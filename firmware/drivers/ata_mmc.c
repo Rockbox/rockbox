@@ -135,18 +135,21 @@ static void swapcopy_sector(const unsigned char *buf);
 static int send_sector(const unsigned char *nextbuf, int timeout);
 static int send_single_sector(const unsigned char *buf, int timeout);
 
-static bool mmc_detect(void);
 static void mmc_tick(void);
 
 /* implementation */
 
-static int select_card(int card_no)
+void mmc_select_clock(int card_no)
 {
     if (card_no == 0)             /* internal */
         or_b(0x10, &PADRH);       /* set clock gate PA12  CHECKME: mask? */
     else                          /* external */
         and_b(~0x10, &PADRH);     /* clear clock gate PA12  CHECKME: mask?*/
-        
+}
+
+static int select_card(int card_no)
+{
+    mmc_select_clock(card_no);
     last_disk_activity = current_tick;
 
     if (!card_info[card_no].initialized)
@@ -760,7 +763,7 @@ void ata_spin(void)
 {
 }
 
-static bool mmc_detect(void)
+bool mmc_detect(void)
 {
     return adc_read(ADC_MMC_SWITCH) < 0x200 ? true : false;
 }

@@ -32,6 +32,9 @@
 #include "button.h"
 #include "sprintf.h"
 #include "hwcompat.h"
+#ifdef HAVE_MMC
+#include "ata_mmc.h"
+#endif
 
 extern void dbg_ports(void); /* NASTY! defined in apps/ */
 
@@ -47,6 +50,9 @@ void screen_dump(void);   /* Nasty again. Defined in apps/ too */
 /* Messages from usb_tick */
 #define USB_INSERTED    1
 #define USB_EXTRACTED   2
+#ifdef HAVE_MMC
+#define USB_REENABLE    3
+#endif
 
 /* Thread states */
 #define EXTRACTING      1
@@ -62,6 +68,10 @@ static int countdown;
 
 static int usb_state;
 
+#ifdef HAVE_MMC
+static int usb_mmc_countdown = 0;
+#endif
+
 /* FIXME: The extra 0x400 is consumed by fat_mount() when the fsinfo
    needs updating */
 static char usb_stack[DEFAULT_STACK_SIZE + 0x400];
@@ -75,6 +85,9 @@ static void usb_enable(bool on)
 #ifdef USB_ENABLE_ONDIOSTYLE
     if(on)
     {
+#ifdef HAVE_MMC
+        mmc_select_clock(mmc_detect() ? 1 : 0);
+#endif
         or_b(0x20, &PADRL); /* enable USB */
         and_b(~0x08, &PADRL); /* assert card detect */
     }
@@ -255,6 +268,22 @@ static void usb_thread(void)
                     }
                 }
                 break;
+
+#ifdef HAVE_MMC
+            case SYS_MMC_INSERTED:
+            case SYS_MMC_EXTRACTED:
+                if(usb_state == USB_INSERTED)
+                {
+                    usb_enable(false);
+                    usb_mmc_countdown = HZ/2; /* re-enable after 0.5 sec */
+                }
+                break;
+
+            case USB_REENABLE:
+                if(usb_state == USB_INSERTED)
+                    usb_enable(true);  /* reenable only if still inserted */
+                break;
+#endif
         }
     }
 }
@@ -308,6 +337,14 @@ static void usb_tick(void)
             }
         }
     }
+#ifdef HAVE_MMC
+    if(usb_mmc_countdown > 0)
+    {
+        usb_mmc_countdown--;
+        if (usb_mmc_countdown == 0)
+            queue_post(&usb_queue, USB_REENABLE, NULL);
+    }
+#endif
 }
 
 void usb_acknowledge(int id)
