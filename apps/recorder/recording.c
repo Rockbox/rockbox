@@ -166,7 +166,7 @@ int rec_create_directory(void)
 
 bool recording_screen(void)
 {
-#ifndef HAVE_RECORDING_KEYPAD
+#ifndef HAVE_RECORDER_KEYPAD
     splash(HZ*2, true, "Recording not supported yet");
     return false;
 #else
