@@ -34,9 +34,9 @@ $(OUTPUT): $(OBJS)
 	@echo "AR $@"
 	@$(AR) ruv $@ $+ >/dev/null 2>&1
 
-$(OBJDIR)/liba52/%.o: $(APPSDIR)/plugins/liba52/%.c
-	mkdir -p $(OBJDIR)/liba52
-	$(CC) -c -O2 $(CFLAGS) -I$(APPSDIR)/plugins/liba52/ $< -o $@
+$(OBJDIR)/liba52/%.o: $(APPSDIR)/codecs/liba52/%.c
+	@mkdir -p $(OBJDIR)/liba52
+	@$(CC) -c -O2 $(CFLAGS) -I$(APPSDIR)/codecs/liba52/ $< -o $@
 
 include $(TOOLSDIR)/make.inc
 
