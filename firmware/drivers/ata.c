@@ -29,16 +29,6 @@
 #include "power.h"
 #include "string.h"
 
-/* Define one of USE_STANDBY, USE_SLEEP or USE_POWEROFF */
-#define USE_SLEEP
-
-/* We can only use power off on the recorder */
-#if !defined(ARCHOS_RECORDER) && defined(USE_POWEROFF)
-#undef USE_POWEROFF
-#define USE_SLEEP
-#endif
-
-
 #define SECTOR_SIZE     512
 #define ATA_DATA        (*((volatile unsigned short*)0x06104100))
 #define ATA_ERROR       (*((volatile unsigned char*)0x06100101))
@@ -92,6 +82,10 @@ static volatile unsigned char* ata_control;
 bool old_recorder = false;
 static bool sleeping = false;
 static int sleep_timeout = 5*HZ;
+static bool poweroff = false;
+#ifdef ARCHOS_RECORDER
+static int poweroff_timeout = 2*HZ;
+#endif
 static char ata_stack[DEFAULT_STACK_SIZE];
 static char ata_thread_name[] = "ata";
 static struct event_queue ata_queue;
@@ -106,10 +100,7 @@ long last_disk_activity = -1;
 static int multisectors; /* number of supported multisectors */
 static unsigned short identify_info[SECTOR_SIZE];
 
-#ifdef USE_POWEROFF
 static int ata_power_on(void);
-#endif
-
 static int perform_soft_reset(void);
 
 static int wait_for_bsy(void) __attribute__ ((section (".icode")));
@@ -177,21 +168,23 @@ int ata_read_sectors(unsigned long start,
 
     mutex_lock(&ata_mtx);
 
+    led(true);
+
     if ( sleeping ) {
-#ifdef USE_POWEROFF
-        if (ata_power_on()) {
-            mutex_unlock(&ata_mtx);
-            return -1;
+        if (poweroff) {
+            if (ata_power_on()) {
+                mutex_unlock(&ata_mtx);
+                return -1;
+            }
         }
-#else
-#ifdef USE_SLEEP
-        if (perform_soft_reset()) {
-            mutex_unlock(&ata_mtx);
-            return -1;
+        else {
+            if (perform_soft_reset()) {
+                mutex_unlock(&ata_mtx);
+                return -1;
+            }
         }
-#endif
-#endif
         sleeping = false;
+        poweroff = false;
     }
 
     if (!wait_for_rdy())
@@ -199,8 +192,6 @@ int ata_read_sectors(unsigned long start,
         mutex_unlock(&ata_mtx);
         return -2;
     }
-
-    led(true);
 
     timeout = current_tick + READ_TIMEOUT;
 
@@ -298,20 +289,20 @@ int ata_write_sectors(unsigned long start,
     mutex_lock(&ata_mtx);
     
     if ( sleeping ) {
-#ifdef USE_POWEROFF
-        if (ata_power_on()) {
-            mutex_unlock(&ata_mtx);
-            return -1;
+        if (poweroff) {
+            if (ata_power_on()) {
+                mutex_unlock(&ata_mtx);
+                return -1;
+            }
         }
-#else
-#ifdef USE_SLEEP
-        if (perform_soft_reset()) {
-            mutex_unlock(&ata_mtx);
-            return -1;
+        else {
+            if (perform_soft_reset()) {
+                mutex_unlock(&ata_mtx);
+                return -1;
+            }
         }
-#endif
-#endif
         sleeping = false;
+        poweroff = false;
     }
     
     if (!wait_for_rdy())
@@ -437,22 +428,15 @@ static int ata_perform_sleep(void)
         return -1;
     }
 
-#ifdef USE_POWEROFF
-    ide_power_enable(false);
-#else
     ATA_SELECT = ata_device;
-#ifdef USE_SLEEP
     ATA_COMMAND = CMD_SLEEP;
-#else
-    ATA_COMMAND = CMD_STANDBY_IMMEDIATE;
-#endif
 
     if (!wait_for_rdy())
     {
         DEBUGF("ata_perform_sleep() - CMD failed\n");
         ret = -2;
     }
-#endif
+
     sleeping = true;
     mutex_unlock(&ata_mtx);
     return ret;
@@ -471,6 +455,7 @@ void ata_spin(void)
 
 static void ata_thread(void)
 {
+    static long last_sleep = 0;
     struct event ev;
     
     while (1) {
@@ -481,12 +466,30 @@ static void ata_thread(void)
                              last_user_activity + sleep_timeout ) &&
                  TIME_AFTER( current_tick, 
                              last_disk_activity + sleep_timeout ) )
+            {
                 ata_perform_sleep();
+                last_sleep = current_tick;
+            }
+
+#ifdef ARCHOS_RECORDER
+            if ( sleeping && poweroff_timeout && !poweroff &&
+                 TIME_AFTER( current_tick, last_sleep + poweroff_timeout ))
+            {
+                mutex_lock(&ata_mtx);
+                ide_power_enable(false);
+                mutex_unlock(&ata_mtx);
+                poweroff = true;
+            }
+#endif
+
             sleep(HZ/4);
         }
         queue_wait(&ata_queue, &ev);
         switch ( ev.id ) {
             case SYS_USB_CONNECTED:
+                if (poweroff)
+                    ata_power_on();
+
                 /* Tell the USB thread that we are safe */
                 DEBUGF("ata_thread got SYS_USB_CONNECTED\n");
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
@@ -562,7 +565,6 @@ int ata_soft_reset(void)
     return ret;
 }
 
-#ifdef USE_POWEROFF
 static int ata_power_on(void)
 {
     int ret;
@@ -586,7 +588,6 @@ static int ata_power_on(void)
     sleeping = false;
     return ret;
 }
-#endif
 
 static int master_slave_detect(void)
 {
