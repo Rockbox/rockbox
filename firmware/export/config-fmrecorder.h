@@ -43,3 +43,5 @@
 /* Define this if you have an FM Radio */
 #define HAVE_FMRADIO 1
 
+/* How to detect USB */
+#define USB_FMRECORDERSTYLE 1

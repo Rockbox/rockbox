@@ -36,3 +36,6 @@
 
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 6
+
+/* How to detect USB */
+#define USB_RECORDERSTYLE 1
