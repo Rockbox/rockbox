@@ -81,7 +81,7 @@ void queue_wait_w_tmo(struct event_queue *q, struct event *ev, int ticks)
     }
 }
 
-void queue_post(struct event_queue *q, int id, void *data)
+void queue_post(struct event_queue *q, long id, void *data)
 {
     int wr;
     int oldlevel;
