@@ -47,6 +47,7 @@ Archos. (Jean Boullier)
 
 <h3>Specs and Papers</h3>
 <ul>
+<li><a href="devicechart.html">Comparison table between all Jukebox models</a>
 <li><a href="/notes.html">Research notes (old, deprecated stuff)</a>
 <li><a href="ports.html">CPU port pin assignments</a>
 <li><a href="datasheets.html">Data sheets</a>
