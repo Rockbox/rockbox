@@ -69,6 +69,9 @@ bool sleeptimer_screen(void)
         button = button_get_w_tmo(HZ);
         switch(button)
         {
+#ifdef SETTINGS_OK2
+            case SETTINGS_OK2:
+#endif
             case SETTINGS_OK:
                 done = true;
                 break;
