@@ -461,7 +461,7 @@ void settings_apply(void)
     backlight_set_on_when_charging(global_settings.backlight_on_when_charging);
     ata_spindown(global_settings.disk_spindown);
 
-#ifdef ATA_POWER_OFF
+#ifdef HAVE_ATA_POWER_OFF
     ata_poweroff(global_settings.disk_poweroff);
 #endif
 
