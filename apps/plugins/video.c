@@ -46,7 +46,7 @@
 
 // trigger levels, we need about 80 kB/sec
 #define PRECHARGE (1024 * 64) // the initial filling before starting to play
-#define SPINUP 2500 // 2200 // from what level on to refill, in milliseconds
+#define SPINUP 3300 // from what level on to refill, in milliseconds
 #define CHUNK (1024*32) // read size
 
 
@@ -537,6 +537,8 @@ int PlayTick(int fd)
     int retval = 1;
     int filepos;
 
+    // check buffer level
+    
     if (gPlay.bHasAudio)
         avail_audio = Available(gBuf.pReadAudio);
     if (gPlay.bHasVideo)
@@ -549,7 +551,8 @@ int PlayTick(int fd)
     }
 
     if ((!gPlay.bHasAudio || gPlay.bAudioUnderrun)
-     && (!gPlay.bHasVideo || gPlay.bVideoUnderrun))
+     && (!gPlay.bHasVideo || gPlay.bVideoUnderrun)
+     && gBuf.bEOF)
         return 0; // all expired
 
     if (!gPlay.bRefilling || gBuf.bEOF)
@@ -593,6 +596,8 @@ int PlayTick(int fd)
         rb->yield(); // have mercy with the other threads
         button = rb->button_get(false);
     }
+
+    // check keypresses
 
     if (button != BUTTON_NONE)
     {
@@ -678,6 +683,9 @@ int PlayTick(int fd)
         }
     } /*  if (button != BUTTON_NONE) */
 
+    
+    // handle seeking
+    
     if (gPlay.bSeeking) // seeking?
     {
         if (gPlay.nSeekAcc < -MAX_ACC)
@@ -694,6 +702,27 @@ int PlayTick(int fd)
             gPlay.nSeekPos -= gPlay.nSeekPos % gBuf.granularity;
         }
         DrawPosition(gPlay.nSeekPos, rb->filesize(fd));
+    }
+
+
+    // check + recover underruns
+    
+    if ((gPlay.bAudioUnderrun || gPlay.bVideoUnderrun) && !gBuf.bEOF)
+    {
+        filepos = rb->lseek(fd, 0, SEEK_CUR);
+
+        if (gPlay.bHasVideo && gPlay.bVideoUnderrun)
+        {
+            gStats.nVideoUnderruns++;
+            filepos -= Available(gBuf.pReadVideo); // take video position
+            SeekTo(fd, filepos);
+        }
+        else if (gPlay.bHasAudio && gPlay.bAudioUnderrun)
+        {
+            gStats.nAudioUnderruns++;
+            filepos -= Available(gBuf.pReadAudio); // else audio
+            SeekTo(fd, filepos);
+        }
     }
 
     return retval;
@@ -831,21 +860,21 @@ int main(char* filename)
 
     // display statistics
     rb->lcd_clear_display();
-    rb->snprintf(gPrint, sizeof(gPrint), "AudioUnderrun: %d", gPlay.bAudioUnderrun);
+    rb->snprintf(gPrint, sizeof(gPrint), "%d Audio Underruns", gStats.nAudioUnderruns);
     rb->lcd_puts(0, 0, gPrint);
-    rb->snprintf(gPrint, sizeof(gPrint), "VideoUnderrun: %d", gPlay.bVideoUnderrun);
+    rb->snprintf(gPrint, sizeof(gPrint), "%d Video Underruns", gStats.nVideoUnderruns);
     rb->lcd_puts(0, 1, gPrint);
-    rb->snprintf(gPrint, sizeof(gPrint), "MinAudio: %d bytes", gStats.minAudioAvail);
+    rb->snprintf(gPrint, sizeof(gPrint), "%d MinAudio bytes", gStats.minAudioAvail);
     rb->lcd_puts(0, 2, gPrint);
-    rb->snprintf(gPrint, sizeof(gPrint), "MinVideo: %d bytes", gStats.minVideoAvail);
+    rb->snprintf(gPrint, sizeof(gPrint), "%d MinVideo bytes", gStats.minVideoAvail);
     rb->lcd_puts(0, 3, gPrint);
     rb->snprintf(gPrint, sizeof(gPrint), "ReadChunk: %d", gBuf.nReadChunk);
     rb->lcd_puts(0, 4, gPrint);
     rb->snprintf(gPrint, sizeof(gPrint), "SeekChunk: %d", gBuf.nSeekChunk);
     rb->lcd_puts(0, 5, gPrint);
-    rb->snprintf(gPrint, sizeof(gPrint), "1st Video: %d", gFileHdr.video_1st_frame);
+    rb->snprintf(gPrint, sizeof(gPrint), "LowWater: %d", gBuf.low_water);
     rb->lcd_puts(0, 6, gPrint);
-    rb->snprintf(gPrint, sizeof(gPrint), "pBufStart: %x", gBuf.pBufStart);
+    rb->snprintf(gPrint, sizeof(gPrint), "HighWater: %d", gBuf.high_water);
     rb->lcd_puts(0, 7, gPrint);
  
     rb->lcd_update();
