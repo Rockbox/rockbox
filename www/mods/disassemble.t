@@ -23,7 +23,7 @@ Do the same on the side.
 <p><img src="b9.jpg"> <img src="b11.jpg">
 <br>
 You have now freed one end of the Archos.
-Now lift the blue rubber bumbers up from the circuit board on the other end, and simply slide the Archos out of its' back plate.
+Now lift the blue rubber bumbers up from the circuit board on the other end, and simply slide the Archos out of its back plate.
 
 <p><i>Björn</i>
 
