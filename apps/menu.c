@@ -289,7 +289,7 @@ int menu_show(int m)
 #endif
 
     /* Put the cursor on the first line and draw the menu */
-    put_cursor(m, 0);
+    put_cursor(m, menus[m].cursor);
 
     while (!exit) {
         key = button_get_w_tmo(HZ/2);
