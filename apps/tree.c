@@ -269,29 +269,19 @@ static int play_dirname(int start_index)
     return 1;
 }
 
-static int play_filename(char *dir, char *file)
+static void play_filename(char *dir, char *file)
 {
-    int fd;
     char name_mp3_filename[MAX_PATH+1];
 
     if (mpeg_status() & MPEG_STATUS_PLAY)
-        return 0;
+        return;
 
-    if (strcasecmp(&file[strlen(file) - strlen(TALK_EXT)], TALK_EXT))
+    if (strcasecmp(&file[strlen(file) - strlen(file_thumbnail_ext)],
+                    file_thumbnail_ext))
     {   /* file has no .talk extension */
         snprintf(name_mp3_filename, sizeof(name_mp3_filename),
-            "%s/%s" TALK_EXT, dir, file);
+            "%s/%s%s", dir, file, file_thumbnail_ext);
 
-        /* check if a corresponding .talk file exists */
-        DEBUGF("Checking for Filename Thumb %s\n", name_mp3_filename);
-        fd = open(name_mp3_filename, O_RDONLY);
-        if (fd < 0)
-        {
-	        DEBUGF("Failed to find: %s\n", name_mp3_filename);
-	        return -1;
-        }
-        DEBUGF("Found: %s\n", name_mp3_filename);
-        close(fd);
         talk_file(name_mp3_filename, false);
     }
     else
@@ -301,8 +291,6 @@ static int play_filename(char *dir, char *file)
         talk_id(LANG_VOICE_DIR_HOVER, false); /* prefix it */
         talk_file(name_mp3_filename, true);
     }
-
-    return 1;
 }
 
 static int compare(const void* p1, const void* p2)
@@ -387,6 +375,94 @@ static void showfileline(int line, int direntry, bool scroll, const int *dirfilt
     if (dotpos)
         *dotpos = '.';
 }
+
+/* walk a directory and check all dircache entries if a .talk file exists */
+void check_file_thumbnails(const char *dirname, int num_files)
+{
+    int i;
+    struct dirent *entry;
+    DIR *dir;
+    
+    dir = opendir(dirname);
+    if(!dir)
+        return;
+
+    for (i=0; i<num_files; i++) /* mark all files as non talking, except the .talk ones */
+    {
+        if (dircache[i].attr & ATTR_DIRECTORY)
+            continue; /* we're not touching directories */
+
+        if (strcasecmp(file_thumbnail_ext,
+            &dircache[i].name[strlen(dircache[i].name)
+                              - strlen(file_thumbnail_ext)]))
+        {   /* no .talk file */
+            dircache[i].attr &= ~TREE_ATTR_THUMBNAIL; /* clear */
+        }
+        else
+        {   /* .talk file, we later let them speak themselves */
+            dircache[i].attr |= TREE_ATTR_THUMBNAIL; /* set */
+        }
+    }
+    
+    while((entry = readdir(dir)) != 0) /* walk directory */
+    {
+        int ext_pos;
+
+        ext_pos = strlen(entry->d_name) - strlen(file_thumbnail_ext);
+        if (ext_pos <= 0 /* too short to carry ".talk" */
+            || (entry->attribute & ATTR_DIRECTORY) /* no file */
+            || strcasecmp(&entry->d_name[ext_pos], file_thumbnail_ext))
+        {   /* or doesn't end with ".talk", no candidate */
+            continue; 
+        }
+        
+        /* terminate the (disposable) name in dir buffer,
+           this truncates off the ".talk" without needing an extra buffer */
+        entry->d_name[ext_pos] = '\0';
+        
+        /* search corresponding file in dir cache */
+        for (i=0; i<num_files; i++)
+        {
+            if (!strcasecmp(dircache[i].name, entry->d_name))
+            {   /* match */
+                dircache[i].attr |= TREE_ATTR_THUMBNAIL; /* set the flag */
+                break; /* exit search loop, because we found it */
+            }
+        }
+    }
+    closedir(dir);
+}
+
+/* check all dircache directories if they contain a "_dirname.talk" file */
+#if 0 /* not practical, this is too slow */
+void check_dir_thumbnails(const char *dirname, int num_files)
+{
+    int i;
+    int fd;
+    char clipfile[MAX_PATH];
+
+    for (i=0; i<num_files; i++)
+    {
+        if (!(dircache[i].attr & ATTR_DIRECTORY))  
+            continue; /* only directories are interesting */
+        
+        /* compose pathname of directory name clip file */
+        snprintf(clipfile, sizeof(clipfile), "%s%s/%s",
+            dirname, dircache[i].name, dir_thumbnail_name);
+
+        fd = open(clipfile, O_RDONLY); /* check if exists */
+        if (fd >= 0)
+        {   /* there is one */
+            dircache[i].attr |= TREE_ATTR_THUMBNAIL; /* set the flag */
+            close(fd);
+        }
+        else
+        {   /* none found, clear the flag */
+            dircache[i].attr &= ~TREE_ATTR_THUMBNAIL;
+        }
+    }
+}
+#endif /* #if 0 */
 
 /* load sorted directory into dircache.  returns NULL on failure. */
 struct entry* load_and_sort_directory(const char *dirname, const int *dirfilter,
@@ -490,6 +566,14 @@ struct entry* load_and_sort_directory(const char *dirname, const int *dirfilter,
     lastdir[sizeof(lastdir)-1] = 0;
     qsort(dircache,i,sizeof(struct entry),compare);
 
+    /* If thumbnail talking is enabled, make an extra run to mark files with 
+       associated thumbnails, so we don't do unsuccessful spinups later. */
+    if (global_settings.talk_file == 3)
+        check_file_thumbnails(dirname, i); /* map .talk to ours */
+#if 0 /* not practical, this is too slow */
+    if (global_settings.talk_dir == 3)
+        check_dir_thumbnails(dirname, i); /* try in the directories */
+#endif /* #if 0 */
     return dircache;
 }
 
@@ -1373,15 +1457,12 @@ static bool dirbrowse(const char *root, const int *dirfilter)
                         }
                     }
                     else
-                    {
+                    { 
                         DEBUGF("Playing file thumbnail: %s/%s%s\n", 
-                            currdir, dircache[lasti].name, TALK_EXT);
-                        res = play_filename(currdir, dircache[lasti].name);
-                        if (res < 0) /* failed, not existing */
-                        {   /* say the number instead, as a fallback */
-                            play_filenumber(lasti-dirsindir+1, 
-                                dircache[lasti].attr);
-                        }
+                            currdir, dircache[lasti].name, file_thumbnail_ext);
+                        /* no fallback necessary, we knew in advance 
+                           that the file exists */
+                        play_filename(currdir, dircache[lasti].name);
                     }
                     thumbnail_time = -1; /* job done */
                 }
@@ -1501,20 +1582,30 @@ static bool dirbrowse(const char *root, const int *dirfilter)
                         talk_spell(dircache[i].name, false);
                     }
                 }
-                else if (global_settings.talk_file == 1) /* files as numbers */
+                else /* file */
                 {
-                    play_filenumber(i-dirsindir+1, 
-                                    dircache[i].attr & TREE_ATTR_MASK);
+                    int voicemethod = global_settings.talk_file;
+                    if (voicemethod == 3) /* thumbnail clip */
+                    {   /* "schedule" a thumbnail, to have a little delay */
+                        if (dircache[i].attr & TREE_ATTR_THUMBNAIL)
+                        {
+                            thumbnail_time = current_tick + HOVER_DELAY;
+                        }
+                        else
+                        {   /* say the number as fallback */
+                            voicemethod = 1;
+                        }
+                    }
+                    if (voicemethod == 1) /* files as numbers */
+                    {
+                        play_filenumber(i-dirsindir+1, 
+                                        dircache[i].attr & TREE_ATTR_MASK);
+                    }
+                    else if (voicemethod == 2) /* files spelled */
+                    {
+                        talk_spell(dircache[i].name, false);
+                    }
                 }
-                else if (global_settings.talk_file == 2) /* files spelled */
-                {
-                    talk_spell(dircache[i].name, false);
-                }
-                else if (global_settings.talk_file == 3) /* hover */
-                {   /* "schedule" a thumbnail, to have a little dalay */
-                    thumbnail_time = current_tick + HOVER_DELAY;
-                }
-
             }
         }
 

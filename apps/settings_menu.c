@@ -924,8 +924,16 @@ static bool voice_dirs(void)
 
 static bool voice_files(void)
 {
-    return set_option( str(LANG_VOICE_FILE), 
+    int oldval = global_settings.talk_file;
+    bool ret;
+    ret = set_option( str(LANG_VOICE_FILE), 
                        &global_settings.talk_file, INT, voice_names, 4, NULL);
+    if (oldval != 3 && global_settings.talk_file == 3)
+    {   /* force reload if newly talking thumbnails, 
+           because the clip presence is cached only if enabled */  
+        reload_directory();
+    }
+    return ret;
 }
 
 static bool voice_menu(void)

@@ -54,9 +54,9 @@ enum {
 /* convenience macro to have both virtual pointer and ID as arguments */
 #define STR(id) ID2P(id), id
 
-/* publish this string, so it's stored only once (better than #define) */
+/* publish these strings, so they're stored only once (better than #define) */
 extern const char* const dir_thumbnail_name; /* "_dirname.talk" */
-#define TALK_EXT ".talk" /* extra extension for file voicing */
+extern const char* const file_thumbnail_ext; /* ".talk" for file voicing */
 
 void talk_init(void);
 int talk_buffer_steal(void); /* claim the mp3 buffer e.g. for play/record */

@@ -39,6 +39,7 @@
 #define QUEUE_SIZE 64 /* must be a power of two */
 #define QUEUE_MASK (QUEUE_SIZE-1)
 const char* const dir_thumbnail_name = "_dirname.talk";
+const char* const file_thumbnail_ext = ".talk";
 
 /***************** Functional Macros *****************/
 

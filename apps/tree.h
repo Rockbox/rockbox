@@ -88,7 +88,10 @@ struct filetype {
 };
  
 
-/* using attribute not used by FAT */
+/* using attribute bits not used by FAT (FAT uses lower 6) */
+
+#define TREE_ATTR_THUMBNAIL 0x0080 /* corresponding .talk file exists */
+
 /* (this also reflects the sort order if by type) */
 #define TREE_ATTR_BMARK 0x0100 /* book mark file */
 #define TREE_ATTR_M3U   0x0200 /* playlist */
@@ -99,7 +102,7 @@ struct filetype {
 #define TREE_ATTR_LNG   0x0700 /* binary lang file */
 #define TREE_ATTR_ROCK  0x0800 /* binary rockbox plugin */
 #define TREE_ATTR_MOD   0x0900 /* firmware file */
-#define TREE_ATTR_MASK  0xFFC0 /* which bits tree.c uses (above) */
+#define TREE_ATTR_MASK  0xFF00 /* which bits tree.c uses for file types */
 
 void tree_get_filetypes(const struct filetype**, int*);
 void tree_init(void);
