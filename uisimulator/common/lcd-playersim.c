@@ -209,7 +209,7 @@ void lcd_clear_display(void)
     int x, y;
     for (y=0; y<2; y++) {
       for (x=0; x<11; x++) {
-        lcd_buffer[y][x++]=lcd_ascii[' '];
+        lcd_buffer[y][x]=lcd_ascii[' '];
       }
     }
     lcd_update();
@@ -218,8 +218,17 @@ void lcd_clear_display(void)
 void lcd_puts(int x, int y, unsigned char *str)
 {
     int i;
-    for (i=0; *str && x<11; i++)
-        lcd_buffer[y][x++]=lcd_ascii[*str++];
+    DEBUGF("lcd_puts(%d, %d, \"", x, y);
+    for (i=0; *str && x<11; i++) {
+#ifdef DEBUGF
+        if (*str>=32 && *str<128)
+            {DEBUGF("%c", *str);}
+        else
+            {DEBUGF("(0x%02x)", *str);}
+#endif
+      lcd_buffer[y][x++]=lcd_ascii[*str++];
+    }
+    DEBUGF("\")\n");
     for (; x<11; x++)
         lcd_buffer[y][x]=lcd_ascii[' '];
     lcd_update();
@@ -230,6 +239,8 @@ void lcd_double_height(bool on)
     double_height = 1;
     if (on)
         double_height = 2;
+    lcd_display_redraw=true;
+    lcd_update();
 }
 
 void lcd_define_pattern(int which, char *pattern, int length)
@@ -239,7 +250,7 @@ void lcd_define_pattern(int which, char *pattern, int length)
     char icon[8];
     memset(icon, 0, sizeof icon);
 
-    DEBUGF("Defining pattern %d\n", pat);
+    DEBUGF("Defining pattern %d:", pat);
     for (j = 0; j <= 5; j++) {
         for (i = 0; i < length; i++) {
             if ((pattern[i])&(1<<(j)))
@@ -248,8 +259,10 @@ void lcd_define_pattern(int which, char *pattern, int length)
     }
     for (i = 1; i <= 5; i++)
     {
+        DEBUGF(" 0x%02x", icon[i]);
         (*font_player)[pat][i-1] = icon[i];
     }
+    DEBUGF("\n");
     lcd_display_redraw=true;
     lcd_update();
 }
@@ -258,6 +271,7 @@ extern void lcd_puts(int x, int y, unsigned char *str);
 
 void lcd_putc(int x, int y, unsigned char ch)
 {
+    DEBUGF("lcd_putc(%d, %d, %d '0x%02x')\n", x, y, ch, ch);
     lcd_buffer[y][x]=lcd_ascii[ch];
     lcd_update();
 }
