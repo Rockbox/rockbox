@@ -69,6 +69,6 @@ void app_main(void)
       break;
     }
     lcd_update();
-    Logf("key %x cursor at %d\n", key, cursor);
+    sleep(1);
   }
 }
