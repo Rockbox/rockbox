@@ -843,7 +843,7 @@ static void say_time(int cursorpos, struct tm *tm)
     }
     
     if (cursorpos == 4) /* month */
-        talk_id(LANG_MONTH_JANUARY + value - 1, false);
+        talk_id(LANG_MONTH_JANUARY + tm->tm_mon, false);
     else
         talk_value(value, unit[cursorpos], false);
 }
