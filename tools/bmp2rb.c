@@ -140,7 +140,6 @@ int read_bmp_file(char* filename,
         close(fd);
         return 3;
       }
-      debugf("Bitmap is %d pixels wide\n", readlong(fh.Width));
 
       /* Exit if too high */
       if(readlong(fh.Height) > 64)
@@ -150,7 +149,6 @@ int read_bmp_file(char* filename,
         close(fd);
 	return 4;
       }
-      debugf("Bitmap is %d pixels heigh\n", readlong(fh.Height));
 
       for(l=0;l < 2;l++)
       {
@@ -243,7 +241,14 @@ void generate_c_source(char *id, int width, int height, unsigned char *bitmap)
 
    f = stdout;
 
-   fprintf(f, "\nconst unsigned char %s[] = {\n", id);
+   if(!id || !id[0])
+     id = "bitmap";
+
+   fprintf(f,
+           "#define BMPHEIGHT_%s %d"
+           "\n#define BMPWIDTH_%s %d"
+           "\nconst unsigned char %s[] = {\n",
+           id, height, id, width, id );
 
    for(i=0, eline=0; i< height; i+=8, eline++) {
        for (a=0; a<width; a++) fprintf(f, "0x%02x, ", bitmap[eline*width + a]);
