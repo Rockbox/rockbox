@@ -27,14 +27,6 @@
 <p>The purpose of this project is to write an Open Source replacement
 firmware for the Archos Jukebox <i>6000</i>, <i>Studio</i> and <i>Recorder</i> MP3 players.
 
-<p>The main emphasis and first target is the Jukebox 6000.
-
-#if 0
-<h2>Warning</h2>
-<p>All firmware mods on this page are still <i><b>highly experimental</b></i>.
-Try them on your own risk. If you are not 100% sure of what you are doing, keep cool.
-#endif
-
 <h2>Activity</h2>
 
 #include "activity.html"
