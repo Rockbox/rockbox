@@ -57,7 +57,7 @@ typedef struct {
 typedef struct DIRtag
 {
     struct dirent   fd;
-    intptr_t        handle;
+    int             handle;
 } DIR;
 #endif //   WIN32
 #endif // SIMULATOR
