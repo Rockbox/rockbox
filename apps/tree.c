@@ -644,19 +644,21 @@ static bool dirbrowse(void)
 
     if (*tc.dirfilter < NUM_FILTER_MODES)
         start_resume(true);
-    
-    numentries = showdir();
-    if (numentries == -1)
-        return false;  /* currdir is not a directory */
-    
-    if (*tc.dirfilter > NUM_FILTER_MODES && numentries==0)
-    {
-        splash(HZ*2, true, str(LANG_NO_FILES));
-        return false;  /* No files found for rockbox_browser() */
-    }
-    update_all = true;
 
-    put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, true);
+    if (!start_wps) {
+        numentries = showdir();
+        if (numentries == -1)
+            return false;  /* currdir is not a directory */
+    
+        if (*tc.dirfilter > NUM_FILTER_MODES && numentries==0)
+        {
+            splash(HZ*2, true, str(LANG_NO_FILES));
+            return false;  /* No files found for rockbox_browser() */
+        }
+        update_all = true;
+
+        put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, true);
+    }
 
     while(1) {
         struct entry *dircache = tc.dircache;
