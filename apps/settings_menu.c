@@ -759,8 +759,8 @@ static bool display_settings_menu(void)
         { str(LANG_PM_MENU),         peak_meter_menu },  
         { str(LANG_VOLUME_DISPLAY),  volume_type },
         { str(LANG_BATTERY_DISPLAY), battery_type },
-        { str(LANG_CAPTION_BACKLIGHT), caption_backlight },
 #endif
+        { str(LANG_CAPTION_BACKLIGHT), caption_backlight },
     };
     
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
