@@ -122,6 +122,14 @@ int open(char* pathname, int flags)
 
 int close(int fd)
 {
+    if (fd < 0 || fd > MAX_OPEN_FILES-1) {
+        errno = EINVAL;
+        return -1;
+    }
+    if (!openfiles[fd].busy) {
+        errno = EBADF;
+        return -1;
+    }
     openfiles[fd].busy = false;
     return 0;
 }
