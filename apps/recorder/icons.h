@@ -90,7 +90,7 @@ extern unsigned char slider_bar[];
 
 extern void statusbar_wipe(void);
 extern void statusbar_icon_battery(int percent, bool charging);
-extern void statusbar_icon_volume(int percent);
+extern bool statusbar_icon_volume(int percent);
 extern void statusbar_icon_play_state(int state);
 extern void statusbar_icon_play_mode(int mode);
 extern void statusbar_icon_shuffle(void);

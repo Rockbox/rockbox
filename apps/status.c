@@ -54,6 +54,7 @@ struct status_info {
     bool shuffle;
     bool keylock;
     bool battery_safe;
+    bool redraw_volume; /* true if the volume gauge needs updating */
 };
 
 void status_init(void)
@@ -158,7 +159,8 @@ void status_draw(bool force_redraw)
     /* only redraw if forced to, or info has changed */
     if (force_redraw ||
         info.inserted ||
-        !info.battery_safe || 
+        !info.battery_safe ||
+        info.redraw_volume ||
         memcmp(&info, &lastinfo, sizeof(struct status_info)))
     {
         lcd_clearrect(0,0,LCD_WIDTH,8);
@@ -213,7 +215,7 @@ void status_draw(bool force_redraw)
         if (battery_state)
             statusbar_icon_battery(info.battlevel, plug_state);
             
-        statusbar_icon_volume(info.volume);
+        info.redraw_volume = statusbar_icon_volume(info.volume);
         statusbar_icon_play_state(current_playmode() + Icon_Play);
         switch (info.repeat) {
             case REPEAT_ONE:

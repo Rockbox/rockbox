@@ -205,7 +205,7 @@ void statusbar_icon_battery(int percent, bool charging)
 /*
  * Print volume gauge to status bar
  */
-void statusbar_icon_volume(int percent)
+bool statusbar_icon_volume(int percent)
 {
     int i,j;
     int volume;
@@ -213,6 +213,8 @@ void statusbar_icon_volume(int percent)
     int step=0;
     char buffer[4];
     unsigned int width, height;
+    bool needs_redraw = false;
+    int type = global_settings.volume_type;
 #if defined(LOADABLE_FONTS)
     unsigned char *font;
 #endif
@@ -231,13 +233,20 @@ void statusbar_icon_volume(int percent)
                    STATUSBAR_Y_POS, 7, STATUSBAR_HEIGHT, false);
     }
     else {
+        /* We want to redraw the icon later on */
         if (last_volume != volume && last_volume >= 0) {
             switch_tick = current_tick + HZ;
         }
 
+        /* If the timeout hasn't yet been reached, we show it numerically
+           and tell the caller that we want to be called again */
+        if(TIME_BEFORE(current_tick,switch_tick)) {
+            type = 1;
+            needs_redraw = true;
+        }
+        
         /* display volume level numerical? */
-        if (global_settings.volume_type || 
-            TIME_BEFORE(current_tick,switch_tick)) 
+        if (type)
         {
             snprintf(buffer, sizeof(buffer), "%2d", percent);
             lcd_setfont(FONT_SYSFIXED);
@@ -259,6 +268,8 @@ void statusbar_icon_volume(int percent)
         }
     }
     last_volume = volume;
+
+    return needs_redraw;
 }
 
 /*
