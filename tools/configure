@@ -83,13 +83,13 @@ VERSION=\$(shell date +%y%m%d-%H%M)
 all: sim
 
 sim:
-	make -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR) VERSION=\$(VERSION)
+	\$(MAKE) -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR) VERSION=\$(VERSION)
 
 clean-sim:
-	make -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR) clean
+	\$(MAKE) -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR) clean
 
 clean:
-	make clean-sim
+	\$(MAKE) clean-sim
 
 EOF
 
@@ -266,19 +266,19 @@ VERSION=\$(shell date +%y%m%d-%H%M)
 all: firmware apps
 
 firmware:
-	make -C \$(FIRMDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR)
+	\$(MAKE) -C \$(FIRMDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR)
 
 apps:
-	make -C \$(APPSDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) VERSION=\$(VERSION)
+	\$(MAKE) -C \$(APPSDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) VERSION=\$(VERSION)
 
 clean-firmware:
-	make -C \$(FIRMDIR) TARGET=\$(TARGET) OBJDIR=\$(THISDIR) clean
+	\$(MAKE) -C \$(FIRMDIR) TARGET=\$(TARGET) OBJDIR=\$(THISDIR) clean
 
 clean-apps:
-	make -C \$(APPSDIR) TARGET=\$(TARGET) OBJDIR=\$(THISDIR) clean
+	\$(MAKE) -C \$(APPSDIR) TARGET=\$(TARGET) OBJDIR=\$(THISDIR) clean
 
 clean:
-	make clean-firmware clean-apps
+	\$(MAKE) clean-firmware clean-apps
 
 EOF
 
