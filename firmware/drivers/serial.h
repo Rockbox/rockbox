@@ -21,5 +21,6 @@
 #define __SERIAL_H__
 
 extern void serial_setup (void);
+extern int remote_control_rx(void);
 
 #endif

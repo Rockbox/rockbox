@@ -43,84 +43,105 @@ static void screen_dump(void);
 
 void serial_setup (void) 
 { 
-    char dummy;
-    dummy = SSR1;
-    SSR1 = 0;
     SMR1 = 0x00;
     SCR1 = 0;
     BRR1 = (FREQ/(32*9600))-1;
+    SSR1 &= 0; /* The status bits must be read before they are cleared,
+                  so we do an AND operation */
 
-    /* let the hardware settle */
+    /* Let the hardware settle. The serial port needs to wait "at least
+       the interval required to transmit or receive one bit" before it
+       can be used. */
     sleep(1);
 
-    SCR1 = 0x50;
-
-    /* This enables the serial Rx interrupt*/
-    IPRE = (IPRE & 0x0FFF) | 0x8000; /* Set to medium priority */
+    SCR1 = 0x10; /* Enable the receiver, no interrupt */
 }
 
-static void process_byte(int byte)
+/* This function returns the received remote control code only if it is
+   received without errors before or after the reception.
+   It therefore returns the received code on the second call after the
+   code has been received. */
+int remote_control_rx(void)
 {
-    int btn = 0;
+    static int last_valid_button = BUTTON_NONE;
+    static int last_was_error = false;
+    int btn;
+    int ret = BUTTON_NONE;
+    
+    /* Errors? Just clear'em. The receiver stops if we don't */
+    if(SSR1 & (SCI_ORER | SCI_FER | SCI_PER)) {
+        SSR1 &= ~(SCI_ORER | SCI_FER | SCI_PER);
+        last_valid_button = BUTTON_NONE;
+        last_was_error = true;
+        return BUTTON_NONE;
+    }
 
-    switch (byte)
-    {
-        case STOP:
+    if(SSR1 & SCI_RDRF) {
+        /* Read byte and clear the Rx Full bit */
+        btn = RDR1;
+        SSR1 &= ~SCI_RDRF;
+
+        if(last_was_error)
+        {
+            last_valid_button = BUTTON_NONE;
+            ret = BUTTON_NONE;
+        }
+        else
+        {
+            switch (btn)
+            {
+                case STOP:
 #ifdef HAVE_RECORDER_KEYPAD
-            btn = BUTTON_OFF;
+                    last_valid_button = BUTTON_OFF;
 #else
-            btn = BUTTON_STOP;
+                    last_valid_button = BUTTON_STOP;
 #endif
-            break;
-
-        case PLAY:
-            btn = BUTTON_PLAY;
-            break;
-
-        case VOLUP:
-            btn = BUTTON_VOL_UP;
-            break;
-
-        case VOLDN:
-            btn = BUTTON_VOL_DOWN;
-            break;
-
-        case PREV:
-            btn = BUTTON_LEFT;
-            break;
-
-        case NEXT:
-            btn = BUTTON_RIGHT;
-            break;
-            
+                    break;
+                    
+                case PLAY:
+                    last_valid_button = BUTTON_PLAY;
+                    break;
+                    
+                case VOLUP:
+                    last_valid_button = BUTTON_VOL_UP;
+                    break;
+                    
+                case VOLDN:
+                    last_valid_button = BUTTON_VOL_DOWN;
+                    break;
+                    
+                case PREV:
+                    last_valid_button = BUTTON_LEFT;
+                    break;
+                    
+                case NEXT:
+                    last_valid_button = BUTTON_RIGHT;
+                    break;
+                    
 #ifdef SCREENDUMP
-        case SCRDMP:
-            screen_dump();
-            break;
+                case SCRDMP:
+                    screen_dump();
+                    break;
 #endif
+                default:
+                    last_valid_button = BUTTON_NONE;
+                    break;
+            }
+        }
     }
-
-    if ( btn ) {
-        queue_post(&button_queue, btn, NULL);
-        backlight_on();
-        queue_post(&button_queue, btn | BUTTON_REL, NULL);
+    else
+    {
+        /* This means that a valid remote control character was received
+           the last time we were called, with no receiver errors either before
+           or after. Then we can assume that there really is a remote control
+           attached, and return the button code. */
+        ret = last_valid_button;
+        last_valid_button = BUTTON_NONE;
     }
-}
+    
+    last_was_error = false;
 
-#pragma interrupt
-void REI1 (void)
-{
-    SSR1 = SSR1 & ~0x10; /* Clear FER */
-    SSR1 = SSR1 & ~0x40; /* Clear RDRF */
-}
-
-#pragma interrupt
-void RXI1 (void)
-{
-    unsigned char serial_byte;
-    serial_byte = RDR1;
-    SSR1 = SSR1 & ~0x40; /* Clear RDRF */
-    process_byte(serial_byte);
+    return ret;
 }
 
 #ifdef SCREENDUMP

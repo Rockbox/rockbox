@@ -28,6 +28,7 @@
 #include "kernel.h"
 #include "backlight.h"
 #include "adc.h"
+#include "serial.h"
 
 struct event_queue button_queue;
 
@@ -52,18 +53,27 @@ static int button_read(void);
 
 static void button_tick(void)
 {
-    static int tick=0;
-    static int count=0;
-    static int lastbtn=0;
-    static int repeat_speed=REPEAT_INTERVAL_START;
-    static bool repeat=false;
+    static int tick = 0;
+    static int count = 0;
+    static int lastbtn = 0;
+    static int repeat_speed = REPEAT_INTERVAL_START;
+    static bool repeat = false;
     int diff;
+    int btn;
 
+    /* Post events for the remote control */
+    btn = remote_control_rx();
+    if(btn)
+    {
+        queue_post(&button_queue, btn, NULL);
+        backlight_on();
+    }   
+    
     /* only poll every X ticks */
     if ( ++tick >= POLL_FREQUENCY )
     {
         bool post = false;
-        int btn = button_read();
+        btn = button_read();
         
         /* Find out if a key has been released */
         diff = btn ^ lastbtn;
@@ -91,7 +101,7 @@ static void button_tick(void)
                     if (count == 0) {
                         post = true;
                         /* yes we have repeat */
-			repeat_speed--;
+                        repeat_speed--;
                         if (repeat_speed < REPEAT_INTERVAL_FINISH)
                            repeat_speed = REPEAT_INTERVAL_FINISH;
                         count = repeat_speed;
