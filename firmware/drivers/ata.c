@@ -80,6 +80,7 @@ int ata_io_address; /* 0x300 or 0x200, only valid on recorder */
 static volatile unsigned char* ata_control;
 
 bool old_recorder = false;
+int ata_spinup_time = 0;
 static bool sleeping = false;
 static int sleep_timeout = 5*HZ;
 static bool poweroff = false;
@@ -186,6 +187,7 @@ int ata_read_sectors(unsigned long start,
         }
         sleeping = false;
         poweroff = false;
+        ata_spinup_time = current_tick - last_disk_activity;
     }
 
     ATA_SELECT = ata_device;
@@ -307,6 +309,7 @@ int ata_write_sectors(unsigned long start,
         }
         sleeping = false;
         poweroff = false;
+        ata_spinup_time = current_tick - last_disk_activity;
     }
     
     ATA_SELECT = ata_device;

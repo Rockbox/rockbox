@@ -1107,7 +1107,7 @@ static bool dbg_disk_info(void)
     bool done = false;
     int i;
     int page = 0;
-    const int max_page = 2;
+    const int max_page = 3;
     unsigned short* identify_info = ata_get_identify();
 
     while(!done)
@@ -1146,6 +1146,13 @@ static bool dbg_disk_info(void)
                       (unsigned)identify_info[60]) / 2048 );
             lcd_puts(0, y++, "Size");
             lcd_puts(0, y++, buf);
+            break;
+
+        case 3:
+            snprintf(buf, sizeof buf, "%d ms", ata_spinup_time * (1000/HZ));
+            lcd_puts(0, y++, "Spinup time");
+            lcd_puts(0, y++, buf);
+            break;
         }
         lcd_update();
 

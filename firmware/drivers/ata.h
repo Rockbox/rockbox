@@ -48,5 +48,6 @@ extern void ata_spin(void);
 extern unsigned short* ata_get_identify(void);
 
 extern long last_disk_activity;
+extern int ata_spinup_time; /* ticks */
 
 #endif
