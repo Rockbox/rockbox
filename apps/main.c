@@ -56,12 +56,12 @@ int init(void)
 
     system_init();
     
-#ifdef HAVE_LCD_BITMAP
-    lcd_init();
-#endif
-    show_logo();
     dmalloc_initialize();
     bmalloc_add_pool(poolstart, poolend-poolstart);
+#ifdef HAVE_LCD_BITMAP
+    lcd_init();
+    show_logo();
+#endif
 
 #ifdef DEBUG
     debug_init();
