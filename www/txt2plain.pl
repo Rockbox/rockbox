@@ -2,22 +2,28 @@
 
 # this is really a faq2html and should only be used for this purpose
 
-while(<STDIN>) {
-
+sub fixline {
     $_ =~ s/\</&lt;/g;
     $_ =~ s/\>/&gt;/g;
 
-    $_ =~ s/(http:\/\/([a-zA-Z0-9_.\/-]*)[^\).])/\<a href=\"$1\"\>$1\<\/a\>/g;
+    $_ =~ s/(http:\/\/([a-zA-Z0-9_.\/-]*)[^\) .\n])/\<a href=\"$1\"\>$1\<\/a\>/g;
 
     $_ =~ s/^$/\&nbsp;/g;   # empty lines are nbsp
     $_ =~ s/(\\|\/)$/$1&nbsp;/g; # clobber backslash on end of line
+}
 
+while(<STDIN>) {
+
+    fixline($_);
 
     # detect and mark Q-sections
     if( $_ =~ /^Q(\d*)/) {
         print "</pre>\n<a name=\"$1\"></a><p class=\"faqq\">$_";
         my $line;
         while(<STDIN>) {
+
+            fixline($_);
+
             $line = $_;
             if($_ !~ /^A/) {
                 print "$_";
