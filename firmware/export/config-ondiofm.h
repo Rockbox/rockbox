@@ -73,4 +73,7 @@
 /* Define this for MMC support instead of ATA harddisk */
 #define HAVE_MMC
 
+/* Define this to support mounting FAT16 partitions */
+#define HAVE_FAT16SUPPORT
+
 #endif /* SIMULATOR */

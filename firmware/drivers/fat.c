@@ -104,6 +104,7 @@
 #define FATLONG_CHKSUM       13
 
 #define CLUSTERS_PER_FAT_SECTOR (SECTOR_SIZE / 4)
+#define CLUSTERS_PER_FAT16_SECTOR (SECTOR_SIZE / 2)
 #define DIR_ENTRIES_PER_SECTOR  (SECTOR_SIZE / DIR_ENTRY_SIZE)
 #define DIR_ENTRY_SIZE       32
 #define NAME_BYTES_PER_ENTRY 13
@@ -228,6 +229,11 @@ struct bpb
     unsigned int startsector;
     unsigned int dataclusters;
     struct fsinfo fsinfo;
+#ifdef HAVE_FAT16SUPPORT
+    /* internals for FAT16 support */
+    bool is_fat16; /* true if we mounted a FAT16 partition, false if FAT32 */
+    unsigned int rootdirsectors; /* fixed # of sectors occupied by root dir */
+#endif /* #ifdef HAVE_FAT16SUPPORT */
 };
 
 static struct bpb fat_bpb;
@@ -281,7 +287,13 @@ static int cluster2sec(int cluster)
 
 static int first_sector_of_cluster(int cluster)
 {
-    return (cluster - 2) * fat_bpb.bpb_secperclus + fat_bpb.firstdatasector;
+#ifdef HAVE_FAT16SUPPORT
+    /* negative clusters (FAT16 root dir) don't get the 2 offset */
+    int zerocluster = cluster < 0 ? 0 : 2;
+#else
+    const int zerocluster = 2;
+#endif
+    return (cluster - zerocluster) * fat_bpb.bpb_secperclus + fat_bpb.firstdatasector;
 }
 
 int fat_startsector(void)
@@ -329,6 +341,7 @@ int fat_mount(int startsector)
     fat_bpb.bpb_secperclus = buf[BPB_SECPERCLUS];
     fat_bpb.bpb_rsvdseccnt = BYTES2INT16(buf,BPB_RSVDSECCNT);
     fat_bpb.bpb_numfats    = buf[BPB_NUMFATS];
+    fat_bpb.bpb_rootentcnt = BYTES2INT16(buf,BPB_ROOTENTCNT); /* needed only for FAT16 */
     fat_bpb.bpb_totsec16   = BYTES2INT16(buf,BPB_TOTSEC16);
     fat_bpb.bpb_media      = buf[BPB_MEDIA];
     fat_bpb.bpb_fatsz16    = BYTES2INT16(buf,BPB_FATSZ16);
@@ -349,8 +362,17 @@ int fat_mount(int startsector)
         fat_bpb.totalsectors = fat_bpb.bpb_totsec16;
     else
         fat_bpb.totalsectors = fat_bpb.bpb_totsec32;
-    fat_bpb.firstdatasector = fat_bpb.bpb_rsvdseccnt +
-        fat_bpb.bpb_numfats * fat_bpb.fatsize;
+
+#ifdef HAVE_FAT16SUPPORT
+    fat_bpb.rootdirsectors = ((fat_bpb.bpb_rootentcnt * 32) 
+        + (fat_bpb.bpb_bytspersec - 1)) / fat_bpb.bpb_bytspersec;
+#endif /* #ifdef HAVE_FAT16SUPPORT */
+    
+    fat_bpb.firstdatasector = fat_bpb.bpb_rsvdseccnt
+#ifdef HAVE_FAT16SUPPORT
+        + fat_bpb.rootdirsectors
+#endif
+        + fat_bpb.bpb_numfats * fat_bpb.fatsize;
 
     /* Determine FAT type */
     datasec = fat_bpb.totalsectors - fat_bpb.firstdatasector;
@@ -365,24 +387,60 @@ int fat_mount(int startsector)
 #else
     if ( fat_bpb.dataclusters < 65525 )
 #endif
-    {
+    { /* FAT16 */
+#ifdef HAVE_FAT16SUPPORT
+        fat_bpb.is_fat16 = true;
+        if (fat_bpb.dataclusters < 4085)
+        { /* FAT12 */
+            DEBUGF("This is FAT12. Go away!\n");
+            return -2;
+        }
+#else /* #ifdef HAVE_FAT16SUPPORT */
         DEBUGF("This is not FAT32. Go away!\n");
         return -2;
+#endif /* #ifndef HAVE_FAT16SUPPORT */
     }
 
-    fat_bpb.bpb_extflags  = BYTES2INT16(buf,BPB_EXTFLAGS);
-    fat_bpb.bpb_fsver     = BYTES2INT16(buf,BPB_FSVER);
-    fat_bpb.bpb_rootclus  = BYTES2INT32(buf,BPB_ROOTCLUS);
-    fat_bpb.bpb_fsinfo    = BYTES2INT16(buf,BPB_FSINFO);
-    fat_bpb.bpb_bkbootsec = BYTES2INT16(buf,BPB_BKBOOTSEC);
-    fat_bpb.bs_drvnum     = buf[BS_32_DRVNUM];
-    fat_bpb.bs_bootsig    = buf[BS_32_BOOTSIG];
+#ifdef HAVE_FAT16SUPPORT
+    if (fat_bpb.is_fat16)
+    { /* FAT16 specific part of BPB */
+        int dirclusters;  
+        fat_bpb.bs_drvnum = buf[BS_DRVNUM];
+        fat_bpb.bs_bootsig = buf[BS_BOOTSIG];
 
-    if(fat_bpb.bs_bootsig == 0x29)
-    {
-        fat_bpb.bs_volid = BYTES2INT32(buf,BS_32_VOLID);
-        strncpy(fat_bpb.bs_vollab, &buf[BS_32_VOLLAB], 11);
-        strncpy(fat_bpb.bs_filsystype, &buf[BS_32_FILSYSTYPE], 8);
+        if(fat_bpb.bs_bootsig == 0x29)
+        {
+            fat_bpb.bs_volid = BYTES2INT32(buf, BS_VOLID);
+            strncpy(fat_bpb.bs_vollab, &buf[BS_VOLLAB], 11);
+            strncpy(fat_bpb.bs_filsystype, &buf[BS_FILSYSTYPE], 8);
+        }
+        fat_bpb.rootdirsector = fat_bpb.bpb_rsvdseccnt
+            + fat_bpb.bpb_numfats * fat_bpb.bpb_fatsz16;
+        dirclusters = ((fat_bpb.rootdirsectors + fat_bpb.bpb_secperclus - 1) 
+          / fat_bpb.bpb_secperclus); /* rounded up, to full clusters */
+        /* I assign negative pseudo cluster numbers for the root directory,
+           their range is counted upward until -1. */
+        fat_bpb.bpb_rootclus = 0 - dirclusters; /* backwards, before the data */
+    }
+    else
+#endif /* #ifdef HAVE_FAT16SUPPORT */
+    { /* FAT32 specific part of BPB */
+        fat_bpb.bpb_extflags  = BYTES2INT16(buf,BPB_EXTFLAGS);
+        fat_bpb.bpb_fsver     = BYTES2INT16(buf,BPB_FSVER);
+        fat_bpb.bpb_rootclus  = BYTES2INT32(buf,BPB_ROOTCLUS);
+        fat_bpb.bpb_fsinfo    = BYTES2INT16(buf,BPB_FSINFO);
+        fat_bpb.bpb_bkbootsec = BYTES2INT16(buf,BPB_BKBOOTSEC);
+        fat_bpb.bs_drvnum     = buf[BS_32_DRVNUM];
+        fat_bpb.bs_bootsig    = buf[BS_32_BOOTSIG];
+
+        if(fat_bpb.bs_bootsig == 0x29)
+        {
+            fat_bpb.bs_volid = BYTES2INT32(buf,BS_32_VOLID);
+            strncpy(fat_bpb.bs_vollab, &buf[BS_32_VOLLAB], 11);
+            strncpy(fat_bpb.bs_filsystype, &buf[BS_32_FILSYSTYPE], 8);
+        }
+
+        fat_bpb.rootdirsector = cluster2sec(fat_bpb.bpb_rootclus);
     }
 
     rc = bpb_is_sane();
@@ -392,17 +450,25 @@ int fat_mount(int startsector)
         return rc * 10 - 3;
     }
 
-    fat_bpb.rootdirsector = cluster2sec(fat_bpb.bpb_rootclus);
-
-    /* Read the fsinfo sector */
-    rc = ata_read_sectors(startsector + fat_bpb.bpb_fsinfo, 1, buf);
-    if (rc < 0)
+#ifdef HAVE_FAT16SUPPORT
+    if (fat_bpb.is_fat16)
     {
-        DEBUGF( "fat_mount() - Couldn't read FSInfo (error code %d)\n", rc);
-        return rc * 10 - 4;
+        fat_bpb.fsinfo.freecount = 0xffffffff; /* force recalc below */
+        fat_bpb.fsinfo.nextfree = 0xffffffff;
     }
-    fat_bpb.fsinfo.freecount = BYTES2INT32(buf, FSINFO_FREECOUNT);
-    fat_bpb.fsinfo.nextfree = BYTES2INT32(buf, FSINFO_NEXTFREE);
+    else
+#endif /* #ifdef HAVE_FAT16SUPPORT */
+    {
+        /* Read the fsinfo sector */
+        rc = ata_read_sectors(startsector + fat_bpb.bpb_fsinfo, 1, buf);
+        if (rc < 0)
+        {
+            DEBUGF( "fat_mount() - Couldn't read FSInfo (error code %d)\n", rc);
+            return rc * 10 - 4;
+        }
+        fat_bpb.fsinfo.freecount = BYTES2INT32(buf, FSINFO_FREECOUNT);
+        fat_bpb.fsinfo.nextfree = BYTES2INT32(buf, FSINFO_NEXTFREE);
+    }
 
     /* calculate freecount if unset */
     if ( fat_bpb.fsinfo.freecount == 0xffffffff )
@@ -423,18 +489,41 @@ void fat_recalc_free(void)
 {
     int free = 0;
     unsigned i;
-    for (i = 0; i<fat_bpb.fatsize; i++) {
-        unsigned int j;
-        unsigned int* fat = cache_fat_sector(i);
-        for (j = 0; j < CLUSTERS_PER_FAT_SECTOR; j++) {
-            unsigned int c = i * CLUSTERS_PER_FAT_SECTOR + j;
-            if ( c > fat_bpb.dataclusters+1 ) /* nr 0 is unused */
-                break;
+#ifdef HAVE_FAT16SUPPORT
+    if (fat_bpb.is_fat16)
+    {
+        for (i = 0; i<fat_bpb.fatsize; i++) {
+            unsigned int j;
+            unsigned short* fat = cache_fat_sector(i);
+            for (j = 0; j < CLUSTERS_PER_FAT16_SECTOR; j++) {
+                unsigned int c = i * CLUSTERS_PER_FAT16_SECTOR + j;
+                if ( c > fat_bpb.dataclusters+1 ) /* nr 0 is unused */
+                    break;
       
-            if (!(SWAB32(fat[j]) & 0x0fffffff)) {
-                free++;
-                if ( fat_bpb.fsinfo.nextfree == 0xffffffff )
-                    fat_bpb.fsinfo.nextfree = c;
+                if (SWAB16(fat[j]) == 0x0000) {
+                    free++;
+                    if ( fat_bpb.fsinfo.nextfree == 0xffffffff )
+                        fat_bpb.fsinfo.nextfree = c;
+                }
+            }
+        }
+    }
+    else
+#endif /* #ifdef HAVE_FAT16SUPPORT */
+    {
+        for (i = 0; i<fat_bpb.fatsize; i++) {
+            unsigned int j;
+            unsigned int* fat = cache_fat_sector(i);
+            for (j = 0; j < CLUSTERS_PER_FAT_SECTOR; j++) {
+                unsigned int c = i * CLUSTERS_PER_FAT_SECTOR + j;
+                if ( c > fat_bpb.dataclusters+1 ) /* nr 0 is unused */
+                    break;
+      
+                if (!(SWAB32(fat[j]) & 0x0fffffff)) {
+                    free++;
+                    if ( fat_bpb.fsinfo.nextfree == 0xffffffff )
+                        fat_bpb.fsinfo.nextfree = c;
+                }
             }
         }
     }
@@ -551,99 +640,203 @@ static unsigned int find_free_cluster(unsigned int startcluster)
     unsigned int offset;
     unsigned int i;
 
-    sector = startcluster / CLUSTERS_PER_FAT_SECTOR;
-    offset = startcluster % CLUSTERS_PER_FAT_SECTOR;
+#ifdef HAVE_FAT16SUPPORT
+    if (fat_bpb.is_fat16)
+    {
+        sector = startcluster / CLUSTERS_PER_FAT16_SECTOR;
+        offset = startcluster % CLUSTERS_PER_FAT16_SECTOR;
     
-    for (i = 0; i<fat_bpb.fatsize; i++) {
-        unsigned int j;
-        unsigned int nr = (i + sector) % fat_bpb.fatsize;
-        unsigned int* fat = cache_fat_sector(nr);
-        if ( !fat )
-            break;
-        for (j = 0; j < CLUSTERS_PER_FAT_SECTOR; j++) {
-            int k = (j + offset) % CLUSTERS_PER_FAT_SECTOR;
-            if (!(SWAB32(fat[k]) & 0x0fffffff)) {
-                unsigned int c = nr * CLUSTERS_PER_FAT_SECTOR + k;
-                 /* Ignore the reserved clusters 0 & 1, and also
-                    cluster numbers out of bounds */
-                if ( c < 2 || c > fat_bpb.dataclusters+1 )
-                    continue;
-                LDEBUGF("find_free_cluster(%x) == %x\n",startcluster,c);
-                fat_bpb.fsinfo.nextfree = c;
-                return c;
+        for (i = 0; i<fat_bpb.fatsize; i++) {
+            unsigned int j;
+            unsigned int nr = (i + sector) % fat_bpb.fatsize;
+            unsigned short* fat = cache_fat_sector(nr);
+            if ( !fat )
+                break;
+            for (j = 0; j < CLUSTERS_PER_FAT16_SECTOR; j++) {
+                int k = (j + offset) % CLUSTERS_PER_FAT16_SECTOR;
+                if (SWAB16(fat[k]) == 0x0000) {
+                    unsigned int c = nr * CLUSTERS_PER_FAT16_SECTOR + k;
+                     /* Ignore the reserved clusters 0 & 1, and also
+                        cluster numbers out of bounds */
+                    if ( c < 2 || c > fat_bpb.dataclusters+1 )
+                        continue;
+                    LDEBUGF("find_free_cluster(%x) == %x\n",startcluster,c);
+                    fat_bpb.fsinfo.nextfree = c;
+                    return c;
+                }
             }
+            offset = 0;
         }
-        offset = 0;
     }
+    else
+#endif /* #ifdef HAVE_FAT16SUPPORT */
+    {
+        sector = startcluster / CLUSTERS_PER_FAT_SECTOR;
+        offset = startcluster % CLUSTERS_PER_FAT_SECTOR;
+    
+        for (i = 0; i<fat_bpb.fatsize; i++) {
+            unsigned int j;
+            unsigned int nr = (i + sector) % fat_bpb.fatsize;
+            unsigned int* fat = cache_fat_sector(nr);
+            if ( !fat )
+                break;
+            for (j = 0; j < CLUSTERS_PER_FAT_SECTOR; j++) {
+                int k = (j + offset) % CLUSTERS_PER_FAT_SECTOR;
+                if (!(SWAB32(fat[k]) & 0x0fffffff)) {
+                    unsigned int c = nr * CLUSTERS_PER_FAT_SECTOR + k;
+                     /* Ignore the reserved clusters 0 & 1, and also
+                        cluster numbers out of bounds */
+                    if ( c < 2 || c > fat_bpb.dataclusters+1 )
+                        continue;
+                    LDEBUGF("find_free_cluster(%x) == %x\n",startcluster,c);
+                    fat_bpb.fsinfo.nextfree = c;
+                    return c;
+                }
+            }
+            offset = 0;
+        }
+    }
+
     LDEBUGF("find_free_cluster(%x) == 0\n",startcluster);
     return 0; /* 0 is an illegal cluster number */
 }
 
 static int update_fat_entry(unsigned int entry, unsigned int val)
 {
-    int sector = entry / CLUSTERS_PER_FAT_SECTOR;
-    int offset = entry % CLUSTERS_PER_FAT_SECTOR;
-    unsigned int* sec;
-
-    LDEBUGF("update_fat_entry(%x,%x)\n",entry,val);
-
-    if (entry==val)
-        panicf("Creating FAT loop: %x,%x\n",entry,val);
-
-    if ( entry < 2 )
-        panicf("Updating reserved FAT entry %d.\n",entry);
-
-    sec = cache_fat_sector(sector);
-    if (!sec)
+#ifdef HAVE_FAT16SUPPORT
+    if (fat_bpb.is_fat16)
     {
-        DEBUGF( "update_entry() - Could not cache sector %d\n", sector);
-        return -1;
-    }
-    fat_cache[(sector + fat_bpb.bpb_rsvdseccnt) & FAT_CACHE_MASK].dirty = true;
+        int sector = entry / CLUSTERS_PER_FAT16_SECTOR;
+        int offset = entry % CLUSTERS_PER_FAT16_SECTOR;
+        unsigned short* sec;
 
-    if ( val ) {
-        if (!(SWAB32(sec[offset]) & 0x0fffffff) &&
-            fat_bpb.fsinfo.freecount > 0)
-            fat_bpb.fsinfo.freecount--;
-    }
-    else {
-        if (SWAB32(sec[offset]) & 0x0fffffff)
-            fat_bpb.fsinfo.freecount++;
-    }
+        val &= 0xFFFF;
 
-    LDEBUGF("update_fat_entry: %d free clusters\n", fat_bpb.fsinfo.freecount);
+        LDEBUGF("update_fat_entry(%x,%x)\n",entry,val);
 
-    /* don't change top 4 bits */
-    sec[offset] &= SWAB32(0xf0000000);
-    sec[offset] |= SWAB32(val & 0x0fffffff);
+        if (entry==val)
+            panicf("Creating FAT loop: %x,%x\n",entry,val);
+
+        if ( entry < 2 )
+            panicf("Updating reserved FAT entry %d.\n",entry);
+
+        sec = cache_fat_sector(sector);
+        if (!sec)
+        {
+            DEBUGF( "update_entry() - Could not cache sector %d\n", sector);
+            return -1;
+        }
+        fat_cache[(sector + fat_bpb.bpb_rsvdseccnt) & FAT_CACHE_MASK].dirty = true;
+
+        if ( val ) {
+            if (SWAB16(sec[offset]) == 0x0000 && fat_bpb.fsinfo.freecount > 0)
+                fat_bpb.fsinfo.freecount--;
+        }
+        else {
+            if (SWAB16(sec[offset]))
+                fat_bpb.fsinfo.freecount++;
+        }
+
+        LDEBUGF("update_fat_entry: %d free clusters\n", fat_bpb.fsinfo.freecount);
+
+        sec[offset] = SWAB16(val);
+    }
+    else
+#endif /* #ifdef HAVE_FAT16SUPPORT */
+    {
+        int sector = entry / CLUSTERS_PER_FAT_SECTOR;
+        int offset = entry % CLUSTERS_PER_FAT_SECTOR;
+        unsigned int* sec;
+
+        LDEBUGF("update_fat_entry(%x,%x)\n",entry,val);
+
+        if (entry==val)
+            panicf("Creating FAT loop: %x,%x\n",entry,val);
+
+        if ( entry < 2 )
+            panicf("Updating reserved FAT entry %d.\n",entry);
+
+        sec = cache_fat_sector(sector);
+        if (!sec)
+        {
+            DEBUGF( "update_entry() - Could not cache sector %d\n", sector);
+            return -1;
+        }
+        fat_cache[(sector + fat_bpb.bpb_rsvdseccnt) & FAT_CACHE_MASK].dirty = true;
+
+        if ( val ) {
+            if (!(SWAB32(sec[offset]) & 0x0fffffff) &&
+                fat_bpb.fsinfo.freecount > 0)
+                fat_bpb.fsinfo.freecount--;
+        }
+        else {
+            if (SWAB32(sec[offset]) & 0x0fffffff)
+                fat_bpb.fsinfo.freecount++;
+        }
+
+        LDEBUGF("update_fat_entry: %d free clusters\n", fat_bpb.fsinfo.freecount);
+
+        /* don't change top 4 bits */
+        sec[offset] &= SWAB32(0xf0000000);
+        sec[offset] |= SWAB32(val & 0x0fffffff);
+    }
 
     return 0;
 }
 
 static int read_fat_entry(unsigned int entry)
 {
-    int sector = entry / CLUSTERS_PER_FAT_SECTOR;
-    int offset = entry % CLUSTERS_PER_FAT_SECTOR;
-    unsigned int* sec;
-
-    sec = cache_fat_sector(sector);
-    if (!sec)
+#ifdef HAVE_FAT16SUPPORT
+    if (fat_bpb.is_fat16)
     {
-        DEBUGF( "read_fat_entry() - Could not cache sector %d\n", sector);
-        return -1;
-    }
+        int sector = entry / CLUSTERS_PER_FAT16_SECTOR;
+        int offset = entry % CLUSTERS_PER_FAT16_SECTOR;
+        unsigned short* sec;
 
-    return SWAB32(sec[offset]) & 0x0fffffff;
+        sec = cache_fat_sector(sector);
+        if (!sec)
+        {
+            DEBUGF( "read_fat_entry() - Could not cache sector %d\n", sector);
+            return -1;
+        }
+
+        return SWAB16(sec[offset]);
+    }
+    else
+#endif /* #ifdef HAVE_FAT16SUPPORT */
+    {
+        int sector = entry / CLUSTERS_PER_FAT_SECTOR;
+        int offset = entry % CLUSTERS_PER_FAT_SECTOR;
+        unsigned int* sec;
+
+        sec = cache_fat_sector(sector);
+        if (!sec)
+        {
+            DEBUGF( "read_fat_entry() - Could not cache sector %d\n", sector);
+            return -1;
+        }
+
+        return SWAB32(sec[offset]) & 0x0fffffff;
+    }
 }
 
-static int get_next_cluster(unsigned int cluster)
+static int get_next_cluster(int cluster)
 {
     int next_cluster;
-
+    int eof_mark = FAT_EOF_MARK;
+    
+#ifdef HAVE_FAT16SUPPORT
+    if (fat_bpb.is_fat16)
+    {
+        eof_mark &= 0xFFFF; /* only 16 bit */
+        if (cluster < 0) /* FAT16 root dir */
+            return cluster + 1; /* don't use the FAT */
+    }
+#endif
     next_cluster = read_fat_entry(cluster);
 
     /* is this last cluster in chain? */
-    if ( next_cluster >= FAT_EOF_MARK )
+    if ( next_cluster >= eof_mark )
         return 0;
     else
         return next_cluster;
@@ -654,6 +847,11 @@ static int update_fsinfo(void)
     unsigned char fsinfo[SECTOR_SIZE];
     unsigned int* intptr;
     int rc;
+    
+#ifdef HAVE_FAT16SUPPORT
+    if (fat_bpb.is_fat16)
+        return 0; /* FAT16 has no FsInfo */
+#endif /* #ifdef HAVE_FAT16SUPPORT */
     
     /* update fsinfo */
     rc = ata_read_sectors(fat_bpb.startsector + fat_bpb.bpb_fsinfo, 1,fsinfo);
@@ -1311,6 +1509,26 @@ int fat_open(unsigned int startcluster,
     return 0;
 }
 
+#ifdef HAVE_FAT16SUPPORT
+/* special function to open the FAT16 root dir, 
+   which may not be on cluster boundary */
+int fat_open_root(struct fat_file *file)
+{
+    int dirclusters;
+    file->firstcluster = fat_bpb.bpb_rootclus;
+    file->lastcluster = fat_bpb.bpb_rootclus;
+    file->lastsector = 0;
+    file->clusternum = 0;
+    dirclusters = 0 - fat_bpb.bpb_rootclus; /* bpb_rootclus is the negative */
+    file->sectornum = (dirclusters * fat_bpb.bpb_secperclus)
+      - fat_bpb.rootdirsectors; /* cluster sectors minus real sectors */
+    file->eof = false;
+
+    LDEBUGF("fat_open_root(), sector %d\n", cluster2sec(fat_bpb.bpb_rootclus));
+    return 0;
+}
+#endif /* #ifdef HAVE_FAT16SUPPORT */
+
 int fat_create_file(const char* name,
                     struct fat_file* file,
                     struct fat_dir* dir)
@@ -1362,7 +1580,7 @@ int fat_create_dir(const char* name,
     memset(buf, 0, sizeof buf);
     sector = cluster2sec(newdir->file.firstcluster);
     for(i = 0;i < (int)fat_bpb.bpb_secperclus;i++) {
-        rc = transfer( sector + fat_bpb.startsector + i, 1, buf, true );
+        rc = transfer( sector + i, 1, buf, true );
         if (rc < 0)
             return rc * 10 - 2;
     }
@@ -1605,10 +1823,14 @@ static int next_write_cluster(struct fat_file* file,
         cluster = get_next_cluster(oldcluster);
 
     if (!cluster) {
-        if (oldcluster)
+        if (oldcluster > 0)
             cluster = find_free_cluster(oldcluster+1);
-        else
+        else if (oldcluster == 0)
             cluster = find_free_cluster(fat_bpb.fsinfo.nextfree);
+#ifdef HAVE_FAT16SUPPORT
+        else /* negative, pseudo-cluster of the root dir */
+            return 0; /* impossible to append something to the root */
+#endif
 
         if (cluster) {
             if (oldcluster)
@@ -1639,9 +1861,19 @@ static int transfer( unsigned int start, int count, char* buf, bool write )
 {
     int rc;
 
+    start += fat_bpb.startsector; /* offset by partition location */
+
     LDEBUGF("transfer(s=%x, c=%x, %s)\n",start, count, write?"write":"read");
     if (write) {
-        if (start < fat_bpb.firstdatasector)
+        unsigned int firstallowed;
+#ifdef HAVE_FAT16SUPPORT
+        if (fat_bpb.is_fat16)
+            firstallowed = fat_bpb.rootdirsector;
+        else
+#endif
+            firstallowed = fat_bpb.firstdatasector;
+            
+        if (start < firstallowed + fat_bpb.startsector)
             panicf("Writing before data\n");
         rc = ata_write_sectors(start, count, buf);
     }
@@ -1722,7 +1954,7 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
         if ( ((sector != first) && (sector != last+1)) || /* not sequential */
              (last-first+1 == 256) ) { /* max 256 sectors per ata request */
             int count = last - first + 1;
-            rc = transfer( first + fat_bpb.startsector, count, buf, write );
+            rc = transfer( first, count, buf, write );
             if (rc < 0)
                 return rc * 10 - 1;
 
@@ -1734,7 +1966,7 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
             (!eof))
         {
             int count = sector - first + 1;
-            rc = transfer( first + fat_bpb.startsector, count, buf, write );
+            rc = transfer( first, count, buf, write );
             if (rc < 0)
                 return rc * 10 - 2;
         }
@@ -1806,8 +2038,19 @@ int fat_opendir(struct fat_dir *dir, unsigned int startcluster,
 {
     int rc;
 
+    dir->entry = 0;
+    dir->sector = 0;
+
     if (startcluster == 0)
+    {
+#ifdef HAVE_FAT16SUPPORT
+        if (fat_bpb.is_fat16)
+        {   /* FAT16 has the root dir outside of the data area */
+            return fat_open_root(&dir->file);
+        }
+#endif
         startcluster = sec2cluster(fat_bpb.rootdirsector);
+    }
 
     rc = fat_open(startcluster, &dir->file, parent_dir);
     if(rc)
@@ -1816,9 +2059,6 @@ int fat_opendir(struct fat_dir *dir, unsigned int startcluster,
                 " (error code %d)\n", rc);
         return rc * 10 - 1;
     }
-
-    dir->entry = 0;
-    dir->sector = 0;
 
     return 0;
 }
