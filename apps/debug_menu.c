@@ -40,6 +40,7 @@
 #include "mpeg.h"
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
+#include "peakmeter.h"
 #endif
 
 /*---------------------------------------------------*/
@@ -1031,7 +1032,10 @@ bool debug_menu(void)
         { "View partitions", dbg_partitions },
 #ifdef HAVE_LCD_BITMAP
         { "View mpeg thread", dbg_mpeg_thread },
-#endif
+#ifdef PM_DEBUG
+        { "pm histogram", peak_meter_histogram},
+#endif /* PM_DEBUG */
+#endif /* HAVE_LCD_BITMAP */
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
@@ -1042,4 +1046,3 @@ bool debug_menu(void)
 }
 
 #endif /* SIMULATOR */
-

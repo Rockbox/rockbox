@@ -74,27 +74,44 @@ static bool volume_type(void)
                        names, 2, NULL);
 }
 
+#ifdef PM_DEBUG
+static bool peak_meter_fps_menu(void) {
+    bool retval = false;
+    retval = set_int( "Refresh rate", "/s", 
+             &peak_meter_fps,
+             NULL, 1, 5, 40);
+    return retval;
+}
+#endif /* PM_DEBUG */
+
 /**
  * Menu to set the hold time of normal peaks.
  */
-static bool peak_meter_hold(void) 
-{
+static bool peak_meter_hold(void) {
+    bool retval = false;
     char* names[] = { str(LANG_OFF),
                       "200 ms ", "300 ms ", "500 ms ", "1 s ", "2 s ",
                       "3 s ", "4 s ", "5 s ", "6 s ", "7 s",
                       "8 s", "9 s", "10 s", "15 s", "20 s",
                       "30 s", "1 min"
     };
-    return set_option( str(LANG_PM_PEAK_HOLD), 
+    retval = set_option( str(LANG_PM_PEAK_HOLD), 
                        &global_settings.peak_meter_hold, names,
                        18, NULL);
+
+    peak_meter_init_times(global_settings.peak_meter_release,
+        global_settings.peak_meter_hold, 
+        global_settings.peak_meter_clip_hold);
+
+    return retval;
 }
 
 /**
  * Menu to set the hold time of clips.
  */
-static bool peak_meter_clip_hold(void) 
-{
+static bool peak_meter_clip_hold(void) {
+    bool retval = false;
+
     char* names[] = { str(LANG_PM_ETERNAL),
                       "1s ", "2s ", "3s ", "4s ", "5s ",
                       "6s ", "7s ", "8s ", "9s ", "10s",
@@ -103,19 +120,167 @@ static bool peak_meter_clip_hold(void)
                       "10min", "20min", "45min", "90min"
     };
 
-    return set_option( str(LANG_PM_CLIP_HOLD), 
+    retval = set_option( str(LANG_PM_CLIP_HOLD), 
                        &global_settings.peak_meter_clip_hold, names,
                        25, peak_meter_set_clip_hold);
+
+    peak_meter_init_times(global_settings.peak_meter_release,
+        global_settings.peak_meter_hold, 
+        global_settings.peak_meter_clip_hold);
+
+    return retval;
 }
 
 /**
  * Menu to set the release time of the peak meter.
  */
-static bool peak_meter_release(void)  
-{
-    return set_int( str(LANG_PM_RELEASE), str(LANG_PM_UNITS_PER_READ), 
+static bool peak_meter_release(void)  {
+    bool retval = false;
+
+    /* The range of peak_meter_release is restricted so that it
+       fits into a 7 bit number. The 8th bit is used for storing
+       something else in the rtc ram.
+       Also, the max value is 0x7e, since the RTC value 0xff is reserved */
+    retval = set_int( str(LANG_PM_RELEASE), str(LANG_PM_UNITS_PER_READ), 
                     &global_settings.peak_meter_release,
-                    NULL, 1, 1, LCD_WIDTH);
+             NULL, 1, 1, 0x7e);
+
+    peak_meter_init_times(global_settings.peak_meter_release,
+        global_settings.peak_meter_hold, 
+        global_settings.peak_meter_clip_hold);
+
+    return retval;
+}
+
+/**
+ * Menu to select wether the scale of the meter 
+ * displays dBfs of linear values.
+ */
+static bool peak_meter_scale(void) {
+    bool retval = false;
+    bool use_dbfs = global_settings.peak_meter_dbfs;
+    retval = set_bool_options(str(LANG_PM_SCALE), 
+        &use_dbfs, 
+        str(LANG_PM_DBFS), str(LANG_PM_LINEAR));
+
+    /* has the user really changed the scale? */
+    if (use_dbfs != global_settings.peak_meter_dbfs) {
+
+        /* store the change */
+        global_settings.peak_meter_dbfs = use_dbfs;
+        peak_meter_set_use_dbfs(use_dbfs);
+
+        /* If the user changed the scale mode the meaning of
+           peak_meter_min (peak_meter_max) has changed. Thus we have
+           to convert the values stored in global_settings. */
+        if (use_dbfs) {
+
+            /* we only store -dBfs */
+            global_settings.peak_meter_min = -peak_meter_get_min() / 100;
+            global_settings.peak_meter_max = -peak_meter_get_max() / 100;
+        } else {
+            int max;
+            
+            /* linear percent */
+            global_settings.peak_meter_min = peak_meter_get_min();
+
+            /* converting dBfs -> percent results in a precision loss.
+               I assume that the user doesn't bother that conversion
+               dBfs <-> percent isn't symmetrical for odd values but that
+               he wants 0 dBfs == 100%. Thus I 'correct' the percent value
+               resulting from dBfs -> percent manually here */
+            max = peak_meter_get_max();
+            global_settings.peak_meter_max = max < 99 ? max : 100;
+        }
+        settings_apply_pm_range();
+    }
+    return retval;
+}
+
+/**
+ * Adjust the min value of the value range that
+ * the peak meter shall visualize.
+ */
+static bool peak_meter_min(void) {
+    bool retval = false;
+    if (global_settings.peak_meter_dbfs) {
+
+        /* for dBfs scale */
+        int range_max = -global_settings.peak_meter_max;
+        int min = -global_settings.peak_meter_min;
+
+        retval =  set_int(str(LANG_PM_MIN), str(LANG_PM_DBFS),
+            &min, NULL, 1, -89, range_max);
+
+        global_settings.peak_meter_min = - min;
+    } 
+
+    /* for linear scale */
+    else {
+        int min = global_settings.peak_meter_min;
+
+        retval =  set_int(str(LANG_PM_MIN), "%",
+            &min, NULL, 
+            1, 0, global_settings.peak_meter_max - 1);
+
+        global_settings.peak_meter_min = (unsigned char)min;
+    }
+
+    settings_apply_pm_range();
+    return retval;
+}
+
+
+/**
+ * Adjust the max value of the value range that
+ * the peak meter shall visualize.
+ */
+static bool peak_meter_max(void) {
+    bool retval = false;
+    if (global_settings.peak_meter_dbfs) {
+
+        /* for dBfs scale */
+        int range_min = -global_settings.peak_meter_min;
+        int max = -global_settings.peak_meter_max;;
+
+        retval =  set_int(str(LANG_PM_MAX), str(LANG_PM_DBFS),
+            &max, NULL, 1, range_min, 0);
+
+        global_settings.peak_meter_max = - max;
+
+    } 
+    
+    /* for linear scale */
+    else {
+        int max = global_settings.peak_meter_max;
+
+        retval =  set_int(str(LANG_PM_MAX), "%",
+            &max, NULL, 
+            1, global_settings.peak_meter_min + 1, 100);
+
+        global_settings.peak_meter_max = (unsigned char)max;
+    }
+
+    settings_apply_pm_range();
+    return retval;
+}
+
+/**
+ * Menu to select wether the meter is in
+ * precision or in energy saver mode
+ */
+static bool peak_meter_performance(void) {
+    bool retval = false;
+    retval = set_bool_options(str(LANG_PM_PERFORMANCE), 
+        &global_settings.peak_meter_performance, 
+        str(LANG_PM_HIGH_PERFORMANCE), str(LANG_PM_ENERGY_SAVER));
+
+    if (global_settings.peak_meter_performance) {
+        peak_meter_fps = 25;
+    } else {
+        peak_meter_fps = 20;
+    }
+    return retval;
 }
 
 /**
@@ -130,6 +295,13 @@ static bool peak_meter_menu(void)
         { str(LANG_PM_RELEASE)  , peak_meter_release   },  
         { str(LANG_PM_PEAK_HOLD), peak_meter_hold      },  
         { str(LANG_PM_CLIP_HOLD), peak_meter_clip_hold },
+        { str(LANG_PM_PERFORMANCE), peak_meter_performance },
+#ifdef PM_DEBUG
+        { "Refresh rate"        , peak_meter_fps_menu  },
+#endif
+        { str(LANG_PM_SCALE)    , peak_meter_scale     },
+        { str(LANG_PM_MIN)      , peak_meter_min       },
+        { str(LANG_PM_MAX)      , peak_meter_max       },
     };
     
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
@@ -137,7 +309,7 @@ static bool peak_meter_menu(void)
     menu_exit(m);
     return result;
 }
-#endif
+#endif /* HAVE_LCD_BITMAP */
 
 static bool shuffle(void)
 {

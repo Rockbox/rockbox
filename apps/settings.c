@@ -44,6 +44,7 @@
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "font.h"
+#include "peakmeter.h"
 #endif
 #include "lang.h"
 #include "language.h"
@@ -52,7 +53,7 @@
 struct user_settings global_settings;
 char rockboxdir[] = ROCKBOX_DIR;       /* config/font/data file directory */
 
-#define CONFIG_BLOCK_VERSION 2
+#define CONFIG_BLOCK_VERSION 3
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -89,10 +90,14 @@ offset  abs
 0x16    0x2a    <(int) Byte offset into resume file>
 0x1a    0x2e    <time until disk spindown>
 0x1b    0x2f    <browse current, play selected>
-0x1c    0x30    <peak meter hold timeout (bit 0-4)>
-0x1d    0x31    <peak meter clip hold timeout (bit 0-4)>
-0x1e    0x32    <peak meter release step size>
-0x1f    0x33    <repeat mode>
+0x1c    0x30    <peak meter hold timeout (bit 0-4)>, 
+                 peak_meter_performance (bit 7)
+0x1d    0x31    <peak meter clip hold timeout (bit 0-4)
+0x1e    0x32    <peak meter release step size, 
+                 peak_meter_dbfs (bit 7)
+0x1f    0x33    <peak meter min either in -db or in percent>
+0x20    0x34    <peak meter max either in -db or in percent>
+0x21    0x35    <repeat mode>
 
         <all unused space filled with 0xff>
 
@@ -316,9 +321,13 @@ int settings_save( void )
          ((global_settings.play_selected & 1) << 1));
     
     config_block[0x1c] = (unsigned char)global_settings.peak_meter_hold;
-    config_block[0x1d] = (unsigned char)global_settings.peak_meter_clip_hold;
-    config_block[0x1e] = (unsigned char)global_settings.peak_meter_release;
-    config_block[0x1f] = (unsigned char)global_settings.repeat_mode;
+    config_block[0x1d] = (unsigned char)global_settings.peak_meter_clip_hold |
+        (global_settings.peak_meter_performance ? 0x80 : 0);
+    config_block[0x1e] = global_settings.peak_meter_release |
+        (global_settings.peak_meter_dbfs ? 0x80 : 0);
+    config_block[0x1f] = (unsigned char)global_settings.peak_meter_min;
+    config_block[0x20] = (unsigned char)global_settings.peak_meter_max;
+    config_block[0x21] = (unsigned char)global_settings.repeat_mode;
 
     memcpy(&config_block[0x24], &global_settings.total_uptime, 4);
 
@@ -355,6 +364,35 @@ int settings_save( void )
     return 0;
 }
 
+#ifdef HAVE_LCD_BITMAP
+/**
+ * Applies the range infos stored in global_settings to 
+ * the peak meter. 
+ */
+void settings_apply_pm_range(void)
+{
+    int pm_min, pm_max;
+
+    /* depending on the scale mode (dBfs or percent) the values
+       of global_settings.peak_meter_dbfs have different meanings */
+    if (global_settings.peak_meter_dbfs) 
+    {
+        /* convert to dBfs * 100          */
+        pm_min = -(((int)global_settings.peak_meter_min) * 100);
+        pm_max = -(((int)global_settings.peak_meter_max) * 100);
+    }
+    else 
+    {
+        /* percent is stored directly -> no conversion */
+        pm_min = global_settings.peak_meter_min;
+        pm_max = global_settings.peak_meter_max;
+    }
+
+    /* apply the range */
+    peak_meter_init_range(global_settings.peak_meter_dbfs, pm_min, pm_max);
+}
+#endif /* HAVE_LCD_BITMAP */
+
 void settings_apply(void)
 {
     char buf[64];
@@ -379,6 +417,13 @@ void settings_apply(void)
 #ifdef HAVE_CHARGE_CTRL
     charge_restart_level = global_settings.discharge ? 
         CHARGE_RESTART_LO : CHARGE_RESTART_HI;
+#endif
+
+#ifdef HAVE_LCD_BITMAP
+    settings_apply_pm_range();
+    peak_meter_init_times(
+        global_settings.peak_meter_release, global_settings.peak_meter_hold, 
+        global_settings.peak_meter_clip_hold);
 #endif
 
     if ( global_settings.wps_file[0] && 
@@ -500,14 +545,25 @@ void settings_load(void)
         if (config_block[0x1c] != 0xFF)
             global_settings.peak_meter_hold = (config_block[0x1c]) & 0x1f;
 
-        if (config_block[0x1d] != 0xFF)
+        if (config_block[0x1d] != 0xFF) {
             global_settings.peak_meter_clip_hold = (config_block[0x1d]) & 0x1f;
+            global_settings.peak_meter_performance = 
+                (config_block[0x1d] & 0x80) != 0;
+        }
 
-        if (config_block[0x1e] != 0xFF)
-            global_settings.peak_meter_release = config_block[0x1e];
+        if (config_block[0x1e] != 0xFF) {
+            global_settings.peak_meter_release = config_block[0x1e] & 0x7f;
+            global_settings.peak_meter_dbfs = (config_block[0x1e] & 0x80) != 0;
+        }
 
         if (config_block[0x1f] != 0xFF)
-            global_settings.repeat_mode = config_block[0x1f];
+            global_settings.peak_meter_min = config_block[0x1f];
+
+        if (config_block[0x20] != 0xFF)
+            global_settings.peak_meter_max = config_block[0x20];
+
+        if (config_block[0x21] != 0xFF)
+            global_settings.repeat_mode = config_block[0x21];
 
         if (config_block[0x24] != 0xFF)
             memcpy(&global_settings.total_uptime, &config_block[0x24], 4);
@@ -685,8 +741,12 @@ void settings_reset(void) {
     global_settings.browse_current = false;
     global_settings.play_selected = true;
     global_settings.peak_meter_release = 8;
-    global_settings.peak_meter_hold = 1;
+    global_settings.peak_meter_hold = 3;
     global_settings.peak_meter_clip_hold = 16;
+    global_settings.peak_meter_dbfs = true;
+    global_settings.peak_meter_min = 60;
+    global_settings.peak_meter_max = 0;
+    global_settings.peak_meter_performance = false;
     global_settings.wps_file[0] = 0;
     global_settings.font_file[0] = 0;
     global_settings.lang_file[0] = 0;

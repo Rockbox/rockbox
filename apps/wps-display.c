@@ -55,17 +55,10 @@
 #endif
 
 #define FORMAT_BUFFER_SIZE 300
-struct format_flags
-{
-    bool dynamic;
-    bool scroll;
-    bool player_progress;
-    bool peak_meter;
-};
 
 static char format_buffer[FORMAT_BUFFER_SIZE];
 static char* format_lines[MAX_LINES];
-static bool dynamic_lines[MAX_LINES];
+static unsigned char line_type[MAX_LINES];
 static int ff_rewind_count;
 bool wps_time_countup = true;
 static bool wps_loaded = false;
@@ -218,9 +211,7 @@ static char* get_dir(char* buf, int buf_size, char* path, int level)
  * buf      - buffer to certain tags, such as track number, play time or 
  *           directory name.
  * buf_size - size of buffer.
- * flags    - flags in this struct will be set depending on the tag:
- *            dynamic - if the tag data changes over time (like play time);
- *            player_progress - set if the tag is %pb.
+ * flags    - returns the type of the line. See constants i wps-display.h
  *
  * Returns the tag. NULL indicates the tag wasn't available.
  */
@@ -228,7 +219,7 @@ static char* get_tag(struct mp3entry* id3,
                      char* tag, 
                      char* buf, 
                      int buf_size,
-                     struct format_flags* flags)
+                     unsigned char* flags)
 {
     if ((0 == tag[0]) || (0 == tag[1]))
     {
@@ -238,6 +229,7 @@ static char* get_tag(struct mp3entry* id3,
     switch (tag[0])
     {
         case 'i':  /* ID3 Information */
+            *flags |= WPS_REFRESH_STATIC;
             switch (tag[1])
             {
                 case 't':  /* ID3 Title */
@@ -263,6 +255,7 @@ static char* get_tag(struct mp3entry* id3,
             break;
 
         case 'f':  /* File Information */
+            *flags |= WPS_REFRESH_STATIC;
             switch(tag[1])
             {
                 case 'v':  /* VBR file? */
@@ -310,40 +303,42 @@ static char* get_tag(struct mp3entry* id3,
             switch(tag[1])
             {
                 case 'b':  /* progress bar */
-                    flags->player_progress = true;
-                    flags->dynamic = true;
+                    *flags |= WPS_REFRESH_PLAYER_PROGRESS;
                     return "\x01";
 
                 case 'p':  /* Playlist Position */
+                    *flags |= WPS_REFRESH_STATIC;
                     snprintf(buf, buf_size, "%d", id3->index + 1);
                     return buf;
 
                 case 'n':  /* Playlist Name (without path) */
+                    *flags |= WPS_REFRESH_STATIC;
                     return playlist_name(buf, buf_size);
 
                 case 'e':  /* Playlist Total Entries */
+                    *flags |= WPS_REFRESH_STATIC;
                     snprintf(buf, buf_size, "%d", playlist_amount());
                     return buf;
 
                 case 'c':  /* Current Time in Song */
-                    flags->dynamic = true;
+                    *flags |= WPS_REFRESH_DYNAMIC;
                     format_time(buf, buf_size, id3->elapsed + ff_rewind_count);
                     return buf;
 
                 case 'r': /* Remaining Time in Song */
-                    flags->dynamic = true;
+                    *flags |= WPS_REFRESH_DYNAMIC;
                     format_time(buf, buf_size, 
                                 id3->length - id3->elapsed - ff_rewind_count);
                     return buf;
 
                 case 't':  /* Total Time */
+                    *flags |= WPS_REFRESH_STATIC;
                     format_time(buf, buf_size, id3->length);
                     return buf;
 
 #ifdef HAVE_LCD_BITMAP
                 case 'm': /* Peak Meter */
-                    flags->peak_meter = true;
-                    flags->dynamic = true;
+                    *flags |= WPS_REFRESH_PEAK_METER;
                     return "\x01";
 #endif
             }
@@ -351,6 +346,7 @@ static char* get_tag(struct mp3entry* id3,
     
         case 'd': /* Directory path information */
             {
+                *flags |= WPS_REFRESH_STATIC;
                 int level = tag[1] - '0';
                 /* d1 through d9 */
                 if ((0 < level) && (9 > level))
@@ -437,16 +433,13 @@ static char* skip_conditional(char* fmt, bool to_else)
  * buf_size - the size of buffer.
  * id3      - the ID3 data to format with.
  * fmt      - format description.
- * flags    - flags in this struct will be set depending on the tag:
- *            dynamic - if the tag data changes over time (like play time);
- *            player_progress - set if the tag is %pb.
- *            scroll - if line scrolling is requested.
+ * flags    - returns the type of the line. See constants i wps-display.h
  */
 static void format_display(char* buf, 
                            int buf_size, 
                            struct mp3entry* id3, 
                            char* fmt, 
-                           struct format_flags* flags)
+                           unsigned char* flags)
 {
     char temp_buf[128];
     char* buf_end = buf + buf_size - 1;   /* Leave room for end null */
@@ -483,7 +476,7 @@ static void format_display(char* buf,
                 break;
         
             case 's':
-                flags->scroll = true;
+                *flags |= WPS_REFRESH_SCROLL;
                 ++fmt;
                 break;
         
@@ -526,10 +519,10 @@ static void format_display(char* buf,
     *buf = 0;
 }
 
-bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_all)
+bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mode)
 {
     char buf[MAX_PATH];
-    struct format_flags flags;
+    unsigned char flags;
     int i;
 #ifdef HAVE_LCD_BITMAP
     /* to find out wether the peak meter is enabled we
@@ -554,16 +547,15 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_all)
         if ( !format_lines[i] )
             break;
 
-        if (dynamic_lines[i] || refresh_all)
+        if ((line_type[i] & refresh_mode) || 
+            (refresh_mode == WPS_REFRESH_ALL))
         {
-            flags.dynamic = false;
-            flags.scroll = false;
-            flags.player_progress = false;
-            flags.peak_meter = false;
+            flags = 0;
             format_display(buf, sizeof(buf), id3, format_lines[i], &flags);
-            dynamic_lines[i] = flags.dynamic;
+            line_type[i] = flags;
             
-            if (flags.player_progress) {
+            /* progress */
+            if (flags & refresh_mode & WPS_REFRESH_PLAYER_PROGRESS) {
 #ifdef HAVE_LCD_CHARCELLS
                 draw_player_progress(id3, ff_rewind_count);
 #else
@@ -578,11 +570,12 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_all)
             }
 
 #ifdef HAVE_LCD_BITMAP
-            if (flags.peak_meter) {
+            /* peak meter */
+            if (flags & refresh_mode & WPS_REFRESH_PEAK_METER) {
                 int peak_meter_y;
-                int w,h;
+                struct font *fnt = font_get(FONT_UI);
+                int h = fnt->height;
                 int offset = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
-                lcd_getstringsize("M",&w,&h);
 
                 peak_meter_y = i * h + offset;
 
@@ -601,9 +594,12 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_all)
             }
 #endif
 
-            if (flags.scroll && !flags.dynamic)
+            /* static line */
+            if (flags & WPS_REFRESH_SCROLL)
             {
+                if (refresh_mode & WPS_REFRESH_SCROLL) {
                 lcd_puts_scroll(0, i, buf);
+            }
             }
             else
             {
@@ -656,7 +652,7 @@ bool wps_display(struct mp3entry* id3)
             }
         }
     }
-    wps_refresh(id3, 0, true);
+    wps_refresh(id3, 0, WPS_REFRESH_ALL);
     status_draw();
     lcd_update();
     return false;

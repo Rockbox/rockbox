@@ -68,7 +68,7 @@ void player_change_volume(int button)
                 if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-                wps_refresh(id3,0,false);
+                wps_refresh(id3, 0, WPS_REFRESH_NON_STATIC);
                 settings_save();
                 break;
 
@@ -78,7 +78,7 @@ void player_change_volume(int button)
                 if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-                wps_refresh(id3,0,false);
+                wps_refresh(id3, 0, WPS_REFRESH_NON_STATIC);
                 settings_save();
                 break;
 
@@ -100,7 +100,7 @@ void player_change_volume(int button)
             button = button_get(true);
     }
     status_draw();
-    wps_refresh(id3,0,true);
+    wps_refresh(id3,0, WPS_REFRESH_ALL);
 }
 #endif
 
@@ -366,9 +366,9 @@ static bool ffwd_rew(int button)
                 }
 
                 if(wps_time_countup == false)
-                    wps_refresh(id3, -ff_rewind_count, false);
+                    wps_refresh(id3, -ff_rewind_count, WPS_REFRESH_PLAYER_PROGRESS);
                 else
-                    wps_refresh(id3, ff_rewind_count, false);
+                    wps_refresh(id3, ff_rewind_count, WPS_REFRESH_PLAYER_PROGRESS);
 
                 break;
 
@@ -399,7 +399,7 @@ static bool ffwd_rew(int button)
         if (!exit)
             button = button_get(true);
     }
-    wps_refresh(id3,0,true);
+    wps_refresh(id3, 0, WPS_REFRESH_ALL);
     return usb;
 }
 
@@ -415,11 +415,11 @@ static bool update(void)
         if (wps_display(id3))
             retcode = true;
         else
-            wps_refresh(id3,0,true);
+            wps_refresh(id3, 0, WPS_REFRESH_ALL);
     }
 
     if (id3)
-        wps_refresh(id3,0,false);
+        wps_refresh(id3, 0, WPS_REFRESH_NON_STATIC);
 
     status_draw();
 
@@ -453,7 +453,7 @@ static bool keylock(void)
 #endif
     display_keylock_text(true);
     keys_locked = true;
-    wps_refresh(id3,0,true);
+    wps_refresh(id3, 0, WPS_REFRESH_ALL);
     if (wps_display(id3)) {
         keys_locked = false;
 #ifdef HAVE_LCD_CHARCELLS
@@ -511,7 +511,7 @@ static bool keylock(void)
             default:
                 display_keylock_text(true);
                 while (button_get(false)); /* clear button queue */
-                wps_refresh(id3,0,true);
+                wps_refresh(id3, 0, WPS_REFRESH_ALL);
                 if (wps_display(id3)) {
                     keys_locked = false;
 #ifdef HAVE_LCD_CHARCELLS
@@ -628,7 +628,7 @@ static bool menu(void)
 #endif
 
     wps_display(id3);
-    wps_refresh(id3,0,true);
+    wps_refresh(id3, 0, WPS_REFRESH_ALL);
     return false;
 }
 
@@ -659,7 +659,7 @@ int wps_show(void)
         if (id3) {
             if (wps_display(id3))
                 return 0;
-            wps_refresh(id3,0,true);
+            wps_refresh(id3, 0, WPS_REFRESH_ALL);
         }
         restore = true;
     }
@@ -674,14 +674,44 @@ int wps_show(void)
             isn't displayed */
         if (peak_meter_enabled) {
             int i;
+
+            /* In high performance mode we read out the mas as
+               often as we can. There is no sleep for cpu */
+            if (global_settings.peak_meter_performance) {
+                long next_refresh = current_tick;
+                long next_big_refresh = current_tick + HZ / 5;
+                button = BUTTON_NONE;
+                while (!TIME_AFTER(current_tick, next_big_refresh)) {
+                    button = button_get(false);
+                    if (button != BUTTON_NONE) {
+                        break;
+                    }
+                    peak_meter_peek();
+                    yield();
+
+                    if (TIME_AFTER(current_tick, next_refresh)) {
+                        wps_refresh(id3, 0, WPS_REFRESH_PEAK_METER);
+                        next_refresh = current_tick + HZ / peak_meter_fps;
+                    }
+                }
+            } 
+            
+            /* In energy saver mode the cpu may sleep a 
+               little bit while waiting for buttons */
+            else {
             for (i = 0; i < 4; i++) {
-                button = button_get_w_tmo(HZ / 20);
+                    button = button_get_w_tmo(HZ / peak_meter_fps);
                 if (button != 0) {
                     break;
                 }
-                wps_refresh(id3, 0, false);
+                    wps_refresh(id3, 0, WPS_REFRESH_PEAK_METER);
+                }
             }
-        } else {
+        } 
+        
+        /* The peak meter is disabled 
+           -> no additional screen updates needed */
+        else {
             button = button_get_w_tmo(HZ/5);
         }
 #else
@@ -880,7 +910,7 @@ int wps_show(void)
             if (wps_display(id3))
                 return 0;
             if (id3)
-                wps_refresh(id3,0,false);
+                wps_refresh(id3, 0, WPS_REFRESH_NON_STATIC);
         }
         if(button != BUTTON_NONE)
             lastbutton = button;

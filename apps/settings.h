@@ -100,6 +100,10 @@ struct user_settings
     int peak_meter_release;   /* units per read out */
     int peak_meter_hold;      /* hold time for peak meter in 1/100 s */
     int peak_meter_clip_hold; /* hold time for clips */
+    bool peak_meter_dbfs;     /* show linear or dbfs values */
+    bool peak_meter_performance;  /* true: high performance, else save energy*/
+    unsigned char peak_meter_min; /* range minimum */
+    unsigned char peak_meter_max; /* range maximum */
 
     /* show status bar */
     bool statusbar;    /* 0=hide, 1=show */
@@ -121,6 +125,7 @@ int settings_save(void);
 void settings_load(void);
 void settings_reset(void);
 void settings_apply(void);
+void settings_apply_pm_range(void);
 void settings_display(void);
 
 bool settings_load_config(char* file);

@@ -22,7 +22,18 @@
 #include <stdbool.h>
 #include "id3.h"
 
-bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_scroll);
+/* constants used in line_type and as refresh_mode for wps_refresh */
+#define WPS_REFRESH_STATIC          1    /* line doesn't change over time */
+#define WPS_REFRESH_DYNAMIC         2    /* line may change (e.g. time flag) */
+#define WPS_REFRESH_SCROLL          4    /* line scrolls */
+#define WPS_REFRESH_PLAYER_PROGRESS 8    /* line contains a progress bar */
+#define WPS_REFRESH_PEAK_METER      16   /* line contains a peak meter */
+#define WPS_REFRESH_ALL             0xff /* to refresh all line types */
+/* to refresh only those lines that change over time */
+#define WPS_REFRESH_NON_STATIC (WPS_REFRESH_ALL & ~WPS_REFRESH_STATIC & ~WPS_REFRESH_SCROLL)
+
+
+bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mode);
 bool wps_display(struct mp3entry* id3);
 bool wps_load(char* file, bool display);
 void wps_reset(void);
