@@ -146,6 +146,7 @@ static struct plugin_api rockbox_api = {
     snprintf,
     strcpy,
     strlen,
+    strrchr,
     memset,
     memcpy,
 #ifndef SIMULATOR

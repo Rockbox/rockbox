@@ -174,6 +174,7 @@ struct plugin_api {
     int    (*snprintf)(char *buf, size_t size, const char *fmt, ...);
     char*  (*strcpy)(char *dst, const char *src);
     size_t (*strlen)(const char *str);
+    char * (*strrchr)(const char *s, int c);
     void*  (*memset)(void *dst, int c, size_t length);
     void*  (*memcpy)(void *out, const void *in, size_t n);
 #ifndef SIMULATOR
