@@ -410,7 +410,7 @@ static void mpeg_thread(void)
                     
                         /* Make sure that the write pointer is at a word
                            boundary */
-                        mp3buf_write &= 0xfffffffe;
+                        mp3buf_write = (mp3buf_write + 1) & 0xfffffffe;
 
                         if(new_file() < 0)
                         {
