@@ -1590,7 +1590,7 @@ bool set_int(char* string,
    that 'variable' points to. not the value within. Only variables with
    type 'bool' should use parameter BOOL.
 
-   The type separation is nececssary since int and bool are fundamentally
+   The type separation is necessary since int and bool are fundamentally
    different and bit-incompatible types and can not share the same access
    code. */
 
@@ -1601,8 +1601,12 @@ bool set_option(char* string, void* variable, enum optiontype type,
     int button;
     int* intvar = (int*)variable;
     bool* boolvar = (bool*)variable;
-    int orgint=*intvar;
-    bool orgbool=*boolvar;
+    int oldval = 0;
+
+    if (type==INT)
+        oldval=*intvar;
+    else
+        oldval=*boolvar;
 
 #ifdef HAVE_LCD_BITMAP
     if(global_settings.statusbar)
@@ -1672,12 +1676,12 @@ bool set_option(char* string, void* variable, enum optiontype type,
             case BUTTON_STOP:
             case BUTTON_MENU:
 #endif
-                if (((type==INT) && (*intvar != orgint)) ||
-                    ((type==BOOL) && (*boolvar != orgbool))) {
+                if (((type==INT) && (*intvar != oldval)) ||
+                    ((type==BOOL) && (*boolvar != oldval))) {
                     if (type==INT)
-                        *intvar=orgint;
+                        *intvar=oldval;
                     else
-                        *boolvar=orgbool;
+                        *boolvar=oldval;
                     lcd_stop_scroll();
                     lcd_puts(0, 0, str(LANG_MENU_SETTING_CANCEL));
                     lcd_update();
