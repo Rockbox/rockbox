@@ -188,6 +188,7 @@ int ata_read_sectors(unsigned long start,
         poweroff = false;
     }
 
+    ATA_SELECT = ata_device;
     if (!wait_for_rdy())
     {
         mutex_unlock(&ata_mtx);
@@ -308,6 +309,7 @@ int ata_write_sectors(unsigned long start,
         poweroff = false;
     }
     
+    ATA_SELECT = ata_device;
     if (!wait_for_rdy())
     {
         mutex_unlock(&ata_mtx);
@@ -398,6 +400,8 @@ static int check_registers(void)
 
 static int freeze_lock(void)
 {
+    ATA_SELECT = ata_device;
+
     if (!wait_for_rdy())
         return -1;
 
@@ -435,13 +439,14 @@ static int ata_perform_sleep(void)
 
     mutex_lock(&ata_mtx);
 
+    ATA_SELECT = ata_device;
+
     if(!wait_for_rdy()) {
         DEBUGF("ata_perform_sleep() - not RDY\n");
         mutex_unlock(&ata_mtx);
         return -1;
     }
 
-    ATA_SELECT = ata_device;
     ATA_COMMAND = CMD_SLEEP;
 
     if (!wait_for_rdy())
@@ -537,6 +542,7 @@ int ata_hard_reset(void)
     sleep(1); /* > 2ms */
 
     /* state HRR2 */
+    ATA_SELECT = ata_device; /* select the right device */
     ret = wait_for_bsy();
 
     /* Massage the return code so it is 0 on success and -1 on failure */
@@ -590,11 +596,11 @@ static int ata_power_on(void)
     if( ata_hard_reset() )
         return -1;
 
-    ATA_SELECT = SELECT_LBA;
-    ATA_CONTROL = CONTROL_nIEN;
-
     if (set_multiple_mode(multisectors))
         return -2;
+
+    if (freeze_lock())
+        return -3;
 
     sleeping = false;
     poweroff = false;
@@ -676,12 +682,13 @@ static int identify(void)
 {
     int i;
 
+    ATA_SELECT = ata_device;
+
     if(!wait_for_rdy()) {
         DEBUGF("identify() - not RDY\n");
         return -1;
     }
 
-    ATA_SELECT = ata_device;
     ATA_COMMAND = CMD_IDENTIFY;
 
     if (!wait_for_start_of_transfer())
@@ -699,12 +706,13 @@ static int identify(void)
 
 static int set_multiple_mode(int sectors)
 {
+    ATA_SELECT = ata_device;
+
     if(!wait_for_rdy()) {
         DEBUGF("set_multiple_mode() - not RDY\n");
         return -1;
     }
 
-    ATA_SELECT = ata_device;
     ATA_NSECTOR = sectors;
     ATA_COMMAND = CMD_SET_MULTIPLE_MODE;
 
@@ -755,9 +763,6 @@ int ata_init(void)
     }
     if (set_multiple_mode(multisectors))
         return -6;
-
-    ATA_SELECT = SELECT_LBA;
-    ATA_CONTROL = CONTROL_nIEN;
 
     return 0;
 }
