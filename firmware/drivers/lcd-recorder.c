@@ -44,12 +44,16 @@
 #define LCD_SET_ENTIRE_DISPLAY_ON                 ((char)0xA5)
 #define LCD_SET_NORMAL_DISPLAY                    ((char)0xA6)
 #define LCD_SET_REVERSE_DISPLAY                   ((char)0xA7)
+#define LCD_SET_MULTIPLEX_RATIO                   ((char)0xA8)
+#define LCD_SET_BIAS_TC_OSC                       ((char)0xA9)
+#define LCD_SET_1OVER4_BIAS_RATIO                 ((char)0xAA)
 #define LCD_SET_INDICATOR_OFF                     ((char)0xAC)
 #define LCD_SET_INDICATOR_ON                      ((char)0xAD)
 #define LCD_SET_DISPLAY_OFF                       ((char)0xAE)
 #define LCD_SET_DISPLAY_ON                        ((char)0xAF)
 #define LCD_SET_PAGE_ADDRESS                      ((char)0xB0)
 #define LCD_SET_COM_OUTPUT_SCAN_DIRECTION         ((char)0xC0)
+#define LCD_SET_TOTAL_FRAME_PHASES                ((char)0xD2)
 #define LCD_SET_DISPLAY_OFFSET                    ((char)0xD3)
 #define LCD_SET_READ_MODIFY_WRITE_MODE            ((char)0xE0)
 #define LCD_SOFTWARE_RESET                        ((char)0xE2)
@@ -127,6 +131,24 @@ void lcd_init (void)
     /* Initialize PB0-3 as output pins */
     PBCR2 &= 0xff00; /* MD = 00 */
     PBIOR |= 0x000f; /* IOR = 1 */
+
+	/* inits like the original firmware */
+	lcd_write(true, LCD_SOFTWARE_RESET);
+	lcd_write(true, LCD_SET_INTERNAL_REGULATOR_RESISTOR_RATIO + 4);
+	lcd_write(true, LCD_SET_1OVER4_BIAS_RATIO + 0); /* force 1/4 bias: 0 */
+	lcd_write(true, LCD_SET_POWER_CONTROL_REGISTER + 7); /* power control register: op-amp=1, regulator=1, booster=1 */
+	lcd_write(true, LCD_SET_DISPLAY_ON);
+	lcd_write(true, LCD_SET_NORMAL_DISPLAY);
+	lcd_write(true, LCD_SET_SEGMENT_REMAP + 1); /* mirror horizontal: 1 */
+	lcd_write(true, LCD_SET_COM_OUTPUT_SCAN_DIRECTION + 8); /* mirror vertical: 1 */
+	lcd_write(true, LCD_SET_DISPLAY_START_LINE + 0);
+#if 0 /* done later, depending on h/w mask bit and settings */
+	lcd_write(true, LCD_SET_CONTRAST_CONTROL_REGISTER);
+	lcd_write(true, 0xF1); /* contrast set to 49/64 */
+#endif
+	lcd_write(true, LCD_SET_PAGE_ADDRESS);
+	lcd_write(true, LCD_SET_LOWER_COLUMN_ADDRESS + 0);
+	lcd_write(true, LCD_SET_HIGHER_COLUMN_ADDRESS + 0);
 
     lcd_clear_display();
     lcd_update();
