@@ -65,7 +65,7 @@ void savestate(int fd);
 #define open(a,b)       rb->sim_open((a),(b))
 #undef lseek
 #define lseek(a,b,c)    rb->sim_lseek((a),(b),(c))
-#define ICODE_ATTR	 
+#define ICODE_ATTR
 #define IDATA_ATTR	 
 #else /* !SIMULATOR */
 #define opendir(a)      rb->opendir((a))
@@ -73,7 +73,7 @@ void savestate(int fd);
 #define mkdir(a,b)      rb->mkdir((a),(b))
 #define open(a,b)       rb->open((a),(b))
 #define lseek(a,b,c)    rb->lseek((a),(b),(c))
-#if CONFIG_CPU == MCF5249 && !defined(SIMULATOR)
+#if CONFIG_CPU == MCF5249
 #define ICODE_ATTR	__attribute__ ((section(".icode")))
 #define IDATA_ATTR	__attribute__ ((section(".idata")))
 #define USE_IRAM	1
