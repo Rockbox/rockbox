@@ -17,14 +17,11 @@ sub list {
     print "</ul>\n";
 }
 
-print "<table class=rockbox><tr><th>player-old</th><th>player</th><th>recorder</th></tr>\n";
-print "<tr><td>This version is for old Archos Jukebox 5000, 6000 models with ROM firmware older than 4.50:\n";
-&list("playerold");
-
-print "</td><td>This version is for Archos Jukebox 5000/6000 with ROM firmware 4.50 or later, and all Studio models:\n";
+print "<table class=rockbox><tr><th>player</th><th>recorder</th></tr>\n";
+print "<tr><td>\n";
 &list("player");
 
-print "</td><td>This version is for all Archos Jukebox Recorder models:\n";
+print "</td><td>\n";
 &list("recorder");
 
 print "</td></tr></table>\n";

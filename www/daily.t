@@ -19,10 +19,9 @@ describing how to compile Rockbox
 <p>These are automated daily builds of the CVS code.
 They are <i>not</i> official releases and are in fact almost guaranteed to contain bugs!
 
-<p>These builds are discussed in IRC or mail only. <font color="red"><big><b>DO NOT FILE BUG REPORTS FOR THEM!</b></big></font>
+<p><b>New:</b> We now accept bug reports for daily builds too. Just make sure you mark the report with the exact version you were running.
 
-<p>There are three versions of each build:
-
+<p>
 <!--#exec cmd="./dailymod.pl" -->
 
 <p><b>Note 1:</b> You must rename the file to "archos.mod" ("ajbrec.ajz" for the recorder) before copying it to the root of your archos.
