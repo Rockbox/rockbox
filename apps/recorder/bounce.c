@@ -225,8 +225,63 @@ static void addclock(void)
     }
 }
 
+#define LETTERS_ON_SCREEN 12
 
-static void loopit(void)
+#define YSPEED 2
+#define XSPEED 3
+#define YADD -4
+
+static int scrollit(void)
+{
+    int b;
+    unsigned int y=100;
+    int x=LCD_WIDTH;
+    unsigned int yy,xx;
+    unsigned int i;
+    int textpos=0;
+
+    char rock[]="Rockbox! Pure pleasure. Pure fun. Oooh. What fun! ;-) ";
+    int letter;
+
+    while(button_get(false) & BUTTON_REL);
+
+    lcd_clear_display();
+    while(1)
+    {
+        b = button_get_w_tmo(HZ/10);
+        if ( b & BUTTON_OFF )
+            return 0;
+        else if ( b & BUTTON_ON )
+            return 1;
+
+        lcd_clear_display();
+
+        for(i=0, yy=y, xx=x; i< LETTERS_ON_SCREEN; i++) {
+            letter = rock[(i+textpos) % (sizeof(rock)-1) ];
+
+            lcd_bitmap((char *)char_gen_12x16[letter-0x20],
+                       xx, table[yy&63],
+                       11, 16, false);
+            yy += YADD;
+            xx+= LCD_WIDTH/LETTERS_ON_SCREEN;
+        }
+        addclock();
+        lcd_update();
+
+        x-= XSPEED;
+        
+        if(x < 0) {
+            x += LCD_WIDTH/LETTERS_ON_SCREEN;
+            y += YADD;
+            textpos++;
+        }
+
+        y+=YSPEED;
+
+    }
+}
+
+static int loopit(void)
 {
     int b;
     unsigned int y=100;
@@ -242,12 +297,16 @@ static void loopit(void)
     int timeout=0;
     char buffer[30];
 
+    while(button_get(false) & BUTTON_REL);
+
     lcd_clear_display();
     while(1)
     {
         b = button_get_w_tmo(HZ/10);
         if ( b & BUTTON_OFF )
-            break;
+            return 0;
+        if ( b & BUTTON_ON )
+            return 1;
         else if(b != BUTTON_NONE)
             timeout=20;
 
@@ -336,9 +395,20 @@ bool bounce(void)
 
     lcd_update();
     sleep(HZ);
-    loopit();
 
+    do {
+        h= loopit();
+        if(h)
+            h= scrollit();
+    } while(h);
+    
     return false;
 }
 
 #endif
+
+/* -----------------------------------------------------------------
+ * local variables:
+ * eval: (load-file "../../firmware/rockbox-mode.el")
+ * end:
+ */
