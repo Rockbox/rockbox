@@ -101,7 +101,7 @@ static char power_thread_name[] = "power";
 
 static int poweroff_timeout = 0;
 static long last_charge_time = 0;
-static int powermgmt_est_runningtime_min = -1;
+int powermgmt_est_runningtime_min = -1;
 
 static bool sleeptimer_active = false;
 static unsigned long sleeptimer_endtick;
@@ -164,7 +164,7 @@ int battery_level(void)
 #ifdef HAVE_CHARGE_CTRL
     if (powermgmt_last_cycle_startstop_min < 20) {
         /* the batteries are lazy, so take a value between the result of the two table lookups */
-        if (charger_enabled)
+        if (charge_state == 1)
             level = (voltage_to_percent(level, percent_to_volt_charge)
                      * battery_lazyness[powermgmt_last_cycle_startstop_min]
                      + voltage_to_percent(level, percent_to_volt_nocharge)
@@ -175,7 +175,7 @@ int battery_level(void)
                      + voltage_to_percent(level, percent_to_volt_charge)
                      * (100 - battery_lazyness[powermgmt_last_cycle_startstop_min])) / 100;
     } else {
-        if (charger_enabled)
+        if (charge_state == 1)
             level = voltage_to_percent(level, percent_to_volt_charge);
         else
             level = voltage_to_percent(level, percent_to_volt_nocharge);
@@ -340,7 +340,7 @@ static void power_thread(void)
         /* charging:     remaining charging time */
 
 #ifdef HAVE_CHARGE_CTRL
-        if (charger_enabled)
+        if (charge_state == 1)
             /* if taking the nocharge battery level, charging lasts 30% longer than the value says */
             /* so consider it because there's the battery lazyness inside the the battery_level */
             if (powermgmt_last_cycle_startstop_min < 20) {
