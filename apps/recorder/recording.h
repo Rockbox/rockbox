@@ -20,6 +20,6 @@
 #define RECORDING_H
 
 bool recording_screen(void);
-char *rec_create_filename(void);
+char *rec_create_filename(char *buf);
 
 #endif

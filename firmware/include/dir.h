@@ -72,7 +72,7 @@ typedef struct DIRtag
 
 extern DIR* opendir(char* name);
 extern int closedir(DIR* dir);
-extern int mkdir(char* name);
+extern int mkdir(char* name, int mode);
 
 extern struct dirent* readdir(DIR* dir);
 

@@ -28,6 +28,7 @@
 #define FONT_DIR "/fonts"
 #define LANG_DIR "/langs"
 #define PLUGIN_DIR ROCKBOX_DIR"/rocks"
+#define REC_BASE_DIR "/recordings"
 
 #define MAX_FILENAME 20
 
@@ -95,6 +96,7 @@ struct user_settings
                           13= 24:00 */
 
     int rec_prerecord_time; /* In seconds, 0-30, 0 means OFF */
+    int rec_directory; /* 0=base dir, 1=current dir */
     
     /* device settings */
 
@@ -229,6 +231,9 @@ extern struct user_settings global_settings;
  * files are stored */
 extern char rockboxdir[];
 extern long lasttime;
+
+/* Recording base directory */
+extern char rec_base_directory[];
 
 /* system defines */
 

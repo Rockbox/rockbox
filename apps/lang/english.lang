@@ -2030,3 +2030,18 @@ id: LANG_MANAGE_MENU
 desc: in the system sub menu
 eng: "Manage Settings"
 new:
+
+id: LANG_RECORD_DIRECTORY
+desc: in recording settings_menu
+eng: "Directory"
+new:
+
+id: LANG_RECORD_CURRENT_DIR
+desc: in recording directory options
+eng: "Current dir"
+new:
+
+id: LANG_CREATE_DIR
+desc: in main menu
+eng: "Create directory"
+new:

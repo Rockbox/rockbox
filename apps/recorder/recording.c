@@ -42,6 +42,10 @@
 #include "timefuncs.h"
 #include "debug.h"
 #include "misc.h"
+#include "tree.h"
+#include "string.h"
+#include "dir.h"
+#include "errno.h"
 
 bool f2_rec_screen(void);
 bool f3_rec_screen(void);
@@ -114,20 +118,22 @@ void adjust_cursor(void)
     }
 }
 
-char *rec_create_filename(void)
+char *rec_create_filename(char *buffer)
 {
-    static char fname[32];
-    struct tm * tm;
+    int fpos;
+    struct tm *tm = get_time();
 
-    tm = get_time();
+    if(global_settings.rec_directory)
+        getcwd(buffer, MAX_PATH);
+    else
+        strncpy(buffer, rec_base_directory, MAX_PATH);
 
-    /* Create a filename: RYYMMDD-HHMMSS.mp3 */
-    snprintf(fname, 32, "/R%02d%02d%02d-%02d%02d%02d.mp3",
+    /* Append filename to path: RYYMMDD-HH.MM.SS.mp3 */
+    fpos = strlen(buffer);
+    snprintf(&buffer[fpos], MAX_PATH-fpos, "/R%02d%02d%02d-%02d%02d%02d.mp3",
              tm->tm_year%100, tm->tm_mon+1, tm->tm_mday,
              tm->tm_hour, tm->tm_min, tm->tm_sec);
-
-    DEBUGF("Filename: %s\n", fname);
-    return fname;
+    return buffer;
 }
 
 bool recording_screen(void)
@@ -144,6 +150,9 @@ bool recording_screen(void)
     unsigned int seconds;
     unsigned int last_seconds = 0;
     int hours, minutes;
+    char path_buffer[MAX_PATH];
+    int rc;
+    bool been_in_usb_mode = false;
 
     cursor = 0;
     mpeg_init_recording();
@@ -170,6 +179,25 @@ bool recording_screen(void)
     lcd_getstringsize("M", &w, &h);
     lcd_setmargins(global_settings.invert_cursor ? 0 : w, 8);
 
+    /* Try to create the base directory if needed */
+    if(global_settings.rec_directory == 0)
+    {
+        rc = mkdir(rec_base_directory, 0);
+        if(rc < 0 && errno != EEXIST)
+        {
+            splash(HZ * 2, true,
+                   "Can't create the %s directory. Error code %d.",
+                   rec_base_directory, rc);
+        }
+        else
+        {
+            /* If we have created the directory, we want the dir browser to
+               be refreshed even if we haven't recorded anything */
+            if(errno != EEXIST)
+                have_recorded = true;
+        }
+    }
+    
     while(!done)
     {
         button = button_get_w_tmo(HZ / peak_meter_fps);
@@ -195,13 +223,13 @@ bool recording_screen(void)
                 if(!(mpeg_status() & MPEG_STATUS_RECORD))
                 {
                     have_recorded = true;
-                    mpeg_record(rec_create_filename());
+                    mpeg_record(rec_create_filename(path_buffer));
                     status_set_playmode(STATUS_RECORD);
                     update_countdown = 1; /* Update immediately */
                 }
                 else
                 {
-                    mpeg_new_file(rec_create_filename());
+                    mpeg_new_file(rec_create_filename(path_buffer));
                     update_countdown = 1; /* Update immediately */
                 }
                 last_seconds = 0;
@@ -354,8 +382,8 @@ bool recording_screen(void)
                 if(mpeg_status() != MPEG_STATUS_RECORD)
                 {
                     usb_screen();
-                    have_recorded = true; /* Refreshes the browser later on */
                     done = true;
+                    been_in_usb_mode = true;
                 }
                 break;
         }
@@ -419,7 +447,7 @@ bool recording_screen(void)
                    that the recorded files don't get too big. */
                 if (mpeg_status() && (seconds >= dseconds))
                 {
-                    mpeg_new_file(rec_create_filename());
+                    mpeg_new_file(rec_create_filename(path_buffer));
                     update_countdown = 1;
                     last_seconds = 0;
                 }
@@ -529,7 +557,11 @@ bool recording_screen(void)
     mpeg_sound_set(SOUND_AVC, global_settings.avc);
 
     lcd_setfont(FONT_UI);
-    return have_recorded;
+
+    if (have_recorded)
+        reload_directory();
+
+    return been_in_usb_mode;
 }
 
 bool f2_rec_screen(void)

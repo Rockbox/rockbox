@@ -117,7 +117,7 @@ static int find_preset(int freq)
 
 bool radio_screen(void)
 {
-    char buf[128];
+    char buf[MAX_PATH];
     bool done = false;
     int button;
     int val;
@@ -248,13 +248,13 @@ bool radio_screen(void)
             case BUTTON_F3:
                 if(mpeg_status() == MPEG_STATUS_RECORD)
                 {
-                    mpeg_new_file(rec_create_filename());
+                    mpeg_new_file(rec_create_filename(buf));
                     update_screen = true;
                 }
                 else
                 {
                     have_recorded = true;
-                    mpeg_record(rec_create_filename());
+                    mpeg_record(rec_create_filename(buf));
                     status_set_playmode(STATUS_RECORD);
                     update_screen = true;
                 }

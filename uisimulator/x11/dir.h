@@ -32,6 +32,7 @@ typedef void * MYDIR;
 extern MYDIR *x11_opendir(char *name);
 extern struct x11_dirent* x11_readdir(MYDIR* dir);
 extern int x11_closedir(MYDIR *dir);
+extern int x11_mkdir(char *name, int mode);
 
 #ifndef NO_REDEFINES_PLEASE
 
@@ -40,6 +41,7 @@ extern int x11_closedir(MYDIR *dir);
 #define opendir(x) x11_opendir(x)
 #define readdir(x) x11_readdir(x)
 #define closedir(x) x11_closedir(x)
+#define mkdir(x, y) x11_mkdir(x, y)
 
 #endif
 

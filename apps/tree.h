@@ -47,6 +47,7 @@ void browse_root(void);
 void set_current_file(char *path);
 bool rockbox_browse(char *root, int dirfilter);
 bool create_playlist(void);
+bool create_dir(void);
 void resume_directory(char *dir);
 char *getcwd(char *buf, int size);
 void reload_directory(void);

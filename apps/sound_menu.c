@@ -255,6 +255,17 @@ static bool recprerecord(void)
                       names, 31, NULL );
 }
 
+static bool recdirectory(void)
+{
+    char *names[] = {
+        rec_base_directory, str(LANG_RECORD_CURRENT_DIR)
+    };
+
+    return set_option(str(LANG_RECORD_DIRECTORY),
+                      &global_settings.rec_directory, INT,
+                      names, 2, NULL );
+}
+
 #endif /* HAVE_MAS3587F */
 
 static void set_chanconf(int val)
@@ -308,7 +319,7 @@ bool recording_menu(bool no_source)
 {
     int m;
     int i = 0;
-    struct menu_items menu[7];
+    struct menu_items menu[8];
     bool result;
 
     menu[i].desc = str(LANG_RECORDING_QUALITY);
@@ -327,6 +338,8 @@ bool recording_menu(bool no_source)
     menu[i++].function = rectimesplit;
     menu[i].desc = str(LANG_RECORD_PRERECORD_TIME);
     menu[i++].function = recprerecord;
+    menu[i].desc = str(LANG_RECORD_DIRECTORY);
+    menu[i++].function = recdirectory;
         
     m=menu_init( menu, i );
     result = menu_run(m);

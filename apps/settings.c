@@ -65,8 +65,10 @@ void dac_line_in(bool enable);
 #endif
 struct user_settings global_settings;
 char rockboxdir[] = ROCKBOX_DIR;       /* config/font/data file directory */
+char rec_base_directory[] = REC_BASE_DIR;
 
-#define CONFIG_BLOCK_VERSION 8
+
+#define CONFIG_BLOCK_VERSION 9
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -156,7 +158,7 @@ Rest of config block, only saved to disk:
 0xB8  (char[20]) WPS file
 0xCC  (char[20]) Lang file
 0xE0  (char[20]) Font file
-0xF4  Prerecording time (bit 0-4)
+0xF4  Prerecording time (bit 0-4), Recording directory option (bit 5-6)
 0xF5-0xFF  <unused>
 
 *************************************/
@@ -439,7 +441,8 @@ int settings_save( void )
     strncpy(&config_block[0xcc], global_settings.lang_file, MAX_FILENAME);
     strncpy(&config_block[0xe0], global_settings.font_file, MAX_FILENAME);
 
-    config_block[0xf4]=(unsigned char)global_settings.rec_prerecord_time;
+    config_block[0xf4]=((unsigned char)global_settings.rec_prerecord_time |
+                        ((unsigned char)global_settings.rec_directory << 5));
 
     if(save_config_buffer())
     {
@@ -681,7 +684,7 @@ void settings_load(void)
         }
 
         if (config_block[0x1d] != 0xFF)
-            memcpy(&global_settings.resume_seed,&config_block[0x1d], 4);
+            memcpy(&global_settings.resume_seed, &config_block[0x1d], 4);
 
         if (config_block[0x21] != 0xFF)
         {
@@ -766,8 +769,10 @@ void settings_load(void)
         strncpy(global_settings.lang_file, &config_block[0xcc], MAX_FILENAME);
         strncpy(global_settings.font_file, &config_block[0xe0], MAX_FILENAME);
 
-        if (config_block[0xf4] != 0xff)
-            global_settings.rec_prerecord_time = config_block[0xf4];
+        if (config_block[0xf4] != 0xff) {
+            global_settings.rec_prerecord_time = config_block[0xf4] & 0x1f;
+            global_settings.rec_directory = (config_block[0xf4] >> 5) & 3;
+        }
         
 #ifdef HAVE_LCD_CHARCELLS
         if (config_block[0xa8] != 0xff)
@@ -1100,6 +1105,10 @@ bool settings_load_config(char* file)
         }
         else if (!strcasecmp(name, "prerecording time")) {
             set_cfg_int(&global_settings.rec_prerecord_time, value, 0, 30);
+        }
+        else if (!strcasecmp(name, "rec directory")) {
+            static char* options[] = {rec_base_directory, "current"};
+            set_cfg_option(&global_settings.rec_directory, value, options, 2);
         }
 #endif
         else if (!strcasecmp(name, "idle poweroff")) {
@@ -1454,6 +1463,12 @@ bool settings_save_config(void)
     fprintf(fd, "prerecording time: %d\r\n",
             global_settings.rec_prerecord_time);
 
+    {
+        static char* options[] = {rec_base_directory, "current"};
+        fprintf(fd, "rec directory: %s\r\n",
+                options[global_settings.rec_directory]);
+    }
+
 #endif
 
     fprintf(fd, "#\r\n# Bookmarking\r\n#\r\n");
@@ -1513,6 +1528,7 @@ void settings_reset(void) {
     global_settings.rec_right_gain = 2; /* 0dB */
     global_settings.rec_editable = false;
     global_settings.rec_prerecord_time = 0;
+    global_settings.rec_directory = 0; /* rec_base_directory */
     global_settings.resume      = RESUME_ASK;
     global_settings.contrast    = lcd_default_contrast();
     global_settings.invert      = DEFAULT_INVERT_SETTING;

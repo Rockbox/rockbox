@@ -304,7 +304,7 @@ bool main_menu(void)
     int i = 0;
 
     /* main menu */
-    struct menu_items items[8];
+    struct menu_items items[9];
 
     items[i].desc = str(LANG_BOOKMARK_MENU);
     items[i++].function = bookmark_menu;
@@ -335,6 +335,9 @@ bool main_menu(void)
 
     items[i].desc = str(LANG_INFO);
     items[i++].function = info_menu;
+
+    items[i].desc = str(LANG_CREATE_DIR);
+    items[i++].function = create_dir;
 
     m=menu_init( items, i );
 #ifdef HAVE_LCD_CHARCELLS

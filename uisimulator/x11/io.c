@@ -133,6 +133,19 @@ int x11_creat(const char *name, mode_t mode)
     return (creat)(name, 0666);
 }
 
+int x11_mkdir(const char *name, mode_t mode)
+{
+    char buffer[256]; /* sufficiently big */
+    (void)mode;
+    if(name[0] == '/') {
+        sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
+        
+        debugf("We create the real directory '%s'\n", buffer);
+        return (mkdir)(buffer, 0666);
+    }
+    return (mkdir)(name, 0666);
+}
+
 int x11_remove(char *name)
 {
     char buffer[256]; /* sufficiently big */

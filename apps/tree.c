@@ -772,6 +772,9 @@ static bool handle_on(int *ds, int *dc, int numentries, int tree_max_on_screen, 
             {
                 int onplay_result;
 
+                if(!numentries)
+                    break;
+                
                 if (currdir[1])
                     snprintf(buf, sizeof buf, "%s/%s",
                              currdir, dircache[dircursor+dirstart].name);
@@ -1495,6 +1498,30 @@ bool create_playlist(void)
     add_dir(currdir[1] ? currdir : "/", fd);
     close(fd);
     sleep(HZ);
+
+    return true;
+}
+
+bool create_dir(void)
+{
+    char dirname[MAX_PATH];
+    int rc;
+    int pathlen;
+
+    memset(dirname, 0, sizeof dirname);
+    
+    snprintf(dirname, sizeof dirname, "%s/",
+             currdir[1] ? currdir : "");
+
+    pathlen = strlen(dirname);
+    rc = kbd_input(dirname + pathlen, (sizeof dirname)-pathlen);
+    if(rc < 0)
+        return false;
+
+    rc = mkdir(dirname, 0);
+    if(rc < 0) {
+        splash(HZ, true, "%s %s", str(LANG_CREATE_DIR), str(LANG_FAILED));
+    }
 
     return true;
 }
