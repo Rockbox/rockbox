@@ -48,6 +48,7 @@ Playlist/Song Info Tags:
         Recorder: This will replace the entire line with a progress bar.
   %pm : Peak Meter (Recorder only)
         The entire line is used as volume peak meter.
+  %pn : Playlist Name (Without path or extension)
   %pp : Playlist Position
   %pe : Total Number of Playlist Entries
   %pc : Current Time In Song
