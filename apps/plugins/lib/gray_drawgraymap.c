@@ -26,7 +26,7 @@
 #ifndef SIMULATOR /* not for simulator by now */
 #include "plugin.h"
 
-#ifdef HAVE_LCD_BITMAP /* and also not for the Player */
+#if CONFIG_LCD == LCD_SSD1815 /* only for Recorder/Ondio */
 #include "gray.h"
 
 /* Prototypes */
