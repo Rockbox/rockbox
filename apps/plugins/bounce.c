@@ -290,17 +290,13 @@ static int loopit(void)
     {
         b = rb->button_get_w_tmo(HZ/10);
         if ( b == (BUTTON_OFF|BUTTON_REL) )
-            return 0;
-        
-        if ( b == SYS_USB_CONNECTED) {
-            rb->usb_screen();
-            return 0;
-        }
-
-        if ( b == (BUTTON_ON|BUTTON_REL) )
-            return 1;
+            return PLUGIN_OK;
         else if(b != BUTTON_NONE)
             timeout=20;
+
+        if ( rb->default_event_handler(b) == SYS_USB_CONNECTED) {
+            return PLUGIN_USB_CONNECTED;
+        }
 
         y+= speed[ysanke&15] + values[NUM_YADD].num;
         x+= speed[xsanke&15] + values[NUM_XADD].num;
