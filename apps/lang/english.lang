@@ -214,13 +214,13 @@ new:
 id: LANG_FFRW_STEP
 desc: in settings_menu
 eng: "FF/RW Min Step"
-voice: "Fast forward/reverse minimum Step"
+voice: "Minimum Step"
 new:
 
 id: LANG_FFRW_ACCEL
 desc: in settings_menu
 eng: "FF/RW Accel"
-voice: "Fast forward/reverse Accelleration"
+voice: "Accelleration"
 new:
 
 id: LANG_FOLLOW
@@ -1258,7 +1258,7 @@ new:
 id: LANG_FADE_ON_STOP
 desc: options menu to set fade on stop or pause
 eng: "Fade On Stop/Pause"
-voice: "Fade On Stop/Pause"
+voice: "Fade On Stop and Pause"
 new:
 
 id: LANG_SOKOBAN_ON
@@ -1300,7 +1300,7 @@ new:
 id: LANG_SAVE_SETTINGS
 desc: in system_settings_menu()
 eng: "Write .cfg file"
-voice: "Write .cfg file"
+voice: "Write configuration file"
 new: 
 
 id: LANG_SETTINGS_SAVED1
@@ -1372,7 +1372,7 @@ new:
 id: LANG_INVERT_CURSOR_BAR
 desc: in settings_menu
 eng: "Bar(Inverse)"
-voice: "Bar(Inverse)"
+voice: "Inverse Bar"
 new:
 
 id: LANG_INVERT_LCD_NORMAL
@@ -1632,7 +1632,7 @@ new:
 id: LANG_FIRMWARE
 desc: in the main menu
 eng: "Browse Firmwares"
-voice: "Browse Firmwares"
+voice: "Browse Firm-wares"
 new:
 
 id: LANG_LANGUAGE
@@ -1644,13 +1644,13 @@ new:
 id: LANG_WHILE_PLAYING
 desc: in settings_menu()
 eng: "Browse .wps files"
-voice: "Browse .wps files"
+voice: "Browse while-playing-screen files"
 new:
 
 id: LANG_CUSTOM_CFG
 desc: in setting_menu()
 eng: "Browse .cfg files"
-voice: "Browse .cfg files"
+voice: "Browse configuration files"
 new:
 
 id: LANG_PLUGINS
@@ -1933,7 +1933,7 @@ new:
 id: LANG_WIND_MENU
 desc: in the playback sub menu
 eng: "FFwd/Rewind"
-voice: ""
+voice: "Fast forward and Rewind"
 new:
 
 id: LANG_LCD_MENU
@@ -2350,7 +2350,7 @@ new:
 id: VOICE_MILLIAMPHOURS
 desc: spoken only, a unit postfix
 eng: ""
-voice: "milliamp hours"
+voice: "milli-amp hours"
 new:
 
 id: VOICE_PIXEL
