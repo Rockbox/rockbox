@@ -1,6 +1,3 @@
-#ifdef ARCHOS_GMINI120
-common/string.c
-#endif
 #ifdef IRIVER_H100
 crt0.S
 backlight.c
@@ -30,6 +27,13 @@ common/strncpy.c
 common/strrchr.c
 common/strtok.c
 common/timefuncs.c
+#if (CONFIG_CPU == SH7034) || (CONFIG_CPU == MCF5249)
+common/memcpy_a.S
+common/memset_a.S
+#else
+common/memcpy.c
+common/memset.c
+#endif
 debug.c
 drivers/adc.c
 #ifdef HAVE_MMC
@@ -81,8 +85,6 @@ system.c
 thread.c
 usb.c
 bitswap.S
-common/memcpy.S
-common/memset.S
 crt0.S
 descramble.S
 drivers/lcd.S
