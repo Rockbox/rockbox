@@ -480,8 +480,12 @@ static int button_read(void)
 
 void button_init(void)
 {
-    /* set port pins as input */
+#ifndef SIMULATOR
+    /* set PA5 and PA11 as input */
+    PACR1 &= 0xff3f;  /* PA11MD = 00 */
+    PACR2 &= 0xfbff;  /* PA5MD = 0 */
     PAIOR &= ~0x820;
+#endif
     queue_init(&button_queue);
     lastbtn = 0;
     tick_add_task(button_tick);
