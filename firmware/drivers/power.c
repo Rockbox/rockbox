@@ -45,7 +45,10 @@ int battery_level(void)
     if(level > BATTERY_LEVEL_FULL)
         level = BATTERY_LEVEL_FULL;
 
-    return ((level-BATTERY_LEVEL_SHUTDOWN) * 100) / BATTERY_RANGE;
+    if(level < BATTERY_LEVEL_DANGEROUS)
+        level = BATTERY_LEVEL_DANGEROUS;
+
+    return ((level-BATTERY_LEVEL_DANGEROUS) * 100) / BATTERY_RANGE;
 }
 
 void charger_enable(bool on)
