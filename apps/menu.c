@@ -195,19 +195,17 @@ void menu_draw(void)
 
 void show_splash(void)
 {
-	char *rockbox = "ROCKbox!";
 
-	lcd_clear_display();
+    char *rockbox = "ROCKbox!";
+    lcd_clear_display();
 
 #ifdef HAVE_LCD_BITMAP
-	if (show_logo() != 0) 
-		return;
+    if (show_logo() != 0) 
+        return;
 #else
-	lcd_puts(0, 0, rockbox);
+    lcd_puts(0, 0, rockbox);
 #endif
 
-	lcd_update();
-	busy_wait();
+    lcd_update();
+    busy_wait();
 }
-
-
