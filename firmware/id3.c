@@ -44,9 +44,6 @@
                              ((b3 & 0x7F) << (1*7)) | \
                              ((b4 & 0x7F) << (0*7)))
 
-#define HASID3V2(entry) entry->id3v2len > 0
-#define HASID3V1(entry) entry->id3v1len > 0
-
 /* Table of bitrates for MP3 files, all values in kilo.
  * Indexed by version, layer and value of bit 15-12 in header.
  */
@@ -596,16 +593,12 @@ bool mp3info(struct mp3entry *entry, char *filename)
     entry->id3v2len = getid3v2len(fd);
     entry->tracknum = 0;
 
-    /* Ignore the tag if it is too big */
-    if(entry->id3v2len > sizeof(entry->id3v2buf))
-        entry->id3v2len = 0;
-    
-    if(HASID3V2(entry))
+    if ( entry->id3v2len && entry->id3v2len <= sizeof( entry->id3v2buf ) )
         setid3v2title(fd, entry);
     entry->length = getsonglength(fd, entry);
 
     entry->id3v1len = getid3v1len(fd);
-    if(HASID3V1(entry) && !entry->title)
+    if(entry->id3v1len && !entry->title)
         setid3v1title(fd, entry);
 
     close(fd);

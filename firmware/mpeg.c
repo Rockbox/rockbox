@@ -624,6 +624,10 @@ static int new_file(int steps)
         else
         {
             add_track_to_tag_list(trackname);
+            /* skip past id3v2 tag (to an even byte) */
+            lseek(mpeg_file, 
+                  id3tags[tag_read_idx]->id3.id3v2len & ~1, 
+                  SEEK_SET);
         }
     } while ( mpeg_file < 0 );
 
@@ -698,6 +702,10 @@ static void mpeg_thread(void)
                 }
 
                 add_track_to_tag_list((char *)ev.data);
+                /* skip past id3v2 tag (to an even byte) */
+                lseek(mpeg_file, 
+                      id3tags[tag_read_idx]->id3.id3v2len & ~1, 
+                      SEEK_SET);
 
                 /* Make it read more data */
                 filling = true;
