@@ -381,14 +381,20 @@ static void power_thread(void)
                                                        /* LED always on or LED on when charger connected */
                 current += CURRENT_BACKLIGHT;
             powermgmt_est_runningtime_min = battery_level() * battery_capacity / 100 * 60 / current;
+#if MEM == 8 /* assuming 192 kbps, the running time is 22% longer with 8MB */
+            powermgmt_est_runningtime_min = powermgmt_est_runningtime_min * 122 / 100;
+#endif /* MEM == 8 */
         }
 #else
         current = usb_inserted() ? CURRENT_USB : CURRENT_NORMAL;
         if (backlight_get_timeout() == 1) /* LED always on */
             current += CURRENT_BACKLIGHT;
         powermgmt_est_runningtime_min = battery_level() * battery_capacity / 100 * 60 / current;
-#endif
-        
+#if MEM == 8 /* assuming 192 kbps, the running time is 22% longer with 8MB */
+        powermgmt_est_runningtime_min = powermgmt_est_runningtime_min * 122 / 100;
+#endif /* MEM == 8 */
+#endif /* HAVE_CHARGE_CONTROL */
+
 #ifdef HAVE_CHARGE_CTRL
 
         if (charge_pause > 0)
@@ -587,6 +593,9 @@ void power_init(void)
     battery_level_update();
     /* calculate the remaining time to that the info screen displays something useful */
     powermgmt_est_runningtime_min = battery_level() * battery_capacity / 100 * 60 / CURRENT_NORMAL;
+#if MEM == 8 /* assuming 192 kbps, the running time is 22% longer with 8MB */
+    powermgmt_est_runningtime_min = powermgmt_est_runningtime_min * 122 / 100;
+#endif
     
 #ifdef HAVE_CHARGE_CTRL
     snprintf(power_message, POWER_MESSAGE_LEN, "Powermgmt started");
