@@ -1926,8 +1926,8 @@ new:
 
 id: LANG_RECORDING_MENU
 desc: in the recording sub menu
-eng: "Start Recording"
-voice: "Start Recording"
+eng: "Recording screen"
+voice: "Recording screen"
 new:
 
 id: LANG_WIND_MENU
