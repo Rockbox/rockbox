@@ -798,13 +798,12 @@ static int getsonglength(int fd, struct mp3entry *entry)
  * Checks all relevant information (such as ID3v1 tag, ID3v2 tag, length etc)
  * about an MP3 file and updates it's entry accordingly.
  *
- * Arguments: entry - the entry to check and update with the new information
- *
- * Returns: void
  */
-bool mp3info(struct mp3entry *entry, char *filename) 
+bool mp3info(struct mp3entry *entry, char *filename, bool v1first)
 {
     int fd;
+    int v1found = false;
+    
     fd = open(filename, O_RDONLY);
     if(-1 == fd)
         return true;
@@ -819,7 +818,10 @@ bool mp3info(struct mp3entry *entry, char *filename)
     entry->tracknum = 0;
     entry->genre = 0xff;
 
-    if (entry->id3v2len)
+    if(v1first)
+        v1found = setid3v1title(fd, entry);
+    
+    if (!v1found && entry->id3v2len)
         setid3v2title(fd, entry);
     entry->length = getsonglength(fd, entry);
 
@@ -827,10 +829,10 @@ bool mp3info(struct mp3entry *entry, char *filename)
        the true size of the MP3 stream */
     entry->filesize -= entry->first_frame_offset;
     
-    /* only seek to end of file if no id3v2 tags were found */
-    if (!entry->id3v2len) {
-        if(!entry->title)
-            setid3v1title(fd, entry);
+    /* only seek to end of file if no id3v2 tags were found,
+       and we already haven't looked for a v1 tag */
+    if (!v1first && !entry->id3v2len) {
+        setid3v1title(fd, entry);
     }
 
     close(fd);
@@ -860,7 +862,7 @@ int main(int argc, char **argv)
     for(i=1; i<argc; i++) {
         struct mp3entry mp3;
         mp3.album = "Bogus";
-        if(mp3info(&mp3, argv[i])) {
+        if(mp3info(&mp3, argv[i], false)) {
             printf("Failed to get %s\n", argv[i]);
             return 0;
         }

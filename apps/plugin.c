@@ -88,19 +88,25 @@ static const struct plugin_api rockbox_api = {
     lcd_puts,
     lcd_puts_scroll,
     lcd_stop_scroll,
+    lcd_set_contrast,
 #ifdef HAVE_LCD_CHARCELLS
     lcd_define_pattern,
     lcd_get_locked_pattern,
     lcd_unlock_pattern,
     lcd_putc,
+    lcd_put_cursor,
+    lcd_remove_cursor,
+    lcd_icon,
 #else
     lcd_putsxy,
+    lcd_puts_style,
     lcd_bitmap,
     lcd_drawline,
     lcd_clearline,
     lcd_drawpixel,
     lcd_clearpixel,
     lcd_setfont,
+    font_get,
     lcd_clearrect,
     lcd_fillrect,
     lcd_drawrect,
@@ -109,14 +115,21 @@ static const struct plugin_api rockbox_api = {
     lcd_update,
     lcd_update_rect,
     scrollbar,
+    checkbox,
+    &lcd_framebuffer[0][0],
+    lcd_blit,
 #ifndef SIMULATOR
     lcd_roll,
 #endif
 #endif
+    backlight_on,
+    backlight_off,
 
     /* button */
     button_get,
     button_get_w_tmo,
+    button_status,
+    button_clear_queue,
 
     /* file */
     (open_func)PREFIX(open),
@@ -131,6 +144,7 @@ static const struct plugin_api rockbox_api = {
     PREFIX(filesize),
     fprintf,
     read_line,
+    settings_parseline,
 
     /* dir */
     PREFIX(opendir),
@@ -139,14 +153,21 @@ static const struct plugin_api rockbox_api = {
 
     /* kernel */
     PREFIX(sleep),
+    yield,
     usb_screen,
     &current_tick,
+    default_event_handler,
+    create_thread,
+    remove_thread,
 
     /* strings and memory */
     snprintf,
     strcpy,
+    strncpy,
     strlen,
     strrchr,
+    strcmp,
+    strcasecmp,
     memset,
     memcpy,
 #ifndef SIMULATOR
@@ -154,32 +175,6 @@ static const struct plugin_api rockbox_api = {
 #endif
 
     /* sound */
-#ifndef SIMULATOR
-#ifdef HAVE_MAS3587F
-    mas_codec_readreg,
-#endif
-#endif
-    
-    /* misc */
-    srand,
-    rand,
-    splash,
-    (qsort_func)qsort,
-    kbd_input,
-    mpeg_current_track,
-    atoi,
-    get_time,
-    plugin_get_buffer,
-
-    /* new stuff at the end, sort into place next time the API gets incompatible */
-
-#ifndef HAVE_LCD_CHARCELLS
-    &lcd_framebuffer[0][0],
-    lcd_blit,
-#endif
-    yield,
-
-    plugin_get_mp3_buffer,
     mpeg_sound_set,
 #ifndef SIMULATOR
     mp3_play_data,
@@ -187,23 +182,12 @@ static const struct plugin_api rockbox_api = {
     mp3_play_stop,
     mp3_is_playing,
     bitswap,
+#ifdef HAVE_MAS3587F
+    mas_codec_readreg,
 #endif
-    &global_settings,
-    backlight_set_timeout,
-#ifndef SIMULATOR
-    ata_sleep,
 #endif
-#ifdef HAVE_LCD_BITMAP
-    checkbox,
-#endif
-#ifndef SIMULATOR
-    plugin_register_timer,
-    plugin_unregister_timer,
-#endif
-    plugin_tsr,
-    create_thread,
-    remove_thread,
-    lcd_set_contrast,
+    
+    /* playback control */
     mpeg_play,
     mpeg_stop,
     mpeg_pause,
@@ -215,8 +199,31 @@ static const struct plugin_api rockbox_api = {
     playlist_amount,
     mpeg_status,
     mpeg_has_changed_track,
-#ifdef HAVE_LCD_BITMAP
-    font_get,
+
+    /* misc */
+    srand,
+    rand,
+    splash,
+    (qsort_func)qsort,
+    kbd_input,
+    mpeg_current_track,
+    atoi,
+    get_time,
+    plugin_get_buffer,
+    plugin_get_mp3_buffer,
+#ifndef SIMULATOR
+    plugin_register_timer,
+    plugin_unregister_timer,
+#endif
+    plugin_tsr,
+
+    /* new stuff at the end, sort into place next time the API gets incompatible */
+
+
+    &global_settings,
+    backlight_set_timeout,
+#ifndef SIMULATOR
+    ata_sleep,
 #endif
 #if defined(DEBUG) || defined(SIMULATOR)
     debugf,
@@ -238,26 +245,6 @@ static const struct plugin_api rockbox_api = {
     set_time,
     reset_poweroff_timer,
 
-    backlight_on,
-    backlight_off,
-
-#ifdef HAVE_LCD_CHARCELLS
-    lcd_icon,
-#endif
-#ifdef HAVE_LCD_BITMAP
-    lcd_puts_style,
-#endif
-#ifdef HAVE_LCD_CHARCELLS
-    lcd_put_cursor,
-    lcd_remove_cursor,
-#endif
-    settings_parseline,
-    strcmp,
-    button_status,
-    button_clear_queue,
-    strncpy,
-    strcasecmp,
-    default_event_handler
 };
 
 int plugin_load(char* plugin, void* parameter)

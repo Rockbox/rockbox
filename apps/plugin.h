@@ -60,12 +60,12 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 24
+#define PLUGIN_API_VERSION 25
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 19
+#define PLUGIN_MIN_API_VERSION 25
 
 /* plugin return codes */
 enum plugin_status {
@@ -114,13 +114,18 @@ struct plugin_api {
     void (*lcd_puts)(int x, int y, unsigned char *string);
     void (*lcd_puts_scroll)(int x, int y, unsigned char* string);
     void (*lcd_stop_scroll)(void);
+    void (*lcd_set_contrast)(int x);
 #ifdef HAVE_LCD_CHARCELLS
     void (*lcd_define_pattern)(int which,char *pattern);
     unsigned char (*lcd_get_locked_pattern)(void);
     void (*lcd_unlock_pattern)(unsigned char pat);
     void (*lcd_putc)(int x, int y, unsigned short ch);
+    void (*lcd_put_cursor)(int x, int y, char cursor_char);
+    void (*lcd_remove_cursor)(void);
+    void (*lcd_icon)(int icon, bool enable);
 #else
     void (*lcd_putsxy)(int x, int y, const unsigned char *string);
+    void (*lcd_puts_style)(int x, int y, unsigned char *str, int style);
     void (*lcd_bitmap)(const unsigned char *src, int x, int y,
                        int nx, int ny, bool clear);
     void (*lcd_drawline)(int x1, int y1, int x2, int y2);
@@ -128,6 +133,7 @@ struct plugin_api {
     void (*lcd_drawpixel)(int x, int y);
     void (*lcd_clearpixel)(int x, int y);
     void (*lcd_setfont)(int font);
+    struct font* (*font_get)(int font);
     void (*lcd_clearrect)(int x, int y, int nx, int ny);
     void (*lcd_fillrect)(int x, int y, int nx, int ny);
     void (*lcd_drawrect)(int x, int y, int nx, int ny);
@@ -137,14 +143,21 @@ struct plugin_api {
     void (*lcd_update_rect)(int x, int y, int width, int height);
     void (*scrollbar)(int x, int y, int width, int height, int items,
                       int min_shown, int max_shown, int orientation);
+    void (*checkbox)(int x, int y, int width, int height, bool checked);
+    unsigned char* lcd_framebuffer;
+    void (*lcd_blit) (unsigned char* p_data, int x, int y, int width, int height, int stride);
 #ifndef SIMULATOR
     void (*lcd_roll)(int pixels);
 #endif
 #endif
+    void (*backlight_on)(void);
+    void (*backlight_off)(void);
 
     /* button */
     int (*button_get)(bool block);
     int (*button_get_w_tmo)(int ticks);
+    int (*button_status)(void);
+    void (*button_clear_queue)(void);
 
     /* file */
     int (*open)(const char* pathname, int flags);
@@ -159,6 +172,7 @@ struct plugin_api {
     int (*filesize)(int fd);
     int (*fprintf)(int fd, const char *fmt, ...);
     int (*read_line)(int fd, char* buffer, int buffer_size);
+    bool (*settings_parseline)(char* line, char** name, char** value);
     
     /* dir */
     DIR* (*opendir)(const char* name);
@@ -167,14 +181,21 @@ struct plugin_api {
 
     /* kernel */
     void (*sleep)(int ticks);
+    void (*yield)(void);
     void (*usb_screen)(void);
     long* current_tick;
+    int (*default_event_handler)(int event);
+    int (*create_thread)(void* function, void* stack, int stack_size, char *name);
+    void (*remove_thread)(int threadnum);
 
     /* strings and memory */
     int    (*snprintf)(char *buf, size_t size, const char *fmt, ...);
     char*  (*strcpy)(char *dst, const char *src);
+    char *(*strncpy)(char *dst, const char *src, size_t length);
     size_t (*strlen)(const char *str);
     char * (*strrchr)(const char *s, int c);
+    int (*strcmp)(const char *, const char *);
+    int (*strcasecmp)(const char *, const char *);
     void*  (*memset)(void *dst, int c, size_t length);
     void*  (*memcpy)(void *out, const void *in, size_t n);
 #ifndef SIMULATOR
@@ -182,32 +203,6 @@ struct plugin_api {
 #endif
 
     /* sound */
-#ifndef SIMULATOR
-#ifdef HAVE_MAS3587F
-    int (*mas_codec_readreg)(int reg);
-#endif
-#endif
-
-    /* misc */
-    void (*srand)(unsigned int seed);
-    int  (*rand)(void);
-    void (*splash)(int ticks, bool center, char *fmt, ...);
-    void (*qsort)(void *base, size_t nmemb, size_t size,
-                  int(*compar)(const void *, const void *));
-    int (*kbd_input)(char* buffer, int buflen);
-    struct mp3entry* (*mpeg_current_track)(void);
-    int (*atoi)(const char *str);
-    struct tm* (*get_time)(void);
-    void* (*plugin_get_buffer)(int* buffer_size);
-
-    /* new stuff, sort in next time the API gets broken! */
-#ifndef HAVE_LCD_CHARCELLS
-    unsigned char* lcd_framebuffer;
-    void (*lcd_blit) (unsigned char* p_data, int x, int y, int width, int height, int stride);
-#endif
-    void (*yield)(void);
-
-    void* (*plugin_get_mp3_buffer)(int* buffer_size);
     void (*mpeg_sound_set)(int setting, int value);
 #ifndef SIMULATOR
     void (*mp3_play_data)(unsigned char* start, int size, void (*get_more)(unsigned char** start, int* size));
@@ -215,23 +210,10 @@ struct plugin_api {
     void (*mp3_play_stop)(void);
     bool (*mp3_is_playing)(void);
     void (*bitswap)(unsigned char *data, int length);
+#ifdef HAVE_MAS3587F
+    int (*mas_codec_readreg)(int reg);
 #endif
-    struct user_settings* global_settings;
-    void (*backlight_set_timeout)(int index);
-#ifndef SIMULATOR
-    int (*ata_sleep)(void);
 #endif
-#ifdef HAVE_LCD_BITMAP
-    void (*checkbox)(int x, int y, int width, int height, bool checked);
-#endif
-#ifndef SIMULATOR
-    int (*plugin_register_timer)(int cycles, int prio, void (*timer_callback)(void));
-    void (*plugin_unregister_timer)(void);
-#endif
-    void (*plugin_tsr)(void (*exit_callback)(void));
-    int (*create_thread)(void* function, void* stack, int stack_size, char *name);
-    void (*remove_thread)(int threadnum);
-    void (*lcd_set_contrast)(int x);
 
     /* playback control */
     void (*mpeg_play)(int offset);
@@ -246,14 +228,37 @@ struct plugin_api {
     int (*mpeg_status)(void);
     bool (*mpeg_has_changed_track)(void);
     
-#ifdef HAVE_LCD_BITMAP
-    struct font* (*font_get)(int font);
+    /* misc */
+    void (*srand)(unsigned int seed);
+    int  (*rand)(void);
+    void (*splash)(int ticks, bool center, char *fmt, ...);
+    void (*qsort)(void *base, size_t nmemb, size_t size,
+                  int(*compar)(const void *, const void *));
+    int (*kbd_input)(char* buffer, int buflen);
+    struct mp3entry* (*mpeg_current_track)(void);
+    int (*atoi)(const char *str);
+    struct tm* (*get_time)(void);
+    void* (*plugin_get_buffer)(int* buffer_size);
+    void* (*plugin_get_mp3_buffer)(int* buffer_size);
+#ifndef SIMULATOR
+    int (*plugin_register_timer)(int cycles, int prio, void (*timer_callback)(void));
+    void (*plugin_unregister_timer)(void);
 #endif
+    void (*plugin_tsr)(void (*exit_callback)(void));
+
+    /* new stuff, sort in next time the API gets broken! */
+
+    struct user_settings* global_settings;
+    void (*backlight_set_timeout)(int index);
+#ifndef SIMULATOR
+    int (*ata_sleep)(void);
+#endif
+
 
 #if defined(DEBUG) || defined(SIMULATOR)
    void (*debugf)(char *fmt, ...);
 #endif
-   bool (*mp3info)(struct mp3entry *entry, char *filename) ;
+   bool (*mp3info)(struct mp3entry *entry, char *filename, bool v1first);
    int (*count_mp3_frames)(int fd, int startpos, int filesize,
                            void (*progressfunc)(int));
    int (*create_xing_header)(int fd, int startpos, int filesize,
@@ -274,26 +279,6 @@ struct plugin_api {
     int  (*set_time)(struct tm *tm);
     void (*reset_poweroff_timer)(void);
 
-    void (*backlight_on)(void);
-    void (*backlight_off)(void);
-
-#ifdef HAVE_LCD_CHARCELLS
-    void (*lcd_icon)(int icon, bool enable);
-#endif
-#ifdef HAVE_LCD_BITMAP
-    void (*lcd_puts_style)(int x, int y, unsigned char *str, int style);
-#endif
-#ifdef HAVE_LCD_CHARCELLS
-    void (*lcd_put_cursor)(int x, int y, char cursor_char);
-    void (*lcd_remove_cursor)(void);
-#endif
-    bool (*settings_parseline)(char* line, char** name, char** value);
-    int (*strcmp)(const char *, const char *);
-    int (*button_status)(void);
-    void (*button_clear_queue)(void);
-    char *(*strncpy)(char *dst, const char *src, size_t length);
-    int (*strcasecmp)(const char *, const char *);
-    int (*default_event_handler)(int event);
 };
 
 /* defined by the plugin loader (plugin.c) */

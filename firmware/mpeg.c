@@ -107,6 +107,8 @@ struct id3tag
 static struct id3tag *id3tags[MAX_ID3_TAGS];
 static struct id3tag _id3tags[MAX_ID3_TAGS];
 
+static bool v1first = false;
+
 static unsigned int current_track_counter = 0;
 static unsigned int last_track_counter = 0;
 
@@ -736,7 +738,7 @@ static int add_track_to_tag_list(char *filename)
     {
         /* grab id3 tag of new file and
            remember where in memory it starts */
-        if(mp3info(&(t->id3), filename))
+        if(mp3info(&(t->id3), filename, v1first))
         {
             DEBUGF("Bad mp3\n");
             return -1;
@@ -1985,6 +1987,11 @@ static void mpeg_thread(void)
 static struct mp3entry taginfo;
 #endif /* #ifdef SIMULATOR */
 
+void mpeg_id3_options(bool _v1first)
+{
+   v1first = _v1first;
+}
+
 struct mp3entry* mpeg_current_track()
 {
 #ifdef SIMULATOR
@@ -2443,7 +2450,7 @@ void mpeg_play(int offset)
         trackname = playlist_peek( steps );
         if (!trackname)
             break;
-        if(mp3info(&taginfo, trackname)) {
+        if(mp3info(&taginfo, trackname, v1first)) {
             /* bad mp3, move on */
             if(++steps > playlist_amount())
                 break;
@@ -2518,7 +2525,7 @@ void mpeg_next(void)
         file = playlist_peek(steps);
         if(!file)
             break;
-        if(mp3info(&taginfo, file)) {
+        if(mp3info(&taginfo, file, v1first)) {
             if(++steps > playlist_amount())
                 break;
             continue;
@@ -2546,7 +2553,7 @@ void mpeg_prev(void)
         file = playlist_peek(steps);
         if(!file)
             break;
-        if(mp3info(&taginfo, file)) {
+        if(mp3info(&taginfo, file, v1first)) {
             steps--;
             continue;
         }

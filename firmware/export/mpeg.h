@@ -96,6 +96,7 @@ void mpeg_error_clear(void);
 /* in order to keep the recording here, I have to expose this */
 void rec_tick(void);
 void playback_tick(void); /* FixMe: get rid of this, use mp3_get_playtime() */
+void mpeg_id3_options(bool _v1first);
 
 #define MPEG_STATUS_PLAY 1
 #define MPEG_STATUS_PAUSE 2

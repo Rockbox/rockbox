@@ -133,7 +133,7 @@ void real_mpeg_play(char* fname)
     static struct dither d0, d1;
     int key=0;
   
-    mp3info(&mp3, fname);
+    mp3info(&mp3, fname, false); /* FIXME: honor the v1first setting */
 
     init_sound(&sound);
 
