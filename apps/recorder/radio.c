@@ -159,7 +159,6 @@ bool radio_screen(void)
 
             case BUTTON_UP:
             case BUTTON_UP | BUTTON_REPEAT:
-            case BUTTON_RC_VOL_UP:
                 global_settings.volume++;
                 if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
@@ -170,7 +169,6 @@ bool radio_screen(void)
 
             case BUTTON_DOWN:
             case BUTTON_DOWN | BUTTON_REPEAT:
-            case BUTTON_RC_VOL_DOWN:
                 global_settings.volume--;
                 if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
