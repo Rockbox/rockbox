@@ -139,33 +139,41 @@ int main(void)
 
     time = *rb->current_tick; /* start time measurement */
 
-    gray_fillrect(0, 0, 111, 55, 150); /* fill everything with gray 150 */
+    gray_set_foreground(150);
+    gray_fillrect(0, 0, 112, 56); /* fill everything with gray 150 */
 
     /* draw a dark gray line star background */
+    gray_set_foreground(80);
     for (y = 0; y < 56; y += 8)        /* horizontal part */
     {
-        gray_drawline(0, y, 111, 55 - y, 80); /* gray lines */
+        gray_drawline(0, y, 111, 55 - y); /* gray lines */
     }
     for (x = 10; x < 112; x += 10)     /* vertical part */
     {
-        gray_drawline(x, 0, 111 - x, 55, 80); /* gray lines */
+        gray_drawline(x, 0, 111 - x, 55); /* gray lines */
     }
 
-    gray_drawrect(0, 0, 111, 55, 0);   /* black border */
+    gray_set_foreground(0);
+    gray_drawrect(0, 0, 112, 56);   /* black border */
 
     /* draw gray tones */
     for (i = 0; i < 86; i++)           
     {
         x = 13 + i;
-        gray_fillrect(x, 6, x, 49, 3 * i); /* gray rectangles */
+        gray_set_foreground(3 * i);
+        gray_verline(x, 6, 49);     /* vertical lines */
     }
 
-    gray_invertrect(13, 29, 98, 49);   /* invert rectangle (lower half) */
-    gray_invertline(13, 27, 98, 27);   /* invert a line */
-    
+    gray_set_drawmode(GRAY_DRAW_INVERSE);
+    gray_fillrect(13, 29, 86, 21);   /* invert rectangle (lower half) */
+    gray_drawline(13, 27, 98, 27);   /* invert a line */
+
     /* show bitmaps (1 bit and 8 bit) */
-    gray_drawbitmap(rockbox, 14, 13, 43, 7, 43, true, 255, 100);   /* opaque */
-    gray_drawbitmap(showing, 58, 13, 39, 7, 39, false, 0, 0); /* transparent */
+    gray_set_drawinfo(GRAY_DRAW_SOLID, 255, 100);
+    gray_drawbitmap(rockbox, 14, 13, 43, 7, 43);   /* opaque */
+    gray_set_drawinfo(GRAY_DRAW_FG, 0, -1);
+    gray_drawbitmap(showing, 58, 13, 39, 7, 39); /* transparent */
+
     gray_drawgraymap(grayscale_gray, 28, 35, 55, 7, 55);
 
     time = *rb->current_tick - time;  /* end time measurement */
@@ -243,7 +251,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     rb = api; // copy to global api pointer
     (void)parameter;
- 
+
     /* This plugin uses the grayscale framework, so initialize */
     gray_init(api);
 
