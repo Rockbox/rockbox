@@ -20,14 +20,24 @@ TARGET = -DARCHOS_PLAYER=1
 #TARGET = -DARCHOS_PLAYER_OLD=1
 #TARGET = -DARCHOS_RECORDER=1
 
-CFLAGS = -Os -W -Wall -m1 -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns $(INCLUDES) $(TARGET) -DDEBUG
+CFLAGS = -W -Wall -m1 -nostdlib -Wstrict-prototypes $(INCLUDES) $(TARGET)
+
+ifdef DEBUG
+CFLAGS += -g -DDEBUG
+else
+CFLAGS += -O -fomit-frame-pointer -fschedule-insns
+endif
+
 AFLAGS += -small -relax
 
 SRC := $(wildcard drivers/*.c common/*.c malloc/*.c *.c)
-OBJS := $(SRC:%.c=%.o) crt0.o
+EXCLUDED_SRC := thread.c
+
+SRC := $(filter-out $(EXCLUDED_SRC),$(SRC))
+
+OBJS := $(SRC:%.c=%.o) $(EXCLUDED_SRC:%.c=%.o) crt0.o
 DEPS:=.deps
 DEPDIRS:=$(DEPS) $(DEPS)/drivers $(DEPS)/common $(DEPS)/malloc
-
 
 librockbox.a: $(OBJS)
 	$(AR) ruv $@ $+
@@ -44,3 +54,7 @@ $(DEPS)/%.d: %.c
 		[ -s $@ ] || rm -f $@'
 
 -include $(SRC:%.c=$(DEPS)/%.d)
+
+# Special targets
+thread.o: thread.c thread.h
+	$(CC) -c -O -fomit-frame-pointer $(CFLAGS) $<
