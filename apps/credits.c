@@ -122,10 +122,10 @@ void roll_credits(void)
       lcd_putsxy(0, 0, buffer, 0);
       lcd_update();
 
-      if (button_get_w_tmo(HZ/10))
+      if (button_get_w_tmo(HZ/20))
         return;
 
-      y-=2;
+      y--;
 
       if(y<0) {
         line++;
