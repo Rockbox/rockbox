@@ -550,6 +550,11 @@ static bool ask_resume(bool ask_once)
     lcd_double_height(false);
 #endif
 
+    if (usb_detect()) {
+        usb_screen();
+        return false;
+    }
+    
     /* always resume? */
     if ( global_settings.resume == RESUME_ON )
         return true;
