@@ -35,6 +35,10 @@
 #define MOSAIQUE_SPEED2 BUTTON_RIGHT
 #define MOSAIQUE_RESTART BUTTON_MENU
 
+#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+#define MOSAIQUE_QUIT BUTTON_OFF
+#define MOSAIQUE_SPEED BUTTON_MODE
+#define MOSAIQUE_RESTART BUTTON_ON
 #endif
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)

@@ -30,6 +30,8 @@
  *
  ****************************************************************************/
 
+#include "plugin.h"
+
 /* Only build for (correct) target */
 #if !defined(SIMULATOR) && CONFIG_CPU==SH7034 && !defined(HAVE_MMC)
 
@@ -43,7 +45,6 @@
 
 /****************** imports ******************/
 
-#include "plugin.h"
 #include "sh7034.h"
 #include "system.h"
 

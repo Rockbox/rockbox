@@ -17,7 +17,7 @@
  **************************************************************************/
 #include "plugin.h"
 
-#ifdef HAVE_LCD_BITMAP
+#if defined(HAVE_LCD_BITMAP) && (CONFIG_HWCODEC != MASNONE)
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
@@ -482,4 +482,4 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
             lastbutton = button;
     }
 }
-#endif /* #ifdef HAVE_LCD_BITMAP */
+#endif /* #ifdef HAVE_LCD_BITMAP and HWCODEC */

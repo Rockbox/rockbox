@@ -26,7 +26,15 @@
 #ifndef SIMULATOR /* not for simulator by now */
 #include "plugin.h"
 
-#ifdef HAVE_LCD_BITMAP /* and also not for the Player */
+#if CONFIG_LCD == LCD_SSD1815 /* only for Recorder/Ondio displays */
+/*
+  FIX:
+
+  This would be a lot nicer if it depended on HAVE_LCD_BITMAP only, but we
+  need to fix the grayscale lib for Gmini and iRiver. Either with true
+  grayscale or 1bit.
+
+*/
 #include "gray.h"
 
 /* variable button definitions */
@@ -38,6 +46,10 @@
 #define JPEG_ZOOM_PRE BUTTON_MENU
 #define JPEG_ZOOM_IN (BUTTON_MENU | BUTTON_REL)
 #define JPEG_ZOOM_OUT (BUTTON_MENU | BUTTON_REPEAT)
+
+#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+#define JPEG_ZOOM_IN BUTTON_ON
+#define JPEG_ZOOM_OUT BUTTON_SELECT
 
 #endif
 

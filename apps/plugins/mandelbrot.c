@@ -20,8 +20,17 @@
 #ifndef SIMULATOR 
 #include "plugin.h"
 
-#ifdef HAVE_LCD_BITMAP // this is not fun on the player
-# include "gray.h"
+#if CONFIG_LCD == LCD_SSD1815 /* only for Recorder/Ondio displays */
+/*
+  FIX:
+
+  This would be a lot nicer if it depended on HAVE_LCD_BITMAP only, but we
+  need to fix the grayscale lib for Gmini and iRiver. Either with true
+  grayscale or 1bit.
+
+*/
+
+#include "gray.h"
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
@@ -42,6 +51,13 @@
 #define MANDELBROT_MAXITER_DEC (BUTTON_MENU | BUTTON_LEFT)
 #define MANDELBROT_RESET (BUTTON_MENU | BUTTON_OFF)
 
+#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+#define MANDELBROT_QUIT BUTTON_OFF
+#define MANDELBROT_ZOOM_IN BUTTON_ON
+#define MANDELBROT_ZOOM_OUT BUTTON_SELECT
+#define MANDELBROT_MAXITER_INC (BUTTON_MODE | BUTTON_RIGHT)
+#define MANDELBROT_MAXITER_DEC (BUTTON_MODE | BUTTON_LEFT)
+#define MANDELBROT_RESET (BUTTON_MODE | BUTTON_SELECT)
 #endif
 
 static struct plugin_api* rb;

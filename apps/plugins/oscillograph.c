@@ -20,6 +20,7 @@
 
 #ifdef HAVE_LCD_BITMAP
 #ifndef SIMULATOR /* don't want this code in the simulator */
+#if CONFIG_HWCODEC != MASNONE /* only for MAS-targets */
 
 /* The different drawing modes */
 #define DRAW_MODE_FILLED  0
@@ -241,5 +242,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     return PLUGIN_OK;
 }
 
+#endif /* if using MAS */
 #endif /* #ifndef SIMULATOR */
 #endif

@@ -32,10 +32,15 @@ snake.c
 snake2.c
 snow.c
 sokoban.c
+#ifndef CONFIG_KEYPAD != IRIVER_H100_PAD
+/* just because it isn't fixed yet to deal with this keymap */
 solitaire.c
+#endif
 splitedit.c
 star.c
+#if CONFIG_LCD == LCD_SSD1815
 video.c
+#endif
 vu_meter.c
 
 #ifdef HAVE_RTC /* Recorder models only */

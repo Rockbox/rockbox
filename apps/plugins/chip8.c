@@ -42,6 +42,13 @@
 #define CHIP8_KEY6 BUTTON_RIGHT
 #define CHIP8_KEY8 BUTTON_DOWN
 
+#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+#define CHIP8_KEY2 BUTTON_UP
+#define CHIP8_KEY4 BUTTON_LEFT
+#define CHIP8_KEY5 BUTTON_SELECT
+#define CHIP8_KEY6 BUTTON_RIGHT
+#define CHIP8_KEY8 BUTTON_DOWN
+
 #endif
 
 static struct plugin_api* rb; /* here is a global api struct pointer */
