@@ -111,14 +111,15 @@ static char lcd_cram;
 static char lcd_pram;
 static char lcd_iram;
 
-static unsigned char lcd_data_byte; /* global write buffer */
-
 unsigned short buffer_xlcd[11][2];
 unsigned short buffer_lcd_mirror[11][2];
 
 #ifdef SIMULATOR
 unsigned char hardware_buffer_lcd[11][2];
+#else
+static unsigned char lcd_data_byte; /* global write buffer */
 #endif
+
 #define NO_CHAR -1
 
 static void lcd_free_pat(int map_ch)
