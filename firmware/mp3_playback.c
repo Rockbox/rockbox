@@ -896,7 +896,6 @@ void mpeg_set_pitch(int pitch)
 
     /* We must tell the MAS that the frequency has changed.
        This will unfortunately cause a short silence. */
-    val = shadow_7f1;
     mas_writemem(MAS_BANK_D0,0x7f1,&shadow_7f1,1);
 }
 #endif
