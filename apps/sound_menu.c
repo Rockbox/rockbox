@@ -168,7 +168,7 @@ static bool treble(void)
     return set_sound(str(LANG_TREBLE), &global_settings.treble, SOUND_TREBLE);
 }
 
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
 static bool loudness(void)
 {
     return set_sound(str(LANG_LOUDNESS), &global_settings.loudness, 
@@ -244,7 +244,9 @@ static bool avc(void)
     return set_option(str(LANG_DECAY), &global_settings.avc, INT,
                       names, 5, set_avc);
 }
+#endif
 
+#if CONFIG_HWCODEC == MAS3587F
 static bool recsource(void)
 {
     static const struct opt_items names[] = {
@@ -406,7 +408,7 @@ bool sound_menu(void)
         { ID2P(LANG_TREBLE), treble },
         { ID2P(LANG_BALANCE), balance },
         { ID2P(LANG_CHANNEL_MENU), chanconf },
-#if CONFIG_HWCODEC == MAS3587F
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
         { ID2P(LANG_LOUDNESS), loudness },
         { ID2P(LANG_AUTOVOL), avc },
         { ID2P(LANG_SUPERBASS), superbass },
