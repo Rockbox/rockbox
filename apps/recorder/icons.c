@@ -17,16 +17,12 @@
  *
  ****************************************************************************/
 #include <lcd.h>
+#include <string.h>
 #include "kernel.h"
 #include "sprintf.h"
+#include "rtc.h"
 
 #include "icons.h"
-#ifndef SIMULATOR
-#include "sprintf.h"
-#endif
-#ifdef HAVE_RTC
-#include "rtc.h"
-#endif
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -229,7 +225,7 @@ void statusbar_icon_volume(int percent)
         }
         if(TIME_BEFORE(current_tick,switch_tick)) { /* display volume lever numerical */
             snprintf(buffer, sizeof(buffer), "%2d", percent);
-            lcd_putsxy(ICON_VOLUME_X_POS+ICON_VOLUME_WIDTH/2-6, STATUSBAR_Y_POS, buffer, 0);
+            lcd_putsxy(ICON_VOLUME_X_POS+ICON_VOLUME_WIDTH/2-6*strlen(buffer)/2, STATUSBAR_Y_POS, buffer, 0);
         }
         else { /* display volume bar */
             volume=volume*14/100;
