@@ -197,8 +197,6 @@ int screenhack_handle_event (Display *dpy, XEvent *event)
           KeySym keysym;
           unsigned char c = 0;
           XLookupString (&event->xkey, &c, 1, &keysym, 0);
-          if (! (keysym >= XK_Shift_L && keysym <= XK_Hyper_R))
-              XBell (dpy, 0);  /* beep for non-chord keys */
           key = keysym;
           /*	    fprintf(stderr, "KEY PRESSED: %c (%02x)\n", c, c); */
       }
