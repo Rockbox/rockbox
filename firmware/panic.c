@@ -45,7 +45,7 @@ void panicf( char *fmt, ...)
     va_list ap;
     
     va_start( ap, fmt );
-    vsprintf( panic_buf, fmt, ap );
+    vsnprintf( panic_buf, sizeof(panic_buf), fmt, ap );
     va_end( ap );
 
     panic( panic_buf );

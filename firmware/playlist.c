@@ -37,7 +37,7 @@ int reload_playlist_info( playlist_info_t *playlist )
 
     /* return a dummy playlist entry */
 
-    sprintf( playlist->filename, "\\playlists\\1.m3u" );
+    strncpy( playlist->filename, "\\playlists\\1.m3u", sizeof(playlist->filename) );
 
     playlist->indices_count = 4;
 
@@ -62,7 +62,8 @@ void load_playlist( playlist_info_t *playlist, const char *filename ) {
     char *m3u_buf = NULL;
     char debug_message[128];
     
-    sprintf( debug_message, "load_playlist( %s )\n", filename );
+    snprintf( debug_message, sizeof(debug_message),
+              "load_playlist( %s )\n", filename );
     debug( debug_message );
     
     /* read file */
@@ -71,7 +72,7 @@ void load_playlist( playlist_info_t *playlist, const char *filename ) {
 
     /* store playlist filename */
     
-    sprintf( playlist->filename, filename );
+    strncpy( playlist->filename, filename, sizeof(playlist->filename) );
     
     /* add track indices to playlist data structure */
     
@@ -159,7 +160,7 @@ void extend_indices( playlist_info_t *playlist, int new_index )
 track_t next_playlist_track( playlist_info_t *playlist ) {
 
     track_t track;
-    sprintf( track.filename, "boogie" );
+    strncpy( track.filename, "boogie", sizeof(track.filename) );
     return track;
 }
 
@@ -320,13 +321,13 @@ void get_indices_as_string( char *string, playlist_info_t *playlist )
         {
             /* first iteration - no comma */
             
-            sprintf( tmp, "%d", p[count] );
+            snprintf( tmp, sizeof(tmp), "%d", p[count] );
         }
         else
         {
             /* normal iteration - insert comma */
             
-            sprintf( tmp, ",%d", p[count] );
+            snprintf( tmp, sizeof(tmp), ",%d", p[count] );
         }
         
         strcat( string, tmp );

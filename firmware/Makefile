@@ -33,7 +33,7 @@ OBJS := $(SRC:%.c=%.o)
 all : archos.mod # archos.asm 
 
 archos.elf : $(OBJS) app.lds
-	$(CC) -nostdlib -o archos.elf $(OBJS) -lgcc -Tapp.lds -Wl,-Map,archos.map
+	$(CC) -nostdlib -o archos.elf $(OBJS) -lgcc -lc -Tapp.lds -Wl,-Map,archos.map
 
 archos.bin : archos.elf
 	$(OC) -O binary archos.elf archos.bin

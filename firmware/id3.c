@@ -27,10 +27,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
-
-#ifdef SIMULATOR
 #include <fcntl.h>
-#endif
 
 struct mp3entry {
     char *path;
@@ -530,7 +527,7 @@ char *secs2str(int ms)
     static char buffer[32];
     int secs = ms/1000;
     ms %= 1000;
-    sprintf(buffer, "%d:%02d.%d", secs/60, secs%60, ms/100);
+    snprintf(buffer, sizeof(buffer), "%d:%02d.%d", secs/60, secs%60, ms/100);
     return buffer;
 }
 

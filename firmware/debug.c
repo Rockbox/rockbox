@@ -29,7 +29,7 @@ char debugbuf[200];
 
 static int debug_tx_ready(void)
 {
-   return (SSR1 & SCI_TDRE);
+    return (SSR1 & SCI_TDRE);
 }
 
 static void debug_tx_char(char ch)
@@ -180,7 +180,7 @@ void debugf(char *fmt, ...)
     va_list ap;
     
     va_start(ap, fmt);
-    vsprintf(debugmembuf, fmt, ap);
+    vsnprintf(debugmembuf, sizeof(debugmembuf), fmt, ap);
     va_end(ap);
     debug(debugmembuf);
 }
@@ -197,7 +197,7 @@ void debugf(char *fmt, ...)
     va_list ap;
     
     va_start( ap, fmt );
-    vsprintf( debugmembuf, fmt, ap );
+    vsnprintf( debugmembuf, sizeof(debugmembuf), fmt, ap );
     va_end( ap );
     printf( debugmembuf );
 }
