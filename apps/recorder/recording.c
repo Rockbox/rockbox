@@ -223,6 +223,7 @@ bool recording_screen(void)
                 break;
 
             case BUTTON_RIGHT:
+            case BUTTON_RIGHT | BUTTON_REPEAT:
                 switch(cursor)
                 {
                     case 0:
@@ -264,6 +265,7 @@ bool recording_screen(void)
                 break;
                 
             case BUTTON_LEFT:
+            case BUTTON_LEFT | BUTTON_REPEAT:
                 switch(cursor)
                 {
                     case 0:
