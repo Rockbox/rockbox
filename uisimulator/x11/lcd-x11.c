@@ -115,7 +115,7 @@ void lcd_update_rect(int x_start, int y_start,
     if(ymax >= LCD_HEIGHT/8)
         ymax = LCD_HEIGHT/8-1;
 
-    for(; yline<ymax; yline++) {
+    for(; yline<=ymax; yline++) {
         y = yline * 8;
         for(x=x_start; x<xmax; x++) {
             if(lcd_framebuffer[x][yline] || lcd_framebuffer_copy[x][yline]) {
