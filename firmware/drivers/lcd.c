@@ -174,6 +174,7 @@ static int scroll_count = 0;
 
 #define ASM_IMPLEMENTATION
 
+static void lcd_write(bool command, int byte) __attribute__ ((section (".icode")));
 static void lcd_write(bool command, int byte)
 
 #ifdef ASM_IMPLEMENTATION
@@ -574,11 +575,13 @@ void lcd_init (void)
 
 /*
  * Update the display.
- * This must be called after all other LCD funtions that change the display.
+ * This must be called after all other LCD functions that change the display.
  */
+void lcd_update (void) __attribute__ ((section (".icode")));
 void lcd_update (void)
 {
     int x, y;
+
     /* Copy display bitmap to hardware */
     for (y = 0; y < LCD_HEIGHT/8; y++)
     {
@@ -770,6 +773,8 @@ void lcd_putsxy(int x, int y, unsigned char *str, int thisfont)
  * Display a bitmap at (x, y), size (nx, ny)
  * clear is true to clear destination area first
  */
+void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
+                 bool clear) __attribute__ ((section (".icode")));
 void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
                  bool clear)
 {
