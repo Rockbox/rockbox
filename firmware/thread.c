@@ -171,7 +171,7 @@ int create_thread(void* function, void* stack, int stack_size, char *name)
     regs->pr = function;
 
     wake_up_thread();
-    return num_threads++; /* return the current ID, e.g for remove_tread() */
+    return num_threads++; /* return the current ID, e.g for remove_thread() */
 }
 
 /*--------------------------------------------------------------------------- 
