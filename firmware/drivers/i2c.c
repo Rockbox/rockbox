@@ -105,7 +105,7 @@ void i2c_ack(int bit)
 
 int i2c_getack(void)
 {
-    unsigned short x;
+    int ret = 1;
 
     /* Here's the deal. The MAS is slow, and sometimes needs to wait
        before it can send the acknowledge. Therefore it forces the clock
@@ -119,15 +119,15 @@ int i2c_getack(void)
     while(!SCL)  /* and wait for the MAS to release it */
         yield();
     
-    x = SDA;
-    if (x)
+    if (SDA)
         /* ack failed */
-        return 0;
+        ret = 0;
+    
     SCL_OUTPUT;
     SCL_LO;
     SDA_HI;
     SDA_OUTPUT;
-    return 1;
+    return ret;
 }
 
 void i2c_outb(unsigned char byte)
