@@ -16,7 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
+#include <stdio.h>
 #include "config.h"
 
 #include <lcd.h>
@@ -299,27 +299,21 @@ void system_reboot (void)
 
 void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
 {
-    unsigned int i;
-
-#if 0
+    bool state = true;
     unsigned int n;
+    char str[32];
 
-    lcd_stop ();
     asm volatile ("sts\tpr,%0" : "=r"(n));
 
     n = (n - (unsigned)UIE0 - 4)>>2; // get exception or interrupt number
-    lcd_start ();
-    lcd_goto (0,0); lcd_puts ("** UIE00 **");
-    lcd_goto (0,1); lcd_puts ("AT 00000000");
-    lcd_goto (6,0); lcd_puthex (n,2);
-    lcd_goto (3,1); lcd_puthex (pc,8); /* or pc - 4 !? */
-    lcd_stop ();
-#endif
+    snprintf(str,sizeof(str),"** UIE%02x **",n);
+    lcd_puts(0,0,str);
+    snprintf(str,sizeof(str),"at %08x",pc);
+    lcd_puts(0,1,str);
 
     while (1)
     {
-        bool state = true;
-        
+        volatile int i;
         led (state);
         state = state?false:true;
         
