@@ -45,19 +45,19 @@ KEYPAD = -DHAVE_RECORDER_KEYPAD
 DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR	\
 $(KEYPAD) $(DISPLAY) -DAPPSVERSION=\"$(VERSION)\"
 
-LDFLAGS =  -lgdi32 -luser32
+LDFLAGS =  -lgdi32 -luser32  -mwindows
 
 # Use this for simulator-only files
-INCLUDES = -I. -I$(DRIVERS) -I$(COMMON) -I$(FIRMWAREDIR) -I$(APPDIR) -I$(RECDIR)
+INCLUDES = -I. -I$(DRIVERS) -I$(COMMON) -I$(FIRMWAREDIR) -I$(APPDIR) -I$(RECDIR) -I../common
 
 # The true Rockbox Applications should use this include path:
 APPINCLUDES = -I$(FIRMWAREDIR)/include $(INCLUDES)
 
 DEFINES += -DWIN32
 
-CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall
+CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall -mwindows
 
-APPCFLAGS = $(DEBUG) $(DEFINES) $(APPINCLUDES) -W -Wall
+APPCFLAGS = $(DEBUG) $(DEFINES) $(APPINCLUDES) -W -Wall -mwindows
 
 FIRMSRCS = chartables.c lcd.c power.c sprintf.c id3.c usb.c \
         mpeg.c powermgmt.c
