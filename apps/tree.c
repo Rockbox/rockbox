@@ -904,23 +904,7 @@ bool dirbrowse(char *root)
                             if(!lang_load(buf)) {
                                 set_file(buf, global_settings.lang_file,
                                          MAX_FILENAME);
-
-                                lcd_clear_display();
-#ifdef HAVE_LCD_CHARCELLS
-                                lcd_puts(0, 0, str(LANG_LANGUAGE_LOADED));
-#else
-                                lcd_getstringsize(str(LANG_LANGUAGE_LOADED),
-                                                  &fw, &fh);
-                                if(fw>LCD_WIDTH)
-                                    fw=0;
-                                else
-                                    fw=LCD_WIDTH/2 - fw/2;
-                                
-                                lcd_putsxy(fw, LCD_HEIGHT/2 - fh/2,
-                                           str(LANG_LANGUAGE_LOADED));
-#endif
-                                lcd_update();
-                                sleep(HZ);            
+                                splash(HZ, 0, true, str(LANG_LANGUAGE_LOADED));
                                 restore = true;
                             }
                             break;
