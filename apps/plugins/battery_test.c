@@ -31,8 +31,7 @@
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
-#define BATTERY_TEST_QUIT BUTTON_ON
-#define BATTERY_TEST_QUIT2 BUTTON_OFF
+#define BATTERY_TEST_QUIT BUTTON_OFF
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define BATTERY_TEST_QUIT BUTTON_OFF
 #elif CONFIG_KEYPAD == PLAYER_PAD
@@ -48,6 +47,11 @@ int init(void)
 {
     int f;
     buffer = rb->plugin_get_mp3_buffer(&buffersize);
+    
+#ifdef HAVE_MMC
+    /* present info what's going on. MMC is slow. */
+    rb->splash(0, true, "Creating dummy file.");
+#endif
 
     /* create a big dummy file */
     f = rb->creat("/battery.dummy", 0);
@@ -101,24 +105,15 @@ enum plugin_status loop(void)
                      t->tm_hour, t->tm_min, t->tm_sec, batt);
         rb->splash(0, true, buf);
         
-        /* simulate 128kbit/s (16kbyte/s) playback duration */
-        do {
-            button = rb->button_get_w_tmo(HZ * (buffersize / 16384) - HZ*10);
-            
-            switch (button) {
-                /* Check if we shall exit the plugin */
-                case BATTERY_TEST_QUIT:
-#ifdef BATTERY_TEST_QUIT2
-                case BATTERY_TEST_QUIT2:
-#endif
-                    return PLUGIN_OK;
-                    
-                default:
-                    if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
-                        return PLUGIN_USB_CONNECTED;
-                    break;
-            }
-        } while (!(button&(BUTTON_REL|BUTTON_REPEAT)));
+        /* simulate 128 kbit/s (16000 byte/s) playback duration */
+        rb->button_clear_queue();
+        button = rb->button_get_w_tmo(HZ * buffersize / 16000) - HZ*10);
+
+        if (button == BATTERY_TEST_QUIT)
+            return PLUGIN_OK;
+
+        if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+            return PLUGIN_USB_CONNECTED;
 
         /* simulate filling the mp3 buffer */
         f = rb->open("/battery.dummy", O_RDONLY);
