@@ -801,6 +801,11 @@ int ata_init(void)
 
     led(false);
 
+	/* Port A setup */
+	PAIOR |= 0x0200; /* output for ATA reset */
+	PADR |= 0x0200; /* release ATA reset */
+	PACR2 &= 0xBFFF; /* GPIO function for PA7 (IDE enable) */
+
     ata_enable(true);
 
     if ( !initialized ) {

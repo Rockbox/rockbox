@@ -63,7 +63,9 @@ void charger_enable(bool on)
 void ide_power_enable(bool on)
 {
 #ifdef HAVE_ATA_POWER_OFF
-    if(on)
+	PAIOR |= 0x20; /* there's no power driver init, so I have to do that here */
+    
+	if(on)
         PADR |= 0x20;
     else
         PADR &= ~0x20;
