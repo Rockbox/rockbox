@@ -31,6 +31,7 @@
 #include "button.h"
 #include "ata.h"
 #include "mpeg.h"
+#include "usb.h"
 #include "powermgmt.h"
 
 #ifdef SIMULATOR
@@ -127,6 +128,7 @@ static void handle_auto_poweroff(void)
         last_charge_time = current_tick;
     
     if(timeout &&
+       !usb_inserted() &&
        (mpeg_stat == 0 ||
         mpeg_stat == (MPEG_STATUS_PLAY | MPEG_STATUS_PAUSE)))
     {

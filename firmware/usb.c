@@ -297,6 +297,11 @@ void usb_start_monitoring(void)
     usb_monitor_enabled = true;
 }
 
+bool usb_inserted(void)
+{
+    return usb_state == USB_INSERTED;
+}
+
 #else
 
 /* Dummy simulator functions */
