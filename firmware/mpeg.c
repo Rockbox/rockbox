@@ -1432,7 +1432,6 @@ static void mpeg_thread(void)
                 break;
 
             case MPEG_PREV: {
-                int numtracks = num_tracks_in_memory();
                 DEBUGF("MPEG_PREV\n");
                 if (!playlist_peek(-1))
                     break;
@@ -1448,7 +1447,7 @@ static void mpeg_thread(void)
                 if (mpeg_file >= 0)
                     close(mpeg_file);
 
-                if (new_file(-numtracks) < 0) {
+                if (new_file(-1) < 0) {
                     DEBUGF("No more files to play\n");
                     filling = false;
                 } else {
