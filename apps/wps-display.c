@@ -59,8 +59,11 @@
 #define FORMAT_BUFFER_SIZE 300
 
 #ifdef HAVE_LCD_CHARCELLS
-unsigned char wps_progress_pat=0;
+static unsigned char wps_progress_pat[6]={0,0,0,0,0,0};
+static bool full_line_progressbar=0;
 static bool draw_player_progress(struct mp3entry* id3, int ff_rewwind_count);
+static void draw_player_fullbar(char* buf, int buf_size,
+                                struct mp3entry* id3, int ff_rewwind_count);
 #endif
 
 static char format_buffer[FORMAT_BUFFER_SIZE];
@@ -382,12 +385,21 @@ static char* get_tag(struct mp3entry* id3,
                 case 'b':  /* progress bar */
                     *flags |= WPS_REFRESH_PLAYER_PROGRESS;
 #ifdef HAVE_LCD_CHARCELLS
-                    snprintf(buf, buf_size, "%c", wps_progress_pat);
+                    snprintf(buf, buf_size, "%c", wps_progress_pat[0]);
+                    full_line_progressbar=0;
                     return buf;
 #else
                     return "\x01";
 #endif
-
+                case 'f':  /* full-line progress bar */
+#ifdef HAVE_LCD_CHARCELLS
+                    *flags |= WPS_REFRESH_PLAYER_PROGRESS;
+                    *flags |= WPS_REFRESH_DYNAMIC;
+                    full_line_progressbar=1;
+                    /* we need 11 characters (full line) for progress-bar */
+                    snprintf(buf, buf_size, "           ");
+                    return buf;
+#endif
                 case 'p':  /* Playlist Position */
                     *flags |= WPS_REFRESH_STATIC;
                     snprintf(buf, buf_size, "%d", id3->index + 1);
@@ -644,8 +656,10 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mo
     bool enable_pm = false;
 #endif
 #ifdef HAVE_LCD_CHARCELLS
-    if (wps_progress_pat==0)
-        wps_progress_pat=lcd_get_locked_pattern();
+    for (i=0; i<6; i++) {
+       if (wps_progress_pat[i]==0)
+           wps_progress_pat[i]=lcd_get_locked_pattern();
+    }
 #endif
 
     if (!id3)
@@ -703,7 +717,11 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mo
 #else
             /* progress */
             if (flags & refresh_mode & WPS_REFRESH_PLAYER_PROGRESS) {
-                draw_player_progress(id3, ff_rewind_count);
+                if (full_line_progressbar)
+                    draw_player_fullbar(buf, sizeof(buf),
+                                        id3, ff_rewind_count);
+                else
+                    draw_player_progress(id3, ff_rewind_count);
             }
 #endif
             if (flags & WPS_REFRESH_SCROLL) {
@@ -780,7 +798,7 @@ bool wps_display(struct mp3entry* id3)
     return false;
 }
 
-#if defined(HAVE_LCD_CHARCELLS)
+#ifdef HAVE_LCD_CHARCELLS
 static bool draw_player_progress(struct mp3entry* id3, int ff_rewwind_count)
 {
     char player_progressbar[7];
@@ -812,9 +830,126 @@ static bool draw_player_progress(struct mp3entry* id3, int ff_rewwind_count)
             player_progressbar[i] += binline[i*5+j];
         }
     }
-    lcd_define_pattern(wps_progress_pat, player_progressbar);
+    lcd_define_pattern(wps_progress_pat[0], player_progressbar);
     return true;
 }
+
+static void draw_player_fullbar(char* buf, int buf_size,
+                                struct mp3entry* id3, int ff_rewwind_count)
+{
+    int i,j,digit;
+
+    char player_progressbar[7];
+    char binline[36];
+    char numbers[11][4][3]={{{1,1,1},{1,0,1},{1,0,1},{1,1,1}},/*0*/
+                            {{0,1,0},{1,1,0},{0,1,0},{0,1,0}},/*1*/
+                            {{1,1,1},{0,0,1},{0,1,0},{1,1,1}},/*2*/
+                            {{1,1,1},{0,0,1},{0,1,1},{1,1,1}},/*3*/
+                            {{1,0,0},{1,1,0},{1,1,1},{0,1,0}},/*4*/
+                            {{1,1,1},{1,1,0},{0,0,1},{1,1,0}},/*5*/
+                            {{1,1,1},{1,0,0},{1,1,1},{1,1,1}},/*6*/
+                            {{1,1,1},{0,0,1},{0,1,0},{1,0,0}},/*7*/
+                            {{1,1,1},{1,1,1},{1,0,1},{1,1,1}},/*8*/
+                            {{1,1,1},{1,1,1},{0,0,1},{1,1,1}},/*9*/
+                            {{0,0,0},{0,1,0},{0,0,0},{0,1,0}}};/*:*/
+
+    int songpos = 0;
+    int digits[5];
+
+    for (i=0; i < buf_size; i++)
+        buf[i] = ' ';
+           
+    if(id3->elapsed >= id3->length)
+        songpos = 11;
+    else {
+        if(wps_time_countup == false)
+            songpos = ((id3->elapsed - ff_rewwind_count) * 55) / id3->length;
+        else
+            songpos = ((id3->elapsed + ff_rewwind_count) * 55) / id3->length;
+    }
+
+    int time=(id3->elapsed + ff_rewind_count);
+   
+    digits[4]=(time % 60000 / 1000 ) % 10;
+    digits[3]=(time % 60000 / 10000) % 10;
+    digits[2]=10; /*:*/
+    digits[1]=(time / 60000 ) % 10;
+    digits[0]=(time / 600000) % 10;
+   
+    /* build the progressbar-icon */
+    for (digit=0; digit <=4; digit++) {
+        memset(binline, 0, sizeof binline);
+        memset(player_progressbar, 0, sizeof player_progressbar);
+
+        /* make the character (progressbar & digit)*/
+        for (i=0; i<=6; i++) {
+            for (j=0;j<5;j++) {
+                /* make the progressbar */
+                if (digit==(songpos/5)) {
+                    /* partial */
+                    if ((j<(songpos%5))&&(i>4))
+                        binline[i*5+j] = 1;
+                    else
+                        binline[i*5+j] = 0;
+                }
+                else {
+                    if (digit<(songpos/5)) {
+                        /* full character */
+                        if (i>4)
+                            binline[i*5+j] = 1;
+                    }
+                }
+                /* insert the digit */
+                if ((j<3)&&(i<4)) {
+                    if (numbers[digits[digit]][i][j]==1)
+                        binline[i*5+j] = 1;
+                }
+            }
+        }
+         
+        for (i=0; i<=6; i++) {
+            for (j=0;j<5;j++) {
+                player_progressbar[i] <<= 1;
+                player_progressbar[i] += binline[i*5+j];
+            }
+        }
+       
+        lcd_define_pattern(wps_progress_pat[digit],player_progressbar);
+        buf[digit]=wps_progress_pat[digit];
+       
+    }
+   
+    /* make rest of the progressbar if necessary */
+    if (songpos/5>4) {
+   
+        memset(binline, 0, sizeof binline);
+        memset(player_progressbar, 0, sizeof player_progressbar);
+
+        for (i=5; i<=6; i++) {
+            for (j=0;j<5;j++) {
+                if (j<(songpos%5)) {
+                    binline[i*5+j] = 1;
+                }
+            }
+        }
+       
+        for (i=0; i<=6; i++) {
+            for (j=0;j<5;j++) {
+                player_progressbar[i] <<= 1;
+                player_progressbar[i] += binline[i*5+j];
+            }
+        }
+       
+        lcd_define_pattern(wps_progress_pat[5],player_progressbar);
+           
+        for (i=5; i < (songpos/5); i++)
+            buf[i] = 0x86; /* '_' */
+             
+        buf[songpos/5]=wps_progress_pat[5];
+    }
+       
+}
+
 #endif
 
 /* -----------------------------------------------------------------
