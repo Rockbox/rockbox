@@ -156,17 +156,23 @@ void menu_draw(int m)
     int menu_lines = MENU_LINES;
 #endif
 
-    lcd_clear_display(); /* ...then clean the screen */
+    lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
     lcd_setmargins(MARGIN_X,MARGIN_Y); /* leave room for cursor and icon */
 #endif
-    /* correct cursor pos if out of screen */
+    /* Adjust cursor pos if it's below the screen */
     if (menus[m].cursor - menus[m].top >= menu_lines)
         menus[m].top++;
+
+    /* Adjust cursor pos if it's above the screen */
+    if(menus[m].cursor < menus[m].top)
+        menus[m].top = menus[m].cursor;
 
     for (i = menus[m].top; 
          (i < menus[m].itemcount) && (i<menus[m].top+menu_lines);
          i++) {
+
+        /* We want to scroll the line where the cursor is */
         if((menus[m].cursor - menus[m].top)==(i-menus[m].top))
 #ifdef HAVE_LCD_BITMAP
             if (global_settings.invert_cursor)
@@ -181,6 +187,7 @@ void menu_draw(int m)
 
     /* place the cursor */
     put_cursorxy(CURSOR_X, menus[m].cursor - menus[m].top, true);
+    
 #ifdef HAVE_LCD_BITMAP
     if (global_settings.scrollbar && menus[m].itemcount > menu_lines) 
         scrollbar(SCROLLBAR_X, SCROLLBAR_Y, SCROLLBAR_WIDTH - 1,
@@ -201,52 +208,18 @@ void menu_draw(int m)
  */
 static void put_cursor(int m, int target)
 {
-    bool do_update = true;
-#ifdef HAVE_LCD_BITMAP
-    int fw, fh;
-    int menu_lines;
-    int height = LCD_HEIGHT;
+    int voice_id;
     
-    lcd_setfont(FONT_UI);
-    lcd_getstringsize("A", &fw, &fh);
-    if(global_settings.statusbar)
-        height -= STATUSBAR_HEIGHT;
-
-    if(global_settings.buttonbar && menus[m].use_buttonbar)
-        height -= BUTTONBAR_HEIGHT;
-
-    menu_lines = height / fh;
-#else
-    int menu_lines = MENU_LINES;
-#endif
-
-    put_cursorxy(CURSOR_X, menus[m].cursor - menus[m].top, false);
     menus[m].cursor = target;
     menu_draw(m);
 
-    if ( target < menus[m].top ) {
-        menus[m].top--;
-        menu_draw(m);
-        do_update = false;
-    }
-    else if ( target-menus[m].top > menu_lines-1 ) {
-        menus[m].top++;
-        menu_draw(m);
-        do_update = false;
-    }
-
-    if (do_update && !global_settings.invert_cursor) {
-        put_cursorxy(CURSOR_X, menus[m].cursor - menus[m].top, true);
-        lcd_update();
-    }
-
-    if (do_update)
-    {   /* "say" the entry under the cursor */
-        int voice_id = menus[m].items[menus[m].cursor].voice_id;
-        if (voice_id >= 0 && global_settings.talk_menu) /* valid ID given? */
+    /* "say" the entry under the cursor */
+    if(global_settings.talk_menu)
+    {
+        voice_id = menus[m].items[menus[m].cursor].voice_id;
+        if (voice_id >= 0) /* valid ID given? */
             talk_id(voice_id, false); /* say it */
     }
-
 }
 
 int menu_init(struct menu_item* mitems, int count, int (*callback)(int, int),
@@ -295,7 +268,6 @@ int menu_show(int m)
 {
     bool exit = false;
     int key;
-    int voice_id;
 #ifdef HAVE_LCD_BITMAP
     int fw, fh;
     int menu_lines;
@@ -316,25 +288,23 @@ int menu_show(int m)
     menu_lines = height / fh;
 #endif
 
-    menu_draw(m);
-
-    /* say current entry */
-    voice_id = menus[m].items[menus[m].cursor].voice_id;
-    if (voice_id >= 0 && global_settings.talk_menu) /* valid ID given? */
-        talk_id(voice_id, false); /* say it */
+    /* Put the cursor on the first line and draw the menu */
+    put_cursor(m, 0);
 
     while (!exit) {
         key = button_get_w_tmo(HZ/2);
 
-        
-
         /*  
-         *   "short-circuit" the default keypresses by running the callback function
+         * "short-circuit" the default keypresses by running the
+         * callback function
+         * The callback may return a new key value, often this will be
+         * BUTTON_NONE or the same key value, but it's perfectly legal
+         * to "simulate" key presses by returning another value.
          */
 
         if( menus[m].callback != NULL )
-            key = menus[m].callback(key, m);            /* make sure there's no match in the switch */
-
+            key = menus[m].callback(key, m);
+        
         switch( key ) {
 
 #ifdef HAVE_RECORDER_KEYPAD
