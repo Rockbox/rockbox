@@ -212,12 +212,10 @@ static void usb_thread(void)
     }
 }
 
-static void usb_tick(void)
+bool usb_detect(void)
 {
     bool current_status;
 
-    if(usb_monitor_enabled)
-    {
 #ifdef ARCHOS_RECORDER
         current_status = (adc_read(ADC_USB_POWER) > 500)?true:false;
 #else
@@ -227,6 +225,18 @@ static void usb_tick(void)
         current_status = (PADR & 0x8000)?false:true;
 #endif
 #endif
+
+    return current_status;
+}
+
+
+static void usb_tick(void)
+{
+    bool current_status;
+
+    if(usb_monitor_enabled)
+    {
+        current_status = usb_detect();
     
         /* Only report when the status has changed */
         if(current_status != last_usb_status)
