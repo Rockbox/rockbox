@@ -425,17 +425,17 @@ eng: "Resume?"
 new:
 
 id: LANG_RESUME_CONFIRM_PLAYER
-desc: posible answers to resume question
+desc: possible answers to resume question
 eng: "(PLAY/STOP)"
 new:
 
 id: LANG_RESUME_CONFIRM_RECORDER
-desc: posible answer to resume question
+desc: possible answer to resume question
 eng: "PLAY = Yes"
 new:
 
 id: LANG_RESUME_CANCEL_RECORDER
-desc: posible answer to resume question
+desc: possible answer to resume question
 eng: "Any Other = No"
 new:
 
