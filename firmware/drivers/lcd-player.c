@@ -144,7 +144,7 @@ static int lcd_get_free_pat(int ch)
     static int last_used_pat=0;
     int loop;
 
-    pat=last_pat;
+    pat=last_used_pat;
     for (loop=0; loop<=pattern_size; loop++) {
         pat=(pat+1)&pattern_size; /* Keep 'pat' within limits */
         if (extended_pattern_usage[pat]==0) {
@@ -153,7 +153,7 @@ static int lcd_get_free_pat(int ch)
                 extended_chars_mapped[map_ch]=NO_CHAR;
                 extended_pattern_content[pat]=NO_CHAR;
             }
-            last_pat=pat;
+            last_used_pat=pat;
             return pat;
         }
         if (extended_pattern_content[pat]>extended_pattern_content[last_pat])
