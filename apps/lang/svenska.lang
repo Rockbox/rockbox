@@ -2864,19 +2864,19 @@ new: "Sånger"
 id: LANG_BATTERY_TYPE
 desc: in battery settings
 eng: "Battery Type"
-voice: ""
+voice: "Battery type"
 new: "Batterityp"
 
 id: LANG_BATTERY_TYPE_ALKALINE
 desc: in battery settings
 eng: "Alkaline"
-voice: ""
+voice: "Alkaline"
 new: "Alkalisk"
 
 id: LANG_BATTERY_TYPE_NIMH
 desc: in battery settings
 eng: "NiMH"
-voice: ""
+voice: "Nickel metal hydride"
 new: "NiMH"
 
 id: LANG_BYTE
@@ -2888,7 +2888,7 @@ new: "B"
 id: LANG_DISK_FREE_INFO
 desc: disk size info
 eng: "Free:"
-voice: ""
+voice: "Free diskspace:"
 new: "Ledigt:"
 
 id: LANG_DISK_SIZE_INFO
@@ -2900,7 +2900,7 @@ new: "Disk:"
 id: LANG_GIGABYTE
 desc: a unit postfix, also voiced
 eng: "GB"
-voice: ""
+voice: "gigabyte"
 new: "GB"
 
 id: LANG_ID3DB_MATCHES
@@ -2936,19 +2936,19 @@ new: "Sök sång"
 id: LANG_KILOBYTE
 desc: a unit postfix, also voiced
 eng: "KB"
-voice: ""
+voice: "kilobyte"
 new: "KB"
 
 id: LANG_MEGABYTE
 desc: a unit postfix, also voiced
 eng: "MB"
-voice: ""
+voice: "megabyte"
 new: "MB"
 
 id: LANG_POINT
 desc: decimal separator for composing numbers
 eng: "."
-voice: ""
+voice: "point"
 new: ","
 
 id: LANG_ID3DB_ALL_SONGS
