@@ -25,9 +25,9 @@
 
 /* data structures */
 
-#define RESUME_NONE     0
-#define RESUME_SONG     1 /* resume song at startup     */
-#define RESUME_PLAYLIST 2 /* resume playlist at startup */
+#define RESUME_OFF 0
+#define RESUME_ASK 1
+#define RESUME_ON  2
 
 struct user_settings
 {
@@ -50,7 +50,7 @@ struct user_settings
 
     /* resume settings */
 
-    bool resume;       /* resume option on/off */
+    int resume;        /* resume option: 0=off, 1=ask, 2=on */
     int resume_index;  /* index in playlist (-1 for no active resume) */
     int resume_offset; /* byte offset in mp3 file */
     int resume_seed;   /* random seed for playlist shuffle */

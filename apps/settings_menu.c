@@ -59,7 +59,8 @@ static void sort_case(void)
 
 static void resume(void)
 {
-    set_bool( "[Resume]", &global_settings.resume );
+    char* names[] = { "off", "ask", "on " };
+    set_option( "[Resume]", &global_settings.resume, names, 3 );
 }
 
 static void backlight_timer(void)

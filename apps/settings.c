@@ -393,7 +393,7 @@ void settings_reset(void) {
     global_settings.loudness    = mpeg_sound_default(SOUND_LOUDNESS);
     global_settings.bass_boost  = mpeg_sound_default(SOUND_SUPERBASS);
     global_settings.avc         = mpeg_sound_default(SOUND_AVC);
-    global_settings.resume      = true;
+    global_settings.resume      = RESUME_ASK;
     global_settings.contrast    = DEFAULT_CONTRAST_SETTING;
     global_settings.poweroff    = DEFAULT_POWEROFF_SETTING;
     global_settings.backlight   = DEFAULT_BACKLIGHT_SETTING;
