@@ -125,6 +125,8 @@ int wps_show(void)
     int lastartist=0, lastalbum=0, lasttitle=0;
     bool lastvbr = false;
 
+    lcd_clear_display();
+
     while ( 1 ) {
         int i;
         char buffer[32];
@@ -174,6 +176,13 @@ int wps_show(void)
            }
 #endif
         } 
+
+#ifdef HAVE_LCD_BITMAP
+        /* draw battery indicator line */
+        lcd_clearline(0,LCD_HEIGHT-1,LCD_WIDTH-1, LCD_HEIGHT-1);
+        lcd_drawline(0,LCD_HEIGHT-1,battery_level() * LCD_WIDTH / 100, LCD_HEIGHT-1);
+#endif
+
         for ( i=0;i<5;i++ ) {
             switch ( button_get(false) ) {
                 case BUTTON_ON:
