@@ -490,4 +490,12 @@ void system_init(void)
 
     /* Activate Warp mode (simultaneous internal and external mem access) */
     BCR |= 0x2000;
+
+    /* Bus state controller initializations. These are only necessary when
+       running from flash. The correct settings for player models are not
+       verified, so we only do this for the recorder. */
+#ifdef HAVE_RECORDING
+    WCR1 = 0x4000; /* Long wait states for CS6 (ATA), short for the rest. */
+    WCR3 = 0x8000; /* WAIT is pulled up, 1 state inserted for CS6 */
+#endif
 }
