@@ -91,15 +91,15 @@ static unsigned char sound[]={
 
 void led(bool on){
     if(on)
-	or_b(0x40, &PBDRL);
+    or_b(0x40, &PBDRL);
     else
-	and_b(~0x40, &PBDRL);
+    and_b(~0x40, &PBDRL);
 }
 
 void calc_period(void){
     period =  61440/bpm-1; // (60*1024)/bpm;
 }
-	
+    
 void callback(unsigned char** start, int* size){
     (void)start; /* unused parameter, avoid warning */
     *size = NULL; /* end of data */
@@ -140,9 +140,9 @@ void draw_display(void){
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_drawline(0, 12, 111, 12);
     if(sound_paused)
-	rb->lcd_puts(0,2,"press play");
+    rb->lcd_puts(0,2,"press play");
     else
-	rb->lcd_puts(0,2,"press pause");
+    rb->lcd_puts(0,2,"press pause");
     rb->lcd_update();
 #endif
 }
@@ -157,10 +157,10 @@ void change_volume(int delta){
     if (vol != rb->global_settings->volume) {
         rb->mpeg_sound_set(SOUND_VOLUME, vol);
         rb->global_settings->volume = vol;
-	rb->snprintf(buffer, sizeof(buffer), "Vol: %d ", vol);
+    rb->snprintf(buffer, sizeof(buffer), "Vol: %d ", vol);
 #ifdef HAVE_LCD_BITMAP
         rb->lcd_puts(10,7, buffer);
-	rb->lcd_update();
+    rb->lcd_update();
 #else
         rb->lcd_puts(0,1, buffer);
 #endif
@@ -169,13 +169,13 @@ void change_volume(int delta){
 
 void timer_callback(void){
     if(minitick>=period){
-	minitick = 0;
-	if(!sound_active && !sound_paused){
-	    play_tock();
-	}
+    minitick = 0;
+    if(!sound_active && !sound_paused){
+        play_tock();
+    }
     } 
     else {
-	minitick++;
+    minitick++;
     }
 }
 
@@ -189,7 +189,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
     rb->bitswap(sound, sizeof(sound));
 
     if (rb->mp3_is_playing())
-	rb->mp3_play_stop(); // stop audio ISR
+    rb->mp3_play_stop(); // stop audio ISR
 
      calc_period();
      rb->plugin_register_timer((FREQ/1024), 1, timer_callback);
@@ -198,83 +198,85 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
 
     /* main loop */
     while (true){
-	
-	switch (rb->button_get(false)) {
+    
+    switch (rb->button_get(true)) {
 #ifdef HAVE_RECORDER_KEYPAD
-	case BUTTON_OFF:
+    case BUTTON_OFF:
 #else
-        case BUTTON_STOP:
+    case BUTTON_STOP:
 #endif
-	    /* get out of here */
-	    rb->mp3_play_stop(); /* stop audio ISR */
-	    rb->plugin_unregister_timer();
-	    led(0);
-	    return PLUGIN_OK;
+        /* get out of here */
+        rb->plugin_unregister_timer();
+        rb->mp3_play_stop(); /* stop audio ISR */
+        led(0);
+        return PLUGIN_OK;
 
-	case BUTTON_PLAY:
-	    if(sound_paused)
-		sound_paused = false;
-	    else
-		sound_paused = true;
-	    calc_period();
-	    draw_display();
-	    break;
+    case BUTTON_PLAY:
+        if(sound_paused)
+        sound_paused = false;
+        else
+        sound_paused = true;
+        calc_period();
+        draw_display();
+        break;
       
 #ifdef HAVE_RECORDER_KEYPAD
-	case BUTTON_UP:
-	case BUTTON_UP | BUTTON_REPEAT:
+    case BUTTON_UP:
+    case BUTTON_UP | BUTTON_REPEAT:
 #else
-	case BUTTON_ON | BUTTON_RIGHT:
-	case BUTTON_ON | BUTTON_RIGHT | BUTTON_REPEAT:
+    case BUTTON_ON | BUTTON_RIGHT:
+    case BUTTON_ON | BUTTON_RIGHT | BUTTON_REPEAT:
 #endif
-	    change_volume(1);
-	    calc_period();
-	    break;
+        change_volume(1);
+        calc_period();
+        break;
 
 #ifdef HAVE_RECORDER_KEYPAD
-	case BUTTON_DOWN:
-	case BUTTON_DOWN | BUTTON_REPEAT:
+    case BUTTON_DOWN:
+    case BUTTON_DOWN | BUTTON_REPEAT:
 #else
-	case BUTTON_ON | BUTTON_LEFT:
-	case BUTTON_ON | BUTTON_LEFT | BUTTON_REPEAT:
+    case BUTTON_ON | BUTTON_LEFT:
+    case BUTTON_ON | BUTTON_LEFT | BUTTON_REPEAT:
 #endif
-	    change_volume(-1);
-	    calc_period();
-	    break;
+        change_volume(-1);
+        calc_period();
+        break;
 
-	case BUTTON_LEFT:
-	    if (bpm > 1)
-		bpm--;
-	    calc_period();
-	    draw_display();
-	    break;
+    case BUTTON_LEFT:
+        if (bpm > 1)
+        bpm--;
+        calc_period();
+        draw_display();
+        break;
 
-	case BUTTON_LEFT | BUTTON_REPEAT:
-	    if (bpm > 10)
-		bpm=bpm-10;
-	    calc_period();
-	    draw_display();
-	    break;
+    case BUTTON_LEFT | BUTTON_REPEAT:
+        if (bpm > 10)
+        bpm=bpm-10;
+        calc_period();
+        draw_display();
+        break;
 
-	case BUTTON_RIGHT:
-	    if(bpm < 400)
-		bpm++;
-	    calc_period();
-	    draw_display();
-	    break;
+    case BUTTON_RIGHT:
+        if(bpm < 400)
+        bpm++;
+        calc_period();
+        draw_display();
+        break;
 
-	case BUTTON_RIGHT | BUTTON_REPEAT:
-	    if (bpm < 400)
-		bpm=bpm+10;
-	    calc_period();
-	    draw_display();
-	    break;
+    case BUTTON_RIGHT | BUTTON_REPEAT:
+        if (bpm < 400)
+        bpm=bpm+10;
+        calc_period();
+        draw_display();
+        break;
 
-	case SYS_USB_CONNECTED:
-	    rb->plugin_unregister_timer();
-	    rb->usb_screen();
-	    return PLUGIN_USB_CONNECTED;
-	}
+    case SYS_USB_CONNECTED:
+        rb->plugin_unregister_timer();
+        rb->mp3_play_stop(); /* stop audio ISR */
+        led(0);
+        rb->usb_screen();
+        return PLUGIN_USB_CONNECTED;
+    }
     }
 }
 #endif /* #ifndef SIMULATOR */
