@@ -39,13 +39,14 @@
 
 static Menu show_hidden_files(void)
 {
-    set_bool( "[Show hidden files]", &global_settings.show_hidden_files );
+    set_bool_options( "Hidden Files", &global_settings.show_hidden_files,
+                      "show", "hide" );
     return MENU_OK;
 }
 
 static Menu contrast(void)
 {
-    set_int( "[Contrast]", "", &global_settings.contrast, 
+    set_int( "Contrast", "", &global_settings.contrast, 
              lcd_set_contrast, 1, 0, MAX_CONTRAST_SETTING );
     return MENU_OK;
 }
@@ -53,27 +54,27 @@ static Menu contrast(void)
 #ifndef HAVE_RECORDER_KEYPAD
 static Menu shuffle(void)
 {
-    set_bool( "[Shuffle]", &global_settings.playlist_shuffle );
+    set_bool( "Shuffle", &global_settings.playlist_shuffle );
     return MENU_OK;
 }
 #endif
 
 static Menu mp3_filter(void)
 {
-    set_bool( "[MP3/M3U filter]", &global_settings.mp3filter );
+    set_bool( "Music Filter", &global_settings.mp3filter );
     return MENU_OK;
 }
 
 static Menu sort_case(void)
 {
-    set_bool( "[Sort case sensitive]", &global_settings.sort_case );
+    set_bool( "Sort Case Sensitive", &global_settings.sort_case );
     return MENU_OK;
 }
 
 static Menu resume(void)
 {
     char* names[] = { "off", "ask", "on " };
-    set_option( "[Resume]", &global_settings.resume, names, 3 );
+    set_option( "Resume", &global_settings.resume, names, 3 );
     return MENU_OK;
 }
 
@@ -84,14 +85,14 @@ static Menu backlight_timer(void)
                       "6s ", "7s ", "8s ", "9s ", "10s",
                       "15s", "20s", "25s", "30s", "45s",
                       "60s", "90s"};
-    set_option("[Backlight]", &global_settings.backlight, names, 19 );
+    set_option("Backlight", &global_settings.backlight, names, 19 );
     backlight_time(global_settings.backlight);
     return MENU_OK;
 }
 
 static Menu scroll_speed(void)
 {
-    set_int("Scroll speed indicator...   ", "", &global_settings.scroll_speed, 
+    set_int("Scroll Speed", "", &global_settings.scroll_speed, 
             &lcd_scroll_speed, 1, 1, 20 );
     return MENU_OK;
 }
@@ -99,7 +100,7 @@ static Menu scroll_speed(void)
 #ifdef HAVE_CHARGE_CTRL
 static Menu deep_discharge(void)
 {
-    set_bool( "[Deep discharge]", &global_settings.discharge );
+    set_bool( "Deep Discharge", &global_settings.discharge );
     charge_restart_level = global_settings.discharge ? 
         CHARGE_RESTART_LO : CHARGE_RESTART_HI;
     return MENU_OK;
@@ -133,7 +134,7 @@ static Menu timedate_set(void)
     timedate[5] = ((timedate[5] & 0x30) >> 4) * 10 + (timedate[5] & 0x0f);
 
 
-    set_time("[Set time/date]",timedate);
+    set_time("Set time/date",timedate);
 
     if(timedate[0] != -1) {
         /* hour   */
@@ -164,7 +165,7 @@ static Menu timedate_set(void)
 
 static Menu spindown(void)
 {
-    set_int("[Disk spindown]", "s", &global_settings.disk_spindown,
+    set_int("Disk Spindown", "s", &global_settings.disk_spindown,
             ata_spindown, 1, 3, 254 );
     return MENU_OK;
 }
@@ -175,7 +176,7 @@ static Menu ff_rewind_min_step(void)
                       "5s ", "6s ", "8s ", "10s",
                       "15s", "20s", "25s", "30s",
                       "45s", "60s" };
-    set_option("[FF/rewind min step]", &global_settings.ff_rewind_min_step,
+    set_option("FF/RW Min Step", &global_settings.ff_rewind_min_step,
                 names, 14 ); 
     return MENU_OK; 
 } 
@@ -186,7 +187,7 @@ static Menu ff_rewind_accel(void)
                       "2x/4s ", "2x/5s ", "2x/6s ", "2x/7s ", 
                       "2x/8s ", "2x/9s ", "2x/10s", "2x/11s",
                       "2x/12s", "2x/13s", "2x/14s", "2x/15s", };
-    set_option("[FF/rewind accel]", &global_settings.ff_rewind_accel, 
+    set_option("FF/RW Accel", &global_settings.ff_rewind_accel, 
                 names, 16 ); 
     return MENU_OK; 
 } 
@@ -197,25 +198,30 @@ Menu settings_menu(void)
     Menu result;
 
     struct menu_items items[] = {
+        { "Playback",        playback_settings_menu },
+        { "File View",       fileview_settings_menu },
+        { "Display",         display_settings_menu  },
+        { "System",          system_settings_menu   },
+    };
+    
+    m=menu_init( items, sizeof items / sizeof(struct menu_items) );
+    result = menu_run(m);
+    menu_exit(m);
+    return result;
+}
+
+Menu playback_settings_menu(void)
+{
+    int m;
+    Menu result;
+
+    struct menu_items items[] = {
 #ifndef HAVE_RECORDER_KEYPAD
-        { "Shuffle",         shuffle         }, 
+        { "Shuffle",        shuffle            },
 #endif
-        { "MP3/M3U filter",  mp3_filter      },
-        { "Sort mode",       sort_case       },
-        { "Backlight Timer", backlight_timer },
-        { "Contrast",        contrast    },  
-        { "Scroll speed",    scroll_speed    },  
-#ifdef HAVE_CHARGE_CTRL
-        { "Deep discharge",  deep_discharge  },
-#endif
-#ifdef HAVE_RTC
-        { "Time/Date",       timedate_set    },
-#endif
-        { "Show hidden files", show_hidden_files },
-        { "FF/Rewind Min Step", ff_rewind_min_step },
-        { "FF/Rewind Accel", ff_rewind_accel },
-        { "Resume",          resume          },
-        { "Disk spindown",   spindown        },
+        { "Resume",         resume             },
+        { "FF/RW Min Step", ff_rewind_min_step },
+        { "FF/RW Accel",    ff_rewind_accel    },
     };
     bool old_shuffle = global_settings.playlist_shuffle;
     
@@ -234,5 +240,60 @@ Menu settings_menu(void)
             sort_playlist(true);
         }
     }
+    return result;
+}
+
+Menu fileview_settings_menu(void)
+{
+    int m;
+    Menu result;
+
+    struct menu_items items[] = {
+        { "Sort Mode",       sort_case           },
+        { "Music Filter",    mp3_filter          },
+        { "Hidden Files",    show_hidden_files   },
+    };
+
+    m=menu_init( items, sizeof items / sizeof(struct menu_items) );
+    result = menu_run(m);
+    menu_exit(m);
+    return result;
+}
+
+Menu display_settings_menu(void)
+{
+    int m;
+    Menu result;
+
+    struct menu_items items[] = {
+        { "Scroll Speed",    scroll_speed    },  
+        { "Backlight",       backlight_timer },
+        { "Contrast",        contrast        },  
+    };
+    
+    m=menu_init( items, sizeof items / sizeof(struct menu_items) );
+    result = menu_run(m);
+    menu_exit(m);
+    return result;
+}
+
+Menu system_settings_menu(void)
+{
+    int m;
+    Menu result;
+
+    struct menu_items items[] = {
+        { "Disk Spindown",   spindown        },
+#ifdef HAVE_CHARGE_CTRL
+        { "Deep Discharge",  deep_discharge  },
+#endif
+#ifdef HAVE_RTC
+        { "Time/Date",       timedate_set    },
+#endif
+    };
+    
+    m=menu_init( items, sizeof items / sizeof(struct menu_items) );
+    result = menu_run(m);
+    menu_exit(m);
     return result;
 }

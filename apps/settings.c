@@ -524,64 +524,15 @@ void settings_display(void)
 
 void set_bool(char* string, bool* variable )
 {
-    bool done = false;
-    int button;
+    set_bool_options(string, variable, "yes", "no ");
+}
 
-#ifdef HAVE_LCD_BITMAP
-    if(global_settings.statusbar)
-        lcd_setmargins(0, STATUSBAR_HEIGHT);
-    else
-        lcd_setmargins(0, 0);
-#endif
-    lcd_clear_display();
-    lcd_puts_scroll(0, 0, string);
-
-    while ( !done ) {
-        lcd_puts(0, 1, *variable ? "on " : "off");
-#ifdef HAVE_LCD_BITMAP
-        status_draw();
-#endif
-        lcd_update();
-
-        button = button_get_w_tmo(HZ/2);
-        switch ( button ) {
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_LEFT:
-#else
-            case BUTTON_STOP:
-            case BUTTON_MENU:
-#endif
-                done = true;
-                break;
-
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_UP:
-            case BUTTON_DOWN:
-#else
-            case BUTTON_LEFT:
-            case BUTTON_RIGHT:
-#endif
-                if(!(button & BUTTON_REL))
-                   *variable = !*variable;
-                break;
-
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_F3:
-#ifdef HAVE_LCD_BITMAP
-                global_settings.statusbar = !global_settings.statusbar;
-                settings_save();
-                if(global_settings.statusbar)
-                    lcd_setmargins(0, STATUSBAR_HEIGHT);
-                else
-                    lcd_setmargins(0, 0);
-                lcd_clear_display();
-                lcd_puts_scroll(0, 0, string);
-#endif
-                break;
-#endif
-        }
-    }
-    lcd_stop_scroll();
+void set_bool_options(char* string, bool* variable, char* yes_str, char* no_str )
+{
+    char* names[] = { yes_str, no_str };
+    int value = !*variable;
+    set_option(string, &value, names, 2);
+    *variable = !value;
 }
 
 void set_int(char* string, 
@@ -600,6 +551,7 @@ void set_int(char* string,
     else
         lcd_setmargins(0, 0);
 #endif
+
     lcd_clear_display();
     lcd_puts_scroll(0, 0, string);
 
