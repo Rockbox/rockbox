@@ -766,3 +766,15 @@ A78: Linus Nielsen Feltzing replied to a similar question on April 17th 2004,
       44100, 48000, 32000: MPEG version 1
       22050, 24000, 16000: MPEG version 2
       11025, 12000, 8000: MPEG version 2.5 (not an official standard)
+
+Q79: How can I make rockbox play tracks in CD order?
+A79: You have two options.
+
+     1: You can rename all tracks to have the track number in front of them
+     (01 - track1.mp3, 02 - track2.mp3, ...). Just make sure to zero-prefix
+     the number properly so that 10 will play after 09.
+
+     2: Make a playlist for each album and play that instead of the .mp3
+     files.
+
+     No, you can't make Rockbox use the track number id3 info for this.
