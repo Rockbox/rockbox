@@ -326,10 +326,6 @@ bool dirbrowse(char *root)
                 lcd_setmargins(0,MARGIN_Y);
                 lcd_setfont(0);
 #endif
-                if ( dirlevel < MAX_DIR_LEVELS )
-                    start = dirpos[dirlevel];
-                else
-                    start = 0;
                 numentries = showdir(currdir, buffer, 0, start, &at_end);
                 dircursor=0;
                 while ( (dircursor < TREE_MAX_ON_SCREEN) && 
