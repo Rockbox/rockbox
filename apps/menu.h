@@ -27,6 +27,6 @@ struct menu_items {
 };
 
 void menu_init(struct menu_items* items, int count);
-void menu_draw(void);
+void menu_run(void);
 
 #endif /* End __MENU_H__ */
