@@ -468,6 +468,7 @@ clean-apps:
 
 clean:
 	\$(MAKE) clean-firmware clean-apps
+	rm -f rockbox.zip
 
 tags-firmware:
 	\$(MAKE) -C \$(FIRMDIR) TARGET=\$(TARGET) OBJDIR=\$(THISDIR) tags
