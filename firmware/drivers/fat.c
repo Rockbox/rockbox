@@ -1576,6 +1576,40 @@ int fat_opendir(struct fat_dir *dir, unsigned int startcluster)
     return 0;
 }
 
+/* convert from unicode to a single-byte charset */
+void unicode2iso(unsigned char* unicode, unsigned char* iso, int count )
+{
+    int i;
+
+    for (i=0; i<count; i++) {
+        int x = i*2;
+        switch (unicode[x+1]) {
+            case 0x03: /* greek, convert to ISO 8859-7 */
+                iso[i] = unicode[x] + 0x30;
+                break;
+
+                /* Sergei says most russians use Win1251, so we will too.
+                   Win1251 differs from ISO 8859-5 by an offset of 0x10. */
+            case 0x04: /* cyrillic, convert to Win1251 */
+                iso[i] = unicode[x] + 0xb0; /* 0xa0 for ISO 8859-5 */
+                break;
+
+            case 0x05: /* hebrew, convert to ISO 8859-8 */
+                iso[i] = unicode[x] + 0x10;
+                break;
+
+            case 0x06: /* arabic, convert to ISO 8859-6 */
+            case 0x0e: /* thai, convert to ISO 8859-11 */
+                iso[i] = unicode[x] + 0xa0;
+                break;
+
+            default:
+                iso[i] = unicode[x];
+                break;
+        }
+    }
+}
+
 int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
 {
     bool done = false;
@@ -1646,7 +1680,7 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
 
                     /* replace shortname with longname? */
                     if ( longs ) {
-                        int j,k,l=0;
+                        int j,l=0;
                         /* iterate backwards through the dir entries */
                         for (j=longs-1; j>=0; j--) {
                             unsigned char* ptr = cached_buf;
@@ -1670,12 +1704,12 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
 
                             /* names are stored in unicode, but we
                                only grab the low byte (iso8859-1). */
-                            for (k=0; k<5; k++)
-                                entry->name[l++] = ptr[index + k*2 + 1];
-                            for (k=0; k<6; k++)
-                                entry->name[l++] = ptr[index + k*2 + 14];
-                            for (k=0; k<2; k++)
-                                entry->name[l++] = ptr[index + k*2 + 28];
+                            unicode2iso(ptr + index + 1, entry->name + l, 5);
+                            l+= 5;
+                            unicode2iso(ptr + index + 14, entry->name + l, 6);
+                            l+= 6;
+                            unicode2iso(ptr + index + 28, entry->name + l, 2);
+                            l+= 2;
                         }
                         entry->name[l]=0;
                     }
