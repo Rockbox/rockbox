@@ -56,6 +56,7 @@ void mp3_play_stop(void);
 long mp3_get_playtime(void);
 void mp3_reset_playtime(void);
 bool mp3_is_playing(void);
+unsigned char* mp3_get_pos(void);
 
 
 #define SOUND_VOLUME 0

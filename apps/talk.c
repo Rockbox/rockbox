@@ -76,6 +76,12 @@ static struct queue_entry queue[QUEUE_SIZE]; /* queue of scheduled clips */
 static int queue_write; /* write index of queue, by application */
 static int queue_read; /* read index of queue, by ISR context */
 
+/***************** Private prototypes *****************/
+
+static int load_voicefont(void);
+static void mp3_callback(unsigned char** start, int* size);
+static int shutup(void);
+static int queue_clip(unsigned char* buf, int size, bool enqueue);
 
 
 /***************** Private implementation *****************/
@@ -158,14 +164,47 @@ static void mp3_callback(unsigned char** start, int* size)
 /* stop the playback and the pending clips, but at frame boundary */
 static int shutup(void)
 {
+    unsigned char* pos;
+    unsigned char* search;
+    unsigned char* end;
+
     mp3_play_pause(false); /* pause */
 
-    /* ToDo: search next frame boundary and continue up to there */
+    if (!is_playing) /* has ended anyway */
+        return 0;
     
-    queue_write = queue_read;
-    is_playing = false;
-    mp3_play_stop();
+    /* search next frame boundary and continue up to there */
+    pos = search = mp3_get_pos();
+    end = queue[queue_read].buf + queue[queue_read].len;
 
+    while (search < end) /* search the remaining data */
+    {
+        if (*search++ != 0xFF) /* search for frame sync byte */
+        {
+            continue;
+        }
+            
+        /* look at the (bitswapped) 2nd byte of header candidate */
+        if ((*search & 0x07) == 0x07  /* rest of frame sync */
+         && (*search & 0x18) != 0x10  /* version != reserved */
+         && (*search & 0x60) != 0x00) /* layer != reserved */
+        {
+            break; /* From looking at the first 2 bytes, this is a header. */
+            /* this is not a sufficient condition to find header,
+               may give "false alert" (end too early), but a start */
+        }
+    }
+
+    queue_write = queue_read; /* reset the queue */
+    is_playing = false;
+
+    /* play old data until the frame end, to keep the MAS in sync */
+    if (search-pos)
+        queue_clip(pos, search-pos, true);
+
+    /* If the voice clips contain dependent frames (currently they don't),
+       it may be a good idea to insert an independent dummy frame here. */
+    
     return 0;
 }
 

@@ -1092,4 +1092,12 @@ bool mp3_is_playing(void)
     return playing;
 }
 
+
+/* returns the next byte position which would be transferred */
+unsigned char* mp3_get_pos(void)
+{
+    return (unsigned char*)SAR3;
+}
+
+
 #endif /* #ifndef SIMULATOR */
