@@ -20,6 +20,9 @@
 #ifndef __TYPES_H
 #define __TYPES_H
 
-typedef unsigned char bool;
+typedef unsigned int bool;
+
+#define TRUE  1
+#define FALSE 0
 
 #endif
