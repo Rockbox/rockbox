@@ -537,7 +537,7 @@ new: "[Spellista]"
 id: LANG_ID3_BITRATE
 desc: in wps
 eng: "[Bitrate]"
-new: "[Bithastighet]"
+new: "[Datahastighet]"
 
 id: LANG_ID3_FRECUENCY
 desc: in wps
