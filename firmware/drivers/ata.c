@@ -34,7 +34,7 @@
 #define ATA_SELECT      (*((volatile unsigned char*)0x06100106))
 #define ATA_COMMAND     (*((volatile unsigned char*)0x06100107))
 #define ATA_STATUS      (*((volatile unsigned char*)0x06100107))
-#define ATA_CONTROL     (*((volatile unsigned char*)0x06200306))
+#define ATA_CONTROL     (*((volatile unsigned char*)0x06200206))
 #define ATA_ALT_STATUS  ATA_CONTROL
 
 #define SELECT_DEVICE1  0x10
