@@ -21,8 +21,8 @@
 
 #include "config.h"
 
-#ifdef HAVE_LCD_BITMAP
 #ifdef USE_GAMES
+
 #include <stdbool.h>
 #include "lcd.h"
 #include "button.h"
@@ -406,5 +406,4 @@ Menu tetris(void)
     return MENU_OK;
 }
 
-#endif
 #endif

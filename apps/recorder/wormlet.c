@@ -19,7 +19,6 @@
 
 #include "config.h"
 
-#ifdef HAVE_LCD_BITMAP
 #ifdef USE_GAMES
 
 #include <sprintf.h>
@@ -742,6 +741,4 @@ Menu wormlet(void)
     return MENU_OK;
 }
 
-
-#endif
 #endif
