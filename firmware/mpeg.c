@@ -489,11 +489,12 @@ static bool saving; /* We are saving the buffer to disk */
 
 static int mpeg_file;
 
-#ifdef HAVE_MAS3587F
 /* Synchronization variables */
+#ifdef HAVE_MAS3587F
 static bool init_recording_done;
 static bool init_playback_done;
 #endif
+static bool mpeg_stop_done;
 
 static void recalculate_watermark(int bitrate)
 {
@@ -1335,6 +1336,7 @@ static void mpeg_thread(void)
                 is_playing = false;
                 paused = false;
                 stop_playing();
+                mpeg_stop_done = true;
                 break;
 
             case MPEG_PAUSE:
@@ -1836,6 +1838,7 @@ static void mpeg_thread(void)
                             }
                         }
 #endif
+                        mpeg_stop_done = true;
                         break;
 
                     case MPEG_SAVE_DATA:
@@ -2240,8 +2243,10 @@ void mpeg_play(int offset)
 void mpeg_stop(void)
 {
 #ifndef SIMULATOR
+    mpeg_stop_done = false;
     queue_post(&mpeg_queue, MPEG_STOP, NULL);
-    yield();
+    while(!mpeg_stop_done)
+        yield();
 #else
     is_playing = false;
     playing = false;
