@@ -23,7 +23,7 @@
 	.section	.text
 	.extern	_INIT
 	.extern _vectable
-	.extern _init_stack
+	.extern _stack
 	.global _start
 	.align  2
 
@@ -36,6 +36,6 @@ _start:
 	nop
 
 1:	.long	_vectable
-2:	.long	_init_stack+2*1024*4
+2:	.long	_stack
 3:	.long	_INIT
 	.type		_start,@function					

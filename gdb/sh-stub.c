@@ -358,12 +358,11 @@ void catch_exception_127 (void);
 void breakpoint (void);
 
 
-#define init_stack_size 2*1024  /* if you change this you should also modify BINIT */
-#define stub_stack_size 2*1024
+//#define stub_stack_size 2*1024
 
-int init_stack[init_stack_size] __attribute__ ((section ("stack"))) = {0};
-int stub_stack[stub_stack_size] __attribute__ ((section ("stack"))) = {0};
+//int stub_stack[stub_stack_size] __attribute__ ((section (".stack"))) = {0};
 
+extern int stub_stack[];
 
 void INIT (void);
 void start (void);
@@ -934,6 +933,8 @@ void breakpoint (void)
 /**** Processor-specific routines start here ****/
 /**** Processor-specific routines start here ****/
 
+extern int stack[];
+
 /* SH1/SH2 exception vector table format */
 typedef struct
 {
@@ -949,13 +950,12 @@ typedef struct
 ** Note that we only define the first 128 vectors, since the Jukebox
 ** firmware has its entry point at 0x200
 */
-
 const vec_type vectable  __attribute__ ((section (".vectors"))) =
 { 
     &start,			        /* 0: Power-on reset PC */
-    init_stack + init_stack_size,       /* 1: Power-on reset SP */
+    stack,                              /* 1: Power-on reset SP */
     &start,			        /* 2: Manual reset PC */
-    init_stack + init_stack_size,       /* 3: Manual reset SP */
+    stack,                              /* 3: Manual reset SP */
     {
         &catch_exception_4,		/* 4: General invalid instruction */
         &catch_exception_5,  	        /* 5: Reserved for system */
@@ -1097,7 +1097,7 @@ void INIT (void)
     dofault = 1;
     stepped = 0;
 
-    stub_sp = stub_stack + stub_stack_size;
+    stub_sp = stub_stack;
     breakpoint ();
 
     /* We should never come here */
@@ -1115,7 +1115,7 @@ void sr(void)
          "         bra   _INIT\n"
          "         nop\n"
          "         .align 2\n"
-         "L_sp:    .long _init_stack + 8000");
+         "L_sp:    .long _stack");
 
     asm("saveRegisters:\n");
     asm(" mov.l	@(L_reg, pc), r0\n"
