@@ -117,7 +117,7 @@ power-on from the RTC alarm</a>.
 <li><a href="http://www.geocities.com/raichea/">Steve Russell's PIC-based remote control</a>
 <li><a href="http://www.angelfire.com/trek/archos/">Chris Halsall's MMJB20 page</a> with disassembly instructions useful for FM and V2 owners.
 <li> Matthias Klumpp's <a href="http://de.geocities.com/matthiasklumpp/">Archos Atmel remote control</a>.
-
+<li> Bluechip's <a href="http://homepage.ntlworld.com/cyborgsystems/CS_Main/RockBox/RockBox.htm">Rockbox plugins</a>
 </ul>
 
 #include "foot.t"
