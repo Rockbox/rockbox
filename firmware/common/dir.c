@@ -30,7 +30,7 @@ static DIR opendirs[MAX_OPEN_DIRS];
 
 DIR* opendir(char* name)
 {
-    char namecopy[256];
+    char namecopy[MAX_PATH];
     char* part;
     char* end;
     struct fat_direntry entry;

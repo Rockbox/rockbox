@@ -20,6 +20,7 @@
 #define _DIR_H_
 
 #include <stdbool.h>
+#include "file.h"
 
 #ifndef DIRENT_DEFINED
 
@@ -31,7 +32,7 @@
 #define ATTR_ARCHIVE     0x20
 
 struct dirent {
-    unsigned char d_name[256];
+    unsigned char d_name[MAX_PATH];
     int attribute;
     int size;
     int startcluster;
