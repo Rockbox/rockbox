@@ -38,27 +38,27 @@ new: "Debug (afblijven!)"
 id: LANG_USB
 desc: in the main menu
 eng: "USB (sim)"
-new: "USB (sim)"
+new: 
 
 id: LANG_ROCKBOX_INFO
 desc: displayed topmost on the info screen
 eng: "Rockbox Info:"
-new: "Rockbox Info:"
+new: 
 
 id: LANG_BUFFER_STAT_PLAYER
 desc: the buffer size player-screen width, %d MB %d fraction of MB
-eng: "Buf: %d.%02dMB"
-new: "Buf: %d.%02dMB"
+eng: "Buf: %d.%03dMB"
+new: 
 
 id: LANG_BUFFER_STAT_RECORDER
 desc: the buffer size recorder-screen width, %d MB %d fraction of MB
-eng: "Buffer: %d.%02dMB"
-new: "Buffer: %d.%02dMB"
+eng: "Buffer: %d.%03dMB"
+new: 
 
 id: LANG_BATTERY_LEVEL_PLAYER
 desc: the battery level in percentage
 eng: "Batt: %d%%%s"
-new: "Batt: %d%%%s"
+new: 
 
 id: LANG_BATTERY_LEVEL_RECORDER
 desc: the battery level in percentage
@@ -73,7 +73,7 @@ new: "Batterij: opladen"
 id: LANG_BOUNCE
 desc: in the demos menu
 eng: "Bounce"
-new: "Bounce"
+new: 
 
 id: LANG_SNOW
 desc: in the demos menu
@@ -83,22 +83,22 @@ new: "Sneeuw"
 id: LANG_TETRIS
 desc: in the games menu
 eng: "Tetris"
-new: "Tetris"
+new: 
 
 id: LANG_SOKOBAN
 desc: in the games menu
 eng: "Sokoban"
-new: "Sokoban"
+new: 
 
 id: LANG_WORMLET
 desc: in the games menu
 eng: "Wormlet"
-new: "Wormlet"
+new: 
 
 id: LANG_SNAKE
 desc: in the games menu
 eng: "Snake"
-new: "Snake"
+new: 
 
 id: LANG_PLAYLIST_LOAD
 desc: displayed on screen while loading a playlist
@@ -118,7 +118,7 @@ new: "Afspelen..."
 id: LANG_PLAYINDICES_PLAYLIST
 desc: in playlist.indices() when playlist is full
 eng: "Playlist"
-new: "Playlist"
+new: "Speellijst"
 
 id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
@@ -178,12 +178,12 @@ new: ""
 id: LANG_CONTRAST
 desc: in settings_menu
 eng: "Contrast"
-new: "Contrast"
+new: 
 
 id: LANG_SHUFFLE
 desc: in settings_menu
 eng: "Shuffle"
-new: "Shuffle"
+new: 
 
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
@@ -338,7 +338,7 @@ new: "Systeem"
 id: LANG_VOLUME
 desc: in sound_settings
 eng: "Volume"
-new: "Volume"
+new: 
 
 id: LANG_BALANCE
 desc: in sound_settings
@@ -358,7 +358,7 @@ new: "Hoog"
 id: LANG_LOUDNESS
 desc: in sound_settings
 eng: "Loudness"
-new: "Loudness"
+new: 
 
 id: LANG_BBOOST
 desc: in sound settings
@@ -403,7 +403,7 @@ new: "Mono Rechts"
 id: LANG_AUTOVOL
 desc: in sound_settings
 eng: "Auto Volume"
-new: "Auto Volume"
+new: 
 
 id: LANG_SHOWDIR_ERROR_BUFFER
 desc: in showdir(), displayed on screen when you reach buffer limit
@@ -423,7 +423,7 @@ new: "Hervatten?"
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: posible answers to resume question
 eng: "(PLAY/STOP)"
-new: "(PLAY/STOP)"
+new: 
 
 id: LANG_RESUME_CONFIRM_RECORDER
 desc: posible answer to resume question
@@ -508,7 +508,7 @@ new: "<geen artiest>"
 id: LANG_ID3_ALBUM
 desc: in wps
 eng: "[Album]"
-new: "[Album]"
+new: 
 
 id: LANG_ID3_NO_ALBUM
 desc: in wps when no album is avaible
@@ -518,7 +518,7 @@ new: "<geen album>"
 id: LANG_ID3_TRACKNUM
 desc: in wps
 eng: "[Tracknum]"
-new: "[Tracknum]"
+new: 
 
 id: LANG_ID3_NO_TRACKNUM
 desc: in wps if no track number is avaible
@@ -538,7 +538,7 @@ new: "[Speellijst]"
 id: LANG_ID3_BITRATE
 desc: in wps
 eng: "[Bitrate]"
-new: "[Bitrate]"
+new: 
 
 id: LANG_ID3_FRECUENCY
 desc: in wps
@@ -568,7 +568,7 @@ new: "Pauze"
 id: LANG_F2_MODE
 desc: in wps F2 pressed
 eng: "mode:"
-new: "mode:"
+new: 
 
 id: LANG_DIR_FILTER
 desc: in wps F2 pressed
@@ -578,12 +578,12 @@ new: ""
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
 eng: "Status"
-new: "Status"
+new: 
 
 id: LANG_F3_SCROLL
 desc: in wps F3 pressed
 eng: "Scroll"
-new: "Scroll"
+new: 
 
 id: LANG_F3_BAR
 desc: in wps F3 pressed
@@ -693,7 +693,7 @@ new: "[F3] volgend niveau"
 id: LANG_WORMLET_LENGTH
 desc: wormlet game
 eng: "Len:%d"
-new: "Len:%d"
+new: 
 
 id: LANG_WORMLET_GROWING
 desc: wormlet game 
@@ -733,7 +733,7 @@ new: "%d Spelers    UP/DN"
 id: LANG_WORMLET_WORMS
 desc: wormlet game
 eng: "%d Worms        L/R"
-new: "%d Worms        L/R"
+new: "%d Wormen       L/R"
 
 id: LANG_WORMLET_REMOTE_CTRL
 desc: wormlet game
@@ -878,37 +878,37 @@ new: "24 uurs klok"
 id: LANG_MONTH_APRIL
 desc: abbreviation for monthname
 eng: "Apr"
-new: "Apr" 
+new: 
 
 id: LANG_MONTH_AUGUST
 desc: abbreviation for monthname
 eng: "Aug"
-new: "Aug" 
+new: 
 
 id: LANG_MONTH_DECEMBER
 desc: abbreviation for monthname
 eng: "Dec"
-new: "Dec" 
+new: 
 
 id: LANG_MONTH_FEBRUARY
 desc: abbreviation for monthname
 eng: "Feb"
-new: "Feb" 
+new: 
 
 id: LANG_MONTH_JANUARY
 desc: abbreviation for monthname
 eng: "Jan"
-new: "Jan" 
+new: 
 
 id: LANG_MONTH_JULY
 desc: abbreviation for monthname
 eng: "Jul"
-new: "Jul" 
+new: 
 
 id: LANG_MONTH_JUNE
 desc: abbreviation for monthname
 eng: "Jun"
-new: "Jun" 
+new: 
 
 id: LANG_MONTH_MARCH
 desc: abbreviation for monthname
@@ -923,7 +923,7 @@ new: "Mei"
 id: LANG_MONTH_NOVEMBER
 desc: abbreviation for monthname
 eng: "Nov"
-new: "Nov"
+new: 
 
 id: LANG_MONTH_OCTOBER
 desc: abbreviation for monthname
@@ -933,7 +933,7 @@ new: "Okt"
 id: LANG_MONTH_SEPTEMBER
 desc: abbreviation for monthname
 eng: "Sep"
-new: "Sep"
+new: 
 
 id: LANG_RESET_CANCEL
 desc: confirm to reset settings
@@ -979,3 +979,148 @@ id: LANG_WEEKDAY_WEDNESDAY
 desc: abbreviation for weekday
 eng: "Wed"
 new: "Wo" 
+
+id: LANG_BATTERY_DISPLAY
+desc: Battery type title
+eng: "Battery Display"
+new: "Batterij Tonen Als" 
+
+id: LANG_CUBE
+desc: the name of the cube demo in the demo menu
+eng: "Cube"
+new: "Kubus" 
+
+id: LANG_DISPLAY_GRAPHIC
+desc: Label for type of icon display
+eng: "Graphic"
+new: "Pictogram" 
+
+id: LANG_DISPLAY_NUMERIC
+desc: Label for type of icon display
+eng: "Numeric"
+new: "Numerieke waarde" 
+
+id: LANG_OSCILLOGRAPH
+desc: the name of the oscillograph demo in the demo menu
+eng: "Oscillograph"
+new: "Oscilograaf" 
+
+id: LANG_PM_DBFS
+desc: in the peak meter menu
+eng: "dBfs"
+new: 
+
+id: LANG_PM_ENERGY_SAVER
+desc: in the peak meter menu
+eng: "Save energy"
+new: "Laag(Spaar energie)" 
+
+id: LANG_PM_HIGH_PERFORMANCE
+desc: in the peak meter menu
+eng: "High performance"
+new: "Hoog" 
+
+id: LANG_PM_LINEAR
+desc: in the peak meter menu
+eng: "linear"
+new: "lineair" 
+
+id: LANG_PM_MAX
+desc: in the peak meter menu
+eng: "Maximum of range"
+new: "Maximaal bereik" 
+
+id: LANG_PM_MIN
+desc: in the peak meter menu
+eng: "Minimum of range"
+new: "Minimaal bereik" 
+
+id: LANG_PM_PERFORMANCE
+desc: in the peak meter menu
+eng: "Performance"
+new: "Nauwkeurigheid" 
+
+id: LANG_PM_SCALE
+desc: in the peak meter menu
+eng: "dBfs <-> linear"
+new: "dBfs <-> lineair" 
+
+id: LANG_RESUME_SETTING_ASK_ONCE
+desc: in settings_menu
+eng: "Ask Once"
+new: "Vraag eenmalig" 
+
+id: LANG_VOLUME_DISPLAY
+desc: Volume type title
+eng: "Volume Display"
+new: "Volume Tonen Als" 
+
+id: LANG_RECORDING
+desc: in the main menu
+eng: "Recording"
+new: "Opnemen" 
+
+id: LANG_RECORDING_CHANNELS
+desc: in the recording settings
+eng: "Channels"
+new: "Kanalen" 
+
+id: LANG_RECORDING_FREQUENCY
+desc: in the recording settings
+eng: "Frequency"
+new: "Frequentie" 
+
+id: LANG_RECORDING_GAIN
+desc: in the recording screen
+eng: "Gain"
+new: 
+
+id: LANG_RECORDING_LEFT
+desc: in the recording screen
+eng: "Left"
+new: "Links" 
+
+id: LANG_RECORDING_QUALITY
+desc: in the recording settings
+eng: "Quality"
+new: "Kwaliteit" 
+
+id: LANG_RECORDING_RIGHT
+desc: in the recording screen
+eng: "Right"
+new: "Rechts" 
+
+id: LANG_RECORDING_SETTINGS
+desc: in the main menu
+eng: "Recording settings"
+new: "Opname Instellingen" 
+
+id: LANG_RECORDING_SOURCE
+desc: in the recording settings
+eng: "Source"
+new: "Bron" 
+
+id: LANG_RECORDING_SRC_DIGITAL
+desc: in the recording settings
+eng: "Digital"
+new: "Digitaal" 
+
+id: LANG_RECORDING_SRC_LINE
+desc: in the recording settings
+eng: "Line In"
+new: "Lijn Ingang" 
+
+id: LANG_RECORDING_SRC_MIC
+desc: in the recording settings
+eng: "Mic"
+new: "Microfoon" 
+
+id: LANG_DISK_FREE_STAT
+desc: disk size info
+eng: "Free: %d.%dGB"
+new: "Vrij: %d.%dGB" 
+
+id: LANG_DISK_STAT
+desc: disk size info
+eng: "Disk: %d.%dGB"
+new: 
