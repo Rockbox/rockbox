@@ -28,6 +28,7 @@
 extern void lcd_init(void);
 extern void lcd_clear_display(void);
 extern void lcd_backlight(bool on);
+extern void lcd_puts(int x, int y, char *string);
 
 #ifdef HAVE_LCD_CHARCELLS
 #    define LCD_ICON_BATTERY         0
@@ -60,7 +61,6 @@ extern void lcd_backlight(bool on);
 #    define LCD_ICON_PARAM          10
 #      define LCD_PARAM_SYMBOL    0xF0
 
-extern void lcd_puts(int x, int y, char *string);
 extern void lcd_define_pattern (int which,char *pattern,int length);
 
 #endif
@@ -73,8 +73,11 @@ extern void lcd_define_pattern (int which,char *pattern,int length);
 #define LCD_WIDTH       112   /* Display width in pixels */
 #define LCD_HEIGHT      64    /* Display height in pixels */
 
-extern void lcd_update (void);
-extern void lcd_puts(int x, int y, char *str, int font);
+extern void lcd_update(void);
+extern void lcd_putsxy(int x, int y, char *string, int font);
+extern void lcd_setfont(int font);
+extern void lcd_getfontsize(int font, int *width, int *height);
+extern void lcd_setmargins(int xmargin, int ymargin);
 extern void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
 			bool clear);
 extern void lcd_clearrect (int x, int y, int nx, int ny);
@@ -85,7 +88,6 @@ extern void lcd_drawline( int x1, int y1, int x2, int y2 );
 extern void lcd_drawpixel(int x, int y);
 extern void lcd_clearpixel(int x, int y);
 
-void lcd_fontsize(char font, char *width, char *height);
 
 #if defined(HAVE_LCD_CHARCELLS) && defined(SIMULATOR)
 #include <charundef.h>

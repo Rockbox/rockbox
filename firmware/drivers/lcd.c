@@ -370,6 +370,10 @@ void lcd_define_pattern (int which,char *pattern,int length)
  */
 unsigned char display[LCD_WIDTH][LCD_HEIGHT/8];
 
+static int font=0;
+static int xmargin=0;
+static int ymargin=0;
+
 /*
  * ASCII character generation tables
  *
@@ -445,13 +449,35 @@ void lcd_clear_display (void)
     memset (display, 0, sizeof display);
 }
 
-/*
- * Put a string at specified position and font
- */
-void lcd_puts(int x, int y, char *str, int font)
+void lcd_setfont(int newfont)
 {
-    int nx = fonts[font];
-    int ny = fontheight[font];
+    font = newfont;
+}
+
+void lcd_setmargins(int x, int y)
+{
+    xmargin = x;
+    ymargin = y;
+}
+
+/*
+ * Put a string at specified character position
+ */
+void lcd_puts(int x, int y, char *str)
+{
+    lcd_putsxy( xmargin + x*fonts[font],
+                ymargin + y*fontheight[font],
+                str, font );
+}
+
+/*
+ * Put a string at specified bit position
+ */
+
+void lcd_putsxy(int x, int y, char *str, int thisfont)
+{
+    int nx = fonts[thisfont];
+    int ny = fontheight[thisfont];
     int ch;
     unsigned char *src;
     int lcd_x = x;
@@ -680,7 +706,7 @@ void lcd_clearpixel(int x, int y)
 /*
  * Return width and height of a given font.
  */
-void lcd_fontsize(char font, char *width, char *height)
+void lcd_getfontsize(int font, int *width, int *height)
 {
     if(font < sizeof(fonts)) {
         *width =  fonts[font];
