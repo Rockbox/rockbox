@@ -73,7 +73,3 @@ int lang_load(char *filename)
     close(fd);
     return retcode;
 }
-
-/* -----------------------------------------------------------------
- * vim: et sw=4 ts=8 sts=4 tw=78
- */

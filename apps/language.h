@@ -22,11 +22,7 @@
 
 /* both these must match the two initial bytes in the binary lang file */
 #define LANGUAGE_COOKIE  0x1a
-#define LANGUAGE_VERSION 0x01
+#define LANGUAGE_VERSION 0x02
 
 /* load a given language file */
 int lang_load(char *filename);
-
-/* -----------------------------------------------------------------
- * vim: et sw=4 ts=8 sts=4 tw=78
- */

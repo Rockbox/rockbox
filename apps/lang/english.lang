@@ -21,16 +21,6 @@ desc: in the main menu
 eng: "General Settings"
 new:
 
-id: LANG_GAMES
-desc: in the main menu
-eng: "Games"
-new:
-
-id: LANG_DEMOS
-desc: in the main menu
-eng: "Demos"
-new:
-
 id: LANG_INFO
 desc: in the main menu
 eng: "Info"
@@ -66,49 +56,9 @@ desc: the buffer size recorder-screen width, %d MB %d fraction of MB
 eng: "Buffer: %d.%03dMB"
 new:
 
-id: LANG_BATTERY_LEVEL_PLAYER
-desc: the battery level in percentage
-eng: "Batt: %d%%%s"
-new:
-
-id: LANG_BATTERY_LEVEL_RECORDER
-desc: the battery level in percentage
-eng: "Battery: %d%%%s"
-new:
-
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
 eng: "Battery: Charging"
-new:
-
-id: LANG_BOUNCE
-desc: in the demos menu
-eng: "Bounce"
-new:
-
-id: LANG_SNOW
-desc: in the demos menu
-eng: "Snow"
-new:
-
-id: LANG_TETRIS
-desc: in the games menu
-eng: "Tetris"
-new:
-
-id: LANG_SOKOBAN
-desc: in the games menu
-eng: "Sokoban"
-new:
-
-id: LANG_WORMLET
-desc: in the games menu
-eng: "Wormlet"
-new:
-
-id: LANG_SNAKE
-desc: in the games menu
-eng: "Snake"
 new:
 
 id: LANG_PLAYLIST_LOAD
@@ -116,16 +66,9 @@ desc: displayed on screen while loading a playlist
 eng: "Loading..."
 new:
 
-# NO LONGER USED
 id: LANG_PLAYLIST_SHUFFLE
 desc: displayed on screen while shuffling a playlist
 eng: "Shuffling..."
-new:
-
-# NO LONGER USED
-id: LANG_PLAYLIST_PLAY
-desc: displayed on screen when start playing a playlist
-eng: "Playing..."
 new:
 
 id: LANG_PLAYINDICES_PLAYLIST
@@ -136,12 +79,6 @@ new:
 id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
 eng: "Buffer Full"
-new:
-
-# NO LONGER USED
-id: LANG_PLAYINDICES_AMOUNT
-desc: number of files in playlist
-eng: "%d Files"
 new:
 
 id: LANG_SETTINGS_SAVE_PLAYER
@@ -174,21 +111,6 @@ desc: used in set_time()
 eng: "OFF To Revert"
 new:
 
-id: LANG_HIDDEN
-desc: in settings_menu
-eng: ""
-new:
-
-id: LANG_HIDDEN_SHOW
-desc: in settings_menu 
-eng: ""
-new:
-
-id: LANG_HIDDEN_HIDE
-desc: in settings_menu
-eng: ""
-new:
-
 id: LANG_CONTRAST
 desc: in settings_menu
 eng: "Contrast"
@@ -202,11 +124,6 @@ new:
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play Selected First"
-new:
-
-id: LANG_MP3FILTER
-desc: in settings_menu
-eng: ""
 new:
 
 id: LANG_SORT_CASE
@@ -274,34 +191,10 @@ desc: in settings_menu
 eng: "Follow Playlist"
 new:
 
-# depreciated
-id: LANG_RESET_ASK_PLAYER
-desc: confirm to reset settings
-eng: ""
-new:
- 
-# depreciated
-id: LANG_RESET_CONFIRM_PLAYER
-desc: confirm to reset settings
-eng: ""
-new:
-
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
 eng: "Are You Sure?"
 new: 
-
-# depreciated
-id: LANG_RESET_CONFIRM_RECORDER
-desc: confirm to reset settings
-eng: ""
-new:
-
-# depreciated
-id: LANG_RESET_CANCEL_RECORDER
-desc: confirm to reset settings
-eng: "OFF=Cancel"
-new:
 
 id: LANG_RESET_DONE_SETTING
 desc: visual confirmation after settings reset
@@ -443,18 +336,6 @@ desc: possible answers to resume question
 eng: "(PLAY/STOP)"
 new:
 
-# depreciated
-id: LANG_RESUME_CONFIRM_RECORDER
-desc: possible answer to resume question
-eng: ""
-new:
-
-# depreciated
-id: LANG_RESUME_CANCEL_RECORDER
-desc: possible answer to resume question
-eng: ""
-new:
-
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
 eng: "Key Lock ON"
@@ -590,11 +471,6 @@ desc: in wps F2 pressed
 eng: "Mode:"
 new:
 
-id: LANG_DIR_FILTER
-desc: in wps F2 pressed
-eng: ""
-new:
-
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
 eng: "Status"
@@ -615,191 +491,10 @@ desc: when playlist has finished
 eng: "End Of List"
 new:
 
-id: LANG_END_CONFIRM_PLAYER
-desc: when playlist has finished
-eng: ""
-new:
-
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
 eng: "End Of Song List"
 new: 
-
-id: LANG_END_CONFIRM_RECORDER
-desc: when playlist has finished
-eng: ""
-new:
-
-id: LANG_SNAKE_SCORE
-desc: when you die in snake game
-eng: "Your score:"
-new:
-
-id: LANG_SNAKE_HISCORE
-desc: high score in snake game
-eng: "High Score: %d"
-new:
-
-id: LANG_SNAKE_HISCORE_NEW
-desc: new high score in snake game
-eng: "New High Score!"
-new:
-
-id: LANG_SNAKE_PAUSE
-desc: displayed when game is paused
-eng: "Game Paused"
-new:
-
-id: LANG_SNAKE_RESUME
-desc: what to do to resume game
-eng: "[PLAY] To Resume"
-new:
-
-id: LANG_SNAKE_QUIT
-desc: how to quit game
-eng: "[OFF] To Quit"
-new:
-
-id: LANG_SNAKE_LEVEL
-desc: level of difficulty
-eng: "Level - %d"
-new:
-
-id: LANG_SNAKE_RANGE
-desc: range of levels
-eng: "(1 - Slow, 9 - Fast)"
-new:
-
-id: LANG_SNAKE_START
-desc: how to start or pause the game
-eng: "[PLAY] To Start/Pause"
-new:
-
-id: LANG_SOKOBAN_LEVEL
-desc: must be smaller than 6 characters
-eng: ""
-new:
-
-id: LANG_SOKOBAN_MOVE
-desc: must be smaller than 6 characters
-eng: ""
-new:
-
-id: LANG_SOKOBAN_WIN
-desc: displayed when you win 
-eng: ""
-new:
-
-id: LANG_SOKOBAN_QUIT
-desc: how to quit game
-eng: ""
-new:
-
-id: LANG_SOKOBAN_F1
-desc: what does F1 do
-eng: ""
-new:
-
-id: LANG_SOKOBAN_F2
-desc: what does F2 do
-eng: ""
-new:
-
-id: LANG_SOKOBAN_F3
-desc: what does F3 do
-eng: ""
-new:
-
-# Next ids are for Worlmet Game.
-# Lenght restrictions for score board strings (LANG_SB_XXX):
-# LCD_PROPFONTS: max 43 pixel
-# fix font: max 7 characters
-
-id: LANG_WORMLET_LENGTH
-desc: wormlet game
-eng: ""
-new:
-
-id: LANG_WORMLET_GROWING
-desc: wormlet game 
-eng: ""
-new:
-
-id: LANG_WORMLET_HUNGRY
-desc: wormlet game
-eng: ""
-new:
-
-id: LANG_WORMLET_WORMED
-desc: wormlet game
-eng: ""
-new:
-
-id: LANG_WORMLET_ARGH
-desc: wormlet game
-eng: ""
-new:
-
-id: LANG_WORMLET_CRASHED
-desc: wormlet game
-eng: ""
-new:
-
-id: LANG_WORMLET_HIGHSCORE
-desc: wormlet game
-eng: ""
-new:
-
-# Length restrictions for wormlet config screen strings (LANG_CS_XXX)
-# They must fit on the entire screen - preferably with the
-# key names aligned right
-
-id: LANG_WORMLET_PLAYERS
-desc: wormlet game
-eng: ""
-new:
-
-id: LANG_WORMLET_WORMS
-desc: wormlet game
-eng: ""
-new:
-
-id: LANG_WORMLET_REMOTE_CTRL
-desc: wormlet game
-eng: ""
-new:
-
-id: LANG_WORMLET_NO_REM_CTRL
-desc: wormlet game
-eng: ""
-new:
-
-id: LANG_WORMLET_2_KEY_CTRL
-desc: wormlet game
-eng: ""
-new:
-
-id: LANG_WORMLET_4_KEY_CTRL
-desc: wormlet game
-eng: ""
-new:
-
-id: LANG_WORMLET_NO_CONTROL
-desc: wormlet game
-eng: ""
-new:
-
-# Wormlet game ids ended
-
-id: LANG_TETRIS_LOSE
-desc: tetris game
-eng: ""
-new:
-
-id: LANG_TETRIS_LEVEL
-desc: tetris game
-eng: ""
-new:
 
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
@@ -900,10 +595,6 @@ id: LANG_RESET_CANCEL
 desc: confirm to reset settings
 eng: "OFF=Cancel"
 new:
-
-# NOTE: ignore this label.  It is no longer used/was an error.
-# We are aware of this and it will this instance will be removed in the future
-id: LANG_TETRIS_LEVEL
 
 id: LANG_TIMEFORMAT
 desc: select the time format of time in status bar
@@ -1013,16 +704,6 @@ new:
 id: LANG_MONTH_DECEMBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Dec"
-new:
-
-id: LANG_CUBE
-desc: the name of the cube demo in the demo menu
-eng: "Cube"
-new:
-
-id: LANG_OSCILLOGRAPH
-desc: the name of the oscillograph demo in the demo menu
-eng: "Oscillograph"
 new:
 
 id: LANG_RESUME_SETTING_ASK_ONCE
@@ -1230,39 +911,9 @@ desc: in settings_menu
 eng: "Battery Capacity"
 new:
 
-id: LANG_QUEUE_QUEUED
-desc: queued track name %s
-eng: "Queued: %s"
-new:
-
-id: LANG_QUEUE_TOTAL
-desc: number of queued tracks %d
-eng: "Total Queued: %d"
-new:
-
-id: LANG_QUEUE_FULL
-desc: queue buffer full
-eng: "Queue Buffer Full"
-new:
-
 id: LANG_MENU_SETTING_CANCEL
 desc: Visual confirmation of canceling a changed setting
 eng: "Canceled"
-new:
-
-id: LANG_MENU_SETTING_OK
-desc: Visual confirmation of changing a setting
-eng: "OK"
-new:
-
-id: LANG_PLAYER_ONPLAY_1
-desc: Line #1 of player ON+PLAY screen
-eng: "\x81 Queue"
-new:
-
-id: LANG_PLAYER_ONPLAY_2
-desc: Line #2 of player ON+PLAY screen
-eng: "- Ren + Del"
 new:
 
 id: LANG_QUEUE
@@ -1383,11 +1034,6 @@ new:
 id: LANG_RECORDING_SIZE
 desc: Display of recorded file size
 eng: "Size:"
-new:
-
-id: LANG_CPU_SLEEP
-desc: in system_settings_menu() (removed)
-eng: ""
 new:
 
 id: LANG_SETTINGS_LOADED1
@@ -1613,26 +1259,6 @@ desc: Do you want to reboot?
 eng: "Reboot now?"
 new:
 
-id: LANG_FLIPIT
-desc: in the games menu
-eng: "Flipit"
-new:
-
-id: LANG_OTHELO
-desc: in the games menu
-eng: "Othelo"
-new:
-
-id: LANG_SLIDING_PUZZLE
-desc: in the games menu
-eng: "Sliding Puzzle"
-new:
-
-id: LANG_STAR
-desc: in the games menu
-eng: "Star"
-new:
-
 id: LANG_QUEUE_LAST
 desc: in onplay menu.  queue a track/playlist at end of playlist.
 eng: "Queue last"
@@ -1776,11 +1402,6 @@ new:
 id: LANG_BUTTONBAR_MENU
 desc:  in button bar
 eng: "Menu"
-new:
-
-id: LANG_BUTTONBAR_OPTIONS
-desc:  in button bar
-eng: "Option"
 new:
 
 id: LANG_FM_BUTTONBAR_PRESETS

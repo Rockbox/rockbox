@@ -43,7 +43,7 @@ open(ENG, "<$english") or die "Can't open $english";
 open(LANG, "<$input") or die "Can't open $input";
 open(OUTF, ">$output") or die "Can't open $output";
 
-my $langversion = 1;
+my $langversion = 2;
 
 binmode OUTF;
 
