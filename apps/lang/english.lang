@@ -1532,3 +1532,8 @@ id: LANG_ALWAYS
 desc: (player) the jump scroll shall be done "always"
 eng: "Always"
 new:
+
+id: LANG_JUMP_SCROLL_DELAY
+desc: (player) Delay before making a jump scroll
+eng: "Jump Scroll Delay"
+new:

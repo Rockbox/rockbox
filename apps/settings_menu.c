@@ -459,10 +459,23 @@ static bool bidir_limit(void)
 #ifdef HAVE_LCD_CHARCELLS
 static bool jump_scroll(void)
 {
-    char* names[] = { str(LANG_OFF), str(LANG_ONE_TIME), str(LANG_ALWAYS)};
-    
-    return set_option(str(LANG_JUMP_SCROLL), &global_settings.jump_scroll,
-                      names, 3, lcd_jump_scroll);
+    char* names[] = { str(LANG_OFF), str(LANG_ONE_TIME), "2",
+                      "3", "4", str(LANG_ALWAYS)};
+    bool ret;
+    ret=set_option(str(LANG_JUMP_SCROLL), &global_settings.jump_scroll,
+                   names, 6, lcd_jump_scroll);
+    if (!ret && global_settings.jump_scroll>=JUMP_SCROLL_ALWAYS) {
+        global_settings.jump_scroll=254; /* Nice future "safe" value */
+    }
+    return ret;
+}
+static bool jump_scroll_delay(void)
+{
+    int dummy = global_settings.jump_scroll_delay * (HZ/10);
+    int rc = set_int(str(LANG_JUMP_SCROLL_DELAY), "ms", &dummy, 
+                     &lcd_jump_scroll_delay, 100, 0, 2500 );
+    global_settings.jump_scroll_delay = dummy / (HZ/10);
+    return rc;
 }
 #endif
 
@@ -761,6 +774,7 @@ static bool scroll_settings_menu(void)
         { str(LANG_BIDIR_SCROLL),    bidir_limit    },
 #ifdef HAVE_LCD_CHARCELLS
         { str(LANG_JUMP_SCROLL),    jump_scroll    },
+        { str(LANG_JUMP_SCROLL_DELAY),    jump_scroll_delay    },
 #endif
     };
 

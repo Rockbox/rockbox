@@ -71,6 +71,7 @@ struct scrollinfo {
     long scroll_start_tick;
     int direction; /* +1 for right or -1 for left*/
     int jump_scroll;
+    int jump_scroll_steps;
 };
 
 #define MAX_CURSOR_CHARS 8
@@ -89,10 +90,11 @@ static char scroll_stack[DEFAULT_STACK_SIZE];
 static char scroll_name[] = "scroll";
 static char scroll_speed = 8; /* updates per second */
 static int scroll_delay = HZ/2; /* delay before starting scroll */
+static int jump_scroll_delay = HZ/4; /* delay between jump scroll jumps */
 static char scroll_spacing = 3; /* spaces between end and start of text */
 static bool allow_bidirectional_scrolling = true;
 static int bidir_limit = 50;  /* percent */
-static int jump_scroll = 0; /* 0=off, 1=once, 2=always */
+static int jump_scroll = 0; /* 0=off, 1=once, ..., JUMP_SCROLL_ALWAYS */
 
 static struct scrollinfo scroll[SCROLLABLE_LINES];
 
@@ -500,7 +502,7 @@ void lcd_init (void)
                   sizeof(scroll_stack), scroll_name);
 }
 
-void lcd_jump_scroll (int mode) /* 0=off, 1=once, 2=always */
+void lcd_jump_scroll (int mode) /* 0=off, 1=once, ..., JUMP_SCROLL_ALWAYS */
 {
     jump_scroll=mode;
 }
@@ -530,8 +532,11 @@ void lcd_puts_scroll(int x, int y, unsigned char* string )
         s->starty=y;
         s->direction=+1;
         s->jump_scroll=0;
-        if (jump_scroll && scroll_delay/2<(HZ/scroll_speed)*(s->textlen-11+x))
-            s->jump_scroll=11-x;
+        s->jump_scroll_steps=0;
+        if (jump_scroll && jump_scroll_delay<(HZ/scroll_speed)*(s->textlen-11+x)) {
+            s->jump_scroll_steps=11-x;
+            s->jump_scroll=jump_scroll;
+        }
         strncpy(s->text,string,sizeof s->text);
         s->turn_offset=-1;
         if (bidir_limit && (s->textlen < ((11-x)*(100+bidir_limit))/100)) {
@@ -584,6 +589,13 @@ void lcd_scroll_delay(int ms)
     scroll_delay = ms / (HZ / 10);
     DEBUGF("scroll_delay=%d (ms=%d, HZ=%d)\n", scroll_delay, ms, HZ);
 }
+
+void lcd_jump_scroll_delay(int ms)
+{
+    jump_scroll_delay = ms / (HZ / 10);
+    DEBUGF("jump_scroll_delay=%d (ms=%d, HZ=%d)\n", jump_scroll_delay, ms, HZ);
+}
+
 static void scroll_thread(void)
 {
     struct scrollinfo* s;
@@ -605,11 +617,12 @@ static void scroll_thread(void)
             if ( s->mode == SCROLL_MODE_RUN ) {
                 if ( TIME_AFTER(current_tick, s->scroll_start_tick) ) {
                     char buffer[12];
+                    int jumping_scroll=s->jump_scroll;
                     update = true;
                     if (s->jump_scroll) {
-                        s->offset+=s->jump_scroll;
+                        s->offset+=s->jump_scroll_steps;
                         s->scroll_start_tick = current_tick +
-                            scroll_delay/2;
+                            jump_scroll_delay;
                         /* Eat space */
                         while (s->offset < s->textlen &&
                                s->text[s->offset] == ' ') {
@@ -617,8 +630,10 @@ static void scroll_thread(void)
                         }
                         if (s->offset >= s->textlen) {
                             s->offset=0;
-                            if (jump_scroll!=2) {
-                                s->jump_scroll=0;
+                            s->scroll_start_tick = current_tick +
+                                scroll_delay;
+                            if (s->jump_scroll != JUMP_SCROLL_ALWAYS) {
+                                s->jump_scroll--;
                                 s->direction=1;
                             }
                         }
@@ -650,7 +665,7 @@ static void scroll_thread(void)
                             break;
                     }
                     o=0;
-                    if (s->turn_offset == -1 && !s->jump_scroll) {
+                    if (s->turn_offset == -1 && !jumping_scroll) {
                         while (i<11) {
                             buffer[i++]=s->text[o++];
                         }

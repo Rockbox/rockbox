@@ -145,6 +145,7 @@ Rest of config block, only saved to disk:
 0xF8  (int) Playlist shuffle seed
 0xFC  (char[260]) Resume playlist (path/to/dir or path/to/playlist.m3u)
 0xFD  (char)jump scroll mode (only for player)
+0xFE  (char)jump scroll delay (only for player)
 
 *************************************/
 
@@ -414,6 +415,7 @@ int settings_save( void )
     strncpy(&config_block[0xFC], global_settings.resume_file, MAX_PATH);
 #ifdef HAVE_LCD_CHARCELLS
     config_block[0xfd]=(unsigned char)global_settings.jump_scroll;
+    config_block[0xfe]=(unsigned char)global_settings.jump_scroll_delay;
 #endif
     DEBUGF( "+Resume file %s\n",global_settings.resume_file );
     DEBUGF( "+Resume index %X offset %X\n",
@@ -533,6 +535,7 @@ void settings_apply(void)
     lcd_scroll_step(global_settings.scroll_step);
 #else
     lcd_jump_scroll(global_settings.jump_scroll);
+    lcd_jump_scroll_delay(global_settings.jump_scroll_delay);
 #endif
     lcd_bidir_scroll(global_settings.bidir_limit);
     lcd_scroll_delay(global_settings.scroll_delay * (HZ/10));
@@ -735,6 +738,8 @@ void settings_load(void)
 #ifdef HAVE_LCD_CHARSCELLS
         if (config_block[0xfd] != 0xff)
             global_settings.jump_scroll = config_block[0xfd];
+        if (config_block[0xfe] != 0xff)
+            global_settings.jump_scroll_delay = config_block[0xfe];
 #endif
         global_settings.resume_file[MAX_PATH]=0;
     }
@@ -1228,6 +1233,7 @@ bool settings_save_config(void)
     fprintf(fd, "scroll step: %d\r\n", global_settings.scroll_step);
 #else
     fprintf(fd, "jump scroll: %d\r\n", global_settings.jump_scroll);
+    fprintf(fd, "jump scroll delay: %d\r\n", global_settings.jump_scroll_delay);
 #endif
 
     fprintf(fd, "bidir limit: %d\r\n", global_settings.bidir_limit);
@@ -1406,6 +1412,7 @@ void settings_reset(void) {
     global_settings.bidir_limit  = 50;
 #ifdef HAVE_LCD_CHARCELLS
     global_settings.jump_scroll  = 1;
+    global_settings.jump_scroll_delay  = 50;
 #endif    
     global_settings.scroll_delay = 100;
     global_settings.scroll_step  = 6;

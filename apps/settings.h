@@ -153,6 +153,7 @@ struct user_settings
     int scroll_step;   /* pixels to advance per update */
 #ifdef HAVE_LCD_CHARCELLS
     int jump_scroll;   /* Fast jump when scrolling */
+    int jump_scroll_delay; /* Delay between jump scroll screens */
 #endif
     bool fade_on_stop; /* fade on pause/unpause/stop */
     bool caption_backlight; /* turn on backlight at end and start of track */
