@@ -310,7 +310,7 @@ static int last_dma_tick = 0;
 extern unsigned long mas_version_code;
 
 static struct event_queue mpeg_queue;
-static char mpeg_stack[DEFAULT_STACK_SIZE + 0x1000];
+static long mpeg_stack[(DEFAULT_STACK_SIZE + 0x1000)/sizeof(long)];
 static const char mpeg_thread_name[] = "mpeg";
 
 static int mp3buflen;
@@ -1982,7 +1982,12 @@ static void mpeg_thread(void)
         }
 #endif /* #if CONFIG_HWCODEC == MAS3587F */
     }
-#endif /* HWCODEC != NONE */
+#else /* HWCODEC != NONE */
+    while(1)
+    {
+        yield();
+    }
+#endif
 }
 #endif /* SIMULATOR */
 
