@@ -42,57 +42,37 @@
 #include <string.h>
 
 static bool pcm_playing;
-static int pcm_freq = 0x6; // 44.1 in default
+static bool pcm_paused;
+static int pcm_freq = 0x6; /* 44.1 is default */
 
 /* Set up the DMA transfer that kicks in when the audio FIFO gets empty */
-static void dma_start(const void *addr_r, long size)
-{   
-    pcm_playing = 1;
-    int i;
+static void dma_start(const void *addr, long size)
+{
+    pcm_playing = true;
+
+    addr = (void *)((unsigned long)addr & ~3); /* Align data */
+    size &= ~3; /* Size must be multiple of 4 */
+
+    /* Reset the audio FIFO */
+    IIS2CONFIG = 0x800;
     
-    int align;
-    align = 4;
-
-    void* addr = (void*)((((unsigned int)addr_r) >> 2) << 2); // always align data, never pass unaligned data
-    size = (size >> 2) << 2; // size shoudl also be always multiple of 4
-
-    BUSMASTER_CTRL = 0x81; /* PARK[1,0]=10 + BCR24BIT */
-
     /* Set up DMA transfer  */
-    DIVR0 = 54;          /* DMA0 is mapped into vector 54 in system.c */
-    SAR0 = ((unsigned long)addr) + align*4;         /* Source address */
-    DAR0 = (unsigned long)&PDOR3;       /* Destination address */
-    BCR0 = size-(align*4);                        /* Bytes to transfer */
-    DMAROUTE = (DMAROUTE & 0xffffff00) | DMA0_REQ_AUDIO_1;
-    DMACONFIG = 1;   /* Enable DMA0Req => set DMAROUTE |= DMA0_REQ_AUDIO_1 */
+    SAR0 = ((unsigned long)addr); /* Source address */
+    DAR0 = (unsigned long)&PDOR3; /* Destination address */
+    BCR0 = size;                  /* Bytes to transfer */
 
-    /* Start transfer when requested */
-    DCR0 = DMA_INT | DMA_EEXT | DMA_CS | DMA_SINC;
-
-    /* Enable interrupt at level 7, priority 0 */
-    ICR4 = (ICR4 & 0xffff00ff) | 0x00001c00;
-    IMR &= ~(1<<14);      /* bit 14 is DMA0 */
-
-    IIS2CONFIG = (pcm_freq << 12) | 0x300;   /* CLOCKSEL for right frequency +  data source = PDOR3 */
-
-    for(i = 0; i < align; i++)
-        PDOR3 = ((unsigned int*)(addr))[i]; /* These are needed to generate FIFO empty request to DMA.. */
+    /* Enable the FIFO and force one write to it */
+    IIS2CONFIG = (pcm_freq << 12) | 0x300;
+    DCR0 = DMA_INT | DMA_EEXT | DMA_CS | DMA_SINC | DMA_START;
 }
 
 /* Stops the DMA transfer and interrupt */
 static void dma_stop(void)
 {
-    pcm_playing = 0;
-    DCR0 = 0;
-                       
-/*    DMAROUTE &= 0xffffff00;
-    DMACONFIG = 0;*/
+    pcm_playing = false;
 
+    /* Reset the FIFO */
     IIS2CONFIG = 0x800;
-    
-    /* Disable DMA0 interrupt */
-    IMR |= (1<<14);
-    ICR4 &= 0xffff00ff;
 }
 
 
@@ -113,8 +93,8 @@ void pcm_set_volume(int volume)
 /* sets frequency of input to DAC */
 void pcm_set_frequency(unsigned int frequency)
 {
-   switch(frequency)
-   {
+    switch(frequency)
+    {
     case 11025:
         pcm_freq = 0x2;
         break;
@@ -126,7 +106,8 @@ void pcm_set_frequency(unsigned int frequency)
         break;
     default:
         pcm_freq = 0x6;
-   }
+        break;
+    }
 }
 
 /* the registered callback function to ask for more mp3 data */
@@ -145,6 +126,23 @@ void pcm_play_stop(void)
     dma_stop();
 }
 
+void pcm_play_pause(bool play)
+{
+    if(pcm_paused && play)
+    {
+        /* Enable the FIFO and force one write to it */
+        IIS2CONFIG = (pcm_freq << 12) | 0x300;
+        DCR0 |= DMA_START;
+        
+        pcm_paused = false;
+    }
+    else if(!pcm_paused && !play)
+    {
+        IIS2CONFIG = 0x800;
+        pcm_paused = true;
+    }
+}
+
 bool pcm_is_playing(void)
 {
     return pcm_playing;
@@ -161,26 +159,51 @@ void DMA0(void)
 
     DSR0 = 1;    /* Clear interrupt */
 
-    if(res == 0x41)
+    /* Stop on error */
+    if(res & 0x70)
     {
        dma_stop();
     }
-
-    if (callback_for_more)
-    {
-        callback_for_more(&start, &size);
-    }
-    
-    if(size)
-    {
-        SAR0 = (unsigned long)start;  /* Source address */
-        BCR0 = size;                  /* Bytes to transfer */
-    }
     else
     {
-        /* Finished playing */
-        dma_stop();
+        if (callback_for_more)
+        {
+            callback_for_more(&start, &size);
+        }
+        
+        if(size)
+        {
+            SAR0 = (unsigned long)start;  /* Source address */
+            BCR0 = size;                  /* Bytes to transfer */
+        }
+        else
+        {
+            /* Finished playing */
+            dma_stop();
+        }
     }
     
     IPR |= (1<<14); /* Clear pending interrupt request */
+}
+
+void pcm_init(void)
+{
+    pcm_playing = false;
+    pcm_paused = false;
+    
+    uda1380_init();
+
+    BUSMASTER_CTRL = 0x81; /* PARK[1,0]=10 + BCR24BIT */
+    DIVR0 = 54;            /* DMA0 is mapped into vector 54 in system.c */
+    DMAROUTE = (DMAROUTE & 0xffffff00) | DMA0_REQ_AUDIO_1;
+    DMACONFIG = 1;   /* DMA0Req = PDOR3 */
+
+    /* Reset the audio FIFO */
+    IIS2CONFIG = 0x800;
+    
+    /* Enable interrupt at level 7, priority 0 */
+    ICR4 = (ICR4 & 0xffff00ff) | 0x00001c00;
+    IMR &= ~(1<<14);      /* bit 14 is DMA0 */
+
+    pcm_set_frequency(44100);
 }
