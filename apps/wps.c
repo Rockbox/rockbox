@@ -945,6 +945,7 @@ int wps_show(void)
             if (id3)
                 wps_refresh(id3,0,false);
         }
-        lastbutton = button;
+        if(button != BUTTON_NONE)
+            lastbutton = button;
     }
 }
