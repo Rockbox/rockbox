@@ -48,7 +48,7 @@ void init_mandelbrot_set(void){
 
 void calc_mandelbrot_set(void){
     
-    unsigned int start_tick, last_yield;
+    long start_tick, last_yield;
     int n_iter;
     int x_pixel, y_pixel;
     int x, x2, y, y2, a, b;
