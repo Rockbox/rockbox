@@ -159,6 +159,7 @@ for(sort keys %entries) {
 }
 
 my $maxsonglen;
+my $sc;
 print "\nSong title table\n";
 #for(sort {$entries{$a}->{'TITLE'} cmp $entries{$b}->{'TITLE'}} %entries) {
 for(sort {$entries{$a}->{'TITLE'} cmp $entries{$b}->{'TITLE'}} keys %entries) {
@@ -237,25 +238,32 @@ if($db) {
 
     open(DB, ">$db") || die "couldn't make $db";
     printf DB "RDB%c", $dbver;
+    
+    $pathindex = 48; # paths always start at index 48
 
-    dumpint(48); # file position index of song table
+    $songindex = $pathindex + $fc; # fc is size of all paths
+    dumpint($songindex); # file position index of song table
     dumpint(scalar(keys %entries)); # number of songs
     dumpint($maxsonglen); # length of song name field
 
-    dumpint(48 + $fc); # file position index of album table
+    # set total size of song title table
+    $sc = scalar(keys %entries) * $maxsonglen;
+    
+    $albumindex = $songindex + $sc; # sc is size of all songs
+    dumpint($albumindex); # file position index of album table
     dumpint(scalar(keys %albums)); # number of albums
     dumpint($maxalbumlen); # length of album name field
     dumpint($maxsongperalbum); # number of entries in songs-per-album array
 
     my $ac = ($maxalbumlen + 8 ) * scalar(keys %albums);
 
-    dumpint(48 + $fc + $ac); # file position index of artist table
+    $artistindex = $albumindex + $ac; # ac is size of all albums
+    dumpint($artistindex); # file position index of artist table
     dumpint(scalar(keys %artists)); # number of artists
     dumpint($maxaristlen); # length of artist name field
     dumpint($maxalbumsperartist); # number of entries in albums-per-artist array
 
-    # 12 x 4 = 48 bytes written before this point
-    my $l=48;
+    my $l=0;
 
     #### TABLE of file names ###
     # path1
@@ -281,13 +289,13 @@ if($db) {
         printf DB ("%s\x00", $str); # title
 
         my $a = $artistcount{$id3->{'ARTIST'}} * $maxaristlen;
-        dumpint($a); # pointer to artist of this song
+        dumpint($a + $artistindex); # pointer to artist of this song
 
         $a = $albumcount{$id3->{'ALBUM'}} * $maxalbumlen;
-        dumpint($a); # pointer to album of this song
+        dumpint($a + $albumindex); # pointer to album of this song
 
         # pointer to filename of this song
-        dumpint($filenamepos{$id3->{'FILE'}});
+        dumpint($filenamepos{$id3->{'FILE'}} + $pathindex);
     }
 
     #### TABLE of albums ###
@@ -296,12 +304,16 @@ if($db) {
     # pointers to songs on album1
 
     for(sort keys %albums) {
+
         my @moo=split(/___/, $_);
         my $t = $moo[1];
         my $str =  $t."\x00" x ($maxalbumlen - length($t));
         printf DB ("%s\x00", $str);
 
-        dumpint(14); # pointers to artists of album1
+        my $a = $artistcount{$moo[0]} * $maxaristlen;
+        dumpint($a + $artistindex); # pointer to artist of this album
+
+        # $maxsongperalbum
         dumpint(15); # pointers to songs on album1
     }
     
