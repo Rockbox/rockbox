@@ -26,6 +26,7 @@
 #include "fat.h"
 #include "disk.h"
 #include "panic.h"
+#include "lcd.h"
 
 
 #define USB_REALLY_BRAVE
@@ -109,7 +110,7 @@ static void usb_thread(void)
 	    DEBUGF("USB inserted. Waiting for ack from %d threads...\n",
 		   num_acks_to_expect);
 	    break;
-	    
+	   
 	case SYS_USB_CONNECTED_ACK:
 	    if(waiting_for_ack)
 	    {
@@ -121,7 +122,7 @@ static void usb_thread(void)
 		       maybe even play some games and stuff. However, the
 		       current firmware isn't quite ready for this yet.
 		       Let's just chicken out and reboot. */
-		    DEBUGF("All threads have acknowledged. Rebooting...\n");
+		    DEBUGF("All threads have acknowledged. Continuing...\n");
 #ifdef USB_REALLY_BRAVE
 		    usb_slave_mode(true);
 #else
@@ -136,6 +137,9 @@ static void usb_thread(void)
 	    break;
 
 	case USB_EXTRACTED:
+	    /* First disable the USB mode */
+	    usb_slave_mode(false);
+	    
 	    /* Tell all threads that we are back in business */
 	    num_acks_to_expect =
 	       queue_broadcast(SYS_USB_DISCONNECTED, NULL) - 1;
@@ -151,7 +155,6 @@ static void usb_thread(void)
 		if(num_acks_to_expect == 0)
 		{
 		    DEBUGF("All threads have acknowledged. We're in business.\n");
-		    usb_slave_mode(false);
 		}
 		else
 		{
@@ -228,6 +231,19 @@ void usb_start_monitoring(void)
     usb_monitor_enabled = true;
 }
 
+void usb_display_info(void)
+{
+    lcd_stop_scroll();
+    lcd_clear_display();
+
+#ifdef HAVE_LCD_BITMAP
+    lcd_puts(4, 3, "[USB Mode]");
+    lcd_update();
+#else
+    lcd_puts(0, 0, "[USB Mode]");
+#endif
+}
+
 #else
 
 /* Dummy simulator functions */
@@ -241,6 +257,10 @@ void usb_init(void)
 }
 
 void usb_start_monitoring(void)
+{
+}
+
+void usb_display_info(void)
 {
 }
 
