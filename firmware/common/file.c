@@ -183,7 +183,7 @@ int close(int fd)
         return -2;
     }
     if (file->write) {
-        rc = flush(fd);
+        rc = fsync(fd);
         if (rc < 0)
             return rc * 10 - 3;
     }
@@ -192,12 +192,12 @@ int close(int fd)
     return 0;
 }
 
-int flush(int fd)
+int fsync(int fd)
 {
     struct filedesc* file = &openfiles[fd];
     int rc = 0;
 
-    LDEBUGF("flush(%d)\n", fd);
+    LDEBUGF("fsync(%d)\n", fd);
 
     if (fd < 0 || fd > MAX_OPEN_FILES-1) {
         errno = EINVAL;

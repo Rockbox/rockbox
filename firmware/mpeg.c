@@ -1975,7 +1975,7 @@ static void mpeg_thread(void)
                                 }
                             }
                             
-                            rc = flush(mpeg_file);
+                            rc = fsync(mpeg_file);
                             if(rc < 0)
                                 panicf("rec fls: %d", rc);
 
