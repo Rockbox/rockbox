@@ -5,8 +5,9 @@
  <a href="./">Back to T-Shirt Design Contest page</a>
 
 <p>
-This is the collection of designs received so far. Remember that we accept design submissions all until the end of August. Keep 'em coming! 
-<p>
+ This is the collection of designs in the contest. The submission period is
+over.
+  <p>
 
 <table border=0 cellspacing=0 cellpadding=0>
 <tr><th colspan=2 align=left>Display format:</th></tr>
