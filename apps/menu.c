@@ -169,6 +169,7 @@ void menu_run(int m)
         switch( button_get(true) ) {
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_UP:
+            case BUTTON_UP | BUTTON_REPEAT:
 #else
             case BUTTON_LEFT:
             case BUTTON_LEFT | BUTTON_REPEAT:
@@ -181,6 +182,7 @@ void menu_run(int m)
 
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_DOWN:
+            case BUTTON_DOWN | BUTTON_REPEAT:
 #else
             case BUTTON_RIGHT:
             case BUTTON_RIGHT | BUTTON_REPEAT:
