@@ -200,7 +200,6 @@ static unsigned int treble_table[] =
     0x5f800  /* 15dB */
 };
 
-#if 0
 static unsigned int prescale_table[] =
 {
     0x80000,  /* 0db */
@@ -220,7 +219,6 @@ static unsigned int prescale_table[] =
     0xe6800, /* 14dB */
     0xe9400  /* 15dB */
 };
-#endif
 #endif
 
 static unsigned char fliptable[] =
@@ -796,6 +794,46 @@ void mpeg_prev(void)
 #endif
 }
 
+
+#ifndef ARCHOS_RECORDER
+int current_volume=0;  /* all values in tenth of dB */
+int current_treble=0;
+int current_bass=0;
+int current_balance=0;
+
+/* convert tenth of dB volume to register value */
+static int tenthdb2reg(int db) {
+    if (db < -540)
+        return (db + 780) / 30;
+    else
+        return (db + 660) / 15;
+}
+
+void set_prescaled_volume(void)
+{
+    int prescale;
+    int l, r;
+
+    prescale = MAX(current_bass, current_treble);
+    if (prescale < 0)
+        prescale = 0;  /* no need to prescale if we don't boost
+                          bass or treble */
+
+    mas_writereg(MAS_REG_KPRESCALE, prescale_table[prescale/10]);
+    
+    /* gain up the analog volume to compensate the prescale reduction gain */
+    r = l = current_volume + prescale;
+
+    /* balance */
+    if (current_balance >= 0)
+        l -= current_balance;
+    else
+        r += current_balance;
+    
+    dac_volume(tenthdb2reg(l), tenthdb2reg(r), false);
+}
+#endif
+
 void mpeg_sound_set(int setting, int value)
 {
 #ifdef SIMULATOR
@@ -813,7 +851,11 @@ void mpeg_sound_set(int setting, int value)
             mas_codec_writereg(0x10, tmp & 0xff00);
 #else
             tmp = 0x38 * value / 100;
-            dac_volume(tmp, tmp, false);
+
+            /* store volume in tenth of dB */
+            current_volume = ( tmp < 0x08 ? tmp*30 - 780 : tmp*15 - 660 );
+
+            set_prescaled_volume();
 #endif
             break;
 
@@ -823,6 +865,8 @@ void mpeg_sound_set(int setting, int value)
             mas_codec_writereg(0x14, tmp & 0xff00);
 #else    
             mas_writereg(MAS_REG_KBASS, bass_table[value]);
+            current_bass = (value-15) * 10;
+            set_prescaled_volume();
 #endif
             break;
 
@@ -832,6 +876,8 @@ void mpeg_sound_set(int setting, int value)
             mas_codec_writereg(0x15, tmp & 0xff00);
 #else    
             mas_writereg(MAS_REG_KTREBLE, treble_table[value]);
+            current_treble = (value-15) * 10;
+            set_prescaled_volume();
 #endif
             break;
     }
