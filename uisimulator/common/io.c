@@ -289,11 +289,9 @@ int sim_fsync(int fd)
 
 #ifdef WIN32
 /* sim-win32 */
-typedef enum plugin_status (*plugin_fn)(void* api, void* param);
 #define dlopen(_x_, _y_) LoadLibrary(_x_)
-#define dlsym(_x_, _y_) (plugin_fn)GetProcAddress(_x_, _y_)
+#define dlsym(_x_, _y_) (void *)GetProcAddress(_x_, _y_)
 #define dlclose(_x_) FreeLibrary(_x_)
-#define dlerror() "Unknown"
 #else
 /* sim-x11 */
 #include <dlfcn.h>
@@ -303,17 +301,25 @@ void *sim_plugin_load(char *plugin, int *fd)
 {
     void* pd;
     char path[256];
-    char buf[256];
     int (*plugin_start)(void * api, void* param);
-    
+#ifdef WIN32
+    char buf[256];
+#endif
+
     snprintf(path, sizeof path, "archos%s", plugin);
 
     *fd = -1;
     
     pd = dlopen(path, RTLD_NOW);
     if (!pd) {
-        snprintf(buf, sizeof buf, "failed to load %s", plugin);
-        DEBUGF("dlopen(%s): %s\n",path,dlerror());
+        DEBUGF("failed to load %s\n", plugin);
+#ifdef WIN32
+        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), 0,
+                      buf, sizeof buf, NULL);
+        DEBUGF("dlopen(%s): %s\n", path, buf);
+#else
+        DEBUGF("dlopen(%s): %s\n", path, dlerror());
+#endif
         dlclose(pd);
         return NULL;
     }
@@ -326,13 +332,13 @@ void *sim_plugin_load(char *plugin, int *fd)
             return NULL;
         }
     }
-    *fd = pd; /* success */
+    *fd = (int)pd; /* success */
     return plugin_start;
 }
 
 void sim_plugin_close(int pd)
 {
-    dlclose(pd);
+    dlclose((void *)pd);
 }
 
 #ifndef WIN32
