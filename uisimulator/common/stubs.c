@@ -226,6 +226,10 @@ void button_set_flip(bool yesno)
     (void)yesno;
 }
 
+void talk_init(void)
+{
+}
+
 int talk_buffer_steal(void)
 {
     return 0;
