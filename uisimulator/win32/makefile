@@ -48,7 +48,7 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) /MD /Fd"Release/vc70.pdb" /c
 SRCS = *.c \
 	$(DRIVERS)/lcd.c \
 	$(APPDIR)*.c \
-	$(FIRMWAREDIR)/chartables.c $(FIRMWAREDIR)/id3.c $(FIRMWAREDIR)/settings.c $(FIRMWAREDIR)/backlight.c \
+	$(FIRMWAREDIR)/chartables.c $(FIRMWAREDIR)/id3.c $(FIRMWAREDIR)/backlight.c \
         $(COMMON)/sprintf.c $(COMMON)/strtok.c
 
 !IF ("$(DISPLAY)" == "-DHAVE_LCD_BITMAP")

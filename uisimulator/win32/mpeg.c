@@ -46,6 +46,14 @@ void mpeg_pause(void)
 {
 }
 
+void mpeg_next (void)
+{
+}
+
+void mpeg_prev (void)
+{
+}
+
 struct mp3entry* mpeg_current_track(void)
 {
     return 0;
