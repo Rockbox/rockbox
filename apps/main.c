@@ -207,6 +207,7 @@ void init(void)
         if (rc == 1 || rc == 2)  /* charger removed or "Off/Stop" pressed */
             power_off();
         /* "On" pressed or USB connected: proceed */
+        show_logo();  /* again, to provide better visual feedback */
     }
 #else
     (void)coldstart;
