@@ -1206,10 +1206,12 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
 
     paused = false;
     playing = false;
+#ifndef SIMULATOR
     playstart_tick = 0;
     cumulative_ticks = 0;
     callback_for_more = 0;
     mpeg_is_initialized = false;
+#endif
 }
 void mp3_shutdown(void)
 {
