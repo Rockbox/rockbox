@@ -111,18 +111,21 @@ int playlist_first_index(void)
     return playlist.first_index;
 }
 
-void playlist_name(char *name, int name_size)
+char *playlist_name(char *buf, int buf_size)
 {
-    char buf[MAX_PATH+1];
-    int i = 0;
+    char *sep;
 
-    snprintf(buf, sizeof(buf), "%s", playlist.filename+playlist.dirlen);
-    while((buf[i] != '.') && (buf[i] != 0))
-        i++;
-    buf[i] = 0;
+    snprintf(buf, buf_size, "%s", playlist.filename+playlist.dirlen);
 
-    snprintf(name, name_size, "%s", buf);
-    return;
+    if (0 == buf[0])
+        return NULL;
+
+    /* Remove extension */
+    sep = strrchr(buf, '.');
+    if (NULL != sep)
+        *sep = 0;
+    
+    return buf;
 }
 
 int playlist_next(int steps)
