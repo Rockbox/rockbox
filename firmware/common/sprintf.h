@@ -21,7 +21,9 @@
 #define __SPRINTF_H__
 
 #include <stddef.h>
+#include <stdarg.h>
 
 int snprintf (char *buf, size_t size, const char *fmt, ...);
+int vsnprintf (char *buf, int size, const char *fmt, va_list ap);
 
 #endif /* __SPRINTF_H__ */
