@@ -22,8 +22,6 @@
 
 #if defined(ARCHOS_PLAYER)
 #include "config-player.h"
-#elif defined(ARCHOS_PLAYER_OLD)
-#include "config-playerold.h"
 #elif defined(ARCHOS_RECORDER)
 #include "config-recorder.h"
 #else

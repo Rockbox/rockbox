@@ -178,27 +178,20 @@ if [ -z "$target" ]; then
 
   echo "Enter target platform: (defaults to Recorder)"
 
-  echo "1 - Archos Player old LCD"
-  echo "2 - Archos Player/Studio new LCD"
-  echo "3 - Archos Recorder"
+  echo "1 - Archos Player/Studio"
+  echo "2 - Archos Recorder"
 
   getit=`input`;
 
   case $getit in
 
    1)
-    target="-DARCHOS_PLAYER_OLD"
-    display="-DHAVE_LCD_CHARCELLS"
-    keypad="-DHAVE_PLAYER_KEYPAD"
-    ;;
-
-   2)
     target="-DARCHOS_PLAYER"
     display="-DHAVE_LCD_CHARCELLS"
     keypad="-DHAVE_PLAYER_KEYPAD"
     ;;
 
-   *|3)
+   *|2)
     target="-DARCHOS_RECORDER"
     display="-DHAVE_LCD_BITMAP"
     keypad="-DHAVE_RECORDER_KEYPAD"

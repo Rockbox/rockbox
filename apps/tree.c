@@ -303,7 +303,7 @@ static int showdir(char *path, int start)
         qsort(dircache,filesindir,sizeof(struct entry),compare);
 
         if ( dir_buffer_full || filesindir == MAX_FILES_IN_DIR ) {
-#ifdef HAVE_NEW_CHARCELL_LCD
+#ifdef HAVE_LCD_CHARCELLS
             lcd_double_height(false);
 #endif
             lcd_clear_display();
@@ -347,7 +347,7 @@ static int showdir(char *path, int start)
     }
 
     lcd_stop_scroll();
-#ifdef HAVE_NEW_CHARCELL_LCD
+#ifdef HAVE_LCD_CHARCELLS
     lcd_double_height(false);
 #endif
     lcd_clear_display();
@@ -446,7 +446,7 @@ static int showdir(char *path, int start)
 
 bool ask_resume(void)
 {
-#ifdef HAVE_NEW_CHARCELL_LCD
+#ifdef HAVE_LCD_CHARCELLS
     lcd_double_height(false);
 #endif
 

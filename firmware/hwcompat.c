@@ -37,3 +37,10 @@ int read_hw_mask(void)
     
     return mask;
 }
+
+#ifdef ARCHOS_PLAYER
+bool has_new_lcd(void)
+{
+    return read_rom_version() > 451;
+}
+#endif

@@ -19,6 +19,8 @@
 #ifndef HWCOMPAT_H
 #define HWCOMPAT_H
 
+#include <stdbool.h>
+
 /* Bit mask values for HW compatibility */
 #define ATA_ADDRESS_300 0x0100
 #define USB_ACTIVE_HIGH 0x0100
@@ -26,5 +28,9 @@
 
 int read_rom_version(void);
 int read_hw_mask(void);
+
+#ifdef ARCHOS_PLAYER
+bool has_new_lcd(void);
+#endif
 
 #endif

@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 #include "config.h"
+#include "hwcompat.h"
 
 #ifdef HAVE_LCD_CHARCELLS
 
@@ -32,19 +33,18 @@
 
 /*** definitions ***/
 
-#ifdef HAVE_NEW_CHARCELL_LCD
-#  define LCD_CONTRAST_SET ((char)0x50)
-#  define LCD_CRAM         ((char)0x80) /* Characters */
-#  define LCD_PRAM         ((char)0xC0) /*  Patterns  */
-#  define LCD_IRAM         ((char)0x40) /*    Icons   */
-#else
-#  define LCD_CONTRAST_SET ((char)0xA8)
-#  define LCD_CRAM         ((char)0xB0) /* Characters */
-#  define LCD_PRAM         ((char)0x80) /*  Patterns  */
-#  define LCD_IRAM         ((char)0xE0) /*    Icons   */
-#endif
-#define LCD_CURSOR(x,y)    ((char)(LCD_CRAM+((y)*16+(x))))
-#define LCD_ICON(i)        ((char)(LCD_IRAM+i))          
+#define OLD_LCD_CONTRAST_SET ((char)0xA8)
+#define OLD_LCD_CRAM         ((char)0xB0) /* Characters */
+#define OLD_LCD_PRAM         ((char)0x80) /*  Patterns  */
+#define OLD_LCD_IRAM         ((char)0xE0) /*    Icons   */
+
+#define NEW_LCD_CONTRAST_SET ((char)0x50)
+#define NEW_LCD_CRAM         ((char)0x80) /* Characters */
+#define NEW_LCD_PRAM         ((char)0xC0) /*  Patterns  */
+#define NEW_LCD_IRAM         ((char)0x40) /*    Icons   */
+
+#define LCD_CURSOR(x,y)    ((char)(lcd_cram+((y)*16+(x))))
+#define LCD_ICON(i)        ((char)(lcd_iram+i))
 
 /*** generic code ***/
 
@@ -68,9 +68,7 @@ static char scroll_spacing = 3; /* spaces between end and start of text */
 static struct scrollinfo scroll; /* only one scroll line at the moment */
 static int scroll_count = 0;
 
-#ifdef HAVE_NEW_CHARCELL_LCD
-
-static const unsigned char lcd_ascii[] = {
+static const unsigned char new_lcd_ascii[] = {
    0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,
    0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f,
    0x10,0x11,0x05,0x13,0x14,0x15,0x16,0x17,
@@ -105,9 +103,7 @@ static const unsigned char lcd_ascii[] = {
    0x20,0x75,0x75,0x75,0x75,0x79,0x20,0x79
 };
 
-#else
-
-static const unsigned char lcd_ascii[] = {
+static const unsigned char old_lcd_ascii[] = {
    0x00,0x01,0x02,0x03,0x00,0x84,0x85,0x89,
    0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
    0xec,0xe3,0xe2,0xe1,0xe0,0xdf,0x15,0x00,
@@ -141,7 +137,15 @@ static const unsigned char lcd_ascii[] = {
    0x73,0x72,0x73,0x73,0x73,0x73,0x73,0x24,
    0x24,0x79,0x79,0x79,0x79,0x7d,0x24,0x7d
 };
-#endif /* HAVE_NEW_CHARCELL_LCD */
+
+static bool new_lcd;
+
+static unsigned const char *lcd_ascii;
+static char lcd_contrast_set;
+static char lcd_cram;
+static char lcd_pram;
+static char lcd_iram;
+
 
 void lcd_clear_display(void)
 {
@@ -170,14 +174,15 @@ void lcd_putc(int x, int y, unsigned char ch)
 void lcd_define_pattern (int which,char *pattern,int length)
 {
     int i;
-    lcd_write(true,LCD_PRAM|which);
+    lcd_write(true,lcd_pram | which);
     for (i=0;i<length;i++)
         lcd_write(false,pattern[i]);
 }
 
 void lcd_double_height(bool on)
 {
-    lcd_write(true,on?9:8);
+    if(new_lcd)
+        lcd_write(true,on?9:8);
 }
 
 static char icon_pos[] =
@@ -238,13 +243,29 @@ void lcd_icon(int icon, bool enable)
 
 void lcd_init (void)
 {
+    new_lcd = has_new_lcd();
+
+    if(new_lcd) {
+        lcd_ascii = new_lcd_ascii;
+        lcd_contrast_set = NEW_LCD_CONTRAST_SET;
+        lcd_cram = NEW_LCD_CRAM;
+        lcd_pram = NEW_LCD_PRAM;
+        lcd_iram = NEW_LCD_IRAM;
+    } else {
+        lcd_ascii = old_lcd_ascii;
+        lcd_contrast_set = OLD_LCD_CONTRAST_SET;
+        lcd_cram = OLD_LCD_CRAM;
+        lcd_pram = OLD_LCD_PRAM;
+        lcd_iram = OLD_LCD_IRAM;
+    }
+    
     create_thread(scroll_thread, scroll_stack,
                   sizeof(scroll_stack), scroll_name);
 }
 
 void lcd_set_contrast(int val)
 {
-    lcd_write(true, LCD_CONTRAST_SET);
+    lcd_write(true, lcd_contrast_set);
     lcd_write(false, 31-val);
 }
 

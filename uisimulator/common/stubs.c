@@ -212,3 +212,13 @@ bool oscillograph(void)
   /* does nothing */
   return false;
 }
+
+void lcd_double_height(bool onoff)
+{
+    (void)onoff;
+}
+
+bool has_new_lcd(void)
+{
+    return false;
+}

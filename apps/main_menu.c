@@ -16,7 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
+#include "config.h"
 #include "options.h"
 
 #include "menu.h"
@@ -107,9 +107,7 @@ int show_logo( void )
 #else
     char *rockbox = "  ROCKbox!";
     lcd_clear_display();
-#ifdef HAVE_NEW_CHARCELL_LCD
     lcd_double_height(true);
-#endif
     lcd_puts(0, 0, rockbox);
     lcd_puts(0, 1, appsversion);
 #endif
@@ -123,7 +121,7 @@ bool show_credits(void)
     int btn;
 
     show_logo();
-#ifdef HAVE_NEW_CHARCELL_LCD
+#ifdef HAVE_LCD_CHARCELLS
     lcd_double_height(false);
 #endif
     

@@ -4,9 +4,6 @@
 /* define this if you have the Player's keyboard */
 #define HAVE_PLAYER_KEYPAD 1
 
-/* define this if you have a post-4.50 charcell LCD display */
-#define HAVE_NEW_CHARCELL_LCD 1
-
 /* Define this if you have a MAS3507D */
 #define HAVE_MAS3507D
 
