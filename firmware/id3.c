@@ -80,9 +80,6 @@ const int freqtab[][4] =
     {22050, 24000, 16000, 0}, /* MPEG version 2 */
 };
 
-#define UNICODE_BOM_1 0xfffe
-#define UNICODE_BOM_2 0xfeff
-
 /* Checks to see if the passed in string is a 16-bit wide Unicode v2
    string.  If it is, we attempt to convert it to a 8-bit ASCII string
    (for valid 8-bit ASCII characters).  If it's not unicode, we leave
@@ -109,14 +106,16 @@ static int unicode_munge(char** string, int *len) {
    /* Unicode with or without BOM */
    if(str[0] == 0x01 || str[0] == 0x02) {
       str++;
-      tmp = BYTES2INT(0, 0, str[1], str[2]);
+      tmp = BYTES2INT(0, 0, str[0], str[1]);
 
-      if(tmp == UNICODE_BOM_2) { /* Little endian? */
+      /* Now check if there is a BOM (zero-width non-breaking space, 0xfeff)
+         and if it is in little or big endian format */
+      if(tmp == 0xfffe) { /* Little endian? */
          le = true;
          str += 2;
       }
 
-      if(tmp == UNICODE_BOM_1) /* Big endian? */
+      if(tmp == 0xfeff) /* Big endian? */
          str += 2;
 
       i = 0;
@@ -133,10 +132,10 @@ static int unicode_munge(char** string, int *len) {
             else
                outstr[i++] = str[1];
          }
+         str += 2;
       } while(str[0] || str[1]);
 
       *len = i;
-      (*string)++; /* Skip the encoding type byte */
       return 0;
    }
 
