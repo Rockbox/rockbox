@@ -39,14 +39,8 @@
 	comment-column 40
 	c-font-lock-extra-types (append '("bool"))
 	)
-  ;; We like auto-newline and hungry-delete
-  (c-toggle-auto-hungry-state 1)
-  ;; keybindings for C, C++, and Objective-C.  We can put these in
-  ;; c-mode-base-map because of inheritance ...
   (define-key c-mode-base-map "\C-m" 'newline-and-indent)
   (define-key c-mode-base-map "\M-q" 'c-fill-paragraph)
-  ;; Cleanups
-  (setq c-cleanup-list '(list-close-comma defun-close-semi empty-defun-braces brace-else-brace brace-elseif-brace scope-operator))
   (setq c-recognize-knr-p nil)
   )
 
