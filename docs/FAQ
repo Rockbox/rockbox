@@ -655,3 +655,10 @@ Q71: Why can't you implement a crossfader? That would be so cool!
 A71: To crossfade you need to decode two MP3 streams simultaneously. The MP3
      decoding is done in hardware and we only have one decoder chip, so it
      can't be done. Sorry.
+
+Q72: My screen is all black/white when I run Rockbox on my Recorder!
+A72: We have no way of knowing the correct contrast setting from start and the
+     displays differ a lot. Change your contrast setting by doing this:
+
+     F1, down, right, down, down, right, down, down, down, right, down (until
+     you like the contrast)
