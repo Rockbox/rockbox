@@ -638,6 +638,7 @@ static int flush_fat(void)
     return 0;
 }
 
+#ifdef HAVE_RTC
 static void fat_time(unsigned short* date,
                      unsigned short* time,
                      unsigned short* tenth )
@@ -657,6 +658,7 @@ static void fat_time(unsigned short* date,
     if (tenth)
         *tenth = (tm->tm_sec & 1) * 100;
 }
+#endif
 
 static int write_long_name(struct fat_file* file,
                            unsigned int firstentry,
@@ -1044,7 +1046,6 @@ static int update_file_size( struct fat_file* file, int size )
     unsigned int* sizeptr;
     unsigned short* clusptr;
     struct fat_file dir;
-    unsigned short date=0, time=0;
     int err;
 
     LDEBUGF("update_file_size(cluster:%x entry:%d size:%d)\n",
@@ -1076,10 +1077,13 @@ static int update_file_size( struct fat_file* file, int size )
     *sizeptr = SWAB32(size);
 
 #ifdef HAVE_RTC
-    fat_time(&date, &time, NULL);
-    *(unsigned short*)(entry + FATDIR_WRTTIME) = SWAB16(time);
-    *(unsigned short*)(entry + FATDIR_WRTDATE) = SWAB16(date);
-    *(unsigned short*)(entry + FATDIR_LSTACCDATE) = SWAB16(date);
+    {
+        unsigned short date=0, time=0;
+        fat_time(&date, &time, NULL);
+        *(unsigned short*)(entry + FATDIR_WRTTIME) = SWAB16(time);
+        *(unsigned short*)(entry + FATDIR_WRTDATE) = SWAB16(date);
+        *(unsigned short*)(entry + FATDIR_LSTACCDATE) = SWAB16(date);
+    }
 #endif
 
     err = fat_seek( &dir, sector );
