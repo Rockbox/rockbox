@@ -99,6 +99,10 @@ static char mmc_stack[DEFAULT_STACK_SIZE];
 static const char mmc_thread_name[] = "mmc";
 static struct event_queue mmc_queue;
 static bool initialized = false;
+static bool delayed_write = false;
+static unsigned char delayed_sector[SECTOR_SIZE];
+static int delayed_sector_num;
+
 static int current_card = 0;
 
 static const unsigned char dummy[] = {
@@ -264,7 +268,7 @@ static unsigned char poll_busy(int timeout)
     /* get data response */
     SSR1 = 0;                     /* start receiving */
     while (!(SSR1 & SCI_RDRF));   /* wait for data */
-    data = RDR1;                  /* read byte */
+    data = fliptable[(signed char)(RDR1)];  /* read byte */
 
     /* wait until the card is ready again */
     i = 0;
@@ -274,7 +278,7 @@ static unsigned char poll_busy(int timeout)
         dummy = RDR1;               /* read byte */
     } while ((dummy != 0xFF) && (++i < timeout));
     
-    return fliptable[(signed char)data];
+    return data;
 }
 
 static int send_cmd(int cmd, unsigned long parameter, unsigned char *response)
@@ -498,6 +502,10 @@ int ata_read_sectors(unsigned long start,
     deselect_card();
     mutex_unlock(&mmc_mutex);
 
+    /* only flush if reading went ok */
+    if ( (ret == 0) && delayed_write )
+        ata_flush();
+
     return ret;
 }
 
@@ -552,17 +560,29 @@ int ata_write_sectors(unsigned long start,
     deselect_card();
     mutex_unlock(&mmc_mutex);
 
+    /* only flush if writing went ok */
+    if ( (ret == 0) && delayed_write )
+        ata_flush();
+
     return ret;
 }
 
-/* no need to delay with flash memory. There is no spinup :) */
+/* While there is no spinup, the delayed write is still here to avoid
+   wearing the flash unnecessarily */
 extern void ata_delayed_write(unsigned long sector, const void* buf)
 {
-    ata_write_sectors(sector, 1, buf);
+    memcpy(delayed_sector, buf, SECTOR_SIZE);
+    delayed_sector_num = sector;
+    delayed_write = true;
 }
 
 extern void ata_flush(void)
 {
+    if ( delayed_write ) {
+        DEBUGF("ata_flush()\n");
+        delayed_write = false;
+        ata_write_sectors(delayed_sector_num, 1, delayed_sector);
+    }
 }
 
 void ata_spindown(int seconds)
