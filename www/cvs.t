@@ -99,6 +99,17 @@ those on the remote repository. This is called "status":
 
 <p><tt>cvs status | grep Status | grep -v Up-to-date</tt>
 
+<h2>What Happens in the Repository?</h2>
+<p>
+ Subscribe to the rockbox-cvs list to get mails sent to you for every commit
+ done to the repostory.
+<p>
+ To join this list, send a mail to majordomo@cool.haxx.se, with the following
+ text in the body (no subject) "subscribe rockbox-cvs".
+<p>
+ <b>Note</b> that this may cause quite a few mails to get sent during periods
+of intense development.
+
 <h2>Getting rid of the password prompts</h2>
 
 <p>Each cvs operation has to be authenticated with ssh. This is normally done
