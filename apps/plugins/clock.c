@@ -137,20 +137,6 @@ static unsigned char yhour_full[] = {
 52,52,52,52,52,52,52,52,52,52,52,46,41,37,34,32,30,27,23,18,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,18,23,27,30,32,34,37,41,46,52,52,52,52,52,52,52,52,52,52
 };
 
-/************************************
- * Used for second-progressbar
- ************************************/
-static unsigned char seconds100[] = {
-1,2,4,5,7,8,11,13,14,16,17,19,22,23,25,26,28,29,32,34,35,37,38,39,42,43,45,46,48,49,51,52,54,55,57,58,60,61,63,64,66,67,69,72,73,75,76,78,79,82,84,85,87,88,91,93,94,96,97,99
-};
-
-/************************************
- * Used for seconds-inverse mode
- ************************************/
-static unsigned char seconds112[] = {
-1,2,4,6,8,10,12,14,16,18,20,21,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,70,72,74,76,78,80,82,84,86,88,90,91,92,94,96,98,100,102,104,106,108,110,111,112
-};
-
 /****************************
  * BITMAPS
  ****************************/
@@ -1811,7 +1797,7 @@ void draw_extras(int year, int day, int month, int hour, int minute, int second)
 
     struct tm* current_time = rb->get_time();
 
-    int fill = seconds112[second];
+    int fill = LCD_WIDTH * second / 60;
 
     char moday[8];
     char dateyr[6];
@@ -1895,7 +1881,7 @@ void draw_extras(int year, int day, int month, int hour, int minute, int second)
         /* Second progressbar */
         if(settings.digital_seconds == 2)
         {
-            rb->progressbar(0, 0, 112, 4, seconds100[second], 0);
+            rb->scrollbar(0, 0, 112, 4, 60, 0, second, HORIZONTAL);
         }
 
         /* Invert the whole LCD as the seconds go */
@@ -1931,7 +1917,7 @@ void draw_extras(int year, int day, int month, int hour, int minute, int second)
         /* Second progressbar */
         if(settings.lcd_seconds == 2)
         {
-            rb->progressbar(0, 0, 112, 4, seconds100[second], 0);
+            rb->scrollbar(0, 0, 112, 4, 60, 0, second, HORIZONTAL);
         }
 
         /* Invert the whole LCD as the seconds go */
