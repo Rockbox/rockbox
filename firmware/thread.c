@@ -46,21 +46,20 @@ static thread_t threads = {1, 0};
  */
 static __inline__ void stctx(void* addr)
 {
-   __asm__ __volatile__ ("mov.l r8, @(0, %0)" :: "r" (addr));
-   __asm__ __volatile__ ("mov.l r9, @(4, %0)" :: "r" (addr));
-   __asm__ __volatile__ ("mov.l r10, @(8, %0)" :: "r" (addr));
-   __asm__ __volatile__ ("mov.l r11, @(12, %0)" :: "r" (addr));
-   __asm__ __volatile__ ("mov.l r12, @(16, %0)" :: "r" (addr));
-   __asm__ __volatile__ ("mov.l r13, @(20, %0)" :: "r" (addr));
-   __asm__ __volatile__ ("mov.l r14, @(24, %0)" :: "r" (addr));
-   __asm__ __volatile__ ("mov.l r15, @(28, %0)" :: "r" (addr));
-   
-   __asm__ __volatile__ ("stc sr, r0");
-   __asm__ __volatile__ ("mov.l r0, @(32, %0)" :: "r" (addr));
-   __asm__ __volatile__ ("stc gbr, r0");
-   __asm__ __volatile__ ("mov.l r0, @(36, %0)" :: "r" (addr));
-   __asm__ __volatile__ ("sts pr, r0");
-   __asm__ __volatile__ ("mov.l r0, @(40, %0)" :: "r" (addr));
+   __asm__ __volatile__ ("mov.l r8, @(0, %0)\n\t"
+			 "mov.l r9, @(4, %0)\n\t"
+			 "mov.l r10, @(8, %0)\n\t"
+			 "mov.l r11, @(12, %0)\n\t"
+			 "mov.l r12, @(16, %0)\n\t"
+			 "mov.l r13, @(20, %0)\n\t"
+			 "mov.l r14, @(24, %0)\n\t"
+			 "mov.l r15, @(28, %0)\n\t"
+			 "stc sr, r0\n\t"
+			 "mov.l r0, @(32, %0)\n\t"
+			 "stc gbr, r0\n\t"
+			 "mov.l r0, @(36, %0)\n\t"
+			 "sts pr, r0\n\t"
+			 "mov.l r0, @(40, %0)" :: "r" (addr));
 }
 
 /*--------------------------------------------------------------------------- 
@@ -69,22 +68,21 @@ static __inline__ void stctx(void* addr)
  */
 static __inline__ void ldctx(void* addr)
 {
-   __asm__ __volatile__ ("mov.l @(0, %0), r8" :: "r" (addr));
-   __asm__ __volatile__ ("mov.l @(4, %0), r9" :: "r" (addr));
-   __asm__ __volatile__ ("mov.l @(8, %0), r10" :: "r" (addr));
-   __asm__ __volatile__ ("mov.l @(12, %0), r11" :: "r" (addr));
-   __asm__ __volatile__ ("mov.l @(16, %0), r12" :: "r" (addr));
-   __asm__ __volatile__ ("mov.l @(20, %0), r13" :: "r" (addr));
-   __asm__ __volatile__ ("mov.l @(24, %0), r14" :: "r" (addr));
-   __asm__ __volatile__ ("mov.l @(28, %0), r15" :: "r" (addr));
-
-   __asm__ __volatile__ ("mov.l @(32, %0), r0" :: "r" (addr));
-   __asm__ __volatile__ ("ldc r0, sr");
-   __asm__ __volatile__ ("mov.l @(36, %0), r0" :: "r" (addr));
-   __asm__ __volatile__ ("ldc r0, gbr");
-   __asm__ __volatile__ ("mov.l @(40, %0), r0" :: "r" (addr));
-   __asm__ __volatile__ ("lds r0, pr");
-   __asm__ __volatile__ ("mov.l r0, @(0, r15)");
+   __asm__ __volatile__ ("mov.l @(0, %0), r8\n\t"
+			 "mov.l @(4, %0), r9\n\t"
+			 "mov.l @(8, %0), r10\n\t"
+			 "mov.l @(12, %0), r11\n\t"
+			 "mov.l @(16, %0), r12\n\t"
+			 "mov.l @(20, %0), r13\n\t"
+			 "mov.l @(24, %0), r14\n\t"
+			 "mov.l @(28, %0), r15\n\t"
+			 "mov.l @(32, %0), r0\n\t"
+			 "ldc r0, sr\n\t"
+			 "mov.l @(36, %0), r0\n\t"
+			 "ldc r0, gbr\n\t"
+			 "mov.l @(40, %0), r0\n\t"
+			 "lds r0, pr\n\t"
+			 "mov.l r0, @(0, r15)" :: "r" (addr));
 }
 
 /*--------------------------------------------------------------------------- 
