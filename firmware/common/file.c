@@ -286,7 +286,7 @@ static int readwrite(int fd, void* buf, int count, bool write)
         }
         else {
             if ( fat_readwrite(&(openfiles[fd].fatfile), 1,
-                               &(openfiles[fd].cache),false) < 0 ) {
+                               &(openfiles[fd].cache),false) < 1 ) {
                 DEBUGF("Failed caching sector\n");
                 errno = EIO;
                 return -1;
