@@ -68,7 +68,7 @@ static void set_gain(void)
 {
     if(global_settings.rec_source == SOURCE_MIC)
     {
-        mpeg_set_recording_gain(global_settings.rec_left_gain, 0,
+        mpeg_set_recording_gain(0, 0,
                                 global_settings.rec_mic_gain);
     }
     else
