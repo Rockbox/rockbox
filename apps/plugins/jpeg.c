@@ -2872,15 +2872,14 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel, int downscale,
     int k_need; /* AC coefficients needed up to here */
     int zero_need; /* init the block with this many zeros */
 
-    int last_dc_val[4];
+    int last_dc_val = 0;
     int store_offs[4]; /* memory offsets: order of Y11 Y12 Y21 Y22 U V */
-    MEMSET(&last_dc_val, 0, sizeof(last_dc_val));
 
     /* pick the IDCT we want, determine how to work with coefs */
     if (downscale == 1)
     {
         pf_idct = idct8x8;
-        k_need = 63; /* all */
+        k_need = 64; /* all */
         zero_need = 63; /* all */
     }
     else if (downscale == 2)
@@ -2940,14 +2939,17 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel, int downscale,
                 struct derived_tbl* actbl = &p_jpeg->ac_derived_tbls[ti];
 
                 /* Section F.2.2.1: decode the DC coefficient difference */
-                last_dc_val[ci] += huff_decode_dc(&bs, dctbl);
-                block[0] = last_dc_val[ci]; /* output it (assumes zag[0] = 0) */
+                s = huff_decode_dc(&bs, dctbl);
 
-                /* Section F.2.2.2: decode the AC coefficients */
                 if (ci == 0) /* only for Y component */
                 {
+                    last_dc_val += s;
+                    block[0] = last_dc_val; /* output it (assumes zag[0] = 0) */
+
                     /* coefficient buffer must be cleared */
                     MEMSET(block+1, 0, zero_need*sizeof(int));
+
+                    /* Section F.2.2.2: decode the AC coefficients */
                     for (; k < k_need; k++)
                     {
                         s = huff_decode_ac(&bs, actbl);
@@ -3026,6 +3028,18 @@ struct t_disp
     int x, y;
 };
 
+
+/************************* Globals ***************************/
+
+/* decompressed image in the possible sizes (1,2,4,8), wasting the other */
+struct t_disp disp[9]; 
+
+/* my memory pool (from the mp3 buffer) */
+char print[32]; /* use a common snprintf() buffer */
+unsigned char* buf; /* up to here currently used by image(s) */
+int buf_size;
+unsigned char* buf_root; /* the root of the images */
+int root_size;
 
 /************************* Implementation ***************************/
 
@@ -3148,6 +3162,7 @@ int wait_for_button(void)
 /* callback updating a progress meter while JPEG decoding */
 void cb_progess(int current, int total)
 {
+    rb->yield(); /* be nice to the other threads */
     rb->progressbar(0, LCD_HEIGHT-8, LCD_WIDTH, 8, 
         current*100/total, 0 /*Grow_Right*/);
     rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
@@ -3170,7 +3185,7 @@ int min_downscale(int x, int y, int bufsize)
     int downscale = 8;
 
     if ((x/8) * (y/8) > bufsize)
-        return 0; /* error, too large even 1:8, doesn't fit */
+        return 0; /* error, too large, even 1:8 doesn't fit */
 
     while ((x*2/downscale) * (y*2/downscale) < bufsize
         && downscale > 1)
@@ -3179,6 +3194,7 @@ int min_downscale(int x, int y, int bufsize)
     }
     return downscale;
 }
+
 
 /* how far can we zoom out, to fit image into the LCD */
 int max_downscale(int x, int y)
@@ -3195,6 +3211,98 @@ int max_downscale(int x, int y)
 }
 
 
+/* return decoded or cached image */
+struct t_disp* get_image(struct jpeg* p_jpg, int ds)
+{
+    int w, h; /* used to center output */
+    int size; /* decompressed image size */
+    long time; /* measured ticks */
+    int status;
+
+    struct t_disp* p_disp = &disp[ds]; /* short cut */
+
+    if (p_disp->bitmap != NULL)
+    {
+        return p_disp; /* we still have it */
+    }
+
+    /* assign image buffer */
+
+     /* physical size needed for decoding */
+    size = (p_jpg->x_phys/ds) * (p_jpg->y_phys / ds);
+    if (buf_size <= size)
+    {   /* have to discard the current */
+        int i;
+        for (i=1; i<=8; i++)
+            disp[i].bitmap = NULL; /* invalidate all bitmaps */
+        buf = buf_root; /* start again from the beginning of the buffer */
+        buf_size = root_size;
+    }
+
+    /* size may be less when decoded (if height is not block aligned) */
+    size = (p_jpg->x_phys/ds) * (p_jpg->y_size / ds);
+    p_disp->bitmap = buf;
+    buf += size;
+    buf_size -= size;
+    
+    rb->snprintf(print, sizeof(print), "decoding %d*%d", 
+        p_jpg->x_size/ds, p_jpg->y_size/ds);
+    rb->lcd_puts(0, 3, print);
+    rb->lcd_update();
+
+    /* update image properties */
+    p_disp->width = p_jpg->x_size/ds;
+    p_disp->stride = p_jpg->x_phys / ds; /* use physical size for stride */
+    p_disp->height = p_jpg->y_size/ds;
+
+    /* the actual decoding */
+    time = *rb->current_tick;
+    status = jpeg_decode(p_jpg, p_disp->bitmap, ds, cb_progess);
+    if (status)
+    {
+        rb->splash(HZ*2, true, "decode error %d", status);
+        return NULL;
+    }
+    time = *rb->current_tick - time;
+    rb->snprintf(print, sizeof(print), " %d.%02d sec ", time/HZ, time%HZ);
+    rb->lcd_getstringsize(print, &w, &h); /* centered in progress bar */
+    rb->lcd_putsxy((LCD_WIDTH - w)/2, LCD_HEIGHT - h, print);
+    rb->lcd_update();
+
+    return p_disp;
+}
+
+
+/* set the view to the given center point, limit if necessary */
+void set_view (struct t_disp* p_disp, int cx, int cy)
+{
+    int x, y;
+
+    /* plain center to available width/height */
+    x = cx - MIN(LCD_WIDTH, p_disp->width) / 2;
+    y = cy - MIN(LCD_HEIGHT, p_disp->height) / 2;
+
+    /* limit against upper image size */
+    x = MIN(p_disp->width - LCD_WIDTH, x);
+    y = MIN(p_disp->height - LCD_HEIGHT, y);
+
+    /* limit against negative side */
+    x = MAX(0, x);
+    y = MAX(0, y);
+
+    p_disp->x = x; /* set the values */
+    p_disp->y = y;
+}
+
+
+/* calculate the view center based on the bitmap position */
+void get_view(struct t_disp* p_disp, int* p_cx, int* p_cy)
+{
+    *p_cx = p_disp->x + MIN(LCD_WIDTH, p_disp->width) / 2;
+    *p_cy = p_disp->y + MIN(LCD_HEIGHT, p_disp->height) / 2;
+}
+
+
 /* load, decode, display the image */
 int main(char* filename) 
 {
@@ -3202,18 +3310,12 @@ int main(char* filename)
     int filesize;
     int grayscales;
     int graysize; // helper
-    char print[32];
-    unsigned char* buf;
-    int buf_size;
     unsigned char* buf_jpeg; /* compressed JPEG image */
-    struct t_disp disp; /* decompressed image */
-    long time; /* measured ticks */
-
     static struct jpeg jpg; /* too large for stack */
     int status;
     int ds, ds_min, ds_max; /* scaling and limits */
-    
-    buf = rb->plugin_get_mp3_buffer(&buf_size);
+    struct t_disp* p_disp; /* currenly displayed image */
+    int cx, cy; /* view center */
 
     fd = rb->open(filename, O_RDONLY);
     if (fd < 0)
@@ -3222,6 +3324,10 @@ int main(char* filename)
         return PLUGIN_ERROR;
     }
     filesize = rb->filesize(fd);
+
+    rb->memset(&disp, 0, sizeof(disp));
+
+    buf = rb->plugin_get_mp3_buffer(&buf_size); /* start munching memory */
 
 
     /* initialize the grayscale buffer:
@@ -3279,6 +3385,8 @@ int main(char* filename)
     buf_size += filesize;
     buf += jpg.words_in_buffer * sizeof(short); /* real space */
     buf_size -= jpg.words_in_buffer * sizeof(short);
+    buf_root = buf; /* we can start the images here */
+    root_size = buf_size;
 
     rb->snprintf(print, sizeof(print), "image %d*%d", jpg.x_size, jpg.y_size);
     rb->lcd_puts(0, 2, print);
@@ -3294,47 +3402,30 @@ int main(char* filename)
         return PLUGIN_ERROR;
     }
     ds = ds_max; /* initials setting */
-
-    /* assign image buffer */
-    rb->memset(&disp, 0, sizeof(disp));
-    disp.bitmap = buf;
+    cx = jpg.x_size/ds/2; /* center the view */
+    cy = jpg.y_size/ds/2;
     
     do  /* loop the image prepare and decoding when zoomed */
     {
-        int w, h; /* used to center output */
-        rb->snprintf(print, sizeof(print), "decoding %d*%d", 
-            jpg.x_size/ds, jpg.y_size/ds);
-        rb->lcd_puts(0, 3, print);
-        rb->lcd_update();
-
-        /* update image properties */
-        disp.width = jpg.x_size/ds;
-        disp.stride = jpg.x_phys / ds; /* use physical size for stride */
-        disp.height = jpg.y_size/ds;
-        disp.x = MAX(0, (disp.width - LCD_WIDTH) / 2); /* center view */
-        disp.y = MAX(0, (disp.height - LCD_HEIGHT) / 2);
-
-        /* the actual decoding */
-        time = *rb->current_tick;
-        status = jpeg_decode(&jpg, disp.bitmap, ds, cb_progess);
-        if (status)
-        {
-            rb->splash(HZ*2, true, "decode error %d", status);
+        p_disp = get_image(&jpg, ds); /* decode or fetch from cache */
+        if (p_disp == NULL)
             return PLUGIN_ERROR;
-        }
-        time = *rb->current_tick - time;
-        rb->snprintf(print, sizeof(print), " %d.%02d sec ", time/HZ, time%HZ);
-        rb->lcd_getstringsize(print, &w, &h); /* centered in progress bar */
-        rb->lcd_putsxy((LCD_WIDTH - w)/2, LCD_HEIGHT - h, print);
+
+        set_view(p_disp, cx, cy);
+
+        rb->snprintf(print, sizeof(print), "showing %d*%d", 
+            p_disp->width, p_disp->height);
+        rb->lcd_puts(0, 3, print);
         rb->lcd_update();
 
         gray_clear_display();
         gray_drawgraymap(
-            disp.bitmap + disp.y * disp.stride + disp.x,
-            MAX(0, (LCD_WIDTH - disp.width) / 2), 
-            MAX(0, (LCD_HEIGHT - disp.height) / 2), 
-            MIN(LCD_WIDTH, disp.width), MIN(LCD_HEIGHT, disp.height), 
-            disp.stride);
+            p_disp->bitmap + p_disp->y * p_disp->stride + p_disp->x,
+            MAX(0, (LCD_WIDTH - p_disp->width) / 2), 
+            MAX(0, (LCD_HEIGHT - p_disp->height) / 2), 
+            MIN(LCD_WIDTH, p_disp->width), 
+            MIN(LCD_HEIGHT, p_disp->height), 
+            p_disp->stride);
 
         gray_show_display(true); /* switch on grayscale overlay */
 
@@ -3343,16 +3434,15 @@ int main(char* filename)
          */
         while (1)
         {
-            status = scroll_bmp(&disp);
+            status = scroll_bmp(p_disp);
             if (status == ZOOM_IN)
             {
                 if (ds > ds_min)
                 {
                     ds /= 2; /* reduce downscaling to zoom in */
-                    /* FixMe: maintain center
-                    disp.x = disp.x * 2 + LCD_WIDTH/2;
-                    disp.y = disp.y * 2 + LCD_HEIGHT/2;
-                    */
+                    get_view(p_disp, &cx, &cy);
+                    cx *= 2; /* prepare the position in the new image */
+                    cy *= 2;
                 }
                 else
                     continue;
@@ -3363,14 +3453,9 @@ int main(char* filename)
                 if (ds < ds_max)
                 {
                     ds *= 2; /* increase downscaling to zoom out */
-                    /* FixMe: maintain center, if possible
-                    disp.x = (disp.x - LCD_WIDTH/2) / 2;
-                    disp.x = MIN(0, disp.x);
-                    disp.x = MAX(disp.width/2 - LCD_WIDTH, disp.x);
-                    disp.y = (disp.y - LCD_HEIGHT/2) / 2;
-                    disp.y = MIN(0, disp.y);
-                    disp.y = MAX(disp.height/2 - LCD_HEIGHT, disp.y);
-                    */
+                    get_view(p_disp, &cx, &cy);
+                    cx /= 2; /* prepare the position in the new image */
+                    cy /= 2;
                 }
                 else
                     continue;
