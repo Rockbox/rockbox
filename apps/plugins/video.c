@@ -238,7 +238,7 @@ void DrawPosition(int pos, int total)
     /* draw a slider over the rest of the line */
     rb->lcd_getstringsize(gPrint, &w, &h);
     w++;
-    rb->scrollbar(w, LCD_HEIGHT-7, LCD_WIDTH-w, 7, 0, total, pos, HORIZONTAL);
+    rb->scrollbar(w, LCD_HEIGHT-7, LCD_WIDTH-w, 7, total, 0, pos, HORIZONTAL);
 
     if (gPlay.state == paused) // we have to draw ourselves
         rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);

@@ -1607,7 +1607,7 @@ int wait_for_button(void)
 void cb_progess(int current, int total)
 {
     rb->yield(); /* be nice to the other threads */
-    rb->scrollbar(0, LCD_HEIGHT-8, LCD_WIDTH, 8, 0, total,
+    rb->scrollbar(0, LCD_HEIGHT-8, LCD_WIDTH, 8, total, 0,
                   current, HORIZONTAL);
     rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
 }
