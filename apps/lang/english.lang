@@ -608,16 +608,6 @@ desc: in wps F3 pressed
 eng: "Bar"
 new:
 
-id: LANG_STATUS_BAR
-desc: display menu, F3 substitute
-eng: "Status Bar"
-new:
-
-id: LANG_SCROLL_BAR
-desc: display menu, F3 substitute
-eng: "Scroll Bar"
-new:
-
 id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
 eng: "End Of List"
@@ -1481,4 +1471,14 @@ new:
 id: LANG_RECORDING_EDITABLE
 desc: Editable recordings setting
 eng: "Editable files"
+new:
+
+id: LANG_STATUS_BAR
+desc: display menu, F3 substitute
+eng: "Status Bar"
+new:
+
+id: LANG_SCROLL_BAR
+desc: display menu, F3 substitute
+eng: "Scroll Bar"
 new:

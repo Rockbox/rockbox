@@ -629,18 +629,6 @@ eng: "bar"
 ### Not previously translated
 new:
 
-id: LANG_STATUS_BAR
-desc: display menu, F3 substitute
-eng: "Status Bar"
-### Not previously translated
-new:
-
-id: LANG_SCROLL_BAR
-desc: display menu, F3 substitute
-eng: "Scroll Bar"
-### Not previously translated
-new:
-
 id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
 eng: "End of list"
@@ -1229,5 +1217,14 @@ desc: sleep timer setting
 eng: "Sleep timer"
 new: "Søvntimer"
 
+id: LANG_STATUS_BAR
+desc: display menu, F3 substitute
+eng: "Status Bar"
+### Not previously translated
+new:
 
-
+id: LANG_SCROLL_BAR
+desc: display menu, F3 substitute
+eng: "Scroll Bar"
+### Not previously translated
+new:

@@ -589,16 +589,6 @@ desc: in wps F3 pressed
 eng: "Bar"
 new: "Barra"
 
-id: LANG_STATUS_BAR
-desc: display menu, F3 substitute
-eng: "Status Bar"
-new: "Estado Barra"
-
-id: LANG_SCROLL_BAR
-desc: display menu, F3 substitute
-eng: "Scroll Bar"
-new: "Desplazamiento Barra"
-
 id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
 eng: "End Of List"
@@ -1438,3 +1428,13 @@ id: LANG_VBRFIX
 desc: The context menu entry
 eng: "Update VBR file"
 new: "Actualizar archivo VBR"
+
+id: LANG_STATUS_BAR
+desc: display menu, F3 substitute
+eng: "Status Bar"
+new: "Estado Barra"
+
+id: LANG_SCROLL_BAR
+desc: display menu, F3 substitute
+eng: "Scroll Bar"
+new: "Desplazamiento Barra"

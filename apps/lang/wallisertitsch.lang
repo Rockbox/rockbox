@@ -594,16 +594,6 @@ desc: in wps F3 pressed
 eng: "bar"
 new: "Liischta"
 
-id: LANG_STATUS_BAR
-desc: display menu, F3 substitute
-eng: "Status Bar"
-new: "Schtatusliischta"
-
-id: LANG_SCROLL_BAR
-desc: display menu, F3 substitute
-eng: "Scroll Bar"
-new: "Scrollliischta"
-
 id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
 eng: "End of list"
@@ -1344,3 +1334,13 @@ id: LANG_FLIPIT_F3
 desc: in the games menu
 eng: "[F3]   step by step"
 new: "[F3]   teilleesig"
+
+id: LANG_STATUS_BAR
+desc: display menu, F3 substitute
+eng: "Status Bar"
+new: "Schtatusliischta"
+
+id: LANG_SCROLL_BAR
+desc: display menu, F3 substitute
+eng: "Scroll Bar"
+new: "Scrollliischta"

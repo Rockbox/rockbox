@@ -583,16 +583,6 @@ desc: in wps F3 pressed
 eng: "Bar"
 new: "Barre"
 
-id: LANG_STATUS_BAR
-desc: display menu, F3 substitute
-eng: "Status Bar"
-new: "Statut Barre"
-
-id: LANG_SCROLL_BAR
-desc: display menu, F3 substitute
-eng: "Scroll Bar"
-new: "Défilement Barre"
-
 id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
 eng: "End Of List"
@@ -1432,3 +1422,13 @@ id: LANG_VBRFIX_NOT_VBR
 desc: Tells the user that the selected file is not a VBR file
 eng: "Not a VBR file"
 new: "Fichier non VBR"
+
+id: LANG_STATUS_BAR
+desc: display menu, F3 substitute
+eng: "Status Bar"
+new: "Statut Barre"
+
+id: LANG_SCROLL_BAR
+desc: display menu, F3 substitute
+eng: "Scroll Bar"
+new: "Défilement Barre"
