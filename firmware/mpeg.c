@@ -1960,6 +1960,18 @@ struct mp3entry* mpeg_current_track()
 #endif /* #ifdef SIMULATOR */
 }
 
+struct mp3entry* mpeg_next_track()
+{
+#ifdef SIMULATOR
+    return &taginfo;
+#else
+    if(num_tracks_in_memory() > 1)
+        return &(id3tags[(tag_read_idx+1) & MAX_ID3_TAGS_MASK]->id3);
+    else
+        return NULL;
+#endif /* #ifdef SIMULATOR */
+}
+
 bool mpeg_has_changed_track(void)
 {
     if(last_track_counter != current_track_counter)

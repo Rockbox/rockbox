@@ -71,6 +71,7 @@ void mpeg_prev(void);
 void mpeg_ff_rewind(int newtime);
 void mpeg_flush_and_reload_tracks(void);
 struct mp3entry* mpeg_current_track(void);
+struct mp3entry* mpeg_next_track(void);
 bool mpeg_has_changed_track(void);
 int mpeg_status(void);
 #if defined(HAVE_MAS3587F) || defined(SIMULATOR)
