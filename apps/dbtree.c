@@ -135,6 +135,7 @@ int db_load(struct tree_context* c, bool* dir_buffer_full)
 
     if (!initialized) {
         DEBUGF("ID3 database is not initialized.\n");
+        c->filesindir = 0;
         return 0;
     }
     
