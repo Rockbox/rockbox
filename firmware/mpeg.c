@@ -2157,6 +2157,12 @@ static void init_recording(void)
     shadow_7f1 = 0x525;
     mas_writemem(MAS_BANK_D0, 0x7f1, &shadow_7f1, 1);
 
+    /* Wait until the DSP has accepted the settings */
+    do
+    {
+        mas_readmem(MAS_BANK_D0, 0x7f1, &val,1);
+    } while(val & 1);
+
     drain_dma_buffer();
 #endif
     mpeg_mode = MPEG_ENCODER;
