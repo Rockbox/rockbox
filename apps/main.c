@@ -64,7 +64,7 @@ void init(void)
 extern int poolstart[];
 extern int poolend[];
 
-int init(void)
+void init(void)
 {
     int rc;
     struct partinfo* pinfo;
@@ -97,8 +97,6 @@ int init(void)
 
     button_init();
     mpeg_init();
-
-    return 0;
 }
 
 int main(void)
