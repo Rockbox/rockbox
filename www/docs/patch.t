@@ -55,6 +55,7 @@ of the list itself.
 <p>
  Applying a 'patch' (output from diff -u) is done with the 'patch' tool:
 <pre>
+  cd to/source/root
   patch < patchfile
 </pre>
 <p>
