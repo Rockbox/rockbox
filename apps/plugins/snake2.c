@@ -898,14 +898,14 @@ void game (void)
 
 void game_init(void) 
 {
+    int button;
     char plevel[30];
     char phscore[30];
 
     dead=0;
     apple=0;
     score=0;
-    int button;
-    
+
     clear_board();
     load_level( level_from_file );
     
