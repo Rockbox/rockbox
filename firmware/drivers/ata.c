@@ -35,7 +35,11 @@
 #define ATA_SELECT      (*((volatile unsigned char*)0x06100106))
 #define ATA_COMMAND     (*((volatile unsigned char*)0x06100107))
 #define ATA_STATUS      (*((volatile unsigned char*)0x06100107))
-#define ATA_CONTROL     (*((volatile unsigned char*)0x06200206))
+
+#define ATA_CONTROL1    ((volatile unsigned char*)0x06200206)
+#define ATA_CONTROL2    ((volatile unsigned char*)0x06200306)
+
+#define ATA_CONTROL     (*ata_control)
 #define ATA_ALT_STATUS  ATA_CONTROL
 
 #define SELECT_DEVICE1  0x10
@@ -58,6 +62,8 @@
 
 static struct mutex ata_mtx;
 static char device; /* device 0 (master) or 1 (slave) */
+
+static volatile unsigned char* ata_control;
 
 static int wait_for_bsy(void)
 {
@@ -299,7 +305,7 @@ int ata_soft_reset(void)
     return ret;
 }
 
-static int master_slave(void)
+static int master_slave_detect(void)
 {
     /* master? */
     ATA_SELECT = 0;
@@ -320,6 +326,41 @@ static int master_slave(void)
     return 0;
 }
 
+static int io_address_detect(void)
+{
+    unsigned char tmp = ATA_STATUS;
+    unsigned char dummy;
+    
+    /* We compare the STATUS register with the ALT_STATUS register, which
+       is located at the same address as CONTROL. If they are the same, we
+       assume that we have the correct address.
+
+       We can't read the ATA_STATUS directly, since the read data will stay
+       on the data bus if the following read does not assert the Chip Select
+       to the ATA controller. We read a register that we know exists to make
+       sure that the data on the bus isn't identical to the STATUS register
+       contents. */
+    dummy = ATA_SECTOR;
+    if(tmp == *ATA_CONTROL2)
+    {
+        DEBUGF("CONTROL is at 0x306\n");
+        ata_control = ATA_CONTROL2;
+    }
+    else
+    {
+        DEBUGF("CONTROL is at 0x206\n");
+        ata_control = ATA_CONTROL1;
+    }
+
+    /* Let's check again, to be sure */
+    if(tmp != ATA_CONTROL)
+    {
+        DEBUGF("ATA I/O address detection failed\n");
+        return -1;
+    }
+    return 0;
+}
+
 int ata_init(void)
 {
     mutex_init(&ata_mtx);
@@ -329,8 +370,11 @@ int ata_init(void)
     PADR |= 0x800; /* disable USB */
     PADR &= ~0x80; /* activate ATA */
 
-    if (master_slave())
+    if (master_slave_detect())
         return -1;
+
+    if (io_address_detect())
+        return -2;
 
     if (check_registers())
         return -3;
