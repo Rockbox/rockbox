@@ -1091,6 +1091,9 @@ void mpeg_next(void)
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_NEXT, NULL);
 #else
+    char* file = playlist_next(1);
+    mp3info(&taginfo, file);
+    current_track_counter++;
     playing = true;
 #endif
 }
@@ -1100,6 +1103,9 @@ void mpeg_prev(void)
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_PREV, NULL);
 #else
+    char* file = playlist_next(-1);
+    mp3info(&taginfo, file);
+    current_track_counter--;
     playing = true;
 #endif
 }
