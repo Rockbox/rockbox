@@ -26,13 +26,15 @@
 #define BATTERY_LEVEL_FULL       400 /* 4.00V */
 #define BATTERY_CAPACITY_MIN 2200
 #define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable in settings */
-#elif CONFIG_BATTERY == BATT_3AAA_ALKALINE /* Ondio, Alkalines */
+#define BATTERY_TYPES_COUNT      1
+#elif CONFIG_BATTERY == BATT_3AAA /* Ondio */
 #define BATTERY_LEVEL_SHUTDOWN   260 /* 2.60V */
 #define BATTERY_LEVEL_EMPTY      270 /* 2.70V */
 #define BATTERY_LEVEL_DANGEROUS  280 /* 2.80V */
-#define BATTERY_LEVEL_FULL       450 /* 4.50V */
+#define BATTERY_LEVEL_FULL       475 /* 4.75V */
 #define BATTERY_CAPACITY_MIN 500
 #define BATTERY_CAPACITY_MAX 1500 /* max. capacity selectable in settings */
+#define BATTERY_TYPES_COUNT      2   /* Alkalines or NiMH */
 #else /* Recorder, NiMH */
 #define BATTERY_LEVEL_SHUTDOWN   450 /* 4.50V */
 #define BATTERY_LEVEL_EMPTY      465 /* 4.65V */
@@ -40,6 +42,7 @@
 #define BATTERY_LEVEL_FULL       585 /* 5.85V */
 #define BATTERY_CAPACITY_MIN 1500
 #define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable in settings */
+#define BATTERY_TYPES_COUNT      1
 #endif
 
 #define BATTERY_RANGE (BATTERY_LEVEL_FULL - BATTERY_LEVEL_EMPTY)
@@ -111,6 +114,7 @@ bool battery_level_safe(void);
 
 void set_poweroff_timeout(int timeout);
 void set_battery_capacity(int capacity); /* set local battery capacity value */
+void set_battery_type(int type); /* set local battery type */
 
 void set_sleep_timer(int seconds);
 int get_sleep_timer(void);

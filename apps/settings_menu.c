@@ -707,6 +707,19 @@ static bool battery_capacity(void)
                    &set_battery_capacity, 50, BATTERY_CAPACITY_MIN,
                    BATTERY_CAPACITY_MAX );
 }
+
+#if BATTERY_TYPES_COUNT > 1
+static bool battery_type(void)
+{
+    static const struct opt_items names[] = {
+        { STR(LANG_BATTERY_TYPE_ALKALINE) },
+        { STR(LANG_BATTERY_TYPE_NIMH) }
+    };
+
+    return set_option(str(LANG_BATTERY_TYPE), &global_settings.battery_type,
+                      INT, names, 2, set_battery_type);
+}
+#endif
 #endif
 
 #ifdef HAVE_CHARGE_CTRL
@@ -1250,6 +1263,9 @@ static bool battery_settings_menu(void)
 #endif
 #ifndef SIMULATOR
         { ID2P(LANG_BATTERY_CAPACITY), battery_capacity },
+#if BATTERY_TYPES_COUNT > 1
+        { ID2P(LANG_BATTERY_TYPE),     battery_type },
+#endif
 #else
 #ifndef HAVE_CHARGE_CTRL
         { "Dummy", NULL }, /* to have an entry at all, in the simulator */

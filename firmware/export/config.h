@@ -45,9 +45,9 @@
 #define GMINI100_PAD    4
 
 /* CONFIG_BATTERY */
-#define BATT_LIION2200      2200 /* FM/V2 recorder type */
-#define BATT_4AA_NIMH       1500
-#define BATT_3AAA_ALKALINE  1000
+#define BATT_LIION2200  2200 /* FM/V2 recorder type */
+#define BATT_4AA_NIMH   1500
+#define BATT_3AAA       1000 /* Ondio */
 
 /* CONFIG_LCD */
 #define LCD_GMINI100 0

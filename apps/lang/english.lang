@@ -2925,3 +2925,21 @@ desc: ID3 virtual folder name
 eng: "Found %d matches"
 voice: ""
 new:
+
+id: LANG_BATTERY_TYPE
+desc: in battery settings
+eng: "Battery type"
+voice: "Battery type"
+new:
+
+id: LANG_BATTERY_TYPE_ALKALINE
+desc: in battery settings
+eng: "Alkaline"
+voice: "Alkaline"
+new:
+
+id: LANG_BATTERY_TYPE_NIMH
+desc: in battery settings
+eng: "NiMH"
+voice: "Nickel metal hydride"
+new:

@@ -26,7 +26,7 @@
 #define CONFIG_I2C I2C_ONDIO
 
 /* Type of mobile power */
-#define CONFIG_BATTERY BATT_3AAA_ALKALINE
+#define CONFIG_BATTERY BATT_3AAA
 
 /* Battery scale factor (average from 3 Ondios) */
 #define BATTERY_SCALE_FACTOR 4735

@@ -235,6 +235,10 @@ static const struct bit_entry rtc_bits[] =
     /* new stuff to be added here */
     /* If values are just added to the end, no need to bump the version. */
 
+#if BATTERY_TYPES_COUNT > 1
+    {1, S_O(battery_type), 0, "battery type", "alkaline,nimh" },
+#endif
+
     /* Current sum of bits: 259 (worst case) */
     /* Sum of all bit sizes must not grow beyond 288! */
 };
@@ -759,6 +763,9 @@ void settings_apply(void)
 #endif
 
     set_battery_capacity(global_settings.battery_capacity);
+#if BATTERY_TYPES_COUNT > 1
+    set_battery_type(global_settings.battery_type);
+#endif
 
 #ifdef HAVE_LCD_BITMAP
     lcd_set_invert_display(global_settings.invert);

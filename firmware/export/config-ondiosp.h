@@ -20,7 +20,7 @@
 #define CPU_FREQ      12000000
 
 /* Type of mobile power */
-#define CONFIG_BATTERY BATT_3AAA_ALKALINE
+#define CONFIG_BATTERY BATT_3AAA
 
 /* Battery scale factor (average from 3 Ondios) */
 #define BATTERY_SCALE_FACTOR 4735

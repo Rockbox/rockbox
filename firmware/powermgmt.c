@@ -89,20 +89,21 @@ static const int poweroff_idle_timeout_value[15] =
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 30, 45, 60
 };
 
-static const int percent_to_volt_decharge[11] =
+static const short percent_to_volt_decharge[BATTERY_TYPES_COUNT][11] =
 /* voltages (centivolt) of 0%, 10%, ... 100% when charging disabled */
 {
 #if CONFIG_BATTERY == BATT_LIION2200
     /* measured values */
-    260, 285, 295, 303, 311, 320, 330, 345, 360, 380, 400
-#elif CONFIG_BATTERY == BATT_3AAA_ALKALINE
-    /* taken from a textbook alkaline discharge graph, not measured */
-    270, 303, 324, 336, 348, 357, 366, 378, 390, 408, 450
+    { 260, 285, 295, 303, 311, 320, 330, 345, 360, 380, 400 }
+#elif CONFIG_BATTERY == BATT_3AAA
+    /* measured values */
+    { 280, 325, 341, 353, 364, 374, 385, 395, 409, 427, 475 }, /* alkaline */
+    { 310, 355, 363, 369, 372, 374, 376, 378, 380, 386, 405 }  /* NiMH */
 #else /* NiMH */
     /* original values were taken directly after charging, but it should show
        100% after turning off the device for some hours, too */
-    450, 481, 491, 497, 503, 507, 512, 514, 517, 525, 540 /* orig. values:
-                                                             ...,528,560 */
+    { 450, 481, 491, 497, 503, 507, 512, 514, 517, 525, 540 } 
+                                            /* orig. values: ...,528,560 */
 #endif
 };
 
@@ -114,6 +115,16 @@ void set_battery_capacity(int capacity)
     if (battery_capacity < BATTERY_CAPACITY_MIN)
         battery_capacity = BATTERY_CAPACITY_MIN;
 }
+
+#if BATTERY_TYPES_COUNT > 1
+static int battery_type = 0;
+
+void set_battery_type(int type)
+{
+    battery_type = type;
+    battery_level_cached = -1; /* reset on type change */
+}
+#endif
 
 #if defined(HAVE_CHARGE_CTRL) || CONFIG_BATTERY == BATT_LIION2200
 int charge_state = 0;                          /* at the beginning, the
@@ -136,7 +147,7 @@ int trickle_sec = 0;                           /* how many seconds should the
                                                   charger be enabled per
                                                   minute for trickle
                                                   charging? */
-static const int percent_to_volt_charge[11] = 
+static const short percent_to_volt_charge[11] =
 /* voltages (centivolt) of 0%, 10%, ... 100% when charging enabled */
 {
     /* values guessed, see
@@ -170,7 +181,7 @@ int battery_time(void)
 
 /* look into the percent_to_volt_* table and get a realistic battery level
        percentage */
-int voltage_to_percent(int voltage, const int* table)
+int voltage_to_percent(int voltage, const short* table)
 {
     if (voltage <= table[0])
         return 0;
@@ -195,6 +206,9 @@ void battery_level_update(void)
     int level = 0;
     int c = 0;
     int i;
+#if BATTERY_TYPES_COUNT == 1 /* single type */
+    const int battery_type = 0;
+#endif
     
     /* calculate maximum over last 3 minutes (skip empty samples) */
     for (i = 0; i < 3; i++)
@@ -214,7 +228,8 @@ void battery_level_update(void)
 
 #ifdef HAVE_CHARGE_CTRL
     if (charge_state == 0) { /* decharge */
-        level = voltage_to_percent(level, percent_to_volt_decharge);
+        level = voltage_to_percent(level, 
+                percent_to_volt_decharge[battery_type]);
     }
     else if (charge_state == 1) { /* charge */
         level = voltage_to_percent(level, percent_to_volt_charge);
@@ -223,7 +238,8 @@ void battery_level_update(void)
         battery_level_cached = level = 100;
     }
 #else
-    level = voltage_to_percent(level, percent_to_volt_decharge);
+    level = voltage_to_percent(level,
+            percent_to_volt_decharge[battery_type]);
     /* always use the decharge table */
 #endif
 

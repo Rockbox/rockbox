@@ -185,6 +185,7 @@ struct user_settings
     bool discharge; /* maintain charge of at least: false = 85%, true = 10%  */
     bool trickle_charge; /* do trickle charging: 0=off, 1=on */
     int battery_capacity; /* in mAh */
+    int battery_type;  /* for units which can take multiple types (Ondio). */
 
     /* resume settings */
 
