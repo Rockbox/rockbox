@@ -45,8 +45,9 @@ bool charger_inserted(void)
     return adc_read(ADC_EXT_POWER) > 0x100;
 #else
 #ifdef HAVE_FMADC
-    /* FM */
-    return adc_read(ADC_CHARGE_REGULATOR) < 0x1FF;
+    /* FM or V2, can also charge from the USB port */
+    return (adc_read(ADC_CHARGE_REGULATOR) < 0x1FF) ||
+        (adc_read(ADC_USB_POWER) < 0x1FF);
 #else
     /* Player */
     return (PADR & 1) == 0;

@@ -137,7 +137,7 @@ void status_draw(bool force_redraw)
         if (info.inserted) {
             battery_state = true;
             plug_state = true;
-#ifdef HAVE_CHARGE_CTRL
+#if defined(HAVE_CHARGE_CTRL) || defined(HAVE_LIION)
             /* zero battery run time if charging */
             if (charge_state > 0) {
                 global_settings.runtime = 0;

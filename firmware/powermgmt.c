@@ -105,6 +105,11 @@ void set_battery_capacity(int capacity)
         battery_capacity = 1500;
 }
 
+#if defined(HAVE_CHARGE_CTRL) || defined(HAVE_LIION)
+int charge_state = 0;                          /* at the beginning, the
+                                                  charger does nothing */
+#endif
+
 #ifdef HAVE_CHARGE_CTRL
 
 char power_message[POWER_MESSAGE_LEN] = "";    /* message that's shown in
@@ -121,9 +126,6 @@ int trickle_sec = 0;                           /* how many seconds should the
                                                   charger be enabled per
                                                   minute for trickle
                                                   charging? */
-int charge_state = 0;                          /* at the beginning, the
-                                                  charger does nothing */
-
 static int percent_to_volt_charge[11] = /* voltages (centivolt) of 0%, 10%,
                                            ... 100% when charging enabled */
 {
@@ -428,6 +430,9 @@ static void power_thread(void)
     int i;
     int avg, ok_samples, spin_samples;
     int current = 0;
+#ifdef HAVE_LIION
+    int charging_current;
+#endif
 #ifdef HAVE_CHARGE_CTRL
     int delta;
     int charged_time = 0;
@@ -517,6 +522,24 @@ static void power_thread(void)
 #endif /* MEM == 8 */
 #endif /* HAVE_CHARGE_CONTROL */
 
+#ifdef HAVE_LIION
+        /* We use the information from the ADC_EXT_POWER ADC channel, which
+           tells us the charging current from the LTC1734. When DC is
+           connected (either via the external adapter, or via USB), we try
+           to determine if it is actively charging or only maintaining the
+           charge. My tests show that ADC readings is below about 0x80 means
+           that the LTC1734 is only maintaining the charge. */
+        if(charger_inserted()) {
+            charging_current = adc_read(ADC_EXT_POWER);
+            if(charging_current < 0x80) {
+                charge_state = 2; /* Trickle */
+            } else {
+                charge_state = 1; /* Charging */
+            }
+        } else {
+            charge_state = 0; /* Not charging */
+        }
+#else
 #ifdef HAVE_CHARGE_CTRL
 
         if (charge_pause > 0)
@@ -754,6 +777,7 @@ static void power_thread(void)
         powermgmt_last_cycle_startstop_min++;
         
 #endif /* HAVE_CHARGE_CTRL*/
+#endif /* HAVE_LIION */
         
         /* sleep for roughly a minute */
 #ifdef HAVE_CHARGE_CTRL
