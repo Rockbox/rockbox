@@ -38,7 +38,7 @@ with .mp3 or .m3u will be displayed in the browser.
 <p>
 Buttons:
 <p>
-<table>
+<table class=listtable>
 <tr>
 <td> UP </td>
 <td>
@@ -93,6 +93,8 @@ Buttons:
 </td></tr>
 <tr><td>
  F3
+</td><td>
+ Toggles status bar on/off
 </td></tr>
 </table>
 

@@ -11,7 +11,7 @@ If you have enabled 'mp3/m3u filter' in the global settings, only files ending
 with .mp3 or .m3u will be displayed in the browser.
 <p>
 Buttons:
-<table>
+<table class=listtable>
 <tr><td>-</td><td>
       Move upwards in the list, if it already is on the topmost entry, you'll
       see the cursor moved to the last entry in the list.
