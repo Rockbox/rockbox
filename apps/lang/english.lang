@@ -1467,3 +1467,8 @@ id: LANG_INVERT_CURSOR
 desc: in settings_menu
 eng: "Invert cursor"
 new:
+
+id: LANG_RECORDING_EDITABLE
+desc: Editable recordings setting
+eng: "Editable files"
+new:

@@ -74,6 +74,7 @@ struct user_settings
     int rec_mic_gain; /* 0-15 */
     int rec_left_gain; /* 0-15 */
     int rec_right_gain; /* 0-15 */
+    bool rec_editable; /* true means that the bit reservoir is off */
     
     /* device settings */
 

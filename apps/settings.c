@@ -96,8 +96,8 @@ offset  abs
 0x16    0x2a    <(int) Byte offset into resume file>
 0x1a    0x2e    <time until disk spindown>
 0x1b    0x2f    <browse current, play selected, queue_resume>
-0x1c    0x30    <peak meter hold timeout (bit 0-4)>, 
-                 peak_meter_performance (bit 7)
+0x1c    0x30    <peak meter hold timeout (bit 0-4),
+                 rec_editable (bit 7)>
 0x1d    0x31    <(int) queue resume index>
 0x21    0x35    <repeat mode (bit 0-1), rec. channels (bit 2),
                  mic gain (bit 4-7)>
@@ -125,7 +125,7 @@ modified unless the header & checksum test fails.
 
 Rest of config block, only saved to disk:
 0xAE  fade on pause/unpause/stop setting (bit 0)
-0xB0  peak meter clip hold timeout (bit 0-4)
+0xB0  peak meter clip hold timeout (bit 0-4), peak meter performance (bit 7)
 0xB1  peak meter release step size, peak_meter_dbfs (bit 7)
 0xB2  peak meter min either in -db or in percent
 0xB3  peak meter max either in -db or in percent
@@ -341,7 +341,8 @@ int settings_save( void )
          ((global_settings.play_selected & 1) << 1) |
          ((global_settings.queue_resume & 3) << 2));
     
-    config_block[0x1c] = (unsigned char)global_settings.peak_meter_hold;
+    config_block[0x1c] = (unsigned char)global_settings.peak_meter_hold |
+        (global_settings.rec_editable?0x80:0);
 
     memcpy(&config_block[0x1d], &global_settings.queue_resume_index, 4);
 
@@ -617,8 +618,11 @@ void settings_load(void)
             global_settings.queue_resume = (config_block[0x1b] >> 2) & 3;
         }
 
-        if (config_block[0x1c] != 0xFF)
+        if (config_block[0x1c] != 0xFF) {
             global_settings.peak_meter_hold = (config_block[0x1c]) & 0x1f;
+            global_settings.rec_editable =
+                config_block[0x1c]?true:false;
+        }
 
         if (config_block[0x1d] != 0xFF)
             memcpy(&global_settings.queue_resume_index, &config_block[0x1d],
@@ -1029,6 +1033,9 @@ bool settings_load_config(char* file)
             static char* options[] = {"stereo", "mono"};
             set_cfg_option(&global_settings.rec_channels, value, options, 2);
         }
+        else if (!strcasecmp(name, "editable recordings")) {
+            set_cfg_bool(&global_settings.rec_editable, value);
+        }
 #endif
         else if (!strcasecmp(name, "idle poweroff")) {
             static char* options[] = {"off","1","2","3","4","5","6","7","8",
@@ -1434,6 +1441,14 @@ bool settings_save_config(void)
              global_settings.rec_left_gain,
              global_settings.rec_right_gain);
     write(fd, buf, strlen(buf));
+
+    {
+        static char* options[] = {"off", "on"};
+        snprintf(buf, sizeof(buf), "editable recordings: %s\r\n",
+                 options[global_settings.rec_editable]);
+        write(fd, buf, strlen(buf));
+    }
+
 #endif
     close(fd);
 
@@ -1467,6 +1482,7 @@ void settings_reset(void) {
     global_settings.rec_mic_gain = 8;
     global_settings.rec_left_gain = 2; /* 0dB */
     global_settings.rec_right_gain = 2; /* 0dB */
+    global_settings.rec_editable = false;
     global_settings.resume      = RESUME_ASK;
     global_settings.contrast    = DEFAULT_CONTRAST_SETTING;
     global_settings.invert      = DEFAULT_INVERT_SETTING;

@@ -1266,6 +1266,7 @@ static void mpeg_thread(void)
     int amount_to_save;
     int writelen;
     int framelen;
+    unsigned long saved_header;
 #endif
     
     is_playing = false;
@@ -1840,10 +1841,10 @@ static void mpeg_thread(void)
                     DEBUGF("Recording...\n");
                     reset_mp3_buffer();
 
-                    /* Advance the write pointer 4096+1500 bytes to make
+                    /* Advance the write pointer to make
                        room for an ID3 tag plus a VBR header */
-                    mp3buf_write = 4096+1500;
-                    memset(mp3buf, 0, 4096+1500);
+                    mp3buf_write = MPEG_RESERVED_HEADER_SPACE;
+                    memset(mp3buf, 0, MPEG_RESERVED_HEADER_SPACE);
 
                     /* Insert the ID3 header */
                     memcpy(mp3buf, empty_id3_header, sizeof(empty_id3_header));
@@ -1883,14 +1884,17 @@ static void mpeg_thread(void)
                        we can no longer trust it */
                     if(num_recorded_frames == 0x7ffff)
                         num_recorded_frames = 0;
+
+                    /* Read the first MP3 frame from the recorded stream */
+                    lseek(mpeg_file, MPEG_RESERVED_HEADER_SPACE, SEEK_SET);
+                    read(mpeg_file, &saved_header, 4);
                     
                     framelen = create_xing_header(mpeg_file, 0, num_rec_bytes,
                                                   mp3buf, num_recorded_frames,
-                                                  rec_version_index,
-                                                  rec_frequency_index,
-                                                  NULL, false);
+                                                  saved_header, NULL, false);
                     
-                    lseek(mpeg_file, 4096+1500-framelen, SEEK_SET);
+                    lseek(mpeg_file, MPEG_RESERVED_HEADER_SPACE-framelen,
+                          SEEK_SET);
                     write(mpeg_file, mp3buf, framelen);
                     close(mpeg_file);
                     
@@ -2823,7 +2827,8 @@ void mpeg_set_pitch(int pitch)
 
 #ifdef HAVE_MAS3587F
 void mpeg_set_recording_options(int frequency, int quality,
-                                int source, int channel_mode)
+                                int source, int channel_mode,
+                                bool editable)
 {
     bool is_mpeg1;
     unsigned long val;
@@ -2843,6 +2848,11 @@ void mpeg_set_recording_options(int frequency, int quality,
     mas_writemem(MAS_BANK_D0, 0x7f0, &val,1);
 
     DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f0, %x)\n", val);
+
+    val = editable?4:0;
+    mas_writemem(MAS_BANK_D0, 0x7f9, &val,1);
+
+    DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f9, %x)\n", val);
 
     val = ((!is_recording << 10) | /* Monitoring */
         ((source < 2)?1:2) << 8) | /* Input select */

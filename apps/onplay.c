@@ -251,11 +251,11 @@ static bool vbr_fix(void)
                                   flen, xingupdate);
 
     if(num_frames) {
-        /* Note: We don't need to pass any values for mpeg_version and
-           sample_rate because they will be extracted from the mpeg stream */
+        /* Note: We don't need to pass a template header because it will be
+           taken from the mpeg stream */
         framelen = create_xing_header(fd, entry.first_frame_offset,
                                       flen, xingbuf, num_frames,
-                                      0, 0, xingupdate, true);
+                                      0, xingupdate, true);
         
         /* Try to fit the Xing header first in the stream. Replace the existing
            VBR header if there is one, else see if there is room between the

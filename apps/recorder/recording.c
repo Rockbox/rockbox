@@ -169,7 +169,8 @@ bool recording_screen(void)
     mpeg_set_recording_options(global_settings.rec_frequency,
                                global_settings.rec_quality,
                                global_settings.rec_source,
-                               global_settings.rec_channels);
+                               global_settings.rec_channels,
+                               global_settings.rec_editable);
 
     set_gain();
 
@@ -312,22 +313,29 @@ bool recording_screen(void)
                 mpeg_set_recording_options(global_settings.rec_frequency,
                                            global_settings.rec_quality,
                                            global_settings.rec_source,
-                                           global_settings.rec_channels);
+                                           global_settings.rec_channels,
+                                           global_settings.rec_editable);
                 
                 set_gain();
                 update_countdown = 1; /* Update immediately */
                 break;
 
             case BUTTON_F2:
-                if (f2_rec_screen())
-                    return SYS_USB_CONNECTED;
-                update_countdown = 1; /* Update immediately */
+                if(mpeg_status())
+                {
+                    if (f2_rec_screen())
+                        return SYS_USB_CONNECTED;
+                    update_countdown = 1; /* Update immediately */
+                }
                 break;
 
             case BUTTON_F3:
-                if (f3_rec_screen())
-                    return SYS_USB_CONNECTED;
-                update_countdown = 1; /* Update immediately */
+                if(mpeg_status())
+                {
+                    if (f3_rec_screen())
+                        return SYS_USB_CONNECTED;
+                    update_countdown = 1; /* Update immediately */
+                }
                 break;
 
         }
@@ -537,7 +545,8 @@ bool f2_rec_screen(void)
     mpeg_set_recording_options(global_settings.rec_frequency,
                                global_settings.rec_quality,
                                global_settings.rec_source,
-                               global_settings.rec_channels);
+                               global_settings.rec_channels,
+                               global_settings.rec_editable);
 
     set_gain();
     
@@ -621,7 +630,8 @@ bool f3_rec_screen(void)
     mpeg_set_recording_options(global_settings.rec_frequency,
                                global_settings.rec_quality,
                                global_settings.rec_source,
-                               global_settings.rec_channels);
+                               global_settings.rec_channels,
+                               global_settings.rec_editable);
 
     set_gain();
     

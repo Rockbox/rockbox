@@ -32,6 +32,9 @@
 #define MPEG_PLAY_PENDING_THRESHOLD 0x10000
 #define MPEG_PLAY_PENDING_SWAPSIZE 0x10000
 
+/* For ID3 info and VBR header */
+#define MPEG_RESERVED_HEADER_SPACE (4096 + 1500)
+
 struct mpeg_debug
 {
         int mp3buflen;
@@ -84,7 +87,8 @@ void mpeg_init_recording(void);
 void mpeg_init_playback(void);
 void mpeg_record(char *filename);
 void mpeg_set_recording_options(int frequency, int quality,
-                                int source, int channel_mode);
+                                int source, int channel_mode,
+                                bool editable);
 void mpeg_set_recording_gain(int left, int right, int mic);
 unsigned long mpeg_recorded_time(void);
 unsigned long mpeg_num_recorded_bytes(void);

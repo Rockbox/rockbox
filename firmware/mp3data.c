@@ -530,14 +530,6 @@ int get_mp3file_info(int fd, struct mp3info *info)
     return bytecount;
 }
 
-/* This is an MP3 header, 128kbit/s, with silence
-   MPEG version and sample frequency are not set */
-static const unsigned char xing_frame_header[] = {
-    0xff, 0xe2, 0x90, 0x64, 0x86, 0x1f
-};
-
-static const char cooltext[] = "Rockbox rocks";
-
 static void int2bytes(unsigned char *buf, int val)
 {
     buf[0] = (val >> 24) & 0xff;
@@ -602,55 +594,30 @@ int count_mp3_frames(int fd, int startpos, int filesize,
     }
 }
 
-/* Note: mpeg_version and sample_rate are 2-bit values, as specified by the
-   MPEG frame standard. See the tables above. */
+static const char cooltext[] = "Rockbox - rocks your box";
+
 int create_xing_header(int fd, int startpos, int filesize,
                        unsigned char *buf, int num_frames,
-                       int mpeg_version, int sample_rate,
+                       unsigned long header_template,
                        void (*progressfunc)(int), bool generate_toc)
 {
     unsigned long header = 0;
-    unsigned long saved_header = 0;
     struct mp3info info;
     int pos, last_pos;
     int i, j;
     int bytes;
     int filepos;
-    int tocentry;
     int x;
     int index;
+    unsigned char toc[100];
 
     DEBUGF("create_xing_header()\n");
     
-    /* Create the frame header */
-    memset(buf, 0, 1500);
-    memcpy(buf, xing_frame_header, 6);
-
-    lseek(fd, startpos, SEEK_SET);
-    buf_init();
-    
-    buf[36] = 'X';
-    buf[36+1] = 'i';
-    buf[36+2] = 'n';
-    buf[36+3] = 'g';
-    int2bytes(&buf[36+4], ((num_frames?VBR_FRAMES_FLAG:0) |
-                           (filesize?VBR_BYTES_FLAG:0) |
-                           (generate_toc?VBR_TOC_FLAG:0)));
-    index = 36+8;
-    if(num_frames)
-    {
-        int2bytes(&buf[index], num_frames);
-        index += 4;
-    }
-
-    if(filesize)
-    {
-        int2bytes(&buf[index], filesize - startpos);
-        index += 4;
-    }
-
     if(generate_toc)
     {
+        lseek(fd, startpos, SEEK_SET);
+        buf_init();
+    
         /* Generate filepos table */
         last_pos = 0;
         filepos = 0;
@@ -670,48 +637,90 @@ int create_xing_header(int fd, int startpos, int filesize,
                 filepos += info.frame_size;
             }
 
-            /* Save one header for later use */
+            /* Save a header for later use. Yes, we may be passed a header
+               template in the header_template argument, but since we are
+               reading headers from the stream anyway, we might as well
+               use the ones we find. However, we only save one header, and
+               we want to save one in te middle of the stream, just in case
+               the first and the last headers are corrupt. */
             if(i == 1)
-                saved_header = header;
+                header_template = header;
             
             if(progressfunc)
             {
                 progressfunc(50 + i/2);
             }
             
-            tocentry = filepos * 256 / filesize;
+            /* Fill in the TOC entry */
+            toc[i] = filepos * 256 / filesize;
             
             DEBUGF("Pos %d: %d  relpos: %d  filepos: %x tocentry: %x\n",
-                   i, pos, pos-last_pos, filepos, tocentry);
-            
-            /* Fill in the TOC entry */
-            buf[index + i] = tocentry;
+                   i, pos, pos-last_pos, filepos, toc[i]);
             
             last_pos = pos;
         }
+    }
 
-        /* Copy the MPEG version and sample rate from the mpeg stream into
-           the Xing header */
-        saved_header &= (VERSION_MASK | SAMPLERATE_MASK);
-    
-        buf[1] |= (saved_header >> 16) & 0xff;
-        buf[2] |= (saved_header >> 8) & 0xff;
+    /* Clear the frame */
+    memset(buf, 0, 1500);
+
+    /* Use the template header and create a new one */
+    mp3headerinfo(&info, header_template);
+
+    /* calculate position of VBR header */
+    if ( info.version == MPEG_VERSION1 ) {
+        if (info.channel_mode == 3) /* mono */
+            index = 21;
+        else
+            index = 36;
     }
-    else
+    else {
+        if (info.channel_mode == 3) /* mono */
+            index = 13;
+        else
+            index = 21;
+    }
+
+    /* We ignore the Protection bit even if the rest of the stream is
+       protected. (fixme?) */
+    header = header_template & ~(BITRATE_MASK | PROTECTION_MASK);
+    header |= 8 << 12; /* This gives us plenty of space, at least 192 bytes */
+
+    /* Write the header to the buffer */
+    int2bytes(buf, header);
+    
+    /* Now get the length of the newly created frame */
+    mp3headerinfo(&info, header);
+
+    /* Create the Xing data */
+    buf[index] = 'X';
+    buf[index+1] = 'i';
+    buf[index+2] = 'n';
+    buf[index+3] = 'g';
+    int2bytes(&buf[index+4], ((num_frames?VBR_FRAMES_FLAG:0) |
+                              (filesize?VBR_BYTES_FLAG:0) |
+                              (generate_toc?VBR_TOC_FLAG:0)));
+    index = index+8;
+    if(num_frames)
     {
-        /* Fill in the MPEG version and sample rate into the Xing header */
-        buf[1] |= mpeg_version << 3;
-        buf[2] |= sample_rate << 2;
+        int2bytes(&buf[index], num_frames);
+        index += 4;
     }
-    
+
+    if(filesize)
+    {
+        int2bytes(&buf[index], filesize - startpos);
+        index += 4;
+    }
+
+    /* Copy the TOC */
+    memcpy(buf + index, toc, 100);
+
+    /* And some extra cool info */
     memcpy(buf + index + 100, cooltext, sizeof(cooltext));
 
-    /* Now get the length of the newly created frame */
-    header = BYTES2INT(buf[0], buf[1], buf[2], buf[3]);
-    mp3headerinfo(&info, header);
-    
 #ifdef DEBUG
-    for(i = 0;i < 417;i++)
+    for(i = 0;i < info.framesize;i++)
     {
         if(i && !(i % 16))
             DEBUGF("\n");

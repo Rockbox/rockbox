@@ -219,6 +219,12 @@ static bool recquality(void)
                    &global_settings.rec_quality, 
                    NULL, 1, 0, 7 );
 }
+
+static bool receditable(void)
+{
+    return set_bool(str(LANG_RECORDING_EDITABLE),
+                    &global_settings.rec_editable);
+}
 #endif /* HAVE_MAS3587F */
 
 static void set_chanconf(int val)
@@ -275,6 +281,7 @@ bool recording_menu(void)
         { str(LANG_RECORDING_FREQUENCY), recfrequency },
         { str(LANG_RECORDING_SOURCE), recsource },
         { str(LANG_RECORDING_CHANNELS), recchannels },
+        { str(LANG_RECORDING_EDITABLE), receditable },
     };
     
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
