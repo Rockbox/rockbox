@@ -913,7 +913,7 @@ void sokoban_loop(void) {
                     lcd_putsxy(10, 20, "YOU WIN!!", 2);
                     lcd_update();
                     lcd_invertrect(0,0,111,63);
-                    lcd_update();*/
+                    lcd_update();
                 }
                 return;
             }
