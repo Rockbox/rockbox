@@ -1,0 +1,23 @@
+Library: libmad-0.15.1b (2004-02-17)
+Imported: 2005-02-15 by Dave Chapman
+
+
+This directory contains a local version of libmad for use by Rockbox
+targets needing software MPEG audio decoding.
+
+
+LICENSING INFORMATION
+
+libmad is (C) 2000-2004 Unibit Technologies, Inc. and licensed under
+the terms of the GNU General Public License.  See file "COPYRIGHT" in
+this directory for more information.
+
+
+IMPORT DETAILS
+
+The base version first imported into Rockbox was libmad-0.15.1b
+(released on 2004-02-17), downloaded on 2005-02-15 from the files
+section at http://sourceforge.net/projects/mad/
+
+The autoconf/automake files were removed from the official source
+tarball, as well as the "msvc++" subdirectory.
