@@ -51,6 +51,11 @@ int battery_level(void)
     return ((level-BATTERY_LEVEL_EMPTY) * 100) / BATTERY_RANGE;
 }
 
+bool battery_level_safe(void)
+{
+    return adc_read(ADC_UNREG_POWER) > BATTERY_LEVEL_DANGEROUS;
+}
+
 void charger_enable(bool on)
 {
 #ifdef ARCHOS_RECORDER

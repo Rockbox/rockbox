@@ -34,4 +34,7 @@ void power_off(void);
 /* Returns battery level in percent */
 int battery_level(void);
 
+/* Tells if the battery level is safe for disk writes */
+bool battery_level_safe(void);
+
 #endif
