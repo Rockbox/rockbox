@@ -2635,13 +2635,10 @@ void mpeg_init(void)
 {
     mpeg_errno = 0;
 
-    create_thread(mpeg_thread, mpeg_stack,
-                  sizeof(mpeg_stack), mpeg_thread_name);
 #ifndef SIMULATOR
     mp3buflen = mp3end - mp3buf;
     queue_init(&mpeg_queue);
 #endif /* #ifndef SIMULATOR */
-
     create_thread(mpeg_thread, mpeg_stack,
                   sizeof(mpeg_stack), mpeg_thread_name);
 
