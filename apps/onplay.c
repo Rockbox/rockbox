@@ -174,8 +174,7 @@ static bool playlist_options(void)
 
     if ((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_M3U)
     {
-        items[i].desc = str(LANG_VIEW);
-        items[i].voice_id = LANG_VIEW;
+        items[i].desc = ID2P(LANG_VIEW);
         items[i].function = view_playlist;
         i++;
         pstart++;
@@ -183,38 +182,32 @@ static bool playlist_options(void)
 
     if (mpeg_status() & MPEG_STATUS_PLAY)
     {
-        items[i].desc = str(LANG_INSERT);
-        items[i].voice_id = LANG_INSERT;
+        items[i].desc = ID2P(LANG_INSERT);
         args[i].position = PLAYLIST_INSERT;
         args[i].queue = false;
         i++;
         
-        items[i].desc = str(LANG_INSERT_FIRST);
-        items[i].voice_id = LANG_INSERT_FIRST;
+        items[i].desc = ID2P(LANG_INSERT_FIRST);
         args[i].position = PLAYLIST_INSERT_FIRST;
         args[i].queue = false;
         i++;
         
-        items[i].desc = str(LANG_INSERT_LAST);
-        items[i].voice_id = LANG_INSERT_LAST;
+        items[i].desc = ID2P(LANG_INSERT_LAST);
         args[i].position = PLAYLIST_INSERT_LAST;
         args[i].queue = false;
         i++;
         
-        items[i].desc = str(LANG_QUEUE);
-        items[i].voice_id = LANG_QUEUE;
+        items[i].desc = ID2P(LANG_QUEUE);
         args[i].position = PLAYLIST_INSERT;
         args[i].queue = true;
         i++;
         
-        items[i].desc = str(LANG_QUEUE_FIRST);
-        items[i].voice_id = LANG_QUEUE_FIRST;
+        items[i].desc = ID2P(LANG_QUEUE_FIRST);
         args[i].position = PLAYLIST_INSERT_FIRST;
         args[i].queue = true;
         i++;
         
-        items[i].desc = str(LANG_QUEUE_LAST);
-        items[i].voice_id = LANG_QUEUE_LAST;
+        items[i].desc = ID2P(LANG_QUEUE_LAST);
         args[i].position = PLAYLIST_INSERT_LAST;
         args[i].queue = true;
         i++;
@@ -222,8 +215,7 @@ static bool playlist_options(void)
     else if (((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_MPA) ||
              (selected_file_attr & ATTR_DIRECTORY))
     {
-        items[i].desc = str(LANG_INSERT);
-        items[i].voice_id = LANG_INSERT;
+        items[i].desc = ID2P(LANG_INSERT);
         args[i].position = PLAYLIST_INSERT;
         args[i].queue = false;
         i++;
@@ -419,8 +411,7 @@ int onplay(char* file, int attr)
         
         if (!(attr & ATTR_DIRECTORY))
         {
-            items[i].desc = str(LANG_ONPLAY_OPEN_WITH);
-            items[i].voice_id = LANG_ONPLAY_OPEN_WITH;
+            items[i].desc = ID2P(LANG_ONPLAY_OPEN_WITH);
             items[i].function = list_viewers;
             i++;
         }
@@ -429,35 +420,30 @@ int onplay(char* file, int attr)
             (attr & ATTR_DIRECTORY) ||
             ((attr & TREE_ATTR_MASK) == TREE_ATTR_M3U))
         {
-            items[i].desc = str(LANG_PLAYINDICES_PLAYLIST);
-            items[i].voice_id = LANG_PLAYINDICES_PLAYLIST;
+            items[i].desc = ID2P(LANG_PLAYINDICES_PLAYLIST);
             items[i].function = playlist_options;
             i++;
         }
         
-        items[i].desc = str(LANG_RENAME);
-        items[i].voice_id = LANG_RENAME;
+        items[i].desc = ID2P(LANG_RENAME);
         items[i].function = rename_file;
         i++;
         
         if (!(attr & ATTR_DIRECTORY))
         {
-            items[i].desc = str(LANG_DELETE);
-            items[i].voice_id = LANG_DELETE;
+            items[i].desc = ID2P(LANG_DELETE);
             items[i].function = delete_file;
             i++;
         }
         else
         {
-            items[i].desc = str(LANG_DELETE_DIR);
-            items[i].voice_id = LANG_DELETE_DIR;
+            items[i].desc = ID2P(LANG_DELETE_DIR);
             items[i].function = delete_dir;
             i++;
         }
     }
 
-    items[i].desc = str(LANG_CREATE_DIR);
-    items[i].voice_id = LANG_CREATE_DIR;
+    items[i].desc = ID2P(LANG_CREATE_DIR);
     items[i].function = create_dir;
     i++;
 

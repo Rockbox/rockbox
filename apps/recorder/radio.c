@@ -641,7 +641,7 @@ static bool radio_add_preset(void)
             strcpy(presets[num_presets].name, buf);
             presets[num_presets].frequency = curr_freq;
             menu_insert(preset_menu, -1,
-                        presets[num_presets].name, 0, 0);
+                        presets[num_presets].name, 0);
             /* We must still rebuild the menu table, since the
                item name pointers must be updated */
             rebuild_preset_menu();
@@ -832,12 +832,11 @@ bool radio_menu(void)
     m = menu_init(items, 0, NULL, NULL, NULL, NULL);
 
     create_monomode_menu();
-    menu_insert(m, -1, monomode_menu_string, LANG_FM_MONO_MODE,
-                toggle_mono_mode);
-    menu_insert(m, -1, STR(LANG_SOUND_SETTINGS), sound_menu);
+    menu_insert(m, -1, monomode_menu_string, toggle_mono_mode);
+    menu_insert(m, -1, ID2P(LANG_SOUND_SETTINGS), sound_menu);
     
 #ifndef SIMULATOR
-    menu_insert(m, -1, STR(LANG_RECORDING_SETTINGS), fm_recording_settings);
+    menu_insert(m, -1, ID2P(LANG_RECORDING_SETTINGS), fm_recording_settings);
 #endif
 
     result = menu_run(m);

@@ -28,6 +28,7 @@
 
 #include "string.h"
 #include "lcd.h"
+#include "settings.h"
 
 extern char having_new_lcd;
 
@@ -277,3 +278,7 @@ void remove_thread(int threadnum)
 {
     (void)threadnum;
 }
+
+/* assure an unused place to direct virtual pointers to */
+unsigned char vp_dummy[VIRT_SIZE];
+

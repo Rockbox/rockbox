@@ -239,7 +239,7 @@ static void set_avc(int val)
 
 static bool avc(void)
 {
-    struct opt_items names[] = {
+    static const struct opt_items names[] = {
         { STR(LANG_OFF) },
         { "20ms", TALK_ID(20, UNIT_MS) },
         { "2s", TALK_ID(2, UNIT_SEC) },
@@ -252,7 +252,7 @@ static bool avc(void)
 
 static bool recsource(void)
 {
-    struct opt_items names[] = {
+    static const struct opt_items names[] = {
         { STR(LANG_RECORDING_SRC_MIC) },
         { STR(LANG_RECORDING_SRC_LINE) },
         { STR(LANG_RECORDING_SRC_DIGITAL) }
@@ -264,7 +264,7 @@ static bool recsource(void)
 
 static bool recfrequency(void)
 {
-    struct opt_items names[] = {
+    static const struct opt_items names[] = {
         { "44.1kHz", TALK_ID(44, UNIT_KHZ) },
         { "48kHz", TALK_ID(48, UNIT_KHZ) },
         { "32kHz", TALK_ID(32, UNIT_KHZ) },
@@ -279,7 +279,7 @@ static bool recfrequency(void)
 
 static bool recchannels(void)
 {
-    struct opt_items names[] = {
+    static const struct opt_items names[] = {
         { STR(LANG_CHANNEL_STEREO) },
         { STR(LANG_CHANNEL_MONO) }
     };
@@ -303,7 +303,7 @@ static bool receditable(void)
 
 static bool rectimesplit(void)
 {
-    struct opt_items names[] = {
+    static const struct opt_items names[] = {
         { STR(LANG_OFF) },
         { "00:05" , TALK_ID(5, UNIT_MIN) },
         { "00:10" , TALK_ID(10, UNIT_MIN) },
@@ -326,7 +326,7 @@ static bool rectimesplit(void)
 
 static bool recprerecord(void)
 {
-    struct opt_items names[] = {
+    static const struct opt_items names[] = {
         { STR(LANG_OFF) },
         { "1s", TALK_ID(1, UNIT_SEC) },
         { "2s", TALK_ID(2, UNIT_SEC) },
@@ -366,7 +366,7 @@ static bool recprerecord(void)
 
 static bool recdirectory(void)
 {
-    struct opt_items names[] = {
+    static const struct opt_items names[] = {
         { rec_base_directory, -1 },
         { STR(LANG_RECORD_CURRENT_DIR) }
     };
@@ -384,7 +384,7 @@ static void set_chanconf(int val)
 
 static bool chanconf(void)
 {
-    struct opt_items names[] = {
+    static const struct opt_items names[] = {
         { STR(LANG_CHANNEL_STEREO) },
 #ifdef HAVE_LCD_CHARCELLS
         { STR(LANG_CHANNEL_STEREO_NARROW_PLAYER) },
@@ -405,21 +405,21 @@ bool sound_menu(void)
 {
     int m;
     bool result;
-    struct menu_item items[] = {
-        { STR(LANG_VOLUME), volume },
-        { STR(LANG_BASS), bass },
-        { STR(LANG_TREBLE), treble },
-        { STR(LANG_BALANCE), balance },
-        { STR(LANG_CHANNEL_MENU), chanconf },
+    static const struct menu_item items[] = {
+        { ID2P(LANG_VOLUME), volume },
+        { ID2P(LANG_BASS), bass },
+        { ID2P(LANG_TREBLE), treble },
+        { ID2P(LANG_BALANCE), balance },
+        { ID2P(LANG_CHANNEL_MENU), chanconf },
 #ifdef HAVE_MAS3587F
-        { STR(LANG_LOUDNESS), loudness },
-        { STR(LANG_AUTOVOL), avc },
-        { STR(LANG_SUPERBASS), superbass },
-        { STR(LANG_MDB_ENABLE), mdb_enable },
-        { STR(LANG_MDB_STRENGTH), mdb_strength },
-        { STR(LANG_MDB_HARMONICS), mdb_harmonics },
-        { STR(LANG_MDB_CENTER), mdb_center },
-        { STR(LANG_MDB_SHAPE), mdb_shape },
+        { ID2P(LANG_LOUDNESS), loudness },
+        { ID2P(LANG_AUTOVOL), avc },
+        { ID2P(LANG_SUPERBASS), superbass },
+        { ID2P(LANG_MDB_ENABLE), mdb_enable },
+        { ID2P(LANG_MDB_STRENGTH), mdb_strength },
+        { ID2P(LANG_MDB_HARMONICS), mdb_harmonics },
+        { ID2P(LANG_MDB_CENTER), mdb_center },
+        { ID2P(LANG_MDB_SHAPE), mdb_shape },
 #endif
     };
     
@@ -439,31 +439,23 @@ bool recording_menu(bool no_source)
     struct menu_item items[8];
     bool result;
 
-    items[i].desc = str(LANG_RECORDING_QUALITY);
-    items[i].voice_id = LANG_RECORDING_QUALITY;
+    items[i].desc = ID2P(LANG_RECORDING_QUALITY);
     items[i++].function = recquality;
-    items[i].desc = str(LANG_RECORDING_FREQUENCY);
-    items[i].voice_id = LANG_RECORDING_FREQUENCY;
+    items[i].desc = ID2P(LANG_RECORDING_FREQUENCY);
     items[i++].function = recfrequency;
     if(!no_source) {
-        items[i].desc = str(LANG_RECORDING_SOURCE);
-        items[i].voice_id = LANG_RECORDING_SOURCE;
+        items[i].desc = ID2P(LANG_RECORDING_SOURCE);
         items[i++].function = recsource;
     }
-    items[i].desc = str(LANG_RECORDING_CHANNELS);
-    items[i].voice_id = LANG_RECORDING_CHANNELS;
+    items[i].desc = ID2P(LANG_RECORDING_CHANNELS);
     items[i++].function = recchannels;
-    items[i].desc = str(LANG_RECORDING_EDITABLE);
-    items[i].voice_id = LANG_RECORDING_EDITABLE;
+    items[i].desc = ID2P(LANG_RECORDING_EDITABLE);
     items[i++].function = receditable;
-    items[i].desc = str(LANG_RECORD_TIMESPLIT);
-    items[i].voice_id = LANG_RECORD_TIMESPLIT;
+    items[i].desc = ID2P(LANG_RECORD_TIMESPLIT);
     items[i++].function = rectimesplit;
-    items[i].desc = str(LANG_RECORD_PRERECORD_TIME);
-    items[i].voice_id = LANG_RECORD_PRERECORD_TIME;
+    items[i].desc = ID2P(LANG_RECORD_PRERECORD_TIME);
     items[i++].function = recprerecord;
-    items[i].desc = str(LANG_RECORD_DIRECTORY);
-    items[i].voice_id = LANG_RECORD_DIRECTORY;
+    items[i].desc = ID2P(LANG_RECORD_DIRECTORY);
     items[i++].function = recdirectory;
 
     m=menu_init( items, i, NULL, NULL, NULL, NULL);

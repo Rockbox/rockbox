@@ -51,8 +51,8 @@ enum {
    unit is upper 4 bits, number the remaining (in regular 2's complement) */
 #define TALK_ID(n,u) ((u)<<UNIT_SHIFT | ((n) & ~(-1<<UNIT_SHIFT))) 
 
-/* convenience macro to have both string and ID as arguments */
-#define STR(id) str(id), id
+/* convenience macro to have both virtual pointer and ID as arguments */
+#define STR(id) ID2P(id), id
 
 /* publish this string, so it's stored only once (better than #define) */
 extern const char* dir_thumbnail_name;

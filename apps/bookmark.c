@@ -93,10 +93,10 @@ bool bookmark_menu(void)
     int m;
     bool result;
 
-    struct menu_item items[] = {
-        { STR(LANG_BOOKMARK_MENU_CREATE), bookmark_create_menu},
-        { STR(LANG_BOOKMARK_MENU_LIST), bookmark_load_menu},
-        { STR(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS), bookmark_mrb_load},
+    static const struct menu_item items[] = {
+        { ID2P(LANG_BOOKMARK_MENU_CREATE), bookmark_create_menu},
+        { ID2P(LANG_BOOKMARK_MENU_LIST), bookmark_load_menu},
+        { ID2P(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS), bookmark_mrb_load},
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_item), NULL,

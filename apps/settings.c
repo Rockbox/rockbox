@@ -1390,7 +1390,7 @@ bool set_int(char* string,
    code. */
 
 bool set_option(char* string, void* variable, enum optiontype type,
-                struct opt_items* options, int numoptions, void (*function)(int))
+                const struct opt_items* options, int numoptions, void (*function)(int))
 {
     bool done = false;
     int button;
@@ -1416,7 +1416,7 @@ bool set_option(char* string, void* variable, enum optiontype type,
 
     while ( !done ) {
         index = type==INT ? *intvar : (int)*boolvar;
-        lcd_puts(0, 1, options[index].string);
+        lcd_puts(0, 1, P2STR(options[index].string));
         if (global_settings.talk_menu && index != oldindex)
         {
             talk_id(options[index].voice_id, false);

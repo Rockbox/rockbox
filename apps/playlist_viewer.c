@@ -681,16 +681,13 @@ static int onplay_menu(int index)
     int m, i=0, result, ret = 0;
     bool current = (tracks[index].index == viewer.current_playing_track);
 
-    items[i].desc = str(LANG_REMOVE);
-    items[i].voice_id = LANG_REMOVE;
+    items[i].desc = ID2P(LANG_REMOVE);
     i++;
 
-    items[i].desc = str(LANG_MOVE);
-    items[i].voice_id = LANG_MOVE;
+    items[i].desc = ID2P(LANG_MOVE);
     i++;
 
-    items[i].desc = str(LANG_FILE_OPTIONS);
-    items[i].voice_id = LANG_FILE_OPTIONS;
+    items[i].desc = ID2P(LANG_FILE_OPTIONS);
     i++;
 
     m = menu_init(items, i, NULL, NULL, NULL, NULL);
@@ -757,11 +754,11 @@ static bool viewer_menu(void)
     int m;
     bool result;
 
-    struct menu_item items[] = {
-        { STR(LANG_SHOW_ICONS),             show_icons },
-        { STR(LANG_SHOW_INDICES),           show_indices },
-        { STR(LANG_TRACK_DISPLAY),          track_display },
-        { STR(LANG_SAVE_DYNAMIC_PLAYLIST),  save_playlist },
+    static const struct menu_item items[] = {
+        { ID2P(LANG_SHOW_ICONS),             show_icons },
+        { ID2P(LANG_SHOW_INDICES),           show_indices },
+        { ID2P(LANG_TRACK_DISPLAY),          track_display },
+        { ID2P(LANG_SAVE_DYNAMIC_PLAYLIST),  save_playlist },
     };
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
@@ -791,7 +788,7 @@ static bool show_indices(void)
 /* How to display a track */
 static bool track_display(void)
 {
-    struct opt_items names[] = {
+    static const struct opt_items names[] = {
         { STR(LANG_DISPLAY_TRACK_NAME_ONLY) },
         { STR(LANG_DISPLAY_FULL_PATH) }
     };

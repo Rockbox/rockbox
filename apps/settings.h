@@ -62,6 +62,30 @@
 #define FF_REWIND_60000 13
 
 
+/* These define "virtual pointers", which could either be a literal string,
+   or a mean a string ID if the pointer is in a certain range.
+   This helps to save space for menus and options. */
+
+#define VIRT_SIZE 0xFFFF /* more than enough for our string ID range */
+#ifdef SIMULATOR
+/* a space which is defined in stubs.c */
+extern unsigned char vp_dummy[VIRT_SIZE]; 
+#define VIRT_PTR vp_dummy
+#else
+/* a location where we won't store strings, 0 is the fastest */
+#define VIRT_PTR ((unsigned char*)0)
+#endif
+
+/* form a "virtual pointer" out of a language ID */
+#define ID2P(id) (VIRT_PTR + id)
+
+/* resolve a pointer which could be a virtualized ID or a literal */
+#define P2STR(p) ((p>=VIRT_PTR && p<=VIRT_PTR+VIRT_SIZE) ? str(p-VIRT_PTR) : p)
+
+/* get the string ID from a virtual pointer, -1 if not virtual */
+#define P2ID(p) ((p>=VIRT_PTR && p<=VIRT_PTR+VIRT_SIZE) ? p-VIRT_PTR : -1)
+
+
 struct user_settings
 {
     /* audio settings */
@@ -224,7 +248,7 @@ struct user_settings
 enum optiontype { INT, BOOL };
 
 struct opt_items {
-    char* string;
+    unsigned char* string;
     int voice_id;
 };
 
@@ -247,7 +271,7 @@ bool set_bool_options(char* string, bool* variable,
 
 bool set_bool(char* string, bool* variable );
 bool set_option(char* string, void* variable, enum optiontype type,
-                struct opt_items* options, int numoptions, void (*function)(int));
+                const struct opt_items* options, int numoptions, void (*function)(int));
 bool set_int(char* string, char* unit, int voice_unit, int* variable,
              void (*function)(int), int step, int min, int max );
 bool set_time_screen(char* string, struct tm *tm);

@@ -278,9 +278,9 @@ bool rec_menu(void)
     bool result;
 
     /* recording menu */
-    struct menu_item items[] = {
-        { STR(LANG_RECORDING_MENU),     recording_screen  },
-        { STR(LANG_RECORDING_SETTINGS), recording_settings},
+    static const struct menu_item items[] = {
+        { ID2P(LANG_RECORDING_MENU),     recording_screen  },
+        { ID2P(LANG_RECORDING_SETTINGS), recording_settings},
     };
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
@@ -298,14 +298,14 @@ bool info_menu(void)
     bool result;
 
     /* info menu */
-    struct menu_item items[] = {
-        { STR(LANG_MENU_SHOW_ID3_INFO), browse_id3        },
-        { STR(LANG_INFO_MENU),          show_info         },
-        { STR(LANG_VERSION),            show_credits      },
+    static const struct menu_item items[] = {
+        { ID2P(LANG_MENU_SHOW_ID3_INFO), browse_id3        },
+        { ID2P(LANG_INFO_MENU),          show_info         },
+        { ID2P(LANG_VERSION),            show_credits      },
 #ifndef SIMULATOR
-        { STR(LANG_DEBUG),              debug_menu        },
+        { ID2P(LANG_DEBUG),              debug_menu        },
 #else
-        { STR(LANG_USB),                simulate_usb      },
+        { ID2P(LANG_USB),                simulate_usb      },
 #endif
     };
 
@@ -326,42 +326,34 @@ bool main_menu(void)
     /* main menu */
     struct menu_item items[8];
 
-    items[i].desc = str(LANG_BOOKMARK_MENU);
-    items[i].voice_id = LANG_BOOKMARK_MENU;
+    items[i].desc = ID2P(LANG_BOOKMARK_MENU);
     items[i++].function = bookmark_menu;
 
-    items[i].desc = str(LANG_SOUND_SETTINGS);
-    items[i].voice_id = LANG_SOUND_SETTINGS;
+    items[i].desc = ID2P(LANG_SOUND_SETTINGS);
     items[i++].function = sound_menu;
 
-    items[i].desc = str(LANG_GENERAL_SETTINGS);
-    items[i].voice_id = LANG_GENERAL_SETTINGS;
+    items[i].desc = ID2P(LANG_GENERAL_SETTINGS);
     items[i++].function = settings_menu;
 
 #ifdef HAVE_FMRADIO
     if(radio_hardware_present()) {
-        items[i].desc = str(LANG_FM_RADIO);
-        items[i].voice_id = LANG_FM_RADIO;
+        items[i].desc = ID2P(LANG_FM_RADIO);
         items[i++].function = radio_screen;
     }
 #endif
 
 #ifdef HAVE_MAS3587F
-    items[i].desc = str(LANG_RECORDING);
-    items[i].voice_id = LANG_RECORDING;
+    items[i].desc = ID2P(LANG_RECORDING);
     items[i++].function = rec_menu;
 #endif
 
-    items[i].desc = str(LANG_PLAYLIST_MENU);
-    items[i].voice_id = LANG_PLAYLIST_MENU;
+    items[i].desc = ID2P(LANG_PLAYLIST_MENU);
     items[i++].function = playlist_menu;
 
-    items[i].desc = str(LANG_PLUGINS);
-    items[i].voice_id = LANG_PLUGINS;
+    items[i].desc = ID2P(LANG_PLUGINS);
     items[i++].function = plugin_browse;
 
-    items[i].desc = str(LANG_INFO);
-    items[i].voice_id = LANG_INFO;
+    items[i].desc = ID2P(LANG_INFO);
     items[i++].function = info_menu;
 
     m=menu_init( items, i, NULL, NULL, NULL, NULL );

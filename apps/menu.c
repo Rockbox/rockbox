@@ -33,6 +33,7 @@
 #include "status.h"
 #include "screens.h"
 #include "talk.h"
+#include "lang.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
@@ -177,12 +178,12 @@ void menu_draw(int m)
 #ifdef HAVE_LCD_BITMAP
             if (global_settings.invert_cursor)
                 lcd_puts_scroll_style(LINE_X, i-menus[m].top,
-                                       menus[m].items[i].desc, STYLE_INVERT);
+                                       P2STR(menus[m].items[i].desc), STYLE_INVERT);
             else
 #endif
-                lcd_puts_scroll(LINE_X, i-menus[m].top, menus[m].items[i].desc);
+                lcd_puts_scroll(LINE_X, i-menus[m].top, P2STR(menus[m].items[i].desc));
         else
-            lcd_puts(LINE_X, i-menus[m].top, menus[m].items[i].desc);
+            lcd_puts(LINE_X, i-menus[m].top, P2STR(menus[m].items[i].desc));
     }
 
     /* place the cursor */
@@ -216,13 +217,13 @@ static void put_cursor(int m, int target)
     /* "say" the entry under the cursor */
     if(global_settings.talk_menu)
     {
-        voice_id = menus[m].items[menus[m].cursor].voice_id;
+        voice_id = P2ID(menus[m].items[menus[m].cursor].desc);
         if (voice_id >= 0) /* valid ID given? */
             talk_id(voice_id, false); /* say it */
     }
 }
 
-int menu_init(struct menu_item* mitems, int count, int (*callback)(int, int),
+int menu_init(const struct menu_item* mitems, int count, int (*callback)(int, int),
               char *button1, char *button2, char *button3)
 {
     int i;
@@ -237,7 +238,7 @@ int menu_init(struct menu_item* mitems, int count, int (*callback)(int, int),
         DEBUGF("Out of menus!\n");
         return -1;
     }
-    menus[i].items = mitems;
+    menus[i].items = (struct menu_item*)mitems; /* de-const */
     menus[i].itemcount = count;
     menus[i].top = 0;
     menus[i].cursor = 0;
@@ -417,7 +418,7 @@ int menu_cursor(int menu)
 
 char* menu_description(int menu, int position)
 {
-    return menus[menu].items[position].desc;
+    return P2STR(menus[menu].items[position].desc);
 }
 
 /*  
@@ -440,8 +441,7 @@ void menu_delete(int menu, int position)
         menus[menu].cursor = menus[menu].itemcount - 1;
 }
 
-void menu_insert(int menu, int position, char *desc, int voice_id,
-                 bool (*function) (void))
+void menu_insert(int menu, int position, char *desc, bool (*function) (void))
 {
     int i;
 
@@ -457,7 +457,6 @@ void menu_insert(int menu, int position, char *desc, int voice_id,
     
     /* Update the current item */
     menus[menu].items[position].desc = desc;
-    menus[menu].items[position].voice_id = voice_id;
     menus[menu].items[position].function = function;
 }
 

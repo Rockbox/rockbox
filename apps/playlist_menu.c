@@ -50,7 +50,7 @@ static bool save_playlist(void)
 
 static bool recurse_directory(void)
 {
-    struct opt_items names[] = {
+    static const struct opt_items names[] = {
         { STR(LANG_OFF) },
         { STR(LANG_ON) },
         { STR(LANG_RESUME_SETTING_ASK)},
@@ -66,11 +66,11 @@ bool playlist_menu(void)
     int m;
     bool result;
 
-    struct menu_item items[] = {
-        { STR(LANG_CREATE_PLAYLIST),       create_playlist   },
-        { STR(LANG_VIEW_DYNAMIC_PLAYLIST), playlist_viewer   },
-        { STR(LANG_SAVE_DYNAMIC_PLAYLIST), save_playlist     },
-        { STR(LANG_RECURSE_DIRECTORY),     recurse_directory },
+    static const struct menu_item items[] = {
+        { ID2P(LANG_CREATE_PLAYLIST),       create_playlist   },
+        { ID2P(LANG_VIEW_DYNAMIC_PLAYLIST), playlist_viewer   },
+        { ID2P(LANG_SAVE_DYNAMIC_PLAYLIST), save_playlist     },
+        { ID2P(LANG_RECURSE_DIRECTORY),     recurse_directory },
     };
 
     m = menu_init( items, sizeof items / sizeof(struct menu_item), NULL,
