@@ -411,6 +411,14 @@ bool f3_screen(void)
                    global_settings.statusbar ? str(LANG_ON) : str(LANG_OFF));
         lcd_bitmap(bitmap_icons_7x8[Icon_FastForward], 
                    LCD_WIDTH/2 + 8, LCD_HEIGHT/2 - 4, 7, 8, true);
+
+        /* Invert */
+        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h*2, str(LANG_INVERT));
+        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, 
+                   global_settings.invert ? str(LANG_ON) : str(LANG_OFF));
+        lcd_bitmap(bitmap_icons_7x8[Icon_DownArrow],
+                   LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8, true);
+
         lcd_update();
 
         switch (button_get(true)) {
@@ -423,6 +431,13 @@ bool f3_screen(void)
             case BUTTON_RIGHT:
             case BUTTON_F3 | BUTTON_RIGHT:
                 global_settings.statusbar = !global_settings.statusbar;
+                used = true;
+                break;
+
+            case BUTTON_DOWN:
+            case BUTTON_F3 | BUTTON_DOWN:
+                global_settings.invert = !global_settings.invert;
+                lcd_set_invert_display(global_settings.invert);
                 used = true;
                 break;
 
