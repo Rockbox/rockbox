@@ -112,14 +112,26 @@
 <tr><th><b>LCD Type</b></th>
     <td>Character 11x2 <a href=#footnote2>(2)</a></td>
     <td>Character 11x2</td>
-    <td>Bitmap 112x64 30mmx24mm</td>
-    <td>Bitmap 112x64 30mmx24mm</td>
-    <td>Bitmap 112x64 30mmx24mm</td>
-    <td>Bitmap 112x64 30mmx24mm</td>
-    <td>Bitmap 112x64 30mmx24mm</td>
-    <td>Bitmap 112x64 30mmx24mm</td>
-    <td>Bitmap 160x128 39mmx31mm</td>
-    <td>Bitmap 160x128 39mmx31mm</td>
+    <td>Bitmap 112x64</td>
+    <td>Bitmap 112x64</td>
+    <td>Bitmap 112x64</td>
+    <td>Bitmap 112x64</td>
+    <td>Bitmap 112x64</td>
+    <td>Bitmap 112x64</td>
+    <td>Bitmap 160x128</td>
+    <td>Bitmap 160x128</td>
+</tr>
+<tr><th><b>LCD size</b></th>
+    <td>?</a></td>
+    <td>?</td>
+    <td>30x24mm</td>
+    <td>30x24mm</td>
+    <td>30x24mm</td>
+    <td>30x24mm</td>
+    <td>30x24mm</td>
+    <td>30x24mm</td>
+    <td>39x31mm</td>
+    <td>39x31mm</td>
 </tr>
 <tr><th><b>Real Time Clock</b></th>
     <td>No</td>
