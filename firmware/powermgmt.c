@@ -105,13 +105,9 @@ int charge_state = 0;                          /* at the beginning, the charger 
 
 static int percent_to_volt_charge[11] = /* voltages (centivolt) of 0%, 10%, ... 100% when charging enabled */
 {
-#ifdef HAVE_LIION
     /* values guessed, see http://www.seattlerobotics.org/encoder/200210/LiIon2.pdf */
     /* until someone measures voltages over a charging cycle */
-    260, 290, 320, 340, 360, 370, 380, 390, 400, 410, 420
-#else /* NiMH */
-    476, 544, 551, 556, 561, 564, 566, 576, 582, 584, 585
-#endif
+    476, 544, 551, 556, 561, 564, 566, 576, 582, 584, 585 /* NiMH */
 };
 
 void enable_trickle_charge(bool on)

@@ -801,6 +801,7 @@ bool view_battery(void)
             case 3: /* remeining time estimation: */
                 lcd_clear_display();
 
+#ifdef HAVE_CHARGE_CTRL
                 snprintf(buf, 30, "charge_state: %d", charge_state);
                 lcd_puts(0, 0, buf);
 
@@ -809,6 +810,7 @@ bool view_battery(void)
 
                 snprintf(buf, 30, "Lev.at cycle start: %d%%", powermgmt_last_cycle_level);
                 lcd_puts(0, 2, buf);
+#endif
 
                 snprintf(buf, 30, "Last PwrHist val: %d.%02d V",
                     power_history[POWER_HISTORY_LEN-1] / 100,
@@ -821,9 +823,9 @@ bool view_battery(void)
                 snprintf(buf, 30, "Est. remaining: %d m", battery_time());
                 lcd_puts(0, 6, buf);
 
+#ifdef HAVE_CHARGE_CTRL
                 snprintf(buf, 30, "Trickle sec: %d/60", trickle_sec);
                 lcd_puts(0, 7, buf);
-#ifdef HAVE_CHARGE_CTRL
 #endif                
                 break;
         }
