@@ -201,7 +201,6 @@ void dbg_ports(void)
     unsigned short portb;
     unsigned char portc;
     char buf[32];
-    unsigned long crc_count;
     int button;
     int battery_voltage;
     int batt_int, batt_frac;
@@ -251,11 +250,6 @@ void dbg_ports(void)
             snprintf(buf, 32, "%s, 0x%x ",
                      ata_device?"slv":"mst", ata_io_address);
             break;
-        case 11:
-            mas_readmem(MAS_BANK_D0, 0x303, &crc_count, 1);
-                
-            snprintf(buf, 32, "CRC: %d    ", crc_count);
-            break;
         }
         lcd_puts(0, 0, buf);
         
@@ -279,12 +273,12 @@ void dbg_ports(void)
         case BUTTON_LEFT:
             currval--;
             if(currval < 0)
-                currval = 11;
+                currval = 10;
             break;
 
         case BUTTON_RIGHT:
             currval++;
-            if(currval > 11)
+            if(currval > 10)
                 currval = 0;
             break;
         }
@@ -507,19 +501,15 @@ void view_battery(void)
                 lcd_puts(0, 4, buf);
 #endif                
                 y = ( power_history[POWER_HISTORY_LEN-1] * 100
-                    + power_history[POWER_HISTORY_LEN-2] * 100
-                    - power_history[POWER_HISTORY_LEN-1-CHARGE_END_NEGD+1] * 100
                     - power_history[POWER_HISTORY_LEN-1-CHARGE_END_NEGD] * 100 )
-                    / CHARGE_END_NEGD / 2;
+                    / CHARGE_END_NEGD;
                 
                 snprintf(buf, 30, "short delta: %d", y);
                 lcd_puts(0, 5, buf);
                 
                 y = ( power_history[POWER_HISTORY_LEN-1] * 100
-                    + power_history[POWER_HISTORY_LEN-2] * 100
-                    - power_history[POWER_HISTORY_LEN-1-CHARGE_END_ZEROD+1] * 100
                     - power_history[POWER_HISTORY_LEN-1-CHARGE_END_ZEROD] * 100 )
-                    / CHARGE_END_ZEROD / 2;
+                    / CHARGE_END_ZEROD;
                 
                 snprintf(buf, 30, "long delta: %d", y);
                 lcd_puts(0, 6, buf);
@@ -568,6 +558,177 @@ void view_battery(void)
 
 #endif
 
+#ifdef HAVE_MAS3507D
+void dbg_mas_info(void)
+{
+    int button;
+    char buf[32];
+    int currval = 0;
+    unsigned long val;
+    unsigned long pll48, pll44, config;
+    int pll_toggle = 0;
+    
+    while(1)
+    {
+        switch(currval)
+        {
+        case 0:
+            mas_readmem(MAS_BANK_D1, 0xff7, &val, 1);
+            lcd_puts(0, 0, "Design Code");
+            snprintf(buf, 32, "%05x      ", val);
+            break;
+        case 1:
+            lcd_puts(0, 0, "DC/DC mode ");
+            snprintf(buf, 32, "8e: %05x  ", mas_readreg(0x8e) & 0xfffff);
+            break;
+        case 2:
+            lcd_puts(0, 0, "Mute/Bypass");
+            snprintf(buf, 32, "aa: %05x  ", mas_readreg(0xaa) & 0xfffff);
+            break;
+        case 3:
+            lcd_puts(0, 0, "PIOData    ");
+            snprintf(buf, 32, "ed: %05x  ", mas_readreg(0xed) & 0xfffff);
+            break;
+        case 4:
+            lcd_puts(0, 0, "Startup Cfg");
+            snprintf(buf, 32, "e6: %05x  ", mas_readreg(0xe6) & 0xfffff);
+            break;
+        case 5:
+            lcd_puts(0, 0, "KPrescale  ");
+            snprintf(buf, 32, "e7: %05x  ", mas_readreg(0xe7) & 0xfffff);
+            break;
+        case 6:
+            lcd_puts(0, 0, "KBass      ");
+            snprintf(buf, 32, "6b: %05x   ", mas_readreg(0x6b) & 0xfffff);
+            break;
+        case 7:
+            lcd_puts(0, 0, "KTreble    ");
+            snprintf(buf, 32, "6f: %05x   ", mas_readreg(0x6f) & 0xfffff);
+            break;
+        case 8:
+            mas_readmem(MAS_BANK_D0, 0x300, &val, 1);
+            lcd_puts(0, 0, "Frame Count");
+            snprintf(buf, 32, "0/300: %04x", val & 0xffff);
+            break;
+        case 9:
+            mas_readmem(MAS_BANK_D0, 0x301, &val, 1);
+            lcd_puts(0, 0, "Status1    ");
+            snprintf(buf, 32, "0/301: %04x", val & 0xffff);
+            break;
+        case 10:
+            mas_readmem(MAS_BANK_D0, 0x302, &val, 1);
+            lcd_puts(0, 0, "Status2    ");
+            snprintf(buf, 32, "0/302: %04x", val & 0xffff);
+            break;
+        case 11:
+            mas_readmem(MAS_BANK_D0, 0x303, &val, 1);
+            lcd_puts(0, 0, "CRC Count  ");
+            snprintf(buf, 32, "0/303: %04x", val & 0xffff);
+            break;
+        case 12:
+            mas_readmem(MAS_BANK_D0, 0x36d, &val, 1);
+            lcd_puts(0, 0, "PLLOffset48");
+            snprintf(buf, 32, "0/36d %05x", val & 0xfffff);
+            break;
+        case 13:
+            mas_readmem(MAS_BANK_D0, 0x32d, &val, 1);
+            lcd_puts(0, 0, "PLLOffset48");
+            snprintf(buf, 32, "0/32d %05x", val & 0xfffff);
+            break;
+        case 14:
+            mas_readmem(MAS_BANK_D0, 0x36e, &val, 1);
+            lcd_puts(0, 0, "PLLOffset44");
+            snprintf(buf, 32, "0/36e %05x", val & 0xfffff);
+            break;
+        case 15:
+            mas_readmem(MAS_BANK_D0, 0x32e, &val, 1);
+            lcd_puts(0, 0, "PLLOffset44");
+            snprintf(buf, 32, "0/32e %05x", val & 0xfffff);
+            break;
+        case 16:
+            mas_readmem(MAS_BANK_D0, 0x36f, &val, 1);
+            lcd_puts(0, 0, "OutputConf ");
+            snprintf(buf, 32, "0/36f %05x", val & 0xfffff);
+            break;
+        case 17:
+            mas_readmem(MAS_BANK_D0, 0x32f, &val, 1);
+            lcd_puts(0, 0, "OutputConf ");
+            snprintf(buf, 32, "0/32f %05x", val & 0xfffff);
+            break;
+        case 18:
+            mas_readmem(MAS_BANK_D1, 0x7f8, &val, 1);
+            lcd_puts(0, 0, "LL Gain    ");
+            snprintf(buf, 32, "1/7f8 %05x", val & 0xfffff);
+            break;
+        case 19:
+            mas_readmem(MAS_BANK_D1, 0x7f9, &val, 1);
+            lcd_puts(0, 0, "LR Gain    ");
+            snprintf(buf, 32, "1/7f9 %05x", val & 0xfffff);
+            break;
+        case 20:
+            mas_readmem(MAS_BANK_D1, 0x7fa, &val, 1);
+            lcd_puts(0, 0, "RL Gain    ");
+            snprintf(buf, 32, "1/7fa %05x", val & 0xfffff);
+            break;
+        case 21:
+            mas_readmem(MAS_BANK_D1, 0x7fb, &val, 1);
+            lcd_puts(0, 0, "RR Gain    ");
+            snprintf(buf, 32, "1/7fb %05x", val & 0xfffff);
+            break;
+        case 22:
+            lcd_puts(0, 0, "L Trailbits");
+            snprintf(buf, 32, "c5: %05x   ", mas_readreg(0xc5) & 0xfffff);
+            break;
+        case 23:
+            lcd_puts(0, 0, "R Trailbits");
+            snprintf(buf, 32, "c6: %05x   ", mas_readreg(0xc6) & 0xfffff);
+            break;
+        }
+        lcd_puts(0, 1, buf);
+        
+        button = button_get_w_tmo(HZ/5);
+        switch(button)
+        {
+        case BUTTON_STOP:
+            return;
+
+        case BUTTON_LEFT:
+            currval--;
+            if(currval < 0)
+                currval = 23;
+            break;
+
+        case BUTTON_RIGHT:
+            currval++;
+            if(currval > 23)
+                currval = 0;
+            break;
+        case BUTTON_PLAY:
+            pll_toggle = !pll_toggle;
+            if(pll_toggle)
+            {
+                /* 14.31818 MHz crystal */
+                pll48 = 0x5d9d0;
+                pll44 = 0xfffceceb;
+                config = 0;
+            }
+            else
+            {
+                /* 14.725 MHz crystal */
+                pll48 = 0x2d0de;
+                pll44 = 0xfffa2319;
+                config = 0;
+            }
+            mas_writemem(MAS_BANK_D0, 0x32d, &pll48, 1);
+            mas_writemem(MAS_BANK_D0, 0x32e, &pll44, 1);
+            mas_writemem(MAS_BANK_D0, 0x32f, &config, 1);
+            mas_run(0x475);
+            break;
+        }
+    }
+}
+#endif
+
 void debug_menu(void)
 {
     int m;
@@ -580,6 +741,9 @@ void debug_menu(void)
 #endif /* HAVE_RTC */
 #endif /* HAVE_LCD_BITMAP */
         { "View OS stacks", dbg_os },
+#ifdef HAVE_MAS3507D
+        { "View MAS info", dbg_mas_info },
+#endif
         { "View MAS regs", dbg_mas },
 #ifdef HAVE_MAS3587F
         { "View MAS codec", dbg_mas_codec },
