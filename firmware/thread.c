@@ -37,7 +37,18 @@ struct regs
     void          *sp;  /* Stack pointer (r15) */
     void*         pr;   /* Procedure register */
 };
+
+#elif CONFIG_CPU == TCC730
+struct regs
+{
+  void *sp;  /* Stack pointer (a15) */
+  void *start; /* Thread start address */
+  int started; /* 0 when not started */
+};
 #endif
+
+#define DEADBEEF ((int)0xdeadbeef)
+
 
 int num_threads;
 static volatile int num_sleepers;
@@ -109,6 +120,51 @@ static inline void load_context(const void* addr)
                   "lds %0,pr\n\t"
                   "mov.l %0, @(0, r15)" : "+r" (addr));
 }
+#elif CONFIG_CPU == TCC730
+/*--------------------------------------------------------------------------- 
+ * Store non-volatile context.
+ *---------------------------------------------------------------------------
+ */
+#define store_context(addr)				\
+    __asm__ volatile (                                  \
+        "push r0,r1\n\t"				\
+        "push r2,r3\n\t"				\
+        "push r4,r5\n\t"				\
+        "push r6,r7\n\t"				\
+        "push a8,a9\n\t"				\
+        "push a10,a11\n\t"				\
+        "push a12,a13\n\t"				\
+        "push a14\n\t"                                  \
+        "ldw @[%0+0], a15\n\t" : : "a" (addr) );
+
+/*--------------------------------------------------------------------------- 
+ * Load non-volatile context.
+ *---------------------------------------------------------------------------
+ */
+#define load_context(addr)                      \
+    {                                           \
+        if (!(addr)->started) {                 \
+            (addr)->started = 1;                \
+            __asm__ volatile (                  \
+                "ldw a15, @[%0+0]\n\t"          \
+                "ldw a14, @[%0+4]\n\t"		\
+                "jmp a14\n\t" : : "a" (addr)	\
+                );				\
+        } else                                  \
+            __asm__ volatile (                  \
+                "ldw a15, @[%0+0]\n\t"		\
+                "pop a14\n\t"			\
+                "pop a13,a12\n\t"               \
+                "pop a11,a10\n\t"               \
+                "pop a9,a8\n\t"			\
+                "pop r7,r6\n\t"			\
+                "pop r5,r4\n\t"			\
+                "pop r3,r2\n\t"			\
+                "pop r1,r0\n\t" : : "a" (addr)	\
+                );                              \
+                                                \
+    }
+
 #endif
 
 /*--------------------------------------------------------------------------- 
@@ -130,6 +186,10 @@ void switch_thread(void)
         /* Enter sleep mode, woken up on interrupt */
 #if CONFIG_CPU == MCF5249
         asm volatile ("stop #0x2000");
+#elif CONFIG_CPU == TCC730
+	/* No sleep instr on the CalmRisc. (?)
+         * TODO: investigate the SYS instruction
+         */
 #else
         SBYCR &= 0x7F;
         asm volatile ("sleep");
@@ -145,9 +205,9 @@ void switch_thread(void)
     store_context(&thread_contexts[current]);
     
     /* Check if the current thread stack is overflown */
-    stackptr = thread_stack[current];
-#ifndef IRIVER_H100
-    if(stackptr[0] != 0xdeadbeef)
+    stackptr = thread_stack[current]; 
+#if ! (defined(IRIVER_H100) || defined (ARCHOS_GMINI120))
+    if(stackptr[0] != DEADBEEF)
        panicf("Stkov %s", thread_name[current]);
 #endif
        
@@ -182,11 +242,11 @@ int create_thread(void* function, void* stack, int stack_size,
       return -1;
 
    /* Munge the stack to make it easy to spot stack overflows */
-   stacklen = stack_size / 4;
+   stacklen = stack_size / sizeof(int);
    stackptr = stack;
    for(i = 0;i < stacklen;i++)
    {
-      stackptr[i] = 0xdeadbeef;
+     stackptr[i] = DEADBEEF;
    }
 
    /* Store interesting information */
@@ -194,16 +254,22 @@ int create_thread(void* function, void* stack, int stack_size,
    thread_stack[num_threads] = stack;
    thread_stack_size[num_threads] = stack_size;
    regs = &thread_contexts[num_threads];
-   store_context(regs);
 #if CONFIG_CPU == MCF5249
+   store_context(regs);
    regs->sp = (void*)(((unsigned int)stack + stack_size - 4) & ~3);
    /* Put the return address on the stack */
    *(unsigned long *)(regs->sp) = (int)function;
 #elif CONFIG_CPU == SH7034
+   store_context(regs);
    /* Subtract 4 to leave room for the PR push in load_context()
       Align it on an even 32 bit boundary */
    regs->sp = (void*)(((unsigned int)stack + stack_size - 4) & ~3);
    regs->pr = function;
+#elif CONFIG_CPU == TCC730
+   /* Align stack on word boundary */
+   regs->sp = (void*)(((unsigned int)stack + stack_size - 2) & ~1);
+   regs->start = (void*)function;
+   regs->started = 0;
 #endif
 
    wake_up_thread();
@@ -244,6 +310,9 @@ void init_threads(void)
     thread_name[0] = main_thread_name;
     thread_stack[0] = stackbegin;
     thread_stack_size[0] = (int)stackend - (int)stackbegin;
+#if CONFIG_CPU == TCC730
+    thread_contexts[0].started = 1;
+#endif
     num_sleepers = 0;
 }
 
@@ -257,7 +326,7 @@ int thread_stack_usage(int threadnum)
    
    for(i = 0;i < thread_stack_size[threadnum]/sizeof(int);i++)
    {
-      if(stackptr[i] != 0xdeadbeef)
+      if(stackptr[i] != DEADBEEF)
          break;
    }
    
