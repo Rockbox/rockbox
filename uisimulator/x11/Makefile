@@ -25,6 +25,7 @@ FIRMWAREDIR = ../../firmware
 DRIVERS = $(FIRMWAREDIR)/drivers
 COMMON = $(FIRMWAREDIR)/common
 LIBMADDIR = $(PREVAPPDIR)/common/libmad
+TOOLSDIR = ../../tools
 
 CC = gcc
 RM = rm -f
@@ -42,7 +43,7 @@ DISPLAY = -DHAVE_LCD_BITMAP
 KEYPAD = -DHAVE_RECORDER_KEYPAD
 
 DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR	\
-$(KEYPAD) $(DISPLAY) #-DLCD_PROPFONTS
+$(KEYPAD) $(DISPLAY) $(EXTRA_DEFINES)
 
 LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
 
@@ -69,11 +70,17 @@ ifdef MPEG_PLAY
   INCLUDES += -I$(PREVAPPDIR)/common
 endif
 
-CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall 
+CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall
 
 APPCFLAGS = $(DEBUG) $(DEFINES) -DAPPSVERSION=\"$(VERSION)\" $(APPINCLUDES) -W -Wall
 
-FIRMSRCS = chartables.c lcd.c sprintf.c id3.c debug.c usb.c mpeg.c power.c powermgmt.c
+FIRMSRCS = chartables.c lcd.c sprintf.c id3.c debug.c usb.c mpeg.c power.c powermgmt.c 
+
+ifeq (LOADABLE_FONTS,$(findstring LOADABLE_FONTS, $(DEFINES)))
+	FIRMSRCS += unicode.c ajf.c panic.c
+	EXTRA_TARGETS = $(OBJDIR)/archos/system.ajf
+	SYSTEM_FONT = $(FIRMWAREDIR)/fonts/alt6x10.bdf
+endif
 
 APPS = main.c tree.c menu.c credits.c main_menu.c\
 	playlist.c showtext.c wps.c settings.c status.c
@@ -95,11 +102,14 @@ endif
 
 OBJS := $(SRCS:%.c=$(OBJDIR)/%.o)
 
-all: $(TARGET)
+all: $(TARGET) $(EXTRA_TARGETS)
 
 clean:
 	$(RM) $(OBJS) *~ core $(TARGET) $(CLIENTS)
 	$(RM) -r $(DEPS)
+
+$(OBJDIR)/archos/system.ajf: $(TOOLSDIR)/bdf2ajf $(SYSTEM_FONT)
+	$(TOOLSDIR)/bdf2ajf -f $(SYSTEM_FONT) -o $(OBJDIR)/archos/system.ajf
 
 distclean: clean
 	$(RM) config.cache
@@ -218,6 +228,9 @@ $(OBJDIR)/id3.o: $(FIRMWAREDIR)/id3.c
 $(OBJDIR)/debug.o: $(FIRMWAREDIR)/debug.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(OBJDIR)/panic.o: $(FIRMWAREDIR)/panic.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 $(OBJDIR)/mpeg.o: $(FIRMWAREDIR)/mpeg.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
@@ -228,6 +241,12 @@ $(OBJDIR)/usb.o: $(FIRMWAREDIR)/usb.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/powermgmt.o: $(FIRMWAREDIR)/powermgmt.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/unicode.o: $(FIRMWAREDIR)/unicode.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/ajf.o: $(FIRMWAREDIR)/ajf.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/stubs.o: ../common/stubs.c

@@ -105,4 +105,15 @@ extern void lcd_clearpixel(int x, int y);
 
 #endif /* CHARCELLS / BITMAP */
 
+#ifdef LOADABLE_FONTS
+extern int lcd_init_fonts(void);
+extern void lcd_putsldfxy(int x, int y, unsigned char *str);
+extern int lcd_getstringsize(unsigned char *str,
+                             unsigned char* font,
+                             int *w, int *h);
+extern void lcd_setldfont(unsigned char* f);
+
+extern unsigned char* lcd_getcurrentldfont(void);
+#endif
+
 #endif /* __LCD_H__ */

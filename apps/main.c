@@ -44,10 +44,11 @@
 #include "backlight.h"
 #include "status.h"
 #include "debug_menu.h"
-
 #include "version.h"
-
 #include "sprintf.h"
+#ifdef LOADABLE_FONTS
+#include "unicode.h"
+#endif
 
 char appsversion[]=APPSVERSION;
 
@@ -64,6 +65,9 @@ void app_main(void)
 void init(void)
 {
     init_threads();
+#ifdef LOADABLE_FONTS
+    unicode_init();
+#endif
     lcd_init();
     show_logo();
     settings_reset();
@@ -153,8 +157,11 @@ void init(void)
 
     status_init();
     usb_start_monitoring();
-    
     power_init();
+#ifdef LOADABLE_FONTS
+    unicode_init();
+    lcd_init_fonts();
+#endif
 }
 
 int main(void)

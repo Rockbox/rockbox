@@ -8,7 +8,7 @@
 #
 CFLAGS := -O -s -ansi
 
-TARGETS := scramble descramble sh2d
+TARGETS := scramble descramble sh2d bdf2ajf
 
 all: $(TARGETS)
 
@@ -18,5 +18,9 @@ descramble: descramble.c
 
 sh2d: sh2d.c
 
+bdf2ajf: bdf2ajf.c
+	gcc -O -ansi $+ -o $@
+
 clean:
-	rm -f $(TARGETS) *~
+	rm -f $(TARGETS) $(shell for f in $(TARGETS) ; do echo $$f.exe $$f.o $$f.obj ; done) *.ajf *~
+

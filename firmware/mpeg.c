@@ -967,6 +967,7 @@ static void mpeg_thread(void)
                 
             case SYS_USB_CONNECTED:
                 stop_playing();
+#ifndef SIMULATOR
                 
                 /* Tell the USB thread that we are safe */
                 DEBUGF("mpeg_thread got SYS_USB_CONNECTED\n");
@@ -974,6 +975,7 @@ static void mpeg_thread(void)
 
                 /* Wait until the USB cable is extracted again */
                 usb_wait_for_disconnect(&mpeg_queue);
+#endif
                 break;
         }
     }

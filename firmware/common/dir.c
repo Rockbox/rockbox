@@ -107,6 +107,7 @@ struct dirent* readdir(DIR* dir)
 
     if ( !entry.name[0] )
         return NULL;
+	
 
     strncpy(theent->d_name, entry.name, sizeof( theent->d_name ) );
     theent->attribute = entry.attr;

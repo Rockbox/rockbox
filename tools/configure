@@ -11,6 +11,8 @@
 target=$1
 debug=$2
 
+extra_defines="-"
+
 input() {
     read response
     echo $response
@@ -66,8 +68,9 @@ sed > Makefile \
  -e "s,@KEYPAD@,${keypad},g" \
  -e "s,@PWD@,${pwd},g" \
  -e "s,@SIMVER@,${simver},g" \
+ -e "s,@EXTRA_DEFINES@,${extra_defines},g" \
 <<EOF 
-## Automaticly generated. http://bjorn.haxx.se/rockbox/
+## Automaticly generated. http://rockbox.haxx.se
 
 SIMDIR=@SIMDIR@
 DEBUG=@DEBUG@
@@ -77,13 +80,14 @@ KEYPAD=@KEYPAD@
 THISDIR="@PWD@"
 SIMVER=@SIMVER@
 VERSION=\$(shell date +%y%m%d-%H%M)
+EXTRA_DEFINES=@EXTRA_DEFINES@
 
 .PHONY: 
 
 all: sim
 
 sim:
-	\$(MAKE) -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR) VERSION=\$(VERSION)
+	\$(MAKE) -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR) VERSION=\$(VERSION) EXTRA_DEFINES=\$(EXTRA_DEFINES)
 
 clean-sim:
 	\$(MAKE) -C \$(SIMDIR) DISPLAY=\$(DISPLAY) KEYPAD=\$(KEYPAD) OBJDIR=\$(THISDIR) clean
@@ -121,6 +125,7 @@ if [ "$target" = "update" ]; then
       echo "Existing generated Makefile found. Getting defaults from it."
       target=`grep "^TARGET=" Makefile | cut -d= -f2-`
       debug=`grep "^DEBUG=" Makefile | cut -d= -f2-`
+      extra_defines=`grep "^EXTRA_DEFINES=" Makefile | cut -d= -f2-`
 
       if [ "$debug" = "SIMULATOR=1" ]; then
         simulator="yes"
@@ -133,7 +138,7 @@ if [ "$target" = "update" ]; then
 else
 
 echo "Setup your Rockbox build environment."
-echo "http://bjorn.haxx.se/rockbox/"
+echo "http://rockbox.haxx.se/"
 echo ""
 
 fi
@@ -173,6 +178,25 @@ if [ -z "$target" ]; then
     ;;
 
   esac
+fi
+
+if [ "-" == "$extra_defines" ]; then
+ if [  "-DARCHOS_RECORDER" = "$target" ] ; then
+  
+  echo "Loadable fonts support? (N)"
+  getit=`input`;
+  if [ "y" = "$getit" ] ; then
+     extra_defines="-DLOADABLE_FONTS"
+  else
+     echo "Proportional font support? (N)"
+     getit=`input`;
+     if [ "y" = "$getit" ] ; then
+        extra_defines="-DLCD_PROPFONTS"
+     else
+        extra_defines=""
+     fi
+  fi
+ fi
 fi
 
 if [ -z "$debug" ]; then
@@ -250,9 +274,10 @@ sed > Makefile \
  -e "s,@APPSDIR@,${appsdir},g" \
  -e "s,@DEBUG@,${debug},g" \
  -e "s,@TARGET@,${target},g" \
+ -e "s,@EXTRA_DEFINES@,${extra_defines},g" \
  -e "s,@PWD@,${pwd},g" \
 <<EOF 
-## Automaticly generated. http://bjorn.haxx.se/rockbox/
+## Automaticly generated. http://rockbox.haxx.se
 
 FIRMDIR=@FIRMDIR@
 APPSDIR=@APPSDIR@
@@ -261,15 +286,16 @@ TARGET=@TARGET@
 THISDIR="@PWD@"
 VERSION=\$(shell date +%y%m%d-%H%M)
 
+EXTRA_DEFINES=@EXTRA_DEFINES@
 .PHONY: firmware apps
 
 all: firmware apps
 
 firmware:
-	\$(MAKE) -C \$(FIRMDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR)
+	\$(MAKE) -C \$(FIRMDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) EXTRA_DEFINES=\$(EXTRA_DEFINES)
 
 apps:
-	\$(MAKE) -C \$(APPSDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) VERSION=\$(VERSION)
+	\$(MAKE) -C \$(APPSDIR) TARGET=\$(TARGET) \$(DEBUG) OBJDIR=\$(THISDIR) VERSION=\$(VERSION) EXTRA_DEFINES=\$(EXTRA_DEFINES)
 
 clean-firmware:
 	\$(MAKE) -C \$(FIRMDIR) TARGET=\$(TARGET) OBJDIR=\$(THISDIR) clean

@@ -15,6 +15,8 @@ OC    = sh-elf-objcopy
 
 INCLUDES=-Iinclude -I. -Icommon -Idrivers
 
+SYSTEM_FONT = fonts/alt6x10.bdf
+
 # Pick a target to build for
 TARGET = -DARCHOS_PLAYER=1
 #TARGET = -DARCHOS_PLAYER_OLD=1
@@ -23,7 +25,7 @@ TARGET = -DARCHOS_PLAYER=1
 # store output files in this directory:
 OBJDIR = .
 
-CFLAGS = -W -Wall -O -m1 -nostdlib -Wstrict-prototypes $(INCLUDES) $(TARGET)
+CFLAGS = -W -Wall -O -m1 -nostdlib -Wstrict-prototypes $(INCLUDES) $(TARGET) $(EXTRA_DEFINES)
 
 ifdef DEBUG
 CFLAGS += -g -DDEBUG
@@ -39,7 +41,11 @@ DEPDIRS:=$(DEPS) $(DEPS)/drivers $(DEPS)/common $(DEPS)/malloc
 
 OUTPUT = $(OBJDIR)/librockbox.a
 
-$(OUTPUT): $(OBJS)
+ifdef LOADABLE_FONTS
+	EXTRA_TARGETS = $(OBJDIR)/system.ajf
+endif
+
+$(OUTPUT): $(OBJS) $(EXTRA_TARGETS)
 	$(AR) ruv $@ $+
 
 $(OBJDIR)/%.o: %.c
@@ -49,6 +55,9 @@ $(OBJDIR)/%.o: %.c
 $(OBJDIR)/%.o: %.S
 	@mkdir -p `dirname $@`
 	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/system.ajf: ../tools/bdf2ajf $(SYSTEM_FONT)
+	../tools/bdf2ajf -f $(SYSTEM_FONT) -o $(OBJDIR)/system.ajf
 
 clean:
 	rm -f $(OBJS) $(OUTPUT)

@@ -39,6 +39,10 @@
 #include "widgets.h"
 #endif
 
+#ifdef LOADABLE_FONTS
+#include "ajf.h"
+#endif
+
 #ifdef HAVE_LCD_BITMAP
 #define LINE_Y      (global_settings.statusbar&&statusbar_enabled?1:0) /* Y position the entry-list starts at */
 #else /* HAVE_LCD_BITMAP */
@@ -59,6 +63,15 @@ bool keys_locked = false;
 
 static void draw_screen(struct mp3entry* id3)
 {
+    int font_height;
+#ifdef LOADABLE_FONTS
+    unsigned char *font = lcd_getcurrentldfont();
+    font_height  = ajf_get_fontheight(font);
+#else
+    font_height = 8;
+#endif
+
+
     lcd_clear_display();
     if(!id3)
     {
@@ -125,7 +138,7 @@ static void draw_screen(struct mp3entry* id3)
                 lcd_puts(0, l++, id3->album?id3->album:"");
                 lcd_puts(0, l++, id3->artist?id3->artist:"");
 
-                if(LINE_Y==0) {
+                if(LINE_Y==0&&font_height<=8) {
                     if(id3->vbr)
                         snprintf(buffer, sizeof(buffer), "%d kbit (avg)",
                                  id3->bitrate);
@@ -133,7 +146,6 @@ static void draw_screen(struct mp3entry* id3)
                         snprintf(buffer, sizeof(buffer), "%d kbit", id3->bitrate);
 
                     lcd_puts(0, l++, buffer);
-
                     snprintf(buffer,sizeof(buffer), "%d Hz", id3->frequency);
                     lcd_puts(0, l++, buffer);
                 }
@@ -148,7 +160,6 @@ static void draw_screen(struct mp3entry* id3)
                     lcd_puts(0, l++, buffer);
                 }
 #else
-
                 lcd_puts(0, l++, id3->artist?id3->artist:"<no artist>");
                 lcd_puts_scroll(0, l++, id3->title?id3->title:"<no title>");
 #endif
@@ -444,13 +455,13 @@ int wps_show(void)
                 if(!keys_locked && !dont_go_to_menu && menu_button_is_down)
                 {
 #ifdef HAVE_LCD_BITMAP
-                        bool laststate=statusbar(false);
+                    bool laststate=statusbar(false);
 #endif
                     lcd_stop_scroll();
                     button_set_release(old_release_mask);
                     main_menu();
 #ifdef HAVE_LCD_BITMAP
-                        statusbar(laststate);
+                    statusbar(laststate);
 #endif
                     old_release_mask = button_set_release(RELEASE_MASK);
                     id3 = mpeg_current_track();
@@ -464,14 +475,14 @@ int wps_show(void)
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD
-                case BUTTON_F3:
+            case BUTTON_F3:
 #ifdef HAVE_LCD_BITMAP
-                    if(global_settings.statusbar) {
-                        statusbar_toggle();
-                        draw_screen(id3);
-                    }
+                if(global_settings.statusbar) {
+                    statusbar_toggle();
+                    draw_screen(id3);
+                }
 #endif
-                    break;
+                break;
 #endif
 
 #ifdef HAVE_RECORDER_KEYPAD
@@ -504,19 +515,19 @@ int wps_show(void)
                 usb_wait_for_disconnect(&button_queue);
 
 #ifdef HAVE_LCD_BITMAP
-                        statusbar(laststate);
+                statusbar(laststate);
 #endif
                 /* Signal to our caller that we have been in USB mode */
                 return SYS_USB_CONNECTED;
                 break;
-                }
+            }
 #endif
             case BUTTON_NONE: /* Timeout */
                 if (mpeg_is_playing() && id3)
                 {
 #ifdef HAVE_LCD_BITMAP
                     snprintf(buffer,sizeof(buffer),
-                                     "Time:%3d:%02d/%d:%02d",
+                             "Time:%3d:%02d/%d:%02d",
                              id3->elapsed / 60000,
                              id3->elapsed % 60000 / 1000,
                              id3->length / 60000,
@@ -524,9 +535,9 @@ int wps_show(void)
                         
                     lcd_puts(0, 6, buffer);
                         
-                            slidebar(0, LCD_HEIGHT-6, LCD_WIDTH, 6,
-                                 id3->elapsed*100/id3->length,
-                                     Grow_Right);
+                    slidebar(0, LCD_HEIGHT-6, LCD_WIDTH, 6,
+                             id3->elapsed*100/id3->length,
+                             Grow_Right);
                         
                     lcd_update();
 #else
@@ -535,7 +546,7 @@ int wps_show(void)
                     if (global_settings.wps_display ==
                         PLAY_DISPLAY_FILENAME_SCROLL)
                     { 
-                                snprintf(buffer,sizeof(buffer), "%d:%02d/%d:%02d  ",
+                        snprintf(buffer,sizeof(buffer), "%d:%02d/%d:%02d  ",
                                  id3->elapsed / 60000,
                                  id3->elapsed % 60000 / 1000,
                                  id3->length / 60000,

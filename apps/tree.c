@@ -43,6 +43,10 @@
 #include "icons.h"
 #endif
 
+#ifdef LOADABLE_FONTS
+#include "ajf.h"
+#endif
+
 #define MAX_FILES_IN_DIR 200
 #define TREE_MAX_FILENAMELEN MAX_PATH
 #define MAX_DIR_LEVELS 10
@@ -152,8 +156,20 @@ static int showdir(char *path, int start)
 {
 #ifdef HAVE_LCD_BITMAP
     int icon_type = 0;
+    int line_height = LINE_HEIGTH;
 #endif
     int i;
+    int tree_max_on_screen;
+#ifdef LOADABLE_FONTS
+    int fh;
+    unsigned char *font = lcd_getcurrentldfont();
+    fh  = ajf_get_fontheight(font);
+    tree_max_on_screen =  ((LCD_HEIGHT-MARGIN_Y)/fh)-LINE_Y;
+    line_height = fh;
+#else
+    tree_max_on_screen = TREE_MAX_ON_SCREEN;
+#endif
+
 
     /* new dir? cache it */
     if (strncmp(path,lastdir,sizeof(lastdir))) {
@@ -217,7 +233,7 @@ static int showdir(char *path, int start)
     lcd_setfont(0);
 #endif
 
-    for ( i=start; i < start+TREE_MAX_ON_SCREEN; i++ ) {
+    for ( i=start; i < start+tree_max_on_screen; i++ ) {
         int len;
 
         if ( i >= filesindir )
@@ -235,8 +251,9 @@ static int showdir(char *path, int start)
                 icon_type = File;
         }
         lcd_bitmap(bitmap_icons_6x8[icon_type], 
-                   6, MARGIN_Y+(LINE_Y+i-start)*LINE_HEIGTH, 6, 8, true);
+                   6, MARGIN_Y+(LINE_Y+i-start)*line_height, 6, 8, true);
 #endif
+
 
         /* if MP3 filter is on, cut off the extension */
         if (global_settings.mp3filter && 
@@ -270,6 +287,15 @@ bool dirbrowse(char *root)
     int rc;
     int button;
     int start_index;
+    int tree_max_on_screen;
+#ifdef LOADABLE_FONTS
+    int fh;
+    unsigned char *font = lcd_getcurrentldfont();
+    fh  = ajf_get_fontheight(font);
+    tree_max_on_screen =  ((LCD_HEIGHT-MARGIN_Y)/fh)-LINE_Y;
+#else
+    tree_max_on_screen = TREE_MAX_ON_SCREEN;
+#endif
 
     memcpy(currdir,root,sizeof(currdir));
     numentries = showdir(root, start);
@@ -379,7 +405,7 @@ bool dirbrowse(char *root)
                             put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
                         }
                         else {
-                            if (numentries < TREE_MAX_ON_SCREEN) {
+                            if (numentries < tree_max_on_screen) {
                                 put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor,
                                              false);
                                 dircursor = numentries - 1;
@@ -387,11 +413,11 @@ bool dirbrowse(char *root)
                                              true);
                             }
                             else {
-                                start = numentries - TREE_MAX_ON_SCREEN;
-                                dircursor = TREE_MAX_ON_SCREEN - 1;
+                                start = numentries - tree_max_on_screen;
+                                dircursor = tree_max_on_screen - 1;
                                 numentries = showdir(currdir, start);
                                 put_cursorxy(0, CURSOR_Y + LINE_Y +
-                                             TREE_MAX_ON_SCREEN - 1, true);
+                                             tree_max_on_screen - 1, true);
                             }
                         }
                     }
@@ -404,7 +430,7 @@ bool dirbrowse(char *root)
                 if(filesindir)
                 {
                     if (dircursor + start + 1 < numentries ) {
-                        if(dircursor+1 < TREE_MAX_ON_SCREEN) {
+                        if(dircursor+1 < tree_max_on_screen) {
                             put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor,
                                          false);
                             dircursor++;
@@ -417,7 +443,7 @@ bool dirbrowse(char *root)
                         }
                     }
                     else {
-                        if(numentries < TREE_MAX_ON_SCREEN) {
+                        if(numentries < tree_max_on_screen) {
                             put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor,
                                          false);
                             start = dircursor = 0;
@@ -512,7 +538,7 @@ bool dirbrowse(char *root)
             /* restore display */
             /* We need to adjust if the number of lines on screen have
                changed because of a status bar change */
-            if(CURSOR_Y+LINE_Y+dircursor>TREE_MAX_ON_SCREEN) {
+            if(CURSOR_Y+LINE_Y+dircursor>tree_max_on_screen) {
                 start++;
                 dircursor--;
             }

@@ -8,7 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2002 by wavey@wavey.org
- *
+ *nn
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
  *
@@ -48,8 +48,9 @@ void panicf( char *fmt, ...)
     lcd_puts(0,0,panic_buf);
 #elif defined(HAVE_LCD_BITMAP)
     lcd_clear_display();
-    lcd_puts(0,0,panic_buf);
+    lcd_putsxy(0,0,panic_buf,0);
     lcd_update();
+
 #else
     /* no LCD */
 #endif

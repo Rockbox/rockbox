@@ -22,11 +22,14 @@
 #include "button.h"
 #include "kernel.h"
 #include "debug.h"
+#include "panic.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #endif
-
+#ifdef LOADABLE_FONTS
+#include "ajf.h"
+#endif
 struct menu {
     int top;
     int cursor;
@@ -54,11 +57,19 @@ static bool inuse[MAX_MENUS] = { false };
 /* count in letter posistions, NOT pixels */
 void put_cursorxy(int x, int y, bool on)
 {
+#ifdef LOADABLE_FONTS
+    int fh;
+    unsigned char* font = lcd_getcurrentldfont();
+    fh = ajf_get_fontheight(font);
+#else 
+    int fh = 8;
+#endif
+
     /* place the cursor */
     if(on) {
 #ifdef HAVE_LCD_BITMAP
         lcd_bitmap ( bitmap_icons_6x8[Cursor], 
-                     x*6, y*8, 4, 8, true);
+                     x*6, y*fh, 4, 8, true);
 #elif defined(SIMULATOR)
         /* player simulator */
         unsigned char cursor[] = { 0x7f, 0x3e, 0x1c, 0x08 };
@@ -70,7 +81,7 @@ void put_cursorxy(int x, int y, bool on)
     else {
 #if defined(HAVE_LCD_BITMAP)
         /* I use xy here since it needs to disregard the margins */
-        lcd_clearrect (x*6, y*8, 4, 8);
+        lcd_clearrect (x*6, y*fh, 4, 8);
 #elif defined(SIMULATOR)
         /* player simulator in action */
         lcd_clearrect (x*6, 12+y*16, 4, 8);
@@ -83,6 +94,15 @@ void put_cursorxy(int x, int y, bool on)
 static void menu_draw(int m)
 {
     int i = 0;
+#ifdef LOADABLE_FONTS
+    int menu_lines;
+    int fh;
+    unsigned char* font = lcd_getcurrentldfont();
+    fh = ajf_get_fontheight(font);
+    menu_lines = LCD_HEIGHT/fh;
+#else
+    int menu_lines = MENU_LINES;
+#endif
 
     lcd_clear_display(); 
     lcd_stop_scroll();
@@ -91,7 +111,7 @@ static void menu_draw(int m)
     lcd_setfont(0);
 #endif
     for (i = menus[m].top; 
-         (i < menus[m].itemcount) && (i<menus[m].top+MENU_LINES);
+         (i < menus[m].itemcount) && (i<menus[m].top+menu_lines);
          i++) {
         if((menus[m].cursor - menus[m].top)==(i-menus[m].top))
             lcd_puts_scroll(1, i-menus[m].top, menus[m].items[i].desc);
@@ -111,7 +131,15 @@ static void menu_draw(int m)
 static void put_cursor(int m, int target)
 {
     bool do_update = true;
-
+#ifdef LOADABLE_FONTS
+    int menu_lines;
+    int fh;
+    unsigned char* font = lcd_getcurrentldfont();
+    fh = ajf_get_fontheight(font);
+    menu_lines = LCD_HEIGHT/fh;
+#else
+    int menu_lines = MENU_LINES;
+#endif
     put_cursorxy(0, menus[m].cursor - menus[m].top, false);
     menus[m].cursor = target;
     menu_draw(m);
@@ -121,7 +149,7 @@ static void put_cursor(int m, int target)
         menu_draw(m);
         do_update = false;
     }
-    else if ( target-menus[m].top > MENU_LINES-1 ) {
+    else if ( target-menus[m].top > menu_lines-1 ) {
         menus[m].top++;
         menu_draw(m);
         do_update = false;
