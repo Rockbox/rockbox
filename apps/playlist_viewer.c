@@ -117,7 +117,9 @@ static void update_display_line(int line, bool scroll);
 static void scroll_display(int lines);
 static void update_first_index(void);
 static bool update_playlist(bool force);
+#ifdef BUTTON_ON
 static int  onplay_menu(int index);
+#endif
 
 /* Initialize the playlist viewer */
 static bool initialize(void)
@@ -563,6 +565,7 @@ static bool update_playlist(bool force)
     return true;
 }
 
+#ifdef BUTTON_ON
 /* Menu of playlist commands.  Invoked via ON+PLAY on main viewer screen.
    Returns -1 if USB attached, 0 if no playlist change, and 1 if playlist
    changed. */
@@ -622,6 +625,7 @@ static int onplay_menu(int index)
 
     return ret;
 }
+#endif
 
 /* Main viewer function */
 bool playlist_viewer(void)
