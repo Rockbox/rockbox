@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Alan Korr
+ * Copyright (C) 2002 by Alan Korr, speedup by Jörg Hohensohn
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -180,9 +180,10 @@ void lcd_write(bool command, int byte)
    Ultimately, all calls to lcd_write(false, xxx) should be substituted by 
    this, it will be most efficient if the LCD buffer is tilted to have the
    X row as consecutive bytes, so we can write a whole row */
-/* FixMe: somehow the red LED is affected by this, although I don't touch
-   any other bit. Therefore not used yet, except for lcd_blit() */
 void lcd_write_data(unsigned char* p_bytes, int count) __attribute__ ((section (".icode")));
+
+#ifdef HAVE_LCD_CHARCELLS
+/* This version works for both Player and Recorder models */
 void lcd_write_data(unsigned char* p_bytes, int count)
 {
     do
@@ -193,7 +194,8 @@ void lcd_write_data(unsigned char* p_bytes, int count)
 
         byte = *p_bytes++ << 24; /* fetch to MSB position */
 
-        cli(); /* make port modifications atomic */
+        cli();  /* make port modifications atomic, in case an IRQ uses PBDRL */
+                /* (currently not the case, so this could be optimized away) */
 
         /* precalculate the values for later bit toggling, init data write */
         asm (
@@ -268,9 +270,9 @@ void lcd_write_data(unsigned char* p_bytes, int count)
             "mov.b  %3,@%4\n"
             
             "bf     1f\n"
-            "mov.b  %1,@%4\n"
+            "mov.b  %1,@%4\n" /* set SD high, SC low still */
             "1:       \n"
-            "or.b   %2, @(r0,gbr)\n"
+            "or.b   %2, @(r0,gbr)\n" /* rise SC (independent of SD level) */
 
             "or.b   %5, @(r0,gbr)\n" /* restore port */
             :
@@ -287,3 +289,105 @@ void lcd_write_data(unsigned char* p_bytes, int count)
 
     } while (--count); /* tail loop is faster */
 }
+
+#else /* #ifdef HAVE_LCD_CHARCELLS */
+/* A further optimized version, exploits that SD is on bit 0 for recorders */
+void lcd_write_data(unsigned char* p_bytes, int count)
+{
+    do
+    {
+        unsigned byte;
+        unsigned sda1;     /* precalculated SC=low,SD=1 */
+
+        /* take inverse data, so I can use the NEGC instruction below, it is
+           the only carry add/sub which does not destroy a source register */
+        byte = ~(*p_bytes++ << 24); /* fetch to MSB position */
+
+        cli(); /* make port modifications atomic, in case an IRQ uses PBDRL */
+                /* (currently not the case, so this could be optimized away) */
+
+        /* precalculate the values for later bit toggling, init data write */
+        asm (
+            "mov.b  @%1,r0\n" /* r0 = PBDRL */
+            "or     %3,r0\n"  /* r0 |= LCD_DS | LCD_SD     DS and SD high, */
+            "and    %2,r0\n"  /* r0 &= ~(LCD_CS | LCD_SC)  CS and SC low   */
+            "mov.b  r0,@%1\n" /* PBDRL = r0 */
+            "neg    r0,%0\n"  /* sda1 = 0-r0 */
+            : /* outputs: */
+            /* %0 */ "=r"(sda1)
+            : /* inputs: */
+            /* %1 */ "r"(LCDR),
+            /* %2 */ "I"(~(LCD_CS | LCD_SC)),
+            /* %3 */ "I"(LCD_DS | LCD_SD)
+            : /* trashed */
+            "r0"
+        );
+
+        /* unrolled loop to serialize the byte */
+        asm (
+            "shll   %0    \n" /* shift the MSB into carry */
+            "negc   %1, r0\n" /* carry to SD, SC low */
+            "mov.b  r0,@%3\n" /* set data to port */
+            "or     %2, r0\n" /* rise SC (independent of SD level) */
+            "mov.b  r0,@%3\n" /* set to port */
+
+            "shll   %0    \n"
+            "negc   %1, r0\n"
+            "mov.b  r0,@%3\n"
+            "or     %2, r0\n"
+            "mov.b  r0,@%3\n"
+
+            "shll   %0    \n"
+            "negc   %1, r0\n"
+            "mov.b  r0,@%3\n"
+            "or     %2, r0\n"
+            "mov.b  r0,@%3\n"
+
+            "shll   %0    \n"
+            "negc   %1, r0\n"
+            "mov.b  r0,@%3\n"
+            "or     %2, r0\n"
+            "mov.b  r0,@%3\n"
+
+            "shll   %0    \n"
+            "negc   %1, r0\n"
+            "mov.b  r0,@%3\n"
+            "or     %2, r0\n"
+            "mov.b  r0,@%3\n"
+
+            "shll   %0    \n"
+            "negc   %1, r0\n"
+            "mov.b  r0,@%3\n"
+            "or     %2, r0\n"
+            "mov.b  r0,@%3\n"
+
+            "shll   %0    \n"
+            "negc   %1, r0\n"
+            "mov.b  r0,@%3\n"
+            "or     %2, r0\n"
+            "mov.b  r0,@%3\n"
+
+            "shll   %0    \n"
+            "negc   %1, r0\n"
+            "mov.b  r0,@%3\n"
+            "or     %2, r0\n"
+            "mov.b  r0,@%3\n"
+
+            "or     %4, r0\n" /* restore port */
+            "mov.b  r0,@%3\n"
+            : /* outputs: */
+            : /* inputs: */
+            /* %0 */ "r"(byte),
+            /* %1 */ "r"(sda1),
+            /* %2 */ "I"(LCD_SC),
+            /* %3 */ "r"(LCDR),
+            /* %4 */ "I"(LCD_CS|LCD_DS|LCD_SD|LCD_SC)
+            :  /* trashed: */
+            "r0"
+        );
+
+        sti(); /* end of atomic port modifications */
+
+    } while (--count); /* tail loop is faster */
+}
+#endif /* #ifdef HAVE_LCD_CHARCELLS */
