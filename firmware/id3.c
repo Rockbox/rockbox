@@ -122,8 +122,8 @@ setid3v1title(int fd, mp3entry *entry)
         if(-1 == lseek(fd, offsets[i], SEEK_END))
             return FALSE;
 
-        buffer[0]=0;
-        read(fd, buffer, 31);
+        buffer[30]=0;
+        read(fd, buffer, 30);
         stripspaces(buffer);
         
         if(buffer[0]) {
