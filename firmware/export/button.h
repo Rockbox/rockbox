@@ -100,7 +100,16 @@ bool button_hold(void);
 #define	BUTTON_DOWN		0x0020
 #define	BUTTON_MENU		0x0100
 
-#endif /* RECORDER/PLAYER/ONDIO KEYPAD */
+#elif CONFIG_KEYPAD == GMINI100_PAD
+
+#define	BUTTON_ON		0x0001
+#define	BUTTON_CANCEL		0x0002
+#define	BUTTON_PLAY		0x0004
+#define	BUTTON_UP		0x0010
+#define	BUTTON_DOWN		0x0020
+#define	BUTTON_MENU		0x0100
+
+#endif /* RECORDER/PLAYER/ONDIO/GMINI KEYPAD */
 
 #endif /* _BUTTON_H_ */
 
