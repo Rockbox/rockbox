@@ -39,8 +39,11 @@ SRC := $(wildcard *.c)
 
 ifeq ($(TARGET),-DARCHOS_RECORDER)
    SRC += $(wildcard recorder/*.c)
-   CFLAGS += -Irecorder -DLCD_PROPFONTS
+   CFLAGS += -Irecorder
    OUTNAME = ajbrec.ajz
+ifneq (LOADABLE_FONTS,$(findstring LOADABLE_FONTS, $(CFLAGS)))
+   CFLAGS += -DLCD_PROPFONTS
+endif
 else
    OUTNAME = archos.mod
 endif
