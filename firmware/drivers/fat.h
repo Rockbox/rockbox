@@ -84,6 +84,9 @@ extern int fat_closewrite(struct fat_file *ent, int size);
 extern int fat_seek(struct fat_file *ent, unsigned int sector );
 extern int fat_remove(struct fat_file *ent);
 extern int fat_truncate(struct fat_file *ent);
+extern int fat_rename(struct fat_file* file, 
+                      unsigned char* newname,
+                      int size);
 
 extern int fat_opendir(struct fat_dir *ent, unsigned int currdir);
 extern int fat_getnext(struct fat_dir *ent, struct fat_direntry *entry);

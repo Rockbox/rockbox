@@ -1175,6 +1175,68 @@ int fat_closewrite(struct fat_file *file, int size)
     return 0;
 }
 
+static int free_direntries(int dircluster, int startentry, int numentries)
+{
+    unsigned char buf[SECTOR_SIZE];
+    struct fat_file dir;
+    unsigned int entry = startentry - numentries + 1;
+    unsigned int sector = entry / DIR_ENTRIES_PER_SECTOR;
+    int i;
+    int err;
+
+    /* create a temporary file handle for the dir holding this file */
+    err = fat_open(dircluster, &dir, NULL);
+    if (err<0)
+        return -1;
+
+    err = fat_seek( &dir, sector );
+    if (err<0)
+        return -2;
+
+    err = fat_readwrite(&dir, 1, buf, false);
+    if (err<1)
+        return -3;
+
+    for (i=0; i < numentries; i++) {
+        LDEBUGF("Clearing dir entry %d (%d/%d)\n",
+                entry, i+1, numentries);
+        buf[(entry % DIR_ENTRIES_PER_SECTOR) * DIR_ENTRY_SIZE] = 0xe5;
+        entry++;
+
+        if ( (entry % DIR_ENTRIES_PER_SECTOR) == 0 ) {
+            /* flush this sector */
+            err = fat_seek(&dir, sector);
+            if (err<0)
+                return -4;
+
+            err = fat_readwrite(&dir, 1, buf, true);
+            if (err<1)
+                return -5;
+
+            if ( i+1 < numentries ) {
+                /* read next sector */
+                err = fat_readwrite(&dir, 1, buf, false);
+                if (err<1)
+                    return -6;
+            }
+            sector++;
+        }
+    }
+
+    if ( entry % DIR_ENTRIES_PER_SECTOR ) {
+        /* flush this sector */
+        err = fat_seek(&dir, sector);
+        if (err<0)
+            return -7;
+            
+        err = fat_readwrite(&dir, 1, buf, true);
+        if (err<1)
+            return -8;
+    }
+
+    return 0;
+}
+
 int fat_remove(struct fat_file* file)
 {
     int next, last = file->firstcluster;
@@ -1187,68 +1249,59 @@ int fat_remove(struct fat_file* file)
         last = next;
     }
 
-    /* free all dir entries */
-    if ( file->dircluster ) {
-        unsigned char buf[SECTOR_SIZE];
-        struct fat_file dir;
-        unsigned int entry = file->direntry - file->direntries + 1;
-        unsigned int sector = entry / DIR_ENTRIES_PER_SECTOR;
-        unsigned int i;
-        int err;
-
-        /* create a temporary file handle for the dir holding this file */
-        err = fat_open(file->dircluster, &dir, NULL);
-        if (err<0)
+    if ( file->dircluster )
+        if ( free_direntries(file->dircluster, 
+                             file->direntry, 
+                             file->direntries) < 0 )
             return -1;
-
-        err = fat_seek( &dir, sector );
-        if (err<0)
-            return -2;
-
-        err = fat_readwrite(&dir, 1, buf, false);
-        if (err<1)
-            return -3;
-
-        for (i=0; i < file->direntries; i++) {
-            LDEBUGF("Clearing dir entry %d (%d/%d)\n",
-                    entry, i+1, file->direntries);
-            buf[(entry % DIR_ENTRIES_PER_SECTOR) * DIR_ENTRY_SIZE] = 0xe5;
-            entry++;
-
-            if ( (entry % DIR_ENTRIES_PER_SECTOR) == 0 ) {
-                /* flush this sector */
-                err = fat_seek(&dir, sector);
-                if (err<0)
-                    return -4;
-
-                err = fat_readwrite(&dir, 1, buf, true);
-                if (err<1)
-                    return -5;
-
-                if ( i+1 < file->direntries ) {
-                    /* read next sector */
-                    err = fat_readwrite(&dir, 1, buf, false);
-                    if (err<1)
-                        return -6;
-                }
-                sector++;
-            }
-        }
-
-        if ( entry % DIR_ENTRIES_PER_SECTOR ) {
-            /* flush this sector */
-            err = fat_seek(&dir, sector);
-            if (err<0)
-                return -7;
-            
-            err = fat_readwrite(&dir, 1, buf, true);
-            if (err<1)
-                return -8;
-        }
-    }
 
     file->firstcluster = 0;
     file->dircluster = 0;
+
+    return 0;
+}
+
+int fat_rename(struct fat_file* file, 
+               unsigned char* newname,
+               int size)
+{
+    int err;
+    struct fat_dir dir;
+    struct fat_file newfile = *file;
+
+    if ( !file->dircluster ) {
+        LDEBUGF("File has no dir cluster!\n");
+        return -1;
+    }
+
+    /* create a temporary file handle */
+    LDEBUGF("create a temporary file handle: fat_opendir(%x,%x)\n",
+            &dir, file->dircluster);
+    err = fat_opendir(&dir, file->dircluster);
+    if (err<0)
+        return -2;
+
+    /* create new name */
+    LDEBUGF("create new name\n");
+    err = add_dir_entry(&dir, &newfile, newname);
+    if (err<0)
+        return -3;
+
+    /* write size and cluster link */
+    LDEBUGF("write size and cluster link\n");
+    err = update_file_size(&newfile, size);
+    if (err<0)
+        return -4;
+
+    /* remove old name */
+    LDEBUGF("remove old name\n");
+    err = free_direntries(file->dircluster, file->direntry, file->direntries);
+    if (err<0)
+        return -5;
+
+    err = flush_fat();
+    if (err<0)
+        return -6;
 
     return 0;
 }

@@ -125,7 +125,7 @@ int open(const char* pathname, int flags)
             break;
         }
     }
-    closedir(dir);
+
     if ( !entry ) {
         LDEBUGF("Didn't find file %s\n",name);
         if ( file->write && (flags & O_CREAT) ) {
@@ -135,6 +135,7 @@ int open(const char* pathname, int flags)
                 DEBUGF("Couldn't create %s in %s\n",name,pathname);
                 errno = EIO;
                 file->busy = false;
+                closedir(dir);
                 return -5;
             }
             file->size = 0;
@@ -143,9 +144,11 @@ int open(const char* pathname, int flags)
             DEBUGF("Couldn't find %s in %s\n",name,pathname);
             errno = ENOENT;
             file->busy = false;
+            closedir(dir);
             return -6;
         }
     }
+    closedir(dir);
 
     file->cacheoffset = -1;
     file->fileoffset = 0;
@@ -205,23 +208,69 @@ int remove(const char* name)
     file = &openfiles[fd];
     rc = fat_truncate(&(file->fatfile));
     if ( rc < 0 ) {
-        DEBUGF("Failed truncating file\n");
+        DEBUGF("Failed truncating file: %d\n", rc);
         errno = EIO;
         return -1;
     }
 
     rc = fat_remove(&(file->fatfile));
     if ( rc < 0 ) {
-        DEBUGF("Failed removing file\n");
+        DEBUGF("Failed removing file: %d\n", rc);
         errno = EIO;
         return -2;
     }
 
     file->size = 0;
 
+    rc = close(fd);
+    if (rc<0)
+        return -3;
+
+    return 0;
+}
+
+int rename(const char* path, const char* newpath)
+{
+    int rc, fd;
+    char* nameptr;
+    struct filedesc* file;
+
+    /* verify new path does not already exist */
+    fd = open(newpath, O_RDONLY);
+    if ( fd >= 0 ) {
+        errno = EBUSY;
+        return fd;
+    }
     close(fd);
 
-    return rc;
+    fd = open(path, O_RDONLY);
+    if ( fd < 0 ) {
+        errno = EIO;
+        return fd;
+    }
+
+    /* strip path */
+    nameptr = strrchr(newpath,'/');
+    if (nameptr)
+        nameptr++;
+    else
+        nameptr = (char*)newpath;
+
+    file = &openfiles[fd];
+    rc = fat_rename(&file->fatfile, nameptr, file->size);
+    if ( rc < 0 ) {
+        DEBUGF("Failed renaming file: %d\n", rc);
+        errno = EIO;
+        return -1;
+    }
+
+    rc = close(fd);
+    if (rc<0) {
+        errno = EIO;
+        return -2;
+    }
+
+    return 0;
 }
 
 int ftruncate(int fd, unsigned int size)
