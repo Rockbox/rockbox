@@ -775,9 +775,11 @@ void settings_load(void)
         if (config_block[0xa9] != 0xff)
             global_settings.jump_scroll_delay = config_block[0xa9];
 #endif
-        global_settings.usemrb = (config_block[0xaf] >> 5) & 3;
-        global_settings.autocreatebookmark = (config_block[0xaf] >> 2) & 7;
-        global_settings.autoloadbookmark = (config_block[0xaf]) & 3;
+        if(config_block[0xaf] != 0xff) {
+            global_settings.usemrb = (config_block[0xaf] >> 5) & 3;
+            global_settings.autocreatebookmark = (config_block[0xaf] >> 2) & 7;
+            global_settings.autoloadbookmark = (config_block[0xaf]) & 3;
+        }
     }
 
     settings_apply();
