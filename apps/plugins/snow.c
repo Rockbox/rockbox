@@ -17,18 +17,32 @@
  *
  **************************************************************************/
 #include "plugin.h"
+#include "playergfx.h"
 
 #ifdef HAVE_LCD_BITMAP
-
 #define NUM_PARTICLES (LCD_WIDTH * LCD_HEIGHT / 72)
+#define SNOW_HEIGHT LCD_HEIGHT
+#define SNOW_WIDTH LCD_WIDTH
+#else
+#define NUM_PARTICLES 10
+#define SNOW_HEIGHT 14
+#define SNOW_WIDTH 20
+#endif
+
+/* variable button definitions */
+#if CONFIG_KEYPAD == PLAYER_PAD
+#define SNOW_QUIT BUTTON_STOP
+#else
+#define SNOW_QUIT BUTTON_OFF
+#endif
 
 static short particles[NUM_PARTICLES][2];
 static struct plugin_api* rb;
 
 static bool particle_exists(int particle)
 {
-    if (particles[particle][0]>=0 && particles[particle][1]>=0 && 
-        particles[particle][0]<LCD_WIDTH && particles[particle][1]<LCD_HEIGHT)
+    if (particles[particle][0]>=0 && particles[particle][1]>=0 &&
+        particles[particle][0]<SNOW_WIDTH && particles[particle][1]<SNOW_HEIGHT)
         return true;
     else
         return false;
@@ -40,7 +54,7 @@ static int create_particle(void)
 
     for (i=0; i<NUM_PARTICLES; i++) {
         if (!particle_exists(i)) {
-            particles[i][0]=(rb->rand()%LCD_WIDTH);
+            particles[i][0]=(rb->rand()%SNOW_WIDTH);
             particles[i][1]=0;
             return i;
         }
@@ -57,7 +71,11 @@ static void snow_move(void)
 
     for (i=0; i<NUM_PARTICLES; i++) {
         if (particle_exists(i)) {
+#ifdef HAVE_LCD_BITMAP
             rb->lcd_clearpixel(particles[i][0],particles[i][1]);
+#else
+            pgfx_clearpixel(particles[i][0],particles[i][1]);
+#endif
             switch ((rb->rand()%7)) {
                 case 0:
                     particles[i][0]++;
@@ -75,7 +93,11 @@ static void snow_move(void)
                     break;
             }
             if (particle_exists(i))
+#ifdef HAVE_LCD_BITMAP
                 rb->lcd_drawpixel(particles[i][0],particles[i][1]);
+#else
+                pgfx_drawpixel(particles[i][0],particles[i][1]);
+#endif
         }
     }
 }
@@ -88,7 +110,14 @@ static void snow_init(void)
         particles[i][0]=-1;
         particles[i][1]=-1;
     }        
+#ifdef HAVE_LCD_BITMAP
     rb->lcd_clear_display();
+#else
+    pgfx_display(0, 0); /* display three times */
+    pgfx_display(4, 0);
+    pgfx_display(8, 0);
+    pgfx_clear_display();
+#endif
 }
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
@@ -98,20 +127,40 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     (void)(parameter);
     rb = api;
 
+#ifdef HAVE_LCD_CHARCELLS
+    if (!pgfx_init(rb, 4, 2))
+    {
+        rb->splash(HZ*2, true, "Old LCD :(");
+        return PLUGIN_OK;
+    }
+#endif
     snow_init();
     while (1) {
         snow_move();
+#ifdef HAVE_LCD_BITMAP
         rb->lcd_update();
+#else
+        pgfx_update();
+#endif
         rb->sleep(HZ/20);
         
         button = rb->button_get(false);
 
-        if (button == BUTTON_OFF)
+        if (button == SNOW_QUIT)
+        {
+#ifdef HAVE_LCD_CHARCELLS
+            pgfx_release();
+#endif
             return PLUGIN_OK;
+        }
         else
             if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+            {
+#ifdef HAVE_LCD_CHARCELLS
+                pgfx_release();
+#endif
                 return PLUGIN_USB_CONNECTED;
+            }
     }
 }
 
-#endif

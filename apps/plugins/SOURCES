@@ -9,6 +9,7 @@ metronome.c
 mosaique.c
 rockbox_flash.c
 search.c
+snow.c
 sort.c
 stopwatch.c
 vbrfix.c
@@ -30,7 +31,6 @@ rockblox.c
 sliding_puzzle.c
 snake.c
 snake2.c
-snow.c
 sokoban.c
 #if CONFIG_KEYPAD != IRIVER_H100_PAD
 /* just because it isn't fixed yet to deal with this keymap */
