@@ -315,14 +315,25 @@ void lcd_puts(int x, int y, unsigned char *string)
 
 void lcd_put_cursor(int x, int y, char cursor_char)
 {
-  cursor.text[0]=buffer_xlcd[x][y];
-  cursor.text[1]=cursor_char;
-  cursor.len=2;
-  cursor.textpos=0;
-  cursor.y_pos=y;
-  cursor.x_pos=x;
-  cursor.downcount=0;
-  cursor.divider=4;
+  if (cursor.len==0) {
+    cursor.text[0]=buffer_xlcd[x][y];
+    cursor.text[1]=cursor_char;
+    cursor.len=2;
+    cursor.textpos=0;
+    cursor.y_pos=y;
+    cursor.x_pos=x;
+    cursor.downcount=0;
+    cursor.divider=4;
+  }
+}
+
+void lcd_remove_cursor(void)
+{
+  if (cursor.len!=0) {
+    cursor.len=0;
+    if (lcdx_putc(cursor.x_pos, cursor.y_pos, cursor.text[0]))
+      lcd_update();
+  }
 }
 
 void lcd_putc(int x, int y, unsigned short ch)
