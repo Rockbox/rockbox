@@ -78,7 +78,8 @@ void gray_drawbitmap(unsigned char *src, int x, int y, int nx, int ny,
 /* font support */
 void gray_setfont(int newfont);
 int gray_getstringsize(unsigned char *str, int *w, int *h);
-
+void gray_putsxy(int x, int y, unsigned char *str, bool draw_bg,
+                 int fg_brightness, int bg_brightness);
 #endif /* HAVE_LCD_BITMAP */
 #endif /* SIMULATOR */
 #endif /* __GRAY_H__ */
