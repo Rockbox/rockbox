@@ -16,10 +16,43 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+        #include "config.h"
+        #include "cpu.h"
 	.section .init.text
 	.global	start
 start:
-	/* We begin with some tricks. If we have built our code to be loaded
+#ifdef IRIVER_H100
+        /* Platform:     iRiver H1xx */
+        move.w #0x2700,%sr
+
+        move.l #MBAR+1,%d0
+        movec.l %d0,%mbar
+        
+        move.l #MBAR2+1,%d0
+        movec.l %d0,%mbar2
+
+        /* Test code: blink the backlight */
+        lea MBAR2,%a0
+        move.l #0x00020000,%d0
+        move.l %d0,(0xbc,%a0) /* Function = 1 */
+        move.l %d0,(0xb8,%a0) /* Enable = 1 */
+        
+.blinkloop:
+        eor.l %d0,(0xb4,%a0)
+        
+        move.l #2000000,%d2
+.delay:  
+        subq.l #1,%d2
+        bne .delay
+        jmp .blinkloop
+
+	.section .resetvectors
+vectors:
+	.long _stackend
+	.long start
+#else
+        /* Platform:     Archos Jukebox
+	 * We begin with some tricks. If we have built our code to be loaded
 	 * via the standalone GDB stub, we will have out VBR at some other
 	 * location than 0x9000000. We must copy the trap vectors for the
 	 * GDB stub to our vector table.
@@ -185,3 +218,4 @@ vectors:
 	.long _stackend
 	.long start
 	.long _stackend
+#endif
