@@ -669,7 +669,7 @@ static void storefile(char* filename, char* setting, int maxlen)
         ptr--;
     }
 
-    if (strcmp(ROCKBOX_DIR, currdir) || (len > maxlen-extlen))
+    if (strcmp(ROCKBOX_DIR, currdir) || (len-extlen > maxlen))
         return;
 
     strncpy(setting, filename, len-extlen);
