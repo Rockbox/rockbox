@@ -17,11 +17,12 @@
  *
  ****************************************************************************/
 #include "config.h"
-#include "sh7034.h"
+#include "cpu.h"
 #include "kernel.h"
 #include "thread.h"
 #include "adc.h"
 
+#if CONFIG_CPU == SH7034
 /**************************************************************************
  ** The A/D conversion is done every tick, in three steps:
  **
@@ -104,3 +105,89 @@ void adc_init(void)
     
     sleep(2);    /* Ensure valid readings when adc_init returns */
 }
+#elif CONFIG_CPU == MCF5249
+
+static unsigned char adcdata[NUM_ADC_CHANNELS];
+
+#define CS_LO  GPIO_OUT &= ~0x80
+#define CS_HI  GPIO_OUT |= 0x80
+#define CLK_LO GPIO_OUT &= ~0x00400000
+#define CLK_HI GPIO_OUT |= 0x00400000
+#define DO     (GPIO_READ & 0x80000000)
+#define DI_LO  GPIO_OUT &= ~0x00200000
+#define DI_HI  GPIO_OUT |= 0x00200000
+
+/* delay loop */
+#define DELAY   do { int _x; for(_x=0;_x<10;_x++);} while (0)
+
+unsigned char adc_scan(int channel)
+{
+    unsigned char data = 0;
+    int i;
+    
+    CS_LO;
+
+    DI_HI;  /* Start bit */
+    DELAY;
+    CLK_HI;
+    DELAY;
+    CLK_LO;
+    
+    DI_HI;  /* Single channel */
+    DELAY;
+    CLK_HI;
+    DELAY;
+    CLK_LO;
+
+    if(channel & 1) /* LSB of channel number */
+        DI_HI;
+    else
+        DI_LO;
+    DELAY;
+    CLK_HI;
+    DELAY;
+    CLK_LO;
+    
+    if(channel & 2) /* MSB of channel number */
+        DI_HI;
+    else
+        DI_LO;
+    DELAY;
+    CLK_HI;
+    DELAY;
+    CLK_LO;
+
+    DELAY;
+
+    for(i = 0;i < 8;i++) /* 8 bits of data */
+    {
+        CLK_HI;
+        DELAY;
+        CLK_LO;
+        DELAY;
+        data <<= 1;
+        data |= DO?1:0;
+    }
+    
+    CS_HI;
+
+    return data;
+}
+
+unsigned short adc_read(int channel)
+{
+    return adcdata[channel];
+}
+
+void adc_init(void)
+{
+    GPIO_FUNCTION |= 0x80600080; /* GPIO7:  CS
+                                    GPIO21: Data In (to the ADC)
+                                    GPIO22: CLK
+                                    GPIO31: Data Out (from the ADC) */
+    GPIO_ENABLE |= 0x00600080;
+    GPIO_OUT |= 0x80;         /* CS high */
+    GPIO_OUT &= ~0x00400000;  /* CLK low */
+}
+
+#endif
