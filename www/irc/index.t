@@ -1,7 +1,9 @@
 #define _PAGE_ IRC
 #include "head.t"
 
-<p>We often hang out on #rockbox over at irc.openprojects.net.
+<p>We often hang out on #rockbox over at irc.freenode.net
+(freenode was once known as openprojects.net, see
+<a href="http://freenode.net/">their web site</a> for more information).
 Since there is a great deal of technical discussion, we log these sessions
 for later reference.
 
