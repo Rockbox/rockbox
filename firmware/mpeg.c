@@ -57,6 +57,7 @@ extern void bitswap(unsigned char *data, int length);
 
 extern char* playlist_peek(int steps);
 extern int playlist_next(int steps);
+extern int playlist_amount(void);
 extern void update_file_pos( int id, int pos );
 
 static char *units[] =
@@ -709,6 +710,7 @@ static int add_track_to_tag_list(char *filename)
 /* If next_track is true, opens the next track, if false, opens prev track */
 static int new_file(int steps)
 {
+    int max_steps = playlist_amount();
     int start = num_tracks_in_memory() - 1;
 
     if (start < 0)
@@ -727,6 +729,10 @@ static int new_file(int steps)
         if(mpeg_file < 0) {
             DEBUGF("Couldn't open file: %s\n",trackname);
             steps++;
+
+            /* Bail out if no file could be opened */
+            if(steps > max_steps)
+                return -1;
         }
         else
         {
