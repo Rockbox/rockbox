@@ -840,11 +840,18 @@ static bool dirbrowse(char *root, int *dirfilter)
     memcpy(currdir,root,sizeof(currdir));
 
     if (*dirfilter < NUM_FILTER_MODES)
-    start_resume(true);
+        start_resume(true);
 
     numentries = showdir(currdir, dirstart, dirfilter);
     if (numentries == -1) 
         return false;  /* currdir is not a directory */
+    
+    if (*dirfilter > NUM_FILTER_MODES && numentries==0)
+    {
+        splash(HZ*2, 0, true, str(LANG_NO_FILES));
+        return false;  /* No files found for rockbox_browser() */
+    }
+    
     update_all = true;
 
     put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
@@ -1171,10 +1178,13 @@ static bool dirbrowse(char *root, int *dirfilter)
                 break;
 
             case TREE_MENU:
-                lcd_stop_scroll();
-                if (main_menu())
-                    reload_root = true;
-                restore = true;
+                if (*dirfilter < NUM_FILTER_MODES)
+                {
+                    lcd_stop_scroll();
+                    if (main_menu())
+                        reload_root = true;
+                    restore = true;
+                }
                 break;
 
             case BUTTON_ON:
@@ -1206,19 +1216,25 @@ static bool dirbrowse(char *root, int *dirfilter)
 
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_F2:
-                if (f2_screen())
-                    reload_root = true;
-                restore = true;
-                break;
+                if (*dirfilter < NUM_FILTER_MODES)
+                {
+                    if (f2_screen())
+                        reload_root = true;
+                    restore = true;
+                    break;
+                }
 
             case BUTTON_F3:
-                if (f3_screen())
-                    reload_root = true;
+                if (*dirfilter < NUM_FILTER_MODES)
+                {
+                    if (f3_screen())
+                        reload_root = true;
 
 #ifdef HAVE_LCD_BITMAP
-                tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
+                    tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
 #endif
-                restore = true;
+                    restore = true;
+                }
                 break;
 #endif
 

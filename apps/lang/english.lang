@@ -1767,3 +1767,8 @@ id: LANG_LINE_IN
 desc:  in settings_menu
 eng: "Line In"
 new:
+
+id: LANG_NO_FILES
+desc:  in settings_menu
+eng: "No files"
+new:
