@@ -1505,6 +1505,7 @@ bool rockbox_browse(char *root, int dirfilter)
 
     memcpy(currdir_save, currdir, sizeof(currdir));
     reload_dir = true;
+    start_wps = false;
     rc = dirbrowse(root, &dirfilter);
     memcpy(currdir, currdir_save, sizeof(currdir));
 
