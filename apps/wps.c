@@ -79,9 +79,9 @@ static void draw_screen(struct mp3entry* id3)
         }
         case PLAY_DISPLAY_DEFAULT:
         {
+            int l = 0;
 #ifdef HAVE_LCD_BITMAP
             char buffer[64];
-            int l = 0;
 
             lcd_puts(0, l++, id3->title?id3->title:"");
             lcd_puts(0, l++, id3->album?id3->album:"");
