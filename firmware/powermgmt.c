@@ -227,12 +227,15 @@ void battery_level_update(void)
     /* always use the decharge table */
 #endif
 
+#ifndef HAVE_MMC  /* this adjustment is only needed for HD based */
     if (battery_level_cached == -1) { /* first run of this procedure */
         /* the battery voltage is usually a little lower directly after
            turning on, because the disk was used heavily raise it by 5 % */
         battery_level_cached = (level > 95) ? 100 : level + 5;
     }
-    else {
+    else 
+#endif
+    {
         /* the level is allowed to be -1 of the last value when usb not
            connected and to be -3 of the last value when usb is connected */
         if (usb_inserted()) {
