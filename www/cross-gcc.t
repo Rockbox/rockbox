@@ -11,7 +11,7 @@ Note that the procedure is exactly the same if you are running cygwin on Windows
 You will need the following archives:
 <ul>
 <li>binutils-2.11.tar.gz (find it at your closest GNU FTP site)
-<li>gcc-3.0.3.tar.gz (find it at your closest GNU FTP site)
+<li>gcc-3.0.4.tar.gz (find it at your closest GNU FTP site)
 <li>(optional) gdb-5.1.1.tar.gz (find it at your closest GNU FTP site)
 </ul>
 
