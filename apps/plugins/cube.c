@@ -18,10 +18,7 @@
 *
 ***************************************************************************/
 #include "plugin.h"
-
-#ifdef HAVE_LCD_CHARCELLS
 #include "playergfx.h"
-#endif
 
 /* Loops that the values are displayed */
 #define DISP_TIME 30
@@ -315,6 +312,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         rb->splash(HZ*2, true, "Old LCD :(");
         return PLUGIN_OK;
     }
+    pgfx_display(3, 0);
 #endif
 
     cube_init();
@@ -338,7 +336,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         if (t_disp>0)
         {
             t_disp--;
-            rb->snprintf(buffer, 30, "x:%d y:%d z:%d h:%d",xs,ys,zs,highspeed);
+            rb->snprintf(buffer, sizeof(buffer), "x:%d y:%d z:%d h:%d",
+                         xs, ys, zs, highspeed);
             rb->lcd_putsxy(0, LCD_HEIGHT-8, buffer);
         }
         rb->lcd_update();
@@ -347,25 +346,24 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         {
             if (t_disp == DISP_TIME)
             {
-                rb->snprintf(buffer, 30, "x%d", xs);
+                rb->snprintf(buffer, sizeof(buffer), "x%d", xs);
                 rb->lcd_puts(0, 0, buffer);
-                rb->snprintf(buffer, 30, "y%d", ys);
-                rb->lcd_puts(8, 0, buffer);
-                rb->snprintf(buffer, 30, "z%d", zs);
+                rb->snprintf(buffer, sizeof(buffer), "y%d", ys);
                 rb->lcd_puts(0, 1, buffer);
-                rb->snprintf(buffer, 30, "h%d", highspeed);
+                pgfx_display(3, 0);
+                rb->snprintf(buffer, sizeof(buffer), "z%d", zs);
+                rb->lcd_puts(8, 0, buffer);
+                rb->snprintf(buffer, sizeof(buffer), "h%d", highspeed);
                 rb->lcd_puts(8, 1, buffer);
             }
             t_disp--;
             if (t_disp == 0)
             {
-                rb->lcd_puts(0, 0, "   ");
-                rb->lcd_puts(8, 0, "   ");
-                rb->lcd_puts(0, 1, "   ");
-                rb->lcd_puts(8, 1, "   ");
+                rb->lcd_clear_display();
+                pgfx_display(3, 0);
             }
         }
-        pgfx_display(3, 0);
+        pgfx_update();
 #endif
 
         xa+=xs;
@@ -437,7 +435,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
             default:
                 if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                {
+#ifdef HAVE_LCD_CHARCELLS
+                    pgfx_release();
+#endif
                     return PLUGIN_USB_CONNECTED;
+                }
                 break;
         }
         if (button!=BUTTON_NONE)
