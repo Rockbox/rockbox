@@ -117,7 +117,7 @@ void radio_init(void)
         radio_get = samsung_get;
     }
 #endif
-    radio_set(RADIO_SLEEP, 1); /* low power mode, if available */
+    radio_stop();
 }
 
 void radio_stop(void)
