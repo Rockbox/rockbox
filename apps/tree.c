@@ -46,6 +46,7 @@
 #include "rolo.h"
 #include "icons.h"
 #include "lang.h"
+#include "viewer.h"
 #include "language.h"
 #include "screens.h"
 
@@ -141,6 +142,7 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 #define TREE_ATTR_WPS 0x100 /* wps config file */
 #define TREE_ATTR_MOD 0x200 /* firmware file */
 #define TREE_ATTR_EQ  0x400 /* EQ config file */
+#define TREE_ATTR_TXT 0x500 /* text file */
 #define TREE_ATTR_FONT 0x800 /* font file */
 #define TREE_ATTR_LNG  0x1000 /* binary lang file */
 #define TREE_ATTR_MASK 0xffd0 /* which bits tree.c uses (above + DIR) */
@@ -258,6 +260,8 @@ static int showdir(char *path, int start)
                     dptr->attr |= TREE_ATTR_EQ;
                 else if (!strcasecmp(&entry->d_name[len-4], ".wps"))
                     dptr->attr |= TREE_ATTR_WPS;
+                else if (!strcasecmp(&entry->d_name[len-4], ".txt"))
+                    dptr->attr |= TREE_ATTR_TXT;
                 else if (!strcasecmp(&entry->d_name[len-4], ".lng"))
                     dptr->attr |= TREE_ATTR_LNG;
 #ifdef HAVE_RECORDER_KEYPAD
@@ -380,6 +384,10 @@ static int showdir(char *path, int start)
                 break;
 
             case TREE_ATTR_EQ:
+                icon_type = Wps;
+                break;
+
+            case TREE_ATTR_TXT:
                 icon_type = Wps;
                 break;
 
@@ -801,6 +809,13 @@ bool dirbrowse(char *root)
                             restore = true;
                             break;
 
+                        case TREE_ATTR_TXT:
+                            snprintf(buf, sizeof buf, "%s/%s",
+                                     currdir, file->name);
+                            viewer_run(buf);
+                            restore = true;
+                            break;
+
                         case TREE_ATTR_LNG:
                             snprintf(buf, sizeof buf, "%s/%s",
                                      currdir, file->name);
@@ -1031,6 +1046,11 @@ bool dirbrowse(char *root)
                 dirstart++;
                 dircursor--;
             }
+#ifdef HAVE_LCD_BITMAP
+            /* the sub-screen might've ruined the margins */
+            lcd_setmargins(MARGIN_X,MARGIN_Y); /* leave room for cursor and
+                                                  icon */
+#endif
             numentries = showdir(currdir, dirstart);
             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
         }
