@@ -348,6 +348,12 @@ void lcd_define_pattern (int which,char *pattern,int length)
     for (i=0;i<length;i++)
 	lcd_write(false,pattern[i]);
 }
+
+void lcd_update(void)
+{
+    /* dummy */
+}
+
 #endif
 
 #endif

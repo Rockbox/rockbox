@@ -29,6 +29,7 @@ extern void lcd_init(void);
 extern void lcd_clear_display(void);
 extern void lcd_backlight(bool on);
 extern void lcd_puts(int x, int y, char *string);
+extern void lcd_update(void);
 
 #ifdef HAVE_LCD_CHARCELLS
 #    define LCD_ICON_BATTERY         0
@@ -73,7 +74,6 @@ extern void lcd_define_pattern (int which,char *pattern,int length);
 #define LCD_WIDTH       112   /* Display width in pixels */
 #define LCD_HEIGHT      64    /* Display height in pixels */
 
-extern void lcd_update(void);
 extern void lcd_putsxy(int x, int y, char *string, int font);
 extern void lcd_setfont(int font);
 extern void lcd_getfontsize(int font, int *width, int *height);
