@@ -393,7 +393,8 @@ bool menu_run(int m)
                 return true;
 
             default:
-                if (menus[m].items[menus[m].cursor].function())
+                if ((menus[m].items[menus[m].cursor].function) &&
+                    (menus[m].items[menus[m].cursor].function()))
                     return true;
         }
     }
