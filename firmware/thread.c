@@ -46,20 +46,22 @@ static thread_t threads = {1, 0};
  */
 static inline void stctx(void* addr)
 {
-    asm volatile ("mov.l r8, @(0, %0)\n\t"
-                  "mov.l r9, @(4, %0)\n\t"
-                  "mov.l r10, @(8, %0)\n\t"
-                  "mov.l r11, @(12, %0)\n\t"
-                  "mov.l r12, @(16, %0)\n\t"
-                  "mov.l r13, @(20, %0)\n\t"
-                  "mov.l r14, @(24, %0)\n\t"
-                  "mov.l r15, @(28, %0)\n\t"
-                  "stc sr, r0\n\t"
-                  "mov.l r0, @(32, %0)\n\t"
-                  "stc gbr, r0\n\t"
-                  "mov.l r0, @(36, %0)\n\t"
-                  "sts pr, r0\n\t"
-                  "mov.l r0, @(40, %0)" :: "r" (addr));
+    unsigned int tmp;
+    
+    asm volatile ("mov.l r8, @(0, %1)\n\t"
+		  "mov.l r9, @(4, %1)\n\t"
+		  "mov.l r10, @(8, %1)\n\t"
+                  "mov.l r11, @(12, %1)\n\t"
+                  "mov.l r12, @(16, %1)\n\t"
+                  "mov.l r13, @(20, %1)\n\t"
+                  "mov.l r14, @(24, %1)\n\t"
+                  "mov.l r15, @(28, %1)\n\t"
+                  "stc sr, %0\n\t"
+                  "mov.l %0, @(32, %1)\n\t"
+                  "stc gbr, %0\n\t"
+                  "mov.l %0, @(36, %1)\n\t"
+                  "sts pr, %0\n\t"
+                  "mov.l %0, @(40, %1)" : "=r&" (tmp) : "r" (addr));
 }
 
 /*--------------------------------------------------------------------------- 
@@ -68,21 +70,23 @@ static inline void stctx(void* addr)
  */
 static inline void ldctx(void* addr)
 {
-    asm volatile ("mov.l @(0, %0), r8\n\t"
-                  "mov.l @(4, %0), r9\n\t"
-                  "mov.l @(8, %0), r10\n\t"
-                  "mov.l @(12, %0), r11\n\t"
-                  "mov.l @(16, %0), r12\n\t"
-                  "mov.l @(20, %0), r13\n\t"
-                  "mov.l @(24, %0), r14\n\t"
-                  "mov.l @(28, %0), r15\n\t"
-                  "mov.l @(32, %0), r0\n\t"
-                  "ldc r0, sr\n\t"
-                  "mov.l @(36, %0), r0\n\t"
-                  "ldc r0, gbr\n\t"
-                  "mov.l @(40, %0), r0\n\t"
-                  "lds r0, pr\n\t"
-                  "mov.l r0, @(0, r15)" :: "r" (addr));
+    unsigned int tmp;
+    
+    asm volatile ("mov.l @(0, %1), r8\n\t"
+                  "mov.l @(4, %1), r9\n\t"
+                  "mov.l @(8, %1), r10\n\t"
+                  "mov.l @(12, %1), r11\n\t"
+                  "mov.l @(16, %1), r12\n\t"
+                  "mov.l @(20, %1), r13\n\t"
+                  "mov.l @(24, %1), r14\n\t"
+                  "mov.l @(28, %1), r15\n\t"
+                  "mov.l @(32, %1), r0\n\t"
+                  "ldc %0, sr\n\t"
+                  "mov.l @(36, %1), %0\n\t"
+                  "ldc %0, gbr\n\t"
+                  "mov.l @(40, %1), %0\n\t"
+                  "lds %0, pr\n\t"
+                  "mov.l %0, @(0, r15)" : "=r&" (tmp) : "r" (addr));
 }
 
 /*--------------------------------------------------------------------------- 
