@@ -353,9 +353,9 @@ int settings_save( void )
         ((global_settings.avc & 0x03) | 
          ((global_settings.channel_config & 0x07) << 2));
 
-    memcpy(&config_block[0x12], &global_settings.resume_index, 2);
-    memcpy(&config_block[0x14], &global_settings.resume_first_index, 2);
-    memcpy(&config_block[0x16], &global_settings.resume_offset, 4);
+    *((short*)(&config_block[0x12])) = global_settings.resume_index;
+    *((short*)(&config_block[0x14])) = global_settings.resume_first_index;
+    *((int*)(&config_block[0x16])) = global_settings.resume_offset;
     DEBUGF( "+Resume index %X offset %X\n",
             global_settings.resume_index,
             global_settings.resume_offset );
@@ -370,7 +370,7 @@ int settings_save( void )
         (global_settings.flip_display ? 0x40 : 0) |
         (global_settings.rec_editable?0x80:0);
 
-    memcpy(&config_block[0x1d], &global_settings.resume_seed, 4);
+    *((int*)(&config_block[0x1d])) = global_settings.resume_seed;
 
     config_block[0x21] = (unsigned char)
         ((global_settings.repeat_mode & 3) |
@@ -654,13 +654,13 @@ void settings_load(void)
         }
 
         if (config_block[0x12] != 0xFF)
-            memcpy(&global_settings.resume_index, &config_block[0x12], 2);
+            global_settings.resume_index = *((short*)(&config_block[0x12]));
 
         if (config_block[0x14] != 0xFF)
-            memcpy(&global_settings.resume_first_index, &config_block[0x14], 2);
+            global_settings.resume_first_index= *((short*)(&config_block[0x14]));
 
         if (config_block[0x16] != 0xFF)
-            memcpy(&global_settings.resume_offset, &config_block[0x16], 4);
+            global_settings.resume_offset = *((int*)(&config_block[0x16]));
 
         if (config_block[0x1a] != 0xFF)
             global_settings.disk_spindown = config_block[0x1a];
@@ -681,7 +681,7 @@ void settings_load(void)
         }
 
         if (config_block[0x1d] != 0xFF)
-            memcpy(&global_settings.resume_seed, &config_block[0x1d], 4);
+            global_settings.resume_seed = *((int*)(&config_block[0x1d]));
 
         if (config_block[0x21] != 0xFF)
         {
