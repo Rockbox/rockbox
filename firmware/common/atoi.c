@@ -17,15 +17,38 @@
  *
  ****************************************************************************/
 
-#include "string.h"
+#include "ctype.h"
 
 int atoi (const char *str)
 {
-    int val = 0, mlt = 1;
-    char *p;
-    p = (char *) (str + strlen(str) - 1);
-    for (; p >= str; --p, mlt *=10)
-        val += (mlt * ((int)*p - '0'));
-    return val;
-}
+    int value = 0;
+    int sign = 1;
+    
+    while (isspace(*str))
+    {
+        str++;
+    }
+    
+    if ('-' == *str)
+    {
+        sign = -1;
+        str++;
+    }
+    else if ('+' == *str)
+    {
+        str++;
+    }
+    
+    while ('0' == *str)
+    {
+        str++;
+    }
 
+    while (isdigit(*str))
+    {
+        value = (value * 10) + (*str - '0');
+        str++;
+    }
+    
+    return value * sign;
+}
