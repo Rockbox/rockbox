@@ -223,6 +223,14 @@ int fat_startsector(void)
     return fat_bpb.startsector;
 }
 
+void fat_size(unsigned int* size, unsigned int* free)
+{
+    if (size)
+        *size = fat_bpb.dataclusters * fat_bpb.bpb_secperclus / 2;
+    if (free)
+        *free = fat_bpb.fsinfo.freecount * fat_bpb.bpb_secperclus / 2;
+}
+
 int fat_mount(int startsector)
 {
     unsigned char buf[SECTOR_SIZE];

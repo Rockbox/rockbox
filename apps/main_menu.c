@@ -38,6 +38,7 @@
 #include "powermgmt.h"
 #include "sound_menu.h"
 #include "status.h"
+#include "fat.h"
 
 #include "lang.h"
 
@@ -158,60 +159,87 @@ bool show_info(void)
     int integer, decimal;
     bool done = false;
     int key;
-    int state=0;
+    int state = 1;
 
     while(!done)
     {
+        int y=0;
         lcd_clear_display();
-        lcd_puts(0, 0, str(LANG_ROCKBOX_INFO));
-        
-        integer = buflen / 1000;
-        decimal = buflen % 1000;
-#ifdef HAVE_LCD_CHARCELLS
-        snprintf(s, sizeof(s), str(LANG_BUFFER_STAT_PLAYER), integer, decimal);
-        lcd_puts(0, 0, s);
-#else
-        snprintf(s, sizeof(s), str(LANG_BUFFER_STAT_RECORDER), integer,
-                 decimal);
-        lcd_puts(0, 2, s);
+#ifdef HAVE_LCD_BITMAP
+        lcd_puts(0, y++, str(LANG_ROCKBOX_INFO));
+        y++;
+        state = 3;
 #endif
 
+        if (state & 1) {
+            integer = buflen / 1000;
+            decimal = buflen % 1000;
 #ifdef HAVE_LCD_CHARCELLS
-        snprintf(s, sizeof(s), str(LANG_BATTERY_LEVEL_PLAYER), 
-                 battery_level(), battery_level_safe() ? "" : "!");
-        lcd_puts(0, 1, s);
+            snprintf(s, sizeof(s), str(LANG_BUFFER_STAT_PLAYER),
+                     integer, decimal);
+#else
+            snprintf(s, sizeof(s), str(LANG_BUFFER_STAT_RECORDER),
+                     integer, decimal);
+#endif
+            lcd_puts(0, y++, s);
+            
+#ifdef HAVE_LCD_CHARCELLS
+            snprintf(s, sizeof(s), str(LANG_BATTERY_LEVEL_PLAYER), 
+                     battery_level(), battery_level_safe() ? "" : "!");
 #else
 #ifdef HAVE_CHARGE_CTRL
-        if (charger_enabled)
-            snprintf(s, sizeof(s), str(LANG_BATTERY_CHARGE));
-        else
+            if (charger_enabled)
+                snprintf(s, sizeof(s), str(LANG_BATTERY_CHARGE));
+            else
+                snprintf(s, sizeof(s), str(LANG_BATTERY_LEVEL_RECORDER), 
+                         battery_level(), battery_level_safe() ? "" : " !!");
+#else
             snprintf(s, sizeof(s), str(LANG_BATTERY_LEVEL_RECORDER), 
                      battery_level(), battery_level_safe() ? "" : " !!");
-        lcd_puts(0, 3, s);
-#else
-        snprintf(s, sizeof(s), str(LANG_BATTERY_LEVEL_RECORDER), 
-                 battery_level(), battery_level_safe() ? "" : " !!");
-        lcd_puts(0, 3, s);
 #endif
 #endif
-    
+            lcd_puts(0, y++, s);
+        }
+
+        if (state & 2) {
+            unsigned int size, free;
+            fat_size( &size, &free );
+
+            size /= 1024;
+            integer = size / 1024;
+            decimal = size % 1024 / 100;
+            snprintf(s, sizeof s, str(LANG_DISK_STAT), integer, decimal);
+            lcd_puts(0, y++, s);
+            
+            free /= 1024;
+            integer = free / 1024;
+            decimal = free % 1024 / 100;
+            snprintf(s, sizeof s, str(LANG_DISK_FREE_STAT), integer, decimal);
+            lcd_puts(0, y++, s);
+        }
         lcd_update();
 
         /* Wait for a key to be pushed */
-        key = button_get_w_tmo(HZ/2);
-        if(key) {
-            switch(state) {
-            case 0:
-                /* first, a non-release event */
-                if(!(key&BUTTON_REL))
-                    state++;
+        key = button_get_w_tmo(HZ*5);
+        switch(key) {
+#ifdef HAVE_PLAYER_KEYPAD
+            case BUTTON_STOP | BUTTON_REL:
+#else
+            case BUTTON_LEFT | BUTTON_REL:
+            case BUTTON_OFF | BUTTON_REL:
+#endif
+                done = true;
                 break;
-            case 1:
-                /* then a release-event */
-                if(key&BUTTON_REL)
-                    done = true;
+
+#ifdef HAVE_PLAYER_KEYPAD
+            case BUTTON_LEFT:
+            case BUTTON_RIGHT:
+                if (state == 1)
+                    state = 2;
+                else
+                    state = 1;
                 break;
-            }
+#endif
         }
     }
 

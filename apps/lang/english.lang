@@ -1082,7 +1082,6 @@ id: LANG_PM_MAX
 desc: in the peak meter menu
 eng: "Maximum of range"
 new:
-
 id: LANG_RECORDING
 desc: in the main menu
 eng: "Recording"
@@ -1142,3 +1141,14 @@ id: LANG_RECORDING_SETTINGS
 desc: in the main menu
 eng: "Recording settings"
 new:
+
+id: LANG_DISK_STAT
+desc: disk size info
+eng: "Disk: %d.%dGB"
+new:
+
+id: LANG_DISK_FREE_STAT
+desc: disk size info
+eng: "Free: %d.%dGB"
+new:
+

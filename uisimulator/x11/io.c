@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <sys/vfs.h>
 #include <dirent.h>
 
 #include <fcntl.h>
@@ -106,4 +107,24 @@ int x11_open(char *name, int opts)
     return open(buffer, opts);
   }
   return open(name, opts);
+}
+
+void fat_size(unsigned int* size, unsigned int* free)
+{
+    struct statfs fs;
+
+    if (!statfs(".", &fs)) {
+        DEBUGF("statfs: bsize=%d blocks=%d free=%d\n",
+               fs.f_bsize, fs.f_blocks, fs.f_bfree);
+        if (size)
+            *size = fs.f_blocks * (fs.f_bsize / 1024);
+        if (free)
+            *free = fs.f_bfree * (fs.f_bsize / 1024);
+    }
+    else {
+        if (size)
+            *size = 0;
+        if (free)
+            *free = 0;
+    }
 }
