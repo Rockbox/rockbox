@@ -1,15 +1,8 @@
-# $Id$
-#
-# This is the czech language files.
-#
-# *WARNING*
-#
-# If you want to add a new string, add it to the end of this file!
-# If you want to remove a string, just blank it, don't actually remove it!
-#
-# If you re-order things or remove entries, you must bump the binary language
-# file version number in both the 'binlang' tool and the language loader code.
-#
+# Czech language file 
+# Based on english.lang version 1.91
+# Translated by Jiri Jurecek
+
+
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
@@ -18,7 +11,7 @@ new: "Nastavení zvuku"
 id: LANG_GENERAL_SETTINGS
 desc: in the main menu
 eng: "General Settings"
-new: "Nastavení"
+new: "Obecné nastavení"
 
 id: LANG_GAMES
 desc: in the main menu
@@ -115,13 +108,11 @@ desc: displayed on screen while loading a playlist
 eng: "Loading..."
 new: "Nahrávám..."
 
-# NO LONGER USED
 id: LANG_PLAYLIST_SHUFFLE
 desc: displayed on screen while shuffling a playlist
 eng: "Shuffling..."
 new: "Promíchávání..."
 
-# NO LONGER USED
 id: LANG_PLAYLIST_PLAY
 desc: displayed on screen when start playing a playlist
 eng: "Playing..."
@@ -137,7 +128,6 @@ desc: in playlist.indices() when playlist is full
 eng: "Buffer Full"
 new: "Zaplnìný buffer"
 
-# NO LONGER USED
 id: LANG_PLAYINDICES_AMOUNT
 desc: number of files in playlist
 eng: "%d Files"
@@ -150,8 +140,8 @@ new: "Neulo¾eno"
 
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
-eng: "Batt. Low?"
-new: "Vybitá bat?"
+eng: "Partition?"
+new: "Disk.chyba?"
 
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
@@ -160,8 +150,8 @@ new: "Ukládání selhalo"
 
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
-eng: "Is Battery Low?"
-new: "Vybitá baterie?"
+eng: "No partition?"
+new: "Chyba disku?"
 
 id: LANG_TIME_SET
 desc: used in set_time()
@@ -273,13 +263,11 @@ desc: in settings_menu
 eng: "Follow Playlist"
 new: "Následování seznamu skladeb"
 
-# depreciated
 id: LANG_RESET_ASK_PLAYER
 desc: confirm to reset settings
 eng: ""
 new: "Opravdu?"
- 
-# depreciated
+
 id: LANG_RESET_CONFIRM_PLAYER
 desc: confirm to reset settings
 eng: ""
@@ -290,13 +278,11 @@ desc: confirm to reset settings
 eng: "Are You Sure?"
 new: "Jste si jistý?"
 
-# depreciated
 id: LANG_RESET_CONFIRM_RECORDER
 desc: confirm to reset settings
 eng: ""
 new: "Play=Vynulovat"
 
-# depreciated
 id: LANG_RESET_CANCEL_RECORDER
 desc: confirm to reset settings
 eng: "OFF=Cancel"
@@ -375,7 +361,7 @@ new: "Vý¹ky"
 id: LANG_LOUDNESS
 desc: in sound_settings
 eng: "Loudness"
-new: "Hlasitost"
+new: "Støedy"
 
 id: LANG_BBOOST
 desc: in sound settings
@@ -444,12 +430,12 @@ new: "(PLAY/STOP)"
 
 id: LANG_RESUME_CONFIRM_RECORDER
 desc: possible answer to resume question
-eng: "PLAY = Yes"
+eng: ""
 new: "Play = Ano"
 
 id: LANG_RESUME_CANCEL_RECORDER
 desc: possible answer to resume question
-eng: "Any Other = No"
+eng: ""
 new: "Ostatní = Ne"
 
 id: LANG_KEYLOCK_ON_PLAYER
@@ -465,32 +451,32 @@ new: "Klávesy vyp."
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
 eng: "Key Lock Is ON"
-new: "Klávesy aktivovány"
+new: "Klávesy zamknuty"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
-eng: "Key Lock Is OFF" 
-new: "Klávesy zamknuty"
+eng: "Key Lock Is OFF"
+new: "Klávesy aktivovány"
 
 id: LANG_MUTE_ON_PLAYER
 desc: displayed when mute is on
 eng: "Mute ON"
-new: "Zvuk zap."
+new: "Zvuk vyp."
 
 id: LANG_MUTE_OFF_PLAYER
 desc: displayed when mute is off
-eng: ""
-new: "Zvuk vyp."
+eng: "Mute OFF"
+new: "Zvuk zap."
 
 id: LANG_MUTE_ON_RECORDER
 desc: displayed when mute is on
 eng: "Mute Is ON"
-new: "Zvuk zapnutý"
+new: "Zvuk vypnutý"
 
 id: LANG_MUTE_OFF_RECORDER
 desc: displayed when mute is off
 eng: "Mute Is OFF"
-new: "Zvuk vypnutý"
+new: "Zvuk zapnutý"
 
 id: LANG_ID3_INFO
 desc: in the browse_id3() function
@@ -674,128 +660,117 @@ new: "[PLAY] - Start/Pauza"
 
 id: LANG_SOKOBAN_LEVEL
 desc: must be smaller than 6 characters
-eng: "Level"
+eng: ""
 new: "Level"
 
 id: LANG_SOKOBAN_MOVE
 desc: must be smaller than 6 characters
-eng: "Moves"
+eng: ""
 new: "Tahù"
 
 id: LANG_SOKOBAN_WIN
 desc: displayed when you win 
-eng: "YOU WIN!!"
+eng: ""
 new: "VYHRÁLS!!"
 
 id: LANG_SOKOBAN_QUIT
 desc: how to quit game
-eng: "[OFF] To Stop"
+eng: ""
 new: "[OFF] - konec"
 
 id: LANG_SOKOBAN_F1
 desc: what does F1 do
-eng: "[F1] - Level"
+eng: ""
 new: "[F1]  - Level"
 
 id: LANG_SOKOBAN_F2
 desc: what does F2 do
-eng: "[F2] Same Level"
+eng: ""
 new: "[F2]  - Stejný Level"
 
 id: LANG_SOKOBAN_F3
 desc: what does F3 do
-eng: "[F3] + Level"
+eng: ""
 new: "[F3]  + Level"
-
-# Next ids are for Worlmet Game.
-# Lenght restrictions for score board strings (LANG_SB_XXX):
-# LCD_PROPFONTS: max 43 pixel
-# fix font: max 7 characters
 
 id: LANG_WORMLET_LENGTH
 desc: wormlet game
-eng: "Len:%d"
+eng: ""
 new: "Vel:%d"
 
 id: LANG_WORMLET_GROWING
 desc: wormlet game 
-eng: "Growing"
+eng: ""
 new: "Roste"
 
 id: LANG_WORMLET_HUNGRY
 desc: wormlet game
-eng: "Hungry"
+eng: ""
 new: "Hladný"
 
 id: LANG_WORMLET_WORMED
 desc: wormlet game
-eng: "Wormed"
+eng: ""
 new: "Se¾rán"
 
 id: LANG_WORMLET_ARGH
 desc: wormlet game
-eng: "Argh"
+eng: ""
 new: "Ups"
 
 id: LANG_WORMLET_CRASHED
 desc: wormlet game
-eng: "Crashed"
+eng: ""
 new: "Narazil"
 
 id: LANG_WORMLET_HIGHSCORE
 desc: wormlet game
-eng: "Hs: %d"
+eng: ""
 new: "Rek:%d"
-
-# Length restrictions for wormlet config screen strings (LANG_CS_XXX)
-# They must fit on the entire screen - preferably with the
-# key names aligned right
 
 id: LANG_WORMLET_PLAYERS
 desc: wormlet game
-eng: "%d Players    UP/DN"
+eng: ""
 new: "%d hráè(ù)    UP/DN"
 
 id: LANG_WORMLET_WORMS
 desc: wormlet game
-eng: "%d Worms        L/R"
+eng: ""
 new: "%d èerv(ù)      L/P"
 
 id: LANG_WORMLET_REMOTE_CTRL
 desc: wormlet game
-eng: "Remote Control F1"
+eng: ""
 new: "Dálk. ovládání F1"
 
 id: LANG_WORMLET_NO_REM_CTRL
 desc: wormlet game
-eng: "No Rem. Control F1"
+eng: ""
 new: "Bez dálk. ovl.  F1"
 
 id: LANG_WORMLET_2_KEY_CTRL
 desc: wormlet game
-eng: "2 Key Control   F1"
+eng: ""
 new: "2 ovl.klávesy   F1"
 
 id: LANG_WORMLET_4_KEY_CTRL
 desc: wormlet game
-eng: "4 Key Control   F1"
+eng: ""
 new: "4 ovl.klávesy   F1"
 
 id: LANG_WORMLET_NO_CONTROL
 desc: wormlet game
-eng: "Out Of Control"
+eng: ""
 new: "Bez ovládání"
-
-# Wormlet game ids ended
 
 id: LANG_TETRIS_LOSE
 desc: tetris game
-eng: "You Lose!"
+eng: ""
 new: "Dohráls!"
 
 id: LANG_TETRIS_LEVEL
 desc: tetris game
-eng: "Rows - Level"
+eng: ""
 new: "Øadkù - Level"
 
 id: LANG_POWEROFF_IDLE
@@ -843,7 +818,7 @@ desc: in the display menu
 eng: "Peak Meter"
 new: "Graf. ekvalizér"
 
-id:   LANG_PM_RELEASE
+id: LANG_PM_RELEASE
 desc: in the peak meter menu
 eng: "Peak Release"
 new: "Uvolnìní maxima"
@@ -892,15 +867,11 @@ id: LANG_RESET_CONFIRM
 desc: confirm to reset settings
 eng: "PLAY=Reset"
 new: "PLAY=Vynuluj"
- 
+
 id: LANG_RESET_CANCEL
 desc: confirm to reset settings
 eng: "OFF=Cancel"
 new: "OFF =Zachovat"
-
-# NOTE: ignore this label.  It is no longer used/was an error.
-# We are aware of this and it will this instance will be removed in the future
-id: LANG_TETRIS_LEVEL
 
 id: LANG_TIMEFORMAT
 desc: select the time format of time in status bar
@@ -1090,7 +1061,7 @@ new: "Maximum rozsahu"
 id: LANG_RECORDING
 desc: in the main menu
 eng: "Recording"
-new: "Nahrávání"
+new: "Záznam"
 
 id: LANG_RECORDING_GAIN
 desc: in the recording screen
@@ -1145,7 +1116,7 @@ new: "Digit."
 id: LANG_RECORDING_SETTINGS
 desc: in the main menu
 eng: "Recording Settings"
-new: "Nastavení nahrávání"
+new: "Nastavení záznamu"
 
 id: LANG_DISK_STAT
 desc: disk size info
@@ -1536,3 +1507,273 @@ id: LANG_JUMP_SCROLL_DELAY
 desc: (player) Delay before making a jump scroll
 eng: "Jump Scroll Delay"
 new: "Uvodní prodleva"
+
+id: LANG_BOOT_CHANGED
+desc: File browser discovered the boot file was changed
+eng: "Boot changed"
+new: "Zmìnìn firmware"
+
+id: LANG_CANCEL_WITH_ANY_RECORDER
+desc: Generic recorder string to use to cancel
+eng: "Any Other = No"
+new: "Ostatní = Ne"
+
+id: LANG_CONFIRM_WITH_PLAY_RECORDER
+desc: Generic recorder string to use to confirm
+eng: "PLAY = Yes"
+new: "Play = Ano"
+
+id: LANG_DISK_FULL
+desc: in recording screen
+eng: "The disk is full. Press OFF to continue."
+new: "Disk je plný. Pro pokraèování stisknìte OFF."
+
+id: LANG_FLIPIT
+desc: in the games menu
+eng: "Flipit"
+new: "FlipIt"
+
+id: LANG_INSERT
+desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+eng: "Insert"
+new: "Vlo¾it"
+
+id: LANG_INSERT_FIRST
+desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+eng: "Insert next"
+new: "Vlo¾it za"
+
+id: LANG_INSERT_LAST
+desc: in onplay menu.  append a track/playlist into dynamic playlist.
+eng: "Insert last"
+new: "Vlo¾it na konec"
+
+id: LANG_OFF_ABORT
+desc: Used on recorder models
+eng: "OFF to abort"
+new: "OFF zru¹it"
+
+id: LANG_OTHELO
+desc: in the games menu
+eng: "Othelo"
+new: "Othelo"
+
+id: LANG_PLAYLIST_ACCESS_ERROR
+desc: Playlist error
+eng: "Error accessing playlist file"
+new: "Chyba pøi pøístupu k playlistu"
+
+id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
+desc: Playlist error
+eng: "Error accessing playlist control file"
+new: "Chyba pøístupu k konf. souboru playlistu"
+
+id: LANG_PLAYLIST_CONTROL_INVALID
+desc: Playlist resume error
+eng: "Playlist control file is invalid"
+new: "Konf. soubor playlistu je neplatný"
+
+id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
+desc: Playlist error
+eng: "Error updating playlist control file"
+new: "Chyba pøístupu k konf. souboru playlistu"
+
+id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
+desc: Playlist error
+eng: "Error accessing directory"
+new: "Chyba pøístupu k adresáøi"
+
+id: LANG_PLAYLIST_INSERT_COUNT
+desc: splash number of tracks inserted
+eng: "Inserted %d tracks (%s)"
+new: "Vlo¾eno %d skladeb (%s)"
+
+id: LANG_PLAYLIST_MENU
+desc: in main menu.
+eng: "Playlist Options"
+new: "Nastavení playlistu"
+
+id: LANG_PLAYLIST_QUEUE_COUNT
+desc: splash number of tracks queued
+eng: "Queued %d tracks (%s)"
+new: "Zaøazeno %d skladeb (%s)"
+
+id: LANG_PLAYLIST_SAVE_COUNT
+desc: splash number of tracks saved
+eng: "Saved %d tracks (%s)"
+new: "Ulo¾eno %d skladeb (%s)"
+
+id: LANG_PLUGIN_CANT_OPEN
+desc: Plugin open error message
+eng: "Can't open %s"
+new: "Chyba pøi otvírání %s"
+
+id: LANG_PLUGIN_ERROR
+desc: The plugin return an error code
+eng: "Plugin returned error"
+new: "Plugin vrátil chybu"
+
+id: LANG_PLUGIN_WRONG_MODEL
+desc: The plugin is not compatible with the archos model trying to run it
+eng: "Incompatible model"
+new: "Nekompatibilní model"
+
+id: LANG_PLUGIN_WRONG_VERSION
+desc: The plugin is not compatible with the rockbox version trying to run it
+eng: "Incompatible version"
+new: "Nekompatibilní verze"
+
+id: LANG_QUEUE_FIRST
+desc: in onplay menu.  queue a track/playlist into dynamic playlist.
+eng: "Queue next"
+new: "Zaøadit za"
+
+id: LANG_QUEUE_LAST
+desc: in onplay menu.  queue a track/playlist at end of playlist.
+eng: "Queue last"
+new: "Zaøadit na konec"
+
+id: LANG_READ_FAILED
+desc: There was an error reading a file
+eng: "Failed reading %s"
+new: "Chyba ètení %s"
+
+id: LANG_REBOOT_NOW
+desc: Do you want to reboot?
+eng: "Reboot now?"
+new: "Restartovat nyní?"
+
+id: LANG_RECORD_TIMESPLIT
+desc: Prompt for record timer interval setting, in the record settings menu
+eng: "Time Split"
+new: "Interval rozdìlení"
+
+id: LANG_RECORD_TIMESPLIT_REC
+desc: 
+eng: "Split time:"
+new: "Interval rozdìlení:"
+
+id: LANG_RECURSE_DIRECTORY
+desc: In playlist menu
+eng: "Recursively Insert Directories"
+new: "Vkládat adresáøe rekurzivnì"
+
+id: LANG_SAVE_DYNAMIC_PLAYLIST
+desc: in playlist menu.
+eng: "Save Dynamic Playlist"
+new: "Ulo¾it dynamický playlist"
+
+id: LANG_SHOW_ICONS
+desc: in settings_menu
+eng: "Show Icons"
+new: "Zobrazit ikony"
+
+id: LANG_SLIDING_PUZZLE
+desc: in the games menu
+eng: "Sliding Puzzle"
+new: "Hra 15"
+
+id: LANG_STAR
+desc: in the games menu
+eng: "Star"
+new: "Star"
+
+id: LANG_STOP_ABORT
+desc: Used on player models
+eng: "STOP to abort"
+new: "STOP zru¹it"
+
+id: LANG_RECURSE_DIRECTORY_QUESTION
+desc: Asked from onplay screen
+eng: "Recursively?"
+new: "Rekurzivnì?"
+
+id: LANG_BUTTONBAR_MENU
+desc: in button bar
+eng: "Menu"
+new: "Menu" 
+
+id: LANG_BUTTONBAR_OPTIONS
+desc: in button bar
+eng: "Option"
+new: "Volby"
+
+id: LANG_CAR_ADAPTER_MODE
+desc: Displayed for setting car adapter mode to on/off
+eng: "Car Adapter Mode"
+new: "Mód auto adaptéru"
+
+id: LANG_CUSTOM_CFG
+desc: in setting_menu()
+eng: "Configurations"
+new: "Konfigurace"
+
+id: LANG_CUSTOM_FONT
+desc: in setting_menu()
+eng: "Fonts"
+new: "Fonty"
+
+id: LANG_FIRMWARE
+desc: in the main menu
+eng: "Firmware"
+new: "Firmware"
+
+id: LANG_FM_BUTTONBAR_PRESETS
+desc: in button bar
+eng: "Preset"
+new: "Pøedvolba"
+
+id: LANG_FM_DELETE_PRESET
+desc: in radio screen
+eng: "Remove preset"
+new: "Vyma¾ pøedvolbu"
+
+id: LANG_FM_NO_FREE_PRESETS
+desc: in radio screen
+eng: "The preset list is full"
+new: "Seznam pøedvoleb je plný"
+
+id: LANG_FM_NO_PRESETS
+desc: in radio screen
+eng: "The preset list is empty"
+new: "Seznam pødvoleb je prázdný"
+
+id: LANG_FM_PRESET_SAVE_FAILED
+desc: in radio screen
+eng: "Preset save failed"
+new: "Chyba pøi ukládání pøedvolby"
+
+id: LANG_FM_SAVE_PRESET
+desc: in radio screen
+eng: "Save preset"
+new: "Ulo¾it pøedvolbu"
+
+id: LANG_FM_STATION
+desc: in radio screen
+eng: "Station: %d.%dMHz"
+new: "Stanice: %d.%dMHz"
+
+id: LANG_LANGUAGE
+desc: in settings_menu
+eng: "Language"
+new: "Jazyk"
+
+id: LANG_LINE_IN
+desc: in settings_menu
+eng: "Line In"
+new: "Linkový vstup"
+
+id: LANG_NO_FILES
+desc: in settings_menu
+eng: "No files"
+new: "®ádné soubory"
+
+id: LANG_PLUGINS
+desc: in main_menu()
+eng: "Plugins"
+new: "Pluginy"
+
+id: LANG_WHILE_PLAYING
+desc: in settings_menu()
+eng: "While Playing Screen"
+new: "Pøehrávací obrazovka"
