@@ -17,7 +17,9 @@
  *
  ****************************************************************************/
 #include <stdio.h>
+#include <time.h>
 #include <stdbool.h>
+
 #include "debug.h"
 
 #include "screens.h"
@@ -169,4 +171,26 @@ void backlight_set_timeout(int seconds)
 void backlight_set_on_when_charging(bool beep)
 {
   (void)beep;
+}
+
+int rtc_read(int address)
+{
+  time_t now = time(NULL);
+  struct tm *teem = localtime(&now);
+
+  switch(address) {
+  case 3: /* hour */
+    return (teem->tm_hour%10) | ((teem->tm_hour/10) << 4);
+
+  case 2: /* minute */
+    return (teem->tm_min%10) | ((teem->tm_min/10) << 4);
+  }
+
+  return address ^ 0x55;
+}
+
+int rtc_write(int address, int value)
+{
+  DEBUGF("write %x to address %x\n", value, address);
+  return 0;
 }
