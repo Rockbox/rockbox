@@ -29,6 +29,7 @@
 #include "panic.h"
 #include "file.h"
 #include "settings.h"
+#include "id3.h"
 
 #define MPEG_STACK_SIZE 0x2000
 #define MPEG_CHUNKSIZE  0x20000
@@ -140,6 +141,14 @@ static bool playing; /* We are playing an MP3 stream */
 static bool filling; /* We are filling the buffer with data from disk */
 
 static int mpeg_file;
+
+/* list of tracks in memory */
+#define MAX_ID3_TAGS 4
+static struct {
+    struct mp3entry id3;
+    int mempos;
+} id3tags[MAX_ID3_TAGS];
+static int last_tag = 0;
 
 static void create_fliptable(void)
 {
@@ -271,6 +280,16 @@ void DEI3(void)
             last_dma_chunk_size = MIN(last_dma_chunk_size, space_until_end_of_buffer);
             DTCR3 = last_dma_chunk_size & 0xffff;
             SAR3 = (unsigned int)mp3buf + mp3buf_read;
+
+            /* will we move across the track boundary? */
+            if (( mp3buf_read <= id3tags[0].mempos ) &&
+                ( mp3buf_read + last_dma_chunk_size > id3tags[0].mempos )) {
+                /* shift array so index 0 is current track */
+                int i;
+                for (i=0; i<MAX_ID3_TAGS-1; i++)
+                    id3tags[i] = id3tags[i+1];
+                last_tag--;
+            }
         }
         else
         {
@@ -297,7 +316,15 @@ static int new_file(void)
     if ( !trackname )
         return -1;
 
-    debugf("playing %s\n", trackname);
+    DEBUGF("playing %s\n", trackname);
+
+    /* grab id3 tag of new file and remember where in memory it starts */
+    if ( last_tag < MAX_ID3_TAGS ) {
+        mp3info(&(id3tags[last_tag].id3), trackname);
+        id3tags[last_tag].mempos = mp3buf_write;
+        last_tag++;
+    }
+
     mpeg_file = open(trackname, O_RDONLY);
     if(mpeg_file < 0)
     {
@@ -305,6 +332,11 @@ static int new_file(void)
         return -1;
     }
     return 0;
+}
+
+struct mp3entry* mpeg_current_track(void)
+{
+    return &(id3tags[0].id3);
 }
 
 static void mpeg_thread(void)
@@ -344,6 +376,14 @@ static void mpeg_thread(void)
                     break;
                 }
                 
+                /* grab id3 tag of new file and
+                   remember where in memory it starts */
+                if ( last_tag < MAX_ID3_TAGS ) {
+                    mp3info(&(id3tags[last_tag].id3), ev.data);
+                    id3tags[last_tag].mempos = mp3buf_write;
+                    last_tag++;
+                }
+
                 /* Make it read more data */
                 filling = true;
                 queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);

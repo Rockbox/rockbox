@@ -29,6 +29,7 @@
 #include "sprintf.h"
 #include "settings.h"
 #include "wps.h"
+#include "mpeg.h"
 
 
 #define LINE_Y      1 /* initial line */
@@ -38,11 +39,12 @@
 #define PLAY_DISPLAY_TRACK_TITLE     2 
 
 /* demonstrates showing different formats from playtune */
-void wps_show_play(char* filename)
+void wps_show(void)
 {
-    struct mp3entry mp3;
-    mp3info(&mp3,filename);
+    struct mp3entry* id3 = mpeg_current_track();
+    static bool playing = true;
 
+    lcd_clear_display();
     switch ( global_settings.wps_display ) {
         case PLAY_DISPLAY_TRACK_TITLE:
         {
@@ -54,7 +56,7 @@ void wps_show_play(char* filename)
             char szBuff[257];
             szBuff[sizeof(szBuff)-1] = 0;
 
-            strncpy(szBuff, filename, sizeof(szBuff));
+            strncpy(szBuff, id3->path, sizeof(szBuff));
 
             szTok = strtok_r(szBuff, "/", &end);
             szTok = strtok_r(NULL, "/", &end);
@@ -62,7 +64,7 @@ void wps_show_play(char* filename)
             // Assume path format of: Genre/Artist/Album/Mp3_file
             strncpy(szArtist,szTok,sizeof(szArtist));
             szArtist[sizeof(szArtist)-1] = 0;
-            szDelimit = strrchr(filename, ch);
+            szDelimit = strrchr(id3->path, ch);
             lcd_puts(0,0, szArtist?szArtist:"<nothing>");
             lcd_puts_scroll(0,LINE_Y,(++szDelimit));
             break;
@@ -70,12 +72,12 @@ void wps_show_play(char* filename)
         case PLAY_DISPLAY_FILENAME_SCROLL:
         {
             char ch = '/';
-            char* szLast = strrchr(filename, ch);
+            char* szLast = strrchr(id3->path, ch);
 
             if (szLast)
                 lcd_puts_scroll(0,0, (++szLast));
             else
-                lcd_puts_scroll(0,0, mp3.path);
+                lcd_puts_scroll(0,0, id3->path);
 
             break;
         }
@@ -85,27 +87,46 @@ void wps_show_play(char* filename)
             char buffer[256];
 
             lcd_puts(0, 0, "[id3 info]");
-            lcd_puts(0, LINE_Y, mp3.title?mp3.title:"");
-            lcd_puts(0, LINE_Y+1, mp3.album?mp3.album:"");
-            lcd_puts(0, LINE_Y+2, mp3.artist?mp3.artist:"");
+            lcd_puts(0, LINE_Y, id3->title?id3->title:"");
+            lcd_puts(0, LINE_Y+1, id3->album?id3->album:"");
+            lcd_puts(0, LINE_Y+2, id3->artist?id3->artist:"");
 
-            snprintf(buffer,sizeof(buffer), "%d ms", mp3.length);
+            snprintf(buffer,sizeof(buffer), "%d ms", id3->length);
             lcd_puts(0, LINE_Y+3, buffer);
 
-            snprintf(buffer,sizeof(buffer), "%d kbits", mp3.bitrate);
+            snprintf(buffer,sizeof(buffer), "%d kbits", id3->bitrate);
 
             lcd_puts(0, LINE_Y+4, buffer);
 
-            snprintf(buffer,sizeof(buffer), "%d Hz", mp3.frequency);
+            snprintf(buffer,sizeof(buffer), "%d Hz", id3->frequency);
             lcd_puts(0, LINE_Y+5, buffer);
 #else
 
-            lcd_puts(0, 0, mp3.artist?mp3.artist:"<no artist>");
-            lcd_puts(0, 1, mp3.title?mp3.title:"<no title>");
+            lcd_puts(0, 0, id3->artist?id3->artist:"<no artist>");
+            lcd_puts(0, 1, id3->title?id3->title:"<no title>");
 #endif
             break;
         }
+    }
+    lcd_update();
+    while ( 1 ) {
+        switch ( button_get(true) ) {
+            case BUTTON_ON:
+                return;
 
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_PLAY:
+#else
+            case BUTTON_UP:
+#endif
+                if ( playing )
+                    mpeg_pause();
+                else
+                    mpeg_resume();
+
+                playing = !playing;
+                break;
+        }
     }
 }
 

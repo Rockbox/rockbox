@@ -76,7 +76,7 @@ APPCFLAGS = $(DEBUG) $(DEFINES) $(APPINCLUDES) -W -Wall
 FIRMSRCS = chartables.c lcd.c sprintf.c id3.c debug.c settings.c
 
 APPS = main.c tree.c play.c menu.c credits.c main_menu.c\
-	playlist.c showtext.c
+	playlist.c showtext.c wps.c
 
 MENUS = games_menu.c screensavers_menu.c settings_menu.c sound_menu.c
 
@@ -180,6 +180,9 @@ $(OBJDIR)/boxes.o: $(RECDIR)/boxes.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/main.o: $(APPDIR)/main.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/wps.o: $(APPDIR)/wps.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/bmp.o: $(RECDIR)/bmp.c

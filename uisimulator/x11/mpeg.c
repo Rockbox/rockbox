@@ -16,11 +16,13 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
+#include <stdbool.h>
 #include "debug.h"
+#include "id3.h"
 
 /* This file is for emulating some of the mpeg controlling functions of 
    the target */
+static struct mp3entry dummy;
 
 void mpeg_volume(void)
 {
@@ -43,6 +45,20 @@ void mpeg_play(char *tune)
 {
   DEBUGF("We instruct the MPEG thread to play %s for us\n",
          tune);
+  mp3info(&dummy, tune);
+}
+
+void mpeg_pause(void)
+{
+}
+
+void mpeg_resume(void)
+{
 }
 
 #endif
+
+struct mp3entry* mpeg_current_track(void)
+{
+    return &dummy;
+}

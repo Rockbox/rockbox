@@ -34,6 +34,7 @@
 #include "mpeg.h"
 #include "playlist.h"
 #include "menu.h"
+#include "wps.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
@@ -198,31 +199,31 @@ char* peek_next_track(int type)
         return NULL;
 
     switch(playing) {
-    default:
-    case 1:
-      /* play-full-dir mode */
+        default:
+        case 1:
+            /* play-full-dir mode */
       
-      /* get next track in dir */
-      while (dircursor + start + 1 < numentries ) {
-          if(dircursor+1 < TREE_MAX_ON_SCREEN)
-            dircursor++;
-          else
-            start++;
-          if ( dircacheptr[dircursor+start]->file &&
-               dircacheptr[dircursor+start]->name[strlen(dircacheptr[dircursor+start]->name)-1] == '3') {
-              snprintf(buf,sizeof buf,"%s/%s",
-                       currdir, dircacheptr[dircursor+start]->name );
-              lcd_clear_display();
-              lcd_puts(0,0,"<Playing>");
-              lcd_puts(0,1,"<all files>");
-              return buf;
-          }
-      }
-      break;
+            /* get next track in dir */
+            while (dircursor + start + 1 < numentries ) {
+                if(dircursor+1 < TREE_MAX_ON_SCREEN)
+                    dircursor++;
+                else
+                    start++;
+                if ( dircacheptr[dircursor+start]->file &&
+                     dircacheptr[dircursor+start]->name[strlen(dircacheptr[dircursor+start]->name)-1] == '3') {
+                    snprintf(buf,sizeof buf,"%s/%s",
+                             currdir, dircacheptr[dircursor+start]->name );
+                    lcd_clear_display();
+                    lcd_puts(0,0,"<Playing>");
+                    lcd_puts(0,1,"<all files>");
+                    return buf;
+                }
+            }
+            break;
       
-    case 2:
-      /* playlist mode */
-      return playlist_next(type);
+        case 2:
+            /* playlist mode */
+            return playlist_next(type);
     }
 
     return NULL;
@@ -246,6 +247,7 @@ bool dirbrowse(char *root)
     lcd_update();
 
     while(1) {
+        bool restore = false;
         button = button_get(true);
 
         switch(button) {
@@ -267,8 +269,7 @@ bool dirbrowse(char *root)
                     }
                     else
                         start = dircursor = 0;
-                    numentries = showdir(currdir, start);
-                    put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+                    restore = true;
                 }
                 else
                     mpeg_stop();
@@ -316,8 +317,7 @@ bool dirbrowse(char *root)
                         playing = 0;
                     }
                 }
-                numentries = showdir(currdir, start);  
-                put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+                restore = true;
                 break;
                 
             case TREE_PREV:
@@ -354,20 +354,28 @@ bool dirbrowse(char *root)
             case TREE_MENU:
                 lcd_stop_scroll();
                 main_menu();
-
-                /* restore display */
-                /* TODO: this is just a copy from BUTTON_STOP, fix it */
-                lcd_clear_display();
-                numentries = showdir(currdir, start);
-                put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
-
+                restore = true;
                 break;
+
+            case BUTTON_ON:
+                wps_show();
+                restore = true;
+                break;
+
         }
 
-        lcd_stop_scroll();
-        if ( numentries )
-            lcd_puts_scroll(LINE_X, LINE_Y+dircursor,
-                            dircacheptr[start+dircursor]->name);
+        if ( restore ) {
+            /* restore display */
+            /* TODO: this is just a copy from BUTTON_STOP, fix it */
+            numentries = showdir(currdir, start);
+            put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
+        }
+        else {
+            lcd_stop_scroll();
+            if ( numentries )
+                lcd_puts_scroll(LINE_X, LINE_Y+dircursor,
+                                dircacheptr[start+dircursor]->name);
+        }
 
         lcd_update();
     }

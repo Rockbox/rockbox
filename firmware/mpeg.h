@@ -27,5 +27,6 @@ void mpeg_resume(void);
 void mpeg_volume(int percent);
 void mpeg_bass(int percent);
 void mpeg_treble(int percent);
+struct mp3entry* mpeg_current_track(void);
 
 #endif
