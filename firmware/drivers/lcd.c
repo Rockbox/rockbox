@@ -115,7 +115,7 @@ struct scrollinfo {
 
 static void scroll_thread(void);
 static char scroll_stack[0x100];
-static char scroll_speed = 10; /* updates per second */
+static char scroll_speed = 5; /* updates per second */
 
 static struct scrollinfo scroll; /* only one scroll line at the moment */
 static int scroll_count = 0;
