@@ -282,6 +282,15 @@ int wps_load_custom_config(void)
                             snprintf(tmpbuf, sizeof(tmpbuf), "%s",
                                     szLast?++szLast:id3->path);
                         break;
+                    case 'h':  /* Conditional Filename \ ID3 Title-Artist */
+                        if(id3->artist && id3->title)
+                            snprintf(tmpbuf, sizeof(tmpbuf), "%s - %s",
+                                    id3->title?id3->title:"<no title>");
+                                    id3->artist?id3->artist:"<no artist>",
+                        else
+                            snprintf(tmpbuf, sizeof(tmpbuf), "%s",
+                                    szLast?++szLast:id3->path);
+                        break;
                     case 'b':  /* File Bitrate */
                         snprintf(tmpbuf, sizeof(tmpbuf), "%d", id3->bitrate);
                         break;

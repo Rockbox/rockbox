@@ -24,6 +24,9 @@ Tags
 %c : Conditional Title/Filename
        Displays "Artist - Title" *or*
        Displays Filename if no ID3 Artist/Title
+%h : Conditional Title/Filename
+       Displays "Title - Artist" *or*
+       Displays Filename if no ID3 Artist/Title
 %b : File Bitrate
 %f : File Frequency
 %p : File Path
@@ -33,6 +36,7 @@ Tags
 %l : Playlist Total Entries
 %e : Elapsed Track Time
 %o : Total Track Time
+%% : Displays a %
 
 Example wps.config File
 -----------------------
