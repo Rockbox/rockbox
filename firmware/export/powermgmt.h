@@ -33,7 +33,7 @@
 #endif
 
 #define BATTERY_RANGE (BATTERY_LEVEL_FULL - BATTERY_LEVEL_EMPTY)
-#define BATTERY_CAPACITY_MAX 2400 /* max. capacity that can be selected in settings menu, min. is always 1500 */
+#define BATTERY_CAPACITY_MAX 3200 /* max. capacity that can be selected in settings menu, min. is always 1500 */
 
 #define POWER_HISTORY_LEN 2*60   /* 2 hours of samples, one per minute */
 #define POWER_AVG_N       4      /* how many samples to take for each measurement */
