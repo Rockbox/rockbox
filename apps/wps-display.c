@@ -327,7 +327,8 @@ static char* get_tag(struct mp3entry* id3,
 
                 case 'r': /* Remaining Time in Song */
                     flags->dynamic = true;
-                    format_time(buf, buf_size, id3->length - id3->elapsed - ff_rewind_count);
+                    format_time(buf, buf_size, 
+                                id3->length - id3->elapsed - ff_rewind_count);
                     return buf;
 
                 case 't':  /* Total Time */
