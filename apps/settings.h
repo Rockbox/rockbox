@@ -83,7 +83,8 @@ struct user_settings
                                1=always,
                                then according to timeout_values[] */
     bool backlight_on_when_charging;
-    bool discharge; /* maintain charge of at least: false = 90%, true = 10%  */
+    bool discharge; /* maintain charge of at least: false = 85%, true = 10%  */
+    bool trickle_charge; /* do trickle charging: 0=off, 1=on */
 
     /* resume settings */
 
