@@ -156,6 +156,10 @@ void status_draw(void)
         else
             lcd_icon(ICON_BATTERY_3, false);
     }
+
+    lcd_icon(ICON_REPEAT, global_settings.repeat_mode != REPEAT_OFF);
+    lcd_icon(ICON_1, global_settings.repeat_mode == REPEAT_ONE);
+    
 #endif
 #ifdef HAVE_LCD_BITMAP
     if (global_settings.statusbar) {
