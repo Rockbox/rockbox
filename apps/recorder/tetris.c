@@ -103,12 +103,9 @@ static const char block_data[7][4][2][4] =
     }
 };
 
-/* not even pseudo random :) */
 int t_rand(int range)
 {
-    static int count;
-    count++;
-    return count % range;
+    return current_tick % range;
 }
 
 void draw_frame(int fstart_x,int fstop_x,int fstart_y,int fstop_y)
