@@ -143,8 +143,6 @@ void init(void)
     }
     
     settings_load();
-    global_settings.total_boots++;
-    settings_save();
     
     mpeg_init( global_settings.volume,
                global_settings.bass,
