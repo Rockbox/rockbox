@@ -61,6 +61,7 @@
 #define BL_RTC      1 /* Recorder, RTC square wave output */
 #define BL_PA14_HI  2 /* Ondio, PA14 high active */
 #define BL_IRIVER   3 /* IRiver GPIO */
+#define BL_GMINI    4 /* Archos GMini */
 
 /* CONFIG_I2C */
 #define I2C_PLAYREC  0 /* Archos Player/Recorder style */

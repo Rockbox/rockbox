@@ -48,6 +48,8 @@
 
 #define CONFIG_I2C I2C_GMINI
 
+#define CONFIG_BACKLIGHT BL_GMINI
+
 #define GMINI_ARCH
 
 #endif
