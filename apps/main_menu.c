@@ -31,6 +31,7 @@
 #include "playlist.h"
 #include "settings.h"
 #include "settings_menu.h"
+#include "power.h"
 #include "sound_menu.h"
 
 #ifdef HAVE_LCD_BITMAP
@@ -148,8 +149,19 @@ void show_info(void)
 
     integer = buflen / 100;
     decimal = buflen % 100;
+#ifdef HAVE_LCD_CHARCELLS
+    snprintf(s, sizeof(s), "Buf: %d.%02dM", integer, decimal);
+#else
     snprintf(s, sizeof(s), "Buffer: %d.%02d Mb", integer, decimal);
+#endif
     lcd_puts(0, 3, s);
+    
+#ifdef HAVE_LCD_CHARCELLS
+    snprintf(s, sizeof(s), "Batt: %d%%", battery_level());
+#else
+    snprintf(s, sizeof(s), "Battery: %d%%", battery_level());
+#endif
+    lcd_puts(0, 4, s);
     
     lcd_update();
 
