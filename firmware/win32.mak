@@ -12,6 +12,7 @@ LD    = sh-elf-ld
 AR    = sh-elf-ar
 AS    = sh-elf-as
 OC    = sh-elf-objcopy
+TOOLSDIR = ../tools
 
 INCLUDES=-Iinclude -I. -Icommon -Idrivers
 
@@ -51,6 +52,12 @@ OBJS := $(SRC:%.c=$(OBJDIR)/%.o) $(OBJDIR)/crt0.o $(OBJDIR)/bitswap.o
 DEPS:=.deps
 DEPDIRS:=$(DEPS) $(DEPS)/drivers $(DEPS)/common $(DEPS)/malloc
 
+ifndef PLAYER
+ifndef PLAYER_OLD
+  OBJS += $(OBJDIR)/sysfont.o
+endif
+endif
+
 OUTPUT = $(OBJDIR)/librockbox.a
 
 $(OUTPUT): $(OBJS)
@@ -62,9 +69,12 @@ $(OBJDIR)/%.o: %.c
 $(OBJDIR)/%.o: %.S
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(OBJDIR)/sysfont.o: fonts/clR6x8.bdf
+	$(TOOLSDIR)/convbdf -c -o $(OBJDIR)/sysfont.c $<
+	$(CC) $(CFLAGS) -c $(OBJDIR)/sysfont.c -o $@
+
 clean:
-	rm -f $(OBJS) $(OUTPUT)
-	rm -rf $(OBJDIR)/$(DEPS)
+	-rm -f $(OBJS) $(OUTPUT) sysfont.c
 
 # Special targets
 $(OBJDIR)/thread.o: thread.c thread.h
