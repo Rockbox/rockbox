@@ -5,7 +5,7 @@
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <   
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/ 
-# $id:$
+# $Id$
 #
 # Copyright (C) 2002 by Daniel Stenberg <daniel@haxx.se>
 #
