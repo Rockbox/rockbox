@@ -272,7 +272,7 @@ Note: Submissions that do not state if their image is for the front or back of t
 <tr>
     <td></td>
     <td><a href="dw-rbox3-front.png"><img border=0 src="design18f.png" width=300 height=252></a></td>
-    <td><a href="dw-rbox3-back.png"><img border=0 src="design18b.png" width=300 height=151></a></td>
+    <td><a href="dw-rbox3-back.png"><img border=0 src="design18b.png" width=300 height=251></a></td>
 </tr>
 <tr>
     <td colspan=3>&nbsp</td>
