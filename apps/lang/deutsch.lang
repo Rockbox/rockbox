@@ -2,7 +2,7 @@
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
-new: "Klangeinstellugen"
+new: "Klangeinstellungen"
 
 id: LANG_GENERAL_SETTINGS
 desc: in the main menu
@@ -57,17 +57,17 @@ new: "Puffer: %d.%02dMb"
 id: LANG_BATTERY_LEVEL_PLAYER
 desc: the battery level in percentage
 eng: "Batt: %d%%%s"
-new: "Batt: %d%%%s"
+new: "Akku: %d%%%s"
 
 id: LANG_BATTERY_LEVEL_RECORDER
 desc: the battery level in percentage
 eng: "Battery: %d%%%s"
-new: "Batterie: %d%%%s"
+new: "Akku: %d%%%s"
 
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
 eng: "Battery: charging"
-new: "Batterie: Ladevorgang"
+new: "Akku: lädt"
 
 id: LANG_BOUNCE
 desc: in the demos menu
@@ -137,7 +137,7 @@ new: "Speicherfehler"
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
 eng: "Batt. low?"
-new: "Batt. schwach?"
+new: "Akku leer?"
 
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
@@ -147,7 +147,7 @@ new: "Speicherfehler"
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
 eng: "Is battery low?"
-new: "Batterie schwach?"
+new: "Akku leer?"
 
 id: LANG_TIME_SET
 desc: if save settings has failed
