@@ -52,10 +52,14 @@ ifeq ($(UNAME),Linux)
   INCLUDES += -I/usr/X11R6/include
   LIBDIRS = -L/usr/X11R6/lib
   DEFINES += -DLINUX
- # MPEG_PLAY = 1
+  MPEG_PLAY = 1
 else
   DEFINES += -DBIG_ENDIAN
   LIBDIRS = 
+endif
+
+ifdef MPEG_PLAY
+  INCLUDES += -I$(PREVAPPDIR)/common
 endif
 
 CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES)
