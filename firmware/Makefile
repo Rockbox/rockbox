@@ -49,8 +49,8 @@ $(OBJDIR)/%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	-$(RM) -f $(OBJDIR)/$(OBJS) *~ $(OUTPUT)
-	-$(RM) -r $(DEPS)
+	rm -f $(OBJS) $(OUTPUT)
+	rm -rf $(OBJDIR)/$(DEPS)
 
 # Special targets
 $(OBJDIR)/thread.o: thread.c thread.h
