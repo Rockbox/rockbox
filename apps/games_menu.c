@@ -19,6 +19,8 @@
 
 #include "config.h"
 #ifdef HAVE_LCD_BITMAP
+#ifdef USE_GAMES
+
 #include <stdio.h>
 #include <stdbool.h>
 #include "lcd.h"
@@ -50,4 +52,5 @@ Menu games_menu(void)
     return result;
 }
 
+#endif
 #endif
