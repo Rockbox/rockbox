@@ -167,7 +167,6 @@ int main(void)
 
     disk_init();
 
-    /* FixMe: the same kind of mounting happens in usb.c, share the code. */
     rc = disk_mount_all();
     if (rc<=0)
     {
@@ -178,6 +177,7 @@ int main(void)
     }
 
     lcd_puts(0, line++, "Loading firmware");
+    lcd_update();
     i = load_firmware();
     snprintf(buf, 256, "Result: %d", i);
     lcd_puts(0, line++, buf);
