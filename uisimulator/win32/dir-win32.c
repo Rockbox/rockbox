@@ -82,7 +82,7 @@ struct dirent *readdir (
         return 0;
     memcpy (dir->fd.d_name, fd.name, 256);
     
-    dir->fd.attribute = fd.attrib ;
+    dir->fd.attribute = fd.attrib & 0x3f;
     dir->fd.size = fd.size;
     dir->fd.startcluster = 0 ;
 
