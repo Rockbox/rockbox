@@ -299,8 +299,8 @@ static void load_playlist_entries_r(int end_index)
 
     viewer.last_index = end_index;
 
-    if (num_entries > MAX_PLAYLIST_ENTRIES)
-        num_entries = MAX_PLAYLIST_ENTRIES;
+    if (num_entries >= MAX_PLAYLIST_ENTRIES)
+        num_entries = MAX_PLAYLIST_ENTRIES-1;
 
     for(i=num_entries; i>=0; i--, end_index--)
     {
