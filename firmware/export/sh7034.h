@@ -153,6 +153,17 @@
 			
 #define CASCR_ADDR      0x05FFFFEE
 
+/* byte halves of the ports */
+#define PADRH_ADDR      0x05FFFFC0
+#define PADRL_ADDR      0x05FFFFC1
+#define PBDRH_ADDR      0x05FFFFC2
+#define PBDRL_ADDR      0x05FFFFC3
+#define PAIORH_ADDR     0x05FFFFC4
+#define PAIORL_ADDR     0x05FFFFC5
+#define PBIORH_ADDR     0x05FFFFC6
+#define PBIORL_ADDR     0x05FFFFC7
+
+
 /* Port B data register bits */
 #define PBDR_LCD_SDA    0x0001 /* LCD serial data */
 #define PBDR_LCD_SCK    0x0002 /* LCD serial clock */
@@ -309,6 +320,17 @@
 #define PCDR       (*((volatile unsigned short*)PCDR_ADDR))
 
 #define CASCR      (*((volatile unsigned char*)CASCR_ADDR))  
+
+/* byte halves of the ports */
+#define PADRH      (*((volatile unsigned char*)PADRH_ADDR))  
+#define PADRL      (*((volatile unsigned char*)PADRL_ADDR))  
+#define PBDRH      (*((volatile unsigned char*)PBDRH_ADDR))  
+#define PBDRL      (*((volatile unsigned char*)PBDRL_ADDR))  
+#define PAIORH     (*((volatile unsigned char*)PAIORH_ADDR)) 
+#define PAIORL     (*((volatile unsigned char*)PAIORL_ADDR)) 
+#define PBIORH     (*((volatile unsigned char*)PBIORH_ADDR)) 
+#define PBIORL     (*((volatile unsigned char*)PBIORL_ADDR)) 
+
 
 /***************************************************************************
  * Register bit definitions
