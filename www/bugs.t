@@ -9,6 +9,7 @@
 <h3>Rules for bug reporting:</h3>
 
 <ol>
+<li> Check that the bug hasn't already been fixed! Try the latest <a href="/daily.shtml">daily build</a>.
 <li> Check that the bug hasn't already been reported
 <li> Do not add "I have the same problem" to an existing bug report if you aren't <b>absolutely certain</b> that it really is the same problem
 <li> Always include the following information in your bug report:
