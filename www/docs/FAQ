@@ -112,6 +112,16 @@ A. Firstly, we wouldn't start something like this if we didn't simply enjoy
          being on the list does not mean it isn't a neat idea.  Bring it to 
          the list.
 
+Q. I don't see you mentioning ogg files on your list of ideas.  What about
+   supporting those?
+A. At the current time this is not considered a possible option.  The 
+   Micronas chip MAS3507 decoder in the archos doesnt support ogg decoding
+   and there is too little program space in the player to implement it 
+   ourselves.  The alternative would be to write a software decoder as part
+   of the RockBox firmware.  However, as much as we love our players, the
+   computing power of the Archos (SH1 microcontroller) is not sufficent for
+   this need. 
+
 Q. I tried one of your firmware files and now I can't access my harddisk!
    When I turn on my jukebox, it says:
                      Part. Error
