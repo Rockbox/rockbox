@@ -49,6 +49,7 @@
 <input type=hidden name=as_sitesearch value="bjorn.haxx.se">
 </form></div>
 
+<a href="http://sourceforge.net"><img src="http://sourceforge.net/ sflogo.php?group_id=44306&amp;type=1" width="88" height="31" border="0" alt="SourceForge.net Logo"></a>
 </td>
 <td>
 
