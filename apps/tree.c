@@ -154,14 +154,7 @@ static int showdir(char *path, int start)
                    6, MARGIN_Y+(i-start)*LINE_HEIGTH, 6, 8, true);
 #endif
 
-        if(len < TREE_MAX_LEN_DISPLAY)
-            lcd_puts(LINE_X, LINE_Y+i-start, dircacheptr[i]->name);
-        else {
-            char storage = dircacheptr[i]->name[TREE_MAX_LEN_DISPLAY];
-            dircacheptr[i]->name[TREE_MAX_LEN_DISPLAY]=0;
-            lcd_puts(LINE_X, LINE_Y+i-start, dircacheptr[i]->name);
-            dircacheptr[i]->name[TREE_MAX_LEN_DISPLAY]=storage;
-        }
+        lcd_puts(LINE_X, LINE_Y+i-start, dircacheptr[i]->name);
     }
 
     return filesindir;
@@ -235,6 +228,8 @@ bool dirbrowse(char *root)
         return -1;  /* root is not a directory */
 
     lcd_puts(0, dircursor, CURSOR_CHAR);
+    lcd_puts_scroll(LINE_X, LINE_Y+dircursor,
+                    dircacheptr[start+dircursor]->name);
 #ifdef HAVE_LCD_BITMAP
     lcd_update();
 #endif
@@ -298,8 +293,8 @@ bool dirbrowse(char *root)
                     dircursor=0;
                     start=0;
                 } else {
-                    int len=
-                      strlen(dircacheptr[dircursor+start]->name);
+                    int len=strlen(dircacheptr[dircursor+start]->name);
+                    lcd_stop_scroll();
                     if((len > 4) &&
                        !strcmp(&dircacheptr[dircursor+start]->name[len-4],
                                ".m3u")) {
@@ -369,6 +364,7 @@ bool dirbrowse(char *root)
 #else
             case BUTTON_MENU:
 #endif
+                lcd_stop_scroll();
                 main_menu();
 
                 /* restore display */
@@ -384,6 +380,11 @@ bool dirbrowse(char *root)
 
                 break;
         }
+
+        lcd_stop_scroll();
+        lcd_puts_scroll(LINE_X, LINE_Y+dircursor,
+                        dircacheptr[start+dircursor]->name);
+
         lcd_update();
     }
 
