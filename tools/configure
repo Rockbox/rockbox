@@ -280,7 +280,7 @@ if [ -z "$archos" ]; then
     tool="$rootdir/tools/scramble -fm"
     output="ajbrec.ajz"
     appextra="recorder"
-    archosrom="$pwd/rombox.ucl"
+    archosrom=""
     flash="$pwd/rockbox.ucl"
     plugins="yes"
     ;;
