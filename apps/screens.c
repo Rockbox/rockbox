@@ -557,6 +557,10 @@ bool quick_screen(int context, int button)
                     case SHOW_PLAYLIST:
                         ptr = str(LANG_FILTER_PLAYLIST);
                         break;
+
+                    case SHOW_ID3DB:
+                        ptr = str(LANG_FILTER_ID3DB);
+                        break;
                 }
         
                 snprintf(buf, sizeof buf, "%s:", str(LANG_FILTER));

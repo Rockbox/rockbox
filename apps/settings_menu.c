@@ -471,10 +471,11 @@ static bool dir_filter(void)
         { STR(LANG_FILTER_ALL) },
         { STR(LANG_FILTER_SUPPORTED) },
         { STR(LANG_FILTER_MUSIC) },
-        { STR(LANG_FILTER_PLAYLIST) }
+        { STR(LANG_FILTER_PLAYLIST) },
+        { STR(LANG_FILTER_ID3DB) }
     };
     return set_option( str(LANG_FILTER), &global_settings.dirfilter, INT,
-                       names, 4, NULL );
+                       names, 5, NULL );
 }
 
 static bool sort_case(void)

@@ -2872,4 +2872,8 @@ eng: "Custom"
 voice: "Custom"
 new:
 
-
+id: LANG_FILTER_ID3DB
+desc: show ID3 database
+eng: "ID3 database"
+voice: "ID3 database"
+new:

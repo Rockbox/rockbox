@@ -194,7 +194,8 @@ struct user_settings
     /* misc options */
 
     int repeat_mode;   /* 0=off 1=repeat all 2=repeat one  */
-    int dirfilter;     /* 0=display all, 1=only supported, 2=only music */
+    int dirfilter;     /* 0=display all, 1=only supported, 2=only music,
+                          3=dirs+playlists, 4=ID3 database */
     bool sort_case;    /* dir sort order: 0=case insensitive, 1=sensitive */
     int volume_type;   /* how volume is displayed: 0=graphic, 1=percent */
     int battery_type;  /* how battery is displayed: 0=graphic, 1=percent */
@@ -351,8 +352,9 @@ enum { REPEAT_OFF, REPEAT_ALL, REPEAT_ONE, NUM_REPEAT_MODES };
 /* Note: Any new filter modes need to be added before NUM_FILTER_MODES.
  *       Any new rockbox browse filter modes (accessible through the menu)
  *       must be added after NUM_FILTER_MODES. */
-enum { SHOW_ALL, SHOW_SUPPORTED, SHOW_MUSIC, SHOW_PLAYLIST, NUM_FILTER_MODES, 
-SHOW_WPS, SHOW_CFG, SHOW_LNG, SHOW_MOD, SHOW_FONT, SHOW_PLUGINS};
+enum { SHOW_ALL, SHOW_SUPPORTED, SHOW_MUSIC, SHOW_PLAYLIST, SHOW_ID3DB,
+       NUM_FILTER_MODES,
+       SHOW_WPS, SHOW_CFG, SHOW_LNG, SHOW_MOD, SHOW_FONT, SHOW_PLUGINS};
 
 /* recursive dir insert options */
 enum { RECURSE_OFF, RECURSE_ON, RECURSE_ASK };
