@@ -457,18 +457,15 @@ static int readwrite(int fd, void* buf, int count, bool write)
         nread = headbytes;
         count -= headbytes;
     }
-
-    /* if buffer has been modified, write it back to disk */
-    if (nread && file->dirty) {
-        rc = flush_cache(fd);
-        if (rc < 0)
-            return rc * 10 - 3;
-    }
+    
+    /* If the buffer has been modified, either it has been flushed already
+     * (if (offs+headbytes == SECTOR_SIZE)...) or does not need to be (no
+     * more data to follow in this call). Do NOT flush here. */
 
     /* read/write whole sectors right into/from the supplied buffer */
     sectors = count / SECTOR_SIZE;
     if ( sectors ) {
-        int rc = fat_readwrite(&(file->fatfile), sectors, 
+        int rc = fat_readwrite(&(file->fatfile), sectors,
             (unsigned char*)buf+nread, write );
         if ( rc < 0 ) {
             DEBUGF("Failed read/writing %d sectors\n",sectors);
