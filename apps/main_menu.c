@@ -68,7 +68,7 @@ int show_logo( void )
     int font_h, font_w;
 
     lcd_clear_display();
-#if LCD_WIDTH == 112
+#if LCD_WIDTH == 112 || LCD_WIDTH == 128
     lcd_bitmap(rockbox112x37, 0, 10, 112, 37, false);
 #endif
 #if LCD_WIDTH == 160

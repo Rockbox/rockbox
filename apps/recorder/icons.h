@@ -64,7 +64,7 @@ extern const unsigned char bitmap_icons_5x8[1][5];
 extern const unsigned char bitmap_icons_6x8[LastIcon][6];
 extern const unsigned char bitmap_icons_7x8[Icon_Last][7];
 
-#if LCD_WIDTH == 112
+#if LCD_WIDTH == 112 || LCD_WIDTH == 128
 extern const unsigned char rockbox112x37[];
 #endif
 #if LCD_WIDTH == 160
