@@ -68,12 +68,8 @@ int show_logo( void )
 
     snprintf(version, sizeof(version), "Ver. %s", appsversion);
     lcd_getfontsize(0, &font_w, &font_h);
-
-    /* lcd_puts needs line height in Chars on screen not pixels */
-    width = ((LCD_WIDTH/font_w) - strlen(version)) / 2;
-    height = ((height+10)/font_h)+1;
-
-    lcd_puts(width, height, version);
+    lcd_putsxy((LCD_WIDTH/2) - ((strlen(version)*font_w)/2),
+               height+10+font_h, version, 0);
 #else
     char *rockbox = "ROCKbox!";
     lcd_puts(0, 0, rockbox);
