@@ -39,7 +39,8 @@ void power_init(void)
 }
 
 bool charger_inserted(void)
-{
+{     
+#ifdef HAVE_CHARGING
 #ifdef HAVE_CHARGE_CTRL
     /* Recorder */
     return adc_read(ADC_EXT_POWER) > 0x100;
@@ -53,10 +54,15 @@ bool charger_inserted(void)
     return (PADR & 1) == 0;
 #endif /* HAVE_FMADC */
 #endif /* HAVE_CHARGE_CTRL */
+#else
+    /* Ondio */
+    return false;
+#endif /* HAVE_CHARGING */
 }
 
 void charger_enable(bool on)
 {
+    (void)on;
 #ifdef HAVE_CHARGE_CTRL
     if(on) 
     {
@@ -68,11 +74,10 @@ void charger_enable(bool on)
         or_b(0x20, &PBDRL);
         charger_enabled = 0;
     }
-#else
-    on = on;
 #endif
 }
 
+#ifndef HAVE_MMC
 void ide_power_enable(bool on)
 {
     (void)on;
@@ -101,6 +106,7 @@ void ide_power_enable(bool on)
         PACR2 &= 0xFBFF; /* GPIO for PA5 */
     }
 }
+#endif /* !HAVE_MMC */
 
 
 bool ide_powered(void)
@@ -144,7 +150,7 @@ bool charger_inserted(void)
 
 void charger_enable(bool on)
 {
-    on = on;
+    (void)on;
 }
 
 void power_off(void)
@@ -153,7 +159,7 @@ void power_off(void)
 
 void ide_power_enable(bool on)
 {
-   on = on;
+   (void)on;
 }
 
 #endif /* SIMULATOR */
