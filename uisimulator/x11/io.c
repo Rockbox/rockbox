@@ -116,7 +116,7 @@ int x11_creat(char *name, int mode)
   if(name[0] == '/') {
     sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
 
-    debugf("We open the real file '%s'\n", buffer);
+    debugf("We create the real file '%s'\n", buffer);
     return creat(buffer, mode);
   }
   return creat(name, mode);
@@ -129,10 +129,25 @@ int x11_remove(char *name)
   if(name[0] == '/') {
     sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
 
-    debugf("We open the real file '%s'\n", buffer);
+    debugf("We remove the real file '%s'\n", buffer);
     return remove(buffer);
   }
   return remove(name);
+}
+
+int x11_rename(char *oldpath, char* newpath)
+{
+  char buffer1[256];
+  char buffer2[256];
+
+  if(oldpath[0] == '/') {
+      sprintf(buffer1, "%s%s", SIMULATOR_ARCHOS_ROOT, oldpath);
+      sprintf(buffer2, "%s%s", SIMULATOR_ARCHOS_ROOT, newpath);
+
+      debugf("We rename the real file '%s' to '%s'\n", buffer1, buffer2);
+      return rename(buffer1, buffer2);
+  }
+  return -1;
 }
 
 void fat_size(unsigned int* size, unsigned int* free)
