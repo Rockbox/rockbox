@@ -19,6 +19,12 @@
 #include <lcd.h>
 
 #include "icons.h"
+#ifndef SIMULATOR
+#include "sprintf.h"
+#endif
+#ifdef HAVE_RTC
+#include "rtc.h"
+#endif
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -32,6 +38,12 @@ unsigned char slider_bar[] =
     0x7c, 0x28, 0x28, 0x28, 0x28,
     0x7c, 0x28, 0x28, 0x28, 0x28,
     0x7c, 0x28, 0x28, 0x28, 0x28, 0x38
+};
+
+static unsigned char bitmap_icon_5x8[][5] =
+{
+    /* Lock */
+    {0x78,0x7f,0x49,0x7f,0x78}
 };
 
 unsigned char bitmap_icons_6x8[LastIcon][6] =
@@ -56,6 +68,36 @@ unsigned char bitmap_icons_6x8[LastIcon][6] =
     { 0x00, 0x1c, 0x3e, 0x3e, 0x3e, 0x1c },
     /* Cursor / Marker */
     { 0x7f, 0x3e, 0x1c, 0x08, 0x00, 0x00 },
+};
+
+static unsigned char bitmap_icon_7x8[][7] =
+{
+    /* Power plug */
+    {0x08,0x1c,0x1c,0x3e,0x3e,0x14,0x14},
+    /* Speaker */
+    {0x00,0x1c,0x1c,0x3e,0x7f,0x00,0x00},
+    /* Speaker mute */
+    {0x01,0x1e,0x1c,0x3e,0x7f,0x20,0x40},
+    /* Play */
+    {0x00,0x7f,0x7f,0x3e,0x1c,0x08,0x00},
+    /* Stop */
+    {0x7f,0x7f,0x7f,0x7f,0x7f,0x7f,0x7f},
+    /* Pause */
+    {0x00,0x7f,0x7f,0x00,0x7f,0x7f,0x00},
+    /* Fast forward */
+    {0x7f,0x3e,0x1c,0x7f,0x3e,0x1c,0x08},
+    /* Fast backward */
+    {0x08,0x1c,0x3e,0x7f,0x1c,0x3e,0x7f},
+    /* Record */
+    {0x1c,0x3e,0x7f,0x7f,0x7f,0x3e,0x1c},
+    /* Record pause */
+    {0x1c,0x3e,0x7f,0x00,0x7f,0x3e,0x1c},
+    /* Normal playmode */
+    {0x08,0x08,0x08,0x08,0x3e,0x1c,0x08},
+    /* Repeat playmode */
+    {0x38,0x44,0x44,0x4e,0x5f,0x44,0x38},
+    /* Shuffle playmode (dice) */
+    {0x3e,0x41,0x51,0x41,0x45,0x41,0x3e}
 };
 
 unsigned char rockbox112x37[]={
@@ -111,4 +153,131 @@ unsigned char rockbox112x37[]={
 
 };
 
+/*
+ * Wipe statusbar
+ */
+void statusbar_wipe(void)
+{
+    int x;
+
+    for (x = 0; x < LCD_WIDTH; x++)
+        lcd_framebuffer[x][STATUSBAR_Y_POS/8]=0x00; 
+}
+
+/*
+ * Print battery icon to status bar
+ */
+void statusbar_icon_battery(int percent, bool charging)
+{
+    int i,j;
+    int fill;
+
+    /* draw battery */
+    for(i=0;i<17;i++) {
+        DRAW_PIXEL((ICON_BATTERY_X_POS+i),STATUSBAR_Y_POS);
+        DRAW_PIXEL((ICON_BATTERY_X_POS+i),(STATUSBAR_Y_POS+6));
+    }
+    for(i=1;i<6;i++) {
+        DRAW_PIXEL(ICON_BATTERY_X_POS,(STATUSBAR_Y_POS+i));
+        DRAW_PIXEL((ICON_BATTERY_X_POS+16),(STATUSBAR_Y_POS+i));
+    }
+    for(i=2;i<5;i++)
+        DRAW_PIXEL((ICON_BATTERY_X_POS+17),(STATUSBAR_Y_POS+i));
+
+    /* fill battery */
+    fill=percent;
+    if(fill<0)
+        fill=0;
+    if(fill>100)
+        fill=100;
+    fill=fill*15/100;
+
+    for(i=1;i<=fill;i++)
+        for(j=1;j<6;j++)
+            DRAW_PIXEL((ICON_BATTERY_X_POS+i),(STATUSBAR_Y_POS+j));
+
+    if(charging)
+        lcd_bitmap(bitmap_icon_7x8[Icon_Plug], ICON_PLUG_X_POS, STATUSBAR_Y_POS, ICON_PLUG_WIDTH, STATUSBAR_HEIGHT, false);
+};
+
+/*
+ * Print volume gauge to status bar
+ */
+void statusbar_icon_volume(int percent)
+{
+    int i,j;
+    int volume;
+    int step=0;
+
+    volume=percent;
+    if(volume<0)
+        volume=0;
+    if(volume>100)
+        volume=100;
+
+    if(volume==0)
+        lcd_bitmap(bitmap_icon_7x8[Icon_Mute], ICON_VOLUME_X_POS+ICON_VOLUME_WIDTH/2-4, STATUSBAR_Y_POS, 7, STATUSBAR_HEIGHT, false);
+    else {
+        volume=volume*14/100;
+        for(i=0;i<volume;i++) {
+            if(i%2 == 0)
+                step++;
+            for(j=1;j<=step;j++)
+                DRAW_PIXEL((ICON_VOLUME_X_POS+i),(STATUSBAR_Y_POS+7-j));
+        }
+    }
+}
+
+/*
+ * Print play state to status bar
+ */
+void statusbar_icon_play_state(int state)
+{
+    lcd_bitmap(bitmap_icon_7x8[state], ICON_PLAY_STATE_X_POS, STATUSBAR_Y_POS, ICON_PLAY_STATE_WIDTH, STATUSBAR_HEIGHT, false);
+}
+
+/*
+ * Print play mode to status bar
+ */
+void statusbar_icon_play_mode(int mode)
+{
+    lcd_bitmap(bitmap_icon_7x8[mode], ICON_PLAY_MODE_X_POS, STATUSBAR_Y_POS, ICON_PLAY_MODE_WIDTH, STATUSBAR_HEIGHT, false);
+}
+
+/*
+ * Print shuffle mode to status bar
+ */
+void statusbar_icon_shuffle(void)
+{
+    lcd_bitmap(bitmap_icon_7x8[Icon_Shuffle], ICON_SHUFFLE_X_POS, STATUSBAR_Y_POS, ICON_SHUFFLE_WIDTH, STATUSBAR_HEIGHT, false);
+}
+
+/*
+ * Print lock when keys are locked
+ */
+void statusbar_icon_lock(void)
+{
+    lcd_bitmap(bitmap_icon_5x8[Icon_Lock], LOCK_X_POS, STATUSBAR_Y_POS, 5, 8, false);
+}
+
+#ifdef HAVE_RTC
+/*
+ * Print time to status bar
+ */
+void statusbar_time(void)
+{
+    int hour,minute;
+    unsigned char buffer[6];
+
+    hour = rtc_read(0x03);
+    minute = rtc_read(0x02);
+
+    snprintf(buffer, sizeof(buffer), "%d%d:%d%d",
+             (hour & 0x30) >> 4,
+             hour & 0x0f,
+             (minute & 0xf0) >> 4,
+             minute & 0x0f);
+    lcd_putsxy(TIME_X_POS, STATUSBAR_Y_POS, buffer, 0);
+}
+#endif
 #endif

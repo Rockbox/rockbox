@@ -36,9 +36,56 @@ extern unsigned char rockbox112x37[];
 
 extern unsigned char slider_bar[];
 
+#define STATUSBAR_X_POS       0
+#define STATUSBAR_Y_POS       0 // MUST be a multiple of 8
+#define STATUSBAR_HEIGHT      8
+#define STATUSBAR_WIDTH       LCD_WIDTH
+#define ICON_BATTERY_X_POS    0
+#define ICON_BATTERY_WIDTH    18
+#define ICON_PLUG_X_POS       STATUSBAR_X_POS+ICON_BATTERY_WIDTH+2
+#define ICON_PLUG_WIDTH       7
+#define ICON_VOLUME_X_POS     STATUSBAR_X_POS+ICON_BATTERY_WIDTH+ICON_PLUG_WIDTH+2+2
+#define ICON_VOLUME_WIDTH     14
+#define ICON_PLAY_STATE_X_POS STATUSBAR_X_POS+ICON_BATTERY_WIDTH+ICON_PLUG_WIDTH+ICON_VOLUME_WIDTH+2+2+2
+#define ICON_PLAY_STATE_WIDTH 7
+#define ICON_PLAY_MODE_X_POS  STATUSBAR_X_POS+ICON_BATTERY_WIDTH+ICON_PLUG_WIDTH+ICON_VOLUME_WIDTH+ICON_PLAY_STATE_WIDTH+2+2+2+2
+#define ICON_PLAY_MODE_WIDTH  7
+#define ICON_SHUFFLE_X_POS    STATUSBAR_X_POS+ICON_BATTERY_WIDTH+ICON_PLUG_WIDTH+ICON_VOLUME_WIDTH+ICON_PLAY_STATE_WIDTH+ICON_PLAY_MODE_WIDTH+2+2+2+2+2
+#define ICON_SHUFFLE_WIDTH    7
+#define LOCK_X_POS            STATUSBAR_X_POS+ICON_BATTERY_WIDTH+ICON_PLUG_WIDTH+ICON_VOLUME_WIDTH+ICON_PLAY_STATE_WIDTH+ICON_PLAY_MODE_WIDTH+ICON_SHUFFLE_WIDTH+2+2+2+2+2+2
+#define LOCK_WIDTH            5
+#define TIME_X_POS            STATUSBAR_WIDTH-5*6-1
+
+/* Symbolic names for icons */
+enum
+{
+    Icon_Lock = 0
+};
+enum
+{
+    Icon_Plug = 0,
+    Icon_Speaker,
+    Icon_Mute,
+    Icon_Play,
+    Icon_Stop,
+    Icon_Pause,
+    Icon_FastForward,
+    Icon_FastBackward,
+    Icon_Record,
+    Icon_RecPause,
+    Icon_Normal,
+    Icon_Repeat,
+    Icon_Shuffle
+};
+
+extern void statusbar_wipe(void);
+extern void statusbar_icon_battery(int percent, bool charging);
+extern void statusbar_icon_volume(int percent);
+extern void statusbar_icon_play_state(int state);
+extern void statusbar_icon_play_mode(int mode);
+extern void statusbar_icon_shuffle(void);
+extern void statusbar_icon_lock(void);
+#ifdef HAVE_RTC
+extern void statusbar_time(void);
+#endif
 #endif /* End HAVE_LCD_BITMAP */
-
-
-
-
-

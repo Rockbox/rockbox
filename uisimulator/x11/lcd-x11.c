@@ -38,11 +38,11 @@
 
 #include "lcd-x11.h"
 
-extern unsigned char display[LCD_WIDTH][LCD_HEIGHT/8];
+extern unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8];
 extern void screen_resized(int width, int height);
 extern Display *dpy;
 
-unsigned char display_copy[LCD_WIDTH][LCD_HEIGHT/8];
+unsigned char lcd_framebuffer_copy[LCD_WIDTH][LCD_HEIGHT/8];
 
 /* this is in uibasic.c */
 extern void drawdots(int color, XPoint *points, int count);
@@ -61,10 +61,10 @@ void lcd_update (void)
 
     for(y=0; y<LCD_HEIGHT; y+=8) {
         for(x=0; x<LCD_WIDTH; x++) {
-            if(display[x][y/8]) {
+            if(lcd_framebuffer[x][y/8]) {
                 /* one or more bits/pixels are set */
                 for(bit=0; bit<8; bit++) {
-                    if(display[x][y/8]&(1<<bit)) {
+                    if(lcd_framebuffer[x][y/8]&(1<<bit)) {
                         points[p].x = x + MARGIN_X;
                         points[p].y = y+bit + MARGIN_Y;
                         p++; /* increase the point counter */
@@ -76,13 +76,13 @@ void lcd_update (void)
 #else
     for(y=0; y<LCD_HEIGHT; y+=8) {
         for(x=0; x<LCD_WIDTH; x++) {
-            if(display[x][y/8] || display_copy[x][y/8]) {
+            if(lcd_framebuffer[x][y/8] || lcd_framebuffer_copy[x][y/8]) {
                 /* one or more bits/pixels are changed */
                 unsigned char diff =
-                  display[x][y/8] ^ display_copy[x][y/8];
+                  lcd_framebuffer[x][y/8] ^ lcd_framebuffer_copy[x][y/8];
 
                 for(bit=0; bit<8; bit++) {
-                    if(display[x][y/8]&(1<<bit)) {
+                    if(lcd_framebuffer[x][y/8]&(1<<bit)) {
                         /* set a dot */
                         points[p].x = x + MARGIN_X;
                         points[p].y = y+bit + MARGIN_Y;
@@ -100,7 +100,7 @@ void lcd_update (void)
     }
 
     /* copy a huge block */
-    memcpy(display_copy, display, sizeof(display));
+    memcpy(lcd_framebuffer_copy, lcd_framebuffer, sizeof(lcd_framebuffer));
 
 #endif
 

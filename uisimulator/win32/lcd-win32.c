@@ -27,7 +27,7 @@
 //
 
 // varaibles
-unsigned char       display[LCD_WIDTH][LCD_HEIGHT/8]; // the display
+unsigned char       lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8]; // the display
 char                bitmap[LCD_HEIGHT][LCD_WIDTH]; // the ui display
 
 BITMAPINFO2 bmi =
@@ -54,7 +54,7 @@ void lcd_update()
 
 	for (x = 0; x < LCD_WIDTH; x++)
 		for (y = 0; y < LCD_HEIGHT; y++)
-            bitmap[y][x] = ((display[x][y/8] >> (y & 7)) & 1);
+            bitmap[y][x] = ((lcd_framebuffer[x][y/8] >> (y & 7)) & 1);
 
 	InvalidateRect (hGUIWnd, NULL, FALSE);
 

@@ -62,6 +62,9 @@ struct user_settings
 
     /* while playing screen settings  */
     int wps_display;   /* 0=id3, 1=file, 2=parse */
+
+    /* show status bar */
+    bool statusbar;    /* 0=hide, 1=show */
     
     /* geeky persistent statistics */
     unsigned int total_uptime; /* total uptime since rockbox was first booted */

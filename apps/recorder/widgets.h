@@ -5,9 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id: not checked in
  *
- * Copyright (C) 2002 Linus Nielsen Feltzing
+ * Copyright (C) 2002 Markus Braun
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,27 +16,21 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _STATUS_H
-#define _STATUS_H
+#ifndef __WIDGETS_H__
+#define __WIDGETS_H__
+#include <lcd.h>
 
-enum playmode
+#ifdef HAVE_LCD_BITMAP
+/* Directions for progressbar and scrollbar */
+enum
 {
-    STATUS_PLAY,
-    STATUS_STOP,
-    STATUS_PAUSE,
-    STATUS_FASTFORWARD,
-    STATUS_FASTBACKWARD,
-    STATUS_RECORD,
-    STATUS_RECORD_PAUSE
+    Grow_Right = 0,
+    Grow_Left,
+    Grow_Down,
+    Grow_Up
 };
 
-void status_init(void);
-void status_set_playmode(enum playmode mode);
-#ifdef HAVE_LCD_BITMAP
-extern bool statusbar_enabled;
-bool statusbar(bool state);
-void statusbar_toggle(void);
-#endif
-void status_draw(void);
-
-#endif
+extern void progressbar(int x, int y, int width, int height, int percent, int direction);
+extern void slidebar(int x, int y, int width, int height, int percent, int direction);
+#endif /* HAVE_LCD_BITMAP */
+#endif /* __WIDGETS_H__ */

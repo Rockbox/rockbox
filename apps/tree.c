@@ -65,12 +65,12 @@ void browse_root(void)
 
 #ifdef HAVE_LCD_BITMAP
 
-#define TREE_MAX_ON_SCREEN   ((LCD_HEIGHT-MARGIN_Y)/LINE_HEIGTH)
+#define TREE_MAX_ON_SCREEN   ((LCD_HEIGHT-MARGIN_Y)/LINE_HEIGTH-LINE_Y)
 #define TREE_MAX_LEN_DISPLAY 16 /* max length that fits on screen */
  
 #define MARGIN_Y      0  /* Y pixel margin */
 #define MARGIN_X      12 /* X pixel margin */
-#define LINE_Y      0 /* Y position the entry-list starts at */
+#define LINE_Y      (global_settings.statusbar&&statusbar_enabled?1:0) /* Y position the entry-list starts at */
 #define LINE_X      2 /* X position the entry-list starts at */
 #define LINE_HEIGTH 8 /* pixels for each text line */
 
@@ -226,7 +226,7 @@ static int showdir(char *path, int start)
                 icon_type = File;
         }
         lcd_bitmap(bitmap_icons_6x8[icon_type], 
-                   6, MARGIN_Y+(i-start)*LINE_HEIGTH, 6, 8, true);
+                   6, MARGIN_Y+(LINE_Y+i-start)*LINE_HEIGTH, 6, 8, true);
 #endif
 
         /* if MP3 filter is on, cut off the extension */
@@ -264,6 +264,7 @@ bool dirbrowse(char *root)
 {
     char buf[MAX_PATH];
     int i;
+    int lasti=-1;
     int rc;
     int button;
     int browse_speed = 0;
@@ -274,33 +275,12 @@ bool dirbrowse(char *root)
     if (numentries == -1) 
         return -1;  /* root is not a directory */
 
-    put_cursorxy(0, CURSOR_Y + dircursor, true);
+    put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
 
     while(1) {
         bool restore = false;
 
-        if ( numentries ) {
-            i = start+dircursor;
-            
-            /* if MP3 filter is on, cut off the extension */
-            if (global_settings.mp3filter && 
-                (dircacheptr[i]->attr &
-                 (TREE_ATTR_M3U|TREE_ATTR_MP3)))
-            {
-                int len = strlen(dircacheptr[i]->name);
-                char temp = dircacheptr[i]->name[len-4];
-                dircacheptr[i]->name[len-4] = 0;
-                lcd_puts_scroll(LINE_X, LINE_Y+dircursor, 
-                                dircacheptr[i]->name);
-                dircacheptr[i]->name[len-4] = temp;
-            }
-            else
-                lcd_puts_scroll(LINE_X, LINE_Y+dircursor,
-                                dircacheptr[i]->name);
-        }
-        lcd_update();
-
-        button = button_get(true);
+        button = button_get_w_tmo(HZ/5);
         switch ( button ) {
             case TREE_EXIT:
                 i=strlen(currdir);
@@ -327,6 +307,8 @@ bool dirbrowse(char *root)
             case BUTTON_OFF:
                 mpeg_stop();
                 status_set_playmode(STATUS_STOP);
+                status_draw();
+                restore = true;
                 break;
 #endif
 
@@ -389,7 +371,7 @@ bool dirbrowse(char *root)
                         if (browse_speed < TREE_MAX_ON_SCREEN - 1) {
                             /* moving the cursor up through a full screen */
                             put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor,
-                                        false);
+                                         false);
                             dircursor--;
                             put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
                         }
@@ -489,7 +471,7 @@ bool dirbrowse(char *root)
                                 dircursor=7;
                                 put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
                             }
-                            
+
                         } 
                         else {
                             /* leaving the cursor at bottom line and moving screen up */
@@ -561,9 +543,15 @@ bool dirbrowse(char *root)
             case TREE_MENU: {
                 bool lastfilter = global_settings.mp3filter;
                 bool lastsortcase = global_settings.sort_case;
+#ifdef HAVE_LCD_BITMAP
+                bool laststate=statusbar(false);
+#endif
                 browse_speed = 0;
                 lcd_stop_scroll();
                 main_menu();
+#ifdef HAVE_LCD_BITMAP
+                statusbar(laststate);
+#endif
                 /* do we need to rescan dir? */
                 if ( lastfilter != global_settings.mp3filter ||
                      lastsortcase != global_settings.sort_case)
@@ -591,8 +579,26 @@ bool dirbrowse(char *root)
                 }
                 break;
 
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_F3:
+#endif
+#ifdef HAVE_LCD_BITMAP
+                if(global_settings.statusbar) {
+                    statusbar_toggle();
+                    if(CURSOR_Y+LINE_Y+dircursor>TREE_MAX_ON_SCREEN) {
+                        start++;
+                        dircursor--;
+                    }
+                    restore = true;
+                }
+#endif
+                break;
+
 #ifndef SIMULATOR
-            case SYS_USB_CONNECTED:
+            case SYS_USB_CONNECTED: {
+#ifdef HAVE_LCD_BITMAP
+                bool laststate=statusbar(false);
+#endif
                 /* Tell the USB thread that we are safe */
                 DEBUGF("dirbrowse got SYS_USB_CONNECTED\n");
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
@@ -607,7 +613,11 @@ bool dirbrowse(char *root)
                 dirlevel = 0;
                 dircursor = 0;
                 start = 0;
-                break;
+#ifdef HAVE_LCD_BITMAP
+                statusbar(laststate);
+#endif
+            }
+            break;
 #endif
         }
 
@@ -617,7 +627,32 @@ bool dirbrowse(char *root)
             put_cursorxy(0, CURSOR_Y + LINE_Y+dircursor, true);
         }
 
-        lcd_stop_scroll();
+        if ( numentries ) {
+            i = start+dircursor;
+
+            /* if MP3 filter is on, cut off the extension */
+            if(lasti!=i || restore) {
+                lasti=i;
+                lcd_stop_scroll();
+                if (global_settings.mp3filter && 
+                    (dircacheptr[i]->attr &
+                     (TREE_ATTR_M3U|TREE_ATTR_MP3)))
+                {
+                    int len = strlen(dircacheptr[i]->name);
+                    char temp = dircacheptr[i]->name[len-4];
+                    dircacheptr[i]->name[len-4] = 0;
+                    lcd_puts_scroll(LINE_X, LINE_Y+dircursor, 
+                                    dircacheptr[i]->name);
+                    dircacheptr[i]->name[len-4] = temp;
+                }
+                else
+                    lcd_puts_scroll(LINE_X, LINE_Y+dircursor,
+                                    dircacheptr[i]->name);
+            }
+        }
+        status_draw();
+        lcd_update();
+
     }
 
     return false;

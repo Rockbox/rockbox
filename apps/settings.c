@@ -275,6 +275,9 @@ int settings_save( void )
     
     rtc_config_block[0x11] = (unsigned char)global_settings.avc;
     
+    rtc_config_block[0x12] = (unsigned char)
+        ((global_settings.statusbar & 1));
+
     memcpy(&rtc_config_block[0x24], &global_settings.total_uptime, 4);
     
     if(save_config_buffer())
@@ -347,6 +350,10 @@ void settings_load(void)
         
         if (rtc_config_block[0x11] != 0xFF)
             global_settings.avc = rtc_config_block[0x11];
+
+        if (rtc_config_block[0x12] != 0xFF) {
+            global_settings.statusbar = rtc_config_block[0x12] & 1;
+        }
     
         if (rtc_config_block[0x24] != 0xFF)
             memcpy(&global_settings.total_uptime, &rtc_config_block[0x24], 4);
@@ -378,6 +385,7 @@ void settings_reset(void) {
     global_settings.wps_display = DEFAULT_WPS_DISPLAY;
     global_settings.mp3filter   = true;
     global_settings.sort_case   = false;
+    global_settings.statusbar   = true;
     global_settings.playlist_shuffle = false;
     global_settings.discharge    = 0;
     global_settings.total_uptime = 0;

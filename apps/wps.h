@@ -21,6 +21,8 @@
 #include "id3.h"
 #include "playlist.h" 
 
+extern bool keys_locked;
+
 int wps_show(void);
 
 #endif

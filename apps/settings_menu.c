@@ -76,6 +76,13 @@ static void deep_discharge(void)
 }
 #endif
 
+#ifdef HAVE_LCD_BITMAP
+static void statusbar(void)
+{
+    set_bool( "[Show status bar]", &global_settings.statusbar );
+}
+#endif
+
 void settings_menu(void)
 {
     int m;
@@ -88,6 +95,9 @@ void settings_menu(void)
         { "While Playing",   wps_set         },
 #ifdef HAVE_CHARGE_CTRL
         { "Deep discharge",  deep_discharge  },
+#endif
+#ifdef HAVE_LCD_BITMAP
+        { "Status bar",      statusbar       },
 #endif
     };
     bool old_shuffle = global_settings.playlist_shuffle;

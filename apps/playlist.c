@@ -30,6 +30,13 @@
 #include "lcd.h"
 #include "kernel.h"
 #include "settings.h"
+#include "status.h"
+
+#ifdef HAVE_LCD_BITMAP
+#define LINE_Y      (global_settings.statusbar&&statusbar_enabled?1:0) /* Y position the entry-list starts at */
+#else /* HAVE_LCD_BITMAP */
+#define LINE_Y      0 /* Y position the entry-list starts at */
+#endif /* HAVE_LCD_BITMAP */
 
 playlist_info_t playlist;
 
@@ -165,7 +172,8 @@ void play_list(char *dir, char *file, int start_index)
     /* If file is NULL, the list is in RAM */
     if(file) {
         lcd_clear_display();
-        lcd_puts(0,0,"Loading...");
+        lcd_puts(0,LINE_Y,"Loading...");
+        status_draw();
         lcd_update();
         playlist.in_ram = false;
     } else {
@@ -194,14 +202,16 @@ void play_list(char *dir, char *file, int start_index)
     
     if(global_settings.playlist_shuffle) {
         if(!playlist.in_ram) {
-            lcd_puts(0,0,"Shuffling...");
+            lcd_puts(0,LINE_Y,"Shuffling...");
+            status_draw();
             lcd_update();
         }
         randomise_playlist( current_tick );
     }
 
     if(!playlist.in_ram) {
-        lcd_puts(0,0,"Playing...  ");
+        lcd_puts(0,LINE_Y,"Playing...  ");
+        status_draw();
         lcd_update();
     }
     /* also make the first song get playing */
@@ -287,7 +297,8 @@ void add_indices_to_playlist(void)
                         next_tick = current_tick + HZ;
                         snprintf(line, sizeof line, "%d files",
                                  playlist.amount);
-                        lcd_puts(0,1,line);
+                        lcd_puts(0,LINE_Y+1,line);
+                        status_draw();
                         lcd_update();
                     }
                 }
@@ -301,7 +312,8 @@ void add_indices_to_playlist(void)
     }
     if(!playlist.in_ram) {
         snprintf(line, sizeof line, "%d files", playlist.amount);
-        lcd_puts(0,1,line);
+        lcd_puts(0,LINE_Y+1,line);
+        status_draw();
         lcd_update();
         close(fd);
     }

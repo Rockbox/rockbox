@@ -24,7 +24,17 @@
 #include "settings.h"
 #include "status.h"
 #include "mpeg.h"
+#include "wps.h"
+#ifdef HAVE_LCD_BITMAP
+#include "icons.h"
+#endif
+#include "power.h"
+
 static enum playmode current_mode;
+
+#ifdef HAVE_LCD_BITMAP
+bool statusbar_enabled = true;
+#endif
 
 void status_init(void)
 {
@@ -35,6 +45,22 @@ void status_set_playmode(enum playmode mode)
 {
     current_mode = mode;
 }
+
+#ifdef HAVE_LCD_BITMAP
+bool statusbar(bool state)
+{
+    bool laststate=statusbar_enabled;
+
+    statusbar_enabled=state;
+
+    return(laststate);
+}
+
+void statusbar_toggle(void)
+{
+    statusbar_enabled=!statusbar_enabled;
+}
+#endif
 
 void status_draw(void)
 {
@@ -95,6 +121,30 @@ void status_draw(void)
             lcd_icon(ICON_PLAY, false);
             lcd_icon(ICON_PAUSE, true);
             break;
+    }
+#endif
+#ifdef HAVE_LCD_BITMAP
+    int battlevel = battery_level();
+    int volume = mpeg_val2phys(SOUND_VOLUME, global_settings.volume);
+
+    if(global_settings.statusbar && statusbar_enabled) {
+        statusbar_wipe();
+#ifdef HAVE_CHARGE_CTRL
+        statusbar_icon_battery(battlevel,charger_enabled);
+#else
+        statusbar_icon_battery(battlevel,false);
+#endif
+        statusbar_icon_volume(volume);
+        statusbar_icon_play_state(current_mode+Icon_Play);
+        if (global_settings.loop_playlist)
+            statusbar_icon_play_mode(Icon_Repeat);
+        else
+            statusbar_icon_play_mode(Icon_Normal);
+        if(global_settings.playlist_shuffle) statusbar_icon_shuffle();
+        if (keys_locked) statusbar_icon_lock();
+#ifdef HAVE_RTC
+        statusbar_time();
+#endif
     }
 #endif
 }

@@ -34,8 +34,16 @@
 #include "power.h"
 #include "status.h"
 #include "main_menu.h"
+#ifdef HAVE_LCD_BITMAP
+#include "icons.h"
+#include "widgets.h"
+#endif
 
-#define LINE_Y      1 /* initial line */
+#ifdef HAVE_LCD_BITMAP
+#define LINE_Y      (global_settings.statusbar&&statusbar_enabled?1:0) /* Y position the entry-list starts at */
+#else /* HAVE_LCD_BITMAP */
+#define LINE_Y      0 /* Y position the entry-list starts at */
+#endif /* HAVE_LCD_BITMAP */
 
 #define PLAY_DISPLAY_DEFAULT         0 
 #define PLAY_DISPLAY_FILENAME_SCROLL 1 
@@ -46,6 +54,8 @@
 #else
 #define RELEASE_MASK (BUTTON_MENU | BUTTON_STOP)
 #endif
+
+bool keys_locked = false;
 
 static void draw_screen(struct mp3entry* id3)
 {
@@ -83,14 +93,14 @@ static void draw_screen(struct mp3entry* id3)
                 strncpy(szArtist,szTok,sizeof(szArtist));
                 szArtist[sizeof(szArtist)-1] = 0;
                 szDelimit = strrchr(id3->path, ch);
-                lcd_puts(0,0, szArtist?szArtist:"<nothing>");
+                lcd_puts(0,LINE_Y, szArtist?szArtist:"<nothing>");
 
                 // removes the .mp3 from the end of the display buffer
                 szPeriod = strrchr(szDelimit, '.');
                 if (szPeriod != NULL)
                     *szPeriod = 0;
 
-                lcd_puts_scroll(0,LINE_Y,(++szDelimit));
+                lcd_puts_scroll(0,LINE_Y+1,(++szDelimit));
                 break;
             }
             case PLAY_DISPLAY_FILENAME_SCROLL:
@@ -99,14 +109,14 @@ static void draw_screen(struct mp3entry* id3)
                 char* szLast = strrchr(id3->path, ch);
 
                 if (szLast)
-                    lcd_puts_scroll(0,0, (++szLast));
+                    lcd_puts_scroll(0,LINE_Y, (++szLast));
                 else
-                    lcd_puts_scroll(0,0, id3->path);
+                    lcd_puts_scroll(0,LINE_Y, id3->path);
                 break;
             }
             case PLAY_DISPLAY_DEFAULT:
             {
-                int l = 0;
+                int l = LINE_Y;
 #ifdef HAVE_LCD_BITMAP
                 char buffer[64];
 
@@ -115,16 +125,28 @@ static void draw_screen(struct mp3entry* id3)
                 lcd_puts(0, l++, id3->album?id3->album:"");
                 lcd_puts(0, l++, id3->artist?id3->artist:"");
 
-                if(id3->vbr)
-                    snprintf(buffer, sizeof(buffer), "%d kbit (avg)",
-                             id3->bitrate);
-                else
-                    snprintf(buffer, sizeof(buffer), "%d kbit", id3->bitrate);
+                if(LINE_Y==0) {
+                    if(id3->vbr)
+                        snprintf(buffer, sizeof(buffer), "%d kbit (avg)",
+                                 id3->bitrate);
+                    else
+                        snprintf(buffer, sizeof(buffer), "%d kbit", id3->bitrate);
 
-                lcd_puts(0, l++, buffer);
+                    lcd_puts(0, l++, buffer);
 
-                snprintf(buffer,sizeof(buffer), "%d Hz", id3->frequency);
-                lcd_puts(0, l++, buffer);
+                    snprintf(buffer,sizeof(buffer), "%d Hz", id3->frequency);
+                    lcd_puts(0, l++, buffer);
+                }
+                else {
+                    if(id3->vbr)
+                        snprintf(buffer, sizeof(buffer), "%dkbit(a) %dHz",
+                                 id3->bitrate, id3->frequency);
+                    else
+                        snprintf(buffer, sizeof(buffer), "%dkbit    %dHz",
+                                 id3->bitrate, id3->frequency);
+
+                    lcd_puts(0, l++, buffer);
+                }
 #else
 
                 lcd_puts(0, l++, id3->artist?id3->artist:"<no artist>");
@@ -166,7 +188,6 @@ void display_keylock_text(bool locked)
 int wps_show(void)
 {
     struct mp3entry* id3 = NULL;
-    bool keys_locked = false;
     bool dont_go_to_menu = false;
     bool menu_button_is_down = false;
     bool pending_keylock = true; /* Keylock will go ON next time */
@@ -364,9 +385,15 @@ int wps_show(void)
 #endif
                 if(!keys_locked && !dont_go_to_menu && menu_button_is_down)
                 {
+#ifdef HAVE_LCD_BITMAP
+                        bool laststate=statusbar(false);
+#endif
                     lcd_stop_scroll();
                     button_set_release(old_release_mask);
                     main_menu();
+#ifdef HAVE_LCD_BITMAP
+                        statusbar(laststate);
+#endif
                     old_release_mask = button_set_release(RELEASE_MASK);
                     id3 = mpeg_current_track();
                     draw_screen(id3);
@@ -377,6 +404,17 @@ int wps_show(void)
                 }
                 menu_button_is_down = false;
                 break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+                case BUTTON_F3:
+#ifdef HAVE_LCD_BITMAP
+                    if(global_settings.statusbar) {
+                        statusbar_toggle();
+                        draw_screen(id3);
+                    }
+#endif
+                    break;
+#endif
 
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_OFF:
@@ -396,7 +434,10 @@ int wps_show(void)
                 return 0;
                     
 #ifndef SIMULATOR
-            case SYS_USB_CONNECTED:
+            case SYS_USB_CONNECTED: {
+#ifdef HAVE_LCD_BITMAP
+                bool laststate=statusbar(false);
+#endif
                 /* Tell the USB thread that we are safe */
                 DEBUGF("wps got SYS_USB_CONNECTED\n");
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
@@ -404,16 +445,20 @@ int wps_show(void)
                 /* Wait until the USB cable is extracted again */
                 usb_wait_for_disconnect(&button_queue);
 
+#ifdef HAVE_LCD_BITMAP
+                        statusbar(laststate);
+#endif
                 /* Signal to our caller that we have been in USB mode */
                 return SYS_USB_CONNECTED;
                 break;
+                }
 #endif
             case BUTTON_NONE: /* Timeout */
                 if (mpeg_is_playing() && id3)
                 {
 #ifdef HAVE_LCD_BITMAP
                     snprintf(buffer,sizeof(buffer),
-                             "Time: %d:%02d / %d:%02d",
+                                     "Time:%3d:%02d/%d:%02d",
                              id3->elapsed / 60000,
                              id3->elapsed % 60000 / 1000,
                              id3->length / 60000,
@@ -421,9 +466,9 @@ int wps_show(void)
                         
                     lcd_puts(0, 6, buffer);
                         
-                    lcd_slidebar(1, LCD_HEIGHT-7, LCD_WIDTH-2, 5,
+                            slidebar(0, LCD_HEIGHT-6, LCD_WIDTH, 6,
                                  id3->elapsed*100/id3->length,
-                                 BAR_RIGHT);
+                                     Grow_Right);
                         
                     lcd_update();
 #else
@@ -432,7 +477,7 @@ int wps_show(void)
                     if (global_settings.wps_display ==
                         PLAY_DISPLAY_FILENAME_SCROLL)
                     { 
-                        snprintf(buffer,sizeof(buffer), "%d:%02d/%d:%02d",
+                                snprintf(buffer,sizeof(buffer), "Time:%3d:%02d/%d:%02d",
                                  id3->elapsed / 60000,
                                  id3->elapsed % 60000 / 1000,
                                  id3->length / 60000,
@@ -445,12 +490,6 @@ int wps_show(void)
                 }
                 
                 status_draw();
-#ifdef HAVE_LCD_BITMAP
-                /* draw battery indicator line */
-                lcd_clearline(0,LCD_HEIGHT-1,LCD_WIDTH-1, LCD_HEIGHT-1);
-                lcd_drawline(0,LCD_HEIGHT-1,battery_level() *
-                             (LCD_WIDTH-1) / 100, LCD_HEIGHT-1);
-#endif
                 break;
         }
     }
