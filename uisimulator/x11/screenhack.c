@@ -295,63 +295,6 @@ pick_visual (Screen *screen)
     return get_visual_resource (screen, "visualID", "VisualID", False);
 }
 
-
-/* Notice when the user has requested a different visual or colormap
-   on a pre-existing window (e.g., "-root -visual truecolor" or
-   "-window-id 0x2c00001 -install") and complain, since when drawing
-   on an existing window, we have no choice about these things.
- */
-static void visual_warning (Screen *screen, Window window, Visual *visual, 
-                            Colormap cmap, Bool window_p)
-{
-    char *visual_string = get_string_resource ("visualID", "VisualID");
-    Visual *desired_visual = pick_visual (screen);
-    char win[100];
-    char why[100];
-
-    if (window == RootWindowOfScreen (screen))
-        strcpy (win, "root window");
-    else
-        sprintf (win, "window 0x%lx", (long) window);
-
-    if (window_p)
-        sprintf (why, "-window-id 0x%lx", (long)window);
-    else
-        strcpy (why, "-root");
-
-    if (visual_string && *visual_string)
-    {
-        char *s;
-        for (s = visual_string; *s; s++)
-            if (isupper (*s)) *s = _tolower (*s);
-
-        if (!strcmp (visual_string, "default") ||
-            !strcmp (visual_string, "default") ||
-            !strcmp (visual_string, "best"))
-            /* don't warn about these, just silently DWIM. */
-            ;
-        else if (visual != desired_visual)
-        {
-            fprintf (stderr, "%s: ignoring `-visual %s' because of `%s'.\n",
-                     progname, visual_string, why);
-            fprintf (stderr, "%s: using %s's visual 0x%lx.\n",
-                     progname, win, (long)XVisualIDFromVisual (visual));
-        }
-        free (visual_string);
-    }
-
-    if (visual == DefaultVisualOfScreen (screen) &&
-        has_writable_cells (screen, visual) &&
-        get_boolean_resource ("installColormap", "InstallColormap"))
-    {
-        fprintf (stderr, "%s: ignoring `-install' because of `%s'.\n",
-                 progname, why);
-        fprintf (stderr, "%s: using %s's colormap 0x%lx.\n",
-                 progname, win, (long) cmap);
-    }
-}
-
-
 int main (int argc, char **argv)
 {
     Widget toplevel;
@@ -360,16 +303,10 @@ int main (int argc, char **argv)
     Screen *screen;
     Visual *visual;
     Colormap cmap;
-    Bool root_p;
-    Window on_window = 0;
     XEvent event;
-    Boolean dont_clear /*, dont_map */;
     char version[255];
 
     sprintf(version,"rockboxui %s",ROCKBOXUI_VERSION);
-#ifdef XLOCKMORE
-    pre_merge_options ();
-#endif
     merge_options ();
 
 #ifdef __sgi
@@ -408,75 +345,11 @@ int main (int argc, char **argv)
                  "This is the RockBox simulator.  The firmware will not take\n"
                  "arguements, so the simulator will not either.\n");
 		exit(0);
-#ifdef LETS_NOT_USE_ARGS
-        const char *s;
-        int i;
-        int x = 18;
-        int end = 78;
-        Bool help_p = !strcmp(argv[1], "-help");
-        fprintf (stderr, "%s\n", version);
-        for (s = progclass; *s; s++) fprintf(stderr, " ");
-        fprintf (stderr, "  eXcellent GUI\n\n");
-
-        if (!help_p)
-            fprintf(stderr, "Unrecognised option: %s\n", argv[1]);
-        fprintf (stderr, "Options include: ");
-        for (i = 0; i < merged_options_size; i++)
-        {
-            char *sw = merged_options [i].option;
-            Bool argp = (merged_options [i].argKind == XrmoptionSepArg);
-            int size = strlen (sw) + (argp ? 6 : 0) + 2;
-            if (x + size >= end)
-            {
-                fprintf (stderr, "\n\t\t ");
-                x = 18;
-            }
-            x += size;
-            fprintf (stderr, "%s", sw);
-            if (argp) fprintf (stderr, " <arg>");
-            if (i != merged_options_size - 1) fprintf (stderr, ", ");
-        }
-        fprintf (stderr, ".\n");
-        exit (help_p ? 0 : 1);
-#endif
     }
 
-    dont_clear = get_boolean_resource ("dontClearRoot", "Boolean");
-    /*dont_map = get_boolean_resource ("dontMapWindow", "Boolean"); */
-    mono_p = get_boolean_resource ("mono", "Boolean");
     if (CellsOfScreen (DefaultScreenOfDisplay (dpy)) <= 2)
         mono_p = True;
 
-    root_p = get_boolean_resource ("root", "Boolean");
-
-    {
-        char *s = get_string_resource ("windowID", "WindowID");
-        if (s && *s)
-            on_window = get_integer_resource ("windowID", "WindowID");
-        if (s) free (s);
-    }
-
-    if (on_window)
-    {
-        XWindowAttributes xgwa;
-        window = (Window) on_window;
-        XtDestroyWidget (toplevel);
-        XGetWindowAttributes (dpy, window, &xgwa);
-        cmap = xgwa.colormap;
-        visual = xgwa.visual;
-        visual_warning (screen, window, visual, cmap, True);
-    }
-    else if (root_p)
-    {
-        XWindowAttributes xgwa;
-        window = RootWindowOfScreen (XtScreen (toplevel));
-        XtDestroyWidget (toplevel);
-        XGetWindowAttributes (dpy, window, &xgwa);
-        cmap = xgwa.colormap;
-        visual = xgwa.visual;
-        visual_warning (screen, window, visual, cmap, False);
-    }
-    else
     {
         Boolean def_visual_p;
         visual = pick_visual (screen);
@@ -538,17 +411,7 @@ int main (int argc, char **argv)
             }
         }
 
-/*
-  if (dont_map)
-  {
-  XtVaSetValues (toplevel, XtNmappedWhenManaged, False, 0);
-  XtRealizeWidget (toplevel);
-  }
-  else
-*/
-        {
-            XtPopup (toplevel, XtGrabNone);
-        }
+        XtPopup (toplevel, XtGrabNone);
 
         XtVaSetValues(toplevel, XtNtitle, version, 0);
 
@@ -566,17 +429,13 @@ int main (int argc, char **argv)
         }
     }
 
-    if (!dont_clear)
-    {
-        XSetWindowBackground (dpy, window,
-                              get_pixel_resource ("background", "Background",
-                                                  dpy, cmap));
-        XClearWindow (dpy, window);
-    }
+    XSetWindowBackground (dpy, window,
+                          get_pixel_resource ("background", "Background",
+                                              dpy, cmap));
+    XClearWindow (dpy, window);
 
-    if (!root_p && !on_window)
-        /* wait for it to be mapped */
-        XIfEvent (dpy, &event, MapNotify_event_p, (XPointer) window);
+    /* wait for it to be mapped */
+    XIfEvent (dpy, &event, MapNotify_event_p, (XPointer) window);
 
     XSync (dpy, False);
 
