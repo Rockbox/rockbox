@@ -28,13 +28,14 @@
 <tr><td colspan="5"><h3>MP3 Cutting, Splitting, Merging</h3></td></tr>
 <tr class="header"><th>Name</th>                                                                   <th>Linux</th>                 <th>Windows</th>               <th>Open Source</th>             <th>Freeware</th></tr>
 <tr><td><a href="http://www.rz.uni-frankfurt.de/~pesch/">mp3DirectCut</a></td>                     <td align="center">&nbsp;</td> <td align="center">X</td>      <td align="center">&nbsp;</td>   <td align="center">X</td></tr>
-<tr><td><a href="http://www.logiccell.com/~mp3trim/">mp3Trim</a></td>                              <td align="center">&nbsp;</td> <td align="center">X</td>      <td align="center">&nbsp;</td>   <td align="center">X</td></tr>
 <tr><td><a href="http://hem.bredband.net/isrmat/mp3page.htm">MP3Slixer</a></td>                    <td align="center">&nbsp;</td> <td align="center">X</td>      <td align="center">X</td>        <td align="center">&nbsp;</td></tr>
 <tr><td><a href="http://musicutter.szm.sk/">MusiCutter</a></td>                                    <td align="center">&nbsp;</td> <td align="center">X</td>      <td align="center">&nbsp;</td>   <td align="center">X</td></tr>
 <tr><td><a href="http://mp3merge.netfirms.com/">MP3Merge</a></td>                                  <td align="center">&nbsp;</td> <td align="center">X</td>      <td align="center">&nbsp;</td>   <td align="center">X</td></tr>
 <tr><td><a href="http://www24.brinkster.com/tanyk/index.html">Split MP3</a></td>                   <td align="center">&nbsp;</td> <td align="center">X</td>      <td align="center">&nbsp;</td>   <td align="center">X</td></tr>
 <tr><td><a href="http://mp3splt.sourceforge.net/">MP3 Splt</a></td>                                <td align="center">X</td>      <td align="center">X</td>      <td align="center">X</td>        <td align="center">&nbsp;</td></tr>
-<tr><td><a href="http://search.cpan.org/~jv/mp3cut/">mp3cut</a></td>                               <td align="center">X</td>      <td align="center">&nbsp;</td> <td align="center">X</td>        <td align="center">&nbsp;</td></tr>
+<tr><td><a href="http://search.cpan.org/~jv/mp3cut/">mp3cut</a></td>                               <td align="center">X</td>      <td align="center">X</td>      <td align="center">X</td>        <td align="center">&nbsp;</td></tr>
+<tr><td><a href="http://www.logiccell.com/~mp3trim/">mp3Trim (free version limits file length to approx. 7 minutes)</a></td>
+                                                                                                   <td align="center">&nbsp;</td> <td align="center">X</td>      <td align="center">&nbsp;</td>   <td align="center">X</td></tr>
 
 <tr><td colspan="5"><h3>MP3 Tagging &amp; Organization</h3></td></tr>
 <tr class="header"><th>Name</th>                                                                   <th>Linux</th>                 <th>Windows</th>               <th>Open Source</th>             <th>Freeware</th></tr>
@@ -52,6 +53,7 @@
 <tr><td><a href="http://search.cpan.org/~jv/mp3info/">mp3info</a>                                  <td align="center">X</td>      <td align="center">&nbsp;</td> <td align="center">X</td>        <td align="center">&nbsp;</td></tr>
 <tr><td><a href="http://search.cpan.org/~jv/mp3getcddb/">mp3getcddb</a>                            <td align="center">X</td>      <td align="center">&nbsp;</td> <td align="center">X</td>        <td align="center">&nbsp;</td></tr>
 <tr><td><a href="http://search.cpan.org/~jv/mp3rename/">mp3rename</a>                              <td align="center">X</td>      <td align="center">&nbsp;</td> <td align="center">X</td>        <td align="center">&nbsp;</td></tr>
+<tr><td><a href="http://www.volny.cz/media-tagger/eng/index.html">Media Tagger</a>                 <td align="center">&nbsp;</td> <td align="center">X</td>      <td align="center">&nbsp;</td>   <td align="center">X</td></tr>
 
 <tr><td colspan="5"><h3>MP3 Repairing &amp; Analyzing</h3></td></tr>
 <tr class="header"><th>Name</th>                                                                   <th>Linux</th>                 <th>Windows</th>               <th>Open Source</th>             <th>Freeware</th></tr>
@@ -60,6 +62,12 @@
 <tr><td><a href="http://www.geocities.com/mp3utility/">MP3Utility</a></td>                         <td align="center">&nbsp;</td> <td align="center">X</td>      <td align="center">&nbsp;</td>   <td align="center">X</td></tr>
 <tr><td><a href="http://www.guerillasoft.nstemp.com/EncSpot2/index.html">EncSpot Basic</a></td>    <td align="center">&nbsp;</td> <td align="center">X</td>      <td align="center">&nbsp;</td>   <td align="center">X</td></tr>
 <tr><td><a href="http://mp3gain.sourceforge.net/index.php">MP3 Gain</a></td>                       <td align="center">&nbsp;</td> <td align="center">X</td>      <td align="center">X</td>        <td align="center">&nbsp;</td></tr>
+
+<tr><td colspan="5"><h3>Disk Utilities</h3></td></tr>
+<tr class="header"><th>Name</th>                                                                   <th>Linux</th>                 <th>Windows</th>               <th>Open Source</th>             <th>Freeware</th></tr>
+<tr><td><a href="http://www.pcinspector.de/download.htm#file_recovery">File Recovery</a></td>      <td align="center">&nbsp;</td> <td align="center">X</td>      <td align="center">&nbsp;</td>   <td align="center">X</td></tr>
+<tr><td><a href="ftp://ftp.heise.de/pub/ct/ctsi/h2format.zip">h2format (formats FAT32 > 32GB, German docs only)</a></td>
+                                                                                                   <td align="center">&nbsp;</td> <td align="center">X</td>      <td align="center">&nbsp;</td>   <td align="center">X</td></tr>
 </table>
 
 #include "foot.t"
