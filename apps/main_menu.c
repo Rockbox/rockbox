@@ -23,42 +23,16 @@
 #include "lcd.h"
 #include "button.h"
 #include "kernel.h"
-
-void show_splash(void);
+#include "main_menu.h"
+#include "sound_menu.h"
 
 #ifdef HAVE_LCD_BITMAP
-
 #include "screensaver.h"
 extern void tetris(void);
-
-/* recorder menu */
-enum Main_Menu_Ids {
-    Tetris, Screen_Saver, Splash, Credits
-};
-
-struct menu_items items[] = {
-    { Tetris,       "Tetris",       tetris      },
-    { Screen_Saver, "Screen Saver", screensaver },
-    { Splash,       "Splash",       show_splash },
-    { Credits,      "Credits",      show_credits },
-};
-
-#else
-
-/* player menu */
-enum Main_Menu_Ids {
-    Splash, Credits
-};
-
-struct menu_items items[] = {
-    { Splash,       "Splash",       show_splash },
-    { Credits,      "Credits",      show_credits },
-};
-
 #endif
 
 #ifdef HAVE_LCD_BITMAP
-int show_logo(void)
+static int show_logo(void)
 {
     unsigned char buffer[112 * 8];
 
@@ -132,6 +106,23 @@ void show_splash(void)
 
 void main_menu(void)
 {
-    menu_init( items, sizeof(items)/sizeof(struct menu_items) );
-    menu_run();
+    int m;
+    enum {
+        Tetris, Screen_Saver, Splash, Credits, Sound
+    };
+
+    /* main menu */
+    struct menu_items items[] = {
+        { Sound,        "Sound",        sound_menu  },
+#ifdef HAVE_LCD_BITMAP
+        { Tetris,       "Tetris",       tetris      },
+        { Screen_Saver, "Screen Saver", screensaver },
+#endif
+        { Splash,       "Splash",       show_splash },
+        { Credits,      "Credits",      show_credits }
+    };
+
+    m=menu_init( items, sizeof items / sizeof(struct menu_items) );
+    menu_run(m);
+    menu_exit(m);
 }
