@@ -493,6 +493,34 @@ void lcd_setmargins(int x, int y)
 extern unsigned char char_dw_8x8_prop[][9];
 
 /*
+ * Return width and height of a given font.
+ */
+void lcd_getstringsize(char *str, unsigned int font, int *w, int *h)
+{
+    (void)font;
+    int width=0;
+    int height=0;
+    unsigned char ch, byte;
+
+    while((ch = *str++)) {
+        /* Limit to char generation table */
+        if ((ch < ASCII_MIN) || (ch > 0x7a))
+            /* replace unsupported letters with question marks */
+            ch = ' '-ASCII_MIN;
+        else
+            ch -= ASCII_MIN;
+
+        byte = char_dw_8x8_prop[ch][8];
+        width += byte>>4;
+        if((byte & 0x0f) > height)
+            height = byte & 0x0f;
+
+    }
+    *w = width;
+    *h = height;
+}
+
+/*
  * Put a string at specified bit position
  */
 
