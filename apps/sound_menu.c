@@ -58,7 +58,7 @@ static void soundsetting(int setting)
 #else
             case BUTTON_RIGHT:
 #endif
-                value += 10;
+                value += 2;
                 if ( value >= 100 )
                     value = 100;
                 (funcs[setting])(value);
@@ -69,7 +69,7 @@ static void soundsetting(int setting)
 #else
             case BUTTON_LEFT:
 #endif
-                value -= 10;
+                value -= 2;
                 if ( value <= 0 )
                     value = 0;
                 (funcs[setting])(value);
