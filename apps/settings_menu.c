@@ -78,9 +78,22 @@ void settings_menu(void)
         { "Scroll speed",    scroll_speed    },  
         { "While Playing",   wps_set },
     };
+    bool old_shuffle = global_settings.playlist_shuffle;
     
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
     menu_run(m);
     menu_exit(m);
     settings_save();
+
+    if (old_shuffle != global_settings.playlist_shuffle)
+    {
+        if (global_settings.playlist_shuffle)
+        {
+            randomise_playlist(&playlist, current_tick);
+        }
+        else
+        {
+            sort_playlist(&playlist);
+        }
+    }
 }

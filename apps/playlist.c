@@ -242,7 +242,7 @@ void randomise_playlist( playlist_info_t *playlist, unsigned int seed )
     srand( seed );
 
     /* randomise entire indices list */
-    for(count = playlist->amount - 1; count ; count--)
+    for(count = playlist->amount - 1; count >= 0; count--)
     {
         /* the rand is from 0 to RAND_MAX, so adjust to our value range */
         candidate = rand() % (count + 1);
@@ -251,6 +251,25 @@ void randomise_playlist( playlist_info_t *playlist, unsigned int seed )
         store = playlist->indices[candidate];
         playlist->indices[candidate] = playlist->indices[count];
         playlist->indices[count] = store;
+    }
+}
+
+static int compare(const void* p1, const void* p2)
+{
+    int* e1 = (int*) p1;
+    int* e2 = (int*) p2;
+
+    return *e1 - *e2;
+}
+
+/*
+ * sort the array of indices for the playlist
+ */
+void sort_playlist( playlist_info_t *playlist )
+{
+    if (playlist->amount > 0)
+    {
+        qsort(&playlist->indices, playlist->amount, sizeof(playlist->indices[0]), compare);
     }
 }
 
