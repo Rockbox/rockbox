@@ -118,8 +118,10 @@ static void display_first_line(int x)
 }
 
 /* Call when the program end */
-static void nim_exit(void)
+static void nim_exit(void *parameter)
 {
+    (void)parameter;
+    
     /*Restore the old pattern*/
     rb->lcd_unlock_pattern(h1);
     rb->lcd_unlock_pattern(h2);
@@ -194,7 +196,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                     {
                         case BUTTON_STOP|BUTTON_REL:
                             go = true;
-                            nim_exit();
+                            nim_exit(NULL);
                             return PLUGIN_OK;
                             break;
 
@@ -214,10 +216,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                                 y++;
                             break;
 
-                        case SYS_USB_CONNECTED:
-                            rb->usb_screen();
-                            nim_exit();
-                            return PLUGIN_USB_CONNECTED;
+                        default:
+                            if (rb->default_event_handler_ex(button, nim_exit,
+                                                    NULL) == SYS_USB_CONNECTED)
+                                return PLUGIN_USB_CONNECTED;
+                            break;
                     }
                     display_first_line(x);
                     rb->snprintf(str,sizeof(str),"[%d..%d]?=%d",min,v,y);
@@ -289,7 +292,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             min=1;
         }
     }
-    nim_exit();
+    nim_exit(NULL);
     return PLUGIN_OK;
 }
 #endif

@@ -31,7 +31,10 @@ snake2.c
 snow.c
 sokoban.c
 solitaire.c
+splitedit.c
+star.c
 video.c
+vu_meter.c
 
 #ifdef HAVE_RTC /* Recorder models only */
 calendar.c
@@ -40,9 +43,6 @@ clock.c
 
 #if CONFIG_KEYPAD != ONDIO_PAD
 /* gradually bring in the ones not working yet */
-splitedit.c
-star.c
-vu_meter.c
 wormlet.c
 #endif /* #if CONFIG_KEYPAD != ONDIO_PAD */
 #endif /*#ifdef HAVE_LCD_BITMAP */

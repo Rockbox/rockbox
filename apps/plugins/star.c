@@ -59,6 +59,32 @@
 #define STAR_CONTROL_BALL  0
 #define STAR_CONTROL_BLOCK 1
 
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define STAR_QUIT BUTTON_OFF
+#define STAR_TOGGLE_CONTROL BUTTON_ON
+#define STAR_TOGGLE_CONTROL2 BUTTON_PLAY
+#define STAR_LEVEL_UP BUTTON_F3
+#define STAR_LEVEL_DOWN BUTTON_F1
+#define STAR_LEVEL_REPEAT BUTTON_F2
+#define STAR_MENU_RUN BUTTON_PLAY
+#define STAR_MENU_RUN2 BUTTON_RIGHT
+#define STAR_MENU_RUN3 BUTTON_ON
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define STAR_QUIT BUTTON_OFF
+#define STAR_TOGGLE_CONTROL_PRE BUTTON_MENU
+#define STAR_TOGGLE_CONTROL (BUTTON_MENU | BUTTON_REL)
+#define STAR_LEVEL_UP (BUTTON_MENU | BUTTON_RIGHT)
+#define STAR_LEVEL_DOWN (BUTTON_MENU | BUTTON_LEFT)
+#define STAR_LEVEL_REPEAT (BUTTON_MENU | BUTTON_UP)
+#define STAR_MENU_RUN BUTTON_RIGHT
+
+#endif
+
+/* function returns because of USB? */
+static bool usb_detected = false;
+
 /* position of the ball */
 static int ball_x, ball_y;
 
@@ -328,6 +354,7 @@ static void star_display_text(char *str, bool waitkey)
     int i;
     char line[255];
     int key;
+    bool go_on;
 
     rb->lcd_clear_display();
 
@@ -384,10 +411,26 @@ static void star_display_text(char *str, bool waitkey)
         {
             current_line = 0;
             rb->lcd_update();
-            if (waitkey)
-                while ((key = rb->button_get(true)) != BUTTON_PLAY
-                       && key != BUTTON_ON
-                       && key != BUTTON_DOWN);
+            go_on = false;
+            while (waitkey && !go_on)
+            {
+                key = rb->button_get(true);
+                switch (key)
+                {
+                    case STAR_MENU_RUN:
+                    case BUTTON_DOWN:
+                        go_on = true;
+                        break;
+                        
+                    default:
+                        if (rb->default_event_handler(key) == SYS_USB_CONNECTED)
+                        {
+                            usb_detected = true;
+                            go_on = true;
+                            break;
+                        }
+                }
+            }
             rb->lcd_clear_display();
         }
     } while (*ptr_char != '\0');
@@ -518,6 +561,8 @@ static int star_run_game(void)
     int move_x = 0;
     int move_y = 0;
     int i;
+    int key;
+    int lastkey = BUTTON_NONE;
 
     int label_offset_y;
 
@@ -531,58 +576,75 @@ static int star_run_game(void)
         move_x = 0;
         move_y = 0;
 
-        switch (rb->button_get(true))
+        while ((move_x == 0) && (move_y == 0))
         {
-            case BUTTON_OFF:
-                return PLUGIN_OK; 
+            key = rb->button_get(true);
+            switch (key)
+            {
+                case STAR_QUIT:
+                    return 0;
                 
-            case BUTTON_LEFT:
-                move_x = -1;
-                break; 
+                case BUTTON_LEFT:
+                    move_x = -1;
+                    break;
 
-            case BUTTON_RIGHT:
-                move_x = 1;
-                break; 
+                case BUTTON_RIGHT:
+                    move_x = 1;
+                    break;
 
-            case BUTTON_UP:
-                move_y = -1;
-                break; 
+                case BUTTON_UP:
+                    move_y = -1;
+                    break;
 
-            case BUTTON_DOWN:
-                move_y = 1;
-                break; 
+                case BUTTON_DOWN:
+                    move_y = 1;
+                    break;
 
-            case BUTTON_F1:
-                if (current_level > 0)
-                {
-                    current_level--;
+                case STAR_LEVEL_DOWN:
+                    if (current_level > 0)
+                    {
+                        current_level--;
+                        star_load_level(current_level);
+                    }
+                    break;
+
+                case STAR_LEVEL_REPEAT:
                     star_load_level(current_level);
-                }
-                continue; 
+                    break;
 
-            case BUTTON_F2:
-                star_load_level(current_level);
-                continue; 
+                case STAR_LEVEL_UP:
+                    if (current_level < STAR_LEVEL_COUNT - 1)
+                    {
+                        current_level++;
+                        star_load_level(current_level);
+                    }
+                    break;
 
-            case BUTTON_F3:
-                if (current_level < STAR_LEVEL_COUNT - 1)
-                {
-                    current_level++;
-                    star_load_level(current_level);
-                }
-                continue; 
+                case STAR_TOGGLE_CONTROL:
+#ifdef STAR_TOGGLE_CONTROL_PRE
+                    if (lastkey != STAR_TOGGLE_CONTROL_PRE)
+                        break;
+#endif
+#ifdef STAR_TOGGLE_CONTROL2
+                case STAR_TOGGLE_CONTROL2:
+#endif
+                    if (control == STAR_CONTROL_BALL)
+                        control = STAR_CONTROL_BLOCK;
+                    else
+                        control = STAR_CONTROL_BALL;
+                    star_display_board_info();
+                    break;
 
-            case BUTTON_PLAY:
-            case BUTTON_ON:
-                if (control == STAR_CONTROL_BALL)
-                    control = STAR_CONTROL_BLOCK;
-                else
-                    control = STAR_CONTROL_BALL;
-                star_display_board_info();
-                continue;
-
-            default:
-                continue;
+                default:
+                    if (rb->default_event_handler(key) == SYS_USB_CONNECTED)
+                    {
+                        usb_detected = true;
+                        return 0;
+                    }
+                    break;
+            }
+            if (key != BUTTON_NONE)
+                lastkey = key;
         }
 
         if (control == STAR_CONTROL_BALL)
@@ -673,6 +735,7 @@ static int star_menu(void)
     unsigned char *menu[4] = {"Start", "Information", "Keys", "Exit"};
     int menu_count = sizeof(menu) / sizeof(unsigned char *);
     int menu_offset_y;
+    int key;
 
     menu_offset_y = LCD_HEIGHT - char_height * menu_count;
 
@@ -700,9 +763,10 @@ static int star_menu(void)
         rb->sleep(STAR_SLEEP);
         anim_state++;
 
-        switch (rb->button_get(false))
+        key = rb->button_get(false);
+        switch (key)
         {
-            case BUTTON_OFF:
+            case STAR_QUIT:
                 return PLUGIN_OK;
             case BUTTON_UP:
                 if (menu_y > 0)
@@ -713,15 +777,18 @@ static int star_menu(void)
                     move_y = 1;
                 break; 
 
-            case BUTTON_ON:
-            case BUTTON_PLAY:
-            case BUTTON_RIGHT:
+            case STAR_MENU_RUN:
+#ifdef STAR_MENU_RUN3
+            case STAR_MENU_RUN2:
+            case STAR_MENU_RUN3:
+#endif
                 refresh = true;
                 switch (menu_y)
                 {
                     case 0:
                         if (!star_run_game())
-                            return PLUGIN_OK;
+                            return usb_detected ?
+                                   PLUGIN_USB_CONNECTED : PLUGIN_OK;
                         break;
                     case 1:
                         star_display_text(
@@ -732,24 +799,33 @@ static int star_menu(void)
                             "take \"o\".", true);
                         break;
                     case 2:
+#if CONFIG_KEYPAD == RECORDER_PAD
                         star_display_text("KEYS\n\n"
                                           "[ON] Toggle Ctl.\n"
                                           "[OFF] Exit\n"
                                           "[F1] Prev. level\n"
                                           "[F2] Reset level\n"
                                           "[F3] Next level", true);
+#elif CONFIG_KEYPAD == ONDIO_PAD
+                        star_display_text("KEYS\n\n"
+                                          "[MENU] Toggle Ctl\n"
+                                          "[OFF] Exit\n"
+                                          "[M <] Prev. level\n"
+                                          "[M ^] Reset level\n"
+                                          "[M >] Next level", true);
+#endif
                         break;
                     case 3:
                         return PLUGIN_OK;
                 }
+                if (usb_detected)
+                    return PLUGIN_USB_CONNECTED;
                 break; 
 
-            case SYS_USB_CONNECTED:
-                rb->usb_screen();
-                return PLUGIN_USB_CONNECTED;
-                
             default:
-                continue;
+                if (rb->default_event_handler(key) == SYS_USB_CONNECTED)
+                    return PLUGIN_USB_CONNECTED;
+                break;
         }
 
         for (i = 0 ; i < char_height ; i++)

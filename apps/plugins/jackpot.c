@@ -64,8 +64,10 @@ static void display_first_line(int g)
 }
 
 /*Call when the program exit*/
-static void jackpot_exit(void)
+static void jackpot_exit(void *parameter)
 {
+    (void)parameter;
+    
     /* Restore the old pattern (i don't find another way to do this. Any
        idea?) */
     rb->lcd_unlock_pattern(h1);
@@ -154,10 +156,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                     }
                     break;
 
-                case SYS_USB_CONNECTED:
-                    rb->usb_screen();
-                    jackpot_exit();
-                    return PLUGIN_USB_CONNECTED;
+                default:
+                    if (rb->default_event_handler_ex(button, jackpot_exit,
+                                                    NULL) == SYS_USB_CONNECTED)
+                        return PLUGIN_USB_CONNECTED;
+                    break;
             }
         }
 
@@ -270,7 +273,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }
 
     /* This is the end */
-    jackpot_exit();
+    jackpot_exit(NULL);
     /* Bye */
     return PLUGIN_OK;
 }

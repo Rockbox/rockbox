@@ -22,6 +22,29 @@
 #ifndef SIMULATOR
 #ifdef HAVE_LCD_BITMAP
 
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define SPLITEDIT_QUIT BUTTON_OFF
+#define SPLITEDIT_PLAY BUTTON_PLAY
+#define SPLITEDIT_SAVE BUTTON_F1
+#define SPLITEDIT_LOOP_MODE BUTTON_F2
+#define SPLITEDIT_SCALE BUTTON_F3
+#define SPLITEDIT_SPEED50 (BUTTON_ON | BUTTON_LEFT)
+#define SPLITEDIT_SPEED100 (BUTTON_ON | BUTTON_PLAY)
+#define SPLITEDIT_SPEED150 (BUTTON_ON | BUTTON_RIGHT)
+#define SPLITEDIT_MENU_RUN BUTTON_PLAY
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define SPLITEDIT_QUIT BUTTON_OFF
+#define SPLITEDIT_PLAY_PRE BUTTON_MENU
+#define SPLITEDIT_PLAY (BUTTON_MENU | BUTTON_REL)
+#define SPLITEDIT_SAVE (BUTTON_MENU | BUTTON_LEFT)
+#define SPLITEDIT_LOOP_MODE (BUTTON_MENU | BUTTON_UP)
+#define SPLITEDIT_SCALE (BUTTON_MENU | BUTTON_RIGHT)
+#define SPLITEDIT_MENU_RUN BUTTON_RIGHT
+
+#endif
+
 #define BMPHEIGHT 7
 #define BMPWIDTH 13
 unsigned char LOOP_BMP[][13] =
@@ -499,7 +522,7 @@ static void generateFileName(char* file_name, int part_no)
     }
     else
     {
-        rb->splash(0, true, "name to long");
+        rb->splash(0, true, "name too long");
         rb->button_get(true);
         rb->button_get(true);
 
@@ -765,7 +788,7 @@ static void save_editor(struct mp3entry *mp3, int splittime)
             choice = (choice + 1) % SE_COUNT;
             break;
 
-        case BUTTON_PLAY:
+        case SPLITEDIT_MENU_RUN:
             switch (choice)
             {
             int saved;
@@ -806,8 +829,16 @@ static void save_editor(struct mp3entry *mp3, int splittime)
             }
             break;
 
-        case BUTTON_OFF:
+        case SPLITEDIT_QUIT:
             exit_request = true;
+            break;
+
+        default:
+            if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+            {
+                splitedit_exit_code = PLUGIN_USB_CONNECTED;
+                exit_request = true;
+            }
             break;
         }
     }
@@ -821,6 +852,7 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                           unsigned int range)
 {
     int button = BUTTON_NONE;
+    int lastbutton = BUTTON_NONE;
     struct mp3entry *mp3 = mp3_to_split;
     unsigned int last_elapsed = 0;
     int lastx = OSCI_X + (OSCI_WIDTH / 2);
@@ -943,12 +975,24 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                     case LOOP_MODE_TO:
                         rb->mpeg_pause();
                         rb->mpeg_ff_rewind(range_start);
+#ifdef HAVE_MMC
+/* MMC is slow - wait some time to allow track reload to finish */
+                        rb->sleep(HZ/20);
+                        if (mp3->elapsed > play_end) /* reload in progress */
+                            rb->splash(10*HZ, true, "Wait - reloading");
+#endif
                         rb->mpeg_resume();
                         break;
 
                     case LOOP_MODE_FROM:
                         rb->mpeg_pause();
                         rb->mpeg_ff_rewind(xpos_to_time(split_x));
+#ifdef HAVE_MMC
+/* MMC is slow - wait some time to allow track reload to finish */
+                        rb->sleep(HZ/20);
+                        if (mp3->elapsed > play_end) /* reload in progress */
+                            rb->splash(10*HZ, true, "Wait - reloading");
+#endif
                         rb->mpeg_resume();
                         break;
 
@@ -964,7 +1008,6 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                         rb->lcd_update();
                         break;
                     }
-
                 }
             }
 
@@ -977,17 +1020,11 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
             /* key_scheme_execute(button, &scheme); */
             switch (button)
             {
-            case SYS_USB_CONNECTED:
-                rb->usb_screen();
-                splitedit_exit_code = PLUGIN_USB_CONNECTED;
-                exit_request = true;
-                break;
-
-            case BUTTON_OFF:
-                exit_request = true;
-                break;
-
-            case BUTTON_PLAY:
+            case SPLITEDIT_PLAY:
+#ifdef SPLITEDIT_PLAY_PRE
+                if (lastbutton != SPLITEDIT_PLAY_PRE)
+                    break;
+#endif
                 rb->mpeg_pause();
                 rb->mpeg_ff_rewind(xpos_to_time(split_x));
                 rb->mpeg_resume();
@@ -1004,20 +1041,22 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 break;
 
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
-            case BUTTON_ON | BUTTON_RIGHT:
+#if defined(SPLITEDIT_SPEED150) && defined(SPLITEDIT_SPEED100) && defined(SPLITEDIT_SPEED50)
+            case SPLITEDIT_SPEED150:
                 rb->mpeg_set_pitch(1500);
                 splitedit_invalidate_osci();
                 break;
 
-            case BUTTON_ON | BUTTON_PLAY:
+            case SPLITEDIT_SPEED100:
                 rb->mpeg_set_pitch(1000);
                 splitedit_invalidate_osci();
                 break;
 
-            case BUTTON_ON | BUTTON_LEFT:
+            case SPLITEDIT_SPEED50:
                 rb->mpeg_set_pitch(500);
                 splitedit_invalidate_osci();
                 break;
+#endif
 #endif
 
             case BUTTON_LEFT:
@@ -1046,7 +1085,7 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 }
                 break;
 
-            case BUTTON_F1 | BUTTON_REL:
+            case SPLITEDIT_SAVE:
                 save_editor(mp3, xpos_to_time(split_x));
                 rb->lcd_clear_display();
                 update_osci();
@@ -1054,19 +1093,34 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 update_icons();
                 break;
 
-            case BUTTON_F2:
+            case SPLITEDIT_LOOP_MODE:
                 splitedit_set_loop_mode(splitedit_get_loop_mode() + 1);
                 update_icons();
                 break;
 
-            case BUTTON_F3:
+            case SPLITEDIT_SCALE:
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
                 rb->peak_meter_set_use_dbfs(rb->peak_meter_get_use_dbfs() +1);
 #endif
                 splitedit_invalidate_osci();
                 update_icons();
                 break;
+
+            case SPLITEDIT_QUIT:
+                exit_request = true;
+                break;
+
+            default:
+                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                {
+                    splitedit_exit_code = PLUGIN_USB_CONNECTED;
+                    exit_request = true;
+                }
+                break;
+
             }
+            if (button != BUTTON_NONE)
+                lastbutton = button;
 
             if (validation_start == ~(unsigned int)0)
             {

@@ -19,6 +19,25 @@
 
 #ifdef HAVE_LCD_BITMAP
 
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define VUMETER_QUIT BUTTON_OFF
+#define VUMETER_HELP BUTTON_ON
+#define VUMETER_MENU BUTTON_F1
+#define VUMETER_MENU_EXIT BUTTON_F1
+#define VUMETER_MENU_EXIT2 BUTTON_OFF
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define VUMETER_QUIT BUTTON_OFF
+#define VUMETER_HELP_PRE BUTTON_MENU
+#define VUMETER_HELP (BUTTON_MENU | BUTTON_REL)
+#define VUMETER_MENU_PRE BUTTON_MENU
+#define VUMETER_MENU (BUTTON_MENU | BUTTON_REPEAT)
+#define VUMETER_MENU_EXIT BUTTON_MENU
+#define VUMETER_MENU_EXIT2 BUTTON_OFF
+
+#endif
+
 const struct plugin_api* rb;
 
 #ifdef SIMULATOR
@@ -97,7 +116,11 @@ void load_settings(void) {
     }
     else {
         reset_settings();
+#if CONFIG_KEYPAD == RECORDER_PAD
         rb->splash(HZ, true, "Press ON for help");
+#elif CONFIG_KEYPAD == ONDIO_PAD
+        rb->splash(HZ, true, "Press MENU for help");
+#endif
     }
 }
 
@@ -195,8 +218,8 @@ void change_settings(void)
 
         switch(rb->button_get_w_tmo(1))
         {
-            case BUTTON_F1:
-            case BUTTON_OFF:
+            case VUMETER_MENU_EXIT:
+            case VUMETER_MENU_EXIT2:
                 quit = true;
                 break;
 
@@ -385,6 +408,7 @@ void digital_meter(void) {
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     int button;
+    int lastbutton = BUTTON_NONE;
     
     TEST_PLUGIN_API(api);
     (void) parameter;
@@ -409,21 +433,33 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
         button = rb->button_get_w_tmo(1);
         switch (button)
         {
-            case BUTTON_OFF:
+            case VUMETER_QUIT:
                 save_settings();
                 return PLUGIN_OK;
                 break;
 
-            case BUTTON_ON:
+            case VUMETER_HELP:
+#ifdef VUMETER_HELP_PRE
+                if (lastbutton != VUMETER_HELP_PRE)
+                    break;
+#endif
                 rb->lcd_clear_display();
                 rb->lcd_puts(0, 0, "OFF: Exit");
+#if CONFIG_KEYPAD == RECORDER_PAD
                 rb->lcd_puts(0, 1, "F1: Settings");
+#elif CONFIG_KEYPAD == ONDIO_PAD
+                rb->lcd_puts(0, 1, "MENU..: Settings");
+#endif
                 rb->lcd_puts(0, 2, "UP/DOWN: Volume");
                 rb->lcd_update();
                 rb->sleep(HZ*3);
                 break;
 
-            case BUTTON_F1:
+            case VUMETER_MENU:
+#ifdef VUMETER_MENU_PRE
+                if (lastbutton != VUMETER_MENU_PRE)
+                    break;
+#endif
                 change_settings();
                 break;
 
@@ -442,6 +478,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
                     return PLUGIN_USB_CONNECTED;
                 break;
         }
+        if (button != BUTTON_NONE)
+            lastbutton = button;
     }
 }
 #endif /* #ifdef HAVE_LCD_BITMAP */
