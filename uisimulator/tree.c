@@ -34,7 +34,7 @@
 #define TREE_MAX_FILENAMELEN 128
 
 struct entry {
-  int file; /* true if file, false if dir */
+  bool file; /* true if file, false if dir */
   char name[TREE_MAX_FILENAMELEN];
   int namelen;
 };
