@@ -16,7 +16,9 @@ ifdef APPEXTRA
    INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
 endif
 
-all: $(OBJDIR)/libmad.a $(OBJDIR)/liba52.a $(OBJDIR)/libFLAC.a
+OUTPUT = $(OBJDIR)/libmad.a $(OBJDIR)/liba52.a $(OBJDIR)/libFLAC.a $(OBJDIR)/libTremor.a
+
+all: $(OUTPUT)
 
 include $(TOOLSDIR)/make.inc
 
@@ -35,9 +37,15 @@ $(OBJDIR)/libFLAC.a:
 	@mkdir -p $(OBJDIR)/libFLAC
 	@$(MAKE) -C libFLAC TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR) VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEMORYSIZE}
 
+$(OBJDIR)/libTremor.a:
+	@echo "MAKE in Tremor"
+	@mkdir -p $(OBJDIR)/Tremor
+	@$(MAKE) -C Tremor TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR) VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEMORYSIZE}
+
 clean:
 	@echo "cleaning codecs"
-	@rm -fr $(OBJDIR)/libmad $(OBJDIR)/liba52 $(OBJDIR)/libFLAC
+	@rm -fr $(OBJDIR)/libmad $(OBJDIR)/liba52 $(OBJDIR)/libFLAC $(OBJDIR)/Tremor
 	@$(MAKE) -C libmad clean
 	@$(MAKE) -C liba52 clean
 	@$(MAKE) -C libFLAC clean
+	@$(MAKE) -C Tremor clean
