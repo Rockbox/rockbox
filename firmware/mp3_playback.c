@@ -531,7 +531,7 @@ static void init_playback(void)
     mp3_play_pause(false);
     
     mas_reset();
-    
+
     /* Enable the audio CODEC and the DSP core, max analog voltage range */
     rc = mas_direct_config_write(MAS_CONTROL, 0x8c00);
     if(rc < 0)
@@ -902,7 +902,7 @@ void mpeg_set_pitch(int pitch)
 }
 #endif
 
-void mp3_init(int volume, int bass, int treble, int balance, int loudness, 
+void mp3_init(int volume, int bass, int treble, int balance, int loudness,
               int avc, int channel_config,
               int mdb_strength, int mdb_harmonics,
               int mdb_center, int mdb_shape, bool mdb_enable,
@@ -950,7 +950,7 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
     DEBUGF("MAS3587 derivate %d, version %c%d\n",
            (mas_version_code & 0xf000) >> 12,
            'A' + ((mas_version_code & 0x0f00) >> 8), mas_version_code & 0xff);
-#elif CONFIG_HW_CODEC == MAS3539F
+#elif CONFIG_HWCODEC == MAS3539F
     or_b(0x08, &PAIORH); /* output for /PR */
     init_playback();
     
