@@ -1473,3 +1473,13 @@ id: LANG_INVERT_LCD_NORMAL
 desc: in settings_menu
 eng: "Normal"
 new: "Normaal" 
+
+id: LANG_MAX_FILES_IN_DIR
+desc: in settings_menu
+eng: "Max files in dir browser"
+new: "Max aantal betanden in browser"
+
+id: LANG_MAX_FILES_IN_PLAYLIST
+desc: in settings_menu
+eng: "Max playlist size"
+new: "Max speellijst grootte"
