@@ -132,7 +132,7 @@ static void putpacket (char *buffer)
         /* Do run length encoding */
         for (runlen = 0; runlen < 100; runlen ++) 
         {
-            if (src[0] != src[runlen]) 
+            if (src[0] != src[runlen] || runlen == 99) 
             {
                 if (runlen > 3) 
                 {
