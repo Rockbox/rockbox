@@ -43,7 +43,7 @@ This version is for Archos Jukebox Recorder 6, 10, 15 and 20. It does <b>not</b>
 <h3>Auxiliary files</h3>
 <ul>
 <li><a href="/lang/">Languages</a>
-<li><a href="/fonts/">Fonts</a>
+<li><a href="/fonts/">Fonts</a> (Recorder and FM Recorder only)
 </ul>
 
 <h2>Installation</h2>
