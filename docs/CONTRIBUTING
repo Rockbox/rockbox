@@ -47,15 +47,7 @@ Patches
 -------
 Create a patch using 'cvs diff -ub'. 
 Trim your patches so they only contain relevant changes.
-Submit all patches to the mailing list. 
-Put [PATCH] first on the subject line of your mail. 
-If the patch is very large (>50k), gzip it before you send it.
-
-
-
-
-
-
-
+Now submist the patch to the project via Sourceforge's patch tracker.
+See: http://sourceforge.net/tracker/?group_id=44306&atid=439120
 
 
