@@ -27,7 +27,7 @@ This version is for Archos Jukebox 5000, 6000 with ROM firmware 4.50 or later, a
 </ul>
 
 </td><td>
-This version is for all Archos Jukebox Recorder models.
+This version is for Archos Jukebox Recorder 6, 10, 15 and 20. It does <b>not</b> work with the FM Recorder.
 
 <ul>
 <li><a href="rockbox-1.4-recorder.zip">rockbox-1.4-recorder.zip</a>
