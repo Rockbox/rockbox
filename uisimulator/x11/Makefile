@@ -43,7 +43,7 @@ $(KEYPAD) $(DISPLAY)
 
 LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
 
-INCLUDES = -I. -I$(DRIVERS) -I$(FIRMWAREDIR) -I$(APPDIR) -I$(RECDIR)
+INCLUDES = -I. -I$(DRIVERS) -I$(COMMON) -I$(FIRMWAREDIR) -I$(APPDIR) -I$(RECDIR)
 
 LIBS = 
 
@@ -64,8 +64,11 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES)
 
 FIRMSRCS = chartables.c lcd.c sprintf.c id3.c debug.c
 
-APPS = tetris.c screensaver.c tree.c app.c play.c menu.c icons.c bmp.c credits.c
+APPS = main.c tree.c play.c menu.c credits.c main_menu.c
 
+ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
+   APPS += tetris.c screensaver.c icons.c bmp.c
+endif
 
 SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c \
         button-x11.c io.c sleep.c $(APPS) $(FIRMSRCS)
@@ -132,6 +135,9 @@ credits.o: $(APPDIR)/credits.c
 menu.o: $(APPDIR)/menu.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+main_menu.o: $(APPDIR)/main_menu.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 icons.o: $(RECDIR)/icons.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
@@ -141,7 +147,7 @@ tetris.o: $(RECDIR)/tetris.c
 screensaver.o: $(RECDIR)/screensaver.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-app.o: $(APPDIR)/app.c
+main.o: $(APPDIR)/main.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 bmp.o: $(RECDIR)/bmp.c
