@@ -989,12 +989,67 @@ desc: the name of the oscillograph demo in the demo menu
 eng: "Oscillograph"
 new: "Oscillographe"
 
-id: LANG_BACKLIGHT_ON
-desc: in settings_menu
-eng: ""
-new: ""
-
 id: LANG_RESUME_SETTING_ASK_ONCE
 desc: in settings_menu
 eng: "Ask Once"
 new: "demander une fois"
+
+id: LANG_BATTERY_DISPLAY
+desc: Battery type title
+eng: "Battery Display"
+new: "Affichage Batterie"
+
+id: LANG_DISPLAY_GRAPHIC
+desc: Label for type of icon display
+eng: "Graphic"
+new: "Graphique"
+
+id: LANG_DISPLAY_NUMERIC
+desc: Label for type of icon display
+eng: "Numeric"
+new: "Numerique" 
+
+id: LANG_PM_DBFS
+desc: in the peak meter menu
+eng: "dBfs"
+new: "dBfs"
+
+id: LANG_PM_ENERGY_SAVER
+desc: in the peak meter menu
+eng: "Save energy"
+new: "Economie  d'énergie"
+
+id: LANG_PM_HIGH_PERFORMANCE
+desc: in the peak meter menu
+eng: "High performance"
+new: "Haute performance"
+
+id: LANG_PM_LINEAR
+desc: in the peak meter menu
+eng: "linear"
+new: "linéaire"
+
+id: LANG_PM_MAX
+desc: in the peak meter menu
+eng: "Maximum of range"
+new: "Maximum du spectre"
+
+id: LANG_PM_MIN
+desc: in the peak meter menu
+eng: "Minimum of range"
+new: "Minimum du spectre"
+
+id: LANG_PM_PERFORMANCE
+desc: in the peak meter menu
+eng: "Performance"
+new:  "Performance"
+
+id: LANG_PM_SCALE
+desc: in the peak meter menu
+eng: "dBfs <-> linear"
+new: "dBfs <-> linéaire"
+
+id: LANG_VOLUME_DISPLAY
+desc: Volume type title
+eng: "Volume Display"
+new: "Affichage du Volume"
