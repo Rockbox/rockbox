@@ -10,28 +10,23 @@ static FILE* file;
 
 int ata_read_sectors(unsigned long start, unsigned char count, void* buf)
 {
-    int i;
-    for (i=0; i<count; i++ )
-        DEBUGF("[Reading block 0x%lx]\n",start+i); 
+    DEBUGF("[Reading block 0x%lx, %d]\n", start, count); 
 
     if(fseek(file,start*BLOCK_SIZE,SEEK_SET)) {
         perror("fseek");
         return -1;
     }
     if(!fread(buf,BLOCK_SIZE,count,file)) {
-        printf("Failed reading %d blocks starting at block 0x%lx\n",count,start); 
+        DEBUGF("ata_write_sectors(0x%x, 0x%x, 0x%x)\n", start, count, buf );
         perror("fread");
         panicf("Disk error\n");
-        return -2;
     }
     return 0;
 }
 
 int ata_write_sectors(unsigned long start, unsigned char count, void* buf)
 {
-    int i;
-    for (i=0; i<count; i++ )
-        DEBUGF("[Writing block 0x%lx]\n",start+i); 
+    DEBUGF("[Writing block 0x%lx, %d]\n", start, count); 
 
     if (start == 0)
         panicf("Writing on sector 0!\n");
@@ -39,11 +34,10 @@ int ata_write_sectors(unsigned long start, unsigned char count, void* buf)
     if(fseek(file,start*BLOCK_SIZE,SEEK_SET)) {
         perror("fseek");
         return -1;
-        panicf("Disk error\n");
     }
     if(!fwrite(buf,BLOCK_SIZE,count,file)) {
+        DEBUGF("ata_write_sectors(0x%x, 0x%x, 0x%x)\n", start, count, buf );
         perror("fwrite");
-        return -2;
         panicf("Disk error\n");
     }
     return 0;

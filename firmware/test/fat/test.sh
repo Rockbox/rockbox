@@ -58,35 +58,37 @@ runtests() {
     try chkfile /apa.txt
     try chkfile /bpa.txt
 
-    echo ---Test: create 10 1k files
-    for i in `seq 1 10`;
+    LOOP=50
+
+    echo ---Test: create $LOOP 40k files
+    for i in `seq 1 $LOOP`;
     do
-        echo ---Test: $i/10 ---
-        try mkfile /rockbox.$i
+        echo ---Test: $i/$LOOP ---
+        try mkfile /rockbox.$i 40
         check
-        try chkfile /bpa.txt
+        try chkfile /rockbox.$i
     done
 
 }
 
-echo "Building test image (1 sector/cluster)"
-buildimage 1
-runtests
-
-echo "Building test image (4 sector/cluster)"
-buildimage 4
-runtests
-
-echo "Building test image (8 sectors/cluster)"
-buildimage 8
+echo "Building test image (128 sectors/cluster)"
+buildimage 128
 runtests
 
 echo "Building test image (32 sectors/cluster)"
 buildimage 32
 runtests
 
-echo "Building test image (128 sectors/cluster)"
-buildimage 128
+echo "Building test image (8 sectors/cluster)"
+buildimage 8
+runtests
+
+echo "Building test image (4 sector/cluster)"
+buildimage 4
+runtests
+
+echo "Building test image (1 sector/cluster)"
+buildimage 1
 runtests
 
 echo "== Test completed sucessfully =="

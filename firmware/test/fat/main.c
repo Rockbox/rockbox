@@ -99,17 +99,26 @@ int dbg_mkfile(char* name, int num)
     }
     num *= 1024;
     while ( num ) {
+        int rc;
         int len = num > sizeof text ? sizeof text : num;
 
         for (i=0; i<len/CHUNKSIZE; i++ )
             sprintf(text+i*CHUNKSIZE,"%c%06x,",name[1],x++);
 
-        if (write(fd, text, len) < 0) {
+        rc = write(fd, text, len);
+        if ( rc < 0 ) {
             DEBUGF("Failed writing data\n");
             return -1;
         }
+        else
+            if ( rc == 0 ) {
+                DEBUGF("No space left\n");
+                break;
+            }
+            else
+                DEBUGF("wrote %d bytes\n",rc);
+
         num -= len;
-        DEBUGF("wrote %d bytes\n",len);
     }
     
     close(fd);
