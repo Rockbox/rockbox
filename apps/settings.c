@@ -68,7 +68,7 @@ offset  abs
 0x0d    0x21    <resume settings byte>
 0x0e    0x22    <shuffle,mp3filter,sort_case,discharge,statusbar,show_hidden>
 0x0f    0x23    <scroll speed>
-0x10    0x24    <ff/rewind accleration rate>
+0x10    0x24    <ff/rewind min step, acceleration rate>
 0x11    0x25    <AVC byte>
 0x12    0x26    <(int) Resume playlist index, or -1 if no playlist resume>
 0x16    0x2a    <(int) Byte offset into resume file>
@@ -269,7 +269,9 @@ int settings_save( void )
 
     config_block[0xf] = (unsigned char)(global_settings.scroll_speed << 3);
     
-    config_block[0x10] = (unsigned char)global_settings.ff_rewind_accel;
+    config_block[0x10] = (unsigned char)
+        ((global_settings.ff_rewind_min_step & 15) << 4 |
+         (global_settings.ff_rewind_accel & 15));
     config_block[0x11] = (unsigned char)global_settings.avc;
     config_block[0x1a] = (unsigned char)global_settings.disk_spindown;
 
@@ -358,8 +360,10 @@ void settings_load(void)
         if (c != 31)
             global_settings.scroll_speed = c;
 
-        if (config_block[0x10] != 0xFF)
-            global_settings.ff_rewind_accel = config_block[0x10];
+        if (config_block[0x10] != 0xFF) {
+            global_settings.ff_rewind_min_step = (config_block[0x10] >> 4) & 15;
+            global_settings.ff_rewind_accel = config_block[0x10] & 15;
+        }
 
         if (config_block[0x11] != 0xFF)
             global_settings.avc = config_block[0x11];
@@ -418,6 +422,7 @@ void settings_reset(void) {
     global_settings.total_uptime = 0;
     global_settings.scroll_speed = 8;
     global_settings.show_hidden_files = false;
+    global_settings.ff_rewind_min_step = DEFAULT_FF_REWIND_MIN_STEP;
     global_settings.ff_rewind_accel = DEFAULT_FF_REWIND_ACCEL_SETTING;
     global_settings.resume_index = -1;
     global_settings.resume_offset = -1;

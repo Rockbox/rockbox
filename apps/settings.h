@@ -31,6 +31,21 @@
 #define RESUME_ASK 1
 #define RESUME_ON  2
 
+#define FF_REWIND_1000   0
+#define FF_REWIND_2000   1
+#define FF_REWIND_3000   2
+#define FF_REWIND_4000   3
+#define FF_REWIND_5000   4
+#define FF_REWIND_6000   5
+#define FF_REWIND_8000   6
+#define FF_REWIND_10000  7
+#define FF_REWIND_15000  8
+#define FF_REWIND_20000  9
+#define FF_REWIND_25000 10
+#define FF_REWIND_30000 11
+#define FF_REWIND_45000 12
+#define FF_REWIND_60000 13
+
 struct user_settings
 {
     /* audio settings */
@@ -65,6 +80,7 @@ struct user_settings
     bool sort_case;    /* dir sort order: 0=case insensitive, 1=sensitive */
     int scroll_speed;  /* long texts scrolling speed: 1-20 */
     bool playlist_shuffle;
+    int ff_rewind_min_step; /* FF/Rewind minimum step size */
     int ff_rewind_accel; /* FF/Rewind acceleration (in seconds per doubling) */
     int disk_spindown; /* time until disk spindown, in seconds (0=off) */
 
@@ -118,6 +134,7 @@ extern char rockboxdir[];
 #define MIN_CONTRAST_SETTING        5
 #define DEFAULT_POWEROFF_SETTING    0
 #define DEFAULT_BACKLIGHT_SETTING   5
+#define DEFAULT_FF_REWIND_MIN_STEP  FF_REWIND_1000
 #define DEFAULT_FF_REWIND_ACCEL_SETTING 3
 
 #endif /* __SETTINGS_H__ */

@@ -44,7 +44,6 @@
 #include "ajf.h"
 #endif
 
-#define FF_REWIND_MIN_STEP 1000 /* minimum ff/rewind step is 1 second */
 #define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
                                 /* 3% of 30min file == 54s step size */
 
@@ -288,73 +287,37 @@ int player_id3_show(void)
 
 static bool ffwd_rew(int button)
 {
-    unsigned int ff_rewind_step = 0; /* current rewind step size */ 
-    unsigned int ff_rewind_max_step = 0; /* max rewind step size */ 
-    int ff_rewind_count = 0;
-    long ff_rewind_accel_tick = 0; /* next time to bump ff/rewind step size */ 
+    static int ff_rew_steps[] = {
+      1000, 2000, 3000, 4000,
+      5000, 6000, 8000, 10000,
+      15000, 20000, 25000, 30000,
+      45000, 60000
+    };
+
+    unsigned int step = 0;     /* current ff/rewind step */ 
+    unsigned int max_step = 0; /* maximum ff/rewind step */ 
+    int ff_rewind_count = 0;   /* current ff/rewind count (in ticks) */
+    int direction = 1;         /* forward=1 or backward=-1 */
+    long accel_tick = 0;       /* next time at which to bump the step size */
     bool exit = false;
     bool usb = false;
 
     while (!exit) {
         switch ( button ) {
             case BUTTON_LEFT | BUTTON_REPEAT:
-                if (ff_rewind)
-                {
-                    ff_rewind_count -= ff_rewind_step; 
-                    if (global_settings.ff_rewind_accel != 0 && 
-                        current_tick >= ff_rewind_accel_tick) 
-                    { 
-                        ff_rewind_step *= 2; 
-                        if (ff_rewind_step > ff_rewind_max_step) 
-                            ff_rewind_step = ff_rewind_max_step; 
-                        ff_rewind_accel_tick = current_tick + 
-                            global_settings.ff_rewind_accel*HZ; 
-                    } 
-                }
-                else
-                {
-                    if ( mpeg_is_playing() && id3 && id3->length )
-                    {
-                        if (!paused)
-                            mpeg_pause();
-#ifdef HAVE_PLAYER_KEYPAD
-                        lcd_stop_scroll();
-#endif
-                        status_set_playmode(STATUS_FASTBACKWARD);
-                        ff_rewind = true;
-                        ff_rewind_max_step = 
-                            id3->length * FF_REWIND_MAX_PERCENT / 100; 
-                        ff_rewind_step = FF_REWIND_MIN_STEP;
-                        if (ff_rewind_step > ff_rewind_max_step) 
-                            ff_rewind_step = ff_rewind_max_step; 
-                        ff_rewind_count = -ff_rewind_step; 
-                        ff_rewind_accel_tick = current_tick + 
-                            global_settings.ff_rewind_accel*HZ; 
-                    }
-                    else
-                        break;
-                }
-
-                if ((int)(id3->elapsed + ff_rewind_count) < 0)
-                    ff_rewind_count = -id3->elapsed;
-
-                if(wps_time_countup == false)
-                    wps_refresh(id3, -ff_rewind_count, false);
-                else
-                    wps_refresh(id3, ff_rewind_count, false);
-                break;
-
             case BUTTON_RIGHT | BUTTON_REPEAT:
                 if (ff_rewind)
                 {
-                    ff_rewind_count += ff_rewind_step; 
+                    ff_rewind_count += step * direction;
+
                     if (global_settings.ff_rewind_accel != 0 && 
-                        current_tick >= ff_rewind_accel_tick) 
+                        current_tick >= accel_tick)
                     { 
-                        ff_rewind_step *= 2; 
-                        if (ff_rewind_step > ff_rewind_max_step) 
-                            ff_rewind_step = ff_rewind_max_step; 
-                        ff_rewind_accel_tick = current_tick + 
+                        step *= 2;
+                        if (step > max_step)
+                            step = max_step;
+
+                        accel_tick = current_tick +
                             global_settings.ff_rewind_accel*HZ; 
                     } 
                 }
@@ -367,49 +330,48 @@ static bool ffwd_rew(int button)
 #ifdef HAVE_PLAYER_KEYPAD
                         lcd_stop_scroll();
 #endif
-                        status_set_playmode(STATUS_FASTFORWARD);
+                        direction = (button & BUTTON_RIGHT) ? 1 : -1;
+
+                        if (direction > 0) 
+                            status_set_playmode(STATUS_FASTFORWARD);
+                        else
+                        status_set_playmode(STATUS_FASTBACKWARD);
+
                         ff_rewind = true;
-                        ff_rewind_max_step = 
-                            id3->length * FF_REWIND_MAX_PERCENT / 100; 
-                        ff_rewind_step = FF_REWIND_MIN_STEP; 
-                        if (ff_rewind_step > ff_rewind_max_step) 
-                            ff_rewind_step = ff_rewind_max_step; 
-                        ff_rewind_count = ff_rewind_step; 
-                        ff_rewind_accel_tick = current_tick + 
+
+                        step = ff_rew_steps[global_settings.ff_rewind_min_step];
+
+                        max_step = id3->length * FF_REWIND_MAX_PERCENT / 100;
+
+                        if (step > max_step)
+                            step = max_step;
+
+                        ff_rewind_count = step * direction;
+                        accel_tick = current_tick +
                             global_settings.ff_rewind_accel*HZ; 
                     }
                     else
                         break;
                 }
 
+                if (direction > 0) {
                 if ((id3->elapsed + ff_rewind_count) > id3->length)
                     ff_rewind_count = id3->length - id3->elapsed;
+                }
+                else {
+                    if ((int)(id3->elapsed + ff_rewind_count) < 0)
+                        ff_rewind_count = -id3->elapsed;
+                }
 
                 if(wps_time_countup == false)
                     wps_refresh(id3, -ff_rewind_count, false);
                 else
                     wps_refresh(id3, ff_rewind_count, false);
+
                 break;
 
             case BUTTON_LEFT | BUTTON_REL:
-                /* rewind */
-                mpeg_ff_rewind(ff_rewind_count);
-                ff_rewind_count = 0;
-                ff_rewind = false;
-                if (paused)
-                    status_set_playmode(STATUS_PAUSE);
-                else {
-                    mpeg_resume();
-                    status_set_playmode(STATUS_PLAY);
-                }
-#ifdef HAVE_LCD_CHARCELLS
-                wps_display(id3);
-#endif
-                exit = true;
-                break;
-
             case BUTTON_RIGHT | BUTTON_REL: 
-                /* fast forward */
                 mpeg_ff_rewind(ff_rewind_count);
                 ff_rewind_count = 0;
                 ff_rewind = false;

@@ -154,6 +154,17 @@ static Menu spindown(void)
     return MENU_OK;
 }
 
+static Menu ff_rewind_min_step(void) 
+{ 
+    char* names[] = { "1s ", "2s ", "3s ", "4s ",
+                      "5s ", "6s ", "8s ", "10s",
+                      "15s", "20s", "25s", "30s",
+                      "45s", "60s" };
+    set_option("[FF/rewind min step]", &global_settings.ff_rewind_min_step,
+                names, 14 ); 
+    return MENU_OK; 
+} 
+
 static Menu ff_rewind_accel(void) 
 { 
     char* names[] = { "off   ", "2x/1s ", "2x/2s ", "2x/3s ", 
@@ -186,6 +197,7 @@ Menu settings_menu(void)
         { "Time/Date",       timedate_set    },
 #endif
         { "Show hidden files", show_hidden_files },
+        { "FF/Rewind",       ff_rewind_min_step },
         { "FF/Rewind Accel", ff_rewind_accel },
         { "Resume",          resume          },
         { "Disk spindown",   spindown        },
