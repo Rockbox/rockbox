@@ -104,7 +104,7 @@ $(OBJDIR)/$(OUTNAME) : $(OBJDIR)/rockbox.bin
 $(OBJDIR)/rockbox.ucl: $(OBJDIR)/rockbox.bin
 	@a=`uclpack -h 2>/dev/null`; \
 	if test -n "$$a"; then \
-	  echo "runs uclpack"; \
+	  echo uclpack --best --2e $< $@ ; \
 	  uclpack --best --2e $< $@ >/dev/null 2>&1; \
 	else \
 	  echo "no uclpack command found, makes a fake UCL file"; \
