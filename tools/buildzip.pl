@@ -84,9 +84,7 @@ sub buildzip {
             
             # no need to add fonts we cannot load anyway
             my $fontsize = filesize(".rockbox/fonts/$o");
-            print STDERR "$maxfont $fontsize $o\n";
             if($fontsize > $maxfont) {
-                print STDERR "unlink\n";
                 unlink(".rockbox/fonts/$o");
             }
         }
