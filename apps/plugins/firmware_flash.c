@@ -47,6 +47,7 @@
 /* We should never check for ARCHOS_* defines in source code. We must
    check for features/hardware that have been defined in config-*.h files.
    This makes it easier for us to maintain portability. */
+#define A_SUPPORTED_PLATFORM 1
 
 #if defined(ARCHOS_PLAYER)
 #define FILE_TYPE "player"
@@ -65,8 +66,11 @@
 #define KEEP MASK_ADR /* keep the mask value */
 #define PLATFORM_ID ID_FM
 #else
-#error "No known platform given!"
+/* this platform is not (yet) flashable */
+#undef A_SUPPORTED_PLATFORM
 #endif
+
+#ifdef A_SUPPORTED_PLATFORM
 
 /* result of the CheckFirmwareFile() function */
 typedef enum
@@ -1004,4 +1008,5 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     return PLUGIN_OK;
 }
 
+#endif /* ifdef A_SUPPORTED_PLATFORM */
 #endif /* #ifndef SIMULATOR */
