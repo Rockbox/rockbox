@@ -68,6 +68,13 @@ typedef unsigned int mode_t;
 typedef unsigned int size_t;
 #endif
 
+typedef int (*open_func)(const char* pathname, int flags);
+typedef ssize_t (*read_func)(int fd, void *buf, size_t count);
+typedef int (*creat_func)(const char *pathname, mode_t mode);
+typedef ssize_t (*write_func)(int fd, const void *buf, size_t count);
+typedef void (*qsort_func)(void *base, size_t nmemb,  size_t size,
+                           int(*_compar)(const void *, const void *));
+
 
 #if defined(__MINGW32__) && defined(SIMULATOR)
 extern int open(const char*, int flags, ...);
