@@ -739,6 +739,12 @@ int wps_show(void)
         restore = true;
     }
 
+    if (mpeg_status() & MPEG_STATUS_PAUSE) {
+        paused = true;
+    } else {
+        paused = false;
+    }
+
     while ( 1 )
     {
 

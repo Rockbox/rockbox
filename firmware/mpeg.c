@@ -1300,6 +1300,7 @@ static void mpeg_thread(void)
                 /* Stop the current stream */
                 play_pending = false;
                 playing = false;
+                paused = false;
                 stop_dma();
 
                 reset_mp3_buffer();
@@ -1339,7 +1340,6 @@ static void mpeg_thread(void)
                 /* Tell the file loading code that we want to start playing
                    as soon as we have some data */
                 play_pending = true;
-                paused = false;
 
                 update_playlist();
                 current_track_counter++;
