@@ -312,3 +312,25 @@ A40: The display on the Players is character cell and not bitmap based.
      This means we can only control what characters get displayed, not
      what pixels are shown.  This makes the prospect of game play very 
      slim (at least for anything involving graphics).
+
+Q41: When recording is finally implimented in Rockbox, will it be possible to
+     use custom codecs (like LAME) or is there a built in codec in the Archos?
+A41: The MP3 encoder is in the MAS3587F chip, and nothing we can change.
+
+Q42: What are the max/min bitrates for recording on the Recorder's encoder?
+A42: The builtin encoder is variable bit rate only with a max of 192kbit/s,
+     and a min of 32kbit/s.
+
+Q43: I have a question about the id3v1 and id3v2 tags...
+A43: Stop!  Here is all the information about that (if you still have
+     questions when done, ask then.)
+
+     1. Rockbox supports both id3v1 and id3v2
+     2. The id3v2 support is limited to the first 300 bytes of the file.  Some
+        ripper programs tend to add very big tags first and then the important
+        ones Rockbox wants to read end up beyond the first 300 bytes and then
+        they remain unknown.
+     3. If you believe that the tags you don't see *are* within 300 bytes, then
+        please make the mp3 file available for one of the developers to try 
+        out.
+     4. The 300-byte limit is subject to be removed in a future version
