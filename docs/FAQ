@@ -145,18 +145,24 @@ A19: Okay, last time.  No.  We have no problems whatsoever reading different
      data directly to the DAC.
 
 Q20. What is the most recent version of Rockbox?
-A20. We recently released version 1.4, so head on over to 
+A20. We recently released version 2.0, so head on over to 
      http://rockbox.haxx.se/download/ and pull it down.
      Make sure to read the release notes.
-     (http://rockbox.haxx.se/download/rockbox-1.4-notes.txt).  
+     (http://rockbox.haxx.se/download/rockbox-2.0-notes.txt).  
 
 Q21. What do you plan to add to coming versions?
 A21. We have a rough idea of which features we plan/expect/hope to be included
      in which versions.  Once again, remember that none of this is written in 
      stone (noticing a pattern yet?) 
 
-     Version 2.0
-          Recording, Autobuild playlists, File/directory management
+     Version 2.1
+          Lots of features and fixes that were held off for 2.0
+
+     Version 2.2
+          User interface overhaul
+
+     Version 2.3
+          Plugin loader, opening the door for a bucketful of new applications
 
 Q22. I tried one of your firmware files and now I can't access my hard disk!
      When I turn on my jukebox, it says:
@@ -356,7 +362,7 @@ A51: Stop!  Here is all the information about that (if you still have
      please make the mp3 file available for one of the developers to try out.
 
      - The 300-byte limit is subject to be removed in a future version
-       (Actually, it is already removed in post-1.4 versions)
+       (Actually, it was removed in post-1.4 versions)
 
 Q52: Where exactly did the name 'Rockbox' come from?
 A52: Well you can follow the full line of emails at 
@@ -475,7 +481,7 @@ A62: There are really only two versions of Rockbox.  One for Players and one
      available for download.  These would be Releases, Daily Builds, and 
      Bleeding Edge.
 
-     The Release version (currently 1.4) has a fixed feature set.  This means
+     The Release version (currently 2.0) has a fixed feature set.  This means
      that we are confident that few, if any, significant bugs still reside
      within the code/features of that 'version'.  This is the version for the 
      common user. 
