@@ -210,4 +210,29 @@ void scrollbar(int x, int y, int width, int height, int items, int min_shown,
         }
     }
 }
+
+/*
+ * Print a checkbox
+ */
+void checkbox(int x, int y, int width, int height, bool checked)
+{
+    /* check position and dimensions */
+    if((x < 0) || (x + width > LCD_WIDTH) || 
+       (y < 0) || (y + height > LCD_HEIGHT) ||
+       (width < 4 ) || (height < 4 ))
+    {
+        return;
+    }
+
+    lcd_drawrect(x, y, width, height);
+
+    if (checked){
+	lcd_drawline(x + 2, y + 2, x + width - 2 - 1 , y + height - 2 - 1);
+	lcd_drawline(x + 2, y + height - 2 - 1, x + width - 2 - 1, y + 2);
+    } else {
+	/* be sure to clear box */
+	lcd_clearrect(x + 1, y + 1, width - 2, height - 2);
+    }
+}
+
 #endif

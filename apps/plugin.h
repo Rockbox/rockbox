@@ -50,7 +50,7 @@
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 9
+#define PLUGIN_MIN_API_VERSION 10
 
 /* plugin return codes */
 enum plugin_status {
@@ -206,6 +206,9 @@ struct plugin_api {
     void (*backlight_set_timeout)(int index);
 #ifndef SIMULATOR
     int (*ata_sleep)(void);
+#endif
+#ifdef HAVE_LCD_BITMAP
+    void (*checkbox)(int x, int y, int width, int height, bool checked);
 #endif
 };
 

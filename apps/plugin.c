@@ -185,6 +185,9 @@ static struct plugin_api rockbox_api = {
 #ifndef SIMULATOR
     ata_sleep,
 #endif
+#ifdef HAVE_LCD_BITMAP
+    checkbox,
+#endif
 };
 
 int plugin_load(char* plugin, void* parameter)

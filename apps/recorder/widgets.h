@@ -38,5 +38,6 @@ enum {
 extern void progressbar(int x, int y, int width, int height, int percent, int direction);
 extern void slidebar(int x, int y, int width, int height, int percent, int direction);
 extern void scrollbar(int x, int y, int width, int height, int items, int min_shown, int max_shown, int orientation);
+extern void checkbox(int x, int y, int width, int height, bool checked);
 #endif /* HAVE_LCD_BITMAP */
 #endif /* __WIDGETS_H__ */
