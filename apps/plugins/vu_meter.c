@@ -21,6 +21,10 @@
 
 const struct plugin_api* rb;
 
+#ifdef SIMULATOR
+#define mas_codec_readreg(x) rand()%MAX_PEAK
+#endif
+
 /* Defines x positions on a logarithmic (dBfs) scale. */
 const unsigned char analog_db_scale[] =
 {0,0,10,15,19,22,25,27,29,31,32,33,35,36,37,38,39,39,40,41,42,42,43,44,44,45,45,46,
