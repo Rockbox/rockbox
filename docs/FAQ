@@ -659,3 +659,5 @@ Q75: Why is there a Radio option in my Rockbox for V2?
 A75: Some of the first V2 units had an FM radio in there, so if you're one of
      the few lucky ones, you can use the radio fine. If you aren't lucky, you
      just won't get any sound when trying the radio screen.
+
+     UPDATE: The daily builds now auto-detect the FM radio hardware.
