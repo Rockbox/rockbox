@@ -109,6 +109,9 @@ munge_loop:
 	cmp/ge	r1,r2
 	bt	munge_loop
 	nop
+
+	mov     #0,r0
+	ldc     r0,gbr
 	
 	! call the mainline	
 	mov.l	main_k,r0
