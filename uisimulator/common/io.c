@@ -54,6 +54,7 @@ struct mydir {
 
 typedef struct mydir MYDIR;
 
+#ifndef WIN32
 static unsigned int rockbox2sim(int opt)
 {
     int newopt = 0;
@@ -70,7 +71,7 @@ static unsigned int rockbox2sim(int opt)
 
     return newopt;
 }
-
+#endif
 
 MYDIR *sim_opendir(const char *name)
 {
@@ -132,14 +133,16 @@ void sim_closedir(MYDIR *dir)
 int sim_open(const char *name, int o)
 {
     char buffer[256]; /* sufficiently big */
+#ifndef WIN32
     int opts = rockbox2sim(o);
+#endif
 
     if(name[0] == '/') {
         sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
         
         debugf("We open the real file '%s'\n", buffer);
 #ifdef WIN32
-        return (open)(buffer, opts);
+        return (open)(buffer, o);
 #else
         return (open)(buffer, opts, 0666);
 #endif
