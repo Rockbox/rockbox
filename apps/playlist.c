@@ -490,18 +490,21 @@ char* playlist_peek(int steps)
 
     /* remove bogus dirs from beginning of path
        (workaround for buggy playlist creation tools) */
-    while (buf)
+    if(!playlist.in_ram)
     {
-        fd = open(buf, O_RDONLY);
-        if (fd > 0)
+        while (buf)
         {
-            close(fd);
-            break;
+            fd = open(buf, O_RDONLY);
+            if (fd >= 0)
+            {
+                close(fd);
+                break;
+            }
+            
+            buf = strchr(buf+1, '/');
         }
-
-        buf = strchr(buf+1, '/');
     }
-
+    
     if (!buf)
     {
         /* Even though this is an invalid file, we still need to pass a file
