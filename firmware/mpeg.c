@@ -610,12 +610,22 @@ void mpeg_init(void)
     mas_writemem(MAS_BANK_D0,0x7f6,&val,1);    
 #endif
     
-#ifdef ARCHOS_RECORDER
-#else
+#ifndef ARCHOS_RECORDER
     mas_writereg(0x3b, 0x20); /* Don't ask why. The data sheet doesn't say */
     mas_run(1);
-    mas_writereg(MAS_REG_KPRESCALE, 0xe9400);
+    sleep(HZ/10);
+#endif
+    
+    mp3buflen = mp3end - mp3buf;
 
+    create_fliptable();
+    
+    queue_init(&mpeg_queue);
+    create_thread(mpeg_thread, mpeg_stack, sizeof(mpeg_stack));
+    mas_poll_start(2);
+
+#ifndef ARCHOS_RECORDER
+    mas_writereg(MAS_REG_KPRESCALE, 0xe9400);
     dac_config(0x04); /* DAC on, all else off */
 #endif
     
@@ -623,12 +633,4 @@ void mpeg_init(void)
     mpeg_treble(DEFAULT_TREBLE_SETTING);
     mpeg_volume(DEFAULT_VOLUME_SETTING);
 
-    mp3buflen = mp3end - mp3buf;
-
-    create_fliptable();
-    
-    queue_init(&mpeg_queue);
-    create_thread(mpeg_thread, mpeg_stack, sizeof(mpeg_stack));
-
-    mas_poll_start(2);
 }
