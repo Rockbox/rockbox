@@ -342,6 +342,7 @@ static void handle_auto_poweroff(void)
                 {
                     DEBUGF("Sleep timer timeout. Stopping...\n");
                     set_sleep_timer(0);
+                    backlight_off(); /* Nighty, nighty... */
                 }
                 else
                 {
