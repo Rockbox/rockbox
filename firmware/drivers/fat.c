@@ -841,7 +841,6 @@ static int add_dir_entry(struct fat_dir* dir,
                 entries_found = entries_needed;
                 LDEBUGF("Found last entry %d\n", 
                         sector * DIR_ENTRIES_PER_SECTOR + i);
-                last = true;
                 done = true;
                 break;
 
@@ -873,7 +872,9 @@ static int add_dir_entry(struct fat_dir* dir,
 
                 /* if we're not extending the dir,
                    we must go back to first free entry */
-                if (!last)
+                if (done)
+                    last = true;
+                else
                     firstentry -= (entries_needed - 1);
             }
         }
@@ -951,6 +952,7 @@ unsigned char char2dos(unsigned char c)
         case 0xe5: /* Special kanji character */
             c = 0x05;
             break;
+        case 0x20:
         case 0x22:
         case 0x2a:
         case 0x2b:
