@@ -27,6 +27,8 @@
 #include "sprintf.h"
 #include "debug.h"
 #include "mpeg.h"
+#include "lcd.h"
+#include "kernel.h"
 
 playlist_info_t playlist;
 
@@ -70,6 +72,10 @@ char* playlist_next(int type)
 void play_list(char *dir, char *file)
 {
     char *sep="";
+
+    lcd_clear_display();
+    lcd_puts(0,0,"Loading...");
+    lcd_update();
     empty_playlist(&playlist);
 
     /* If the dir does not end in trailing new line, we use a separator.
@@ -86,9 +92,11 @@ void play_list(char *dir, char *file)
 
     /* if shuffle is wanted, this is where to do that */
 
+    lcd_puts(0,0,"Playing...");
+    lcd_update();
     /* also make the first song get playing */
     mpeg_play(playlist_next(0));
-
+    sleep(HZ);
 }
 
 /*
@@ -113,8 +121,8 @@ void add_indices_to_playlist( playlist_info_t *playlist )
     int count = 0;
 
     unsigned char *p;
-    unsigned char buf[255];
-
+    unsigned char buf[512];
+    char line[16];
 
     fd = open(playlist->filename, O_RDONLY);
     if(-1 == fd)
@@ -144,12 +152,19 @@ void add_indices_to_playlist( playlist_info_t *playlist )
                 }
 
                 store_index = 0;
+                if ( playlist->amount % 200 == 0 ) {
+                    snprintf(line, sizeof line, "%d", playlist->amount);
+                    lcd_puts(0,1,line);
+                    lcd_update();
+                }
             }
         }
 
         i+= count;
     }
-
+    snprintf(line, sizeof line, "%d", playlist->amount);
+    lcd_puts(0,1,line);
+    lcd_update();
 
     close(fd);
 }
