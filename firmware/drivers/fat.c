@@ -431,7 +431,6 @@ static int read_entry(int entry)
     thisfatentoffset = fatoffset % fat_bpb.bpb_bytspersec;
 
     /* Load the sector if it is not cached */
-    debugf("Loading FAT sector %d\n", thisfatsecnum);
     sec = cache_fat_sector(thisfatsecnum);
     if(!sec)
     {
@@ -451,11 +450,8 @@ static int get_next_cluster(unsigned int cluster)
 {
     int next_cluster;
 
-    debugf("get_next_cluster(%d)\n", cluster);
     next_cluster = read_entry(cluster);
 
-    debugf("next cluster is %d\n", next_cluster);
-    
     /* is this last cluster in chain? */
     if ( next_cluster >= 0x0ffffff8 )
         return 0;
