@@ -25,6 +25,8 @@ struct partinfo {
     unsigned char type;
 };
 
+#define PARTITION_TYPE_FAT32 0x0c
+
 /* returns a pointer to an array of 8 partinfo structs */
 struct partinfo* disk_init(void);
 

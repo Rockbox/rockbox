@@ -76,7 +76,7 @@ extern int poolend[];
 
 void init(void)
 {
-    int rc;
+    int rc, i;
     struct partinfo* pinfo;
 
     system_init();
@@ -124,10 +124,17 @@ void init(void)
     pinfo = disk_init();
     if (!pinfo)
         panicf("disk: NULL");
-    
-    rc = fat_mount(pinfo[0].start);
-    if(rc)
-        panicf("mount: %d",rc);
+
+    for ( i=0; i<4; i++ ) {
+        if ( pinfo[i].type == PARTITION_TYPE_FAT32 ) {
+            rc = fat_mount(pinfo[i].start);
+            if(rc)
+                panicf("mount: %d",rc);
+        }
+    }
+    if ( i==4 ) {
+        panicf("No FAT32 partition!");
+    }
     
     settings_load();
     global_settings.total_boots++;
