@@ -194,18 +194,22 @@ static int compare(const void* p1, const void* p2)
 
 static void showfileline(int line, int direntry, bool scroll)
 {
-    /* if music filter is on, cut off the extension */
-    if (global_settings.dirfilter == SHOW_MUSIC && 
-        (dircache[direntry].attr & (TREE_ATTR_M3U|TREE_ATTR_MPA)))
+    /* if any file filter is on, strip the extension */
+    if (global_settings.dirfilter != SHOW_ALL && 
+        !(dircache[direntry].attr & ATTR_DIRECTORY))
     {
-        int len = strlen(dircache[direntry].name);
-        char temp = dircache[direntry].name[len-4];
-        dircache[direntry].name[len-4] = 0;
+        char* dotpos = strrchr(dircache[direntry].name, '.');
+        char temp;
+        if (dotpos) {
+            temp = *dotpos;
+            *dotpos = 0;
+        }
         if(scroll)
             lcd_puts_scroll(LINE_X, line, dircache[direntry].name);
         else
             lcd_puts(LINE_X, line, dircache[direntry].name);
-        dircache[direntry].name[len-4] = temp;
+        if (dotpos)
+            *dotpos = temp;
     }
     else {
         if(scroll)
