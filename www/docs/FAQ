@@ -1,0 +1,58 @@
+Rockbox FAQ
+
+
+Q. What is Rockbox, what is it's purpose?
+A. The purpose of this project is to write an Open Source replacement 
+   firmware for the Archos Jukebox 6000, Studio 20 and Recorder MP3 players.
+
+Q. Can the changes or the software that Rockbox suggests or offers 
+   possibly damage my Archos Player?
+A. All firmware mods that are presented still highly experimental. 
+   Try them on your own risk. We offer no garuntee that this software/hardware
+   changes won't damage your player or void your warentee.
+
+Q. Do you have a mailing list?
+A. Sure do! The list is rockbox@cool.haxx.se.  To subscribe, send you need to
+   send a message to majordomo@cool.haxx.se with the words "subscribe rockbox"
+   in the body. 
+
+Q. Great you have a mailing list!  Is there anyway for me to catch up on
+   past posts?
+A. Check out the archives at: http://bjorn.haxx.se/rockbox/mail.cgi
+
+Q. I want to see what the inside of my player looks like, but I would really
+   like to avoid voiding my warentee.  Is there anything you can suggest?
+A. Well Björn Stenberg was kind enough to void his warentee so you don't have 
+   to.  Take a look at his dissection of the player at: 
+   http://bjorn.haxx.se/isd200/archos.html
+
+Q. What exactly are you trying to achieve with this line of development?
+   (A.K.A. whats your purpose for being here?)
+A. Well, some of the ideas that have been presented/discussed for the future
+   that we would like to see would include (in no particular order):
+              - No pause between songs 
+              - Mid-song resume 
+              - Mid-playlist resume 
+              - No-scan playlists 
+              - Unlimited playlist size 
+              - Autobuild playlists (ie: "all songs in this directory tree") 
+              - Auto-continue play in the next directory 
+              - Current folder and all sub-folder random play 
+              - Full disk random play 
+              - REAL random
+              - Multi song queue
+       	      - Faster scroll speed 
+              - Archos Recorder support. Most of the hardware is the same, 
+                but the display and some other things differ. 
+              - More cool features with the wire remote control (including 
+                controlling your Archos from your car radio (req hw mod))
+              - Support playing of other files types (ie: Ogg Vorbis support)
+              - Support for megabass switch (req hw mod) 
+              - Player control via USB
+              - Memory expansion?
+   Note: Just because something is on this list, does not mean that it is
+         technically feasible. (But hey we can dream)  And something not
+         being on the list does not mean it isn't a neat idea.  Bring it to 
+         the list.
+
+
