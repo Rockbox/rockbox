@@ -55,5 +55,11 @@ how_to_compile.raw: $(DOCS)/README $(TXT2HTML)
 how_to_compile.html: how_to_compile.t how_to_compile.raw $(TXT2HTML)
 	$(ACTION) $<
 
+credits.raw: $(DOCS)/CREDITS $(TXT2HTML)
+	$(TXT2HTML) < $< > $@
+
+credits.html: credits.t credits.raw $(TXT2HTML)
+	$(ACTION) $<
+
 %.html : %.t
 	$(ACTION) $<
