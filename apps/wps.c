@@ -809,7 +809,11 @@ int wps_show(void)
         
         /* ignore non-remote buttons when keys are locked */
         if (keys_locked &&
+#ifdef HAVE_RECORDER_KEYPAD
             ! ((button & BUTTON_F1) ||
+#else
+            ! ((button & BUTTON_MENU) ||
+#endif
                (button == SYS_USB_CONNECTED) ||
                (button & BUTTON_REMOTE)))
             continue;
