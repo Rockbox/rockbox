@@ -26,4 +26,10 @@ They are <i>not</i> official releases, they are in fact almost guaranteed to not
 
 <p><b>Note 2:</b> The Recorder version does not work yet, due to unfinished drivers. It builds, but does not run.
 
+<h2>Build status</h2>
+
+<p>This table shows which targets are currently buildable with the CVS code:
+
+<p>
+<!--#include virtual="buildstatus.link" -->
 #include "foot.t"
