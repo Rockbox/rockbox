@@ -21,17 +21,20 @@
 
 //#define BOOTLOADER
         
+	.section .init.text
+	.global	start
+start:
 #if defined(ARCHOS_GMINI120)
-	.section .text
-	.global _start
-_start:
 	;; disable all interrupts
  	clrsr fe
 	clrsr ie
 	clrsr te
-
+	ld a14, #0x3F0000
 	;; copy data section from flash to ram.
 
+	ld r5, 0xA5
+	ldb @[a14 + 6], r5	; disable watchdog
+	
 	ld a11, #(_datacopy)	; where the data section is in the flash
 	ld a8, #(_datastart)	; destination
 
@@ -56,9 +59,9 @@ _start:
 
 	ld r2, #0
 	ld a8, #(_bssstart)	; destination
-	ld a9, #_bsssize
-	
+	ld a9, #_bsssize	
 	ld r6, e9
+
 	cmp eq, r6, #0
 	brf .bss_init_loop
 	cmp eq, r9, #0
@@ -75,12 +78,6 @@ _start:
 .bss_init_end:
 	
 	ld a15, _stackend
-
-	;; rest of the setup in C
-	jsr _cpu_setup
-
-	;; enable IRQs (keep traps and fast interrupts low)
-	setsr ie
 
 	;; go!
 	jsr _main
@@ -119,9 +116,6 @@ irq_handler:
 	ret_irq
 
 #elif defined(IRIVER_H100)
-	.section .init.text
-	.global	start
-start:
 
         /* Platform:     iRiver H1xx */
         move.w #0x2700,%sr
@@ -264,9 +258,6 @@ vectors:
 	.long _stackend
 	.long start
 #else
-	.section .init.text
-	.global	start
-start:
         /* Platform:     Archos Jukebox
 	 * We begin with some tricks. If we have built our code to be loaded
 	 * via the standalone GDB stub, we will have out VBR at some other
