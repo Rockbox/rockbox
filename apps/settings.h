@@ -63,7 +63,6 @@ struct user_settings
     int wps_display;   /* 0=id3, 1=file, 2=parse */
     
     /* geeky persistent statistics */
-    unsigned short total_boots; /* how many times the device has been booted */
     unsigned int total_uptime; /* total uptime since rockbox was first booted */
 };
 

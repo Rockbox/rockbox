@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include "config.h"
+#include "kernel.h"
 #include "settings.h"
 #include "disk.h"
 #include "panic.h"
@@ -28,10 +29,10 @@
 #include "lcd.h"
 #include "mpeg.h"
 #include "string.h"
+#include "ata.h"
+#include "power.h"
 
 struct user_settings global_settings;
-
-#ifdef HAVE_RTC
 
 /********************************************
 
@@ -60,7 +61,6 @@ offset  abs
 
   the geeky but useless statistics part:
 0x24    <total uptime in seconds: 32 bits uint, actually unused for now>
-0x28    <boots: 16 bits uint>
   
 0x2a    <checksum 2 bytes: xor of 0x0-0x29>
 
@@ -113,6 +113,7 @@ static void init_config_buffer( void )
     rtc_config_block[3] = 0x0;	/* config block version number */
 }
 
+#ifdef HAVE_RTC
 /*
  * save the config block buffer on the RTC RAM
  */
@@ -184,7 +185,60 @@ static int load_config_buffer( void )
     return 1;
 }
 
+#else /* HAVE_RTC */
+/*
+ * save the config block buffer on the 61 Sector
+ */
+static int save_config_buffer( void )
+{
+    DEBUGF( "save_config_buffer()\n" );
+
+    /* update the checksum in the end of the block before saving */
+    calculate_config_checksum(rtc_config_block + sizeof(rtc_config_block) - 2);
+#ifdef SAVE_TO_DISK
+    if(battery_level_safe())
+        return !ata_write_sectors( 61, 1, rtc_config_block);
+    else
+        return -1;
+#else
+    return 0;
+#endif
+}
+
+/*
+ * load the config block buffer from disk
+ */
+static int load_config_buffer( void )
+{
+#ifdef SAVE_TO_DISK
+    unsigned char cksum[2];
+    
+    DEBUGF( "load_config_buffer()\n" );
+    
+    ata_read_sectors( 61, 1,  rtc_config_block);
+
+    /* calculate the checksum, check it and the header */
+    calculate_config_checksum(cksum);
+    
+    if (rtc_config_block[0x0] == 'R'
+         && rtc_config_block[0x1] == 'o'
+         && rtc_config_block[0x2] == 'c'
+         && rtc_config_block[0x3] == 0x0
+         && cksum[0] == rtc_config_block[0x2a]
+         && cksum[1] == rtc_config_block[0x2b]) {
+            DEBUGF( "load_config_buffer: header & checksum test ok\n" );
+            return 0; /* header and checksum is valid */
+        }
+#endif
+    /* if checksum is not valid, initialize the config buffer to all-unused */
+    DEBUGF( "load_config_buffer: header & checksum test failed\n" );
+    init_config_buffer();
+    return 1;
+}
+
+
 #endif /* HAVE_RTC */
+
 
 /*
  * persist all runtime user settings to disk or RTC RAM
@@ -193,7 +247,6 @@ int settings_save( void )
 {
     DEBUGF( "settings_save()\n" );
     
-#ifdef HAVE_RTC
     /* update the config block buffer with current
        settings and save the block in the RTC */
     rtc_config_block[0x4] = (unsigned char)global_settings.volume;
@@ -220,12 +273,22 @@ int settings_save( void )
     rtc_config_block[0x11] = (unsigned char)global_settings.avc;
     
     memcpy(&rtc_config_block[0x24], &global_settings.total_uptime, 4);
-    memcpy(&rtc_config_block[0x28], &global_settings.total_boots, 2);
     
-    save_config_buffer();
-#endif /* HAVE_RTC */
-    
-    return 1;
+    if(save_config_buffer())
+    {
+        lcd_clear_display();
+#ifdef HAVE_LCD_CHARCELLS
+        lcd_puts(0, 0, "Save failed");
+        lcd_puts(0, 1, "Batt. low?");
+#else
+        lcd_puts(4, 2, "Save failed");
+        lcd_puts(2, 4, "Is battery low?");
+        lcd_update();
+#endif
+        sleep(HZ*2);
+        return -1;
+    }
+    return 0;
 }
 
 /*
@@ -233,16 +296,13 @@ int settings_save( void )
  */
 void settings_load(void)
 {
-#ifdef HAVE_RTC
     unsigned char c;
-#endif
     
     DEBUGF( "reload_all_settings()\n" );
 
     /* populate settings with default values */
     settings_reset();
     
-#ifdef HAVE_RTC
     /* load the buffer from the RTC (resets it to all-unused if the block
        is invalid) and decode the settings which are set in the block */
     if (!load_config_buffer()) {
@@ -286,11 +346,7 @@ void settings_load(void)
     
         if (rtc_config_block[0x24] != 0xFF)
             memcpy(&global_settings.total_uptime, &rtc_config_block[0x24], 4);
-        if (rtc_config_block[0x28] != 0xFF)
-            memcpy(&global_settings.total_boots, &rtc_config_block[0x28], 2);
     }
-
-#endif /* HAVE_RTC */
 }
 
 /*
@@ -314,7 +370,6 @@ void settings_reset(void) {
     global_settings.mp3filter   = true;
     global_settings.sort_case   = false;
     global_settings.playlist_shuffle = false;
-    global_settings.total_boots = 0;
     global_settings.total_uptime = 0;
     global_settings.scroll_speed = 8;
 }
