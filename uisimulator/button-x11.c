@@ -30,7 +30,15 @@ void button_init()
 }
 
 /*
- * Get button pressed from hardware
+ * Translate X keys to Recorder keys
+ *
+ * We simulate recorder keys on the numeric keypad:
+ *
+ * 4,6,8,2 = Left, Right, Up, Down
+ * 5 = Play/pause
+ * Div,Mul,Sub = The tree menu keys
+ * +,Enter = On, Off
+ *
  */
 static int get_raw_button (void)
 {
@@ -41,18 +49,41 @@ static int get_raw_button (void)
 	case XK_Left:
 	case XK_KP_4:
 	    return BUTTON_LEFT;
+
 	case XK_KP_Right:
 	case XK_Right:
 	case XK_KP_6:
 	    return BUTTON_RIGHT;
+
 	case XK_KP_Up:
 	case XK_Up:
 	case XK_KP_8:
 	    return BUTTON_UP;
+
 	case XK_KP_Down:
 	case XK_Down:
 	case XK_KP_2:
 	    return BUTTON_DOWN;
+
+	case XK_KP_Space:
+	case XK_KP_5:
+	    return BUTTON_PLAY;
+
+	case XK_KP_Enter:
+	    return BUTTON_OFF;
+
+	case XK_KP_Add:
+	    return BUTTON_ON;
+
+	case XK_KP_Divide:
+	    return BUTTON_F1;
+
+	case XK_KP_Multiply:
+	    return BUTTON_F2;
+
+	case XK_KP_Subtract:
+	    return BUTTON_F3;
+
 	default:
 	    return 0;
     }
