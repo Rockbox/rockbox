@@ -28,3 +28,4 @@ CVSROOT $CVSROOT/CVSROOT/syncmail -C4 -u %{sVv} zagor@users.sourceforge.net
 ^firmware $CVSROOT/CVSROOT/syncmail -C4 -u %{sVv} rockbox-cvs@cool.haxx.se
 ^uisimulator $CVSROOT/CVSROOT/syncmail -C4 -u %{sVv} rockbox-cvs@cool.haxx.se
 ^tools $CVSROOT/CVSROOT/syncmail -C4 -u %{sVv} rockbox-cvs@cool.haxx.se
+^gdb $CVSROOT/CVSROOT/syncmail -C4 -u %{sVv} rockbox-cvs@cool.haxx.se
