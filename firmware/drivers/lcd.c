@@ -914,12 +914,20 @@ void lcd_getfontsize(unsigned int font, int *width, int *height)
 void lcd_puts_scroll(int x, int y, char* string )
 {
     struct scrollinfo* s = &scroll;
+    char *ch;
 #ifdef HAVE_LCD_CHARCELLS
     s->space = 11 - x;
 #else
     int width, height;
     lcd_getfontsize(font, &width, &height);
+#ifndef LCD_PROPFONTS
     s->space = (LCD_WIDTH - xmargin - x*width) / width;
+#else
+    ch = string;
+    width = 0;
+    for (s->space = 0; width + (char_dw_8x8_prop[*ch][8]>>4) < LCD_WIDTH - x;
+        width += (char_dw_8x8_prop[*ch][8]>>4), ch++, s->space++);
+#endif
 #endif
     lcd_puts(x,y,string);
     s->textlen = strlen(string);
@@ -941,6 +949,12 @@ void lcd_stop_scroll(void)
         struct scrollinfo* s = &scroll;
         scroll_count = 0;
         
+#ifdef LCD_PROPFONTS
+        lcd_clearrect(xmargin + s->startx*fonts[font],
+                        ymargin + s->starty*fontheight[font],
+                        LCD_WIDTH - xmargin,
+                        fontheight[font]);
+#endif
         /* restore scrolled row */
         lcd_puts(s->startx,s->starty,s->text);
         lcd_update();
