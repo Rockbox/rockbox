@@ -90,7 +90,7 @@ int rolo_load(char* filename)
     lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
 
     /* verify that file can be read and descrambled */
-    if ((mp3buf + (2*length)+4) >= &mp3end) {
+    if ((mp3buf + (2*length)+4) >= mp3end) {
         rolo_error("Not enough room to load file");
         return -1;
     }
