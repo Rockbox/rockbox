@@ -166,7 +166,7 @@ $(OBJDIR)/lang.o: $(APPDIR)/lang/$(LANGUAGE).lang
 	$(TOOLSDIR)/genlang -p=$(OBJDIR)/lang $<
 	$(CC) $(CFLAGS) -c $(OBJDIR)/lang.c -o $@
 
-$(OBJDIR)/lcd.o: $(DRIVERS)/lcd-recorder.c
+$(OBJDIR)/lcd-recorder.o: $(DRIVERS)/lcd-recorder.c
 	$(CC) $(APPCFLAGS) -DHAVE_LCD_BITMAP -c $< -o $@
 
 $(OBJDIR)/power.o: $(DRIVERS)/power.c

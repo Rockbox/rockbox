@@ -121,4 +121,5 @@ void lcd_putc(int x, int y, unsigned char ch)
 
 void lcd_set_contrast( int x )
 {
+    (void)x;
 }
