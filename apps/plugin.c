@@ -33,6 +33,7 @@
 
 #ifdef SIMULATOR
 #include <dlfcn.h>
+#include <debug.h>
 #define PREFIX(_x_) x11_ ## _x_
 #else
 #define PREFIX(_x_) _x_
@@ -118,6 +119,7 @@ static struct plugin_api rockbox_api = {
     srand,
     rand,
     splash,
+    qsort,
 };
 
 int plugin_load(char* plugin, void* parameter)
@@ -144,6 +146,7 @@ int plugin_load(char* plugin, void* parameter)
     if (!pd) {
         snprintf(buf, sizeof buf, "Can't open %s", plugin);
         splash(HZ*2, 0, true, buf);
+        DEBUGF("dlopen(%s): %s\n",path,dlerror());
         dlclose(pd);
         return -1;
     }

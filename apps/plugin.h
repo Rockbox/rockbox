@@ -37,7 +37,7 @@
 #include "lcd.h"
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 1
+#define PLUGIN_API_VERSION 2
 
 /* plugin return codes */
 enum plugin_status {
@@ -149,6 +149,8 @@ struct plugin_api {
     void (*srand)(unsigned int seed);
     int  (*rand)(void);
     void (*splash)(int ticks, int keymask, bool center, char *fmt, ...);
+    void (*qsort)(void *base, size_t nmemb, size_t size,
+                  int(*compar)(const void *, const void *));
 };
 
 /* defined by the plugin loader (plugin.c) */
