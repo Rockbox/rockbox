@@ -17,8 +17,10 @@
  *
  ****************************************************************************/
 
-#include <sprintf.h>
 #include "config.h"
+#ifdef HAVE_LCD_BITMAP
+
+#include <sprintf.h>
 #include "sokoban.h"
 #include "lcd.h"
 #include "button.h"
@@ -1375,3 +1377,5 @@ Menu sokoban(void)
 
     return MENU_OK;
 }
+
+#endif
