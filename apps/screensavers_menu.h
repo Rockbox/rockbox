@@ -19,7 +19,7 @@
 #ifndef _SCREENSAVERS_MENU_H
 #define _SCREENSAVERS_MENU_H
 
-void screensavers_menu(void);
+Menu screensavers_menu(void);
 
 #endif
 

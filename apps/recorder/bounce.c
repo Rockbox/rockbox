@@ -24,6 +24,7 @@
 #include "lcd.h"
 #include "button.h"
 #include "kernel.h"
+#include "menu.h"
 
 #ifdef SIMULATOR
 #include <stdio.h>
@@ -83,7 +84,7 @@ static void loopit(void)
 }
 
 
-void bounce(void)
+Menu bounce(void)
 {
     int w, h;
     char *off = "[Off] to stop";
@@ -126,6 +127,8 @@ void bounce(void)
     lcd_update();
     sleep(HZ);
     loopit();
+
+    return MENU_OK;
 }
 
 #endif

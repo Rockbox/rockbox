@@ -22,15 +22,23 @@
 
 #include <stdbool.h>
 
+typedef enum {
+  MENU_OK,
+  MENU_REFRESH_DIR, /* any file/directory contents need to be re-read */
+  MENU_LAST /* don't use as return code, only for number of return codes
+               available */
+} Menu;
+
 struct menu_items {
     char *desc;
-    void (*function) (void);
+    Menu (*function) (void);
 };
 
 int menu_init(struct menu_items* items, int count);
 void menu_exit(int menu);
-void menu_run(int menu);
 
 void put_cursorxy(int x, int y, bool on);
+
+Menu menu_run(int menu);
 
 #endif /* End __MENU_H__ */

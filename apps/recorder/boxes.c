@@ -25,6 +25,7 @@
 #include "lcd.h"
 #include "button.h"
 #include "kernel.h"
+#include "menu.h"
 
 #ifdef SIMULATOR
 #include <stdio.h>
@@ -82,7 +83,7 @@ static void ss_loop(void)
     }
 }
 
-void boxes(void)
+Menu boxes(void)
 {
     int w, h;
     char *off = "[Off] to stop";
@@ -125,6 +126,8 @@ void boxes(void)
     lcd_update();
     sleep(HZ/2);
     ss_loop();
+
+    return MENU_OK;
 }
 
 #endif

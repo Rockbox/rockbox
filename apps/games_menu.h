@@ -19,6 +19,8 @@
 #ifndef _GAMES_MENU_H
 #define _GAMES_MENU_H
 
-void games_menu(void);
+#include "menu.h"
+
+Menu games_menu(void);
 
 #endif

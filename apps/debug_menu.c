@@ -82,7 +82,7 @@ void dbg_os(void)
     }
 }
 #else
-void dbg_os(void)
+Menu dbg_os(void)
 {
     char buf[32];
     int button;
@@ -109,7 +109,7 @@ void dbg_os(void)
         switch(button)
         {
         case BUTTON_STOP:
-            return;
+            return MENU_OK;
 
 	    case BUTTON_LEFT:
             currval--;
@@ -124,12 +124,13 @@ void dbg_os(void)
             break;
         }
     }
+    return MENU_OK;
 }
 #endif
 
 #ifdef HAVE_LCD_BITMAP
 /* Test code!!! */
-void dbg_ports(void)
+Menu dbg_ports(void)
 {
     unsigned short porta;
     unsigned short portb;
@@ -199,12 +200,13 @@ void dbg_ports(void)
             case BUTTON_LEFT:
                 charger_enable(false);
                 ide_power_enable(true);
-                return;
+                return MENU_OK;
         }
     }
+    return MENU_OK;
 }
 #else
-void dbg_ports(void)
+Menu dbg_ports(void)
 {
     unsigned short porta;
     unsigned short portb;
@@ -280,7 +282,7 @@ void dbg_ports(void)
         switch(button)
         {
         case BUTTON_STOP:
-            return;
+            return MENU_OK;
 
         case BUTTON_LEFT:
             currval--;
@@ -295,12 +297,13 @@ void dbg_ports(void)
             break;
         }
     }
+    return MENU_OK;
 }
 #endif
 
 #ifdef HAVE_RTC
 /* Read RTC RAM contents and display them */
-void dbg_rtc(void)
+Menu dbg_rtc(void)
 {
     char buf[32];
     unsigned char addr = 0, r, c;
@@ -344,14 +347,15 @@ void dbg_rtc(void)
             break;
         case BUTTON_OFF:
         case BUTTON_LEFT:
-            return;
+            return MENU_OK;
         }
     }
+    return MENU_OK;
 }
 #else
-void dbg_rtc(void)
+Menu dbg_rtc(void)
 {
-    return;
+    return MENU_OK;
 }
 #endif
 
@@ -361,7 +365,7 @@ void dbg_rtc(void)
 #define NUMROWS 4
 #endif
 /* Read MAS registers and display them */
-void dbg_mas(void)
+Menu dbg_mas(void)
 {
     char buf[32];
     unsigned int addr = 0, r, i;
@@ -405,13 +409,14 @@ void dbg_mas(void)
 #else
         case BUTTON_DOWN:
 #endif
-            return;
+            return MENU_OK;
         }
     }
+    return MENU_OK;
 }
 
 #ifdef HAVE_MAS3587F
-void dbg_mas_codec(void)
+Menu dbg_mas_codec(void)
 {
     char buf[32];
     unsigned int addr = 0, r, i;
@@ -442,9 +447,10 @@ void dbg_mas_codec(void)
             if (addr) { addr -= 4; }
             break;
         case BUTTON_LEFT:
-            return;
+            return MENU_OK;
         }
     }
+    return MENU_OK;
 }
 #endif
 
@@ -458,7 +464,7 @@ void dbg_mas_codec(void)
 #define BAT_FIRST_VAL  MAX(POWER_HISTORY_LEN - LCD_WIDTH - 1, 0)
 #define BAT_YSPACE    (LCD_HEIGHT - 20)
 
-void view_battery(void)
+Menu view_battery(void)
 {
     int view = 0;
     int i, x, y;
@@ -579,15 +585,16 @@ void view_battery(void)
                 
             case BUTTON_LEFT:
             case BUTTON_OFF:
-                return;
+                return MENU_OK;
         }
     }
+    return MENU_OK;
 }
 
 #endif
 
 #ifdef HAVE_MAS3507D
-void dbg_mas_info(void)
+Menu dbg_mas_info(void)
 {
     int button;
     char buf[32];
@@ -721,7 +728,7 @@ void dbg_mas_info(void)
         switch(button)
         {
         case BUTTON_STOP:
-            return;
+            return MENU_OK;
 
         case BUTTON_LEFT:
             currval--;
@@ -757,12 +764,14 @@ void dbg_mas_info(void)
             break;
         }
     }
+    return MENU_OK;
 }
 #endif
 
-void debug_menu(void)
+Menu debug_menu(void)
 {
     int m;
+    Menu result;
 
     struct menu_items items[] = {
         { "View I/O ports", dbg_ports },
@@ -785,8 +794,10 @@ void debug_menu(void)
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
-    menu_run(m);
+    result = menu_run(m);
     menu_exit(m);
+    
+    return result;
 }
 
 #endif /* SIMULATOR */

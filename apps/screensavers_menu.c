@@ -30,12 +30,13 @@
 #include "sprintf.h"
 
 #include "boxes.h"
-extern void bounce(void);
-extern void blank(void);
+extern Menu bounce(void);
+extern Menu blank(void);
 
-void screensavers_menu(void)
+Menu screensavers_menu(void)
 {
     int m;
+    Menu result;
 
     struct menu_items items[] = {
         { "Boxes", boxes },
@@ -44,8 +45,10 @@ void screensavers_menu(void)
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
-    menu_run(m);
+    result = menu_run(m);
     menu_exit(m);
+
+    return result;
 }
 
 #endif

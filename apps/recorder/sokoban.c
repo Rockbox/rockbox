@@ -23,6 +23,7 @@
 #include "lcd.h"
 #include "button.h"
 #include "kernel.h"
+#include "menu.h"
 
 #ifdef SIMULATOR
 #include <stdio.h>
@@ -1334,7 +1335,7 @@ void sokoban_loop(void) {
 }
 
 
-void sokoban(void)
+Menu sokoban(void)
 {
     int w, h;
     int len = strlen(SOKOBAN_TITLE);
@@ -1371,4 +1372,6 @@ void sokoban(void)
     sleep(HZ*2);
     lcd_clear_display();
     sokoban_loop();
+
+    return MENU_OK;
 }

@@ -19,6 +19,8 @@
 #ifndef _SOUND_MENU_H
 #define _SOUND_MENU_H
 
-void sound_menu(void);
+#include "menu.h"
+
+Menu sound_menu(void);
 
 #endif

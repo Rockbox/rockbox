@@ -19,6 +19,8 @@
 #ifndef _SETTINGS_MENU_H
 #define _SETTINGS_MENU_H
 
-void settings_menu(void);
+#include "menu.h"
+
+Menu settings_menu(void);
 
 #endif

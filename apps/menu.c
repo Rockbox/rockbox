@@ -212,13 +212,14 @@ void menu_exit(int m)
     inuse[m] = false;
 }
 
-void menu_run(int m)
+Menu menu_run(int m)
 {
 #ifndef SIMULATOR
 #ifdef HAVE_LCD_BITMAP
     bool laststate;
 #endif
 #endif
+    Menu result = MENU_OK;
 
     menu_draw(m);
 
@@ -273,7 +274,7 @@ void menu_run(int m)
             case BUTTON_MENU:
 #endif
                 lcd_stop_scroll();
-                return;
+                return result;
 
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_F3:
@@ -298,6 +299,7 @@ void menu_run(int m)
 #else
                 lcd_icon(ICON_PARAM, true);
 #endif
+                result = MENU_REFRESH_DIR;
                 break;
 #endif
 
@@ -308,4 +310,6 @@ void menu_run(int m)
         status_draw();
         lcd_update();
     }
+
+    return result;
 }

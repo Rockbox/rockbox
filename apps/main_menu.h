@@ -19,7 +19,9 @@
 #ifndef _MAIN_MENU_H
 #define _MAIN_MENU_H
 
+#include "menu.h"
+
 extern int show_logo(void);
-extern void main_menu(void);
+extern Menu main_menu(void);
 
 #endif

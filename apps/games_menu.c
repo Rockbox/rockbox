@@ -29,11 +29,12 @@
 #include "sprintf.h"
 
 #include "sokoban.h"
-extern void tetris(void);
+extern Menu tetris(void);
 
-void games_menu(void)
+Menu games_menu(void)
 {
     int m;
+    Menu result;
 
     struct menu_items items[] = {
         { "Tetris", tetris },
@@ -41,10 +42,10 @@ void games_menu(void)
     };
 
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
-    menu_run(m);
+    result = menu_run(m);
     menu_exit(m);
+
+    return result;
 }
 
 #endif
-
-

@@ -20,7 +20,9 @@
 #ifndef __BOXES_H__
 #define __BOXES_H__
 
-void boxes(void);
+#include "menu.h"
+
+Menu boxes(void);
 
 #endif /* __BOXES_H__ */
 

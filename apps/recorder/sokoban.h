@@ -20,10 +20,12 @@
 #ifndef __SOKOBAN__
 #define __SOKOBAN__
 
+#include "menu.h"
+
 void load_level(int);
 void update_screen(void);
 void sokoban_loop(void);
-void sokoban(void);
+Menu sokoban(void);
 
 #endif /*__SOKOBAN__ */
 

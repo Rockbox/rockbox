@@ -145,48 +145,56 @@ void set_sound(char* string,
     lcd_stop_scroll();
 }
 
-static void volume(void)
+static Menu volume(void)
 {
     set_sound("Volume", &global_settings.volume, SOUND_VOLUME);
+    return MENU_OK;
 }
 
-static void balance(void)
+static Menu balance(void)
 {
     set_sound("Balance", &global_settings.balance, SOUND_BALANCE);
+    return MENU_OK;
 }
 
-static void bass(void)
+static Menu bass(void)
 {
     set_sound("Bass", &global_settings.bass, SOUND_BASS);
+    return MENU_OK;
 };
 
-static void treble(void)
+static Menu treble(void)
 {
     set_sound("Treble", &global_settings.treble, SOUND_TREBLE);
+    return MENU_OK;
 }
 
 #ifdef HAVE_MAS3587F
-static void loudness(void)
+static Menu loudness(void)
 {
     set_sound("Loudness", &global_settings.loudness, SOUND_LOUDNESS);
+    return MENU_OK;
 };
 
-static void bass_boost(void)
+static Menu bass_boost(void)
 {
     set_sound("Bass boost", &global_settings.bass_boost, SOUND_SUPERBASS);
+    return MENU_OK;
 };
 
-static void avc(void)
+static Menu avc(void)
 {
     char* names[] = { "off", "2s ", "4s ", "8s " };
     set_option("[AV decay time]", &global_settings.avc, names, 4 );
     mpeg_sound_set(SOUND_AVC, global_settings.avc);
+    return MENU_OK;
 }
 #endif /* ARCHOS_RECORDER */
 
-void sound_menu(void)
+Menu sound_menu(void)
 {
     int m;
+    Menu result;
     struct menu_items items[] = {
         { "Volume", volume },
         { "Bass",   bass },
@@ -200,6 +208,8 @@ void sound_menu(void)
     };
     
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
-    menu_run(m);
+    result = menu_run(m);
     menu_exit(m);
+
+    return result;
 }

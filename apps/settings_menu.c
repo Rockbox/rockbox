@@ -36,39 +36,45 @@
 #include "powermgmt.h"
 #include "rtc.h"
 
-static void show_hidden_files(void)
+static Menu show_hidden_files(void)
 {
     set_bool( "[Show hidden files]", &global_settings.show_hidden_files );
+    return MENU_OK;
 }
 
-static void contrast(void)
+static Menu contrast(void)
 {
     set_int( "[Contrast]", "", &global_settings.contrast, 
              lcd_set_contrast, 1, 0, MAX_CONTRAST_SETTING );
+    return MENU_OK;
 }
 
-static void shuffle(void)
+static Menu shuffle(void)
 {
     set_bool( "[Shuffle]", &global_settings.playlist_shuffle );
+    return MENU_OK;
 }
 
-static void mp3_filter(void)
+static Menu mp3_filter(void)
 {
     set_bool( "[MP3/M3U filter]", &global_settings.mp3filter );
+    return MENU_OK;
 }
 
-static void sort_case(void)
+static Menu sort_case(void)
 {
     set_bool( "[Sort case sensitive]", &global_settings.sort_case );
+    return MENU_OK;
 }
 
-static void resume(void)
+static Menu resume(void)
 {
     char* names[] = { "off", "ask", "on " };
     set_option( "[Resume]", &global_settings.resume, names, 3 );
+    return MENU_OK;
 }
 
-static void backlight_timer(void)
+static Menu backlight_timer(void)
 {
     char* names[] = { "off", "on ",
                       "1s ", "2s ", "3s ", "4s ", "5s ",
@@ -77,15 +83,17 @@ static void backlight_timer(void)
                       "60s", "90s"};
     set_option("[Backlight]", &global_settings.backlight, names, 19 );
     backlight_time(global_settings.backlight);
+    return MENU_OK;
 }
 
-static void scroll_speed(void)
+static Menu scroll_speed(void)
 {
     set_int("Scroll speed indicator...", "", &global_settings.scroll_speed, 
             &lcd_scroll_speed, 1, 1, 20 );
+    return MENU_OK;
 }
 
-static void wps_set(void)
+static Menu wps_set(void)
 {
 #ifdef HAVE_LCD_BITMAP
     char* names[] = { "ID3 Tags", "File     ", "Parse    " };
@@ -102,18 +110,20 @@ static void wps_set(void)
 #endif
 
 #endif
+    return MENU_OK;
 }
 
 #ifdef HAVE_CHARGE_CTRL
-static void deep_discharge(void)
+static Menu deep_discharge(void)
 {
     set_bool( "[Deep discharge]", &global_settings.discharge );
     charge_restart_level = global_settings.discharge ? CHARGE_RESTART_LO : CHARGE_RESTART_HI;
+    return MENU_OK;
 }
 #endif
 
 #ifdef HAVE_RTC
-static void timedate_set(void)
+static Menu timedate_set(void)
 {
     int timedate[7]; /* hour,minute,second,year,month,day,dayofweek */
 
@@ -150,24 +160,28 @@ static void timedate_set(void)
         rtc_write(0x04, timedate[6] | (rtc_read(0x04) & 0xf8));  /* dayofweek          */
         rtc_write(0x00, 0x00);                                   /* 0.1 + 0.01 seconds */
     }
+    return MENU_OK;
 }
 #endif
 
-static void ff_rewind(void)
+static Menu ff_rewind(void)
 {
     set_int("[FF/Rewind Step Size]", "s", &global_settings.ff_rewind,
             NULL, 1, 1, 999 );
+    return MENU_OK;
 }
 
-void settings_menu(void)
+Menu settings_menu(void)
 {
     int m;
+    Menu result;
+
     struct menu_items items[] = {
         { "Shuffle",         shuffle         }, 
         { "MP3/M3U filter",  mp3_filter      },
         { "Sort mode",       sort_case       },
         { "Backlight Timer", backlight_timer },
-        { "Contrast",    contrast    },  
+        { "Contrast",        contrast    },  
         { "Scroll speed",    scroll_speed    },  
         { "While Playing",   wps_set         },
 #ifdef HAVE_CHARGE_CTRL
@@ -183,7 +197,7 @@ void settings_menu(void)
     bool old_shuffle = global_settings.playlist_shuffle;
     
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
-    menu_run(m);
+    result = menu_run(m);
     menu_exit(m);
 
     if (old_shuffle != global_settings.playlist_shuffle)
@@ -197,4 +211,5 @@ void settings_menu(void)
             sort_playlist();
         }
     }
+    return result;
 }

@@ -27,6 +27,7 @@
 #include "button.h"
 #include "kernel.h"
 #include <string.h>
+#include "menu.h"
 
 #ifdef SIMULATOR
 #include <stdio.h>
@@ -388,7 +389,7 @@ void init_tetris(void)
     next_f = 0;
 }
 
-void tetris(void)
+Menu tetris(void)
 {
     init_tetris();
 
@@ -400,6 +401,8 @@ void tetris(void)
     next_f = t_rand(block_frames[next_b]);
     new_block();
     game_loop();
+
+    return MENU_OK;
 }
 
 #endif

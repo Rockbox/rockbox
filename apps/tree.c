@@ -640,13 +640,15 @@ bool dirbrowse(char *root)
                 bool lastfilter = global_settings.mp3filter;
                 bool lastsortcase = global_settings.sort_case;
                 bool show_hidden_files = global_settings.show_hidden_files;
+                Menu result;
 
                 lcd_stop_scroll();
-                main_menu();
+                result = main_menu();
                 /* do we need to rescan dir? */
-                if ( lastfilter != global_settings.mp3filter ||
-                     lastsortcase != global_settings.sort_case ||
-                     show_hidden_files != global_settings.show_hidden_files)
+                if (result == MENU_REFRESH_DIR ||
+                    lastfilter != global_settings.mp3filter ||
+                    lastsortcase != global_settings.sort_case ||
+                    show_hidden_files != global_settings.show_hidden_files)
                     lastdir[0] = 0;
                 restore = true;
                 break;

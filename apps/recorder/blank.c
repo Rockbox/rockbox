@@ -24,6 +24,7 @@
 #include "lcd.h"
 #include "button.h"
 #include "kernel.h"
+#include "menu.h"
 
 #ifdef SIMULATOR
 #include <stdio.h>
@@ -33,7 +34,7 @@
 #define SS_TITLE       "Blank"
 #define SS_TITLE_FONT  2
 
-void blank(void)
+Menu blank(void)
 {
     int w, h;
     char *off = "[Off] to stop";
@@ -76,15 +77,16 @@ void blank(void)
     lcd_update();
     sleep(HZ);
 
-	lcd_clear_display();
+    lcd_clear_display();
     lcd_update();
 
-	while(1) {
-		if(button_get(false))
-			return;
+    while(1) {
+        if(button_get(false))
+            return MENU_OK;
         sleep(HZ/10);
-	}
-
+    }
+    
+    return MENU_OK;
 }
 
 #endif
