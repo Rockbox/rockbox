@@ -457,6 +457,7 @@ static void mpeg_thread(void)
                             queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
                         }
                     }
+                    yield(); /* To be safe */
                 }
                 break;
         }
