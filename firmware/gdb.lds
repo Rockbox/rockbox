@@ -36,7 +36,8 @@ SECTIONS
     .stack :
     {
        *(.stack)
-       _stack = . + 0x8000;
+       . = . + 0x8000;
+       _stack = .;
     }
 
     .heap :
