@@ -424,7 +424,7 @@ new: "Kaldigi yerden?"
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: posible answers to resume question
 eng: "(PLAY/STOP)"
-new: "(ÇAL/DUR)
+new: "(ÇAL/DUR)"
 
 id: LANG_RESUME_CONFIRM_RECORDER
 desc: posible answer to resume question
@@ -534,7 +534,7 @@ new: "[Uzunluk]"
 id: LANG_ID3_PLAYLIST
 desc: in wps
 eng: "[Playlist]"
-new: "[Sarki Listesi]
+new: "[Sarki Listesi]"
 
 id: LANG_ID3_BITRATE
 desc: in wps
@@ -738,12 +738,12 @@ new: "Es: %d"
 id: LANG_WORMLET_PLAYERS
 desc: wormlet game
 eng: "%d Players    up/dn"
-new: "%d Oyuncu     y/a"
+new: "%d Oyuncu  y/a"
 
 id: LANG_WORMLET_WORMS
 desc: wormlet game
 eng: "%d Worms        l/r"
-new: "%d Kurtcuk    sa/so"
+new: "%d Kurtcuk sa/so"
 
 id: LANG_WORMLET_REMOTE_CTRL
 desc: wormlet game
@@ -811,3 +811,13 @@ id: LANG_FILTER_ALL
 desc: show all files
 eng: "All"
 new: "Hepsi"
+
+id: LANG_SET_BOOL_YES
+desc: bool true representation
+eng: "Yes"
+new: "Evet"
+
+id: LANG_SET_BOOL_NO
+desc: bool false representation
+eng: "No"
+new: "Hayir"
