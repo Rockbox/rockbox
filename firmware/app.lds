@@ -58,8 +58,4 @@ SECTIONS
         _mp3end = .;
     }
 
-    .pad 0x0900C800 :
-    {
-        LONG(0);
-    }
 }
