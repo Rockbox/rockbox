@@ -1,4 +1,3 @@
-# $Id$
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -163,17 +162,17 @@ new: "OFF om terug te zetten"
 id: LANG_HIDDEN
 desc: in settings_menu
 eng: ""
-new: ""
+new:
 
 id: LANG_HIDDEN_SHOW
 desc: in settings_menu 
 eng: ""
-new: ""
+new:
 
 id: LANG_HIDDEN_HIDE
 desc: in settings_menu
 eng: ""
-new: ""
+new:
 
 id: LANG_CONTRAST
 desc: in settings_menu
@@ -193,7 +192,7 @@ new: "Speel Geselecteerde Eerst"
 id: LANG_MP3FILTER
 desc: in settings_menu
 eng: ""
-new: ""
+new:
 
 id: LANG_SORT_CASE
 desc: in settings_menu
@@ -263,12 +262,12 @@ new: "Volg Speellijst"
 id: LANG_RESET_ASK_PLAYER
 desc: confirm to reset settings
 eng: ""
-new: ""
+new:
 
 id: LANG_RESET_CONFIRM_PLAYER
 desc: confirm to reset settings
 eng: ""
-new: ""
+new:
 
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
@@ -278,7 +277,7 @@ new: "Weet je het zeker?"
 id: LANG_RESET_CONFIRM_RECORDER
 desc: confirm to reset settings
 eng: ""
-new: ""
+new:
 
 id: LANG_RESET_CANCEL_RECORDER
 desc: confirm to reset settings
@@ -573,7 +572,7 @@ new:
 id: LANG_DIR_FILTER
 desc: in wps F2 pressed
 eng: ""
-new: ""
+new:
 
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
@@ -598,7 +597,7 @@ new: "Einde van de lijst"
 id: LANG_END_CONFIRM_PLAYER
 desc: when playlist has finished
 eng: ""
-new: ""
+new:
 
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
@@ -608,7 +607,7 @@ new: "Einde van de titellijst"
 id: LANG_END_CONFIRM_RECORDER
 desc: when playlist has finished
 eng: ""
-new: ""
+new:
 
 id: LANG_SNAKE_SCORE
 desc: when you die in snake game
@@ -1301,9 +1300,9 @@ eng: "Creating"
 new: "Creeëren..."
 
 id: LANG_CPU_SLEEP
-desc: in system_settings_menu()
-eng: "Power Saving"
-new: "Energie sparen" 
+desc: in system_settings_menu() (removed)
+eng: ""
+new: 
 
 id: LANG_FADE_ON_STOP
 desc: options menu to set fade on stop or pause
@@ -1399,3 +1398,18 @@ id: LANG_INVERT
 desc: in settings_menu
 eng: "Invert"
 new: "Omgedraaid" 
+
+id: LANG_SAVE_SETTINGS
+desc: in system_settings_menu()
+eng: "Write .cfg file"
+new: "Schrijf .cfg bestand"
+
+id: LANG_SETTINGS_SAVED1
+desc: Feedback shown when a .cfg file is saved
+eng: "Settings"
+new: "Instellingen" 
+
+id: LANG_SETTINGS_SAVED2
+desc: Feedback shown when a .cfg file is saved
+eng: "Saved"
+new: "Opgeslagen" 
