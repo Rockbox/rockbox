@@ -9,6 +9,6 @@
 # The weird grep -v thing in here is due to Apple's stupidities and is needed
 # to make this do right when used on Mac OS X.
 
-SRC := $(shell cat SOURCES | gcc -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
+SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
 $(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -include "config.h" - | \
 grep -v "^\#")
