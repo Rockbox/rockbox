@@ -977,7 +977,7 @@ static int master_slave_detect(void)
 }
 
 #if CONFIG_CPU == SH7034 /* special archos quirk */
-static int io_address_detect(void)
+static void io_address_detect(void)
 {   /* now, use the HW mask instead of probing */
     if (read_hw_mask() & ATA_ADDRESS_200)
     {
@@ -991,8 +991,6 @@ static int io_address_detect(void)
         old_recorder = true;
         ata_control = ATA_CONTROL2;
     }
-
-    return 0;
 }
 #endif
 
@@ -1117,10 +1115,37 @@ unsigned short* ata_get_identify(void)
     return identify_info;
 }
 
+static int init_and_check(bool hard_reset)
+{
+    int rc;
+
+    if (hard_reset)
+    {
+        /* This should reset both master and slave, we don't yet know what's in */
+        ata_device = 0;
+        if (ata_hard_reset())
+            return -1;
+    }
+
+    rc = master_slave_detect();
+    if (rc)
+        return -10 + rc;
+
+    /* symptom fix: else check_registers() below may fail */
+    if (hard_reset && !wait_for_bsy())
+        return -20;
+
+    rc = check_registers();
+    if (rc)
+        return -30 + rc;
+    
+    return 0;
+}
+
 int ata_init(void)
 {
     int rc;
-    bool coldstart = (PACR2 & 0x4000) != 0; 
+    bool coldstart = (PACR2 & 0x4000) != 0;
 
     mutex_init(&ata_mtx);
 
@@ -1144,33 +1169,19 @@ int ata_init(void)
             sleep(HZ); /* allow voltage to build up */
         }
 
-        if (coldstart)
-        {
-            /* This should reset both master and slave, we don't yet know what's in */
-            ata_device = 0;
-            if (ata_hard_reset())
-                return -1;
-        }
-
-        rc = master_slave_detect();
-        if (rc)
-            return -10 + rc;
-
 #if CONFIG_CPU == SH7034
-        rc = io_address_detect();
-        if (rc)
-            return -20 + rc;
-#endif
+        io_address_detect();
+#endif  
+        /* first try, hard reset at cold start only */
+        rc = init_and_check(coldstart);  
 
-        /* symptom fix: else check_registers() below may fail */
-        if (coldstart && !wait_for_bsy())
-        {   
-            return -29;
+        if (rc) 
+        {   /* failed? -> second try, always with hard reset */
+            DEBUGF("ata: init failed, retrying...\n");
+            rc  = init_and_check(true);
+            if (rc)
+                return rc;
         }
-
-        rc = check_registers();
-        if (rc)
-            return -30 + rc;
 
         rc = identify();
         if (rc)
