@@ -25,7 +25,7 @@
 
 NAME ID3v1 and ID3v2 support ENAME
 YES
-UNKNOWN
+TD ID3v1 ETD
 EFEAT
 
 NAME Background noise during playback ENAME
