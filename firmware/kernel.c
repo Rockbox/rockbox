@@ -18,6 +18,7 @@
  ****************************************************************************/
 #include <stdlib.h>
 #include <string.h>
+#include "config.h"
 #include "kernel.h"
 #include "thread.h"
 #include "cpu.h"
@@ -27,8 +28,6 @@
 long current_tick = 0;
 
 static void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
-
-static void tick_start(unsigned int interval_in_ms);
 
 /* This array holds all queues that are initiated. It is used for broadcast. */
 static struct event_queue *all_queues[32];
@@ -155,7 +154,7 @@ int queue_broadcast(long id, void *data)
  * Timer tick
  ****************************************************************************/
 #if CONFIG_CPU == SH7034
-static void tick_start(unsigned int interval_in_ms)
+void tick_start(unsigned int interval_in_ms)
 {
     unsigned int count;
 
@@ -207,7 +206,7 @@ void IMIA0(void)
     TSR0 &= ~0x01;
 }
 #elif CONFIG_CPU == MCF5249
-static void tick_start(unsigned int interval_in_ms)
+void tick_start(unsigned int interval_in_ms)
 {
     unsigned int count;
 
@@ -282,7 +281,7 @@ void TIMER0(void)
     TACON |= 0x80;
 }
 
-static void tick_start(unsigned int interval_in_ms)
+void tick_start(unsigned int interval_in_ms)
 {
     long count;
     count = (long)FREQ * (long)interval_in_ms / 1000 / 16;

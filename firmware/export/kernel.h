@@ -87,5 +87,6 @@ extern int queue_broadcast(long id, void *data);
 extern void mutex_init(struct mutex *m);
 extern void mutex_lock(struct mutex *m);
 extern void mutex_unlock(struct mutex *m);
+extern void tick_start(unsigned int interval_in_ms);
 
 #endif
