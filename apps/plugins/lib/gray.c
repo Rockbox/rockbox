@@ -77,7 +77,7 @@ static void gray_timer_isr(void)
         int x1 = MAX(graybuf->x, 0);
         int x2 = MIN(graybuf->x + graybuf->width, LCD_WIDTH);
         int y1 = MAX(graybuf->by << 3, 0);
-        int y2 = MIN((graybuf->by + graybuf->bheight) << 3, LCD_HEIGHT);
+        int y2 = MIN((graybuf->by << 3) + graybuf->height, LCD_HEIGHT);
 
         if (y1 > 0)  /* refresh part above overlay, full width */
             rb->lcd_update_rect(0, 0, LCD_WIDTH, y1);
@@ -108,7 +108,7 @@ static void graypixel(int x, int y, unsigned long pattern)
      * It delivers max. 16 pseudo-random bits in each iteration. */
 
     /* simple but fast pseudo-random generator */
-    asm(
+    asm (
         "mov     #75,r1          \n"
         "mulu    %1,r1           \n"  /* multiply by 75 */
         "sts     macl,%1         \n"  /* get result */
@@ -126,7 +126,7 @@ static void graypixel(int x, int y, unsigned long pattern)
     );
 
     /* precalculate mask and byte address in first bitplane */
-    asm(
+    asm (
         "mov     %3,%0           \n"  /* take y as base for address offset */
         "shlr2   %0              \n"  /* shift right by 3 (= divide by 8) */
         "shlr    %0              \n"
@@ -164,7 +164,7 @@ static void graypixel(int x, int y, unsigned long pattern)
     );
 
     /* the hard part: set bits in all bitplanes according to pattern */
-    asm(
+    asm volatile (
         "cmp/hs  %1,%5           \n"  /* random >= depth ? */
         "bf      .p_ntrim        \n"
         "sub     %1,%5           \n"  /* yes: random -= depth */
@@ -240,7 +240,7 @@ static void grayblock(int x, int by, unsigned char* src, int stride)
     /* precalculate the bit patterns with random shifts (same RNG as graypixel,
      * see there for an explanation) for all 8 pixels and put them on an
      * extra stack */
-    asm(
+    asm (
         "mova    .gb_reload,r0   \n"  /* set default loopback address */
         "tst     %3,%3           \n"  /* stride == 0 ? */
         "bf      .gb_needreload  \n"  /* no: keep that address */
@@ -323,7 +323,7 @@ static void grayblock(int x, int by, unsigned char* src, int stride)
 
     /* set the bits for all 8 pixels in all bytes according to the
      * precalculated patterns on the pattern stack */
-    asm (
+    asm volatile (
         "mov.l   @%3+,r1         \n"  /* pop all 8 patterns */
         "mov.l   @%3+,r2         \n"
         "mov.l   @%3+,r3         \n"
@@ -368,7 +368,7 @@ static void grayblock(int x, int by, unsigned char* src, int stride)
 /* Invert the bits for 1-8 pixels within the buffer */
 static void grayinvertmasked(int x, int by, unsigned char mask)
 {
-    asm(
+    asm volatile (
         "mulu    %4,%5           \n"  /* width * by (offset of row) */
         "mov     #0,r1           \n"  /* current_plane = 0 */
         "sts     macl,r2         \n"  /* get mulu result */
@@ -473,7 +473,7 @@ int gray_init_buffer(unsigned char *gbuf, int gbuf_size, int width,
     graybuf->data = (unsigned char *) (graybuf->bitpattern + depth + 1);
     graybuf->curfont = FONT_SYSFIXED;
 
-    i = depth;
+    i = depth - 1;
     j = 8;
     while (i != 0)
     {
@@ -660,36 +660,39 @@ void gray_scroll_left(int count, bool black_border)
         ptr = graybuf->data + MULU16(graybuf->width, by);
         for (d = 0; d < graybuf->depth; d++)
         {   
-            if (count & 1)  /* odd count: scroll byte-wise */
-                asm volatile (
-                ".sl_loop1:                   \n"
-                    "mov.b   @%0+,r1          \n"
-                    "mov.b   r1,@(%2,%0)      \n"
-                    "cmp/hi  %0,%1            \n"
-                    "bt      .sl_loop1        \n"
-                    : /* outputs */
-                    : /* inputs */
-                    /* %0 */ "r"(ptr + count),
-                    /* %1 */ "r"(ptr + graybuf->width),
-                    /* %2 */ "z"(-count - 1)
-                    : /* clobbers */
-                    "r1"
-                );
-            else           /* even count: scroll word-wise */
-                asm volatile (
-                ".sl_loop2:                   \n"
-                    "mov.w   @%0+,r1          \n"
-                    "mov.w   r1,@(%2,%0)      \n"
-                    "cmp/hi  %0,%1            \n"
-                    "bt      .sl_loop2        \n"
-                    : /* outputs */
-                    : /* inputs */
-                    /* %0 */ "r"(ptr + count),
-                    /* %1 */ "r"(ptr + graybuf->width),
-                    /* %2 */ "z"(-count - 2)
-                    : /* clobbers */
-                    "r1"
-                );
+            asm volatile (
+                "mov     %0,r1            \n" /* check if both source... */
+                "or      %2,r1            \n" /* ...and offset are even */
+                "shlr    r1               \n" /* -> lsb = 0 */
+                "bf      .sl_start2       \n" /* -> copy word-wise */
+
+                "add     #-1,%2           \n" /* copy byte-wise */
+            ".sl_loop1:                   \n"
+                "mov.b   @%0+,r1          \n"
+                "mov.b   r1,@(%2,%0)      \n"
+                "cmp/hi  %0,%1            \n"
+                "bt      .sl_loop1        \n"
+                
+                "bra     .sl_end          \n"
+                "nop                      \n"
+
+            ".sl_start2:                  \n" /* copy word-wise */
+                "add     #-2,%2           \n"
+            ".sl_loop2:                   \n"
+                "mov.w   @%0+,r1          \n"
+                "mov.w   r1,@(%2,%0)      \n"
+                "cmp/hi  %0,%1            \n"
+                "bt      .sl_loop2        \n"
+
+            ".sl_end:                     \n"
+                : /* outputs */
+                : /* inputs */
+                /* %0 */ "r"(ptr + count),
+                /* %1 */ "r"(ptr + graybuf->width),
+                /* %2 */ "z"(-count)
+                : /* clobbers */
+                "r1"
+            );
 
             rb->memset(ptr + graybuf->width - count, filler, count);
             ptr += graybuf->plane_size;
@@ -725,36 +728,39 @@ void gray_scroll_right(int count, bool black_border)
         ptr = graybuf->data + MULU16(graybuf->width, by);
         for (d = 0; d < graybuf->depth; d++)
         {
-            if (count & 1)  /* odd count: scroll byte-wise */
-                asm volatile (
-                ".sr_loop1:                   \n"
-                    "mov.b   @(%2,%0),r1      \n"
-                    "mov.b   r1,@-%0          \n"
-                    "cmp/hi  %1,%0            \n"
-                    "bt      .sr_loop1        \n"
-                    : /* outputs */
-                    : /* inputs */
-                    /* %0 */ "r"(ptr + graybuf->width),
-                    /* %1 */ "r"(ptr + count),
-                    /* %2 */ "z"(-count - 1)
-                    : /* clobbers */
-                    "r1"
-                );
-            else            /* even count: scroll word-wise */
-                asm volatile (
-                ".sr_loop2:                   \n"
-                    "mov.w   @(%2,%0),r1      \n"
-                    "mov.w   r1,@-%0          \n"
-                    "cmp/hi  %1,%0            \n"
-                    "bt      .sr_loop2        \n"
-                    : /* outputs */
-                    : /* inputs */
-                    /* %0 */ "r"(ptr + graybuf->width),
-                    /* %1 */ "r"(ptr + count),
-                    /* %2 */ "z"(-count - 2)
-                    : /* clobbers */
-                    "r1"
-                );
+            asm volatile (
+                "mov     %0,r1            \n" /* check if both source... */
+                "or      %2,r1            \n" /* ...and offset are even */
+                "shlr    r1               \n" /* -> lsb = 0 */
+                "bf      .sr_start2       \n" /* -> copy word-wise */
+
+                "add     #-1,%2           \n" /* copy byte-wise */
+            ".sr_loop1:                   \n"
+                "mov.b   @(%2,%0),r1      \n"
+                "mov.b   r1,@-%0          \n"
+                "cmp/hi  %1,%0            \n"
+                "bt      .sr_loop1        \n"
+                
+                "bra     .sr_end          \n"
+                "nop                      \n"
+                
+            ".sr_start2:                  \n" /* copy word-wise */
+                "add     #-2,%2           \n"
+            ".sr_loop2:                   \n"
+                "mov.w   @(%2,%0),r1      \n"
+                "mov.w   r1,@-%0          \n"
+                "cmp/hi  %1,%0            \n"
+                "bt      .sr_loop2        \n"
+                
+            ".sr_end:                     \n"
+                : /* outputs */
+                : /* inputs */
+                /* %0 */ "r"(ptr + graybuf->width),
+                /* %1 */ "r"(ptr + count),
+                /* %2 */ "z"(-count)
+                : /* clobbers */
+                "r1"
+            );
 
             rb->memset(ptr, filler, count);
             ptr += graybuf->plane_size;
@@ -864,7 +870,7 @@ void gray_scroll_up(int count, bool black_border)
         filler = 0;
     
     /* scroll column by column to minimize flicker */
-    asm(
+    asm volatile (
         "mov     #0,r6           \n"  /* x = 0 */
         "mova    .su_shifttbl,r0 \n"  /* calculate jump destination for */
         "mov.b   @(r0,%6),%6     \n"  /*   shift amount from table */
@@ -967,7 +973,7 @@ void gray_scroll_down(int count, bool black_border)
         filler = 0;
     
     /* scroll column by column to minimize flicker */
-    asm(
+    asm volatile (
         "mov     #0,r6           \n"  /* x = 0 */
         "mova    .sd_shifttbl,r0 \n"  /* calculate jump destination for */
         "mov.b   @(r0,%6),%6     \n"  /*   shift amount from table */
@@ -1431,7 +1437,7 @@ void gray_invertrect(int x1, int y1, int x2, int y2)
 void gray_drawgraymap(unsigned char *src, int x, int y, int nx, int ny,
                       int stride)
 {
-    int xi, yi;
+    int xi, yi, byte;
     unsigned char *row;
 
     if (graybuf == NULL 
@@ -1464,7 +1470,9 @@ void gray_drawgraymap(unsigned char *src, int x, int y, int nx, int ny,
         {
             for (xi = x; xi < x + nx; xi++)
             {
-                graypixel(xi, yi, graybuf->bitpattern[MULU16(*row++,
+                byte = *row++;  
+                /* separated to force GCC to use 16bit multiplication below */
+                graypixel(xi, yi, graybuf->bitpattern[MULU16(byte,
                                   graybuf->depth + 1) >> 8]);
             }
             yi++;
@@ -1609,8 +1617,9 @@ void gray_putsxy(int x, int y, unsigned char *str, bool draw_bg,
 
         /* get proportional width and glyph bits */
         width = pf->width ? pf->width[ch] : pf->maxwidth;
-        bits = pf->bits + (pf->offset ? pf->offset[ch] : (pf->height * ch));
-        
+        bits = pf->bits + (pf->offset ? pf->offset[ch] 
+                                      : MULU16(pf->height, ch));
+
         gray_drawbitmap((unsigned char*) bits, x, y, width, pf->height,
                         width, draw_bg, fg_brightness, bg_brightness);
         x += width;
