@@ -29,7 +29,7 @@ extern void lcd_init(void);
 extern void lcd_clear_display(void);
 extern void lcd_backlight(bool on);
 extern void lcd_puts(int x, int y, unsigned char *string);
-extern void lcd_putc(int x, int y, unsigned char ch);
+extern void lcd_putc(int x, int y, unsigned short ch);
 extern void lcd_scroll_pause(void);
 extern void lcd_scroll_pause_line(int line);
 extern void lcd_scroll_resume(void);
@@ -82,13 +82,15 @@ enum
     ICON_PARAM
 };
 
-extern void lcd_define_pattern (int which,char *pattern,int length);
+extern void lcd_define_hw_pattern (int which,char *pattern,int length);
+extern void lcd_define_pattern (int which,char *pattern);
 extern void lcd_double_height (bool on);
+unsigned char lcd_get_locked_pattern();
+void lcd_unlock_pattern(unsigned char pat);
 
 #endif
 
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
-
 #if defined(HAVE_LCD_CHARCELLS) && defined(SIMULATOR)
 #define LCD_WIDTH       (4*11*6)  /* Display width in pixels */
 #define LCD_HEIGHT      (4*16+2*24) /* 4*char + 2*icons */
