@@ -169,6 +169,11 @@ void status_draw(void)
 #ifdef HAVE_RTC
         statusbar_time();
 #endif
+#ifdef SIMULATOR
+        lcd_update();
+#else
+        lcd_update_rect(0,0,LCD_WIDTH,8);
+#endif
     }
 #endif
 }
