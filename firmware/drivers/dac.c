@@ -70,5 +70,5 @@ int dac_config(int value)
     }
 
     i2c_end();
-    return 0;
+    return ret;
 }
