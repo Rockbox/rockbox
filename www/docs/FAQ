@@ -256,3 +256,14 @@ A31: The developers have discussed the possibility of a boot loader.  (Mainly
      different verions of Rockbox or the Archo firmware itself.  We do not
      have an expected date on this.  (As a matter of fact, developement on it
      has not even started yet).
+
+Q32: I was thinking about making the USB a bit more usable.  What are the
+     chances of using the USB port to [play games / share files / list
+     the device as something other then a hard drive / sell my soul to you
+     for a nickel].  What do you think?
+A32: You really don't want to know what I think, it involves road flares, 
+     microwave ovens and shaved cats.  Enough said.  But regarding the USB 
+     portion of your question, this is not feasible.  We have no control over
+     the USB port itself.  We are capable of dectecting if it is in use (so we
+     know which mode to switch to) but that is it.  Sorry.  Now about your
+     soul.  Would you settle for 3 cents and a small wad of belly button lint?
