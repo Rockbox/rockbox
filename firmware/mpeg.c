@@ -29,7 +29,6 @@
 #include "file.h"
 
 #define MPEG_STACK_SIZE 0x2000
-#define MPEG_BUFSIZE    0x100000
 #define MPEG_CHUNKSIZE  0x20000
 #define MPEG_LOW_WATER  0x30000
 
@@ -118,7 +117,11 @@ static unsigned char fliptable[] =
 static struct event_queue mpeg_queue;
 static int mpeg_stack[MPEG_STACK_SIZE/sizeof(int)];
 
-static unsigned char mp3buf[ MPEG_BUFSIZE ];
+/* defined in linker script */
+extern unsigned char mp3buf[];
+extern unsigned char mp3end[];
+
+static int mp3buflen;
 static int mp3buf_write;
 static int mp3buf_read;
 
@@ -215,6 +218,52 @@ static void reset_mp3_buffer(void)
 }
 
 #pragma interrupt
+void IRQ6(void)
+{
+    stop_dma();
+}
+
+#pragma interrupt
+void DEI3(void)
+{
+    int unplayed_space_left;
+    int space_until_end_of_buffer;
+
+    if(playing)
+    {
+        mp3buf_read += last_dma_chunk_size;
+        if(mp3buf_read >= mp3buflen)
+            mp3buf_read = 0;
+    
+        unplayed_space_left = mp3buf_write - mp3buf_read;
+        if(unplayed_space_left < 0)
+            unplayed_space_left = mp3buflen + unplayed_space_left;
+
+        space_until_end_of_buffer = mp3buflen - mp3buf_read;
+        
+        if(!filling && unplayed_space_left < MPEG_LOW_WATER)
+        {
+            queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+        }
+        
+        if(unplayed_space_left)
+        {
+            last_dma_chunk_size = MIN(65536, unplayed_space_left);
+            last_dma_chunk_size = MIN(last_dma_chunk_size, space_until_end_of_buffer);
+            DTCR3 = last_dma_chunk_size & 0xffff;
+            SAR3 = (unsigned int)mp3buf + mp3buf_read;
+        }
+        else
+        {
+            DEBUGF("No more MP3 data. Stopping.\n");
+            CHCR3 = 0; /* Stop DMA interrupt */
+        }
+    }
+
+    CHCR3 &= ~0x0002; /* Clear DMA interrupt */
+}
+
+#pragma interrupt
 void IMIA1(void)
 {
     dma_tick();
@@ -239,6 +288,7 @@ static void mpeg_thread(void)
         switch(ev.id)
         {
             case MPEG_PLAY:
+                DEBUGF("MPEG_PLAY %s\n",ev.data);
                 /* Stop the current stream */
                 play_pending = false;
                 playing = false;
@@ -263,18 +313,21 @@ static void mpeg_thread(void)
                 break;
 
             case MPEG_STOP:
+                DEBUGF("MPEG_STOP\n");
                 /* Stop the current stream */
                 playing = false;
                 stop_dma();
                 break;
 
             case MPEG_PAUSE:
+                DEBUGF("MPEG_PAUSE\n");
                 /* Stop the current stream */
                 playing = false;
                 stop_dma();
                 break;
 
             case MPEG_RESUME:
+                DEBUGF("MPEG_RESUME\n");
                 /* Stop the current stream */
                 playing = true;
                 start_dma();
@@ -285,7 +338,7 @@ static void mpeg_thread(void)
 
                 /* We interpret 0 as "empty buffer" */
                 if(free_space_left <= 0)
-                    free_space_left = MPEG_BUFSIZE + free_space_left;
+                    free_space_left = mp3buflen + free_space_left;
 
                 if(free_space_left <= MPEG_CHUNKSIZE)
                 {
@@ -295,7 +348,7 @@ static void mpeg_thread(void)
                 }
             
                 amount_to_read = MIN(MPEG_CHUNKSIZE, free_space_left);
-                amount_to_read = MIN(MPEG_BUFSIZE - mp3buf_write, amount_to_read);
+                amount_to_read = MIN(mp3buflen - mp3buf_write, amount_to_read);
                 
                 /* Read in a few seconds worth of MP3 data. We don't want to
                    read too large chunks because the bitswapping will take
@@ -309,7 +362,7 @@ static void mpeg_thread(void)
                     bitswap(mp3buf + mp3buf_write, len);
                     
                     mp3buf_write += len;
-                    if(mp3buf_write >= MPEG_BUFSIZE)
+                    if(mp3buf_write >= mp3buflen)
                     {
                         mp3buf_write = 0;
                         DEBUGF("W\n");
@@ -406,11 +459,51 @@ static void setup_sci0(void)
     SCR0 |= 0x20;
 }
 
+
+void mpeg_play(char* trackname)
+{
+    queue_post(&mpeg_queue, MPEG_PLAY, trackname);
+}
+
+void mpeg_stop(void)
+{
+    queue_post(&mpeg_queue, MPEG_STOP, NULL);
+}
+
+void mpeg_pause(void)
+{
+    queue_post(&mpeg_queue, MPEG_PAUSE, NULL);
+}
+
+void mpeg_resume(void)
+{
+    queue_post(&mpeg_queue, MPEG_RESUME, NULL);
+}
+
+void mpeg_volume(int percent)
+{
+    int volume = 0x2c * percent / 100;
+    dac_volume(volume);
+}
+
+void mpeg_bass(int percent)
+{
+    int bass = 15 * percent / 100;
+    mas_writereg(MAS_REG_KBASS, bass_table[bass]);
+}
+
+void mpeg_treble(int percent)
+{
+    int treble = 15 * percent / 100;
+    mas_writereg(MAS_REG_KTREBLE, treble_table[treble]);
+}
+
 void mpeg_init(void)
 {
     int rc;
 
     setup_sci0();
+    i2c_init();
 
 #ifdef DEBUG
     {
@@ -453,42 +546,15 @@ void mpeg_init(void)
     mas_poll_start(2);
 
     mas_writereg(MAS_REG_KPRESCALE, 0xe9400);
-}
 
-void mpeg_play(char* trackname)
-{
-    queue_post(&mpeg_queue, MPEG_PLAY, trackname);
-}
+    mp3buflen = mp3end - mp3buf;
 
-void mpeg_stop(void)
-{
-    queue_post(&mpeg_queue, MPEG_STOP, NULL);
-}
+    if(dac_config(0x04) < 0) {
+        DEBUGF("dac_config() failed\n");
+    }
 
-void mpeg_pause(void)
-{
-    queue_post(&mpeg_queue, MPEG_PAUSE, NULL);
-}
+    mpeg_volume(70);
+    mpeg_bass(50);
+    mpeg_treble(50);
 
-void mpeg_resume(void)
-{
-    queue_post(&mpeg_queue, MPEG_RESUME, NULL);
-}
-
-void mpeg_volume(int percent)
-{
-    int volume = 0x2c * percent / 100;
-    dac_volume(volume);
-}
-
-void mpeg_bass(int percent)
-{
-    int bass = 15 * percent / 100;
-    mas_writereg(MAS_REG_KBASS, bass_table[bass]);
-}
-
-void mpeg_treble(int percent)
-{
-    int treble = 15 * percent / 100;
-    mas_writereg(MAS_REG_KTREBLE, treble_table[treble]);
 }
