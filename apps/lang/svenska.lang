@@ -65,7 +65,8 @@ eng: "Loading..."
 voice: ""
 new: "Laddar..."
 
-id: LANG_PLAYLIST_SHUFFLE
+id: LAN
+  G_PLAYLIST_SHUFFLE
 desc: displayed on screen while shuffling a playlist
 eng: "Shuffling..."
 voice: ""
@@ -134,8 +135,6 @@ new: "Slumpa"
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play Selected First"
-### Voice string was changed! Previous version was:
-### "Shuffle"
 voice: "Play Selected File First"
 new: "Spela den valda först"
 
@@ -1280,10 +1279,10 @@ voice: "LCD Mode"
 new: "LCD-Läge"
 
 id: LANG_SOKOBAN_ON
-desc: how to undo move 
-eng: "[ON] To Undo"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "[PÅ] för att ångra"
+new: ""
 
 id: LANG_SAVE_SETTINGS
 desc: in system_settings_menu()
@@ -1304,22 +1303,22 @@ voice: ""
 new: "Sparad"
 
 id: LANG_VBRFIX_NOT_VBR
-desc: Tells the user that the selected file is not a VBR file
-eng: "Not a VBR file"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Filen är inte VBR"
+new: ""
 
 id: LANG_VBRFIX_STOP_PLAY
-desc: Tells the user to stop the playback
-eng: "Stop the playback first"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Stoppa uppspelningen först"
+new: ""
 
 id: LANG_VBRFIX
-desc: The context menu entry
-eng: "Update VBR file"
-voice: "Update VBR file"
-new: "Uppdatera VBR-filen"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_STATUS_BAR
 desc: display menu, F3 substitute
@@ -2128,7 +2127,7 @@ new: ""
 id: VOICE_HUNDRED
 desc: spoken only, for composing numbers
 eng: ""
-voice: "hunded"
+voice: "hundred"
 new: ""
 
 id: VOICE_KHZ
@@ -2320,254 +2319,330 @@ new: ""
 id: LANG_DELETE_DIR
 desc: in on+play menu
 eng: "Delete directory"
+voice: "delete directory"
 new: "Ta bort katalog"
 
 id: LANG_VOICE
 desc: root of voice menu
 eng: "Voice"
+voice: "Voice"
 new: "Röst"
 
 id: LANG_VOICE_DIR
 desc: item of voice menu, set the "talkbox" mode for directories
 eng: "Voice Directories"
+voice: "Voice Directories"
 new: "Röstkataloger"
 
 id: LANG_VOICE_DIR_ENTER
 desc: "talkbox" mode for directories
 eng: "on enter"
+voice: "on enter"
 new: "vid ingång"
 
 id: LANG_VOICE_DIR_HOVER
 desc: "talkbox" mode for directories
 eng: "while hovering"
+voice: "while hovering"
 new: "under svävning"
 
 id: LANG_VOICE_FILE
 desc: item of voice menu, set the voive mode for files
 eng: "Voice Filenames"
+voice: "Voice Filenames"
 new: "Röstfilnamn"
 
 id: LANG_VOICE_MENU
 desc: item of voice menu, enable/disable the voice UI
 eng: "Voice Menus"
+voice: "Voice Menus"
 new: "Röstmeny"
 
 id: LANG_VOICE_NUMBER
 desc: "talkbox" mode for files+directories
 eng: "Numbers"
+voice: "Numbers"
 new: "Siffror"
 
 id: LANG_VOICE_SPELL
 desc: "talkbox" mode for files+directories
 eng: "Spell"
+voice: "Spell"
 new: "Stava"
 
 id: VOICE_CHAR_A
 desc: spoken only, for spelling
 eng: ""
+voice: "A"
 new: ""
 
 id: VOICE_CHAR_B
 desc: spoken only, for spelling
 eng: ""
+voice: "B"
 new: ""
 
 id: VOICE_CHAR_C
 desc: spoken only, for spelling
 eng: ""
+voice: "C"
 new: ""
 
 id: VOICE_CHAR_D
 desc: spoken only, for spelling
 eng: ""
+voice: "D"
 new: ""
 
 id: VOICE_CHAR_E
 desc: spoken only, for spelling
 eng: ""
+voice: "E"
 new: ""
 
 id: VOICE_CHAR_F
 desc: spoken only, for spelling
 eng: ""
+voice: "F"
 new: ""
 
 id: VOICE_CHAR_G
 desc: spoken only, for spelling
 eng: ""
+voice: "G"
 new: ""
 
 id: VOICE_CHAR_H
 desc: spoken only, for spelling
 eng: ""
+voice: "H"
 new: ""
 
 id: VOICE_CHAR_I
 desc: spoken only, for spelling
 eng: ""
+voice: "I"
 new: ""
 
 id: VOICE_CHAR_J
 desc: spoken only, for spelling
 eng: ""
+voice: "J"
 new: ""
 
 id: VOICE_CHAR_K
 desc: spoken only, for spelling
 eng: ""
+voice: "K"
 new: ""
 
 id: VOICE_CHAR_L
 desc: spoken only, for spelling
 eng: ""
+voice: "L"
 new: ""
 
 id: VOICE_CHAR_M
 desc: spoken only, for spelling
 eng: ""
+voice: "M"
 new: ""
 
 id: VOICE_CHAR_N
 desc: spoken only, for spelling
 eng: ""
+voice: "N"
 new: ""
 
 id: VOICE_CHAR_O
 desc: spoken only, for spelling
 eng: ""
+voice: "O"
 new: ""
 
 id: VOICE_CHAR_P
 desc: spoken only, for spelling
 eng: ""
+voice: "P"
 new: ""
 
 id: VOICE_CHAR_Q
 desc: spoken only, for spelling
 eng: ""
+voice: "Q"
 new: ""
 
 id: VOICE_CHAR_R
 desc: spoken only, for spelling
 eng: ""
+voice: "R"
 new: ""
 
 id: VOICE_CHAR_S
 desc: spoken only, for spelling
 eng: ""
+voice: "S"
 new: ""
 
 id: VOICE_CHAR_T
 desc: spoken only, for spelling
 eng: ""
+voice: "T"
 new: ""
 
 id: VOICE_CHAR_U
 desc: spoken only, for spelling
 eng: ""
+voice: "U"
 new: ""
 
 id: VOICE_CHAR_V
 desc: spoken only, for spelling
 eng: ""
+voice: "V"
 new: ""
 
 id: VOICE_CHAR_W
 desc: spoken only, for spelling
 eng: ""
+voice: "W"
 new: ""
 
 id: VOICE_CHAR_X
 desc: spoken only, for spelling
 eng: ""
+voice: "X"
 new: ""
 
 id: VOICE_CHAR_Y
 desc: spoken only, for spelling
 eng: ""
+voice: "Y"
 new: ""
 
 id: VOICE_CHAR_Z
 desc: spoken only, for spelling
 eng: ""
+voice: "Z"
 new: ""
 
 id: VOICE_CURRENT_TIME
 desc: spoken only, for wall clock announce
 eng: ""
+voice: "Current time:"
 new: ""
 
 id: VOICE_DIR
 desc: spoken only, prefix for directory number
 eng: ""
+voice: "folder"
 new: ""
 
 id: VOICE_EXT_AJZ
 desc: spoken only, for file extension
 eng: ""
+voice: "firmware"
 new: ""
 
 id: VOICE_EXT_BMARK
 desc: spoken only, for file extension and the word in general
 eng: ""
+voice: "bookmark"
 new: ""
 
 id: VOICE_EXT_CFG
 desc: spoken only, for file extension
 eng: ""
+voice: "configuration"
 new: ""
 
 id: VOICE_EXT_FONT
 desc: spoken only, for file extension
 eng: ""
+voice: "font"
 new: ""
 
 id: VOICE_EXT_MPA
 desc: spoken only, for file extension
 eng: ""
+voice: "audio"
 new: ""
 
 id: VOICE_EXT_ROCK
 desc: spoken only, for file extension
 eng: ""
+voice: "plug-in"
 new: ""
 
 id: VOICE_EXT_TXT
 desc: spoken only, for file extension
 eng: ""
+voice: "text"
 new: ""
 
 id: VOICE_EXT_UCL
 desc: spoken only, for file extension
 eng: ""
+voice: "flash"
 new: ""
 
 id: VOICE_EXT_WPS
 desc: spoken only, for file extension
 eng: ""
+voice: "while-playing-screen"
 new: ""
 
 id: VOICE_FILE
 desc: spoken only, prefix for file number
 eng: ""
+voice: "file"
 new: ""
 
 id: VOICE_HERTZ
 desc: spoken only, a unit postfix
 eng: ""
+voice: "hertz"
 new: ""
 
 id: VOICE_MILLIAMPHOURS
 desc: spoken only, a unit postfix
 eng: ""
+voice: "milli-amp hours"
 new: ""
 
 id: VOICE_PER_SEC
 desc: spoken only, a unit postfix
 eng: ""
+voice: "per second"
 new: ""
 
 id: VOICE_PIXEL
 desc: spoken only, a unit postfix
 eng: ""
+voice: "pixel"
 new: ""
+
+id: LANG_FILETYPES_EXTENSION_FULL
+desc: Extension array full
+eng: "Extension array full"
+new: "Tillägssamlingen är full"
+
+id: LANG_FILETYPES_FULL
+desc: Filetype array full
+eng: "Filetype array full"
+new: "Filtypssamlingen är full"
+
+id: LANG_FILETYPES_PLUGIN_NAME_LONG
+desc: Viewer plugin name too long
+eng: "Plugin name too long"
+new: "Insticksnamnet är för långt"
+
+id: LANG_FILETYPES_STRING_BUFFER_EMPTY
+desc: Filetype string buffer empty
+eng: "Filetype string buffer empty"
+new: "Strängbufferten för filtyper är tom"
+
+id: LANG_ONPLAY_OPEN_WITH
+desc: Onplay open with
+eng: "Open with"
+new: "Öppna med"
