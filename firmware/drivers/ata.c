@@ -100,6 +100,8 @@ static long last_disk_activity = -1;
 static int ata_power_on(void);
 #endif
 
+static int perform_soft_reset(void);
+
 static int wait_for_bsy(void) __attribute__ ((section (".icode")));
 static int wait_for_bsy(void)
 {
@@ -152,21 +154,25 @@ int ata_read_sectors(unsigned long start,
     int ret = 0;
 
     last_disk_activity = current_tick;
+
+    mutex_lock(&ata_mtx);
+
 #ifndef USE_STANDBY
     if ( sleeping ) {
 #ifdef USE_POWEROFF
         if (ata_power_on()) {
+            mutex_unlock(&ata_mtx);
             return -1;
         }
 #else
-        if (ata_soft_reset()) {
+        if (perform_soft_reset()) {
+            mutex_unlock(&ata_mtx);
             return -1;
         }
 #endif
         sleeping = false;
     }
 #endif
-    mutex_lock(&ata_mtx);
 
     if (!wait_for_rdy())
     {
@@ -239,21 +245,24 @@ int ata_write_sectors(unsigned long start,
 
     last_disk_activity = current_tick;
 
+    mutex_lock(&ata_mtx);
+    
 #ifndef USE_STANDBY
     if ( sleeping ) {
 #ifdef USE_POWEROFF
         if (ata_power_on()) {
+            mutex_unlock(&ata_mtx);
             return -1;
         }
 #else
-        if (ata_soft_reset()) {
+        if (perform_soft_reset()) {
+            mutex_unlock(&ata_mtx);
             return -1;
         }
 #endif
         sleeping = false;
     }
 #endif
-    mutex_lock(&ata_mtx);
     
     if (!wait_for_rdy())
     {
@@ -370,7 +379,7 @@ static int ata_perform_sleep(void)
     int ret = 0;
 
     mutex_lock(&ata_mtx);
-    
+
     if(!wait_for_rdy()) {
         mutex_unlock(&ata_mtx);
         return -1;
@@ -460,13 +469,11 @@ int ata_hard_reset(void)
     return ret;
 }
 
-int ata_soft_reset(void)
+static int perform_soft_reset(void)
 {
     int ret;
     int retry_count;
     
-    mutex_lock(&ata_mtx);
-
     ATA_SELECT = SELECT_LBA | ata_device;
     ATA_CONTROL = CONTROL_nIEN|CONTROL_SRST;
     sleep(HZ/20000); /* >= 5us */
@@ -489,14 +496,24 @@ int ata_soft_reset(void)
     return ret;
 }
 
+int ata_soft_reset(void)
+{
+    int ret;
+    
+    mutex_lock(&ata_mtx);
+
+    ret = perform_soft_reset();
+
+    mutex_unlock(&ata_mtx);
+    return ret;
+}
+
 #ifdef USE_POWEROFF
 static int ata_power_on(void)
 {
     int ret;
     int retry_count;
     
-    mutex_lock(&ata_mtx);
-
     ide_power_enable(true);
     sleep(HZ/2);
 
@@ -513,7 +530,6 @@ static int ata_power_on(void)
     ret = ret?0:-1;
 
     sleeping = false;
-    mutex_unlock(&ata_mtx);
     return ret;
 }
 #endif
