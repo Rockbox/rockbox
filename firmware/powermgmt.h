@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Heikki Hannikainen
+ * Copyright (C) 2002 by Heikki Hannikainen, Uwe Freese
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -58,6 +58,7 @@ extern int powermgmt_last_cycle_level;         /* which level had the batteries 
 
 extern int battery_lazyness[20]; /* how does the battery react when plugging in/out the charger */
 extern int trickle_sec;          /* trickle charge: How many seconds per minute are we charging actually? */
+extern int charge_state;         /* tells what the charger is doing (for info display): 0: decharging/charger off, 1: charge, 2: top-off, 3: trickle */
 
 #endif /* HAVE_CHARGE_CTRL */
 
