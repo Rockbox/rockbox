@@ -540,7 +540,7 @@ static int showdir(char *path, int start)
     return filesindir;
 }
 
-static bool ask_resume(void)
+static bool ask_resume(bool ask_once)
 {
 #ifdef HAVE_LCD_CHARCELLS
     lcd_double_height(false);
@@ -571,7 +571,7 @@ static bool ask_resume(void)
             break;
     }
 
-    if ( global_settings.resume == RESUME_ASK_ONCE) {
+    if ( global_settings.resume == RESUME_ASK_ONCE && ask_once) {
         global_settings.resume_index = -1;
         settings_save();
     }
@@ -613,7 +613,7 @@ void reload_directory(void)
     reload_dir = true;
 }
 
-static void start_resume(void)
+static void start_resume(bool ask_once)
 {
     if ( global_settings.resume &&
          global_settings.resume_index != -1 ) {
@@ -621,7 +621,7 @@ static void start_resume(void)
                global_settings.resume_index,
                global_settings.resume_offset);
 
-        if (!ask_resume())
+        if (!ask_resume(ask_once))
             return;
         
         if (playlist_resume() != -1)
@@ -817,7 +817,7 @@ static bool dirbrowse(char *root)
 
     memcpy(currdir,root,sizeof(currdir));
 
-    start_resume();
+    start_resume(true);
 
     numentries = showdir(currdir, dirstart);
     if (numentries == -1) 
@@ -1157,6 +1157,11 @@ static bool dirbrowse(char *root)
 #ifdef HAVE_LCD_BITMAP
                         tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
 #endif
+                        restore = true;
+                    }
+                    else
+                    {
+                        start_resume(false);
                         restore = true;
                     }
                 }
