@@ -19,7 +19,7 @@ $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
 
 SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P -include "config.h" - )
 SOURCES = $(SRC)
-OBJS := $(SRC:%.c=$(OBJDIR)/libwavpack/%.o)
+OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 DEPFILE = $(OBJDIR)/dep-libwavpack
 DIRS = 
 

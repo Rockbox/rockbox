@@ -19,7 +19,7 @@ CFLAGS = $(GCCOPTS) $(A52OPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${ME
 
 SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P -include "config.h" - )
 SOURCES = $(SRC)
-OBJS := $(SRC:%.c=$(OBJDIR)/liba52/%.o)
+OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 DEPFILE = $(OBJDIR)/dep-liba52
 DIRS = 
 

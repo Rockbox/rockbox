@@ -20,11 +20,9 @@ $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
 
 SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P -include "config.h" - )
 SOURCES = $(SRC)
-OBJS := $(SRC:%.c=$(OBJDIR)/libmad/%.o)
+OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 DEPFILE = $(OBJDIR)/dep-libmad
 DIRS = 
-
-OUTPUT = $(OBJDIR)/libmad.a
 
 all: $(OUTPUT)
 
@@ -32,7 +30,7 @@ $(OUTPUT): $(OBJS)
 	@echo "AR $@"
 	@$(AR) ruv $@ $+ >/dev/null 2>&1
 
-$(OBJDIR)/libmad/%.o: $(APPSDIR)/codecs/libmad/%.c
+$(OBJDIR)/%.o: $(APPSDIR)/codecs/libmad/%.c
 	@echo "CC $<"
 	@$(CC) -c -O2 $(CFLAGS) -I$(APPSDIR)/codecs/libmad/ $< -o $@
 
