@@ -125,6 +125,9 @@
 				RelativePath="..\..\firmware\disk.c">
 			</File>
 			<File
+				RelativePath="..\icons.c">
+			</File>
+			<File
 				RelativePath="..\..\firmware\id3.c">
 			</File>
 			<File
@@ -164,15 +167,18 @@
 				RelativePath="..\tree.c">
 			</File>
 			<File
-				RelativePath="..\tree.c">
-			</File>
-			<File
 				RelativePath="uisw32.c">
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc">
+			<File
+				RelativePath="dir-win32.h">
+			</File>
+			<File
+				RelativePath="..\x11\dir.h">
+			</File>
 			<File
 				RelativePath="lcd-win32.h">
 			</File>
