@@ -104,10 +104,12 @@ int read_bmp_file(char* filename,
     int background;
     int fd = open(filename, O_RDONLY);
     long size;
+    long allocsize;
     unsigned int row, col;
     int l;
     unsigned char *bmp;
     int width;
+    int height;
     int depth;
 
     if(fd == -1)
@@ -136,21 +138,29 @@ int read_bmp_file(char* filename,
      }
 
      /* Exit if too wide */
+     if(readlong(&fh.Width) > 160)
+     {
+         debugf("error - Bitmap is too wide for iRiver models (%d pixels, max is 160)\n",
+                readlong(&fh.Width));
+         return 3;
+     }
      if(readlong(&fh.Width) > 112)
      {
-         debugf("error - Bitmap is too wide (%d pixels, max is 112)\n",
+         debugf("info - Bitmap is too wide for Archos models (%d pixels, max is 112)\n",
                 readlong(&fh.Width));
-         close(fd);
-         return 3;
      }
 
      /* Exit if too high */
+     if(readlong(&fh.Height) > 128)
+     {
+         debugf("error - Bitmap is too high for iRiver models (%d pixels, max is 128)\n",
+                readlong(&fh.Height));
+         return 4;
+     }
      if(readlong(&fh.Height) > 64)
      {
-         debugf("error - Bitmap is too high (%d pixels, max is 64)\n",
+         debugf("info - Bitmap is too high for Archos models (%d pixels, max is 64)\n",
                 readlong(&fh.Height));
-         close(fd);
-         return 4;
      }
      
      for(l=0;l < 2;l++)
@@ -191,10 +201,18 @@ int read_bmp_file(char* filename,
       else
           PaddedWidth = ((width+31)&(~0x1f))/8;
 
-      size = PaddedWidth*readlong(&fh.Height);
-
+      height = readlong(&fh.Height);
+      
+      allocsize = size = PaddedWidth*height; /* read this many bytes */
       bmp = (unsigned char *)malloc(size);
-      *bitmap = (unsigned char *)malloc(size);
+
+      if(height%8) {
+          /* not even 8 bytes, add up to a full 8 pixels boundary */
+          height += 8-(height%8);
+          allocsize = PaddedWidth*height; /* bytes to alloc */
+      }
+
+      *bitmap = (unsigned char *)malloc(allocsize);
 
       if(bmp == NULL)
       {
