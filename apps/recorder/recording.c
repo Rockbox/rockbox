@@ -241,7 +241,7 @@ int rec_create_directory(void)
 
 bool recording_screen(void)
 {
-    int button;
+    long button;
     bool done = false;
     char buf[32];
     char buf2[32];

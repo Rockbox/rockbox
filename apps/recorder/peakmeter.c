@@ -118,8 +118,8 @@ static const long clip_time_out[] = {
     0 * HZ, 1  * HZ, 2 * HZ, 3 * HZ, 4 * HZ, 5 * HZ, 
     6 * HZ, 7 * HZ, 8 * HZ, 9 * HZ, 10 * HZ, 15 * HZ,
     20 * HZ, 25 * HZ, 30 * HZ, 45 * HZ, 60 * HZ, 90 * HZ,
-    120 * HZ, 180 * HZ, 300 * HZ, 600 * HZ, 1200 * HZ,
-    2700 * HZ, 5400 * HZ
+    120 * HZ, 180 * HZ, 300 * HZ, 600L * HZ, 1200L * HZ,
+    2700L * HZ, 5400L * HZ
 };
 
 /* precalculated peak values that represent magical
