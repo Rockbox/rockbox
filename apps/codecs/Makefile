@@ -16,7 +16,7 @@ ifdef APPEXTRA
    INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
 endif
 
-.PHONY: libmad liba52 libFLAC libTremor libwavpack
+.PHONY: libmad liba52 libFLAC libTremor libwavpack dumb
 
 OUTPUT = $(SOFTWARECODECS)
 
@@ -49,6 +49,11 @@ libwavpack:
 	@echo "MAKE in libwavpack"
 	@mkdir -p $(OBJDIR)/libwavpack
 	@$(MAKE) -C libwavpack TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR)/libwavpack VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEMORYSIZE} OUTPUT=$(OBJDIR)/libwavpack.a
+
+dumb:
+	@echo "MAKE in dumb"
+	@mkdir -p $(OBJDIR)/dumb
+	@$(MAKE) -C dumb TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR)/dumb VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEMORYSIZE} LIBDIR=$(OBJDIR) OFLAGS="$(CFLAGS)"
 
 clean:
 	@echo "cleaning codecs"
