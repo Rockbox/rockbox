@@ -25,48 +25,48 @@
 #include "kernel.h"
 #include "menu.h"
 
-#define MAX_WORM_LENGTH 500    // size of the ring of the worm
-#define INITIAL_WORM_LENGTH 10 // when the game starts
-#define WORM_PER_FOOD 7 // num of pixel the worm grows by eating a food
+#define MAX_WORM_LENGTH 500    /* size of the ring of the worm */
+#define INITIAL_WORM_LENGTH 10 /* when the game starts */
+#define WORM_PER_FOOD 7        /* num of pixel the worm grows per eaten food */
 
-// The worm is stored in a ring of xy coordinates
-short wormx[MAX_WORM_LENGTH];
-short wormy[MAX_WORM_LENGTH];
+/* The worm is stored in a ring of xy coordinates */
+static short wormx[MAX_WORM_LENGTH];
+static short wormy[MAX_WORM_LENGTH];
 
-int head; // index of the head within the buffer
-short headx;
-short heady;
+static int head; /* index of the head within the buffer */
+static short headx;
+static short heady;
 
-int tail; // index of the tail within the buffer
-int growing; // number of cyles the worm still keeps growing
+static int tail;    /* index of the tail within the buffer */
+static int growing; /* number of cyles the worm still keeps growing */
 
 
-#define MAX_FOOD 5  // maximal number of food items
-#define FOOD_SIZE 3 // the width and height of a food
-short foodx[MAX_FOOD];
-short foody[MAX_FOOD];
+#define MAX_FOOD  5 /* maximal number of food items */
+#define FOOD_SIZE 3 /* the width and height of a food */
+static short foodx[MAX_FOOD];
+static short foody[MAX_FOOD];
 
-#define MAX_ARGH 100 // maximal number of argh items
-#define ARGH_SIZE 4 // the width and height of a argh
-#define ARGHS_PER_FOOD 2 // number of arghs produced each time a food was eaten
-short arghx[MAX_ARGH];
-short arghy[MAX_ARGH];
-int arghCount;
+#define MAX_ARGH  100    /* maximal number of argh items */
+#define ARGH_SIZE 4      /* the width and height of a argh */
+#define ARGHS_PER_FOOD 2 /* number of arghs produced per eaten food */
+static short arghx[MAX_ARGH];
+static short arghy[MAX_ARGH];
+static int arghCount;
 
-// direction vector in which the worm moves
-short dirx; // only values -1 0 1 allowed
-short diry; // only values -1 0 1 allowed
+/* direction vector in which the worm moves */
+static short dirx; /* only values -1 0 1 allowed */
+static short diry; /* only values -1 0 1 allowed */
 
-int speed = 10;
+static int speed = 10;
 
-// return values of checkCollision
+/* return values of checkCollision */
 #define COLLISION_NONE 0
 #define COLLISION_WORM 1
 #define COLLISION_FOOD 2
 #define COLLISION_ARGH 3
 #define COLLISION_FIELD 4
 
-// size of the field the worm lives in
+/* size of the field the worm lives in */
 #define FIELD_RECT_X 1
 #define FIELD_RECT_Y 1
 #define FIELD_RECT_WIDTH  LCD_HEIGHT - 2
@@ -76,12 +76,11 @@ int speed = 10;
  * Returns the current length of the worm.
  * @return int a positive value
  */
-int getWormLength(void) {
-    // initial simple calculation will be overwritten
-    // if wrong.
+static int getWormLength(void) {
+    /* initial simple calculation will be overwritten if wrong. */
     int retVal = head - tail;
 
-    // if the worm 'crosses' the boundaries of the ringbuffer
+    /* if the worm 'crosses' the boundaries of the ringbuffer */
     if (retVal < 0) {
         retVal = head + MAX_WORM_LENGTH - tail;
     }
@@ -98,7 +97,7 @@ int getWormLength(void) {
  * @return Returns true if the coordinate hits the food specified by
  * foodIndex.
  */
-bool specificFoodCollision(int foodIndex, int x, int y) {
+static bool specificFoodCollision(int foodIndex, int x, int y) {
     bool retVal = false;
     if (x >= foodx[foodIndex]             &&
         x <  foodx[foodIndex] + FOOD_SIZE &&
@@ -116,15 +115,13 @@ bool specificFoodCollision(int foodIndex, int x, int y) {
  * -1 is returned.
  * @return int  -1 <= value < MAX_FOOD
  */
-int foodCollision(int x, int y) {
+static int foodCollision(int x, int y) {
     int i = 0;
     int retVal = -1;
-    bool collisionDetected = false;
-    for (i = 0; i < MAX_FOOD && !collisionDetected; i++) {
+    for (i = 0; i < MAX_FOOD; i++) {
         if (specificFoodCollision(i, x, y)) {
-
-            collisionDetected = true;
             retVal = i;
+            break;
         }
     }
     return retVal;
@@ -139,16 +136,17 @@ int foodCollision(int x, int y) {
  * @return Returns true if the coordinate hits the argh specified by
  * arghIndex.
  */
-bool specificArghCollision(int arghIndex, int x, int y) {
-    bool retVal = false;
-    if (x >= arghx[arghIndex]             &&
-        x <  arghx[arghIndex] + ARGH_SIZE &&
-        y >= arghy[arghIndex]             &&
-        y <  arghy[arghIndex] + ARGH_SIZE) {
+static bool specificArghCollision(int arghIndex, int x, int y) {
 
-        retVal = true;
+    if ( x >= arghx[arghIndex] &&
+         y >= arghy[arghIndex] &&
+         x <  arghx[arghIndex] + ARGH_SIZE &&
+         y <  arghy[arghIndex] + ARGH_SIZE )
+    {
+        return true;
     }
-    return retVal;
+
+    return false;
 }
 
 /**
@@ -159,17 +157,15 @@ bool specificArghCollision(int arghIndex, int x, int y) {
  * @param int y The y coordinate.
  * @return int  -1 <= value < arghCount <= MAX_ARGH
  */
-int arghCollision(int x, int y) {
+static int arghCollision(int x, int y) {
     int i = 0;
     int retVal = -1;
-    bool collisionDetected = false;
 
-    // search for the argh that has the specified coords
-    for (i = 0; i < arghCount && !collisionDetected; i++) {
+    /* search for the argh that has the specified coords */
+    for (i = 0; i < arghCount; i++) {
         if (specificArghCollision(i, x, y)) {
-
-            collisionDetected = true;
             retVal = i;
+            break;
         }
     }
     return retVal;
@@ -181,23 +177,25 @@ int arghCollision(int x, int y) {
  * 0 <= foodIndex <= MAX_FOOD
  * @return Returns true if the worm collides with the specified food.
  */
-bool wormFoodCollision(int foodIndex) {
+static bool wormFoodCollision(int foodIndex)
+{
     bool retVal = false;
 
-    // buffer wormLength because getWormLength is expensive
+    /* buffer wormLength because getWormLength is expensive */
     int wormLength = getWormLength();
     int i;
 
-    // although all the worm gets iterated i is NOT the index
-    // of the worm arrays
-    for (i = 0; i < wormLength && !retVal; i++) {
+    /* although all the worm gets iterated i is NOT 
+       the index of the worm arrays */
+    for (i = 0; i < wormLength; i++) {
 
-        // convert i to the true worm indices
+        /* convert i to the true worm indices */
         int wormIndex = (tail + i) % MAX_WORM_LENGTH;
-
-        // The check
-        if (specificFoodCollision(foodIndex, wormx[wormIndex], wormy[wormIndex])) {
+        if (specificFoodCollision(foodIndex, 
+                                  wormx[wormIndex], 
+                                  wormy[wormIndex])) {
             retVal = true;
+            break;
         }
     }
 
@@ -206,27 +204,29 @@ bool wormFoodCollision(int foodIndex) {
 
 /**
  * Checks wether the worm collides with the argh at the specfied argh-arrays.
- * @param int arghIndex The index of the argh in the arrays. Ensure the value is
- * 0 <= arghIndex < arghCount <= MAX_ARGH
+ * @param int arghIndex The index of the argh in the arrays.
+ * Ensure the value is 0 <= arghIndex < arghCount <= MAX_ARGH
  * @return Returns true if the worm collides with the specified argh.
  */
-bool wormArghCollision(int arghIndex) {
+static bool wormArghCollision(int arghIndex)
+{
     bool retVal = false;
 
-    // buffer wormLength because getWormLength is expensive
+    /* buffer wormLength because getWormLength is expensive */
     int wormLength = getWormLength();
     int i;
 
-    // although all the worm gets iterated i is NOT the index
-    // of the worm arrays
-    for (i = 0; i < wormLength && !retVal; i++) {
+    /* although all the worm gets iterated i is NOT 
+       the index of the worm arrays */
+    for (i = 0; i < wormLength; i++) {
 
-        // convert i to the true worm indices
+        /* convert i to the true worm indices */
         int wormIndex = (tail + i) % MAX_WORM_LENGTH;
-
-        // The check
-        if (specificArghCollision(arghIndex, wormx[wormIndex], wormy[wormIndex])) {
+        if (specificArghCollision(arghIndex, 
+                                  wormx[wormIndex], 
+                                  wormy[wormIndex])) {
             retVal = true;
+            break;
         }
     }
 
@@ -239,37 +239,38 @@ bool wormArghCollision(int arghIndex) {
  * @param int index 
  * Ensure that 0 <= index < MAX_FOOD.
  */
-void makeFood(int index) {
+static void makeFood(int index) {
 
     int x = 0;
     int y = 0;
     bool collisionDetected = false;
 
     do {
-        // make coordinates for a new food so that
-        // the entire food lies within the FIELD
+        /* make coordinates for a new food so that
+           the entire food lies within the FIELD */
         x = rand() % (FIELD_RECT_WIDTH  - FOOD_SIZE);
         y = rand() % (FIELD_RECT_HEIGHT - FOOD_SIZE);
 
-        // Ensure that the new food doesn't collide with any
-        // existing foods or arghs.
-        // If one or more corners of the new food hit any existing
-        // argh or food a collision is detected.
+        /* Ensure that the new food doesn't collide with any
+           existing foods or arghs.
+           If one or more corners of the new food hit any existing
+           argh or food a collision is detected.
+        */
         collisionDetected = 
-           foodCollision(x                , y                ) >= 0 ||
-           foodCollision(x + FOOD_SIZE - 1, y                ) >= 0 ||
-           foodCollision(x                , y + FOOD_SIZE - 1) >= 0 ||
-           foodCollision(x + FOOD_SIZE - 1, y + FOOD_SIZE - 1) >= 0 ||
-           arghCollision(x                , y                ) >= 0 || 
-           arghCollision(x + FOOD_SIZE - 1, y                ) >= 0 ||
-           arghCollision(x                , y + FOOD_SIZE - 1) >= 0 ||
-           arghCollision(x + FOOD_SIZE - 1, y + FOOD_SIZE - 1) >= 0;
+            foodCollision(x, y ) >= 0 ||
+            foodCollision(x, y + FOOD_SIZE - 1) >= 0 ||
+            foodCollision(x + FOOD_SIZE - 1, y ) >= 0 ||
+            foodCollision(x + FOOD_SIZE - 1, y + FOOD_SIZE - 1) >= 0 ||
+            arghCollision(x, y ) >= 0 || 
+            arghCollision(x, y + FOOD_SIZE - 1) >= 0 ||
+            arghCollision(x + FOOD_SIZE - 1, y ) >= 0 ||
+            arghCollision(x + FOOD_SIZE - 1, y + FOOD_SIZE - 1) >= 0;
 
-        // use coordinates for further testing
+        /* use coordinates for further testing */
         foodx[index] = x;
         foody[index] = y;
 
-        // now test wether we accidently hit the worm with food ;)
+        /* now test wether we accidently hit the worm with food ;) */
         collisionDetected |= wormFoodCollision(index);
     }
     while (collisionDetected);
@@ -281,11 +282,12 @@ void makeFood(int index) {
  * the coordinates of the desired food can be found. Ensure 
  * that the value is 0 <= index <= MAX_FOOD.
  */
-void clearFood(int index) {
-    // remove the old food from the screen
-    lcd_clearrect  (foodx[index] + FIELD_RECT_X, 
-                    foody[index] + FIELD_RECT_Y, 
-                    FOOD_SIZE, FOOD_SIZE);
+static void clearFood(int index)
+{
+    /* remove the old food from the screen */
+    lcd_clearrect(foodx[index] + FIELD_RECT_X, 
+                  foody[index] + FIELD_RECT_Y, 
+                  FOOD_SIZE, FOOD_SIZE);
 }
 
 /**
@@ -294,14 +296,15 @@ void clearFood(int index) {
  * the coordinates of the desired food can be found. Ensure 
  * that the value is 0 <= index <= MAX_FOOD.
  */
-void drawFood(int index) {
-    // draw the food object
-    lcd_fillrect  (foodx[index] + FIELD_RECT_X, 
-                   foody[index] + FIELD_RECT_Y, 
-                   FOOD_SIZE, FOOD_SIZE);
+static void drawFood(int index)
+{
+    /* draw the food object */
+    lcd_fillrect(foodx[index] + FIELD_RECT_X, 
+                 foody[index] + FIELD_RECT_Y, 
+                 FOOD_SIZE, FOOD_SIZE);
     lcd_clearrect(foodx[index] + FIELD_RECT_X + 1, 
-                   foody[index] + FIELD_RECT_Y + 1, 
-                   FOOD_SIZE - 2, FOOD_SIZE - 2);
+                  foody[index] + FIELD_RECT_Y + 1, 
+                  FOOD_SIZE - 2, FOOD_SIZE - 2);
 }
 
 /**
@@ -310,35 +313,37 @@ void drawFood(int index) {
  * @param int index 
  * Ensure that 0 <= index < arghCount < MAX_ARGH.
  */
-void makeArgh(int index) {
+static void makeArgh(int index)
+{
     int x; 
     int y; 
     bool collisionDetected = false;
 
     do {
-        // make coordinates for a new argh so that
-        // the entire food lies within the FIELD
+        /* make coordinates for a new argh so that
+           the entire food lies within the FIELD */
         x = rand() % (FIELD_RECT_WIDTH  - ARGH_SIZE);
         y = rand() % (FIELD_RECT_HEIGHT - ARGH_SIZE);
-        // Ensure that the new argh doesn't intersect with any
-        // existing foods or arghs.
-        // If one or more corners of the new argh hit any existing
-        // argh or food an intersection is detected.
+        /* Ensure that the new argh doesn't intersect with any
+           existing foods or arghs.
+           If one or more corners of the new argh hit any existing
+           argh or food an intersection is detected.
+        */
         collisionDetected = 
-           foodCollision(x                , y                ) >= 0 || 
-           foodCollision(x + ARGH_SIZE - 1, y                ) >= 0 ||
-           foodCollision(x                , y + ARGH_SIZE - 1) >= 0 ||
-           foodCollision(x + ARGH_SIZE - 1, y + ARGH_SIZE - 1) >= 0 ||
-           arghCollision(x                , y                ) >= 0 || 
-           arghCollision(x + ARGH_SIZE - 1, y                ) >= 0 ||
-           arghCollision(x                , y + ARGH_SIZE - 1) >= 0 ||
-           arghCollision(x + ARGH_SIZE - 1, y + ARGH_SIZE - 1) >= 0;
+            foodCollision(x, y ) >= 0 || 
+            foodCollision(x, y + ARGH_SIZE - 1) >= 0 ||
+            foodCollision(x + ARGH_SIZE - 1, y ) >= 0 ||
+            foodCollision(x + ARGH_SIZE - 1, y + ARGH_SIZE - 1) >= 0 ||
+            arghCollision(x, y ) >= 0 || 
+            arghCollision(x, y + ARGH_SIZE - 1) >= 0 ||
+            arghCollision(x + ARGH_SIZE - 1, y ) >= 0 ||
+            arghCollision(x + ARGH_SIZE - 1, y + ARGH_SIZE - 1) >= 0;
 
-        // use the candidate coordinates to make a real argh
+        /* use the candidate coordinates to make a real argh */
         arghx[index] = x;
         arghy[index] = y;
 
-        // now test wether we accidently hit the worm with argh ;)
+        /* now test wether we accidently hit the worm with argh ;) */
         collisionDetected |= wormArghCollision(index);
     }
     while (collisionDetected);
@@ -350,42 +355,42 @@ void makeArgh(int index) {
  * the coordinates of the desired argh can be found. Ensure 
  * that the value is 0 <= index < arghCount <= MAX_ARGH.
  */
-void drawArgh(int index) {
-    // draw the new argh
-    lcd_fillrect  (arghx[index] + FIELD_RECT_X, 
-                   arghy[index] + FIELD_RECT_Y, 
-                   ARGH_SIZE, ARGH_SIZE);
+static void drawArgh(int index)
+{
+    /* draw the new argh */
+    lcd_fillrect(arghx[index] + FIELD_RECT_X, 
+                 arghy[index] + FIELD_RECT_Y, 
+                 ARGH_SIZE, ARGH_SIZE);
 }
 
 /**
  * Initializes the worm-, food- and argh-arrays, draws a frame,
  * makes some food and argh and display all that stuff.
  */
-void initWormlet(void) {
+static void initWormlet(void)
+{
+    int i;
 
-    // Needed when the game is restarted using BUTTON_ON
+    /* Initialize all the worm coordinates to 0,0. */
+    memset(wormx,0,sizeof wormx);
+    memset(wormy,0,sizeof wormy);
+
+    /* Needed when the game is restarted using BUTTON_ON */
     lcd_clear_display();
 
-    // Initialize all the worm coordinates to 0,0.
-    int i;
-    for (i = 0; i < MAX_WORM_LENGTH; i++){
-        wormx[i] = 0;
-        wormy[i] = 0;
-    }
-
-    // initialize the worm size
+    /* initialize the worm size */
     head = INITIAL_WORM_LENGTH;
     tail = 0;
 
-    // initialize the worm start point
+    /* initialize the worm start point */
     headx = 0;
     heady = 0;
 
-    // set the initial direction the worm creeps to
+    /* set the initial direction the worm creeps to */
     dirx = 1;
     diry = 0;
 
-    // make and display some food and argh
+    /* make and display some food and argh */
     arghCount = MAX_FOOD;
     for (i = 0; i < MAX_FOOD; i++) {
         makeFood(i);
@@ -394,63 +399,56 @@ void initWormlet(void) {
         drawArgh(i);
     }
 
-    // draw the game field
-    lcd_invertrect  (0    , 0  , FIELD_RECT_WIDTH + 2, FIELD_RECT_HEIGHT + 2);
-    lcd_invertrect(0 + 1, 0 + 1, FIELD_RECT_WIDTH    , FIELD_RECT_HEIGHT);
+    /* draw the game field */
+    lcd_invertrect(0, 0, FIELD_RECT_WIDTH + 2, FIELD_RECT_HEIGHT + 2);
+    lcd_invertrect(1, 1, FIELD_RECT_WIDTH, FIELD_RECT_HEIGHT);
 
-    // make everything visible
+    /* make everything visible */
     lcd_update();
 }
 
 /** 
  * Move the worm one step further.
- * The direction in which the worm moves is taken
- * from dirx and diry. If the 
- * worm crosses the boundaries of the field the
- * worm is wrapped (it enters the field from the
- * opposite side). moveWorm decreases growing if > 0.
+ * The direction in which the worm moves is taken from dirx and diry. If the 
+ * worm crosses the boundaries of the field the worm is wrapped (it enters
+ * the field from the opposite side). moveWorm decreases growing if > 0.
  */
-void moveWorm(void) {
-    // find the next array index for the head
+static void moveWorm(void)
+{
+    /* find the next array index for the head */
     head++;
-    if (head >= MAX_WORM_LENGTH){
+    if (head >= MAX_WORM_LENGTH)
         head = 0;
-    }
 
-    // find the next array index for the tail
+    /* find the next array index for the tail */
     tail++;
-    if (tail >= MAX_WORM_LENGTH){
+    if (tail >= MAX_WORM_LENGTH)
         tail = 0;
-    }
 
-    // determine the new head position
+    /* determine the new head position */
     headx += dirx;
     heady += diry;
 
-    // Wrap the new head position if necessary
-    if (headx >= FIELD_RECT_WIDTH) {
+    /* Wrap the new head position if necessary */
+    if (headx >= FIELD_RECT_WIDTH)
         headx = 0;
-    }
+    else
+        if (headx < 0)
+            headx = FIELD_RECT_WIDTH - 1;
 
-    if (headx < 0){
-        headx = FIELD_RECT_WIDTH - 1;
-    }
-
-    if (heady >= FIELD_RECT_HEIGHT) {
+    if (heady >= FIELD_RECT_HEIGHT)
         heady = 0;
-    }
+    else
+        if (heady < 0)
+            heady = FIELD_RECT_HEIGHT - 1;
 
-    if (heady < 0) {
-        heady = FIELD_RECT_HEIGHT - 1;
-    }
-
-    // store the new head position in the 
-    // worm arrays
+    /* store the new head position in the worm arrays */
     wormx[head] = headx;
     wormy[head] = heady;
 
-    // update the worms grow state
-    if (growing > 0) growing --;
+    /* update the worms grow state */
+    if (growing > 0)
+        growing--;
 }
 
 /**
@@ -458,11 +456,12 @@ void moveWorm(void) {
  * the display buffer. lcd_update() is NOT called thus
  * the caller has to take care that the buffer is displayed.
  */
-void drawWorm(void) {
-    // draw the new head
+static void drawWorm(void)
+{
+    /* draw the new head */
     lcd_drawpixel( wormx[head] + FIELD_RECT_X, wormy[head] + FIELD_RECT_Y);
 
-    // clear the space behind the worm
+    /* clear the space behind the worm */
     lcd_clearpixel(wormx[tail] + FIELD_RECT_X, wormy[tail] + FIELD_RECT_Y);
 }
 
@@ -473,25 +472,22 @@ void drawWorm(void) {
  * @return int The index of the worm arrays that contain x, y.
  * Returns -1 if the coordinates are not part of the worm.
  */ 
-int wormCollision(int x, int y) {
+static int wormCollision(int x, int y)
+{
     int retVal = -1;
 
-    // getWormLength is expensive -> buffer the value
+    /* getWormLength is expensive -> buffer the value */
     int wormLength = getWormLength();
     int i;
 
-    // test each entry that is part of the worm
+    /* test each entry that is part of the worm */
     for (i = 0; i < wormLength && retVal == -1; i++) {
 
-        // The iteration iterates the length of the worm.
-        // Here's the conversion to the true indices within
-        // the worm arrays.
+        /* The iteration iterates the length of the worm.
+           Here's the conversion to the true indices within the worm arrays. */
         int trueIndex = (tail + i) % MAX_WORM_LENGTH;
-
-        // The check
-        if (wormx[trueIndex] == x && wormy[trueIndex] == y) {
+        if (wormx[trueIndex] == x && wormy[trueIndex] == y)
             retVal = trueIndex;
-        }
     }
     return retVal;
 }
@@ -501,13 +497,14 @@ int wormCollision(int x, int y) {
  * crossed the field boundaries. 
  * @return bool true if the worm just has wrapped.
  */ 
-bool fieldCollision(void) {
+static bool fieldCollision(void)
+{
     bool retVal = false;
     if ((headx == FIELD_RECT_WIDTH - 1  && dirx == -1) ||
-        (headx == 0                     && dirx ==  1) ||
         (heady == FIELD_RECT_HEIGHT - 1 && diry == -1) ||
-        (heady == 0                     && diry ==  1)) {
-
+        (headx == 0 && dirx ==  1) ||
+        (heady == 0 && diry ==  1))
+    {
         retVal = true;
     }
     return retVal;
@@ -516,78 +513,46 @@ bool fieldCollision(void) {
 /**
  * Checks and returns wether the head of the worm
  * is colliding with something currently.
- * @return int One of the values
- * <ul>
- *   <li>COLLISION_NONE
- *   <li>COLLISION_WORM
- *   <li>COLLISION_FOOD
- *   <li>COLLISION_ARGH
- *   <li>COLLISION_FIELD
- * </ul>
+ * @return int One of the values:
+ *   COLLISION_NONE
+ *   COLLISION_WORM
+ *   COLLISION_FOOD
+ *   COLLISION_ARGH
+ *   COLLISION_FIELD
  */
-int checkCollision(void) {
+static int checkCollision(void)
+{
     int retVal = COLLISION_NONE;
 
-    if (wormCollision(headx, heady) >= 0) {
+    if (wormCollision(headx, heady) >= 0)
         retVal = COLLISION_WORM;
-    }
 
-    if (foodCollision(headx, heady) >= 0) {
+    if (foodCollision(headx, heady) >= 0)
         retVal = COLLISION_FOOD;
-    }
 
-    if (arghCollision(headx, heady) >= 0) {
+    if (arghCollision(headx, heady))
         retVal = COLLISION_ARGH;
-    }
 
-    if (fieldCollision()) {
+    if (fieldCollision())
         retVal = COLLISION_FIELD;
-    }
 
     return retVal;
 }
-
-/*
-void debugOutput(void) {
-    char buf[40];
-
-    // head
-    snprintf(buf, sizeof(buf), "h:%d(%d;%d)    ", head, wormx[head], wormy[head]);
-    lcd_putsxy(FIELD_RECT_WIDTH + 3, 0, buf, 0);
-
-    // tail
-    snprintf(buf, sizeof(buf), "t:%d(%d;%d)    ", tail, wormx[tail], wormy[tail]);
-    lcd_putsxy(FIELD_RECT_WIDTH + 3, 8, buf, 0);
-
-    // speed
-    snprintf(buf, sizeof(buf), "div:%d  ", speed);
-    lcd_putsxy(FIELD_RECT_WIDTH + 3, 16, buf, 0);
-
-    // collision
-    switch (checkCollision()) {
-        case COLLISION_NONE:  snprintf(buf, sizeof(buf), "free  "); break;
-        case COLLISION_WORM:  snprintf(buf, sizeof(buf), "worm  "); break;
-        case COLLISION_FOOD:  snprintf(buf, sizeof(buf), "food  "); break;
-        case COLLISION_ARGH:  snprintf(buf, sizeof(buf), "argh  "); break;
-        case COLLISION_FIELD: snprintf(buf, sizeof(buf), "field "); break;
-    }
-    lcd_putsxy(FIELD_RECT_WIDTH + 3, 24, buf, 0);
-}
-*/
 
 /**
  * Prints out the score board with all the status information
  * about the game.
  */
-void scoreBoard(void) {
+static void scoreBoard(void)
+{
     char buf[15];
     char buf2[15];
 
-    // Title
+    /* Title */
     snprintf(buf, sizeof (buf), "Wormlet");
     lcd_putsxy(FIELD_RECT_WIDTH + 3, 0, buf, 0);
 
-    // length
+    /* length */
     snprintf(buf, sizeof (buf), "length:");
     lcd_putsxy(FIELD_RECT_WIDTH + 3, 12, buf, 0);
     snprintf(buf, sizeof (buf), "%d  ", getWormLength() - growing);
@@ -596,12 +561,10 @@ void scoreBoard(void) {
     switch (checkCollision()) {
         case COLLISION_NONE:  
             snprintf(buf, sizeof(buf), "I'm hungry!  "); 
-            if (growing > 0) {
+            if (growing > 0)
                 snprintf(buf2, sizeof(buf2), "growing");
-            }
-            else {
+            else
                 snprintf(buf2, sizeof(buf2), "             ");
-            }
             break;
 
         case COLLISION_WORM:  
@@ -634,7 +597,8 @@ void scoreBoard(void) {
  * @return bool Returns true if the worm is dead. Returns
  * false if the worm is healthy, up and creeping.
  */
-bool processCollisions(void) {
+static bool processCollisions(void)
+{
     bool wormDead = false;
     int index = -1;
 
@@ -642,44 +606,39 @@ bool processCollisions(void) {
 
     if (!wormDead) {
 
-        // check if food was eaten
+        /* check if food was eaten */
         index = foodCollision(headx, heady);
         if (index != -1){
+            int i;
+            
             clearFood(index);
             makeFood(index);
             drawFood(index);
             
-            int i = 0;
-            
             for (i = 0; i < ARGHS_PER_FOOD; i++) {
                 arghCount++;
-                if (arghCount > MAX_ARGH) {
+                if (arghCount > MAX_ARGH)
                     arghCount = MAX_ARGH;
-                }
                 makeArgh(arghCount - 1);
                 drawArgh(arghCount - 1);
             }
 
             tail -= WORM_PER_FOOD;
             growing += WORM_PER_FOOD;
-            if (tail < 0) {
+            if (tail < 0)
                 tail += MAX_WORM_LENGTH; 
-            }
 
             drawWorm();
         }
 
-        // check if argh was eaten
+        /* check if argh was eaten */
         else {
             index = arghCollision(headx, heady);
-            if (index != -1) {
+            if (index != -1)
                 wormDead = true;
-            }
-            else {
-                if (wormCollision(headx, heady) != -1) {
+            else
+                if (wormCollision(headx, heady) != -1)
                     wormDead = true;
-                }
-            }
         }
     }
     return wormDead;
@@ -691,14 +650,15 @@ bool processCollisions(void) {
  * with a dead worm. Returns false if the user
  * aborted the game manually.
  */ 
-bool run(void) {
+static bool run(void)
+{
     int button = 0;
     int wormDead = false;
 
-    // initialize the board and so on
+    /* initialize the board and so on */
     initWormlet();
 
-    // change the direction of the worm
+    /* change the direction of the worm */
     while (button != BUTTON_OFF && ! wormDead)
     {
         switch (button) {
@@ -732,7 +692,6 @@ bool run(void) {
         }
 
         moveWorm();
-//      debugOutput();
         wormDead = processCollisions();
         drawWorm();
         scoreBoard();
@@ -751,25 +710,25 @@ Menu wormlet(void)
     int button;
     do {    
 
-        // button state will be overridden if
-        // the game quits with the death of the worm.
-        // Initializing button to BUTTON_OFF ensures
-        // that the user can hit BUTTON_OFF during the
-        // game to return to the menu.
+        /* button state will be overridden if
+           the game quits with the death of the worm.
+           Initializing button to BUTTON_OFF ensures
+           that the user can hit BUTTON_OFF during the
+           game to return to the menu.
+        */
         button  = BUTTON_OFF;
 
-        // start the game
+        /* start the game */
         wormDead = run();
 
-        // if worm isn't dead the game was quit
-        // via BUTTON_OFF -> no need to wait for
-        // buttons.
+        /* if worm isn't dead the game was quit
+           via BUTTON_OFF -> no need to wait for buttons. */
         if (wormDead) {
             do {
                 button = button_get(true);
             }
-            // BUTTON_ON -> start new game
-            // BUTTON_OFF -> back to game menu
+            /* BUTTON_ON -> start new game */
+            /* BUTTON_OFF -> back to game menu */
             while (button != BUTTON_OFF && button != BUTTON_ON);
         }
     }
