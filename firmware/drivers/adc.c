@@ -39,7 +39,7 @@ static void adc_tick(void)
     /* Start a conversion on the next channel */
     current_channel++;
     if(current_channel == NUM_ADC_CHANNELS)
-	current_channel = 0;
+        current_channel = 0;
     ADCSR = ADCSR_ADST | current_channel;
 }
 
