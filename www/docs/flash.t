@@ -19,7 +19,7 @@ Flashing
 in the sense used here and elsewhere in regard to Rockbox means
 reprogramming the flash memory of the Archos unit. Flash memory
 (sometimes called &quot;Flash ROM&quot;) is a type of nonvolatile
-memory that can be erased and reprogrammed in circuit. It is a
+memory that can be erased and reprogrammed in-circuit. It is a
 variation of electrically erasable programmable read-only memory
 (EEPROM).
 </p>
@@ -35,7 +35,7 @@ Terminology used in the following:<br>
 </p>
 <p>
 By
-reprogramming the firmware we can boot much faster. Archos has a
+reprogramming the firmware, we can boot much faster. Archos has a
 pathetic boot loader, versus the boot time for Rockbox is much faster
 than the disk spinup, in fact it has to wait for the disk. Your boot
 time will be as quick as a disk spinup (e.g. 4 seconds from powerup
@@ -48,7 +48,8 @@ The
 replaced firmware will host a bootloader and 2 images. This possible
 by compression. The first is the &quot;permanent&quot; backup, not to
 be changed any more. The second is the default one to be started, the
-first is only used when you hold the F1 key during start. Like
+first is only used when you hold the F1 key (will be Menu for recorders)
+during start. Like
 supplied here, the first image is the original Archos firmware, the
 second is a current build of Rockbox. This second image is meant to
 be reprogrammed, it can contain anything you like, if you prefer, you
@@ -367,7 +368,7 @@ second one, e.g. in case Rockbox from flash doesn't work for you.
 This way you keep the dual bootloader and you can easily try
 different later. You can download
 <a href="http://joerg.hohensohn.bei.t-online.de/archos/flash">UCLs</a>
-for the latest Recorder and FM firmware
+for the latest firmware
 <a href="http://joerg.hohensohn.bei.t-online.de/archos/flash">here</a>.
 
 </p>
