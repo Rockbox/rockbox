@@ -55,6 +55,11 @@ int button_set_release(int newmask)
  * Div,Mul,Sub = The tree menu keys
  * +,Enter = On, Off
  *
+ * Alternative Keys For Laptop or VNC Users
+ * Recorder:
+ * Space=Play Q=On A=Off 1,2,3 = F1,F2,F3
+ * Player:
+ * Q=On Enter=Menu
  */
 
 /* from uibasic.c */
@@ -89,27 +94,38 @@ static int get_raw_button (void)
 	case XK_KP_Space:
 	case XK_KP_5:
 	case XK_KP_Begin:
+	case XK_space:
 	    return BUTTON_PLAY;
 
 	case XK_KP_Enter:
+	case XK_A:
+	case XK_a:
 	    return BUTTON_OFF;
 
 	case XK_KP_Add:
+	case XK_Q:
+	case XK_q:
 	    return BUTTON_ON;
 
 	case XK_KP_Divide:
+	case XK_1:
 	    return BUTTON_F1;
 
 	case XK_KP_Multiply:
+	case XK_2:
 	    return BUTTON_F2;
 
 	case XK_KP_Subtract:
+	case XK_3:
 	    return BUTTON_F3;
 #else
 	case XK_KP_Add:
+	case XK_Q:
+	case XK_q:
 	    return BUTTON_ON;
 
 	case XK_KP_Enter:
+	case XK_Enter:
 	    return BUTTON_MENU;
 #endif
 
