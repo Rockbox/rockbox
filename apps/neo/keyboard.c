@@ -8,7 +8,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2003 by an Open Neo author (FILL IN)
+ * Copyright (C) 2003 by Francois Boucher
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
