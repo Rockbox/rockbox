@@ -137,9 +137,9 @@ static bool sort_case(void)
 
 static bool resume(void)
 {
-    char* names[] = { str(LANG_OFF), 
+    char* names[] = { str(LANG_SET_BOOL_NO), 
                       str(LANG_RESUME_SETTING_ASK),
-                      str(LANG_ON) };
+                      str(LANG_SET_BOOL_YES) };
     return set_option( str(LANG_RESUME), &global_settings.resume,
                        names, 3, NULL );
 }
