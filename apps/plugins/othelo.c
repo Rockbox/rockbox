@@ -698,7 +698,7 @@ static void show_grid(void)
 /********************************************************************
  * flash the board - used for invalid move!
  ********************************************************************/
-static void flashboard()
+static void flashboard(void)
 {
     rb->lcd_invertrect(0,0, (8*7)+1,(8*7)+1);
     rb->lcd_update_rect(0,0, (8*7)+1,(8*7)+1);
