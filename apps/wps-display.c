@@ -53,7 +53,7 @@
 #define WPS_CONFIG ROCKBOX_DIR "/default.wps"
 
 #ifdef HAVE_LCD_BITMAP
-#define MAX_LINES 10
+#define MAX_LINES 13
 #define FORMAT_BUFFER_SIZE 800
 #else
 #define MAX_LINES 2
