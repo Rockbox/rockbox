@@ -914,8 +914,10 @@ int wps_show(void)
                 if ( lastbutton != BUTTON_LEFT )   
                      break; 
 #endif
-                if (!id3 || (id3->elapsed < 3*1000))
+                if (!id3 || (id3->elapsed < 3*1000)) {
+                    mpeg_stop();
                     mpeg_prev();
+                }
                 else {
                     if (!paused)
                         mpeg_pause();
@@ -933,6 +935,7 @@ int wps_show(void)
                 if ( lastbutton != BUTTON_RIGHT )   
                      break; 
 #endif
+                mpeg_stop();
                 mpeg_next();
                 break;
 
