@@ -42,6 +42,7 @@
 #include "status.h"
 #include "debug.h"
 #include "ata.h"
+#include "rolo.h"
 #include "icons.h"
 
 #ifdef HAVE_LCD_BITMAP
@@ -57,7 +58,7 @@
 char name_buffer[NAME_BUFFER_SIZE];
 int name_buffer_length;
 struct entry {
-    short attr; /* FAT attributes */
+    short attr; /* FAT attributes + file type flags */
     char *name;
 };
 
@@ -126,8 +127,12 @@ extern unsigned char bitmap_icons_6x8[LastIcon][6];
 #define RELEASE_MASK (BUTTON_STOP)
 #endif /* HAVE_RECORDER_KEYPAD */
 
-#define TREE_ATTR_M3U 0x80 /* unused by FAT attributes */
-#define TREE_ATTR_MPA 0x40 /* unused by FAT attributes */
+/* using attribute not used by FAT */
+#define TREE_ATTR_MPA 0x40 /* mpeg audio file */
+#define TREE_ATTR_M3U 0x80 /* playlist */
+#define TREE_ATTR_WPS 0x100 /* wps config file */
+#define TREE_ATTR_MOD 0x200 /* firmware file */
+#define TREE_ATTR_MASK 0xffd0 /* which bits tree.c uses (above + DIR) */
 
 static int build_playlist(int start_index)
 {
@@ -232,9 +237,16 @@ static int showdir(char *path, int start)
                    (!strcasecmp(&entry->d_name[len-4], ".mp2")) ||
 		    (!strcasecmp(&entry->d_name[len-4], ".mpa")))
                     dptr->attr |= TREE_ATTR_MPA;
-                else
-                    if (!strcasecmp(&entry->d_name[len-4], ".m3u"))
-                        dptr->attr |= TREE_ATTR_M3U;
+                else if (!strcasecmp(&entry->d_name[len-4], ".m3u"))
+                    dptr->attr |= TREE_ATTR_M3U;
+                else if (!strcasecmp(&entry->d_name[len-4], ".wps"))
+                    dptr->attr |= TREE_ATTR_WPS;
+#ifdef HAVE_RECORDER_KEYPAD
+                else if (!strcasecmp(&entry->d_name[len-4], ".ajz"))
+#else
+                else if (!strcasecmp(&entry->d_name[len-4], ".mod"))
+#endif
+                    dptr->attr |= TREE_ATTR_MOD;
             }
 
             /* filter non-mp3 or m3u files */
@@ -291,17 +303,30 @@ static int showdir(char *path, int start)
 
         len = strlen(dircache[i].name);
 
-        if ( dircache[i].attr & ATTR_DIRECTORY )
-            icon_type = Folder;
-        else if ( dircache[i].attr & TREE_ATTR_M3U )
-            icon_type = Playlist;
-        else if ( dircache[i].attr & TREE_ATTR_MPA )
-            icon_type = File;
-        else if (!strcasecmp(&dircache[i].name[len-4], ".wps"))
-            icon_type = Wps;
-        else
-            icon_type = 0;
+        switch ( dircache[i].attr & TREE_ATTR_MASK ) {
+            case ATTR_DIRECTORY:
+                icon_type = Folder;
+                break;
 
+            case TREE_ATTR_M3U:
+                icon_type = Playlist;
+                break;
+
+            case TREE_ATTR_MPA:
+                icon_type = File;
+                break;
+
+            case TREE_ATTR_WPS:
+                icon_type = Wps;
+                break;
+
+            case TREE_ATTR_MOD:
+                icon_type = Mod_Ajz;
+                break;
+
+            default:
+                icon_type = 0;
+        }
 #ifdef HAVE_LCD_BITMAP
         if (icon_type)
             lcd_bitmap(bitmap_icons_6x8[icon_type], 
@@ -450,7 +475,6 @@ bool dirbrowse(char *root)
     int lasti=-1;
     int rc;
     int button;
-    int start_index;
     int tree_max_on_screen;
 #ifdef LOADABLE_FONTS
     int fh;
@@ -543,68 +567,82 @@ bool dirbrowse(char *root)
                     start=0;
                 } else {
                     int seed = current_tick;
+                    bool play = false;
+                    int start_index=0;
                     lcd_stop_scroll();
-                    if (file->attr & TREE_ATTR_M3U )
-                    {
-                        if ( global_settings.resume )
-                            snprintf(global_settings.resume_file,
-                                     MAX_PATH, "%s/%s",
-                                     currdir, file->name);
-                        play_list(currdir, file->name, 0, false, 0, seed );
-                        start_index = 0;
-                    }
-                    else if (file->attr & TREE_ATTR_MPA ) {
-                        if ( global_settings.resume )
-                            strncpy(global_settings.resume_file,
-                                    currdir, MAX_PATH);
-                        start_index = build_playlist(dircursor+start);
+                    switch ( file->attr & TREE_ATTR_MASK ) {
+                        case TREE_ATTR_M3U:
+                            if ( global_settings.resume )
+                                snprintf(global_settings.resume_file,
+                                         MAX_PATH, "%s/%s",
+                                         currdir, file->name);
+                            play_list(currdir, file->name, 0, false, 0, seed );
+                            start_index = 0;
+                            play = true;
+                            break;
 
-                        /* it is important that we get back the index in
-                           the (shuffled) list and stor that */
-                        start_index = play_list(currdir, NULL,
-                                                start_index, false, 0, seed);
-                    }
-                    else {
-                        /* wps config file? */
-                        int len = strlen(file->name);
-                        if (!strcasecmp(&file->name[len-4], ".wps")) {
+                        case TREE_ATTR_MPA:
+                            if ( global_settings.resume )
+                                strncpy(global_settings.resume_file,
+                                        currdir, MAX_PATH);
+                            start_index = build_playlist(dircursor+start);
+
+                            /* it is important that we get back the index in
+                               the (shuffled) list and stor that */
+                            start_index = play_list(currdir, NULL,
+                                                    start_index, false,
+                                                    0, seed);
+                            play = true;
+                            break;
+
+                            /* wps config file */
+                        case TREE_ATTR_WPS:
                             snprintf(buf, sizeof buf, "%s/%s", 
                                      currdir, file->name);
                             wps_load_custom(buf);
                             restore = true;
                             break;
-                        }
-                        else
+
+#ifndef SIMULATOR
+                            /* firmware file */
+                        case TREE_ATTR_MOD:
+                            snprintf(buf, sizeof buf, "%s/%s", 
+                                     currdir, file->name);
+                            rolo_load(buf);
                             break;
-                    }
-                    if ( global_settings.resume ) {
-                        /* the resume_index must always be the index in the
-                           shuffled list in case shuffle is enabled */
-                        global_settings.resume_index = start_index;
-                        global_settings.resume_offset = 0;
-                        global_settings.resume_seed = seed;
-                        settings_save();
+#endif
                     }
 
-                    status_set_playmode(STATUS_PLAY);
-                    status_draw();
-                    lcd_stop_scroll();
-                    rc = wps_show();
-                    if(rc == SYS_USB_CONNECTED)
-                    {
-                        /* Force a re-read of the root directory */
-                        strcpy(currdir, "/");
-                        lastdir[0] = 0;
-                        dirlevel = 0;
-                        dircursor = 0;
-                        start = 0;
-                        global_settings.resume_index = -1;
-                    }
+                    if ( play ) {
+                        if ( global_settings.resume ) {
+                            /* the resume_index must always be the index in the
+                               shuffled list in case shuffle is enabled */
+                            global_settings.resume_index = start_index;
+                            global_settings.resume_offset = 0;
+                            global_settings.resume_seed = seed;
+                            settings_save();
+                        }
+
+                        status_set_playmode(STATUS_PLAY);
+                        status_draw();
+                        lcd_stop_scroll();
+                        rc = wps_show();
+                        if(rc == SYS_USB_CONNECTED)
+                        {
+                            /* Force a re-read of the root directory */
+                            strcpy(currdir, "/");
+                            lastdir[0] = 0;
+                            dirlevel = 0;
+                            dircursor = 0;
+                            start = 0;
+                            global_settings.resume_index = -1;
+                        }
 #ifdef LOADABLE_FONTS
-                    tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
+                        tree_max_on_screen = (LCD_HEIGHT - MARGIN_Y) / fh;
 #else
-                    tree_max_on_screen = TREE_MAX_ON_SCREEN;
+                        tree_max_on_screen = TREE_MAX_ON_SCREEN;
 #endif
+                    }
                 }
                 restore = true;
                 break;

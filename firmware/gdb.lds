@@ -39,7 +39,9 @@ SECTIONS
        _stackbegin = .;
        /* We put the copy of the .iram section here to save space */
        _iramcopy = .;
-       . = 0x2000;
+       . += 0x2000;
+       _topramcopy = .;
+       . += 0x300;
        _stackend = .;
     } > DRAM
 
@@ -63,9 +65,15 @@ SECTIONS
         _mp3buf = .;
     } > DRAM
 
-    .mp3end 0x09200000 :
+    .mp3end 0x09200000 - 0x300:
     {
         _mp3end = .;
+    } > DRAM
+
+    .topram : AT ( _topramcopy ) {
+        _topramstart = .;
+        *(.topcode)
+        _topramend = .;
     } > DRAM
 
     .iram 0xf000000 : AT ( _iramcopy )
