@@ -1175,7 +1175,7 @@ bool settings_load_config(char* file)
         }
         else if (!strcasecmp(name, "autocreate bookmarks"))
         {
-            static char* options[] = {"off", "on", "ask","recent only - yes","recent only - ask"};
+            static char* options[] = {"off", "on", "ask","recent only - on", "recent only - ask"};
             set_cfg_option(&global_settings.autocreatebookmark, value, options, 5);
         }
         else if (!strcasecmp(name, "use most-recent-bookmarks"))
@@ -1518,7 +1518,7 @@ bool settings_save_config(void)
 
     {
         static char* options[] = {"off", "on", "unique only"};
-        fprintf(fd, "UseMRB: %s\r\n", options[global_settings.usemrb]);
+        fprintf(fd, "use most-recent-bookmarks: %s\r\n", options[global_settings.usemrb]);
     }
 
     fprintf(fd, "#\r\n# Playlists\r\n#\r\n");
