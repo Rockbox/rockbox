@@ -1440,10 +1440,9 @@ static bool dirbrowse(char *root, int *dirfilter)
 }
 
 static int plsize = 0;
-static bool add_dir(char* dirname, int fd)
+static bool add_dir(char* dirname, int len, int fd)
 {
     bool abort = false;
-    char buf[MAX_PATH/2]; /* saving a little stack... */
     DIR* dir;
 
     /* check for user abort */
@@ -1465,14 +1464,21 @@ static bool add_dir(char* dirname, int fd)
         if (!entry)
             break;
         if (entry->attribute & ATTR_DIRECTORY) {
+            int dirlen = strlen(dirname);
+            bool result;
+
             if (!strcmp(entry->d_name, ".") ||
                 !strcmp(entry->d_name, ".."))
                 continue;
+
             if (dirname[1])
-                snprintf(buf, sizeof buf, "%s/%s", dirname, entry->d_name);
+                snprintf(dirname+dirlen, len-dirlen, "/%s", entry->d_name);
             else
-                snprintf(buf, sizeof buf, "/%s", entry->d_name);
-            if (add_dir(buf,fd)) {
+                snprintf(dirname, len, "/%s", entry->d_name);
+
+            result = add_dir(dirname, len, fd);
+            dirname[dirlen] = '\0';
+            if (result) {
                 abort = true;
                 break;
             }
@@ -1483,6 +1489,7 @@ static bool add_dir(char* dirname, int fd)
                 (!strcasecmp(&entry->d_name[x-4], ".mp2")) ||
                 (!strcasecmp(&entry->d_name[x-4], ".mpa")))
             {
+                char buf[8];
                 write(fd, dirname, strlen(dirname));
                 write(fd, "/", 1);
                 write(fd, entry->d_name, x);
@@ -1532,8 +1539,9 @@ bool create_playlist(void)
     if (fd < 0)
         return false;
 
+    snprintf(filename, sizeof(filename), "%s", currdir[1] ? currdir : "/");
     plsize = 0;
-    add_dir(currdir[1] ? currdir : "/", fd);
+    add_dir(filename, sizeof(filename), fd);
     close(fd);
     sleep(HZ);
 
