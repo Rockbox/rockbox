@@ -82,6 +82,11 @@ TD 10 000 ETD
 TD 999 ETD
 EFEAT
 
+NAME Supports bad path prefixes in playlists ENAME
+NO
+YES
+EFEAT
+
 NAME Open source/development process ENAME
 YES
 NO
@@ -210,6 +215,11 @@ EFEAT
 NAME Remote Control Controllable ENAME
 YES
 YES
+EFEAT
+
+NAME ISO8859-1 font support (Player) ENAME
+NO
+NO
 EFEAT
 
 </table>
