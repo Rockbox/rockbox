@@ -68,10 +68,11 @@
 #endif
 
 bool keys_locked = false;
-bool device_muted = false;
 static bool ff_rewind = false;
 static bool paused = false;
-int ff_rewind_count = 0;
+static int ff_rewind_count = 0;
+static struct mp3entry* id3 = NULL;
+static int old_release_mask;
 
 #ifdef CUSTOM_WPS
 static char custom_wps[5][64];
@@ -80,7 +81,7 @@ static int scroll_line;
 static int scroll_line_custom;
 #endif
 
-static void draw_screen(struct mp3entry* id3)
+static void draw_screen(void)
 {
     int font_height;
 
@@ -327,9 +328,6 @@ bool refresh_wps(bool refresh_scroll)
 #endif
 #endif
 
-    struct mp3entry* id3 = NULL;
-    id3 = mpeg_current_track();
-
     if(!id3)
     {
         lcd_stop_scroll();
@@ -437,14 +435,12 @@ bool display_custom_wps(int x_val, int y_val, bool do_scroll, char *wps_string)
     char cchr3;
     unsigned int seek;
 
-    struct mp3entry* id3 = NULL;
     char* szLast;
 
-    id3 = mpeg_current_track();
     szLast = strrchr(id3->path, '/');
     if(szLast)
-      /* point to the first letter in the file name */
-      szLast++;
+        /* point to the first letter in the file name */
+        szLast++;
 
     buffer[0] = 0;
 
@@ -468,11 +464,11 @@ bool display_custom_wps(int x_val, int y_val, bool do_scroll, char *wps_string)
                         {
                             case 't':  /* ID3 Title */
                                 snprintf(tmpbuf, sizeof(tmpbuf), "%s", 
-                                        id3->title?id3->title:"<no title>");
+                                         id3->title?id3->title:"<no title>");
                                 break;
                             case 'a':  /* ID3 Artist */
                                 snprintf(tmpbuf, sizeof(tmpbuf), "%s", 
-                                        id3->artist?id3->artist:"<no artist>");
+                                         id3->artist?id3->artist:"<no artist>");
                                 break;
                             case 'n':  /* ID3 Track Number */
                                 snprintf(tmpbuf, sizeof(tmpbuf), "%d", id3->tracknum);
@@ -490,11 +486,11 @@ bool display_custom_wps(int x_val, int y_val, bool do_scroll, char *wps_string)
                             case 'c':  /* Conditional Filename \ ID3 Artist-Title */
                                 if(id3->artist && id3->title)
                                     snprintf(tmpbuf, sizeof(tmpbuf), "%s - %s",
-                                            id3->artist?id3->artist:"<no artist>",
-                                            id3->title?id3->title:"<no title>");
+                                             id3->artist?id3->artist:"<no artist>",
+                                             id3->title?id3->title:"<no title>");
                                 else
                                     snprintf(tmpbuf, sizeof(tmpbuf), "%s",
-                                            szLast?szLast:id3->path);
+                                             szLast?szLast:id3->path);
                                 break;
                             case 'd':  /* Conditional Filename \ ID3 Title-Artist */
                                 if(id3->artist && id3->title)
@@ -503,7 +499,7 @@ bool display_custom_wps(int x_val, int y_val, bool do_scroll, char *wps_string)
                                              id3->artist?id3->artist:"<no artist>");
                                 else
                                     snprintf(tmpbuf, sizeof(tmpbuf), "%s",
-                                            szLast?szLast:id3->path);
+                                             szLast?szLast:id3->path);
                                 break;
                             case 'b':  /* File Bitrate */
                                 snprintf(tmpbuf, sizeof(tmpbuf), "%d", id3->bitrate);
@@ -516,11 +512,11 @@ bool display_custom_wps(int x_val, int y_val, bool do_scroll, char *wps_string)
                                 break;
                             case 'n':  /* File Name */
                                 snprintf(tmpbuf, sizeof(tmpbuf), "%s",
-                                        szLast?szLast:id3->path);
+                                         szLast?szLast:id3->path);
                                 break;
                             case 's':  /* File Size (In Kilobytes) */
                                 snprintf(tmpbuf, sizeof(tmpbuf), "%d",
-                                        id3->filesize / 1024);
+                                         id3->filesize / 1024);
                                 break;
                         }
                         break;
@@ -537,13 +533,13 @@ bool display_custom_wps(int x_val, int y_val, bool do_scroll, char *wps_string)
                                 break;
                             case 'c':  /* Current Time in Song */
                                 snprintf(tmpbuf, sizeof(tmpbuf), "%d:%02d",
-                                        (id3->elapsed + ff_rewind_count) / 60000,
-                                        (id3->elapsed + ff_rewind_count) % 60000 / 1000);
+                                         (id3->elapsed + ff_rewind_count) / 60000,
+                                         (id3->elapsed + ff_rewind_count) % 60000 / 1000);
                                 break;
                             case 't':  /* Total Time */
                                 snprintf(tmpbuf, sizeof(tmpbuf), "%d:%02d",
-                                        id3->length / 60000,
-                                        id3->length % 60000 / 1000);
+                                         id3->length / 60000,
+                                         id3->length % 60000 / 1000);
                                 break;
                         }
                         break;
@@ -623,7 +619,6 @@ int player_id3_show(void)
     int menu_max = 6;
     bool menu_changed = true;
     char scroll_text[MAX_PATH];
-    struct mp3entry* id3 = NULL;
 
     lcd_stop_scroll();
     lcd_clear_display();
@@ -633,7 +628,6 @@ int player_id3_show(void)
  
     while(1)
     {
-        id3 = mpeg_current_track();
         button = button_get(false);
 
         switch(button)
@@ -727,7 +721,6 @@ int player_id3_show(void)
             lcd_puts_scroll(0, 1, scroll_text);
         }
 
-        status_draw();
         lcd_update();
         yield();
     }
@@ -736,9 +729,10 @@ int player_id3_show(void)
 }
 
 #ifndef CUSTOM_WPS
-static void display_file_time(unsigned int elapsed, unsigned int length)
+static void display_file_time(void)
 {
     char buffer[32];
+    int elapsed = id3->elapsed + ff_rewind_count;
 
 #ifdef HAVE_LCD_BITMAP
     int line;
@@ -750,11 +744,12 @@ static void display_file_time(unsigned int elapsed, unsigned int length)
              "Time:%3d:%02d/%d:%02d",
              elapsed / 60000,
              elapsed % 60000 / 1000,
-             length / 60000,
-             length % 60000 / 1000 );
+             id3->length / 60000,
+             id3->length % 60000 / 1000 );
 
     lcd_puts(0, line, buffer);
-    slidebar(0, LCD_HEIGHT-6, LCD_WIDTH, 6, elapsed*100/length, Grow_Right);
+    slidebar(0, LCD_HEIGHT-6, LCD_WIDTH, 6, 
+             elapsed*100/id3->length, Grow_Right);
     lcd_update();
 #else
     /* Display time with the filename scroll only because
@@ -767,8 +762,8 @@ static void display_file_time(unsigned int elapsed, unsigned int length)
         snprintf(buffer,sizeof(buffer), "%d:%02d/%d:%02d  ",
                  elapsed / 60000,
                  elapsed % 60000 / 1000,
-                 length / 60000,
-                 length % 60000 / 1000 );
+                 id3->length / 60000,
+                 id3->length % 60000 / 1000 );
 
         lcd_puts(0, 1, buffer);
         lcd_update();
@@ -813,7 +808,6 @@ void display_keylock_text(bool locked)
     {
         lcd_puts(2, 3, "Key lock is OFF");
     }
-    status_draw();
     lcd_update();
 #endif
     
@@ -839,32 +833,402 @@ void display_mute_text(bool muted)
     {
         lcd_puts(2, 3, "Mute is OFF");
     }
-    status_draw();
     lcd_update();
 #endif
     
     sleep(HZ);
 }
 
+static void handle_usb(void)
+{
+#ifndef SIMULATOR
+#ifdef HAVE_LCD_BITMAP
+    bool laststate=statusbar(false);
+#endif
+    /* Tell the USB thread that we are safe */
+    DEBUGF("wps got SYS_USB_CONNECTED\n");
+    usb_acknowledge(SYS_USB_CONNECTED_ACK);
+                    
+    /* Wait until the USB cable is extracted again */
+    usb_wait_for_disconnect(&button_queue);
+
+#ifdef HAVE_LCD_BITMAP
+    statusbar(laststate);
+#endif
+#endif
+}
+
+static bool ffwd_rew(int button)
+{
+    unsigned int ff_rewind_step = 0; /* current rewind step size */ 
+    unsigned int ff_rewind_max_step = 0; /* max rewind step size */ 
+    long ff_rewind_accel_tick = 0; /* next time to bump ff/rewind step size */ 
+    bool exit = false;
+    bool usb = false;
+
+    while (!exit) {
+        switch ( button ) {
+            case BUTTON_LEFT | BUTTON_REPEAT:
+                if (ff_rewind)
+                {
+                    ff_rewind_count -= ff_rewind_step; 
+                    if (global_settings.ff_rewind_accel != 0 && 
+                        current_tick >= ff_rewind_accel_tick) 
+                    { 
+                        ff_rewind_step *= 2; 
+                        if (ff_rewind_step > ff_rewind_max_step) 
+                            ff_rewind_step = ff_rewind_max_step; 
+                        ff_rewind_accel_tick = current_tick + 
+                            global_settings.ff_rewind_accel*HZ; 
+                    } 
+                }
+                else
+                {
+                    if ( mpeg_is_playing() && id3 && id3->length )
+                    {
+                        if (!paused)
+                            mpeg_pause();
+#ifdef HAVE_PLAYER_KEYPAD
+                        lcd_stop_scroll();
+#endif
+                        status_set_playmode(STATUS_FASTBACKWARD);
+                        ff_rewind = true;
+                        ff_rewind_max_step = 
+                            id3->length * FF_REWIND_MAX_PERCENT / 100; 
+                        ff_rewind_step = FF_REWIND_MIN_STEP;
+                        if (ff_rewind_step > ff_rewind_max_step) 
+                            ff_rewind_step = ff_rewind_max_step; 
+                        ff_rewind_count = -ff_rewind_step; 
+                        ff_rewind_accel_tick = current_tick + 
+                            global_settings.ff_rewind_accel*HZ; 
+                    }
+                    else
+                        break;
+                }
+
+                if ((int)(id3->elapsed + ff_rewind_count) < 0)
+                    ff_rewind_count = -id3->elapsed;
+
+#ifdef CUSTOM_WPS
+                refresh_wps(false);
+#else
+                display_file_time();
+#endif
+                break;
+
+            case BUTTON_RIGHT | BUTTON_REPEAT:
+                if (ff_rewind)
+                {
+                    ff_rewind_count += ff_rewind_step; 
+                    if (global_settings.ff_rewind_accel != 0 && 
+                        current_tick >= ff_rewind_accel_tick) 
+                    { 
+                        ff_rewind_step *= 2; 
+                        if (ff_rewind_step > ff_rewind_max_step) 
+                            ff_rewind_step = ff_rewind_max_step; 
+                        ff_rewind_accel_tick = current_tick + 
+                            global_settings.ff_rewind_accel*HZ; 
+                    } 
+                }
+                else
+                {
+                    if ( mpeg_is_playing() && id3 && id3->length )
+                    {
+                        if (!paused)
+                            mpeg_pause();
+#ifdef HAVE_PLAYER_KEYPAD
+                        lcd_stop_scroll();
+#endif
+                        status_set_playmode(STATUS_FASTFORWARD);
+                        ff_rewind = true;
+                        ff_rewind_max_step = 
+                            id3->length * FF_REWIND_MAX_PERCENT / 100; 
+                        ff_rewind_step = FF_REWIND_MIN_STEP; 
+                        if (ff_rewind_step > ff_rewind_max_step) 
+                            ff_rewind_step = ff_rewind_max_step; 
+                        ff_rewind_count = ff_rewind_step; 
+                        ff_rewind_accel_tick = current_tick + 
+                            global_settings.ff_rewind_accel*HZ; 
+                    }
+                    else
+                        break;
+                }
+
+                if ((id3->elapsed + ff_rewind_count) > id3->length)
+                    ff_rewind_count = id3->length - id3->elapsed;
+
+#ifdef CUSTOM_WPS
+                refresh_wps(false);
+#else
+                display_file_time();
+#endif
+                break;
+
+            case BUTTON_LEFT | BUTTON_REL:
+                /* rewind */
+                mpeg_ff_rewind(ff_rewind_count);
+                ff_rewind_count = 0;
+                ff_rewind = false;
+                if (paused)
+                    status_set_playmode(STATUS_PAUSE);
+                else {
+                    mpeg_resume();
+                    status_set_playmode(STATUS_PLAY);
+                }
+#ifdef HAVE_LCD_CHARCELLS
+                draw_screen();
+#endif
+                exit = true;
+                break;
+
+            case BUTTON_RIGHT | BUTTON_REL: 
+                /* fast forward */
+                mpeg_ff_rewind(ff_rewind_count);
+                ff_rewind_count = 0;
+                ff_rewind = false;
+                if (paused)
+                    status_set_playmode(STATUS_PAUSE);
+                else {
+                    mpeg_resume();
+                    status_set_playmode(STATUS_PLAY);
+                }
+#ifdef HAVE_LCD_CHARCELLS
+                draw_screen();
+#endif
+                exit = true;
+                break;
+
+            case SYS_USB_CONNECTED:
+                handle_usb();
+                usb = true;
+                exit = true;
+                break;
+        }
+        if (!exit)
+            button = button_get(true);
+    }
+
+    return usb;
+}
+
+static void update(void)
+{
+    if (mpeg_has_changed_track())
+    {
+        lcd_stop_scroll();
+        id3 = mpeg_current_track();
+        draw_screen();
+    }
+
+    if (id3) {
+#ifdef CUSTOM_WPS
+        refresh_wps(false);
+#else
+        display_file_time();
+#endif
+    }
+
+    status_draw();
+
+    /* save resume data */
+    if ( id3 && 
+         global_settings.resume &&
+         global_settings.resume_offset != id3->offset ) {
+        DEBUGF("R%X,%X (%X)\n", global_settings.resume_offset,
+               id3->offset,id3);
+        global_settings.resume_index = id3->index;
+        global_settings.resume_offset = id3->offset;
+        settings_save();
+    }
+}
+
+
+static bool keylock(void)
+{
+    bool exit = false;
+
+#ifdef HAVE_LCD_CHARCELLS
+    lcd_icon(ICON_RECORD, true);
+#endif
+    display_keylock_text(true);
+    keys_locked = true;
+    draw_screen();
+    status_draw();
+    while (button_get(false)); /* clear button queue */
+
+    while (!exit) {
+        switch ( button_get_w_tmo(HZ/5) ) {
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_F1 | BUTTON_DOWN:
+#else
+            case BUTTON_MENU | BUTTON_STOP:
+#endif
+#ifdef HAVE_LCD_CHARCELLS
+                lcd_icon(ICON_RECORD, false);
+#endif
+                display_keylock_text(false);
+                keys_locked = false;
+                exit = true;
+                while (button_get(false)); /* clear button queue */
+                break;
+
+            case SYS_USB_CONNECTED:
+                handle_usb();
+                return true;
+
+            case BUTTON_NONE:
+                update();
+                break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_F1:
+#else
+            case BUTTON_MENU:
+#endif
+                /* ignore menu key, to avoid displaying "Keylock ON"
+                   every time we unlock the keys */
+                break;
+
+            default:
+                display_keylock_text(true);
+                while (button_get(false)); /* clear button queue */
+                draw_screen();
+                break;
+        }
+    }
+    return false;
+}
+
+static bool menu(void)
+{
+    static bool muted = false;
+    bool exit = false;
+    int last_button = 0;
+
+#ifdef HAVE_LCD_CHARCELLS
+    lcd_icon(ICON_PARAM, true);
+#endif
+
+    while (!exit) {
+        int button = button_get(true);
+        
+        switch ( button ) {
+            /* go into menu */
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_F1 | BUTTON_REL:
+#else
+            case BUTTON_MENU | BUTTON_REL:
+#endif
+                exit = true;
+                if ( !last_button ) {
+                    lcd_stop_scroll();
+                    button_set_release(old_release_mask);
+                    main_menu();
+                    old_release_mask = button_set_release(RELEASE_MASK);
+                }
+                break;
+
+                /* mute */
+#ifdef HAVE_PLAYER_KEYPAD
+            case BUTTON_PLAY:
+#else
+            case BUTTON_UP:
+#endif
+                if ( muted )
+                    mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+                else
+                    mpeg_sound_set(SOUND_VOLUME, 0);
+                muted = !muted;
+                display_mute_text(muted);
+                break;
+
+                /* key lock */
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_F1 | BUTTON_DOWN:
+#else
+            case BUTTON_MENU | BUTTON_STOP:
+#endif
+                if (keylock())
+                    return true;
+                exit = true;
+                break;
+
+#ifdef HAVE_PLAYER_KEYPAD
+                /* change volume */
+            case BUTTON_MENU | BUTTON_LEFT:
+            case BUTTON_MENU | BUTTON_LEFT | BUTTON_REPEAT:
+                dont_go_to_menu = true;
+                global_settings.volume--;
+                if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
+                    global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
+                mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+                display_volume_level(global_settings.volume);
+                draw_screen();
+                status_draw();
+                settings_save();
+                break;
+
+                /* change volume */
+            case BUTTON_MENU | BUTTON_RIGHT:
+            case BUTTON_MENU | BUTTON_RIGHT | BUTTON_REPEAT:
+                dont_go_to_menu = true;
+                global_settings.volume++;
+                if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
+                    global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
+                mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+                display_volume_level(global_settings.volume);
+                draw_screen();
+                status_draw();
+                settings_save();
+                break;
+
+                /* show id3 tags */
+            case BUTTON_MENU | BUTTON_ON:
+                if (keys_locked)
+                {
+                    display_keylock_text(keys_locked);
+                    restore = true;
+                    break;
+                }
+                lcd_stop_scroll();
+                lcd_icon(ICON_PARAM, true);
+                lcd_icon(ICON_AUDIO, true);
+                if(player_id3_show() == SYS_USB_CONNECTED)
+                    return true;
+                lcd_icon(ICON_PARAM, false);
+                lcd_icon(ICON_AUDIO, true);
+                draw_screen();
+                break;
+#endif
+
+            case SYS_USB_CONNECTED:
+                handle_usb();
+                return true;
+        }
+        last_button = button;
+    }
+
+#ifdef HAVE_LCD_CHARCELLS
+    lcd_icon(ICON_PARAM, false);
+#endif
+
+    draw_screen();
+
+    return false;
+}
+
 /* demonstrates showing different formats from playtune */
 int wps_show(void)
 {
-    struct mp3entry* id3 = NULL;
 
 #ifdef HAVE_PLAYER_KEYPAD
     int retval;
 #endif
-    bool dont_go_to_menu = false;
-    bool menu_button_is_down = false;
-    bool pending_keylock = true; /* Keylock will go ON next time */
-    bool pending_mute = true; /* Mute will go ON next time */
-    int old_release_mask;
     int button;
-    unsigned int ff_rewind_step = 0; /* current rewind step size */ 
-    unsigned int ff_rewind_max_step = 0; /* max rewind step size */ 
-    long ff_rewind_accel_tick = 0; /* next time to bump ff/rewind step size */ 
     bool ignore_keyup = true;
     bool restore = false;
+
+    id3 = NULL;
 
     old_release_mask = button_set_release(RELEASE_MASK);
 
@@ -879,6 +1243,7 @@ int wps_show(void)
 #endif
 
     ff_rewind = false;
+    ff_rewind_count = 0;
 
 #ifdef CUSTOM_WPS
     load_custom_wps();  /* Load the Custom WPS file, if there is one */
@@ -887,7 +1252,10 @@ int wps_show(void)
     if(mpeg_is_playing())
     {
         id3 = mpeg_current_track();
-        draw_screen(id3);
+        if (id3) {
+            draw_screen();
+            display_file_time();
+        }
         restore = true;
     }
 
@@ -903,23 +1271,10 @@ int wps_show(void)
                 continue;
         }
         
-        if(mpeg_has_changed_track())
-        {
-            lcd_stop_scroll();
-            id3 = mpeg_current_track();
-            draw_screen(id3);
-        }
-
         switch(button)
         {
+            /* exit to dir browser */
             case BUTTON_ON:
-                if (keys_locked)
-                {
-                    display_keylock_text(keys_locked);
-                    restore = true;
-                    break;
-                }
-
 #ifdef HAVE_LCD_CHARCELLS
                 lcd_icon(ICON_RECORD, false);
                 lcd_icon(ICON_AUDIO, false);
@@ -927,20 +1282,19 @@ int wps_show(void)
                 button_set_release(old_release_mask);
                 return 0;
                 
+                /* play/pause */
             case BUTTON_PLAY:
-                if (keys_locked)
+                if ( paused )
                 {
-                    display_keylock_text(keys_locked);
-                    restore = true;
-                    break;
+                    mpeg_resume();
+                    paused = false;
+                    status_set_playmode(STATUS_PLAY);
                 }
-
-                if ( !paused )
+                else
                 {
                     mpeg_pause();
                     paused = true;
                     status_set_playmode(STATUS_PAUSE);
-                    status_draw();
                     if (global_settings.resume) {
                         settings_save();
 #ifndef HAVE_RTC
@@ -948,27 +1302,14 @@ int wps_show(void)
 #endif
                     }
                 }
-                else
-                {
-                    mpeg_resume();
-                    paused = false;
-                    status_set_playmode(STATUS_PLAY);
-                    status_draw();
-                }
                 break;
 
+                /* volume up */
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_UP:
             case BUTTON_UP | BUTTON_REPEAT:
 #endif
             case BUTTON_VOL_UP:
-                if (keys_locked)
-                {
-                    display_keylock_text(keys_locked);
-                    restore = true;
-                    break;
-                }
-
                 global_settings.volume++;
                 if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
@@ -977,18 +1318,12 @@ int wps_show(void)
                 settings_save();
                 break;
 
+                /* volume down */
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_DOWN:
             case BUTTON_DOWN | BUTTON_REPEAT:
 #endif
             case BUTTON_VOL_DOWN:
-                if (keys_locked)
-                {
-                    display_keylock_text(keys_locked);
-                    restore = true;
-                    break;
-                }
-
                 global_settings.volume--;
                 if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
@@ -997,379 +1332,43 @@ int wps_show(void)
                 settings_save();
                 break;
 
+                /* fast forward / rewind */
             case BUTTON_LEFT | BUTTON_REPEAT:
-                if (!keys_locked)
-                {
-                    if (ff_rewind)
-                    {
-                        ff_rewind_count -= ff_rewind_step; 
-                        if (global_settings.ff_rewind_accel != 0 && 
-                            current_tick >= ff_rewind_accel_tick) 
-                            { 
-                                ff_rewind_step *= 2; 
-                                if (ff_rewind_step > ff_rewind_max_step) 
-                                    ff_rewind_step = ff_rewind_max_step; 
-                                ff_rewind_accel_tick = current_tick + 
-                                    global_settings.ff_rewind_accel*HZ; 
-                            } 
-                    }
-                    else
-                    {
-                        if ( mpeg_is_playing() && id3 && id3->length )
-                        {
-                            if (!paused)
-                                mpeg_pause();
-#ifdef HAVE_PLAYER_KEYPAD
-                            lcd_stop_scroll();
-#endif
-                            status_set_playmode(STATUS_FASTBACKWARD);
-                            status_draw();
-                            ff_rewind = true;
-                            ff_rewind_max_step = 
-                                id3->length * FF_REWIND_MAX_PERCENT / 100; 
-                            ff_rewind_step = FF_REWIND_MIN_STEP;
-                            if (ff_rewind_step > ff_rewind_max_step) 
-                                ff_rewind_step = ff_rewind_max_step; 
-                            ff_rewind_count = -ff_rewind_step; 
-                            ff_rewind_accel_tick = current_tick + 
-                                global_settings.ff_rewind_accel*HZ; 
-                        }
-                        else
-                            break;
-                    }
-
-                    if ((int)(id3->elapsed + ff_rewind_count) < 0)
-                        ff_rewind_count = -id3->elapsed;
-
-#ifdef CUSTOM_WPS
-                    refresh_wps(false);
-#else
-                    display_file_time(id3->elapsed + ff_rewind_count,
-                                      id3->length);
-#endif
-                }
-                break;
-
             case BUTTON_RIGHT | BUTTON_REPEAT:
-                if (!keys_locked)
-                {
-                    if (ff_rewind)
-                    {
-                           ff_rewind_count += ff_rewind_step; 
-                           if (global_settings.ff_rewind_accel != 0 && 
-                               current_tick >= ff_rewind_accel_tick) 
-                           { 
-                               ff_rewind_step *= 2; 
-                               if (ff_rewind_step > ff_rewind_max_step) 
-                                   ff_rewind_step = ff_rewind_max_step; 
-                               ff_rewind_accel_tick = current_tick + 
-                                   global_settings.ff_rewind_accel*HZ; 
-                           } 
-                    }
-                    else
-                    {
-                        if ( mpeg_is_playing() && id3 && id3->length )
-                        {
-                            if (!paused)
-                                mpeg_pause();
-#ifdef HAVE_PLAYER_KEYPAD
-                            lcd_stop_scroll();
-#endif
-                            status_set_playmode(STATUS_FASTFORWARD);
-                            status_draw();
-                            ff_rewind = true;
-                            ff_rewind_max_step = 
-                                id3->length * FF_REWIND_MAX_PERCENT / 100; 
-                            ff_rewind_step = FF_REWIND_MIN_STEP; 
-                            if (ff_rewind_step > ff_rewind_max_step) 
-                                ff_rewind_step = ff_rewind_max_step; 
-                            ff_rewind_count = ff_rewind_step; 
-                            ff_rewind_accel_tick = current_tick + 
-                                global_settings.ff_rewind_accel*HZ; 
-                        }
-                        else
-                            break;
-                    }
-
-                    if ((id3->elapsed + ff_rewind_count) > id3->length)
-                        ff_rewind_count = id3->length - id3->elapsed;
-
-#ifdef CUSTOM_WPS
-                    refresh_wps(false);
-#else
-                    display_file_time(id3->elapsed + ff_rewind_count,
-                                      id3->length);
-#endif
-                }
+                ffwd_rew(button);
                 break;
 
+                /* prev / restart */
             case BUTTON_LEFT | BUTTON_REL:
-                if (menu_button_is_down && keys_locked)
-                {
-                    sleep(HZ/6);
-                    draw_screen(id3);
-                }
-                if (!keys_locked)
-                {
-                    if (ff_rewind)
-                    {
-                        /* rewind */
-                        mpeg_ff_rewind(ff_rewind_count);
-                        ff_rewind_count = 0;
-                        ff_rewind = false;
-                        if (paused)
-                            status_set_playmode(STATUS_PAUSE);
-                        else {
-                            mpeg_resume();
-                            status_set_playmode(STATUS_PLAY);
-                        }
-#ifdef HAVE_LCD_CHARCELLS
-                        draw_screen(id3);
-#endif
-                    }
-#ifdef HAVE_PLAYER_KEYPAD
-                    else if(!menu_button_is_down)
-#else
-                    else
-#endif
-                    {
-                        if (!id3 || (id3->elapsed < 3*1000))
-                            mpeg_prev();
-                        else {
-                            if (!paused)
-                                mpeg_pause();
+                if (!id3 || (id3->elapsed < 3*1000))
+                    mpeg_prev();
+                else {
+                    if (!paused)
+                        mpeg_pause();
 
-                            mpeg_ff_rewind(-(id3->elapsed));
+                    mpeg_ff_rewind(-(id3->elapsed));
 
-                            if (!paused)
-                                mpeg_resume();
-                        }
-                    }
-                }
-#ifdef HAVE_PLAYER_KEYPAD
-                else if(!menu_button_is_down)
-#else
-                else
-#endif
-                {
-                    display_keylock_text(keys_locked);
-                    restore = true;
+                    if (!paused)
+                        mpeg_resume();
                 }
                 break;
 
+                /* next */
             case BUTTON_RIGHT | BUTTON_REL:
-                if (menu_button_is_down && keys_locked)
-                {
-                    sleep(HZ/6);
-                    draw_screen(id3);
-                }
-                if (!keys_locked)
-                {
-                    if (ff_rewind)
-                    {
-                        /* fast forward */
-                        mpeg_ff_rewind(ff_rewind_count);
-                        ff_rewind_count = 0;
-                        ff_rewind = false;
-                        if (paused)
-                            status_set_playmode(STATUS_PAUSE);
-                        else {
-                            mpeg_resume();
-                            status_set_playmode(STATUS_PLAY);
-                        }
-#ifdef HAVE_LCD_CHARCELLS
-                        draw_screen(id3);
-#endif
-                    }
+                mpeg_next();
+                break;
+
+                /* menu key functions */
 #ifdef HAVE_PLAYER_KEYPAD
-                    else if(!menu_button_is_down)
-#else
-                    else
-#endif
-                    {
-                        mpeg_next();
-                    }
-                }
-#ifdef HAVE_PLAYER_KEYPAD
-                else if(!menu_button_is_down)
-#else
-                else
-#endif
-                {
-                    display_keylock_text(keys_locked);
-                    restore = true;
-                    break;
-                }
-                break;
-
-#ifdef HAVE_PLAYER_KEYPAD
-            case BUTTON_MENU | BUTTON_LEFT:
-            case BUTTON_MENU | BUTTON_LEFT | BUTTON_REPEAT:
-                dont_go_to_menu = true;
-                global_settings.volume--;
-                if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
-                    global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
-                mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-                display_volume_level(global_settings.volume);
-                draw_screen(id3);
-                status_draw();
-                settings_save();
-                break;
-
-            case BUTTON_MENU | BUTTON_RIGHT:
-            case BUTTON_MENU | BUTTON_RIGHT | BUTTON_REPEAT:
-                dont_go_to_menu = true;
-                global_settings.volume++;
-                if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
-                    global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
-                mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-                display_volume_level(global_settings.volume);
-                draw_screen(id3);
-                status_draw();
-                settings_save();
-                break;
-
-            case BUTTON_MENU | BUTTON_ON:
-                if (keys_locked)
-                {
-                    display_keylock_text(keys_locked);
-                    restore = true;
-                    break;
-                }
-                lcd_stop_scroll();
-                dont_go_to_menu = false;
-                menu_button_is_down = false;
-                lcd_icon(ICON_PARAM, true);
-                lcd_icon(ICON_AUDIO, true);
-                retval = player_id3_show();
-                if(retval == SYS_USB_CONNECTED)
-                    return SYS_USB_CONNECTED;
-                lcd_icon(ICON_PARAM, false);
-                lcd_icon(ICON_AUDIO, true);
-                draw_screen(id3);
-                break;
-
             case BUTTON_MENU:
-                lcd_icon(ICON_PARAM, true);
-                lcd_icon(ICON_AUDIO, false);
-                menu_button_is_down = true;
-                break;
-
-            case BUTTON_PLAY | BUTTON_REL:
-                /* The PLAY key has been release while the MENU key
-                   was held */
-                if(menu_button_is_down)
-                    pending_mute = !pending_mute;
-                break;
-
-            case BUTTON_STOP | BUTTON_REL:
-                /* The STOP key has been release while the MENU key
-                   was held */
-                if(menu_button_is_down)
-                    pending_keylock = !pending_keylock;
-                break;
 #else
             case BUTTON_F1:
-                menu_button_is_down = true;
-                break;
- 
-            case BUTTON_UP | BUTTON_REL:
-                /* The UP key has been release while the F1 key
-                   was held */
-                if(menu_button_is_down)
-                {
-                    pending_mute = !pending_mute;
-                    debugf("pending: %d\n", pending_mute);
-                }
-                break; 
-              
-            case BUTTON_DOWN | BUTTON_REL:
-                /* The DOWN key has been release while the F1 key
-                   was held */
-                if(menu_button_is_down)
-                {
-                    pending_keylock = !pending_keylock;
-                    debugf("pending: %d\n", pending_keylock);
-                }
-                break;
 #endif
-
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_F1 | BUTTON_UP:
-#else
-            case BUTTON_MENU | BUTTON_PLAY:
-#endif
-                if(keys_locked)
-                {
-                    display_keylock_text(keys_locked);
-                    restore = true;
-                    break;
-                }
-
-                if(device_muted != pending_mute)
-                {
-                    device_muted = pending_mute;
-
-                    if(device_muted)
-                        mpeg_sound_set(SOUND_VOLUME, 0);
-                    else
-                        mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-                    display_mute_text(device_muted);
-                    restore = true;
-                }
-                dont_go_to_menu = true;
-                break;
-                    
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_F1 | BUTTON_DOWN:
-#else
-            case BUTTON_MENU | BUTTON_STOP:
-#endif
-                if(keys_locked != pending_keylock)
-                {
-                    keys_locked = pending_keylock;
-
-#ifdef HAVE_LCD_CHARCELLS
-                    if(keys_locked)
-                        lcd_icon(ICON_RECORD, true);
-                    else
-                        lcd_icon(ICON_RECORD, false);
-#endif
-                    display_keylock_text(keys_locked);
-                    restore = true;
-                }
-
-                dont_go_to_menu = true;
-                break;
-                    
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_F1 | BUTTON_REL:
-#else
-            case BUTTON_MENU | BUTTON_REL:
-#endif
-#ifdef HAVE_LCD_CHARCELLS
-                lcd_icon(ICON_PARAM, false);
-#endif
-                if(!keys_locked && !dont_go_to_menu && menu_button_is_down)
-                {
-                    lcd_stop_scroll();
-                    button_set_release(old_release_mask);
-                    main_menu();
-                    old_release_mask = button_set_release(RELEASE_MASK);
-                    ignore_keyup = true;
-                    id3 = mpeg_current_track();
-                    restore = true;
-                }
-                else
-                {
-                    dont_go_to_menu = false;
-                }
-#ifdef HAVE_LCD_CHARCELLS
-                lcd_icon(ICON_AUDIO, true);
-#endif
-                menu_button_is_down = false;
+                if (menu())
+                    return SYS_USB_CONNECTED;
                 break;
 
+                /* toggle status bar */
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_F3:
 #ifdef HAVE_LCD_BITMAP
@@ -1384,18 +1383,12 @@ int wps_show(void)
                 break;
 #endif
 
+                /* stop and exit wps */
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_OFF:
 #else
             case BUTTON_STOP:
 #endif
-                if (keys_locked)
-                {
-                    display_keylock_text(keys_locked);
-                    restore = true;
-                    break;
-                }
-
 #ifdef HAVE_LCD_CHARCELLS
                 lcd_icon(ICON_RECORD, false);
                 lcd_icon(ICON_AUDIO, false);
@@ -1406,62 +1399,27 @@ int wps_show(void)
                 return 0;
                     
 #ifndef SIMULATOR
-            case SYS_USB_CONNECTED: {
-#ifdef HAVE_LCD_BITMAP
-                bool laststate=statusbar(false);
-#endif
-                /* Tell the USB thread that we are safe */
-                DEBUGF("wps got SYS_USB_CONNECTED\n");
-                usb_acknowledge(SYS_USB_CONNECTED_ACK);
-                    
-                /* Wait until the USB cable is extracted again */
-                usb_wait_for_disconnect(&button_queue);
-
-#ifdef HAVE_LCD_BITMAP
-                statusbar(laststate);
-#endif
-                /* Signal to our caller that we have been in USB mode */
+            case SYS_USB_CONNECTED:
+                handle_usb();
                 return SYS_USB_CONNECTED;
-                break;
-            }
 #endif
-            case BUTTON_NONE: /* Timeout */
-                if(!mpeg_is_playing())
-                    restore = true;
-                
-                if (id3)
-#ifdef CUSTOM_WPS
-                    refresh_wps(false);
-#else
-                    display_file_time(id3->elapsed, id3->length);
-#endif
-                
-                /* save resume data */
-                if ( id3 && 
-                     global_settings.resume &&
-                     global_settings.resume_offset != id3->offset ) {
-                    DEBUGF("R%X,%X (%X)\n", global_settings.resume_offset,
-                           id3->offset,id3);
-                    global_settings.resume_index = id3->index;
-                    global_settings.resume_offset = id3->offset;
-                    settings_save();
-                }
 
-                status_draw();
+            case BUTTON_NONE: /* Timeout */
+                update();
                 break;
         }
 
         if ( button )
             ata_spin();
 
-        if(restore) {
+        if (restore) {
             restore = false;
-            draw_screen(id3);
-            if (mpeg_is_playing() && id3)
+            draw_screen();
+            if (id3)
 #ifdef CUSTOM_WPS
                 refresh_wps(false);
 #else
-                display_file_time(id3->elapsed, id3->length);
+                display_file_time();
 #endif
         }
     }
