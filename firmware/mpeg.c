@@ -34,13 +34,12 @@
 #include "file.h"
 #endif
 
-#define MPEG_CHUNKSIZE  0x20000
-#ifdef ARCHOS_RECORDER
-/* recorder is slower and needs more load time */
-#define MPEG_LOW_WATER  0x40000
-#else
+#define MPEG_FIRST_CHUNKSIZE  0x20000
+#define MPEG_CHUNKSIZE  0x180000
+#define MPEG_FIRST_SWAP_CHUNKSIZE  0x20000
+#define MPEG_SWAP_CHUNKSIZE  0x8000
+#define MPEG_HIGHWATER  0x10000
 #define MPEG_LOW_WATER  0x30000
-#endif
 
 #define MPEG_PLAY         1
 #define MPEG_STOP         2
@@ -49,6 +48,7 @@
 #define MPEG_NEXT         5
 #define MPEG_PREV         6
 #define MPEG_NEED_DATA    100
+#define MPEG_SWAP_DATA    101
 
 extern char* peek_next_track(int type);
 extern char* peek_prev_track(int type);
@@ -274,6 +274,7 @@ extern unsigned char mp3end[];
 
 static int mp3buflen;
 static int mp3buf_write;
+static int mp3buf_swapwrite;
 static int mp3buf_read;
 
 static int last_dma_chunk_size;
@@ -355,14 +356,14 @@ static void dma_tick(void)
 {
     if(playing)
     {
-	/* Start DMA if it is disabled and the DEMAND pin is high */
+        /* Start DMA if it is disabled and the DEMAND pin is high */
         if(!dma_on && (PBDR & 0x4000))
         {
             if(!(SCR0 & 0x80))
                 start_dma();
         }
-	id3tags[0].id3.elapsed += (current_tick - last_dma_tick) * 1000 / HZ;
-	last_dma_tick = current_tick;
+        id3tags[0].id3.elapsed += (current_tick - last_dma_tick) * 1000 / HZ;
+        last_dma_tick = current_tick;
     }
 }
 
@@ -379,6 +380,7 @@ static void reset_mp3_buffer(void)
 {
     mp3buf_read = 0;
     mp3buf_write = 0;
+    mp3buf_swapwrite = 0;
 }
 
 #pragma interrupt
@@ -436,7 +438,7 @@ void DEI3(void)
         {
             DEBUGF("No more MP3 data. Stopping.\n");
             CHCR3 = 0; /* Stop DMA interrupt */
-	    playing = false;
+            playing = false;
         }
     }
 
@@ -486,7 +488,7 @@ static void stop_playing(void)
     playing = false;
     filling = false;
     if(mpeg_file >= 0)
-	close(mpeg_file);
+        close(mpeg_file);
     mpeg_file = -1;
     stop_dma();
 }
@@ -497,6 +499,7 @@ static void mpeg_thread(void)
     int len;
     int free_space_left;
     int amount_to_read;
+    int amount_to_swap;
 
     play_pending = false;
     playing = false;
@@ -505,6 +508,7 @@ static void mpeg_thread(void)
     while(1)
     {
         DEBUGF("S\n");
+        yield();
         queue_wait(&mpeg_queue, &ev);
         switch(ev.id)
         {
@@ -545,7 +549,7 @@ static void mpeg_thread(void)
 
             case MPEG_STOP:
                 DEBUGF("MPEG_STOP\n");
-		stop_playing();
+                stop_playing();
                 break;
 
             case MPEG_PAUSE:
@@ -614,6 +618,50 @@ static void mpeg_thread(void)
                 }
                 break; 
 
+            case MPEG_SWAP_DATA:
+                free_space_left = mp3buf_write - mp3buf_swapwrite;
+
+                if(free_space_left == 0)
+                    break;
+                
+                if(free_space_left < 0)
+                    free_space_left = mp3buflen + free_space_left;
+
+                if(play_pending)
+                    amount_to_swap = MIN(MPEG_FIRST_SWAP_CHUNKSIZE,
+                                         free_space_left);
+                else
+                    amount_to_swap = MIN(MPEG_SWAP_CHUNKSIZE, free_space_left);
+                amount_to_swap = MIN(mp3buflen - mp3buf_swapwrite,
+                                     amount_to_swap);
+                
+                DEBUGF("B %x\n", amount_to_swap);
+                bitswap((unsigned short *)(mp3buf + mp3buf_swapwrite),
+                        (amount_to_swap+1)/2);
+
+                mp3buf_swapwrite += amount_to_swap;
+                if(mp3buf_swapwrite >= mp3buflen)
+                {
+                    mp3buf_swapwrite = 0;
+                    DEBUGF("BW\n");
+                }
+
+                /* Tell ourselves that we must swap more data */
+                queue_post(&mpeg_queue, MPEG_SWAP_DATA, 0);
+
+                /* And while we're at it, see if we have started
+                   playing yet. If not, do it. */
+                if(play_pending)
+                {
+                    play_pending = false;
+                    playing = true;
+                    
+                    last_dma_tick = current_tick;
+                    init_dma();
+                    start_dma();
+                }
+                break;
+
             case MPEG_NEED_DATA:
                 free_space_left = mp3buf_read - mp3buf_write;
 
@@ -621,16 +669,26 @@ static void mpeg_thread(void)
                 if(free_space_left <= 0)
                     free_space_left = mp3buflen + free_space_left;
 
+                /* Make sure that we don't fill the entire buffer */
+                free_space_left -= 2;
+
                 /* do we have any more buffer space to fill? */
-                if(free_space_left <= MPEG_CHUNKSIZE)
+                if(free_space_left <= MPEG_HIGHWATER)
                 {
                     DEBUGF("0\n");
                     filling = false;
                     ata_sleep();
                     break;
                 }
-            
-                amount_to_read = MIN(MPEG_CHUNKSIZE, free_space_left);
+
+                if(play_pending)
+                {
+                    amount_to_read = MIN(MPEG_FIRST_CHUNKSIZE, free_space_left);
+                }
+                else
+                {
+                    amount_to_read = MIN(MPEG_CHUNKSIZE, free_space_left);
+                }
                 amount_to_read = MIN(mp3buflen - mp3buf_write, amount_to_read);
                 
                 /* Read in a few seconds worth of MP3 data. We don't want to
@@ -643,11 +701,9 @@ static void mpeg_thread(void)
                     len = read(mpeg_file, mp3buf+mp3buf_write, amount_to_read);
                     if(len > 0)
                     {
-                        DEBUGF("B\n");
+                        /* Tell ourselves that we need to swap some data */
+                        queue_post(&mpeg_queue, MPEG_SWAP_DATA, 0);
 
-                        bitswap((unsigned short *)(mp3buf + mp3buf_write),
-                                (len+1)/2);
-                    
                         mp3buf_write += len;
                         if(mp3buf_write >= mp3buflen)
                         {
@@ -657,18 +713,6 @@ static void mpeg_thread(void)
 
                         /* Tell ourselves that we want more data */
                         queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
-
-                        /* And while we're at it, see if we have started
-                           playing yet. If not, do it. */
-                        if(play_pending)
-                        {
-                            play_pending = false;
-                            playing = true;
-                
-			    last_dma_tick = current_tick;
-                            init_dma();
-                            start_dma();
-                        }
                     }
                     else
                     {
@@ -696,20 +740,19 @@ static void mpeg_thread(void)
                             queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
                         }
                     }
-                    yield(); /* To be safe */
                 }
                 break;
-		
-	    case SYS_USB_CONNECTED:
-		stop_playing();
-		
-		/* Tell the USB thread that we are safe */
-		DEBUGF("mpeg_thread got SYS_USB_CONNECTED\n");
-		usb_acknowledge(SYS_USB_CONNECTED_ACK);
+                
+            case SYS_USB_CONNECTED:
+                stop_playing();
+                
+                /* Tell the USB thread that we are safe */
+                DEBUGF("mpeg_thread got SYS_USB_CONNECTED\n");
+                usb_acknowledge(SYS_USB_CONNECTED_ACK);
 
-		/* Wait until the USB cable is extracted again */
-		usb_wait_for_disconnect(&mpeg_queue);
-		break;
+                /* Wait until the USB cable is extracted again */
+                usb_wait_for_disconnect(&mpeg_queue);
+                break;
         }
     }
 }
@@ -996,7 +1039,7 @@ void mpeg_init(int volume, int bass, int treble)
     
     queue_init(&mpeg_queue);
     create_thread(mpeg_thread, mpeg_stack,
-		  sizeof(mpeg_stack), mpeg_thread_name);
+                  sizeof(mpeg_stack), mpeg_thread_name);
     mas_poll_start(2);
 
 #ifndef ARCHOS_RECORDER
