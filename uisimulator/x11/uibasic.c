@@ -64,6 +64,8 @@ char *progclass = "rockboxui";
 char *defaults [] = {
 #ifdef IRIVER_H100
   ".background:	lightblue",
+#elif defined ARCHOS_GMINI120
+  ".background: royalblue",
 #else
   ".background:	lightgreen",
 #endif
