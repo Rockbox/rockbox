@@ -374,9 +374,18 @@ void lcd_double_height(bool on)
     lcd_write(true,on?9:8);
 }
 
+#endif /* !SIMULATOR */
+
+#endif /* HAVE_LCD_CHARCELLS */
+
+#if defined(HAVE_LCD_CHARCELLS) || defined(SIMULATOR) /* not BITMAP */
+void lcd_init (void)
+{
+    create_thread(scroll_thread, scroll_stack, sizeof(scroll_stack));
+}
 #endif
 
-#endif
+
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR) /* not CHARCELLS */
 
 /*
@@ -417,13 +426,7 @@ static unsigned char ones[]  = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 static char fonts[] = { 6,8,12 };
 static char fontheight[] = { 8,12,16 };
 
-#ifdef SIMULATOR
-
-void lcd_init (void)
-{
-    create_thread(scroll_thread, scroll_stack, sizeof(scroll_stack));
-}
-#else
+#ifndef SIMULATOR
 
 /*
  * Initialize LCD
