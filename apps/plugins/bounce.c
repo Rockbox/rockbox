@@ -238,8 +238,12 @@ static int scrollit(void)
         b = rb->button_get_w_tmo(HZ/10);
         if ( b == (BUTTON_OFF|BUTTON_REL) )
             return 0;
-        else if ( b == (BUTTON_ON|BUTTON_REL) )
+
+        if ( b == (BUTTON_ON|BUTTON_REL) )
             return 1;
+
+        if ( rb->default_event_handler(b) == SYS_USB_CONNECTED )
+            return -1;
 
         rb->lcd_clear_display();
 
@@ -290,13 +294,16 @@ static int loopit(void)
     {
         b = rb->button_get_w_tmo(HZ/10);
         if ( b == (BUTTON_OFF|BUTTON_REL) )
-            return PLUGIN_OK;
-        else if(b != BUTTON_NONE)
-            timeout=20;
+            return 0;
 
-        if ( rb->default_event_handler(b) == SYS_USB_CONNECTED) {
-            return PLUGIN_USB_CONNECTED;
-        }
+        if ( b == (BUTTON_ON|BUTTON_REL) )
+            return 1;        
+
+        if ( rb->default_event_handler(b) == SYS_USB_CONNECTED )
+            return -1;
+
+        if ( b != BUTTON_NONE )
+            timeout=20;
 
         y+= speed[ysanke&15] + values[NUM_YADD].num;
         x+= speed[xsanke&15] + values[NUM_XADD].num;
@@ -388,14 +395,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->sleep(HZ);
     
     do {
-        h= loopit();
-        if(h)
+        h = loopit();
+        if (h > 0)
             h = scrollit();
-    } while(h);
+    } while(h > 0);
     
     rb->lcd_setfont(FONT_UI);
     
-    return false;
+    return h = 0 ? PLUGIN_OK : PLUGIN_USB_CONNECTED;
 }
 
 #endif
