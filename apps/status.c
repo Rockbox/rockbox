@@ -204,11 +204,7 @@ void status_draw(void)
         statusbar_time(hour, minute);
 #endif
 
-#ifdef SIMULATOR
-        lcd_update();
-#else
         lcd_update_rect(0, 0, LCD_WIDTH, STATUSBAR_HEIGHT);
-#endif
     }
 #endif
 }
