@@ -6,3 +6,6 @@
 
 /* define this if you have the Recorder's 10-key keyboard */
 #define HAVE_RECORDER_KEYPAD 1
+
+/* define this if you have a real-time clock */
+#define HAVE_RTC 1
