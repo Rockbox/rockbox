@@ -19,7 +19,12 @@
 
 /*
  * Parts of this code has been stolen from the Ample project and was written
- * by David Härdeman.
+ * by David Härdeman. It has since been extended and enhanced pretty much by
+ * all sorts of friendly Rockbox people.
+ *
+ * A nice reference for MPEG header info:
+ * http://rockbox.haxx.se/docs/mpeghdr.html
+ *
  */
 
 #include <stdio.h>
@@ -69,10 +74,11 @@ const int bs[4] = {0, 384000, 1152000, 1152000};
 /* Table of sample frequency for MP3 files.
  * Indexed by version and layer.
  */
-const int freqtab[2][4] =
+const int freqtab[][4] =
 {
-    {44100, 48000, 32000, 0},
-    {22050, 24000, 16000, 0},
+    {11025, 12000, 8000, 0},  /* MPEG version 2.5 */
+    {44100, 48000, 32000, 0}, /* MPEG Version 1 */
+    {22050, 24000, 16000, 0}, /* MPEG version 2 */
 };
 
 /*
@@ -365,10 +371,7 @@ static bool mp3frameheader(unsigned long head)
 }
 
 /*
- * Calculates the length (in milliseconds) of an MP3 file. Currently this code
- * doesn't care about VBR (Variable BitRate) files since it would have to scan
- * through the entire file but this should become a config option in the
- * future.
+ * Calculates the length (in milliseconds) of an MP3 file.
  *
  * Modified to only use integers.
  *
@@ -386,7 +389,11 @@ static int getsonglength(int fd, struct mp3entry *entry)
     unsigned char frame[156];
     unsigned char* xing;
     
-    int version;
+    enum {
+        MPEG_VERSION2_5,
+        MPEG_VERSION1,
+        MPEG_VERSION2
+    } version;
     int layer;
     int bitindex;
     int bitrate;
@@ -394,6 +401,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
     int frequency;
     int chmode;
     int bytecount;
+    int bittable; /* which bitrate table to use */
 
     long bpf;
     long tpf;
@@ -441,11 +449,22 @@ static int getsonglength(int fd, struct mp3entry *entry)
 #endif
     /* MPEG Audio Version */
     switch((header & 0x180000) >> 19) {
-        case 2:
-            version = 2;
+        case 0:
+            /* MPEG version 2.5 is not an official standard */
+            version = MPEG_VERSION2_5;
+            bittable = MPEG_VERSION2; /* use the V2 bit rate table */
             break;
+
+        case 2:
+            /* MPEG version 2 (ISO/IEC 13818-3) */
+            version = MPEG_VERSION2;
+            bittable = MPEG_VERSION2;
+            break;
+
         case 3:
-            version = 1;
+            /* MPEG version 1 (ISO/IEC 11172-3) */
+            version = MPEG_VERSION1;
+            bittable = MPEG_VERSION1;
             break;
         default:
             goto restart;
@@ -468,13 +487,13 @@ static int getsonglength(int fd, struct mp3entry *entry)
 
     /* Bitrate */
     bitindex = (header & 0xF000) >> 12;
-    bitrate = bitrate_table[version-1][layer-1][bitindex];
+    bitrate = bitrate_table[bittable-1][layer-1][bitindex];
     if(bitrate == 0)
         goto restart;
 
     /* Sampling frequency */
     freqindex = (header & 0x0C00) >> 10;
-    frequency = freqtab[version-1][freqindex];
+    frequency = freqtab[version][freqindex];
     if(frequency == 0)
         goto restart;
 
@@ -489,22 +508,22 @@ static int getsonglength(int fd, struct mp3entry *entry)
     /* Calculate bytes per frame, calculation depends on layer */
     switch(layer) {
         case 1:
-            bpf = bitrate_table[version - 1][layer - 1][bitindex];
+            bpf = bitrate_table[bittable - 1][layer - 1][bitindex];
             bpf *= 48000;
-            bpf /= freqtab[version-1][freqindex] << (version - 1);
+            bpf /= freqtab[version][freqindex] << (bittable - 1);
             break;
         case 2:
         case 3:
-            bpf = bitrate_table[version - 1][layer - 1][bitindex];
+            bpf = bitrate_table[bittable - 1][layer - 1][bitindex];
             bpf *= 144000;
-            bpf /= freqtab[version-1][freqindex] << (version - 1);
+            bpf /= freqtab[version][freqindex] << (bittable - 1);
             break;
         default:
             bpf = 1;
     }
 	
     /* Calculate time per frame */
-    tpf = bs[layer] / (freqtab[version-1][freqindex] << (version - 1));
+    tpf = bs[layer] / (freqtab[version][freqindex] << (bittable - 1));
         
     entry->bpf = bpf;
     entry->tpf = tpf;
