@@ -499,7 +499,7 @@ static void setup_sci0(void)
     SMR0 = 0x80;
 
     /* Set baudrate 1Mbit/s */
-    BRR0 = 0x03;
+    BRR0 = 0x02;
 
     /* use SCK as serial clock output */
     SCR0 = 0x01;
@@ -989,7 +989,7 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
     mas_writereg(0xc5, 0);
     mas_writereg(0xc6, 0);
     
-    /* We need to set the PLL for a 14.1318MHz crystal */
+    /* We need to set the PLL for a 14.31818MHz crystal */
     if(mas_version_code == 0x0601) /* Version F10? */
     {
         val = 0x5d9d0;
