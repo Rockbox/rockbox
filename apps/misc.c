@@ -124,63 +124,54 @@ static const unsigned char bmpheader[] =
     0x00, 0x00
 };
 
-static unsigned char buf[112*8];
-static unsigned char buf2[112*8];
-static const char dummy[2] = {0, 0};
-
 void screen_dump(void)
 {
-    int f;
-    int i, shift;
-    int x, y;
+    int fh;
+    int bx, by, ix, iy;
+    int src_byte, src_mask, dst_mask;
     char filename[MAX_PATH];
+    static unsigned char line_block[8][16];
     struct tm *tm = get_time();
-
-    i = 0;
-    for(y = 0;y < LCD_HEIGHT/8;y++)
-    {
-        for(x = 0;x < LCD_WIDTH;x++)
-        {
-            buf[i++] = lcd_framebuffer[y][x];
-        }
-    }
-
-    memset(buf2, 0, sizeof(buf2));
     
-    for(y = 0;y < 64;y++)
-    {
-        shift = y & 7;
-        
-        for(x = 0;x < 112/8;x++)
-        {
-            for(i = 0;i < 8;i++)
-            {
-                buf2[y*112/8+x] |= ((buf[y/8*112+x*8+i] >> shift)
-                                    & 0x01) << (7-i);
-            }
-        }
-    }
-
     snprintf(filename, MAX_PATH, "/dump %04d-%02d-%02d %02d-%02d-%02d.bmp",
              tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday,
              tm->tm_hour, tm->tm_min, tm->tm_sec);
-    f = creat(filename, O_WRONLY);
-    if(f >= 0)
+
+    fh = creat(filename, O_WRONLY);
+    if (fh < 0)
+        return;
+
+    write(fh, bmpheader, sizeof(bmpheader));
+
+    /* BMP image goes bottom up */
+    for (by = LCD_HEIGHT/8 - 1; by >= 0; by--)
     {
-        write(f, bmpheader, sizeof(bmpheader));
-        
-        for(i = 63;i >= 0;i--)
+        memset(&line_block[0][0], 0, 8*16);
+
+        for (bx = 0; bx < LCD_WIDTH/8; bx++)
         {
-            write(f, &buf2[i*14], 14);
-            write(f, dummy, 2);
+            dst_mask = 0x01;
+            for (ix = 7; ix >= 0; ix--)
+            {
+                src_byte = lcd_framebuffer[by][8*bx+ix];
+                src_mask = 0x01;
+                for (iy = 7; iy >= 0; iy--)
+                {
+                    if (src_byte & src_mask)
+                        line_block[iy][bx] |= dst_mask;
+                    src_mask <<= 1;
+                }
+                dst_mask <<= 1;
+            }
         }
         
-        close(f);
+        write(fh, &line_block[0][0], 8*16);
     }
+    close(fh);
 }
 #endif
 
-/* parse a line from a configuration file. the line format is: 
+/* parse a line from a configuration file. the line format is:
 
    name: value
 
