@@ -14,6 +14,7 @@ all: $(OBJS)
 	@(cd mods; $(MAKE))
 	@(cd internals; $(MAKE))
 	@(cd irc; $(MAKE))
+	@(cd devcon; $(MAKE))
 
 main.html: main.t activity.html
 
