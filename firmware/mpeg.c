@@ -1296,6 +1296,7 @@ static void mpeg_thread(void)
                 if ( new_file(0) == -1 )
                 {
                     is_playing = false;
+                    track_change();
                     break;
                 }
 
