@@ -30,6 +30,8 @@
 #include "sprintf.h"
 #include <string.h>
 #include "playlist.h"
+#include "settings.h"
+#include "backlight.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "games_menu.h"
@@ -165,6 +167,54 @@ void scroll_speed(void)
     }
 }
 
+void backlight_timer(void)
+{
+    bool done = false;
+    int timer = global_settings.backlight;
+    char str[16];
+
+    lcd_clear_display();
+    lcd_puts_scroll(0,0,"Backlight");
+
+    while (!done) {
+        snprintf(str,sizeof str,"Timeout: %d s  ", timer);
+        lcd_puts(0,1,str);
+        lcd_update();
+        switch( button_get(true) ) {
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_UP:
+#else
+            case BUTTON_RIGHT:
+#endif
+                timer++;
+                if(timer > 60)
+                    timer = 60;
+                break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_DOWN:
+#else
+            case BUTTON_LEFT:
+#endif
+                timer--;
+                if ( timer < 0 )
+                    timer = 0;
+                break;
+
+#ifdef HAVE_RECORDER_KEYPAD
+            case BUTTON_LEFT:
+#else
+            case BUTTON_STOP:
+            case BUTTON_MENU:
+#endif
+                done = true;
+                global_settings.backlight = timer;
+                backlight_on();
+                break;
+        }
+    }
+}
+
 void shuffle(void)
 {
     bool done = false;
@@ -196,13 +246,14 @@ void main_menu(void)
 {
     int m;
     enum {
-        Games, Screensavers, Version, Sound, Scroll, Shuffle
+        Games, Screensavers, Version, Sound, Scroll, Shuffle, Backlight
     };
 
     /* main menu */
     struct menu_items items[] = {
         { Shuffle,      "Shuffle",      shuffle           },
         { Sound,        "Sound",        sound_menu        },
+        { Backlight,    "Backlight",    backlight_timer   },
         { Scroll,       "Scroll speed", scroll_speed      },
 #ifdef HAVE_LCD_BITMAP
         { Games,        "Games",        games_menu        },
