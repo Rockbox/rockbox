@@ -253,12 +253,6 @@ if [ -z "$debug" ]; then
   esac
 fi
 
-if [ "yes" = "$simulator" ]; then
-  # we deal with the simulator Makefile separately
-  simul
-  exit
-fi
-
 ##################################################################
 # Figure out where the firmware code is!
 #
@@ -340,6 +334,12 @@ if [ -z "$language" ]; then
     fi
 fi
 
+
+if [ "yes" = "$simulator" ]; then
+  # we deal with the simulator Makefile separately
+  simul
+  exit
+fi
 
 sed > Makefile \
  -e "s,@FIRMDIR@,${firmdir},g" \
