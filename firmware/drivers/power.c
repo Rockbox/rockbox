@@ -31,8 +31,12 @@ bool charger_enabled = 0;
 
 bool charger_inserted(void)
 {
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_CHARGE_CTRL
+#ifdef HAVE_FMADC
+    return adc_read(ADC_CHARGE_REGULATOR) < 0x1FF;
+#else
     return adc_read(ADC_EXT_POWER) > 0x100;
+#endif
 #else
     return (PADR & 1) == 0;
 #endif

@@ -191,10 +191,19 @@ int button_get_w_tmo(int ticks)
  * DOWN, PLAY, LEFT, and RIGHT are likewise connected to AN5. */
  
 /* Button analog voltage levels */
+#ifdef HAVE_FMADC
+/* FM Recorder super-special levels */
+#define	LEVEL1		150
+#define	LEVEL2		385
+#define	LEVEL3		545
+#define	LEVEL4		700
+#else
+/* plain bog standard Recorder levels */
 #define	LEVEL1		250
 #define	LEVEL2		500
 #define	LEVEL3		700
 #define	LEVEL4		900
+#endif
 
 /*
  *Initialize buttons
@@ -219,11 +228,22 @@ static int button_read(void)
     int btn = BUTTON_NONE;
 
     /* Check port B pins for ON and OFF */
-    int data = PBDR;
+    int data;
+
+#ifdef HAVE_FMADC
+    /* TODO: use proper defines here, and not the numerics in the
+       function argument */
+    if ( adc_read(3) < 512 )
+        btn |= BUTTON_ON;
+    if ( adc_read(2) > 512 )
+        btn |= BUTTON_OFF;
+#else
+    data = PBDR;
     if ((data & PBDR_BTN_ON) == 0)
         btn |= BUTTON_ON;
     else if ((data & PBDR_BTN_OFF) == 0)
         btn |= BUTTON_OFF;
+#endif
 
     /* Check F1-3 and UP */
     data = adc_read(ADC_BUTTON_ROW1);
@@ -245,12 +265,22 @@ static int button_read(void)
         data = adc_read(ADC_BUTTON_ROW2);
         if (data >= LEVEL4)
             btn |= BUTTON_DOWN;
-        else if (data >= LEVEL3)
+        else if (data >= LEVEL3) {
+#ifdef HAVE_FMADC
+            btn |= BUTTON_RIGHT;
+#else
             btn |= BUTTON_PLAY;
+#endif
+        }
         else if (data >= LEVEL2)
             btn |= BUTTON_LEFT;
-        else if (data >= LEVEL1)
+        else if (data >= LEVEL1) {
+#ifdef HAVE_FMADC
+            btn |= BUTTON_PLAY;
+#else
             btn |= BUTTON_RIGHT;
+#endif
+        }
     }
   
     return btn;

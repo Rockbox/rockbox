@@ -218,7 +218,11 @@ static void usb_tick(void)
 #ifdef ARCHOS_RECORDER
         current_status = (adc_read(ADC_USB_POWER) > 500)?true:false;
 #else
+#ifdef ARCHOS_FMRECORDER
+        current_status = (adc_read(ADC_USB_POWER) < 512)?true:false;
+#else
         current_status = (PADR & 0x8000)?false:true;
+#endif
 #endif
     
         /* Only report when the status has changed */
