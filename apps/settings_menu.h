@@ -21,10 +21,6 @@
 
 #include "menu.h"
 
-Menu playback_settings_menu(void);
-Menu fileview_settings_menu(void);
-Menu display_settings_menu(void);
-Menu system_settings_menu(void);
 Menu settings_menu(void);
 
 #endif

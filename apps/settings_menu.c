@@ -192,24 +192,6 @@ static Menu ff_rewind_accel(void)
     return MENU_OK; 
 } 
 
-Menu settings_menu(void)
-{
-    int m;
-    Menu result;
-
-    struct menu_items items[] = {
-        { "Playback",        playback_settings_menu },
-        { "File View",       fileview_settings_menu },
-        { "Display",         display_settings_menu  },
-        { "System",          system_settings_menu   },
-    };
-    
-    m=menu_init( items, sizeof items / sizeof(struct menu_items) );
-    result = menu_run(m);
-    menu_exit(m);
-    return result;
-}
-
 Menu playback_settings_menu(void)
 {
     int m;
@@ -243,7 +225,7 @@ Menu playback_settings_menu(void)
     return result;
 }
 
-Menu load_default_config(void)
+static Menu reset_settings(void)
 {
     int button = 0;
 
@@ -256,23 +238,26 @@ Menu load_default_config(void)
     lcd_puts(0,1,"Play = Yes");
     lcd_puts(0,2,"Any Other = No");
 #endif
+    lcd_update();
     button = button_get(true);
     if (button == BUTTON_PLAY) {
         settings_reset();
         lcd_clear_display();
         lcd_puts(0,0,"Settings");
         lcd_puts(0,1,"Cleared");
+        lcd_update();
         sleep(HZ);
         return(true);
     } else {
         lcd_clear_display();
         lcd_puts(0,0,"Canceled");
+        lcd_update();
         sleep(HZ);
         return(false);
     }
 }
 
-Menu fileview_settings_menu(void)
+static Menu fileview_settings_menu(void)
 {
     int m;
     Menu result;
@@ -289,7 +274,7 @@ Menu fileview_settings_menu(void)
     return result;
 }
 
-Menu display_settings_menu(void)
+static Menu display_settings_menu(void)
 {
     int m;
     Menu result;
@@ -306,7 +291,7 @@ Menu display_settings_menu(void)
     return result;
 }
 
-Menu system_settings_menu(void)
+static Menu system_settings_menu(void)
 {
     int m;
     Menu result;
@@ -319,7 +304,7 @@ Menu system_settings_menu(void)
 #ifdef HAVE_RTC
         { "Time/Date",       timedate_set    },
 #endif
-        { "Load Default Config", load_default_config },
+        { "Reset settings",  reset_settings },
     };
     
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
@@ -327,3 +312,22 @@ Menu system_settings_menu(void)
     menu_exit(m);
     return result;
 }
+
+Menu settings_menu(void)
+{
+    int m;
+    Menu result;
+
+    struct menu_items items[] = {
+        { "Playback",        playback_settings_menu },
+        { "File View",       fileview_settings_menu },
+        { "Display",         display_settings_menu  },
+        { "System",          system_settings_menu   },
+    };
+    
+    m=menu_init( items, sizeof items / sizeof(struct menu_items) );
+    result = menu_run(m);
+    menu_exit(m);
+    return result;
+}
+
