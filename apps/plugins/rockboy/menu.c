@@ -8,22 +8,28 @@
 #include "string.h"
 #include "button.h"
 #include "rockmacros.h"
+#include "mem.h"
 
 /* load/save state function declarations */
 static void do_slot_menu(bool is_load);
+static void do_opt_menu(void);
+static void munge_name(char *buf, size_t bufsiz);
+
+/* directory ROM save slots belong in */
+#define STATE_DIR "/.rockbox/rockboy"
 
 #define MENU_CANCEL (-1)
 static int do_menu(char *title, char **items, size_t num_items, int sel_item);
 
 /* main menu items */
-#define MAIN_MENU_TITLE "RockBoy Menu"
+#define MAIN_MENU_TITLE "Rockboy"
 typedef enum {
-  ITEM_BACK,
-  ITEM_LOAD,
-  ITEM_SAVE,
-  ITEM_OPT,
-  ITEM_QUIT,
-  ITEM_LAST
+  MM_ITEM_BACK,
+  MM_ITEM_LOAD,
+  MM_ITEM_SAVE,
+  MM_ITEM_OPT,
+  MM_ITEM_QUIT,
+  MM_ITEM_LAST
 } MainMenuItem;
 
 /* strings for the main menu */
@@ -36,20 +42,37 @@ static const char *main_menu[] = {
 };
 
 typedef enum {
-  ITEM_SLOT1,
-  ITEM_SLOT2,
-  ITEM_SLOT3,
-  ITEM_SLOT4,
-  ITEM_SLOT5
+  SM_ITEM_SLOT1,
+  SM_ITEM_SLOT2,
+  SM_ITEM_SLOT3,
+  SM_ITEM_SLOT4,
+  SM_ITEM_SLOT5,
+  SM_ITEM_FILE,
+  SM_ITEM_BACK,
+  SM_ITEM_LAST
 } SlotMenuItem;
 
-/* this is evil, but we snprintf() into it later :( */
+/* this semi-evil, but we snprintf() into these strings later
+ * Note: if you want more save slots, just add more lines 
+ * to this array */
 static const char *slot_menu[] = {
   "1.                  ",
   "2.                  ",
   "3.                  ",
   "4.                  ",
-  "5.                  "
+  "5.                  ",
+  "Save to File...     ",
+  "Previous Menu...    "
+};
+
+#define OPT_MENU_TITLE "Options"
+typedef enum {
+  OM_ITEM_BACK,
+  OM_MENU_LAST
+} OptMenuItem;
+
+static const char *opt_menu[] = {
+  "Previous Menu..."
 };
 
 /*
@@ -79,17 +102,20 @@ int do_user_menu(void) {
     
     /* handle selected menu item */
     switch (mi) {
-      case ITEM_QUIT:
+      case MM_ITEM_QUIT:
         ret = USER_MENU_QUIT;
       case MENU_CANCEL:
-      case ITEM_BACK:
+      case MM_ITEM_BACK:
         done = true;
         break;
-      case ITEM_LOAD:
-        do_slot_menu(1);
+      case MM_ITEM_LOAD:
+        do_slot_menu(true);
         break;
-      case ITEM_SAVE:
-        do_slot_menu(0);
+      case MM_ITEM_SAVE:
+        do_slot_menu(false);
+        break;
+      case MM_ITEM_OPT:
+        do_opt_menu();
         break;
     }
   }
@@ -99,26 +125,158 @@ int do_user_menu(void) {
 }
 
 /*
- * do_load_menu - prompt the user for a memory slot
+ * munge_name - munge a string into a filesystem-safe name
+ */
+static void munge_name(char *buf, const size_t bufsiz) {
+  unsigned int i, max;
+
+  /* check strlen */
+  max = strlen(buf);
+  max = (max < bufsiz) ? max : bufsiz;
+  
+  /* iterate over characters and munge them (if necessary) */
+  for (i = 0; i < max; i++)
+    if (!isalnum(buf[i]))
+      buf[i] = '_';
+}
+
+/*
+ * build_slot_path - build a path to an slot state file for this rom
  *
- * TOOD
+ * Note: uses rom.name.  Is there a safer way of doing this?  Like a ROM
+ * checksum or something like that?
+ */
+static void build_slot_path(char *buf, size_t bufsiz, size_t slot_id) {
+  char name_buf[40];
+
+  /* munge state file name */
+  strncpy(name_buf, rom.name, sizeof(name_buf));
+  name_buf[16] = '\0';
+  munge_name(name_buf, strlen(name_buf));
+
+  /* glom the whole mess together */
+  snprintf(buf, bufsiz, "%s/%s-%d.rbs", STATE_DIR, name_buf, slot_id + 1);
+}
+
+/*
+ * do_file - load or save game data in the given file
  *
+ * Returns true on success and false on failure.
+ *
+ * @desc is a brief user-provided description (<20 bytes) of the state.
+ * If no description is provided, set @desc to NULL.
+ *
+ */
+static bool do_file(char *path, char *desc, bool is_load) {
+  char buf[200], desc_buf[20];
+  int fd, file_mode;
+    
+  /* set file mode */
+  file_mode = is_load ? O_RDONLY : (O_WRONLY | O_CREAT);
+  
+  /* attempt to open file descriptor here */
+  if ((fd = open(path, file_mode)) <= 0)
+    return false;
+
+  /* load/save state */
+  if (is_load) {
+    /* load description */
+    read(fd, desc_buf, 20);
+
+    /* load state */
+    loadstate(fd);
+
+    /* print out a status message so the user knows the state loaded */
+    snprintf(buf, sizeof(buf), "Loaded state from \"%s\"", path);
+    rb->splash(HZ * 1, true, buf);
+  } else {
+    /* build description buffer */
+    memset(desc_buf, 0, sizeof(desc_buf));
+    if (desc)
+      strncpy(desc_buf, desc, sizeof(desc_buf));
+
+    /* save state */
+    write(fd, desc_buf, 20);
+    savestate(fd);
+  }
+
+  /* close file descriptor */
+  close(fd);
+
+  /* return true (for success) */
+  return true;
+}
+
+/*
+ * do_slot - load or save game data in the given slot
+ *
+ * Returns true on success and false on failure.
+ */
+static bool do_slot(size_t slot_id, bool is_load) {
+  char path_buf[256], desc_buf[20];
+  
+  /* build slot filename, clear desc buf */
+  build_slot_path(path_buf, sizeof(path_buf), slot_id);
+  memset(desc_buf, 0, sizeof(desc_buf));
+
+  /* if we're saving to a slot, then get a brief description */
+  if (!is_load) {
+    if (rb->kbd_input(desc_buf, sizeof(desc_buf)) || !strlen(desc_buf)) {
+      memset(desc_buf, 0, sizeof(desc_buf));
+      strncpy(desc_buf, "Untitled", sizeof(desc_buf));
+    }
+  }
+
+  /* load/save file */
+  return do_file(path_buf, desc_buf, is_load);
+}
+
+/* 
+ * get information on the given slot
+ */
+static void slot_info(char *info_buf, size_t info_bufsiz, size_t slot_id) {
+  char buf[256];
+  int fd;
+
+  /* get slot file path */
+  build_slot_path(buf, sizeof(buf), slot_id);
+
+  /* attempt to open slot */
+  if ((fd = open(buf, O_RDONLY)) >= 0) {
+    /* this slot has a some data in it, read it */
+    if (read(fd, buf, 20) > 0) {
+      buf[20] = '\0';
+      snprintf(info_buf, info_bufsiz, "%2d. %s", slot_id + 1, buf);
+    } else {
+      snprintf(info_buf, info_bufsiz, "%2d. ERROR", slot_id + 1);
+    }
+    close(fd);
+  } else {
+    /* if we couldn't open the file, then the slot is empty */
+    snprintf(info_buf, info_bufsiz, "%2d.", slot_id + 1);
+  }
+}
+
+/*
+ * do_slot_menu - prompt the user for a load/save memory slot
  */
 static void do_slot_menu(bool is_load) {
   int i, mi, ret, num_items;
   bool done = false;
-  char *title;
+  char *title, buf[256];
 
   /* set defaults */
   ret = 0; /* return value */
   mi = 0; /* initial menu selection */
   num_items = sizeof(slot_menu) / sizeof(char*);
   
-  /* create menu items */
-  for (i = 0; i < num_items; i++) {
-    /* TODO: get slot info here */
-    snprintf((char*) slot_menu[i], sizeof(slot_menu[i]), "%2d. %s", i + 1, "<empty>");
-  }
+  /* create menu items (the last two are file and previous menu,
+   * so don't populate those) */
+  for (i = 0; i < num_items - 2; i++)
+    slot_info((char*) slot_menu[i], 20, i);
+  
+  /* set text of file item */
+  snprintf((char*) slot_menu[SM_ITEM_FILE], 20, "%s File...", is_load ? "Load from" : "Save to");
   
   /* set menu title */
   title = is_load ? "Load State" : "Save State";
@@ -129,16 +287,45 @@ static void do_slot_menu(bool is_load) {
     mi = do_menu(title, (char**) slot_menu, num_items, mi);
     
     /* handle selected menu item */
-    if (mi == MENU_CANCEL) {
-      done = true;
-      break;
-    } else {
-      if (is_load) {
-        /* TODO: load slot here */
+    done = true;
+    if (mi != MENU_CANCEL && mi != SM_ITEM_BACK) {
+      if (mi == SM_ITEM_FILE) {
+        char rom_name_buf[40];
+
+        /* munge rom name to valid filename */
+        strncpy(rom_name_buf, rom.name, 16);
+        munge_name(rom_name_buf, sizeof(rom_name_buf));
+
+        /* create default filename */
+        snprintf(buf, sizeof(buf), "/%s.rbs", rom_name_buf);
+
+        /* prompt for output filename, save to file */
+        if (!rb->kbd_input(buf, sizeof(buf)))
+          done = do_file(buf, NULL, is_load);
       } else {
-        /* TODO: save slot here */
+        done = do_slot(mi, is_load);
       }
+
+      /* if we couldn't save the state file, then print out an
+       * error message */
+      if (!is_load && !done)
+        rb->splash(HZ * 2, true, "Couldn't save state file.");
     }
+  }
+}
+
+static void do_opt_menu(void) {
+  int mi, num_items;
+  bool done = false;
+
+  /* set a couple of defaults */
+  num_items = sizeof(opt_menu) / sizeof(char*);
+  mi = 0;
+  
+  while (!done) {
+    mi = do_menu(OPT_MENU_TITLE, (char**) opt_menu, num_items, mi);
+    if (mi == MENU_CANCEL || mi == OM_ITEM_BACK)
+      done = true;
   }
 }
 
@@ -148,7 +335,7 @@ static void do_slot_menu(bool is_load) {
 /* at some point i'll make this a generic menu interface, but for now,
  * these defines will suffice */
 #define MENU_X 10
-#define MENU_Y 10
+#define MENU_Y 8
 #define MENU_WIDTH (LCD_WIDTH - 2 * MENU_X)
 #define MENU_HEIGHT (LCD_HEIGHT - 2 * MENU_Y)
 #define MENU_RECT MENU_X, MENU_Y, MENU_WIDTH, MENU_HEIGHT
@@ -201,7 +388,7 @@ static void draw_menu(char *title, char **items, size_t num_items)  {
   int x, y, w, h, by;
 
   /* set to default? font */
-  /* rb->lcd_setfont(0); */
+  rb->lcd_setfont(0);
   
   /* draw the outline */
   rb->lcd_fillrect(SHADOW_RECT);

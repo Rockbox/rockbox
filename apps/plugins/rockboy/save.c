@@ -169,9 +169,12 @@ void loadstate(int fd)
 	int irl = hw.cgb ? 8 : 2;
 	int vrl = hw.cgb ? 4 : 2;
 	int srl = mbc.ramsize << 1;
+  size_t base_offset;
 
 	ver = hramofs = hiofs = palofs = oamofs = wavofs = 0;
 
+  base_offset = lseek(fd, 0, SEEK_CUR);
+  
 	read(fd,buf, 4096);
 	
 	for (j = 0; header[j][0]; j++)
@@ -207,14 +210,18 @@ void loadstate(int fd)
 	if (wavofs) memcpy(snd.wave, buf+wavofs, sizeof snd.wave);
 	else memcpy(snd.wave, ram.hi+0x30, 16); /* patch data from older files */
 
-	lseek(fd, iramblock<<12, SEEK_SET);
+	lseek(fd, base_offset + (iramblock << 12), SEEK_SET);
 	read(fd,ram.ibank, 4096*irl);
 	
-	lseek(fd, vramblock<<12, SEEK_SET);
+	lseek(fd, base_offset + (vramblock << 12), SEEK_SET);
 	read(fd,lcd.vbank, 4096*vrl);
 	
-	lseek(fd, sramblock<<12, SEEK_SET);
+	lseek(fd, base_offset + (sramblock << 12), SEEK_SET);
 	read(fd,ram.sbank, 4096*srl);
+        vram_dirty();
+        pal_dirty();
+        sound_dirty();
+        mem_updatemap();			
 }
 
 void savestate(int fd)
@@ -226,6 +233,7 @@ void savestate(int fd)
 	int irl = hw.cgb ? 8 : 2;
 	int vrl = hw.cgb ? 4 : 2;
 	int srl = mbc.ramsize << 1;
+  size_t base_offset;
 
 	ver = 0x105;
 	iramblock = 1;
@@ -261,16 +269,18 @@ void savestate(int fd)
 	memcpy(buf+oamofs, lcd.oam.mem, sizeof lcd.oam);
 	memcpy(buf+wavofs, snd.wave, sizeof snd.wave);
 
-	lseek(fd, 0, SEEK_SET);
+  /* calculate base offset for output file */
+  /* (we'll seek relative to that from now on) */
+	base_offset = lseek(fd, 0, SEEK_CUR);
 	write(fd,buf, 4096);
 	
-	lseek(fd, iramblock<<12, SEEK_SET);
+	lseek(fd, base_offset + (iramblock << 12), SEEK_SET);
 	write(fd,ram.ibank, 4096*irl);
 	
-	lseek(fd, vramblock<<12, SEEK_SET);
+	lseek(fd, base_offset + (vramblock << 12), SEEK_SET);
 	write(fd,lcd.vbank, 4096*vrl);
 	
-	lseek(fd, sramblock<<12, SEEK_SET);
+	lseek(fd, base_offset + (sramblock << 12), SEEK_SET);
 	write(fd,ram.sbank, 4096*srl);
 }
 

@@ -44,6 +44,8 @@ void pcm_init(void);
 void doevents(void);
 void ev_poll(void);
 int do_user_menu(void);
+void loadstate(int fd);
+void savestate(int fd);
 #define USER_MENU_QUIT -2
 
 
