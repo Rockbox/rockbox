@@ -123,7 +123,7 @@ extern unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
 extern void lcd_setmargins(int xmargin, int ymargin);
 extern int  lcd_getxmargin(void);
 extern int  lcd_getymargin(void);
-extern void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
+extern void lcd_bitmap (const unsigned char *src, int x, int y, int nx, int ny,
 			bool clear);
 extern void lcd_clearrect (int x, int y, int nx, int ny);
 extern void lcd_fillrect (int x, int y, int nx, int ny);
@@ -141,7 +141,7 @@ extern void lcd_set_flip(bool yesno);
 extern void lcd_bidir_scroll(int threshold);
 extern void lcd_scroll_step(int pixels);
 extern void lcd_setfont(int font);
-extern void lcd_putsxy(int x, int y, unsigned char *string);
+extern void lcd_putsxy(int x, int y, const unsigned char *string);
 extern int  lcd_getstringsize(unsigned char *str, int *w, int *h);
 extern int  lcd_getstringsize(unsigned char *str, int *w, int *h);
 

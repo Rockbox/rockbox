@@ -120,8 +120,8 @@ struct plugin_api {
     void (*lcd_unlock_pattern)(unsigned char pat);
     void (*lcd_putc)(int x, int y, unsigned short ch);
 #else
-    void (*lcd_putsxy)(int x, int y, unsigned char *string);
-    void (*lcd_bitmap)(unsigned char *src, int x, int y,
+    void (*lcd_putsxy)(int x, int y, const unsigned char *string);
+    void (*lcd_bitmap)(const unsigned char *src, int x, int y,
                        int nx, int ny, bool clear);
     void (*lcd_drawline)(int x1, int y1, int x2, int y2);
     void (*lcd_clearline)(int x1, int y1, int x2, int y2);

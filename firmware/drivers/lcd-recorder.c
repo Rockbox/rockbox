@@ -371,7 +371,7 @@ void lcd_puts_style(int x, int y, unsigned char *str, int style)
 }
 
 /* put a string at a given pixel position, skipping first ofs pixel columns */
-static void lcd_putsxyofs(int x, int y, int ofs, unsigned char *str)
+static void lcd_putsxyofs(int x, int y, int ofs, const unsigned char *str)
 {
     int ch;
     struct font* pf = font_get(curfont);
@@ -428,7 +428,7 @@ static void lcd_putsxyofs(int x, int y, int ofs, unsigned char *str)
 }
 
 /* put a string at a given pixel position */
-void lcd_putsxy(int x, int y, unsigned char *str)
+void lcd_putsxy(int x, int y, const unsigned char *str)
 {
     lcd_putsxyofs(x, y, 0, str);
 }
@@ -450,12 +450,13 @@ void lcd_putsxy(int x, int y, unsigned char *str)
  * Draw a bitmap at (x, y), size (nx, ny)
  * if 'clear' is true, clear destination area first
  */
-void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
+void lcd_bitmap (const unsigned char *src, int x, int y, int nx, int ny,
                  bool clear) __attribute__ ((section (".icode")));
-void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
+void lcd_bitmap (const unsigned char *src, int x, int y, int nx, int ny,
                  bool clear)
 {
-    unsigned char *src_col, *dst, *dst_col;
+    const unsigned char *src_col;
+    unsigned char *dst, *dst_col;
     unsigned int data, mask1, mask2, mask3, mask4;
     int stride, shift;
 

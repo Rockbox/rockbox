@@ -25,7 +25,7 @@
 
 int filetype_get_attr(char*);
 #ifdef HAVE_LCD_BITMAP
-char* filetype_get_icon(int);
+const char* filetype_get_icon(int);
 #else
 int   filetype_get_icon(int);
 #endif
@@ -37,7 +37,7 @@ int   filetype_load_plugin(char*,char*);
 
 struct file_type {
 #ifdef HAVE_LCD_BITMAP
-    unsigned char* icon; /* the icon which shall be used for it, NULL if unknown */
+    const unsigned char* icon; /* the icon which shall be used for it, NULL if unknown */
 #else
     int icon; /* the icon which shall be used for it, -1 if unknown */
 #endif

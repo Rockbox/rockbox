@@ -163,8 +163,6 @@ void tree_get_filetypes(struct filetype** types, int* count)
 #define SCROLLBAR_Y      lcd_getymargin()
 #define SCROLLBAR_WIDTH  6
 
-extern unsigned char bitmap_icons_6x8[LastIcon][6];
-
 #else /* HAVE_LCD_BITMAP */
 
 #define TREE_MAX_ON_SCREEN   2
@@ -461,7 +459,7 @@ static int showdir(char *path, int start, int *dirfilter)
     bool dir_buffer_full;
 
 #ifdef HAVE_LCD_BITMAP
-    char* icon;
+    const char* icon;
     int line_height;
     int fw, fh;
     lcd_setfont(FONT_UI);

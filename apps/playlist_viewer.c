@@ -118,10 +118,6 @@ static struct playlist_entry        tracks[MAX_PLAYLIST_ENTRIES];
 /* Used when viewing playlists on disk */
 static struct playlist_info         temp_playlist;
 
-#ifdef HAVE_LCD_BITMAP
-extern unsigned char bitmap_icons_6x8[LastIcon][6];
-#endif
-
 static bool initialize(char* filename, bool reload);
 static void load_playlist_entries(int start_index);
 static void load_playlist_entries_r(int end_index);

@@ -136,7 +136,7 @@ void filetype_init(void)
 
 /* get icon */
 #ifdef HAVE_LCD_BITMAP
-char* filetype_get_icon(int attr)
+const char* filetype_get_icon(int attr)
 #else
 int   filetype_get_icon(int attr)
 #endif
