@@ -545,14 +545,16 @@ static int add_directory_to_playlist(struct playlist_info* playlist,
 
     /* use the tree browser dircache to load files */
     global_settings.dirfilter = SHOW_ALL;
-    num_files = ft_load(tc, dirname);
-    files = (struct entry*) tc->dircache;
 
-    if(!num_files)
+    if (ft_load(tc, dirname) < 0)
     {
         splash(HZ*2, true, str(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));
-        return 0;
+        global_settings.dirfilter = dirfilter;
+        return -1;
     }
+
+    files = (struct entry*) tc->dircache;
+    num_files = tc->filesindir;
 
     /* we've overwritten the dircache so tree browser will need to be
        reloaded */
