@@ -14,7 +14,10 @@ for ( @tarballs ) {
     $log = "";
     if (/-(\d+)/) {
         $date = $1;
-        if ( -f "$basedir/changes-$date.log") {
+        if ( -f "$basedir/changes-$date.txt") {
+            $log = "<a href=\"daily/changes-$date.txt\">Changelog</a>";
+        }
+        elsif ( -f "$basedir/changes-$date.log") {
             $log = "<a href=\"daily/changes-$date.log\">Changelog</a>";
         }
     }
