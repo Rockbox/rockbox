@@ -58,6 +58,7 @@ Playlist/Song Info Tags:
         Player: This will display a 1 character "cup" that empties as the
                 progresses.
         Recorder: This will replace the entire line with a progress bar.
+  %pf : Player: Full-line progress bar + time display
   %pc : Current Time In Song
   %pe : Total Number of Playlist Entries
   %pm : Peak Meter (Recorder only)
@@ -67,6 +68,7 @@ Playlist/Song Info Tags:
   %pr : Remaining Time In Song
   %ps : Shuffle. Shows 's' if shuffle mode is enabled.
   %pt : Total Track Time
+  %pv : Current volume
 
 Conditional Tags (If/Else block):
   %?xx<|> : Conditional: if the tag specified by "xx" has a value, the 
