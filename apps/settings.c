@@ -452,8 +452,10 @@ void set_int(char* string,
         switch( button_get(true) ) {
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_UP:
+            case BUTTON_UP | BUTTON_REPEAT:
 #else
             case BUTTON_RIGHT:
+            case BUTTON_RIGHT | BUTTON_REPEAT:
 #endif
                 *variable += step;
                 if(*variable > max )
@@ -462,8 +464,10 @@ void set_int(char* string,
 
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_DOWN:
+            case BUTTON_DOWN | BUTTON_REPEAT:
 #else
             case BUTTON_LEFT:
+            case BUTTON_LEFT | BUTTON_REPEAT:
 #endif
                 *variable -= step;
                 if(*variable < min )
@@ -499,8 +503,10 @@ void set_option(char* string, int* variable, char* options[], int numoptions )
         switch ( button_get(true) ) {
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_UP:
+            case BUTTON_UP | BUTTON_REPEAT:
 #else
             case BUTTON_RIGHT:
+            case BUTTON_RIGHT | BUTTON_REPEAT:
 #endif
                 if ( *variable < (numoptions-1) )
                     (*variable)++;
@@ -508,8 +514,10 @@ void set_option(char* string, int* variable, char* options[], int numoptions )
 
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_DOWN:
+            case BUTTON_DOWN | BUTTON_REPEAT:
 #else
             case BUTTON_LEFT:
+            case BUTTON_LEFT | BUTTON_REPEAT:
 #endif
                 if ( *variable > 0 )
                     (*variable)--;
