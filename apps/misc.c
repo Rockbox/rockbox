@@ -221,7 +221,6 @@ bool clean_shutdown(void)
         lcd_clear_display();
         splash(0, true, str(LANG_SHUTTINGDOWN));
         mpeg_stop();
-        settings_save();
         ata_flush();
         ata_spindown(1);
         while(ata_disk_is_active())
