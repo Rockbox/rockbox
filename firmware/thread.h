@@ -16,17 +16,12 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __thread_h
-#define __thread_h	1
-
-#include <sys/types.h>
+#ifndef THREAD_H
+#define THREAD_H
 
 #define MAXTHREADS	16
 
-extern int	create_thread(void* fp, void* sp, int stk_size);
-extern void	switch_thread(void);
+int create_thread(void* fp, void* sp, int stk_size);
+void switch_thread(void);
 
-#endif /* __thread.h */
-
-/* eof */
-
+#endif

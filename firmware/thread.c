@@ -20,20 +20,22 @@
 
 typedef union
 {
-  struct regs_t
-  {
-    void*	lr;
-    u_int32_t	cr;
-    void*	sp;
-  } regs;
-  u_int32_t	mem[32];
+   struct regs_t
+   {
+      unsigned int  r[7]; /* Registers r8 thru r14 */
+      void          *sp;  /* Stack pointer (r15) */
+      unsigned int  sr;   /* Status register */
+      void*         gbr;  /* Global base register */
+      void*         pr;   /* Procedure register */
+   } regs;
+   unsigned int mem[32];
 } ctx_t;
 
 typedef struct
 {
-  int		created;
-  int		current;
-  ctx_t		ctx[MAXTHREADS] __attribute__ ((aligned (32)));
+   int		created;
+   int		current;
+   ctx_t ctx[MAXTHREADS] __attribute__ ((aligned (32)));
 } thread_t;
 
 static thread_t threads = {1, 0};
@@ -42,74 +44,47 @@ static thread_t threads = {1, 0};
  * Store non-volatile context.
  *---------------------------------------------------------------------------
  */
-static inline void
-stctx(void*	addr)
+static __inline__ void stctx(void* addr)
 {
-  u_int32_t	tmp;
-
-  __asm__ __volatile__ ("mflr %0" : "=r" (tmp));
-  __asm__ __volatile__ ("stw  %0,0(%1)" :: "r" (tmp), "b" (addr) : "memory");
-  __asm__ __volatile__ ("mfcr %0" : "=r" (tmp));
-  __asm__ __volatile__ ("stw  %0,4(%1)" :: "r" (tmp), "b" (addr) : "memory");
-  __asm__ __volatile__ ("stw 1, 8(%0)\n\t"
-			"stw 2, 12(%0)\n\t"
-			"stw 13,16(%0)\n\t"
-			"stw 14,20(%0)\n\t"
-			"stw 15,24(%0)\n\t"
-			"stw 16,28(%0)\n\t"
-			"stw 17,32(%0)\n\t"
-			"stw 18,36(%0)\n\t"
-			"stw 19,40(%0)\n\t"
-			"stw 20,44(%0)\n\t"
-			"stw 21,48(%0)\n\t"
-			"stw 22,52(%0)\n\t"
-			"stw 23,56(%0)\n\t"
-			"stw 24,60(%0)\n\t"
-			"stw 25,64(%0)\n\t"
-			"stw 26,68(%0)\n\t"
-			"stw 27,72(%0)\n\t"
-			"stw 28,76(%0)\n\t"
-			"stw 29,80(%0)\n\t"
-			"stw 30,84(%0)\n\t"
-			"stw 31,88(%0)\n\t"
-			:: "b" (addr) : "memory");
+   __asm__ __volatile__ ("mov.l r8, @(0, %0)" :: "r" (addr));
+   __asm__ __volatile__ ("mov.l r9, @(4, %0)" :: "r" (addr));
+   __asm__ __volatile__ ("mov.l r10, @(8, %0)" :: "r" (addr));
+   __asm__ __volatile__ ("mov.l r11, @(12, %0)" :: "r" (addr));
+   __asm__ __volatile__ ("mov.l r12, @(16, %0)" :: "r" (addr));
+   __asm__ __volatile__ ("mov.l r13, @(20, %0)" :: "r" (addr));
+   __asm__ __volatile__ ("mov.l r14, @(24, %0)" :: "r" (addr));
+   __asm__ __volatile__ ("mov.l r15, @(28, %0)" :: "r" (addr));
+   
+   __asm__ __volatile__ ("stc sr, r0");
+   __asm__ __volatile__ ("mov.l r0, @(32, %0)" :: "r" (addr));
+   __asm__ __volatile__ ("stc gbr, r0");
+   __asm__ __volatile__ ("mov.l r0, @(36, %0)" :: "r" (addr));
+   __asm__ __volatile__ ("sts pr, r0");
+   __asm__ __volatile__ ("mov.l r0, @(40, %0)" :: "r" (addr));
 }
 
 /*--------------------------------------------------------------------------- 
  * Load non-volatile context.
  *---------------------------------------------------------------------------
  */
-static inline void
-ldctx(void*	addr)
+static __inline__ void ldctx(void* addr)
 {
-  u_int32_t	tmp;
+   __asm__ __volatile__ ("mov.l @(0, %0), r8" :: "r" (addr));
+   __asm__ __volatile__ ("mov.l @(4, %0), r9" :: "r" (addr));
+   __asm__ __volatile__ ("mov.l @(8, %0), r10" :: "r" (addr));
+   __asm__ __volatile__ ("mov.l @(12, %0), r11" :: "r" (addr));
+   __asm__ __volatile__ ("mov.l @(16, %0), r12" :: "r" (addr));
+   __asm__ __volatile__ ("mov.l @(20, %0), r13" :: "r" (addr));
+   __asm__ __volatile__ ("mov.l @(24, %0), r14" :: "r" (addr));
+   __asm__ __volatile__ ("mov.l @(28, %0), r15" :: "r" (addr));
 
-  __asm__ __volatile__ ("lwz  %0,0(%1)" : "=r" (tmp): "b" (addr) : "memory");
-  __asm__ __volatile__ ("mtlr %0" : "=r" (tmp));
-  __asm__ __volatile__ ("lwz  %0,4(%1)" : "=r" (tmp): "b" (addr) : "memory");
-  __asm__ __volatile__ ("mtcr %0" : "=r" (tmp));
-  __asm__ __volatile__ ("lwz 1, 8(%0)\n\t"
-			"lwz 2, 12(%0)\n\t"
-			"lwz 13,16(%0)\n\t"
-			"lwz 14,20(%0)\n\t"
-			"lwz 15,24(%0)\n\t"
-			"lwz 16,28(%0)\n\t"
-			"lwz 17,32(%0)\n\t"
-			"lwz 18,36(%0)\n\t"
-			"lwz 19,40(%0)\n\t"
-			"lwz 20,44(%0)\n\t"
-			"lwz 21,48(%0)\n\t"
-			"lwz 22,52(%0)\n\t"
-			"lwz 23,56(%0)\n\t"
-			"lwz 24,60(%0)\n\t"
-			"lwz 25,64(%0)\n\t"
-			"lwz 26,68(%0)\n\t"
-			"lwz 27,72(%0)\n\t"
-			"lwz 28,76(%0)\n\t"
-			"lwz 29,80(%0)\n\t"
-			"lwz 30,84(%0)\n\t"
-			"lwz 31,88(%0)\n\t"
-			:: "b" (addr) : "memory");
+   __asm__ __volatile__ ("mov.l @(32, %0), r0" :: "r" (addr));
+   __asm__ __volatile__ ("ldc r0, sr");
+   __asm__ __volatile__ ("mov.l @(36, %0), r0" :: "r" (addr));
+   __asm__ __volatile__ ("ldc r0, gbr");
+   __asm__ __volatile__ ("mov.l @(40, %0), r0" :: "r" (addr));
+   __asm__ __volatile__ ("lds r0, pr");
+   __asm__ __volatile__ ("mov.l r0, @(0, r15)");
 }
 
 /*--------------------------------------------------------------------------- 
@@ -137,23 +112,18 @@ switch_thread(void)
  * Return 0 if context area could be allocated, else -1.
  *---------------------------------------------------------------------------
  */
-int
-create_thread(void*	fp,
-	      void*	sp,
-	      int	stk_size)
+int create_thread(void* fp, void* sp, int stk_size)
 {
-  thread_t*		t = &threads;
+   thread_t* t = &threads;
 
-  if (t->created >= MAXTHREADS)
-    return -1;
-  else
-    {
+   if (t->created >= MAXTHREADS)
+      return -1;
+   else
+   {
       ctx_t* ctxp = &t->ctx[t->created++];
       stctx(ctxp);
-      ctxp->regs.sp = (void*)(((u_int32_t)sp + stk_size - 256) & ~31);
-      ctxp->regs.lr = fp;
-    }
-  return 0;
+      ctxp->regs.sp = (void*)(((unsigned int)sp + stk_size) & ~31);
+      ctxp->regs.pr = fp;
+   }
+   return 0;
 }
-
-/* eof */
