@@ -1512,7 +1512,8 @@ void mpeg_play(int offset)
             break;
         if(mp3info(&taginfo, trackname)) {
             /* bad mp3, move on */
-            steps++;
+            if(++steps > playlist_amount())
+                break;
             continue;
         }
         playlist_next(steps);
@@ -1575,7 +1576,8 @@ void mpeg_next(void)
         if(!file)
             break;
         if(mp3info(&taginfo, file)) {
-            steps++;
+            if(++steps > playlist_amount())
+                break;
             continue;
         }
         index = playlist_next(steps);
