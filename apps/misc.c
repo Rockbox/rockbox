@@ -103,7 +103,7 @@ int main(int argc, char **argv)
 #endif
 
 #ifdef SCREENDUMP
-extern unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8];
+extern unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
 static unsigned char bmpheader[] =
 {
     0x42, 0x4d, 0x3e, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3e, 0x00,
@@ -131,7 +131,7 @@ void screen_dump(void)
     {
         for(x = 0;x < LCD_WIDTH;x++)
         {
-            buf[i++] = lcd_framebuffer[x][y];
+            buf[i++] = lcd_framebuffer[y][x];
         }
     }
 

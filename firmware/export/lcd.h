@@ -111,14 +111,14 @@ void lcd_remove_cursor(void);
 #define LCD_HEIGHT      64    /* Display height in pixels */
 #endif
 
-#define DRAW_PIXEL(x,y) lcd_framebuffer[(x)][(y)/8] |= (1<<((y)&7))
-#define CLEAR_PIXEL(x,y) lcd_framebuffer[(x)][(y)/8] &= ~(1<<((y)&7))
-#define INVERT_PIXEL(x,y) lcd_framebuffer[(x)][(y)/8] ^= (1<<((y)&7))
+#define DRAW_PIXEL(x,y) lcd_framebuffer[(y)/8][(x)] |= (1<<((y)&7))
+#define CLEAR_PIXEL(x,y) lcd_framebuffer[(y)/8][(x)] &= ~(1<<((y)&7))
+#define INVERT_PIXEL(x,y) lcd_framebuffer[(y)/8][(x)] ^= (1<<((y)&7))
 
 /*
  * Memory copy of display bitmap
  */
-extern unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8];
+extern unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
 
 extern void lcd_setmargins(int xmargin, int ymargin);
 extern int  lcd_getxmargin(void);

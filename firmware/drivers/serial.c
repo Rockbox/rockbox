@@ -177,7 +177,7 @@ static void screen_dump(void)
     {
         for(x = 0;x < LCD_WIDTH;x++)
         {
-            serial_tx(lcd_framebuffer[x][y]);
+            serial_tx(lcd_framebuffer[y][x]);
         }
     }
     set_irq_level(level);

@@ -23,7 +23,7 @@
 #include "lcd.h"
 #include "lcd-playersim.h"
 
-unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8]; /* the display */
+unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH]; /* the display */
 char bitmap[LCD_HEIGHT][LCD_WIDTH]; /* the ui display */
 
 BITMAPINFO2 bmi =
@@ -80,7 +80,7 @@ void lcd_update()
 
     for (x = 0; x < LCD_WIDTH; x++)
         for (y = 0; y < LCD_HEIGHT; y++)
-            bitmap[y][x] = ((lcd_framebuffer[x][y/8] >> (y & 7)) & 1);
+            bitmap[y][x] = ((lcd_framebuffer[y/8][x] >> (y & 7)) & 1);
 
     InvalidateRect (hGUIWnd, NULL, FALSE);
 
@@ -107,7 +107,7 @@ void lcd_update_rect(int x_start, int y_start,
 
     for (x = x_start; x < xmax; x++)
         for (y = y_start; y < ymax; y++)
-            bitmap[y][x] = ((lcd_framebuffer[x][y/8] >> (y & 7)) & 1);
+            bitmap[y][x] = ((lcd_framebuffer[y/8][x] >> (y & 7)) & 1);
 
     /* Bagder: If I only knew how, I would make this call only invalidate
        the actual rectangle we want updated here, this NULL thing here will

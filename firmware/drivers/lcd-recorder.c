@@ -107,7 +107,7 @@ static int curfont = FONT_SYSFIXED;
 static int xoffset = 0; /* needed for flip */
 #endif
 
-unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8];
+unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
 
 /* All zeros and ones bitmaps for area filling */
 static unsigned char zeros[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -166,7 +166,6 @@ void lcd_init (void)
 
 /* Performance function that works with an external buffer
    note that y and height are in 8-pixel units! */
-void lcd_blit (unsigned char* p_data, int x, int y, int width, int height, int stride) __attribute__ ((section (".icode")));
 void lcd_blit (unsigned char* p_data, int x, int y, int width, int height, int stride)
 {
     /* Copy display bitmap to hardware */
@@ -189,7 +188,7 @@ void lcd_blit (unsigned char* p_data, int x, int y, int width, int height, int s
 void lcd_update (void) __attribute__ ((section (".icode")));
 void lcd_update (void)
 {
-    int x, y;
+    int y;
 
     /* Copy display bitmap to hardware */
     for (y = 0; y < LCD_HEIGHT/8; y++)
@@ -198,8 +197,7 @@ void lcd_update (void)
         lcd_write (true, LCD_CNTL_HIGHCOL | ((xoffset>>4) & 0xf));
         lcd_write (true, LCD_CNTL_LOWCOL | (xoffset & 0xf));
 
-        for (x = 0; x < LCD_WIDTH; x++)
-            lcd_write (false, lcd_framebuffer[x][y]);
+        lcd_write_data (lcd_framebuffer[y], LCD_WIDTH);
     }
 }
 
@@ -211,17 +209,15 @@ void lcd_update_rect (int x_start, int y,
                       int width, int height)
 {
     int ymax;
-    int xmax;
-    int x;
 
     /* The Y coordinates have to work on even 8 pixel rows */
-    ymax = (y + height)/8;
+    ymax = (y + height-1)/8;
     y /= 8;
 
-    xmax = x_start + width;
-
-    if(xmax > LCD_WIDTH)
-        xmax = LCD_WIDTH;
+    if(x_start + width > LCD_WIDTH)
+        width = LCD_WIDTH - x_start;
+    if (width <= 0)
+        return; /* nothing left to do, 0 is harmful to lcd_write_data() */
     if(ymax >= LCD_HEIGHT/8)
         ymax = LCD_HEIGHT/8-1;
 
@@ -232,8 +228,7 @@ void lcd_update_rect (int x_start, int y,
         lcd_write (true, LCD_CNTL_HIGHCOL | (((x_start+xoffset)>>4) & 0xf));
         lcd_write (true, LCD_CNTL_LOWCOL | ((x_start+xoffset) & 0xf));
 
-        for (x = x_start; x < xmax; x++)
-            lcd_write (false, lcd_framebuffer[x][y]);
+        lcd_write_data (&lcd_framebuffer[y][x_start], width);
     }
 }
 
@@ -459,7 +454,15 @@ void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
         ny = LCD_HEIGHT - y;      
 
     shift = y & 7;
-    dst2 = &lcd_framebuffer[x][y/8];
+    dst2 = &lcd_framebuffer[y/8][x];
+
+    /* short cut for byte aligned match (e.g. standard text) */
+    if (!shift && ny==8)
+    {
+        memcpy(dst2, src, nx);
+        return;
+    }
+
     ny += shift;
 
     /* Calculate bit masks */
@@ -479,7 +482,7 @@ void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
     for (x = 0; x < nx; x++)
     {
         dst = dst2;
-        dst2 += LCD_HEIGHT/8;
+        dst2++;
         data = 0;
         y = 0;
 
@@ -489,7 +492,7 @@ void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
             data = *src++ << shift;
             *dst = (*dst & mask) | data;
             data >>= 8;
-            dst++;
+            dst += LCD_WIDTH;
 
             /* Intermediate rows */
             for (y = 8; y < ny-8; y += 8)
@@ -497,7 +500,7 @@ void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
                 data |= *src++ << shift;
                 *dst = (*dst & mask2) | data;
                 data >>= 8;
-                dst++;
+                dst += LCD_WIDTH;
             }
         }
 

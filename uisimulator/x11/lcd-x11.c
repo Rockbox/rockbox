@@ -39,12 +39,12 @@
 #include "lcd-x11.h"
 #include "lcd-playersim.h"
 
-extern unsigned char lcd_framebuffer[LCD_WIDTH][LCD_HEIGHT/8];
+extern unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
 extern void screen_resized(int width, int height);
 extern Display *dpy;
 
 #ifdef HAVE_LCD_BITMAP
-unsigned char lcd_framebuffer_copy[LCD_WIDTH][LCD_HEIGHT/8];
+unsigned char lcd_framebuffer_copy[LCD_HEIGHT/8][LCD_WIDTH];
 
 static int counter;
 
@@ -66,13 +66,13 @@ void lcd_update (void)
 
     for(y=0; y<LCD_HEIGHT; y+=8) {
         for(x=0; x<LCD_WIDTH; x++) {
-            if(lcd_framebuffer[x][y/8] || lcd_framebuffer_copy[x][y/8]) {
+            if(lcd_framebuffer[y/8][x] || lcd_framebuffer_copy[y/8][x]) {
                 /* one or more bits/pixels are changed */
                 unsigned char diff =
-                    lcd_framebuffer[x][y/8] ^ lcd_framebuffer_copy[x][y/8];
+                    lcd_framebuffer[y/8][x] ^ lcd_framebuffer_copy[y/8][x];
 
                 for(bit=0; bit<8; bit++) {
-                    if(lcd_framebuffer[x][y/8]&(1<<bit)) {
+                    if(lcd_framebuffer[y/8][x]&(1<<bit)) {
                         /* set a dot */
                         points[p].x = x + MARGIN_X;
                         points[p].y = y+bit + MARGIN_Y;
@@ -131,13 +131,13 @@ void lcd_update_rect(int x_start, int y_start,
     for(; yline<=ymax; yline++) {
         y = yline * 8;
         for(x=x_start; x<xmax; x++) {
-            if(lcd_framebuffer[x][yline] || lcd_framebuffer_copy[x][yline]) {
+            if(lcd_framebuffer[yline][x] || lcd_framebuffer_copy[yline][x]) {
                 /* one or more bits/pixels are changed */
                 unsigned char diff =
-                  lcd_framebuffer[x][yline] ^ lcd_framebuffer_copy[x][yline];
+                  lcd_framebuffer[yline][x] ^ lcd_framebuffer_copy[yline][x];
 
                 for(bit=0; bit<8; bit++) {
-                    if(lcd_framebuffer[x][yline]&(1<<bit)) {
+                    if(lcd_framebuffer[yline][x]&(1<<bit)) {
                         /* set a dot */
                         points[p].x = x + MARGIN_X;
                         points[p].y = y+bit + MARGIN_Y;
@@ -152,7 +152,7 @@ void lcd_update_rect(int x_start, int y_start,
                 }
 
                 /* update the copy */
-                lcd_framebuffer_copy[x][yline] = lcd_framebuffer[x][yline];
+                lcd_framebuffer_copy[yline][x] = lcd_framebuffer[yline][x];
             }
         }
     }
