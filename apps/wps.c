@@ -96,10 +96,10 @@ static void draw_screen(struct mp3entry* id3)
             lcd_puts(0, l++, id3->artist?id3->artist:"");
 
             if(id3->vbr)
-                snprintf(buffer, sizeof(buffer), "Variable Bit Rate");
+                snprintf(buffer, sizeof(buffer), "%d kbit (avg)",
+                         id3->bitrate);
             else
-                snprintf(buffer, sizeof(buffer), "%d kbits", id3->bitrate);
-                
+                snprintf(buffer, sizeof(buffer), "%d kbit", id3->bitrate);
 
             lcd_puts(0, l++, buffer);
 
