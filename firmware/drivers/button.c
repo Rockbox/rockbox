@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include "config.h"
 #include "sh7034.h"
+#include "system.h"
 #include "button.h"
 #include "kernel.h"
 #include "backlight.h"
@@ -64,6 +65,14 @@ static void button_tick(void)
                     post = true;
                     repeat = true;
                     count = REPEAT_INTERVAL;
+#ifdef HAVE_RECORDER_KEYPAD
+                    /* If the OFF button is pressed long enough, and we are
+                       still alive, then the unit must be connected to a
+                       charger. Therefore we will reboot and let the original
+                       firmware handle the charging. */
+                    if(btn == BUTTON_OFF)
+                        system_reboot();
+#endif
                 }
             }
             if ( post )
