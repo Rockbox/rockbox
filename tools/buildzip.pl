@@ -104,14 +104,15 @@ sub buildzip {
             }
         }
 
-        if($image) {
-            # image is blank when this is a simulator
-            if( filesize("rockbox.ucl") > 1000 ) {
-                `cp rockbox.ucl .rockbox/`;  # UCL for flashing
-            }
-            if( filesize("rombox.ucl") > 1000) {
-                `cp rombox.ucl .rockbox/`;  # UCL for flashing
-            }
+    }
+
+    if($image) {
+        # image is blank when this is a simulator
+        if( filesize("rockbox.ucl") > 1000 ) {
+            `cp rockbox.ucl .rockbox/`;  # UCL for flashing
+        }
+        if( filesize("rombox.ucl") > 1000) {
+            `cp rombox.ucl .rockbox/`;  # UCL for flashing
         }
     }
 
