@@ -111,6 +111,9 @@ timer.o: $(LIBMADDIR)/timer.c
 version.o: $(LIBMADDIR)/version.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+mpegplay.o: $(APPDIR)/common/mpegplay.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 endif
 
 menu.o: $(APPDIR)/menu.c

@@ -31,7 +31,7 @@
 #include "id3.h"
 
 #ifdef MPEG_PLAY
-#include "x11/mpegplay.h"
+#include "common/mpegplay.h"
 #endif
 
 #define LINE_Y      1 /* initial line */
