@@ -37,6 +37,7 @@
 #define ATA_CONTROL     (*((volatile unsigned char*)0x06200306))
 #define ATA_ALT_STATUS  ATA_CONTROL
 
+#define SELECT_DEVICE1  0x10
 #define SELECT_LBA      0x40
 
 #define STATUS_BSY      0x80
@@ -54,7 +55,8 @@
 #define CMD_SLEEP                  0xE6
 #define CMD_SECURITY_FREEZE_LOCK   0xF5
 
-struct mutex ata_mtx;
+static struct mutex ata_mtx;
+static char device; /* device 0 (master) or 1 (slave) */
 
 static int wait_for_bsy(void)
 {
@@ -114,7 +116,7 @@ int ata_read_sectors(unsigned long start,
     ATA_SECTOR  = start & 0xff;
     ATA_LCYL    = (start >> 8) & 0xff;
     ATA_HCYL    = (start >> 16) & 0xff;
-    ATA_SELECT  = ((start >> 24) & 0xf) | SELECT_LBA;
+    ATA_SELECT  = ((start >> 24) & 0xf) | SELECT_LBA | device;
     ATA_COMMAND = CMD_READ_SECTORS;
 
     for (i=0; i<count; i++) {
@@ -164,7 +166,7 @@ int ata_write_sectors(unsigned long start,
     ATA_SECTOR  = start & 0xff;
     ATA_LCYL    = (start >> 8) & 0xff;
     ATA_HCYL    = (start >> 16) & 0xff;
-    ATA_SELECT  = ((start >> 24) & 0xf) | SELECT_LBA;
+    ATA_SELECT  = ((start >> 24) & 0xf) | SELECT_LBA | device;
     ATA_COMMAND = CMD_WRITE_SECTORS;
 
     for (i=0; i<count; i++) {
@@ -289,7 +291,7 @@ int ata_soft_reset(void)
     
     mutex_lock(&ata_mtx);
     
-    ATA_SELECT = SELECT_LBA;
+    ATA_SELECT = SELECT_LBA | device;
     ATA_CONTROL = CONTROL_nIEN|CONTROL_SRST;
     sleep(HZ/20000); /* >= 5us */
 
@@ -302,6 +304,27 @@ int ata_soft_reset(void)
     return ret;
 }
 
+static int master_slave(void)
+{
+    /* master? */
+    ATA_SELECT = 0;
+    if ( ATA_STATUS & STATUS_RDY ) {
+        device = 0;
+        DEBUGF("Found master harddisk\n");
+    }
+    else {
+        /* slave? */
+        ATA_SELECT = SELECT_DEVICE1;
+        if ( ATA_STATUS & STATUS_RDY ) {
+            device = SELECT_DEVICE1;
+            DEBUGF("Found slave harddisk\n");
+        }
+        else
+            return -1;
+    }
+    return 0;
+}
+
 int ata_init(void)
 {
     mutex_init(&ata_mtx);
@@ -311,14 +334,20 @@ int ata_init(void)
     /* activate ATA */
     PADR &= ~0x80;
 
-    if (!ata_hard_reset())
+    if (master_slave())
         return -1;
+
+    if (!ata_hard_reset())
+        return -2;
             
     if (!check_registers())
-        return -2;
+        return -3;
 
     if (freeze_lock() < 0)
         return -4;
+
+    if (ata_spindown(1) < 0)
+        return -5;
 
     ATA_SELECT = SELECT_LBA;
     ATA_CONTROL = CONTROL_nIEN;
