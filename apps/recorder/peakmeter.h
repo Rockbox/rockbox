@@ -25,5 +25,6 @@ extern void peak_meter_init(void);
 extern void peak_meter_playback(bool playback);
 extern void peak_meter_draw(int x, int y, int width, int height);
 extern void peak_meter_set_clip_hold(int time);
+extern void peak_meter_peek(void);
 
 #endif /* __PEAKMETER_H__ */

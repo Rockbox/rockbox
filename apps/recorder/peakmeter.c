@@ -105,7 +105,7 @@ void peak_meter_playback(bool playback) {
  * that ocurred. This function could be used by a thread for
  * busy reading the MAS.
  */
-static void peak_meter_peek(void) {
+void peak_meter_peek(void) {
 #ifdef SIMULATOR
     int left = 8000;
     int right = 9000;
