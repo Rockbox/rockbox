@@ -30,6 +30,7 @@
 
 #ifdef HAVE_LCD_BITMAP
 #include "bmp.h"
+#include "icons.h"
 #include "screensaver.h"
 extern void tetris(void);
 #endif
@@ -43,20 +44,28 @@ int show_logo( void )
     int failure;
     int height, width, font_h, font_w;
 
+    int i;
+    int eline;
+
     failure = read_bmp_file("/rockbox112.bmp", &width, &height, buffer);
 
     debugf("read_bmp_file() returned %d, width %d height %d\n",
            failure, width, height);
 
+    lcd_clear_display();
+
     if (failure) {
-        debugf("Unable to find \"/rockbox112.bmp\"\n");
-        return -1;
-    } else {
+        unsigned char *ptr=rockbox112x37;
+        for(i=0; i < 37; i+=8) {
+            /* the bitmap function doesn't work with full-height bitmaps
+               so we "stripe" the logo output */
+            lcd_bitmap(ptr, 0, 10+i, 112, (37-i)>8?8:37-i, false);
+            ptr += 112;
+        }
+        height = 37;
 
-        int i;
-        int eline;
-
-        lcd_clear_display();
+    }
+    else {
 
         for(i=0, eline=0; i < height; i+=8, eline++) {
             /* the bitmap function doesn't work with full-height bitmaps
@@ -70,6 +79,8 @@ int show_logo( void )
     lcd_getfontsize(0, &font_w, &font_h);
     lcd_putsxy((LCD_WIDTH/2) - ((strlen(version)*font_w)/2),
                height+10+font_h, version, 0);
+    lcd_update();
+
 #else
     char *rockbox = "ROCKbox!";
     lcd_clear_display();
@@ -79,8 +90,6 @@ int show_logo( void )
     lcd_puts(0, 0, rockbox);
     lcd_puts(0, 1, appsversion);
 #endif
-
-    lcd_update();
 
     return 0;
 }
