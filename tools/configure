@@ -214,17 +214,17 @@ if [ "-" = "$extra_defines" ]; then
   echo "Do you want to use Screensavers? (Y)"
   getit=`input`;
   if [ "n" = "$getit" -o "N" = "$getit" ] ; then
-	extra_defines="$extra_defines"
+	extra_defines="$extra_defines -DDISABLE_SCREENSAVERS"
   else
-        extra_defines="$extra_defines -DUSE_SCREENSAVERS"
+        extra_defines="$extra_defines"
   fi
  
   echo "Do you want to play Games? (Y)"
   getit=`input`;
   if [ "n" = "$getit" -o "N" = "$getit" ] ; then
-	extra_defines="$extra_defines"
+	extra_defines="$extra_defines -DDISABLE_GAMES"
   else
-        extra_defines="$extra_defines -DUSE_GAMES"
+        extra_defines="$extra_defines"
   fi
  
   echo "Loadable fonts support? (N)"
