@@ -44,6 +44,9 @@ OUTPUT = $(OBJDIR)/librockbox.a
 $(OUTPUT): $(OBJS)
 	$(AR) ruv $@ $+
 
+.c.o:
+	$(CC) $(CFLAGS) -c $< -o $(OBJDIR)/$@
+
 clean:
 	-$(RM) -f $(OBJDIR)/$(OBJS) *~ $(OUTPUT)
 	-$(RM) -r $(DEPS)
@@ -52,11 +55,11 @@ clean:
 $(OBJDIR)/thread.o: thread.c thread.h
 	$(CC) -c -O -fomit-frame-pointer $(CFLAGS) $< -o $@
 
-$(DEPS)/%.d: %.c
-	@$(SHELL) -c 'for d in $(DEPDIRS); do { if [ ! -d $$d ]; then mkdir $$d; fi; }; done'
+$(OBJDIR)/$(DEPS)/%.d: %.c
+	@$(SHELL) -c 'for d in $(DEPDIRS); do { if [ ! -d $$d ]; then mkdir $(OBJDIR)/$$d; fi; }; done'
 	@echo "Updating dependencies for $<"
 	@$(SHELL) -ec '$(CC) -MM $(CFLAGS) $< \
 		|sed '\''s|\($*\)\.o[ :]*|$(OBJDIR)/\1.o $(<:%.c=%.d) : |g'\'' > $@; \
 		[ -s $@ ] || rm -f $@'
 
--include $(SRC:%.c=$(DEPS)/%.d)
+-include $(SRC:%.c=$(OBJDIR)/$(DEPS)/%.d)
