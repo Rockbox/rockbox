@@ -32,6 +32,8 @@
 #define MPEG_PLAY_PENDING_THRESHOLD 0x10000
 #define MPEG_PLAY_PENDING_SWAPSIZE 0x10000
 
+#define MPEG_MAX_PRERECORD_SECONDS 30
+
 /* For ID3 info and VBR header */
 #define MPEG_RESERVED_HEADER_SPACE (4096 + 1500)
 
@@ -89,7 +91,7 @@ void mpeg_record(char *filename);
 void mpeg_new_file(char *filename);
 void mpeg_set_recording_options(int frequency, int quality,
                                 int source, int channel_mode,
-                                bool editable);
+                                bool editable, int prerecord_time);
 void mpeg_set_recording_gain(int left, int right, bool use_mic);
 unsigned long mpeg_recorded_time(void);
 unsigned long mpeg_num_recorded_bytes(void);
@@ -123,7 +125,8 @@ void mpeg_error_clear(void);
 #define MPEG_STATUS_PLAY 1
 #define MPEG_STATUS_PAUSE 2
 #define MPEG_STATUS_RECORD 4
-#define MPEG_STATUS_ERROR 8
+#define MPEG_STATUS_PRERECORD 8
+#define MPEG_STATUS_ERROR 16
 
 #define MPEGERR_DISK_FULL 1
 

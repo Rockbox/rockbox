@@ -172,9 +172,10 @@ bool radio_screen(void)
 
     mpeg_set_recording_options(global_settings.rec_frequency,
                                global_settings.rec_quality,
-                               1 /* Line In */,
+                               1, /* Line In */
                                global_settings.rec_channels,
-                               global_settings.rec_editable);
+                               global_settings.rec_editable,
+                               global_settings.rec_prerecord_time);
 
     
     mpeg_set_recording_gain(mpeg_sound_default(SOUND_LEFT_GAIN),
@@ -230,7 +231,7 @@ bool radio_screen(void)
         switch(button)
         {
             case BUTTON_OFF:
-                if(mpeg_status())
+                if(mpeg_status() == MPEG_STATUS_RECORD)
                 {
                     mpeg_stop();
                     status_set_playmode(STATUS_STOP);
@@ -244,17 +245,16 @@ bool radio_screen(void)
                 break;
 
             case BUTTON_F3:
-                /* Only act if the mpeg is stopped */
-                if(!mpeg_status())
+                if(mpeg_status() == MPEG_STATUS_RECORD)
                 {
-                    have_recorded = true;
-                    mpeg_record(rec_create_filename());
-                    status_set_playmode(STATUS_RECORD);
+                    mpeg_new_file(rec_create_filename());
                     update_screen = true;
                 }
                 else
                 {
-                    mpeg_new_file(rec_create_filename());
+                    have_recorded = true;
+                    mpeg_record(rec_create_filename());
+                    status_set_playmode(STATUS_RECORD);
                     update_screen = true;
                 }
                 last_seconds = 0;
@@ -353,11 +353,12 @@ bool radio_screen(void)
                 
             case SYS_USB_CONNECTED:
                 /* Only accept USB connection when not recording */
-                if(!mpeg_status())
+                if(mpeg_status() != MPEG_STATUS_RECORD)
                 {
                     usb_screen();
                     fmradio_set_status(0);
-                    have_recorded = true; /* Refreshes the browser later on */
+                    screen_freeze = true; /* Cosmetic: makes sure the
+                                             radio screen doesn't redraw */
                     done = true;
                 }
                 break;
@@ -368,6 +369,8 @@ bool radio_screen(void)
         if(!screen_freeze)
         {
             lcd_setmargins(0, 8);
+            
+            /* Only display the peak meter when not recording */
             if(!mpeg_status())
             {
                 lcd_clearrect(0, 8 + fh*(top_of_screen + 3), LCD_WIDTH, fh);
@@ -415,13 +418,19 @@ bool radio_screen(void)
                          str(LANG_CHANNEL_MONO));
                 lcd_puts(0, top_of_screen + 2, buf);
 
-                if(mpeg_status())
+                if(mpeg_status() == MPEG_STATUS_RECORD)
                 {
                     hours = seconds / 3600;
                     minutes = (seconds - (hours * 3600)) / 60;
                     snprintf(buf, 32, "%s %02d:%02d:%02d",
                              str(LANG_RECORDING_TIME),
                              hours, minutes, seconds%60);
+                    lcd_puts(0, top_of_screen + 3, buf);
+                }
+                else
+                {
+                    snprintf(buf, 32, "%s %02d",
+                             str(LANG_RECORD_PRERECORD), seconds%60);
                     lcd_puts(0, top_of_screen + 3, buf);
                 }
                 
@@ -687,7 +696,19 @@ bool radio_delete_preset(void)
 
 static bool fm_recording_settings(void)
 {
-    return recording_menu(true);
+    bool ret;
+    
+    ret = recording_menu(true);
+    if(!ret)
+    {
+        mpeg_set_recording_options(global_settings.rec_frequency,
+                                   global_settings.rec_quality,
+                                   1, /* Line In */
+                                   global_settings.rec_channels,
+                                   global_settings.rec_editable,
+                                   global_settings.rec_prerecord_time);
+    }
+    return ret;
 }
 
 bool radio_menu(void)

@@ -85,6 +85,8 @@ struct user_settings
                           5 = 01:00, 6 = 02:00, 7 = 04:00, 8 = 06:00
                           9 = 08:00, 10= 10:00, 11= 12:00, 12= 18:00,
                           13= 24:00 */
+
+    int rec_prerecord_time; /* In seconds, 0-30, 0 means OFF */
     
     /* device settings */
 

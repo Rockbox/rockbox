@@ -129,6 +129,9 @@ location used, and reset the setting in question with a factory default if
 needed. Memory locations not used by a given version should not be
 modified unless the header & checksum test fails.
 
+Because 0xff mean that the byte is unused, care must be taken so that
+a used byte can't have the value 0xff. Either use only 7 bits, or make sure
+that the value will never be 0xff.
 
 Rest of config block, only saved to disk:
 0xA8  (char)jump scroll mode (only for player)
@@ -151,9 +154,8 @@ Rest of config block, only saved to disk:
 0xB8  (char[20]) WPS file
 0xCC  (char[20]) Lang file
 0xE0  (char[20]) Font file
-0xF4  <unused>
-0xF8  <unused>
-0xFC  <unused>
+0xF4  Prerecording time (bit 0-4)
+0xF5-0xFF  <unused>
 
 *************************************/
 
@@ -431,6 +433,8 @@ int settings_save( void )
     strncpy(&config_block[0xb8], global_settings.wps_file, MAX_FILENAME);
     strncpy(&config_block[0xcc], global_settings.lang_file, MAX_FILENAME);
     strncpy(&config_block[0xe0], global_settings.font_file, MAX_FILENAME);
+
+    config_block[0xf4]=(unsigned char)global_settings.rec_prerecord_time;
 
     if(save_config_buffer())
     {
@@ -756,6 +760,10 @@ void settings_load(void)
         strncpy(global_settings.wps_file, &config_block[0xb8], MAX_FILENAME);
         strncpy(global_settings.lang_file, &config_block[0xcc], MAX_FILENAME);
         strncpy(global_settings.font_file, &config_block[0xe0], MAX_FILENAME);
+
+        if (config_block[0xf4] != 0xff)
+            global_settings.rec_prerecord_time = config_block[0xf4];
+        
 #ifdef HAVE_LCD_CHARCELLS
         if (config_block[0xa8] != 0xff)
             global_settings.jump_scroll = config_block[0xa8];
@@ -1079,6 +1087,9 @@ bool settings_load_config(char* file)
         else if (!strcasecmp(name, "editable recordings")) {
             set_cfg_bool(&global_settings.rec_editable, value);
         }
+        else if (!strcasecmp(name, "prerecording time")) {
+            set_cfg_int(&global_settings.rec_prerecord_time, value, 0, 30);
+        }
 #endif
         else if (!strcasecmp(name, "idle poweroff")) {
             static char* options[] = {"off","1","2","3","4","5","6","7","8",
@@ -1379,6 +1390,10 @@ bool settings_save_config(void)
     fprintf(fd, "line in: %s\r\n", boolopt[global_settings.line_in]);
 #endif
 
+    fprintf(fd, "max files in dir: %d\r\n", global_settings.max_files_in_dir);
+    fprintf(fd, "max files in playlist: %d\r\n",
+            global_settings.max_files_in_playlist);
+    
 #ifdef HAVE_MAS3587F
     fprintf(fd, "#\r\n# Recording\r\n#\r\n");
     fprintf(fd, "rec quality: %d\r\n", global_settings.rec_quality);
@@ -1409,12 +1424,12 @@ bool settings_save_config(void)
     fprintf(fd, "editable recordings: %s\r\n",
             boolopt[global_settings.rec_editable]);
 
+    fprintf(fd, "prerecording time: %d\r\n",
+            global_settings.rec_prerecord_time);
+
 #endif
 
-    fprintf(fd, "max files in dir: %d\r\n", global_settings.max_files_in_dir);
-    fprintf(fd, "max files in playlist: %d\r\n",
-            global_settings.max_files_in_playlist);
-    
+    fprintf(fd, "#\r\n# Playlists\r\n#\r\n");
     {
         static char* options[] = {"off", "on", "ask"};
         fprintf(fd, "recursive directory insert: %s\r\n",
@@ -1454,6 +1469,7 @@ void settings_reset(void) {
     global_settings.rec_left_gain = 2; /* 0dB */
     global_settings.rec_right_gain = 2; /* 0dB */
     global_settings.rec_editable = false;
+    global_settings.rec_prerecord_time = 0;
     global_settings.resume      = RESUME_ASK;
     global_settings.contrast    = lcd_default_contrast();
     global_settings.invert      = DEFAULT_INVERT_SETTING;

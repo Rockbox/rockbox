@@ -241,6 +241,20 @@ static bool rectimesplit(void)
                       names, 14, NULL );
 }
 
+static bool recprerecord(void)
+{
+    char *names[] = {
+        str(LANG_OFF),"1s","2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s",
+        "10s", "11s", "12s", "13s", "14s", "15s", "16s", "17s", "18s", "19s",
+        "20s", "21s", "22s", "23s", "24s", "25s", "26s", "27s", "28s", "29s",
+        "30s"
+    };
+
+    return set_option(str(LANG_RECORD_PRERECORD_TIME),
+                      &global_settings.rec_prerecord_time, INT,
+                      names, 31, NULL );
+}
+
 #endif /* HAVE_MAS3587F */
 
 static void set_chanconf(int val)
@@ -294,7 +308,7 @@ bool recording_menu(bool no_source)
 {
     int m;
     int i = 0;
-    struct menu_items menu[6];
+    struct menu_items menu[7];
     bool result;
 
     menu[i].desc = str(LANG_RECORDING_QUALITY);
@@ -311,6 +325,8 @@ bool recording_menu(bool no_source)
     menu[i++].function = receditable;
     menu[i].desc = str(LANG_RECORD_TIMESPLIT);
     menu[i++].function = rectimesplit;
+    menu[i].desc = str(LANG_RECORD_PRERECORD_TIME);
+    menu[i++].function = recprerecord;
         
     m=menu_init( menu, i );
     result = menu_run(m);

@@ -1847,3 +1847,13 @@ id: LANG_FLIP_DISPLAY
 desc: in settings_menu, option to turn display+buttos by 180 degreed
 eng: "Upside Down"
 new:
+
+id: LANG_RECORD_PRERECORD
+desc: in recording and radio screen
+eng: "Prerecording"
+new:
+
+id: LANG_RECORD_PRERECORD_TIME
+desc: in recording settings_menu
+eng: "Prerecord time"
+new:

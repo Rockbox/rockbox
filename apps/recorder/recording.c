@@ -160,7 +160,8 @@ bool recording_screen(void)
                                global_settings.rec_quality,
                                global_settings.rec_source,
                                global_settings.rec_channels,
-                               global_settings.rec_editable);
+                               global_settings.rec_editable,
+                               global_settings.rec_prerecord_time);
 
     set_gain();
 
@@ -174,7 +175,7 @@ bool recording_screen(void)
         switch(button)
         {
             case BUTTON_OFF:
-                if(mpeg_status())
+                if(mpeg_status() & MPEG_STATUS_RECORD)
                 {
                     mpeg_stop();
                     status_set_playmode(STATUS_STOP);
@@ -190,7 +191,7 @@ bool recording_screen(void)
 
             case BUTTON_PLAY:
                 /* Only act if the mpeg is stopped */
-                if(!mpeg_status())
+                if(!(mpeg_status() & MPEG_STATUS_RECORD))
                 {
                     have_recorded = true;
                     mpeg_record(rec_create_filename());
@@ -305,13 +306,16 @@ bool recording_screen(void)
                 if (recording_menu(false))
                     return SYS_USB_CONNECTED;
                 settings_save();
+
                 mpeg_set_recording_options(global_settings.rec_frequency,
                                            global_settings.rec_quality,
                                            global_settings.rec_source,
                                            global_settings.rec_channels,
-                                           global_settings.rec_editable);
+                                           global_settings.rec_editable,
+                                           global_settings.rec_prerecord_time);
                 
                 set_gain();
+
                 update_countdown = 1; /* Update immediately */
 
                 lcd_setfont(FONT_SYSFIXED);
@@ -319,7 +323,7 @@ bool recording_screen(void)
                 break;
 
             case BUTTON_F2:
-                if(!mpeg_status())
+                if(mpeg_status() != MPEG_STATUS_RECORD)
                 {
                     if (f2_rec_screen())
                     {
@@ -332,7 +336,7 @@ bool recording_screen(void)
                 break;
 
             case BUTTON_F3:
-                if(!mpeg_status())
+                if(mpeg_status() != MPEG_STATUS_RECORD)
                 {
                     if (f3_rec_screen())
                     {
@@ -346,14 +350,12 @@ bool recording_screen(void)
 
             case SYS_USB_CONNECTED:
                 /* Only accept USB connection when not recording */
-                if(!mpeg_status())
+                if(mpeg_status() != MPEG_STATUS_RECORD)
                 {
                     usb_screen();
                     have_recorded = true; /* Refreshes the browser later on */
                     done = true;
                 }
-                lcd_setfont(FONT_SYSFIXED);
-                lcd_setmargins(global_settings.invert_cursor ? 0 : w, 8);
                 break;
         }
 
@@ -387,21 +389,28 @@ bool recording_screen(void)
 
                 dseconds = rec_timesplit_seconds(); 
 
-                /* Display the split interval if the record timesplit
-                   is active */
-                if (global_settings.rec_timesplit)
+                if(mpeg_status() & MPEG_STATUS_PRERECORD)
                 {
-                    /* Display the record timesplit interval rather than 
-                       the file size if the record timer is active */
-                    dhours = dseconds / 3600;
-                    dminutes = (dseconds - (dhours * 3600)) / 60;
-                    snprintf(buf, 32, "%s %02d:%02d",
-                             str(LANG_RECORD_TIMESPLIT_REC),
-                             dhours, dminutes);
+                    snprintf(buf, 32, "%s...", str(LANG_RECORD_PRERECORD));
                 }
                 else
-                    snprintf(buf, 32, "%s %s", str(LANG_RECORDING_SIZE),
-                             num2max5(mpeg_num_recorded_bytes(), buf2));
+                {
+                    /* Display the split interval if the record timesplit
+                       is active */
+                    if (global_settings.rec_timesplit)
+                    {
+                        /* Display the record timesplit interval rather than 
+                           the file size if the record timer is active */
+                        dhours = dseconds / 3600;
+                        dminutes = (dseconds - (dhours * 3600)) / 60;
+                        snprintf(buf, 32, "%s %02d:%02d",
+                                 str(LANG_RECORD_TIMESPLIT_REC),
+                                 dhours, dminutes);
+                    }
+                    else
+                        snprintf(buf, 32, "%s %s", str(LANG_RECORDING_SIZE),
+                                 num2max5(mpeg_num_recorded_bytes(), buf2));
+                }
                 lcd_puts(0, 1, buf);
 
                 /* We will do file splitting regardless, since the OFF
@@ -622,7 +631,8 @@ bool f2_rec_screen(void)
                                global_settings.rec_quality,
                                global_settings.rec_source,
                                global_settings.rec_channels,
-                               global_settings.rec_editable);
+                               global_settings.rec_editable,
+                               global_settings.rec_prerecord_time);
 
     set_gain();
     
@@ -671,22 +681,6 @@ bool f3_rec_screen(void)
                 used = true;
                 break;
 
-            case BUTTON_DOWN:
-            case BUTTON_F3 | BUTTON_DOWN:
-                global_settings.rec_frequency++;
-                if(global_settings.rec_frequency > 5)
-                    global_settings.rec_frequency = 0;
-                used = true;
-                break;
-
-            case BUTTON_RIGHT:
-            case BUTTON_F3 | BUTTON_RIGHT:
-                global_settings.rec_channels++;
-                if(global_settings.rec_channels > 1)
-                    global_settings.rec_channels = 0;
-                used = true;
-                break;
-
             case BUTTON_F3 | BUTTON_REL:
                 if ( used )
                     exit = true;
@@ -707,10 +701,11 @@ bool f3_rec_screen(void)
                                global_settings.rec_quality,
                                global_settings.rec_source,
                                global_settings.rec_channels,
-                               global_settings.rec_editable);
+                               global_settings.rec_editable,
+                               global_settings.rec_prerecord_time);
 
     set_gain();
-    
+
     settings_save();
     lcd_setfont(FONT_UI);
 

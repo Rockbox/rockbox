@@ -44,6 +44,7 @@ extern void bitswap(unsigned char *data, int length);
 #ifdef HAVE_MAS3587F
 static void init_recording(void);
 static void init_playback(void);
+static void start_prerecording(void);
 static void start_recording(void);
 static void stop_recording(void);
 static int get_unsaved_space(void);
@@ -497,6 +498,17 @@ static char recording_filename[MAX_PATH];
 static int rec_frequency_index; /* For create_xing_header() calls */
 static int rec_version_index;   /* For create_xing_header() calls */
 static bool disable_xing_header; /* When splitting files */
+
+static bool prerecording; /* True if prerecording is enabled */
+static bool is_prerecording; /* True if we are prerecording */
+static int prerecord_buffer[MPEG_MAX_PRERECORD_SECONDS]; /* Array of buffer
+                                                            indexes for each
+                                                            prerecorded
+                                                            second */
+static int prerecord_index; /* Current index in the prerecord buffer */
+static int prerecording_max_seconds;   /* Max number of seconds to store */
+static int prerecord_count; /* Number of seconds in the prerecord buffer */
+static int prerecord_timeout; /* The tick count of the next prerecord data store */
 #endif
 
 static int mpeg_file;
@@ -865,17 +877,38 @@ static void dma_tick(void)
 
             num_rec_bytes += i;
             
-            /* Signal to save the data if we are running out of buffer
-               space */
-            num_bytes = mp3buf_write - mp3buf_read;
-            if(num_bytes < 0)
-                num_bytes += mp3buflen;
-
-            if(mp3buflen - num_bytes < MPEG_RECORDING_LOW_WATER && !saving)
+            if(is_prerecording)
             {
-                saving = true;
-                queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
-                wake_up_thread();
+                if(TIME_AFTER(current_tick, prerecord_timeout))
+                {
+                    prerecord_timeout = current_tick + HZ;
+
+                    /* Store the write pointer every second */
+                    prerecord_buffer[prerecord_index++] = mp3buf_write;
+
+                    /* Wrap if necessary */
+                    if(prerecord_index == prerecording_max_seconds)
+                        prerecord_index = 0;
+
+                    /* Update the number of seconds recorded */
+                    if(prerecord_count < prerecording_max_seconds)
+                        prerecord_count++;
+                }
+            }
+            else
+            {
+                /* Signal to save the data if we are running out of buffer
+                   space */
+                num_bytes = mp3buf_write - mp3buf_read;
+                if(num_bytes < 0)
+                    num_bytes += mp3buflen;
+                
+                if(mp3buflen - num_bytes < MPEG_RECORDING_LOW_WATER && !saving)
+                {
+                    saving = true;
+                    queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
+                    wake_up_thread();
+                }
             }
         }
     }
@@ -1887,20 +1920,84 @@ static void mpeg_thread(void)
             switch(ev.id)
             {
                 case MPEG_RECORD:
-                    DEBUGF("Recording...\n");
-                    reset_mp3_buffer();
+                    if(is_prerecording)
+                    {
+                        int startpos, i;
+                        
+                        /* Go back prerecord_count seconds in the buffer */
+                        startpos = prerecord_index - prerecord_count;
+                        if(startpos < 0)
+                            startpos += prerecording_max_seconds;
 
-                    /* Advance the write pointer to make
-                       room for an ID3 tag plus a VBR header */
-                    mp3buf_write = MPEG_RESERVED_HEADER_SPACE;
-                    memset(mp3buf, 0, MPEG_RESERVED_HEADER_SPACE);
+                        /* Read the mp3 buffer pointer from the prerecord buffer */
+                        startpos = prerecord_buffer[startpos];
 
-                    /* Insert the ID3 header */
-                    memcpy(mp3buf, empty_id3_header, sizeof(empty_id3_header));
+                        DEBUGF("Start looking at address %x (%x)\n",
+                               mp3buf+startpos, startpos);
+
+                        saved_header = get_last_recorded_header();
+                        
+                        mem_find_next_frame(startpos, &offset, 5000,
+                                            saved_header);
+
+                        mp3buf_read = startpos + offset;
+                        
+                        DEBUGF("New mp3buf_read address: %x (%x)\n",
+                               mp3buf+mp3buf_read, mp3buf_read);
+
+                        /* Make room for headers */
+                        mp3buf_read -= MPEG_RESERVED_HEADER_SPACE;
+                        if(mp3buf_read < 0)
+                        {
+                            /* Clear the bottom half */
+                            memset(mp3buf, 0,
+                                   mp3buf_read + MPEG_RESERVED_HEADER_SPACE);
+
+                            /* And the top half */
+                            mp3buf_read += mp3buflen;
+                            memset(mp3buf + mp3buf_read, 0,
+                                   mp3buflen - mp3buf_read);
+                        }
+                        else
+                        {
+                            memset(mp3buf + mp3buf_read, 0,
+                                   MPEG_RESERVED_HEADER_SPACE);
+                        }
+
+                        /* Copy the empty ID3 header */
+                        startpos = mp3buf_read;
+                        for(i = 0;i < (int)sizeof(empty_id3_header);i++)
+                        {
+                            mp3buf[startpos++] = empty_id3_header[i];
+                            if(startpos == mp3buflen)
+                                startpos = 0;
+                        }
+                        
+                        DEBUGF("New mp3buf_read address (reservation): %x\n",
+                               mp3buf+mp3buf_read);
+                        
+                        DEBUGF("Prerecording...\n");
+                    }
+                    else
+                    {
+                        reset_mp3_buffer();
+
+                        num_rec_bytes = 0;
+                        
+                        /* Advance the write pointer to make
+                           room for an ID3 tag plus a VBR header */
+                        mp3buf_write = MPEG_RESERVED_HEADER_SPACE;
+                        memset(mp3buf, 0, MPEG_RESERVED_HEADER_SPACE);
+                        
+                        /* Insert the ID3 header */
+                        memcpy(mp3buf, empty_id3_header,
+                               sizeof(empty_id3_header));
+
+                        DEBUGF("Recording...\n");
+                    }
 
                     start_recording();
-                    demand_irq_enable(true);
-                    
+
                     mpeg_file = open(recording_filename, O_WRONLY|O_CREAT);
                     
                     if(mpeg_file < 0)
@@ -1910,14 +2007,13 @@ static void mpeg_thread(void)
 
                 case MPEG_STOP:
                     DEBUGF("MPEG_STOP\n");
-                    demand_irq_enable(false);
 
                     /* Store the last recorded header for later use by the
                        Xing header generation */
                     saved_header = get_last_recorded_header();
                     
                     stop_recording();
-                    
+
                     /* Save the remaining data in the buffer */
                     stop_pending = true;
                     queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
@@ -1942,6 +2038,11 @@ static void mpeg_thread(void)
                         if(num_recorded_frames == 0x7ffff)
                             num_recorded_frames = 0;
 
+                        /* Also, if we have been prerecording, the frame count
+                           will be wrong */
+                        if(prerecording)
+                            num_recorded_frames = 0;
+                        
                         /* saved_header is saved right before stopping
                            the MAS */
                         framelen = create_xing_header(mpeg_file, 0,
@@ -1970,6 +2071,11 @@ static void mpeg_thread(void)
                         }
                     }
 #endif
+
+                    if(prerecording)
+                    {
+                        start_prerecording();
+                    }
                     mpeg_stop_done = true;
                     break;
 
@@ -2117,7 +2223,6 @@ static void mpeg_thread(void)
                                 if(errno == ENOSPC)
                                 {
                                     mpeg_errno = MPEGERR_DISK_FULL;
-                                    demand_irq_enable(false);
                                     stop_recording();
                                     queue_post(&mpeg_queue, MPEG_STOP_DONE, 0);
                                     break;
@@ -2161,18 +2266,22 @@ static void mpeg_thread(void)
                     break;
 
                 case SYS_USB_CONNECTED:
-                    is_playing = false;
-                    paused = false;
-                    stop_playing();
-#ifndef SIMULATOR
+                    /* We can safely go to USB mode if no recording
+                       is taking place */
+                    if((!is_recording || is_prerecording) && mpeg_stop_done)
+                    {
+                        /* Even if we aren't recording, we still call this
+                           function, to put the MAS in monitoring mode,
+                           to save power. */
+                        stop_recording();
                 
-                    /* Tell the USB thread that we are safe */
-                    DEBUGF("mpeg_thread got SYS_USB_CONNECTED\n");
-                    usb_acknowledge(SYS_USB_CONNECTED_ACK);
+                        /* Tell the USB thread that we are safe */
+                        DEBUGF("mpeg_thread got SYS_USB_CONNECTED\n");
+                        usb_acknowledge(SYS_USB_CONNECTED_ACK);
                     
-                    /* Wait until the USB cable is extracted again */
-                    usb_wait_for_disconnect(&mpeg_queue);
-#endif
+                        /* Wait until the USB cable is extracted again */
+                        usb_wait_for_disconnect(&mpeg_queue);
+                    }
                     break;
             }
         }
@@ -2245,16 +2354,6 @@ bool mpeg_has_changed_track(void)
 }
 
 #ifdef HAVE_MAS3587F
-void mpeg_init_recording(void)
-{
-    init_recording_done = false;
-    queue_post(&mpeg_queue, MPEG_INIT_RECORDING, NULL);
-
-    while(!init_recording_done)
-        sleep_thread();
-    wake_up_thread();
-}
-
 void mpeg_init_playback(void)
 {
     init_playback_done = false;
@@ -2265,99 +2364,14 @@ void mpeg_init_playback(void)
     wake_up_thread();
 }
 
-static void init_recording(void)
-{
-    unsigned long val;
-    int rc;
-
-    stop_playing();
-    is_playing = false;
-    paused = false;
-
-    reset_mp3_buffer();
-    remove_all_tags();
-    
-    if(mpeg_file >= 0)
-        close(mpeg_file);
-    mpeg_file = -1;
-
-    /* Init the recording variables */
-    is_recording = false;
-    
-    mas_reset();
-    
-    /* Enable the audio CODEC and the DSP core, max analog voltage range */
-    rc = mas_direct_config_write(MAS_CONTROL, 0x8c00);
-    if(rc < 0)
-        panicf("mas_ctrl_w: %d", rc);
-
-    /* Stop the current application */
-    val = 0;
-    mas_writemem(MAS_BANK_D0,0x7f6,&val,1);    
-    do
-    {
-        mas_readmem(MAS_BANK_D0, 0x7f7, &val, 1);
-    } while(val);
-
-    /* Perform black magic as described by the data sheet */
-    if((mas_version_code & 0xff) == 2)
-    {
-        DEBUGF("Performing MAS black magic for B2 version\n");
-        mas_writereg(0xa3, 0x98);
-        mas_writereg(0x94, 0xfffff);
-        val = 0;
-        mas_writemem(MAS_BANK_D1, 0, &val, 1);
-        mas_writereg(0xa3, 0x90);
-    }
-
-    /* Enable A/D Converters */
-    mas_codec_writereg(0x0, 0xcccd);
-
-    /* Copy left channel to right (mono mode) */
-    mas_codec_writereg(8, 0x8000);
-    
-    /* ADC scale 0%, DSP scale 100%
-       We use the DSP output for monitoring, because it works with all
-       sources including S/PDIF */
-    mas_codec_writereg(6, 0x0000);
-    mas_codec_writereg(7, 0x4000);
-
-    /* No mute */
-    val = 0;
-    mas_writemem(MAS_BANK_D0, 0x7f9, &val, 1);    
-    
-    /* Set Demand mode, no monitoring and validate all settings */
-    val = 0x125;
-    mas_writemem(MAS_BANK_D0, 0x7f1, &val, 1);
-
-    /* Start the encoder application */
-    val = 0x40;
-    mas_writemem(MAS_BANK_D0, 0x7f6, &val, 1);
-    do
-    {
-        mas_readmem(MAS_BANK_D0, 0x7f7, &val, 1);
-    } while(!(val & 0x40));
-
-    /* We have started the recording application with monitoring OFF.
-       This is because we want to record at least one frame to fill the DMA
-       buffer, because the silly MAS will not negate EOD until at least one
-       DMA transfer has taken place.
-       Now let's wait for some data to be encoded. */
-    sleep(20);
-    
-    /* Disable IRQ6 */
-    IPRB &= 0xff0f;
-
-    mpeg_mode = MPEG_ENCODER;
-
-    DEBUGF("MAS Recording application started\n");
-}
-
 static void init_playback(void)
 {
     unsigned long val;
     int rc;
 
+    if(mpeg_mode == MPEG_ENCODER)
+        stop_recording();
+    
     stop_dma();
     
     mas_reset();
@@ -2411,6 +2425,121 @@ static void init_playback(void)
     DEBUGF("MAS Decoding application started\n");
 }
 
+/****************************************************************************
+ **
+ **
+ ** Recording functions
+ **
+ **
+ ***************************************************************************/
+void mpeg_init_recording(void)
+{
+    init_recording_done = false;
+    queue_post(&mpeg_queue, MPEG_INIT_RECORDING, NULL);
+
+    while(!init_recording_done)
+        sleep_thread();
+    wake_up_thread();
+}
+
+static void init_recording(void)
+{
+    unsigned long val;
+    int rc;
+
+    /* Disable IRQ6 */
+    IPRB &= 0xff0f;
+
+    stop_playing();
+    is_playing = false;
+    paused = false;
+
+    reset_mp3_buffer();
+    remove_all_tags();
+    
+    if(mpeg_file >= 0)
+        close(mpeg_file);
+    mpeg_file = -1;
+
+    /* Init the recording variables */
+    is_recording = false;
+    is_prerecording = false;
+
+    mpeg_stop_done = true;
+    
+    mas_reset();
+    
+    /* Enable the audio CODEC and the DSP core, max analog voltage range */
+    rc = mas_direct_config_write(MAS_CONTROL, 0x8c00);
+    if(rc < 0)
+        panicf("mas_ctrl_w: %d", rc);
+
+    /* Stop the current application */
+    val = 0;
+    mas_writemem(MAS_BANK_D0,0x7f6,&val,1);    
+    do
+    {
+        mas_readmem(MAS_BANK_D0, 0x7f7, &val, 1);
+    } while(val);
+
+    /* Perform black magic as described by the data sheet */
+    if((mas_version_code & 0xff) == 2)
+    {
+        DEBUGF("Performing MAS black magic for B2 version\n");
+        mas_writereg(0xa3, 0x98);
+        mas_writereg(0x94, 0xfffff);
+        val = 0;
+        mas_writemem(MAS_BANK_D1, 0, &val, 1);
+        mas_writereg(0xa3, 0x90);
+    }
+
+    /* Enable A/D Converters */
+    mas_codec_writereg(0x0, 0xcccd);
+
+    /* Copy left channel to right (mono mode) */
+    mas_codec_writereg(8, 0x8000);
+    
+    /* ADC scale 0%, DSP scale 100%
+       We use the DSP output for monitoring, because it works with all
+       sources including S/PDIF */
+    mas_codec_writereg(6, 0x0000);
+    mas_codec_writereg(7, 0x4000);
+
+    /* No mute */
+    val = 0;
+    mas_writemem(MAS_BANK_D0, 0x7f9, &val, 1);
+    
+    /* Set Demand mode, no monitoring and validate all settings */
+    val = 0x125;
+    mas_writemem(MAS_BANK_D0, 0x7f1, &val, 1);
+
+    /* Start the encoder application */
+    val = 0x40;
+    mas_writemem(MAS_BANK_D0, 0x7f6, &val, 1);
+    do
+    {
+        mas_readmem(MAS_BANK_D0, 0x7f7, &val, 1);
+    } while(!(val & 0x40));
+
+    /* We have started the recording application with monitoring OFF.
+       This is because we want to record at least one frame to fill the DMA
+       buffer, because the silly MAS will not negate EOD until at least one
+       DMA transfer has taken place.
+       Now let's wait for some data to be encoded. */
+    sleep(20);
+    
+    /* Now set it to Monitoring mode as default, saves power */
+    val = 0x525;
+    mas_writemem(MAS_BANK_D0, 0x7f1, &val, 1);
+
+    mpeg_mode = MPEG_ENCODER;
+
+    DEBUGF("MAS Recording application started\n");
+
+    /* At this point, all settings are the reset MAS defaults, next thing is to
+       call mpeg_set_recording_options(). */
+}
+
 void mpeg_record(char *filename)
 {
     mpeg_errno = 0;
@@ -2418,9 +2547,44 @@ void mpeg_record(char *filename)
     strncpy(recording_filename, filename, MAX_PATH - 1);
     recording_filename[MAX_PATH - 1] = 0;
     
-    num_rec_bytes = 0;
     disable_xing_header = false;
     queue_post(&mpeg_queue, MPEG_RECORD, NULL);
+}
+
+static void start_prerecording(void)
+{
+    unsigned long val;
+
+    DEBUGF("Starting prerecording\n");
+    
+    prerecord_index = 0;
+    prerecord_count = 0;
+    prerecord_timeout = current_tick + HZ;
+    memset(prerecord_buffer, 0, sizeof(prerecord_buffer));
+    reset_mp3_buffer();
+    
+    is_prerecording = true;
+
+    /* Stop monitoring and start the encoder */
+    mas_readmem(MAS_BANK_D0, 0x7f1, &val, 1);
+    val &= ~(1 << 10);
+    val |= 1;
+    mas_writemem(MAS_BANK_D0, 0x7f1, &val, 1);
+    DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f1, %x)\n", val);
+
+    /* Wait until the DSP has accepted the settings */
+    do
+    {
+        mas_readmem(MAS_BANK_D0, 0x7f1, &val,1);
+    } while(val & 1);
+    
+    sleep(20);
+
+    is_recording = true;
+    stop_pending = false;
+    saving = false;
+
+    demand_irq_enable(true);
 }
 
 static void start_recording(void)
@@ -2428,43 +2592,64 @@ static void start_recording(void)
     unsigned long val;
 
     num_recorded_frames = 0;
-    
-    /* Stop monitoring and record for real */
-    mas_readmem(MAS_BANK_D0, 0x7f1, &val, 1);
-    val &= ~(1 << 10);
-    val |= 1;
-    mas_writemem(MAS_BANK_D0, 0x7f1, &val, 1);
 
-    /* Wait until the DSP has accepted the settings */
-    do
+    if(is_prerecording)
     {
-        mas_readmem(MAS_BANK_D0, 0x7f1, &val,1);
-    } while(val & 1);
-
-    sleep(20);
+        /* This will make the IRQ handler start recording
+           for real, i.e send MPEG_SAVE_DATA messages when
+           the buffer is full */
+        is_prerecording = false;
+    }
+    else
+    {
+        /* If prerecording is off, we need to stop the monitoring
+           and start the encoder */
+        mas_readmem(MAS_BANK_D0, 0x7f1, &val, 1);
+        val &= ~(1 << 10);
+        val |= 1;
+        mas_writemem(MAS_BANK_D0, 0x7f1, &val, 1);
+        DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f1, %x)\n", val);
+        
+        /* Wait until the DSP has accepted the settings */
+        do
+        {
+            mas_readmem(MAS_BANK_D0, 0x7f1, &val,1);
+        } while(val & 1);
+        
+        sleep(20);
+    }
     
-    /* Store the current time */
-    record_start_time = current_tick;
-
     is_recording = true;
     stop_pending = false;
     saving = false;
+
+    /* Store the current time */
+    if(prerecording)
+        record_start_time = current_tick - prerecord_count * HZ;
+    else
+        record_start_time = current_tick;
+        
+    demand_irq_enable(true);
 }
 
 static void stop_recording(void)
 {
     unsigned long val;
 
-    is_recording = false;
+    demand_irq_enable(false);
 
+    is_recording = false;
+    is_prerecording = false;
+        
     /* Read the number of frames recorded */
     mas_readmem(MAS_BANK_D0, 0xfd0, &num_recorded_frames, 1);
-    
+
     /* Start monitoring */
     mas_readmem(MAS_BANK_D0, 0x7f1, &val, 1);
     val |= (1 << 10) | 1;
     mas_writemem(MAS_BANK_D0, 0x7f1, &val, 1);
-
+    DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f1, %x)\n", val);
+    
     /* Wait until the DSP has accepted the settings */
     do
     {
@@ -2472,6 +2657,82 @@ static void stop_recording(void)
     } while(val & 1);
     
     drain_dma_buffer();
+}
+
+void mpeg_set_recording_options(int frequency, int quality,
+                                int source, int channel_mode,
+                                bool editable, int prerecord_time)
+{
+    bool is_mpeg1;
+    unsigned long val;
+
+    is_mpeg1 = (frequency < 3)?true:false;
+
+    rec_version_index = is_mpeg1?3:2;
+    rec_frequency_index = frequency % 3;
+    
+    val = (quality << 17) |
+        (rec_frequency_index << 10) |
+        ((is_mpeg1?1:0) << 9) |
+        (1 << 8) | /* CRC on */
+        (((channel_mode * 2 + 1) & 3) << 6) |
+        (1 << 5) /* MS-stereo */ |
+        (1 << 2) /* Is an original */;
+    mas_writemem(MAS_BANK_D0, 0x7f0, &val,1);
+
+    DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f0, %x)\n", val);
+
+    val = editable?4:0;
+    mas_writemem(MAS_BANK_D0, 0x7f9, &val,1);
+
+    DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f9, %x)\n", val);
+
+    val = (((source < 2)?1:2) << 8) | /* Input select */
+        (1 << 5) | /* SDO strobe invert */
+        ((is_mpeg1?0:1) << 3) |
+        (1 << 2) | /* Inverted SIBC clock signal */
+        1; /* Validate */
+    mas_writemem(MAS_BANK_D0, 0x7f1, &val,1);
+
+    DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f1, %x)\n", val);
+
+    drain_dma_buffer();
+    
+    if(source == 0) /* Mic */
+    {
+        /* Copy left channel to right (mono mode) */
+        mas_codec_writereg(8, 0x8000);
+    }
+    else
+    {
+        /* Stereo input mode */
+        mas_codec_writereg(8, 0);
+    }
+
+    prerecording_max_seconds = prerecord_time;
+    if(prerecording_max_seconds)
+    {
+        prerecording = true;
+        start_prerecording();
+    }
+    else
+    {
+        prerecording = false;
+        is_prerecording = false;
+        is_recording = false;
+    }
+}
+
+/* If use_mic is true, the left gain is used */
+void mpeg_set_recording_gain(int left, int right, bool use_mic)
+{
+    /* Enable both left and right A/D */
+    mas_codec_writereg(0x0,
+                       (left << 12) |
+                       (right << 8) |
+                       (left << 4) |
+                       (use_mic?0x0008:0) | /* Connect left A/D to mic */
+                       0x0007);
 }
 
 void mpeg_new_file(char *filename)
@@ -2492,16 +2753,37 @@ void mpeg_new_file(char *filename)
 
 unsigned long mpeg_recorded_time(void)
 {
+    if(is_prerecording)
+        return prerecord_count * HZ;
+    
     if(is_recording)
         return current_tick - record_start_time;
-    else
-        return 0;
+
+    return 0;
 }
 
 unsigned long mpeg_num_recorded_bytes(void)
 {
+    int num_bytes;
+    int index;
+    
     if(is_recording)
-        return num_rec_bytes;
+    {
+        if(is_prerecording)
+        {
+            index = prerecord_index - prerecord_count;
+            if(index < 0)
+                index += prerecording_max_seconds;
+            
+            num_bytes = mp3buf_write - prerecord_buffer[index];
+            if(num_bytes < 0)
+                num_bytes += mp3buflen;
+            
+            return num_bytes;;
+        }
+        else
+            return num_rec_bytes;
+    }
     else
         return 0;
 }
@@ -2660,8 +2942,11 @@ int mpeg_status(void)
         ret |= MPEG_STATUS_PAUSE;
     
 #ifdef HAVE_MAS3587F
-    if(is_recording)
+    if(is_recording && !is_prerecording)
         ret |= MPEG_STATUS_RECORD;
+
+    if(is_prerecording)
+        ret |= MPEG_STATUS_PRERECORD;
 #endif
 
     if(mpeg_errno)
@@ -3055,73 +3340,6 @@ void mpeg_set_pitch(int pitch)
     val = 0x25;
     mas_writemem(MAS_BANK_D0,0x7f1,&val,1);
 }
-#endif
-
-#ifdef HAVE_MAS3587F
-void mpeg_set_recording_options(int frequency, int quality,
-                                int source, int channel_mode,
-                                bool editable)
-{
-    bool is_mpeg1;
-    unsigned long val;
-
-    is_mpeg1 = (frequency < 3)?true:false;
-
-    rec_version_index = is_mpeg1?3:2;
-    rec_frequency_index = frequency % 3;
-    
-    val = (quality << 17) |
-        (rec_frequency_index << 10) |
-        ((is_mpeg1?1:0) << 9) |
-        (1 << 8) | /* CRC on */
-        (((channel_mode * 2 + 1) & 3) << 6) |
-        (1 << 5) /* MS-stereo */ |
-        (1 << 2) /* Is an original */;
-    mas_writemem(MAS_BANK_D0, 0x7f0, &val,1);
-
-    DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f0, %x)\n", val);
-
-    val = editable?4:0;
-    mas_writemem(MAS_BANK_D0, 0x7f9, &val,1);
-
-    DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f9, %x)\n", val);
-
-    val = ((!is_recording << 10) | /* Monitoring */
-        ((source < 2)?1:2) << 8) | /* Input select */
-        (1 << 5) | /* SDO strobe invert */
-        ((is_mpeg1?0:1) << 3) |
-        (1 << 2) | /* Inverted SIBC clock signal */
-        1; /* Validate */
-    mas_writemem(MAS_BANK_D0, 0x7f1, &val,1);
-
-    DEBUGF("mas_writemem(MAS_BANK_D0, 0x7f1, %x)\n", val);
-
-    drain_dma_buffer();
-    
-    if(source == 0) /* Mic */
-    {
-        /* Copy left channel to right (mono mode) */
-        mas_codec_writereg(8, 0x8000);
-    }
-    else
-    {
-        /* Stereo input mode */
-        mas_codec_writereg(8, 0);
-    }
-}
-
-/* If use_mic is true, the left gain is used */
-void mpeg_set_recording_gain(int left, int right, bool use_mic)
-{
-    /* Enable both left and right A/D */
-    mas_codec_writereg(0x0,
-                       (left << 12) |
-                       (right << 8) |
-                       (left << 4) |
-                       (use_mic?0x0008:0) | /* Connect left A/D to mic */
-                       0x0007);
-}
-
 #endif
 
 #ifdef SIMULATOR
