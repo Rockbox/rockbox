@@ -33,8 +33,9 @@
 int read_rom_version(void);
 int read_hw_mask(void);
 
-#ifdef HAVE_LCD_CHARCELLS
+#ifdef ARCHOS_PLAYER
 bool has_new_lcd(void);
+bool has_ata_power_control(void) __attribute__ ((alias ("has_new_lcd")));
 #endif
 
 #endif

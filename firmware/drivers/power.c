@@ -119,7 +119,7 @@ void ide_power_enable(bool on)
     if(on)
     {
 #ifdef ATA_POWER_PLAYERSTYLE
-        if (read_rom_version() > 451) /* new players only */
+        if (has_ata_power_control())
         {
             or_b(0x10, &PBDRL);
             touched = true;
@@ -134,7 +134,7 @@ void ide_power_enable(bool on)
     if(!on)
     {
 #ifdef ATA_POWER_PLAYERSTYLE
-        if (read_rom_version() > 451) /* new players only */
+        if (has_ata_power_control())
         {
             and_b(~0x10, &PBDRL);
             touched = true;
@@ -166,7 +166,7 @@ bool ide_powered(void)
 {
 #if defined(NEEDS_ATA_POWER_ON) || defined(HAVE_ATA_POWER_OFF)
 #ifdef ATA_POWER_PLAYERSTYLE
-    if (read_rom_version() > 451) /* new players only */
+    if (has_ata_power_control())
     {
         if ((PBCR2 & 0x0300) || !(PBIOR & 0x0010)) /* not configured for output */
             return false; /* would be floating low, disk off */
