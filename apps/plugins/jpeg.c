@@ -1470,22 +1470,18 @@ int root_size;
 /* interactively scroll around the image */
 int scroll_bmp(struct t_disp* pdisp)
 {
+    /*empty the button queue first, to avoid unwanted scrolling */
+    while(rb->button_get(false) != BUTTON_NONE);
+
     while (true)
     {
         int button;
         int move;
 
-        /* we're unfortunately slower than key repeat,
-           so empty the button queue, to avoid post-scroll */
-        while(rb->button_get(false) != BUTTON_NONE);
-
         button = rb->button_get(true);
 
         if (button == SYS_USB_CONNECTED)
-        {
-            gray_release_buffer(); /* switch off overlay and deinitialize */
             return PLUGIN_USB_CONNECTED;
-        }
 
         switch(button & ~(BUTTON_REPEAT))
         {
@@ -1885,7 +1881,7 @@ int main(char* filename)
         gray_show_display(false); /* switch off overlay */
 
     }
-    while (status > 0 && status != SYS_USB_CONNECTED);
+    while (status != PLUGIN_OK && status != PLUGIN_USB_CONNECTED);
 
     gray_release_buffer(); /* deinitialize */
 
