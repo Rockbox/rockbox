@@ -22,6 +22,6 @@
 #ifndef __LIBRARY_MEMORY_CONFIG_H__
 #  define __LIBRARY_MEMORY_CONFIG_H__
 #  define PACKAGE_NAME "memory"
-#  define PACKAGE_VERSION "0.1.0"
+#  define PACKAGE_VERSION "0.1.1"
 #  define MEMORY_PAGE_USE_SPLAY_TREE 1
 #endif
