@@ -794,7 +794,7 @@ int lcd_getstringsize(unsigned char *str, unsigned int font, int *w, int *h)
             ch -= ASCII_MIN;
 
         byte = char_dw_8x8_prop[ch][8];
-        width += byte>>4;
+        width += (byte>>4) + 1;
         if((byte & 0x0f) > height)
             height = byte & 0x0f;
 
