@@ -4,10 +4,6 @@ README
 FILES
 *.lds
 common/*.[ch]
-malloc/*.[ch]
-malloc/README
-malloc/THOUGHTS
-malloc/Makefile
 drivers/*.[ch]
 export/*.h
 include/*.h
