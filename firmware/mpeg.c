@@ -415,6 +415,23 @@ void DEI3(void)
         if(mp3buf_read >= mp3buflen)
             mp3buf_read = 0;
     
+        /* First, check if we are on a track boundary */
+        if (last_tag > 1)
+        {
+            if (mp3buf_read == id3tags[1].mempos)
+            {
+                /* shift array so index 0 is current track */
+                int i;
+
+                DEBUGF("Track change\n");
+                for (i=0; i<last_tag-1; i++)
+                {
+                    id3tags[i] = id3tags[i+1];
+                }
+                last_tag--;
+            }
+        }
+        
         unplayed_space_left = mp3buf_write - mp3buf_read;
         if(unplayed_space_left < 0)
             unplayed_space_left = mp3buflen + unplayed_space_left;
@@ -430,23 +447,23 @@ void DEI3(void)
         if(unplayed_space_left)
         {
             last_dma_chunk_size = MIN(65536, unplayed_space_left);
-            last_dma_chunk_size = MIN(last_dma_chunk_size, space_until_end_of_buffer);
-            DTCR3 = last_dma_chunk_size & 0xffff;
-            SAR3 = (unsigned int)mp3buf + mp3buf_read;
+            last_dma_chunk_size = MIN(last_dma_chunk_size,
+                                      space_until_end_of_buffer);
 
             /* several tracks loaded? */
-            if ( last_tag>1 ) {
+            if (last_tag>1)
+            {
                 /* will we move across the track boundary? */
-                if (( mp3buf_read <= id3tags[1].mempos ) &&
-                    ((mp3buf_read+last_dma_chunk_size) > id3tags[1].mempos )) {
-                    /* shift array so index 0 is current track */
-                    int i;
-                    for (i=0; i<last_tag-1; i++)
-                        id3tags[i] = id3tags[i+1];
-                    last_tag--;
-                    DEBUGF("Track change\n");
+                if (( mp3buf_read < id3tags[1].mempos ) &&
+                    ((mp3buf_read+last_dma_chunk_size) > id3tags[1].mempos ))
+                {
+                    /* Make sure that we end exactly on the boundary */
+                    last_dma_chunk_size = id3tags[1].mempos - mp3buf_read;
                 }
             }
+
+            DTCR3 = last_dma_chunk_size & 0xffff;
+            SAR3 = (unsigned int)mp3buf + mp3buf_read;
         }
         else
         {
