@@ -46,7 +46,9 @@
 
 #define FF_REWIND_MIN_STEP 1000 /* minimum ff/rewind step is 1 second */
 #define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
-                                /* 3% of 30min file == 54s step size */ 
+                                /* 3% of 30min file == 54s step size */
+
+#define WPS_CONFIG "/wps.config"
 
 #ifdef HAVE_LCD_BITMAP
     #define PLAY_DISPLAY_2LINEID3        0 
@@ -326,16 +328,6 @@ void draw_player_progress(int x, int y)
 
 bool load_custom_wps(void)
 {
-#ifdef SIMULATOR
-    snprintf(custom_wps[0],sizeof(custom_wps[0]),"%s","%s%pp/%pe: %?%it - %ia%:%fn%?");
-    snprintf(custom_wps[1],sizeof(custom_wps[1]),"%s","%pc/%pt");
-    snprintf(custom_wps[2],sizeof(custom_wps[2]),"%s","%it");
-    snprintf(custom_wps[3],sizeof(custom_wps[3]),"%s","%id");
-    snprintf(custom_wps[4],sizeof(custom_wps[4]),"%s","%ia");
-    snprintf(custom_wps[5],sizeof(custom_wps[5]),"%s","%id");
-    scroll_line_custom = 0;
-    return(true);
-#else
     int fd;
     int l = 0;
     int numread = 1;
@@ -347,7 +339,11 @@ bool load_custom_wps(void)
     }
     l = 0;
 
-    fd = open("/wps.config", O_RDONLY);
+#ifdef SIMULATOR
+    fd = x11_open(WPS_CONFIG, O_RDONLY);
+#else
+    fd = open(WPS_CONFIG, O_RDONLY);
+#endif
     if(-1 == fd)
     {
         close(fd);
@@ -380,7 +376,6 @@ bool load_custom_wps(void)
             scroll_line_custom = l;
     }
     return(true);
-#endif
 }
 
 bool display_custom_wps(int x_val, int y_val, bool do_scroll, char *wps_string)
