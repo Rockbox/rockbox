@@ -425,7 +425,11 @@ void settings_apply(void)
     backlight_set_timeout(global_settings.backlight_timeout);
     backlight_set_on_when_charging(global_settings.backlight_on_when_charging);
     ata_spindown(global_settings.disk_spindown);
+
+#ifdef ATA_POWER_OFF
     ata_poweroff(global_settings.disk_poweroff);
+#endif
+
     set_poweroff_timeout(global_settings.poweroff);
 #ifdef HAVE_CHARGE_CTRL
     charge_restart_level = global_settings.discharge ? 
@@ -1035,6 +1039,8 @@ bool set_time(char* string, int timedate[])
     char cursor[][3] = {{ 0,  8, 12}, {18,  8, 12}, {36,  8, 12},
                         {24, 16, 24}, {54, 16, 18}, {78, 16, 12}};
     char daysinmonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    
+    int monthname_len = 0, dayname_len = 0;
 
 
 #ifdef HAVE_LCD_BITMAP
@@ -1068,9 +1074,7 @@ bool set_time(char* string, int timedate[])
                        (realyear - 1) / 100 + (realyear - 1) / 400 + 7 - 1) % 7;
 
         snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d ",
-                 timedate[0],
-                 timedate[1],
-                 timedate[2]);
+                 timedate[0], timedate[1], timedate[2]);
         lcd_puts(0, 1, buffer);
 
         /* recalculate the positions and offsets */
@@ -1106,23 +1110,25 @@ bool set_time(char* string, int timedate[])
         lcd_getstringsize(buffer, &width, &prev_line_height);
 
         snprintf(buffer, sizeof(buffer), "%s 20%02d %s %02d ",
-                 dayname[timedate[6]],
-                 timedate[3],
-                 monthname[timedate[4] - 1],
+                 dayname[timedate[6]], timedate[3], monthname[timedate[4] - 1],
                  timedate[5]);
         lcd_puts(0, 2, buffer);
 
         /* recalculate the positions and offsets */
         lcd_getstringsize(buffer, &width, &line_height);
 
+        /* store these 2 to prevent _repeated_ strlen calls */
+        monthname_len = strlen(monthname[timedate[4] - 1]);
+        dayname_len = strlen(dayname[timedate[6]]);
+
         /* weekday */
-        strncpy(reffub, buffer, strlen(dayname[timedate[6]]));
-        reffub[strlen(dayname[timedate[6]])] = '\0';
+        strncpy(reffub, buffer, dayname_len);
+        reffub[dayname_len] = '\0';
         lcd_getstringsize(reffub, &weekday_width, &height);
         lcd_getstringsize(" ", &separator_width, &height);
 
         /* year */
-        strncpy(reffub, buffer + strlen(dayname[timedate[6]]) + 1, 4);
+        strncpy(reffub, buffer + dayname_len + 1, 4);
         reffub[4] = '\0';
         lcd_getstringsize(reffub, &width, &height);
         cursor[3][INDEX_X] = weekday_width + separator_width;
@@ -1130,8 +1136,8 @@ bool set_time(char* string, int timedate[])
         cursor[3][INDEX_WIDTH] = width;
 
         /* month */
-        strncpy(reffub, buffer + strlen(dayname[timedate[6]]) + 6, strlen(monthname[timedate[4] - 1]));
-        reffub[strlen(monthname[timedate[4] - 1])] = '\0';
+        strncpy(reffub, buffer + dayname_len + 6, monthname_len);
+        reffub[monthname_len] = '\0';
         lcd_getstringsize(reffub, &width, &height);
         cursor[4][INDEX_X] = weekday_width + separator_width +
                              cursor[3][INDEX_WIDTH] + separator_width;
@@ -1139,7 +1145,7 @@ bool set_time(char* string, int timedate[])
         cursor[4][INDEX_WIDTH] = width;
 
         /* day */
-        strncpy(reffub, buffer + strlen(dayname[timedate[6]]) + strlen(monthname[timedate[4] - 1]) + 7, 2);
+        strncpy(reffub, buffer + dayname_len + monthname_len + 7, 2);
         reffub[2] = '\0';
         lcd_getstringsize(reffub, &width, &height);
         cursor[5][INDEX_X] = weekday_width + separator_width +

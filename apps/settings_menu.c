@@ -343,7 +343,8 @@ static bool dir_filter(void)
 {
     char* names[] = { str(LANG_FILTER_ALL),
                       str(LANG_FILTER_SUPPORTED),
-                      str(LANG_FILTER_MUSIC) };
+                      str(LANG_FILTER_MUSIC),
+                      str(LANG_FILTER_PLAYLIST) };
 
     return set_option( str(LANG_FILTER), &global_settings.dirfilter,
                        names, 3, NULL );

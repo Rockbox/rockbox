@@ -1156,3 +1156,9 @@ id: LANG_POWEROFF
 desc: disk poweroff flag
 eng: "Disk Poweroff"
 new:
+
+id: LANG_FILTER_PLAYLIST
+desc: show only playlist
+eng: "Playlists"
+new:
+

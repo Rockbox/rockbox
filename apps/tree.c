@@ -272,6 +272,14 @@ static int showdir(char *path, int start)
                     dptr->attr |= TREE_ATTR_MOD;
             }
 
+            /* filter out all non-playlist files */
+            if ( global_settings.dirfilter == SHOW_PLAYLIST &&
+                 (!(dptr->attr &
+                    (ATTR_DIRECTORY|TREE_ATTR_M3U))) ) {
+                i--;
+                continue;
+            }
+            
             /* filter out non-music files */
             if ( global_settings.dirfilter == SHOW_MUSIC &&
                  (!(dptr->attr &

@@ -289,6 +289,10 @@ bool f2_screen(void)
             case SHOW_MUSIC:
                 ptr = str(LANG_FILTER_MUSIC);
                 break;
+                
+            case SHOW_PLAYLIST:
+                ptr = str(LANG_FILTER_PLAYLIST);
+                break;
         }
 
         snprintf(buf, sizeof buf, "%s:", str(LANG_FILTER));

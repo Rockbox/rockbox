@@ -149,13 +149,8 @@ bool set_bool_options(char* string, bool* variable,
 bool set_bool(char* string, bool* variable );
 bool set_option(char* string, int* variable, char* options[],
                 int numoptions, void (*function)(int));
-bool set_int(char* string, 
-             char* unit,
-             int* variable,
-             void (*function)(int),
-             int step,
-             int min,
-             int max );
+bool set_int(char* string, char* unit, int* variable,
+             void (*function)(int), int step, int min, int max );
 bool set_time(char* string, int timedate[]);
 
 /* global settings */
@@ -184,6 +179,12 @@ extern char rockboxdir[];
 enum { REPEAT_OFF, REPEAT_ALL, REPEAT_ONE, NUM_REPEAT_MODES };
 
 /* dir filter options */
-enum { SHOW_ALL, SHOW_SUPPORTED, SHOW_MUSIC, NUM_FILTER_MODES };
+enum { SHOW_ALL, SHOW_SUPPORTED, SHOW_MUSIC, SHOW_PLAYLIST, NUM_FILTER_MODES };
 
 #endif /* __SETTINGS_H__ */
+
+
+
+
+
+
