@@ -231,7 +231,11 @@ bool show_info(void)
         /* Wait for a key to be pushed */
         key = button_get_w_tmo(HZ*5);
         switch(key) {
+
             case SETTINGS_OK:
+#ifdef SETTINGS_OK2
+            case SETTINGS_OK2:
+#endif
             case SETTINGS_CANCEL:
                 done = true;
                 break;
