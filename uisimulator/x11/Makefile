@@ -135,6 +135,7 @@ clean:
 		$(OBJDIR)/build.lang $(OBJDIR)/*.o $(OBJDIR)/sysfont.c \
 		$(ROCKS) $(OBJDIR)/credits.raw
 	$(RM) -r $(DEPS)
+	$(RM) -f $(OBJDIR)/libplugin.a $(OBJDIR)/rockbox.zip
 
 $(OBJDIR)/%.rock: $(APPDIR)/plugins/%.c $(APPDIR)/plugin.h
 	$(CC) $(APPCFLAGS) -DPLUGIN -L$(OBJDIR) -lplugin -shared $< -o $@
