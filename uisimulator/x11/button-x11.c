@@ -59,7 +59,7 @@ int button_set_release(int newmask)
  * Recorder:
  * Space=Play Q=On A=Off 1,2,3 = F1,F2,F3
  * Player:
- * Q=On Enter=Menu
+ * Q=On Return=Menu
  */
 
 /* from uibasic.c */
@@ -125,7 +125,7 @@ static int get_raw_button (void)
 	    return BUTTON_ON;
 
 	case XK_KP_Enter:
-	case XK_Enter:
+	case XK_Return:
 	    return BUTTON_MENU;
 #endif
 
