@@ -27,7 +27,7 @@
 
 <p align="right">
 <a class="menulink" href="/rockbox/">main page</a><br>
-<a class="menulink" href="/rockbox/download.html">download</a><br>
+<a class="menulink" href="/rockbox/download/">download</a><br>
 <a class="menulink" href="/rockbox/docs/FAQ">FAQ</a><br>
 <a class="menulink" href="/rockbox/notes.html">research notes</a><br>
 <a class="menulink" href="/rockbox/docs/">data sheets</a><br>
