@@ -125,7 +125,11 @@ struct plugin_api {
     /* file */
     int (*open)(const char* pathname, int flags);
     int (*close)(int fd);
+#ifdef SIMULATOR
+    ssize_t (*read)(int fd, void* buf, int count);
+#else
     int (*read)(int fd, void* buf, int count);
+#endif
     int (*lseek)(int fd, int offset, int whence);
     int (*creat)(const char *pathname, int mode);
     int (*write)(int fd, void* buf, int count);
