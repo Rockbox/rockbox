@@ -669,19 +669,10 @@ A76: It means you have more files in a single directory than you have
 
      Solution: Increase the "max files in dir browser" setting.
 
-     The current official release (2.3) contains a bug that sets
-     the default buffer setting to 0, giving the dir buffer full error.
-     Solution:
+     The 2.2 release contained a bug that set the default buffer setting
+     to 0, giving the dir buffer full error.
 
-     1) Change the limit in the settings
-
-     2) Exit the menu back to the browser
-
-     3) Force a disk spinup. There are several ways: either select
-     another setting for the file filter, or insert the USB and extract
-     it again
-     
-     4) Turn it off and on again
+     Solution: Upgrade to 2.3.
 
 Q77: Why are you developing X when you should be doing Y?
 A77: You make the common mistake of confusing Rockbox development with that of
