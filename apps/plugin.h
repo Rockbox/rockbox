@@ -205,7 +205,7 @@ struct plugin_api {
     struct user_settings* global_settings;
     void (*backlight_set_timeout)(int index);
 #ifndef SIMULATOR
-    void (*ata_sleep)(void);
+    int (*ata_sleep)(void);
 #endif
 };
 
