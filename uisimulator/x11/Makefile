@@ -49,8 +49,6 @@ LANGUAGE = english
 DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR	\
 $(KEYPAD) $(DISPLAY) $(EXTRA_DEFINES) $(RTC)
 
-LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
-
 # Use this for simulator-only files
 INCLUDES = -I. -I$(DRIVERS) -I$(FIRMWAREDIR)/export -I$(APPDIR) \
 -I$(MACHINEDIR) -I../common -I$(OBJDIR)
@@ -61,15 +59,24 @@ APPINCLUDES = $(INCLUDES)
 
 LIBS = -lpthread
 
-UNAME := $(shell uname)
+UNAME := $(shell uname|sed -e "s/CYGWIN.*/CYGWIN/")
 ifeq ($(UNAME),Linux)
+  LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
   INCLUDES += -I/usr/X11R6/include
   LIBDIRS = -L/usr/X11R6/lib
   DEFINES += -DLINUX
   #MPEG_PLAY = 1
 else
+ifeq ($(UNAME),CYGWIN)
+  LDFLAGS = -lSM -lICE -lXt -lX11 -lXmu -lSM -lICE -lX11
+  INCLUDES += -I/usr/X11R6/include
+  LIBDIRS = -L/usr/X11R6/lib
+  DEFINES += -DLINUX
+else
+  LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
   DEFINES += -DBIG_ENDIAN
   LIBDIRS = 
+endif
 endif
 
 ifdef MPEG_PLAY
@@ -321,8 +328,13 @@ $(OBJDIR)/lcd-player.o: $(DRIVERS)/lcd-player.c
 $(OBJDIR)/%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+ifeq ($(UNAME),CYGWIN)
+$(TARGET): $(OBJS)
+	$(CC) -g -o $(TARGET) $(OBJS) $(LIBDIRS) $(LDFLAGS) $(LIBS)
+else
 $(TARGET): $(OBJS)
 	$(CC) -g -o $(TARGET) $(LIBDIRS) $(LDFLAGS) $(OBJS) $(LIBS)
+endif
 
 DEPS:=$(OBJDIR)/.deps
 
