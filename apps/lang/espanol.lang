@@ -2962,3 +2962,9 @@ desc: Used when you need to say playlist, also voiced
 eng: "Playlist"
 voice: "Lista de reproducción"
 new: "Lista de reproducción"
+
+id: LANG_RECORD_STARTUP
+desc: Start Rockbox in Recording screen
+eng: "Show recording screen on startup"
+voice: "Mostrar pantalla de grabación al encender"
+new: "Mostrar pantalla de grabación al encender"
