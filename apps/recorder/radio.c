@@ -707,7 +707,7 @@ bool radio_delete_preset(void)
 
 bool handle_radio_presets_menu(void)
 {
-    struct menu_item preset_menu_items[] = {
+    static const struct menu_item preset_menu_items[] = {
         { ID2P(LANG_FM_EDIT_PRESET), radio_edit_preset },
         { ID2P(LANG_FM_DELETE_PRESET), radio_delete_preset },
     };

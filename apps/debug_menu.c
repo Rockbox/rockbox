@@ -61,7 +61,7 @@
 extern int ata_device;
 extern int ata_io_address;
 extern int num_threads;
-extern char *thread_name[];
+extern const char *thread_name[];
 
 #ifdef HAVE_LCD_BITMAP
 /* Test code!!! */

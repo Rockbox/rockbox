@@ -24,7 +24,7 @@
 #include "button.h"
 #include "sprintf.h"
 
-char* const credits[] = {
+const char* const credits[] = {
 #include "credits.raw" /* generated list of names from docs/CREDITS */
 };
 
