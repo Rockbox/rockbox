@@ -37,7 +37,7 @@
   <li>Net - openssh</li>
  </ul>
 
-<h2>Step 3: Select the Eric's mirror site and install</h2>
+<h2>Step 3: Select Eric's mirror site and install</h2>
 <p>
  Start the Setup program again. When the installer prompts you for a mirror
  site URL, enter <b>http://lassauge.free.fr/cygwin</b> in the "User URL" field.
