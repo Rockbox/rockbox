@@ -1,6 +1,3 @@
-? Makefile.tmpl
-? lib/Makefile.tmpl
-? lib/dep-pluginlib
 #             __________               __   ___.
 #   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
 #   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
