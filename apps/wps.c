@@ -267,7 +267,8 @@ int wps_show(void)
                         break;
                     mpeg_stop();
                     status_set_playmode(STATUS_STOP);
-                    break;
+                    return 0;
+                    
 #ifndef SIMULATOR
                 case SYS_USB_CONNECTED:
                     /* Tell the USB thread that we are safe */
