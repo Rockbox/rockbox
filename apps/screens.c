@@ -121,12 +121,18 @@ void usb_screen(void)
 }
 
 
+/* some simulator dummies */
+#ifdef SIMULATOR
+#define BATTERY_SCALE_FACTOR 7000
+#endif
+
+
 #ifdef HAVE_LCD_BITMAP
 void charging_display_info(bool animate)
 {
     unsigned char charging_logo[36];
     const int pox_x = (LCD_WIDTH - sizeof(charging_logo)) / 2;
-    const int pox_y = 24;
+    const int pox_y = 32;
     static unsigned phase = 3;
     unsigned i;
     int battery_voltage;
@@ -139,13 +145,32 @@ void charging_display_info(bool animate)
 
     snprintf(buf, 32, "  Batt: %d.%02dV %d%%  ", batt_int, batt_frac,
              battery_level());
-    lcd_puts(0, 6, buf);
+    lcd_puts(0, 7, buf);
 
 #ifdef HAVE_CHARGE_CTRL
-    snprintf(buf, 30, "  Charging: %s", charger_enabled ? "yes" : "no");
+
+    snprintf(buf, 32, "Charge mode:");
     lcd_puts(0, 2, buf);
-    if (!charger_enabled)
+
+    if (charge_state == 1)
+        snprintf(buf, 32, str(LANG_BATTERY_CHARGE));
+    else if (charge_state == 2)
+        snprintf(buf, 32, str(LANG_BATTERY_TOPOFF_CHARGE));
+    else if (charge_state == 3)
+        snprintf(buf, 32, str(LANG_BATTERY_TRICKLE_CHARGE));
+    else
+        snprintf(buf, 32, "not charging");
+
+    lcd_puts(0, 3, buf);
+    if (charger_enabled)
+    {
+        backlight_on(); /* using the light gives good indication */
+    }
+    else
+    {
+        backlight_off();
         animate = false;
+    }
 #endif                
 
     
@@ -185,9 +210,10 @@ void charging_display_info(bool animate)
     }
     lcd_update();
 }
-#else
+#else /* not HAVE_LCD_BITMAP */
 void charging_display_info(bool animate)
 {
+    /* ToDo for Player */
     (void)animate;
 }
 #endif
@@ -210,8 +236,8 @@ int charging_screen(void)
 
     ide_power_enable(false); /* power down the disk, else would be spinning */
 
-    backlight_on();
     lcd_clear_display();
+    backlight_on();
     status_draw(true);
 
 #ifdef HAVE_LCD_BITMAP
@@ -221,8 +247,6 @@ int charging_screen(void)
     lcd_puts(0, 1, "[charging]");
 #endif
     
-    charger_enable(true);
-
     do
     {
         status_draw(false);
