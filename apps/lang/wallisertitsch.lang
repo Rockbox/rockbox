@@ -1,5 +1,5 @@
-# $Id$
-#
+# $Id: wallisertitsch.lang,v 1.14 2002/10/06 12:56:00 vicentinimartin
+
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
@@ -426,7 +426,7 @@ new: "Fortsetzu?"
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: posible answers to resume question
 eng: "(PLAY/STOP)"
-new: "(Abschpilu/Stop)"
+new: "(PLAY/Stop)"
 
 id: LANG_RESUME_CONFIRM_RECORDER
 desc: posible answer to resume question
@@ -441,12 +441,12 @@ new: "Susch en Taschta = Nei"
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
 eng: "Keylock ON"
-new: "Tschtuschperri A"
+new: "Taschtuschperri A"
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
 eng: "Keylock OFF"
-new: "Tschtuschperri Üs"
+new: "Taschtuschperri Üs"
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
@@ -787,7 +787,7 @@ new: "0 Reie - Level 0"
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
 eng: "Idle Poweroff"
-new:
+new: "automatischus Üsschaltu"
 
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
@@ -797,7 +797,7 @@ new: "Nöiji Spraach"
 id: LANG_FILTER
 desc: setting name for dir filter
 eng: "Show files"
-new: "Zeig di Datije"
+new: "Datiifilter"
 
 id: LANG_FILTER_MUSIC
 desc: show only music-related files
@@ -807,7 +807,7 @@ new: "Müsig"
 id: LANG_FILTER_SUPPORTED
 desc: show all file types supported by Rockbox
 eng: "Supported"
-new: "Unnerschtützt"
+new: "Unnerschtützti"
 
 id: LANG_FILTER_ALL
 desc: show all files
@@ -827,29 +827,49 @@ new: "Nei"
 id: LANG_PM_MENU
 desc: in the display menu
 eng: "Peak meter"
-new:
+new: "Üsstiirigsazeig"
 
 id:   LANG_PM_RELEASE
 desc: in the peak meter menu
 eng: "Peak release"
-new: 
+new: "Gschw. bim Abfallu"
 
 id: LANG_PM_PEAK_HOLD
 desc: in the peak meter menu
 eng: "Peak hold time"
-new: 
+new: "Üsstiirig Haltezit"
 
 id: LANG_PM_CLIP_HOLD
 desc: in the peak meter menu
 eng: "Clip hold time"
-new: 
+new: "Uberstiirig Haltezit"
 
 id: LANG_PM_ETERNAL
 desc: in the peak meter menu
 eng: "eternal"
-new: 
+new: "ewig"
 
 id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
 eng: "Units per read"
-new: 
+new: "Einheite pro gläsnum Wärt"
+
+id: LANG_BACKLIGHT_ON_WHEN_CHARGING
+desc: in display_settings_menu
+eng: "Backlight on when charging"
+new: "Bilüüchtig a bim ladu"
+
+id: LANG_REPEAT
+desc: in settings_menu
+eng: "Repeat"
+new: "Widerholig"
+
+id: LANG_REPEAT_ALL
+desc: repeat playlist once all songs have completed
+eng: "All"
+new: "Alli Lieder"
+
+id: LANG_REPEAT_ONE
+desc: repeat one song
+eng: "One"
+new: "Eis Lied"

@@ -262,7 +262,7 @@ new: "Indstil tid/dato"
 id: LANG_SPINDOWN
 desc: in settings_menu
 eng: "Disk Spindown"
-new: "'Disk spindown'" 
+new: "Disk 'spindown'" 
 
 id: LANG_FFRW_STEP
 desc: in settings_menu
@@ -873,17 +873,17 @@ new: ""
 id:   LANG_PM_RELEASE
 desc: in the peak meter menu
 eng: "Peak release"
-new: "Peak frigivelse"
+new: "Spidsfrigivelse"
 
 id: LANG_PM_PEAK_HOLD
 desc: in the peak meter menu
 eng: "Peak hold time"
-new: "Peak frysetid"
+new: "Spidsfrysetid"
 
 id: LANG_PM_CLIP_HOLD
 desc: in the peak meter menu
 eng: "Clip hold time"
-new: "Klip frysetid"
+new: "Klipfrysetid"
 
 id: LANG_PM_ETERNAL
 desc: in the peak meter menu
@@ -894,5 +894,25 @@ id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
 eng: "Units per read"
 new: "Enheder pr. læsning"
+
+id: LANG_BACKLIGHT_ON_WHEN_CHARGING
+desc: in display_settings_menu
+eng: "Backlight on when charging"
+new: "Lys under opladning"
+
+id: LANG_REPEAT
+desc: in settings_menu
+eng: "Repeat"
+new: "Gentag"
+
+id: LANG_REPEAT_ALL
+desc: repeat playlist once all songs have completed
+eng: "All"
+new: "Alle"
+
+id: LANG_REPEAT_ONE
+desc: repeat one song
+eng: "One"
+new: "En"
 
 
