@@ -84,6 +84,11 @@ clean:
 DEPS:=.deps
 DEPDIRS:=$(DEPS) $(DEPS)/recorder
 
+DIRS = $(subst $(DEPS),".",$(DEPDIRS)) 
+
+tags:
+	@$(SHELL) -c 'for d in $(DIRS); do { etags -o $(OBJDIR)/TAGS -a $$d/*.[ch]; }; done'
+
 $(OBJDIR)/$(DEPS)/%.d: %.c
 	@$(SHELL) -c 'for d in $(DEPDIRS); do { if [ ! -d $(OBJDIR)/$$d ]; then mkdir $(OBJDIR)/$$d; fi; }; done'
 	@echo "Updating dependencies for $(OBJDIR)/$<"
