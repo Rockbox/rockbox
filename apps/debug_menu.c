@@ -567,6 +567,7 @@ bool dbg_partitions(void)
 }
 
 #ifdef HAVE_LCD_BITMAP
+static bool boost = false;
 /* Test code!!! */
 bool dbg_ports(void)
 {
@@ -635,7 +636,7 @@ bool dbg_ports(void)
     unsigned int gpio_enable;
     unsigned int gpio1_enable;
     int adc_buttons, adc_remote, adc_battery;
-    char buf[32];
+    char buf[128];
     int button;
     int line;
 
@@ -657,33 +658,33 @@ bool dbg_ports(void)
         gpio_enable = GPIO_ENABLE;
         gpio1_enable = GPIO1_ENABLE;
         
-        snprintf(buf, 32, "GPIO_READ:     %08x", gpio_read);
+        snprintf(buf, sizeof(buf), "GPIO_READ:     %08x", gpio_read);
         lcd_puts(0, line++, buf);
-        snprintf(buf, 32, "GPIO_OUT:      %08x", gpio_out);
+        snprintf(buf, sizeof(buf), "GPIO_OUT:      %08x", gpio_out);
         lcd_puts(0, line++, buf);
-        snprintf(buf, 32, "GPIO_FUNCTION: %08x", gpio_function);
+        snprintf(buf, sizeof(buf), "GPIO_FUNCTION: %08x", gpio_function);
         lcd_puts(0, line++, buf);
-        snprintf(buf, 32, "GPIO_ENABLE:   %08x", gpio_enable);
+        snprintf(buf, sizeof(buf), "GPIO_ENABLE:   %08x", gpio_enable);
         lcd_puts(0, line++, buf);
 
-        snprintf(buf, 32, "GPIO1_READ:     %08x", gpio1_read);
+        snprintf(buf, sizeof(buf), "GPIO1_READ:     %08x", gpio1_read);
         lcd_puts(0, line++, buf);
-        snprintf(buf, 32, "GPIO1_OUT:      %08x", gpio1_out);
+        snprintf(buf, sizeof(buf), "GPIO1_OUT:      %08x", gpio1_out);
         lcd_puts(0, line++, buf);
-        snprintf(buf, 32, "GPIO1_FUNCTION: %08x", gpio1_function);
+        snprintf(buf, sizeof(buf), "GPIO1_FUNCTION: %08x", gpio1_function);
         lcd_puts(0, line++, buf);
-        snprintf(buf, 32, "GPIO1_ENABLE:   %08x", gpio1_enable);
+        snprintf(buf, sizeof(buf), "GPIO1_ENABLE:   %08x", gpio1_enable);
         lcd_puts(0, line++, buf);
 
         adc_buttons = adc_read(ADC_BUTTONS);
         adc_remote = adc_read(ADC_REMOTE);
         adc_battery = adc_read(ADC_BATTERY);
 
-        snprintf(buf, 32, "ADC_BUTTONS: %02x", adc_buttons);
+        snprintf(buf, sizeof(buf), "ADC_BUTTONS: %02x", adc_buttons);
         lcd_puts(0, line++, buf);
-        snprintf(buf, 32, "ADC_REMOTE:  %02x", adc_remote);
+        snprintf(buf, sizeof(buf), "ADC_REMOTE:  %02x", adc_remote);
         lcd_puts(0, line++, buf);
-        snprintf(buf, 32, "ADC_BATTERY: %02x", adc_battery);
+        snprintf(buf, sizeof(buf), "ADC_BATTERY: %02x", adc_battery);
         lcd_puts(0, line++, buf);
 
         lcd_update();
@@ -691,6 +692,24 @@ bool dbg_ports(void)
 
         switch(button)
         {
+        case BUTTON_UP:
+            cpu_boost(true);
+            snprintf(buf, sizeof(buf), "freq: %d, IDECONFIG1: %08x, IDECONFIG2: %08x", FREQ, IDECONFIG1, IDECONFIG2);
+            splash(HZ, false, buf);
+            break;
+            
+        case BUTTON_DOWN:
+            cpu_boost(false);
+            snprintf(buf, sizeof(buf), "freq: %d, IDECONFIG1: %08x, IDECONFIG2: %08x", FREQ, IDECONFIG1, IDECONFIG2);
+            splash(HZ, false, buf);
+            break;
+            
+        case BUTTON_SELECT:
+            set_cpu_frequency(CPUFREQ_DEFAULT);
+            snprintf(buf, sizeof(buf), "freq: %d, IDECONFIG1: %08x, IDECONFIG2: %08x", FREQ, IDECONFIG1, IDECONFIG2);
+            splash(HZ, false, buf);
+            break;
+            
             case SETTINGS_CANCEL:
                 return false;
         }
