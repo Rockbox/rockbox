@@ -32,8 +32,7 @@
 
 #include "lang.h"
 
-//#define SMALL_STEP_SIZE 15*60    /* Seconds */
-#define SMALL_STEP_SIZE 2*60    /* Seconds */
+#define SMALL_STEP_SIZE 15*60    /* Seconds */
 #define LARGE_STEP_SIZE 30*60    /* Seconds */
 #define THRESHOLD       60       /* Minutes */
 #define MAX_TIME        5*60*60  /* Hours */
