@@ -81,7 +81,6 @@ static void draw_screen(struct mp3entry* id3)
                 lcd_puts_scroll(0,0, (++szLast));
             else
                 lcd_puts_scroll(0,0, id3->path);
-
             break;
         }
         case PLAY_DISPLAY_DEFAULT:
@@ -122,6 +121,7 @@ void wps_show(void)
 
     while ( 1 ) {
         int i;
+        char buffer[32];
 
         if ( ( id3->length != lastlength ) ||
              ( id3->filesize != lastsize ) ||
@@ -138,20 +138,24 @@ void wps_show(void)
             lastalbum = id3->album[0];
             lasttitle = id3->title[0];
         }
-
-#ifdef HAVE_LCD_BITMAP
+        
+        if (playing)
         {
-            char buffer[32];
             snprintf(buffer,sizeof(buffer), "Time: %d:%02d / %d:%02d",
                      id3->elapsed / 60000,
                      id3->elapsed % 60000 / 1000,
                      id3->length / 60000,
                      id3->length % 60000 / 1000 );
-            lcd_puts(0, 6, buffer);
-            lcd_update();
-        }
-#endif
 
+#ifdef HAVE_LCD_BITMAP
+            lcd_puts(0, 6, buffer);
+#else
+            // Display time with the filename scroll only because the screen has room. 
+            if (global_settings.wps_display == PLAY_DISPLAY_FILENAME_SCROLL)
+                lcd_puts(0, 1, buffer);
+#endif
+            lcd_update();
+        } 
         for ( i=0;i<5;i++ ) {
             switch ( button_get(false) ) {
                 case BUTTON_ON:
