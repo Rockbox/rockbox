@@ -6,3 +6,5 @@ release
 genlang
 uplang
 binlang
+rockbox-style.el
+sample.emacs

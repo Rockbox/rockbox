@@ -5,7 +5,6 @@ Makefile
 README
 FILES
 *.lds
-rockbox-mode.el
 common/*.[ch]
 malloc/*.[ch]
 malloc/README
