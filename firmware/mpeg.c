@@ -1343,9 +1343,10 @@ void mpeg_next(void)
 #else
     char* file;
     int steps = 1;
+    int index;
 
     do {
-        file = playlist_next(steps, NULL);
+        file = playlist_next(steps, &index);
         if(!file)
             break;
         if(mp3info(&taginfo, file)) {
@@ -1353,6 +1354,7 @@ void mpeg_next(void)
             continue;
         }
         current_track_counter++;
+        taginfo.index = index;
         playing = true;
         break;
     } while(1);
@@ -1366,9 +1368,10 @@ void mpeg_prev(void)
 #else
     char* file;
     int steps = -1;
+    int index;
 
     do {
-        file = playlist_next(steps, NULL);
+        file = playlist_next(steps, &index);
         if(!file)
             break;
         if(mp3info(&taginfo, file)) {
@@ -1376,6 +1379,7 @@ void mpeg_prev(void)
             continue;
         }
         current_track_counter++;
+        taginfo.index = index;
         playing = true;
         break;
     } while(1);
