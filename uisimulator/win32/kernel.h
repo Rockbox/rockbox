@@ -17,4 +17,4 @@
  *
  ****************************************************************************/
 
-#include "../../firmware/include/kernel.h"
+#include "../../firmware/export/kernel.h"
