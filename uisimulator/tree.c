@@ -22,14 +22,19 @@
 #include <lcd.h>
 #include <button.h>
 #include "kernel.h"
+#include "tree.h"
 #ifdef WIN32
 #include <windows.h>
 #endif // WIN32
 
-#define TREE_MAX_LEN 15
+#define TREE_MAX_LEN       15
 #define TREE_MAX_ON_SCREEN 7
 
 int dircursor=0;
+
+void browse_root(void) {
+	dirbrowse("/");
+}
 
 bool dirbrowse(char *root)
 {
