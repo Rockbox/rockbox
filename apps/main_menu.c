@@ -163,8 +163,6 @@ bool show_info(void)
 
     if (global_settings.talk_menu)
     {   /* say whatever is reasonable, no real connection to the screen */
-        struct tm* tm;
-
         if (battery_level() >= 0)
         {
             talk_id(LANG_BATTERY_TIME, true);
@@ -178,14 +176,16 @@ bool show_info(void)
         talk_value(decimal, UNIT_GB, true);
 
 #ifdef HAVE_RTC
-        tm = get_time();
-        talk_id(VOICE_CURRENT_TIME, true);
-        talk_value(tm->tm_hour, UNIT_HOUR, true);
-        talk_value(tm->tm_min, UNIT_MIN, true);
-        talk_value(tm->tm_sec, UNIT_SEC, true);
-        talk_id(LANG_MONTH_JANUARY + tm->tm_mon, true);
-        talk_number(tm->tm_mday, true);
-        talk_number(1900 + tm->tm_year, true);
+        {
+            struct tm* tm = get_time();
+            talk_id(VOICE_CURRENT_TIME, true);
+            talk_value(tm->tm_hour, UNIT_HOUR, true);
+            talk_value(tm->tm_min, UNIT_MIN, true);
+            talk_value(tm->tm_sec, UNIT_SEC, true);
+            talk_id(LANG_MONTH_JANUARY + tm->tm_mon, true);
+            talk_number(tm->tm_mday, true);
+            talk_number(1900 + tm->tm_year, true);
+        }
 #endif
     }
 
