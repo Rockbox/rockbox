@@ -146,7 +146,7 @@ static char lcd_cram;
 static char lcd_pram;
 static char lcd_iram;
 
-
+#ifndef SIMULATOR
 void lcd_clear_display(void)
 {
     int i;
@@ -241,6 +241,13 @@ void lcd_icon(int icon, bool enable)
     lcd_write(false, icon_mirror[pos]);
 }
 
+void lcd_set_contrast(int val)
+{
+    lcd_write(true, lcd_contrast_set);
+    lcd_write(false, 31-val);
+}
+#endif /* SIMULATOR */
+
 void lcd_init (void)
 {
     new_lcd = has_new_lcd();
@@ -261,12 +268,6 @@ void lcd_init (void)
     
     create_thread(scroll_thread, scroll_stack,
                   sizeof(scroll_stack), scroll_name);
-}
-
-void lcd_set_contrast(int val)
-{
-    lcd_write(true, lcd_contrast_set);
-    lcd_write(false, 31-val);
 }
 
 void lcd_puts_scroll(int x, int y, unsigned char* string )
