@@ -27,9 +27,9 @@ href="http://joerg.hohensohn.bei.t-online.de/archos/doom/source.zip">http://joer
 
 <li> Press START on your taskbar, choose RUN and type in the box (minus
    quotes): "command" You should now be looking at a command prompt. If you
-   don't know basic DOS commands, here is what you need to know:
-<br>
-   cd > change dir (format: cd <dir>) IE: "cd .." to go UP one, "cd ROCKBOX" to enter a path "ROCKBOX"
+   don't know basic DOS commands, here is what you need to know: Use 'cd'
+   change dir (format: cd <dir>) IE: "cd .." to go UP one, "cd ROCKBOX" to
+   enter a path "ROCKBOX"
 
 <li> Navigate to your PATH in DOS prompt, using "cd" as illustrated above.
 
@@ -40,7 +40,7 @@ href="http://joerg.hohensohn.bei.t-online.de/archos/doom/source.zip">http://joer
    For example, if your AVI movie is called "filename" then you'd put in the following:
 <pre>
 	avitoyuv filename.avi filename.yuv
-</ptr>
+</pre>
 
    OPTIONAL: You can name the output file differently, whatever you specify it
    will be called.  INFO: This can take long to convert.
