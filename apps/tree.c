@@ -240,8 +240,9 @@ bool dirbrowse(char *root)
         return -1;  /* root is not a directory */
 
     lcd_puts(0, dircursor, CURSOR_CHAR);
-    lcd_puts_scroll(LINE_X, LINE_Y+dircursor,
-                    dircacheptr[start+dircursor]->name);
+    if ( numentries )
+        lcd_puts_scroll(LINE_X, LINE_Y+dircursor,
+                        dircacheptr[start+dircursor]->name);
     lcd_update();
 
     while(1) {
@@ -357,8 +358,9 @@ bool dirbrowse(char *root)
         }
 
         lcd_stop_scroll();
-        lcd_puts_scroll(LINE_X, LINE_Y+dircursor,
-                        dircacheptr[start+dircursor]->name);
+        if ( numentries )
+            lcd_puts_scroll(LINE_X, LINE_Y+dircursor,
+                            dircacheptr[start+dircursor]->name);
 
         lcd_update();
     }
