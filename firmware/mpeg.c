@@ -1675,7 +1675,12 @@ static void mpeg_thread(void)
                     int next = (tag_read_idx+1) & MAX_ID3_TAGS_MASK;
 
                     /* Reset the buffer */
-                    mp3buf_write = mp3buf_swapwrite = id3tags[next]->mempos;
+                    mp3buf_write = id3tags[next]->mempos;
+
+                    /* Reset swapwrite unless we're still swapping current
+                       track */
+                    if (get_unplayed_space() <= get_playable_space())
+                        mp3buf_swapwrite = mp3buf_write;
 
                     close(mpeg_file);
                     remove_all_non_current_tags();
