@@ -22,10 +22,10 @@
 #include "led.h"
 #include "system.h"
 
+#ifdef HAVE_LED
+
 static bool xor;
 static bool current;
-
-#ifdef HAVE_LED
 
 void led(bool on)
 {
