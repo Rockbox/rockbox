@@ -17,12 +17,17 @@
  *
  ****************************************************************************/
 
+#ifndef __CONFIG_H__
+#define __CONFIG_H__
+
 #if defined(ARCHOS_PLAYER)
 #include "config-player.h"
-#elsif definfed(ARCHOS_PLAYER_OLD)
+#elif defined(ARCHOS_PLAYER_OLD)
 #include "config-playerold.h"
-#elsif definfed(ARCHOS_RECORDER)
+#elif defined(ARCHOS_RECORDER)
 #include "config-recorder.h"
 #else
 /* no known platform */
+#endif
+
 #endif
