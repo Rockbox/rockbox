@@ -45,6 +45,21 @@ char virtual[LCD_WIDTH*LCD_HEIGHT];
 short level_speeds[10] = {1000,900,800,700,600,500,400,300,250,200};
 int blocks = 7;
 int block_frames[7] = {1,2,2,2,4,4,4};
+
+/*
+ block_data is built up the following way
+
+ first array index specifies the block number
+ second array index specifies the rotation of the block
+ third array index specifies:
+     0: x-coordinates of pixels
+     1: y-coordinates of pixels
+ fourth array index specifies the coordinate of a pixel
+
+ each block consists of four pixels whose relative coordinates are given
+ with block_data
+*/
+
 int block_data[7][4][2][4] =
 {
     {
