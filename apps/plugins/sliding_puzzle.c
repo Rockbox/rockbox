@@ -180,7 +180,7 @@ static void puzzle_init(void)
     
     /* shuffle spots */
     for (i=19; i>=0; i--) {
-        r = (*rb->current_tick % (i+1));
+        r = (rb->rand() % (i+1));
     
         temp = spots[r];
         spots[r] = spots[i];
@@ -192,11 +192,16 @@ static void puzzle_init(void)
     
     /* test if the puzzle is solvable */
     for (i=0; i<20; i++)
-    tsp[i] = spots[i];
+        tsp[i] = spots[i];
     r=0;
+
+    /* First, check if the problem has even or odd parity,
+       depending on where the empty square is */
     if (((4-hole%5) + (3-hole/5))%2 == 1)
-    ++r;
-    for (i=0; i<15; i++) {
+        ++r;
+
+    /* Now check how many swaps we need to solve it */
+    for (i=0; i<19; i++) {
         while (tsp[i] != (i+1)) {
             temp = tsp[i];
             tsp[i] = tsp[temp-1];
