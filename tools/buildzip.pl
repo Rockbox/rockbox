@@ -177,10 +177,10 @@ if($target !~ /sim/i) {
     }
 }
 
-if($target =~ /recorder/i) {
-    runone("recorder", $exe);
+if($target =~ /player/i) {
+    runone("player", $exe);
 }
 else {
-    runone("player", $exe);
+    runone("recorder", $exe);
 }
 
