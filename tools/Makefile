@@ -6,10 +6,9 @@
 #                     \/            \/     \/    \/            \/
 # $Id$
 #
-CFLAGS := -O3 -s -ansi
+CFLAGS := -O -s -ansi
 
-TARGETS := scramble descramble sh2d \
-	scramble.static.bz2 descramble.static.bz2 sh2d.static.bz2
+TARGETS := scramble descramble sh2d
 
 all: $(TARGETS)
 
@@ -21,18 +20,3 @@ sh2d: sh2d.c
 
 clean:
 	rm -f $(TARGETS) *~
-
-descramble.static.bz2: descramble.c
-	$(CC) -static $(CFLAGS) -o descramble.static $<
-	bzip2 -f descramble.static
-	chmod a+r descramble.static.bz2
-
-scramble.static.bz2: scramble.c
-	$(CC) -static $(CFLAGS) -o scramble.static $<
-	bzip2 -f scramble.static
-	chmod a+r scramble.static.bz2
-
-sh2d.static.bz2: sh2d.c
-	$(CC) -static $(CFLAGS) -o sh2d.static $<
-	bzip2 -f sh2d.static
-	chmod a+r sh2d.static.bz2
