@@ -496,7 +496,12 @@ static void power_thread(void)
                 /* turn it off now */
                 if (charger_enabled)
                     charger_enable(false);
+            }
 
+            /* Start new charge cycle? This must be possible also in trickle/top-off, because when usb connected, */
+            /* the trickle charge amount may not be enough */
+            
+            if ((charge_state == 0) || (charge_state > 1))
                 /* if battery is not full, enable charging */
                 /* make sure charging starts if 1%-lazyness in battery_level_update() is too slow */
                 if (    (battery_level() < charge_restart_level)
@@ -530,7 +535,7 @@ static void power_thread(void)
                             power_history[i] = power_history[POWER_HISTORY_LEN-1];
                     }
                 }
-            }
+
         } else {
             /* charger not inserted */
             if (charge_state > 0) {
