@@ -9,6 +9,9 @@
 *
 * Grayscale framework
 *
+* This is a generic framework to use grayscale display within Rockbox
+* plugins. It obviously does not work for the player.
+*
 * Copyright (C) 2004 Jens Arnold
 *
 * All files in this archive are subject to the GNU General Public License.
@@ -25,10 +28,6 @@
 #ifdef HAVE_LCD_BITMAP /* and also not for the Player */
 #include "gray.h"
 
-/* This is a generic framework to use grayscale display within rockbox
- * plugins. It obviously does not work for the player.
- */
-
 /**** internal core functions and definitions ****/
 
 /* You do not want to touch these if you don't know exactly what you're
@@ -41,29 +40,63 @@
 #define MULU16(a, b) ((unsigned long) \
                      (((unsigned short) (a)) * ((unsigned short) (b))))
 
+/* The grayscale buffer management structure */
 typedef struct
 {
     int x;
-    int by;        /* 8-pixel units */
+    int by;         /* 8-pixel units */
     int width;
     int height;
-    int bheight;   /* 8-pixel units */
+    int bheight;    /* 8-pixel units */
     int plane_size;
-    int depth;     /* number_of_bitplanes  = (number_of_grayscales - 1) */
-    int cur_plane; /* for the timer isr */
-    unsigned long randmask; /* mask for random value in graypixel() */
-    unsigned long flags;    /* various flags, see #defines */
+    int depth;      /* number_of_bitplanes  = (number_of_grayscales - 1) */
+    int cur_plane;  /* for the timer isr */
+    unsigned long randmask;    /* mask for random value in _writepixel() */
+    unsigned long flags;       /* various flags, see #defines */
     unsigned long *bitpattern; /* pointer to start of pattern table */
-    unsigned char *data;    /* pointer to start of bitplane data */
-    int curfont;   /* current selected font */
+    unsigned char *data;       /* pointer to start of bitplane data */
+    unsigned long fg_pattern;  /* current foreground pattern */
+    unsigned long bg_pattern;  /* current background pattern */
+    int drawmode;              /* current draw mode */
+    struct font *curfont;      /* current selected font */
 } tGraybuf;
 
-static struct plugin_api *rb = NULL;    /* global api struct pointer */
-static tGraybuf *graybuf = NULL;
-static short gray_random_buffer;
+/** globals **/
+
+static struct plugin_api *rb = NULL; /* global api struct pointer */
+static tGraybuf *graybuf = NULL;     /* pointer to grayscale buffer */
+static short random_buffer;
+
+/** prototypes **/
+
+static void _timer_isr(void);
+
+static void _writepixel(int x, int y, unsigned long pattern);
+static void _invertpixel(int x, int y, unsigned long pattern);
+
+static void _writearray(unsigned char *address, unsigned char *src, int stride,
+                        unsigned mask);
+
+static void _writeblock(unsigned char *address, unsigned mask, unsigned bits);
+static void _invertblock(unsigned char *address, unsigned mask, unsigned bits);
+static void _writeblockfg(unsigned char *address, unsigned mask, unsigned bits);
+static void _writeblockbg(unsigned char *address, unsigned mask, unsigned bits);
+
+/** function pointer arrays **/
+
+static void (*_pixelfuncs[4])(int x, int y, unsigned long pattern) = {
+    _invertpixel, _writepixel, _writepixel, _writepixel
+};
+
+static void (*_blockfuncs[4])(unsigned char *address, unsigned mask,
+                              unsigned bits) = {
+    _invertblock, _writeblockfg, _writeblockbg, _writeblock
+};
+
+/** implementation **/
 
 /* timer interrupt handler: display next bitplane */
-static void gray_timer_isr(void)
+static void _timer_isr(void)
 {
     rb->lcd_blit(graybuf->data + MULU16(graybuf->plane_size, graybuf->cur_plane),
                  graybuf->x, graybuf->by, graybuf->width, graybuf->bheight,
@@ -95,11 +128,11 @@ static void gray_timer_isr(void)
     }
 }
 
-/* Set a pixel to a specific bit pattern
- * This is the fundamental graphics primitive, asm optimized */
-static void graypixel(int x, int y, unsigned long pattern)
+/* Set a pixel to a specific bit pattern (low level routine) */
+static void _writepixel(int x, int y, unsigned long pattern)
 {
-    register long address, mask, random;
+    register unsigned mask, random;
+    register unsigned char *address;
 
     /* Some (pseudo-)random function must be used here to shift the bit
      * pattern randomly, otherwise you would get flicker and/or moire.
@@ -118,7 +151,7 @@ static void graypixel(int x, int y, unsigned long pattern)
         "and     %2,%0           \n"  /* mask out unneeded bits */
         : /* outputs */
         /* %0 */ "=&r"(random),
-        /* %1, in & out */ "+r"(gray_random_buffer)
+        /* %1, in & out */ "+r"(random_buffer)
         : /* inputs */
         /* %2 */ "r"(graybuf->randmask)
         : /* clobbers */
@@ -136,12 +169,12 @@ static void graypixel(int x, int y, unsigned long pattern)
         "add     %4,%0           \n"  /* add base + x to get final address */
 
         "mov     %3,%1           \n"  /* move lower 3 bits of y out of r0 */
-        "mova    .pp_table,%3    \n"  /* get address of mask table in r0 */
-        "bra     .pp_end         \n"  /* skip the table */
+        "mova    .wp_masktable,%3\n"  /* get address of mask table in r0 */
+        "bra     .wp_predone     \n"  /* skip the table */
         "mov.b   @(%3,%1),%1     \n"  /* get entry from mask table */
-        
+
         ".align  2               \n"
-    ".pp_table:                  \n"  /* mask table */
+    ".wp_masktable:              \n"  /* mask table */
         ".byte   0x01            \n"
         ".byte   0x02            \n"
         ".byte   0x04            \n"
@@ -151,9 +184,9 @@ static void graypixel(int x, int y, unsigned long pattern)
         ".byte   0x40            \n"
         ".byte   0x80            \n"
 
-    ".pp_end:                    \n"
+    ".wp_predone:                \n"
         : /* outputs */
-        /* %0 */ "=&r"(address),    
+        /* %0 */ "=&r"(address),
         /* %1 */ "=&r"(mask)
         : /* inputs */
         /* %2 */ "r"(graybuf->width),
@@ -166,12 +199,12 @@ static void graypixel(int x, int y, unsigned long pattern)
     /* the hard part: set bits in all bitplanes according to pattern */
     asm volatile (
         "cmp/hs  %1,%5           \n"  /* random >= depth ? */
-        "bf      .p_ntrim        \n"
+        "bf      .wp_ntrim       \n"
         "sub     %1,%5           \n"  /* yes: random -= depth */
         /* it's sufficient to do this once, since the mask guarantees
          * random < 2 * depth */
-    ".p_ntrim:                   \n"
-    
+    ".wp_ntrim:                  \n"
+
         /* calculate some addresses */
         "mulu    %4,%1           \n"  /* end address offset */
         "not     %3,r1           \n"  /* get inverse mask (for "and") */
@@ -180,41 +213,41 @@ static void graypixel(int x, int y, unsigned long pattern)
         "add     %2,%1           \n"  /* end offset -> end address */
         "sts     macl,%5         \n"  /* result of mulu */
         "add     %2,%5           \n"  /* address of <random>'th plane */
-        "bra     .p_start1       \n"
+        "bra     .wp_start1      \n"
         "mov     %5,r2           \n"  /* copy address */
 
         /* first loop: set bits from <random>'th bitplane to last */
-    ".p_loop1:                   \n"
+    ".wp_loop1:                  \n"
         "mov.b   @r2,r3          \n"  /* get data byte */
         "shlr    %0              \n"  /* shift bit mask, sets t bit */
         "and     r1,r3           \n"  /* reset bit (-> "white") */
-        "bf      .p_white1       \n"  /* t=0? -> "white" bit */
+        "bf      .wp_white1      \n"  /* t=0? -> "white" bit */
         "or      %3,r3           \n"  /* set bit ("black" bit) */
-    ".p_white1:                  \n"
+    ".wp_white1:                 \n"
         "mov.b   r3,@r2          \n"  /* store data byte */
         "add     %4,r2           \n"  /* advance address to next bitplane */
-    ".p_start1:                  \n"
+    ".wp_start1:                 \n"
         "cmp/hi  r2,%1           \n"  /* address < end address ? */
-        "bt      .p_loop1        \n"
-        
-        "bra     .p_start2       \n"
+        "bt      .wp_loop1       \n"
+
+        "bra     .wp_start2      \n"
         "nop                     \n"
 
         /* second loop: set bits from first to <random-1>'th bitplane
          * Bit setting works the other way round here to equalize average
          * execution times for bright and dark pixels */
-    ".p_loop2:                   \n"
+    ".wp_loop2:                  \n"
         "mov.b   @%2,r3          \n"  /* get data byte */
         "shlr    %0              \n"  /* shift bit mask, sets t bit */
         "or      %3,r3           \n"  /* set bit (-> "black") */
-        "bt      .p_black2       \n"  /* t=1? -> "black" bit */
+        "bt      .wp_black2      \n"  /* t=1? -> "black" bit */
         "and     r1,r3           \n"  /* reset bit ("white" bit) */
-    ".p_black2:                  \n"
+    ".wp_black2:                 \n"
         "mov.b   r3,@%2          \n"  /* store data byte */
         "add     %4,%2           \n"  /* advance address to next bitplane */
-    ".p_start2:                  \n"
+    ".wp_start2:                 \n"
         "cmp/hi  %2,%5           \n"  /* address < <random>'th address ? */
-        "bt      .p_loop2        \n"
+        "bt      .wp_loop2       \n"
         : /* outputs */
         : /* inputs */
         /* %0 */ "r"(pattern),
@@ -228,31 +261,100 @@ static void graypixel(int x, int y, unsigned long pattern)
     );
 }
 
-/* Set 8 pixels to specific gray values at once, asm optimized
- * This greatly enhances performance of gray_fillrect() and gray_drawgraymap()
- * for larger rectangles and graymaps */
-static void grayblock(int x, int by, unsigned char* src, int stride)
+/* invert all bits for one pixel (low level routine) */
+static void _invertpixel(int x, int y, unsigned long pattern)
 {
-    register unsigned char *address, *end_addr;
-    unsigned long pat_stack[8];
-    register unsigned long *pat_ptr = &pat_stack[8]; /* behind last element */
+    register unsigned mask;
+    register unsigned char *address;
 
-    /* precalculate the bit patterns with random shifts (same RNG as graypixel,
-     * see there for an explanation) for all 8 pixels and put them on an
-     * extra stack */
+    (void) pattern; /* not used for invert */
+
+    /* precalculate mask and byte address in first bitplane */
     asm (
-        "mova    .gb_reload,r0   \n"  /* set default loopback address */
-        "tst     %3,%3           \n"  /* stride == 0 ? */
-        "bf      .gb_needreload  \n"  /* no: keep that address */
-        "mova    .gb_reuse,r0    \n"  /* yes: set shortcut (no reload) */
-    ".gb_needreload:             \n"
-        "mov     r0,r2           \n"  /* loopback address to r2 */
-        "mov     #7,r3           \n"  /* loop count in r3: 8 pixels */
+        "mov     %3,%0           \n"  /* take y as base for address offset */
+        "shlr2   %0              \n"  /* shift right by 3 (= divide by 8) */
+        "shlr    %0              \n"
+        "mulu    %0,%2           \n"  /* multiply with width */
+        "and     #7,%3           \n"  /* get lower 3 bits of y */
+        "sts     macl,%0         \n"  /* get mulu result */
+        "add     %4,%0           \n"  /* add base + x to get final address */
 
-        ".align  2               \n"  /** load pattern for pixel **/
-    ".gb_reload:                 \n"
+        "mov     %3,%1           \n"  /* move lower 3 bits of y out of r0 */
+        "mova    .ip_masktable,%3\n"  /* get address of mask table in r0 */
+        "bra     .ip_predone     \n"  /* skip the table */
+        "mov.b   @(%3,%1),%1     \n"  /* get entry from mask table */
+
+        ".align  2               \n"
+    ".ip_masktable:              \n"  /* mask table */
+        ".byte   0x01            \n"
+        ".byte   0x02            \n"
+        ".byte   0x04            \n"
+        ".byte   0x08            \n"
+        ".byte   0x10            \n"
+        ".byte   0x20            \n"
+        ".byte   0x40            \n"
+        ".byte   0x80            \n"
+
+    ".ip_predone:                \n"
+        : /* outputs */
+        /* %0 */ "=&r"(address),    
+        /* %1 */ "=&r"(mask)
+        : /* inputs */
+        /* %2 */ "r"(graybuf->width),
+        /* %3 = r0 */ "z"(y),
+        /* %4 */ "r"(graybuf->data + x)
+        : /* clobbers */
+        "macl"
+    );
+
+    /* invert bits in all bitplanes */
+    asm volatile (
+        "mov     #0,r1           \n"  /* current_plane = 0 */
+
+    ".ip_loop:                   \n"
+        "mov.b   @%1,r2          \n"  /* get data byte */
+        "add     #1,r1           \n"  /* current_plane++; */
+        "xor     %2,r2           \n"  /* invert bits */
+        "mov.b   r2,@%1          \n"  /* store data byte */
+        "add     %3,%1           \n"  /* advance address to next bitplane */
+        "cmp/hi  r1,%0           \n"  /* current_plane < depth ? */
+        "bt      .ip_loop        \n"
+        : /* outputs */
+        : /* inputs */
+        /* %0 */ "r"(graybuf->depth),
+        /* %1 */ "r"(address),
+        /* %2 */ "r"(mask),
+        /* %3 */ "r"(graybuf->plane_size)
+        : /* clobbers */
+        "r1", "r2"
+    );
+}
+
+/* Write an 8-pixel block, defined by their brightnesses in a graymap.
+ * Address is the byte in the first bitplane, src is the graymap start address,
+ * stride is the increment for the graymap to get to the next pixel, mask
+ * determines which pixels of the destination block are changed. For "0" bits,
+ * the src address is not incremented! */
+static void _writearray(unsigned char *address, unsigned char *src, int stride,
+                        unsigned mask)
+{
+    unsigned long pat_stack[8];
+    register unsigned char *end_addr;
+    register unsigned long *pat_ptr = &pat_stack[8];
+
+    /* precalculate the bit patterns with random shifts (same RNG as
+     * _writepixel, see there for an explanation) for all 8 pixels and put them
+     * on an extra "stack" */
+    asm (
+        "mov     #8,r3           \n"  /* loop count in r3: 8 pixels */
+        "mov     %7,r2           \n"  /* copy mask */
+
+    ".wa_loop:                   \n"  /** load pattern for pixel **/
+        "mov     #0,r0           \n"  /* pattern for skipped pixel must be 0 */
+        "shlr    r2              \n"  /* shift out lsb of mask */
+        "bf      .wa_skip        \n"  /* skip this pixel */
+
         "mov.b   @%2,r0          \n"  /* load src byte */
-        "nop                     \n"  /* align here, saves a pipeline stall */
         "extu.b  r0,r0           \n"  /* extend unsigned */
         "mulu    %4,r0           \n"  /* macl = byte * depth; */
         "add     %3,%2           \n"  /* src += stride; */
@@ -262,20 +364,18 @@ static void grayblock(int x, int by, unsigned char* src, int stride)
         "shll2   r0              \n"
         "mov.l   @(r0,%5),r4     \n"  /* r4 = bitpattern[byte]; */
 
-        ".align  2               \n"  /** RNG **/
-    ".gb_reuse:                  \n"
         "mov     #75,r0          \n"
-        "mulu    r0,%1           \n"  /* multiply by 75 */
-        "sts     macl,%1         \n"
-        "add     #74,%1          \n"  /* add another 74 */
+        "mulu    r0,%0           \n"  /* multiply by 75 */
+        "sts     macl,%0         \n"
+        "add     #74,%0          \n"  /* add another 74 */
         /* Since the lower bits are not very random: */
-        "swap.b  %1,r1           \n"  /* get bits 8..15 (need max. 5) */
+        "swap.b  %0,r1           \n"  /* get bits 8..15 (need max. 5) */
         "and     %6,r1           \n"  /* mask out unneeded bits */
 
         "cmp/hs  %4,r1           \n"  /* random >= depth ? */
-        "bf      .gb_ntrim       \n"
+        "bf      .wa_ntrim       \n"
         "sub     %4,r1           \n"  /* yes: random -= depth; */
-    ".gb_ntrim:                  \n"
+    ".wa_ntrim:                  \n"
 
         "mov.l   .ashlsi3,r0     \n"  /** rotate pattern **/
         "jsr     @r0             \n"  /* r4 -> r0, shift left by r5 */
@@ -288,37 +388,27 @@ static void grayblock(int x, int by, unsigned char* src, int stride)
         "mov     r0,r1           \n"  /* store previous result in r1 */
 
         "or      r1,r0           \n"  /* rotated_pattern = r0 | r1 */
-        "mov.l   r0,@-%0         \n"  /* push on pattern stack */
 
-        "cmp/pl  r3              \n"  /* loop count > 0? */
-        "bf      .gb_patdone     \n"  /* no: done */
+    ".wa_skip:                   \n"
+        "mov.l   r0,@-%1         \n"  /* push on pattern stack */
 
-        "jmp     @r2             \n"  /* yes: loop */
         "add     #-1,r3          \n"  /* decrease loop count */
-
-        ".align  2               \n"
-    ".ashlsi3:                   \n"  /* C library routine: */
-        ".long   ___ashlsi3      \n"  /* shift r4 left by r5, return in r0 */
-    ".lshrsi3:                   \n"  /* C library routine: */
-        ".long   ___lshrsi3      \n"  /* shift r4 right by r5, return in r0 */
-        /* both routines preserve r4, destroy r5 and take ~16 cycles */
-
-    ".gb_patdone:                \n"
+        "cmp/pl  r3              \n"  /* loop count > 0? */
+        "bt      .wa_loop        \n"  /* yes: loop */
         : /* outputs */
-        /* %0, in & out */ "+r"(pat_ptr),
-        /* %1, in & out */ "+r"(gray_random_buffer)
+        /* %0, in & out */ "+r"(random_buffer),
+        /* %1, in & out */ "+r"(pat_ptr)
         : /* inputs */
         /* %2 */ "r"(src),
         /* %3 */ "r"(stride),
         /* %4 */ "r"(graybuf->depth),
         /* %5 */ "r"(graybuf->bitpattern),
-        /* %6 */ "r"(graybuf->randmask)
+        /* %6 */ "r"(graybuf->randmask),
+        /* %7 */ "r"(mask)
         : /* clobbers */
         "r0", "r1", "r2", "r3", "r4", "r5", "macl"
     );
 
-    /* calculate start address in first bitplane and end address */
-    address = graybuf->data + x + MULU16(graybuf->width, by);
     end_addr = address + MULU16(graybuf->depth, graybuf->plane_size);
 
     /* set the bits for all 8 pixels in all bytes according to the
@@ -327,81 +417,300 @@ static void grayblock(int x, int by, unsigned char* src, int stride)
         "mov.l   @%3+,r1         \n"  /* pop all 8 patterns */
         "mov.l   @%3+,r2         \n"
         "mov.l   @%3+,r3         \n"
-        "mov.l   @%3+,r4         \n"
-        "mov.l   @%3+,r5         \n"
-        "mov.l   @%3+,r6         \n"
-        "mov.l   @%3+,r7         \n"
-        "mov.l   @%3+,%3         \n"
+        "mov.l   @%3+,r8         \n"
+        "mov.l   @%3+,r9         \n"
+        "mov.l   @%3+,r10        \n"
+        "mov.l   @%3+,r11        \n"
+        "mov.l   @%3+,r12        \n"
 
-    ".gb_loop:                   \n"  /* loop for all bitplanes */
+        "not     %4,%4           \n"  /* "set" mask -> "keep" mask */
+        "extu.b  %4,%4           \n"  /* mask out high bits */
+        "tst     %4,%4           \n"  /* nothing to keep? */
+        "bt      .wa_sloop       \n"  /* yes: jump to short loop */
+
+    ".wa_floop:                  \n"  /** full loop (there are bits to keep)**/
         "shlr    r1              \n"  /* rotate lsb of pattern 1 to t bit */
         "rotcl   r0              \n"  /* rotate t bit into r0 */
         "shlr    r2              \n"
         "rotcl   r0              \n"
         "shlr    r3              \n"
         "rotcl   r0              \n"
-        "shlr    r4              \n"
+        "shlr    r8              \n"
         "rotcl   r0              \n"
-        "shlr    r5              \n"
+        "shlr    r9              \n"
         "rotcl   r0              \n"
-        "shlr    r6              \n"
+        "shlr    r10             \n"
         "rotcl   r0              \n"
-        "shlr    r7              \n"
+        "shlr    r11             \n"
         "rotcl   r0              \n"
-        "shlr    %3              \n"
+        "shlr    r12             \n"
+        "mov.b   @%0,%3          \n"  /* read old value */
+        "rotcl   r0              \n"
+        "and     %4,%3           \n"  /* mask out unneeded bits */
+        "or      r0,%3           \n"  /* set new bits */
+        "mov.b   %3,@%0          \n"  /* store value to bitplane */
+        "add     %2,%0           \n"  /* advance to next bitplane */
+        "cmp/hi  %0,%1           \n"  /* last bitplane done? */
+        "bt      .wa_floop       \n"  /* no: loop */
+
+        "bra     .wa_end         \n"
+        "nop                     \n"
+
+    ".wa_sloop:                  \n"  /** short loop (nothing to keep) **/
+        "shlr    r1              \n"  /* rotate lsb of pattern 1 to t bit */
+        "rotcl   r0              \n"  /* rotate t bit into r0 */
+        "shlr    r2              \n"
+        "rotcl   r0              \n"
+        "shlr    r3              \n"
+        "rotcl   r0              \n"
+        "shlr    r8              \n"
+        "rotcl   r0              \n"
+        "shlr    r9              \n"
+        "rotcl   r0              \n"
+        "shlr    r10             \n"
+        "rotcl   r0              \n"
+        "shlr    r11             \n"
+        "rotcl   r0              \n"
+        "shlr    r12             \n"
         "rotcl   r0              \n"
         "mov.b   r0,@%0          \n"  /* store byte to bitplane */
         "add     %2,%0           \n"  /* advance to next bitplane */
         "cmp/hi  %0,%1           \n"  /* last bitplane done? */
-        "bt      .gb_loop        \n"  /* no: loop */
+        "bt      .wa_sloop       \n"  /* no: loop */
+
+    ".wa_end:                    \n"
         : /* outputs */
         : /* inputs */
         /* %0 */ "r"(address),
         /* %1 */ "r"(end_addr),
         /* %2 */ "r"(graybuf->plane_size),
-        /* %3 */ "r"(pat_ptr)
+        /* %3 */ "r"(pat_ptr),
+        /* %4 */ "r"(mask)
         : /* clobbers */
-        "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"
+        "r0", "r1", "r2", "r3", "r8", "r9", "r10", "r11", "r12"
     );
 }
 
-/* Invert the bits for 1-8 pixels within the buffer */
-static void grayinvertmasked(int x, int by, unsigned char mask)
+/* Write an 8-pixel block, defined by foreground and background pattern.
+ * Address is the byte in the first bitplane, mask determines which pixels to
+ * set, and bits determines if the pixel is foreground or background */
+static void _writeblock(unsigned char *address, unsigned mask, unsigned bits)
+{
+    unsigned long pat_stack[8];
+    register unsigned char *end_addr;
+    register unsigned long *pat_ptr = &pat_stack[8];
+
+    /* precalculate the bit patterns with random shifts (same RNG as _writepixel,
+     * see there for an explanation) for all 8 pixels and put them on an
+     * extra stack */
+    asm (
+        "mov     #8,r3           \n"  /* loop count in r3: 8 pixels */
+        "mov     %6,r2           \n"  /* copy mask */
+
+    ".wb_loop:                   \n"  /** load pattern for pixel **/
+        "shlr    r2              \n"  /* shift out lsb of mask */
+        "bf      .wb_skip        \n"  /* skip this pixel */
+
+        "mov     %2,r4           \n"  /* load foreground pattern */
+        "shlr    %7              \n"  /* shift out lsb of bits */
+        "bt      .wb_fg          \n"  /* foreground? -> skip next insn */
+        "mov     %3,r4           \n"  /* load background pattern */
+    ".wb_fg:                     \n"
+
+        "mov     #75,r0          \n"
+        "mulu    r0,%0           \n"  /* multiply by 75 */
+        "sts     macl,%0         \n"
+        "add     #74,%0          \n"  /* add another 74 */
+        /* Since the lower bits are not very random: */
+        "swap.b  %0,r1           \n"  /* get bits 8..15 (need max. 5) */
+        "and     %5,r1           \n"  /* mask out unneeded bits */
+
+        "cmp/hs  %4,r1           \n"  /* random >= depth ? */
+        "bf      .wb_ntrim       \n"
+        "sub     %4,r1           \n"  /* yes: random -= depth; */
+    ".wb_ntrim:                  \n"
+
+        "mov.l   .ashlsi3,r0     \n"  /** rotate pattern **/
+        "jsr     @r0             \n"  /* r4 -> r0, shift left by r5 */
+        "mov     r1,r5           \n"
+
+        "mov     %4,r5           \n"
+        "sub     r1,r5           \n"  /* r5 = depth - r1 */
+        "mov.l   .lshrsi3,r1     \n"
+        "jsr     @r1             \n"  /* r4 -> r0, shift right by r5 */
+        "mov     r0,r1           \n"  /* store previous result in r1 */
+
+        "bra     .wb_store       \n"
+        "or      r1,r0           \n"  /* rotated_pattern = r0 | r1 */
+
+    ".wb_skip:                   \n"
+        "shlr    %7              \n"  /* shift out lsb of bits to keep in sync */
+        "mov     #0,r0           \n"  /* pattern for skipped pixel must be 0 */
+
+    ".wb_store:                  \n"
+        "mov.l   r0,@-%1         \n"  /* push on pattern stack */
+
+        "add     #-1,r3          \n"  /* decrease loop count */
+        "cmp/pl  r3              \n"  /* loop count > 0? */
+        "bt      .wb_loop        \n"  /* yes: loop */
+        : /* outputs */
+        /* %0, in & out */ "+r"(random_buffer),
+        /* %1, in & out */ "+r"(pat_ptr)
+        : /* inputs */
+        /* %2 */ "r"(graybuf->fg_pattern),
+        /* %3 */ "r"(graybuf->bg_pattern),
+        /* %4 */ "r"(graybuf->depth),
+        /* %5 */ "r"(graybuf->randmask),
+        /* %6 */ "r"(mask),
+        /* %7 */ "r"(bits)
+        : /* clobbers */
+        "r0", "r1", "r2", "r3", "r4", "r5", "macl"
+    );
+
+    end_addr = address + MULU16(graybuf->depth, graybuf->plane_size);
+
+    /* set the bits for all 8 pixels in all bytes according to the
+     * precalculated patterns on the pattern stack */
+    asm volatile (
+        "mov.l   @%3+,r1         \n"  /* pop all 8 patterns */
+        "mov.l   @%3+,r2         \n"
+        "mov.l   @%3+,r3         \n"
+        "mov.l   @%3+,r8         \n"
+        "mov.l   @%3+,r9         \n"
+        "mov.l   @%3+,r10        \n"
+        "mov.l   @%3+,r11        \n"
+        "mov.l   @%3+,r12        \n"
+
+        "not     %4,%4           \n"  /* "set" mask -> "keep" mask */
+        "extu.b  %4,%4           \n"  /* mask out high bits */
+        "tst     %4,%4           \n"  /* nothing to keep? */
+        "bt      .wb_sloop       \n"  /* yes: jump to short loop */
+
+    ".wb_floop:                  \n"  /** full loop (there are bits to keep)**/
+        "shlr    r1              \n"  /* rotate lsb of pattern 1 to t bit */
+        "rotcl   r0              \n"  /* rotate t bit into r0 */
+        "shlr    r2              \n"
+        "rotcl   r0              \n"
+        "shlr    r3              \n"
+        "rotcl   r0              \n"
+        "shlr    r8              \n"
+        "rotcl   r0              \n"
+        "shlr    r9              \n"
+        "rotcl   r0              \n"
+        "shlr    r10             \n"
+        "rotcl   r0              \n"
+        "shlr    r11             \n"
+        "rotcl   r0              \n"
+        "shlr    r12             \n"
+        "mov.b   @%0,%3          \n"  /* read old value */
+        "rotcl   r0              \n"
+        "and     %4,%3           \n"  /* mask out unneeded bits */
+        "or      r0,%3           \n"  /* set new bits */
+        "mov.b   %3,@%0          \n"  /* store value to bitplane */
+        "add     %2,%0           \n"  /* advance to next bitplane */
+        "cmp/hi  %0,%1           \n"  /* last bitplane done? */
+        "bt      .wb_floop       \n"  /* no: loop */
+
+        "bra     .wb_end         \n"
+        "nop                     \n"
+
+    ".wb_sloop:                  \n"  /** short loop (nothing to keep) **/
+        "shlr    r1              \n"  /* rotate lsb of pattern 1 to t bit */
+        "rotcl   r0              \n"  /* rotate t bit into r0 */
+        "shlr    r2              \n"
+        "rotcl   r0              \n"
+        "shlr    r3              \n"
+        "rotcl   r0              \n"
+        "shlr    r8              \n"
+        "rotcl   r0              \n"
+        "shlr    r9              \n"
+        "rotcl   r0              \n"
+        "shlr    r10             \n"
+        "rotcl   r0              \n"
+        "shlr    r11             \n"
+        "rotcl   r0              \n"
+        "shlr    r12             \n"
+        "rotcl   r0              \n"
+        "mov.b   r0,@%0          \n"  /* store byte to bitplane */
+        "add     %2,%0           \n"  /* advance to next bitplane */
+        "cmp/hi  %0,%1           \n"  /* last bitplane done? */
+        "bt      .wb_sloop       \n"  /* no: loop */
+
+    ".wb_end:                    \n"
+        : /* outputs */
+        : /* inputs */
+        /* %0 */ "r"(address),
+        /* %1 */ "r"(end_addr),
+        /* %2 */ "r"(graybuf->plane_size),
+        /* %3 */ "r"(pat_ptr),
+        /* %4 */ "r"(mask)
+        : /* clobbers */
+        "r0", "r1", "r2", "r3", "r8", "r9", "r10", "r11", "r12"
+    );
+}
+
+/* References to C library routines used in _writearray and _writeblock */
+asm (
+    ".align  2               \n"
+".ashlsi3:                   \n"  /* C library routine: */
+    ".long   ___ashlsi3      \n"  /* shift r4 left by r5, return in r0 */
+".lshrsi3:                   \n"  /* C library routine: */
+    ".long   ___lshrsi3      \n"  /* shift r4 right by r5, return in r0 */
+    /* both routines preserve r4, destroy r5 and take ~16 cycles */
+);
+
+/* Invert pixels within an 8-pixel block.
+ * Address is the byte in the first bitplane, mask and bits determine which
+ * pixels to invert ('And'ed together, for matching the parameters with
+ * _writeblock) */
+static void _invertblock(unsigned char *address, unsigned mask, unsigned bits)
 {
     asm volatile (
-        "mulu    %4,%5           \n"  /* width * by (offset of row) */
         "mov     #0,r1           \n"  /* current_plane = 0 */
-        "sts     macl,r2         \n"  /* get mulu result */
-        "add     r2,%1           \n"  /* -> address in 1st bitplane */
 
-    ".i_loop:                    \n"
+    ".im_loop:                   \n"
         "mov.b   @%1,r2          \n"  /* get data byte */
         "add     #1,r1           \n"  /* current_plane++; */
         "xor     %2,r2           \n"  /* invert bits */
         "mov.b   r2,@%1          \n"  /* store data byte */
         "add     %3,%1           \n"  /* advance address to next bitplane */
         "cmp/hi  r1,%0           \n"  /* current_plane < depth ? */
-        "bt      .i_loop         \n"
+        "bt      .im_loop        \n"
         : /* outputs */
         : /* inputs */
         /* %0 */ "r"(graybuf->depth),
-        /* %1 */ "r"(graybuf->data + x),
-        /* %2 */ "r"(mask),
-        /* %3 */ "r"(graybuf->plane_size),
-        /* %4 */ "r"(graybuf->width),
-        /* %5 */ "r"(by)
+        /* %1 */ "r"(address),
+        /* %2 */ "r"(mask & bits),
+        /* %3 */ "r"(graybuf->plane_size)
         : /* clobbers */
         "r1", "r2", "macl"
     );
 }
 
-/*** public core functions ***/
+/* Call _writeblock with the mask modified to draw foreground pixels only */
+static void _writeblockfg(unsigned char *address, unsigned mask, unsigned bits)
+{
+    _writeblock(address, mask & bits, bits);
+}
 
-/* Initialize the framework */
+/* Call _writeblock with the mask modified to draw background pixels only */
+static void _writeblockbg(unsigned char *address, unsigned mask, unsigned bits)
+{
+    _writeblock(address, mask & ~bits, bits);
+}
+
+/**** public functions ****/
+
+/* Initialize the framework
+ *
+ * Every framework needs such a function, and it has to be called as
+ * the very first one */
 void gray_init(struct plugin_api* newrb)
 {
     rb = newrb;
 }
+
+/** General functions **/
 
 /* Prepare the grayscale display buffer
  *
@@ -424,9 +733,11 @@ void gray_init(struct plugin_api* newrb)
  * it creates as many bitplanes as fit into memory, although 1 bitplane will
  * only deliver black & white display.
  *
- * The total memory needed can be calculated as follows:
+ * If you need info about the memory taken by the grayscale buffer, supply an
+ * int* as the last parameter. This int will then contain the number of bytes
+ * used. The total memory needed can be calculated as follows:
  *   total_mem =
- *     sizeof(tGraybuf)      (= 48 bytes currently)
+ *     sizeof(tGraybuf)      (= 64 bytes currently)
  *   + sizeof(long)          (=  4 bytes)
  *   + (width * bheight + sizeof(long)) * depth
  *   + 0..3                  (longword alignment of grayscale display buffer)
@@ -437,8 +748,7 @@ int gray_init_buffer(unsigned char *gbuf, int gbuf_size, int width,
     int possible_depth, plane_size;
     int i, j, align;
 
-    if (rb == NULL
-        || (unsigned) width > LCD_WIDTH
+    if ((unsigned) width > LCD_WIDTH
         || (unsigned) bheight > (LCD_HEIGHT/8)
         || depth < 1)
         return 0;
@@ -471,7 +781,6 @@ int gray_init_buffer(unsigned char *gbuf, int gbuf_size, int width,
     graybuf->flags = 0;
     graybuf->bitpattern = (unsigned long *) (gbuf + sizeof(tGraybuf));
     graybuf->data = (unsigned char *) (graybuf->bitpattern + depth + 1);
-    graybuf->curfont = FONT_SYSFIXED;
 
     i = depth - 1;
     j = 8;
@@ -500,12 +809,17 @@ int gray_init_buffer(unsigned char *gbuf, int gbuf_size, int width,
                 value -= depth;   /* "white" bit */
             else
                 pattern |= 1;     /* "black" bit */
-        }  
+        }
         /* now the lower <depth> bits contain the pattern */
 
         graybuf->bitpattern[i] = pattern;
     }
     
+    graybuf->fg_pattern = graybuf->bitpattern[0]; /* black */
+    graybuf->bg_pattern = graybuf->bitpattern[depth]; /* white */
+    graybuf->drawmode = GRAY_DRAW_SOLID;
+    graybuf->curfont = FONT_SYSFIXED;
+
     if (buf_taken)  /* caller requested info about space taken */
     {
         *buf_taken = sizeof(tGraybuf) + sizeof(long)
@@ -530,7 +844,6 @@ void gray_release_buffer(void)
 
 /* Set position of the top left corner of the grayscale overlay
  *
- * arguments:
  *   x  = left margin in pixels
  *   by = top margin in 8-pixel units
  *
@@ -544,9 +857,6 @@ void gray_release_buffer(void)
  */
 void gray_position_display(int x, int by)
 {
-    if (graybuf == NULL)
-        return;
-
     graybuf->x = x;
     graybuf->by = by;
     
@@ -556,7 +866,6 @@ void gray_position_display(int x, int by)
 
 /* Switch the grayscale overlay on or off
  *
- * arguments:
  *   enable = true:  the grayscale overlay is switched on if initialized
  *          = false: the grayscale overlay is switched off and the regular lcd
  *                   content is restored
@@ -576,13 +885,10 @@ void gray_position_display(int x, int by)
  */
 void gray_show_display(bool enable)
 {
-    if (graybuf == NULL)
-        return;
-
     if (enable)
     {
         graybuf->flags |= GRAY_RUNNING;
-        rb->plugin_register_timer(FREQ / 67, 1, gray_timer_isr);
+        rb->plugin_register_timer(FREQ / 67, 1, _timer_isr);
     }
     else
     {
@@ -592,45 +898,85 @@ void gray_show_display(bool enable)
     }
 }
 
-/*** public optional functions ***/
-
-/* Here are the various graphics primitives. Cut out functions you do not
- * need in order to keep plugin code size down.
+/* Set the draw mode for subsequent drawing operations
+ *
+ *   drawmode =
+ *     GRAY_DRAW_INVERSE: Foreground pixels are inverted, background pixels are
+ *                        left untouched
+ *     GRAY_DRAW_FG:      Only foreground pixels are drawn
+ *     GRAY_DRAW_BG:      Only background pixels are drawn
+ *     GRAY_DRAW_SOLID:   Foreground and background pixels are drawn
  */
+void gray_set_drawmode(int drawmode)
+{
+    if ((unsigned) drawmode <= GRAY_DRAW_SOLID)
+        graybuf->drawmode = drawmode;
+}
 
-/* Clear the grayscale display (sets all pixels to white)
+/* Set the foreground shade for subsequent drawing operations
+ *
+ * brightness = 0 (black) .. 255 (white)
  */
+void gray_set_foreground(int brightness)
+{
+    if ((unsigned) brightness <= 255)
+        graybuf->fg_pattern = graybuf->bitpattern[MULU16(brightness,
+                              graybuf->depth + 1) >> 8];
+}
+
+/* Set the background shade for subsequent drawing operations
+ *
+ * brightness = 0 (black) .. 255 (white)
+ */
+void gray_set_background(int brightness)
+{
+    if ((unsigned) brightness <= 255)
+        graybuf->bg_pattern = graybuf->bitpattern[MULU16(brightness,
+                              graybuf->depth + 1) >> 8];
+}
+
+/* Set draw mode, foreground and background shades at once
+ * 
+ * If you hand it -1 (or in fact any other out-of-bounds value) for a
+ * parameter, that particular setting won't be changed
+ */
+void gray_set_drawinfo(int drawmode, int fg_brightness, int bg_brightness)
+{
+    gray_set_drawmode(drawmode);
+    gray_set_foreground(fg_brightness);
+    gray_set_background(bg_brightness);
+}
+
+/** Functions affecting the whole dsplay **/
+
+/* Clear the grayscale display (sets all pixels to white) */
 void gray_clear_display(void)
 {
-    if (graybuf == NULL)
-        return;
-
     rb->memset(graybuf->data, 0, MULU16(graybuf->depth, graybuf->plane_size));
 }
 
-/* Set the grayscale display to all black
- */
+/* Set the grayscale display to all black */
 void gray_black_display(void)
 {
-    if (graybuf == NULL)
-        return;
-
     rb->memset(graybuf->data, 0xFF, MULU16(graybuf->depth, graybuf->plane_size));
 }
 
 /* Do an lcd_update() to show changes done by rb->lcd_xxx() functions (in areas
- * of the screen not covered by the grayscale overlay). If the grayscale 
- * overlay is running, the update will be done in the next call of the
- * interrupt routine, otherwise it will be performed right away. See also
- * comment for the gray_show_display() function.
+ * of the screen not covered by the grayscale overlay).
+ *
+ * If the grayscale overlay is running, the update will be done in the next
+ * call of the interrupt routine, otherwise it will be performed right away.
+ * See also comment for the gray_show_display() function.
  */
 void gray_deferred_update(void)
 {
-    if (graybuf != NULL && (graybuf->flags & GRAY_RUNNING))
+    if (graybuf->flags & GRAY_RUNNING)
         graybuf->flags |= GRAY_DEFERRED_UPDATE;
     else
         rb->lcd_update();
 }
+
+/** Scrolling functions **/
 
 /* Scroll the whole grayscale buffer left by <count> pixels
  *
@@ -643,16 +989,13 @@ void gray_deferred_update(void)
 void gray_scroll_left(int count, bool black_border)
 {
     int by, d;
+    unsigned filler;
     unsigned char *ptr;
-    unsigned char filler;
 
-    if (graybuf == NULL || (unsigned) count >= (unsigned) graybuf->width)
+    if ((unsigned) count >= (unsigned) graybuf->width)
         return;
         
-    if (black_border)
-        filler = 0xFF;
-    else
-        filler = 0;
+    filler = black_border ? 0xFF : 0;
 
     /* Scroll row by row to minimize flicker (byte rows = 8 pixels each) */
     for (by = 0; by < graybuf->bheight; by++)
@@ -711,16 +1054,13 @@ void gray_scroll_left(int count, bool black_border)
 void gray_scroll_right(int count, bool black_border)
 {
     int by, d;
+    unsigned filler;
     unsigned char *ptr;
-    unsigned char filler;
 
-    if (graybuf == NULL || (unsigned) count >= (unsigned) graybuf->width)
+    if ((unsigned) count >= (unsigned) graybuf->width)
         return;
 
-    if (black_border)
-        filler = 0xFF;
-    else
-        filler = 0;
+    filler = black_border ? 0xFF : 0;
 
     /* Scroll row by row to minimize flicker (byte rows = 8 pixels each) */
     for (by = 0; by < graybuf->bheight; by++)
@@ -778,16 +1118,10 @@ void gray_scroll_right(int count, bool black_border)
 void gray_scroll_up8(bool black_border)
 {
     int by, d;
+    unsigned filler;
     unsigned char *ptr;
-    unsigned char filler;
 
-    if (graybuf == NULL)
-        return;
-        
-    if (black_border)
-        filler = 0xFF;
-    else
-        filler = 0;
+    filler = black_border ? 0xFF : 0;
 
     /* Scroll row by row to minimize flicker (byte rows = 8 pixels each) */
     for (by = 1; by < graybuf->bheight; by++)
@@ -818,16 +1152,10 @@ void gray_scroll_up8(bool black_border)
 void gray_scroll_down8(bool black_border)
 {
     int by, d;
+    unsigned filler;
     unsigned char *ptr;
-    unsigned char filler;
 
-    if (graybuf == NULL)
-        return;
-        
-    if (black_border)
-        filler = 0xFF;
-    else
-        filler = 0;
+    filler = black_border ? 0xFF : 0;
 
     /* Scroll row by row to minimize flicker (byte rows = 8 pixels each) */
     for (by = graybuf->bheight - 1; by > 0; by--)
@@ -859,16 +1187,13 @@ void gray_scroll_down8(bool black_border)
  */
 void gray_scroll_up(int count, bool black_border)
 {
-    unsigned long filler;
+    unsigned filler;
 
-    if (graybuf == NULL || (unsigned) count > 7)
+    if ((unsigned) count > 7)
         return;
 
-    if (black_border)
-        filler = 0xFF;
-    else
-        filler = 0;
-    
+    filler = black_border ? 0xFFu : 0;
+
     /* scroll column by column to minimize flicker */
     asm volatile (
         "mov     #0,r6           \n"  /* x = 0 */
@@ -962,16 +1287,13 @@ void gray_scroll_up(int count, bool black_border)
  */
 void gray_scroll_down(int count, bool black_border)
 {
-    unsigned long filler;
+    unsigned filler;
 
-    if (graybuf == NULL || (unsigned) count > 7)
+    if ((unsigned) count > 7)
         return;
 
-    if (black_border)
-        filler = 0xFF << count; /* calculate filler bits */
-    else
-        filler = 0;
-    
+    filler = black_border ? (0xFFu << count) : 0;
+
     /* scroll column by column to minimize flicker */
     asm volatile (
         "mov     #0,r6           \n"  /* x = 0 */
@@ -1053,42 +1375,32 @@ void gray_scroll_down(int count, bool black_border)
     );
 }
 
-/* Set a pixel to a specific gray value
- *
- * brightness is 0..255 (black to white) regardless of real bit depth
- */
-void gray_drawpixel(int x, int y, int brightness)
-{
-    if (graybuf == NULL 
-        || (unsigned) x >= (unsigned) graybuf->width
-        || (unsigned) y >= (unsigned) graybuf->height
-        || (unsigned) brightness > 255)
-        return;
+/** Pixel and line functions **/
 
-    graypixel(x, y, graybuf->bitpattern[MULU16(brightness,
-                    graybuf->depth + 1) >> 8]);
-}
-
-/* Invert a pixel
- *
- * The bit pattern for that pixel in the buffer is inverted, so white becomes
- * black, light gray becomes dark gray etc.
+/* Set a pixel with the current drawinfo
+ * 
+ * If the drawmode is GRAY_DRAW_INVERSE, the pixel is inverted
+ * GRAY_DRAW_FG and GRAY_DRAW_SOLID draw the pixel in the foreground shade
+ * GRAY_DRAW_BG draws the pixel in the background shade
  */
-void gray_invertpixel(int x, int y)
+void gray_drawpixel(int x, int y)
 {
-    if (graybuf == NULL 
-        || (unsigned) x >= (unsigned) graybuf->width
+    unsigned long pattern;
+
+    if ((unsigned) x >= (unsigned) graybuf->width
         || (unsigned) y >= (unsigned) graybuf->height)
         return;
 
-    grayinvertmasked(x, (y >> 3), 1 << (y & 7));
+    pattern = (graybuf->drawmode == GRAY_DRAW_BG) ?
+              graybuf->bg_pattern : graybuf->fg_pattern;
+
+    _pixelfuncs[graybuf->drawmode](x, y, pattern);
 }
 
-/* Draw a line from (x1, y1) to (x2, y2) with a specific gray value
- *
- * brightness is 0..255 (black to white) regardless of real bit depth
+/* Draw a line from (x1, y1) to (x2, y2) with the current drawinfo,
+ * See gray_drawpixel() for details
  */
-void gray_drawline(int x1, int y1, int x2, int y2, int brightness)
+void gray_drawline(int x1, int y1, int x2, int y2)
 {
     int numpixels;
     int i;
@@ -1097,92 +1409,9 @@ void gray_drawline(int x1, int y1, int x2, int y2, int brightness)
     int x, xinc1, xinc2;
     int y, yinc1, yinc2;
     unsigned long pattern;
+    void (*pixelfunc)(int x, int y, unsigned long pattern);
 
-    if (graybuf == NULL 
-        || (unsigned) x1 >= (unsigned) graybuf->width
-        || (unsigned) y1 >= (unsigned) graybuf->height
-        || (unsigned) x2 >= (unsigned) graybuf->width
-        || (unsigned) y2 >= (unsigned) graybuf->height
-        || (unsigned) brightness > 255)
-        return;
-
-    pattern = graybuf->bitpattern[MULU16(brightness, graybuf->depth + 1) >> 8];
-
-    deltax = abs(x2 - x1);
-    deltay = abs(y2 - y1);
-    xinc2 = 1;
-    yinc2 = 1;
-
-    if (deltax >= deltay)
-    {
-        numpixels = deltax;
-        d = 2 * deltay - deltax;
-        dinc1 = deltay * 2;
-        dinc2 = (deltay - deltax) * 2;
-        xinc1 = 1;
-        yinc1 = 0;
-    }
-    else
-    {
-        numpixels = deltay;
-        d = 2 * deltax - deltay;
-        dinc1 = deltax * 2;
-        dinc2 = (deltax - deltay) * 2;
-        xinc1 = 0;
-        yinc1 = 1;
-    }
-    numpixels++; /* include endpoints */
-
-    if (x1 > x2)
-    {
-        xinc1 = -xinc1;
-        xinc2 = -xinc2;
-    }
-
-    if (y1 > y2)
-    {
-        yinc1 = -yinc1;
-        yinc2 = -yinc2;
-    }
-
-    x = x1;
-    y = y1;
-
-    for (i=0; i<numpixels; i++)
-    {
-        graypixel(x, y, pattern);
-
-        if (d < 0)
-        {
-            d += dinc1;
-            x += xinc1;
-            y += yinc1;
-        }
-        else
-        {
-            d += dinc2;
-            x += xinc2;
-            y += yinc2;
-        }
-    }
-}
-
-/* Invert a line from (x1, y1) to (x2, y2)
- *
- * The bit patterns for the pixels of the line are inverted, so white becomes
- * black, light gray becomes dark gray etc.
- */
-void gray_invertline(int x1, int y1, int x2, int y2)
-{
-    int numpixels;
-    int i;
-    int deltax, deltay;
-    int d, dinc1, dinc2;
-    int x, xinc1, xinc2;
-    int y, yinc1, yinc2;
-
-    if (graybuf == NULL 
-        || (unsigned) x1 >= (unsigned) graybuf->width
+    if ((unsigned) x1 >= (unsigned) graybuf->width
         || (unsigned) y1 >= (unsigned) graybuf->height
         || (unsigned) x2 >= (unsigned) graybuf->width
         || (unsigned) y2 >= (unsigned) graybuf->height)
@@ -1227,204 +1456,197 @@ void gray_invertline(int x1, int y1, int x2, int y2)
 
     x = x1;
     y = y1;
-
-    for (i=0; i<numpixels; i++)
-    {
-        grayinvertmasked(x, (y >> 3), 1 << (y & 7));
-
-        if (d < 0)
-        {
-            d += dinc1;
-            x += xinc1;
-            y += yinc1;
-        }
-        else
-        {
-            d += dinc2;
-            x += xinc2;
-            y += yinc2;
-        }
-    }
-}
-
-/* Draw a (hollow) rectangle with a specific gray value,
- * corners are (x1, y1) and (x2, y2)
- *
- * brightness is 0..255 (black to white) regardless of real bit depth
- */
-void gray_drawrect(int x1, int y1, int x2, int y2, int brightness)
-{
-    int x, y;
-    unsigned long pattern;
-    unsigned char srcpixel;
-
-    if (graybuf == NULL 
-        || (unsigned) x1 >= (unsigned) graybuf->width
-        || (unsigned) y1 >= (unsigned) graybuf->height
-        || (unsigned) x2 >= (unsigned) graybuf->width
-        || (unsigned) y2 >= (unsigned) graybuf->height
-        || (unsigned) brightness > 255)
-        return;
-
-    if (y1 > y2)
-    {
-        y = y1;
-        y1 = y2;
-        y2 = y;
-    }
-    if (x1 > x2)
-    {
-        x = x1;
-        x1 = x2; 
-        x2 = x;
-    }
-
-    pattern = graybuf->bitpattern[MULU16(brightness, graybuf->depth + 1) >> 8];
-    srcpixel = brightness;
-
-    for (x = x1 + 1; x < x2; x++)
-    {
-        graypixel(x, y1, pattern);
-        graypixel(x, y2, pattern);
-    }
-    for (y = y1; y <= y2; )
-    {
-        if (!(y & 7) && (y2 - y >= 7))
-        /* current row byte aligned in fb & at least 8 rows left */
-        {
-            /* shortcut: draw all 8 rows at once: 2..3 times faster */
-            grayblock(x1, y >> 3, &srcpixel, 0);
-            grayblock(x2, y >> 3, &srcpixel, 0);
-            y += 8;
-        }
-        else
-        {
-            graypixel(x1, y, pattern);
-            graypixel(x2, y, pattern);
-            y++;
-        }
-    }
-}
-
-/* Fill a rectangle with a specific gray value 
- * corners are (x1, y1) and (x2, y2)
- *
- * brightness is 0..255 (black to white) regardless of real bit depth
- */
-void gray_fillrect(int x1, int y1, int x2, int y2, int brightness)
-{
-    int x, y;
-    unsigned long pattern;
-    unsigned char srcpixel;
-
-    if (graybuf == NULL 
-        || (unsigned) x1 >= (unsigned) graybuf->width
-        || (unsigned) y1 >= (unsigned) graybuf->height
-        || (unsigned) x2 >= (unsigned) graybuf->width
-        || (unsigned) y2 >= (unsigned) graybuf->height
-        || (unsigned) brightness > 255)
-        return;
-        
-    if (y1 > y2)
-    {
-        y = y1;
-        y1 = y2;
-        y2 = y;
-    }
-    if (x1 > x2)
-    {
-        x = x1;
-        x1 = x2; 
-        x2 = x;
-    }
-
-    pattern = graybuf->bitpattern[MULU16(brightness, graybuf->depth + 1) >> 8];
-    srcpixel = brightness;
-
-    for (y = y1; y <= y2; )
-    {
-        if (!(y & 7) && (y2 - y >= 7))
-        /* current row byte aligned in fb & at least 8 rows left */
-        {
-            for (x = x1; x <= x2; x++)
-            {
-                /* shortcut: draw all 8 rows at once: 2..3 times faster */
-                grayblock(x, y >> 3, &srcpixel, 0);
-            }
-            y += 8;
-        }
-        else
-        {
-            for (x = x1; x <= x2; x++)
-            {
-                graypixel(x, y, pattern);
-            }
-            y++;
-        }
-    }
-}
-
-/* Invert a (solid) rectangle, corners are (x1, y1) and (x2, y2)
- *
- * The bit patterns for all pixels of the rectangle are inverted, so white
- * becomes black, light gray becomes dark gray etc. This is the fastest of
- * all gray_xxxrect() functions! Perfectly suited for cursors.
- */
-void gray_invertrect(int x1, int y1, int x2, int y2)
-{
-    int x, yb, yb1, yb2;
-    unsigned char mask;
-
-    if (graybuf == NULL 
-        || (unsigned) x1 >= (unsigned) graybuf->width
-        || (unsigned) y1 >= (unsigned) graybuf->height
-        || (unsigned) x2 >= (unsigned) graybuf->width
-        || (unsigned) y2 >= (unsigned) graybuf->height)
-        return;
-
-    if (y1 > y2)
-    {
-        yb = y1;
-        y1 = y2;
-        y2 = yb;
-    }
-    if (x1 > x2)
-    {
-        x = x1;
-        x1 = x2; 
-        x2 = x;
-    }
     
-    yb1 = y1 >> 3;
-    yb2 = y2 >> 3;
+    pixelfunc = _pixelfuncs[graybuf->drawmode];
+    pattern = (graybuf->drawmode == GRAY_DRAW_BG) ?
+              graybuf->bg_pattern : graybuf->fg_pattern;
 
-    if (yb1 == yb2)
+    for (i = 0; i < numpixels; i++)
     {
-        mask = 0xFFu << (y1 & 7);
-        mask &= 0xFFu >> (7 - (y2 & 7));
+        pixelfunc(x, y, pattern);
 
-        for (x = x1; x <= x2; x++)
-            grayinvertmasked(x, yb1, mask);
-    }
-    else
-    {
-        mask = 0xFFu << (y1 & 7);
-
-        for (x = x1; x <= x2; x++)
-            grayinvertmasked(x, yb1, mask);
-            
-        for (yb = yb1 + 1; yb < yb2; yb++)
+        if (d < 0)
         {
-            for (x = x1; x <= x2; x++)
-                grayinvertmasked(x, yb, 0xFF);
+            d += dinc1;
+            x += xinc1;
+            y += yinc1;
         }
-        
-        mask = 0xFFu >> (7 - (y2 & 7));
-
-        for (x = x1; x <= x2; x++)
-            grayinvertmasked(x, yb2, mask);
+        else
+        {
+            d += dinc2;
+            x += xinc2;
+            y += yinc2;
+        }
     }
 }
+
+/* Draw a horizontal line from (x1, y) to (x2, y) with the current drawinfo,
+ * See gray_drawpixel() for details
+ */
+void gray_horline(int x1, int x2, int y)
+{
+    int x;
+    unsigned long pattern;
+    void (*pixelfunc)(int x, int y, unsigned long pattern);
+
+    if ((unsigned) x1 >= (unsigned) graybuf->width
+        || (unsigned) x2 >= (unsigned) graybuf->width
+        || (unsigned) y >= (unsigned) graybuf->height)
+        return;
+
+    if (x1 > x2)
+    {
+        x = x1;
+        x1 = x2;
+        x2 = x;
+    }
+    pixelfunc = _pixelfuncs[graybuf->drawmode];
+    pattern = (graybuf->drawmode == GRAY_DRAW_BG) ?
+              graybuf->bg_pattern : graybuf->fg_pattern;
+              
+    for (x = x1; x <= x2; x++)
+        pixelfunc(x, y, pattern);
+
+}
+
+/* Draw a vertical line from (x, y1) to (x, y2) with the current drawinfo,
+ * See gray_drawpixel() for details
+ *
+ * This one uses the block drawing optimization, so it is rather fast.
+ */
+void gray_verline(int x, int y1, int y2)
+{
+    int shift, y, ny;
+    unsigned bits, mask_top, mask_bottom;
+    unsigned char *dst;
+    void (*blockfunc)(unsigned char *address, unsigned mask, unsigned bits);
+
+    if ((unsigned) x >= (unsigned) graybuf->width
+        || (unsigned) y1 >= (unsigned) graybuf->height
+        || (unsigned) y2 >= (unsigned) graybuf->height)
+        return;
+    
+    if (y1 > y2)
+    {
+        y = y1;
+        y1 = y2;
+        y2 = y;
+    }
+    y = y1;
+    ny = y2 - y1 + 1;
+        
+    dst = graybuf->data + x + MULU16(graybuf->width, y >> 3);
+    shift = y & 7;
+    ny += shift;
+
+    mask_top = 0xFFu << (y & 7);
+    mask_bottom = ~(0xFEu << ((ny - 1) & 7));
+    if (ny <= 8)
+        mask_bottom &= mask_top;
+    
+    blockfunc = _blockfuncs[graybuf->drawmode];
+    bits = (graybuf->drawmode == GRAY_DRAW_BG) ? 0u : 0xFFu;
+
+    if (ny > 8)
+    {
+        blockfunc(dst, mask_top, bits);
+        dst += graybuf->width;
+
+        for (y = 8; y < ny - 8; y += 8)
+        {
+            blockfunc(dst, 0xFFu, bits);
+            dst += graybuf->width;
+        }
+    }
+
+    blockfunc(dst, mask_bottom, bits);
+}
+
+/** Rectangle functions **/
+
+/* Draw a (hollow) rectangle with the current drawinfo,
+ * See gray_drawpixel() for details
+ */
+void gray_drawrect(int x, int y, int nx, int ny)
+{
+    int x2, y2;
+
+    if ((unsigned) x >= (unsigned) graybuf->width
+        || (unsigned) y >= (unsigned) graybuf->height)
+        return;
+
+    if ((unsigned) (y + ny) >= (unsigned) graybuf->height) /* clip bottom */
+        ny = graybuf->height - y;
+
+    if ((unsigned) (x + nx) >= (unsigned) graybuf->width) /* clip right */
+        nx = graybuf->width - x;
+        
+    x2 = x + nx - 1;
+    y2 = y + ny - 1;
+
+    gray_horline(x, x2, y);
+    gray_horline(x, x2, y2);
+    gray_verline(x, y, y2);
+    gray_verline(x2, y, y2);
+}
+
+/* Draw a filled rectangle with the current drawinfo,
+ * See gray_drawpixel() for details
+ *
+ * This one uses the block drawing optimization, so it is rather fast.
+ */
+void gray_fillrect(int x, int y, int nx, int ny)
+{
+    int shift;
+    unsigned bits, mask_top, mask_bottom;
+    unsigned char *dst, *dst_row;
+    void (*blockfunc)(unsigned char *address, unsigned mask, unsigned bits);
+    
+    if ((unsigned) x >= (unsigned) graybuf->width
+        || (unsigned) y >= (unsigned) graybuf->height)
+        return;
+        
+    if ((unsigned) (y + ny) >= (unsigned) graybuf->height) /* clip bottom */
+        ny = graybuf->height - y;
+
+    if ((unsigned) (x + nx) >= (unsigned) graybuf->width) /* clip right */
+        nx = graybuf->width - x;
+
+    dst = graybuf->data + x + MULU16(graybuf->width, y >> 3);
+    shift = y & 7;
+    ny += shift;
+
+    mask_top = 0xFFu << (y & 7);
+    mask_bottom = ~(0xFEu << ((ny - 1) & 7));
+    if (ny <= 8)
+        mask_bottom &= mask_top;
+    
+    blockfunc = _blockfuncs[graybuf->drawmode];
+    bits = (graybuf->drawmode == GRAY_DRAW_BG) ? 0u : 0xFFu;
+
+    if (ny > 8)
+    {
+        dst_row = dst;
+        for (x = 0; x < nx; x++)
+            blockfunc(dst_row++, mask_top, bits);
+
+        dst += graybuf->width;
+            
+        for (y = 8; y < ny - 8; y += 8)
+        {
+            dst_row = dst;
+            for (x = 0; x < nx; x++)
+                blockfunc(dst_row++, 0xFFu, bits);
+
+            dst += graybuf->width;
+        }
+    }
+
+    for (x = 0; x < nx; x++)
+        blockfunc(dst++, mask_bottom, bits);
+}
+
+/** Bitmap functions **/
 
 /* Copy a grayscale bitmap into the display
  * 
@@ -1433,55 +1655,66 @@ void gray_invertrect(int x1, int y1, int x2, int y2)
  * The <stride> parameter is useful if you want to show only a part of a
  * bitmap. It should always be set to the "row length" of the bitmap, so
  * for displaying the whole bitmap, nx == stride.
+ *
+ * This is the only drawing function NOT using the drawinfo.
  */
 void gray_drawgraymap(unsigned char *src, int x, int y, int nx, int ny,
                       int stride)
 {
-    int xi, yi, byte;
-    unsigned char *row;
+    int shift;
+    unsigned mask_top, mask_bottom;
+    unsigned char *src_row, *dst, *dst_row;
 
-    if (graybuf == NULL 
-        || (unsigned) x >= (unsigned) graybuf->width
+    if ((unsigned) x >= (unsigned) graybuf->width
         || (unsigned) y >= (unsigned) graybuf->height)
         return;
     
-    if ((y + ny) >= graybuf->height) /* clip bottom */
+    if ((unsigned) (y + ny) >= (unsigned) graybuf->height) /* clip bottom */
         ny = graybuf->height - y;
 
-    if ((x + nx) >= graybuf->width) /* clip right */
+    if ((unsigned) (x + nx) >= (unsigned) graybuf->width) /* clip right */
         nx = graybuf->width - x;
+        
+    dst = graybuf->data + x + MULU16(graybuf->width, y >> 3);
+    shift = y & 7;
+    ny += shift;
 
-    for (yi = y; yi < y + ny; )
+    mask_top = 0xFFu << (y & 7);
+    mask_bottom = ~(0xFEu << ((ny - 1) & 7));
+    if (ny <= 8)
+        mask_bottom &= mask_top;
+
+    if (ny > 8)
     {
-        row = src;
+        src_row = src;
+        dst_row = dst;
 
-        if (!(yi & 7) && (y + ny - yi > 7))
-        /* current row byte aligned in fb & at least 8 rows left */
+        for (x = 0; x < nx; x++)
+            _writearray(dst_row++, src_row++, stride, mask_top);
+            
+        src += MULU16(stride, 8 - shift);
+        dst += graybuf->width;
+
+        for (y = 8; y < ny - 8; y += 8)
         {
-            for (xi = x; xi < x + nx; xi++)
-            {
-                /* shortcut: draw all 8 rows at once: 2..3 times faster */
-                grayblock(xi, yi >> 3, row++, stride);
-            }
-            yi += 8;
+            src_row = src;
+            dst_row = dst;
+            
+            for (x = 0; x < nx; x++)
+                _writearray(dst_row++, src_row++, stride, 0xFFu);
+
             src += stride << 3;
-        }
-        else
-        {
-            for (xi = x; xi < x + nx; xi++)
-            {
-                byte = *row++;  
-                /* separated to force GCC to use 16bit multiplication below */
-                graypixel(xi, yi, graybuf->bitpattern[MULU16(byte,
-                                  graybuf->depth + 1) >> 8]);
-            }
-            yi++;
-            src += stride;
+            dst += graybuf->width;
         }
     }
+
+    for (x = 0; x < nx; x++)
+        _writearray(dst++, src++, stride, mask_bottom);
 }
 
-/* Display a bitmap with specific foreground and background gray values
+/* Display a bitmap with the current drawinfo
+ *
+ * The drawmode is used as described for gray_set_drawmode()
  *
  * This (now) uses the same bitmap format as the core b&w graphics routines,
  * so you can use bmp2rb to generate bitmaps for use with this function as
@@ -1496,59 +1729,70 @@ void gray_drawgraymap(unsigned char *src, int x, int y, int nx, int ny,
  *
  * The <stride> parameter is useful if you want to show only a part of a
  * bitmap. It should always be set to the "row length" of the bitmap.
- *
- * If draw_bg is false, only foreground pixels are drawn, so the background
- * is transparent. In this case bg_brightness is ignored.
  */
 void gray_drawbitmap(unsigned char *src, int x, int y, int nx, int ny,
-                     int stride, bool draw_bg, int fg_brightness,
-                     int bg_brightness)
+                     int stride)
 {
-    int xi, dy;
-    int bits = 0;  /* Have to initialize to prevent warning */
-    unsigned long fg_pattern, bg_pattern;
-    unsigned char *col;
+    int shift;
+    unsigned bits, mask_top, mask_bottom;
+    unsigned char *src_col, *dst, *dst_col;
+    void (*blockfunc)(unsigned char *address, unsigned mask, unsigned bits);
 
-    if (graybuf == NULL
-        || (unsigned) x >= (unsigned) graybuf->width
-        || (unsigned) y >= (unsigned) graybuf->height
-        || (unsigned) fg_brightness > 255
-        || (unsigned) bg_brightness > 255)
+    if ((unsigned) x >= (unsigned) graybuf->width
+        || (unsigned) y >= (unsigned) graybuf->height)
         return;
-
-    if ((y + ny) >= graybuf->height) /* clip bottom */
+        
+    if ((unsigned) (y + ny) >= (unsigned) graybuf->height) /* clip bottom */
         ny = graybuf->height - y;
 
-    if ((x + nx) >= graybuf->width) /* clip right */
+    if ((unsigned) (x + nx) >= (unsigned) graybuf->width) /* clip right */
         nx = graybuf->width - x;
 
-    fg_pattern = graybuf->bitpattern[MULU16(fg_brightness,
-                                     graybuf->depth + 1) >> 8];
+    dst = graybuf->data + x + MULU16(graybuf->width, y >> 3);
+    shift = y & 7;
+    ny += shift;
 
-    bg_pattern = graybuf->bitpattern[MULU16(bg_brightness,
-                                     graybuf->depth + 1) >> 8];
+    mask_top = 0xFFu << (y & 7);
+    mask_bottom = ~(0xFEu << ((ny - 1) & 7));
+    if (ny <= 8)
+        mask_bottom &= mask_top;
 
-    for (xi = x; xi < x + nx; xi++)
+    blockfunc = _blockfuncs[graybuf->drawmode];
+
+    for(x = 0; x < nx; x++)
     {
-        col = src++;
-        for (dy = 0; dy < ny; dy++)
+        src_col = src++;
+        dst_col = dst++;
+        bits = 0;
+        y = 0;
+
+        if (ny > 8)
         {
-            if (!(dy & 7))   /* get next 8 bits */
+            bits = *src_col << shift;
+            src_col += stride;
+
+            blockfunc(dst_col, mask_top, bits);
+            dst_col += graybuf->width;
+            bits >>= 8;
+
+            for (y = 8; y < ny - 8; y += 8)
             {
-                bits = (int)(*col);
-                col += stride;
+                bits |= *src_col << shift;
+                src_col += stride;
+                
+                blockfunc(dst_col, 0xFFu, bits);
+                dst_col += graybuf->width;
+                bits >>= 8;
             }
-
-            if (bits & 0x01)
-                graypixel(xi, y + dy, fg_pattern);
-            else
-                if (draw_bg)
-                    graypixel(xi, y + dy, bg_pattern);
-
-            bits >>= 1;
         }
+        if (y + shift < ny)
+            bits |= *src_col << shift;
+
+        blockfunc(dst_col, mask_bottom, bits);
     }
 }
+
+/** Font support **/
 
 /* Set font for the font routines
  * 
@@ -1557,7 +1801,7 @@ void gray_drawbitmap(unsigned char *src, int x, int y, int nx, int ny,
  */
 void gray_setfont(int newfont)
 {
-    graybuf->curfont = newfont;
+    graybuf->curfont = rb->font_get(newfont);
 }
 
 /* Calculate width and height of the given text in pixels when rendered with
@@ -1570,9 +1814,9 @@ int gray_getstringsize(unsigned char *str, int *w, int *h)
 {
     int ch;
     int width = 0;
-    struct font* pf = rb->font_get(graybuf->curfont);
+    struct font *pf = graybuf->curfont;
 
-    while ((ch = *str++)) 
+    while ((ch = *str++))
     {
         /* check input range */
         if (ch < pf->firstchar || ch >= pf->firstchar + pf->size)
@@ -1589,25 +1833,20 @@ int gray_getstringsize(unsigned char *str, int *w, int *h)
     return width;
 }
 
-/* Display text with specified foreground and background shades
+/* Display text starting at (x, y) with the current font and drawinfo
  *
- * If draw_bg is false, only foreground pixels are drawn, so the background
- * is transparent. In this case bg_brightness is ignored.
+ * The drawmode is used as described for gray_set_drawmode()
  */
-void gray_putsxy(int x, int y, unsigned char *str, bool draw_bg,
-                 int fg_brightness, int bg_brightness)
+void gray_putsxy(int x, int y, unsigned char *str)
 {
     int ch, width;
     bitmap_t *bits;
-    struct font *pf = rb->font_get(graybuf->curfont);
+    struct font *pf = graybuf->curfont;
 
-    if (graybuf == NULL
-        || (unsigned) x >= (unsigned) graybuf->width
-        || (unsigned) y >= (unsigned) graybuf->height
-        || (unsigned) fg_brightness > 255
-        || (unsigned) bg_brightness > 255)
+    if ((unsigned) x >= (unsigned) graybuf->width
+        || (unsigned) y >= (unsigned) graybuf->height)
         return;
-        
+
     while ((ch = *str++) != '\0' && x < graybuf->width)
     {
         /* check input range */
@@ -1621,7 +1860,7 @@ void gray_putsxy(int x, int y, unsigned char *str, bool draw_bg,
                                       : MULU16(pf->height, ch));
 
         gray_drawbitmap((unsigned char*) bits, x, y, width, pf->height,
-                        width, draw_bg, fg_brightness, bg_brightness);
+                        width);
         x += width;
     }
 }
