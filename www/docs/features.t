@@ -63,6 +63,11 @@ YES
 NO
 EFEAT
 
+NAME <b>Max number of songs in a playlist</b> ENAME
+TD 10.000 ETD
+TD 999 ETD
+EFEAT
+
 NAME <b>Open source/development process</b> ENAME
 YES
 NO
