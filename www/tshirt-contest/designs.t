@@ -456,6 +456,19 @@ Note: Submissions that do not state if their image is for the front or back of t
     <td colspan=3>&nbsp</td>
 </tr>
 
+<!-- Entry 32 -->
+<tr><td>(32)</td>
+    <td colspan=2>Rick Southerland</td>
+</tr>
+<tr>
+    <td></td>
+    <td><a href="Alt-Front-Rick-Southerland.jpg"><img border=0 src="design32f.jpg" width=268 height=300></a></td>
+    <td><a href="Back-T-Shirt-Rick-Southerland.jpg"><img border=0 src="design31b.jpg" width=297 height=300></a></td>
+</tr>
+<tr>
+    <td colspan=3>&nbsp</td>
+</tr>
+
 <!-- End Entries -->
 
 </table>
