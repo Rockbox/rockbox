@@ -480,6 +480,8 @@ int wps_show(void)
 
     while ( 1 )
     {
+        bool restore = false;
+
         button = button_get_w_tmo(HZ/5);
 
         /* discard first event if it's a button release */
@@ -503,9 +505,7 @@ int wps_show(void)
                 if (keys_locked)
                 {
                     display_keylock_text(keys_locked);
-                    draw_screen(id3);
-                    if (mpeg_is_playing() && id3)
-                        display_file_time(id3->elapsed, id3->length);
+                    restore = true;
                     break;
                 }
 
@@ -520,9 +520,7 @@ int wps_show(void)
                 if (keys_locked)
                 {
                     display_keylock_text(keys_locked);
-                    draw_screen(id3);
-                    if (mpeg_is_playing() && id3)
-                        display_file_time(id3->elapsed, id3->length);
+                    restore = true;
                     break;
                 }
 
@@ -556,9 +554,7 @@ int wps_show(void)
                 if (keys_locked)
                 {
                     display_keylock_text(keys_locked);
-                    draw_screen(id3);
-                    if (mpeg_is_playing() && id3)
-                        display_file_time(id3->elapsed, id3->length);
+                    restore = true;
                     break;
                 }
 
@@ -578,9 +574,7 @@ int wps_show(void)
                 if (keys_locked)
                 {
                     display_keylock_text(keys_locked);
-                    draw_screen(id3);
-                    if (mpeg_is_playing() && id3)
-                        display_file_time(id3->elapsed, id3->length);
+                    restore = true;
                     break;
                 }
 
@@ -692,9 +686,7 @@ int wps_show(void)
 #endif
                 {
                     display_keylock_text(keys_locked);
-                    draw_screen(id3);
-                    if (mpeg_is_playing() && id3)
-                        display_file_time(id3->elapsed, id3->length);
+                    restore = true;
                 }
                 break;
 
@@ -734,9 +726,7 @@ int wps_show(void)
 #endif
                 {
                     display_keylock_text(keys_locked);
-                    draw_screen(id3);
-                    if (mpeg_is_playing() && id3)
-                        display_file_time(id3->elapsed, id3->length);
+                    restore = true;
                     break;
                 }
                 break;
@@ -772,9 +762,7 @@ int wps_show(void)
                 if (keys_locked)
                 {
                     display_keylock_text(keys_locked);
-                    draw_screen(id3);
-                    if (mpeg_is_playing() && id3)
-                        display_file_time(id3->elapsed, id3->length);
+                    restore = true;
                     break;
                 }
                 lcd_stop_scroll();
@@ -843,9 +831,7 @@ int wps_show(void)
                 if(keys_locked)
                 {
                     display_keylock_text(keys_locked);
-                    draw_screen(id3);
-                    if (mpeg_is_playing() && id3)
-                        display_file_time(id3->elapsed, id3->length);
+                    restore = true;
                     break;
                 }
 
@@ -858,9 +844,7 @@ int wps_show(void)
                     else
                         mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
                     display_mute_text(device_muted);
-                    if (mpeg_is_playing() && id3)
-                        display_file_time(id3->elapsed, id3->length);
-                    draw_screen(id3);
+                    restore = true;
                 }
                 dont_go_to_menu = true;
                 break;
@@ -881,9 +865,7 @@ int wps_show(void)
                         lcd_icon(ICON_RECORD, false);
 #endif
                     display_keylock_text(keys_locked);
-                    draw_screen(id3);
-                    if (mpeg_is_playing() && id3)
-                        display_file_time(id3->elapsed, id3->length);
+                    restore = true;
                 }
 
                 dont_go_to_menu = true;
@@ -905,9 +887,7 @@ int wps_show(void)
                     old_release_mask = button_set_release(RELEASE_MASK);
                     ignore_keyup = true;
                     id3 = mpeg_current_track();
-                    draw_screen(id3);
-                    if (mpeg_is_playing() && id3)
-                        display_file_time(id3->elapsed, id3->length);
+                    restore = true;
                 }
                 else
                 {
@@ -928,9 +908,7 @@ int wps_show(void)
                     lcd_setmargins(0, STATUSBAR_HEIGHT);
                 else
                     lcd_setmargins(0, 0);
-                draw_screen(id3);
-                if (mpeg_is_playing() && id3)
-                    display_file_time(id3->elapsed, id3->length);
+                restore = true;
 #endif
                 break;
 #endif
@@ -943,9 +921,7 @@ int wps_show(void)
                 if (keys_locked)
                 {
                     display_keylock_text(keys_locked);
-                    draw_screen(id3);
-                    if (mpeg_is_playing() && id3)
-                        display_file_time(id3->elapsed, id3->length);
+                    restore = true;
                     break;
                 }
 
@@ -994,6 +970,12 @@ int wps_show(void)
 
                 status_draw();
                 break;
+        }
+
+        if(restore) {
+            draw_screen(id3);
+            if (mpeg_is_playing() && id3)
+                display_file_time(id3->elapsed, id3->length);
         }
     }
 }
