@@ -273,6 +273,7 @@ int wps_show(void)
 
 #ifdef HAVE_RECORDER_KEYPAD
                 case BUTTON_UP:
+                case BUTTON_UP | BUTTON_REPEAT:
                     if (keys_locked)
                     {
                         display_keylock_text(keys_locked);
@@ -287,6 +288,7 @@ int wps_show(void)
                     break;
 
                 case BUTTON_DOWN:
+                case BUTTON_DOWN | BUTTON_REPEAT:
                     if (keys_locked)
                     {
                         display_keylock_text(keys_locked);
@@ -324,6 +326,7 @@ int wps_show(void)
 
 #ifdef HAVE_PLAYER_KEYPAD
                 case BUTTON_MENU | BUTTON_LEFT:
+                case BUTTON_MENU | BUTTON_LEFT | BUTTON_REPEAT:
                     dont_go_to_menu = true;
                     global_settings.volume--;
                     if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
@@ -332,6 +335,7 @@ int wps_show(void)
                     break;
 
                 case BUTTON_MENU | BUTTON_RIGHT:
+                case BUTTON_MENU | BUTTON_RIGHT | BUTTON_REPEAT:
                     dont_go_to_menu = true;
                     global_settings.volume++;
                     if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
