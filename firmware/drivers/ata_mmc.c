@@ -242,7 +242,17 @@ int ata_soft_reset(void)
 
 void ata_enable(bool on)
 {
-    (void)on;
+    PBCR1 &= ~0x0C00; /* use PB13 as GPIO, if not modified below */
+    if (on)
+    {
+        /* serial setup */
+        PBCR1 |=  0x0800; /* as SCK1 */
+    }
+    else
+    {
+        PBDR |= 0x2000; /* drive PB13 high */
+        PBIOR |= 0x2000; /* output PB13 */
+    }
 }
 
 unsigned short* ata_get_identify(void)
@@ -261,19 +271,14 @@ int ata_init(void)
     /* Port setup */
     PADR |= 0x1600; /* set all the selects high (=inactive) */
     PAIOR |= 0x1600; /* make outputs for them */
-    PAIOR &= ~0x0008; /* input for card detect */
-
-    /* serial setup */
-    PBCR1 &= ~0x0CF0; /* use PB10, PB11, PB13 */
-    PBCR1 |=  0x08A0; /*  as RxD1, TxD1, SCK1 */
 
     if(adc_read(ADC_MMC_SWITCH) < 0x200)
     {   /* MMC inserted */
-        PADR |= 0x0200;
+        PADR &= ~0x1000; /* clear PA12 */
     }
     else
     {   /* no MMC, use internal memory */
-        PADR |= 0x0400;
+        PADR |= 0x1000; /* set PA12 */
     }
 
     sleeping = false;

@@ -72,11 +72,6 @@ static bool usb_monitor_enabled;
 
 static void usb_enable(bool on)
 {
-#ifdef HAVE_LCD_BITMAP
-    if(read_hw_mask() & USB_ACTIVE_HIGH)
-        on = !on;
-#endif
-    
 #ifdef USB_ENABLE_ONDIOSTYLE
     if(on)
     {
@@ -88,6 +83,10 @@ static void usb_enable(bool on)
     }
     or_b(0x20, &PAIORL); /* output for USB enable */
 #else /* standard HD Jukebox */
+#ifdef HAVE_LCD_BITMAP
+    if(read_hw_mask() & USB_ACTIVE_HIGH)
+        on = !on;
+#endif
     if(on)
     {
         and_b(~0x04, &PADRH); /* enable USB */
