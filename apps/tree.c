@@ -413,7 +413,7 @@ bool dirbrowse(char *root)
                         if (start) {
                             /* leaving the cursor at top line and moving screen down */
                             if (browse_speed >=TREE_MAX_ON_SCREEN-1)
-                                start = start - TREE_MAX_ON_SCREEN - 1;
+                                start = start - TREE_MAX_ON_SCREEN + 1;
                             else
                                 start--;
                             if (start<0)
