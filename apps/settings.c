@@ -552,10 +552,14 @@ void settings_apply(void)
 
 static int default_contrast(void)
 {
+#ifdef SIMULATOR
+    return 30;
+#else
 #ifdef HAVE_LCD_CHARCELLS
     return 30;
 #else
     return (read_hw_mask() & LCD_CONTRAST_BIAS) ? 31 : 49;
+#endif
 #endif
 }
 
