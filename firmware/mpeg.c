@@ -28,6 +28,7 @@
 #include "thread.h"
 #include "panic.h"
 #include "file.h"
+#include "settings.h"
 
 #define MPEG_STACK_SIZE 0x2000
 #define MPEG_CHUNKSIZE  0x20000

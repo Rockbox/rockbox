@@ -64,6 +64,19 @@ void reload_all_settings( user_settings_t *settings );
 void reset_settings( user_settings_t *settings );
 void display_current_settings( user_settings_t *settings );
 
+/* system defines */
+
+#define DEFAULT_VOLUME_SETTING     70
+#define DEFAULT_BALANCE_SETTING    50
+#define DEFAULT_BASS_SETTING       50
+#define DEFAULT_TREBLE_SETTING     50
+#define DEFAULT_LOUDNESS_SETTING    0
+#define DEFAULT_BASS_BOOST_SETTING  0
+#define DEFAULT_CONTRAST_SETTING    0
+#define DEFAULT_POWEROFF_SETTING    0
+#define DEFAULT_BACKLIGHT_SETTING   1
+
+
 #endif /* __SETTINGS_H__ */
 
 
