@@ -420,13 +420,13 @@ static bool scroll_step(void)
                    &global_settings.scroll_step,
                    &lcd_scroll_step, 1, 1, LCD_WIDTH );
 }
+#endif
 
 static bool bidir_limit(void)
 {
     return set_int(str(LANG_BIDIR_SCROLL), "%", &global_settings.bidir_limit, 
                    &lcd_bidir_scroll, 25, 0, 200 );
 }
-#endif
 
 #ifndef SIMULATOR
 /**
@@ -686,8 +686,8 @@ static bool scroll_settings_menu(void)
         { str(LANG_SCROLL_DELAY),    scroll_delay    },  
 #ifdef HAVE_LCD_BITMAP
         { str(LANG_SCROLL_STEP),     scroll_step     },  
-        { str(LANG_BIDIR_SCROLL),    bidir_limit    },  
 #endif
+        { str(LANG_BIDIR_SCROLL),    bidir_limit    },  
     };
 
     m = menu_init( items, sizeof items / sizeof(struct menu_items) );
