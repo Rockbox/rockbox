@@ -1338,7 +1338,7 @@ bool dbg_mmc_info(void)
                     snprintf(pbuf, sizeof(pbuf), "Speed: %d.%01d %cBit/s",
                              value / 10, value % 10, unit);
                 else
-                    snprintf(pbuf, sizeof(pbuf), "Tsac: %d %cBit/s",
+                    snprintf(pbuf, sizeof(pbuf), "Speed: %d %cBit/s",
                              value / 10, unit);
                 lcd_puts(0, 1, pbuf);
 
@@ -1350,20 +1350,20 @@ bool dbg_mmc_info(void)
                 else
                     snprintf(pbuf, sizeof(pbuf), "Tsac: %d %cs",
                              value / 10, unit);
-                lcd_puts(0, 1, pbuf);
+                lcd_puts(0, 2, pbuf);
 
                 snprintf(pbuf, sizeof(pbuf), "Nsac: %d clk", card->nsac);
-                lcd_puts(0, 2, pbuf);
-                snprintf(pbuf, sizeof(pbuf), "R2W: *%d", card->r2w_factor);
                 lcd_puts(0, 3, pbuf);
+                snprintf(pbuf, sizeof(pbuf), "R2W: *%d", card->r2w_factor);
+                lcd_puts(0, 4, pbuf);
                 snprintf(pbuf, sizeof(pbuf), "IRmax: %d..%d mA",
                          i_vmin[mmc_extract_bits(card->csd, 66, 3)],
                          i_vmax[mmc_extract_bits(card->csd, 69, 3)]);
-                lcd_puts(0, 4, pbuf);
+                lcd_puts(0, 5, pbuf);
                 snprintf(pbuf, sizeof(pbuf), "IWmax: %d..%d mA",
                          i_vmin[mmc_extract_bits(card->csd, 72, 3)],
                          i_vmax[mmc_extract_bits(card->csd, 75, 3)]);
-                lcd_puts(0, 5, pbuf);
+                lcd_puts(0, 6, pbuf);
             }
         }
         else
