@@ -623,7 +623,6 @@ static void rebuild_preset_menu(void)
     for(i = 0;i < num_presets;i++)
     {
         preset_menu_items[i].desc = presets[i].name;
-        preset_menu_items[i].voice_id = -1;
     }
 }
 
@@ -705,8 +704,8 @@ bool radio_delete_preset(void)
 bool handle_radio_presets_menu(void)
 {
     struct menu_item preset_menu_items[] = {
-        { STR(LANG_FM_EDIT_PRESET), radio_edit_preset },
-        { STR(LANG_FM_DELETE_PRESET), radio_delete_preset },
+        { ID2P(LANG_FM_EDIT_PRESET), radio_edit_preset },
+        { ID2P(LANG_FM_DELETE_PRESET), radio_delete_preset },
     };
     int m;
 
