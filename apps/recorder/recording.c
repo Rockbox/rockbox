@@ -134,7 +134,11 @@ void adjust_cursor(void)
             cursor = 0;
     
         if(cursor > 2)
+#ifdef REC_PREV /* normal case, stop at the end */
             cursor = 2;
+#else
+            cursor = 0; /* only 1 button, cycle through */
+#endif
     }
     else
     {
