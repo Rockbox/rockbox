@@ -19,6 +19,8 @@
 #ifndef _DIR_H_
 #define _DIR_H_
 
+#include <stdbool.h>
+
 #ifndef DIRENT_DEFINED
 
 #define ATTR_READ_ONLY   0x01
@@ -42,8 +44,10 @@ struct dirent {
 #include "fat.h"
 
 typedef struct {
+    bool busy;
     int startcluster;
     struct fat_dir fatdir;
+    struct dirent theent;
 } DIR;
 
 #else // SIMULATOR

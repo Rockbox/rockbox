@@ -17,15 +17,16 @@
  *
  ****************************************************************************/
 #include <stdio.h>
+#include <errno.h>
 #include <string.h>
 #include <stdbool.h>
 #include "fat.h"
 #include "dir.h"
 #include "debug.h"
 
-static DIR thedir;
-static struct dirent theent;
-static bool busy=false;
+#define MAX_OPEN_DIRS 8
+
+static DIR opendirs[MAX_OPEN_DIRS];
 
 DIR* opendir(char* name)
 {
@@ -33,20 +34,30 @@ DIR* opendir(char* name)
     char* part;
     char* end;
     struct fat_direntry entry;
-    struct fat_dir* dir = &(thedir.fatdir);
+    int dd;
 
-    if ( busy ) {
-        DEBUGF("Only one open dir at a time\n");
+    /* find a free dir descriptor */
+    for ( dd=0; dd<MAX_OPEN_DIRS; dd++ )
+        if ( !opendirs[dd].busy )
+            break;
+
+    if ( dd == MAX_OPEN_DIRS ) {
+        DEBUGF("Too many dirs open\n");
+        errno = EMFILE;
         return NULL;
     }
+
+    opendirs[dd].busy = true;
 
     if ( name[0] != '/' ) {
         DEBUGF("Only absolute paths supported right now\n");
+        opendirs[dd].busy = false;
         return NULL;
     }
 
-    if ( fat_opendir(dir, 0) < 0 ) {
+    if ( fat_opendir(&(opendirs[dd].fatdir), 0) < 0 ) {
         DEBUGF("Failed opening root dir\n");
+        opendirs[dd].busy = false;
         return NULL;
     }
 
@@ -58,15 +69,18 @@ DIR* opendir(char* name)
         int partlen = strlen(part);
         /* scan dir for name */
         while (1) {
-            if (fat_getnext(dir,&entry) < 0)
+            if ((fat_getnext(&(opendirs[dd].fatdir),&entry) < 0) ||
+                (!entry.name[0])) {
+                opendirs[dd].busy = false;
                 return NULL;
-            if ( !entry.name[0] )
-                return NULL;
+            }
             if ( (entry.attr & FAT_ATTR_DIRECTORY) &&
                  (!strncmp(part, entry.name, partlen)) ) {
-                if ( fat_opendir(dir, entry.firstcluster) < 0 ) {
+                if ( fat_opendir(&(opendirs[dd].fatdir),
+                                 entry.firstcluster) < 0 ) {
                     DEBUGF("Failed opening dir '%s' (%d)\n",
                            part, entry.firstcluster);
+                    opendirs[dd].busy = false;
                     return NULL;
                 }
                 break;
@@ -74,20 +88,19 @@ DIR* opendir(char* name)
         }
     }
 
-    busy = true;
-
-    return &thedir;
+    return &opendirs[dd];
 }
 
 int closedir(DIR* dir)
 {
-    busy=false;
+    dir->busy=false;
     return 0;
 }
 
 struct dirent* readdir(DIR* dir)
 {
     struct fat_direntry entry;
+    struct dirent* theent = &(dir->theent);
 
     if (fat_getnext(&(dir->fatdir),&entry) < 0)
         return NULL;
@@ -95,12 +108,12 @@ struct dirent* readdir(DIR* dir)
     if ( !entry.name[0] )
         return NULL;
 
-    strncpy(theent.d_name, entry.name, sizeof( theent.d_name ) );
-    theent.attribute = entry.attr;
-    theent.size = entry.filesize;
-    theent.startcluster = entry.firstcluster;
+    strncpy(theent->d_name, entry.name, sizeof( theent->d_name ) );
+    theent->attribute = entry.attr;
+    theent->size = entry.filesize;
+    theent->startcluster = entry.firstcluster;
 
-    return &theent;
+    return theent;
 }
 
 /*
