@@ -58,7 +58,10 @@ sub buildzip {
             `$cmd`;
         }
 
-        `cp rockbox.ucl .rockbox/`;  # UCL for flashing
+        if($image) {
+            # image is blank when this is a simulator
+            `cp rockbox.ucl .rockbox/`;  # UCL for flashing
+        }
     }
 
     mkdir ".rockbox/docs", 0777;
@@ -83,12 +86,12 @@ sub buildzip {
 
     `find .rockbox | zip $zip -@ >/dev/null`;
 
-    `zip $zip $image`;
+    if($image) {
+        `zip $zip $image`;
+    }
 
     # remove the .rockbox afterwards
     `rm -rf .rockbox`;
-
-    print "Created $zip\n";
 }
 
 my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) =
@@ -115,10 +118,24 @@ sub runone {
              ($type eq "player")?0:1);
 };
 
-if($ARGV[0] !~ /player/i) {
-    runone("recorder", "ajbrec.ajz");
+my $target = $ARGV[0];
+
+my $exe = "";
+
+if($target !~ /sim/i) {
+    # not a simulator
+    if($target =~ /recorder/i) {
+        $exe = "ajbrec.ajz";
+    }
+    else {
+        $exe = "archos.mod";
+    }
+}
+
+if($target =~ /recorder/i) {
+    runone("recorder", $exe);
 }
 else {
-    runone("player", "archos.mod");
+    runone("player", $exe);
 }
 
