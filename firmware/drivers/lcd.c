@@ -667,6 +667,16 @@ void lcd_setmargins(int x, int y)
     ymargin = y;
 }
 
+int lcd_getxmargin(void)
+{
+    return xmargin;
+}
+
+int lcd_getymargin(void)
+{
+    return ymargin;
+}
+
 
 
 #ifdef LOADABLE_FONTS

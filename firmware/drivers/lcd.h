@@ -97,6 +97,8 @@ extern void lcd_putsxy(int x, int y, unsigned char *string, int font);
 extern void lcd_setfont(int font);
 extern void lcd_getfontsize(unsigned int font, int *width, int *height);
 extern void lcd_setmargins(int xmargin, int ymargin);
+extern int  lcd_getxmargin(void);
+extern int  lcd_getymargin(void);
 extern void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
 			bool clear);
 extern void lcd_clearrect (int x, int y, int nx, int ny);
