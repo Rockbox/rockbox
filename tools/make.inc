@@ -1,3 +1,5 @@
+# -*- Makefile -*-
+
 $(OBJDIR)/%.o: %.c
 	@mkdir -p `dirname $@`
 	@echo "CC $<"
