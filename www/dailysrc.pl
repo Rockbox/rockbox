@@ -10,7 +10,15 @@ closedir DIR;
 print "<ul>\n";
 
 for ( @tarballs ) {
-    print "<li><a href=\"daily/$_\">$_</a>\n";
+    $size = (stat("$basedir/$_"))[7];
+    $log = "";
+    if (/-(\d+)/) {
+        $date = $1;
+        if ( -f "$basedir/changes-$date.log") {
+            $log = "<a href=\"daily/changes-$date.log\">Changelog</a>";
+        }
+    }
+    print "<li><a href=\"daily/$_\">$_</a> ($size bytes) $log\n";
 }
 
 print "</ul>\n";
