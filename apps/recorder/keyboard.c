@@ -28,6 +28,7 @@
 #include "status.h"
 #include "talk.h"
 #include "settings.h"
+#include "misc.h"
 
 #define KEYBOARD_LINES 4
 #define KEYBOARD_PAGES 3
@@ -89,6 +90,7 @@ int kbd_input(char* text, int buflen)
     char outline[256];
     char c = 0;
     struct font* font = font_get(FONT_SYSFIXED);
+    int button;
 
     lcd_setfont(FONT_SYSFIXED);
     font_w = font->maxwidth;
@@ -193,8 +195,9 @@ int kbd_input(char* text, int buflen)
 
         /* The default action is to redraw */
         redraw = true;
-        
-        switch ( button_get_w_tmo(HZ/2) ) {
+
+        button = button_get_w_tmo(HZ/2);
+        switch ( button ) {
 
             case BUTTON_OFF:
                 /* abort */
@@ -309,15 +312,16 @@ int kbd_input(char* text, int buflen)
                     kbd_spellchar(text[editpos]);
                 break;
 
-            case SYS_USB_CONNECTED:
-                usb_screen();
-                lcd_setfont(FONT_SYSFIXED);
-                break;
-
             case BUTTON_NONE:
                 status_draw(false);
                 redraw = false;
                 break;
+
+            default:
+                if(default_event_handler(button) == SYS_USB_CONNECTED)
+                    lcd_setfont(FONT_SYSFIXED);
+                break;
+
         }
     }
     lcd_setfont(FONT_UI);

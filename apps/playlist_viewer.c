@@ -32,6 +32,7 @@
 #include "tree.h"
 #include "onplay.h"
 #include "talk.h"
+#include "misc.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -1045,14 +1046,16 @@ bool playlist_viewer_ex(char* filename)
                 update = true;
                 break;
 
-            case SYS_USB_CONNECTED:
-                usb_screen();
-                ret = true;
-                goto exit;
-                break;
-
             case BUTTON_NONE:
                 status_draw(false);
+                break;
+
+            default:
+                if(default_event_handler(button) == SYS_USB_CONNECTED)
+                {
+                    ret = true;
+                    goto exit;
+                }
                 break;
         }
 

@@ -45,6 +45,7 @@
 #include "kernel.h"
 #include "sprintf.h"
 #include "talk.h"
+#include "misc.h"
 
 #define MAX_BOOKMARKS 10
 #define MAX_BOOKMARK_SIZE  350
@@ -277,12 +278,10 @@ bool bookmark_autobookmark(void)
                 done = true;
                 break;
 
-            case SYS_USB_CONNECTED:
-                usb_screen();
-#ifdef HAVE_LCD_CHARCELLS
-                status_set_param(true);
-#endif
-                return false;
+            default:
+                if(default_event_handler(key) == SYS_USB_CONNECTED)
+                    return false;
+                break;
         }
     }
     return true;
@@ -511,25 +510,23 @@ bool bookmark_autoload(char* file)
 
         while(!done)
         {
+            button_clear_queue();
+            
             /* Wait for a key to be pushed */
-            while (button_get(false)); /* clear button queue */
             key = button_get(true);
             switch(key)
             {
-                default:
-                    return false;
 #ifdef HAVE_LCD_BITMAP
                 case BUTTON_DOWN:
                     return bookmark_load(global_bookmark_file_name, false);
 #endif
                 case BUTTON_PLAY:
                     return bookmark_load(global_bookmark_file_name, true);
-                case SYS_USB_CONNECTED:
-                    usb_screen();
-#ifdef HAVE_LCD_CHARCELLS
-                    status_set_param(true);
-#endif
-                    return true;
+
+                default:
+                    if(default_event_handler(key) == SYS_USB_CONNECTED)
+                        return true;
+                    return false;
             }
         }
         return true;
@@ -690,12 +687,6 @@ static char* select_bookmark(char* bookmark_file_name)
                 while (button_get(false)); /* clear button queue */
                 break;
 
-            case SYS_USB_CONNECTED:
-                usb_screen();
-#ifdef HAVE_LCD_CHARCELLS
-                status_set_param(true);
-#endif
-                return NULL;
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_UP:
                 bookmark_id--;
@@ -726,6 +717,10 @@ static char* select_bookmark(char* bookmark_file_name)
             case BUTTON_STOP:
                 return NULL;
 #endif
+            default:
+                if(default_event_handler(key) == SYS_USB_CONNECTED)
+                    return NULL;
+                break;
         }
     }
 

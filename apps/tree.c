@@ -56,6 +56,7 @@
 #include "action.h"
 #include "talk.h"
 #include "filetypes.h"
+#include "misc.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -599,7 +600,7 @@ static bool ask_resume(bool ask_once)
 #endif
 
     if (usb_detect()) {
-        usb_screen();
+        default_event_handler(SYS_USB_CONNECTED);
         return false;
     }
     
@@ -635,13 +636,8 @@ static bool ask_resume(bool ask_once)
             case BUTTON_ON | BUTTON_REPEAT:
                 break;
 #endif
-
-            case SYS_USB_CONNECTED:
-                usb_screen();
-                stop = true;
-                break;
-
             default:
+                default_event_handler(button);
                 stop = true;
                 break;
         }
@@ -940,6 +936,7 @@ static bool dirbrowse(char *root, int *dirfilter)
 #ifndef SIMULATOR
         if (boot_changed) {
             bool stop = false;
+            int button;
 
             lcd_clear_display();
             lcd_puts(0,0,str(LANG_BOOT_CHANGED));
@@ -950,18 +947,15 @@ static bool dirbrowse(char *root, int *dirfilter)
             lcd_update();
 #endif
             while (!stop) {
-                switch (button_get(true)) {
+                button = button_get(true);
+                switch (button) {
                     case BUTTON_PLAY:
                         rolo_load("/" BOOTFILE);
                         stop = true;
                         break;
 
-                    case SYS_USB_CONNECTED:
-                        usb_screen();
-                        stop = true;
-                        break;
-
                     default:
+                        default_event_handler(button);
                         stop = true;
                         break;
                  }
@@ -1372,11 +1366,6 @@ static bool dirbrowse(char *root, int *dirfilter)
 #endif
                 break;
 
-            case SYS_USB_CONNECTED:
-                usb_screen();
-                reload_root = true;
-                break;
-
             case BUTTON_NONE:
                 if (thumbnail_time != -1 &&
                     TIME_AFTER(current_tick, thumbnail_time))
@@ -1392,6 +1381,11 @@ static bool dirbrowse(char *root, int *dirfilter)
                     thumbnail_time = -1; /* job done */
                 }
                 status_draw(false);
+                break;
+
+            default:
+                if(default_event_handler(button) == SYS_USB_CONNECTED)
+                    reload_root = true;
                 break;
         }
 

@@ -416,12 +416,16 @@ bool radio_screen(void)
                 /* Only accept USB connection when not recording */
                 if(mpeg_status() != MPEG_STATUS_RECORD)
                 {
-                    usb_screen();
+                    default_event_handler(SYS_USB_CONNECTED);
                     fmradio_set_status(0);
                     screen_freeze = true; /* Cosmetic: makes sure the
                                              radio screen doesn't redraw */
                     done = true;
                 }
+                break;
+                
+            default:
+                default_event_handler(button);
                 break;
         }
 

@@ -1362,10 +1362,10 @@ bool set_int(char* string,
                 done = true;
                 break;
 
-            case SYS_USB_CONNECTED:
-                usb_screen();
-                return true;
-
+            default:
+                if(default_event_handler(button) == SYS_USB_CONNECTED)
+                    return true;
+                break;
         }
         if(*variable > max )
             *variable = max;
@@ -1492,9 +1492,10 @@ bool set_option(char* string, void* variable, enum optiontype type,
                 done = true;
                 break;
 
-            case SYS_USB_CONNECTED:
-                usb_screen();
-                return true;
+            default:
+                if(default_event_handler(button) == SYS_USB_CONNECTED)
+                    return true;
+                break;
         }
 
         if ( function && button != BUTTON_NONE) {

@@ -34,6 +34,7 @@
 #include "screens.h"
 #include "talk.h"
 #include "lang.h"
+#include "misc.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
@@ -373,12 +374,10 @@ int menu_show(int m)
                 exit = true;
                 break;
 
-            case SYS_USB_CONNECTED:
-                usb_screen();
-#ifdef HAVE_LCD_CHARCELLS
-                status_set_param(false);
-#endif
-                return MENU_ATTACHED_USB;
+            default:
+                if(default_event_handler(key) == SYS_USB_CONNECTED)
+                    return MENU_ATTACHED_USB;
+                break;
         }
         
         status_draw(false);

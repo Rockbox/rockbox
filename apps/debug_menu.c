@@ -46,6 +46,7 @@
 #include "dir.h"
 #include "panic.h"
 #include "screens.h"
+#include "misc.h"
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
 #include "peakmeter.h"
@@ -520,10 +521,11 @@ bool dbg_partitions(void)
                 if (partition > 3)
                     partition = 0;
                 break;
-                
-            case SYS_USB_CONNECTED:
-                usb_screen();
-                return true;
+
+            default:
+                if(default_event_handler(button) == SYS_USB_CONNECTED)
+                    return true;
+                break;
         }
     }
     return false;

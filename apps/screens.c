@@ -288,6 +288,7 @@ int charging_screen(void)
    2 if USB was connected */
 int on_screen(void)
 {
+    int button;
     static int pitch = 1000;
     bool exit = false;
     bool used = false;
@@ -329,7 +330,8 @@ int on_screen(void)
 
         /* use lastbutton, so the main loop can decide whether to
            exit to browser or not */
-        switch (button_get(true)) {
+        button = button_get(true);
+        switch (button) {
             case BUTTON_UP:
             case BUTTON_ON | BUTTON_UP:
             case BUTTON_ON | BUTTON_UP | BUTTON_REPEAT:
@@ -407,9 +409,10 @@ int on_screen(void)
                 used = true;
                 break;
 
-            case SYS_USB_CONNECTED:
-                usb_screen();
-                return 2;
+            default:
+                if(default_event_handler(button) == SYS_USB_CONNECTED)
+                    return 2;
+                break;
         }
     }
 
@@ -606,10 +609,11 @@ bool quick_screen(int context, int button)
 
             case BUTTON_OFF | BUTTON_REPEAT:
                 return false;
-                
-            case SYS_USB_CONNECTED:
-                usb_screen();
-                return true;
+
+            default:
+                if(default_event_handler(key) == SYS_USB_CONNECTED)
+                    return true;
+                break;
         }
     }
 
@@ -1082,9 +1086,10 @@ bool set_time_screen(char* string, struct tm *tm)
                 tm->tm_year = -1;
                 break;
 
-            case SYS_USB_CONNECTED:
-                usb_screen();
-                return true;
+            default:
+                if (default_event_handler(button) == SYS_USB_CONNECTED)
+                    return true;
+                break;
         }
     }
 
@@ -1112,6 +1117,9 @@ bool shutdown_screen(void)
                 break;
 
             default:
+                if(default_event_handler(button) == SYS_USB_CONNECTED)
+                    return true;
+                
                 /* Return if any other button was pushed, or if there
                    was a timeout. We ignore RELEASE events, since we may
                    have been called by a button down event, and the user might

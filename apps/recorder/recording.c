@@ -437,10 +437,14 @@ bool recording_screen(void)
                 /* Only accept USB connection when not recording */
                 if(mpeg_status() != MPEG_STATUS_RECORD)
                 {
-                    usb_screen();
+                    default_event_handler(SYS_USB_CONNECTED);
                     done = true;
                     been_in_usb_mode = true;
                 }
+                break;
+                
+            default:
+                default_event_handler(button);
                 break;
         }
 
@@ -622,6 +626,7 @@ bool f2_rec_screen(void)
     bool used = false;
     int w, h;
     char buf[32];
+    int button;
 
     lcd_setfont(FONT_SYSFIXED);
     lcd_getstringsize("A",&w,&h);
@@ -671,7 +676,8 @@ bool f2_rec_screen(void)
 
         lcd_update();
 
-        switch (button_get(true)) {
+        button = button_get(true);
+        switch (button) {
             case BUTTON_LEFT:
             case BUTTON_F2 | BUTTON_LEFT:
                 global_settings.rec_quality++;
@@ -706,9 +712,10 @@ bool f2_rec_screen(void)
                 used = true;
                 break;
 
-            case SYS_USB_CONNECTED:
-                usb_screen();
-                return true;
+            default:
+                if(default_event_handler(button) == SYS_USB_CONNECTED)
+                    return true;
+                break;
         }
     }
 
@@ -735,6 +742,7 @@ bool f3_rec_screen(void)
     bool exit = false;
     bool used = false;
     int w, h;
+    int button;
     char *src_str[] =
     {
         str(LANG_RECORDING_SRC_MIC),
@@ -760,7 +768,8 @@ bool f3_rec_screen(void)
 
         lcd_update();
 
-        switch (button_get(true)) {
+        button = button_get(true);
+        switch (button) {
             case BUTTON_LEFT:
             case BUTTON_F3 | BUTTON_LEFT:
                 global_settings.rec_source++;
@@ -779,9 +788,10 @@ bool f3_rec_screen(void)
                 used = true;
                 break;
 
-            case SYS_USB_CONNECTED:
-                usb_screen();
-                return true;
+            default:
+                if(default_event_handler(button) == SYS_USB_CONNECTED)
+                    return true;
+                break;
         }
     }
 

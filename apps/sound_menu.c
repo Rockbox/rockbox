@@ -33,6 +33,7 @@
 #include "lang.h"
 #include "sprintf.h"
 #include "talk.h"
+#include "misc.h"
 
 static char *fmt[] =
 {
@@ -56,6 +57,7 @@ bool set_sound(char* string,
     char str[32];
     int talkunit = UNIT_INT;
     int steps;
+    int button;
 
     unit = mpeg_sound_unit(setting);
     numdec = mpeg_sound_numdecimals(setting);
@@ -99,7 +101,8 @@ bool set_sound(char* string,
         lcd_update();
 
         changed = false;
-        switch( button_get_w_tmo(HZ/2) ) {
+        button = button_get_w_tmo(HZ/2);
+        switch( button ) {
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_UP:
             case BUTTON_UP | BUTTON_REPEAT:
@@ -136,9 +139,10 @@ bool set_sound(char* string,
                 done = true;
                 break;
 
-            case SYS_USB_CONNECTED:
-                usb_screen();
-                return true;
+            default:
+                if(default_event_handler(button) == SYS_USB_CONNECTED)
+                    return true;
+                break;
         }
         if (changed) {
             mpeg_sound_set(setting, *variable);

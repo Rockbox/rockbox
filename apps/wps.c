@@ -48,6 +48,8 @@
 #endif
 #include "lang.h"
 #include "bookmark.h"
+#include "misc.h"
+
 #define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
                                 /* 3% of 30min file == 54s step size */
 #define MIN_FF_REWIND_STEP 500
@@ -296,9 +298,9 @@ bool browse_id3(void)
                 exit = true;
                 break;
 
-            case SYS_USB_CONNECTED: 
-                usb_screen();
-                return true;
+            default:
+                if(default_event_handler(button) ==  SYS_USB_CONNECTED)
+                    return true;
                 break;
         }
     }
@@ -419,11 +421,12 @@ static bool ffwd_rew(int button)
                 exit = true;
                 break;
 
-            case SYS_USB_CONNECTED:
-                status_set_ffmode(0);
-                usb_screen();
-                usb = true;
-                exit = true;
+            default:
+                if(default_event_handler(button) == SYS_USB_CONNECTED) {
+                    status_set_ffmode(0);
+                    usb = true;
+                    exit = true;
+                }
                 break;
         }
         if (!exit)
@@ -511,10 +514,12 @@ static bool menu(void)
                 while (button_get(false)); /* clear button queue */
                 break;
 
-            case SYS_USB_CONNECTED:
-                usb_screen();
-                keys_locked = false;
-                return true;
+            default:
+                if(default_event_handler(button) == SYS_USB_CONNECTED) {
+                    keys_locked = false;
+                    return true;
+                }
+                break;
         }
 
         if (keys_locked) {
@@ -754,19 +759,20 @@ int wps_show(void)
         if (button && ignore_keyup)
         {
             ignore_keyup = false;
-            if (button & BUTTON_REL && button != SYS_USB_CONNECTED)
+            /* Negative events are system events */
+            if (button >= 0 && button & BUTTON_REL )
                 continue;
         }
         
         /* ignore non-remote buttons when keys are locked */
         if (keys_locked &&
+            ! ((button < 0) ||
 #ifdef HAVE_RECORDER_KEYPAD
-            ! ((button & BUTTON_F1) ||
+               (button & BUTTON_F1) ||
 #else
-            ! ((button & BUTTON_MENU) ||
+               (button & BUTTON_MENU) ||
 #endif
-               (button == BUTTON_NONE) ||
-               (button == SYS_USB_CONNECTED)
+               (button == BUTTON_NONE)
 #ifdef BUTTON_REMOTE
                || (button & BUTTON_REMOTE)
 #endif
@@ -970,12 +976,13 @@ int wps_show(void)
                 exit = true;
                 break;
 
-            case SYS_USB_CONNECTED:
-                usb_screen();
-                return SYS_USB_CONNECTED;
-
             case BUTTON_NONE: /* Timeout */
                 update_track = true;
+                break;
+
+            default:
+                if(default_event_handler(button) == SYS_USB_CONNECTED)
+                    return SYS_USB_CONNECTED;
                 break;
         }
 

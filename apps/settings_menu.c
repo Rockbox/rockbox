@@ -43,6 +43,7 @@
 #include "screens.h"
 #include "talk.h"
 #include "timefuncs.h"
+#include "misc.h"
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
 #endif
@@ -1037,6 +1038,7 @@ static bool reset_settings(void)
 {
     bool done=false;
     int line;
+    int button;
  
     lcd_clear_display();
 
@@ -1052,7 +1054,8 @@ static bool reset_settings(void)
     lcd_update();
      
     while(!done) {
-        switch(button_get(true)) {
+        button = button_get(true);
+        switch(button) {
         case BUTTON_PLAY:
             settings_reset();
             settings_apply();
@@ -1071,9 +1074,9 @@ static bool reset_settings(void)
             done = true;
             break;
 
-        case SYS_USB_CONNECTED:
-            usb_screen();
-            return true;
+        default:
+            if(default_event_handler(button) == SYS_USB_CONNECTED)
+                return true;
         }
     }
 

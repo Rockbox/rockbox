@@ -249,9 +249,10 @@ bool show_info(void)
                     state = 1;
                 break;
 #endif
-            case SYS_USB_CONNECTED:
-                usb_screen();
-                return true;
+           default:
+               if(default_event_handler(key) == SYS_USB_CONNECTED)
+                   return true;
+               break;
         }
     }
 
