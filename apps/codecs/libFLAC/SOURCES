@@ -10,6 +10,6 @@ md5.c
 memory.c
 seekable_stream_decoder.c
 stream_decoder.c
-#if CONFIG_CPU==MCF5249
+#if CONFIG_CPU==MCF5249 && !defined(SIMULATOR)
 coldfire.S
 #endif
