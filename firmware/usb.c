@@ -59,7 +59,8 @@ static int countdown;
 
 static int usb_state;
 
-static char usb_stack[0x800];
+static char usb_stack[DEFAULT_STACK_SIZE];
+static char usb_thread_name[] = "usb";
 static struct event_queue usb_queue;
 static bool last_usb_status;
 static bool usb_monitor_enabled;
@@ -269,7 +270,7 @@ void usb_init(void)
     last_usb_status = false;
     
     queue_init(&usb_queue);
-    create_thread(usb_thread, usb_stack, sizeof(usb_stack));
+    create_thread(usb_thread, usb_stack, sizeof(usb_stack), usb_thread_name);
 
     tick_add_task(usb_tick);
 }

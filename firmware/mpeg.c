@@ -33,7 +33,6 @@
 #include "file.h"
 #endif
 
-#define MPEG_STACK_SIZE 0x2000
 #define MPEG_CHUNKSIZE  0x20000
 #define MPEG_LOW_WATER  0x30000
 
@@ -260,7 +259,8 @@ static unsigned char fliptable[] =
 static unsigned short big_fliptable[65536];
 
 static struct event_queue mpeg_queue;
-static int mpeg_stack[MPEG_STACK_SIZE/sizeof(int)];
+static char mpeg_stack[DEFAULT_STACK_SIZE + 0x1000];
+static char mpeg_thread_name[] = "mpeg";
 
 /* defined in linker script */
 extern unsigned char mp3buf[];
@@ -984,7 +984,8 @@ void mpeg_init(int volume, int bass, int treble)
     create_fliptable();
     
     queue_init(&mpeg_queue);
-    create_thread(mpeg_thread, mpeg_stack, sizeof(mpeg_stack));
+    create_thread(mpeg_thread, mpeg_stack,
+		  sizeof(mpeg_stack), mpeg_thread_name);
     mas_poll_start(2);
 
 #ifndef ARCHOS_RECORDER

@@ -30,7 +30,8 @@
 #define BACKLIGHT_OFF 2
 
 static void backlight_thread(void);
-static char backlight_stack[0x400];
+static char backlight_stack[DEFAULT_STACK_SIZE];
+static char backlight_thread_name[] = "backlight";
 static struct event_queue backlight_queue;
 
 static int backlight_timer;
@@ -111,6 +112,7 @@ void backlight_init(void)
     rtc_write(0x0a, 0x40); /* Enable square wave */
 #endif
     queue_init(&backlight_queue);
-    create_thread(backlight_thread, backlight_stack, sizeof(backlight_stack));
+    create_thread(backlight_thread, backlight_stack,
+		  sizeof(backlight_stack), backlight_thread_name);
     backlight_on();
 }

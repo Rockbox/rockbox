@@ -112,7 +112,8 @@ struct scrollinfo {
 };
 
 static void scroll_thread(void);
-static char scroll_stack[0x800];
+static char scroll_stack[DEFAULT_STACK_SIZE];
+static char scroll_name[] = "scroll";
 static char scroll_speed = 8; /* updates per second */
 static char scroll_spacing = 3; /* spaces between end and start of text */
 
@@ -381,7 +382,8 @@ void lcd_double_height(bool on)
 #if defined(HAVE_LCD_CHARCELLS) || defined(SIMULATOR) /* not BITMAP */
 void lcd_init (void)
 {
-    create_thread(scroll_thread, scroll_stack, sizeof(scroll_stack));
+    create_thread(scroll_thread, scroll_stack,
+                  sizeof(scroll_stack), scroll_name);
 }
 #endif
 
@@ -439,7 +441,8 @@ void lcd_init (void)
 
     lcd_clear_display();
     lcd_update();
-    create_thread(scroll_thread, scroll_stack, sizeof(scroll_stack));
+    create_thread(scroll_thread, scroll_stack,
+                  sizeof(scroll_stack), scroll_name);
 }
 
 /*
