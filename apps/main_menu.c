@@ -20,6 +20,9 @@
 #include "menu.h"
 #include "tree.h"
 #include "credits.h"
+#include "lcd.h"
+#include "button.h"
+#include "kernel.h"
 
 void show_splash(void);
 
@@ -108,7 +111,7 @@ int show_logo(void)
 
 void show_splash(void)
 {
-
+    int i;
     char *rockbox = "ROCKbox!";
     lcd_clear_display();
 
@@ -120,7 +123,11 @@ void show_splash(void)
 #endif
 
     lcd_update();
-    while(!button_get());
+    for ( i=0;i<10;i++) {
+        sleep(HZ/10);
+        if (button_get())
+            break;
+    }
 }
 
 void main_menu(void)
