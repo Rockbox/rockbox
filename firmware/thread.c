@@ -99,10 +99,22 @@ void switch_thread(void)
  */
 int create_thread(void* function, void* stack, int stack_size)
 {
+    unsigned int i;
+    unsigned int stacklen;
+    unsigned int *stackptr;
+        
     if (num_threads >= MAXTHREADS)
         return -1;
     else
     {
+	/* Munge the stack to make it easy to spot stack overflows */
+	stacklen = stack_size / 4;
+	stackptr = stack;
+	for(i = 0;i < stacklen;i++)
+	{
+	    stackptr[i] = 0xdeadbeef;
+	}
+
         struct regs* regs = &thread_contexts[num_threads++];
         store_context(regs);
         /* Subtract 4 to leave room for the PR push in ldctx()
