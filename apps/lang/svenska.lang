@@ -306,7 +306,7 @@ new: "Sortera"
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
-eng: "Scroll"
+eng: "Scrolling"
 new: "Rullning"
 
 id: LANG_RESET
@@ -1521,13 +1521,13 @@ new: "Spela = Ja"
 
 id: LANG_CUSTOM_CFG
 desc: in setting_menu()
-eng: "Configurations"
-new: "Konfigureringar"
+eng: "Browse .cfg files"
+new: "Se .cfg-filer"
 
 id: LANG_CUSTOM_FONT
 desc: in setting_menu()
-eng: "Fonts"
-new: "Fonter"
+eng: "Browse Fonts"
+new: "Se Fonter"
 
 id: LANG_DISK_FULL
 desc: in recording screen
@@ -1536,8 +1536,8 @@ new: "Disken är full. Tryck AV för att fortsätta."
 
 id: LANG_FIRMWARE
 desc: in the main menu
-eng: "Firmware"
-new: "Maskinvara"
+eng: "Browse Firmwares"
+new: "Se Maskinvaror"
 
 id: LANG_FLIPIT
 desc: in the games menu
@@ -1626,8 +1626,8 @@ new: "Sparat %d spår (%s)"
 
 id: LANG_PLUGINS
 desc: in main_menu()
-eng: "Plugins"
-new: "Insticksmoduler"
+eng: "Browse Plugins"
+new: "Se Insticksmoduler"
 
 id: LANG_PLUGIN_CANT_OPEN
 desc: Plugin open error message
@@ -1716,8 +1716,8 @@ new: "STANNA för avbryt"
 
 id: LANG_WHILE_PLAYING
 desc: in settings_menu()
-eng: "While Playing Screen"
-new: "Skärm vid spel"
+eng: "Browse .wps files"
+new: "Se .wps-filer"
 
 id: LANG_BUTTONBAR_MENU
 desc: in button bar
@@ -1813,4 +1813,169 @@ id: LANG_RECORD_PRERECORD_TIME
 desc: in recording settings_menu
 eng: "Prerecord time"
 new: "Förinspelningstid"
+
+id: LANG_AUTO_BOOKMARK_QUERY
+desc: prompt for user to decide to create an bookmark
+eng: "Create a Bookmark?"
+new: "Skapa bokmärke"
+
+id: LANG_BARS_MENU
+desc: in the display sub menu
+eng: "Status-/Scrollbar"
+new: "Status-/Rullningslist"
+
+id: LANG_BATTERY_MENU
+desc: in the system sub menu
+eng: "Battery"
+new: "Batteri"
+
+id: LANG_BOOKMARK_AUTOLOAD_QUERY
+desc: prompt for user to decide to create a bookmark
+eng: "Load Last Bookmark?"
+new: "Ladda Förra Bokmärket?"
+
+id: LANG_BOOKMARK_CREATE_FAILURE
+desc: Indicates bookmark was not created
+eng: "Bookmark Failed!"
+new: "Bokmärket Misslyckades!"
+
+id: LANG_BOOKMARK_CREATE_SUCCESS
+desc: Indicates bookmark was successfully created
+eng: "Bookmark Created"
+new: "Bokmärket Skapat"
+
+id: LANG_BOOKMARK_LOAD_EMPTY
+desc: Indicates bookmark was empty
+eng: "Bookmark Empty"
+new: "Tomt Bokmärke"
+
+id: LANG_BOOKMARK_MENU
+desc: Text on main menu to get to bookmark commands
+eng: "Bookmarks"
+new: "Bokmärken"
+
+id: LANG_BOOKMARK_MENU_CREATE
+desc: Used off of the bookmark menu to create a bookmark
+eng: "Create Bookmark"
+new: "Skapa Bokmärke"
+
+id: LANG_BOOKMARK_MENU_LIST
+desc: Used off of the bookmark menu to list available bookmarks for the currently playing directory or M3U
+eng: "List Bookmarks"
+new: "Lista Bokmärken"
+
+id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
+desc: Text for the menu text to access the most recent bookmarks list
+eng: "Recent Bookmarks"
+new: "Nyliga Bokmärken"
+
+id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
+desc: Used on the bookmark select window to label bookmark number
+eng: "Bookmark"
+new: "Bokmärke"
+
+id: LANG_BOOKMARK_SELECT_DELETE
+desc: Used on the bookmark select window to indicated the bookmark delete option
+eng: "ON+Play = Delete"
+new: "ON+Play = Ta Bort"
+
+id: LANG_BOOKMARK_SELECT_EXIT
+desc: From the bookmark list screen, allows user to exit
+eng: "OFF = Exit"
+new: "OFF = Utgång"
+
+id: LANG_BOOKMARK_SELECT_INDEX_TEXT
+desc: Used on the bookmark select window to label index number
+eng: "Index"
+new: "Index"
+
+id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
+desc: From the auto-load screen, allows user to list all bookmarks
+eng: "Down = List"
+new: "Down = Lista"
+
+id: LANG_BOOKMARK_SELECT_PLAY
+desc: Used on the bookmark select window to indicated the play option
+eng: "PLAY = Select"
+new: "PLAY = Välj"
+
+id: LANG_BOOKMARK_SELECT_TIME_TEXT
+desc: Used on the bookmark select window to label elapsed time
+eng: "Time"
+new: "Tid"
+
+id: LANG_BOOKMARK_SETTINGS
+desc: in general settings
+eng: "Bookmarking"
+new: "Sätt Bokmärken"
+
+id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
+desc: prompt for user to decide to create an bookmark
+eng: "Bookmark on Stop"
+new: "Bokmärke vid Stop"
+
+id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
+desc: prompt for user to decide to create a bookmark
+eng: "Load Last Bookmark"
+new: "Ladda Senaste Bokmärket"
+
+id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
+desc: Configuration option to maintain a list of recent bookmarks
+eng: "Maintain a List of Recent Bookmarks?"
+new: "Spara en Lista av Nya Bokmärken?"
+
+id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
+desc: Save in recent bookmarks only
+eng: "Ask - Recent only"
+new: "Fråga - Bara nya"
+
+id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
+desc: Save in recent bookmarks only
+eng: "Yes - Recent only"
+new: "Ja - Bara nya"
+
+id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
+desc: Save only on bookmark for each playlist in recent bookmarks
+eng: "Unique only"
+new: "Bara unika"
+
+id: LANG_DISK_MENU
+desc: in the system sub menu
+eng: "Disk"
+new: "Disk"
+
+id: LANG_INFO_MENU
+desc: in the info sub menu
+eng: "Rockbox Info"
+new: "Rockbox Info"
+
+id: LANG_LCD_MENU
+desc: in the display sub menu
+eng: "LCD Settings"
+new: "LCD-inställning"
+
+id: LANG_LIMITS_MENU
+desc: in the system sub menu
+eng: "Limits"
+new: "Gränser"
+
+id: LANG_MANAGE_MENU
+desc: in the system sub menu
+eng: "Manage Settings"
+new: "Administrera inställningar"
+
+id: LANG_RECORDING_MENU
+desc: in the recording sub menu
+eng: "Start Recording"
+new: "Börja Inspelning"
+
+id: LANG_TIME_MENU
+desc: in the system sub menu
+eng: "Time & Date"
+new: "Tid & Datum"
+
+id: LANG_WIND_MENU
+desc: in the playback sub menu
+eng: "FFwd/Rewind"
+new: "Snabbspolning/Returspolning"
 
