@@ -12,8 +12,10 @@ OC    = sh-elf-objcopy
 
 FIRMWARE = ../../firmware
 
-INCLUDES = -I$(FIRMWARE)/include -I$(FIRMWARE)/export -I$(FIRMWARE)/common -I$(FIRMWARE)/drivers -I..
-CFLAGS = -O -W -Wall -m1 -nostdlib -ffreestanding -Wstrict-prototypes $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEM}
+INCLUDES = -I$(FIRMWARE)/include -I$(FIRMWARE)/export -I$(FIRMWARE)/common \
+-I$(FIRMWARE)/drivers -I.. -Ilib
+CFLAGS = -O -W -Wall -m1 -nostdlib -ffreestanding -Wstrict-prototypes	\
+$(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEM}
 
 LDS := plugin.lds
 LINKFILE := $(OBJDIR)/pluginlink.lds
@@ -30,8 +32,8 @@ no_configure:
 	@echo "http://rockbox.haxx.se/docs/how_to_compile.html"
 endif
 
-$(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKFILE)
-	$(CC) -O -nostdlib -o $@ $< -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/$*.map
+$(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKFILE) $(OBJDIR)/libplugin.a
+	$(CC) -O -nostdlib -o $@ $< -L$(OBJDIR) -lplugin -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/$*.map
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.elf
 	$(OC) -O binary $< $@
@@ -39,8 +41,11 @@ $(OBJDIR)/%.rock : $(OBJDIR)/%.elf
 $(OBJDIR)/%.o: %.c  ../plugin.h Makefile
 	$(CC) $(CFLAGS) -c $< -o $@
 
-all: $(ROCKS)
-	@echo done
+all: $(OBJDIR)/libplugin.a $(ROCKS)
+	echo "done"
+
+$(OBJDIR)/libplugin.a:
+	$(MAKE) -C lib TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR) VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEM}
 
 # MEM should be passed on to this makefile with the chosen memory size given
 # in number of MB
@@ -49,3 +54,4 @@ $(LINKFILE): $(LDS)
 
 clean:
 	-rm -f $(ROCKS) $(LINKFILE)
+	$(MAKE) -C lib clean

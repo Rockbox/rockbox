@@ -73,7 +73,7 @@ clean:
 $(OBJDIR)/$(DEPS)/%.d: %.c
 	@$(SHELL) -c 'for d in $(DEPDIRS); do { if [ ! -d $(OBJDIR)/$$d ]; then mkdir $(OBJDIR)/$$d; fi; }; done'
 	@echo "Updating dependencies for $<"
-	$(SHELL) -ec '$(CC) -MM $(CFLAGS) $< \
+	@$(SHELL) -ec '$(CC) -MM $(CFLAGS) $< \
 		|sed '\''s|\($*\)\.o[ :]*|$(OBJDIR)/\1.o $(<:%.c=%.d) : |g'\'' > $@; \
 		[ -s $@ ] || rm -f $@'
 
