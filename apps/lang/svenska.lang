@@ -1,3 +1,4 @@
+
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
@@ -7,3 +8,869 @@ id: LANG_GENERAL_SETTINGS
 desc: in the main menu
 eng: "General Settings"
 new: "Huvudinställningar"
+
+id: LANG_AUTOVOL
+desc: in sound_settings
+eng: "Auto Volume"
+new: "Automatvolym"
+
+id: LANG_BACKLIGHT
+desc: in settings_menu
+eng: "Backlight"
+new: "Skärmljus"
+
+id: LANG_BALANCE
+desc: in sound_settings
+eng: "Balance"
+new: "Balans"
+
+id: LANG_BASS
+desc: in sound_settings
+eng: "Bass"
+new: "Bas"
+
+id: LANG_BATTERY_CHARGE
+desc: tells that the battery is charging, instead of battery level
+eng: "Battery: charging"
+new: "Batteri: laddar"
+
+id: LANG_BATTERY_LEVEL_PLAYER
+desc: the battery level in percentage
+eng: "Batt: %d%%%s"
+new: "Batt: %d%%%s"
+
+id: LANG_BATTERY_LEVEL_RECORDER
+desc: the battery level in percentage
+eng: "Battery: %d%%%s"
+new: "Batteri: %d%%%s"
+
+id: LANG_BBOOST
+desc: in sound settings
+eng: "Bass Boost"
+new: "Basförstärkning"
+
+id: LANG_BOUNCE
+desc: in the demos menu
+eng: "Bounce"
+new: "Studsa"
+
+id: LANG_BUFFER_STAT_PLAYER
+desc: the buffer size player-screen width, %d MB %d fraction of MB
+eng: "Buf: %d.%02dMb"
+new: "Buf: %d.%02dMb"
+
+id: LANG_BUFFER_STAT_RECORDER
+desc: the buffer size recorder-screen width, %d MB %d fraction of MB
+eng: "Buffer: %d.%02dMb"
+new: "Buffert: %d.%02dMb"
+
+id: LANG_CASE_MENU
+desc: in fileview_settings_menu()
+eng: "Sort Mode"
+new: "Sortera"
+
+id: LANG_CHANNEL
+desc: in sound_settings
+eng: "Channel configuration"
+new: "Kanalkonfigurering"
+
+id: LANG_CHANNEL_LEFT
+desc: in sound_settings
+eng: "Mono Left"
+new: "Mono vänster"
+
+id: LANG_CHANNEL_MENU
+desc: in sound_settings
+eng: "Channels"
+new: "kanaler"
+
+id: LANG_CHANNEL_MONO
+desc: in sound_settings
+eng: "Mono"
+new: "Mono"
+
+id: LANG_CHANNEL_RIGHT
+desc: in sound_settings
+eng: "Mono Right"
+new: "Mono höger"
+
+id: LANG_CHANNEL_STEREO
+desc: in sound_settings
+eng: "Stereo"
+new: "Stereo"
+
+id: LANG_CONTRAST
+desc: in settings_menu
+eng: "Contrast"
+new: "Kontrast"
+
+id: LANG_DEBUG
+desc: in the main menu
+eng: "Debug (keep out!)"
+new: "Debug (rör ej!)"
+
+id: LANG_DECAY
+desc: in sound_settings
+eng: "AV decay time"
+new: "AV falltid"
+
+id: LANG_DEMOS
+desc: in the main menu
+eng: "Demos"
+new: "Demosar"
+
+id: LANG_DIR_FILTER
+desc: in wps F2 pressed
+eng: "Dir filter: %s"
+new: "Dir filter: %s"
+
+id: LANG_DISCHARGE
+desc: in settings_menu
+eng: "Deep discharge"
+new: "Ljup urladdning"
+
+id: LANG_DISPLAY
+desc: in settings_menu()
+eng: "Display"
+new: "Skärm"
+
+id: LANG_END_CONFIRM_PLAYER
+desc: when playlist has finished
+eng: "<Press ON>"
+new: "<Tryck ON>"
+
+id: LANG_END_CONFIRM_RECORDER
+desc: when playlist has finished
+eng: "Press ON"
+new: "Tryck ON"
+
+id: LANG_END_PLAYLIST_PLAYER
+desc: when playlist has finished
+eng: "End of list"
+new: "Listan slut"
+
+id: LANG_END_PLAYLIST_RECORDER
+desc: when playlist has finished
+eng: "<End of song list>"
+new: "<Slut på listan>"
+
+id: LANG_F2_MODE
+desc: in wps F2 pressed
+eng: "mode:"
+new: "läge:"
+
+id: LANG_F3_BAR
+desc: in wps F3 pressed
+eng: "bar"
+new: "list"
+
+id: LANG_F3_SCROLL
+desc: in wps F3 pressed
+eng: "Scroll"
+new: "Rull-"
+
+id: LANG_F3_STATUS
+desc: in wps F3 pressed
+eng: "Status"
+new: "Status-"
+
+id: LANG_FFRW_ACCEL
+desc: in settings_menu
+eng: "FF/RW Accel"
+new: "FF/RW Accel"
+
+id: LANG_FFRW_STEP
+desc: in settings_menu
+eng: "FF/RW Min Step"
+new: "FF/RW Min Step"
+
+id: LANG_FILE
+desc: in settings_menu()
+eng: "File View"
+new: "Filvy"
+
+id: LANG_FOLLOW
+desc: in settings_menu
+eng: "Follow Playlist"
+new: "Följ spellistan"
+
+id: LANG_GAMES
+desc: in the main menu
+eng: "Games"
+new: "Spel"
+
+id: LANG_HIDDEN
+desc: in settings_menu
+eng: "Hidden Files"
+new: "Gömda filer"
+
+id: LANG_HIDDEN_HIDE
+desc: in settings_menu
+eng: "Hide"
+new: "Göm"
+
+id: LANG_HIDDEN_SHOW
+desc: in settings_menu 
+eng: "Show"
+new: "Visa"
+
+id: LANG_ID3_ALBUM
+desc: in wps
+eng: "[Album]"
+new: "[Album]"
+
+id: LANG_ID3_ARTIST
+desc: in wps 
+eng: "[Artist]"
+new: "[Artist]"
+
+id: LANG_ID3_BITRATE
+desc: in wps
+eng: "[Bitrate]"
+new: "[Bitrate]"
+
+id: LANG_ID3_FRECUENCY
+desc: in wps
+eng: "[Frecuency]"
+new: "[Frekvens]"
+
+id: LANG_ID3_INFO
+desc: in the browse_id3() function
+eng: "-ID3 Info- "
+new: "-ID3 Info- "
+
+id: LANG_ID3_LENGHT
+desc: in wps
+eng: "[Length]"
+### Not previously translated
+new: 
+
+id: LANG_ID3_NO_ALBUM
+desc: in wps when no album is avaible
+eng: "<no album>"
+### Not previously translated
+new: 
+
+id: LANG_ID3_NO_ARTIST
+desc: in wps when no artist is avaible
+eng: "<no artist>"
+### Not previously translated
+new: 
+
+id: LANG_ID3_NO_TITLE
+desc: in wps when no title is avaible
+eng: "<no title>"
+### Not previously translated
+new: 
+
+id: LANG_ID3_NO_TRACKNUM
+desc: in wps if no track number is avaible
+eng: "<no tracknum>"
+### Not previously translated
+new: 
+
+id: LANG_ID3_PATH
+desc: in wps
+eng: "[PATH]"
+### Not previously translated
+new: 
+
+id: LANG_ID3_PLAYLIST
+desc: in wps
+eng: "[Playlist]"
+### Not previously translated
+new: 
+
+id: LANG_ID3_SCREEN
+desc: in the browse_id3() function
+eng: "--Screen-- "
+### Not previously translated
+new: 
+
+id: LANG_ID3_TITLE
+desc: in wps
+eng: "[Title]"
+### Not previously translated
+new: 
+
+id: LANG_ID3_TRACKNUM
+desc: in wps
+eng: "[Tracknum]"
+### Not previously translated
+new: 
+
+id: LANG_INFO
+desc: in the main menu
+eng: "Info"
+### Not previously translated
+new: 
+
+id: LANG_KEYLOCK_OFF_PLAYER
+desc: displayed when key lock is turned off
+eng: "Keylock OFF"
+### Not previously translated
+new: 
+
+id: LANG_KEYLOCK_OFF_RECORDER
+desc: displayed when key lock is turned off
+eng: "Key lock is OFF"
+### Not previously translated
+new: 
+
+id: LANG_KEYLOCK_ON_PLAYER
+desc: displayed when key lock is on
+eng: "Keylock ON"
+### Not previously translated
+new: 
+
+id: LANG_KEYLOCK_ON_RECORDER
+desc: displayed when key lock is on
+eng: "Key lock is ON"
+### Not previously translated
+new: 
+
+id: LANG_LOUDNESS
+desc: in sound_settings
+eng: "Loudness"
+### Not previously translated
+new: 
+
+id: LANG_MP3FILTER
+desc: in settings_menu
+eng: "Music Filter"
+### Not previously translated
+new: 
+
+id: LANG_MUTE_OFF_PLAYER
+desc: displayed when mute is off
+eng: "MUTE OFF"
+### Not previously translated
+new: 
+
+id: LANG_MUTE_OFF_RECORDER
+desc: displayed when mute is off
+eng: "Mute is OFF"
+### Not previously translated
+new: 
+
+id: LANG_MUTE_ON_PLAYER
+desc: displayed when mute is on
+eng: "Mute ON"
+### Not previously translated
+new: 
+
+id: LANG_MUTE_ON_RECORDER
+desc: displayed when mute is on
+eng: "Mute is ON"
+### Not previously translated
+new: 
+
+id: LANG_OFF
+desc: Used in a lot of places
+eng: "Off"
+### Not previously translated
+new: 
+
+id: LANG_ON
+desc: Used in a lot of places
+eng: "On"
+### Not previously translated
+new: 
+
+id: LANG_PAUSE
+desc: in wps
+eng: "Pause"
+### Not previously translated
+new: 
+
+id: LANG_PITCH_DOWN
+desc: in wps
+eng: "Pitch down"
+### Not previously translated
+new: 
+
+id: LANG_PITCH_UP
+desc: in wps
+eng: "Pitch up"
+### Not previously translated
+new: 
+
+id: LANG_PLAYBACK
+desc: in settings_menu()
+eng: "Playback"
+### Not previously translated
+new: 
+
+id: LANG_PLAYINDICES_AMOUNT
+desc: number of files in playlist
+eng: "%d files"
+### Not previously translated
+new: 
+
+id: LANG_PLAYINDICES_BUFFER
+desc: in playlist.indices() when playlist is full
+eng: "buffer full"
+### Not previously translated
+new: 
+
+id: LANG_PLAYINDICES_PLAYLIST
+desc: in playlist.indices() when playlist is full
+eng: "Playlist"
+### Not previously translated
+new: 
+
+id: LANG_PLAYLIST_LOAD
+desc: displayed on screen while loading a playlist
+eng: "Loading..."
+### Not previously translated
+new: 
+
+id: LANG_PLAYLIST_PLAY
+desc: displayed on screen when start playing a playlist
+eng: "Playing..."
+### Not previously translated
+new: 
+
+id: LANG_PLAYLIST_SHUFFLE
+desc: displayed on screen while shuffling a playlist
+eng: "Shuffling..."
+### Not previously translated
+new: 
+
+id: LANG_PLAY_SELECTED
+desc: in settings_menu
+eng: "Play selected first"
+### Not previously translated
+new: 
+
+id: LANG_RESET
+desc: in system_settings_menu()
+eng: "Reset settings"
+### Not previously translated
+new: 
+
+id: LANG_RESET_ASK_PLAYER
+desc: confirm to reset settings
+eng: "Really?"
+### Not previously translated
+new: 
+
+id: LANG_RESET_ASK_RECORDER
+desc: confirm to reset settings
+eng: "Are you sure?"
+### Not previously translated
+new: 
+
+id: LANG_RESET_CANCEL_RECORDER
+desc: confirm to reset settings
+eng: "Any Other = No"
+### Not previously translated
+new: 
+
+id: LANG_RESET_CONFIRM_PLAYER
+desc: confirm to reset settings
+eng: "Play/Stop"
+### Not previously translated
+new: 
+
+id: LANG_RESET_CONFIRM_RECORDER
+desc: confirm to reset settings
+eng: "Play = Yes"
+### Not previously translated
+new: 
+
+id: LANG_RESET_DONE_CANCEL
+desc: Visual confirmation of cancelation
+eng: "Canceled"
+### Not previously translated
+new: 
+
+id: LANG_RESET_DONE_CLEAR
+desc: visual confirmation after settings reset
+eng: "Cleared"
+### Not previously translated
+new: 
+
+id: LANG_RESET_DONE_SETTING
+desc: visual confirmation after settings reset
+eng: "Settings"
+### Not previously translated
+new: 
+
+id: LANG_RESUME
+desc: in settings_menu
+eng: "Resume"
+### Not previously translated
+new: 
+
+id: LANG_RESUME_ASK
+desc: question asked at the begining when resume is on
+eng: "Resume?"
+### Not previously translated
+new: 
+
+id: LANG_RESUME_CANCEL_RECORDER
+desc: posible answer to resume question
+eng: "Any Other = No"
+### Not previously translated
+new: 
+
+id: LANG_RESUME_CONFIRM_PLAYER
+desc: posible answers to resume question
+eng: "(PLAY/STOP)"
+### Not previously translated
+new: 
+
+id: LANG_RESUME_CONFIRM_RECORDER
+desc: posible answer to resume question
+eng: "Play = Yes"
+### Not previously translated
+new: 
+
+id: LANG_RESUME_SETTING_ASK
+desc: in settings_menu
+eng: "ask"
+### Not previously translated
+new: 
+
+id: LANG_ROCKBOX_INFO
+desc: displayed topmost on the info screen
+eng: "Rockbox info:"
+### Not previously translated
+new: 
+
+id: LANG_SCROLL
+desc: in settings_menu
+eng: "Scroll Speed Setting Example"
+### Not previously translated
+new: 
+
+id: LANG_SCROLL_MENU
+desc: in display_settings_menu()
+eng: "Scroll Speed"
+### Not previously translated
+new: 
+
+id: LANG_SETTINGS_BATTERY_PLAYER
+desc: if save settings has failed
+eng: "Batt. low?"
+### Not previously translated
+new: 
+
+id: LANG_SETTINGS_BATTERY_RECORDER
+desc: if save settings has failed
+eng: "Is battery low?"
+### Not previously translated
+new: 
+
+id: LANG_SETTINGS_SAVE_PLAYER
+desc: displayed if save settings has failed
+eng: "Save failed"
+### Not previously translated
+new: 
+
+id: LANG_SETTINGS_SAVE_RECORDER
+desc: displayed if save settings has failed
+eng: "Save failed"
+### Not previously translated
+new: 
+
+id: LANG_SHOWDIR_ERROR_BUFFER
+desc: in showdir(), displayed on screen when you reach buffer limit
+eng: "Dir Buffer"
+### Not previously translated
+new: 
+
+id: LANG_SHOWDIR_ERROR_FULL
+desc: in showdir(), displayed on screen when you reach buffer limit
+eng: "is full!"
+### Not previously translated
+new: 
+
+id: LANG_SHUFFLE
+desc: in settings_menu
+eng: "Shuffle"
+### Not previously translated
+new: 
+
+id: LANG_SNAKE
+desc: in the games menu
+eng: "Snake"
+### Not previously translated
+new: 
+
+id: LANG_SNAKE_HISCORE
+desc: high score in snake game
+eng: "High Score: %d"
+### Not previously translated
+new: 
+
+id: LANG_SNAKE_HISCORE_NEW
+desc: new high score in snake game
+eng: "New High Score!"
+### Not previously translated
+new: 
+
+id: LANG_SNAKE_LEVEL
+desc: level of difficulty
+eng: "Level - %d"
+### Not previously translated
+new: 
+
+id: LANG_SNAKE_PAUSE
+desc: displayed when game is paused
+eng: "Game Paused"
+### Not previously translated
+new: 
+
+id: LANG_SNAKE_QUIT
+desc: how to quit game
+eng: "[Off] to quit"
+### Not previously translated
+new: 
+
+id: LANG_SNAKE_RANGE
+desc: range of levels
+eng: "(1 - slow, 9 - fast)"
+### Not previously translated
+new: 
+
+id: LANG_SNAKE_RESUME
+desc: what to do to resume game
+eng: "[Play] to resume"
+### Not previously translated
+new: 
+
+id: LANG_SNAKE_SCORE
+desc: when you die in snake game
+eng: "Your score :"
+### Not previously translated
+new: 
+
+id: LANG_SNAKE_START
+desc: how to start or pause the game
+eng: "[Play] to start/pause"
+### Not previously translated
+new: 
+
+id: LANG_SNOW
+desc: in the demos menu
+eng: "Snow"
+### Not previously translated
+new: 
+
+id: LANG_SOKOBAN
+desc: in the games menu
+eng: "Sokoban"
+### Not previously translated
+new: 
+
+id: LANG_SOKOBAN_F1
+desc: what does F1 do
+eng: "[F1] - level"
+### Not previously translated
+new: 
+
+id: LANG_SOKOBAN_F2
+desc: what does F2 do
+eng: "[F2] same level"
+### Not previously translated
+new: 
+
+id: LANG_SOKOBAN_F3
+desc: what does F3 do
+eng: "[F3] + level"
+### Not previously translated
+new: 
+
+id: LANG_SOKOBAN_LEVEL
+desc: must be smaller than 6 characters
+eng: "Level"
+### Not previously translated
+new: 
+
+id: LANG_SOKOBAN_MOVE
+desc: must be smaller than 6 characters
+eng: "Moves"
+### Not previously translated
+new: 
+
+id: LANG_SOKOBAN_QUIT
+desc: how to quit game
+eng: "[Off] to stop"
+### Not previously translated
+new: 
+
+id: LANG_SOKOBAN_WIN
+desc: displayed when you win 
+eng: "YOU WIN!!"
+### Not previously translated
+new: 
+
+id: LANG_SORT_CASE
+desc: in settings_menu
+eng: "Sort Case Sensitive"
+### Not previously translated
+new: 
+
+id: LANG_SPINDOWN
+desc: in settings_menu
+eng: "Disk Spindown"
+### Not previously translated
+new: 
+
+id: LANG_SYSTEM
+desc: in settings_menu()
+eng: "System"
+### Not previously translated
+new: 
+
+id: LANG_TETRIS
+desc: in the games menu
+eng: "Tetris"
+### Not previously translated
+new: 
+
+id: LANG_TETRIS_LEVEL
+desc: tetris game
+eng: "0 Rows - Level 0"
+### Not previously translated
+new: 
+
+id: LANG_TETRIS_LOSE
+desc: tetris game
+eng: "You lose!"
+### Not previously translated
+new: 
+
+id: LANG_TIME
+desc: in settings_menu
+eng: "Set Time/Date"
+### Not previously translated
+new: 
+
+id: LANG_TIME_REVERT
+desc: used in set_time()
+eng: "OFF to revert"
+### Not previously translated
+new: 
+
+id: LANG_TIME_SET
+desc: 
+eng: "ON to set"
+### Not previously translated
+new: 
+
+id: LANG_TREBLE
+desc: in sound_settings
+eng: "Treble"
+### Not previously translated
+new: 
+
+id: LANG_USB
+desc: in the main menu
+eng: "USB (sim)"
+### Not previously translated
+new: 
+
+id: LANG_VERSION
+desc: in the main menu
+eng: "Version"
+### Not previously translated
+new: 
+
+id: LANG_VOLUME
+desc: in sound_settings
+eng: "Volume"
+### Not previously translated
+new: 
+
+id: LANG_WORMLET
+desc: in the games menu
+eng: "Wormlet"
+### Not previously translated
+new: 
+
+id: LANG_WORMLET_2_KEY_CTRL
+desc: wormlet game
+eng: "2 key control   F1"
+### Not previously translated
+new: 
+
+id: LANG_WORMLET_4_KEY_CTRL
+desc: wormlet game
+eng: "4 key control   F1"
+### Not previously translated
+new: 
+
+id: LANG_WORMLET_ARGH
+desc: wormlet game
+eng: "Argh"
+### Not previously translated
+new: 
+
+id: LANG_WORMLET_CRASHED
+desc: wormlet game
+eng: "Crashed"
+### Not previously translated
+new: 
+
+id: LANG_WORMLET_GROWING
+desc: wormlet game 
+eng: "Growing"
+### Not previously translated
+new: 
+
+id: LANG_WORMLET_HIGHSCORE
+desc: wormlet game
+eng: "Hs: %d"
+### Not previously translated
+new: 
+
+id: LANG_WORMLET_HUNGRY
+desc: wormlet game
+eng: "Hungry"
+### Not previously translated
+new: 
+
+id: LANG_WORMLET_LENGTH
+desc: wormlet game
+eng: "Len:%d"
+### Not previously translated
+new: 
+
+id: LANG_WORMLET_NO_CONTROL
+desc: wormlet game
+eng: "Out of control"
+### Not previously translated
+new: 
+
+id: LANG_WORMLET_NO_REM_CTRL
+desc: wormlet game
+eng: "No rem. control F1"
+### Not previously translated
+new: 
+
+id: LANG_WORMLET_PLAYERS
+desc: wormlet game
+eng: "%d Players    up/dn"
+### Not previously translated
+new: 
+
+id: LANG_WORMLET_REMOTE_CTRL
+desc: wormlet game
+eng: "Remote control F1"
+### Not previously translated
+new: 
+
+id: LANG_WORMLET_WORMED
+desc: wormlet game
+eng: "Wormed"
+### Not previously translated
+new: 
+
+id: LANG_WORMLET_WORMS
+desc: wormlet game
+eng: "%d Worms        l/r"
+### Not previously translated
+new: 
