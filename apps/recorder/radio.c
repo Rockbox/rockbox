@@ -380,7 +380,7 @@ bool radio_screen(void)
                 settings_save();
                 break;
 
-            case BUTTON_F1:
+            case BUTTON_F1 | BUTTON_REL:
                 radio_menu();
                 curr_preset = find_preset(curr_freq);
                 lcd_clear_display();
@@ -391,7 +391,7 @@ bool radio_screen(void)
                 update_screen = true;
                 break;
                 
-            case BUTTON_F2:
+            case BUTTON_F2 | BUTTON_REL:
                 handle_radio_presets();
                 curr_preset = find_preset(curr_freq);
                 lcd_clear_display();
@@ -671,8 +671,8 @@ static int handle_radio_presets_menu_cb(int key, int m)
 #if CONFIG_KEYPAD == RECORDER_PAD
     switch(key)
     {
-        case BUTTON_F3:
-            key = BUTTON_LEFT; /* Fake an exit */
+        case BUTTON_F3 | BUTTON_REL:
+            key = MENU_EXIT; /* Fake an exit */
             break;
     }
 #endif
@@ -741,18 +741,18 @@ int handle_radio_presets_cb(int key, int m)
     
     switch(key)
     {
-        case BUTTON_F1:
+        case BUTTON_F1 | BUTTON_REL:
             radio_add_preset();
             menu_draw(m);
             key = BUTTON_NONE;
             break;
             
-        case BUTTON_F2:
+        case BUTTON_F2 | BUTTON_REL:
             menu_draw(m);
-            key = BUTTON_LEFT; /* Fake an exit */
+            key = MENU_EXIT; /* Fake an exit */
             break;
             
-        case BUTTON_F3:
+        case BUTTON_F3 | BUTTON_REL:
             ret = handle_radio_presets_menu();
             menu_draw(m);
             if(ret)
