@@ -1176,6 +1176,7 @@ static bool dirbrowse(char *root, int *dirfilter)
                             if(!lang_load(buf)) {
                                 set_file(buf, global_settings.lang_file,
                                          MAX_FILENAME);
+                                talk_init(); /* use voice of same language */
                                 splash(HZ, true, str(LANG_LANGUAGE_LOADED));
                                 restore = true;
                             }

@@ -587,6 +587,7 @@ void settings_apply(void)
         snprintf(buf, sizeof buf, ROCKBOX_DIR LANG_DIR "/%s.lng",
                  global_settings.lang_file);
         lang_load(buf);
+        talk_init(); /* use voice of same language */
     }
 
     set_car_adapter_mode(global_settings.car_adapter_mode);
@@ -974,7 +975,10 @@ bool settings_load_config(char* file)
         }
         else if (!strcasecmp(name, "lang")) {
             if (!lang_load(value))
+            {
                 set_file(value, global_settings.lang_file, MAX_FILENAME);
+                talk_init(); /* use voice of same language */
+            }
         }
         else if (!strcasecmp(name, "bidir limit"))
             set_cfg_int(&global_settings.bidir_limit, value, 0, 200);

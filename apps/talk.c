@@ -26,6 +26,7 @@
 #include "file.h"
 #include "buffer.h"
 #include "system.h"
+#include "settings.h"
 #include "mp3_playback.h"
 #include "mpeg.h"
 #include "lang.h"
@@ -36,7 +37,6 @@ extern void bitswap(unsigned char *data, int length); /* no header for this */
 /***************** Constants *****************/
 
 #define QUEUE_SIZE 50
-const char* voicefont_file = "/.rockbox/langs/english.voice";
 const char* dir_thumbnail_name = ".dirname.mp3";
 
 
@@ -84,9 +84,28 @@ static int load_voicefont(void);
 static void mp3_callback(unsigned char** start, int* size);
 static int shutup(void);
 static int queue_clip(unsigned char* buf, int size, bool enqueue);
+static int open_voicefile(void);
 
 
 /***************** Private implementation *****************/
+
+static int open_voicefile(void)
+{
+    char buf[64];
+    char* p_lang = "english"; /* default */
+
+    if ( global_settings.lang_file[0] &&
+         global_settings.lang_file[0] != 0xff ) 
+    {   /* try to open the voice file of the selected language */
+        p_lang = global_settings.lang_file;
+    }
+
+    snprintf(buf, sizeof(buf), ROCKBOX_DIR LANG_DIR "/%s.voice", p_lang);
+
+    return open(buf, O_RDONLY);
+}
+
+
 
 static int load_voicefont(void)
 {
@@ -95,7 +114,7 @@ static int load_voicefont(void)
 
     p_voicefont = NULL; /* indicate no voicefont if we fail below */
 
-    fd = open(voicefont_file, O_RDONLY);
+    fd = open_voicefile();
     if (fd < 0) /* failed to open */
     {
         p_voicefont = NULL; /* indicate no voicefont */
@@ -253,7 +272,7 @@ void talk_init(void)
 {
     int fd;
 
-    fd = open(voicefont_file, O_RDONLY);
+    fd = open_voicefile();
     if (fd >= 0) /* success */
     {
         close(fd);
