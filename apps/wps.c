@@ -480,8 +480,10 @@ static bool keylock(void)
         switch ( button_get_w_tmo(HZ/5) ) {
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_F1 | BUTTON_DOWN:
+            case BUTTON_F1 | BUTTON_REPEAT | BUTTON_DOWN:
 #else
             case BUTTON_MENU | BUTTON_STOP:
+            case BUTTON_MENU | BUTTON_REPEAT | BUTTON_STOP:
 #endif
 #ifdef HAVE_LCD_CHARCELLS
                 lcd_icon(ICON_RECORD, false);
@@ -502,8 +504,10 @@ static bool keylock(void)
 
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_F1:
+            case BUTTON_F1 | BUTTON_REPEAT:
 #else
             case BUTTON_MENU:
+            case BUTTON_MENU | BUTTON_REPEAT:
 #endif
                 /* ignore menu key, to avoid displaying "Keylock ON"
                    every time we unlock the keys */
