@@ -253,10 +253,10 @@ int check_lines(void)
         {
             lines++;
             for(i=y;i > 1;i--)
-		for (x=0;x<max_x;x++)
-		    virtual[i*max_x] = virtual[((i-1)*max_x)];
-	    for (x=0;x<max_x;x++)
-		virtual[max_x] = 0;
+        		for (x=0;x<max_x;x++)
+		            memcpy(&virtual[i*max_x], &virtual[((i-1)*max_x)], max_x);
+	        for (x=0;x<max_x;x++)
+		        memset (&virtual[max_x], 0, max_x);
         }
     }
     return lines;
