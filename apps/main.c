@@ -27,6 +27,7 @@
 #include "tree.h"
 #include "panic.h"
 #include "menu.h"
+#include "system.h"
 #ifndef SIMULATOR
 #include "dmalloc.h"
 #include "bmalloc.h"
@@ -49,6 +50,8 @@ int init(void)
 {
     int rc;
 
+    system_init();
+    
 #ifdef HAVE_LCD_BITMAP
     lcd_init();
 #endif
