@@ -27,6 +27,6 @@ my $max = $romsize - $romstart;
 my $file = filesize($ARGV[1]);
 
 if($file > $max ) {
-    print "Output is larger than max ($max)\n";
+    printf "Output is %d bytes larger than max ($max)\n", $file-$max;
     exit 1;
 }
