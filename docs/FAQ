@@ -639,3 +639,8 @@ A70: If your device is off and you connect the charger, the Archos charger code
      is started immediately. You can then start Rockbox with holding down the
      ON key for several seconds. Hold the key down a really long time, until
      you see the Rockbox logo!
+
+Q71: Why can't you implement a crossfader? That would be so cool!
+A71: To crossfade you need to decode two MP3 streams simultaneously. The MP3
+     decoding is done in hardware and we only have one decoder chip, so it
+     can't be done. Sorry.
