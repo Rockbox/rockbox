@@ -23,7 +23,7 @@ serious Rockbox freak can live without.
  Linux (or any other unix-like OS: <a href="/cross-gcc.html">Building the cross compiler</a>. This
 describes how to build and install gcc for sh1.
 <li>
- Windows: (the recommended way) <a href="http://rockbox.my-vserver.de/win32-sdk.html">Setup a cygwin Rockbox development environment</a> (uses approx 7.5MB)
+ Windows: (the recommended way) <a href="cygwin_sdk.html">Setup a cygwin Rockbox development environment</a>.
 </ul>
 
 <h2>Get The Source</h2>
