@@ -1103,10 +1103,12 @@ void basicButtonsProcess(void){
                     formatResult();
                     if (memTemp > MINIMUM)
                         doAdd(&memTemp, &memTempPower, result, power);
-                    else
+                    else {
                         /* if result is too small and memTemp = 0,
                            doAdd will not add */
-                        memTemp = result; memTempPower = power;
+                        memTemp = result;
+                        memTempPower = power;
+                    }
                     calStatus = cal_normal;
                     break;
 
