@@ -142,20 +142,30 @@ int wps_show(void)
         
         if (playing)
         {
+#ifdef HAVE_LCD_BITMAP
             snprintf(buffer,sizeof(buffer), "Time: %d:%02d / %d:%02d",
                      id3->elapsed / 60000,
                      id3->elapsed % 60000 / 1000,
                      id3->length / 60000,
                      id3->length % 60000 / 1000 );
 
-#ifdef HAVE_LCD_BITMAP
             lcd_puts(0, 6, buffer);
+            lcd_update();
 #else
             // Display time with the filename scroll only because the screen has room. 
             if (global_settings.wps_display == PLAY_DISPLAY_FILENAME_SCROLL)
+            { 
+
+                snprintf(buffer,sizeof(buffer), "Time: %d:%02d / %d:%02d",
+                         id3->elapsed / 60000,
+                         id3->elapsed % 60000 / 1000,
+                         id3->length / 60000,
+                         id3->length % 60000 / 1000 );
+
                 lcd_puts(0, 1, buffer);
+                lcd_update();
+           }
 #endif
-            lcd_update();
         } 
         for ( i=0;i<5;i++ ) {
             switch ( button_get(false) ) {
@@ -206,7 +216,6 @@ int wps_show(void)
 #endif
                     mpeg_stop();
                     break;
-
 #ifndef SIMULATOR
                 case SYS_USB_CONNECTED:
                     /* Tell the USB thread that we are safe */
