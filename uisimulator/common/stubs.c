@@ -91,5 +91,5 @@ void ata_flush(void)
 void simulate_usb(void)
 {
     usb_display_info();
-    button_get(true);
+    while (button_get(true) & BUTTON_REL);
 }
