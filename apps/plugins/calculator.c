@@ -899,13 +899,14 @@ void result2typingbuf(void)
     double tempresult = ABS(result); /* positive num makes things simple */
 
     int temppower;
+    double tempmodifier = 1;
+    int count;
+
     if(SCIENTIFIC_FORMAT)
         temppower = 1; /* output x.xxxx format */
     else
         temppower = power;
 
-    double tempmodifier = 1;
-    int count;
     cleartypingbuf();
 
     if(tempresult < MINIMUM){ /* if 0,faster display and avoid complication*/
@@ -974,8 +975,8 @@ void result2typingbuf(void)
 /* -----------------------------------------------------------------------
 printResult() generates LCD display.
 ----------------------------------------------------------------------- */
-void printResult(void){
-
+void printResult(void)
+{
     int k;
 
     switch_Status:
