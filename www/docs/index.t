@@ -3,7 +3,7 @@
 
 <h2>For users</h2>
 <ul>
-<li> <a href="/manual/manual.pdf">User manual</a> (pdf, ~300 KB)
+<li> <a href="/manual/manual.pdf">User manual</a> (pdf, ~300 KB) (<a href="/manual/manual.txt">plain text version</a>, 105KB)
 <li> <a href="faq.html">Frequently Asked Questions</a>
 <li> <a href="battery-faq.html">Frequently Asked Questions about Batteries and Charging</a>
 <li> <a href="/screenshots/">Screenshots</a> of Rockbox.
