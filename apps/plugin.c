@@ -271,7 +271,7 @@ static const struct plugin_api rockbox_api = {
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
     button_hold,
 #endif
-#if (CONFIG_HWCODEC == MASNONE)
+#if (CONFIG_HWCODEC == MASNONE) && !defined(SIMULATOR)
     pcm_play_data,    
     pcm_play_stop,
     pcm_set_frequency,
