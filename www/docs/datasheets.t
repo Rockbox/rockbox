@@ -40,6 +40,8 @@
 <ul>
 <li><a href="S1A0903X01.pdf">Samsung S1A0903X01 AM/FM 1chip tuner with PLL</a> 547 kB
 <li><a href="S1A0905X01.pdf">Samsung S1A0905X01 RDS (Radio Data System) demodulator</a> 35 kB
+<li><a href="1734i.pdf">Linear 1734 Litium-Ion Battery Charger</a> 140 kB
+<li><a href="1872f.pdf">Linear 1872 Step-up DC/DC controller</a> 182 kB
 </ul>
 
 #include "foot.t"
