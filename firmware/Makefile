@@ -7,12 +7,11 @@
 # $Id$
 #
 
-HPATH = /usr/local/sh-gcc/bin
-CC    = $(HPATH)/sh-elf-gcc 
-LD    = $(HPATH)/sh-elf-ld
-AR    = $(HPATH)/sh-elf-ar
-AS    = $(HPATH)/sh-elf-as
-OC    = $(HPATH)/sh-elf-objcopy
+CC    = sh-elf-gcc 
+LD    = sh-elf-ld
+AR    = sh-elf-ar
+AS    = sh-elf-as
+OC    = sh-elf-objcopy
 
 INCLUDES=-I.
 
