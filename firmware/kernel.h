@@ -37,6 +37,7 @@
 #define SYS_USB_CONNECTED_ACK     -2
 #define SYS_USB_DISCONNECTED      -3
 #define SYS_USB_DISCONNECTED_ACK  -4
+#define SYS_TIMEOUT               -5
 
 struct event
 {
@@ -69,6 +70,7 @@ int tick_remove_task(void (*f)(void));
 
 extern void queue_init(struct event_queue *q);
 extern void queue_wait(struct event_queue *q, struct event *ev);
+extern void queue_wait_w_tmo(struct event_queue *q, struct event *ev, int ticks);
 extern void queue_post(struct event_queue *q, int id, void *data);
 extern bool queue_empty(struct event_queue* q);
 extern int queue_broadcast(int id, void *data);

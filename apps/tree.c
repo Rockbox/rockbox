@@ -1047,6 +1047,7 @@ bool dirbrowse(char *root)
 #endif
 
             case SYS_USB_CONNECTED:
+                status_set_playmode(STATUS_STOP);
                 usb_screen();
                 reload_root = true;
                 break;

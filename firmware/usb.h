@@ -25,7 +25,7 @@ void usb_init(void);
 void usb_start_monitoring(void);
 void usb_acknowledge(int id);
 void usb_wait_for_disconnect(struct event_queue *q);
-void usb_display_info(void);
+int usb_wait_for_disconnect_w_tmo(struct event_queue *q, int ticks);
 bool usb_inserted(void);
 
 #endif

@@ -17,9 +17,10 @@
  *
  ****************************************************************************/
 #include <stdio.h>
+#include <stdbool.h>
 #include "debug.h"
 
-#include "usb.h"
+#include "screens.h"
 #include "button.h"
 #include "menu.h"
 

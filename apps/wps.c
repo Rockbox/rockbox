@@ -284,6 +284,7 @@ static int browse_id3(void)
                 break;
 
             case SYS_USB_CONNECTED: 
+                status_set_playmode(STATUS_STOP);
                 usb_screen();
                 return SYS_USB_CONNECTED;
                 break;
@@ -397,6 +398,7 @@ static bool ffwd_rew(int button)
                 break;
 
             case SYS_USB_CONNECTED:
+                status_set_playmode(STATUS_STOP);
                 usb_screen();
                 usb = true;
                 exit = true;
@@ -482,6 +484,7 @@ static bool keylock(void)
                 break;
 
             case SYS_USB_CONNECTED:
+                status_set_playmode(STATUS_STOP);
                 usb_screen();
                 return true;
 
@@ -603,6 +606,7 @@ static bool menu(void)
                 break;
 
             case SYS_USB_CONNECTED:
+                status_set_playmode(STATUS_STOP);
                 usb_screen();
                 return true;
         }
@@ -852,6 +856,7 @@ int wps_show(void)
                 return 0;
                     
             case SYS_USB_CONNECTED:
+                status_set_playmode(STATUS_STOP);
                 usb_screen();
                 return SYS_USB_CONNECTED;
 

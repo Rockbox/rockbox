@@ -19,6 +19,7 @@
 #ifndef _SCREENS_H_
 #define _SCREENS_H_
 
+void usb_display_info(void);
 void usb_screen(void);
 
 #ifdef HAVE_RECORDER_KEYPAD
