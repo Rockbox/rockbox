@@ -19,12 +19,17 @@
 #ifndef THREAD_H
 #define THREAD_H
 
+#include <stdbool.h>
+
 #define MAXTHREADS	16
 #define DEFAULT_STACK_SIZE 0x400 /* Bytes */
 
 int create_thread(void* function, void* stack, int stack_size, char *name);
 void switch_thread(void);
+void sleep_thread(void);
+void wake_up_thread(void);
 void init_threads(void);
 int thread_stack_usage(int threadnum);
+void cpu_sleep(bool enabled);
 
 #endif

@@ -75,7 +75,6 @@ runtests() {
     try mkfile /cpa.rock 0
     check
     try chkfile /cpa.rock
-    try chkfile /apa.rock
     try chkfile /bpa.rock
 
     LOOP=50

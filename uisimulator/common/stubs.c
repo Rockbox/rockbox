@@ -221,3 +221,8 @@ void lcd_fillrect (int x, int y, int nx, int ny)
   (void)ny;
 }
 #endif
+
+void cpu_sleep(bool enabled)
+{
+    (void)enabled;
+}

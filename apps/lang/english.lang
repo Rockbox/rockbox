@@ -1376,3 +1376,8 @@ id: LANG_RECORDING_SIZE
 desc: Display of recorded file size
 eng: "Size:"
 new:
+
+id: LANG_CPU_SLEEP
+desc: in system_settings_menu()
+eng: "Power Saving"
+new:

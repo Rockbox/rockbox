@@ -59,13 +59,15 @@ void sleep(int ticks)
     int timeout = current_tick + ticks + 1;
 
     while (TIME_BEFORE( current_tick, timeout )) {
-        yield();
+        sleep_thread();
     }
+    wake_up_thread();
 }
 
 void yield(void)
 {
     switch_thread();
+    wake_up_thread();
 }
 
 /****************************************************************************
@@ -96,8 +98,9 @@ void queue_wait(struct event_queue *q, struct event *ev)
 {
     while(q->read == q->write)
     {
-        switch_thread();
+        sleep_thread();
     }
+    wake_up_thread();
 
     *ev = q->events[(q->read++) & QUEUE_LENGTH_MASK];
 }
@@ -108,8 +111,9 @@ void queue_wait_w_tmo(struct event_queue *q, struct event *ev, int ticks)
 
     while(q->read == q->write && TIME_BEFORE( current_tick, timeout ))
     {
-        switch_thread();
+        sleep_thread();
     }
+    wake_up_thread();
 
     if(q->read != q->write)
     {
@@ -201,6 +205,7 @@ void IMIA0(void)
     }
 
     current_tick++;
+    wake_up_thread();
 
     TSR0 &= ~0x01;
 }
@@ -257,7 +262,8 @@ void mutex_lock(struct mutex *m)
 {
     /* Wait until the lock is open... */
     while(m->locked)
-        yield();
+        sleep_thread();
+    wake_up_thread();
 
     /* ...and lock it */
     m->locked = true;

@@ -180,8 +180,7 @@ bool recording_screen(void)
 
     while(!done)
     {
-        yield();
-        button = button_get(false);
+        button = button_get_w_tmo(HZ / peak_meter_fps);
         switch(button)
         {
             case BUTTON_OFF:

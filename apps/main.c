@@ -103,12 +103,12 @@ void init(void)
     font_init();
     show_logo();
 
+    set_irq_level(0);
 #ifdef DEBUG
     debug_init();
 #else
     serial_setup();
 #endif
-    set_irq_level(0);
 
     i2c_init();
 

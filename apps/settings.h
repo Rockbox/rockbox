@@ -147,6 +147,8 @@ struct user_settings
     int bidir_limit;   /* bidir scroll length limit */
     int scroll_delay;  /* delay (in 1/10s) before starting scroll */
     int scroll_step;   /* pixels to advance per update */
+
+    bool cpu_sleep;    /* Use sleep instruction when idle? */
 };
 
 /* prototypes */

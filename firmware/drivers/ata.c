@@ -111,7 +111,8 @@ static int wait_for_bsy(void)
 {
     int timeout = current_tick + HZ*10;
     while (TIME_BEFORE(current_tick, timeout) && (ATA_ALT_STATUS & STATUS_BSY))
-        yield();
+        sleep_thread();
+    wake_up_thread();
 
     if (TIME_BEFORE(current_tick, timeout))
         return 1;
@@ -131,7 +132,8 @@ static int wait_for_rdy(void)
     
     while (TIME_BEFORE(current_tick, timeout) &&
            !(ATA_ALT_STATUS & STATUS_RDY))
-        yield();
+        sleep_thread();
+    wake_up_thread();
 
     if (TIME_BEFORE(current_tick, timeout))
         return STATUS_RDY;

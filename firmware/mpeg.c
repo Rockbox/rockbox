@@ -845,6 +845,7 @@ static void dma_tick(void)
             {
                 saving = true;
                 queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
+                wake_up_thread();
             }
         }
     }
@@ -948,6 +949,7 @@ void DEI3(void)
     }
 
     CHCR3 &= ~0x0002; /* Clear DMA interrupt */
+    wake_up_thread();
 }
 
 #ifdef HAVE_MAS3587F
@@ -1791,9 +1793,10 @@ static void mpeg_thread(void)
         }
         else
         {
+            /* This doesn't look neccessary...
             yield();
             if(!queue_empty(&mpeg_queue))
-            {
+            {*/
                 queue_wait(&mpeg_queue, &ev);
                 switch(ev.id)
                 {
@@ -1897,7 +1900,7 @@ static void mpeg_thread(void)
                         init_playback_done = true;
                         break;
                 }
-            }
+            /*}*/
         }
 #endif
     }
@@ -1974,7 +1977,8 @@ void mpeg_init_recording(void)
     queue_post(&mpeg_queue, MPEG_INIT_RECORDING, NULL);
 
     while(!init_recording_done)
-        yield();
+        sleep_thread();
+    wake_up_thread();
 }
 
 void mpeg_init_playback(void)
@@ -1983,7 +1987,8 @@ void mpeg_init_playback(void)
     queue_post(&mpeg_queue, MPEG_INIT_PLAYBACK, NULL);
 
     while(!init_playback_done)
-        yield();
+        sleep_thread();
+    wake_up_thread();
 }
 
 static void init_recording(void)

@@ -16,8 +16,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <stdbool.h>
 #include "thread.h"
 #include "panic.h"
+#include "kernel.h"
+#include "sh7034.h"
 
 struct regs
 {
@@ -30,6 +33,8 @@ struct regs
 };
 
 int num_threads;
+bool cpu_sleep_enabled;
+static volatile int num_sleepers;
 static int current_thread;
 static struct regs thread_contexts[MAXTHREADS] __attribute__ ((section(".idata")));
 char *thread_name[MAXTHREADS];
@@ -95,6 +100,18 @@ void switch_thread(void)
     int next;
     unsigned int *stackptr;
 
+#ifdef SIMULATOR
+    /* Do nothing */
+#else
+
+    while (cpu_sleep_enabled && num_sleepers == num_threads)
+    {
+        /* Enter sleep mode, woken up on interrupt */
+        SBYCR &= 0x7F;
+        asm volatile ("sleep");
+    }
+    
+#endif
     next = current = current_thread;
     if (++next >= num_threads)
         next = 0;
@@ -106,6 +123,22 @@ void switch_thread(void)
     
     if(stackptr[0] != 0xdeadbeef)
        panicf("Stkov %s", thread_name[next]);
+}
+
+void cpu_sleep(bool enabled)
+{
+    cpu_sleep_enabled = enabled;
+}
+
+void sleep_thread(void)
+{
+    ++num_sleepers;
+    switch_thread();
+}
+
+void wake_up_thread(void)
+{
+    num_sleepers = 0;
 }
 
 /*--------------------------------------------------------------------------- 
@@ -144,6 +177,7 @@ int create_thread(void* function, void* stack, int stack_size, char *name)
         regs->sr = 0;
         regs->pr = function;
     }
+    wake_up_thread();
     return 0;
 }
 
@@ -154,6 +188,7 @@ void init_threads(void)
     thread_name[0] = main_thread_name;
     thread_stack[0] = stackbegin;
     thread_stack_size[0] = (int)stackend - (int)stackbegin;
+    num_sleepers = 0;
 }
 
 int thread_stack_usage(int threadnum)
