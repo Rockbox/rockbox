@@ -619,7 +619,7 @@ static bool dirbrowse(void)
     char buf[MAX_PATH];
     int i;
     int lasti=-1;
-    int button;
+    unsigned button;
     int tree_max_on_screen;
     bool reload_root = false;
     int lastfilter = *tc.dirfilter;
@@ -630,7 +630,7 @@ static bool dirbrowse(void)
     long thumbnail_time = -1; /* for delaying a thumbnail */
     bool update_all = false; /* set this to true when the whole file list
                                 has been refreshed on screen */
-    int lastbutton = 0;
+    unsigned lastbutton = 0;
     char* currdir = tc.currdir; /* just a shortcut */
     bool id3db = *tc.dirfilter == SHOW_ID3DB;
 
@@ -689,7 +689,7 @@ static bool dirbrowse(void)
 #ifndef SIMULATOR
         if (boot_changed) {
             bool stop = false;
-            int button;
+            unsigned int button;
 
             lcd_clear_display();
             lcd_puts(0,0,str(LANG_BOOT_CHANGED));

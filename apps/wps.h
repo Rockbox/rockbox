@@ -24,7 +24,7 @@
 extern bool keys_locked;
 extern bool wps_time_countup;
 
-int wps_show(void);
+long wps_show(void);
 bool refresh_wps(bool refresh_scroll);
 void handle_usb(void);
 

@@ -426,9 +426,9 @@ static void waitfor_nokey(void)
 }
 
 /* demonstrates showing different formats from playtune */
-int wps_show(void)
+long wps_show(void)
 {
-    int button = 0, lastbutton = 0;
+    long button = 0, lastbutton = 0;
     bool ignore_keyup = true;
     bool restore = false;
     long restoretimer = 0; /* timer to delay screen redraw temporarily */
