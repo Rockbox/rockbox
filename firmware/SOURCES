@@ -21,7 +21,11 @@ common/strcat.c
 common/strchr.c
 common/strcmp.c
 common/strcpy.c
+#if CONFIG_CPU == SH7034
+common/strlen_a.S
+#else
 common/strlen.c
+#endif
 common/strncmp.c
 common/strncpy.c
 common/strrchr.c

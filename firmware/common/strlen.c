@@ -1,4 +1,4 @@
-/* 
+/*
 FUNCTION
 	<<strlen>>---character string length
 	
@@ -52,6 +52,10 @@ QUICKREF
 #ifndef DETECTNULL
 #error long int is not a 32bit or 64bit byte
 #endif
+
+size_t
+_DEFUN (strlen, (str),
+	_CONST char *str) __attribute__ ((section (".icode")));
 
 size_t
 _DEFUN (strlen, (str),
