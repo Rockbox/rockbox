@@ -548,7 +548,7 @@ static bool menu(void)
 #ifdef HAVE_PLAYER_KEYPAD
             case BUTTON_MENU | BUTTON_PLAY:
 #else
-            case BUTTON_F1 | BUTTON_UP:
+            case BUTTON_F1 | BUTTON_PLAY:
 #endif
                 if ( muted )
                     mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
