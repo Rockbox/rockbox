@@ -74,7 +74,7 @@ void player_change_volume(int button)
                 if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-                wps_refresh(id3, 0, WPS_REFRESH_NON_STATIC);
+                wps_refresh(id3, nid3, 0, WPS_REFRESH_NON_STATIC);
                 settings_save();
                 break;
 
@@ -84,7 +84,7 @@ void player_change_volume(int button)
                 if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
                 mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
-                wps_refresh(id3, 0, WPS_REFRESH_NON_STATIC);
+                wps_refresh(id3, nid3, 0, WPS_REFRESH_NON_STATIC);
                 settings_save();
                 break;
 
@@ -109,7 +109,7 @@ void player_change_volume(int button)
         if (!exit)
             button = button_get(true);
     }
-    wps_refresh(id3,0, WPS_REFRESH_ALL);
+    wps_refresh(id3, nid3, 0, WPS_REFRESH_ALL);
 }
 #endif
 
@@ -406,7 +406,7 @@ static bool ffwd_rew(int button)
                     status_set_playmode(STATUS_PLAY);
                 }
 #ifdef HAVE_LCD_CHARCELLS
-                wps_display(id3);
+                wps_display(id3, nid3);
 #endif
                 exit = true;
                 break;
