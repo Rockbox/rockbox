@@ -377,7 +377,7 @@ A60: We currently support four different hardware platforms: Players, Recorder
      For each platform, Rockbox is released in three versions: Release, Daily
      Build and Bleeding Edge. These only differ in release frequency.
 
-     The Release version (currently 2.2) is a frozen known-good state. This
+     The Release version (currently 2.3) is a frozen known-good state. This
      means that we are confident that few, if any, significant bugs reside
      within the code for that version. This is the version for the common
      user.
@@ -400,35 +400,28 @@ A60: We currently support four different hardware platforms: Players, Recorder
             
 Q61: I am in Windows and can't create a .rockbox directory to store my
      files.  When are you going to fix this?
-A61: We won't.  The limitations of your operating system is not reason 
-     enough for us to change how we handle things.  And you _can_ create
-     this directory.  Open a command line and type:
-          mkdir j:\.rockbox
-     You will need to correct the location for the drive letter that Windows
-     assigns to your drive.
+A61: You don't need to. The directory should have been created when you
+     installed Rockbox. If it wasn't created, you haven't installed it
+     correctly. Re-read the installation instructions on the download page:
+
+     http://www.rockbox.org/download/
 
 Q62: I own a Mac.  I can't seem to create the .rockbox file.  Can you 
      fix this?
-A62: Truth is, we don't need to fix anything.  If you are using OSX then you
-     can just open a console, change directories to the device and just:
-          mkdir .rockbox
-
-     If you are in another version then you should be able to do command-N in 
-     the Finder, then name the folder.  
+A62: See question 61.
          
 Q63: Will Rockbox work on any of Archos' other units?
-A63: Other than the 4 currently supported models: no, probably not. If Archos
+A63: Other than the 6 currently supported models: no, probably not. If Archos
      releases another rockbox-able player (such as the V2) then rockbox will
      find its way onto it, but their new devices as the Gmini, MM, and AV
      units are completely different hardware and probably won't be supported
-     by rockbox unless someone enthusiastically reverse engineers them and
+     by Rockbox unless someone enthusiastically reverse engineers them and
      submits patches to make it happen.
 
      See also: http://www.rockbox.org/docs/nodo.html#7
 
-Q64: I copied the rockbox MOD/AJZ file to the root, removed the jukebox
-     safely and rebooted. But Rockbox still didn't load. What is wrong?
-     I am running Windows.
+Q64: I installed Rockbox, removed the jukebox safely and rebooted, but Rockbox
+     still didn't load. What is wrong? I am running Windows.
 A64: The old MOD/AJZ was not entirely deleted from the disk. It is still
      there, and the boot loader finds that one instead of the new file. Here's
      what you can do:
@@ -663,10 +656,7 @@ A74: The Recorder V2 is essentially an FM Recorder without the radio. It looks
 
 Q75: Why is there a Radio option in my Rockbox for V2?
 A75: Some of the first V2 units had an FM radio in there, so if you're one of
-     the few lucky ones, you can use the radio fine. If you aren't lucky, you
-     just won't get any sound when trying the radio screen.
-
-     UPDATE: The daily builds now auto-detect the FM radio hardware.
+     the few lucky ones, you can use the radio fine.
 
 Q76: What does "dir buffer is full" mean?
 A76: It means you have more files in a single directory than you have
@@ -674,7 +664,7 @@ A76: It means you have more files in a single directory than you have
 
      Solution: Increase the "max files in dir browser" setting.
 
-     The current official release (2.2) contains a bug that sets
+     The current official release (2.3) contains a bug that sets
      the default buffer setting to 0, giving the dir buffer full error.
      Solution:
 
