@@ -16,7 +16,8 @@ File Location
 Custom WPS files may be located anywhere on the drive. The only restriction is
 that they must end in .wps. When you PLAY a .wps file, it'll be used for the
 future WPS screens. If the "played" wps file is located in the /.rockbox
-folder, it'll be remembered and used for subsequent restarts.
+folder, it'll be remembered and used for subsequent restarts. Filenames in the
+/.rockbox folder must be no more than 24 characters long.
 
 Tags
 ----
