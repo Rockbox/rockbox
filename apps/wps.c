@@ -1154,14 +1154,16 @@ static bool menu(void)
 #ifdef HAVE_PLAYER_KEYPAD
             case BUTTON_MENU | BUTTON_PLAY:
 #else
-            case BUTTON_MENU | BUTTON_UP:
+            case BUTTON_F1 | BUTTON_UP:
 #endif
                 if ( muted )
                     mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
                 else
                     mpeg_sound_set(SOUND_VOLUME, 0);
                 muted = !muted;
+#ifdef HAVE_LCD_CHARCELLS
                 lcd_icon(ICON_PARAM, false);
+#endif
                 display_mute_text(muted);
                 break;
 
