@@ -133,7 +133,7 @@ static inline int tas (volatile int *pointer)
 /* Compare And Swap */
 static inline int cas (volatile int *pointer,int requested_value,int new_value)
   {
-    unsigned int oldlevel = set_irq_level(15);
+    unsigned int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
     if (*pointer == requested_value)
       {
         *pointer = new_value;
@@ -146,7 +146,7 @@ static inline int cas (volatile int *pointer,int requested_value,int new_value)
 
 static inline int cas2 (volatile int *pointer1,volatile int *pointer2,int requested_value1,int requested_value2,int new_value1,int new_value2)
   {
-    unsigned int oldlevel = set_irq_level(15);
+    unsigned int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
     if (*pointer1 == requested_value1 && *pointer2 == requested_value2)
       {
         *pointer1 = new_value1;

@@ -302,7 +302,7 @@ void (*vbr[]) (void) __attribute__ ((section (".vectors"))) =
 
 void system_reboot (void)
 {
-    set_irq_level(15);
+    set_irq_level(HIGHEST_IRQ_LEVEL);
 
     asm volatile ("ldc\t%0,vbr" : : "r"(0));
 
