@@ -348,4 +348,9 @@ void usb_start_monitoring(void)
 {
 }
 
+bool usb_detect(void)
+{
+    return false;
+}
+
 #endif
