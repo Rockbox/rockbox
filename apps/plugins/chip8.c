@@ -24,8 +24,7 @@
 #ifdef HAVE_LCD_BITMAP 
 
 static struct plugin_api* rb; /* here is a global api struct pointer */
-/* plugins have no framebuffer access, we need a copy */
-unsigned char lcd_framebuf[8][64];
+unsigned char lcd_framebuf[8][64]; /* frame buffer in hardware fomat */
 
 typedef unsigned char byte;                     /* sizeof(byte)==1          */
 typedef unsigned short word;                    /* sizeof(word)>=2          */
@@ -344,10 +343,11 @@ static void chip8_update_display(void)
 {
  int x,y,i;
  byte w;
+ byte* row;
 
-// lcd_clear_display();
  for (y=0;y<=7;++y)                             /* 32 rows                  */
  {
+  row = lcd_framebuf[y];
   for (x=0;x<64;++x)                            /* 64 columns               */
   {
     w = 0;
@@ -358,19 +358,11 @@ static void chip8_update_display(void)
       {
         w += 128+64;
       }
-      lcd_framebuf[y][x] = w;
     }
+    *row++ = w;
   }
  }
- rb->lcd_bitmap(lcd_framebuf[0], 24, 0*8, 64, 8, true);
- rb->lcd_bitmap(lcd_framebuf[1], 24, 1*8, 64, 8, true);
- rb->lcd_bitmap(lcd_framebuf[2], 24, 2*8, 64, 8, true);
- rb->lcd_bitmap(lcd_framebuf[3], 24, 3*8, 64, 8, true);
- rb->lcd_bitmap(lcd_framebuf[4], 24, 4*8, 64, 8, true);
- rb->lcd_bitmap(lcd_framebuf[5], 24, 5*8, 64, 8, true);
- rb->lcd_bitmap(lcd_framebuf[6], 24, 6*8, 64, 8, true);
- rb->lcd_bitmap(lcd_framebuf[7], 24, 7*8, 64, 8, true);
- rb->lcd_update_rect(24,0,64,64);
+ rb->lcd_blit(lcd_framebuf[0], 24, 0, 64, 8, 64);
 }
 
 
@@ -432,7 +424,7 @@ static void chip8_execute(void)
                                                /* Update the machine status */
   chip8_update_display();
   chip8_keyboard();
-  rb->sleep(HZ/70);                                             /* ca. 70Hz */
+  rb->yield();  /* we should regulate the speed by timer query, sleep/yield */
 
   for (i=key_pressed=0;i<16;++i)                /* check if a key was first */
     if (chip8_keys[i]) key_pressed=i+1;         /* pressed                  */
