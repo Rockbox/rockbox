@@ -24,6 +24,7 @@ mandelbrot.c
 minesweeper.c
 mosaique.c
 oscillograph.c
+oscilloscope.c
 pong.c
 rockblox.c
 sliding_puzzle.c
