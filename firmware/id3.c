@@ -131,13 +131,12 @@ setid3v1title(FILE *file, mp3entry *entry)
     char buffer[31];
     int offsets[3] = {-95,-65,-125};
     int i;
-    char *result;
+
+    static char keepit[3][32];
 
     for(i=0;i<3;i++) {
-        if(fseek(file, offsets[i], SEEK_END) != 0) {
-            free(result);
+        if(fseek(file, offsets[i], SEEK_END) != 0)
             return FALSE;
-        }
 
         buffer[0]=0;
         fgets(buffer, 31, file);
@@ -146,13 +145,16 @@ setid3v1title(FILE *file, mp3entry *entry)
         if(buffer[0]) {
             switch(i) {
             case 0:
-                entry->artist = strdup(buffer);
+                strcpy(keepit[0], buffer);
+                entry->artist = keepit[0];
                 break;
             case 1:
-                entry->album = strdup(buffer);
+                strcpy(keepit[1], buffer);
+                entry->album = keepit[1];
                 break;
             case 2:
-                entry->title = strdup(buffer);
+                strcpy(keepit[2], buffer);
+                entry->title = keepit[2];
                 break;
             }
         }
@@ -173,7 +175,6 @@ setid3v1title(FILE *file, mp3entry *entry)
 static void
 setid3v2title(FILE *file, mp3entry *entry) 
 {
-    char *buffer;
     int minframesize;
     int size, readsize = 0, headerlen;
     char *title = NULL;
@@ -181,6 +182,8 @@ setid3v2title(FILE *file, mp3entry *entry)
     char *album = NULL;
     char header[10];
     unsigned short int version;
+    static char buffer[512];
+    int titlen, artistn, albumn;   
 	
     /* 10 = headerlength */
     if(entry->id3v2len < 10)
@@ -193,7 +196,10 @@ setid3v2title(FILE *file, mp3entry *entry)
 	
     /* Read all frames in the tag */
     size = entry->id3v2len - 10;
-    buffer = malloc(size + 1);
+
+    if(size >= sizeof(buffer))
+        size = sizeof(buffer)-1;
+
     if(size != (int)fread(buffer, sizeof(char), size, file)) {
         free(buffer);
         return;
@@ -235,9 +241,8 @@ setid3v2title(FILE *file, mp3entry *entry)
             headerlen--;
             if(headerlen > (size - readsize))
                 headerlen = (size - readsize);
-            artist = malloc(headerlen + 1);
-            snprintf(artist, headerlen + 1, "%s", 
-                     (buffer + readsize));
+            artist = buffer + readsize;
+            artistn = headerlen;
             readsize += headerlen;
         }
         else if(!strncmp(header, "TIT2", strlen("TIT2")) || 
@@ -246,9 +251,8 @@ setid3v2title(FILE *file, mp3entry *entry)
             headerlen--;
             if(headerlen > (size - readsize))
                 headerlen = (size - readsize);
-            title = malloc(headerlen + 1);
-            snprintf(title, headerlen + 1, "%s", 
-                     (buffer + readsize));
+            title = buffer + readsize;
+            titlen = headerlen;
             readsize += headerlen;
         }
         else if(!strncmp(header, "TALB", strlen("TALB"))) {
@@ -256,23 +260,26 @@ setid3v2title(FILE *file, mp3entry *entry)
             headerlen--;
             if(headerlen > (size - readsize))
                 headerlen = (size - readsize);
-            album = malloc(headerlen + 1);
-            snprintf(album, headerlen + 1, "%s", 
-                     (buffer + readsize));
+            album = buffer + readsize;
+            albumn = headerlen;
             readsize += headerlen;
         }
     }
     
-    if(artist)
+    if(artist) {
         entry->artist = artist;
+        artist[artistn]=0;
+    }
   
-    if(title)
+    if(title) {
         entry->title = title;
+        title[titlen]=0;
+    }
 
-    if(album)
+    if(album) {
         entry->album = album;
-  
-    free(buffer);
+        album[albumn]=0;
+    }
 }
 
 /*
@@ -392,7 +399,7 @@ getsonglength(FILE *file, mp3entry *entry)
     if((header & 0xF000) == 0xF000)
         goto restart;
 
-#ifdef DEBUG_STANDALONE
+#ifdef DEBUG_VERBOSE
     fprintf(stderr,
             "We found %x-%x-%x-%x and checksync %i and test %x\n", 
             BYTE0(header), BYTE1(header), BYTE2(header), BYTE3(header), 
@@ -437,7 +444,7 @@ getsonglength(FILE *file, mp3entry *entry)
     if(frequency == 0)
         return -1;
 
-#ifdef DEBUG_STANDALONE
+#ifdef DEBUG_VERBOSE
     fprintf(stderr,
             "Version %i, lay %i, biti %i, bitr %i, freqi %i, freq %i\n", 
             version, layer, bitindex, bitrate, freqindex, frequency);
@@ -514,25 +521,37 @@ mp3info(mp3entry *entry, char *filename)
 
 #ifdef DEBUG_STANDALONE
 
+char *secs2str(int ms)
+{
+    static char buffer[32];
+    int secs = ms/1000;
+    ms %= 1000;
+    sprintf(buffer, "%d:%02d.%d", secs/60, secs%60, ms/100);
+    return buffer;
+}
+
 int main(int argc, char **argv)
 {
-    if(argc > 1) {
+    int i;
+    for(i=1; i<argc; i++) {
         mp3entry mp3;
-        if(mp3info(&mp3, argv[1])) {
-            printf("Failed\n");
+        if(mp3info(&mp3, argv[i])) {
+            printf("Failed to get %s\n", argv[i]);
             return 0;
         }
 
-        printf("Title: %s\n"
-               "Artist: %s\n"
-               "Album:  %s\n"
-               "Length: %.1f secs\n"
-               "Bitrate: %d\n"
-               "Frequency: %d\n",
+        printf("****** File: %s\n"
+               "      Title: %s\n"
+               "     Artist: %s\n"
+               "      Album: %s\n"
+               "     Length: %s\n"
+               "    Bitrate: %d\n"
+               "  Frequency: %d\n",
+               argv[i],
                mp3.title?mp3.title:"<blank>",
                mp3.artist?mp3.artist:"<blank>",
                mp3.album?mp3.album:"<blank>",
-               mp3.length/1000.0,
+               secs2str(mp3.length),
                mp3.bitrate,
                mp3.frequency);
     }
