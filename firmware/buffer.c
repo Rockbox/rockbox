@@ -21,7 +21,7 @@
 
 #ifdef SIMULATOR
 unsigned char mp3buffer[0x100000];
-unsigned char mp3end[1];
+unsigned char *mp3end = mp3buffer + sizeof(mp3buffer);
 #else
 /* defined in linker script */
 extern unsigned char mp3buffer[];

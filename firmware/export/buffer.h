@@ -20,7 +20,11 @@
 #define BUFFER_H
 
 /* defined in linker script */
+#ifdef SIMULATOR
+extern unsigned char *mp3end;
+#else
 extern unsigned char mp3end[];
+#endif
 
 extern unsigned char *mp3buf;
 
