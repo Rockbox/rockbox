@@ -20,6 +20,8 @@
 #define _USB_H_
 
 void usb_init(void);
+void usb_start_monitoring(void);
 void usb_acknowledge(int id);
+void usb_wait_for_disconnect(struct event_queue *q);
 
 #endif
