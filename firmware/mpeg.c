@@ -207,6 +207,7 @@ static unsigned int last_track_counter = 0;
 #ifndef SIMULATOR
 
 static bool mpeg_is_initialized = false;
+
 static int tag_read_idx = 0;
 static int tag_write_idx = 0;
 
@@ -468,6 +469,7 @@ static bool is_playing; /* We are (attempting to) playing MP3 files */
 static bool filling; /* We are filling the buffer with data from disk */
 static bool dma_underrun; /* True when the DMA has stopped because of
                              slow disk reading (read error, shaking) */
+static int low_watermark; /* Dynamic low watermark level */
 static int lowest_watermark_level; /* Debug value to observe the buffer
                                       usage */
 #ifdef HAVE_MAS3587F
@@ -485,6 +487,18 @@ static int mpeg_file;
 static bool init_recording_done;
 static bool init_playback_done;
 #endif
+
+static void recalculate_watermark(int bitrate)
+{
+    if(ata_spinup_time)
+    {
+        low_watermark = ata_spinup_time * 3 / HZ * bitrate*1000 / 8;
+    }
+    else
+    {
+        low_watermark = MPEG_LOW_WATER;
+    }
+}
 
 void mpeg_get_debugdata(struct mpeg_debug *dbgdata)
 {
@@ -505,6 +519,7 @@ void mpeg_get_debugdata(struct mpeg_debug *dbgdata)
     dbgdata->unplayed_space = get_unplayed_space();
     dbgdata->unswapped_space = get_unswapped_space();
 
+    dbgdata->low_watermark_level = low_watermark;
     dbgdata->lowest_watermark_level = lowest_watermark_level;
 }
 
@@ -768,7 +783,7 @@ static void dma_tick(void)
             if(num_bytes < 0)
                 num_bytes += mp3buflen;
 
-            if(mp3buflen - num_bytes < MPEG_LOW_WATER && !saving)
+            if(mp3buflen - num_bytes < low_watermark && !saving)
                 queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
         }
     }
@@ -810,7 +825,7 @@ void DEI3(void)
         
         space_until_end_of_buffer = mp3buflen - mp3buf_read;
         
-        if(!filling && unplayed_space_left < MPEG_LOW_WATER)
+        if(!filling && unplayed_space_left < low_watermark)
         {
             filling = true;
             queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
@@ -1067,13 +1082,19 @@ void hexdump(unsigned char *buf, int len)
 
 static void start_playback_if_ready(void)
 {
+    int playable_space;
+
+    playable_space = mp3buf_swapwrite - mp3buf_read;
+    if(playable_space < 0)
+        playable_space += mp3buflen;
+    
     /* See if we have started playing yet. If not, do it. */
     if(play_pending || dma_underrun)
     {
         /* If the filling has stopped, and we still haven't reached
            the watermark, the file must be smaller than the
            watermark. We must still play it. */
-        if(((mp3buf_swapwrite - mp3buf_read) >= MPEG_LOW_WATER) ||
+        if((playable_space >= low_watermark) ||
            !filling || dma_underrun)
         {
             DEBUGF("P\n");
@@ -1278,7 +1299,7 @@ static void mpeg_thread(void)
                     unswapped_space_left = get_unswapped_space();
 
                     /* should we start reading more data? */
-                    if(!filling && (unplayed_space_left < MPEG_LOW_WATER)) {
+                    if(!filling && (unplayed_space_left < low_watermark)) {
                         filling = true;
                         queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
                         play_pending = true;
@@ -1464,7 +1485,7 @@ static void mpeg_thread(void)
                     unplayed_space_left  = get_unplayed_space();
                     unswapped_space_left = get_unswapped_space();
 
-                    if (mpeg_file>=0 && unplayed_space_left < MPEG_LOW_WATER)
+                    if (mpeg_file>=0 && unplayed_space_left < low_watermark)
                     {
                         /* We need to load more data before starting */
                         filling = true;
@@ -1579,7 +1600,7 @@ static void mpeg_thread(void)
                 }
 
                 /* Read small chunks while we are below the low water mark */
-                if(unplayed_space_left < MPEG_LOW_WATER)
+                if(unplayed_space_left < low_watermark)
                     amount_to_read = MIN(MPEG_LOW_WATER_CHUNKSIZE,
                                          free_space_left);
                 else
@@ -1595,6 +1616,12 @@ static void mpeg_thread(void)
                     t1 = current_tick;
                     len = read(mpeg_file, mp3buf+mp3buf_write, amount_to_read);
 
+                    if(id3tags[tag_read_idx]->id3.vbr)
+                        recalculate_watermark(320);
+                    else
+                        recalculate_watermark(
+                            id3tags[tag_read_idx]->id3.bitrate);
+                    
                     if(len > 0)
                     {
                         t2 = current_tick;
@@ -2794,6 +2821,8 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int 
     dbg_timer_start();
     dbg_cnt2us(0);
 #endif
+
+    recalculate_watermark(320); /* Maximum bitrate for safety's sake */
 }
 
 /* -----------------------------------------------------------------

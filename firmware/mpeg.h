@@ -25,7 +25,7 @@
 #define MPEG_HIGH_WATER  2 /* We leave 2 bytes empty because otherwise we
                               wouldn't be able to see the difference between
                               an empty buffer and a full one. */
-#define MPEG_LOW_WATER  0x40000
+#define MPEG_LOW_WATER  0x60000
 #define MPEG_LOW_WATER_CHUNKSIZE  0x40000
 
 struct mpeg_debug
@@ -47,6 +47,7 @@ struct mpeg_debug
         int unplayed_space;
         int unswapped_space;
 
+        int low_watermark_level;
         int lowest_watermark_level;
 };
 
