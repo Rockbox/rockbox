@@ -114,6 +114,49 @@ struct fsinfo {
 #define FSINFO_FREECOUNT 488
 #define FSINFO_NEXTFREE  492
 
+struct bpb
+{
+    char bs_oemname[9];  /* OEM string, ending with \0 */
+    int bpb_bytspersec;  /* Bytes per sectory, typically 512 */
+    int bpb_secperclus;  /* Sectors per cluster */
+    int bpb_rsvdseccnt;  /* Number of reserved sectors */
+    int bpb_numfats;     /* Number of FAT structures, typically 2 */
+    int bpb_rootentcnt;  /* Number of dir entries in the root */
+    int bpb_totsec16;    /* Number of sectors on the volume (old 16-bit) */
+    int bpb_media;       /* Media type (typically 0xf0 or 0xf8) */
+    int bpb_fatsz16;     /* Number of used sectors per FAT structure */
+    int bpb_secpertrk;   /* Number of sectors per track */
+    int bpb_numheads;    /* Number of heads */
+    int bpb_hiddsec;     /* Hidden sectors before the volume */
+    unsigned int bpb_totsec32;    /* Number of sectors on the volume
+                                     (new 32-bit) */
+    int last_word;       /* 0xAA55 */
+
+    /**** FAT12/16 specific *****/
+    int bs_drvnum;       /* Drive number */
+    int bs_bootsig;      /* Is 0x29 if the following 3 fields are valid */
+    unsigned int bs_volid; /* Volume ID */
+    char bs_vollab[12];    /* Volume label, 11 chars plus \0 */
+    char bs_filsystype[9]; /* File system type, 8 chars plus \0 */
+
+    /**** FAT32 specific *****/
+    int bpb_fatsz32;
+    int bpb_extflags;
+    int bpb_fsver;
+    int bpb_rootclus;
+    int bpb_fsinfo;
+    int bpb_bkbootsec;
+
+    /* variables for internal use */
+    int fatsize;
+    int totalsectors;
+    int rootdirsector;
+    int firstdatasector;
+    int startsector;
+};
+
+struct bpb fat_bpb;
+
 static int first_sector_of_cluster(int cluster);
 static int bpb_is_sane(void);
 static void *cache_fat_sector(int secnum);
