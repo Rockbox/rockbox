@@ -39,11 +39,11 @@ void radio_set_status(int status)
 #ifdef HAVE_TUNER_PWR_CTRL
     if (status)
     {
-        and_b(~0x04, &PADR); /* drive PA2 low for tuner enable */
+        and_b(~0x04, &PADRL); /* drive PA2 low for tuner enable */
         sleep(1); /* let the voltage settle */
     }
     else
-        or_b(0x04, &PADR); /* drive PA2 high for tuner disable */
+        or_b(0x04, &PADRL); /* drive PA2 high for tuner disable */
 #endif
 }
 
@@ -63,9 +63,9 @@ void power_init(void)
     charger_enable(false); /* Default to charger OFF */
 #endif
 #ifdef HAVE_TUNER_PWR_CTRL
-    and_b(~0x30, &PACR2); /* GPIO for PA2 */
-    or_b(0x04, &PADR); /* drive PA2 high for tuner disable */
-    or_b(0x04, &PAIOR); /* output for PA2 */
+    PACR2 &= ~0x0030;  /* GPIO for PA2 */
+    or_b(0x04, &PADRL); /* drive PA2 high for tuner disable */
+    or_b(0x04, &PAIORL); /* output for PA2 */
 #endif
 }
 
