@@ -30,7 +30,6 @@ start:
 	clrsr ie
 	clrsr te
 	ld a14, #0x3F0000
-	;; copy data section from flash to ram.
 
 	ld r5, 0xA5
 	ldb @[a14 + 6], r5	; disable watchdog
@@ -38,6 +37,7 @@ start:
 	ld a11, #(_datacopy)	; where the data section is in the flash
 	ld a8, #(_datastart)	; destination
 
+	;; copy data section from flash to ram.
 	ld a9, #_datasize
 	ld r6, e9
 	cmp eq, r6, #0
@@ -57,6 +57,7 @@ start:
 	brt .data_copy_loop
 .data_copy_end:
 
+	;; zero out bss
 	ld r2, #0
 	ld a8, #(_bssstart)	; destination
 	ld a9, #_bsssize	
@@ -76,7 +77,8 @@ start:
 	cmp ugt, r9, #0
 	brt .bss_init_loop
 .bss_init_end:
-	
+
+	;; set stack pointer
 	ld a15, _stackend
 
 	;; go!
