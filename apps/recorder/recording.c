@@ -123,11 +123,11 @@ void adjust_cursor(void)
 
 unsigned int frame_times[] =
 {
-    2400, /* 48kHz */
     2612, /* 44.1kHz */
+    2400, /* 48kHz */
     3600, /* 32kHz */
-    2400, /* 24kHz */
     2612, /* 22.05kHz */
+    2400, /* 24kHz */
     3200  /* 16kHz */
 };
 
@@ -187,6 +187,7 @@ bool recording_screen(void)
 
     while(!done)
     {
+        yield();
         button = button_get(false);
         switch(button)
         {
