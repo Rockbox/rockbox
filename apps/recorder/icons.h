@@ -48,7 +48,6 @@ enum icons_7x8 {
     Icon_FastBackward,
     Icon_Record,
     Icon_RecPause,
-    Icon_Normal,
     Icon_Repeat,
     Icon_RepeatOne,
     Icon_Shuffle,

@@ -196,10 +196,6 @@ void status_draw(void)
         statusbar_icon_volume(volume);
         statusbar_icon_play_state(current_mode + Icon_Play);
         switch (global_settings.repeat_mode) {
-            case REPEAT_OFF:
-                statusbar_icon_play_mode(Icon_Normal);
-                break;
-
             case REPEAT_ONE:
                 statusbar_icon_play_mode(Icon_RepeatOne);
                 break;
