@@ -521,7 +521,8 @@ static bool timedate_set(void)
     timedate[3] = rtc_read(0x07); /* year   */
     timedate[4] = rtc_read(0x06); /* month  */
     timedate[5] = rtc_read(0x05); /* day    */
-    /* day of week not read, calculated */
+
+    /* day of week not read, calculated in set_time() */
     /* hour   */
     timedate[0] = ((timedate[0] & 0x30) >> 4) * 10 + (timedate[0] & 0x0f); 
     /* minute */
@@ -534,6 +535,29 @@ static bool timedate_set(void)
     timedate[4] = ((timedate[4] & 0x10) >> 4) * 10 + (timedate[4] & 0x0f); 
     /* day    */
     timedate[5] = ((timedate[5] & 0x30) >> 4) * 10 + (timedate[5] & 0x0f);
+
+    /* do some range checks */
+    /* This prevents problems with time/date setting after a power loss */
+    if (timedate[0] < 0 || timedate[0] > 23 ||
+        timedate[1] < 0 || timedate[1] > 59 || 
+        timedate[2] < 0 || timedate[2] > 59 ||
+        timedate[3] < 0 || timedate[3] > 99 ||
+        timedate[4] < 0 || timedate[4] > 12 ||
+        timedate[5] < 0 || timedate[5] > 31)
+    {
+        /* hour   */
+        timedate[0] = 0;
+        /* minute */
+        timedate[1] = 0;
+        /* second */
+        timedate[2] = 0;
+        /* year   */
+        timedate[3] = 3;
+        /* month  */
+        timedate[4] = 1;
+        /* day    */
+        timedate[5] = 1;
+    }
 #endif
 
     result = set_time(str(LANG_TIME),timedate);
