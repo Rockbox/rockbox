@@ -21,3 +21,4 @@ mecraw      => Lee Marlow
 hardeep     => Hardeep Sidhu
 [IDC]Dragon => Jörg Hohensohn
 uski        => Bertrand Achard
+Quelsaruk   => Jose Maria Garcia-Valdecasas Bernal
