@@ -56,7 +56,12 @@ char* credits[] = {
     "Magnus Holmgren",
     "Bill Napier",
     "George Styles",
-	"Mats Lidell"
+    "Mats Lidell",
+    "Lee Marlow",
+    "Nate Nystrom",
+    "Nick Robinson",
+    "Chad Lockwood",
+    "John Pybus",
 };
 
 #ifdef HAVE_LCD_BITMAP
