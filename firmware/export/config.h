@@ -30,6 +30,7 @@
 #define MAS3587F 3587
 #define MAS3507D 3507
 #define MAS3539F 3539
+#define MASNONE  1    /* if codec is done by SW */
 
 /* CONFIG_CPU */
 #define SH7034  7034

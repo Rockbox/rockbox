@@ -10,6 +10,9 @@
 
 #define CONFIG_KEYPAD IRIVER_H100_PAD
 
+/* Define this if you do software codec */
+#define CONFIG_HWCODEC MASNONE
+
 #ifndef SIMULATOR
 
 /* Define this if you have a Motorola SCF5249 */
