@@ -29,8 +29,9 @@ INCLUDES = -I. -I$(SIMCOMMON) -I$(OBJDIR) -I$(FIRMDIR)/export -I$(APPSDIR)
 DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR \
 $(TARGET) -DAPPSVERSION=\"$(VERSION)\" -DMEM=${MEMORYSIZE} $(EXTRA_DEFINES)
 
-SRC := $(shell cat SOURCES | gcc -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
- $(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -include "config.h" - )
+# This sets up 'SRC' based on the files mentioned in SOURCES
+include $(TOOLSDIR)/makesrc.inc
+
 OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 
 SOURCES = $(SRC)

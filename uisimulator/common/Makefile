@@ -25,8 +25,9 @@ DEBUG = -g
 # Use this for simulator-only files
 INCLUDES = -I. -I$(OBJDIR) -I$(FIRMDIR)/export -I$(APPSDIR) -I$(ROOTDIR)/uisimulator/$(SIMVER)
 
-SRC := $(shell cat SOURCES | gcc -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
- $(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -include "config.h" - )
+# This sets up 'SRC' based on the files mentioned in SOURCES
+include $(TOOLSDIR)/makesrc.inc
+
 OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 
 DEFINES := -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR \

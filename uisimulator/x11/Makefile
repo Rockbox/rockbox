@@ -27,8 +27,9 @@ DEBUG = -g
 # Use this for simulator-only files
 INCLUDES = -I. -I$(SIMCOMMON) -I$(OBJDIR) -I$(FIRMDIR)/export -I$(APPSDIR)
 
-SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
- $(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -include "config.h" - )
+# This sets up 'SRC' based on the files mentioned in SOURCES
+include $(TOOLSDIR)/makesrc.inc
+
 OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 
 DEFINES := -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR \
