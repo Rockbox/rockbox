@@ -524,6 +524,7 @@ int dbg_cmd(int argc, char *argv[])
                " mkfile <file> <size (KB)>\n"
                " chkfile <file>\n"
                " del <file>\n"
+               " rmdir <dir>\n"
                " dump <file> <offset>\n"
                " mkdir <dir>\n"
                " trunc <file> <size>\n"
@@ -546,8 +547,8 @@ int dbg_cmd(int argc, char *argv[])
     if (!strcasecmp(cmd, "ds"))
     {                    
         if ( arg1 ) {
-            DEBUGF("secnum: %d\n", atoi(arg1));
-            dbg_dump_sector(atoi(arg1));
+            DEBUGF("secnum: %d\n", strtol(arg1, NULL, 0));
+            dbg_dump_sector(strtol(arg1, NULL, 0));
         }
     }
 
@@ -573,7 +574,7 @@ int dbg_cmd(int argc, char *argv[])
     {
         if (arg1) {
             if (arg2)
-                return dbg_mkfile(arg1,atoi(arg2));
+                return dbg_mkfile(arg1,strtol(arg2, NULL, 0));
             else
                 return dbg_mkfile(arg1,1);
         }
@@ -583,7 +584,7 @@ int dbg_cmd(int argc, char *argv[])
     {
         if (arg1) {
             if (arg2)
-                return dbg_chkfile(arg1, atoi(arg2));
+                return dbg_chkfile(arg1, strtol(arg2, NULL, 0));
             else
                 return dbg_chkfile(arg1, 0);
         }
@@ -602,11 +603,17 @@ int dbg_cmd(int argc, char *argv[])
             return remove(arg1);
     }
 
+    if (!strcasecmp(cmd, "rmdir"))
+    {
+        if (arg1)
+            return rmdir(arg1);
+    }
+
     if (!strcasecmp(cmd, "dump"))
     {
         if (arg1) {
             if (arg2)
-                return dbg_dump(arg1, atoi(arg2));
+                return dbg_dump(arg1, strtol(arg2, NULL, 0));
             else
                 return dbg_dump(arg1, 0);
         }
@@ -633,7 +640,7 @@ int dbg_cmd(int argc, char *argv[])
     if (!strcasecmp(cmd, "trunc"))
     {
         if (arg1 && arg2)
-            return dbg_trunc(arg1, atoi(arg2));
+            return dbg_trunc(arg1, strtol(arg2, NULL, 0));
     }
 
     if (!strcasecmp(cmd, "ren"))
