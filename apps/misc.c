@@ -35,6 +35,7 @@
 #include "ata.h"
 #include "kernel.h"
 #include "power.h"
+#include "powermgmt.h"
 #include "backlight.h"
 #ifdef HAVE_MMC
 #include "ata_mmc.h"
@@ -232,19 +233,7 @@ bool clean_shutdown(void)
     {
         lcd_clear_display();
         splash(0, true, str(LANG_SHUTTINGDOWN));
-        mpeg_stop();
-        ata_flush();
-        ata_spindown(1);
-        while(ata_disk_is_active())
-            sleep(HZ/10);
-
-        mp3_shutdown();
-#if CONFIG_KEYPAD == ONDIO_PAD
-        backlight_off();
-        sleep(1);
-        lcd_set_contrast(0);
-#endif
-        power_off();
+        shutdown_hw();
     }
 #endif
     return false;

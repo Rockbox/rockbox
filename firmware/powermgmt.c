@@ -351,7 +351,7 @@ static void handle_auto_poweroff(void)
            TIME_AFTER(current_tick, last_disk_activity + timeout) &&
            TIME_AFTER(current_tick, last_charge_time + timeout))
         {
-            power_off();
+            shutdown_hw();
         }
     }
     else
@@ -375,7 +375,7 @@ static void handle_auto_poweroff(void)
                        we cut the power */
                     while(ata_disk_is_active())
                        sleep(HZ);
-                    power_off();
+                    shutdown_hw();
                 }
             }
         }
@@ -874,3 +874,18 @@ void powermgmt_init(void)
 
 #endif /* SIMULATOR */
 
+void shutdown_hw(void) {
+    mpeg_stop();
+    ata_flush();
+    ata_spindown(1);
+    while(ata_disk_is_active())
+    sleep(HZ/10);
+
+    mp3_shutdown();
+#if CONFIG_KEYPAD == ONDIO_PAD
+    backlight_off();
+    sleep(1);
+    lcd_set_contrast(0);
+#endif
+    power_off();
+}

@@ -120,5 +120,6 @@ void set_sleep_timer(int seconds);
 int get_sleep_timer(void);
 void set_car_adapter_mode(bool setting);
 void reset_poweroff_timer(void);
+void shutdown_hw(void);
 
 #endif
