@@ -58,8 +58,8 @@ char* playlist_next(int type)
             (now_playing[seek] != '\r') &&
             (seek < max))
         seek++;
-      if(seek == max)
-        seek = max-1;
+/*      if(seek == max)
+        seek = max-1;*/
       now_playing[seek]=0;
 
       return now_playing;
@@ -100,22 +100,31 @@ void empty_playlist( playlist_info_t *playlist )
  */
 void add_indices_to_playlist( playlist_info_t *playlist )
 {
+/*
     char *p;
     int   i = 0;
     unsigned char byte;
     unsigned char lastbyte='\n';
+*/
     int nread;
-
+    
     int fd;
+
+    int i = 0;
+    unsigned char *p;
+    unsigned char buf[255];
+    int store_index = 0;
+    int count = 0;
 
     fd = open(playlist->filename, O_RDONLY);
     if(-1 == fd)
         return; /* failure */
 
-    p = &byte;
+#ifdef ROBHAK
+    p = &byte;  /* Not being used? */
     
     /* loop thru buffer, store index whenever we get a new line */
-    
+
     while((nread = read(fd, &byte, 1)) == 1)
     {
         /* move thru (any) newlines */
@@ -131,6 +140,34 @@ void add_indices_to_playlist( playlist_info_t *playlist )
         i++;
         lastbyte = byte;
     }
+#endif
+    store_index = 1;
+
+    while((nread = read(fd, &buf, sizeof(buf))) != 0)
+    {
+        p = buf;
+
+        for(count=0; count < nread; count++,p++) {
+
+            /* Are we on a new line? */
+            if(((*p == '\n') || (*p == '\r')) && (!store_index))
+            {
+                store_index = 1;
+            } 
+            else if(store_index) 
+            {
+                /* Store a new entry */
+                DEBUGF("tune %d at position %d\n", playlist->amount, i+count);
+                playlist->indices[ playlist->amount ] = i+count;
+                playlist->amount++;
+
+                store_index = 0;
+            }
+        }
+
+        i+= count;
+    }
+
 
     close(fd);
 }
