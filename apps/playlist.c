@@ -655,9 +655,11 @@ void add_indices_to_playlist(void)
         if(-1 == fd)
             return; /* failure */
 
+#ifndef SIMULATOR
         /* use mp3 buffer for maximum load speed */
         buflen = (&mp3end - &mp3buf[0]);
         buffer = mp3buf;
+#endif
     }
 
     store_index = true;
