@@ -56,6 +56,7 @@ extern void system_init(void);
 #define I_CONSTRAINT "I"
 #endif
 
+#if CONFIG_CPU == SH7034
 #define or_b(mask, address) \
   asm                                     \
     ("or.b\t%0,@(r0,gbr)"                 \
@@ -76,6 +77,7 @@ extern void system_init(void);
      :                                       \
      : /* %0 */ I_CONSTRAINT((char)(mask)), \
        /* %1 */ "z"(address-GBR))
+#endif
 
 #ifndef SIMULATOR
 
@@ -83,6 +85,7 @@ extern void system_init(void);
  * Interrupt level setting
  * The level is left shifted 4 bits
  ****************************************************************************/
+#if CONFIG_CPU == SH7034
 #define HIGHEST_IRQ_LEVEL (15<<4)
 static inline int set_irq_level(int level)
 {
@@ -129,42 +132,6 @@ static inline unsigned long SWAB32(unsigned long value)
     return value;
 }
 
-/* Test And Set - UNTESTED */
-static inline int tas (volatile int *pointer)
-  {
-    int result;
-    asm volatile ("tas.b\t@%1;movt\t%0" : "=t"(result) : "r"((char *)pointer) : "memory");
-    return result;
-  }
-
-/* Compare And Swap */
-static inline int cas (volatile int *pointer,int requested_value,int new_value)
-  {
-    unsigned int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-    if (*pointer == requested_value)
-      {
-        *pointer = new_value;
-        set_irq_level(oldlevel);
-        return 1;
-      }
-    set_irq_level(oldlevel);
-    return 0;
-  }
-
-static inline int cas2 (volatile int *pointer1,volatile int *pointer2,int requested_value1,int requested_value2,int new_value1,int new_value2)
-  {
-    unsigned int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-    if (*pointer1 == requested_value1 && *pointer2 == requested_value2)
-      {
-        *pointer1 = new_value1;
-        *pointer2 = new_value2;
-        set_irq_level(oldlevel);
-        return 1;
-      }
-    set_irq_level(oldlevel);
-    return 0;
-  }
- 
 /* Utilize the user break controller to catch invalid memory accesses. */
 int system_memory_guard(int newmode);
 
@@ -176,6 +143,19 @@ enum {
     MAXMEMGUARD
 };
 
+#elif CONFIG_CPU == MCF5249
+#define HIGHEST_IRQ_LEVEL (7<<8)
+static inline int set_irq_level(int level)
+{
+    int i;
+    /* Read the old level and set the new one */
+    asm volatile ("move.w %%sr,%0\n"
+                  "or.l #0x2000,%1\n"
+                  "move.w %1,%%sr\n" : "=r" (i) : "r" (level));
+    return i;
+}
+
+#endif
 #endif
 
 #endif
