@@ -517,6 +517,11 @@ static void format_display(char* buf,
     }
     
     *buf = 0;
+
+    /* If no flags have been set, the line didn't contain any format codes.
+       We still want to refresh it. */
+    if(*flags == 0)
+        *flags = WPS_REFRESH_STATIC;
 }
 
 bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mode)
