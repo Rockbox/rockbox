@@ -1,4 +1,4 @@
-#define _PAGE_ FAQ - Features We Will No Do
+#define _PAGE_ FAQ - Features We Will Not Implement
 #include "head.t"
 
 #include "nodo.raw"
