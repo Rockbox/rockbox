@@ -3,7 +3,7 @@
 #include "manual.t"
 The main menu offers:
 <p>
-[screen dump]
+<img src="rec-menu.png" width=120 height=70 alt="Main menu">
 
 <p>
 Sound Settings -
