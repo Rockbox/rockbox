@@ -1082,3 +1082,43 @@ id: LANG_PM_MAX
 desc: in the peak meter menu
 eng: "Maximum of range"
 new:
+
+id: LANG_RECORDING
+desc: in the main menu
+eng: "Recording"
+new:
+
+id: LANG_RECORDING_GAIN
+desc: in the recording screen
+eng: "Gain"
+new:
+
+id: LANG_RECORDING_LEFT
+desc: in the recording screen
+eng: "Left"
+new:
+
+id: LANG_RECORDING_RIGHT
+desc: in the recording screen
+eng: "Right"
+new:
+
+id: LANG_RECORDING_QUALITY
+desc: in the recording settings
+eng: "Quality"
+new:
+
+id: LANG_RECORDING_FREQUENCY
+desc: in the recording settings
+eng: "Frequency"
+new:
+
+id: LANG_RECORDING_SOURCE
+desc: in the recording settings
+eng: "Source"
+new:
+
+id: LANG_RECORDING_CHANNEL
+desc: in the recording settings
+eng: "Channel"
+new:

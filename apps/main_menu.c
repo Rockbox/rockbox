@@ -41,6 +41,10 @@
 
 #include "lang.h"
 
+#ifdef HAVE_MAS3587F
+#include "recording.h"
+#endif
+
 #ifdef HAVE_LCD_BITMAP
 #include "bmp.h"
 #include "icons.h"
@@ -223,6 +227,9 @@ bool main_menu(void)
     struct menu_items items[] = {
         { str(LANG_SOUND_SETTINGS),     sound_menu        },
         { str(LANG_GENERAL_SETTINGS),   settings_menu     },
+#ifdef HAVE_MAS3587F
+        { str(LANG_RECORDING),   recording_screen     },
+#endif
 #ifdef HAVE_LCD_BITMAP
 #ifdef USE_GAMES
         { str(LANG_GAMES),              games_menu        },
