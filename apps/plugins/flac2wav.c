@@ -19,8 +19,8 @@
 
 #include "plugin.h"
 
-#if (CONFIG_HWCODEC == MASNONE) && !defined(SIMULATOR)
-/* software codec platforms, not for simulator */
+#if (CONFIG_HWCODEC == MASNONE)
+/* software codec platforms */
 
 #include <codecs/libFLAC/include/FLAC/seekable_stream_decoder.h>
 
@@ -65,7 +65,7 @@ FLAC__StreamDecoderWriteStatus flac_write_handler(const FLAC__SeekableStreamDeco
     if (samples*frame->header.channels > (FLAC_MAX_SUPPORTED_BLOCKSIZE*FLAC_MAX_SUPPORTED_CHANNELS)) {
       // ERROR!!!
 #ifdef SIMULATOR
-      fprintf(stderr,"ERROR: samples*frame->header.channels=%d\n",samples*frame->header.channels);
+      printf("ERROR: samples*frame->header.channels=%d\n",samples*frame->header.channels);
 #endif
       return(FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE);
     }

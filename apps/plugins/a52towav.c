@@ -19,8 +19,8 @@
 
 #include "plugin.h"
 
-#if (CONFIG_HWCODEC == MASNONE) && !defined(SIMULATOR)
-/* software codec platforms, not for simulator */
+#if (CONFIG_HWCODEC == MASNONE)
+/* software codec platforms */
 
 #include <inttypes.h>  /* Needed by a52.h */
 
@@ -67,7 +67,7 @@ void ao_play(file_info_struct* file_info,sample_t* samples,int flags) {
     }
   } else {
 #ifdef SIMULATOR
-    fprintf(stderr,"ERROR: unsupported format: %d\n",flags);
+    printf("ERROR: unsupported format: %d\n",flags);
 #endif
   }
 
@@ -109,7 +109,7 @@ void a52_decode_data (file_info_struct* file_info, uint8_t * start, uint8_t * en
 		length = a52_syncinfo (buf, &flags, &sample_rate, &bit_rate);
 		if (!length) {
 #ifdef SIMULATOR
-		    fprintf (stderr, "skip\n");
+		    printf("skip\n");
 #endif
 		    for (bufptr = buf; bufptr < buf + 6; bufptr++)
 			bufptr[0] = bufptr[1];
@@ -150,7 +150,7 @@ void a52_decode_data (file_info_struct* file_info, uint8_t * start, uint8_t * en
 		continue;
 	    error:
 #ifdef SIMULATOR
-		fprintf (stderr, "error\n");
+		printf ("error\n");
 #endif
 		bufptr = buf;
 		bufpos = buf + 7;

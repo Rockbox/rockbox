@@ -19,7 +19,7 @@
 
 /* Various "helper functions" common to all the xxx2wav decoder plugins  */
 
-#if (CONFIG_HWCODEC == MASNONE) && !defined(SIMULATOR)
+#if (CONFIG_HWCODEC == MASNONE)
 /* software codec platforms, not for simulator */
 
 #include "plugin.h"

@@ -19,8 +19,8 @@
 
 #include "plugin.h"
 
-#if (CONFIG_HWCODEC == MASNONE) && !defined(SIMULATOR)
-/* software codec platforms, not for simulator */
+#if (CONFIG_HWCODEC == MASNONE)
+/* software codec platforms */
 
 #include <codecs/libmad/mad.h>
 
