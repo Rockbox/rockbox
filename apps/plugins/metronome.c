@@ -278,7 +278,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
         rb->mp3_play_stop(); // stop audio ISR
 
     calc_period();
-    rb->plugin_register_timer((FREQ/1024), 1, timer_callback);
+    rb->plugin_register_timer(((*rb->cpu_frequency)/1024), 1, timer_callback);
 
     draw_display();
 
