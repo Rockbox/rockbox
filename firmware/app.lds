@@ -36,8 +36,18 @@ SECTIONS
 	*(.vectors)
 	}> ICMEM  AT> FIRMWARE
 
+/* We start at 0x2000, to avoid overwriting Archos' loader datasegment.
+ * If it turns out that we won't call back the loader, this can be set to 0.
+ */
+.bss 0x2000 : {
+	*(.bss)
+	. = ALIGN(2);
+	}> DRAM	
 
-.data 0x2000: { 
+/* Data is put after BSS, to have all strings addresses > VIRT_PTR + VIRT_SIZE.
+   Strings are in rodata, so what we really assert is (.rodata > VIRT_PTR + VIRT_SIZE)
+   See settings.h for details */
+.data ALIGN(2): { 
 	*(.data) 
 	. = ALIGN(2);
 	*(.rodata) 
@@ -46,10 +56,6 @@ SECTIONS
 	. = ALIGN(2);
 	}> DRAM AT> FIRMWARE
 
-.bss ALIGN(2) : {
-	*(.bss)
-	. = ALIGN(2);
-	}> DRAM	
 
 .stack ALIGN(2) : {	
    . = . + 0x2000;
