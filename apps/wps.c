@@ -267,11 +267,11 @@ static int browse_id3(void)
                 break;
 
 #ifdef HAVE_PLAYER_KEYPAD
-            case BUTTON_STOP:
+            case BUTTON_STOP | BUTTON_REL:
 #else
-            case BUTTON_OFF:
+            case BUTTON_OFF | BUTTON_REL:
 #endif
-            case BUTTON_PLAY:
+            case BUTTON_PLAY | BUTTON_REL:
                 lcd_stop_scroll();
                 exit = true;
                 break;
