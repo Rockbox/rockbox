@@ -8,6 +8,7 @@
 #define EFEAT </tr>
 
 #define YES  <td class=fgood>Yes ETD
+#define PARTLY <td class=fgood>Partly ETD
 #define NO   <td class=fbad>No ETD
 #define BADYES  <td class=fbad>Yes ETD
 #define GOODNO  <td class=fgood>No ETD
@@ -139,7 +140,7 @@ EFEAT
 
 NAME Generates XING VBR header when recording ENAME
 YES
-NO
+YES
 EFEAT
 
 NAME High Resolution Volume Control ENAME
@@ -173,7 +174,7 @@ YES
 EFEAT
 
 NAME Supports the VBRI header ENAME
-NO
+PARTLY
 YES
 EFEAT
 
