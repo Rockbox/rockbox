@@ -1706,10 +1706,45 @@ new: "Lagalista stjórnar skrá er ógild"
 id: LANG_RECURSE_DIRECTORY
 desc: In playlist menu
 eng: "Recursively Insert Directories"
-new: "Bæta öllum Skrám í skrá"
+new: "Bæta öllum Skrám í lagalistaskrá"
 
 id: LANG_RECURSE_DIRECTORY_QUESTION
 desc: Asked from onplay screen
 eng: "Recursively?"
-new: "Bæta öllum Skrám í skrá?"
+new: "Bæta við undirskám?"
+
+id: LANG_CUSTOM_FONT
+desc: in setting_menu()
+eng: "Fonts"
+new: "Bókstafir"
+
+id: LANG_FIRMWARE
+desc: in the main menu
+eng: "Firmware"
+new: "Stýrikerfi"
+
+id: LANG_LANGUAGE
+desc: in settings_menu
+eng: "Language"
+new: "Tungumál"
+
+id: LANG_WHILE_PLAYING
+desc: in settings_menu()
+eng: "While Playing Screen"
+new: "Á meðan lag er spila skjár"
+
+id: LANG_CUSTOM_CFG
+desc: in setting_menu()
+eng: "Configurations"
+new: "Uppsetningar"
+
+id: LANG_PLUGINS
+desc: in main_menu()
+eng: "Plugins"
+new: "Hugbúnaður"
+
+id: LANG_CAR_ADAPTER_MODE
+desc: Displayed for setting car adapter mode to on/off
+eng: "Car Adapter Mode"
+new: "Bíla tengi stilling"
 
