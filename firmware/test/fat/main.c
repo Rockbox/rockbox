@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <time.h>
+#include <sys/time.h>
 #include "fat.h"
 #include "debug.h"
 #include "disk.h"
@@ -84,13 +86,15 @@ void dbg_dir(char* currdir)
 }
 
 #define CHUNKSIZE 8
+#define BUFSIZE 8192
 
 int dbg_mkfile(char* name, int num)
 {
-    char text[8192];
+    char text[BUFSIZE+1];
     int i;
     int fd;
     int x=0;
+    bool stop = false;
 
     fd = open(name,O_WRONLY);
     if (fd<0) {
@@ -100,7 +104,7 @@ int dbg_mkfile(char* name, int num)
     num *= 1024;
     while ( num ) {
         int rc;
-        int len = num > sizeof text ? sizeof text : num;
+        int len = num > BUFSIZE ? BUFSIZE : num;
 
         for (i=0; i<len/CHUNKSIZE; i++ )
             sprintf(text+i*CHUNKSIZE,"%c%06x,",name[1],x++);
@@ -113,23 +117,35 @@ int dbg_mkfile(char* name, int num)
         else
             if ( rc == 0 ) {
                 DEBUGF("No space left\n");
-                break;
+                return -2;
             }
             else
                 DEBUGF("wrote %d bytes\n",rc);
 
         num -= len;
+
+        if ( !num ) {
+            if ( stop )
+                break;
+
+            /* add a random number of chunks to test byte-copy code */
+            num = ((int) rand() % SECTOR_SIZE) & ~7;
+            LDEBUGF("Adding random size %d\n",num);
+            stop = true;
+        }
     }
-    
+
     close(fd);
     return 0;
 }
+
 
 int dbg_chkfile(char* name, int size)
 {
     char text[81920];
     int i;
     int x=0;
+    int pos = 0;
     int block=0;
     int fd = open(name,O_RDONLY);
     if (fd<0) {
@@ -137,18 +153,21 @@ int dbg_chkfile(char* name, int size)
         return -1;
     }
 
-    if (size) {
-        lseek(fd, size*512, SEEK_SET);
-        x = size * 1024 / 16;
-        LDEBUGF("Check base is %x\n",x);
-    }
+    size = lseek(fd, 0, SEEK_END);
+    DEBUGF("File is %d bytes\n", size);
+    /* random start position */
+    if ( size )
+        pos = ((int)rand() % size) & ~7;
+    lseek(fd, pos, SEEK_SET);
+    x = pos / CHUNKSIZE;
+
+    LDEBUGF("Check base is %x (%d)\n",x,pos);
 
     while (1) {
         int rc = read(fd, text, sizeof text);
         DEBUGF("read %d bytes\n",rc);
         if (rc < 0) {
-            DEBUGF("Failed writing data\n");
-            return -1;
+            panicf("Failed reading data\n");
         }
         else {
             char tmp[CHUNKSIZE+1];
@@ -157,13 +176,86 @@ int dbg_chkfile(char* name, int size)
             for (i=0; i<rc/CHUNKSIZE; i++ ) {
                 sprintf(tmp,"%c%06x,",name[1],x++);
                 if (strncmp(text+i*CHUNKSIZE,tmp,CHUNKSIZE)) {
-                    DEBUGF("Mismatch in byte %x (sector %d). Expected %.8s found %.8s\n",
-                           block*sizeof(text)+i*CHUNKSIZE,
-                           (block*sizeof(text)+i*CHUNKSIZE) / SECTOR_SIZE,
+                    int idx = pos + block*sizeof(text) + i*CHUNKSIZE;
+                    DEBUGF("Mismatch in byte 0x%x (byte 0x%x of sector 0x%x)."
+                           "\nExpected %.8s found %.8s\n",
+                           idx, idx % SECTOR_SIZE, idx / SECTOR_SIZE,
                            tmp,
                            text+i*CHUNKSIZE);
-                    dbg_dump_buffer(text+i*CHUNKSIZE - 0x20, 0x40, 
-                                    block*sizeof(text)+i*CHUNKSIZE - 0x20);
+                    DEBUGF("i=%x, idx=%x\n",i,idx);
+                    dbg_dump_buffer(text+i*CHUNKSIZE - 0x20, 0x40, idx - 0x20);
+                    return -1;
+                }
+            }
+        }
+        block++;
+    }
+    
+    close(fd);
+
+    return 0;
+}
+
+int dbg_wrtest(char* name)
+{
+    char text[81920];
+    int i;
+    int x=0;
+    int pos = 0;
+    int block=0;
+    int size, fd, rc;
+    char tmp[CHUNKSIZE+1];
+
+    fd = open(name,O_RDWR);
+    if (fd<0) {
+        DEBUGF("Failed opening file\n");
+        return -1;
+    }
+
+    size = lseek(fd, 0, SEEK_END);
+    DEBUGF("File is %d bytes\n", size);
+    /* random start position */
+    if ( size )
+        pos = ((int)rand() % size) & ~7;
+    rc = lseek(fd, pos, SEEK_SET);
+    if ( rc < 0 )
+        panicf("Failed seeking\n");
+    x = pos / CHUNKSIZE;
+    LDEBUGF("Check base is %x (%d)\n",x,pos);
+
+    sprintf(tmp,"%c%06x,",name[1],x++);
+    rc = write(fd, tmp, 8);
+    if ( rc < 0 )
+        panicf("Failed writing data\n");
+
+    if ( size )
+        pos = ((int)rand() % size) & ~7;
+    rc = lseek(fd, pos, SEEK_SET);
+    if ( rc < 0 )
+        panicf("Failed seeking\n");
+    x = pos / CHUNKSIZE;
+    LDEBUGF("Check base 2 is %x (%d)\n",x,pos);
+
+    while (1) {
+        rc = read(fd, text, sizeof text);
+        DEBUGF("read %d bytes\n",rc);
+        if (rc < 0) {
+            panicf("Failed reading data\n");
+        }
+        else {
+            if (!rc)
+                break;
+            for (i=0; i<rc/CHUNKSIZE; i++ ) {
+                sprintf(tmp,"%c%06x,",name[1],x++);
+                if (strncmp(text+i*CHUNKSIZE,tmp,CHUNKSIZE)) {
+                    int idx = pos + block*sizeof(text) + i*CHUNKSIZE;
+                    DEBUGF("Mismatch in byte 0x%x (byte 0x%x of sector 0x%x)."
+                           "\nExpected %.8s found %.8s\n",
+                           idx, idx % SECTOR_SIZE, idx / SECTOR_SIZE,
+                           tmp,
+                           text+i*CHUNKSIZE);
+                    DEBUGF("i=%x, idx=%x\n",i,idx);
+                    dbg_dump_buffer(text+i*CHUNKSIZE - 0x20, 0x40, idx - 0x20);
                     return -1;
                 }
             }
@@ -207,6 +299,64 @@ void dbg_type(char* name)
     close(fd);
 }
 
+int dbg_append(char* name)
+{
+    int x=0;
+    int size, fd, rc;
+    char tmp[CHUNKSIZE+1];
+
+    fd = open(name,O_RDONLY);
+    if (fd<0) {
+        DEBUGF("Failed opening file\n");
+        return -1;
+    }
+
+    size = lseek(fd, 0, SEEK_END);
+    DEBUGF("File is %d bytes\n", size);
+    x = size / CHUNKSIZE;
+    LDEBUGF("Check base is %x (%d)\n",x,size);
+
+    close(fd);
+
+    fd = open(name,O_RDWR|O_APPEND);
+    if (fd<0) {
+        DEBUGF("Failed opening file\n");
+        return -1;
+    }
+
+    sprintf(tmp,"%c%06x,",name[1],x++);
+    rc = write(fd, tmp, 8);
+    if ( rc < 0 )
+        panicf("Failed writing data\n");
+
+    close(fd);
+
+    return 0;
+}
+
+int dbg_dump(char* name, int offset)
+{
+    char buf[SECTOR_SIZE];
+
+    int rc;
+    int fd = open(name,O_RDONLY);
+    if (fd<0) {
+        DEBUGF("Failed opening file\n");
+        return -1;
+    }
+    lseek(fd, offset, SEEK_SET);
+    rc = read(fd, buf, sizeof buf);
+
+    if ( rc < 0 )
+        panicf("Error reading data\n");
+
+    close(fd);
+
+    dbg_dump_buffer(buf, rc, offset);
+
+    return 0;
+}
+
 void dbg_tail(char* name)
 {
     unsigned char buf[SECTOR_SIZE*5];
@@ -240,14 +390,14 @@ void dbg_tail(char* name)
     close(fd);
 }
 
-void dbg_head(char* name)
+int dbg_head(char* name)
 {
     unsigned char buf[SECTOR_SIZE*5];
     int fd,rc;
 
     fd = open(name,O_RDONLY);
     if (fd<0)
-        return;
+        return -1;
     DEBUGF("Got file descriptor %d\n",fd);
     
     rc = read(fd, buf, SECTOR_SIZE*3);
@@ -265,19 +415,36 @@ void dbg_head(char* name)
     }
 
     close(fd);
+    return 0;
 }
 
-int dbg_del(char* name)
+int dbg_trunc(char* name, int size)
 {
-    return remove(name);
-}
+    int fd,rc;
 
-char current_directory[256] = "\\";
-int last_secnum = 0;
+#if 1
+    fd = open(name,O_RDWR);
+    if (fd<0)
+        return -1;
 
-void dbg_prompt(void)
-{
-    DEBUGF("C:%s> ", current_directory);
+    rc = ftruncate(fd, size);
+    if (rc<0) {
+        DEBUGF("ftruncate(%d) failed\n", size);
+        return -2;
+    }
+
+#else
+    fd = open(name,O_RDWR|O_TRUNC);
+    if (fd<0)
+        return -1;
+
+    rc = lseek(fd, size, SEEK_SET);
+    if (fd<0)
+        return -2;
+#endif
+
+    close(fd);
+    return 0;
 }
 
 int dbg_cmd(int argc, char *argv[])
@@ -306,6 +473,11 @@ int dbg_cmd(int argc, char *argv[])
                " mkfile <file> <size (KB)>\n"
                " chkfile <file>\n"
                " del <file>\n"
+               " dump <file> <offset>\n"
+               " mkdir <dir>\n"
+               " trunc <file> <size>\n"
+               " wrtest <file>\n"
+               " append <file>\n"
             );
         return -1;
     }
@@ -335,7 +507,7 @@ int dbg_cmd(int argc, char *argv[])
     if (!strcasecmp(cmd, "head"))
     {
         if (arg1)
-            dbg_head(arg1);
+            return dbg_head(arg1);
     }
             
     if (!strcasecmp(cmd, "tail"))
@@ -367,7 +539,41 @@ int dbg_cmd(int argc, char *argv[])
     if (!strcasecmp(cmd, "del"))
     {
         if (arg1)
-            return dbg_del(arg1);
+            return remove(arg1);
+    }
+
+    if (!strcasecmp(cmd, "dump"))
+    {
+        if (arg1) {
+            if (arg2)
+                return dbg_dump(arg1, atoi(arg2));
+            else
+                return dbg_dump(arg1, 0);
+        }
+    }
+
+    if (!strcasecmp(cmd, "dump"))
+    {
+        if (arg1)
+            return mkdir(arg1);
+    }
+
+    if (!strcasecmp(cmd, "wrtest"))
+    {
+        if (arg1)
+            return dbg_wrtest(arg1);
+    }
+
+    if (!strcasecmp(cmd, "append"))
+    {
+        if (arg1)
+            return dbg_append(arg1);
+    }
+
+    if (!strcasecmp(cmd, "trunc"))
+    {
+        if (arg1 && arg2)
+            return dbg_trunc(arg1, atoi(arg2));
     }
 
     return 0;
@@ -379,6 +585,10 @@ int main(int argc, char *argv[])
 {
     int rc,i;
     struct partinfo* pinfo;
+    struct timeval tv;
+
+    gettimeofday(&tv, NULL);
+    srand(tv.tv_usec);
 
     if(ata_init("disk.img")) {
         DEBUGF("*** Warning! The disk is uninitialized\n");
