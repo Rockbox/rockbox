@@ -40,9 +40,10 @@ changes done to multiple:
  diff programs don't have that, and then -c (for 'context diff') is OK.
 
 <h2>Submitting A Patch</h2>
-<p>All patches that are meant for inclusion in the sources should be posted to 
-the <a href="http://sourceforge.net/tracker/?group_id=44306&atid=439120">patch tracker</a>.  
-Patches sent to the mailing list are quickly lost in the traffic of the list itself.  
+<p>All patches that are meant for inclusion in the sources should follow the 
+format listed on the <a href="contributing.html">Contributing to Rockbox</a> page, and be posted to the <a href="http://sourceforge.net/tracker/?group_id=44306&atid=439120">patch tracker</a>.  Patches sent to the mailing list are quickly lost in the traffic of the list itself.
+<p>
+ Please keep in mind that not all submitted patches will be accepted.
 
 <h2>Applying A Patch</h2>
 <p>
