@@ -583,7 +583,8 @@ bool settings_load_eq(char* file)
         else if (!strcasecmp(name, "balance"))
             set_eq_sound(value, SOUND_BALANCE, &global_settings.balance);
         else if (!strcasecmp(name, "channels"))
-            set_eq_sound(value, SOUND_CHANNELS, &global_settings.bass);
+            set_eq_sound(value, SOUND_CHANNELS,
+                         &global_settings.channel_config);
 #ifdef HAVE_MAS3587F
         else if (!strcasecmp(name, "loudness"))
             set_eq_sound(value, SOUND_LOUDNESS, &global_settings.loudness);
