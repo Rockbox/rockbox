@@ -60,7 +60,7 @@ int lang_load(const char *filename)
                 id = (ptr[0]<<8) | ptr[1];  /* get two-byte id */
                 ptr+=2;                     /* pass the id */
                 if(id < LANG_LAST_INDEX_IN_ARRAY) {
-#ifdef SIMULATOR
+#if 0
                     printf("%2x New: %30s ", id, ptr);
                     printf("Replaces: %s\n", language_strings[id]);
 #endif
