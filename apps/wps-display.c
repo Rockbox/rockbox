@@ -40,6 +40,7 @@
 #include "mas.h"
 #include "lang.h"
 #include "powermgmt.h"
+#include "sprintf.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"

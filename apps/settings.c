@@ -53,6 +53,7 @@
 #include "language.h"
 #include "wps-display.h"
 #include "powermgmt.h"
+#include "sprintf.h"
 
 struct user_settings global_settings;
 char rockboxdir[] = ROCKBOX_DIR;       /* config/font/data file directory */

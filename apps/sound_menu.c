@@ -31,6 +31,7 @@
 #include "icons.h"
 #endif
 #include "lang.h"
+#include "sprintf.h"
 
 static char *fmt[] =
 {
