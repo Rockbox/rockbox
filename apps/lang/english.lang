@@ -1,0 +1,14 @@
+id: LANG_SOUND_SETTINGS
+desc: in the main menu
+eng: "Sound Settings"
+new:
+
+id: LANG_GENERAL_SETTINGS
+desc: in the main menu
+eng: "General Settings"
+new:
+
+id: LANG_GAMES
+desc: in the main menu
+eng: "Games"
+new:
