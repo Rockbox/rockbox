@@ -139,10 +139,10 @@ void ide_power_enable(bool on)
     else
         GPIO_OUT |= 0x80000000;
 #elif defined(GMINI_ARCH)
-    if (on)
-        P1 |= 0x04;
+    if(on)
+        P1 |= 0x08;
     else
-        P2 &= ~0x04;
+        P1 &= ~0x08;
 #else
     bool touched = false;
 #ifdef NEEDS_ATA_POWER_ON
@@ -190,7 +190,7 @@ bool ide_powered(void)
 #ifdef IRIVER_H100
     return (GPIO_OUT & 0x80000000)?false:true;
 #elif defined(GMINI_ARCH)
-    return (P1 & 0x04?true:false);
+    return (P1 & 0x08?true:false);
 #else
 #if defined(NEEDS_ATA_POWER_ON) || defined(HAVE_ATA_POWER_OFF)
 #ifdef ATA_POWER_PLAYERSTYLE

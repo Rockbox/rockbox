@@ -199,7 +199,7 @@ extern void set_pll_freq(int pll_index, long freq_out);
 
 extern void* volatile interrupt_vector[16]  __attribute__ ((section(".idata")));
 
-extern void ddma_transfer(int dir, int mem, long intAddr, long extAddr,
+extern void ddma_transfer(int dir, int mem, void* intAddr, long extAddr,
                           int num);
 
 

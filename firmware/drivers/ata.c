@@ -30,6 +30,8 @@
 #include "string.h"
 #include "hwcompat.h"
 
+#define SECTOR_SIZE     (512)
+
 #if CONFIG_CPU == MCF5249
 
 /* don't use sh7034 assembler routines */
@@ -162,8 +164,8 @@
 #define READ_PATTERN3 0xaa
 #define READ_PATTERN4 0x55
 
-extern int idatastart __attribute__ ((section(".idata")));
 
+static unsigned char ide_sector_data[SECTOR_SIZE] __attribute__ ((section(".idata")));
 static unsigned ide_reg_temp __attribute__ ((section(".idata")));
 
 void ide_write_register(int reg, int value) {
@@ -175,7 +177,7 @@ void ide_write_register(int reg, int value) {
     ide_reg_temp = value;
 
     long extAddr = (long)reg << 16;
-    ddma_transfer(1, 1, (char*)&ide_reg_temp - (char*)&idatastart, extAddr, 2);  
+    ddma_transfer(1, 1, &ide_reg_temp, extAddr, 2);  
 
     /* set the RAM speed to 6 cycles.
     unsigned char miuscfg = MIUSCFG;
@@ -190,7 +192,7 @@ int ide_read_register(int reg) {
        MIUSCFG = miuscfg; */
   
     long extAddr = (long)reg << 16;
-    ddma_transfer(0, 1, (char*)&ide_reg_temp - (char*)&idatastart, extAddr, 2);
+    ddma_transfer(0, 1, &ide_reg_temp, extAddr, 2);
   
     /* This is done like this in the archos firmware... 
        miuscfg = MIUSCFG;
@@ -229,7 +231,6 @@ int ide_read_register(int reg) {
 
 #define READ_TIMEOUT 5*HZ
 
-#define SECTOR_SIZE     512
 
 static struct mutex ata_mtx;
 char ata_device; /* device 0 (master) or 1 (slave) */
@@ -364,6 +365,16 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
         } while (++wbuf < wbufend); /* tail loop is faster */
     }
 #else
+#if CONFIG_CPU == TCC730
+    int sectorcount = wordcount / 0x100;
+    do {
+        /* Slurp an entire sector with a single dma transfer */
+        ddma_transfer(0, 1, ide_sector_data, ATA_DATA_IDX << 16, SECTOR_SIZE);
+        memcpy(buf, ide_sector_data, SECTOR_SIZE);
+        buf += SECTOR_SIZE;
+        sectorcount--;
+    } while (sectorcount > 0);
+#else
     /* turbo-charged assembler version */
     /* this assumes wordcount to be a multiple of 4 */
     asm (
@@ -458,6 +469,7 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
         : /*trashed */
         "r0","r1","r2","r3"
     );
+#endif
 #endif
 }
 
@@ -1071,14 +1083,22 @@ int ata_hard_reset(void)
     GPIO_OUT |= 0x00080000;
     sleep(1); /* > 25us */
 #elif CONFIG_CPU == TCC730
+
+    P6 &= ~0x40;
+    ddma_transfer(0, 1, ide_sector_data, 0xF00000, SECTOR_SIZE);
+    P6 |= 0x40;
+    
+    /*
+      What can the following do?
     P1 |= 0x04;
     P10CON &= ~0x56;
-    sleep(1); /* > ???ms */
+    sleep(1);
 
     P10CON |= 0x56;
     P10 &= ~0x56;
     P1 &= ~0x04;
-    sleep(1); /* > ???ms */
+    sleep(1);
+    */
 #endif
 
     /* state HRR2 */
@@ -1206,10 +1226,7 @@ void ata_enable(bool on)
     GPIO_ENABLE |= 0x00040000;
     GPIO_FUNCTION |= 0x00040000;
 #elif CONFIG_CPU == TCC730
-    if(on)
-        P1 |= 0x08;
-    else
-        P1 &= ~0x08;
+
 #endif
 }
 
@@ -1358,8 +1375,7 @@ int ata_init(void)
 {
     int rc;
 #if CONFIG_CPU == TCC730
-    /* TODO: check for cold start (never happenning now) */
-    bool coldstart = false;
+    bool coldstart = (P1 & 0x80) == 0;
 #elif CONFIG_CPU == MCF5249
     bool coldstart = (GPIO_FUNCTION & 0x00080000) == 0;
 #else

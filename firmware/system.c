@@ -34,13 +34,13 @@ void ddma_wait_idle(void)
     } while ((DDMACOM & 3) != 0);
 }
 
-void ddma_transfer(int dir, int mem, long intAddr, long extAddr, int num)
+void ddma_transfer(int dir, int mem, void* intAddr, long extAddr, int num)
     __attribute__ ((section (".icode")));
-void ddma_transfer(int dir, int mem, long intAddr, long extAddr, int num) {
+void ddma_transfer(int dir, int mem, void* intAddr, long extAddr, int num) {
     int irq = set_irq_level(1);
     ddma_wait_idle();
     long externalAddress = (long) extAddr;
-    long internalAddress = (long) intAddr;
+    long internalAddress = ((long) intAddr) & 0xFFFF;
     /* HW wants those two in word units. */
     num /= 2;
     externalAddress /= 2;
@@ -130,10 +130,9 @@ void smsc_delay() {
 }
 
 static void extra_init(void) {
-    /* Power on 
-       P1 |= 0x01;
-       P1CON |= 0x01;
-    */
+    /* Power on stuff */
+    P1 |= 0x07;
+    P1CON |= 0x1f;
     
     /* SMSC chip config (?) */
     P6CON |= 0x08;
@@ -147,7 +146,7 @@ static void extra_init(void) {
     }
     
     /* P5 conf
-     * line 2 & 4 are digital, other analog. : P5CON = 0xec;
+     * lines 0, 1 & 4 are digital, other analog. : P5CON = 0xec;
      */
     
     /* P7 conf
