@@ -23,8 +23,7 @@
 
 #ifdef HAVE_ONDIO_ADC
 
-#define ADC_MMC_SWITCH          0 /* Battery voltage always reads 0x3FF due to
-                                     silly scaling */
+#define ADC_MMC_SWITCH          0 /* low values if MMC inserted */
 #define ADC_USB_POWER           1 /* USB, reads 0x000 when USB is inserted */
 #define ADC_BUTTON_OPTION       2 /* the option button, low value if pressed */
 #define ADC_BUTTON_ONOFF        3 /* the on/off button, high value if pressed */

@@ -84,9 +84,9 @@ static void usb_enable(bool on)
     }
     else
     {
-        and_b(~0x20, &PADRL);
+        and_b(~0x20, &PADRL); /* disable USB */
     }
-    or_b(0x20, &PAIORL);
+    or_b(0x20, &PAIORL); /* output for USB enable */
 #else /* standard HD Jukebox */
     if(on)
     {

@@ -29,6 +29,7 @@
 #include "power.h"
 #include "string.h"
 #include "hwcompat.h"
+#include "adc.h"
 
 /* use file for an MMC-based system, FIXME in makefile */
 #ifdef HAVE_MMC 
@@ -257,9 +258,23 @@ int ata_init(void)
 
     led(false);
 
-    /* ToDo: Port setup */
-    // PAIOR |= 0x1680;
+    /* Port setup */
+    PADR |= 0x1600; /* set all the selects high (=inactive) */
+    PAIOR |= 0x1600; /* make outputs for them */
+    PAIOR &= ~0x0008; /* input for card detect */
 
+    /* serial setup */
+    PBCR1 &= ~0x0CF0; /* use PB10, PB11, PB13 */
+    PBCR1 |=  0x08A0; /*  as RxD1, TxD1, SCK1 */
+
+    if(adc_read(ADC_MMC_SWITCH) < 0x200)
+    {   /* MMC inserted */
+        PADR |= 0x0200;
+    }
+    else
+    {   /* no MMC, use internal memory */
+        PADR |= 0x0400;
+    }
 
     sleeping = false;
     ata_enable(true);
