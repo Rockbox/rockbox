@@ -124,7 +124,7 @@ LRESULT CALLBACK GUIWndProc (
                 break;
             case WMSZ_BOTTOMRIGHT:
                 GetWindowRect (hWnd, &r2);
-                if (abs(r2.right - r->right) > abs(r2.bottom - r->bottom))
+                if (r2.right - r->right > r2.bottom - r->bottom)
                     v = (r->right - r->left) / (UI_WIDTH / 5);
                 else
                     v = (r->bottom - r->top) / (UI_HEIGHT / 5);
@@ -135,7 +135,7 @@ LRESULT CALLBACK GUIWndProc (
                 break;
             case WMSZ_BOTTOMLEFT:
                 GetWindowRect (hWnd, &r2);
-                if (abs(r2.left - r->left) > abs(r2.bottom - r->bottom))
+                if (-(r2.left - r->left) > r2.bottom - r->bottom)
                     v = (r->right - r->left) / (UI_WIDTH / 5);
                 else
                     v = (r->bottom - r->top) / (UI_HEIGHT / 5);
@@ -146,7 +146,7 @@ LRESULT CALLBACK GUIWndProc (
                 break;
             case WMSZ_TOPRIGHT:
                 GetWindowRect (hWnd, &r2);
-                if (abs(r2.right - r->right) > abs(r2.top - r->top))
+                if (r2.right - r->right > -(r2.top - r->top))
                     v = (r->right - r->left) / (UI_WIDTH / 5);
                 else
                     v = (r->bottom - r->top) / (UI_HEIGHT / 5);
@@ -157,7 +157,7 @@ LRESULT CALLBACK GUIWndProc (
                 break;
             case WMSZ_TOPLEFT:
                 GetWindowRect (hWnd, &r2);
-                if (abs(r2.left - r->left) > abs(r2.top - r->top))
+                if (-(r2.left - r->left) > -(r2.top - r->top))
                     v = (r->right - r->left) / (UI_WIDTH / 5);
                 else
                     v = (r->bottom - r->top) / (UI_HEIGHT / 5);
@@ -168,7 +168,7 @@ LRESULT CALLBACK GUIWndProc (
                 break;
             }
 
-            wsprintf (s, UI_TITLE " @%d%%", 
+            wsprintf (s, UI_TITLE " @%d%%",
                 (r->right - r->left - GetSystemMetrics (SM_CXSIZEFRAME) * 2 -4)
                 * 100 / UI_WIDTH);
             SetWindowText (hWnd, s);
@@ -177,15 +177,13 @@ LRESULT CALLBACK GUIWndProc (
         }
     case WM_ERASEBKGND:
         {
-            PAINTSTRUCT ps;
-            HDC hDc = BeginPaint (hWnd, &ps);
+            HDC hDc = (HDC) wParam;
             RECT r;
 
             GetClientRect (hWnd, &r);
             // blit background image to screen
             StretchBlt (hDc, 0, 0, r.right, r.bottom,
                 hMemDc, 0, 0, UI_WIDTH, UI_HEIGHT, SRCCOPY);
-            EndPaint (hWnd, &ps);
             return TRUE;
         }
     case WM_PAINT:
