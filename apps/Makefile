@@ -42,6 +42,8 @@ ifeq ($(TARGET),-DARCHOS_RECORDER)
    CFLAGS += -Irecorder
    OUTNAME = ajbrec.ajz
 else
+   SRC += $(wildcard player/*.c)
+   CFLAGS += -Iplayer
    OUTNAME = archos.mod
 endif
 
@@ -77,7 +79,12 @@ clean:
 	-$(RM) -r $(OBJDIR)/$(DEPS)
 
 DEPS:=.deps
-DEPDIRS:=$(DEPS) $(DEPS)/recorder
+DEPDIRS:=$(DEPS)
+ifeq ($(TARGET),-DARCHOS_RECORDER)
+DEPDIRS += $(DEPS)/recorder
+else
+DEPDIRS +=  $(DEPS)/player
+endif
 
 DIRS = $(subst $(DEPS),".",$(DEPDIRS)) 
 
