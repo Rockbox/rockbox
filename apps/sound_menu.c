@@ -32,7 +32,9 @@ enum { Volume, Bass, Treble, numsettings };
 
 static void soundsetting(int setting)
 {
-    static int savedsettings[numsettings] = { 50, 50, 50 };
+    static int savedsettings[numsettings] = { DEFAULT_VOLUME_SETTING,
+                                              DEFAULT_BASS_SETTING,
+                                              DEFAULT_TREBLE_SETTING};
     static const char* names[] = { "Volume", "Bass", "Treble" };
     static settingfunc funcs[] = { mpeg_volume, mpeg_bass, mpeg_treble };
 
