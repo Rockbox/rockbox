@@ -484,7 +484,8 @@ static bool ask_resume(bool ask_once)
 #endif
                 /* Handle sys events, ignore button releases */
             default:
-                if(default_event_handler(button) || !(button & BUTTON_REL))
+                if(default_event_handler(button) == SYS_USB_CONNECTED ||
+                   (!(button & SYS_EVENT) && !(button & BUTTON_REL)))
                     stop = true;
                 break;
         }

@@ -63,7 +63,7 @@ static bool car_adapter_mode(void)
                              &global_settings.car_adapter_mode,
                              STR(LANG_SET_BOOL_YES),
                              STR(LANG_SET_BOOL_NO),
-                             set_car_adapter_mode);
+                             NULL);
 }
 #endif
 

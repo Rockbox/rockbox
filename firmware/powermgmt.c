@@ -89,11 +89,6 @@ void set_battery_capacity(int capacity)
   (void)capacity;
 }
 
-void set_car_adapter_mode(bool setting)
-{
-    (void)setting;
-}
-
 void reset_poweroff_timer(void)
 {
 }
@@ -150,9 +145,6 @@ static enum {
     CHARGER_PLUGGED,                /* transient state */
     CHARGER
 } charger_input_state;
-
-static bool waiting_to_resume_play = false;
-static long play_resume_time;
 #endif
 
 #ifdef HAVE_CHARGE_CTRL
@@ -191,8 +183,6 @@ static int battery_type     = 0;
 
 /* Power history: power_history[0] is the newest sample */
 unsigned short power_history[POWER_HISTORY_LEN];
-
-static bool car_adapter_mode_enabled = false;
 
 static char power_stack[DEFAULT_STACK_SIZE + DEBUG_STACK];
 static const char power_thread_name[] = "power";
@@ -401,47 +391,6 @@ static void handle_auto_poweroff(void)
     }
 }
 
-void set_car_adapter_mode(bool setting)
-{
-    car_adapter_mode_enabled = setting;
-}
-
-#ifdef HAVE_CHARGING
-static void car_adapter_mode_processing(void)
-{    
-    if (car_adapter_mode_enabled) {
-
-        if (waiting_to_resume_play) {
-            if (TIME_AFTER(current_tick, play_resume_time)) {
-                if (audio_status() & AUDIO_STATUS_PAUSE) {
-                    audio_resume(); 
-                }
-                waiting_to_resume_play = false;
-            }
-        } else {
-            if (charger_input_state == CHARGER_UNPLUGGED) {
-                /*
-                 * Just got unplugged, pause if playing
-                 */
-                if ((audio_status() & AUDIO_STATUS_PLAY) &&
-                    !(audio_status() & AUDIO_STATUS_PAUSE)) {
-                    audio_pause(); 
-                }
-            } else if(charger_input_state == CHARGER_PLUGGED) { 
-                /*
-                 * Just got plugged in, delay & resume if we were playing
-                 */
-                if (audio_status() & AUDIO_STATUS_PAUSE) {
-                    /* delay resume a bit while the engine is cranking */
-                    play_resume_time = current_tick + HZ*5;
-                    waiting_to_resume_play = true;
-                }
-            }
-        }
-    }
-}
-#endif
-
 /*
  * Estimate how much current we are drawing just to run.
  */
@@ -507,6 +456,7 @@ static void power_thread_sleep(int ticks)
                     charger_input_state = CHARGER_PLUGGED;
                     return;
                 case CHARGER_PLUGGED:
+                    queue_broadcast(SYS_CHARGER_CONNECTED, NULL);
                     charger_input_state = CHARGER;
                     break;
                 case CHARGER:
@@ -517,6 +467,7 @@ static void power_thread_sleep(int ticks)
                 case NO_CHARGER:
                     break;
                 case CHARGER_UNPLUGGED:
+                    queue_broadcast(SYS_CHARGER_DISCONNECTED, NULL);
                     charger_input_state = NO_CHARGER;
                     break;
                 case CHARGER_PLUGGED:
@@ -531,9 +482,6 @@ static void power_thread_sleep(int ticks)
         sleep(small_ticks);
         ticks -= small_ticks;
 
-#ifdef HAVE_CHARGING
-        car_adapter_mode_processing();
-#endif
 #ifdef HAVE_ALARM_MOD
         power_thread_rtc_process();
 #endif

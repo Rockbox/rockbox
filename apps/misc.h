@@ -44,5 +44,6 @@ bool settings_parseline(char* line, char** name, char** value);
 bool clean_shutdown(void);
 long default_event_handler_ex(long event, void (*callback)(void *), void *parameter);
 long default_event_handler(long event);
+void car_adapter_mode_init(void);
 
 #endif

@@ -58,7 +58,7 @@
 #include "power.h"
 #include "talk.h"
 #include "plugin.h"
-
+#include "misc.h"
 
 #if (CONFIG_HWCODEC == MASNONE)
 #include "pcm_playback.h"
@@ -270,6 +270,9 @@ void init(void)
 
 #if (CONFIG_HWCODEC == MASNONE)
     pcm_init();
+#endif
+#ifdef HAVE_CHARGING
+    car_adapter_mode_init();
 #endif
 }
 

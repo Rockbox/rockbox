@@ -825,8 +825,6 @@ void settings_apply(void)
         lang_load(buf);
         talk_init(); /* use voice of same language */
     }
-
-    set_car_adapter_mode(global_settings.car_adapter_mode);
 }
 
 

@@ -43,6 +43,8 @@
 #define SYS_MMC_EXTRACTED         ((SYS_EVENT | ((long)7 << 27)))
 #define SYS_POWEROFF              ((SYS_EVENT | ((long)8 << 27)))
 #define SYS_FS_CHANGED            ((SYS_EVENT | ((long)9 << 27)))
+#define SYS_CHARGER_CONNECTED     ((SYS_EVENT | ((long)10 << 27)))
+#define SYS_CHARGER_DISCONNECTED  ((SYS_EVENT | ((long)11 << 27)))
 
 struct event
 {

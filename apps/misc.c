@@ -31,6 +31,7 @@
 #include "screens.h"
 #include "talk.h"
 #include "mpeg.h"
+#include "audio.h"
 #include "mp3_playback.h"
 #include "settings.h"
 #include "ata.h"
@@ -289,6 +290,61 @@ bool clean_shutdown(void)
     return false;
 }
 
+#ifdef HAVE_CHARGING
+static bool waiting_to_resume_play = false;
+static long play_resume_tick;
+
+static void car_adapter_mode_processing(bool inserted)
+{    
+    if (global_settings.car_adapter_mode)
+    {
+        if(inserted)
+        { 
+            /*
+             * Just got plugged in, delay & resume if we were playing
+             */
+            if (audio_status() & AUDIO_STATUS_PAUSE)
+            {
+                /* delay resume a bit while the engine is cranking */
+                play_resume_tick = current_tick + HZ*5;
+                waiting_to_resume_play = true;
+            }
+        }
+        else
+        {
+            /*
+             * Just got unplugged, pause if playing
+             */
+            if ((audio_status() & AUDIO_STATUS_PLAY) &&
+                !(audio_status() & AUDIO_STATUS_PAUSE))
+            {
+                audio_pause(); 
+            }
+        }
+    }
+}
+
+static void car_adapter_tick(void)
+{
+    if (waiting_to_resume_play)
+    {
+        if (TIME_AFTER(current_tick, play_resume_tick))
+        {
+            if (audio_status() & AUDIO_STATUS_PAUSE)
+            {
+                audio_resume(); 
+            }
+            waiting_to_resume_play = false;
+        }
+    }
+}
+
+void car_adapter_mode_init(void)
+{
+    tick_add_task(car_adapter_tick);
+}
+#endif
+
 long default_event_handler_ex(long event, void (*callback)(void *), void *parameter)
 {
     switch(event)
@@ -307,6 +363,15 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
             if (!clean_shutdown())
                 return SYS_POWEROFF;
             break;
+#ifdef HAVE_CHARGING
+        case SYS_CHARGER_CONNECTED:
+            car_adapter_mode_processing(true);
+            return SYS_CHARGER_CONNECTED;
+            
+        case SYS_CHARGER_DISCONNECTED:
+            car_adapter_mode_processing(false);
+            return SYS_CHARGER_DISCONNECTED;
+#endif
     }
     return 0;
 }
@@ -315,4 +380,3 @@ long default_event_handler(long event)
 {
     return default_event_handler_ex(event, NULL, NULL);
 }
-
