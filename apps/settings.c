@@ -362,7 +362,7 @@ int settings_save( void )
          ((global_settings.rec_mic_gain & 0x0f) << 4));
     config_block[0x22] = (unsigned char)
         ((global_settings.rec_quality & 7) |
-         ((global_settings.rec_source & 1) << 3) |
+         ((global_settings.rec_source & 3) << 3) |
          ((global_settings.rec_frequency & 7) << 5));
     config_block[0x23] = (unsigned char)global_settings.rec_left_gain;
     config_block[0x24] = (unsigned char)global_settings.rec_right_gain;
