@@ -56,6 +56,8 @@ int show_logo(void)
         int i;
         int eline;
 
+        lcd_clear_display();
+
         for(i=0, eline=0; i< height; i+=8, eline++) {
             /* the bitmap function doesn't work with full-height bitmaps
                so we "stripe" the logo output */
@@ -75,10 +77,10 @@ int show_logo(void)
 
 void show_splash(void)
 {
-    lcd_clear_display();
-    
     if (show_logo() != 0) 
         return;
+
+    sleep(200);
 }
 
 void version(void)
