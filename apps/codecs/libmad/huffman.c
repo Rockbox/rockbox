@@ -3078,7 +3078,7 @@ struct hufftable const mad_huff_pair_table[32] = {
   /*  1 */ { hufftab1,   0, 3 },
   /*  2 */ { hufftab2,   0, 3 },
   /*  3 */ { hufftab3,   0, 3 },
-  /*  4 */ { 0 /* not used */ },
+  /*  4 */ { hufftab0,   0, 0 }, /* not used */
   /*  5 */ { hufftab5,   0, 3 },
   /*  6 */ { hufftab6,   0, 4 },
   /*  7 */ { hufftab7,   0, 4 },
@@ -3088,7 +3088,7 @@ struct hufftable const mad_huff_pair_table[32] = {
   /* 11 */ { hufftab11,  0, 4 },
   /* 12 */ { hufftab12,  0, 4 },
   /* 13 */ { hufftab13,  0, 4 },
-  /* 14 */ { 0 /* not used */ },
+  /* 14 */ { hufftab0,   0, 0 }, /* not used */
   /* 15 */ { hufftab15,  0, 4 },
   /* 16 */ { hufftab16,  1, 4 },
   /* 17 */ { hufftab16,  2, 4 },
