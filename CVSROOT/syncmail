@@ -164,6 +164,8 @@ def main():
     except getopt.error, msg:
         usage(1, msg)
 
+    username = 'apa'
+
     # parse the options
     for opt, arg in opts:
         if opt in ('-h', '--help'):
