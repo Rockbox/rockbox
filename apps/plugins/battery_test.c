@@ -69,12 +69,25 @@ void loop(void)
             rb->splash(HZ, true, "Failed creating /battery.log");
             break;
         }
+#ifdef HAVE_RTC
         t = rb->get_time();
+#else
+        {
+            static struct tm temp;
+            long t2 = *rb->current_tick/HZ;
+            temp.tm_hour=t2/3600;
+            temp.tm_min=(t2/60)%60;
+            temp.tm_sec=t2%60;
+            t=&temp;
+        }
+#endif
         rb->snprintf(buf, sizeof buf, "%02d:%02d:%02d Battery %d%%\n",
                      t->tm_hour, t->tm_min, t->tm_sec, batt);
         rb->write(f, buf, rb->strlen(buf));
         rb->close(f);
 
+        rb->snprintf(buf, sizeof buf, "%02d:%02d:%02d Battery %d%%%%",
+                     t->tm_hour, t->tm_min, t->tm_sec, batt);
         rb->splash(0, true, buf);
         
         /* simulate 128kbit/s (16kbyte/s) playback duration */
