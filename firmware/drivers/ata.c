@@ -197,15 +197,8 @@ int ata_write_sectors(unsigned long start,
 
 static int check_registers(void)
 {
-    int ret = 0;
-    
-    mutex_lock(&ata_mtx);
-    
     if ( ATA_STATUS & STATUS_BSY )
-    {
-        mutex_unlock(&ata_mtx);
-        return 0;
-    }
+        return -1;
     
     ATA_NSECTOR = 0xa5;
     ATA_SECTOR  = 0x5a;
@@ -216,10 +209,9 @@ static int check_registers(void)
         (ATA_SECTOR  == 0x5a) &&
         (ATA_LCYL    == 0xaa) &&
         (ATA_HCYL    == 0x55))
-        ret = 1;
+        return 0;
 
-    mutex_unlock(&ata_mtx);
-    return ret;
+    return -2;
 }
 
 static int freeze_lock(void)
@@ -273,11 +265,11 @@ int ata_hard_reset(void)
     
     mutex_lock(&ata_mtx);
     
-    PADR &= ~0x0002;
+    PADR &= ~0x0200;
 
     sleep(2);
 
-    PADR |= 0x0002;
+    PADR |= 0x0200;
 
     ret =  wait_for_rdy();
 
@@ -337,16 +329,13 @@ int ata_init(void)
     if (master_slave())
         return -1;
 
-    if (!ata_hard_reset())
-        return -2;
-            
-    if (!check_registers())
+    if (check_registers())
         return -3;
 
-    if (freeze_lock() < 0)
+    if (freeze_lock())
         return -4;
 
-    if (ata_spindown(1) < 0)
+    if (ata_spindown(1))
         return -5;
 
     ATA_SELECT = SELECT_LBA;
