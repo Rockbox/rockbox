@@ -136,6 +136,8 @@ void init(void)
 
     button_init();
 
+    power_init(); /* moved up from below mpeg_init, hope that's not harmful */
+
     if (coldstart && charger_inserted())
     {
         rc = charging_screen(); /* display a "charging" screen */
@@ -200,8 +202,6 @@ void init(void)
                global_settings.bass_boost,
                global_settings.avc,
                global_settings.channel_config );
-
-    power_init();
 
     if (coldstart && !usb_detect())
     {   /* when starting from flash, this time _we_ have to yield */
