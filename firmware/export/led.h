@@ -22,7 +22,12 @@
 
 #include <stdbool.h>
 
+#ifdef HAVE_NO_LED /* dummies if no LED available */
+#define led(on)
+#define invert_led(on)
+#else /* normal hardware */
 extern void led( bool on );
 extern void invert_led( bool on );
+#endif
 
 #endif

@@ -10,9 +10,6 @@
 /* Define this if you have a MAS3587F */
 #define HAVE_MAS3587F
 
-/* Define this if you have a FM Recorder key system */
-#define HAVE_FMADC 1 /* don't know yet */
-
 /* Define this if you have a LiIon battery */
 /* #define HAVE_LIION */
 
@@ -47,10 +44,7 @@
 #define HAVE_FMRADIO 0
 
 /* How to detect USB */
-#define USB_FMRECORDERSTYLE 1 /* don't know yet */
-
-/* Define this if the platform has (chargeable) batteries */
-#define HAVE_BATTERIES 0
+#define USB_FMRECORDERSTYLE 1 /* like FM, on AN1 */
 
 /* The start address index for ROM builds */
 #define ROM_START 0x12010 /* don't know yet */
@@ -60,4 +54,7 @@
 
 /* Define this for different I2C pinout */
 #define HAVE_ONDIO_I2C
+
+/* Define this for no LED available */
+#define HAVE_NO_LED
 

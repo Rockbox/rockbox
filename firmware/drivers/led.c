@@ -22,6 +22,8 @@
 #include "led.h"
 #include "system.h"
 
+#ifndef HAVE_NO_LED
+
 static bool xor;
 static bool current;
 
@@ -51,3 +53,4 @@ void invert_led(bool on)
     led(current);
 }
 
+#endif // #ifndef HAVE_NO_LED
