@@ -363,7 +363,7 @@ unsigned long buf_find_next_frame(int fd, int *offset, int max_offset,
 
 int get_mp3file_info(int fd, struct mp3info *info)
 {
-    unsigned char frame[1024];
+    unsigned char frame[1050];
     unsigned char *vbrheader;
     unsigned long header;
     int bytecount;
