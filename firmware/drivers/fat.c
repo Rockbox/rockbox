@@ -253,10 +253,6 @@ struct fat_cache_entry
 static char fat_cache_sectors[FAT_CACHE_SIZE][SECTOR_SIZE];
 static struct fat_cache_entry fat_cache[FAT_CACHE_SIZE];
 
-/* sectors cache for longname use */
-static unsigned char lastsector[SECTOR_SIZE];
-static unsigned char lastsector2[SECTOR_SIZE];
-
 static int sec2cluster(unsigned int sec)
 {
     if ( sec < fat_bpb.firstdatasector )
@@ -1695,7 +1691,7 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
     int longarray[20];
     int longs=0;
     int sectoridx=0;
-    static unsigned char cached_buf[SECTOR_SIZE];
+    unsigned char* cached_buf = dir->sectorcache[0];
 
     dir->entrycount = 0;
 
@@ -1766,13 +1762,13 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
                                 if ( sectoridx >= SECTOR_SIZE*2 ) {
                                     if ( ( index >= SECTOR_SIZE ) &&
                                          ( index < SECTOR_SIZE*2 ))
-                                        ptr = lastsector;
+                                        ptr = dir->sectorcache[1];
                                     else
-                                        ptr = lastsector2;
+                                        ptr = dir->sectorcache[2];
                                 }
                                 else {
                                     if ( index < SECTOR_SIZE )
-                                        ptr = lastsector;
+                                        ptr = dir->sectorcache[1];
                                 }
 
                                 index &= SECTOR_SIZE-1;
@@ -1799,9 +1795,9 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
 
         /* save this sector, for longname use */
         if ( sectoridx )
-            memcpy( lastsector2, cached_buf, SECTOR_SIZE );
+            memcpy( dir->sectorcache[2], dir->sectorcache[0], SECTOR_SIZE );
         else
-            memcpy( lastsector, cached_buf, SECTOR_SIZE );
+            memcpy( dir->sectorcache[1], dir->sectorcache[0], SECTOR_SIZE );
         sectoridx += SECTOR_SIZE;
 
     }
