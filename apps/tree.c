@@ -1017,7 +1017,6 @@ static bool dirbrowse(char *root, int *dirfilter)
 
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_OFF | BUTTON_REL:
-#endif
                 /* Stop the music if it is playing, else show the shutdown
                    screen */
                 if(mpeg_status())
@@ -1029,6 +1028,7 @@ static bool dirbrowse(char *root, int *dirfilter)
                     }
                 }
                 break;
+#endif
 
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_OFF | BUTTON_REPEAT:
