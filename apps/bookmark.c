@@ -44,6 +44,7 @@
 #include "debug.h"
 #include "kernel.h"
 #include "sprintf.h"
+#include "talk.h"
 
 #define MAX_BOOKMARKS 10
 #define MAX_BOOKMARK_SIZE  350

@@ -60,9 +60,6 @@
 #define FF_REWIND_45000 12
 #define FF_REWIND_60000 13
 
-/* convenience macro to have both string and ID as arguments */
-#define STR(id) str(id), id
-
 
 struct user_settings
 {

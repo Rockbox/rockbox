@@ -31,6 +31,7 @@
 #include "keyboard.h"
 #include "tree.h"
 #include "onplay.h"
+#include "talk.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -721,6 +722,7 @@ static int onplay_menu(int index)
                     if (tracks[index].display_index != viewer.num_tracks ||
                         global_settings.repeat_mode == REPEAT_ALL)
                     {
+                        talk_buffer_steal(); /* will use the mp3 buffer */
                         mpeg_play(0);
                         viewer.current_playing_track = -1;
                     }

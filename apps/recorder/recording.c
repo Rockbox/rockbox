@@ -46,6 +46,7 @@
 #include "string.h"
 #include "dir.h"
 #include "errno.h"
+#include "talk.h"
 
 bool f2_rec_screen(void);
 bool f3_rec_screen(void);
@@ -166,6 +167,9 @@ bool recording_screen(void)
     
     peak_meter_enabled = true;
 
+    if (global_settings.rec_prerecord_time)
+        talk_buffer_steal(); /* will use the mp3 buffer */
+
     mpeg_set_recording_options(global_settings.rec_frequency,
                                global_settings.rec_quality,
                                global_settings.rec_source,
@@ -223,6 +227,7 @@ bool recording_screen(void)
                 if(!(mpeg_status() & MPEG_STATUS_RECORD))
                 {
                     have_recorded = true;
+                    talk_buffer_steal(); /* we use the mp3 buffer */
                     mpeg_record(rec_create_filename(path_buffer));
                     status_set_playmode(STATUS_RECORD);
                     update_countdown = 1; /* Update immediately */
@@ -335,6 +340,9 @@ bool recording_screen(void)
                 if (recording_menu(false))
                     return SYS_USB_CONNECTED;
                 settings_save();
+
+                if (global_settings.rec_prerecord_time)
+                    talk_buffer_steal(); /* will use the mp3 buffer */
 
                 mpeg_set_recording_options(global_settings.rec_frequency,
                                            global_settings.rec_quality,
@@ -660,6 +668,9 @@ bool f2_rec_screen(void)
         }
     }
 
+    if (global_settings.rec_prerecord_time)
+        talk_buffer_steal(); /* will use the mp3 buffer */
+
     mpeg_set_recording_options(global_settings.rec_frequency,
                                global_settings.rec_quality,
                                global_settings.rec_source,
@@ -729,6 +740,9 @@ bool f3_rec_screen(void)
                 return true;
         }
     }
+
+    if (global_settings.rec_prerecord_time)
+        talk_buffer_steal(); /* will use the mp3 buffer */
 
     mpeg_set_recording_options(global_settings.rec_frequency,
                                global_settings.rec_quality,

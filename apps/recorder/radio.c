@@ -46,6 +46,7 @@
 #include "font.h"
 #include "sound_menu.h"
 #include "recording.h"
+#include "talk.h"
 
 #ifdef HAVE_FMRADIO
 
@@ -174,6 +175,9 @@ bool radio_screen(void)
     
     peak_meter_enabled = true;
 
+    if (global_settings.rec_prerecord_time)
+        talk_buffer_steal(); /* will use the mp3 buffer */
+
     mpeg_set_recording_options(global_settings.rec_frequency,
                                global_settings.rec_quality,
                                1, /* Line In */
@@ -257,6 +261,7 @@ bool radio_screen(void)
                 else
                 {
                     have_recorded = true;
+                    talk_buffer_steal(); /* we use the mp3 buffer */
                     mpeg_record(rec_create_filename(buf));
                     status_set_playmode(STATUS_RECORD);
                     update_screen = true;
@@ -704,6 +709,9 @@ static bool fm_recording_settings(void)
     ret = recording_menu(true);
     if(!ret)
     {
+        if (global_settings.rec_prerecord_time)
+            talk_buffer_steal(); /* will use the mp3 buffer */
+
         mpeg_set_recording_options(global_settings.rec_frequency,
                                    global_settings.rec_quality,
                                    1, /* Line In */

@@ -1596,6 +1596,7 @@ int playlist_start(int start_index, int offset)
     struct playlist_info* playlist = &current_playlist;
 
     playlist->index = start_index;
+    talk_buffer_steal(); /* will use the mp3 buffer */
     mpeg_play(offset);
 
     return 0;

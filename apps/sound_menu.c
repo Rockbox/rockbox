@@ -32,6 +32,7 @@
 #endif
 #include "lang.h"
 #include "sprintf.h"
+#include "talk.h"
 
 static char *fmt[] =
 {
@@ -53,11 +54,16 @@ bool set_sound(char* string,
     int dec;
     char* unit;
     char str[32];
+    int talkunit = UNIT_INT;
 
     unit = mpeg_sound_unit(setting);
     numdec = mpeg_sound_numdecimals(setting);
     min = mpeg_sound_min(setting);
     max = mpeg_sound_max(setting);
+    if (*unit == 'd') /* crude reconstruction */
+        talkunit = UNIT_DB;
+    else if (*unit == '%')
+        talkunit = UNIT_PERCENT;
     
 #ifdef HAVE_LCD_BITMAP
     if(global_settings.statusbar)
@@ -81,6 +87,7 @@ bool set_sound(char* string,
             {
                 snprintf(str,sizeof str,"%d %s  ", val, unit);
             }
+            talk_value(val, talkunit, false); /* speak it */
         }
         lcd_puts(0,1,str);
         status_draw(true);
@@ -183,9 +190,9 @@ static bool avc(void)
 {
     struct opt_items names[] = {
         { STR(LANG_OFF) },
-        { "2s", -1 },
-        { "4s", -1 },
-        { "8s", -1 }
+        { "2s", TALK_ID(2, UNIT_SEC) },
+        { "4s", TALK_ID(4, UNIT_SEC) },
+        { "8s", TALK_ID(8, UNIT_SEC) }
     };
     return set_option(str(LANG_DECAY), &global_settings.avc, INT,
                       names, 4, set_avc);
@@ -206,12 +213,12 @@ static bool recsource(void)
 static bool recfrequency(void)
 {
     struct opt_items names[] = {
-        { "44.1kHz", -1 },
-        { "48kHz", -1 },
-        { "32kHz", -1 },
-        { "22.05kHz", -1 },
-        { "24kHz", -1 },
-        { "16kHz", -1 }
+        { "44.1kHz", TALK_ID(44, UNIT_KHZ) },
+        { "48kHz", TALK_ID(48, UNIT_KHZ) },
+        { "32kHz", TALK_ID(32, UNIT_KHZ) },
+        { "22.05kHz", TALK_ID(22, UNIT_KHZ) },
+        { "24kHz", TALK_ID(24, UNIT_KHZ) },
+        { "16kHz", TALK_ID(16, UNIT_KHZ) }
     };
     return set_option(str(LANG_RECORDING_FREQUENCY),
                       &global_settings.rec_frequency, INT,
@@ -246,19 +253,19 @@ static bool rectimesplit(void)
 {
     struct opt_items names[] = {
         { STR(LANG_OFF) },
-        { "00:05" , -1 },
-        { "00:10" , -1 },
-        { "00:15" , -1 },
-        { "00:30" , -1 },
-        { "01:00" , -1 },
-        { "02:00" , -1 },
-        { "04:00" , -1 },
-        { "06:00" , -1 },
-        { "08:00" , -1 },
-        { "10:00" , -1 },
-        { "12:00" , -1 },
-        { "18:00" , -1 },
-        { "24:00" , -1 }
+        { "00:05" , TALK_ID(5, UNIT_MIN) },
+        { "00:10" , TALK_ID(10, UNIT_MIN) },
+        { "00:15" , TALK_ID(15, UNIT_MIN) },
+        { "00:30" , TALK_ID(30, UNIT_MIN) },
+        { "01:00" , TALK_ID(1, UNIT_HOUR) },
+        { "02:00" , TALK_ID(2, UNIT_HOUR) },
+        { "04:00" , TALK_ID(4, UNIT_HOUR) },
+        { "06:00" , TALK_ID(6, UNIT_HOUR) },
+        { "08:00" , TALK_ID(8, UNIT_HOUR) },
+        { "10:00" , TALK_ID(10, UNIT_HOUR) },
+        { "12:00" , TALK_ID(12, UNIT_HOUR) },
+        { "18:00" , TALK_ID(18, UNIT_HOUR) },
+        { "24:00" , TALK_ID(24, UNIT_HOUR) }
     };
     return set_option(str(LANG_RECORD_TIMESPLIT),
                       &global_settings.rec_timesplit, INT,
@@ -269,36 +276,36 @@ static bool recprerecord(void)
 {
     struct opt_items names[] = {
         { STR(LANG_OFF) },
-        { "1s", -1 },
-        { "2s", -1 },
-        { "3s", -1 },
-        { "4s", -1 },
-        { "5s", -1 },
-        { "6s", -1 },
-        { "7s", -1 },
-        { "8s", -1 },
-        { "9s", -1 },
-        { "10s", -1 },
-        { "11s", -1 },
-        { "12s", -1 },
-        { "13s", -1 },
-        { "14s", -1 },
-        { "15s", -1 },
-        { "16s", -1 },
-        { "17s", -1 },
-        { "18s", -1 },
-        { "19s", -1 },
-        { "10s", -1 },
-        { "21s", -1 },
-        { "22s", -1 },
-        { "23s", -1 },
-        { "24s", -1 },
-        { "25s", -1 },
-        { "26s", -1 },
-        { "27s", -1 },
-        { "28s", -1 },
-        { "29s", -1 },
-        { "30s", -1 }
+        { "1s", TALK_ID(1, UNIT_SEC) },
+        { "2s", TALK_ID(2, UNIT_SEC) },
+        { "3s", TALK_ID(3, UNIT_SEC) },
+        { "4s", TALK_ID(4, UNIT_SEC) },
+        { "5s", TALK_ID(5, UNIT_SEC) },
+        { "6s", TALK_ID(6, UNIT_SEC) },
+        { "7s", TALK_ID(7, UNIT_SEC) },
+        { "8s", TALK_ID(8, UNIT_SEC) },
+        { "9s", TALK_ID(9, UNIT_SEC) },
+        { "10s", TALK_ID(10, UNIT_SEC) },
+        { "11s", TALK_ID(11, UNIT_SEC) },
+        { "12s", TALK_ID(12, UNIT_SEC) },
+        { "13s", TALK_ID(13, UNIT_SEC) },
+        { "14s", TALK_ID(14, UNIT_SEC) },
+        { "15s", TALK_ID(15, UNIT_SEC) },
+        { "16s", TALK_ID(16, UNIT_SEC) },
+        { "17s", TALK_ID(17, UNIT_SEC) },
+        { "18s", TALK_ID(18, UNIT_SEC) },
+        { "19s", TALK_ID(19, UNIT_SEC) },
+        { "20s", TALK_ID(20, UNIT_SEC) },
+        { "21s", TALK_ID(21, UNIT_SEC) },
+        { "22s", TALK_ID(22, UNIT_SEC) },
+        { "23s", TALK_ID(23, UNIT_SEC) },
+        { "24s", TALK_ID(24, UNIT_SEC) },
+        { "25s", TALK_ID(25, UNIT_SEC) },
+        { "26s", TALK_ID(26, UNIT_SEC) },
+        { "27s", TALK_ID(27, UNIT_SEC) },
+        { "28s", TALK_ID(28, UNIT_SEC) },
+        { "29s", TALK_ID(29, UNIT_SEC) },
+        { "30s", TALK_ID(30, UNIT_SEC) }
     };
     return set_option(str(LANG_RECORD_PRERECORD_TIME),
                       &global_settings.rec_prerecord_time, INT,

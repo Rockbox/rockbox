@@ -44,6 +44,7 @@
 #include "buffer.h"
 #include "screens.h"
 #include "playlist_menu.h"
+#include "talk.h"
 #ifdef HAVE_FMRADIO
 #include "radio.h"
 #endif

@@ -1,0 +1,398 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
+ *
+ * Copyright (C) 2004 Jörg Hohensohn
+ *
+ * This module collects the Talkbox and voice UI functions.
+ * (Talkbox reads directory names from mp3 clips called thumbnails,
+ *  the voice UI lets menus and screens "talk" from a voicefont in memory.
+ *
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+
+#include <stdio.h>
+#include <stddef.h>
+#include "file.h"
+#include "buffer.h"
+#include "system.h"
+#include "mp3_playback.h"
+#include "mpeg.h"
+#include "lang.h"
+#include "talk.h"
+#include "screens.h" /* test hack */
+extern void bitswap(unsigned char *data, int length); /* no header for this */
+
+/***************** Constants *****************/
+
+#define VOICEFONT_FILENAME "/.rockbox/langs/english.voice"
+#define QUEUE_SIZE 32
+
+
+/***************** Data types *****************/
+
+struct clip_entry /* one entry of the index table */
+{
+    int offset; /* offset from start of voicefont file */
+    int size; /* size of the clip */
+};
+
+struct voicefont /* file format of our "voicefont" */
+{
+    int version; /* version of the voicefont */
+    int headersize; /* size of the header, =offset to index */
+    int id_max; /* number of clips contained */
+    struct clip_entry index[]; /* followed by the index table */
+    /* and finally the bitswapped mp3 clips, not visible here */
+};
+
+
+struct queue_entry /* one entry of the internal queue */
+{
+    unsigned char* buf;
+    int len;
+};
+
+
+
+/***************** Globals *****************/
+
+static unsigned char* p_thumbnail; /* buffer for thumbnail */
+static long size_for_thumbnail; /* leftover buffer size for it */
+static struct voicefont* p_voicefont; /* loaded voicefont */
+static bool has_voicefont; /* a voicefont file is present */
+static bool is_playing; /* we're currently playing */
+static struct queue_entry queue[QUEUE_SIZE]; /* queue of scheduled clips */
+static int queue_write; /* write index of queue, by application */
+static int queue_read; /* read index of queue, by ISR context */
+
+
+
+/***************** Private implementation *****************/
+
+static int load_voicefont(void)
+{
+    int fd;
+    int size;
+
+    p_voicefont = NULL; /* indicate no voicefont if we fail below */
+
+    fd = open(VOICEFONT_FILENAME, O_RDONLY);
+    if (fd < 0) /* failed to open */
+    {
+        p_voicefont = NULL; /* indicate no voicefont */
+        has_voicefont = false; /* don't try again */
+        return 0;
+    }
+
+    size = read(fd, mp3buf, mp3end - mp3buf);
+    if (size > 1000
+        && ((struct voicefont*)mp3buf)->headersize
+           == offsetof(struct voicefont, index))
+    {
+        p_voicefont = (struct voicefont*)mp3buf;
+
+        /* thumbnail buffer is the remaining space behind */
+        p_thumbnail = mp3buf + size;
+        p_thumbnail += (int)p_thumbnail % 2; /* 16-bit align */
+        size_for_thumbnail = mp3end - p_thumbnail;
+    }
+    else
+    {
+        has_voicefont = false; /* don't try again */
+    }
+    close(fd);
+
+    return size;
+}
+
+
+/* called in ISR context if mp3 data got consumed */
+static void mp3_callback(unsigned char** start, int* size)
+{
+    int play_now;
+
+    if (queue[queue_read].len > 0) /* current clip not finished? */
+    {   /* feed the next 64K-1 chunk */
+        play_now = MIN(queue[queue_read].len, 0xFFFF);
+        *start = queue[queue_read].buf;
+        *size = play_now;
+        queue[queue_read].buf += play_now;
+        queue[queue_read].len -= play_now;
+        return;
+    }
+    else /* go to next entry */
+    {
+        queue_read++;
+        if (queue_read >= QUEUE_SIZE)
+            queue_read = 0;
+    }
+
+    if (queue_read != queue_write) /* queue is not empty? */
+    {   /* start next clip */
+        play_now = MIN(queue[queue_read].len, 0xFFFF);
+        *start = queue[queue_read].buf;
+        *size = play_now;
+        queue[queue_read].buf += play_now;
+        queue[queue_read].len -= play_now;
+    }
+    else
+    {
+        *size = 0; /* end of data */
+        is_playing = false;
+        mp3_play_stop(); /* fixme: should be done by caller */
+    }
+}
+
+
+/* stop the playback and the pending clips, but at frame boundary */
+static int shutup(void)
+{
+    mp3_play_pause(false); /* pause */
+
+    /* ToDo: search next frame boundary and continue up to there */
+    
+    queue_write = queue_read;
+    is_playing = false;
+    mp3_play_stop();
+
+    return 0;
+}
+
+
+/* schedule a clip, at the end or discard the existing queue */
+static int queue_clip(unsigned char* buf, int size, bool enqueue)
+{
+    if (!enqueue)
+        shutup(); /* cut off all the pending stuff */
+    
+    queue[queue_write].buf = buf;
+    queue[queue_write].len = size;
+    
+    /* FixMe: make this IRQ-safe */
+        
+    if (!is_playing)
+    {   /* queue empty, we have to do the initial start */
+        int size_now = MIN(size, 0xFFFF); /* DMA can do no more */
+        is_playing = true;
+        mp3_play_data(buf, size_now, mp3_callback);
+        mp3_play_pause(true); /* kickoff audio */
+        queue[queue_write].buf += size_now;
+        queue[queue_write].len -= size_now;
+    }
+
+    queue_write++;
+    if (queue_write >= QUEUE_SIZE)
+        queue_write = 0;
+
+    return 0;
+}
+
+
+/***************** Public implementation *****************/
+
+void talk_init(void)
+{
+    has_voicefont = true; /* unless we fail later, assume we have one */
+    talk_buffer_steal();
+    queue_write = queue_read = 0; 
+}
+
+
+/* somebody else claims the mp3 buffer, e.g. for regular play/record */
+int talk_buffer_steal(void)
+{
+    p_voicefont = NULL; /* indicate no voicefont (trashed) */
+    p_thumbnail = mp3buf; /*  whole space for thumbnail */
+    size_for_thumbnail = mp3end - mp3buf;
+    return 0;
+}
+
+
+/* play a voice ID from voicefont */
+int talk_id(int id, bool enqueue)
+{
+    int clipsize;
+    unsigned char* clipbuf;
+    int unit;
+
+    if (mpeg_status()) /* busy, buffer in use */
+        return -1; 
+
+    if (p_voicefont == NULL && has_voicefont)
+        load_voicefont(); /* reload needed */
+
+    if (p_voicefont == NULL) /* still no voices? */
+        return -1;
+
+    /* check if this is a special ID, with a value */
+    unit = ((unsigned)id) >> UNIT_SHIFT;
+    if (id != -1 && unit)
+    {   /* sign-extend the value */
+        //splash(200, true,"unit=%d", unit);
+        id = (unsigned)id << (32-UNIT_SHIFT);
+        id >>= (32-UNIT_SHIFT);
+        talk_value(id, unit, enqueue); /* speak it */
+        return 0; /* and stop, end of special case */
+    }
+
+    if (id < 0 || id >= p_voicefont->id_max)
+        return -1;
+
+    clipsize = p_voicefont->index[id].size;
+    if (clipsize == 0) /* clip not included in voicefont */
+        return -1;
+
+    clipbuf = mp3buf + p_voicefont->index[id].offset;
+
+    queue_clip(clipbuf, clipsize, enqueue);
+
+    return 0;
+}
+
+
+/* play a thumbnail from file */
+int talk_file(char* filename, bool enqueue)
+{
+    int fd;
+    int size;
+
+    if (mpeg_status()) /* busy, buffer in use */
+        return -1; 
+
+    if (p_thumbnail == NULL || size_for_thumbnail <= 0)
+        return -1;
+
+    fd = open(filename, O_RDONLY);
+    if (fd < 0) /* failed to open */
+    {
+        return 0;
+    }
+
+    size = read(fd, p_thumbnail, size_for_thumbnail);
+    close(fd);
+
+    /* ToDo: find audio, skip ID headers and trailers */
+
+    if (size)
+    {
+        bitswap(p_thumbnail, size);
+        queue_clip(p_thumbnail, size, enqueue);
+    }
+
+    return size;
+}
+
+
+/* say a numeric value, this works for english,
+   but not necessarily for other languages */
+int talk_number(int n, bool enqueue)
+{
+    int level = 0; // mille count
+    int mil = 1000000000; // highest possible "-illion"
+
+    if (!enqueue)
+        shutup(); /* cut off all the pending stuff */
+    
+    if (n==0)
+    {   // special case
+        talk_id(VOICE_ZERO, true);
+        return 0;
+    }
+    
+    if (n<0)
+    {
+        talk_id(VOICE_MINUS, true);
+        n = -n;
+    }
+    
+    while (n)
+    {
+        int segment = n / mil; // extract in groups of 3 digits
+        n -= segment * mil; // remove the used digits from number
+        mil /= 1000; // digit place for next round
+
+        if (segment)
+        {
+            int hundreds = segment / 100;
+            int ones = segment % 100;
+
+            if (hundreds)
+            {
+                talk_id(VOICE_ZERO + hundreds, true);
+                talk_id(VOICE_HUNDRED, true);
+            }
+
+            // combination indexing
+            if (ones > 20)
+            {
+               int tens = ones/10 + 18;
+               talk_id(VOICE_ZERO + tens, true);
+               ones %= 10;
+            }
+
+            // direct indexing
+            if (ones)
+                talk_id(VOICE_ZERO + ones, true);
+ 
+            // add billion, million, thousand
+            if (mil)
+                talk_id(VOICE_BILLION + level, true);
+        }
+        level++;
+    }
+
+    return 0;
+}
+
+int talk_value(int n, int unit, bool enqueue)
+{
+    int unit_id;
+    const int unit_voiced[] = 
+    {   /* lookup table for the voice ID of the units */
+        -1, -1, -1, /* regular ID, int, signed */
+        VOICE_MILLISECONDS, /* here come the "real" units */
+        VOICE_SECONDS, 
+        VOICE_MINUTES, 
+        VOICE_HOURS, 
+        VOICE_KHZ, 
+        VOICE_DB, 
+        VOICE_PERCENT, 
+        VOICE_MEGABYTE, 
+        VOICE_GIGABYTE
+    };
+
+    if (unit < 0 || unit >= UNIT_LAST)
+        unit_id = -1;
+    else
+        unit_id = unit_voiced[unit];
+
+    if ((n==1 || n==-1) // singular?
+        && unit_id >= VOICE_SECONDS && unit_id <= VOICE_HOURS)
+    {
+        unit_id--; /* use the singular for those units which have */
+    }
+
+    /* special case with a "plus" before */
+    if (n > 0 && (unit == UNIT_SIGNED || unit == UNIT_DB))
+    {
+        talk_id(VOICE_PLUS, enqueue);
+        enqueue = true;
+    }
+
+    talk_number(n, enqueue); /* say the number */
+    talk_id(unit_id, true); /* say the unit, if any */
+        
+    return 0;
+}
+

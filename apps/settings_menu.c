@@ -40,6 +40,7 @@
 #include "ata.h"
 #include "tree.h"
 #include "screens.h"
+#include "talk.h"
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
 #endif
@@ -167,23 +168,23 @@ static bool peak_meter_hold(void) {
     bool retval = false;
     struct opt_items names[] = {
         { STR(LANG_OFF) },
-        { "200 ms " , -1 },
-        { "300 ms " , -1 },
-        { "500 ms " , -1 },
-        { "1 s " , -1 },
-        { "2 s " , -1 },
-        { "3 s " , -1 },
-        { "4 s " , -1 },
-        { "5 s " , -1 },
-        { "6 s " , -1 },
-        { "7 s" , -1 },
-        { "8 s" , -1 },
-        { "9 s" , -1 },
-        { "10 s" , -1 },
-        { "15 s" , -1 },
-        { "20 s" , -1 },
-        { "30 s" , -1 },
-        { "1 min" , -1 }
+        { "200 ms " , TALK_ID(200, UNIT_MS) },
+        { "300 ms " , TALK_ID(300, UNIT_MS) },
+        { "500 ms " , TALK_ID(500, UNIT_MS) },
+        { "1 s" , TALK_ID(1, UNIT_SEC) },
+        { "2 s" , TALK_ID(2, UNIT_SEC) },
+        { "3 s" , TALK_ID(3, UNIT_SEC) },
+        { "4 s" , TALK_ID(4, UNIT_SEC) },
+        { "5 s" , TALK_ID(5, UNIT_SEC) },
+        { "6 s" , TALK_ID(6, UNIT_SEC) },
+        { "7 s" , TALK_ID(7, UNIT_SEC) },
+        { "8 s" , TALK_ID(8, UNIT_SEC) },
+        { "9 s" , TALK_ID(9, UNIT_SEC) },
+        { "10 s" , TALK_ID(10, UNIT_SEC) },
+        { "15 s" , TALK_ID(15, UNIT_SEC) },
+        { "20 s" , TALK_ID(20, UNIT_SEC) },
+        { "30 s" , TALK_ID(30, UNIT_SEC) },
+        { "1 min" , TALK_ID(1, UNIT_MIN) }
     };
     retval = set_option( str(LANG_PM_PEAK_HOLD),
                          &global_settings.peak_meter_hold, INT, names,
@@ -204,30 +205,30 @@ static bool peak_meter_clip_hold(void) {
 
     struct opt_items names[] = {
         { STR(LANG_PM_ETERNAL) },
-        { "1s " , -1 },
-        { "2s " , -1 },
-        { "3s " , -1 },
-        { "4s " , -1 },
-        { "5s " , -1 },
-        { "6s " , -1 },
-        { "7s " , -1 },
-        { "8s " , -1 },
-        { "9s " , -1 },
-        { "10s" , -1 },
-        { "15s" , -1 },
-        { "20s" , -1 },
-        { "25s" , -1 },
-        { "30s" , -1 },
-        { "45s" , -1 },
-        { "60s" , -1 },
-        { "90s" , -1 },
-        { "2min" , -1 },
-        { "3min" , -1 },
-        { "5min" , -1 },
-        { "10min" , -1 },
-        { "20min" , -1 },
-        { "45min" , -1 },
-        { "90min" , -1 }
+        { "1s " , TALK_ID(1, UNIT_SEC) },
+        { "2s " , TALK_ID(2, UNIT_SEC) },
+        { "3s " , TALK_ID(3, UNIT_SEC) },
+        { "4s " , TALK_ID(4, UNIT_SEC) },
+        { "5s " , TALK_ID(5, UNIT_SEC) },
+        { "6s " , TALK_ID(6, UNIT_SEC) },
+        { "7s " , TALK_ID(7, UNIT_SEC) },
+        { "8s " , TALK_ID(8, UNIT_SEC) },
+        { "9s " , TALK_ID(9, UNIT_SEC) },
+        { "10s" , TALK_ID(10, UNIT_SEC) },
+        { "15s" , TALK_ID(15, UNIT_SEC) },
+        { "20s" , TALK_ID(20, UNIT_SEC) },
+        { "25s" , TALK_ID(25, UNIT_SEC) },
+        { "30s" , TALK_ID(30, UNIT_SEC) },
+        { "45s" , TALK_ID(45, UNIT_SEC) },
+        { "60s" , TALK_ID(60, UNIT_SEC) },
+        { "90s" , TALK_ID(90, UNIT_SEC) },
+        { "2min" , TALK_ID(2, UNIT_MIN) },
+        { "3min" , TALK_ID(3, UNIT_MIN) },
+        { "5min" , TALK_ID(5, UNIT_MIN) },
+        { "10min" , TALK_ID(10, UNIT_MIN) },
+        { "20min" , TALK_ID(20, UNIT_MIN) },
+        { "45min" , TALK_ID(45, UNIT_MIN) },
+        { "90min" , TALK_ID(90, UNIT_MIN) }
     };
     retval = set_option( str(LANG_PM_CLIP_HOLD), 
                          &global_settings.peak_meter_clip_hold, INT, names,
@@ -531,23 +532,23 @@ static bool backlight_timer(void)
     struct opt_items names[] = {
         { STR(LANG_OFF) },
         { STR(LANG_ON) },
-        { "1s ", -1 },
-        { "2s ", -1 },
-        { "3s ", -1 },
-        { "4s ", -1 },
-        { "5s ", -1 },
-        { "6s ", -1 },
-        { "7s ", -1 },
-        { "8s ", -1 },
-        { "9s ", -1 },
-        { "10s", -1 },
-        { "15s", -1 },
-        { "20s", -1 },
-        { "25s", -1 },
-        { "30s", -1 },
-        { "45s", -1 },
-        { "60s", -1 },
-        { "90s", -1 }
+        { "1s ", TALK_ID(1, UNIT_SEC) },
+        { "2s ", TALK_ID(2, UNIT_SEC) },
+        { "3s ", TALK_ID(3, UNIT_SEC) },
+        { "4s ", TALK_ID(4, UNIT_SEC) },
+        { "5s ", TALK_ID(5, UNIT_SEC) },
+        { "6s ", TALK_ID(6, UNIT_SEC) },
+        { "7s ", TALK_ID(7, UNIT_SEC) },
+        { "8s ", TALK_ID(8, UNIT_SEC) },
+        { "9s ", TALK_ID(9, UNIT_SEC) },
+        { "10s", TALK_ID(10, UNIT_SEC) },
+        { "15s", TALK_ID(15, UNIT_SEC) },
+        { "20s", TALK_ID(20, UNIT_SEC) },
+        { "25s", TALK_ID(25, UNIT_SEC) },
+        { "30s", TALK_ID(30, UNIT_SEC) },
+        { "45s", TALK_ID(45, UNIT_SEC) },
+        { "60s", TALK_ID(60, UNIT_SEC) },
+        { "90s", TALK_ID(90, UNIT_SEC) }
     };
     return set_option(str(LANG_BACKLIGHT), &global_settings.backlight_timeout,
                       INT, names, 19, backlight_set_timeout );
@@ -557,20 +558,20 @@ static bool poweroff_idle_timer(void)
 {
     struct opt_items names[] = {
         { STR(LANG_OFF) },
-        { "1m ", -1 },
-        { "2m ", -1 },
-        { "3m ", -1 },
-        { "4m ", -1 },
-        { "5m ", -1 },
-        { "6m ", -1 },
-        { "7m ", -1 },
-        { "8m ", -1 },
-        { "9m ", -1 },
-        { "10m", -1 },
-        { "15m", -1 },
-        { "30m", -1 },
-        { "45m", -1 },
-        { "60m", -1 }
+        { "1m ", TALK_ID(1, UNIT_MIN) },
+        { "2m ", TALK_ID(2, UNIT_MIN) },
+        { "3m ", TALK_ID(3, UNIT_MIN) },
+        { "4m ", TALK_ID(4, UNIT_MIN) },
+        { "5m ", TALK_ID(5, UNIT_MIN) },
+        { "6m ", TALK_ID(6, UNIT_MIN) },
+        { "7m ", TALK_ID(7, UNIT_MIN) },
+        { "8m ", TALK_ID(8, UNIT_MIN) },
+        { "9m ", TALK_ID(9, UNIT_MIN) },
+        { "10m", TALK_ID(10, UNIT_MIN) },
+        { "15m", TALK_ID(15, UNIT_MIN) },
+        { "30m", TALK_ID(30, UNIT_MIN) },
+        { "45m", TALK_ID(45, UNIT_MIN) },
+        { "60m", TALK_ID(60, UNIT_MIN) }
     };
     return set_option(str(LANG_POWEROFF_IDLE), &global_settings.poweroff,
                       INT, names, 15, set_poweroff_timeout);
@@ -613,9 +614,9 @@ static bool jump_scroll(void)
     struct opt_items names[] = {
         { STR(LANG_OFF) },
         { STR(LANG_ONE_TIME) },
-        { "2", -1 },
-        { "3", -1 },
-        { "4", -1 },
+        { "2", TALK_ID(2, UNIT_INT) },
+        { "3", TALK_ID(3, UNIT_INT) },
+        { "4", TALK_ID(4, UNIT_INT) },
         { STR(LANG_ALWAYS) }
     };
     bool ret;
@@ -799,20 +800,20 @@ static bool buffer_margin(void)
 static bool ff_rewind_min_step(void)
 { 
     struct opt_items names[] = {
-        { "1s", -1 },
-        { "2s", -1 },
-        { "3s", -1 },
-        { "4s", -1 },
-        { "5s", -1 },
-        { "6s", -1 },
-        { "8s", -1 },
-        { "10s", -1 },
-        { "15s", -1 },
-        { "20s", -1 },
-        { "25s", -1 },
-        { "30s", -1 },
-        { "45s", -1 },
-        { "60s", -1 }
+        { "1s", TALK_ID(1, UNIT_SEC) },
+        { "2s", TALK_ID(2, UNIT_SEC) },
+        { "3s", TALK_ID(3, UNIT_SEC) },
+        { "4s", TALK_ID(4, UNIT_SEC) },
+        { "5s", TALK_ID(5, UNIT_SEC) },
+        { "6s", TALK_ID(6, UNIT_SEC) },
+        { "8s", TALK_ID(8, UNIT_SEC) },
+        { "10s", TALK_ID(10, UNIT_SEC) },
+        { "15s", TALK_ID(15, UNIT_SEC) },
+        { "20s", TALK_ID(20, UNIT_SEC) },
+        { "25s", TALK_ID(25, UNIT_SEC) },
+        { "30s", TALK_ID(30, UNIT_SEC) },
+        { "45s", TALK_ID(45, UNIT_SEC) },
+        { "60s", TALK_ID(60, UNIT_SEC) }
     };
     return set_option(str(LANG_FFRW_STEP), &global_settings.ff_rewind_min_step,
                       INT, names, 14, NULL ); 
@@ -828,21 +829,21 @@ static bool ff_rewind_accel(void)
 { 
     struct opt_items names[] = {
         { STR(LANG_OFF) }, 
-        { "2x/1s", -1 },
-        { "2x/2s", -1 },
-        { "2x/3s", -1 },
-        { "2x/4s", -1 },
-        { "2x/5s", -1 },
-        { "2x/6s", -1 },
-        { "2x/7s", -1 },
-        { "2x/8s", -1 },
-        { "2x/9s", -1 },
-        { "2x/10s", -1 },
-        { "2x/11s", -1 },
-        { "2x/12s", -1 },
-        { "2x/13s", -1 },
-        { "2x/14s", -1 },
-        { "2x/15s", -1 }
+        { "2x/1s", TALK_ID(1, UNIT_SEC) },
+        { "2x/2s", TALK_ID(2, UNIT_SEC) },
+        { "2x/3s", TALK_ID(3, UNIT_SEC) },
+        { "2x/4s", TALK_ID(4, UNIT_SEC) },
+        { "2x/5s", TALK_ID(5, UNIT_SEC) },
+        { "2x/6s", TALK_ID(6, UNIT_SEC) },
+        { "2x/7s", TALK_ID(7, UNIT_SEC) },
+        { "2x/8s", TALK_ID(8, UNIT_SEC) },
+        { "2x/9s", TALK_ID(9, UNIT_SEC) },
+        { "2x/10s", TALK_ID(10, UNIT_SEC) },
+        { "2x/11s", TALK_ID(11, UNIT_SEC) },
+        { "2x/12s", TALK_ID(12, UNIT_SEC) },
+        { "2x/13s", TALK_ID(13, UNIT_SEC) },
+        { "2x/14s", TALK_ID(14, UNIT_SEC) },
+        { "2x/15s", TALK_ID(15, UNIT_SEC) }
     };
     return set_option(str(LANG_FFRW_ACCEL), &global_settings.ff_rewind_accel, 
                       INT, names, 16, NULL ); 

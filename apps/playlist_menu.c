@@ -26,7 +26,7 @@
 #include "tree.h"
 #include "settings.h"
 #include "playlist_viewer.h"
-
+#include "talk.h"
 #include "lang.h"
 
 #define DEFAULT_PLAYLIST_NAME "/dynamic.m3u"
