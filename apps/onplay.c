@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include "sprintf.h"
 #include "lcd.h"
 #include "dir.h"
 #include "file.h"
