@@ -597,18 +597,18 @@ new: "Einde van de lijst"
 
 id: LANG_END_CONFIRM_PLAYER
 desc: when playlist has finished
-eng: "<Press ON>"
-new: "<Kies ON>"
+eng: ""
+new: ""
 
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
-eng: "<End of song list>"
-new: "<Einde van liedjeslijst>"
+eng: "End of song list"
+new: "Einde van de titellijst"
 
 id: LANG_END_CONFIRM_RECORDER
 desc: when playlist has finished
-eng: "Press ON"
-new: "Kies ON"
+eng: ""
+new: ""
 
 id: LANG_SNAKE_SCORE
 desc: when you die in snake game
