@@ -79,6 +79,15 @@ _stackend = ADDR(.stack) + SIZEOF(.stack);
 
 _idatastart = ADDR(.idata);
 
+/* FIXME: Where to put mp3 buffer? */
+
+_mp3buffer = 0;
+_mp3end = 0;
+
+/* Plugins are not supported on the Gmini*/
+
+_pluginbuf = 0;
+
 }
 
 #else
