@@ -366,8 +366,13 @@ void cal_initial (void)
         rb->lcd_drawline(X_1_POS+i*REC_WIDTH, Y_1_POS,
                          X_1_POS+i*REC_WIDTH, Y_6_POS);
 
-    /* draw buttons */
+#ifdef CALCULATOR_OPERATORS
+    /* basic operators are available through separate button */
     buttonGroup = sciButtons;
+#else
+    buttonGroup = basicButtons;
+#endif
+    /* draw buttons */
     for (i = 0; i < 5; i++){
         for (j = 0; j < 5; j++){
             rb->lcd_getstringsize( buttonChar[buttonGroup][i][j],&w,&h);
