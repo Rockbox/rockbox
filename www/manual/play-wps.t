@@ -13,29 +13,14 @@ only be seen while there is actual music playback.
 Buttons:
 <p>
 <table>
-<tr><td>
- MENU+STOP
-</td><td>
- Toggle key lock ON/OFF
+<tr><td> PLAY </td><td> Toggle PAUSE/PLAY </td></tr>
+<tr><td> ON </td><td> Switch to the <a href="play-dir.html">dir browser</a>.
 </td></tr>
-<tr><td>
- PLAY
-</td><td>
-   Toggle PAUSE/PLAY
+<tr><td> STOP </td><td> Stop playback </td></tr>
+<tr><td> MENU </td><td> Switches to the <a href="play-menu.html">main menu</a>.
+<tr><td> MENU+STOP </td><td> Toggle key lock ON/OFF </td></tr>
+<tr><td> MENU+ '-' </td><td> Lower the volume </td></tr>
+<tr><td> MENU+ '+' </td><td> Raise the volume </td></tr>
 </td></tr>
-<tr><td>
- ON 
-</td><td>
-    Switch to the <a href="play-dir.html">dir browser</a>.
-</td></tr>
-<tr><td>
- STOP
-</td><td>
-   Stop playback
-</td></tr>
-<tr><td>
- MENU
-</td><td>
-   Switches to the <a href="play-menu.html">main menu</a>.
-</td></tr>
+
 </table>
