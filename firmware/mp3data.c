@@ -646,7 +646,23 @@ int create_xing_header(int fd, int startpos, int filesize,
             }
             
             /* Fill in the TOC entry */
-            toc[i] = filepos * 256 / filesize;
+            /* each toc is a single byte indicating how many 256ths of the
+             * way through the file, is that percent of the way through the
+             * song. the easy method, filepos*256/filesize, chokes when
+             * the upper 8 bits of the file position are nonzero 
+             * (i.e. files over 16mb in size).
+             */
+            if (filepos > 0xFFFFFF)
+            {
+                /* instead of multiplying filepos by 256, we divide
+                 * filesize by 256.
+                 */
+                toc[i] = filepos / (filesize >> 8);
+            }
+            else
+            {
+                toc[i] = filepos * 256 / filesize;
+            }
             
             DEBUGF("Pos %d: %d  relpos: %d  filepos: %x tocentry: %x\n",
                    i, pos, pos-last_pos, filepos, toc[i]);
