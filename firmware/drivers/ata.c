@@ -174,92 +174,129 @@ static void copy_read_sectors(unsigned char* buf,
                          __attribute__ ((section (".icode")));
 static void copy_read_sectors(unsigned char* buf, int wordcount)
 {
-    unsigned short tmp = 0; /* have to init to prevent warning? */
+#ifdef PREFER_C
+    unsigned short tmp = 0;
 
-    if ( (unsigned int)buf & 1) 
+    if ( (unsigned int)buf & 1)
     {   /* not 16-bit aligned, copy byte by byte */
         unsigned char* bufend = buf + wordcount*2;
-#ifdef PREFER_C
         do
         {   /* loop compiles to 9 assembler instructions */
+            /* takes 13 clock cycles because of 2 pipeline stalls */
             tmp = ATA_DATA;
             *buf++ = tmp & 0xff; /* I assume big endian */
             *buf++ = tmp >> 8;   /*  and don't use the SWAB16 macro */
         } while (buf < bufend); /* tail loop is faster */
-#else
-        /* I can bring it down to 7 instructions/loop, and exploit pipeline */
-        asm (
-            "mov    #1, r0 \n"      /* r0 = 1; */
-            /* correct for the "early increment" below */
-            "add  	#-2,%2 \n"    /* buf -= 2; */
-            "add  	#-2,%3 \n"    /* bufend -= 2; */
-            "loop_b: \n"
-            "mov.w	@%1,%0 \n"      /* tmp = ATA_DATA; */
-            /* Now we're reading from the bus, I do something independent we 
-               need later, to avoid pipeline stall */
-            "add  	#0x02,%2 \n"    /* buf += 2; */
-            "cmp/hs	%3,%2 \n"       /* if (buf < bufend) */
-            /* now use the read result */
-            "mov.b	%0,@%2 \n"      /* buf[0] = lowbyte(tmp); */
-            "shlr8	%0 \n"          /* tmp >>= 8; */
-            "mov.b	%0,@(r0,%2) \n" /* buf[r0] = lowbyte(tmp); */
-            "bf	    loop_b \n"      /* goto loop_b; */
-            : /* outputs */
-            : /* inputs */
-            /* %0 */ "r"(tmp),
-            /* %1 */ "r"(&ATA_DATA),
-            /* %2 */ "r"(buf),
-            /* %3 */ "r"(bufend)
-            : /* trashed */
-            "r0"
-        );
-#endif
     }
-    else 
+    else
     {   /* 16-bit aligned, can do faster copy */
         unsigned short* wbuf = (unsigned short*)buf;
         unsigned short* wbufend = wbuf + wordcount;
-#ifdef PREFER_C
         do
         {   /* loop compiles to 7 assembler instructions */
+            /* takes 11 clock cycles because of 2 pipeline stalls */
             *wbuf = SWAB16(ATA_DATA);
         } while (++wbuf < wbufend); /* tail loop is faster */
-#else
-        /* I can bring it down to 9 instructions for 2 loops, and pipeline */
-        asm (
-            "mov    #2, r0 \n"      /* r0 = 2 */
-            /* correct for the "early increment" below */
-            "add  	#-4,%2 \n"      /* wbuf -= 4; */
-            "bra enter_loop \n"     /* goto enter_loop, after next instr. */
-            "add  	#-4,%3 \n"      /* wbufend -= 4; */
-            "loop_w: \n"
-            /* use read result and store, from last round */
-            "swap.b	%0,%0 \n"       /* endian_swap(tmp); */
-            "mov.w	%0,@(r0,%2) \n" /* wbuf[r0] = tmp; */
-            "enter_loop: \n"
-            "mov.w	@%1,%0 \n"      /* tmp = ATA_DATA; */
-            /* keep the pipeline busy with 2 independent instructions */
-            "add  	#0x04,%2 \n"    /* wbuf += 4; */
-            "cmp/hs	%3,%2 \n"       /* if (wbuf < wbufend) */
-            "swap.b	%0,%0 \n"       /* endian_swap(tmp); */
-            "mov.w	%0,@%2 \n"      /* wbuf[0] = tmp; */
-            /* unrolled, do one more */
-            "mov.w	@%1,%0 \n"      /* tmp = ATA_DATA; */
-            /* use and store later, to keep pipeline busy */
-            "bf	    loop_w \n"      /* goto loop_w; */
-            "swap.b	%0,%0 \n"       /* endian_swap(tmp); */
-            "mov.w	%0,@(r0,%2) \n" /* wbuf[r0] = tmp; */
-            : /* outputs */
-            : /* inputs */
-            /* %0 */ "r"(tmp),
-            /* %1 */ "r"(&ATA_DATA),
-            /* %2 */ "r"(wbuf),
-            /* %3 */ "r"(wbufend)
-            : /* trashed */
-            "r0"
-        );
-#endif
     }
+#else
+    /* turbo-charged assembler version */
+    /* this assumes wordcount to be a multiple of 4 */
+    asm (
+        "add     %1,%1       \n"  /* wordcount -> bytecount */
+        "add     %0,%1       \n"  /* bytecount -> bufend */
+        "mov     %0,r0       \n"
+        "tst     #1,r0       \n"  /* 16-bit aligned ? */
+        "bt      .aligned    \n"  /* yes, do word copy */
+
+        ".align  2           \n"
+        /* not 16-bit aligned */
+        "mov     #-1,r3      \n"  /* prepare a bit mask for high byte */
+        "extu.b  r3,r3       \n"
+        "swap.b  r3,r3       \n"  /* r3 = 0x0000FF00 */
+
+        "mov.w   @%2,r2      \n"  /* read first word (1st round) */
+        "add     #-12,%1     \n"  /* adjust end address for offsets */
+        "mov.b   r2,@%0      \n"  /* store low byte of first word */
+        "bra     .start4_b   \n"  /* jump into loop after next instr. */
+        "add     #-5,%0      \n"  /* adjust for dest. offsets; now even */
+
+    ".loop4_b:               \n"  /* main loop: copy 4 words in a row */
+        "mov.w   @%2,r2      \n"  /* read first word (2+ round) */
+        "and     r3,r1       \n"  /* get high byte of fourth word (2+ round) */
+        "extu.b  r2,r0       \n"  /* get low byte of first word (2+ round) */
+        "or      r1,r0       \n"  /* combine with high byte of fourth word */
+        "mov.w   r0,@(4,%0)  \n"  /* store at buf[4] */
+        "nop                 \n"  /* maintain alignment */
+    ".start4_b:              \n"
+        "mov.w   @%2,r1      \n"  /* read second word */
+        "and     r3,r2       \n"  /* get high byte of first word */
+        "extu.b  r1,r0       \n"  /* get low byte of second word */
+        "or      r2,r0       \n"  /* combine with high byte of first word */
+        "mov.w   r0,@(6,%0)  \n"  /* store at buf[6] */
+        "add     #8,%0       \n"  /* buf += 8 */
+        "mov.w   @%2,r2      \n"  /* read third word */
+        "and     r3,r1       \n"  /* get high byte of second word */
+        "extu.b  r2,r0       \n"  /* get low byte of third word */
+        "or      r1,r0       \n"  /* combine with high byte of second word */
+        "mov.w   r0,@%0      \n"  /* store at buf[0] */
+        "cmp/hi  %0,%1       \n"  /* check for end */
+        "mov.w   @%2,r1      \n"  /* read fourth word */
+        "and     r3,r2       \n"  /* get high byte of third word */
+        "extu.b  r1,r0       \n"  /* get low byte of fourth word */
+        "or      r2,r0       \n"  /* combine with high byte of third word */
+        "mov.w   r0,@(2,%0)  \n"  /* store at buf[2] */
+        "bt      .loop4_b    \n"
+        /* 24 instructions for 4 copies, takes 26 clock cycles */
+        /* avg. 6.5 cycles per word - 100% faster */
+
+        "swap.b  r1,r0       \n"  /* get high byte of last word */
+        "mov.b   r0,@(4,%0)  \n"  /* and store it */
+
+        "bra     .exit       \n"
+        "nop                 \n"
+
+        ".align  2           \n"
+        /* 16-bit aligned, loop(read and store word) */
+    ".aligned:               \n"
+        "mov.w   @%2,r2      \n"  /* read first word (1st round) */
+        "add     #-12,%1     \n"  /* adjust end address for offsets */
+        "bra     .start4_w   \n"  /* jump into loop after next instr. */
+        "add     #-6,%0      \n"  /* adjust for destination offsets */
+
+    ".loop4_w:               \n"  /* main loop: copy 4 words in a row */
+        "mov.w   @%2,r2      \n"  /* read first word (2+ round) */
+        "swap.b  r1,r0       \n"  /* swap fourth word (2+ round) */
+        "mov.w   r0,@(4,%0)  \n"  /* store fourth word (2+ round) */
+        "nop                 \n"  /* maintain alignment */
+    ".start4_w:              \n"
+        "mov.w   @%2,r1      \n"  /* read second word */
+        "swap.b  r2,r0       \n"  /* swap first word */
+        "mov.w   r0,@(6,%0)  \n"  /* store first word in buf[6] */
+        "add     #8,%0       \n"  /* buf += 8 */
+        "mov.w   @%2,r2      \n"  /* read third word */
+        "swap.b  r1,r0       \n"  /* swap second word */
+        "mov.w   r0,@%0      \n"  /* store second word in buf[0] */
+        "cmp/hi  %0,%1       \n"  /* check for end */
+        "mov.w   @%2,r1      \n"  /* read fourth word */
+        "swap.b  r2,r0       \n"  /* swap third word */
+        "mov.w   r0,@(2,%0)  \n"  /* store third word */
+        "bt      .loop4_w    \n"
+        /* 16 instructions for 4 copies, takes 18 clock cycles */
+        /* avg. 4.5 cycles per word - 144% faster */
+
+        "swap.b  r1,r0       \n"  /* swap fourth word (last round) */
+        "mov.w   r0,@(4,%0)  \n"  /* and store it */
+
+        ".exit:              \n"
+        : /* outputs */
+        : /* inputs */
+        /* %0 */ "r"(buf),
+        /* %1 */ "r"(wordcount),
+        /* %2 */ "r"(&ATA_DATA)
+        : /*trashed */
+        "r0","r1","r2","r3"
+    );
+#endif
 }
 
 int ata_read_sectors(unsigned long start,
@@ -958,14 +995,10 @@ int ata_init(void)
 
         if (coldstart)
         {
-            /* Reset both master and slave, we don't yet know what's in */
-            /* this is safe because non-present devices don't report busy */
+            /* This should reset both master and slave, we don't yet know what's in */
             ata_device = 0;
             if (ata_hard_reset())
                 return -1;
-            ata_device = SELECT_DEVICE1;
-            if (ata_hard_reset())
-                return -2;
         }
 
         rc = master_slave_detect();
