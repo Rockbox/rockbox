@@ -7,10 +7,9 @@
 
 Build your own archos.mod.
 
-1. Check out 'firmware', 'apps' and 'tools' from CVS (or possibly from a
-   downloaded archive). You may possibly want 'uisimulator' too (for trying
-   out things on host before making target tests).  If you haven't already
-   done so, we advise you pull down the 'docs' directory as well.
+1. Check out 'firmware', 'apps', 'docs' and 'tools' from CVS (or possibly from
+   a downloaded archive). You may possibly want 'uisimulator' too (for trying
+   out things on host before making target tests).
 
    If you do want to play with the simulator, read UISIMULATOR.
 
