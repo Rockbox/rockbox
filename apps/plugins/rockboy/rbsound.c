@@ -15,7 +15,7 @@ rcvar_t pcm_exports[] =
 	    RCV_END
 };
 
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_HWCODEC == MASNONE && !defined(SIMULATOR)
 static short* buf1;
 
 static short front_buf[512];
