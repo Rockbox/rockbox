@@ -878,9 +878,10 @@ bool settings_load_config(char* file)
             set_sound(value, SOUND_BALANCE, &global_settings.balance);
         else if (!strcasecmp(name, "channels")) {
             static char* options[] = {
-                "stereo","mono","mono left","mono right"};
+                "stereo","stereo narrow","mono","mono left",
+                "mono right","karaoke","stereo wide"};
             set_cfg_option(&global_settings.channel_config, value,
-                           options, 4);
+                           options, 7);
         }
         else if (!strcasecmp(name, "wps")) {
             if (wps_load(value,false))
@@ -941,6 +942,8 @@ bool settings_load_config(char* file)
         }
         else if (!strcasecmp(name, "scrollbar"))
             set_cfg_bool(&global_settings.scrollbar, value);
+        else if (!strcasecmp(name, "invert"))
+            set_cfg_bool(&global_settings.invert, value);
 #endif
         else if (!strcasecmp(name, "shuffle"))
             set_cfg_bool(&global_settings.playlist_shuffle, value);
@@ -1000,8 +1003,10 @@ bool settings_load_config(char* file)
             set_sound(value, SOUND_LOUDNESS, &global_settings.loudness);
         else if (!strcasecmp(name, "bass boost"))
             set_sound(value, SOUND_SUPERBASS, &global_settings.bass_boost);
-        else if (!strcasecmp(name, "auto volume"))
-            set_sound(value, SOUND_AVC, &global_settings.avc);
+        else if (!strcasecmp(name, "auto volume")) {
+            static char* options[] = {"off", "2", "4", "8" };
+            set_cfg_option(&global_settings.avc, value, options, 4);
+        }
         else if (!strcasecmp(name, "rec mic gain"))
             set_sound(value, SOUND_MIC_GAIN, &global_settings.rec_mic_gain);
         else if (!strcasecmp(name, "rec left gain"))

@@ -18,7 +18,8 @@ volume                 (0 - 100)
 bass                   (-15 - 15)
 treble                 (-15 - 15)
 balance                (-100 - 100)
-channels               (stereo, mono, mono left, mono right)
+channels               (stereo, stereo narrow, stereo wide,
+                        mono, mono left, mono right, karaoke)
 
 shuffle                (on, off)
 repeat                 (off, all, one)
@@ -54,7 +55,7 @@ Recorder-specific settings (allowed values) [unit]
 ---------------------------------------------------
 loudness               (0 - 17)
 bass boost             (0 - 100)
-auto volume            (0=off, 1=2s, 2=4s, 3=8s)
+auto volume            (off, 2, 4, 8) [seconds]
 
 peak meter release     (1 - 126)
 peak meter hold        (off, 200ms, 300ms, 500ms,
@@ -74,6 +75,7 @@ volume display         (graphic, numeric)
 battery display        (graphic, numeric)
 time format            (12hour, 24hour)
 font                   (/path/filename.fnt)
+invert                 (on, off)
 
 deep discharge         (on, off)
 trickle charge         (on, off)
