@@ -194,7 +194,10 @@ static inline long SWAB32(long value)
     result[ 7.. 0] = value[31..24];
   */    
 {
-    return SWAB16(SWAW32(SWAB16(value)));
+    asm volatile ("swap.b\t%0,%0\n"
+                  "swap.w\t%0,%0\n"
+                  "swap.b\t%0,%0\n" : "+r"(value));
+    return value;
 }
 
 /* Test And Set - UNTESTED */
