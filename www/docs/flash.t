@@ -10,6 +10,7 @@ by Jörg Hohensohn aka [IDC]Dragon
 5. How do I flash the firmware?<br>
 6. How do I bring in a current / my personal build of Rockbox?<br>
 7. Known issues, limitations<br>
+8. Movies and images<br>
 
 <h2>1. What is this about?</h2>
 <p>
@@ -257,7 +258,7 @@ Rockbox versions works OK. If you feel homesick, hold F1 during powerup.
 
 <p>
 Latest Rockbox now has a charging screen, but it is in an early stage. You'll 
-get it When the unit is off and you plug in the charger. The Rockbox charging
+get it when the unit is off and you plug in the charger. The Rockbox charging
 algorithm is first measuring the battery voltage for about 40 seconds, after
 that it only starts charging when the capacity is below 85%. 
 You can use the Archos charging (which always tops off) by holding F1 
@@ -265,8 +266,15 @@ while plugging in.
 
 <p>
 The plugin API is currently changed often, new builds may render the plugins 
-incompatible. When updating, make shure you grab those too, but don't
+incompatible. When updating, make sure you grab those too, but don't
 overwrite the rockbox_flash.rock yet, since you still need it matching the 
 currently running Rockbox to flash.
+
+<h2>8. Movies and images</h2>
+<p>
+ Jörg's AVI movie (1.5MB) <a href="flash/rockbox_flash_boot.avi">rockbox_flash_boot.avi</a> showing his unit booting Rockbox from flash.
+<p>
+ Roland's screendump from the movie:<br>
+<img src="flash/rockbox-flash.jpg" width="352" height="288">
 
 #include "foot.t"
