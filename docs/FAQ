@@ -712,16 +712,16 @@ A74: The Recorder models have a connector for digital audio output using the
      (The pitch shift function also modifies the sampling frequency!).
 
      For recording digital signals on the Recorder, use the white RCA jack
-     (left channel) and plug it into the digital output of your CD aplayer, MD
+     (left channel) and plug it into the digital output of your CD player, MD
      player or whatever. Don't forget to select digital input in the recording
      settings!
 
-     Note that there exist some adapter cables with different color coding, so
-     if it doesn't work try to swap red and white. The tip of the 3.5mm jack
-     is the digital input, the ring is the ouput. For recording digital
-     signals on the FM Recorder, you need a special 4-pole 3.5mm plug (shaft =
-     ground, tip = left channel analog line in, first ring (next to tip) =
-     right channel analog line in, second ring = digital in).
+     Note that some adapter cables exist with different color coding, so if it
+     doesn't work try to swap red and white. The tip of the 3.5mm jack is the
+     digital input, the ring is the ouput. For recording digital signals on
+     the FM Recorder, you need a special 4-pole 3.5mm plug (shaft = ground,
+     tip = left channel analog line in, first ring (next to tip) = right
+     channel analog line in, second ring = digital in).
 
      If you want to connect devices with optical inputs/outputs, you need a
      small converter box which converts your signal from electrical to optical
