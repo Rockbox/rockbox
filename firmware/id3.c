@@ -26,9 +26,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <fcntl.h>
-#include <file.h>
-#include <types.h>
+#include "file.h"
+#include "types.h"
 
 #include "id3.h"
 
