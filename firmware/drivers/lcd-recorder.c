@@ -476,13 +476,13 @@ void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
     
     if (!shift && clear)  /* shortcut for byte aligned match with clear */
     {
-    	while (ny >= 8)   /* all full rows */
-    	{
-    		memcpy(dst, src, nx);
-    		src += stride;
-    		dst += LCD_WIDTH;
+        while (ny >= 8)   /* all full rows */
+        {
+            memcpy(dst, src, nx);
+            src += stride;
+            dst += LCD_WIDTH;
             ny -= 8;
-    	}
+        }
         if (ny == 0)     /* nothing left to do? */
             return;
         /* last partial row to do by default routine */
@@ -506,8 +506,8 @@ void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
     /* Loop for each column */
     for (x = 0; x < nx; x++)
     {
-    	src_col = src++;
-    	dst_col = dst++;
+        src_col = src++;
+        dst_col = dst++;
         data = 0;
         y = 0;
 

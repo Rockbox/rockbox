@@ -238,7 +238,7 @@ struct font* font_load(char *path)
     /* one-time rotate font bits to rockbox format*/
     rotate_font_bits(pf);
 
-    return pf;	/* success!*/
+    return pf;    /* success!*/
 }
 
 /*
@@ -309,7 +309,7 @@ static void rotleft(unsigned char *dst, bitmap_t *src, unsigned int width,
                     unsigned int height)
 {
     unsigned int i,j;
-    unsigned int src_words;		/* # words of input image*/
+    unsigned int src_words;        /* # words of input image*/
     unsigned int dst_mask;      /* bit mask for destination */
     bitmap_t src_mask;          /* bit mask for source */
 
@@ -331,21 +331,21 @@ static void rotleft(unsigned char *dst, bitmap_t *src, unsigned int width,
 
             /* if set in input, set in rotated output */
             if (src[i] & src_mask)
-            	dst[j] |= dst_mask;
+                dst[j] |= dst_mask;
 
             src_mask >>= 1;    /* next input bit */
             if (src_mask == 0) /* input word done? */
             {
-            	src_mask = 1 << (sizeof (bitmap_t) * 8 - 1);
-            	i++;           /* next input word */
+                src_mask = 1 << (sizeof (bitmap_t) * 8 - 1);
+                i++;           /* next input word */
             }
         }
 
         dst_mask <<= 1;          /* next output bit (row) */
         if (dst_mask > (1 << 7)) /* output bit > 7? */
         {
-        	dst_mask = 1;
-        	dst += width;        /* next output byte row */
+            dst_mask = 1;
+            dst += width;        /* next output byte row */
         }
     }
 }
