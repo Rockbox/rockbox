@@ -154,7 +154,7 @@ int snprintf(char *buf, size_t size, const char *fmt, ...)
     va_end(ap);
 
     /* make sure it ends with a trailing zero */
-    pr.ptr[ok?0:-1]='\0';
+    pr.ptr[(pr.bytes < pr.max) ? 0 : -1] = '\0';
     
     return pr.bytes;
 }
@@ -171,7 +171,7 @@ int vsnprintf(char *buf, int size, const char *fmt, va_list ap)
     ok = format(sprfunc, &pr, fmt, ap);
 
     /* make sure it ends with a trailing zero */
-    pr.ptr[ok?0:-1]='\0';
+    pr.ptr[(pr.bytes < pr.max) ? 0 : -1] = '\0';
     
     return pr.bytes;
 }
