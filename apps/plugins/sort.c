@@ -189,18 +189,35 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     stringbuffer = buf;
     pointers = (char **)(buf + buf_size - sizeof(int));
 
+    rb->lcd_clear_display();
+    rb->splash(0, true, "Loading...");
+    
     rc = read_buffer(0);
     if(rc == 0) {
+        rb->lcd_clear_display();
+        rb->splash(0, true, "Sorting...");
         sort_buffer();
+        
+        rb->lcd_clear_display();
+        rb->splash(0, true, "Writing...");
+        sort_buffer();
+        
         rc = write_file();
         if(rc < 0) {
+            rb->lcd_clear_display();
             rb->splash(HZ, true, "Can't write file: %d", rc);
+        } else {
+            rb->lcd_clear_display();
+            rb->splash(HZ, true, "Done");
         }
     } else {
-        if(rc < 0)
+        if(rc < 0) {
+            rb->lcd_clear_display();
             rb->splash(HZ, true, "Can't read file: %d", rc);
-        else
+        } else {
+            rb->lcd_clear_display();
             rb->splash(HZ, true, "The file is too big");
+        }
     }
     
     return PLUGIN_OK;
