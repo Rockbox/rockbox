@@ -27,6 +27,7 @@ static struct tm tm;
 
 struct tm *get_time(void)
 {
+#ifdef HAVE_RTC
     char rtcbuf[8];
     int i;
 
@@ -49,5 +50,16 @@ struct tm *get_time(void)
     tm.tm_wday = rtcbuf[4] & 0x07;
     tm.tm_yday = 0; /* Not implemented for now */
     tm.tm_isdst = -1; /* Not implemented for now */
+#else
+    tm.tm_sec = 0;
+    tm.tm_min = 0;
+    tm.tm_hour = 0;
+    tm.tm_mday = 1;
+    tm.tm_mon = 1;
+    tm.tm_year = 1970;
+    tm.tm_wday = 1;
+    tm.tm_yday = 0; /* Not implemented for now */
+    tm.tm_isdst = -1; /* Not implemented for now */
+#endif
     return &tm;
 }
