@@ -86,6 +86,7 @@ void mpeg_set_pitch(int percent);
 void mpeg_init_recording(void);
 void mpeg_init_playback(void);
 void mpeg_record(char *filename);
+void mpeg_new_file(char *filename);
 void mpeg_set_recording_options(int frequency, int quality,
                                 int source, int channel_mode,
                                 bool editable);

@@ -221,6 +221,11 @@ bool recording_screen(void)
                     update_countdown = 1; /* Update immediately */
                     last_seconds = 0;
                 }
+                else
+                {
+                    mpeg_new_file(create_filename());
+                    update_countdown = 1; /* Update immediately */
+                }
                 break;
 
             case BUTTON_UP:
@@ -389,10 +394,7 @@ bool recording_screen(void)
 
                     if (mpeg_status() && (seconds >= dseconds))
                     {
-                        /* stop and restart recording */
-                        mpeg_stop();
-                        have_recorded = true;
-                        mpeg_record(create_filename());
+                        mpeg_new_file(create_filename());
                         update_countdown = 1;
                         last_seconds = 0;
                     }

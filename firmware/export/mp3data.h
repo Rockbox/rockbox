@@ -56,6 +56,8 @@ struct mp3info {
 
 
 unsigned long find_next_frame(int fd, int *offset, int max_offset, unsigned long last_header);
+unsigned long mem_find_next_frame(int startpos, int *offset, int max_offset,
+                                  unsigned long last_header);
 int get_mp3file_info(int fd, struct mp3info *info);
 int count_mp3_frames(int fd, int startpos, int filesize,
                      void (*progressfunc)(int));

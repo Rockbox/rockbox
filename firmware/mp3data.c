@@ -212,7 +212,7 @@ static bool mp3headerinfo(struct mp3info *info, unsigned long header)
     return true;
 }
 
-unsigned long find_next_frame(int fd, int *offset, int max_offset, unsigned long last_header)
+static unsigned long __find_next_frame(int fd, int *offset, int max_offset, unsigned long last_header, int(*getfunc)(int fd, unsigned char *c))
 {
     unsigned long header=0;
     unsigned char tmp;
@@ -227,7 +227,7 @@ unsigned long find_next_frame(int fd, int *offset, int max_offset, unsigned long
     /* Fill up header with first 24 bits */
     for(i = 0; i < 3; i++) {
         header <<= 8;
-        if(!read(fd, &tmp, 1))
+        if(!getfunc(fd, &tmp))
             return 0;
         header |= tmp;
         pos++;
@@ -235,7 +235,7 @@ unsigned long find_next_frame(int fd, int *offset, int max_offset, unsigned long
 
     do {
         header <<= 8;
-        if(!read(fd, &tmp, 1))
+        if(!getfunc(fd, &tmp))
             return 0;
         header |= tmp;
         pos++;
@@ -252,6 +252,16 @@ unsigned long find_next_frame(int fd, int *offset, int max_offset, unsigned long
 #endif
     
     return header;
+}
+
+static int fileread(int fd, unsigned char *c)
+{
+    return read(fd, c, 1);
+}
+
+unsigned long find_next_frame(int fd, int *offset, int max_offset, unsigned long last_header)
+{
+    return __find_next_frame(fd, offset, max_offset, last_header, fileread);
 }
 
 static int fnf_read_index;
@@ -315,44 +325,37 @@ static void buf_init(void)
 unsigned long buf_find_next_frame(int fd, int *offset, int max_offset,
                                   unsigned long last_header)
 {
-    unsigned long header=0;
-    unsigned char tmp;
-    int i;
+    return __find_next_frame(fd, offset, max_offset, last_header, buf_getbyte);
+}
 
-    int pos = 0;
+static int mp3buflen;
+static int mem_pos;
+static int mem_cnt;
+static int mem_maxlen;
 
-    /* We remember the last header we found, to use as a template to see if
-       the header we find has the same frequency, layer etc */
-    last_header &= 0xffff0c00;
-
-    /* Fill up header with first 24 bits */
-    for(i = 0; i < 3; i++) {
-        header <<= 8;
-        if(!buf_getbyte(fd, &tmp))
-            return 0;
-        header |= tmp;
-        pos++;
-    }
-
-    do {
-        header <<= 8;
-        if(!buf_getbyte(fd, &tmp))
-            return 0;
-        header |= tmp;
-        pos++;
-        if(max_offset > 0 && pos > max_offset)
-            return 0;
-    } while(!is_mp3frameheader(header) ||
-            (last_header?((header & 0xffff0c00) != last_header):false));
-
-    *offset = pos - 4;
-
-#ifdef DEBUG
-    if(*offset)
-        DEBUGF("Warning: skipping %d bytes of garbage\n", *offset);
-#endif
+static int mem_getbyte(int dummy, unsigned char *c)
+{
+    dummy = dummy;
     
-    return header;
+    *c = mp3buf[mem_pos++];
+    if(mem_pos >= mp3buflen)
+        mem_pos = 0;
+
+    if(mem_cnt++ >= mem_maxlen)
+        return 0;
+    else
+        return 1;
+}
+
+unsigned long mem_find_next_frame(int startpos, int *offset, int max_offset,
+                                  unsigned long last_header)
+{
+    mp3buflen = mp3end - mp3buf;
+    mem_pos = startpos;
+    mem_cnt = 0;
+    mem_maxlen = max_offset;
+
+    return __find_next_frame(0, offset, max_offset, last_header, mem_getbyte);
 }
 
 int get_mp3file_info(int fd, struct mp3info *info)

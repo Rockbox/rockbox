@@ -52,6 +52,7 @@ static void stop_recording(void);
 static int get_unplayed_space(void);
 static int get_playable_space(void);
 static int get_unswapped_space(void);
+static int get_unsaved_space(void);
 #endif
 
 #define MPEG_PLAY         1
@@ -65,6 +66,7 @@ static int get_unswapped_space(void);
 #define MPEG_RECORD 9
 #define MPEG_INIT_RECORDING 10
 #define MPEG_INIT_PLAYBACK 11
+#define MPEG_NEW_FILE    12
 #define MPEG_NEED_DATA    100
 #define MPEG_TRACK_CHANGE 101
 #define MPEG_SAVE_DATA    102
@@ -494,6 +496,7 @@ static bool saving; /* We are saving the buffer to disk */
 static char recording_filename[MAX_PATH];
 static int rec_frequency_index; /* For create_xing_header() calls */
 static int rec_version_index;   /* For create_xing_header() calls */
+static bool disable_xing_header; /* When splitting files */
 #endif
 
 static int mpeg_file;
@@ -686,6 +689,16 @@ static int get_unswapped_space(void)
         space += mp3buflen;
     return space;
 }
+
+#ifdef HAVE_MAS3587F
+static int get_unsaved_space(void)
+{
+    int space = mp3buf_write - mp3buf_read;
+    if (space < 0)
+        space += mp3buflen;
+    return space;
+}
+#endif
 
 static void init_dma(void)
 {
@@ -1270,6 +1283,9 @@ static void mpeg_thread(void)
     int writelen;
     int framelen;
     unsigned long saved_header;
+    int startpos;
+    int rc;
+    int offset;
 #endif
     
     is_playing = false;
@@ -1893,29 +1909,34 @@ static void mpeg_thread(void)
                     if(mpeg_file >= 0)
                         close(mpeg_file);
 
-                    /* Create the Xing header */
-                    mpeg_file = open(recording_filename, O_RDWR);
-                    if(mpeg_file < 0)
-                        panicf("rec upd: %d (%s)", mpeg_file, recording_filename);
+                    if(!disable_xing_header)
+                    {
+                        /* Create the Xing header */
+                        mpeg_file = open(recording_filename, O_RDWR);
+                        if(mpeg_file < 0)
+                            panicf("rec upd: %d (%s)", mpeg_file,
+                                   recording_filename);
 
-                    /* If the number of recorded frames have reached 0x7ffff,
-                       we can no longer trust it */
-                    if(num_recorded_frames == 0x7ffff)
-                        num_recorded_frames = 0;
-
-                    /* Read the first MP3 frame from the recorded stream */
-                    lseek(mpeg_file, MPEG_RESERVED_HEADER_SPACE, SEEK_SET);
-                    read(mpeg_file, &saved_header, 4);
-                    
-                    framelen = create_xing_header(mpeg_file, 0, num_rec_bytes,
-                                                  mp3buf, num_recorded_frames,
-                                                  saved_header, NULL, false);
-                    
-                    lseek(mpeg_file, MPEG_RESERVED_HEADER_SPACE-framelen,
-                          SEEK_SET);
-                    write(mpeg_file, mp3buf, framelen);
-                    close(mpeg_file);
-                    
+                        /* If the number of recorded frames have
+                           reached 0x7ffff, we can no longer trust it */
+                        if(num_recorded_frames == 0x7ffff)
+                            num_recorded_frames = 0;
+                        
+                        /* Read the first MP3 frame from the recorded stream */
+                        lseek(mpeg_file, MPEG_RESERVED_HEADER_SPACE, SEEK_SET);
+                        read(mpeg_file, &saved_header, 4);
+                        
+                        framelen = create_xing_header(mpeg_file, 0,
+                                                      num_rec_bytes, mp3buf,
+                                                      num_recorded_frames,
+                                                      saved_header, NULL,
+                                                      false);
+                        
+                        lseek(mpeg_file, MPEG_RESERVED_HEADER_SPACE-framelen,
+                              SEEK_SET);
+                        write(mpeg_file, mp3buf, framelen);
+                        close(mpeg_file);
+                    }
                     mpeg_file = -1;
                     
 #ifdef DEBUG1
@@ -1933,9 +1954,105 @@ static void mpeg_thread(void)
 #endif
                     mpeg_stop_done = true;
                     break;
+
+                case MPEG_NEW_FILE:
+                    /* Make sure we have at least one complete frame
+                       in the buffer */
+                    amount_to_save = get_unsaved_space();
+                    while(amount_to_save < 1800)
+                    {
+                        sleep(HZ/10);
+                        amount_to_save = get_unsaved_space();
+                    }
+
+                    /* Now find a frame boundary to split at */
+                    startpos = mp3buf_write - 1800;
+                    if(startpos < 0)
+                        startpos += mp3buflen;
+
+                    {
+                        unsigned long tmp[2];
+                        /* Find out how the mp3 header should look like */
+                        mas_readmem(MAS_BANK_D0, 0xfd1, tmp, 2);
+                        saved_header = 0xffe00000 |
+                            ((tmp[0] & 0x7c00) << 6) |
+                            (tmp[1] & 0xffff);
+                        DEBUGF("Header: %08x\n", saved_header);
+                    }
+
+                    mem_find_next_frame(startpos, &offset, 1800, saved_header);
+
+                    /* offset will now contain the number of bytes to
+                       add to startpos to find the frame boundary */
+                    startpos += offset;
+                    if(startpos >= mp3buflen)
+                        startpos -= mp3buflen;
+
+                    amount_to_save = startpos - mp3buf_read;
+                    if(amount_to_save < 0)
+                        amount_to_save += mp3buflen;
+
+                    /* First save up to the end of the buffer */
+                    writelen = MIN(amount_to_save,
+                                   mp3buflen - mp3buf_read);
+                    
+                    rc = write(mpeg_file, mp3buf + mp3buf_read, writelen);
+                    if(rc < 0)
+                    {
+                        if(errno == ENOSPC)
+                        {
+                            mpeg_errno = MPEGERR_DISK_FULL;
+                            demand_irq_enable(false);
+                            stop_recording();
+                            queue_post(&mpeg_queue, MPEG_STOP_DONE, 0);
+                            break;
+                        }
+                        else
+                        {
+                            panicf("rec wrt: %d", rc);
+                        }
+                    }
+
+                    /* Then save the rest */
+                    writelen =  amount_to_save - writelen;
+                    if(writelen)
+                    {
+                        rc = write(mpeg_file, mp3buf, writelen);
+                        if(rc < 0)
+                        {
+                            if(errno == ENOSPC)
+                            {
+                                mpeg_errno = MPEGERR_DISK_FULL;
+                                demand_irq_enable(false);
+                                stop_recording();
+                                queue_post(&mpeg_queue, MPEG_STOP_DONE, 0);
+                                break;
+                            }
+                            else
+                            {
+                                panicf("spt wrt: %d", rc);
+                            }
+                        }
+                    }
+
+                    /* Advance the buffer pointers */
+                    mp3buf_read += amount_to_save;
+                    if(mp3buf_read >= mp3buflen)
+                        mp3buf_read -= mp3buflen;
+
+                    /* Close the current file */
+                    rc = close(mpeg_file);
+                    if(rc < 0)
+                        panicf("spt cls: %d", rc);
+
+                    /* Open the new file */
+                    mpeg_file = open(recording_filename, O_WRONLY|O_CREAT);
+                    if(mpeg_file < 0)
+                        panicf("sptfile: %d", mpeg_file);
+                    break;
                     
                 case MPEG_SAVE_DATA:
-                    amount_to_save = mp3buf_write - mp3buf_read;
+                    amount_to_save = get_unsaved_space();
                     
                     /* If the result is negative, the write index has
                        wrapped */
@@ -1954,8 +2071,6 @@ static void mpeg_thread(void)
                            amount_to_save < MPEG_RECORDING_LOW_WATER ||
                            stop_pending)
                         {
-                            int rc;
-                            
                             /* Only save up to the end of the buffer */
                             writelen = MIN(amount_to_save,
                                            mp3buflen - mp3buf_read);
@@ -1981,14 +2096,14 @@ static void mpeg_thread(void)
                                 }
                             }
                             
-                            rc = fsync(mpeg_file);
-                            if(rc < 0)
-                                panicf("rec fls: %d", rc);
-
                             mp3buf_read += amount_to_save;
                             if(mp3buf_read >= mp3buflen)
                                 mp3buf_read = 0;
                             
+                            rc = fsync(mpeg_file);
+                            if(rc < 0)
+                                panicf("rec fls: %d", rc);
+
                             queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
                         }
                         else
@@ -2257,6 +2372,7 @@ void mpeg_record(char *filename)
     recording_filename[MAX_PATH - 1] = 0;
     
     num_rec_bytes = 0;
+    disable_xing_header = false;
     queue_post(&mpeg_queue, MPEG_RECORD, NULL);
 }
 
@@ -2309,6 +2425,21 @@ static void stop_recording(void)
     } while(val & 1);
     
     drain_dma_buffer();
+}
+
+void mpeg_new_file(char *filename)
+{
+    mpeg_errno = 0;
+    
+    strncpy(recording_filename, filename, MAX_PATH - 1);
+    recording_filename[MAX_PATH - 1] = 0;
+
+    disable_xing_header = true;
+
+    /* Store the current time */
+    record_start_time = current_tick;
+
+    queue_post(&mpeg_queue, MPEG_NEW_FILE, NULL);
 }
 
 unsigned long mpeg_recorded_time(void)
