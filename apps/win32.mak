@@ -57,7 +57,7 @@ ifdef PROPFONTS
     DEFINES  += -DLCD_PROPFONTS
 endif
 
-CFLAGS = -O -W -Wall -m1 -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns $(INCLUDES) $(TARGET) $(DEFINES)
+CFLAGS = -O -W -Wall -m1 -nostdlib -ffreestanding -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns $(INCLUDES) $(DEFINES)
 AFLAGS += -small -relax
 
 ifdef DEBUG
@@ -88,7 +88,7 @@ $(OBJDIR)/librockbox.a:
 	make -C $(FIRMWARE) -f win32.mak TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR)
 
 $(OBJDIR)/archos.elf : $(OBJS) $(LDS) $(OBJDIR)/librockbox.a
-	$(CC) -Os -nostdlib -o $(OBJDIR)/archos.elf $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -L$(FIRMWARE) -T$(LDS) -Wl,-Map,$(OBJDIR)/archos.map
+	$(CC) -Os -nostdlib -o $(OBJDIR)/archos.elf $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -lc -L$(FIRMWARE) -T$(LDS) -Wl,-Map,$(OBJDIR)/archos.map
 
 $(OBJDIR)/archos.bin : $(OBJDIR)/archos.elf
 	$(OC) -O binary $(OBJDIR)/archos.elf $(OBJDIR)/archos.bin
