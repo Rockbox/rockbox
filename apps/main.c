@@ -31,6 +31,7 @@
 #include "system.h"
 #include "usb.h"
 #include "adc.h"
+#include "i2c.h"
 #ifndef SIMULATOR
 #include "dmalloc.h"
 #include "bmalloc.h"
@@ -93,6 +94,8 @@ void init(void)
 #endif
     set_irq_level(0);
 
+    i2c_init();
+    
     adc_init();
     
     usb_init();
