@@ -123,7 +123,7 @@ new: "Playlista"
 id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
 eng: "Buffer Full"
-new: "pelny bufor"
+new: "Pelny bufor"
 
 id: LANG_PLAYINDICES_AMOUNT
 desc: number of files in playlist
@@ -183,7 +183,7 @@ new: "Kontrast"
 id: LANG_SHUFFLE
 desc: in settings_menu
 eng: "Shuffle"
-new: "Losuj"
+new: "Losowo"
 
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
@@ -208,7 +208,7 @@ new: "Dokoncz"
 id: LANG_OFF
 desc: Used in a lot of places
 eng: "Off"
-new: "Wylacz"
+new: "wyl."
 
 id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
@@ -218,7 +218,7 @@ new: "Pytaj"
 id: LANG_ON
 desc: Used in a lot of places
 eng: "On"
-new: "Wlacz"
+new: "wlacz"
 
 id: LANG_BACKLIGHT
 desc: in settings_menu
@@ -228,7 +228,7 @@ new: "Podswietlenie"
 id: LANG_SCROLL
 desc: in settings_menu
 eng: "Scroll Speed Setting Example"
-new: "Przyklad ustawiania predkosci"
+new: "Przykladowa predkosc przesuwu"
 
 id: LANG_DISCHARGE
 desc: in settings_menu
@@ -387,22 +387,22 @@ new: "Konfiguracja kanalow"
 id: LANG_CHANNEL_STEREO
 desc: in sound_settings
 eng: "Stereo"
-new: "Stereo"
+new: "stereo"
 
 id: LANG_CHANNEL_MONO
 desc: in sound_settings
 eng: "Mono"
-new: "Mono"
+new: "mono"
 
 id: LANG_CHANNEL_LEFT
 desc: in sound_settings
 eng: "Mono Left"
-new: "Mono Lewy"
+new: "mono lewy"
 
 id: LANG_CHANNEL_RIGHT
 desc: in sound_settings
 eng: "Mono Right"
-new: "Mono Prawy"
+new: "mono prawy"
 
 id: LANG_AUTOVOL
 desc: in sound_settings
@@ -582,12 +582,12 @@ new: "Filtr katalogow: %s"
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
 eng: "Status"
-new: "Status"
+new: "Gorny"
 
 id: LANG_F3_SCROLL
 desc: in wps F3 pressed
 eng: "Scroll"
-new: "Przesuw"
+new: "Lewy"
 
 id: LANG_F3_BAR
 desc: in wps F3 pressed
@@ -803,17 +803,17 @@ new: "Pokaz pliki"
 id: LANG_FILTER_MUSIC
 desc: show only music-related files
 eng: "Music"
-new: "Muzyczne"
+new: "muzyczne"
 
 id: LANG_FILTER_SUPPORTED
 desc: show all file types supported by Rockbox
 eng: "Supported"
-new: "Wspierane"
+new: "wspierane"
 
 id: LANG_FILTER_ALL
 desc: show all files
 eng: "All"
-new: "Wszystkie"
+new: "wszystkie"
 
 id: LANG_SET_BOOL_YES
 desc: bool true representation
@@ -830,7 +830,7 @@ desc: in the display menu
 eng: "Peak Meter"
 new: "Wskaznik szczyt."
 
-id: LANG_PM_RELEASE
+id:   LANG_PM_RELEASE
 desc: in the peak meter menu
 eng: "Peak Release"
 new: "Zwolnienie szczyt."
@@ -868,12 +868,12 @@ new: "Powtorz"
 id: LANG_REPEAT_ALL
 desc: repeat playlist once all songs have completed
 eng: "All"
-new: "Wszystkie"
+new: "wszystkie"
 
 id: LANG_REPEAT_ONE
 desc: repeat one song
 eng: "One"
-new: "Pojedynczy"
+new: "pojedynczy"
 
 id: LANG_RESET_CONFIRM
 desc: confirm to reset settings
@@ -1087,12 +1087,12 @@ new: "Wzmocnienie"
 id: LANG_RECORDING_LEFT
 desc: in the recording screen
 eng: "Left"
-new: "Lewy"
+new: "lewy"
 
 id: LANG_RECORDING_RIGHT
 desc: in the recording screen
 eng: "Right"
-new: "Prawy"
+new: "prawy"
 
 id: LANG_RECORDING_QUALITY
 desc: in the recording settings
@@ -1152,7 +1152,7 @@ new: "Wylaczanie dysku"
 id: LANG_FILTER_PLAYLIST
 desc: show only playlist
 eng: "Playlists"
-new: "Playlisty"
+new: "playlisty"
 
 id: LANG_BATTERY_TIME
 desc: battery level in % and estimated time remaining
@@ -1187,7 +1187,7 @@ new: "Rozmiar skoku przesuwania"
 id: LANG_SCROLL_STEP_EXAMPLE
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size Setting Example Text"
-new: "Przykladowy tekst ustawienia rozmiaru skoku przesuwania"
+new: "Przykladowy rozmiar skoku przesuwania"
 
 id: LANG_SCROLL_SPEED
 desc: in display_settings_menu()
@@ -1312,7 +1312,7 @@ new: "GRAJ=Ustaw OFF=Anuluj"
 id: LANG_CREATE_PLAYLIST
 desc: Menu option for creating a playlist
 eng: "Create Playlist"
-new: "Stworz Playliste"
+new: "Stworz playliste"
 
 id: LANG_CREATING
 desc: Screen feedback during playlist creation
@@ -1342,7 +1342,7 @@ new: "Opusc"
 id: LANG_MENU_SHOW_ID3_INFO
 desc: Menu option to start id3 viewer
 eng: "Show ID3 Info"
-new: "Pokaz Info ID3"
+new: "Pokaz info ID3"
 
 id: LANG_ID3_GENRE
 desc: ID3 frame 'genre'
@@ -1392,4 +1392,29 @@ new: "Fade przy zatrzymaniu"
 id: LANG_SOKOBAN_ON
 desc: how to undo move 
 eng: "[ON] To Undo"
-new: "[ON] - przywroc"
+new: "[ON] przywroc"
+
+id: LANG_INVERT
+desc: in settings_menu
+eng: "Invert"
+new: "Negatyw"
+
+id: LANG_CHANNEL_STEREO_NARROW_PLAYER
+desc: in sound_settings
+eng: "St. Narrow"
+new: "waskie st."
+
+id: LANG_CHANNEL_STEREO_NARROW_RECORDER
+desc: in sound_settings
+eng: "Stereo Narrow"
+new: "waskie stereo"
+
+id: LANG_CHANNEL_STEREO_WIDE
+desc: in sound_settings
+eng: "Stereo Wide"
+new: "szerokie stereo"
+
+id: LANG_CHANNEL_KARAOKE
+desc: in sound_settings
+eng: "Karaoke"
+new: "karaoke"
