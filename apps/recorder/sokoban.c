@@ -24,7 +24,6 @@
 
 #ifdef USE_GAMES
 
-#include <sprintf.h>
 #include "sokoban.h"
 #include "lcd.h"
 #include "button.h"
@@ -42,6 +41,8 @@
 #endif
 #include <string.h>
 #include "lang.h"
+#include "sprintf.h"
+
 #define SOKOBAN_TITLE       "Sokoban"
 #define SOKOBAN_TITLE_FONT  2
 #define LEVELS_FILE         "/sokoban.levels"
