@@ -119,13 +119,12 @@ void ev_poll(void)
         }
         if(pressed & ROCKBOY_MENU) {
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
-          if (do_user_menu() == USER_MENU_QUIT) {
+          if (do_user_menu() == USER_MENU_QUIT) 
 #endif
+          {
             die("");
             cleanshut=1;
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
           }
-#endif
         }
     }
     
@@ -139,11 +138,11 @@ void vid_setpal(int i, int r, int g, int b)
     (void)b;
 }
 
-void vid_init(void)
+void vid_begin(void)
 {
 }
 
-void vid_begin(void)
+void vid_init(void)
 {
     fb.pelsize=1; // 8 bit framebuffer.. (too much.. but lowest gnuboy will support.. so yea...
     fb.h=144;
