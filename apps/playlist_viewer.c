@@ -827,7 +827,7 @@ bool playlist_viewer_ex(char* filename)
     bool update=true;       /* update display */
     bool cursor_on=true;    /* used for flashing cursor */
     int old_cursor_pos;     /* last cursor position */
-    int button; 
+    int button, lastbutton = BUTTON_NONE;
 
     if (!initialize(filename, false))
         goto exit;
@@ -931,6 +931,10 @@ bool playlist_viewer_ex(char* filename)
 #endif
 
             case TREE_RUN:
+#ifdef TREE_RUN_PRE
+                if (lastbutton != TREE_RUN_PRE)
+                    break;
+#endif
                 if (viewer.move_track >= 0)
                 {
                     /* Move track */
@@ -1057,6 +1061,7 @@ bool playlist_viewer_ex(char* filename)
             cursor_on = true;
             update = false;
         }
+        lastbutton = button;
     }
 
 exit:
