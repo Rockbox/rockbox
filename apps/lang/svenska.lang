@@ -9,16 +9,6 @@ desc: in the main menu
 eng: "General Settings"
 new: "Huvudinställning"
 
-id: LANG_GAMES
-desc: in the main menu
-eng: "Games"
-new: "Spel"
-
-id: LANG_DEMOS
-desc: in the main menu
-eng: "Demos"
-new: "Demosar"
-
 id: LANG_INFO
 desc: in the main menu
 eng: "Info"
@@ -54,50 +44,10 @@ desc: the buffer size recorder-screen width, %d MB %d fraction of MB
 eng: "Buffer: %d.%03dMB"
 new: "Buffert: %d.%03dMB"
 
-id: LANG_BATTERY_LEVEL_PLAYER
-desc: the battery level in percentage
-eng: "Batt: %d%%%s"
-new: "Batt: %d%%%s"
-
-id: LANG_BATTERY_LEVEL_RECORDER
-desc: the battery level in percentage
-eng: "Battery: %d%%%s"
-new: "Batteri: %d%%%s"
-
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
 eng: "Battery: Charging"
 new: "Batteriladdning"
-
-id: LANG_BOUNCE
-desc: in the demos menu
-eng: "Bounce"
-new: "Studsare"
-
-id: LANG_SNOW
-desc: in the demos menu
-eng: "Snow"
-new: "Snöfall"
-
-id: LANG_TETRIS
-desc: in the games menu
-eng: "Tetris"
-new: "Tetris"
-
-id: LANG_SOKOBAN
-desc: in the games menu
-eng: "Sokoban"
-new: "Sokoban"
-
-id: LANG_WORMLET
-desc: in the games menu
-eng: "Wormlet"
-new: "Wormlet"
-
-id: LANG_SNAKE
-desc: in the games menu
-eng: "Snake"
-new: "Orm"
 
 id: LANG_PLAYLIST_LOAD
 desc: displayed on screen while loading a playlist
@@ -109,11 +59,6 @@ desc: displayed on screen while shuffling a playlist
 eng: "Shuffling..."
 new: "Slumpar..."
 
-id: LANG_PLAYLIST_PLAY
-desc: displayed on screen when start playing a playlist
-eng: "Playing..."
-new: "Spelar..."
-
 id: LANG_PLAYINDICES_PLAYLIST
 desc: in playlist.indices() when playlist is full
 eng: "Playlist"
@@ -123,11 +68,6 @@ id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
 eng: "Buffer Full"
 new: "Full buffert"
-
-id: LANG_PLAYINDICES_AMOUNT
-desc: number of files in playlist
-eng: "%d Files"
-new: "%d filer"
 
 id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
@@ -159,21 +99,6 @@ desc: used in set_time()
 eng: "OFF To Revert"
 new: "AV för att återgå"
 
-id: LANG_HIDDEN
-desc: in settings_menu
-eng: ""
-new: ""
-
-id: LANG_HIDDEN_SHOW
-desc: in settings_menu 
-eng: ""
-new: ""
-
-id: LANG_HIDDEN_HIDE
-desc: in settings_menu
-eng: ""
-new: ""
-
 id: LANG_CONTRAST
 desc: in settings_menu
 eng: "Contrast"
@@ -188,11 +113,6 @@ id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play Selected First"
 new: "Spela den valda först"
-
-id: LANG_MP3FILTER
-desc: in settings_menu
-eng: ""
-new: ""
 
 id: LANG_SORT_CASE
 desc: in settings_menu
@@ -259,30 +179,10 @@ desc: in settings_menu
 eng: "Follow Playlist"
 new: "Följ spellistan"
 
-id: LANG_RESET_ASK_PLAYER
-desc: confirm to reset settings
-eng: ""
-new: ""
-
-id: LANG_RESET_CONFIRM_PLAYER
-desc: confirm to reset settings
-eng: ""
-new: ""
-
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
 eng: "Are You Sure?"
 new: "Är du säker?"
-
-id: LANG_RESET_CONFIRM_RECORDER
-desc: confirm to reset settings
-eng: ""
-new: ""
-
-id: LANG_RESET_CANCEL_RECORDER
-desc: confirm to reset settings
-eng: "OFF=Cancel"
-new: "AV=Avbryt"
 
 id: LANG_RESET_DONE_SETTING
 desc: visual confirmation after settings reset
@@ -424,25 +324,15 @@ desc: possible answers to resume question
 eng: "(PLAY/STOP)"
 new: "(Ja/Nej)"
 
-id: LANG_RESUME_CONFIRM_RECORDER
-desc: possible answer to resume question
-eng: ""
-new: ""
-
-id: LANG_RESUME_CANCEL_RECORDER
-desc: possible answer to resume question
-eng: ""
-new: ""
-
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
 eng: "Key Lock ON"
-new: "Lås PÅ"
+new: "Lås på"
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
 eng: "Key Lock OFF"
-new: "Lås AV"
+new: "Lås av"
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
@@ -457,12 +347,12 @@ new: "Tangentlåset är AV"
 id: LANG_MUTE_ON_PLAYER
 desc: displayed when mute is on
 eng: "Mute ON"
-new: "Tyst PÅ"
+new: "Tyst på"
 
 id: LANG_MUTE_OFF_PLAYER
 desc: displayed when mute is off
 eng: "Mute OFF"
-new: "Tyst AV"
+new: "Tyst av"
 
 id: LANG_MUTE_ON_RECORDER
 desc: displayed when mute is on
@@ -569,11 +459,6 @@ desc: in wps F2 pressed
 eng: "Mode:"
 new: "Läge:"
 
-id: LANG_DIR_FILTER
-desc: in wps F2 pressed
-eng: ""
-new: ""
-
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
 eng: "Status"
@@ -593,181 +478,12 @@ id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
 eng: "End Of List"
 new: "Listan slut"
-
-id: LANG_END_CONFIRM_PLAYER
-desc: when playlist has finished
-eng: ""
-new: ""
+### LANG_END_CONFIRM_PLAYER was not found in the english file!
 
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
 eng: "End Of Song List"
 new: "Slut på spellistan"
-
-id: LANG_END_CONFIRM_RECORDER
-desc: when playlist has finished
-eng: ""
-new: ""
-
-id: LANG_SNAKE_SCORE
-desc: when you die in snake game
-eng: "Your score:"
-new: "Dina poäng:"
-
-id: LANG_SNAKE_HISCORE
-desc: high score in snake game
-eng: "High Score: %d"
-new: "Topplista: %d"
-
-id: LANG_SNAKE_HISCORE_NEW
-desc: new high score in snake game
-eng: "New High Score!"
-new: "Nytt rekord!"
-
-id: LANG_SNAKE_PAUSE
-desc: displayed when game is paused
-eng: "Game Paused"
-new: "Spelet pausat"
-
-id: LANG_SNAKE_RESUME
-desc: what to do to resume game
-eng: "[PLAY] To Resume"
-new: "[Spela] för att återgå"
-
-id: LANG_SNAKE_QUIT
-desc: how to quit game
-eng: "[OFF] To Quit"
-new: "[Av] för att avsluta"
-
-id: LANG_SNAKE_LEVEL
-desc: level of difficulty
-eng: "Level - %d"
-new: "Nivå - %d"
-
-id: LANG_SNAKE_RANGE
-desc: range of levels
-eng: "(1 - Slow, 9 - Fast)"
-new: "(1 - Långsamt, 9 - Fort)"
-
-id: LANG_SNAKE_START
-desc: how to start or pause the game
-eng: "[PLAY] To Start/Pause"
-new: "[Spela] för att starta/pausa"
-
-id: LANG_SOKOBAN_LEVEL
-desc: must be smaller than 6 characters
-eng: ""
-new: ""
-
-id: LANG_SOKOBAN_MOVE
-desc: must be smaller than 6 characters
-eng: ""
-new: ""
-
-id: LANG_SOKOBAN_WIN
-desc: displayed when you win 
-eng: ""
-new: ""
-
-id: LANG_SOKOBAN_QUIT
-desc: how to quit game
-eng: ""
-new: ""
-
-id: LANG_SOKOBAN_F1
-desc: what does F1 do
-eng: ""
-new: ""
-
-id: LANG_SOKOBAN_F2
-desc: what does F2 do
-eng: ""
-new: ""
-
-id: LANG_SOKOBAN_F3
-desc: what does F3 do
-eng: ""
-new: ""
-
-id: LANG_WORMLET_LENGTH
-desc: wormlet game
-eng: ""
-new: ""
-
-id: LANG_WORMLET_GROWING
-desc: wormlet game 
-eng: ""
-new: ""
-
-id: LANG_WORMLET_HUNGRY
-desc: wormlet game
-eng: ""
-new: ""
-
-id: LANG_WORMLET_WORMED
-desc: wormlet game
-eng: ""
-new: ""
-
-id: LANG_WORMLET_ARGH
-desc: wormlet game
-eng: ""
-new: ""
-
-id: LANG_WORMLET_CRASHED
-desc: wormlet game
-eng: ""
-new: ""
-
-id: LANG_WORMLET_HIGHSCORE
-desc: wormlet game
-eng: ""
-new: ""
-
-id: LANG_WORMLET_PLAYERS
-desc: wormlet game
-eng: ""
-new: ""
-
-id: LANG_WORMLET_WORMS
-desc: wormlet game
-eng: ""
-new: ""
-
-id: LANG_WORMLET_REMOTE_CTRL
-desc: wormlet game
-eng: ""
-new: ""
-
-id: LANG_WORMLET_NO_REM_CTRL
-desc: wormlet game
-eng: ""
-new: ""
-
-id: LANG_WORMLET_2_KEY_CTRL
-desc: wormlet game
-eng: ""
-new: ""
-
-id: LANG_WORMLET_4_KEY_CTRL
-desc: wormlet game
-eng: ""
-new: ""
-
-id: LANG_WORMLET_NO_CONTROL
-desc: wormlet game
-eng: ""
-new: ""
-
-id: LANG_TETRIS_LOSE
-desc: tetris game
-eng: ""
-new: ""
-
-id: LANG_TETRIS_LEVEL
-desc: tetris game
-eng: ""
-new: ""
 
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
@@ -888,11 +604,7 @@ id: LANG_WEEKDAY_THURSDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Thu"
 new: "Tor"
-
-id: LANG_CUBE
-desc: the name of the cube demo in the demo menu
-eng: "Cube"
-new: "Kub"
+### LANG_CUBE was not found in the english file!
 
 id: LANG_MONTH_APRIL
 desc: Maximum 3-letter abbreviation for monthname
@@ -953,11 +665,6 @@ id: LANG_MONTH_SEPTEMBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Sep"
 new: "Sep"
-
-id: LANG_OSCILLOGRAPH
-desc: the name of the oscillograph demo in the demo menu
-eng: "Oscillograph"
-new: "Oscilloskop"
 
 id: LANG_RESUME_SETTING_ASK_ONCE
 desc: in settings_menu
@@ -1194,30 +901,10 @@ desc: in settings_menu
 eng: "Trickle Charge"
 new: "Underhållsladdning"
 
-id: LANG_QUEUE_FULL
-desc: queue buffer full
-eng: "Queue Buffer Full"
-new: "Kön är full" 
-
-id: LANG_QUEUE_QUEUED
-desc: queued track name %s
-eng: "Queued: %s"
-new: "Köad: %s"
-
-id: LANG_QUEUE_TOTAL
-desc: number of queued tracks %d
-eng: "Total Queued: %d"
-new: "Kö: %d st"
-
 id: LANG_MENU_SETTING_CANCEL
 desc: Visual confirmation of canceling a changed setting
 eng: "Canceled"
 new: "Avbrutet"
-
-id: LANG_MENU_SETTING_OK
-desc: Visual confirmation of changing a setting
-eng: "OK"
-new: "OK"
 
 id: LANG_ALARM_MOD_ALARM_MENU
 desc: The name of the additional entry in the main menu for the RTC alarm mod.
@@ -1274,16 +961,6 @@ desc: Something failed. To be appended after above actions
 eng: "Failed"
 new: "misslyckades"
 
-id: LANG_PLAYER_ONPLAY_1
-desc: Line #1 of player ON+PLAY screen
-eng: "\x81 Queue"
-new: "\x81 Köa"
-
-id: LANG_PLAYER_ONPLAY_2
-desc: Line #2 of player ON+PLAY screen
-eng: "- Ren + Del"
-new: "- Ren + Del"
-
 id: LANG_QUEUE
 desc: The verb/action Queue
 eng: "Queue"
@@ -1338,11 +1015,6 @@ id: LANG_MENU_SHOW_ID3_INFO
 desc: Menu option to start id3 viewer
 eng: "Show ID3 Info"
 new: "Visa ID3 info"
-
-id: LANG_CPU_SLEEP
-desc: in system_settings_menu() (removed)
-eng: ""
-new: ""
 
 id: LANG_FADE_ON_STOP
 desc: options menu to set fade on stop or pause
@@ -1527,7 +1199,7 @@ new: "Se .cfg-filer"
 id: LANG_CUSTOM_FONT
 desc: in setting_menu()
 eng: "Browse Fonts"
-new: "Se Fonter"
+new: "Se fonter"
 
 id: LANG_DISK_FULL
 desc: in recording screen
@@ -1537,12 +1209,7 @@ new: "Disken är full. Tryck AV för att fortsätta."
 id: LANG_FIRMWARE
 desc: in the main menu
 eng: "Browse Firmwares"
-new: "Se Fasta Programvaror"
-
-id: LANG_FLIPIT
-desc: in the games menu
-eng: "Flipit"
-new: "Flipit"
+new: "Se fasta programvaror"
 
 id: LANG_INSERT
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
@@ -1573,11 +1240,6 @@ id: LANG_OFF_ABORT
 desc: Used on recorder models
 eng: "OFF to abort"
 new: "AV för avbryt"
-
-id: LANG_OTHELO
-desc: in the games menu
-eng: "Othelo"
-new: "Othello"
 
 id: LANG_PLAYLIST_ACCESS_ERROR
 desc: Playlist error
@@ -1627,7 +1289,7 @@ new: "Sparat %d spår (%s)"
 id: LANG_PLUGINS
 desc: in main_menu()
 eng: "Browse Plugins"
-new: "Se Insticksmoduler"
+new: "Se insticksmoduler"
 
 id: LANG_PLUGIN_CANT_OPEN
 desc: Plugin open error message
@@ -1699,16 +1361,6 @@ desc: in settings_menu
 eng: "Show Icons"
 new: "Visa ikoner"
 
-id: LANG_SLIDING_PUZZLE
-desc: in the games menu
-eng: "Sliding Puzzle"
-new: "Glidande pussel"
-
-id: LANG_STAR
-desc: in the games menu
-eng: "Star"
-new: "Stjärna"
-
 id: LANG_STOP_ABORT
 desc: Used on player models
 eng: "STOP to abort"
@@ -1723,11 +1375,6 @@ id: LANG_BUTTONBAR_MENU
 desc: in button bar
 eng: "Menu"
 new: "Meny"
-
-id: LANG_BUTTONBAR_OPTIONS
-desc: in button bar
-eng: "Option"
-new: "Val"
 
 id: LANG_FM_BUTTONBAR_PRESETS
 desc: in button bar
@@ -1817,7 +1464,7 @@ new: "Förinspelningstid"
 id: LANG_AUTO_BOOKMARK_QUERY
 desc: prompt for user to decide to create an bookmark
 eng: "Create a Bookmark?"
-new: "Skapa Bokmärke?"
+new: "Skapa bokmärke?"
 
 id: LANG_BARS_MENU
 desc: in the display sub menu
@@ -1832,22 +1479,22 @@ new: "Batteri"
 id: LANG_BOOKMARK_AUTOLOAD_QUERY
 desc: prompt for user to decide to create a bookmark
 eng: "Load Last Bookmark?"
-new: "Ladda Förra Bokmärket?"
+new: "Ladda förra bokmärket?"
 
 id: LANG_BOOKMARK_CREATE_FAILURE
 desc: Indicates bookmark was not created
 eng: "Bookmark Failed!"
-new: "Bokmärket Misslyckades!"
+new: "Bokmärket misslyckades!"
 
 id: LANG_BOOKMARK_CREATE_SUCCESS
 desc: Indicates bookmark was successfully created
 eng: "Bookmark Created"
-new: "Bokmärket Skapat"
+new: "Bokmärket skapat"
 
 id: LANG_BOOKMARK_LOAD_EMPTY
 desc: Indicates bookmark was empty
 eng: "Bookmark Empty"
-new: "Tomt Bokmärke"
+new: "Tomt bokmärke"
 
 id: LANG_BOOKMARK_MENU
 desc: Text on main menu to get to bookmark commands
@@ -1857,17 +1504,17 @@ new: "Bokmärken"
 id: LANG_BOOKMARK_MENU_CREATE
 desc: Used off of the bookmark menu to create a bookmark
 eng: "Create Bookmark"
-new: "Skapa Bokmärke"
+new: "Skapa bokmärke"
 
 id: LANG_BOOKMARK_MENU_LIST
 desc: Used off of the bookmark menu to list available bookmarks for the currently playing directory or M3U
 eng: "List Bookmarks"
-new: "Lista Bokmärken"
+new: "Lista bokmärken"
 
 id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
 desc: Text for the menu text to access the most recent bookmarks list
 eng: "Recent Bookmarks"
-new: "Nyliga Bokmärken"
+new: "Nya bokmärken"
 
 id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
 desc: Used on the bookmark select window to label bookmark number
@@ -1907,7 +1554,7 @@ new: "Tid"
 id: LANG_BOOKMARK_SETTINGS
 desc: in general settings
 eng: "Bookmarking"
-new: "Sätt Bokmärken"
+new: "Sätt bokmärken"
 
 id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
 desc: prompt for user to decide to create an bookmark
@@ -1917,7 +1564,7 @@ new: "Bokmärke vid Stop"
 id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
 desc: prompt for user to decide to create a bookmark
 eng: "Load Last Bookmark"
-new: "Ladda Senaste Bokmärket"
+new: "Ladda senaste bokmärket"
 
 id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
 desc: Configuration option to maintain a list of recent bookmarks
@@ -1947,7 +1594,7 @@ new: "Disk"
 id: LANG_INFO_MENU
 desc: in the info sub menu
 eng: "Rockbox Info"
-new: "Rockbox Info"
+new: "Rockbox info"
 
 id: LANG_LCD_MENU
 desc: in the display sub menu
@@ -1967,15 +1614,29 @@ new: "Administrera inställningar"
 id: LANG_RECORDING_MENU
 desc: in the recording sub menu
 eng: "Start Recording"
-new: "Börja Inspelning"
+new: "Börja inspelning"
 
 id: LANG_TIME_MENU
 desc: in the system sub menu
 eng: "Time & Date"
-new: "Tid & Datum"
+new: "Tid & datum"
 
 id: LANG_WIND_MENU
 desc: in the playback sub menu
 eng: "FFwd/Rewind"
 new: "Snabbspolning/Returspolning"
 
+id: LANG_CREATE_DIR
+desc: in main menu
+eng: "Create directory"
+new: "Skapa katalog"
+
+id: LANG_RECORD_CURRENT_DIR
+desc: in recording directory options
+eng: "Current dir"
+new: "Aktuell katalog"
+
+id: LANG_RECORD_DIRECTORY
+desc: in recording settings_menu
+eng: "Directory"
+new: "Katalog"
