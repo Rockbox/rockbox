@@ -50,6 +50,11 @@ A {
  line-height: 140%;
 }
 
+.menutext {
+ color: #f0f0f0;
+ font-size: 8pt;
+}
+
 .buildok {
  background-color: #00ff00;
  width: 3em;
@@ -103,3 +108,8 @@ PRE {
  background-color: #aae8aa;
  padding: 4px;
 }
+
+.bad td {
+ background-color: #f0c0c0;
+}
+
