@@ -59,12 +59,10 @@ use F3 to see how many mines are left (supposing all your flags are correct)
 
 #elif CONFIG_KEYPAD == IRIVER_H100_PAD
 #define MINESWP_QUIT BUTTON_OFF
-#define MINESWP_START BUTTON_ON
-#define MINESWP_TOGGLE_PRE BUTTON_MODE
-
-#define MINESWP_TOGGLE (BUTTON_MODE | BUTTON_REL)
-#define MINESWP_DISCOVER (BUTTON_MODE | BUTTON_REPEAT)
-#define MINESWP_INFO (BUTTON_MODE | BUTTON_OFF)
+#define MINESWP_START BUTTON_SELECT
+#define MINESWP_TOGGLE BUTTON_SELECT
+#define MINESWP_DISCOVER BUTTON_ON
+#define MINESWP_INFO BUTTON_MODE
 
 #endif
 
@@ -305,15 +303,17 @@ int minesweeper(void)
     while(true){
         rb->lcd_clear_display();
     
-        rb->lcd_putsxy(1,1,"Mine Sweeper");
+        rb->lcd_puts(0,0,"Mine Sweeper");
 
         rb->snprintf(str, 20, "%d%% mines", p);
-        rb->lcd_putsxy(1,19,str);
-        rb->lcd_putsxy(1,28,"down / up");
+        rb->lcd_puts(0,1,str);
+        rb->lcd_puts(0,2,"down / up");
 #if CONFIG_KEYPAD == RECORDER_PAD
-        rb->lcd_putsxy(1,44,"ON to start");
+        rb->lcd_puts(0,4,"ON to start");
 #elif CONFIG_KEYPAD == ONDIO_PAD
-        rb->lcd_putsxy(1,44,"MODE to start");
+        rb->lcd_puts(0,4,"MODE to start");
+#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+        rb->lcd_puts(0,4,"SELECT to start");
 #endif
 
         rb->lcd_update();
