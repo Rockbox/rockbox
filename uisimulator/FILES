@@ -7,7 +7,7 @@ win32/Makefile.vc6
 win32/uisw32.sln
 win32/uisw32.rc
 win32/uisw32.suo
-win32/UI256.bmp
+win32/UI-*.bmp
 win32/uisw32.vcproj
 win32/rockbox.dsp
 win32/rockbox.ico
