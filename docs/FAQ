@@ -642,3 +642,28 @@ A72: When looking on the hard disk the Archos firmware only matches the first
      ajbrec.ajz.bak or ajbrec.ajz-20030404 match and are loaded.  To 
      prevent this from happening, give the it a file name that differs in 
      the first 10 characters, e.g., ajbrec.bak.ajz. 
+
+Q73: Help! My recorder crashes when I copy files to it!
+A73: Yes, the recorder can crash when you copy several gigabytes of
+     files to it. The explanation is simple: Copying several gigabytes
+     of files through USB requires a long period of sustained disk
+     activity and drains more power than the batteries of the recorder
+     can store. A long copy will eventually drain the batteries to the
+     point where the recorder can no longer function and it halts.
+     This even happens when connected to the charger, since the power
+     drain is more than the charger can provide! If the recorder halts
+     while connecter to the charger, the batteries will recover and
+     after a short while it will reboot the Archos firmware in charger
+     mode. To make it worse, depending on the USB drivers of your
+     system it can cause your system to crash as well, or confuse it
+     to the point it needs a reboot.
+
+     There is no solution, just some tips.
+
+     * Connect to the charger when copying lots of files. This will
+       not prevent the problem, but it will take longer to happen.
+     * Make sure you have "Deep Discharge" disabled.
+     * Switch off the "Backlight On When Plugged" option.
+     * Use USB 2.0. Transfers will be much faster.
+     * Copy incrementally. With fully charged standard batteries it
+       should be capable of sustained copying for 2 - 2.5 hours.
