@@ -23,13 +23,14 @@ APPDIR= ..
 FIRMWAREDIR = ../../firmware
 DRIVERS = $(FIRMWAREDIR)/drivers
 COMMON = $(FIRMWAREDIR)/common
+LIBMADDIR = $(APPDIR)/common/libmad
 
 CC = gcc
 RM = rm -f
 DEBUG = -g
 
-DISPLAY = -DHAVE_LCD_CHARCELLS
-#DISPLAY = -DHAVE_LCD_BITMAP
+#DISPLAY = -DHAVE_LCD_CHARCELLS
+DISPLAY = -DHAVE_LCD_BITMAP
 
 DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR	\
 -DHAVE_RECORDER_KEYPAD $(DISPLAY)
@@ -37,6 +38,8 @@ DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR	\
 LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
 
 INCLUDES = -I. -I$(DRIVERS) -I$(FIRMWAREDIR)
+
+LIBS = 
 
 UNAME := $(shell uname)
 ifeq ($(UNAME),Linux)
@@ -58,9 +61,9 @@ SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c \
         button-x11.c io.c sleep.c $(APPS) $(FIRMSRCS)
 
 ifdef MPEG_PLAY
-  SRCS += mpegplay.c
-  DEFINES += -DMPEG_PLAY
-  LIBS = -lmad
+  SRCS += mpegplay.c bit.c decoder.c fixed.c frame.c huffman.c layer12.c layer3.c stream.c synth.c timer.c version.c
+  DEFINES += -DMPEG_PLAY -DFPM_DEFAULT -DHAVE_CONFIG_H
+  INCLUDES += -I$(LIBMADDIR)
 endif
 
 OBJS := $(SRCS:c=o)
@@ -73,6 +76,42 @@ clean:
 
 distclean: clean
 	$(RM) config.cache
+
+ifdef MPEG_PLAY
+bit.o: $(LIBMADDIR)/bit.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+decoder.o: $(LIBMADDIR)/decoder.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+fixed.o: $(LIBMADDIR)/fixed.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+frame.o: $(LIBMADDIR)/frame.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+huffman.o: $(LIBMADDIR)/huffman.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+layer12.o: $(LIBMADDIR)/layer12.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+layer3.o: $(LIBMADDIR)/layer3.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+stream.o: $(LIBMADDIR)/stream.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+synth.o: $(LIBMADDIR)/synth.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+timer.o: $(LIBMADDIR)/timer.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+version.o: $(LIBMADDIR)/version.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+endif
 
 menu.o: $(APPDIR)/menu.c
 	$(CC) $(CFLAGS) -c $< -o $@
