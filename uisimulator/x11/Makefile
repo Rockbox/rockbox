@@ -19,7 +19,8 @@
 
 TARGET = rockboxui
 
-FIRMWAREDIR = ../firmware
+APPDIR= ..
+FIRMWAREDIR = ../../firmware
 DRIVERS = $(FIRMWAREDIR)/drivers
 
 CC = gcc
@@ -55,6 +56,12 @@ clean:
 
 distclean: clean
 	$(RM) config.cache
+
+tetris.o: $(APPDIR)/tetris.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+app.o: $(APPDIR)/app.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 lcd.o: $(DRIVERS)/lcd.c
 	$(CC) $(CFLAGS) -c $< -o $@
