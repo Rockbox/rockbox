@@ -64,7 +64,7 @@ struct bpb
 
 struct fat_direntry
 {
-    unsigned char name[12];         /* Name plus \0 */
+    unsigned char name[256];        /* Name plus \0 */
     unsigned short attr;            /* Attributes */
     unsigned char crttimetenth;     /* Millisecond creation
                                        time stamp (0-199) */
@@ -74,8 +74,6 @@ struct fat_direntry
     unsigned short wrttime;         /* Last write time */
     unsigned short wrtdate;         /* Last write date */
     unsigned int filesize;          /* File size in bytes */
-    unsigned short fstclusterlo;
-    unsigned short fstclusterhi;
     int firstcluster;               /* fstclusterhi<<16 + fstcluslo */
 };
 
@@ -91,7 +89,7 @@ struct fat_dirent
     int entry;
     unsigned int cached_sec;
     unsigned int num_sec;
-    char cached_buf[SECTOR_SIZE];
+    unsigned char cached_buf[SECTOR_SIZE];
 };
 
 struct fat_fileent

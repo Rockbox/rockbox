@@ -123,8 +123,13 @@ static unsigned int getcurrdostime(unsigned short *dosdate,
 static int create_dos_name(unsigned char *name, unsigned char *newname);
 #endif
 
+/* fat cache */
 static unsigned char *fat_cache[256];
 static int fat_cache_dirty[256];
+
+/* sectors cache for longname use */
+static unsigned char lastsector[SECTOR_SIZE];
+static unsigned char lastsector2[SECTOR_SIZE];
 
 #ifdef TEST_FAT
 
@@ -788,13 +793,6 @@ int fat_create_file(struct bpb *bpb, unsigned int currdir, char *name)
 
 static int parse_direntry(struct fat_direntry *de, unsigned char *buf)
 {
-    /* is this a long filename entry? */
-    if ( ( buf[FATDIR_ATTR] & FAT_ATTR_LONG_NAME_MASK ) == 
-         FAT_ATTR_LONG_NAME )
-    {
-        return 0;
-    }
-    
     memset(de, 0, sizeof(struct fat_direntry));
     de->attr = buf[FATDIR_ATTR];
     de->crttimetenth = buf[FATDIR_CRTTIMETENTH];
@@ -930,25 +928,83 @@ int fat_getnext(struct bpb *bpb,
     int i;
     int err;
     unsigned char firstbyte;
+    int longarray[20];
+    int longs=0;
+    int sectoridx=0;
 
     while(!done)
     {
-        /* Look for a free slot */
         for(i = ent->entry;i < SECTOR_SIZE/32;i++)
         {
             firstbyte = ent->cached_buf[i*32];
+
             if(firstbyte == 0xe5)
+                /* free entry */
                 continue;
 
             if(firstbyte == 0)
-                /* no more entries */
+                /* last entry */
                 return -1;
 
-            if ( parse_direntry(entry, &ent->cached_buf[i*32]) ) {
-                done = 1;
-                break;
+            /* longname entry? */
+            if ( ( ent->cached_buf[i*32 + FATDIR_ATTR] &
+                   FAT_ATTR_LONG_NAME_MASK ) == FAT_ATTR_LONG_NAME ) {
+                longarray[longs++] = i*32 + sectoridx;
+            }
+            else {
+                if ( parse_direntry(entry, &ent->cached_buf[i*32]) ) {
+
+                    /* replace shortname with longname? */
+                    if ( longs ) {
+                        int j,k,l=0;
+
+                        /* iterate backwards through the dir entries */
+                        for (j=longs-1; j>=0; j--) {
+                            unsigned char* ptr = ent->cached_buf;
+                            int index = longarray[j];
+                            
+                            /* current or cached sector? */
+                            if ( sectoridx >= SECTOR_SIZE ) {
+                                if ( sectoridx >= SECTOR_SIZE*2 ) {
+                                    if ( index >= SECTOR_SIZE ) {
+                                        if ( index >= SECTOR_SIZE*2 )
+                                            ptr = ent->cached_buf;
+                                        else
+                                            ptr = lastsector;
+                                    }
+                                    else
+                                        ptr = lastsector2;
+                                }
+                                else {
+                                    if ( index < SECTOR_SIZE )
+                                        ptr = lastsector;
+                                }
+
+                                index &= SECTOR_SIZE-1;
+                            }
+
+                            /* piece together the name subcomponents */
+                            for (k=0; k<5; k++)
+                                entry->name[l++] = ptr[index + k*2 + 1];
+                            for (k=0; k<6; k++)
+                                entry->name[l++] = ptr[index + k*2 + 14];
+                            for (k=0; k<2; k++)
+                                entry->name[l++] = ptr[index + k*2 + 28];
+                        }
+                        entry->name[l]=0;
+                    }
+                    done = 1;
+                    break;
+                }
             }
         }
+
+        /* save this sector, for longname use */
+        if ( sectoridx )
+            memcpy( lastsector2, ent->cached_buf, SECTOR_SIZE );
+        else
+            memcpy( lastsector, ent->cached_buf, SECTOR_SIZE );
+        sectoridx += SECTOR_SIZE;
 
         /* Next sector? */
         if(i < SECTOR_SIZE/32)
