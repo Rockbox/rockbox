@@ -33,6 +33,7 @@
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "widgets.h"
+#include "wps.h"
 #endif
 
 struct menu {
@@ -325,18 +326,10 @@ Menu menu_run(int m)
                 return result;
 
 #ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_F3: {
-#ifdef HAVE_LCD_BITMAP
-                  unsigned char state;
-                  state = global_settings.statusbar << 1 | global_settings.scrollbar;
-                  state = (state + 1) % 4;
-                  global_settings.statusbar = state >> 1;
-                  global_settings.scrollbar = state & 0x1;
-                  settings_save();
-
-                  menu_draw(m);
-#endif
-                }
+            case BUTTON_F3:
+                if (f3_screen())
+                    return SYS_USB_CONNECTED;
+                menu_draw(m);
                 break;
 #endif
 
