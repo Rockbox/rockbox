@@ -164,8 +164,10 @@ bool recording_screen(void)
     int hours, minutes;
 
     cursor = 0;
-    mpeg_stop();
     mpeg_init_recording();
+
+    mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+    
     status_set_playmode(STATUS_STOP);
     
     peak_meter_playback(false);
@@ -414,6 +416,7 @@ bool recording_screen(void)
                          str(LANG_CHANNEL_MONO):str(LANG_CHANNEL_STEREO),
                          global_settings.rec_quality);
                 lcd_puts(0, 6, buf);
+                lcd_update();
             }
             else
             {
@@ -421,12 +424,22 @@ bool recording_screen(void)
                 peak_meter_draw(0, 8 + h*2, LCD_WIDTH, h);
                 lcd_update_rect(0, 8 + h*2, LCD_WIDTH, h);
             }
-            lcd_update();
         }
     }
     
     mpeg_init_playback();
 
+    mpeg_sound_channel_config(global_settings.channel_config);
+    mpeg_sound_set(SOUND_BASS, global_settings.bass);
+    mpeg_sound_set(SOUND_TREBLE, global_settings.treble);
+    mpeg_sound_set(SOUND_BALANCE, global_settings.balance);
+    mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
+    
+#ifdef HAVE_MAS3587F
+    mpeg_sound_set(SOUND_LOUDNESS, global_settings.loudness);
+    mpeg_sound_set(SOUND_SUPERBASS, global_settings.bass_boost);
+    mpeg_sound_set(SOUND_AVC, global_settings.avc);
+#endif
     return have_recorded;
 }
 

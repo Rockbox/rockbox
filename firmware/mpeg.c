@@ -218,7 +218,7 @@ static int num_tracks_in_memory(void)
 #ifndef SIMULATOR
 static void debug_tags(void)
 {
-#ifdef DEBUG
+#ifdef DEBUG_TAGS
     int i;
 
     for(i = 0;i < MAX_ID3_TAGS;i++)
@@ -470,13 +470,18 @@ static bool dma_underrun; /* True when the DMA has stopped because of
 static int lowest_watermark_level; /* Debug value to observe the buffer
                                       usage */
 #ifdef HAVE_MAS3587F
-bool recording; /* We are recording */
-static bool is_recording; /* We are (attempting to) record */
+static bool is_recording; /* We are recording */
 bool stop_pending;
 unsigned long record_start_frame; /* Frame number where recording started */
 #endif
 
 static int mpeg_file;
+
+#ifdef HAVE_MAS3587F
+/* Synchronization variables */
+static bool init_recording_done;
+static bool init_playback_done;
+#endif
 
 void mpeg_get_debugdata(struct mpeg_debug *dbgdata)
 {
@@ -624,6 +629,7 @@ bool inverted_pr;
 unsigned long num_rec_bytes;
 #endif
 
+static void dma_tick (void) __attribute__ ((section (".icode")));
 static void dma_tick(void)
 {
 #ifdef HAVE_MAS3587F
@@ -654,36 +660,56 @@ static void dma_tick(void)
             timing_info[timing_info_index++] = current_tick;
             TCNT2 = 0;
 #endif
+            /* We read as long as EOD is high, but max 30 bytes.
+               This code is optimized, and should probably be
+               written in assembler instead. */
             if(inverted_pr)
             {
-                for(i = 0;PBDR & 0x4000;i++)
+                i = 0;
+                while((*((volatile unsigned char *)PBDR_ADDR) & 0x40)
+                      && i < 30)
                 {
                     PADR |= 0x800;
+
+                    while(*((volatile unsigned char *)PBDR_ADDR) & 0x80);
                     
                     /* It must take at least 5 cycles before
                        the data is read */
+                    asm(" nop\n nop\n nop\n");
                     mp3buf[mp3buf_write++] = *(unsigned char *)0x4000000;
-                    
-                    PADR &= ~0x800;
                     
                     if(mp3buf_write >= mp3buflen)
                         mp3buf_write = 0;
+
+                    i++;
+                    
+                    PADR &= ~0x800;
+
+                    /* No wait for /RTW, cause it's not necessary */
                 }
             }
             else
             {
-                for(i = 0;PBDR & 0x4000;i++)
+                i = 0;
+                while((*((volatile unsigned char *)PBDR_ADDR) & 0x40)
+                      && i < 30)
                 {
                     PADR &= ~0x800;
+                    
+                    while(*((volatile unsigned char *)PBDR_ADDR) & 0x80);
                     
                     /* It must take at least 5 cycles before
                        the data is read */
                     mp3buf[mp3buf_write++] = *(unsigned char *)0x4000000;
                     
-                    PADR |= 0x800;
-                    
                     if(mp3buf_write >= mp3buflen)
                         mp3buf_write = 0;
+
+                    i++;
+                    
+                    PADR |= 0x800;
+
+                    /* No wait for /RTW, cause it's not necessary */
                 }
             }
 #ifdef DEBUG
@@ -816,7 +842,10 @@ static void demand_irq_enable(bool on)
     int oldlevel = set_irq_level(15);
     
     if(on)
+    {
         IPRA = (IPRA & 0xfff0) | 0x000b;
+        ICR &= ~0x0010; /* IRQ3 level sensitive */
+    }
     else
         IPRA &= 0xfff0;
 
@@ -828,21 +857,23 @@ static void demand_irq_enable(bool on)
 void IRQ6(void)
 {
     stop_dma();
-    
-#ifdef HAVE_MAS3587F
-    /* Enable IRQ to trap the next DEMAND */
-    demand_irq_enable(true);
-#endif
 }
 
 #ifdef HAVE_MAS3587F
 #pragma interrupt
 void IRQ3(void)
 {
+    /* Begin with setting the IRQ to edge sensitive */
+    ICR |= 0x0010;
+    
     dma_tick();
 
-    /* Disable IRQ until DEMAND goes low again */
-    demand_irq_enable(false);
+#if 0
+    if(mpeg_mode == MPEG_ENCODER)
+        /* Shut off if recording is stopped */
+        if(!is_recording)
+            demand_irq_enable(false);
+#endif
 }
 #endif
 
@@ -954,8 +985,8 @@ static void update_playlist(void)
 
     if (num_tracks_in_memory() > 0)
     {
-    index = playlist_next(id3tags[tag_read_idx]->id3.index);
-    id3tags[tag_read_idx]->id3.index = index;
+        index = playlist_next(id3tags[tag_read_idx]->id3.index);
+        id3tags[tag_read_idx]->id3.index = index;
     }
 }
 
@@ -1154,6 +1185,7 @@ static void mpeg_thread(void)
             case MPEG_STOP:
                 DEBUGF("MPEG_STOP\n");
                 is_playing = false;
+                paused = false;
                 stop_playing();
                 break;
 
@@ -1242,8 +1274,8 @@ static void mpeg_thread(void)
                         filling = true;
                         queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
                         
-                        /* Tell the file loading code that we want to start playing
-                           as soon as we have some data */
+                        /* Tell the file loading code that we want
+                           to start playing as soon as we have some data */
                         play_pending = true;
 
                         current_track_counter++;
@@ -1277,8 +1309,8 @@ static void mpeg_thread(void)
                     filling = true;
                     queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
 
-                    /* Tell the file loading code that we want to start playing
-                       as soon as we have some data */
+                    /* Tell the file loading code that we want to
+                       start playing as soon as we have some data */
                     play_pending = true;
 
                     current_track_counter++;
@@ -1594,6 +1626,7 @@ static void mpeg_thread(void)
 #ifdef HAVE_MAS3587F
             case MPEG_INIT_RECORDING:
                 init_recording();
+                init_recording_done = true;
                 break;
 #endif
             }
@@ -1621,7 +1654,6 @@ static void mpeg_thread(void)
                     case MPEG_STOP:
                         DEBUGF("MPEG_STOP\n");
                         is_recording = false;
-                        recording = false;
 
                         /* Save the remaining data in the buffer */
                         stop_pending = true;
@@ -1690,7 +1722,8 @@ static void mpeg_thread(void)
                         }
                         else
                         {
-                            /* We have saved all data, time to stop for real */
+                            /* We have saved all data,
+                               time to stop for real */
                             if(stop_pending)
                                 queue_post(&mpeg_queue, MPEG_STOP_DONE, 0);
                         }
@@ -1698,6 +1731,7 @@ static void mpeg_thread(void)
                         
                     case MPEG_INIT_PLAYBACK:
                         init_playback();
+                        init_playback_done = true;
                         break;
                 }
             }
@@ -1732,15 +1766,9 @@ static void setup_sci0(void)
     /* Set interrupt ITU2 and SCI0 priority to 0 */
     IPRD &= 0x0ff0;
 
-    /* set IRQ6 and IRQ7 to edge detect */
-    ICR |= 0x03;
-
     /* set PB15 and PB14 to inputs */
     PBIOR &= 0x7fff;
     PBIOR &= 0xbfff;
-
-    /* set IRQ6 prio 8 and IRQ7 prio 0 */
-    IPRB = ( IPRB & 0xff00 ) | 0x0080;
 
     /* Enable End of DMA interrupt at prio 8 */
     IPRC = (IPRC & 0xf0ff) | 0x0800;
@@ -1779,26 +1807,30 @@ bool mpeg_has_changed_track(void)
 #ifdef HAVE_MAS3587F
 void mpeg_init_recording(void)
 {
+    init_recording_done = false;
     queue_post(&mpeg_queue, MPEG_INIT_RECORDING, NULL);
-    yield();
+
+    while(!init_recording_done)
+        yield();
 }
 
 void mpeg_init_playback(void)
 {
+    init_playback_done = false;
     queue_post(&mpeg_queue, MPEG_INIT_PLAYBACK, NULL);
-    yield();
+
+    while(!init_playback_done)
+        yield();
 }
 
 static void init_recording(void)
 {
     unsigned long val;
+    int rc;
 
-    /* Stop the current stream */
-    play_pending = false;
-    playing = false;
-    is_playing = false;
-    stop_dma();
-    
+    stop_playing();
+    paused = false;
+
     reset_mp3_buffer();
     remove_all_tags();
     
@@ -1807,9 +1839,15 @@ static void init_recording(void)
     mpeg_file = -1;
 
     /* Init the recording variables */
-    recording = false;
     is_recording = false;
     
+    mas_reset();
+    
+    /* Enable the audio CODEC and the DSP core, max analog voltage range */
+    rc = mas_direct_config_write(MAS_CONTROL, 0x8c00);
+    if(rc < 0)
+        panicf("mas_ctrl_w: %d", rc);
+
     /* Stop the current application */
     val = 0;
     mas_writemem(MAS_BANK_D0,0x7f6,&val,1);    
@@ -1828,7 +1866,7 @@ static void init_recording(void)
         mas_writemem(MAS_BANK_D1, 0, &val, 1);
         mas_writereg(0xa3, 0x90);
     }
-    
+
     /* Enable the Left A/D Converter */
     mas_codec_writereg(0x0, 0xcccd);
 
@@ -1855,6 +1893,9 @@ static void init_recording(void)
         mas_readmem(MAS_BANK_D0, 0x7f7, &val, 1);
     } while(!(val & 0x40));
 
+    /* Disable IRQ6 */
+    IPRB &= 0xff0f;
+
     mpeg_mode = MPEG_ENCODER;
 
     DEBUGF("MAS Recording application started\n");
@@ -1863,7 +1904,17 @@ static void init_recording(void)
 static void init_playback(void)
 {
     unsigned long val;
+    int rc;
+
+    stop_dma();
     
+    mas_reset();
+    
+    /* Enable the audio CODEC and the DSP core, max analog voltage range */
+    rc = mas_direct_config_write(MAS_CONTROL, 0x8c00);
+    if(rc < 0)
+        panicf("mas_ctrl_w: %d", rc);
+
     /* Stop the current application */
     val = 0;
     mas_writemem(MAS_BANK_D0,0x7f6,&val,1);    
@@ -1895,7 +1946,15 @@ static void init_playback(void)
         mas_readmem(MAS_BANK_D0, 0x7f7, &val, 1);
     } while((val & 0x0c) != 0x0c);
 
+    mpeg_sound_channel_config(MPEG_SOUND_STEREO);
+
     mpeg_mode = MPEG_DECODER;
+
+    /* set IRQ6 to edge detect */
+    ICR |= 0x02;
+
+    /* set IRQ6 prio 8 */
+    IPRB = ( IPRB & 0xff0f ) | 0x0080;
 
     DEBUGF("MAS Decoding application started\n");
 }
@@ -1912,7 +1971,6 @@ void mpeg_record(char *filename)
 
 static void start_recording(void)
 {
-    recording = true;
     stop_pending = false;
 }
 
@@ -2478,7 +2536,8 @@ void mpeg_set_recording_options(int frequency, int quality,
     val = (quality << 17) |
         ((frequency % 3) << 10) |
         ((is_mpeg1?1:0) << 9) |
-        ((channel_mode * 2 + 1) << 6) |
+        (1 << 8) | /* CRC on */
+        (((channel_mode * 2 + 1) & 3) << 6) |
         (1 << 5) /* MS-stereo */ |
         (1 << 2) /* Is an original */;
     mas_writemem(MAS_BANK_D0, 0x7f0, &val,1);
@@ -2523,9 +2582,7 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int 
 #ifdef SIMULATOR
     volume = bass = treble = balance = loudness = bass_boost = avc;
 #else
-#ifdef HAVE_MAS3587F
-    int rc;
-#else
+#ifdef HAVE_MAS3507D
     unsigned long val;
     loudness = bass_boost = avc;
 #endif
@@ -2533,25 +2590,11 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int 
     setup_sci0();
 
 #ifdef HAVE_MAS3587F
-    mas_reset();
+    init_playback();
     
-    /* Enable the audio CODEC and the DSP core, max analog voltage range */
-    rc = mas_direct_config_write(MAS_CONTROL, 0x4c00);
-    if(rc < 0)
-        panicf("mas_ctrl_w: %d", rc);
-
-    rc = mas_direct_config_read(MAS_CONTROL);
-    if(rc < 0)
-        panicf("mas_ctrl_r: %d", rc);
-
     mas_version_code = mas_readver();
     DEBUGF("MAS3587 derivate %d, version B%d\n",
            (mas_version_code & 0xff00) >> 8, mas_version_code & 0xff);
-    
-    init_playback();
-    
-    mpeg_sound_channel_config(MPEG_SOUND_STEREO);
-
 #endif
 
 #ifdef HAVE_DAC3550A
@@ -2564,6 +2607,12 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int 
     PBDR |= 0x20;
     sleep(HZ/5);
     
+    /* set IRQ6 to edge detect */
+    ICR |= 0x02;
+
+    /* set IRQ6 prio 8 */
+    IPRB = ( IPRB & 0xff0f ) | 0x0080;
+
     mas_readmem(MAS_BANK_D1, 0xff7, &mas_version_code, 1);
     
     mas_writereg(0x3b, 0x20); /* Don't ask why. The data sheet doesn't say */
@@ -2597,7 +2646,7 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int 
     }
     
 #endif
-    
+
     mp3buflen = mp3end - mp3buf;
 
     queue_init(&mpeg_queue);
@@ -2606,19 +2655,16 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int 
 
 #ifdef HAVE_MAS3507D
     mas_poll_start(1);
+
+    mas_writereg(MAS_REG_KPRESCALE, 0xe9400);
+    dac_config(0x04); /* DAC on, all else off */
+
+    mpeg_sound_channel_config(MPEG_SOUND_STEREO);
 #endif
 
 #ifdef HAVE_MAS3587F
     ICR &= ~0x0010; /* IRQ3 level sensitive */
     PACR1 = (PACR1 & 0x3fff) | 0x4000; /* PA15 is IRQ3 */
-#endif
-
-#ifdef HAVE_MAS3507D
-    mas_writereg(MAS_REG_KPRESCALE, 0xe9400);
-    dac_config(0x04); /* DAC on, all else off */
-
-    mpeg_sound_channel_config(MPEG_SOUND_STEREO);
-
 #endif
 
     /* Must be done before calling mpeg_sound_set() */
