@@ -703,12 +703,12 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mo
                 /* scroll line */
                 if (refresh_mode & WPS_REFRESH_SCROLL)  {
                     lcd_puts_scroll(0, i, buf);
+                    update_line = true;
                 }
             }
-
             /* dynamic / static line */
-            if ((flags & refresh_mode & WPS_REFRESH_DYNAMIC) ||
-                (flags & refresh_mode & WPS_REFRESH_STATIC))
+            else if ((flags & refresh_mode & WPS_REFRESH_DYNAMIC) ||
+                     (flags & refresh_mode & WPS_REFRESH_STATIC))
             {
                 update_line = true;
                 lcd_puts(0, i, buf);
