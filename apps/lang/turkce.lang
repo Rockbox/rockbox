@@ -469,12 +469,12 @@ new: "Ses ACIK"
 id: LANG_MUTE_ON_RECORDER
 desc: displayed when mute is on
 eng: "Mute is ON"
-new: "Ses ACIK"
+new: "Ses KAPALI"
 
 id: LANG_MUTE_OFF_RECORDER
 desc: displayed when mute is off
 eng: "Mute is OFF"
-new: "Ses KAPALI"
+new: "Ses ACIK"
 
 id: LANG_ID3_INFO
 desc: in the browse_id3() function
