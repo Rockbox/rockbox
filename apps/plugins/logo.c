@@ -17,12 +17,16 @@
  *
  **************************************************************************/
 #include "plugin.h"
+#include "playergfx.h"
 
-#if defined(HAVE_LCD_BITMAP) && (LCD_WIDTH >= 91)
+#ifdef HAVE_LCD_BITMAP
+#define DISPLAY_WIDTH LCD_WIDTH
+#define DISPLAY_HEIGHT LCD_HEIGHT
+#define RAND_SCALE 5
 
 #if LCD_WIDTH > 112
-#define WIDTH 112
-#define HEIGHT 37
+#define LOGO_WIDTH 112
+#define LOGO_HEIGHT 37
 #define LOGO rockbox112x37
 const unsigned char rockbox112x37[]={
         0x00, 0x00, 0x02, 0xff, 0x02, 0xfa, 0xfa, 0xfa, 0xfa, 0xfa, 0xfa, 0xfa, 0xfa,
@@ -76,9 +80,9 @@ const unsigned char rockbox112x37[]={
         0x08, 0xe8, 0xe8, 0xa8, 0x09, 0x0a, 0x0d, 0x02,
 };
 
-#else
-#define WIDTH 91
-#define HEIGHT 32
+#else /* LCD_WIDTH <= 112 */
+#define LOGO_WIDTH 91
+#define LOGO_HEIGHT 32
 #define LOGO rockbox91x32
 const unsigned char rockbox91x32[] = {
         0x00, 0x02, 0x7f, 0x02, 0xfa, 0xfa, 0xfa, 0xfa, 0xfa, 0xfa, 0xf8, 0xf8, 0xf0,
@@ -113,37 +117,81 @@ const unsigned char rockbox91x32[] = {
         0x08, 0x10, 0x20, 0x41, 0x42, 0x42, 0x43, 0x42, 0x41, 0x40, 0x60, 0x50, 0x40,
         0x40, 0x40, 0x20, 0x50, 0x28, 0x10, 0x20, 0x40, 0x43, 0x44, 0x5b, 0x64, 0x18,
 };
+#endif /* LCD_WIDTH */
+
+#else /* !LCD_BITMAP */
+#define DISPLAY_WIDTH 55
+#define DISPLAY_HEIGHT 14
+#define RAND_SCALE 2
+#define LOGO_WIDTH 16
+#define LOGO_HEIGHT 7
+#define LOGO rockbox16x7
+const unsigned char rockbox16x7[] = {
+    0x0a, 0x55, 0x7e, 0x18, 0x00, 0xff, 0xff, 0x09,
+    0xff, 0x76, 0x00, 0xff, 0xff, 0x44, 0x7c, 0x38,
+};
+#endif /* !LCD_BITMAP */
+
+/* variable button definitions */
+#if CONFIG_KEYPAD == PLAYER_PAD
+#define LP_QUIT BUTTON_STOP
+#define LP_DEC_X BUTTON_LEFT
+#define LP_INC_X BUTTON_RIGHT
+#define LP_DEC_Y (BUTTON_ON | BUTTON_LEFT)
+#define LP_INC_Y (BUTTON_ON | BUTTON_RIGHT)
+#else
+#define LP_QUIT BUTTON_OFF
+#define LP_DEC_X BUTTON_LEFT
+#define LP_INC_X BUTTON_RIGHT
+#define LP_DEC_Y BUTTON_DOWN
+#define LP_INC_Y BUTTON_UP
 #endif
 
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     int button;
     int timer = 10;
-    int x = (LCD_WIDTH / 2) - (WIDTH / 2);
-    int y = (LCD_HEIGHT / 2) - (HEIGHT / 2);
+    int x = (DISPLAY_WIDTH / 2) - (LOGO_WIDTH / 2);
+    int y = (DISPLAY_HEIGHT / 2) - (LOGO_HEIGHT / 2);
     struct plugin_api* rb = api;
     int dx;
     int dy;
+#ifdef HAVE_LCD_CHARCELLS
+    int cpos = -1;
+    int old_cpos = -1;
+#endif
 
     TEST_PLUGIN_API(api);
     (void)parameter;
-    rb->srand(*rb->current_tick);
 
-    dx = rb->rand()%11 - 5;
-    dy = rb->rand()%11 - 5;
+#ifdef HAVE_LCD_CHARCELLS
+    if (!pgfx_init(rb, 4, 2)) {
+        rb->splash(HZ*2, true, "Old LCD :(");
+        return PLUGIN_OK;
+    }
+#endif
+    rb->srand(*rb->current_tick);
+    dx = rb->rand()%(2*RAND_SCALE+1) - RAND_SCALE;
+    dy = rb->rand()%(2*RAND_SCALE+1) - RAND_SCALE;
 
     while (1) {
+#ifdef HAVE_LCD_BITMAP
         rb->lcd_clear_display();
-        rb->lcd_bitmap(LOGO, x, y, WIDTH, HEIGHT, false);
+        rb->lcd_bitmap(LOGO, x, y, LOGO_WIDTH, LOGO_HEIGHT, false);
+#else
+        pgfx_clear_display();
+        pgfx_bitmap(LOGO, x % 5, y, LOGO_WIDTH, LOGO_HEIGHT, false);
+        cpos = x / 5;
+#endif
 
         x += dx;
         if (x < 0) {
             dx = -dx;
             x = 0;
         }
-        if (x + WIDTH > LCD_WIDTH) {
+        if (x > DISPLAY_WIDTH - LOGO_WIDTH) {
             dx = -dx;
-            x = LCD_WIDTH - WIDTH;
+            x = DISPLAY_WIDTH - LOGO_WIDTH;
         }
 
         y += dy;
@@ -151,37 +199,56 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
             dy = -dy;
             y = 0;
         }
-        if (y + HEIGHT > LCD_HEIGHT) {
+        if (y > DISPLAY_HEIGHT - LOGO_HEIGHT) {
             dy = -dy;
-            y = LCD_HEIGHT - HEIGHT;
+            y = DISPLAY_HEIGHT - LOGO_HEIGHT;
         }
-        
+
+#ifdef HAVE_LCD_BITMAP
         rb->lcd_update();
+#else
+        if (cpos != old_cpos) {
+            rb->lcd_clear_display();
+            pgfx_update();
+            pgfx_display(cpos, 0);
+            old_cpos = cpos;
+        }
+        else
+            pgfx_update();
+#endif
         rb->sleep(HZ/timer);
         
         button = rb->button_get(false);
         switch (button) {
-            case BUTTON_OFF:
+            case LP_QUIT:
+#ifdef HAVE_LCD_CHARCELLS
+                pgfx_release();
+#endif
                 return PLUGIN_OK;
-            case BUTTON_LEFT:
-                dx--;
+            case LP_DEC_X:
+                if (dx)
+                    dx += (dx < 0) ? 1 : -1;
                 break;
-            case BUTTON_RIGHT:
-                dx++;
+            case LP_INC_X:
+                dx += (dx < 0) ? -1 : 1;
                 break;
-            case BUTTON_UP:
-                dy--;
+            case LP_DEC_Y:
+                if (dy)
+                    dy += (dy < 0) ? 1 : -1;
                 break;
-            case BUTTON_DOWN:
-                dy++;
+            case LP_INC_Y:
+                dy += (dy < 0) ? -1 : 1;
                 break;
                 
             default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
-                return PLUGIN_USB_CONNECTED;
+                if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
+#ifdef HAVE_LCD_CHARCELLS
+                    pgfx_release();
+#endif
+                    return PLUGIN_USB_CONNECTED;
+                }
                 break;
         }
     }
 }
 
-#endif

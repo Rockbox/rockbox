@@ -5,6 +5,7 @@ cube.c
 favorites.c
 firmware_flash.c
 helloworld.c
+logo.c
 metronome.c
 mosaique.c
 rockbox_flash.c
@@ -22,7 +23,6 @@ chip8.c
 flipit.c
 grayscale.c
 jpeg.c
-logo.c
 mandelbrot.c
 minesweeper.c
 oscillograph.c
