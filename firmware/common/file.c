@@ -337,7 +337,9 @@ static int flush_cache(int fd)
 {
     int rc;
     struct filedesc* file = &openfiles[fd];
+#if 0
     int sector = file->fileoffset / SECTOR_SIZE;
+#endif
     
     DEBUGF("Flushing dirty sector cache %x\n", sector);
     
