@@ -51,7 +51,7 @@ UNAME := $(shell uname)
 ifeq ($(UNAME),Linux)
   INCLUDES += -I/usr/X11R6/include
   LIBDIRS = -L/usr/X11R6/lib
-  DEFINES += -DLINUX -DLITTLE_ENDIAN
+  DEFINES += -DLINUX
 #  MPEG_PLAY = 1
 else
   DEFINES += -DBIG_ENDIAN
