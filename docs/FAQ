@@ -774,3 +774,11 @@ A79: You have two options.
      files.
 
      No, you can't make Rockbox use the track number id3 info for this.
+
+Q80: Why does Rockbox say that I only have 18Gb free space on my 20Gb disk?
+A80: Because the disk manufacturers have a different definition of Giga than
+     the rest of the computer world does.
+
+     Read more about it here:
+
+     http://personal-computer-tutor.com/abc3/v30/vic30.htm
