@@ -10,6 +10,7 @@
 
 <ol>
 <li> Check that the bug hasn't already been reported
+<li> Do not add "I have the same problem" to an existing bug report if you aren't <b>absolutely certain</b> that it really is the same problem
 <li> Always include the following information in your bug report:
   <ul>
   <li> Which exact model Archos you have (as printed on the unit)
