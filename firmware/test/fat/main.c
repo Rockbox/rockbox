@@ -6,6 +6,7 @@
 #include "debug.h"
 #include "disk.h"
 #include "dir.h"
+#include "file.h"
 
 void dbg_dump_sector(int sec);
 void dbg_dump_buffer(unsigned char *buf);
@@ -17,7 +18,7 @@ void dbg_dump_sector(int sec)
     unsigned char buf[512];
 
     ata_read_sectors(sec,1,buf);
-    printf("---< Sector %d >-----------------------------------------\n", sec);
+    DEBUGF("---< Sector %d >-----------------------------------------\n", sec);
     dbg_dump_buffer(buf);
 }
 
@@ -33,7 +34,7 @@ void dbg_dump_buffer(unsigned char *buf)
         {
             c = buf[i*16+j];
 
-            printf("%02x ", c);
+            DEBUGF("%02x ", c);
             if(c < 32 || c > 127)
             {
                 ascii[j] = '.';
@@ -45,39 +46,39 @@ void dbg_dump_buffer(unsigned char *buf)
         }
 
         ascii[j] = 0;
-        printf("%s\n", ascii);
+        DEBUGF("%s\n", ascii);
     }
 }
 
 void dbg_print_bpb(struct bpb *bpb)
 {
-    printf("bpb_oemname = \"%s\"\n", bpb->bs_oemname);
-    printf("bpb_bytspersec = %d\n", bpb->bpb_bytspersec);
-    printf("bpb_secperclus = %d\n", bpb->bpb_secperclus);
-    printf("bpb_rsvdseccnt = %d\n", bpb->bpb_rsvdseccnt);
-    printf("bpb_numfats = %d\n", bpb->bpb_numfats);
-    printf("bpb_rootentcnt = %d\n", bpb->bpb_rootentcnt);
-    printf("bpb_totsec16 = %d\n", bpb->bpb_totsec16);
-    printf("bpb_media = %02x\n", bpb->bpb_media);
-    printf("bpb_fatsz16 = %d\n", bpb->bpb_fatsz16);
-    printf("bpb_secpertrk = %d\n", bpb->bpb_secpertrk);
-    printf("bpb_numheads = %d\n", bpb->bpb_numheads);
-    printf("bpb_hiddsec = %u\n", bpb->bpb_hiddsec);
-    printf("bpb_totsec32 = %u\n", bpb->bpb_totsec32);
+    DEBUGF("bpb_oemname = \"%s\"\n", bpb->bs_oemname);
+    DEBUGF("bpb_bytspersec = %d\n", bpb->bpb_bytspersec);
+    DEBUGF("bpb_secperclus = %d\n", bpb->bpb_secperclus);
+    DEBUGF("bpb_rsvdseccnt = %d\n", bpb->bpb_rsvdseccnt);
+    DEBUGF("bpb_numfats = %d\n", bpb->bpb_numfats);
+    DEBUGF("bpb_rootentcnt = %d\n", bpb->bpb_rootentcnt);
+    DEBUGF("bpb_totsec16 = %d\n", bpb->bpb_totsec16);
+    DEBUGF("bpb_media = %02x\n", bpb->bpb_media);
+    DEBUGF("bpb_fatsz16 = %d\n", bpb->bpb_fatsz16);
+    DEBUGF("bpb_secpertrk = %d\n", bpb->bpb_secpertrk);
+    DEBUGF("bpb_numheads = %d\n", bpb->bpb_numheads);
+    DEBUGF("bpb_hiddsec = %u\n", bpb->bpb_hiddsec);
+    DEBUGF("bpb_totsec32 = %u\n", bpb->bpb_totsec32);
 
-    printf("bs_drvnum = %d\n", bpb->bs_drvnum);
-    printf("bs_bootsig = %02x\n", bpb->bs_bootsig);
+    DEBUGF("bs_drvnum = %d\n", bpb->bs_drvnum);
+    DEBUGF("bs_bootsig = %02x\n", bpb->bs_bootsig);
     if(bpb->bs_bootsig == 0x29)
     {
-       printf("bs_volid = %xl\n", bpb->bs_volid);
-       printf("bs_vollab = \"%s\"\n", bpb->bs_vollab);
-       printf("bs_filsystype = \"%s\"\n", bpb->bs_filsystype);
+       DEBUGF("bs_volid = %xl\n", bpb->bs_volid);
+       DEBUGF("bs_vollab = \"%s\"\n", bpb->bs_vollab);
+       DEBUGF("bs_filsystype = \"%s\"\n", bpb->bs_filsystype);
     }
 
-    printf("bpb_fatsz32 = %u\n", bpb->bpb_fatsz32);
-    printf("last_word = %04x\n", bpb->last_word);
+    DEBUGF("bpb_fatsz32 = %u\n", bpb->bpb_fatsz32);
+    DEBUGF("last_word = %04x\n", bpb->last_word);
 
-    printf("fat_type = FAT32\n");
+    DEBUGF("fat_type = FAT32\n");
 }
 
 void dbg_dir(char* currdir)
@@ -88,38 +89,40 @@ void dbg_dir(char* currdir)
     dir = opendir(currdir);
     if (dir)
     {
-        for ( entry = readdir(dir); 
-              entry; 
-              entry = readdir(dir) )
-        {
-            printf("%s (%08x)\n", entry->d_name, entry->size);
+        while ( (entry = readdir(dir)) ) {
+            DEBUGF("%15s (%d bytes)\n", entry->d_name, entry->size);
         }
     }
     else
     {
-        fprintf(stderr, "Could not open dir %s\n", currdir);
+        DEBUGF( "Could not open dir %s\n", currdir);
     }
     closedir(dir);
 }
 
-void dbg_type(int cluster)
+void dbg_type(char* name)
 {
     unsigned char buf[SECTOR_SIZE*5];
-    struct fat_file ent;
-    int i;
+    int i,fd,rc;
 
-    fat_open(cluster,&ent);
+    fd = open(name,O_RDONLY);
+    if (fd<0)
+        return;
+    DEBUGF("Got file descriptor %d\n",fd);
     
-    for (i=0;i<5;i++)
-        if(fat_read(&ent, 1, buf) >= 0)
+    for (i=0;i<5;i++) {
+        rc = read(fd, buf, SECTOR_SIZE/3);
+        if( rc >= 0 )
         {
             buf[SECTOR_SIZE]=0;
-            printf("%s\n", buf);
+            DEBUGF("%d: %d\n", i, rc);
         }
         else
         {
-            fprintf(stderr, "Could not read file on cluster %d\n", cluster);
+            DEBUGF("Failed reading file\n");
         }
+    }
+    close(fd);
 }
 
 char current_directory[256] = "\\";
@@ -127,7 +130,7 @@ int last_secnum = 0;
 
 void dbg_prompt(void)
 {
-    printf("C:%s> ", current_directory);
+    DEBUGF("C:%s> ", current_directory);
 }
 
 void dbg_console(void)
@@ -173,19 +176,17 @@ void dbg_console(void)
                     {
                         last_secnum++;
                     }
-                    printf("secnum: %d\n", last_secnum);
+                    DEBUGF("secnum: %d\n", last_secnum);
                     dbg_dump_sector(last_secnum);
                     continue;
                 }
 
                 if(!strcasecmp(s, "type"))
                 {
-                    int cluster = 0;
-                    if((s = strtok(NULL, " \n")))
-                    {
-                        cluster = atoi(s);
-                    }
-                    dbg_type(cluster);
+                    s = strtok(NULL, " \n");
+                    if (!s)
+                        continue;
+                    dbg_type(s);
                     continue;
                 }
             
@@ -196,6 +197,8 @@ void dbg_console(void)
                 }
             }
         }
+        else
+            quit = 1;
     }
 }
 

@@ -32,6 +32,7 @@ struct dirent {
     unsigned char d_name[256];
     int attribute;
     int size;
+    int startcluster;
 };
 #endif
 

@@ -5,7 +5,7 @@ CFLAGS = -g -Wall -DTEST_FAT -I$(DRIVERS) -I$(FIRMWARE)/common -I$(FIRMWARE) -I.
 
 TARGET = fat
 
-$(TARGET): fat.o ata-sim.o main.o disk.o debug.o dir.o
+$(TARGET): fat.o ata-sim.o main.o disk.o debug.o dir.o file.o
 	gcc -g -o fat $+ -lfl
 
 fat.o: $(DRIVERS)/fat.c $(DRIVERS)/fat.h $(DRIVERS)/ata.h
@@ -15,6 +15,9 @@ disk.o: $(FIRMWARE)/common/disk.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 dir.o: $(FIRMWARE)/common/dir.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+file.o: $(FIRMWARE)/common/file.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 debug.o: $(FIRMWARE)/debug.c

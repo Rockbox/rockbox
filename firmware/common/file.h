@@ -33,14 +33,15 @@
 #ifndef SIMULATOR
 extern int open(char* pathname, int flags);
 extern int close(int fd);
-
 extern int read(int fd, void* buf, int count);
-extern int write(int fd, void* buf, int count);
-
 extern int lseek(int fd, int offset, int whence);
 
+#ifdef DISK_WRITE
+extern int write(int fd, void* buf, int count);
 extern int remove(char* pathname);
 extern int rename(char* oldname, char* newname);
+#endif
+
 #else
 #ifdef WIN32
 #include <io.h>
