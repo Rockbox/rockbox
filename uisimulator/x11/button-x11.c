@@ -109,7 +109,7 @@ int button_get(bool block)
     do {
         bits = get_raw_button();
         if(block && !bits)
-            x11_sleep(HZ/4);
+            x11_sleep(HZ/10);
         else
             break;
     } while(1);
