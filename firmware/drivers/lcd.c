@@ -195,9 +195,8 @@ void lcd_write_data(unsigned char* p_bytes, int count)
 
         byte = *p_bytes++ << 24; /* fetch to MSB position */
 
-        /* make port modifications atomic, in case an IRQ uses PBDRL */
-        /* (currently not the case, so this could be optimized away) */
-        oldlevel = set_irq_level(15);
+        /* This code will fail if an interrupt changes the contents of PBDRL.
+           If so, we must disable the interrupt here. */
 
         /* precalculate the values for later bit toggling, init data write */
         asm (
@@ -287,7 +286,8 @@ void lcd_write_data(unsigned char* p_bytes, int count)
             : "r0"
         );
 
-        set_irq_level(oldlevel);
+        /* This is the place to reenable the interrupts, if we have disabled
+           them. See above. */
 
     } while (--count); /* tail loop is faster */
 }
@@ -306,9 +306,8 @@ void lcd_write_data(unsigned char* p_bytes, int count)
            the only carry add/sub which does not destroy a source register */
         byte = ~(*p_bytes++ << 24); /* fetch to MSB position */
 
-        /* make port modifications atomic, in case an IRQ uses PBDRL */
-        /* (currently not the case, so this could be optimized away) */
-        oldlevel = set_irq_level(15);
+        /* This code will fail if an interrupt changes the contents of PBDRL.
+           If so, we must disable the interrupt here. */
 
         /* precalculate the values for later bit toggling, init data write */
         asm (
@@ -390,7 +389,8 @@ void lcd_write_data(unsigned char* p_bytes, int count)
             "r0"
         );
 
-        set_irq_level(oldlevel);
+        /* This is the place to reenable the interrupts, if we have disabled
+           them. See above. */
 
     } while (--count); /* tail loop is faster */
 }
