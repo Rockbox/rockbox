@@ -2377,17 +2377,17 @@ void mpeg_set_recording_gain(int left, int right, bool use_mic)
 }
 
 /* try to make some kind of beep, also in recording mode */
-void mpeg_beep(int freq, int duration)
+void mpeg_beep(int duration)
 {
-    (void)freq; /* not used yet */
     long starttick = current_tick;
     do
-    {
-        mas_codec_writereg(0, 0); /* some little-understood sequence, */
-        mas_codec_writereg(0, 1); /*  there may be better ways */
+    {  /* toggle bit 0 of codec register 0, toggling the DAC off & on.
+        * While this is still audible even without an external signal,
+        * it doesn't affect the (pre-)recording. */
+        mas_codec_writereg(0, shadow_codec_reg0 ^ 1);
+        mas_codec_writereg(0, shadow_codec_reg0);
     }
     while (current_tick - starttick < duration);
-    mas_codec_writereg(0, shadow_codec_reg0); /* restore it */
 }
 
 void mpeg_new_file(const char *filename)

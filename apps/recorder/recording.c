@@ -322,25 +322,25 @@ bool recording_screen(void)
                 /* Only act if the mpeg is stopped */
                 if(!(mpeg_status() & MPEG_STATUS_RECORD))
                 {
-                    if (global_settings.talk_menu)
-                    {   /* no voice possible here, but a beep */
-                        mpeg_beep(0,HZ/4); /* longer beep on start */
-                    }
                     have_recorded = true;
                     talk_buffer_steal(); /* we use the mp3 buffer */
                     mpeg_record(rec_create_filename(path_buffer));
                     update_countdown = 1; /* Update immediately */
                     last_seconds = 0;
+                    if (global_settings.talk_menu)
+                    {   /* no voice possible here, but a beep */
+                        mpeg_beep(HZ/2); /* longer beep on start */
+                    }
                 }
                 else
                 {
                     if(mpeg_status() & MPEG_STATUS_PAUSE)
                     {
+                        mpeg_resume_recording();
                         if (global_settings.talk_menu)
                         {   /* no voice possible here, but a beep */
-                            mpeg_beep(0,HZ/8); /* short beep on resume */
+                            mpeg_beep(HZ/4); /* short beep on resume */
                         }
-                        mpeg_resume_recording();
                     }
                     else
                     {

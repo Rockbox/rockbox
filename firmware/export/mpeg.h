@@ -99,7 +99,7 @@ unsigned int mpeg_error(void);
 void mpeg_error_clear(void);
 int mpeg_get_file_pos(void);
 unsigned long mpeg_get_last_header(void);
-void mpeg_beep(int freq, int duration);
+void mpeg_beep(int duration);
 
 /* in order to keep the recording here, I have to expose this */
 void rec_tick(void);
