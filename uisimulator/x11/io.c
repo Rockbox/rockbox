@@ -19,18 +19,24 @@ typedef struct mydir MYDIR;
 MYDIR *x11_opendir(char *name)
 {
   char buffer[256]; /* sufficiently big */
-  MYDIR *my = (MYDIR *)malloc(sizeof(MYDIR));
+  DIR *dir;
 
   if(name[0] == '/') {
     sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);    
-    my->dir=(DIR *)opendir(buffer);
+    dir=(DIR *)opendir(buffer);
   }
   else
-    my->dir=(DIR *)opendir(name);
-  
-  my->name = (char *)strdup(name);
+    dir=(DIR *)opendir(name);
 
-  return my;
+  if(dir) {
+    MYDIR *my = (MYDIR *)malloc(sizeof(MYDIR));
+    my->dir = dir;
+    my->name = (char *)strdup(name);
+
+    return my;
+  }
+  /* failed open, return NULL */
+  return (MYDIR *)0;
 }
 
 struct x11_dirent *x11_readdir(MYDIR *dir)
