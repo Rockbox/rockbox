@@ -19,37 +19,46 @@
 
 TARGET = rockboxui
 
+FIRMWAREDIR=../firmware
+
 CC = gcc
 RM = rm
 
 CFLAGS = -g
-CPPFLAGS =  -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS
+CPPFLAGS =  -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR -DHAVE_LCD_BITMAP -I$(FIRMWAREDIR)
 LDFLAGS = -lX11 -lm -lXt -lXmu -lnsl
 INCLUDES = 
 LIBDIRS = 
-DEPEND = .depends
 
-OBJS=   screenhack.o uibasic.o resources.o visual.o lcd.o lcd-x11.o
+OBJS=   screenhack.o uibasic.o resources.o visual.o lcd.o lcd-x11.o chartables.o
 
 SRCS = $(OBJS:%.o=%.c)
 HDRS = $(OBJS:%.o=%.h)
 
-all: $(DEPEND) $(TARGET)
+all: $(TARGET)
 
 clean:
-	$(RM) -f $(OBJS) *~ core $(TARGET) $(CLIENTS) $(DEPEND)
+	$(RM) -f $(OBJS) *~ core $(TARGET) $(CLIENTS)
 
 distclean: clean
 	$(RM) config.cache
 
+lcd.o: $(FIRMWAREDIR)/lcd.c
+	$(CC) $(CPPFLAGS) $(INCLUDES) $(CFLAGS) -c $< -o $@
+
+chartables.o: $(FIRMWAREDIR)/chartables.c
+	$(CC) $(CPPFLAGS) $(INCLUDES) $(CFLAGS) -c $< -o $@
+
 .c.o:
 	$(CC) $(CPPFLAGS) $(INCLUDES) $(CFLAGS) -c $<
-
-$(DEPEND):
-	$(CC) -MM $(CFLAGS) $(SRCS) > $(DEPEND)
 
 $(TARGET): $(OBJS)
 	$(CC) -o $(TARGET) $(LIBDIRS) $(LDFLAGS) $(OBJS)
 
-# Dependencies
-include $(DEPEND)
+
+lcd-x11.o: lcd-x11.c screenhack.h config.h resources.h visual.h lcd-x11.h
+resources.o: resources.c utils.h resources.h
+screenhack.o: screenhack.c xmu.h screenhack.h config.h resources.h \
+  visual.h version.h vroot.h
+uibasic.o: uibasic.c screenhack.h config.h resources.h visual.h version.h
+visual.o: visual.c utils.h resources.h visual.h
