@@ -310,7 +310,7 @@ static bool save_memo(int changed, bool new_mod, struct shown *shown)
 {
     int fp,fq;
     fp = rb->open("/.rockbox/.memo",O_RDONLY | O_CREAT);
-    fq = rb->open("/.rockbox/~temp",O_RDWR | O_CREAT | O_TRUNC);
+    fq = rb->creat("/.rockbox/~temp", 0);
     if ( (fq != -1) && (fp != -1) )
     {
         int i;
@@ -323,19 +323,13 @@ static bool save_memo(int changed, bool new_mod, struct shown *shown)
         }
         if (new_mod)
         {
-            rb->snprintf(temp, 3, "%02d", memos[changed].day);
-            rb->write(fq,temp,2);
-            rb->snprintf(temp, 3, "%02d", memos[changed].month);
-            rb->write(fq,temp,2);
-            rb->snprintf(temp, 5, "%04d", memos[changed].year);
-            rb->write(fq,temp,4);
-            rb->snprintf(temp, 2, "%01d", memos[changed].wday);
-            rb->write(fq,temp,1);
-            rb->snprintf(temp, 2, "%01d", memos[changed].type);
-            rb->write(fq,temp,1);
-            rb->snprintf(temp, rb->strlen(memos[changed].message)+1,
-                         "%s\n", memos[changed].message);
-            rb->write(fq,temp, rb->strlen(temp));
+            rb->fprintf(fq, "%02d%02d%04d%01d%01d%s\n",
+                        memos[changed].day,
+                        memos[changed].month,
+                        memos[changed].year,
+                        memos[changed].wday,
+                        memos[changed].type,
+                        memos[changed].message);
         }
         rb->lseek(fp, memos[changed].file_pointer_end, SEEK_SET);
         for (i = memos[changed].file_pointer_end;
@@ -345,7 +339,7 @@ static bool save_memo(int changed, bool new_mod, struct shown *shown)
             rb->write(fq,temp,1);
         }
         rb->close(fp);
-        fp = rb->open("/.rockbox/.memo",O_WRONLY | O_CREAT | O_TRUNC);
+        fp = rb->creat("/.rockbox/.memo", 0);
         rb->lseek(fp, 0, SEEK_SET);
         rb->lseek(fq, 0, SEEK_SET);
         for (i = 0; i < rb->filesize(fq); i++)
@@ -372,7 +366,7 @@ static void add_memo(struct shown *shown, int type)
     if (rb->kbd_input(memos[memos_in_memory].message,
                       sizeof memos[memos_in_memory].message) != -1)
     {
-        if (memos[memos_in_memory].message != "")
+        if (rb->strlen(memos[memos_in_memory].message))
     	{
             memos[memos_in_memory].file_pointer_start = 0;
             memos[memos_in_memory].file_pointer_end = 0;
