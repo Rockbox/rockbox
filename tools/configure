@@ -48,7 +48,6 @@ sed > Makefile \
  -e "s,@ROOTDIR@,${rootdir},g" \
  -e "s,@ARCHOS@,${archos},g" \
  -e "s,@DEBUG@,${debug},g" \
- -e "s,@DISPLAY@,${display},g" \
  -e "s,@KEYPAD@,${keypad},g" \
  -e "s,@PWD@,${pwd},g" \
  -e "s,@LANGUAGE@,${language},g" \
@@ -62,7 +61,6 @@ ROOTDIR=@ROOTDIR@
 SIMDIR=\$(ROOTDIR)/uisimulator/@SIMVER@
 TOOLSDIR=\$(ROOTDIR)/tools
 DEBUG=@DEBUG@
-DISPLAY=@DISPLAY@
 KEYPAD=@KEYPAD@
 THISDIR="@PWD@"
 SIMVER=@SIMVER@
@@ -185,7 +183,6 @@ if [ "$target" = "update" ]; then
 
       if [ "$debug" = "SIMULATOR=1" ]; then
         simulator="yes"
-        display=`grep "^DISPLAY=" Makefile | cut -d= -f2-`
         keypad=`grep "^KEYPAD=" Makefile | cut -d= -f2-`
         simver=`grep "^SIMVER=" Makefile | cut -d= -f2-`
       fi
@@ -259,6 +256,7 @@ if [ -z "$archos" ]; then
    9)
     archos="h100"
     target="-DIRIVER_H100"
+    memory=32 # always
     ;;
 
    *)
