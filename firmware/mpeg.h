@@ -26,6 +26,7 @@ void mpeg_pause(void);
 void mpeg_resume(void);
 void mpeg_next(void);
 void mpeg_prev(void);
+bool mpeg_is_playing(void);
 void mpeg_sound_set(int setting, int value);
 int mpeg_sound_min(int setting);
 int mpeg_sound_max(int setting);
