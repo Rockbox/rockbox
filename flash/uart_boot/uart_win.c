@@ -136,3 +136,4 @@ void UartClose(tUartHandle handle)
 
 	return;
 }
+

@@ -54,3 +54,4 @@ void UartClose(tUartHandle handle);
 
 
 #endif // _UART_H
+

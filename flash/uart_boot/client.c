@@ -15,7 +15,7 @@ int ConfigFirstlevelPlayer (tUartHandle serial_handle)
 	if(!UartConfig(serial_handle, 4800, eMARKPARITY, eTWOSTOPBITS, 8))
 	{
 		UINT32 dwErr = GET_LAST_ERR();
-		printf("Error %d setting up COM params for baudrate byte\n", dwErr);
+		printf("Error %lu setting up COM params for baudrate byte\n", dwErr);
 		exit(1);
 	}
 
@@ -24,7 +24,7 @@ int ConfigFirstlevelPlayer (tUartHandle serial_handle)
 	if (result_nbr != 2)
 	{
 		UINT32 dwErr = GET_LAST_ERR();
-		printf("Error %d setting up COM params for baudrate byte\n", dwErr);
+		printf("Error %lu setting up COM params for baudrate byte\n", dwErr);
 	}
 
 	SLEEP(100); // wait for the chars to be sent, is there a better way?
@@ -48,7 +48,7 @@ int ConfigFirstlevelRecorder (tUartHandle serial_handle)
 	if(!UartConfig(serial_handle, 4800, eNOPARITY, eTWOSTOPBITS, 8))
 	{
 		UINT32 dwErr = GET_LAST_ERR();
-		printf("Error %d setting up COM params for baudrate byte\n", dwErr);
+		printf("Error %lu setting up COM params for baudrate byte\n", dwErr);
 		exit(1);
 	}
 
@@ -66,7 +66,7 @@ int ConfigFirstlevelRecorder (tUartHandle serial_handle)
 	if(!UartConfig(serial_handle, 38400, eNOPARITY, eONESTOPBIT, 8))
 	{
 		UINT32 dwErr = GET_LAST_ERR();
-		printf("Error %d setting up COM params for 1st level loader\n", dwErr);
+		printf("Error %lu setting up COM params for 1st level loader\n", dwErr);
 		exit(1);
 	}
 
@@ -78,7 +78,6 @@ int ConfigFirstlevelRecorder (tUartHandle serial_handle)
 int DownloadByte(tUartHandle serial_handle, unsigned char byte, bool bAck)
 {
 	unsigned char received;
-	bool bRecorder = true; // false for player
 
 	while (1)
 	{
@@ -230,7 +229,7 @@ int DownloadArchosMonitor(tUartHandle serial_handle, char* szFilename)
 	if(!UartConfig(serial_handle, 115200, eNOPARITY, eONESTOPBIT, 8))
 	{
 		UINT32 dwErr = GET_LAST_ERR();
-		printf("Error %d setting up COM params for baudrate %d\n", dwErr, 115200);
+		printf("Error %lu setting up COM params for baudrate %d\n", dwErr, 115200);
 		exit(1);
 	}
 
