@@ -17,6 +17,10 @@
  *
  ****************************************************************************/
 #include <memory.h>
+#include "memory-page.h"
+#if 0
+#include "memory-slab.h"
+#endif
 
 /* NOT VERY OPTIMIZED AT ALL BUT WE WILL DO IT WHEN PRIORITY COMES */
 void memory_copy (void *target,void const *source,unsigned int count)
@@ -35,10 +39,10 @@ void memory_set (void *target,int byte,unsigned int count)
 void memory_setup (void)
   {
 #if 1
-    memory_set (free_page,0,MEMORY_TOTAL_BYTES);
-    memory_set (free_page_bin,0,MEMORY_TOTAL_ORDERS *sizeof (struct memory_free_page *));
-    memory_set (free_page_order + 1,0,MEMORY_TOTAL_PAGES);
+    memory_set (__memory_free_page,0,MEMORY_TOTAL_BYTES);
+    memory_set (__memory_free_page_bin,0,MEMORY_TOTAL_ORDERS *sizeof (struct memory_free_page *));
+    memory_set (__memory_free_page_order + 1,0,MEMORY_TOTAL_PAGES);
 #endif
-    free_page_order[0] = MEMORY_TOTAL_ORDERS - 1;
-    free_page_bin[MEMORY_TOTAL_ORDERS - 1] = free_page;
+    __memory_free_page_order[0] = MEMORY_TOTAL_ORDERS - 1;
+    __memory_free_page_bin[MEMORY_TOTAL_ORDERS - 1] = __memory_free_page;
   }

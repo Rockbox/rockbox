@@ -16,86 +16,70 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __LIBRARY_MEMORY_C__
-#  error "This header file must be included ONLY from memory.c."
+#include <memory.h>
+#include "memory-page.h"
+#if 0 
+#include "memory-slab.h"
 #endif
-#ifndef __LIBRARY_MEMORY_PAGE_H__
-#  define __LIBRARY_MEMORY_PAGE_H__
-
-struct memory_free_page
-  {
-    struct memory_free_page
-      *less,*more;
-    char
-      reserved[MEMORY_PAGE_MINIMAL_SIZE - 2*sizeof (struct memory_free_page *)];
-  };
-
-#define LESS -1
-#define MORE +1
 
 #ifdef TEST
 
-struct memory_free_page free_page[MEMORY_TOTAL_PAGES];
-
-static inline unsigned int get_offset (int order)
-  {
-    return (2 << order);
-  }
-
 // IA32 has no problem with shift operation
-static inline unsigned int get_size (int order)
+static inline unsigned int __memory_get_size (int order)
   {
     return (MEMORY_PAGE_MINIMAL_SIZE << order);
   }
 
 // Arghhhh ! I cannot align 'free_page' on 512-byte boundary (max is 16-byte for Cygwin)
-static inline struct memory_free_page *get_neighbour (struct memory_free_page *node,unsigned int size)
+static inline struct memory_free_page *__memory_get_neighbour (struct memory_free_page *node,unsigned int size)
   {
-    return ((struct memory_free_page *)((unsigned)free_page + (((unsigned)node - (unsigned)free_page) ^ size)));
+    return ((struct memory_free_page *)((unsigned)__memory_free_page + (((unsigned)node - (unsigned)__memory_free_page) ^ size)));
   }
 
 #else
 
-extern struct memory_free_page free_page[MEMORY_TOTAL_PAGES] asm("dram");
-
-static inline unsigned int get_offset (int order)
-  {
-    static unsigned short offset [MEMORY_TOTAL_ORDERS] =
-      { 2,4,8,16,32,64,128,256,512,1024,2048,4096,8192 };
-    return offset[order];
-  }
-
 // SH1 has very poor shift instructions (only <<1,>>1,<<2,>>2,<<8,>>8,<<16 and >>16).
 // so we should use a lookup table to speedup. 
-static inline unsigned int get_size (int order)
+static inline unsigned int __memory_get_size (int order)
   {
-    return (get_offset (order))<<8;
+    static unsigned short size [MEMORY_TOTAL_ORDERS] =
+      {
+           1<<MEMORY_PAGE_MINIMAL_ORDER,
+           2<<MEMORY_PAGE_MINIMAL_ORDER,
+           4<<MEMORY_PAGE_MINIMAL_ORDER,
+           8<<MEMORY_PAGE_MINIMAL_ORDER,
+          16<<MEMORY_PAGE_MINIMAL_ORDER,
+          32<<MEMORY_PAGE_MINIMAL_ORDER,
+          64<<MEMORY_PAGE_MINIMAL_ORDER,
+         128<<MEMORY_PAGE_MINIMAL_ORDER,
+         256<<MEMORY_PAGE_MINIMAL_ORDER,
+         512<<MEMORY_PAGE_MINIMAL_ORDER,
+        1024<<MEMORY_PAGE_MINIMAL_ORDER,
+        2048<<MEMORY_PAGE_MINIMAL_ORDER,
+        4096<<MEMORY_PAGE_MINIMAL_ORDER
+      };
+    return size[order];
   }
 
-static inline struct memory_free_page *get_neighbour (struct memory_free_page *node,unsigned int size)
+static inline struct memory_free_page *__memory_get_neighbour (struct memory_free_page *node,unsigned int size)
   {
     return ((struct memory_free_page *)((unsigned)node ^ size));
   }
 
 #endif
 
-static char free_page_order[MEMORY_TOTAL_PAGES];
-static struct memory_free_page *free_page_bin[MEMORY_TOTAL_ORDERS];
-
-static inline int get_order (struct memory_free_page *node)
+static inline int __memory_get_order (struct memory_free_page *node)
   {
-    return free_page_order[node -  free_page];
+    return __memory_free_page_order[node -  __memory_free_page];
   }
-static inline void set_order (struct memory_free_page *node,int order)
+static inline void __memory_set_order (struct memory_free_page *node,int order)
   {
-    free_page_order[node -  free_page] = order;
+    __memory_free_page_order[node -  __memory_free_page] = order;
   }
 
 #if MEMORY_PAGE_USE_SPLAY_TREE
 
-#  include <stdio.h>
-
-static struct memory_free_page *splay_page (struct memory_free_page *root,struct memory_free_page *node)
+static struct memory_free_page *__memory_splay_page (struct memory_free_page *root,struct memory_free_page *node)
   {
     struct memory_free_page *down;
     struct memory_free_page *less;
@@ -153,15 +137,15 @@ static struct memory_free_page *splay_page (struct memory_free_page *root,struct
     return root;
   }
 
-static inline void insert_page (int order,struct memory_free_page *node)
+static inline void __memory_insert_page (int order,struct memory_free_page *node)
   {
-    struct memory_free_page *root = free_page_bin[order];
+    struct memory_free_page *root = __memory_free_page_bin[order];
     if (!root)
       {
         node->less = 
         node->more = 0;
       }
-    else if (node < (root = splay_page (root,node)))
+    else if (node < (root = __memory_splay_page (root,node)))
       {
         node->less = root->less;
         node->more = root;
@@ -173,91 +157,91 @@ static inline void insert_page (int order,struct memory_free_page *node)
         node->more = root->more;
         node->more = 0;
       }
-    free_page_bin[order] = node;
-    set_order (node,order);
+    __memory_free_page_bin[order] = node;
+    __memory_set_order (node,order);
     return;
   }
 
-static inline struct memory_free_page *pop_page (int order,int want)
+static inline struct memory_free_page *__memory_pop_page (int order,int want)
   {
-    struct memory_free_page *root = free_page_bin[order];
+    struct memory_free_page *root = __memory_free_page_bin[order];
     if (root)
       {
-        root = splay_page (root,free_page);
-        free_page_bin[order] = root->more;
-        set_order (root,~want);
+        root = __memory_splay_page (root,__memory_free_page);
+        __memory_free_page_bin[order] = root->more;
+        __memory_set_order (root,~want);
       }
     return root;
   }
 
-static inline void remove_page (int order,struct memory_free_page *node)
+static inline void __memory_remove_page (int order,struct memory_free_page *node)
   {
-    struct memory_free_page *root = free_page_bin[order];
-    root = splay_page (root,node);
+    struct memory_free_page *root = __memory_free_page_bin[order];
+    root = __memory_splay_page (root,node);
     if (root->less)
-      {          
-        node = splay_page (root->less,node);
+      {        
+        node = __memory_splay_page (root->less,node);
         node->more = root->more;
       }
     else
       node = root->more;
-    free_page_bin[order] = node;
+    __memory_free_page_bin[order] = node;
   }
  
 #else
 
-static inline void insert_page (int order,struct memory_free_page *node)
+static inline void __memory_insert_page (int order,struct memory_free_page *node)
   {
-    struct memory_free_page *head = free_page_bin[order];
+    struct memory_free_page *head = __memory_free_page_bin[order];
     node->less = 0;
     node->more = head;
     if (head)
       head->less = node;
-    free_page_bin[order] = node;
-    set_order (node,order);
+    __memory_free_page_bin[order] = node;
+    __memory_set_order (node,order);
   }
 
 static inline struct memory_free_page *pop_page (int order,int want)
   {
-    struct memory_free_page *node = free_page_bin[order];
+    struct memory_free_page *node = __memory_free_page_bin[order];
     if (node)
       {
-        free_page_bin[order] = node->more;
+        __memory_free_page_bin[order] = node->more;
         if (node->more)
           node->more->less = 0;
-        set_order (node,~want);
+        __memory_set_order (node,~want);
       }
     return node;
   }
 
-static inline void remove_page (int order,struct memory_free_page *node)
+static inline void __memory_remove_page (int order,struct memory_free_page *node)
   {
     if (node->less)
       node->less->more = node->more;
     else
-      free_page_bin[order] = node->more;
+      __memory_free_page_bin[order] = node->more;
     if (node->more)
       node->more->less = node->less;
   }
 
 #endif
 
-static inline void push_page (int order,struct memory_free_page *node)
+static inline void __memory_push_page (int order,struct memory_free_page *node)
   {
     node->less = 0;
     node->more = 0;
-    free_page_bin[order] = node;
-    set_order (node,order);
+    __memory_free_page_bin[order] = node;
+    __memory_set_order (node,order);
   }
 
-static struct memory_free_page *allocate_page (unsigned int size,int order)
+static struct memory_free_page *__memory_allocate_page (unsigned int size,int order)
   {
     struct memory_free_page *node;
     int min = order;
     while ((unsigned)order <= (MEMORY_TOTAL_ORDERS - 1))
       // order is valid ?
       {
-        if (!(node = pop_page (order,min)))
+        if (!(node = __memory_pop_page (order,min)))
           // no free page of this order ?
           {
             ++order; size <<= 1;
@@ -267,39 +251,39 @@ static struct memory_free_page *allocate_page (unsigned int size,int order)
           // split our larger page in smaller pages
           {
             --order; size >>= 1;
-            push_page (order,(struct memory_free_page *)((unsigned int)node + size));
+            __memory_push_page (order,(struct memory_free_page *)((unsigned int)node + size));
           }
         return node;
       }
     return MEMORY_RETURN_FAILURE;
   }
 
-static inline void release_page (struct memory_free_page *node,unsigned int size,int order)
+static inline void __memory_release_page (struct memory_free_page *node,unsigned int size,int order)
   {
     struct memory_free_page *neighbour;
     while ((order <= (MEMORY_TOTAL_ORDERS - 1)) &&
-           ((neighbour = get_neighbour (node,size)),
-            (get_order (neighbour) == order)))
+         ((neighbour = __memory_get_neighbour (node,size)),
+         (__memory_get_order (neighbour) == order)))
       // merge our released page with its contiguous page into a larger page
       {
-        remove_page (order,neighbour);
+        __memory_remove_page (order,neighbour);
         ++order; size <<= 1;
         if (neighbour < node)
           node = neighbour;
       }
-    insert_page (order,node);
+    __memory_insert_page (order,node);
   }
 
 
 /*****************************************************************************/
-/*                             PUBLIC FUNCTIONS                              */
+/*                             PUBLIC FUNCTIONS                            */
 /*****************************************************************************/
 
 void *memory_allocate_page (int order)
   {
     if (order < 0)
       return MEMORY_RETURN_FAILURE;
-    return allocate_page (get_size (order),order);
+    return __memory_allocate_page (__memory_get_size (order),order);
   }
 
 // release a page :
@@ -309,10 +293,10 @@ void *memory_allocate_page (int order)
 int memory_release_page (void *address)
   {
     struct memory_free_page *node = (struct memory_free_page *)address;
-    int order = ~get_order (node);
+    int order = ~__memory_get_order (node);
     if (order < 0)
       return MEMORY_RETURN_FAILURE;
-    release_page (node,get_size (order),order);
+    __memory_release_page (node,__memory_get_size (order),order);
     return MEMORY_RETURN_SUCCESS;
   }
 
@@ -322,58 +306,58 @@ int memory_release_page (void *address)
 #  include <stdlib.h>
 #  if MEMORY_PAGE_USE_SPLAY_TREE
 
-static void dump_splay_node (struct memory_free_page *node,int level)
+void __memory_dump_splay_node (struct memory_free_page *node,int level)
   {
     if (!node)
       return;
-    dump_splay_node (node->less,level+1);
-    printf ("\n%*s[%d-%d]",level,"",(node - free_page),(node - free_page) + (1 << get_order (node)) - 1);
-    dump_splay_node (node->more,level+1);    
+    __memory_dump_splay_node (node->less,level+1);
+    printf ("\n%*s[%d-%d]",level,"",(node - __memory_free_page),(node - __memory_free_page) + (1 << __memory_get_order (node)) - 1);
+    __memory_dump_splay_node (node->more,level+1);    
   }
 
-static void dump_splay_tree (struct memory_free_page *root)
+void __memory_dump_splay_tree (struct memory_free_page *root)
   {
-    dump_splay_node (root,2); fflush (stdout);
+    __memory_dump_splay_node (root,2); fflush (stdout);
   }
 
 #  endif
 
-void memory_spy_page (void *address)
+void __memory_spy_page (void *address)
   {
     struct memory_free_page *node = (struct memory_free_page *)address;
     int order,used;
     if (node)
       {
-        order = get_order (node);
+        order = __memory_get_order (node);
         used = order < 0;
         if (used)
           order = ~order;
-        printf("\n(%s,%2d,%7d)",(used ? "used" : "free"),order,get_size (order));
+        printf("\n(%s,%2d,%7d)",(used ? "used" : "free"),order,__memory_get_size (order));
       }
   }
 
-void memory_dump (int order)
+void __memory_dump (int order)
   {
-    struct memory_free_page *node = free_page_bin[order];
-    printf("\n(%s,%2d,%7d)",node ? "free" : "none",order,get_size (order));
+    struct memory_free_page *node = __memory_free_page_bin[order];
+    printf("\n(%s,%2d,%7d)",node ? "free" : "none",order,__memory_get_size (order));
 #  if MEMORY_PAGE_USE_SPLAY_TREE
-    dump_splay_tree (node);
+    __memory_dump_splay_tree (node);
 #  else
     while (node)
       {
-        printf("[%d-%d]",(node - free_page),(node - free_page) + (1<<order) - 1);
+        printf("[%d-%d]",(node - __memory_free_page),(node - __memory_free_page) + (1<<order) - 1);
         node = node->more;
       }
 #  endif
 
   }
 
-void memory_check (int order)
+void __memory_check (int order)
   {
     struct memory_free_page *node[4096],*swap;
     unsigned int i = 0,j = 0;
     while (i <= 12)
-      memory_dump (i++);
+      __memory_dump (i++);
     i = 0;
     printf ("\nallocating...\n");
     while (order >= 0)
@@ -382,31 +366,31 @@ void memory_check (int order)
         while ((swap = memory_allocate_page (j)))
           {
             node[i++] = swap;
-            printf("[%d-%d]",(swap - free_page),(swap - free_page) + ((1 << j)-1));
+            printf("[%d-%d]",(swap - __memory_free_page),(swap - __memory_free_page) + ((1 << j)-1));
             for (j += (rand () & 15); j > (unsigned int)order; j -= order);
           }
         --order;
       }
     node[i] = 0;
     while (j <= 12)
-      memory_dump (j++);
+      __memory_dump (j++);
     j = 0;
     printf ("\nreleasing...");
     --i;
     while (i > 0)
       {
         unsigned int k = 0;
-#if 0
+#  if 0
         printf ("\n");
-#endif
+#  endif
         swap = node[k++];
-#if 0
+#  if 0
         while (swap)
           {
-            printf("[%d-%d]",(swap - free_page),(swap - free_page) + ((1 << ~get_order (swap))-1));
+            printf("[%d-%d]",(swap - __memory_free_page),(swap - __memory_free_page) + ((1 << ~__memory_get_order (swap))-1));
             swap = node[k++];
           }
-#endif
+#  endif
         for (j += 1 + (rand () & 15); j >= i; j -= i);
         swap = node[j];
         node[j] = node[i];
@@ -417,9 +401,8 @@ void memory_check (int order)
     memory_release_page (node[0]);
     i = 0;
     while (i <= 12)
-      memory_dump (i++);
-    printf("\n\n%s !",(get_order (free_page) == 12) ? "SUCCESS" : "FAILURE");
+      __memory_dump (i++);
+    printf("\n\n%s !",(__memory_get_order (__memory_free_page) == 12) ? "SUCCESS" : "FAILURE");
   }
 
-#endif
 #endif

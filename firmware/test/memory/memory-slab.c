@@ -16,17 +16,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __LIBRARY_MEMORY_C__
-#  error "This header file must be included ONLY from memory.c."
-#endif
-#ifndef __LIBRARY_MEMORY_PAGE_H__
-#  define __LIBRARY_MEMORY_PAGE_H__
-
-struct memory_free_block
-  {
-    struct memory_free_block
-      *link;
-  };
+#if 0
+#include <memory.h>
+#include "memory-page.h"
+#include "memory-slab.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // MEMORY SLAB :
@@ -34,17 +27,7 @@ struct memory_free_block
 //
 //
 
-struct memory_slab
-  {
-    struct memory_slab
-      *less,*more; 
-    unsigned int // left == number of free blocks left
-      left;
-    struct memory_free_block
-      *free; 
-  };
-
-static inline struct memory_slab *push_slab (struct memory_slab *head,struct memory_slab *node)
+static inline struct memory_slab *__memory_push_slab (struct memory_slab *head,struct memory_slab *node)
   {
     node->less = head;
     if (head)
@@ -57,14 +40,14 @@ static inline struct memory_slab *push_slab (struct memory_slab *head,struct mem
     return node;
   }
 
-static inline struct memory_slab *pop_slab (struct memory_slab *head,struct memory_slab *node)
+static inline struct memory_slab *__memory_pop_slab (struct memory_slab *head,struct memory_slab *node)
   {
     if (head)
       head->more = node->more;
     return node->more;
   }
 
-static inline struct memory_slab *move_slab (struct memory_slab **from,struct memory_slab **to)
+static inline struct memory_slab *__memory_move_slab (struct memory_slab **from,struct memory_slab **to)
   {
     struct memory_slab *head = *from;
     *from = (*from)->more;
@@ -87,33 +70,9 @@ static inline struct memory_slab *move_slab (struct memory_slab **from,struct me
 //
 //
 
-struct memory_cache
-  {
-    struct memory_cache
-      *less,*more,*same; 
-    unsigned int
-      left; // number of free slabs
-    struct memory_slab
-      *used;
-    struct memory_slab
-      *free;
-    struct memory_slab
-      *reap;
-    unsigned int
-      size,original_size;
-    unsigned int
-      page_size;
-    unsigned int
-      blocks_per_slab; 
-    int
-      page_order;
-    unsigned int
-      flags;
-  };
-
 static struct memory_cache *cache_tree;
 
-static inline int get_order (unsigned size)
+static inline int __memory_get_order (unsigned size)
   {
     int order = 0;
     size = (size + sizeof(struct memory_free_block) - 1) & - sizeof(struct memory_free_block);
@@ -124,7 +83,7 @@ static inline int get_order (unsigned size)
     return order;
   }
 
-static inline struct memory_slab *get_slab (struct memory_cache *cache,void *address)
+static inline struct memory_slab *__memory_get_slab (struct memory_cache *cache,void *address)
   {
 #ifdef TEST
     return (struct memory_slab *)((((unsigned)address + cache->page_size) & -cache->page_size) - sizeof (struct memory_slab));
@@ -133,7 +92,7 @@ static inline struct memory_slab *get_slab (struct memory_cache *cache,void *add
 #endif
   }    
 
-static struct memory_cache *splay_cache (struct memory_cache *root,unsigned int left)
+static struct memory_cache *__memory_splay_cache (struct memory_cache *root,unsigned int left)
   {
     struct memory_cache *down;
     struct memory_cache *less;
@@ -191,14 +150,14 @@ static struct memory_cache *splay_cache (struct memory_cache *root,unsigned int 
     return root;
   }
 
-static inline struct memory_cache *insert_cache (struct memory_cache *root,struct memory_cache *node)
+static inline struct memory_cache *__memory_insert_cache (struct memory_cache *root,struct memory_cache *node)
   {
     node->less = 
     node->more =
     node->same = 0;
     if (root)
       {
-        if (node->left == ((root = splay_cache (root,node))->left))
+        if (node->left == ((root = __memory_splay_cache (root,node))->left))
           {
             node->less = root.less;
             node->more = root.more;
@@ -221,11 +180,11 @@ static inline struct memory_cache *insert_cache (struct memory_cache *root,struc
     return node;
   }
 
-static inline struct memory_cache *remove_cache (struct memory_cache *root,struct memory_cache *node)
+static inline struct memory_cache *__memory_remove_cache (struct memory_cache *root,struct memory_cache *node)
   {
     if (root)
       {
-        root = splay_cache (root,node);
+        root = __memory_splay_cache (root,node);
         if (root != node)
           {
             node->less->same = node->same;
@@ -235,7 +194,7 @@ static inline struct memory_cache *remove_cache (struct memory_cache *root,struc
           }
         if (root->less)
           {          
-            node = splay_page (root->less,node);
+            node = __memory_splay_page (root->less,node);
             node->more = root->more;
           }
         else
@@ -244,12 +203,12 @@ static inline struct memory_cache *remove_cache (struct memory_cache *root,struc
     return root;
   }
 
-static inline struct memory_cache *move_cache (struct memory_cache *root,struct memory_cache *node,int delta)
+static inline struct memory_cache *__memory_move_cache (struct memory_cache *root,struct memory_cache *node,int delta)
   {
-    if ((root = remove_cache (root,node)))
+    if ((root = __memory_remove_cache (root,node)))
       {
         node->left += delta;
-        root = insert_cache (root,node);
+        root = __memory_insert_cache (root,node);
       }
     return root;
   }
@@ -291,15 +250,15 @@ struct memory_slab *memory_grow_cache (struct memory_cache *cache)
               }
             *link = 0;
             cache->blocks_per_slab = slab->free;
-            cache->reap = push_slab (cache->reap,slab);
-            cache_tree = move_cache (cache_tree,cache,+1);
+            cache->reap = __memory_push_slab (cache->reap,slab);
+            cache_tree = __memory_move_cache (cache_tree,cache,+1);
             return slab;
           }
       }
     return MEMORY_RETURN_FAILURE;
   }
 
-static int shrink_cache (struct memory_cache *cache,int all,int move)
+static int __memory_shrink_cache (struct memory_cache *cache,int all,int move)
   {
     struct memory_slab *slab;
     unsigned int slabs = 0;
@@ -308,12 +267,12 @@ static int shrink_cache (struct memory_cache *cache,int all,int move)
         while ((slab = cache->reap))
           {
             ++slabs;
-            cache->reap = pop_slab (cache->reap,slab);
+            cache->reap = __memory_pop_slab (cache->reap,slab);
             memory_release_page ((void *)slab);
             if (all)
               continue;
             if (move)
-              cache_tree = move_cache (cache_tree,cache,-slabs);
+              cache_tree = __memory_move_cache (cache_tree,cache,-slabs);
             return MEMORY_RETURN_SUCCESS;
           }
       }
@@ -322,7 +281,7 @@ static int shrink_cache (struct memory_cache *cache,int all,int move)
 
 int memory_shrink_cache (struct memory_cache *cache,int all)
   {
-    return shrink_cache (cache,all,1 /* move cache in cache_tree */);
+    return __memory_shrink_cache (cache,all,1 /* move cache in cache_tree */);
   }
 
 struct memory_cache *memory_create_cache (unsigned int size,int align,int flags)
@@ -382,7 +341,7 @@ struct memory_cache *memory_create_cache (unsigned int size,int align,int flags)
     cache->page_size = page_size;
     cache->page_order = page_order;
 
-    cache_tree = insert_cache (cache_tree,cache);
+    cache_tree = __memory_insert_cache (cache_tree,cache);
 
     return cache;
   }
@@ -392,8 +351,8 @@ int memory_destroy_cache (struct memory_cache *cache)
     /* FIX ME : this function shouldn't be called if there are still used blocks */
     if (cache && !cache->free && !cache->used)
       {
-        cache_tree = remove_cache (cache_tree,cache);
-        if (shrink_cache (cache,1 /* release all free slabs */,0 /* don't move in cache_tree */))
+        cache_tree = __memory_remove_cache (cache_tree,cache);
+        if (__memory_shrink_cache (cache,1 /* release all free slabs */,0 /* don't move in cache_tree */))
           return memory_cache_release (&cache_cache,cache);
       }
     return MEMORY_RETURN_FAILURE;
@@ -413,33 +372,33 @@ void *memory_cache_allocate (struct memory_cache *cache)
 ok:                 struct memory_free_block *block = slab->free;
                     slab->free = block->link;
                     if (--slab->left == 0)
-                      move_slab (&cache->free,&cache->used);
+                      __memory_move_slab (&cache->free,&cache->used);
                     return block;
                   }
               }
             if (cache->reap)
               {
-                slab = move_slab (&cache->reap,&cache->free);
-                cache_tree = move_cache (cache_tree,cache,-1);
+                slab = __memory_move_slab (&cache->reap,&cache->free);
+                cache_tree = __memory_move_cache (cache_tree,cache,-1);
                 goto ok;
               }
           }
-        while (grow_cache (cache));
+        while (__memory_grow_cache (cache));
       }
     return MEMORY_RETURN_FAILURE;
   }
 
 int memory_cache_release (struct memory_cache *cache,void *address)
   {
-    struct memory_slab *slab = get_slab (cache,address);
+    struct memory_slab *slab = __memory_get_slab (cache,address);
     ((struct memory_free_block *)address)->link = slab->free;
     slab->free = (struct memory_free_block *)address;
     if (slab->left++ == 0)
-      move_slab (&cache->used,&cache->free);
+      __memory_move_slab (&cache->used,&cache->free);
     else if (slab->left == cache->blocks_per_slab)
       {
-        move_slab (&cache->free,&cache->reap);
-        cache_tree = move_cache (cache_tree,cache,+1);
+        __memory_move_slab (&cache->free,&cache->reap);
+        cache_tree = __memory_move_cache (cache_tree,cache,+1);
       }
     return MEMORY_RETURN_SUCCESS;
   }
