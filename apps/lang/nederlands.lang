@@ -1,4 +1,3 @@
-# $Id$
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -1007,8 +1006,8 @@ new: "Oscilograaf"
 
 id: LANG_PM_DBFS
 desc: in the peak meter menu
-eng: "dBfs"
-new: 
+eng: "Logarithmic(dB)"
+new: "Logaritmisch(dB)" 
 
 id: LANG_PM_ENERGY_SAVER
 desc: in the peak meter menu
@@ -1022,8 +1021,8 @@ new: "Hoog"
 
 id: LANG_PM_LINEAR
 desc: in the peak meter menu
-eng: "Linear"
-new: "Lineair" 
+eng: "Linear(%)"
+new: "Lineair(%)" 
 
 id: LANG_PM_MAX
 desc: in the peak meter menu
@@ -1042,8 +1041,8 @@ new: "Nauwkeurigheid"
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
-eng: "dBfs <-> Linear"
-new: "dBfs <-> Lineair" 
+eng: "Scale"
+new: "Schaal" 
 
 id: LANG_RESUME_SETTING_ASK_ONCE
 desc: in settings_menu
@@ -1236,12 +1235,12 @@ eng: "OK"
 new: 
 
 id: LANG_PLAYER_ONPLAY_1
-desc: 
+desc: Line #1 of player ON+PLAY screen
 eng: "\x81 Queue"
 new: "\x81 Wachtrij" 
 
 id: LANG_PLAYER_ONPLAY_2
-desc: 
+desc: Line #2 of player ON+PLAY screen
 eng: "- Ren + Del"
 new: "- Hern + Verw"
 
@@ -1397,8 +1396,8 @@ new: "Breed Stereo"
 
 id: LANG_INVERT
 desc: in settings_menu
-eng: "Invert"
-new: "Omgedraaid" 
+eng: "LCD Mode"
+new: 
 
 id: LANG_SAVE_SETTINGS
 desc: in system_settings_menu()
@@ -1432,8 +1431,8 @@ new: "Update VBR bestand"
 
 id: LANG_INVERT_CURSOR
 desc: in settings_menu
-eng: "Invert cursor"
-new: "Geïnverteerde cursor"
+eng: "Line Selector"
+new: "Regel cursor"
 
 id: LANG_RECORDING_EDITABLE
 desc: Editable recordings setting
@@ -1449,3 +1448,28 @@ id: LANG_STATUS_BAR
 desc: display menu, F3 substitute
 eng: "Status Bar"
 new: 
+
+id: LANG_CAPTION_BACKLIGHT
+desc: in settings_menu
+eng: "Caption backlight"
+new: "Backlight flits" 
+
+id: LANG_INVERT_CURSOR_BAR
+desc: in settings_menu
+eng: "Bar(Inverse)"
+new: "Regel(geïnverteerd)" 
+
+id: LANG_INVERT_CURSOR_POINTER
+desc: in settings_menu
+eng: "Pointer"
+new: "Wijzer" 
+
+id: LANG_INVERT_LCD_INVERSE
+desc: in settings_menu
+eng: "Inverse"
+new: "Geïnverteerd"
+
+id: LANG_INVERT_LCD_NORMAL
+desc: in settings_menu
+eng: "Normal"
+new: "Normaal" 
