@@ -192,7 +192,13 @@ $(OBJDIR)/%.o: $(PLUGINDIR)/lib/%.c
 $(OBJDIR)/%.rock: $(APPSDIR)/plugins/%.c $(APPSDIR)/plugin.h
 	@echo CC $<
 	@$(CC) $(APPCFLAGS) -DPLUGIN -shared $< -L$(OBJDIR) -lplugin -o $@
+ifeq ($(UNAME),CYGWIN)
+# 'x' must be kept or you'll have "Win32 error 5" 
+#     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
+#         #define ERROR_ACCESS_DENIED 5L
+else
 	@chmod -x $@
+endif
 
 ################## Patterns for building objects ##################
 $(OBJDIR)/%.o: ../x11/%.c
