@@ -110,7 +110,7 @@ COMMONSRCS = io.c stubs.c lcd-common.c sim_icons.c fmradio.c
 
 FIRMSRCS = $(LCDSRSC) id3.c mp3data.c usb.c mpeg.c mp3_playback.c \
 	powermgmt.c power.c sprintf.c buffer.c strtok.c random.c \
-	timefuncs.c
+	timefuncs.c strcasestr.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c icons.c language.c \
 	playlist.c wps.c wps-display.c settings.c status.c \
