@@ -76,6 +76,7 @@ struct fat_dir
 
 extern void fat_init(void);
 extern int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) int startsector);
+extern int fat_unmount(int volume, bool flush);
 extern void fat_size(IF_MV2(int volume,) unsigned int* size, unsigned int* free); // public for info
 extern void fat_recalc_free(IF_MV_NONVOID(int volume)); // public for debug info screen
 extern int fat_create_dir(const char* name,

@@ -480,6 +480,33 @@ int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) int startsector)
     return 0;
 }
 
+#ifdef HAVE_MULTIVOLUME
+int fat_unmount(int volume, bool flush)
+{
+    struct bpb* fat_bpb = &fat_bpbs[volume];
+    if(flush)
+    {
+        flush_fat(fat_bpb); /* the clean way, while still alive */
+    }
+    else
+    {   /* volume is not accessible any more, e.g. MMC removed */
+        int i;
+        mutex_lock(&cache_mutex);
+        for(i = 0;i < FAT_CACHE_SIZE;i++)
+        {
+            struct fat_cache_entry *fce = &fat_cache[i];
+            if(fce->inuse && fce->fat_vol == fat_bpb)
+            {
+                fce->inuse = false; /* discard all from that volume */
+                fce->dirty = false;
+            }
+        }
+        mutex_unlock(&cache_mutex);
+    }
+    fat_bpb->mounted = false;
+}
+#endif
+
 void fat_recalc_free(IF_MV_NONVOID(int volume))
 {
 #ifndef HAVE_MULTIVOLUME
@@ -946,15 +973,21 @@ static int flush_fat(IF_MV_NONVOID(struct bpb* fat_bpb))
     unsigned char *sec;
     LDEBUGF("flush_fat()\n");
 
+    mutex_lock(&cache_mutex);
     for(i = 0;i < FAT_CACHE_SIZE;i++)
     {
         struct fat_cache_entry *fce = &fat_cache[i];
-        if(fce->inuse && fce->dirty)
+        if(fce->inuse 
+#ifdef HAVE_MULTIVOLUME
+            && fce->fat_vol == fat_bpb
+#endif
+            && fce->dirty)
         {
             sec = fat_cache_sectors[i];
             flush_fat_sector(fce, sec);
         }
     }
+    mutex_unlock(&cache_mutex);
 
     rc = update_fsinfo(IF_MV(fat_bpb));
     if (rc < 0)
