@@ -77,6 +77,17 @@ static void usb_enable(bool on)
         on = !on;
 #endif
     
+#ifdef USB_ENABLE_ONDIOSTYLE
+    if(on)
+    {
+        or_b(0x20, &PADRL); /* enable USB */
+    }
+    else
+    {
+        and_b(~0x20, &PADRL);
+    }
+    or_b(0x20, &PAIORL);
+#else /* standard HD Jukebox */
     if(on)
     {
         and_b(~0x04, &PADRH); /* enable USB */
@@ -86,6 +97,7 @@ static void usb_enable(bool on)
         or_b(0x04, &PADRH);
     }
     or_b(0x04, &PAIORH);
+#endif
 }
 
 static void usb_slave_mode(bool on)

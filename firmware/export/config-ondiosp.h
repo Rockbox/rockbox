@@ -46,6 +46,9 @@
 /* How to detect USB */
 #define USB_FMRECORDERSTYLE 1 /* like FM, on AN1 */
 
+/* How to enable USB */
+#define USB_ENABLE_ONDIOSTYLE 1 /* with PA5 */
+
 /* The start address index for ROM builds */
 #define ROM_START 0x12010 /* don't know yet */
 
