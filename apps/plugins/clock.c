@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: clock.c,v 2.31 2003/12/8
+ * $Id: clock.c,v 2.40 2003/12/8
  *
  * Copyright (C) 2003 Zakk Roberts
  *
@@ -19,6 +19,13 @@
 
 /*****************************
  * RELEASE NOTES
+
+***** VERSION 2.40 **
+-Cleaned and optimized code, -removed unused code and bitmaps,
+-Progressbar and more animations at credits screen, -centered
+text all over, -general settings added at ON+F3, -new arrow bitmap
+for general settings and mode selector, -bugfix: 12:00AM is no longer
+00:00AM
 
 ***** VERSION 2.31 **
 Fixed credits roll - now displays all names. Features
@@ -61,7 +68,7 @@ Original release, featuring analog / digital modes and a few options.
 
 #ifdef HAVE_LCD_BITMAP
 
-#define CLOCK_VERSION "2.31"
+#define CLOCK_VERSION "2.40"
 
 /* prototypes */
 void show_logo(bool animate, bool show_clock_text);
@@ -85,11 +92,15 @@ int remaining_h=0, remaining_m=0, remaining_s=0;
 bool editing_target = false;
 bool display_counter = true;
 
+/* used for centering of text all over */
+char buf[20];
+int buf_w, buf_h;
+
 static struct plugin_api* rb;
 
 /***********************************************************
  * Used for hands to define lengths at a given time - ANALOG
- ***********************************************************/
+ **********************************************************/
 static unsigned char xminute[] = {
 56,59,61,64,67,70,72,75,77,79,80,82,83,84,84,84,84,84,83,82,80,79,77,75,72,70,67,64,61,59,56,53,51,48,45,42,40,37,35,33,32,30,29,28,28,28,28,28,29,30,32,33,35,37,40,42,45,48,51,53,
 };
@@ -105,7 +116,7 @@ static unsigned char xhour[] = {
 
 /**************************************************************
  * Used for hands to define lengths at a give time - FULLSCREEN
- **************************************************************/
+ *************************************************************/
 static unsigned char xminute_full[] = {
 56,58,61,65,69,74,79,84,91,100,110,110,110,110,110,110,110,110,110,110,110,100,91,84,79,74,69,65,61,58,56,54,51,47,43,38,33,28,21,12,1,1,1,1,1,1,1,1,1,1,1,12,21,28,33,38,43,47,51,54
 };
@@ -122,9 +133,9 @@ static unsigned char yhour_full[] = {
 /****************************
  * BITMAPS
  ****************************/
-/****************************
+/*************************
  * "0" bitmap - for binary
- ****************************/
+ ************************/
 static unsigned char bitmap_0[] = {
 0xc0, 0xf0, 0x3c, 0x0e, 0x06, 0x03, 0x03, 0x03, 0x03, 0x06, 0x0e, 0x3c, 0xf0,
 0xc0, 0x00,
@@ -132,9 +143,9 @@ static unsigned char bitmap_0[] = {
 0x1f, 0x00,
 0x00, 0x00, 0x01, 0x03, 0x03, 0x06, 0x06, 0x06, 0x06, 0x03, 0x03, 0x01, 0x00,
 0x00, 0x00 };
-/****************************
+/*************************
  * "1" bitmap - for binary
- ****************************/
+ ************************/
 static unsigned char bitmap_1[] = {
 0xe0, 0x70, 0x38, 0x1c, 0x0e, 0x07, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00,
 0x00, 0x00,
@@ -144,170 +155,21 @@ static unsigned char bitmap_1[] = {
 0x06, 0x00 };
 /****************************
  * PM indicator (moon + text)
- ****************************/
+ ***************************/
 static unsigned char pm[] = { 0xFF,0xFF,0x33,0x33,0x33,0x1E,0x0C,0x00,0xFF,0xFF,0x06,0x0C,0x06,0xFF,0xFF };
 /****************************
  * AM Indicator (sun and text
- ****************************/
+ ***************************/
 static unsigned char am[] = { 0xFE,0xFF,0x1B,0x1B,0xFF,0xFE,0x00,0x00,0xFF,0xFF,0x06,0x0C,0x06,0xFF,0xFF };
+/**************
+ * Arrow bitmap
+ *************/
+static unsigned char arrow[] = { 0x0C, 0x0C, 0x0C, 0x0C, 0x0C, 0x3F, 0x1E, 0x0C };
 
-/*****************************************
- * We've got 4 different clock logos...
- * The currently used one is #4,
- * "clockbox" -- the others are kept here
- * in case the logo selector is ever
- * brought back or we want to switch..
- ****************************************/
-/* Logo #1 - Standard (by Zakk Roberts) */
-const unsigned char clocklogo_1[] = {
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0xe0, 0xf8, 0xfc, 0xfe, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xe0,
-0xf8, 0xfc, 0xfe, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x80, 0xc0, 0xe0, 0xe0, 0xe0, 0xc0, 0x00,
-0x80, 0xe0, 0xf0, 0xf8, 0xfc, 0xfc, 0xfe, 0xfe, 0x7e, 0x7e, 0x7e, 0x7e, 0x7e,
-0x7e, 0x7e, 0x7e, 0x7e, 0x7e, 0x7e, 0x3e, 0x3e, 0x3e, 0x1e, 0x0e, 0x00, 0x00,
-0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x80, 0xe0, 0xf0,
-0xf8, 0xfc, 0xfc, 0x7e, 0x3e, 0x3e, 0x3e, 0x3e, 0xbe, 0xbe, 0x3e, 0x3e, 0x3e,
-0x3e, 0x7e, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfc, 0x00, 0x00, 0x00, 0x80, 0xe0,
-0xf0, 0xf8, 0xfc, 0xfc, 0xfe, 0xfe, 0x7e, 0x7e, 0x7e, 0x7e, 0x7e, 0x7e, 0x7e,
-0x7e, 0x7e, 0x7e, 0x7e, 0x3e, 0x3e, 0x3e, 0x1e, 0x0e, 0x00, 0x00, 0x00, 0xff,
-0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x80, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe,
-0xff, 0x7f, 0x3f, 0x1f, 0x0f, 0x07, 0x03, 0x00,
-0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
-0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xc0, 0x3f, 0x3f, 0xc0, 0xc0, 0xc0,
-0xc0, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0xff, 0xff,
-0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff,
-0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xef, 0xc7, 0x83, 0x01,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
-0xff, 0xff, 0xff, 0x80, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00, 0x00,
-0x00, 0x80, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0xff, 0xff,
-0xff, 0xff, 0xff, 0xff, 0xff, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-0x80, 0x80, 0x80, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff,
-0xff, 0xff, 0xff, 0xff, 0xff, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff,
-0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x80, 0x00,
-0x0f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f,
-0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1e, 0x1c, 0x00, 0x00,
-0x00, 0x1f, 0x1f, 0x1f, 0x0f, 0x07, 0x01, 0x00, 0x00, 0x00, 0x0f, 0x1f, 0x1f,
-0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f,
-0x1f, 0x1f, 0x1f, 0x0f, 0x07, 0x03, 0x01, 0x00, 0x00, 0x00, 0x00, 0x0f, 0x1f,
-0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f,
-0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1e, 0x1c, 0x00, 0x00, 0x00, 0x1f,
-0x1f, 0x1f, 0x0f, 0x07, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x01, 0x03, 0x07, 0x0f, 0x1f, 0x1f, 0x1f, 0x1f
-};
-
-/* Logo #2 - Digital Segments (by Zakk Roberts) */
-const unsigned char clocklogo_2[] = {
-0x00, 0x00, 0x00, 0x00, 0xfe, 0xfd, 0xfb, 0xf7, 0x0f, 0x0f, 0x0f, 0x0f, 0x0f,
-0x0f, 0x0f, 0x0f, 0x0f, 0x0f, 0x0f, 0x07, 0x03, 0x01, 0x00, 0x00, 0x00, 0x00,
-0xfe, 0xfc, 0xf8, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfe, 0xfd, 0xfb, 0xf7,
-0x0f, 0x0f, 0x0f, 0x0f, 0x0f, 0x0f, 0x0f, 0x0f, 0x0f, 0x0f, 0x0f, 0xf7, 0xfb,
-0xfd, 0xfe, 0x00, 0x00, 0x00, 0xfe, 0xfd, 0xfb, 0xf7, 0x0f, 0x0f, 0x0f, 0x0f,
-0x0f, 0x0f, 0x0f, 0x0f, 0x0f, 0x0f, 0x0f, 0x07, 0x03, 0x01, 0x00, 0x00, 0x00,
-0x00, 0xfe, 0xfc, 0xf8, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80,
-0xe0, 0xf0, 0x70, 0x10, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0xbf, 0x1f, 0x0f, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0xbf, 0x1f, 0x0f, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xbf, 0x1f, 0x0f, 0x07,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x0f,
-0x1f, 0xbf, 0x00, 0x00, 0x00, 0xbf, 0x1f, 0x0f, 0x07, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0xbf, 0x5f, 0xef, 0xf7, 0xf0, 0xf0, 0xf0, 0xe0, 0x40, 0x00, 0x06, 0x07,
-0x07, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xfe, 0xfc, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0xff, 0xff, 0xfe, 0xfc, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xfe, 0xfc,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfc, 0xfe,
-0xff, 0xff, 0x00, 0x00, 0x00, 0xff, 0xff, 0xfe, 0xfc, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0xff, 0xff, 0xfe, 0xfd, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x0c, 0x3c,
-0xfc, 0xf0, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00,
-0xc0, 0x00, 0x40, 0x40, 0x4f, 0x17, 0x1b, 0xdd, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e,
-0x1e, 0x1e, 0x1e, 0xde, 0x1e, 0x5e, 0x5c, 0x58, 0x10, 0xc0, 0x00, 0x00, 0xc0,
-0x0f, 0x57, 0x5b, 0x5d, 0x1e, 0x1e, 0x1e, 0x1e, 0xde, 0x1e, 0x1e, 0x1e, 0x9e,
-0x1e, 0x1e, 0x1c, 0x18, 0x10, 0x00, 0x00, 0x00, 0x00, 0x0f, 0xd7, 0x1b, 0x5d,
-0x5e, 0x5e, 0x1e, 0xde, 0x1e, 0x1e, 0xde, 0x1e, 0x5e, 0x5e, 0x5e, 0x1d, 0xdb,
-0x17, 0x0f, 0xc0, 0x00, 0x40, 0x4f, 0x57, 0x1b, 0x1d, 0x1e, 0x1e, 0xde, 0x1e,
-0x1e, 0x1e, 0x9e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1c, 0x18, 0x10, 0x00, 0x00, 0x00,
-0x00, 0x0f, 0x07, 0x03, 0x01, 0x40, 0x40, 0x40, 0x00, 0xc0, 0x00, 0x00, 0x00,
-0x00, 0xc1, 0x01, 0x41, 0x40, 0x40, 0x00, 0xc0,
-0x1d, 0x00, 0x10, 0x10, 0x10, 0x00, 0x00, 0x1d, 0x00, 0x10, 0x10, 0x10, 0x00,
-0x00, 0x00, 0x00, 0x1d, 0x00, 0x10, 0x10, 0x10, 0x00, 0x1d, 0x00, 0x00, 0x1d,
-0x00, 0x10, 0x10, 0x10, 0x00, 0x00, 0x00, 0x00, 0x1d, 0x00, 0x02, 0x00, 0x0d,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0x18, 0x00, 0x00, 0x00, 0x1d, 0x00, 0x02,
-0x00, 0x02, 0x05, 0x18, 0x00, 0x00, 0x1d, 0x00, 0x10, 0x10, 0x10, 0x00, 0x1d,
-0x00, 0x00, 0x1d, 0x00, 0x10, 0x10, 0x10, 0x00, 0x00, 0x00, 0x00, 0x1d, 0x00,
-0x02, 0x00, 0x0d, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x1c, 0x00, 0x12, 0x10, 0x12, 0x00, 0x01, 0x00, 0x10, 0x10,
-0x00, 0x1d, 0x00, 0x14, 0x10, 0x11, 0x00, 0x1d
-};
-
-/* Logo #3 - Electroplate (by Adam S. & Zakk Roberts)
- * Definition: (N) any artifact that has been plated with a thin coat of metal by electrolysis */
-const unsigned char clocklogo_3[] = {
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0c, 0x1c, 0x3c, 0xfc,
-0xfc, 0xfc, 0xfc, 0xfc, 0xfc, 0x5c, 0xf8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf8, 0xfc, 0xf8,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x0c, 0x1c, 0x3c, 0xfc, 0xfc, 0xfc,
-0xfc, 0xf8, 0xe8, 0xb8, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x80, 0xc0, 0xe0, 0xe0, 0xf0, 0xf0, 0xf0, 0xf0, 0xb0,
-0xf0, 0xd0, 0x70, 0x50, 0x70, 0x60, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff,
-0xff, 0xff, 0xff, 0xff, 0xff, 0x55, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x80, 0xc0, 0xe0, 0xe0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf8, 0xff, 0xff, 0xff,
-0xf8, 0xf0, 0xf0, 0xf0, 0xa0, 0xe0, 0x40, 0x80, 0x80, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x80, 0xc0, 0xe0, 0xe0, 0xf0, 0xf0, 0xf0, 0x70, 0xf0,
-0xb0, 0xf0, 0x70, 0x70, 0x70, 0x60, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
-0xff, 0xff, 0xff, 0xaa, 0xff, 0x00, 0x00, 0x00, 0x00, 0x80, 0xc0, 0xe0, 0xe0,
-0xe0, 0xe0, 0x60, 0xe0, 0x20, 0x00, 0x00, 0x00,
-0x00, 0x00, 0xfc, 0xff, 0xff, 0xff, 0xff, 0xff, 0xaf, 0xfb, 0x0e, 0x01, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff,
-0xff, 0xff, 0xff, 0xff, 0xff, 0x55, 0xff, 0x00, 0x00, 0x00, 0x00, 0xf0, 0xfe,
-0xff, 0xff, 0xff, 0xff, 0xff, 0x6b, 0x0f, 0x02, 0x01, 0x00, 0xff, 0xff, 0xff,
-0xe0, 0xe0, 0xe1, 0xe3, 0xef, 0xff, 0xff, 0xff, 0xfd, 0xf6, 0xf8, 0xe0, 0xe0,
-0xc0, 0x00, 0xfc, 0xff, 0xff, 0xff, 0xff, 0xff, 0xb7, 0xfd, 0x0f, 0x01, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
-0xff, 0xff, 0xff, 0xaa, 0xff, 0xf8, 0xfc, 0xfe, 0xff, 0xff, 0xff, 0x5f, 0xf7,
-0x3f, 0x05, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x03, 0x1f, 0x3f, 0x7f, 0xff, 0xff, 0xfe, 0xfb, 0xee, 0xf8, 0xd0,
-0xe0, 0xa0, 0xc0, 0xc0, 0xc0, 0xc0, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7f,
-0xff, 0xff, 0xff, 0xff, 0x7f, 0xd5, 0xff, 0x00, 0x00, 0x00, 0x00, 0x03, 0x07,
-0x1f, 0x3f, 0x7f, 0xff, 0xff, 0xfd, 0xf6, 0xf8, 0xf0, 0xf0, 0xf0, 0xf1, 0xf1,
-0xf1, 0xf1, 0xf1, 0xb9, 0xfd, 0x5f, 0x7f, 0x2f, 0x3f, 0x0b, 0x07, 0x01, 0x01,
-0x00, 0x00, 0x03, 0x1f, 0x3f, 0x7f, 0xff, 0xff, 0xfe, 0xfb, 0xee, 0xf8, 0xd0,
-0xe0, 0xe0, 0xc0, 0xc0, 0xc0, 0xc0, 0xc0, 0x00, 0x00, 0x00, 0x7f, 0xff, 0xff,
-0xff, 0x7f, 0xff, 0xaa, 0x7f, 0x03, 0x03, 0x0f, 0x3f, 0x7f, 0x7f, 0xff, 0xfd,
-0xf6, 0xfc, 0xd8, 0xe0, 0x40, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x01,
-0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
-0x01, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x01,
-0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
-0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
-0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-};
-
-/* Logo #4 - "Clockbox" (by Adam S.) */
-const unsigned char clocklogo_4[] = {
+/************************************
+ * "Clockbox" clock logo - by Adam S.
+ ***********************************/
+const unsigned char clocklogo[] = {
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0xc0, 0xe0, 0xe0, 0xf0, 0xf0,
 0x78, 0x78, 0x3c, 0x3c, 0xfc, 0xfc, 0xfc, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e,
 0x1e, 0x3c, 0x3c, 0x3c, 0x7c, 0x7c, 0xf8, 0xf8, 0xf0, 0x30, 0x00, 0x00, 0x00,
@@ -352,8 +214,7 @@ const unsigned char clocklogo_4[] = {
 0x0f, 0x1f, 0x1f, 0x1e, 0x1c, 0x1c, 0x1c, 0x1e, 0x1f, 0x0f, 0x07, 0x07, 0x01,
 0x00, 0x00, 0x00, 0x10, 0x1c, 0x1e, 0x1f, 0x0f, 0x07, 0x03, 0x01, 0x01, 0x07,
 0x1f, 0x1f, 0x1f, 0x1c, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-};
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 /******************
  * Time's Up bitmap
@@ -421,8 +282,7 @@ const unsigned char timesup[] = {
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 0x03, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-};
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 /* settings saved to this location */
 static char default_filename[] = "/.rockbox/rocks/.clock_settings";
@@ -460,7 +320,6 @@ char* jobs[] = {
 };
 
 bool done = false; /* This bool is used for most of the while loops */
-int logo = 4; /* must be set before we show the logo */
 
 /***********************************
  * This is saved to default_filename
@@ -538,8 +397,10 @@ void save_settings(void)
     rb->lcd_clear_display();
 
     /* display information */
+    rb->snprintf(buf, sizeof(buf), "Saving Settings");
+    rb->lcd_getstringsize(buf, &buf_w, &buf_h);
+    rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 56, buf);
     show_logo(true, true);
-    rb->lcd_puts(0, 7, "Saving...");
 
     rb->lcd_update();
 
@@ -550,10 +411,19 @@ void save_settings(void)
     {
         rb->write (fd, &settings, sizeof(struct saved_settings));
         rb->close(fd);
-        rb->lcd_puts(0, 7, "Save Succeeded");
+
+        rb->lcd_clearrect(0, 56, 112, 8);
+        rb->snprintf(buf, sizeof(buf), "Saved Settings");
+        rb->lcd_getstringsize(buf, &buf_w, &buf_h);
+        rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 56, buf);
     }
     else
-        rb->lcd_puts(0, 7, "Save Failed");
+    {
+        rb->lcd_clearrect(0, 56, 112, 8);
+        rb->snprintf(buf, sizeof(buf), "Save Failed");
+        rb->lcd_getstringsize(buf, &buf_w, &buf_h);
+        rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 56, buf);
+    }
 
     rb->lcd_update();
 
@@ -573,35 +443,57 @@ void load_settings(void)
 
     rb->lcd_setfont(FONT_SYSFIXED);
 
-    rb->lcd_puts(0, 6, "Clock " CLOCK_VERSION);
+    rb->snprintf(buf, sizeof(buf), "Clock %s", CLOCK_VERSION);
+    rb->lcd_getstringsize(buf, &buf_w, &buf_h);
+    rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 48, buf);
+
+    rb->snprintf(buf, sizeof(buf), "Loading Settings");
+    rb->lcd_getstringsize(buf, &buf_w, &buf_h);
+    rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 56, buf);
+    show_logo(true, true);
+    rb->lcd_update();
 
     if(fd >= 0) /* does file exist? */
     {
         if(rb->filesize(fd) == sizeof(struct saved_settings)) /* if so, is it the right size? */
         {
-            rb->lcd_puts(0, 7, "Loading...");
             rb->read(fd, &settings, sizeof(struct saved_settings));
             rb->close(fd);
-            show_logo(true, true);
-            rb->lcd_puts(0, 6, "Clock " CLOCK_VERSION);
-            rb->lcd_puts(0, 7, "Loaded settings");
+
+            rb->lcd_clearrect(0, 56, 112, 8);
+            rb->snprintf(buf, sizeof(buf), "Loaded Settings");
+            rb->lcd_getstringsize(buf, &buf_w, &buf_h);
+            rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 56, buf);
         }
         else /* bail out */
         {
-            rb->lcd_puts(0, 7, "Old settings file");
+            rb->lcd_clearrect(0, 56, 112, 8);
+            rb->snprintf(buf, sizeof(buf), "Old Settings File");
+            rb->lcd_getstringsize(buf, &buf_w, &buf_h);
+            rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 56, buf);
             reset_settings();
         }
     }
     else /* bail out */
     {
-        rb->lcd_puts(0, 7, "Can't find settings");
+        rb->lcd_clearrect(0, 56, 112, 8);
+        rb->snprintf(buf, sizeof(buf), "No Settings File");
+        rb->lcd_getstringsize(buf, &buf_w, &buf_h);
+        rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 56, buf);
+
+        /* use the default in this case */
         reset_settings();
     }
 
     rb->lcd_update();
 
+#ifndef SIMULATOR
+    rb->ata_sleep();
+#endif
+
     rb->sleep(HZ*2);
 
+    /* make the logo fly out */
     exit_logo();
 }
 
@@ -811,7 +703,7 @@ bool colon, bool lcd)
 {
     int xpos = x;
 
-    /* Draw PM indicator */
+    /* Draw AM/PM indicator */
     if(settings.clock == 2)
     {
         if(settings.digital_12h)
@@ -837,14 +729,22 @@ bool colon, bool lcd)
     if(settings.clock == 2)
     {
         if(settings.digital_12h)
+        {
             if(hour > 12)
                 hour -= 12;
+            if(hour == 0)
+                hour = 12;
+        }
     }
     else
     {
         if(settings.lcd_12h)
+        {
             if(hour > 12)
                 hour -= 12;
+            if(hour == 0)
+                hour = 12;
+        }
     }
 
     draw_7seg_digit(hour / 10, xpos, y, width, height, lcd);
@@ -1043,48 +943,53 @@ void binary(int hour, int minute, int second)
  ***************/
 void show_logo(bool animate, bool show_clock_text)
 {
-    int x_position;
+    int y_position;
 
     unsigned char *clogo = 0;
-    clogo = (unsigned char *)clocklogo_4;
+    clogo = (unsigned char *)clocklogo;
+
+    rb->snprintf(buf, sizeof(buf), "Clock %s", CLOCK_VERSION);
+    rb->lcd_getstringsize(buf, &buf_w, &buf_h);
 
     /* animate logo */
     if(animate)
     {
         /* move down the screen */
-        for(x_position = 0; x_position <= 25; x_position++)
+        for(y_position = 0; y_position <= 25; y_position++)
         {
-            rb->lcd_clearline(0, x_position/2-1, 111, x_position/2-1);
-            rb->lcd_clearline(0, x_position/2+38, 111, x_position/2+38);
-            rb->lcd_bitmap(clogo, 0, x_position/2, 112, 37, true);
+            rb->lcd_clearline(0, y_position/2-1, 111, y_position/2-1);
+            rb->lcd_clearline(0, y_position/2+38, 111, y_position/2+38);
+            rb->lcd_bitmap(clogo, 0, y_position/2, 112, 37, true);
             if(show_clock_text)
-                rb->lcd_puts(0, 6, "Clock " CLOCK_VERSION);
+                rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 48, buf);
             rb->lcd_update();
         }
         /* bounce back up a little */
-        for(x_position = 25; x_position >= 18; x_position--)
+        for(y_position = 25; y_position >= 18; y_position--)
         {
-            rb->lcd_clearline(0, x_position/2-1, 111, x_position/2-1);
-            rb->lcd_clearline(0, x_position/2+38, 111, x_position/2+38);
-            rb->lcd_bitmap(clogo, 0, x_position/2, 112, 37, true);
+            rb->lcd_clearline(0, y_position/2-1, 111, y_position/2-1);
+            rb->lcd_clearline(0, y_position/2+38, 111, y_position/2+38);
+            rb->lcd_bitmap(clogo, 0, y_position/2, 112, 37, true);
             if(show_clock_text)
-                rb->lcd_puts(0, 6, "Clock " CLOCK_VERSION);
+                rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 48, buf);
             rb->lcd_update();
         }
         /* and go back down again */
-        for(x_position = 18; x_position <= 20; x_position++)
+        for(y_position = 18; y_position <= 20; y_position++)
         {
-            rb->lcd_clearline(0, x_position/2-1, 111, x_position/2-1);
-            rb->lcd_clearline(0, x_position/2+38, 111, x_position/2+38);
-            rb->lcd_bitmap(clogo, 0, x_position/2, 112, 37, true);
+            rb->lcd_clearline(0, y_position/2-1, 111, y_position/2-1);
+            rb->lcd_clearline(0, y_position/2+38, 111, y_position/2+38);
+            rb->lcd_bitmap(clogo, 0, y_position/2, 112, 37, true);
             if(show_clock_text)
-                rb->lcd_puts(0, 6, "Clock " CLOCK_VERSION);
+                rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 48, buf);
             rb->lcd_update();
         }
     }
     else /* don't animate, just show */
     {
         rb->lcd_bitmap(clogo, 0, 10, 112, 37, true);
+        if(show_clock_text)
+            rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 48, buf);
         rb->lcd_update();
     }
 }
@@ -1094,28 +999,28 @@ void show_logo(bool animate, bool show_clock_text)
  *******************/
 void exit_logo(void)
 {
-    int x_position;
+    int y_position;
 
     unsigned char *clogo = 0;
-    clogo = (unsigned char *)clocklogo_4;
+    clogo = (unsigned char *)clocklogo;
 
     /* fly downwards */
-    for(x_position = 20; x_position <= 128; x_position++)
+    for(y_position = 20; y_position <= 128; y_position++)
     {
-        rb->lcd_clearline(0, x_position/2-1, 111, x_position/2-1);
-        rb->lcd_bitmap(clogo, 0, x_position/2, 112, 37, true);
+        rb->lcd_clearline(0, y_position/2-1, 111, y_position/2-1);
+        rb->lcd_bitmap(clogo, 0, y_position/2, 112, 37, true);
         rb->lcd_update();
     }
 }
 
-/********************
+/*******************
  * Rolls the credits
- ********************/
+ ******************/
 /* The following function is pretty confusing, so
  * it's extra well commented. */
 bool roll_credits(void)
 {
-    int j, namepos, jobpos; /* namepos/jobpos are x coords for strings of text */
+    int j=0, namepos, jobpos; /* namepos/jobpos are x coords for strings of text */
     int btn;
     int numnames = 12; /* amount of people in the credits array */
     int pause;
@@ -1125,10 +1030,33 @@ bool roll_credits(void)
     char job[15];
     int name_w, name_h;
     int job_w, job_h;
+    int credits_w, credits_h, credits_pos;
+    int progress_pos, progress_percent=0;
 
-    /* Shows "[Credits] X/X" */
+    /* shows "[Credits] XX/XX" */
     char elapsednames[16];
 
+    /* put text into variable, and save the width and height of the text */
+    rb->snprintf(elapsednames, sizeof(elapsednames), "[Credits] %02d/%02d", j+1, numnames);
+    rb->lcd_getstringsize(elapsednames, &credits_w, &credits_h);
+
+    /* fly in text from the left */
+    for(credits_pos = 0 - credits_w; credits_pos <= (LCD_WIDTH/2)-(credits_w/2); credits_pos++)
+    {
+        rb->lcd_clearline(credits_pos-1, 0, credits_pos-1, 8);
+        rb->lcd_putsxy(credits_pos, 0, elapsednames);
+        rb->lcd_update(); /* update the whole lcd to slow down the loop */
+    }
+
+    /* unfold progressbar from the right */
+    for(progress_pos = LCD_WIDTH; progress_pos >= 40; progress_pos--)
+    {
+        rb->scrollbar(progress_pos, 9, LCD_WIDTH-progress_pos, 7, numnames*4, 0, progress_percent, HORIZONTAL);
+        rb->lcd_clearline(0, 0, 0, 30);
+        rb->lcd_update(); /* update the whole lcd to slow down the loop */
+    }
+
+    /* now roll the credits */
     for(j=0; j < numnames; j++)
     {
         rb->lcd_clear_display();
@@ -1136,13 +1064,15 @@ bool roll_credits(void)
         show_logo(false, false);
 
         rb->snprintf(elapsednames, sizeof(elapsednames), "[Credits] %02d/%02d", j+1, numnames);
-        rb->lcd_puts(0, 0, elapsednames);
+        rb->lcd_putsxy(credits_pos-1, 0, elapsednames);
 
         /* used to center the text */
         rb->snprintf(name, sizeof(name), "%s", credits[j]);
         rb->snprintf(job, sizeof(job), "%s", jobs[j]);
         rb->lcd_getstringsize(name, &name_w, &name_h);
         rb->lcd_getstringsize(job, &job_w, &job_h);
+
+        rb->scrollbar(progress_pos, 9, LCD_WIDTH-progress_pos, 7, numnames*4, 0, progress_percent, HORIZONTAL);
 
         /* line 1 flies in */
         for (namepos=0-name_w; namepos < (LCD_WIDTH/2)-(name_w/2)-2; namepos++)
@@ -1157,6 +1087,10 @@ bool roll_credits(void)
                 return false;
         }
 
+        progress_percent++;
+        rb->scrollbar(progress_pos, 9, LCD_WIDTH-progress_pos, 7, numnames*4, 0, progress_percent, HORIZONTAL);
+        rb->lcd_update_rect(progress_pos, 8, 112-progress_pos, 8);
+
         /* now line 2 flies in */
         for(jobpos=LCD_WIDTH; jobpos > (LCD_WIDTH/2)-(job_w+2)/2; jobpos--) /* we use (job_w+2) to ensure it fits on the LCD */
         {
@@ -1169,6 +1103,10 @@ bool roll_credits(void)
             if (btn !=  BUTTON_NONE && !(btn & BUTTON_REL))
                 return false;
         }
+
+        progress_percent++;
+        rb->scrollbar(progress_pos, 9, LCD_WIDTH-progress_pos, 7, numnames*4, 0, progress_percent, HORIZONTAL);
+        rb->lcd_update_rect(progress_pos, 8, 112-progress_pos, 8);
 
         /* pause (2s) and scan for button presses */
         for (pause = 0; pause < 10; pause++)
@@ -1187,6 +1125,10 @@ bool roll_credits(void)
             if (btn !=  BUTTON_NONE && !(btn & BUTTON_REL))
                 return false;
         }
+
+        progress_percent++;
+        rb->scrollbar(progress_pos, 9, LCD_WIDTH-progress_pos, 7, numnames*4, 0, progress_percent, HORIZONTAL);
+        rb->lcd_update_rect(progress_pos, 8, 112-progress_pos, 8);
 
         /* fly out both lines at same time */
         namepos=((LCD_WIDTH/2)-(name_w/2))+8;
@@ -1207,6 +1149,9 @@ bool roll_credits(void)
             jobpos--;
         }
 
+        progress_percent++;
+        rb->scrollbar(progress_pos, 9, LCD_WIDTH-progress_pos, 7, numnames*4, 0, progress_percent, HORIZONTAL);
+
         /* pause (.2s) */
         rb->sleep(HZ/2);
 
@@ -1215,6 +1160,23 @@ bool roll_credits(void)
         if (btn !=  BUTTON_NONE && !(btn & BUTTON_REL))
              return false;
     }
+
+    /* now make the text exit to the right */
+    for(credits_pos = (LCD_WIDTH/2)-(credits_w/2); credits_pos <= 112; credits_pos++)
+    {
+        rb->lcd_clearline(credits_pos-1, 0, credits_pos-1, 8);
+        rb->lcd_putsxy(credits_pos, 0, elapsednames);
+        rb->lcd_update();
+    }
+
+    /* fold progressbar in to the right */
+    for(progress_pos = 42; progress_pos < 112; progress_pos++)
+    {
+        rb->lcd_clearline(progress_pos-1, 8, progress_pos-1, 16);
+        rb->scrollbar(progress_pos, 9, LCD_WIDTH-progress_pos, 7, numnames*4, 0, progress_percent, HORIZONTAL);
+        rb->lcd_update(); /* update the whole lcd to slow down the loop */
+    }
+
     exit_logo();
 
     return true;
@@ -1230,7 +1192,9 @@ bool show_credits(void)
 
     rb->lcd_clear_display();
 
-    rb->lcd_puts(0, 7, "Credit Roll...");
+    rb->snprintf(buf, sizeof(buf), "Credits");
+    rb->lcd_getstringsize(buf, &buf_w, &buf_h);
+    rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 56, buf);
 
     /* show the logo with an animation and the clock version text */
     show_logo(true, true);
@@ -1292,10 +1256,10 @@ bool f1_screen(void)
             rb->lcd_puts(0, 0, "At any mode, [F3]");
             rb->lcd_puts(0, 1, "opens the Options");
             rb->lcd_puts(0, 2, "screen. In Options");
-            rb->lcd_puts(0, 3, "move the cursor");
-            rb->lcd_puts(0, 4, "with UP/DOWN and");
-            rb->lcd_puts(0, 5, "use PLAY to toggle");
-            rb->lcd_puts(0, 6, "selected option.");
+            rb->lcd_puts(0, 3, "use UP/DN to move");
+            rb->lcd_puts(0, 4, "and PLAY to toggle.");
+            rb->lcd_puts(0, 5, "[ON+F3] shows you");
+            rb->lcd_puts(0, 6, "General Settings.");
             rb->lcd_puts(0, 7, "<< BACK 3/9 NEXT >>");
         }
         else if(screen == 4)
@@ -1391,76 +1355,6 @@ bool f1_screen(void)
         }
     }
     return true;
-}
-
-/*************************
- * F2 Screen - Pick a Logo
- * [[ NO LONGER USED ]]
- ************************/
-void f2_screen(void)
-{
-    rb->lcd_clear_display();
-    rb->splash(HZ, true, "LEFT/RIGHT to choose logo");
-    rb->lcd_update();
-    rb->lcd_clear_display();
-    rb->splash(HZ, true, "F2 to select and exit");
-    rb->lcd_update();
-    rb->lcd_clear_display();
-
-    /* let's make sure that the logo isn't invalid */
-    if(logo > 4)
-        logo = 1;
-
-    done = false;
-
-    while(!done)
-    {
-        show_logo(false, false);
-
-        rb->lcd_clearrect(0, 48, 112, 16);
-
-        if(logo == 1)
-        {
-            rb->lcd_puts(0, 0, "1) 'Default'");
-            rb->lcd_puts(0, 6, "By Zakk Roberts");
-        }
-        else if(logo == 2)
-        {
-            rb->lcd_puts(0, 0, "2) 'Digital'");
-            rb->lcd_puts(0, 6, "By Zakk Roberts");
-        }
-        else if(logo == 3)
-        {
-            rb->lcd_puts(0, 0, "3) 'Electroplate'");
-            rb->lcd_puts(0, 6, "By Adam S. and");
-            rb->lcd_puts(0, 7, "Zakk Roberts");
-        }
-        else
-        {
-            rb->lcd_puts(0, 0, "4) 'Clockbox'");
-            rb->lcd_puts(0, 6, "By Adam S.");
-        }
-
-        rb->lcd_update();
-
-        switch(rb->button_get_w_tmo(HZ/4))
-        {
-            case BUTTON_F2:
-            case BUTTON_OFF:
-                done = true;
-                break;
-
-            case BUTTON_RIGHT:
-                if(logo < 4)
-                    logo++;
-                break;
-
-            case BUTTON_LEFT:
-                if(logo > 1)
-                    logo--;
-                break;
-        }
-    }
 }
 
 /*********************
@@ -1856,6 +1750,116 @@ bool f3_screen(void)
     return true;
 }
 
+/**********************************
+ * Confirm resetting of settings,
+ * used in general_settings()    */
+void confirm_reset(void)
+{
+    bool ask_reset_done = false;
+
+    while(!ask_reset_done)
+    {
+        rb->lcd_clear_display();
+
+        rb->snprintf(buf, sizeof(buf), "Reset Settings?");
+        rb->lcd_getstringsize(buf, &buf_w, &buf_h);
+        rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 0, buf);
+
+        rb->lcd_puts(0, 2, "PLAY = Yes");
+        rb->lcd_puts(0, 3, "Any Other = No");
+
+        rb->lcd_update();
+
+        switch(rb->button_get_w_tmo(HZ/4))
+        {
+            case BUTTON_PLAY:
+                reset_settings();
+                rb->splash(HZ*2, true, "Settings Reset");
+                ask_reset_done = true;
+                break;
+
+            case BUTTON_F1    :
+                ask_reset_done = true;
+                break;
+        }
+    }
+}
+
+/************************************
+ * General settings. Reset, save, etc
+ ***********************************/
+void general_settings(void)
+{
+    int cursorpos = 1;
+
+    done = false;
+
+    while(!done)
+    {
+        rb->lcd_clear_display();
+
+        rb->snprintf(buf, sizeof(buf), "General Settings");
+        rb->lcd_getstringsize(buf, &buf_w, &buf_h);
+        rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 0, buf);
+
+        rb->lcd_puts(2, 2, "Reset Settings");
+        rb->lcd_puts(2, 3, "Save Settings");
+        rb->lcd_puts(2, 4, "Show Counter");
+
+        rb->snprintf(buf, sizeof(buf), "UP/DOWN to move");
+        rb->lcd_getstringsize(buf, &buf_w, &buf_h);
+        rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 48, buf);
+        rb->snprintf(buf, sizeof(buf), "PLAY to select");
+        rb->lcd_getstringsize(buf, &buf_w, &buf_h);
+        rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 56, buf);
+
+        rb->lcd_bitmap(arrow, 1, 17, 8, 6, true);
+        rb->lcd_bitmap(arrow, 1, 25, 8, 6, true);
+        rb->checkbox(1, 33, 8, 6, display_counter);
+
+        switch(cursorpos)
+        {
+            case 1:
+                rb->lcd_invertrect(0, 16, 112, 8); break;
+
+            case 2:
+                rb->lcd_invertrect(0, 24, 112, 8); break;
+
+            case 3:
+                rb->lcd_invertrect(0, 32, 112, 8); break;
+        }
+
+        rb->lcd_update();
+
+        switch(rb->button_get_w_tmo(HZ/4))
+        {
+            case BUTTON_OFF:
+            case BUTTON_F3:
+                done = true;
+                break;
+
+            case BUTTON_UP:
+                if(cursorpos > 1)
+                    cursorpos--;
+                break;
+
+            case BUTTON_DOWN:
+                if(cursorpos < 3)
+                    cursorpos++;
+                break;
+
+            case BUTTON_PLAY:
+                if(cursorpos == 1)
+                    confirm_reset();
+                else if(cursorpos == 2)
+                    save_settings();
+                else
+                    display_counter = !display_counter;
+                break;
+        }
+    }
+}
+
 /****************************************
  * Draws the extras, IE border, digits...
  ***************************************/
@@ -2024,11 +2028,6 @@ void draw_extras(int year, int day, int month, int hour, int minute, int second)
 void select_mode(void)
 {
     int cursorpos = settings.clock;
-    bool a = false; /* (a)nalog */
-    bool d = false; /* (d)igital */
-    bool l = false; /* (l)cd */
-    bool f = false; /* (f)ullscreen */
-    bool b = false; /* (b)inary */
 
     done = false;
 
@@ -2045,21 +2044,12 @@ void select_mode(void)
         rb->lcd_puts(0, 6, "UP/DOWN: Choose");
         rb->lcd_puts(0, 7, "PLAY:Go|OFF:Cancel");
 
-        switch(settings.clock)
-        {
-            case 1: a=true; d=l=f=b=false; break;
-            case 2: d=true; a=l=f=b=false; break;
-            case 3: l=true; a=d=f=b=false; break;
-            case 4: f=true; a=d=l=b=false; break;
-            case 5: b=true; a=d=l=f=false; break;
-        }
-
-        /* draw a checkbox next to current mode */
-        rb->checkbox(1, 9, 8, 6, a);
-        rb->checkbox(1, 17, 8, 6, d);
-        rb->checkbox(1, 25, 8, 6, l);
-        rb->checkbox(1, 33, 8, 6, f);
-        rb->checkbox(1, 41, 8, 6, b);
+        /* draw an arrow next to all of them */
+        rb->lcd_bitmap(arrow, 1, 9, 8, 6, true);
+        rb->lcd_bitmap(arrow, 1, 17, 8, 6, true);
+        rb->lcd_bitmap(arrow, 1, 25, 8, 6, true);
+        rb->lcd_bitmap(arrow, 1, 33, 8, 6, true);
+        rb->lcd_bitmap(arrow, 1, 41, 8, 6, true);
 
         /* draw line selector */
         switch(cursorpos)
@@ -2109,6 +2099,7 @@ void counter_finished(void)
     int btn;
     int xpos = 0;
     bool bouncing_up = false;
+    bool led_on = true;
     unsigned char *times_up = 0;
     times_up = (unsigned char *)timesup;
 
@@ -2127,7 +2118,7 @@ void counter_finished(void)
         rb->lcd_update();
 
         /* pause */
-        rb->sleep(HZ/15);
+        rb->sleep(HZ/25);
 
         /* move bitmap up/down 1px */
         if(bouncing_up)
@@ -2136,6 +2127,8 @@ void counter_finished(void)
                 xpos--;
             else
                 bouncing_up = false;
+
+            led_on = true;
         }
         else
         {
@@ -2143,12 +2136,27 @@ void counter_finished(void)
                 xpos++;
             else
                bouncing_up = true;
+
+            led_on = false;
         }
+
+        /* turn red led on and off */
+#ifndef SIMULATOR
+        if(led_on)
+            or_b(0x40, &PBDRL);
+        else
+            and_b(~0x40, &PBDRL);
+#endif
 
         /* exit on keypress */
         btn = rb->button_get(false);
         if (btn !=  BUTTON_NONE && !(btn & BUTTON_REL))
+        {
+#ifndef SIMULATOR
+            and_b(~0x40, &PBDRL); /* shut off the red led */
+#endif
             done = true;
+        }
     }
 }
 
@@ -2255,7 +2263,6 @@ void counter_options(void)
         rb->checkbox(1, 17, 8, 6, counting_up);
         rb->checkbox(1, 25, 8, 6, !counting_up);
 
-
         /* draw a cursor */
         switch(cursorpos)
         {
@@ -2276,8 +2283,7 @@ void counter_options(void)
         /* button scan */
         switch(rb->button_get_w_tmo(HZ/4))
         {
-            case BUTTON_F2: /* exit screen */
-            case BUTTON_OFF:
+            case BUTTON_OFF: /* exit screen */
                 current = counting_up;
                 if(current != original)
                     counter = 0;
@@ -2429,11 +2435,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         {
             rb->lcd_clear_display();
 
-            /* flash counter if needed */
+            /* flash counter if needed
             if(!counting && displayed_value != 0)
                 display_counter = !display_counter;
             else
-                display_counter = true;
+                display_counter = true; */
 
             /* and then print it */
             show_counter();
@@ -2515,8 +2521,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 rb->lcd_drawline((LCD_WIDTH/2)-1, (LCD_HEIGHT/2)-3,
                                  (LCD_WIDTH/2)+1, (LCD_HEIGHT/2)-3);
                 rb->lcd_drawpixel(LCD_WIDTH/2, LCD_HEIGHT/2);
-
-
             }
             /**************
              * Digital mode
@@ -2615,6 +2619,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             }
         }
 
+        if(settings.analog_time == 2 && temphour == 0)
+            temphour = 12;
         if(settings.analog_time == 2 && temphour > 12)
             temphour -= 12;
 
@@ -2636,7 +2642,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 /* restore set backlight timeout */
                 rb->backlight_set_timeout(
                     rb->global_settings->backlight_timeout);
-                
+
                 return PLUGIN_OK;
 
             case BUTTON_ON | BUTTON_REL: /* credit roll */
@@ -2647,15 +2653,18 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 counter_options();
                 break;
 
+            case BUTTON_ON | BUTTON_F3: /* general settings */
+                general_settings();
+                break;
+
             case BUTTON_F1 | BUTTON_REL: /* help */
                 f1_screen();
                 break;
 
             case BUTTON_F2 | BUTTON_REL: /* start/stop counter */
-                if(settings.clock != 5)
+                if(display_counter)
                 {
-                    /* Ignore if the counter was reset */
-                    if(!f2_held)
+                    if(!f2_held) /* Ignore if the counter was reset */
                     {
                         if(counting)
                         {
@@ -2673,9 +2682,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 break;
 
             case BUTTON_F2 | BUTTON_REPEAT: /* reset counter */
-                f2_held = true;  /* Ignore the release event */
-                counter = 0;
-                start_tick = *rb->current_tick;
+                if(display_counter)
+                {
+                    f2_held = true;  /* Ignore the release event */
+                    counter = 0;
+                    start_tick = *rb->current_tick;
+                }
                 break;
 
             case BUTTON_F3: /* options */
