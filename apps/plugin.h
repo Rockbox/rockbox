@@ -283,6 +283,10 @@ struct plugin_api {
 #ifdef HAVE_LCD_BITMAP
     void (*lcd_puts_style)(int x, int y, unsigned char *str, int style);
 #endif
+#ifdef HAVE_LCD_CHARCELLS
+    void (*lcd_put_cursor)(int x, int y, char cursor_char);
+    void (*lcd_remove_cursor)(void);
+#endif
 };
 
 /* defined by the plugin loader (plugin.c) */

@@ -247,6 +247,10 @@ static struct plugin_api rockbox_api = {
 #ifdef HAVE_LCD_BITMAP
     lcd_puts_style,
 #endif
+#ifdef HAVE_LCD_CHARCELLS
+    lcd_put_cursor,
+    lcd_remove_cursor,
+#endif
 };
 
 int plugin_load(char* plugin, void* parameter)
