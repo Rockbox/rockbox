@@ -153,6 +153,25 @@
 			
 #define CASCR_ADDR      0x05FFFFEE
 
+/* Port B data register bits */
+#define PBDR_LCD_SDA    0x0001 /* LCD serial data */
+#define PBDR_LCD_SCK    0x0002 /* LCD serial clock */
+#define PBDR_LCD_DC     0x0004 /* LCD data (1) / command (0) */
+#define PBDR_LCD_CS1    0x0008 /* LCD chip select 1 (active low) */
+#define PBDR_BTN_OFF    0x0010 /* Off button (active low) */
+#define PBDR_LED_RED    0x0040 /* Red LED */
+#define PBDR_BTN_ON     0x0100 /* On button (active low) */
+
+/* A/D control/status register bits */
+#define ADCSR_CH     0x07   /* Channel/group select */
+#define ADCSR_CKS    0x08   /* Clock select */
+#define ADCSR_SCAN   0x10   /* Scan mode */
+#define ADCSR_ADST   0x20   /* A/D start */
+#define ADCSR_ADIE   0x40   /* A/D interrupt enable */
+#define ADCSR_ADF    0x80   /* A/D end flag */
+
+/* A/D control register bits */
+#define ADCR_TRGE    0x80   /* Trigger enable */
 
 /* register macros for direct access: */
 
