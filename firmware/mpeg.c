@@ -286,7 +286,7 @@ static void set_elapsed(struct mp3entry* id3)
 
             /* calculate remainder time */
             plen = (nextpos - relpos) * (id3->filesize / 256);
-            id3->elapsed += remainder * 1000 / plen ;
+            id3->elapsed += (((remainder * 100) / plen) * id3->length) / 10000;
         }
         else {
             /* no TOC exists. set a rough estimate using average bitrate */
@@ -921,9 +921,9 @@ static void mpeg_thread(void)
             }
 
             case MPEG_FF_REWIND: {
-                struct mp3entry *id3 = mpeg_current_track();
-                int oldtime  = id3->elapsed;
-                int newtime  = oldtime + (int)ev.data;
+                struct mp3entry *id3  = mpeg_current_track();
+                unsigned int oldtime  = id3->elapsed;
+                unsigned int newtime  = oldtime + (int)ev.data;
                 int curpos, newpos, diffpos;
                 DEBUGF("MPEG_FF_REWIND\n");
 
@@ -933,7 +933,7 @@ static void mpeg_thread(void)
                 {
                     /* Use the TOC to find the new position */
                     unsigned int percent, remainder;
-                    int curtoc, nexttoc, nextpos;
+                    int curtoc, nexttoc, plen;
 
                     percent = (newtime*100)/id3->length; 
                     if (percent > 99)
@@ -951,11 +951,11 @@ static void mpeg_thread(void)
                     /* Use the remainder to get a more accurate position */
                     remainder   = (newtime*100)%id3->length;
                     remainder   = (remainder*100)/id3->length;
-                    nextpos     = (id3->filesize/256)*nexttoc;
-                    newpos     += ((nextpos-newpos)*remainder)/100;
+                    plen        = (nexttoc - curtoc)*(id3->filesize/256);
+                    newpos     += (plen/100)*remainder;
                 }
                 else if (id3->bpf && id3->tpf)
-                    newpos = (newtime*id3->bpf)/id3->tpf;
+                    newpos = (newtime/id3->tpf)*id3->bpf;
                 else
                 {
                     /* Not enough information to FF/Rewind */
