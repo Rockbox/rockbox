@@ -90,18 +90,17 @@ void menu_init(struct menu_items* mitems, int count)
     menu_top = items[0].id;
     menu_bottom = count-1;
     cursor = menu_top;
-#ifdef HAVE_LCD_BITMAP
-    lcd_setmargins(0,0);
-    lcd_setfont(0);
-#endif
-    lcd_clear_display();
-    lcd_update();
 }
 
 void menu_draw(void)
 {
     int i = 0;
 
+    lcd_clear_display();
+#ifdef HAVE_LCD_BITMAP
+    lcd_setmargins(0,0);
+    lcd_setfont(0);
+#endif
     for (i = 0; i < itemcount; i++) {
         lcd_puts(1, i, items[i].desc);
         if (i < menu_top)
@@ -119,7 +118,6 @@ void menu_run(void)
     int key;
 
     menu_draw();
-    put_cursor_menu_top();
     
     while(1) {
         key = button_get();
@@ -167,7 +165,6 @@ void menu_run(void)
                 execute_menu_item();
             
                 /* Return to previous display state */
-                lcd_clear_display();
                 menu_draw();
                 break;
 
