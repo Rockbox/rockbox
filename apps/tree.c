@@ -87,7 +87,6 @@ static int showdir(char *path, int start)
 
     /* new dir? cache it */
     if (strncmp(path,lastdir,sizeof(lastdir))) {
-        debugf("Caching dir %s\n",path);
         DIR *dir = opendir(path);
         if(!dir)
             return -1; /* not a directory */
