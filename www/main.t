@@ -10,6 +10,11 @@ firmware for the Archos Jukebox <i>5000</i>, <i>6000</i>, <i>Studio</i> and <i>R
 
 <h2>News</h2>
 
+<p><i>2002-08-06</i>: Battery charging added for the Recorders (players have hardware charging).
+
+<p><i>2002-07-28</i>: Configuration saving implemented for all models. Experimental saving to disk
+is not yet enabled on the players by default.
+
 <p><i>2002-06-30</i>: USB cable detection added.
 
 <p><i>2002-06-27</i>: MP3 playback now works for Recorder 6000 and Recorder 10 too.
