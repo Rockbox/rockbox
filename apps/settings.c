@@ -678,20 +678,30 @@ void settings_load(void)
             global_settings.topruntime =
                 config_block[0x28] | (config_block[0x29] << 8);
 
-        global_settings.fade_on_stop = config_block[0xae] & 1;
-        global_settings.caption_backlight = (config_block[0xae] >> 1) & 1;
+        if (config_block[0x29] != 0xae) {
+            global_settings.fade_on_stop = config_block[0xae] & 1;
+            global_settings.caption_backlight = (config_block[0xae] >> 1) & 1;
+        }
 
-        global_settings.peak_meter_clip_hold = (config_block[0xb0]) & 0x1f;
-        global_settings.peak_meter_performance = 
-            (config_block[0xb0] & 0x80) != 0;
+        if(config_block[0xb0] != 0xff) {
+            global_settings.peak_meter_clip_hold = (config_block[0xb0]) & 0x1f;
+            global_settings.peak_meter_performance = 
+                (config_block[0xb0] & 0x80) != 0;
+        }
 
-        global_settings.peak_meter_release = config_block[0xb1] & 0x7f;
-        global_settings.peak_meter_dbfs = (config_block[0xb1] & 0x80) != 0;
+        if(config_block[0xb1] != 0xff) {
+            global_settings.peak_meter_release = config_block[0xb1] & 0x7f;
+            global_settings.peak_meter_dbfs = (config_block[0xb1] & 0x80) != 0;
+        }
 
-        global_settings.peak_meter_min = config_block[0xb2];
-        global_settings.peak_meter_max = config_block[0xb3];
+        if(config_block[0xb2] != 0xff)
+            global_settings.peak_meter_min = config_block[0xb2];
+        
+        if(config_block[0xb3] != 0xff)
+            global_settings.peak_meter_max = config_block[0xb3];
 
-        global_settings.battery_capacity = config_block[0xb4]*50 + 1000;
+        if(config_block[0xb4] != 0xff)
+            global_settings.battery_capacity = config_block[0xb4]*50 + 1000;
 
         if (config_block[0xb5] != 0xff)
             global_settings.scroll_step = config_block[0xb5];
@@ -702,10 +712,7 @@ void settings_load(void)
         if (config_block[0xb7] != 0xff)
             global_settings.bidir_limit = config_block[0xb7];
 
-        if (config_block[0xae] != 0xff)
-            global_settings.fade_on_stop = config_block[0xae];
-
-        if (config_block[0xac] != 0xff)
+       if (config_block[0xac] != 0xff)
             global_settings.max_files_in_dir =
                 config_block[0xac] | (config_block[0xad] << 8);
 
@@ -1413,6 +1420,7 @@ void settings_reset(void) {
     global_settings.runtime = 0;
     global_settings.topruntime = 0;
     global_settings.fade_on_stop = true;
+    global_settings.caption_backlight = false;
     global_settings.max_files_in_dir = 400;
     global_settings.max_files_in_playlist = 10000;
 }
