@@ -60,9 +60,7 @@ struct format_flags
 {
     bool dynamic;
     bool scroll;
-#ifdef HAVE_LCD_CHARCELLS
     bool player_progress;
-#endif
 };
 
 static char format_buffer[FORMAT_BUFFER_SIZE];
@@ -309,12 +307,10 @@ static char* get_tag(struct mp3entry* id3,
         case 'p':  /* Playlist/Song Information */
             switch(tag[1])
             {
-#if defined(HAVE_LCD_CHARCELLS) && !defined(SIMULATOR)
-                case 'b':  /* Player progress bar */
+                case 'b':  /* progress bar */
                     flags->player_progress = true;
                     flags->dynamic = true;
                     return "\x01";
-#endif
 
                 case 'p':  /* Playlist Position */
                     snprintf(buf, buf_size, "%d", id3->index + 1);
@@ -527,9 +523,6 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_all)
     struct format_flags flags;
     bool scroll_active = false;
     int i;
-#ifdef HAVE_LCD_BITMAP
-    int bmp_time_line;
-#endif
 
     if (!id3)
     {
@@ -549,16 +542,29 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_all)
         {
             flags.dynamic = false;
             flags.scroll = false;
-#ifdef HAVE_LCD_CHARCELLS
             flags.player_progress = false;
-#endif
             format_display(buf, sizeof(buf), id3, format_lines[i], &flags);
             dynamic_lines[i] = flags.dynamic;
             
-#if defined(HAVE_LCD_CHARCELLS) && !defined(SIMULATOR)
-            if (flags.player_progress)
+            if (flags.player_progress) {
+#ifdef HAVE_LCD_CHARCELLS
+#ifndef SIMULATOR
                 draw_player_progress(id3, ff_rewind_count);
 #endif
+#else
+                int w,h;
+                int offset = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
+#ifdef LCD_PROPFONTS
+                lcd_getstringsize("M",0,&w,&h);
+#else
+                lcd_getfontsize(0,&w,&h);
+#endif
+                slidebar(0, i*h + offset + 1, LCD_WIDTH, 6, 
+                         (id3->elapsed + ff_rewind_count) * 100 / id3->length,
+                         Grow_Right);
+                continue;
+#endif
+            }
 
             if (!scroll_active && flags.scroll && !flags.dynamic)
             {
@@ -571,19 +577,8 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, bool refresh_all)
             }
         }
     }
-#ifdef HAVE_LCD_BITMAP
-    if (global_settings.statusbar)
-        bmp_time_line = 5;
-    else
-        bmp_time_line = 6;
-
-    format_display(buf, sizeof(buf), id3, "Time: %pc/%pt", &flags);
-    lcd_puts(0, bmp_time_line, buf);
-
-    slidebar(0, LCD_HEIGHT-6, LCD_WIDTH, 6, 
-             id3->elapsed * 100 / id3->length, Grow_Right);
     lcd_update();
-#endif
+
     return true;
 }
 
@@ -625,7 +620,8 @@ void wps_display(struct mp3entry* id3)
                            "%id\n"
                            "%ia\n"
                            "%fb kbit %fv\n"
-                           "%ff Hz\n");
+                           "Time: %pc / %pt\n"
+                           "%pb\n");
 #else
                 wps_format("%s%pp/%pe: %?ia<%ia - >%?it<%it|%fm>\n"
                            "%pc/%pt\n");
