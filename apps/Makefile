@@ -32,7 +32,12 @@ endif
 CFLAGS = -O -W -Wall -m1 -nostdlib -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns $(INCLUDES) $(TARGET) $(DEFINES)
 AFLAGS += -small -relax
 
-SRC := $(wildcard drivers/*.c common/*.c *.c)
+SRC := $(wildcard *.c)
+
+ifeq ($(TARGET),-DARCHOS_RECORDER)
+   SRC += $(wildcard recorder/*.c)
+endif
+
 OBJS := $(SRC:%.c=%.o)
 
 all : archos.mod # archos.asm 
