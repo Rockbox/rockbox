@@ -2,42 +2,46 @@
 #define DOWNLOAD_PAGE
 #include "head.t"
 
-<h2>Latest version: 1.4</h2>
+<h2>Latest version: 2.0</h2>
 
-<p>Please read the <a href="rockbox-1.4-notes.txt">release notes</a>. (<a href="old.html">Older releases</a>)
+<p>Please read the <a href="rockbox-2.0-notes.txt">release notes</a>. (<a href="old.html">Older releases</a>)
 
 <p>
 <table class=rockbox><tr>
-<th>player-old</th>
 <th>player</th>
 <th>recorder</th>
+<th>fm recorder</th>
 </tr><tr>
 <td>
-This version is for old Archos Jukebox 6000 models with ROM firmware older than 4.50.
-
+This version is for Archos Jukebox 5000, 6000 and all Studio models.
 <ul>
-<li><a href="rockbox-1.4-player-old.zip">rockbox-1.4-player-old.zip</a>
+<li><a href="rockbox-2.0-player.zip">rockbox-2.0-player.zip</a>
+<br>(137 KB)
 </ul>
 
 </td><td>
-This version is for Archos Jukebox 5000, 6000 with ROM firmware 4.50 or later, and all Studio models.
+This version is for all non-FM Archos Jukebox Recorder models.
 
 <ul>
-<li><a href="rockbox-1.4-player-new.zip">rockbox-1.4-player-new.zip</a>
+<li><a href="rockbox-2.0-recorder.zip">rockbox-2.0-recorder.zip</a>
+<br>(231 KB)
 </ul>
 
-</td><td>
-This version is for Archos Jukebox Recorder 6, 10, 15 and 20. It does <b>not</b> work with the FM Recorder.
+</td>
+<td>
+This version is for Archos Jukebox FM Recorder.
 
 <ul>
-<li><a href="rockbox-1.4-recorder.zip">rockbox-1.4-recorder.zip</a>
+<li><a href="rockbox-2.0-fmrecorder.zip">rockbox-2.0-fmrecorder.zip</a>
+<br>(229 KB)
 </ul>
 
-</td></tr></table>
+</td>
+</tr></table>
 
 <h3>Source code</h3>
 <ul>
-<li><a href="rockbox-1.4.tar.gz">rockbox-1.4.tar.gz</a>
+<li><a href="rockbox-2.0.tar.gz">rockbox-2.0.tar.gz</a>
 </ul>
 
 <h3>Auxiliary files</h3>
@@ -55,6 +59,10 @@ This version is for Archos Jukebox Recorder 6, 10, 15 and 20. It does <b>not</b>
 <h2>Uninstallation</h2>
 
 <p>If you ever want to remove the Rockbox firmware, simply delete archos.mod (player) or ajbrec.ajz (recorder) from the root of your Archos disk.
+
+<h2>Manual</h2>
+
+<p>We have a brand new <a href="/manual/manual.pdf">manual in PDF format</a>. Please read it.
 
 <h2>Bug reports</h2>
 

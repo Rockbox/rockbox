@@ -2,6 +2,19 @@
 #define HISTORY_PAGE
 #include "head.t"
 
+<p><i>2003-02-14</i>: Matthew P. O'Reilly gave Linus an FM Recorder  for his birthday!
+Linus had it for 2 hours before he took it apart and started drawing schematics...
+
+<p><i>2003-01-10</i>: Full ISO-8859-1 font support added for Players, using the <a href="/docs/rocklatin.html">Rocklatin1</a> dynamic charset system.
+
+<p><i>2002-12-21</i>: You can now donate to the Rockbox project via PayPal. See the new button in the left menu.
+
+<p><i>2002-11-10</i>: Added recording functionality.
+
+<p><i>2002-10-15</i>: Now the Player/Studio models run the same firmware. No more Old and New player firmware.
+
+<p><i>2002-10-11</i>: Version 1.4 is released. <a href="download/">Grab it</a>.
+
 <p><i>2002-09-19</i>: We now support multiple languages. You can help by translating Rockbox to your language. No programming skills required.
 <a href="http://rockbox.haxx.se/mail/archive/rockbox-archive-2002-09/0856.shtml">See instructions here</a>
 
