@@ -130,8 +130,11 @@ int rolo_load(const char* filename)
     system_init();           /* Initialize system for restart */
     i2c_init();              /* Init i2c bus - it seems like a good idea */
     ICR = IRQ0_EDGE_TRIGGER; /* Make IRQ0 edge triggered */
-#ifndef ARCHOS_PLAYER        /* player is to be checked later */
-	PAIOR = 0x0FA0;          /* needed when flashed, probably model-specific */
+	TSTR = 0xE0;             /* disable all timers */
+    /* model-specific de-init, needed when flashed */
+    /* Especially the Archos software is picky about this */
+#if defined(ARCHOS_RECORDER) || defined(ARCHOS_RECORDERV2) || defined(ARCHOS_FMRECORDER)
+	PAIOR = 0x0FA0;
 #endif
 
     rolo_restart(mp3buf, ramstart, length);
