@@ -1,18 +1,32 @@
 Rockbox FAQ
 
+Q. What is a FAQ?
+A. A rare small animal of the specius 'Textius Electronicus'.  It is know for
+   its helpful attitude and vicious misspellings.
 
 Q. What is Rockbox, what is it's purpose?
 A. The purpose of this project is to write an Open Source replacement 
    firmware for the Archos Jukebox 6000, Studio 20 and Recorder MP3 players.
 
-Q. Can the changes or the software that Rockbox suggests or offers 
-   possibly damage my Archos Player?
-A. All firmware mods that are presented still highly experimental. 
-   Try them on your own risk. We offer no garuntee that this software/hardware
-   changes won't damage your player or void your warentee.
+Q. I want to write code for my Archos, how do I proceed?
+A. Well, you have two options.  If you are a member of SourceForge then
+   you can request to be added to the developers list.  If you would like to 
+   remain anonymous, then please feel free to submit patches for consideration
+   to the project.
+
+Q. Okay, so how do I submist a patch?
+A. Run: "diff -u oldfile newfile" against the file(s) you have changed.  Then
+   mail the output to any member of the development team and we will take it 
+   under consideration.  (Please remember that not all submissions are 
+   accpeted.)
+
+Q. I want to join the development team, but don't have a SourceForge account,
+   what should I do?
+A. Head on over to http://sourceforge.net/account/register.php and create an
+   account for yourself.
 
 Q. Do you have a mailing list?
-A. Sure do! The list is rockbox@cool.haxx.se.  To subscribe, send you need to
+A. Sure do! The list is rockbox@cool.haxx.se.  To subscribe, you need to
    send a message to majordomo@cool.haxx.se with the words "subscribe rockbox"
    in the body. 
 
@@ -20,11 +34,22 @@ Q. Great you have a mailing list!  Is there anyway for me to catch up on
    past posts?
 A. Check out the archives at: http://bjorn.haxx.se/rockbox/mail.cgi
 
+Q. What is this "SourceForge" you keep mentioning?
+A. http://www.sourceforge.net
+
+Q. Can the changes or the software that Rockbox suggests or offers 
+   possibly damage my Archos Player?
+A. All firmware mods that are presented are still highly experimental. 
+   Try them at your own risk. We offer no garuntee that this software, or the
+   hardware modifications we show, will not damage your player or void your 
+   warentee.
+
 Q. I want to see what the inside of my player looks like, but I would really
    like to avoid voiding my warentee.  Is there anything you can suggest?
 A. Well Björn Stenberg was kind enough to void his warentee so you don't have 
    to.  Take a look at his dissection of the player at: 
-   http://bjorn.haxx.se/isd200/archos.html
+   http://bjorn.haxx.se/rockbox/mods/disassemble.html   
+   http://bjorn.haxx.se/rockbox/mods/disassemble2.html
 
 Q. What exactly are you trying to achieve with this line of development?
    (A.K.A. whats your purpose for being here?)
@@ -54,5 +79,3 @@ A. Well, some of the ideas that have been presented/discussed for the future
          technically feasible. (But hey we can dream)  And something not
          being on the list does not mean it isn't a neat idea.  Bring it to 
          the list.
-
-
