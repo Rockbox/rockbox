@@ -85,6 +85,5 @@ void app_main(void)
       break;
     }
     lcd_update();
-    sleep(1);
   }
 }
