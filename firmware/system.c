@@ -419,6 +419,13 @@ void (* const vbr[]) (void) __attribute__ ((section (".vectors"))) =
 
 void system_init(void)
 {
+    /* Clear the accumulators. From here on it's the responsibility of
+       whoever uses them to clear them after use (use movclr instruction). */
+    asm volatile ("movclr.l %%acc0, %%d0\n\t"
+                  "movclr.l %%acc1, %%d0\n\t"
+                  "movclr.l %%acc2, %%d0\n\t"
+                  "movclr.l %%acc3, %%d0\n\t"
+                  : : : "d0");
 }
 
 void set_cpu_frequency (long) __attribute__ ((section (".icode")));

@@ -11,5 +11,5 @@ memory.c
 seekable_stream_decoder.c
 stream_decoder.c
 #if CONFIG_CPU==MCF5249
-coldfire.c
+coldfire.S
 #endif
