@@ -23,7 +23,9 @@
 
 /* Only build for target */
 #ifndef SIMULATOR
-#ifdef HAVE_LCD_BITMAP
+
+/* define DUMMY if you only want to "play" with the UI, does no harm */
+/* #define DUMMY */
 
 #ifndef UINT8
 #define UINT8 unsigned char
@@ -123,6 +125,10 @@ bool ReadID(volatile UINT8* pBase, UINT8* pManufacturerID, UINT8* pDeviceID)
 /* erase the sector which contains the given address */
 bool EraseSector(volatile UINT8* pAddr)
 {
+#ifdef DUMMY
+    (void)pAddr; /* prevents warning */
+    return true;
+#else
     volatile UINT8* pBase =
         (UINT8*)((UINT32)pAddr & 0xFFF80000); /* round down to 512k align */
     unsigned timeout = 43000; /* the timeout loop should be no less than
@@ -140,11 +146,17 @@ bool EraseSector(volatile UINT8* pAddr)
     while (*pAddr != 0xFF && --timeout); /* poll for erased */
 
     return (timeout != 0);
+#endif
 }
 
 /* address must be in an erased location */
 inline bool ProgramByte(volatile UINT8* pAddr, UINT8 data)
 {
+#ifdef DUMMY
+    (void)pAddr; /* prevents warnings */
+    (void)data;
+    return true;
+#else
     unsigned timeout = 35; /* the timeout loop should be no less than 20us */
 
     if (~*pAddr & data) /* just a safety feature, not really necessary */
@@ -161,6 +173,7 @@ inline bool ProgramByte(volatile UINT8* pAddr, UINT8 data)
     while (*pAddr != data && --timeout); /* poll for programmed */
 
     return (timeout != 0);
+#endif
 }
 
 /* this returns true if supported and fills the info struct */
@@ -197,10 +210,10 @@ bool GetFlashInfo(tFlashInfo* pInfo)
 /* place a 32 bit value into memory, big endian */
 void Write32(UINT8* pByte, UINT32 value)
 {
-    pByte[0] = (UINT8)(value >> 24);	
-    pByte[1] = (UINT8)(value >> 16);	
-    pByte[2] = (UINT8)(value >> 8);	
-    pByte[3] = (UINT8)(value);	
+    pByte[0] = (UINT8)(value >> 24);    
+    pByte[1] = (UINT8)(value >> 16);    
+    pByte[2] = (UINT8)(value >> 8);    
+    pByte[3] = (UINT8)(value);    
 }
 
 /* read a 32 bit value from memory, big endian */
@@ -220,7 +233,7 @@ UINT32 Read32(UINT8* pByte)
 tImageHeader* GetSecondImage(void)
 {
     tImageHeader* pImage1;
-    UINT32 pos = 0;	/* default: not found */
+    UINT32 pos = 0;    /* default: not found */
     UINT32* pFlash = (UINT32*)FB;
 
     UINT16 version = *(UINT16*)(FB + VERS_ADR);
@@ -244,8 +257,8 @@ tImageHeader* GetSecondImage(void)
         /* success, we have a second image */
         pos = (UINT32)pImage1 + sizeof(tImageHeader) + pImage1->size;
         if (((pos + SECTORSIZE-1) & ~(SECTORSIZE-1)) != pos)
-        {	/* not sector-aligned */
-            pos = 0; // sanity check failed
+        {    /* not sector-aligned */
+            pos = 0; /* sanity check failed */
         }
     }
 
@@ -449,7 +462,18 @@ unsigned VerifyImageFile(char* filename, UINT8* pos,
 
 
 /***************** User Interface Functions *****************/
-/*                 (to be changed for Player)               */
+
+int WaitForButton(void)
+{
+    int button;
+    
+    do
+    {
+        button = rb->button_get(true);
+    } while (button & BUTTON_REL);
+    
+    return button;
+}
 
 /* helper for DoUserDialog() */
 void ShowFlashInfo(tFlashInfo* pInfo, tImageHeader* pImageHeader)
@@ -458,7 +482,7 @@ void ShowFlashInfo(tFlashInfo* pInfo, tImageHeader* pImageHeader)
 
     if (!pInfo->manufacturer)
     {
-        rb->lcd_puts(0, 0, "Flash: M=?? D=??");
+        rb->lcd_puts_scroll(0, 0, "Flash: M=?? D=??");
     }
     else
     {
@@ -466,11 +490,11 @@ void ShowFlashInfo(tFlashInfo* pInfo, tImageHeader* pImageHeader)
         {
             rb->snprintf(buf, sizeof(buf), "Flash size: %d KB",
                          pInfo->size / 1024);
-            rb->lcd_puts(0, 0, buf);
+            rb->lcd_puts_scroll(0, 0, buf);
         }
         else
         {
-            rb->lcd_puts(0, 0, "Unsupported chip");
+            rb->lcd_puts_scroll(0, 0, "Unsupported chip");
         }
         
     }
@@ -479,23 +503,23 @@ void ShowFlashInfo(tFlashInfo* pInfo, tImageHeader* pImageHeader)
     {
         rb->snprintf(buf, sizeof(buf), "Image at %d KB",
                      ((UINT8*)pImageHeader - FB) / 1024);
-        rb->lcd_puts(0, 1, buf);
+        rb->lcd_puts_scroll(0, 1, buf);
     }
     else
     {
-            rb->lcd_puts(0, 1, "No image found!");
+        rb->lcd_puts_scroll(0, 1, "No image found!");
     }
-    
-    rb->lcd_update();
 }
 
 
 /* Kind of our main function, defines the application flow. */
-void DoUserDialog(char* filename)
+#ifdef HAVE_LCD_BITMAP
+/* recorder version */
+void DoUserDialog(char* filename, bool show_greet)
 {
     tImageHeader ImageHeader;
     tFlashInfo FlashInfo;
-    char buf[32];
+    static char buf[MAX_PATH];
     int button;
     int rc; /* generic return code */
     UINT32 space, aligned_size, true_size;
@@ -516,6 +540,8 @@ void DoUserDialog(char* filename)
     rc = GetFlashInfo(&FlashInfo);
 
     ShowFlashInfo(&FlashInfo, (void*)pos);
+    rb->lcd_update();
+
     if (FlashInfo.size == 0) /* no valid chip */
     {
         rb->splash(HZ*3, 0, true, "Not flashable");
@@ -523,36 +549,42 @@ void DoUserDialog(char* filename)
     }
     else if (pos == 0)
     {
-        rb->splash(HZ*3, 0, true, "No Image");
+        rb->splash(HZ*3, 0, true, "No image");
         return; /* exit */
     }
     
-    rb->lcd_puts(0, 3, "using file:");
-    rb->lcd_puts_scroll(0, 4, filename); 
-    rb->lcd_puts(0, 6, "[F1] to check file");
-    rb->lcd_puts(0, 7, "other key to exit");
-    rb->lcd_update();
-    
-    button = rb->button_get(true);
-    button = rb->button_get(true);
-    
-    if (button != BUTTON_F1)
+    if (show_greet)
     {
-        return;
+        rb->lcd_puts(0, 3, "using file:");
+        rb->lcd_puts_scroll(0, 4, filename); 
+        rb->lcd_puts(0, 6, "[F1] to check file");
+        rb->lcd_puts(0, 7, "other key to exit");
+        rb->lcd_update();
+
+        if (WaitForButton() != BUTTON_F1)
+        {
+            return;
+        }
+        rb->lcd_clear_display();
     }
 
-    rb->lcd_clear_display();
-    rb->lcd_puts(0, 0, "checking...");
+    rb->lcd_puts(0, show_greet ? 0 : 3, "Checking...");
     rb->lcd_update();
 
     space = FlashInfo.size - (pos-FB + sizeof(ImageHeader));
     /* size minus start */
     
     rc = CheckImageFile(filename, space, &ImageHeader);
-    rb->lcd_puts(0, 0, "checked:");
+    if (rc != eOK)
+    {
+        rb->lcd_clear_display(); /* make room for error message */
+        show_greet = true; /* verbose */
+    }
+
+    rb->lcd_puts(0, show_greet ? 0 : 3, "Checked:");
     switch (rc) {
         case eOK:
-            rb->lcd_puts(0, 1, "File OK.");
+            rb->lcd_puts(0, show_greet ? 0 : 4, "File OK.");
             break;
     case eNotUCL:
             rb->lcd_puts(0, 1, "File not UCL ");
@@ -592,7 +624,7 @@ void DoUserDialog(char* filename)
     }
 
     if (rc == eOK)
-    {	/* was OK */
+    {    /* was OK */
         rb->lcd_puts(0, 6, "[F2] to program");
         rb->lcd_puts(0, 7, "other key to exit");
     }
@@ -600,12 +632,9 @@ void DoUserDialog(char* filename)
     { /* error occured */
         rb->lcd_puts(0, 6, "Any key to exit");
     }
-
     rb->lcd_update();
-    
-    button = rb->button_get(true);
-    button = rb->button_get(true);
-    
+
+    button = WaitForButton();
     if (rc != eOK || button != BUTTON_F2)
     {
         return;
@@ -620,24 +649,23 @@ void DoUserDialog(char* filename)
                                         the next sector */
     
     rb->lcd_clear_display();
-    rb->lcd_puts(0, 0, "Programming...");
+    rb->lcd_puts_scroll(0, 0, "Programming...");
     rb->lcd_update();
 
     rc = ProgramImageFile(filename, pos, &ImageHeader, UCL_HEADER, true_size);
     if (rc)
     {   /* errors */
         rb->lcd_clear_display();
+        rb->snprintf(buf, sizeof(buf), "%d errors", rc);
         rb->lcd_puts(0, 0, "Error:");
         rb->lcd_puts(0, 1, "Programming fail!");
-        rb->snprintf(buf, sizeof(buf), "%d errors", rc);
         rb->lcd_puts(0, 2, buf);
         rb->lcd_update();
-        button = rb->button_get(true);
-        button = rb->button_get(true);
+        button = WaitForButton();
     }
     
     rb->lcd_clear_display();
-    rb->lcd_puts(0, 0, "Verifying...");
+    rb->lcd_puts_scroll(0, 0, "Verifying...");
     rb->lcd_update();
 
     rc = VerifyImageFile(filename, pos, &ImageHeader, UCL_HEADER, true_size);
@@ -649,9 +677,9 @@ void DoUserDialog(char* filename)
     }
     else
     {
+        rb->snprintf(buf, sizeof(buf), "%d errors", rc);
         rb->lcd_puts(0, 0, "Error:");
         rb->lcd_puts(0, 1, "Verify fail!");
-        rb->snprintf(buf, sizeof(buf), "%d errors", rc);
         rb->lcd_puts(0, 2, buf);
         rb->lcd_puts(0, 3, "Use safe image");
         rb->lcd_puts(0, 4, "if booting hangs:");
@@ -659,16 +687,172 @@ void DoUserDialog(char* filename)
     }
     rb->lcd_puts(0, 7, "Any key to exit");
     rb->lcd_update();
-    
-    button = rb->button_get(true);
-    button = rb->button_get(true);
+    WaitForButton();
 }
+
+#else /* #ifdef HAVE_LCD_BITMAP */
+
+/* Player version */
+void DoUserDialog(char* filename, bool show_greet)
+{
+    tImageHeader ImageHeader;
+    tFlashInfo FlashInfo;
+    static char buf[MAX_PATH];
+    int button;
+    int rc; /* generic return code */
+    UINT32 space, aligned_size, true_size;
+    UINT8* pos;
+    int memleft;
+
+    /* "allocate" memory */
+    sector = rb->plugin_get_buffer(&memleft);
+    if (memleft < SECTORSIZE) /* need buffer for a flash sector */
+    {
+        rb->splash(HZ*3, 0, true, "Out of memory");
+        return; /* exit */
+    }
+
+    pos = (void*)GetSecondImage();
+    rc = GetFlashInfo(&FlashInfo);
+
+    if (show_greet)
+    {
+        ShowFlashInfo(&FlashInfo, (void*)pos);
+        WaitForButton();
+    }
+
+    if (FlashInfo.size == 0) /* no valid chip */
+    {
+        rb->splash(HZ*3, 0, true, "Not flashable");
+        return; /* exit */
+    }
+    else if (pos == 0)
+    {
+        rb->splash(HZ*3, 0, true, "No image");
+        return; /* exit */
+    }
+    
+    if (show_greet)
+    {
+        rb->snprintf(buf, sizeof(buf), "File: %s", filename);
+        rb->lcd_puts_scroll(0, 0, buf);
+        rb->lcd_puts_scroll(0, 1, "[Menu] to check file, other key to exit");
+
+        if (WaitForButton() != BUTTON_MENU)
+        {
+            return;
+        }
+        rb->lcd_clear_display();
+    }
+
+    rb->lcd_puts(0, 0, "Checking...");
+
+    space = FlashInfo.size - (pos-FB + sizeof(ImageHeader));
+    /* size minus start */
+    
+    rc = CheckImageFile(filename, space, &ImageHeader);
+    rb->lcd_puts(0, 0, "Checked:");
+    switch (rc) {
+        case eOK:
+            rb->lcd_puts(0, 1, "File OK.");
+            rb->sleep(HZ*1);
+            break;
+    case eNotUCL:
+            rb->lcd_puts_scroll(0, 1, "File not UCL compressed.");
+            break;
+    case eWrongAlgorithm:
+            rb->lcd_puts_scroll(0, 1, "Wrong compression algorithm.");
+            break;
+    case eFileNotFound:
+            rb->lcd_puts_scroll(0, 1, "File not found.");
+            break;
+    case eTooBig:
+            rb->lcd_puts_scroll(0, 1, "File too big.");
+            break;
+    case eTooSmall:
+            rb->lcd_puts_scroll(0, 1, "File too small. Incomplete?");
+            break;
+    case eReadErr:
+            rb->lcd_puts_scroll(0, 1, "File read error.");
+            break;
+    case eMultiBlocks:
+            rb->lcd_puts_scroll(0, 1, "File invalid. Blocksize too small?");
+            break;
+    default:
+            rb->lcd_puts_scroll(0, 1, "Check failed.");
+            break;
+    }
+
+    if (rc == eOK)
+    {    /* was OK */
+        rb->lcd_clear_display();
+        rb->lcd_puts_scroll(0, 0, "[ON] to program,");
+        rb->lcd_puts_scroll(0, 1, "other key to exit.");
+    }
+    else
+    { /* error occured */
+        WaitForButton();
+        rb->lcd_clear_display();
+        rb->lcd_puts_scroll(0, 0, "Flash failed.");
+        rb->lcd_puts_scroll(0, 1, "Any key to exit.");
+    }
+
+    button = WaitForButton();
+    if (rc != eOK || button != BUTTON_ON)
+    {
+        return;
+    }
+    
+    true_size = ImageHeader.size;
+    aligned_size = ((sizeof(tImageHeader) + true_size + SECTORSIZE-1) &
+                    ~(SECTORSIZE-1)) - sizeof(tImageHeader); /* round up to
+                                                                next flash
+                                                                sector */
+    ImageHeader.size = aligned_size; /* increase image size such that we reach
+                                        the next sector */
+    
+    rb->lcd_clear_display();
+    rb->lcd_puts_scroll(0, 0, "Programming...");
+
+    rc = ProgramImageFile(filename, pos, &ImageHeader, UCL_HEADER, true_size);
+    if (rc)
+    {   /* errors */
+        rb->lcd_clear_display();
+        rb->snprintf(buf, sizeof(buf), "%d errors", rc);
+        rb->lcd_puts_scroll(0, 0, "Programming failed!");
+        rb->lcd_puts_scroll(0, 1, buf);
+        button = WaitForButton();
+    }
+    
+    rb->lcd_clear_display();
+    rb->lcd_puts_scroll(0, 0, "Verifying...");
+
+    rc = VerifyImageFile(filename, pos, &ImageHeader, UCL_HEADER, true_size);
+
+    rb->lcd_clear_display();
+    if (rc == 0)
+    {
+        rb->lcd_puts(0, 0, "Verify OK.");
+    }
+    else
+    {
+        rb->snprintf(buf, sizeof(buf), "Verify fail! %d errors", rc);
+        rb->lcd_puts_scroll(0, 0, buf);
+        rb->lcd_puts_scroll(0, 1, "Use safe image if booting hangs: [Menu] during power-on");
+        button = WaitForButton();
+    }
+}
+
+#endif /* not HAVE_LCD_BITMAP */
+
+
 
 /***************** Plugin Entry Point *****************/
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     char* filename;
+    bool show_greet;
 
     /* this macro should be called as the first thing you do in the plugin.
        it test that the api version and model the plugin was compiled for
@@ -676,18 +860,22 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     TEST_PLUGIN_API(api);
 
     if (parameter == NULL)
+    {
         filename = DEFAULT_FILENAME;
+        show_greet = true;
+    }
     else
+    {
         filename = (char*) parameter; 
+        show_greet = false;
+    }
     
     rb = api; /* copy to global api pointer */
 
     /* now go ahead and have fun! */
-    DoUserDialog(filename);
+    DoUserDialog(filename, show_greet);
 
     return PLUGIN_OK;
 }
 
-#endif // #ifdef HAVE_LCD_BITMAP
-
-#endif // #ifndef SIMULATOR
+#endif /* #ifndef SIMULATOR */
