@@ -415,9 +415,12 @@ void lcd_clear_display(void)
 
 void lcd_puts(int x, int y, unsigned char *string)
 {
+    int i;
     lcd_write(true,LCD_CURSOR(x,y));
-    while (*string && x++<11)
+    for (i=0; *string && x++<11; i++)
         lcd_write(false,lcd_ascii[*(unsigned char*)string++]);
+    for (; x<11; x++)
+        lcd_write(false,lcd_ascii[' ']);
 }
 
 void lcd_putc(int x, int y, unsigned char ch)
@@ -861,6 +864,7 @@ void lcd_putspropxy(int x, int y, unsigned char *str, int thisfont)
  */
 void lcd_puts(int x, int y, unsigned char *str)
 {
+    int xpos,ypos,w,h;
 #if defined(SIMULATOR) && defined(HAVE_LCD_CHARCELLS)
     /* We make the simulator truncate the string if it reaches the right edge,
        as otherwise it'll wrap. The real target doesn't wrap. */
@@ -879,20 +883,23 @@ void lcd_puts(int x, int y, unsigned char *str)
         return;
 
 #ifdef LCD_PROPFONTS
-    lcd_putspropxy( xmargin + x*fonts[font],
-                    ymargin + y*fontheight[font],
-                    str, font );
+    lcd_getstringsize(str, font, &w, &h);
+    xpos = xmargin + x * fonts[font];
+    ypos = ymargin + y * fontheight[font];
+    lcd_putspropxy(xpos, ypos, str, font);
 #elif LOADABLE_FONTS
-    {
-        int w,h;
-        lcd_getstringsize(str,_font,&w,&h);
-        lcd_putsldfxy( xmargin + x*w/strlen(str), ymargin + y*h, str );
-    }
+    lcd_getstringsize(str,_font,&w,&h);
+    xpos = xmargin + x * w / strlen(str);
+    ypos = ymargin + y * h;
+    lcd_putsldfxy(xpos, ypos, str);
 #else
-    lcd_putsxy( xmargin + x*fonts[font],
-                ymargin + y*fontheight[font],
-                str, font );
+    xpos = xmargin + x * fonts[font];
+    ypos = ymargin + y * fontheight[font];
+    lcd_putsxy(xpos, ypos, str, font);
+    w = strlen(str) * fonts[font];
+    h = fontheight[font];
 #endif
+    lcd_clearrect(xpos + w, ypos, LCD_WIDTH - (xpos + w), h);
 #if defined(SIMULATOR) && defined(HAVE_LCD_CHARCELLS)
     /* this function is being used when simulating a charcell LCD and
        then we update immediately */

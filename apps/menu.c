@@ -81,9 +81,9 @@ struct menu {
 #endif /* HAVE_LCD_BITMAP */
 
 #ifdef HAVE_NEW_CHARCELL_LCD
-#define CURSOR_CHAR "\x7e"
+#define CURSOR_CHAR 0x7e
 #else
-#define CURSOR_CHAR "\x89"
+#define CURSOR_CHAR 0x89
 #endif
 
 static struct menu menus[MAX_MENUS];
@@ -112,7 +112,7 @@ void put_cursorxy(int x, int y, bool on)
         unsigned char cursor[] = { 0x7f, 0x3e, 0x1c, 0x08 };
         lcd_bitmap ( cursor, x*6, 12+y*16, 4, 8, true);
 #else
-        lcd_puts(x, y, CURSOR_CHAR);
+        lcd_putc(x, y, CURSOR_CHAR);
 #endif
     }
     else {
@@ -123,7 +123,7 @@ void put_cursorxy(int x, int y, bool on)
         /* player simulator in action */
         lcd_clearrect (x*6, 12+y*16, 4, 8);
 #else
-        lcd_puts(x, y, " ");
+        lcd_putc(x, y, ' ');
 #endif
     }
 }
