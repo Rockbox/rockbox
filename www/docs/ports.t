@@ -182,9 +182,9 @@
 <h2>Port C/Analog In</h2>
 <table border=1>
 <tr><th>Port pin</th>
-    <th colspan=2>Player</th>
-    <th colspan=2>Recorder</th>
-    <th colspan=2>FM/V2 Recorder</th>
+    <th>Player</th>
+    <th>Recorder</th>
+    <th>FM/V2 Recorder</th>
 </tr>
 <tr><th><b>PC0/AN0</b></th>
     <td>LEFT key</td>
