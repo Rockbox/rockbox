@@ -205,4 +205,51 @@ void adc_init(void)
     adcdata[3] = adc_scan(3);
 }
 
+#elif CONFIG_CPU == TCC730
+
+
+/**************************************************************************
+ **
+ ** Each channel will be updated HZ/CHANNEL_ORDER_SIZE times per second.
+ **
+ *************************************************************************/
+
+static int current_channel;
+static int current_channel_idx;
+static unsigned short adcdata[NUM_ADC_CHANNELS];
+
+#define CHANNEL_ORDER_SIZE 2
+static int channel_order[CHANNEL_ORDER_SIZE] = {6,7};
+
+static void adc_tick(void)
+{
+    if (ADCON & (1 << 3)) {
+        /* previous conversion finished? */
+        adcdata[current_channel] = ADDATA >> 6;
+        emu_debugf("ADC[%x] = %x", current_channel, adcdata[current_channel]);
+        if (++current_channel_idx >= CHANNEL_ORDER_SIZE)
+            current_channel_idx = 0;
+        current_channel = channel_order[current_channel_idx];
+        int adcon = (current_channel << 4) | 1;
+        ADCON = adcon;
+    }
+}
+
+unsigned short adc_read(int channel)
+{
+    return adcdata[channel];
+}
+
+void adc_init(void)
+{
+    current_channel_idx = 0;
+    current_channel = channel_order[current_channel_idx];
+  
+    ADCON = (current_channel << 4) | 1;
+  
+    tick_add_task(adc_tick);
+  
+    sleep(2);    /* Ensure valid readings when adc_init returns */
+}
+
 #endif
