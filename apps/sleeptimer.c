@@ -30,6 +30,7 @@
 #include "powermgmt.h"
 #include "status.h"
 #include "debug.h"
+#include "talk.h"
 
 #include "lang.h"
 
@@ -52,6 +53,7 @@ bool sleeptimer_screen(void)
     int amount = 0;
     int org_timer=get_sleep_timer();
     bool changed=false;
+    bool sayit = true;
 
 #ifdef HAVE_LCD_BITMAP
     lcd_setfont(FONT_UI);
@@ -107,7 +109,7 @@ bool sleeptimer_screen(void)
             if(newtime > MAX_TIME)
                 newtime = MAX_TIME;
 
-            changed=true;
+            changed = sayit = true;
             set_sleep_timer(newtime);
             break;
                 
@@ -126,7 +128,7 @@ bool sleeptimer_screen(void)
             if(newtime < 0)
                 newtime = 0;
             
-            changed=true;
+            changed = sayit = true;
             set_sleep_timer(newtime);
             break;
         }
@@ -141,10 +143,32 @@ bool sleeptimer_screen(void)
             snprintf(buf, 32, "%d:%02d",
                      hours, minutes);
             lcd_puts(0, 1, buf);
+
+            if (sayit)
+            {
+                bool enqueue = false; /* first one should not ne queued */
+
+                if (hours)
+                {   
+                    talk_value(hours, UNIT_HOUR, enqueue);
+                    enqueue = true; /* queue any following */
+                }
+                if (minutes)
+                {
+                    talk_value(minutes, UNIT_MIN, enqueue);
+                }
+
+                sayit = false;
+            }
         }
         else
         {
             lcd_puts(0, 1, str(LANG_OFF));
+            if (sayit)
+            {
+                talk_id(LANG_OFF, false);
+                sayit = false;
+            }
         }
 
         status_draw(true);
