@@ -229,6 +229,8 @@ void dbg_ports(void)
     unsigned char portc;
     char buf[32];
     int button;
+    int battery_voltage;
+    int batt_int, batt_frac;
 
     lcd_clear_display();
 
@@ -244,15 +246,22 @@ void dbg_ports(void)
 	lcd_puts(0, 1, buf);
 
 	snprintf(buf, 32, "AN0: %03x AN4: %03x", adc_read(0), adc_read(4));
-	lcd_puts(0, 3, buf);
+	lcd_puts(0, 2, buf);
 	snprintf(buf, 32, "AN1: %03x AN5: %03x", adc_read(1), adc_read(5));
-	lcd_puts(0, 4, buf);
+	lcd_puts(0, 3, buf);
 	snprintf(buf, 32, "AN2: %03x AN6: %03x", adc_read(2), adc_read(6));
-	lcd_puts(0, 5, buf);
+	lcd_puts(0, 4, buf);
 	snprintf(buf, 32, "AN3: %03x AN7: %03x", adc_read(3), adc_read(7));
+	lcd_puts(0, 5, buf);
+
+    battery_voltage = (adc_read(6) * 6465) / 10000;
+    batt_int = battery_voltage / 100;
+    batt_frac = battery_voltage % 100;
+    
+	snprintf(buf, 32, "Battery: %d.%02dV", batt_int, batt_frac);
 	lcd_puts(0, 6, buf);
 
-	snprintf(buf, 32, "%s : 0x%x",
+	snprintf(buf, 32, "ATA: %s, 0x%x",
              ata_device?"slave":"master", ata_io_address);
 	lcd_puts(0, 7, buf);
 	
