@@ -255,14 +255,46 @@ static int compare(const void* p1, const void* p2)
 {
     struct entry* e1 = (struct entry*)p1;
     struct entry* e2 = (struct entry*)p2;
+    int criteria;
 
-    if (( e1->attr & ATTR_DIRECTORY ) == ( e2->attr & ATTR_DIRECTORY ))
+    if (e1->attr & ATTR_DIRECTORY && e2->attr & ATTR_DIRECTORY)
+    {   /* two directories */
+        criteria = global_settings.sort_dir;
+    }
+    else if (!(e1->attr & ATTR_DIRECTORY) && !(e2->attr & ATTR_DIRECTORY))
+    {   /* two files */
+        criteria = global_settings.sort_file;
+    }
+    else /* dir and file, dir goes first */
+        return ( e2->attr & ATTR_DIRECTORY ) - ( e1->attr & ATTR_DIRECTORY );
+
+    switch(criteria)
+    {
+    case 3: /* sort type */
+        {
+            int t1 = e1->attr & TREE_ATTR_MASK;
+            int t2 = e2->attr & TREE_ATTR_MASK;
+
+            if (!t1) /* unknown type */
+                t1 = 0x7FFFFFFF; /* gets a high number, to sort after known */
+            if (!t2) /* unknown type */
+                t2 = 0x7FFFFFFF; /* gets a high number, to sort after known */
+
+            if (t1 - t2) /* if different */
+                return t1 - t2;
+            /* else fall through to alphabetical sorting */
+        }
+    case 0: /* sort alphabetically */
         if (global_settings.sort_case)
             return strncmp(e1->name, e2->name, MAX_PATH);
         else
             return strncasecmp(e1->name, e2->name, MAX_PATH);
-    else
-        return ( e2->attr & ATTR_DIRECTORY ) - ( e1->attr & ATTR_DIRECTORY );
+    case 1: /* sort date */
+        return e1->time_write - e2->time_write;
+    case 2: /* sort date, newest first */
+        return e2->time_write - e1->time_write;
+    }
+    return 0; /* never reached */
 }
 
 static void showfileline(int line, int direntry, bool scroll, int *dirfilter)

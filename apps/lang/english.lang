@@ -154,7 +154,7 @@ new:
 id: LANG_SORT_CASE
 desc: in settings_menu
 eng: "Sort Case Sensitive"
-voice: ""
+voice: "Sort Case Sensitive"
 new:
 
 id: LANG_RESUME
@@ -254,9 +254,9 @@ voice: ""
 new:
 
 id: LANG_CASE_MENU
-desc: in fileview_settings_menu()
-eng: "Sort Mode"
-voice: "Sort Mode"
+desc: DEPRECATED
+eng: ""
+voice: ""
 new:
 
 id: LANG_SCROLL_MENU
@@ -2684,4 +2684,40 @@ id: LANG_ONPLAY_OPEN_WITH
 desc: Onplay open with
 eng: "Open with"
 voice: "open with"
+new:
+
+id: LANG_SORT_DIR
+desc: browser sorting setting
+eng: "Sort Directories"
+voice: "sort directories"
+new:
+
+id: LANG_SORT_FILE
+desc: browser sorting setting
+eng: "Sort Files"
+voice: "sort files"
+new:
+
+id: LANG_SORT_ALPHA
+desc: browser sorting setting
+eng: "Alphabetical"
+voice: "Alphabetical"
+new:
+
+id: LANG_SORT_DATE
+desc: browser sorting setting
+eng: "by date"
+voice: "by date"
+new:
+
+id: LANG_SORT_DATE_REVERSE
+desc: browser sorting setting
+eng: "by newest date"
+voice: "by newest date"
+new:
+
+id: LANG_SORT_TYPE
+desc: browser sorting setting
+eng: "by type"
+voice: "by type"
 new:

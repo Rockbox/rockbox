@@ -318,8 +318,11 @@ static struct bit_entry hd_bits[] =
     {2, S_O(talk_file), 0, "talk file", "off,number,spell" },
     {1, S_O(talk_menu), true, "talk menu", off_on },
 
-    /* new stuff to be added here */
+    /* new stuff to be added at the end */
     /* If values are just added to the end, no need to bump the version. */
+    {2, S_O(sort_file), 0, "sort files", "alpha,oldest,newest,type" },
+    {2, S_O(sort_dir), 0, "sort dirs", "alpha,oldest,newest" },
+
 
     /* Sum of all bit sizes must not grow beyond 0xB8*8 = 1472 */
 };

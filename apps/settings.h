@@ -208,6 +208,10 @@ struct user_settings
     bool talk_menu; /* enable voice UI */
     int talk_dir; /* talkbox mode: 0=off 1=number 2=clip@enter 3=clip@hover */
     int talk_file; /* voice filename mode: 0=off, 1=number, other t.b.d. */ 
+
+    /* file browser sorting */
+    int sort_file; /* 0=alpha, 1=date, 2=date (new first), 3=type */
+    int sort_dir; /* 0=alpha, 1=date (old first), 2=date (new first) */
 };
 
 enum optiontype { INT, BOOL };

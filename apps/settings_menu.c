@@ -476,6 +476,29 @@ static bool sort_case(void)
     return set_bool( str(LANG_SORT_CASE), &global_settings.sort_case );
 }
 
+static bool sort_file(void)
+{
+    struct opt_items names[] = {
+        { STR(LANG_SORT_ALPHA) },
+        { STR(LANG_SORT_DATE) },
+        { STR(LANG_SORT_DATE_REVERSE) },
+        { STR(LANG_SORT_TYPE) }
+    };
+    return set_option( str(LANG_SORT_FILE), &global_settings.sort_file, INT,
+                       names, 4, NULL );
+}
+
+static bool sort_dir(void)
+{
+    struct opt_items names[] = {
+        { STR(LANG_SORT_ALPHA) },
+        { STR(LANG_SORT_DATE) },
+        { STR(LANG_SORT_DATE_REVERSE) }
+    };
+    return set_option( str(LANG_SORT_DIR), &global_settings.sort_dir, INT,
+                       names, 3, NULL );
+}
+
 static bool resume(void)
 {
     struct opt_items names[] = {
@@ -1056,7 +1079,9 @@ static bool fileview_settings_menu(void)
     bool result;
 
     struct menu_item items[] = {
-        { STR(LANG_CASE_MENU),    sort_case           },
+        { STR(LANG_SORT_CASE),    sort_case           },
+        { STR(LANG_SORT_DIR),     sort_dir            },
+        { STR(LANG_SORT_FILE),    sort_file           },
         { STR(LANG_FILTER),       dir_filter          },
         { STR(LANG_FOLLOW),       browse_current      },
         { STR(LANG_SHOW_ICONS),   show_icons          },
