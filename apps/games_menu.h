@@ -21,6 +21,6 @@
 
 #include "menu.h"
 
-Menu games_menu(void);
+bool games_menu(void);
 
 #endif

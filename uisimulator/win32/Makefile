@@ -66,7 +66,8 @@ FIRMSRCS = lcd-recorder.c power.c sprintf.c id3.c usb.c		\
         mpeg.c powermgmt.c font.c sysfont.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c icons.c language.c \
-	playlist.c showtext.c wps.c wps-display.c settings.c status.c
+	playlist.c showtext.c wps.c wps-display.c settings.c status.c \
+	screens.c
 
 MENUS = games_menu.c demo_menu.c settings_menu.c sound_menu.c
 
@@ -195,6 +196,9 @@ $(OBJDIR)/sysfont.o: $(FIRMWAREDIR)/fonts/clR6x8.bdf
 	$(CC) $(APPCFLAGS) -c $(OBJDIR)/sysfont.c -o $@
 
 $(OBJDIR)/status.o: $(APPDIR)/status.c
+	$(CC) $(APPCFLAGS) -c $< -o $@
+
+$(OBJDIR)/screens.o: $(APPDIR)/screens.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/version.o: $(FIRMWAREDIR)/version.c

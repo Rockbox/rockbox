@@ -21,6 +21,6 @@
 
 #include "menu.h"
 
-Menu sound_menu(void);
+bool sound_menu(void);
 
 #endif

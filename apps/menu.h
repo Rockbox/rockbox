@@ -22,16 +22,9 @@
 
 #include <stdbool.h>
 
-typedef enum {
-  MENU_OK,
-  MENU_DISK_CHANGED, /* any file/directory contents need to be re-read */
-  MENU_LAST /* don't use as return code, only for number of return codes
-               available */
-} Menu;
-
 struct menu_items {
     unsigned char *desc;
-    Menu (*function) (void);
+    bool (*function) (void); /* return true if USB was connected */
 };
 
 int menu_init(struct menu_items* items, int count);
@@ -39,6 +32,6 @@ void menu_exit(int menu);
 
 void put_cursorxy(int x, int y, bool on);
 
-Menu menu_run(int menu);
+bool menu_run(int menu);
 
 #endif /* End __MENU_H__ */

@@ -33,7 +33,7 @@
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "widgets.h"
-#include "wps.h"
+#include "screens.h"
 #endif
 
 struct menu {
@@ -242,13 +242,13 @@ void menu_exit(int m)
     inuse[m] = false;
 }
 
-Menu menu_run(int m)
+bool menu_run(int m)
 {
-    Menu result = MENU_OK;
+    bool exit = false;
 
     menu_draw(m);
 
-    while(1) {
+    while (!exit) {
         switch( button_get_w_tmo(HZ/2) ) {
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_UP:
@@ -303,12 +303,12 @@ Menu menu_run(int m)
                                        are gonna clear the screen anyway */
                 lcd_clear_display();
             
-                /* if a child returns that the contents is changed, we
-                   must remember this, even if we perhaps invoke other
-                   children too before returning back */
-                if(MENU_DISK_CHANGED ==
-                   menus[m].items[menus[m].cursor].function())
-                  result = MENU_DISK_CHANGED;
+                /* if a child returns that USB was used, 
+                   we return immediately */
+                if (menus[m].items[menus[m].cursor].function()) {
+                    lcd_scroll_pause(); /* just in case */
+                    return true;
+                }
             
                 /* Return to previous display state */
                 menu_draw(m);
@@ -321,39 +321,29 @@ Menu menu_run(int m)
             case BUTTON_STOP:
             case BUTTON_MENU:
 #endif
-                lcd_stop_scroll();
-                while (button_get(false)); /* clear button queue */
-                return result;
+                lcd_scroll_pause();
+                exit = true;
+                break;
 
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_F3:
                 if (f3_screen())
-                    return SYS_USB_CONNECTED;
+                    return true;
                 menu_draw(m);
                 break;
 #endif
 
-#ifndef SIMULATOR
             case SYS_USB_CONNECTED:
-                backlight_time(4);
-                usb_acknowledge(SYS_USB_CONNECTED_ACK);
-                usb_wait_for_disconnect(&button_queue);
-                backlight_time(global_settings.backlight);
+                usb_screen();
 #ifdef HAVE_LCD_CHARCELLS
-                lcd_icon(ICON_PARAM, true);
+                lcd_icon(ICON_PARAM, false);
 #endif
-                menu_draw(m);
-                result = MENU_DISK_CHANGED;
-                break;
-#endif
-
-            default:
-                break;
+                return true;
         }
         
         status_draw();
         lcd_update();
     }
 
-    return result;
+    return false;
 }

@@ -26,6 +26,7 @@
 #include "mpeg.h"
 #include "settings.h"
 #include "status.h"
+#include "screens.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #endif
@@ -38,7 +39,7 @@ static char *fmt[] =
     "%d.%02d %s  "      /* 2 decimals */
 };
 
-void set_sound(char* string, 
+bool set_sound(char* string, 
                int* variable,
                int setting)
 {
@@ -120,20 +121,10 @@ void set_sound(char* string,
 #endif
                 done = true;
                 break;
-#ifdef HAVE_RECORDER_KEYPAD
-            case BUTTON_F3:
-#ifdef HAVE_LCD_BITMAP
-                global_settings.statusbar = !global_settings.statusbar;
-                settings_save();
-                if(global_settings.statusbar)
-                  lcd_setmargins(0, STATUSBAR_HEIGHT);
-                else
-                    lcd_setmargins(0, 0);
-                lcd_clear_display();
-                lcd_puts_scroll(0, 0, string);
-#endif
-                break;
-#endif
+
+            case SYS_USB_CONNECTED:
+                usb_screen();
+                return true;
         }
         if (changed) {
             mpeg_sound_set(setting, *variable);
@@ -144,43 +135,41 @@ void set_sound(char* string,
         }
     }
     lcd_stop_scroll();
+    return false;
 }
 
-static Menu volume(void)
+static bool volume(void)
 {
-    set_sound(str(LANG_VOLUME), &global_settings.volume, SOUND_VOLUME);
-    return MENU_OK;
+    return set_sound(str(LANG_VOLUME), &global_settings.volume, SOUND_VOLUME);
 }
 
-static Menu balance(void)
+static bool balance(void)
 {
-    set_sound(str(LANG_BALANCE), &global_settings.balance, SOUND_BALANCE);
-    return MENU_OK;
+    return set_sound(str(LANG_BALANCE), &global_settings.balance,
+                     SOUND_BALANCE);
 }
 
-static Menu bass(void)
+static bool bass(void)
 {
-    set_sound(str(LANG_BASS), &global_settings.bass, SOUND_BASS);
-    return MENU_OK;
+    return set_sound(str(LANG_BASS), &global_settings.bass, SOUND_BASS);
 };
 
-static Menu treble(void)
+static bool treble(void)
 {
-    set_sound(str(LANG_TREBLE), &global_settings.treble, SOUND_TREBLE);
-    return MENU_OK;
+    return set_sound(str(LANG_TREBLE), &global_settings.treble, SOUND_TREBLE);
 }
 
 #ifdef HAVE_MAS3587F
-static Menu loudness(void)
+static bool loudness(void)
 {
-    set_sound(str(LANG_LOUDNESS), &global_settings.loudness, SOUND_LOUDNESS);
-    return MENU_OK;
+    return set_sound(str(LANG_LOUDNESS), &global_settings.loudness, 
+                     SOUND_LOUDNESS);
 };
 
-static Menu bass_boost(void)
+static bool bass_boost(void)
 {
-    set_sound(str(LANG_BBOOST), &global_settings.bass_boost, SOUND_SUPERBASS);
-    return MENU_OK;
+    return set_sound(str(LANG_BBOOST), &global_settings.bass_boost, 
+                     SOUND_SUPERBASS);
 };
 
 static void set_avc(int val)
@@ -188,11 +177,11 @@ static void set_avc(int val)
     mpeg_sound_set(SOUND_AVC, val);
 }
 
-static Menu avc(void)
+static bool avc(void)
 {
     char* names[] = { str(LANG_OFF), "2s", "4s", "8s" };
-    set_option(str(LANG_DECAY), &global_settings.avc, names, 4, set_avc );
-    return MENU_OK;
+    return set_option(str(LANG_DECAY), &global_settings.avc, 
+                      names, 4, set_avc);
 }
 #endif /* ARCHOS_RECORDER */
 
@@ -201,19 +190,18 @@ static void set_chanconf(int val)
     mpeg_sound_set(SOUND_CHANNELS, val);
 }
 
-static Menu chanconf(void)
+static bool chanconf(void)
 {
     char *names[] = {str(LANG_CHANNEL_STEREO), str(LANG_CHANNEL_MONO),
-	    str(LANG_CHANNEL_LEFT),str(LANG_CHANNEL_RIGHT) };
-    set_option(str(LANG_CHANNEL),
-               &global_settings.channel_config, names, 4, set_chanconf );
-    return MENU_OK;
+                     str(LANG_CHANNEL_LEFT), str(LANG_CHANNEL_RIGHT) };
+    return set_option(str(LANG_CHANNEL), &global_settings.channel_config,
+                      names, 4, set_chanconf );
 }
 
-Menu sound_menu(void)
+bool sound_menu(void)
 {
     int m;
-    Menu result;
+    bool result;
     struct menu_items items[] = {
         { str(LANG_VOLUME), volume },
         { str(LANG_BASS), bass },

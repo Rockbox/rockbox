@@ -33,14 +33,14 @@
 
 #include "lang.h"
 
-extern Menu bounce(void);
-extern Menu snow(void);
-extern Menu oscillograph(void);
+extern bool bounce(void);
+extern bool snow(void);
+extern bool oscillograph(void);
 
-Menu demo_menu(void)
+bool demo_menu(void)
 {
     int m;
-    Menu result;
+    bool result;
 
     struct menu_items items[] = {
         { str(LANG_BOUNCE), bounce },

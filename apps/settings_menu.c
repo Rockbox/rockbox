@@ -38,99 +38,94 @@
 #include "ata.h"
 #include "lang.h"
 
-static Menu show_hidden_files(void)
+static bool show_hidden_files(void)
 {
-    set_bool_options( str(LANG_HIDDEN), &global_settings.show_hidden_files,
-                      str(LANG_HIDDEN_SHOW), str(LANG_HIDDEN_HIDE) );
-    return MENU_OK;
+    return set_bool_options( str(LANG_HIDDEN),
+                             &global_settings.show_hidden_files,
+                             str(LANG_HIDDEN_SHOW),
+                             str(LANG_HIDDEN_HIDE) );
 }
 
-static Menu contrast(void)
+static bool contrast(void)
 {
-    set_int( str(LANG_CONTRAST), "", &global_settings.contrast, 
-             lcd_set_contrast, 1, 0, MAX_CONTRAST_SETTING );
-    return MENU_OK;
+    return set_int( str(LANG_CONTRAST), "", &global_settings.contrast, 
+                    lcd_set_contrast, 1, 0, MAX_CONTRAST_SETTING );
 }
 
 #ifndef HAVE_RECORDER_KEYPAD
-static Menu shuffle(void)
+static bool shuffle(void)
 {
-    set_bool( str(LANG_SHUFFLE), &global_settings.playlist_shuffle );
-    return MENU_OK;
+    return set_bool( str(LANG_SHUFFLE), &global_settings.playlist_shuffle );
 }
 #endif
 
-static Menu play_selected(void)
+static bool play_selected(void)
 {
-    set_bool( str(LANG_PLAY_SELECTED), &global_settings.play_selected );
-    return MENU_OK;
+    return set_bool( str(LANG_PLAY_SELECTED), &global_settings.play_selected );
 }
 
-static Menu mp3_filter(void)
+static bool mp3_filter(void)
 {
-    set_bool( str(LANG_MP3FILTER), &global_settings.mp3filter );
-    return MENU_OK;
+    return set_bool( str(LANG_MP3FILTER), &global_settings.mp3filter );
 }
 
-static Menu sort_case(void)
+static bool sort_case(void)
 {
-    set_bool( str(LANG_SORT_CASE), &global_settings.sort_case );
-    return MENU_OK;
+    return set_bool( str(LANG_SORT_CASE), &global_settings.sort_case );
 }
 
-static Menu resume(void)
+static bool resume(void)
 {
     char* names[] = { str(LANG_OFF), 
                       str(LANG_RESUME_SETTING_ASK),
                       str(LANG_ON) };
-    set_option( str(LANG_RESUME), &global_settings.resume, names, 3, NULL );
-    return MENU_OK;
+    return set_option( str(LANG_RESUME), &global_settings.resume,
+                       names, 3, NULL );
 }
 
-static Menu backlight_timer(void)
+static bool backlight_timer(void)
 {
     char* names[] = { str(LANG_OFF), str(LANG_ON),
                       "1s ", "2s ", "3s ", "4s ", "5s ",
                       "6s ", "7s ", "8s ", "9s ", "10s",
                       "15s", "20s", "25s", "30s", "45s",
                       "60s", "90s"};
-    set_option(str(LANG_BACKLIGHT), &global_settings.backlight, names, 19, 
-               backlight_time );
-    return MENU_OK;
+    return set_option(str(LANG_BACKLIGHT), &global_settings.backlight, 
+                      names, 19, backlight_time );
 }
 
-static Menu poweroff_idle_timer(void)
+static bool poweroff_idle_timer(void)
 {
     char* names[] = { str(LANG_OFF),
                       "1m ", "2m ", "3m ", "4m ", "5m ",
                       "6m ", "7m ", "8m ", "9m ", "10m",
                       "15m", "30m", "45m", "60m"};
-    set_option(str(LANG_POWEROFF_IDLE), &global_settings.poweroff, names,
-               15, set_poweroff_timeout);
-    return MENU_OK;
+    return set_option(str(LANG_POWEROFF_IDLE), &global_settings.poweroff,
+                      names, 15, set_poweroff_timeout);
 }
 
-static Menu scroll_speed(void)
+static bool scroll_speed(void)
 {
-    set_int(str(LANG_SCROLL), "", &global_settings.scroll_speed, 
-            &lcd_scroll_speed, 1, 1, 30 );
-    return MENU_OK;
+    return set_int(str(LANG_SCROLL), "", &global_settings.scroll_speed, 
+                   &lcd_scroll_speed, 1, 1, 30 );
 }
 
 #ifdef HAVE_CHARGE_CTRL
-static Menu deep_discharge(void)
+static bool deep_discharge(void)
 {
-    set_bool( str(LANG_DISCHARGE), &global_settings.discharge );
+    bool result;
+    result = set_bool( str(LANG_DISCHARGE), &global_settings.discharge );
     charge_restart_level = global_settings.discharge ? 
         CHARGE_RESTART_LO : CHARGE_RESTART_HI;
-    return MENU_OK;
+    return result;
 }
 #endif
 
 #ifdef HAVE_LCD_BITMAP
-static Menu timedate_set(void)
+static bool timedate_set(void)
 {
     int timedate[7]; /* hour,minute,second,year,month,day,dayofweek */
+    bool result;
 
 #ifdef HAVE_RTC
     timedate[0] = rtc_read(0x03); /* hour   */
@@ -167,7 +162,7 @@ static Menu timedate_set(void)
     timedate[5] = 1;
 #endif
 
-    set_time(str(LANG_TIME),timedate);
+    result = set_time(str(LANG_TIME),timedate);
 
 #ifdef HAVE_RTC
     if(timedate[0] != -1) {
@@ -194,49 +189,45 @@ static Menu timedate_set(void)
         rtc_write(0x00, 0x00); /* 0.1 + 0.01 seconds */
     }
 #endif
-    return MENU_OK;
+    return result;
 }
 #endif
 
-static Menu spindown(void)
+static bool spindown(void)
 {
-    set_int(str(LANG_SPINDOWN), "s", &global_settings.disk_spindown,
-            ata_spindown, 1, 3, 254 );
-    return MENU_OK;
+    return set_int(str(LANG_SPINDOWN), "s", &global_settings.disk_spindown,
+                   ata_spindown, 1, 3, 254 );
 }
 
-static Menu ff_rewind_min_step(void) 
+static bool ff_rewind_min_step(void) 
 { 
     char* names[] = { "1s", "2s", "3s", "4s",
                       "5s", "6s", "8s", "10s",
                       "15s", "20s", "25s", "30s",
                       "45s", "60s" };
-    set_option(str(LANG_FFRW_STEP), &global_settings.ff_rewind_min_step,
-                names, 14, NULL ); 
-    return MENU_OK; 
+    return set_option(str(LANG_FFRW_STEP), &global_settings.ff_rewind_min_step,
+                      names, 14, NULL ); 
 } 
 
-static Menu ff_rewind_accel(void) 
+static bool ff_rewind_accel(void) 
 { 
     char* names[] = { str(LANG_OFF), "2x/1s", "2x/2s", "2x/3s", 
                       "2x/4s", "2x/5s", "2x/6s", "2x/7s", 
                       "2x/8s", "2x/9s", "2x/10s", "2x/11s",
                       "2x/12s", "2x/13s", "2x/14s", "2x/15s", };
-    set_option(str(LANG_FFRW_ACCEL), &global_settings.ff_rewind_accel, 
-                names, 16, NULL ); 
-    return MENU_OK; 
+    return set_option(str(LANG_FFRW_ACCEL), &global_settings.ff_rewind_accel, 
+                      names, 16, NULL ); 
 } 
 
-static Menu browse_current(void)
+static bool browse_current(void)
 {
-    set_bool( str(LANG_FOLLOW), &global_settings.browse_current );
-    return MENU_OK;
+    return set_bool( str(LANG_FOLLOW), &global_settings.browse_current );
 }
 
-Menu playback_settings_menu(void)
+static bool playback_settings_menu(void)
 {
     int m;
-    Menu result;
+    bool result;
 
     struct menu_items items[] = {
 #ifndef HAVE_RECORDER_KEYPAD
@@ -268,7 +259,7 @@ Menu playback_settings_menu(void)
     return result;
 }
 
-static Menu reset_settings(void)
+static bool reset_settings(void)
 {
     int button = 0;
 
@@ -300,10 +291,10 @@ static Menu reset_settings(void)
     }
 }
 
-static Menu fileview_settings_menu(void)
+static bool fileview_settings_menu(void)
 {
     int m;
-    Menu result;
+    bool result;
 
     struct menu_items items[] = {
         { str(LANG_CASE_MENU),    sort_case           },
@@ -312,16 +303,16 @@ static Menu fileview_settings_menu(void)
         { str(LANG_FOLLOW),       browse_current      },
     };
 
-    m=menu_init( items, sizeof items / sizeof(struct menu_items) );
+    m = menu_init( items, sizeof items / sizeof(struct menu_items) );
     result = menu_run(m);
     menu_exit(m);
     return result;
 }
 
-static Menu display_settings_menu(void)
+static bool display_settings_menu(void)
 {
     int m;
-    Menu result;
+    bool result;
 
     struct menu_items items[] = {
         { str(LANG_SCROLL_MENU),     scroll_speed    },  
@@ -335,10 +326,10 @@ static Menu display_settings_menu(void)
     return result;
 }
 
-static Menu system_settings_menu(void)
+static bool system_settings_menu(void)
 {
     int m;
-    Menu result;
+    bool result;
 
     struct menu_items items[] = {
         { str(LANG_SPINDOWN),    spindown        },
@@ -358,10 +349,10 @@ static Menu system_settings_menu(void)
     return result;
 }
 
-Menu settings_menu(void)
+bool settings_menu(void)
 {
     int m;
-    Menu result;
+    bool result;
 
     struct menu_items items[] = {
         { str(LANG_PLAYBACK),        playback_settings_menu },
@@ -370,7 +361,7 @@ Menu settings_menu(void)
         { str(LANG_SYSTEM),          system_settings_menu   },
     };
     
-    m=menu_init( items, sizeof items / sizeof(struct menu_items) );
+    m = menu_init( items, sizeof items / sizeof(struct menu_items) );
     result = menu_run(m);
     menu_exit(m);
     return result;

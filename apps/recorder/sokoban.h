@@ -22,10 +22,7 @@
 
 #include "menu.h"
 
-void load_level(int);
-void update_screen(void);
-void sokoban_loop(void);
-Menu sokoban(void);
+bool sokoban(void);
 
 #endif /*__SOKOBAN__ */
 

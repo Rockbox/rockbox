@@ -36,13 +36,13 @@
 #include "wormlet.h"
 #include "lang.h"
 
-extern Menu tetris(void);
-extern Menu snake(void);
+extern bool tetris(void);
+extern bool snake(void);
 
-Menu games_menu(void)
+bool games_menu(void)
 {
     int m;
-    Menu result;
+    bool result;
 
     struct menu_items items[] = {
         { str(LANG_TETRIS),  tetris  },

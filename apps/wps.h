@@ -29,6 +29,7 @@ int wps_show(void);
 bool load_custom_wps(void);
 bool display_custom_wps(int x_val, int y_val, bool do_scroll, char *wps_string);
 bool refresh_wps(bool refresh_scroll);
+void handle_usb(void);
 
 #ifdef HAVE_RECORDER_KEYPAD
 bool f2_screen(void);

@@ -19,7 +19,7 @@
 #ifndef _DEMOS_MENU_H
 #define _DEMOS_MENU_H
 
-Menu demo_menu(void);
+bool demo_menu(void);
 
 #endif
 

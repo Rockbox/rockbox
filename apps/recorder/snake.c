@@ -257,10 +257,10 @@ void game_init(void) {
      
 }
 
-Menu snake(void) {
+bool snake(void) {
     game_init(); 
     lcd_clear_display();
     game();    
-    return MENU_OK;
+    return false;
 }
 

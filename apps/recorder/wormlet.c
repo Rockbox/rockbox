@@ -34,6 +34,7 @@
 #include "menu.h"
 #include "rtc.h"
 #include "lang.h"
+#include "screens.h"
 
 /* size of the field the worm lives in */
 #define FIELD_RECT_X 1
@@ -1888,7 +1889,7 @@ extern bool use_old_rect;
 /**
  * Main entry point from the menu to start the game control.
  */
-Menu wormlet(void)
+bool wormlet(void)
 {
     bool wormDead = false;
     int button;
@@ -1974,6 +1975,10 @@ Menu wormlet(void)
                     use_remote = true;
                 }
                 break;
+
+            case SYS_USB_CONNECTED:
+                usb_screen();
+                return true;
         }
     } while (button != BUTTON_PLAY && 
              button != BUTTON_OFF  && button != BUTTON_ON);
@@ -2007,7 +2012,7 @@ Menu wormlet(void)
     }
     while (button != BUTTON_OFF);
 
-    return MENU_OK;
+    return false;
 }
 
 

@@ -21,6 +21,6 @@
 
 #include "menu.h"
 
-Menu settings_menu(void);
+bool settings_menu(void);
 
 #endif

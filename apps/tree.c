@@ -47,6 +47,7 @@
 #include "icons.h"
 #include "lang.h"
 #include "language.h"
+#include "screens.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -880,7 +881,8 @@ bool dirbrowse(char *root)
 
             case TREE_MENU:
                 lcd_stop_scroll();
-                main_menu();
+                if (main_menu())
+                    reload_root = true;
                 restore = true;
                 break;
 
@@ -915,24 +917,10 @@ bool dirbrowse(char *root)
                 break;
 #endif
 
-#ifndef SIMULATOR
-            case SYS_USB_CONNECTED: {
-                backlight_time(4);
-
-                /* Tell the USB thread that we are safe */
-                DEBUGF("dirbrowse got SYS_USB_CONNECTED\n");
-                usb_acknowledge(SYS_USB_CONNECTED_ACK);
-                
-                /* Wait until the USB cable is extracted again */
-                usb_wait_for_disconnect(&button_queue);
-
-                backlight_time(global_settings.backlight);
-                
-                /* Force a re-read of the root directory */
+            case SYS_USB_CONNECTED:
+                usb_screen();
                 reload_root = true;
-            }
-            break;
-#endif
+                break;
         }
 
         if ( button )

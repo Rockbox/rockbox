@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Philipp Pertermann
+ * Copyright (C) 2002 Björn Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,13 +16,15 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef _SCREENS_H_
+#define _SCREENS_H_
 
-#ifndef __WORMLET__
-#define __WORMLET__
+void usb_screen(void);
 
-#include "menu.h"
+#ifdef HAVE_RECORDER_KEYPAD
+int on_screen(void);
+bool f2_screen(void);
+bool f3_screen(void);
+#endif
 
-bool wormlet(void);
-
-#endif /*__WORMLET__ */
-
+#endif

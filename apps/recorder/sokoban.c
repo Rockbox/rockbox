@@ -27,6 +27,7 @@
 #include "button.h"
 #include "kernel.h"
 #include "menu.h"
+#include "screens.h"
 
 #ifdef SIMULATOR
 #include <stdio.h>
@@ -36,6 +37,10 @@
 #define SOKOBAN_TITLE   "Sokoban"
 #define SOKOBAN_TITLE_FONT  2
 #define NUM_LEVELS  sizeof(levels)/320
+
+static void load_level(int);
+static void update_screen(void);
+static bool sokoban_loop(void);
 
 static char board[16][20];
 static int current_level=0;
@@ -1766,7 +1771,7 @@ static const char levels[][320] = {
 };
 
 
-void load_level (int level_to_load) {
+static void load_level (int level_to_load) {
     int a = 0;
     int b = 0;
     int c = 0;
@@ -1790,7 +1795,7 @@ void load_level (int level_to_load) {
     return;
 }
 
-void update_screen(void) {
+static void update_screen(void) {
     int b = 0;
     int c = 0;
     char s[25];
@@ -1855,7 +1860,8 @@ void update_screen(void) {
 
 
 
-void sokoban_loop(void) {
+static bool sokoban_loop(void)
+{
     int ii = 0;
     moves = 0;
     current_level = 0;
@@ -1868,7 +1874,7 @@ void sokoban_loop(void) {
 
             case BUTTON_OFF:
                 /* get out of here */
-                return; 
+                return false; 
 
             case BUTTON_F3:
                 /* increase level */
@@ -2170,6 +2176,10 @@ void sokoban_loop(void) {
                     row++;
                 break;
 
+            case SYS_USB_CONNECTED:
+                usb_screen();
+                return true;
+
             default:
                 idle = true;
                 break;
@@ -2192,20 +2202,23 @@ void sokoban_loop(void) {
                     lcd_invertrect(0,0,111,63);
                     lcd_update();
                     if ( button_get(false) )
-                        return;
+                        return false;
                 }
-                return;
+                return false;
             }
             load_level(current_level);
             lcd_clear_display();
             update_screen();
         }
     }
+
+    return false;
 }
 
 
-Menu sokoban(void)
+bool sokoban(void)
 {
+    bool result;
     int w, h;
     int len = strlen(SOKOBAN_TITLE);
 
@@ -2240,9 +2253,9 @@ Menu sokoban(void)
     lcd_update();
     sleep(HZ*2);
     lcd_clear_display();
-    sokoban_loop();
+    result = sokoban_loop();
 
-    return MENU_OK;
+    return result;
 }
 
 #endif

@@ -117,7 +117,7 @@ int show_logo( void )
     return 0;
 }
 
-Menu show_credits(void)
+bool show_credits(void)
 {
     int j = 0;
     int btn;
@@ -132,23 +132,23 @@ Menu show_credits(void)
 
         btn = button_get(false);
         if (btn !=  BUTTON_NONE && !(btn & BUTTON_REL))
-            return MENU_OK;
+            return false;
     }
     roll_credits();
-    return MENU_OK;
+    return false;
 }
 
 #ifdef SIMULATOR
 #define mp3buf 0
 #define mp3end 0
 
-extern Menu simulate_usb(void);
+extern bool simulate_usb(void);
 #else
 /* defined in linker script */
 extern unsigned char mp3buf[];
 extern unsigned char mp3end[];
 #endif
-Menu show_info(void)
+bool show_info(void)
 {
     char s[32];
     int buflen = ((mp3end - mp3buf) * 100) / 0x100000;
@@ -199,13 +199,13 @@ Menu show_info(void)
             done = true;
     }
 
-    return MENU_OK;
+    return false;
 }
 
-Menu main_menu(void)
+bool main_menu(void)
 {
     int m;
-    Menu result;
+    bool result;
 
     /* main menu */
     struct menu_items items[] = {

@@ -30,6 +30,7 @@
 #include "kernel.h"
 #include <string.h>
 #include "menu.h"
+#include "screens.h"
 
 #ifdef SIMULATOR
 #include <stdio.h>
@@ -106,12 +107,12 @@ static const char block_data[7][4][2][4] =
     }
 };
 
-int t_rand(int range)
+static int t_rand(int range)
 {
     return current_tick % range;
 }
 
-void draw_frame(int fstart_x,int fstop_x,int fstart_y,int fstop_y)
+static void draw_frame(int fstart_x,int fstop_x,int fstart_y,int fstop_y)
 {
     lcd_drawline(fstart_x, fstart_y, fstop_x, fstart_y);
     lcd_drawline(fstart_x, fstop_y, fstop_x, fstop_y);
@@ -123,7 +124,7 @@ void draw_frame(int fstart_x,int fstop_x,int fstart_y,int fstop_y)
     lcd_drawline(fstart_x - 1, fstop_y + 1, fstop_x - 1, fstop_y + 1);
 }
 
-void draw_block(int x, int y, int block, int frame, bool clear)
+static void draw_block(int x, int y, int block, int frame, bool clear)
 {
     int i, a, b;
     for(i=0;i < 4;i++) {
@@ -144,7 +145,7 @@ void draw_block(int x, int y, int block, int frame, bool clear)
     }
 }
 
-void to_virtual(void)
+static void to_virtual(void)
 {
     int i,a,b;
 
@@ -156,7 +157,7 @@ void to_virtual(void)
                 current_x + block_data[current_b][current_f][1][i] * 4 - b) = current_b + 1;
 }
 
-bool block_touch (int x, int y)
+static bool block_touch (int x, int y)
 {
     int a,b;
     for (a = 0; a < 4; a++)
@@ -166,7 +167,7 @@ bool block_touch (int x, int y)
     return false;
 }
 
-bool gameover(void)
+static bool gameover(void)
 {
     int i;
     int frame, block, y, x;
@@ -191,7 +192,7 @@ bool gameover(void)
     return false;
 }
 
-bool valid_position(int x, int y, int block, int frame)
+static bool valid_position(int x, int y, int block, int frame)
 {
     int i;
     for(i=0;i < 4;i++)
@@ -204,7 +205,7 @@ bool valid_position(int x, int y, int block, int frame)
     return true;
 }
 
-void from_virtual(void)
+static void from_virtual(void)
 {
     int x,y;
     for(y = 0; y < max_y; y++)
@@ -215,7 +216,7 @@ void from_virtual(void)
                 lcd_clearpixel(start_x + x, start_y + y);
 }
 
-void move_block(int x,int y,int f)
+static void move_block(int x,int y,int f)
 {
     int last_frame = current_f;
     if(f != 0)
@@ -239,7 +240,7 @@ void move_block(int x,int y,int f)
         current_f = last_frame;
 }
 
-void new_block(void)
+static void new_block(void)
 {
     current_b = next_b;
     current_f = next_f;
@@ -266,7 +267,7 @@ void new_block(void)
         draw_block(current_x, current_y, current_b, current_f, false);
 }
 
-int check_lines(void)
+static int check_lines(void)
 {
     int x,y,i,j;
     bool line;
@@ -298,7 +299,7 @@ int check_lines(void)
     return lines / 4;
 }
 
-void move_down(void)
+static void move_down(void)
 {
     int l;
     char s[25];
@@ -327,7 +328,7 @@ void move_down(void)
         move_block(-4,0,0);
 } 
 
-void game_loop(void)
+static bool game_loop(void)
 {
     while(1)
     {
@@ -336,28 +337,32 @@ void game_loop(void)
         {
             switch(button_get_w_tmo(HZ/10))
             {
-            case BUTTON_OFF:
-                return;
+                case BUTTON_OFF:
+                    return false;
                 
-            case BUTTON_UP:
-            case BUTTON_UP | BUTTON_REPEAT:
-                move_block(0,-3,0);
-                break;
+                case BUTTON_UP:
+                case BUTTON_UP | BUTTON_REPEAT:
+                    move_block(0,-3,0);
+                    break;
                 
-            case BUTTON_DOWN:
-            case BUTTON_DOWN | BUTTON_REPEAT:
-                move_block(0,3,0);
-                break;
+                case BUTTON_DOWN:
+                case BUTTON_DOWN | BUTTON_REPEAT:
+                    move_block(0,3,0);
+                    break;
                 
-            case BUTTON_RIGHT:
-            case BUTTON_RIGHT | BUTTON_REPEAT:
-                move_block(0,0,1);
-                break;
+                case BUTTON_RIGHT:
+                case BUTTON_RIGHT | BUTTON_REPEAT:
+                    move_block(0,0,1);
+                    break;
                 
-            case BUTTON_LEFT:
-            case BUTTON_LEFT | BUTTON_REPEAT:
-                move_down();
-                break;
+                case BUTTON_LEFT:
+                case BUTTON_LEFT | BUTTON_REPEAT:
+                    move_down();
+                    break;
+
+                case SYS_USB_CONNECTED:
+                    usb_screen();
+                    return true;
             }
             
             count++;
@@ -369,14 +374,16 @@ void game_loop(void)
             lcd_putsxy (2, 52, str(LANG_TETRIS_LOSE), 0);
             lcd_update();
             sleep(HZ * 3);
-            return;
+            return false;
         }
 
         move_down();
     }
+
+    return false;
 }
 
-void init_tetris(void)
+static void init_tetris(void)
 {
     memset(&virtual, 0, sizeof(virtual));
 
@@ -391,7 +398,7 @@ void init_tetris(void)
     next_f = 0;
 }
 
-Menu tetris(void)
+bool tetris(void)
 {
     init_tetris();
 
@@ -402,9 +409,7 @@ Menu tetris(void)
     next_b = t_rand(blocks);
     next_f = t_rand(block_frames[next_b]);
     new_block();
-    game_loop();
-
-    return MENU_OK;
+    return game_loop();
 }
 
 #endif

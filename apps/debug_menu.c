@@ -46,7 +46,7 @@ extern char *thread_name[];
 
 #ifdef HAVE_LCD_BITMAP
 /* Test code!!! */
-Menu dbg_os(void)
+bool dbg_os(void)
 {
     char buf[32];
     int button;
@@ -77,13 +77,13 @@ Menu dbg_os(void)
         {
             case BUTTON_OFF:
             case BUTTON_LEFT:
-                return MENU_OK;
+                return false;
         }
     }
-    return MENU_OK;
+    return false;
 }
 #else
-Menu dbg_os(void)
+bool dbg_os(void)
 {
     char buf[32];
     int button;
@@ -110,7 +110,7 @@ Menu dbg_os(void)
         switch(button)
         {
         case BUTTON_STOP:
-            return MENU_OK;
+            return false;
 
 	    case BUTTON_LEFT:
             currval--;
@@ -125,13 +125,13 @@ Menu dbg_os(void)
             break;
         }
     }
-    return MENU_OK;
+    return false;
 }
 #endif
 
 #ifdef HAVE_LCD_BITMAP
 /* Test code!!! */
-Menu dbg_ports(void)
+bool dbg_ports(void)
 {
     unsigned short porta;
     unsigned short portb;
@@ -186,13 +186,13 @@ Menu dbg_ports(void)
         switch(button)
         {
             case BUTTON_OFF:
-                return MENU_OK;
+                return false;
         }
     }
-    return MENU_OK;
+    return false;
 }
 #else
-Menu dbg_ports(void)
+bool dbg_ports(void)
 {
     unsigned short porta;
     unsigned short portb;
@@ -268,7 +268,7 @@ Menu dbg_ports(void)
         switch(button)
         {
         case BUTTON_STOP:
-            return MENU_OK;
+            return false;
 
         case BUTTON_LEFT:
             currval--;
@@ -283,13 +283,13 @@ Menu dbg_ports(void)
             break;
         }
     }
-    return MENU_OK;
+    return false;
 }
 #endif
 
 #ifdef HAVE_RTC
 /* Read RTC RAM contents and display them */
-Menu dbg_rtc(void)
+bool dbg_rtc(void)
 {
     char buf[32];
     unsigned char addr = 0, r, c;
@@ -333,15 +333,15 @@ Menu dbg_rtc(void)
             break;
         case BUTTON_OFF:
         case BUTTON_LEFT:
-            return MENU_OK;
+            return false;
         }
     }
-    return MENU_OK;
+    return false;
 }
 #else
-Menu dbg_rtc(void)
+bool dbg_rtc(void)
 {
-    return MENU_OK;
+    return false;
 }
 #endif
 
@@ -351,7 +351,7 @@ Menu dbg_rtc(void)
 #define NUMROWS 4
 #endif
 /* Read MAS registers and display them */
-Menu dbg_mas(void)
+bool dbg_mas(void)
 {
     char buf[32];
     unsigned int addr = 0, r, i;
@@ -395,14 +395,14 @@ Menu dbg_mas(void)
 #else
         case BUTTON_DOWN:
 #endif
-            return MENU_OK;
+            return false;
         }
     }
-    return MENU_OK;
+    return false;
 }
 
 #ifdef HAVE_MAS3587F
-Menu dbg_mas_codec(void)
+bool dbg_mas_codec(void)
 {
     char buf[32];
     unsigned int addr = 0, r, i;
@@ -433,10 +433,10 @@ Menu dbg_mas_codec(void)
             if (addr) { addr -= 4; }
             break;
         case BUTTON_LEFT:
-            return MENU_OK;
+            return false;
         }
     }
-    return MENU_OK;
+    return false;
 }
 #endif
 
@@ -450,7 +450,7 @@ Menu dbg_mas_codec(void)
 #define BAT_FIRST_VAL  MAX(POWER_HISTORY_LEN - LCD_WIDTH - 1, 0)
 #define BAT_YSPACE    (LCD_HEIGHT - 20)
 
-Menu view_battery(void)
+bool view_battery(void)
 {
     int view = 0;
     int i, x, y;
@@ -571,16 +571,16 @@ Menu view_battery(void)
                 
             case BUTTON_LEFT:
             case BUTTON_OFF:
-                return MENU_OK;
+                return false;
         }
     }
-    return MENU_OK;
+    return false;
 }
 
 #endif
 
 #ifdef HAVE_MAS3507D
-Menu dbg_mas_info(void)
+bool dbg_mas_info(void)
 {
     int button;
     char buf[32];
@@ -714,7 +714,7 @@ Menu dbg_mas_info(void)
         switch(button)
         {
         case BUTTON_STOP:
-            return MENU_OK;
+            return false;
 
         case BUTTON_LEFT:
             currval--;
@@ -750,14 +750,14 @@ Menu dbg_mas_info(void)
             break;
         }
     }
-    return MENU_OK;
+    return false;
 }
 #endif
 
-Menu debug_menu(void)
+bool debug_menu(void)
 {
     int m;
-    Menu result;
+    bool result;
 
     struct menu_items items[] = {
         { "View I/O ports", dbg_ports },

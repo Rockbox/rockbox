@@ -38,6 +38,7 @@
 #include "powermgmt.h"
 #include "status.h"
 #include "atoi.h"
+#include "screens.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "font.h"
@@ -476,84 +477,84 @@ bool settings_load_eq(char* file)
                                 if (!strcasecmp(buf_set,"volume")) {
                                     global_settings.volume = (atoi(buf_val)/2);
                                     if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME) ||
-                                            global_settings.volume < mpeg_sound_min(SOUND_VOLUME)) {
+                                       global_settings.volume < mpeg_sound_min(SOUND_VOLUME)) {
                                         global_settings.volume = mpeg_sound_default(SOUND_VOLUME);
                                         syntax_error = true;
                                     }
                                     mpeg_sound_set(SOUND_VOLUME, global_settings.volume);
 
                                 } else
-                                if (!strcasecmp(buf_set,"bass")) {
-                                    if (buf_val[0] == '-')
-                                        global_settings.bass = ((mpeg_sound_max(SOUND_BASS)/2)-atoi(buf_val+1));
-                                    else
-                                        global_settings.bass = (atoi(buf_val)+(mpeg_sound_max(SOUND_BASS)/2));
-                                    if (global_settings.bass > mpeg_sound_max(SOUND_BASS) || 
+                                    if (!strcasecmp(buf_set,"bass")) {
+                                        if (buf_val[0] == '-')
+                                            global_settings.bass = ((mpeg_sound_max(SOUND_BASS)/2)-atoi(buf_val+1));
+                                        else
+                                            global_settings.bass = (atoi(buf_val)+(mpeg_sound_max(SOUND_BASS)/2));
+                                        if (global_settings.bass > mpeg_sound_max(SOUND_BASS) || 
                                             global_settings.bass < mpeg_sound_min(SOUND_BASS)) {
-                                        global_settings.bass = mpeg_sound_default(SOUND_BASS);
-                                        syntax_error = true;
-                                    }
-                                    mpeg_sound_set(SOUND_BASS, global_settings.bass);
-                                } else
-                                if (!strcasecmp(buf_set,"treble")) {
-                                    if (buf_val[0] == '-')
-                                        global_settings.treble = ((mpeg_sound_max(SOUND_TREBLE)/2)-atoi(buf_val+1));
-                                    else
-                                        global_settings.treble = (atoi(buf_val)+(mpeg_sound_max(SOUND_TREBLE)/2));
-                                    if (global_settings.treble > mpeg_sound_max(SOUND_TREBLE) || 
-                                            global_settings.treble < mpeg_sound_min(SOUND_TREBLE)) {
-                                        global_settings.treble = mpeg_sound_default(SOUND_TREBLE);
-                                        syntax_error = true;
-                                    }
-                                    mpeg_sound_set(SOUND_TREBLE, global_settings.treble);
-                                } else
-                                if (!strcasecmp(buf_set,"balance")) {
-                                    if (buf_val[0] == '-')
-                                        global_settings.balance = -(atoi(buf_val+1)/2);
-                                    else
-                                        global_settings.balance = ((atoi(buf_val)/2));
-                                    if (global_settings.balance > mpeg_sound_max(SOUND_BALANCE) || 
-                                            global_settings.balance < mpeg_sound_min(SOUND_BALANCE)) {
-                                        global_settings.balance = mpeg_sound_default(SOUND_BALANCE);
-                                        syntax_error = true;
-                                    }
-                                    mpeg_sound_set(SOUND_BALANCE, global_settings.balance);
-                                } else
-                                if (!strcasecmp(buf_set,"channels")) {
-                                    global_settings.channel_config = atoi(buf_val);
-                                    if (global_settings.channel_config > mpeg_sound_max(SOUND_CHANNELS) || 
-                                            global_settings.channel_config < mpeg_sound_min(SOUND_CHANNELS)) {
-                                        global_settings.channel_config = mpeg_sound_default(SOUND_CHANNELS);
-                                        syntax_error = true;
-                                    }
-                                    mpeg_sound_set(SOUND_CHANNELS, global_settings.channel_config);
-                                } else
-                                if (!strcasecmp(buf_set,"loudness")) {
-                                    global_settings.loudness = atoi(buf_val);
-                                    if(global_settings.loudness > mpeg_sound_max(SOUND_LOUDNESS) ||
-                                            global_settings.loudness < mpeg_sound_min(SOUND_LOUDNESS)) {
-                                        global_settings.loudness = mpeg_sound_default(SOUND_LOUDNESS);
-                                        syntax_error = true;
-                                    }
-                                    mpeg_sound_set(SOUND_LOUDNESS, global_settings.loudness);
-                                } else
-                                if (!strcasecmp(buf_set,"bass boost")) {
-                                    global_settings.bass_boost = (atoi(buf_val)/10);
-                                    if(global_settings.bass_boost > mpeg_sound_max(SOUND_SUPERBASS) ||
-                                            global_settings.bass_boost < mpeg_sound_min(SOUND_SUPERBASS)) {
-                                        global_settings.bass_boost = mpeg_sound_default(SOUND_SUPERBASS);
-                                        syntax_error = true;
-                                    }
-                                    mpeg_sound_set(SOUND_SUPERBASS, global_settings.bass_boost);
-                                } else                                if (!strcasecmp(buf_set,"auto volume")) {
-                                    global_settings.avc = atoi(buf_val);
-                                    if (global_settings.avc > mpeg_sound_max(SOUND_AVC) || 
-                                            global_settings.avc < mpeg_sound_min(SOUND_AVC)) {
-                                        global_settings.avc = mpeg_sound_default(SOUND_AVC);
-                                        syntax_error = true;
-                                    }
-                                    mpeg_sound_set(SOUND_AVC, global_settings.avc);
-                                }
+                                            global_settings.bass = mpeg_sound_default(SOUND_BASS);
+                                            syntax_error = true;
+                                        }
+                                        mpeg_sound_set(SOUND_BASS, global_settings.bass);
+                                    } else
+                                        if (!strcasecmp(buf_set,"treble")) {
+                                            if (buf_val[0] == '-')
+                                                global_settings.treble = ((mpeg_sound_max(SOUND_TREBLE)/2)-atoi(buf_val+1));
+                                            else
+                                                global_settings.treble = (atoi(buf_val)+(mpeg_sound_max(SOUND_TREBLE)/2));
+                                            if (global_settings.treble > mpeg_sound_max(SOUND_TREBLE) || 
+                                                global_settings.treble < mpeg_sound_min(SOUND_TREBLE)) {
+                                                global_settings.treble = mpeg_sound_default(SOUND_TREBLE);
+                                                syntax_error = true;
+                                            }
+                                            mpeg_sound_set(SOUND_TREBLE, global_settings.treble);
+                                        } else
+                                            if (!strcasecmp(buf_set,"balance")) {
+                                                if (buf_val[0] == '-')
+                                                    global_settings.balance = -(atoi(buf_val+1)/2);
+                                                else
+                                                    global_settings.balance = ((atoi(buf_val)/2));
+                                                if (global_settings.balance > mpeg_sound_max(SOUND_BALANCE) || 
+                                                    global_settings.balance < mpeg_sound_min(SOUND_BALANCE)) {
+                                                    global_settings.balance = mpeg_sound_default(SOUND_BALANCE);
+                                                    syntax_error = true;
+                                                }
+                                                mpeg_sound_set(SOUND_BALANCE, global_settings.balance);
+                                            } else
+                                                if (!strcasecmp(buf_set,"channels")) {
+                                                    global_settings.channel_config = atoi(buf_val);
+                                                    if (global_settings.channel_config > mpeg_sound_max(SOUND_CHANNELS) || 
+                                                        global_settings.channel_config < mpeg_sound_min(SOUND_CHANNELS)) {
+                                                        global_settings.channel_config = mpeg_sound_default(SOUND_CHANNELS);
+                                                        syntax_error = true;
+                                                    }
+                                                    mpeg_sound_set(SOUND_CHANNELS, global_settings.channel_config);
+                                                } else
+                                                    if (!strcasecmp(buf_set,"loudness")) {
+                                                        global_settings.loudness = atoi(buf_val);
+                                                        if(global_settings.loudness > mpeg_sound_max(SOUND_LOUDNESS) ||
+                                                           global_settings.loudness < mpeg_sound_min(SOUND_LOUDNESS)) {
+                                                            global_settings.loudness = mpeg_sound_default(SOUND_LOUDNESS);
+                                                            syntax_error = true;
+                                                        }
+                                                        mpeg_sound_set(SOUND_LOUDNESS, global_settings.loudness);
+                                                    } else
+                                                        if (!strcasecmp(buf_set,"bass boost")) {
+                                                            global_settings.bass_boost = (atoi(buf_val)/10);
+                                                            if(global_settings.bass_boost > mpeg_sound_max(SOUND_SUPERBASS) ||
+                                                               global_settings.bass_boost < mpeg_sound_min(SOUND_SUPERBASS)) {
+                                                                global_settings.bass_boost = mpeg_sound_default(SOUND_SUPERBASS);
+                                                                syntax_error = true;
+                                                            }
+                                                            mpeg_sound_set(SOUND_SUPERBASS, global_settings.bass_boost);
+                                                        } else                                if (!strcasecmp(buf_set,"auto volume")) {
+                                                            global_settings.avc = atoi(buf_val);
+                                                            if (global_settings.avc > mpeg_sound_max(SOUND_AVC) || 
+                                                                global_settings.avc < mpeg_sound_min(SOUND_AVC)) {
+                                                                global_settings.avc = mpeg_sound_default(SOUND_AVC);
+                                                                syntax_error = true;
+                                                            }
+                                                            mpeg_sound_set(SOUND_AVC, global_settings.avc);
+                                                        }
                                 if (syntax_error) {
                                     lcd_clear_display();
                                     lcd_puts(0,1,"SyntaxError");
@@ -636,20 +637,24 @@ void settings_display(void)
 #endif
 }
 
-void set_bool(char* string, bool* variable )
+bool set_bool(char* string, bool* variable )
 {
-    set_bool_options(string, variable, "yes", "no ");
+    return set_bool_options(string, variable, "yes", "no ");
 }
 
-void set_bool_options(char* string, bool* variable, char* yes_str, char* no_str )
+bool set_bool_options(char* string, bool* variable,
+                      char* yes_str, char* no_str )
 {
     char* names[] = { yes_str, no_str };
     int value = !*variable;
-    set_option(string, &value, names, 2, NULL);
+    bool result;
+
+    result = set_option(string, &value, names, 2, NULL);
     *variable = !value;
+    return result;
 }
 
-void set_int(char* string, 
+bool set_int(char* string, 
              char* unit,
              int* variable,
              void (*function)(int),
@@ -713,14 +718,20 @@ void set_int(char* string,
 #endif
                 done = true;
                 break;
+
+            case SYS_USB_CONNECTED:
+                usb_screen();
+                return true;
         }
         if ( function && button != BUTTON_NONE)
             function(*variable);
     }
     lcd_stop_scroll();
+
+    return false;
 }
 
-void set_option(char* string, int* variable, char* options[],
+bool set_option(char* string, int* variable, char* options[],
                 int numoptions, void (*function)(int))
 {
     bool done = false;
@@ -778,12 +789,17 @@ void set_option(char* string, int* variable, char* options[],
 #endif
                 done = true;
                 break;
+
+            case SYS_USB_CONNECTED:
+                usb_screen();
+                return true;
         }
 
         if ( function && button != BUTTON_NONE)
             function(*variable);
     }
     lcd_stop_scroll();
+    return false;
 }
 
 #ifdef HAVE_LCD_BITMAP
@@ -797,7 +813,7 @@ char cursor[][3] = {{ 0,  8, 12}, {18,  8, 12}, {36,  8, 12},
                     {24, 16, 24}, {54, 16, 18}, {78, 16, 12}};
 char daysinmonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-void set_time(char* string, int timedate[])
+bool set_time(char* string, int timedate[])
 {
     bool done = false;
     int button;
@@ -999,9 +1015,13 @@ void set_time(char* string, int timedate[])
 #endif
                 break;
 #endif
-            default:
-                break;
+
+            case SYS_USB_CONNECTED:
+                usb_screen();
+                return true;
         }
     }
+
+    return false;
 }
 #endif

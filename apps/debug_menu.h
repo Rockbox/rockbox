@@ -19,12 +19,12 @@
 #ifndef _DEBUG_MENU_H
 #define _DEBUG_MENU_H
 
-Menu debug_menu(void);
+bool debug_menu(void);
 
 #ifndef SIMULATOR
-extern Menu dbg_ports(void);
+extern bool dbg_ports(void);
 #ifdef HAVE_RTC
-extern Menu dbg_rtc(void);
+extern bool dbg_rtc(void);
 #endif
 #endif
 
