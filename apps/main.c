@@ -132,13 +132,8 @@ void init(void)
         panicf("disk: NULL");
 
     for ( i=0; i<4; i++ ) {
-        if ( pinfo[i].type == PARTITION_TYPE_FAT32 ||
-             pinfo[i].type == PARTITION_TYPE_FAT32_LBA ) {
-            rc = fat_mount(pinfo[i].start);
-            if(rc)
-                panicf("mount: %d",rc);
+        if (!fat_mount(pinfo[i].start))
             break;
-        }
     }
     if ( i==4 ) {
         DEBUGF("No partition found, trying to mount sector 0.\n");
