@@ -89,7 +89,7 @@ ifeq ($(DISPLAY),-DHAVE_LCD_BITMAP)
 else
 	LCDSRSC = lcd-playersim.c lcd-player.c lcd-player-charset.c font-player.c
 endif
-FIRMSRCS = $(LCDSRSC) id3.c usb.c mpeg.c powermgmt.c power.c $(EXTRAFIRMSRC)
+FIRMSRCS = $(LCDSRSC) id3.c mp3data.c usb.c mpeg.c powermgmt.c power.c $(EXTRAFIRMSRC)
 
 APPS = main.c tree.c menu.c credits.c main_menu.c icons.c language.c \
 	playlist.c wps.c wps-display.c settings.c status.c \
@@ -232,6 +232,9 @@ $(OBJDIR)/settings.o: $(APPDIR)/settings.c
 	$(CC) $(APPCFLAGS) -c $< -o $@
 
 $(OBJDIR)/id3.o: $(FIRMWAREDIR)/id3.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/mp3data.o: $(FIRMWAREDIR)/mp3data.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/font.o: $(FIRMWAREDIR)/font.c

@@ -90,6 +90,7 @@ unsigned long mpeg_num_recorded_bytes(void);
 #endif
 void mpeg_get_debugdata(struct mpeg_debug *dbgdata);
 void mpeg_set_buffer_margin(int seconds);
+int mpeg_create_xing_header(char *filename, void (*progressfunc)(int));
 
 #define SOUND_VOLUME 0
 #define SOUND_BASS 1

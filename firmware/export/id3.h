@@ -39,15 +39,18 @@ struct mp3entry {
     unsigned int first_frame_offset; /* Byte offset to first real MP3 frame.
                                         Used for skipping leading garbage to
                                         avoid gaps between tracks. */
+    unsigned int xing_header_pos;
     unsigned int filesize; /* in bytes */
     unsigned int length;   /* song length */
     unsigned int elapsed;  /* ms played */
+
+    /* MP3 stream specific info */
     long bpf;              /* bytes per frame */
     long tpf;              /* time per frame */
 
     /* Xing VBR fields */
     bool vbr;
-    unsigned char vbrflags;
+    bool has_toc;    /* True if there is a VBR header in the file */
     unsigned char toc[100];/* table of contents */
 
     /* these following two fields are used for local buffering */
@@ -58,10 +61,6 @@ struct mp3entry {
     int offset;            /* bytes played */
     int index;             /* playlist index */
 };
-
-#define VBR_FRAMES_FLAG 0x01
-#define VBR_BYTES_FLAG  0x02
-#define VBR_TOC_FLAG    0x04
 
 enum {
     ID3_VER_1_0 = 1,

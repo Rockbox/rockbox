@@ -26,6 +26,7 @@
 #include "string.h"
 #include <kernel.h>
 #include "thread.h"
+#include "mp3data.h"
 #ifndef SIMULATOR
 #include "i2c.h"
 #include "mas.h"
@@ -302,7 +303,7 @@ static void remove_all_tags(void)
 static void set_elapsed(struct mp3entry* id3)
 {
     if ( id3->vbr ) {
-        if ( id3->vbrflags & VBR_TOC_FLAG ) {
+        if ( id3->has_toc ) {
             /* calculate elapsed time using TOC */
             int i;
             unsigned int remainder, plen, relpos, nextpos;
@@ -1482,7 +1483,7 @@ static void mpeg_thread(void)
 
                 if (id3->vbr)
                 {
-                    if (id3->vbrflags & VBR_TOC_FLAG)
+                    if (id3->has_toc)
                     {
                         /* Use the TOC to find the new position */
                         unsigned int percent, remainder;
@@ -1528,10 +1529,10 @@ static void mpeg_thread(void)
                        transition properly to the next song */
                     newpos = id3->filesize - id3->id3v1len - 1;
                 }
-                else if (newpos < (int)id3->id3v2len)
+                else if (newpos < (int)id3->first_frame_offset)
                 {
-                    /* skip past id3v2 tag */
-                    newpos = id3->id3v2len;
+                    /* skip past id3v2 tag and other leading garbage */
+                    newpos = id3->first_frame_offset;
                 }
 
                 if (mpeg_file >= 0)
@@ -1720,7 +1721,7 @@ static void mpeg_thread(void)
                         t2 = current_tick;
                         DEBUGF("time: %d\n", t2 - t1);
                         DEBUGF("R: %x\n", len);
-                        
+
                         /* Now make sure that we don't feed the MAS with ID3V1
                            data */
                         if (len < amount_to_read)
@@ -1734,19 +1735,19 @@ static void mpeg_thread(void)
                             {
                                 if(tagptr >= mp3buflen)
                                     tagptr -= mp3buflen;
-                                
+
                                 if(mp3buf[tagptr] != tag[i])
                                     taglen = 0;
-                                
+
                                 tagptr++;
                             }
-                            
+
                             if(taglen)
                             {
                                 /* Skip id3v1 tag */
                                 DEBUGF("Skipping ID3v1 tag\n");
                                 len -= taglen;
-                                
+
                                 /* The very rare case when the entire tag
                                    wasn't read in this read() call must be
                                    taken care of */
@@ -1819,131 +1820,135 @@ static void mpeg_thread(void)
         }
         else
         {
-            /* This doesn't look neccessary...
-            yield();
-            if(!queue_empty(&mpeg_queue))
-            {*/
-                queue_wait(&mpeg_queue, &ev);
-                switch(ev.id)
-                {
-                    case MPEG_RECORD:
-                        DEBUGF("Recording...\n");
-                        reset_mp3_buffer();
-                        start_recording();
-                        demand_irq_enable(true);
-                        mpeg_file = creat(recording_filename, O_WRONLY);
+            queue_wait(&mpeg_queue, &ev);
+            switch(ev.id)
+            {
+                case MPEG_RECORD:
+                    DEBUGF("Recording...\n");
+                    reset_mp3_buffer();
 
-                        if(mpeg_file < 0)
-                            panicf("recfile: %d", mpeg_file);
+                    /* Advance the write pointer 4096+417 bytes to make
+                       room for an ID3 tag plus a VBR header */
+                    mp3buf_write = 4096+417;
+                    memset(mp3buf, 0, 4096+417);
 
+                    start_recording();
+                    demand_irq_enable(true);
+                    
+                    mpeg_file = creat(recording_filename, O_WRONLY);
+                    
+                    if(mpeg_file < 0)
+                        panicf("recfile: %d", mpeg_file);
+
+                    
+                    close(mpeg_file);
+                    
+                    mpeg_file = -1;
+                    break;
+                    
+                case MPEG_STOP:
+                    DEBUGF("MPEG_STOP\n");
+                    demand_irq_enable(false);
+                    stop_recording();
+                    
+                    /* Save the remaining data in the buffer */
+                    stop_pending = true;
+                    queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
+                    break;
+                    
+                case MPEG_STOP_DONE:
+                    DEBUGF("MPEG_STOP_DONE\n");
+                    
+                    if(mpeg_file >= 0)
                         close(mpeg_file);
-                        mpeg_file = -1;
-                        break;
-
-                    case MPEG_STOP:
-                        DEBUGF("MPEG_STOP\n");
-                        demand_irq_enable(false);
-                        stop_recording();
-
-                        /* Save the remaining data in the buffer */
-                        stop_pending = true;
-                        queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
-                        break;
-
-                    case MPEG_STOP_DONE:
-                        DEBUGF("MPEG_STOP_DONE\n");
-
-                        if(mpeg_file >= 0)
-                            close(mpeg_file);
-                        mpeg_file = -1;
-
+                    mpeg_file = -1;
+                    
 #ifdef DEBUG1
+                    {
+                        int i;
+                        for(i = 0;i < 512;i++)
                         {
-                            int i;
-                            for(i = 0;i < 512;i++)
-                            {
-                                DEBUGF("%d - %d us (%d bytes)\n",
-                                       timing_info[i*2],
-                                       (timing_info[i*2+1] & 0xffff) *
-                                       10000 / 13824,
-                                       timing_info[i*2+1] >> 16);
-                            }
+                            DEBUGF("%d - %d us (%d bytes)\n",
+                                   timing_info[i*2],
+                                   (timing_info[i*2+1] & 0xffff) *
+                                   10000 / 13824,
+                                   timing_info[i*2+1] >> 16);
                         }
+                    }
 #endif
-                        mpeg_stop_done = true;
-                        break;
-
-                    case MPEG_SAVE_DATA:
-                        amount_to_save = mp3buf_write - mp3buf_read;
-
-                        /* If the result is negative, the write index has
-                           wrapped */
-                        if(amount_to_save < 0)
+                    mpeg_stop_done = true;
+                    break;
+                    
+                case MPEG_SAVE_DATA:
+                    amount_to_save = mp3buf_write - mp3buf_read;
+                    
+                    /* If the result is negative, the write index has
+                       wrapped */
+                    if(amount_to_save < 0)
+                    {
+                        amount_to_save += mp3buflen;
+                    }
+                    
+                    DEBUGF("r: %x w: %x\n", mp3buf_read, mp3buf_write);
+                    DEBUGF("ats: %x\n", amount_to_save);
+                    /* Save data only if the buffer is getting full,
+                       or if we should stop recording */
+                    if(amount_to_save)
+                    {
+                        if(mp3buflen - amount_to_save < MPEG_LOW_WATER ||
+                           stop_pending)
                         {
-                            amount_to_save += mp3buflen;
-                        }
-
-                        DEBUGF("r: %x w: %x\n", mp3buf_read, mp3buf_write);
-                        DEBUGF("ats: %x\n", amount_to_save);
-                        /* Save data only if the buffer is getting full,
-                           or if we should stop recording */
-                        if(amount_to_save)
-                        {
-                            if(mp3buflen - amount_to_save < MPEG_LOW_WATER ||
-                               stop_pending)
-                            {
-                                int rc;
-
-                                /* Only save up to the end of the buffer */
-                                writelen = MIN(amount_to_save,
-                                               mp3buflen - mp3buf_read);
-
-                                DEBUGF("wrl: %x\n", writelen);
-                                mpeg_file = open(recording_filename,
-                                                 O_WRONLY| O_APPEND);
-                                if(mpeg_file < 0)
-                                    panicf("rec open: %d", mpeg_file);
-                                    
-                                rc = write(mpeg_file, mp3buf + mp3buf_read,
-                                           writelen);
-
-                                if(rc < 0)
-                                    panicf("rec wrt: %d", rc);
-
-                                rc = close(mpeg_file);
-                                if(rc < 0)
-                                    panicf("rec cls: %d", rc);
-
-                                mpeg_file = -1;
-                                DEBUGF("rc: %x\n", rc);
-                                
-                                mp3buf_read += amount_to_save;
-                                if(mp3buf_read >= mp3buflen)
-                                    mp3buf_read = 0;
-                                
-                                queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
-                            }
-                            else
-                            {
-                                saving = false;
-                            }
+                            int rc;
+                            
+                            /* Only save up to the end of the buffer */
+                            writelen = MIN(amount_to_save,
+                                           mp3buflen - mp3buf_read);
+                            
+                            DEBUGF("wrl: %x\n", writelen);
+                            mpeg_file = open(recording_filename,
+                                             O_WRONLY| O_APPEND);
+                            if(mpeg_file < 0)
+                                panicf("rec open: %d", mpeg_file);
+                            
+                            rc = write(mpeg_file, mp3buf + mp3buf_read,
+                                       writelen);
+                            
+                            if(rc < 0)
+                                panicf("rec wrt: %d", rc);
+                            
+                            rc = close(mpeg_file);
+                            if(rc < 0)
+                                panicf("rec cls: %d", rc);
+                            
+                            mpeg_file = -1;
+                            DEBUGF("rc: %x\n", rc);
+                            
+                            mp3buf_read += amount_to_save;
+                            if(mp3buf_read >= mp3buflen)
+                                mp3buf_read = 0;
+                            
+                            queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
                         }
                         else
                         {
-                            /* We have saved all data,
-                               time to stop for real */
-                            if(stop_pending)
-                                queue_post(&mpeg_queue, MPEG_STOP_DONE, 0);
                             saving = false;
                         }
-                        break;
-                        
-                    case MPEG_INIT_PLAYBACK:
-                        init_playback();
-                        init_playback_done = true;
-                        break;
-                }
-            /*}*/
+                    }
+                    else
+                    {
+                        /* We have saved all data,
+                           time to stop for real */
+                        if(stop_pending)
+                            queue_post(&mpeg_queue, MPEG_STOP_DONE, 0);
+                        saving = false;
+                    }
+                    break;
+                    
+                case MPEG_INIT_PLAYBACK:
+                    init_playback();
+                    init_playback_done = true;
+                    break;
+            }
         }
 #endif
     }
@@ -2980,4 +2985,75 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness,
     dbg_timer_start();
     dbg_cnt2us(0);
 #endif
+}
+
+int d_1;
+int d_2;
+
+int mpeg_create_xing_header(char *filename, void (*progressfunc)(int))
+{
+    struct mp3entry entry;
+    char xingbuf[417];
+    int fd;
+    int rc;
+    int flen;
+    int num_frames;
+    int fpos;
+
+    if(progressfunc)
+        progressfunc(0);
+
+    rc = mp3info(&entry, filename);
+    if(rc < 0)
+        return rc * 10 - 1;
+    
+    fd = open(filename, O_RDWR);
+    if(fd < 0)
+        return fd * 10 - 2;
+
+    flen = lseek(fd, 0, SEEK_END);
+
+    d_1 = entry.first_frame_offset;
+    d_2 = entry.filesize;
+    
+    if(progressfunc)
+        progressfunc(0);
+
+    num_frames = count_mp3_frames(fd, entry.first_frame_offset,
+                                  flen,
+                                  progressfunc);
+
+    create_xing_header(fd, entry.first_frame_offset,
+                       flen, xingbuf, num_frames, progressfunc);
+
+    /* Try to fit the Xing header first in the stream. Replace the existing
+       Xing header if there is one, else see if there is room between the
+       ID3 tag and the first MP3 frame. */
+    if(entry.xing_header_pos)
+    {
+        /* Reuse existing Xing header */
+        fpos = entry.xing_header_pos;
+    }
+    else
+    {
+        /* Any room between ID3 tag and first MP3 frame? */
+        if(entry.first_frame_offset - entry.id3v2len > 417)
+        {
+            fpos = entry.first_frame_offset - 417;
+        }
+        else
+        {
+            close(fd);
+            return -3;
+        }
+    }
+
+    lseek(fd, fpos, SEEK_SET);
+    write(fd, xingbuf, 417);
+    close(fd);
+
+    if(progressfunc)
+        progressfunc(100);
+
+    return 0;
 }

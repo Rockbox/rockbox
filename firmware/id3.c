@@ -22,9 +22,6 @@
  * by David Härdeman. It has since been extended and enhanced pretty much by
  * all sorts of friendly Rockbox people.
  *
- * A nice reference for MPEG header info:
- * http://rockbox.haxx.se/docs/mpeghdr.html
- *
  */
 
 #include <stdio.h>
@@ -37,6 +34,7 @@
 #include "atoi.h"
 
 #include "id3.h"
+#include "mp3data.h"
 
 #define UNSYNC(b0,b1,b2,b3) (((b0 & 0x7F) << (3*7)) | \
                              ((b1 & 0x7F) << (2*7)) | \
@@ -47,38 +45,6 @@
                                 ((b1 & 0xFF) << (2*8)) | \
                                 ((b2 & 0xFF) << (1*8)) | \
                                 ((b3 & 0xFF) << (0*8)))
-
-/* Table of bitrates for MP3 files, all values in kilo.
- * Indexed by version, layer and value of bit 15-12 in header.
- */
-const int bitrate_table[2][3][16] =
-{
-    {
-        {0,32,64,96,128,160,192,224,256,288,320,352,384,416,448,0},
-        {0,32,48,56, 64,80, 96, 112,128,160,192,224,256,320,384,0},
-        {0,32,40,48, 56,64, 80, 96, 112,128,160,192,224,256,320,0}
-    },
-    {
-        {0,32,48,56,64,80,96,112,128,144,160,176,192,224,256,0},
-        {0, 8,16,24,32,40,48, 56, 64, 80, 96,112,128,144,160,0},
-        {0, 8,16,24,32,40,48, 56, 64, 80, 96,112,128,144,160,0}
-    }
-};
-
-/* Table of samples per frame for MP3 files.
- * Indexed by layer. Multiplied with 1000.
- */
-const int bs[4] = {0, 384000, 1152000, 1152000};
-
-/* Table of sample frequency for MP3 files.
- * Indexed by version and layer.
- */
-const int freqtab[][4] =
-{
-    {11025, 12000, 8000, 0},  /* MPEG version 2.5 */
-    {44100, 48000, 32000, 0}, /* MPEG Version 1 */
-    {22050, 24000, 16000, 0}, /* MPEG version 2 */
-};
 
 /* Checks to see if the passed in string is a 16-bit wide Unicode v2
    string.  If it is, we attempt to convert it to a 8-bit ASCII string
@@ -168,6 +134,7 @@ static bool setid3v1title(int fd, struct mp3entry *entry)
     if (strncmp(buffer, "TAG", 3))
         return false;
 
+    entry->id3v1len = 128;
     entry->id3version = ID3_VER_1_0;
 
     for (i=0; i < (int)sizeof offsets; i++) {
@@ -239,6 +206,8 @@ static void setid3v2title(int fd, struct mp3entry *entry)
     char *tracknum = NULL;
     int bytesread = 0;
     int buffersize = sizeof(entry->id3v2buf);
+    int flags;
+    int skip;
 	
     /* Bail out if the tag is shorter than 10 bytes */
     if(entry->id3v2len < 10)
@@ -275,17 +244,34 @@ static void setid3v2title(int fd, struct mp3entry *entry)
     }
     entry->id3version = version;
 
+    /* Skip the extended header if it is present */
+    if(version >= ID3_VER_2_4) {
+        if(header[5] & 0x40) {
+            if(4 != read(fd, header, 4))
+                return;
+            
+            framelen = UNSYNC(header[0], header[1], 
+                              header[2], header[3]);
+
+            lseek(fd, framelen - 4, SEEK_CUR);
+        }
+    }
+    
     /* 
      * We must have at least minframesize bytes left for the 
      * remaining frames to be interesting 
      */
     while(size > minframesize) {
+        flags = 0;
+        
         /* Read frame header and check length */
         if(version >= ID3_VER_2_3) {
             if(10 != read(fd, header, 10))
                 return;
             /* Adjust for the 10 bytes we read */
             size -= 10;
+
+            flags = BYTES2INT(0, 0, header[8], header[9]);
             
             if (version >= ID3_VER_2_4) {
                 framelen = UNSYNC(header[4], header[5], 
@@ -311,6 +297,33 @@ static void setid3v2title(int fd, struct mp3entry *entry)
         if(framelen == 0)
             return;
 
+        if(flags)
+        {
+            skip = 0;
+            
+            if(flags & 0x0040) /* Grouping identity */
+                skip++;
+
+            if(flags & 0x000e) /* Compression, encryption or
+                                  unsynchronization */
+            {
+                /* Skip it using the total size in case
+                   it was truncated */
+                size -= totframelen;
+                lseek(fd, totframelen, SEEK_CUR);
+                continue;
+            }
+
+            if(flags & 0x0001) /* Data length indicator */
+                skip += 4;
+
+            if(skip)
+            {
+                lseek(fd, skip, SEEK_CUR);
+                framelen -= skip;
+            }
+        }
+                
         /* If the frame is larger than the remaining buffer space we try
            to read as much as would fit in the buffer */
         if(framelen >= buffersize - bufferpos)
@@ -404,6 +417,7 @@ static int getid3v2len(int fd)
     else
         offset = UNSYNC(buf[0], buf[1], buf[2], buf[3]) + 10;
 
+    DEBUGF("ID3V2 Length: 0x%x\n", offset);
     return offset;
 }
 
@@ -417,29 +431,6 @@ static int getfilesize(int fd)
         return 0; /* unknown */
 
     return size;
-}
-
-/* check if 'head' is a valid mp3 frame header */
-static bool mp3frameheader(unsigned long head)
-{
-    if ((head & 0xffe00000) != 0xffe00000) /* bad sync? */
-        return false;
-    if (!((head >> 17) & 3)) /* no layer? */
-        return false;
-    if (((head >> 12) & 0xf) == 0xf) /* bad bitrate? */
-        return false;
-    if (!((head >> 12) & 0xf)) /* no bitrate? */
-        return false;
-    if (((head >> 10) & 0x3) == 0x3) /* bad sample rate? */
-        return false;
-    if (((head >> 19) & 1) == 1 &&
-        ((head >> 17) & 3) == 3 &&
-        ((head >> 16) & 1) == 1)
-        return false;
-    if ((head & 0xffff0000) == 0xfffe0000)
-        return false;
-	
-    return true;
 }
 
 /*
@@ -456,270 +447,54 @@ static bool mp3frameheader(unsigned long head)
 static int getsonglength(int fd, struct mp3entry *entry)
 {
     unsigned int filetime = 0;
-    unsigned long header=0;
-    unsigned char tmp;
-    unsigned char frame[156];
-    unsigned char* xing;
-    
-    enum {
-        MPEG_VERSION2_5,
-        MPEG_VERSION1,
-        MPEG_VERSION2
-    } version;
-    int layer;
-    int bitindex;
-    int bitrate;
-    int freqindex;
-    int frequency;
-    int chmode;
+    struct mp3info info;
     int bytecount;
-    int bytelimit;
-    int bittable; /* which bitrate table to use */
-    bool header_found = false;
-
-    long bpf;
-    long tpf;
-
+    
     /* Start searching after ID3v2 header */ 
     if(-1 == lseek(fd, entry->id3v2len, SEEK_SET))
         return 0;
-	
-    /* Fill up header with first 24 bits */
-    for(version = 0; version < 3; version++) {
-        header <<= 8;
-        if(!read(fd, &tmp, 1))
-            return 0;
-        header |= tmp;
-    }
-	
-    /* Loop trough file until we find a frame header */
-    bytecount = entry->id3v2len - 1;
-    bytelimit = entry->id3v2len + 0x20000;
-  restart:
-    do {
-        header <<= 8;
-        if(!read(fd, &tmp, 1))
-            return 0;
-        header |= tmp;
 
-        /* Quit if we haven't found a valid header within 128K */
-        bytecount++;
-        if(bytecount > bytelimit)
-            return 0;
-    } while(!mp3frameheader(header));
-	
-    /* 
-     * Some files are filled with garbage in the beginning, 
-     * if the bitrate index of the header is binary 1111 
-     * that is a good indicator
-     */
-    if((header & 0xF000) == 0xF000)
-        goto restart;
+    bytecount = get_mp3file_info(fd, &info);
 
-    /* MPEG Audio Version */
-    switch((header & 0x180000) >> 19) {
-        case 0:
-            /* MPEG version 2.5 is not an official standard */
-            version = MPEG_VERSION2_5;
-            bittable = MPEG_VERSION2; /* use the V2 bit rate table */
-            break;
+    DEBUGF("Space between ID3V2 tag and first audio frame: 0x%x bytes\n",
+           bytecount);
 
-        case 2:
-            /* MPEG version 2 (ISO/IEC 13818-3) */
-            version = MPEG_VERSION2;
-            bittable = MPEG_VERSION2;
-            break;
-
-        case 3:
-            /* MPEG version 1 (ISO/IEC 11172-3) */
-            version = MPEG_VERSION1;
-            bittable = MPEG_VERSION1;
-            break;
-        default:
-            goto restart;
-    }
-
-    /* Layer */
-    switch((header & 0x060000) >> 17) {
-        case 1:
-            layer = 3;
-            break;
-        case 2:
-            layer = 2;
-            break;
-        case 3:
-            layer = 1;
-            break;
-        default:
-            goto restart;
-    }
-
-    /* Bitrate */
-    bitindex = (header & 0xF000) >> 12;
-    bitrate = bitrate_table[bittable-1][layer-1][bitindex];
-    if(bitrate == 0)
-        goto restart;
-
-    /* Sampling frequency */
-    freqindex = (header & 0x0C00) >> 10;
-    frequency = freqtab[version][freqindex];
-    if(frequency == 0)
-        goto restart;
-
-#ifdef DEBUG_VERBOSE
-    DEBUGF( "Version %i, lay %i, biti %i, bitr %i, freqi %i, freq %i, chmode %d\n", 
-            version, layer, bitindex, bitrate, freqindex, frequency, chmode);
-#endif
-    entry->version = version;
-    entry->layer = layer;
-    entry->frequency = frequency;
-	
-    /* Calculate bytes per frame, calculation depends on layer */
-    switch(layer) {
-        case 1:
-            bpf = bitrate_table[bittable - 1][layer - 1][bitindex];
-            bpf *= 48000;
-            bpf /= freqtab[version][freqindex] << (bittable - 1);
-            break;
-        case 2:
-        case 3:
-            bpf = bitrate_table[bittable - 1][layer - 1][bitindex];
-            bpf *= 144000;
-            bpf /= freqtab[version][freqindex] << (bittable - 1);
-            break;
-        default:
-            bpf = 1;
-    }
-	
-    /* Calculate time per frame */
-    tpf = bs[layer] / (freqtab[version][freqindex] << (bittable - 1));
-        
-    entry->bpf = bpf;
-    entry->tpf = tpf;
- 
-    /* OK, we have found a frame. Let's see if it has a Xing header */
-    if(read(fd, frame, sizeof frame) < 0)
+    if(bytecount < 0)
         return -1;
+    
+    bytecount += entry->id3v2len;
 
-    /* Channel mode (stereo/mono) */
-    chmode = (header & 0xc0) >> 6;
-
-    /* calculate position of Xing VBR header */
-    if ( version == 1 ) {
-        if ( chmode == 3 ) /* mono */
-            xing = frame + 17;
-        else
-            xing = frame + 32;
-    }
-    else {
-        if ( chmode == 3 ) /* mono */
-            xing = frame + 9;
-        else
-            xing = frame + 17;
-    }
-
-    if (xing[0] == 'X' &&
-        xing[1] == 'i' &&
-        xing[2] == 'n' &&
-        xing[3] == 'g')
-    {
-        int i = 8; /* Where to start parsing info */
-
-        /* Yes, it is a VBR file */
-        entry->vbr = true;
-        entry->vbrflags = xing[7];
-        
-        if (entry->vbrflags & VBR_FRAMES_FLAG) /* Is the frame count there? */
-        {
-            int framecount = (xing[i] << 24) | (xing[i+1] << 16) |
-                (xing[i+2] << 8) | xing[i+3];
- 
-            filetime = framecount * tpf;
-            i += 4;
-        }
-
-        if (entry->vbrflags & VBR_BYTES_FLAG) /* is byte count there? */
-        {
-            int bytecount = (xing[i] << 24) | (xing[i+1] << 16) |
-                (xing[i+2] << 8) | xing[i+3];
- 
-            bitrate = bytecount * 8 / filetime;
-            i += 4;
-        }
-
-        if (entry->vbrflags & VBR_TOC_FLAG) /* is table-of-contents there? */
-        {
-            memcpy( entry->toc, xing+i, 100 );
-        }
-
-        /* Make sure we skip this frame in playback */
-        bytecount += bpf;
-
-        header_found = true;
-    }
-
-    if (xing[0] == 'V' &&
-        xing[1] == 'B' &&
-        xing[2] == 'R' &&
-        xing[3] == 'I')
-    {
-        int framecount;
-        int bytecount;
-        
-        /* Yes, it is a FhG VBR file */
-        entry->vbr = true;
-        entry->vbrflags = 0;
-
-        bytecount = (xing[10] << 24) | (xing[11] << 16) |
-            (xing[12] << 8) | xing[13];
- 
-        framecount = (xing[14] << 24) | (xing[15] << 16) |
-            (xing[16] << 8) | xing[17];
- 
-        filetime = framecount * tpf;
-        bitrate = bytecount * 8 / filetime;
-
-        /* We don't parse the TOC, since we don't yet know how to (FIXME) */
-
-        /* Make sure we skip this frame in playback */
-        bytecount += bpf;
-
-        header_found = true;
-    }
-
-    /* Is it a LAME Info frame? */
-    if (xing[0] == 'I' &&
-        xing[1] == 'n' &&
-        xing[2] == 'f' &&
-        xing[3] == 'o')
-    {
-        /* Make sure we skip this frame in playback */
-        bytecount += bpf;
-
-        header_found = true;
-    }
-
-
-    entry->bitrate = bitrate;
+    entry->bitrate = info.bitrate;
 
     /* If the file time hasn't been established, this may be a fixed
        rate MP3, so just use the default formula */
+
+    filetime = info.file_time;
+    
     if(filetime == 0)
     {
         /* 
          * Now song length is 
          * ((filesize)/(bytes per frame))*(time per frame) 
          */
-        filetime = entry->filesize/bpf*tpf;
+        filetime = entry->filesize/info.frame_size*info.frame_time;
     }
 
+    entry->tpf = info.frame_time;
+    entry->bpf = info.frame_size;
+    
+    entry->vbr = info.is_vbr;
+    entry->has_toc = info.has_toc;
+    memcpy(entry->toc, info.toc, sizeof(info.toc));
+
+    entry->xing_header_pos = info.xing_header_pos;
+    
     /* Update the seek point for the first playable frame */
     entry->first_frame_offset = bytecount;
     DEBUGF("First frame is at %x\n", entry->first_frame_offset);
 
     return filetime;
 }
-
 
 /*
  * Checks all relevant information (such as ID3v1 tag, ID3v2 tag, length etc)
@@ -750,6 +525,10 @@ bool mp3info(struct mp3entry *entry, char *filename)
         setid3v2title(fd, entry);
     entry->length = getsonglength(fd, entry);
 
+    /* Subtract the meta information from the file size to get
+       the true size of the MP3 stream */
+    entry->filesize -= entry->first_frame_offset;
+    
     /* only seek to end of file if no id3v2 tags were found */
     if (!entry->id3v2len) {
         if(!entry->title)
