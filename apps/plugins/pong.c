@@ -31,6 +31,8 @@
 
 #define RES 100
 
+#define MOVE_STEP 2 /* move pad this many steps up/down each move */
+
 static struct plugin_api* rb;
 
 struct pong {
@@ -54,7 +56,7 @@ void singlepad(int x, int y, int set)
 
 void pad(struct pong *p, int pad)
 {
-    static int xpos[2]={0, 112-PAD_WIDTH};
+    static int xpos[2]={0, LCD_WIDTH-PAD_WIDTH};
 
     /* clear existing pad */
     singlepad(xpos[pad], p->e_pad[pad], 0);
@@ -72,7 +74,7 @@ bool wallcollide(struct pong *p, int pad)
        the wall */
     if(pad) {
         /* right-side */
-        if(p->ballx > 112*RES)
+        if(p->ballx > LCD_WIDTH*RES)
             return true;
     }
     else {
@@ -107,7 +109,7 @@ bool padcollide(struct pong *p, int pad, int *info)
 
         if(pad) {
             /* right-side */
-            if((x + BALL_WIDTH) > (112 - PAD_WIDTH))
+            if((x + BALL_WIDTH) > (LCD_WIDTH - PAD_WIDTH))
                 return true; /* phump */
         }
         else {
@@ -162,7 +164,7 @@ void score(struct pong *p, int pad)
 
     /* then move the X-speed of the ball and give it a random Y position */
     p->ballspeedx = -p->ballspeedx;
-    p->bally = rb->rand()%(64-BALL_HEIGTH);
+    p->bally = rb->rand()%(LCD_HEIGHT-BALL_HEIGTH);
 
     /* restore Y-speed to default */
     p->ballspeedy = (p->ballspeedy > 0) ? SPEEDY : -SPEEDY;
@@ -191,10 +193,10 @@ void ball(struct pong *p)
     newy = p->bally/RES;
 
     /* detect if ball hits a wall */
-    if(newy + BALL_HEIGTH > 64) {
+    if(newy + BALL_HEIGTH > LCD_HEIGHT) {
         /* hit floor, bounce */
         p->ballspeedy = -p->ballspeedy;
-        newy = 64 - BALL_HEIGTH;
+        newy = LCD_HEIGHT - BALL_HEIGTH;
         p->bally = newy * RES;
     }
     else if(newy < 0) {
@@ -224,8 +226,8 @@ void ball(struct pong *p)
 void padmove(int *pos, int dir)
 {
     *pos += dir;
-    if(*pos > (64-PAD_HEIGHT))
-        *pos = (64-PAD_HEIGHT);
+    if(*pos > (LCD_HEIGHT-PAD_HEIGHT))
+        *pos = (LCD_HEIGHT-PAD_HEIGHT);
     else if(*pos < 0)
         *pos = 0;
 }
@@ -245,16 +247,16 @@ bool keys(struct pong *p)
             return false; /* exit game NOW */
 
         if(key & BUTTON_LEFT) /* player left goes down */
-            padmove(&p->w_pad[0], 1);
+            padmove(&p->w_pad[0], MOVE_STEP);
 
         if(key & BUTTON_F1)   /* player left goes up */
-            padmove(&p->w_pad[0], -1);
+            padmove(&p->w_pad[0], - MOVE_STEP);
 
         if(key & BUTTON_RIGHT) /* player right goes down */
-            padmove(&p->w_pad[1], 1);
+            padmove(&p->w_pad[1], MOVE_STEP);
 
         if(key & BUTTON_F3)   /* player right goes up */
-            padmove(&p->w_pad[1], -1);
+            padmove(&p->w_pad[1], -MOVE_STEP);
     }
     return true; /* return false to exit game */
 }
@@ -263,7 +265,7 @@ void showscore(struct pong *p)
 {
     static char buffer[20];
 
-    rb->snprintf(buffer, 20, "%d - %d", p->score[0], p->score[1]);
+    rb->snprintf(buffer, sizeof(buffer), "%d - %d", p->score[0], p->score[1]);
     rb->lcd_puts(4, 0, buffer);
 }
 
