@@ -65,9 +65,7 @@ void init(void)
 {
     init_threads();
     lcd_init();
-#ifndef HAVE_LCD_CHARCELLS
-     font_init();
-#endif
+    font_init();
     show_logo();
     settings_reset();
     settings_load();
