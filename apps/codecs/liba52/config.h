@@ -18,4 +18,6 @@
 
 /* Used in bitstream.h */
 
+#ifndef SIMULATOR
 #define WORDS_BIGENDIAN 1
+#endif
