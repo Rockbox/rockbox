@@ -24,8 +24,12 @@ The screen lines contain the following information:
 <tr><th> Key </th><th> Function </th></tr>
 <tr><td> UP</td><td> Increase volume </td></tr>
 <tr><td> DOWN </td><td>  Decrease volume </td></tr>
-<tr><td> LEFT </td><td>  Move to previous song</td></tr>
-<tr><td> RIGHT </td><td> Move to next song </td></tr>
+
+<tr><td> LEFT </td><td> Quick press: moves to the beginning of the song, or if
+pressed while in the beginning of a song it moves to the previous
+song. Keep the button pressed to rewind the song. </td></tr>
+
+<tr><td> RIGHT </td><td> Quick press: moves to next song. Keep the button pressed to fast-forward the song. </td></tr>
 <tr><td> PLAY </td><td> Toggle PAUSE/PLAY. If 'resume' is enabled, pressing PAUSE will make it store a "resume point" where it can start again from later. </td></tr>
 <tr><td>ON</td><td> Switch to the <a href="rec-dir.html">dir browser</a> </td></tr>
 <tr><td>OFF</td><td> Stop playback </td></tr>
