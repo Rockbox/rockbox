@@ -35,6 +35,7 @@
 #include "thread.h"
 #include "powermgmt.h"
 #include "system.h"
+#include "font.h"
 
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
@@ -125,6 +126,40 @@ bool dbg_os(void)
             break;
         }
     }
+    return false;
+}
+#endif
+
+#ifdef HAVE_LCD_BITMAP
+bool dbg_hw_info(void)
+{
+    char buf[32];
+    int button;
+    int usb_polarity;
+    int rom_version = *(unsigned short*)0x20000fe;
+
+    if(PADR & 0x400)
+        usb_polarity = 1;
+    else
+        usb_polarity = 0;
+
+    lcd_setmargins(0, 0);
+    lcd_setfont(FONT_SYSFIXED);
+    lcd_clear_display();
+
+    snprintf(buf, 32, "ROM: %d.%02d", rom_version/100, rom_version%100);
+    lcd_puts(0, 1, buf);
+    
+    snprintf(buf, 32, "USB: %s", usb_polarity?"positive":"negative");
+    lcd_puts(0, 2, buf);
+    
+    snprintf(buf, 32, "ATA: 0x%x", ata_io_address);
+    lcd_puts(0, 3, buf);
+    
+    lcd_update();
+    
+    button = button_get(true);
+
     return false;
 }
 #endif
@@ -776,6 +811,7 @@ bool debug_menu(void)
 #endif
 #ifdef HAVE_LCD_BITMAP
         { "View battery", view_battery },
+        { "View HW info", dbg_hw_info },
 #endif
     };
 
