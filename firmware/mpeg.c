@@ -735,17 +735,20 @@ static void mpeg_thread(void)
                 if ( num_tracks_in_memory() > 1 ) {
                     int track_offset = (tag_read_idx+1) & MAX_ID3_TAGS_MASK;
                     mp3buf_read = id3tags[track_offset]->mempos;
-                    playing = true;
-                    last_dma_tick = current_tick;
                     init_dma();
-                    start_dma();
-                    track_change();
+                    last_dma_tick = current_tick;
 
                     /* should we start reading more data? */
                     if(!filling && (get_unplayed_space() < MPEG_LOW_WATER)) {
                         filling = true;
                         queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+                        play_pending = true;
+                    } else {
+                        playing = true;
+                        start_dma();
                     }
+                    
+                    track_change();
                 }
                 else {
                     reset_mp3_buffer();
