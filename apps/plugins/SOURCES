@@ -65,3 +65,7 @@ nim.c
 /* not for Ondio, has no remote control pin */
 alpine_cdc.c
 #endif
+
+#if SOFTWARECODECS == yes
+mpa2wav.c
+#endif

@@ -16,6 +16,10 @@ ifdef APPEXTRA
    INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
 endif
 
+ifdef SOFTWARECODECS
+   CODECLIBS = -lmad
+endif
+
 LDS := plugin.lds
 LINKFILE := $(OBJDIR)/pluginlink.lds
 DEPFILE = $(OBJDIR)/dep-plugins
@@ -32,7 +36,7 @@ all: $(OBJDIR)/libplugin.a $(ROCKS) $(DEPFILE)
 
 $(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKFILE) $(OBJDIR)/libplugin.a
 	@echo "LD $@"
-	@$(CC) $(GCCOPTS) -O -nostdlib -o $@ $< -L$(OBJDIR) -lplugin -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/$*.map
+	@$(CC) $(GCCOPTS) -O -nostdlib -o $@ $< -L$(OBJDIR) $(CODECLIBS) -lplugin -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/$*.map
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.elf
 	@echo "OBJCOPY $<"
