@@ -87,7 +87,6 @@ static unsigned char curr_hd[3]; /* current frame header, for re-sync */
 static int filehandle; /* global, so the MMC variant can keep the file open */
 static unsigned char* p_silence; /* VOICE_PAUSE clip, used for termination */
 static int silence_len; /* length of the VOICE_PAUSE clip */
-static bool silence_add; /* flag if trailing silence shall be added */
 static unsigned char* p_lastclip; /* address of latest clip, for silence add */
 
 
@@ -201,27 +200,29 @@ static void mp3_callback(unsigned char** start, int* size)
     }
     else if (sent > 0) /* go to next entry */
     {
-        queue_read++;
-        if (queue_read >= QUEUE_SIZE)
-            queue_read = 0;
+        queue_read = (queue_read + 1) & QUEUE_MASK;
     }
+
+re_check:
 
     if (QUEUE_LEVEL) /* queue is not empty? */
     {   /* start next clip */
         sent = MIN(queue[queue_read].len, 0xFFFF);
         *start = p_lastclip = queue[queue_read].buf;
         *size = sent;
-        curr_hd[0] = (*start)[1];
-        curr_hd[1] = (*start)[2];
-        curr_hd[2] = (*start)[3];
+        curr_hd[0] = p_lastclip[1];
+        curr_hd[1] = p_lastclip[2];
+        curr_hd[2] = p_lastclip[3];
     }
-    else if (silence_add && p_silence != NULL /* want and can add silence */
-          && p_lastclip < p_thumbnail) /* and wasn't playing thumbnail file */
+    else if (p_silence != NULL            /* silence clip available */
+             && p_lastclip != p_silence   /* previous clip wasn't silence */
+             && p_lastclip < p_thumbnail) /* ..and not a thumbnail */
     {   /* add silence clip when queue runs empty playing a voice clip */
-        silence_add = false; /* do this only once */
-        sent = 0; /* not part of "official" data from queue */
-        *start = p_silence;
-        *size = silence_len;
+        queue[queue_write].buf = p_silence;
+        queue[queue_write].len = silence_len;
+        queue_write = (queue_write + 1) & QUEUE_MASK;
+
+        goto re_check;
     }
     else
     {
@@ -271,9 +272,7 @@ static int shutup(void)
         {   /* play old data until the frame end, to keep the MAS in sync */
             sent = search-pos;
 
-            queue_write = queue_read + 1; /* will be empty after next callback */
-            if (queue_write >= QUEUE_SIZE)
-                queue_write = 0;
+            queue_write = (queue_read + 1) & QUEUE_MASK; /* will be empty after next callback */
             queue[queue_read].len = sent; /* current one ends after this */
 
             DTCR3 = sent; /* let the DMA finish this frame */
@@ -310,15 +309,11 @@ static int queue_clip(unsigned char* buf, int size, bool enqueue)
     {
         queue[queue_write].buf = buf; /* populate an entry */
         queue[queue_write].len = size;
-    
-        queue_write++; /* increase queue */
-        if (queue_write >= QUEUE_SIZE)
-            queue_write = 0;
+        queue_write = (queue_write + 1) & QUEUE_MASK;
     }
         
     if (queue_level == 0)
     {   /* queue was empty, we have to do the initial start */
-        silence_add = true;
         p_lastclip = buf;
         sent = MIN(size, 0xFFFF); /* DMA can do no more */
         mp3_play_data(buf, sent, mp3_callback);
