@@ -1,5 +1,7 @@
 #define _PAGE_ Rockbox WPS
 #include "head.t"
+#include "manual.t"
+
 <p>
 The While Playing Screen shows info about what is currently played and can
 only be seen while there is actual music playback.
@@ -7,6 +9,8 @@ only be seen while there is actual music playback.
 [screen dump]
 <p>
 [explain screen info]
+<p>
+Buttons:
 <p>
 <table>
 <tr><td>

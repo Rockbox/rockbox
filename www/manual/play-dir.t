@@ -1,5 +1,6 @@
 #define _PAGE_ Rockbox Directory Browser
 #include "head.t"
+#include "manual.t"
 <p>
 In the dir browser, you will see the files and directories that are put in the
 directory you are currently browsing.
