@@ -18,17 +18,36 @@
  ****************************************************************************/
 
 #include <windows.h>
-#include "uisw32.h"
-#include "kernel.h"
 #include "thread-win32.h"
 
-void sleep(int ticks)
+HANDLE              lpThreads[256];
+int                 nThreads = 0,
+                    nPos = 0;
+
+
+DWORD WINAPI runthread (LPVOID lpParameter)
 {
-    Sleep (1000 / HZ * ticks);
+    ((void(*)())lpParameter) ();
+    return 0;
 }
 
-
-void yield (void)
+int create_thread(void* fp, void* sp, int stk_size)
 {
-    PostThreadMessage (GetWindowThreadProcessId (hGUIWnd,NULL), TM_YIELD, 0, 0);
+    DWORD dwThreadID;
+
+    if (nThreads == 256)
+        return -1;
+
+    lpThreads[nThreads++] = CreateThread (NULL,
+        0,
+        runthread,
+        fp,
+        0,
+        &dwThreadID);
+
+    return 0;
+}
+
+void init_threads(void)
+{
 }

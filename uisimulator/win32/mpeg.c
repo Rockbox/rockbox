@@ -20,6 +20,8 @@
 /* This file is for emulating some of the mpeg controlling functions of 
    the target */
 
+#include "debug.h"
+
 void mpeg_volume(void)
 {
 }
@@ -35,3 +37,12 @@ void mpeg_treble(void)
 void mpeg_stop(void)
 {
 }
+
+#ifndef MPEGPLAY
+void mpeg_play(char *tune)
+{
+  DEBUGF("We instruct the MPEG thread to play %s for us\n",
+         tune);
+}
+
+#endif

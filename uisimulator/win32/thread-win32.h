@@ -17,18 +17,6 @@
  *
  ****************************************************************************/
 
-#include <windows.h>
-#include "uisw32.h"
-#include "kernel.h"
-#include "thread-win32.h"
-
-void sleep(int ticks)
-{
-    Sleep (1000 / HZ * ticks);
-}
-
-
-void yield (void)
-{
-    PostThreadMessage (GetWindowThreadProcessId (hGUIWnd,NULL), TM_YIELD, 0, 0);
-}
+extern HANDLE               lpThreads[256];
+extern int                  nPos,
+                            nThreads;

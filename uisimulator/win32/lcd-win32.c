@@ -40,13 +40,6 @@ BITMAPINFO2 bmi =
 }; // bitmap information
 
 
-// lcd_init
-// init lcd controler
-void lcd_init()
-{
-    lcd_clear_display ();
-}
-
 // lcd_update
 // update lcd
 void lcd_update()

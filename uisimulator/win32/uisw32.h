@@ -32,6 +32,8 @@
 #define UI_LCD_POSX                 59 // x position of lcd
 #define UI_LCD_POSY                 95 // y position of lcd
 
+#define TM_YIELD                    WM_USER + 101 // thread message for yield
+
 extern HWND                         hGUIWnd; // the GUI window handle
 extern unsigned int                 uThreadID; // id of mod thread
 extern bool                         bActive;

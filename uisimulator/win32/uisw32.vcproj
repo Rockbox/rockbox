@@ -182,7 +182,10 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\firmware\playlist.c">
+				RelativePath="..\..\apps\playlist.c">
+			</File>
+			<File
+				RelativePath="..\..\apps\recorder\screensaver.c">
 			</File>
 			<File
 				RelativePath="..\..\firmware\settings.c">
@@ -192,6 +195,12 @@
 			</File>
 			<File
 				RelativePath="..\..\firmware\common\sprintf.c">
+			</File>
+			<File
+				RelativePath="..\..\apps\recorder\tetris.c">
+			</File>
+			<File
+				RelativePath="thread-win32.c">
 			</File>
 			<File
 				RelativePath="..\..\apps\tree.c">
@@ -220,6 +229,9 @@
 			</File>
 			<File
 				RelativePath="..\screensaver.h">
+			</File>
+			<File
+				RelativePath="thread-win32.h">
 			</File>
 			<File
 				RelativePath="..\tree.h">

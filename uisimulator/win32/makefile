@@ -27,11 +27,11 @@ APPDIR = ../../apps/
 RECDIR = $(APPDIR)recorder/
 RM = del
 
-#DISPLAY = -DHAVE_LCD_CHARCELLS
-DISPLAY = -DHAVE_LCD_BITMAP
+DISPLAY = -DHAVE_LCD_CHARCELLS
+#DISPLAY = -DHAVE_LCD_BITMAP
 
-#KEYPAD = -DHAVE_PLAYER_KEYPAD
-KEYPAD = -DHAVE_RECORDER_KEYPAD
+KEYPAD = -DHAVE_PLAYER_KEYPAD
+#KEYPAD = -DHAVE_RECORDER_KEYPAD
 
 CC = cl
 DEFINES = -DWIN32 -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR	\
@@ -46,7 +46,7 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) /MD /Fd"Release/vc70.pdb"
 SRCS = lcd-win32.c uisw32.c lcd.c button.c tree.c main.c \
   chartables.c kernel.c uisw32.res dir-win32.c main_menu.c \
   play.c debug-win32.c menu.c credits.c sound_menu.c mpeg.c \
-  id3.c settings.c sprintf.c
+  id3.c settings.c sprintf.c thread-win32.c playlist.c
 
 !IF ("$(DISPLAY)" == "-DHAVE_LCD_BITMAP")
 SRCS = $(SRCS) tetris.c screensaver.c icons.c bmp.c
@@ -104,6 +104,9 @@ settings.obj: $(FIRMWAREDIR)/settings.c
 
 sprintf.obj: $(FIRMWAREDIR)/common/sprintf.c
  $(CC) $(CFLAGS) -c $(FIRMWAREDIR)/common/sprintf.c -osprintf.obj
+
+playlist.obj: ../../apps/playlist.c
+ $(CC) $(CFLAGS) -c ../../apps/playlist.c -oplaylist.obj
 
 clean:
  $(RM) *.obj

@@ -22,6 +22,8 @@
 #include "uisw32.h"
 #include "resource.h"
 #include "button.h"
+#include "thread.h"
+#include "thread-win32.h"
 
 // extern functions
 extern void                 app_main (void *); // mod entry point
@@ -32,6 +34,7 @@ HWND                                hGUIWnd; // the GUI window handle
 unsigned int                        uThreadID; // id of mod thread
 PBYTE                               lpKeys;
 bool                                bActive; // window active?
+HANDLE                              hGUIThread; // thread for GUI
 
 // GUIWndProc
 // window proc for GUI simulator
@@ -186,6 +189,11 @@ LRESULT GUIWndProc (
         hGUIWnd = NULL;
         PostQuitMessage (0);
         break;
+    case WM_DESTROY:
+        // close simulator
+        hGUIWnd = NULL;
+        PostQuitMessage (0);
+        break;
     }
 
     return DefWindowProc (hWnd, uMsg, wParam, lParam);
@@ -229,8 +237,16 @@ BOOL GUIStartup ()
 // destroy window, unregister window class
 int GUIDown ()
 {
+    int i;
+
     DestroyWindow (hGUIWnd);
-    _endthreadex (uThreadID);
+    CloseHandle (hGUIThread);
+    for (i = 0; i < nThreads; i++)
+    {
+        ResumeThread (lpThreads[i]);
+        WaitForSingleObject (lpThreads[i], 1);
+        CloseHandle (lpThreads[i]);
+    }
     return 0;
 }
 
@@ -239,10 +255,17 @@ int GUIDown ()
 void GUIMessageLoop ()
 {
     MSG msg;
-    while (GetMessage (&msg, hGUIWnd, 0, 0) && hGUIWnd != NULL)
+    while (GetMessage (&msg, NULL, 0, 0))
     {
         TranslateMessage (&msg);
         DispatchMessage (&msg);
+        if (msg.message == TM_YIELD)
+        {
+            SuspendThread (lpThreads[nPos]);
+            if (++nPos >= nThreads)
+                nPos = 0;
+            ResumeThread (lpThreads[nPos]);
+        }
     }
 }
 
@@ -256,12 +279,15 @@ int WINAPI WinMain (
                     int nShowCmd // show command
                     )
 {
+    DWORD           dwThreadID;
     if (!GUIStartup ())
         return 0;
 
-    uThreadID = _beginthread (app_main, 0, NULL);
-    if (uThreadID == -0L)
-        return MessageBox (NULL, "Error creating mod thread!", "Error", MB_OK);
+    hGUIThread = CreateThread (NULL, 0, (LPTHREAD_START_ROUTINE)app_main,
+        NULL, 0, &dwThreadID);
+
+    if (hGUIThread == NULL)
+        return MessageBox (NULL, "Error creating gui thread!", "Error", MB_OK);
 
     GUIMessageLoop ();
 
