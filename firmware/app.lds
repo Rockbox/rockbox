@@ -146,11 +146,11 @@ SECTIONS
 
     /* TRICK ALERT! We want 0x2000 bytes of stack, but we set the section
        size smaller, and allow the stack to grow into the .iram copy */
-    .stack ADDR(.data)+SIZEOF(.data) + SIZEOF(.iram):
+    .stack ADDR(.data) + SIZEOF(.data) + SIZEOF(.iram):
     {
        *(.stack)
-       _stackbegin = .;
-       . += 0x2000-SIZEOF(.iram);
+       _stackbegin = . - SIZEOF(.iram);
+       . += 0x2000 - SIZEOF(.iram);
        _stackend = .;
     } > DRAM
 
