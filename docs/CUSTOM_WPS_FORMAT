@@ -20,18 +20,22 @@ folder, it'll be remembered and used for subsequent restarts.
 
 Tags
 ----
+(Options marked (*) have been added after the last official release, and are
+thus only available in daily builds.)
+
 ID3 Info Tags:
   %ia : ID3 Artist
   %id : ID3 Album Name
-  %ig : ID3 Genre Name
+  %ig : ID3 Genre Name (*)
   %in : ID3 Track Number
   %it : ID3 Track Title
   %iy : ID3 Year
+  %iv : ID3 Version (1.1, 2.2, 2.3, 2.4 or empty if no id3 tag) (*)
 
 
 Battery Info:
-  %bl : Show numeric battery level
-  %bt : Show estimated battery time left
+  %bl : Show numeric battery level in percent (*)
+  %bt : Show estimated battery time left (*)
 
 File Info Tags:
   %fb : File Bitrate (in kbps)
@@ -78,8 +82,8 @@ Other Tags:
   %|  : Display a '|'
   %>  : Display a '>'
   %s  : Indicate that the line should scroll. Can occur anywhere in 
-        a line (given that the text is displayed; see conditional 
-        below). You can specify up to 10 scrolling lines.
+        a line (given that the text is displayed; see conditionals
+        above). You can specify up to 10 scrolling lines (*).
         %s is ignored if combined with %pb, %pc or %pr on the same
         line (the result wouldn't be good anyway).
 
