@@ -243,6 +243,35 @@ Menu playback_settings_menu(void)
     return result;
 }
 
+Menu load_default_config(void)
+{
+    int button = 0;
+
+    lcd_clear_display();
+#ifdef HAVE_LCD_CHARCELLS
+    lcd_puts(0,0,"Really?");
+    lcd_puts(0,1,"Play/Stop");
+#else
+    lcd_puts(0,0,"Are you sure?");
+    lcd_puts(0,1,"Play = Yes");
+    lcd_puts(0,2,"Any Other = No");
+#endif
+    button = button_get(true);
+    if (button == BUTTON_PLAY) {
+        settings_reset();
+        lcd_clear_display();
+        lcd_puts(0,0,"Settings");
+        lcd_puts(0,1,"Cleared");
+        sleep(HZ);
+        return(true);
+    } else {
+        lcd_clear_display();
+        lcd_puts(0,0,"Canceled");
+        sleep(HZ);
+        return(false);
+    }
+}
+
 Menu fileview_settings_menu(void)
 {
     int m;
@@ -290,6 +319,7 @@ Menu system_settings_menu(void)
 #ifdef HAVE_RTC
         { "Time/Date",       timedate_set    },
 #endif
+        { "Load Default Config", load_default_config },
     };
     
     m=menu_init( items, sizeof items / sizeof(struct menu_items) );
