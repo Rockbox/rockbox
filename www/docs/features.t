@@ -26,7 +26,7 @@
 <th>Feature</th>
 <th>Rockbox</th>
 <th>Archos</th>
-<th>iRiver</th>
+<th>iRiver h1x0</th>
 </tr>
 
 NAME ID3v1 and ID3v2 support ENAME
