@@ -63,9 +63,10 @@ char* credits[] = {
 
 void roll_credits(void)
 {
-    unsigned int i;
+    int i;
     int j;
     int line = 0;
+    int numnames = sizeof(credits)/sizeof(char*);
 
     lcd_clear_display();
 
@@ -73,6 +74,28 @@ void roll_credits(void)
     lcd_setmargins(0,8);
 #endif
 
+    for ( i=0; i < numnames; i += MAX_LINES )
+    {
+        lcd_clear_display();
+#ifdef HAVE_LCD_BITMAP
+        lcd_putsxy(0, 0, " [Credits]",0);
+#endif
+        for(line = 0;line < MAX_LINES && line+i < numnames;line++)
+        {
+            lcd_puts(0, line, credits[line+i]);
+        }
+
+        lcd_update();
+
+        /* abort on keypress */
+        for ( j=0;j<10;j++ )
+        {
+            sleep(DISPLAY_TIME/10);
+            if (button_get(false))
+                return;
+        }
+    }
+    return;
     for ( i=0; i<sizeof(credits)/sizeof(char*); i++ ) {
 #ifdef HAVE_LCD_BITMAP
         lcd_putsxy(0, 0, " [Credits]",0);
