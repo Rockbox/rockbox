@@ -166,7 +166,7 @@ struct user_settings
     int max_files_in_dir; /* Max entries in directory (file browser) */
     int max_files_in_playlist; /* Max entries in playlist */
     bool show_icons;   /* 0=hide 1=show */
-    bool recursive_dir_insert;/* should directories be inserted recursively */
+    int recursive_dir_insert; /* should directories be inserted recursively */
 };
 
 enum optiontype { INT, BOOL };
@@ -222,5 +222,8 @@ enum { REPEAT_OFF, REPEAT_ALL, REPEAT_ONE, NUM_REPEAT_MODES };
 
 /* dir filter options */
 enum { SHOW_ALL, SHOW_SUPPORTED, SHOW_MUSIC, SHOW_PLAYLIST, NUM_FILTER_MODES };
+
+/* recursive dir insert options */
+enum { RECURSE_OFF, RECURSE_ON, RECURSE_ASK };
 
 #endif /* __SETTINGS_H__ */

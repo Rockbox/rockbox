@@ -49,8 +49,13 @@ static bool save_playlist(void)
 
 static bool recurse_directory(void)
 {
-    return (set_bool( str(LANG_RECURSE_DIRECTORY),
-                        &global_settings.recursive_dir_insert));
+    char* names[] = { str(LANG_OFF), 
+                      str(LANG_ON),
+                      str(LANG_RESUME_SETTING_ASK) };
+
+    return set_option( str(LANG_RECURSE_DIRECTORY),
+                       &global_settings.recursive_dir_insert, INT, names, 3,
+                       NULL );
 }
 
 bool playlist_menu(void)

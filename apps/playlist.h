@@ -51,7 +51,8 @@ int playlist_create(char *dir, char *file);
 int playlist_resume(void);
 int playlist_add(char *filename);
 int playlist_insert_track(char *filename, int position, bool queue);
-int playlist_insert_directory(char *dirname, int position, bool queue);
+int playlist_insert_directory(char *dirname, int position, bool queue,
+                              bool recurse);
 int playlist_insert_playlist(char *filename, int position, bool queue);
 int playlist_delete(int index);
 int playlist_shuffle(int random_seed, int start_index);

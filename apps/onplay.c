@@ -62,7 +62,45 @@ static bool add_to_playlist(int position, bool queue)
     if (selected_file_attr & TREE_ATTR_MPA)
         playlist_insert_track(selected_file, position, queue);
     else if (selected_file_attr & ATTR_DIRECTORY)
-        playlist_insert_directory(selected_file, position, queue);
+    {
+        bool recurse = false;
+
+        if (global_settings.recursive_dir_insert != RECURSE_ASK)
+            recurse = (bool)global_settings.recursive_dir_insert;
+        else
+        {
+            /* Ask if user wants to recurse directory */
+            bool exit = false;
+            
+            lcd_clear_display();
+            lcd_puts_scroll(0,0,str(LANG_RECURSE_DIRECTORY_QUESTION));
+            lcd_puts_scroll(0,1,selected_file);
+            
+#ifdef HAVE_LCD_BITMAP
+            lcd_puts(0,3,str(LANG_CONFIRM_WITH_PLAY_RECORDER));
+            lcd_puts(0,4,str(LANG_CANCEL_WITH_ANY_RECORDER)); 
+#endif
+            
+            lcd_update();
+            
+            while (!exit) {
+                int btn = button_get(true);
+                switch (btn) {
+                case BUTTON_PLAY:
+                    recurse = true;
+                    exit = true;
+                    break;
+                default:
+                    /* ignore button releases */
+                    if (!(btn & BUTTON_REL))
+                        exit = true;
+                    break;
+                }
+            }
+        }
+
+        playlist_insert_directory(selected_file, position, queue, recurse);
+    }
     else if (selected_file_attr & TREE_ATTR_M3U)
         playlist_insert_playlist(selected_file, position, queue);
 

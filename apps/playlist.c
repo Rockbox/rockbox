@@ -131,7 +131,7 @@ static int add_indices_to_playlist(void);
 static int add_track_to_playlist(char *filename, int position, bool queue,
                                  int seek_pos);
 static int add_directory_to_playlist(char *dirname, int *position, bool queue,
-                                     int *count);
+                                     int *count, bool recurse);
 static int remove_track_from_playlist(int position, bool write);
 static int randomise_playlist(unsigned int seed, bool start_current,
                               bool write);
@@ -402,7 +402,7 @@ static int add_track_to_playlist(char *filename, int position, bool queue,
  * Insert directory into playlist.  May be called recursively.
  */
 static int add_directory_to_playlist(char *dirname, int *position, bool queue,
-                                     int *count)
+                                     int *count, bool recurse)
 {
     char buf[MAX_PATH+1];
     char *count_str;
@@ -446,12 +446,12 @@ static int add_directory_to_playlist(char *dirname, int *position, bool queue,
 
         if (files[i].attr & ATTR_DIRECTORY)
         {
-            if (global_settings.recursive_dir_insert)
+            if (recurse)
             {
                 /* recursively add directories */
                 snprintf(buf, sizeof(buf), "%s/%s", dirname, files[i].name);
                 result = add_directory_to_playlist(buf, position, queue,
-                    count);
+                    count, recurse);
                 if (result < 0)
                     break;
 
@@ -1385,7 +1385,8 @@ int playlist_insert_track(char *filename, int position, bool queue)
 /*
  * Insert all tracks from specified directory into playlist.
  */
-int playlist_insert_directory(char *dirname, int position, bool queue)
+int playlist_insert_directory(char *dirname, int position, bool queue,
+                              bool recurse)
 {
     int count = 0;
     int result;
@@ -1398,7 +1399,8 @@ int playlist_insert_directory(char *dirname, int position, bool queue)
 
     display_playlist_count(count, count_str);
 
-    result = add_directory_to_playlist(dirname, &position, queue, &count);
+    result = add_directory_to_playlist(dirname, &position, queue, &count,
+        recurse);
     fsync(playlist.control_fd);
 
     display_playlist_count(count, count_str);

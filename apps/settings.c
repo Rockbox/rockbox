@@ -351,7 +351,7 @@ int settings_save( void )
     config_block[0x1b] = (unsigned char)
         (((global_settings.browse_current & 1)) |
          ((global_settings.play_selected & 1) << 1) |
-         ((global_settings.recursive_dir_insert & 1) << 2));
+         ((global_settings.recursive_dir_insert & 3) << 2));
     
     config_block[0x1c] = (unsigned char)global_settings.peak_meter_hold |
         (global_settings.rec_editable?0x80:0);
@@ -646,7 +646,7 @@ void settings_load(void)
             global_settings.browse_current = (config_block[0x1b]) & 1;
             global_settings.play_selected = (config_block[0x1b] >> 1) & 1;
             global_settings.recursive_dir_insert =
-                (config_block[0x1b] >> 2) & 1;
+                (config_block[0x1b] >> 2) & 3;
         }
 
         if (config_block[0x1c] != 0xFF) {
@@ -1079,8 +1079,11 @@ bool settings_load_config(char* file)
         else if (!strcasecmp(name, "max files in playlist"))
             set_cfg_int(&global_settings.max_files_in_playlist, value,
                         1000, 20000);
-        else if (!strcasecmp(name, "recursive directory insert"))
-            set_cfg_bool(&global_settings.recursive_dir_insert, value);
+        else if (!strcasecmp(name, "recursive directory insert")) {
+            static char* options[] = {"off", "on", "ask"};
+            set_cfg_option(&global_settings.recursive_dir_insert, value,
+                options, 3);
+        }
     }
 
     close(fd);
@@ -1369,8 +1372,11 @@ bool settings_save_config(void)
     fprintf(fd, "max files in playlist: %d\r\n",
             global_settings.max_files_in_playlist);
     
-    fprintf(fd, "recursive directory insert: %s\r\n",
-            boolopt[global_settings.recursive_dir_insert]);
+    {
+        static char* options[] = {"off", "on", "ask"};
+        fprintf(fd, "recursive directory insert: %s\r\n",
+                options[global_settings.recursive_dir_insert]);
+    }
 
     close(fd);
 
@@ -1459,7 +1465,7 @@ void settings_reset(void) {
     global_settings.max_files_in_dir = 400;
     global_settings.max_files_in_playlist = 10000;
     global_settings.show_icons = true;
-    global_settings.recursive_dir_insert = false;
+    global_settings.recursive_dir_insert = RECURSE_OFF;
 }
 
 bool set_bool(char* string, bool* variable )

@@ -1650,12 +1650,12 @@ new:
 
 id: LANG_QUEUE_FIRST
 desc: in onplay menu.  queue a track/playlist into dynamic playlist.
-eng: "Queue first"
+eng: "Queue next"
 new:
 
 id: LANG_INSERT_FIRST
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
-eng: "Insert first"
+eng: "Insert next"
 new:
 
 id: LANG_SAVE_DYNAMIC_PLAYLIST
@@ -1721,4 +1721,9 @@ new:
 id: LANG_RECURSE_DIRECTORY
 desc: In playlist menu
 eng: "Recursively Insert Directories"
+new:
+
+id: LANG_RECURSE_DIRECTORY_QUESTION
+desc: Asked from onplay screen
+eng: "Recursively?"
 new:
