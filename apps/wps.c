@@ -43,13 +43,10 @@ void wps_show_play(char* filename)
     mp3entry  mp3;
     mp3info(&mp3,filename);
 
-    lcd_clear_display();
-
-    switch (global_settings.wps_display)
-    {
+    switch ( global_settings.wps_display ) {
         case PLAY_DISPLAY_TRACK_TITLE:
         {
-            int ch = '/';
+            char ch = '/';
             char* end;
             char* szTok;
             char* szDelimit;
@@ -72,7 +69,7 @@ void wps_show_play(char* filename)
         }
         case PLAY_DISPLAY_FILENAME_SCROLL:
         {
-            int ch = '/';
+            char ch = '/';
             char* szLast = strrchr(filename, ch);
 
             if (szLast)
@@ -110,15 +107,13 @@ void wps_show_play(char* filename)
         }
 
     }
-
-    lcd_update();
 }
 
 /* experimental idea still being sorted out, but want it in the the code tree still so that important playlist info is not forgotten. */
 #if 0
 void wps_show_playlist(char* current, playlist_info_t *list)
 {
-    int ch       = '/';
+    char ch       = '/';
     char* szLast = strrchr(current, ch);
     char buf[16];
     
