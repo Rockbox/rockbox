@@ -89,7 +89,7 @@ int static showdir(char *path, struct entry *buffer, int start,
 
     buffer[i].file = !(entry->attribute&ATTR_DIRECTORY);
 
-    buffer[i].file?(icon_type=FileIcon):(icon_type=DirIcon);
+    buffer[i].file?(icon_type=File):(icon_type=Folder);
     lcd_bitmap(bitmap_icons_6x8[icon_type], 6, LINE_Y+i*LINE_HEIGTH, 6, 
                8, TRUE);
 
