@@ -47,6 +47,8 @@
 #define BE32(_x_) _x_
 #endif
 
+#define ID3DB_VERSION 1
+
 static int fd;
 
 static int
@@ -54,12 +56,13 @@ static int
     songcount, albumcount, artistcount,
     songlen, songarraylen,
     albumlen, albumarraylen,
-    artistlen;
+    artistlen, initialized = 0;
 
 int db_init(void)
 {
     unsigned int version;
     unsigned int buf[12];
+    unsigned char* ptr = (char*)buf;
     
     fd = open(ROCKBOX_DIR "/rockbox.id3db", O_RDONLY);
     if (fd < 0) {
@@ -68,7 +71,20 @@ int db_init(void)
     }
     read(fd, buf, 48);
 
+    if (ptr[0] != 'R' ||
+        ptr[1] != 'D' ||
+        ptr[2] != 'B')
+    {
+        DEBUGF("File is not a rockbox id3 database, aborting\n");
+        return -1;
+    }
+    
     version = BE32(buf[0]) & 0xff;
+    if (version != ID3DB_VERSION)
+    {
+        DEBUGF("Unsupported database version %d, aborting.\n");
+        return -1;
+    }
     DEBUGF("Version: RDB%d\n", version);
 
     songstart = BE32(buf[1]);
@@ -93,7 +109,15 @@ int db_init(void)
     DEBUGF("Number of artists: %d\n", artistcount);
     DEBUGF("Artiststart: %x\n", artiststart);
     DEBUGF("Artistlen: %d\n", artistlen);
-    
+
+    if (songstart > albumstart ||
+        albumstart > artiststart)
+    {
+        DEBUGF("Corrupt id3db database, aborting.\n");
+        return -1;
+    }
+
+    initialized = 1;
     return 0;
 }
 
@@ -108,6 +132,12 @@ int db_load(struct tree_context* c, bool* dir_buffer_full)
 
     int table = c->currtable;
     int extra = c->currextra;
+
+    if (!initialized) {
+        DEBUGF("ID3 database is not initialized.\n");
+        return 0;
+    }
+    
     c->dentry_size = 2 * sizeof(int);
     
     DEBUGF("db_load(%d, %x)\n", table, extra);
