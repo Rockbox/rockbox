@@ -338,7 +338,6 @@ bool menu_run(int m)
         }
         
         status_draw();
-        lcd_update();
     }
 
     return false;
