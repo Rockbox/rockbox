@@ -783,7 +783,7 @@ new: "Nieuwe Taal"
 id: LANG_FILTER
 desc: setting name for dir filter
 eng: "Show Files"
-new: "Welke Bestanden Tonen"
+new: "Toon Bestanden"
 
 id: LANG_FILTER_MUSIC
 desc: show only music-related files
@@ -1108,7 +1108,7 @@ new: "Digitaal"
 id: LANG_RECORDING_SRC_LINE
 desc: in the recording settings
 eng: "Line In"
-new: "Lijn Ingang" 
+new: "Lijn In" 
 
 id: LANG_RECORDING_SRC_MIC
 desc: in the recording settings
@@ -1124,3 +1124,23 @@ id: LANG_DISK_STAT
 desc: disk size info
 eng: "Disk: %d.%dGB"
 new: 
+
+id: LANG_FILTER_PLAYLIST
+desc: show only playlist
+eng: "Playlists"
+new: "Speellijsten" 
+
+id: LANG_POWEROFF
+desc: disk poweroff flag
+eng: "Disk Poweroff"
+new: "Disk Uitschakelen" 
+
+id: LANG_BATTERY_TIME
+desc: battery level in % and estimated time remaining
+eng: "%d%% %dh %dm"
+new: 
+
+id: LANG_SLEEP_TIMER
+desc: sleep timer setting
+eng: "Sleep timer"
+new:
