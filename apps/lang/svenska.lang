@@ -1537,7 +1537,7 @@ new: "Disken är full. Tryck AV för att fortsätta."
 id: LANG_FIRMWARE
 desc: in the main menu
 eng: "Browse Firmwares"
-new: "Se Maskinvaror"
+new: "Se Fasta Programvaror"
 
 id: LANG_FLIPIT
 desc: in the games menu
@@ -1817,7 +1817,7 @@ new: "Förinspelningstid"
 id: LANG_AUTO_BOOKMARK_QUERY
 desc: prompt for user to decide to create an bookmark
 eng: "Create a Bookmark?"
-new: "Skapa bokmärke"
+new: "Skapa Bokmärke?"
 
 id: LANG_BARS_MENU
 desc: in the display sub menu
