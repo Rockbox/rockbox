@@ -16,7 +16,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#undef DEBUG
 #include <stdbool.h>
 #include "config.h"
 #include "debug.h"
