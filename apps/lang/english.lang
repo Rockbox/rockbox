@@ -2805,3 +2805,9 @@ desc:  in main menu
 eng: "Shutting down..."
 voice: ""
 new:
+
+id: LANG_CONFIRM_SHUTDOWN
+desc:  in shutdown screen
+eng: "Press OFF to shut down"
+voice: ""
+new:
