@@ -13,7 +13,17 @@ sub filesize {
     return $size;
 }
 
-my $max = $ARGV[0];
+my $romsize = 256*1024; # 256 KB
+
+my $romstart = $ARGV[0];
+
+if($romstart =~ /^0x(.*)/i) {
+    $romstart = hex($romstart);
+}
+
+
+my $max = $romsize - $romstart;
+
 my $file = filesize($ARGV[1]);
 
 if($file > $max ) {

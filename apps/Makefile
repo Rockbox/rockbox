@@ -55,14 +55,9 @@ SRC := $(wildcard *.c)
 
 ifeq ($(TARGET), -DARCHOS_FMRECORDER)
    TOOL_OPT = -fm
-   MAXROMSIZE = 180208 # 176KB -16
 endif
 ifeq ($(TARGET), -DARCHOS_RECORDERV2)
    TOOL_OPT = -v2
-   MAXROMSIZE = 188400 # 184KB - 16
-endif
-ifeq ($(TARGET), -DARCHOS_RECORDER)
-   MAXROMSIZE = 192496 # 188KB - 16
 endif
 
 
@@ -104,6 +99,9 @@ ifndef TOOLSDIR
 	TOOLSDIR=../tools
 endif
 
+MAXINFILE = $(OBJDIR)/romstart.temp
+MAXOUTFILE = $(OBJDIR)/romstart
+
 ifdef DEBUG
 all : $(OBJDIR)/rockbox.elf rocks
 else
@@ -123,7 +121,13 @@ $(LINKFILE): $(LDS)
 	 cat $< | $(CC) -DMEMORYSIZE=$(MEM) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
 
 $(LINKROM): $(ROMLDS)
-	 cat $< | $(CC) -DMEMORYSIZE=$(MEM) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
+	cat $< | $(CC) -DMEMORYSIZE=$(MEM) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
+
+$(MAXOUTFILE):
+	@echo '#include "config.h"' > $(MAXINFILE)
+	@echo "ROM_START" >> $(MAXINFILE)
+	@cat $(MAXINFILE) | $(CC) -DMEMORYSIZE=$(MEM) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - > $(MAXOUTFILE)
+	@rm $(MAXINFILE)
 
 $(OBJDIR)/rombox.elf : $(OBJS) $(LINKROM) $(OBJDIR)/librockbox.a
 	@echo "LD rombox.elf"
@@ -157,13 +161,13 @@ $(OBJDIR)/rockbox.ucl: $(OBJDIR)/rockbox.bin
 	  echo "fake" > $@; \
 	fi
 
-$(OBJDIR)/rombox.ucl: $(OBJDIR)/rombox.bin
+$(OBJDIR)/rombox.ucl: $(OBJDIR)/rombox.bin $(MAXOUTFILE)
 	@a=`uclpack -h 2>/dev/null`; \
 	if test -n "$$a"; then \
 	  echo "UCLPACK rombox" ; \
 	  uclpack --none $< $@ >/dev/null 2>&1; \
 	  if test -s $@; then \
-	    perl $(TOOLSDIR)/romsizetest.pl $(MAXROMSIZE) $@; \
+	    perl $(TOOLSDIR)/romsizetest.pl `cat $(MAXOUTFILE)` $@; \
 	    if test $$? -ne 0; then \
 	      echo "removing UCL file again, making it a fake one"; \
 	      echo "fake" > $@; \
