@@ -688,7 +688,9 @@ static int onplay_screen(char* dir, char* file)
                        LCD_WIDTH/2 + 8, LCD_HEIGHT/2 - 4, 7, 8, true);
         }
 
-        lcd_putsxy(0, LCD_HEIGHT/2 - h/2, str(LANG_RENAME));
+        ptr = str(LANG_RENAME);
+        lcd_getstringsize(ptr,&w,&h);
+        lcd_putsxy(0, LCD_HEIGHT/2 - h/2, ptr);
         lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
                    LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8, true);
     }
