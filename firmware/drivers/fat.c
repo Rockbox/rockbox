@@ -1782,8 +1782,10 @@ int fat_closewrite(struct fat_file *file, long size, int attr)
         long len;
         long next;
         for ( next = file->firstcluster; next;
-              next = get_next_cluster(IF_MV2(fat_bpb,) next) )
-            LDEBUGF("cluster %ld: %lx\n", count++, next);
+              next = get_next_cluster(IF_MV2(fat_bpb,) next) ) {
+            LDEBUGF("cluster %ld: %lx\n", count, next);
+            count++;
+        }
         len = count * fat_bpb->bpb_secperclus * SECTOR_SIZE;
         LDEBUGF("File is %ld clusters (chainlen=%ld, size=%ld)\n",
                 count, len, size );
