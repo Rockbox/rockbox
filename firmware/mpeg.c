@@ -641,7 +641,7 @@ void mpeg_volume(int percent)
     mas_codec_writereg(0x10, volume & 0xff00);
 #else
     volume = 0x38 * percent / 100;
-    dac_volume(volume);
+    dac_volume(volume, volume, false);
 #endif
 }
 
