@@ -738,7 +738,7 @@ static void mpeg_thread(void)
                         /* Make sure that the write pointer is at a word
                            boundary when we reach the end of the file */
                         if(len < amount_to_read)
-                            mp3buf_write = (mp3buf_write + 1) & 0xfffffffe;
+                            len = (len + 1) & 0xfffffffe;
                         
                         mp3buf_write += len;
                         if(mp3buf_write >= mp3buflen)
