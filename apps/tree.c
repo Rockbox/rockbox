@@ -521,6 +521,7 @@ bool ask_resume(void)
 
     switch (button_get(true)) {
         case BUTTON_PLAY:
+        case BUTTON_RC_PLAY:
             return true;
 
         case SYS_USB_CONNECTED:
@@ -686,6 +687,7 @@ static bool handle_on(int* ds, int* dc, int numentries, int tree_max_on_screen)
     while (!exit) {
         switch (button_get(true)) {
             case TREE_PREV:
+            case BUTTON_RC_LEFT:
             case BUTTON_ON | TREE_PREV:
             case BUTTON_ON | TREE_PREV | BUTTON_REPEAT:
                 used = true;
@@ -699,6 +701,7 @@ static bool handle_on(int* ds, int* dc, int numentries, int tree_max_on_screen)
                 break;
                 
             case TREE_NEXT:
+            case BUTTON_RC_RIGHT:
             case BUTTON_ON | TREE_NEXT:
             case BUTTON_ON | TREE_NEXT | BUTTON_REPEAT:
                 used = true;
@@ -714,6 +717,7 @@ static bool handle_on(int* ds, int* dc, int numentries, int tree_max_on_screen)
 
 
             case BUTTON_PLAY:
+            case BUTTON_RC_PLAY:
             case BUTTON_ON | BUTTON_PLAY:
                 if (currdir[1])
                     snprintf(buf, sizeof buf, "%s/%s",
@@ -804,6 +808,7 @@ bool dirbrowse(char *root)
         button = button_get_w_tmo(HZ/5);
         switch ( button ) {
             case TREE_EXIT:
+            case BUTTON_RC_STOP:
             case TREE_EXIT | BUTTON_REPEAT:
                 i=strlen(currdir);
                 if (i>1) {
@@ -848,6 +853,7 @@ bool dirbrowse(char *root)
 
             case TREE_ENTER:
             case TREE_ENTER | BUTTON_REPEAT:
+            case BUTTON_RC_PLAY:
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_PLAY:
             case BUTTON_PLAY | BUTTON_REPEAT: 
@@ -1005,7 +1011,7 @@ bool dirbrowse(char *root)
 
             case TREE_PREV:
             case TREE_PREV | BUTTON_REPEAT:
-            case BUTTON_VOL_UP:
+            case BUTTON_RC_VOL_UP:
                 if(filesindir) {
                     if(dircursor) {
                         put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, false);
@@ -1043,7 +1049,7 @@ bool dirbrowse(char *root)
 
             case TREE_NEXT:
             case TREE_NEXT | BUTTON_REPEAT:
-            case BUTTON_VOL_DOWN:
+            case BUTTON_RC_VOL_DOWN:
                 if(filesindir)
                 {
                     if (dircursor + dirstart + 1 < numentries ) {

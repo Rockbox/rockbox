@@ -574,7 +574,7 @@ static bool menu(void)
             case BUTTON_MENU | BUTTON_REL:
 #endif
                 exit = true;
-                if ( !last_button ) {
+                if ( !last_button && !keys_locked ) {
                     lcd_stop_scroll();
 
                     if (main_menu())
@@ -807,6 +807,13 @@ int wps_show(void)
                 continue;
         }
         
+        /* ignore non-remote buttons when keys are locked */
+        if (keys_locked &&
+            ! ((button & BUTTON_F1) ||
+               (button == SYS_USB_CONNECTED) ||
+               (button & BUTTON_REMOTE)))
+            continue;
+
         switch(button)
         {
             case BUTTON_ON:
@@ -848,6 +855,7 @@ int wps_show(void)
 
                 /* play/pause */
             case BUTTON_PLAY:
+            case BUTTON_RC_PLAY:
                 if ( paused )
                 {
                     paused = false;
@@ -879,7 +887,7 @@ int wps_show(void)
             case BUTTON_UP:
             case BUTTON_UP | BUTTON_REPEAT:
 #endif
-            case BUTTON_VOL_UP:
+            case BUTTON_RC_VOL_UP:
                 global_settings.volume++;
                 if(global_settings.volume > mpeg_sound_max(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_max(SOUND_VOLUME);
@@ -893,7 +901,7 @@ int wps_show(void)
             case BUTTON_DOWN:
             case BUTTON_DOWN | BUTTON_REPEAT:
 #endif
-            case BUTTON_VOL_DOWN:
+            case BUTTON_RC_VOL_DOWN:
                 global_settings.volume--;
                 if(global_settings.volume < mpeg_sound_min(SOUND_VOLUME))
                     global_settings.volume = mpeg_sound_min(SOUND_VOLUME);
@@ -909,6 +917,7 @@ int wps_show(void)
                 break;
 
                 /* prev / restart */
+            case BUTTON_RC_LEFT:
             case BUTTON_LEFT | BUTTON_REL:
 #ifdef HAVE_RECORDER_KEYPAD
                 if ( lastbutton != BUTTON_LEFT )   
@@ -929,6 +938,7 @@ int wps_show(void)
                 break;
 
                 /* next */
+            case BUTTON_RC_RIGHT:
             case BUTTON_RIGHT | BUTTON_REL:
 #ifdef HAVE_RECORDER_KEYPAD
                 if ( lastbutton != BUTTON_RIGHT )   
@@ -973,6 +983,7 @@ int wps_show(void)
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_OFF:
 #else
+            case BUTTON_RC_STOP:
             case BUTTON_STOP | BUTTON_REL:
                 if ( lastbutton != BUTTON_STOP )
                     break;

@@ -91,31 +91,27 @@ int remote_control_rx(void)
             switch (btn)
             {
                 case STOP:
-#ifdef HAVE_RECORDER_KEYPAD
-                    last_valid_button = BUTTON_OFF;
-#else
-                    last_valid_button = BUTTON_STOP;
-#endif
+                    last_valid_button = BUTTON_RC_STOP;
                     break;
                     
                 case PLAY:
-                    last_valid_button = BUTTON_PLAY;
+                    last_valid_button = BUTTON_RC_PLAY;
                     break;
                     
                 case VOLUP:
-                    last_valid_button = BUTTON_VOL_UP;
+                    last_valid_button = BUTTON_RC_VOL_UP;
                     break;
                     
                 case VOLDN:
-                    last_valid_button = BUTTON_VOL_DOWN;
+                    last_valid_button = BUTTON_RC_VOL_DOWN;
                     break;
                     
                 case PREV:
-                    last_valid_button = BUTTON_LEFT;
+                    last_valid_button = BUTTON_RC_LEFT;
                     break;
                     
                 case NEXT:
-                    last_valid_button = BUTTON_RIGHT;
+                    last_valid_button = BUTTON_RC_RIGHT;
                     break;
                     
 #ifdef SCREENDUMP

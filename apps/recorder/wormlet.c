@@ -1348,11 +1348,11 @@ static bool run(void)
                 player2_dir = (player2_dir + 1) % 4;
                 break;
 
-            case BUTTON_VOL_UP:
+            case BUTTON_RC_VOL_UP:
                 player3_dir = (player3_dir + 1) % 4;
                 break;
 
-            case BUTTON_VOL_DOWN:
+            case BUTTON_RC_VOL_DOWN:
                 player3_dir = (player3_dir + 3) % 4;
                 break;
 

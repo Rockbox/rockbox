@@ -1,3 +1,4 @@
+
 /***************************************************************************
  *             __________               __   ___.
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
@@ -37,16 +38,18 @@ int button_get_w_tmo(int ticks);
 #define	BUTTON_LEFT		0x0040
 #define	BUTTON_RIGHT		0x0080
 
-/* remote control buttons */
-#define BUTTON_VOL_UP           0x1000
-#define BUTTON_VOL_DOWN         0x1001
-
 /* Button modifiers */
+#define	BUTTON_REMOTE		0x2000
 #define	BUTTON_REPEAT		0x4000
 #define	BUTTON_REL		0x8000
 
-/* Special message */
-#define	BUTTON_LOCKED		0x2000
+/* remote control buttons */
+#define BUTTON_RC_VOL_UP        (0x0008 | BUTTON_REMOTE)
+#define BUTTON_RC_VOL_DOWN      (0x0800 | BUTTON_REMOTE)
+#define BUTTON_RC_PLAY          (BUTTON_UP | BUTTON_REMOTE)
+#define BUTTON_RC_STOP          (BUTTON_DOWN | BUTTON_REMOTE)
+#define BUTTON_RC_LEFT          (BUTTON_LEFT | BUTTON_REMOTE)
+#define BUTTON_RC_RIGHT         (BUTTON_RIGHT| BUTTON_REMOTE)
 
 #ifdef HAVE_RECORDER_KEYPAD
 
@@ -57,19 +60,12 @@ int button_get_w_tmo(int ticks);
 #define	BUTTON_F2		0x0200
 #define	BUTTON_F3		0x0400
 
-#define ALL_BUTTONS (BUTTON_ON | BUTTON_UP | BUTTON_DOWN | BUTTON_LEFT | \
-                     BUTTON_RIGHT | BUTTON_OFF | BUTTON_PLAY | BUTTON_F1 | \
-                     BUTTON_F2 | BUTTON_F3)
-
 #elif HAVE_PLAYER_KEYPAD
 
 /* Jukebox 6000 and Studio specific button codes */
 #define	BUTTON_MENU		0x0002
 #define	BUTTON_PLAY		BUTTON_UP
 #define	BUTTON_STOP		BUTTON_DOWN
-
-#define ALL_BUTTONS (BUTTON_ON | BUTTON_UP | BUTTON_DOWN | BUTTON_LEFT | \
-                     BUTTON_RIGHT | BUTTON_MENU)
 
 #endif /* HAVE_PLAYER_KEYPAD */
 
