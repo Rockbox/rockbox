@@ -39,34 +39,41 @@ with .mp3 or .m3u will be displayed in the browser.
 Buttons:
 <p>
 <table class=listtable>
-<tr>
+<tr valign=top>
 <td> UP </td>
 <td>
      Move upwards in the list, if it already is on the topmost entry, you'll
         see the cursor moved to the last entry in the list.
 </td></tr>
-<tr>
+<tr valign=top>
 <td>DOWN</td>
 <td>
    Move downwards in the list, if it already is on the last entry, you'll
         see the cursor moved to the first entry in the list.
 </td></tr>
-<tr>
+<tr valign=top>
 <td> LEFT</td>
 <td>   Move "up" one directory level to the parent directory.
 </td></tr>
-<tr>
+<tr valign=top>
 <td> RIGHT</td>
-<td>  If the cursor is now on a line of a directory, the browser will switch
-        into browsing that directory. If the cursor is on a line with a file,
-        special actions are peformed depending on the file type. If the file
-        is an mp3 file, it'll jump into the <a href="rec-wps.html">WPS</a> and
-        start playing this file.
-        If the file is an m3u file (playlist), the list will first be loaded
-        and then pop up the WPS showing the first file that gets played from
-        the list. If you have 'shuffle' selected in the global settings, the
-        playlist will be shuffled directly after having been loaded, otherwise
-        it'll be played in a straight top-to-bottom fashion.
+<td>
+
+  If the cursor is now on a line of a directory, the browser will switch into
+  browsing that directory.
+
+<p> If the cursor is on a line with a file, special actions are peformed
+  depending on the file type. If the file is an mp3 file, it'll jump into the
+  <a href="rec-wps.html">WPS</a> and start playing this file. It will then
+  continue to play the other songs in the same directory. Your 'shuffle'
+  setting is acknowledged.
+
+<p> If the selected entry is an m3u file (playlist), the list will first be
+  loaded and then pop up the WPS showing the first file that gets played from
+  the list. If you have 'shuffle' selected in the global settings, the
+  playlist will be shuffled directly after having been loaded, otherwise it'll
+  be played in a straight top-to-bottom fashion.
+
 </td></tr>
 <tr><td>
  PLAY
