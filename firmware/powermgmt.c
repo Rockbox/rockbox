@@ -257,8 +257,16 @@ static void handle_auto_poweroff(void)
         {
             if(TIME_AFTER(current_tick, sleeptimer_endtick))
             {
-                DEBUGF("Sleep timer timeout. Shutting off...\n");
-                power_off();
+                if(charger_is_inserted)
+                {
+                    DEBUGF("Sleep timer timeout. Rebooting...\n");
+                    system_reboot();
+                }
+                else
+                {
+                    DEBUGF("Sleep timer timeout. Shutting off...\n");
+                    power_off();
+                }
             }
         }
     }
