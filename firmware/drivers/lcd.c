@@ -594,7 +594,7 @@ void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
         {
             /* First partial row */
             data = *src++ << shift;
-            *dst = (*dst & mask) ^ data;
+            *dst = (*dst & mask) | data;
             data >>= 8;
             dst++;
 
@@ -602,7 +602,7 @@ void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
             for (y = 8; y < ny-8; y += 8)
             {
                 data |= *src++ << shift;
-                *dst = (*dst & mask2) ^ data;
+                *dst = (*dst & mask2) | data;
                 data >>= 8;
                 dst++;
             }
@@ -611,7 +611,7 @@ void lcd_bitmap (unsigned char *src, int x, int y, int nx, int ny,
         /* Last partial row */
         if (y + shift < ny)
             data |= *src++ << shift;
-        *dst = (*dst & mask3) ^ (data & mask4);
+        *dst = (*dst & mask3) | (data & mask4);
     }
 }
 
@@ -713,6 +713,76 @@ void lcd_drawline( int x1, int y1, int x2, int y2 )
     for(i=0; i<numpixels; i++)
     {
         DRAW_PIXEL(x,y);
+
+        if(d < 0)
+        {
+            d += dinc1;
+            x += xinc1;
+            y += yinc1;
+        }
+        else
+        {
+            d += dinc2;
+            x += xinc2;
+            y += yinc2;
+        }
+    }
+}
+
+void lcd_clearline( int x1, int y1, int x2, int y2 )
+{
+    int numpixels;
+    int i;
+    int deltax, deltay;
+    int d, dinc1, dinc2;
+    int x, xinc1, xinc2;
+    int y, yinc1, yinc2;
+
+    deltax = abs(x2 - x1);
+    deltay = abs(y2 - y1);
+
+    if(deltax >= deltay)
+    {
+        numpixels = deltax;
+        d = 2 * deltay - deltax;
+        dinc1 = deltay * 2;
+        dinc2 = (deltay - deltax) * 2;
+        xinc1 = 1;
+        xinc2 = 1;
+        yinc1 = 0;
+        yinc2 = 1;
+    }
+    else
+    {
+        numpixels = deltay;
+        d = 2 * deltax - deltay;
+        dinc1 = deltax * 2;
+        dinc2 = (deltax - deltay) * 2;
+        xinc1 = 0;
+        xinc2 = 1;
+        yinc1 = 1;
+        yinc2 = 1;
+    }
+    numpixels++; /* include endpoints */
+
+    if(x1 > x2)
+    {
+        xinc1 = -xinc1;
+        xinc2 = -xinc2;
+    }
+
+    if(y1 > y2)
+    {
+        yinc1 = -yinc1;
+        yinc2 = -yinc2;
+    }
+
+    x = x1;
+    y = y1;
+
+    for(i=0; i<numpixels; i++)
+    {
+        CLEAR_PIXEL(x,y);
 
         if(d < 0)
         {
