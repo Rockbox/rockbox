@@ -60,7 +60,10 @@ void status_draw(void)
 #if defined(HAVE_LCD_BITMAP) && defined(HAVE_RTC)
     int hour, minute;
 #endif
-    
+
+    if ( !global_settings.statusbar )
+        return;
+
 #if defined(HAVE_LCD_CHARCELLS)
     lcd_icon(ICON_VOLUME, true);
     if(volume > 10)
