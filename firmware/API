@@ -22,6 +22,7 @@ LCD
     lcd_init() - init the LCD stuff
     lcd_clear_display() - clear the whole display
     lcd_backlight(on) - set backlight on/off
+    lcd_puts(x,y,string) write a string at given character position
 
   Recorder
  
@@ -29,7 +30,10 @@ LCD
     shown on screen by calling lcd_update().
 
     lcd_update() update the LCD according to the internal buffer.
-    lcd_puts(x,y,string,font) put a string at given position
+    lcd_setfont(int font) set default font
+    lcd_setmargins(int x, int y) set top/left margins
+    lcd_putsxy(x,y,string,font) put a string at given position, using a
+                                specific font
     lcd_bitmap(src,x,y,width,height,clear) put a bitmap at given position
     lcd_clearrect(x,y,width,height) clear a rectangle area
     lcd_fillrect(x,y,width,height) fill a rectangle area
@@ -42,7 +46,6 @@ LCD
 
   Player
 
-    lcd_puts(x,y,string) write a string at given position
     lcd_define_pattern(which,pattern,lenth) define a custom pattern
 
 Buttons
