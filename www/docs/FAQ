@@ -263,7 +263,12 @@ Q32: I was thinking about making the USB a bit more usable.  What are the
      for a nickel].  What do you think?
 A32: You really don't want to know what I think, it involves road flares, 
      microwave ovens and shaved cats.  Enough said.  But regarding the USB 
-     portion of your question, this is not feasible.  We have no control over
-     the USB port itself.  We are capable of dectecting if it is in use (so we
-     know which mode to switch to) but that is it.  Sorry.  Now about your
+     portion of your question, this is not feasible.  First, any ideas 
+     regarding special communications over the USB port will not work because
+     we have no control over the USB port itself.  We are capable of 
+     dectecting if it is in use (so we know which mode to switch to) but that 
+     is it.  Second, if you would like to have your Archos as a harddrive for
+     another device, know that this will not work either.  The Archos unit is 
+     a slave.  Most other USB devices are slaves as well.  So without some
+     master involved there can be no communication.  Sorry.  Now about your
      soul.  Would you settle for 3 cents and a small wad of belly button lint?
