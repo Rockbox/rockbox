@@ -1403,8 +1403,8 @@ int ata_init(void)
     GPIO_FUNCTION |= 0x00080000;
 
     /* ATA controller interface */
-    IDECONFIG1 = 0x00107000;
-    IDECONFIG2 = 0x00040000;
+    IDECONFIG1 = 0x00107400;  /* BUFEN2 enable, 5 clock pre, 3 clock post */
+    IDECONFIG2 = 0x00040000;  /* TA Enable = 1 */
 #endif
 
     sleeping = false;
