@@ -172,12 +172,11 @@ void init(void)
     
     status_init();
     usb_start_monitoring();
-    power_init();
     playlist_init();
     tree_init();
 
-    /* This one must be the last one, since it wants the rest of the buffer
-       space */
+    /* No buffer allocation (see buffer.c) may take place after the call to
+       mpeg_init() since the mpeg thread takes the rest of the buffer space */
     mpeg_init( global_settings.volume,
                global_settings.bass,
                global_settings.treble,
@@ -186,6 +185,8 @@ void init(void)
                global_settings.bass_boost,
                global_settings.avc,
                global_settings.channel_config );
+
+    power_init();
 }
 
 int main(void)
