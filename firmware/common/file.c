@@ -363,13 +363,15 @@ int lseek(int fd, int offset, int whence)
                 return -4;
             }
         }
-        rc = fat_readwrite(&(openfiles[fd].fatfile), 1,
-                           &(openfiles[fd].cache),false);
-        if ( rc < 0 ) {
-            errno = EIO;
-            return -5;
+        if ( sectoroffset ) {
+            rc = fat_readwrite(&(openfiles[fd].fatfile), 1,
+                               &(openfiles[fd].cache),false);
+            if ( rc < 0 ) {
+                errno = EIO;
+                return -5;
+            }
+            openfiles[fd].cacheoffset = sectoroffset;
         }
-        openfiles[fd].cacheoffset = sectoroffset;
     }
     else
         if ( openfiles[fd].cacheoffset != -1 )

@@ -1102,7 +1102,7 @@ static bool transfer( int start, int count, char* buf, bool write )
 {
     int err;
 
-    LDEBUGF("transfer(s=%x, c=%x)\n",start, count);
+    LDEBUGF("transfer(s=%x, c=%x, %s)\n",start, count, write?"write":"read");
     if (write)
         err = ata_write_sectors(start, count, buf);
     else
@@ -1126,9 +1126,9 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
     int first=0, last=0;
     int i;
 
-    LDEBUGF( "fat_write(file:%x,count:%d,buf:%x)\n",
-             cluster,sectorcount,buf);
-    LDEBUGF( "fat_write: c=%x s=%x n=%d\n", cluster,sector,numsec);
+    LDEBUGF( "fat_readwrite(file:%x,count:0x%x,buf:%x,%s)\n",
+             cluster,sectorcount,buf,write?"write":"read");
+    LDEBUGF( "fat_readwrite: sec=%x numsec=%d\n", sector,numsec);
     if ( sector == -1 )
         return 0;
 
@@ -1176,15 +1176,11 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
             first = sector;
         }
         else {
-            /* last sector requested */
-            if (i >= sectorcount-1) {
+            if (i == sectorcount-1) { /* last sector requested */
                 int count = sector - first + 1;
                 if (!transfer( first + fat_bpb.startsector, 
                                count, buf, write ))
                     return -2;
-                
-                ((char*)buf) += count * SECTOR_SIZE;
-                first = sector;
             }
         }
 
@@ -1204,43 +1200,31 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
 
 int fat_seek(struct fat_file *file, int seeksector )
 {
+    int clusternum, sectornum, sector;
     int cluster = file->firstcluster;
-    int sector = cluster2sec(cluster);
-    int numsec = 0;
     int i;
 
-    if ( seeksector ) {
-        for (i=0; i<seeksector; i++) {
-            numsec++;
-            if ( numsec >= fat_bpb.bpb_secperclus ) {
-                cluster = get_next_cluster(cluster);
-                if (!cluster)
-                {
-                    /* end of file */
-                    if (i == (seeksector-1))
-                    {
-                        /* seeksector is last sector in file */
-                        sector = -1;
-                        break;
-                    }
-                    else
-                        /* attempting to seek beyond end of file */
-                        return -1;
-                }
-                
-                sector = cluster2sec(cluster);
-                if (sector<0)
-                    return -2;
-                numsec=0;
-            }
-            else
-                sector++;
+    seeksector--;
+    clusternum = seeksector / fat_bpb.bpb_secperclus;
+    sectornum = seeksector % fat_bpb.bpb_secperclus;
+
+    for (i=0; i<clusternum; i++) {
+        cluster = get_next_cluster(cluster);
+        if (!cluster) {
+            sector = -1;
+            break;
         }
     }
-        
+
+    if ( sector > -1 )
+        sector = cluster2sec(cluster) + sectornum;
+
+    LDEBUGF("fat_seek(%x) == %x, %x, %x\n",
+            seeksector, cluster, sector, sectornum);
+
     file->lastcluster = cluster;
     file->lastsector = sector;
-    file->sectornum = numsec;
+    file->sectornum = sectornum + 1;
     return 0;
 }
 
