@@ -34,11 +34,9 @@
 #include "file.h"
 #endif
 
-#define MPEG_FIRST_CHUNKSIZE  0x20000
 #define MPEG_CHUNKSIZE  0x180000
-#define MPEG_FIRST_SWAP_CHUNKSIZE  0x20000
 #define MPEG_SWAP_CHUNKSIZE  0x8000
-#define MPEG_HIGHWATER  0x10000
+#define MPEG_HIGH_WATER  2
 #define MPEG_LOW_WATER  0x30000
 
 #define MPEG_PLAY         1
@@ -507,7 +505,8 @@ static void mpeg_thread(void)
 
     while(1)
     {
-        DEBUGF("S\n");
+        DEBUGF("S R:%x W:%x SW:%x\n",
+	       mp3buf_read, mp3buf_write, mp3buf_swapwrite);
         yield();
         queue_wait(&mpeg_queue, &ev);
         switch(ev.id)
@@ -627,13 +626,13 @@ static void mpeg_thread(void)
                 if(free_space_left < 0)
                     free_space_left = mp3buflen + free_space_left;
 
-                if(play_pending)
-                    amount_to_swap = MIN(MPEG_FIRST_SWAP_CHUNKSIZE,
-                                         free_space_left);
-                else
-                    amount_to_swap = MIN(MPEG_SWAP_CHUNKSIZE, free_space_left);
-                amount_to_swap = MIN(mp3buflen - mp3buf_swapwrite,
-                                     amount_to_swap);
+		amount_to_swap = MIN(MPEG_SWAP_CHUNKSIZE, free_space_left);
+		if(mp3buf_write < mp3buf_swapwrite)
+		    amount_to_swap = MIN(mp3buflen - mp3buf_swapwrite,
+					 amount_to_swap);
+		else
+		    amount_to_swap = MIN(mp3buf_write - mp3buf_swapwrite,
+					 amount_to_swap);
                 
                 DEBUGF("B %x\n", amount_to_swap);
                 bitswap((unsigned short *)(mp3buf + mp3buf_swapwrite),
@@ -653,12 +652,20 @@ static void mpeg_thread(void)
                    playing yet. If not, do it. */
                 if(play_pending)
                 {
-                    play_pending = false;
-                    playing = true;
-                    
-                    last_dma_tick = current_tick;
-                    init_dma();
-                    start_dma();
+		    if((mp3buf_swapwrite - mp3buf_read) >= MPEG_LOW_WATER)
+		    {
+			DEBUGF("P\n");
+			play_pending = false;
+			playing = true;
+			
+			last_dma_tick = current_tick;
+			init_dma();
+			start_dma();
+
+			/* Tell ourselves that we need more data */
+			queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+
+		    }
                 }
                 break;
 
@@ -673,7 +680,7 @@ static void mpeg_thread(void)
                 free_space_left -= 2;
 
                 /* do we have any more buffer space to fill? */
-                if(free_space_left <= MPEG_HIGHWATER)
+                if(free_space_left <= MPEG_HIGH_WATER)
                 {
                     DEBUGF("0\n");
                     filling = false;
@@ -683,7 +690,7 @@ static void mpeg_thread(void)
 
                 if(play_pending)
                 {
-                    amount_to_read = MIN(MPEG_FIRST_CHUNKSIZE, free_space_left);
+                    amount_to_read = MIN(MPEG_LOW_WATER, free_space_left);
                 }
                 else
                 {
@@ -701,6 +708,7 @@ static void mpeg_thread(void)
                     len = read(mpeg_file, mp3buf+mp3buf_write, amount_to_read);
                     if(len > 0)
                     {
+			DEBUGF("R: %x\n", len);
                         /* Tell ourselves that we need to swap some data */
                         queue_post(&mpeg_queue, MPEG_SWAP_DATA, 0);
 
@@ -711,8 +719,11 @@ static void mpeg_thread(void)
                             DEBUGF("W\n");
                         }
 
-                        /* Tell ourselves that we want more data */
-                        queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+			if(!play_pending)
+			{
+			    /* Tell ourselves that we want more data */
+			    queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+			}
                     }
                     else
                     {
