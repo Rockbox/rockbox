@@ -65,7 +65,7 @@ Q11. CBR recording!
 A11. The MP3 encoding hardware does not allow this.
 
 Q12. Change tempo of a song without changing pitch!
-A12. The MP3 decoding hardware does now allow this.
+A12. The MP3 decoding hardware does not allow this.
 
 Q13. Graphic frequency (spectrum) analyzer!
 A13. We can't access the audio waveform from the MP3 decoder so we can't
