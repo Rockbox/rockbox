@@ -28,6 +28,7 @@
 #include "panic.h"
 #include "lcd.h"
 #include "adc.h"
+#include "usb.h"
 
 
 #define USB_REALLY_BRAVE
