@@ -1225,7 +1225,14 @@ static bool dirbrowse(const char *root, const int *dirfilter)
                             /* plugin file */
                         case TREE_ATTR_ROCK:
                             if (plugin_load(buf,NULL) == PLUGIN_USB_CONNECTED)
-                                reload_root = true;
+                            {
+                                if(*dirfilter > NUM_FILTER_MODES)
+                                    /* leave sub-browsers after usb, doing
+                                       otherwise might be confusing to the user */
+                                    exit_func = true;
+                                else
+                                    reload_root = true;
+                            }
                             else
                                 restore = true;
                             break;
@@ -1487,7 +1494,14 @@ static bool dirbrowse(const char *root, const int *dirfilter)
 
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
-                    reload_root = true;
+                {
+                    if(*dirfilter > NUM_FILTER_MODES)
+                        /* leave sub-browsers after usb, doing otherwise
+                           might be confusing to the user */
+                        exit_func = true;
+                    else
+                        reload_root = true;
+                }
                 break;
         }
 
