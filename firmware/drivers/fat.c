@@ -756,6 +756,7 @@ int fat_create_file(unsigned int currdir, char *name)
 
 static int parse_direntry(struct fat_direntry *de, unsigned char *buf)
 {
+    int i=0,j=0;
     memset(de, 0, sizeof(struct fat_direntry));
     de->attr = buf[FATDIR_ATTR];
     de->crttimetenth = buf[FATDIR_CRTTIMETENTH];
@@ -766,8 +767,15 @@ static int parse_direntry(struct fat_direntry *de, unsigned char *buf)
     de->filesize = BYTES2INT32(buf,FATDIR_FILESIZE);
     de->firstcluster = BYTES2INT16(buf,FATDIR_FSTCLUSLO) |
                       (BYTES2INT16(buf,FATDIR_FSTCLUSHI) << 16);
-    strncpy(de->name, &buf[FATDIR_NAME], 11);
 
+    /* fix the name */
+    for (i=0; (i<8) && (buf[FATDIR_NAME+i] != ' '); i++)
+        de->name[j++] = buf[FATDIR_NAME+i];
+    if ( buf[FATDIR_NAME+8] != ' ' ) {
+        de->name[j++] = '.';
+        for (i=8; (i<11) && (buf[FATDIR_NAME+i] != ' '); i++)
+            de->name[j++] = buf[FATDIR_NAME+i];
+    }
     return 1;
 }
 
