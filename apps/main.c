@@ -27,6 +27,9 @@
 #include "tree.h"
 #include "panic.h"
 #include "menu.h"
+#include "dmalloc.h"
+#include "bmalloc.h"
+#include "mpeg.h"
 
 void app_main(void)
 {
@@ -35,9 +38,18 @@ void app_main(void)
 }
 
 #ifndef SIMULATOR
+
+/* defined in linker script */
+extern int poolstart[];
+extern int poolend[];
+
 int init(void)
 {
     int rc;
+
+    dmalloc_initialize();
+    bmalloc_add_pool(poolstart, poolend-poolstart);
+
     debug_init();
     kernel_init();
     set_irq_level(0);
@@ -55,6 +67,7 @@ int init(void)
         panicf("mount: %d",rc);
 
     button_init();
+    mpeg_init();
 
     return 0;
 }
