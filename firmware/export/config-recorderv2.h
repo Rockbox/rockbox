@@ -62,7 +62,7 @@
 #define USB_FMRECORDERSTYLE 1
 
 /* Define this if the platform can charge batteries */
-#define HAVE_BATTERIES 1
+#define HAVE_CHARGING 1
 
 /* The start address index for ROM builds */
 #define ROM_START 0x12010

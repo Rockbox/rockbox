@@ -231,7 +231,7 @@ void charging_display_info(bool animate)
 }
 #endif
 
-#ifdef HAVE_BATTERIES
+#ifdef HAVE_CHARGING
 /* blocks while charging, returns on event:
    1 if charger cable was removed
    2 if Off/Stop key was pressed
@@ -283,7 +283,7 @@ int charging_screen(void)
 
     return rc;
 }
-#endif /* HAVE_BATTERIES */
+#endif /* HAVE_CHARGING */
 
 
 #if CONFIG_KEYPAD == RECORDER_PAD

@@ -58,6 +58,7 @@ void dac_line_in(bool enable);
 /* This flag is set by dirbrowse() if a new language is loaded */
 bool language_changed;
 
+#ifdef HAVE_CHARGING
 static bool car_adapter_mode(void)
 {
     return set_bool_options( str(LANG_CAR_ADAPTER_MODE),
@@ -66,6 +67,7 @@ static bool car_adapter_mode(void)
                              STR(LANG_SET_BOOL_NO),
                              set_car_adapter_mode);
 }
+#endif
 
 static bool contrast(void)
 {
@@ -1351,7 +1353,9 @@ static bool system_settings_menu(void)
 #if CONFIG_HWCODEC == MAS3507D
         { ID2P(LANG_LINE_IN),          line_in                },
 #endif
+#ifdef HAVE_CHARGING
         { ID2P(LANG_CAR_ADAPTER_MODE), car_adapter_mode       },
+#endif
         { ID2P(LANG_MANAGE_MENU),      manage_settings_menu   },
     };
 

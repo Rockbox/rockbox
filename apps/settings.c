@@ -224,7 +224,9 @@ static const struct bit_entry rtc_bits[] =
 #elif CONFIG_BATTERY == BATT_3AAA_ALKALINE
     {12, S_O(battery_capacity), 1000, "battery capacity", NULL },
 #endif
+#ifdef HAVE_CHARGING
     {1, S_O(car_adapter_mode), false, "car adapter mode", off_on },
+#endif
 
     /* new stuff to be added here */
     /* If values are just added to the end, no need to bump the version. */
@@ -281,7 +283,7 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(browse_current), false, "follow playlist", off_on },
     /* playlist */
     {1, S_O(playlist_viewer_icons), true, "playlist viewer icons", off_on },
-    {1, S_O(playlist_viewer_indices), true, 
+    {1, S_O(playlist_viewer_indices), true,
         "playlist viewer indices", off_on },
     {1, S_O(playlist_viewer_track_display), 0, 
         "playlist viewer track display", "track name,full path" },

@@ -151,7 +151,7 @@ void init(void)
 
     powermgmt_init();
 
-#ifdef HAVE_BATTERIES
+#ifdef HAVE_CHARGING
     if (coldstart && charger_inserted() && !global_settings.car_adapter_mode)
     {
         rc = charging_screen(); /* display a "charging" screen */
