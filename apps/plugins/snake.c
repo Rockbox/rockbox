@@ -238,13 +238,14 @@ void game_init(void) {
 
 
     rb->lcd_clear_display();
+    rb->lcd_setfont(FONT_SYSFIXED);
     rb->snprintf(plevel,sizeof(plevel),"Level - %d",level);
     rb->snprintf(phscore,sizeof(phscore),"High Score: %d",hiscore);
-    rb->lcd_putsxy(3,2, plevel);
-    rb->lcd_putsxy(3,12, "(1 - slow, 9 - fast)");
-    rb->lcd_putsxy(3,22, "[Off] to quit");
-    rb->lcd_putsxy(3,32, "[Play] to start/pause");
-    rb->lcd_putsxy(3,42, phscore);
+    rb->lcd_puts(0,0, plevel);
+    rb->lcd_puts(0,1, "(1-slow, 9-fast)");
+    rb->lcd_puts(0,2, "OFF - quit");
+    rb->lcd_puts(0,3, "PLAY - start/pause");
+    rb->lcd_puts(0,4, phscore);
     rb->lcd_update();
 
     while (1) {    
@@ -268,7 +269,7 @@ void game_init(void) {
                 break;
         }
         rb->snprintf(plevel,sizeof(plevel),"Level - %d",level);
-        rb->lcd_putsxy(3,2, plevel);
+        rb->lcd_puts(0,0, plevel);
         rb->lcd_update();
     }
      
