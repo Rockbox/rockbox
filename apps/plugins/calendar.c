@@ -19,7 +19,7 @@
  ****************************************************************************/
 #include "plugin.h"
 
-#ifdef HAVE_LCD_BITMAP
+#if defined(HAVE_LCD_BITMAP) && defined(HAVE_RTC)
 
 #include <timefuncs.h>
 

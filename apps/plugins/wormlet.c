@@ -18,7 +18,7 @@
  ****************************************************************************/
 #include "plugin.h"
 
-#ifdef HAVE_LCD_BITMAP
+#if defined(HAVE_LCD_BITMAP) && (CONFIG_KEYPAD == RECORDER_PAD)
 
 /* size of the field the worm lives in */
 #define FIELD_RECT_X 1
