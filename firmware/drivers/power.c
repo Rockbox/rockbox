@@ -23,6 +23,7 @@
 #include "kernel.h"
 #include "system.h"
 #include "power.h"
+#include "hwcompat.h"
 
 #ifdef HAVE_CHARGE_CTRL
 bool charger_enabled;
