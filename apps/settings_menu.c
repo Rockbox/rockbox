@@ -157,7 +157,7 @@ static void scroll_speed(void)
 }
 
 
-void wps_set()
+void wps_set(void)
 {
    /* Simple menu for selecting what the display shows during playback */
 
