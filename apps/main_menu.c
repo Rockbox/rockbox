@@ -121,10 +121,14 @@ void show_credits(void)
     roll_credits();
 }
 
+#ifdef SIMULATOR
+#define mp3buf 0
+#define mp3end 0
+#else
 /* defined in linker script */
 extern unsigned char mp3buf[];
 extern unsigned char mp3end[];
-
+#endif
 void show_info(void)
 {
     char s[32];
