@@ -428,12 +428,12 @@ new:
 id: LANG_RESUME_CONFIRM_RECORDER
 desc: possible answer to resume question
 eng: ""
-new:
+new: 
 
 id: LANG_RESUME_CANCEL_RECORDER
 desc: possible answer to resume question
 eng: ""
-new:
+new: 
 
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
@@ -658,37 +658,37 @@ new: "[PLAY] om te starten/pauseren"
 id: LANG_SOKOBAN_LEVEL
 desc: must be smaller than 6 characters
 eng: ""
-new:
+new: 
 
 id: LANG_SOKOBAN_MOVE
 desc: must be smaller than 6 characters
 eng: ""
-new:
+new: 
 
 id: LANG_SOKOBAN_WIN
 desc: displayed when you win 
 eng: ""
-new:
+new: 
 
 id: LANG_SOKOBAN_QUIT
 desc: how to quit game
 eng: ""
-new:
+new: 
 
 id: LANG_SOKOBAN_F1
 desc: what does F1 do
 eng: ""
-new:
+new: 
 
 id: LANG_SOKOBAN_F2
 desc: what does F2 do
 eng: ""
-new:
+new: 
 
 id: LANG_SOKOBAN_F3
 desc: what does F3 do
 eng: ""
-new:
+new: 
 
 id: LANG_WORMLET_LENGTH
 desc: wormlet game
@@ -698,77 +698,77 @@ new:
 id: LANG_WORMLET_GROWING
 desc: wormlet game 
 eng: ""
-new:
+new: 
 
 id: LANG_WORMLET_HUNGRY
 desc: wormlet game
 eng: ""
-new:
+new: 
 
 id: LANG_WORMLET_WORMED
 desc: wormlet game
 eng: ""
-new:
+new: 
 
 id: LANG_WORMLET_ARGH
 desc: wormlet game
 eng: ""
-new:
+new: 
 
 id: LANG_WORMLET_CRASHED
 desc: wormlet game
 eng: ""
-new:
+new: 
 
 id: LANG_WORMLET_HIGHSCORE
 desc: wormlet game
 eng: ""
-new:
+new: 
 
 id: LANG_WORMLET_PLAYERS
 desc: wormlet game
 eng: ""
-new:
+new: 
 
 id: LANG_WORMLET_WORMS
 desc: wormlet game
 eng: ""
-new:
+new: 
 
 id: LANG_WORMLET_REMOTE_CTRL
 desc: wormlet game
 eng: ""
-new:
+new: 
 
 id: LANG_WORMLET_NO_REM_CTRL
 desc: wormlet game
 eng: ""
-new:
+new: 
 
 id: LANG_WORMLET_2_KEY_CTRL
 desc: wormlet game
 eng: ""
-new:
+new: 
 
 id: LANG_WORMLET_4_KEY_CTRL
 desc: wormlet game
 eng: ""
-new:
+new: 
 
 id: LANG_WORMLET_NO_CONTROL
 desc: wormlet game
 eng: ""
-new:
+new: 
 
 id: LANG_TETRIS_LOSE
 desc: tetris game
 eng: ""
-new:
+new: 
 
 id: LANG_TETRIS_LEVEL
 desc: tetris game
 eng: ""
-new:
+new: 
 
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
@@ -1569,3 +1569,118 @@ id: LANG_REBOOT_NOW
 desc: Do you want to reboot?
 eng: "Reboot now?"
 new: "Opnieuw starten?"
+
+id: LANG_FLIPIT
+desc: in the games menu
+eng: "Flipit"
+new: "Draai 'em" 
+
+id: LANG_INSERT
+desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+eng: "Insert"
+new: "Invoegen" 
+
+id: LANG_INSERT_FIRST
+desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+eng: "Insert next"
+new: "Voeg hier in" 
+
+id: LANG_INSERT_LAST
+desc: in onplay menu.  append a track/playlist into dynamic playlist.
+eng: "Insert last"
+new: "Voeg als laatste in" 
+
+id: LANG_OFF_ABORT
+desc: Used on recorder models
+eng: "OFF to abort"
+new: "OFF om af te breken"
+
+id: LANG_OTHELO
+desc: in the games menu
+eng: "Othelo"
+new: "Othelo" 
+
+id: LANG_PLAYLIST_ACCESS_ERROR
+desc: Playlist error
+eng: "Error accessing playlist file"
+new: "Fout in gebruik speellijst" 
+
+id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
+desc: Playlist error
+eng: "Error accessing playlist control file"
+new: "Fout in gebruik speellijst stuurbestand" 
+
+id: LANG_PLAYLIST_CONTROL_INVALID
+desc: Playlist resume error
+eng: "Playlist control file is invalid"
+new: "Speellijst stuurbestand is niet bruikbaar"
+
+id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
+desc: Playlist error
+eng: "Error updating playlist control file"
+new: "Fout in bijwerken speellijst stuurbestand"
+
+id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
+desc: Playlist error
+eng: "Error accessing directory"
+new: "Fout tijdens toegen directorie" 
+
+id: LANG_PLAYLIST_INSERT_COUNT
+desc: splash number of tracks inserted
+eng: "Inserted %d tracks (%s)"
+new: "%d nummers toegevoegd (%s)" 
+
+id: LANG_PLAYLIST_MENU
+desc: in main menu.
+eng: "Playlist Options"
+new: "Speellijst opties" 
+
+id: LANG_PLAYLIST_QUEUE_COUNT
+desc: splash number of tracks queued
+eng: "Queued %d tracks (%s)"
+new: "%d nummers in wachtrij (%s)"
+
+id: LANG_PLAYLIST_SAVE_COUNT
+desc: splash number of tracks saved
+eng: "Saved %d tracks (%s)"
+new: "%d nummers opgeslagen (%s)"
+
+id: LANG_QUEUE_FIRST
+desc: in onplay menu.  queue a track/playlist into dynamic playlist.
+eng: "Queue next"
+new: "Volgende in wachtrij" 
+
+id: LANG_QUEUE_LAST
+desc: in onplay menu.  queue a track/playlist at end of playlist.
+eng: "Queue last"
+new: "Onderaan wachtrij" 
+
+id: LANG_RECURSE_DIRECTORY
+desc: In playlist menu
+eng: "Recursively Insert Directories"
+new: "Voeg ook subdirectories in"
+
+id: LANG_SAVE_DYNAMIC_PLAYLIST
+desc: in playlist menu.
+eng: "Save Dynamic Playlist"
+new: "Sla dynamische speellijst op" 
+
+id: LANG_SLIDING_PUZZLE
+desc: in the games menu
+eng: "Sliding Puzzle"
+new: "Schuifpuzzel" 
+
+id: LANG_STAR
+desc: in the games menu
+eng: "Star"
+new: "Ster" 
+
+id: LANG_STOP_ABORT
+desc: Used on player models
+eng: "STOP to abort"
+new: "STOP om af te breken" 
+
+id: LANG_RECURSE_DIRECTORY_QUESTION
+desc: Asked from onplay screen
+eng: "Recursively?"
+new: "Ook sub-directories?" 
