@@ -111,10 +111,6 @@ void backlight_tick(void)
 
 void backlight_init(void)
 {
-#ifdef HAVE_RTC
-    rtc_write(0x13, 0x10); /* 32 kHz swuare wave */
-    rtc_write(0x01, 0x00); /* Clear Stop bit */
-#endif
     queue_init(&backlight_queue);
     create_thread(backlight_thread, backlight_stack,
                   sizeof(backlight_stack), backlight_thread_name);
