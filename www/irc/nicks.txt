@@ -24,3 +24,4 @@ uski        => Bertrand Achard
 Quelsaruk   => Jose Maria Garcia-Valdecasas Bernal
 amiconn     => Jens Arnold
 mattzz      => Matthias Wientapper
+pfavr       => Peter Favrholdt
