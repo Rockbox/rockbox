@@ -39,9 +39,10 @@
 #include "font.h"
 #include "system.h"
 #include "lcd.h"
-
+#include "id3.h"
+#include "mpeg.h"
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 4
+#define PLUGIN_API_VERSION 5 
 
 /* plugin return codes */
 enum plugin_status {
@@ -162,6 +163,7 @@ struct plugin_api {
     void (*qsort)(void *base, size_t nmemb, size_t size,
                   int(*compar)(const void *, const void *));
     int (*kbd_input)(char* buffer, int buflen);
+    struct mp3entry* (*mpeg_current_track)();
 };
 
 /* defined by the plugin loader (plugin.c) */

@@ -31,6 +31,7 @@
 #include "plugin.h"
 #include "lang.h"
 #include "keyboard.h"
+#include "mpeg.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -134,6 +135,7 @@ static struct plugin_api rockbox_api = {
     splash,
     qsort,
     kbd_input,
+    mpeg_current_track, 
 };
 
 int plugin_load(char* plugin, void* parameter)
