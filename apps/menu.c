@@ -62,7 +62,7 @@ void put_cursorxy(int x, int y, bool on)
 #elif defined(SIMULATOR)
         /* player simulator */
         unsigned char cursor[] = { 0x7f, 0x3e, 0x1c, 0x08 };
-        lcd_bitmap ( cursor, x*6, 8+y*8, 4, 8, true);
+        lcd_bitmap ( cursor, x*6, 12+y*16, 4, 8, true);
 #else
         lcd_puts(x, y, CURSOR_CHAR);
 #endif
@@ -73,7 +73,7 @@ void put_cursorxy(int x, int y, bool on)
         lcd_clearrect (x*6, y*8, 4, 8);
 #elif defined(SIMULATOR)
         /* player simulator in action */
-        lcd_clearrect (x*6, 8+y*8, 4, 8);
+        lcd_clearrect (x*6, 12+y*16, 4, 8);
 #else
         lcd_puts(x, y, " ");
 #endif
