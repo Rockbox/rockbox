@@ -64,7 +64,6 @@ static int get_unswapped_space(void);
 #define MPEG_TRACK_CHANGE 101
 #define MPEG_SAVE_DATA    102
 #define MPEG_STOP_DONE    103
-#define MPEG_REC_TIMEOUT  104
 
 enum
 {
@@ -617,10 +616,11 @@ static void stop_dma(void)
     dma_on = false;
 }
 
-long current_dma_tick = 0;
+#ifdef HAVE_MAS3587F
 long timing_info_index = 0;
 long timing_info[1024];
 bool inverted_pr;
+#endif
 
 static void dma_tick(void)
 {
@@ -1618,13 +1618,6 @@ static void mpeg_thread(void)
                         queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
                         break;
 
-                    case MPEG_REC_TIMEOUT:
-                        demand_irq_enable(false);
-                        if(mpeg_file >= 0)
-                            close(mpeg_file);
-                        panicf("Timeout: %d", (int)ev.data);
-                        break;
-                        
                     case MPEG_STOP_DONE:
                         DEBUGF("MPEG_STOP_DONE\n");
 
@@ -2570,11 +2563,13 @@ void mpeg_init(int volume, int bass, int treble, int balance, int loudness, int 
     memset(id3tags, sizeof(id3tags), 0);
     memset(_id3tags, sizeof(id3tags), 0);
 
+#ifdef HAVE_MAS3587F
     if(read_hw_mask() & PR_ACTIVE_HIGH)
         inverted_pr = true;
     else
         inverted_pr = false;
-
+#endif
+    
 #ifdef DEBUG
     dbg_timer_start();
     dbg_cnt2us(0);
