@@ -42,12 +42,11 @@
 
 /* -- -- */
 
-GC draw_gc, erase_gc;
+GC draw_gc;
 static Colormap cmap;
-static XColor color_track, color_car;
 
 static long maxx, maxy;
-static double track_zoom=1;
+static int display_zoom=2;
 
 Display *dpy;
 Window window;
@@ -74,40 +73,29 @@ void init_window ()
 
   XGetWindowAttributes (dpy, window, &xgwa);
 
-  color_track.red=65535;
-  color_track.green=65535;
-  color_track.blue=65535;
-
-  color_car.red=65535;
-  color_car.green=65535;
-  color_car.blue=0;
-
   cmap = xgwa.colormap;
 
   gcv.function = GXxor;
   gcv.foreground =
     get_pixel_resource ("foreground", "Foreground", dpy, cmap);
-  draw_gc = erase_gc = XCreateGC (dpy, window, GCForeground, &gcv);
-  XAllocColor (dpy, cmap, &color_track);
-  XAllocColor (dpy, cmap, &color_car);
+  draw_gc = XCreateGC (dpy, window, GCForeground, &gcv);
 
   screen_resized(200, 100);
 }
 
 void screen_resized(int width, int height)
 {
-#if 0
-  XWindowAttributes xgwa;
-  XGetWindowAttributes (dpy, window, &xgwa);
-  maxx = ((long)(xgwa.width));
-  maxy = ((long)(xgwa.height));
-#else
   maxx = width-1;
   maxy = height-1;
-#endif
+
+  display_zoom = maxy/64;
+  if (maxx/120 < display_zoom) 
+    display_zoom = maxx/120;
+  if (display_zoom<1)
+    display_zoom = 1;
   XSetForeground (dpy, draw_gc, get_pixel_resource ("background", "Background",
                                                     dpy, cmap));
-  XFillRectangle(dpy, window, draw_gc, 0, 0, width, height);
+  XFillRectangle(dpy, window, draw_gc, 0, 0, width*display_zoom, height*display_zoom);
 
 }
 
@@ -129,10 +117,10 @@ void drawline(int color, int x1, int y1, int x2, int y2)
                    get_pixel_resource("foreground", "Foreground", dpy, cmap));
 
   XDrawLine(dpy, window, draw_gc, 
-            (int)(x1*track_zoom), 
-            (int)(y1*track_zoom), 
-            (int)(x2*track_zoom), 
-            (int)(y2*track_zoom));
+            (int)(x1*display_zoom), 
+            (int)(y1*display_zoom), 
+            (int)(x2*display_zoom), 
+            (int)(y2*display_zoom));
 }
 
 void drawdot(int color, int x, int y)
@@ -145,7 +133,8 @@ void drawdot(int color, int x, int y)
     XSetForeground(dpy, draw_gc,
                    get_pixel_resource("foreground", "Foreground", dpy, cmap));
 
-  XDrawPoint(dpy, window, draw_gc, x, y);
+  XFillRectangle(dpy, window, draw_gc, x*display_zoom, y*display_zoom, 
+		 display_zoom, display_zoom);
 }
 
 void drawdots(int color, XPoint *points, int count)
@@ -158,8 +147,13 @@ void drawdots(int color, XPoint *points, int count)
     XSetForeground(dpy, draw_gc,
                    get_pixel_resource("foreground", "Foreground", dpy, cmap));
 
-  
-  XDrawPoints(dpy, window, draw_gc, points, count, CoordModeOrigin);
+  while (count-->=0) {
+    XFillRectangle(dpy, window, draw_gc, 
+		   points[count].x*display_zoom,
+		   points[count].y*display_zoom, 
+		   display_zoom, 
+		   display_zoom);
+  }
 }
 
 void drawtext(int color, int x, int y, char *text)
@@ -172,7 +166,7 @@ void drawtext(int color, int x, int y, char *text)
     XSetForeground(dpy, draw_gc,
                    get_pixel_resource("foreground", "Foreground", dpy, cmap));
 
-  XDrawString(dpy, window, draw_gc, x, y, text, strlen(text));
+  XDrawString(dpy, window, draw_gc, x*display_zoom, y*display_zoom, text, strlen(text));
 }
 
 /* this is where the applicaton starts */
