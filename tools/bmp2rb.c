@@ -256,7 +256,7 @@ void generate_c_source(char *id, int width, int height, unsigned char *bitmap)
    }
    
 
-   fprintf(f, "\n};");
+   fprintf(f, "\n};\n");
 }
 
 
