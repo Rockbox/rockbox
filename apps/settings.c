@@ -82,7 +82,7 @@ offset  abs
 0x0d    0x21    <resume settings byte>
 0x0e    0x22    <shuffle,dirfilter,sort_case,discharge,statusbar,show_hidden,
                  scroll bar>
-0x0f    0x23    <scroll speed>
+0x0f    0x23    <timeformat, scroll speed. volume type, battery type>
 0x10    0x24    <ff/rewind min step, acceleration rate>
 0x11    0x25    <AVC, channel config>
 0x12    0x26    <(int) Resume playlist index, or -1 if no playlist resume>
@@ -294,10 +294,12 @@ int settings_save( void )
          ((global_settings.statusbar & 1) << 4) |
          ((global_settings.dirfilter & 2) << 4) |
          ((global_settings.scrollbar & 1) << 6));
-
+    
     config_block[0xf] = (unsigned char)
-         ((global_settings.timeformat & 1) << 2) |
-         ((global_settings.scroll_speed    << 3));
+        (((global_settings.timeformat & 1)   << 2) |
+         ( global_settings.scroll_speed      << 3) |
+         ((global_settings.volume_type & 1)  << 4) |
+         ((global_settings.battery_type & 1) << 5));
     
     config_block[0x10] = (unsigned char)
         ((global_settings.ff_rewind_min_step & 15) << 4 |
@@ -466,6 +468,8 @@ void settings_load(void)
         if (config_block[0xf] != 0xFF) {
             global_settings.timeformat  = (config_block[0xf] >> 2) & 1;
             global_settings.scroll_speed = config_block[0xf] >> 3;
+            global_settings.volume_type = (config_block[0xf] >> 4) & 1;
+            global_settings.battery_type = (config_block[0xf] >> 5) & 1;
         }
 
         if (config_block[0x10] != 0xFF) {
@@ -670,6 +674,8 @@ void settings_reset(void) {
     global_settings.discharge    = 0;
     global_settings.total_uptime = 0;
     global_settings.timeformat   = 0;
+    global_settings.volume_type  = 0;
+    global_settings.battery_type = 0;
     global_settings.scroll_speed = 8;
     global_settings.ff_rewind_min_step = DEFAULT_FF_REWIND_MIN_STEP;
     global_settings.ff_rewind_accel = DEFAULT_FF_REWIND_ACCEL_SETTING;

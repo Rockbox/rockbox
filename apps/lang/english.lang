@@ -1028,4 +1028,22 @@ desc: in settings_menu
 eng: "Ask Once"
 new:
 
+id: LANG_BATTERY_DISPLAY
+desc: Battery type title
+eng: "Battery Display"
+new:
 
+id: LANG_VOLUME_DISPLAY
+desc: Volume type title
+eng: "Volume Display"
+new:
+
+id: LANG_DISPLAY_GRAPHIC
+desc: Label for type of icon display
+eng: "Graphic"
+new:
+
+id: LANG_DISPLAY_NUMERIC
+desc: Label for type of icon display
+eng: "Numeric"
+new:

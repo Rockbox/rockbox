@@ -152,22 +152,38 @@ void statusbar_icon_battery(int percent, bool charging)
 {
     int i;
     int fill;
+	char buffer[5];
+    unsigned int width, height;
 
-    /* draw battery */
-    lcd_drawrect(ICON_BATTERY_X_POS, STATUSBAR_Y_POS, 17, 7);
-    for (i=2; i < 5; i++)
-        lcd_drawpixel(ICON_BATTERY_X_POS + 17, STATUSBAR_Y_POS + i);
-    
-    /* fill battery */
-    fill=percent;
-    if (fill < 0)
-        fill = 0;
-    if (fill > 100)
-        fill = 100;
+	/* fill battery */
+	fill=percent;
+	if (fill < 0)
+		fill = 0;
+	if (fill > 100)
+		fill = 100;
 
-    fill = fill * 15 / 100;
+	if (global_settings.battery_type) {
 
-    lcd_fillrect(ICON_BATTERY_X_POS + 1, STATUSBAR_Y_POS + 1, fill, 5);
+		/* Numeric display */
+		snprintf(buffer, sizeof(buffer), "%3d", percent);
+		lcd_setfont(FONT_SYSFIXED);
+		lcd_getstringsize(buffer, &width, &height);
+		if (height <= STATUSBAR_HEIGHT)
+			lcd_putsxy(ICON_BATTERY_X_POS + ICON_BATTERY_WIDTH / 2 -
+					   width/2, STATUSBAR_Y_POS, buffer);
+		lcd_setfont(FONT_UI);
+
+	} else {
+
+		/* draw battery */
+		lcd_drawrect(ICON_BATTERY_X_POS, STATUSBAR_Y_POS, 17, 7);
+		for (i=2; i < 5; i++)
+			lcd_drawpixel(ICON_BATTERY_X_POS + 17, STATUSBAR_Y_POS + i);
+
+		fill = fill * 15 / 100;
+
+		lcd_fillrect(ICON_BATTERY_X_POS + 1, STATUSBAR_Y_POS + 1, fill, 5);
+	}
 
     /* draw power plug if charging */
     if (charging)
@@ -207,8 +223,11 @@ void statusbar_icon_volume(int percent)
             switch_tick = current_tick + HZ;
             last_volume = volume;
         }
-        /* display volume lever numerical? */
-        if (TIME_BEFORE(current_tick,switch_tick)) { 
+
+        /* display volume level numerical? */
+		if (global_settings.volume_type || 
+			TIME_BEFORE(current_tick,switch_tick)) 
+		{
             snprintf(buffer, sizeof(buffer), "%2d", percent);
             lcd_setfont(FONT_SYSFIXED);
             lcd_getstringsize(buffer, &width, &height);
@@ -216,8 +235,8 @@ void statusbar_icon_volume(int percent)
                 lcd_putsxy(ICON_VOLUME_X_POS + ICON_VOLUME_WIDTH / 2 -
                            width/2, STATUSBAR_Y_POS, buffer);
             lcd_setfont(FONT_UI);
-        }
-        else { /* display volume bar */
+        } else { 
+            /* display volume bar */
             volume = volume * 14 / 100;
             for(i=0; i < volume; i++) {
                 if(i%2 == 0)

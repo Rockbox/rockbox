@@ -157,6 +157,24 @@ static bool sort_case(void)
     return set_bool( str(LANG_SORT_CASE), &global_settings.sort_case );
 }
 
+static bool battery_type(void)
+{
+    char* names[] = { str(LANG_DISPLAY_GRAPHIC), 
+                      str(LANG_DISPLAY_NUMERIC)  };
+
+    return set_option( str(LANG_BATTERY_DISPLAY), 
+                       &global_settings.battery_type, names, 2, NULL);
+}
+
+static bool volume_type(void)
+{
+    char* names[] = { str(LANG_DISPLAY_GRAPHIC), 
+                      str(LANG_DISPLAY_NUMERIC) };
+
+    return set_option( str(LANG_VOLUME_DISPLAY), &global_settings.volume_type,
+                       names, 2, NULL);
+}
+
 static bool resume(void)
 {
     char* names[] = { str(LANG_SET_BOOL_NO), 
@@ -427,6 +445,8 @@ static bool display_settings_menu(void)
         { str(LANG_CONTRAST),        contrast        },  
 #ifdef HAVE_LCD_BITMAP
         { str(LANG_PM_MENU),         peak_meter_menu },  
+        { str(LANG_VOLUME_DISPLAY),  volume_type },
+        { str(LANG_BATTERY_DISPLAY), battery_type },
 #endif
     };
     

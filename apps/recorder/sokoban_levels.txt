@@ -1,12 +1,13 @@
+/*
 # Map legend:
 #
-#   white space is clear back ground
-#   X = black back ground
-#   # = wall
-#   . = block destination 
-#   @ = starting position
-#   $ = movable block
-
+#  1 white space is clear back ground
+#  0 X = black back ground
+#  2 # = wall
+#  3 . = block destination 
+#  5 @ = starting position
+#  4 $ = movable block
+#  7 % = a placed block
 
 level: 1
 XXXXXXXXXXXXXXXXXXXX
@@ -70,7 +71,7 @@ XXXXXXXXXXXXXXXXXXXX
 XXXXXXXXXXXXXXXXXXXX
 XXXXXXXXX#####XXXXXX
 XXXXXX####  .#XXXXXX
-XXXXXX#   $ 7#XXXXXX
+XXXXXX#   $ %#XXXXXX
 XXXXXX# $$ $.#XXXXXX
 XXXXXX##@##..#XXXXXX
 XXXXXXX#######XXXXXX
@@ -180,7 +181,7 @@ XXXXXXXX#####XXXXXXX
 XXXXXX###  @#XXXXXXX
 XXXXXX#  $. ##XXXXXX
 XXXXXX#  .$. #XXXXXX
-XXXXXX### 7$ #XXXXXX
+XXXXXX### %$ #XXXXXX
 XXXXXXXX#   ##XXXXXX
 XXXXXXXX#####XXXXXXX
 XXXXXXXXXXXXXXXXXXXX
@@ -196,7 +197,7 @@ XXXXXXXXXXXXXXXXXXXX
 XXXXXX########XXXXXX
 XXXXXX#  #   #XXXXXX
 XXXXXX# $..$ #XXXXXX
-XXXXXX#@$.7 ##XXXXXX
+XXXXXX#@$.% ##XXXXXX
 XXXXXX# $..$ #XXXXXX
 XXXXXX#  #   #XXXXXX
 XXXXXX########XXXXXX
@@ -250,7 +251,7 @@ XXXXXXXXXXXXXXXXXXXX
 XXXXXXX########XXXXX
 XXXXXXX#   #. #XXXXX
 XXXXXX##  $...#XXXXX
-XXXXXX#  $ #7.#XXXXX
+XXXXXX#  $ #%.#XXXXX
 XXXXX## ##$# ##XXXXX
 XXXXX#   $  $ #XXXXX
 XXXXX#   #    #XXXXX
@@ -338,11 +339,11 @@ XXXXXXXXXXXXXXXXXXXX
 XXXXXXXXXXXXXXXXXXXX
 XXXXXXXXXXXXXXXXXXXX
 XXXXX#########XXXXXX
-XXXXX#   7   #XXXXXX
+XXXXX#   %   #XXXXXX
 XXXXX# $.$. @#XXXXXX
 XXXXX# .$.$. #XXXXXX
 XXXXX# $.$.$ #XXXXXX
-XXXXX#   7   #XXXXXX
+XXXXX#   %   #XXXXXX
 XXXXX#########XXXXXX
 XXXXXXXXXXXXXXXXXXXX
 XXXXXXXXXXXXXXXXXXXX
@@ -396,7 +397,7 @@ XXXXXX#####XXXXXXXXX
 XXXXXX#   ####XXXXXX
 XXXXX## #$   #XXXXXX
 XXXXX# $  $$ #XXXXXX
-XXXXX# #$#.7.#XXXXXX
+XXXXX# #$#.%.#XXXXXX
 XXXXX#   @...#XXXXXX
 XXXXX#########XXXXXX
 XXXXXXXXXXXXXXXXXXXX
@@ -412,8 +413,8 @@ XXXXXXXXXXXXXXXXXXXX
 XXXXXXXXX#####XXXXXX
 XXXXXX####   ##XXXXX
 XXXXXX# $ $   #XXXXX
-XXXXXX#@#.7.# #XXXXX
-XXXXXX# #.7.# #XXXXX
+XXXXXX#@#.%.# #XXXXX
+XXXXXX# #.%.# #XXXXX
 XXXXXX#   $ $ #XXXXX
 XXXXXX##   ####XXXXX
 XXXXXXX#####XXXXXXXX
@@ -466,9 +467,9 @@ XXXXXXXXXXXXXXXXXXXX
 XXXXXXXXXXXXXXXXXXXX
 XXXXX#######XXXXXXXX
 XXXXX#     #####XXXX
-XXXXX# $ .7. $ #XXXX
-XXXXX#@$.7 7.$ #XXXX
-XXXXX# $ .7. $ #XXXX
+XXXXX# $ .%. $ #XXXX
+XXXXX#@$.% %.$ #XXXX
+XXXXX# $ .%. $ #XXXX
 XXXXX######    #XXXX
 XXXXXXXXXX######XXXX
 XXXXXXXXXXXXXXXXXXXX
@@ -484,8 +485,8 @@ XXXXXXXXXXXXXXXXXXXX
 XXXXX######XXXXXXXXX
 XXXXX#    #XXXXXXXXX
 XXXXX# $  ####XXXXXX
-XXXXX# $7..7 #XXXXXX
-XXXXX# 7..7$ #XXXXXX
+XXXXX# $%..% #XXXXXX
+XXXXX# %..%$ #XXXXXX
 XXXXX####  $ #XXXXXX
 XXXXXXXX# @  #XXXXXX
 XXXXXXXX######XXXXXX
@@ -574,9 +575,9 @@ XXXXXXXXXXXXXXXXXXXX
 XXXXXXXXXXXXXXXXXXXX
 XXXXXX########XXXXXX
 XXXXXX#  #.. ##XXXXX
-XXXXXX# $. $7 #XXXXX
+XXXXXX# $. $% #XXXXX
 XXXXXX#  $@$  #XXXXX
-XXXXXX# 7$ .$ #XXXXX
+XXXXXX# %$ .$ #XXXXX
 XXXXXX## ..#  #XXXXX
 XXXXXXX########XXXXX
 XXXXXXXXXXXXXXXXXXXX
@@ -590,13 +591,13 @@ XXXXXXXXXXXXXXXXXXXX
 XXXXXXXXXXXXXXXXXXXX
 XXXXXXXXXXXXXXXXXXXX
 XXXXXX#######XXXXXXX
-XXXXX##  7  ##XXXXXX
+XXXXX##  %  ##XXXXXX
 XXXXX# . . . #XXXXXX
-XXXXX# $ 7   #XXXXXX
-XXXXX#7$$7$$7#XXXXXX
-XXXXX#   7 $ #XXXXXX
+XXXXX# $ %   #XXXXXX
+XXXXX#%$$%$$%#XXXXXX
+XXXXX#   % $ #XXXXXX
 XXXXX# . .@. #XXXXXX
-XXXXX##  7  ##XXXXXX
+XXXXX##  %  ##XXXXXX
 XXXXXX#######XXXXXXX
 XXXXXXXXXXXXXXXXXXXX
 XXXXXXXXXXXXXXXXXXXX
@@ -609,9 +610,9 @@ XXXXXXXXXXXXXXXXXXXX
 XXXXXXXXXXXXXXXXXXXX
 XXXXX#########XXXXXX
 XXXXX#   .$ @#XXXXXX
-XXXXX# $ 7 $ #XXXXXX
-XXXXX#7...7.7#XXXXXX
-XXXXX# $$7   #XXXXXX
+XXXXX# $ % $ #XXXXXX
+XXXXX#%...%.%#XXXXXX
+XXXXX# $$%   #XXXXXX
 XXXXX#   . $ #XXXXXX
 XXXXX#########XXXXXX
 XXXXXXXXXXXXXXXXXXXX
@@ -681,7 +682,7 @@ XXXXXXXX#######XXXXX
 XXXXXX###     #XXXXX
 XXXXX##   # # #XXXXX
 XXXXX#  #.$$$ #XXXXX
-XXXXX# #.7# ###XXXXX
+XXXXX# #.%# ###XXXXX
 XXXXX#  ..# #XXXXXXX
 XXXXX###..$ ##XXXXXX
 XXXXXXX#.# $ #XXXXXX
@@ -718,7 +719,7 @@ XXXXX#      #XXXXXXX
 XXXXX# @ $# #XXXXXXX
 XXXXX## #   #XXXXXXX
 XXXXX# $#.# #XXXXXXX
-XXXXX#  .7.$#XXXXXXX
+XXXXX#  .%.$#XXXXXXX
 XXXXX## #.# #XXXXXXX
 XXXXXX# #.  ##XXXXXX
 XXXXX## $.#  #XXXXXX
@@ -737,7 +738,7 @@ XXXX####      #XXXXX
 XXXX#   .### ##XXXXX
 XXXX# # #    ##XXXXX
 XXXX# # $ $#. #XXXXX
-XXXX# #  7  # #XXXXX
+XXXX# #  %  # #XXXXX
 XXXX# .#$ $ # #XXXXX
 XXXX##    # # #XXXXX
 XXXXX# ###.   #XXXXX
@@ -775,9 +776,9 @@ XXXXXX##$#  .#XXXXXX
 XXXXXXX# #$# #XXXXXX
 XXXXXX##.  . #XXXXXX
 XXXXXX#  ##  #XXXXXX
-XXXXXX#  #  7#XXXXXX
+XXXXXX#  #  %#XXXXXX
 XXXXXX# $  $ #XXXXXX
-XXXXXX# $#7 @#XXXXXX
+XXXXXX# $#% @#XXXXXX
 XXXXXX#  #.###XXXXXX
 XXXXXX######XXXXXXXX
 XXXXXXXXXXXXXXXXXXXX
@@ -807,11 +808,11 @@ XXXXXXXXX####XXXXXXX
 XXXXXXX###  ##XXXXXX
 XXXXXX##     ##XXXXX
 XXXXXX#   # ..#XXXXX
-XXXXX## $#7#$.#XXXXX
+XXXXX## $#%#$.#XXXXX
 XXXXX#  $ # $.#XXXXX
 XXXXX#  $ @ $.#XXXXX
 XXXXX#  $ # $.#XXXXX
-XXXXX##$$#7#$.#XXXXX
+XXXXX##$$#%#$.#XXXXX
 XXXXXX#.  # ..#XXXXX
 XXXXXX##.    ##XXXXX
 XXXXXXX###  ##XXXXXX
@@ -894,16 +895,16 @@ level: 50
 XXXXXXXXXXXXXXXXXXXX
 XXXXXXXXXXXXXXXXXXXX
 XXXXX##########XXXXX
-XXXXX#..$ $ 7.#XXXXX
-XXXXX#.7 $ $..#XXXXX
-XXXXX##.$ $ 7##XXXXX
-XXXXXX#7 $ $.#XXXXXX
+XXXXX#..$ $ %.#XXXXX
+XXXXX#.% $ $..#XXXXX
+XXXXX##.$ $ %##XXXXX
+XXXXXX#% $ $.#XXXXXX
 XXXXXX#.$ $ .#XXXXXX
 XXXXXX#. $ $.#XXXXXX
-XXXXXX#.$@$ 7#XXXXXX
-XXXXX##7 $ $.##XXXXX
-XXXXX#..$ $ 7.#XXXXX
-XXXXX#.7 $ $..#XXXXX
+XXXXXX#.$@$ %#XXXXXX
+XXXXX##% $ $.##XXXXX
+XXXXX#..$ $ %.#XXXXX
+XXXXX#.% $ $..#XXXXX
 XXXXX##########XXXXX
 XXXXXXXXXXXXXXXXXXXX
 XXXXXXXXXXXXXXXXXXXX
@@ -1170,7 +1171,7 @@ XXX#  # @ $ # $#XXXX
 XXX#  #      $ ####X
 XXX## ####$##     #X
 XXX# $#.....# #   #X
-XXX#  $..77. $# ###X
+XXX#  $..%%. $# ###X
 XX##  #.....#   #XXX
 XX#   ### #######XXX
 XX# $$  #  #XXXXXXXX
@@ -1189,7 +1190,7 @@ XXXX#  ##  $ $ ##XXX
 XXXX# $  ## ## .#XXX
 XXXX#  #$##$  #.#XXX
 XXXX###   $..##.#XXX
-XXXXX#    #.7...#XXX
+XXXXX#    #.%...#XXX
 XXXXX# $$ #.....#XXX
 XXXXX#  #########XXX
 XXXXX#  #XXXXXXXXXXX
@@ -1261,9 +1262,9 @@ X# # $  #     #$ ..#
 X# #  ### ##     #.#
 X# ###  #  #  #$ ..#
 X# #    # $####  #.#
-X# #$   $  $  #7 ..#
+X# #$   $  $  #% ..#
 X#    $ # $ $ #  #.#
-X#### $###    #7 ..#
+X#### $###    #% ..#
 XXXX#    $$ ###....#
 XXXX#      ##X######
 XXXX########XXXXXXXX
@@ -1421,8 +1422,8 @@ X## # #       ######
 X## #   $#$#@  #   #
 X#  #      $ #   $ #
 X#  ### ######### ##
-X#  ## ..7..... # ##
-X## ## 7.7..7.7 # ##
+X#  ## ..%..... # ##
+X## ## %.%..%.% # ##
 X# $########## ##$ #
 X#  $   $  $    $  #
 X#  #   #   #   #  #
@@ -1756,11 +1757,11 @@ XXXXXXXXXXXXXXXXXXXX
 
 level: 98
 XXXXX#########XXXXXX
-XXXXX#7.7#7.7#XXXXXX
-XXXXX#.7.7.7.#XXXXXX
-XXXXX#7.7.7.7#XXXXXX
-XXXXX#.7.7.7.#XXXXXX
-XXXXX#7.7.7.7#XXXXXX
+XXXXX#%.%#%.%#XXXXXX
+XXXXX#.%.%.%.#XXXXXX
+XXXXX#%.%.%.%#XXXXXX
+XXXXX#.%.%.%.#XXXXXX
+XXXXX#%.%.%.%#XXXXXX
 XXXXX###   ###XXXXXX
 XXXXXXX#   #XXXXXXXX
 XXX###### ######XXXX
@@ -1782,7 +1783,7 @@ XXX####    $   #XXXX
 X###  # #####  #XXXX
 X#    # #....$ #XXXX
 X# #   $ ....# #XXXX
-X#  $ # #.7..# #XXXX
+X#  $ # #.%..# #XXXX
 X###  #### ### #XXXX
 XXX#### @$  ##$##XXX
 XXXXXX### $     #XXX
@@ -1793,9 +1794,9 @@ XXXXXXXXXXXXXXXXXXXX
 level: 100
 XXXXXX############XX
 XXXXX##..        #XX
-XXXX##..7 $    $ #XX
-XXX##..7.# # #$ ##XX
-XXX#..7.# # # $  #XX
+XXXX##..% $    $ #XX
+XXX##..%.# # #$ ##XX
+XXX#..%.# # # $  #XX
 ####...#  #    # #XX
 #  ## #          #XX
 # @$ $ ###  # # ##XX
