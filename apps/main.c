@@ -34,12 +34,13 @@
 #endif
 #include "mpeg.h"
 #include "main_menu.h"
+#include "thread.h"
 
 #include "version.h"
 
 char appsversion[]=APPSVERSION;
 
-int init(void);
+void init(void);
 
 void app_main(void)
 {
@@ -49,7 +50,7 @@ void app_main(void)
 
 #ifdef SIMULATOR
 
-int init(void)
+void init(void)
 {
     init_threads();
     lcd_init();
