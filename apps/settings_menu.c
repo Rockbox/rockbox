@@ -49,6 +49,14 @@ static bool contrast(void)
                     lcd_set_contrast, 1, 0, MAX_CONTRAST_SETTING );
 }
 
+static bool caption_backlight(void)
+{
+    bool rc = set_bool( str(LANG_CAPTION_BACKLIGHT),
+                        &global_settings.caption_backlight);
+
+    return rc;
+}
+
 #ifdef HAVE_LCD_BITMAP
 
 static bool invert(void)
@@ -67,13 +75,6 @@ static bool invert_cursor(void)
     return rc;
 }
 
-static bool caption_backlight(void)
-{
-    bool rc = set_bool( str(LANG_CAPTION_BACKLIGHT),
-                        &global_settings.caption_backlight);
-
-    return rc;
-}
 /**
  * Menu to configure the battery display on status bar
  */
