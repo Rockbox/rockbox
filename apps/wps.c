@@ -384,8 +384,7 @@ static bool ffwd_rew(int button)
                     status_set_playmode(STATUS_PLAY);
                 }
 #ifdef HAVE_LCD_CHARCELLS
-                if (wps_display(id3))
-                    return true;
+                wps_display(id3);
 #endif
                 exit = true;
                 break;
@@ -453,8 +452,13 @@ static bool keylock(void)
     display_keylock_text(true);
     keys_locked = true;
     wps_refresh(id3,0,true);
-    if (wps_display(id3))
-        return true;
+    if (wps_display(id3)) {
+        keys_locked = false;
+#ifdef HAVE_LCD_CHARCELLS
+        status_set_record(false);
+#endif
+        return false;
+    }
     status_draw();
     while (button_get(false)); /* clear button queue */
 
@@ -482,7 +486,13 @@ static bool keylock(void)
                 return true;
 
             case BUTTON_NONE:
-                update();
+                if(update()) {
+                    keys_locked = false;
+#ifdef HAVE_LCD_CHARCELLS
+                    status_set_record(false);
+#endif
+                    exit = true;
+                }
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD
@@ -500,8 +510,13 @@ static bool keylock(void)
                 display_keylock_text(true);
                 while (button_get(false)); /* clear button queue */
                 wps_refresh(id3,0,true);
-                if(wps_display(id3))
-                    return true;
+                if (wps_display(id3)) {
+                    keys_locked = false;
+#ifdef HAVE_LCD_CHARCELLS
+                    status_set_record(false);
+#endif
+                    exit = true;
+                }
                 break;
         }
     }
@@ -610,8 +625,7 @@ static bool menu(void)
     status_set_param(false);
 #endif
 
-    if (wps_display(id3))
-        return true;
+    wps_display(id3);
     wps_refresh(id3,0,true);
     return false;
 }
