@@ -72,7 +72,7 @@ int mpeg_sound_numdecimals(int setting);
 struct mp3entry* mpeg_current_track(void);
 bool mpeg_has_changed_track(void);
 int mpeg_status(void);
-#ifdef HAVE_MAS3587F
+#if defined(HAVE_MAS3587F) || defined(SIMULATOR)
 void mpeg_set_pitch(int percent);
 void mpeg_init_recording(void);
 void mpeg_init_playback(void);
