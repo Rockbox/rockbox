@@ -149,6 +149,24 @@ int button_get(bool block)
     return BUTTON_NONE;
 }
 
+int button_get_w_tmo(int ticks)
+{
+    struct event ev;
+    unsigned int timeout = current_tick + ticks;
+
+    while (TIME_BEFORE( current_tick, timeout ))
+    {
+        if(!queue_empty(&button_queue))
+        {
+            queue_wait(&button_queue, &ev);
+            return ev.id;
+        }
+        yield();
+    }
+
+    return BUTTON_NONE;
+}
+
 int button_set_repeat(int newmask)
 {
     int oldmask = repeat_mask;

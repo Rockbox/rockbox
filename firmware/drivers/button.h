@@ -26,6 +26,7 @@ extern struct event_queue button_queue;
 
 void button_init (void);
 int button_get (bool block);
+int button_get_w_tmo(int ticks);
 int button_set_repeat(int newmask);
 int button_set_release(int newmask);
 
