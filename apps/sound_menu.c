@@ -31,15 +31,11 @@
 typedef void (*settingfunc)(int);
 enum { Volume, Bass, Treble, numsettings };
 
-static void soundsetting(int setting)
-{
-    static int savedsettings[numsettings] = { DEFAULT_VOLUME_SETTING,
-                                              DEFAULT_BASS_SETTING,
-                                              DEFAULT_TREBLE_SETTING};
-    static const char* names[] = { "Volume", "Bass", "Treble" };
-    static settingfunc funcs[] = { mpeg_volume, mpeg_bass, mpeg_treble };
+static const char* names[] = { "Volume", "Bass", "Treble" };
+static settingfunc funcs[] = { mpeg_volume, mpeg_bass, mpeg_treble };
 
-    int value = savedsettings[setting];
+static void soundsetting(int setting, int *value)
+{
     char buf[32];
     bool done = false;
 
@@ -48,7 +44,7 @@ static void soundsetting(int setting)
     lcd_puts(0,0,buf);
 
     while ( !done ) {
-        snprintf(buf,sizeof buf,"%d %% ",value);
+        snprintf(buf,sizeof buf,"%d %% ", *value);
         lcd_puts(0,1,buf);
         lcd_update();
 
@@ -58,10 +54,10 @@ static void soundsetting(int setting)
 #else
             case BUTTON_RIGHT:
 #endif
-                value += 2;
-                if ( value >= 100 )
-                    value = 100;
-                (funcs[setting])(value);
+                *value += 2;
+                if ( *value >= 100 )
+                    *value = 100;
+                (funcs[setting])(*value);
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD
@@ -69,10 +65,10 @@ static void soundsetting(int setting)
 #else
             case BUTTON_LEFT:
 #endif
-                value -= 2;
-                if ( value <= 0 )
-                    value = 0;
-                (funcs[setting])(value);
+                *value -= 2;
+                if ( *value <= 0 )
+                    *value = 0;
+                (funcs[setting])(*value);
                 break;
 
 #ifdef HAVE_RECORDER_KEYPAD
@@ -81,7 +77,6 @@ static void soundsetting(int setting)
             case BUTTON_STOP:
             case BUTTON_MENU:
 #endif
-                savedsettings[setting] = value;
                 done = true;
                 break;
         }
@@ -90,17 +85,17 @@ static void soundsetting(int setting)
 
 static void volume(void)
 {
-    soundsetting(Volume);
+    soundsetting(Volume, &global_settings.volume);
 }
 
 static void bass(void)
 {
-    soundsetting(Bass);
+    soundsetting(Bass, &global_settings.bass);
 };
 
 static void treble(void)
 {
-    soundsetting(Treble);
+    soundsetting(Treble, &global_settings.treble);
 }
 
 void sound_menu(void)
@@ -116,4 +111,3 @@ void sound_menu(void)
     menu_run(m);
     menu_exit(m);
 }
-
