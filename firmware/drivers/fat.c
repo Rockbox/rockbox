@@ -1861,9 +1861,8 @@ static int transfer( unsigned int start, int count, char* buf, bool write )
 {
     int rc;
 
-    start += fat_bpb.startsector; /* offset by partition location */
-
-    LDEBUGF("transfer(s=%x, c=%x, %s)\n",start, count, write?"write":"read");
+    LDEBUGF("transfer(s=%x, c=%x, %s)\n",
+        start+ fat_bpb.startsector, count, write?"write":"read");
     if (write) {
         unsigned int firstallowed;
 #ifdef HAVE_FAT16SUPPORT
@@ -1873,12 +1872,15 @@ static int transfer( unsigned int start, int count, char* buf, bool write )
 #endif
             firstallowed = fat_bpb.firstdatasector;
             
-        if (start < firstallowed + fat_bpb.startsector)
-            panicf("Writing before data\n");
-        rc = ata_write_sectors(start, count, buf);
+        if (start < firstallowed)
+            panicf("Write %d before data\n", firstallowed - start);
+        if (start + count > fat_bpb.totalsectors)
+            panicf("Write %d after data\n",
+                start + count - fat_bpb.totalsectors);
+        rc = ata_write_sectors(start + fat_bpb.startsector, count, buf);
     }
     else
-        rc = ata_read_sectors(start, count, buf);
+        rc = ata_read_sectors(start + fat_bpb.startsector, count, buf);
     if (rc < 0) {
         DEBUGF( "transfer() - Couldn't %s sector %x"
                 " (error code %d)\n", 
