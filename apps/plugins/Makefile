@@ -40,25 +40,31 @@ no_configure:
 endif
 
 $(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKFILE) $(OBJDIR)/libplugin.a
-	$(CC) -O -nostdlib -o $@ $< -L$(OBJDIR) -lplugin -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/$*.map
+	@echo "LD $@"
+	@$(CC) -O -nostdlib -o $@ $< -L$(OBJDIR) -lplugin -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/$*.map
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.elf
-	$(OC) -O binary $< $@
+	@echo "OBJCOPY $<"
+	@$(OC) -O binary $< $@
 
 $(OBJDIR)/%.o: %.c  ../plugin.h Makefile
-	$(CC) $(CFLAGS) -c $< -o $@
+	@echo "CC $<"
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 all: $(OBJDIR)/libplugin.a $(ROCKS)
-	echo "done"
+	@echo "plugins done"
 
 $(OBJDIR)/libplugin.a:
-	$(MAKE) -C lib TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR) VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEM}
+	@echo "MAKE in lib"
+	@$(MAKE) -C lib TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR) VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEM}
 
 # MEM should be passed on to this makefile with the chosen memory size given
 # in number of MB
 $(LINKFILE): $(LDS)
-	$(CC) -DMEMORYSIZE=$(MEM) $(DEFINES) -x c -E -P $< >$@
+	@echo "build $@"
+	@$(CC) -DMEMORYSIZE=$(MEM) $(DEFINES) -x c -E -P $< >$@
 
 clean:
-	-rm -f $(ROCKS) $(LINKFILE) $(OBJDIR)/*.rock
-	$(MAKE) -C lib clean
+	@echo "cleaning plugins"
+	@-rm -f $(ROCKS) $(LINKFILE) $(OBJDIR)/*.rock
+	@$(MAKE) -C lib clean

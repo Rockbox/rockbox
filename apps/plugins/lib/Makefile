@@ -62,25 +62,28 @@ no_configure:
 endif
 
 all: $(OUTPUT)
+	@echo "lib done"
 
 $(OUTPUT): $(OBJS)
-	$(AR) ruv $@ $+
+	@echo "AR $@"
+	@$(AR) ruv $@ $+ >/dev/null
 
 $(OBJDIR)/%.o: %.c
 	@mkdir -p `dirname $@`
-	$(CC) $(CFLAGS) -c $< -o $@
+	@echo "CC $<"
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 tags:
 	@$(SHELL) -c 'for d in $(DIRS); do { etags -o $(OBJDIR)/TAGS -a $$d/*.[ch]; }; done'
 
 clean:
-	rm -f $(OBJS) $(OUTPUT)
-	rm -rf $(OBJDIR)/$(DEPS)
+	@echo "cleaning lib"
+	@rm -f $(OBJS) $(OUTPUT)
+	@rm -rf $(OBJDIR)/$(DEPS)
 
 $(OBJDIR)/$(DEPS)/%.d: %.c
 	@$(SHELL) -c 'for d in $(DEPDIRS); do { if [ ! -d $(OBJDIR)/$$d ]; then mkdir $(OBJDIR)/$$d; fi; }; done'
-	@echo "Updating dependencies for $<"
-	@$(SHELL) -ec '$(CC) -MM $(CFLAGS) $< \
+	@$(SHELL) -ec '$(CC) -MM $(CFLAGS) $< 2>/dev/null \
 		|sed '\''s|\($*\)\.o[ :]*|$(OBJDIR)/\1.o $(<:%.c=%.d) : |g'\'' > $@; \
 		[ -s $@ ] || rm -f $@'
 

@@ -11,6 +11,7 @@ CFLAGS := -O -ansi
 TARGETS := scramble descramble sh2d bmp2rb convbdf generate_rocklatin
 
 all: $(TARGETS)
+	@echo "tools done"
 
 scramble: scramble.c
 

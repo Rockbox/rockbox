@@ -44,6 +44,7 @@ ifdef ARCHOS_ROM
 endif
 
 LDS := $(FIRMWARE)/app.lds
+ROMLDS := $(FIRMWARE)/rom.lds
 
 ifdef DEBUG
     DEFINES := -DDEBUG
@@ -54,15 +55,23 @@ SRC := $(wildcard *.c)
 
 ifeq ($(TARGET), -DARCHOS_FMRECORDER)
    TOOL_OPT = -fm
+   MAXROMSIZE = 180208 # 176KB -16
 endif
 ifeq ($(TARGET), -DARCHOS_RECORDERV2)
    TOOL_OPT = -v2
+   MAXROMSIZE = 188400 # 184KB - 16
 endif
+ifeq ($(TARGET), -DARCHOS_RECORDER)
+   MAXROMSIZE = 192496 # 188KB - 16
+endif
+
 
 ifeq ($(ANYREC), RECORDER)
    SRC += $(wildcard recorder/*.c)
    CFLAGS += -Irecorder
    OUTNAME = ajbrec.ajz
+   # set the ROMTARGET here to make this get built only on recorders
+   ROMTARGET := $(OBJDIR)/rombox.ucl
 else
 ifeq ($(TARGET), -DARCHOS_PLAYER)
    SRC += $(wildcard player/*.c)
@@ -80,6 +89,7 @@ endif
 OBJS := $(OBJDIR)/lang.o $(SRC:%.c=$(OBJDIR)/%.o)
 
 LINKFILE = $(OBJDIR)/linkage.lds
+LINKROM = $(OBJDIR)/linkrom.lds
 
 ifndef OBJDIR
 no_configure:
@@ -97,7 +107,7 @@ endif
 ifdef DEBUG
 all : $(OBJDIR)/rockbox.elf rocks
 else
-all : $(OBJDIR)/$(OUTNAME) $(OBJDIR)/rockbox.ucl rocks
+all : $(OBJDIR)/$(OUTNAME) $(OBJDIR)/rockbox.ucl rocks $(ROMTARGET)
 endif
 
 rocks:
@@ -112,11 +122,24 @@ $(OBJDIR)/librockbox.a:
 $(LINKFILE): $(LDS)
 	 cat $< | $(CC) -DMEMORYSIZE=$(MEM) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
 
+$(LINKROM): $(ROMLDS)
+	 cat $< | $(CC) -DMEMORYSIZE=$(MEM) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
+
+$(OBJDIR)/rombox.elf : $(OBJS) $(LINKROM) $(OBJDIR)/librockbox.a
+	@echo "LD rombox.elf"
+	@$(CC) -Os -nostdlib -o $@ $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -L$(FIRMWARE) -T$(LINKROM) -Wl,-Map,$(OBJDIR)/rombox.map
+
 $(OBJDIR)/rockbox.elf : $(OBJS) $(LINKFILE) $(OBJDIR)/librockbox.a
-	$(CC) -Os -nostdlib -o $@ $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -L$(FIRMWARE) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
+	@echo "LD rockbox.elf"
+	@$(CC) -Os -nostdlib -o $@ $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -L$(FIRMWARE) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
 
 $(OBJDIR)/rockbox.bin : $(OBJDIR)/rockbox.elf
-	$(OC) -O binary $< $@
+	@echo "OBJCOPY $<"
+	@$(OC) -O binary $< $@
+
+$(OBJDIR)/rombox.bin : $(OBJDIR)/rombox.elf
+	@echo "OBJCOPY $<"
+	@$(OC) -O binary $< $@
 
 $(OBJDIR)/rockbox.asm: $(OBJDIR)/rockbox.bin
 	$(TOOLSDIR)/sh2d -sh1 $< > $@
@@ -127,10 +150,30 @@ $(OBJDIR)/$(OUTNAME) : $(OBJDIR)/rockbox.bin
 $(OBJDIR)/rockbox.ucl: $(OBJDIR)/rockbox.bin
 	@a=`uclpack -h 2>/dev/null`; \
 	if test -n "$$a"; then \
-	  echo uclpack --best --2e $< $@ ; \
+	  echo "UCLPACK rockbox" ; \
 	  uclpack --best --2e $< $@ >/dev/null 2>&1; \
 	else \
-	  echo "no uclpack command found, makes a fake UCL file"; \
+	  echo "no uclpack command found, makes a fake rockbox.ucl"; \
+	  echo "fake" > $@; \
+	fi
+
+$(OBJDIR)/rombox.ucl: $(OBJDIR)/rombox.bin
+	@a=`uclpack -h 2>/dev/null`; \
+	if test -n "$$a"; then \
+	  echo "UCLPACK rombox" ; \
+	  uclpack --none $< $@ >/dev/null 2>&1; \
+	  if test -s $@; then \
+	    perl $(TOOLSDIR)/romsizetest.pl $(MAXROMSIZE) $@; \
+	    if test $$? -ne 0; then \
+	      echo "removing UCL file again, making it a fake one"; \
+	      echo "fake" > $@; \
+	    fi \
+	  else \
+	    echo "Your uclpack seems to not support --none, making a fake ucl"; \
+	    echo "fake" > $@; \
+	  fi \
+	else \
+	  echo "no uclpack command found, makes a fake rombox.ucl"; \
 	  echo "fake" > $@; \
 	fi
 
@@ -139,26 +182,34 @@ $(OBJDIR)/credits.raw: $(DOCSDIR)/CREDITS
 
 $(OBJDIR)/credits.o: credits.c credits.h $(OBJDIR)/credits.raw
 	@mkdir -p `dirname $@`
-	$(CC) $(CFLAGS) -c $< -o $@
+	@echo "CC $<"
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/%.o: %.c
 	@mkdir -p `dirname $@`
-	$(CC) $(CFLAGS) -c $< -o $@
+	@echo "CC $<"
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/build.lang: lang/$(LANGUAGE).lang $(TOOLSDIR)/uplang
-	perl $(TOOLSDIR)/uplang lang/english.lang $< > $@
+	@echo "UPLANG"
+	@perl $(TOOLSDIR)/uplang lang/english.lang $< > $@
 
 $(OBJDIR)/lang.o: $(OBJDIR)/build.lang $(TOOLSDIR)/genlang
-	perl -s $(TOOLSDIR)/genlang -p=$(OBJDIR)/lang $<
-	$(CC) $(CFLAGS) -c $(OBJDIR)/lang.c -o $@
+	@echo "GENLANG"
+	@perl -s $(TOOLSDIR)/genlang -p=$(OBJDIR)/lang $<
+	@echo "CC lang.c"
+	@$(CC) $(CFLAGS) -c $(OBJDIR)/lang.c -o $@
 
 clean:
-	-rm -f $(OBJS) $(OBJDIR)/$(OUTNAME) $(OBJDIR)/rockbox.asm \
-	$(OBJDIR)/rockbox.bin $(OBJDIR)/rockbox.elf $(OBJDIR)/*.map \
-	$(OBJDIR)/lang.o $(OBJDIR)/build.lang $(OBJDIR)/lang.[ch] \
-	$(OBJDIR)/credits.raw $(LINKFILE) $(OBJDIR)/rockbox.ucl
-	-$(RM) -r $(OBJDIR)/$(DEPS)
-	$(MAKE) -C plugins clean
+	@echo "cleaning apps"
+	@-rm -f $(OBJS) $(OBJDIR)/$(OUTNAME) $(OBJDIR)/rockbox.asm	\
+	$(OBJDIR)/rockbox.bin $(OBJDIR)/rockbox.elf $(OBJDIR)/*.map	\
+	$(OBJDIR)/lang.o $(OBJDIR)/build.lang $(OBJDIR)/lang.[ch]	\
+	$(OBJDIR)/credits.raw $(LINKFILE) $(OBJDIR)/rockbox.ucl		\
+	$(LINKROM) $(OBJDIR)/rombox.ucl $(OBJDIR)/rombox.bin		\
+	$(OBJDIR)/rombox.elf
+	@-$(RM) -r $(OBJDIR)/$(DEPS)
+	@$(MAKE) -C plugins clean
 
 DEPS:=.deps
 DEPDIRS:=$(DEPS)
@@ -180,8 +231,7 @@ tags:
 
 $(OBJDIR)/$(DEPS)/%.d: %.c
 	@$(SHELL) -c 'for d in $(DEPDIRS); do { if [ ! -d $(OBJDIR)/$$d ]; then mkdir $(OBJDIR)/$$d; fi; }; done'
-	@echo "Updating dependencies for $(OBJDIR)/$<"
-	@$(SHELL) -ec '$(CC) -MM $(CFLAGS) $< \
+	@$(SHELL) -ec '$(CC) -MM $(CFLAGS) $< 2>/dev/null \
 		|sed '\''s|\($*\)\.o[ :]*|$(OBJDIR)/\1.o $(<:%.c=%.d) : |g'\'' > $@; \
 		[ -s $@ ] || rm -f $@'
 

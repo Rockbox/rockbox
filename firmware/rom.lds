@@ -24,15 +24,14 @@ SECTIONS
         . = _datastart + 0x200;
         *(.data)
         . = ALIGN(0x4);
-        _dataend = .;
+        _dataend = .;         
+        . = ALIGN(0x10);  /* Maintain proper alignment for .text section */
     } > DRAM
     
-    .datacopy :
-    {
-       . += SIZEOF(.data);
-    } > FLASH
-
-    .text :
+    /* TRICK ALERT! Newer versions of the linker don't allow output sections
+       to overlap even if one of them is empty, so advance the location pointer
+       "by hand" */
+    .text LOADADDR(.data) + SIZEOF(.data) :
     {
         *(.init.text)
         *(.text)
@@ -44,10 +43,6 @@ SECTIONS
         *(.rodata)
         *(.rodata.str1.4)
         . = ALIGN(0x4);
-    } > FLASH
-
-    .iramcopy : 
-    {
         _iramcopy = .;
     } > FLASH
 
