@@ -51,7 +51,9 @@ char* credits[] = {
     "Nuutti Kotivuori",
     "Heikki Hannikainen",
     "Hardeep Sidhu",
-    "Markus Braun"
+    "Markus Braun",
+    "Justin Heiner",
+    "Magnus Holmgren",
 };
 
 #ifdef HAVE_LCD_BITMAP
