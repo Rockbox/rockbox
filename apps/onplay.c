@@ -123,6 +123,12 @@ static bool vbr_fix(void)
     int fpos;
 
 
+    if(mpeg_status())
+    {
+        splash(HZ*2, 0, true, "Stop the playback");
+        return reload_dir;
+    }
+    
     lcd_clear_display();
     lcd_puts_scroll(0, 0, selected_file);
     lcd_update();
