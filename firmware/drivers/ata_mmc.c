@@ -242,18 +242,24 @@ static unsigned char poll_byte(int timeout)
 static unsigned char poll_busy(int timeout)
 {
     int i;
-    unsigned char data;
+    unsigned char data, dummy;
     
     while (!(SSR1 &SCI_TEND));    /* wait for end of transfer */
     TDR1 = 0xFF;                  /* send do-nothing data in parallel */
-    
+
+    /* get data response */
+    SSR1 = 0;                     /* start receiving */
+    while (!(SSR1 & SCI_RDRF));   /* wait for data */
+    data = RDR1;                  /* read byte */
+
+    /* wait until the card is ready again */
     i = 0;
     do {
         SSR1 = 0;                   /* start receiving */
         while (!(SSR1 & SCI_RDRF)); /* wait for data */
-        data = RDR1;                /* read byte */
-    } while ((data == 0x00) && (++i < timeout));
-
+        dummy = RDR1;               /* read byte */
+    } while ((dummy != 0xFF) && (++i < timeout));
+    
     return fliptable[(signed char)data];
 }
 
