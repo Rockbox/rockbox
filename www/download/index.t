@@ -4,7 +4,7 @@
 
 <h2>Changes for version 1.3</h2>
 
-<p>Please read the <a href="rockbox-1.3-notes.txt">release notes</a>.
+<p>Please read the <a href="rockbox-1.3-notes.txt">release notes</a>. (<a href="old.html">Older releases</a>)
 
 <p>
 <table><tr valign="top"><td>
