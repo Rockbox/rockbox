@@ -48,4 +48,4 @@ $(LINKFILE): $(LDS)
 	cat $< | $(CC) -DMEMORYSIZE=$(MEM) $(DEFINES) -E -P - >$@
 
 clean:
-	-rm -f $(ROCKS)
+	-rm -f $(ROCKS) $(LINKFILE)
