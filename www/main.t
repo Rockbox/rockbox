@@ -28,13 +28,6 @@ firmware for the Archos Jukebox <i>5000</i>, <i>6000</i>, <i>Studio</i> and <i>R
 <!--#include file="bugs.html" -->
 <small><b>Note:</b> Don't file bug reports on daily builds. They are work in progress.</small>
 
-<h2>Vacations</h2>
-<p>Parts of the core team is currently away on vacation:
-<ul>
-<li>Linus Nielsen (Linus): Back monday july 22, reads mail
-<li>Daniel Stenberg (Bagder): Back thursday july 25, does not read mail
-</ul>
-
 <h2>Roadmap</h2>
 <p>This is a rough indication of which features we plan/expect/hope to be
 included in which versions. Naturally, this is all subject to change without
