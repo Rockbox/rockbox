@@ -30,7 +30,7 @@
 <a class="menulink" href="/">home</a><br>
 <a class="menulink" href="/docs/features.html">features</a><br>
 <a class="menulink" href="/download/">download</a><br>
-<a class="menulink" href="/screenshots.html">screen&nbsp;shots</a><br>
+<a class="menulink" href="/screenshots/">screen&nbsp;shots</a><br>
 <a class="menulink" href="/docs/">documentation</a><br>
 <a class="menulink" href="/mail/">mailing lists</a><br>
 <a class="menulink" href="/irc/">IRC</a><br>
