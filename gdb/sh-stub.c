@@ -441,6 +441,11 @@ int ata_wait_for_rdy(void)
 
 int ata_spindown(int time)
 {
+	/* Port A setup */
+	PAIOR |= 0x0280; /* output for ATA reset, IDE enable */
+	PADR |= 0x0200; /* release ATA reset */
+ 	PACR2 &= 0xBFFF; /* GPIO function for PA7 (IDE enable) */
+
     /* activate ATA */
     PADR &= ~0x80;
 
