@@ -22,16 +22,23 @@ Tags
 ----
 ID3 Info Tags:
   %ia : ID3 Artist
-  %it : ID3 Track Title
-  %in : ID3 Track Number
   %id : ID3 Album Name
+  %ig : ID3 Genre Name
+  %in : ID3 Track Number
+  %it : ID3 Track Title
+  %iy : ID3 Year
+
+
+Battery Info:
+  %bl : Show numeric battery level
+  %bt : Show estimated battery time left
 
 File Info Tags:
   %fb : File Bitrate (in kbps)
   %ff : File Frequency (in Hz)
-  %fp : File Path
-  %fn : File Name (without extension)
   %fm : File Name
+  %fn : File Name (without extension)
+  %fp : File Path
   %fs : File Size (In Kilobytes)
   %fv : "(vbr)" if variable bit rate or "" if constant bit rate
   %d1 : First directory from end of file path.
@@ -46,13 +53,14 @@ Playlist/Song Info Tags:
         Player: This will display a 1 character "cup" that empties as the
                 progresses.
         Recorder: This will replace the entire line with a progress bar.
+  %pc : Current Time In Song
+  %pe : Total Number of Playlist Entries
   %pm : Peak Meter (Recorder only)
         The entire line is used as volume peak meter.
   %pn : Playlist Name (Without path or extension)
   %pp : Playlist Position
-  %pe : Total Number of Playlist Entries
-  %pc : Current Time In Song
   %pr : Remaining Time In Song
+  %ps : Shuffle. Shows 's' if shuffle mode is enabled.
   %pt : Total Track Time
 
 Conditional Tags (If/Else block):
