@@ -20,31 +20,8 @@
 #ifndef __LED_H__
 #define __LED_H__
 
-#include <sh7034.h>
-#include <system.h>
+#include "types.h"
 
-#define LEDB 6 /* PB6 : red LED */
-
-static inline void led_turn_off (void)
-{
-    clear_bit (LEDB,PBDR+1);
-    clear_bit (2,TSTR_ADDR);
-}
-
-static inline void led_turn_on (void)
-{
-    set_bit (LEDB,PBDR+1);
-    set_bit (2,TSTR_ADDR);
-}
-
-static inline void led_toggle (void)
-{
-    toggle_bit (LEDB,PBDR+1);
-}
-
-extern void led_set_volume (unsigned short volume);
-extern void led_setup (void);
+extern void led( bool on );
 
 #endif
-
-

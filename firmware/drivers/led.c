@@ -17,54 +17,21 @@
  *
  ****************************************************************************/
 
-#include "config.h"
+#include "types.h"
+#include "sh7034.h"
+#include "led.h"
 
-#include <led.h>
-
-#define turn_on() \
-  set_bit (LEDB,PBDR_ADDR+1)
-
-#define turn_off() \
-  clear_bit (LEDB,PBDR_ADDR+1)
-
-#define start_timer() \
-  set_bit (2,TSTR_ADDR)
-
-#define stop_timer() \
-  clear_bit (2,TSTR_ADDR)
-
-#define eoi(subinterrupt) \
-  clear_bit (subinterrupt,TSR2_ADDR)
-
-#define set_volume(volume) \
-  GRA2 = volume & 0x7FFF
-
-
-void led_set_volume (unsigned short volume)
+void led(bool on)
 {
-    volume <<= 10;
-    if (volume == 0)
-	led_turn_off ();
-    else if (volume == 0x8000) 
-	led_turn_on ();
+#ifdef ASM_IMPLEMENTATION
+    if ( on )
+	asm("or.b %0, @(r0,gbr)" : : "I"(0x40), "z"(PBDR_ADDR+1));
     else
-    {
-	set_volume (volume);
-        start_timer ();
-    }
+	asm("and.b %0, @(r0,gbr)" : : "I"(~0x40), "z"(PBDR_ADDR+1));
+#else
+    if ( on )
+	PBDR |= 0x40;
+    else
+	PBDR &= ~0x40;
+#endif
 }
-
-#pragma interrupt
-void IMIA2 (void)
-{
-    turn_off ();
-    eoi (0);
-}
-
-#pragma interrupt
-void OVI2 (void)
-{
-    turn_on ();
-    eoi (2);
-}
-    
