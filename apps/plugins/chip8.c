@@ -61,15 +61,46 @@ static byte chip8_running;                     /* Flag for End-of-Emulation */
 typedef void (*opcode_fn) (word opcode);
 typedef void (*math_fn) (byte *reg1,byte reg2);
 
+static bool is_playing;
+
+/* one frame of bitswapped mp3 data */
+static unsigned char beep[]={255,
+223, 28, 35,  0,192,210, 35,226, 72,188,242,  1,128,166, 16, 68,146,252,151, 19,
+ 10,180,245,127, 96,184,  3,184, 30,  0,118, 59,128,121,102,  6,212,  0, 97,  6,
+ 42, 65, 28,134,192,145, 57, 38,136, 73, 29, 38,132, 15, 21, 70, 91,185, 99,198,
+ 15,192, 83,  6, 33,129, 20,  6, 97, 33,  4,  6,245,128, 92,  6, 24,  0, 86,  6,
+ 56,129, 44, 24,224, 25, 13, 48, 50, 82,180, 11,251,106,249, 59, 24, 82,175,223,
+252,119, 76,134,120,236,149,250,247,115,254,145,173,174,168,180,255,107,195, 89,
+ 24, 25, 48,131,192, 61, 48, 64, 10,176, 49, 64,  1,152, 50, 32,  8,140, 48, 16,
+  5,129, 51,196,187, 41,177, 23,138, 70, 50,  8, 10,242, 48,192,  3,248,226,  0,
+ 20,100, 18, 96, 41, 96, 78,102,  7,201,122, 76,119, 20,137, 37,177, 15,132,224,
+ 20, 17,191, 67,147,187,116,211, 41,169, 63,172,182,186,217,155,111,140,104,254,
+111,181,184,144, 17,148, 21,101,166,227,100, 86, 85, 85, 85}; 
+
+/* callback to request more mp3 data */
+void callback(unsigned char** start, int* size)
+{
+    *start = beep; /* give it the same frame again */
+    *size = sizeof(beep);
+}
+
 /****************************************************************************/
 /* Turn sound on                                                            */
 /****************************************************************************/
-static void chip8_sound_on (void) { }
+static void chip8_sound_on (void) 
+{
+    if (!is_playing)
+        rb->mp3_play_pause(true); /* kickoff audio */
+}
 
 /****************************************************************************/
 /* Turn sound off                                                           */
 /****************************************************************************/
-static void chip8_sound_off (void) { }
+static void chip8_sound_off (void) 
+{ 
+    if (!is_playing)
+        rb->mp3_play_pause(false); /* pause audio */
+}
 
 static void op_call (word opcode)
 {
@@ -430,8 +461,9 @@ static void chip8_execute(void)
         --chip8_regs.delay;
 
     if (chip8_regs.sound)
-        --chip8_regs.sound;       /* How could we make sound on the archos? */
-                                               /* Update the machine status */
+        if (--chip8_regs.sound == 0)          /* Update the machine status */
+            chip8_sound_off();       
+                                               
     chip8_update_display();
     chip8_keyboard();
     rb->yield(); /* we should regulate the speed by timer query, sleep/yield */
@@ -517,8 +549,23 @@ bool chip8_run(char* file)
     rb->lcd_clear_display();
     rb->lcd_drawrect(23,0,66,64);
     rb->lcd_update();
+
+    /* init sound */
+    is_playing = rb->mp3_is_playing(); /* would we disturb playback? */
+    if (!is_playing) /* no? then we can make sound */
+    {   /* prepare */
+        rb->mp3_play_init();
+        rb->mp3_play_data(beep, sizeof(beep), callback);
+        rb->mpeg_sound_set(SOUND_VOLUME, rb->global_settings->volume);
+    }
+
     chip8_reset();
     while (chip8_running) chip8_execute();
+
+    if (!is_playing)
+    {   /* stop it if we used audio */
+        rb->mp3_play_stop(); // stop audio ISR
+    }
 
     return true;
 }
