@@ -378,6 +378,84 @@ Note: Submissions that do not state if their image is for the front or back of t
     <td colspan=3>&nbsp</td>
 </tr>
 
+<!-- Entry 26 -->
+<tr><td>(26)</td>
+    <td colspan=2>Jean-S&eacute;bastien Tauth</td>
+</tr>
+<tr>
+    <td></td>
+    <td><a href="jace-dehodossy-front.jpg"><img border=0 src="design16f.jpg" width=266 height=92></a></td>
+    <td><a href="jeansebastien.tauth-2.jpg"><img border=0 src="design26b.jpg" width=212 height=300></a></td>
+</tr>
+<tr>
+    <td colspan=3>&nbsp</td>
+</tr>
+
+<!-- Entry 26 -->
+<tr><td>(26)</td>
+    <td colspan=2>Jean-S&eacute;bastien Tauth</td>
+</tr>
+<tr>
+    <td></td>
+    <td><a href="jace-dehodossy-front.jpg"><img border=0 src="design16f.jpg" width=266 height=92></a></td>
+    <td><a href="jeansebastien.tauth-2.jpg"><img border=0 src="design26b.jpg" width=212 height=300></a></td>
+</tr>
+<tr>
+    <td colspan=3>&nbsp</td>
+</tr>
+
+<!-- Entry 27 -->
+<tr><td>(27)</td>
+    <td colspan=2>Jean-S&eacute;bastien Tauth</td>
+</tr>
+<tr>
+    <td></td>
+    <td><a href="jace-dehodossy-front.jpg"><img border=0 src="design16f.jpg" width=266 height=92></a></td>
+    <td><a href="jeansebastien.tauth-3.jpg"><img border=0 src="design27b.jpg" width=212 height=300></a></td>
+</tr>
+<tr>
+    <td colspan=3>&nbsp</td>
+</tr>
+
+<!-- Entry 28 -->
+<tr><td>(28)</td>
+    <td colspan=2>Jean-S&eacute;bastien Tauth</td>
+</tr>
+<tr>
+    <td></td>
+    <td><a href="jace-dehodossy-front.jpg"><img border=0 src="design16f.jpg" width=266 height=92></a></td>
+    <td><a href="jeansebastien.tauth-4.jpg"><img border=0 src="design28b.jpg" width=300 height=297></a></td>
+</tr>
+<tr>
+    <td colspan=3>&nbsp</td>
+</tr>
+
+<!-- Entry 29 -->
+<tr><td>(29)</td>
+    <td colspan=2>Jean-S&eacute;bastien Tauth</td>
+</tr>
+<tr>
+    <td></td>
+    <td><a href="jace-dehodossy-front.jpg"><img border=0 src="design16f.jpg" width=266 height=92></a></td>
+    <td><a href="jeansebastien.tauth-5.jpg"><img border=0 src="design29b.jpg" width=300 height=297></a></td>
+</tr>
+<tr>
+    <td colspan=3>&nbsp</td>
+</tr>
+
+<!-- Entry 30 -->
+<tr><td>(30)</td>
+    <td colspan=2>Jean-S&eacute;bastien Tauth</td>
+</tr>
+<tr>
+    <td></td>
+    <td><a href="jace-dehodossy-front.jpg"><img border=0 src="design16f.jpg" width=266 height=92></a></td>
+    <td><a href="jeansebastien.tauth-6.jpg"><img border=0 src="design30b.jpg" width=298 height=300></a></td>
+</tr>
+<tr>
+    <td colspan=3>&nbsp</td>
+</tr>
+
 
 <!-- End Entries -->
 
