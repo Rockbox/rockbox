@@ -6,7 +6,8 @@
 #                     \/            \/     \/    \/            \/
 #     Fichier de langue français - Version optimisée pour le player (!)
 #     Eric LASSAUGE <lassauge AT users.sourceforge.net> - Juin 2004
-#     Modifié pa Mourad Jaber <newbeewan AT users.sourceforge.net> - Octobre 2004
+#     Modifié par Mourad Jaber <newbeewan AT users.sourceforge.net> - Octobre 2004
+#     Modifié par Manuel Dejonghe (lImbus) <lImbus AT users.soureforge.net> - February 2005
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -81,7 +82,7 @@ voice: ""
 new: "Mélange en Cours..."
 
 id: LANG_PLAYINDICES_PLAYLIST
-desc: in playlist.indices() when playlist is full
+desc: in playlist.indices() when playlist is full *WARNING* this and next ID are only used in this function.
 eng: "Playlist"
 voice: "Playlist"
 new: "Liste d'écoute"
@@ -252,7 +253,7 @@ id: LANG_CASE_MENU
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: ""
+new:
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
@@ -324,7 +325,7 @@ id: LANG_BBOOST
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: ""
+new:
 
 id: LANG_DECAY
 desc: in sound_settings
@@ -423,40 +424,40 @@ voice: ""
 new: "Touches activées"
 
 id: LANG_MUTE_ON_PLAYER
-desc: displayed when mute is on
-eng: "Mute ON"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Son coupé"
+new:
 
 id: LANG_MUTE_OFF_PLAYER
-desc: displayed when mute is off
-eng: "Mute OFF"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Son activé"
+new:
 
 id: LANG_MUTE_ON_RECORDER
-desc: displayed when mute is on
-eng: "Mute Is ON"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Le son est coupé"
+new:
 
 id: LANG_MUTE_OFF_RECORDER
-desc: displayed when mute is off
-eng: "Mute Is OFF"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Son est actif"
+new:
 
 id: LANG_ID3_INFO
-desc: in the browse_id3() function
-eng: "-ID3 Info- "
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "-Infos ID3-"
+new:
 
 id: LANG_ID3_SCREEN
-desc: in the browse_id3() function
-eng: "--Screen-- "
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "--Ecran--"
+new:
 
 id: LANG_ID3_TITLE
 desc: in wps
@@ -993,16 +994,16 @@ voice: "Recording Settings"
 new: "Options d'enreg."
 
 id: LANG_DISK_STAT
-desc: disk size info
-eng: "Disk: %d.%dGB"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Disq: %d.%dGo"
+new:
 
 id: LANG_DISK_FREE_STAT
-desc: disk size info
-eng: "Free: %d.%dGB"
-voice: "Free diskspace:"
-new: "Dispo: %d.%dGo"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new:
 
 id: LANG_POWEROFF
 desc: disk poweroff flag
@@ -1260,7 +1261,7 @@ id: LANG_SOKOBAN_ON
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: ""
+new:
 
 id: LANG_INVERT
 desc: in settings_menu
@@ -1269,22 +1270,22 @@ voice: "LCD Mode"
 new: "Mode d'affichage"
 
 id: LANG_CHANNEL_STEREO_NARROW_PLAYER
-desc: in sound_settings
-eng: "St. Narrow"
-voice: "Stereo Narrow"
-new: "St. réduite"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new:
 
 id: LANG_CHANNEL_STEREO_NARROW_RECORDER
-desc: in sound_settings
-eng: "Stereo Narrow"
-voice: "Stereo Narrow"
-new: "Stéréo réduite"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new:
 
 id: LANG_CHANNEL_STEREO_WIDE
-desc: in sound_settings
-eng: "Stereo Wide"
-voice: "Stereo Wide"
-new: "St. élargie"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new:
 
 id: LANG_CHANNEL_KARAOKE
 desc: in sound_settings
@@ -1314,19 +1315,19 @@ id: LANG_VBRFIX_STOP_PLAY
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: ""
+new:
 
 id: LANG_VBRFIX_NOT_VBR
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: ""
+new:
 
 id: LANG_VBRFIX
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: ""
+new:
 
 id: LANG_INVERT_CURSOR
 desc: in settings_menu
@@ -1677,10 +1678,10 @@ voice: ""
 new: "Pré-selections"
 
 id: LANG_FM_SAVE_PRESET
-desc: in radio screen
-eng: "Save preset"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Enreg. pré-selection"
+new:
 
 id: LANG_FM_DELETE_PRESET
 desc: in radio screen
@@ -1701,10 +1702,10 @@ voice: ""
 new: "Echec d'enreg. pré-selection"
 
 id: LANG_FM_NO_PRESETS
-desc: in radio screen
-eng: "The preset list is empty"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "liste de pré-selections vide"
+new:
 
 id: LANG_FM_NO_FREE_PRESETS
 desc: in radio screen
@@ -2115,10 +2116,10 @@ voice: "14"
 new: 
 
 id: VOICE_GIGABYTE
-desc: spoken only, a unit postfix
+desc: DEPRECATED
 eng: ""
-voice: "gigabyte"
-new: 
+voice: ""
+new:
 
 id: VOICE_HERTZ
 desc: spoken only, a unit postfix
@@ -2151,10 +2152,10 @@ voice: "kilohertz"
 new: 
 
 id: VOICE_MEGABYTE
-desc: spoken only, a unit postfix, currently not used
+desc: DEPRECATED
 eng: ""
-voice: "megabyte"
-new: 
+voice: ""
+new:
 
 id: VOICE_MILLIAMPHOURS
 desc: spoken only, a unit postfix
@@ -2241,10 +2242,10 @@ voice: "plus"
 new: 
 
 id: VOICE_POINT
-desc: spoken only, decimal separator for composing numbers
+desc: DEPRECATED
 eng: ""
-voice: "point"
-new: 
+voice: ""
+new:
 
 id: VOICE_SECOND
 desc: spoken only, a unit postfix
@@ -2364,7 +2365,7 @@ id: LANG_VOICE_DIR_ENTER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: ""
+new:
 
 id: LANG_VOICE_DIR_HOVER
 desc: "talkbox" mode for directories + files
@@ -2699,114 +2700,282 @@ new: "par type"
 id: LANG_CONFIRM_SHUTDOWN
 desc: in shutdown screen
 eng: "Press OFF to shut down"
+voice: "by type"
 new: "Presser OFF pr Arrêter"
 
 id: LANG_FM_BUTTONBAR_ACTION
 desc: in radio screen
 eng: "Action"
+voice: "by type"
 new: 
 
 id: LANG_FM_BUTTONBAR_ADD
 desc: in radio screen
 eng: "Add"
+voice: "by type"
 new: "Ajout."
 
 id: LANG_FM_BUTTONBAR_EDIT
-desc: in radio screen
-eng: "Edit"
-new: "Editer"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new:
 
 id: LANG_FM_BUTTONBAR_EXIT
 desc: in radio screen
 eng: "Exit"
+voice: ""
 new: "Sortie"
 
 id: LANG_FM_EDIT_PRESET
 desc: in radio screen
 eng: "Edit preset"
+voice: ""
 new: "Editer pré-select."
 
 id: LANG_FM_MONO_MODE
 desc: in radio screen
 eng: "Force mono"
+voice: ""
 new: "Mode mono"
 
 id: LANG_ID3_ORDER
 desc: in playback settings screen
 eng: "ID3 tag priority"
+voice: ""
 new: "priorité de tag ID3"
 
 id: LANG_ID3_V1_FIRST
 desc: in playback settings screen
 eng: "V1 then V2"
+voice: ""
 new: "V1 puis V2"
 
 id: LANG_ID3_V2_FIRST
 desc: in playback settings screen
 eng: "V2 then V1"
+voice: ""
 new: "V2 puis V1"
 
 id: LANG_INSTALLATION_INCOMPLETE
 desc: in browse root
 eng: "Installation incomplete"
+voice: ""
 new: "Installation incomplète"
 
 id: LANG_MDB_CENTER
 desc: in sound settings
 eng: "MDB Center frequency"
+voice: ""
 new: 
 
 id: LANG_MDB_ENABLE
 desc: in sound settings
 eng: "MDB Enable"
+voice: ""
 new: "MDB Actif"
 
 id: LANG_MDB_HARMONICS
 desc: in sound settings
 eng: "MDB Harmonics"
+voice: ""
 new: "Harmoniques MDB"
 
 id: LANG_MDB_SHAPE
 desc: in sound settings
 eng: "MDB Shape"
+voice: ""
 new: "MDB Modéle"
 
 id: LANG_MDB_STRENGTH
 desc: in sound settings
 eng: "MDB Strength"
+voice: ""
 new: "MDB renforcé"
 
 id: LANG_NO_ROCKBOX_DIR
 desc: in browse root
 eng: "No .rockbox directory"
+voice: ""
 new: "Pas de rep. '.rockbox' !"
 
 id: LANG_REMOVE_MMC
 desc: before acknowledging usb in case an MMC is inserted (Ondio)
 eng: "Please remove inserted MMC"
+voice: ""
 new: "Enlever la carte MMC insérée"
 
 id: LANG_SHUTDOWN
 desc: in main menu
 eng: "Shut down"
+voice: ""
 new: "Arrêter..."
 
 id: LANG_SHUTTINGDOWN
 desc: in main menu
 eng: "Shutting down..."
+voice: ""
 new: "Arrêt en cours"
 
 id: LANG_SUPERBASS
 desc: in sound settings
 eng: "Super bass"
+voice: ""
 new: "Super basses"
 
 id: VOICE_DOT
 desc: spoken only, for spelling
 eng: ""
+voice: ""
 new: 
 
 id: VOICE_PAUSE
 desc: spoken only, for spelling, a split second of silence (difficult to author)
 eng: ""
+voice: ""
 new: 
+
+id: LANG_STEREO_WIDTH
+desc: in sound_settings
+eng: "Stereo width"
+voice: "Stereo width"
+new: 
+
+id: LANG_CHANNEL_CUSTOM
+desc: in sound_settings
+eng: "Custom"
+voice: "Custom"
+new: 
+
+id: LANG_FILTER_ID3DB
+desc: show ID3 database
+eng: "ID3 database"
+voice: "ID3 database"
+new: 
+
+id: LANG_ID3DB_ARTISTS
+desc: ID3 virtual folder name
+eng: "Artists"
+voice: "Artists"
+new: "Artistes"
+
+id: LANG_ID3DB_ALBUMS
+desc: ID3 virtual folder name
+eng: "Albums"
+voice: ""
+new: 
+
+id: LANG_ID3DB_SONGS
+desc: ID3 virtual folder name
+eng: "Songs"
+voice: ""
+new: "chansons"
+
+id: LANG_ID3DB_SEARCH
+desc: ID3 virtual folder name
+eng: "Search"
+voice: ""
+new: "rechercher"
+
+id: LANG_ID3DB_SEARCH_ARTISTS
+desc: ID3 virtual folder name
+eng: "Search Artists"
+voice:
+new: "Chercher Artistes"
+
+id: LANG_ID3DB_SEARCH_ALBUMS
+desc: ID3 virtual folder name
+eng: "Search Albums"
+voice: ""
+new: "Chercher Albums"
+
+id: LANG_ID3DB_SEARCH_SONGS
+desc: ID3 virtual folder name
+eng: "Search Songs"
+voice: ""
+new: "chercher chansons"
+
+id: LANG_ID3DB_MATCHES
+desc: ID3 virtual folder name
+eng: "Found %d matches"
+voice: ""
+new: "trouvé %d correspondantes"
+
+id: LANG_BATTERY_TYPE
+desc: in battery settings
+eng: "Battery Type"
+voice: "Battery type"
+new: "Type de Batterie" 
+
+id: LANG_BATTERY_TYPE_ALKALINE
+desc: in battery settings
+eng: "Alkaline"
+voice: "Alkaline"
+new: 
+
+id: LANG_BATTERY_TYPE_NIMH
+desc: in battery settings
+eng: "NiMH"
+voice: "Nickel metal hydride"
+new: 
+
+id: LANG_POINT
+desc: decimal separator for composing numbers
+eng: "."
+voice: "point"
+new: 
+
+id: LANG_BYTE
+desc: a unit postfix
+eng: "B"
+voice: ""
+new: "o"
+
+id: LANG_KILOBYTE
+desc: a unit postfix, also voiced
+eng: "KB"
+voice: "kilobyte"
+new: "Ko"
+
+id: LANG_MEGABYTE
+desc: a unit postfix, also voiced
+eng: "MB"
+### Not previously translated
+voice: "megabyte"
+new: "Mo"
+
+id: LANG_GIGABYTE
+desc: a unit postfix, also voiced
+eng: "GB"
+voice: "gigabyte"
+new: "Go"
+
+id: LANG_DISK_SIZE_INFO
+desc: disk size info
+eng: "Disk:"
+voice: ""
+new: "Disque:"
+
+id: LANG_DISK_FREE_INFO
+desc: disk size info
+eng: "Free:"
+voice: "Free diskspace:"
+new: "Espace Libre:"
+
+id: LANG_ID3DB_ALL_SONGS
+desc: ID3 virtual folder name
+eng: "<All songs>"
+voice: ""
+new: "<toutes chansons>"
+
+id: LANG_PLAYLIST
+desc: Used when you need to say playlist, also voiced
+eng: "Playlist"
+voice: "Playlist"
+new: "Liste d'écoute"
+
+id: LANG_RECORD_STARTUP
+desc: Start Rockbox in Recording screen
+eng: "Show recording screen on startup"
+voice: "Show recording screen on startup"
+new: "Afficher le menu d'enregistrement au demarrage"
