@@ -637,8 +637,6 @@ void DoUserDialog(char* filename)
     tCheckROM result;
     bool is_romless;
 
-    rb->lcd_setfont(FONT_SYSFIXED);
-
     /* this can only work if Rockbox runs in DRAM, not flash ROM */
     if ((UINT8*)rb >= FB && (UINT8*)rb < FB + 4096*1024) /* 4 MB max */
     {   /* we're running from flash */
@@ -653,6 +651,13 @@ void DoUserDialog(char* filename)
         return; /* exit */
     }
 
+    /* refuse to work if the power may fail meanwhile */
+    if (!rb->battery_level_safe())
+    {
+        rb->splash(HZ*3, true, "Battery too low!");
+        return; /* exit */
+    }
+    
     /* check boot ROM */
     result = CheckBootROM();
     if (result == eUnknown)
@@ -681,6 +686,8 @@ void DoUserDialog(char* filename)
         rb->splash(HZ*3, true, "Out of memory");
         return; /* exit */
     }
+
+    rb->lcd_setfont(FONT_SYSFIXED);
 
     rc = GetFlashInfo(&FlashInfo);
     ShowFlashInfo(&FlashInfo);
@@ -881,6 +888,13 @@ void DoUserDialog(char* filename)
         return; /* exit */
     }
 
+    /* refuse to work if the power may fail meanwhile */
+    if (!rb->battery_level_safe())
+    {
+        rb->splash(HZ*3, true, "Batt. too low!");
+        return; /* exit */
+    }
+    
     /* check boot ROM */
     result = CheckBootROM();
     if (result == eUnknown)
