@@ -668,6 +668,7 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mo
     bool update_line;
 #ifdef HAVE_LCD_BITMAP
     int h = font_get(FONT_UI)->height;
+    int offset = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
     /* to find out wether the peak meter is enabled we
        assume it wasn't until we find a line that contains
        the peak meter. We can't use peak_meter_enabled itself
@@ -708,7 +709,6 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mo
 #ifdef HAVE_LCD_BITMAP
             /* progress */
             if (flags & refresh_mode & WPS_REFRESH_PLAYER_PROGRESS) {
-                int offset = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
                 int percent=
                     id3->length?
                     (id3->elapsed + ff_rewind_count) * 100 / id3->length:0;
@@ -719,7 +719,6 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mo
             if (flags & refresh_mode & WPS_REFRESH_PEAK_METER) {
                 /* peak meter */
                 int peak_meter_y;
-                int offset = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
 
                 update_line = true;
                 peak_meter_y = i * h + offset;
@@ -763,7 +762,7 @@ bool wps_refresh(struct mp3entry* id3, int ffwd_offset, unsigned char refresh_mo
         }
 #ifdef HAVE_LCD_BITMAP
         if (update_line) {
-            lcd_update_rect(0, i * h, LCD_WIDTH, h);
+            lcd_update_rect(0, i*h + offset, LCD_WIDTH, h);
         }
 #endif
     }
