@@ -285,6 +285,9 @@ int ata_hard_reset(void)
 
     ret =  wait_for_rdy();
 
+    /* Massage the return code so it is 0 on success and -1 on failure */
+    ret = ret?0:-1;
+
     mutex_unlock(&ata_mtx);
     return ret;
 }
@@ -292,6 +295,7 @@ int ata_hard_reset(void)
 int ata_soft_reset(void)
 {
     int ret;
+    int retry_count;
     
     mutex_lock(&ata_mtx);
     
@@ -302,8 +306,16 @@ int ata_soft_reset(void)
     ATA_CONTROL = CONTROL_nIEN;
     sleep(HZ/400); /* >2ms */
 
-    ret = wait_for_rdy();
+    /* This little sucker can take up to 30 seconds */
+    retry_count = 8;
+    do
+    {
+	ret = wait_for_rdy();
+    } while(!ret && retry_count--);
 
+    /* Massage the return code so it is 0 on success and -1 on failure */
+    ret = ret?0:-1;
+    
     mutex_unlock(&ata_mtx);
     return ret;
 }
@@ -367,14 +379,23 @@ static int io_address_detect(void)
     return 0;
 }
 
+void ata_enable(bool on)
+{
+    if(on)
+	PADR &= ~0x80; /* enable ATA */
+    else
+	PADR |= 0x80;   /* disable ATA */
+
+    PAIOR |= 0x80;
+}
+
 int ata_init(void)
 {
     mutex_init(&ata_mtx);
     
     led(false);
 
-    PADR |= 0x800; /* disable USB */
-    PADR &= ~0x80; /* activate ATA */
+    ata_enable(true);
 
     if (master_slave_detect())
         return -1;

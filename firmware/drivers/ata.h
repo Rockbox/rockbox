@@ -19,6 +19,8 @@
 #ifndef __ATA_H__
 #define __ATA_H__
 
+#include <stdbool.h>
+
 /*
   ata_spindown() time values:
    -1     Immediate spindown
@@ -30,6 +32,7 @@
    254    Reserved
    255    21 min 15 s
 */
+extern void ata_enable(bool on);
 extern int ata_spindown(int time);
 extern int ata_hard_reset(void);
 extern int ata_soft_reset(void);
