@@ -171,7 +171,7 @@ int rolo_load(char* filename)
         return -1;
     }
 
-    restore_io = rolo_io_load("/startup_io.bin"); /* test code, recycle a variable */
+    restore_io = rolo_io_load("/startup_io.bin"); /* test code */
 
     lcd_puts(0, 1, "Executing     ");
     lcd_update();
@@ -185,6 +185,7 @@ int rolo_load(char* filename)
     system_init();           /* Initialize system for restart */
     i2c_init();              /* Init i2c bus - it seems like a good idea */
     ICR = IRQ0_EDGE_TRIGGER; /* Make IRQ0 edge triggered */
+	PAIOR = 0x0FA0;          /* needed when flashed, probably model-specific */
 
     if (restore_io) /* test code */
         rolo_io_restore(); /* restore the I/Os from the file content */
