@@ -39,7 +39,7 @@ When asked for a password, just press enter:
 <li> Be a 
 <a href="http://sourceforge.net/project/memberlist.php?group_id=44306">registered developer</a>
 of the Rockbox project
-<li> Have logged on to your account once (ssh <b>username</b>@rockbox.sourceforge.net) and then waited a few hours for SourceForge to set up your cvs
+<li> Log on to your cvs server account once: <tt>ssh <b>username</b>@cvs.rockbox.sourceforge.net</tt> <br>It will disconnect you immediately, but now your account is set up.
 </ol>
 
 <p>Then run:
