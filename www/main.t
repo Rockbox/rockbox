@@ -15,7 +15,7 @@ upgrade your ordinary Archos firmware.
 
 <h2>News</h2>
 
-<p><i>2004-10-26</i>: iRiver progress: the LCD driver is working! http://www.rockbox.org/twiki/bin/view/Main/IriverPort.
+<p><i>2004-10-26</i>: iRiver progress: the LCD driver <a href=http://www.rockbox.org/twiki/bin/view/Main/IriverPort>is working</a>! .
 
 <p><i>2004-10-05</i>: Call for help: We need information from Ondio owners for our <a href="/twiki/bin/view/Main/ArchosOndio">Archos Ondio port</a>.
 
