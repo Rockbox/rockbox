@@ -160,14 +160,14 @@ void lcd_puthex (unsigned int value,int digits)
  */
 unsigned char display[DISP_X][DISP_Y/8];
 
-//
-// ASCII character generation tables
-//
-// This contains only the printable characters (0x20-0x7f).
-// Each element in this table is a character pattern bitmap.
-//
-#define	ASCII_MIN			0x20	// First char in table
-#define	ASCII_MAX			0x7f	// Last char in table
+/*
+ * ASCII character generation tables
+ *
+ * This contains only the printable characters (0x20-0x7f).
+ * Each element in this table is a character pattern bitmap.
+ */
+#define	ASCII_MIN			0x20	/* First char in table */
+#define	ASCII_MAX			0x7f	/* Last char in table */
 
 extern const unsigned char char_gen_6x8[][5][1];
 extern const unsigned char char_gen_8x12[][7][2];
@@ -191,21 +191,21 @@ static int lcd_size; /* Current font width */
  */
 void lcd_init (void)
 {
-	// Initialize PB0-3 as output pins
-	PBCR2 &= 0xff00; // MD = 00
-	PBIOR |= 0x000f; // IOR = 1
+    /* Initialize PB0-3 as output pins */
+    PBCR2 &= 0xff00; /* MD = 00 */
+    PBIOR |= 0x000f; /* IOR = 1 */
 
-	// Initialize LCD
-	lcd_write (TRUE, LCD_CNTL_RESET);
-	lcd_write (TRUE, LCD_CNTL_POWER);
-	lcd_write (TRUE, LCD_CNTL_SEGREMAP);
-	lcd_write (TRUE, LCD_CNTL_OUTSCAN);
-	lcd_write (TRUE, LCD_CNTL_CONTRAST);
-	lcd_write (TRUE, 0x30); // Contrast parameter
-	lcd_write (TRUE, LCD_CNTL_DISPON);
+    /* Initialize LCD */
+    lcd_write (TRUE, LCD_CNTL_RESET);
+    lcd_write (TRUE, LCD_CNTL_POWER);
+    lcd_write (TRUE, LCD_CNTL_SEGREMAP);
+    lcd_write (TRUE, LCD_CNTL_OUTSCAN);
+    lcd_write (TRUE, LCD_CNTL_CONTRAST);
+    lcd_write (TRUE, 0x30); /* Contrast parameter */
+    lcd_write (TRUE, LCD_CNTL_DISPON);
 
-	lcd_clear_display();
-	lcd_update();
+    lcd_clear_display();
+    lcd_update();
 }
 
 /*
@@ -417,3 +417,8 @@ void lcd_invertrect (int x, int y, int nx, int ny)
 /* no LCD defined, no code to use */
 #endif
 
+/* -----------------------------------------------------------------
+ * local variables:
+ * eval: (load-file "rockbox-mode.el")
+ * end:
+ */
