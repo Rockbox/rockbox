@@ -10,7 +10,7 @@ firmware for the Archos Jukebox <i>6000</i>, <i>Studio</i> and <i>Recorder</i> M
 
 <h2>News</h2>
 
-<p><i>2002-06-07</i>: The Recorder ATA driver is now ready.
+<p><i>2002-06-07</i>: The ATA driver now works for the Recorder models too.
 
 <p><i>2002-06-01</i>: Version 1.0 is released! <a href="download.html">Download it here</a>.
 
