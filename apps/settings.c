@@ -340,6 +340,7 @@ void settings_display(void)
 void set_bool(char* string, bool* variable )
 {
     bool done = false;
+    int button;
 
     lcd_clear_display();
     lcd_puts_scroll(0,0,string);
@@ -348,7 +349,8 @@ void set_bool(char* string, bool* variable )
         lcd_puts(0, 1, *variable ? "on " : "off");
         lcd_update();
 
-        switch ( button_get(true) ) {
+        button = button_get(true);
+        switch ( button ) {
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_LEFT:
 #else
@@ -359,7 +361,8 @@ void set_bool(char* string, bool* variable )
                 break;
 
             default:
-                *variable = !*variable;
+                if(!(button & BUTTON_REL))
+                   *variable = !*variable;
                 break;
         }
     }
