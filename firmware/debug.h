@@ -26,12 +26,17 @@ extern void ldebugf(char* file, int line, char *fmt, ...);
 #ifdef __GNUC__
 
 /*  */
-#if defined(DEBUG) || defined(SIMULATOR)
+#if defined(SIMULATOR)
 #define DEBUGF	debugf
 #define LDEBUGF(...) ldebugf(__FILE__, __LINE__, __VA_ARGS__)
 #else
+#if defined(DEBUG)
+#define DEBUGF	debugf
+#define LDEBUGF debugf
+#else
 #define DEBUGF(...)
 #define LDEBUGF(...)
+#endif
 #endif
 
 
