@@ -27,8 +27,15 @@ APPDIR = ../../apps/
 RECDIR = $(APPDIR)recorder/
 RM = del
 
+#DISPLAY = -DHAVE_LCD_CHARCELLS
+DISPLAY = -DHAVE_LCD_BITMAP
+
+#KEYPAD = -DHAVE_PLAYER_KEYPAD
+KEYPAD = -DHAVE_RECORDER_KEYPAD
+
 CC = cl
-DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR -DARCHOS_RECORDER -D_WIN32 -DWIN32
+DEFINES = -DWIN32 -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR	\
+$(KEYPAD) $(DISPLAY)
 LDFLAGS = /ouisw32.exe /link -subsystem:windows
 INCLUDES = -I$(FIRMWAREDIR) -I$(DRIVERS) -I$(COMMON) -I$(SIMDIR) -I$(APPDIR) -I$(RECDIR)
 LIBS = gdi32.lib user32.lib
@@ -36,12 +43,14 @@ LIBS = gdi32.lib user32.lib
 
 CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) /MD /Fd"Release/vc70.pdb"
 
-#SRCS = $(wildcard *.c)
-
-SRCS = lcd-win32.c tetris.c uisw32.c lcd.c button.c tree.c main.c \
+SRCS = lcd-win32.c uisw32.c lcd.c button.c tree.c main.c \
   chartables.c kernel.c uisw32.res dir-win32.c main_menu.c \
-  play.c bmp.c debug-win32.c screensaver.c menu.c credits.c \
-  icons.c sound_menu.c mpeg.c id3.c settings.c sprintf.c
+  play.c debug-win32.c menu.c credits.c sound_menu.c mpeg.c \
+  id3.c settings.c sprintf.c
+
+!IF ("$(DISPLAY)" == "-DHAVE_LCD_BITMAP")
+SRCS = $(SRCS) tetris.c screensaver.c icons.c bmp.c
+!ENDIF
 
 OBJS = $(SRCS:.c=.obj)
 

@@ -31,6 +31,7 @@ extern void					new_key(int key);
 HWND                                hGUIWnd; // the GUI window handle
 unsigned int                        uThreadID; // id of mod thread
 PBYTE                               lpKeys;
+bool                                bActive; // window active?
 
 // GUIWndProc
 // window proc for GUI simulator
@@ -47,6 +48,12 @@ LRESULT GUIWndProc (
 
     switch (uMsg)
     {
+    case WM_ACTIVATE:
+        if (LOWORD(wParam) == WA_ACTIVE || LOWORD(wParam) == WA_CLICKACTIVE)
+            bActive = true;
+        else
+            bActive = false;
+        return TRUE;
     case WM_CREATE:
         // load background image
         hBkgnd = (HBITMAP)LoadImage (GetModuleHandle (NULL), MAKEINTRESOURCE(IDB_UI),

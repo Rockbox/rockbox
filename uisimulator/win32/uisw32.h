@@ -34,6 +34,7 @@
 
 extern HWND                         hGUIWnd; // the GUI window handle
 extern unsigned int                 uThreadID; // id of mod thread
+extern bool                         bActive;
 
 // typedefs
 typedef unsigned char               uchar;

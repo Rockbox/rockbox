@@ -20,7 +20,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;C:\Programming\CVS Checkout\RockBox\apps\recorder&quot;;&quot;C:\Programming\CVS Checkout\RockBox\apps&quot;;&quot;C:\Programming\CVS Checkout\RockBox\firmware&quot;;&quot;C:\Programming\CVS Checkout\RockBox\uisimulator\win32&quot;;&quot;C:\Programming\CVS Checkout\RockBox\firmware\drivers&quot;;&quot;C:\Programming\CVS Checkout\RockBox\firmware\common&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;ARCHOS_RECORDER;SIMULATOR;HAVE_LCD_BITMAP;SIMULATOR;"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;HAVE_PLAYER_KEYPAD;HAVE_LCD_CHARCELLS;SIMULATOR;SIMULATOR;"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -185,9 +185,6 @@
 				RelativePath="..\..\firmware\playlist.c">
 			</File>
 			<File
-				RelativePath="..\..\apps\recorder\screensaver.c">
-			</File>
-			<File
 				RelativePath="..\..\firmware\settings.c">
 			</File>
 			<File
@@ -195,9 +192,6 @@
 			</File>
 			<File
 				RelativePath="..\..\firmware\common\sprintf.c">
-			</File>
-			<File
-				RelativePath="..\..\apps\recorder\tetris.c">
 			</File>
 			<File
 				RelativePath="..\..\apps\tree.c">
