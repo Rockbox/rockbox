@@ -29,6 +29,7 @@
 #include <ctype.h>
 #include <time.h>
 
+#include "config.h"
 #include "screenhack.h"
 
 #include "version.h"
@@ -61,7 +62,11 @@ XrmOptionDescRec options [] = {
 char *progclass = "rockboxui";
 
 char *defaults [] = {
+#ifdef IRIVER_H100
+  ".background:	lightblue",
+#else
   ".background:	lightgreen",
+#endif
   ".foreground:	black",
   "*help:       false",
   0
