@@ -37,10 +37,14 @@
 
 #ifdef HAVE_LCD_BITMAP
 #include "games_menu.h"
-#include "screensavers_menu.h"
 #include "bmp.h"
 #include "icons.h"
-#endif
+
+#ifdef USE_SCREENSAVERS
+#include "screensavers_menu.h"
+#endif /* End USE_SCREENSAVERS */
+
+#endif /* End HAVE_LCD_BITMAP */
 
 int show_logo( void )
 {
@@ -159,17 +163,20 @@ Menu show_info(void)
 #endif
 
 #ifdef HAVE_LCD_CHARCELLS
-        snprintf(s, sizeof(s), "Batt: %d%%%s", battery_level(), battery_level_safe() ? "" : "!");
+        snprintf(s, sizeof(s), "Batt: %d%%%s", 
+                 battery_level(), battery_level_safe() ? "" : "!");
         lcd_puts(0, 1, s);
 #else
 #ifdef HAVE_CHARGE_CTRL
         if (charger_enabled)
             snprintf(s, sizeof(s), "Battery: charging");
         else
-            snprintf(s, sizeof(s), "Battery: %d%%%s", battery_level(), battery_level_safe() ? "" : " !!");
+            snprintf(s, sizeof(s), "Battery: %d%%%s", 
+                     battery_level(), battery_level_safe() ? "" : " !!");
         lcd_puts(0, 3, s);
 #else
-        snprintf(s, sizeof(s), "Battery: %d%%%s", battery_level(), battery_level_safe() ? "" : " !!");
+        snprintf(s, sizeof(s), "Battery: %d%%%s", 
+                 battery_level(), battery_level_safe() ? "" : " !!");
         lcd_puts(0, 3, s);
 #endif
 #endif
@@ -197,7 +204,9 @@ Menu main_menu(void)
         { "General Settings",   settings_menu     },
 #ifdef HAVE_LCD_BITMAP
         { "Games",              games_menu        },
+#ifdef USE_SCREENSAVERS
         { "Screensavers",       screensavers_menu },
+#endif /* end USE_SCREENSAVERS */
 #endif
         { "Info",               show_info         },
         { "Version",            show_credits      },

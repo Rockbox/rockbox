@@ -20,6 +20,7 @@
 #include "config.h"
 
 #ifdef HAVE_LCD_BITMAP
+#ifdef USE_SCREENSAVERS
 
 #include "boxes.h"
 #include "lcd.h"
@@ -125,4 +126,5 @@ Menu boxes(void)
     return MENU_OK;
 }
 
+#endif
 #endif

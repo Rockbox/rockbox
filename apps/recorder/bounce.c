@@ -20,6 +20,7 @@
 #include "config.h"
 
 #ifdef HAVE_LCD_BITMAP
+#ifdef USE_SCREENSAVERS
 
 #include "lcd.h"
 #include "button.h"
@@ -131,4 +132,5 @@ Menu bounce(void)
     return MENU_OK;
 }
 
+#endif
 #endif
