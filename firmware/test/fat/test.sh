@@ -15,8 +15,9 @@ check() {
 }
 
 try() {
-    echo COMMAND: fat $1 $2 $3 >> $RESULT
-    ./fat $1 $2 $3 2>> $RESULT
+    echo COMMAND: fat $1 "$2" "$3"
+    echo COMMAND: fat $1 "$2" "$3" >> $RESULT
+    ./fat $1 "$2" "$3" 2>> $RESULT
     RETVAL=$?
     [ $RETVAL -ne 0 ] && fail
 }
@@ -26,6 +27,10 @@ buildimage() {
     mount -o loop $IMAGE $MOUNT
     echo "Filling it with /etc files"
     find /etc -type f -maxdepth 1 -exec cp {} $MOUNT \;
+    for i in `seq 1 120`;
+    do
+        echo apa > "$MOUNT/very $i long test filename so we can make sure they.work"
+    done
     mkdir $MOUNT/dir
     umount $MOUNT
 }
@@ -34,53 +39,63 @@ runtests() {
     rm $RESULT
 
     echo ---Test: create a 10K file
-    try mkfile /apa.txt 10
-    try mkfile /dir/apa.txt 10
+    try mkfile "/really long filenames rock" 10
     check
-    try chkfile /apa.txt 10
-    try chkfile /dir/apa.txt 8
+    try mkfile /dir/apa.monkey.me.now 10
+    check
+    try chkfile "/really long filenames rock" 10
+    try chkfile /dir/apa.monkey.me.now 8
 
     echo ---Test: create a 1K file
-    try mkfile /bpa.txt 1
+    try mkfile /bpa.rock 1
     check
-    try chkfile /bpa.txt 1
+    try chkfile /bpa.rock 1
 
     echo ---Test: create a 40K file
-    try mkfile /cpa.txt 40
+    try mkfile /cpa.rock 40
     check
-    try chkfile /cpa.txt 40
+    try chkfile /cpa.rock 40
 
     echo ---Test: create a 400K file
-    try mkfile /dpa.txt 400
+    try mkfile /dpa.rock 400
     check
-    try chkfile /dpa.txt 400
+    try chkfile /dpa.rock 400
 
-    echo ---Test: truncate previous 40K file to 20K
-    try mkfile /cpa.txt 20
+    echo ---Test: create a 1200K file
+    try mkfile /epa.rock 1200
     check
-    try chkfile /cpa.txt 20
+    try chkfile /epa.rock 1200
 
-    echo ---Test: truncate previous 20K file to 0K
-    try mkfile /cpa.txt 0
+    echo ---Test: rewrite first 20K of a 40K file
+    try mkfile /cpa.rock 20
     check
-    try chkfile /cpa.txt
-    try chkfile /apa.txt
-    try chkfile /bpa.txt
+    try chkfile /cpa.rock 20
+
+    echo ---Test: rewrite first sector of 40K file
+    try mkfile /cpa.rock 0
+    check
+    try chkfile /cpa.rock
+    try chkfile /apa.rock
+    try chkfile /bpa.rock
 
     LOOP=50
-    SIZE=70
+    SIZE=700
+
+    try del "/really long filenames rock"
 
     echo ---Test: create $LOOP $SIZE k files
     for i in `seq 1 $LOOP`;
     do
         echo ---Test: $i/$LOOP ---
-        try mkfile /rockbox.$i $SIZE
+        try mkfile "/rockbox rocks.$i" $SIZE
         check
-        try chkfile /rockbox.$i $SIZE
+        try chkfile "/rockbox rocks.$i" $SIZE
         check
-        try del /rockbox.$i
+        try del "/rockbox rocks.$i"
         check
-        try mkfile /rockbox.$i $SIZE
+        try mkfile "/rockbox rocks.$i" $SIZE
+        check
+        try ren "/rockbox rocks.$i" "$i is a new long filename!"
         check
     done
 
@@ -90,20 +105,20 @@ echo "Building test image (4 sector/cluster)"
 buildimage 4
 runtests
 
-echo "Building test image (128 sectors/cluster)"
-buildimage 128
-runtests
-
 echo "Building test image (32 sectors/cluster)"
 buildimage 32
+runtests
+
+echo "Building test image (1 sector/cluster)"
+buildimage 1
 runtests
 
 echo "Building test image (8 sectors/cluster)"
 buildimage 8
 runtests
 
-echo "Building test image (1 sector/cluster)"
-buildimage 1
+echo "Building test image (128 sectors/cluster)"
+buildimage 128
 runtests
 
 echo "== Test completed sucessfully =="

@@ -8,7 +8,7 @@
 
 static FILE* file;
 
-int ata_read_sectors(unsigned long start, unsigned char count, void* buf)
+int ata_read_sectors(unsigned long start, int count, void* buf)
 {
     if ( count > 1 )
         DEBUGF("[Reading %d blocks: 0x%lx to 0x%lx]\n",
@@ -28,7 +28,7 @@ int ata_read_sectors(unsigned long start, unsigned char count, void* buf)
     return 0;
 }
 
-int ata_write_sectors(unsigned long start, unsigned char count, void* buf)
+int ata_write_sectors(unsigned long start, int count, void* buf)
 {
     if ( count > 1 )
         DEBUGF("[Writing %d blocks: 0x%lx to 0x%lx]\n",

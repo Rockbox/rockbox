@@ -331,40 +331,47 @@ int dbg_append(char* name)
 int dbg_test(char* name)
 {
     int x=0;
-    int size, fd, rc;
-    char buf[4096];
+    int j;
+    int fd;
+    char text[BUFSIZE+1];
 
-    fd = open(name,O_RDWR);
-    if (fd<0) {
-        DEBUGF("Failed opening file\n");
-        return -1;
-    }
+    for (j=0; j<5; j++) {
+        int num = 40960;
 
-    size = lseek(fd, -1024, SEEK_END);
-    size &= ~7;
-    DEBUGF("File is %d bytes\n", size);
-    x = size / CHUNKSIZE;
-    LDEBUGF("Check base is %x (%d)\n",x,size);
+        fd = open(name,O_WRONLY|O_CREAT|O_APPEND);
+        if (fd<0) {
+            DEBUGF("Failed opening file\n");
+            return -1;
+        }
 
-    rc = read(fd, buf, sizeof buf);
-    if ( rc < 0 )
-        panicf("Failed reading data\n");
-    if ( rc == 0 )
-        DEBUGF("EOF\n");
+        while ( num ) {
+            int rc, i;
+            int len = num > BUFSIZE ? BUFSIZE : num;
 
-    rc = read(fd, buf, sizeof buf);
-    if ( rc < 0 )
-        panicf("Failed reading data\n");
-    if ( rc == 0 )
-        DEBUGF("EOF\n");
+            for (i=0; i<len/CHUNKSIZE; i++ )
+                sprintf(text+i*CHUNKSIZE,"%c%06x,",name[1],x++);
 
-    rc = write(fd, buf, sizeof buf);
-    if ( rc < 0 )
-        panicf("Failed writing data\n");
-    if ( rc == 0 )
-        DEBUGF("Nothing written!\n");
+            rc = write(fd, text, len);
+            if ( rc < 0 ) {
+                DEBUGF("Failed writing data\n");
+                return -1;
+            }
+            else
+                if ( rc == 0 ) {
+                    DEBUGF("No space left\n");
+                    return -2;
+                }
+                else
+                    DEBUGF("wrote %d bytes\n",rc);
 
-    return close(fd);
+            num -= len;
+        }
+
+        if (close(fd) < 0)
+            return -1;
+    }    
+
+    return 0;
 }
 
 int dbg_dump(char* name, int offset)
@@ -511,6 +518,7 @@ int dbg_cmd(int argc, char *argv[])
                " wrtest <file>\n"
                " append <file>\n"
                " test <file>\n"
+               " ren <file> <newname>\n"
             );
         return -1;
     }
@@ -613,6 +621,12 @@ int dbg_cmd(int argc, char *argv[])
     {
         if (arg1 && arg2)
             return dbg_trunc(arg1, atoi(arg2));
+    }
+
+    if (!strcasecmp(cmd, "ren"))
+    {
+        if (arg1 && arg2)
+            return rename(arg1, arg2);
     }
 
     return 0;
