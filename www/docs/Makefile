@@ -55,6 +55,12 @@ how_to_compile.raw: $(DOCS)/README $(TXT2HTML)
 how_to_compile.html: how_to_compile.t how_to_compile.raw $(TXT2HTML)
 	$(ACTION) $<
 
+uisimulator.raw: $(DOCS)/UISIMULATOR $(TXT2HTML)
+	$(TXT2HTML) < $< > $@
+
+uisimulator.html: uisimulator.t uisimulator.raw $(TXT2HTML)
+	$(ACTION) $<
+
 credits.raw: $(DOCS)/CREDITS $(TXT2HTML)
 	$(TXT2HTML) < $< > $@
 
