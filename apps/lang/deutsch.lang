@@ -75,7 +75,7 @@ new: "Mische..."
 id: LANG_PLAYINDICES_PLAYLIST
 desc: in playlist.indices() when playlist is full
 eng: "Playlist"
-voice: "Playliste"
+voice: "Abspielliste"
 new: "Playliste"
 
 id: LANG_PLAYINDICES_BUFFER
@@ -315,7 +315,7 @@ new: "Loudness"
 id: LANG_BBOOST
 desc: in sound settings
 eng: "Bass Boost"
-voice: "Bass Boost"
+voice: "Bass Anhebung"
 new: "Bass Boost"
 
 id: LANG_DECAY
@@ -765,73 +765,73 @@ new: "Sa"
 id: LANG_MONTH_JANUARY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Jan"
-voice: ""
+voice: "Januar"
 new: "Jan"
 
 id: LANG_MONTH_FEBRUARY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Feb"
-voice: ""
+voice: "Februar"
 new: "Feb"
 
 id: LANG_MONTH_MARCH
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Mar"
-voice: ""
+voice: "März"
 new: "Mär"
 
 id: LANG_MONTH_APRIL
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Apr"
-voice: ""
+voice: "April"
 new: "Apr"
 
 id: LANG_MONTH_MAY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "May"
-voice: ""
+voice: "Mai"
 new: "Mai"
 
 id: LANG_MONTH_JUNE
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Jun"
-voice: ""
+voice: "Juni"
 new: "Jun"
 
 id: LANG_MONTH_JULY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Jul"
-voice: ""
+voice: "Juli"
 new: "Jul"
 
 id: LANG_MONTH_AUGUST
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Aug"
-voice: ""
+voice: "August"
 new: "Aug"
 
 id: LANG_MONTH_SEPTEMBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Sep"
-voice: ""
+voice: "September"
 new: "Sep"
 
 id: LANG_MONTH_OCTOBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Oct"
-voice: ""
+voice: "Oktober"
 new: "Okt"
 
 id: LANG_MONTH_NOVEMBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Nov"
-voice: ""
+voice: "November"
 new: "Nov"
 
 id: LANG_MONTH_DECEMBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Dec"
-voice: ""
+voice: "Dezember"
 new: "Dez"
 
 id: LANG_RESUME_SETTING_ASK_ONCE
@@ -993,7 +993,7 @@ new: "HDD: %d.%dGB"
 id: LANG_DISK_FREE_STAT
 desc: disk size info
 eng: "Free: %d.%dGB"
-voice: ""
+voice: "Freier Plattenplatz:"
 new: "Frei: %d.%dGB"
 
 id: LANG_POWEROFF
@@ -1005,19 +1005,19 @@ new: "HD ausschalten"
 id: LANG_FILTER_PLAYLIST
 desc: show only playlist
 eng: "Playlists"
-voice: "Playlisten"
+voice: "Abspiellisten"
 new: "Playlisten"
 
 id: LANG_BATTERY_TIME
 desc: battery level in % and estimated time remaining
 eng: "%d%% %dh %dm"
-voice: ""
+voice: "Akkuladung:"
 new: "%d%% %d Std %d Min"
 
 id: LANG_SLEEP_TIMER
 desc: sleep timer setting
 eng: "Sleep Timer"
-voice: "Einschlaftimer"
+voice: "Einschlafzeit"
 new: "Einschlaftimer"
 
 id: LANG_MP3BUFFER_MARGIN
@@ -1161,7 +1161,7 @@ new: "PLAY=OK OFF=Abbruch"
 id: LANG_CREATE_PLAYLIST
 desc: Menu option for creating a playlist
 eng: "Create Playlist"
-voice: "Erstelle Playlist"
+voice: "Erstelle Abspielliste"
 new: "Erstelle Playlist"
 
 id: LANG_CREATING
@@ -1245,7 +1245,7 @@ new: "geladen"
 id: LANG_FADE_ON_STOP
 desc: options menu to set fade on stop or pause
 eng: "Fade On Stop/Pause"
-voice: "Blenden bei Stop/Pause"
+voice: "Ausblenden bei Stop/Pause"
 new: "Blenden bei Stop/Pause"
 
 id: LANG_SOKOBAN_ON
@@ -1329,7 +1329,7 @@ new: "Zeilenauswahl"
 id: LANG_RECORDING_EDITABLE
 desc: Editable recordings setting
 eng: "Independent frames"
-voice: "unabhängige mp3-Frames"
+voice: "unabhängige mp3-Rahmen"
 new: "unabhängige mp3-Frames"
 
 id: LANG_STATUS_BAR
@@ -1383,7 +1383,7 @@ new: "Max Anzahl Dateien in Verzeichnisanzeige"
 id: LANG_MAX_FILES_IN_PLAYLIST
 desc: in settings_menu
 eng: "Max playlist size"
-voice: "Maximale Playlist-Länge"
+voice: "Maximale Länge Abspielliste"
 new: "Max Playlist-Länge"
 
 id: LANG_JUMP_SCROLL
@@ -1425,7 +1425,7 @@ new: "Zeit zum Aufteilen:"
 id: LANG_SHOW_ICONS
 desc: in settings_menu
 eng: "Show Icons"
-voice: "Icons anzeigen"
+voice: "Sinnbilder anzeigen"
 new: "Icons anzeigen"
 
 id: LANG_DISK_FULL
@@ -1529,13 +1529,13 @@ new: "Einfügen als nächsten"
 id: LANG_SAVE_DYNAMIC_PLAYLIST
 desc: in playlist menu.
 eng: "Save Current Playlist"
-voice: "Speichere aktuelle Playlist"
+voice: "Speichere aktuelle Apspielliste"
 new: "Speichere aktuelle Playlist"
 
 id: LANG_PLAYLIST_MENU
 desc: in main menu.
 eng: "Playlist Options"
-voice: "Playlist Optionen"
+voice: "Abspielliste Optionen"
 new: "Playlist Optionen"
 
 id: LANG_PLAYLIST_INSERT_COUNT
@@ -1631,7 +1631,7 @@ new: "Sprache"
 id: LANG_WHILE_PLAYING
 desc: in settings_menu()
 eng: "Browse .wps files"
-voice: "Zeige .wps-Dateien"
+voice: "Zeige WPS-Dateien"
 new: "Zeige .wps-Dateien"
 
 id: LANG_CUSTOM_CFG
@@ -1643,7 +1643,7 @@ new: "Zeige .cfg-Dateien"
 id: LANG_PLUGINS
 desc: in main_menu()
 eng: "Browse Plugins"
-voice: "Zeige Plugins"
+voice: "Zeige Zusatzprogramme"
 new: "Zeige Plugins"
 
 id: LANG_CAR_ADAPTER_MODE
@@ -1655,7 +1655,7 @@ new: "Kfz-Adapter Modus"
 id: LANG_LINE_IN
 desc:  in settings_menu
 eng: "Line In"
-voice: "Line In"
+voice: "Analogeingang"
 new: "Line In"
 
 id: LANG_NO_FILES
@@ -1727,7 +1727,7 @@ new: "Aufnehmen"
 id: LANG_VIEW_DYNAMIC_PLAYLIST
 desc: in playlist menu.
 eng: "View Current Playlist"
-voice: "Zeige aktuelle Playliste"
+voice: "Zeige aktuelle Aspielliste"
 new: "Zeige aktuelle Playliste"
 
 id: LANG_MOVE
@@ -2398,7 +2398,7 @@ new: "beim Betreten"
 id: LANG_VOICE_DIR_HOVER
 desc: "talkbox" mode for directories
 eng: "while hovering"
-voice: "mit Cursor"
+voice: "mit Zeiger"
 new: "mit Cursor"
 
 id: VOICE_FILE
@@ -2627,4 +2627,16 @@ id: VOICE_EXT_AJZ
 desc: spoken only, for file extension
 eng: ""
 voice: "Firmware"
+new:
+
+id: LANG_DELETE_DIR
+desc: in on+play menu
+eng: "Delete directory"
+voice: "Verzeichnis löschen"
+new: "Verzeichnis löschen"
+
+id: VOICE_CURRENT_TIME
+desc: spoken only, for wall clock announce
+eng: ""
+voice: "Uhrzeit:"
 new:
