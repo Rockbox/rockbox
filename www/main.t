@@ -10,6 +10,8 @@ firmware for the Archos Jukebox <i>5000</i>, <i>6000</i>, <i>Studio</i> and <i>R
 
 <h2>News</h2>
 
+<p><i>2002-08-09</i>: Version 1.1 is released. <a href="download/">Download it here</a>.
+
 <p><i>2002-08-06</i>: Web site moved to new domain: <strong>rockbox.haxx.se</strong>. Bear with us while we chase down the last bad links.
 
 <p><i>2002-08-06</i>: Battery charging added for the Recorders (players have hardware charging).
