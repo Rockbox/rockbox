@@ -1,12 +1,21 @@
 #define _PAGE_ How To Work With Patches
 #include "head.t"
+<p>
+ When we speak of 'patches' in the Rockbox project, we mean a set of changes
+ to one or more source files.
 
 <h2>Tools Of The Trade</h2>
 <p>
 Use the tools 'diff' and 'patch'. Preferably the GNU versions. They're readily
 available for all imaginable platforms.
 <p>
-[Add favourite diff/patch links here]
+Try one of these:
+<ul>
+<li> <a href="http://www.fsf.org/software/patch/patch.html">http://www.fsf.org/software/patch/patch.html</a>
+<li> <a href="http://www.gnu.org/directory/diffutils.html">http://www.gnu.org/directory/diffutils.html</a>
+<li> <a href="http://gnuwin32.sourceforge.net/packages/patch.htm">http://gnuwin32.sourceforge.net/packages/patch.htm</a> - patch for Windows
+<li> <a href="http://gnuwin32.sourceforge.net/packages/diffutils.htm">http://gnuwin32.sourceforge.net/packages/diffutils.htm</a> - diff for Windows
+</ul>
 
 <h2>Creating A Patch</h2>
 <p>
