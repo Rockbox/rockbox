@@ -34,3 +34,6 @@
 
 /* How to detect USB */
 #define USB_PLAYERSTYLE 1
+
+/* Define this if the platform has batteries */
+#define HAVE_BATTERIES 1

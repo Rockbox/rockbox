@@ -42,3 +42,6 @@
 
 /* How to detect USB */
 #define USB_RECORDERSTYLE 1
+
+/* Define this if the platform has batteries */
+#define HAVE_BATTERIES 1

@@ -28,6 +28,10 @@
 #include "config-fmrecorder.h"
 #elif defined(ARCHOS_RECORDERV2)
 #include "config-recorderv2.h"
+#elif defined(NEO_35)
+#include "config-neo35.h"
+#elif defined(NEO_MSTATION)
+#include "config-mstation.h"
 #else
 /* no known platform */
 #endif

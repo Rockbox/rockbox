@@ -51,3 +51,6 @@
 
 /* How to detect USB */
 #define USB_FMRECORDERSTYLE 1
+
+/* Define this if the platform has batteries */
+#define HAVE_BATTERIES 1
