@@ -160,6 +160,13 @@ int open(const char* pathname, int flags)
             closedir(dir);
             return -7;
         }
+    } else {
+        if(file->write && (file->attr & FAT_ATTR_DIRECTORY)) {
+            errno = EISDIR;
+            file->busy = false;
+            closedir(dir);
+            return -8;
+        }
     }
     closedir(dir);
 
@@ -169,7 +176,7 @@ int open(const char* pathname, int flags)
     if (file->write && (flags & O_APPEND)) {
         rc = lseek(fd,0,SEEK_END);
         if (rc < 0 )
-            return rc * 10 - 8;
+            return rc * 10 - 9;
     }
 
     return fd;
