@@ -14,10 +14,9 @@
 <li> <a href="credits.html">The Noble People Behind Rockbox</a>
 
 <li> Good external user forums devoted to Archos: <a
-href="http://forums.funmp3players.com/forum/forum.asp?forum_id=8&forum_title=General+%2D+Jukebox+Player%2FRecorder">funmp3players.com</a>
-and <a
-href="http://groups.yahoo.com/group/archosjukebox6000/">archosjukebox6000 on
-yahoo</a>.
+href="http://forums.funmp3players.com/forum/forum.asp?forum_id=8&forum_title=General+%2D+Jukebox+Player%2FRecorder">funmp3players.com</a>,
+<a href="http://groups.yahoo.com/group/archosjukebox6000/">archosjukebox6000
+on yahoo</a> and <a href="http://www.newmp3technology.net/forum/">newmp3technology.net</a>.
 
 <li> Small help texts for your <a href="Help-JBR.txt">Recorder</A> or <a
 href="Help-Stu.txt">Player/Studio</a>, meant to be stored and read on your
