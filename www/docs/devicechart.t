@@ -148,8 +148,8 @@
     <td>9-12V 600mA</td>
     <td>9-12V 600mA</td>
     <td>9-12V 600mA</td>
-    <td>6V ?mA</td>
-    <td>6V ?mA</td>
+    <td>6V 700mA</td>
+    <td>6V 700mA</td>
 </tr>
 </table>
 <p>
