@@ -316,7 +316,7 @@ static int send_cmd(int cmd, unsigned long parameter, unsigned char *response)
     if (response[0] != 0x00)
     {
         write_transfer(dummy, 1);
-        return -1;
+        return -10;
     }
 
     switch (cmd)
@@ -351,7 +351,7 @@ static int receive_cxd(unsigned char *buf)
     if (poll_byte(20) != DT_START_BLOCK)
     {
         write_transfer(dummy, 1);
-        return -1;                /* not start of data */
+        return -11;               /* not start of data */
     }
     
     read_transfer(buf, 16);
@@ -497,7 +497,7 @@ static int receive_sector(unsigned char *inbuf, unsigned char *swapbuf,
     if (poll_byte(timeout) != DT_START_BLOCK)
     {
         write_transfer(dummy, 1);
-        return -1;                /* not start of data */
+        return -12;               /* not start of data */
     }
     
     while (!(SSR1 & SCI_TEND));   /* wait for end of transfer */
@@ -577,7 +577,7 @@ static int send_sector(const unsigned char *nextbuf, int timeout)
     serial_mode = SER_DISABLED;
 
     if ((poll_busy(timeout) & 0x1F) != 0x05) /* something went wrong */
-        ret = -1;
+        ret = -13;
 
     write_transfer(dummy, 1);
 
@@ -595,7 +595,7 @@ static int send_single_sector(const unsigned char *buf, int timeout)
     write_transfer(dummy, 2);     /* crc - dontcare */
 
     if ((poll_busy(timeout) & 0x1F) != 0x05) /* something went wrong */
-        ret = -1;
+        ret = -14;
 
     write_transfer(dummy, 1);
 
@@ -786,8 +786,6 @@ static void mmc_tick(void)
         if (countdown >= 0)
             countdown--;
 
-        /* Report to the thread if we have had 3 identical status
-           readings in a row */
         if (countdown == 0)
         {
             if (current_status)
