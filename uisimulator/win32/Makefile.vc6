@@ -48,6 +48,7 @@ SRCS = *.c \
 	$(DRIVERS)/lcd.c $(DRIVERS)/power.c \
 	$(APPDIR)*.c \
 	$(FIRMWAREDIR)/chartables.c $(FIRMWAREDIR)/id3.c $(FIRMWAREDIR)/usb.c $(FIRMWAREDIR)/mpeg.c \
+	$(FIRMWAREDIR)/powermgmt.c \
         $(COMMON)/sprintf.c $(COMMON)/strtok.c
 
 !IF ("$(DISPLAY)" == "-DHAVE_LCD_BITMAP")
