@@ -21,6 +21,13 @@
 
 #ifndef SIMULATOR
 
+#define BATTERY_LEVEL_SHUTDOWN   450 /* 4.5V */
+#define BATTERY_LEVEL_EMPTY      465 /* 4.65V */
+#define BATTERY_LEVEL_DANGEROUS  475 /* 4.75V */
+#define BATTERY_LEVEL_FULL       520 /* 5.2V */
+
+#define BATTERY_RANGE (BATTERY_LEVEL_FULL - BATTERY_LEVEL_EMPTY)
+
 #define POWER_HISTORY_LEN 2*60   /* 2 hours of samples, one per minute */
 #define POWER_AVG         3      /* how many samples to take for each measurement */
 
@@ -42,8 +49,15 @@ extern char charge_restart_level;
 
 extern unsigned short power_history[POWER_HISTORY_LEN];
 
+/* Start up power management thread */
 void power_init(void);
 
-#endif
+#endif /* SIMULATOR */
+
+/* Returns battery level in percent */
+int battery_level(void);
+
+/* Tells if the battery level is safe for disk writes */
+bool battery_level_safe(void);
 
 #endif

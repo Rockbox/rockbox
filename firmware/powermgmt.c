@@ -29,7 +29,19 @@
 #include "power.h"
 #include "powermgmt.h"
 
-#ifndef SIMULATOR
+#ifdef SIMULATOR
+
+int battery_level(void)
+{
+    return 100;
+}
+
+bool battery_level_safe(void)
+{
+    return true;
+}
+
+#else /* not SIMULATOR */
 
 static char power_stack[DEFAULT_STACK_SIZE];
 static char power_thread_name[] = "power";
@@ -39,6 +51,46 @@ unsigned short power_history[POWER_HISTORY_LEN];
 char power_message[POWER_MESSAGE_LEN] = "";
 char charge_restart_level = CHARGE_RESTART_HI;
 #endif
+
+/* Returns battery level in percent */
+int battery_level(void)
+{
+    int level = 0;
+    int c = 0;
+    int i;
+    
+    /* calculate average over last 3 minutes (skip empty samples) */
+    for (i = 0; i < 3; i++)
+        if (power_history[POWER_HISTORY_LEN-1-i]) {
+            level += power_history[POWER_HISTORY_LEN-1-i];
+            c++;
+        }
+        
+    if (c)
+        level = level / c;  /* avg */
+    else /* history was empty, get a fresh sample */
+        level = (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) / 10000;
+
+#ifdef HAVE_CHARGE_CTRL    
+    if (charger_enabled)
+    	level -= 10;  /* the charger raises the voltage 0.05-0.2v */
+#endif
+    
+    if(level > BATTERY_LEVEL_FULL)
+        level = BATTERY_LEVEL_FULL;
+
+    if(level < BATTERY_LEVEL_EMPTY)
+        level = BATTERY_LEVEL_EMPTY;
+
+    return ((level-BATTERY_LEVEL_EMPTY) * 100) / BATTERY_RANGE;
+}
+
+/* Tells if the battery level is safe for disk writes */
+bool battery_level_safe(void)
+{
+    /* I'm pretty sure we don't want an average over a long time here */
+    return adc_read(ADC_UNREG_POWER) > (BATTERY_LEVEL_DANGEROUS * 10000) / BATTERY_SCALE_FACTOR;
+}
 
 /*
  * This power thread maintains a history of battery voltage
@@ -175,4 +227,5 @@ void power_init(void)
     create_thread(power_thread, power_stack, sizeof(power_stack), power_thread_name);
 }
 
-#endif
+#endif /* SIMULATOR */
+
