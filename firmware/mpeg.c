@@ -285,7 +285,7 @@ unsigned long mpeg_get_last_header(void)
 {
 #ifdef SIMULATOR
     return 0;
-#else
+#elif CONFIG_HWCODEC != MASNONE
     unsigned long tmp[2];
 
     /* Read the frame data from the MAS and reconstruct it with the
@@ -415,7 +415,9 @@ void mpeg_get_debugdata(struct mpeg_debug *dbgdata)
 
     dbgdata->last_dma_chunk_size = last_dma_chunk_size;
 
+#if CONFIG_CPU == SH7034
     dbgdata->dma_on = (SCR0 & 0x80) != 0;
+#endif
     dbgdata->playing = playing;
     dbgdata->play_pending = play_pending;
     dbgdata->is_playing = is_playing;
@@ -961,6 +963,7 @@ static void start_playback_if_ready(void)
     }
 }
 
+#if CONFIG_HWCODEC != MASNONE
 static bool swap_one_chunk(void)
 {
     int free_space_left;
@@ -1001,8 +1004,13 @@ static bool swap_one_chunk(void)
 
     return true;
 }
-
-static const unsigned char empty_id3_header[] =
+#else
+static bool swap_one_chunk(void)
+{
+    return false;
+}
+#endif
+const unsigned char empty_id3_header[] =
 {
     'I', 'D', '3', 0x03, 0x00, 0x00,
     0x00, 0x00, 0x1f, 0x76 /* Size is 4096 minus 10 bytes for the header */
@@ -1010,6 +1018,7 @@ static const unsigned char empty_id3_header[] =
 
 static void mpeg_thread(void)
 {
+#if CONFIG_HWCODEC != MASNONE
     static int pause_tick = 0;
     static unsigned int pause_track = 0;
     struct event ev;
@@ -1971,6 +1980,7 @@ static void mpeg_thread(void)
         }
 #endif /* #if CONFIG_HWCODEC == MAS3587F */
     }
+#endif /* HWCODEC != NONE */
 }
 #endif /* SIMULATOR */
 
@@ -2450,6 +2460,63 @@ unsigned long mpeg_num_recorded_bytes(void)
         return 0;
 }
 
+#else /* CONFIG_HWCODEC == MAS3587F */
+
+/* dummies coming up */
+
+void bitswap(unsigned char *data, int length)
+{
+    /* a dummy */
+    /* this ought to be useless */
+}
+
+void mpeg_init_playback(void)
+{
+    /* a dummy */
+}
+unsigned long mpeg_recorded_time(void)
+{
+    /* a dummy */
+}
+void mpeg_beep(int duration)
+{
+    /* a dummy */
+}
+void mpeg_pause_recording(void)
+{
+    /* a dummy */
+}
+void mpeg_resume_recording(void)
+{
+    /* a dummy */
+}
+unsigned long mpeg_num_recorded_bytes(void)
+{
+    /* a dummy */
+}
+void mpeg_record(const char *filename)
+{
+    /* a dummy */
+}
+void mpeg_new_file(const char *filename)
+{
+    /* a dummy */
+}
+
+void mpeg_set_recording_gain(int left, int right, bool use_mic)
+{
+    /* a dummy */
+}
+void mpeg_init_recording(void)
+{
+    /* a dummy */
+}
+void mpeg_set_recording_options(int frequency, int quality,
+                                int source, int channel_mode,
+                                bool editable, int prerecord_time)
+{
+    /* a dummy */
+}
 #endif
 
 void mpeg_play(int offset)
