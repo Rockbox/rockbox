@@ -1795,12 +1795,15 @@ void tree_init(void)
     dircache = buffer_alloc(max_files_in_dir * sizeof(struct entry));
 }
 
-void bookmark_play(char *resume_file, int index, int offset, int seed)
+void bookmark_play(char *resume_file, int index, int offset, int seed,
+                   char *filename)
 {
+    int i;
     int len=strlen(resume_file);
 
     if (!strcasecmp(&resume_file[len-4], ".m3u"))
     {
+        /* Playlist playback */
         char* slash;
         // check that the file exists
         int fd = open(resume_file, O_RDONLY);
@@ -1829,12 +1832,30 @@ void bookmark_play(char *resume_file, int index, int offset, int seed)
     }
     else
     {
+        /* Directory playback */
         lastdir[0]='\0';
         if (playlist_create(resume_file, NULL) != -1)
         {
             resume_directory(resume_file);
             if (global_settings.playlist_shuffle)
                 playlist_shuffle(seed, -1);
+
+            /* Check if the file is at the same spot in the directory,
+               else search for it */
+            if ((strcmp(strrchr(playlist_peek(index) + 1,'/') + 1,
+                        filename)))
+            {
+                for ( i=0; i < playlist_amount(); i++ ) 
+                {
+                    if ((strcmp(strrchr(playlist_peek(i) + 1,'/') + 1,
+                                filename)) == 0)
+                        break;
+                }
+                if (i < playlist_amount())
+                    index = i;
+                else
+                    return;
+            }
             playlist_start(index,offset);
         }
     }

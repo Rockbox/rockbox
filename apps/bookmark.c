@@ -73,8 +73,7 @@ static bool  parse_bookmark(const char *bookmark,
                             int* ms,
                             int * repeat_mode,
                             bool *shuffle,
-                            char* file_name,
-                            unsigned int max_file_name_size);
+                            char* file_name);
 static char* select_bookmark(const char* bookmark_file_name);
 static bool  system_check(void);
 static bool  write_bookmark(bool create_bookmark_file);
@@ -84,6 +83,7 @@ static char global_temp_buffer[MAX_PATH+1];
 static char global_bookmark_file_name[MAX_PATH];
 static char global_read_buffer[MAX_BOOKMARK_SIZE];
 static char global_bookmark[MAX_BOOKMARK_SIZE];
+static char global_filename[MAX_PATH];
 
 /* ----------------------------------------------------------------------- */
 /* Displays the bookmark menu options for the user to decide.  This is an  */
@@ -162,7 +162,7 @@ static bool bookmark_load_menu(void)
                                      NULL,
                                      &global_settings.repeat_mode,
                                      &global_settings.playlist_shuffle,
-                                     NULL, 0);
+                                     global_filename);
         }
         else
         {
@@ -171,7 +171,8 @@ static bool bookmark_load_menu(void)
         }
 
         if (success)
-            bookmark_play(global_temp_buffer, index, offset, seed);
+            bookmark_play(global_temp_buffer, index, offset, seed,
+                          global_filename);
     }
 
     return success;
@@ -203,10 +204,11 @@ bool bookmark_mrb_load()
                              NULL,
                              &global_settings.repeat_mode,
                              &global_settings.playlist_shuffle,
-                             NULL, 0);
+                             global_filename);
 
     if (success)
-        bookmark_play(global_temp_buffer, index, offset, seed);
+        bookmark_play(global_temp_buffer, index, offset, seed,
+                      global_filename);
 
     return success;
 }
@@ -442,7 +444,7 @@ static bool check_bookmark(const char* bookmark)
     return parse_bookmark(bookmark,
                           NULL,NULL,NULL, NULL,
                           NULL,0,NULL,NULL,
-                          NULL, NULL, 0);
+                          NULL, NULL);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -566,12 +568,13 @@ bool bookmark_load(const char* file, bool autoload)
                                 NULL,
                                 &global_settings.repeat_mode,
                                 &global_settings.playlist_shuffle,
-                                NULL, 0);
+                                global_filename);
 
     }
 
     if(success)
-        bookmark_play(global_temp_buffer,index,offset,seed);
+        bookmark_play(global_temp_buffer, index, offset, seed,
+                      global_filename);
 
     return success;
 }
@@ -778,7 +781,6 @@ static void display_bookmark(const char* bookmark,
     int  ms = 0;
     int  repeat_mode = 0;
     bool playlist_shuffle = false;
-    char MP3_file_name[45];
     int  len;
     char *dot;
 
@@ -786,7 +788,7 @@ static void display_bookmark(const char* bookmark,
     parse_bookmark(bookmark,
                    &resume_index, NULL, NULL, NULL, NULL, 0,
                    &ms, &repeat_mode, &playlist_shuffle,
-                   MP3_file_name, sizeof(MP3_file_name));
+                   global_filename);
 
     lcd_clear_display();
     lcd_stop_scroll();
@@ -807,14 +809,14 @@ static void display_bookmark(const char* bookmark,
         statusbar_icon_shuffle();
 
     /* File Name */
-    len=strlen(MP3_file_name);
+    len=strlen(global_filename);
     if (len>3)
-      dot=strrchr(MP3_file_name + len - 4, '.');
+      dot=strrchr(global_filename + len - 4, '.');
     else
       dot=NULL;
     if (dot)
         *dot='\0';
-    lcd_puts_scroll(0, 0, MP3_file_name);
+    lcd_puts_scroll(0, 0, global_filename);
     if (dot)
         *dot='.';
 
@@ -854,9 +856,9 @@ static void display_bookmark(const char* bookmark,
     lcd_puts_scroll(0, 6, str(LANG_BOOKMARK_SELECT_DELETE));
 #else
     (void)bookmark_id;
-    len=strlen(MP3_file_name);
+    len=strlen(global_filename);
     if (len>3)
-      dot=strrchr(MP3_file_name+len-4,'.');
+      dot=strrchr(global_filename+len-4,'.');
     else
       dot=NULL;
     if (dot)
@@ -868,7 +870,7 @@ static void display_bookmark(const char* bookmark,
                  (bookmark_count+1),
                  ms / 60000,
                  ms % 60000 / 1000,
-                 MP3_file_name);
+                 global_filename);
     }
     else
     {
@@ -878,7 +880,7 @@ static void display_bookmark(const char* bookmark,
              ms / 60000,
              ms % 3600000 / 60000,
              ms % 60000 / 1000,
-             MP3_file_name);
+             global_filename);
     }
 
     status_draw(false);
@@ -907,7 +909,7 @@ static void say_bookmark(const char* bookmark,
                    NULL, NULL, NULL, 
                    dir, sizeof(dir),
                    &ms, NULL, NULL,
-                   NULL, 0);
+                   NULL);
 /* disabled, because transition between talkbox and voice UI clip is not nice */
 #if 0 
     if (global_settings.talk_dir >= 3)
@@ -987,8 +989,7 @@ static bool parse_bookmark(const char *bookmark,
                            unsigned int resume_file_size,
                            int* ms,
                            int * repeat_mode, bool *shuffle,
-                           char* file_name,
-                           unsigned int max_file_name_size)
+                           char* file_name)
 {
     /* First check to see if a valid line was passed in. */
     int  bookmark_len                = strlen(bookmark);
@@ -1097,9 +1098,8 @@ static bool parse_bookmark(const char *bookmark,
 
     if (file_name && local_file_name)
     {
-        strncpy(file_name, local_file_name,
-                MIN(strlen(local_file_name),max_file_name_size-1));
-        file_name[MIN(strlen(local_file_name),max_file_name_size-1)]=0;
+        strncpy(file_name, local_file_name,MAX_PATH-1);
+        file_name[MAX_PATH-1] = 0;
     }
 
     return true;
