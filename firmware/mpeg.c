@@ -377,7 +377,7 @@ static void mpeg_thread(void)
                 {
                     DEBUGF("R\n");
                     len = read(mpeg_file, mp3buf+mp3buf_write, amount_to_read);
-                    if(len)
+                    if(len > 0)
                     {
                         DEBUGF("B\n");
                         bitswap(mp3buf + mp3buf_write, len);
@@ -405,6 +405,11 @@ static void mpeg_thread(void)
                     }
                     else
                     {
+                        if(len < 0)
+                        {
+                            DEBUGF("MPEG read error\n");
+                        }
+                        
                         close(mpeg_file);
                         mpeg_file = -1;
                     
