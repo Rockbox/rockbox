@@ -43,12 +43,6 @@ _PTR
 _DEFUN (memset, (m, c, n),
 	_PTR m _AND
 	int c _AND
-	size_t n) __attribute__ ((section (".icode")));
-
-_PTR 
-_DEFUN (memset, (m, c, n),
-	_PTR m _AND
-	int c _AND
 	size_t n)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
