@@ -39,7 +39,7 @@ static bool charger_was_inserted = 0;
 static bool backlight_on_when_charging = 0;
 
 static int backlight_timer;
-static int backlight_timeout = 5;
+static unsigned int backlight_timeout = 5;
 
 const char backlight_timeout_value[19] =
 {
@@ -125,9 +125,12 @@ int backlight_get_timeout(void)
     return backlight_timeout;
 }
 
-void backlight_set_timeout(int seconds)
+void backlight_set_timeout(unsigned int index)
 {
-    backlight_timeout = seconds;
+    if(index >= sizeof(backlight_timeout_value))
+        /* if given a weird value, use 0 */
+        index=0;
+    backlight_timeout = index; /* index in the backlight_timeout_value table */
     backlight_on();
 }
 
