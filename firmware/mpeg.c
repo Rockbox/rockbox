@@ -53,7 +53,6 @@ static void stop_recording(void);
 static int get_unsaved_space(void);
 static void pause_recording(void);
 static void resume_recording(void);
-static int shadow_codec_reg0;
 #endif /* #if CONFIG_HWCODEC == MAS3587F */
 
 #ifndef SIMULATOR
@@ -362,6 +361,7 @@ unsigned long shadow_encoder_control = 0;
 unsigned long shadow_io_control_main = 0;
 unsigned long shadow_app_select = 0;
 unsigned long shadow_soft_mute = 0;
+unsigned shadow_codec_reg0;
 #endif
 
 static int mpeg_file;
@@ -648,7 +648,7 @@ void rec_tick(void)
             num_bytes = mp3buf_write - mp3buf_read;
             if(num_bytes < 0)
                 num_bytes += mp3buflen;
-            
+
             if(mp3buflen - num_bytes < MPEG_RECORDING_LOW_WATER && !saving)
             {
                 saving = true;
@@ -2393,7 +2393,7 @@ void mpeg_beep(int duration)
 void mpeg_new_file(const char *filename)
 {
     mpeg_errno = 0;
-    
+
     strncpy(recording_filename, filename, MAX_PATH - 1);
     recording_filename[MAX_PATH - 1] = 0;
 

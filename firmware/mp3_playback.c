@@ -45,6 +45,7 @@ enum
 
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
 extern unsigned long shadow_io_control_main;
+extern unsigned shadow_codec_reg0;
 #endif
 
 /**** globals ****/
@@ -539,7 +540,8 @@ static void init_playback(void)
     } while(val);
     
     /* Enable the D/A Converter */
-    mas_codec_writereg(0x0, 0x0001);
+    shadow_codec_reg0 = 0x0001;
+    mas_codec_writereg(0x0, shadow_codec_reg0);
 
     /* ADC scale 0%, DSP scale 100% */
     mas_codec_writereg(6, 0x0000);
