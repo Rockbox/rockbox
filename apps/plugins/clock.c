@@ -110,6 +110,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     struct tm* current_time;
 
+    bool exit = false;
+    bool used = false;
+
     TEST_PLUGIN_API(api);
     (void)parameter;
     rb = api;
@@ -126,9 +129,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         rb->lcd_setfont(FONT_SYSFIXED);
 
         /* start all the clock stuff */
-
-        bool exit = false;
-        bool used = false;
 
         /* Time info */
         current_time = rb->get_time();

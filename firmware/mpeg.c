@@ -1267,6 +1267,7 @@ static const unsigned char empty_id3_header[] =
     0x00, 0x00, 0x1f, 0x76 /* Size is 4096 minus 10 bytes for the header */
 };
 
+#ifdef HAVE_MAS3587F
 static unsigned long get_last_recorded_header(void)
 {
     unsigned long tmp[2];
@@ -1276,6 +1277,7 @@ static unsigned long get_last_recorded_header(void)
     mas_readmem(MAS_BANK_D0, 0xfd1, tmp, 2);
     return 0xffe00000 | ((tmp[0] & 0x7c00) << 6) | (tmp[1] & 0xffff);
 }
+#endif
 
 static void mpeg_thread(void)
 {
