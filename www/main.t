@@ -15,17 +15,11 @@ upgrade your ordinary Archos firmware.
 
 <h2>News</h2>
 
+<p><i>2004-05-07</i>: The CVS repository has <a href="/cvs.html">moved</a>
+
 <p><i>2004-03-14</i>: Rockbox can <a href="/lang/">talk</a> to you
 
 <p><i>2004-03-11</i>: Version 2.2 is <a href="/download/">released</a>
-
-<p><i>2004-02-05</i>: Rockbox can play <a href="/docs/rvf.html">video</a>, with sound 
-
-<p><i>2003-12-04</i>: Version 2.1 is <a href="/download/">released</a>
-
-<p><i>2003-07-09</i>: Rockbox started from <a href="/docs/flash.html">flash ROM</a> works
-
-<p><i>2003-06-30</i>: The plugin loader is now <a href="http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-06/0707.shtml">alive</a>
 
 <p><i><small>(Old news items have moved to a 
 <a href="history.html">separate page</a>.)</small></i>

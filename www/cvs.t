@@ -3,8 +3,7 @@
 
 <h2>Browsing the repository</h2>
 
-<p>Just go <a
-href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/">here</a>.
+<p>Just go <a href="/viewcvs.cgi/">here</a>.
 
 <h2>Daily snapshots</h2>
 
@@ -28,8 +27,7 @@ installed to do this.
 <li>www - the web page
 </ul>
 
-The examples below use the 'rockbox' module, since that's what most people are
-interested in. We have a few other convenient aliases that gets several
+<p>We have a few other convenient aliases that gets several
 modules at once for you:
 
 <ul>
@@ -39,37 +37,26 @@ modules at once for you:
 <li> website - gets the www and docs modules
 </ul>
 
+<p>The examples below use the 'rockbox' module, since that is what most
+people are interested in. 
+
 <h3>Anonymous read-only checkout</h3>
 
 <p>If you are not a registered developer, use this method.
 When asked for a password, just press enter:
 
-<p><tt>cvs -d:pserver:anonymous@cvs.rockbox.sourceforge.net:/cvsroot/rockbox login
-<br>cvs -z3 -d:pserver:anonymous@cvs.rockbox.sourceforge.net:/cvsroot/rockbox co rockbox</tt>
+<p><tt>cvs -d:pserver:anonymous@rockbox.haxx.se:/cvsroot/rockbox login
+<br>cvs -z3 -d:pserver:anonymous@rockbox.haxx.se:/cvsroot/rockbox co rockbox</tt>
 
 <p>A "rockbox" directory will be created in your current directory, and all
 the directories and source files go there.
 
-<h3>Checkout for developers</h3>
+<h3>Checkout with write access (for developers)</h3>
 
-<p>For this, you need to:
+<p>For this, you need to be added to the writers list by Rockbox administrators. After that, you can login with your username:
 
-<ol>
-<li> Have <a href="http://www.openssh.com">SSH</a> installed.
-<li> Have a <a href="http://sourceforge.net/account/register.php">SourceForge account</a>
-<li> Be a 
-<a href="http://sourceforge.net/project/memberlist.php?group_id=44306">registered developer</a>
-of the Rockbox project
-<li> Log on to your cvs server account once: <tt>ssh <b>username</b>@cvs.rockbox.sourceforge.net</tt> <br>It will disconnect you immediately, but now your account is set up.
-</ol>
-
-<p>Then run:
-
-<p><tt>export CVS_RSH=ssh
-<br>cvs -z3 -d:ext:<b>username</b>@cvs.rockbox.sourceforge.net:/cvsroot/rockbox co rockbox</tt>
-
-<p>If you are using WinCVS, the procedure is
-<a href="http://www.wincvs.org/ssh.html">somewhat different</a>.
+<p><tt>cvs -d:pserver:<b>username</b>@rockbox.haxx.se:/cvsroot/rockbox login
+<br>cvs -z3 -d:pserver:<b>username</b>@rockbox.haxx.se:/cvsroot/rockbox co rockbox</tt>
 
 <h2>Checking in modifications</h2>
 

@@ -2,6 +2,14 @@
 #define HISTORY_PAGE
 #include "head.t"
 
+<p><i>2004-02-05</i>: Rockbox can play <a href="/docs/rvf.html">video</a>, with sound 
+
+<p><i>2003-12-04</i>: Version 2.1 is <a href="/download/">released</a>
+
+<p><i>2003-07-09</i>: Rockbox started from <a href="/docs/flash.html">flash ROM</a> works
+
+<p><i>2003-06-30</i>: The plugin loader is now <a href="http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-06/0707.shtml">alive</a>
+
 <p><i>2003-05-09</i>: The 400-file dir browser limit is <a href="http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-05/0334.shtml">gone</a>.
 
 <p><i>2003-05-03</i>: Finally, FM Radio support for FM Recorder models!
