@@ -375,6 +375,61 @@ void lcd_double_height(bool on)
     lcd_write(true,on?9:8);
 }
 
+unsigned char icon_mirror[11];
+static char icon_pos[] =
+{
+    0, 0, 0, 0, /* Battery */
+    2, /* USB */
+    3, /* Play */
+    4, /* Record */
+    5, /* Pause */
+    5, /* Audio */
+    6, /* Repeat */
+    7, /* 1 */
+    9,  /* Volume */
+    9,  /* Volume 1 */
+    9,  /* Volume 2 */
+    10, /* Volume 3 */
+    10, /* Volume 4 */
+    10, /* Volume 5 */
+    10, /* Param */
+};
+
+static char icon_mask[] =
+{
+    0x02, 0x08, 0x04, 0x10, /* Battery */
+    0x04, /* USB */
+    0x10, /* Play */
+    0x10, /* Record */
+    0x02, /* Pause */
+    0x10, /* Audio */
+    0x02, /* Repeat */
+    0x01, /* 1 */
+    0x04, /* Volume */
+    0x02, /* Volume 1 */
+    0x01, /* Volume 2 */
+    0x08, /* Volume 3 */
+    0x04, /* Volume 4 */
+    0x01, /* Volume 5 */
+    0x10, /* Param */
+};
+
+void lcd_icon(int icon, bool enable)
+{
+    int pos, mask;
+
+    pos = icon_pos[icon];
+    mask = icon_mask[icon];
+    
+    lcd_write(true, LCD_ICON(pos));
+    
+    if(enable)
+        icon_mirror[pos] |= mask;
+    else
+        icon_mirror[pos] &= ~mask;
+    
+    lcd_write(false, icon_mirror[pos]);
+}
 #endif /* !SIMULATOR */
 
 #endif /* HAVE_LCD_CHARCELLS */
@@ -384,6 +439,8 @@ void lcd_init (void)
 {
     create_thread(scroll_thread, scroll_stack,
                   sizeof(scroll_stack), scroll_name);
+    
+    memset(icon_mirror, sizeof(icon_mirror), 0);
 }
 #endif
 

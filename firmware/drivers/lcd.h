@@ -30,6 +30,7 @@ extern void lcd_clear_display(void);
 extern void lcd_backlight(bool on);
 extern void lcd_puts(int x, int y, unsigned char *string);
 extern void lcd_puts_scroll(int x, int y, unsigned char* string );
+extern void lcd_icon(int icon, bool enable);
 extern void lcd_stop_scroll(void);
 extern void lcd_scroll_speed( int speed );
 
@@ -40,35 +41,29 @@ extern void lcd_scroll_speed( int speed );
 #endif
 
 #ifdef HAVE_LCD_CHARCELLS
-#    define LCD_ICON_BATTERY         0
-#      define LCD_BATTERY_FRAME   0x02
-#      define LCD_BATTERY_BAR1    0x08
-#      define LCD_BATTERY_BAR2    0x04
-#      define LCD_BATTERY_BAR3    0x10
-#    define LCD_ICON_USB             2
-#      define LCD_USB_LOGO        0xFF
-#    define LCD_ICON_PLAY            3
-#      define LCD_PLAY_ICON       0xFF
-#    define LCD_ICON_RECORD          4
-#      define LCD_RECORD_ICON     0x10
-#    define LCD_ICON_STOP            5
-#      define LCD_STOP_ICON       0x0F
-#    define LCD_ICON_AUDIO           5
-#      define LCD_AUDIO_ICON      0xF0
-#    define LCD_ICON_REVERSE         6
-#      define LCD_REVERSE_ICON    0xFF
-#    define LCD_ICON_SINGLE          7
-#      define LCD_SINGLE_ICON     0xFF
-#    define LCD_ICON_VOLUME0         9
-#      define LCD_VOLUME_ICON     0x04   
-#      define LCD_VOLUME_BAR1     0x02
-#      define LCD_VOLUME_BAR2     0x01
-#    define LCD_ICON_VOLUME1        10
-#      define LCD_VOLUME_BAR3     0x08
-#      define LCD_VOLUME_BAR4     0x04
-#      define LCD_VOLUME_BAR5     0x01
-#    define LCD_ICON_PARAM          10
-#      define LCD_PARAM_SYMBOL    0xF0
+
+/* Icon definitions for lcd_icon() */
+enum
+{
+    ICON_BATTERY = 0,
+    ICON_BATTERY_1,
+    ICON_BATTERY_2,
+    ICON_BATTERY_3,
+    ICON_USB,
+    ICON_PLAY,
+    ICON_RECORD,
+    ICON_PAUSE,
+    ICON_AUDIO,
+    ICON_REPEAT,
+    ICON_1,
+    ICON_VOLUME,
+    ICON_VOLUME_1,
+    ICON_VOLUME_2,
+    ICON_VOLUME_3,
+    ICON_VOLUME_4,
+    ICON_VOLUME_5,
+    ICON_PARAM
+};
 
 extern void lcd_define_pattern (int which,char *pattern,int length);
 extern void lcd_double_height (bool on);
