@@ -23,7 +23,8 @@ Terminology
   level, to make it easier to build things (some of the files assume this
   hierarchy).
 
-  All CVS details can be found here: http://bjorn.haxx.se/rockbox/cvs.html
+  All CVS details can be found here:
+  http://rockbox.haxx.se/twiki/bin/view/Main/UsingCVS
 
 2. Build Uisimulator
 
