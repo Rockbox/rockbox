@@ -1318,3 +1318,23 @@ id: LANG_PLAYER_KEYBOARD_DELETE
 desc: Delete alternative in player keyboard interaction
 eng: "Delete"
 new: "Löschen"
+
+id: LANG_ID3_GENRE
+desc: ID3 frame 'genre'
+eng: "[Genre]"
+new: "[Genre]"
+
+id: LANG_ID3_NO_INFO
+desc: ID3 info is missing
+eng: "<no info>"
+new: "<keine Info>"
+
+id: LANG_ID3_YEAR
+desc: ID3 info 'year'
+eng: "[Year]"
+new: "[Jahr]"
+
+id: LANG_MENU_SHOW_ID3_INFO
+desc: Menu option to start id3 viewer
+eng: "Show ID3 Info"
+new: "Zeige ID3 Info"
