@@ -269,6 +269,7 @@ if [ -z "$archos" ]; then
     output="archos.mod"
     appextra="player"
     archosrom=""
+    flash=""
     plugins="yes"
     ;;
 
@@ -280,6 +281,7 @@ if [ -z "$archos" ]; then
     output="ajbrec.ajz"
     appextra="recorder"
     archosrom="$pwd/rombox.ucl"
+    flash="$pwd/rockbox.ucl"
     plugins="yes"
     ;;
 
@@ -291,6 +293,7 @@ if [ -z "$archos" ]; then
     output="ajbrec.ajz"
     appextra="recorder"
     archosrom="$pwd/rombox.ucl"
+    flash="$pwd/rockbox.ucl"
     plugins="yes"
     ;;
 
@@ -302,6 +305,7 @@ if [ -z "$archos" ]; then
     output="ajbrec.ajz"
     appextra="recorder"
     archosrom="$pwd/rombox.ucl"
+    flash="$pwd/rockbox.ucl"
     plugins="yes"
     ;;
 
@@ -313,6 +317,7 @@ if [ -z "$archos" ]; then
     output="ajbrec.ajz"
     appextra="recorder"
     archosrom="$pwd/rombox.ucl"
+    flash="$pwd/rockbox.ucl"
     plugins="yes"
     ;;
 
@@ -325,6 +330,7 @@ if [ -z "$archos" ]; then
     output="rockbox.iriver"
     appextra=""
     archosrom=""
+    flash=""
     plugins="yes"
     ;;
 
@@ -336,6 +342,7 @@ if [ -z "$archos" ]; then
     output="ajbrec.ajz"
     appextra="recorder"
     archosrom="$pwd/rombox.ucl"
+    flash="$pwd/rockbox.ucl"
     plugins="yes"
     ;;
 
@@ -431,6 +438,7 @@ sed > Makefile \
  -e "s,@OUTPUT@,${output},g" \
  -e "s,@APPEXTRA@,${appextra},g" \
  -e "s,@ARCHOSROM@,${archosrom},g" \
+ -e "s,@FLASHFILE@,${flash},g" \
  -e "s,@PLUGINS@,${plugins},g" \
  -e "s,@GCCOPTS@,${GCCOPTS},g" \
 <<EOF 
@@ -444,6 +452,7 @@ export DOCSDIR=\$(ROOTDIR)/docs
 export DEBUG=@DEBUG@
 export ARCHOS=@ARCHOS@
 export ARCHOSROM=@ARCHOSROM@
+export FLASHFILE=@FLASHFILE@
 export TARGET=@TARGET@
 export OBJDIR=@PWD@
 export LANGUAGE=@LANGUAGE@

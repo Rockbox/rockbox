@@ -21,9 +21,6 @@ endif
 SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P -include "config.h" - )
 DIRS = .
 
-# set the ROMTARGET here
-ROMTARGET := $(ARCHOSROM)
-
 ifdef APPEXTRA
    DIRS += $(APPEXTRA)
    INCLUDES += -I$(APPEXTRA)
@@ -42,7 +39,7 @@ MAXOUTFILE = $(OBJDIR)/romstart
 ifdef DEBUG
 all: $(OBJDIR)/rockbox.elf rocks
 else
-all: $(OBJDIR)/$(BINARY) $(OBJDIR)/rockbox.ucl rocks $(ROMTARGET)
+all: $(OBJDIR)/$(BINARY) $(FLASHFILE) rocks $(ARCHOSROM)
 endif
 
 dep: $(DEPFILE)
@@ -101,7 +98,7 @@ $(OBJDIR)/rockbox.ucl: $(OBJDIR)/rockbox.bin
 	  echo "fake" > $@; \
 	fi
 
-$(ARCHOSROM): $(OBJDIR)/rombox.bin $(MAXOUTFILE)
+$(OBJDIR)/rombox.ucl: $(OBJDIR)/rombox.bin $(MAXOUTFILE)
 	@a=`uclpack -h 2>/dev/null`; \
 	if test -n "$$a"; then \
 	  echo "UCLPACK rombox" ; \
