@@ -104,13 +104,30 @@ int kbd_input(char* text, int buflen)
     while (!done) {
         int i, p;
         int len = strlen(text);
+        int scrpos;
+        int dir;
 
-        /* draw input */
-        if (old_cursor_pos<cursor_pos && 7<(cursor_pos-left_pos) && cursor_pos<(len-1))
-            left_pos++;
-        else
-            if (cursor_pos<old_cursor_pos && (cursor_pos-left_pos)<2 && 0<left_pos)
-                left_pos--;
+        scrpos = cursor_pos - left_pos;
+        dir = cursor_pos - old_cursor_pos;
+
+        /* Keep the cursor on screen, with a 2 character scroll margin */
+        if(dir < 0) {
+           if(scrpos < 2) {
+              left_pos = cursor_pos - 2;
+              if(left_pos < 0)
+                 left_pos = 0;
+           }
+        }
+        if(dir > 0) {
+           if(scrpos > 7) {
+              left_pos = cursor_pos - 9;
+              if(left_pos < 0)
+                 left_pos = 0;
+              if(left_pos > len - 9)
+                 left_pos = len - 9;
+           }
+        }
+
         p=0;
         i = left_pos;
         while (p<10 && text[i]) {
