@@ -16,6 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <stdio.h>
 #include "ata.h"
 #include "debug.h"
 #include "disk.h"
@@ -38,9 +39,9 @@
           (array[pos] | (array[pos+1] << 8 ) | \
           (array[pos+2] << 16 ) | (array[pos+3] << 24 ))
 
-struct partinfo part[8];
+static struct partinfo part[8];
 
-int disk_init(void)
+struct partinfo* disk_init(void)
 {
     int i;
     unsigned char sector[512];
@@ -51,7 +52,7 @@ int disk_init(void)
     if ( (sector[510] != 0x55) ||
          (sector[511] != 0xaa)) {
         DEBUGF("Bad boot sector signature\n");
-        return -1;
+        return NULL;
     }
 
     /* parse partitions */
@@ -70,5 +71,5 @@ int disk_init(void)
         }
     }
 
-    return 0;
+    return part;
 }

@@ -25,8 +25,7 @@ struct partinfo {
     unsigned char type;
 };
 
-extern struct partinfo part[8];
-
-int disk_init(void);
+/* returns a pointer to an array of 8 partinfo structs */
+struct partinfo* disk_init(void);
 
 #endif

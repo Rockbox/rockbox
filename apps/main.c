@@ -53,6 +53,7 @@ extern int poolend[];
 int init(void)
 {
     int rc;
+    struct partinfo* pinfo;
 
     system_init();
     
@@ -73,11 +74,11 @@ int init(void)
     if(rc)
         panicf("ata: %d",rc);
 
-    rc = disk_init();
-    if (rc)
-        panicf("disk: %d",rc);
+    pinfo = disk_init();
+    if (!pinfo)
+        panicf("disk: NULL");
 
-    rc = fat_mount(part[0].start);
+    rc = fat_mount(pinfo[0].start);
     if(rc)
         panicf("mount: %d",rc);
 
