@@ -87,7 +87,7 @@ void roll_credits(void)
         lcd_putsxy(0, 0, buffer);
         lcd_update();
 
-        if (button_get_w_tmo(HZ/20))
+        if (button_get_w_tmo(HZ/20) & BUTTON_REL)
             return;
 
         y--;
