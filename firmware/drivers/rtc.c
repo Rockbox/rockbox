@@ -25,6 +25,14 @@
 #define	RTC_DEV_WRITE   (RTC_ADR | 0x00)
 #define	RTC_DEV_READ    (RTC_ADR | 0x01)
 
+void rtc_init(void)
+{
+    unsigned char data;
+    data = (unsigned int)rtc_read(0x0c);
+    data &= 0xbf;
+    rtc_write(0x0c,data);
+}
+
 int rtc_write(unsigned char address, unsigned char value)
 {
     int ret = 0;
@@ -55,7 +63,7 @@ int rtc_read(unsigned char address)
     
     buf[0] = address;
 
-    /* send run command */
+    /* send read command */
     if (i2c_write(RTC_DEV_READ,buf,1) >= 0)
     {
         i2c_start();
@@ -65,6 +73,8 @@ int rtc_read(unsigned char address)
             value = i2c_inb(1);
         }
     }
+
+    i2c_stop();
 
     i2c_end();
     return value;
