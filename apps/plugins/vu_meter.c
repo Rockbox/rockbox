@@ -119,7 +119,7 @@ void load_settings(void) {
 #if CONFIG_KEYPAD == RECORDER_PAD
         rb->splash(HZ, true, "Press ON for help");
 #elif CONFIG_KEYPAD == ONDIO_PAD
-        rb->splash(HZ, true, "Press MENU for help");
+        rb->splash(HZ, true, "Press MODE for help");
 #endif
     }
 }
@@ -448,7 +448,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
 #if CONFIG_KEYPAD == RECORDER_PAD
                 rb->lcd_puts(0, 1, "F1: Settings");
 #elif CONFIG_KEYPAD == ONDIO_PAD
-                rb->lcd_puts(0, 1, "MENU..: Settings");
+                rb->lcd_puts(0, 1, "MODE..: Settings");
 #endif
                 rb->lcd_puts(0, 2, "UP/DOWN: Volume");
                 rb->lcd_update();

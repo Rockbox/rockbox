@@ -102,8 +102,8 @@ static struct plugin_api* rb;
 #define HELP_SOL_REM2STACK "F3: Put the card on top of the remains' stack on one of the 4 final color stacks."
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
-#define HELP_SOL_MOVE "MENU: Select cards, Move cards, reveal hidden cards ..."
-#define HELP_SOL_DRAW "MENU..: Un-select a card if it was selected. Else, draw 3 new cards out of the remains' stack."
+#define HELP_SOL_MOVE "MODE: Select cards, Move cards, reveal hidden cards ..."
+#define HELP_SOL_DRAW "MODE..: Un-select a card if it was selected. Else, draw 3 new cards out of the remains' stack."
 #define HELP_SOL_REM2CUR "LEFT..: Put the card on top of the remains' stack on top of the cursor."
 #define HELP_SOL_CUR2STACK "RIGHT..: Put the card under the cursor on one of the 4 final color stacks."
 #define HELP_SOL_REM2STACK "UP..: Put the card on top of the remains' stack on one of the 4 final color stacks."
@@ -341,13 +341,13 @@ int solitaire_help(void){
         rb->lcd_putsxy(0, 49, "be done using");
         rb->lcd_putsxy(0, 56, "arrows, ON and F2.");
 #elif CONFIG_KEYPAD == ONDIO_PAD
-        rb->lcd_putsxy(0, 0, "Press a key short or");
-        rb->lcd_putsxy(0, 7, "long to see it's role.");
-        rb->lcd_putsxy(0, 21, "Press OFF to");
+        rb->lcd_putsxy(0, 0, "Press a key short");
+        rb->lcd_putsxy(0, 7, "or long to see it's");
+        rb->lcd_putsxy(0, 21, "role. Press OFF to");
         rb->lcd_putsxy(0, 28, "return to menu.");
         rb->lcd_putsxy(0, 42, "All actions can be");
-        rb->lcd_putsxy(0, 49, "done using arows,");
-        rb->lcd_putsxy(0, 56, "short & long MENU.");
+        rb->lcd_putsxy(0, 49, "done using arrows,");
+        rb->lcd_putsxy(0, 56, "short & long MODE.");
 #endif
 
         rb->lcd_update();

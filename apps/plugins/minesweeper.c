@@ -304,7 +304,7 @@ int minesweeper(void)
 #if CONFIG_KEYPAD == RECORDER_PAD
         rb->lcd_putsxy(1,44,"ON to start");
 #elif CONFIG_KEYPAD == ONDIO_PAD
-        rb->lcd_putsxy(1,44,"MENU to start");
+        rb->lcd_putsxy(1,44,"MODE to start");
 #endif
 
         rb->lcd_update();

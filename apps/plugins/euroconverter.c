@@ -60,7 +60,7 @@ static int currency[12]={
                             4033990,    /*BEF Belgium*/
                             16638600,   /*ESP Spain*/
                             594573,     /*FIM Finland*/
-                            78756,      /*IEP Irland*/
+                            78756,      /*IEP Ireland*/
                             193627000,  /*ITL Italy*/
                             4033990,    /*LUF Luxemburg*/
                             220371,     /*NLG Netherlands*/
@@ -76,7 +76,7 @@ static int nb_digit[12]={
                             2,   /*BEF Belgium*/
                             0,   /*ESP Spain*/
                             2,   /*FIM Finland*/
-                            2,   /*IEP Irland*/
+                            2,   /*IEP Ireland*/
                             0,   /*ITL Italy*/
                             2,   /*LUF Luxemburg*/
                             2,   /*NLG Netherlands*/
@@ -86,15 +86,15 @@ static int nb_digit[12]={
 
 /* max euro to have home currency */
 static long long max_euro[12]={
-                                  99999999000LL,    /*FRF France      999 999.99 */
-                                  99999999000LL,    /*DEM Germany     999 999.99 */
-                                  99999999000LL,    /*ATS Austria     999 999.99 */
-                                  99999999000LL,    /*BEF Belgium     999 999.99 */
-                                  99999999000LL,    /*ESP Spain       99 999 999 */
-                                  99999999000LL,    /*FIM Finland     999 999.99 */
-                                  99999999000LL,    /*IEP Irland      999 999.99 */
-                                  51645690000LL,    /*ITL Italy       999 999 999 */
-                                  99999999000LL,    /*LUF Luxemburg   999 999.99 */
+                                  99999999000LL,   /*FRF France      999 999.99 */
+                                  99999999000LL,   /*DEM Germany     999 999.99 */
+                                  99999999000LL,   /*ATS Austria     999 999.99 */
+                                  99999999000LL,   /*BEF Belgium     999 999.99 */
+                                  99999999000LL,   /*ESP Spain       99 999 999 */
+                                  99999999000LL,   /*FIM Finland     999 999.99 */
+                                  99999999000LL,   /*IEP Ireland     999 999.99 */
+                                  51645690000LL,   /*ITL Italy       999 999 999 */
+                                  99999999000LL,   /*LUF Luxemburg   999 999.99 */
                                   99999999000LL,   /*NLG Netherlands 999 999.99 */
                                   99999999000LL,   /*PTE Portugal    99 999 999 */
                                   29347028000LL    /*GRD Greece      99 999 999 */
@@ -107,14 +107,14 @@ static long long max_curr[12]={
                                   99999999000LL,   /*DEM Germany     511291.88 */
                                   99999999000LL,   /*ATS Austria     72672.83 */
                                   99999999000LL,   /*BEF Belgium     24789.35 */
-                                  92233720300000LL, /*ESP Spain      5543358.23 */
+                                  92233720300000LL,/*ESP Spain       5543358.23 */
                                   99999999000LL,   /*FIM Finland     168187.92 */
-                                  9999999900LL,    /*IEP Irland      1269744.51 exact value=1269738.07 */
+                                  9999999900LL,    /*IEP Ireland     1269744.51 exact value=1269738.07 */
                                   92233720300000LL,/*ITL Italy       476347.41 */
                                   99999999000LL,   /*LUF Luxemburg   24789.35 */
                                   99999999000LL,   /*NLG Netherlands 453780.21 */
-                                  92233720300000LL, /*PTE Portugal    4600598.57 */
-                                  92233720300000LL  /*GRD Greece      2706777.69 */
+                                  92233720300000LL,/*PTE Portugal    4600598.57 */
+                                  92233720300000LL /*GRD Greece      2706777.69 */
                               };
 
 static unsigned char *abbrev_str[12] = {
@@ -124,7 +124,7 @@ static unsigned char *abbrev_str[12] = {
                                           "...BEF...",  /*Belgium*/
                                           "...ESP...",  /*Spain*/
                                           "...FIM...",  /*Finland*/
-                                          "...IEP...",  /*Irland*/
+                                          "...IEP...",  /*Ireland*/
                                           "...ITL...",  /*Italy*/
                                           "...LUF...",  /*Luxemburg*/
                                           "...NLG...",  /*Netherlands*/

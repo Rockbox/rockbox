@@ -286,7 +286,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_putsxy(2, 48, "[F3] step by step");
 #elif CONFIG_KEYPAD == ONDIO_PAD
     rb->lcd_putsxy(2, 8, "[OFF] to stop");
-    rb->lcd_putsxy(2, 18, "[MENU] toggle");
+    rb->lcd_putsxy(2, 18, "[MODE] toggle");
     rb->lcd_putsxy(2, 28, "[M-LEFT] shuffle");
     rb->lcd_putsxy(2, 38, "[M-UP] solution");
     rb->lcd_putsxy(2, 48, "[M-RIGHT] step by step");

@@ -173,7 +173,7 @@ void game_pause (void) {
 #if CONFIG_KEYPAD == RECORDER_PAD
     rb->lcd_putsxy(3,22,"[Play] to resume");
 #elif CONFIG_KEYPAD == ONDIO_PAD
-    rb->lcd_putsxy(3,22,"[Menu] to resume");
+    rb->lcd_putsxy(3,22,"[Mode] to resume");
 #endif
     rb->lcd_putsxy(3,32,"[Off] to quit");
     rb->lcd_update();
@@ -279,7 +279,7 @@ void game_init(void) {
 #if CONFIG_KEYPAD == RECORDER_PAD
     rb->lcd_puts(0,3, "PLAY - start/pause");
 #elif CONFIG_KEYPAD == ONDIO_PAD
-    rb->lcd_puts(0,3, "MENU - start/pause");
+    rb->lcd_puts(0,3, "MODE - start/pause");
 #endif
     rb->lcd_puts(0,4, phscore);
     rb->lcd_update();

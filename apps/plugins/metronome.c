@@ -36,8 +36,8 @@
 #define METRONOME_PAUSE (BUTTON_MENU | BUTTON_REPEAT)
 #define METRONOME_VOL_UP BUTTON_UP
 #define METRONOME_VOL_DOWN BUTTON_DOWN
-#define METRONOME_MSG_START "start: menu"
-#define METRONOME_MSG_STOP "pause: hold menu"
+#define METRONOME_MSG_START "start: mode"
+#define METRONOME_MSG_STOP "pause: hold mode"
 
 #elif CONFIG_KEYPAD == PLAYER_PAD
 #define METRONOME_QUIT BUTTON_STOP

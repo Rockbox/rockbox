@@ -878,7 +878,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_putsxy(3, 46, "[F3] + Level");
 #elif CONFIG_KEYPAD == ONDIO_PAD
     rb->lcd_putsxy(3,  6, "[OFF] To Stop");
-    rb->lcd_putsxy(3, 16, "[MENU] To Undo");
+    rb->lcd_putsxy(3, 16, "[MODE] To Undo");
     rb->lcd_putsxy(3, 26, "[M-LEFT] - Level");
     rb->lcd_putsxy(3, 36, "[M-UP] Same Level");
     rb->lcd_putsxy(3, 46, "[M-RIGHT] + Level");

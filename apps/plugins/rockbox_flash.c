@@ -966,7 +966,7 @@ void DoUserDialog(char* filename)
     {
         rb->snprintf(buf, sizeof(buf), "Verify fail! %d errors", rc);
         rb->lcd_puts_scroll(0, 0, buf);
-        rb->lcd_puts_scroll(0, 1, "Use safe image if booting hangs: [Menu] during power-on");
+        rb->lcd_puts_scroll(0, 1, "Use safe image if booting hangs: [-] during power-on");
         button = WaitForButton();
     }
 }

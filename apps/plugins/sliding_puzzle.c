@@ -334,8 +334,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_putsxy(3, 38, "[F2] change pic");
 #elif CONFIG_KEYPAD == ONDIO_PAD
     rb->lcd_putsxy(0, 18, "[OFF] to stop");
-    rb->lcd_putsxy(0, 28, "[MENU..] shuffle");
-    rb->lcd_putsxy(0, 38, "[MENU] change pic");
+    rb->lcd_putsxy(0, 28, "[MODE..] shuffle");
+    rb->lcd_putsxy(0, 38, "[MODE] change pic");
 #endif
     rb->lcd_update();
     rb->sleep(HZ*2);

@@ -808,7 +808,7 @@ static int star_menu(void)
                                           "[F3] Next level", true);
 #elif CONFIG_KEYPAD == ONDIO_PAD
                         star_display_text("KEYS\n\n"
-                                          "[MENU] Toggle Ctl\n"
+                                          "[MODE] Toggle Ctl\n"
                                           "[OFF] Exit\n"
                                           "[M <] Prev. level\n"
                                           "[M ^] Reset level\n"
