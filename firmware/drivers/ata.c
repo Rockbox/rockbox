@@ -30,6 +30,9 @@
 #include "string.h"
 #include "hwcompat.h"
 
+/* use plain C code in copy_read_sectors(), instead of tweaked assembler */
+#define PREFER_C /* mystery: assembler caused problems with some disks */
+
 #define SECTOR_SIZE     512
 #define ATA_DATA        (*((volatile unsigned short*)0x06104100))
 #define ATA_ERROR       (*((volatile unsigned char*)0x06100101))
