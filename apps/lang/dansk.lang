@@ -148,7 +148,7 @@ id: LANG_SORT_CASE
 desc: in settings_menu
 eng: "Sort Case Sensitive"
 voice: "Sort Case Sensitive"
-new: "Sortér versal-sensitivt"
+new: "Sorter versal-sensitivt"
 
 id: LANG_RESUME
 desc: in settings_menu
