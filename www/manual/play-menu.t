@@ -17,9 +17,8 @@ Version -
 (Debug? -)
 
 <p>
-Buttons:
-<p>
-<table>
+<table class=buttontable>
+<tr><th>Button</th><th>Function</th>
 <tr><td>-</td><td>Move upwards in the list</td></tr>
 <tr><td>+</td><td>Move downwards in the list</td></tr>
 <tr><td>PLAY</td><td>Selects the menu alternative the cursor is "on"</td></tr>

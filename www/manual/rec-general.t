@@ -55,15 +55,5 @@ short timeout makes the interface less responsive and use more batteries for
 more frequent spinups, while a long timeout makes the disk spin too long and
 use more batteries...
 
-<p>
-Buttons:
-<p>
-<table>
-<tr><td>UP</td><td>Move upwards in the list</td></tr>
-<tr><td>DOWN</td><td>Move downwards in the list</td></tr>
-<tr><td>RIGHT</td><td>Select item in list</td></tr>
-<tr><td>F1</td><td>Toggle back to the screen you came from when you arrived here, <a href="rec-wps.html">WPS</a> or <a href="rec-dir.html">dir browser</a></td></tr>
-</table>
-
 #include "foot.t"
 

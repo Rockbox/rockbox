@@ -35,10 +35,11 @@ side of each entry that shows what kind of entry it is.
 <p>
 If you have enabled 'mp3/m3u filter' in the global settings, only files ending
 with .mp3 or .m3u will be displayed in the browser.
+
 <p>
-Buttons:
-<p>
-<table class=listtable>
+
+<table class=buttontable>
+<tr><th>Button</th><th>Function</th>
 <tr valign=top>
 <td> UP </td>
 <td>
@@ -56,53 +57,37 @@ Buttons:
 <td>   Move "up" one directory level to the parent directory.
 </td></tr>
 <tr valign=top>
-<td> RIGHT</td>
-<td>
+<td> PLAY or RIGHT</td>
+<td>If the cursor is on a directory, the browser will go into that directory.
 
-  If the cursor is now on a line of a directory, the browser will switch into
-  browsing that directory.
-
-<p> If the cursor is on a line with a file, special actions are peformed
-  depending on the file type. If the file is an mp3 file, it'll jump into the
+<p>If the cursor is on an .mp3 file, it'll jump into the
   <a href="rec-wps.html">WPS</a> and start playing this file. It will then
-  continue to play the other songs in the same directory. Your 'shuffle'
-  setting is acknowledged.
+  continue to play the other songs in the same directory.
 
-<p> If the selected entry is an m3u file (playlist), the list will first be
+<p> If the cursor is on an .m3u file (playlist), the list will first be
   loaded and then pop up the WPS showing the first file that gets played from
-  the list. If you have 'shuffle' selected in the global settings, the
-  playlist will be shuffled directly after having been loaded, otherwise it'll
-  be played in a straight top-to-bottom fashion.
+  the list.
 
-</td></tr>
-<tr><td>
- PLAY
-</td><td>
-   The same as RIGHT
+<p> If the cursor is on an .ajz file (firmware), the firmware file will
+  be loaded and executed.
+
+<p> If the cursor is on a .wps file (WPS config), the file will
+  be loaded and used for the wps display.
+
 </td></tr>
 <tr><td>
  ON
 </td><td>
- If there is an mp3 playing, this'll switch back the WPS.
+ If there is an mp3 playing, this will go back to the WPS.
 </td></tr>
 <tr><td>
  OFF
 </td><td>
     If there is an mp3 playing, this stops playback.
 </td></tr>
-<tr><td>
- F1
-</td><td>
- Switches to the <a href="rec-menu.html">main menu</a>.
-</td></tr>
-<tr><td>
- F2
-</td></tr>
-<tr><td>
- F3
-</td><td>
- Toggles status bar on/off
-</td></tr>
+<tr><td>F1</td><td>Switches to the <a href="rec-menu.html">main menu</a>.</td></tr>
+<tr><td>F2</td><td>Show browse/play settings screen</td></tr>
+<tr><td>F3</td><td>Show display settings screen</td></tr>
 </table>
 
 #include "foot.t"
