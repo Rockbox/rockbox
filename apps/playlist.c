@@ -125,7 +125,7 @@ char* playlist_next(int steps)
     }
     else {
         strncpy(dir_buf, playlist.filename, playlist.dirlen-1);
-        dir_buf[playlist.dirlen] = 0;
+        dir_buf[playlist.dirlen-1] = 0;
 
         /* handle dos style drive letter */
         if ( ':' == buf[1] ) {
