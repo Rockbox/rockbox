@@ -34,9 +34,9 @@
 extern void tetris(void);
 #endif
 
-#ifdef HAVE_LCD_BITMAP
 static int show_logo(void)
 {
+#ifdef HAVE_LCD_BITMAP
     unsigned char buffer[112 * 8];
 
     int failure;
@@ -57,48 +57,28 @@ static int show_logo(void)
         int eline;
 
         for(i=0, eline=0; i< height; i+=8, eline++) {
-            int x,y;
-      
             /* the bitmap function doesn't work with full-height bitmaps
                so we "stripe" the logo output */
-
             lcd_bitmap(&buffer[eline*width], 0, 10+i, width,
                        (height-i)>8?8:height-i, false);
-      
-#if 0
-            /* for screen output debugging */
-            for(y=0; y<8 && (i+y < height); y++) {
-                for(x=0; x < width; x++) {
-
-                    if(buffer[eline*width + x] & (1<<y)) {
-                        printf("*");
-                    }
-                    else
-                        printf(" ");
-                }
-                printf("\n");
-            }
-#endif
         }
     }
+    lcd_update();
 
-    return 0;
-}
-#endif
-
-void show_splash(void)
-{
-    char *rockbox = "ROCKbox!";
-    lcd_clear_display();
-
-#ifdef HAVE_LCD_BITMAP
-    if (show_logo() != 0) 
-        return;
 #else
+    char *rockbox = "ROCKbox!";
     lcd_puts(0, 0, rockbox);
 #endif
 
-    lcd_update();
+    return 0;
+}
+
+void show_splash(void)
+{
+    lcd_clear_display();
+
+    if (show_logo() != 0) 
+      return;
 }
 
 void version(void)
