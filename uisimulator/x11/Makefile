@@ -67,7 +67,7 @@ ifeq ($(UNAME),Linux)
   DEFINES += -DLINUX
 else
 ifeq ($(UNAME),CYGWIN)
-  LDFLAGS = -lSM -lICE -lXt -lX11 -lXmu -lSM -lICE -lX11 -ldl
+  LDFLAGS = -lSM -lICE -lXt -lX11 -lXmu -lSM -lICE -lX11
   INCLUDES += -I/usr/X11R6/include
   LIBDIRS = -L/usr/X11R6/lib
   DEFINES += -DLINUX
