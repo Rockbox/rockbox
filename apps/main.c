@@ -53,7 +53,9 @@ int init(void)
     dmalloc_initialize();
     bmalloc_add_pool(poolstart, poolend-poolstart);
 
+#ifdef DEBUG
     debug_init();
+#endif
     kernel_init();
     set_irq_level(0);
 
