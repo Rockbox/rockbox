@@ -31,6 +31,7 @@
 <a class="menulink" href="/download/">download</a><br>
 <a class="menulink" href="/docs/">documentation</a><br>
 <a class="menulink" href="/mail/">mailing lists</a><br>
+<a class="menulink" href="/twiki/">twiki</a><br>
 <a class="menulink" href="/irc/">IRC</a><br>
 <a class="menulink" href="/daily.shtml">daily builds</a><br>
 <a class="menulink" href="/requests.shtml">feature&nbsp;requests</a><br>
