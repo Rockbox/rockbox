@@ -130,6 +130,7 @@ void init(void)
             rc = fat_mount(pinfo[i].start);
             if(rc)
                 panicf("mount: %d",rc);
+            break;
         }
     }
     if ( i==4 ) {
