@@ -56,7 +56,7 @@ Archos Jukebox Recorder V2
 <p>
  <a href="/fonts/">Fonts for Rockbox</a>
 <p>
- <a href="/langs/">Language files for Rockbox</a>
+ <a href="/lang/">Language files for Rockbox</a>
 
 <h2>Uninstallation</h2>
 

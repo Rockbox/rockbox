@@ -8,7 +8,7 @@
 <li> <a href="battery-faq.html">Frequently Asked Questions about Batteries and Charging</a>
 <li> <a href="/screenshots/">Screenshots</a> of Rockbox.
 <li> <a href="/fonts/">Fonts to download</a>
-<li> <a href="/langs/">Language files and voice clips to download</a>
+<li> <a href="/lang/">Language files and voice clips to download</a>
 </ul>
 <h2>For Advanced Users</h2>
 <ul>
