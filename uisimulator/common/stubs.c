@@ -104,3 +104,10 @@ Menu simulate_usb(void)
     while (button_get(true) & BUTTON_REL);
     return MENU_OK;
 }
+
+void lcd_define_pattern (int which,char *pattern,int length)
+{
+    (void)which;
+    (void)pattern;
+    (void)length;
+}
