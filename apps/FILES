@@ -14,3 +14,6 @@ plugins/lib/*.[ch]
 plugins/lib/Makefile
 plugins/sokoban.levels
 plugins/viewers.config
+SOURCES
+plugins/SOURCES
+plugins/lib/SOURCES
