@@ -117,6 +117,14 @@ int open(const char* pathname, int flags)
         return -4;
     }
 
+    if(name[0] == 0) {
+        DEBUGF("Empty file name\n");
+        errno = EINVAL;
+        file->busy = false;
+        closedir(dir);
+        return -5;
+    }
+    
     /* scan dir for name */
     while ((entry = readdir(dir))) {
         if ( !strcasecmp(name, entry->d_name) ) {
@@ -140,7 +148,7 @@ int open(const char* pathname, int flags)
                 errno = EIO;
                 file->busy = false;
                 closedir(dir);
-                return rc * 10 - 5;
+                return rc * 10 - 6;
             }
             file->size = 0;
             file->attr = 0;
@@ -150,7 +158,7 @@ int open(const char* pathname, int flags)
             errno = ENOENT;
             file->busy = false;
             closedir(dir);
-            return -6;
+            return -7;
         }
     }
     closedir(dir);
@@ -161,7 +169,7 @@ int open(const char* pathname, int flags)
     if (file->write && (flags & O_APPEND)) {
         rc = lseek(fd,0,SEEK_END);
         if (rc < 0 )
-            return rc * 10 - 7;
+            return rc * 10 - 8;
     }
 
     return fd;

@@ -127,9 +127,9 @@ int mkdir(char *name, int mode)
     int rc;
 
     (void)mode;
-    
+
     if ( name[0] != '/' ) {
-        DEBUGF("Only absolute paths supported right now\n");
+        DEBUGF("mkdir: Only absolute paths supported right now\n");
         return -1;
     }
 
@@ -155,13 +155,19 @@ int mkdir(char *name, int mode)
         return -2;
     }    
 
+    if(basename[0] == 0) {
+        DEBUGF("mkdir: Empty dir name\n");
+        errno = EINVAL;
+        return -3;
+    }
+    
     /* Now check if the name already exists */
     while ((entry = readdir(dir))) {
         if ( !strcasecmp(basename, entry->d_name) ) {
             DEBUGF("mkdir error: file exists\n");
             errno = EEXIST;
             closedir(dir);
-            return - 3;
+            return - 4;
         }
     }
 
