@@ -1014,7 +1014,6 @@ bool wps_display(struct mp3entry* id3,
         lcd_update();
 #endif
         global_settings.resume_index = -1;
-        status_set_playmode(STATUS_STOP);
         status_draw(true);
         sleep(HZ);
         return true;

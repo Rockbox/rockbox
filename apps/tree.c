@@ -16,7 +16,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -1020,7 +1019,6 @@ static bool dirbrowse(char *root, int *dirfilter)
             case BUTTON_OFF:
                 bookmark_autobookmark();
                 mpeg_stop();
-                status_set_playmode(STATUS_STOP);
                 status_draw(false);
                 restore = true;
                 break;
@@ -1375,7 +1373,6 @@ static bool dirbrowse(char *root, int *dirfilter)
                 break;
 
             case SYS_USB_CONNECTED:
-                status_set_playmode(STATUS_STOP);
                 usb_screen();
                 reload_root = true;
                 break;
@@ -1732,6 +1729,5 @@ void bookmark_play(char *resume_file, int index, int offset, int seed)
         }
     }
 
-    status_set_playmode(STATUS_PLAY);
     start_wps=true;
 }

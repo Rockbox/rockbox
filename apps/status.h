@@ -31,7 +31,7 @@ enum playmode
 };
 
 void status_init(void);
-void status_set_playmode(enum playmode mode);
+void status_set_ffmode(enum playmode mode);
 #ifdef HAVE_LCD_BITMAP
 bool statusbar(bool state);
 void buttonbar_set(char* caption1, char* caption2, char* caption3);

@@ -523,7 +523,6 @@ bool bookmark_autoload(char* file)
                 case BUTTON_PLAY:
                     return bookmark_load(global_bookmark_file_name, true);
                 case SYS_USB_CONNECTED:
-                    status_set_playmode(STATUS_STOP);
                     usb_screen();
 #ifdef HAVE_LCD_CHARCELLS
                     status_set_param(true);

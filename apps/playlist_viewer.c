@@ -856,7 +856,6 @@ bool playlist_viewer_ex(char* filename)
 #else
             splash(HZ, true, str(LANG_END_PLAYLIST_RECORDER));
 #endif
-            status_set_playmode(STATUS_STOP);
             goto exit;
         }
 
@@ -988,7 +987,6 @@ bool playlist_viewer_ex(char* filename)
                     /* Stop current track and play new track */
                     mpeg_stop();
                     playlist_start(tracks[INDEX(viewer.cursor_pos)].index, 0);
-                    status_set_playmode(STATUS_PLAY);
                     update_playlist(false);
                 }
                 else
@@ -1001,7 +999,6 @@ bool playlist_viewer_ex(char* filename)
                         goto exit;
 
                     playlist_start(tracks[INDEX(viewer.cursor_pos)].index, 0);
-                    status_set_playmode(STATUS_PLAY);
 
                     /* Our playlist is now the current list */
                     if (!initialize(NULL, true))

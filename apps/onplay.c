@@ -138,7 +138,6 @@ static bool add_to_playlist(int position, bool queue)
         if (global_settings.playlist_shuffle)
             playlist_shuffle(current_tick, -1);
         playlist_start(0,0);
-        status_set_playmode(STATUS_PLAY);
         status_draw(false);
         onplay_result = ONPLAY_START_PLAY;
     }

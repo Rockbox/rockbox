@@ -297,7 +297,6 @@ bool browse_id3(void)
                 break;
 
             case SYS_USB_CONNECTED: 
-                status_set_playmode(STATUS_STOP);
                 usb_screen();
                 return true;
                 break;
@@ -371,9 +370,9 @@ static bool ffwd_rew(int button)
                         direction = (button & BUTTON_RIGHT) ? 1 : -1;
 
                         if (direction > 0) 
-                            status_set_playmode(STATUS_FASTFORWARD);
+                            status_set_ffmode(STATUS_FASTFORWARD);
                         else
-                        status_set_playmode(STATUS_FASTBACKWARD);
+                            status_set_ffmode(STATUS_FASTBACKWARD);
 
                         ff_rewind = true;
 
@@ -387,8 +386,8 @@ static bool ffwd_rew(int button)
                 }
 
                 if (direction > 0) {
-                if ((id3->elapsed + ff_rewind_count) > id3->length)
-                    ff_rewind_count = id3->length - id3->elapsed;
+                    if ((id3->elapsed + ff_rewind_count) > id3->length)
+                        ff_rewind_count = id3->length - id3->elapsed;
                 }
                 else {
                     if ((int)(id3->elapsed + ff_rewind_count) < 0)
@@ -411,12 +410,9 @@ static bool ffwd_rew(int button)
                 mpeg_ff_rewind(id3->elapsed+ff_rewind_count);
                 ff_rewind_count = 0;
                 ff_rewind = false;
-                if (paused)
-                    status_set_playmode(STATUS_PAUSE);
-                else {
+                status_set_ffmode(0);
+                if (!paused)
                     mpeg_resume();
-                    status_set_playmode(STATUS_PLAY);
-                }
 #ifdef HAVE_LCD_CHARCELLS
                 wps_display(id3, nid3);
 #endif
@@ -424,7 +420,7 @@ static bool ffwd_rew(int button)
                 break;
 
             case SYS_USB_CONNECTED:
-                status_set_playmode(STATUS_STOP);
+                status_set_ffmode(0);
                 usb_screen();
                 usb = true;
                 exit = true;
@@ -516,7 +512,6 @@ static bool menu(void)
                 break;
 
             case SYS_USB_CONNECTED:
-                status_set_playmode(STATUS_STOP);
                 usb_screen();
                 keys_locked = false;
                 return true;
@@ -689,7 +684,6 @@ int wps_show(void)
     while ( 1 )
     {
         bool mpeg_paused = (mpeg_status() & MPEG_STATUS_PAUSE)?true:false;
-        status_set_playmode(paused ? STATUS_PAUSE : STATUS_PLAY);
         
         /* did someone else (i.e power thread) change mpeg pause mode? */
         if (paused != mpeg_paused) {
@@ -807,7 +801,6 @@ int wps_show(void)
                         /* pause may have been turned off by pitch screen */
                         if (paused && !(mpeg_status() & MPEG_STATUS_PAUSE)) {
                             paused = false;
-                            status_set_playmode(STATUS_PLAY);
                         }
                         break;
 
@@ -838,7 +831,6 @@ int wps_show(void)
                 if ( paused )
                 {
                     paused = false;
-                    status_set_playmode(STATUS_PLAY);
                     if ( global_settings.fade_on_stop )
                         fade(1);
                     else
@@ -847,7 +839,6 @@ int wps_show(void)
                 else
                 {
                     paused = true;
-                    status_set_playmode(STATUS_PAUSE);
                     if ( global_settings.fade_on_stop )
                         fade(0);
                     else
@@ -980,7 +971,6 @@ int wps_show(void)
                 break;
 
             case SYS_USB_CONNECTED:
-                status_set_playmode(STATUS_STOP);
                 usb_screen();
                 return SYS_USB_CONNECTED;
 
@@ -1014,7 +1004,6 @@ int wps_show(void)
             lcd_stop_scroll();
             bookmark_autobookmark();
             mpeg_stop();
-            status_set_playmode(STATUS_STOP);
 
             /* Keys can be locked when exiting, so either unlock here
                or implement key locking in tree.c too */

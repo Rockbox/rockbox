@@ -25,6 +25,7 @@
 #include "settings.h"
 #include "status.h"
 #include "mp3_playback.h"
+#include "mpeg.h"
 #include "wps.h"
 #ifdef HAVE_RTC
 #include "timefuncs.h"
@@ -35,7 +36,7 @@
 #endif
 #include "powermgmt.h"
 
-static enum playmode current_mode = STATUS_STOP;
+static enum playmode ff_mode;
 
 static long switch_tick;
 static int  battery_charge_step = 0;
@@ -57,13 +58,45 @@ struct status_info {
 
 void status_init(void)
 {
-    status_set_playmode(STATUS_STOP);
+    ff_mode = 0;
 }
 
-void status_set_playmode(enum playmode mode)
+void status_set_ffmode(enum playmode mode)
 {
-    current_mode = mode;
+    ff_mode = mode; /* Either STATUS_FASTFORWARD or STATUS_FASTBACKWARD */
     status_draw(false);
+}
+
+int current_playmode(void)
+{
+    int mpeg_stat = mpeg_status();
+
+    /* ff_mode can be either STATUS_FASTFORWARD or STATUS_FASTBACKWARD
+       and that supercedes the other modes */
+    if(ff_mode)
+        return ff_mode;
+    
+    if(mpeg_stat & MPEG_STATUS_PLAY)
+    {
+        if(mpeg_stat & MPEG_STATUS_PAUSE)
+            return STATUS_PAUSE;
+        else
+            return STATUS_PLAY;
+    }
+#ifdef HAVE_MAS3587F
+    else
+    {
+        if(mpeg_stat & MPEG_STATUS_RECORD)
+        {
+            if(mpeg_stat & MPEG_STATUS_PAUSE)
+                return STATUS_RECORD_PAUSE;
+            else
+                return STATUS_RECORD;
+        }
+    }
+#endif
+    
+    return STATUS_STOP;
 }
 
 #if defined(HAVE_LCD_CHARCELLS)
@@ -120,7 +153,7 @@ void status_draw(bool force_redraw)
     info.shuffle = global_settings.playlist_shuffle;
     info.keylock = keys_locked;
     info.repeat = global_settings.repeat_mode;
-    info.playmode = current_mode;
+    info.playmode = current_playmode();
 
     /* only redraw if forced to, or info has changed */
     if (force_redraw ||
@@ -181,7 +214,7 @@ void status_draw(bool force_redraw)
             statusbar_icon_battery(info.battlevel, plug_state);
             
         statusbar_icon_volume(info.volume);
-        statusbar_icon_play_state(current_mode + Icon_Play);
+        statusbar_icon_play_state(current_playmode() + Icon_Play);
         switch (info.repeat) {
             case REPEAT_ONE:
                 statusbar_icon_play_mode(Icon_RepeatOne);
@@ -218,8 +251,8 @@ void status_draw(bool force_redraw)
     lcd_icon(ICON_VOLUME_4, info.volume > 70);
     lcd_icon(ICON_VOLUME_5, info.volume > 90);
 
-    lcd_icon(ICON_PLAY, current_mode == STATUS_PLAY);
-    lcd_icon(ICON_PAUSE, current_mode == STATUS_PAUSE);
+    lcd_icon(ICON_PLAY, current_playmode() == STATUS_PLAY);
+    lcd_icon(ICON_PAUSE, current_playmode() == STATUS_PAUSE);
 
     lcd_icon(ICON_REPEAT, global_settings.repeat_mode != REPEAT_OFF);
     lcd_icon(ICON_1, global_settings.repeat_mode == REPEAT_ONE);
