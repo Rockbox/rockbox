@@ -1,7 +1,7 @@
 #define _PAGE_ Accessing source code via CVS
 #include "head.t"
 
-<h2>Browsing the repositry</h2>
+<h2>Browsing the repository</h2>
 
 <p>Just go <a
 href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/rockbox/">here</a>.
