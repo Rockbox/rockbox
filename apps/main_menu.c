@@ -61,15 +61,6 @@
 #ifdef HAVE_LCD_BITMAP
 #include "bmp.h"
 #include "icons.h"
-
-#ifdef USE_GAMES
-#include "games_menu.h"
-#endif /* End USE_GAMES */
-
-#ifdef USE_DEMOS
-#include "demo_menu.h"
-#endif /* End USE_DEMOS */
-
 #endif /* End HAVE_LCD_BITMAP */
 
 int show_logo( void )
