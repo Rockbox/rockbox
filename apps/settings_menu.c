@@ -367,8 +367,6 @@ static bool reset_settings(void)
     lcd_puts(0,line+1,str(LANG_RESET_CANCEL));
 
     lcd_update();
-
-    lcd_clear_display();
      
     while(!done) {
         switch(button_get(true)) {
