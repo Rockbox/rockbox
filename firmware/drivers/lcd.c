@@ -20,6 +20,7 @@
 #include "config.h"
 #include "lcd.h"
 #include "kernel.h"
+#include "thread.h"
 #include <string.h>
 #include <stdlib.h>
 
@@ -816,7 +817,6 @@ static void scroll_thread(void)
             scroll_count++;
         else {
             lcd_puts(s->xpos,s->starty,s->text + s->offset);
-            debugf("puts(%2d,%s)\n",s->xpos,s->text+s->offset);
             if ( s->textlen - s->offset < s->space )
                 lcd_puts(s->startx + s->textlen - s->offset, s->starty," ");
             lcd_update();
