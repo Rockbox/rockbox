@@ -12,6 +12,11 @@ faq.html: faq.t faq.raw $(TXT2PLAIN)
 faq.raw: FAQ $(TXT2PLAIN)
 	$(TXT2PLAIN) < $< > $@
 
+battery.raw: BATTERY $(TXT2PLAIN)
+	$(TXT2PLAIN) < $< > $@
+
+battery.html: battery.t battery.raw $(TXT2PLAIN)
+	$(ACTION) $<
 
 %.html : %.t
 	$(ACTION) $<
