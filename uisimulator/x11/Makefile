@@ -22,6 +22,7 @@ TARGET = rockboxui
 APPDIR= ..
 FIRMWAREDIR = ../../firmware
 DRIVERS = $(FIRMWAREDIR)/drivers
+COMMON = $(FIRMWAREDIR)/common
 
 CC = gcc
 RM = rm -f
@@ -43,8 +44,11 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES)
 
 #SRCS = $(wildcard *.c)
 
-SRCS = screenhack.c uibasic.c resources.c visual.c lcd.c lcd-x11.c \
-        button-x11.c chartables.c tetris.c app.c tree.c io.c sleep.c
+FIRMSRCS = chartables.c lcd.c sprintf.c
+
+SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c \
+        button-x11.c tetris.c app.c tree.c io.c sleep.c \
+	$(FIRMSRCS)
 
 OBJS := $(SRCS:c=o)
 
@@ -70,6 +74,9 @@ lcd.o: $(DRIVERS)/lcd.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 chartables.o: $(FIRMWAREDIR)/chartables.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+sprintf.o: $(COMMON)/sprintf.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 .c.o:
