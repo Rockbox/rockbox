@@ -20,7 +20,7 @@
 #define _DIR_H_
 
 #include <stdbool.h>
-#include "file.h"
+#include <file.h>
 
 #ifndef DIRENT_DEFINED
 
