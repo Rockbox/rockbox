@@ -14,11 +14,11 @@ by Jörg Hohensohn aka [IDC]Dragon
 
 <h2>What is Flashing</h2>
 
-<p> Flashing in the sense used here and elsewhere in regard to Rockbox, means
+<p> Flashing in the sense used here and elsewhere in regard to Rockbox means
 reprogramming the flash memory of the Archos unit.  Flash memory (sometimes
-called "flash RAM") is a type of constantly-powered nonvolatile memory that
-can be erased and reprogrammed. It is a variation of electrically erasable
-programmable read-only memory (EEPROM).
+called "Flash ROM") is a type of nonvolatile memory that can be erased and 
+reprogrammed. It is a variation of electrically erasable programmable 
+read-only memory (EEPROM).
 
 <p>
  When you bought Your Archos, it came with the Archos firmware flashed. Now,
@@ -122,10 +122,11 @@ in. If the chip is blank, you'll need the UART boot mod as well.
 The vast majority of the Player/Recorder/FM all have the same boot ROM content, 
 differenciation comes later by flash content. So far very few people had a 
 different, presumable later boot ROM. It uses a different flash layout.
-For these the tools will refuse to work, the only
-way to find out is to try if the sanity check fails. 
+The Hardware Info screen tells the boot ROM version in the ROM CRC line.
+You need a value marked with "V1".
+For V2 boxes the tools will refuse to work for the time being. 
 Flashing these is not impossible, but the firmware authoring has to be 
-different. It takes a developer with the UART boot mod to go ahead with it.
+different. It takes a developer with the serial mod to go ahead with it.
 </ul>
 
 <h2>5. How do I flash the firmware?</h2>
@@ -133,19 +134,20 @@ different. It takes a developer with the UART boot mod to go ahead with it.
 I'm using the new plugin feature to run the flasher code. There's not really a
 wrong path to take, however here's a suggested step by step procedure:
 <ul>
-<li> copy 3 files of <a href="http://joerg.hohensohn.bei.t-online.de/archos/">this package</a> to the root directory of your box:<ol>
-  <li> ajbrec.ajz (the version of Rockbox we're going to use and have in the
+<li> copy the following files of <a href="http://joerg.hohensohn.bei.t-online.de/archos/">this package</a> to your box:<ol>
+  <li> "ajbrec.ajz" into the root directory (the version of Rockbox we're going to use and have in the
 firmware file)<br>
-  <li> firmware_flash.rock (the plugin for this job)<br>
-  <li> firmware_rec.bin or firmware_fm.bin (the complete firmware for your model,
+  <li> firmware_rec.bin or firmware_fm.bin into the root directory (the complete firmware for your model,
 with my bootloader and the two images)
+  <li> all .rock files to .rockbox/rocks (the plugins for Rockbox)<br>
  </ol>
 <li> Restart the box so that the new ajbrec.ajz gets started.
 
 <li> Enter the debug menu and select the hardware info screen. Check you flash
-IDs (bottom line), and please make a note about your hardware mask value
-(second line). The latter is just for my curiosity, not needed for the
-flow. If the flash info shows question marks, you can stop here, sorry.
+IDs and ROM CRC (bottom two lines), and please make a note about your hardware 
+mask value (second line). The latter is just for my curiosity, not needed for the
+flow. If the flash info shows question marks or you have ROM V2, you can stop 
+here, sorry.
 
 <li> Backup the current firmware, using the first option of the debug menu
 (Dump ROM contents). This creates 2 files in the root directory, which you may
@@ -176,15 +178,9 @@ don't switch off the box! Otherwise you'll have seen it working for the last
 time.  While Rockbox is still in DRAM and operational, we could upgrade the
 plugin via USB and try again. If you switch it off, it's gone.
 
-<li> When the programming is done, rename the "ajbrec.ajz" file to
-ajbrec.ajz_" or so. Pressing On+Play can do it, or the PC via USB. This is a
-nice trick to make only the Archos firmware find and load it, versus Rockbox
-looks for the exact filename. Since Rockbox is up to date, there's no point in
-having it loading this on startup.
-
 <li> Unplug the charger, restart the box and hopefully be in Rockbox straight
-away! You should delete "firmware_flash.rock" then, to avoid your little
-brother playing with that. Again, pressing On+Play can do it, or your PC. You
+away! You may delete "firmware_flash.rock" then, to avoid your little
+brother playing with that. Pressing On+Play can do it, or your PC. You
 can also delete the ".bin" files.
 
 <li> Try starting again, this time holding F1 while pressing On. It should
@@ -200,10 +196,12 @@ box this time. Keep the Rockbox copy and the plugins of this package for that
 job, because that's the one it was tested with.
 
 <h2>6. How do I bring in a current / my personal build of Rockbox?</h2>
+<p> Short explaination: very easy, just play "rockbox.ucl" from the download 
+or build. Long version:
+
 <p>
 The second image is the working copy, the "rockbox_flash.rock" plugin from this
-package reprograms it. I suggest to place the plugin to where you keep the
-others, "/.rockbox/rocks/". The plugin needs to be consistant with the Rockbox
+package reprograms it. The plugins needs to be consistant with the Rockbox
 plugin API version, otherwise it will detect mismatch and won't run.
 
 <p> It currently requires an exotic input, a UCL-compressed image, because
@@ -217,8 +215,10 @@ href="http://www.oberhumer.com/opensource/ucl/">www.oberhumer.com/opensource/ucl
 and Cygwin I can do that, so the executables are in <a
 href="http://joerg.hohensohn.bei.t-online.de/archos/">the package</a>. The
 sample program from that download is called "uclpack". We'll use that to
-compress "rockbox.bin" which is the result of the compilation. If flashing
-becomes very popular, this could be a part of the build process.
+compress "rockbox.bin" which is the result of the compilation. This is 
+a part of the build process meanwhile. If you compile Rockbox yourself,
+you should copy uclpack to a directory which is in the path, I recommend 
+placing it int the same dir as SH compiler.
 
 <p>
 Don't flash any "old" builds which don't have the latest coldstart ability I
@@ -230,21 +230,27 @@ Here are the steps:
 <li> If you start from a .ajz file, you'll need to descramble it first into
 "rockbox.bin", by using "descramble ajbrec.ajz rockbox.bin". IMPORTANT: For an
 FM, the command is different, use "descramble -fm ajbrec.ajz rockbox.bin"!
-Otherwise the image won't be functional.
-
-<li> Compress the image using uclpack, algorithm 2e (the most efficient, and
-the only one supported by the bootloader), with maximum compression, by typing
+Otherwise the image won't be functional. Compress the image using uclpack, 
+algorithm 2e (the most efficient, and the only one supported by the 
+bootloader), with maximum compression, by typing 
 "uclpack --2e --best rockbox.bin rockbox.ucl". You can make a batch file for
 this and the above step, if you like.
 
-<li> Copy the resulting file to the root directory of your box.
+<li> Normally, you'll download or compile rockbox.ucl. Copy it together 
+with ajbrec.ajz and all the rocks to the appropriate places, replacing the old.
 
-<li> Start the "rockbox_flash.rock" plugin. It's a bit similar to the other
-one, but I made it different to make the user aware. It tells you the flash
-size and the starting position (so you can calculate how much is left). After
-pressing F1 it will check the file, available size, etc. With F2 it's being
-programmed, no need for warning this time. If it goes wrong, you'll still have
-the permanent image.
+<li> Just "play" the .ucl file, thos will kick off the "rockbox_flash.rock" 
+plugin. It's a bit similar to the other one, but I made it different 
+to make the user aware. It will check the file, 
+available size, etc. With F2 it's being programmed, no need for warning this 
+time. If it goes wrong, you'll still have the permanent image. 
+
+<li> It may happen 
+that you get an "Incompatible Version" error, if the plugin interface has 
+changed meanwhile. You're running an "old" copy of Rockbox, but are trying
+to execute a newer plugin, the one you just downloaded. The easiest solution
+is to rolo into this new version, by playing the ajbrec.ajz file. Then
+you are consistant and can play rockbox.ucl.
 
 <li> When done, you can restart the box and hopefully your new Rockbox image.
 
@@ -260,16 +266,13 @@ on the box, that's the strenuous part.
 <p>
 The latest ATA init fixes seemed to have solved early adopter's problems.
 However, the wait for the harddisk is longer, you're unlikely to reach the 3
-seconds boot time. I hope it will improve one day again. If there should still
-be ATA errors on startup, use F1-On for the Archos image. Then you can either
-reprogram the original firmware from your backup, or live with F1-On until a
-better Rockbox build resolves it, or program the Archos software in the second
-image, too.
+seconds boot time. I hope it will improve one day again.
 
 <p>
 Loading the original Archos firmware via rolo may hang, if Rockbox is started
 from flash. This is some initialization problem which I hope to fix, rolo-ing
-Rockbox versions works OK. If you feel homesick, hold F1 during powerup.
+Rockbox versions works OK. If you feel homesick, move away ajbrec.ajz and hold 
+F1 during powerup.
 
 <p>
 Latest Rockbox now has a charging screen, but it is in an early stage. You'll 
@@ -277,13 +280,17 @@ get it when the unit is off and you plug in the charger. The Rockbox charging
 algorithm is first measuring the battery voltage for about 40 seconds, after
 that it only starts charging when the capacity is below 85%. 
 You can use the Archos charging (which always tops off) by holding F1 
-while plugging in.
+while plugging in. Some FM users reported charging problems even with F1,
+they had to revert to the original flash content.
 
 <p>
 The plugin API is currently changed often, new builds may render the plugins 
-incompatible. When updating, make sure you grab those too, but don't
-overwrite the rockbox_flash.rock yet, since you still need it matching the 
-currently running Rockbox to flash.
+incompatible. When updating, make sure you grab those too, and rolo into
+the new version before flashing it.
+
+<p>
+Two people have an issue with recording, it freezes after a few minutes or so 
+(statistically). The use F1 to record with Archos software as a workaround.
 
 <h2>8. Movies and images</h2>
 <p>
