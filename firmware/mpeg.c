@@ -38,7 +38,7 @@
 #include "usb.h"
 #include "file.h"
 #include "hwcompat.h"
-#endif
+#endif /* #ifndef SIMULATOR */
 
 extern void bitswap(unsigned char *data, int length);
 
@@ -48,13 +48,13 @@ static void start_prerecording(void);
 static void start_recording(void);
 static void stop_recording(void);
 static int get_unsaved_space(void);
-#endif
+#endif /* #ifdef HAVE_MAS3587F */
 
 #ifndef SIMULATOR
 static int get_unplayed_space(void);
 static int get_playable_space(void);
 static int get_unswapped_space(void);
-#endif
+#endif /* #ifndef SIMULATOR */
 
 #define MPEG_PLAY         1
 #define MPEG_STOP         2
@@ -79,7 +79,7 @@ static enum
     MPEG_DECODER,
     MPEG_ENCODER
 } mpeg_mode;
-#endif
+#endif /* #ifdef HAVE_MAS3587F */
 
 extern char* playlist_peek(int steps);
 extern bool playlist_check(int steps);
@@ -113,7 +113,7 @@ static int num_tracks_in_memory(void)
 {
     return (tag_write_idx - tag_read_idx) & MAX_ID3_TAGS_MASK;
 }
-#endif
+#endif /* #ifndef SIMULATOR */
 
 #ifndef SIMULATOR
 static void debug_tags(void)
@@ -130,7 +130,7 @@ static void debug_tags(void)
     }
     DEBUGF("read: %d, write :%d\n", tag_read_idx, tag_write_idx);
     DEBUGF("num_tracks_in_memory: %d\n", num_tracks_in_memory());
-#endif
+#endif /* #ifdef DEBUG_TAGS */
 }
 
 static bool append_tag(struct id3tag *tag)
@@ -192,7 +192,7 @@ static void remove_all_tags(void)
 
     debug_tags();
 }
-#endif
+#endif /* #ifndef SIMULATOR */
 
 static void set_elapsed(struct mp3entry* id3)
 {
@@ -303,7 +303,7 @@ static int prerecord_index; /* Current index in the prerecord buffer */
 static int prerecording_max_seconds;   /* Max number of seconds to store */
 static int prerecord_count; /* Number of seconds in the prerecord buffer */
 static int prerecord_timeout; /* The tick count of the next prerecord data store */
-#endif
+#endif /* #ifdef HAVE_MAS3587F */
 
 static int mpeg_file;
 
@@ -311,7 +311,7 @@ static int mpeg_file;
 #ifdef HAVE_MAS3587F
 static bool init_recording_done;
 static bool init_playback_done;
-#endif
+#endif /* #ifdef HAVE_MAS3587F */
 static bool mpeg_stop_done;
 
 static void recalculate_watermark(int bitrate)
@@ -396,7 +396,7 @@ static void postpone_dma_tick(void)
 
     TSTR |= 0x02; /* Start timer 1 */
 }
-#endif
+#endif /* #ifndef HAVE_MAS3507D */
 
 #ifdef DEBUG
 static void dbg_timer_start(void)
@@ -417,7 +417,7 @@ static int dbg_cnt2us(unsigned int cnt)
 {
     return (cnt * 10000) / (FREQ/800);
 }
-#endif
+#endif /* #ifdef DEBUG */
 
 static int get_unplayed_space(void)
 {
@@ -472,13 +472,13 @@ static int get_unsaved_space(void)
         space += mp3buflen;
     return space;
 }
-#endif
+#endif /* #ifdef HAVE_MAS3587F */
 
 #ifdef HAVE_MAS3587F
 #ifdef DEBUG
 static long timing_info_index = 0;
 static long timing_info[1024];
-#endif
+#endif /* #ifdef DEBUG */
 static bool inverted_pr;
 static unsigned long num_rec_bytes;
 static unsigned long num_recorded_frames;
@@ -530,7 +530,7 @@ static void dma_tick(void)
 #ifdef HAVE_MAS3587F
     if(mpeg_mode == MPEG_DECODER)
     {
-#endif
+#endif /* #ifdef HAVE_MAS3587F */
         if(playing && !paused)
         {
             /* Start DMA if it is disabled and the DEMAND pin is high */
@@ -553,7 +553,7 @@ static void dma_tick(void)
 #ifdef DEBUG
             timing_info[timing_info_index++] = current_tick;
             TCNT2 = 0;
-#endif
+#endif /* #ifdef DEBUG */
             /* We read as long as EOD is high, but max 30 bytes.
                This code is optimized, and should probably be
                written in assembler instead. */
@@ -610,7 +610,7 @@ static void dma_tick(void)
 #ifdef DEBUG
             timing_info[timing_info_index++] = TCNT2 + (i << 16);
             timing_info_index &= 0x3ff;
-#endif
+#endif /* #ifdef DEBUG */
 
             num_rec_bytes += i;
             
@@ -649,7 +649,7 @@ static void dma_tick(void)
             }
         }
     }
-#endif
+#endif /* #ifdef HAVE_MAS3587F */
 }
 
 static void reset_mp3_buffer(void)
@@ -766,7 +766,7 @@ static void demand_irq_enable(bool on)
 
     set_irq_level(oldlevel);
 }
-#endif
+#endif /* #ifdef HAVE_MAS3587F */
 
 #pragma interrupt
 void IMIA1(void) /* Timer 1 interrupt */
@@ -776,7 +776,7 @@ void IMIA1(void) /* Timer 1 interrupt */
 #ifdef HAVE_MAS3587F
     /* Disable interrupt */
     IPRC &= ~0x000f;
-#endif
+#endif /* #ifdef HAVE_MAS3587F */
 }
 
 #ifdef HAVE_MAS3587F
@@ -791,7 +791,7 @@ void IRQ3(void) /* PA15: MAS demand IRQ */
     else
         postpone_dma_tick();
 }
-#endif
+#endif /* #ifdef HAVE_MAS3587F */
 
 static int add_track_to_tag_list(char *filename)
 {
@@ -894,7 +894,7 @@ static void stop_playing(void)
     /* Stop the current stream */
 #ifdef HAVE_MAS3587F
     demand_irq_enable(false);
-#endif
+#endif /* #ifdef HAVE_MAS3587F */
     playing = false;
     filling = false;
     if(mpeg_file >= 0)
@@ -922,7 +922,7 @@ static void track_change(void)
 #ifdef HAVE_MAS3587F
     /* Reset the AVC */
     mpeg_sound_set(SOUND_AVC, -1);
-#endif
+#endif /* #ifdef HAVE_MAS3587F */
     remove_current_tag();
 
     update_playlist();
@@ -944,7 +944,7 @@ void hexdump(unsigned char *buf, int len)
     }
     DEBUGF("\n");
 }
-#endif
+#endif /* #ifdef DEBUG */
 
 static void start_playback_if_ready(void)
 {
@@ -977,7 +977,7 @@ static void start_playback_if_ready(void)
                 mp3_play_pause(true);
 #ifdef HAVE_MAS3587F
                 demand_irq_enable(true);
-#endif
+#endif /* #ifdef HAVE_MAS3587F */
             }
 
             /* Tell ourselves that we need more data */
@@ -1043,7 +1043,7 @@ static unsigned long get_last_recorded_header(void)
     mas_readmem(MAS_BANK_D0, 0xfd1, tmp, 2);
     return 0xffe00000 | ((tmp[0] & 0x7c00) << 6) | (tmp[1] & 0xffff);
 }
-#endif
+#endif /* #ifdef HAVE_MAS3587F */
 
 static void mpeg_thread(void)
 {
@@ -1065,7 +1065,7 @@ static void mpeg_thread(void)
     int rc;
     int offset;
     int countdown;
-#endif
+#endif /* #ifdef HAVE_MAS3587F */
     
     is_playing = false;
     play_pending = false;
@@ -1077,7 +1077,7 @@ static void mpeg_thread(void)
 #ifdef HAVE_MAS3587F
         if(mpeg_mode == MPEG_DECODER)
         {
-#endif
+#endif /* #ifdef HAVE_MAS3587F */
         yield();
 
         /* Swap if necessary, and don't block on the queue_wait() */
@@ -1103,7 +1103,7 @@ static void mpeg_thread(void)
                 /* Silence the A/D input, it may be on because the radio
                    may be playing */
                 mas_codec_writereg(6, 0x0000);
-#endif
+#endif /* #ifdef HAVE_FMRADIO */
 
                 /* Stop the current stream */
                 play_pending = false;
@@ -1539,7 +1539,7 @@ static void mpeg_thread(void)
                 amount_to_read = MIN(mp3buflen - mp3buf_write, amount_to_read);
 #if MEM == 8    
                 amount_to_read = MIN(0x100000, amount_to_read);
-#endif
+#endif /* #if MEM == 8 */
 
                 /* Read as much mpeg data as we can fit in the buffer */
                 if(mpeg_file >= 0)
@@ -1640,16 +1640,16 @@ static void mpeg_thread(void)
 
                 /* Wait until the USB cable is extracted again */
                 usb_wait_for_disconnect(&mpeg_queue);
-#endif
+#endif /* #ifndef SIMULATOR */
                 break;
-#endif /* USB_NONE */
+#endif /* #ifndef USB_NONE */
                 
 #ifdef HAVE_MAS3587F
             case MPEG_INIT_RECORDING:
                 init_recording();
                 init_recording_done = true;
                 break;
-#endif
+#endif /* #ifdef HAVE_MAS3587F */
             }
 #ifdef HAVE_MAS3587F
         }
@@ -1809,7 +1809,7 @@ static void mpeg_thread(void)
                                    timing_info[i*2+1] >> 16);
                         }
                     }
-#endif
+#endif /* #ifdef DEBUG1 */
 
                     if(prerecording)
                     {
@@ -2026,14 +2026,14 @@ static void mpeg_thread(void)
                     break;
             }
         }
-#endif
+#endif /* #ifdef HAVE_MAS3587F */
     }
 }
 #endif /* SIMULATOR */
 
 #ifdef SIMULATOR
 static struct mp3entry taginfo;
-#endif
+#endif /* #ifdef SIMULATOR */
 
 struct mp3entry* mpeg_current_track()
 {
@@ -2044,7 +2044,7 @@ struct mp3entry* mpeg_current_track()
         return &(id3tags[tag_read_idx]->id3);
     else
         return NULL;
-#endif
+#endif /* #ifdef SIMULATOR */
 }
 
 bool mpeg_has_changed_track(void)
@@ -2463,7 +2463,7 @@ void mpeg_play(int offset)
     is_playing = true;
     
     queue_post(&mpeg_queue, MPEG_PLAY, (void*)offset);
-#endif
+#endif /* #ifdef SIMULATOR */
 
     mpeg_errno = 0;
 }
@@ -2478,7 +2478,7 @@ void mpeg_stop(void)
 #else
     is_playing = false;
     playing = false;
-#endif
+#endif /* #ifndef SIMULATOR */
     
 }
 
@@ -2490,7 +2490,7 @@ void mpeg_pause(void)
     is_playing = true;
     playing = false;
     paused = true;
-#endif
+#endif /* #ifndef SIMULATOR */
 }
 
 void mpeg_resume(void)
@@ -2501,7 +2501,7 @@ void mpeg_resume(void)
     is_playing = true;
     playing = true;
     paused = false;
-#endif
+#endif /* #ifndef SIMULATOR */
 }
 
 void mpeg_next(void)
@@ -2529,7 +2529,7 @@ void mpeg_next(void)
         playing = true;
         break;
     } while(1);
-#endif
+#endif /* #ifndef SIMULATOR */
 }
 
 void mpeg_prev(void)
@@ -2556,7 +2556,7 @@ void mpeg_prev(void)
         playing = true;
         break;
     } while(1);
-#endif
+#endif /* #ifndef SIMULATOR */
 }
 
 void mpeg_ff_rewind(int newtime)
@@ -2565,14 +2565,14 @@ void mpeg_ff_rewind(int newtime)
     queue_post(&mpeg_queue, MPEG_FF_REWIND, (void *)newtime);
 #else
     (void)newtime;
-#endif
+#endif /* #ifndef SIMULATOR */
 }
 
 void mpeg_flush_and_reload_tracks(void)
 {
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_FLUSH_RELOAD, NULL);
-#endif
+#endif /* #ifndef SIMULATOR*/
 }
 
 int mpeg_status(void)
@@ -2591,7 +2591,7 @@ int mpeg_status(void)
 
     if(is_prerecording)
         ret |= MPEG_STATUS_PRERECORD;
-#endif
+#endif /* #ifdef HAVE_MAS3587F */
 
     if(mpeg_errno)
         ret |= MPEG_STATUS_ERROR;
@@ -2629,15 +2629,19 @@ static void mpeg_thread(void)
         sleep(HZ);
     }
 }
-#endif
+#endif /* #ifdef SIMULATOR */
 
 void mpeg_init(void)
 {
     mpeg_errno = 0;
 
+    create_thread(mpeg_thread, mpeg_stack,
+                  sizeof(mpeg_stack), mpeg_thread_name);
+#ifndef SIMULATOR
     mp3buflen = mp3end - mp3buf;
-
     queue_init(&mpeg_queue);
+#endif /* #ifndef SIMULATOR */
+
     create_thread(mpeg_thread, mpeg_stack,
                   sizeof(mpeg_stack), mpeg_thread_name);
 
@@ -2649,10 +2653,10 @@ void mpeg_init(void)
         inverted_pr = true;
     else
         inverted_pr = false;
-#endif
+#endif /* #ifdef HAVE_MAS3587F */
     
 #ifdef DEBUG
     dbg_timer_start();
     dbg_cnt2us(0);
-#endif
+#endif /* DEBUG */
 }

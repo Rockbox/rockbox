@@ -29,6 +29,7 @@
 #include "status.h"
 #include "kernel.h"
 #include "mpeg.h"
+#include "mp3_playback.h"
 #include "ctype.h"
 #include "file.h"
 #include "errno.h"
