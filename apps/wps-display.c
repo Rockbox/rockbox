@@ -111,10 +111,13 @@ static const char* const genres[] = {
     "Duet", "Punk Rock", "Drum Solo", "A capella", "Euro-House", "Dance Hall"
 };
 
-char* wps_get_genre(unsigned int genre)
+char* wps_get_genre(struct mp3entry* id3)
 {
-    if (genre < sizeof(genres)/sizeof(char*))
-        return (char*)genres[genre];
+    if( id3->genre_string )
+        return id3->genre_string ;
+    
+    if (id3->genre < sizeof(genres)/sizeof(char*))
+        return (char*)genres[id3->genre];
     return NULL;
 }
 
@@ -383,12 +386,7 @@ static char* get_tag(struct mp3entry* id3,
                     return NULL;
 
                 case 'g':  /* genre */
-                    if( id3->genre_string )
-                        return id3->genre_string ;
-
-                    if (id3->genre < sizeof(genres)/sizeof(char*))
-                        return (char*)genres[id3->genre];
-                    return NULL;
+                    return wps_get_genre(id3);
 
                 case 'v': /* id3 version */
                     switch (id3->id3version) {

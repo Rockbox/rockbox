@@ -201,8 +201,8 @@ bool browse_id3(void)
             case 4:
                 lcd_puts(0, 0, str(LANG_ID3_GENRE));
                 lcd_puts_scroll(0, 1,
-                                wps_get_genre(id3->genre) ?
-                                wps_get_genre(id3->genre) :
+                                wps_get_genre(id3) ?
+                                wps_get_genre(id3) :
                                 (char*)str(LANG_ID3_NO_INFO));
                 break;
 
