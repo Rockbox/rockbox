@@ -20,9 +20,34 @@
 #include "debug.h"
 #include "mas.h"
 
-int mas_default_read(unsigned long *buf)
+int mas_default_read(unsigned short *buf)
 {
-    return mas_devread(buf, 1);
+    unsigned char *dest = (unsigned char *)buf;
+    int ret = 0;
+    
+    i2c_start();
+    i2c_outb(MAS_DEV_WRITE);
+    if (i2c_getack()) {
+        i2c_outb(MAS_DATA_READ);
+        if (i2c_getack()) {
+            i2c_start();
+            i2c_outb(MAS_DEV_READ);
+            if (i2c_getack()) {
+                    dest[0] = i2c_inb(0);
+                    dest[1] = i2c_inb(1);
+            }
+            else
+                ret = -3;
+        }
+        else
+            ret = -2;
+    }
+    else
+        ret = -1;
+    
+    i2c_stop();
+
+    return ret;
 }
 
 int mas_run(unsigned short address)
@@ -126,7 +151,7 @@ int mas_readreg(int reg)
     return buf[0] | buf[1] << 8 | buf[3] << 16;
 }
 
-int mas_writereg(int reg, unsigned short val)
+int mas_writereg(int reg, unsigned int val)
 {
     int i;
     unsigned char buf[16];
