@@ -18,8 +18,8 @@
  ****************************************************************************/
 
     .section    .icode,"ax",@progbits
-    .global     _bitswap
     .align      4
+    .global     _bitswap
     .type       _bitswap,@function
 
 /* Registers used:
@@ -36,46 +36,56 @@
 
 _bitswap:
     mov.l   .fliptable,r7
-    mov #1,r6
-    mov r4,r0
-    and #1,r0               /* odd address? */
-    cmp/eq  #0,r0
-    bt  .init               /* no, address is even */
+    mov     #1,r6
+    mov     r4,r0
+    tst     #1,r0           /* odd address? */
+    bt      .init           /* no, address is even */
 
     mov.b   @r4,r0          /* swap first byte */
     extu.b  r0,r0
     mov.b   @(r0,r7),r0
     mov.b   r0,@r4
-    add #1,r4
-    add #-1,r5
-    bra .init
+    add     #1,r4
+    add     #-1,r5
+    bra     .init 
+
+    /* The instruction order below is a bit strange, because:
+     * 1) Keeping load/stores on longword boundaries means the instruction
+     *    fetch won't compete with the memory access (because instructions
+     *    are fetched in pairs).
+     * 2) Using the result of a fetch in the next instruction causes a 
+     *    stall (except in certain circumstances).
+     * See the SH-1 programming manual for details.
+     */
+
 .loop:
     mov.w   @r4,r1          /* data to flip */
-    swap.b  r1,r2
-    extu.b  r2,r0           /* high byte */
-    mov.b   @(r0,r7),r2
-    extu.b  r2,r0           /* Zero extend */
-    swap.b  r0,r3           /* put high byte in result */
-    extu.b  r1,r0           /* low byte */
-    mov.b   @(r0,r7),r1
-    extu.b  r1,r0           /* Zero extend */
-    or  r0,r3               /* put low byte in result */
+    add     #-2,r5
+    swap.b  r1,r2           /* get high byte */
+    extu.b  r2,r0           /* prepare high byte */
+    mov.b   @(r0,r7),r2     /* swap high byte */
+    extu.b  r1,r0           /* perpare low byte */
+    mov.b   @(r0,r7),r1     /* swap low byte */
+    extu.b  r2,r2           /* zero extend high byte */
+    swap.b  r2,r3           /* put high byte in result */
+    extu.b  r1,r0           /* zero extend low byte */
+    or      r0,r3           /* put low byte in result */
     mov.w   r3,@r4          /* store result */
-    add #2,r4
-    add #-2,r5
+    add     #2,r4
 .init:
     cmp/gt  r6,r5           /* while [bytes remaining] > 1 */
-    bt  .loop               /* (at least 2 bytes left) */
+    bt      .loop           /* (at least 2 bytes left) */
 
     cmp/eq  r6,r5
     bf  .exit               /* if not 1 byte left, exit */
 
-    mov.b   @r4,r0              /* swap last byte */
+    mov.b   @r4,r0          /* swap last byte */
     extu.b  r0,r0
     mov.b   @(r0,r7),r0
     mov.b   r0,@r4
 .exit:
     rts
+    nop
 
     .align  4
 
