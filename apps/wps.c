@@ -213,7 +213,7 @@ int wps_show(void)
                the screen has room. */
             if (global_settings.wps_display == PLAY_DISPLAY_FILENAME_SCROLL)
             { 
-                snprintf(buffer,sizeof(buffer), "Time: %d:%02d / %d:%02d",
+                snprintf(buffer,sizeof(buffer), "%d:%02d/%d:%02d",
                          id3->elapsed / 60000,
                          id3->elapsed % 60000 / 1000,
                          id3->length / 60000,
