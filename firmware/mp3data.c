@@ -163,7 +163,9 @@ static bool mp3headerinfo(struct mp3info *info, unsigned long header)
     /* Bitrate */
     bitindex = (header & 0xf000) >> 12;
     info->bitrate = bitrate_table[bittable][info->layer][bitindex];
-
+    if(info->bitrate == 0)
+        return false;
+    
     /* Sampling frequency */
     freqindex = (header & 0x0C00) >> 10;
     info->frequency = freqtab[info->version][freqindex];
