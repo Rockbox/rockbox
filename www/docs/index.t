@@ -18,6 +18,7 @@
 <li><a href="datasheets.html">Data sheets</a>
 <li><a href="/schematics/">Schematics</a>
 <li><a href="/cvs.html">How to use CVS</a>
+<li><a href="/docs/patch.html">How To Work With Patches</a>
 <li><a href="/cross-gcc.html">Building the cross compiler</a>
 <li><a href="/sh-win/">Setting up the gnush cross compiler for Windows</a>
 <li><a href="http://rockbox.my-vserver.de/win32-sdk.html">Setting up a small (~7.5 MB) Rockbox development environment for Windows</a>
