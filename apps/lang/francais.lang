@@ -301,8 +301,6 @@ new: "Mode de tri"
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
-### English phrase was changed! Previous translation was made on:
-### "Scroll Speed"
 eng: "Scroll"
 new: "Vitesse de défilement"
 
@@ -1195,3 +1193,18 @@ id: LANG_TRICKLE_CHARGE
 desc: in settings_menu
 eng: "Trickle Charge"
 new: "Charge Max Persistante"
+
+id: LANG_QUEUE_FULL
+desc: queue buffer full
+eng: "Queue buffer full"
+new: "Buffer de Queue plein!"
+
+id: LANG_QUEUE_QUEUED
+desc: queued track name %s
+eng: "Queued: %s"
+new: "Mis en queue: %s"
+
+id: LANG_QUEUE_TOTAL
+desc: number of queued tracks %d
+eng: "Total queued: %d"
+new: "total mis en Queue: %d"
