@@ -67,8 +67,13 @@ bool device_muted = false;
 static bool ff_rewind = false;
 static bool paused = false;
 
+#ifdef CUSTOM_WPS
+static char custom_wps[64];
+#endif
+
 static void draw_screen(struct mp3entry* id3)
 {
+
     int font_height;
 #ifdef LOADABLE_FONTS
     unsigned char *font = lcd_getcurrentldfont();
@@ -91,10 +96,11 @@ static void draw_screen(struct mp3entry* id3)
     else
     {
 #ifdef CUSTOM_WPS
-        if(global_settings.wps_changed) {
-            if(global_settings.wps_display == PLAY_DISPLAY_CUSTOM_WPS)
-                load_custom_wps();
-            global_settings.wps_changed = false;
+        static int last_wps = -1;
+        if ( last_wps != global_settings.wps_display &&
+             global_settings.wps_display == PLAY_DISPLAY_CUSTOM_WPS ) {
+            load_custom_wps();
+            last_wps = global_settings.wps_display;
         }
 #endif
         switch ( global_settings.wps_display ) {
@@ -225,10 +231,10 @@ static void draw_screen(struct mp3entry* id3)
 #ifdef CUSTOM_WPS
             case PLAY_DISPLAY_CUSTOM_WPS:
             {
-                if(global_settings.custom_wps[0] == 0)
-                snprintf(global_settings.custom_wps, sizeof(global_settings.custom_wps),
+                if(custom_wps[0] == 0)
+                snprintf(custom_wps, sizeof(custom_wps),
                         "Couldn't Load Custom WPS");
-                display_custom_wps(0, 0, true, global_settings.custom_wps);
+                display_custom_wps(0, 0, true, custom_wps);
                 break;
             }
 #endif
@@ -247,11 +253,11 @@ bool load_custom_wps(void)
     fd = open("/wps.config", O_RDONLY);
     if(-1 == fd)
     {
-        global_settings.custom_wps[0] = 0;
+        custom_wps[0] = 0;
         close(fd);
         return(false);
     }
-    read(fd, global_settings.custom_wps, sizeof(global_settings.custom_wps));
+    read(fd, custom_wps, sizeof(custom_wps));
     close(fd);
     return(true);
 }
