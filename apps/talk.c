@@ -31,6 +31,7 @@
 #include "lang.h"
 #include "talk.h"
 #include "screens.h" /* test hack */
+#include "kernel.h"
 extern void bitswap(unsigned char *data, int length); /* no header for this */
 
 /***************** Constants *****************/
@@ -160,13 +161,20 @@ static void mp3_callback(unsigned char** start, int* size)
     }
 }
 
-
 /* stop the playback and the pending clips, but at frame boundary */
 static int shutup(void)
 {
     unsigned char* pos;
     unsigned char* search;
     unsigned char* end;
+    unsigned char frame1, frame3;
+    unsigned char *firstclip = mp3buf + p_voicefont->index[0].offset;
+
+    /* We use the first frame in the thumbnail buffer as a template
+       for finding headers, assuming that all thumbnails are encoded
+       with the same parameters */
+    frame1 = firstclip[1]; /* second byte of the first mp3 header */
+    frame3 = firstclip[3]; /* last byte of the first mp3 header */
 
     mp3_play_pause(false); /* pause */
 
@@ -177,22 +185,14 @@ static int shutup(void)
     pos = search = mp3_get_pos();
     end = queue[queue_read].buf + queue[queue_read].len;
 
+    /* Find the next frame boundary */
     while (search < end) /* search the remaining data */
     {
-        if (*search++ != 0xFF) /* search for frame sync byte */
+        if(search[0] == 0xff && search[1] == frame1 && search[3] == frame3)
         {
-            continue;
+            break;
         }
-            
-        /* look at the (bitswapped) 2nd byte of header candidate */
-        if ((*search & 0x07) == 0x07  /* rest of frame sync */
-         && (*search & 0x18) != 0x10  /* version != reserved */
-         && (*search & 0x60) != 0x00) /* layer != reserved */
-        {
-            break; /* From looking at the first 2 bytes, this is a header. */
-            /* this is not a sufficient condition to find header,
-               may give "false alert" (end too early), but a start */
-        }
+        search++;
     }
 
     queue_write = queue_read; /* reset the queue */
