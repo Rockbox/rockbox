@@ -299,7 +299,7 @@ int plugin_load(const char* plugin, void* parameter)
 
     pd = dlopen(path, RTLD_NOW);
     if (!pd) {
-        snprintf(buf, sizeof buf, "Can't open %s", plugin);
+        snprintf(buf, sizeof buf, str(LANG_PLUGIN_CANT_OPEN), plugin);
         splash(HZ*2, true, buf);
         DEBUGF("dlopen(%s): %s\n",path,dlerror());
         dlclose(pd);
