@@ -33,7 +33,7 @@
    255    21 min 15 s
 */
 extern void ata_enable(bool on);
-extern int ata_spindown(int time);
+extern void ata_spindown(int seconds);
 extern int ata_sleep(void);
 extern int ata_hard_reset(void);
 extern int ata_soft_reset(void);

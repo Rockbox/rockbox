@@ -19,11 +19,13 @@
 #include <stdbool.h>
 #include "ata.h"
 #include "kernel.h"
+#include "thread.h"
 #include "led.h"
 #include "sh7034.h"
 #include "system.h"
 #include "debug.h"
 #include "panic.h"
+#include "usb.h"
 
 #define SECTOR_SIZE     512
 #define ATA_DATA        (*((volatile unsigned short*)0x06104100))
@@ -61,6 +63,8 @@
 #define CMD_SLEEP                  0xE6
 #define CMD_SECURITY_FREEZE_LOCK   0xF5
 
+#define Q_SLEEP 0
+
 static struct mutex ata_mtx;
 char ata_device; /* device 0 (master) or 1 (slave) */
 int ata_io_address; /* 0x300 or 0x200, only valid on recorder */
@@ -68,6 +72,12 @@ static volatile unsigned char* ata_control;
 
 bool old_recorder = false;
 static bool sleeping = false;
+static int sleep_timer = 0;
+static int sleep_timeout = 5*HZ;
+static char ata_stack[DEFAULT_STACK_SIZE];
+static char ata_thread_name[] = "ata";
+static struct event_queue ata_queue;
+static bool initialized = false;
 
 static int wait_for_bsy(void)
 {
@@ -121,7 +131,8 @@ int ata_read_sectors(unsigned long start,
     }
 
     mutex_lock(&ata_mtx);
-    
+    sleep_timer = sleep_timeout;
+
     if (!wait_for_rdy())
     {
         mutex_unlock(&ata_mtx);
@@ -179,6 +190,7 @@ int ata_write_sectors(unsigned long start,
     }
 
     mutex_lock(&ata_mtx);
+    sleep_timer = sleep_timeout;
     
     if (!wait_for_rdy())
     {
@@ -254,39 +266,12 @@ static int freeze_lock(void)
     return 0;
 }
 
-int ata_spindown(int time)
+void ata_spindown(int seconds)
 {
-    int ret = 0;
-
-    mutex_lock(&ata_mtx);
-    
-    if(!wait_for_rdy())
-    {
-        mutex_unlock(&ata_mtx);
-        return -1;
-    }
-
-    if ( time == -1 ) {
-        ATA_COMMAND = CMD_STANDBY_IMMEDIATE;
-    }
-    else {
-        if (time > 255)
-        {
-            mutex_unlock(&ata_mtx);
-            return -1;
-        }
-        ATA_NSECTOR = time & 0xff;
-        ATA_COMMAND = CMD_STANDBY;
-    }
-
-    if (!wait_for_rdy())
-        ret = -1;
-
-    mutex_unlock(&ata_mtx);
-    return ret;
+    sleep_timeout = seconds * HZ;
 }
 
-int ata_sleep(void)
+static int ata_perform_sleep(void)
 {
     int ret = 0;
 
@@ -304,8 +289,47 @@ int ata_sleep(void)
         ret = -1;
 
     sleeping = true;
+    sleep_timer = 0;
     mutex_unlock(&ata_mtx);
     return ret;
+}
+
+int ata_sleep(void)
+{
+    queue_post(&ata_queue, Q_SLEEP, NULL);
+    return 0;
+}
+
+static void ata_thread(void)
+{
+    struct event ev;
+    
+    while (1) {
+        queue_wait(&ata_queue, &ev);
+        switch ( ev.id ) {
+	    case SYS_USB_CONNECTED:
+		/* Tell the USB thread that we are safe */
+		DEBUGF("backlight_thread got SYS_USB_CONNECTED\n");
+		usb_acknowledge(SYS_USB_CONNECTED_ACK);
+
+		/* Wait until the USB cable is extracted again */
+		usb_wait_for_disconnect(&ata_queue);
+		break;
+
+            case Q_SLEEP:
+                ata_perform_sleep();
+                break;
+        }
+    }
+}
+
+static void ata_tick(void)
+{
+    if (sleep_timer) {
+        sleep_timer--;
+        if (!sleep_timer)
+            queue_post(&ata_queue, 0, NULL);
+    }
 }
 
 int ata_hard_reset(void)
@@ -433,7 +457,7 @@ void ata_enable(bool on)
 int ata_init(void)
 {
     mutex_init(&ata_mtx);
-    
+
     led(false);
 
     ata_enable(true);
@@ -450,8 +474,13 @@ int ata_init(void)
     if (freeze_lock())
         return -4;
 
-    if (ata_spindown(1))
-        return -5;
+    if ( !initialized ) {
+        queue_init(&ata_queue);
+        create_thread(ata_thread, ata_stack,
+                      sizeof(ata_stack), ata_thread_name);
+        tick_add_task(ata_tick);
+        initialized = true;
+    }
 
     ATA_SELECT = SELECT_LBA;
     ATA_CONTROL = CONTROL_nIEN;
