@@ -109,17 +109,18 @@ garbled flash content: the UART boot mod, which in turn requires the
 serial mod. It can bring the dead back to life, with that it's
 possible to reflash independently from the outside, even if the flash
 is completely erased. It has been used that during development, else
-Rockbox in flash wouldn't have been possible. Most of the developing
-effort went into this tooling. So people skilled to do these mods
-don't need to worry. The others may feel unpleasant using the first
-tool for reflashing the firmware.
+Rockbox in flash wouldn't have been possible.
+Extensive development effort went into the exploitation of the UART boot 
+mod. Mechanically adept users with good soldering skills can easily perform 
+these mods. Others may feel uncomfortable using the first tool 
+(firmware_flash.rock) for reflashing the firmware.
 </p>
 <p>
-To
-comfort you a bit again: The flash tools are stable since quite a
-while. Several people use them a lot and quite careless meanwhile,
-even reflashed while playing. However, we don't generally recommend
-that. ;-)
+To comfort you a bit again: 
+If you are starting with a known-good image, you are unlikely to experience 
+problems. The flash tools have been stable for quite a while. Several users 
+have used them extensively, even flashing while playing! Although it worked, 
+it's not the recommended method. ;-)" 
 </p>
 <p>
 About
@@ -142,11 +143,10 @@ You need two things:
 </p>
 <ul>
 	<li>
-	The
-	first is a Recorder or FM model. Be sure you're using the correct
-	package, Recorder and FM are different! The technology works for the
-	Player models, too. Players can also be flashed, but Rockbox does
-	not run cold-started on those, yet.
+	The	first is a Recorder, FM Recorder or Recorder V2 model. Be sure 
+	you're using the correct package, they are different! The technology 
+	works for the Player models, too. Players can also be flashed, but Rockbox 
+	does not run cold-started on those, yet.
 	</li>
 	<li>
 	Second,
@@ -174,6 +174,8 @@ procedure:
 	<a href="http://joerg.hohensohn.bei.t-online.de/archos/flash/flash_rec.zip">Recorder</a>
     or
     <a href="http://joerg.hohensohn.bei.t-online.de/archos/flash/flash_fm.zip">FM</a>,
+    or
+    <a href="http://joerg.hohensohn.bei.t-online.de/archos/flash/flash_v2.zip">V2</a>,
 	copy some files of it to your box:
 	<ol>
 		<li>
@@ -182,8 +184,8 @@ procedure:
 		and have in the firmware file)
 		</li>
 		<li>
-		firmware_rec.bin
-		or firmware_fm.bin into the root directory (the complete firmware
+		firmware_rec.bin or firmware_fm.bin or firmware_v2.bin (name depends on
+		your model) into the root directory (the complete firmware
 		for your model, with the bootloader and the two images). There now
 		is also a _norom variant, copy both, the plugin will decide which
 		one is required for your box.
@@ -383,8 +385,15 @@ charging problems even with F1, they had to revert to the original
 flash content.
 </p>
 <p>
-If
-the plugin API is changed, new builds may render the plugins
+For FM and V2, the disk is not shutdown in the Rockbox charging screen.
+For these, we also recommend to charge using the Archos software.
+Because of some disks brief spinup attempt before reaching the charge
+screen, please avoid to discharge your battery flat, else
+it may be too weak to even get there, locking you out and requiring 
+external charging.
+</p>
+<p>
+If the plugin API is changed, new builds may render the plugins
 incompatible. When updating, make sure you grab those too, and rolo
 into the new version before flashing it.
 </p>
