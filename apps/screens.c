@@ -230,6 +230,10 @@ bool f2_screen(void)
                 used = true;
                 break;
 
+            case BUTTON_F2 | BUTTON_REPEAT:
+                used = true;
+                break;
+
             case SYS_USB_CONNECTED:
                 usb_screen();
                 return true;
@@ -287,6 +291,10 @@ bool f3_screen(void)
             case BUTTON_F3 | BUTTON_REL:
                 if ( used )
                     exit = true;
+                used = true;
+                break;
+
+            case BUTTON_F3 | BUTTON_REPEAT:
                 used = true;
                 break;
 
