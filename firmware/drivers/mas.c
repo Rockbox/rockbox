@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 #include "stdbool.h"
+#include "config.h"
 #include "sh7034.h"
 #include "i2c.h"
 #include "debug.h"
@@ -130,7 +131,7 @@ int mas_writemem(int bank, int addr, unsigned long* src, int len)
 
     j = 0;
     while(len--) {
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_MAS3587F
         buf[i++] = 0;
         buf[i++] = ptr[j+1];
         buf[i++] = ptr[j+2];
@@ -230,7 +231,7 @@ static int mas_devread(unsigned long *dest, int len)
             if (i2c_getack()) {
                 for (i=0;len;i++) {
                     len--;
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_MAS3587F
                     i2c_inb(0); /* Dummy read */
                     ptr[i*4+0] = 0;
                     ptr[i*4+1] = i2c_inb(0) & 0x0f;
@@ -264,8 +265,7 @@ static int mas_devread(unsigned long *dest, int len)
     return ret;
 }
 
-#ifdef ARCHOS_RECORDER
-
+#ifdef HAVE_MAS3587F
 void mas_reset(void)
 {
     PAIOR |= 0x100;

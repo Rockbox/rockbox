@@ -9,3 +9,6 @@
 
 /* define this if you have a real-time clock */
 #define HAVE_RTC 1
+
+/* Define this if you have a MAS3587F */
+#define HAVE_MAS3587F

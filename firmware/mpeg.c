@@ -88,7 +88,7 @@ static int minval[] =
 static int maxval[] =
 {
     50,    /* Volume */
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_MAS3587F
     24,    /* Bass */
     24,    /* Treble */
 #else
@@ -103,7 +103,7 @@ static int maxval[] =
 static int defaultval[] =
 {
     70/2,    /* Volume */
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_MAS3587F
     12+6,    /* Bass */
     12+6,    /* Treble */
 #else
@@ -233,7 +233,7 @@ static void remove_all_tags(void)
 static int last_dma_tick = 0;
 static int pause_tick = 0;
 
-#ifndef ARCHOS_RECORDER
+#ifdef HAVE_MAS3507D
 static unsigned int bass_table[] =
 {
     0x9e400, /* -15dB */
@@ -915,7 +915,7 @@ static void mpeg_thread(void)
             case MPEG_TRACK_CHANGE:
                 DEBUGF("Track change\n");
 
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_MAS3587F
                 /* Reset the AVC */
                 mpeg_sound_set(SOUND_AVC, -1);
 #endif
@@ -1062,7 +1062,7 @@ bool mpeg_is_playing(void)
 }
 
 #ifndef SIMULATOR
-#ifndef ARCHOS_RECORDER
+#ifdef HAVE_MAS3507D
 int current_volume=0;  /* all values in tenth of dB */
 int current_treble=0;
 int current_bass=0;
@@ -1099,8 +1099,8 @@ void set_prescaled_volume(void)
     
     dac_volume(tenthdb2reg(l), tenthdb2reg(r), false);
 }
-#endif /* ARCHOS_RECORDER */
-#endif /* SIMULATOR */
+#endif /* HAVE_MAS3507D */
+#endif /* !SIMULATOR */
 
 void mpeg_sound_set(int setting, int value)
 {
@@ -1114,7 +1114,7 @@ void mpeg_sound_set(int setting, int value)
         case SOUND_VOLUME:
             value *= 2; /* Convert to percent */
             
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_MAS3587F
             tmp = 0x7f00 * value / 100;
             mas_codec_writereg(0x10, tmp & 0xff00);
 #else
@@ -1128,7 +1128,7 @@ void mpeg_sound_set(int setting, int value)
             break;
 
         case SOUND_BASS:
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_MAS3587F
             tmp = (((value-12) * 8) & 0xff) << 8;
             mas_codec_writereg(0x14, tmp & 0xff00);
 #else    
@@ -1139,7 +1139,7 @@ void mpeg_sound_set(int setting, int value)
             break;
 
         case SOUND_TREBLE:
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_MAS3587F
             tmp = (((value-12) * 8) & 0xff) << 8;
             mas_codec_writereg(0x15, tmp & 0xff00);
 #else    
@@ -1149,7 +1149,7 @@ void mpeg_sound_set(int setting, int value)
 #endif
             break;
             
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_MAS3587F
         case SOUND_SUPERBASS:
             if (value) {
                 tmp = MAX(MIN(value * 12, 0x7f), 0);
@@ -1213,7 +1213,7 @@ int mpeg_val2phys(int setting, int value)
             break;
         
         case SOUND_BASS:
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_MAS3587F
             result = value - 12;
 #else
             result = value - 15;
@@ -1221,14 +1221,14 @@ int mpeg_val2phys(int setting, int value)
             break;
         
         case SOUND_TREBLE:
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_MAS3587F
             result = value - 12;
 #else
             result = value - 15;
 #endif
             break;
 
-#ifdef ARCHOS_RECORDER            
+#ifdef HAVE_MAS3587F
         case SOUND_LOUDNESS:
             result = value;
             break;
@@ -1247,7 +1247,7 @@ void mpeg_init(int volume, int bass, int treble, int loudness, int bass_boost, i
     volume = bass = treble = loudness = bass_boost = avc;
 #else
     unsigned long val;
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_MAS3587F
     int rc;
 #else
     loudness = bass_boost = avc;
@@ -1255,7 +1255,7 @@ void mpeg_init(int volume, int bass, int treble, int loudness, int bass_boost, i
 
     setup_sci0();
 
-#ifdef ARCHOS_RECORDER
+#ifdef HAVE_MAS3587F
     mas_reset();
     
     /* Enable the audio CODEC and the DSP core, max analog voltage range */
@@ -1291,7 +1291,7 @@ void mpeg_init(int volume, int bass, int treble, int loudness, int bass_boost, i
     mas_writemem(MAS_BANK_D0,0x7f6,&val,1);    
 #endif
     
-#ifndef ARCHOS_RECORDER
+#ifdef HAVE_MAS3507D
     mas_writereg(0x3b, 0x20); /* Don't ask why. The data sheet doesn't say */
     mas_run(1);
     sleep(HZ);
@@ -1334,7 +1334,7 @@ void mpeg_init(int volume, int bass, int treble, int loudness, int bass_boost, i
                   sizeof(mpeg_stack), mpeg_thread_name);
     mas_poll_start(2);
 
-#ifndef ARCHOS_RECORDER
+#ifdef HAVE_MAS3507D
     mas_writereg(MAS_REG_KPRESCALE, 0xe9400);
     dac_config(0x04); /* DAC on, all else off */
 
@@ -1346,7 +1346,8 @@ void mpeg_init(int volume, int bass, int treble, int loudness, int bass_boost, i
     mpeg_sound_set(SOUND_BASS, bass);
     mpeg_sound_set(SOUND_TREBLE, treble);
     mpeg_sound_set(SOUND_VOLUME, volume);
-#ifdef ARCHOS_RECORDER
+    
+#ifdef HAVE_MAS3587F
     mpeg_sound_set(SOUND_LOUDNESS, loudness);
     mpeg_sound_set(SOUND_SUPERBASS, bass_boost);
     mpeg_sound_set(SOUND_AVC, avc);
