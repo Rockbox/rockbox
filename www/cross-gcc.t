@@ -19,7 +19,7 @@ You will need the following archives:
 <p>
 <pre>
  /home/linus> tar zxf binutils-2.11.tar.gz
- /home/linus> tar zxf gcc-3.0.3.tar.gz
+ /home/linus> tar zxf gcc-3.0.4.tar.gz
  /home/linus> tar zxf gdb-5.1.1.tar.gz
 </pre>
 
@@ -61,7 +61,7 @@ binutils in the PATH.
 <pre>
  /home/linus> export PATH=/home/linus/sh1/bin:$PATH
  /home/linus> cd build/gcc
- /home/linus/gcc> ../../gcc-3.0.3/configure --target=sh-elf --prefix=/home/linus/sh1 --enable-languages=c
+ /home/linus/gcc> ../../gcc-3.0.4/configure --target=sh-elf --prefix=/home/linus/sh1 --enable-languages=c
  /home/linus/build/gcc> make
  /home/linus/build/gcc> make install
 </pre>
