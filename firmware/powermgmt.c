@@ -87,6 +87,9 @@ static int poweroff_timeout = 0;
 static long last_charge_time = 0;
 static int powermgmt_est_runningtime_min = -1;
 
+static bool sleeptimer_active = false;
+static unsigned long sleeptimer_endtick;
+
 unsigned short power_history[POWER_HISTORY_LEN];
 #ifdef HAVE_CHARGE_CTRL
 char power_message[POWER_MESSAGE_LEN] = "";
@@ -190,6 +193,28 @@ void set_poweroff_timeout(int timeout)
     poweroff_timeout = timeout;
 }
 
+void set_sleep_timer(int seconds)
+{
+    if(seconds)
+    {
+        sleeptimer_active = true;
+        sleeptimer_endtick = current_tick + seconds * HZ;
+    }
+    else
+    {
+        sleeptimer_active = false;
+        sleeptimer_endtick = 0;
+    }
+}
+
+int get_sleep_timer(void)
+{
+    if(sleeptimer_active)
+        return (sleeptimer_endtick - current_tick) / HZ;
+    else
+        return 0;
+}
+
 /* We shut off in the following cases:
    1) The unit is idle, not playing music
    2) The unit is playing music, but is paused
@@ -223,6 +248,19 @@ static void handle_auto_poweroff(void)
            TIME_AFTER(current_tick, last_disk_activity + timeout) &&
            TIME_AFTER(current_tick, last_charge_time + timeout))
             power_off();
+    }
+    else
+    {
+        /* Handle sleeptimer */
+        if(sleeptimer_endtick &&
+           !usb_inserted())
+        {
+            if(TIME_AFTER(current_tick, sleeptimer_endtick))
+            {
+                DEBUGF("Sleep timer timeout. Shutting off...\n");
+                power_off();
+            }
+        }
     }
 }
 

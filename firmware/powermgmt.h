@@ -76,4 +76,7 @@ bool battery_level_safe(void);
 
 void set_poweroff_timeout(int timeout);
 
+void set_sleep_timer(int seconds);
+int get_sleep_timer(void);
+
 #endif
