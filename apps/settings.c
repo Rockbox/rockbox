@@ -49,6 +49,7 @@
 #include "icons.h"
 #include "font.h"
 #include "peakmeter.h"
+#include "hwcompat.h"
 #endif
 #include "lang.h"
 #include "language.h"
@@ -61,7 +62,7 @@
 struct user_settings global_settings;
 char rockboxdir[] = ROCKBOX_DIR;       /* config/font/data file directory */
 
-#define CONFIG_BLOCK_VERSION 5
+#define CONFIG_BLOCK_VERSION 6
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -549,6 +550,15 @@ void settings_apply(void)
     }
 }
 
+static int default_contrast(void)
+{
+#ifdef HAVE_LCD_CHARCELLS
+    return 30;
+#else
+    return (read_hw_mask() & LCD_CONTRAST_BIAS) ? 31 : 49;
+#endif
+}
+
 /*
  * load settings from disk or RTC RAM
  */
@@ -581,7 +591,7 @@ void settings_load(void)
             global_settings.invert =
                 config_block[0xa] & 0x40 ? true : false;
             if ( global_settings.contrast < MIN_CONTRAST_SETTING )
-                global_settings.contrast = DEFAULT_CONTRAST_SETTING;
+                global_settings.contrast = default_contrast();
             global_settings.show_icons =
                 config_block[0xa] & 0x80 ? true : false;
         }
@@ -989,7 +999,7 @@ bool settings_load_config(char* file)
             set_cfg_bool(&global_settings.play_selected, value);
         else if (!strcasecmp(name, "contrast"))
             set_cfg_int(&global_settings.contrast, value,
-                        0, MAX_CONTRAST_SETTING);
+                        MIN_CONTRAST_SETTING, MAX_CONTRAST_SETTING);
         else if (!strcasecmp(name, "scroll speed"))
             set_cfg_int(&global_settings.scroll_speed, value, 1, 10);
         else if (!strcasecmp(name, "scan min step")) {
@@ -1405,7 +1415,7 @@ void settings_reset(void) {
     global_settings.rec_right_gain = 2; /* 0dB */
     global_settings.rec_editable = false;
     global_settings.resume      = RESUME_ASK;
-    global_settings.contrast    = DEFAULT_CONTRAST_SETTING;
+    global_settings.contrast    = default_contrast();
     global_settings.invert      = DEFAULT_INVERT_SETTING;
     global_settings.poweroff    = DEFAULT_POWEROFF_SETTING;
     global_settings.backlight_timeout   = DEFAULT_BACKLIGHT_TIMEOUT_SETTING;

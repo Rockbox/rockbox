@@ -46,7 +46,8 @@
 static bool contrast(void)
 {
     return set_int( str(LANG_CONTRAST), "", &global_settings.contrast, 
-                    lcd_set_contrast, 1, 0, MAX_CONTRAST_SETTING );
+                    lcd_set_contrast, 1, MIN_CONTRAST_SETTING,
+                    MAX_CONTRAST_SETTING );
 }
 
 static bool caption_backlight(void)
