@@ -64,6 +64,9 @@ static struct plugin_api rockbox_api = {
     lcd_stop_scroll,
 #ifdef HAVE_LCD_CHARCELLS
     lcd_define_pattern,
+    lcd_get_locked_pattern,
+    lcd_unlock_pattern,
+    lcd_putc,
 #else
     lcd_putsxy,
     lcd_bitmap,

@@ -41,8 +41,9 @@
 #include "lcd.h"
 #include "id3.h"
 #include "mpeg.h"
+
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 5 
+#define PLUGIN_API_VERSION 6
 
 /* plugin return codes */
 enum plugin_status {
@@ -87,6 +88,9 @@ struct plugin_api {
     void (*lcd_stop_scroll)(void);
 #ifdef HAVE_LCD_CHARCELLS
     void (*lcd_define_pattern)(int which,char *pattern);
+    unsigned char (*lcd_get_locked_pattern)(void);
+    void (*lcd_unlock_pattern)(unsigned char pat);
+    void (*lcd_putc)(int x, int y, unsigned short ch);
 #else
     void (*lcd_putsxy)(int x, int y, unsigned char *string);
     void (*lcd_bitmap)(unsigned char *src, int x, int y,
