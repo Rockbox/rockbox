@@ -52,8 +52,6 @@ int button_set_release(int newmask)
 
 int button_get(bool block)
 {
-    int func_call = current_tick;
-    
     int btn = 0;
     do
     {
