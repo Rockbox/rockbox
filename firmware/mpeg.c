@@ -52,6 +52,13 @@ static char *units[] =
     "%"     /* Treble */
 };
 
+static int numdecimals[] =
+{
+    1,    /* Volume */
+    2,    /* Bass */
+    1     /* Treble */
+};
+
 static int minval[] =
 {
     0,    /* Volume */
@@ -76,6 +83,11 @@ static int defaultval[] =
 char *mpeg_sound_unit(int setting)
 {
     return units[setting];
+}
+
+int mpeg_sound_numdecimals(int setting)
+{
+    return numdecimals[setting];
 }
 
 int mpeg_sound_min(int setting)
@@ -738,15 +750,15 @@ int mpeg_val2phys(int setting, int value)
     switch(setting)
     {
         case SOUND_VOLUME:
-            result = value * 2;
+            result = value * 20;
             break;
         
         case SOUND_BASS:
-            result = value * 2;
+            result = value * 200;
             break;
         
         case SOUND_TREBLE:
-            result = value * 2;
+            result = value * 20;
             break;
     }
     return result;
