@@ -137,22 +137,20 @@ void display_keylock_text(bool locked)
 
 void display_mute_text(bool muted)
 {
-    lcd_clear_display();
-
+    char *s;
+    lcd_stop_scroll();
 #ifdef HAVE_LCD_CHARCELLS
     if (muted)
-        lcd_puts(0, 0, str(LANG_MUTE_ON_PLAYER));
+        s = str(LANG_MUTE_ON_PLAYER);
     else
-        lcd_puts(0, 0, str(LANG_MUTE_OFF_PLAYER));
+        s = str(LANG_MUTE_OFF_PLAYER);
 #else
     if (muted)
-        lcd_puts(2, 3, str(LANG_MUTE_ON_RECORDER));
+        s = str(LANG_MUTE_ON_RECORDER);
     else
-        lcd_puts(2, 3, str(LANG_MUTE_OFF_RECORDER));
-    lcd_update();
+        s = str(LANG_MUTE_OFF_RECORDER);
 #endif
-    
-    sleep(HZ);
+    splash(HZ, true, s);
 }
 
 bool browse_id3(void)
