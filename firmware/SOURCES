@@ -92,7 +92,9 @@ crt0.S
 #endif
 mp3_playback.c
 mp3data.c
+#ifndef BOOTLOADER
 mpeg.c
+#endif
 #ifndef WIN32 /* the win32 sim has its own versin of these: */
 panic.c
 debug.c
