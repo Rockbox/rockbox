@@ -52,7 +52,7 @@ ifeq ($(UNAME),Linux)
   INCLUDES += -I/usr/X11R6/include
   LIBDIRS = -L/usr/X11R6/lib
   DEFINES += -DLINUX
-#  MPEG_PLAY = 1
+ # MPEG_PLAY = 1
 else
   DEFINES += -DBIG_ENDIAN
   LIBDIRS = 
@@ -64,7 +64,7 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES)
 
 FIRMSRCS = chartables.c lcd.c sprintf.c id3.c debug.c
 
-APPS = tetris.c screensaver.c tree.c app.c play.c menu.c icons.c bmp.c
+APPS = tetris.c screensaver.c tree.c app.c play.c menu.c icons.c bmp.c credits.c
 
 
 SRCS = screenhack.c uibasic.c resources.c visual.c lcd-x11.c \
@@ -125,6 +125,9 @@ mpegplay.o: $(PREVAPPDIR)/common/mpegplay.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 endif
+
+credits.o: $(APPDIR)/credits.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 menu.o: $(APPDIR)/menu.c
 	$(CC) $(CFLAGS) -c $< -o $@
