@@ -256,3 +256,8 @@ A17: Charging starts if the battery level is below 85%. This is because
      night. Charging will then start some hours later. The second possibility:
      Use the Archos charging algorithm. At least, your batteries will be full
      one more time. ;-)
+
+Q18: Why does rockbox show a question mark for the battery level?
+A18: Rockbox waits for about a minute to show a battery reading, to increase
+     the reliability of the reading. In previous versions, the battery level
+     rockbox initially reported was always too low.

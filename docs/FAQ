@@ -273,9 +273,8 @@ A44: This is because the Player font is character cell based (as opposed to
 
 Q45: Why don't you have as many games available for the Players?
 A45: The display on the Players is character cell and not bitmap based.  
-     This means we can only control what characters get displayed, not
-     what pixels are shown.  This means that the prospect of game play are
-     limited, but we are always open for new submissions.
+     This means there is much more limitations in the amount of graphics that
+     can be displayed, and thus what kind of games can be written.
 
 Q46: I keep shutting off my player in my pocket. Can the OFF (Recorder) or
      STOP (Player) key be locked?
@@ -298,7 +297,7 @@ Q50: Would it be possible to record from line in on the player?
 A50: No.
 
 Q51: I have a question about the id3v1 and id3v2 tags...
-A51: Stop!  Rockbox supports both id3v1 and id3v2.  If you have problems
+A51: Rockbox supports both id3v1 and id3v2.  If you have problems,
      report it to the developers and please provide an example.
 
 Q52: Where exactly did the name 'Rockbox' come from?
@@ -314,10 +313,10 @@ A52: Well you can follow the full line of emails at
      There you have it.  Recommended by users, decision by dictator.
 
 Q53: Why is there a limit of 400 files in a directory?
-A53: This is a configurable value, 400 files is the default.
+A53: This is a configurable value, 400 files is just the default.
 
 Q54: Why is there a 10,000 song limit on playlists?
-A54: This is a configurable value, 10,000 songs is the default.
+A54: This is a configurable value, 10,000 songs is just the default.
 
 Q55: How can I make playlists on my PC?
 A55: There are many programs that can create .m3u playlists. WinAmp is one.
@@ -372,30 +371,32 @@ A59: If we were better programmers we would take that as an insult.  But we
      can be found under our bug submission rules.)
 
 Q60: What's with all the different versions of Rockbox?
-A60: There are really only two versions of Rockbox.  One for Players and one
-     for Recorders.  However, we do have 3 other 'versions' of Rockbox 
-     available for download.  These would be Releases, Daily Builds, and 
-     Bleeding Edge.
 
-     The Release version (currently 2.0) has a fixed feature set.  This means
-     that we are confident that few, if any, significant bugs still reside
-     within the code/features of that 'version'.  This is the version for the 
-     common user. 
+A60: We currently support four different hardware platforms: Players, Recorder
+     v1, Recorder v2 and FM Recorder.
+     For each platform, Rockbox is released in three versions: Release, Daily
+     Build and Bleeding Edge. These only differ in release frequency.
 
-     The Daily Builds (see: http://rockbox.haxx.se/daily.shtml#target_builds)
-     are automated daily builds of the CVS code.  As such they contain all
-     the new features (and bugs ;) ) that have been introduced after the 
-     last official release, and upto and including that morning.  
+     The Release version (currently 2.1) is a frozen known-good state. This
+     means that we are confident that few, if any, significant bugs reside
+     within the code for that version. This is the version for the common
+     user.
 
-     The Bleeding Edge 'versions' are automated builds that are updated 
-     every 20 minutes or so.  This are as feature full and bug ridden as you 
-     can possibly get if you are not a developer, or are not pulling directly
-     from the CVS tree.
+     The Daily Builds (http://rockbox.haxx.se/daily.shtml) are automated
+     daily builds of the CVS (development) code.  As such they contain all the
+     new features (and bugs) that have been introduced after the last official
+     release, up to this morning.
+
+     The Bleeding Edge builds (http://rockbox.haxx.se/daily.shtml#bleeding_edge)
+     are built from the CVS code every 20 minutes. The purpose of these builds
+     is to verify the code builds properly on all platforms (and simulators)
+     and also to allow testers to try out new features and bug fixes without
+     having to build the code themselves.
  
-     Please Note: Daily and Bleeding Edge builds are expected to be buggy.
-     We ask that you _do not_ submit bug reports for Bleeding Edge versions,
-     but would love to hear any reports you may have about Release or Daily
-     build versions. (see "How can I report about bugs in Rockbox?")
+     Please Note: Bleeding Edge builds are expected to be buggy at times. We
+     ask that you _do not_ submit bug reports for Bleeding Edge builds, but
+     would love to hear any reports you may have about Release or Daily build
+     versions. (see "How can I report about bugs in Rockbox?")
             
 Q61: I am in Windows and can't create a .rockbox directory to store my
      files.  When are you going to fix this?
@@ -416,8 +417,14 @@ A62: Truth is, we don't need to fix anything.  If you are using OSX then you
      the Finder, then name the folder.  
          
 Q63: Will Rockbox work on any of Archos' other units?
-A63: Right now Rockbox supports the Archos' Players, Recorders (v1 and v2)
-     and the FM Recorder.
+A63: Other than the 4 currently supported models: no, probably not. If Archos
+     releases another rockbox-able player (such as the V2) then rockbox will
+     find its way onto it, but their new devices as the Gmini, MM, and AV
+     units are completely different hardware and probably won't be supported
+     by rockbox unless someone enthusiastically reverse engineers them and
+     submits patches to make it happen.
+
+     See also: http://rockbox.haxx.se/docs/nodo.html#7
 
 Q64: I copied the rockbox MOD/AJZ file to the root, removed the jukebox
      safely and rebooted. But Rockbox still didn't load. What is wrong?
@@ -526,9 +533,7 @@ A68: We have no way of knowing the correct contrast setting from start and the
      you like the contrast)
 
 Q69: Where are the FM controls for the FM Recorder?
-A69: In Rockbox 2.0 and earlier, FM support was not yet developed. FM tuner
-     support is only available using the very latest versions of the Rockbox
-     builds for the FM Recorder.
+A69: In the menu: FM Radio
 
 Q70: I installed/renamed ajbrec.ajz (or archos.mod) but I am still booting
      with another version of firmware.
