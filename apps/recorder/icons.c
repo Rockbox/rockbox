@@ -72,10 +72,13 @@ const unsigned char bitmap_icons_7x8[][7] =
     {0x3e,0x41,0x51,0x41,0x45,0x41,0x3e}, /* Shuffle playmode (dice) */
     {0x04,0x0c,0x1c,0x3c,0x1c,0x0c,0x04}, /* Down-arrow */
     {0x20,0x30,0x38,0x3c,0x38,0x30,0x20}, /* Up-arrow */
-#ifndef HAVE_LED
-    {0x1c,0x22,0x41,0x49,0x41,0x22,0x1c}, /* Disk/MMC activity */
-#endif
 };
+
+#ifndef HAVE_LED
+/* Disk/MMC activity */
+const unsigned char bitmap_icon_disk[12] = 
+    {0x15,0x3f,0x7d,0x7B,0x77,0x67,0x79,0x7b,0x57,0x4f,0x47,0x7f};
+#endif
 
 #if LCD_WIDTH == 112 || LCD_WIDTH == 128
 /* Archos Jukebox/ Ondio + Gmini LCD width */
@@ -408,7 +411,7 @@ void statusbar_icon_lock(void)
  */
 void statusbar_led(void)
 {
-    lcd_bitmap(bitmap_icons_7x8[Icon_Disk], ICON_DISK_X_POS, 
+    lcd_bitmap(bitmap_icon_disk, ICON_DISK_X_POS, 
                STATUSBAR_Y_POS, ICON_DISK_WIDTH, STATUSBAR_HEIGHT, false);
 }
 #endif

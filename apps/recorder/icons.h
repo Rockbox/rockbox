@@ -57,15 +57,15 @@ enum icons_7x8 {
     Icon_Shuffle,
     Icon_DownArrow,
     Icon_UpArrow,
-#ifndef HAVE_LED
-	Icon_Disk,
-#endif
     Icon_Last
 };
 
 extern const unsigned char bitmap_icons_5x8[1][5];
 extern const unsigned char bitmap_icons_6x8[LastIcon][6];
 extern const unsigned char bitmap_icons_7x8[Icon_Last][7];
+#ifndef HAVE_LED
+extern const unsigned char bitmap_icon_disk[];
+#endif
 
 #if LCD_WIDTH == 112 || LCD_WIDTH == 128
 extern const unsigned char rockbox112x37[];
@@ -92,7 +92,7 @@ extern const unsigned char rockbox160x53[];
 #define ICON_SHUFFLE_WIDTH    7
 #define LOCK_X_POS            STATUSBAR_X_POS+ICON_BATTERY_WIDTH+ICON_PLUG_WIDTH+ICON_VOLUME_WIDTH+ICON_PLAY_STATE_WIDTH+ICON_PLAY_MODE_WIDTH+ICON_SHUFFLE_WIDTH+2+2+2+2+2+2
 #define LOCK_WIDTH            5
-#define ICON_DISK_WIDTH       7
+#define ICON_DISK_WIDTH       12
 #define ICON_DISK_X_POS       STATUSBAR_WIDTH-ICON_DISK_WIDTH
 #define TIME_X_END            STATUSBAR_WIDTH-1
 
