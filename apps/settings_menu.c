@@ -89,7 +89,7 @@ static Menu backlight_timer(void)
 
 static Menu scroll_speed(void)
 {
-    set_int("Scroll speed indicator...", "", &global_settings.scroll_speed, 
+    set_int("Scroll speed indicator...   ", "", &global_settings.scroll_speed, 
             &lcd_scroll_speed, 1, 1, 20 );
     return MENU_OK;
 }
