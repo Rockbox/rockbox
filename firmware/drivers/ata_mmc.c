@@ -626,7 +626,7 @@ int ata_read_sectors(IF_MV2(int drive,)
                      void* inbuf)
 {
     int ret = 0;
-    int i;
+    int last_sector;
     unsigned long addr;
     unsigned char response;
     void *inbuf_prev = NULL;
@@ -645,22 +645,17 @@ int ata_read_sectors(IF_MV2(int drive,)
     if (start + incount > card->numsectors)
         panicf("Reading past end of card\n");
 
+    /* some cards don't like reading the very last sector with
+     * CMD_READ_MULTIPLE_BLOCK, so make sure this sector is always
+     * read with CMD_READ_SINGLE_BLOCK. */
+    last_sector = (start + incount == card->numsectors) ? 1 : 0;
+
     if (ret == 0)
     {
-        if (incount == 1)
-        {   
-            ret = send_cmd(CMD_READ_SINGLE_BLOCK, addr, &response);
-            if (ret == 0)
-            {
-                ret = receive_sector(inbuf, inbuf_prev, card->read_timeout);
-                inbuf_prev = inbuf;
-                last_disk_activity = current_tick;
-            }
-        }
-        else
+        if (incount > 1)
         {
             ret = send_cmd(CMD_READ_MULTIPLE_BLOCK, addr, &response);
-            for (i = 0; (i < incount) && (ret == 0); i++)
+            for (; (incount > last_sector) && (ret == 0); incount--)
             {
                 ret = receive_sector(inbuf, inbuf_prev, card->read_timeout);
                 inbuf_prev = inbuf;
@@ -670,13 +665,24 @@ int ata_read_sectors(IF_MV2(int drive,)
             if (ret == 0)
                 ret = send_cmd(CMD_STOP_TRANSMISSION, 0, &response);
         }
+        if (incount && (ret == 0))
+        {
+            ret = send_cmd(CMD_READ_SINGLE_BLOCK, addr, &response);
+            if (ret == 0)
+            {
+                ret = receive_sector(inbuf, inbuf_prev, card->read_timeout);
+                inbuf_prev = inbuf;
+                last_disk_activity = current_tick;
+            }
+        }
+            
         if (ret == 0)
             bitswap(inbuf_prev, SECTOR_SIZE);
     }
 
     deselect_card();
     mutex_unlock(&mmc_mutex);
-
+    
     /* only flush if reading went ok */
     if ( (ret == 0) && delayed_write )
         ata_flush();
@@ -690,7 +696,6 @@ int ata_write_sectors(IF_MV2(int drive,)
                       const void* buf)
 {
     int ret = 0;
-    int i;
     unsigned long addr;
     unsigned char response;
     tCardInfo *card;
@@ -724,7 +729,7 @@ int ata_write_sectors(IF_MV2(int drive,)
         {
             swapcopy_sector(buf); /* prepare first sector */
             ret = send_cmd(CMD_WRITE_MULTIPLE_BLOCK, addr, &response);
-            for (i = 1; (i < count) && (ret == 0); i++)
+            for (; (count > 1) && (ret == 0); count--)
             {
                 buf += SECTOR_SIZE;
                 ret = send_sector(buf, card->write_timeout);
