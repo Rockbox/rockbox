@@ -60,6 +60,8 @@
 #define STATUS_DRQ      0x08
 #define STATUS_ERR      0x01
 
+#define ERROR_ABRT      0x04
+
 #define CONTROL_nIEN    0x02
 #define CONTROL_SRST    0x04
 
@@ -880,10 +882,22 @@ static int set_features(void)
         { 83, 3, 0x05, 1 },    /* power management: lowest power */
         { 83, 9, 0x42, 0x80 }, /* acoustic management: lowest noise */
         { 82, 6, 0xaa, 0 },    /* enable read look-ahead */
+        { 83, 14, 0x03, 0 },   /* force PIO mode */
         { 0, 0, 0, 0 }         /* <end of list> */
     };
     int i;
+    int pio_mode = 2;
 
+    /* Find out the highest supported PIO mode */
+    if(identify_info[64] & 2)
+        pio_mode = 4;
+    else
+        if(identify_info[64] & 1)
+            pio_mode = 3;
+
+    /* Update the table */
+    features[3].parameter = 8 + pio_mode;
+    
     ATA_SELECT = ata_device;
 
     if (!wait_for_rdy()) {
@@ -899,7 +913,13 @@ static int set_features(void)
 
             if (!wait_for_rdy()) {
                 DEBUGF("set_features() - CMD failed\n");
-                return -2 - i;
+                return -10 - i;
+            }
+
+            if(ATA_ALT_STATUS & STATUS_ERR) {
+                if(ATA_ERROR & ERROR_ABRT) {
+                    return -20 - i;
+                }
             }
         }
     }
