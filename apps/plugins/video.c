@@ -330,6 +330,7 @@ int main(char* filename)
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
+    int ret;
     /* this macro should be called as the first thing you do in the plugin.
     it test that the api version and model the plugin was compiled for
     matches the machine it is running on */
@@ -339,12 +340,15 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     
     if (parameter == NULL)
     {
-        rb->splash(HZ*2, 0, true, "play .rfv file");
+        rb->splash(HZ*2, 0, true, "Play .rvf file!");
         return PLUGIN_ERROR;
     }
 
     /* now go ahead and have fun! */
-    return main((char*) parameter);
+    ret = main((char*) parameter);
+    if (ret==PLUGIN_USB_CONNECTED)
+        rb->usb_screen();
+    return ret;
 }
 
 #endif /* #ifdef HAVE_LCD_BITMAP */
