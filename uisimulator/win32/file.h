@@ -24,6 +24,10 @@
 #include <fcntl.h>
 #endif
 
+#ifndef _commit
+extern int _commit( int handle );
+#endif
+
 int win32_rename(char *oldpath, char *newpath);
 int win32_filesize(int fd);
 

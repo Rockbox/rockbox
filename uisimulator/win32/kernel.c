@@ -104,14 +104,18 @@ int set_irq_level (int level)
     return (_lv = level);
 }
 
+/* TODO: Implement mutexes for win32 */
 void mutex_init(struct mutex *m)
 {
+    (void)m;
 }
 
 void mutex_lock(struct mutex *m)
 {
+    (void)m;
 }
 
 void mutex_unlock(struct mutex *m)
 {
+    (void)m;
 }
