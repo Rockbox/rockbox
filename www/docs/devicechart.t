@@ -161,12 +161,12 @@
     <td>LiIon (Custom)</td>
 </tr>
 <tr><th><b>Charger spec</b></th>
-    <td>9-12V 600mA</td>
-    <td>9-12V 600mA</td>
-    <td>9-12V 600mA</td>
-    <td>9-12V 600mA</td>
-    <td>6V 700mA</td>
-    <td>6V 700mA</td>
+    <td>9-12V 600mA center&nbsp;+</td>
+    <td>9-12V 600mA center&nbsp;+</td>
+    <td>9-12V 600mA center&nbsp;+</td>
+    <td>9-12V 600mA center&nbsp;+</td>
+    <td>6V 700mA center&nbsp;+</td>
+    <td>6V 700mA center&nbsp;+</td>
 </tr>
 <tr><th><b>Dimensions</b></th>
     <td>115x83x34 mm (4.5"x3.2"x1.3")</td>
