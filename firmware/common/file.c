@@ -174,16 +174,16 @@ int close(int fd)
         return -2;
     }
     if (file->write) {
-        /* truncate? */
-        if (file->trunc) {
-            if (ftruncate(fd, file->fileoffset) < 0)
-                return -1;
-        }
-
         /* flush sector cache */
         if ( file->dirty ) {
             if (flush_cache(fd) < 0)
                 return -2;
+        }
+
+        /* truncate? */
+        if (file->trunc) {
+            if (ftruncate(fd, file->fileoffset) < 0)
+                return -1;
         }
 
         /* tie up all loose ends */
