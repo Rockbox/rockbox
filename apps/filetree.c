@@ -392,13 +392,10 @@ int ft_enter(struct tree_context* c)
 
             case TREE_ATTR_LNG:
                 if(!lang_load(buf)) {
-                    extern bool language_changed; /* from settings_menu.c */
-
                     set_file(buf, global_settings.lang_file,
                              MAX_FILENAME);
                     talk_init(); /* use voice of same language */
                     splash(HZ, true, str(LANG_LANGUAGE_LOADED));
-                    language_changed = true;
                 }
                 break;
 

@@ -55,9 +55,6 @@ void dac_line_in(bool enable);
 #include "alarm_menu.h"
 #endif
 
-/* This flag is set by dirbrowse() if a new language is loaded */
-bool language_changed;
-
 #ifdef HAVE_CHARGING
 static bool car_adapter_mode(void)
 {
@@ -897,9 +894,7 @@ static bool custom_cfg_browse(void)
 
 static bool language_browse(void)
 {
-    language_changed = false;
-    rockbox_browse(ROCKBOX_DIR LANG_DIR, SHOW_LNG);
-    return language_changed;
+    return rockbox_browse(ROCKBOX_DIR LANG_DIR, SHOW_LNG);
 }
 
 static bool voice_menus(void)
