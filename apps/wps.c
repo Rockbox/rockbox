@@ -40,55 +40,50 @@
 /* demonstrates showing different formats from playtune */
 void wps_show_play(char* filename)
 {
-     mp3entry  mp3;
-     mp3info(&mp3,filename);
+    mp3entry  mp3;
+    mp3info(&mp3,filename);
 
-     lcd_clear_display();
+    lcd_clear_display();
 
-     switch (global_settings.wps_display)
-     {
-          case PLAY_DISPLAY_TRACK_TITLE:
-          {
+    switch (global_settings.wps_display)
+    {
+        case PLAY_DISPLAY_TRACK_TITLE:
+        {
             int ch = '/';
             char* end;
+            char* szTok;
+            char* szDelimit;
             char szArtist[26];
             char szBuff[257];
             szBuff[sizeof(szBuff)-1] = 0;
 
             strncpy(szBuff, filename, sizeof(szBuff));
 
-            char* szTok = strtok_r(szBuff, "/", &end);
+            szTok = strtok_r(szBuff, "/", &end);
             szTok = strtok_r(NULL, "/", &end);
 
             // Assume path format of: Genre/Artist/Album/Mp3_file
             strncpy(szArtist,szTok,sizeof(szArtist));
             szArtist[sizeof(szArtist)-1] = 0;
-            char* szDelimit = strrchr(filename, ch);
-#ifdef HAVE_LCD_BITMAP
+            szDelimit = strrchr(filename, ch);
             lcd_puts(0,0, szArtist?szArtist:"<nothing>");
             lcd_puts_scroll(0,LINE_Y,(++szDelimit));
-#else 
-            lcd_puts(0,0, szArtist?szArtist:"<nothing>");
-            lcd_puts_scroll(0,1,(++szDelimit));
-#endif
-               break;
-         }
-         case PLAY_DISPLAY_FILENAME_SCROLL:
-         {
-               int ch = '/';
-               char* szLast = strrchr(filename, ch);
+            break;
+        }
+        case PLAY_DISPLAY_FILENAME_SCROLL:
+        {
+            int ch = '/';
+            char* szLast = strrchr(filename, ch);
 
-               if (szLast)
-               {
-                   lcd_puts_scroll(0,0, (++szLast));
-               } else {
-                   lcd_puts_scroll(0,0, mp3.path);
-               }
+            if (szLast)
+                lcd_puts_scroll(0,0, (++szLast));
+            else
+                lcd_puts_scroll(0,0, mp3.path);
 
-               break;
-         }
-         case PLAY_DISPLAY_DEFAULT:
-         {
+            break;
+        }
+        case PLAY_DISPLAY_DEFAULT:
+        {
 #ifdef HAVE_LCD_BITMAP
             char buffer[256];
 
