@@ -73,7 +73,7 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall
 
 APPCFLAGS = $(DEBUG) $(DEFINES) -DAPPSVERSION=\"$(VERSION)\" $(APPINCLUDES) -W -Wall
 
-FIRMSRCS = chartables.c lcd.c sprintf.c id3.c debug.c usb.c mpeg.c
+FIRMSRCS = chartables.c lcd.c sprintf.c id3.c debug.c usb.c mpeg.c power.c
 
 APPS = main.c tree.c menu.c credits.c main_menu.c\
 	playlist.c showtext.c wps.c settings.c
@@ -222,6 +222,9 @@ $(OBJDIR)/usb.o: $(FIRMWAREDIR)/usb.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/stubs.o: ../common/stubs.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/power.o: $(DRIVERS)/power.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 

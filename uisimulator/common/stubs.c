@@ -26,8 +26,3 @@ void backlight_time(int dummy)
 {
     (void)dummy;
 }
-
-int battery_level(void)
-{
-    return 73;
-}
