@@ -503,6 +503,8 @@ void lcd_puts(int x, int y, char *str)
         buffer[11-x]=0;
         str = buffer;
     }
+    xmargin = 0;
+    ymargin = 8;
 #endif
 
     lcd_putsxy( xmargin + x*fonts[font],
