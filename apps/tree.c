@@ -28,7 +28,6 @@
 #include "button.h"
 #include "kernel.h"
 #include "tree.h"
-#include "play.h"
 #include "main_menu.h"
 #include "sprintf.h"
 #include "mpeg.h"
@@ -324,11 +323,11 @@ bool dirbrowse(char *root)
                     }
                     
                     else {
-
                         playing = 1;
                         mpeg_play(buf);
                         lcd_stop_scroll();
                         wps_show();
+                        playing = 0;
                     }
                 }
                 restore = true;
