@@ -136,8 +136,8 @@ new: "Spara misslyckades"
 
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
-eng: "Batt. Low?"
-new: "Batt. tomt?"
+eng: "Partition?"
+new: "Partition?"
 
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
@@ -146,8 +146,8 @@ new: "Spara misslyckades"
 
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
-eng: "Is Battery Low?"
-new: "Är batteriet urladdat?"
+eng: "No partition?"
+new: "Ingen partition?"
 
 id: LANG_TIME_SET
 desc: used in set_time()
@@ -426,13 +426,13 @@ new: "(Ja/Nej)"
 
 id: LANG_RESUME_CONFIRM_RECORDER
 desc: possible answer to resume question
-eng: "PLAY = Yes"
-new: "Spela = Ja"
+eng: ""
+new: ""
 
 id: LANG_RESUME_CANCEL_RECORDER
 desc: possible answer to resume question
-eng: "Any Other = No"
-new: "Övriga = Nej"
+eng: ""
+new: ""
 
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
@@ -656,118 +656,118 @@ new: "[Spela] för att starta/pausa"
 
 id: LANG_SOKOBAN_LEVEL
 desc: must be smaller than 6 characters
-eng: "Level"
-new: "Nivå"
+eng: ""
+new: ""
 
 id: LANG_SOKOBAN_MOVE
 desc: must be smaller than 6 characters
-eng: "Moves"
-new: "Drag"
+eng: ""
+new: ""
 
 id: LANG_SOKOBAN_WIN
 desc: displayed when you win 
-eng: "YOU WIN!!"
-new: "DU VINNER!!"
+eng: ""
+new: ""
 
 id: LANG_SOKOBAN_QUIT
 desc: how to quit game
-eng: "[OFF] To Stop"
-new: "[Av] för att stanna"
+eng: ""
+new: ""
 
 id: LANG_SOKOBAN_F1
 desc: what does F1 do
-eng: "[F1] - Level"
-new: "[F1] - Nivå"
+eng: ""
+new: ""
 
 id: LANG_SOKOBAN_F2
 desc: what does F2 do
-eng: "[F2] Same Level"
-new: "[F2] Samma nivå"
+eng: ""
+new: ""
 
 id: LANG_SOKOBAN_F3
 desc: what does F3 do
-eng: "[F3] + Level"
-new: "[F3] + Nivå"
+eng: ""
+new: ""
 
 id: LANG_WORMLET_LENGTH
 desc: wormlet game
-eng: "Len:%d"
-new: "Längd:%d"
+eng: ""
+new: ""
 
 id: LANG_WORMLET_GROWING
 desc: wormlet game 
-eng: "Growing"
-new: "Växer"
+eng: ""
+new: ""
 
 id: LANG_WORMLET_HUNGRY
 desc: wormlet game
-eng: "Hungry"
-new: "Hungrig"
+eng: ""
+new: ""
 
 id: LANG_WORMLET_WORMED
 desc: wormlet game
-eng: "Wormed"
-new: "Wormed"
+eng: ""
+new: ""
 
 id: LANG_WORMLET_ARGH
 desc: wormlet game
-eng: "Argh"
-new: "Argh"
+eng: ""
+new: ""
 
 id: LANG_WORMLET_CRASHED
 desc: wormlet game
-eng: "Crashed"
-new: "Krasch"
+eng: ""
+new: ""
 
 id: LANG_WORMLET_HIGHSCORE
 desc: wormlet game
-eng: "Hs: %d"
-new: "Hs: %d"
+eng: ""
+new: ""
 
 id: LANG_WORMLET_PLAYERS
 desc: wormlet game
-eng: "%d Players    UP/DN"
-new: "%d Spelare  upp/ner"
+eng: ""
+new: ""
 
 id: LANG_WORMLET_WORMS
 desc: wormlet game
-eng: "%d Worms        L/R"
-new: "%d Worms        h/v"
+eng: ""
+new: ""
 
 id: LANG_WORMLET_REMOTE_CTRL
 desc: wormlet game
-eng: "Remote Control F1"
-new: "Fjärrkontroll F1"
+eng: ""
+new: ""
 
 id: LANG_WORMLET_NO_REM_CTRL
 desc: wormlet game
-eng: "No Rem. Control F1"
-new: "Ingen fjärrkontroll F1"
+eng: ""
+new: ""
 
 id: LANG_WORMLET_2_KEY_CTRL
 desc: wormlet game
-eng: "2 Key Control   F1"
-new: "2-tangentskontroll   F1"
+eng: ""
+new: ""
 
 id: LANG_WORMLET_4_KEY_CTRL
 desc: wormlet game
-eng: "4 Key Control   F1"
-new: "4-tangentskontroll   F1"
+eng: ""
+new: ""
 
 id: LANG_WORMLET_NO_CONTROL
 desc: wormlet game
-eng: "Out Of Control"
-new: "Ingen kontroll"
+eng: ""
+new: ""
 
 id: LANG_TETRIS_LOSE
 desc: tetris game
-eng: "You Lose!"
-new: "Du förlorar!"
+eng: ""
+new: ""
 
 id: LANG_TETRIS_LEVEL
 desc: tetris game
-eng: "Rows - Level"
-new: "Rader - Nivå"
+eng: ""
+new: ""
 
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
@@ -1498,3 +1498,224 @@ id: LANG_ALWAYS
 desc: (player) the jump scroll shall be done "always"
 eng: "Always"
 new: "Alltid"
+
+id: LANG_BOOT_CHANGED
+desc: File browser discovered the boot file was changed
+eng: "Boot changed"
+### Not previously translated
+new: "Ändrad start"
+
+id: LANG_CANCEL_WITH_ANY_RECORDER
+desc: Generic recorder string to use to cancel
+eng: "Any Other = No"
+new: "Någon annan = Nej"
+
+id: LANG_CAR_ADAPTER_MODE
+desc: Displayed for setting car adapter mode to on/off
+eng: "Car Adapter Mode"
+new: "Biltillsatsläge"
+
+id: LANG_CONFIRM_WITH_PLAY_RECORDER
+desc: Generic recorder string to use to confirm
+eng: "PLAY = Yes"
+new: "Spela = Ja"
+
+id: LANG_CUSTOM_CFG
+desc: in setting_menu()
+eng: "Configurations"
+new: "Konfigureringar"
+
+id: LANG_CUSTOM_FONT
+desc: in setting_menu()
+eng: "Fonts"
+new: "Fonter"
+
+id: LANG_DISK_FULL
+desc: in recording screen
+eng: "The disk is full. Press OFF to continue."
+new: "Disken är full. Tryck AV för att fortsätta."
+
+id: LANG_FIRMWARE
+desc: in the main menu
+eng: "Firmware"
+new: "Maskinvara"
+
+id: LANG_FLIPIT
+desc: in the games menu
+eng: "Flipit"
+new: "Flipit"
+
+id: LANG_INSERT
+desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+eng: "Insert"
+new: "Sätt in"
+
+id: LANG_INSERT_FIRST
+desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+eng: "Insert next"
+new: "Sätt in nästa"
+
+id: LANG_INSERT_LAST
+desc: in onplay menu.  append a track/playlist into dynamic playlist.
+eng: "Insert last"
+new: "Sätt in sist"
+
+id: LANG_JUMP_SCROLL_DELAY
+desc: (player) Delay before making a jump scroll
+eng: "Jump Scroll Delay"
+new: "Hopprullningsfördröjning"
+
+id: LANG_LANGUAGE
+desc: in settings_menu
+eng: "Language"
+new: "Språk"
+
+id: LANG_OFF_ABORT
+desc: Used on recorder models
+eng: "OFF to abort"
+new: "AV för avbryt"
+
+id: LANG_OTHELO
+desc: in the games menu
+eng: "Othelo"
+new: "Othello"
+
+id: LANG_PLAYLIST_ACCESS_ERROR
+desc: Playlist error
+eng: "Error accessing playlist file"
+new: "Kan ej nå filen med spellistan"
+
+id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
+desc: Playlist error
+eng: "Error accessing playlist control file"
+new: "Kan ej nå filen för spellistekontroll"
+
+id: LANG_PLAYLIST_CONTROL_INVALID
+desc: Playlist resume error
+eng: "Playlist control file is invalid"
+new: "Filen för spellistekontroll är inte korrekt"
+
+id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
+desc: Playlist error
+eng: "Error updating playlist control file"
+new: "Fel vid uppdatering av file för spellistekontroll"
+
+id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
+desc: Playlist error
+eng: "Error accessing directory"
+new: "Kan inte nå katalogen"
+
+id: LANG_PLAYLIST_INSERT_COUNT
+desc: splash number of tracks inserted
+eng: "Inserted %d tracks (%s)"
+new: "Insatta %d spår (%s)"
+
+id: LANG_PLAYLIST_MENU
+desc: in main menu.
+eng: "Playlist Options"
+new: "Val för spellista"
+
+id: LANG_PLAYLIST_QUEUE_COUNT
+desc: splash number of tracks queued
+eng: "Queued %d tracks (%s)"
+new: "Köat %d spår (%s)"
+
+id: LANG_PLAYLIST_SAVE_COUNT
+desc: splash number of tracks saved
+eng: "Saved %d tracks (%s)"
+new: "Sparat %d spår (%s)"
+
+id: LANG_PLUGINS
+desc: in main_menu()
+eng: "Plugins"
+new: "Insticksmoduler"
+
+id: LANG_PLUGIN_CANT_OPEN
+desc: Plugin open error message
+eng: "Can't open %s"
+new: "Kan inte öppna %s"
+
+id: LANG_PLUGIN_ERROR
+desc: The plugin return an error code
+eng: "Plugin returned error"
+new: "Insticksmodulen gav fel"
+
+id: LANG_PLUGIN_WRONG_MODEL
+desc: The plugin is not compatible with the archos model trying to run it
+eng: "Incompatible model"
+new: "Icke kompatibel model"
+
+id: LANG_PLUGIN_WRONG_VERSION
+desc: The plugin is not compatible with the rockbox version trying to run it
+eng: "Incompatible version"
+new: "Icke kompatibel version"
+
+id: LANG_QUEUE_FIRST
+desc: in onplay menu.  queue a track/playlist into dynamic playlist.
+eng: "Queue next"
+new: "Köa nästa"
+
+id: LANG_QUEUE_LAST
+desc: in onplay menu.  queue a track/playlist at end of playlist.
+eng: "Queue last"
+new: "Köa sist"
+
+id: LANG_READ_FAILED
+desc: There was an error reading a file
+eng: "Failed reading %s"
+new: "Misslyckad läsning %s"
+
+id: LANG_REBOOT_NOW
+desc: Do you want to reboot?
+eng: "Reboot now?"
+new: "Starta om nu?"
+
+id: LANG_RECORD_TIMESPLIT
+desc: Prompt for record timer interval setting, in the record settings menu
+eng: "Time Split"
+new: "Tidsdelning"
+
+id: LANG_RECORD_TIMESPLIT_REC
+desc: 
+eng: "Split time:"
+new: "Tidsdelning:"
+
+id: LANG_RECURSE_DIRECTORY
+desc: In playlist menu
+eng: "Recursively Insert Directories"
+new: "Sätt in kataloger rekursivt"
+
+id: LANG_RECURSE_DIRECTORY_QUESTION
+desc: Asked from onplay screen
+eng: "Recursively?"
+new: "Rekursivt?"
+
+id: LANG_SAVE_DYNAMIC_PLAYLIST
+desc: in playlist menu.
+eng: "Save Dynamic Playlist"
+new: "Spara dynamisk spellista"
+
+id: LANG_SHOW_ICONS
+desc: in settings_menu
+eng: "Show Icons"
+new: "Visa ikoner"
+
+id: LANG_SLIDING_PUZZLE
+desc: in the games menu
+eng: "Sliding Puzzle"
+new: "Glidande pussel"
+
+id: LANG_STAR
+desc: in the games menu
+eng: "Star"
+new: "Stjärna"
+
+id: LANG_STOP_ABORT
+desc: Used on player models
+eng: "STOP to abort"
+new: "STANNA för avbryt"
+
+id: LANG_WHILE_PLAYING
+desc: in settings_menu()
+eng: "While Playing Screen"
+new: "Under spel menyn"
