@@ -186,6 +186,30 @@ static int compare(const void* p1, const void* p2)
         return ( e2->attr & ATTR_DIRECTORY ) - ( e1->attr & ATTR_DIRECTORY );
 }
 
+static void showfileline(int line, int direntry, bool scroll)
+{
+    /* if music filter is on, cut off the extension */
+    if (global_settings.dirfilter == SHOW_MUSIC && 
+        (dircache[direntry].attr & (TREE_ATTR_M3U|TREE_ATTR_MPA)))
+    {
+        int len = strlen(dircache[direntry].name);
+        char temp = dircache[direntry].name[len-4];
+        dircache[direntry].name[len-4] = 0;
+        if(scroll)
+            lcd_puts_scroll(LINE_X, line, dircache[direntry].name);
+        else
+            lcd_puts(LINE_X, line, dircache[direntry].name);
+        dircache[direntry].name[len-4] = temp;
+    }
+    else {
+        if(scroll)
+            lcd_puts_scroll(LINE_X, line, dircache[direntry].name);
+        else
+            lcd_puts(LINE_X, line, dircache[direntry].name);
+    }
+}
+
+
 static int showdir(char *path, int start)
 {
     int icon_type = 0;
@@ -356,8 +380,8 @@ static int showdir(char *path, int start)
         dirstart = start;
     }
 
-    lcd_stop_scroll();
 #ifdef HAVE_LCD_CHARCELLS
+    lcd_stop_scroll();
     lcd_double_height(false);
 #endif
     lcd_clear_display();
@@ -434,17 +458,7 @@ static int showdir(char *path, int start)
 #endif
         }
 
-        /* if music filter is on, cut off the extension */
-        if (global_settings.dirfilter == SHOW_MUSIC && 
-            (dircache[i].attr & (TREE_ATTR_M3U|TREE_ATTR_MPA)))
-        {
-            char temp = dircache[i].name[len-4];
-            dircache[i].name[len-4] = 0;
-            lcd_puts(LINE_X, i-start, dircache[i].name);
-            dircache[i].name[len-4] = temp;
-        }
-        else
-            lcd_puts(LINE_X, i-start, dircache[i].name);
+        showfileline(i-start, i, false); /* no scroll */
     }
 
 #ifdef HAVE_LCD_BITMAP
@@ -866,6 +880,11 @@ bool dirbrowse(char *root)
     int lastfilter = global_settings.dirfilter;
     bool lastsortcase = global_settings.sort_case;
     int lastdircursor=-1;
+    bool need_update = true;
+
+    bool update_all = false; /* set this to true when the whole file list
+                                has been refreshed on screen */
+
 #ifdef HAVE_LCD_BITMAP
     int fw, fh;
     lcd_getstringsize("A", &fw, &fh);
@@ -885,6 +904,7 @@ bool dirbrowse(char *root)
     numentries = showdir(currdir, dirstart);
     if (numentries == -1) 
         return -1;  /* currdir is not a directory */
+    update_all = true;
 
     put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
 
@@ -892,7 +912,6 @@ bool dirbrowse(char *root)
         struct entry* file = &dircache[dircursor+dirstart];
 
         bool restore = false;
-        bool need_update = false;
 
         button = button_get_w_tmo(HZ/5);
         switch ( button ) {
@@ -962,7 +981,8 @@ bool dirbrowse(char *root)
                     dirlevel++;
                     dircursor=0;
                     dirstart=0;
-                } else {
+                }
+                else {
                     int seed = current_tick;
                     bool play = false;
                     int start_index=0;
@@ -1115,6 +1135,7 @@ bool dirbrowse(char *root)
                         if (dirstart) {
                             dirstart--;
                             numentries = showdir(currdir, dirstart);
+                            update_all=true;
                             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
                         }
                         else {
@@ -1129,6 +1150,7 @@ bool dirbrowse(char *root)
                                 dirstart = numentries - tree_max_on_screen;
                                 dircursor = tree_max_on_screen - 1;
                                 numentries = showdir(currdir, dirstart);
+                                update_all = true;
                                 put_cursorxy(CURSOR_X, CURSOR_Y +
                                              tree_max_on_screen - 1, true);
                             }
@@ -1153,6 +1175,7 @@ bool dirbrowse(char *root)
                         else {
                             dirstart++;
                             numentries = showdir(currdir, dirstart);
+                            update_all = true;
                             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
                         }
                     }
@@ -1166,6 +1189,7 @@ bool dirbrowse(char *root)
                         else {
                             dirstart = dircursor = 0;
                             numentries = showdir(currdir, dirstart);
+                            update_all=true;
                             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
                         }
                     }
@@ -1266,34 +1290,29 @@ bool dirbrowse(char *root)
                                                   icon */
 #endif
             numentries = showdir(currdir, dirstart);
+            update_all = true;
             put_cursorxy(CURSOR_X, CURSOR_Y + dircursor, true);
             
             need_update = true;
             reload_dir = false;
         }
 
-        if ( numentries ) {
+        if ( numentries && need_update) {
             i = dirstart+dircursor;
 
             /* if MP3 filter is on, cut off the extension */
             if(lasti!=i || restore) {
                 lcd_stop_scroll();
-                if (lastdircursor!=-1)
-                    lcd_puts(LINE_X, lastdircursor, dircache[lasti].name);
+
+                /* So if lastdircursor and dircursor differ, and then full
+                   screen was not refreshed, restore the previous line */
+                if ((lastdircursor != dircursor) && !update_all ) {
+                    showfileline(lastdircursor, lasti, false); /* no scroll */
+                }
                 lasti=i;
                 lastdircursor=dircursor;
-                if (global_settings.dirfilter == SHOW_MUSIC && 
-                    (dircache[i].attr & (TREE_ATTR_M3U|TREE_ATTR_MPA)))
-                {
-                    int len = strlen(dircache[i].name);
-                    char temp = dircache[i].name[len-4];
-                    dircache[i].name[len-4] = 0;
-                    lcd_puts_scroll(LINE_X, dircursor, dircache[i].name);
-                    dircache[i].name[len-4] = temp;
-                }
-                else
-                    lcd_puts_scroll(LINE_X, dircursor, dircache[i].name);
 
+                showfileline(dircursor, i, true); /* scroll please */
                 need_update = true;
             }
         }
@@ -1302,6 +1321,7 @@ bool dirbrowse(char *root)
             lcd_update();
 
             need_update = false;
+            update_all = false;
         }
     }
 
