@@ -161,7 +161,7 @@ void lcd_puts(int x, int y, unsigned char *str)
 #if defined(HAVE_LCD_CHARCELLS)
     /* We make the simulator truncate the string if it reaches the right edge,
        as otherwise it'll wrap. The real target doesn't wrap. */
-
+  
     char buffer[12];
     if(strlen(str)+x > 11 ) {
         strncpy(buffer, str, sizeof buffer);
@@ -583,7 +583,7 @@ void lcd_puts_scroll(int x, int y, unsigned char* string )
     lcd_puts(x,y,string);
     lcd_getstringsize(string, &w, &h);
 
-    if (LCD_WIDTH - x*8 - xmargin < w)
+    if ((LCD_WIDTH - x*6 - xmargin) < w)
     {
         /* prepare scroll line */
         char *end;
@@ -662,7 +662,7 @@ static void scroll_thread(void)
                 s->offset %= s->width;
 
             lcd_getstringsize(s->line, &w, &h);
-            xpos = xmargin + (s->startx-1) * w / s->len;
+            xpos = xmargin + s->startx * s->width / s->len;
             ypos = ymargin + s->starty * h;
 
             lcd_clearrect(xpos, ypos, LCD_WIDTH - xmargin, h);
