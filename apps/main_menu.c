@@ -34,7 +34,7 @@
 extern void tetris(void);
 #endif
 
-static int show_logo(void)
+int show_logo(void)
 {
 #ifdef HAVE_LCD_BITMAP
     unsigned char buffer[112 * 8];

@@ -19,7 +19,7 @@
 #ifndef _MAIN_MENU_H
 #define _MAIN_MENU_H
 
-extern void show_splash(void);
+extern int show_logo(void);
 extern void main_menu(void);
 
 #endif
