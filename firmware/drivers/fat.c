@@ -1577,7 +1577,7 @@ int fat_opendir(struct fat_dir *dir, unsigned int startcluster)
 }
 
 /* convert from unicode to a single-byte charset */
-void unicode2iso(unsigned char* unicode, unsigned char* iso, int count )
+static void unicode2iso(unsigned char* unicode, unsigned char* iso, int count )
 {
     int i;
 
