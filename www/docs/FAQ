@@ -15,7 +15,7 @@ A. Start by reading up on the information about the jukeboxes on our web page.
    Then go into CVS and look at the code we've written. Then take what you
    need and start writing.
 
-Q. Okay, so how do I submist a patch?
+Q. Okay, so how do I submit a patch?
 A. Run: "diff -u oldfile newfile" against the file(s) you have changed.  Then
    mail the output to any member of the development team and we will take it 
    under consideration.  (Please remember that all submissions are not
@@ -34,6 +34,13 @@ A. Sure do! The list is rockbox@cool.haxx.se.  To subscribe, you need to
 Q. Great you have a mailing list!  Is there anyway for me to catch up on
    past posts?
 A. Check out the archives at: http://bjorn.haxx.se/rockbox/mail.cgi
+
+Q. How can I meet the developers working on the project?
+A. One way is by visiting us on IRC.  Head on over to the server
+   irc.openprojects.net, and then join "#rockbox".  There is usually at least
+   one person there.  If you don't see any activity, feel free to post 
+   questions anyway, serveral of us log the channel and will get you answers
+   when we unidle.
 
 Q. What is this "SourceForge" you keep mentioning?
 A. http://www.sourceforge.net
