@@ -28,7 +28,6 @@
     </th>
     <th valign=top>
      <a href=ondiosp.jpg><img src=ondiosp_t.jpg></a><br>Ondio SP
-     <a href=#footnote5>(5)</a>
     </th>
 </tr>
 <tr><th><b>USB</b></th>
@@ -268,9 +267,6 @@
  <br>
  <a name=footnote4></a><i>(4) The picture shows an FM Recorder, but
    they look exactly the same, apart from the printed text.</i>
- <br>
- <a name=footnote5></a><i>(5) The picture shows an Ondio FM, but
-   they look almost the same, apart from color and printed text.</i>
 
 
 #include "foot.t"
