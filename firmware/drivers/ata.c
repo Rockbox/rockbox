@@ -424,19 +424,9 @@ extern void ata_flush(void)
 
 static int check_registers(void)
 {
-    /* When starting from Flash, the disk is not yet ready when we get here. */
-    /* Crude first fix is to block and poll here for a while, 
-       can we do better? */
-    int time = 0;
-    while ((ATA_STATUS & STATUS_BSY))
-    {
-        if (time >= HZ*10) /* timeout, disk is not coming up */
+    if ( ATA_STATUS & STATUS_BSY )
             return -1;
 
-        sleep(HZ/10);
-        time += HZ/10;
-    };
-    
     ATA_NSECTOR = 0xa5;
     ATA_SECTOR  = 0x5a;
     ATA_LCYL    = 0xaa;
@@ -819,6 +809,19 @@ int ata_init(void)
     ata_enable(true);
 
     if ( !initialized ) {
+        /* When starting from Flash, the disk is not yet ready when we get here. */
+        /* Crude first fix is to block and poll here for a while, 
+           can we do better? */
+        int time = 0;
+        while ((ATA_STATUS & STATUS_BSY))
+        {
+            if (time >= HZ*10) /* timeout, disk is not coming up */
+                return -6;
+
+            sleep(HZ/10);
+            time += HZ/10;
+        };
+        
         if (master_slave_detect())
             return -1;
         
