@@ -95,7 +95,7 @@ static void draw_screen(struct mp3entry* id3)
             lcd_puts(0, l++, id3->album?id3->album:"");
             lcd_puts(0, l++, id3->artist?id3->artist:"");
 
-            if(id3->bitrate == VARIABLE_BIT_RATE)
+            if(id3->vbr)
                 snprintf(buffer, sizeof(buffer), "Variable Bit Rate");
             else
                 snprintf(buffer, sizeof(buffer), "%d kbits", id3->bitrate);
@@ -123,6 +123,7 @@ int wps_show(void)
     struct mp3entry* id3 = mpeg_current_track();
     unsigned int lastlength=0, lastsize=0, lastrate=0;
     int lastartist=0, lastalbum=0, lasttitle=0;
+    bool lastvbr = false;
 
     while ( 1 ) {
         int i;
@@ -131,6 +132,7 @@ int wps_show(void)
         if ( ( id3->length != lastlength ) ||
              ( id3->filesize != lastsize ) ||
              ( id3->bitrate != lastrate ) ||
+             ( id3->vbr != lastvbr ) ||
              ( (id3->artist?id3->artist[0]:0) != lastartist ) ||
              ( (id3->album?id3->album[0]:0) != lastalbum ) ||
              ( (id3->title?id3->title[0]:0) != lasttitle ) )
