@@ -1,5 +1,4 @@
 /* plugins common to both Player+Recorder model */
-chessclock.c
 favorites.c
 firmware_flash.c
 helloworld.c
@@ -48,6 +47,7 @@ wormlet.c
 #endif /*#ifdef HAVE_LCD_BITMAP */
 
 #ifdef HAVE_LCD_CHARCELLS /* Player model only */
+chessclock.c
 euroconverter.c
 jackpot.c
 nim.c
