@@ -321,7 +321,7 @@ bool recording_screen(void)
                 break;
 
             case BUTTON_F2:
-                if(mpeg_status())
+                if(!mpeg_status())
                 {
                     if (f2_rec_screen())
                         return SYS_USB_CONNECTED;
@@ -330,7 +330,7 @@ bool recording_screen(void)
                 break;
 
             case BUTTON_F3:
-                if(mpeg_status())
+                if(!mpeg_status())
                 {
                     if (f3_rec_screen())
                         return SYS_USB_CONNECTED;
