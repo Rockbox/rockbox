@@ -224,6 +224,12 @@ static int showdir(char *path, int start)
                 continue;
             }
 
+            /* Skip FAT volume ID */
+            if (entry->attribute & ATTR_VOLUME_ID) {
+                i--;
+                continue;
+            }
+
             /* Skip dotfiles if set to skip them */
             if (!global_settings.show_hidden_files &&
                 ((entry->d_name[0]=='.') ||
