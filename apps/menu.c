@@ -103,13 +103,7 @@ void menu_run(int m)
     menu_draw(m);
     
     while(1) {
-        key = button_get();
-        if(!key) {
-            sleep(1);
-            continue;
-        }
-        
-        switch(key) {
+        switch( button_get(true) ) {
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_UP:
 #else

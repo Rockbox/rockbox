@@ -99,7 +99,7 @@ void show_splash(void)
     lcd_update();
     for ( i=0;i<10;i++) {
         sleep(HZ/10);
-        if (button_get())
+        if (button_get(false))
             break;
     }
 }

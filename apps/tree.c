@@ -178,13 +178,7 @@ bool dirbrowse(char *root)
 #endif
 
     while(1) {
-        int key = button_get();
-
-        if(!key) {
-            sleep(1);
-            continue;
-        }
-        switch(key) {
+        switch ( button_get(true) ) {
 #if defined(SIMULATOR) && defined(HAVE_RECODER_KEYPAD)
             case BUTTON_OFF:
                 return false;

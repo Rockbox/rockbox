@@ -89,13 +89,7 @@ void playtune(char *dir, char *file)
 #endif
 
     while(1) {
-        int key = button_get();
-
-        if(!key) {
-            sleep(30);
-            continue;
-        }
-        switch(key) {
+        switch ( button_get(true) ) {
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_OFF:
             case BUTTON_LEFT:

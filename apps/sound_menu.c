@@ -44,14 +44,10 @@ static void soundsetting(int setting)
     lcd_puts(0,0,buf);
 
     while ( !done ) {
-        int key;
         snprintf(buf,sizeof buf,"%d %% ",value);
         lcd_puts(0,1,buf);
 
-        while ( !(key = button_get()) )
-            yield();
-
-        switch ( key ) {
+        switch ( button_get(true) ) {
 #ifdef HAVE_RECORDER_KEYPAD
             case BUTTON_UP:
 #else

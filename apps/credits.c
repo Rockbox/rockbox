@@ -78,7 +78,7 @@ void show_credits(void)
             /* abort on keypress */
             for ( j=0;j<10;j++ ) {
                 sleep(DISPLAY_TIME/10);
-                if (button_get())
+                if (button_get(false))
                     return;
             }
             lcd_clear_display();
@@ -90,7 +90,7 @@ void show_credits(void)
         /* abort on keypress */
         for ( j=0;j<10;j++ ) {
             sleep(DISPLAY_TIME/10);
-            if (button_get())
+            if (button_get(false))
                 return;
         }
     }
