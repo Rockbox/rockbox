@@ -264,7 +264,9 @@ int plugin_load(const char* plugin, void* parameter)
 {
     enum plugin_status (*plugin_start)(struct plugin_api* api, void* param);
     int rc;
+#ifndef SIMULATOR
     char buf[64];
+#endif
     int fd;
 
 #ifdef HAVE_LCD_BITMAP
@@ -287,7 +289,7 @@ int plugin_load(const char* plugin, void* parameter)
     lcd_clear_display();
 #endif
 #ifdef SIMULATOR
-    plugin_start = sim_plugin_load(plugin, &fd);
+    plugin_start = sim_plugin_load((char *)plugin, &fd);
     if(!plugin_start)
         return -1;
 #else
