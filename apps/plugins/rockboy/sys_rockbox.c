@@ -71,7 +71,7 @@ void joy_close(void)
 
 #endif
 
-unsigned int oldbuttonstate = 0, newbuttonstate;
+unsigned int oldbuttonstate = 0, newbuttonstate,holdbutton;
 
 void ev_poll(void)
 {
@@ -82,7 +82,9 @@ void ev_poll(void)
     pressed = newbuttonstate & ~oldbuttonstate;
     oldbuttonstate = newbuttonstate;
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
-    fb.mode=rb->button_hold();
+    if (rb->button_hold()&~holdbutton)
+	fb.mode=(fb.mode+1)%3;
+    holdbutton=rb->button_hold();
 #endif
     if(released) {
         ev.type = EV_RELEASE;
@@ -161,7 +163,12 @@ void vid_update(int scanline)
 #if LCD_HEIGHT == 64 /* Archos */
     int balance = 0;
     if (fb.mode==1)
-	  scanline-=16;
+      scanline-=16;
+    else if (fb.mode==2) {
+      scanline-=8;
+      if(scanline>=128)
+          return;
+    }
     scanline_remapped = scanline / 16;
     frameb = rb->lcd_framebuffer + scanline_remapped * LCD_WIDTH;
     while (cnt < 160) {
@@ -235,6 +242,11 @@ void vid_update(int scanline)
 #else /* LCD_HEIGHT != 64, iRiver */
     if (fb.mode==1)
       scanline-=16;
+    else if (fb.mode==2) {
+      scanline-=8;
+      if(scanline>=128)
+          return;
+    }
 #ifdef GRAYSCALE
     scanline_remapped = scanline / 4;
 #else
