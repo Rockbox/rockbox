@@ -230,28 +230,33 @@ A29: Don't confuse the terms.  Reverse engineering means examining a product
      software without first researching the surrounding interfaces, then no 
      software has ever been written from scratch.
 
-Q30: Wait a minute here.  You have released version 1.0, but not a single one 
-     of the ideas you have spoken about is actually implimented!  Calling this
-     version 1.0 is really misleading.  Whats the story?!
-A30: In simple terms, the first release is called 1.0 because it has a basic 
-     working feature set that works and has no known bugs. That is what 1.0 
-     means.  It is true that Rockbox 1.0 lacks most of the feature set that 
-     every sane user wants.  However, we never said it was more 
-     feature-complete or better in any way then the original firmware at this 
-     early point.  This first release was done as a proof of concept that our 
-     ideas are moving in the right direction.  We also hope that it helps 
+Q30: Wait a minute here.  When you released version 1.0 you did not have a single
+     one of the ideas you have mentioned on your website actually implimented!  
+     Calling this version 1.0 is really misleading.  Whats the story?!
+A30: In simple terms, the first release was called 1.0 because it had a basic 
+     working feature set that worked and had no known bugs. That is what 1.0 
+     meant.  It is true that Rockbox 1.0 lacked most of the feature set that 
+     every sane user wanted.  However, we never said it was more 
+     feature-complete or better in any way then the original firmware that early
+     in the project.  The first release was done as a proof of concept that our 
+     ideas are moving in the right direction.  We also hoped that it would help
      bring the project some attention, and some additional developers.  
-     Adding the missing features is just a matter of time (and that time goes
-     faster if you, yes you, help too). 
+     Adding the missing features was just a matter of time.  In more recently
+     releases we have completed many of our desired goals, and several new ones
+     that were implimented to fullfill user requests.
 
 Q31: I've heard talk of a 'Rolo'.  What is that? (Or 'All you ever wanted
      to know about Rockbox boot loaders')
 A31: The developers have discussed the possibility of a boot loader.  (Mainly
      because having one sounds cool, and isn't Rolo just a great name?)
      The idea would be that a user could use the load to choose between
-     different verions of Rockbox or the Archo firmware itself.  We do not
-     have an expected date on this.  (As a matter of fact, developement on it
-     has not even started yet).
+     different verions of Rockbox or the Archo firmware itself.  We have a 
+     working version of ROLO implimented for the players, and a version in 
+     development for the recorders.  However, at this time, the patch for ROLO
+     is not optimal for use and is not part of the main branch of the CVS.
+     Once this improves and has been tested sufficently, it will become part of
+     the main release.  Please check the mailing list logs and irc logs for more
+     information.  
 
 Q32: I was thinking about making the USB a bit more usable.  What are the
      chances of using the USB port to [play games / share files / list
@@ -273,7 +278,6 @@ Q33: When I use RockBox my jukebox's red "error" light turns on a lot, but this
      doesn't happen on the factory firmware.  Why?
 A33: Rockbox uses the red LED as harddisk activity light, not as an error 
      light. Relax and enjoy the music.
-
 
 Q34: How do I use the loadable fonts?
 A34: Loadable fonts are a work in progress.  We do not have full documentation
