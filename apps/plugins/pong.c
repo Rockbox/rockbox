@@ -263,7 +263,7 @@ void showscore(struct pong *p)
 {
     static char buffer[20];
 
-    snprintf(buffer, 20, "%d - %d", p->score[0], p->score[1]);
+    rb->snprintf(buffer, 20, "%d - %d", p->score[0], p->score[1]);
     rb->lcd_puts(4, 0, buffer);
 }
 
