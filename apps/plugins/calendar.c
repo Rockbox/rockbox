@@ -49,6 +49,8 @@ struct shown {
 
 static bool use_system_font = false;
 
+static bool been_in_usb_mode = false;
+
 /* leap year -- account for gregorian reformation in 1752 */
 static int is_leap_year(int yr)
 {
@@ -306,7 +308,7 @@ static void load_memo(struct shown *shown)
 
 static bool save_memo(int changed, bool new_mod, struct shown *shown)
 {
-	int fp,fq;
+    int fp,fq;
     fp = rb->open("/.rockbox/.memo",O_RDONLY | O_CREAT);
     fq = rb->open("/.rockbox/~temp",O_RDWR | O_CREAT | O_TRUNC);
     if ( (fq != -1) && (fp != -1) )
@@ -410,29 +412,32 @@ static void add_memo(struct shown *shown, int type)
 static bool edit_memo(int change, struct shown *shown)
 {
     bool exit = false;
-    rb->lcd_clear_display();
-    if (memos_in_shown_memory > 0)
-    {
-        rb->lcd_puts(0,0,"Remove : Up");
-        rb->lcd_puts(0,1,"Edit : Down");
-        rb->lcd_puts(0,2,"New :");
-        rb->lcd_puts(2,3,"weekly : Left");
-        rb->lcd_puts(2,4,"monthly : Play");
-        rb->lcd_puts(2,5,"annually : Right");
-        rb->lcd_puts(2,6,"one off : On");
-    }
-    else
-    {
-        rb->lcd_puts(0,0,"New :");
-        rb->lcd_puts(2,1,"weekly : Left");
-        rb->lcd_puts(2,2,"monthly : Play");
-        rb->lcd_puts(2,3,"anualy : Right");
-        rb->lcd_puts(2,4,"one off : On");
-    }
-    rb->lcd_update();
+    int button;
+    
     while (!exit)
     {
-        switch (rb->button_get(true))
+        rb->lcd_clear_display();
+        if (memos_in_shown_memory > 0)
+        {
+            rb->lcd_puts(0,0,"Remove : Up");
+            rb->lcd_puts(0,1,"Edit : Down");
+            rb->lcd_puts(0,2,"New :");
+            rb->lcd_puts(2,3,"weekly : Left");
+            rb->lcd_puts(2,4,"monthly : Play");
+            rb->lcd_puts(2,5,"annually : Right");
+            rb->lcd_puts(2,6,"one off : On");
+        }
+        else
+        {
+            rb->lcd_puts(0,0,"New :");
+            rb->lcd_puts(2,1,"weekly : Left");
+            rb->lcd_puts(2,2,"monthly : Play");
+            rb->lcd_puts(2,3,"anualy : Right");
+            rb->lcd_puts(2,4,"one off : On");
+        }
+        rb->lcd_update();
+        button = rb->button_get(true);
+        switch (button)
         {
             case BUTTON_OFF:
                 return false;
@@ -473,8 +478,10 @@ static bool edit_memo(int change, struct shown *shown)
                 }
                 break;
 
-            case SYS_USB_CONNECTED:
-                return true;
+            default:
+                if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                    been_in_usb_mode = true;
+                break;
         }
     }
     return false;
@@ -542,6 +549,8 @@ static bool any_events(struct shown *shown, bool force)
 {
     int lines_displayed = 0;
     bool exit=false;
+    int button;
+    
     update_memos_shown(shown);
     if (memos_in_shown_memory > 0)
         show_lines(lines_displayed,shown);
@@ -552,7 +561,8 @@ static bool any_events(struct shown *shown, bool force)
     rb->lcd_update();
     while (!exit)
     {
-        switch (rb->button_get(true))
+        button = rb->button_get(true);
+        switch (button)
         {
             case BUTTON_DOWN:
                 if (memos_in_shown_memory > 0)
@@ -582,8 +592,11 @@ static bool any_events(struct shown *shown, bool force)
             case BUTTON_OFF:
                 return false;
 
-            case SYS_USB_CONNECTED:
-                return true;
+            default:
+                if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                    been_in_usb_mode = true;
+                show_lines(lines_displayed,shown);
+                break;
         }
     }
     return false;
@@ -648,6 +661,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     struct today today;
     struct shown shown;
     bool exit = false;
+    int button;
+    
     TEST_PLUGIN_API(api);
     (void)(parameter);
     
@@ -659,7 +674,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     draw_calendar(&shown);
     while (!exit)
     {
-        switch (rb->button_get(true))
+        button = rb->button_get(true);
+        switch (button)
         {
             case BUTTON_OFF:
                 return false;
@@ -700,13 +716,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 draw_calendar(&shown);
                 break;
 
-            case SYS_USB_CONNECTED:
-                rb->usb_screen();
+            default:
+                if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                    been_in_usb_mode = true;
                 draw_calendar(&shown);
                 break;
         }
     }
-    return false;
+    return been_in_usb_mode?PLUGIN_USB_CONNECTED:PLUGIN_OK;
 }
 
 #endif
