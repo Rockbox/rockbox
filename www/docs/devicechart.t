@@ -70,8 +70,8 @@
     <td>In</td>
     <td>No</td>
     <td>No</td>
-    <td>?</td>
-    <td>?</td>
+    <td>Optical In+Out</td>
+    <td>Optical In+Out</td>
 </tr>
 <tr><th><b>Separate Line Out</b></th>
     <td>Yes</td>
@@ -226,8 +226,8 @@
     <td>No</td>
     <td>n.a.</td>
     <td>n.a.</td>
-    <td>?</td>
-    <td>?</td>
+    <td>Yes</td>
+    <td>Yes</td>
 </tr>
 <tr><th><b>CPU</b></th>
     <td>SH7034 12 MHz</td>
@@ -262,8 +262,8 @@
     <td>6V 700mA center&nbsp;+</td>
     <td>no charger</td>
     <td>no charger</td>
-    <td>350mA 5 volt 2 A</td>
-    <td>350mA 5 volt 2 A</td>
+    <td>350mA 5 volt center&nbsp;+</td>
+    <td>350mA 5 volt center&nbsp;+</td>
 </tr>
 <tr><th><b>Dimensions</b></th>
     <td>115x83x34 mm (4.5"x3.2"x1.3")</td>
