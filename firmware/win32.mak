@@ -77,7 +77,7 @@ clean:
 	-rm -f $(OBJS) $(OUTPUT) sysfont.c
 
 # Special targets
-$(OBJDIR)/thread.o: thread.c thread.h
+$(OBJDIR)/thread.o: thread.c export/thread.h
 	$(CC) -c -O -fomit-frame-pointer $(CFLAGS) $< -o $@
 
 -include $(SRC:%.c=$(OBJDIR)/$(DEPS)/%.d)
