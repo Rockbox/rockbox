@@ -888,20 +888,21 @@ int fat_read( struct fat_file *file, int sectorcount, void* buf )
         return 0;
 
     /* find sequential sectors and read them all at once */
-    for (i=0; i<sectorcount; i++ ) {
+    for (i=0; i<sectorcount && sector>0; i++ ) {
         numsec++;
         if ( numsec >= fat_bpb.bpb_secperclus ) {
             cluster = get_next_cluster(cluster);
             if (!cluster) {
                 /* end of file */
                 sector = -1;
-                break;
             }
-            
-            sector = cluster2sec(cluster);
-            if (sector<0)
-                return -1;
-            numsec=0;
+            else
+            {
+                sector = cluster2sec(cluster);
+                if (sector<0)
+                    return -1;
+                numsec=0;
+            }
         }
         else
             sector++;
