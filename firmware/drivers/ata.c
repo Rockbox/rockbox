@@ -226,6 +226,8 @@ int ata_read_sectors(unsigned long start,
 
             if (!wait_for_start_of_transfer()) {
                 ret = -4;
+                if(ata_hard_reset())
+                    break;
                 goto retry;
             }
 
@@ -279,7 +281,7 @@ int ata_read_sectors(unsigned long start,
             last_disk_activity = current_tick;
         }
 
-        if(!wait_for_end_of_transfer()) {
+        if(!ret && !wait_for_end_of_transfer()) {
             ret = -3;
             goto retry;
         }
