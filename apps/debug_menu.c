@@ -1238,15 +1238,15 @@ static bool view_runtime(void)
                 lcd_update();
                 while (1) {
                     key = button_get_w_tmo(HZ*10);
-                    if ( key & BUTTON_REL )
-                        continue;
                     if ( key == SETTINGS_OK ) {
                         if ( state == 1 )
                             global_settings.runtime = 0;
                         else
                             global_settings.topruntime = 0;
+                        break;
                     }
-                    break;
+                    if ( key & BUTTON_REL )
+                        break;
                 }
                 break;
         }
