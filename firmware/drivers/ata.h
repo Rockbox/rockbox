@@ -45,4 +45,6 @@ extern void ata_delayed_write(unsigned long sector, void* buf);
 extern void ata_flush(void);
 extern void ata_spin(void);
 
+extern long last_disk_activity;
+
 #endif

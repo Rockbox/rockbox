@@ -98,7 +98,7 @@ static unsigned char delayed_sector[SECTOR_SIZE];
 static int delayed_sector_num;
 
 static long last_user_activity = -1;
-static long last_disk_activity = -1;
+long last_disk_activity = -1;
 
 static int multisectors; /* number of supported multisectors */
 static unsigned short identify_info[SECTOR_SIZE];
