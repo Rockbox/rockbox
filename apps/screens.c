@@ -693,7 +693,8 @@ bool quick_screen(int context, int button)
                     
                 break;
 
-            case BUTTON_OFF | BUTTON_REPEAT:
+            case BUTTON_OFF | BUTTON_REL:
+                lcd_setfont(FONT_UI);
                 return false;
 
             default:
