@@ -245,6 +245,14 @@ static void new_playlist(struct playlist_info* playlist, const char *dir,
 static void create_control(struct playlist_info* playlist)
 {
     playlist->control_fd = creat(playlist->control_filename, 0000200);
+    if (playlist->control_fd >= 0)
+    {   
+        /* have to close and re-open without O_TRUNC, otherwise it may get
+           chopped on closing (the file pointer is not always at the end) */
+        close(playlist->control_fd);
+        playlist->control_fd = open(playlist->control_filename, O_RDWR);
+    }
+
     if (playlist->control_fd < 0)
     {
         splash(HZ*2, true, "%s (%d)", str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR),
@@ -303,7 +311,7 @@ static void update_playlist_filename(struct playlist_info* playlist,
         sep="/";
         dirlen++;
     }
-    
+
     playlist->dirlen = dirlen;
     
     snprintf(playlist->filename, sizeof(playlist->filename),
@@ -1253,7 +1261,7 @@ int playlist_resume(void)
                     {
                         /* str1=version str2=dir str3=file */
                         int version;
-                        
+
                         if (!str1)
                         {
                             result = -1;
@@ -1311,7 +1319,7 @@ int playlist_resume(void)
                         last_position = atoi(str2);
                         
                         queue = (current_command == resume_add)?false:true;
-                        
+
                         /* seek position is based on str3's position in
                            buffer */
                         if (add_track_to_playlist(playlist, str3, position,
@@ -1403,7 +1411,7 @@ int playlist_resume(void)
                 /* to ignore any extra newlines */
                 current_command = resume_comment;
             } 
-            else if(newline) 
+            else if(newline)
             {
                 newline = false;
 
