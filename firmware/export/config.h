@@ -34,19 +34,23 @@
 /* CONFIG_CPU */
 #define SH7034  7034
 #define MCF5249 5249
-#define CR16    16   /* lacking a proper abbrivation */
+#define TCC730   730   /* lacking a proper abbrivation */
 
 /* CONFIG_KEYPAD */
 #define PLAYER_PAD      0
 #define RECORDER_PAD    1
 #define ONDIO_PAD       2
 #define IRIVER_H100_PAD 3
-#define GMINI_PAD       4
+#define GMINI100_PAD    4
 
 /* CONFIG_BATTERY */
 #define BATT_LIION2200      2200 /* FM/V2 recorder type */
 #define BATT_4AA_NIMH       1500
 #define BATT_3AAA_ALKALINE  1000
+
+/* CONFIG_LCD */
+#define LCD_GMINI100 0
+#define LCD_SSD1815  1 /* as used by Archos Recorders and Ondios */
 
 /* CONFIG_BACKLIGHT */
 #define BL_PA14_LO  0 /* Player, PA14 low active */

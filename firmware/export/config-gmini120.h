@@ -12,17 +12,31 @@
 #define LCD_HEIGHT 64
 
 /* When button.h is updated with gmini details, then fix this: */
-#define CONFIG_KEYPAD /*GMINI_PAD */ IRIVER_H100_PAD
+#define CONFIG_KEYPAD GMINI100_PAD
+
+#define CONFIG_LCD GMINI100_LCD
 
 #ifndef SIMULATOR
 
-/* Define this if you have a CalmRISC16 */
-#define CONFIG_CPU CR16
+/* Define this if you have a TCC730 (CalmRISC16) */
+#define CONFIG_CPU TCC730
+
+/* Define this if you have a gmini 100 style LCD */
+#define CONFIG_LCD LCD_GMINI100
 
 /* Type of mobile power, FIXME: probably different, make new type */
-#define CONFIG_BATTERY
+#define CONFIG_BATTERY BATT_LIION2200
+#define BATTERY_SCALE_FACTOR 6465
+/* chosen values at random -- jyp */
 
 /* Define this if the platform can charge batteries */
 #define HAVE_CHARGING 1
+
+#define CPU_FREQ 30000000
+/* approximate value (and false in general since freq is variable) */
+
+/* Always enable debug till we stabilize */
+#define EMULATOR
+#define DEBUG
 
 #endif
