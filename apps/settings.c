@@ -71,7 +71,7 @@ offset  abs
                  browse_current>
 0x0f    0x23    <scroll speed>
 0x10    0x24    <ff/rewind min step, acceleration rate>
-0x11    0x25    <AVC byte>
+0x11    0x25    <AVC, channel config>
 0x12    0x26    <(int) Resume playlist index, or -1 if no playlist resume>
 0x16    0x2a    <(int) Byte offset into resume file>
 0x1a    0x2e    <time until disk spindown>
@@ -275,7 +275,8 @@ int settings_save( void )
     config_block[0x10] = (unsigned char)
         ((global_settings.ff_rewind_min_step & 15) << 4 |
          (global_settings.ff_rewind_accel & 15));
-    config_block[0x11] = (unsigned char)global_settings.avc;
+    config_block[0x11] = (unsigned char)(global_settings.avc ||
+                                         global_settings.channel_config << 2);
     config_block[0x1a] = (unsigned char)global_settings.disk_spindown;
 
     memcpy(&config_block[0x12], &global_settings.resume_index, 4);
@@ -370,7 +371,10 @@ void settings_load(void)
         }
 
         if (config_block[0x11] != 0xFF)
-            global_settings.avc = config_block[0x11];
+        {
+            global_settings.avc = config_block[0x11] & 0x03;
+            global_settings.channel_config = (config_block[0x11] >> 2) & 0x03;
+        }
 
         if (config_block[0x12] != 0xFF)
             memcpy(&global_settings.resume_index, &config_block[0x12], 4);
@@ -527,6 +531,7 @@ void settings_reset(void) {
     global_settings.loudness    = mpeg_sound_default(SOUND_LOUDNESS);
     global_settings.bass_boost  = mpeg_sound_default(SOUND_SUPERBASS);
     global_settings.avc         = mpeg_sound_default(SOUND_AVC);
+    global_settings.channel_config = mpeg_sound_default(SOUND_CHANNELS);
     global_settings.resume      = RESUME_ASK;
     global_settings.contrast    = DEFAULT_CONTRAST_SETTING;
     global_settings.poweroff    = DEFAULT_POWEROFF_SETTING;
