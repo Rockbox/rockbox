@@ -173,7 +173,6 @@ int ata_read_sectors(unsigned long start,
 
     mutex_lock(&ata_mtx);
 
-#ifndef USE_STANDBY
     if ( sleeping ) {
 #ifdef USE_POWEROFF
         if (ata_power_on()) {
@@ -181,14 +180,15 @@ int ata_read_sectors(unsigned long start,
             return -1;
         }
 #else
+#ifdef USE_SLEEP
         if (perform_soft_reset()) {
             mutex_unlock(&ata_mtx);
             return -1;
         }
 #endif
+#endif
         sleeping = false;
     }
-#endif
 
     if (!wait_for_rdy())
     {
@@ -263,7 +263,6 @@ int ata_write_sectors(unsigned long start,
 
     mutex_lock(&ata_mtx);
     
-#ifndef USE_STANDBY
     if ( sleeping ) {
 #ifdef USE_POWEROFF
         if (ata_power_on()) {
@@ -271,14 +270,15 @@ int ata_write_sectors(unsigned long start,
             return -1;
         }
 #else
+#ifdef USE_SLEEP
         if (perform_soft_reset()) {
             mutex_unlock(&ata_mtx);
             return -1;
         }
 #endif
+#endif
         sleeping = false;
     }
-#endif
     
     if (!wait_for_rdy())
     {
@@ -397,6 +397,7 @@ static int ata_perform_sleep(void)
     mutex_lock(&ata_mtx);
 
     if(!wait_for_rdy()) {
+        DEBUGF("ata_perform_sleep() - not RDY\n");
         mutex_unlock(&ata_mtx);
         return -1;
     }
@@ -412,7 +413,10 @@ static int ata_perform_sleep(void)
 #endif
 
     if (!wait_for_rdy())
+    {
+        DEBUGF("ata_perform_sleep() - CMD failed\n");
         ret = -1;
+    }
 #endif
     sleeping = true;
     mutex_unlock(&ata_mtx);
