@@ -170,10 +170,12 @@ int ata_read_sectors(unsigned long start,
     int timeout;
     int count;
     void* buf;
+    int spinup_start;
 
     mutex_lock(&ata_mtx);
 
     last_disk_activity = current_tick;
+    spinup_start = current_tick;
 
     led(true);
 
@@ -242,7 +244,7 @@ int ata_read_sectors(unsigned long start,
             }
 
             if (spinup) {
-                ata_spinup_time = current_tick - last_disk_activity;
+                ata_spinup_time = current_tick - spinup_start;
                 spinup = false;
                 sleeping = false;
                 poweroff = false;
@@ -314,6 +316,7 @@ int ata_write_sectors(unsigned long start,
 {
     int i;
     int ret = 0;
+    int spinup_start;
 
     if (start == 0)
         panicf("Writing on sector 0\n");
@@ -321,6 +324,7 @@ int ata_write_sectors(unsigned long start,
     mutex_lock(&ata_mtx);
     
     last_disk_activity = current_tick;
+    spinup_start = current_tick;
 
     led(true);
 
@@ -369,7 +373,7 @@ int ata_write_sectors(unsigned long start,
         }
 
         if (spinup) {
-            ata_spinup_time = current_tick - last_disk_activity;
+            ata_spinup_time = current_tick - spinup_start;
             spinup = false;
             sleeping = false;
             poweroff = false;
