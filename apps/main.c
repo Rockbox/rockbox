@@ -146,7 +146,7 @@ void init(void)
     }
     
     settings_load();
-    font_load(ROCKBOX_DIR "/default.fon");
+    font_load(ROCKBOX_DIR "/default.fnt");
     
     mpeg_init( global_settings.volume,
                global_settings.bass,
