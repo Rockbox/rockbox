@@ -153,6 +153,7 @@ struct bpb
     int rootdirsector;
     int firstdatasector;
     int startsector;
+    int dataclusters;
     struct fsinfo fsinfo;
 };
 
@@ -227,7 +228,6 @@ int fat_mount(int startsector)
     unsigned char buf[SECTOR_SIZE];
     int err;
     int datasec;
-    int countofclusters;
     int i;
 
     for(i = 0;i < FAT_CACHE_SIZE;i++)
@@ -280,7 +280,7 @@ int fat_mount(int startsector)
 
     /* Determine FAT type */
     datasec = fat_bpb.totalsectors - fat_bpb.firstdatasector;
-    countofclusters = datasec / fat_bpb.bpb_secperclus;
+    fat_bpb.dataclusters = datasec / fat_bpb.bpb_secperclus;
 
 #ifdef TEST_FAT
     /*
@@ -289,7 +289,7 @@ int fat_mount(int startsector)
     */
     if ( fat_bpb.bpb_fatsz16 )
 #else
-    if ( countofclusters < 65525 )
+    if ( fat_bpb.dataclusters < 65525 )
 #endif
     {
         DEBUGF("This is not FAT32. Go away!\n");
@@ -330,6 +330,8 @@ int fat_mount(int startsector)
     fat_bpb.fsinfo.nextfree = BYTES2INT32(buf, FSINFO_NEXTFREE);
     LDEBUGF("Freecount: %x\n",fat_bpb.fsinfo.freecount);
     LDEBUGF("Nextfree: %x\n",fat_bpb.fsinfo.nextfree);
+    LDEBUGF("Cluster count: %x\n",fat_bpb.dataclusters);
+    LDEBUGF("FAT sectors: %x\n",fat_bpb.fatsize);
 
     return 0;
 }
@@ -342,12 +344,13 @@ static int bpb_is_sane(void)
                 fat_bpb.bpb_bytspersec);
         return -1;
     }
-    if(fat_bpb.bpb_secperclus * fat_bpb.bpb_bytspersec > 32768)
+    if(fat_bpb.bpb_secperclus * fat_bpb.bpb_bytspersec > 128*1024)
     {
-        DEBUGF( "bpb_is_sane() - Warning: cluster size is larger than 32K "
+        DEBUGF( "bpb_is_sane() - Error: cluster size is larger than 128K "
                 "(%d * %d = %d)\n",
                 fat_bpb.bpb_bytspersec, fat_bpb.bpb_secperclus,
                 fat_bpb.bpb_bytspersec * fat_bpb.bpb_secperclus);
+        return -2;
     }
     if (fat_bpb.bpb_rsvdseccnt != 32)
     {
@@ -369,7 +372,7 @@ static int bpb_is_sane(void)
     {
         DEBUGF( "bpb_is_sane() - Error: Last word is not "
                 "0xaa55 (0x%04x)\n", fat_bpb.last_word);
-        return -4;
+        return -3;
     }
 
     if (fat_bpb.fsinfo.freecount >
@@ -378,7 +381,7 @@ static int bpb_is_sane(void)
     {
         DEBUGF( "bpb_is_sane() - Error: FSInfo.Freecount > disk size "
                  "(0x%04x)\n", fat_bpb.fsinfo.freecount);
-        return -5;
+        return -4;
     }
 
     return 0;
@@ -429,19 +432,27 @@ static int find_free_cluster(int startcluster)
     int offset = startcluster % CLUSTERS_PER_FAT_SECTOR;
     int i;
 
+    /* don't waste time scanning if the disk is already full */
+    if (!fat_bpb.fsinfo.freecount)
+        return 0;
+
     for (i = 0; i<fat_bpb.fatsize; i++) {
         int j;
         int nr = (i + sector) % fat_bpb.fatsize;
         unsigned int* fat = cache_fat_sector(nr);
         if ( !fat )
             break;
-        for (j = offset; j < CLUSTERS_PER_FAT_SECTOR; j++)
+        for (j = offset; j < CLUSTERS_PER_FAT_SECTOR; j++) {
             if (!(SWAB32(fat[j]) & 0x0fffffff)) {
                 int c = nr * CLUSTERS_PER_FAT_SECTOR + j;
+                if ( c > fat_bpb.dataclusters+1 ) /* nr 0 is unused */
+                    break;
                 LDEBUGF("find_free_cluster(%x) == %x\n",startcluster,c);
                 fat_bpb.fsinfo.nextfree = c;
                 return c;
             }
+        }
+        offset = 0;
     }
     LDEBUGF("find_free_cluster(%x) == 0\n",startcluster);
     return 0; /* 0 is an illegal cluster number */
@@ -687,7 +698,6 @@ static int add_dir_entry(struct fat_dir* dir,
         }
 
         if (!new) {
-            LDEBUGF("Reading sector %x...\n", sec);
             /* Read the next sector in the current dir */
             err = ata_read_sectors(sec + fat_bpb.startsector,1,buf);
             if (err)
@@ -979,8 +989,9 @@ int fat_closewrite(struct fat_file *file, int size)
     int next, last = file->lastcluster;
     int endcluster = last;
 
-    LDEBUGF("fat_closewrite(%d)\n",size);
+    LDEBUGF("fat_closewrite(size=%d, last=%x)\n",size, last);
 
+    /* truncate trailing clusters */
     last = get_next_cluster(last);
     while ( last && last != FAT_EOF_MARK ) {
         next = get_next_cluster(last);
@@ -988,13 +999,20 @@ int fat_closewrite(struct fat_file *file, int size)
         last = next;
     }
 
-    if ( !size ) {
+    /* if no cluster was written, size is 0 */
+    if (!endcluster)
+        size = 0;
+
+    if (!size) {
         /* empty file */
-        update_fat_entry(file->firstcluster, 0);
-        file->firstcluster = 0;
+        if ( file->firstcluster ) {
+            update_fat_entry(file->firstcluster, 0);
+            file->firstcluster = 0;
+        }
     }
     else
         update_fat_entry(endcluster, FAT_EOF_MARK);
+
     update_dir_entry(file, size);
     flush_fat();
 
@@ -1011,6 +1029,8 @@ int fat_closewrite(struct fat_file *file, int size)
                 count, len, size );
         if ( len > size + fat_bpb.bpb_secperclus * SECTOR_SIZE)
             panicf("Cluster chain is too long\n");
+        if ( len < size )
+            panicf("Cluster chain is too short\n");
     }
 #endif
 
@@ -1034,84 +1054,19 @@ int fat_remove(struct fat_file* file)
     return 0;
 }
 
-int fat_read( struct fat_file *file, int sectorcount, void* buf )
+
+static int next_write_cluster(struct fat_file* file,
+                              int oldcluster,
+                              int* newsector)
 {
-    int cluster = file->lastcluster;
-    int sector = file->lastsector;
-    int numsec = file->sectornum;
-    int first=0, last=0;
-    int err, i;
-
-    LDEBUGF( "fat_read(file:%x,count:%d,buf:%x)\n",
-             cluster,sectorcount,buf);
-    LDEBUGF( "fat_read: c=%x s=%x n=%d\n", cluster,sector,numsec);
-    if ( sector == -1 )
-        return 0;
-
-    /* find sequential sectors and read/write them all at once */
-    for (i=0; i<sectorcount && sector>=0; i++ ) {
-        numsec++;
-        if ( numsec > fat_bpb.bpb_secperclus ) {
-            cluster = get_next_cluster(cluster);
-            if (!cluster) {
-                /* reading past end-of-file */
-                sector = -1;
-            }
-            
-            if (cluster) {
-                sector = cluster2sec(cluster);
-                LDEBUGF("cluster2sec(%x) == %x\n",cluster,sector);
-                if (sector<0)
-                    return -1;
-                numsec=1;
-            }
-        }
-        else {
-            if (sector)
-                sector++;
-            else {
-                sector = cluster2sec(file->firstcluster);
-                numsec=1;
-            }
-        }
-
-        if (!first)
-            first = sector;
-
-        if ( ((sector != first) && (sector != last+1)) ||  
-             /* not sequential any more? */
-             (i == sectorcount-1) ||   /* last sector requested? */
-             (sector-first+1 == 256) ) { /* max 256 sectors per ata request */
-            int count = sector - first + 1;
-            int start = first + fat_bpb.startsector;
-            LDEBUGF("s=%x, l=%x, f=%x, i=%d\n",sector,last,first,i);
-            err = ata_read_sectors(start, count, buf);
-            if (err) {
-                DEBUGF( "fat_read() - Couldn't read sector %d"
-                        " (error code %d)\n", sector,err);
-                return -2;
-            }
-            ((char*)buf) += count * SECTOR_SIZE;
-            first = 0;
-        }
-        last = sector;
-   }
-
-    file->lastcluster = cluster;
-    file->lastsector = sector;
-    file->sectornum = numsec;
-
-    return sectorcount;
-}
-
-int next_write_cluster(struct fat_file* file, int oldcluster, int* newsector)
-{
-    int cluster;
+    int cluster = 0;
     int sector;
 
     LDEBUGF("next_write_cluster(%x,%x)\n",file->firstcluster, oldcluster);
 
-    cluster = get_next_cluster(oldcluster);
+    if (oldcluster)
+        cluster = get_next_cluster(oldcluster);
+
     if (!cluster) {
         if (oldcluster)
             cluster = find_free_cluster(oldcluster+1);
@@ -1123,9 +1078,15 @@ int next_write_cluster(struct fat_file* file, int oldcluster, int* newsector)
                 update_fat_entry(oldcluster, cluster); 
             else
                 file->firstcluster = cluster;
+            update_fat_entry(cluster, FAT_EOF_MARK); 
         }
         else {
-            DEBUGF("next_write_sector(): Disk full!\n");
+#ifdef TEST_FAT
+            if (fat_bpb.fsinfo.freecount>0)
+                panicf("There is free space, but find_free_cluster() "
+                       "didn't find it!\n");
+#endif
+            DEBUGF("next_write_cluster(): Disk full!\n");
             return 0;
         }
     }
@@ -1137,6 +1098,25 @@ int next_write_cluster(struct fat_file* file, int oldcluster, int* newsector)
     return cluster;
 }
 
+static bool transfer( int start, int count, char* buf, bool write )
+{
+    int err;
+
+    LDEBUGF("transfer(s=%x, c=%x)\n",start, count);
+    if (write)
+        err = ata_write_sectors(start, count, buf);
+    else
+        err = ata_read_sectors(start, count, buf);
+    if (err) {
+        DEBUGF( "transfer() - Couldn't %s sector %x"
+                " (error code %d)\n", 
+                write ? "write":"read", start, err);
+        return false;
+    }
+    return true;
+}
+
+
 int fat_readwrite( struct fat_file *file, int sectorcount, 
                    void* buf, bool write )
 {
@@ -1144,7 +1124,7 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
     int sector = file->lastsector;
     int numsec = file->sectornum;
     int first=0, last=0;
-    int err, i;
+    int i;
 
     LDEBUGF( "fat_write(file:%x,count:%d,buf:%x)\n",
              cluster,sectorcount,buf);
@@ -1153,23 +1133,31 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
         return 0;
 
     /* find sequential sectors and write them all at once */
-    for (i=0; i<sectorcount; i++ ) {
+    for (i=0; (i < sectorcount) && (sector > -1); i++ ) {
         numsec++;
         if ( numsec > fat_bpb.bpb_secperclus || !cluster ) {
+            int oldcluster = cluster;
             if (write)
                 cluster = next_write_cluster(file, cluster, &sector);
             else {
                 cluster = get_next_cluster(cluster);
                 sector = cluster2sec(cluster);
             }
-            if (!cluster)
+            if (!cluster) {
                 sector = -1;
+                if ( write ) {
+                    /* set file->lastcluster to last available cluster,
+                       so we can terminate the file in closewrite() */
+                    cluster = oldcluster;
+                }
+            }
             numsec=1;
         }
         else {
             if (sector)
                 sector++;
             else {
+                /* look up first sector of file */
                 sector = cluster2sec(file->firstcluster);
                 numsec=1;
             }
@@ -1179,23 +1167,27 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
             first = sector;
 
         if ( ((sector != first) && (sector != last+1)) || /* not sequential */
-             (i == sectorcount-1) ||   /* last sector requested */
-             (sector-first+1 == 256) ) { /* max 256 sectors per ata request */
-            int count = sector - first + 1;
-            int start = first + fat_bpb.startsector;
-            LDEBUGF("s=%x, l=%x, f=%x, i=%d\n",sector,last,first,i);
-            if (write)
-                err = ata_write_sectors(start, count, buf);
-            else
-                err = ata_read_sectors(start, count, buf);
-            if (err) {
-                DEBUGF( "fat_readwrite() - Couldn't read sector %d"
-                        " (error code %d)\n", sector,err);
+             (last-first+1 == 256) ) { /* max 256 sectors per ata request */
+            int count = last - first + 1;
+            if (!transfer( first + fat_bpb.startsector, count, buf, write ))
                 return -2;
-            }
+
             ((char*)buf) += count * SECTOR_SIZE;
-            first = 0;
+            first = sector;
         }
+        else {
+            /* last sector requested */
+            if (i >= sectorcount-1) {
+                int count = sector - first + 1;
+                if (!transfer( first + fat_bpb.startsector, 
+                               count, buf, write ))
+                    return -2;
+                
+                ((char*)buf) += count * SECTOR_SIZE;
+                first = sector;
+            }
+        }
+
         last = sector;
     }
 
@@ -1203,7 +1195,11 @@ int fat_readwrite( struct fat_file *file, int sectorcount,
     file->lastsector = sector;
     file->sectornum = numsec;
 
-    return sectorcount;
+    /* if eof, don't report last block as read/written */
+    if (sector == -1)
+        i--;
+
+    return i;
 }
 
 int fat_seek(struct fat_file *file, int seeksector )

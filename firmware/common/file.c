@@ -197,13 +197,9 @@ static int readwrite(int fd, void* buf, int count, bool write)
     LDEBUGF( "readwrite(%d,%x,%d,%s)\n",
              fd,buf,count,write?"write":"read");
 
-    /* attempt to access past EOF? */
-    if (count > openfiles[fd].size - openfiles[fd].fileoffset) {
-        if ( write )
-            openfiles[fd].size = openfiles[fd].fileoffset + count;
-        else
-            count = openfiles[fd].size - openfiles[fd].fileoffset;
-    }
+    /* attempt to read past EOF? */
+    if (!write && count > openfiles[fd].size - openfiles[fd].fileoffset)
+        count = openfiles[fd].size - openfiles[fd].fileoffset;
 
     /* any head bytes? */
     if ( openfiles[fd].cacheoffset != -1 ) {
@@ -253,8 +249,12 @@ static int readwrite(int fd, void* buf, int count, bool write)
         }
         else {
             if ( rc > 0 ) {
-                nread += sectors * SECTOR_SIZE;
+                nread += rc * SECTOR_SIZE;
                 count -= sectors * SECTOR_SIZE;
+
+                /* if eof, skip tail bytes */
+                if ( rc < sectors )
+                    count = 0;
             }
             else {
                 /* eof */
@@ -285,6 +285,12 @@ static int readwrite(int fd, void* buf, int count, bool write)
     }
 
     openfiles[fd].fileoffset += nread;
+    LDEBUGF("fileoffset: %d\n", openfiles[fd].fileoffset);
+
+    /* adjust file size to length written */
+    if ( write && openfiles[fd].fileoffset > openfiles[fd].size )
+        openfiles[fd].size = openfiles[fd].fileoffset;
+
     return nread;
 }
 
