@@ -26,6 +26,7 @@
 #DEFAULT (echo ""; id; echo %{sVv}; date; cat) >> $CVSROOT/CVSROOT/commitlog
 CVSROOT $CVSROOT/CVSROOT/syncmail -C4 -u %{sVv} zagor@users.sourceforge.net
 ^apps $CVSROOT/CVSROOT/syncmail -C4 -u %{sVv} rockbox-cvs@cool.haxx.se
+^flash $CVSROOT/CVSROOT/syncmail -C4 -u %{sVv} rockbox-cvs@cool.haxx.se
 ^firmware $CVSROOT/CVSROOT/syncmail -C4 -u %{sVv} rockbox-cvs@cool.haxx.se
 ^docs $CVSROOT/CVSROOT/syncmail -C4 -u %{sVv} rockbox-cvs@cool.haxx.se
 ^uisimulator $CVSROOT/CVSROOT/syncmail -C4 -u %{sVv} rockbox-cvs@cool.haxx.se
