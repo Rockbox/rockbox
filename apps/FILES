@@ -12,3 +12,4 @@ plugins/plugin.lds
 plugins/*.txt
 plugins/lib/*.[ch]
 plugins/lib/Makefile
+plugins/sokoban.levels
