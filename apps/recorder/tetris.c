@@ -345,7 +345,7 @@ void game_loop(void)
 		move_block(2,0,0);
 	    }
 	    if ( b & BUTTON_UP ) {
-		move_block(0,0,1);
+		move_block(0,0,-1);
 	    }
 	    if ( b & BUTTON_DOWN ) {
 		move_down();
