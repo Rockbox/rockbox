@@ -136,7 +136,7 @@ irq_handler:
            DMA is enabled and has priority in both banks
            All types of accesses are allowed
            (We might want to restrict that to save power) */
-        move.l #0x1000e001,%d0
+        move.l #0x10000e01,%d0
         movec.l %d0,%rambar1
 
         /* 32K Non-DMA SRAM at 0x10010000
