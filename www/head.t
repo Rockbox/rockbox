@@ -36,6 +36,7 @@
 <a class="menulink" href="/rockbox/irc/">IRC</a><br>
 <a class="menulink" href="/rockbox/tools.html">tools</a><br>
 <a class="menulink" href="/rockbox/internals/">photos</a><br>
+<a class="menulink" href="http://bjorn.haxx.se/rockbox/daily.shtml">daily builds</a><br>
 <a class="menulink" href="/rockbox/cvs.html">CVS</a><br>
 <a class="menulink" href="http://sourceforge.net/projects/rockbox/">sourceforge</a><br>
 <a class="menulink" href="/isd200/">linux driver</a>
