@@ -1842,7 +1842,8 @@ static void mpeg_thread(void)
             case MPEG_TRACK_CHANGE:
                 track_change();
                 break;
-                
+
+#ifndef USB_NONE
             case SYS_USB_CONNECTED:
                 is_playing = false;
                 paused = false;
@@ -1857,6 +1858,7 @@ static void mpeg_thread(void)
                 usb_wait_for_disconnect(&mpeg_queue);
 #endif
                 break;
+#endif /* USB_NONE */
                 
 #ifdef HAVE_MAS3587F
             case MPEG_INIT_RECORDING:

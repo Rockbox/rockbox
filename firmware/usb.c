@@ -37,8 +37,7 @@ extern void dbg_ports(void); /* NASTY! defined in apps/ */
 
 #define USB_REALLY_BRAVE
 
-
-#ifndef SIMULATOR
+#if !defined(SIMULATOR) && !defined(USB_NONE)
 
 /* Messages from usb_tick */
 #define USB_INSERTED    1
@@ -338,6 +337,12 @@ bool usb_inserted(void)
 
 #else
 
+#ifdef USB_NONE
+bool usb_inserted(void)
+{
+}
+#endif
+
 /* Dummy simulator functions */
 void usb_acknowledge(int id)
 {
@@ -357,4 +362,4 @@ bool usb_detect(void)
     return false;
 }
 
-#endif
+#endif /* USB_NONE or SIMULATOR */
