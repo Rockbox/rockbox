@@ -42,6 +42,8 @@ char* playlist_next(int steps, char *dirname)
     int fd;
     int i;
     char buf[MAX_PATH+1];
+    char dir_buf[MAX_PATH+1];
+    char *dir_end;
 
     playlist.index = (playlist.index+steps) % playlist.amount;
     seek = playlist.indices[playlist.index];
@@ -81,10 +83,32 @@ char* playlist_next(int steps, char *dirname)
               strcpy(now_playing, &buf[2]);
               return now_playing;
           }
-          else {
-              snprintf(now_playing, MAX_PATH+1, "%s/%s", dirname, buf);
+          else if ( '.' == buf[0] && '.' == buf[1] && '/' == buf[2] ) {
+              /* handle relative paths */
+              seek=3;
+              while(buf[seek] == '.' &&
+                    buf[seek+1] == '.' &&
+                    buf[seek+2] == '/')
+                  seek += 3;
+              strcpy(dir_buf, dirname);
+              for (i=0; i<seek/3; i++) {
+                  dir_end = strrchr(dir_buf, '/');
+                  if (dir_end)
+                      *dir_end = '\0';
+                  else
+                      break;
+              }
+              snprintf(now_playing, MAX_PATH+1, "%s/%s", dir_buf, &buf[seek]);
               return now_playing;
           }
+          else if ( '.' == buf[0] && '/' == buf[1] ) {
+              snprintf(now_playing, MAX_PATH+1, "%s/%s", dirname, &buf[2]);
+              return now_playing;
+          }
+	  else {
+	      snprintf(now_playing, MAX_PATH+1, "%s/%s", dirname, buf);
+	      return now_playing;
+	  }
       }
     }
     else
