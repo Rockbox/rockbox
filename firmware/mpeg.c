@@ -95,17 +95,17 @@ extern int playlist_amount(void);
 extern void update_file_pos( int id, int pos );
 
 /* list of tracks in memory */
-#define MAX_ID3_TAGS (1<<4) /* Must be power of 2 */
-#define MAX_ID3_TAGS_MASK (MAX_ID3_TAGS - 1)
+#define MAX_TRACK_ENTRIES (1<<4) /* Must be power of 2 */
+#define MAX_TRACK_ENTRIES_MASK (MAX_TRACK_ENTRIES - 1)
 
-struct id3tag
+struct trackdata
 {
     struct mp3entry id3;
     int mempos;
     int load_ahead_index;
 };
 
-static struct id3tag id3tags[MAX_ID3_TAGS];
+static struct trackdata trackdata[MAX_TRACK_ENTRIES];
 
 static bool v1first = false;
 
@@ -114,12 +114,12 @@ static unsigned int last_track_counter = 0;
 
 #ifndef SIMULATOR
 
-static int tag_read_idx = 0;
-static int tag_write_idx = 0;
+static int track_read_idx = 0;
+static int track_write_idx = 0;
 
 static int num_tracks_in_memory(void)
 {
-    return (tag_write_idx - tag_read_idx) & MAX_ID3_TAGS_MASK;
+    return (track_write_idx - track_read_idx) & MAX_TRACK_ENTRIES_MASK;
 }
 #endif /* #ifndef SIMULATOR */
 
@@ -129,11 +129,11 @@ static void debug_tags(void)
 #ifdef DEBUG_TAGS
     int i;
 
-    for(i = 0;i < MAX_ID3_TAGS;i++)
+    for(i = 0;i < MAX_TRACK_ENTRIES;i++)
     {
-        DEBUGF("%d - %s\n", i, id3tags[i].id3.path);
+        DEBUGF("%d - %s\n", i, trackdata[i].id3.path);
     }
-    DEBUGF("read: %d, write :%d\n", tag_read_idx, tag_write_idx);
+    DEBUGF("read: %d, write :%d\n", track_read_idx, track_write_idx);
     DEBUGF("num_tracks_in_memory: %d\n", num_tracks_in_memory());
 #endif /* #ifdef DEBUG_TAGS */
 }
@@ -143,7 +143,7 @@ static void remove_current_tag(void)
     if(num_tracks_in_memory() > 0)
     {
         /* First move the index, so nobody tries to access the tag */
-        tag_read_idx = (tag_read_idx+1) & MAX_ID3_TAGS_MASK;
+        track_read_idx = (track_read_idx+1) & MAX_TRACK_ENTRIES_MASK;
         debug_tags();
     }
     else
@@ -154,15 +154,23 @@ static void remove_current_tag(void)
 
 static void remove_all_non_current_tags(void)
 {
-    tag_write_idx = (tag_read_idx+1) & MAX_ID3_TAGS_MASK;
+    track_write_idx = (track_read_idx+1) & MAX_TRACK_ENTRIES_MASK;
     debug_tags();
 }
 
 static void remove_all_tags(void)
 {
-    tag_write_idx = tag_read_idx;
+    track_write_idx = track_read_idx;
 
     debug_tags();
+}
+
+static struct trackdata *get_trackdata(int offset)
+{
+    if(offset > num_tracks_in_memory())
+        return NULL;
+    else
+       return &trackdata[(track_read_idx + offset) & MAX_TRACK_ENTRIES_MASK];
 }
 #endif /* #ifndef SIMULATOR */
 
@@ -477,9 +485,7 @@ static int get_unplayed_space_current_song(void)
 
     if (num_tracks_in_memory() > 1)
     {
-        int track_offset = (tag_read_idx+1) & MAX_ID3_TAGS_MASK;
-
-        space = id3tags[track_offset].mempos - audiobuf_read;
+        space = get_trackdata(1)->mempos - audiobuf_read;
     }
     else
     {
@@ -666,7 +672,7 @@ void rec_tick(void)
 
 void playback_tick(void)
 {
-    id3tags[tag_read_idx].id3.elapsed +=
+    get_trackdata(0)->id3.elapsed +=
         (current_tick - last_dma_tick) * 1000 / HZ;
     last_dma_tick = current_tick;
 }
@@ -686,7 +692,8 @@ static void transfer_end(unsigned char** ppbuf, int* psize)
     {
         int unplayed_space_left;
         int space_until_end_of_buffer;
-        int track_offset = (tag_read_idx+1) & MAX_ID3_TAGS_MASK;
+        int track_offset = 1;
+        struct trackdata *track;
 
         audiobuf_read += last_dma_chunk_size;
         if(audiobuf_read >= audiobuflen)
@@ -695,10 +702,10 @@ static void transfer_end(unsigned char** ppbuf, int* psize)
         /* First, check if we are on a track boundary */
         if (num_tracks_in_memory() > 1)
         {
-            if (audiobuf_read == id3tags[track_offset].mempos)
+            if (audiobuf_read == get_trackdata(track_offset)->mempos)
             {
                 queue_post(&mpeg_queue, MPEG_TRACK_CHANGE, 0);
-                track_offset = (track_offset+1) & MAX_ID3_TAGS_MASK;
+                track_offset++;
             }
         }
         
@@ -721,20 +728,21 @@ static void transfer_end(unsigned char** ppbuf, int* psize)
             /* several tracks loaded? */
             if (num_tracks_in_memory() > 1)
             {
+                track = get_trackdata(track_offset);
+                
                 /* will we move across the track boundary? */
-                if (( audiobuf_read < id3tags[track_offset].mempos ) &&
+                if (( audiobuf_read < track->mempos ) &&
                     ((audiobuf_read+last_dma_chunk_size) >
-                     id3tags[track_offset].mempos ))
+                     track->mempos ))
                 {
                     /* Make sure that we end exactly on the boundary */
-                    last_dma_chunk_size = id3tags[track_offset].mempos
-                        - audiobuf_read;
+                    last_dma_chunk_size = track->mempos - audiobuf_read;
                 }
             }
 
             *psize = last_dma_chunk_size & 0xffff;
             *ppbuf = audiobuf + audiobuf_read;
-            id3tags[tag_read_idx].id3.offset += last_dma_chunk_size;
+            get_trackdata(0)->id3.offset += last_dma_chunk_size;
 
             /* Update the watermark debug level */
             if(unplayed_space_left < lowest_watermark_level)
@@ -770,27 +778,31 @@ static void transfer_end(unsigned char** ppbuf, int* psize)
     wake_up_thread();
 }
 
-static int add_track_to_tag_list(const char *filename)
+static struct trackdata *add_track_to_tag_list(const char *filename)
 {
-    if(num_tracks_in_memory() >= MAX_ID3_TAGS)
+    struct trackdata *track;
+    
+    if(num_tracks_in_memory() >= MAX_TRACK_ENTRIES)
     {
         DEBUGF("Tag memory is full\n");
-        return -1;
+        return NULL;
     }
-        
+
+    track = &trackdata[track_write_idx];
+    
     /* grab id3 tag of new file and
        remember where in memory it starts */
-    if(mp3info(&id3tags[tag_write_idx].id3, filename, v1first))
+    if(mp3info(&track->id3, filename, v1first))
     {
         DEBUGF("Bad mp3\n");
-        return -1;
+        return NULL;
     }
-    id3tags[tag_write_idx].mempos = audiobuf_write;
-    id3tags[tag_write_idx].id3.elapsed = 0;
+    track->mempos = audiobuf_write;
+    track->id3.elapsed = 0;
 
-    tag_write_idx = (tag_write_idx+1) & MAX_ID3_TAGS_MASK;
+    track_write_idx = (track_write_idx+1) & MAX_TRACK_ENTRIES_MASK;
     debug_tags();
-    return 0;
+    return track;
 }
 
 static int new_file(int steps)
@@ -798,6 +810,7 @@ static int new_file(int steps)
     int max_steps = playlist_amount();
     int start = 0;
     int i;
+    struct trackdata *track;
 
     /* Find out how many steps to advance. The load_ahead_index field tells
        us how many playlist entries it had to skip to get to a valid one.
@@ -805,11 +818,10 @@ static int new_file(int steps)
     if(steps > 0 && num_tracks_in_memory() > 1)
     {
         /* Begin with the song after the currently playing one */
-        i = (tag_read_idx + 1) & MAX_ID3_TAGS_MASK;
-        while(i != tag_write_idx)
+        i = 1;
+        while((track = get_trackdata(i++)))
         {
-            start += id3tags[i].load_ahead_index;
-            i = (i+1) & MAX_ID3_TAGS_MASK;
+            start += track->load_ahead_index;
         }
     }
     
@@ -832,9 +844,9 @@ static int new_file(int steps)
         }
         else
         {
-            int new_tag_idx = tag_write_idx;
+            struct trackdata *track = add_track_to_tag_list(trackname);
 
-            if(add_track_to_tag_list(trackname))
+            if(!track)
             {
                 /* Bad mp3 file */
                 if(steps < 0)
@@ -848,19 +860,19 @@ static int new_file(int steps)
             {
                 /* skip past id3v2 tag */
                 lseek(mpeg_file, 
-                      id3tags[new_tag_idx].id3.first_frame_offset,
+                      track->id3.first_frame_offset,
                       SEEK_SET);
-                id3tags[new_tag_idx].id3.index = steps;
-                id3tags[new_tag_idx].load_ahead_index = steps;
-                id3tags[new_tag_idx].id3.offset = 0;
+                track->id3.index = steps;
+                track->load_ahead_index = steps;
+                track->id3.offset = 0;
 
-                if(id3tags[new_tag_idx].id3.vbr)
+                if(track->id3.vbr)
                     /* Average bitrate * 1.5 */
                     recalculate_watermark(
-                        (id3tags[new_tag_idx].id3.bitrate * 3) / 2);
+                        (track->id3.bitrate * 3) / 2);
                 else
                     recalculate_watermark(
-                        id3tags[new_tag_idx].id3.bitrate);
+                        track->id3.bitrate);
                     
             }
         }
@@ -889,11 +901,13 @@ static void stop_playing(void)
 static void update_playlist(void)
 {
     int index;
+    struct trackdata *track;
 
     if (num_tracks_in_memory() > 0)
     {
-        index = playlist_next(id3tags[tag_read_idx].id3.index);
-        id3tags[tag_read_idx].id3.index = index;
+        track = get_trackdata(0);
+        index = playlist_next(track->id3.index);
+        track->id3.index = index;
     }
 }
 
@@ -1098,7 +1112,7 @@ static void mpeg_thread(void)
 
                 /* mid-song resume? */
                 if (start_offset) {
-                    struct mp3entry* id3 = &id3tags[tag_read_idx].id3;
+                    struct mp3entry* id3 = &get_trackdata(0)->id3;
                     lseek(mpeg_file, start_offset, SEEK_SET);
                     id3->offset = start_offset;
                     set_elapsed(id3);
@@ -1106,7 +1120,7 @@ static void mpeg_thread(void)
                 else {
                     /* skip past id3v2 tag */
                     lseek(mpeg_file, 
-                          id3tags[tag_read_idx].id3.first_frame_offset, 
+                          get_trackdata(0)->id3.first_frame_offset, 
                           SEEK_SET);
 
                 }
@@ -1169,7 +1183,7 @@ static void mpeg_thread(void)
                     mp3_play_pause(false);
 
                     track_change();
-                    audiobuf_read = id3tags[tag_read_idx].mempos;
+                    audiobuf_read = get_trackdata(0)->mempos;
                     last_dma_chunk_size = MIN(0x2000, get_unplayed_space_current_song());
                     mp3_play_data(audiobuf + audiobuf_read, last_dma_chunk_size, transfer_end);
                     dma_underrun = false;
@@ -1289,16 +1303,12 @@ static void mpeg_thread(void)
                 {
                     /* We have started loading other tracks that need to be
                        accounted for */
-                    int i = tag_read_idx;
-                    int j = tag_write_idx - 1;
+                    struct trackdata *track;
+                    int i = 0;
 
-                    if (j < 0)
-                        j = MAX_ID3_TAGS - 1;
-
-                    while (i != j)
+                    while((track = get_trackdata(i++)))
                     {
-                        curpos += id3tags[i].id3.filesize;
-                        i = (i+1) & MAX_ID3_TAGS_MASK;
+                        curpos += track->id3.filesize;
                     }
                 }
 
@@ -1398,11 +1408,8 @@ static void mpeg_thread(void)
 
                 if (numtracks > 1)
                 {
-                    /* Reload songs */
-                    int next = (tag_read_idx+1) & MAX_ID3_TAGS_MASK;
-
                     /* Reset the buffer */
-                    audiobuf_write = id3tags[next].mempos;
+                    audiobuf_write = get_trackdata(1)->mempos;
 
                     /* Reset swapwrite unless we're still swapping current
                        track */
@@ -2020,7 +2027,7 @@ struct mp3entry* audio_current_track()
     return &taginfo;
 #else
     if(num_tracks_in_memory())
-        return &id3tags[tag_read_idx].id3;
+        return &get_trackdata(0)->id3;
     else
         return NULL;
 #endif /* #ifdef SIMULATOR */
@@ -2032,7 +2039,7 @@ struct mp3entry* audio_next_track()
     return &taginfo;
 #else
     if(num_tracks_in_memory() > 1)
-        return &(id3tags[(tag_read_idx+1) & MAX_ID3_TAGS_MASK].id3);
+        return &get_trackdata(1)->id3;
     else
         return NULL;
 #endif /* #ifdef SIMULATOR */
@@ -2771,7 +2778,7 @@ void audio_init(void)
     create_thread(mpeg_thread, mpeg_stack,
                   sizeof(mpeg_stack), mpeg_thread_name);
 
-    memset(id3tags, sizeof(id3tags), 0);
+    memset(trackdata, sizeof(trackdata), 0);
 
 #if CONFIG_HWCODEC == MAS3587F
     if(read_hw_mask() & PR_ACTIVE_HIGH)
