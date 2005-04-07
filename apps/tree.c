@@ -71,6 +71,12 @@ const struct filetype filetypes[] = {
     { ".mp3", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
     { ".mp2", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
     { ".mpa", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
+#if CONFIG_HWCODEC == MASNONE
+    /* Temporary hack to allow playlist creation */
+    { ".ogg", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
+    { ".wma", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
+    { ".wav", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
+#endif
     { ".m3u", TREE_ATTR_M3U, Playlist, LANG_PLAYLIST },
     { ".cfg", TREE_ATTR_CFG, Config, VOICE_EXT_CFG },
     { ".wps", TREE_ATTR_WPS, Wps, VOICE_EXT_WPS },
