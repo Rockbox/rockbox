@@ -1,0 +1,159 @@
+NEWSDATE(28-nov-2003)
+
+ ITEM Rockbox now finally runs on the Recorder V2.
+
+ENDDATE
+
+NEWSDATE(03-nov-2003)
+
+ ITEM LINUSN revamped the file split feature so it always splits on MP3
+ frame boundaries. As a bonus, the Play key can now be pressed to start a new
+ file during recording.
+
+ ITEM LINUSN applied a bunch of nice patches, like Line-In activation on
+ Players, a VU meter plugin, a NIM game for the Player, plus a few bug
+ fixes.
+
+ ITEM The Chip8 emulator has finally been added to the CVS!
+
+ ITEM Recording with flashed firmware is finally stable
+
+ENDDATE
+
+NEWSDATE(28-aug-2003)
+
+ ITEM Can Rockbox be made to
+ LINK("http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-08/0784.shtml",
+ play WAV) files?
+
+ENDDATE
+
+NEWSDATE(22-aug-2003)
+
+ ITEM NAME(Jesús Rodríguez Marcial) posted his brand new translation of
+ Rockbox into
+ LINK("http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-08/0576.shtml",
+ Galego).
+
+ ITEM BAGDER and
+ LINUSN posted a re-worked
+ LINK("http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-08/0584.shtml",
+ suggestion) previously posted about how to remap the keys of the Recorder
+ versions of Rockbox. Discussions followed.
+
+ ITEM NAME(idc-dragon) called for
+ LINK("http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-08/0596.shtml",
+ early adopter needed for player flashing).
+
+ENDDATE
+
+NEWSDATE(21-aug-2003)
+
+ ITEM NAME(Druzina Dobravec) brought a
+ LINK("http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-08/0530.shtml",
+ Slovenian language file) as
+ LINK("http://rockbox.haxx.se/lang/", language) number 20.
+
+ENDDATE
+
+NEWSDATE(13-aug-2003)
+
+ ITEM NAME(Bernhard) offered a
+ LINK("http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-08/0381.shtml",
+ good advice to windows people using Archos). He says
+ LINK("http://www.ct.heise.de/ct/03/16/links/208.shtml", DevEject) is a good
+ thing.
+
+ENDDATE
+
+NEWSDATE(11-aug-2003)
+
+ ITEM NAME(Todd Lowe) was searching for
+ LINK("http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-08/0345.shtml",
+ external battery pack options for FMR).
+
+ENDDATE
+
+NEWSDATE(9-aug-2003)
+
+ ITEM NAME(Magnus Holmgren) managed to improve the speed of the ROLO quite a
+ lot with his
+ LINK("http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-08/0325.shtml",
+ descrable in assembler fix).
+
+ENDDATE
+
+NEWSDATE(8-aug-2003)
+
+ ITEM NAME(doctor23) brought up the always-hot topic of
+ LINK("http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-08/0283.shtml",
+ Should I Buy a Recorder or FM Recorder?). The same issue was also brought up
+ by NAME(Brad) five days later in his
+ LINK("http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-08/0374.shtml",
+ JBR vs FMR? Which one is better) mail.
+
+ENDDATE
+
+NEWSDATE(6-aug-2003)
+
+ ITEM One of those interesting threads on
+ LINK("http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-08/0196.shtml",
+ should you really buy a JBFMR20?).
+
+ENDDATE
+
+NEWSDATE(5-aug-2003)
+
+ ITEM NAME(idc-dragon) posted that he
+ LINK("http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-08/0142.shtml",
+ needs some Player firmware version insight for flashing). There might be a
+ flashable player in the future if he gets sufficient help!
+
+ENDDATE
+
+NEWSDATE(4-aug-2003)
+
+ ITEM NAME(Gadi Cohen) brought a patch that now offers
+ LINK("http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-08/0074.shtml",
+ working hebrew) for Rockbox.
+
+ENDDATE
+
+NEWSDATE(3-aug-2003)
+
+ ITEM NAME(CombThins) brought a thought-through suggestion on
+ LINK("http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-08/0051.shtml",
+ how to support nested playlists).
+
+ENDDATE
+
+NEWSDATE(1-aug-2003)
+
+ ITEM NAME(idc-dragon) got a bunch of
+ LINK("http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-08/0001.shtml",
+ SST39 flash chips) he offered in case anyone feels like "patching" their
+ units to become flashable.
+
+ ITEM BAGDER
+ LINK("http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-08/0006.shtml",
+ announced UCL built in regular build process). So if you install 'uclpack'
+ properly, running make as usual will build you a .ucl file for flashing as
+ well!
+
+ ITEM NAME(Remo Hofer)
+ LINK("http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-08/0013.shtml",
+ suggested) we move the fonts to .rockbox/fonts/ and the languages to
+ .rockbox/languages/. The suggestion got some support from various people.
+
+ ITEM BAGDER fixed daily-zips to include full download packages including most
+ of everything users want, in one single zip archive.
+
+ENDDATE
+
+NEWSDATE(31-jul-2003)
+
+ ITEM NAME(David Reis) posted about his new
+ LINK("http://rockbox.haxx.se/mail/archive/rockbox-archive-2003-07/1520.shtml",
+ favourites rock).
+
+ENDDATE
