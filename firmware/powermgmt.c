@@ -110,7 +110,7 @@ static const short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 #elif CONFIG_BATTERY == BATT_3AAA
     /* measured values */
     { 280, 325, 341, 353, 364, 374, 385, 395, 409, 427, 475 }, /* alkaline */
-    { 310, 355, 363, 369, 372, 374, 378, 378, 380, 386, 405 }  /* NiMH */
+    { 310, 355, 363, 369, 372, 374, 376, 378, 380, 386, 405 }  /* NiMH */
 #elif CONFIG_BATTERY == BATT_LIPOL1300
     { 333, 341, 349, 358, 365, 373, 370, 386, 393, 400, 409 }
 #else /* NiMH */
@@ -197,7 +197,8 @@ static long sleeptimer_endtick;
 
 static long last_event_tick;
 
-static void battery_level_update(void);     /* forward declaration */
+static void battery_status_update(void);
+static int runcurrent(void);
 
 void reset_poweroff_timer(void)
 {
@@ -209,7 +210,7 @@ void set_battery_type(int type)
 {
     if (type != battery_type) {
         battery_type = type;
-        battery_level_update();     /* recalculate the battery level */
+        battery_status_update();     /* recalculate the battery status */
     }
 }
 #endif
@@ -221,6 +222,7 @@ void set_battery_capacity(int capacity)
         battery_capacity = BATTERY_CAPACITY_MAX;
     if (battery_capacity < BATTERY_CAPACITY_MIN)
         battery_capacity = BATTERY_CAPACITY_MIN;
+    battery_status_update();     /* recalculate the battery status */
 }
 
 int battery_time(void)
@@ -231,10 +233,6 @@ int battery_time(void)
 /* Returns battery level in percent */
 int battery_level(void)
 {
-#ifdef HAVE_CHARGE_CTRL
-    if ((charge_state == CHARGING) && (battery_percent == 100))
-        return 99;
-#endif
     return battery_percent;
 }
 
@@ -290,20 +288,23 @@ static int voltage_to_percent(int voltage, const short* table)
         }
 }
 
-/* update battery level, called once per minute */
-static void battery_level_update(void)
+/* update battery level and estimated runtime, called once per minute or
+ * when battery capacity / type settings are changed */
+static void battery_status_update(void)
 {
     int level;
 
 #ifdef HAVE_CHARGE_CTRL
     if (charge_state == DISCHARGING) {
-        level = voltage_to_percent(battery_centivolts, 
+        level = voltage_to_percent(battery_centivolts,
                 percent_to_volt_discharge[battery_type]);
     }
     else if (charge_state == CHARGING) {
-        level = voltage_to_percent(battery_centivolts, percent_to_volt_charge);
+        /* battery level is defined to be < 100% until charging is finished */
+        level = MIN(voltage_to_percent(battery_centivolts,
+                    percent_to_volt_charge), 99);
     }
-    else { /* in trickle charge, the battery is by definition 100% full */
+    else { /* in topoff/trickle charge, the battery is by definition 100% full */
         level = 100;
     }
 #else
@@ -320,6 +321,21 @@ static void battery_level_update(void)
     }
 #endif
     battery_percent = level;
+
+    /* calculate estimated remaining running time */
+    /* discharging: remaining running time */
+    /* charging:    remaining charging time */
+#ifdef HAVE_CHARGE_CTRL
+    if (charge_state == CHARGING) {
+        powermgmt_est_runningtime_min = (100 - level) * battery_capacity / 100
+                                      * 60 / (CURRENT_MAX_CHG - runcurrent());
+    }
+    else
+#endif
+    {
+        powermgmt_est_runningtime_min = level * battery_capacity / 100 
+                                      * 60 / runcurrent();
+    }
 }
 
 /*
@@ -400,20 +416,24 @@ static int runcurrent(void)
 {
     int current;
 
+#if MEM == 8 && !defined(HAVE_MMC)
+    /* assuming 192 kbps, the running time is 22% longer with 8MB */
+    current = (CURRENT_NORMAL*100/122);
+#else
     current = CURRENT_NORMAL;
+#endif /* MEM == 8 */
+
     if(usb_inserted()) {
         current = CURRENT_USB;
     }
+
+    if ((backlight_get_timeout() == 1) /* LED always on */
 #ifdef HAVE_CHARGE_CTRL
-    if ((backlight_get_timeout() == 1) || /* LED always on */
-        (charger_inserted() && backlight_get_on_when_charging())) {
-        current += CURRENT_BACKLIGHT;
-    }
-#else
-    if (backlight_get_timeout() == 1) { /* LED always on */
-        current += CURRENT_BACKLIGHT;
-    }
+        || (charger_inserted() && backlight_get_on_when_charging())
 #endif
+       ) {
+        current += CURRENT_BACKLIGHT;
+    }
 
     return(current);
 }
@@ -558,30 +578,8 @@ static void power_thread(void)
         /* insert new value at the start, in centivolts 8-) */
         power_history[0] = battery_centivolts;
 
-        /* update battery level every minute */
-        battery_level_update();
-
-        /* calculate estimated remaining running time */
-        /* discharging: remaining running time */
-        /* charging:    remaining charging time */
-
-        powermgmt_est_runningtime_min = battery_level() *
-            battery_capacity / 100 * 60 / runcurrent();
-#if MEM == 8 /* assuming 192 kbps, the running time is 22% longer with 8MB */
-        powermgmt_est_runningtime_min =
-            powermgmt_est_runningtime_min * 122 / 100;
-#endif /* MEM == 8 */
-
-#ifdef HAVE_CHARGE_CTRL
-        /*
-         * If we are charging, the "runtime" is estimated time till the battery
-         * is recharged.
-         */
-        if (charge_state == CHARGING) {
-            powermgmt_est_runningtime_min = (100 - battery_level()) *
-                 battery_capacity / 100 * 60 / (CURRENT_MAX_CHG - runcurrent());
-        }
-#endif /* HAVE_CHARGE_CTRL */
+        /* update battery status every minute */
+        battery_status_update();
 
 #if CONFIG_BATTERY == BATT_LIION2200
         /* We use the information from the ADC_EXT_POWER ADC channel, which
