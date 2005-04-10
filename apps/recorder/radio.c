@@ -804,7 +804,6 @@ int handle_radio_presets_cb(int key, int m)
 bool handle_radio_presets(void)
 {
     int result;
-    int i;
     bool reload_dir = false;
 
     if(presets_loaded)
@@ -828,8 +827,8 @@ bool handle_radio_presets(void)
         
         if (result >= 0) /* A preset was selected */
         {
-            i = menu_cursor(preset_menu);
-            curr_freq = presets[i].frequency;
+            curr_preset = menu_cursor(preset_menu);
+            curr_freq = presets[curr_preset].frequency;
             radio_set(RADIO_FREQUENCY, curr_freq);
             remember_frequency();
         }
