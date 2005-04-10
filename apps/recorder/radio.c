@@ -817,6 +817,8 @@ bool handle_radio_presets(void)
                                  str(LANG_FM_BUTTONBAR_ADD),
                                  str(LANG_FM_BUTTONBAR_EXIT),
                                  str(LANG_FM_BUTTONBAR_ACTION));
+        if (curr_preset >= 0)
+            menu_set_cursor(preset_menu, curr_preset);
         result = menu_show(preset_menu);
         menu_exit(preset_menu);
         if (result == MENU_SELECTED_EXIT)

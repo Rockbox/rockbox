@@ -166,7 +166,7 @@ void menu_draw(int m)
 #endif
     /* Adjust cursor pos if it's below the screen */
     if (menus[m].cursor - menus[m].top >= menu_lines)
-        menus[m].top++;
+        menus[m].top = menus[m].cursor - (menu_lines - 1);
 
     /* Adjust cursor pos if it's above the screen */
     if(menus[m].cursor < menus[m].top)
@@ -508,3 +508,13 @@ bool menu_movedown(int menu)
     
     return true;
 }
+
+/*
+ * Allows to set the cursor position. Doesn't redraw by itself.
+ */
+
+void menu_set_cursor(int menu, int position)
+{
+    menus[menu].cursor = position;
+}
+
