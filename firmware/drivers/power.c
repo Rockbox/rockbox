@@ -70,6 +70,9 @@ void power_init(void)
     
     GPIO_ENABLE |= 0x80000000;
     GPIO_FUNCTION |= 0x80000000;
+#ifdef HAVE_SPDIF_POWER
+    spdif_power_enable(false);
+#endif
 #else
 #ifdef HAVE_CHARGE_CTRL
     or_b(0x20, &PBIORL); /* Set charging control bit to output */
@@ -127,6 +130,19 @@ void charger_enable(bool on)
     }
 #endif
 }
+
+#ifdef HAVE_SPDIF_POWER
+void spdif_power_enable(bool on)
+{
+    GPIO1_FUNCTION |= 0x01000000;
+    GPIO1_ENABLE |= 0x01000000;
+    
+    if(on)
+        GPIO1_OUT &= ~0x01000000;
+    else
+        GPIO1_OUT |= 0x01000000;
+}
+#endif
 
 #ifndef HAVE_MMC
 void ide_power_enable(bool on)
@@ -260,5 +276,12 @@ void ide_power_enable(bool on)
 {
    (void)on;
 }
+
+#ifdef HAVE_SPDIF_POWER
+void spdif_power_enable(bool on)
+{
+   (void)on;
+}
+#endif
 
 #endif /* SIMULATOR */

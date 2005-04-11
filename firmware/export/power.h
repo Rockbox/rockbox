@@ -30,6 +30,10 @@ void ide_power_enable(bool on);
 bool ide_powered(void);
 void power_off(void);
 
+#ifdef HAVE_SPDIF_POWER
+void spdif_power_enable(bool on);
+#endif
+
 #ifdef CONFIG_TUNER
 /* status values */
 #define FMRADIO_OFF     0 /* switched off */
