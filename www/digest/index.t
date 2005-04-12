@@ -24,8 +24,8 @@ browser using <a href="http://sidenews.net/">sidenews.net</a>.
  href="/mail/">join the mailing list</a> and post about it there.
 
 <p> <a
-href="http://feeds.archive.org/validator/check?url=http://rockbox.haxx.se/digest/digest.rss"><img
-src="valid-rss.png" alt="[Valid RSS]" title="Validate my RSS feed" width="88"
-height="31" border="0" /></a>
+href="http://feedvalidator.org/check.cgi?url=http://www.rockbox.org/digest/digest.rss">
+<img src="valid-rss.png" alt="[Valid RSS]" title="Validate my RSS feed"
+width="88" height="31" border="0" /></a>
 
 #include "foot.t"
