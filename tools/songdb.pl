@@ -47,6 +47,9 @@ my %albums;
 my %years;
 my %filename;
 
+my %lcartists;
+my %lcalbums;
+
 my $dbver = 1;
 
 if(! -d $dir or $help) {
@@ -160,9 +163,29 @@ sub dodir {
         $$id3{'ALBUM'} = "<no album tag>" if ($$id3{'ALBUM'} eq "");
         $$id3{'TITLE'} = "<no title tag>" if ($$id3{'TITLE'} eq "");
 
-        # prepend Artist name to handle duplicate album names from other
-        # artists
-        my $albumid = $id3->{'ALBUM'}."___".$id3->{'ARTIST'};
+        # Only use one case-variation of each album/artist
+        if (exists($lcalbums{lc($$id3{'ALBUM'})})) {
+            # if another album with different case exists
+            # use that case (store it in $$id3{'ALBUM'}
+            $$id3{'ALBUM'} = $lcalbums{lc($$id3{'ALBUM'})};
+        }
+        else {
+            # else create a new entry in the hash
+            $lcalbums{lc($$id3{'ALBUM'})} = $$id3{'ALBUM'};
+        }
+        
+        if (exists($lcartists{lc($$id3{'ARTIST'})})) {
+            $$id3{'ARTIST'} = $lcartists{lc($$id3{'ARTIST'})};
+        }
+        else {
+            $lcartists{lc($$id3{'ARTIST'})} = $$id3{'ARTIST'};
+        }
+
+        # prepend Dir name to handle duplicate album names in different
+        # dirs. Meaning multi-artist cds will be handled correctly if
+        # put in a single directory.
+        my $albumid = $id3->{'ALBUM'}."___".$dir;
+        
         if($albumid ne "<no album tag>___<no artist tag>") {
             my $num = ++$albums{$albumid};
             if($num > $maxsongperalbum) {
