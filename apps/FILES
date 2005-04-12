@@ -46,3 +46,4 @@ codecs/dumb/src/allegro/*
 codecs/dumb/src/core/*
 codecs/dumb/src/helpers/*
 codecs/dumb/src/it/*
+codecs/libmusepack/*

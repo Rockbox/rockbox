@@ -1,0 +1,12 @@
+
+1.1
+    * add compliance & cleanup patches from Michael Roitzsch of xine project 	
+    * switch to BSD license
+    * port to pure C
+    * add doxygen documentation
+    * revise API somewhat
+	
+1.0.3			
+    * autotools build process
+    * sample binary added
+    * floating-point mode by default

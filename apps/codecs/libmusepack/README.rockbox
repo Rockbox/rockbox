@@ -1,0 +1,27 @@
+Library: libmusepack-1.1 (Released 2005-01-22 (I think))
+Imported: 2005-04-12 by Thom Johansen 
+
+
+This directory contains a local version of libmusepack for use by Rockbox
+for software decoding and encoding of Musepack files.
+
+
+LICENSING INFORMATION
+
+libmusepack is distributed under a modified BSD license - see the files AUTHORS
+and COPYING in this directory for details.
+
+
+IMPORT DETAILS
+
+The base version first imported into Rockbox was the libmusepack included
+in the libmusepack-1.1.tar.bz2 distribution, downloaded on 2005-04-11 from
+www.musepack.net.
+
+The contents of the libmusepack-1.1/, libmusepack-1.1/src/ and
+libmusepack-1.1/include/ were all put in one directory for simplicity, and
+the sample decoder and automake/autoconf stuff were removed. The default
+FILE* based IO handlers in mpc_reader.c were also removed. Some small
+modifications to make the library compilable and compatible with Rockbox
+was made.
+

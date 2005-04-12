@@ -16,7 +16,7 @@ ifdef APPEXTRA
    INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
 endif
 
-.PHONY: libmad liba52 libFLAC libTremor libwavpack dumb
+.PHONY: libmad liba52 libFLAC libTremor libwavpack dumb libmusepack
 
 OUTPUT = $(SOFTWARECODECS)
 
@@ -55,11 +55,17 @@ dumb:
 	@mkdir -p $(OBJDIR)/dumb
 	@$(MAKE) -C dumb TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR)/dumb VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEMORYSIZE} LIBDIR=$(OBJDIR) OFLAGS="$(CFLAGS)"
 
+libmusepack:
+	@echo "MAKE in libmusepack"
+	@mkdir -p $(OBJDIR)/libmusepack
+	@$(MAKE) -C libmusepack TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR)/libmusepack VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEMORYSIZE} OUTPUT=$(OBJDIR)/libmusepack.a
+
 clean:
 	@echo "cleaning codecs"
-	@rm -fr $(OBJDIR)/libmad $(OBJDIR)/libmad.a $(OBJDIR)/liba52 $(OBJDIR)/libFLAC $(OBJDIR)/Tremor $(OBJDIR)/libwavpack $(OBJDIR)/dumb $(OBJDIR)/libdumb.a $(OBJDIR)/libdumbd.a
+	@rm -fr $(OBJDIR)/libmad $(OBJDIR)/libmad.a $(OBJDIR)/liba52 $(OBJDIR)/libFLAC $(OBJDIR)/Tremor $(OBJDIR)/libwavpack $(OBJDIR)/dumb $(OBJDIR)/libdumb.a $(OBJDIR)/libdumbd.a $(OBJDIR)/libmusepack $(OBJDIR)/libmusepack.a
 	@$(MAKE) -C libmad clean
 	@$(MAKE) -C liba52 clean
 	@$(MAKE) -C libFLAC clean
 	@$(MAKE) -C Tremor clean
 	@$(MAKE) -C libwavpack clean
+	@$(MAKE) -C libmusepack clean
