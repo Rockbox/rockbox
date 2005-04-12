@@ -2,7 +2,7 @@
 #include "head.t"
 #include "news.t"
 
-<p> BAGDER is the editor of the Rockbox digest section. He tries to keep up
+<p> NAME(Jonas Häggqvist) is the editor of the Rockbox digest section. He tries to keep up
  with discussions on IRC, the mailing list, the sourceforge trackers and CVS
  commits to sum up what's going on in the project in a slightly digested
  manner. Suitable for outsiders who don't care to follow the intense
