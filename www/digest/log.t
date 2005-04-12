@@ -1,3 +1,154 @@
+NEWSDATE(2005-apr-12)
+ 
+ ITEM LINK("http://www.rockbox.org/digest/", Rockbox Digest) is now active
+ again.
+
+ENDDATE
+
+NEWSDATE(2005-apr-10)
+
+ ITEM The iRiver bootloader has now
+ LINK("http://www.rockbox.org/twiki/bin/view/Main/IriverBoot", been tested)
+ with the 1.65 firmware from iRiver.
+
+ENDDATE
+
+NEWSDATE(2005-apr-05)
+
+ ITEM Trigger recording has been
+ LINK("http://www.rockbox.org/mail/archive/rockbox-archive-2005-04/0050.shtml",
+ added to CVS). Thanks to NAME(Philipp Pertermann) for his work.
+
+ENDDATE
+
+NEWSDATE(2005-feb-10)
+ 
+ ITEM A bunch of people have now tested the iRiver
+ LINK("http://www.rockbox.org/twiki/bin/view/Main/IriverBoot", bootloader).
+ A few bumps, but no bricked players!
+
+ENDDATE
+
+NEWSDATE(2005-02-08)
+
+ ITEM LINK("http://www.rockbox.org/twiki/bin/view/Main/RockboxShots", Evidence)
+ of Rockbox
+ LINK("http://www.rockbox.org/twiki/bin/view/Main/IriverBoot", booting) on
+ LINK("http://www.rockbox.org/twiki/bin/view/Main/IriverPort", iRiver).
+
+ENDDATE
+
+NEWSDATE(2004-12-23)
+
+ ITEM Rockbox v2.4 is LINK("http://www.rockbox.org/download/", released).
+ ITEM The LINK("http://www.rockbox.org/twiki/bin/view/Main/RockboxManual",
+ Rockbox 2.4 manual) is out.
+
+ENDDATE
+
+NEWSDATE(2004-12-17)
+
+ ITEM Rockbox started from
+ LINK("http://www.rockbox.org/twiki/bin/view/Main/FlashingRockbox", flash ROM)
+ finally available for players.
+
+ENDDATE
+
+NEWSDATE(2004-12-16)
+
+ ITEM The LINK("http://www.rockbox.org/twiki/bin/view/Main/RockboxManual",
+ Rockbox 2.3 manual) is out. Thanks go to Christi Alice Scarborough for her
+ outstanding work! 
+
+ENDDATE
+
+NEWSDATE(2004-11-09)
+
+ ITEM Some downtime due to planned server maintenance (replaced a harddisk).
+
+ENDDATE
+
+NEWSDATE(2004-11-01)
+
+ ITEM The site was down nearly four days due to hardware failure while the
+ admins were away.
+
+ENDDATE
+
+NEWSDATE(2004-10-26)
+
+ ITEM Rockbox v2.3 is LINK("http://www.rockbox.org/download/", released).
+
+ENDDATE
+
+NEWSDATE(2004-10-26)
+
+ ITEM iRiver progress: the LCD driver
+ LINK("http://www.rockbox.org/twiki/bin/view/Main/IriverPort#Writing_an_LCD_driver_",
+ is working)!
+
+ENDDATE
+
+NEWSDATE(2004-10-05)
+
+ ITEM Call for help: We need information from Ondio owners for our
+ LINK("http://www.rockbox.org/twiki/bin/view/Main/ArchosOndio",
+ Archos Ondio port).
+
+ENDDATE
+
+NEWSDATE(2004-10-01)
+
+ ITEM Touchdown! The Coldfire BDM wiggler is working on the iHP-120 target!
+ Time for some sweet GDB debugging...
+
+ENDDATE
+
+NEWSDATE(2004-09-24)
+
+ ITEM We finally have rockbox.org, thanks to Jeff at Misticriver.
+
+ENDDATE
+
+NEWSDATE(2004-09-13)
+
+ ITEM Call for help! Please donate your broken iRiver iHP-1xx to the project!
+
+ENDDATE
+
+NEWSDATE(2004-07-08)
+
+ ITEM Good news for Windows users! You can now install the
+ LINK("http://www.rockbox.org/daily.shtml", daily builds) with an installer
+ executable. Thanks to Christi Scarborough for that.
+
+ENDDATE
+
+NEWSDATE(2004-06-17)
+
+ ITEM We now have a LINK("http://www.rockbox.org/twiki", Wiki) for the
+ documentation. Feel free to join the documentation frenzy!
+
+ENDDATE
+
+NEWSDATE(2004-05-07)
+
+ ITEM The CVS repository has LINK("http://www.rockbox.org/cvs.html", moved)
+
+ENDDATE
+
+NEWSDATE(2004-03-14)
+
+ ITEM Rockbox can LINK("http://www.rockbox.org/lang/", talk) to you
+
+ENDDATE
+
+NEWSDATE(2004-03-11)
+
+ ITEM Version 2.2 is LINK("http://www.rockbox.org/download/", released)
+
+ENDDATE
+
 NEWSDATE(28-nov-2003)
 
  ITEM Rockbox now finally runs on the Recorder V2.
