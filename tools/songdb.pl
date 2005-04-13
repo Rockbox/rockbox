@@ -181,11 +181,11 @@ sub dodir {
         $$id3{'ALBUM'} = "<no album tag>" if ($$id3{'ALBUM'} eq "");
         $$id3{'TITLE'} = "<no title tag>" if ($$id3{'TITLE'} eq "");
 
-        # prepend Artist name to handle duplicate album names from other
-        # artists
-        my $albumid = $id3->{'ALBUM'}."___".$id3->{'ARTIST'};
+        # Append dirname, to handle multi-artist albums
+        $$id3{'DIR'} = $dir;
+        my $albumid = $id3->{'ALBUM'}."___".$$id3{'DIR'};
         
-        if($albumid ne "<no album tag>___<no artist tag>") {
+        if($id3->{'ALBUM'}."___".$id3->{'ARTIST'} ne "<no album tag>___<no artist tag>") {
             my $num = ++$albums{$albumid};
             if($num > $maxsongperalbum) {
                 $maxsongperalbum = $num;
@@ -443,7 +443,7 @@ if ($db) {
 
         for (sort keys %{$artist2albums{$artist}}) {
             my $id3 = $artist2albums{$artist}{$_};
-            my $a = $albumcount{"$$id3{'ALBUM'}___$$id3{'ARTIST'}"} * $albumentrysize;
+            my $a = $albumcount{"$$id3{'ALBUM'}___$$id3{'DIR'}"} * $albumentrysize;
             dumpint($a + $albumindex);
         }
 
