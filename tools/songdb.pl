@@ -153,16 +153,6 @@ sub dodir {
             $path = $1;
         }
 
-        $entries{$path}= $id3;
-        $artists{$id3->{'ARTIST'}}++ if($id3->{'ARTIST'});
-        $genres{$id3->{'GENRE'}}++ if($id3->{'GENRE'});
-        $years{$id3->{'YEAR'}}++ if($id3->{'YEAR'});
-
-        # fallback names
-        $$id3{'ARTIST'} = "<no artist tag>" if ($$id3{'ARTIST'} eq "");
-        $$id3{'ALBUM'} = "<no album tag>" if ($$id3{'ALBUM'} eq "");
-        $$id3{'TITLE'} = "<no title tag>" if ($$id3{'TITLE'} eq "");
-
         # Only use one case-variation of each album/artist
         if (exists($lcalbums{lc($$id3{'ALBUM'})})) {
             # if another album with different case exists
@@ -181,10 +171,19 @@ sub dodir {
             $lcartists{lc($$id3{'ARTIST'})} = $$id3{'ARTIST'};
         }
 
-        # prepend Dir name to handle duplicate album names in different
-        # dirs. Meaning multi-artist cds will be handled correctly if
-        # put in a single directory.
-        my $albumid = $id3->{'ALBUM'}."___".$dir;
+        $entries{$path}= $id3;
+        $artists{$id3->{'ARTIST'}}++ if($id3->{'ARTIST'});
+        $genres{$id3->{'GENRE'}}++ if($id3->{'GENRE'});
+        $years{$id3->{'YEAR'}}++ if($id3->{'YEAR'});
+
+        # fallback names
+        $$id3{'ARTIST'} = "<no artist tag>" if ($$id3{'ARTIST'} eq "");
+        $$id3{'ALBUM'} = "<no album tag>" if ($$id3{'ALBUM'} eq "");
+        $$id3{'TITLE'} = "<no title tag>" if ($$id3{'TITLE'} eq "");
+
+        # prepend Artist name to handle duplicate album names from other
+        # artists
+        my $albumid = $id3->{'ALBUM'}."___".$id3->{'ARTIST'};
         
         if($albumid ne "<no album tag>___<no artist tag>") {
             my $num = ++$albums{$albumid};
