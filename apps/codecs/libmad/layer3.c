@@ -384,8 +384,7 @@ mad_fixed_t const ca[8] = {
  * imdct_s[i/even][k] = cos((PI / 24) * (2 *       (i / 2) + 7) * (2 * k + 1))
  * imdct_s[i /odd][k] = cos((PI / 24) * (2 * (6 + (i-1)/2) + 7) * (2 * k + 1))
  */
-static
-mad_fixed_t const imdct_s[6][6] = {
+mad_fixed_t const imdct_s[6][6] IDATA_ATTR = {
 # include "imdct_s.dat"
 };
 
@@ -397,7 +396,7 @@ mad_fixed_t const imdct_s[6][6] = {
  * window_l[i] = sin((PI / 36) * (i + 1/2))
  */
 static
-mad_fixed_t const window_l[36] = {
+mad_fixed_t const window_l[36] IDATA_ATTR = {
   MAD_F(0x00b2aa3e) /* 0.043619387 */, MAD_F(0x0216a2a2) /* 0.130526192 */,
   MAD_F(0x03768962) /* 0.216439614 */, MAD_F(0x04cfb0e2) /* 0.300705800 */,
   MAD_F(0x061f78aa) /* 0.382683432 */, MAD_F(0x07635284) /* 0.461748613 */,
@@ -427,8 +426,7 @@ mad_fixed_t const window_l[36] = {
  *
  * window_s[i] = sin((PI / 12) * (i + 1/2))
  */
-static
-mad_fixed_t const window_s[12] = {
+mad_fixed_t const window_s[12] IDATA_ATTR = {
   MAD_F(0x0216a2a2) /* 0.130526192 */, MAD_F(0x061f78aa) /* 0.382683432 */,
   MAD_F(0x09bd7ca0) /* 0.608761429 */, MAD_F(0x0cb19346) /* 0.793353340 */,
   MAD_F(0x0ec835e8) /* 0.923879533 */, MAD_F(0x0fdcf549) /* 0.991444861 */,
@@ -1575,7 +1573,7 @@ void III_aliasreduce(mad_fixed_t xr[576], int lines)
 # if defined(ASO_IMDCT)
 void III_imdct_l(mad_fixed_t const [18], mad_fixed_t [36], unsigned int);
 # else
-#  if 1
+#  if 0
 static
 void fastsdct(mad_fixed_t const x[9], mad_fixed_t y[18])
 {
@@ -1766,6 +1764,589 @@ void imdct36(mad_fixed_t const x[18], mad_fixed_t y[36])
  * NAME:	imdct36
  * DESCRIPTION:	perform X[18]->x[36] IMDCT
  */
+
+# if CONFIG_CPU==MCF5249 && !defined(SIMULATOR)
+/* emac optimized imdct36, it is very ugly and i hope to replace it soon.
+ * for now it is actually somewhat faster than the stock implementation. 
+ */
+static inline
+void imdct36(mad_fixed_t const X[18], mad_fixed_t x[36])
+{
+  mad_fixed_t t[16];
+  /* assumes FRACBITS = 28 */
+  asm volatile (
+    "move.l #0xb0, %%d0\n\t"        /* frac. mode, saturate, round */
+    "move.l %%d0, %%macsr\n\t"
+    "move.l (4*4, %[X]), %%d0\n\t"
+    "move.l #0x0ec835e8, %%d1\n\t"
+    "mac.l %%d0, %%d1, (13*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x061f78aa, %%d1\n\t"
+    "mac.l %%d0, %%d1, (1*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l %%acc0, %%d7\n\t"
+    "asl.l #3, %%d7\n\t"
+    "move.l %%d7, (6*4, %[t])\n\t"
+    
+    "sub.l (10*4, %[X]), %%d0\n\t"
+    "move.l %%d0, (14*4, %[t])\n\t"
+    "move.l #0x061f78aa, %%d1\n\t"
+    "msac.l %%d0, %%d1, (7*4, %[X]), %%d0, %%acc0\n\t"
+    "add.l (16*4, %[X]), %%d0\n\t"
+    "move.l %%d0, (15*4, %[t])\n\t"
+    "move.l #0x0ec835e8, %%d1\n\t"
+    "msac.l %%d0, %%d1, (%[X]), %%d2, %%acc0\n\t"
+    "move.l %%acc0, %%d6\n\t"
+    "asl.l #3, %%d6\n\t"
+    "move.l %%d6, (%[t])\n\t"
+    
+    "sub.l (11*4, %[X]), %%d2\n\t" /* store t8-t11 in d2-d5, will need them soon */
+    "sub.l (12*4, %[X]), %%d2\n\t"
+    "move.l %%d2, (8*4, %[t])\n\t"
+    "move.l #0x0216a2a2, %%d1\n\t"
+    "mac.l %%d2, %%d1, (2*4, %[X]), %%d3, %%acc0\n\t"
+    
+	"sub.l (9*4, %[X]), %%d3\n\t"
+    "sub.l (14*4, %[X]), %%d3\n\t"
+    "move.l %%d3, (9*4, %[t])\n\t"
+    "move.l #0x09bd7ca0, %%d1\n\t"
+    "mac.l %%d3, %%d1, (3*4, %[X]), %%d4, %%acc0\n\t"
+    
+	"sub.l (8*4, %[X]), %%d4\n\t"
+    "sub.l (15*4, %[X]), %%d4\n\t"
+    "move.l %%d4, (10*4, %[t])\n\t"
+    "move.l #0x0cb19346, %%d1\n\t"
+    "msac.l %%d4, %%d1, (5*4, %[X]), %%d5, %%acc0\n\t"
+    
+	"sub.l (6*4, %[X]), %%d5\n\t"
+    "sub.l (17*4, %[X]), %%d5\n\t"
+    "move.l %%d5, (11*4, %[t])\n\t"
+    "move.l #0x0fdcf549, %%d1\n\t"
+    "msac.l %%d5, %%d1, (%[X]), %%d0, %%acc0\n\t"
+    
+	"movclr.l %%acc0, %%d7\n\t"
+    "asl.l #3, %%d7\n\t"
+    "move.l %%d7, (7*4, %[x])\n\t"
+    "neg.l %%d7\n\t"
+    "move.l %%d7, (10*4, %[x])\n\t"
+    
+    "move.l #0x0cb19346, %%d1\n\t"
+    "msac.l %%d2, %%d1, (3*4, %[X]), %%d2, %%acc0\n\t" /* preload for t12 statement */
+    "move.l #0x0fdcf549, %%d1\n\t"
+    "mac.l %%d3, %%d1, (8*4, %[X]), %%d3, %%acc0\n\t"
+    "move.l #0x0216a2a2, %%d1\n\t"
+    "mac.l %%d4, %%d1, (11*4, %[X]), %%d4, %%acc0\n\t"
+    "move.l #0x09bd7ca0, %%d1\n\t"
+    "msac.l %%d5, %%d1, (12*4, %[X]), %%d5, %%acc0\n\t"
+    "movclr.l %%acc0, %%d7\n\t"
+    "asl.l #3, %%d7\n\t"
+    "sub.l %%d6, %%d7\n\t" /* t0 is still in d6 */
+    "move.l %%d7, (19*4, %[x])\n\t"
+    "move.l %%d7, (34*4, %[x])\n\t"
+    
+    "sub.l %%d2, %%d0\n\t"
+    "add.l %%d3, %%d0\n\t"
+    "sub.l %%d4, %%d0\n\t"
+    "sub.l %%d5, %%d0\n\t"
+    "add.l (15*4, %[X]), %%d0\n\t"
+    
+	"move.l (2*4, %[X]), %%d3\n\t"
+    "add.l (5*4, %[X]), %%d3\n\t"
+    "sub.l (6*4, %[X]), %%d3\n\t"
+    "sub.l (9*4, %[X]), %%d3\n\t"
+    "sub.l (14*4, %[X]), %%d3\n\t"
+    "sub.l (17*4, %[X]), %%d3\n\t"
+    
+    "move.l %%d0, (12*4, %[t])\n\t"
+    "move.l %%d3, (13*4, %[t])\n\t"    
+	
+    "move.l #0x0ec835e8, %%d1\n\t"
+    "msac.l %%d0, %%d1, (1*4, %[X]), %%d2, %%acc0\n\t"
+    "move.l #0x061f78aa, %%d1\n\t"
+    "mac.l %%d3, %%d1, (7*4, %[X]), %%d3, %%acc0\n\t"
+    "movclr.l %%acc0, %%d7\n\t"
+    "asl.l #3, %%d7\n\t"
+    "add.l %%d6, %%d7\n\t"
+    "move.l %%d7, (22*4, %[x])\n\t"
+    "move.l %%d7, (31*4, %[x])\n\t"
+    
+    "move.l #0x09bd7ca0, %%d1\n\t"
+    "msac.l %%d1, %%d2, (10*4, %[X]), %%d2, %%acc0\n\t"
+    "move.l #0x0216a2a2, %%d1\n\t"
+    "mac.l %%d1, %%d3, (16*4, %[X]), %%d3, %%acc0\n\t"
+    "move.l #0x0fdcf549, %%d1\n\t"
+    "msac.l %%d1, %%d2, (6*4, %[t]), %%d2, %%acc0\n\t"
+    "move.l #0x0cb19346, %%d1\n\t"
+    "mac.l %%d1, %%d3, (%[X]), %%d0, %%acc0\n\t"
+    "movclr.l %%acc0, %%d7\n\t"
+    "asl.l #3, %%d7\n\t"
+    "add.l %%d2, %%d7\n\t"
+    "move.l %%d7, (1*4, %[t])\n\t"
+    
+    "move.l #0x03768962, %%d1\n\t"
+    "mac.l %%d1, %%d0, (2*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0e313245, %%d1\n\t"
+    "mac.l %%d1, %%d0, (3*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0ffc19fd, %%d1\n\t"
+    "msac.l %%d1, %%d0, (5*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0acf37ad, %%d1\n\t"
+    "msac.l %%d1, %%d0, (6*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x04cfb0e2, %%d1\n\t"
+    "mac.l %%d1, %%d0, (8*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0898c779, %%d1\n\t"
+    "msac.l %%d1, %%d0, (9*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0d7e8807, %%d1\n\t"
+    "mac.l %%d1, %%d0, (11*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0f426cb5, %%d1\n\t"
+    "mac.l %%d1, %%d0, (12*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0bcbe352, %%d1\n\t"
+    "msac.l %%d1, %%d0, (14*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x00b2aa3e, %%d1\n\t"
+    "mac.l %%d1, %%d0, (15*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x07635284, %%d1\n\t"
+    "msac.l %%d1, %%d0, (17*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0f9ee890, %%d1\n\t"
+    "msac.l %%d1, %%d0, (%[X]), %%d0, %%acc0\n\t"
+    "movclr.l %%acc0, %%d6\n\t"
+    "asl.l #3, %%d6\n\t"
+    "add.l %%d7, %%d6\n\t"
+    "move.l %%d6, (6*4, %[x])\n\t"
+    "neg.l %%d6\n\t"
+    "move.l %%d6, (11*4, %[x])\n\t"
+    
+    "move.l #0x0f426cb5, %%d1\n\t"
+    "msac.l %%d1, %%d0, (2*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x00b2aa3e, %%d1\n\t"
+    "msac.l %%d1, %%d0, (3*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0898c779, %%d1\n\t"
+    "mac.l %%d1, %%d0, (5*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0f9ee890, %%d1\n\t"
+    "mac.l %%d1, %%d0, (6*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0acf37ad, %%d1\n\t"
+    "mac.l %%d1, %%d0, (8*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x07635284, %%d1\n\t"
+    "msac.l %%d1, %%d0, (9*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0e313245, %%d1\n\t"
+    "msac.l %%d1, %%d0, (11*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0bcbe352, %%d1\n\t"
+    "msac.l %%d1, %%d0, (12*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x03768962, %%d1\n\t"
+    "msac.l %%d1, %%d0, (14*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0d7e8807, %%d1\n\t"
+    "mac.l %%d1, %%d0, (15*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0ffc19fd, %%d1\n\t"
+    "mac.l %%d1, %%d0, (17*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x04cfb0e2, %%d1\n\t"
+    "mac.l %%d1, %%d0, (%[X]), %%d0, %%acc0\n\t"
+    "movclr.l %%acc0, %%d6\n\t"
+    "asl.l #3, %%d6\n\t"
+    "add.l %%d7, %%d6\n\t"
+    "move.l %%d6, (23*4, %[x])\n\t"
+    "move.l %%d6, (30*4, %[x])\n\t"
+    
+    "move.l #0x0bcbe352, %%d1\n\t"
+    "msac.l %%d1, %%d0, (2*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0d7e8807, %%d1\n\t"
+    "mac.l %%d1, %%d0, (3*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x07635284, %%d1\n\t"
+    "msac.l %%d1, %%d0, (5*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x04cfb0e2, %%d1\n\t"
+    "mac.l %%d1, %%d0, (6*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0f9ee890, %%d1\n\t"
+    "mac.l %%d1, %%d0, (8*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0ffc19fd, %%d1\n\t"
+    "msac.l %%d1, %%d0, (9*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x00b2aa3e, %%d1\n\t"
+    "msac.l %%d1, %%d0, (11*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x03768962, %%d1\n\t"
+    "mac.l %%d1, %%d0, (12*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0f426cb5, %%d1\n\t"
+    "msac.l %%d1, %%d0, (14*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0e313245, %%d1\n\t"
+    "mac.l %%d1, %%d0, (15*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0898c779, %%d1\n\t"
+    "mac.l %%d1, %%d0, (17*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0acf37ad, %%d1\n\t"
+    "msac.l %%d1, %%d0, (4*4, %[X]), %%d0, %%acc0\n\t"
+    "movclr.l %%acc0, %%d6\n\t"
+    "asl.l #3, %%d6\n\t"
+    "sub.l %%d7, %%d6\n\t"
+    "move.l %%d6, (18*4, %[x])\n\t"
+    "move.l %%d6, (35*4, %[x])\n\t"
+    
+    "move.l #0x061f78aa, %%d1\n\t"
+    "mac.l %%d1, %%d0, (13*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0ec835e8, %%d1\n\t"
+    "msac.l %%d1, %%d0, (1*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l %%acc0, %%d5\n\t"
+    "asl.l #3, %%d5\n\t"
+    "move.l %%d5, (7*4, %[t])\n\t"
+    
+    "move.l #0x0cb19346, %%d1\n\t"
+    "msac.l %%d1, %%d0, (7*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0fdcf549, %%d1\n\t"
+    "mac.l %%d1, %%d0, (10*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0216a2a2, %%d1\n\t"
+    "mac.l %%d1, %%d0, (16*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x09bd7ca0, %%d1\n\t"
+    "msac.l %%d1, %%d0, (%[X]), %%d0, %%acc0\n\t"
+    "move.l %%acc0, %%d7\n\t"
+    "asl.l #3, %%d7\n\t"
+    "move.l %%d7, (2*4, %[t])\n\t"
+    
+    "move.l #0x04cfb0e2, %%d1\n\t"
+    "mac.l %%d1, %%d0, (2*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0ffc19fd, %%d1\n\t"
+    "mac.l %%d1, %%d0, (3*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0d7e8807, %%d1\n\t"
+    "msac.l %%d1, %%d0, (5*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x03768962, %%d1\n\t"
+    "mac.l %%d1, %%d0, (6*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0bcbe352, %%d1\n\t"
+    "msac.l %%d1, %%d0, (8*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0e313245, %%d1\n\t"
+    "msac.l %%d1, %%d0, (9*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x07635284, %%d1\n\t"
+    "mac.l %%d1, %%d0, (11*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0acf37ad, %%d1\n\t"
+    "msac.l %%d1, %%d0, (12*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0f9ee890, %%d1\n\t"
+    "mac.l %%d1, %%d0, (14*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0898c779, %%d1\n\t"
+    "mac.l %%d1, %%d0, (15*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x00b2aa3e, %%d1\n\t"
+    "mac.l %%d1, %%d0, (17*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0f426cb5, %%d1\n\t"
+    "mac.l %%d1, %%d0, (%[X]), %%d0, %%acc0\n\t"
+    "movclr.l %%acc0, %%d6\n\t"
+    "asl.l #3, %%d6\n\t"
+    "move.l %%d6, (5*4, %[x])\n\t"
+    "neg.l %%d6\n\t"
+    "move.l %%d6, (12*4, %[x])\n\t"
+    
+    "move.l #0x0acf37ad, %%d1\n\t"
+    "mac.l %%d1, %%d0, (2*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0898c779, %%d1\n\t"
+    "msac.l %%d1, %%d0, (3*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0e313245, %%d1\n\t"
+    "mac.l %%d1, %%d0, (5*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0f426cb5, %%d1\n\t"
+    "msac.l %%d1, %%d0, (6*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x03768962, %%d1\n\t"
+    "msac.l %%d1, %%d0, (8*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x00b2aa3e, %%d1\n\t"
+    "mac.l %%d1, %%d0, (9*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0ffc19fd, %%d1\n\t"
+    "msac.l %%d1, %%d0, (11*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0f9ee890, %%d1\n\t"
+    "mac.l %%d1, %%d0, (12*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x04cfb0e2, %%d1\n\t"
+    "msac.l %%d1, %%d0, (14*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x07635284, %%d1\n\t"
+    "mac.l %%d1, %%d0, (15*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0d7e8807, %%d1\n\t"
+    "mac.l %%d1, %%d0, (17*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0bcbe352, %%d1\n\t"
+    "msac.l %%d1, %%d0, (%[X]), %%d0, %%acc0\n\t"
+    "movclr.l %%acc0, %%d6\n\t"
+    "asl.l #3, %%d6\n\t"
+    "add.l %%d7, %%d6\n\t"
+    "move.l %%d6, (%[x])\n\t"
+    "neg.l %%d6\n\t"
+    "move.l %%d6, (17*4, %[x])\n\t"
+    
+    "move.l #0x0f9ee890, %%d1\n\t"
+    "msac.l %%d1, %%d0, (2*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x07635284, %%d1\n\t"
+    "msac.l %%d1, %%d0, (3*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x00b2aa3e, %%d1\n\t"
+    "msac.l %%d1, %%d0, (5*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0bcbe352, %%d1\n\t"
+    "mac.l %%d1, %%d0, (6*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0f426cb5, %%d1\n\t"
+    "mac.l %%d1, %%d0, (8*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0d7e8807, %%d1\n\t"
+    "mac.l %%d1, %%d0, (9*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0898c779, %%d1\n\t"
+    "mac.l %%d1, %%d0, (11*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x04cfb0e2, %%d1\n\t"
+    "msac.l %%d1, %%d0, (12*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0acf37ad, %%d1\n\t"
+    "msac.l %%d1, %%d0, (14*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0ffc19fd, %%d1\n\t"
+    "msac.l %%d1, %%d0, (15*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0e313245, %%d1\n\t"
+    "msac.l %%d1, %%d0, (17*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x03768962, %%d1\n\t"
+    "msac.l %%d1, %%d0, (1*4, %[X]), %%d0, %%acc0\n\t"
+    "movclr.l %%acc0, %%d6\n\t"
+    "asl.l #3, %%d6\n\t"
+    "add.l %%d7, %%d6\n\t"
+    "move.l %%d6, (24*4, %[x])\n\t"
+    "move.l %%d6, (29*4, %[x])\n\t"
+    
+    "move.l #0x0216a2a2, %%d1\n\t"
+    "msac.l %%d1, %%d0, (7*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x09bd7ca0, %%d1\n\t"
+    "msac.l %%d1, %%d0, (10*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0cb19346, %%d1\n\t"
+    "mac.l %%d1, %%d0, (16*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0fdcf549, %%d1\n\t"
+    "mac.l %%d1, %%d0, (%[X]), %%d0, %%acc0\n\t"
+    "movclr.l %%acc0, %%d7\n\t"
+    "asl.l #3, %%d7\n\t"
+    "add.l %%d5, %%d7\n\t"
+    "move.l %%d7, (3*4, %[t])\n\t"
+    
+    "move.l #0x00b2aa3e, %%d1\n\t"
+    "mac.l %%d1, %%d0, (2*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x03768962, %%d1\n\t"
+    "mac.l %%d1, %%d0, (3*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x04cfb0e2, %%d1\n\t"
+    "msac.l %%d1, %%d0, (5*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x07635284, %%d1\n\t"
+    "msac.l %%d1, %%d0, (6*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0898c779, %%d1\n\t"
+    "mac.l %%d1, %%d0, (8*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0acf37ad, %%d1\n\t"
+    "mac.l %%d1, %%d0, (9*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0bcbe352, %%d1\n\t"
+    "msac.l %%d1, %%d0, (11*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0d7e8807, %%d1\n\t"
+    "msac.l %%d1, %%d0, (12*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0e313245, %%d1\n\t"
+    "mac.l %%d1, %%d0, (14*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0f426cb5, %%d1\n\t"
+    "mac.l %%d1, %%d0, (15*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0f9ee890, %%d1\n\t"
+    "msac.l %%d1, %%d0, (17*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0ffc19fd, %%d1\n\t"
+    "msac.l %%d1, %%d0, (%[X]), %%d0, %%acc0\n\t"
+    "movclr.l %%acc0, %%d6\n\t"
+    "asl.l #3, %%d6\n\t"
+    "add.l %%d7, %%d6\n\t"
+    "move.l %%d6, (8*4, %[x])\n\t"
+    "neg.l %%d6\n\t"
+    "move.l %%d6, (9*4, %[x])\n\t"
+    
+    "move.l #0x0e313245, %%d1\n\t"
+    "msac.l %%d1, %%d0, (2*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0bcbe352, %%d1\n\t"
+    "mac.l %%d1, %%d0, (3*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0f9ee890, %%d1\n\t"
+    "mac.l %%d1, %%d0, (5*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0898c779, %%d1\n\t"
+    "msac.l %%d1, %%d0, (6*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0ffc19fd, %%d1\n\t"
+    "msac.l %%d1, %%d0, (8*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x04cfb0e2, %%d1\n\t"
+    "mac.l %%d1, %%d0, (9*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0f426cb5, %%d1\n\t"
+    "mac.l %%d1, %%d0, (11*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x00b2aa3e, %%d1\n\t"
+    "msac.l %%d1, %%d0, (12*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0d7e8807, %%d1\n\t"
+    "msac.l %%d1, %%d0, (14*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x03768962, %%d1\n\t"
+    "msac.l %%d1, %%d0, (15*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0acf37ad, %%d1\n\t"
+    "mac.l %%d1, %%d0, (17*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x07635284, %%d1\n\t"
+    "mac.l %%d1, %%d0, (%[X]), %%d0, %%acc0\n\t"
+    "movclr.l %%acc0, %%d6\n\t"
+    "asl.l #3, %%d6\n\t"
+    "add.l %%d7, %%d6\n\t"
+    "move.l %%d6, (21*4, %[x])\n\t"
+    "move.l %%d6, (32*4, %[x])\n\t"
+    
+    "move.l #0x0d7e8807, %%d1\n\t"
+    "msac.l %%d1, %%d0, (2*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0f426cb5, %%d1\n\t"
+    "mac.l %%d1, %%d0, (3*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0acf37ad, %%d1\n\t"
+    "mac.l %%d1, %%d0, (5*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0ffc19fd, %%d1\n\t"
+    "msac.l %%d1, %%d0, (6*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x07635284, %%d1\n\t"
+    "msac.l %%d1, %%d0, (8*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0f9ee890, %%d1\n\t"
+    "mac.l %%d1, %%d0, (9*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x03768962, %%d1\n\t"
+    "mac.l %%d1, %%d0, (11*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0e313245, %%d1\n\t"
+    "msac.l %%d1, %%d0, (12*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x00b2aa3e, %%d1\n\t"
+    "mac.l %%d1, %%d0, (14*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0bcbe352, %%d1\n\t"
+    "mac.l %%d1, %%d0, (15*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x04cfb0e2, %%d1\n\t"
+    "msac.l %%d1, %%d0, (17*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0898c779, %%d1\n\t"
+    "msac.l %%d1, %%d0, (14*4, %[t]), %%d0, %%acc0\n\t"
+    "movclr.l %%acc0, %%d6\n\t"
+    "asl.l #3, %%d6\n\t"
+    "sub.l %%d7, %%d6\n\t"
+    "move.l %%d6, (20*4, %[x])\n\t"
+    "move.l %%d6, (33*4, %[x])\n\t"
+    
+    "move.l #0x0ec835e8, %%d1\n\t"
+    "msac.l %%d1, %%d0, (15*4, %[t]), %%d0, %%acc0\n\t"
+    "move.l #0x061f78aa, %%d1\n\t"
+    "mac.l %%d1, %%d0, (12*4, %[t]), %%d0, %%acc0\n\t"
+    "movclr.l %%acc0, %%d6\n\t"
+    "asl.l #3, %%d6\n\t"
+    "sub.l %%d5, %%d6\n\t"
+    "move.l %%d6, (4*4, %[t])\n\t"
+    
+    "move.l #0x061f78aa, %%d1\n\t"
+    "mac.l %%d1, %%d0, (13*4, %[t]), %%d0, %%acc0\n\t"
+    "move.l #0x0ec835e8, %%d1\n\t"
+    "mac.l %%d1, %%d0, (8*4, %[t]), %%d0, %%acc0\n\t"
+    "movclr.l %%acc0, %%d7\n\t" /* don't need t7 anymore */
+    "asl.l #3, %%d7\n\t"
+    "add.l %%d6, %%d7\n\t"
+    "move.l %%d7, (4*4, %[x])\n\t"
+    "neg.l %%d7\n\t"
+    "move.l %%d7, (13*4, %[x])\n\t"
+    
+    "move.l #0x09bd7ca0, %%d1\n\t"
+    "mac.l %%d1, %%d0, (9*4, %[t]), %%d0, %%acc0\n\t"
+    "move.l #0x0216a2a2, %%d1\n\t"
+    "msac.l %%d1, %%d0, (10*4, %[t]), %%d0, %%acc0\n\t"
+    "move.l #0x0fdcf549, %%d1\n\t"
+    "mac.l %%d1, %%d0, (11*4, %[t]), %%d0, %%acc0\n\t"
+    "move.l #0x0cb19346, %%d1\n\t"
+    "msac.l %%d1, %%d0, (8*4, %[t]), %%d0, %%acc0\n\t"
+    "movclr.l %%acc0, %%d7\n\t"
+    "asl.l #3, %%d7\n\t"
+    "add.l %%d6, %%d7\n\t"
+    "move.l %%d7, (1*4, %[x])\n\t"
+    "neg.l %%d7\n\t"
+    "move.l %%d7, (16*4, %[x])\n\t"
+    
+    "move.l #0x0fdcf549, %%d1\n\t"
+    "msac.l %%d1, %%d0, (9*4, %[t]), %%d0, %%acc0\n\t"
+    "move.l #0x0cb19346, %%d1\n\t"
+    "msac.l %%d1, %%d0, (10*4, %[t]), %%d0, %%acc0\n\t"
+    "move.l #0x09bd7ca0, %%d1\n\t"
+    "msac.l %%d1, %%d0, (11*4, %[t]), %%d0, %%acc0\n\t"
+    "move.l #0x0216a2a2, %%d1\n\t"
+    "msac.l %%d1, %%d0, (1*4, %[X]), %%d0, %%acc0\n\t"
+    "movclr.l %%acc0, %%d7\n\t"
+    "asl.l #3, %%d7\n\t"
+    "add.l %%d6, %%d7\n\t"
+    "move.l %%d7, (25*4, %[x])\n\t"
+    "move.l %%d7, (28*4, %[x])\n\t"
+    
+    "move.l #0x0fdcf549, %%d1\n\t"
+    "msac.l %%d1, %%d0, (7*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0cb19346, %%d1\n\t"
+    "msac.l %%d1, %%d0, (10*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x09bd7ca0, %%d1\n\t"
+    "msac.l %%d1, %%d0, (16*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0216a2a2, %%d1\n\t"
+    "msac.l %%d1, %%d0, (%[X]), %%d0, %%acc0\n\t"
+    "movclr.l %%acc0, %%d6\n\t"
+    "asl.l #3, %%d6\n\t"
+    "sub.l (6*4, %[t]), %%d6\n\t"
+    "move.l %%d6, (5*4, %[t])\n\t"
+    
+    "move.l #0x0898c779, %%d1\n\t"
+    "mac.l %%d1, %%d0, (2*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x04cfb0e2, %%d1\n\t"
+    "mac.l %%d1, %%d0, (3*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0bcbe352, %%d1\n\t"
+    "mac.l %%d1, %%d0, (5*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x00b2aa3e, %%d1\n\t"
+    "mac.l %%d1, %%d0, (6*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0e313245, %%d1\n\t"
+    "mac.l %%d1, %%d0, (8*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x03768962, %%d1\n\t"
+    "msac.l %%d1, %%d0, (9*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0f9ee890, %%d1\n\t"
+    "mac.l %%d1, %%d0, (11*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x07635284, %%d1\n\t"
+    "msac.l %%d1, %%d0, (12*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0ffc19fd, %%d1\n\t"
+    "mac.l %%d1, %%d0, (14*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0acf37ad, %%d1\n\t"
+    "msac.l %%d1, %%d0, (15*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0f426cb5, %%d1\n\t"
+    "mac.l %%d1, %%d0, (17*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0d7e8807, %%d1\n\t"
+    "msac.l %%d1, %%d0, (%[X]), %%d0, %%acc0\n\t"
+    "movclr.l %%acc0, %%d7\n\t"
+    "asl.l #3, %%d7\n\t"
+    "add.l %%d6, %%d7\n\t"
+    "move.l %%d7, (2*4, %[x])\n\t"
+    "neg.l %%d7\n\t"
+    "move.l %%d7, (15*4, %[x])\n\t"
+    
+    "move.l #0x07635284, %%d1\n\t"
+    "mac.l %%d1, %%d0, (2*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0acf37ad, %%d1\n\t"
+    "mac.l %%d1, %%d0, (3*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x03768962, %%d1\n\t"
+    "mac.l %%d1, %%d0, (5*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0d7e8807, %%d1\n\t"
+    "mac.l %%d1, %%d0, (6*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x00b2aa3e, %%d1\n\t"
+    "msac.l %%d1, %%d0, (8*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0f426cb5, %%d1\n\t"
+    "mac.l %%d1, %%d0, (9*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x04cfb0e2, %%d1\n\t"
+    "msac.l %%d1, %%d0, (11*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0ffc19fd, %%d1\n\t"
+    "mac.l %%d1, %%d0, (12*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0898c779, %%d1\n\t"
+    "msac.l %%d1, %%d0, (14*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0f9ee890, %%d1\n\t"
+    "mac.l %%d1, %%d0, (15*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0bcbe352, %%d1\n\t"
+    "msac.l %%d1, %%d0, (17*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0e313245, %%d1\n\t"
+    "mac.l %%d1, %%d0, (%[X]), %%d0, %%acc0\n\t"
+    "movclr.l %%acc0, %%d7\n\t"
+    "asl.l #3, %%d7\n\t"
+    "add.l %%d6, %%d7\n\t"
+    "move.l %%d7, (3*4, %[x])\n\t"
+    "neg.l %%d7\n\t"
+    "move.l %%d7, (14*4, %[x])\n\t"
+    
+    "move.l #0x0ffc19fd, %%d1\n\t"
+    "msac.l %%d1, %%d0, (2*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0f9ee890, %%d1\n\t"
+    "msac.l %%d1, %%d0, (3*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0f426cb5, %%d1\n\t"
+    "msac.l %%d1, %%d0, (5*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0e313245, %%d1\n\t"
+    "msac.l %%d1, %%d0, (6*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0d7e8807, %%d1\n\t"
+    "msac.l %%d1, %%d0, (8*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0bcbe352, %%d1\n\t"
+    "msac.l %%d1, %%d0, (9*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0acf37ad, %%d1\n\t"
+    "msac.l %%d1, %%d0, (11*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x0898c779, %%d1\n\t"
+    "msac.l %%d1, %%d0, (12*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x07635284, %%d1\n\t"
+    "msac.l %%d1, %%d0, (14*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x04cfb0e2, %%d1\n\t"
+    "msac.l %%d1, %%d0, (15*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x03768962, %%d1\n\t"
+    "msac.l %%d1, %%d0, (17*4, %[X]), %%d0, %%acc0\n\t"
+    "move.l #0x00b2aa3e, %%d1\n\t"
+    "msac.l %%d1, %%d0, (%[X]), %%d0, %%acc0\n\t"
+    "movclr.l %%acc0, %%d7\n\t"
+    "asl.l #3, %%d7\n\t"
+    "add.l %%d6, %%d7\n\t"
+    "move.l %%d7, (26*4, %[x])\n\t"
+    "move.l %%d7, (27*4, %[x])\n\t"
+    : : [X] "a" (X), [x] "a" (x), [t] "a" (t) 
+    : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7");
+  /* pfew */
+}
+
+#else
+
 static inline
 void imdct36(mad_fixed_t const X[18], mad_fixed_t x[36])
 {
@@ -2052,6 +2633,8 @@ void imdct36(mad_fixed_t const X[18], mad_fixed_t x[36])
 
   x[26] = x[27] = MAD_F_MLZ(hi, lo) + t5;
 }
+#endif /* MCF5249 */
+
 #  endif
 
 /*
@@ -2147,112 +2730,7 @@ void III_imdct_l(mad_fixed_t const X[18], mad_fixed_t z[36],
  */
 
 # if CONFIG_CPU==MCF5249 && !defined(SIMULATOR)
-/* this should probably be stuffed in a .S file somewhere, it's almost
-   100% asm as it is.
- */
-static
-void III_imdct_s(mad_fixed_t const X[18], mad_fixed_t z[36])
-{
-  mad_fixed_t y[36], *yptr;
-  mad_fixed_t const *wptr;
-
-  /* IMDCT */
-  yptr = &y[0];
-
-  /* if additional precision is needed in this block, it is possible to
-   * get more low bits out of the accext01 register _before_ doing the
-   * movclrs.
-   */
-  asm volatile (
-    "move.l #0x000000b0, %%macsr\n\t" /* frac. mode, saturation, rounding */
-    "suba.l %%a0, %%a0\n\t"         /* clear loop variable */
-    ".align 2\n\t.imdctloop:\n\t"   /* outer loop label */
-    "lea.l imdct_s, %%a1\n\t"       /* load pointer to imdct coefs in a1 */
-    "movem.l (%[X]), %%d0-%%d5\n\t" /* load input data in d0-d5 */
-    
-    "clr.l %%d7\n\t"                /* init loop variable */
-    "move.l (%%a1)+, %%a5\n\t"      /* load imdct coef in a5 */
-    ".align 2\n\t.macloop:\n\t"     /* inner loop label */
-    "mac.l %%d0, %%a5, (%%a1)+, %%a5, %%acc0\n\t" /* mac sequence */
-    "mac.l %%d1, %%a5, (%%a1)+, %%a5, %%acc0\n\t"
-    "mac.l %%d2, %%a5, (%%a1)+, %%a5, %%acc0\n\t"
-    "mac.l %%d3, %%a5, (%%a1)+, %%a5, %%acc0\n\t"
-    "mac.l %%d4, %%a5, (%%a1)+, %%a5, %%acc0\n\t"
-    "mac.l %%d5, %%a5, (%%a1)+, %%a5, %%acc0\n\t"
-    "movclr.l %%acc0, %%d6\n\t"     /* get result, left shifted once */
-    "asl.l #3, %%d6\n\t"            /* got one shift free, shift three more */
-    "mov.l %%d6, (%[yptr], %%d7.l*4)\n\t"         /* yptr[i] = result */
-    "neg.l %%d6\n\t"
-    "neg.l %%d7\n\t"
-    "mov.l %%d6, (5*4, %[yptr], %%d7.l*4)\n\t"    /* yptr[5 - 1] = -result */
-    "mac.l %%d0, %%a5, (%%a1)+, %%a5, %%acc0\n\t" /* mac sequence */
-    "mac.l %%d1, %%a5, (%%a1)+, %%a5, %%acc0\n\t"
-    "mac.l %%d2, %%a5, (%%a1)+, %%a5, %%acc0\n\t"
-    "mac.l %%d3, %%a5, (%%a1)+, %%a5, %%acc0\n\t"
-    "mac.l %%d4, %%a5, (%%a1)+, %%a5, %%acc0\n\t"
-    "mac.l %%d5, %%a5, (%%a1)+, %%a5, %%acc0\n\t"
-    "movclr.l %%acc0, %%d6\n\t"    /* get result */
-    "asl.l #3, %%d6\n\t"
-    "mov.l %%d6, (11*4, %[yptr], %%d7.l*4)\n\t"   /* yptr[11 - i] = result*/
-    "neg.l %%d7\n\t"
-    "mov.l %%d6, (6*4, %[yptr], %%d7.l*4)\n\t"    /* yptr[i + 6] = result */
-    "addq.l #1, %%d7\n\t"           /* increment inner loop variable */
-    "cmp.l #3, %%d7\n\t"            /* we do three inner loop iterations */
-    "jne .macloop\n\t"
-
-    "adda.l #48, %[yptr]\n\t"       /* add pointer increment */
-    "adda.l #24, %[X]\n\t"
-    "addq.l #1, %%a0\n\t"           /* increment outer loop variable */
-    "cmpa.l #3, %%a0\n\t"           /* we do three outer loop iterations */
-    "jne .imdctloop\n\t"
-    : [X] "+a" (X), [yptr] "+a" (yptr) 
-    : : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a0", "a1", "a5");
-
-  /* windowing, overlapping and concatenation */
-
-  yptr = &y[0];
-  wptr = &window_s[0];
-
-  asm volatile (
-    "clr.l %%d7\n\t"
-    ".align 2\n\t.overlaploop:\n\t"
-    "clr.l (%[z], %%d7.l*4)\n\t" /* z[i + 0] = 0 */
-    "move.l (%[wptr]), %%d0\n\t"
-    "move.l (%[yptr]), %%d2\n\t"
-    "mac.l %%d0, %%d2, 24(%[wptr]), %%d1, %%acc0\n\t"
-    "movclr.l %%acc0, %%d6\n\t"
-    "asl.l #3, %%d6\n\t"
-    "move.l %%d6, (6*4, %[z], %%d7.l*4)\n\t" /* z[i + 6] = result */
-    
-    "move.l 24(%[yptr]), %%d2\n\t"
-    "mac.l %%d1, %%d2, 48(%[yptr]), %%d2, %%acc0\n\t"
-    "mac.l %%d0, %%d2, 72(%[yptr]), %%d2, %%acc0\n\t"
-    "movclr.l %%acc0, %%d6\n\t"
-    "asl.l #3, %%d6\n\t"
-    "move.l %%d6, (12*4, %[z], %%d7.l*4)\n\t" /* z[i + 12] = result */
-    
-    "mac.l %%d1, %%d2, (24*4, %[yptr]), %%d2, %%acc0\n\t"
-    "mac.l %%d0, %%d2, (30*4, %[yptr]), %%d2, %%acc0\n\t"
-    "movclr.l %%acc0, %%d6\n\t"
-    "asl.l #3, %%d6\n\t"
-    "move.l %%d6, (18*4, %[z], %%d7.l*4)\n\t" /* z[i + 18] = result */
-    
-    "mac.l %%d1, %%d2, %%acc0\n\t"
-    "movclr.l %%acc0, %%d6\n\t"
-    "asl.l #3, %%d6\n\t"
-    "move.l %%d6, (24*4, %[z], %%d7.l*4)\n\t"   /* z[i + 24] = result */
-    
-    "clr.l (30*4, %[z], %%d7.l*4)\n\t"       /* z[i + 30] = 0 */
-    "addq.l #1, %%d7\n\t"
-    "addq.l #4, %[yptr]\n\t"
-    "addq.l #4, %[wptr]\n\t"
-    "cmp.l #6, %%d7\n\t"                    /* six iterations */
-    "jne .overlaploop\n\t"
-    : [yptr] "+a" (yptr), [wptr] "+a" (wptr)
-    : [z] "a" (z) 
-    : "d7");
-}
-
+void III_imdct_s(mad_fixed_t const X[18], mad_fixed_t z[36]);
 #else
 
 static

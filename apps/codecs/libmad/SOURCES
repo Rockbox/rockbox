@@ -9,3 +9,6 @@ stream.c
 synth.c
 timer.c
 version.c
+#if CONFIG_CPU==MCF5249 && !defined(SIMULATOR)
+imdct_mcf5249.S
+#endif
