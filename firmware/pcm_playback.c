@@ -207,3 +207,122 @@ void pcm_init(void)
 
     pcm_set_frequency(44100);
 }
+
+
+#define NUM_PCM_BUFFERS 16 /* Must be a power of 2 */
+#define NUM_PCM_BUFFERS_MASK (NUM_PCM_BUFFERS - 1)
+
+struct pcmbufdesc
+{
+    void *addr;
+    int size;
+    void (*callback)(void); /* Call this when the buffer has been played */
+} pcmbuffers[NUM_PCM_BUFFERS];
+
+int pcmbuf_read_index;
+int pcmbuf_write_index;
+int pcmbuf_unplayed_bytes;
+int pcmbuf_watermark;
+void (*pcmbuf_watermark_callback)(int bytes_left);
+
+int pcm_play_num_used_buffers(void)
+{
+    return (pcmbuf_write_index - pcmbuf_read_index) & NUM_PCM_BUFFERS_MASK;
+}
+
+void pcm_play_set_watermark(int numbytes, void (*callback)(int bytes_left))
+{
+    pcmbuf_watermark = numbytes;
+    pcmbuf_watermark_callback = callback;
+}
+
+bool pcm_play_add_chunk(void *addr, int size, void (*callback)(void))
+{
+    /* We don't use the last buffer, since we can't see the difference
+       between the full and empty condition */
+    if(pcm_play_num_used_buffers() < (NUM_PCM_BUFFERS - 1))
+    {
+        pcmbuffers[pcmbuf_write_index].addr = addr;
+        pcmbuffers[pcmbuf_write_index].size = size;
+        pcmbuffers[pcmbuf_write_index].callback = callback;
+        pcmbuf_write_index = (pcmbuf_write_index+1) & NUM_PCM_BUFFERS_MASK;
+        pcmbuf_unplayed_bytes += size;
+        return true;
+    }
+    else
+        return false;
+}
+
+void pcm_play_init(void)
+{
+    pcmbuf_read_index = 0;
+    pcmbuf_write_index = 0;
+    pcmbuf_unplayed_bytes = 0;
+    pcm_play_set_watermark(0x10000, NULL);
+}
+
+static int last_chunksize = 0;
+
+static void pcm_play_callback(unsigned char** start, long* size)
+{
+    struct pcmbufdesc *desc = &pcmbuffers[pcmbuf_read_index];
+    int sz;
+
+    pcmbuf_unplayed_bytes -= last_chunksize;
+    
+    if(desc->size == 0)
+    {
+        /* The buffer is finished, call the callback function */
+        if(desc->callback)
+            desc->callback();
+
+        /* Advance to the next buffer */
+        pcmbuf_read_index = (pcmbuf_read_index + 1) & NUM_PCM_BUFFERS_MASK;
+        desc = &pcmbuffers[pcmbuf_read_index];
+    }
+    
+    if(pcm_play_num_used_buffers())
+    {
+        /* Play max 64K at a time */
+        sz = MIN(desc->size, 32768);
+        *start = desc->addr;
+        *size = sz;
+
+        /* Update the buffer descriptor */
+        desc->size -= sz;
+        desc->addr += sz;
+
+        last_chunksize = sz;
+    }
+    else
+    {
+        /* No more buffers */
+        *size = 0;
+    }
+#if 0
+    if(pcmbuf_unplayed_bytes <= pcmbuf_watermark)
+    {
+        if(pcmbuf_watermark_callback)
+        {
+            pcmbuf_watermark_callback(pcmbuf_unplayed_bytes);
+        }
+    }
+#endif
+}
+
+void pcm_play_start(void)
+{
+    struct pcmbufdesc *desc = &pcmbuffers[pcmbuf_read_index];
+    int size;
+    char *start;
+    
+    if(!pcm_is_playing())
+    {
+        size = MIN(desc->size, 32768);
+        start = desc->addr;
+        pcm_play_data(start, size, pcm_play_callback);
+        last_chunksize = size;
+        desc->size -= size;
+        desc->addr += size;
+    }
+}

@@ -63,8 +63,8 @@
 #include "pcm_playback.h"
 #include "buffer.h"
 
-#define CHUNK_SIZE      44100    /* Transfer CHUNK_SIZE bytes on
-                                    each DMA transfer */
+#define CHUNK_SIZE      0x100000    /* Transfer CHUNK_SIZE bytes on
+                                       each DMA transfer */
 
 static unsigned char line = 0;
 static unsigned char *audio_buffer;
@@ -95,9 +95,9 @@ static void puts(const char *fmt, ...)
 /* Very basic WAVE-file support.. Just for testing purposes.. */
 int load_wave(char *filename)
 {
-    int f, i;
+    int f, i, num;
     unsigned char buf[32];
-    unsigned short *p;
+    unsigned short *p, *end;
 
     puts("Loading %s..", filename);
 
@@ -136,10 +136,18 @@ int load_wave(char *filename)
     close(f);
 
     puts("Changing byte order..");
+    end = (unsigned short *)(audio_buffer + audio_size);
     p = (unsigned short *)audio_buffer;
-    for (i=0; i<audio_size/2; i++, p++)
+    while(p < end)
     {
-        *p = SWAB16(*p);
+        /* Swap 128k at a time, to allow the other threads to run */
+        num = MIN(0x20000, (int)(end - p));
+        for(i = 0;i < num;i++)
+        {
+            *p = SWAB16(*p);
+            p++;
+        }
+        yield();
     }
 
     return 0;
@@ -152,19 +160,13 @@ int load_wave(char *filename)
 
 */
 
-static void test_get_more(unsigned char **ptr, long *size)
+int test_tracknum;
+static void test_trackchange(void)
 {
-    static long last_chunk_size = 0;
-
-    audio_pos += last_chunk_size;
-    
-    if(audio_pos < audio_size)
-    {
-        last_chunk_size = MIN(CHUNK_SIZE, (audio_size - audio_pos));
-        *ptr = &audio_buffer[audio_pos];
-        *size = last_chunk_size;
-    }
+    test_tracknum++;
 }
+
+extern int pcmbuf_unplayed_bytes;
 
 bool uda1380_test(void)
 {
@@ -173,11 +175,15 @@ bool uda1380_test(void)
     bool done = false;
     char buf[80];
     bool play = true;
+    int sz;
+    char *ptr;
 
     lcd_setmargins(0, 0);
     lcd_clear_display(); 
     lcd_update();
 
+    test_tracknum = 1;
+    
     line = 0;
     
     if (load_wave("/sample.wav") == -1)
@@ -188,10 +194,19 @@ bool uda1380_test(void)
     puts("Playing..");
 
     audio_pos = 0;
+    pcm_play_init();
     pcm_set_frequency(44100);
     pcm_set_volume(0xff - vol);
-    pcm_play_data(audio_buffer, CHUNK_SIZE,
-                  test_get_more);
+
+    ptr = audio_buffer;
+    for(sz = 0;sz < audio_size;sz += CHUNK_SIZE)
+    {
+        if(!pcm_play_add_chunk(ptr, CHUNK_SIZE, test_trackchange))
+            break;
+        ptr += MIN(CHUNK_SIZE, (audio_size - sz));
+    }
+
+    pcm_play_start();
 
     while(!done)
     {
@@ -205,6 +220,10 @@ bool uda1380_test(void)
         lcd_puts(0, line+3, buf);
         snprintf(buf, sizeof(buf), "DSR0: %02x", DSR0);
         lcd_puts(0, line+4, buf);
+        snprintf(buf, sizeof(buf), "Track: %d", test_tracknum);
+        lcd_puts(0, line+5, buf);
+        snprintf(buf, sizeof(buf), "Unplayed: %08x", pcmbuf_unplayed_bytes);
+        lcd_puts(0, line+6, buf);
         lcd_update();
 
         button = button_get_w_tmo(HZ/2);

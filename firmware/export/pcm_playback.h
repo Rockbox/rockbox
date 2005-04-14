@@ -21,11 +21,21 @@
 
 void pcm_init(void);
 void pcm_set_frequency(unsigned int frequency);
+
+/* This is for playing "raw" PCM data */
 void pcm_play_data(const unsigned char* start, int size,
                    void (*get_more)(unsigned char** start, long* size));
+
 void pcm_play_stop(void);
 void pcm_play_pause(bool play);
 bool pcm_is_playing(void);
 void pcm_set_volume(int volume);
+
+/* These functions are for playing chained buffers of PCM data */
+void pcm_play_init(void);
+void pcm_play_start(void);
+bool pcm_play_add_chunk(void *addr, int size, void (*callback)(void));
+int pcm_play_num_used_buffers(void);
+void pcm_play_set_watermark(int numbytes, void (*callback)(int bytes_left));
 
 #endif
