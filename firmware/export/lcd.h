@@ -65,6 +65,9 @@ extern void lcd_update_rect(int x, int y, int width, int height);
   #define lcd_update_rect(x,y,w,h)
 #endif
 
+#ifdef IRIVER_H100
+void lcd_remote_init(void);
+#endif
 #ifdef HAVE_LCD_CHARCELLS
 
 /* Icon definitions for lcd_icon() */
