@@ -131,8 +131,6 @@ int uda1380_set_regs(void)
 /* Initialize UDA1380 codec with default register values (uda1380_defaults) */
 int uda1380_init(void)
 {
-    PLLCR &= ~(1 << 22);     /* Set AudioClk = FXTAL/2*/
-
     if (uda1380_set_regs() == -1)
         return -1;
     
