@@ -61,6 +61,10 @@
 #include "icons.h"
 #endif /* End HAVE_LCD_BITMAP */
 
+#ifdef HAVE_REMOTE_LCD
+#include "lcd-remote.h"
+#endif
+
 int show_logo( void )
 {
 #ifdef HAVE_LCD_BITMAP
@@ -73,6 +77,11 @@ int show_logo( void )
 #endif
 #if LCD_WIDTH == 160
     lcd_bitmap(rockbox160x53, 0, 10, 160, 53, false);
+#endif
+
+#ifdef HAVE_REMOTE_LCD
+	 lcd_remote_bitmap(rockbox112x37,10,14,112,37, false);
+	 lcd_remote_update();
 #endif
 
 #if 0

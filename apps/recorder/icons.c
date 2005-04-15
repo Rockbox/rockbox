@@ -80,8 +80,8 @@ const unsigned char bitmap_icon_disk[12] =
     {0x15,0x3f,0x7d,0x7B,0x77,0x67,0x79,0x7b,0x57,0x4f,0x47,0x7f};
 #endif
 
-#if LCD_WIDTH == 112 || LCD_WIDTH == 128
-/* Archos Jukebox/ Ondio + Gmini LCD width */
+#if  LCD_WIDTH == 112 || LCD_WIDTH == 128 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_WIDTH == 134)
+/* Archos Jukebox/ Ondio + Gmini LCD width / remote lcd of iriver*/
 
 const unsigned char rockbox112x37[]={
  0x00, 0x00, 0x02, 0xff, 0x02, 0xfa, 0xfa, 0xfa, 0xfa, 0xfa, 0xfa, 0xfa, 0xfa,
