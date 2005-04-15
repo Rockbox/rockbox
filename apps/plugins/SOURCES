@@ -74,5 +74,6 @@ flac2wav.c
 vorbis2wav.c
 wv2wav.c
 mpc2wav.c
+midi2wav.c
 iriverify.c
 #endif
