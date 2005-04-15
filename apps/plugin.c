@@ -138,6 +138,7 @@ static const struct plugin_api rockbox_api = {
     lcd_remote_backlight_off,
 	 lcd_remote_set_contrast,
 	 lcd_remote_update,
+	 lcd_remote_bitmap,
 	 &lcd_remote_framebuffer[0][0],
 #endif
     /* button */

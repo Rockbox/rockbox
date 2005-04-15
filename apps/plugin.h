@@ -180,6 +180,8 @@ struct plugin_api {
     void (*remote_backlight_off)(void);
 	 void (*remote_set_contrast)(int val);
 	 void (*remote_update)(void);
+	 void (*remote_bitmap) (const unsigned char *src, int x, int y,
+                               int nx, int ny, bool clear);
 	 unsigned char* lcd_remote_framebuffer;
 #endif
 
