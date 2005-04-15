@@ -23,17 +23,27 @@
 
 #if CONFIG_CPU == MCF5249
 
-#define CS_LO       GPIO_OUT &= ~0x00000004
-#define CS_HI       GPIO_OUT |= 0x00000004
+#define CS_LO       GPIO1_OUT &= ~0x00000004
+#define CS_HI       GPIO1_OUT |= 0x00000004
 #define CLK_LO      GPIO_OUT &= ~0x10000000
 #define CLK_HI      GPIO_OUT |= 0x10000000
-#define DATA_LO     GPIO_OUT &= ~0x00040000
-#define DATA_HI     GPIO_OUT |= 0x00040000
+#define DATA_LO     GPIO1_OUT &= ~0x00040000
+#define DATA_HI     GPIO1_OUT |= 0x00040000
 #define RS_LO       GPIO_OUT &= ~0x00010000
 #define RS_HI       GPIO_OUT |= 0x00010000
 
 /* delay loop */
 #define DELAY   do { int _x; for(_x=0;_x<3;_x++);} while (0)
+
+void lcd_remote_backlight_on(void)
+{
+    GPIO_OUT &= ~0x00000800;
+}
+
+void lcd_remote_backlight_off(void)
+{
+    GPIO_OUT |= 0x00000800;
+}
 
 void lcd_remote_write_command(int cmd)
 {
@@ -89,7 +99,7 @@ void lcd_remote_write_data(const unsigned char* p_bytes, int count)
     CS_HI;
 }
 
-void lcd_remote_write_command_ex(int cmd, int data1, int data2)
+void lcd_remote_write_command_ex(int cmd, int data)
 {
     int i;
     
@@ -110,85 +120,87 @@ void lcd_remote_write_command_ex(int cmd, int data1, int data2)
         CLK_LO;
     }
     
-    RS_HI;
-    
     for (i = 0; i < 8; i++)
     {
-        if (data1 & 0x80)
+        if (data & 0x80)
             DATA_HI;
         else
             DATA_LO;
         
         CLK_HI;
-        data1 <<= 1;
+        data <<= 1;
         DELAY;
         
         CLK_LO;
     }
     
-    if (data2 != -1)
-    {
-        for (i = 0; i < 8; i++)
-        {
-            if (data2 & 0x80)
-                DATA_HI;
-            else
-                DATA_LO;
-            
-            CLK_HI;
-            data2 <<= 1;
-            DELAY;
-            
-            CLK_LO;
-        }
-    }
-    
     CS_HI;
 }
 
-#define LCD_REMOTE_ADC_NORMAL       0xa0
-#define LCD_REMOTE_ADC_REVERSE      0xa1
+#define LCD_REMOTE_CNTL_ADC_NORMAL          0xa0
+#define LCD_REMOTE_CNTL_ADC_REVERSE         0xa1
+#define LCD_REMOTE_CNTL_SHL_NORMAL          0xc0
+#define LCD_REMOTE_CNTL_SHL_REVERSE         0xc8
+#define LCD_REMOTE_CNTL_DISPLAY_ON_OFF      0xae
+#define LCD_REMOTE_CNTL_ENTIRE_ON_OFF       0xa4
+#define LCD_REMOTE_CNTL_REVERSE_ON_OFF      0xa6
+#define LCD_REMOTE_CTNL_NOP                 0xe3
+#define LCD_REMOTE_CNTL_POWER_CONTROL       0x2b
+#define LCD_REMOTE_CNTL_SELECT_REGULATOR    0x20
+#define LCD_REMOTE_CNTL_SELECT_BIAS         0xa2
+#define LCD_REMOTE_CNTL_SELECT_VOLTAGE      0x81
 
-#define LCD_REMOTE_SHL_NORMAL       0xc0
-#define LCD_REMOTE_SHL_REVERSE      0xc8
+void lcd_remote_powersave(bool on)
+{
+    lcd_remote_write_command(LCD_REMOTE_CNTL_DISPLAY_ON_OFF | (on ? 0 : 1));
+    lcd_remote_write_command(LCD_REMOTE_CNTL_ENTIRE_ON_OFF | (on ? 1 : 0));
+}
 
-#define LCD_REMOTE_DISPLAY_OFF      0xae
-#define LCD_REMOTE_DISPLAY_ON       0xaf
+void lcd_remote_set_contrast(int val)
+{
+    lcd_remote_write_command_ex(LCD_REMOTE_CNTL_SELECT_VOLTAGE, val);
+}
 
-#define LCD_REMOTE_REVERSE_OFF      0xa6
-#define LCD_REMOTE_REVERSE_ON       0xa7
-
-#define LCD_REMOTE_DISPLAY_NORMAL   0xa4
-#define LCD_REMOTE_DISPLAY_ENTIRE   0xa5
-
-#define LCD_REMOTE_NO_OPERATION     0xe3
-
-#define LCD_REMOTE_POWER_CONTROL    0x2b
+void lcd_remote_set_invert_display(bool yesno)
+{
+    lcd_remote_write_command(LCD_REMOTE_CNTL_REVERSE_ON_OFF | yesno);
+}
 
 void lcd_remote_init(void)
 {
-    GPIO_FUNCTION   |= 0x10010000;  /* GPIO16: RS
+    GPIO_FUNCTION   |= 0x10010800;  /* GPIO11: Backlight
+                                       GPIO16: RS
                                        GPIO28: CLK */
     
     GPIO1_FUNCTION  |= 0x00040004;  /* GPIO34: CS
                                        GPIO50: Data */
-    GPIO_ENABLE     |= 0x10010000;
+    GPIO_ENABLE     |= 0x10010800;
     GPIO1_ENABLE    |= 0x00040004;
-
+    
     CLK_LO;
     CS_HI;
+    
+    lcd_remote_write_command(LCD_REMOTE_CNTL_ADC_NORMAL);
+    lcd_remote_write_command(LCD_REMOTE_CNTL_SHL_NORMAL);
+    lcd_remote_write_command(LCD_REMOTE_CNTL_SELECT_BIAS | 0x0);
+    
+    lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x4);
+    sleep(1);
+    lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x6);
+    sleep(1);
+    lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x7);
+    
+    lcd_remote_write_command(LCD_REMOTE_CNTL_SELECT_REGULATOR | 0x4); // Select regulator @ 5.0 (default);
+    lcd_remote_set_contrast(32);
+    
+    sleep(1);
+    
+    lcd_remote_write_command(0x40); // init line
+    lcd_remote_write_command(0xB0); // page address
+    lcd_remote_write_command(0x10); // column
+    lcd_remote_write_command(0x00); // column
+    
+    lcd_remote_write_command(LCD_REMOTE_CNTL_DISPLAY_ON_OFF | 1);
 }
-
-/*
-    lcd_remote_write_command(LCD_REMOTE_ADC_NORMAL);
-    lcd_remote_write_command(LCD_REMOTE_SHL_NORMAL);
-    lcd_remote_write_command(0xA2); // Bias 0
-    lcd_remote_write_command(LCD_REMOTE_POWER_CONTROL | 0x4);	// Convertor
-    // 1ms
-    lcd_remote_write_command(LCD_REMOTE_POWER_CONTROL | 0x2);	// Regulator
-    // 1ms
-    lcd_remote_write_command(LCD_REMOTE_POWER_CONTROL | 0x1);	// Follower
-    // 1ms
-*/
 
 #endif
