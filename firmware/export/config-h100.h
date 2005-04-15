@@ -8,6 +8,10 @@
 #define LCD_WIDTH  160
 #define LCD_HEIGHT 128
 
+/* remote LCD */
+#define LCD_REMOTE_WIDTH  132
+#define LCD_REMOTE_HEIGHT 65
+
 #define CONFIG_KEYPAD IRIVER_H100_PAD
 
 /* Define this if you do software codec */
@@ -61,5 +65,8 @@
 
 /* Define this if you can control the S/PDIF power */
 #define HAVE_SPDIF_POWER
+
+/* Define this if you have an remote lcd */
+#define HAVE_REMOTE_LCD
 
 #endif
