@@ -27,6 +27,8 @@ int  backlight_get_timeout(void);
 void backlight_set_timeout(int index);
 bool backlight_get_on_when_charging(void);
 void backlight_set_on_when_charging(bool yesno);
+void remote_backlight_on(void);
+void remote_backlight_off(void);
 extern const char backlight_timeout_value[];
 
 #endif

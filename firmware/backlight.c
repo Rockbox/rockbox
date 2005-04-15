@@ -41,6 +41,8 @@ const char backlight_timeout_value[19] =
 
 #define BACKLIGHT_ON 1
 #define BACKLIGHT_OFF 2
+#define REMOTE_BACKLIGHT_ON 3
+#define REMOTE_BACKLIGHT_OFF 4
 
 static void backlight_thread(void);
 static long backlight_stack[DEFAULT_STACK_SIZE/sizeof(long)];
@@ -51,6 +53,9 @@ static bool charger_was_inserted = 0;
 static bool backlight_on_when_charging = 0;
 
 static int backlight_timer;
+#ifdef HAVE_REMOTE_LCD
+static int remote_backlight_timer;
+#endif
 static unsigned int backlight_timeout = 5;
 
 static void __backlight_off(void)
@@ -66,10 +71,6 @@ static void __backlight_off(void)
     and_b(~0x40, &PADRH); /* drive it low */
 #elif CONFIG_BACKLIGHT == BL_GMINI
     P1 &= ~0x10;
-#endif
-
-#ifdef HAVE_REMOTE_LCD
-	lcd_remote_backlight_off();
 #endif
 }
 
@@ -88,10 +89,6 @@ static void __backlight_on(void)
 #elif CONFIG_BACKLIGHT == BL_GMINI
     P1 |= 0x10;
 #endif
-
-#ifdef HAVE_REMOTE_LCD
-	lcd_remote_backlight_on();
-#endif
 }
 
 void backlight_thread(void)
@@ -103,6 +100,28 @@ void backlight_thread(void)
         queue_wait(&backlight_queue, &ev);
         switch(ev.id)
         {
+#ifdef HAVE_REMOTE_LCD
+            case REMOTE_BACKLIGHT_ON:
+                remote_backlight_timer =
+                    HZ*backlight_timeout_value[backlight_timeout];
+
+                /* Backlight == OFF in the setting? */
+                if(remote_backlight_timer < 0)
+                {
+                    remote_backlight_timer = 0; /* Disable the timeout */
+                    lcd_remote_backlight_off();
+                }
+                else 
+                {
+                    lcd_remote_backlight_on();
+                }
+                break;
+
+            case REMOTE_BACKLIGHT_OFF:
+                lcd_remote_backlight_off();
+                break;
+                
+#endif
             case BACKLIGHT_ON:
                 if( backlight_on_when_charging && charger_inserted() )
                 {
@@ -152,6 +171,18 @@ void backlight_off(void)
     queue_post(&backlight_queue, BACKLIGHT_OFF, NULL);
 }
 
+#ifdef HAVE_REMOTE_LCD
+void remote_backlight_on(void)
+{
+    queue_post(&backlight_queue, REMOTE_BACKLIGHT_ON, NULL);
+}
+
+void remote_backlight_off(void)
+{
+    queue_post(&backlight_queue, REMOTE_BACKLIGHT_OFF, NULL);
+}
+#endif
+
 int backlight_get_timeout(void)
 {
     return backlight_timeout;
@@ -195,6 +226,16 @@ void backlight_tick(void)
             backlight_off();
         }
     }
+#ifdef HAVE_REMOTE_LCD
+    if(remote_backlight_timer)
+    {
+        remote_backlight_timer--;
+        if(remote_backlight_timer == 0)
+        {
+            remote_backlight_off();
+        }
+    }
+#endif
 }
 
 void backlight_init(void)
@@ -213,6 +254,9 @@ void backlight_init(void)
     P1CON |= 0x10; /* P1.4 C-MOS output mode */
 #endif    
     backlight_on();
+#ifdef HAVE_REMOTE_LCD
+    remote_backlight_on();
+#endif
 }
 
 #else /* no backlight, empty dummy functions */
@@ -225,6 +269,9 @@ int  backlight_get_timeout(void) {return 0;}
 void backlight_set_timeout(int index) {(void)index;}
 bool backlight_get_on_when_charging(void) {return 0;}
 void backlight_set_on_when_charging(bool yesno) {(void)yesno;}
-
+#ifdef HAVE_REMOTE_LCD
+void remote_backlight_on(void) {}
+void remote_backlight_off(void) {}
+#endif
 #endif /* #ifdef CONFIG_BACKLIGHT */
 

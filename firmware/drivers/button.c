@@ -150,7 +150,12 @@ static void button_tick(void)
                         queue_post(&button_queue, BUTTON_REPEAT | btn, NULL);
                     else
                         queue_post(&button_queue, btn, NULL);
-                    backlight_on();
+#ifdef HAVE_REMOTE_LCD
+                    if(btn & BUTTON_REMOTE)
+                        remote_backlight_on();
+                    else
+#endif
+                        backlight_on();
 
                     reset_poweroff_timer();
                 }
