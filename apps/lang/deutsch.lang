@@ -3075,3 +3075,9 @@ desc:
 eng: "Trigger active"
 voice:
 new: "Trigger aktiv"
+
+id: LANG_LCD_REMOTE_MENU
+desc: in the display sub menu
+eng: "Remote-LCD Einstellungen"
+voice: ""
+new:
