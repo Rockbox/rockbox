@@ -250,7 +250,7 @@ static const struct bit_entry rtc_bits[] =
 
 #ifdef HAVE_REMOTE_LCD
     /* remote lcd */
-    {6, S_O(remote_contrast), 32, "remote_contrast", NULL },
+    {6, S_O(remote_contrast), 42, "remote_contrast", NULL },
     {1, S_O(remote_invert), false, "remote_invert", off_on },
 #endif
 
