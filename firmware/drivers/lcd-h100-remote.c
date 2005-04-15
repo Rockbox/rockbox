@@ -16,12 +16,20 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #include "config.h"
 #include "cpu.h"
+#include "lcd-remote.h"
 #include "kernel.h"
 #include "thread.h"
+#include <string.h>
+#include <stdlib.h>
+#include "file.h"
+#include "debug.h"
+#include "system.h"
+#include "font.h"
 
-#if CONFIG_CPU == MCF5249
+unsigned char lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH];
 
 #define CS_LO       GPIO1_OUT &= ~0x00000004
 #define CS_HI       GPIO1_OUT |= 0x00000004
@@ -149,6 +157,8 @@ void lcd_remote_write_command_ex(int cmd, int data)
 #define LCD_REMOTE_CNTL_SELECT_REGULATOR    0x20
 #define LCD_REMOTE_CNTL_SELECT_BIAS         0xa2
 #define LCD_REMOTE_CNTL_SELECT_VOLTAGE      0x81
+#define LCD_REMOTE_CNTL_INIT_LINE           0x40
+#define LCD_REMOTE_CNTL_SET_PAGE_ADDRESS    0xB0
 
 void lcd_remote_powersave(bool on)
 {
@@ -166,6 +176,165 @@ void lcd_remote_set_invert_display(bool yesno)
     lcd_remote_write_command(LCD_REMOTE_CNTL_REVERSE_ON_OFF | yesno);
 }
 
+void lcd_remote_bitmap(const unsigned char *src, int x, int y, int nx, int ny, bool clear) __attribute__ ((section (".icode")));
+void lcd_remote_bitmap(const unsigned char *src, int x, int y, int nx, int ny, bool clear)
+{
+    const unsigned char *src_col;
+    unsigned char *dst, *dst_col;
+    unsigned int data, mask1, mask2, mask3, mask4;
+    int stride, shift;
+    
+    if (((unsigned) x >= LCD_REMOTE_WIDTH) || ((unsigned) y >= LCD_REMOTE_HEIGHT))
+    {
+        return;
+    }
+    
+    stride = nx;    /* otherwise right-clipping will destroy the image */
+
+    if (((unsigned) (x + nx)) >= LCD_REMOTE_WIDTH)
+    {
+        nx = LCD_REMOTE_WIDTH - x;
+    }
+    
+    if (((unsigned) (y + ny)) >= LCD_REMOTE_HEIGHT)
+    {
+        ny = LCD_REMOTE_HEIGHT - y;
+    }
+        
+    dst = &lcd_remote_framebuffer[y >> 3][x];
+    shift = y & 7;
+    
+    if (!shift && clear)  /* shortcut for byte aligned match with clear */
+    {
+        while (ny >= 8)   /* all full rows */
+        {
+            memcpy(dst, src, nx);
+            src += stride;
+            dst += LCD_REMOTE_WIDTH;
+            ny -= 8;
+        }
+        if (ny == 0)     /* nothing left to do? */
+        {
+            return;
+        }
+        /* last partial row to do by default routine */
+    }
+
+    ny += shift;
+
+    /* Calculate bit masks */
+    mask4 = ~(0xfe << ((ny-1) & 7));  /* data mask for last partial row */
+    
+    if (clear)
+    {
+        mask1 = ~(0xff << shift); /* clearing of first partial row */
+        mask2 = 0;                /* clearing of intermediate (full) rows */
+        mask3 = ~mask4;           /* clearing of last partial row */
+        if (ny <= 8)
+        {
+            mask3 |= mask1;
+        }
+    }
+    else
+    {
+        mask1 = mask2 = mask3 = 0xff;
+    }
+
+    /* Loop for each column */
+    for (x = 0; x < nx; x++)
+    {
+        src_col = src++;
+        dst_col = dst++;
+        data = 0;
+        y = 0;
+
+        if (ny > 8)
+        {
+            /* First partial row */
+            data = *src_col << shift;
+            *dst_col = (*dst_col & mask1) | data;
+            src_col += stride;
+            dst_col += LCD_REMOTE_WIDTH;
+            data >>= 8;
+
+            /* Intermediate rows */
+            for (y = 8; y < ny-8; y += 8)
+            {
+                data |= *src_col << shift;
+                *dst_col = (*dst_col & mask2) | data;
+                src_col += stride;
+                dst_col += LCD_REMOTE_WIDTH;
+                data >>= 8;
+            }
+        }
+
+        /* Last partial row */
+        if (y + shift < ny)
+        {
+            data |= *src_col << shift;
+        }
+        
+        *dst_col = (*dst_col & mask3) | (data & mask4);
+    }
+}
+
+void lcd_remote_drawrect(int x, int y, int nx, int ny)
+{
+    int i;
+
+    if (x > LCD_REMOTE_WIDTH)
+    {
+        return;
+    }
+    
+    if (y > LCD_REMOTE_HEIGHT)
+    {
+        return;
+    }
+
+    if (x + nx > LCD_REMOTE_WIDTH)
+    {
+        nx = LCD_REMOTE_WIDTH - x;
+    }
+    
+    if (y + ny > LCD_REMOTE_HEIGHT)
+    {
+        ny = LCD_REMOTE_HEIGHT - y;
+    }
+
+    /* vertical lines */
+    for (i = 0; i < ny; i++)
+    {
+        REMOTE_DRAW_PIXEL(x, (y + i));
+        REMOTE_DRAW_PIXEL((x + nx - 1), (y + i));
+    }
+
+    /* horizontal lines */
+    for (i = 0; i < nx; i++)
+    {
+        REMOTE_DRAW_PIXEL((x + i),y);
+        REMOTE_DRAW_PIXEL((x + i),(y + ny - 1));
+    }
+}
+
+void lcd_remote_clear(void)
+{
+    memset(lcd_remote_framebuffer, 0, sizeof lcd_remote_framebuffer);
+}
+
+void lcd_remote_update(void)
+{
+    int y;
+
+    /* Copy display bitmap to hardware */
+    for (y = 0; y < LCD_REMOTE_HEIGHT / 8; y++)
+    {
+        lcd_remote_write_command(LCD_REMOTE_CNTL_SET_PAGE_ADDRESS | y);
+        lcd_remote_write_command_ex(0x10, 0x00);
+        lcd_remote_write_data(lcd_remote_framebuffer[y], LCD_REMOTE_WIDTH);
+    }
+}
+
 void lcd_remote_init(void)
 {
     GPIO_FUNCTION   |= 0x10010800;  /* GPIO11: Backlight
@@ -180,27 +349,28 @@ void lcd_remote_init(void)
     CLK_LO;
     CS_HI;
     
-    lcd_remote_write_command(LCD_REMOTE_CNTL_ADC_NORMAL);
-    lcd_remote_write_command(LCD_REMOTE_CNTL_SHL_NORMAL);
+    lcd_remote_write_command(LCD_REMOTE_CNTL_ADC_REVERSE);
+    lcd_remote_write_command(LCD_REMOTE_CNTL_SHL_REVERSE);
     lcd_remote_write_command(LCD_REMOTE_CNTL_SELECT_BIAS | 0x0);
     
-    lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x4);
+    lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x5);
     sleep(1);
     lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x6);
     sleep(1);
     lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x7);
     
-    lcd_remote_write_command(LCD_REMOTE_CNTL_SELECT_REGULATOR | 0x4); // Select regulator @ 5.0 (default);
+    lcd_remote_write_command(LCD_REMOTE_CNTL_SELECT_REGULATOR | 0x4); // 0x4 Select regulator @ 5.0 (default);
     lcd_remote_set_contrast(32);
     
     sleep(1);
     
-    lcd_remote_write_command(0x40); // init line
-    lcd_remote_write_command(0xB0); // page address
-    lcd_remote_write_command(0x10); // column
-    lcd_remote_write_command(0x00); // column
+    lcd_remote_write_command(LCD_REMOTE_CNTL_INIT_LINE | 0x0); // init line
+    lcd_remote_write_command(LCD_REMOTE_CNTL_SET_PAGE_ADDRESS | 0x0); // page address
+    lcd_remote_write_command_ex(0x10, 0x00); // Column MSB + LSB
     
     lcd_remote_write_command(LCD_REMOTE_CNTL_DISPLAY_ON_OFF | 1);
+    
+    lcd_remote_clear();
+    lcd_remote_drawrect(0, 0, 10, 20);
+    lcd_remote_update();
 }
-
-#endif
