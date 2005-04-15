@@ -97,7 +97,7 @@ struct GPatch * gusload(char * filename)
 	if(file == -1)
 	{
 		char message[50];
-		snprintf(message, 50, "Error opening %s", filename);
+		rb->snprintf(message, 50, "Error opening %s", filename);
 		rb->splash(HZ*2, true, message);
 		return NULL;
 	}
