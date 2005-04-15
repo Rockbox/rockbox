@@ -19,12 +19,16 @@
 #define SAMPLE_RATE 48000
 #define MAX_VOICES 100
 
-/*	This is for writing to the DSP directly from the Simulator
+/*
+#if defined(SIMULATOR)
+//	This is for writing to the DSP directly from the Simulator
 #include <stdio.h>
 #include <stdlib.h>
 #include <linux/soundcard.h>
 #include <sys/ioctl.h>
+#endif
 */
+
 
 #include "../../plugin.h"
 #include "midi/midiutil.c"
@@ -47,23 +51,56 @@ struct plugin_api * rb;
 
 
 
+
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    TEST_PLUGIN_API(api);
-    (void)parameter;
-    rb = api;
-    rb->splash(HZ*2, true, "MIDI");
-    midimain();
-    rb->splash(HZ*2, true, "FINISHED PLAYING");
-    return PLUGIN_OK;
+	TEST_PLUGIN_API(api);
+	rb = api;
+    	TEST_PLUGIN_API(api);
+    	(void)parameter;
+    	rb = api;
+
+    	if(parameter == NULL)
+    	{
+    		rb->splash(HZ*2, true, " Play .MID file ");
+    		return PLUGIN_OK;
+    	}
+    	rb->splash(HZ, true, parameter);
+    	if(midimain(parameter) == -1)
+    	{
+    		return PLUGIN_ERROR;
+    	}
+    	rb->splash(HZ*3, true, "FINISHED PLAYING");
+    	return PLUGIN_OK;
 }
 
 
-int midimain()
+int midimain(void * filename)
 {
-    	rb->splash(HZ*2, true, "OPENED DSP");
+
+	printf("\nHello.\n");
+
+	rb->splash(HZ/5, true, "LOADING MIDI");
+
+	struct MIDIfile * mf = loadFile(filename);
+	long bpm, nsmp, l;
+
+	int bp=0;
+
+	rb->splash(HZ/5, true, "LOADING PATCHES");
+	if (initSynth(mf, "/.rockbox/patchset/patchset.cfg", "/.rockbox/patchset/drums.cfg") == -1)
+	{
+		return -1;
+	}
+
 	fd=rb->open("/dsp.raw", O_WRONLY|O_CREAT);
+
 /*
+//This lets you hear the music through the sound card if you are on Simulator
+//Make a symlink, archos/dsp.raw and make it point to /dev/dsp or whatever
+//your sound device is.
+
+#if defined(SIMULATOR)
         int arg, status;
         int bit, samp, ch;
 
@@ -82,24 +119,14 @@ int midimain()
         status = ioctl(fd, SOUND_PCM_WRITE_RATE, &arg);
         status = ioctl(fd, SOUND_PCM_READ_RATE, &arg);
         samp=arg;
+#endif
 */
 
-	printf("\nHello.\n");
-//	initSound();	//Open the computer's sound card
-	int a=0;
 
-	rb->splash(HZ*2, true, "LOADING MIDI");
+	rb->splash(HZ/5, true, "  START PLAYING  ");
 
-	struct MIDIfile * mf = loadFile("/test.mid");
 
-	rb->splash(HZ*2, true, "LOADED MIDI");
-	long bpm, nsmp, l;
 
-	int bp=0;
-
-	rb->splash(HZ*2, true, "LOADING PATCHES");
-	initSynth(mf, "/iriver2.cfg", "/drums.cfg");	//Initialize the MIDI syntehsizer
-	rb->splash(HZ*2, true, "START PLAYING");
 
 	signed char buf[3000];
 

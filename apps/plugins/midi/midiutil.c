@@ -40,16 +40,18 @@
 #define CTRL_PANNING	10
 #define CHANNEL 	1
 
-
+//Most of these are deprecated.. rampdown is used, maybe one other one too
 #define STATE_ATTACK  		1
 #define STATE_DECAY  		2
 #define STATE_SUSTAIN 		3
 #define STATE_RELEASE 		4
 #define STATE_RAMPDOWN		5
 
+//Loop states
 #define STATE_LOOPING           7
 #define STATE_NONLOOPING	8
 
+//Various bits in the GUS mode byte
 #define LOOP_ENABLED	4
 #define LOOP_PINGPONG   8
 #define LOOP_REVERSE    16
@@ -65,7 +67,8 @@ unsigned char chVol[16];	//Channel volume
 unsigned char chPanLeft[16];	//Channel panning
 unsigned char chPanRight[16];
 unsigned char chPat[16];        //Channel patch
-unsigned char chPW[16];        //Channel pitch wheel, MSB
+unsigned char chPW[16];        //Channel pitch wheel, MSB only
+
 
 struct GPatch * gusload(char *);
 struct GPatch * patchSet[128];
@@ -118,8 +121,19 @@ struct MIDIfile
 	int numPatches;
 };
 
-void *my_malloc(int size);
 
+
+void sendEvent(struct Event * ev);
+int tick(struct MIDIfile * mf);
+inline void setPoint(struct SynthObject * so, int pt);
+struct Event * getEvent(struct Track * tr, int evNum);
+int readTwoBytes(int file);
+int readFourBytes(int file);
+int readVarData(int file);
+int midimain(void * filename);
+
+
+//Rick's code
 void *alloc(int size)
 {
 	static char *offset = NULL;
@@ -143,7 +157,7 @@ void *alloc(int size)
 	totalSize -= size + 4;
 	return ret;
 }
-
+/*
 void *ralloc(char *offset, int len)
 {
 	int size;
@@ -175,17 +189,12 @@ void *ralloc(char *offset, int len)
 
 	return ret;
 }
-
+*/
 
 void * allocate(int size)
 {
 	return alloc(size);
 }
-
-void sendEvent(struct Event * ev);
-int tick(struct MIDIfile * mf);
-inline void setPoint(struct SynthObject * so, int pt);
-struct Event * getEvent(struct Track * tr, int evNum);
 
 unsigned char readChar(int file)
 {
@@ -211,11 +220,9 @@ int eof(int fd)
 	return size+1 == rb->lseek(fd, 0, SEEK_CUR);
 }
 
-void printf(char *fmt, ...) {}
+void printf(char *fmt, ...) {fmt=fmt; }
 
-//#define my_malloc(a) malloc(a)
-
-
+/*
 void *audio_bufferbase;
 void *audio_bufferpointer;
 unsigned int audio_buffer_free;
@@ -252,11 +259,8 @@ void setmallocpos(void *pointer)
     audio_bufferpointer = pointer;
     audio_buffer_free = audio_bufferpointer - audio_bufferbase;
 }
-
+*/
 void exit(int code)
 {
-}
-
-void free(void * ptr)
-{
+	code = code; //Stub function, kill warning for now
 }

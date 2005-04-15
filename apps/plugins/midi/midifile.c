@@ -185,7 +185,6 @@ struct Track * readTrack(int file)
 	trk->pos = 0;
 	trk->delta = 0;
 
-	int len=0;
 	int numEvents=0;
 
 	int pos = rb->lseek(file, 0, SEEK_CUR);
@@ -269,6 +268,8 @@ int readVarData(int file)
     return(value);
 }
 
+
+/*
 //This function should not be needed because we
 //can just release the whole memory buffer at once
 void unloadFile(struct MIDIfile * mf)
@@ -296,10 +297,10 @@ void unloadFile(struct MIDIfile * mf)
 	}
 	free(mf); 	//Unload the main struct
 }
-
+*/
 void bail(const char * err)
 {
-	printf("\nERROR: %s\n", err);
+	rb->splash(HZ*3, true, err);
 	exit(0);
 }
 

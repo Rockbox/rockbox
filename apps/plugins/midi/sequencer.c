@@ -242,7 +242,7 @@ void sendEvent(struct Event * ev)
 int tick(struct MIDIfile * mf)
 {
 	if(mf==NULL)
-		return;
+		return 0;
 
 	int a=0;
 	int tracksAdv=0;

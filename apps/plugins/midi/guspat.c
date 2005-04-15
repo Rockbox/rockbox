@@ -94,6 +94,14 @@ struct GPatch * gusload(char * filename)
 
 	int file = rb->open(filename, O_RDONLY);
 
+	if(file == -1)
+	{
+		char message[50];
+		snprintf(message, 50, "Error opening %s", filename);
+		rb->splash(HZ*2, true, message);
+		return NULL;
+	}
+
 	gp->header=readData(file, 12);
 	gp->gravisid=readData(file, 10);
 	gp->desc=readData(file, 60);

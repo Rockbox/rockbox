@@ -49,7 +49,7 @@ void readTextBlock(int file, char * buf)
 
 //Filename is the name of the config file
 //The MIDI file should have been loaded at this point
-void initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
+int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
 {
 	char patchUsed[128];
 	char drumUsed[128];
@@ -92,8 +92,8 @@ void initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
 		if(mf->tracks[a] == NULL)
 		{
 			printf("\nNULL TRACK !!!");
-			exit(1);
-			return;
+			rb->splash(HZ*2, true, "Null Track in loader.");
+			return -1;
 		}
 
 		for(ts=0; ts<mf->tracks[a]->numEvents; ts++)
@@ -112,22 +112,31 @@ void initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
 	}
 
 	int file = rb->open(filename, O_RDONLY);
+	if(file == -1)
+	{
+		rb->splash(HZ*2, true, "Bad patch config.\nDid you install the patchset?");
+		return -1;
+	}
 
-	char name[30];
-	char fn[30];
+	char name[40];
+	char fn[40];
 
 	//Scan our config file and load the right patches as needed
 	int c = 0;
-	rb->snprintf(name, 30, "");
+	rb->snprintf(name, 40, "");
 	for(a=0; a<128; a++)
 	{
 		while(readChar(file)!=' ' && !eof(file));
 		readTextBlock(file, name);
 
-		rb->snprintf(fn, 30, "/patchset/%s.pat", name);
+		rb->snprintf(fn, 40, "/.rockbox/patchset/%s.pat", name);
 		printf("\nLOADING: <%s> ", fn);
+
 		if(patchUsed[a]==1)
 			patchSet[a]=gusload(fn);
+
+//		if(patchSet[a] == NULL)
+//			return -1;
 
 		while((c != '\n'))
 			c = readChar(file);
@@ -135,6 +144,11 @@ void initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
 	rb->close(file);
 
 	file = rb->open(drumConfig, O_RDONLY);
+	if(file == -1)
+	{
+		rb->splash(HZ*2, true, "Bad drum config.\nDid you install the patchset?");
+		return -1;
+	}
 
 	//Scan our config file and load the drum data
 	int idx=0;
@@ -143,7 +157,7 @@ void initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
 	{
 		readTextBlock(file, number);
 		readTextBlock(file, name);
-		rb->snprintf(fn, 30, "/patchset/%s.pat", name);
+		rb->snprintf(fn, 40, "/.rockbox/patchset/%s.pat", name);
 
 		idx = rb->atoi(number);
 		if(idx == 0)
@@ -151,13 +165,15 @@ void initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
 
 		if(drumUsed[idx]==1)
 			drumSet[idx]=gusload(fn);
+
+//		if(drumSet[idx] == NULL)
+//			return -1;
+
 		while((c != '\n') && (c != 255) && (!eof(file)))
-		{
-			printf("loop");
 			c = readChar(file);
-		}
 	}
 	rb->close(file);
+	return 0;
 }
 
 
