@@ -301,6 +301,17 @@ struct user_settings
     /* file browser sorting */
     int sort_file; /* 0=alpha, 1=date, 2=date (new first), 3=type */
     int sort_dir; /* 0=alpha, 1=date (old first), 2=date (new first) */
+    
+#ifdef HAVE_REMOTE_LCD
+	 /* remote lcd */
+    int remote_contrast;   /* lcd contrast:          0-63 0=low 63=high            */
+    bool remote_invert;    /* invert display */
+    bool remote_flip_display; /* turn display (and button layout) by 180 degrees */
+    int remote_backlight_timeout;  /* backlight off timeout:  0-18 0=never,
+                               1=always,
+                               then according to timeout_values[] */
+#endif
+    
 };
 
 enum optiontype { INT, BOOL };

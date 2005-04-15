@@ -3069,3 +3069,9 @@ new:
 id: LANG_RECORD_TRIGGER_ACTIVE
 eng: "Trigger active"
 new:
+
+id: LANG_LCD_REMOTE_MENU
+desc: in the display sub menu
+eng: "Remote-LCD Settings"
+voice: ""
+new:

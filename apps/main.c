@@ -71,6 +71,10 @@
 #include "ata_mmc.h"
 #endif
 
+#ifdef HAVE_REMOTE_LCD
+#include "lcd-remote.h"
+#endif
+
 /*#define AUTOROCK*/ /* define this to check for "autostart.rock" on boot */
 
 const char appsversion[]=APPSVERSION;
@@ -139,6 +143,10 @@ void init(void)
     settings_reset();
     
     lcd_init();
+    
+#ifdef HAVE_REMOTE_LCD    
+    lcd_remote_init();
+#endif
 
     font_init();
     show_logo();

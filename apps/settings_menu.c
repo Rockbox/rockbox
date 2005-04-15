@@ -56,6 +56,10 @@ void dac_line_in(bool enable);
 #include "alarm_menu.h"
 #endif
 
+#ifdef HAVE_REMOTE_LCD
+#include "lcd-remote.h"
+#endif
+
 #ifdef HAVE_CHARGING
 static bool car_adapter_mode(void)
 {
@@ -74,6 +78,26 @@ static bool contrast(void)
                     lcd_set_contrast, 1, MIN_CONTRAST_SETTING,
                     MAX_CONTRAST_SETTING );
 }
+
+#ifdef HAVE_REMOTE_LCD
+static bool remote_contrast(void)
+{
+    return set_int( str(LANG_CONTRAST), "", UNIT_INT,
+                    &global_settings.remote_contrast, 
+                    lcd_remote_set_contrast, 1, MIN_CONTRAST_SETTING,
+                    MAX_CONTRAST_SETTING );
+}
+
+static bool remote_invert(void)
+{
+     bool rc = set_bool_options(str(LANG_INVERT),
+                                &global_settings.remote_invert,
+                                STR(LANG_INVERT_LCD_INVERSE),
+                                STR(LANG_INVERT_LCD_NORMAL),
+                                lcd_remote_set_invert_display);
+     return rc;
+}
+#endif
 
 #ifdef CONFIG_BACKLIGHT
 static bool caption_backlight(void)
@@ -1178,6 +1202,27 @@ static bool lcd_settings_menu(void)
     return result;
 }
 
+#ifdef HAVE_REMOTE_LCD
+static bool lcd_remote_settings_menu(void)
+{
+    int m;
+    bool result;
+
+    static const struct menu_item items[] = {
+        { ID2P(LANG_CONTRAST),        remote_contrast },
+        { ID2P(LANG_INVERT),          remote_invert },
+/*        { ID2P(LANG_FLIP_DISPLAY),    remote_flip_display },
+        { ID2P(LANG_INVERT_CURSOR),   invert_cursor },*/
+    };
+
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
+    result = menu_run(m);
+    menu_exit(m);
+    return result;
+}
+#endif
+
 #ifdef HAVE_LCD_BITMAP
 static bool bars_settings_menu(void)
 {
@@ -1214,6 +1259,9 @@ static bool display_settings_menu(void)
 #endif
         { ID2P(LANG_WHILE_PLAYING),   custom_wps_browse },
         { ID2P(LANG_LCD_MENU),        lcd_settings_menu },
+#ifdef HAVE_REMOTE_LCD
+        { ID2P(LANG_LCD_REMOTE_MENU), lcd_remote_settings_menu },
+#endif
         { ID2P(LANG_SCROLL_MENU),     scroll_settings_menu },
 #ifdef HAVE_LCD_BITMAP
         { ID2P(LANG_BARS_MENU),       bars_settings_menu },

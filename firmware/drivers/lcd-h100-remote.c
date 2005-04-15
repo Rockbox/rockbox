@@ -29,7 +29,11 @@
 #include "system.h"
 #include "font.h"
 
-unsigned char lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH];
+unsigned char lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH]
+#ifndef SIMULATOR
+              __attribute__ ((section(".idata")))
+#endif	
+		;
 
 #define CS_LO       GPIO1_OUT &= ~0x00000004
 #define CS_HI       GPIO1_OUT |= 0x00000004
@@ -176,6 +180,11 @@ void lcd_remote_set_invert_display(bool yesno)
     lcd_remote_write_command(LCD_REMOTE_CNTL_REVERSE_ON_OFF | yesno);
 }
 
+int lcd_remote_default_contrast(void)
+{
+    return 32;
+}
+
 void lcd_remote_bitmap(const unsigned char *src, int x, int y, int nx, int ny, bool clear) __attribute__ ((section (".icode")));
 void lcd_remote_bitmap(const unsigned char *src, int x, int y, int nx, int ny, bool clear)
 {
@@ -317,7 +326,7 @@ void lcd_remote_drawrect(int x, int y, int nx, int ny)
     }
 }
 
-void lcd_remote_clear(void)
+void lcd_remote_clear_display(void)
 {
     memset(lcd_remote_framebuffer, 0, sizeof lcd_remote_framebuffer);
 }
@@ -360,7 +369,6 @@ void lcd_remote_init(void)
     lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x7);
     
     lcd_remote_write_command(LCD_REMOTE_CNTL_SELECT_REGULATOR | 0x4); // 0x4 Select regulator @ 5.0 (default);
-    lcd_remote_set_contrast(32);
     
     sleep(1);
     
@@ -370,7 +378,6 @@ void lcd_remote_init(void)
     
     lcd_remote_write_command(LCD_REMOTE_CNTL_DISPLAY_ON_OFF | 1);
     
-    lcd_remote_clear();
-    lcd_remote_drawrect(0, 0, 10, 20);
+    lcd_remote_clear_display();
     lcd_remote_update();
 }

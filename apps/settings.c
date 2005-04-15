@@ -83,6 +83,10 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #define MAX_LINES 2
 #endif
 
+#ifdef HAVE_REMOTE_LCD
+#include "lcd-remote.h"
+#endif
+
 long lasttime = 0;
 static long config_sector = 0;  /* mark uninitialized */
 static unsigned char config_block[CONFIG_BLOCK_SIZE];
@@ -242,6 +246,12 @@ static const struct bit_entry rtc_bits[] =
 
 #if BATTERY_TYPES_COUNT > 1
     {1, S_O(battery_type), 0, "battery type", "alkaline,nimh" },
+#endif
+
+#ifdef HAVE_REMOTE_LCD
+    /* remote lcd */
+    {6, S_O(remote_contrast), 32, "remote_contrast", NULL },
+    {1, S_O(remote_invert), false, "remote_invert", off_on },
 #endif
 
     /* Current sum of bits: 259 (worst case) */
@@ -763,6 +773,10 @@ void settings_apply(void)
     
     lcd_set_contrast(global_settings.contrast);
     lcd_scroll_speed(global_settings.scroll_speed);
+#ifdef HAVE_REMOTE_LCD
+	 lcd_remote_set_contrast(global_settings.remote_contrast);
+	 lcd_remote_set_invert_display(global_settings.remote_invert);
+#endif 
     backlight_set_timeout(global_settings.backlight_timeout);
     backlight_set_on_when_charging(global_settings.backlight_on_when_charging);
     ata_spindown(global_settings.disk_spindown);
