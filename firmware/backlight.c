@@ -28,6 +28,10 @@
 #include "power.h"
 #include "system.h"
 
+#ifdef HAVE_REMOTE_LCD
+#include "lcd-remote.h"
+#endif
+
 #ifdef CONFIG_BACKLIGHT
 
 const char backlight_timeout_value[19] =
@@ -63,6 +67,10 @@ static void __backlight_off(void)
 #elif CONFIG_BACKLIGHT == BL_GMINI
     P1 &= ~0x10;
 #endif
+
+#ifdef HAVE_REMOTE_LCD
+	lcd_remote_backlight_off();
+#endif
 }
 
 static void __backlight_on(void)
@@ -79,6 +87,10 @@ static void __backlight_on(void)
     or_b(0x40, &PADRH); /* drive it high */
 #elif CONFIG_BACKLIGHT == BL_GMINI
     P1 |= 0x10;
+#endif
+
+#ifdef HAVE_REMOTE_LCD
+	lcd_remote_backlight_on();
 #endif
 }
 
