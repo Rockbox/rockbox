@@ -53,6 +53,10 @@
 #endif
 #include "sound.h"
 
+#ifdef HAVE_REMOTE_LCD
+#include "lcd-remote.h"
+#endif
+
 #ifdef PLUGIN
 #if defined(DEBUG) || defined(SIMULATOR)
 #undef DEBUGF
@@ -169,6 +173,15 @@ struct plugin_api {
     void (*backlight_off)(void);
     void (*backlight_set_timeout)(int index);
     void (*splash)(int ticks, bool center, const char *fmt, ...);
+
+#ifdef HAVE_REMOTE_LCD
+	 void (*remote_clear_display)(void);
+    void (*remote_backlight_on)(void);
+    void (*remote_backlight_off)(void);
+	 void (*remote_set_contrast)(int val);
+	 void (*remote_update)(void);
+	 unsigned char* lcd_remote_framebuffer;
+#endif
 
     /* button */
     long (*button_get)(bool block);

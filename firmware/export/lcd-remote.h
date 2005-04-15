@@ -40,6 +40,7 @@ extern void lcd_remote_set_invert_display(bool yesno);
 extern int  lcd_remote_default_contrast(void);
 extern void lcd_remote_bitmap (const unsigned char *src, int x, int y,
                                int nx, int ny, bool clear);
+extern void lcd_remote_update(void);
 
 #endif
 #endif

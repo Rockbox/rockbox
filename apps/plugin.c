@@ -54,6 +54,10 @@
 #include "widgets.h"
 #endif
 
+#ifdef HAVE_REMOTE_LCD
+#include "lcd-remote.h"
+#endif
+
 #if MEM >= 32
 #define PLUGIN_BUFFER_SIZE 0xC0000
 #else
@@ -128,7 +132,14 @@ static const struct plugin_api rockbox_api = {
     backlight_off,
     backlight_set_timeout,
     splash,
-
+#ifdef HAVE_REMOTE_LCD
+	 lcd_remote_clear_display,
+    lcd_remote_backlight_on,
+    lcd_remote_backlight_off,
+	 lcd_remote_set_contrast,
+	 lcd_remote_update,
+	 &lcd_remote_framebuffer[0][0],
+#endif
     /* button */
     button_get,
     button_get_w_tmo,
