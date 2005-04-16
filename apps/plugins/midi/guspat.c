@@ -66,6 +66,18 @@ struct GWaveform * loadWaveform(int file)
 	wav->res=readData(file, 36);
 	wav->data=readData(file, wav->wavSize);
 
+	int a=0;
+
+	//If we have a 16 bit waveform
+	if(wav->mode & 1  && (wav->mode & 2))
+	{
+		for(a=0; a<wav->wavSize; a+=2)	//Convert it to
+		{
+			//wav->data[a]=wav->data[a]; //+((wav->mode & 2) << 6);
+			wav->data[a|1]=wav->data[(a)|1]+(1 << 7);
+		}
+	}
+
 	return wav;
 }
 

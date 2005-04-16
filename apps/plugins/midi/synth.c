@@ -186,10 +186,7 @@ inline signed short int getSample(struct GWaveform * wf, unsigned int s)
 	{
 
 		if(s<<1 >= wf->wavSize)
-		{
-		//	printf("\nSAMPLE OUT OF RANGE: s=%d  2s=%d  ws=%d", s, 2*s, wf->wavSize);
 			return 0;
-		}
 
 
 		/*
@@ -198,14 +195,14 @@ inline signed short int getSample(struct GWaveform * wf, unsigned int s)
 		*/
 
 
-		//If they are unsigned, convert them to signed
-		//or was it the other way around. Whatever, it works
-		unsigned char b1=wf->data[s<<1]+((wf->mode & 2) << 6);
-		unsigned char b2=wf->data[(s<<1)|1]+((wf->mode & 2) << 6);
-		return (b1 | (b2<<8));
+		//Sign conversion moved into guspat.c
+		unsigned char b1=wf->data[s<<1];     //+((wf->mode & 2) << 6);
+		unsigned char b2=wf->data[(s<<1)|1]; //+((wf->mode & 2) << 6);
+		return (b1 | (b2<<8)) ;
 	}
 	else
-	{               //8-bit samples
+	{       //8-bit samples
+		//Do we even have anything 8-bit in our set?
 		unsigned char b1=wf->data[s]+((wf->mode & 2) << 6);
 		return b1<<8;
 	}
@@ -237,10 +234,6 @@ inline void setPoint(struct SynthObject * so, int pt)
 	so->curPoint = pt;
 
 	int r=0;
-
-
-
-
 	int rate = so->wf->envRate[pt];
 
 	r=3-((rate>>6) & 0x3);		// Some blatant Timidity code for rate conversion...
@@ -256,7 +249,7 @@ inline void setPoint(struct SynthObject * so, int pt)
 	default this to 10, and maybe later have an option to set it to 9
 	for longer decays.
 	*/
-	so->curRate = r<<9;
+	so->curRate = r<<10;
 
 
 	so->targetOffset = so->wf->envOffset[pt]<<(20);
@@ -371,6 +364,7 @@ inline signed short int synthVoice(int v)
 
 	if(so->curOffset < 0)
 		so->isUsed=0;  //This is OK
+
 
 	s = s * (so->curOffset >> 22);
 	s = s>>6;

@@ -19,15 +19,21 @@
 #define SAMPLE_RATE 48000
 #define MAX_VOICES 100
 
-/*
+
+//Only define LOCAL_DSP on Simulator or else we're asking for trouble
 #if defined(SIMULATOR)
+	//Enable this to write to the soundcard via a /dsv/dsp symlink in /
+//	#define LOCAL_DSP
+#endif
+
+
+#if defined(LOCAL_DSP)
 //	This is for writing to the DSP directly from the Simulator
 #include <stdio.h>
 #include <stdlib.h>
 #include <linux/soundcard.h>
 #include <sys/ioctl.h>
 #endif
-*/
 
 
 #include "../../plugin.h"
@@ -40,9 +46,9 @@
 
 
 
-//#include "lib/xxx2wav.h"
+#include "lib/xxx2wav.h"
 
-int fd=-1; //File descriptor, for opening /dev/dsp and writing to it
+int fd=-1; //File descriptor where the output is written
 
 extern long tempo; //The sequencer keeps track of this
 
@@ -93,14 +99,12 @@ int midimain(void * filename)
 		return -1;
 	}
 
-	fd=rb->open("/dsp.raw", O_WRONLY|O_CREAT);
-
-/*
 //This lets you hear the music through the sound card if you are on Simulator
 //Make a symlink, archos/dsp.raw and make it point to /dev/dsp or whatever
 //your sound device is.
 
-#if defined(SIMULATOR)
+#if defined(LOCAL_DSP)
+       	fd=rb->open("/dsp.raw", O_WRONLY);
         int arg, status;
         int bit, samp, ch;
 
@@ -119,8 +123,15 @@ int midimain(void * filename)
         status = ioctl(fd, SOUND_PCM_WRITE_RATE, &arg);
         status = ioctl(fd, SOUND_PCM_READ_RATE, &arg);
         samp=arg;
+#else
+       	file_info_struct file_info;
+	file_info.samplerate = 48000;
+	file_info.infile = fd;
+	file_info.channels = 2;
+	file_info.bitspersample = 16;
+	local_init("/miditest.tmp", "/miditest.wav", &file_info, rb);
+	fd = file_info.outfile;
 #endif
-*/
 
 
 	rb->splash(HZ/5, true, "  START PLAYING  ");
@@ -190,6 +201,12 @@ int midimain(void * filename)
 
 //	unloadFile(mf);
 	printf("\n");
-	rb->close(fd);
+
+#if !defined(LOCAL_DSP)
+
+		close_wav(&file_info);
+#else
+		rb->close(fd);
+#endif
 	return 0;
 }
