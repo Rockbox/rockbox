@@ -1,11 +1,20 @@
-NEWSDATE(2005-apr-12)
+NEWSDATE(2005-05-15)
+
+ ITEM The iRiver remote LCD driver is
+ LINK("http://www.rockbox.org/twiki/pub/Main/IriverPort/remote_lcd.jpg",
+ now working) - thanks to NAME(Rick La Charité), NAME(Christian Gmeiner) and
+ LINUSN for this progress.
+
+ENDDATE
+
+NEWSDATE(2005-04-12)
  
  ITEM LINK("http://www.rockbox.org/digest/", Rockbox Digest) is now active
  again.
 
 ENDDATE
 
-NEWSDATE(2005-apr-10)
+NEWSDATE(2005-04-10)
 
  ITEM The iRiver bootloader has now
  LINK("http://www.rockbox.org/twiki/bin/view/Main/IriverBoot", been tested)
@@ -13,7 +22,7 @@ NEWSDATE(2005-apr-10)
 
 ENDDATE
 
-NEWSDATE(2005-apr-05)
+NEWSDATE(2005-04-05)
 
  ITEM Trigger recording has been
  LINK("http://www.rockbox.org/mail/archive/rockbox-archive-2005-04/0050.shtml",
@@ -21,7 +30,7 @@ NEWSDATE(2005-apr-05)
 
 ENDDATE
 
-NEWSDATE(2005-feb-10)
+NEWSDATE(2005-02-10)
  
  ITEM A bunch of people have now tested the iRiver
  LINK("http://www.rockbox.org/twiki/bin/view/Main/IriverBoot", bootloader).
