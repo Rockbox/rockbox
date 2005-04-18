@@ -2,10 +2,11 @@
 
 IMAGE=disk.img
 MOUNT=/mnt/dummy
+DIR=$MOUNT/q
 RESULT=result.txt
 
 fail() {
-    echo "!! Test failed. Look in $RESULT for test logs."
+    echo "!! Test failed $RETVAL. Look in $RESULT for test logs."
     chmod a+rw $RESULT
     exit
 }
@@ -24,16 +25,16 @@ try() {
 }
 
 buildimage() {
-    /sbin/mkdosfs -F 32 -s $1 $IMAGE > /dev/null
-    mount -o loop $IMAGE $MOUNT
-    echo "Filling it with /etc files"
-    find /etc -type f -maxdepth 1 -exec cp {} $MOUNT \;
+    /sbin/mkdosfs -F 16 -s $1 $IMAGE > /dev/null;
+    mount -o loop,fat=16 $IMAGE $MOUNT;
+    echo "Filling it with /etc files";
+    mkdir $DIR;
+    find /etc -type f -maxdepth 1 -exec cp {} $DIR \;
     for i in `seq 1 120`;
     do
-        echo apa > "$MOUNT/very $i long test filename so we can make sure they.work"
-    done
-    mkdir $MOUNT/dir
-    umount $MOUNT
+        echo apa > "$DIR/very $i long test filename so we can make sure they.work";
+    done;
+    umount $MOUNT;
 }
 
 runtests() {
@@ -89,7 +90,7 @@ runtests() {
     try chkfile /cpa.rock
     try chkfile /bpa.rock
 
-    LOOP=50
+    LOOP=25
     SIZE=700
 
     try del "/really long filenames rock"
@@ -98,15 +99,15 @@ runtests() {
     for i in `seq 1 $LOOP`;
     do
         echo ---Test: $i/$LOOP ---
-        try mkfile "/rockbox rocks.$i" $SIZE
+        try mkfile "/q/rockbox rocks.$i" $SIZE
         check
-        try chkfile "/rockbox rocks.$i" $SIZE
+        try chkfile "/q/rockbox rocks.$i" $SIZE
         check
-        try del "/rockbox rocks.$i"
+        try del "/q/rockbox rocks.$i"
         check
-        try mkfile "/rockbox rocks.$i" $SIZE
+        try mkfile "/q/rockbox rocks.$i" $SIZE
         check
-        try ren "/rockbox rocks.$i" "$i is a new long filename!"
+        try ren "/q/rockbox rocks.$i" "/q/$i is a new long filename!"
         check
     done
 
@@ -118,18 +119,6 @@ echo "--------------------------------------"
 buildimage 4
 runtests
 
-echo "---------------------------------------"
-echo "Building test image (32 sectors/cluster)"
-echo "---------------------------------------"
-buildimage 32
-runtests
-
-echo "--------------------------------------"
-echo "Building test image (1 sector/cluster)"
-echo "--------------------------------------"
-buildimage 1
-runtests
-
 echo "--------------------------------------"
 echo "Building test image (8 sectors/cluster)"
 echo "--------------------------------------"
@@ -137,9 +126,9 @@ buildimage 8
 runtests
 
 echo "----------------------------------------"
-echo "Building test image (128 sectors/cluster)"
+echo "Building test image (64 sectors/cluster)"
 echo "----------------------------------------"
-buildimage 128
+buildimage 16
 runtests
 
 echo "== Test completed successfully =="

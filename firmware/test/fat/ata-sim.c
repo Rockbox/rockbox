@@ -2,11 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include "debug.h"
-#include "panic.h"
 
 #define BLOCK_SIZE 512
 
 static FILE* file;
+
+void panicf( const char *fmt, ... );
 
 int ata_read_sectors(unsigned long start, int count, void* buf)
 {
@@ -51,10 +52,9 @@ int ata_write_sectors(unsigned long start, int count, void* buf)
     return 0;
 }
 
-int ata_init(char* filename)
+int ata_init(void)
 {
-    if (!filename)
-        filename = "disk.img";
+    char* filename = "disk.img";
     /* check disk size */
     file=fopen(filename,"rb+");
     if(!file) {

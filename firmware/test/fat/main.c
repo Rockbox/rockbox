@@ -9,12 +9,13 @@
 #include "dir.h"
 #include "file.h"
 
-extern int ata_init(char*);
-extern void ata_read_sectors(int, int, char*);
-
 void dbg_dump_sector(int sec);
 void dbg_dump_buffer(unsigned char *buf, int len, int offset);
 void dbg_console(void);
+
+void mutex_init(void* l) {}
+void mutex_lock(void* l) {}
+void mutex_unlock(void* l) {}
 
 void panicf( char *fmt, ...)
 {
@@ -24,6 +25,24 @@ void panicf( char *fmt, ...)
     vfprintf(stderr, fmt, ap );
     va_end( ap );
     exit(1);
+}
+
+void debugf(const char *fmt, ...)
+{
+    va_list ap;
+    va_start( ap, fmt );
+    fprintf(stderr,"DEBUGF: ");
+    vfprintf( stderr, fmt, ap );
+    va_end( ap );
+}
+
+void ldebugf(const char* file, int line, const char *fmt, ...)
+{
+    va_list ap;
+    va_start( ap, fmt );
+    fprintf( stderr, "%s:%d ", file, line );
+    vfprintf( stderr, fmt, ap );
+    va_end( ap );
 }
 
 void dbg_dump_sector(int sec)
@@ -660,7 +679,7 @@ int main(int argc, char *argv[])
 
     srand(clock());
 
-    if(ata_init("disk.img")) {
+    if(ata_init()) {
         DEBUGF("*** Warning! The disk is uninitialized\n");
         return -1;
     }
