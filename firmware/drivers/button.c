@@ -196,9 +196,9 @@ void button_init(void)
 {
     /* hardware inits */
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
-    /* Set GPIO37 as general purpose input */
-    GPIO1_FUNCTION |= 0x00000020;
-    GPIO1_ENABLE &= ~0x00000020;
+    /* Set GPIO33, GPIO37, GPIO38  and GPIO52 as general purpose inputs */
+    GPIO1_FUNCTION |= 0x00100062;
+    GPIO1_ENABLE &= ~0x00100062;
 #elif CONFIG_KEYPAD == RECORDER_PAD
     /* Set PB4 and PB8 as input pins */
     PBCR1 &= 0xfffc;  /* PB8MD = 00 */
