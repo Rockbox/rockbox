@@ -715,6 +715,9 @@ int main(int argc, char *argv[])
 
     ata_exit();
 
+    if (rc)
+        DEBUGF("Return code: %d\n", rc);
+
     return rc;
 }
 
