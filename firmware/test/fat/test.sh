@@ -105,7 +105,7 @@ runtests() {
         check
         try mkfile "/rockbox rocks.$i" $SIZE
         check
-        try ren "/rockbox rocks.$i" "$i is a new long filename!"
+        try ren "/rockbox rocks.$i" "/$i is a new long filename!"
         check
     done
 
