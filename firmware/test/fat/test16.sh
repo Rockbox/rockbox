@@ -128,7 +128,7 @@ runtests
 echo "----------------------------------------"
 echo "Building test image (64 sectors/cluster)"
 echo "----------------------------------------"
-buildimage 16
+buildimage 64
 runtests
 
 echo "== Test completed successfully =="
