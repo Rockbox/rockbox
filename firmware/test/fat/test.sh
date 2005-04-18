@@ -32,7 +32,6 @@ buildimage() {
     do
         echo apa > "$MOUNT/very $i long test filename so we can make sure they.work"
     done
-    mkdir $MOUNT/dir
     umount $MOUNT
 }
 
