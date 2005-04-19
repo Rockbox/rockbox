@@ -37,6 +37,9 @@
 #include "powermgmt.h"
 #include "led.h"
 #include "sound.h"
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
+#include "button.h"
+#endif
 
 static enum playmode ff_mode;
 
@@ -157,7 +160,11 @@ void status_draw(bool force_redraw)
     info.hour = tm->tm_hour;
     info.minute = tm->tm_min;
     info.shuffle = global_settings.playlist_shuffle;
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
+    info.keylock = button_hold();
+#else    
     info.keylock = keys_locked;
+#endif
     info.repeat = global_settings.repeat_mode;
     info.playmode = current_playmode();
 #ifndef HAVE_LED

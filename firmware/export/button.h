@@ -36,6 +36,7 @@ void button_set_flip(bool flip); /* turn 180 degrees */
 
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
 bool button_hold(void);
+bool remote_button_hold(void);
 #endif
 
 #define  BUTTON_NONE          0x0000

@@ -356,70 +356,97 @@ static int button_read(void)
 
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
 
-    data = adc_scan(ADC_BUTTONS);
+    static bool hold_button = false;
+    static bool remote_hold_button = false;
 
-    if (data < 0x80)
-        if (data < 0x30)
-            if (data < 0x18)
-                btn = BUTTON_SELECT;
-            else
-                btn = BUTTON_UP;
-        else
-            if (data < 0x50)
-                btn = BUTTON_LEFT;
-            else
-                btn = BUTTON_DOWN;
-    else
-        if (data < 0xb0)
-            if (data < 0xa0)
-                btn = BUTTON_RIGHT;
-            else
-                btn = BUTTON_OFF;
-        else
-            if (data < 0xd0)
-                btn = BUTTON_MODE;
-            else
-                if (data < 0xf0)
-                    btn = BUTTON_REC;
+    /* light handling */
+    if (hold_button && !button_hold())
+    {
+        backlight_on();
+    }
+    if (remote_hold_button && !remote_button_hold())
+    {
+        remote_backlight_on();
+    }
+    hold_button = button_hold();
+    remote_hold_button = remote_button_hold();
 
-    data = adc_scan(ADC_REMOTE);
-
-    if (data < 0x74)
-        if (data < 0x40)
-            if (data < 0x20)
-                if(data < 0x10)
-                    btn = BUTTON_RC_STOP;
+    /* normal buttons */
+    if (!button_hold())
+    {
+        data = adc_scan(ADC_BUTTONS);
+        
+        if (data < 0x80)
+            if (data < 0x30)
+                if (data < 0x18)
+                    btn = BUTTON_SELECT;
                 else
-                    btn = BUTTON_RC_VOL_DOWN;
+                    btn = BUTTON_UP;
             else
-                btn = BUTTON_RC_VOL;
-        else
-            if (data < 0x58)
-                btn = BUTTON_RC_VOL_UP;
-            else
-                btn = BUTTON_RC_BITRATE;
-    else
-        if (data < 0xb0)
-            if (data < 0x88)
-                btn = BUTTON_RC_REC;
-            else
-                btn = BUTTON_RC_SOURCE;
-        else
-            if (data < 0xd8)
-                if(data < 0xc0)
-                    btn = BUTTON_RC_FF;
+                if (data < 0x50)
+                    btn = BUTTON_LEFT;
                 else
-                    btn = BUTTON_RC_MENU;
+                    btn = BUTTON_DOWN;
+        else
+            if (data < 0xb0)
+                if (data < 0xa0)
+                    btn = BUTTON_RIGHT;
+                else
+                    btn = BUTTON_OFF;
             else
-                if (data < 0xf0)
-                    btn = BUTTON_RC_REW;
+                if (data < 0xd0)
+                    btn = BUTTON_MODE;
+                else
+                    if (data < 0xf0)
+                        btn = BUTTON_REC;
+    }
+    
+    /* remote buttons */
+    if (!remote_button_hold())
+    {
+        data = adc_scan(ADC_REMOTE);
 
-    data = GPIO1_READ;
-    if ((data & 0x20) == 0)
-        btn |= BUTTON_ON;
+        if (data < 0x74)
+            if (data < 0x40)
+                if (data < 0x20)
+                    if(data < 0x10)
+                        btn = BUTTON_RC_STOP;
+                    else
+                        btn = BUTTON_RC_VOL_DOWN;
+                else
+                    btn = BUTTON_RC_VOL;
+            else
+                if (data < 0x58)
+                    btn = BUTTON_RC_VOL_UP;
+                else
+                    btn = BUTTON_RC_BITRATE;
+        else
+            if (data < 0xb0)
+                if (data < 0x88)
+                    btn = BUTTON_RC_REC;
+                else
+                    btn = BUTTON_RC_SOURCE;
+            else
+                if (data < 0xd8)
+                    if(data < 0xc0)
+                        btn = BUTTON_RC_FF;
+                    else
+                        btn = BUTTON_RC_MENU;
+                else
+                    if (data < 0xf0)
+                        btn = BUTTON_RC_REW;
+    }
+                    
+    /* special buttons */
+    if (!button_hold())
+    {
+        data = GPIO1_READ;
+        if ((data & 0x20) == 0)
+            btn |= BUTTON_ON;
 
-    if ((data & 0x40) == 0)
-        btn |= BUTTON_RC_ON;
+        if ((data & 0x40) == 0)
+            btn |= BUTTON_RC_ON;
+    }
     
 #elif CONFIG_KEYPAD == RECORDER_PAD
 
