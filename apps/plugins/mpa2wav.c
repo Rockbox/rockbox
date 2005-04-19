@@ -146,8 +146,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
   int Status=0;
   unsigned short Sample;
   int i;
-  size_t ReadSize, Remaining;
-  unsigned char  *ReadStart;
 
   /* Generic plugin inititialisation */
 
