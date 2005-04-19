@@ -9,12 +9,12 @@ for later reference.
 
 <p>If you don't want to download and install an IRC client or are locked behind a firewall, try our <a href="cgiirc/irc.cgi">web client</a>.
 
-<h2>Nick reference</h2>
-<pre>
-#include "nicks.txt"
-</pre>
+<p>
+<a href="/twiki/bin/view/Main/IrcNicks">Nick reference</a>
 
 <h2>Logs</h2>
+
+<p><a href="current.txt">Today's log</a> (updating live)
 
 <!--#exec cmd="./irclogs.pl" -->
 
