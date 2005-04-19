@@ -1,4 +1,4 @@
-NEWSDATE(2005-05-15)
+NEWSDATE(2005-04-15)
 
  ITEM The iRiver remote LCD driver is
  LINK("http://www.rockbox.org/twiki/pub/Main/IriverPort/remote_lcd.jpg",
