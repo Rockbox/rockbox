@@ -91,6 +91,7 @@ void font_init(void);
 struct font* font_load(const char *path);
 struct font* font_get(int font);
 void font_reset(void);
+int font_getstringsize(const unsigned char *str, int *w, int *h, int fontnumber);
 
 #else /* HAVE_LCD_BITMAP */
 

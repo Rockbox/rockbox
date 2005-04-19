@@ -319,24 +319,7 @@ void lcd_setfont(int newfont)
 
 int lcd_getstringsize(const unsigned char *str, int *w, int *h)
 {
-    struct font* pf = font_get(curfont);
-    int ch;
-    int width = 0;
-
-    while((ch = *str++)) {
-        /* check input range*/
-        if (ch < pf->firstchar || ch >= pf->firstchar+pf->size)
-            ch = pf->defaultchar;
-        ch -= pf->firstchar;
-
-        /* get proportional width and glyph bits*/
-        width += pf->width? pf->width[ch]: pf->maxwidth;
-    }
-    if ( w )
-        *w = width;
-    if ( h )
-        *h = pf->height;
-    return width;
+    return font_getstringsize(str, w, h, curfont);
 }
 
 /* put a string at a given char position */

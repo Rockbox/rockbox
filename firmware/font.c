@@ -225,6 +225,31 @@ struct font* font_get(int font)
             panicf("No font!");
     }
 }
+/*
+ * Returns the stringsize of a given string. 
+ */
+int font_getstringsize(const unsigned char *str, int *w, int *h, int fontnumber)
+{
+    struct font* pf = font_get(fontnumber);
+    int ch;
+    int width = 0;
+
+    while((ch = *str++)) {
+        /* check input range*/
+        if (ch < pf->firstchar || ch >= pf->firstchar+pf->size)
+            ch = pf->defaultchar;
+        ch -= pf->firstchar;
+
+        /* get proportional width and glyph bits*/
+        width += pf->width? pf->width[ch]: pf->maxwidth;
+    }
+    if ( w )
+        *w = width;
+    if ( h )
+        *h = pf->height;
+    return width;
+}
+
 
 #endif /* HAVE_LCD_BITMAP */
 
