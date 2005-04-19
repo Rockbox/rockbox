@@ -16,8 +16,6 @@
  *
  ****************************************************************************/
 
-
-
 extern struct plugin_api * rb;
 
 struct Event * getEvent(struct Track * tr, int evNum)
@@ -178,7 +176,20 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
 
 
 
-inline signed short int getSample(struct GWaveform * wf, unsigned int s)
+int currentVoice IDATA_ATTR;
+struct SynthObject * so IDATA_ATTR;
+struct GWaveform * wf IDATA_ATTR;
+int s IDATA_ATTR;
+short s1 IDATA_ATTR;
+short s2 IDATA_ATTR;
+short sample IDATA_ATTR;	//For synthSample
+unsigned int cpShifted IDATA_ATTR;
+
+unsigned char b1 IDATA_ATTR;
+unsigned char b2 IDATA_ATTR;
+
+
+inline int getSample(int s)
 {
 
 	//16 bit samples
@@ -186,24 +197,23 @@ inline signed short int getSample(struct GWaveform * wf, unsigned int s)
 	{
 
 		if(s<<1 >= wf->wavSize)
+		{
+			printf("\n!!!!! %d \t %d", s<<1, wf->wavSize);
 			return 0;
-
-
-		/*
-		 *	Probably put the signed/unsigned and and 8-16 bit conversion
-		 *	into the patch loader and have it run there, once.
-		*/
-
+		}
+//		signed short a =  ((short *)wf->data)[s];
 
 		//Sign conversion moved into guspat.c
-		unsigned char b1=wf->data[s<<1];     //+((wf->mode & 2) << 6);
-		unsigned char b2=wf->data[(s<<1)|1]; //+((wf->mode & 2) << 6);
+		b1=wf->data[s<<1]+((wf->mode & 2) << 6);
+		b2=wf->data[(s<<1)|1]+((wf->mode & 2) << 6);
 		return (b1 | (b2<<8)) ;
+
+		//Get rid of this sometime
 	}
 	else
 	{       //8-bit samples
 		//Do we even have anything 8-bit in our set?
-		unsigned char b1=wf->data[s]+((wf->mode & 2) << 6);
+		int b1=wf->data[s]+((wf->mode & 2) << 6);
 		return b1<<8;
 	}
 }
@@ -251,14 +261,18 @@ inline void setPoint(struct SynthObject * so, int pt)
 	*/
 	so->curRate = r<<10;
 
+	//Do this here because the patches assume a 44100 sampling rate
+	//We've halved our sampling rate, ergo the ADSR code will be
+	//called half the time. Ergo, double the rate to keep stuff
+	//sounding right.
+	so->curRate = so->curRate << 1;
+
 
 	so->targetOffset = so->wf->envOffset[pt]<<(20);
 	if(pt==0)
 		so->curOffset = 0;
 }
 
-
-long msi=0;
 
 inline void stopVoice(struct SynthObject * so)
 {
@@ -269,51 +283,37 @@ inline void stopVoice(struct SynthObject * so)
 
 }
 
-int rampDown = 0;
 
-inline signed short int synthVoice(int v)
+inline signed short int synthVoice()
 {
-	//Probably can combine these 2 lines into one..
-	//But for now, this looks more readable
-//	struct GPatch * pat = patchSet[chPat[voices[v].ch]];
-//	struct GWaveform * wf = pat->waveforms[pat->noteTable[voices[v].note]];
-	struct SynthObject * so = &voices[v];
-	struct GWaveform * wf = so->wf;
+	so = &voices[currentVoice];
+	wf = so->wf;
 
-	signed int s;
 
 	if(so->state != STATE_RAMPDOWN)
 	{
-		if(so->loopDir==LOOPDIR_FORWARD)
-		{
-			so->cp += so->delta;
-		}
-		else
-		{
-			so->cp -= so->delta;
-		}
+		so->cp += so->delta;
 	}
 
-	if( (so->cp>>9 >= (wf->wavSize)) && (so->state != STATE_RAMPDOWN))
+	cpShifted = so->cp >> 10;
+
+	if( (cpShifted >= (wf->wavSize>>1)) && (so->state != STATE_RAMPDOWN))
 		stopVoice(so);
 
-        /*
-	//Original, working, no interpolation
-		s=getSample(wf, (so->cp>>10));
-        */
+        s2 = getSample((cpShifted)+1);
 
-
-
-        int s2=getSample(wf, (so->cp>>10)+1);
-
-	if((wf->mode & (LOOP_REVERSE|LOOP_PINGPONG)) && so->loopState == STATE_LOOPING && (so->cp>>10 <= (wf->startLoop>>1)))
+	if((wf->mode & (LOOP_REVERSE|LOOP_PINGPONG)) && so->loopState == STATE_LOOPING && (cpShifted <= (wf->startLoop>>1)))
 	{
 		if(wf->mode & LOOP_REVERSE)
 		{
 			so->cp = (wf->endLoop)<<9;
-			s2=getSample(wf, (so->cp>>10));
+			cpShifted = so->cp >> 10;
+			s2=getSample((cpShifted));
 	        } else
+	        {
+	        	so->delta = -so->delta;
 			so->loopDir = LOOPDIR_FORWARD;
+		}
 	}
 
 	if((wf->mode & 28) && (so->cp>>10 >= wf->endLoop>>1))
@@ -322,14 +322,21 @@ inline signed short int synthVoice(int v)
 		if((wf->mode & (24)) == 0)
 		{
 			so->cp = (wf->startLoop)<<9;
-			s2=getSample(wf, (so->cp>>10));
+			cpShifted = so->cp >> 10;
+			s2=getSample((cpShifted));
 		} else
+		{
+			so->delta = -so->delta;
 			so->loopDir = LOOPDIR_REVERSE;
+		}
 	}
 
 	//Better, working, linear interpolation
-	int s1=getSample(wf, (so->cp>>10));
-	s = s1 + ((long)((s2 - s1) * (so->cp & 1023))>>10);
+	s1=getSample((cpShifted));
+	s = s1 + ((signed)((s2 - s1) * (so->cp & 1023))>>10);
+
+
+//ADSR COMMENT WOULD GO FROM HERE.........
 
 	if(so->curRate == 0)
 		stopVoice(so);
@@ -366,8 +373,9 @@ inline signed short int synthVoice(int v)
 		so->isUsed=0;  //This is OK
 
 
-	s = s * (so->curOffset >> 22);
-	s = s>>6;
+	s = (s * (so->curOffset >> 22) >> 6);
+
+// ............. TO HERE
 
 
 	if(so->state == STATE_RAMPDOWN)
@@ -377,64 +385,28 @@ inline signed short int synthVoice(int v)
 			so->isUsed=0;
 	}
 
-	s = s * so->decay; s = s >> 9;
+	s = s * so->decay; s = s >> 10;
 
 	return s*((signed short int)so->vol*(signed short int)chVol[so->ch])>>14;
 }
 
 
-
-int mhL[16];
-int mhR[16];
-int mp=0;	//Mix position, for circular array
-//	Was stuff for Ghetto Lowpass Filter, now deprecated.
-
-
 inline void synthSample(int * mixL, int * mixR)
 {
-	int a=0;
-	signed long int leftMix=0, rightMix=0, sample=0;
-	for(a=0; a<MAX_VOICES; a++)
+//	signed int leftMix=0, rightMix=0,
+	*mixL = 0;
+	*mixR = 0;
+	for(currentVoice=0; currentVoice<MAX_VOICES; currentVoice++)
 	{
-		if(voices[a].isUsed==1)
+		if(voices[currentVoice].isUsed==1)
 		{
-			sample = synthVoice(a);
-
-			leftMix += (sample*chPanLeft[voices[a].ch])>>7;
-			rightMix += (sample*chPanRight[voices[a].ch])>>7;
+			sample = synthVoice(currentVoice);
+			*mixL += (sample*chPanLeft[voices[currentVoice].ch])>>7;
+			*mixR += (sample*chPanRight[voices[currentVoice].ch])>>7;
 		}
 	}
 
 	//TODO: Automatic Gain Control, anyone?
 	//Or, should this be implemented on the DSP's output volume instead?
-	*mixL = leftMix;
-	*mixR = rightMix;
-
 	return;  //No more ghetto lowpass filter.. linear intrpolation works well.
-
-
-	// HACK HACK HACK
-	// This is the infamous Ghetto Lowpass Filter
-	// Now that I have linear interpolation, it should not be needed anymore.
-	/*
-	mp++;
-	if(mp==4)
-		mp=0;
-
-	mhL[mp]=leftMix;
-	mhR[mp]=rightMix;
-
-	*mixL = 0;
-	*mixR = 0;
-
-
-	for(a=0; a<4; a++)
-	{
-		*mixL += mhL[a];
-		*mixR += mhR[a];
-	}
-	*mixL = *mixL>>4;
-	*mixR = *mixR>>4;
-	*/
-	// END HACK END HACK END HACK
 }

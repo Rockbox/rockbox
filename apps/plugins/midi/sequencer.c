@@ -88,9 +88,30 @@ void setPW(int ch, int msb)
 
 void pressNote(int ch, int note, int vol)
 {
+/*
+	if(ch == 0) return;
+//	if(ch == 1) return;
+	if(ch == 2) return;
+	if(ch == 3) return;
+	if(ch == 4) return;
+	if(ch == 5) return;
+	if(ch == 6) return;
+	if(ch == 7) return;
+	if(ch == 8) return;
+	if(ch == 9) return;
+	if(ch == 10) return;
+	if(ch == 11) return;
+	if(ch == 12) return;
+	if(ch == 13) return;
+	if(ch == 14) return;
+	if(ch == 15) return;
+*/
 	int a=0;
 	for(a=0; a<MAX_VOICES; a++)
 	{
+		if(voices[a].ch == ch && voices[a].note == note)
+			break;
+
 		if(voices[a].isUsed==0)
 			break;
 	}
@@ -107,7 +128,7 @@ void pressNote(int ch, int note, int vol)
 	voices[a].vol=vol;
 	voices[a].cp=0;
 	voices[a].state=STATE_ATTACK;
-	voices[a].pstate=STATE_ATTACK;
+//	voices[a].pstate=STATE_ATTACK;
 	voices[a].decay=255;
 
 
@@ -170,15 +191,12 @@ void releaseNote(int ch, int note)
 	{
 		if(voices[a].ch == ch && voices[a].note == note)
 		{
-			//voices[a].isUsed=0;
 			if((voices[a].wf->mode & 28))
 			{
-				voices[a].tmp=40;
+		//		voices[a].tmp=40;
 //				voices[a].state = STATE_RELEASE; //Ramp down
 
 //				voices[a].state = STATE_RAMPDOWN; //Ramp down
-
-//				voices[a].isUsed = 0;
 				setPoint(&voices[a], 3);
 			}
 		}
@@ -281,6 +299,9 @@ int tick(struct MIDIfile * mf)
 					{
 						tempo =	(((short)e->evData[0])<<16)|(((short)e->evData[1])<<8)|(e->evData[2]);
 						printf("\nMeta-Event: Tempo Set = %d", tempo);
+						bpm=mf->div*1000000/tempo;
+						numberOfSamples=SAMPLE_RATE/bpm;
+
 					}
 				}
 				tr->delta = 0;

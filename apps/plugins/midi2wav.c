@@ -16,7 +16,7 @@
  *
  ****************************************************************************/
 
-#define SAMPLE_RATE 48000
+#define SAMPLE_RATE 22050
 #define MAX_VOICES 100
 
 
@@ -37,6 +37,12 @@
 
 
 #include "../../plugin.h"
+
+#include "lib/xxx2wav.h"
+
+int numberOfSamples IDATA_ATTR;
+long bpm;
+
 #include "midi/midiutil.c"
 #include "midi/guspat.h"
 #include "midi/guspat.c"
@@ -46,7 +52,6 @@
 
 
 
-#include "lib/xxx2wav.h"
 
 int fd=-1; //File descriptor where the output is written
 
@@ -54,6 +59,7 @@ extern long tempo; //The sequencer keeps track of this
 
 
 struct plugin_api * rb;
+
 
 
 
@@ -80,6 +86,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     	return PLUGIN_OK;
 }
 
+signed char outputBuffer[3000] IDATA_ATTR; //signed char.. gonna run out of iram ... !
+
+
+int currentSample IDATA_ATTR;
+int outputBufferPosition IDATA_ATTR;
+int outputSampleOne IDATA_ATTR;
+int outputSampleTwo IDATA_ATTR;
+
 
 int midimain(void * filename)
 {
@@ -89,9 +103,6 @@ int midimain(void * filename)
 	rb->splash(HZ/5, true, "LOADING MIDI");
 
 	struct MIDIfile * mf = loadFile(filename);
-	long bpm, nsmp, l;
-
-	int bp=0;
 
 	rb->splash(HZ/5, true, "LOADING PATCHES");
 	if (initSynth(mf, "/.rockbox/patchset/patchset.cfg", "/.rockbox/patchset/drums.cfg") == -1)
@@ -125,7 +136,7 @@ int midimain(void * filename)
         samp=arg;
 #else
        	file_info_struct file_info;
-	file_info.samplerate = 48000;
+	file_info.samplerate = SAMPLE_RATE;
 	file_info.infile = fd;
 	file_info.channels = 2;
 	file_info.bitspersample = 16;
@@ -134,12 +145,11 @@ int midimain(void * filename)
 #endif
 
 
-	rb->splash(HZ/5, true, "  START PLAYING  ");
+	rb->splash(HZ/5, true, "  Starting Playback  ");
 
 
 
 
-	signed char buf[3000];
 
 	// tick() will do one MIDI clock tick. Then, there's a loop here that
 	// will generate the right number of samples per MIDI tick. The whole
@@ -152,49 +162,56 @@ int midimain(void * filename)
 
 	printf("\nOkay, starting sequencing");
 
+
+	currentSample=0; 			//Sample counting variable
+ 	outputBufferPosition = 0;
+
+
+	bpm=mf->div*1000000/tempo;
+	numberOfSamples=SAMPLE_RATE/bpm;
+
+
+
 	//Tick() will return 0 if there are no more events left to play
 	while(tick(mf))
 	{
 
 		//Some annoying math to compute the number of samples
 		//to syntehsize per each MIDI tick.
-		bpm=mf->div*1000000/tempo;
-		nsmp=SAMPLE_RATE/bpm;
 
 		//Yes we need to do this math each time because the tempo
 		//could have changed.
 
 		// On second thought, this can be moved to the event that
 		//recalculates the tempo, to save a little bit of CPU time.
-		for(l=0; l<nsmp; l++)
+		for(currentSample=0; currentSample<numberOfSamples; currentSample++)
 		{
-			int s1, s2;
 
-			synthSample(&s1, &s2);
+			synthSample(&outputSampleOne, &outputSampleTwo);
 
 
 			//16-bit audio because, well, it's better
 			// But really because ALSA's OSS emulation sounds extremely
 			//noisy and distorted when in 8-bit mode. I still do not know
 			//why this happens.
-			buf[bp]=s1&0XFF; // Low byte first
-			bp++;
-			buf[bp]=s1>>8;   //High byte second
-			bp++;
+			outputBuffer[outputBufferPosition]=outputSampleOne&0XFF; // Low byte first
+			outputBufferPosition++;
+			outputBuffer[outputBufferPosition]=outputSampleOne>>8;   //High byte second
+			outputBufferPosition++;
 
-			buf[bp]=s2&0XFF; // Low byte first
-			bp++;
-			buf[bp]=s2>>8;   //High byte second
-			bp++;
+			outputBuffer[outputBufferPosition]=outputSampleTwo&0XFF; // Low byte first
+			outputBufferPosition++;
+			outputBuffer[outputBufferPosition]=outputSampleTwo>>8;   //High byte second
+			outputBufferPosition++;
 
 
 			//As soon as we produce 2000 bytes of sound,
 			//write it to the sound card. Why 2000? I have
 			//no idea. It's 1 AM and I am dead tired.
-			if(bp>=2000)
+			if(outputBufferPosition>=2000)
 			{
-				rb->write(fd, buf, 2000);
-				bp=0;
+				rb->write(fd, outputBuffer, 2000);
+				outputBufferPosition=0;
 			}
 		}
 	}

@@ -36,6 +36,7 @@ struct GWaveform
 	unsigned char * name;
 	unsigned char fractions;
 	unsigned int wavSize;
+	unsigned int numSamples;
 	unsigned int startLoop;
 	unsigned int endLoop;
 	unsigned int sampRate;

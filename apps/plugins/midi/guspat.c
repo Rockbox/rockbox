@@ -66,18 +66,64 @@ struct GWaveform * loadWaveform(int file)
 	wav->res=readData(file, 36);
 	wav->data=readData(file, wav->wavSize);
 
+	wav->numSamples = wav->wavSize / 2;
 	int a=0;
 
+	return wav;
+	if(wav->mode & 1 == 0)	//Whoops, 8 bit
+	{
+		wav->numSamples = wav->wavSize;
+
+		//Allocate a block for the rest of it
+		//It should end up right after the previous one.
+		wav->wavSize = wav->wavSize * 2;
+		void * foo = allocate(wav->wavSize);
+
+
+		for(a=0; a<1000; a++)
+			printf("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+
+		for(a=wav->wavSize-1; a>0; a-=2)
+		{
+
+		}
+	//	int b1=wf->data[s]+((wf->mode & 2) << 6);
+	//	return b1<<8;
+	}
+
+	/*
+//#if !defined(SIMULATOR)
+	for(a=0; a<wav->wavSize; a+=2)
+	{
+		unsigned char tmp;
+		tmp = wav->data[2*a];
+		wav->data[2*a] = wav->data[2*a+1];
+		wav->data[2*a+1] = tmp;
+	}
+//#endif
+
+	if(wav->mode & 2)
+	{
+		for(a=0; a<wav->wavSize/2; a++)
+		{
+			((short *) wav->data)[a] = ((short *) wav->data)[a] - 32767;
+		}
+	}
+*/
+
+
+
 	//If we have a 16 bit waveform
-	if(wav->mode & 1  && (wav->mode & 2))
+/*	if(wav->mode & 1  && (wav->mode & 2))
 	{
 		for(a=0; a<wav->wavSize; a+=2)	//Convert it to
 		{
-			//wav->data[a]=wav->data[a]; //+((wav->mode & 2) << 6);
+			wav->data[a]=wav->data[a]+(1 << 7);
 			wav->data[a|1]=wav->data[(a)|1]+(1 << 7);
 		}
 	}
-
+*/
 	return wav;
 }
 

@@ -63,33 +63,26 @@
 extern struct plugin_api * rb;
 
 
+int chVol[16] IDATA_ATTR;	//Channel volume
+int chPanLeft[16] IDATA_ATTR;	//Channel panning
+int chPanRight[16] IDATA_ATTR;
+int chPat[16];        //Channel patch
+int chPW[16];        //Channel pitch wheel, MSB only
+
+
+/*
 unsigned char chVol[16];	//Channel volume
 unsigned char chPanLeft[16];	//Channel panning
 unsigned char chPanRight[16];
 unsigned char chPat[16];        //Channel patch
 unsigned char chPW[16];        //Channel pitch wheel, MSB only
-
-
+*/
 struct GPatch * gusload(char *);
 struct GPatch * patchSet[128];
 struct GPatch * drumSet[128];
-struct SynthObject voices[MAX_VOICES];
 
 
-
-struct SynthObject
-{
-	int tmp;
-	struct GWaveform * wf;
-	unsigned int delta;
-	unsigned int decay;
-	unsigned int cp;
-	unsigned char state, pstate, loopState, loopDir;
-	unsigned char note, vol, ch, isUsed;
-	int curRate, curOffset, targetOffset;
-	int curPoint;
-};
-
+//char myarray[80] IDATA_ATTR;
 
 struct Event
 {
@@ -120,6 +113,34 @@ struct MIDIfile
 	unsigned char patches[128];
 	int numPatches;
 };
+/*
+struct SynthObject
+{
+//	int tmp;
+	struct GWaveform * wf;
+	unsigned int delta;
+	unsigned int decay;
+	unsigned int cp;
+	unsigned char state, loopState, loopDir;
+	unsigned char note, vol, ch, isUsed;
+	int curRate, curOffset, targetOffset;
+	unsigned int curPoint;
+};
+*/
+struct SynthObject
+{
+//	int tmp;
+	struct GWaveform * wf;
+	int delta;
+	int decay;
+	int cp;
+	int state, loopState, loopDir;
+	int note, vol, ch, isUsed;
+	int curRate, curOffset, targetOffset;
+	int curPoint;
+};
+
+struct SynthObject voices[MAX_VOICES] IDATA_ATTR;
 
 
 
@@ -133,12 +154,15 @@ int readVarData(int file);
 int midimain(void * filename);
 
 
-//Rick's code
 void *alloc(int size)
 {
 	static char *offset = NULL;
 	static int totalSize = 0;
 	char *ret;
+
+	int remainder = size % 4;
+
+	size = size + 4-remainder;
 
 	if (offset == NULL)
 	{
@@ -157,40 +181,34 @@ void *alloc(int size)
 	totalSize -= size + 4;
 	return ret;
 }
+
+
+//Rick's code
 /*
-void *ralloc(char *offset, int len)
+void *alloc(int size)
 {
-	int size;
+	static char *offset = NULL;
+	static int totalSize = 0;
 	char *ret;
+
 
 	if (offset == NULL)
 	{
-		return alloc(len);
+		offset = rb->plugin_get_audio_buffer(&totalSize);
 	}
 
-	size = *((unsigned int *)offset - 4);
-
-	if (size >= 0x02000000)
+	if (size + 4 > totalSize)
 	{
 		return NULL;
 	}
 
-	ret = alloc(len);
+	ret = offset + 4;
+	*((unsigned int *)offset) = size;
 
-	if (len < size)
-	{
-		rb->memcpy(ret, offset, len);
-	}
-	else
-	{
-		rb->memcpy(ret, offset, size);
-		rb->memset(ret, 0, len - size);
-	}
-
+	offset += size + 4;
+	totalSize -= size + 4;
 	return ret;
-}
-*/
-
+}*/
 void * allocate(int size)
 {
 	return alloc(size);
@@ -222,44 +240,6 @@ int eof(int fd)
 
 void printf(char *fmt, ...) {fmt=fmt; }
 
-/*
-void *audio_bufferbase;
-void *audio_bufferpointer;
-unsigned int audio_buffer_free;
-
-
-
-
-void *my_malloc(int size)
-{
-
-    void *alloc;
-
-    if (!audio_bufferbase)
-    {
-        audio_bufferbase = audio_bufferpointer
-            = rb->plugin_get_audio_buffer(&audio_buffer_free);
-#if MEM <= 8 && !defined(SIMULATOR)
-
-        if ((unsigned)(ovl_start_addr - (unsigned char *)audio_bufferbase)
-            < audio_buffer_free)
-            audio_buffer_free = ovl_start_addr - (unsigned char *)audio_bufferbase;
-#endif
-    }
-    if (size + 4 > audio_buffer_free)
-        return 0;
-    alloc = audio_bufferpointer;
-    audio_bufferpointer += size + 4;
-    audio_buffer_free -= size + 4;
-    return alloc;
-}
-
-void setmallocpos(void *pointer)
-{
-    audio_bufferpointer = pointer;
-    audio_buffer_free = audio_bufferpointer - audio_bufferbase;
-}
-*/
 void exit(int code)
 {
 	code = code; //Stub function, kill warning for now
