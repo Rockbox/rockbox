@@ -130,6 +130,9 @@ unsigned char *OutputPtr=OutputBuffer;
 unsigned char *GuardPtr=NULL;
 const unsigned char *OutputBufferEnd=OutputBuffer+OUTPUT_BUFFER_SIZE;
 
+mad_fixed_t mad_frame_overlap[2][32][18] IDATA_ATTR;
+unsigned char mad_main_data[MAD_BUFFER_MDLEN] IDATA_ATTR;
+
 #ifdef USE_IRAM
 extern char iramcopy[];
 extern char iramstart[];
@@ -168,7 +171,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
   mad_synth_init(&Synth);
   mad_timer_reset(&Timer);
 
- //if error:   return PLUGIN_ERROR;
+  /* We do this so libmad doesn't try to call codec_calloc() */
+  memset(mad_frame_overlap, 0, sizeof(mad_frame_overlap));
+  Frame.overlap = &mad_frame_overlap;
+  Stream.main_data = &mad_main_data;
+  
+  GuardPtr = &filebuf[file_info.filesize];
+  memset(GuardPtr,0,MAD_BUFFER_GUARD);
+  mad_stream_buffer(&Stream, filebuf,file_info.filesize);
 
   file_info.curpos=0;
   file_info.start_tick=*(rb->current_tick);
@@ -176,42 +186,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
   rb->button_clear_queue();
 
   /* This is the decoding loop. */
-  while (file_info.curpos < file_info.filesize) {
-    if(Stream.buffer==NULL || Stream.error==MAD_ERROR_BUFLEN) {
-      if(Stream.next_frame!=NULL) {
-        Remaining=Stream.bufend-Stream.next_frame;
-        memmove(InputBuffer,Stream.next_frame,Remaining);
-        ReadStart=InputBuffer+Remaining;
-        ReadSize=INPUT_BUFFER_SIZE-Remaining;
-      } else {
-        ReadSize=INPUT_BUFFER_SIZE;
-        ReadStart=InputBuffer;
-        Remaining=0;
-      }
-
-      /* Fill-in the buffer. If an error occurs print a message
-       * and leave the decoding loop. If the end of stream is
-       * reached we also leave the loop but the return status is
-       * left untouched.
-       */
-
-      if ((file_info.filesize-file_info.curpos) < (int) ReadSize) {
-         ReadSize=file_info.filesize-file_info.curpos;
-      }
-      memcpy(ReadStart,&filebuf[file_info.curpos],ReadSize);
-      file_info.curpos+=ReadSize;
-
-      if (file_info.curpos >= file_info.filesize) 
-      {
-        GuardPtr=ReadStart+ReadSize;
-        memset(GuardPtr,0,MAD_BUFFER_GUARD);
-        ReadSize+=MAD_BUFFER_GUARD;
-      }
-
-      /* Pipe the new buffer content to libmad's stream decoder facility */
-      mad_stream_buffer(&Stream,InputBuffer,ReadSize+Remaining);
-      Stream.error=0;
-    }
+  while (file_info.curpos < file_info.filesize &&
+         Stream.this_frame != GuardPtr &&
+      Stream.error != MAD_ERROR_BUFLEN) {
+      file_info.curpos += (int)Stream.next_frame - (int)Stream.this_frame;
 
     if(mad_frame_decode(&Frame,&Stream))
     {
