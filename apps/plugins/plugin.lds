@@ -15,7 +15,7 @@ OUTPUT_FORMAT(elf32-sh)
 #endif
 
 #ifdef IRIVER_H100
-#define DRAMORIG 0x30000000
+#define DRAMORIG 0x31000000
 #define IRAMORIG 0x10010000
 #define IRAMSIZE 0x8000
 #else
