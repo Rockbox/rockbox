@@ -20,39 +20,39 @@
 #define BYTE unsigned char
 
 //Data chunk ID types, returned by readID()
-#define ID_UNKNOWN 	-1
-#define ID_MTHD		1
-#define ID_MTRK 	2
-#define ID_EOF  	3
+#define ID_UNKNOWN  -1
+#define ID_MTHD     1
+#define ID_MTRK     2
+#define ID_EOF      3
 
 //MIDI Commands
-#define MIDI_NOTE_OFF	128
-#define MIDI_NOTE_ON	144
-#define MIDI_AFTERTOUCH	160
-#define MIDI_CONTROL	176
-#define MIDI_PRGM	192
-#define MIDI_PITCHW	224
+#define MIDI_NOTE_OFF   128
+#define MIDI_NOTE_ON    144
+#define MIDI_AFTERTOUCH 160
+#define MIDI_CONTROL    176
+#define MIDI_PRGM   192
+#define MIDI_PITCHW 224
 
 
 //MIDI Controllers
-#define CTRL_VOLUME	7
-#define CTRL_BALANCE	8
-#define CTRL_PANNING	10
-#define CHANNEL 	1
+#define CTRL_VOLUME 7
+#define CTRL_BALANCE    8
+#define CTRL_PANNING    10
+#define CHANNEL     1
 
 //Most of these are deprecated.. rampdown is used, maybe one other one too
-#define STATE_ATTACK  		1
-#define STATE_DECAY  		2
-#define STATE_SUSTAIN 		3
-#define STATE_RELEASE 		4
-#define STATE_RAMPDOWN		5
+#define STATE_ATTACK        1
+#define STATE_DECAY         2
+#define STATE_SUSTAIN       3
+#define STATE_RELEASE       4
+#define STATE_RAMPDOWN      5
 
 //Loop states
 #define STATE_LOOPING           7
-#define STATE_NONLOOPING	8
+#define STATE_NONLOOPING    8
 
 //Various bits in the GUS mode byte
-#define LOOP_ENABLED	4
+#define LOOP_ENABLED    4
 #define LOOP_PINGPONG   8
 #define LOOP_REVERSE    16
 
@@ -63,81 +63,69 @@
 extern struct plugin_api * rb;
 
 
-int chVol[16] IDATA_ATTR;	//Channel volume
-int chPanLeft[16] IDATA_ATTR;	//Channel panning
+int chVol[16] IDATA_ATTR;       /* Channel volume                */
+int chPanLeft[16] IDATA_ATTR;   /* Channel panning               */
 int chPanRight[16] IDATA_ATTR;
-int chPat[16];        //Channel patch
-int chPW[16];        //Channel pitch wheel, MSB only
+int chPat[16];                  /* Channel patch                 */
+int chPW[16];                   /* Channel pitch wheel, MSB only */
 
 
-/*
-unsigned char chVol[16];	//Channel volume
-unsigned char chPanLeft[16];	//Channel panning
-unsigned char chPanRight[16];
-unsigned char chPat[16];        //Channel patch
-unsigned char chPW[16];        //Channel pitch wheel, MSB only
-*/
 struct GPatch * gusload(char *);
 struct GPatch * patchSet[128];
 struct GPatch * drumSet[128];
 
-
-//char myarray[80] IDATA_ATTR;
-
 struct Event
 {
-	unsigned int delta;
-	unsigned char status, d1, d2;
-	unsigned int len;
-	unsigned char * evData;
+    unsigned int delta;
+    unsigned char status, d1, d2;
+    unsigned int len;
+    unsigned char * evData;
 };
 
 struct Track
 {
-	unsigned int size;
-	unsigned int numEvents;
-	unsigned int delta;	//For sequencing
-	unsigned int pos;	//For sequencing
-	void * dataBlock;
+    unsigned int size;
+    unsigned int numEvents;
+    unsigned int delta; /* For sequencing */
+    unsigned int pos;   /* For sequencing */
+    void * dataBlock;
 };
 
 
 struct MIDIfile
 {
-	int  Length;
-
-	//int Format; //We don't really care what type it is
-	unsigned short numTracks;
-	unsigned short div;	//Time division, X ticks per millisecond
-	struct Track * tracks[48];
-	unsigned char patches[128];
-	int numPatches;
+    int  Length;
+    unsigned short numTracks;
+    unsigned short div; /* Time division, X ticks per millisecond */
+    struct Track * tracks[48];
+    unsigned char patches[128];
+    int numPatches;
 };
+
 /*
 struct SynthObject
 {
-//	int tmp;
-	struct GWaveform * wf;
-	unsigned int delta;
-	unsigned int decay;
-	unsigned int cp;
-	unsigned char state, loopState, loopDir;
-	unsigned char note, vol, ch, isUsed;
-	int curRate, curOffset, targetOffset;
-	unsigned int curPoint;
+    struct GWaveform * wf;
+    unsigned int delta;
+    unsigned int decay;
+    unsigned int cp;
+    unsigned char state, loopState, loopDir;
+    unsigned char note, vol, ch, isUsed;
+    int curRate, curOffset, targetOffset;
+    unsigned int curPoint;
 };
 */
+
 struct SynthObject
 {
-//	int tmp;
-	struct GWaveform * wf;
-	int delta;
-	int decay;
-	int cp;
-	int state, loopState, loopDir;
-	int note, vol, ch, isUsed;
-	int curRate, curOffset, targetOffset;
-	int curPoint;
+    struct GWaveform * wf;
+    int delta;
+    int decay;
+    unsigned int cp;
+    int state, loopState, loopDir;
+    int note, vol, ch, isUsed;
+    int curRate, curOffset, targetOffset;
+    int curPoint;
 };
 
 struct SynthObject voices[MAX_VOICES] IDATA_ATTR;
@@ -156,91 +144,91 @@ int midimain(void * filename);
 
 void *alloc(int size)
 {
-	static char *offset = NULL;
-	static int totalSize = 0;
-	char *ret;
+    static char *offset = NULL;
+    static int totalSize = 0;
+    char *ret;
 
-	int remainder = size % 4;
+    int remainder = size % 4;
 
-	size = size + 4-remainder;
+    size = size + 4-remainder;
 
-	if (offset == NULL)
-	{
-		offset = rb->plugin_get_audio_buffer(&totalSize);
-	}
+    if (offset == NULL)
+    {
+        offset = rb->plugin_get_audio_buffer(&totalSize);
+    }
 
-	if (size + 4 > totalSize)
-	{
-		return NULL;
-	}
+    if (size + 4 > totalSize)
+    {
+        return NULL;
+    }
 
-	ret = offset + 4;
-	*((unsigned int *)offset) = size;
+    ret = offset + 4;
+    *((unsigned int *)offset) = size;
 
-	offset += size + 4;
-	totalSize -= size + 4;
-	return ret;
+    offset += size + 4;
+    totalSize -= size + 4;
+    return ret;
 }
 
 
-//Rick's code
+/* Rick's code */
 /*
 void *alloc(int size)
 {
-	static char *offset = NULL;
-	static int totalSize = 0;
-	char *ret;
+    static char *offset = NULL;
+    static int totalSize = 0;
+    char *ret;
 
 
-	if (offset == NULL)
-	{
-		offset = rb->plugin_get_audio_buffer(&totalSize);
-	}
+    if (offset == NULL)
+    {
+        offset = rb->plugin_get_audio_buffer(&totalSize);
+    }
 
-	if (size + 4 > totalSize)
-	{
-		return NULL;
-	}
+    if (size + 4 > totalSize)
+    {
+        return NULL;
+    }
 
-	ret = offset + 4;
-	*((unsigned int *)offset) = size;
+    ret = offset + 4;
+    *((unsigned int *)offset) = size;
 
-	offset += size + 4;
-	totalSize -= size + 4;
-	return ret;
+    offset += size + 4;
+    totalSize -= size + 4;
+    return ret;
 }*/
 void * allocate(int size)
 {
-	return alloc(size);
+    return alloc(size);
 }
 
 unsigned char readChar(int file)
 {
-	char buf[2];
-	rb->read(file, &buf, 1);
-	return buf[0];
+    char buf[2];
+    rb->read(file, &buf, 1);
+    return buf[0];
 }
 
 unsigned char * readData(int file, int len)
 {
-	unsigned char * dat = allocate(len);
-	rb->read(file, dat, len);
-	return dat;
+    unsigned char * dat = allocate(len);
+    rb->read(file, dat, len);
+    return dat;
 }
 
 int eof(int fd)
 {
-	int curPos = rb->lseek(fd, 0, SEEK_CUR);
+    int curPos = rb->lseek(fd, 0, SEEK_CUR);
 
-	int size = rb->lseek(fd, 0, SEEK_END);
+    int size = rb->lseek(fd, 0, SEEK_END);
 
-	rb->lseek(fd, curPos, SEEK_SET);
-	return size+1 == rb->lseek(fd, 0, SEEK_CUR);
+    rb->lseek(fd, curPos, SEEK_SET);
+    return size+1 == rb->lseek(fd, 0, SEEK_CUR);
 }
 
 void printf(char *fmt, ...) {fmt=fmt; }
 
 void exit(int code)
 {
-	code = code; //Stub function, kill warning for now
+    code = code; /* Stub function, kill warning for now */
 }

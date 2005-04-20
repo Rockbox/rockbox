@@ -16,7 +16,7 @@
  *
  ****************************************************************************/
 
-//This came from one of the Gravis documents
+/* This came from one of the Gravis documents */
 static const unsigned int gustable[]=
 {
   8175, 8661, 9177, 9722, 10300, 10913, 11562, 12249, 12978, 13750, 14567, 15433,
@@ -33,63 +33,63 @@ static const unsigned int gustable[]=
 
 struct GWaveform
 {
-	unsigned char * name;
-	unsigned char fractions;
-	unsigned int wavSize;
-	unsigned int numSamples;
-	unsigned int startLoop;
-	unsigned int endLoop;
-	unsigned int sampRate;
-	unsigned int lowFreq;
-	unsigned int highFreq;
-	unsigned int rootFreq;
-	unsigned int tune;
-	unsigned int balance;
-	unsigned char * envRate;
-	unsigned char * envOffset;
+    unsigned char * name;
+    unsigned char fractions;
+    unsigned int wavSize;
+    unsigned int numSamples;
+    unsigned int startLoop;
+    unsigned int endLoop;
+    unsigned int sampRate;
+    unsigned int lowFreq;
+    unsigned int highFreq;
+    unsigned int rootFreq;
+    unsigned int tune;
+    unsigned int balance;
+    unsigned char * envRate;
+    unsigned char * envOffset;
 
-	unsigned char tremSweep;
-	unsigned char tremRate;
-	unsigned char tremDepth;
-	unsigned char vibSweep;
-	unsigned char vibRate;
-	unsigned char vibDepth;
-	unsigned char mode;
+    unsigned char tremSweep;
+    unsigned char tremRate;
+    unsigned char tremDepth;
+    unsigned char vibSweep;
+    unsigned char vibRate;
+    unsigned char vibDepth;
+    unsigned char mode;
 
-	unsigned int scaleFreq;
-	unsigned int scaleFactor;
+    unsigned int scaleFreq;
+    unsigned int scaleFactor;
 
-	unsigned char * res;
-	signed char * data;
+    unsigned char * res;
+    signed char * data;
 };
 
 
 struct GPatch
 {
-	unsigned int patchNumber;
-	unsigned char * header;
-	unsigned char * gravisid;
-	unsigned char * desc;
-	unsigned char inst, voc, chan;
-	unsigned int numWaveforms;
-	unsigned int datSize;
-	unsigned int vol;
-	unsigned char * res;
+    unsigned int patchNumber;
+    unsigned char * header;
+    unsigned char * gravisid;
+    unsigned char * desc;
+    unsigned char inst, voc, chan;
+    unsigned int numWaveforms;
+    unsigned int datSize;
+    unsigned int vol;
+    unsigned char * res;
 
 
-	unsigned int instrID;
-	unsigned char * instrName;
-	unsigned int instrSize;
-	unsigned int layers;
-	unsigned char * instrRes;
+    unsigned int instrID;
+    unsigned char * instrName;
+    unsigned int instrSize;
+    unsigned int layers;
+    unsigned char * instrRes;
 
-	unsigned char layerDup;
-	unsigned char layerID;
-	unsigned int layerSize;
-	unsigned char numWaves;
-	unsigned char * layerRes;
+    unsigned char layerDup;
+    unsigned char layerID;
+    unsigned int layerSize;
+    unsigned char numWaves;
+    unsigned char * layerRes;
 
-	unsigned char noteTable[128];
-	struct GWaveform * waveforms[255];
+    unsigned char noteTable[128];
+    struct GWaveform * waveforms[255];
 };
 
