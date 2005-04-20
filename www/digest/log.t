@@ -1,3 +1,8 @@
+NEWSDATE(2005-04-20)
+ ITEM LINUSN
+ LINK("http://www.rockbox.org/mail/archive/rockbox-archive-2005-04/0161.shtml",
+ announced) that he has played the first seconds of mp3 on his iRiver.
+
 NEWSDATE(2005-04-15)
 
  ITEM The iRiver remote LCD driver is
