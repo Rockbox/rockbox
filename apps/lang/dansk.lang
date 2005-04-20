@@ -3057,6 +3057,5 @@ new: "Udløser klar"
 id: LANG_LCD_REMOTE_MENU
 desc: in the display sub menu
 eng: "Remote-LCD Settings"
-### Not previously translated
-voice: "Fjernbetjenings-LCD indstillinger"
-new: 
+voice: 
+new: "Fjernbetjenings-LCD indstillinger"
