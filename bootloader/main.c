@@ -62,7 +62,7 @@ int load_firmware(void)
     unsigned long chksum;
     unsigned long sum;
     int i;
-    unsigned char *buf = (unsigned char *)0x30000000;
+    unsigned char *buf = (unsigned char *)0x31000000;
     char str[80];
     
     fd = open("/rockbox.iriver", O_RDONLY);
