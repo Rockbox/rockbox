@@ -60,7 +60,7 @@ void cpu_boost(bool on_off);
   asm volatile ("nop")
 
 /* gcc 3.4 changed the format of the constraints */
-#if (__GNUC__ >= 3) && (__GNUC_MINOR__ > 3)
+#if (__GNUC__ >= 3) && (__GNUC_MINOR__ > 3) || (__GNUC__ >= 4)
 #define I_CONSTRAINT "I08"
 #else
 #define I_CONSTRAINT "I"
