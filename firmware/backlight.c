@@ -82,7 +82,7 @@ static void __backlight_on(void)
     /* Enable square wave */
     rtc_write(0x0a, rtc_read(0x0a) | 0x40);
 #elif CONFIG_BACKLIGHT == BL_PA14_LO /* Player */
-    and_b(~0x40, &PADRH); /* drive an set low */
+    and_b(~0x40, &PADRH); /* drive and set low */
     or_b(0x40, &PAIORH);
 #elif CONFIG_BACKLIGHT == BL_PA14_HI /* Ondio */
     or_b(0x40, &PADRH); /* drive it high */
