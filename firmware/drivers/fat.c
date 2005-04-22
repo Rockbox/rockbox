@@ -85,6 +85,10 @@
 #define FAT_ATTR_LONG_NAME_MASK (FAT_ATTR_READ_ONLY | FAT_ATTR_HIDDEN | \
                                  FAT_ATTR_SYSTEM | FAT_ATTR_VOLUME_ID | \
                                  FAT_ATTR_DIRECTORY | FAT_ATTR_ARCHIVE )
+                                 
+/* NTRES flags */
+#define FAT_NTRES_LC_NAME    0x08
+#define FAT_NTRES_LC_EXT     0x10
 
 #define FATDIR_NAME          0
 #define FATDIR_ATTR          11
@@ -1235,14 +1239,11 @@ static int add_dir_entry(struct fat_dir* dir,
     struct bpb* fat_bpb = &fat_bpbs[0];
 #endif
     unsigned char buf[SECTOR_SIZE];
-    unsigned char shortname[16];
+    unsigned char shortname[12];
     int rc;
     unsigned int sector;
     bool done = false;
-    bool eof = false;
-    bool last = false;
     int entries_needed, entries_found = 0;
-    int namelen = strlen(name);
     int firstentry;
 
     LDEBUGF( "add_dir_entry(%s,%lx)\n",
@@ -1255,87 +1256,71 @@ static int add_dir_entry(struct fat_dir* dir,
     /* The "." and ".." directory entries must not be long names */
     if(dotdir) {
         int i;
-        strncpy(shortname, name, 16);
-        for(i = strlen(shortname);i < 12;i++)
+        strncpy(shortname, name, 12);
+        for(i = strlen(shortname); i < 12; i++)
             shortname[i] = ' ';
         
         entries_needed = 1;
     } else {
-        /* create dos name */
         rc = create_dos_name(name, shortname);
         if (rc < 0)
             return rc * 10 - 0;
 
         /* one dir entry needed for every 13 bytes of filename,
            plus one entry for the short name */
-        entries_needed = namelen / NAME_BYTES_PER_ENTRY + 1;
-        if (namelen % NAME_BYTES_PER_ENTRY)
-            entries_needed++;
+        entries_needed = (strlen(name) + (NAME_BYTES_PER_ENTRY-1))
+                         / NAME_BYTES_PER_ENTRY + 1;
     }
 
- restart:
-    firstentry = 0;
-
+  restart:
+    firstentry = -1;
+    
     rc = fat_seek(&dir->file, 0);
     if (rc < 0)
         return rc * 10 - 1;
 
-    for (sector=0; !done; sector++)
+    /* step 1: search for free entries and check for duplicate shortname */
+    for (sector = 0; !done; sector++)
     {
         unsigned int i;
 
-        rc = 0;
-        if (!eof) {
-            rc = fat_readwrite(&dir->file, 1, buf, false);
-        }
-        if (rc == 0) {
-            /* eof: add new sector */
-            eof = true;
-
-            memset(buf, 0, sizeof buf);
-            LDEBUGF("Adding new sector to dir\n");
-            rc = fat_seek(&dir->file, sector);
-            if (rc < 0)
-                return rc * 10 - 2;
-
-            /* add sectors (we must clear the whole cluster) */
-            do {
-                rc = fat_readwrite(&dir->file, 1, buf, true);
-                if (rc < 1)
-                    return rc * 10 - 3;
-            } while (dir->file.sectornum < (int)fat_bpb->bpb_secperclus);
-        }
+        rc = fat_readwrite(&dir->file, 1, buf, false);
         if (rc < 0) {
             DEBUGF( "add_dir_entry() - Couldn't read dir"
                     " (error code %d)\n", rc);
-            return rc * 10 - 4;
+            return rc * 10 - 2;
+        }
+
+        if (rc == 0) { /* current end of dir reached */
+            LDEBUGF("End of dir on cluster boundary\n");
+            break;
         }
 
         /* look for free slots */
-        for (i=0; i < DIR_ENTRIES_PER_SECTOR && !done; i++)
+        for (i = 0; i < DIR_ENTRIES_PER_SECTOR; i++)
         {
-            unsigned char firstbyte = buf[i * DIR_ENTRY_SIZE];
-            switch (firstbyte) {
-            case 0: /* end of dir */
-                entries_found = entries_needed;
-                LDEBUGF("Found last entry %d\n", 
+            switch (buf[i * DIR_ENTRY_SIZE]) {
+              case 0:
+                entries_found += DIR_ENTRIES_PER_SECTOR - i;
+                LDEBUGF("Found end of dir %d\n",
                         sector * DIR_ENTRIES_PER_SECTOR + i);
+                i = DIR_ENTRIES_PER_SECTOR - 1;
                 done = true;
                 break;
 
-            case 0xe5: /* free entry */
+              case 0xe5:
                 entries_found++;
                 LDEBUGF("Found free entry %d (%d/%d)\n",
                         sector * DIR_ENTRIES_PER_SECTOR + i,
                         entries_found, entries_needed);
                 break;
 
-            default:
+              default:
                 entries_found = 0;
 
                 /* check that our intended shortname doesn't already exist */
                 if (!strncmp(shortname, buf + i * DIR_ENTRY_SIZE, 12)) {
-                    /* filename exists already. make a new one */
+                    /* shortname exists already, make a new one */
                     randomize_dos_name(shortname);
                     LDEBUGF("Duplicate shortname, changing to %s\n",
                             shortname);
@@ -1345,28 +1330,53 @@ static int add_dir_entry(struct fat_dir* dir,
                 }
                 break;
             }
-
-            if (!firstentry && (entries_found == entries_needed)) {
-                firstentry = sector * DIR_ENTRIES_PER_SECTOR + i;
-
-                /* if we're not extending the dir,
-                   we must go back to first free entry */
-                if (done)
-                    last = true;
-                else
-                    firstentry -= (entries_needed - 1);
-            }
+            if (firstentry < 0 && (entries_found >= entries_needed))
+                firstentry = sector * DIR_ENTRIES_PER_SECTOR + i + 1
+                             - entries_found;
         }
     }
 
+    /* step 2: extend the dir if necessary */
+    if (firstentry < 0)
+    {
+#ifdef HAVE_FAT16SUPPORT
+        if (dir->file.firstcluster < 0) {
+            LDEBUGF("FAT16 root dir isn't extendable\n");
+            return -3;
+        }
+#endif
+        LDEBUGF("Adding new sector(s) to dir\n");
+        rc = fat_seek(&dir->file, sector);
+        if (rc < 0)
+            return rc * 10 - 4;
+        memset(buf, 0, sizeof buf);
+
+        /* we must clear whole clusters */
+        for (; (entries_found < entries_needed) ||
+               (dir->file.sectornum < (int)fat_bpb->bpb_secperclus); sector++)
+        {
+            if (sector >= (65536/DIR_ENTRIES_PER_SECTOR))
+                return -5; /* dir too large -- FAT specification */
+
+            rc = fat_readwrite(&dir->file, 1, buf, true);
+            if (rc < 1)  /* No more room or something went wrong */
+                return rc * 10 - 6;
+
+            entries_found += DIR_ENTRIES_PER_SECTOR;
+        }
+
+        firstentry = sector * DIR_ENTRIES_PER_SECTOR - entries_found;
+    }
+
+    /* step 3: add entry */
     sector = firstentry / DIR_ENTRIES_PER_SECTOR;
     LDEBUGF("Adding longname to entry %d in sector %d\n",
             firstentry, sector);
-
-    rc = write_long_name(&dir->file, firstentry, 
+            
+    rc = write_long_name(&dir->file, firstentry,
                          entries_needed, name, shortname, is_directory);
     if (rc < 0)
-        return rc * 10 - 5;
+        return rc * 10 - 7;
 
     /* remember where the shortname dir entry is located */
     file->direntry = firstentry + entries_needed - 1;
@@ -1375,53 +1385,6 @@ static int add_dir_entry(struct fat_dir* dir,
     LDEBUGF("Added new dir entry %d, using %d slots.\n",
             file->direntry, file->direntries);
 
-    /* advance the end-of-dir marker? */
-    if (last)
-    {
-        unsigned int lastentry = firstentry + entries_needed;
-
-        LDEBUGF("Updating end-of-dir entry %d\n",lastentry);
-
-        if (lastentry % DIR_ENTRIES_PER_SECTOR)
-        {
-            int idx = (lastentry % DIR_ENTRIES_PER_SECTOR) * DIR_ENTRY_SIZE;
-
-            rc = fat_seek(&dir->file, lastentry / DIR_ENTRIES_PER_SECTOR);
-            if (rc < 0)
-                return rc * 10 - 6;
-
-            rc = fat_readwrite(&dir->file, 1, buf, false);
-            if (rc < 1)
-                return rc * 10 - 7;
-
-            /* clear last entry */
-            buf[idx] = 0;
-
-            rc = fat_seek(&dir->file, lastentry / DIR_ENTRIES_PER_SECTOR);
-            if (rc < 0)
-                return rc * 10 - 8;
-            
-            /* we must clear entire last cluster */
-            do {
-                rc = fat_readwrite(&dir->file, 1, buf, true);
-                if (rc < 1)
-                    return rc * 10 - 9;
-                memset(buf, 0, sizeof buf);
-            } while (dir->file.sectornum < (int)fat_bpb->bpb_secperclus);
-        }
-        else
-        {
-            /* add a new sector/cluster for last entry */
-            memset(buf, 0, sizeof buf);
-            do {
-                rc = fat_readwrite(&dir->file, 1, buf, true);
-                if (rc < 1)
-                    return rc * 10 - 9; /* Same error code as above, can't be
-                                           more than -9 */
-            } while (dir->file.sectornum < (int)fat_bpb->bpb_secperclus);
-        }
-    }
-
     return 0;
 }
 
@@ -1429,10 +1392,6 @@ unsigned char char2dos(unsigned char c)
 {
     switch(c)
     {
-        case 0xe5: /* Special kanji character */
-            c = 0x05;
-            break;
-
         case 0x22:
         case 0x2a:
         case 0x2b:
@@ -1448,16 +1407,15 @@ unsigned char char2dos(unsigned char c)
         case 0x5c:
         case 0x5d:
         case 0x7c:
-            /* Illegal name, replace */
+            /* Illegal char, replace */
             c = '_';
             break;
                 
         default:
             if(c <= 0x20)
-            {
-                /* Illegal name, remove */
-                c = 0;
-            }
+                c = 0;   /* Illegal char, remove */
+            else
+                c = toupper(c);
             break;
     }
     return c;
@@ -1478,12 +1436,15 @@ static int create_dos_name(const unsigned char *name, unsigned char *newname)
     {
         unsigned char c = char2dos(*name);
         if (c)
-            newname[i++] = toupper(c);
+            newname[i++] = c;
     }
 
     /* Pad both name and extension */
     while (i < 11)
         newname[i++] = ' ';
+
+    if (newname[0] == 0xe5) /* Special kanji character */
+        newname[0] = 0x05;
 
     if (ext)
     {   /* Extension part */
@@ -1492,7 +1453,7 @@ static int create_dos_name(const unsigned char *name, unsigned char *newname)
         {
             unsigned char c = char2dos(*ext);
             if (c)
-                newname[i++] = toupper(c);
+                newname[i++] = c;
         }
     }
     return 0;
@@ -1580,6 +1541,9 @@ static int update_short_entry( struct fat_file* file, long size, int attr )
 static int parse_direntry(struct fat_direntry *de, const unsigned char *buf)
 {
     int i=0,j=0;
+    unsigned char c;
+    bool lowercase;
+
     memset(de, 0, sizeof(struct fat_direntry));
     de->attr = buf[FATDIR_ATTR];
     de->crttimetenth = buf[FATDIR_CRTTIMETENTH];
@@ -1592,14 +1556,24 @@ static int parse_direntry(struct fat_direntry *de, const unsigned char *buf)
         ((long)(unsigned)BYTES2INT16(buf,FATDIR_FSTCLUSHI) << 16);
     /* The double cast is to prevent a sign-extension to be done on CalmRISC16.
        (the result of the shift is always considered signed) */
-
+       
     /* fix the name */
-    for (i=0; (i<8) && (buf[FATDIR_NAME+i] != ' '); i++)
-        de->name[j++] = buf[FATDIR_NAME+i];
-    if ( buf[FATDIR_NAME+8] != ' ' ) {
+    lowercase = (buf[FATDIR_NTRES] & FAT_NTRES_LC_NAME);
+    c = buf[FATDIR_NAME];
+    if (c == 0x05)  /* special kanji char */
+        c = 0xe5;
+    i = 0;
+    while (c != ' ') {
+        de->name[j++] = lowercase ? tolower(c) : c;
+        if (++i >= 8)
+            break;
+        c = buf[FATDIR_NAME+i];
+    }
+    if (buf[FATDIR_NAME+8] != ' ') {
+        lowercase = (buf[FATDIR_NTRES] & FAT_NTRES_LC_EXT);
         de->name[j++] = '.';
-        for (i=8; (i<11) && (buf[FATDIR_NAME+i] != ' '); i++)
-            de->name[j++] = buf[FATDIR_NAME+i];
+        for (i = 8; (i < 11) && ((c = buf[FATDIR_NAME+i]) != ' '); i++)
+            de->name[j++] = lowercase ? tolower(c) : c;
     }
     return 1;
 }
