@@ -407,11 +407,12 @@ if ($db) {
         my $str =  $t."\x00" x ($maxalbumlen - length($t));
         print DB $str;
 
-        my $aoffset = $artistcount{$moo[0]} * $artistentrysize;
-        dumpint($aoffset + $artistindex); # pointer to artist of this album
-
         my @songlist = keys %{$album2songs{$albumid}};
         my $id3 = $album2songs{$albumid}{$songlist[0]};
+
+        my $aoffset = $artistcount{$id3->{'ARTIST'}} * $artistentrysize;
+        dumpint($aoffset + $artistindex); # pointer to artist of this album
+			
         if (defined $id3->{'TRACKNUM'}) {
             @songlist = sort {
                 $album2songs{$albumid}{$a}->{'TRACKNUM'} <=>
