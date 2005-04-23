@@ -185,7 +185,7 @@ sub dodir {
         $$id3{'DIR'} = $dir;
         my $albumid = $id3->{'ALBUM'}."___".$$id3{'DIR'};
         
-        if($id3->{'ALBUM'}."___".$id3->{'ARTIST'} ne "<no album tag>___<no artist tag>") {
+        if($id3->{'ALBUM'}."___".$id3->{'DIR'} ne "<no album tag>___<no artist tag>") {
             my $num = ++$albums{$albumid};
             if($num > $maxsongperalbum) {
                 $maxsongperalbum = $num;
@@ -385,7 +385,7 @@ if ($db) {
         my $a = $artistcount{$id3->{'ARTIST'}} * $artistentrysize;
         dumpint($a + $artistindex); # pointer to artist of this song
 
-        $a = $albumcount{"$$id3{ALBUM}___$$id3{ARTIST}"} * $albumentrysize;
+        $a = $albumcount{"$$id3{ALBUM}___$$id3{DIR}"} * $albumentrysize;
         dumpint($a + $albumindex); # pointer to album of this song
 
         # pointer to filename of this song
