@@ -237,7 +237,7 @@ static int update_fsinfo(IF_MV_NONVOID(struct bpb* fat_bpb));
 static int flush_fat(IF_MV_NONVOID(struct bpb* fat_bpb));
 static int bpb_is_sane(IF_MV_NONVOID(struct bpb* fat_bpb));
 static void *cache_fat_sector(IF_MV2(struct bpb* fat_bpb,) long secnum, bool dirty);
-static int create_dos_name(const unsigned char *name, unsigned char *newname);
+static void create_dos_name(const unsigned char *name, unsigned char *newname);
 static void randomize_dos_name(unsigned char *name);
 static unsigned long find_free_cluster(IF_MV2(struct bpb* fat_bpb,) unsigned long start);
 static int transfer(IF_MV2(struct bpb* fat_bpb,) unsigned long start, long count, char* buf, bool write );
@@ -1262,9 +1262,7 @@ static int add_dir_entry(struct fat_dir* dir,
         
         entries_needed = 1;
     } else {
-        rc = create_dos_name(name, shortname);
-        if (rc < 0)
-            return rc * 10 - 0;
+        create_dos_name(name, shortname);
 
         /* one dir entry needed for every 13 bytes of filename,
            plus one entry for the short name */
@@ -1421,7 +1419,7 @@ unsigned char char2dos(unsigned char c)
     return c;
 }
 
-static int create_dos_name(const unsigned char *name, unsigned char *newname)
+static void create_dos_name(const unsigned char *name, unsigned char *newname)
 {
     int i;
     unsigned char *ext;      
@@ -1456,7 +1454,6 @@ static int create_dos_name(const unsigned char *name, unsigned char *newname)
                 newname[i++] = c;
         }
     }
-    return 0;
 }
 
 static void randomize_dos_name(unsigned char *name)
