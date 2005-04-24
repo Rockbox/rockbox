@@ -178,8 +178,13 @@ sub dodir {
 
         # fallback names
         $$id3{'ARTIST'} = "<no artist tag>" if ($$id3{'ARTIST'} eq "");
-        $$id3{'ALBUM'} = "<no album tag>" if ($$id3{'ALBUM'} eq "");
-        $$id3{'TITLE'} = "<no title tag>" if ($$id3{'TITLE'} eq "");
+        # Fall back on the directory name (not full path dirname),
+        # if no album tag
+        $$id3{'ALBUM'} = (split m[/], $dir)[-1] if ($$id3{'ALBUM'} eq "");
+        # fall back on basename of the file if no title tag.
+        my $base;
+        ($base = $f) =~ s/\.\w+$//;
+        $$id3{'TITLE'} =  $base if ($$id3{'TITLE'} eq "");
 
         # Append dirname, to handle multi-artist albums
         $$id3{'DIR'} = $dir;
