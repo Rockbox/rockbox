@@ -181,6 +181,8 @@ sub dodir {
         # Fall back on the directory name (not full path dirname),
         # if no album tag
         $$id3{'ALBUM'} = (split m[/], $dir)[-1] if ($$id3{'ALBUM'} eq "");
+	#if that doesn't work, fall back.
+	$$id3{'ALBUM'} = "<no album tag>" if ($$id3{'ALBUM'} eq "");
         # fall back on basename of the file if no title tag.
         my $base;
         ($base = $f) =~ s/\.\w+$//;
