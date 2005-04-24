@@ -294,11 +294,7 @@ sub dumpint {
 
 #    print "int: $num\n";
 
-    printf DB ("%c%c%c%c",
-               $num>>24,
-               ($num&0xff0000)>>16,
-               ($num&0xff00)>>8,
-               ($num&0xff));
+    print DB pack "N", $num;
 }
 
 if (!scalar keys %entries) {
