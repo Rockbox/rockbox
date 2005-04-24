@@ -377,7 +377,7 @@ if ($db) {
     # pointer to filename of song1
 
     my $offset = $songindex;
-    for(sort {$entries{$a}->{'TITLE'} cmp $entries{$b}->{'TITLE'}} keys %entries) {
+    for(sort {uc($entries{$a}->{'TITLE'}) cmp uc($entries{$b}->{'TITLE'})} keys %entries) {
         my $f = $_;
         my $id3 = $entries{$f};
         my $t = $id3->{'TITLE'};
@@ -403,7 +403,7 @@ if ($db) {
     # pointers to artists of album1
     # pointers to songs on album1
 
-    for(sort keys %albums) {
+    for(sort {uc($a) cmp uc($b)} keys %albums) {
         my $albumid = $_;
         my @moo=split(/___/, $_);
         my $t = $moo[0];
@@ -440,7 +440,7 @@ if ($db) {
     # name of artist1
     # pointers to albums of artist1
 
-    for (sort keys %artists) {
+    for (sort {uc($a) cmp uc($b)} keys %artists) {
         my $artist = $_;
         my $str =  $_."\x00" x ($maxartistlen - length($_));
         print DB $str;
