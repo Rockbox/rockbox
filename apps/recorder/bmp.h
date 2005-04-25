@@ -26,4 +26,5 @@
 int read_bmp_file(char* filename,
                   int *get_width,  /* in pixels */
                   int *get_height, /* in pixels */
-                  char *bitmap);
+                  char *bitmap,
+                  int maxsize);/* Maximum amount of bytes to write to bitmap */
