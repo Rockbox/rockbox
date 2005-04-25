@@ -38,7 +38,6 @@ snake.c
 snake2.c
 sokoban.c
 solitaire.c
-splitedit.c
 star.c
 #if CONFIG_LCD == LCD_SSD1815
 video.c
@@ -76,6 +75,8 @@ wv2wav.c
 mpc2wav.c
 midi2wav.c
 iriverify.c
+#else
+splitedit.c
 #endif
 
 #ifdef HAVE_REMOTE_LCD
