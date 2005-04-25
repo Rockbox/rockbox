@@ -44,7 +44,9 @@
 #include "mpeg.h"
 #include "audio.h"
 #include "mp3_playback.h"
+#if (HWCODEC == MASNONE)
 #include "pcm_playback.h"
+#endif
 #include "settings.h"
 #include "thread.h"
 #include "playlist.h"
@@ -269,10 +271,8 @@ struct plugin_api {
     struct mp3entry* (*audio_current_track)(void);
     void (*audio_flush_and_reload_tracks)(void);
     int (*audio_get_file_pos)(void);
-#if (CONFIG_HWCODEC == MAS3587F)
-    unsigned long (*mpeg_get_last_header)(void);
-#endif
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+    unsigned long (*mpeg_get_last_header)(void);
     void (*sound_set_pitch)(int pitch);        
 #endif
 

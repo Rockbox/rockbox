@@ -226,8 +226,8 @@ static const struct plugin_api rockbox_api = {
     audio_current_track,
     audio_flush_and_reload_tracks,
     audio_get_file_pos,
-    mpeg_get_last_header,
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+    mpeg_get_last_header,
     sound_set_pitch,
 #endif
 
