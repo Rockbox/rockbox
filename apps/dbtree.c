@@ -57,16 +57,21 @@
 #define BE32(_x_) _x_
 #endif
 
-#define ID3DB_VERSION 1
+#define SONGENTRY_SIZE    (songlen+12+genrelen+4)
+#define FILEENTRY_SIZE    (filelen+12)
+#define ALBUMENTRY_SIZE   (albumlen+4+songarraylen*4)
+#define ARTISTENTRY_SIZE  (artistlen+albumarraylen*4)
+
+#define ID3DB_VERSION 2
 
 static int fd;
 
 static int
-    songstart, albumstart, artiststart,
-    songcount, albumcount, artistcount,
-    songlen, songarraylen,
+    songstart, albumstart, artiststart, filestart,
+    songcount, albumcount, artistcount, filecount,
+    songlen, songarraylen, genrelen, filelen,
     albumlen, albumarraylen,
-    artistlen, initialized = 0;
+    artistlen, rundbdirty,initialized = 0;
 
 static int db_play_folder(struct tree_context* c);
 static int db_search(struct tree_context* c, char* string);
@@ -76,7 +81,7 @@ static char searchstring[32];
 int db_init(void)
 {
     unsigned int version;
-    unsigned int buf[12];
+    unsigned int buf[17];
     unsigned char* ptr = (char*)buf;
     
     fd = open(ROCKBOX_DIR "/rockbox.id3db", O_RDONLY);
@@ -84,7 +89,7 @@ int db_init(void)
         DEBUGF("Failed opening database\n");
         return -1;
     }
-    read(fd, buf, 48);
+    read(fd, buf, 68);
 
     if (ptr[0] != 'R' ||
         ptr[1] != 'D' ||
@@ -94,29 +99,35 @@ int db_init(void)
         return -1;
     }
     
-    version = BE32(buf[0]) & 0xff;
+    version = BE32(buf[0])&0xFF;
     if (version != ID3DB_VERSION)
     {
         splash(HZ,true,"Unsupported database version %d!", version);
         return -1;
     }
 
-    songstart = BE32(buf[1]);
-    songcount = BE32(buf[2]);
-    songlen   = BE32(buf[3]);
+    artiststart = BE32(buf[1]);
+    albumstart = BE32(buf[2]);
+    songstart = BE32(buf[3]);
+    filestart = BE32(buf[4]);
+    
+    artistcount = BE32(buf[5]);
+    albumcount = BE32(buf[6]);
+    songcount = BE32(buf[7]);
+    filecount = BE32(buf[8]);
+    
+    artistlen = BE32(buf[9]);
+    albumlen   = BE32(buf[10]);
+    songlen = BE32(buf[11]);
+    genrelen = BE32(buf[12]);
+    filelen = BE32(buf[13]);
+    songarraylen = BE32(buf[14]);
+    albumarraylen = BE32(buf[15]);
+    rundbdirty = BE32(buf[16]);
 
-    albumstart = BE32(buf[4]);
-    albumcount = BE32(buf[5]);
-    albumlen   = BE32(buf[6]);
-    songarraylen = BE32(buf[7]);
-
-    artiststart = BE32(buf[8]);
-    artistcount = BE32(buf[9]);
-    artistlen   = BE32(buf[10]);
-    albumarraylen = BE32(buf[11]);
-
-    if (songstart > albumstart ||
-        albumstart > artiststart)
+    if (songstart > filestart ||
+        albumstart > songstart ||
+        artiststart > albumstart)
     {
         splash(HZ,true,"Corrupt ID3 database!");
         return -1;
@@ -150,7 +161,7 @@ int db_load(struct tree_context* c)
     c->dentry_size = 2;
     c->dirfull = false;
 
-    DEBUGF("db_load(%d, %x, %d)\n", table, extra, c->firstpos);
+    DEBUGF("db_load() table: %d extra: 0x%x  firstpos: %d\n", table, extra, c->firstpos);
 
     if (!table) {
         table = root;
@@ -166,7 +177,7 @@ int db_load(struct tree_context* c)
                                str(LANG_ID3DB_ALBUMS),
                                str(LANG_ID3DB_SONGS),
                                str(LANG_ID3DB_SEARCH)};
-
+            DEBUGF("dbload table root\n");
             for (i=0; i < 4; i++) {
                 strcpy(nbuf, labels[i]);
                 dptr[0] = (unsigned long)nbuf;
@@ -186,7 +197,7 @@ int db_load(struct tree_context* c)
             char* labels[] = { str(LANG_ID3DB_SEARCH_ARTISTS),
                                str(LANG_ID3DB_SEARCH_ALBUMS),
                                str(LANG_ID3DB_SEARCH_SONGS)};
-
+            DEBUGF("dbload table search\n");
             for (i=0; i < 3; i++) {
                 strcpy(nbuf, labels[i]);
                 dptr[0] = (unsigned long)nbuf;
@@ -201,6 +212,7 @@ int db_load(struct tree_context* c)
         case searchartists:
         case searchalbums:
         case searchsongs:
+            DEBUGF("dbload table searchsongs/searchartists/searchalbums\n");
             i = db_search(c, searchstring);
             c->dirlength = c->filesindir = i;
             if (c->dirfull) {
@@ -214,26 +226,28 @@ int db_load(struct tree_context* c)
             return i;
 
         case allsongs:
-            offset = songstart + c->firstpos * (songlen + 12);
+            DEBUGF("dbload table allsongs\n");		
+            offset = songstart + c->firstpos * SONGENTRY_SIZE;
             itemcount = songcount;
             stringlen = songlen;
             break;
 
         case allalbums:
-            offset = albumstart +
-                c->firstpos * (albumlen + 4 + songarraylen * 4);
+            DEBUGF("dbload table allalbums\n");		
+            offset = albumstart + c->firstpos * ALBUMENTRY_SIZE;
             itemcount = albumcount;
             stringlen = albumlen;
             break;
 
         case allartists:
-            offset = artiststart +
-                c->firstpos * (artistlen + albumarraylen * 4);
+            DEBUGF("dbload table allartists\n");		
+            offset = artiststart + c->firstpos * ARTISTENTRY_SIZE;
             itemcount = artistcount;
             stringlen = artistlen;
             break;
 
         case albums4artist:
+            DEBUGF("dbload table albums4artist\n");		
             /* 'extra' is offset to the artist */
             safeplacelen = albumarraylen * 4;
             safeplace = (void*)(end_of_nbuf - safeplacelen);
@@ -252,6 +266,7 @@ int db_load(struct tree_context* c)
             break;
 
         case songs4album:
+            DEBUGF("dbload table songs4album\n");
             /* 'extra' is offset to the album */
             safeplacelen = songarraylen * 4;
             safeplace = (void*)(end_of_nbuf - safeplacelen);
@@ -261,8 +276,10 @@ int db_load(struct tree_context* c)
                 return -1;
 
 #ifdef LITTLE_ENDIAN
-            for (i=0; i<songarraylen; i++)
+            for (i=0; i<songarraylen; i++) {
                 safeplace[i] = BE32(safeplace[i]);
+                DEBUGF("db_load songs4album song %d: 0x%x\n",i,safeplace[i]);
+            }
 #endif
             offset = safeplace[0];
             itemcount = songarraylen;
@@ -270,8 +287,9 @@ int db_load(struct tree_context* c)
             break;
 
         case songs4artist:
+            DEBUGF("dbload table songs4artist\n");		
             /* 'extra' is offset to the artist, used as filter */
-            offset = songstart + c->firstpos * (songlen + 12);
+            offset = songstart + c->firstpos * SONGENTRY_SIZE;
             itemcount = songcount;
             stringlen = songlen;
             break;
@@ -318,13 +336,16 @@ int db_load(struct tree_context* c)
             case songs4album:
             case songs4artist:
                 rc = read(fd, intbuf, 12);
+		skip = SONGENTRY_SIZE-stringlen-12; /* skip the rest of the song info */
                 if (rc < 12) {
                     DEBUGF("%d read(%d) returned %d\n", i, 12, rc);
                     return -1;
                 }
                 /* continue to next song if wrong artist */
-                if (table == songs4artist && (int)BE32(intbuf[0]) != extra)
+                if (table == songs4artist && (int)BE32(intbuf[0]) != extra) {
+ 		    lseek(fd, skip, SEEK_CUR);
                     continue;
+		}
 
                 /* save offset of filename */
                 dptr[1] = BE32(intbuf[2]);
@@ -400,19 +421,19 @@ static int db_search(struct tree_context* c, char* string)
         case searchartists:
             start = artiststart;
             count = artistcount;
-            size = artistlen + albumarraylen * 4;
+            size = ARTISTENTRY_SIZE;
             break;
 
         case searchalbums:
             start = albumstart;
             count = albumcount;
-            size = albumlen + 4 + songarraylen * 4;
+            size = ALBUMENTRY_SIZE;
             break;
 
         case searchsongs:
             start = songstart;
             count = songcount;
-            size = songlen + 12;
+            size = SONGENTRY_SIZE;
             break;
             
         default:
@@ -497,7 +518,7 @@ int db_enter(struct tree_context* c)
         case searchalbums:
             /* virtual <all albums> entry points to the artist,
                all normal entries point to the album */
-            if (newextra >= artiststart)
+            if (newextra < albumstart)
                 c->currtable = songs4artist;
             else
                 c->currtable = songs4album;

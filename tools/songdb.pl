@@ -12,6 +12,8 @@ my $dir;
 my $strip;
 my $verbose;
 my $help;
+my $dirisalbum;
+my $dirisalbumname;
 
 while($ARGV[0]) {
     if($ARGV[0] eq "--db") {
@@ -33,6 +35,14 @@ while($ARGV[0]) {
         $verbose = 1;
         shift @ARGV;
     }
+    elsif($ARGV[0] eq "--dirisalbum") {
+    	$dirisalbum = 1;
+	shift @ARGV;
+    }
+    elsif($ARGV[0] eq "--dirisalbumname") {
+    	$dirisalbumname = 1;
+	shift @ARGV;
+    }
     elsif($ARGV[0] eq "--help" or ($ARGV[0] eq "-h")) {
         $help = 1;
         shift @ARGV;
@@ -50,11 +60,13 @@ my %filename;
 my %lcartists;
 my %lcalbums;
 
-my $dbver = 1;
+my %dir2albumname;
+
+my $dbver = 2;
 
 if(! -d $dir or $help) {
     print "'$dir' is not a directory\n" if ($dir ne "" and ! -d $dir);
-    print "songdb --path <dir> [--db <file>] [--strip <path>] [--verbose] [--help]\n";
+    print "songdb --path <dir> [--dirisalbum] [--dirisalbumname] [--db <file>] [--strip <path>] [--verbose] [--help]\n";
     exit;
 }
 
@@ -140,6 +152,7 @@ sub dodir {
         # YEAR
 
         # don't index songs without tags
+	# um. yes we do.
         if (not defined $$id3{'ARTIST'} and
             not defined $$id3{'ALBUM'} and
             not defined $$id3{'TITLE'})
@@ -178,29 +191,56 @@ sub dodir {
 
         # fallback names
         $$id3{'ARTIST'} = "<no artist tag>" if ($$id3{'ARTIST'} eq "");
-        # Fall back on the directory name (not full path dirname),
-        # if no album tag
-        $$id3{'ALBUM'} = (split m[/], $dir)[-1] if ($$id3{'ALBUM'} eq "");
-	#if that doesn't work, fall back.
+	# Fall back on the directory name (not full path dirname),
+	# if no album tag
+	if ($dirisalbum) {
+	  if($dir2albumname{$dir} eq "") {
+	  	$dir2albumname{$dir} = $$id3{'ALBUM'};
+	  }
+	  elsif($dir2albumname{$dir} ne $$id3{'ALBUM'}) {
+	        $dir2albumname{$dir} = (split m[/], $dir)[-1];
+	  }
+	}
+	# if no directory
+	if ($dirisalbumname) {
+	  $$id3{'ALBUM'} = (split m[/], $dir)[-1] if ($$id3{'ALBUM'} eq "");
+	}
 	$$id3{'ALBUM'} = "<no album tag>" if ($$id3{'ALBUM'} eq "");
-        # fall back on basename of the file if no title tag.
-        my $base;
-        ($base = $f) =~ s/\.\w+$//;
+	# fall back on basename of the file if no title tag.
+	my $base;
+	($base = $f) =~ s/\.\w+$//;
         $$id3{'TITLE'} =  $base if ($$id3{'TITLE'} eq "");
 
         # Append dirname, to handle multi-artist albums
         $$id3{'DIR'} = $dir;
-        my $albumid = $id3->{'ALBUM'}."___".$$id3{'DIR'};
-        
-        if($id3->{'ALBUM'}."___".$id3->{'DIR'} ne "<no album tag>___<no artist tag>") {
+        my $albumid;
+	if ($dirisalbum) {
+	  $albumid=$$id3{'DIR'};
+	}
+	else {
+	  $albumid= $id3->{'ALBUM'}."___".$$id3{'DIR'};
+	}
+	#printf "album id: %s\n", $albumid;
+
+#        if($id3->{'ALBUM'}."___".$id3->{'DIR'} ne "<no album tag>___<no artist tag>") {
             my $num = ++$albums{$albumid};
             if($num > $maxsongperalbum) {
                 $maxsongperalbum = $num;
                 $longestalbum = $albumid;
             }
             $album2songs{$albumid}{$$id3{TITLE}} = $id3;
-            $artist2albums{$$id3{ARTIST}}{$$id3{ALBUM}} = $id3;
-        }
+	    if($dirisalbum) {
+              $artist2albums{$$id3{ARTIST}}{$$id3{DIR}} = $id3;
+	    }
+	    else {
+	      $artist2albums{$$id3{ARTIST}}{$$id3{ALBUM}} = $id3;
+	    }
+#        }
+    }
+
+    if($dirisalbum and $dir2albumname{$dir} eq "") {
+       $dir2albumname{$dir} = (split m[/], $dir)[-1];
+       printf "%s\n", $dir2albumname{$dir};
     }
 
     # extractdirs filters out only subdirectories from all given entries
@@ -217,17 +257,24 @@ dodir($dir);
 print "\n";
 
 print "File name table\n" if ($verbose);
-my $fc;
 for(sort keys %entries) {
     printf("  %s\n", $_) if ($verbose);
-    $fc += length($_)+1;
+    my $l = length($_);
+    if($l > $maxfilelen) {
+       $maxfilelen = $l;
+       $longestfilename = $_;
+    }		  
 }
+$maxfilelen++; # include zero termination byte
+while($maxfilelen&3) {
+    $maxfilelen++;
+}    
 
 my $maxsonglen = 0;
 my $sc;
 print "\nSong title table\n" if ($verbose);
 
-for(sort {$entries{$a}->{'TITLE'} cmp $entries{$b}->{'TITLE'}} keys %entries) {
+for(sort {uc($entries{$a}->{'TITLE'}) cmp uc($entries{$b}->{'TITLE'})} keys %entries) {
     printf("  %s\n", $entries{$_}->{'TITLE'} ) if ($verbose);
     my $l = length($entries{$_}->{'TITLE'});
     if($l > $maxsonglen) {
@@ -244,8 +291,8 @@ my $maxartistlen = 0;
 print "\nArtist table\n" if ($verbose);
 my $i=0;
 my %artistcount;
-for(sort keys %artists) {
-    printf("  %s\n", $_) if ($verbose);
+for(sort {uc($a) cmp uc($b)} keys %artists) {
+    printf("  %s: %d\n", $_, $i) if ($verbose);
     $artistcount{$_}=$i++;
     my $l = length($_);
     if($l > $maxartistlen) {
@@ -256,6 +303,7 @@ for(sort keys %artists) {
     $l = scalar keys %{$artist2albums{$_}};
     if ($l > $maxalbumsperartist) {
         $maxalbumsperartist = $l;
+	$longestartistalbum = $_;
     }
 }
 $maxartistlen++; # include zero termination byte
@@ -263,12 +311,22 @@ while($maxartistlen&3) {
     $maxartistlen++;
 }
 
-if ($verbose) {
-    print "\nGenre table\n";
-    for(sort keys %genres) {
-        printf("  %s\n", $_);
-    }
+print "\nGenre table\n" if ($verbose);
+for(sort keys %genres) {
+  my $l = length($_);
+  if($l > $maxgenrelen) {
+    $maxgenrelen = $l;
+    $longestgenrename = $_;
+  }
+}
 
+$maxgenrelen++; #include zero termination byte
+while($maxgenrelen&3) {
+    $maxgenrelen++;
+}
+    
+
+if ($verbose) {
     print "\nYear table\n";
     for(sort keys %years) {
         printf("  %s\n", $_);
@@ -279,14 +337,32 @@ print "\nAlbum table\n" if ($verbose);
 my $maxalbumlen = 0;
 my %albumcount;
 $i=0;
-for(sort keys %albums) {
+my @albumssort;
+if($dirisalbum) {
+ @albumssort = sort {uc($dir2albumname{$a}) cmp uc($dir2albumname{$b})} keys %albums;
+}
+else {
+ @albumssort = sort {uc($a) cmp uc($b)} keys %albums;
+}
+for(@albumssort) {
     my @moo=split(/___/, $_);
     printf("  %s\n", $moo[0]) if ($verbose);
     $albumcount{$_} = $i++;
-    my $l = length($moo[0]);
+    my $l;
+    if($dirisalbum) {
+     $l = length($dir2albumname{$_});
+    }
+    else {
+     $l = length($moo[0]);
+    }
     if($l > $maxalbumlen) {
         $maxalbumlen = $l;
-        $longestalbumname = $moo[0];
+	if($dirisalbum) {
+	  $longestalbumname = $dir2albumname{$_};
+	}
+	else {
+	  $longestalbumname = $moo[0];
+	}
     }
 }
 $maxalbumlen++; # include zero termination byte
@@ -295,6 +371,14 @@ while($maxalbumlen&3) {
 }
 
 
+
+sub dumpshort {
+    my ($num)=@_;
+
+    #    print "int: $num\n";
+    
+    print DB pack "n", $num;
+}
 
 sub dumpint {
     my ($num)=@_;
@@ -311,111 +395,124 @@ if (!scalar keys %entries) {
 }
 
 if ($db) {
-    my $songentrysize = $maxsonglen + 12;
+    my $songentrysize = $maxsonglen + 12 + $maxgenrelen+ 4;
     my $albumentrysize = $maxalbumlen + 4 + $maxsongperalbum*4;
     my $artistentrysize = $maxartistlen + $maxalbumsperartist*4;
+    my $fileentrysize = $maxfilelen + 12;
 
-    printf "Number of artists  : %d\n", scalar keys %artists;
-    printf "Number of albums   : %d\n", scalar keys %albums;
-    printf "Number of songs    : %d\n", scalar keys %entries;
-    print "Max artist length  : $maxartistlen ($longestartist)\n";
-    print "Max album length   : $maxalbumlen ($longestalbumname)\n";
-    print "Max song length    : $maxsonglen ($longestsong)\n";
-    print "Max songs per album: $maxsongperalbum ($longestalbum)\n";
+    printf "Number of artists        : %d\n", scalar keys %artists;
+    printf "Number of albums         : %d\n", scalar keys %albums;
+    printf "Number of songs / files  : %d\n", scalar keys %entries;
+    print "Max artist length    : $maxartistlen ($longestartist)\n";
+    print "Max album length     : $maxalbumlen ($longestalbumname)\n";
+    print "Max song length      : $maxsonglen ($longestsong)\n";
+    print "Max songs per album  : $maxsongperalbum ($longestalbum)\n";
+    print "Max albums per artist: $maxalbumsperartist ($longestartistalbum)\n";
+    print "Max genre length     : $maxgenrelen ($longestgenrename)\n";
+    print "Max file length      : $maxfilelen ($longestfilename)\n";
     print "Database version: $dbver\n" if ($verbose);
+    print "Song Entry Size : $songentrysize ($maxsonglen + 12 + $maxgenrelen + 4)\n" if ($verbose);
+    print "Album Entry Size: $albumentrysize ($maxalbumlen + 4 + $maxsongperalbum * 4)\n" if ($verbose);
+    print "Artist Entry Size: $artistentrysize ($maxartistlen + $maxalbumsperartist * 4)\n" if ($verbose);
+    print "File Entry Size: $fileentrysize ($maxfilelen + 12)\n" if ($verbose);
+    
 
     open(DB, ">$db") || die "couldn't make $db";
     binmode(DB);
     printf DB "RDB%c", $dbver;
     
-    $pathindex = 48; # paths always start at index 48
+    $pathindex = 68; # paths always start at index 68
 
-    $songindex = $pathindex + $fc; # fc is size of all paths
-    $songindex++ while ($songindex & 3); # align to 32 bits
-
-    dumpint($songindex); # file position index of song table
-    dumpint(scalar(keys %entries)); # number of songs
-    dumpint($maxsonglen); # length of song name field
+    $artistindex = $pathindex;
 
     # set total size of song title table
     $sc = scalar(keys %entries) * $songentrysize;
-    
-    $albumindex = $songindex + $sc; # sc is size of all songs
-    dumpint($albumindex); # file position index of album table
-    dumpint(scalar(keys %albums)); # number of albums
-    dumpint($maxalbumlen); # length of album name field
-    dumpint($maxsongperalbum); # number of entries in songs-per-album array
-
     my $ac = scalar(keys %albums) * $albumentrysize;
-
-    $artistindex = $albumindex + $ac; # ac is size of all albums
+    my $arc = scalar(keys %artists) * $artistentrysize;
+    $albumindex = $artistindex + $arc; # arc is size of all artists
+    $songindex = $albumindex + $ac; # ac is size of all albums
+    my $fileindex = $songindex + $sc; # sc is size of all songs
+    
     dumpint($artistindex); # file position index of artist table
+    dumpint($albumindex); # file position index of album table
+    dumpint($songindex); # file position index of song table
+    dumpint($fileindex); # file position index of file table
     dumpint(scalar(keys %artists)); # number of artists
+    dumpint(scalar(keys %albums)); # number of albums
+    dumpint(scalar(keys %entries)); # number of songs
+    dumpint(scalar(keys %entries)); # number of files
     dumpint($maxartistlen); # length of artist name field
+    dumpint($maxalbumlen); # length of album name field
+    dumpint($maxsonglen); # length of song name field		
+    dumpint($maxgenrelen); #length of genre field
+    dumpint($maxfilelen); # length of file field
+    dumpint($maxsongperalbum); # number of entries in songs-per-album array
     dumpint($maxalbumsperartist); # number of entries in albums-per-artist array
+    dumpint(-1); # rundb dirty
 
-    my $l=0;
+    #### TABLE of artists ###
+    # name of artist1
+    # pointers to albums of artist1
 
-    #### TABLE of file names ###
-    # path1
+    for (sort {uc($a) cmp uc($b)} keys %artists) {
+        my $artist = $_;
+        my $str =  $_."\x00" x ($maxartistlen - length($_));
+        print DB $str;
 
-    my %filenamepos;
-    for $f (sort keys %entries) {
-        printf DB ("%s\x00", $f);
-        $filenamepos{$f}= $l;
-        $l += length($f)+1;
+        for (sort keys %{$artist2albums{$artist}}) {
+            my $id3 = $artist2albums{$artist}{$_};
+            my $a;
+	    if($dirisalbum) {
+	      $a = $albumcount{"$$id3{'DIR'}"} * $albumentrysize;
+	    }
+	    else {
+	      $a = $albumcount{"$$id3{'ALBUM'}___$$id3{'DIR'}"} * $albumentrysize;
+	    }
+            dumpint($a + $albumindex);
+        }
+
+        for (scalar keys %{$artist2albums{$artist}} .. $maxalbumsperartist-1) {
+            print DB "\x00\x00\x00\x00";
+        }
+
     }
-    while ($l & 3) {
-        print DB "\x00";
-        $l++;
-    }
 
-    #### TABLE of songs ###
-    # title of song1
-    # pointer to artist of song1
-    # pointer to album of song1
-    # pointer to filename of song1
-
-    my $offset = $songindex;
-    for(sort {uc($entries{$a}->{'TITLE'}) cmp uc($entries{$b}->{'TITLE'})} keys %entries) {
-        my $f = $_;
-        my $id3 = $entries{$f};
-        my $t = $id3->{'TITLE'};
-        my $str = $t."\x00" x ($maxsonglen- length($t));
-
-        print DB $str; # title
-
-        my $a = $artistcount{$id3->{'ARTIST'}} * $artistentrysize;
-        dumpint($a + $artistindex); # pointer to artist of this song
-
-        $a = $albumcount{"$$id3{ALBUM}___$$id3{DIR}"} * $albumentrysize;
-        dumpint($a + $albumindex); # pointer to album of this song
-
-        # pointer to filename of this song
-        dumpint($filenamepos{$f} + $pathindex);
-
-        $$id3{'songoffset'} = $offset;
-        $offset += $songentrysize;
-    }
+   ### Build song offset info.
+   my $offset = $songindex;
+   for(sort {uc($entries{$a}->{'TITLE'}) cmp uc($entries{$b}->{'TITLE'})} keys %entries) {
+     my $id3 = $entries{$_};
+     $$id3{'songoffset'} = $offset;
+     $offset += $songentrysize;
+   }
+		    
 
     #### TABLE of albums ###
     # name of album1
     # pointers to artists of album1
     # pointers to songs on album1
 
-    for(sort {uc($a) cmp uc($b)} keys %albums) {
+    for(@albumssort) {
         my $albumid = $_;
-        my @moo=split(/___/, $_);
-        my $t = $moo[0];
-        my $str =  $t."\x00" x ($maxalbumlen - length($t));
-        print DB $str;
+	my @moo=split(/___/, $_);
+        my $t;
+        my $str;
+	if($dirisalbum) {
+  	  $t = $dir2albumname{$albumid};
+	}
+	else {
+	  $t = $moo[0];
+	}
+	$str =  $t."\x00" x ($maxalbumlen - length($t));
+	print DB $str;
 
         my @songlist = keys %{$album2songs{$albumid}};
         my $id3 = $album2songs{$albumid}{$songlist[0]};
 
+	#printf "(d) albumid: %s artist: %s\n",$albumid, $id3->{'ARTIST'};
+
         my $aoffset = $artistcount{$id3->{'ARTIST'}} * $artistentrysize;
-        dumpint($aoffset + $artistindex); # pointer to artist of this album
-			
+	dumpint($aoffset + $artistindex); # pointer to artist of this album
+		
         if (defined $id3->{'TRACKNUM'}) {
             @songlist = sort {
                 $album2songs{$albumid}{$a}->{'TRACKNUM'} <=>
@@ -435,26 +532,59 @@ if ($db) {
             print DB "\x00\x00\x00\x00";
         }
     }
-    
-    #### TABLE of artists ###
-    # name of artist1
-    # pointers to albums of artist1
 
-    for (sort {uc($a) cmp uc($b)} keys %artists) {
-        my $artist = $_;
-        my $str =  $_."\x00" x ($maxartistlen - length($_));
+    #### Build filename offset info
+    my $l=$fileindex;
+    my %filenamepos;
+    for $f (sort keys %entries) {
+        $filenamepos{$f}= $l;
+	$l += $fileentrysize;
+    }
+		
+    #### TABLE of songs ###
+    # title of song1
+    # pointer to artist of song1
+    # pointer to album of song1
+    # pointer to filename of song1
+
+    for(sort {uc($entries{$a}->{'TITLE'}) cmp uc($entries{$b}->{'TITLE'})} keys %entries) {
+        my $f = $_;
+        my $id3 = $entries{$f};
+        my $t = $id3->{'TITLE'};
+	my $g = $id3->{'GENRE'};
+        my $str = $t."\x00" x ($maxsonglen- length($t));
+
+        print DB $str; # title
+	$str = $g."\x00" x ($maxgenrelen - length($g));
+
+        my $a = $artistcount{$id3->{'ARTIST'}} * $artistentrysize;
+        dumpint($a + $artistindex); # pointer to artist of this song
+
+	if($dirisalbum) {
+	  $a = $albumcount{"$$id3{DIR}"} * $albumentrysize;
+	}
+	else {
+          $a = $albumcount{"$$id3{ALBUM}___$$id3{DIR}"} * $albumentrysize;
+	}
+        dumpint($a + $albumindex); # pointer to album of this song
+
+        # pointer to filename of this song
+        dumpint($filenamepos{$f});
+	print DB $str; #genre
+	dumpshort(-1);
+	dumpshort($id3->{'YEAR'});
+    }
+
+    #### TABLE of file names ###
+    # path1
+
+    for $f (sort keys %entries) {
+        my $str = $f."\x00" x ($maxfilelen- length($f));
+	my $id3 = $entries{$f}; 
         print DB $str;
-
-        for (sort keys %{$artist2albums{$artist}}) {
-            my $id3 = $artist2albums{$artist}{$_};
-            my $a = $albumcount{"$$id3{'ALBUM'}___$$id3{'DIR'}"} * $albumentrysize;
-            dumpint($a + $albumindex);
-        }
-
-        for (scalar keys %{$artist2albums{$artist}} .. $maxalbumsperartist-1) {
-            print DB "\x00\x00\x00\x00";
-        }
-
+	dumpint(0);
+        dumpint($id3->{'songoffset'});
+        dumpint(-1);
     }
 
     close(DB);
