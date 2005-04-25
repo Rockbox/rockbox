@@ -76,7 +76,7 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 37
+#define PLUGIN_API_VERSION 38
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -269,7 +269,9 @@ struct plugin_api {
     struct mp3entry* (*audio_current_track)(void);
     void (*audio_flush_and_reload_tracks)(void);
     int (*audio_get_file_pos)(void);
+#if (CONFIG_HWCODEC == MAS3587F)
     unsigned long (*mpeg_get_last_header)(void);
+#endif
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     void (*sound_set_pitch)(int pitch);        
 #endif
@@ -343,6 +345,10 @@ struct plugin_api {
     bool (*pcm_is_playing)(void);
     void (*pcm_set_volume)(int volume);
     void (*pcm_play_pause)(bool play);
+#endif
+#ifdef HAVE_LCD_BITMAP
+    int (*read_bmp_file)(char* filename, int *get_width, int *get_height,
+                         char *bitmap, int maxsize);
 #endif
 };
 

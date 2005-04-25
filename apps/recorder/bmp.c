@@ -16,23 +16,20 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-/*********************************************************************
- *
- * Converts BMP files to Rockbox bitmap format
- *
- * 1999-05-03 Linus Nielsen Feltzing
- *
- **********************************************/
+
+/*
+2005-04-16 Tomas Salfischberger:
+ - New BMP loader function, based on the old one (borrowed a lot of
+   calculations and checks there.)
+ - Conversion part needs some optimization, doing unneeded calulations now.
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
+
 #include "debug.h"
-
+#include "lcd.h"
 #include "file.h"
-
-#if 0
 
 #ifdef __GNUC__
 #define STRUCT_PACKED __attribute__((packed))
@@ -41,195 +38,167 @@
 #pragma pack (push, 2)
 #endif
 
-struct Fileheader
-{
-  unsigned short Type;          /* signature - 'BM' */
-  unsigned  long Size;          /* file size in bytes */
-  unsigned short Reserved1;     /* 0 */
-  unsigned short Reserved2;     /* 0 */
-  unsigned long  OffBits;       /* offset to bitmap */
-  unsigned long  StructSize;    /* size of this struct (40) */
-  unsigned long  Width;         /* bmap width in pixels */
-  unsigned long  Height;        /* bmap height in pixels */
-  unsigned short Planes;        /* num planes - always 1 */
-  unsigned short BitCount;      /* bits per pixel */
-  unsigned long  Compression;   /* compression flag */
-  unsigned long  SizeImage;     /* image size in bytes */
-  long           XPelsPerMeter; /* horz resolution */
-  long           YPelsPerMeter; /* vert resolution */
-  unsigned long  ClrUsed;       /* 0 -> color table size */
-  unsigned long  ClrImportant;  /* important color count */
+/* Struct from original code. */
+struct Fileheader {
+    unsigned short Type;        /* signature - 'BM' */
+    unsigned long Size;         /* file size in bytes */
+    unsigned short Reserved1;   /* 0 */
+    unsigned short Reserved2;   /* 0 */
+    unsigned long OffBits;      /* offset to bitmap */
+    unsigned long StructSize;   /* size of this struct (40) */
+    unsigned long Width;        /* bmap width in pixels */
+    unsigned long Height;       /* bmap height in pixels */
+    unsigned short Planes;      /* num planes - always 1 */
+    unsigned short BitCount;    /* bits per pixel */
+    unsigned long Compression;  /* compression flag */
+    unsigned long SizeImage;    /* image size in bytes */
+    long XPelsPerMeter;         /* horz resolution */
+    long YPelsPerMeter;         /* vert resolution */
+    unsigned long ClrUsed;      /* 0 -> color table size */
+    unsigned long ClrImportant; /* important color count */
 } STRUCT_PACKED;
 
-struct RGBQUAD
-{
-  unsigned char rgbBlue;
-  unsigned char rgbGreen;
-  unsigned char rgbRed;
-  unsigned char rgbReserved;
-} STRUCT_PACKED;
 
 #ifdef LITTLE_ENDIAN
 #define readshort(x) x
 #define readlong(x) x
+
 #else
 
-#define readshort(x) (((x&0xff00)>>8)|((x&0x00ff)<<8))
-#define readlong(x) (((x&0xff000000)>>24)| \
-                     ((x&0x00ff0000)>>8) | \
-                     ((x&0x0000ff00)<<8) | \
-                     ((x&0x000000ff)<<24))
-#endif
-
-/*********************************************************************
- * read_bmp_file()
- *
- * Reads a 8bit BMP file and puts the data in a 1-pixel-per-byte
- * array. Returns 0 on success.
- *
- **********************************************/
-int read_bmp_file(char* filename,
-                  int *get_width,  /* in pixels */
-                  int *get_height, /* in pixels */
-                  char *bitmap)
-{
-   struct Fileheader fh;
-   struct RGBQUAD palette[2]; /* two colors only */
-
-   unsigned int bitmap_width, bitmap_height;
-
-   long PaddedWidth;
-   int background;
-   int fd = open(filename, O_RDONLY);
-   long size;
-   unsigned int row, col;
-   int l;
-   unsigned char *bmp;
-   int width;
-
-   if(fd == -1)
-   {
-      debugf("error - can't open '%s'\n", filename);
-      return 1;
-   }
-   else
-   {
-     if(read(fd, &fh, sizeof(struct Fileheader)) !=
-        sizeof(struct Fileheader))
-      {
-	debugf("error - can't Read Fileheader Stucture\n");
-        close(fd);
-        return 2;
-      }
-
-      /* Exit if not monochrome */
-      if(readshort(fh.BitCount) > 8)
-      {
-	debugf("error - Bitmap must be less than 8, got %d\n",
-               readshort(fh.BitCount));
-        close(fd);
-        return 2;
-      }
-
-      /* Exit if too wide */
-      if(readlong(fh.Width) > 112)
-      {
-	debugf("error - Bitmap is too wide (%d pixels, max is 112)\n",
-               readlong(fh.Width));
-        close(fd);
-        return 3;
-      }
-      debugf("Bitmap is %d pixels wide\n", readlong(fh.Width));
-
-      /* Exit if too high */
-      if(readlong(fh.Height) > 64)
-      {
-	debugf("error - Bitmap is too high (%d pixels, max is 64)\n",
-               readlong(fh.Height));
-        close(fd);
-	return 4;
-      }
-      debugf("Bitmap is %d pixels heigh\n", readlong(fh.Height));
-
-      for(l=0;l < 2;l++)
-      {
-	if(read(fd, &palette[l],sizeof(struct RGBQUAD)) !=
-           sizeof(struct RGBQUAD))
-	{
-          debugf("error - Can't read bitmap's color palette\n");
-          close(fd);
-          return 5;
-	}
-      }
-      /* pass the other palettes */
-      lseek(fd, 254*sizeof(struct RGBQUAD), SEEK_CUR);
-
-      /* Try to guess the foreground and background colors.
-         We assume that the foreground color is the darkest. */
-      if(((int)palette[0].rgbRed +
-          (int)palette[0].rgbGreen +
-          (int)palette[0].rgbBlue) >
-          ((int)palette[1].rgbRed +
-          (int)palette[1].rgbGreen +
-          (int)palette[1].rgbBlue))
-      {
-         background = 0;
-      }
-      else
-      {
-         background = 1;
-      }
-
-      /*  width = readlong(fh.Width)*readshort(fh.BitCount); */
-
-      width = readlong(fh.Width);
-
-      /* PaddedWidth = ((width+31)&(~0x1f))/8; */
-      PaddedWidth = ((width+3)&(~0x3));
-      size = PaddedWidth*readlong(fh.Height);
-
-      bmp = (unsigned char *)malloc(size);
-
-      if(bmp == NULL)
-      {
-          debugf("error - Out of memory\n");
-          close(fd);
-          return 6;
-      }
-      else
-      {
-          if(read(fd, (unsigned char*)bmp,(long)size) != size) {
-              debugf("error - Can't read image\n");
-              close(fd);
-              return 7;
-          }
-      }
-
-      bitmap_height = readlong(fh.Height);
-      bitmap_width = readlong(fh.Width);
-
-      *get_width = bitmap_width;
-      *get_height = bitmap_height;
-
-      /* Now convert the bitmap into an array with 1 byte per pixel,
-         exactly the size of the image */
-
-      for(row = 0;row < bitmap_height;row++) {
-	for(col = 0;col < bitmap_width;col++) {
-          if(bmp[(bitmap_height-1 -row) * PaddedWidth + col]) {
-            bitmap[ (row/8) * bitmap_width + col ] &= ~ (1<<(row&7));
-          }
-          else {
-            bitmap[ (row/8) * bitmap_width + col ] |= 1<<(row&7);
-          }
-	}
-      }
-
-      free(bmp);
-
-   }
-   close(fd);
-   return 0; /* success */
+/* Endian functions */
+short readshort(void* value) {
+    unsigned char* bytes = (unsigned char*) value;
+    return bytes[0] | (bytes[1] << 8);
 }
 
-#endif /* 0 */
+int readlong(void* value) {
+    unsigned char* bytes = (unsigned char*) value;
+    return bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24);
+}
+
+#endif
+
+
+/* Function to get a pixel from a line. (Tomas: maybe a better way?) */
+int getpix(int px, unsigned char *bmpbuf) {
+    int a = (px / 8);
+    int b = (7 - (px % 8));
+
+    return (bmpbuf[a] & (1 << b)) != 0;
+}
+
+
+/******************************************************************************
+ * read_bmp_file()
+ *
+ * Reads a monochrome BMP file and puts the data in rockbox format in *bitmap.
+ *
+ *****************************************************************************/
+int read_bmp_file(char* filename,
+                  int *get_width,      /* in pixels */
+                  int *get_height,     /* in pixels */
+                  char *bitmap,
+                  int maxsize) /* Maximum amount of bytes to write to bitmap */
+{
+    struct Fileheader fh;
+    int bitmap_width, bitmap_height, PaddedWidth, PaddedHeight;
+    int fd, row, col, ret;
+    char bmpbuf[(LCD_WIDTH / 8 + 3) & ~3]; /* Buffer for one line */
+
+    fd = open(filename, O_RDONLY);
+
+    /* Exit if file opening failed */
+    if (fd < 0) {
+        DEBUGF("error - can't open '%s' open returned: %d\n", filename, fd);
+        return (fd * 10) - 1; 
+    }
+
+    /* read fileheader */
+    ret = read(fd, &fh, sizeof(struct Fileheader));
+    if(ret < 0) {
+        close(fd);
+        return (ret * 10 - 2);
+    }
+    
+    if(ret != sizeof(struct Fileheader)) {
+        DEBUGF("error - can't read Fileheader structure.");
+        close(fd);
+        return -3;
+    }
+
+    /* Exit if not monochrome */
+    if (readshort(&fh.BitCount) != 1) {
+        DEBUGF("error - Bitmap must be in 1 bit per pixel format. "
+               "This one is: %d\n", readshort(&fh.BitCount));
+        close(fd);
+        return -4;
+    }
+
+    /* Exit if too wide */
+    if (readlong(&fh.Width) > LCD_WIDTH) {
+        DEBUGF("error - Bitmap is too wide (%d pixels, max is %d)\n",
+                        readlong(&fh.Width), LCD_WIDTH);
+        close(fd);
+        return -5;
+    }
+
+    /* Exit if too high */
+    if (readlong(&fh.Height) > LCD_HEIGHT) {
+        DEBUGF("error - Bitmap is too high (%d pixels, max is %d)\n",
+                        readlong(&fh.Height), LCD_HEIGHT);
+        close(fd);
+        return -6;
+    }
+
+    /* Calculate image size */
+    bitmap_height = readlong(&fh.Height);
+    bitmap_width = readlong(&fh.Width);
+    /* Paddedwidth is for BMP files. */
+    PaddedWidth = ((bitmap_width + 31) & (~0x1f)) / 8;
+    /* PaddedHeight is for rockbox format. */
+    PaddedHeight = (bitmap_height + 7) / 8;
+
+    /* Check if this fits the buffer */
+    if ((PaddedHeight * bitmap_width) > maxsize) {
+        DEBUGF("error - Bitmap is too large to fit the supplied buffer: "
+               "%d bytes.\n", (PaddedHeight * bitmap_width));
+        close(fd);
+        return -7;
+    }
+
+    /* Search to the beginning of the image data */
+    lseek(fd, (off_t)readlong(&fh.OffBits), SEEK_SET);
+
+    /* loop to read rows and put them to buffer */
+    for (row = 0; row < bitmap_height; row++) {
+        /* read one row */
+        ret = read(fd, bmpbuf, PaddedWidth);
+        if (ret != PaddedWidth) {
+            DEBUGF("error reading image, read returned: %d expected was: "
+                   "%d\n", ret, PaddedWidth);
+            close(fd);
+            return -8;
+        }
+
+        /* loop though the pixels in this line. */
+        for (col = 0; col < bitmap_width; col++) {
+            ret = getpix(col, bmpbuf);
+            if (ret == 1) {
+                bitmap[bitmap_width * ((bitmap_height - row - 1) / 8) + col]
+                    &= ~ 1 << ((bitmap_height - row - 1) % 8);
+            } else {
+                bitmap[bitmap_width * ((bitmap_height - row - 1) / 8) + col]
+                    |= 1 << ((bitmap_height - row - 1) % 8);
+            }
+        }
+    }
+
+    close(fd);
+
+    /* returning image size: */
+    *get_width = bitmap_width;
+    *get_height = bitmap_height;
+
+    return (PaddedHeight * bitmap_width); /* return the used buffer size. */
+
+}

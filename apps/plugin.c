@@ -52,6 +52,7 @@
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
 #include "widgets.h"
+#include "bmp.h"
 #endif
 
 #ifdef HAVE_REMOTE_LCD
@@ -133,13 +134,13 @@ static const struct plugin_api rockbox_api = {
     backlight_set_timeout,
     splash,
 #ifdef HAVE_REMOTE_LCD
-	 lcd_remote_clear_display,
+    lcd_remote_clear_display,
     lcd_remote_backlight_on,
     lcd_remote_backlight_off,
-	 lcd_remote_set_contrast,
-	 lcd_remote_update,
-	 lcd_remote_bitmap,
-	 &lcd_remote_framebuffer[0][0],
+    lcd_remote_set_contrast,
+    lcd_remote_update,
+    lcd_remote_bitmap,
+    &lcd_remote_framebuffer[0][0],
 #endif
     /* button */
     button_get,
@@ -291,6 +292,9 @@ static const struct plugin_api rockbox_api = {
     pcm_is_playing,
     pcm_set_volume,
     pcm_play_pause,
+#endif
+#ifdef HAVE_LCD_BITMAP
+    read_bmp_file,
 #endif
 };
 
