@@ -1,0 +1,4 @@
+#include "resource.h"
+
+IDI_RBICON ICON "favicon.ico"
+IDI_BOOTLOADER BIN "bootloader.bin"

@@ -1,0 +1,3 @@
+#define IDI_RBICON  101
+#define IDI_BOOTLOADER 102
+
