@@ -73,7 +73,8 @@ short readshort(void* value) {
 
 long readlong(void* value) {
     unsigned char* bytes = (unsigned char*) value;
-    return bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24);
+    return (long)bytes[0] | ((long)bytes[1] << 8) |
+        ((long)bytes[2] << 16) | ((long)bytes[3] << 24);
 }
 
 #endif
