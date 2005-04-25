@@ -372,6 +372,9 @@ int db_load(struct tree_context* c)
             lseek(fd, skip, SEEK_CUR);
 
         hits++;
+
+	if(table==songs4artist)
+		c->dirlength=hits;
         
         /* next name is stored immediately after this */
         nptr = (void*)nptr + strlen((char*)nptr) + 1;
