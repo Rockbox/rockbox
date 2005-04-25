@@ -271,8 +271,10 @@ struct plugin_api {
     struct mp3entry* (*audio_current_track)(void);
     void (*audio_flush_and_reload_tracks)(void);
     int (*audio_get_file_pos)(void);
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if !defined(SIMULATOR) && (CONFIG_HWCODEC != MASNONE)
     unsigned long (*mpeg_get_last_header)(void);
+#endif
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     void (*sound_set_pitch)(int pitch);        
 #endif
 

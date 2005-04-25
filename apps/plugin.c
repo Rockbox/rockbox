@@ -226,8 +226,10 @@ static const struct plugin_api rockbox_api = {
     audio_current_track,
     audio_flush_and_reload_tracks,
     audio_get_file_pos,
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if !defined(SIMULATOR) && (CONFIG_HWCODEC != MASNONE)
     mpeg_get_last_header,
+#endif
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     sound_set_pitch,
 #endif
 
