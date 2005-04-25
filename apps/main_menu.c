@@ -81,7 +81,6 @@ int show_logo( void )
 
 #ifdef HAVE_REMOTE_LCD
 	 lcd_remote_bitmap(rockbox112x37,10,14,112,37, false);
-	 lcd_remote_update();
 #endif
 
 #if 0
@@ -108,6 +107,14 @@ int show_logo( void )
     lcd_putsxy((LCD_WIDTH/2) - ((strlen(version)*font_w)/2),
                LCD_HEIGHT-font_h, version);
     lcd_update();
+
+#ifdef HAVE_REMOTE_LCD
+    lcd_remote_setfont(FONT_SYSFIXED);
+    lcd_remote_getstringsize("A", &font_w, &font_h);
+    lcd_remote_putsxy((LCD_REMOTE_WIDTH/2) - ((strlen(version)*font_w)/2),
+               LCD_REMOTE_HEIGHT-font_h, version);
+    lcd_remote_update();
+#endif
 
 #else
     char *rockbox = "  ROCKbox!";

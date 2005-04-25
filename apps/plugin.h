@@ -177,13 +177,36 @@ struct plugin_api {
     void (*splash)(int ticks, bool center, const char *fmt, ...);
 
 #ifdef HAVE_REMOTE_LCD
-	 void (*remote_clear_display)(void);
+    void (*remote_clear_display)(void);
+    void (*remote_puts)(int x, int y, const unsigned char *string);
+    void (*remote_lcd_puts_scroll)(int x, int y, const unsigned char* string);
+    void (*remote_lcd_stop_scroll)(void);
+    void (*remote_set_contrast)(int x);
+
+    void (*remote_putsxy)(int x, int y, const unsigned char *string);
+    void (*remote_puts_style)(int x, int y, const unsigned char *str, int style);
+    void (*remote_puts_scroll_style)(int x, int y, const unsigned char* string,
+                                  int style);
+    void (*remote_bitmap)(const unsigned char *src, int x, int y,
+                       int nx, int ny, bool clear);
+    void (*remote_drawline)(int x1, int y1, int x2, int y2);
+    void (*remote_clearline)(int x1, int y1, int x2, int y2);
+    void (*remote_drawpixel)(int x, int y);
+    void (*remote_clearpixel)(int x, int y);
+    void (*remote_setfont)(int font);
+    struct font* (*remote_font_get)(int font);
+    void (*remote_clearrect)(int x, int y, int nx, int ny);
+    void (*remote_fillrect)(int x, int y, int nx, int ny);
+    void (*remote_drawrect)(int x, int y, int nx, int ny);
+    void (*remote_invertrect)(int x, int y, int nx, int ny);
+    int  (*remote_getstringsize)(const unsigned char *str, int *w, int *h);
+    void (*remote_update)(void);
+    void (*remote_update_rect)(int x, int y, int width, int height);
+//    void (*remote_scrollbar)(int x, int y, int width, int height, int items,
+//                      int min_shown, int max_shown, int orientation);
+    //void (*remote_checkbox)(int x, int y, int width, int height, bool checked);
     void (*remote_backlight_on)(void);
-    void (*remote_backlight_off)(void);
-	 void (*remote_set_contrast)(int val);
-	 void (*remote_update)(void);
-	 void (*remote_bitmap) (const unsigned char *src, int x, int y,
-                               int nx, int ny, bool clear);
+    void (*remote_backlight_off)(void);    
 	 unsigned char* lcd_remote_framebuffer;
 #endif
 
