@@ -10,6 +10,7 @@
 my $db = "rockbox.id3db";
 my $dir;
 my $strip;
+my $add;
 my $verbose;
 my $help;
 my $dirisalbum;
@@ -31,6 +32,11 @@ while($ARGV[0]) {
         shift @ARGV;
         shift @ARGV;
     }
+    elsif($ARGV[0] eq "--add") {
+        $add = $ARGV[1];
+        shift @ARGV;
+        shift @ARGV;
+    }				
     elsif($ARGV[0] eq "--verbose") {
         $verbose = 1;
         shift @ARGV;
@@ -66,7 +72,7 @@ my $dbver = 2;
 
 if(! -d $dir or $help) {
     print "'$dir' is not a directory\n" if ($dir ne "" and ! -d $dir);
-    print "songdb --path <dir> [--dirisalbum] [--dirisalbumname] [--db <file>] [--strip <path>] [--verbose] [--help]\n";
+    print "songdb --path <dir> [--dirisalbum] [--dirisalbumname] [--db <file>] [--strip <path>] [--add <path>] [--verbose] [--help]\n";
     exit;
 }
 
@@ -165,6 +171,10 @@ sub dodir {
         if ($strip ne "" and $path =~ /^$strip(.*)/) {
             $path = $1;
         }
+
+	if ($add ne "") {
+	    $path = $add . $path;
+	}
 
         # Only use one case-variation of each album/artist
         if (exists($lcalbums{lc($$id3{'ALBUM'})})) {
