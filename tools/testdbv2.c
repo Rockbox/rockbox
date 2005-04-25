@@ -197,32 +197,10 @@ printf("Artist Entry Size mismatch.. update the code to correct size.\n");
                              showfile(header.filestart +
                                              temp2*sizeof(struct FileEntry));
 		     break;
+             default:
+		     return;
+		     break;
      }
    } while(1);
-   printf("\n");
-   fseek(fp,SongEntry.artist,SEEK_SET);
-   fread(&ArtistEntry,sizeof(struct ArtistEntry),1,fp);
-   printf("Offset: 0x%x\nArtist: %s\n",SongEntry.artist,ArtistEntry.name);
-   for(i=0;i<header.albumarraylen;i++) {
-	   ArtistEntry.album[i]=BE32(ArtistEntry.album[i]);
-	   printf("Album %d: 0x%x\n",i,ArtistEntry.album[i]);
-   }
-   printf("\n");
-   fseek(fp,SongEntry.file,SEEK_SET);
-   fread(&FileEntry,sizeof(struct FileEntry),1,fp);
-   FileEntry.hash=BE32(FileEntry.hash);
-   FileEntry.tagoffset=BE32(FileEntry.tagoffset);
-   FileEntry.rundboffset=BE32(FileEntry.rundboffset);
-   printf("Offset: 0x%x\nFilename: %s\nHash: 0x%x\nTag: 0x%x\nRunDB: 0x%x\n",
-		   SongEntry.file,FileEntry.name,FileEntry.hash,
-		   FileEntry.tagoffset, FileEntry.rundboffset);
-   
-   /*fseek(fp,AlbumEntry.artist,SEEK_SET);
-   fread(&ArtistEntry,sizeof(struct ArtistEntry),1,fp);
-   printf("Offset: 0x%x\nArtist: %s\n",AlbumEntry.artist,ArtistEntry.name);
-   for(i=0;i<header.albumarraylen;i++) {
-      ArtistEntry.album[i]=BE32(ArtistEntry.album[i]);
-      printf("Album %d: 0x%x\n",i,ArtistEntry.album[i]);
-   } */  
    fclose(fp);
 }
