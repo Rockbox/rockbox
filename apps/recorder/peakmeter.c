@@ -56,8 +56,8 @@ static long peak_meter_clip_timeout_r;
 static int  peak_meter_clip_hold;
 
 /* specifies the value range in peak volume values */
-static unsigned short peak_meter_range_min;
-static unsigned short peak_meter_range_max;
+unsigned short peak_meter_range_min;
+unsigned short peak_meter_range_max;
 static unsigned short peak_meter_range;
 
 /* if set to true clip timeout is disabled */
