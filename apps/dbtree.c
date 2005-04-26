@@ -168,7 +168,7 @@ int db_load(struct tree_context* c)
                 return -1;
 
 #ifdef LITTLE_ENDIAN
-            for (i=0; i<albumarraylen; i++)
+            for (i=0; i<tagdbheader.albumarraylen; i++)
                 safeplace[i] = BE32(safeplace[i]);
 #endif
             offset = safeplace[0];
@@ -187,7 +187,7 @@ int db_load(struct tree_context* c)
                 return -1;
 
 #ifdef LITTLE_ENDIAN
-            for (i=0; i<songarraylen; i++) {
+            for (i=0; i<tagdbheader.songarraylen; i++) {
                 safeplace[i] = BE32(safeplace[i]);
                 DEBUGF("db_load songs4album song %d: 0x%x\n",i,safeplace[i]);
             }

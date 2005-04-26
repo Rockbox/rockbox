@@ -79,7 +79,7 @@ int tagdb_init(void)
 #ifdef LITTLE_ENDIAN
     p=(int *)&tagdbheader;
     for(i=0;i<17;i++) {
-        *p=BE32(p);
+        *p=BE32(*p);
         p++;
     }
 #endif
