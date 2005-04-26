@@ -121,7 +121,10 @@ EOF
      endian="little"
    fi
    echo "Simulator environment deemed $endian endian"
-   rm /tmp/conftest-$id /tmp/conftest-$id.c
+
+   # use wildcard here to make it work even if it was named *.exe like
+   # on cygwin
+   rm -f /tmp/conftest-$id*
  fi
 }
 
