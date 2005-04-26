@@ -24,6 +24,7 @@ talk.c
 #endif
 tree.c
 dbtree.c
+database.c
 filetree.c
 wps-display.c
 wps.c

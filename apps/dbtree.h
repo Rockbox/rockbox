@@ -20,13 +20,12 @@
 #define DBTREE_H
 
 #include "tree.h"
+#include "database.h"
 
 enum table { invalid, root, allsongs, allalbums, allartists,
              albums4artist, songs4album, songs4artist,
              search, searchartists, searchalbums, searchsongs };
 
-int db_init(void);
-void db_shutdown(void);
 int db_enter(struct tree_context* c);
 void db_exit(struct tree_context* c);
 int db_load(struct tree_context* c);
@@ -35,6 +34,7 @@ const char* db_get_icon(struct tree_context* c);
 #else
 int   db_get_icon(struct tree_context* c);
 #endif
+
 
 
 #endif
