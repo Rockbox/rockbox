@@ -43,6 +43,8 @@ crosswincc () {
  GCCOPTS="$GCCOPTS -mno-cygwin"
 
  output="rockboxui.exe" # use this as output binary name
+ crosscompile="yes"
+ endian="little" # windows is little endian
 }
 
 simcc () {
@@ -92,24 +94,56 @@ simcc () {
    exit
    ;;
  esac
+
+
+ if test "X$crosscompile" != "Xyes"; then
+   id=$$
+   cat >/tmp/conftest-$id.c <<EOF
+#include <stdio.h>
+int main(int argc, char **argv)
+{
+  int var=0;
+  char *varp = (char *)&var;
+  *varp=1;
+
+  printf("%d\n", var);
+  return 0;
+}
+EOF
+
+   $CC -o /tmp/conftest-$id /tmp/conftest-$id.c 2>/dev/null
+
+   if test `/tmp/conftest-$id 2>/dev/null` -gt "1"; then
+     # big endian
+     endian="big"
+   else
+     # little endian
+     endian="little"
+   fi
+   echo "Simulator environment deemed $endian endian"
+   rm /tmp/conftest-$id /tmp/conftest-$id.c
+ fi
 }
 
 shcc () {
  prefixtools sh-elf-
  GCCOPTS="$CCOPTS -m1"
  GCCOPTIMIZE="-fomit-frame-pointer -fschedule-insns"
+ endian="big"
 }
 
 calmrisccc () {
  prefixtools calmrisc16-unknown-elf-
  GCCOPTS="-Wl\,--no-check-sections $CCOPTS"
  GCCOPTIMIZE="-fomit-frame-pointer"
+ endian="big"
 }
 
 coldfirecc () {
  prefixtools m68k-elf-
  GCCOPTS="$CCOPTS -g -m5200 -Wa\,-m5249 -malign-int -mstrict-align"
  GCCOPTIMIZE="-fomit-frame-pointer"
+ endian="big"
 }
 
 whichaddr () {
@@ -543,6 +577,19 @@ else
 
 fi
 
+if test "X$endian" = "Xbig"; then
+  defendian="ROCKBOX_BIG_ENDIAN"
+else
+  defendian="ROCKBOX_LITTLE_ENDIAN"
+fi
+
+sed > autoconf.h \
+ -e "s,@ENDIAN@,${defendian},g" \
+<<EOF
+/* Define endianess for the target or simulator platform */
+#define @ENDIAN@ 1
+EOF
+
 sed > Makefile \
  -e "s,@ROOTDIR@,${rootdir},g" \
  -e "s,@DEBUG@,${debug},g" \
@@ -576,6 +623,7 @@ sed > Makefile \
  -e "s,@GCCVER@,${gccver},g" \
  -e "s,@GCCNUM@,${gccnum},g" \
  -e "s,@UNAME@,${uname},g" \
+ -e "s,@ENDIAN@,${defendian},g" \
 <<EOF
 ## Automaticly generated. http://www.rockbox.org/
 
