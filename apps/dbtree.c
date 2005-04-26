@@ -64,14 +64,14 @@
 
 #define ID3DB_VERSION 2
 
-static int fd;
+static int fd = -1;
 
 static int
     songstart, albumstart, artiststart, filestart,
     songcount, albumcount, artistcount, filecount,
     songlen, songarraylen, genrelen, filelen,
     albumlen, albumarraylen,
-    artistlen, rundbdirty,initialized = 0;
+    artistlen, rundbdirty, initialized = 0;
 
 static int db_play_folder(struct tree_context* c);
 static int db_search(struct tree_context* c, char* string);
@@ -135,6 +135,13 @@ int db_init(void)
 
     initialized = 1;
     return 0;
+}
+
+void db_shutdown(void)
+{
+    if (fd >= 0)
+        close(fd);
+    initialized = 0;
 }
 
 int db_load(struct tree_context* c)

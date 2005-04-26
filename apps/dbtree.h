@@ -26,6 +26,7 @@ enum table { invalid, root, allsongs, allalbums, allartists,
              search, searchartists, searchalbums, searchsongs };
 
 int db_init(void);
+void db_shutdown(void);
 int db_enter(struct tree_context* c);
 void db_exit(struct tree_context* c);
 int db_load(struct tree_context* c);
