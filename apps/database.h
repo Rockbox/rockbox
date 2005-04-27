@@ -65,7 +65,7 @@ struct tagdb_header {
 struct file_entry {
         char *name;
         int hash;
-        int tagentry;
+        int songentry;
         int rundbentry;
 };
 
