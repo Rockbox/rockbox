@@ -1337,12 +1337,6 @@ static int add_dir_entry(struct fat_dir* dir,
     /* step 2: extend the dir if necessary */
     if (firstentry < 0)
     {
-#ifdef HAVE_FAT16SUPPORT
-        if (dir->file.firstcluster < 0) {
-            LDEBUGF("FAT16 root dir isn't extendable\n");
-            return -3;
-        }
-#endif
         LDEBUGF("Adding new sector(s) to dir\n");
         rc = fat_seek(&dir->file, sector);
         if (rc < 0)
