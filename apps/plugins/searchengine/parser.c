@@ -22,14 +22,24 @@
 #include "parser.h"
 
 struct token *currentToken, curtoken;
+unsigned char *filter[20],*nofilter=0;
+int currentlevel=0;
 int syntaxerror;
 int parse_fd;
 char errormsg[250];
 
 unsigned char *parse(int fd) {
 	unsigned char *ret=0;
+	int i;
 	syntaxerror=0;
 	parse_fd=fd;
+	currentlevel=0;
+	if(nofilter==0) {
+		nofilter=my_malloc(sizeof(unsigned char)*rb->tagdbheader->filecount);
+		rb->memset(nofilter,1,rb->tagdbheader->filecount);
+	}
+	for(i=0;i<20;i++)
+		filter[i]=nofilter;
 	database_init();
 	parser_acceptIt();
 	currentToken=&curtoken;
@@ -101,7 +111,8 @@ unsigned char *parseCompareNum() {
 		n1=getvalue(&number1);
 	if(number2.kind==TOKEN_NUM)
 		n2=getvalue(&number2);
-	for(i=0;i<rb->tagdbheader->filecount;i++) {
+	for(i=0;i<rb->tagdbheader->filecount;i++) 
+		if(filter[currentlevel][i]) {
 		loadentry(i);
 		if(number1.kind==TOKEN_NUMIDENTIFIER)
 		  n1=getvalue(&number1);
@@ -182,7 +193,8 @@ unsigned char *parseCompareString() {
 		s1=getstring(&string1);
 	if(string2.kind==TOKEN_STRING)
 		s2=getstring(&string2);
-        for(i=0;i<rb->tagdbheader->filecount;i++) {
+        for(i=0;i<rb->tagdbheader->filecount;i++) 
+		if(filter[currentlevel][i]) {
                 loadentry(i);
 		if(string1.kind==TOKEN_STRINGIDENTIFIER)
                   s1=getstring(&string1);
@@ -208,11 +220,14 @@ unsigned char *parseExpr() {
  	                ret = parseExpr();
 			if(ret==NULL) return 0;
  	                for(i=0;i<rb->tagdbheader->filecount;i++)
-		          ret[i]=!ret[i];
+			   if(filter[currentlevel][i])
+		             ret[i]=!ret[i];
 			break;
 	    case TOKEN_LPAREN:
 			parser_accept(TOKEN_LPAREN);
+			currentlevel++;
 			ret = parseMExpr();
+			currentlevel--;
 			if(ret==NULL) return 0;
 			parser_accept(TOKEN_RPAREN);
 			break;
@@ -241,26 +256,37 @@ unsigned char *parseMExpr() {
 	int i;
         if(syntaxerror) return 0;
 	PUTS("parseMExpr");       
-	ret=parseExpr();
-	while(currentToken->kind==TOKEN_AND||currentToken->kind==TOKEN_OR) {
-		switch(currentToken->kind) {
-			case TOKEN_AND:
-				parser_accept(TOKEN_AND);
-				PUTS("parseAnd");
-				ret2 = parseExpr();
-				if(ret2==NULL) return 0;
-                        	for(i=0;i<rb->tagdbheader->filecount;i++)
-				    ret[i]=ret[i] && ret2[i];
-				break;
-			case TOKEN_OR:
-				parser_accept(TOKEN_OR);
-				PUTS("parseOr");
-				ret2 = parseExpr();
-				if(ret2==NULL) return 0;
-				for(i=0;i<rb->tagdbheader->filecount;i++)
-				    ret[i]=ret[i] || ret2[i];
-				break;
-		}
+	ret=parseLExpr();
+	while(currentToken->kind==TOKEN_OR) {
+	    parser_accept(TOKEN_OR);
+	    PUTS("parseOr");
+	    ret2 = parseLExpr();
+	    if(ret2==NULL) return 0;
+	    for(i=0;i<rb->tagdbheader->filecount;i++)
+	       if(filter[currentlevel][i]) // this should always be true
+	         ret[i]=ret[i] || ret2[i];
+	       else
+		 rb->splash(HZ*2,true,"An or is having a filter, bad.");
 	}
+	return ret;
+}
+
+unsigned char *parseLExpr() {
+        unsigned char *ret,*ret2;
+        int i;
+        if(syntaxerror) return 0;
+        PUTS("parseLExpr");
+	filter[currentlevel]=nofilter;
+        ret=parseExpr();
+	filter[currentlevel]=ret;
+        while(currentToken->kind==TOKEN_AND) {
+            parser_accept(TOKEN_AND);
+            PUTS("parseAnd");
+            ret2 = parseExpr();
+            if(ret2==NULL) return 0;
+            for(i=0;i<rb->tagdbheader->filecount;i++)
+                ret[i]=ret[i] && ret2[i];
+        }
+	filter[currentlevel]=nofilter;
 	return ret;
 }

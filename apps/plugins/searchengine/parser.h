@@ -27,3 +27,4 @@ unsigned char *parseCompareNum(void);
 unsigned char *parseCompareString(void);
 unsigned char *parseExpr(void);
 unsigned char *parseMExpr(void);
+unsigned char *parseLExpr(void);
