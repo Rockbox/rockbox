@@ -29,6 +29,7 @@ main() {
 	printf("Output filename? ");
 	fflush(stdout);
 	fgets(buf,254,stdin);
+	buf[strlen(buf)-1]=0;
 	fp=fopen(buf,"w");
 	if(fp<0) {
 		printf("Error opening outputfile.\n");
