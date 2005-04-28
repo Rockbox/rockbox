@@ -37,7 +37,7 @@ DIRS = .
 
 #for any recorder and iRiver model
 ifneq (,$(strip $(foreach tgt,RECORDER IRIVER,$(findstring $(tgt),$(TARGET)))))
-    SUBDIRS += rockboy
+    SUBDIRS += rockboy searchengine
 endif
 
 .PHONY: $(SUBDIRS)

@@ -78,7 +78,7 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 38
+#define PLUGIN_API_VERSION 39
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -375,6 +375,11 @@ struct plugin_api {
     int (*read_bmp_file)(char* filename, int *get_width, int *get_height,
                          char *bitmap, int maxsize);
 #endif
+    struct tagdb_header *tagdbheader;
+    int *tagdb_fd;
+    int *tagdb_initialized;
+    int (*tagdb_init) (void);
+    char *(*strcasestr) (const char* phaystack, const char* pneedle);
 };
 
 /* defined by the plugin loader (plugin.c) */

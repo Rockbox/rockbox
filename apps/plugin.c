@@ -45,6 +45,7 @@
 #include "powermgmt.h"
 #include "system.h"
 #include "sound.h"
+#include "database.h"
 #if (CONFIG_HWCODEC == MASNONE)
 #include "pcm_playback.h"
 #endif
@@ -319,6 +320,11 @@ static const struct plugin_api rockbox_api = {
 #ifdef HAVE_LCD_BITMAP
     read_bmp_file,
 #endif
+    &tagdbheader,
+    &tagdb_fd,
+    &tagdb_initialized,
+    tagdb_init,
+    strcasestr,
 };
 
 int plugin_load(const char* plugin, void* parameter)
