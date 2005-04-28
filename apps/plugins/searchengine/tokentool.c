@@ -28,7 +28,7 @@ main() {
 	int done=0;
 	printf("Output filename? ");
 	fflush(stdout);
-	scanf("%s",buf);
+	fgets(buf,254,stdin);
 	fp=fopen(buf,"w");
 	if(fp<0) {
 		printf("Error opening outputfile.\n");
@@ -41,13 +41,13 @@ main() {
 		printf("(arguments:) NUMBER=14 NUMBERFIELD=15 STRING=16 STRINGFIELD=17\n");
 		printf("Token kind? ");
 		fflush(stdout);
-		scanf("%d",&num);
-		token.kind=num;
+		fgets(buf,254,stdin);
+		token.kind=strtol(buf,0,10);
 		memset(&token.spelling,0,256);
 		if(token.kind==TOKEN_STRING) {
 	  	  printf("Token spelling? ");
 		  fflush(stdout);
-		  scanf("%s",&token.spelling);
+		  fgets(token.spelling,254,stdin);
 		}
                 if(token.kind==TOKEN_STRINGIDENTIFIER)
                         printf("TITLE=4 ARTIST=5 ALBUM=6 GENRE=7 FILENAME=8\n");
@@ -59,8 +59,8 @@ main() {
 			token.kind==TOKEN_NUM) {	
 			printf("Token intvalue? ");
 			fflush(stdout);
-			scanf("%d",&num);
-			token.intvalue=num;
+			fgets(buf,254,stdin);
+			token.intvalue=strtol(buf,0,10);
 		}
 		fwrite(&token,sizeof(struct token),1,fp);
 		done=token.kind==0;
