@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id
+ * $Id$
  *
  * Copyright (C) 2005 by Michiel van der Kolk 
  *
@@ -71,7 +71,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     audio_buffer_free=0;
 
     /* now go ahead and have fun! */
-    rb->splash(HZ*2, true, "SearchEngine v0.1"); 
+    PUTS("SearchEngine v0.1");
     tokenstream[0].kind=TOKEN_NUMIDENTIFIER;
     tokenstream[0].intvalue=INTVALUE_YEAR;
     tokenstream[1].kind=TOKEN_GTE;
@@ -96,6 +96,5 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 /*	rb->write(fd,result,rb->tagdbheader->filecount);*/
     	rb->close(fd);
     }
-    rb->sleep(HZ*10);
     return PLUGIN_OK;
 }
