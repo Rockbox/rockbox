@@ -35,10 +35,17 @@ OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 DEFS := $(SRC:%.c=$(OBJDIR)/%.def)
 DIRS = .
 
+#######################################
+# Subdirs containing multi-file plugins
+
+#for all targets
+SUBDIRS += searchengine
+
 #for any recorder and iRiver model
 ifneq (,$(strip $(foreach tgt,RECORDER IRIVER,$(findstring $(tgt),$(TARGET)))))
-    SUBDIRS += rockboy searchengine
+    SUBDIRS += rockboy
 endif
+
 
 .PHONY: $(SUBDIRS)
 all: $(OBJDIR)/libplugin.a $(ROCKS) $(SUBDIRS) $(DEPFILE)

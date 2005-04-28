@@ -24,17 +24,8 @@ SOURCES = $(SRC)
 OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 DIRS = .
 
-
-ifndef SIMVER
-ifneq (,$(findstring RECORDER,$(TARGET))) ## Archos recorder targets
-    OUTPUT = $(OUTDIR)/searchengine.rock
-else  ## iRiver target
-    LDS := ../plugin.lds
-    OUTPUT = $(OUTDIR)/searchengine.rock
-endif
-else  ## simulators
-    OUTPUT = $(OUTDIR)/searchengine.rock
-endif
+LDS := ../plugin.lds
+OUTPUT = $(OUTDIR)/searchengine.rock
 
 all: $(OUTPUT)
 
