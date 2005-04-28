@@ -16,13 +16,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "searchengine.h"
 #include "token.h"
 #include "dbinterface.h"
-
-#define REQUIRESONGDATA() if(!currententry->loadedsongdata) loadsongdata();
-#define REQUIRERUNDBDATA() if(!currententry->loadedrundbdata) loadrundbdata();
-#define REQUIREALBUMNAME() if(!currententry->loadedalbumname) { REQUIRESONGDATA(); loadalbumname(); }
-#define REQUIREARTISTNAME() if(!currententry->loadedartistname) { REQUIRESONGDATA(); loadartistname(); }
 
 char *getstring(struct token *token) {
 	switch(token->kind) {
@@ -31,25 +27,27 @@ char *getstring(struct token *token) {
 		case TOKEN_STRINGIDENTIFIER:
 			switch(token->intvalue) {
 				case INTVALUE_TITLE:
-					REQUIRESONGDATA();
+					loadsongdata();
 					return currententry->title;
 				case INTVALUE_ARTIST:
-					REQUIREARTISTNAME();
+					loadartistname();
 					return currententry->artistname;
 				case INTVALUE_ALBUM:
-					REQUIREALBUMNAME();
+					loadalbumname();
 					return currententry->albumname;
 				case INTVALUE_GENRE:
-					REQUIRESONGDATA();
+					loadsongdata();
 					return currententry->genre;
 				case INTVALUE_FILENAME:
 					return currententry->filename;
 				default:
+					rb->splash(HZ*2,true,"unknown stringid intvalue");
 					return 0;
 			}
 			break;
 		default:
 			// report error
+			 rb->splash(HZ*2,true,"unknown token...");
 			return 0;
 	}
 }
@@ -61,19 +59,21 @@ int getvalue(struct token *token) {
 		case TOKEN_NUMIDENTIFIER:
 			switch(token->intvalue) {
 				case INTVALUE_YEAR:
-					REQUIRESONGDATA();
+					loadsongdata();
 					return currententry->year;
 				case INTVALUE_RATING:
-					REQUIRERUNDBDATA();
+					loadrundbdata();
 					return currententry->rating;
 				case INTVALUE_PLAYCOUNT:
-					REQUIRERUNDBDATA();
+					loadrundbdata();
 					return currententry->playcount;
 				default:
+					rb->splash(HZ*2,true,"unknown numid intvalue");
 					// report error.
 					return 0;
 			}
 		default:
+			rb->splash(HZ*2,true,"unknown token...");
 			return 0;
 	}
 }

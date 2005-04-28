@@ -87,8 +87,7 @@ void loadentry(int filerecord) {
 }
 
 void loadsongdata() {
-    if(currententry->loadedsongdata || 
-        !currententry->loadedfiledata) 
+    if(currententry->loadedsongdata) 
         return;
     currententry->title=(char *)my_malloc(rb->tagdbheader->songlen);
     currententry->genre=(char *)my_malloc(rb->tagdbheader->genrelen);
@@ -112,6 +111,9 @@ void loadartistname() {
    /* memory optimization possible, only malloc for an album name once, then
     * write that pointer to the entrys using it.
    */
+   if(currententry->loadedartistname)
+	   return;
+   loadsongdata();
    currententry->artistname=(char *)my_malloc(rb->tagdbheader->artistlen);
    rb->lseek(*rb->tagdb_fd,currententry->artistoffset,SEEK_SET);
    rb->read(*rb->tagdb_fd,currententry->artistname,rb->tagdbheader->artistlen);
@@ -120,6 +122,9 @@ void loadartistname() {
 
 void loadalbumname() {
    /* see the note at loadartistname */
+   if(currententry->loadedalbumname)
+      return;      
+   loadsongdata();
    currententry->albumname=(char *)my_malloc(rb->tagdbheader->albumlen);
    rb->lseek(*rb->tagdb_fd,currententry->albumoffset,SEEK_SET);
    rb->read(*rb->tagdb_fd,currententry->albumname,rb->tagdbheader->albumlen);

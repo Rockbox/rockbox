@@ -20,6 +20,17 @@
 #include <stdio.h>
 #include "token.h"
 
+
+#ifdef LITTLE_ENDIAN
+#define BE32(_x_) (((_x_ & 0xff000000) >> 24) | \
+                                   ((_x_ & 0x00ff0000) >> 8) | \
+                                   ((_x_ & 0x0000ff00) << 8) | \
+                                   ((_x_ & 0x000000ff) << 24))
+#else
+#define BE32(_x_) _x_
+#endif
+
+
 struct token token;
 char buf[500];
 long num;
@@ -62,7 +73,7 @@ main() {
 			printf("Token intvalue? ");
 			fflush(stdout);
 			fgets(buf,254,stdin);
-			token.intvalue=strtol(buf,0,10);
+			token.intvalue=BE32(strtol(buf,0,10));
 		}
 		fwrite(&token,sizeof(struct token),1,fp);
 		done=token.kind==0;

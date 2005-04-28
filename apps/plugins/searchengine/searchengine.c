@@ -91,7 +91,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     	rb->close(fd);
     }
     rb->snprintf(buf,250,"Hits: %d",hits);
-    PUTS(buf);
-    rb->sleep(HZ*3);
+    rb->splash(HZ*3,true,buf);
     return PLUGIN_OK;
 }

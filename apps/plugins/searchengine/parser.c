@@ -188,10 +188,10 @@ unsigned char *parseCompareString() {
                   s1=getstring(&string1);
 		if(string2.kind==TOKEN_STRINGIDENTIFIER)
                   s2=getstring(&string2);
-		if(contains)
-	          ret[i]=rb->strcasestr(s1,s2)!=0;
+		if(contains) 
+		    ret[i]=rb->strcasestr(s1,s2)!=0;
 		else
-		  ret[i]=rb->strcasecmp(s1,s2)==0;
+		    ret[i]=rb->strcasecmp(s1,s2)==0;
         }
         return ret;
 }
