@@ -744,16 +744,19 @@ int ata_read_sectors(IF_MV2(int drive,)
         c_addr += len;
         c_block++;
     }
-    /* some cards don't like reading the very last sector with
-     * CMD_READ_MULTIPLE_BLOCK, so make sure this sector is always
-     * read with CMD_READ_SINGLE_BLOCK. This is caught by the 'last
-     * partial block' read. */
+    /* some cards don't like reading the very last block with
+     * CMD_READ_MULTIPLE_BLOCK, so make sure this block is always
+     * read with CMD_READ_SINGLE_BLOCK. Let the 'last partial block'
+     * read catch this. */
     if (c_end_block == card->numblocks)
         c_end_block--;
 
     if (c_block < c_end_block)
     {
-        rc = send_cmd(CMD_READ_MULTIPLE_BLOCK, c_addr, &response);
+        int read_cmd = (c_end_block - c_block > 1) ?
+                       CMD_READ_MULTIPLE_BLOCK : CMD_READ_SINGLE_BLOCK;
+
+        rc = send_cmd(read_cmd, c_addr, &response);
         if (rc)
         {
             rc = rc * 10 - 4;
@@ -774,11 +777,14 @@ int ata_read_sectors(IF_MV2(int drive,)
             c_addr += blocksize;
             c_block++;
         }
-        rc = send_cmd(CMD_STOP_TRANSMISSION, 0, &response);
-        if (rc)
+        if (read_cmd == CMD_READ_MULTIPLE_BLOCK)
         {
-            rc = rc * 10 - 6;
-            goto error;
+            rc = send_cmd(CMD_STOP_TRANSMISSION, 0, &response);
+            if (rc)
+            {
+                rc = rc * 10 - 6;
+                goto error;
+            }
         }
         bitswap(inbuf_prev, blocksize);
     }
@@ -848,81 +854,94 @@ int ata_write_sectors(IF_MV2(int drive,)
     offset = c_addr & (blocksize - 1);
     c_block = c_addr >> card->block_exp;
     c_end_block = c_end_addr >> card->block_exp;
-    
-    if (offset) /* first partial block */
-    {
-        unsigned long len = MIN(c_end_addr - c_addr, blocksize - offset);
 
-        rc = cache_block(IF_MV2(drive,) c_block, blocksize,
-                         card->read_timeout);
-        if (rc)
+    /* Special case: first block is trimmed at both ends. May only happen
+     * if (blocksize > 2 * sectorsize), i.e. blocksize == 2048 */
+    if ((c_block == c_end_block) && offset)
+        c_end_block++;
+
+    if (c_block < c_end_block)
+    {
+        int write_cmd;
+        unsigned char start_token;
+        
+        if (c_end_block - c_block > 1)
         {
-            rc = rc * 10 - 2;
-            goto error;
+            write_cmd   = CMD_WRITE_MULTIPLE_BLOCK;
+            start_token = DT_START_WRITE_MULTIPLE;
         }
-        swapcopy(block_cache[current_cache].data + 2 + offset, buf, len);
-        rc = send_cmd(CMD_WRITE_BLOCK, c_addr - offset, &response);
+        else
+        {
+            write_cmd   = CMD_WRITE_BLOCK;
+            start_token = DT_START_BLOCK;
+        }
+        
+        if (offset)
+        {
+            unsigned long len = MIN(c_end_addr - c_addr, blocksize - offset);
+            
+            rc = cache_block(IF_MV2(drive,) c_block, blocksize,
+                         card->read_timeout);
+            if (rc)
+            {
+                rc = rc * 10 - 2;
+                goto error;
+            }
+            swapcopy(block_cache[current_cache].data + 2 + offset, buf, len);
+            buf += len;
+            c_addr -= offset;
+        }
+        else
+        {
+            swapcopy_block(buf, blocksize);
+            buf += blocksize;
+        }
+        rc = send_cmd(write_cmd, c_addr, &response);
         if (rc)
         {
             rc = rc * 10 - 3;
             goto error;
         }
-        buf += len;
-        rc = send_block(NULL, blocksize, DT_START_BLOCK, card->write_timeout);
-        if (rc)
+        c_block++;  /* early increment to simplify the loop */
+        
+        while (c_block < c_end_block)
         {
-            rc = rc * 10 - 4;
-            goto error;
+            rc = send_block(buf, blocksize, start_token, card->write_timeout);
+            if (rc)
+            {
+                rc = rc * 10 - 4;
+                goto error;
+            }
+            last_disk_activity = current_tick;
+            buf += blocksize;
+            c_addr += blocksize;
+            c_block++;
         }
-        c_addr += len;
-        c_block++;
-    }
-    if (c_block < c_end_block)
-    {
-        swapcopy_block(buf, blocksize);
-        rc = send_cmd(CMD_WRITE_MULTIPLE_BLOCK, c_addr, &response);
+        rc = send_block(NULL, blocksize, start_token, card->write_timeout);
         if (rc)
         {
             rc = rc * 10 - 5;
             goto error;
         }
-        while (c_block < c_end_block - 1)
-        {
-            buf += blocksize;
-            rc = send_block(buf, blocksize, DT_START_WRITE_MULTIPLE,
-                            card->write_timeout);
-            if (rc)
-            {
-                rc = rc * 10 - 6;
-                goto error;
-            }
-            last_disk_activity = current_tick;
-            c_addr += blocksize;
-            c_block++;
-        }
-        buf += blocksize;
-        rc = send_block(NULL, blocksize, DT_START_WRITE_MULTIPLE,
-                        card->write_timeout);
-        if (rc)
-        {
-            rc = rc * 10 - 7;
-            goto error;
-        }
         last_disk_activity = current_tick;
         c_addr += blocksize;
-        c_block++;
-        
-        response = DT_STOP_TRAN;
-        write_transfer(&response, 1);
-        poll_busy(card->write_timeout);
+        /* c_block++ was done early */
+
+        if (write_cmd == CMD_WRITE_MULTIPLE_BLOCK)
+        {
+            response = DT_STOP_TRAN;
+            write_transfer(&response, 1);
+            poll_busy(card->write_timeout);
+        }
     }
+    
     if (c_addr < c_end_addr) /* last partial block */
     {
         rc = cache_block(IF_MV2(drive,) c_block, blocksize,
                          card->read_timeout);
         if (rc)
         {
-            rc = rc * 10 - 8;
+            rc = rc * 10 - 6;
             goto error;
         }
         swapcopy(block_cache[current_cache].data + 2, buf,
@@ -930,13 +949,13 @@ int ata_write_sectors(IF_MV2(int drive,)
         rc = send_cmd(CMD_WRITE_BLOCK, c_addr, &response);
         if (rc)
         {
-            rc = rc * 10 - 9;
+            rc = rc * 10 - 7;
             goto error;
         }
         rc = send_block(NULL, blocksize, DT_START_BLOCK, card->write_timeout);
         if (rc)
         {
-            rc = rc * 10 - 9;
+            rc = rc * 10 - 8;
             goto error;
         }
     }
