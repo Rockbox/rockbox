@@ -54,7 +54,7 @@ void setmallocpos(void *pointer)
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     unsigned char *result,buf[500];
-    int parsefd;
+    int parsefd,hits;
     /* this macro should be called as the first thing you do in the plugin.
        it test that the api version and model the plugin was compiled for
        matches the machine it is running on */
@@ -78,14 +78,20 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->snprintf(buf,250,"Retval: 0x%x",result);
     PUTS(buf);
     rb->close(parsefd);
+    hits=0;
     if(result!=0) {
 	int fd=rb->open("/search.m3u", O_WRONLY|O_CREAT|O_TRUNC);
 	int i;
 	for(i=0;i<rb->tagdbheader->filecount;i++)
-	  if(result[i])
+	  if(result[i]) {
+            hits++;
 	    rb->fdprintf(fd,"%s\n",getfilename(i));
+	  }
 /*	rb->write(fd,result,rb->tagdbheader->filecount);*/
     	rb->close(fd);
     }
+    rb->snprintf(buf,250,"Hits: %d",hits);
+    PUTS(buf);
+    rb->sleep(HZ*3);
     return PLUGIN_OK;
 }

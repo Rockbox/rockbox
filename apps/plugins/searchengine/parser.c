@@ -148,11 +148,19 @@ unsigned char *parseCompareString() {
 	   rb->snprintf(errormsg,250,"'%d' found where STRING/STRINGID expected\n",currentToken->kind);
 	   return 0;
         }
-	
-	contains=currentToken->kind==TOKEN_CONTAINS;
+
         if(currentToken->kind==TOKEN_CONTAINS ||
-               currentToken->kind==TOKEN_EQUALS)
+               currentToken->kind==TOKEN_EQUALS) {
+	  if(currentToken->kind==TOKEN_CONTAINS) {
+	     contains=1;
+	     PUTS("Contains");
+	  }
+	  else {
+	     contains=0;
+	     PUTS("Equals");
+	  }
 	  parser_acceptIt();
+	}
 	else {
            syntaxerror=1;
 	   rb->snprintf(errormsg,250,"'%d' found where CONTAINS/EQUALS expected\n",currentToken->kind);

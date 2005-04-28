@@ -51,7 +51,7 @@
 struct token {
       unsigned char kind;
       char spelling[256];
-      int intvalue;
+      long intvalue;
 };
 
 char *getstring(struct token *token);
