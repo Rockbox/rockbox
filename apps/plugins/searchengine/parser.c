@@ -21,18 +21,18 @@
 #include "dbinterface.h"
 #include "parser.h"
 
-struct token *tokenbuffer,*currentToken;
-int currentindex;
+struct token *currentToken, curtoken;
 int syntaxerror;
+int parse_fd;
 char errormsg[250];
 
-unsigned char *parse(struct token *tokenbuf) {
+unsigned char *parse(int fd) {
 	unsigned char *ret=0;
-	currentindex=0;
 	syntaxerror=0;
-	tokenbuffer=tokenbuf;
+	parse_fd=fd;
 	database_init();
-	currentToken=&tokenbuffer[currentindex];
+	parser_acceptIt();
+	currentToken=&curtoken;
 	PUTS("parse");
 	ret=parseMExpr();
 	if(syntaxerror) {
@@ -45,7 +45,7 @@ unsigned char *parse(struct token *tokenbuf) {
 
 void parser_acceptIt(void) {
         if(syntaxerror) return;
-	currentToken=&tokenbuffer[++currentindex];
+	rb->read(parse_fd,&curtoken,sizeof(struct token));
 }
 
 int parser_accept(unsigned char kind) {
@@ -61,7 +61,7 @@ int parser_accept(unsigned char kind) {
 }
 
 unsigned char *parseCompareNum() {
-	struct token *number1,*number2;
+	struct token number1,number2;
 	unsigned char *ret;
 	int i,n1=-1,n2=-1;
 	int op;
@@ -69,7 +69,7 @@ unsigned char *parseCompareNum() {
         PUTS("parseCompareNum");
         if(currentToken->kind==TOKEN_NUM ||
 		currentToken->kind==TOKEN_NUMIDENTIFIER) {
-	   number1=currentToken;	
+	   rb->memcpy(&number1,currentToken,sizeof(struct token));
 	   parser_acceptIt();
 	}
 	else {
@@ -88,7 +88,7 @@ unsigned char *parseCompareNum() {
 	}
         if(currentToken->kind==TOKEN_NUM ||
                 currentToken->kind==TOKEN_NUMIDENTIFIER) {
-           number2=currentToken;
+           rb->memcpy(&number2,currentToken,sizeof(struct token));
            parser_acceptIt();
         }
         else {
@@ -97,16 +97,16 @@ unsigned char *parseCompareNum() {
 	   return 0;
 	}
 	ret=my_malloc(sizeof(unsigned char)*rb->tagdbheader->filecount);
-	if(number1->kind==TOKEN_NUM)
-		n1=getvalue(number1);
-	if(number2->kind==TOKEN_NUM)
-		n2=getvalue(number2);
+	if(number1.kind==TOKEN_NUM)
+		n1=getvalue(&number1);
+	if(number2.kind==TOKEN_NUM)
+		n2=getvalue(&number2);
 	for(i=0;i<rb->tagdbheader->filecount;i++) {
 		loadentry(i);
-		if(number1->kind==TOKEN_NUMIDENTIFIER)
-		  n1=getvalue(number1);
-		if(number2->kind==TOKEN_NUMIDENTIFIER)
-		  n2=getvalue(number2);
+		if(number1.kind==TOKEN_NUMIDENTIFIER)
+		  n1=getvalue(&number1);
+		if(number2.kind==TOKEN_NUMIDENTIFIER)
+		  n2=getvalue(&number2);
 		switch(op) {
 			case TOKEN_GT:
 				ret[i]=n1 > n2;
@@ -132,7 +132,7 @@ unsigned char *parseCompareNum() {
 }
 
 unsigned char *parseCompareString() {
-        struct token *string1,*string2;
+        struct token string1,string2;
         unsigned char *ret;
 	char *s1=NULL,*s2=NULL;
         int i,contains;
@@ -140,7 +140,7 @@ unsigned char *parseCompareString() {
         PUTS("parseCompareString");
         if(currentToken->kind==TOKEN_STRING ||
                 currentToken->kind==TOKEN_STRINGIDENTIFIER) {
-           string1=currentToken;
+	   rb->memcpy(&string1,currentToken,sizeof(struct token));
            parser_acceptIt();
         }
         else {
@@ -161,7 +161,7 @@ unsigned char *parseCompareString() {
 	
         if(currentToken->kind==TOKEN_STRING ||
                 currentToken->kind==TOKEN_STRINGIDENTIFIER) {
-           string2=currentToken;
+	   rb->memcpy(&string2,currentToken,sizeof(struct token));
            parser_acceptIt();
         }
         else {
@@ -170,16 +170,16 @@ unsigned char *parseCompareString() {
 	   return 0;
         }
         ret=my_malloc(sizeof(unsigned char)*rb->tagdbheader->filecount);
-	if(string1->kind==TOKEN_STRING)
-		s1=getstring(string1);
-	if(string2->kind==TOKEN_STRING)
-		s2=getstring(string2);
+	if(string1.kind==TOKEN_STRING)
+		s1=getstring(&string1);
+	if(string2.kind==TOKEN_STRING)
+		s2=getstring(&string2);
         for(i=0;i<rb->tagdbheader->filecount;i++) {
                 loadentry(i);
-		if(string1->kind==TOKEN_STRINGIDENTIFIER)
-                  s1=getstring(string1);
-		if(string2->kind==TOKEN_STRINGIDENTIFIER)
-                  s2=getstring(string2);
+		if(string1.kind==TOKEN_STRINGIDENTIFIER)
+                  s1=getstring(&string1);
+		if(string2.kind==TOKEN_STRINGIDENTIFIER)
+                  s2=getstring(&string2);
 		if(contains)
 	          ret[i]=rb->strcasestr(s1,s2)!=0;
 		else

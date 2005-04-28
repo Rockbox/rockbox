@@ -19,18 +19,15 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
-/* workaround for cygwin not defining endian macros */
-#if !defined(LITTLE_ENDIAN) && !defined(BIG_ENDIAN) && defined(_X86_)
-#define LITTLE_ENDIAN
-#endif
-
-#ifdef LITTLE_ENDIAN
+#ifdef ROCKBOX_LITTLE_ENDIAN
 #define BE32(_x_) (((_x_ & 0xff000000) >> 24) | \
-                   ((_x_ & 0x00ff0000) >> 8) | \
-                   ((_x_ & 0x0000ff00) << 8) | \
-                   ((_x_ & 0x000000ff) << 24))
+                                   ((_x_ & 0x00ff0000) >> 8) | \
+                                   ((_x_ & 0x0000ff00) << 8) | \
+                                   ((_x_ & 0x000000ff) << 24))
+#define BE16(_x_) ( ((_x_&0xFF00) >> 8)|((_x_&0xFF)<<8))
 #else
 #define BE32(_x_) _x_
+#define BE16(_x_) _x_
 #endif
 
 #define SONGENTRY_SIZE    (tagdbheader.songlen+12+tagdbheader.genrelen+4)

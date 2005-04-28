@@ -16,12 +16,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-extern struct token *tokenbuffer,*currentToken;
-
+extern struct token *currentToken;
 extern int syntaxerror;
 extern char errormsg[250];
 
-unsigned char *parse(struct token *tokenbuf);
+unsigned char *parse(int fd);
 void parser_acceptIt(void);
 int parser_accept(unsigned char kind);
 unsigned char *parseCompareNum(void);

@@ -50,18 +50,15 @@ void setmallocpos(void *pointer)
     audio_buffer_free = audio_bufferpointer - audio_bufferbase;
 }
 
-struct token tokenstream[10];
-
 /* this is the plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     unsigned char *result,buf[500];
+    int parsefd;
     /* this macro should be called as the first thing you do in the plugin.
        it test that the api version and model the plugin was compiled for
        matches the machine it is running on */
     TEST_PLUGIN_API(api);
-
-    (void)parameter;
 
     /* if you are using a global api pointer, don't forget to copy it!
        otherwise you will get lovely "I04: IllInstr" errors... :-) */
@@ -72,21 +69,15 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     /* now go ahead and have fun! */
     PUTS("SearchEngine v0.1");
-    tokenstream[0].kind=TOKEN_NUMIDENTIFIER;
-    tokenstream[0].intvalue=INTVALUE_YEAR;
-    tokenstream[1].kind=TOKEN_GTE;
-    tokenstream[2].kind=TOKEN_NUM;
-    tokenstream[2].intvalue=1980;
-    tokenstream[3].kind=TOKEN_AND;
-    tokenstream[4].kind=TOKEN_NUMIDENTIFIER;
-    tokenstream[4].intvalue=INTVALUE_YEAR;
-    tokenstream[5].kind=TOKEN_LT;
-    tokenstream[6].kind=TOKEN_NUM;
-    tokenstream[6].intvalue=1990;
-    tokenstream[7].kind=TOKEN_EOF;
-    result=parse(tokenstream);
+    parsefd=rb->open(parameter,O_RDONLY);
+    if(parsefd<0) {
+        rb->splash(2*HZ,true,"Unable to open search tokenstream");
+	return PLUGIN_ERROR;	
+    }
+    result=parse(parsefd);
     rb->snprintf(buf,250,"Retval: 0x%x",result);
     PUTS(buf);
+    rb->close(parsefd);
     if(result!=0) {
 	int fd=rb->open("/search.m3u", O_WRONLY|O_CREAT|O_TRUNC);
 	int i;
