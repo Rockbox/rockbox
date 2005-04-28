@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id
+ * $Id$
  *
  * Copyright (C) 2005 by Michiel van der Kolk 
  *
@@ -20,6 +20,7 @@
 #define SEARCHENGINE_H
 #include <plugin.h>
 #include <database.h>
+#include <autoconf.h>
 
 extern int w, h, y;
 #define PUTS(str) do { \

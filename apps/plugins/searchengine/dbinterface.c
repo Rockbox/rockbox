@@ -1,3 +1,21 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
+ *
+ * Copyright (C) 2005 by Michiel van der Kolk 
+ *
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
 #include "searchengine.h"
 #include "dbinterface.h"
 
@@ -44,6 +62,11 @@ void loadentry(int filerecord) {
 	rb->read(*rb->tagdb_fd,&entryarray[filerecord].hash,4);
 	rb->read(*rb->tagdb_fd,&entryarray[filerecord].songentry,4);
 	rb->read(*rb->tagdb_fd,&entryarray[filerecord].rundbentry,4);
+#ifdef ROCKBOX_LITTLE_ENDIAN
+	entryarray[filerecord].hash=BE32(entryarray[filerecord].hash);
+	entryarray[filerecord].songentry=BE32(entryarray[filerecord].songentry);
+	entryarray[filerecord].rundbentry=BE32(entryarray[filerecord].rundbentry);
+#endif
 	entryarray[filerecord].loadedfiledata=1;
     }
     currententry=&entryarray[filerecord];
@@ -63,6 +86,12 @@ void loadsongdata() {
     rb->read(*rb->tagdb_fd,currententry->genre,rb->tagdbheader->genrelen);
     rb->read(*rb->tagdb_fd,&currententry->bitrate,2);
     rb->read(*rb->tagdb_fd,&currententry->year,2);
+#ifdef ROCKBOX_LITTLE_ENDIAN
+    currententry->artistoffset=BE32(currententry->artistoffset);
+    currententry->albumoffset=BE32(currententry->albumoffset);
+    currententry->bitrate=BE16(currententry->bitrate);
+    currententry->year=BE16(currententry->year);
+#endif
     currententry->loadedsongdata=1;
 }
 
