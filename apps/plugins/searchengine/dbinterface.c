@@ -54,19 +54,33 @@ int database_init() {
     return 0;
 }
 
+long readlong(int fd) {
+	long num;
+	rb->read(fd,&num,4);
+#ifdef ROCKBOX_LITTLE_ENDIAN
+	num=BE32(num);
+#endif
+	return num;
+}
+
+short readshort(int fd) {
+        short num;
+        rb->read(fd,&num,2);
+#ifdef ROCKBOX_LITTLE_ENDIAN
+        num=BE16(num);
+#endif
+        return num;
+}
+
+
 void loadentry(int filerecord) {
     if(entryarray[filerecord].loadedfiledata==0) {
         rb->lseek(*rb->tagdb_fd,FILERECORD2OFFSET(filerecord),SEEK_SET);
         entryarray[filerecord].filename=(char *)my_malloc(rb->tagdbheader->filelen);
 	rb->read(*rb->tagdb_fd,entryarray[filerecord].filename,rb->tagdbheader->filelen);
-	rb->read(*rb->tagdb_fd,&entryarray[filerecord].hash,4);
-	rb->read(*rb->tagdb_fd,&entryarray[filerecord].songentry,4);
-	rb->read(*rb->tagdb_fd,&entryarray[filerecord].rundbentry,4);
-#ifdef ROCKBOX_LITTLE_ENDIAN
-	entryarray[filerecord].hash=BE32(entryarray[filerecord].hash);
-	entryarray[filerecord].songentry=BE32(entryarray[filerecord].songentry);
-	entryarray[filerecord].rundbentry=BE32(entryarray[filerecord].rundbentry);
-#endif
+	entryarray[filerecord].hash=readlong(*rb->tagdb_fd);
+	entryarray[filerecord].songentry=readlong(*rb->tagdb_fd);
+	entryarray[filerecord].rundbentry=readlong(*rb->tagdb_fd);
 	entryarray[filerecord].loadedfiledata=1;
     }
     currententry=&entryarray[filerecord];
@@ -80,18 +94,12 @@ void loadsongdata() {
     currententry->genre=(char *)my_malloc(rb->tagdbheader->genrelen);
     rb->lseek(*rb->tagdb_fd,currententry->songentry,SEEK_SET);
     rb->read(*rb->tagdb_fd,currententry->title,rb->tagdbheader->songlen);
-    rb->read(*rb->tagdb_fd,&currententry->artistoffset,4);
-    rb->read(*rb->tagdb_fd,&currententry->albumoffset,4);
+    currententry->artistoffset=readlong(*rb->tagdb_fd);
+    currententry->albumoffset=readlong(*rb->tagdb_fd);
     rb->lseek(*rb->tagdb_fd,4,SEEK_CUR);
     rb->read(*rb->tagdb_fd,currententry->genre,rb->tagdbheader->genrelen);
-    rb->read(*rb->tagdb_fd,&currententry->bitrate,2);
-    rb->read(*rb->tagdb_fd,&currententry->year,2);
-#ifdef ROCKBOX_LITTLE_ENDIAN
-    currententry->artistoffset=BE32(currententry->artistoffset);
-    currententry->albumoffset=BE32(currententry->albumoffset);
-    currententry->bitrate=BE16(currententry->bitrate);
-    currententry->year=BE16(currententry->year);
-#endif
+    currententry->bitrate=readshort(*rb->tagdb_fd);
+    currententry->year=readshort(*rb->tagdb_fd);
     currententry->loadedsongdata=1;
 }
 
