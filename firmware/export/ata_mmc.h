@@ -23,17 +23,20 @@ typedef struct
 {  
     bool initialized;
     unsigned char bitrate_register;
-    unsigned int read_timeout;    /* n * 8 clock cycles */
-    unsigned int write_timeout;   /* n * 8 clock cycles */
+    unsigned long read_timeout;   /* n * 8 clock cycles */
+    unsigned long write_timeout;  /* n * 8 clock cycles */
 
     unsigned long ocr;            /* OCR register */
     unsigned long csd[4];         /* CSD register, 16 bytes */
     unsigned long cid[4];         /* CID register, 16 bytes */
-    unsigned int speed;           /* bit/s */
+    unsigned long speed;          /* bit/s */
     unsigned int nsac;            /* clock cycles */
-    unsigned int tsac;            /* n * 0.1 ns */
+    unsigned long tsac;           /* n * 0.1 ns */
     unsigned int r2w_factor;
-    unsigned int numsectors;      /* size in sectors */
+    unsigned long size;           /* size in bytes */
+    unsigned long numblocks;      /* size in flash blocks */
+    unsigned int blocksize;       /* block size in bytes */
+    unsigned int block_exp;       /* block size exponent */
 } tCardInfo;
 
 void mmc_select_clock(int card_no);

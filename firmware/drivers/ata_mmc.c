@@ -35,6 +35,7 @@
 #include "disk.h" /* for mount/unmount */
 
 #define SECTOR_SIZE     512
+#define MAX_BLOCK_SIZE  2048
 
 /* Command definitions */
 #define CMD_GO_IDLE_STATE        0x40  /* R1 */
@@ -43,6 +44,7 @@
 #define CMD_SEND_CID             0x4a  /* R1 */
 #define CMD_STOP_TRANSMISSION    0x4c  /* R1 */
 #define CMD_SEND_STATUS          0x4d  /* R2 */
+#define CMD_SET_BLOCKLEN         0x50  /* R1 */
 #define CMD_READ_SINGLE_BLOCK    0x51  /* R1 */
 #define CMD_READ_MULTIPLE_BLOCK  0x52  /* R1 */
 #define CMD_WRITE_BLOCK          0x58  /* R1b */
@@ -75,15 +77,13 @@
 
 /* Data start tokens */
 
-#define DT_START_BLOCK          0xfe
-#define DT_START_WRITE_MULTIPLE 0xfc
-#define DT_STOP_TRAN            0xfd
+#define DT_START_BLOCK               0xfe
+#define DT_START_WRITE_MULTIPLE      0xfc
+#define DT_STOP_TRAN                 0xfd
 
 /* for compatibility */
 bool old_recorder = false; /* FIXME: get rid of this cross-dependency */
 int ata_spinup_time = 0;
-char ata_device = 0; /* device 0 (master) or 1 (slave) */
-int ata_io_address = 0; /* 0x300 or 0x200, only valid on recorder */
 long last_disk_activity = -1;
 
 /* private variables */
@@ -91,7 +91,7 @@ long last_disk_activity = -1;
 static struct mutex mmc_mutex;
 
 #ifdef HAVE_HOTSWAP
-static long mmc_stack[DEFAULT_STACK_SIZE/sizeof(long)];
+static long mmc_stack[(DEFAULT_STACK_SIZE + 0x800)/sizeof(long)];
 static const char mmc_thread_name[] = "mmc";
 static struct event_queue mmc_queue;
 #endif
@@ -111,10 +111,22 @@ static const unsigned char dummy[] = {
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 };
 
-/* 2 buffers for writing, include start token and dummy crc and an extra
- * byte to keep word alignment */
-static unsigned char sector_buffer[2][(SECTOR_SIZE+4)];
-static int current_buffer = 0;
+struct block_cache_entry {
+    bool inuse;
+#ifdef HAVE_MULTIVOLUME
+    int drive;
+#endif
+    unsigned long blocknum;
+    unsigned char data[MAX_BLOCK_SIZE+4];
+    /* include start token, dummy crc, and an extra byte at the start 
+     * to keep the data word aligned. */
+};
+
+/* 2 buffers used alternatively for writing, and also for reading
+ * and sub-block writing if block size > sector size */
+#define NUMCACHES 2
+static struct block_cache_entry block_cache[NUMCACHES];
+static int current_cache = 0;
 
 static tCardInfo card_info[2];
 #ifndef HAVE_MULTIVOLUME
@@ -135,17 +147,19 @@ static void write_transfer(const unsigned char *buf, int len)
             __attribute__ ((section(".icode")));
 static void read_transfer(unsigned char *buf, int len)
             __attribute__ ((section(".icode")));
-static unsigned char poll_byte(int timeout);
-static unsigned char poll_busy(int timeout);
+static unsigned char poll_byte(long timeout);
+static unsigned char poll_busy(long timeout);
 static int send_cmd(int cmd, unsigned long parameter, unsigned char *response);
 static int receive_cxd(unsigned char *buf);
 static int initialize_card(int card_no);
-static int receive_sector(unsigned char *inbuf, unsigned char *swapbuf,
-                          int timeout);
-static void swapcopy_sector(const unsigned char *buf);
-static int send_sector(const unsigned char *nextbuf, int timeout);
-static int send_single_sector(const unsigned char *buf, int timeout);
-
+static void swapcopy(void *dst, const void *src, unsigned long size);
+static int receive_block(unsigned char *inbuf, unsigned char *swapbuf,
+                         int size, long timeout);
+static void swapcopy_block(const unsigned char *buf, int size);
+static int send_block(const unsigned char *nextbuf, int size,
+                      unsigned char start_token, long timeout);
+static int cache_block(IF_MV2(int drive,) unsigned long blocknum,
+                       int size, long timeout);
 static void mmc_tick(void);
 
 /* implementation */
@@ -227,9 +241,9 @@ static void write_transfer(const unsigned char *buf, int len)
     if (serial_mode != SER_POLL_WRITE)
     {
         while (!(SSR1 & SCI_TEND)); /* wait for end of transfer */
-        SCR1 = 0;                  /* disable transmitter & receiver */
-        SSR1 = 0;                  /* clear all flags */
-        SCR1 = SCI_TE;             /* enable transmitter only */
+        SCR1 = 0;                   /* disable transmitter & receiver */
+        SSR1 = 0;                   /* clear all flags */
+        SCR1 = SCI_TE;              /* enable transmitter only */
         serial_mode = SER_POLL_WRITE;
     }
 
@@ -264,9 +278,9 @@ static void read_transfer(unsigned char *buf, int len)
 }
 
 /* returns 0xFF on timeout, timeout is in bytes */
-static unsigned char poll_byte(int timeout) 
+static unsigned char poll_byte(long timeout)
 {
-    int i;
+    long i;
     unsigned char data = 0;       /* stop the compiler complaining */
 
     if (serial_mode != SER_POLL_READ)
@@ -283,9 +297,9 @@ static unsigned char poll_byte(int timeout)
 }
 
 /* returns 0 on timeout, timeout is in bytes */
-static unsigned char poll_busy(int timeout) 
+static unsigned char poll_busy(long timeout)
 {
-    int i;
+    long i;
     unsigned char data, dummy;
     
     if (serial_mode != SER_POLL_READ)
@@ -329,7 +343,7 @@ static int send_cmd(int cmd, unsigned long parameter, unsigned char *response)
     if (response[0] != 0x00)
     {
         write_transfer(dummy, 1);
-        return -10;
+        return -1;
     }
 
     switch (cmd)
@@ -364,7 +378,7 @@ static int receive_cxd(unsigned char *buf)
     if (poll_byte(20) != DT_START_BLOCK)
     {
         write_transfer(dummy, 1);
-        return -11;               /* not start of data */
+        return -1;                /* not start of data */
     }
     
     read_transfer(buf, 16);
@@ -408,7 +422,7 @@ unsigned long mmc_extract_bits(
 
 static int initialize_card(int card_no)
 {
-    int i, temp;
+    int rc, i, temp;
     unsigned char response[5];
     tCardInfo *card = &card_info[card_no];
 
@@ -437,24 +451,39 @@ static int initialize_card(int card_no)
         return -2;                /* not ready */
         
     /* get OCR register */
-    if (send_cmd(CMD_READ_OCR, 0, response))
-        return -3;
-    card->ocr = (response[1] << 24) + (response[2] << 16)
-              + (response[3] << 8) + response[4];
+    rc = send_cmd(CMD_READ_OCR, 0, response);
+    if (rc)
+        return rc * 10 - 3;
+    card->ocr = (response[1] << 24) | (response[2] << 16)
+              | (response[3] << 8) | response[4];
         
     /* check voltage */
     if (!(card->ocr & 0x00100000)) /* 3.2 .. 3.3 V */
         return -4;
     
     /* get CSD register */
-    if (send_cmd(CMD_SEND_CSD, 0, response))
-        return -5;
-    if (receive_cxd((unsigned char*)card->csd))
-        return -6;
+    rc = send_cmd(CMD_SEND_CSD, 0, response);
+    if (rc)
+        return rc * 10 - 5;
+    rc = receive_cxd((unsigned char*)card->csd);
+    if (rc)
+        return rc * 10 - 6;
 
-    /* check block size */
-    if ((1 << mmc_extract_bits(card->csd, 44, 4)) != SECTOR_SIZE)
+    /* check block sizes */
+    card->block_exp = mmc_extract_bits(card->csd, 44, 4);
+    card->blocksize = 1 << card->block_exp;
+    if ((mmc_extract_bits(card->csd, 102, 4) != card->block_exp)
+        || card->blocksize > MAX_BLOCK_SIZE)
+    {
         return -7;
+    }
+
+    if (card->blocksize != SECTOR_SIZE)
+    {
+        rc = send_cmd(CMD_SET_BLOCKLEN, card->blocksize, response);
+        if (rc)
+            return rc * 10 - 8;
+    }
 
     /* max transmission speed, clock divider */
     temp = mmc_extract_bits(card->csd, 29, 3);
@@ -474,23 +503,30 @@ static int initialize_card(int card_no)
     card->tsac = card->tsac * exponent[temp] / 10;
 
     /* r2w_factor, write timeout */
-    temp = mmc_extract_bits(card->csd, 99, 3);
-    temp = (temp > 5) ? 5 : temp;
-    card->r2w_factor = 1 << temp;
-    card->write_timeout = card->read_timeout * card->r2w_factor;
+    card->r2w_factor = 1 << mmc_extract_bits(card->csd, 99, 3);
+    if (card->r2w_factor > 32)    /* dirty MMC spec violation */
+    {
+        card->read_timeout *= 4;  /* add safety factor */
+        card->write_timeout = card->read_timeout * 8;
+    }
+    else
+        card->write_timeout = card->read_timeout * card->r2w_factor;
 
     /* card size */
-    card->numsectors = (mmc_extract_bits(card->csd, 54, 12) + 1)
-                       * (1 << (mmc_extract_bits(card->csd, 78, 3)+2));
+    card->numblocks = (mmc_extract_bits(card->csd, 54, 12) + 1)
+                      * (1 << (mmc_extract_bits(card->csd, 78, 3) + 2));
+    card->size = card->numblocks * card->blocksize;
 
     /* switch to full speed */
     setup_sci1(card->bitrate_register);
     
     /* get CID register */
-    if (send_cmd(CMD_SEND_CID, 0, response))
-        return -8;
-    if (receive_cxd((unsigned char*)card->cid))
-        return -9;
+    rc = send_cmd(CMD_SEND_CID, 0, response);
+    if (rc)
+        return rc * 10 - 9;
+    rc = receive_cxd((unsigned char*)card->cid);
+    if (rc)
+        return rc * 10 - 9;
 
     card->initialized = true;
     return 0;
@@ -510,17 +546,23 @@ tCardInfo *mmc_card_info(int card_no)
     return card;
 }
 
-/* Receive one sector with dma, possibly swapping the previously received
- * sector in the background */
-static int receive_sector(unsigned char *inbuf, unsigned char *swapbuf, 
-                          int timeout)
+static void swapcopy(void *dst, const void *src, unsigned long size)
+{
+    memcpy(dst, src, size);
+    bitswap(dst, size);
+}
+
+/* Receive one block with dma, possibly swapping the previously received
+ * block in the background */
+static int receive_block(unsigned char *inbuf, unsigned char *swapbuf,
+                         int size, long timeout)
 {
     if (poll_byte(timeout) != DT_START_BLOCK)
     {
         write_transfer(dummy, 1);
-        return -12;               /* not start of data */
+        return -1;                /* not start of data */
     }
-    
+
     while (!(SSR1 & SCI_TEND));   /* wait for end of transfer */
 
     SCR1 = 0;                     /* disable serial */
@@ -530,7 +572,7 @@ static int receive_sector(unsigned char *inbuf, unsigned char *swapbuf,
     CHCR2 = 0;                    /* disable */
     SAR2 = RDR1_ADDR;
     DAR2 = (unsigned long) inbuf;
-    DTCR2 = SECTOR_SIZE;
+    DTCR2 = size;
     CHCR2 = 0x4601;               /* fixed source address, RXI1, enable */
     DMAOR = 0x0001;
     SCR1 = (SCI_RE|SCI_RIE);      /* kick off DMA */
@@ -540,8 +582,8 @@ static int receive_sector(unsigned char *inbuf, unsigned char *swapbuf,
      * the second one is lost because of the SCI overrun. However, this 
      * behaviour conveniently discards the crc. */
 
-    if (swapbuf != NULL)          /* bitswap previous sector */
-        bitswap(swapbuf, SECTOR_SIZE);
+    if (swapbuf != NULL)          /* bitswap previous block */
+        bitswap(swapbuf, size);
     yield();                      /* be nice */
 
     while (!(CHCR2 & 0x0002));    /* wait for end of DMA */
@@ -553,26 +595,25 @@ static int receive_sector(unsigned char *inbuf, unsigned char *swapbuf,
     return 0;
 }
 
-/* copies one sector into the next-current write buffer, then bitswaps */
-static void swapcopy_sector(const unsigned char *buf)
+/* copies one block into the next-current block cache, then bitswaps */
+static void swapcopy_block(const unsigned char *buf, int size)
 {
-    unsigned char *curbuf;
+    current_cache = (current_cache + 1) % NUMCACHES; /* next cache */
 
-    current_buffer ^= 1;          /* toggles between 0 and 1 */
-
-    curbuf = sector_buffer[current_buffer];
-    curbuf[1] = DT_START_WRITE_MULTIPLE;
-    curbuf[(SECTOR_SIZE+2)] = curbuf[(SECTOR_SIZE+3)] = 0xFF; /* dummy crc */
-    memcpy(curbuf + 2, buf, SECTOR_SIZE);
-    bitswap(curbuf + 1, (SECTOR_SIZE+1));
+    block_cache[current_cache].inuse = false;
+    swapcopy(block_cache[current_cache].data + 2, buf, size);
 }
 
-/* Send one sector with dma from the current sector buffer, possibly preparing
- * the next sector within the other sector buffer in the background. Use
- * for multisector transfer only */
-static int send_sector(const unsigned char *nextbuf, int timeout)
+/* Send one block with dma from the current block cache, possibly preparing
+ * the next block within the next block cache in the background. */
+static int send_block(const unsigned char *nextbuf, int size,
+                      unsigned char start_token, long timeout)
 {
-    int ret = 0;
+    int rc = 0;
+    unsigned char *curbuf = block_cache[current_cache].data;
+    
+    curbuf[1] = fliptable[(signed char)start_token];
+    *(unsigned short *)(curbuf + size + 2) = 0xFFFF;
 
     while (!(SSR1 & SCI_TEND));   /* wait for end of transfer */
 
@@ -581,15 +622,15 @@ static int send_sector(const unsigned char *nextbuf, int timeout)
 
     /* setup DMA channel 2 */
     CHCR2 = 0;                    /* disable */
-    SAR2 = (unsigned long)(sector_buffer[current_buffer] + 1);
+    SAR2 = (unsigned long)(curbuf + 1);
     DAR2 = TDR1_ADDR;
-    DTCR2 = (SECTOR_SIZE+3);
+    DTCR2 = size + 3;             /* start token + block + dummy crc */
     CHCR2 = 0x1701;               /* fixed dest. address, TXI1, enable */
     DMAOR = 0x0001;
     SCR1 = (SCI_TE|SCI_TIE);      /* kick off DMA */
 
     if (nextbuf != NULL)          /* prepare next sector */
-        swapcopy_sector(nextbuf);
+        swapcopy_block(nextbuf, size);
     yield();                      /* be nice */
 
     while (!(CHCR2 & 0x0002));    /* wait for end of DMA */
@@ -598,29 +639,52 @@ static int send_sector(const unsigned char *nextbuf, int timeout)
     serial_mode = SER_DISABLED;
 
     if ((poll_busy(timeout) & 0x1F) != 0x05) /* something went wrong */
-        ret = -13;
+        rc = -1;
 
     write_transfer(dummy, 1);
 
-    return ret;
+    return rc;
 }
 
-/* Send one sector with polled i/o. Use for single sector transfers only. */
-static int send_single_sector(const unsigned char *buf, int timeout)
+static int cache_block(IF_MV2(int drive,) unsigned long blocknum,
+                       int size, long timeout)
 {
-    int ret = 0;
-    unsigned char start_token = DT_START_BLOCK;
+    int rc, i;
+    unsigned char response;
+    
+    /* check whether the block is already cached */
+    for (i = 0; i < NUMCACHES; i++)
+    {
+        if (block_cache[i].inuse && (block_cache[i].blocknum == blocknum)
+#ifdef HAVE_MULTIVOLUME
+            && (block_cache[i].drive == drive)
+#endif
+           )
+        {
+            current_cache = i;
+            return 0;
+        }
+    }
+    /* not found: read the block */
+    current_cache = (current_cache + 1) % NUMCACHES;
+    rc = send_cmd(CMD_READ_SINGLE_BLOCK, blocknum * size, &response);
+    if (rc)
+        return rc * 10 - 1;
 
-    write_transfer(&start_token, 1);
-    write_transfer(buf, SECTOR_SIZE);
-    write_transfer(dummy, 2);     /* crc - dontcare */
+    block_cache[current_cache].inuse = false;
+    rc = receive_block(block_cache[current_cache].data + 2, NULL,
+                       size, timeout);
+    if (rc)
+        return rc * 10 - 2;
 
-    if ((poll_busy(timeout) & 0x1F) != 0x05) /* something went wrong */
-        ret = -14;
+#ifdef HAVE_MULTIVOLUME
+    block_cache[current_cache].drive = drive;
+#endif
+    block_cache[current_cache].blocknum = blocknum;
+    block_cache[current_cache].inuse = true;
+    last_disk_activity = current_tick;
 
-    write_transfer(dummy, 1);
-
-    return ret;
+    return 0;
 }
 
 int ata_read_sectors(IF_MV2(int drive,)
@@ -628,75 +692,120 @@ int ata_read_sectors(IF_MV2(int drive,)
                      int incount,
                      void* inbuf)
 {
-    int ret = 0;
-    int last_sector;
-    unsigned long addr;
+    int rc = 0;
+    unsigned int blocksize, offset;
+    unsigned long c_addr, c_end_addr;
+    unsigned long c_block, c_end_block;
     unsigned char response;
     void *inbuf_prev = NULL;
     tCardInfo *card;
 
-    addr = start * SECTOR_SIZE;
-
+    c_addr = start * SECTOR_SIZE;
+    c_end_addr = c_addr + incount * SECTOR_SIZE;
+    
     mutex_lock(&mmc_mutex);
     led(true);
 #ifdef HAVE_MULTIVOLUME
     card = &card_info[drive];
-    ret = select_card(drive);
+    rc = select_card(drive);
 #else
     card = &card_info[current_card];
-    ret = select_card(current_card);
+    rc = select_card(current_card);
 #endif
-    if (start + incount > card->numsectors)
+    if (rc)
     {
-        ret = -15;
-        /* panicf("Reading %d@%d, past end of card %d\n", 
-            incount, start, card->numsectors); */
+        rc = rc * 10 - 1;
+        goto error;
+    }
+    if (c_end_addr > card->size)
+    {
+        rc = -2;
+        goto error;
     }
 
+    blocksize = card->blocksize;
+    offset = c_addr & (blocksize - 1);
+    c_block = c_addr >> card->block_exp;
+    c_end_block = c_end_addr >> card->block_exp;
+
+    if (offset) /* first partial block */
+    {
+        unsigned long len = MIN(c_end_addr - c_addr, blocksize - offset);
+
+        rc = cache_block(IF_MV2(drive,) c_block, blocksize,
+                         card->read_timeout);
+        if (rc)
+        {
+            rc = rc * 10 - 3;
+            goto error;
+        }
+        swapcopy(inbuf, block_cache[current_cache].data + 2 + offset, len);
+        inbuf += len;
+        c_addr += len;
+        c_block++;
+    }
     /* some cards don't like reading the very last sector with
      * CMD_READ_MULTIPLE_BLOCK, so make sure this sector is always
-     * read with CMD_READ_SINGLE_BLOCK. */
-    last_sector = (start + incount == card->numsectors) ? 1 : 0;
+     * read with CMD_READ_SINGLE_BLOCK. This is caught by the 'last
+     * partial block' read. */
+    if (c_end_block == card->numblocks)
+        c_end_block--;
 
-    if (ret == 0)
+    if (c_block < c_end_block)
     {
-        if (incount > 1)
+        rc = send_cmd(CMD_READ_MULTIPLE_BLOCK, c_addr, &response);
+        if (rc)
         {
-            ret = send_cmd(CMD_READ_MULTIPLE_BLOCK, addr, &response);
-            for (; (incount > last_sector) && (ret == 0); incount--)
-            {
-                ret = receive_sector(inbuf, inbuf_prev, card->read_timeout);
-                inbuf_prev = inbuf;
-                inbuf += SECTOR_SIZE;
-                last_disk_activity = current_tick;
-            }
-            if (ret == 0)
-                ret = send_cmd(CMD_STOP_TRANSMISSION, 0, &response);
+            rc = rc * 10 - 4;
+            goto error;
         }
-        if (incount && (ret == 0))
+        while (c_block < c_end_block)
         {
-            ret = send_cmd(CMD_READ_SINGLE_BLOCK, addr, &response);
-            if (ret == 0)
+            rc = receive_block(inbuf, inbuf_prev, blocksize,
+                               card->read_timeout);
+            if (rc)
             {
-                ret = receive_sector(inbuf, inbuf_prev, card->read_timeout);
-                inbuf_prev = inbuf;
-                last_disk_activity = current_tick;
+                rc = rc * 10 - 5;
+                goto error;
             }
+            last_disk_activity = current_tick;
+            inbuf_prev = inbuf;
+            inbuf += blocksize;
+            c_addr += blocksize;
+            c_block++;
         }
-            
-        if (ret == 0)
-            bitswap(inbuf_prev, SECTOR_SIZE);
+        rc = send_cmd(CMD_STOP_TRANSMISSION, 0, &response);
+        if (rc)
+        {
+            rc = rc * 10 - 6;
+            goto error;
+        }
+        bitswap(inbuf_prev, blocksize);
     }
+    if (c_addr < c_end_addr) /* last partial block */
+    {
+        rc = cache_block(IF_MV2(drive,) c_block, blocksize,
+                         card->read_timeout);
+        if (rc)
+        {
+            rc = rc * 10 - 7;
+            goto error;
+        }
+        swapcopy(inbuf, block_cache[current_cache].data + 2,
+                 c_end_addr - c_addr);
+    }
+
+  error:
 
     deselect_card();
     led(false);
     mutex_unlock(&mmc_mutex);
     
     /* only flush if reading went ok */
-    if ( (ret == 0) && delayed_write )
+    if ( (rc == 0) && delayed_write )
         ata_flush();
 
-    return ret;
+    return rc;
 }
 
 int ata_write_sectors(IF_MV2(int drive,)
@@ -704,70 +813,145 @@ int ata_write_sectors(IF_MV2(int drive,)
                       int count,
                       const void* buf)
 {
-    int ret = 0;
-    unsigned long addr;
+    int rc = 0;
+    unsigned int blocksize, offset;
+    unsigned long c_addr, c_end_addr;
+    unsigned long c_block, c_end_block;
     unsigned char response;
     tCardInfo *card;
 
     if (start == 0)
         panicf("Writing on sector 0\n");
 
-    addr = start * SECTOR_SIZE;
-    
+    c_addr = start * SECTOR_SIZE;
+    c_end_addr = c_addr + count * SECTOR_SIZE;
+
     mutex_lock(&mmc_mutex);
     led(true);
 #ifdef HAVE_MULTIVOLUME
     card = &card_info[drive];
-    ret = select_card(drive);
+    rc = select_card(drive);
 #else
     card = &card_info[current_card];
-    ret = select_card(current_card);
+    rc = select_card(current_card);
 #endif
-    if (start + count > card->numsectors)
+    if (rc)
+    {
+        rc = rc * 10 - 1;
+        goto error;
+    }
+
+    if (c_end_addr  > card->size)
         panicf("Writing past end of card\n");
 
-    if (ret == 0)
+    blocksize = card->blocksize;
+    offset = c_addr & (blocksize - 1);
+    c_block = c_addr >> card->block_exp;
+    c_end_block = c_end_addr >> card->block_exp;
+    
+    if (offset) /* first partial block */
     {
-        if (count == 1)
+        unsigned long len = MIN(c_end_addr - c_addr, blocksize - offset);
+
+        rc = cache_block(IF_MV2(drive,) c_block, blocksize,
+                         card->read_timeout);
+        if (rc)
         {
-            ret = send_cmd(CMD_WRITE_BLOCK, addr, &response);
-            if (ret == 0)
-                ret = send_single_sector(buf, card->write_timeout);
-            last_disk_activity = current_tick;
+            rc = rc * 10 - 2;
+            goto error;
         }
-        else
+        swapcopy(block_cache[current_cache].data + 2 + offset, buf, len);
+        rc = send_cmd(CMD_WRITE_BLOCK, c_addr - offset, &response);
+        if (rc)
         {
-            swapcopy_sector(buf); /* prepare first sector */
-            ret = send_cmd(CMD_WRITE_MULTIPLE_BLOCK, addr, &response);
-            for (; (count > 1) && (ret == 0); count--)
+            rc = rc * 10 - 3;
+            goto error;
+        }
+        buf += len;
+        rc = send_block(NULL, blocksize, DT_START_BLOCK, card->write_timeout);
+        if (rc)
+        {
+            rc = rc * 10 - 4;
+            goto error;
+        }
+        c_addr += len;
+        c_block++;
+    }
+    if (c_block < c_end_block)
+    {
+        swapcopy_block(buf, blocksize);
+        rc = send_cmd(CMD_WRITE_MULTIPLE_BLOCK, c_addr, &response);
+        if (rc)
+        {
+            rc = rc * 10 - 5;
+            goto error;
+        }
+        while (c_block < c_end_block - 1)
+        {
+            buf += blocksize;
+            rc = send_block(buf, blocksize, DT_START_WRITE_MULTIPLE,
+                            card->write_timeout);
+            if (rc)
             {
-                buf += SECTOR_SIZE;
-                ret = send_sector(buf, card->write_timeout);
-                last_disk_activity = current_tick;
+                rc = rc * 10 - 6;
+                goto error;
             }
-            if (ret == 0)
-            {
-                ret = send_sector(NULL, card->write_timeout);
-                if (ret == 0)
-                {
-                    response = DT_STOP_TRAN;
-                    write_transfer(&response, 1);
-                    poll_busy(card->write_timeout);
-                }
-                last_disk_activity = current_tick;
-            }
+            last_disk_activity = current_tick;
+            c_addr += blocksize;
+            c_block++;
+        }
+        buf += blocksize;
+        rc = send_block(NULL, blocksize, DT_START_WRITE_MULTIPLE,
+                        card->write_timeout);
+        if (rc)
+        {
+            rc = rc * 10 - 7;
+            goto error;
+        }
+        last_disk_activity = current_tick;
+        c_addr += blocksize;
+        c_block++;
+        
+        response = DT_STOP_TRAN;
+        write_transfer(&response, 1);
+        poll_busy(card->write_timeout);
+    }
+    if (c_addr < c_end_addr) /* last partial block */
+    {
+        rc = cache_block(IF_MV2(drive,) c_block, blocksize,
+                         card->read_timeout);
+        if (rc)
+        {
+            rc = rc * 10 - 8;
+            goto error;
+        }
+        swapcopy(block_cache[current_cache].data + 2, buf,
+                 c_end_addr - c_addr);
+        rc = send_cmd(CMD_WRITE_BLOCK, c_addr, &response);
+        if (rc)
+        {
+            rc = rc * 10 - 9;
+            goto error;
+        }
+        rc = send_block(NULL, blocksize, DT_START_BLOCK, card->write_timeout);
+        if (rc)
+        {
+            rc = rc * 10 - 9;
+            goto error;
         }
     }
+
+  error:
 
     deselect_card();
     led(false);
     mutex_unlock(&mmc_mutex);
 
     /* only flush if writing went ok */
-    if ( (ret == 0) && delayed_write )
+    if ( (rc == 0) && delayed_write )
         ata_flush();
 
-    return ret;
+    return rc;
 }
 
 /* While there is no spinup, the delayed write is still here to avoid
@@ -782,7 +966,8 @@ extern void ata_delayed_write(unsigned long sector, const void* buf)
 /* write the delayed sector to volume 0 */
 extern void ata_flush(void)
 {
-    if ( delayed_write ) {
+    if ( delayed_write ) 
+    {
         DEBUGF("ata_flush()\n");
         delayed_write = false;
         ata_write_sectors(IF_MV2(0,) delayed_sector_num, 1, delayed_sector);
@@ -823,7 +1008,8 @@ static void mmc_thread(void)
     
     while (1) {
         queue_wait(&mmc_queue, &ev);
-        switch ( ev.id ) {
+        switch ( ev.id ) 
+        {
             case SYS_USB_CONNECTED:
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 /* Wait until the USB cable is extracted again */
