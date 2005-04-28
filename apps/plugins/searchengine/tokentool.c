@@ -49,6 +49,7 @@ main() {
 	  	  printf("Token spelling? ");
 		  fflush(stdout);
 		  fgets(token.spelling,254,stdin);
+		  token.spelling[strlen(token.spelling)-1]=0;
 		}
                 if(token.kind==TOKEN_STRINGIDENTIFIER)
                         printf("TITLE=4 ARTIST=5 ALBUM=6 GENRE=7 FILENAME=8\n");
