@@ -50,7 +50,7 @@
 
 struct token {
       unsigned char kind;
-      char spelling[256];
+      char spelling[255]; // 255 should make it aligned again..
       long intvalue;
 };
 
