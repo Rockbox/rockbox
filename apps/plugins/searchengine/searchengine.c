@@ -35,12 +35,14 @@ void *my_malloc(size_t size)
     {
         audio_bufferbase = audio_bufferpointer
             = rb->plugin_get_audio_buffer(&audio_buffer_free);
+        audio_bufferpointer+=3;
+        audio_bufferpointer&=~3;
     }
     if (size + 4 > audio_buffer_free)
         return 0;
     alloc = audio_bufferpointer;
-    audio_bufferpointer += size + 4;
-    audio_buffer_free -= size + 4;
+    audio_bufferpointer +=(size+3)&~3; // alignment
+    audio_buffer_free -= (size+3)&~3;
     return alloc;
 }
 
