@@ -44,7 +44,7 @@ int database_init() {
     p=(char *)entryarray;
     // zero all entries.
     for(i=0;i<sizeof(struct entry)*rb->tagdbheader->filecount;i++) 
-	    *(p++)=0;
+        *(p++)=0;
     if(*rb->tagdb_initialized!=1) {
         if(!rb->tagdb_init()) {
             // failed loading db
@@ -55,21 +55,21 @@ int database_init() {
 }
 
 long readlong(int fd) {
-	long num;
-	rb->read(fd,&num,4);
+    long num;
+    rb->read(fd,&num,4);
 #ifdef ROCKBOX_LITTLE_ENDIAN
-	num=BE32(num);
+    num=BE32(num);
 #endif
-	return num;
+    return num;
 }
 
 short readshort(int fd) {
-        short num;
-        rb->read(fd,&num,2);
+    short num;
+    rb->read(fd,&num,2);
 #ifdef ROCKBOX_LITTLE_ENDIAN
-        num=BE16(num);
+    num=BE16(num);
 #endif
-        return num;
+    return num;
 }
 
 
@@ -77,11 +77,11 @@ void loadentry(int filerecord) {
     if(entryarray[filerecord].loadedfiledata==0) {
         rb->lseek(*rb->tagdb_fd,FILERECORD2OFFSET(filerecord),SEEK_SET);
         entryarray[filerecord].filename=(char *)my_malloc(rb->tagdbheader->filelen);
-	rb->read(*rb->tagdb_fd,entryarray[filerecord].filename,rb->tagdbheader->filelen);
-	entryarray[filerecord].hash=readlong(*rb->tagdb_fd);
-	entryarray[filerecord].songentry=readlong(*rb->tagdb_fd);
-	entryarray[filerecord].rundbentry=readlong(*rb->tagdb_fd);
-	entryarray[filerecord].loadedfiledata=1;
+        rb->read(*rb->tagdb_fd,entryarray[filerecord].filename,rb->tagdbheader->filelen);
+        entryarray[filerecord].hash=readlong(*rb->tagdb_fd);
+        entryarray[filerecord].songentry=readlong(*rb->tagdb_fd);
+        entryarray[filerecord].rundbentry=readlong(*rb->tagdb_fd);
+        entryarray[filerecord].loadedfiledata=1;
     }
     currententry=&entryarray[filerecord];
 }
@@ -103,7 +103,7 @@ void loadsongdata() {
 }
 
 void loadrundbdata() {
-	// we don't do this yet.
+    // we don't do this yet.
     currententry->loadedrundbdata=1;
 }
 
@@ -112,7 +112,7 @@ void loadartistname() {
     * write that pointer to the entrys using it.
    */
    if(currententry->loadedartistname)
-	   return;
+       return;
    loadsongdata();
    currententry->artistname=(char *)my_malloc(rb->tagdbheader->artistlen);
    rb->lseek(*rb->tagdb_fd,currententry->artistoffset,SEEK_SET);
@@ -123,7 +123,7 @@ void loadartistname() {
 void loadalbumname() {
    /* see the note at loadartistname */
    if(currententry->loadedalbumname)
-      return;      
+       return;      
    loadsongdata();
    currententry->albumname=(char *)my_malloc(rb->tagdbheader->albumlen);
    rb->lseek(*rb->tagdb_fd,currententry->albumoffset,SEEK_SET);
@@ -133,7 +133,7 @@ void loadalbumname() {
 
 char *getfilename(int entry) {
    if(entryarray[entry].loadedfiledata==0)
-	   return "error O.o;;;";
+       return "error O.o;;;";
    else
-	   return entryarray[entry].filename;
+       return entryarray[entry].filename;
 }

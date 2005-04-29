@@ -72,7 +72,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     parsefd=rb->open(parameter,O_RDONLY);
     if(parsefd<0) {
         rb->splash(2*HZ,true,"Unable to open search tokenstream");
-	return PLUGIN_ERROR;	
+        return PLUGIN_ERROR;    
     }
     result=parse(parsefd);
     rb->snprintf(buf,250,"Retval: 0x%x",result);
@@ -80,15 +80,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->close(parsefd);
     hits=0;
     if(result!=0) {
-	int fd=rb->open("/search.m3u", O_WRONLY|O_CREAT|O_TRUNC);
-	int i;
-	for(i=0;i<rb->tagdbheader->filecount;i++)
-	  if(result[i]) {
-            hits++;
-	    rb->fdprintf(fd,"%s\n",getfilename(i));
-	  }
-/*	rb->write(fd,result,rb->tagdbheader->filecount);*/
-    	rb->close(fd);
+        int fd=rb->open("/search.m3u", O_WRONLY|O_CREAT|O_TRUNC);
+        int i;
+        for(i=0;i<rb->tagdbheader->filecount;i++)
+            if(result[i]) {
+                hits++;
+                rb->fdprintf(fd,"%s\n",getfilename(i));
+            }
+        rb->close(fd);
     }
     rb->snprintf(buf,250,"Hits: %d",hits);
     rb->splash(HZ*3,true,buf);

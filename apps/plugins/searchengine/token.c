@@ -21,59 +21,59 @@
 #include "dbinterface.h"
 
 char *getstring(struct token *token) {
-	switch(token->kind) {
-		case TOKEN_STRING:
-			return token->spelling;
-		case TOKEN_STRINGIDENTIFIER:
-			switch(token->intvalue) {
-				case INTVALUE_TITLE:
-					loadsongdata();
-					return currententry->title;
-				case INTVALUE_ARTIST:
-					loadartistname();
-					return currententry->artistname;
-				case INTVALUE_ALBUM:
-					loadalbumname();
-					return currententry->albumname;
-				case INTVALUE_GENRE:
-					loadsongdata();
-					return currententry->genre;
-				case INTVALUE_FILENAME:
-					return currententry->filename;
-				default:
-					rb->splash(HZ*2,true,"unknown stringid intvalue");
-					return 0;
-			}
-			break;
-		default:
-			// report error
-			 rb->splash(HZ*2,true,"unknown token...");
-			return 0;
-	}
+    switch(token->kind) {
+        case TOKEN_STRING:
+            return token->spelling;
+        case TOKEN_STRINGIDENTIFIER:
+            switch(token->intvalue) {
+                case INTVALUE_TITLE:
+                    loadsongdata();
+                    return currententry->title;
+                case INTVALUE_ARTIST:
+                    loadartistname();
+                    return currententry->artistname;
+                case INTVALUE_ALBUM:
+                    loadalbumname();
+                    return currententry->albumname;
+                case INTVALUE_GENRE:
+                    loadsongdata();
+                    return currententry->genre;
+                case INTVALUE_FILENAME:
+                    return currententry->filename;
+                default:
+                    rb->splash(HZ*2,true,"unknown stringid intvalue");
+                    return 0;
+            }
+            break;
+        default:
+            // report error
+             rb->splash(HZ*2,true,"unknown token...");
+            return 0;
+    }
 }
 
 int getvalue(struct token *token) {
-	switch(token->kind) {
-		case TOKEN_NUM:
-			return token->intvalue;
-		case TOKEN_NUMIDENTIFIER:
-			switch(token->intvalue) {
-				case INTVALUE_YEAR:
-					loadsongdata();
-					return currententry->year;
-				case INTVALUE_RATING:
-					loadrundbdata();
-					return currententry->rating;
-				case INTVALUE_PLAYCOUNT:
-					loadrundbdata();
-					return currententry->playcount;
-				default:
-					rb->splash(HZ*2,true,"unknown numid intvalue");
-					// report error.
-					return 0;
-			}
-		default:
-			rb->splash(HZ*2,true,"unknown token...");
-			return 0;
-	}
+    switch(token->kind) {
+        case TOKEN_NUM:
+            return token->intvalue;
+        case TOKEN_NUMIDENTIFIER:
+            switch(token->intvalue) {
+                case INTVALUE_YEAR:
+                    loadsongdata();
+                    return currententry->year;
+                case INTVALUE_RATING:
+                    loadrundbdata();
+                    return currententry->rating;
+                case INTVALUE_PLAYCOUNT:
+                    loadrundbdata();
+                    return currententry->playcount;
+                default:
+                    rb->splash(HZ*2,true,"unknown numid intvalue");
+                    // report error.
+                    return 0;
+            }
+        default:
+            rb->splash(HZ*2,true,"unknown token...");
+            return 0;
+    }
 }
