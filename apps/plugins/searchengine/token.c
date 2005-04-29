@@ -21,6 +21,7 @@
 #include "dbinterface.h"
 
 char *getstring(struct token *token) {
+    char buf[200];
     switch(token->kind) {
         case TOKEN_STRING:
             return token->spelling;
@@ -41,18 +42,21 @@ char *getstring(struct token *token) {
                 case INTVALUE_FILENAME:
                     return currententry->filename;
                 default:
-                    rb->splash(HZ*2,true,"unknown stringid intvalue");
-                    return 0;
+                    rb->snprintf(buf,199,"unknown stringid intvalue %d",token->intvalue);
+                    rb->splash(HZ*2,true,buf);
+                    return "";
             }
             break;
         default:
             // report error
-             rb->splash(HZ*2,true,"unknown token...");
-            return 0;
+            rb->snprintf(buf,199,"unknown token %d in getstring..",token->kind); 
+            rb->splash(HZ*2,true,buf);
+            return "";
     }
 }
 
 int getvalue(struct token *token) {
+    char buf[200];
     switch(token->kind) {
         case TOKEN_NUM:
             return token->intvalue;
@@ -68,12 +72,14 @@ int getvalue(struct token *token) {
                     loadrundbdata();
                     return currententry->playcount;
                 default:
-                    rb->splash(HZ*2,true,"unknown numid intvalue");
+                    rb->snprintf(buf,199,"unknown numid intvalue %d",token->intvalue);
+                    rb->splash(HZ*2,true,buf);
                     // report error.
                     return 0;
             }
         default:
-            rb->splash(HZ*2,true,"unknown token...");
+            rb->snprintf(buf,199,"unknown token %d in getvalue..",token->kind);
+            rb->splash(HZ*2,true,buf);
             return 0;
     }
 }
