@@ -120,5 +120,6 @@ clean:
 	$(OBJS) $(DEFS)
 	@$(MAKE) -C lib clean
 	@$(MAKE) -C rockboy clean
+	@$(MAKE) -C searchengine clean
 
 -include $(DEPFILE)
