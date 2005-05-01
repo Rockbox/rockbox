@@ -1047,7 +1047,8 @@ static bool playback_settings_menu(void)
     result = menu_run(m);
     menu_exit(m);
 
-    if (old_shuffle != global_settings.playlist_shuffle)
+    if ((old_shuffle != global_settings.playlist_shuffle) 
+        && (audio_status() & AUDIO_STATUS_PLAY))
     {
         if (global_settings.playlist_shuffle)
         {
