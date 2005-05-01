@@ -308,7 +308,9 @@ bool recording_screen(void)
     char path_buffer[MAX_PATH];
     bool been_in_usb_mode = false;
     int last_audio_stat = -1;
+#ifdef HAVE_LED
     bool last_led_stat = false;
+#endif
 
     const unsigned char *byte_units[] = {
         ID2P(LANG_BYTE),
@@ -354,6 +356,7 @@ bool recording_screen(void)
     while(!done)
     {
         int audio_stat = audio_status();
+#ifdef HAVE_LED
 
         /*
          * Flash the LED while waiting to record.  Turn it on while
@@ -408,6 +411,7 @@ bool recording_screen(void)
                 led(false);
             }
         }
+#endif /* HAVE_LED */
 
         /* Wait for a button while drawing the peak meter */
         button = peak_meter_draw_get_btn(0, 8 + h*2, LCD_WIDTH, h);
@@ -597,8 +601,10 @@ bool recording_screen(void)
             case REC_SETTINGS:
                 if(audio_stat != AUDIO_STATUS_RECORD)
                 {
+#ifdef HAVE_LED
                     /* led is restored at begin of loop / end of function */
                     led(false);
+#endif
                     if (recording_menu(false))
                     {
                         return SYS_USB_CONNECTED;
@@ -628,8 +634,10 @@ bool recording_screen(void)
             case REC_F2:
                 if(audio_stat != AUDIO_STATUS_RECORD)
                 {
+#ifdef HAVE_LED
                     /* led is restored at begin of loop / end of function */
                     led(false);
+#endif
                     if (f2_rec_screen())
                     {
                         have_recorded = true;
@@ -652,8 +660,10 @@ bool recording_screen(void)
                 {
                     if(audio_stat != AUDIO_STATUS_RECORD)
                     {
+#ifdef HAVE_LED
                         /* led is restored at begin of loop / end of function */
                         led(false);
+#endif
                         if (f3_rec_screen())
                         {
                             have_recorded = true;
