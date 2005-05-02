@@ -15,6 +15,7 @@ sort.c
 stopwatch.c
 vbrfix.c
 viewer.c
+dict.c
 
 #ifdef HAVE_LCD_BITMAP /* Recorder/Ondio models only */
 bounce.c
