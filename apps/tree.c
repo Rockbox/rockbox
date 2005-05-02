@@ -1562,7 +1562,8 @@ int ft_play_dirname(int start_index)
         return 0;
 
     snprintf(dirname_mp3_filename, sizeof(dirname_mp3_filename), "%s/%s/%s",
-             tc.currdir, dircache[start_index].name, dir_thumbnail_name);
+             tc.currdir[1] ? tc.currdir : "" , dircache[start_index].name,
+             dir_thumbnail_name);
 
     DEBUGF("Checking for %s\n", dirname_mp3_filename);
 
