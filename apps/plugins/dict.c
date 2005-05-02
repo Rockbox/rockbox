@@ -26,7 +26,6 @@ static int display_columns, display_lines;
 
 /* Some lenghts */
 #define WORDLEN 32 /* has to be the same in rdf2binary.c */
-#define DESCLEN 2048
 
 /* The word struct :) */
 struct stWord
@@ -49,6 +48,33 @@ void init_screen(void)
     display_lines = 2;
     display_columns = 11;
 #endif
+}
+
+/* global vars for pl_malloc() */
+void *bufptr;
+int bufleft;
+
+/* simple function to "allocate" memory in pluginbuffer. */
+void *pl_malloc(int size)
+{
+    void *ptr;
+    ptr = bufptr;
+
+    if (bufleft < size)
+    {
+        return NULL;
+    }
+    else
+    {
+        bufptr += size;
+        return ptr;
+    }
+}
+
+/* init function for pl_malloc() */
+void pl_malloc_init(void)
+{
+    bufptr = rb->plugin_get_buffer(&bufleft);
 }
 
 /* for endian problems */
@@ -74,8 +100,8 @@ long readlong(void* value)
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     char searchword[WORDLEN]; /* word to search for */
-    char description[DESCLEN]; /* description buffer */
-    char output[DESCLEN]; /* output buffer */
+    char *description; /* pointer to description buffer */
+    char *output; /* pointer to output buffer */
     char *ptr, *space;
     struct stWord word; /* the struct to read into */
     int fIndex, fData; /* files */
@@ -89,6 +115,25 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     /* get screen info */
     init_screen();
+
+    /* get pl_malloc() buffer ready. */
+    pl_malloc_init();
+
+    /* init description buffer (size is because we don't have scrolling)*/
+    description = (char *)pl_malloc(display_columns * display_lines);
+    if (description == NULL)
+    {
+        DEBUGF("Err: failed to allocate description buffer.");
+        return PLUGIN_ERROR;
+    }
+
+    /* init output buffer */
+    output = (char *)pl_malloc(display_columns);
+    if (output == NULL)
+    {
+        DEBUGF("Err: failed to allocate output buffer.");
+        return PLUGIN_ERROR;
+    }
 
     /* "clear" input buffer */
     searchword[0] = '\0';
@@ -160,7 +205,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lseek(fData, readlong(&word.offset), SEEK_SET);
 
     /* Read in the description */
-    rb->read_line(fData, description, DESCLEN);
+    rb->read_line(fData, description, display_columns * display_lines);
 
     /* And print it to debug. */
     DEBUGF("Description: %s\n", description);
