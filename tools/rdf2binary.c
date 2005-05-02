@@ -46,15 +46,14 @@ long long_to_big_endian (void* value)
 
 int main()
 {
-    FILE *in;
-    int idx_out, desc_out;
+    FILE *in, *idx_out, *desc_out;
     struct word w;
     char buf[10000];
     long cur_offset = 0;
 
     in = fopen("dict.preparsed", "r");
-    idx_out = open("dict.index", O_WRONLY | O_CREAT);
-    desc_out = open("dict.desc", O_WRONLY | O_CREAT);
+    idx_out = fopen("dict.index", "wb");
+    desc_out = fopen("dict.desc", "wb");
 
     if (in == NULL || idx_out < 0 || desc_out < 0)
     {
@@ -79,20 +78,20 @@ int main()
         /* We will null-terminate the words */
         strncpy(w.word, word, WORDLEN - 1);
         w.offset = long_to_big_endian(&cur_offset);
-        write(idx_out, &w, sizeof(struct word));
+        fwrite(&w, sizeof(struct word), 1, idx_out);
 
         while (1)
         {
             int len = strlen(desc);
             cur_offset += len;
-            write(desc_out, desc, len);
+            fwrite(desc, len, 1, desc_out);
 
             desc = strtok(NULL, "\t");
             if (desc == NULL)
                 break ;
 
             cur_offset++;
-            write(desc_out, "\n", 1);
+            fwrite("\n", 1, 1, desc_out);
 
         }
     }
