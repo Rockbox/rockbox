@@ -9,7 +9,7 @@
 CFLAGS := -O -ansi -g
 LDFLAGS := -g
 
-TARGETS := scramble descramble sh2d bmp2rb convbdf generate_rocklatin mkboot
+TARGETS := scramble descramble sh2d bmp2rb rdf2binary convbdf generate_rocklatin mkboot
 
 all: $(TARGETS)
 	@echo "tools done"
@@ -25,6 +25,9 @@ sh2d: sh2d.c
 
 bmp2rb:	bmp2rb.c
 	$(CC) -DAPPLICATION_NAME=\"$@\" -g $+ -o $@
+
+rdf2binary:	rdf2binary.c
+	$(CC) -g $+ -o $@
 
 mkboot:	mkboot.c
 	$(CC) -g $+ -o $@
