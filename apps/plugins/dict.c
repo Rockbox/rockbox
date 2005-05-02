@@ -52,7 +52,7 @@ void init_screen(void)
 }
 
 /* for endian problems */
-#ifdef LITTLE_ENDIAN
+#ifdef ROCKBOX_BIG_ENDIAN
 #define readlong(x) x
 #else
 long readlong(void* value)
@@ -140,7 +140,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     {
         DEBUGF("Not found.\n");
         rb->splash(HZ*2, true, "Not found.");
-		rb->close(fIndex);
+        rb->close(fIndex);
         return PLUGIN_OK;
     }
 
@@ -152,7 +152,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     {
         DEBUGF("Err: Failed to open description file.\n");
         rb->splash(HZ*2, true, "Failed to open descriptions.");
-		rb->close(fIndex);
+        rb->close(fIndex);
         return PLUGIN_ERROR;
     }
 
@@ -187,14 +187,15 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     {
         /* copy one lcd line */
         rb->strncpy(output, ptr, display_columns);
-		output[display_columns] = '\0';
+        output[display_columns] = '\0';
 
-		/* unsigned to kill a warning... */
-		if((int)rb->strlen(ptr) < display_columns) {
-			rb->lcd_puts(0, lines, output);
+        /* typecast to kill a warning... */
+        if((int)rb->strlen(ptr) < display_columns)
+        {
+            rb->lcd_puts(0, lines, output);
             lines++;
-			break;
-		}
+            break;
+        }
 
 
         /* get the last spacechar */
@@ -210,7 +211,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             next = display_columns;
         }
 
-		/* put the line on screen */
+        /* put the line on screen */
         rb->lcd_puts(0, lines, output);
 
         /* get output count */
@@ -240,6 +241,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }
 
     rb->close(fIndex);
-	rb->close(fData);
+    rb->close(fData);
     return PLUGIN_OK;
 }
