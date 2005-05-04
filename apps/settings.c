@@ -73,7 +73,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 
 
 
-#define CONFIG_BLOCK_VERSION 20
+#define CONFIG_BLOCK_VERSION 21
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -382,82 +382,49 @@ static const struct bit_entry hd_bits[] =
     /* Sum of all bit sizes must not grow beyond 0xB8*8 = 1472 */
 };
 
-
-/* helper function to extract n (<=32) bits from an arbitrary position */
+/* helper function to extract n (<=32) bits from an arbitrary position
+ * counting from LSB to MSB */
 static unsigned long get_bits(
     const unsigned long* p, /* the start of the bitfield array */
     unsigned int from, /* bit no. to start reading from */
     unsigned int size) /* how many bits to read */
 {
-    unsigned int bit_index;
-    unsigned int bits_to_use;
-
-    unsigned long mask;
+    unsigned int long_index = from / 32;
+    unsigned int bit_index = from % 32;
     unsigned long result;
 
-    if (size==1)
-    {   /* short cut */
-        return (p[from/32] & 1<<from%32) != 0;
-    }
+    result = p[long_index] >> bit_index;
 
-    result = 0;
-    while (size)
-    {
-        bit_index = from % 32;
-        bits_to_use = MIN(32 - bit_index, size);
-        mask = 0xFFFFFFFF >> (32 - bits_to_use);
-        mask <<= bit_index;
+    if (bit_index + size > 32)     /* crossing longword boundary */
+        result |= p[long_index+1] << (32 - bit_index);
 
-        result <<= bits_to_use; /* from last round */
-        result |= (p[from/32] & mask) >> bit_index;
-
-        from += bits_to_use;
-        size -= bits_to_use;
-    }
+    result &= 0xFFFFFFFF >> (32 - size);
 
     return result;
 }
 
-/* helper function to set n (<=32) bits to an arbitrary position */
+/* helper function to set n (<=32) bits to an arbitrary position,
+ * counting from LSB to MSB */
 static void set_bits(
     unsigned long* p, /* the start of the bitfield array */
     unsigned int from, /* bit no. to start writing into */
     unsigned int size, /* how many bits to change */
     unsigned long value) /* content (LSBs will be taken) */
 {
-    unsigned int end;
-    unsigned int word_index, bit_index;
-    unsigned int bits_to_use;
-
+    unsigned int long_index = from / 32;
+    unsigned int bit_index = from % 32;
     unsigned long mask;
 
-    if (size==1)
-    {   /* short cut */
-        if (value & 1)
-            p[from/32] |= 1<<from%32;
-        else
-            p[from/32] &= ~(1<<from%32);
-        return;
-    }
+    mask = 0xFFFFFFFF >> (32 - size);
+    value &= mask;
+    mask <<= bit_index;
 
-    end = from + size - 1;
+    if (bit_index + size > 32)
+        p[long_index+1] = 
+            (p[long_index+1] & (0xFFFFFFFF << (bit_index + size - 32)))
+            | (value >> (32 - bit_index));
 
-    /* write back to front, least to most significant */
-    while (size)
-    {
-        word_index = end / 32;
-        bit_index = (end % 32) + 1;
-        bits_to_use = MIN(bit_index, size);
-        bit_index -= bits_to_use;
-        mask = 0xFFFFFFFF >> (32 - bits_to_use);
-        mask <<= bit_index;
-
-        p[word_index] = (p[word_index] & ~mask) | (value<<bit_index & mask);
-
-        value >>= bits_to_use;
-        size -= bits_to_use;
-        end -= bits_to_use;
-    }
+    p[long_index] = (p[long_index] & ~mask) | (value << bit_index);
 }
 
 /*

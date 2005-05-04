@@ -395,29 +395,16 @@ unsigned long mmc_extract_bits(
     unsigned int start,     /* bit no. to start reading  */
     unsigned int size)      /* how many bits to read */
 {
-    unsigned int bit_index;
-    unsigned int bits_to_use;
-    unsigned long mask;
+    unsigned int long_index = start / 32;
+    unsigned int bit_index = start % 32;
     unsigned long result;
+    
+    result = p[long_index] << bit_index;
 
-    if (size == 1)
-    {   /* short cut */
-        return ((p[start/32] >> (31 - (start % 32))) & 1);
-    }
-
-    result = 0;
-    while (size)
-    {
-        bit_index = start % 32;
-        bits_to_use = MIN(32 - bit_index, size);
-        mask = 0xFFFFFFFF >> (32 - bits_to_use);
-
-        result <<= bits_to_use; /* start last round */
-        result |= (p[start/32] >> (32 - bits_to_use - bit_index)) & mask;
-
-        start += bits_to_use;
-        size -= bits_to_use;
-    }
+    if (bit_index + size > 32)    /* crossing longword boundary */
+        result |= p[long_index+1] >> (32 - bit_index);
+        
+    result >>= 32 - size;
 
     return result;
 }
