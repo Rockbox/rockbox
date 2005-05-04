@@ -1085,7 +1085,7 @@ int ata_hard_reset(void)
     /* state HRR1 */
     or_b(0x02, &PADRH); /* negate _RESET */
     sleep(1); /* > 2ms */
-#elif config_cpu == MCF5249
+#elif CONFIG_CPU == MCF5249
     GPIO_OUT &= ~0x00080000;
     sleep(1); /* > 25us */
 
