@@ -20,40 +20,22 @@
 #define _POWERMGMT_H_
 
 #if CONFIG_BATTERY == BATT_LIION2200 /* FM Recorder, LiIon */
-#define BATTERY_LEVEL_SHUTDOWN   260 /* 2.60V */
-#define BATTERY_LEVEL_EMPTY      265 /* 2.65V */
-#define BATTERY_LEVEL_DANGEROUS  280 /* 2.80V */
-#define BATTERY_LEVEL_FULL       400 /* 4.00V */
 #define BATTERY_CAPACITY_MIN 2200
 #define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable in settings */
 #define BATTERY_TYPES_COUNT      1
 #elif CONFIG_BATTERY == BATT_3AAA /* Ondio */
-#define BATTERY_LEVEL_SHUTDOWN   260 /* 2.60V */
-#define BATTERY_LEVEL_EMPTY      270 /* 2.70V */
-#define BATTERY_LEVEL_DANGEROUS  280 /* 2.80V */
-#define BATTERY_LEVEL_FULL       475 /* 4.75V */
 #define BATTERY_CAPACITY_MIN 500
 #define BATTERY_CAPACITY_MAX 1500 /* max. capacity selectable in settings */
 #define BATTERY_TYPES_COUNT      2   /* Alkalines or NiMH */
 #elif CONFIG_BATTERY == BATT_LIPOL1300 /* iRiver H1x0 */
-#define BATTERY_LEVEL_SHUTDOWN   306 /* 3.06V */
-#define BATTERY_LEVEL_EMPTY      330 /* 3.30V */
-#define BATTERY_LEVEL_DANGEROUS  339 /* 3.39V */
-#define BATTERY_LEVEL_FULL       400 /* 4.00V */
 #define BATTERY_CAPACITY_MIN 1300
 #define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable in settings */
 #define BATTERY_TYPES_COUNT      1
 #else /* Recorder, NiMH */
-#define BATTERY_LEVEL_SHUTDOWN   450 /* 4.50V */
-#define BATTERY_LEVEL_EMPTY      465 /* 4.65V */
-#define BATTERY_LEVEL_DANGEROUS  475 /* 4.75V */
-#define BATTERY_LEVEL_FULL       585 /* 5.85V */
 #define BATTERY_CAPACITY_MIN 1500
 #define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable in settings */
 #define BATTERY_TYPES_COUNT      1
 #endif
-
-#define BATTERY_RANGE (BATTERY_LEVEL_FULL - BATTERY_LEVEL_EMPTY)
 
 #define POWER_HISTORY_LEN 2*60   /* 2 hours of samples, one per minute */
 

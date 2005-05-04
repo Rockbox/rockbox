@@ -101,6 +101,19 @@ static const int poweroff_idle_timeout_value[15] =
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 30, 45, 60
 };
 
+static const unsigned int battery_level_dangerous[BATTERY_TYPES_COUNT] =
+{
+#if CONFIG_BATTERY == BATT_LIION2200 /* FM Recorder, LiIon */
+    280
+#elif CONFIG_BATTERY == BATT_3AAA /* Ondio */
+    310, 345    /* alkaline, NiHM */
+#elif CONFIG_BATTERY == BATT_LIPOL1300 /* iRiver H1x0 */
+    339
+#else /* Player/recorder, NiMH */
+    475
+#endif
+};
+
 static const short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 /* voltages (centivolt) of 0%, 10%, ... 100% when charging disabled */
 {
@@ -239,7 +252,7 @@ int battery_level(void)
 /* Tells if the battery level is safe for disk writes */
 bool battery_level_safe(void)
 {
-    return battery_centivolts > BATTERY_LEVEL_DANGEROUS;
+    return battery_centivolts > battery_level_dangerous[battery_type];
 }
 
 void set_poweroff_timeout(int timeout)
