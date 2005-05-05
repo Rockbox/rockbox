@@ -1119,9 +1119,16 @@ static bool dirbrowse(void)
             case SYS_FS_CHANGED:
                 if (!id3db) /* file browsing */
                 {
-                    /* FixMe: skip this if not in root 
-                       and our path is still valid */
-                    reload_root = true; /* the dumb way */
+                    if (currdir[1])     /* not in the root */
+                    {
+                        DIR *dir = opendir(currdir);
+                        if (dir)        /* path still valid */
+                        {
+                            closedir(dir);
+                            break;      /* don't reload the root */
+                        }
+                    }
+                    reload_root = true;
                 }
                 break;
 #endif
