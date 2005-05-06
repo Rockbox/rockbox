@@ -267,7 +267,7 @@ exit:
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
 /*---------------------------------------------------*/
-extern int ata_device;
+extern char ata_device;
 extern int ata_io_address;
 extern int num_threads;
 extern const char *thread_name[];
@@ -1063,7 +1063,7 @@ bool dbg_cpufreq(void)
     return false;
 }
 #endif
-
+               
 #ifdef HAVE_RTC
 /* Read RTC RAM contents and display them */
 bool dbg_rtc(void)
@@ -1373,7 +1373,7 @@ bool view_battery(void)
 }
 
 #endif
-
+                              
 #if CONFIG_HWCODEC == MAS3507D
 bool dbg_mas_info(void)
 {
