@@ -151,15 +151,27 @@ bool show_credits(void)
 #ifdef SIMULATOR
 extern bool simulate_usb(void);
 #endif
+
+#ifdef HAVE_LCD_CHARCELLS
+#define SIZE_FMT "%s%s"
+#else
+#define SIZE_FMT "%s %s"
+#endif
+
 bool show_info(void)
 {
-    char s[32], s2[32];
+    char s[32], s1[32];
     long buflen = ((audiobufend - audiobuf) * 2) / 2097;  /* avoid overflow */
     int integer, decimal;
     bool done = false;
     int key;
     int state = 1;
     unsigned long size, free;
+#ifdef HAVE_MULTIVOLUME
+    char s2[32];
+    unsigned long size2 = 0;
+    unsigned long free2 = 0;
+#endif
 
     const unsigned char *kbyte_units[] = {
         ID2P(LANG_KILOBYTE),
@@ -168,6 +180,10 @@ bool show_info(void)
     };
 
     fat_size( IF_MV2(0,) &size, &free );
+#ifdef HAVE_MULTIVOLUME
+    if (fat_ismounted(1))
+        fat_size( 1, &size2, &free2 );
+#endif
 
     if (global_settings.talk_menu)
     {   /* say whatever is reasonable, no real connection to the screen */
@@ -180,7 +196,17 @@ bool show_info(void)
         }
 
         talk_id(LANG_DISK_FREE_INFO, enqueue);
+#ifdef HAVE_MULTIVOLUME
+        talk_id(LANG_DISK_NAME_INTERNAL, true);
+        output_dyn_value(NULL, 0, free, kbyte_units, true);
+        if (size2)
+        {
+            talk_id(LANG_DISK_NAME_MMC, true);
+            output_dyn_value(NULL, 0, free2, kbyte_units, true);
+        }
+#else
         output_dyn_value(NULL, 0, free, kbyte_units, true); /* NULL == talk */
+#endif
 
 #ifdef HAVE_RTC
         {
@@ -217,7 +243,7 @@ bool show_info(void)
                      integer, decimal);
 #endif
             lcd_puts(0, y++, s);
-            
+
 #ifdef HAVE_CHARGE_CTRL
             if (charge_state == 1)
                 snprintf(s, sizeof(s), str(LANG_BATTERY_CHARGE));
@@ -236,21 +262,30 @@ bool show_info(void)
         }
 
         if (state & 2) {
+#ifdef HAVE_MULTIVOLUME
+            output_dyn_value(s1, sizeof s1, free, kbyte_units, true);
             output_dyn_value(s2, sizeof s2, size, kbyte_units, true);
-#ifdef HAVE_LCD_CHARCELLS
-            snprintf(s, sizeof s, "%s%s", str(LANG_DISK_SIZE_INFO), s2);
+            snprintf(s, sizeof s, "%s %s/%s", str(LANG_DISK_NAME_INTERNAL),
+                     s1, s2);
 #else
-            snprintf(s, sizeof s, "%s %s", str(LANG_DISK_SIZE_INFO), s2);
+            output_dyn_value(s1, sizeof s1, size, kbyte_units, true);
+            snprintf(s, sizeof s, SIZE_FMT, str(LANG_DISK_SIZE_INFO), s1);
 #endif
             lcd_puts(0, y++, s);
 
-            output_dyn_value(s2, sizeof s2, free, kbyte_units, true);
-#ifdef HAVE_LCD_CHARCELLS
-            snprintf(s, sizeof s, "%s%s", str(LANG_DISK_FREE_INFO), s2);
+#ifdef HAVE_MULTIVOLUME
+            if (size2) {
+                output_dyn_value(s1, sizeof s1, free2, kbyte_units, true);
+                output_dyn_value(s2, sizeof s2, size2, kbyte_units, true);
+                snprintf(s, sizeof s, "%s %s/%s", str(LANG_DISK_NAME_MMC),
+                         s1, s2);
+                lcd_puts(0, y++, s);
+            }
 #else
-            snprintf(s, sizeof s, "%s %s", str(LANG_DISK_FREE_INFO), s2);
-#endif
+            output_dyn_value(s1, sizeof s1, free, kbyte_units, true);
+            snprintf(s, sizeof s, SIZE_FMT, str(LANG_DISK_FREE_INFO), s1);
             lcd_puts(0, y++, s);
+#endif
         }
         lcd_update();
 
