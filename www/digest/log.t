@@ -1,3 +1,7 @@
+NEWSDATE(2005-05-06)
+ ITEM LINUSN now has an iRiver H320 which will be used in the future attempt
+ to port Rockbox to this device.
+
 NEWSDATE(2005-04-20)
  ITEM LINUSN
  LINK("http://www.rockbox.org/mail/archive/rockbox-archive-2005-04/0161.shtml",
