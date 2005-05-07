@@ -7,7 +7,8 @@
 # $Id$
 #
 
-INCLUDES= -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I. -I$(OBJDIR)
+INCLUDES= -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I. -I$(OBJDIR)	\
+ -I$(BUILDDIR)
 
 DEPFILE = $(OBJDIR)/dep-bootloader
 LDS := $(FIRMDIR)/boot.lds
@@ -37,7 +38,7 @@ MAXOUTFILE = $(OBJDIR)/romstart
 ifdef DEBUG
 all: $(OBJDIR)/bootloader.elf
 else
-all: $(OBJDIR)/$(BINARY) $(FLASHFILE)
+all: $(BUILDDIR)/$(BINARY) $(FLASHFILE)
 endif
 
 dep: $(DEPFILE)
@@ -52,9 +53,9 @@ $(MAXOUTFILE):
 	@cat $(MAXINFILE) | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - > $(MAXOUTFILE)
 	@rm $(MAXINFILE)
 
-$(OBJDIR)/bootloader.elf : $(OBJS) $(LINKFILE) $(OBJDIR)/librockbox.a $(DEPFILE)
+$(OBJDIR)/bootloader.elf : $(OBJS) $(LINKFILE) $(DEPFILE)
 	@echo "LD bootloader.elf"
-	$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -L$(FIRMDIR) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/bootloader.map
+	$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -L$(BUILDDIR)/firmware -lrockbox -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/bootloader.map
 
 $(OBJDIR)/bootloader.bin : $(OBJDIR)/bootloader.elf
 	@echo "OBJCOPY $<"
@@ -63,7 +64,7 @@ $(OBJDIR)/bootloader.bin : $(OBJDIR)/bootloader.elf
 $(OBJDIR)/bootloader.asm: $(OBJDIR)/bootloader.bin
 	$(TOOLSDIR)/sh2d -sh1 $< > $@
 
-$(OBJDIR)/$(BINARY) : $(OBJDIR)/bootloader.bin
+$(BUILDDIR)/$(BINARY) : $(OBJDIR)/bootloader.bin
 	@echo "Build bootloader file"
 	@$(MKFIRMWARE) $< $@
 
@@ -71,7 +72,7 @@ include $(TOOLSDIR)/make.inc
 
 clean:
 	@echo "cleaning bootloader"
-	@-rm -f $(OBJS) $(OBJDIR)/$(BINARY) $(OBJDIR)/bootloader.asm \
+	@-rm -f $(OBJS) $(BUILDDIR)/$(BINARY) $(OBJDIR)/bootloader.asm \
 	$(OBJDIR)/bootloader.bin $(OBJDIR)/bootloader.elf $(OBJDIR)/*.map \
 	$(LINKFILE) $(MAXOUTFILE) $(DEPFILE)
 
