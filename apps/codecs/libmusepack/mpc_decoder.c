@@ -35,6 +35,7 @@
 /// \file mpc_decoder.c
 /// Core decoding routines and logic.
 
+#include <string.h>
 #include "musepack.h"
 #include "internal.h"
 #include "requant.h"
@@ -1254,6 +1255,7 @@ helper3(mpc_decoder *d, mpc_uint32_t bitpos, mpc_uint32_t* buffoffs)
 static mpc_uint32_t get_initial_fpos(mpc_decoder *d, mpc_uint32_t StreamVersion)
 {
     mpc_uint32_t fpos = 0;
+    (void)StreamVersion;
     switch ( d->StreamVersion ) {                                                  // setting position to the beginning of the data-bitstream
     case  0x04: fpos =  48; break;
     case  0x05:
