@@ -277,17 +277,20 @@ include make/Makefile.inc
 
 
 $(CORE_EXAMPLES_EXE): examples/%$(EXE_SUFFIX): examples/%.o $(CORE_LIB_FILE_RELEASE)
-	$(CC) $^ -o $@ $(LDFLAGS) $(LINK_MATH)
+	@echo "(dumb) compiling $^"
+	@$(CC) $^ -o $@ $(LDFLAGS) $(LINK_MATH)
 
 $(ALLEGRO_EXAMPLES_EXE): examples/%$(EXE_SUFFIX): examples/%.o $(ALLEGRO_LIB_FILE_RELEASE) $(CORE_LIB_FILE_RELEASE)
-	$(CC) $^ -o $@ $(LDFLAGS) $(LINK_ALLEGRO)
+	@echo "(dumb) compiling $^"
+	@$(CC) $^ -o $@ $(LDFLAGS) $(LINK_ALLEGRO)
 
 $(CORE_EXAMPLES_OBJ): examples/%.o: examples/%.c include/dumb.h
-	$(CC) -c $< -o $@ $(CFLAGS_RELEASE)
+	@echo "(dumb) compiling $^"
+	@$(CC) -c $< -o $@ $(CFLAGS_RELEASE)
 
 $(ALLEGRO_EXAMPLES_OBJ): examples/%.o: examples/%.c include/dumb.h include/aldumb.h
-	$(CC) -c $< -o $@ $(CFLAGS_RELEASE) -Wno-missing-declarations
-
+	@echo "(dumb) compiling $^"
+	@$(CC) -c $< -o $@ $(CFLAGS_RELEASE) -Wno-missing-declarations
 
 clean:
 	$(call DELETE,$(call FIX,$(OBJDIR_BASE)/release/*.o))
