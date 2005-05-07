@@ -36,6 +36,7 @@
 /// Synthesis functions.
 /// \todo document me
 
+#include <string.h>
 #include "musepack.h"
 #include "internal.h"
 

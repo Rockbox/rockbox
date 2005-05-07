@@ -35,6 +35,7 @@
 /// \file streaminfo.c
 /// Implementation of streaminfo reading functions.
 
+#include <string.h>
 #include "musepack.h"
 #include "internal.h"
 
@@ -63,6 +64,8 @@ mpc_streaminfo_init(mpc_streaminfo * si)
 static mpc_int32_t
 streaminfo_read_header_sv8(mpc_streaminfo * si, mpc_reader * fp)
 {
+    (void)si;
+    (void)fp;
     return 0;
 }
 
