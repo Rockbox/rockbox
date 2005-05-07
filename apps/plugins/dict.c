@@ -202,7 +202,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }
 
     /* seek to the right offset */
-    rb->lseek(fData, readlong(&word.offset), SEEK_SET);
+    rb->lseek(fData, (off_t)readlong(&word.offset), SEEK_SET);
 
     /* Read in the description */
     rb->read_line(fData, description, display_columns * display_lines);
