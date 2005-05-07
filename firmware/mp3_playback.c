@@ -79,8 +79,6 @@ bool audio_is_initialized = false;
 
 unsigned long mas_version_code;
 
-bool dma_on;  /* The DMA is active */
-
 #if CONFIG_HWCODEC == MAS3507D
 static void mas_poll_start(void)
 {
