@@ -641,6 +641,7 @@ export ARCHOSROM=@ARCHOSROM@
 export FLASHFILE=@FLASHFILE@
 export TARGET=@TARGET@
 export OBJDIR=@PWD@
+export BUILDDIR=\$(OBJDIR)
 export LANGUAGE=@LANGUAGE@
 export MEMORYSIZE=@MEMORY@
 export VERSION=\$(shell date +%y%m%d-%H%M)
