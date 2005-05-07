@@ -910,14 +910,16 @@ void splash(int ticks,       /* how long the splash is displayed */
         sleep(ticks);
 }
 
+#ifdef HAVE_CHARGING
 void charging_splash(void)
 {
     splash(2*HZ, true, str(LANG_BATTERY_CHARGE));
     button_clear_queue();
 }
+#endif
 
 
-#ifdef HAVE_LCD_BITMAP
+#if defined(HAVE_LCD_BITMAP) && defined (HAVE_RTC)
 
 /* little helper function for voice output */
 static void say_time(int cursorpos, const struct tm *tm)
@@ -1212,7 +1214,7 @@ bool set_time_screen(const char* string, struct tm *tm)
 
     return false;
 }
-#endif
+#endif /* defined(HAVE_LCD_BITMAP) && defined (HAVE_RTC) */
 
 #if CONFIG_KEYPAD == RECORDER_PAD || CONFIG_KEYPAD == IRIVER_H100_PAD
 bool shutdown_screen(void)
