@@ -30,6 +30,7 @@
 #include "debug.h"
 #include "lcd.h"
 #include "file.h"
+#include "autoconf.h"
 
 #ifdef __GNUC__
 #define STRUCT_PACKED __attribute__((packed))
