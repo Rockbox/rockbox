@@ -910,7 +910,7 @@ void splash(int ticks,       /* how long the splash is displayed */
         sleep(ticks);
 }
 
-#ifdef HAVE_CHARGING
+#if defined(HAVE_CHARGING) || defined(SIMULATOR)
 void charging_splash(void)
 {
     splash(2*HZ, true, str(LANG_BATTERY_CHARGE));
