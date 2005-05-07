@@ -51,7 +51,7 @@ void cpu_boost(bool on_off);
 #define MAX(a, b) (((a)>(b))?(a):(b))
 #endif
 
-#ifdef LITTLE_ENDIAN
+#ifdef ROCKBOX_LITTLE_ENDIAN
 #define SWAB16(x) (x)
 #define SWAB32(x) (x)
 #endif

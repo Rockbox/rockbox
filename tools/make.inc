@@ -17,6 +17,7 @@ $(OBJDIR)/%.o: %.S
 # the lame echo stuff down here is to prevent any compiler errors/warnings
 # to cause an error code to get returned and thus stop the build
 $(DEPFILE): $(SOURCES)
+	$(SILENT)mkdir -p `dirname $(DEPFILE)`
 	$(SILENT)rm -f $(DEPFILE)
 	$(SILENT)(for each in $(SOURCES) x; do \
           if test "x" != "$$each"; then \

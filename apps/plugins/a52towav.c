@@ -31,17 +31,10 @@
 
 static struct plugin_api* rb;
 
-/* FIX: We can remove this warning when the build system has a
-   mechanism for auto-detecting the endianness of the target CPU -
-   WORDS_BIGENDIAN is defined in liba52/config.h and is also used
-   internally by liba52.
- */
-
 #ifdef WORDS_BIGENDIAN
-  #warning ************************************* BIG ENDIAN
-  #define LE_S16(x) ( (uint16_t) ( ((uint16_t)(x) >> 8) | ((uint16_t)(x) << 8) ) )
+#define LE_S16(x) ( (uint16_t) ( ((uint16_t)(x) >> 8) | ((uint16_t)(x) << 8) ) )
 #else
-  #define LE_S16(x) (x)
+#define LE_S16(x) (x)
 #endif
 
 

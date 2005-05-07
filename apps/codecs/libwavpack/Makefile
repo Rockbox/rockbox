@@ -8,7 +8,7 @@
 #
 
 INCLUDES=-I$(APPSDIR) -I.. -I. -I$(FIRMDIR)/include -I$(FIRMDIR)/export	\
- -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers
+ -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers -I$(BUILDDIR)
 
 ifdef APPEXTRA
 INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
@@ -26,7 +26,7 @@ OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))
 DEPFILE = $(OBJDIR)/dep-libwavpack
 DIRS = 
 
-OUTPUT = $(OBJDIR)/libwavpack.a
+OUTPUT = $(BUILDDIR)/libwavpack.a
 
 all: $(OUTPUT)
 
@@ -35,7 +35,7 @@ $(OUTPUT): $(OBJS)
 	@$(AR) ruv $@ $+ >/dev/null 2>&1
 
 $(OBJDIR)/libwavpack/%.o: $(APPSDIR)/codecs/libwavpack/%.c
-	@echo "CC $<"
+	@echo "(libwavpack) CC $<"
 	@$(CC) -c -O2 $(CFLAGS) -I$(APPSDIR)/codecs/libwavpack/ $< -o $@
 
 include $(TOOLSDIR)/make.inc

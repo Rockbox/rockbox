@@ -20,6 +20,8 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
+#include "autoconf.h"
+
 /* symbolic names for multiple choice configurations: */
 
 /* CONFIG_TUNER (note these are combineable bit-flags) */

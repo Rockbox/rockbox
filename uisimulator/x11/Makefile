@@ -25,7 +25,8 @@ RM = rm -f
 DEBUG = -g
 
 # Use this for simulator-only files
-INCLUDES = -I. -I$(SIMCOMMON) -I$(OBJDIR) -I$(FIRMDIR)/export -I$(APPSDIR)
+INCLUDES = -I. -I$(SIMCOMMON) -I$(OBJDIR) -I$(FIRMDIR)/export -I$(APPSDIR) \
+ -I$(BUILDDIR)
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc
@@ -41,7 +42,7 @@ DIRS = .
 
 CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) $(GCCOPTS)
 
-OUTFILE = $(OBJDIR)/libsim.a
+OUTFILE = $(BUILDDIR)/libsim.a
 
 all: $(OUTFILE)
 	@$(MAKE) -C $(SIMCOMMON)

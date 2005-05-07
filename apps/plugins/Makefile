@@ -8,7 +8,7 @@
 #
 
 INCLUDES = -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I$(FIRMDIR)/common \
- -I$(FIRMDIR)/drivers -I$(APPSDIR) -Ilib
+ -I$(FIRMDIR)/drivers -I$(APPSDIR) -Ilib -I$(BUILDDIR)
 CFLAGS = $(GCCOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES)	\
  -DMEM=${MEMORYSIZE} -DPLUGIN
 
@@ -48,15 +48,15 @@ endif
 
 
 .PHONY: $(SUBDIRS)
-all: $(OBJDIR)/libplugin.a $(ROCKS) $(SUBDIRS) $(DEPFILE)
+all: $(BUILDDIR)/libplugin.a $(ROCKS) $(SUBDIRS) $(DEPFILE)
 
 ifndef SIMVER
-$(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKFILE) $(OBJDIR)/libplugin.a
-	@echo "LD $@"
-	@$(CC) $(GCCOPTS) -O -nostdlib -o $@ $< -L$(OBJDIR) $(CODECLIBS) -lplugin -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/$*.map
+$(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKFILE) $(BUILDDIR)/libplugin.a
+	@echo "LD "`basename $@`
+	@$(CC) $(GCCOPTS) -O -nostdlib -o $@ $< -L$(BUILDDIR) $(CODECLIBS) -lplugin -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/$*.map
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.elf
-	@echo "OBJCOPY $<"
+	@echo "OBJCOPY "`basename $@`
 	@$(OC) -O binary $< $@
 else
 
@@ -64,9 +64,9 @@ ifeq ($(SIMVER), x11)
 ###################################################
 # This is the X11 simulator version
 
-$(OBJDIR)/%.rock : $(OBJDIR)/%.o  $(OBJDIR)/libplugin.a
-	@echo "LD $@"
-	@$(CC) $(CFLAGS) -shared $< -L$(OBJDIR)  $(CODECLIBS) -lplugin -o $@
+$(OBJDIR)/%.rock : $(OBJDIR)/%.o  $(BUILDDIR)/libplugin.a
+	@echo "LD "`basename $@`
+	@$(CC) $(CFLAGS) -shared $< -L$(BUILDDIR)  $(CODECLIBS) -lplugin -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
@@ -81,11 +81,11 @@ else # end of x11-simulator
 DLLTOOLFLAGS = --export-all
 DLLWRAPFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 -mno-cygwin
 
-$(OBJDIR)/%.rock : $(OBJDIR)/%.o  $(OBJDIR)/libplugin.a
-	@echo "DLL $@"
+$(OBJDIR)/%.rock : $(OBJDIR)/%.o  $(BUILDDIR)/libplugin.a
+	@echo "DLL "`basename $@`
 	@$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $<
-	@$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< $(OBJDIR)/libplugin.a \
-                $(patsubst -l%,$(OBJDIR)/lib%.a,$(CODECLIBS)) -o $@
+	@$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< $(BUILDDIR)/libplugin.a \
+                $(patsubst -l%,$(BUILDDIR)/lib%.a,$(CODECLIBS)) -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
@@ -99,9 +99,10 @@ endif # end of simulator section
 
 include $(TOOLSDIR)/make.inc
 
-$(OBJDIR)/libplugin.a:
+$(BUILDDIR)/libplugin.a:
 	@echo "MAKE in lib"
-	@$(MAKE) -C lib TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR) VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEMORYSIZE}
+	@mkdir -p $(OBJDIR)/lib
+	@$(MAKE) -C lib OBJDIR=$(OBJDIR)/lib
 
 # MEM should be passed on to this makefile with the chosen memory size given
 # in number of MB
@@ -112,14 +113,14 @@ $(LINKFILE): $(LDS)
 $(SUBDIRS):
 	@echo "MAKE in $@"
 	@mkdir -p $(OBJDIR)/$@
-	@$(MAKE) -C $@ TARGET=$(TARGET) DEBUG=$(DEBUG) OUTDIR=$(OBJDIR) OBJDIR=$(OBJDIR)/$@ VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEMORYSIZE}
+	@$(MAKE) -C $@ OUTDIR=$(OBJDIR) OBJDIR=$(OBJDIR)/$@
 
 clean:
 	@echo "cleaning plugins"
 	@rm -f $(ROCKS) $(LINKFILE) $(OBJDIR)/*.rock $(DEPFILE) $(ELFS) \
 	$(OBJS) $(DEFS)
-	@$(MAKE) -C lib clean
-	@$(MAKE) -C rockboy clean
-	@$(MAKE) -C searchengine clean
+	@$(MAKE) -C lib clean OBJDIR=$(OBJDIR)/lib
+	@$(MAKE) -C rockboy clean OBJDIR=$(OBJDIR)/rockboy
+	@$(MAKE) -C searchengine clean OBJDIR=$(OBJDIR)/searchengine
 
 -include $(DEPFILE)

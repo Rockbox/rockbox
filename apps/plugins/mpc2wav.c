@@ -77,8 +77,8 @@ get_size_impl(void *data)
 bool
 canseek_impl(void *data)
 {
-  file_info_struct *f = (file_info_struct *)data;
-  return true;
+    (void)data;
+    return true;
 }
 
 static int
@@ -110,7 +110,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
   file_info_struct file_info;
   unsigned short Sample;
   unsigned status = 1;
-  int i;
+  unsigned int i;
   mpc_reader reader;
 
   /* Generic plugin inititialisation */

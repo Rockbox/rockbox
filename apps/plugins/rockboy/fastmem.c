@@ -69,7 +69,7 @@ int readw(int a)
 		byte *p = mbc.rmap[a>>12];
 		if (p)
 		{
-#ifdef LITTLE_ENDIAN
+#ifdef ROCKBOX_LITTLE_ENDIAN
 #ifndef ALLOW_UNALIGNED_IO
 			if (a&1) return p[a] | (p[a+1]<<8);
 #endif
@@ -89,7 +89,7 @@ void writew(int a, int w)
 		byte *p = mbc.wmap[a>>12];
 		if (p)
 		{
-#ifdef LITTLE_ENDIAN
+#ifdef ROCKBOX_LITTLE_ENDIAN
 #ifndef ALLOW_UNALIGNED_IO
 			if (a&1)
 			{

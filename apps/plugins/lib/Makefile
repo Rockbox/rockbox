@@ -11,7 +11,7 @@
 # .. for stuff in the plugins dir
 # . for stuff in the pluginlib dir
 INCLUDES=-I$(APPSDIR) -I.. -I. -I$(FIRMDIR)/include -I$(FIRMDIR)/export	\
- -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers
+ -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers -I$(BUILDDIR)
 
 ifdef APPEXTRA
 INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
@@ -28,7 +28,7 @@ OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 DEPFILE = $(OBJDIR)/dep-pluginlib
 DIRS = .
 
-OUTPUT = $(OBJDIR)/libplugin.a
+OUTPUT = $(BUILDDIR)/libplugin.a
 
 all: $(OUTPUT)
 

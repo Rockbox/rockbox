@@ -42,6 +42,7 @@
 #include "icons.h"
 #include "lang.h"
 #include "keyboard.h"
+#include "autoconf.h"
 
 static int db_play_folder(struct tree_context* c);
 static int db_search(struct tree_context* c, char* string);
@@ -167,7 +168,7 @@ int db_load(struct tree_context* c)
             if (rc < safeplacelen)
                 return -1;
 
-#ifdef LITTLE_ENDIAN
+#ifdef ROCKBOX_LITTLE_ENDIAN
             for (i=0; i<tagdbheader.albumarraylen; i++)
                 safeplace[i] = BE32(safeplace[i]);
 #endif
@@ -186,7 +187,7 @@ int db_load(struct tree_context* c)
             if (rc < safeplacelen)
                 return -1;
 
-#ifdef LITTLE_ENDIAN
+#ifdef ROCKBOX_LITTLE_ENDIAN
             for (i=0; i<tagdbheader.songarraylen; i++) {
                 safeplace[i] = BE32(safeplace[i]);
                 DEBUGF("db_load songs4album song %d: 0x%x\n",i,safeplace[i]);

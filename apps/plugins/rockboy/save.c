@@ -15,7 +15,7 @@
 
 
 
-#ifdef LITTLE_ENDIAN
+#ifdef ROCKBOX_LITTLE_ENDIAN
 #define LIL(x) (x)
 #else
 #define LIL(x) ((x<<24)|((x&0xff00)<<8)|((x>>8)&0xff00)|(x>>24))

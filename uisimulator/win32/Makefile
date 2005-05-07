@@ -24,7 +24,8 @@ DEPFILE = $(OBJDIR)/dep-simwin
 RM = rm -f
 DEBUG = -g
 
-INCLUDES = -I. -I$(SIMCOMMON) -I$(OBJDIR) -I$(FIRMDIR)/export -I$(APPSDIR)
+INCLUDES = -I. -I$(SIMCOMMON) -I$(OBJDIR) -I$(FIRMDIR)/export -I$(APPSDIR) \
+ -I$(BUILDDIR)
 
 DEFINES = -DHAVE_CONFIG_H -DGETTIMEOFDAY_TWO_ARGS -DSIMULATOR \
 $(TARGET) -DAPPSVERSION=\"$(VERSION)\" -DMEM=${MEMORYSIZE} $(EXTRA_DEFINES)
@@ -39,7 +40,7 @@ DIRS = .
 
 CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall -mno-cygwin
 
-OUTFILE = $(OBJDIR)/libsim.a
+OUTFILE = $(BUILDDIR)/libsim.a
 
 all: $(OUTFILE)
 	@echo "MAKE in common sim"
@@ -62,7 +63,8 @@ $(OBJDIR)/UI256.bmp: UI-$(ARCHOS).bmp
 	@cp $< $@
 
 $(OBJDIR)/uisw32-res.o: uisw32.rc $(OBJDIR)/UI256.bmp
-	$(WINDRES) --include-dir $(OBJDIR) -i $< -o $@
+	@echo "WINDRES"
+	@$(WINDRES) --include-dir $(OBJDIR) -i $< -o $@
 
 include $(TOOLSDIR)/make.inc
 

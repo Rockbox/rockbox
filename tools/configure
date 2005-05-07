@@ -589,8 +589,14 @@ fi
 sed > autoconf.h \
  -e "s,@ENDIAN@,${defendian},g" \
 <<EOF
+/* This header was made by configure */
+#ifndef __BUILD_AUTOCONF_H
+#define __BUILD_AUTOCONF_H
+
 /* Define endianess for the target or simulator platform */
 #define @ENDIAN@ 1
+
+#endif /* __BUILD_AUTOCONF_H */
 EOF
 
 sed > Makefile \
@@ -641,7 +647,7 @@ export ARCHOSROM=@ARCHOSROM@
 export FLASHFILE=@FLASHFILE@
 export TARGET=@TARGET@
 export OBJDIR=@PWD@
-export BUILDDIR=\$(OBJDIR)
+export BUILDDIR=@PWD@
 export LANGUAGE=@LANGUAGE@
 export MEMORYSIZE=@MEMORY@
 export VERSION=\$(shell date +%y%m%d-%H%M)
@@ -675,13 +681,13 @@ MAKEFLAGS += --no-print-directory
 .PHONY: all clean tags zip
 
 all:
-	@\$(MAKE) -C \$(FIRMDIR)
-	@\$(MAKE) -C \$(APPSDIR)
+	@\$(MAKE) -C \$(FIRMDIR) OBJDIR=\$(BUILDDIR)/firmware
+	@\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/apps
 
 clean:
-	@\$(MAKE) -C \$(FIRMDIR) clean
-	@\$(MAKE) -C \$(APPSDIR) clean
-	@rm -f rockbox.zip TAGS
+	@\$(MAKE) -C \$(FIRMDIR) clean OBJDIR=\$(BUILDDIR)/firmware
+	@\$(MAKE) -C \$(APPSDIR) clean OBJDIR=\$(BUILDDIR)/apps
+	@rm -rf rockbox.zip TAGS apps firmware comsim sim
 
 tags:
 	@rm -f TAGS

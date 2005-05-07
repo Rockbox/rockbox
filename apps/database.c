@@ -42,6 +42,7 @@
 #include "lang.h"
 #include "keyboard.h"
 #include "database.h"
+#include "autoconf.h"
 
 #undef NEW_DB_CODE
 
@@ -58,7 +59,7 @@ struct tagdb_header tagdbheader;
 int tagdb_init(void)
 {
     unsigned char* ptr = (char*)&tagdbheader.version;
-#ifdef LITTLE_ENDIAN
+#ifdef ROCKBOX_LITTLE_ENDIAN
     int i, *p;
 #endif
 
@@ -76,7 +77,7 @@ int tagdb_init(void)
         splash(HZ,true,"Not a rockbox ID3 database!");
         return -1;
     }
-#ifdef LITTLE_ENDIAN
+#ifdef ROCKBOX_LITTLE_ENDIAN
     p=(int *)&tagdbheader;
     for(i=0;i<17;i++) {
         *p=BE32(*p);

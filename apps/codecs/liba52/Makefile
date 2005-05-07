@@ -8,7 +8,7 @@
 #
 
 INCLUDES=-I$(APPSDIR) -I.. -I. -I$(FIRMDIR)/include -I$(FIRMDIR)/export	\
- -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers
+ -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers -I$(BUILDDIR)
 
 ifdef APPEXTRA
 INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
@@ -26,7 +26,7 @@ OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))
 DEPFILE = $(OBJDIR)/dep-liba52
 DIRS = 
 
-OUTPUT = $(OBJDIR)/liba52.a
+OUTPUT = $(BUILDDIR)/liba52.a
 
 all: $(OUTPUT)
 
@@ -35,7 +35,7 @@ $(OUTPUT): $(OBJS)
 	@$(AR) ruv $@ $+ >/dev/null 2>&1
 
 $(OBJDIR)/liba52/%.o: $(APPSDIR)/codecs/liba52/%.c
-	@echo "CC $<"
+	@echo "(liba52) CC $<"
 	@$(CC) -c -O2 $(CFLAGS) -I$(APPSDIR)/codecs/liba52/ $< -o $@
 
 include $(TOOLSDIR)/make.inc

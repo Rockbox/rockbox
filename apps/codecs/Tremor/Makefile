@@ -8,14 +8,15 @@
 #
 
 INCLUDES=-I$(APPSDIR) -I.. -I. -I$(FIRMDIR)/include -I$(FIRMDIR)/export	\
- -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers
+ -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers -I$(BUILDDIR)
 
 ifdef APPEXTRA
 INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
 endif
 
 TREMOROPTS =
-CFLAGS = $(GCCOPTS) $(TREMOROPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
+CFLAGS = $(GCCOPTS) $(TREMOROPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
+-DMEM=${MEMORYSIZE}
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc
@@ -26,7 +27,7 @@ OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))
 DEPFILE = $(OBJDIR)/dep-Tremor
 DIRS = 
 
-OUTPUT = $(OBJDIR)/libTremor.a
+OUTPUT = $(BUILDDIR)/libTremor.a
 
 all: $(OUTPUT)
 
@@ -35,7 +36,7 @@ $(OUTPUT): $(OBJS)
 	@$(AR) ruv $@ $+ >/dev/null 2>&1
 
 $(OBJDIR)/Tremor/%.o: $(APPSDIR)/codecs/Tremor/%.c
-	@echo "CC $<"
+	@echo "(Tremor) CC $<"
 	@$(CC) -c -O2 $(CFLAGS) -I$(APPSDIR)/codecs/Tremor/ $< -o $@
 
 include $(TOOLSDIR)/make.inc

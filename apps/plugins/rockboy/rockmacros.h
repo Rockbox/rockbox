@@ -19,10 +19,7 @@
 
 #include <plugin.h>
 
-/* workaround for cygwin not defining endian macros */
-#if !defined(LITTLE_ENDIAN) && !defined(BIG_ENDIAN) && defined(_X86_)
-#define LITTLE_ENDIAN
-#endif
+#include "autoconf.h"
 
 #define malloc(a) my_malloc(a)
 void *my_malloc(size_t size);

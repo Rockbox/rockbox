@@ -20,7 +20,7 @@
 
 /* Used in bitstream.h */
 
-#ifndef SIMULATOR
+#ifdef ROCKBOX_BIG_ENDIAN
 #define WORDS_BIGENDIAN 1
 #endif
 

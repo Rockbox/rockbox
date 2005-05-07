@@ -6,7 +6,7 @@
 
 #include "rockmacros.h"
 
-#ifdef LITTLE_ENDIAN
+#ifdef ROCKBOX_LITTLE_ENDIAN
 #define LO 0
 #define HI 1
 #else

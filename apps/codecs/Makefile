@@ -8,7 +8,7 @@
 #
 
 INCLUDES = -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I$(FIRMDIR)/common \
- -I$(FIRMDIR)/drivers -I$(APPSDIR) -Ilib
+ -I$(FIRMDIR)/drivers -I$(APPSDIR) -Ilib -I$(BUILDDIR)
 CFLAGS = $(GCCOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
  -DMEM=${MEMORYSIZE}
 
@@ -28,44 +28,45 @@ include $(TOOLSDIR)/make.inc
 libmad:
 	@echo "MAKE in libmad"
 	@mkdir -p $(OBJDIR)/libmad
-	@$(MAKE) -C libmad TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR)/libmad VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEMORYSIZE} OUTPUT=$(OBJDIR)/libmad.a
+	@$(MAKE) -C libmad OBJDIR=$(OBJDIR)/libmad OUTPUT=$(BUILDDIR)/libmad.a
 
 liba52:
 	@echo "MAKE in liba52"
 	@mkdir -p $(OBJDIR)/liba52
-	@$(MAKE) -C liba52 TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR)/liba52 VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEMORYSIZE} OUTPUT=$(OBJDIR)/liba52.a
+	@$(MAKE) -C liba52 OBJDIR=$(OBJDIR)/liba52 OUTPUT=$(BUILDDIR)/liba52.a
 
 libFLAC:
 	@echo "MAKE in libFLAC"
 	@mkdir -p $(OBJDIR)/libFLAC
-	@$(MAKE) -C libFLAC TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR)/libFLAC VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEMORYSIZE} OUTPUT=$(OBJDIR)/libFLAC.a
+	@$(MAKE) -C libFLAC OBJDIR=$(OBJDIR)/libFLAC OUTPUT=$(BUILDDIR)/libFLAC.a
 
 libTremor:
 	@echo "MAKE in Tremor"
 	@mkdir -p $(OBJDIR)/Tremor
-	@$(MAKE) -C Tremor TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR)/Tremor VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEMORYSIZE} OUTPUT=$(OBJDIR)/libTremor.a
+	@$(MAKE) -C Tremor OBJDIR=$(OBJDIR)/Tremor OUTPUT=$(BUILDDIR)/libTremor.a
 
 libwavpack:
 	@echo "MAKE in libwavpack"
 	@mkdir -p $(OBJDIR)/libwavpack
-	@$(MAKE) -C libwavpack TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR)/libwavpack VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEMORYSIZE} OUTPUT=$(OBJDIR)/libwavpack.a
+	@$(MAKE) -C libwavpack OBJDIR=$(OBJDIR)/libwavpack OUTPUT=$(BUILDDIR)/libwavpack.a
 
 dumb:
 	@echo "MAKE in dumb"
 	@mkdir -p $(OBJDIR)/dumb
-	@$(MAKE) -C dumb TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR)/dumb VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEMORYSIZE} LIBDIR=$(OBJDIR) OFLAGS="$(CFLAGS)"
+	@$(MAKE) -C dumb OBJDIR=$(OBJDIR)/dumb LIBDIR=$(BUILDDIR) OFLAGS="$(CFLAGS)"
 
 libmusepack:
 	@echo "MAKE in libmusepack"
 	@mkdir -p $(OBJDIR)/libmusepack
-	@$(MAKE) -C libmusepack TARGET=$(TARGET) DEBUG=$(DEBUG) OBJDIR=$(OBJDIR)/libmusepack VERSION=$(VERSION) EXTRA_DEFINES="$(EXTRA_DEFINES)" MEM=${MEMORYSIZE} OUTPUT=$(OBJDIR)/libmusepack.a
+	@$(MAKE) -C libmusepack OBJDIR=$(OBJDIR)/libmusepack OUTPUT=$(BUILDDIR)/libmusepack.a
 
 clean:
 	@echo "cleaning codecs"
-	@rm -fr $(OBJDIR)/libmad $(OBJDIR)/libmad.a $(OBJDIR)/liba52 $(OBJDIR)/libFLAC $(OBJDIR)/Tremor $(OBJDIR)/libwavpack $(OBJDIR)/dumb $(OBJDIR)/libdumb.a $(OBJDIR)/libdumbd.a $(OBJDIR)/libmusepack $(OBJDIR)/libmusepack.a
-	@$(MAKE) -C libmad clean
-	@$(MAKE) -C liba52 clean
-	@$(MAKE) -C libFLAC clean
-	@$(MAKE) -C Tremor clean
-	@$(MAKE) -C libwavpack clean
-	@$(MAKE) -C libmusepack clean
+	$(SILENT)rm -fr $(OBJDIR)/libmad $(BUILDDIR)/libmad.a $(OBJDIR)/liba52 $(OBJDIR)/libFLAC $(OBJDIR)/Tremor $(OBJDIR)/libwavpack $(OBJDIR)/dumb $(BUILDDIR)/libdumb.a $(BUILDDIR)/libdumbd.a $(OBJDIR)/libmusepack $(BUILDDIR)/libmusepack.a
+	@$(MAKE) -C libmad clean OBJDIR=$(OBJDIR)/libmad
+	@$(MAKE) -C liba52 clean OBJDIR=$(OBJDIR)/liba52
+	@$(MAKE) -C libFLAC clean OBJDIR=$(OBJDIR)/libFLAC
+	@$(MAKE) -C Tremor clean OBJDIR=$(OBJDIR)/Tremor
+	@$(MAKE) -C libwavpack clean OBJDIR=$(OBJDIR)/libwavpack
+	@$(MAKE) -C libmusepack clean OBJDIR=$(OBJDIR)/libmusepack
+	@$(MAKE) -C dumb clean OBJDIR=$(OBJDIR)/dumb

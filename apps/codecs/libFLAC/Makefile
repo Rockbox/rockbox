@@ -7,8 +7,9 @@
 # $Id$
 #
 
-INCLUDES=-I$(APPSDIR) -I.. -I. -I$(FIRMDIR)/include -I$(FIRMDIR)/export	\
- -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers -I$(APPSDIR)/codecs/libFLAC/include
+INCLUDES=-I$(APPSDIR) -I.. -I. -I$(FIRMDIR)/include -I$(FIRMDIR)/export	      \
+ -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers -I$(APPSDIR)/codecs/libFLAC/include \
+ -I$(BUILDDIR)
 
 ifdef APPEXTRA
 INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
@@ -16,9 +17,10 @@ endif
 
 NEWGCC=$(shell expr $(GCCNUM) ">" 303)
 
-FLACOPTS = -DFLAC__NO_ASM -DFLAC__ALIGN_MALLOC_DATA			      \
--DFLAC__INTEGER_ONLY_LIBRARY -DVERSION=\"1.1.2\" -fomit-frame-pointer	      \
--funroll-loops -finline-functions -Wall -W -Winline -DFLaC__INLINE=__inline__
+FLACOPTS = -DFLAC__NO_ASM -DFLAC__ALIGN_MALLOC_DATA			\
+-DFLAC__INTEGER_ONLY_LIBRARY -DVERSION=\"1.1.2\" -fomit-frame-pointer	\
+-funroll-loops -finline-functions -Wall -W -Wno-inline			\
+-DFLaC__INLINE=__inline__
 
 ifeq ($(NEWGCC), 1)
   # this is 3.4.X options:
@@ -37,7 +39,7 @@ OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))
 DEPFILE = $(OBJDIR)/dep-libFLAC
 DIRS = 
 
-OUTPUT = $(OBJDIR)/libFLAC.a
+OUTPUT = $(BUILDDIR)/libFLAC.a
 
 all: $(OUTPUT)
 
@@ -47,7 +49,7 @@ $(OUTPUT): $(OBJS)
 
 $(OBJDIR)/libFLAC/%.o: $(APPSDIR)/codecs/libFLAC/%.c
 	@mkdir -p $(OBJDIR)/libFLAC
-	@echo "CC $<"
+	@echo "(libFLAC) CC $<"
 	@$(CC) -c -O2 $(CFLAGS) -I$(APPSDIR)/codecs/libFLAC/include/FLAC $< -o $@
 
 include $(TOOLSDIR)/make.inc

@@ -8,7 +8,7 @@
 #
 
 INCLUDES=-I$(APPSDIR) -I.. -I. -I$(FIRMDIR)/include -I$(FIRMDIR)/export	\
- -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers
+ -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers -I$(BUILDDIR)
 
 ifdef APPEXTRA
 INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
@@ -34,7 +34,7 @@ $(OUTPUT): $(OBJS)
 	$(AR) ruv $@ $+ >/dev/null 2>&1
 
 $(OBJDIR)/%.o: $(APPSDIR)/codecs/libmad/%.c
-	@echo "CC $<"
+	@echo "(libmad) CC "`basename $<`
 	@$(CC) -c -O2 $(CFLAGS) -I$(APPSDIR)/codecs/libmad/ $< -o $@
 
 include $(TOOLSDIR)/make.inc

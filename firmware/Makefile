@@ -7,7 +7,7 @@
 # $Id$
 #
 
-INCLUDES=-Iinclude -I$(FIRMDIR) -Iexport -Icommon -Idrivers
+INCLUDES=-Iinclude -I$(FIRMDIR) -Iexport -Icommon -Idrivers -I$(BUILDDIR)
 
 CFLAGS = $(GCCOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
 
@@ -18,18 +18,15 @@ SOURCES = $(SRC)
 OBJS2 := $(patsubst %.c, $(OBJDIR)/%.o, $(SRC)) $(OBJDIR)/sysfont.o
 OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))
 DIRS:=. drivers common
-OUTPUT = $(OBJDIR)/librockbox.a
+OUTPUT = $(BUILDDIR)/librockbox.a
 DEPFILE = $(OBJDIR)/dep-firmware
 
-all: $(TOOLSDIR)/convbdf $(OUTPUT) $(EXTRA_TARGETS)
+all: $(OUTPUT) $(EXTRA_TARGETS)
 
 dep: $(DEPFILE)
 
-$(TOOLSDIR)/convbdf:
-	$(MAKE) CC=gcc LD=ld -C $(TOOLSDIR)
-
 $(OUTPUT): $(OBJS) $(DEPFILE)
-	@echo "AR $@"
+	@echo "AR+RANLIB $@"
 	@$(AR) ruv $@ $(OBJS) >/dev/null 2>&1
 	@$(RANLIB) $@
 
@@ -42,13 +39,13 @@ clean:
 
 # Special targets
 $(OBJDIR)/thread.o: thread.c export/thread.h
-	@echo "CC thread.c"
-	@$(CC) -c -O -fomit-frame-pointer $(CFLAGS) $< -o $@
+	$(SILENT)echo "CC thread.c"
+	$(SILENT)$(CC) -c -O -fomit-frame-pointer $(CFLAGS) $< -o $@
 
 $(OBJDIR)/sysfont.o: fonts/clR6x8.bdf
 	@echo "CONVBDF"
-	@$(TOOLSDIR)/convbdf -c -o $(OBJDIR)/sysfont.c $<
+	$(SILENT)$(TOOLSDIR)/convbdf -c -o $(OBJDIR)/sysfont.c $<
 	@echo "CC sysfont.c"
-	@$(CC) $(CFLAGS) -c $(OBJDIR)/sysfont.c -o $@
+	$(SILENT)$(CC) $(CFLAGS) -c $(OBJDIR)/sysfont.c -o $@
 
 -include $(DEPFILE)

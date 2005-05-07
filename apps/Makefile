@@ -7,7 +7,8 @@
 # $Id$
 #
 
-INCLUDES= -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I. -I$(OBJDIR)
+INCLUDES= -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I. -I$(BUILDDIR)	\
+ -I$(OBJDIR)
 
 DEPFILE = $(OBJDIR)/dep-apps
 LDS := $(FIRMDIR)/app.lds
@@ -43,29 +44,26 @@ MAXOUTFILE = $(OBJDIR)/romstart
 
 ifdef SIMVER
 # this is a sim build
-COMMONLIB = $(ROOTDIR)/uisimulator/common/libcomsim.a
+COMMONLIB = $(BUILDDIR)/comsim/libcomsim.a
 
-all: $(COMMONLIB) $(OBJDIR)/$(BINARY) $(CODECS) $(ROCKS)
+all: $(COMMONLIB) $(BUILDDIR)/$(BINARY) $(CODECS) $(ROCKS)
 	@$(MAKE) -C $(SIMDIR)
 
 $(COMMONLIB):
 	@$(MAKE) -C $(ROOTDIR)/uisimulator/common
 else
 # regular target build
-all: $(OBJDIR)/$(BINARY) $(FLASHFILE) $(CODECS) $(ROCKS) $(ARCHOSROM)
+all: $(BUILDDIR)/$(BINARY) $(FLASHFILE) $(CODECS) $(ROCKS) $(ARCHOSROM)
 endif
 
 dep: $(DEPFILE)
 
 build-codecs:
-	@$(MAKE) -C codecs
+	@$(MAKE) -C codecs OBJDIR=$(OBJDIR)/codecs
 
 rocks:
-	@$(MAKE) -C plugins/lib
-	@$(MAKE) -C plugins
-
-$(OBJDIR)/librockbox.a:
-	@$(MAKE) -C $(FIRMDIR)
+	@$(MAKE) -C plugins/lib OBJDIR=$(OBJDIR)/plugins/lib
+	@$(MAKE) -C plugins  OBJDIR=$(OBJDIR)/plugins
 
 $(LINKFILE): $(LDS)
 	@echo "Build LDS file"
@@ -81,28 +79,28 @@ $(MAXOUTFILE):
 	@cat $(MAXINFILE) | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - > $(MAXOUTFILE)
 	@rm $(MAXINFILE)
 
-$(OBJDIR)/rombox.elf : $(OBJS) $(LINKROM) $(OBJDIR)/librockbox.a $(DEPFILE)
+$(OBJDIR)/rombox.elf : $(OBJS) $(LINKROM) $(DEPFILE)
 	@echo "LD rombox.elf"
-	@$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -L$(FIRMDIR) -T$(LINKROM) -Wl,-Map,$(OBJDIR)/rombox.map
+	@$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lgcc -L$(BUILDDIR)/firmware -T$(LINKROM) -Wl,-Map,$(OBJDIR)/rombox.map
 
 ifndef SIMVER
 
-$(OBJDIR)/rockbox.elf : $(OBJS) $(LINKFILE) $(OBJDIR)/librockbox.a $(DEPFILE)
+$(OBJDIR)/rockbox.elf : $(OBJS) $(LINKFILE) $(DEPFILE)
 	@echo "LD rockbox.elf"
-	$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(OBJDIR) -lrockbox -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
+	@$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS)  -L$(BUILDDIR)/firmware -L$(BUILDDIR) -lrockbox -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
 
 $(OBJDIR)/rockbox.bin : $(OBJDIR)/rockbox.elf
-	@echo "OBJCOPY $<"
+	@echo "OBJCOPY "`basename $@`
 	@$(OC) -O binary $< $@
 
 $(OBJDIR)/rombox.bin : $(OBJDIR)/rombox.elf
-	@echo "OBJCOPY $<"
+	@echo "OBJCOPY "`basename $@`
 	@$(OC) -O binary $< $@
 
 $(OBJDIR)/rockbox.asm: $(OBJDIR)/rockbox.bin
 	$(TOOLSDIR)/sh2d -sh1 $< > $@
 
-$(OBJDIR)/$(BINARY) : $(OBJDIR)/rockbox.bin
+$(BUILDDIR)/$(BINARY) : $(OBJDIR)/rockbox.bin
 	@echo "Build firmware file"
 	@$(MKFIRMWARE) $< $@
 
@@ -111,22 +109,23 @@ else
 
 ifeq ($(SIMVER), win32)
 # OK, this is ugly but we need it on the link line to make it do right
-EXTRAOBJ = $(OBJDIR)/uisw32-res.o
+EXTRAOBJ = $(BUILDDIR)/sim/uisw32-res.o
 endif
 
 
-$(OBJDIR)/$(BINARY) : $(OBJS) $(OBJDIR)/librockbox.a $(DEPFILE) $(OBJDIR)/libsim.a $(OBJDIR)/libcomsim.a
+$(BUILDDIR)/$(BINARY) : $(OBJS) $(DEPFILE) $(BUILDDIR)/libsim.a \
+	$(BUILDDIR)/libcomsim.a
 	@echo "LD $(BINARY)"
-	$(CC) $(GCCOPTS) -o $@ $(OBJS) -L$(OBJDIR) -lrockbox -lsim -lcomsim $(LDOPTS) $(EXTRAOBJ) -Wl,-Map,$(OBJDIR)/rockbox.map
+	@$(CC) $(GCCOPTS) -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lsim -lcomsim $(LDOPTS) $(EXTRAOBJ) -Wl,-Map,$(OBJDIR)/rockbox.map
 
-$(OBJDIR)/libsim.a:
-	@$(MAKE) -C $(SIMDIR)
+$(BUILDDIR)/libsim.a:
+	@$(MAKE) -C $(SIMDIR) OBJDIR=$(BUILDDIR)/sim
 
-$(OBJDIR)/libcomsim.a:
-	@$(MAKE) -C $(ROOTDIR)/uisimulator/common
+$(BUILDDIR)/libcomsim.a:
+	@$(MAKE) -C $(ROOTDIR)/uisimulator/common OBJDIR=$(BUILDDIR)/comsim
 endif
 
-$(OBJDIR)/rockbox.ucl: $(OBJDIR)/rockbox.bin
+$(BUILDDIR)/rockbox.ucl: $(OBJDIR)/rockbox.bin
 	@a=`uclpack -h 2>/dev/null`; \
 	if test -n "$$a"; then \
 	  echo "UCLPACK rockbox" ; \
@@ -136,7 +135,7 @@ $(OBJDIR)/rockbox.ucl: $(OBJDIR)/rockbox.bin
 	  echo "fake" > $@; \
 	fi
 
-$(OBJDIR)/rombox.ucl: $(OBJDIR)/rombox.bin $(MAXOUTFILE)
+$(BUILDDIR)/rombox.ucl: $(OBJDIR)/rombox.bin $(MAXOUTFILE)
 	@a=`uclpack -h 2>/dev/null`; \
 	if test -n "$$a"; then \
 	  echo "UCLPACK rombox" ; \
@@ -157,7 +156,8 @@ $(OBJDIR)/rombox.ucl: $(OBJDIR)/rombox.bin $(MAXOUTFILE)
 	fi
 
 $(OBJDIR)/credits.raw: $(DOCSDIR)/CREDITS
-	perl credits.pl < $< > $@
+	@echo "create credits.raw"
+	@perl credits.pl < $< > $@
 
 $(OBJDIR)/credits.o: credits.c credits.h $(OBJDIR)/credits.raw
 	@mkdir -p `dirname $@`
@@ -168,24 +168,26 @@ include $(TOOLSDIR)/make.inc
 
 $(OBJDIR)/build.lang: lang/$(LANGUAGE).lang $(TOOLSDIR)/uplang
 	@echo "UPLANG"
+	@mkdir -p `dirname $@`
 	@perl $(TOOLSDIR)/uplang lang/english.lang $< > $@
 
 $(OBJDIR)/lang.o: $(OBJDIR)/build.lang $(TOOLSDIR)/genlang
 	@echo "GENLANG"
-	@perl -s $(TOOLSDIR)/genlang -p=$(OBJDIR)/lang $<
+	@mkdir -p `dirname $@`
+	@perl -s $(TOOLSDIR)/genlang -p=$(BUILDDIR)/lang $<
 	@echo "CC lang.c"
-	@$(CC) $(CFLAGS) -c $(OBJDIR)/lang.c -o $@
+	@$(CC) $(CFLAGS) -c $(BUILDDIR)/lang.c -o $@
 
 clean:
 	@echo "cleaning apps"
-	@-rm -f $(OBJS) $(OBJDIR)/$(BINARY) $(OBJDIR)/rockbox.asm	\
-	$(OBJDIR)/rockbox.bin $(OBJDIR)/rockbox.elf $(OBJDIR)/*.map	\
-	$(OBJDIR)/lang.o $(OBJDIR)/build.lang $(OBJDIR)/lang.[ch]	\
-	$(OBJDIR)/credits.raw $(LINKFILE) $(OBJDIR)/rockbox.ucl		\
-	$(LINKROM) $(OBJDIR)/rombox.ucl $(OBJDIR)/rombox.bin		\
-	$(OBJDIR)/rombox.elf $(MAXOUTFILE) $(DEPFILE)
-	@$(MAKE) -C plugins clean
-	@$(MAKE) -C codecs clean
+	@-rm -f $(OBJS) $(BUILDDIR)/$(BINARY) $(OBJDIR)/rockbox.asm	     \
+	$(OBJDIR)/rockbox.bin $(OBJDIR)/rockbox.elf $(OBJDIR)/*.map	     \
+	$(OBJDIR)/lang.o $(OBJDIR)/build.lang $(BUILDDIR)/lang.[ch]	     \
+	$(OBJDIR)/credits.raw $(LINKFILE) $(BUILDDIR)/rockbox.ucl $(LINKROM) \
+	$(BUILDDIR)/rombox.ucl $(OBJDIR)/rombox.bin $(OBJDIR)/rombox.elf     \
+	$(MAXOUTFILE) $(DEPFILE)
+	@$(MAKE) -C plugins clean OBJDIR=$(OBJDIR)/plugins
+	@$(MAKE) -C codecs clean OBJDIR=$(OBJDIR)/codecs
 	@rm -rf $(OBJDIR)/recorder $(OBJDIR)/player
 ifdef SIMVER
 	@$(MAKE) -C $(SIMDIR) clean

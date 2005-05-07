@@ -59,10 +59,9 @@ struct Fileheader {
 } STRUCT_PACKED;
 
 
-#ifdef LITTLE_ENDIAN
+#ifdef ROCKBOX_LITTLE_ENDIAN
 #define readshort(x) x
 #define readlong(x) x
-
 #else
 
 /* Endian functions */
