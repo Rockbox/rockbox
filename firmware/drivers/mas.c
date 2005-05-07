@@ -271,11 +271,15 @@ void mas_reset(void)
     or_b(0x01, &PAIORH);
 
 #if CONFIG_HWCODEC == MAS3507D
+    /* PB5 is "MAS enable". make it GPIO output and high */
+    PBCR2 &= ~0x0c00;
+    or_b(0x20, &PBIORL);
+    or_b(0x20, &PBDRL);
+
     and_b(~0x01, &PADRH);
     sleep(HZ/100);
     or_b(0x01, &PADRH);
     sleep(HZ/5);
-
 #elif (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     if(old_recorder)
     {

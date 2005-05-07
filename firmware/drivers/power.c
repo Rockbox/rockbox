@@ -74,7 +74,13 @@ void power_init(void)
     spdif_power_enable(false);
 #endif
 #else
+#ifdef HAVE_POWEROFF_ON_PB5
+    PBCR2 &= ~0x0c00;    /* GPIO for PB5 */
+    or_b(0x20, &PBIORL); 
+    or_b(0x20, &PBDRL);  /* hold power */
+#endif
 #ifdef HAVE_CHARGE_CTRL
+    PBCR2 &= ~0x0c00;    /* GPIO for PB5 */
     or_b(0x20, &PBIORL); /* Set charging control bit to output */
     charger_enable(false); /* Default to charger OFF */
 #endif
