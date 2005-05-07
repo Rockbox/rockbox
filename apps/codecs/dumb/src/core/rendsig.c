@@ -141,16 +141,18 @@ void duh_sigrenderer_set_sigparam(
 	if (!sigrenderer) return;
 
 	proc = sigrenderer->desc->sigrenderer_set_sigparam;
-	if (proc)
-		(*proc)(sigrenderer->sigrenderer, id, value);
-	else
-		TRACE("Parameter #%d = %ld for signal %c%c%c%c, which does not take parameters.\n",
-			(int)id,
-			value,
-			(int)(sigrenderer->desc->type >> 24),
-			(int)(sigrenderer->desc->type >> 16),
-			(int)(sigrenderer->desc->type >> 8),
-			(int)(sigrenderer->desc->type));
+	if (proc) {
+            (*proc)(sigrenderer->sigrenderer, id, value);
+            return;
+        }
+
+        TRACE("Parameter #%d = %ld for signal %c%c%c%c, which does not take parameters.\n",
+              (int)id,
+              value,
+              (int)(sigrenderer->desc->type >> 24),
+              (int)(sigrenderer->desc->type >> 16),
+              (int)(sigrenderer->desc->type >> 8),
+              (int)(sigrenderer->desc->type));
 }
 
 

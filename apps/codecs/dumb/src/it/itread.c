@@ -555,8 +555,8 @@ static long it_read_sample_data(int cmwt, IT_SAMPLE *sample, unsigned char conve
 		/** WARNING - unresolved business here... test with ModPlug? */
 
 		if (sample->flags & IT_SAMPLE_STEREO)
-			exit(37);
-
+                    return -1;
+                
 /*
 //#ifndef STEREO_SAMPLES_COUNT_AS_TWO
 		ASSERT(!(sample->flags & IT_SAMPLE_STEREO));

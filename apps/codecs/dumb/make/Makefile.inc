@@ -15,20 +15,26 @@ $(ALLEGRO_LIB_FILE): CFLAGS := $(CFLAGS)
 
 
 $(OBJDIR)/%.o: src/core/%.c include/dumb.h include/internal/dumb.h
-	$(CC) -c -o $@ $< $(CFLAGS)
+	@echo "(dumb) CC $<"
+	@$(CC) -c -o $@ $< $(CFLAGS)
 
 $(OBJDIR)/%.o: src/helpers/%.c include/dumb.h
-	$(CC) -c -o $@ $< $(CFLAGS)
+	@echo "(dumb) CC $<"
+	@$(CC) -c -o $@ $< $(CFLAGS)
 
 $(OBJDIR)/%.o: src/it/%.c include/dumb.h include/internal/it.h
-	$(CC) -c -o $@ $< $(CFLAGS)
+	@echo "(dumb) CC $<"
+	@$(CC) -c -o $@ $< $(CFLAGS)
 
 $(OBJDIR)/%.o: src/allegro/%.c include/aldumb.h include/dumb.h \
                       include/internal/aldumb.h include/internal/dumb.h
-	$(CC) -c -o $@ $< $(CFLAGS) $(WFLAGS_ALLEGRO)
+	@echo "(dumb) CC $<"
+	@$(CC) -c -o $@ $< $(CFLAGS) $(WFLAGS_ALLEGRO)
 
 $(CORE_LIB_FILE): $(CORE_OBJECTS)
-	$(AR) rs $@ $^
+	@echo "(dumb) AR $<"
+	@$(AR) rs $@ $^
 
 $(ALLEGRO_LIB_FILE): $(ALLEGRO_OBJECTS)
-	$(AR) rs $@ $^
+	@echo "(dumb) AR $<"
+	@$(AR) rs $@ $^

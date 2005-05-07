@@ -78,12 +78,16 @@ static const char xm_has_memory[] = {
 /* Effects marked with 'special' are handled specifically in itrender.c */
 void _dumb_it_xm_convert_effect(int effect, int value, IT_ENTRY *entry)
 {
+#ifdef SIMULATOR
 const int log = 0;
+#endif 
 
 	if ((!effect && !value) || (effect >= XM_N_EFFECTS))
 		return;
 
+#ifdef SIMULATOR
 if (log) printf("%c%02X", (effect<10)?('0'+effect):('A'+effect-10), value);
+#endif 
 
 	/* Linearisation of the effect number... */
 	if (effect == XM_E) {
@@ -94,7 +98,9 @@ if (log) printf("%c%02X", (effect<10)?('0'+effect):('A'+effect-10), value);
 		value = LOW(value);
 	}
 
+#ifdef SIMULATOR
 if (log) printf(" - %2d %02X", effect, value);
+#endif 
 
 #if 0 // This should be handled in itrender.c!
 	/* update effect memory */
@@ -227,16 +233,20 @@ if (log) printf(" - %2d %02X", effect, value);
 			entry->mask &= ~IT_ENTRY_EFFECT;
 	}
 
+#ifdef SIMULATOR
 if (log) printf(" - %2d %02X", effect, value);
-
+#endif
+ 
 	/* Inverse linearisation... */
 	if (effect >= SBASE && effect < SBASE+16) {
 		value = EFFECT_VALUE(effect-SBASE, value);
 		effect = IT_S;
 	}
 
+#ifdef SIMULATOR
 if (log) printf(" - %c%02X\n", 'A'+effect-1, value);
-
+#endif
+ 
 	entry->effect = effect;
 	entry->effectvalue = value;
 }

@@ -83,6 +83,9 @@
 #define ABS(x) (((x) >= 0) ? (x) : (-(x)))
 
 
+#if 0 /* This code serves no useful purpose for Rockbox. Possibly the trace
+         thing could be defined for simulator... */
+
 #ifdef DEBUGMODE
 
 #ifndef ASSERT
@@ -105,6 +108,17 @@
 
 #endif
 
+#else /* 0 */
+/* disable TRACE() and ASSERT() calls */
+#define TRACE(...)
+#define ASSERT(...)
+
+/* now fake float function to hush the compiler */
+#define pow(x,y) ((x)+(y))
+#define floor(x) x
+#define log(x) (x)
+#define exp(x)   (x)
+#endif /* 0 */
 
 #define DUMB_ID(a,b,c,d) (((unsigned int)(a) << 24) | \
                           ((unsigned int)(b) << 16) | \
