@@ -1935,8 +1935,6 @@ bool dbg_save_roms(void)
 #endif /*  CONFIG_CPU == SH7034 */
 
 #ifdef CONFIG_TUNER
-extern int debug_fm_detection;
-
 bool dbg_fm_radio(void)
 {
     char buf[32];
@@ -1954,8 +1952,6 @@ bool dbg_fm_radio(void)
         
         snprintf(buf, sizeof buf, "HW detected: %s", fm_detected?"yes":"no");
         lcd_puts(0, 0, buf);
-        snprintf(buf, sizeof buf, "Result: %08x", debug_fm_detection);
-        lcd_puts(0, 1, buf);
         lcd_update();
         
         button = button_get(true);

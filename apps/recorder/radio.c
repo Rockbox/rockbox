@@ -84,8 +84,6 @@ static struct fmstation presets[MAX_PRESETS];
 
 static const char default_filename[] = "/.rockbox/fm-presets-default.fmr";
 
-int debug_fm_detection;
-
 static int preset_menu; /* The menu index of the preset list */
 static struct menu_item preset_menu_items[MAX_PRESETS];
 static int num_presets; /* The number of presets in the preset list */

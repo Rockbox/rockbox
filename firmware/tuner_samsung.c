@@ -27,7 +27,6 @@
 #define DEFAULT_IN2 0x140884 /* 5kHz, 7.2MHz crystal */
 #define PLL_FREQ_STEP 10000
 
-int debug_fm_detection;
 static int fm_in1;
 static int fm_in2;
 
@@ -96,9 +95,7 @@ int samsung_get(int setting)
     {
         case RADIO_PRESENT:
             fmradio_set(2, 0x140885); /* 5kHz, 7.2MHz crystal, test mode 1 */
-            val = fmradio_read(0);
-            debug_fm_detection = val;
-            val = (val == 0x140885);
+            val = (fmradio_read(0) == 0x140885);
             break;
 
         case RADIO_TUNED:
