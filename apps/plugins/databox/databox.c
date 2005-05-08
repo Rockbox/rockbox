@@ -242,7 +242,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 editing.currentselection=(editing.currentselection+
                     1) %editing.selectionmax;
             }
-            if(button&BUTTON_RIGHT
+            else if(button&BUTTON_RIGHT
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
                 ||button&BUTTON_UP
 #endif
@@ -250,7 +250,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 editing.currentselection=(editing.currentselection +
                     editing.selectionmax-1) % editing.selectionmax;             
             }
-            if(button&BUTTON_SELECT) {
+            else if(button&BUTTON_OFF) {
+                rb->memcpy(&editor.token[editor.currentindex],&editing.old_token,sizeof(struct token));
+                editing.selecting=0;
+            }
+            else if(button&BUTTON_SELECT) {
                 buildtoken(editing.selection_candidates[editing.currentselection],&editor.token[editor.currentindex]);
                 editing.selecting=0;
                 if(editor.token[editor.currentindex].kind==TOKEN_EOF)
