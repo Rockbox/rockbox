@@ -539,15 +539,15 @@ bool dbg_hw_info(void)
     int oldmode;  /* saved memory guard mode */
 
 #ifdef USB_ENABLE_ONDIOSTYLE
-    if(PADR & 0x20)
+    if(PADRL & 0x20)
 #else
-    if(PADR & 0x400)
+    if(PADRH & 0x04)
 #endif
         usb_polarity = 0; /* Negative */
     else
         usb_polarity = 1; /* Positive */
 
-    if(PADR & 0x800)
+    if(PADRH & 0x08)
         pr_polarity = 0; /* Negative */
     else
         pr_polarity = 1; /* Positive */
@@ -636,7 +636,7 @@ bool dbg_hw_info(void)
     bool has_bootrom; /* flag for boot ROM present */
     int oldmode;  /* saved memory guard mode */
 
-    if(PADR & 0x400)
+    if(PADRH & 0x04)
         usb_polarity = 0; /* Negative */
     else
         usb_polarity = 1; /* Positive */
@@ -1119,12 +1119,7 @@ bool dbg_rtc(void)
     }
     return false;
 }
-#else
-bool dbg_rtc(void)
-{
-    return false;
-}
-#endif
+#endif /* HAVE_RTC */
 
 #if CONFIG_HWCODEC != MASNONE
 
