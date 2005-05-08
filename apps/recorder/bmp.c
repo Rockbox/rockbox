@@ -61,17 +61,17 @@ struct Fileheader {
 
 
 #ifdef ROCKBOX_LITTLE_ENDIAN
-#define readshort(x) x
-#define readlong(x) x
+#define readshort(x) *(x)
+#define readlong(x) *(x)
 #else
 
-/* Endian functions */
-short readshort(void* value) {
+/* big endian functions */
+static short readshort(short *value) {
     unsigned char* bytes = (unsigned char*) value;
     return bytes[0] | (bytes[1] << 8);
 }
 
-long readlong(void* value) {
+static long readlong(long *value) {
     unsigned char* bytes = (unsigned char*) value;
     return (long)bytes[0] | ((long)bytes[1] << 8) |
         ((long)bytes[2] << 16) | ((long)bytes[3] << 24);
