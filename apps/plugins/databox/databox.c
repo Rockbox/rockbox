@@ -18,13 +18,28 @@
  ****************************************************************************/
 #include "databox.h"
 
-/* welcome to the example rockbox plugin */
+/* variable button definitions */
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
+#define DBX_SELECT BUTTON_SELECT
+#define DBX_STOP   BUTTON_OFF
+#elif CONFIG_KEYPAD == RECORDER_PAD
+#define DBX_SELECT BUTTON_PLAY
+#define DBX_STOP   BUTTON_OFF
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define DBX_SELECT BUTTON_MENU
+#define DBX_STOP   BUTTON_OFF
+#elif CONFIG_KEYPAD == PLAYER_PAD
+#define DBX_SELECT BUTTON_PLAY
+#define DBX_STOP   BUTTON_STOP
+#endif
+
+#define MAX_TOKENS 70
 
 /* here is a global api struct pointer. while not strictly necessary,
    it's nice not to have to pass the api pointer in all function calls
    in the plugin */
 struct plugin_api* rb;
-struct token tokenbuf[200];
+struct token tokenbuf[MAX_TOKENS];
 
 struct print printing;
 struct editor editor;
@@ -164,20 +179,6 @@ int writetstream(char *filename,struct token *token) {
     return i;
 }
 
-int hcl_button_get(void) {
-    int oldbuttonstate,newbuttonstate,pressed=0;
-    oldbuttonstate = rb->button_status();
-    do {
-        newbuttonstate = rb->button_status();
-        pressed = newbuttonstate & ~oldbuttonstate;
-        oldbuttonstate = newbuttonstate;
-        rb->yield();
-    }
-    while(!pressed);
-    rb->button_clear_queue();
-    return pressed;
-}
-
 /* this is the plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
@@ -199,13 +200,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* now go ahead and have fun! */
     rb->splash(HZ*2, true, "Databox! Enter filename ^.^");
     databox_init();
-    if(rb->kbd_input(filename, 100)) {
+    filename[0] = '\0';
+    if(rb->kbd_input(filename, sizeof filename)) {
         rb->splash(HZ*2, true, "Something went wrong with the filename.. exiting..");
         return PLUGIN_ERROR;
     }
     /* add / in front if omitted */
     if(filename[0]!='/') {
-        rb->strncpy(buf+1,filename,99);
+        rb->strncpy(buf+1,filename,sizeof(filename)-1);
         buf[0]='/';
         rb->strcpy(filename,buf);
     }
@@ -213,9 +215,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     if(rb->strncasecmp(filename+rb->strlen(filename)-4,".rsp",4)) {
         rb->strcat(filename,".rsp");
     }
-    rb->lcd_clear_display();
-    rb->lcd_update();
-    editor.currentindex=editor.tokencount=readtstream(filename,editor.token,200);
+    editor.currentindex=editor.tokencount
+                       =readtstream(filename,editor.token,MAX_TOKENS);
     editing.currentselection=0;
     editing.selecting=0;
     if(editor.currentindex==0) {
@@ -226,47 +227,44 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         rb->memset(&editing.old_token,0,sizeof(struct token));        
     }
     do {
+        rb->lcd_setfont(FONT_SYSFIXED);
         rb->lcd_clear_display();
-        rb->lcd_update();
         printing.line=0;
         printing.position=0;
         displaytstream(editor.token);
         editor.valid=check_tokenstream(editor.token,editor.editingmode);
         check_accepted(editor.token,editor.currentindex);
         rb->lcd_update();
-        button=hcl_button_get();
-        if(editing.selecting) {
-            // button handling, up, down, select,stop
-            // up/right = move currentselection one up
-            // down/left = move currentselection one down
-            // select = build token in place.
-            // stop = cancel editing
-            if(button&BUTTON_LEFT
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
-                ||button&BUTTON_DOWN
+        button = rb->button_get(true);
+        switch (button) {
+          case BUTTON_LEFT:
+#ifdef BUTTON_DOWN
+          case BUTTON_DOWN:
 #endif
-                ) {
-                editing.currentselection=(editing.currentselection+
-                    1) %editing.selectionmax;
-            }
-            else if(button&BUTTON_RIGHT
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
-                ||button&BUTTON_UP
+            if (editing.selecting)
+                editing.currentselection = (editing.currentselection +
+                        editing.selectionmax-1) % editing.selectionmax;
+            else
+                editor.currentindex = (editor.currentindex + editor.tokencount) 
+                                    % (editor.tokencount+1);
+            break;
+
+          case BUTTON_RIGHT:
+#ifdef BUTTON_DOWN
+          case BUTTON_UP:
 #endif
-                ) {
-                editing.currentselection=(editing.currentselection +
-                    editing.selectionmax-1) % editing.selectionmax;             
-            }
-            else if(button&BUTTON_OFF) {
-                rb->memcpy(&editor.token[editor.currentindex],&editing.old_token,sizeof(struct token));
-                editing.selecting=0;
-            }
-            else if(button&BUTTON_PLAY
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
-                    ||button&BUTTON_SELECT
-#endif
-                    ) {
-                buildtoken(editing.selection_candidates[editing.currentselection],&editor.token[editor.currentindex]);
+            if (editing.selecting)
+                editing.currentselection = (editing.currentselection+1)
+                                         % editing.selectionmax;
+            else
+                editor.currentindex = (editor.currentindex+1) 
+                                    % (editor.tokencount+1);
+            break;
+
+          case DBX_SELECT:
+            if(editing.selecting) {
+                buildtoken(editing.selection_candidates[editing.currentselection],
+                           &editor.token[editor.currentindex]);
                 editing.selecting=0;
                 if(editor.token[editor.currentindex].kind==TOKEN_EOF)
                     done=1;
@@ -278,46 +276,38 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                     editing.selecting=1;
                     editing.currentselection=0;
                     buildchoices(acceptedmask);
-                    rb->memcpy(&editing.old_token,&editor.token[editor.currentindex],sizeof(struct token));
+                    rb->memcpy(&editing.old_token,&editor.token[editor.currentindex],
+                               sizeof(struct token));
                 }
             }
-        }
-        else {
-            // button handling, left, right, select, stop
-            // left/down = move currentindex down
-            // right/up = move currentindex up
-            // select = enter selecting mode.
-            // stop = quit editor.
-            if(button&BUTTON_LEFT
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
-                ||button&BUTTON_DOWN
-#endif
-                ) {
-                editor.currentindex=(editor.currentindex + 
-                    editor.tokencount) % (editor.tokencount+1);
-            }
-            else if(button&BUTTON_RIGHT
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
-                ||button&BUTTON_UP
-#endif
-                ) {
-                editor.currentindex=(editor.currentindex+1) % (editor.tokencount+1);
-            }
-            else if(button&BUTTON_OFF) {
-                done=1;
-            }
-            else if(button&BUTTON_PLAY
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
-                    ||button&BUTTON_SELECT
-#endif
-                    ) {
+            else {
                 editing.selecting=1;
                 editing.currentselection=0;
                 buildchoices(acceptedmask);
-                rb->memcpy(&editing.old_token,&editor.token[editor.currentindex],sizeof(struct token));
+                rb->memcpy(&editing.old_token,&editor.token[editor.currentindex],
+                           sizeof(struct token));
             }
+            break;
+
+          case DBX_STOP:
+            if(editing.selecting) {
+                rb->memcpy(&editor.token[editor.currentindex],&editing.old_token,
+                           sizeof(struct token));
+                editing.selecting=0;
+            }
+            else
+                done=1;
+            break;
+
+          default:
+            if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
+                rb->lcd_setfont(FONT_UI);
+                return PLUGIN_USB_CONNECTED;
+            }
+            break;
         }
     } while (!done);
+    rb->lcd_setfont(FONT_UI);
     if(editor.valid&&editor.tokencount>0) {
         if(writetstream(filename,editor.token)) {
             rb->splash(HZ*2,true,"Wrote file succesfully ^.^");

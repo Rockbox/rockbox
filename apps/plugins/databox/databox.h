@@ -55,8 +55,4 @@ extern struct print printing;
 extern struct editor editor;
 extern struct editing editing;
 
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
-#define  BUTTON_PLAY          BUTTON_ON
-#endif
-
 #endif
