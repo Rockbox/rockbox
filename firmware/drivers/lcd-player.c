@@ -96,7 +96,6 @@ static char scroll_ticks = 12; /* # of ticks between updates */
 static int scroll_delay = HZ/2; /* delay before starting scroll */
 static int jump_scroll_delay = HZ/4; /* delay between jump scroll jumps */
 static char scroll_spacing = 3; /* spaces between end and start of text */
-static bool allow_bidirectional_scrolling = true;
 static int bidir_limit = 50;  /* percent */
 static int jump_scroll = 0; /* 0=off, 1=once, ..., JUMP_SCROLL_ALWAYS */
 
@@ -700,12 +699,6 @@ void lcd_stop_scroll(void)
     lcd_update();
 }
 
-
-void lcd_allow_bidirectional_scrolling(bool on)
-{
-    allow_bidirectional_scrolling=on;
-}
-
 static const char scroll_tick_table[16] = {
  /* Hz values:
     1, 1.25, 1.55, 2, 2.5, 3.12, 4, 5, 6.25, 8.33, 10, 12.5, 16.7, 20, 25, 33 */
@@ -833,8 +826,14 @@ static void scroll_thread(void)
                     cursor.textpos++;
                     if (cursor.textpos>=cursor.len)
                         cursor.textpos=0;
+#ifdef SIMULATOR
+                    lcdx_putc(cursor.x_pos, cursor.y_pos,
+                              cursor.text[cursor.textpos]);
+                    update=true;
+#else
                     update|=lcdx_putc(cursor.x_pos, cursor.y_pos,
                                       cursor.text[cursor.textpos]);
+#endif
                 }
             }
             if (update) {

@@ -98,7 +98,6 @@ extern void lcd_jump_scroll (int mode); /* 0=off, 1=once, ..., ALWAYS */
 extern void lcd_jump_scroll_delay( int ms );
 unsigned char lcd_get_locked_pattern(void);
 void lcd_unlock_pattern(unsigned char pat);
-void lcd_allow_bidirectional_scrolling(bool on);
 extern void lcd_bidir_scroll(int threshold);
 void lcd_put_cursor(int x, int y, char cursor_char);
 void lcd_remove_cursor(void);
