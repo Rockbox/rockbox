@@ -197,10 +197,12 @@ void backlight_set_timeout(int index)
     backlight_on();
 }
 
+#ifdef HAVE_CHARGE_CTRL
 bool backlight_get_on_when_charging(void)
 {
     return backlight_on_when_charging;
 }
+#endif
 
 void backlight_set_on_when_charging(bool yesno)
 {
@@ -267,7 +269,6 @@ void backlight_off(void) {}
 void backlight_tick(void) {}
 int  backlight_get_timeout(void) {return 0;}
 void backlight_set_timeout(int index) {(void)index;}
-bool backlight_get_on_when_charging(void) {return 0;}
 void backlight_set_on_when_charging(bool yesno) {(void)yesno;}
 #ifdef HAVE_REMOTE_LCD
 void remote_backlight_on(void) {}

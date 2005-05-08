@@ -120,11 +120,10 @@ bool charger_inserted(void)
 #endif
 }
 
+#ifdef HAVE_CHARGE_CTRL
 void charger_enable(bool on)
 {
-    (void)on;
-#ifdef HAVE_CHARGE_CTRL
-    if(on) 
+    if(on)
     {
         and_b(~0x20, &PBDRL);
         charger_enabled = 1;
@@ -134,8 +133,8 @@ void charger_enable(bool on)
         or_b(0x20, &PBDRL);
         charger_enabled = 0;
     }
-#endif
 }
+#endif
 
 #ifdef HAVE_SPDIF_POWER
 void spdif_power_enable(bool on)
@@ -165,7 +164,7 @@ void ide_power_enable(bool on)
         P1 |= 0x08;
     else
         P1 &= ~0x08;
-#else
+#else /* SH1 based archos */
     bool touched = false;
 #ifdef NEEDS_ATA_POWER_ON
     if(on)
@@ -177,7 +176,7 @@ void ide_power_enable(bool on)
 #endif
         touched = true;
     }
-#endif
+#endif /* NEEDS_ATA_POWER_ON */
 #ifdef HAVE_ATA_POWER_OFF
     if(!on)
     {
@@ -188,7 +187,7 @@ void ide_power_enable(bool on)
 #endif
         touched = true;
     }
-#endif
+#endif /* HAVE_ATA_POWER_OFF */
 
 /* late port preparation, else problems with read/modify/write 
    of other bits on same port, while input and floating high */
@@ -202,9 +201,8 @@ void ide_power_enable(bool on)
         PACR2 &= 0xFBFF; /* GPIO for PA5 */
 #endif
     }
-#endif
+#endif /* SH1 based archos */
 }
-#endif /* !HAVE_MMC */
 
 
 bool ide_powered(void)
@@ -213,7 +211,7 @@ bool ide_powered(void)
     return (GPIO_OUT & 0x80000000)?false:true;
 #elif defined(GMINI_ARCH)
     return (P1 & 0x08?true:false);
-#else
+#else /* SH1 based archos */
 #if defined(NEEDS_ATA_POWER_ON) || defined(HAVE_ATA_POWER_OFF)
 #ifdef ATA_POWER_PLAYERSTYLE
     /* This is not correct for very old players, since these are unable to
@@ -223,17 +221,18 @@ bool ide_powered(void)
         return false; /* would be floating low, disk off */
     else
         return (PBDRL & 0x10) != 0;
-#else
+#else /* !ATA_POWER_PLAYERSTYLE */
     if ((PACR2 & 0x0400) || !(PAIORL & 0x20)) /* not configured for output */
         return true; /* would be floating high, disk on */
     else
         return (PADRL & 0x20) != 0;
-#endif /* ATA_POWER_PLAYERSTYLE */
-#else
+#endif /* !ATA_POWER_PLAYERSTYLE */
+#else /* !defined(NEEDS_ATA_POWER_ON) && !defined(HAVE_ATA_POWER_OFF) */
     return true; /* pretend always powered if not controlable */
 #endif
 #endif
 }
+#endif /* !HAVE_MMC */
 
 
 void power_off(void)
