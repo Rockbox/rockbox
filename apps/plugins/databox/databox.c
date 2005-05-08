@@ -68,6 +68,10 @@ void print(char *word, int invert) {
         printing.position=0;
         newpos=printing.position+strlen+1;
     }
+    /* Fixme: the display code needs to keep the current item visible instead of
+     * just displaying the first items. */
+    if (printing.font_h*printing.line >= LCD_HEIGHT)
+        return;
     rb->lcd_putsxy(printing.font_w*printing.position,printing.font_h*printing.line,word);
     if(invert)
         rb->lcd_invertrect(printing.font_w*printing.position,printing.font_h*printing.line,printing.font_w*strlen,printing.font_h);
@@ -84,7 +88,11 @@ void print(char *word, int invert) {
         printing.line++;
         printing.position = 0;
         newpos = printing.position + strlen + (invert ? 3 : 1);
-    }
+    } 
+    /* Fixme: the display code needs to keep the current item visible instead of
+     * just displaying the first items. */
+    if (printing.line >= 2)
+        return;
     if (invert) {
         rb->lcd_putc(printing.position, printing.line, MARKER_LEFT);
         rb->lcd_puts(printing.position + 1, printing.line, word);
@@ -226,8 +234,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     databox_init();
     filename[0] = '\0';
     if(rb->kbd_input(filename, sizeof filename)) {
-        rb->splash(HZ*2, true, "Something went wrong with the filename.. exiting..");
-        return PLUGIN_ERROR;
+        rb->splash(HZ*2, true, "Cancelled...");
+        return PLUGIN_OK;
     }
     /* add / in front if omitted */
     if(filename[0]!='/') {
@@ -278,7 +286,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             break;
 
           case BUTTON_RIGHT:
-#ifdef BUTTON_DOWN
+#ifdef BUTTON_UP
           case BUTTON_UP:
 #endif
             if (editing.selecting)
