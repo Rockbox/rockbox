@@ -23,41 +23,67 @@
 #include "kernel.h"
 #include "button.h"
 #include "sprintf.h"
+#include "string.h"
 
 const char* const credits[] = {
 #include "credits.raw" /* generated list of names from docs/CREDITS */
 };
 
-#ifdef HAVE_LCD_BITMAP
-#define MAX_LINES 7
-#define DISPLAY_TIME  HZ*2
-#else
-#define MAX_LINES 2
-#define DISPLAY_TIME  HZ
-#endif
-
 #ifdef HAVE_LCD_CHARCELLS
+#define MAX(x, y) ((x) > (y) ? (x) : (y))
 void roll_credits(void)
 {
-    int i;
-    int line = 0;
     int numnames = sizeof(credits)/sizeof(char*);
+    int curr_name = 0;
+    int curr_len = strlen(credits[0]);
+    int curr_index = 0;
+    int curr_line = 0;
+    int name, len, new_len, line, x;
 
-    lcd_clear_display();
-
-    for ( i=0; i < numnames; i += MAX_LINES )
+    while (1)
     {
         lcd_clear_display();
-        for(line = 0;line < MAX_LINES && line+i < numnames;line++)
-        {
-            lcd_puts(0, line, credits[line+i]);
-        }
 
+        name = curr_name;
+        x = -curr_index;
+        len = curr_len;
+        line = curr_line;
+
+        while (x < 11)
+        {
+            int x2;
+
+            if (x < 0)
+                lcd_puts(0, line, credits[name] - x);
+            else
+                lcd_puts(x, line, credits[name]);
+                
+            if (++name >= numnames)
+                break;
+
+            x2 = x + len/2;
+            if ((unsigned)x2 < 11)
+                lcd_puts(x2, line ^ 1, "*");
+
+            new_len = strlen(credits[name]);
+            x += MAX(len/2 + 2, len - new_len/2 + 1);
+            len = new_len;
+            line ^= 1;
+        }
         /* abort on keypress */
-        if (button_get_w_tmo(DISPLAY_TIME) & BUTTON_REL)
+        if (button_get_w_tmo(HZ/8) & BUTTON_REL)
             return;
+
+        if (++curr_index >= curr_len)
+        {
+            if (++curr_name >= numnames)
+                break;
+            new_len = strlen(credits[curr_name]);
+            curr_index -= MAX(curr_len/2 + 2, curr_len - new_len/2 + 1);
+            curr_len = new_len;
+            curr_line ^= 1;
+        }
     }
-    return;
 }
 #else
 
