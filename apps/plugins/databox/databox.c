@@ -217,7 +217,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_update();
     editor.currentindex=editor.tokencount=readtstream(filename,editor.token,200);
     editing.currentselection=0;
-    editing.selecting=editor.currentindex==0 ? 1 : 0;
+    editing.selecting=0;
+    if(editor.currentindex==0) {
+        editor.valid=check_tokenstream(editor.token,editor.editingmode);
+        check_accepted(editor.token,editor.currentindex);
+        editing.selecting=1;
+        buildchoices(acceptedmask);
+        rb->memset(&editing.old_token,0,sizeof(struct token));        
+    }
     do {
         rb->lcd_clear_display();
         rb->lcd_update();
@@ -285,14 +292,17 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 editor.currentindex=(editor.currentindex + 
                     editor.tokencount) % (editor.tokencount+1);
             }
-            if(button&BUTTON_RIGHT
+            else if(button&BUTTON_RIGHT
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
                 ||button&BUTTON_UP
 #endif
                 ) {
                 editor.currentindex=(editor.currentindex+1) % (editor.tokencount+1);
             }
-            if(button&BUTTON_SELECT) {
+            else if(button&BUTTON_OFF) {
+                done=1;
+            }
+            else if(button&BUTTON_SELECT) {
                 editing.selecting=1;
                 editing.currentselection=0;
                 buildchoices(acceptedmask);
@@ -300,12 +310,18 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             }
         }
     } while (!done);
-    if(writetstream(filename,editor.token)) {
-        rb->splash(HZ*2,true,"Wrote file succesfully ^.^");
-        return PLUGIN_OK;
+    if(editor.valid&&editor.tokencount>0) {
+        if(writetstream(filename,editor.token)) {
+            rb->splash(HZ*2,true,"Wrote file succesfully ^.^");
+            return PLUGIN_OK;
+        }
+        else {
+            rb->splash(HZ*2,true,"Error while writing file :(");
+            return PLUGIN_ERROR;
+        }
     }
     else {
-        rb->splash(HZ*2,true,"Error while writing rsp :(");
-        return PLUGIN_ERROR;
+        rb->splash(HZ*2,true,"Search query invalid, not saving.");
+        return PLUGIN_OK;
     }
 }
