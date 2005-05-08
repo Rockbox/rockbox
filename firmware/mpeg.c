@@ -1019,11 +1019,13 @@ static bool swap_one_chunk(void)
 }
 #endif
 
+#ifdef HAVE_RECORDING
 const unsigned char empty_id3_header[] =
 {
     'I', 'D', '3', 0x03, 0x00, 0x00,
     0x00, 0x00, 0x1f, 0x76 /* Size is 4096 minus 10 bytes for the header */
 };
+#endif
 
 static void mpeg_thread(void)
 {

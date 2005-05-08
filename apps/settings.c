@@ -69,8 +69,9 @@
 void dac_line_in(bool enable);
 #endif
 struct user_settings global_settings;
+#ifdef HAVE_RECORDING
 const char rec_base_directory[] = REC_BASE_DIR;
-
+#endif
 
 
 #define CONFIG_BLOCK_VERSION 21
@@ -155,8 +156,10 @@ Rest of config block, only saved to disk:
 /* some sets of values which are used more than once, to save memory */
 static const char off_on[] = "off,on";
 static const char off_on_ask[] = "off,on,ask";
-static const char graphic_numeric[] = "graphic,numeric";
 static const char off_number_spell_hover[] = "off,number,spell,hover";
+#ifdef HAVE_LCD_BITMAP
+static const char graphic_numeric[] = "graphic,numeric";
+#endif
 
 #ifdef HAVE_RECORDING
 /* keep synchronous to trig_durations and
