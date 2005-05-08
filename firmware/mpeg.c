@@ -369,7 +369,6 @@ unsigned long shadow_encoder_control = 0;
 
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
 unsigned long shadow_io_control_main = 0;
-unsigned long shadow_app_select = 0;
 unsigned long shadow_soft_mute = 0;
 unsigned shadow_codec_reg0;
 #endif
