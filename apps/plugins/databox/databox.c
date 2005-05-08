@@ -261,7 +261,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 rb->memcpy(&editor.token[editor.currentindex],&editing.old_token,sizeof(struct token));
                 editing.selecting=0;
             }
-            else if(button&BUTTON_SELECT) {
+            else if(button&BUTTON_PLAY
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
+                    ||button&BUTTON_SELECT
+#endif
+                    ) {
                 buildtoken(editing.selection_candidates[editing.currentselection],&editor.token[editor.currentindex]);
                 editing.selecting=0;
                 if(editor.token[editor.currentindex].kind==TOKEN_EOF)
@@ -302,7 +306,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             else if(button&BUTTON_OFF) {
                 done=1;
             }
-            else if(button&BUTTON_SELECT) {
+            else if(button&BUTTON_PLAY
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
+                    ||button&BUTTON_SELECT
+#endif
+                    ) {
                 editing.selecting=1;
                 editing.currentselection=0;
                 buildchoices(acceptedmask);
