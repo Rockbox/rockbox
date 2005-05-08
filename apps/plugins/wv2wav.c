@@ -32,7 +32,7 @@ static file_info_struct file_info;
 static long temp_buffer [BUFFER_SIZE];
 
 /* Reformat samples from longs in processor's native endian mode to
- little-endian data with (possibly) less than 4 bytes / sample. */
+ little-endian data with 2 bytes / sample. */
 uchar* format_samples (int bps, uchar *dst, long *src, ulong samcnt)
 {
   long temp;
@@ -41,7 +41,10 @@ uchar* format_samples (int bps, uchar *dst, long *src, ulong samcnt)
   {
     case 1:
       while (samcnt--)
-        *dst++ = *src++ + 128;
+      {
+        *dst++ = (uchar)(temp = (*src++ << 8));
+        *dst++ = (uchar)(temp >> 8);
+      }
 
       break;
 
@@ -57,9 +60,8 @@ uchar* format_samples (int bps, uchar *dst, long *src, ulong samcnt)
     case 3:
       while (samcnt--) 
       {
-        *dst++ = (uchar)(temp = *src++);
+        *dst++ = (uchar)(temp = (*src++ >> 8));
         *dst++ = (uchar)(temp >> 8);
-        *dst++ = (uchar)(temp >> 16);
       }
 
       break;
@@ -67,10 +69,8 @@ uchar* format_samples (int bps, uchar *dst, long *src, ulong samcnt)
     case 4:
       while (samcnt--) 
       {
-        *dst++ = (uchar)(temp = *src++);
+        *dst++ = (uchar)(temp = (*src++ >> 16));
         *dst++ = (uchar)(temp >> 8);
-        *dst++ = (uchar)(temp >> 16);
-        *dst++ = (uchar)(temp >> 24);
       }
 
       break;
@@ -83,7 +83,6 @@ uchar* format_samples (int bps, uchar *dst, long *src, ulong samcnt)
 void wvpack_decode_data(file_info_struct* file_info, int samples_to_decode, WavpackContext **wpc)
 {
   int bps = WavpackGetBytesPerSample(*wpc);
-    
   /* nothing to decode */
   if (!samples_to_decode)
   {
@@ -98,9 +97,20 @@ void wvpack_decode_data(file_info_struct* file_info, int samples_to_decode, Wavp
     /* update some infos */
     file_info->current_sample += samples_unpacked;    
  
-    format_samples (bps, (uchar *) temp_buffer, temp_buffer, samples_unpacked *= file_info->channels);
+    /* for now, convert mono to stereo here, in place */
+    if (WavpackGetReducedChannels (*wpc) == 1) {
+      long *dst = temp_buffer + (samples_unpacked * 2);
+      long *src = temp_buffer + samples_unpacked;
+      long count = samples_unpacked;
 
-    rb->write(file_info->outfile, temp_buffer, samples_unpacked * bps);
+      while (count--) {
+        *--dst = *--src;
+        *--dst = *src;
+      }
+    }
+ 
+    format_samples (bps, (uchar *) temp_buffer, temp_buffer, samples_unpacked * file_info->channels);
+    rb->write(file_info->outfile, temp_buffer, samples_unpacked * 4);
   }   
 }
 
@@ -118,7 +128,7 @@ long Read(void* buffer, long size)
   } 
   else 
   {
-    memcpy(buffer, &filebuf[file_info.curpos], (file_info.filesize-1-file_info.curpos));
+    memcpy(buffer, &filebuf[file_info.curpos], file_info.filesize-file_info.curpos);
     file_info.curpos = file_info.filesize;
   }
     
@@ -151,10 +161,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
     return PLUGIN_ERROR;
   }  
 
-  /* grap/set some infos */
-  file_info.channels = WavpackGetReducedChannels(wpc);
+  /* grap/set some infos (forcing some to temp values) */
+  file_info.channels = 2;
   file_info.total_samples = WavpackGetNumSamples(wpc);
-  file_info.bitspersample = WavpackGetBitsPerSample(wpc);
+  file_info.bitspersample = 16;
   file_info.samplerate = WavpackGetSampleRate(wpc);
   file_info.current_sample = 0;
   
@@ -175,8 +185,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
     }
   }  
           
+  close_wav(&file_info);    
+
   /* do some last checks */
-  if ((WavpackGetNumSamples (wpc) != (ulong) -1) && (file_info.total_samples != WavpackGetNumSamples (wpc))) 
+  if ((WavpackGetNumSamples (wpc) != (ulong) -1) && (file_info.current_sample != WavpackGetNumSamples (wpc))) 
   {
     rb->splash(HZ*2, true, "incorrect number of samples!");
     return PLUGIN_ERROR;
@@ -187,7 +199,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
     return PLUGIN_ERROR;
   }
   
-  close_wav(&file_info);    
   rb->splash(HZ*2, true, "FINISHED!");
 
   return PLUGIN_OK;
