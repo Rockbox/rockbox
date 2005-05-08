@@ -32,9 +32,10 @@ static char debugbuf[200];
 #include "kernel.h"
 #include "system.h"
 
+#ifdef DEBUG
+#if CONFIG_CPU == SH7034 /* these are still very SH-oriented */
 void debug_init(void)
 {
-#if CONFIG_CPU == SH7034
     /* Clear it all! */
     SSR1 &= ~(SCI_RDRF | SCI_ORER | SCI_PER | SCI_FER);
 
@@ -43,11 +44,8 @@ void debug_init(void)
     SCR1 |= 0x40;
     SCR1 &= ~0x80;
     IPRE |= 0xf000; /* Set to highest priority */
-#endif
 }
 
-#ifdef DEBUG
-#if CONFIG_CPU == SH7034 /* these are still very SH-oriented */
 static int debug_tx_ready(void)
 {
     return (SSR1 & SCI_TDRE);

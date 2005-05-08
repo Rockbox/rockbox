@@ -557,12 +557,9 @@ static void drain_dma_buffer(void)
     );
 }
 
-#endif /* #if CONFIG_HWCODEC == MAS3587F */
-
 void rec_tick (void) __attribute__ ((section (".icode")));
 void rec_tick(void)
 {
-#if CONFIG_HWCODEC == MAS3587F
     int i;
     int num_bytes;
     if(is_recording && (PBDR & 0x4000))
@@ -667,8 +664,8 @@ void rec_tick(void)
             }
         }
     }
-#endif /* #if CONFIG_HWCODEC == MAS3587F */
 }
+#endif /* #if CONFIG_HWCODEC == MAS3587F */
 
 void playback_tick(void)
 {
