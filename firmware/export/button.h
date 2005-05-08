@@ -63,6 +63,7 @@ bool remote_button_hold(void);
 #define  BUTTON_MODE          0x0200
 #define  BUTTON_REC           0x0400
 #define  BUTTON_ON            0x0001
+#define  BUTTON_PLAY          BUTTON_ON
 #define  BUTTON_OFF           0x0002
 #define  BUTTON_UP            0x0010
 #define  BUTTON_DOWN          0x0020
