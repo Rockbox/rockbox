@@ -39,11 +39,11 @@ DIRS = .
 # Subdirs containing multi-file plugins
 
 #for all targets
-SUBDIRS += searchengine
+SUBDIRS += searchengine databox
 
 #for any recorder and iRiver model
 ifneq (,$(strip $(foreach tgt,RECORDER IRIVER,$(findstring $(tgt),$(TARGET)))))
-    SUBDIRS += rockboy databox
+    SUBDIRS += rockboy
 endif
 
 

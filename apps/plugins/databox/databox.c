@@ -48,22 +48,25 @@ struct editing editing;
 extern int acceptedmask;
 
 void databox_init(void) {
+#ifdef HAVE_LCD_BITMAP
     printing.fontfixed = rb->font_get(FONT_SYSFIXED);
     rb->lcd_setfont(FONT_SYSFIXED);
     printing.font_w = printing.fontfixed->maxwidth;
     printing.font_h = printing.fontfixed->height;
+#endif
     printing.line=0;
     printing.position=0;
     editor.editingmode = INVALID_MARK;
     editor.token = tokenbuf;
 }
 
+#ifdef HAVE_LCD_BITMAP
 void print(char *word, int invert) {
     int strlen=rb->strlen(word), newpos=printing.position+strlen+1;
     if(newpos*printing.font_w>LCD_WIDTH) {
-            printing.line++;
-            printing.position=0;
-            newpos=printing.position+strlen+1;
+        printing.line++;
+        printing.position=0;
+        newpos=printing.position+strlen+1;
     }
     rb->lcd_putsxy(printing.font_w*printing.position,printing.font_h*printing.line,word);
     if(invert)
@@ -71,6 +74,27 @@ void print(char *word, int invert) {
     rb->lcd_update_rect(printing.font_w*printing.position,printing.font_h*printing.line,printing.font_w*strlen,printing.font_h);
     printing.position=newpos;
 }
+#else /* HAVE_LCD_CHARCELLS */
+#define MARKER_LEFT 0x81
+#define MARKER_RIGHT 0x82
+void print(char *word, int invert) {
+    int strlen = rb->strlen(word);
+    int newpos = printing.position + strlen + (invert ? 3 : 1);
+    if (newpos > 11) {
+        printing.line++;
+        printing.position = 0;
+        newpos = printing.position + strlen + (invert ? 3 : 1);
+    }
+    if (invert) {
+        rb->lcd_putc(printing.position, printing.line, MARKER_LEFT);
+        rb->lcd_puts(printing.position + 1, printing.line, word);
+        rb->lcd_putc(printing.position + strlen + 1, printing.line, MARKER_RIGHT);
+    }
+    else
+        rb->lcd_puts(printing.position, printing.line, word);
+    printing.position = newpos;
+}
+#endif
 
 void displaytstream(struct token *token) {
     int index=0;
@@ -224,17 +248,21 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         check_accepted(editor.token,editor.currentindex);
         editing.selecting=1;
         buildchoices(acceptedmask);
-        rb->memset(&editing.old_token,0,sizeof(struct token));        
+        rb->memset(&editing.old_token,0,sizeof(struct token));
     }
     do {
+#ifdef HAVE_LCD_BITMAP
         rb->lcd_setfont(FONT_SYSFIXED);
+#endif
         rb->lcd_clear_display();
         printing.line=0;
         printing.position=0;
         displaytstream(editor.token);
         editor.valid=check_tokenstream(editor.token,editor.editingmode);
         check_accepted(editor.token,editor.currentindex);
+#ifdef HAVE_LCD_BITMAP
         rb->lcd_update();
+#endif
         button = rb->button_get(true);
         switch (button) {
           case BUTTON_LEFT:
@@ -301,13 +329,17 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
           default:
             if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
+#ifdef HAVE_LCD_BITMAP
                 rb->lcd_setfont(FONT_UI);
+#endif                
                 return PLUGIN_USB_CONNECTED;
             }
             break;
         }
     } while (!done);
+#ifdef HAVE_LCD_BITMAP
     rb->lcd_setfont(FONT_UI);
+#endif
     if(editor.valid&&editor.tokencount>0) {
         if(writetstream(filename,editor.token)) {
             rb->splash(HZ*2,true,"Wrote file succesfully ^.^");

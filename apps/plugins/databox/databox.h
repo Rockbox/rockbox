@@ -29,8 +29,10 @@
 extern struct plugin_api* rb;
 
 struct print {
+#ifdef HAVE_LCD_BITMAP
    struct font *fontfixed;
    int font_w,font_h;
+#endif
    int line;
    int position;
 };
