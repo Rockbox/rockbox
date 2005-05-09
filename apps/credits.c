@@ -60,15 +60,15 @@ void roll_credits(void)
                 
             if (++name >= numnames)
                 break;
+            line ^= 1;
 
             x2 = x + len/2;
             if ((unsigned)x2 < 11)
-                lcd_puts(x2, line ^ 1, "*");
+                lcd_putc(x2, line, '*');
 
             new_len = strlen(credits[name]);
             x += MAX(len/2 + 2, len - new_len/2 + 1);
             len = new_len;
-            line ^= 1;
         }
         /* abort on keypress */
         if (button_get_w_tmo(HZ/8) & BUTTON_REL)
