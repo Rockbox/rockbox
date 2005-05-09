@@ -255,7 +255,7 @@ id: LANG_CASE_MENU
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
@@ -327,7 +327,7 @@ id: LANG_BBOOST
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_DECAY
 desc: in sound_settings
@@ -429,37 +429,37 @@ id: LANG_MUTE_ON_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_MUTE_OFF_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_MUTE_ON_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_MUTE_OFF_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_INFO
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_SCREEN
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_TITLE
 desc: in wps
@@ -999,13 +999,13 @@ id: LANG_DISK_STAT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_DISK_FREE_STAT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_POWEROFF
 desc: disk poweroff flag
@@ -1263,7 +1263,7 @@ id: LANG_SOKOBAN_ON
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_INVERT
 desc: in settings_menu
@@ -1275,19 +1275,19 @@ id: LANG_CHANNEL_STEREO_NARROW_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_CHANNEL_STEREO_NARROW_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_CHANNEL_STEREO_WIDE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_CHANNEL_KARAOKE
 desc: in sound_settings
@@ -1317,19 +1317,19 @@ id: LANG_VBRFIX_STOP_PLAY
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_VBRFIX_NOT_VBR
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_VBRFIX
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_INVERT_CURSOR
 desc: in settings_menu
@@ -1691,7 +1691,7 @@ id: LANG_FM_SAVE_PRESET
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_FM_DELETE_PRESET
 desc: in radio screen
@@ -1715,7 +1715,7 @@ id: LANG_FM_NO_PRESETS
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_FM_NO_FREE_PRESETS
 desc: in radio screen
@@ -1772,6 +1772,7 @@ voice: "Temps de préenregistrement"
 new: "Temps de préenr."
 
 # Auto bookmark prompts
+
 id: LANG_BOOKMARK_AUTOLOAD_QUERY
 desc: prompt for user to decide to create a bookmark
 eng: "Load Last Bookmark?"
@@ -1785,6 +1786,7 @@ voice: ""
 new: "Créer un signet?"
 
 # Bookmark Select Menu Text
+
 id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
 desc: From the auto-load screen, allows user to list all bookmarks
 eng: "Down = List"
@@ -1828,6 +1830,7 @@ voice: ""
 new: "ON+PLAY = Suppr."
 
 # Bookmark creation/failure text
+
 id: LANG_BOOKMARK_CREATE_SUCCESS
 desc: Indicates bookmark was successfully created
 eng: "Bookmark Created"
@@ -1841,6 +1844,7 @@ voice: ""
 new: "Erreur de signet!"
 
 # Bookmark creation/failure text
+
 id: LANG_BOOKMARK_LOAD_EMPTY
 desc: Indicates bookmark was empty
 eng: "Bookmark Empty"
@@ -1848,6 +1852,7 @@ voice: ""
 new: "Signet vide"
 
 # Bookmark Settings Text
+
 id: LANG_BOOKMARK_SETTINGS
 desc: in general settings
 eng: "Bookmarking"
@@ -1891,6 +1896,7 @@ voice: "Unique seulement"
 new: "Unique seulement"
 
 # Main Bookmarks Menu
+
 id: LANG_BOOKMARK_MENU
 desc: Text on main menu to get to bookmark commands
 eng: "Bookmarks"
@@ -1964,6 +1970,7 @@ voice: "Date & Heure"
 new: "Date & Heure"
 
 # Limits
+
 id: LANG_LIMITS_MENU
 desc: in the system sub menu
 eng: "Limits"
@@ -2270,7 +2277,7 @@ id: VOICE_POINT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: VOICE_MILLISECONDS
 desc: spoken only, a unit postfix
@@ -2336,13 +2343,13 @@ id: VOICE_MEGABYTE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: VOICE_GIGABYTE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: VOICE_MILLIAMPHOURS
 desc: spoken only, a unit postfix
@@ -2404,7 +2411,7 @@ id: LANG_VOICE_DIR_ENTER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_VOICE_DIR_HOVER
 desc: "talkbox" mode for directories + files
@@ -2632,7 +2639,7 @@ id: VOICE_EXT_UCL
 desc: spoken only, for file extension
 eng: ""
 voice: "flash"
-new:
+new: 
 
 id: VOICE_EXT_AJZ
 desc: spoken only, for file extension
@@ -2653,6 +2660,7 @@ voice: "Temps actuel:"
 new: 
 
 #Filetypes
+
 id: LANG_FILETYPES_EXTENSION_FULL
 desc: Extension array full
 eng: "Extension array full"
@@ -2741,7 +2749,7 @@ id: LANG_FM_BUTTONBAR_EDIT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_FM_BUTTONBAR_ADD
 desc: in radio screen
@@ -3006,3 +3014,93 @@ desc: Announce that the RTC alarm has been turned off
 eng: "Alarm Disabled"
 voice: "Réveil désactivé"
 new: "Réveil désactivé"
+
+id: LANG_RECORD_TRIGGER
+desc: in recording settings_menu
+eng: "Trigger"
+voice: "Déclencheur"
+new: "Déclencheur"
+
+id: LANG_RECORD_START_THRESHOLD
+desc: in recording settings_menu
+eng: "Start above"
+voice: "Démarre au dessus de"
+new: "Démarre au dessus de"
+
+id: LANG_RECORD_MIN_DURATION
+desc: in recording settings_menu
+eng: "for at least"
+voice: "pour au moins"
+new: "pour au moins"
+
+id: LANG_RECORD_STOP_THRESHOLD
+desc: in recording settings_menu
+eng: "Stop below"
+voice: "Arrêtes en dessous de"
+new: "Arrêtes en dessous de"
+
+id: LANG_RECORD_STOP_POSTREC
+desc: in recording settings_menu
+eng: "for at least"
+voice: "pour au moins"
+new: "pour au moins"
+
+id: LANG_RECORD_STOP_GAP
+desc: in recording settings_menu
+eng: "Presplit gap"
+voice: "Pause avant séparation"
+new: "Pause avant séparation"
+
+id: LANG_RECORD_TRIGGER_MODE
+desc: in recording settings_menu
+eng: "Trigger"
+voice: "Déclencheur"
+new: "Déclencheur"
+
+id: LANG_RECORD_TRIG_NOREARM
+desc: in recording settings_menu
+eng: "Once"
+voice: "unique"
+new: "unique"
+
+id: LANG_RECORD_TRIG_REARM
+desc: in recording settings_menu
+eng: "Repeat"
+voice: "Répéter"
+new: "Répéter"
+
+id: LANG_DB_INF
+desc: -inf db for values below measurement
+eng: "-inf"
+voice: "-inf"
+new: "-inf"
+
+id: LANG_RECORD_TRIG_IDLE
+desc: waiting for threshold
+eng: "Trigger idle"
+voice: "Déclencheur en attente"
+new: "Déclencheur en attente"
+
+id: LANG_RECORD_TRIGGER_ACTIVE
+desc: 
+eng: "Trigger active"
+voice: "Déclencheur activé"
+new: "Déclencheur activé"
+
+id: LANG_LCD_REMOTE_MENU
+desc: in the display sub menu
+eng: "Remote-LCD Settings"
+voice: "Propriétés écran télécommande"
+new: "Prop. écran télécommande"
+
+id: LANG_DISK_NAME_INTERNAL
+desc: in info menu; name for internal disk with multivolume (keep short!)
+eng: "Int:"
+voice: "Interne"
+new: "Int:"
+
+id: LANG_DISK_NAME_MMC
+desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
+eng: "MMC:"
+voice: "Carte mémoire"
+new: "MMC:"
