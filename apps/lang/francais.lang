@@ -255,7 +255,7 @@ id: LANG_CASE_MENU
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
@@ -327,7 +327,7 @@ id: LANG_BBOOST
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: LANG_DECAY
 desc: in sound_settings
@@ -429,37 +429,37 @@ id: LANG_MUTE_ON_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: LANG_MUTE_OFF_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: LANG_MUTE_ON_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: LANG_MUTE_OFF_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: LANG_ID3_INFO
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: LANG_ID3_SCREEN
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: LANG_ID3_TITLE
 desc: in wps
@@ -999,13 +999,13 @@ id: LANG_DISK_STAT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: LANG_DISK_FREE_STAT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: LANG_POWEROFF
 desc: disk poweroff flag
@@ -1263,7 +1263,7 @@ id: LANG_SOKOBAN_ON
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: LANG_INVERT
 desc: in settings_menu
@@ -1275,19 +1275,19 @@ id: LANG_CHANNEL_STEREO_NARROW_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: LANG_CHANNEL_STEREO_NARROW_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: LANG_CHANNEL_STEREO_WIDE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: LANG_CHANNEL_KARAOKE
 desc: in sound_settings
@@ -1317,19 +1317,19 @@ id: LANG_VBRFIX_STOP_PLAY
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: LANG_VBRFIX_NOT_VBR
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: LANG_VBRFIX
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: LANG_INVERT_CURSOR
 desc: in settings_menu
@@ -1425,7 +1425,7 @@ id: LANG_RECORD_TIMESPLIT
 desc: Prompt for record timer interval setting, in the record settings menu
 eng: "Time Split"
 voice: "Temps de coupure"
-new: "Temps de coupure"
+new: "Tps coupure"
 
 id: LANG_RECORD_TIMESPLIT_REC
 desc: Display of record timer interval setting, on the record screen
@@ -1691,7 +1691,7 @@ id: LANG_FM_SAVE_PRESET
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: LANG_FM_DELETE_PRESET
 desc: in radio screen
@@ -1715,7 +1715,7 @@ id: LANG_FM_NO_PRESETS
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: LANG_FM_NO_FREE_PRESETS
 desc: in radio screen
@@ -1769,7 +1769,7 @@ id: LANG_RECORD_PRERECORD_TIME
 desc: in recording settings_menu
 eng: "Prerecord time"
 voice: "Temps de préenregistrement"
-new: "Temps de préenr."
+new: "Tps préenr."
 
 # Auto bookmark prompts
 
@@ -2277,7 +2277,7 @@ id: VOICE_POINT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: VOICE_MILLISECONDS
 desc: spoken only, a unit postfix
@@ -2343,13 +2343,13 @@ id: VOICE_MEGABYTE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: VOICE_GIGABYTE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: VOICE_MILLIAMPHOURS
 desc: spoken only, a unit postfix
@@ -2411,7 +2411,7 @@ id: LANG_VOICE_DIR_ENTER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: LANG_VOICE_DIR_HOVER
 desc: "talkbox" mode for directories + files
@@ -2639,7 +2639,7 @@ id: VOICE_EXT_UCL
 desc: spoken only, for file extension
 eng: ""
 voice: "flash"
-new: 
+new:
 
 id: VOICE_EXT_AJZ
 desc: spoken only, for file extension
@@ -2660,7 +2660,6 @@ voice: "Temps actuel:"
 new: 
 
 #Filetypes
-
 id: LANG_FILETYPES_EXTENSION_FULL
 desc: Extension array full
 eng: "Extension array full"
@@ -2749,7 +2748,7 @@ id: LANG_FM_BUTTONBAR_EDIT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: LANG_FM_BUTTONBAR_ADD
 desc: in radio screen
@@ -3024,8 +3023,8 @@ new: "Déclencheur"
 id: LANG_RECORD_START_THRESHOLD
 desc: in recording settings_menu
 eng: "Start above"
-voice: "Démarre au dessus de"
-new: "Démarre au dessus de"
+voice: "Démarrer au dessus de"
+new: "Démarrer à"
 
 id: LANG_RECORD_MIN_DURATION
 desc: in recording settings_menu
@@ -3036,8 +3035,8 @@ new: "pour au moins"
 id: LANG_RECORD_STOP_THRESHOLD
 desc: in recording settings_menu
 eng: "Stop below"
-voice: "Arrêtes en dessous de"
-new: "Arrêtes en dessous de"
+voice: "Arrêter en dessous de"
+new: "Arrêt dessous"
 
 id: LANG_RECORD_STOP_POSTREC
 desc: in recording settings_menu
@@ -3048,14 +3047,14 @@ new: "pour au moins"
 id: LANG_RECORD_STOP_GAP
 desc: in recording settings_menu
 eng: "Presplit gap"
-voice: "Pause avant séparation"
-new: "Pause avant séparation"
+voice: "Temps de coupe"
+new: "Tps coupe"
 
 id: LANG_RECORD_TRIGGER_MODE
 desc: in recording settings_menu
 eng: "Trigger"
 voice: "Déclencheur"
-new: "Déclencheur"
+new: "Déclench."
 
 id: LANG_RECORD_TRIG_NOREARM
 desc: in recording settings_menu
