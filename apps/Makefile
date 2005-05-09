@@ -42,6 +42,8 @@ LINKROM = $(OBJDIR)/linkrom.lds
 MAXINFILE = $(OBJDIR)/romstart.temp
 MAXOUTFILE = $(OBJDIR)/romstart
 
+LIBROCKBOX = $(BUILDDIR)/librockbox.a
+
 ifdef SIMVER
 # this is a sim build
 COMMONLIB = $(BUILDDIR)/comsim/libcomsim.a
@@ -79,13 +81,13 @@ $(MAXOUTFILE):
 	@cat $(MAXINFILE) | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - > $(MAXOUTFILE)
 	@rm $(MAXINFILE)
 
-$(OBJDIR)/rombox.elf : $(OBJS) $(LINKROM) $(DEPFILE)
+$(OBJDIR)/rombox.elf : $(OBJS) $(LINKROM) $(DEPFILE) $(LIBROCKBOX)
 	@echo "LD rombox.elf"
 	@$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lgcc -L$(BUILDDIR)/firmware -T$(LINKROM) -Wl,-Map,$(OBJDIR)/rombox.map
 
 ifndef SIMVER
 
-$(OBJDIR)/rockbox.elf : $(OBJS) $(LINKFILE) $(DEPFILE)
+$(OBJDIR)/rockbox.elf : $(OBJS) $(LINKFILE) $(DEPFILE) $(LIBROCKBOX)
 	@echo "LD rockbox.elf"
 	@$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS)  -L$(BUILDDIR)/firmware -L$(BUILDDIR) -lrockbox -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
 
