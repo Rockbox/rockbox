@@ -214,7 +214,7 @@ int writetstream(char *filename,struct token *token) {
 /* this is the plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    int button,done=0;
+    int button,done=0,abort=0;
     char filename[100],buf[100];
     /* this macro should be called as the first thing you do in the plugin.
        it test that the api version and model the plugin was compiled for
@@ -332,7 +332,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 editing.selecting=0;
             }
             else
-                done=1;
+                abort=1;
             break;
 
           default:
@@ -344,10 +344,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             }
             break;
         }
-    } while (!done);
+    } while (!done&&!abort);
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_setfont(FONT_UI);
 #endif
+    if(abort)
+        return PLUGIN_OK;
+
     if(editor.valid&&editor.tokencount>0) {
         if(writetstream(filename,editor.token)) {
             rb->splash(HZ*2,true,"Wrote file succesfully ^.^");
