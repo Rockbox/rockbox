@@ -100,6 +100,8 @@ void parse_checktoken() {
               break;
          case TOKEN_EQUALS:
          case TOKEN_CONTAINS:
+         case TOKEN_STARTSWITH:
+         case TOKEN_ENDSWITH:
               ok=acceptedmask&ACCEPT_STROP;
               break;
          case TOKEN_STRING:

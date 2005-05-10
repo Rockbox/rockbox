@@ -71,6 +71,9 @@ int getvalue(struct token *token) {
                 case INTVALUE_PLAYCOUNT:
                     loadrundbdata();
                     return currententry->playcount;
+                case INTVALUE_AUTORATING:
+                    // todo.
+                    return 0;
                 default:
                     rb->snprintf(buf,199,"unknown numid intvalue %d",token->intvalue);
                     rb->splash(HZ*2,true,buf);

@@ -145,6 +145,8 @@ void buildchoices(int mask) {
     if(mask&ACCEPT_STROP) {
         editing.selection_candidates[i++]=TOKEN_CONTAINS;
         editing.selection_candidates[i++]=TOKEN_EQUALS;
+        editing.selection_candidates[i++]=TOKEN_STARTSWITH;
+        editing.selection_candidates[i++]=TOKEN_ENDSWITH;
     }
     if(mask&ACCEPT_LPAREN) {
         editing.selection_candidates[i++]=TOKEN_LPAREN;

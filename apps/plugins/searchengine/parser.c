@@ -146,7 +146,8 @@ unsigned char *parseCompareString() {
     struct token string1,string2;
     unsigned char *ret;
     char *s1=NULL,*s2=NULL;
-    int i,contains;
+    int i,i2;
+    int op;
     if(syntaxerror) return 0;
     PUTS("parseCompareString");
     if(currentToken->kind==TOKEN_STRING ||
@@ -159,19 +160,12 @@ unsigned char *parseCompareString() {
         rb->snprintf(errormsg,250,"'%d' found where STRING/STRINGID expected\n",currentToken->kind);
         return 0;
     }
-    if(currentToken->kind==TOKEN_CONTAINS ||
-          currentToken->kind==TOKEN_EQUALS) {
-        if(currentToken->kind==TOKEN_CONTAINS) {
-            contains=1;
-            PUTS("Contains");
-        } else {
-            contains=0;
-            PUTS("Equals");
-        }
+    op=currentToken->kind;
+    if(op>=TOKEN_CONTAINS&&op<=TOKEN_ENDSWITH) {
         parser_acceptIt();
     } else {
         syntaxerror=1;
-        rb->snprintf(errormsg,250,"'%d' found where CONTAINS/EQUALS expected\n",currentToken->kind);
+        rb->snprintf(errormsg,250,"'%d' found where STROP expected\n",op);
         return 0;
     }
     if(currentToken->kind==TOKEN_STRING ||
@@ -196,10 +190,21 @@ unsigned char *parseCompareString() {
                 s1=getstring(&string1);
             if(string2.kind==TOKEN_STRINGIDENTIFIER)
                 s2=getstring(&string2);
-            if(contains) 
-                ret[i]=rb->strcasestr(s1,s2)!=0;
-            else
-                ret[i]=rb->strcasecmp(s1,s2)==0;
+            switch(op) {
+                case TOKEN_CONTAINS:
+                    ret[i]=rb->strcasestr(s1,s2)!=0;
+                    break;
+                case TOKEN_EQUALS:
+                    ret[i]=rb->strcasecmp(s1,s2)==0;
+                    break;
+                case TOKEN_STARTSWITH:
+                    ret[i]=rb->strncasecmp(s1,s2,rb->strlen(s2))==0;
+                    break;
+                case TOKEN_ENDSWITH:
+                    i2=rb->strlen(s2);
+                    ret[i]=rb->strncasecmp(s1+rb->strlen(s1)-i2,s2,i2)==0;
+                    break;
+            }
         }
     return ret;
 }

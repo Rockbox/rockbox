@@ -35,6 +35,8 @@ char *tokentypetostring(int tokentype) {
         case TOKEN_RPAREN: return ")";
         case TOKEN_CONTAINS: return "contains";
         case TOKEN_EQUALS: return "equals";
+        case TOKEN_STARTSWITH: return "starts with";
+        case TOKEN_ENDSWITH: return "ends with";
         case TOKEN_NUM: return "<number>";
         case TOKEN_NUMIDENTIFIER: return "<numberproperty>";
         case TOKEN_STRING: return "<string>";
@@ -58,6 +60,7 @@ char *numidtostring(int numid) {
         case INTVALUE_YEAR: return "<year>";
         case INTVALUE_RATING: return "<rating>";
         case INTVALUE_PLAYCOUNT: return "<playcount>";
+        case INTVALUE_AUTORATING: return "<autorating>";
     }
     return "numiderror";
 }
@@ -99,6 +102,10 @@ void buildtoken(int tokentype,struct token *token) {
         case TOKEN_PLAYCOUNT:
             token->kind=TOKEN_NUMIDENTIFIER;
             token->intvalue=INTVALUE_PLAYCOUNT;
+            break;
+        case TOKEN_AUTORATING:
+            token->kind=TOKEN_NUMIDENTIFIER;
+            token->intvalue=INTVALUE_AUTORATING;
             break;
         case TOKEN_TITLE:
             token->kind=TOKEN_STRINGIDENTIFIER;
@@ -172,6 +179,8 @@ char *tokentostring(struct token *token) {
         case TOKEN_RPAREN: 
         case TOKEN_CONTAINS:
         case TOKEN_EQUALS:
+        case TOKEN_STARTSWITH:
+        case TOKEN_ENDSWITH:
             return tokentypetostring(token->kind);
         case TOKEN_NUM: rb->snprintf(bufbla,40,"%d",token->intvalue);
             return bufbla;
