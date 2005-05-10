@@ -570,7 +570,7 @@ int ata_read_sectors(IF_MV2(int drive,)
 
                    We choose alternative 2.
                 */
-                ata_soft_reset();
+                perform_soft_reset();
                 ret = -4;
                 goto retry;
             }
@@ -605,11 +605,11 @@ int ata_read_sectors(IF_MV2(int drive,)
                 -- ATA specification
             */
             if ( status & (STATUS_BSY | STATUS_ERR | STATUS_DF) ) {
-                ata_soft_reset();
+                perform_soft_reset();
                 ret = -5;
                 goto retry;
             }
-             
+
             buf += sectors * SECTOR_SIZE; /* Advance one chunk of sectors */
             count -= sectors;
 
@@ -617,7 +617,7 @@ int ata_read_sectors(IF_MV2(int drive,)
         }
 
         if(!ret && !wait_for_end_of_transfer()) {
-            ata_soft_reset();
+            perform_soft_reset();
             ret = -3;
             goto retry;
         }
