@@ -31,7 +31,7 @@ static void msleep(int msec)
     struct timeval delay;
     
     delay.tv_sec = msec / 1000;
-    delay.tv_usec = (msec - 1000 * delay.tv_sec) * 1000;
+    delay.tv_usec = (msec % 1000) * 1000;
     select(0, NULL, NULL, NULL, &delay); /* portable sub-second sleep */
 }
 
