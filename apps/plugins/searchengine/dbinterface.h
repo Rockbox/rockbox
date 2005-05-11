@@ -16,30 +16,38 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+struct dbglobals {
+    int playcountmin;
+    int playcountmax;
+    int gotplaycountlimits;
+    int currententryindex;
+};
+
 struct entry {
-   int loadedfiledata,
-       loadedsongdata,
-       loadedrundbdata,
-       loadedalbumname,
-       loadedartistname;
-   char *filename;
-   long hash;
-   long songentry;
-   long rundbentry;
-   short year;
-   short bitrate;
-   long rating;
-   long playcount;
-   char *title;
-   char *genre;
-   long artistoffset;
-   long albumoffset;
-   char *artistname;
-   char *albumname;
+    int loadedfiledata,
+        loadedsongdata,
+        loadedrundbdata,
+        loadedalbumname,
+        loadedartistname;
+    char *filename;
+    long hash;
+    long songentry;
+    long rundbentry;
+    short year;
+    short bitrate;
+    long rating;
+    long playcount;
+    char *title;
+    char *genre;
+    long artistoffset;
+    long albumoffset;
+    char *artistname;
+    char *albumname;
 };
 
 extern struct entry *currententry;
 extern struct entry *entryarray;
+extern struct dbglobals dbglobal;
 
 int database_init(void);
 void loadentry(int filerecord);

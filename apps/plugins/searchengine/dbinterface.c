@@ -33,7 +33,7 @@
 #define FILERECORD2OFFSET(_x_) (rb->tagdbheader->filestart + _x_ * FILEENTRY_SIZE)
 
 struct entry *currententry;
-
+struct dbglobals dbglobal;
 static struct entry *entryarray;
 
 int database_init() {
@@ -51,6 +51,9 @@ int database_init() {
             return -1;
         }
     }
+    dbglobal.playcountmin=0;
+    dbglobal.playcountmax=0;
+    dbglobal.gotplaycountlimits=0;
     return 0;
 }
 
@@ -84,6 +87,7 @@ void loadentry(int filerecord) {
         entryarray[filerecord].loadedfiledata=1;
     }
     currententry=&entryarray[filerecord];
+    dbglobal.currententryindex=filerecord;
 }
 
 void loadsongdata() {

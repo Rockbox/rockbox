@@ -57,6 +57,7 @@ char *getstring(struct token *token) {
 
 int getvalue(struct token *token) {
     char buf[200];
+    int index,i;
     switch(token->kind) {
         case TOKEN_NUM:
             return token->intvalue;
@@ -72,8 +73,23 @@ int getvalue(struct token *token) {
                     loadrundbdata();
                     return currententry->playcount;
                 case INTVALUE_AUTORATING:
-                    // todo.
-                    return 0;
+                    if(!dbglobal.gotplaycountlimits) {
+                        index=dbglobal.currententryindex;
+                        dbglobal.playcountmax=0;
+                        dbglobal.playcountmin=0xFFFFFFFF;
+                        for(i=0;i<rb->tagdbheader->filecount;i++) {
+                            loadentry(i);
+                            loadrundbdata();
+                            if(currententry->playcount>dbglobal.playcountmax)
+                                dbglobal.playcountmax=currententry->playcount;
+                            if(currententry->playcount<dbglobal.playcountmin)
+                                dbglobal.playcountmin=currententry->playcount;
+                        }
+                        dbglobal.gotplaycountlimits=1;
+                        loadentry(index);
+                    }
+                    loadrundbdata();
+                    return (currententry->playcount-dbglobal.playcountmin)*10/(dbglobal.playcountmax-dbglobal.playcountmin);
                 default:
                     rb->snprintf(buf,199,"unknown numid intvalue %d",token->intvalue);
                     rb->splash(HZ*2,true,buf);
