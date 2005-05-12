@@ -22,7 +22,7 @@ OBJS= resource.o iriver.o main.o md5.o
 $(TARGET) : $(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) -o $@
 
-resource.o: resource.rc bootloader.bin favicon.ico
+resource.o: resource.rc bootloader.bin rockbox.ico
 	$(WINDRES) -v $< $@
 
 iriver.o: iriver.c iriver.h
