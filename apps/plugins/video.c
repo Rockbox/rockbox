@@ -852,6 +852,9 @@ int main(char* filename)
     if (fd < 0)
         return PLUGIN_ERROR;
     file_size =  rb->filesize(fd);
+    
+    // reset pitch value to ensure synchronous playback
+    rb->sound_set_pitch(1000);
 
     // init statistics
     rb->memset(&gStats, 0, sizeof(gStats));
