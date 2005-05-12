@@ -50,7 +50,7 @@ HWND controls[CTL_NUM];
 
 /* begin mkboot.c excerpt */
 
-char image[0x200000 + 0x220 + 0x200000/0x200];
+unsigned char image[0x200000 + 0x220 + 0x200000/0x200];
 
 int mkboot(TCHAR *infile, TCHAR *outfile, unsigned char *bldata, int bllen)
 {
