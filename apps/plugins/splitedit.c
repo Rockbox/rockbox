@@ -1053,7 +1053,7 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 break;
 
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
-#if defined(SPLITEDIT_SPEED150) && defined(SPLITEDIT_SPEED100) && defined(SPLITEDIT_SPEED50)
+#ifdef SPLITEDIT_SPEED100
             case SPLITEDIT_SPEED150:
                 rb->sound_set_pitch(1500);
                 splitedit_invalidate_osci();
@@ -1180,6 +1180,12 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 }
             }
         }
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#ifdef SPLITEDIT_SPEED100
+        rb->sound_set_pitch(1000); /* make sure to reset pitch */
+#endif
+#endif
+
     }
     return retval;
 }
