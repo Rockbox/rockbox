@@ -224,22 +224,25 @@ int PatchFirmware()
         goto error;
     }
     /* now md5sum it */
-    if (!FileMD5(name3, md5sum_str)) goto error;
+    if (!FileMD5(name3, md5sum_str)) {
+        MessageBox(NULL, TEXT("Error in checksumming"),
+                   TEXT("Error"), MB_ICONERROR);
+        goto error;
+    }
     for (i = 0; i < sizeof(checksums)/sizeof(char *); ++i) {
-        if (strncmp(checksums[i], md5sum_str, 32) != 0) {
-            MessageBox(NULL, 
-                       TEXT("Checksum doesn't match known good patched firmware.\n")
-                       TEXT("Download another firmware image, then try again."),
-                       TEXT("Error"), MB_ICONERROR);
-            goto error;
+        if (strncmp(checksums[i], md5sum_str, 32) == 0) {
+            /* all is fine, rename the patched file to original name of the firmware */
+            MoveFileEx(name3, fn, MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING);
+            /* delete temp files */
+            DeleteFile(name1);
+            DeleteFile(name2);
+            return 1;
         }
     }
-    /* all is fine, rename the patched file to original name of the firmware */
-    MoveFileEx(name3, fn, MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING);
-    /* delete temp files */
-    DeleteFile(name1);
-    DeleteFile(name2);
-    return 1;
+    MessageBox(NULL, 
+               TEXT("Checksum doesn't match known good patched firmware.\n")
+               TEXT("Download another firmware image, then try again."),
+               TEXT("Error"), MB_ICONERROR);
 error:
     /* delete all temp files, don't care if some aren't created yet */
     DeleteFile(name1);
