@@ -26,7 +26,7 @@ void usage(void)
     exit(1);
 }
 
-char image[0x200000 + 0x220 + 0x200000/0x200];
+unsigned char image[0x200000 + 0x220 + 0x200000/0x200];
 
 int main(int argc, char *argv[])
 {
