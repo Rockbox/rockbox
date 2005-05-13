@@ -1,10 +1,23 @@
+NEWSDATE(2005-05-13)
+ 
+ ITEM NAME(Jens Arnold) checked in code that should fix the long-standing
+ LINK("http://sourceforge.net/tracker/index.php?func=detail&group_id=44306&atid=439118&aid=622799",
+ Red Led Death bug).
+
+ ITEM LINUSN has fixed the problem with the iRiver 1.65 firmware.
+
+ ITEM A Windows utility to patch iRiver firmware files has been
+ LINK("http://www.rockbox.org/twiki/bin/view/Main/IriverBoot", released).
+
 NEWSDATE(2005-05-06)
+
  ITEM LINUSN now has an iRiver H320 which will be used in the future attempt
  to port Rockbox to this device.
 
 ENDDATE
 
 NEWSDATE(2005-04-20)
+
  ITEM LINUSN
  LINK("http://www.rockbox.org/mail/archive/rockbox-archive-2005-04/0161.shtml",
  announced) that he has played the first seconds of mp3 on his iRiver.
@@ -79,8 +92,8 @@ ENDDATE
 NEWSDATE(2004-12-16)
 
  ITEM The LINK("http://www.rockbox.org/twiki/bin/view/Main/RockboxManual",
- Rockbox 2.3 manual) is out. Thanks go to Christi Alice Scarborough for her
- outstanding work! 
+ Rockbox 2.3 manual) is out. Thanks go to NAME(Christi Alice Scarborough) for
+ her outstanding work!
 
 ENDDATE
 
