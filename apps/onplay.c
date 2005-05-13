@@ -355,7 +355,7 @@ static bool rename_file(void)
     int pathlen = (ptr - selected_file);
     strncpy(newname, selected_file, sizeof newname);
     if (!kbd_input(newname + pathlen, (sizeof newname)-pathlen)) {
-        if (!strlen(selected_file+pathlen) ||
+        if (!strlen(newname + pathlen) ||
             (rename(selected_file, newname) < 0)) {
             lcd_clear_display();
             lcd_puts(0,0,str(LANG_RENAME));
