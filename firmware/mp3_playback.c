@@ -653,6 +653,11 @@ void mp3_play_pause(bool play)
     (void)play;
 }
 
+bool mp3_pause_done(void)
+{
+    return true;
+}
+
 unsigned char* mp3_get_pos(void)
 {
     /* a dummy */

@@ -414,8 +414,10 @@ static void fade(bool fade_in)
             sound_set(SOUND_VOLUME, fp_volume >> 8);
         }
         audio_pause();
+#ifndef SIMULATOR
         /* let audio thread run and wait for the mas to run out of data */
         while (!mp3_pause_done())
+#endif
             sleep(HZ/10);
 
         /* reset volume to what it was before the fade */
