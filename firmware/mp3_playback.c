@@ -542,6 +542,19 @@ void mp3_play_pause(bool play)
         paused = true;
         cumulative_ticks += current_tick - playstart_tick;
     }
+}     
+
+bool mp3_pause_done(void)
+{
+    unsigned long frame_count;
+
+    if (!paused)
+        return false;
+    
+    mas_readmem(MAS_BANK_D0, MAS_D0_MPEG_FRAME_COUNT, &frame_count, 1);
+    /* This works because the frame counter never wraps,
+     * i.e. zero always means lost sync. */
+    return frame_count == 0;
 }
 
 void mp3_play_stop(void)

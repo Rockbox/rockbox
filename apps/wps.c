@@ -384,34 +384,39 @@ static bool update(void)
 
 static void fade(bool fade_in)
 {
+    unsigned fp_global_vol = global_settings.volume << 8;
+    unsigned fp_step = fp_global_vol / 30;
+
     if (fade_in) {
         /* fade in */
-        int current_volume = 20;
-        
+        unsigned fp_volume = 0;
+
         /* zero out the sound */
-        sound_set(SOUND_VOLUME, current_volume);
+        sound_set(SOUND_VOLUME, 0);
 
         sleep(HZ/10); /* let audio thread run */
         audio_resume();
         
-        while (current_volume < global_settings.volume) {    
-            current_volume += 2;
+        while (fp_volume < fp_global_vol) {
+            fp_volume += fp_step;
             sleep(1);
-            sound_set(SOUND_VOLUME, current_volume);
+            sound_set(SOUND_VOLUME, fp_volume >> 8);
         }
         sound_set(SOUND_VOLUME, global_settings.volume);
     }
     else {
         /* fade out */
-        int current_volume = global_settings.volume;
+        unsigned fp_volume = fp_global_vol;
 
-        while (current_volume > 20) {    
-            current_volume -= 2;
+        while (fp_volume > fp_step) {
+            fp_volume -= fp_step;
             sleep(1);
-            sound_set(SOUND_VOLUME, current_volume);
+            sound_set(SOUND_VOLUME, fp_volume >> 8);
         }
         audio_pause();
-        sleep(HZ/5); /* let audio thread run */
+        /* let audio thread run and wait for the mas to run out of data */
+        while (!mp3_pause_done())
+            sleep(HZ/10);
 
         /* reset volume to what it was before the fade */
         sound_set(SOUND_VOLUME, global_settings.volume);

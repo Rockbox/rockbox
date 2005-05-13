@@ -42,6 +42,7 @@ void mp3_play_data(const unsigned char* start, int size,
     void (*get_more)(unsigned char** start, int* size) /* callback fn */
 );
 void mp3_play_pause(bool play);
+bool mp3_pause_done(void);
 void mp3_play_stop(void);
 long mp3_get_playtime(void);
 void mp3_reset_playtime(void);
