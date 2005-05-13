@@ -128,10 +128,11 @@ static unsigned char *word_mode_str[] = {"wrap", "chop", "words"};
 enum {
     NORMAL=0,
     JOIN,
+    REFLOW,
     EXPAND,
     LINE_MODES
 } line_mode = 0;
-static unsigned char *line_mode_str[] = {"normal", "join", "expand", "lines"};
+static unsigned char *line_mode_str[] = {"normal", "join", "reflow", "expand", "lines"};
 
 enum {
     NARROW=0,
@@ -158,8 +159,10 @@ static unsigned char *page_mode_str[] = {"don't overlap", "overlap", "pages"};
 
 static unsigned char buffer[BUFFER_SIZE + 1];
 static unsigned char line_break[] = {0,0x20,'-',9,0xB,0xC};
-static int display_columns; /* number of columns on the display */
+static int display_columns; /* number of (pixel) columns on the display */
 static int display_lines; /* number of lines on the display */
+static int draw_columns; /* number of (pixel) columns available for text */
+static int par_indent_spaces; /* number of spaces to indent first paragraph */
 static int fd;
 static long file_size;
 static bool mac_text;
@@ -171,6 +174,21 @@ static unsigned char *next_screen_ptr;
 static unsigned char *next_screen_to_draw_ptr;
 static unsigned char *next_line_ptr;
 static struct plugin_api* rb;
+
+static unsigned char glyph_width[256];
+
+#define ADVANCE_COUNTERS(c) do { width += glyph_width[c]; k++; } while(0)
+#define LINE_IS_FULL ((k>MAX_COLUMNS-1) || (width > draw_columns))
+static unsigned char* crop_at_width(const unsigned char* p)
+{
+    int k,width;
+
+    k=width=0;
+    while (!LINE_IS_FULL)
+        ADVANCE_COUNTERS(p[k]);
+
+    return (unsigned char*) p+k-1;
+}
 
 static unsigned char* find_first_feed(const unsigned char* p, int size)
 {
@@ -198,7 +216,7 @@ static unsigned char* find_last_space(const unsigned char* p, int size)
 {
     int i, j, k;
 
-    k = line_mode==JOIN? 0:1;
+    k = (line_mode==JOIN) || (line_mode==REFLOW) ? 0:1;
 
     for (i=size-1; i>=0; i--)
         for (j=k; j < (int) sizeof(line_break); j++)
@@ -208,72 +226,99 @@ static unsigned char* find_last_space(const unsigned char* p, int size)
     return NULL;
 }
 
-static unsigned char* find_next_line(const unsigned char* cur_line)
+static unsigned char* find_next_line(const unsigned char* cur_line, bool *is_short)
 {
     const unsigned char *next_line = NULL;
-    int size, i, j, k, chop_len, search_len, spaces, newlines, draw_columns;
+    int size, i, j, k, width, search_len, spaces, newlines;
+    bool first_chars;
     unsigned char c;
 
+    if (is_short != NULL) 
+        *is_short = true;
+    
     if BUFFER_OOB(cur_line)
         return NULL;
 
-#ifdef HAVE_LCD_BITMAP
-    draw_columns = need_scrollbar? display_columns-1: display_columns;
-#else
-    draw_columns = display_columns;
-#endif
-
     if (view_mode == WIDE) {
-        search_len = chop_len = MAX_WIDTH;
+        search_len = MAX_WIDTH;
     }
     else {   /* view_mode == NARROW */
-        chop_len = draw_columns;
-        search_len =  chop_len + 1;
+        search_len = crop_at_width(cur_line) - cur_line; 
     }
 
     size = BUFFER_OOB(cur_line+search_len) ? buffer_end-cur_line : search_len;
 
-    if (line_mode == JOIN) {
+    if ((line_mode == JOIN) || (line_mode == REFLOW)) {
         /* Need to scan ahead and possibly increase search_len and size,
          or possibly set next_line at second hard return in a row. */
         next_line = NULL;
-        for (j=k=spaces=newlines=0; j < size; j++) {
-            if (k == MAX_COLUMNS)
+        first_chars=true;
+        for (j=k=width=spaces=newlines=0; ; j++) {
+            if (BUFFER_OOB(cur_line+j)) 
+                    return NULL;
+            if (LINE_IS_FULL) {
+                size = search_len = j;
                 break;
+            }
 
             c = cur_line[j];
             switch (c) {
                 case ' ':
-                    spaces++;
+                    if (line_mode == REFLOW) {
+                        if (newlines > 0) {
+                            size = j;
+                            next_line = cur_line + size;
+                            return (unsigned char*) next_line;
+                        }
+                        if (j==0) /* i=1 is intentional */
+                            for (i=0; i<par_indent_spaces; i++)
+                                ADVANCE_COUNTERS(' '); 
+                    }
+                    if (!first_chars) spaces++;
                     break;
 
                 case 0:
                     if (newlines > 0) {
                         size = j;
-                        next_line = cur_line + size - spaces - 1;
+                        next_line = cur_line + size - spaces;
                         if (next_line != cur_line)
                             return (unsigned char*) next_line;
                         break;
                     }
+                    
                     newlines++;
-                    size += spaces;
+                    size += spaces -1;
                     if (BUFFER_OOB(cur_line+size) || size > 2*search_len)
                         return NULL;
-
                     search_len = size;
-                    spaces = 0;
-                    k++;
+                    spaces = first_chars? 0:1;
                     break;
 
                 default:
-                    newlines = 0;
+                    if (line_mode==JOIN || newlines>0) {
                     while (spaces) {
                         spaces--;
-                        k++;
-                        if (k == MAX_COLUMNS - 1)
+                            ADVANCE_COUNTERS(' ');
+                            if (LINE_IS_FULL) {
+                                size = search_len = j;
                             break;
                     }
-                    k++;
+                        }
+                        newlines=0;
+                   } else if (spaces) { 
+                        /* REFLOW, multiple spaces between words: count only 
+                         * one. If more are needed, they will be added
+                         * while drawing. */ 
+                        search_len = size;
+                        spaces=0;
+                        ADVANCE_COUNTERS(' ');
+                        if (LINE_IS_FULL) {
+                            size = search_len = j;
+                            break;
+                        }
+                    } 
+                    first_chars = false;
+                    ADVANCE_COUNTERS(c);
                     break;
             }
         }
@@ -289,7 +334,7 @@ static unsigned char* find_next_line(const unsigned char* cur_line)
                 next_line = find_last_space(cur_line, size);
 
             if (next_line == NULL)
-                next_line = cur_line + chop_len;
+                next_line = crop_at_width(cur_line);
             else
                 if (word_mode == WRAP)
                     for (i=0;
@@ -317,6 +362,9 @@ static unsigned char* find_next_line(const unsigned char* cur_line)
     if (BUFFER_OOB(next_line))
         return NULL;
 
+    if (is_short)
+        *is_short = false;
+    
     return (unsigned char*) next_line;
 }
 
@@ -342,7 +390,7 @@ static unsigned char* find_prev_line(const unsigned char* cur_line)
      points from where they wrap when scrolling down.
        If buffer is at top of file, start at top of buffer. */
 
-    if (line_mode == JOIN)
+    if ((line_mode == JOIN) || (line_mode == REFLOW))
         prev_line = p = NULL;
     else
         prev_line = p = find_last_feed(buffer, cur_line-buffer-1);
@@ -356,7 +404,7 @@ static unsigned char* find_prev_line(const unsigned char* cur_line)
     /* Wrap downwards until too far, then use the one before. */
     while (p < cur_line && p != NULL) {
         prev_line = p;
-        p = find_next_line(prev_line);
+        p = find_next_line(prev_line, NULL);
     }
 
     if (BUFFER_OOB(prev_line))
@@ -477,10 +525,13 @@ static void viewer_scrollbar(void) {
 static void viewer_draw(int col)
 {
     int i, j, k, line_len, resynch_move, spaces, left_col=0;
+    int width, extra_spaces, indent_spaces, spaces_per_word;
+    bool multiple_spacing, line_is_short;
     unsigned char *line_begin;
     unsigned char *line_end;
     unsigned char c;
     unsigned char scratch_buffer[MAX_COLUMNS + 1];
+
 
     /* If col==-1 do all calculations but don't display */
     if (col != -1) {
@@ -499,7 +550,7 @@ static void viewer_draw(int col)
             break;  /* Happens after display last line at BUFFER_EOF() */
 
         line_begin = line_end;
-        line_end = find_next_line(line_begin);
+        line_end = find_next_line(line_begin, &line_is_short);
 
         if (line_end == NULL) {
             if (BUFFER_EOF()) {
@@ -524,7 +575,7 @@ static void viewer_draw(int col)
                 if (i > 0)
                     next_line_ptr -= resynch_move;
 
-                line_end = find_next_line(line_begin);
+                line_end = find_next_line(line_begin, NULL);
                 if (line_end == NULL)  /* Should not really happen */
                     break;
             }
@@ -536,6 +587,8 @@ static void viewer_draw(int col)
                 line_begin++;
                 if (word_mode == CHOP)
                     line_end++;
+                else
+                    line_len--;
             }
             for (j=k=spaces=0; j < line_len; j++) {
                 if (k == MAX_COLUMNS)
@@ -561,13 +614,102 @@ static void viewer_draw(int col)
                         break;
                 }
             }
+        
             if (col != -1)
                 if (k > col) {
                     scratch_buffer[k] = 0;
                     rb->lcd_puts(left_col, i, scratch_buffer + col);
                 }
         }
-        else {
+        else if (line_mode == REFLOW) {
+            if (line_begin[0] == 0) {
+                line_begin++;
+                if (word_mode == CHOP)
+                    line_end++;
+                else
+                    line_len--;
+            }
+
+            indent_spaces = 0;
+            if (!line_is_short) {
+                multiple_spacing = false;
+                for (j=width=spaces=0; j < line_len; j++) {
+                    c = line_begin[j];
+                    switch (c) {
+                        case ' ':
+                        case 0:
+                            if ((j==0) && (word_mode==WRAP))
+                                /* special case: indent the paragraph, 
+                                 * don't count spaces */
+                                indent_spaces = par_indent_spaces;
+                            else if (!multiple_spacing) 
+                                spaces++;
+                            multiple_spacing = true;
+                            break;
+                        default:
+                            multiple_spacing = false;
+                            width += glyph_width[c];
+                            k++;
+                            break;
+                    }
+                }
+                if (multiple_spacing) spaces--;
+                
+                if (spaces) {
+                    /* total number of spaces to insert between words */
+                    extra_spaces = (draw_columns-width) / glyph_width[' '] 
+                            - indent_spaces;
+                    /* number of spaces between each word*/
+                    spaces_per_word = extra_spaces / spaces;
+                    /* number of words with n+1 spaces (to fill up) */
+                    extra_spaces = extra_spaces % spaces;
+                    if (spaces_per_word > 2) { /* too much spacing is awful */
+                        spaces_per_word = 3;
+                        extra_spaces = 0;
+                    } 
+                } else { /* this doesn't matter much... no spaces anyway */
+                    spaces_per_word = extra_spaces = 0;
+                }
+            } else { /* end of a paragraph: don't fill line */
+                spaces_per_word = 1;
+                extra_spaces = 0;
+            }
+            
+            multiple_spacing = false;
+            for (j=k=spaces=0; j < line_len; j++) {
+                if (k == MAX_COLUMNS)
+                    break;
+
+                c = line_begin[j];
+                switch (c) {
+                    case ' ':
+                    case 0:
+                        if (j==0 && word_mode==WRAP) { /* indent paragraph */
+                            for (j=0; j<par_indent_spaces; j++)
+                                scratch_buffer[k++] = ' ';
+                            j=0;
+                        } 
+                        else if (!multiple_spacing) {
+                            for (width = spaces<extra_spaces ? -1:0; width < spaces_per_word; width++)
+                                    scratch_buffer[k++] = ' ';
+                            spaces++;
+                        }
+                        multiple_spacing = true;
+                        break;
+                    default:
+                        scratch_buffer[k++] = c;
+                        multiple_spacing = false;
+                        break;
+                }
+            }
+                    
+            if (col != -1)
+                if (k > col) {
+                    scratch_buffer[k] = 0;
+                    rb->lcd_puts(left_col, i, scratch_buffer + col);
+                }
+        } 
+        else { /* line_mode != JOIN && line_mode != REFLOW */
             if (col != -1)
                 if (line_len > col) {
                     c = line_end[0];
@@ -636,20 +778,38 @@ static void init_need_scrollbar(void) {
      and thus ONE_SCREEN_FITS_ALL(), and thus NEED_SCROLLBAR() */
     viewer_draw(-1);
     need_scrollbar = NEED_SCROLLBAR();
+    draw_columns = need_scrollbar? display_columns-glyph_width['o'] : display_columns;
+    par_indent_spaces = draw_columns/(5*glyph_width[' ']);
 }
 #endif
 
 static bool viewer_init(char* file)
 {
 #ifdef HAVE_LCD_BITMAP
-    int w,h;
+    int idx, ch;
+    struct font *pf;
 
-    rb->lcd_getstringsize("o", &w, &h);
-    display_lines = LCD_HEIGHT / h;
-    display_columns = LCD_WIDTH / w;
+    pf = rb->font_get(FONT_UI);
+    if (pf->width != NULL)
+    {   /* variable pitch font -- fill structure from font width data */
+        ch = pf->defaultchar - pf->firstchar; 
+        rb->memset(glyph_width, pf->width[ch], 256);
+        idx = pf->firstchar;
+        rb->memcpy(&glyph_width[idx], pf->width, pf->size);
+        idx += pf->size;
+        rb->memset(&glyph_width[idx], pf->width[ch], 256-idx);
+    } 
+    else /* fixed pitch font -- same width for all glyphs */
+        rb->memset(glyph_width, pf->maxwidth, 256);
+    
+    display_lines = LCD_HEIGHT / pf->height;
+    display_columns = LCD_WIDTH;
 #else
+    /* REAL fixed pitch :) all chars use up 1 cell */
     display_lines = 2;
-    display_columns = 11;
+    draw_columns = display_columns = 11;
+    par_indent_spaces = 2;
+    rb->memset(glyph_width, 1, 256);
 #endif
     /*********************
     * (Could re-initialize settings here, if you
@@ -755,14 +915,18 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 break;
 
             case VIEWER_MODE_LINE:
-                /* Line-paragraph mode: NORMAL, JOIN or EXPAND */
+                /* Line-paragraph mode: NORMAL, JOIN, REFLOW or EXPAND */
                 if (++line_mode == LINE_MODES)
                     line_mode = 0;
 
-                if (view_mode == WIDE)
+                if (view_mode == WIDE) {
                     if (line_mode == JOIN)
                         if (++line_mode == LINE_MODES)
                             line_mode = 0;
+                    if (line_mode == REFLOW)
+                        if (++line_mode == LINE_MODES)
+                            line_mode = 0;
+                }
 
 #ifdef HAVE_LCD_BITMAP
                 init_need_scrollbar();
@@ -778,10 +942,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
 
             case VIEWER_MODE_WIDTH:
                 /* View-width mode: NARROW or WIDE */
-                if (line_mode == JOIN)
+                if ((line_mode == JOIN) || (line_mode == REFLOW))
                     rb->splash(HZ, true, "(no %s %s)",
                                view_mode_str[WIDE],
-                               line_mode_str[JOIN]);
+                               line_mode_str[line_mode]);
                 else
                     if (++view_mode == VIEW_MODES)
                         view_mode = 0;
@@ -839,7 +1003,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
             case VIEWER_SCREEN_LEFT | BUTTON_REPEAT:
                 if (view_mode == WIDE) {
                     /* Screen left */
-                    col -= display_columns;
+                    col -= draw_columns/glyph_width['o'];
                     col = col_limit(col);
                 }
                 else {   /* view_mode == NARROW */
@@ -854,7 +1018,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
             case VIEWER_SCREEN_RIGHT | BUTTON_REPEAT:
                 if (view_mode == WIDE) {
                     /* Screen right */
-                    col += display_columns;
+                    col += draw_columns/glyph_width['o'];
                     col = col_limit(col);
                 }
                 else {   /* view_mode == NARROW */
