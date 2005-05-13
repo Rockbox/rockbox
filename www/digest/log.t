@@ -9,6 +9,8 @@ NEWSDATE(2005-05-13)
  ITEM A Windows utility to patch iRiver firmware files has been
  LINK("http://www.rockbox.org/twiki/bin/view/Main/IriverBoot", released).
 
+ENDDATE
+
 NEWSDATE(2005-05-06)
 
  ITEM LINUSN now has an iRiver H320 which will be used in the future attempt
