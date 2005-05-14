@@ -128,11 +128,20 @@ static unsigned char *word_mode_str[] = {"wrap", "chop", "words"};
 enum {
     NORMAL=0,
     JOIN,
-    REFLOW,
+#ifdef HAVE_LCD_BITMAP
+    REFLOW, /* Makes no sense for the player */
+#endif
     EXPAND,
-    LINE_MODES
+    LINE_MODES,
+#ifndef HAVE_LCD_BITMAP
+    REFLOW  /* Sorting it behind LINE_MODES effectively disables it. */
+#endif
 } line_mode = 0;
-static unsigned char *line_mode_str[] = {"normal", "join", "reflow", "expand", "lines"};
+
+static unsigned char *line_mode_str[] = {
+    [NORMAL] = "normal", [JOIN] = "join",       [REFLOW] = "reflow",
+    [EXPAND] = "expand", [LINE_MODES] = "lines"
+};
 
 enum {
     NARROW=0,
@@ -254,8 +263,8 @@ static unsigned char* find_next_line(const unsigned char* cur_line, bool *is_sho
         next_line = NULL;
         first_chars=true;
         for (j=k=width=spaces=newlines=0; ; j++) {
-            if (BUFFER_OOB(cur_line+j)) 
-                    return NULL;
+            if (BUFFER_OOB(cur_line+j))
+                return NULL;
             if (LINE_IS_FULL) {
                 size = search_len = j;
                 break;
@@ -296,16 +305,16 @@ static unsigned char* find_next_line(const unsigned char* cur_line, bool *is_sho
 
                 default:
                     if (line_mode==JOIN || newlines>0) {
-                    while (spaces) {
-                        spaces--;
+                        while (spaces) {
+                            spaces--;
                             ADVANCE_COUNTERS(' ');
                             if (LINE_IS_FULL) {
                                 size = search_len = j;
-                            break;
-                    }
+                                break;
+                            }
                         }
                         newlines=0;
-                   } else if (spaces) { 
+                   } else if (spaces) {
                         /* REFLOW, multiple spaces between words: count only 
                          * one. If more are needed, they will be added
                          * while drawing. */ 
