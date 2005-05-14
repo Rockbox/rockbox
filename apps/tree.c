@@ -283,7 +283,7 @@ static int showdir(void)
     }
     else {
         if (strncmp(tc.currdir, lastdir, sizeof(lastdir)) || reload_dir) {
-            if (ft_load(&tc, NULL) < 0)
+            if (ft_load(&tc, NULL) < 0)     
                 return -1;
             strcpy(lastdir, tc.currdir);
             newdir = true;
@@ -1117,19 +1117,10 @@ static bool dirbrowse(void)
 
 #ifdef HAVE_HOTSWAP
             case SYS_FS_CHANGED:
-                if (!id3db) /* file browsing */
-                {
-                    if (currdir[1])     /* not in the root */
-                    {
-                        DIR *dir = opendir(currdir);
-                        if (dir)        /* path still valid */
-                        {
-                            closedir(dir);
-                            break;      /* don't reload the root */
-                        }
-                    }
-                    reload_root = true;
-                }
+                if (!id3db)
+                    reload_dir = true; 
+                /* The 'dir no longer valid' situation will be caught later
+                 * by checking the showdir() result. */
                 break;
 #endif
 
@@ -1159,6 +1150,11 @@ static bool dirbrowse(void)
             lcd_stop_scroll();
             if (wps_show() == SYS_USB_CONNECTED)
                 reload_root = true;
+#ifdef HAVE_HOTSWAP
+            else 
+                if (!id3db) /* Try reload to catch 'no longer valid' case. */
+                    reload_dir = true;
+#endif
 #ifdef HAVE_LCD_BITMAP
             tree_max_on_screen = recalc_screen_height();
 #endif
@@ -1167,6 +1163,9 @@ static bool dirbrowse(void)
             start_wps=false;
         }
 
+#ifdef HAVE_HOTSWAP
+    check_rescan:
+#endif
         /* do we need to rescan dir? */
         if (reload_dir || reload_root ||
             lastfilter != *tc.dirfilter ||
@@ -1217,6 +1216,14 @@ static bool dirbrowse(void)
             lcd_setfont(FONT_UI);
 #endif
             numentries = showdir();
+#ifdef HAVE_HOTSWAP
+            if (currdir[1] && (numentries < 0)) 
+            {   /* not in root and reload failed */
+                reload_root = true; /* try root */
+                reload_dir = false;
+                goto check_rescan;
+            }
+#endif
             update_all = true;
             put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, true);
 
@@ -1224,14 +1231,14 @@ static bool dirbrowse(void)
             reload_dir = false;
         }
 
-        if ( numentries && need_update) {
+        if ( (numentries > 0) && need_update) {
             i = tc.dirstart+tc.dircursor;
 
             /* if MP3 filter is on, cut off the extension */
             if(lasti!=i || restore) {
                 char* name;
                 int attr = 0;
-                
+
                 if (id3db)
                     name = ((char**)tc.dircache)[lasti * tc.dentry_size];
                 else {
