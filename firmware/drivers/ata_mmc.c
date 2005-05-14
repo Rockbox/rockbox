@@ -178,6 +178,8 @@ void mmc_select_clock(int card_no)
 
 static int select_card(int card_no)
 {
+    mutex_lock(&mmc_mutex);
+    led(true);
     mmc_select_clock(card_no);
     last_disk_activity = current_tick;
 
@@ -209,6 +211,8 @@ static void deselect_card(void)
     while (!(SSR1 & SCI_TEND));   /* wait for end of transfer */
     or_b(0x06, &PADRH);           /* deassert CS (both cards) */
 
+    led(false);
+    mutex_unlock(&mmc_mutex);
     last_disk_activity = current_tick;
 }
 
@@ -527,10 +531,8 @@ tCardInfo *mmc_card_info(int card_no)
     
     if (!card->initialized && ((card_no == 0) || mmc_detect()))
     {
-        mutex_lock(&mmc_mutex);
         select_card(card_no);
         deselect_card();
-        mutex_unlock(&mmc_mutex);
     }
     return card;
 }
@@ -692,19 +694,15 @@ int ata_read_sectors(IF_MV2(int drive,)
     unsigned long c_block, c_end_block;
     unsigned char response;
     tCardInfo *card;
+#ifndef HAVE_MULTIVOLUME
+    int drive = current_card;
+#endif
 
     c_addr = start * SECTOR_SIZE;
     c_end_addr = c_addr + incount * SECTOR_SIZE;
     
-    mutex_lock(&mmc_mutex);
-    led(true);
-#ifdef HAVE_MULTIVOLUME
     card = &card_info[drive];
     rc = select_card(drive);
-#else
-    card = &card_info[current_card];
-    rc = select_card(current_card);
-#endif
     if (rc)
     {
         rc = rc * 10 - 1;
@@ -798,8 +796,6 @@ int ata_read_sectors(IF_MV2(int drive,)
   error:
 
     deselect_card();
-    led(false);
-    mutex_unlock(&mmc_mutex);
     
     /* only flush if reading went ok */
     if ( (rc == 0) && delayed_write )
@@ -819,6 +815,9 @@ int ata_write_sectors(IF_MV2(int drive,)
     unsigned long c_block, c_end_block;
     unsigned char response;
     tCardInfo *card;
+#ifndef HAVE_MULTIVOLUME
+    int drive = current_card;
+#endif
 
     if (start == 0)
         panicf("Writing on sector 0\n");
@@ -826,15 +825,8 @@ int ata_write_sectors(IF_MV2(int drive,)
     c_addr = start * SECTOR_SIZE;
     c_end_addr = c_addr + count * SECTOR_SIZE;
 
-    mutex_lock(&mmc_mutex);
-    led(true);
-#ifdef HAVE_MULTIVOLUME
     card = &card_info[drive];
     rc = select_card(drive);
-#else
-    card = &card_info[current_card];
-    rc = select_card(current_card);
-#endif
     if (rc)
     {
         rc = rc * 10 - 1;
@@ -959,8 +951,6 @@ int ata_write_sectors(IF_MV2(int drive,)
   error:
 
     deselect_card();
-    led(false);
-    mutex_unlock(&mmc_mutex);
 
     /* only flush if writing went ok */
     if ( (rc == 0) && delayed_write )
