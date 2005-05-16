@@ -94,7 +94,7 @@ static struct mutex mmc_mutex;
 static long mmc_stack[(DEFAULT_STACK_SIZE + 0x800)/sizeof(long)];
 static const char mmc_thread_name[] = "mmc";
 static struct event_queue mmc_queue;
-static bool mmc_monitor_enabled = false;
+static bool mmc_monitor_enabled = true;
 #endif
 static bool initialized = false;
 static bool new_mmc_circuit;

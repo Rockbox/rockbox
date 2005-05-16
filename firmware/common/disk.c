@@ -100,6 +100,10 @@ int disk_mount_all(void)
 {
     int mounted;
     int i;
+    
+#if defined(HAVE_MMC) && defined(HAVE_HOTSWAP)
+    mmc_enable_monitoring(false);
+#endif
 
     fat_init(); /* reset all mounted partitions */
     for (i=0; i<NUM_VOLUMES; i++)
@@ -111,6 +115,9 @@ int disk_mount_all(void)
     {
         mounted += disk_mount(1); /* try 2nd "drive", too */
     }
+#ifdef HAVE_HOTSWAP
+    mmc_enable_monitoring(true);
+#endif
 #endif
 
     return mounted;

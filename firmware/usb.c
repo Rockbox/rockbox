@@ -194,13 +194,7 @@ static void usb_slave_mode(bool on)
             panicf("ata: %d",rc);
         }
     
-#if defined(HAVE_MMC) && defined(HAVE_HOTSWAP)
-        mmc_enable_monitoring(false);
         rc = disk_mount_all();
-        mmc_enable_monitoring(true);
-#else
-        rc = disk_mount_all();
-#endif
         if (rc <= 0) /* no partition */
             panicf("mount: %d",rc);
 
