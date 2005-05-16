@@ -233,6 +233,9 @@ void init(void)
         usb_screen();
         system_reboot();
     }
+#if defined(HAVE_MMC) && defined(HAVE_HOTSWAP)
+    mmc_enable_monitoring(true);
+#endif
 
     settings_calc_config_sector();
     settings_load(SETTINGS_ALL);

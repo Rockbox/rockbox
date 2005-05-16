@@ -94,6 +94,7 @@ static struct mutex mmc_mutex;
 static long mmc_stack[(DEFAULT_STACK_SIZE + 0x800)/sizeof(long)];
 static const char mmc_thread_name[] = "mmc";
 static struct event_queue mmc_queue;
+static bool mmc_monitor_enabled = false;
 #endif
 static bool initialized = false;
 static bool new_mmc_circuit;
@@ -1033,6 +1034,11 @@ static void mmc_thread(void)
         }
     }
 }
+
+void mmc_enable_monitoring(bool on)
+{
+    mmc_monitor_enabled = on;
+}
 #endif /* #ifdef HAVE_HOTSWAP */
 
 bool mmc_detect(void)
@@ -1050,6 +1056,9 @@ bool mmc_usb_active(int delayticks)
 static void mmc_tick(void)
 {
     bool current_status;
+#ifndef HAVE_HOTSWAP
+    const bool mmc_monitor_enabled = true;
+#endif
 
     if (new_mmc_circuit)
         /* USB bridge activity is 0 on idle, ~527 on active */
@@ -1061,29 +1070,32 @@ static void mmc_tick(void)
         last_usb_activity = current_tick;
     usb_activity = current_status;
 
-    current_status = mmc_detect();
-    /* Only report when the status has changed */
-    if (current_status != last_mmc_status)
+    if (mmc_monitor_enabled)
     {
-        last_mmc_status = current_status;
-        countdown = 30;
-    }
-    else
-    {
-        /* Count down until it gets negative */
-        if (countdown >= 0)
-            countdown--;
-
-        if (countdown == 0)
+        current_status = mmc_detect();
+        /* Only report when the status has changed */
+        if (current_status != last_mmc_status)
         {
-            if (current_status)
+            last_mmc_status = current_status;
+            countdown = 30;
+        }
+        else
+        {
+            /* Count down until it gets negative */
+            if (countdown >= 0)
+                countdown--;
+
+            if (countdown == 0)
             {
-                queue_broadcast(SYS_MMC_INSERTED, NULL);
-            }
-            else
-            {
-                queue_broadcast(SYS_MMC_EXTRACTED, NULL);
-                card_info[1].initialized = false;
+                if (current_status)
+                {
+                    queue_broadcast(SYS_MMC_INSERTED, NULL);
+                }
+                else
+                {
+                    queue_broadcast(SYS_MMC_EXTRACTED, NULL);
+                    card_info[1].initialized = false;
+                }
             }
         }
     }

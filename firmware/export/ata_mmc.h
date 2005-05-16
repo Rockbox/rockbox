@@ -45,5 +45,8 @@ unsigned long mmc_extract_bits(const unsigned long *p, unsigned int start,
                                unsigned int size);
 tCardInfo *mmc_card_info(int card_no);
 bool mmc_usb_active(int delayticks);
+#ifdef HAVE_HOTSWAP
+void mmc_enable_monitoring(bool on);
+#endif
 
 #endif
