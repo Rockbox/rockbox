@@ -408,11 +408,13 @@ static int showdir(void)
                   start + tc.firstpos + tree_max_on_screen, VERTICAL);
 
 #if CONFIG_KEYPAD == RECORDER_PAD
-    if(global_settings.buttonbar) {
-        buttonbar_set(*tc.dirfilter < NUM_FILTER_MODES ?
-                      str(LANG_DIRBROWSE_F1) : (unsigned char *) "",
-                      str(LANG_DIRBROWSE_F2),
-                      str(LANG_DIRBROWSE_F3));
+    if (global_settings.buttonbar) {
+        if (*tc.dirfilter < NUM_FILTER_MODES)
+            buttonbar_set(str(LANG_DIRBROWSE_F1),
+                          str(LANG_DIRBROWSE_F2),
+                          str(LANG_DIRBROWSE_F3));
+        else
+            buttonbar_set("<<<", "", "");
         buttonbar_draw();
     }
 #endif
@@ -1001,6 +1003,8 @@ static bool dirbrowse(void)
 
                     id3db = check_changed_id3mode(id3db);
                 }
+                else /* use it as a quick exit instead */
+                    exit_func = true;
                 break;
 
             case TREE_WPS:
@@ -1134,7 +1138,7 @@ static bool dirbrowse(void)
                            might be confusing to the user */
                         exit_func = true;
                     else
-                        reload_root = true;
+                        reload_dir = true;
                 }
                 break;
         }
@@ -1149,7 +1153,7 @@ static bool dirbrowse(void)
         {
             lcd_stop_scroll();
             if (wps_show() == SYS_USB_CONNECTED)
-                reload_root = true;
+                reload_dir = true;
 #ifdef HAVE_HOTSWAP
             else 
                 if (!id3db) /* Try reload to catch 'no longer valid' case. */
@@ -1163,9 +1167,7 @@ static bool dirbrowse(void)
             start_wps=false;
         }
 
-#ifdef HAVE_HOTSWAP
     check_rescan:
-#endif
         /* do we need to rescan dir? */
         if (reload_dir || reload_root ||
             lastfilter != *tc.dirfilter ||
@@ -1202,7 +1204,7 @@ static bool dirbrowse(void)
 #ifdef HAVE_LCD_BITMAP
             tree_max_on_screen = recalc_screen_height();
 #endif
-            
+
             /* We need to adjust if the number of lines on screen have
                changed because of a status bar change */
             if(CURSOR_Y+LINE_Y+tc.dircursor>tree_max_on_screen) {
@@ -1216,14 +1218,12 @@ static bool dirbrowse(void)
             lcd_setfont(FONT_UI);
 #endif
             numentries = showdir();
-#ifdef HAVE_HOTSWAP
-            if (currdir[1] && (numentries < 0)) 
+            if (currdir[1] && (numentries < 0))
             {   /* not in root and reload failed */
                 reload_root = true; /* try root */
                 reload_dir = false;
                 goto check_rescan;
             }
-#endif
             update_all = true;
             put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, true);
 
