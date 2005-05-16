@@ -116,7 +116,7 @@ id: LANG_TIME_REVERT
 desc: used in set_time()
 eng: "OFF To Revert"
 voice: ""
-new: "POIS peruuttaa"
+new: "OFF peruuttaa"
 
 id: LANG_CONTRAST
 desc: in settings_menu
@@ -386,7 +386,7 @@ id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
 eng: "(PLAY/STOP)"
 voice: ""
-new: "(TOISTA/PYSÄYTÄ)"
+new: "(PLAY/STOP)"
 
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
@@ -692,13 +692,13 @@ id: LANG_RESET_CONFIRM
 desc: confirm to reset settings
 eng: "PLAY=Reset"
 voice: ""
-new: "TOISTA=Nollaa"
+new: "PLAY=Nollaa"
  
 id: LANG_RESET_CANCEL
 desc: confirm to reset settings
 eng: "OFF=Cancel"
 voice: ""
-new: "POIS=Peruuta"
+new: "OFF=Peruuta"
 
 id: LANG_TIMEFORMAT
 desc: select the time format of time in status bar
@@ -914,7 +914,7 @@ id: LANG_RECORDING
 desc: in the main menu
 eng: "Recording"
 voice: "Recording"
-new: "Nauhoitetaan"
+new: "Nauhoitus"
 
 id: LANG_RECORDING_GAIN
 desc: in the recording screen
@@ -1154,7 +1154,7 @@ id: LANG_ALARM_MOD_KEYS
 desc: Shown key functions in alarm menu (for the RTC alarm mod).
 eng: "PLAY=Set OFF=Cancel"
 voice: ""
-new: "TOISTA=Aseta POIS=Peruuta"
+new: "PLAY=Aseta OFF=Peruuta"
 
 id: LANG_CREATE_PLAYLIST
 desc: Menu option for creating a playlist
@@ -1376,7 +1376,7 @@ id: LANG_MAX_FILES_IN_DIR
 desc: in settings_menu
 eng: "Max files in dir browser"
 voice: "Max files in directory browser"
-new: "Hakemistoselaimessa enint. tiedostoja" 
+new: "Hakemistoselaimessa tiedostoja enintään"
 
 id: LANG_MAX_FILES_IN_PLAYLIST
 desc: in settings_menu
@@ -1430,13 +1430,13 @@ id: LANG_DISK_FULL
 desc: in recording screen
 eng: "The disk is full. Press OFF to continue."
 voice: ""
-new: "Levy on täynnä. Paina POIS jatkaaksesi."
+new: "Levy on täynnä. Paina OFF jatkaaksesi."
 
 id: LANG_CONFIRM_WITH_PLAY_RECORDER
 desc: Generic recorder string to use to confirm
 eng: "PLAY = Yes"
 voice: ""
-new: "TOISTA = Kyllä"
+new: "PLAY = Kyllä"
 
 id: LANG_CANCEL_WITH_ANY_RECORDER
 desc: Generic recorder string to use to cancel
@@ -1558,13 +1558,13 @@ id: LANG_OFF_ABORT
 desc: Used on recorder models
 eng: "OFF to abort"
 voice: ""
-new: "POIS keskeyttää"
+new: "OFF keskeyttää"
 
 id: LANG_STOP_ABORT
 desc: Used on player models
 eng: "STOP to abort"
 voice: ""
-new: "PYSÄYTÄ keskeyttää"
+new: "STOP keskeyttää"
 
 id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
 desc: Playlist error
@@ -1782,7 +1782,7 @@ id: LANG_BOOKMARK_SELECT_EXIT
 desc: From the bookmark list screen, allows user to exit
 eng: "OFF = Exit"
 voice: ""
-new: "POIS = Poistu"
+new: "OFF = Poistu"
 
 id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
 desc: Used on the bookmark select window to label bookmark number
@@ -1806,13 +1806,13 @@ id: LANG_BOOKMARK_SELECT_PLAY
 desc: Used on the bookmark select window to indicated the play option
 eng: "PLAY = Select"
 voice: ""
-new: "TOISTA = Valitse"
+new: "PLAY = Valitse"
 
 id: LANG_BOOKMARK_SELECT_DELETE
 desc: Used on the bookmark select window to indicated the bookmark delete option
 eng: "ON+Play = Delete"
 voice: ""
-new: "PÄÄLLE+TOISTA = Poista"
+new: "ON+PLAY = Poista"
 
 # Bookmark creation/failure text
 id: LANG_BOOKMARK_CREATE_SUCCESS
@@ -2368,19 +2368,19 @@ id: LANG_VOICE_MENU
 desc: item of voice menu, enable/disable the voice UI
 eng: "Voice Menus"
 voice: "Voice Menus"
-new: "Puhevalikot"
+new: "Puhu valikot"
 
 id: LANG_VOICE_DIR
 desc: item of voice menu, set the "talkbox" mode for directories
 eng: "Voice Directories"
 voice: "Voice Directories"
-new: "Puhehakemistot"
+new: "Puhu hakemistonimet"
 
 id: LANG_VOICE_FILE
 desc: item of voice menu, set the voive mode for files
 eng: "Voice Filenames"
 voice: "Voice Filenames"
-new: "Puhetiedostot"
+new: "Puhu tiedostonimet"
 
 id: LANG_VOICE_NUMBER
 desc: "talkbox" mode for files+directories
@@ -2795,7 +2795,7 @@ id: LANG_CONFIRM_SHUTDOWN
 desc:  in shutdown screen
 eng: "Press OFF to shut down"
 voice: ""
-new: "Paina POIS sammuttaaksesi"
+new: "Paina OFF sammuttaaksesi"
 
 id: LANG_ID3_ORDER
 desc:  in playback settings screen
@@ -3060,3 +3060,15 @@ desc: in the display sub menu
 eng: "Remote-LCD Settings"
 voice: ""
 new: "LCD-ohjaimen asetukset"
+
+id: LANG_DISK_NAME_INTERNAL
+desc: in info menu; name for internal disk with multivolume (keep short!)
+eng: "Int:"
+voice: "Internal"
+new: "Sis:"
+  	 
+id: LANG_DISK_NAME_MMC
+desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
+eng: "MMC:"
+voice: "Multimedia card"
+new: "MMC:"
