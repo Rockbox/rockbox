@@ -998,7 +998,7 @@ static bool dirbrowse(void)
                 {
                     lcd_stop_scroll();
                     if (main_menu())
-                        reload_root = true;
+                        reload_dir = true;
                     restore = true;
 
                     id3db = check_changed_id3mode(id3db);
@@ -1033,7 +1033,7 @@ static bool dirbrowse(void)
                 if (*tc.dirfilter < NUM_FILTER_MODES)
                 {
                     if (quick_screen(CONTEXT_TREE, BUTTON_F2))
-                        reload_root = true;
+                        reload_dir = true;
                     restore = true;
 
                     id3db = check_changed_id3mode(id3db);
@@ -1045,7 +1045,7 @@ static bool dirbrowse(void)
                 if (*tc.dirfilter < NUM_FILTER_MODES)
                 {
                     if (quick_screen(CONTEXT_TREE, BUTTON_F3))
-                        reload_root = true;
+                        reload_dir = true;
                     tree_max_on_screen = recalc_screen_height();
                     restore = true;
                 }
