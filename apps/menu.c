@@ -301,10 +301,6 @@ int menu_show(int m)
     /* Put the cursor on the first line and draw the menu */
     put_cursor(m, menus[m].cursor);
 
-    /* wait until all keys are released */
-    while (button_get(false) != BUTTON_NONE)
-        yield();
-    
     while (!exit) {
         key = button_get_w_tmo(HZ/2);
 
