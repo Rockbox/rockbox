@@ -127,6 +127,7 @@ void init(void)
 void init(void)
 {
     int rc;
+    bool mounted = false;
 #if defined(HAVE_CHARGING) && (CONFIG_CPU == SH7034)
     /* if nobody initialized ATA before, I consider this a cold start */
     bool coldstart = (PACR2 & 0x4000) != 0; /* starting from Flash */
@@ -216,22 +217,35 @@ void init(void)
     }
 
     usb_start_monitoring();
-
-    /* FixMe: the same kind of mounting happens in usb.c, share the code. */
-    rc = disk_mount_all();
-    if (rc<=0)
-    {
-        lcd_clear_display();
-        lcd_puts(0, 0, "No partition");
-        lcd_puts(0, 1, "found.");
-#ifdef HAVE_LCD_BITMAP
-        lcd_puts(0, 2, "Insert USB cable");
-        lcd_puts(0, 3, "and fix it.");
-        lcd_update();
+    while (usb_detect())
+    {   /* enter USB mode early, before trying to mount */
+        if (button_get_w_tmo(HZ/10) == SYS_USB_CONNECTED)
+#ifdef HAVE_MMC
+            if (!mmc_touched() || (mmc_remove_request() == SYS_MMC_EXTRACTED))
 #endif
-        while(button_get(true) != SYS_USB_CONNECTED) {};
-        usb_screen();
-        system_reboot();
+            {
+                usb_screen();
+                mounted = true; /* mounting done @ end of USB mode */
+            }
+    }
+
+    if (!mounted)
+    {
+        rc = disk_mount_all();
+        if (rc<=0)
+        {
+            lcd_clear_display();
+            lcd_puts(0, 0, "No partition");
+            lcd_puts(0, 1, "found.");
+#ifdef HAVE_LCD_BITMAP
+            lcd_puts(0, 2, "Insert USB cable");
+            lcd_puts(0, 3, "and fix it.");
+            lcd_update();
+#endif
+            while(button_get(true) != SYS_USB_CONNECTED) {};
+            usb_screen();
+            system_reboot();
+        }
     }
 
     settings_calc_config_sector();

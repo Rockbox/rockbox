@@ -434,11 +434,6 @@ static bool ask_resume(bool ask_once)
     lcd_double_height(false);
 #endif
 
-    if (usb_detect()) {
-        default_event_handler(SYS_USB_CONNECTED);
-        return false;
-    }
-
 #ifdef HAVE_ALARM_MOD
     if ( rtc_check_alarm_started(true) ) {
        rtc_enable_alarm(false);

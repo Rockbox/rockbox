@@ -103,6 +103,12 @@ static unsigned char delayed_sector[SECTOR_SIZE];
 static int delayed_sector_num;
 
 static enum {
+    MMC_UNKNOWN,
+    MMC_UNTOUCHED,
+    MMC_TOUCHED 
+} mmc_status = MMC_UNKNOWN;
+
+static enum {
     SER_POLL_WRITE,
     SER_POLL_READ,
     SER_DISABLED
@@ -429,6 +435,8 @@ static int initialize_card(int card_no)
         10000000, 100000000, 1000000000
     };
 
+    if (card_no == 1)
+        mmc_status = MMC_TOUCHED;
     /* switch to SPI mode */
     send_cmd(CMD_GO_IDLE_STATE, 0, response);
     if (response[0] != 0x01)
@@ -1046,6 +1054,27 @@ bool mmc_detect(void)
     return adc_read(ADC_MMC_SWITCH) < 0x200 ? true : false;
 }
 
+bool mmc_touched(void)
+{
+    if (mmc_status == MMC_UNKNOWN) /* try to detect */
+    {
+        unsigned char response;
+
+        mutex_lock(&mmc_mutex);
+        mmc_select_clock(1);
+        setup_sci1(7);             /* safe value */
+        and_b(~0x02, &PADRH);      /* assert CS */
+        send_cmd(CMD_SEND_OP_COND, 0, &response);
+        if (response == 0xFF)
+            mmc_status = MMC_UNTOUCHED;
+        else
+            mmc_status = MMC_TOUCHED;
+
+        deselect_card();
+    }
+    return mmc_status == MMC_TOUCHED;
+}
+
 bool mmc_usb_active(int delayticks)
 {
     /* reading "inactive" is delayed by user-supplied monoflop value */
@@ -1094,6 +1123,7 @@ static void mmc_tick(void)
                 else
                 {
                     queue_broadcast(SYS_MMC_EXTRACTED, NULL);
+                    mmc_status = MMC_UNTOUCHED;
                     card_info[1].initialized = false;
                 }
             }
@@ -1157,6 +1187,8 @@ int ata_init(void)
     
     if ( !initialized ) 
     {
+        if (!last_mmc_status)
+            mmc_status = MMC_UNTOUCHED;
         new_mmc_circuit = ((read_hw_mask() & MMC_CLOCK_POLARITY) != 0);
 #ifdef HAVE_HOTSWAP
         queue_init(&mmc_queue);
