@@ -29,6 +29,7 @@
 #include "audio.h"
 #include "wps.h"
 #include "settings.h"
+#include "tree.h"
 #include "bookmark.h"
 #include "dir.h"
 #include "status.h"
@@ -482,7 +483,6 @@ bool bookmark_autoload(const char* file)
     }
     else
     {
-        button_clear_queue(); /* clear button queue */
         /* Prompting user to confirm bookmark load */
         lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
@@ -498,12 +498,8 @@ bool bookmark_autoload(const char* file)
 #endif
         lcd_update();
 
-        sleep(100);
-
         while(!done)
         {
-            button_clear_queue();
-            
             /* Wait for a key to be pushed */
             key = button_get(true);
             switch(key)
@@ -516,12 +512,14 @@ bool bookmark_autoload(const char* file)
                     return bookmark_load(global_bookmark_file_name, true);
 
                 default:
-                    if(default_event_handler(key) == SYS_USB_CONNECTED)
-                        return true;
-                    return false;
+                    /* Handle sys events, ignore button releases & repeats */
+                    if (default_event_handler(key) ||
+                        !(key & (BUTTON_REPEAT|BUTTON_REL)))
+                        done = true;
+                    break;
             }
         }
-        return true;
+        return false;
     }
 }
 
@@ -601,6 +599,19 @@ static int get_bookmark_count(const char* bookmark_file_name)
     
 }
 
+#if CONFIG_KEYPAD == ONDIO_PAD
+#define BOOKMARK_SELECT_PRE BUTTON_RIGHT
+#define BOOKMARK_SELECT (BUTTON_RIGHT | BUTTON_REL)
+#define BOOKMARK_DELETE (BUTTON_RIGHT | BUTTON_REPEAT)
+
+#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+#define BOOKMARK_SELECT BUTTON_SELECT
+#define BOOKMARK_DELETE (BUTTON_ON | BUTTON_SELECT)
+
+#else /* player, recorder, gmini */
+#define BOOKMARK_SELECT BUTTON_PLAY
+#define BOOKMARK_DELETE (BUTTON_ON | BUTTON_PLAY)
+#endif
 
 /* ----------------------------------------------------------------------- */
 /* This displays a the bookmarks in a file and allows the user to          */
@@ -610,7 +621,8 @@ static char* select_bookmark(const char* bookmark_file_name)
 {
     int bookmark_id = 0;
     int bookmark_id_prev = -1;
-    int  key = 0;
+    int key;
+    int lastkey = BUTTON_NONE;
     char* bookmark = NULL;
     int bookmark_count = 0;
 
@@ -618,7 +630,6 @@ static char* select_bookmark(const char* bookmark_file_name)
     lcd_setmargins(0, 0);
 #endif
 
-    button_clear_queue(); /* clear button queue */
     bookmark_count = get_bookmark_count(bookmark_file_name);
 
     while(true)
@@ -641,7 +652,6 @@ static char* select_bookmark(const char* bookmark_file_name)
             {
                 splash(HZ, true, str(LANG_BOOKMARK_LOAD_EMPTY));
                 remove(bookmark_file_name);
-                button_clear_queue(); /* clear button queue */
                 return NULL;
             }
             else
@@ -661,7 +671,11 @@ static char* select_bookmark(const char* bookmark_file_name)
         key = button_get(true);
         switch(key)
         {
-            case SETTINGS_OK:
+            case BOOKMARK_SELECT:
+#ifdef BOOKMARK_SELECT_PRE
+                if (lastkey != BOOKMARK_SELECT_PRE)
+                    break;
+#endif
                 /* User wants to use this bookmark */
 #ifdef HAVE_LCD_BITMAP
                 if (global_settings.statusbar)
@@ -671,33 +685,26 @@ static char* select_bookmark(const char* bookmark_file_name)
 #endif
                 return bookmark;
 
-#if CONFIG_KEYPAD == ONDIO_PAD
-            case BUTTON_MENU | BUTTON_RIGHT:
-#elif CONFIG_KEYPAD == IRIVER_H100_PAD
-            case BUTTON_ON | BUTTON_SELECT:
-#else
-            case BUTTON_ON | BUTTON_PLAY:
-#endif
+            case BOOKMARK_DELETE:
                 /* User wants to delete this bookmark */
                 delete_bookmark(bookmark_file_name, bookmark_id);
                 bookmark_id_prev=-2;
                 bookmark_count--;
                 if(bookmark_id >= bookmark_count)
                     bookmark_id = bookmark_count -1;
-                button_clear_queue(); /* clear button queue */
-                break;
-
-            case SETTINGS_INC:
-                bookmark_id--;
                 break;
 
             case SETTINGS_DEC:
+            case SETTINGS_DEC | BUTTON_REPEAT:
+                bookmark_id--;
+                break;
+
+            case SETTINGS_INC:
+            case SETTINGS_INC | BUTTON_REPEAT:
                 bookmark_id++;
                 break;
 
-#if CONFIG_KEYPAD != ONDIO_PAD
             case SETTINGS_CANCEL:
-#endif
 #ifdef SETTINGS_CANCEL2
             case SETTINGS_CANCEL2:
 #endif
@@ -711,6 +718,7 @@ static char* select_bookmark(const char* bookmark_file_name)
                     return NULL;
                 break;
         }
+        lastkey = key;
     }
 
     return NULL;
