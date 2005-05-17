@@ -135,6 +135,12 @@ long Read(void* buffer, long size)
   return (file_info.curpos - oldpos);
 }
 
+#ifdef USE_IRAM
+extern char iramcopy[];
+extern char iramstart[];
+extern char iramend[];
+#endif
+
 /* this is the plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* file)
 {
@@ -144,7 +150,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
   /* generic plugin initialisation */
   TEST_PLUGIN_API(api);
   rb = api;
-  
+
+  #ifdef USE_IRAM
+  rb->memcpy(iramstart, iramcopy, iramend-iramstart);
+  #endif
+
   /* this function sets up the buffers and reads the file into RAM */
   if (local_init(file,"/wvtest.wav",&file_info,api)) 
   {
