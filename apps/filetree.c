@@ -310,7 +310,6 @@ int ft_enter(struct tree_context* c)
     char buf[MAX_PATH];
     struct entry *dircache = c->dircache;
     struct entry* file = &dircache[c->dircursor + c->dirstart];
-    bool reload_root = false;
     bool reload_dir = false;
     bool start_wps = false;
     bool exit_func = false;
@@ -431,7 +430,7 @@ int ft_enter(struct tree_context* c)
                            otherwise might be confusing to the user */
                         exit_func = true;
                     else
-                        reload_root = true;
+                        reload_dir = true;
                 }
                 break;
 
@@ -441,7 +440,7 @@ int ft_enter(struct tree_context* c)
                 if (plugin)
                 {
                     if (plugin_load(plugin,buf) == PLUGIN_USB_CONNECTED)
-                        reload_root = true;
+                        reload_dir = true;
                 }
                 break;
             }
@@ -470,12 +469,10 @@ int ft_enter(struct tree_context* c)
 
     if (reload_dir)
         rc = 1;
-    if (reload_root)
-        rc = 2;
     if (start_wps)
-        rc = 3;
+        rc = 2;
     if (exit_func)
-        rc = 4;
+        rc = 3;
 
     return rc;
 }
@@ -518,7 +515,7 @@ int ft_exit(struct tree_context* c)
     }
 
     if (exit_func)
-        rc = 4;
+        rc = 3;
 
     return rc;
 }

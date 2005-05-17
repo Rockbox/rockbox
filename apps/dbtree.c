@@ -447,7 +447,7 @@ int db_enter(struct tree_context* c)
         case searchsongs:
             c->dirlevel--;
             if (db_play_folder(c) >= 0)
-                rc = 3;
+                rc = 2;
             break;
 
         case search:

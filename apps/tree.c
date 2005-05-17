@@ -765,9 +765,8 @@ static bool dirbrowse(void)
                 switch (i)
                 {
                     case 1: reload_dir = true; break;
-                    case 2: reload_root = true; break;
-                    case 3: start_wps = true; break;
-                    case 4: exit_func = true; break;
+                    case 2: start_wps = true; break;
+                    case 3: exit_func = true; break;
                     default: break;
                 }
 
@@ -801,7 +800,7 @@ static bool dirbrowse(void)
                 if (id3db)
                     db_exit(&tc);
                 else
-                    if (ft_exit(&tc) == 4)
+                    if (ft_exit(&tc) == 3)
                         exit_func = true;
 
                 restore = true;
