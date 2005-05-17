@@ -879,7 +879,6 @@ static void viewer_load_settings(void)
     char line[1024];
     
     settings_fd=rb->open(SETTINGS_FILE, O_RDONLY);
-    rb->splash(HZ, true, "load %s %d", SETTINGS_FILE, settings_fd);
     if (settings_fd < 0) return;
 
     file_name_len = rb->strlen(file_name);
