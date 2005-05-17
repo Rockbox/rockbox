@@ -24,6 +24,8 @@
 #error Scrollbar function requires PLUGIN_API_VERSION 3 at least
 #endif
 
+#define SETTINGS_FILE	"/.rockbox/viewers/viewer.dat"
+
 #define WRAP_TRIM          44  /* Max number of spaces to trim (arbitrary) */
 #define MAX_COLUMNS        64  /* Max displayable string len (over-estimate) */
 #define MAX_WIDTH         910  /* Max line length in WIDE mode */
@@ -53,10 +55,12 @@
  (next_screen_ptr==NULL && screen_top_ptr==buffer && BUFFER_BOF())
 
 /* Is a scrollbar called for on the current screen? */
-#define NEED_SCROLLBAR() ((!(ONE_SCREEN_FITS_ALL())) && \
- (view_mode==WIDE? scrollbar_mode[WIDE]==SB_ON: scrollbar_mode[NARROW]==SB_ON))
+#define NEED_SCROLLBAR() \
+ ((!(ONE_SCREEN_FITS_ALL())) && (scrollbar_mode[view_mode]==SB_ON))
 
 /* variable button definitions */
+
+/* Recorder keys */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define VIEWER_QUIT BUTTON_OFF
 #define VIEWER_PAGE_UP BUTTON_UP
@@ -66,15 +70,14 @@
 #define VIEWER_MODE_WRAP BUTTON_F1
 #define VIEWER_MODE_LINE BUTTON_F2
 #define VIEWER_MODE_WIDTH BUTTON_F3
-/* Recorder, Ondio, iRiver */
 #define VIEWER_MODE_PAGE (BUTTON_ON | BUTTON_F1)
 #define VIEWER_MODE_SCROLLBAR (BUTTON_ON | BUTTON_F3)
-/* Recorder, iRiver */
 #define VIEWER_LINE_UP (BUTTON_ON | BUTTON_UP)
 #define VIEWER_LINE_DOWN (BUTTON_ON | BUTTON_DOWN)
 #define VIEWER_COLUMN_LEFT (BUTTON_ON | BUTTON_LEFT)
 #define VIEWER_COLUMN_RIGHT (BUTTON_ON | BUTTON_RIGHT)
 
+/* Ondio keys */
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define VIEWER_QUIT BUTTON_OFF
 #define VIEWER_PAGE_UP BUTTON_UP
@@ -84,10 +87,10 @@
 #define VIEWER_MODE_WRAP (BUTTON_MENU | BUTTON_LEFT)
 #define VIEWER_MODE_LINE (BUTTON_MENU | BUTTON_UP)
 #define VIEWER_MODE_WIDTH (BUTTON_MENU | BUTTON_RIGHT)
-/* Recorder, Ondio, iRiver */
 #define VIEWER_MODE_PAGE (BUTTON_MENU | BUTTON_DOWN)
 #define VIEWER_MODE_SCROLLBAR (BUTTON_MENU | BUTTON_OFF)
 
+/* Player keys */
 #elif CONFIG_KEYPAD == PLAYER_PAD
 #define VIEWER_QUIT BUTTON_STOP
 #define VIEWER_PAGE_UP BUTTON_LEFT
@@ -98,6 +101,7 @@
 #define VIEWER_MODE_LINE (BUTTON_ON | BUTTON_MENU | BUTTON_RIGHT)
 #define VIEWER_MODE_WIDTH (BUTTON_ON | BUTTON_RIGHT)
 
+/* iRiver H1x0 keys */
 #elif CONFIG_KEYPAD == IRIVER_H100_PAD
 #define VIEWER_QUIT BUTTON_OFF
 #define VIEWER_PAGE_UP BUTTON_UP
@@ -107,10 +111,8 @@
 #define VIEWER_MODE_WRAP BUTTON_REC
 #define VIEWER_MODE_LINE BUTTON_MODE
 #define VIEWER_MODE_WIDTH BUTTON_SELECT
-/* Recorder, Ondio, iRiver */
 #define VIEWER_MODE_PAGE (BUTTON_ON | BUTTON_MODE)
 #define VIEWER_MODE_SCROLLBAR (BUTTON_ON | BUTTON_REC)
-/* Recorder, iRiver */
 #define VIEWER_LINE_UP (BUTTON_ON | BUTTON_UP)
 #define VIEWER_LINE_DOWN (BUTTON_ON | BUTTON_DOWN)
 #define VIEWER_COLUMN_LEFT (BUTTON_ON | BUTTON_LEFT)
@@ -158,6 +160,7 @@ enum {
 } scrollbar_mode[VIEW_MODES] = {SB_OFF, SB_ON};
 static unsigned char *scrollbar_mode_str[] = {"off", "on", "scrollbar"};
 static bool need_scrollbar;
+
 enum {
     NO_OVERLAP=0,
     OVERLAP,
@@ -173,6 +176,7 @@ static int display_lines; /* number of lines on the display */
 static int draw_columns; /* number of (pixel) columns available for text */
 static int par_indent_spaces; /* number of spaces to indent first paragraph */
 static int fd;
+static char *file_name;
 static long file_size;
 static bool mac_text;
 static long file_pos; /* Position of the top of the buffer in the file */
@@ -792,7 +796,7 @@ static void init_need_scrollbar(void) {
 }
 #endif
 
-static bool viewer_init(char* file)
+static bool viewer_init(void)
 {
 #ifdef HAVE_LCD_BITMAP
     int idx, ch;
@@ -833,7 +837,7 @@ static bool viewer_init(char* file)
 #endif
     **********************/
 
-    fd = rb->open(file, O_RDONLY);
+    fd = rb->open(file_name, O_RDONLY);
     if (fd==-1)
         return false;
 
@@ -856,10 +860,123 @@ static bool viewer_init(char* file)
     return true;
 }
 
+/* in the viewer settings file, the line format is:
+ * - file name (variable length)
+ * - settings  (fixed length strings appended, EOL included)
+ */
+typedef struct {
+        char word_mode[2], line_mode[2], view_mode[2];
+        char file_pos[11], screen_top_ptr[11];
+#ifdef HAVE_LCD_BITMAP
+        char scrollbar_mode[VIEW_MODES][2], page_mode[2];
+#endif
+        char EOL;
+} viewer_settings_string;
+
+static void viewer_load_settings(void)
+{
+    int settings_fd, file_name_len, req_line_len, line_len; 
+    char line[1024];
+    
+    settings_fd=rb->open(SETTINGS_FILE, O_RDONLY);
+    rb->splash(HZ, true, "load %s %d", SETTINGS_FILE, settings_fd);
+    if (settings_fd < 0) return;
+
+    file_name_len = rb->strlen(file_name);
+    req_line_len = file_name_len + sizeof(viewer_settings_string);
+    while ((line_len = rb->read_line(settings_fd, line, sizeof(line))) > 0) {
+        if ((line_len == req_line_len) && 
+                (rb->strncasecmp(line, file_name, file_name_len) == 0)) {
+            /* found a match, load stored values */
+            viewer_settings_string *prefs = (void*) &line[file_name_len];
+
+#ifdef HAVE_LCD_BITMAP
+            /* view mode will be initialized later anyways */
+            for (view_mode=0; view_mode<VIEW_MODES; ++view_mode)
+                scrollbar_mode[view_mode] = 
+                        rb->atoi(prefs->scrollbar_mode[view_mode]);
+            
+            page_mode = rb->atoi(prefs->page_mode);
+#endif
+            
+            word_mode = rb->atoi(prefs->word_mode);
+            line_mode = rb->atoi(prefs->line_mode);
+            view_mode = rb->atoi(prefs->view_mode);
+            
+#ifdef HAVE_LCD_BITMAP
+            init_need_scrollbar();
+#endif
+            /* the following settings are safety checked 
+             * (file may have changed on disk) 
+             */
+            file_pos = rb->atoi(prefs->file_pos); /* should be atol() */
+            if (file_pos > file_size) {
+                    file_pos = 0;
+                    break;
+            } 
+            buffer_end = BUFFER_END();  /* Update whenever file_pos changes */
+            
+            screen_top_ptr = buffer + rb->atoi(prefs->screen_top_ptr);
+            if (BUFFER_OOB(screen_top_ptr)) {
+                    screen_top_ptr = buffer;
+                    break;
+            }
+        }
+    }
+    rb->close(settings_fd);
+    
+    fill_buffer(file_pos, buffer, BUFFER_SIZE);
+}
+            
+static void viewer_save_settings(void)
+{
+    int settings_fd, file_name_len, req_line_len, line_len; 
+    char line[1024];
+    viewer_settings_string prefs;
+    
+    settings_fd=rb->open(SETTINGS_FILE, O_RDWR | O_CREAT);
+    DEBUGF("SETTINGS_FILE: %d\n", settings_fd);
+    if (settings_fd < 0) return;
+
+    file_name_len = rb->strlen(file_name);
+    req_line_len = file_name_len + sizeof(viewer_settings_string);
+    while ((line_len = rb->read_line(settings_fd, line, sizeof(line))) > 0) {
+        if ((line_len == req_line_len) && 
+                (rb->strncasecmp(line, file_name, file_name_len) == 0)) {
+            /* found a match, reposition file pointer to overwrite this line */
+            rb->lseek(settings_fd, -line_len, SEEK_CUR);
+            break;
+        }
+    }
+    
+    /* fill structure in order to prevent overwriting with 0s (snprintf
+     * intentionally overflows so that no terminating NULLs are written 
+     * to disk). */
+    rb->snprintf(prefs.word_mode, 3, "%2d", word_mode);
+    rb->snprintf(prefs.line_mode, 3, "%2d", line_mode);
+    rb->snprintf(prefs.view_mode, 3, "%2d", view_mode);
+    rb->snprintf(prefs.file_pos, 12, "%11d", file_pos);
+    rb->snprintf(prefs.screen_top_ptr, 12, "%11d", screen_top_ptr-buffer);
+#ifdef HAVE_LCD_BITMAP
+    /* view_mode is not needed anymore */
+    for (view_mode=0; view_mode<VIEW_MODES; ++view_mode) 
+        rb->snprintf(prefs.scrollbar_mode[view_mode], 3, 
+                        "%2d", scrollbar_mode[view_mode]);
+                        
+    rb->snprintf(prefs.page_mode, 3, "%2d", page_mode);
+#endif
+    prefs.EOL = '\n';
+    
+    rb->write(settings_fd, file_name, file_name_len);
+    rb->write(settings_fd, &prefs, sizeof(prefs));
+    rb->close(settings_fd);
+}     
+
 static void viewer_exit(void *parameter)
 {
     (void)parameter;
 
+    viewer_save_settings();
     rb->close(fd);
 }
 
@@ -888,12 +1005,15 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
     if (!file)
         return PLUGIN_ERROR;
 
-    ok = viewer_init(file);
+    file_name = file;
+    ok = viewer_init();
     if (!ok) {
         rb->splash(HZ, false, "Error");
         viewer_exit(NULL);
         return PLUGIN_OK;
     }
+
+    viewer_load_settings();
 
     viewer_draw(col);
 
