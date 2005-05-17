@@ -291,7 +291,7 @@ int process_metadata (WavpackContext *wpc, WavpackMetadata *wpmd);
 
 int read_entropy_vars (WavpackStream *wps, WavpackMetadata *wpmd);
 int read_hybrid_profile (WavpackStream *wps, WavpackMetadata *wpmd);
-long get_word (WavpackStream *wps, int chan);
+long get_words (WavpackStream *wps, int nchans, int nsamples, long *buffer);
 long exp2s (int log);
 int restore_weight (char weight);
 

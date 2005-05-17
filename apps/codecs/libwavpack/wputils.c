@@ -19,6 +19,8 @@
 
 #include <string.h>
 
+static void strcpy_loc (char *dst, char *src) { while (*src) *dst++ = *src++; *dst = 0; }
+
 ///////////////////////////// local table storage ////////////////////////////
 
 const ulong sample_rates [] = { 6000, 8000, 9600, 11025, 12000, 16000, 22050,
@@ -49,7 +51,6 @@ WavpackContext *WavpackOpenFileInput (read_stream infile, char *error)
 {
     WavpackStream *wps = &wpc.stream;
     ulong bcount;
-    (void)error;
 
     CLEAR (wpc);
     wpc.infile = infile;
@@ -64,12 +65,12 @@ WavpackContext *WavpackOpenFileInput (read_stream infile, char *error)
 	bcount = read_next_header (wpc.infile, &wps->wphdr);
 
 	if (bcount == (ulong) -1) {
-	    /*strcpy (error, "not compatible with this version of WavPack file!");*/
+	    strcpy_loc (error, "invalid WavPack file!");
 	    return NULL;
 	}
 
 	if ((wps->wphdr.flags & UNKNOWN_FLAGS) || wps->wphdr.version < 0x402 || wps->wphdr.version > 0x40f) {
-	    /*strcpy (error, "not compatible with this version of WavPack file!");*/
+	    strcpy_loc (error, "invalid WavPack file!");
 	    return NULL;
 	}
 
@@ -77,8 +78,8 @@ WavpackContext *WavpackOpenFileInput (read_stream infile, char *error)
 	    wpc.total_samples = wps->wphdr.total_samples;
 
 	if (!unpack_init (&wpc)) {
-	    /*strcpy (error, wpc.error_message [0] ? wpc.error_message :
-		"not compatible with this version of WavPack file!");*/
+	    strcpy_loc (error, wpc.error_message [0] ? wpc.error_message :
+		"invalid WavPack file!");
 
 	    return NULL;
 	}
@@ -170,7 +171,7 @@ ulong WavpackUnpackSamples (WavpackContext *wpc, long *buffer, ulong samples)
 		    break;
 
 		if (wps->wphdr.version < 0x402 || wps->wphdr.version > 0x40f) {
-		    /*strcpy (wpc->error_message, "not compatible with this version of WavPack file!");*/
+		    strcpy_loc (wpc->error_message, "invalid WavPack file!");
 		    break;
 		}
 

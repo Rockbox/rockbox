@@ -123,9 +123,20 @@ static const uchar exp2_table [] = {
     0xea, 0xec, 0xed, 0xee, 0xf0, 0xf1, 0xf2, 0xf4, 0xf5, 0xf6, 0xf8, 0xf9, 0xfa, 0xfc, 0xfd, 0xff
 };
 
+static const char ones_count_table [] = {
+    0,1,0,2,0,1,0,3,0,1,0,2,0,1,0,4,0,1,0,2,0,1,0,3,0,1,0,2,0,1,0,5,
+    0,1,0,2,0,1,0,3,0,1,0,2,0,1,0,4,0,1,0,2,0,1,0,3,0,1,0,2,0,1,0,6,
+    0,1,0,2,0,1,0,3,0,1,0,2,0,1,0,4,0,1,0,2,0,1,0,3,0,1,0,2,0,1,0,5,
+    0,1,0,2,0,1,0,3,0,1,0,2,0,1,0,4,0,1,0,2,0,1,0,3,0,1,0,2,0,1,0,7,
+    0,1,0,2,0,1,0,3,0,1,0,2,0,1,0,4,0,1,0,2,0,1,0,3,0,1,0,2,0,1,0,5,
+    0,1,0,2,0,1,0,3,0,1,0,2,0,1,0,4,0,1,0,2,0,1,0,3,0,1,0,2,0,1,0,6,
+    0,1,0,2,0,1,0,3,0,1,0,2,0,1,0,4,0,1,0,2,0,1,0,3,0,1,0,2,0,1,0,5,
+    0,1,0,2,0,1,0,3,0,1,0,2,0,1,0,4,0,1,0,2,0,1,0,3,0,1,0,2,0,1,0,8
+};
+
 ///////////////////////////// executable code ////////////////////////////////
 
-static int log2 (unsigned long avalue);
+static int mylog2 (unsigned long avalue);
 
 // Read the median log2 values from the specifed metadata structure, convert
 // them back to 32-bit unsigned values and store them. If length is not
@@ -270,140 +281,167 @@ static ulong read_code (Bitstream *bs, ulong maxcode);
 // of WORD_EOF indicates that the end of the bitstream was reached (all 1s) or
 // some other error occurred.
 
-long get_word (WavpackStream *wps, int chan)
+long get_words (WavpackStream *wps, int nchans, int nsamples, long *buffer)
 {
-    ulong ones_count, low, mid, high;
-    int sign;
+    ulong tsamples = nsamples * nchans, ones_count, low, mid, high;
+    int next8, sign, chan;
+    long *bptr = buffer;
 
-    if (wps->w.zeros_acc) {
-	if (--wps->w.zeros_acc) {
-	    wps->w.slow_level [chan] -= (wps->w.slow_level [chan] + SLO) >> SLS;
-	    return 0;
-	}
-    }
-    else if (!wps->w.holding_zero && !wps->w.holding_one && !(wps->w.median [0] [0] & ~1) && !(wps->w.median [0] [1] & ~1)) {
-	ulong mask;
-	int cbits;
+    while (tsamples--) {
 
-	for (cbits = 0; cbits < 33 && getbit (&wps->wvbits); ++cbits);
+	chan = (nchans == 1) ? 0 : (~tsamples & 1);
 
-	if (cbits == 33)
-	    return WORD_EOF;
-
-	if (cbits < 2)
-	    wps->w.zeros_acc = cbits;
-	else {
-	    for (mask = 1, wps->w.zeros_acc = 0; --cbits; mask <<= 1)
-		if (getbit (&wps->wvbits))
-		    wps->w.zeros_acc |= mask;
-
-	    wps->w.zeros_acc |= mask;
-	}
-
-	if (wps->w.zeros_acc) {
-	    wps->w.slow_level [chan] -= (wps->w.slow_level [chan] + SLO) >> SLS;
-	    CLEAR (wps->w.median);
-	    return 0;
-	}
-    }
-
-    if (wps->w.holding_zero)
-	ones_count = wps->w.holding_zero = 0;
-    else {
-#ifdef LIMIT_ONES
-	for (ones_count = 0; ones_count < (LIMIT_ONES + 1) && getbit (&wps->wvbits); ++ones_count);
-
-	if (ones_count == (LIMIT_ONES + 1))
-	    return WORD_EOF;
-
-	if (ones_count == LIMIT_ONES) {
+	if (!(wps->w.median [0] [0] & ~1) && !wps->w.holding_zero && !wps->w.holding_one && !(wps->w.median [0] [1] & ~1)) {
 	    ulong mask;
 	    int cbits;
 
-	    for (cbits = 0; cbits < 33 && getbit (&wps->wvbits); ++cbits);
-
-	    if (cbits == 33)
-		return WORD_EOF;
-
-	    if (cbits < 2)
-		ones_count = cbits;
+	    if (wps->w.zeros_acc) {
+		if (--wps->w.zeros_acc) {
+		    wps->w.slow_level [chan] -= (wps->w.slow_level [chan] + SLO) >> SLS;
+		    *bptr++ = 0;
+		    continue;
+		}
+	    }
 	    else {
-		for (mask = 1, ones_count = 0; --cbits; mask <<= 1)
-		    if (getbit (&wps->wvbits))
+		for (cbits = 0; cbits < 33 && getbit (&wps->wvbits); ++cbits);
+
+		if (cbits == 33)
+		    break;
+
+		if (cbits < 2)
+		    wps->w.zeros_acc = cbits;
+		else {
+		    for (mask = 1, wps->w.zeros_acc = 0; --cbits; mask <<= 1)
+			if (getbit (&wps->wvbits))
+			    wps->w.zeros_acc |= mask;
+
+		    wps->w.zeros_acc |= mask;
+		}
+
+		if (wps->w.zeros_acc) {
+		    wps->w.slow_level [chan] -= (wps->w.slow_level [chan] + SLO) >> SLS;
+		    CLEAR (wps->w.median);
+		    *bptr++ = 0;
+		    continue;
+		}
+	    }
+	}
+
+	if (wps->w.holding_zero)
+	    ones_count = wps->w.holding_zero = 0;
+	else {
+	    if (wps->wvbits.bc < 8) {
+		if (++(wps->wvbits.ptr) == wps->wvbits.end)
+		    wps->wvbits.wrap (&wps->wvbits);
+
+		next8 = (wps->wvbits.sr |= *(wps->wvbits.ptr) << wps->wvbits.bc) & 0xff;
+		wps->wvbits.bc += 8;
+	    }
+	    else
+		next8 = wps->wvbits.sr & 0xff;
+
+	    if (next8 == 0xff) {
+		wps->wvbits.bc -= 8;
+		wps->wvbits.sr >>= 8;
+
+		for (ones_count = 8; ones_count < (LIMIT_ONES + 1) && getbit (&wps->wvbits); ++ones_count);
+
+		if (ones_count == (LIMIT_ONES + 1))
+		    break;
+
+		if (ones_count == LIMIT_ONES) {
+		    ulong mask;
+		    int cbits;
+
+		    for (cbits = 0; cbits < 33 && getbit (&wps->wvbits); ++cbits);
+
+		    if (cbits == 33)
+			break;
+
+		    if (cbits < 2)
+			ones_count = cbits;
+		    else {
+			for (mask = 1, ones_count = 0; --cbits; mask <<= 1)
+			    if (getbit (&wps->wvbits))
+				ones_count |= mask;
+
 			ones_count |= mask;
+		    }
 
-		ones_count |= mask;
-	    }
-
-	    ones_count += LIMIT_ONES;
-	}
-#else
-	for (ones_count = 0; getbit (&wps->wvbits); ++ones_count);
-#endif
-
-	if (wps->w.holding_one) {
-	    wps->w.holding_one = ones_count & 1;
-	    ones_count = (ones_count >> 1) + 1;
-	}
-	else {
-	    wps->w.holding_one = ones_count & 1;
-	    ones_count >>= 1;
-	}
-
-	wps->w.holding_zero = ~wps->w.holding_one & 1;
-    }
-
-    if ((wps->wphdr.flags & HYBRID_FLAG) && !chan)
-	update_error_limit (wps);
-
-    if (ones_count == 0) {
-	low = 0;
-	high = GET_MED (0) - 1;
-	DEC_MED0 ();
-    }
-    else {
-	low = GET_MED (0);
-	INC_MED0 ();
-
-	if (ones_count == 1) {
-	    high = low + GET_MED (1) - 1;
-	    DEC_MED1 ();
-	}
-	else {
-	    low += GET_MED (1);
-	    INC_MED1 ();
-
-	    if (ones_count == 2) {
-		high = low + GET_MED (2) - 1;
-		DEC_MED2 ();
+		    ones_count += LIMIT_ONES;
+		}
 	    }
 	    else {
-		low += (ones_count - 2) * GET_MED (2);
-		high = low + GET_MED (2) - 1;
-		INC_MED2 ();
+		wps->wvbits.bc -= (ones_count = ones_count_table [next8]) + 1;
+		wps->wvbits.sr >>= ones_count + 1;
+	    }
+
+	    if (wps->w.holding_one) {
+		wps->w.holding_one = ones_count & 1;
+		ones_count = (ones_count >> 1) + 1;
+	    }
+	    else {
+		wps->w.holding_one = ones_count & 1;
+		ones_count >>= 1;
+	    }
+
+	    wps->w.holding_zero = ~wps->w.holding_one & 1;
+	}
+
+	if ((wps->wphdr.flags & HYBRID_FLAG) && !chan)
+	    update_error_limit (wps);
+
+	if (ones_count == 0) {
+	    low = 0;
+	    high = GET_MED (0) - 1;
+	    DEC_MED0 ();
+	}
+	else {
+	    low = GET_MED (0);
+	    INC_MED0 ();
+
+	    if (ones_count == 1) {
+		high = low + GET_MED (1) - 1;
+		DEC_MED1 ();
+	    }
+	    else {
+		low += GET_MED (1);
+		INC_MED1 ();
+
+		if (ones_count == 2) {
+		    high = low + GET_MED (2) - 1;
+		    DEC_MED2 ();
+		}
+		else {
+		    low += (ones_count - 2) * GET_MED (2);
+		    high = low + GET_MED (2) - 1;
+		    INC_MED2 ();
+		}
 	    }
 	}
+
+	mid = (high + low + 1) >> 1;
+
+	if (!wps->w.error_limit [chan])
+	    mid = read_code (&wps->wvbits, high - low) + low;
+	else while (high - low > wps->w.error_limit [chan]) {
+	    if (getbit (&wps->wvbits))
+		mid = (high + (low = mid) + 1) >> 1;
+	    else
+		mid = ((high = mid - 1) + low + 1) >> 1;
+	}
+
+	sign = getbit (&wps->wvbits);
+
+	if (wps->wphdr.flags & HYBRID_BITRATE) {
+	    wps->w.slow_level [chan] -= (wps->w.slow_level [chan] + SLO) >> SLS;
+	    wps->w.slow_level [chan] += mylog2 (mid);
+	}
+
+	*bptr++ = sign ? ~mid : mid;
     }
 
-    mid = (high + low + 1) >> 1;
-
-    if (!wps->w.error_limit [chan])
-	mid = read_code (&wps->wvbits, high - low) + low;
-    else while (high - low > wps->w.error_limit [chan]) {
-	if (getbit (&wps->wvbits))
-	    mid = (high + (low = mid) + 1) >> 1;
-	else
-	    mid = ((high = mid - 1) + low + 1) >> 1;
-    }
-
-    sign = getbit (&wps->wvbits);
-
-    if (wps->wphdr.flags & HYBRID_BITRATE) {
-	wps->w.slow_level [chan] -= (wps->w.slow_level [chan] + SLO) >> SLS;
-	wps->w.slow_level [chan] += log2 (mid);
-    }
-
-    return sign ? ~mid : mid;
+    return nchans == 1 ? (bptr - buffer) : ((bptr - buffer) / 2);
 }
 
 // Read a single unsigned value from the specified bitstream with a value
@@ -448,7 +486,7 @@ static ulong read_code (Bitstream *bs, ulong maxcode)
 // This function returns the log2 for the specified 32-bit unsigned value.
 // The maximum value allowed is about 0xff800000 and returns 8447.
 
-static int log2 (unsigned long avalue)
+static int mylog2 (unsigned long avalue)
 {
     int dbits;
 
