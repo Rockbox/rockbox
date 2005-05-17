@@ -827,7 +827,7 @@ static bool dirbrowse(void)
                 }
                 break;
 #endif
-#ifndef IRIVER_H100
+#if defined(HAVE_CHARGING) && !defined(IRIVER_H100)
             case TREE_OFF | BUTTON_REPEAT:
                 if (charger_inserted()) {
                     charging_splash();
