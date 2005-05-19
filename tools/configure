@@ -689,7 +689,7 @@ all:
 clean:
 	@\$(MAKE) -C \$(FIRMDIR) clean OBJDIR=\$(BUILDDIR)/firmware
 	@\$(MAKE) -C \$(APPSDIR) clean OBJDIR=\$(BUILDDIR)/@APPS@
-	@rm -rf rockbox.zip TAGS @APPS@ firmware comsim sim
+	@rm -rf rockbox.zip TAGS @APPS@ firmware comsim sim lang.h
 
 tags:
 	@rm -f TAGS
