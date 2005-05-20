@@ -1065,8 +1065,20 @@ int system_memory_guard(int newmode)
     (void)newmode;
     return 0;
 }
+
 void system_reboot (void)
 {
-    /* dummy */
+#if CONFIG_CPU == MCF5249
+    set_cpu_frequency(0);
+    
+    asm(" move.w #0x2700,%sr");
+    /* Reset the cookie for the crt0 crash check */
+    asm(" move.l #0,%d0");
+    asm(" move.l %d0,0x10017ffc");
+    asm(" movec.l %d0,%vbr");
+    asm(" move.l 0,%sp");
+    asm(" move.l 4,%a0");
+    asm(" jmp (%a0)");
+#endif
 }
 #endif
