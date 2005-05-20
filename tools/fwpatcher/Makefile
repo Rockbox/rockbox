@@ -9,25 +9,41 @@
 
 PREFIX=i586-mingw32msvc-
 
-TARGET = fwpatcher.exe
+TARGET = fwpatchernu.exe
+TARGETU = fwpatcher.exe
 
 WINDRES = $(PREFIX)windres
 CC = $(PREFIX)gcc
 
-CFLAGS = -DUNICODE -D_UNICODE -I. -Os -s -fomit-frame-pointer
+UNICODE = -DUNICODE -D_UNICODE
+CFLAGS = -I. -Os -s -fomit-frame-pointer
 LDFLAGS = -lmingw32 -mwindows -s
 
 OBJS= resource.o iriver.o main.o md5.o
+OBJSU= resource.o iriveru.o mainu.o md5.o
 
-$(TARGET) : $(OBJS)
+all: $(TARGET) $(TARGETU)
+
+$(TARGET): $(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) -o $@
+
+$(TARGETU): $(OBJSU)
+	$(CC) $(LDFLAGS) $(OBJSU) -o $@
 
 resource.o: resource.rc bootloader.bin rockbox.ico
 	$(WINDRES) -v $< $@
 
+iriveru.o: iriver.c iriver.h
+	$(CC) $(CFLAGS) $(UNICODE) -c $< -o $@
+
 iriver.o: iriver.c iriver.h
+
+mainu.o: main.c
+	$(CC) $(CFLAGS) $(UNICODE) -c $< -o $@
 
 main.o: main.c
 
 md5.o: md5.c md5.h
 
+clean:
+	rm -f $(OBJSU) $(OBJS) $(TARGETU) $(TARGET)
