@@ -42,6 +42,32 @@ int usb_screen(void)
    return 0;
 }
 
+static void usb_enable(bool on)
+{
+    GPIO_OUT &= ~0x01000000;      /* GPIO24 is the Cypress chip power */
+    GPIO_ENABLE |= 0x01000000;
+    GPIO_FUNCTION |= 0x01000000;
+    
+    GPIO1_FUNCTION |= 0x00000080; /* GPIO39 is the USB detect input */
+
+    if(on)
+    {
+        /* Power on the Cypress chip */
+        GPIO_OUT |= 0x01000000;
+        sleep(2);
+    }
+    else
+    {
+        /* Power off the Cypress chip */
+        GPIO_OUT &= ~0x01000000;        
+    }
+}
+
+bool usb_detect(void)
+{
+    return (GPIO1_READ & 0x80)?true:false;
+}
+
 void start_iriver_fw(void)
 {
     asm(" move.w #0x2700,%sr");
@@ -127,10 +153,32 @@ void main(void)
     int i;
     int rc;
     char buf[256];
+    bool rc_on_button = false;
+    bool on_button = false;
+    int data;
+
+    /* Read the buttons early */
+
+    /* Set GPIO33, GPIO37, GPIO38  and GPIO52 as general purpose inputs */
+    GPIO1_FUNCTION |= 0x00100062;
+    GPIO1_ENABLE &= ~0x00100062;
+
+    data = GPIO1_READ;
+    if ((data & 0x20) == 0)
+        on_button = true;
+    
+    if ((data & 0x40) == 0)
+        rc_on_button = true;
 
     power_init();
     system_init();
     kernel_init();
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    /* Set up waitstates for the peripherals */
+    set_cpu_frequency(0); /* PLL off */
+#endif
+    
     backlight_init();
     set_irq_level(0);
     lcd_init();
@@ -140,19 +188,21 @@ void main(void)
 
     lcd_setfont(FONT_SYSFIXED);
 
+    snprintf(buf, 256, "Rockboot version 1");
+    lcd_puts(0, line++, buf);
+
     sleep(HZ/50); /* Allow the button driver to check the buttons */
 
-    if(button_status() & BUTTON_REC ||
-        (button_status() & BUTTON_RC_ON) == BUTTON_RC_ON) {
+    if(button_status() & BUTTON_REC || rc_on_button) {
         lcd_puts(0, 8, "Starting original firmware...");
         lcd_update();
         start_iriver_fw();
     }
 
-    if((button_status() & BUTTON_ON) & button_hold()) {
+    if(on_button & button_hold()) {
         lcd_puts(0, 8, "HOLD switch on, power off...");
         lcd_update();
-        sleep(HZ/2);
+        sleep(HZ*2);
         /* Reset the cookie for the crt0 crash check */
         asm(" move.l #0,%d0");
         asm(" move.l %d0,0x10017ffc");
@@ -166,7 +216,7 @@ void main(void)
         power_off();
     }
 #endif
-    
+
     rc = ata_init();
     if(rc)
     {
@@ -175,21 +225,38 @@ void main(void)
         lcd_clear_display();
         snprintf(str, 31, "ATA error: %d", rc);
         lcd_puts(0, 1, str);
-        lcd_puts(0, 3, "Press ON to debug");
         lcd_update();
         while(!(button_get(true) & BUTTON_REL));
 #endif
         panicf("ata: %d", rc);
     }
 
+    /* A hack to enter USB mode without using the USB thread */
+    if(usb_detect())
+    {
+        lcd_clear_display();
+        lcd_puts(0, 7, "    Bootloader USB mode");
+        lcd_update();
+
+        ata_spin();
+        ata_enable(false);
+        usb_enable(true);
+        while(usb_detect())
+        {
+            ata_spin(); /* Prevent the drive from spinning down */
+            sleep(HZ);
+        }
+
+        system_reboot();
+    }
+    
     disk_init();
 
     rc = disk_mount_all();
     if (rc<=0)
     {
         lcd_clear_display();
-        lcd_puts(0, 0, "No partition");
-        lcd_puts(0, 1, "found.");
+        lcd_puts(0, 0, "No partition found");
         while(button_get(true) != SYS_USB_CONNECTED) {};
     }
 
