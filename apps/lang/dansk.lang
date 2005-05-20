@@ -3059,3 +3059,15 @@ desc: in the display sub menu
 eng: "Remote-LCD Settings"
 voice: 
 new: "Fjernbetjenings-LCD indstillinger"
+
+id: LANG_DISK_NAME_INTERNAL
+desc: in info menu; name for internal disk with multivolume (keep short!)
+eng: "Int:"
+voice: "Internal"
+new: "Int:"
+
+id: LANG_DISK_NAME_MMC
+desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
+eng: "MMC:"
+voice: "Multimedia card"
+new: "MMC:"
