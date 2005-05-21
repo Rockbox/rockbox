@@ -39,6 +39,16 @@
 static short particles[NUM_PARTICLES][2];
 static struct plugin_api* rb;
 
+#ifdef HAVE_LCD_BITMAP
+#if LCD_WIDTH >= 160
+#define FLAKE_WIDTH 5
+static const unsigned char flake[] = {0x0a,0x04,0x1f,0x04,0x0a};
+#else
+#define FLAKE_WIDTH 3
+static const unsigned char flake[] = {0x02,0x07,0x02};
+#endif
+#endif
+
 static bool particle_exists(int particle)
 {
     if (particles[particle][0]>=0 && particles[particle][1]>=0 &&
@@ -72,7 +82,8 @@ static void snow_move(void)
     for (i=0; i<NUM_PARTICLES; i++) {
         if (particle_exists(i)) {
 #ifdef HAVE_LCD_BITMAP
-            rb->lcd_clearpixel(particles[i][0],particles[i][1]);
+            rb->lcd_clearrect(particles[i][0],particles[i][1],
+                              FLAKE_WIDTH,FLAKE_WIDTH);
 #else
             pgfx_clearpixel(particles[i][0],particles[i][1]);
 #endif
@@ -94,13 +105,15 @@ static void snow_move(void)
             }
             if (particle_exists(i))
 #ifdef HAVE_LCD_BITMAP
-                rb->lcd_drawpixel(particles[i][0],particles[i][1]);
+                rb->lcd_bitmap(flake,particles[i][0],particles[i][1],
+                               FLAKE_WIDTH,FLAKE_WIDTH,true);
 #else
                 pgfx_drawpixel(particles[i][0],particles[i][1]);
 #endif
         }
     }
 }
+
 
 static void snow_init(void)
 {
