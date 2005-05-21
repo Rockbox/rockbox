@@ -231,12 +231,21 @@ int PatchFirmware()
     }
     for (i = 0; i < sizeof(checksums)/sizeof(char *); ++i) {
         if (strncmp(checksums[i], md5sum_str, 32) == 0) {
-            /* all is fine, rename the patched file to original name of the firmware */
-            MoveFileEx(name3, fn, MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING);
             /* delete temp files */
             DeleteFile(name1);
             DeleteFile(name2);
-            return 1;
+            /* all is fine, rename the patched file to original name of the firmware */
+            if (MoveFileEx(name3, fn, MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING)) {
+                return 1;
+            }
+            else {
+                DeleteFile(name3); /* Deleting a perfectly good firmware here really */
+                MessageBox(NULL,
+                           TEXT("Couldn't modify existing file.\n")
+                           TEXT("Check if file is write protected, then try again."),
+                           TEXT("Error"), MB_ICONERROR);
+                return 0;
+            }
         }
     }
     MessageBox(NULL, 
