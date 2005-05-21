@@ -25,8 +25,8 @@
 #define RAND_SCALE 5
 
 #if defined(IRIVER_H100) && !defined(SIMULATOR)
-#define REMOTE_WIDTH LCD_REMOTE_WIDTH
-#define REMOTE_HEIGHT LCD_REMOTE_HEIGHT
+#define REMOTE_WIDTH 134
+#define REMOTE_HEIGHT 65
 #define REMOTE_LOGO_WIDTH 91
 #define REMOTE_LOGO_HEIGHT 32
 #define REMOTE_LOGO rockbox91x32
@@ -191,7 +191,6 @@ const unsigned char rockbox16x7[] = {
 
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
-    static char debug[30];
     int button;
     int timer = 10;
     int x = (DISPLAY_WIDTH / 2) - (LOGO_WIDTH / 2);
@@ -227,8 +226,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
                 (x * (REMOTE_WIDTH - REMOTE_LOGO_WIDTH)) / (DISPLAY_WIDTH - LOGO_WIDTH),
                 (y * (REMOTE_HEIGHT - REMOTE_LOGO_HEIGHT)) / (DISPLAY_HEIGHT - LOGO_HEIGHT),
                 REMOTE_LOGO_WIDTH, REMOTE_LOGO_HEIGHT, false);
-        rb->snprintf(debug, sizeof(debug), "X: %d Y: %d - RX: %d RY: %d", x, y, (x * (REMOTE_WIDTH - REMOTE_LOGO_WIDTH)) / (DISPLAY_WIDTH - LOGO_WIDTH), (y * (REMOTE_HEIGHT - REMOTE_LOGO_HEIGHT)) / (DISPLAY_HEIGHT - LOGO_HEIGHT));
-        rb->lcd_putsxy(5, DISPLAY_HEIGHT - 10, debug);
 #endif
 #else
         pgfx_clear_display();
