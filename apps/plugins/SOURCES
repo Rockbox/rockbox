@@ -82,4 +82,5 @@ splitedit.c
 
 #ifdef HAVE_REMOTE_LCD
 remotelcd.c
+remotetest.c
 #endif

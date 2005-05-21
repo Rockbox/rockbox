@@ -37,11 +37,11 @@
 
 #elif CONFIG_KEYPAD == IRIVER_H100_PAD
 #define FLIPIT_QUIT BUTTON_OFF
-#define FLIPIT_SHUFFLE BUTTON_SELECT
+#define FLIPIT_SHUFFLE BUTTON_MODE
 #define FLIPIT_SOLVE BUTTON_ON
 #define FLIPIT_STEP_BY_STEP BUTTON_REC
-#define FLIPIT_TOGGLE_PRE BUTTON_MODE
-#define FLIPIT_TOGGLE (BUTTON_MODE | BUTTON_REL)
+#define FLIPIT_TOGGLE_PRE BUTTON_SELECT
+#define FLIPIT_TOGGLE (BUTTON_SELECT | BUTTON_REL)
 
 #endif
 
@@ -51,6 +51,43 @@ static int toggle[20];
 static int cursor_pos, moves;
 static char s[5];
 static char *ptr;
+
+#if LCD_WIDTH == 160
+#define SPOT_SIZE 20
+#define SPOT_SPACE 4
+#define MARGIN_TOP 16
+#define MARGIN_LEFT 5
+static unsigned char spot_pic[2][60] = {
+    { 0xe0, 0xf8, 0xfc, 0xfe, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff,
+      0xff, 0xff, 0xff, 0xff, 0xff, 0xfe, 0xfe, 0xfc, 0xf8, 0xe0,
+      0x7f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+      0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f,
+      0x00, 0x01, 0x03, 0x07, 0x07, 0x0f, 0x0f, 0x0f, 0x0f, 0x0f,
+      0x0f, 0x0f, 0x0f, 0x0f, 0x0f, 0x07, 0x07, 0x03, 0x01, 0x00, },
+    { 0xe0, 0x18, 0x0c, 0x06, 0x02, 0x01, 0x01, 0x01, 0x01, 0x01,
+      0x01, 0x01, 0x01, 0x01, 0x01, 0x02, 0x06, 0x0c, 0x18, 0xe0,
+      0x7f, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x7f,
+      0x00, 0x01, 0x03, 0x06, 0x04, 0x08, 0x08, 0x08, 0x08, 0x08,
+      0x08, 0x08, 0x08, 0x08, 0x08, 0x04, 0x06, 0x03, 0x01, 0x00, }
+};
+
+#define CURSOR_SIZE 22
+static unsigned char cursor_pic[66] = {
+      0x55, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00,
+      0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00,
+      0x01, 0xaa, 0x55, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0x00, 0xaa, 0x15, 0x20, 0x00, 0x20, 0x00, 0x20,
+      0x00, 0x20, 0x00, 0x20, 0x00, 0x20, 0x00, 0x20, 0x00, 0x20,
+      0x00, 0x20, 0x00, 0x20, 0x00, 0x2a,
+};
+
+#else
+#define SPOT_SIZE 14
+#define SPOT_SPACE 2
+#define MARGIN_TOP 0
+#define MARGIN_LEFT 0
 static unsigned char spot_pic[2][28] = {
     { 0xe0, 0xf8, 0xfc, 0xfe, 0xfe, 0xff, 0xff,
       0xff, 0xff, 0xfe, 0xfe, 0xfc, 0xf8, 0xe0,
@@ -61,41 +98,47 @@ static unsigned char spot_pic[2][28] = {
       0x01, 0x06, 0x08, 0x10, 0x10, 0x20, 0x20,
       0x20, 0x20, 0x10, 0x10, 0x08, 0x06, 0x01 }
 };
+
+#define CURSOR_SIZE 16
 static unsigned char cursor_pic[32] = {
     0x55, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00,
     0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0xaa,
     0x55, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80,
     0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0xaa };
-
+#endif
 
 /* draw a spot at the coordinates (x,y), range of p is 0-19 */
 static void draw_spot(int p) {
     ptr = spot_pic[spots[p]];
+    int x,y;
+    x = (p%5)*(SPOT_SIZE + SPOT_SPACE)+1 + MARGIN_LEFT;
+    y = (p/5)*(SPOT_SIZE + SPOT_SPACE)+1 + MARGIN_TOP;
+    rb->lcd_bitmap (ptr, x, y, SPOT_SIZE, SPOT_SIZE, true);
+/*
     rb->lcd_bitmap (ptr, (p%5)*16+1, (p/5)*16+1, 14, 8, true);
     ptr += 14;
     rb->lcd_bitmap (ptr, (p%5)*16+1, (p/5)*16+9, 14, 6, true);
+*/
 }
 
 /* draw the cursor at the current cursor position */
 static void draw_cursor(void) {
     int i,j;
-    i = (cursor_pos%5)*16;
-    j = (cursor_pos/5)*16;
+    i = (cursor_pos%5)*CURSOR_SIZE + (SPOT_SPACE/2)*(cursor_pos%5) + MARGIN_LEFT;
+    j = (cursor_pos/5)*CURSOR_SIZE + (SPOT_SPACE/2)*(cursor_pos/5) + MARGIN_TOP;
     ptr = cursor_pic;
-    rb->lcd_bitmap (ptr, i, j, 16, 8, false);
-    ptr += 16;
-    rb->lcd_bitmap (ptr, i, j+8, 16, 8, false);
+    rb->lcd_bitmap (ptr, i, j, CURSOR_SIZE, CURSOR_SIZE, false);
 }
 
 /* clear the cursor where it is */
 static void clear_cursor(void) {
     int i,j;
-    i = (cursor_pos%5)*16;
-    j = (cursor_pos/5)*16;
-    rb->lcd_clearline(i, j, i+15, j);
-    rb->lcd_clearline(i, j+15, i+15, j+15);
-    rb->lcd_clearline(i, j, i, j+15);
-    rb->lcd_clearline(i+15, j, i+15, j+15);
+    i = (cursor_pos%5)*CURSOR_SIZE + (SPOT_SPACE/2)*(cursor_pos%5) + MARGIN_LEFT;
+    j = (cursor_pos/5)*CURSOR_SIZE + (SPOT_SPACE/2)*(cursor_pos/5) + MARGIN_TOP;
+    rb->lcd_clearline(i, j, i+CURSOR_SIZE-1, j);
+    rb->lcd_clearline(i, j+CURSOR_SIZE-1, i+CURSOR_SIZE-1, j+CURSOR_SIZE-1);
+    rb->lcd_clearline(i, j, i, j+CURSOR_SIZE-1);
+    rb->lcd_clearline(i+CURSOR_SIZE-1, j, i+CURSOR_SIZE-1, j+CURSOR_SIZE-1);
 }
 
 /* check if the puzzle is finished */
@@ -131,7 +174,7 @@ static void flipit_toggle(void) {
     }
     moves++;
     rb->snprintf(s, sizeof(s), "%d", moves);
-    rb->lcd_putsxy(85, 20, s);
+    rb->lcd_putsxy(LCD_WIDTH - 27, 20, s);
     if (flipit_finished())
         clear_cursor();
 }
@@ -151,8 +194,8 @@ static void flipit_init(void) {
     int i;
     rb->lcd_clear_display();
     moves = 0;
-    rb->lcd_drawrect(80, 0, 32, 64);
-    rb->lcd_putsxy(81, 10, "Flips");
+    rb->lcd_drawrect(LCD_WIDTH - 32, 0, 32, LCD_HEIGHT);
+    rb->lcd_putsxy(LCD_WIDTH - 31, 10, "Flips");
     for (i=0; i<20; i++) {
         spots[i]=1;
         toggle[i]=1;
@@ -167,11 +210,11 @@ static void flipit_init(void) {
     cursor_pos = 0;
     draw_cursor();
     moves = 0;
-    rb->lcd_clearrect(80, 0, 32, 64);
-    rb->lcd_drawrect(80, 0, 32, 64);
-    rb->lcd_putsxy(81, 10, "Flips");
+    rb->lcd_clearrect(LCD_WIDTH - 32, 0, 32, LCD_HEIGHT);
+    rb->lcd_drawrect(LCD_WIDTH - 32, 0, 32, LCD_HEIGHT);
+    rb->lcd_putsxy(LCD_WIDTH - 31, 10, "Flips");
     rb->snprintf(s, sizeof(s), "%d", moves);
-    rb->lcd_putsxy(85, 20, s);
+    rb->lcd_putsxy(LCD_WIDTH - 27, 20, s);
     rb->lcd_update();
 }
 
@@ -298,13 +341,19 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_putsxy(2, 28, "[M-LEFT] shuffle");
     rb->lcd_putsxy(2, 38, "[M-UP] solution");
     rb->lcd_putsxy(2, 48, "[M-RIGHT] step by step");
+#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+    rb->lcd_putsxy(2, 8, "[STOP] to stop");
+    rb->lcd_putsxy(2, 18, "[SELECT] toggle");
+    rb->lcd_putsxy(2, 28, "[MODE] shuffle");
+    rb->lcd_putsxy(2, 38, "[PLAY] solution");
+    rb->lcd_putsxy(2, 48, "[REC] step by step");
 #endif
     rb->lcd_update();
     rb->sleep(HZ*3);
 
     rb->lcd_clear_display();
-    rb->lcd_drawrect(80, 0, 32, 64);
-    rb->lcd_putsxy(81, 10, "Flips");
+    rb->lcd_drawrect(LCD_WIDTH - 32, 0, 32, LCD_HEIGHT);
+    rb->lcd_putsxy(LCD_WIDTH - 31, 10, "Flips");
     for (i=0; i<20; i++) {
         spots[i]=1;
         draw_spot(i);
