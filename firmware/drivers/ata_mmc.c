@@ -173,21 +173,20 @@ static void mmc_tick(void);
 
 /* implementation */
 
-void mmc_select_clock(int card_no)
+void mmc_enable_int_flash_clock(bool on)
 {
-    /* set clock gate for external card / reset for internal card if the
-     * MMC clock polarity bit is 0, vice versa if it is 1 */
-    if ((card_no != 0) ^ new_mmc_circuit)
-        or_b(0x10, &PADRH);       /* set clock gate PA12 */
-    else
+    /* Internal flash clock is enabled by setting PA12 high with the new
+     * clock circuit, and by setting it low with the old clock circuit */
+    if (on ^ new_mmc_circuit)
         and_b(~0x10, &PADRH);     /* clear clock gate PA12 */
+    else
+        or_b(0x10, &PADRH);       /* set clock gate PA12 */
 }
 
 static int select_card(int card_no)
 {
     mutex_lock(&mmc_mutex);
     led(true);
-    mmc_select_clock(card_no);
     last_disk_activity = current_tick;
 
     if (!card_info[card_no].initialized)
@@ -1061,7 +1060,6 @@ bool mmc_touched(void)
         unsigned char response;
 
         mutex_lock(&mmc_mutex);
-        mmc_select_clock(1);
         setup_sci1(7);             /* safe value */
         and_b(~0x02, &PADRH);      /* assert CS */
         send_cmd(CMD_SEND_OP_COND, 0, &response);
@@ -1144,6 +1142,7 @@ void ata_enable(bool on)
     {
         PBCR1 |= 0x08A0;    /* as SCK1, TxD1, RxD1 */
         IPRE &= 0x0FFF;     /* disable SCI1 interrupts for the CPU */
+        mmc_enable_int_flash_clock(true);  /* always enabled in SPI mode */
     }
     and_b(~0x80, &PADRL); /* assert reset */
     sleep(HZ/20);
@@ -1183,13 +1182,13 @@ int ata_init(void)
     }
 #endif
 
+    new_mmc_circuit = ((read_hw_mask() & MMC_CLOCK_POLARITY) != 0);
     ata_enable(true);
     
     if ( !initialized ) 
     {
         if (!last_mmc_status)
             mmc_status = MMC_UNTOUCHED;
-        new_mmc_circuit = ((read_hw_mask() & MMC_CLOCK_POLARITY) != 0);
 #ifdef HAVE_HOTSWAP
         queue_init(&mmc_queue);
         create_thread(mmc_thread, mmc_stack,

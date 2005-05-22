@@ -39,7 +39,7 @@ typedef struct
     unsigned int block_exp;       /* block size exponent */
 } tCardInfo;
 
-void mmc_select_clock(int card_no);
+void mmc_enable_int_flash_clock(bool on);
 bool mmc_detect(void);
 unsigned long mmc_extract_bits(const unsigned long *p, unsigned int start,
                                unsigned int size);

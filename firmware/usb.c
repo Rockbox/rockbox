@@ -88,7 +88,7 @@ static void usb_enable(bool on)
     if(on)
     {
 #ifdef HAVE_MMC
-        mmc_select_clock(mmc_detect() ? 1 : 0);
+        mmc_enable_int_flash_clock(!mmc_detect());
 #endif
         if (!(read_hw_mask() & MMC_CLOCK_POLARITY))
             and_b(~0x20, &PBDRH); /* old circuit needs SCK1 = low while on USB */
