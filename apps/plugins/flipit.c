@@ -37,11 +37,11 @@
 
 #elif CONFIG_KEYPAD == IRIVER_H100_PAD
 #define FLIPIT_QUIT BUTTON_OFF
-#define FLIPIT_SHUFFLE BUTTON_SELECT
+#define FLIPIT_SHUFFLE BUTTON_MODE
 #define FLIPIT_SOLVE BUTTON_ON
 #define FLIPIT_STEP_BY_STEP BUTTON_REC
-#define FLIPIT_TOGGLE_PRE BUTTON_MODE
-#define FLIPIT_TOGGLE (BUTTON_MODE | BUTTON_REL)
+#define FLIPIT_TOGGLE_PRE BUTTON_SELECT
+#define FLIPIT_TOGGLE (BUTTON_SELECT | BUTTON_REL)
 
 #endif
 
@@ -298,6 +298,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_putsxy(2, 28, "[M-LEFT] shuffle");
     rb->lcd_putsxy(2, 38, "[M-UP] solution");
     rb->lcd_putsxy(2, 48, "[M-RIGHT] step by step");
+#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+    rb->lcd_putsxy(2, 8, "[STOP] to stop");
+    rb->lcd_putsxy(2, 18, "[SELECT] toggle");
+    rb->lcd_putsxy(2, 28, "[MODE] shuffle");
+    rb->lcd_putsxy(2, 38, "[PLAY] solution");
+    rb->lcd_putsxy(2, 48, "[REC] step by step");
 #endif
     rb->lcd_update();
     rb->sleep(HZ*3);
