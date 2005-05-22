@@ -602,26 +602,40 @@ int sound_val2phys(int setting, int value)
 
    The pitch value is in tenths of percent.
 */
+static int last_pitch = 1000;
+
 void sound_set_pitch(int pitch)
 {
     unsigned long val;
 
-    /* invert pitch value */
-    pitch = 1000000/pitch;
-
-    /* Calculate the new (bogus) frequency */
-    val = 18432*pitch/1000;
+    if (pitch != last_pitch)
+    {
+        /* Calculate the new (bogus) frequency */
+        val = 18432 * 1000 / pitch;
     
-    mas_writemem(MAS_BANK_D0, MAS_D0_OFREQ_CONTROL, &val, 1);
+        mas_writemem(MAS_BANK_D0, MAS_D0_OFREQ_CONTROL, &val, 1);
 
-    /* We must tell the MAS that the frequency has changed.
-       This will unfortunately cause a short silence. */
-    mas_writemem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &shadow_io_control_main, 1);
+        /* We must tell the MAS that the frequency has changed.
+         * This will unfortunately cause a short silence. */
+        mas_writemem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &shadow_io_control_main, 1);
+        
+        last_pitch = pitch;
+    }
+}
+
+int sound_get_pitch(void)
+{
+    return last_pitch;
 }
 #elif defined SIMULATOR
 void sound_set_pitch(int pitch)
 {
     (void)pitch;
+}
+
+int sound_get_pitch(void)
+{
+    return 1000;
 }
 #endif
 

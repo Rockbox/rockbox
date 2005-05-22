@@ -389,7 +389,7 @@ int charging_screen(void)
 int pitch_screen(void)
 {
     int button;
-    static int pitch = 1000;
+    int pitch = sound_get_pitch();
     bool exit = false;
     bool used = false;
 
@@ -436,9 +436,8 @@ int pitch_screen(void)
             case BUTTON_ON | BUTTON_UP:
             case BUTTON_ON | BUTTON_UP | BUTTON_REPEAT:
                 used = true;
-                pitch++;
-                if ( pitch > 2000 )
-                    pitch = 2000;
+                if ( pitch < 2000 )
+                    pitch++;
                 sound_set_pitch(pitch);
                 break;
 
@@ -446,9 +445,8 @@ int pitch_screen(void)
             case BUTTON_ON | BUTTON_DOWN:
             case BUTTON_ON | BUTTON_DOWN | BUTTON_REPEAT:
                 used = true;
-                pitch--;
-                if ( pitch < 500 )
-                    pitch = 500;
+                if ( pitch > 500 )
+                    pitch--;
                 sound_set_pitch(pitch);
                 break;
 
@@ -468,29 +466,17 @@ int pitch_screen(void)
                 break;
 
             case BUTTON_ON | BUTTON_RIGHT:
+            case BUTTON_LEFT | BUTTON_REL:
                 if ( pitch < 2000 ) {
                     pitch += 20;
-                    sound_set_pitch(pitch);
-                }
-                break;
-
-            case BUTTON_RIGHT | BUTTON_REL:
-                if ( pitch > 500 ) {
-                    pitch -= 20;
                     sound_set_pitch(pitch);
                 }
                 break;
 
             case BUTTON_ON | BUTTON_LEFT:
+            case BUTTON_RIGHT | BUTTON_REL:
                 if ( pitch > 500 ) {
                     pitch -= 20;
-                    sound_set_pitch(pitch);
-                }
-                break;
-
-            case BUTTON_LEFT | BUTTON_REL:
-                if ( pitch < 2000 ) {
-                    pitch += 20;
                     sound_set_pitch(pitch);
                 }
                 break;
