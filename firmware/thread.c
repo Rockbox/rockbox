@@ -64,6 +64,8 @@ extern int stackbegin[];
 extern int stackend[];
 
 void switch_thread(void) __attribute__ ((section(".icode")));
+static inline void store_context(void* addr) __attribute__ ((always_inline));
+static inline void load_context(const void* addr) __attribute__ ((always_inline));
 
 #if CONFIG_CPU == MCF5249
 /*--------------------------------------------------------------------------- 
