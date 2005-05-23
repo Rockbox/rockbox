@@ -24,6 +24,10 @@ plugins/rockboy/Version
 plugins/rockboy/README
 plugins/rockboy/COPYING
 plugins/rockboy/HACKING
+plugins/searchengine/Makefile
+plugins/searchengine/*.[ch]
+plugins/databox/Makefile
+plugins/databox/*.[ch]
 codecs/*.[ch]
 codecs/Makefile
 codecs/liba52/*
