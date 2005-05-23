@@ -80,6 +80,11 @@ long tell_handler(void *datasource) {
   return p->curpos;
 }
 
+#ifdef USE_IRAM
+extern char iramcopy[];
+extern char iramstart[];
+extern char iramend[];
+#endif
 
 /* this is the plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* file)
@@ -106,7 +111,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
      otherwise you will get lovely "I04: IllInstr" errors... :-) */
   rb = api;
 
-
+  #ifdef USE_IRAM
+  rb->memcpy(iramstart, iramcopy, iramend-iramstart);
+  #endif
+    
   /* This function sets up the buffers and reads the file into RAM */
 
   if (local_init(file,"/vorbistest.wav",&file_info,api)) {
