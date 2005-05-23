@@ -16,7 +16,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef __CONFIG_H__
+/* to easier allow this source file to be used even from tools when config.h
+   cannot be included safely */
 #include "config.h"
+#endif
 
 #ifdef HAVE_LCD_CHARCELLS
 
