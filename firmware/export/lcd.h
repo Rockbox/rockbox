@@ -60,6 +60,13 @@ extern void lcd_blit (const unsigned char* p_data, int x, int y, int width,
 
 /* update a fraction of the screen */
 extern void lcd_update_rect(int x, int y, int width, int height);
+
+#ifdef HAVE_REMOTE_LCD
+extern void lcd_remote_update(void);
+/* update a fraction of the screen */
+extern void lcd_remote_update_rect(int x, int y, int width, int height);
+#endif
+
 #else
   #define lcd_update()
   #define lcd_update_rect(x,y,w,h)

@@ -17,6 +17,9 @@
 /* Define this if you do software codec */
 #define CONFIG_HWCODEC MASNONE
 
+/* Define this if you have an remote lcd */
+#define HAVE_REMOTE_LCD
+
 #ifndef SIMULATOR
 
 /* Define this if you have a Motorola SCF5249 */
@@ -65,8 +68,5 @@
 
 /* Define this if you can control the S/PDIF power */
 #define HAVE_SPDIF_POWER
-
-/* Define this if you have an remote lcd */
-#define HAVE_REMOTE_LCD
 
 #endif

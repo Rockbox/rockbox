@@ -65,8 +65,10 @@ struct scrollinfo {
 
 static volatile int scrolling_lines=0; /* Bitpattern of which lines are scrolling */
 
+#ifndef SIMULATOR
 static void scroll_thread(void);
 static long scroll_stack[DEFAULT_STACK_SIZE/sizeof(long)];
+#endif
 static const char scroll_name[] = "remote_scroll";
 static char scroll_ticks = 12; /* # of ticks between updates*/
 static int scroll_delay = HZ/2; /* ticks delay before start */
@@ -87,6 +89,7 @@ static struct scrollinfo scroll[SCROLLABLE_LINES];
 /* delay loop */
 #define DELAY   do { int _x; for(_x=0;_x<3;_x++);} while (0)
 
+#ifndef SIMULATOR
 void lcd_remote_backlight_on(void)
 {
     GPIO_OUT &= ~0x00000800;
@@ -224,6 +227,8 @@ int lcd_remote_default_contrast(void)
 {
     return 32;
 }
+
+#endif
 
 void lcd_remote_bitmap(const unsigned char *src, int x, int y, int nx, int ny, bool clear) __attribute__ ((section (".icode")));
 void lcd_remote_bitmap(const unsigned char *src, int x, int y, int nx, int ny, bool clear)
@@ -371,6 +376,7 @@ void lcd_remote_clear_display(void)
     memset(lcd_remote_framebuffer, 0, sizeof lcd_remote_framebuffer);
 }
 
+#ifndef SIMULATOR
 /*
  * Update the display.
  * This must be called after all other LCD functions that change the display.
@@ -430,6 +436,7 @@ void lcd_remote_init(void)
                   sizeof(scroll_stack), scroll_name);
 }
 
+
 /*
  * Update a fraction of the display.
  */
@@ -479,6 +486,9 @@ void lcd_remote_roll(int lines)
     lcd_remote_write_command(LCD_REMOTE_CNTL_INIT_LINE | 0x0); // init line
     lcd_remote_write_data(data, 2);
 }
+
+#endif
+
 
 void lcd_remote_setmargins(int x, int y)
 {
@@ -903,6 +913,7 @@ void lcd_remote_bidir_scroll(int percent)
     bidir_limit = percent;
 }
 
+#ifndef SIMULATOR
 static void scroll_thread(void)
 {
     struct font* pf;
@@ -964,3 +975,5 @@ static void scroll_thread(void)
         sleep(scroll_ticks);
     }
 }
+#endif /* SIMULATOR */
+

@@ -46,11 +46,6 @@ extern void screen_resized(int width, int height);
 #ifdef HAVE_LCD_BITMAP
 unsigned char lcd_framebuffer_copy[LCD_HEIGHT/8][LCD_WIDTH];
 
-void lcd_set_invert_display(bool invert)
-{
-    (void)invert;
-}
-
 void lcd_update (void)
 {
     int x, y;
@@ -162,6 +157,135 @@ void lcd_update_rect(int x_start, int y_start,
     XSync(dpy,False);
     XtAppUnlock(app);
 }
+
+#ifdef LCD_REMOTE_HEIGHT
+extern unsigned char lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH];
+unsigned char lcd_remote_framebuffer_copy[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH];
+
+#define REMOTE_MARGIN_X 2
+#define REMOTE_MARGIN_Y (LCD_HEIGHT + 2 + MARGIN_Y)
+
+void lcd_remote_update (void)
+{
+    int x, y;
+    int p=0;
+    int bit;
+    struct coordinate points[LCD_REMOTE_WIDTH * LCD_REMOTE_HEIGHT];
+    int cp=0;
+    struct coordinate clearpoints[LCD_REMOTE_WIDTH * LCD_REMOTE_HEIGHT];
+
+    for(y=0; y<LCD_REMOTE_HEIGHT; y+=8) {
+        for(x=0; x<LCD_REMOTE_WIDTH; x++) {
+            if(lcd_remote_framebuffer[y/8][x] ||
+               lcd_remote_framebuffer_copy[y/8][x]) {
+                /* one or more bits/pixels are changed */
+                unsigned char diff =
+                    lcd_remote_framebuffer[y/8][x] ^
+                    lcd_remote_framebuffer_copy[y/8][x];
+
+                for(bit=0; bit<8; bit++) {
+                    if(lcd_remote_framebuffer[y/8][x]&(1<<bit)) {
+                        /* set a dot */
+                        points[p].x = x + REMOTE_MARGIN_X;
+                        points[p].y = y+bit + REMOTE_MARGIN_Y;
+                        p++; /* increase the point counter */
+                    }
+                    else if(diff &(1<<bit)) {
+                        /* clear a dot */
+                        clearpoints[cp].x = x + REMOTE_MARGIN_X;
+                        clearpoints[cp].y = y+bit + REMOTE_MARGIN_Y;
+                        cp++; /* increase the point counter */
+                    }
+                }
+            }
+        }
+    }
+
+    /* copy a huge block */
+    memcpy(lcd_remote_framebuffer_copy, lcd_remote_framebuffer,
+           sizeof(lcd_remote_framebuffer));
+
+    drawdots(0, &clearpoints[0], cp);
+    drawdots(1, &points[0], p);
+    /* printf("lcd_update: Draws %d pixels, clears %d pixels (max %d/%d)\n",
+       p, cp, p+cp, LCD_HEIGHT*LCD_WIDTH); */
+    XtAppLock(app);
+    XSync(dpy,False);
+    XtAppUnlock(app);
+}
+
+void lcd_remote_update_rect(int x_start, int y_start,
+                            int width, int height)
+{
+    int x;
+    int yline=y_start;
+    int y;
+    int p=0;
+    int bit;
+    int cp=0;
+    int xmax;
+    int ymax;
+    struct coordinate points[LCD_WIDTH * LCD_HEIGHT];
+    struct coordinate clearpoints[LCD_WIDTH * LCD_HEIGHT];
+
+#if 0
+    fprintf(stderr, "%04d: lcd_update_rect(%d, %d, %d, %d)\n",
+            counter++, x_start, y_start, width, height);
+#endif
+    /* The Y coordinates have to work on even 8 pixel rows */
+    ymax = (yline + height)/8;
+    yline /= 8;
+
+    xmax = x_start + width;
+
+    if(xmax > LCD_REMOTE_WIDTH)
+        xmax = LCD_REMOTE_WIDTH;
+    if(ymax >= LCD_REMOTE_HEIGHT/8)
+        ymax = LCD_REMOTE_HEIGHT/8-1;
+
+    for(; yline<=ymax; yline++) {
+        y = yline * 8;
+        for(x=x_start; x<xmax; x++) {
+            if(lcd_remote_framebuffer[yline][x] ||
+               lcd_remote_framebuffer_copy[yline][x]) {
+                /* one or more bits/pixels are changed */
+                unsigned char diff =
+                  lcd_remote_framebuffer[yline][x] ^
+                    lcd_remote_framebuffer_copy[yline][x];
+
+                for(bit=0; bit<8; bit++) {
+                    if(lcd_remote_framebuffer[yline][x]&(1<<bit)) {
+                        /* set a dot */
+                        points[p].x = x + REMOTE_MARGIN_X;
+                        points[p].y = y+bit + REMOTE_MARGIN_Y;
+                        p++; /* increase the point counter */
+                    }
+                    else if(diff &(1<<bit)) {
+                        /* clear a dot */
+                        clearpoints[cp].x = x + REMOTE_MARGIN_X;
+                        clearpoints[cp].y = y+bit + REMOTE_MARGIN_Y;
+                        cp++; /* increase the point counter */
+                    }
+                }
+
+                /* update the copy */
+                lcd_remote_framebuffer_copy[yline][x] =
+                    lcd_remote_framebuffer[yline][x];
+            }
+        }
+    }
+
+    drawdots(0, &clearpoints[0], cp);
+    drawdots(1, &points[0], p);
+    /* printf("lcd_update_rect: Draws %d pixels, clears %d pixels\n", p, cp);*/
+    XtAppLock(app);
+    XSync(dpy,False);
+    XtAppUnlock(app);
+}
+
+
+#endif
+
 #endif
 #ifdef HAVE_LCD_CHARCELLS
 

@@ -235,7 +235,7 @@ void screenhack()
 
 void screen_redraw()
 {
-    /* draw a border around the "Recorder" screen */
+    /* draw a border around the screen */
 #define X1 0
 #define Y1 0
 #define X2 (LCD_WIDTH + MARGIN_X*2)
@@ -246,4 +246,17 @@ void screen_redraw()
     drawline(1, X1, Y2, X2, Y2);
     drawline(1, X1, Y1, X1, Y2);
     lcd_update();
+#ifdef LCD_REMOTE_HEIGHT
+    /* draw a border around the remote LCD screen */
+#define RX1 0
+#define RY1 (Y2 +1)
+#define RX2 (LCD_REMOTE_WIDTH + MARGIN_X*2)
+#define RY2 (Y2 + 1 + LCD_REMOTE_HEIGHT)
+
+    drawline(1, RX1, RY1, RX2, RY1);
+    drawline(1, RX2, RY1, RX2, RY2);
+    drawline(1, RX1, RY2, RX2, RY2);
+    drawline(1, RX1, RY1, RX1, RY2);
+    lcd_remote_update();
+#endif
 }

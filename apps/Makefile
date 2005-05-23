@@ -46,13 +46,9 @@ LIBROCKBOX = $(BUILDDIR)/librockbox.a
 
 ifdef SIMVER
 # this is a sim build
-COMMONLIB = $(BUILDDIR)/comsim/libcomsim.a
 
-all: $(COMMONLIB) $(BUILDDIR)/$(BINARY) $(CODECS) $(ROCKS)
-	@$(MAKE) -C $(SIMDIR)
+all: $(BUILDDIR)/$(BINARY) $(CODECS) $(ROCKS)
 
-$(COMMONLIB):
-	@$(MAKE) -C $(ROOTDIR)/uisimulator/common
 else
 # regular target build
 all: $(BUILDDIR)/$(BINARY) $(FLASHFILE) $(CODECS) $(ROCKS) $(ARCHOSROM)
@@ -120,11 +116,6 @@ $(BUILDDIR)/$(BINARY) : $(OBJS) $(DEPFILE) $(BUILDDIR)/libsim.a \
 	@echo "LD $(BINARY)"
 	@$(CC) $(GCCOPTS) -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lsim -lcomsim $(LDOPTS) $(EXTRAOBJ) -Wl,-Map,$(OBJDIR)/rockbox.map
 
-$(BUILDDIR)/libsim.a:
-	@$(MAKE) -C $(SIMDIR) OBJDIR=$(BUILDDIR)/sim
-
-$(BUILDDIR)/libcomsim.a:
-	@$(MAKE) -C $(ROOTDIR)/uisimulator/common OBJDIR=$(BUILDDIR)/comsim
 endif
 
 $(BUILDDIR)/rockbox.ucl: $(OBJDIR)/rockbox.bin

@@ -48,11 +48,6 @@ extern unsigned char hardware_buffer_lcd[11][2];
 static unsigned char lcd_buffer_copy[11][2];
 #endif 
 
-void lcd_set_invert_display(bool invert)
-{
-    (void)invert;
-}
-
 /* lcd_update()
    update lcd */
 void lcd_update()
@@ -126,6 +121,20 @@ void lcd_update_rect(int x_start, int y_start,
     r.bottom = (UI_LCD_POSY + (UI_LCD_HEIGHT * ymax / LCD_HEIGHT))
                * r.bottom / UI_HEIGHT;
     InvalidateRect (hGUIWnd, &r, FALSE);
+}
+
+void lcd_remote_update(void)
+{
+    
+}
+
+void lcd_remote_update_rect(int x_start, int y_start,
+                            int width, int height)
+{
+    (void)x_start;
+    (void)y_start;
+    (void)width;
+    (void)height;
 }
 
 /* lcd_backlight()

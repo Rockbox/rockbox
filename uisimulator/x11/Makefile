@@ -45,7 +45,6 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) $(GCCOPTS)
 OUTFILE = $(BUILDDIR)/libsim.a
 
 all: $(OUTFILE)
-	@$(MAKE) -C $(SIMCOMMON)
 
 include $(TOOLSDIR)/make.inc
 

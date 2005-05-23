@@ -46,3 +46,27 @@ void lcd_set_flip(bool yesno)
     (void)yesno;
 }
 
+void lcd_set_invert_display(bool invert)
+{
+    (void)invert;
+}
+
+void lcd_remote_set_invert_display(bool invert)
+{
+    (void)invert;
+}
+
+#ifdef HAVE_REMOTE_LCD
+void lcd_remote_set_contrast(int val)
+{
+    (void)val;
+}
+void lcd_remote_backlight_on(int val)
+{
+    (void)val;
+}
+void lcd_remote_backlight_off(int val)
+{
+    (void)val;
+}
+#endif

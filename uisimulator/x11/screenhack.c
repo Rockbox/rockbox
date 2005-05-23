@@ -437,8 +437,13 @@ int main (int argc, char **argv)
     {
         static char geometry[40];
 #ifdef HAVE_LCD_BITMAP
+        unsigned int height = LCD_HEIGHT;
+#ifdef LCD_REMOTE_HEIGHT
+        height += LCD_REMOTE_HEIGHT;
+#endif
+        printf("height: %d\n", height);
         snprintf(geometry, 40, "*geometry: %dx%d",
-                 LCD_WIDTH*display_zoom+14, LCD_HEIGHT*display_zoom+8);
+                 LCD_WIDTH*display_zoom+14, height*display_zoom+8);
 #else
         snprintf(geometry, 40, "*geometry: %dx%d", 280*display_zoom,
                  132*display_zoom);

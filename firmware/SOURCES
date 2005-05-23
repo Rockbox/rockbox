@@ -112,9 +112,9 @@ descramble.S
 #endif
 drivers/lcd.S
 #ifdef IRIVER_H100
+drivers/lcd-h100-remote.c
 #ifndef SIMULATOR
 drivers/uda1380.c
-drivers/lcd-h100-remote.c
 pcm_playback.c
 #endif
 #endif
