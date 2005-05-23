@@ -36,7 +36,7 @@ convbdf: convbdf.c
 	$(CC) -g $+ -o $@
 
 generate_rocklatin: generate_rocklatin.c ../firmware/drivers/lcd-player-charset.c 
-	$(CC) -DHAVE_LCD_CHARCELLS -I../firmware/export -g $+ -o $@
+	$(CC) -DHAVE_LCD_CHARCELLS -D__CONFIG_H__ -I../firmware/export $+ -o $@
 
 clean:
 	rm -f $(TARGETS) $(shell for f in $(TARGETS) ; do echo $$f.exe $$f.o $$f.obj ; done) *.ajf *~
