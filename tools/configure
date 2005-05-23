@@ -447,7 +447,7 @@ if [ -z "$archos" ]; then
     codecs="libmad liba52 libFLAC libTremor libwavpack dumb libmusepack"
     ;;
 
-   *)
+   2)
     archos="recorder"
     target="-DARCHOS_RECORDER"
     shcc
@@ -458,6 +458,11 @@ if [ -z "$archos" ]; then
     flash="$pwd/rockbox.ucl"
     plugins="yes"
     codecs=""
+    ;;
+
+   *)
+    echo "Please select an actual target platform!"
+    exit
     ;;
 
   esac
@@ -600,6 +605,14 @@ sed > autoconf.h \
 #endif /* __BUILD_AUTOCONF_H */
 EOF
 
+if test "$simulator" = "yes"; then
+  # add simul make stuff on the #SIMUL# line
+  simmagic='/#SIMUL#/c\	@$(MAKE) -C $(SIMDIR) OBJDIR=$(BUILDDIR)/sim\n	@$(MAKE) -C $(ROOTDIR)/uisimulator/common OBJDIR=$(BUILDDIR)/comsim'
+else
+  # delete the line that matches
+  simmagic='/#SIMUL#/D'
+fi
+
 sed > Makefile \
  -e "s,@ROOTDIR@,${rootdir},g" \
  -e "s,@DEBUG@,${debug},g" \
@@ -635,6 +648,7 @@ sed > Makefile \
  -e "s,@GCCNUM@,${gccnum},g" \
  -e "s,@UNAME@,${uname},g" \
  -e "s,@ENDIAN@,${defendian},g" \
+ -e "${simmagic}" \
 <<EOF
 ## Automaticly generated. http://www.rockbox.org/
 
@@ -683,6 +697,7 @@ MAKEFLAGS += --no-print-directory
 .PHONY: all clean tags zip
 
 all:
+#SIMUL#
 	@\$(MAKE) -C \$(FIRMDIR) OBJDIR=\$(BUILDDIR)/firmware
 	@\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@
 
