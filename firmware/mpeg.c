@@ -525,35 +525,16 @@ static unsigned long num_recorded_frames;
 
 static void drain_dma_buffer(void)
 {
-    asm (
-        "mov     #0x40,r2        \n" /* mask for EOD check */
-        "bra     .d_start        \n"
-        "mov.b   @%0,r1          \n" /* read PBDR (first time) */
+    while (PBDRH & 0x40)
+    {
+        xor_b(0x08, &PADRH);
 
-    ".d_loop:                    \n"
-        "xor.b   #0x08,@(r0,gbr) \n" /* set PR active */
-    ".d_wait1:                   \n"
-        "mov.b   @%0,r1          \n" /* read PBDR */
-        "cmp/pz  r1              \n" /* and wait for PRTW */
-        "bf      .d_wait1        \n"
+        while (PBDRH & 0x80);
 
-        "xor.b   #0x08,@(r0,gbr) \n" /* reset PR to inactive */
-    ".d_wait2:                   \n"
-        "mov.b   @%0,r1          \n" /* read PBDR */
-        "cmp/pz  r1              \n" /* and wait for /PRTW */
-        "bt      .d_wait2        \n"
+        xor_b(0x08, &PADRH);
 
-    ".d_start:                   \n"
-        "tst     r1,r2           \n" /* EOD low? */
-        "bf      .d_loop         \n" /* no: next pass */
-
-        : /* outputs */
-        : /* inputs */
-        /* %0 */ "r"(PBDR_ADDR),
-        /* %1 = r0 */ "z"(&PADRH)
-        : /* clobbers */
-        "r1","r2"
-    );
+        while (!(PBDRH & 0x80));
+    }
 }
 
 void rec_tick (void) __attribute__ ((section (".icode")));
@@ -561,67 +542,44 @@ void rec_tick(void)
 {
     int i;
     int num_bytes;
-    if(is_recording && (PBDR & 0x4000))
+    int delay;
+    char data;
+
+    if(is_recording && (PBDRH & 0x40))
     {
 #ifdef DEBUG
         timing_info[timing_info_index++] = current_tick;
         TCNT2 = 0;
 #endif /* #ifdef DEBUG */
-        /* We read as long as EOD is high, but max 30 bytes. */
-        asm (
-            "mov     #30,r3          \n" /* i_max = 30 */
-            "mov     #0x40,r2        \n" /* mask for EOD check */
-            "mov     #0,%0           \n" /* i = 0; */
-            "add     %2,%1           \n" /* audiobuf_write -> cur_addr */
-            "add     %2,%3           \n" /* audiobuflen -> end_addr */
-            "bra     .r_start        \n"
-            "mov.b   @%4,r1          \n" /* read PBDR (first time) */
+        i = 0;
+        while (PBDRH & 0x40)      /* We try to read as long as EOD is high */
+        {
+            xor_b(0x08, &PADRH);  /* Set PR active, independent of polarity */
 
-            ".align  2               \n"
+            delay = 0;
+            while (PBDRH & 0x80)  /* Wait until /RTW becomes active */
+            {
+                delay++;
+                if (delay > 100)  /* Bail out if we have to wait too long */
+                {                 /* i.e. the MAS doesn't want to talk to us */
+                    xor_b(0x08, &PADRH);         /* Set PR inactive */
+                    goto transfer_end;           /* and get out of here */
+                }
+            }
 
-        ".r_loop:                    \n"
-            "xor.b   #0x08,@(r0,gbr) \n" /* set PR active */
-        ".r_wait1:                   \n"
-            "mov.b   @%4,r1          \n" /* read PBDR */
-            "cmp/pz  r1              \n" /* and wait for PRTW */
-            "bf      .r_wait1        \n"
-            
-            "mov.b   @%6,r1          \n" /* read byte from mas */
-            "add     #1,%0           \n" /* i++; */
-            "mov.b   r1,@%1          \n" /* store byte */
-            "add     #1,%1           \n" /* increment current address */
-            
-            "cmp/hi  %1,%3           \n" /* end address reached? */
-            "bt      .r_nowrap       \n" /* no: do nothing */
-            "mov     %2,%1           \n" /* yes: reset to start address */
-        ".r_nowrap:                  \n"
-            
-            "xor.b   #0x08,@(r0,gbr) \n" /* set PR inactive again */
-        ".r_wait2:                   \n"
-            "mov.b   @%4,r1          \n" /* read PBDR */
-            "cmp/pz  r1              \n" /* and wait for /PRTW */
-            "bt      .r_wait2        \n"
-            
-        ".r_start:                   \n"
-            "tst     r2,r1           \n" /* EOD low? */
-            "bt      .r_end          \n" /* yes: end of transfer */
-            "cmp/hi  %0,r3           \n" /* i < i_max? */
-            "bt      .r_loop         \n" /* yes: next pass */
+            data = *(unsigned char *)0x04000000; /* read data byte */
+                
+            xor_b(0x08, &PADRH);                 /* Set PR inactive */
 
-        ".r_end:                     \n"
-            "sub     %2,%1           \n" /* cur_addr -> audiobuf_write */
-            : /* outputs */
-            /* %0 */ "=&r"(i),
-            /* %1, in & out */ "+r"(audiobuf_write)
-            : /* inputs */
-            /* %2 */ "r"(audiobuf),
-            /* %3 */ "r"(audiobuflen),
-            /* %4 */ "r"(PBDR_ADDR),
-            /* %5 = r0 */ "z"(&PADRH),
-            /* %6 */ "r"(0x4000000)
-            : /* clobbers */
-            "r1","r2","r3"
-        );
+            audiobuf[audiobuf_write++] = data;
+
+            if (audiobuf_write >= audiobuflen)
+                audiobuf_write = 0;
+
+            i++;
+        }
+      transfer_end:
+
 #ifdef DEBUG
         timing_info[timing_info_index++] = TCNT2 + (i << 16);
         timing_info_index &= 0x3ff;
@@ -2349,7 +2307,7 @@ void mpeg_set_recording_options(int frequency, int quality,
 
     rec_version_index = is_mpeg1?3:2;
     rec_frequency_index = frequency % 3;
-    
+
     shadow_encoder_control = (quality << 17) |
         (rec_frequency_index << 10) |
         ((is_mpeg1?1:0) << 9) |
