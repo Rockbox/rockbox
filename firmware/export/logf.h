@@ -19,9 +19,11 @@
 #ifndef LOGF_H
 #define LOGF_H
 
-extern unsigned char logfbuffer[];
-extern unsigned char *logfptr;
-extern unsigned char *logfend;
+#define MAX_LOGF_LINES 1000
+#define MAX_LOGF_DATASIZE (16*MAX_LOGF_LINES)
+
+extern unsigned char logfbuffer[MAX_LOGF_LINES][16];
+extern int logfindex;
 extern bool logfwrap;
 
 void logf(const char *format, ...);
