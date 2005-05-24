@@ -30,7 +30,7 @@
 #include <sprintf.h>
 #include <stdbool.h>
 #include "config.h"
-#include "lcd.h"
+#include "lcd-remote.h"
 #include "logf.h"
 
 unsigned char logfbuffer[MAX_LOGF_LINES][16];
@@ -46,7 +46,7 @@ static void displayremote(void)
     int i;
     int index;
 
-    lcd_getstringsize("A", &w, &h);
+    lcd_remote_getstringsize("A", &w, &h);
     lines = LCD_REMOTE_HEIGHT/h;
 
     lcd_remote_setmargins(0, 0);
