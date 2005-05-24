@@ -30,13 +30,48 @@
 #include <sprintf.h>
 #include <stdbool.h>
 #include "config.h"
-
-#define MAX_LOGF_LINES 1000
-#define MAX_LOGF_DATASIZE (16*MAX_LOGF_LINES)
+#include "lcd.h"
+#include "logf.h"
 
 unsigned char logfbuffer[MAX_LOGF_LINES][16];
 int logfindex;
 bool logfwrap;
+
+#ifdef HAVE_REMOTE_LCD
+static void displayremote(void)
+{
+    /* TODO: we should have a debug option that enables/disables this! */
+    int w, h;
+    int lines;
+    int i;
+    int index;
+
+    lcd_getstringsize("A", &w, &h);
+    lines = LCD_REMOTE_HEIGHT/h;
+
+    lcd_remote_setmargins(0, 0);
+    lcd_remote_clear_display();
+    
+    index = logfindex;
+    for(i = lines-1; i>=0; i--) {
+        unsigned char buffer[17];
+
+        if(--index < 0) {
+            if(logfwrap)
+                index = MAX_LOGF_LINES-1;
+            else
+                break; /* done */
+        }
+        
+        memcpy(buffer, logfbuffer[index], 16);
+        buffer[16]=0;
+        lcd_remote_puts(0, i, buffer);
+    }
+    lcd_remote_update();   
+}
+#else
+#define displayremote()
+#endif
 
 void logf(const char *format, ...)
 {
@@ -58,4 +93,6 @@ void logf(const char *format, ...)
         memset(ptr+len, ' ', 16-len);
 
     logfindex++; /* leave it where we write the next time */
+
+    displayremote();
 }
