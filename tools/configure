@@ -324,7 +324,7 @@ if [ -z "$archos" ]; then
 # Figure out target platform
 #
 
-  echo "Enter target platform: (default is Archos Recorder)"
+  echo "Enter target platform:"
 
   echo "1 - Archos Player/Studio"
   echo "2 - Archos Recorder"
