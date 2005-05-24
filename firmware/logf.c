@@ -34,27 +34,28 @@
 #define MAX_LOGF_LINES 1000
 #define MAX_LOGF_DATASIZE (16*MAX_LOGF_LINES)
 
-unsigned char logfbuffer[MAX_LOGF_DATASIZE];
-unsigned char *logfend=&logfbuffer[MAX_LOGF_DATASIZE];
-unsigned char *logfptr=&logfbuffer[0];
+unsigned char logfbuffer[MAX_LOGF_LINES][16];
+int logfindex;
 bool logfwrap;
 
 void logf(const char *format, ...)
 {
     int len;
+    unsigned char *ptr;
     va_list ap;
     va_start(ap, format);
 
-    if(logfptr >= logfend) {
+    if(logfindex >= MAX_LOGF_LINES) {
         /* wrap */
         logfwrap = true;
-        logfptr = &logfbuffer[0];
+        logfindex = 0;
     }
-    len = vsnprintf(logfptr, 16, format, ap);
+    ptr = logfbuffer[logfindex];
+    len = vsnprintf(ptr, 16, format, ap);
     va_end(ap);
     if(len < 16)
         /* pad with spaces up to the 16 byte border */
-        memset(logfptr+len, ' ', 16-len);
+        memset(ptr+len, ' ', 16-len);
 
-    logfptr += 16; /* leave it where we write the next time */
+    logfindex++; /* leave it where we write the next time */
 }
