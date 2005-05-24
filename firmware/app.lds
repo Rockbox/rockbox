@@ -91,7 +91,7 @@ _idatastart = ADDR(.idata);
 /* FIXME: Where to put audio buffer? */
 
 _audiobuffer = 0;
-_audioend = 0;
+_audiobufend = 0;
 
 /* Plugins are not supported on the Gmini*/
 
