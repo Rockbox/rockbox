@@ -43,8 +43,6 @@ CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) -W -Wall -mno-cygwin
 OUTFILE = $(BUILDDIR)/libsim.a
 
 all: $(OUTFILE)
-	@echo "MAKE in common sim"
-	$(MAKE) -C $(SIMCOMMON)
 
 $(OUTFILE): $(OBJS) $(OBJDIR)/UI256.bmp $(OBJDIR)/uisw32-res.o
 	@echo "AR+RANLIB $@"
