@@ -34,7 +34,6 @@ III_imdct_s:
      */
     move.l #0xb0, %macsr                /* frac mode, saturation, rounding */
     sub.l %a0, %a0                      /* clear loop variable */
-    .align 2
 .imdctloop:                             /* outer loop label */
     lea.l imdct_s, %a1                  /* load pointer to imdct coefs in a1 */
     movem.l (%a2), %d0-%d5              /* load some input data in d0-d5 */
@@ -42,7 +41,6 @@ III_imdct_s:
 
     clr.l %d7                           /* clear loop variable */
     move.l (%a1)+, %a4                  /* load imdct coef in a4 */
-    .align 2
 .macloop:                               /* inner loop label */
     mac.l %d0, %a4, (%a1)+, %a4, %acc0  /* mac sequence */
     mac.l %d1, %a4, (%a1)+, %a4, %acc0
@@ -85,7 +83,6 @@ III_imdct_s:
     lea.l window_s, %a4               /* a4 = window coef pointer */
 
     moveq.l #6, %d7                   /* six iterations */
-    .align 2
 .overlaploop:
     clr.l (%a2)                       /* z[i + 0] = 0 */
     move.l (%a4), %d0
