@@ -454,22 +454,22 @@ bool recording_screen(void)
                     /* is this manual or triggered recording? */
                     if ((global_settings.rec_trigger_mode == TRIG_MODE_OFF) ||
                         (peak_meter_trigger_status() != TRIG_OFF))
-                {
+                    {
                         /* manual recording */
-                    have_recorded = true;
-                    talk_buffer_steal(); /* we use the mp3 buffer */
-                    mpeg_record(rec_create_filename(path_buffer));
-                    update_countdown = 1; /* Update immediately */
-                    last_seconds = 0;
-                    if (global_settings.talk_menu)
-                    {   /* no voice possible here, but a beep */
-                        audio_beep(HZ/2); /* longer beep on start */
+                        have_recorded = true;
+                        talk_buffer_steal(); /* we use the mp3 buffer */
+                        mpeg_record(rec_create_filename(path_buffer));
+                        update_countdown = 1; /* Update immediately */
+                        last_seconds = 0;
+                        if (global_settings.talk_menu)
+                        {   /* no voice possible here, but a beep */
+                            audio_beep(HZ/2); /* longer beep on start */
+                        }
                     }
-                }
 
                     /* this is triggered recording */
-                else
-                {
+                    else
+                    {
                         update_countdown = 1; /* Update immediately */
 
                         /* we don't start recording now, but enable the
