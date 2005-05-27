@@ -109,11 +109,8 @@ static int write_file(void)
 		str_begin = buf_ptr;
 	}
 
-	/* Ok, skip a char */
-	buf_ptr++;
-
-	/* until ... */
-    } while(buf_ptr < stringbuffer + readsize);
+	/* Next char, until ... */
+    } while(buf_ptr++ < stringbuffer + readsize);
 
     rb->close(fd);
 
