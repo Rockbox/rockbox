@@ -1397,7 +1397,7 @@ static void mpeg_thread(void)
 
                 /* We interpret 0 as "empty buffer" */
                 if(free_space_left <= 0)
-                    free_space_left = audiobuflen + free_space_left;
+                    free_space_left += audiobuflen;
 
                 unplayed_space_left = audiobuflen - free_space_left;
 
@@ -1405,7 +1405,7 @@ static void mpeg_thread(void)
                 free_space_left -= MPEG_HIGH_WATER;
 
                 /* do we have any more buffer space to fill? */
-                if(free_space_left <= MPEG_HIGH_WATER)
+                if(free_space_left <= 0)
                 {
                     DEBUGF("0\n");
                     filling = false;
@@ -1421,7 +1421,8 @@ static void mpeg_thread(void)
                     amount_to_read = free_space_left;
 
                 /* Don't read more than until the end of the buffer */
-                amount_to_read = MIN(audiobuflen - audiobuf_write, amount_to_read);
+                amount_to_read = MIN(audiobuflen - audiobuf_write,
+                                     amount_to_read);
 #if MEM == 8    
                 amount_to_read = MIN(0x100000, amount_to_read);
 #endif /* #if MEM == 8 */
@@ -1434,7 +1435,8 @@ static void mpeg_thread(void)
                 {
                     DEBUGF("R\n");
                     t1 = current_tick;
-                    len = read(mpeg_file, audiobuf+audiobuf_write, amount_to_read);
+                    len = read(mpeg_file, audiobuf + audiobuf_write,
+                               amount_to_read);
                     if(len > 0)
                     {
                         t2 = current_tick;
@@ -1445,10 +1447,15 @@ static void mpeg_thread(void)
                            data */
                         if (len < amount_to_read)
                         {
-                            int tagptr = audiobuf_write + len - 128;
                             int i;
-                            char *tag = "TAG";
+                            static const unsigned char tag[] = "TAG";
                             int taglen = 128;
+                            int tagptr = audiobuf_write + len - 128;
+                            
+                            /* Really rare case: entire potential tag wasn't
+                               read in this call AND audiobuf_write < 128 */
+                            if (tagptr < 0)
+                                tagptr += audiobuflen;
                             
                             for(i = 0;i < 3;i++)
                             {
@@ -1456,7 +1463,10 @@ static void mpeg_thread(void)
                                     tagptr -= audiobuflen;
 
                                 if(audiobuf[tagptr] != tag[i])
+                                {
                                     taglen = 0;
+                                    break;
+                                }
 
                                 tagptr++;
                             }
@@ -1467,16 +1477,18 @@ static void mpeg_thread(void)
                                 DEBUGF("Skipping ID3v1 tag\n");
                                 len -= taglen;
 
-                                /* The very rare case when the entire tag
-                                   wasn't read in this read() call must be
-                                   taken care of */
-                                if(len < 0)
-                                    len = 0;
+                                /* In the very rare case when the entire tag
+                                   wasn't read in this read() len will be < 0.
+                                   Take care of this when changing the write
+                                   pointer. */
                             }
                         }
 
                         audiobuf_write += len;
-                        
+
+                        if (audiobuf_write < 0)
+                            audiobuf_write += audiobuflen;
+
                         if(audiobuf_write >= audiobuflen)
                         {
                             audiobuf_write = 0;
