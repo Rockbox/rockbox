@@ -1,5 +1,4 @@
-#include "../codec.h"
-
+#include "../codec.h" 
 #ifdef ROCKBOX_BIG_ENDIAN
 #define BIG_ENDIAN 1
 #define LITTLE_ENDIAN 0
@@ -9,4 +8,6 @@
 #define LITTLE_ENDIAN 1
 #define BIG_ENDIAN 0
 #endif
-#define _LOW_ACCURACY_
+
+
+// #define _LOW_ACCURACY_

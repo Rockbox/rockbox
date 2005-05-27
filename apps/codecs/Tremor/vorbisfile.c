@@ -669,6 +669,10 @@ static int _ov_open1(void *f,OggVorbis_File *vf,char *initial,
   int offsettest=(f?callbacks.seek_func(f,0,SEEK_CUR):-1);
   int ret;
 
+#if CONFIG_CPU == MCF5249 
+  mcf5249_init_mac();   /* initialize the Coldfire MAC unit */
+#endif
+
   memset(vf,0,sizeof(*vf));
   vf->datasource=f;
   vf->callbacks = callbacks;

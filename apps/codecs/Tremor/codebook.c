@@ -306,7 +306,7 @@ long vorbis_book_decodev_set(codebook *book,ogg_int32_t *a,
   return(0);
 }
 
-long vorbis_book_decodevv_add(codebook *book,ogg_int32_t **a,\
+long vorbis_book_decodevv_add(codebook *book,ogg_int32_t **a,
 			      long offset,int ch,
 			      oggpack_buffer *b,int n,int point){
   long i,j,entry;

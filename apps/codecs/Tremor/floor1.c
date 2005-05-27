@@ -124,7 +124,7 @@ static int icomp(const void *a,const void *b){
 static vorbis_look_floor *floor1_look(vorbis_dsp_state *vd,vorbis_info_mode *mi,
                               vorbis_info_floor *in){
 
-  int *sortpointer[VIF_POSIT+2];
+  static int *sortpointer[VIF_POSIT+2] IDATA_ATTR;
   vorbis_info_floor1 *info=(vorbis_info_floor1 *)in;
   vorbis_look_floor1 *look=(vorbis_look_floor1 *)_ogg_calloc(1,sizeof(*look));
   int i,j,n=0;
@@ -216,7 +216,7 @@ static int render_point(int x0,int x1,int y0,int y1,int x){
 #  define XdB(n) (n)
 #endif
 
-static const ogg_int32_t FLOOR_fromdB_LOOKUP[256]={
+static ogg_int32_t FLOOR_fromdB_LOOKUP[256] IDATA_ATTR ={
   XdB(0x000000e5), XdB(0x000000f4), XdB(0x00000103), XdB(0x00000114),
   XdB(0x00000126), XdB(0x00000139), XdB(0x0000014e), XdB(0x00000163),
   XdB(0x0000017a), XdB(0x00000193), XdB(0x000001ad), XdB(0x000001c9),
@@ -283,14 +283,14 @@ static const ogg_int32_t FLOOR_fromdB_LOOKUP[256]={
   XdB(0x69f80e9a), XdB(0x70dafda8), XdB(0x78307d76), XdB(0x7fffffff),
 };
   
-static void render_line(int x0,int x1,int y0,int y1,ogg_int32_t *d){
+static void render_line(int x0,register int x1,int y0,int y1,ogg_int32_t *d){
   int dy=y1-y0;
-  int adx=x1-x0;
-  int ady=abs(dy);
-  int base=dy/adx;
-  int sy=(dy<0?base-1:base+1);
-  int x=x0;
-  int y=y0;
+  register int x=x0;
+  register int y=y0;
+  register int adx=x1-x0;
+  register int ady=abs(dy);
+  register int base=dy/adx;
+  register int sy=(dy<0?base-1:base+1);
   int err=0;
 
   ady-=abs(base*adx);
@@ -433,7 +433,7 @@ static int floor1_inverse2(vorbis_block *vb,vorbis_look_floor *in,void *memo,
 }
 
 /* export hooks */
-vorbis_func_floor floor1_exportbundle={
+vorbis_func_floor floor1_exportbundle  = {
   &floor1_unpack,&floor1_look,&floor1_free_info,
   &floor1_free_look,&floor1_inverse1,&floor1_inverse2
 };

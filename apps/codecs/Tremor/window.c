@@ -56,7 +56,6 @@ const void *_vorbis_window(int type, int left){
 void _vorbis_apply_window(ogg_int32_t *d,const void *window_p[2],
 			  long *blocksizes,
 			  int lW,int W,int nW){
-  
   LOOKUP_T *window[2]={window_p[0],window_p[1]};
   long n=blocksizes[W];
   long ln=blocksizes[lW];
@@ -67,7 +66,14 @@ void _vorbis_apply_window(ogg_int32_t *d,const void *window_p[2],
 
   long rightbegin=n/2+n/4-rn/4;
   long rightend=rightbegin+rn/2;
-  
+
+#if CONFIG_CPU == MCF5249
+  mcf5249_init_mac();   /* shouldn't be needed, but just in case */
+  mcf5249_vect_zero(&d[0], leftbegin);
+  mcf5249_vect_mult_fw(&d[leftbegin], &window[lW][0], leftend-leftbegin);
+  mcf5249_vect_mult_bw(&d[rightbegin], &window[nW][rn/2-1], rightend-rightbegin);
+  mcf5249_vect_zero(&d[rightend], n-rightend);
+#else  
   int i,p;
 
   for(i=0;i<leftbegin;i++)
@@ -81,4 +87,6 @@ void _vorbis_apply_window(ogg_int32_t *d,const void *window_p[2],
 
   for(;i<n;i++)
     d[i]=0;
+#endif
 }
+

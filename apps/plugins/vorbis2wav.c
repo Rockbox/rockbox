@@ -16,7 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
+#include "kernel.h"
 #include "plugin.h"
 
 #if (CONFIG_HWCODEC == MASNONE)
@@ -86,6 +86,10 @@ extern char iramstart[];
 extern char iramend[];
 #endif
 
+
+/* reserve the PCM buffer in the IRAM area */
+static char pcmbuf[4096] IDATA_ATTR;
+
 /* this is the plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* file)
 {
@@ -97,7 +101,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
   long n;
   int current_section;
   int eof;
-  static char pcmbuf[4096];
 #if BYTE_ORDER == BIG_ENDIAN
   int i;
   char x;
@@ -120,6 +123,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
   if (local_init(file,"/vorbistest.wav",&file_info,api)) {
     return PLUGIN_ERROR;
   }
+
 
   /* Create a decoder instance */
 
@@ -171,7 +175,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
 
   close_wav(&file_info);
   rb->splash(HZ*2, true, "FINISHED!");
-
   return PLUGIN_OK;
 }
 #endif /* CONFIG_HWCODEC == MASNONE */

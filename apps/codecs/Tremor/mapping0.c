@@ -28,6 +28,8 @@
 #include "registry.h"
 #include "misc.h"
 
+
+
 /* simplistic, wasteful way of doing this (unique lookup for each
    mode/submapping); there should be a central repository for
    identical lookups.  That will require minor work, so I'm putting it
@@ -124,6 +126,7 @@ static int ilog(unsigned int v){
   return(ret);
 }
 
+
 /* also responsible for range checking */
 static vorbis_info_mapping *mapping0_unpack(vorbis_info *vi,oggpack_buffer *opb){
   int i;
@@ -176,7 +179,17 @@ static vorbis_info_mapping *mapping0_unpack(vorbis_info *vi,oggpack_buffer *opb)
   return(NULL);
 }
 
-static int seq=0;
+
+/* IRAM buffer keep the pcm data; only for windows size upto 2048
+   for space restrictions. No real compromise, larger window sizes
+   are only used for very low quality settings (q<0?) */
+#define IRAM_PCM_SIZE 2048
+static ogg_int32_t pcm_iram[IRAM_PCM_SIZE] IDATA_ATTR;
+
+static int seq = 0;
+
+#define CHANNELS 2    /* max 2 channels on the ihp-1xx (stereo)  */
+
 static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
   vorbis_dsp_state     *vd=vb->vd;
   vorbis_info          *vi=vd->vi;
@@ -188,12 +201,16 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
   int                   i,j;
   long                  n=vb->pcmend=ci->blocksizes[vb->W];
 
-  ogg_int32_t **pcmbundle=(ogg_int32_t **)alloca(sizeof(*pcmbundle)*vi->channels);
-  int    *zerobundle=(int *)alloca(sizeof(*zerobundle)*vi->channels);
-  
-  int   *nonzero  =(int *)alloca(sizeof(*nonzero)*vi->channels);
-  void **floormemo=(void **)alloca(sizeof(*floormemo)*vi->channels);
-  
+  /* statically allocate mapping structures in IRAM */
+  static ogg_int32_t *pcmbundle[CHANNELS] IDATA_ATTR;
+  static int    zerobundle[CHANNELS] IDATA_ATTR;
+  static int   nonzero[CHANNELS] IDATA_ATTR;
+  static void *floormemo[CHANNELS] IDATA_ATTR;
+
+  /* test for too many channels; 
+     (maybe this is can be checked at the stream level?) */
+  if (vi->channels > CHANNELS) return (-1);
+
   /* time domain information decode (note that applying the
      information would have to happen later; we'll probably add a
      function entry to the harness for that later */
@@ -272,37 +289,63 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
   //for(j=0;j<vi->channels;j++)
   //_analysis_output("residue",seq+j,vb->pcm[j],-8,n/2,0,0);
 
+
+/* pbv: removed this loop by fusion with the following one 
+   to avoid recopying data to/from the IRAM */
+#if 0
   /* compute and apply spectral envelope */
   for(i=0;i<vi->channels;i++){
     ogg_int32_t *pcm=vb->pcm[i];
     int submap=info->chmuxlist[i];
     look->floor_func[submap]->
       inverse2(vb,look->floor_look[submap],floormemo[i],pcm);
-  }
+  } 
+#endif
 
   //for(j=0;j<vi->channels;j++)
   //_analysis_output("mdct",seq+j,vb->pcm[j],-24,n/2,0,1);
 
   /* transform the PCM data; takes PCM vector, vb; modifies PCM vector */
   /* only MDCT right now.... */
-  for(i=0;i<vi->channels;i++){
-    ogg_int32_t *pcm=vb->pcm[i];
-    mdct_backward(n,pcm,pcm);
+
+  /* check if we can do this in IRAM */
+  if(n <= IRAM_PCM_SIZE) {  /* normal window size: yes */
+    for(i=0;i<vi->channels;i++){
+      ogg_int32_t *pcm=vb->pcm[i];
+      int submap=info->chmuxlist[i];
+
+      if(nonzero[i]) {
+	memcpy(pcm_iram, pcm, sizeof(ogg_int32_t)*n);
+	look->floor_func[submap]->
+	  inverse2(vb,look->floor_look[submap],floormemo[i],pcm_iram);
+	mdct_backward(n, pcm_iram, pcm_iram);
+	/* window the data */
+	_vorbis_apply_window(pcm_iram,b->window,ci->blocksizes,vb->lW,vb->W,vb->nW);
+	memcpy(pcm, pcm_iram, sizeof(ogg_int32_t)*n);
+      }
+      else 
+	memset(pcm, 0, sizeof(ogg_int32_t)*n);
+    }
+  }
+  else {         /* large window: no, do it in the normal memory */
+    for(i=0;i<vi->channels;i++){
+      ogg_int32_t *pcm=vb->pcm[i];
+      int submap=info->chmuxlist[i];
+
+      look->floor_func[submap]->
+	inverse2(vb,look->floor_look[submap],floormemo[i],pcm);
+      if(nonzero[i]) {
+	mdct_backward(n, pcm, pcm);
+	/* window the data */
+	_vorbis_apply_window(pcm,b->window,ci->blocksizes,vb->lW,vb->W,vb->nW);
+      }
+      else 
+	memset(pcm, 0, sizeof(ogg_int32_t)*n);
+    }
   }
 
   //for(j=0;j<vi->channels;j++)
   //_analysis_output("imdct",seq+j,vb->pcm[j],-24,n,0,0);
-
-  /* window the data */
-  for(i=0;i<vi->channels;i++){
-    ogg_int32_t *pcm=vb->pcm[i];
-    if(nonzero[i])
-      _vorbis_apply_window(pcm,b->window,ci->blocksizes,vb->lW,vb->W,vb->nW);
-    else
-      for(j=0;j<n;j++)
-	pcm[j]=0;
-    
-  }
 
   //for(j=0;j<vi->channels;j++)
   //_analysis_output("window",seq+j,vb->pcm[j],-24,n,0,0);
@@ -313,10 +356,11 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
 }
 
 /* export hooks */
-vorbis_func_mapping mapping0_exportbundle={
+vorbis_func_mapping mapping0_exportbundle ={
   &mapping0_unpack,
   &mapping0_look,
   &mapping0_free_info,
   &mapping0_free_look,
   &mapping0_inverse
 };
+

@@ -94,7 +94,7 @@ STIN void mdct_butterfly_16(DATA_TYPE *x){
 }
 
 /* 32 point butterfly (in place, 4 register) */
-STIN void mdct_butterfly_32(DATA_TYPE *x){
+STIN  void mdct_butterfly_32(DATA_TYPE *x){
 
   REG_TYPE r0, r1;
 
@@ -152,7 +152,7 @@ STIN void mdct_butterfly_generic(DATA_TYPE *x,int points,int step){
   DATA_TYPE *x2        = x + (points>>1) - 8;
   REG_TYPE   r0;
   REG_TYPE   r1;
-
+  
   do{
     r0 = x1[6] - x2[6]; x1[6] += x2[6];
     r1 = x2[7] - x1[7]; x1[7] += x2[7];
@@ -180,7 +180,7 @@ STIN void mdct_butterfly_generic(DATA_TYPE *x,int points,int step){
     r0 = x1[4] - x2[4]; x1[4] += x2[4];
     r1 = x1[5] - x2[5]; x1[5] += x2[5];
     XNPROD31( r0, r1, T[0], T[1], &x2[4], &x2[5] ); T-=step;
-
+    
     r0 = x1[2] - x2[2]; x1[2] += x2[2];
     r1 = x1[3] - x2[3]; x1[3] += x2[3];
     XNPROD31( r0, r1, T[0], T[1], &x2[2], &x2[3] ); T-=step;
@@ -231,7 +231,7 @@ STIN void mdct_butterfly_generic(DATA_TYPE *x,int points,int step){
   }while(T>sincos_lookup0);
 }
 
-STIN void mdct_butterflies(DATA_TYPE *x,int points,int shift){
+STIN void mdct_butterflies(DATA_TYPE *x,int points,int shift) {
 
   int stages=8-shift;
   int i,j;
@@ -243,33 +243,34 @@ STIN void mdct_butterflies(DATA_TYPE *x,int points,int shift){
 
   for(j=0;j<points;j+=32)
     mdct_butterfly_32(x+j);
-
 }
 
-static unsigned char bitrev[16]={0,8,4,12,2,10,6,14,1,9,5,13,3,11,7,15};
+
+static const unsigned char bitrev[16] 
+   IDATA_ATTR = {0,8,4,12,2,10,6,14,1,9,5,13,3,11,7,15};
 
 STIN int bitrev12(int x){
   return bitrev[x>>8]|(bitrev[(x&0x0f0)>>4]<<4)|(((int)bitrev[x&0x00f])<<8);
 }
 
-STIN void mdct_bitreverse(DATA_TYPE *x,int n,int step,int shift){
+STIN void mdct_bitreverse(DATA_TYPE *x,int n,int step,int shift) {
 
   int          bit   = 0;
   DATA_TYPE   *w0    = x;
   DATA_TYPE   *w1    = x = w0+(n>>1);
   LOOKUP_T    *T = (step>=4)?(sincos_lookup0+(step>>1)):sincos_lookup1;
   LOOKUP_T    *Ttop  = T+1024;
-  DATA_TYPE    r2;
+  REG_TYPE    r2;
 
   do{
-    DATA_TYPE r3     = bitrev12(bit++);
+    REG_TYPE r3      = bitrev12(bit++);
     DATA_TYPE *x0    = x + ((r3 ^ 0xfff)>>shift) -1;
     DATA_TYPE *x1    = x + (r3>>shift);
 
     REG_TYPE  r0     = x0[0]  + x1[0];
     REG_TYPE  r1     = x1[1]  - x0[1];
 
-	      XPROD32( r0, r1, T[1], T[0], &r2, &r3 ); T+=step;
+	      XPROD32( r0, r1, T[1], T[0], r2, r3 ); T+=step;
 
 	      w1    -= 4;
 
@@ -287,7 +288,7 @@ STIN void mdct_bitreverse(DATA_TYPE *x,int n,int step,int shift){
               r0     = x0[0]  + x1[0];
               r1     = x1[1]  - x0[1];
 
-	      XPROD32( r0, r1, T[1], T[0], &r2, &r3 ); T+=step;
+	      XPROD32( r0, r1, T[1], T[0], r2, r3 ); T+=step;
 
               r0     = (x0[1] + x1[1])>>1;
               r1     = (x0[0] - x1[0])>>1;
@@ -299,14 +300,14 @@ STIN void mdct_bitreverse(DATA_TYPE *x,int n,int step,int shift){
 	      w0    += 4;
   }while(T<Ttop);
   do{
-    DATA_TYPE r3     = bitrev12(bit++);
+    REG_TYPE r3     = bitrev12(bit++);
     DATA_TYPE *x0    = x + ((r3 ^ 0xfff)>>shift) -1;
     DATA_TYPE *x1    = x + (r3>>shift);
 
     REG_TYPE  r0     = x0[0]  + x1[0];
     REG_TYPE  r1     = x1[1]  - x0[1];
 
-	      T-=step; XPROD32( r0, r1, T[0], T[1], &r2, &r3 );
+	      T-=step; XPROD32( r0, r1, T[0], T[1], r2, r3 );
 
 	      w1    -= 4;
 
@@ -324,7 +325,7 @@ STIN void mdct_bitreverse(DATA_TYPE *x,int n,int step,int shift){
               r0     = x0[0]  + x1[0];
               r1     = x1[1]  - x0[1];
 
-	      T-=step; XPROD32( r0, r1, T[0], T[1], &r2, &r3 );
+	      T-=step; XPROD32( r0, r1, T[0], T[1], r2, r3 );
 
               r0     = (x0[1] + x1[1])>>1;
               r1     = (x0[0] - x1[0])>>1;
@@ -337,7 +338,8 @@ STIN void mdct_bitreverse(DATA_TYPE *x,int n,int step,int shift){
   }while(w0<w1);
 }
 
-void mdct_backward(int n, DATA_TYPE *in, DATA_TYPE *out){
+
+void mdct_backward(int n, DATA_TYPE *in, DATA_TYPE *out) {
   int n2=n>>1;
   int n4=n>>2;
   DATA_TYPE *iX;
@@ -346,6 +348,10 @@ void mdct_backward(int n, DATA_TYPE *in, DATA_TYPE *out){
   LOOKUP_T *V;
   int shift;
   int step;
+
+#if CONFIG_CPU == MCF5249
+  mcf5249_init_mac();  /* should be redundant */
+#endif
 
   for (shift=6;!(n&(1<<shift));shift++);
   shift=13-shift;
@@ -389,7 +395,6 @@ void mdct_backward(int n, DATA_TYPE *in, DATA_TYPE *out){
 
   mdct_butterflies(out+n2,n2,shift);
   mdct_bitreverse(out,n,step,shift);
-
   /* rotate + window */
 
   step>>=2;
@@ -507,4 +512,3 @@ void mdct_backward(int n, DATA_TYPE *in, DATA_TYPE *out){
     }while(oX1>oX2);
   }
 }
-

@@ -23,6 +23,7 @@
 #include "os_types.h"
 
 #include "asm_arm.h"
+#include "asm_mcf5249.h"
   
 
 /* Some prototypes that were not defined elsewhere */
@@ -36,7 +37,6 @@ void* alloca(size_t size);
   
 #ifndef  _LOW_ACCURACY_
 /* 64 bit multiply */
-
 //#include <sys/types.h>
 
 #if BYTE_ORDER==LITTLE_ENDIAN
@@ -47,9 +47,7 @@ union magic {
   } halves;
   ogg_int64_t whole;
 };
-#endif 
-
-#if BYTE_ORDER==BIG_ENDIAN
+#elif BYTE_ORDER==BIG_ENDIAN
 union magic {
   struct {
     ogg_int32_t hi;
@@ -64,7 +62,6 @@ static inline ogg_int32_t MULT32(ogg_int32_t x, ogg_int32_t y) {
   magic.whole = (ogg_int64_t)x * y;
   return magic.halves.hi;
 }
-
 static inline ogg_int32_t MULT31(ogg_int32_t x, ogg_int32_t y) {
   return MULT32(x,y)<<1;
 }
@@ -102,7 +99,6 @@ static inline ogg_int32_t MULT31(ogg_int32_t x, ogg_int32_t y) {
 static inline ogg_int32_t MULT31_SHIFT15(ogg_int32_t x, ogg_int32_t y) {
   return (x >> 6) * y;  /* y preshifted >>9 */
 }
-
 #endif
 
 /*
@@ -122,11 +118,15 @@ static inline ogg_int32_t MULT31_SHIFT15(ogg_int32_t x, ogg_int32_t y) {
  * macros.
  */
 
+/* replaced XPROD32 with a macro to avoid memory reference 
+   _x, _y are the results (must be l-values) */
+#define XPROD32(_a, _b, _t, _v, _x, _y)		\
+  { (_x)=MULT32(_a,_t)+MULT32(_b,_v);		\
+    (_y)=MULT32(_b,_t)-MULT32(_a,_v); }
+
+
 #ifdef __i386__
 
-#define XPROD32(_a, _b, _t, _v, _x, _y)		\
-  { *(_x)=MULT32(_a,_t)+MULT32(_b,_v);		\
-    *(_y)=MULT32(_b,_t)-MULT32(_a,_v); }
 #define XPROD31(_a, _b, _t, _v, _x, _y)		\
   { *(_x)=MULT31(_a,_t)+MULT31(_b,_v);		\
     *(_y)=MULT31(_b,_t)-MULT31(_a,_v); }
@@ -135,14 +135,6 @@ static inline ogg_int32_t MULT31_SHIFT15(ogg_int32_t x, ogg_int32_t y) {
     *(_y)=MULT31(_b,_t)+MULT31(_a,_v); }
 
 #else
-
-static inline void XPROD32(ogg_int32_t  a, ogg_int32_t  b,
-			   ogg_int32_t  t, ogg_int32_t  v,
-			   ogg_int32_t *x, ogg_int32_t *y)
-{
-  *x = MULT32(a, t) + MULT32(b, v);
-  *y = MULT32(b, t) - MULT32(a, v);
-}
 
 static inline void XPROD31(ogg_int32_t  a, ogg_int32_t  b,
 			   ogg_int32_t  t, ogg_int32_t  v,
@@ -159,9 +151,7 @@ static inline void XNPROD31(ogg_int32_t  a, ogg_int32_t  b,
   *x = MULT31(a, t) - MULT31(b, v);
   *y = MULT31(b, t) + MULT31(a, v);
 }
-
 #endif
-
 #endif
 
 #ifndef _V_CLIP_MATH
@@ -242,7 +232,6 @@ static inline ogg_int32_t VFLOAT_ADD(ogg_int32_t a,ogg_int32_t ap,
 }
 
 #endif
-
 
 
 

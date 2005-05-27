@@ -24,12 +24,12 @@
 #  define _V_IFDEFJAIL_H_
 
 #  ifdef __GNUC__
-#    define STIN static __inline__
+#    define STIN static inline
 #  elif _WIN32
-#    define STIN static __inline
+#    define STIN static __inline__
 #  endif
 #else
-#  define STIN static
+#  define STIN static inline
 #endif
 
 #ifndef M_PI

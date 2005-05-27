@@ -172,8 +172,12 @@ static int _vds_init(vorbis_dsp_state *v,vorbis_info *vi){
   v->pcm_storage=ci->blocksizes[1];
   v->pcm=(ogg_int32_t **)_ogg_malloc(vi->channels*sizeof(*v->pcm));
   v->pcmret=(ogg_int32_t **)_ogg_malloc(vi->channels*sizeof(*v->pcmret));
+
+  // pbv: allow for extra padding for windowing
   for(i=0;i<vi->channels;i++)
     v->pcm[i]=(ogg_int32_t *)_ogg_calloc(v->pcm_storage,sizeof(*v->pcm[i]));
+    // v->pcm[i]=(ogg_int32_t *)_ogg_calloc(v->pcm_storage,sizeof(*v->pcm[i]));
+    
 
   /* all 1 (large block) or 0 (small block) */
   /* explicitly set for the sake of clarity */

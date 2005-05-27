@@ -34,8 +34,10 @@
 #define cPI1_8 (0x7641af3d)
 #endif
 
-extern void mdct_forward(int n, DATA_TYPE *in, DATA_TYPE *out);
+//extern void mdct_forward(int n, DATA_TYPE *in, DATA_TYPE *out);
 extern void mdct_backward(int n, DATA_TYPE *in, DATA_TYPE *out);
+//extern void mdct_bitreverse(DATA_TYPE *x,int n,int step,int shift);
+//extern void mdct_butterflies(DATA_TYPE *x,int points,int shift);
 
 #endif
 
