@@ -1673,9 +1673,9 @@ bool dbg_mmc_info(void)
                          (int) mmc_extract_bits(card->cid, 0, 8),
                          (int) mmc_extract_bits(card->cid, 8, 16));
                 lcd_puts(0, 4, pbuf);
-                snprintf(pbuf, sizeof(pbuf), "Blocks: %08lx", card->numblocks);
+                snprintf(pbuf, sizeof(pbuf), "Blocks: 0x%06lx", card->numblocks);
                 lcd_puts(0, 5, pbuf);
-                snprintf(pbuf, sizeof(pbuf), "Blocksize: %d", card->blocksize);
+                snprintf(pbuf, sizeof(pbuf), "Blksz.: %d", card->blocksize);
                 lcd_puts(0, 6, pbuf);
             }
             else                  /* Technical details */
