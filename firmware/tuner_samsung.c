@@ -20,8 +20,11 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include "config.h"
 #include "tuner.h" /* tuner abstraction interface */
 #include "fmradio.h" /* physical interface driver */
+#include "mpeg.h"
+#include "sound.h"
 
 #define DEFAULT_IN1 0x100003 /* Mute */
 #define DEFAULT_IN2 0x140884 /* 5kHz, 7.2MHz crystal */
@@ -49,6 +52,28 @@ void samsung_set(int setting, int value)
         case RADIO_FREQUENCY:
         {
             int pll_cnt;
+#if CONFIG_HWCODEC == MAS3587F
+            /* Shift the MAS internal clock away for certain frequencies to
+             * avoid interference. */
+            int pitch = 1000;
+            
+            /* 4th harmonic falls in the FM frequency range */
+            int if_freq = 4 * mpeg_get_mas_pllfreq();
+
+            /* shift the mas harmonic >= 300 kHz away using the direction
+             * which needs less shifting. */
+            if (value < if_freq)
+            {
+                if (if_freq - value < 300000)
+                    pitch = 1003 - (if_freq - value) / 100000;
+            }
+            else
+            {
+                if (value - if_freq < 300000)
+                    pitch = 997 + (value - if_freq) / 100000;
+            }
+            sound_set_pitch(pitch);
+#endif
             /* We add the standard Intermediate Frequency 10.7MHz
             ** before calculating the divisor
             ** The reference frequency is set to 50kHz, and the VCO

@@ -50,6 +50,9 @@ void mpeg_set_recording_options(int frequency, int quality,
                                 int source, int channel_mode,
                                 bool editable, int prerecord_time);
 void mpeg_set_recording_gain(int left, int right, bool use_mic);
+#if CONFIG_TUNER & S1A0903X01
+int mpeg_get_mas_pllfreq(void);
+#endif
 unsigned long mpeg_recorded_time(void);
 unsigned long mpeg_num_recorded_bytes(void);
 void mpeg_pause_recording(void);
