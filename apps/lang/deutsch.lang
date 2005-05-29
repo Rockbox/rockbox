@@ -1420,7 +1420,7 @@ id: LANG_RECORD_TIMESPLIT_REC
 desc: Display of record timer interval setting, on the record screen
 eng: "Split time:"
 voice: ""
-new: "Zeit zum Aufteilen:"
+new: "Teilen alle:"
 
 id: LANG_SHOW_ICONS
 desc: in settings_menu
