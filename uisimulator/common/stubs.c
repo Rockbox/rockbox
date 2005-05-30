@@ -133,6 +133,11 @@ void backlight_set_on_when_charging(bool beep)
   (void)beep;
 }
 
+void remote_backlight_set_timeout(int index)
+{
+  (void)index;
+}
+
 int rtc_read(int address)
 {
   time_t now = time(NULL);

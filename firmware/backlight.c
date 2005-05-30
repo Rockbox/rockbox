@@ -283,6 +283,7 @@ void backlight_set_on_when_charging(bool yesno) {(void)yesno;}
 #ifdef HAVE_REMOTE_LCD
 void remote_backlight_on(void) {}
 void remote_backlight_off(void) {}
+void remote_backlight_set_timeout(int index) {(void)index;}
 #endif
 #endif /* #ifdef CONFIG_BACKLIGHT */
 
