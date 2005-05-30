@@ -53,10 +53,11 @@ static bool charger_was_inserted = 0;
 static bool backlight_on_when_charging = 0;
 
 static int backlight_timer;
+static unsigned int backlight_timeout = 5;
 #ifdef HAVE_REMOTE_LCD
 static int remote_backlight_timer;
+static unsigned int remote_backlight_timeout = 5;
 #endif
-static unsigned int backlight_timeout = 5;
 
 static void __backlight_off(void)
 {
@@ -103,7 +104,7 @@ void backlight_thread(void)
 #ifdef HAVE_REMOTE_LCD
             case REMOTE_BACKLIGHT_ON:
                 remote_backlight_timer =
-                    HZ*backlight_timeout_value[backlight_timeout];
+                    HZ*backlight_timeout_value[remote_backlight_timeout];
 
                 /* Backlight == OFF in the setting? */
                 if(remote_backlight_timer < 0)
@@ -180,6 +181,15 @@ void remote_backlight_on(void)
 void remote_backlight_off(void)
 {
     queue_post(&backlight_queue, REMOTE_BACKLIGHT_OFF, NULL);
+}
+
+void remote_backlight_set_timeout(int index)
+{
+    if((unsigned)index >= sizeof(backlight_timeout_value))
+        /* if given a weird value, use 0 */
+        index=0;
+    remote_backlight_timeout = index; /* index in the backlight_timeout_value table */
+    remote_backlight_on();
 }
 #endif
 

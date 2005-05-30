@@ -253,8 +253,10 @@ static const struct bit_entry rtc_bits[] =
 
 #ifdef HAVE_REMOTE_LCD
     /* remote lcd */
-    {6, S_O(remote_contrast), 42, "remote_contrast", NULL },
-    {1, S_O(remote_invert), false, "remote_invert", off_on },
+    {6, S_O(remote_contrast), 42, "remote contrast", NULL },
+    {1, S_O(remote_invert), false, "remote invert", off_on },
+    {5, S_O(remote_backlight_timeout), 5, "remote backlight timeout",
+        "off,on,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90" },
 #endif
 
     /* Current sum of bits: 259 (worst case) */
@@ -744,8 +746,9 @@ void settings_apply(void)
     lcd_set_contrast(global_settings.contrast);
     lcd_scroll_speed(global_settings.scroll_speed);
 #ifdef HAVE_REMOTE_LCD
-	 lcd_remote_set_contrast(global_settings.remote_contrast);
-	 lcd_remote_set_invert_display(global_settings.remote_invert);
+	lcd_remote_set_contrast(global_settings.remote_contrast);
+	lcd_remote_set_invert_display(global_settings.remote_invert);
+    remote_backlight_set_timeout(global_settings.remote_backlight_timeout);
 #endif 
     backlight_set_timeout(global_settings.backlight_timeout);
     backlight_set_on_when_charging(global_settings.backlight_on_when_charging);

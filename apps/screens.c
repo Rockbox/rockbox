@@ -343,6 +343,7 @@ int charging_screen(void)
 
     lcd_clear_display();
     backlight_set_timeout(global_settings.backlight_timeout);
+    remote_backlight_set_timeout(global_settings.remote_backlight_timeout);
     backlight_set_on_when_charging(global_settings.backlight_on_when_charging);
     status_draw(true);
 

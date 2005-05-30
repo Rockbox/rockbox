@@ -637,6 +637,37 @@ static bool backlight_timer(void)
 }
 #endif /* CONFIG_BACKLIGHT */
 
+#ifdef HAVE_REMOTE_LCD
+
+static bool remote_backlight_timer(void)
+{
+    static const struct opt_items names[] = {
+        { STR(LANG_OFF) },
+        { STR(LANG_ON) },
+        { "1s ", TALK_ID(1, UNIT_SEC) },
+        { "2s ", TALK_ID(2, UNIT_SEC) },
+        { "3s ", TALK_ID(3, UNIT_SEC) },
+        { "4s ", TALK_ID(4, UNIT_SEC) },
+        { "5s ", TALK_ID(5, UNIT_SEC) },
+        { "6s ", TALK_ID(6, UNIT_SEC) },
+        { "7s ", TALK_ID(7, UNIT_SEC) },
+        { "8s ", TALK_ID(8, UNIT_SEC) },
+        { "9s ", TALK_ID(9, UNIT_SEC) },
+        { "10s", TALK_ID(10, UNIT_SEC) },
+        { "15s", TALK_ID(15, UNIT_SEC) },
+        { "20s", TALK_ID(20, UNIT_SEC) },
+        { "25s", TALK_ID(25, UNIT_SEC) },
+        { "30s", TALK_ID(30, UNIT_SEC) },
+        { "45s", TALK_ID(45, UNIT_SEC) },
+        { "60s", TALK_ID(60, UNIT_SEC) },
+        { "90s", TALK_ID(90, UNIT_SEC) }
+    };
+    return set_option(str(LANG_BACKLIGHT), &global_settings.remote_backlight_timeout,
+                      INT, names, 19, backlight_set_timeout );
+}
+
+#endif /* HAVE_REMOTE_LCD */
+
 static bool poweroff_idle_timer(void)
 {
     static const struct opt_items names[] = {
@@ -1210,6 +1241,7 @@ static bool lcd_remote_settings_menu(void)
     bool result;
 
     static const struct menu_item items[] = {
+        { ID2P(LANG_BACKLIGHT),       remote_backlight_timer },
         { ID2P(LANG_CONTRAST),        remote_contrast },
         { ID2P(LANG_INVERT),          remote_invert },
 /*        { ID2P(LANG_FLIP_DISPLAY),    remote_flip_display },
