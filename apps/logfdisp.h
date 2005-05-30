@@ -16,6 +16,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifdef HAVE_LCD_BITMAP
+#ifndef LOGFDISP_H
+#define LOGFDISP_H
 bool logfdisplay(void);
-#endif
+
+#endif /* LOGFDISP_H */
+

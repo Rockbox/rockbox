@@ -51,6 +51,7 @@
 #endif
 #include "misc.h"
 #include "lang.h"
+#include "logfdisp.h"
 
 #ifdef HAVE_RECORDING
 #include "recording.h"
@@ -80,25 +81,8 @@ int show_logo( void )
 #endif
 
 #ifdef HAVE_REMOTE_LCD
-	 lcd_remote_bitmap(rockbox112x37,10,14,112,37, false);
-#endif
-
-#if 0
-    /*
-     * This code is not used anymore, but I kept it here since it shows
-     * one way of using the BMP reader function to display an externally
-     * providing logo.
-     */
-    unsigned char buffer[112 * 8];
-    int width, height;
-
-    int failure;
-    failure = read_bmp_file("/rockbox112.bmp", &width, &height, buffer);
-
-    debugf("read_bmp_file() returned %d, width %d height %d\n",
-           failure, width, height);
-           
-    lcd_bitmap(&buffer, 0, 10, width, height, false);
+    lcd_remote_clear_display();
+    lcd_remote_bitmap(rockbox112x37,10,14,112,37, false);
 #endif
 
     snprintf(version, sizeof(version), "Ver. %s", appsversion);
@@ -365,6 +349,9 @@ bool info_menu(void)
         { ID2P(LANG_DEBUG),              debug_menu        },
 #else
         { ID2P(LANG_USB),                simulate_usb      },
+#ifdef ROCKBOX_HAS_LOGF
+        {"logf", logfdisplay },
+#endif
 #endif
     };
 

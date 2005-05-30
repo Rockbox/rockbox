@@ -18,6 +18,9 @@
  ****************************************************************************/
 #ifndef LOGF_H
 #define LOGF_H
+#include <config.h>
+
+#ifdef ROCKBOX_HAS_LOGF
 
 #define MAX_LOGF_LINES 1000
 #define MAX_LOGF_DATASIZE (16*MAX_LOGF_LINES)
@@ -27,5 +30,9 @@ extern int logfindex;
 extern bool logfwrap;
 
 void logf(const char *format, ...);
+#else
+/* built without logf() support enabled */
+#define logf(...)
+#endif
 
 #endif /* LOGF_H */

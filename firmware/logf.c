@@ -33,6 +33,9 @@
 #include "lcd-remote.h"
 #include "logf.h"
 
+/* Only provide all this if asked to */
+#ifdef ROCKBOX_HAS_LOGF
+
 unsigned char logfbuffer[MAX_LOGF_LINES][16];
 int logfindex;
 bool logfwrap;
@@ -96,3 +99,5 @@ void logf(const char *format, ...)
 
     displayremote();
 }
+
+#endif

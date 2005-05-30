@@ -57,6 +57,7 @@
 #ifdef HAVE_MMC
 #include "ata_mmc.h"
 #endif
+#include "logfdisp.h"
 
 #ifdef IRIVER_H100
 #include "uda1380.h"
@@ -2046,6 +2047,9 @@ bool debug_menu(void)
         { "View runtime", view_runtime },
 #ifdef CONFIG_TUNER
         { "FM Radio", dbg_fm_radio },
+#endif
+#ifdef ROCKBOX_HAS_LOGF
+        {"logf", logfdisplay },
 #endif
     };
 

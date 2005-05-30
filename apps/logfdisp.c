@@ -17,6 +17,8 @@
  *
  ****************************************************************************/
 #include "config.h"
+
+#ifdef ROCKBOX_HAS_LOGF
 #include <timefuncs.h>
 #include <string.h>
 #include <kernel.h>
@@ -74,4 +76,13 @@ bool logfdisplay(void)
 
     return false;
 }
-#endif
+#else /* HAVE_LCD_BITMAP */
+bool logfdisplay(void)
+
+{
+    /* TODO: implement a browser for charcell bitmaps */
+    return false;
+}
+#endif /* HAVE_LCD_BITMAP */
+
+#endif /* ROCKBOX_HAS_LOGF */

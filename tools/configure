@@ -11,6 +11,8 @@
 # global CC options for all platforms
 CCOPTS="-W -Wall -O -nostdlib -ffreestanding -Wstrict-prototypes"
 
+use_logf="#undef ROCKBOX_HAS_LOGF"
+
 #
 # Begin Function Definitions
 #
@@ -171,6 +173,48 @@ whichaddr () {
     esac
 }
 
+whichdevel () {
+  ##################################################################
+  # Prompt for specific developer options
+  #
+  echo ""
+  echo "Enter your developer options (press enter when done)"
+  echo "(D)EBUG, (L)ogf, (S)imulator"
+  cont=1
+
+  while [ $cont = "1" ]; do
+
+    option=`input`;
+
+    case $option in
+      [Dd])
+        echo "define DEBUG"
+        debug="1"
+        GCCOPTS="$GCCOPTS -g -DDEBUG"
+        ;;
+      [Ll])
+        logf="yes"
+        echo "logf() support enabled"
+        use_logf="#define ROCKBOX_HAS_LOGF 1"
+        ;;
+      [Ss])
+        echo "Simulator build enabled"
+        simulator="yes"
+        ;;
+      *)
+        echo "done"
+        cont=0
+        ;;
+    esac 
+  done
+
+  if [ "yes" = "$simulator" ]; then
+    debug="1"
+    extradefines="-DSIMULATOR"
+    whichsim
+  fi
+}
+
 whichsim () {
 
 if [ -z "$simver" ]; then
@@ -229,9 +273,6 @@ whichlang() {
         num=`expr $num + 1`
     done
 }
-
-target=$1
-debug=$2
 
 if test "$1" = "--help"; then
   echo "Rockbox configure script."
@@ -317,8 +358,6 @@ fi
 
 apps="apps"
 appsdir='\$(ROOTDIR)/apps'
-
-if [ -z "$archos" ]; then
 
 ##################################################################
 # Figure out target platform
@@ -469,7 +508,10 @@ if [ -z "$archos" ]; then
 
   echo "Platform set to $archos"
 
-fi
+
+############################################################################
+# Amount of memory, for those that can differ.
+#
 
 if [ -z "$memory" ]; then
   size="2"
@@ -490,11 +532,11 @@ if [ -z "$memory" ]; then
   echo "Memory size selected: $memory MB"
 fi
 
-if [ -z "$debug" ]; then
-  ##################################################################
-  # Figure out debug on/off
-  #
-  echo "Build (N)ormal, (D)ebug, (S)imulator, (B)ootloader? (N)"
+##################################################################
+# Figure out build "type"
+#
+  echo ""
+  echo "Build (N)ormal, (D)evel, (S)imulator, (B)ootloader? (N)"
 
   option=`input`;
 
@@ -518,9 +560,8 @@ if [ -z "$debug" ]; then
       whichsim
       ;;
     [Dd])
-      debug="1"
-      echo "Debug build selected"
-      GCCOPTS="$GCCOPTS -g -DDEBUG"
+      echo "Devel build selected"
+      whichdevel
       ;;
     *)
       debug=""
@@ -529,11 +570,12 @@ if [ -z "$debug" ]; then
       ;;
 
   esac
-fi
+
 
 whichaddr
 
-if [ -z "$language" ]; then
+############################################################################
+# language
 
     echo "Select a number for the language to use (default is english)"
 
@@ -545,7 +587,6 @@ if [ -z "$language" ]; then
         language="english"
     fi
     echo "Language set to $language"
-fi
 
 uname=`uname`
 
@@ -594,6 +635,7 @@ fi
 
 sed > autoconf.h \
  -e "s,@ENDIAN@,${defendian},g" \
+ -e "s,^#undef ROCKBOX_HAS_LOGF,$use_logf,g" \
 <<EOF
 /* This header was made by configure */
 #ifndef __BUILD_AUTOCONF_H
@@ -601,6 +643,9 @@ sed > autoconf.h \
 
 /* Define endianess for the target or simulator platform */
 #define @ENDIAN@ 1
+
+/* Define this if you build rockbox to support the logf logging and display */
+#undef ROCKBOX_HAS_LOGF
 
 #endif /* __BUILD_AUTOCONF_H */
 EOF

@@ -1,3 +1,4 @@
+logf.c
 #ifndef SIMULATOR
 backlight.c
 #endif
