@@ -79,7 +79,3 @@ iriverify.c
 #else
 splitedit.c
 #endif
-
-#ifdef HAVE_REMOTE_LCD
-remotelcd.c
-#endif
