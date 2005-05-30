@@ -663,7 +663,7 @@ static bool remote_backlight_timer(void)
         { "90s", TALK_ID(90, UNIT_SEC) }
     };
     return set_option(str(LANG_BACKLIGHT), &global_settings.remote_backlight_timeout,
-                      INT, names, 19, backlight_set_timeout );
+                      INT, names, 19, remote_backlight_set_timeout );
 }
 
 #endif /* HAVE_REMOTE_LCD */
