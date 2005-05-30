@@ -1,4 +1,6 @@
+#ifdef ROCKBOX_HAS_LOGF
 logfdisp.c
+#endif
 alarm_menu.c
 bookmark.c
 credits.c

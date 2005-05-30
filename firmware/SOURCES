@@ -1,4 +1,6 @@
+#ifdef ROCKBOX_HAS_LOGF
 logf.c
+#endif
 #ifndef SIMULATOR
 backlight.c
 #endif
