@@ -390,7 +390,7 @@ void lcd_remote_update (void)
     for (y = 0; y < LCD_REMOTE_HEIGHT / 8; y++)
     {
         lcd_remote_write_command(LCD_REMOTE_CNTL_SET_PAGE_ADDRESS | y);
-        lcd_remote_write_command_ex(0x10, 0x00);
+        lcd_remote_write_command_ex(0x10, 0x04);
         lcd_remote_write_data(lcd_remote_framebuffer[y], LCD_REMOTE_WIDTH);
     }
 }
@@ -423,7 +423,7 @@ void lcd_remote_init(void)
     
     sleep(1);
     
-    lcd_remote_write_command(LCD_REMOTE_CNTL_INIT_LINE | 0x0); // init line
+    lcd_remote_write_command(LCD_REMOTE_CNTL_INIT_LINE | 0x1); // init line
     lcd_remote_write_command(LCD_REMOTE_CNTL_SET_PAGE_ADDRESS | 0x0); // page address
     lcd_remote_write_command_ex(0x10, 0x00); // Column MSB + LSB
     

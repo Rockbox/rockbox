@@ -67,7 +67,7 @@ extern const unsigned char bitmap_icons_7x8[Icon_Last][7];
 extern const unsigned char bitmap_icon_disk[];
 #endif
 
-#if  LCD_WIDTH == 112 || LCD_WIDTH == 128 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_WIDTH == 134)
+#if  LCD_WIDTH == 112 || LCD_WIDTH == 128 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_WIDTH == 128)
 extern const unsigned char rockbox112x37[];
 #endif
 #if LCD_WIDTH == 160
