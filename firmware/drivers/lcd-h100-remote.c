@@ -473,13 +473,13 @@ void lcd_remote_update_rect (int x_start, int y,
  * remapping only and all operations on the lcd are affected.
  * -> 
  * @param int lines - The number of lines that are rolled. 
- *  The value must be 0 <= pixels < LCD_HEIGHT.
+ *  The value must be 0 <= pixels < LCD_REMOTE_HEIGHT.
  */
 void lcd_remote_roll(int lines)
 {
     char data[2];
 
-    lines &= LCD_HEIGHT-1;
+    lines &= LCD_REMOTE_HEIGHT-1;
     data[0] = lines & 0xff;
     data[1] = lines >> 8;
     
@@ -539,7 +539,7 @@ void lcd_remote_puts_style(int x, int y, const unsigned char *str, int style)
     lcd_remote_putsxy(xpos, ypos, str);
     lcd_remote_clearrect(xpos + w, ypos, LCD_REMOTE_WIDTH - (xpos + w), h);
     if (style & STYLE_INVERT)
-        lcd_remote_invertrect(xpos, ypos, LCD_WIDTH - xpos, h);
+        lcd_remote_invertrect(xpos, ypos, LCD_REMOTE_WIDTH - xpos, h);
 
 }
 
@@ -549,7 +549,7 @@ static void lcd_remote_putsxyofs(int x, int y, int ofs, const unsigned char *str
     int ch;
     struct font* pf = font_get(curfont);
 
-    while ((ch = *str++) != '\0' && x < LCD_WIDTH)
+    while ((ch = *str++) != '\0' && x < LCD_REMOTE_WIDTH)
     {
         int gwidth, width;
 
@@ -560,7 +560,7 @@ static void lcd_remote_putsxyofs(int x, int y, int ofs, const unsigned char *str
 
         /* get proportional width and glyph bits */
         gwidth = pf->width ? pf->width[ch] : pf->maxwidth;
-        width = MIN (gwidth, LCD_WIDTH - x);
+        width = MIN (gwidth, LCD_REMOTE_WIDTH - x);
 
         if (ofs != 0)
         {
@@ -869,7 +869,7 @@ void lcd_remote_puts_scroll_style(int x, int y, const unsigned char *string, int
         }
 
         end = strchr(s->line, '\0');
-        strncpy(end, string, LCD_WIDTH/2);
+        strncpy(end, string, LCD_REMOTE_WIDTH/2);
 
         s->len = strlen(string);
         s->offset = 0;
@@ -952,9 +952,9 @@ static void scroll_thread(void)
                     s->backward = false;
                     s->start_tick = current_tick + scroll_delay * 2;
                 }
-                if (s->offset >= s->width - (LCD_WIDTH - xpos)) {
+                if (s->offset >= s->width - (LCD_REMOTE_WIDTH - xpos)) {
                     /* at end of line */
-                    s->offset = s->width - (LCD_WIDTH - xpos);
+                    s->offset = s->width - (LCD_REMOTE_WIDTH - xpos);
                     s->backward = true;
                     s->start_tick = current_tick + scroll_delay * 2;
                 }
@@ -965,11 +965,11 @@ static void scroll_thread(void)
                     s->offset %= s->width;
             }
 
-            lcd_remote_clearrect(xpos, ypos, LCD_WIDTH - xpos, pf->height);
+            lcd_remote_clearrect(xpos, ypos, LCD_REMOTE_WIDTH - xpos, pf->height);
             lcd_remote_putsxyofs(xpos, ypos, s->offset, s->line);
             if (s->invert)
-                lcd_remote_invertrect(xpos, ypos, LCD_WIDTH - xpos, pf->height);
-            lcd_remote_update_rect(xpos, ypos, LCD_WIDTH - xpos, pf->height);
+                lcd_remote_invertrect(xpos, ypos, LCD_REMOTE_WIDTH - xpos, pf->height);
+            lcd_remote_update_rect(xpos, ypos, LCD_REMOTE_WIDTH - xpos, pf->height);
         }
 
         sleep(scroll_ticks);
