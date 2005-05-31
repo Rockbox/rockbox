@@ -29,7 +29,7 @@
 
 static struct plugin_api* rb;
 static file_info_struct file_info;
-static long temp_buffer [BUFFER_SIZE];
+static long temp_buffer [BUFFER_SIZE] IDATA_ATTR;
 
 /* Reformat samples from longs in processor's native endian mode to
  little-endian data with 2 bytes / sample. */

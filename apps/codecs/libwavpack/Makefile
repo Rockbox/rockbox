@@ -15,7 +15,7 @@ INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
 endif
 
 CFLAGS = $(GCCOPTS) \
-$(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
+$(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE} -O2 \
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc

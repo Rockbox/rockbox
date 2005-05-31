@@ -45,7 +45,7 @@ static ulong read_next_header (read_stream infile, WavpackHeader *wphdr);
 // large integer or floating point files (but always provides at least 24 bits
 // of resolution).
 
-static WavpackContext wpc;
+static WavpackContext wpc IDATA_ATTR;
 
 WavpackContext *WavpackOpenFileInput (read_stream infile, char *error)
 {

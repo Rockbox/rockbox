@@ -4,4 +4,7 @@ metadata.c
 unpack.c
 words.c
 wputils.c
+#if CONFIG_CPU==MCF5249 && !defined(SIMULATOR)
+coldfire.S
+#endif
 

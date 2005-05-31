@@ -27,7 +27,11 @@ static void strcpy_loc (char *dst, char *src) { while (*src) *dst++ = *src++; *d
 // these macros implement the weight application and update operations
 // that are at the heart of the decorrelation loops
 
+#if 0	// PERFCOND
 #define apply_weight_i(weight, sample) ((weight * sample + 512) >> 10)
+#else
+#define apply_weight_i(weight, sample) ((((weight * sample) >> 8) + 2) >> 2)
+#endif
 
 #define apply_weight_f(weight, sample) (((((sample & 0xffff) * weight) >> 9) + \
     (((sample & ~0xffff) >> 9) * weight) + 1) >> 1)
@@ -39,7 +43,7 @@ static void strcpy_loc (char *dst, char *src) { while (*src) *dst++ = *src++; *d
 #define apply_weight(weight, sample) ((int32_t)((weight * (int64_t) sample + 512) >> 10))
 #endif
 
-#if 1	// PERFCOND
+#if 0	// PERFCOND
 #define update_weight(weight, delta, source, result) \
     if (source && result) weight -= ((((source ^ result) >> 30) & 2) - 1) * delta;
 #else
@@ -315,9 +319,14 @@ int read_config_info (WavpackContext *wpc, WavpackMetadata *wpmd)
 // samples unpacked, which can be less than the number requested if an error
 // occurs or the end of the block is reached.
 
+#if CONFIG_CPU==MCF5249 && !defined(SIMULATOR)
+extern void decorr_stereo_pass_cont_mcf5249 (struct decorr_pass *dpp, long *buffer, long sample_count);
+#else
+static void decorr_stereo_pass_cont (struct decorr_pass *dpp, long *buffer, long sample_count);
+#endif
+
 static void decorr_mono_pass (struct decorr_pass *dpp, long *buffer, long sample_count);
 static void decorr_stereo_pass (struct decorr_pass *dpp, long *buffer, long sample_count);
-static void decorr_stereo_pass_cont (struct decorr_pass *dpp, long *buffer, long sample_count);
 static void fixup_samples (WavpackStream *wps, long *buffer, ulong sample_count);
 
 long unpack_samples (WavpackContext *wpc, long *buffer, ulong sample_count)
@@ -372,7 +381,11 @@ long unpack_samples (WavpackContext *wpc, long *buffer, ulong sample_count)
 	else
 	    for (tcount = wps->num_terms, dpp = wps->decorr_passes; tcount--; dpp++) {
 		decorr_stereo_pass (dpp, buffer, 8);
+#if CONFIG_CPU==MCF5249 && !defined(SIMULATOR)
+		decorr_stereo_pass_cont_mcf5249 (dpp, buffer + 16, sample_count - 8);
+#else
 		decorr_stereo_pass_cont (dpp, buffer + 16, sample_count - 8);
+#endif
 	    }
 
 	if (flags & JOINT_STEREO)
@@ -530,11 +543,13 @@ static void decorr_stereo_pass (struct decorr_pass *dpp, long *buffer, long samp
     dpp->weight_B = weight_B;
 }
 
+#if CONFIG_CPU != MCF5249 || defined(SIMULATOR)
+
 static void decorr_stereo_pass_cont (struct decorr_pass *dpp, long *buffer, long sample_count)
 {
     long delta = dpp->delta, weight_A = dpp->weight_A, weight_B = dpp->weight_B;
     long *bptr, *tptr, *eptr = buffer + (sample_count * 2), sam_A, sam_B;
-    int k;
+    int k, i;
 
     switch (dpp->term) {
 
@@ -581,23 +596,11 @@ static void decorr_stereo_pass_cont (struct decorr_pass *dpp, long *buffer, long
 		update_weight (weight_B, delta, tptr [1], sam_A);
 	    }
 
-	    k = dpp->term;
-	    dpp->samples_B [--k & (MAX_TERM - 1)] = bptr [-1];
-	    dpp->samples_A [  k & (MAX_TERM - 1)] = bptr [-2];
-	    dpp->samples_B [--k & (MAX_TERM - 1)] = bptr [-3];
-	    dpp->samples_A [  k & (MAX_TERM - 1)] = bptr [-4];
-	    dpp->samples_B [--k & (MAX_TERM - 1)] = bptr [-5];
-	    dpp->samples_A [  k & (MAX_TERM - 1)] = bptr [-6];
-	    dpp->samples_B [--k & (MAX_TERM - 1)] = bptr [-7];
-	    dpp->samples_A [  k & (MAX_TERM - 1)] = bptr [-8];
-	    dpp->samples_B [--k & (MAX_TERM - 1)] = bptr [-9];
-	    dpp->samples_A [  k & (MAX_TERM - 1)] = bptr [-10];
-	    dpp->samples_B [--k & (MAX_TERM - 1)] = bptr [-11];
-	    dpp->samples_A [  k & (MAX_TERM - 1)] = bptr [-12];
-	    dpp->samples_B [--k & (MAX_TERM - 1)] = bptr [-13];
-	    dpp->samples_A [  k & (MAX_TERM - 1)] = bptr [-14];
-	    dpp->samples_B [--k & (MAX_TERM - 1)] = bptr [-15];
-	    dpp->samples_A [  k & (MAX_TERM - 1)] = bptr [-16];
+	    for (k = dpp->term - 1, i = 8; i--; k--) {
+		dpp->samples_B [k & (MAX_TERM - 1)] = *--bptr;
+		dpp->samples_A [k & (MAX_TERM - 1)] = *--bptr;
+	    }
+
 	    break;
 
 	case -1:
@@ -638,6 +641,8 @@ static void decorr_stereo_pass_cont (struct decorr_pass *dpp, long *buffer, long
     dpp->weight_A = weight_A;
     dpp->weight_B = weight_B;
 }
+
+#endif
 
 static void decorr_mono_pass (struct decorr_pass *dpp, long *buffer, long sample_count)
 {
