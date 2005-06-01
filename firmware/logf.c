@@ -18,10 +18,10 @@
  ****************************************************************************/
 
 /*
- * logf() logs 16 bytes in a circular buffer. Each logged string is space-
- * padded for easier and faster output on screen. Just output 16 lines on each
- * line. 16 bytes fit nicely on the iRiver remote LCD (128 pixels with an 8
- * pixels font).
+ * logf() logs MAX_LOGF_ENTRY (21) bytes per entry in a circular buffer. Each
+ * logged string is space- padded for easier and faster output on screen. Just
+ * output MAX_LOGF_ENTRY characters on each line. MAX_LOGF_ENTRY bytes fit
+ * nicely on the iRiver remote LCD (128 pixels with an 8x6 pixels font).
  */
 
 #include <string.h>
@@ -36,7 +36,7 @@
 /* Only provide all this if asked to */
 #ifdef ROCKBOX_HAS_LOGF
 
-unsigned char logfbuffer[MAX_LOGF_LINES][16];
+unsigned char logfbuffer[MAX_LOGF_LINES][MAX_LOGF_ENTRY];
 int logfindex;
 bool logfwrap;
 
@@ -57,7 +57,7 @@ static void displayremote(void)
     
     index = logfindex;
     for(i = lines-1; i>=0; i--) {
-        unsigned char buffer[17];
+        unsigned char buffer[MAX_LOGF_ENTRY+1];
 
         if(--index < 0) {
             if(logfwrap)
@@ -66,8 +66,8 @@ static void displayremote(void)
                 break; /* done */
         }
         
-        memcpy(buffer, logfbuffer[index], 16);
-        buffer[16]=0;
+        memcpy(buffer, logfbuffer[index], MAX_LOGF_ENTRY);
+        buffer[MAX_LOGF_ENTRY]=0;
         lcd_remote_puts(0, i, buffer);
     }
     lcd_remote_update();   
@@ -89,11 +89,11 @@ void logf(const char *format, ...)
         logfindex = 0;
     }
     ptr = logfbuffer[logfindex];
-    len = vsnprintf(ptr, 16, format, ap);
+    len = vsnprintf(ptr, MAX_LOGF_ENTRY, format, ap);
     va_end(ap);
-    if(len < 16)
-        /* pad with spaces up to the 16 byte border */
-        memset(ptr+len, ' ', 16-len);
+    if(len < MAX_LOGF_ENTRY)
+        /* pad with spaces up to the MAX_LOGF_ENTRY byte border */
+        memset(ptr+len, ' ', MAX_LOGF_ENTRY-len);
 
     logfindex++; /* leave it where we write the next time */
 

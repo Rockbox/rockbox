@@ -59,7 +59,7 @@ bool logfdisplay(void)
     do {
         index = logfindex;
         for(i = lines-1; i>=0; i--) {
-            unsigned char buffer[17];
+            unsigned char buffer[MAX_LOGF_ENTRY + 1];
 
             if(--index < 0) {
                 if(logfwrap)
@@ -68,8 +68,8 @@ bool logfdisplay(void)
                     break; /* done */
             }
         
-            memcpy(buffer, logfbuffer[index], 16);
-            buffer[16]=0;
+            memcpy(buffer, logfbuffer[index], MAX_LOGF_ENTRY);
+            buffer[MAX_LOGF_ENTRY]=0;
             lcd_puts(0, i, buffer);
         }
         lcd_update();
@@ -100,7 +100,7 @@ bool logfdump(void)
     
     fd = open("/.rockbox/logf.txt", O_CREAT|O_WRONLY);
     if(-1 != fd) {
-        unsigned char buffer[17];
+        unsigned char buffer[MAX_LOGF_ENTRY +1];
         int index = logfindex-1;
         int stop = logfindex;
 
@@ -113,8 +113,8 @@ bool logfdump(void)
                     break; /* done */
             }
         
-            memcpy(buffer, logfbuffer[index], 16);
-            buffer[16]=0;
+            memcpy(buffer, logfbuffer[index], MAX_LOGF_ENTRY);
+            buffer[MAX_LOGF_ENTRY]=0;
             fdprintf(fd, "%s\n", buffer);
             index--;
         }

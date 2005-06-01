@@ -23,9 +23,10 @@
 #ifdef ROCKBOX_HAS_LOGF
 
 #define MAX_LOGF_LINES 1000
-#define MAX_LOGF_DATASIZE (16*MAX_LOGF_LINES)
+#define MAX_LOGF_ENTRY 21 /* 128/6 pixels */
+#define MAX_LOGF_DATASIZE (MAX_LOGF_ENTRY*MAX_LOGF_LINES)
 
-extern unsigned char logfbuffer[MAX_LOGF_LINES][16];
+extern unsigned char logfbuffer[MAX_LOGF_LINES][MAX_LOGF_ENTRY];
 extern int logfindex;
 extern bool logfwrap;
 
