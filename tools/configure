@@ -278,7 +278,14 @@ if test "$1" = "--help"; then
   echo "Rockbox configure script."
   echo "Invoke this in a directory to generate a Makefile to build Rockbox"
   echo "Do *NOT* run this within the tools directory!"
+  echo ""
+  echo "Usage: configure [--ccache]"
   exit
+fi
+
+if test "$1" = "--ccache"; then
+  echo "Enable ccache for building"
+  ccache="yes"
 fi
 
 if test -r "configure"; then
@@ -625,6 +632,10 @@ else
 
  echo "Using $CC $gccver ($gccnum)"
 
+fi
+
+if test "X$ccache" = "Xyes"; then
+  CC="ccache $CC"
 fi
 
 if test "X$endian" = "Xbig"; then
