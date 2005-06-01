@@ -423,7 +423,7 @@ void lcd_remote_init(void)
     
     sleep(1);
     
-    lcd_remote_write_command(LCD_REMOTE_CNTL_INIT_LINE | 0x1); // init line
+    lcd_remote_write_command(LCD_REMOTE_CNTL_INIT_LINE | 0x0); // init line
     lcd_remote_write_command(LCD_REMOTE_CNTL_SET_PAGE_ADDRESS | 0x0); // page address
     lcd_remote_write_command_ex(0x10, 0x00); // Column MSB + LSB
     
