@@ -19,6 +19,7 @@
 #ifndef LOGFDISP_H
 #define LOGFDISP_H
 bool logfdisplay(void);
+bool logfdump(void);
 
 #endif /* LOGFDISP_H */
 

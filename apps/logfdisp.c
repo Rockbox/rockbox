@@ -19,6 +19,8 @@
 #include "config.h"
 
 #ifdef ROCKBOX_HAS_LOGF
+#include <file.h>
+#include <sprintf.h>
 #include <timefuncs.h>
 #include <string.h>
 #include <kernel.h>
@@ -84,5 +86,41 @@ bool logfdisplay(void)
     return false;
 }
 #endif /* HAVE_LCD_BITMAP */
+
+/* Store the logf log to logf.txt in the .rockbox directory. The order of the
+ * entries will be "reversed" so that the most recently logged entry is on the
+ * top of the file */
+bool logfdump(void)
+{
+    int fd;
+
+    if(!logfindex && !logfwrap)
+        /* nothing is logged just yet */
+        return false;
+    
+    fd = open("/.rockbox/logf.txt", O_CREAT|O_WRONLY);
+    if(-1 != fd) {
+        unsigned char buffer[17];
+        int index = logfindex-1;
+        int stop = logfindex;
+
+
+        while(index != stop) {
+            if(index < 0) {
+                if(logfwrap)
+                    index = MAX_LOGF_LINES-1;
+                else
+                    break; /* done */
+            }
+        
+            memcpy(buffer, logfbuffer[index], 16);
+            buffer[16]=0;
+            fdprintf(fd, "%s\n", buffer);
+            index--;
+        }
+        close(fd);
+    }
+    return false;
+}
 
 #endif /* ROCKBOX_HAS_LOGF */

@@ -351,6 +351,7 @@ bool info_menu(void)
         { ID2P(LANG_USB),                simulate_usb      },
 #ifdef ROCKBOX_HAS_LOGF
         {"logf", logfdisplay },
+        {"logfdump", logfdump },
 #endif
 #endif
     };

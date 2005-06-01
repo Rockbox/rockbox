@@ -2050,6 +2050,7 @@ bool debug_menu(void)
 #endif
 #ifdef ROCKBOX_HAS_LOGF
         {"logf", logfdisplay },
+        {"logfdump", logfdump },
 #endif
     };
 
