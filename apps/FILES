@@ -28,6 +28,7 @@ plugins/searchengine/Makefile
 plugins/searchengine/*.[ch]
 plugins/databox/Makefile
 plugins/databox/*.[ch]
+plugins/midi/*.[ch]
 codecs/*.[ch]
 codecs/Makefile
 codecs/liba52/*
