@@ -343,7 +343,7 @@ Files
 
      Returns size of a file. Upon error, returns -1.
 
-  int fprintf(int fd, const char *fmt, ...);
+  int fdprintf(int fd, const char *fmt, ...);
 
      Write a formated string in the fd.
      Returns the number of characters writen to file.
