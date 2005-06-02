@@ -46,6 +46,9 @@
 #define IRIVER_H100_PAD 3
 #define GMINI100_PAD    4
 
+/* CONFIG_REMOTE_KEYPAD */
+#define H100_REMOTE 0 
+
 /* CONFIG_BATTERY */
 #define BATT_LIION2200  2200 /* FM/V2 recorder type */
 #define BATT_4AA_NIMH   1500

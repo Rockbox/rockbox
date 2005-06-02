@@ -14,6 +14,8 @@
 
 #define CONFIG_KEYPAD IRIVER_H100_PAD
 
+#define CONFIG_REMOTE_KEYPAD H100_REMOTE
+
 /* Define this if you do software codec */
 #define CONFIG_HWCODEC MASNONE
 
