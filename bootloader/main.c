@@ -188,7 +188,7 @@ void main(void)
 
     lcd_setfont(FONT_SYSFIXED);
 
-    snprintf(buf, 256, "Rockboot version 1");
+    snprintf(buf, 256, "Rockboot version 2");
     lcd_puts(0, line++, buf);
 
     sleep(HZ/50); /* Allow the button driver to check the buttons */
