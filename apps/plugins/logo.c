@@ -189,6 +189,16 @@ const unsigned char rockbox16x7[] = {
 #define LP_INC_Y BUTTON_UP
 #endif
 
+#ifdef CONFIG_REMOTE_KEYPAD
+#if CONFIG_REMOTE_KEYPAD == H100_REMOTE
+#define LP_R_QUIT BUTTON_RC_STOP
+#define LP_R_DEC_X BUTTON_RC_REW
+#define LP_R_INC_X BUTTON_RC_FF
+#define LP_R_DEC_Y BUTTON_RC_SOURCE
+#define LP_R_INC_Y BUTTON_RC_BITRATE
+#endif
+#endif /* CONFIG_REMOTE_KEYPAD */
+
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     int button;
@@ -273,22 +283,37 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
         button = rb->button_get(false);
         switch (button) {
             case LP_QUIT:
+#ifdef CONFIG_REMOTE_KEYPAD
+            case LP_R_QUIT:
+#endif
 #ifdef HAVE_LCD_CHARCELLS
                 pgfx_release();
 #endif
                 return PLUGIN_OK;
             case LP_DEC_X:
+#ifdef CONFIG_REMOTE_KEYPAD
+            case LP_R_DEC_X:
+#endif
                 if (dx)
                     dx += (dx < 0) ? 1 : -1;
                 break;
             case LP_INC_X:
+#ifdef CONFIG_REMOTE_KEYPAD
+            case LP_R_INC_X:
+#endif
                 dx += (dx < 0) ? -1 : 1;
                 break;
             case LP_DEC_Y:
+#ifdef CONFIG_REMOTE_KEYPAD
+            case LP_R_DEC_Y:
+#endif
                 if (dy)
                     dy += (dy < 0) ? 1 : -1;
                 break;
             case LP_INC_Y:
+#ifdef CONFIG_REMOTE_KEYPAD
+            case LP_R_INC_Y:
+#endif
                 dy += (dy < 0) ? -1 : 1;
                 break;
                 
