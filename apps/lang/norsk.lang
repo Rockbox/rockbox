@@ -1171,28 +1171,28 @@ voice: "Rename"
 new: "Endre navn"
 
 id: LANG_PLAYER_KEYBOARD_ABORT
-desc: Abort alternative in player keyboard interaction
-eng: "Abort"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Avbryt"
+new:
 
 id: LANG_PLAYER_KEYBOARD_ACCEPT
-desc: Accept alternative in player keyboard interaction
-eng: "Accept"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Utfør"
+new:
 
 id: LANG_PLAYER_KEYBOARD_BACKSPACE
-desc: Backspace alternative in player keyboard interaction
-eng: "Backspace"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Slette"
+new:
 
 id: LANG_PLAYER_KEYBOARD_DELETE
-desc: Delete alternative in player keyboard interaction
-eng: "Delete"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Slette"
+new:
 
 id: LANG_ID3_GENRE
 desc: ID3 frame 'genre'
@@ -2975,3 +2975,93 @@ desc: Announce that the RTC alarm has been turned off
 eng: "Alarm Disabled"
 voice: "Alarm Disabled"
 new: "Alarm avslått"
+
+id: LANG_RECORD_TRIGGER
+desc: in recording settings_menu
+eng: "Trigger"
+voice: 
+new: "Utløser"
+
+id: LANG_RECORD_START_THRESHOLD
+desc: in recording settings_menu
+eng: "Start above"
+voice: 
+new: "Start over"
+
+id: LANG_RECORD_MIN_DURATION
+desc: in recording settings_menu
+eng: "for at least"
+voice: 
+new: "minst"
+
+id: LANG_RECORD_STOP_THRESHOLD
+desc: in recording settings_menu
+eng: "Stop below"
+voice: 
+new: "Start under"
+
+id: LANG_RECORD_STOP_POSTREC
+desc: in recording settings_menu
+eng: "for at least"
+voice: 
+new: "minst"
+
+id: LANG_RECORD_STOP_GAP
+desc: in recording settings_menu
+eng: "Presplit gap"
+voice: 
+new: "Førsplitt-mellomrom"
+
+id: LANG_RECORD_TRIGGER_MODE
+desc: in recording settings_menu
+eng: "Trigger"
+voice: 
+new: "Utløser"
+
+id: LANG_RECORD_TRIG_NOREARM
+desc: in recording settings_menu
+eng: "Once"
+voice: 
+new: "Én gang"
+
+id: LANG_RECORD_TRIG_REARM
+desc: in recording settings_menu
+eng: "Repeat"
+voice: 
+new: "Gjenta"
+
+id: LANG_DB_INF
+desc: -inf db for values below measurement
+eng: "-inf"
+voice: 
+new: "-uendelig"
+
+id: LANG_RECORD_TRIG_IDLE
+desc: waiting for threshold
+eng: "Trigger idle"
+voice: 
+new: "Utløser venter"
+
+id: LANG_RECORD_TRIGGER_ACTIVE
+desc: 
+eng: "Trigger active"
+voice: 
+new: "Utløser aktiv"
+
+id: LANG_LCD_REMOTE_MENU
+desc: in the display sub menu
+eng: "Remote-LCD Settings"
+voice: ""
+new: "LCD-innstillinger for fjernkontroll"
+
+id: LANG_DISK_NAME_INTERNAL
+desc: in info menu; name for internal disk with multivolume (keep short!)
+eng: "Int:"
+voice: "Intern"
+new: "Int:"
+
+id: LANG_DISK_NAME_MMC
+desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
+eng: "MMC:"
+voice: "Multimediakort"
+new: "MMK:" 
