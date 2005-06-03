@@ -390,11 +390,6 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
 #endif
     
 #if CONFIG_HWCODEC == MAS3507D
-    and_b(~0x20, &PBDRL);
-    sleep(HZ/5);
-    or_b(0x20, &PBDRL);
-    sleep(HZ/5);
-    
     /* set IRQ6 to edge detect */
     ICR |= 0x02;
 
