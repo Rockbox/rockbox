@@ -131,7 +131,7 @@ static bool mp3headerinfo(struct mp3info *info, unsigned long header)
         
     case (1L << 19):
         return false;
-        
+
     case (2L << 19):
         /* MPEG version 2 (ISO/IEC 13818-3) */
         info->version = MPEG_VERSION2;
@@ -678,12 +678,21 @@ int create_xing_header(int fd, int startpos, int filesize,
         }
     }
 
+    /* Use the template header and create a new one.
+       We ignore the Protection bit even if the rest of the stream is
+       protected. (fixme?) */
+    header = xing_header_template & ~(BITRATE_MASK | PROTECTION_MASK);
+    header |= 8 << 12; /* This gives us plenty of space, at least 192 bytes */
+
+    if (!mp3headerinfo(&info, header))
+        return 0;      /* invalid header */
+
     /* Clear the frame */
     memset(buf, 0, 1500);
 
-    /* Use the template header and create a new one */
-    mp3headerinfo(&info, xing_header_template);
-
+    /* Write the header to the buffer */
+    long2bytes(buf, header);
+    
     /* calculate position of VBR header */
     if ( info.version == MPEG_VERSION1 ) {
         if (info.channel_mode == 3) /* mono */
@@ -698,22 +707,8 @@ int create_xing_header(int fd, int startpos, int filesize,
             index = 21;
     }
 
-    /* We ignore the Protection bit even if the rest of the stream is
-       protected. (fixme?) */
-    header = xing_header_template & ~(BITRATE_MASK | PROTECTION_MASK);
-    header |= 8 << 12; /* This gives us plenty of space, at least 192 bytes */
-
-    /* Write the header to the buffer */
-    long2bytes(buf, header);
-    
-    /* Now get the length of the newly created frame */
-    mp3headerinfo(&info, header);
-
     /* Create the Xing data */
-    buf[index] = 'X';
-    buf[index+1] = 'i';
-    buf[index+2] = 'n';
-    buf[index+3] = 'g';
+    memcpy(&buf[index], "Xing", 4);
     long2bytes(&buf[index+4], ((num_frames?VBR_FRAMES_FLAG:0) |
                               (filesize?VBR_BYTES_FLAG:0) |
                               (generate_toc?VBR_TOC_FLAG:0)));
