@@ -1532,7 +1532,7 @@ bool set_option(const char* string, void* variable, enum optiontype type,
 /* This array holds the record timer interval lengths, in seconds */
 static const unsigned long rec_timer_seconds[] =
 {
-    24L*60*60, /* OFF really means 24 hours, to avoid >2Gbyte files */
+    0,        /* 0 means OFF */
     5*60,     /* 00:05 */
     10*60,    /* 00:10 */
     15*60,    /* 00:15 */

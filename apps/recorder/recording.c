@@ -92,6 +92,8 @@ bool f3_rec_screen(void);
 #define SOURCE_LINE 1
 #define SOURCE_SPDIF 2
 
+#define MAX_FILE_SIZE 0x7FF00000 /* 2 GB - 1 MB */
+
 const char* const freq_str[6] =
 {
     "44.1kHz",
@@ -670,6 +672,7 @@ bool recording_screen(void)
         if(update_countdown == 0 || seconds > last_seconds)
         {
             unsigned int dseconds, dhours, dminutes;
+            unsigned long num_recorded_bytes;
             int pos = 0;
 
             update_countdown = 5;
@@ -685,6 +688,7 @@ bool recording_screen(void)
             lcd_puts(0, 0, buf);
 
             dseconds = rec_timesplit_seconds();
+            num_recorded_bytes = mpeg_num_recorded_bytes();
 
             if(audio_stat & AUDIO_STATUS_PRERECORD)
             {
@@ -708,7 +712,7 @@ bool recording_screen(void)
                 else
                 {
                     output_dyn_value(buf2, sizeof buf2,
-                                     mpeg_num_recorded_bytes(),
+                                     num_recorded_bytes,
                                      byte_units, true);
                     snprintf(buf, 32, "%s %s",
                              str(LANG_RECORDING_SIZE), buf2);
@@ -719,7 +723,9 @@ bool recording_screen(void)
             /* We will do file splitting regardless, since the OFF
                setting really means 24 hours. This is to make sure
                that the recorded files don't get too big. */
-            if (audio_stat && (seconds >= dseconds))
+            if (audio_stat && 
+                ((global_settings.rec_timesplit && (seconds >= dseconds))
+                 || (num_recorded_bytes >= MAX_FILE_SIZE)))
             {
                 mpeg_new_file(rec_create_filename(path_buffer));
                 update_countdown = 1;
