@@ -1,13 +1,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define ARTISTLEN        28
-#define ALBUMLEN         24
-#define SONGLEN          52
-#define GENRELEN         12
-#define FILELEN          96
-#define SONGARRAYLEN     14
-#define ALBUMARRAYLEN    1
+#define ARTISTLEN        32
+#define ALBUMLEN         68
+#define SONGLEN          92
+#define GENRELEN         20
+#define FILELEN          212
+#define SONGARRAYLEN     48
+#define ALBUMARRAYLEN    38
 
 
 #define BE32(_x_) (((_x_ & 0xff000000) >> 24) | \
