@@ -405,7 +405,7 @@ if (!scalar keys %entries) {
 }
 
 if ($db) {
-    my $songentrysize = $maxsonglen + 12 + $maxgenrelen+ 4;
+    my $songentrysize = $maxsonglen + 12 + $maxgenrelen+ 12;
     my $albumentrysize = $maxalbumlen + 4 + $maxsongperalbum*4;
     my $artistentrysize = $maxartistlen + $maxalbumsperartist*4;
     my $fileentrysize = $maxfilelen + 12;
@@ -583,6 +583,9 @@ if ($db) {
 	print DB $str; #genre
 	dumpshort(-1);
 	dumpshort($id3->{'YEAR'});
+    dumpint(-1);
+    dumpshort($id3->{'TRACKNUM'});
+    dumpshort(-1);
     }
 
     #### TABLE of file names ###
