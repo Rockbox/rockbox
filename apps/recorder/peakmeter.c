@@ -1143,19 +1143,17 @@ int peak_meter_draw_get_btn(int x, int y, int width, int height)
     long next_refresh = current_tick;
     long next_big_refresh = current_tick + HZ / 10;
     button = BUTTON_NONE;
+
     while (!TIME_AFTER(current_tick, next_big_refresh)) {
         button = button_get(false);
         if (button != BUTTON_NONE) {
             break;
         }
+        sleep(MAX(next_refresh - current_tick, 0) - 1);
+        next_refresh = current_tick + HZ / peak_meter_fps;
         peak_meter_peek();
-        yield();
-
-        if (TIME_AFTER(current_tick, next_refresh)) {
-            peak_meter_draw(x, y, width, height);
-            lcd_update_rect(x, y, width, height);
-            next_refresh = current_tick + HZ / peak_meter_fps;
-        }
+        peak_meter_draw(x, y, width, height);
+        lcd_update_rect(x, y, width, height);
     }
     return button;
 }
