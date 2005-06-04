@@ -68,7 +68,7 @@ my %lcalbums;
 
 my %dir2albumname;
 
-my $dbver = 2;
+my $dbver = 3;
 
 if(! -d $dir or $help) {
     print "'$dir' is not a directory\n" if ($dir ne "" and ! -d $dir);
