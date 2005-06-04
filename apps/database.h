@@ -30,7 +30,7 @@
 #define BE16(_x_) _x_
 #endif
 
-#define SONGENTRY_SIZE    (tagdbheader.songlen+12+tagdbheader.genrelen+4)
+#define SONGENTRY_SIZE    (tagdbheader.songlen+12+tagdbheader.genrelen+12)
 #define FILEENTRY_SIZE    (tagdbheader.filelen+12)
 #define ALBUMENTRY_SIZE   (tagdbheader.albumlen+4+tagdbheader.songarraylen*4)
 #define ARTISTENTRY_SIZE  (tagdbheader.artistlen+tagdbheader.albumarraylen*4)
@@ -72,7 +72,7 @@ extern int tagdb_fd;
 int tagdb_init(void);
 void tagdb_shutdown(void);
 
-#define TAGDB_VERSION 2
+#define TAGDB_VERSION 3
 
 struct rundb_header {
         int version;
