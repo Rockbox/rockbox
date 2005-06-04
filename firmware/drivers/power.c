@@ -68,8 +68,10 @@ void power_init(void)
     GPIO1_ENABLE |= 0x00080000;
     GPIO1_FUNCTION |= 0x00080000;
 
-    /* Hard drive power, default = off */
+#ifdef BOOTLOADER
+    /* Hard drive power default = off in bootloader*/
     GPIO_OUT |= 0x80000000;
+#endif
     GPIO_ENABLE |= 0x80000000;
     GPIO_FUNCTION |= 0x80000000;
 #ifdef HAVE_SPDIF_POWER
