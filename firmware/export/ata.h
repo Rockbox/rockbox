@@ -61,7 +61,9 @@ extern int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count, 
 extern void ata_delayed_write(unsigned long sector, const void* buf);
 extern void ata_flush(void);
 extern void ata_spin(void);
+#if CONFIG_LED == LED_REAL
 extern void ata_set_led_enabled(bool enabled);
+#endif
 extern unsigned short* ata_get_identify(void);
 
 extern long last_disk_activity;

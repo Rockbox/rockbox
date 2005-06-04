@@ -67,8 +67,8 @@
 /* The start address index for ROM builds */
 #define ROM_START 0x14010
 
-/* Define this for programmable LED available */
-#define HAVE_LED
+/* Software controlled LED */
+#define CONFIG_LED LED_REAL
 
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_RTC /* on I2C controlled RTC port */

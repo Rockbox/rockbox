@@ -36,7 +36,9 @@ void panicf( const char *fmt, ...)
     va_list ap;
 
 #ifndef SIMULATOR
+#if CONFIG_LED == LED_REAL
     bool state = false;
+#endif
 
     /* Disable interrupts */
 #if CONFIG_CPU == SH7034
@@ -76,7 +78,7 @@ void panicf( const char *fmt, ...)
     DEBUGF(panic_buf);
     while (1)
     {
-#ifndef SIMULATOR
+#if (CONFIG_LED == LED_REAL) && !defined(SIMULATOR)
         volatile long i;
         led (state);
         state = state?false:true;

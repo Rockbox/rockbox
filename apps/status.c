@@ -60,7 +60,7 @@ struct status_info {
     bool keylock;
     bool battery_safe;
     bool redraw_volume; /* true if the volume gauge needs updating */
-#ifndef HAVE_LED
+#if CONFIG_LED == LED_VIRTUAL
 	bool led; /* disk LED simulation in the status bar */
 #endif
 };
@@ -167,7 +167,7 @@ void status_draw(bool force_redraw)
 #endif
     info.repeat = global_settings.repeat_mode;
     info.playmode = current_playmode();
-#ifndef HAVE_LED
+#if CONFIG_LED == LED_VIRTUAL
     info.led = led_read(HZ/2); /* delay should match polling interval */
 #endif
 
@@ -248,7 +248,7 @@ void status_draw(bool force_redraw)
 #ifdef HAVE_RTC
         statusbar_time(info.hour, info.minute);
 #endif
-#ifndef HAVE_LED
+#if CONFIG_LED == LED_VIRTUAL
         if (info.led)
             statusbar_led();
 #endif

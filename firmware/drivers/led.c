@@ -23,16 +23,11 @@
 #include "system.h"
 #include "kernel.h"
 
-static bool current;
-
-#ifdef HAVE_LED
-
-static bool xor;
+#if CONFIG_LED == LED_REAL
 
 void led(bool on)
 {
-    current = on;
-    if ( on ^ xor )
+    if ( on )
 #ifdef GMINI_ARCH
         P2 |= 1;
     else
@@ -48,21 +43,9 @@ void led(bool on)
 #endif
 }
 
-void invert_led(bool on)
-{
-    if ( on )
-    {
-        xor = 1;
-    }
-    else
-    {
-        xor = 0;
-    }
-    led(current);
-}
+#elif CONFIG_LED == LED_VIRTUAL
 
-#else /* no LED, just status update */
-
+static bool current;
 static long last_on; /* timestamp of switching off */
 
 void led(bool on)
@@ -74,15 +57,10 @@ void led(bool on)
     current = on;
 }
 
-void invert_led(bool on)
-{
-    (void)on; /* no invert feature */
-}
-
 bool led_read(int delayticks) /* read by status bar update */
 {
     /* reading "off" is delayed by user-supplied monoflop value */
     return (current || TIME_BEFORE(current_tick, last_on+delayticks));
 }
 
-#endif // #ifdef HAVE_LED
+#endif /* CONFIG_LED */

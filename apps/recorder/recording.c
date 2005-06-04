@@ -307,7 +307,7 @@ bool recording_screen(void)
     char path_buffer[MAX_PATH];
     bool been_in_usb_mode = false;
     int last_audio_stat = -1;
-#ifdef HAVE_LED
+#if CONFIG_LED == LED_REAL
     bool led_state = false;
     int led_countdown = 2;
 #endif
@@ -320,7 +320,7 @@ bool recording_screen(void)
     };
 
     cursor = 0;
-#if defined(HAVE_LED) && !defined(SIMULATOR)
+#if (CONFIG_LED == LED_REAL) && !defined(SIMULATOR)
     ata_set_led_enabled(false);
 #endif
     mpeg_init_recording();
@@ -356,7 +356,7 @@ bool recording_screen(void)
     while(!done)
     {
         int audio_stat = audio_status();
-#ifdef HAVE_LED
+#if CONFIG_LED == LED_REAL
 
         /*
          * Flash the LED while waiting to record.  Turn it on while
@@ -401,7 +401,7 @@ bool recording_screen(void)
                 led(false);
             }
         }
-#endif /* HAVE_LED */
+#endif /* CONFIG_LED */
 
         /* Wait for a button a while (HZ/10) drawing the peak meter */
         button = peak_meter_draw_get_btn(0, 8 + h*2, LCD_WIDTH, h);
@@ -574,7 +574,7 @@ bool recording_screen(void)
             case REC_SETTINGS:
                 if(audio_stat != AUDIO_STATUS_RECORD)
                 {
-#ifdef HAVE_LED
+#if CONFIG_LED == LED_REAL
                     /* led is restored at begin of loop / end of function */
                     led(false);
 #endif
@@ -607,7 +607,7 @@ bool recording_screen(void)
             case REC_F2:
                 if(audio_stat != AUDIO_STATUS_RECORD)
                 {
-#ifdef HAVE_LED
+#if CONFIG_LED == LED_REAL
                     /* led is restored at begin of loop / end of function */
                     led(false);
 #endif
@@ -633,7 +633,7 @@ bool recording_screen(void)
                 {
                     if(audio_stat != AUDIO_STATUS_RECORD)
                     {
-#ifdef HAVE_LED
+#if CONFIG_LED == LED_REAL
                         /* led is restored at begin of loop / end of function */
                         led(false);
 #endif
@@ -839,7 +839,7 @@ bool recording_screen(void)
     if (have_recorded)
         reload_directory();
 
-#if defined(HAVE_LED) && !defined(SIMULATOR)
+#if (CONFIG_LED == LED_REAL) && !defined(SIMULATOR)
     ata_set_led_enabled(true);
 #endif
     return been_in_usb_mode;

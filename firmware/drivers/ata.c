@@ -241,8 +241,10 @@ static volatile unsigned char* ata_control;
 
 bool old_recorder = false;
 int ata_spinup_time = 0;
+#ifdef CONFIG_LED
 static bool ata_led_enabled = true;
 static bool ata_led_on = false;
+#endif
 static bool spinup = false;
 static bool sleeping = true;
 static long sleep_timeout = 5*HZ;
@@ -475,12 +477,16 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
 #endif
 }
 
+#ifdef CONFIG_LED
 static void ata_led(bool on) {
     ata_led_on = on;
     if (ata_led_enabled) {
         led(ata_led_on);
     }
 }
+#else
+#define ata_led(on)
+#endif
 
 int ata_read_sectors(IF_MV2(int drive,)
                      unsigned long start,
@@ -1468,6 +1474,7 @@ int ata_init(void)
     return 0;
 }
 
+#if CONFIG_LED == LED_REAL
 void ata_set_led_enabled(bool enabled) {
     ata_led_enabled = enabled;
     if (ata_led_enabled) {
@@ -1476,3 +1483,4 @@ void ata_set_led_enabled(bool enabled) {
         led(false);
     }
 }
+#endif

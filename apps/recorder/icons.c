@@ -74,7 +74,7 @@ const unsigned char bitmap_icons_7x8[][7] =
     {0x20,0x30,0x38,0x3c,0x38,0x30,0x20}, /* Up-arrow */
 };
 
-#ifndef HAVE_LED
+#if CONFIG_LED == LED_VIRTUAL
 /* Disk/MMC activity */
 const unsigned char bitmap_icon_disk[12] = 
     {0x15,0x3f,0x7d,0x7B,0x77,0x67,0x79,0x7b,0x57,0x4f,0x47,0x7f};
@@ -405,7 +405,7 @@ void statusbar_icon_lock(void)
                STATUSBAR_Y_POS, 5, 8, false);
 }
 
-#ifndef HAVE_LED
+#if CONFIG_LED == LED_VIRTUAL
 /*
  * no real LED: disk activity in status bar
  */

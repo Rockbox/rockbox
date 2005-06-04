@@ -277,7 +277,7 @@ void init(void)
 
 #ifdef AUTOROCK
     if (!usb_detect())
-    {   
+    {
         int fd;
         static const char filename[] = PLUGIN_DIR "/autostart.rock"; 
 
@@ -303,8 +303,10 @@ int main(void)
     app_main();
 
     while(1) {
+#if CONFIG_LED == LED_REAL
         led(true); sleep(HZ/10);
         led(false); sleep(HZ/10);
+#endif
     }
     return 0;
 }

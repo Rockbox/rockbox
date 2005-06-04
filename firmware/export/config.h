@@ -74,6 +74,11 @@
 #define I2C_GMINI    2 /* Gmini style */
 #define I2C_H100     3 /* iRiver h100 style */
 
+/* CONFIG_LED */
+#define LED_REAL     1 /* SW controlled LED (Archos recorders, player, Gmini) */
+#define LED_VIRTUAL  2 /* Virtual LED (icon) (Archos Ondio) */
+/* else                   HW controlled LED (iRiver H1x0) */
+
 /* now go and pick yours */
 #if defined(ARCHOS_PLAYER)
 #include "config-player.h"

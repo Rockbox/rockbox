@@ -63,7 +63,7 @@ enum icons_7x8 {
 extern const unsigned char bitmap_icons_5x8[1][5];
 extern const unsigned char bitmap_icons_6x8[LastIcon][6];
 extern const unsigned char bitmap_icons_7x8[Icon_Last][7];
-#ifndef HAVE_LED
+#if CONFIG_LED == LED_VIRTUAL
 extern const unsigned char bitmap_icon_disk[];
 #endif
 
@@ -106,7 +106,7 @@ extern void statusbar_icon_lock(void);
 #ifdef HAVE_RTC
 extern void statusbar_time(int hour, int minute);
 #endif
-#ifndef HAVE_LED
+#if CONFIG_LED == LED_VIRTUAL
 extern void	statusbar_led(void);
 #endif
 

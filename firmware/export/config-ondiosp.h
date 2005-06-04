@@ -73,6 +73,9 @@
 /* define this if media can be exchanged on the fly */
 #define HAVE_HOTSWAP
 
+/* Virtual LED (icon) */
+#define CONFIG_LED LED_VIRTUAL
+
 #define CONFIG_LCD LCD_SSD1815
 
 #define BOOTFILE_EXT ".ajz"

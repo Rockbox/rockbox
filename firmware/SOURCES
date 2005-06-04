@@ -52,7 +52,9 @@ drivers/lcd-recorder.c
 #endif
 #endif
 drivers/power.c
+#ifdef CONFIG_LED
 drivers/led.c
+#endif
 #ifndef SIMULATOR
 drivers/adc.c
 #ifdef HAVE_MMC

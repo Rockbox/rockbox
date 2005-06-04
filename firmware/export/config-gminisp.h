@@ -48,7 +48,8 @@
 
 #define GMINI_ARCH
 
-#define HAVE_LED
+/* Software controlled LED */
+#define CONFIG_LED LED_REAL
 
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ
