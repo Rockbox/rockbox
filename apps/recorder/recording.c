@@ -290,15 +290,12 @@ static void trigger_listener(int trigger_status)
     }
 }
 
-#define BLINK_MASK 0x10
-
 bool recording_screen(void)
 {
     long button;
     bool done = false;
     char buf[32];
     char buf2[32];
-    long timeout = current_tick + HZ/10;
     int gain;
     int w, h;
     int update_countdown = 1;
@@ -309,7 +306,8 @@ bool recording_screen(void)
     bool been_in_usb_mode = false;
     int last_audio_stat = -1;
 #ifdef HAVE_LED
-    bool last_led_stat = false;
+    bool led_state = false;
+    int led_countdown = 2;
 #endif
 
     const unsigned char *byte_units[] = {
@@ -366,17 +364,11 @@ bool recording_screen(void)
         {
             if (audio_stat & AUDIO_STATUS_PAUSE)
             {
-                /*
-                This is supposed to be the same as
-                  led(current_tick & BLINK_MASK)
-                But we do this hubub to prevent unnecessary hardware
-                communication when the led already has the desired state.
-                */
-                if (last_led_stat != ((current_tick & BLINK_MASK) == BLINK_MASK))
+                if (--led_countdown <= 0)
                 {
-                    /* trigger is on in status TRIG_READY (no check needed) */
-                    last_led_stat = !last_led_stat;
-                    led(last_led_stat);
+                    led_state = !led_state;
+                    led(led_state);
+                    led_countdown = 2;
                 }
             }
             else
@@ -388,21 +380,17 @@ bool recording_screen(void)
         else
         {
             int trigStat = peak_meter_trigger_status();
-
-            // other trigger stati than trig_off and trig_steady
-            // already imply that we are recording.
+            /*
+             * other trigger stati than trig_off and trig_steady
+             * already imply that we are recording.
+             */
             if (trigStat == TRIG_STEADY)
             {
-                /* This is supposed to be the same as
-                   led(current_tick & BLINK_MASK)
-                   But we do this hubub to prevent unnecessary hardware
-                   communication when the led already has the desired state.
-                */
-                if (last_led_stat != ((current_tick & BLINK_MASK) == BLINK_MASK))
+                if (--led_countdown <= 0)
                 {
-                    /* trigger is on in status TRIG_READY (no check needed) */
-                    last_led_stat = !last_led_stat;
-                    led(last_led_stat);
+                    led_state = !led_state;
+                    led(led_state);
+                    led_countdown = 2;
                 }
             }
             else
@@ -413,7 +401,7 @@ bool recording_screen(void)
         }
 #endif /* HAVE_LED */
 
-        /* Wait for a button while drawing the peak meter */
+        /* Wait for a button a while (HZ/10) drawing the peak meter */
         button = peak_meter_draw_get_btn(0, 8 + h*2, LCD_WIDTH, h);
 
         if (last_audio_stat != audio_stat)
@@ -428,20 +416,18 @@ bool recording_screen(void)
         switch(button)
         {
             case REC_STOPEXIT:
+                /* turn off the trigger */
+                peak_meter_trigger(false);
+                peak_meter_set_trigger_listener(NULL);
+
                 if(audio_stat & AUDIO_STATUS_RECORD)
                 {
-                    /* turn off the trigger */
-                    peak_meter_trigger(false);
-                    peak_meter_set_trigger_listener(NULL);
                     audio_stop();
                 }
                 else
                 {
                     peak_meter_playback(true);
                     peak_meter_enabled = false;
-                    /* turn off the trigger */
-                    peak_meter_set_trigger_listener(NULL);
-                    peak_meter_trigger(false);
                     done = true;
                 }
                 update_countdown = 1; /* Update immediately */
@@ -459,7 +445,6 @@ bool recording_screen(void)
                         have_recorded = true;
                         talk_buffer_steal(); /* we use the mp3 buffer */
                         mpeg_record(rec_create_filename(path_buffer));
-                        update_countdown = 1; /* Update immediately */
                         last_seconds = 0;
                         if (global_settings.talk_menu)
                         {   /* no voice possible here, but a beep */
@@ -470,8 +455,6 @@ bool recording_screen(void)
                     /* this is triggered recording */
                     else
                     {
-                        update_countdown = 1; /* Update immediately */
-
                         /* we don't start recording now, but enable the
                            trigger and let the callback function
                            trigger_listener control when the recording starts */
@@ -493,8 +476,8 @@ bool recording_screen(void)
                     {
                         mpeg_pause_recording();
                     }
-                    update_countdown = 1; /* Update immediately */
                 }
+                update_countdown = 1; /* Update immediately */
                 break;
 
 #ifdef REC_PREV
@@ -520,35 +503,29 @@ bool recording_screen(void)
                     case 0:
                         if(global_settings.rec_source == SOURCE_MIC)
                         {
-                            global_settings.rec_mic_gain++;
-                            if(global_settings.rec_mic_gain >
+                            if(global_settings.rec_mic_gain <
                                sound_max(SOUND_MIC_GAIN))
-                                global_settings.rec_mic_gain =
-                                    sound_max(SOUND_MIC_GAIN);
+                            global_settings.rec_mic_gain++;
                         }
                         else
                         {
                             gain = MAX(global_settings.rec_left_gain,
-                                       global_settings.rec_right_gain) + 1;
-                            if(gain > sound_max(SOUND_MIC_GAIN))
-                                gain = sound_max(SOUND_MIC_GAIN);
+                                       global_settings.rec_right_gain);
+                            if(gain < sound_max(SOUND_LEFT_GAIN))
+                                gain++;
                             global_settings.rec_left_gain = gain;
                             global_settings.rec_right_gain = gain;
                         }
                         break;
                     case 1:
-                        global_settings.rec_left_gain++;
-                        if(global_settings.rec_left_gain >
+                        if(global_settings.rec_left_gain <
                            sound_max(SOUND_LEFT_GAIN))
-                            global_settings.rec_left_gain =
-                                sound_max(SOUND_LEFT_GAIN);
+                            global_settings.rec_left_gain++;
                         break;
                     case 2:
-                        global_settings.rec_right_gain++;
-                        if(global_settings.rec_right_gain >
+                        if(global_settings.rec_right_gain <
                            sound_max(SOUND_RIGHT_GAIN))
-                            global_settings.rec_right_gain =
-                                sound_max(SOUND_RIGHT_GAIN);
+                            global_settings.rec_right_gain++;
                         break;
                 }
                 set_gain();
@@ -562,35 +539,29 @@ bool recording_screen(void)
                     case 0:
                         if(global_settings.rec_source == SOURCE_MIC)
                         {
-                            global_settings.rec_mic_gain--;
-                            if(global_settings.rec_mic_gain <
+                            if(global_settings.rec_mic_gain >
                                sound_min(SOUND_MIC_GAIN))
-                                global_settings.rec_mic_gain =
-                                    sound_min(SOUND_MIC_GAIN);
+                                global_settings.rec_mic_gain--;
                         }
                         else
                         {
                             gain = MAX(global_settings.rec_left_gain,
-                                       global_settings.rec_right_gain) - 1;
-                            if(gain < sound_min(SOUND_LEFT_GAIN))
-                                gain = sound_min(SOUND_LEFT_GAIN);
+                                       global_settings.rec_right_gain);
+                            if(gain > sound_min(SOUND_LEFT_GAIN))
+                                gain--;
                             global_settings.rec_left_gain = gain;
                             global_settings.rec_right_gain = gain;
                         }
                         break;
                     case 1:
-                        global_settings.rec_left_gain--;
-                        if(global_settings.rec_left_gain <
+                        if(global_settings.rec_left_gain >
                            sound_min(SOUND_LEFT_GAIN))
-                            global_settings.rec_left_gain =
-                                sound_min(SOUND_LEFT_GAIN);
+                            global_settings.rec_left_gain--;
                         break;
                     case 2:
-                        global_settings.rec_right_gain--;
-                        if(global_settings.rec_right_gain <
-                           sound_min(SOUND_MIC_GAIN))
-                            global_settings.rec_right_gain =
-                                sound_min(SOUND_MIC_GAIN);
+                        if(global_settings.rec_right_gain >
+                           sound_min(SOUND_RIGHT_GAIN))
+                            global_settings.rec_right_gain--;
                         break;
                 }
                 set_gain();
@@ -691,138 +662,133 @@ bool recording_screen(void)
                 break;
         }
 
-        if(TIME_AFTER(current_tick, timeout))
+        lcd_setfont(FONT_SYSFIXED);
+
+        seconds = mpeg_recorded_time() / HZ;
+ 
+        update_countdown--;
+        if(update_countdown == 0 || seconds > last_seconds)
         {
-            lcd_setfont(FONT_SYSFIXED);
+            unsigned int dseconds, dhours, dminutes;
+            int pos = 0;
 
-            timeout = current_tick + HZ/10;
+            update_countdown = 5;
+            last_seconds = seconds;
 
-            seconds = mpeg_recorded_time() / HZ;
-            
-            update_countdown--;
-            if(update_countdown == 0 || seconds > last_seconds)
+            lcd_clear_display();
+
+            hours = seconds / 3600;
+            minutes = (seconds - (hours * 3600)) / 60;
+            snprintf(buf, 32, "%s %02d:%02d:%02d",
+                     str(LANG_RECORDING_TIME),
+                     hours, minutes, seconds%60);
+            lcd_puts(0, 0, buf);
+
+            dseconds = rec_timesplit_seconds();
+
+            if(audio_stat & AUDIO_STATUS_PRERECORD)
             {
-                unsigned int dseconds, dhours, dminutes;
-                int pos = 0;
-
-                update_countdown = 5;
-                last_seconds = seconds;
-
-                lcd_clear_display();
-
-                hours = seconds / 3600;
-                minutes = (seconds - (hours * 3600)) / 60;
-                snprintf(buf, 32, "%s %02d:%02d:%02d",
-                         str(LANG_RECORDING_TIME),
-                         hours, minutes, seconds%60);
-                lcd_puts(0, 0, buf);
-
-                dseconds = rec_timesplit_seconds(); 
-
-                if(audio_stat & AUDIO_STATUS_PRERECORD)
+                snprintf(buf, 32, "%s...", str(LANG_RECORD_PRERECORD));
+            }
+            else
+            {
+                /* Display the split interval if the record timesplit
+                   is active */
+                if (global_settings.rec_timesplit)
                 {
-                    snprintf(buf, 32, "%s...", str(LANG_RECORD_PRERECORD));
+                    /* Display the record timesplit interval rather
+                       than the file size if the record timer is
+                       active */
+                    dhours = dseconds / 3600;
+                    dminutes = (dseconds - (dhours * 3600)) / 60;
+                    snprintf(buf, 32, "%s %02d:%02d",
+                             str(LANG_RECORD_TIMESPLIT_REC),
+                             dhours, dminutes);
                 }
                 else
                 {
-                    /* Display the split interval if the record timesplit
-                       is active */
-                    if (global_settings.rec_timesplit)
-                    {
-                        /* Display the record timesplit interval rather
-                           than the file size if the record timer is
-                           active */
-                        dhours = dseconds / 3600;
-                        dminutes = (dseconds - (dhours * 3600)) / 60;
-                        snprintf(buf, 32, "%s %02d:%02d",
-                                 str(LANG_RECORD_TIMESPLIT_REC),
-                                 dhours, dminutes);
-                    }
-                    else
-                    {
-                        output_dyn_value(buf2, sizeof buf2,
-                                         mpeg_num_recorded_bytes(),
-                                         byte_units, true);
-                        snprintf(buf, 32, "%s %s",
-                                 str(LANG_RECORDING_SIZE), buf2);
-                    }
+                    output_dyn_value(buf2, sizeof buf2,
+                                     mpeg_num_recorded_bytes(),
+                                     byte_units, true);
+                    snprintf(buf, 32, "%s %s",
+                             str(LANG_RECORDING_SIZE), buf2);
                 }
-                lcd_puts(0, 1, buf);
+            }
+            lcd_puts(0, 1, buf);
 
-                /* We will do file splitting regardless, since the OFF
-                   setting really means 24 hours. This is to make sure
-                   that the recorded files don't get too big. */
-                if (audio_stat && (seconds >= dseconds))
-                {
-                    mpeg_new_file(rec_create_filename(path_buffer));
-                    update_countdown = 1;
-                    last_seconds = 0;
-                }
+            /* We will do file splitting regardless, since the OFF
+               setting really means 24 hours. This is to make sure
+               that the recorded files don't get too big. */
+            if (audio_stat && (seconds >= dseconds))
+            {
+                mpeg_new_file(rec_create_filename(path_buffer));
+                update_countdown = 1;
+                last_seconds = 0;
+            }
 
-                /* Show mic gain if input source is Mic */
-                if(global_settings.rec_source == 0)
+            /* Show mic gain if input source is Mic */
+            if(global_settings.rec_source == 0)
+            {
+                snprintf(buf, 32, "%s: %s", str(LANG_RECORDING_GAIN),
+                         fmt_gain(SOUND_MIC_GAIN,
+                                  global_settings.rec_mic_gain,
+                                  buf2, sizeof(buf2)));
+                if (global_settings.invert_cursor && (pos++ == cursor))
+                    lcd_puts_style(0, 4, buf, STYLE_INVERT);
+                else
+                    lcd_puts(0, 4, buf);
+            }
+            else
+            {
+                if(global_settings.rec_source == SOURCE_LINE)
                 {
+                    gain = MAX(global_settings.rec_left_gain,
+                               global_settings.rec_right_gain);
+
                     snprintf(buf, 32, "%s: %s", str(LANG_RECORDING_GAIN),
-                             fmt_gain(SOUND_MIC_GAIN,
-                                      global_settings.rec_mic_gain,
+                             fmt_gain(SOUND_LEFT_GAIN, gain,
                                       buf2, sizeof(buf2)));
                     if (global_settings.invert_cursor && (pos++ == cursor))
                         lcd_puts_style(0, 4, buf, STYLE_INVERT);
                     else
                         lcd_puts(0, 4, buf);
+
+                    snprintf(buf, 32, "%s: %s", str(LANG_RECORDING_LEFT),
+                             fmt_gain(SOUND_LEFT_GAIN,
+                                      global_settings.rec_left_gain,
+                                      buf2, sizeof(buf2)));
+                    if (global_settings.invert_cursor && (pos++ == cursor))
+                        lcd_puts_style(0, 5, buf, STYLE_INVERT);
+                    else
+                        lcd_puts(0, 5, buf);
+
+                    snprintf(buf, 32, "%s: %s", str(LANG_RECORDING_RIGHT),
+                             fmt_gain(SOUND_RIGHT_GAIN,
+                                      global_settings.rec_right_gain,
+                                      buf2, sizeof(buf2)));
+                    if (global_settings.invert_cursor && (pos++ == cursor))
+                        lcd_puts_style(0, 6, buf, STYLE_INVERT);
+                    else
+                        lcd_puts(0, 6, buf);
                 }
-                else
-                {
-                    if(global_settings.rec_source == SOURCE_LINE)
-                    {
-                        gain = MAX(global_settings.rec_left_gain,
-                                   global_settings.rec_right_gain);
-
-                        snprintf(buf, 32, "%s: %s", str(LANG_RECORDING_GAIN),
-                                 fmt_gain(SOUND_LEFT_GAIN, gain,
-                                          buf2, sizeof(buf2)));
-                        if (global_settings.invert_cursor && (pos++ == cursor))
-                            lcd_puts_style(0, 4, buf, STYLE_INVERT);
-                        else
-                            lcd_puts(0, 4, buf);
-                        
-                        snprintf(buf, 32, "%s: %s", str(LANG_RECORDING_LEFT),
-                                 fmt_gain(SOUND_LEFT_GAIN,
-                                          global_settings.rec_left_gain,
-                                          buf2, sizeof(buf2)));
-                        if (global_settings.invert_cursor && (pos++ == cursor))
-                            lcd_puts_style(0, 5, buf, STYLE_INVERT);
-                        else
-                            lcd_puts(0, 5, buf);
-                        
-                        snprintf(buf, 32, "%s: %s", str(LANG_RECORDING_RIGHT),
-                                 fmt_gain(SOUND_RIGHT_GAIN,
-                                          global_settings.rec_right_gain,
-                                          buf2, sizeof(buf2)));
-                        if (global_settings.invert_cursor && (pos++ == cursor))
-                            lcd_puts_style(0, 6, buf, STYLE_INVERT);
-                        else
-                            lcd_puts(0, 6, buf);
-                    }
-                }
-
-                if(global_settings.rec_source != SOURCE_SPDIF)
-                    put_cursorxy(0, 4 + cursor, true);
-
-                if (global_settings.rec_source != SOURCE_LINE) {
-                    snprintf(buf, 32, "%s %s [%d]",
-                             freq_str[global_settings.rec_frequency],
-                             global_settings.rec_channels?
-                             str(LANG_CHANNEL_MONO):str(LANG_CHANNEL_STEREO),
-                             global_settings.rec_quality);
-                    lcd_puts(0, 6, buf);
-                }
-
-                status_draw(true);
-                peak_meter_draw(0, 8 + h*2, LCD_WIDTH, h);
-
-                lcd_update();
             }
+
+            if(global_settings.rec_source != SOURCE_SPDIF)
+                put_cursorxy(0, 4 + cursor, true);
+
+            if (global_settings.rec_source != SOURCE_LINE) {
+                snprintf(buf, 32, "%s %s [%d]",
+                         freq_str[global_settings.rec_frequency],
+                         global_settings.rec_channels?
+                         str(LANG_CHANNEL_MONO):str(LANG_CHANNEL_STEREO),
+                         global_settings.rec_quality);
+                lcd_puts(0, 6, buf);
+            }
+
+            status_draw(true);
+            peak_meter_draw(0, 8 + h*2, LCD_WIDTH, h);
+
+            lcd_update();
 
             /* draw the trigger status */
             if (peak_meter_trigger_status() != TRIG_OFF)
@@ -838,8 +804,6 @@ bool recording_screen(void)
             done = true;
         }
     }
-
-    invert_led(false);
 
     if(audio_status() & AUDIO_STATUS_ERROR)
     {
