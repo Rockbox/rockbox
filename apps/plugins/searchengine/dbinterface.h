@@ -43,6 +43,9 @@ struct entry {
     long albumoffset;
     char *artistname;
     char *albumname;
+    long playtime;
+    short track;
+    short samplerate;
 };
 
 extern struct entry *currententry;

@@ -25,7 +25,7 @@
 #undef ARTISTENTRY_SIZE
 #undef FILERECORD2OFFSET
 
-#define SONGENTRY_SIZE    (rb->tagdbheader->songlen+12+rb->tagdbheader->genrelen+4)
+#define SONGENTRY_SIZE    (rb->tagdbheader->songlen+12+rb->tagdbheader->genrelen+12)
 #define FILEENTRY_SIZE    (rb->tagdbheader->filelen+12)
 #define ALBUMENTRY_SIZE   (rb->tagdbheader->albumlen+4+rb->tagdbheader->songarraylen*4)
 #define ARTISTENTRY_SIZE  (rb->tagdbheader->artistlen+rb->tagdbheader->albumarraylen*4)
@@ -103,6 +103,9 @@ void loadsongdata() {
     rb->read(*rb->tagdb_fd,currententry->genre,rb->tagdbheader->genrelen);
     currententry->bitrate=readshort(*rb->tagdb_fd);
     currententry->year=readshort(*rb->tagdb_fd);
+    currententry->playtime=readlong(*rb->tagdb_fd);
+    currententry->track=readshort(*rb->tagdb_fd);
+    currententry->samplerate=readshort(*rb->tagdb_fd);
     currententry->loadedsongdata=1;
 }
 
