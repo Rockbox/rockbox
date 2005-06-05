@@ -30,19 +30,31 @@ This tool converts the rdf file to the binary data used in the dict plugin.
 /* maximum word lenght, has to be the same in dict.c */
 #define WORDLEN 32
 
+/* struckt packing */
+#ifdef __GNUC__
+#define STRUCT_PACKED __attribute__((packed))
+#else
+#define STRUCT_PACKED
+#pragma pack (push, 2)
+#endif
+
+
 struct word
 {
     char word[WORDLEN];
     long offset;
-};
+} STRUCT_PACKED;
 
 /* convert offsets here, not on device. */
-long long_to_big_endian (void* value)
-{
-    unsigned char* bytes = (unsigned char*) value;
-    return (long)bytes[0] | ((long)bytes[1] << 8) |
-           ((long)bytes[2] << 16) | ((long)bytes[3] << 24);
+long reverse (long N) {
+    unsigned char B[4];
+    B[0] = (N & 0x000000FF) >> 0;
+    B[1] = (N & 0x0000FF00) >> 8;
+    B[2] = (N & 0x00FF0000) >> 16;
+    B[3] = (N & 0xFF000000) >> 24;
+    return ((B[0] << 24) | (B[1] << 16) | (B[2] << 8) | (B[3] << 0));
 }
+
 
 int main()
 {
@@ -77,7 +89,7 @@ int main()
 
         /* We will null-terminate the words */
         strncpy(w.word, word, WORDLEN - 1);
-        w.offset = long_to_big_endian(&cur_offset);
+        w.offset = reverse(cur_offset);
         fwrite(&w, sizeof(struct word), 1, idx_out);
 
         while (1)
