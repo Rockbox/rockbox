@@ -50,7 +50,10 @@ dir is the current direction of the snake - 0=up, 1=right, 2=down, 3=left;
 #error "lacks keymapping"
 #endif
 
-static int board[28][16],snakelength;
+#define BOARD_WIDTH (LCD_WIDTH/4)
+#define BOARD_HEIGHT (LCD_HEIGHT/4)
+
+static int board[BOARD_WIDTH][BOARD_HEIGHT],snakelength;
 static unsigned int score,hiscore=0;
 static short dir,frames,apple,level=1,dead=0;
 static struct plugin_api* rb;
@@ -90,7 +93,7 @@ void colission (short x, short y)
             die();
             break;
     }
-    if (x==28 || x<0 || y==16 || y<0) 
+    if (x==BOARD_WIDTH || x<0 || y==BOARD_HEIGHT || y<0) 
         die();
 }
 
@@ -120,8 +123,8 @@ void move_head (short x, short y)
 void frame (void)
 {
     short x,y,head=0;
-    for (x=0; x<28; x++) {
-        for (y=0; y<16; y++) {
+    for (x=0; x<BOARD_WIDTH; x++) {
+        for (y=0; y<BOARD_HEIGHT; y++) {
             switch (board[x][y]) {
                 case 1:
                     if (!head) {
@@ -154,8 +157,8 @@ void redraw (void)
 {
     short x,y;
     rb->lcd_clear_display();
-    for (x=0; x<28; x++) {
-        for (y=0; y<16; y++) {
+    for (x=0; x<BOARD_WIDTH; x++) {
+        for (y=0; y<BOARD_HEIGHT; y++) {
             switch (board[x][y]) {
                 case -1:
                     rb->lcd_fillrect((x*4)+1,y*4,2,4);
@@ -216,8 +219,8 @@ void game (void) {
             frames=0;
             if (!apple) {
                 do {
-                    x=rb->rand() % 28;
-                    y=rb->rand() % 16;
+                    x=rb->rand() % BOARD_WIDTH;
+                    y=rb->rand() % BOARD_HEIGHT;
                 } while (board[x][y]);
                 apple=1;
                 board[x][y]=-1;
@@ -263,8 +266,8 @@ void game_init(void) {
     short x,y;
     char plevel[10],phscore[20];
 
-    for (x=0; x<28; x++) {
-        for (y=0; y<16; y++) {
+    for (x=0; x<BOARD_WIDTH; x++) {
+        for (y=0; y<BOARD_HEIGHT; y++) {
             board[x][y]=0;
         }
     }
