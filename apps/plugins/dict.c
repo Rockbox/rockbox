@@ -27,12 +27,20 @@ static int display_columns, display_lines;
 /* Some lenghts */
 #define WORDLEN 32 /* has to be the same in rdf2binary.c */
 
+/* Struct packing */
+#ifdef __GNUC__
+#define STRUCT_PACKED __attribute__((packed))
+#else
+#define STRUCT_PACKED
+#pragma pack (push, 2)
+#endif
+
 /* The word struct :) */
 struct stWord
 {
     char word[WORDLEN];
     long offset;
-};
+} STRUCT_PACKED;
 
 /* A funtion to get width and height etc (from viewer.c) */
 void init_screen(void)
@@ -79,13 +87,15 @@ void pl_malloc_init(void)
 
 /* for endian problems */
 #ifdef ROCKBOX_BIG_ENDIAN
-#define readlong(x) x
+#define reverse(x) x
 #else
-long readlong(void* value)
-{
-    unsigned char* bytes = (unsigned char*) value;
-    return (long)bytes[0] | ((long)bytes[1] << 8) |
-           ((long)bytes[2] << 16) | ((long)bytes[3] << 24);
+long reverse (long N) {
+    unsigned char B[4];
+    B[0] = (N & 0x000000FF) >> 0;
+    B[1] = (N & 0x0000FF00) >> 8;
+    B[2] = (N & 0x00FF0000) >> 16;
+    B[3] = (N & 0xFF000000) >> 24;
+    return ((B[0] << 24) | (B[1] << 16) | (B[2] << 8) | (B[3] << 0));
 }
 #endif
 
@@ -95,6 +105,10 @@ long readlong(void* value)
 #else
 #define LP_QUIT BUTTON_OFF
 #endif
+
+/* data files */
+#define DICT_INDEX ROCKBOX_DIR "/dict.index"
+#define DICT_DESC ROCKBOX_DIR "/dict.desc"
 
 /* the main plugin function */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
@@ -140,7 +154,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     rb->kbd_input(searchword, sizeof(searchword)); /* get the word to search */
 
-    fIndex = rb->open("/.rockbox/dict.index", O_RDONLY); /* index file */
+    fIndex = rb->open(DICT_INDEX, O_RDONLY); /* index file */
     if (fIndex < 0)
     {
         DEBUGF("Err: Failed to open index file.\n");
@@ -189,10 +203,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         return PLUGIN_OK;
     }
 
-    DEBUGF("Found %s at offset %d\n", word.word, readlong(&word.offset));
+    DEBUGF("Found %s at offset %d\n", word.word, reverse(word.offset));
 
     /* now open the description file */
-    fData = rb->open("/.rockbox/dict.desc", O_RDONLY);
+    fData = rb->open(DICT_DESC, O_RDONLY);
     if (fData < 0)
     {
         DEBUGF("Err: Failed to open description file.\n");
@@ -202,7 +216,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }
 
     /* seek to the right offset */
-    rb->lseek(fData, (off_t)readlong(&word.offset), SEEK_SET);
+    rb->lseek(fData, (off_t)reverse(word.offset), SEEK_SET);
 
     /* Read in the description */
     rb->read_line(fData, description, display_columns * display_lines);
