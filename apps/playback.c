@@ -1132,7 +1132,7 @@ int audio_status(void)
 void audio_init(void)
 {
     logf("audio api init");
-    codecbuflen = audiobufend - audiobuf - AUDIOBUF_SIZE 
+    codecbuflen = audiobufend - audiobuf - PCMBUF_SIZE 
                   - MALLOC_BUFSIZE - GUARD_BUFSIZE;
     //codecbuflen = 2*512*1024;
     codecbufused = 0;
@@ -1142,7 +1142,7 @@ void audio_init(void)
     paused = false;
     track_changed = false;
     
-    logf("abuf:%0x", AUDIOBUF_SIZE);
+    logf("abuf:%0x", PCMBUF_SIZE);
     logf("fbuf:%0x", codecbuflen);
     logf("mbuf:%0x", MALLOC_BUFSIZE);
     
