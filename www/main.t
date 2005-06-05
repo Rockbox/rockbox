@@ -17,6 +17,9 @@ upgrade your ordinary Archos firmware.
 
 <h2>News</h2>
 
+<p><i>2005-06-06</i>: Rockbox plays MP3 and Ogg Vorbis music on the iRiver
+ H1xx.
+
 <p><i>2005-02-08</i>: <a
 href="http://www.rockbox.org/twiki/bin/view/Main/RockboxShots">Evidence</a> of
 Rockbox <a
