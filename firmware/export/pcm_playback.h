@@ -19,6 +19,8 @@
 #ifndef PCM_PLAYBACK_H
 #define PCM_PLAYBACK_H
 
+#define PCMBUF_SIZE   (1*1024*1024)
+
 void pcm_init(void);
 void pcm_set_frequency(unsigned int frequency);
 
@@ -37,5 +39,9 @@ void pcm_play_start(void);
 bool pcm_play_add_chunk(void *addr, int size, void (*callback)(void));
 int pcm_play_num_used_buffers(void);
 void pcm_play_set_watermark(int numbytes, void (*callback)(int bytes_left));
+
+void pcm_set_boost_mode(bool state);
+unsigned int audiobuffer_get_latency(void);
+bool audiobuffer_insert(char *buf, size_t length);
 
 #endif

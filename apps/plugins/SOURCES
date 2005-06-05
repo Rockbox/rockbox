@@ -72,6 +72,10 @@ mpa2wav.c
 a52towav.c
 flac2wav.c
 vorbis2wav.c
+#ifdef IRIVER_H100
+codecvorbis.c
+codecmpa.c
+#endif
 wv2wav.c
 mpc2wav.c
 midi2wav.c

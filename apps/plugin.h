@@ -383,6 +383,11 @@ struct plugin_api {
 };
 
 /* defined by the plugin loader (plugin.c) */
+#ifdef IRIVER_H100
+int codec_load_ram(char* pluginptr, size_t size, void *parameter, void* ptr2, size_t bufwrap);
+int codec_load_file(const char* plugin, void* parameter);
+#endif
+
 int plugin_load(const char* plugin, void* parameter);
 void* plugin_get_buffer(int *buffer_size);
 void* plugin_get_audio_buffer(int *buffer_size);

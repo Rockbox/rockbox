@@ -21,7 +21,6 @@
 #include "debug.h"
 #include "panic.h"
 #include <kernel.h>
-#include "pcm_playback.h"
 #ifndef SIMULATOR
 #include "cpu.h"
 #include "i2c.h"
@@ -32,18 +31,46 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#include "pcm_playback.h"
 #include "lcd.h"
 #include "button.h"
 #include "file.h"
 #include "buffer.h"
-
 #include "sprintf.h"
 #include "button.h"
 #include <string.h>
 
+#define CHUNK_SIZE           32768
+/* Must be a power of 2 */
+#define NUM_PCM_BUFFERS      (PCMBUF_SIZE / CHUNK_SIZE)
+#define NUM_PCM_BUFFERS_MASK (NUM_PCM_BUFFERS - 1)
+#define PCM_WATERMARK        0x10000
+
 static bool pcm_playing;
 static bool pcm_paused;
 static int pcm_freq = 0x6; /* 44.1 is default */
+
+static char *audiobuffer;
+static size_t audiobuffer_pos;
+static volatile size_t audiobuffer_free;
+static size_t audiobuffer_fillpos;
+static bool boost_mode;
+
+static unsigned char *next_start;
+static long next_size;
+
+struct pcmbufdesc
+{
+    void *addr;
+    int size;
+    void (*callback)(void); /* Call this when the buffer has been played */
+} pcmbuffers[NUM_PCM_BUFFERS];
+
+volatile int pcmbuf_read_index;
+volatile int pcmbuf_write_index;
+int pcmbuf_unplayed_bytes;
+int pcmbuf_watermark;
+void (*pcmbuf_watermark_callback)(int bytes_left);
 
 /* Set up the DMA transfer that kicks in when the audio FIFO gets empty */
 static void dma_start(const void *addr, long size)
@@ -75,6 +102,15 @@ static void dma_stop(void)
     IIS2CONFIG = 0x800;
 }
 
+void pcm_boost(bool state)
+{
+    static bool boost_state = false;
+    
+    if (state != boost_state) {
+        cpu_boost(state);
+        boost_state = state;
+    }
+}
 
 /* set volume of the main channel */
 void pcm_set_volume(int volume)
@@ -113,152 +149,9 @@ void pcm_set_frequency(unsigned int frequency)
 /* the registered callback function to ask for more mp3 data */
 static void (*callback_for_more)(unsigned char**, long*) = NULL;
 
-void pcm_play_data(const unsigned char* start, int size,
-                   void (*get_more)(unsigned char** start, long* size))
-{
-    callback_for_more = get_more;
-
-    dma_start(start, size);
-}
-
-void pcm_play_stop(void)
-{
-    dma_stop();
-}
-
-void pcm_play_pause(bool play)
-{
-    if(pcm_paused && play)
-    {
-        /* Enable the FIFO and force one write to it */
-        IIS2CONFIG = (pcm_freq << 12) | 0x300;
-        DCR0 |= DMA_START;
-        
-        pcm_paused = false;
-    }
-    else if(!pcm_paused && !play)
-    {
-        IIS2CONFIG = 0x800;
-        pcm_paused = true;
-    }
-}
-
-bool pcm_is_playing(void)
-{
-    return pcm_playing;
-}
-
-/* DMA0 Interrupt is called when the DMA has finished transfering a chunk */
-void DMA0(void) __attribute__ ((interrupt_handler, section(".icode")));
-void DMA0(void)
-{
-    unsigned char* start;
-    long size = 0;
-
-    int res = DSR0;
-
-    DSR0 = 1;    /* Clear interrupt */
-
-    /* Stop on error */
-    if(res & 0x70)
-    {
-       dma_stop();
-    }
-    else
-    {
-        if (callback_for_more)
-        {
-            callback_for_more(&start, &size);
-        }
-        
-        if(size)
-        {
-            SAR0 = (unsigned long)start;  /* Source address */
-            BCR0 = size;                  /* Bytes to transfer */
-        }
-        else
-        {
-            /* Finished playing */
-            dma_stop();
-        }
-    }
-    
-    IPR |= (1<<14); /* Clear pending interrupt request */
-}
-
-void pcm_init(void)
-{
-    pcm_playing = false;
-    pcm_paused = false;
-    
-    uda1380_init();
-
-    BUSMASTER_CTRL = 0x81; /* PARK[1,0]=10 + BCR24BIT */
-    DIVR0 = 54;            /* DMA0 is mapped into vector 54 in system.c */
-    DMAROUTE = (DMAROUTE & 0xffffff00) | DMA0_REQ_AUDIO_1;
-    DMACONFIG = 1;   /* DMA0Req = PDOR3 */
-
-    /* Reset the audio FIFO */
-    IIS2CONFIG = 0x800;
-    
-    /* Enable interrupt at level 7, priority 0 */
-    ICR4 = (ICR4 & 0xffff00ff) | 0x00001c00;
-    IMR &= ~(1<<14);      /* bit 14 is DMA0 */
-
-    pcm_set_frequency(44100);
-}
-
-
-#define NUM_PCM_BUFFERS 16 /* Must be a power of 2 */
-#define NUM_PCM_BUFFERS_MASK (NUM_PCM_BUFFERS - 1)
-
-struct pcmbufdesc
-{
-    void *addr;
-    int size;
-    void (*callback)(void); /* Call this when the buffer has been played */
-} pcmbuffers[NUM_PCM_BUFFERS];
-
-int pcmbuf_read_index;
-int pcmbuf_write_index;
-int pcmbuf_unplayed_bytes;
-int pcmbuf_watermark;
-void (*pcmbuf_watermark_callback)(int bytes_left);
-
 int pcm_play_num_used_buffers(void)
 {
     return (pcmbuf_write_index - pcmbuf_read_index) & NUM_PCM_BUFFERS_MASK;
-}
-
-void pcm_play_set_watermark(int numbytes, void (*callback)(int bytes_left))
-{
-    pcmbuf_watermark = numbytes;
-    pcmbuf_watermark_callback = callback;
-}
-
-bool pcm_play_add_chunk(void *addr, int size, void (*callback)(void))
-{
-    /* We don't use the last buffer, since we can't see the difference
-       between the full and empty condition */
-    if(pcm_play_num_used_buffers() < (NUM_PCM_BUFFERS - 1))
-    {
-        pcmbuffers[pcmbuf_write_index].addr = addr;
-        pcmbuffers[pcmbuf_write_index].size = size;
-        pcmbuffers[pcmbuf_write_index].callback = callback;
-        pcmbuf_write_index = (pcmbuf_write_index+1) & NUM_PCM_BUFFERS_MASK;
-        pcmbuf_unplayed_bytes += size;
-        return true;
-    }
-    else
-        return false;
-}
-
-void pcm_play_init(void)
-{
-    pcmbuf_read_index = 0;
-    pcmbuf_write_index = 0;
-    pcmbuf_unplayed_bytes = 0;
-    pcm_play_set_watermark(0x10000, NULL);
 }
 
 static int last_chunksize = 0;
@@ -269,6 +162,8 @@ static void pcm_play_callback(unsigned char** start, long* size)
     int sz;
 
     pcmbuf_unplayed_bytes -= last_chunksize;
+    audiobuffer_free += last_chunksize;
+    
     
     if(desc->size == 0)
     {
@@ -299,7 +194,7 @@ static void pcm_play_callback(unsigned char** start, long* size)
         /* No more buffers */
         *size = 0;
     }
-#if 0
+#if 1
     if(pcmbuf_unplayed_bytes <= pcmbuf_watermark)
     {
         if(pcmbuf_watermark_callback)
@@ -308,6 +203,240 @@ static void pcm_play_callback(unsigned char** start, long* size)
         }
     }
 #endif
+}
+
+void pcm_play_data(const unsigned char* start, int size,
+                   void (*get_more)(unsigned char** start, long* size))
+{
+    callback_for_more = get_more;
+    dma_start(start, size);
+    
+    if (get_more == pcm_play_callback)
+        get_more(&next_start, &next_size);
+}
+
+void pcm_play_stop(void)
+{
+    dma_stop();
+    audiobuffer_pos = 0;
+    audiobuffer_fillpos = 0;
+    audiobuffer_free = PCMBUF_SIZE;
+    pcmbuf_read_index = 0;
+    pcmbuf_write_index = 0;
+    pcmbuf_unplayed_bytes = 0;
+    next_start = NULL;
+    next_size = 0;
+    pcm_boost(false);
+}
+
+void pcm_play_pause(bool play)
+{
+    if(pcm_paused && play && pcmbuf_unplayed_bytes)
+    {
+        /* Enable the FIFO and force one write to it */
+        IIS2CONFIG = (pcm_freq << 12) | 0x300;
+        DCR0 |= DMA_START;
+        
+        pcm_paused = false;
+    }
+    else if(!pcm_paused && !play)
+    {
+        IIS2CONFIG = 0x800;
+        pcm_paused = true;
+    }
+}
+
+bool pcm_is_playing(void)
+{
+    return pcm_playing;
+}
+
+/* DMA0 Interrupt is called when the DMA has finished transfering a chunk */
+void DMA0(void) __attribute__ ((interrupt_handler, section(".icode")));
+void DMA0(void)
+{
+    int res = DSR0;
+    bool rockboy = callback_for_more != pcm_play_callback;
+
+    DSR0 = 1;    /* Clear interrupt */
+
+    /* Stop on error */
+    if(res & 0x70)
+    {
+       dma_stop();
+    }
+    else
+    {
+        if (callback_for_more && rockboy)
+            callback_for_more(&next_start, &next_size);
+        if(next_size)
+        {
+            SAR0 = (unsigned long)next_start;  /* Source address */
+            BCR0 = next_size;                  /* Bytes to transfer */
+            if (callback_for_more && !rockboy)
+                callback_for_more(&next_start, &next_size);
+        }
+        else
+        {
+            /* Finished playing */
+            dma_stop();
+        }
+    }
+    
+    IPR |= (1<<14); /* Clear pending interrupt request */
+}
+
+void pcm_init(void)
+{
+    pcm_playing = false;
+    pcm_paused = false;
+    
+    uda1380_init();
+
+    BUSMASTER_CTRL = 0x81; /* PARK[1,0]=10 + BCR24BIT */
+    DIVR0 = 54;            /* DMA0 is mapped into vector 54 in system.c */
+    DMAROUTE = (DMAROUTE & 0xffffff00) | DMA0_REQ_AUDIO_1;
+    DMACONFIG = 1;   /* DMA0Req = PDOR3 */
+
+    /* Reset the audio FIFO */
+    IIS2CONFIG = 0x800;
+    
+    /* Enable interrupt at level 7, priority 0 */
+    ICR4 = (ICR4 & 0xffff00ff) | 0x00001c00;
+    IMR &= ~(1<<14);      /* bit 14 is DMA0 */
+    
+    pcm_play_init();
+    pcm_set_frequency(44100);
+}
+
+void pcm_play_set_watermark(int numbytes, void (*callback)(int bytes_left))
+{
+    pcmbuf_watermark = numbytes;
+    pcmbuf_watermark_callback = callback;
+}
+
+bool pcm_play_add_chunk(void *addr, int size, void (*callback)(void))
+{
+    /* We don't use the last buffer, since we can't see the difference
+       between the full and empty condition */
+    if(pcm_play_num_used_buffers() < (NUM_PCM_BUFFERS - 2))
+    {
+        pcmbuffers[pcmbuf_write_index].addr = addr;
+        pcmbuffers[pcmbuf_write_index].size = size;
+        pcmbuffers[pcmbuf_write_index].callback = callback;
+        pcmbuf_write_index = (pcmbuf_write_index+1) & NUM_PCM_BUFFERS_MASK;
+        pcmbuf_unplayed_bytes += size;
+        return true;
+    }
+    else
+        return false;
+}
+
+void pcm_watermark_callback(int bytes_left)
+{
+    (void)bytes_left;
+    
+    /* Fill audio buffer by boosting cpu */
+    pcm_boost(true);
+}
+
+void pcm_set_boost_mode(bool state)
+{
+	boost_mode = state;
+        if (boost_mode)
+            pcm_boost(true);
+}
+
+void audiobuffer_add_event(void (*event_handler)(void))
+{
+    while (!pcm_play_add_chunk(NULL, 0, event_handler))
+        yield();
+}
+
+unsigned int audiobuffer_get_latency(void)
+{
+    int latency;
+    
+    /* This has to be done better. */
+    latency = (PCMBUF_SIZE - audiobuffer_free - audiobuffer_fillpos
+        - CHUNK_SIZE)/4 / (44100/1000);
+    if (latency < 0)
+        latency = 0;
+    
+    return latency;
+}
+
+bool audiobuffer_insert(char *buf, size_t length)
+{
+    size_t copy_n = 0;
+    
+    if (audiobuffer_free < length + CHUNK_SIZE) {
+        if (!boost_mode)
+            pcm_boost(false);
+        return false;
+    }
+    
+    if (!pcm_is_playing()) {
+        pcm_boost(true);
+        if (audiobuffer_free < PCMBUF_SIZE - CHUNK_SIZE*2)
+            pcm_play_start();
+    }
+
+    while (length > 0) {
+        copy_n = MIN(length, PCMBUF_SIZE - audiobuffer_pos - 
+                     audiobuffer_fillpos);
+        copy_n = MIN(CHUNK_SIZE, copy_n);
+        memcpy(&audiobuffer[audiobuffer_pos+audiobuffer_fillpos],
+               buf, copy_n);
+        buf += copy_n;
+        audiobuffer_free -= copy_n;
+        length -= copy_n;
+        
+        /* Pre-buffer to meet CHUNK_SIZE requirement */
+        if (copy_n + audiobuffer_fillpos < CHUNK_SIZE && length == 0) {
+            audiobuffer_fillpos += copy_n;
+            return true;
+        }
+        
+        copy_n += audiobuffer_fillpos;
+        
+        while (!pcm_play_add_chunk(&audiobuffer[audiobuffer_pos], 
+                                   copy_n, NULL)) {
+            if (!boost_mode)
+                pcm_boost(false);
+            yield();
+        }
+        
+        audiobuffer_pos += copy_n;
+        audiobuffer_fillpos = 0;
+        
+        if (audiobuffer_pos >= PCMBUF_SIZE) {
+            audiobuffer_pos = 0;
+        }
+    }
+
+    return true;
+}
+
+void pcm_play_init(void)
+{
+    audiobuffer = &audiobuf[(audiobufend - audiobuf) - 
+                            PCMBUF_SIZE];
+    audiobuffer_free = PCMBUF_SIZE;
+    audiobuffer_pos = 0;
+    audiobuffer_fillpos = 0;
+    boost_mode = 0;
+    pcmbuf_read_index = 0;
+    pcmbuf_write_index = 0;
+    pcmbuf_unplayed_bytes = 0;
+    pcm_play_set_watermark(PCM_WATERMARK, pcm_watermark_callback);
+    
+    /* Play a small chunk of zeroes to initialize the playback system. */
+    audiobuffer_pos = 32000;
+    audiobuffer_free -= audiobuffer_pos;
+    memset(&audiobuffer[0], 0, audiobuffer_pos);
+    pcm_play_add_chunk(&audiobuffer[0], audiobuffer_pos, NULL);
+    pcm_play_start();
 }
 
 void pcm_play_start(void)
@@ -320,9 +449,9 @@ void pcm_play_start(void)
     {
         size = MIN(desc->size, 32768);
         start = desc->addr;
-        pcm_play_data(start, size, pcm_play_callback);
         last_chunksize = size;
         desc->size -= size;
         desc->addr += size;
+        pcm_play_data(start, size, pcm_play_callback);
     }
 }

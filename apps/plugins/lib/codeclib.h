@@ -28,28 +28,9 @@
 #define IDATA_ATTR	 
 #endif
 
-/* the main data structure of the program */
-typedef struct {
-    int infile;
-    int outfile;
-    off_t curpos;
-    off_t filesize;
-    int samplerate;
-    int bitspersample;
-    int channels;
-    int frames_decoded;
-    unsigned long total_samples;
-    unsigned long current_sample;
-    unsigned long start_tick;
-} file_info_struct;
-
-#define MALLOC_BUFSIZE (512*1024)
-
 extern int mem_ptr;
 extern int bufsize;
-extern unsigned char* mp3buf;     // The actual MP3 buffer from Rockbox
 extern unsigned char* mallocbuf;  // 512K from the start of MP3 buffer
-extern unsigned char* filebuf;    // The rest of the MP3 buffer
 
 void* codec_malloc(size_t size);
 void* codec_calloc(size_t nmemb, size_t size);
@@ -61,7 +42,5 @@ void *memset(void *s, int c, size_t n);
 int memcmp(const void *s1, const void *s2, size_t n);
 void* memmove(const void *s1, const void *s2, size_t n);
 
-void display_status(file_info_struct* file_info);
-int local_init(char* infilename, char* outfilename, file_info_struct* file_info, struct plugin_api* rb);
-void close_wav(file_info_struct* file_info);
-void xxx2wav_set_api(struct plugin_api* rb);
+int codec_init(struct plugin_api* rb, struct codec_api* ci);
+

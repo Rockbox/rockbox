@@ -40,14 +40,14 @@ void* codec_malloc(size_t size) {
 
   x=&mallocbuf[mem_ptr];
   mem_ptr+=(size+3)&~3; // Keep memory 32-bit aligned (if it was already?)
-
+/*
   if(TIME_AFTER(*(local_rb->current_tick), last_tick + HZ)) {
       local_rb->snprintf(s,30,"Memory used: %d",mem_ptr);
       local_rb->lcd_putsxy(0,80,s);
 
       last_tick = *(local_rb->current_tick);
       local_rb->lcd_update();
-  }
+  }*/
   return(x);
 }
 
@@ -161,6 +161,11 @@ static unsigned char wav_header[44]={'R','I','F','F',    //  0 - ChunkID
                               0,0,0,0             // 40 - Subchunk2Size
                              };
 
+
+void xxx2wav_set_api(struct plugin_api* rb)
+{
+    local_rb = rb;
+}
 
 int local_init(char* infilename, char* outfilename, file_info_struct* file_info, struct plugin_api* rb) {
   char s[32];

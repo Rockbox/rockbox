@@ -1928,6 +1928,7 @@ void mpeg_id3_options(bool _v1first)
    v1first = _v1first;
 }
 
+#ifndef IRIVER_H100
 struct mp3entry* audio_current_track()
 {
 #ifdef SIMULATOR
@@ -1961,6 +1962,7 @@ bool audio_has_changed_track(void)
     }
     return false;
 }
+#endif
 
 #if CONFIG_HWCODEC == MAS3587F
 void audio_init_playback(void)
@@ -2487,6 +2489,7 @@ void mpeg_set_recording_options(int frequency, int quality,
 }
 #endif
 
+#ifndef IRIVER_H100
 void audio_play(int offset)
 {
 #ifdef SIMULATOR
@@ -2713,3 +2716,5 @@ void audio_init(void)
     dbg_cnt2us(0);
 #endif /* DEBUG */
 }
+
+#endif /* IRIVER_H100 */

@@ -35,4 +35,7 @@ playergfx.c
 #endif
 #if CONFIG_HWCODEC == MASNONE /* software codec platforms */
 xxx2wav.c
+#ifdef IRIVER_H100
+codeclib.c
+#endif
 #endif

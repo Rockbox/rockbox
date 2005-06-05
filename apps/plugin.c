@@ -327,6 +327,65 @@ static const struct plugin_api rockbox_api = {
     strcasestr,
 };
 
+#ifdef IRIVER_H100
+int codec_load_ram(char* pluginptr, size_t size, void *parameter, void* ptr2, size_t bufwrap)
+{
+    enum plugin_status (*plugin_start)(struct plugin_api* api, void* param);
+    int copy_n;
+    
+    if ((int)&pluginbuf != (int)pluginptr) {
+        /* zero out plugin buffer to ensure a properly zeroed bss area */
+        memset(pluginbuf, 0, PLUGIN_BUFFER_SIZE);
+        
+        size = MIN(size, PLUGIN_BUFFER_SIZE);
+        copy_n = MIN(size, bufwrap);
+        memcpy(pluginbuf, pluginptr, copy_n);
+        
+        size -= copy_n;
+        if (size > 0) {
+            memcpy(ptr2, &pluginptr[copy_n], size);
+        }
+    }
+    
+    plugin_start = (void*)&pluginbuf;
+    
+    if (plugin_size <= 0) {
+        return -1;
+    }
+    
+    invalidate_icache();
+    
+    return plugin_start((struct plugin_api*) &rockbox_api, parameter);
+}
+
+int codec_load_file(const char *plugin, void *parameter)
+{
+    char msgbuf[80];
+    int fd;
+    int rc;
+    
+    fd = open(plugin, O_RDONLY);
+    if (fd < 0) {
+        snprintf(msgbuf, sizeof(msgbuf)-1, "Couldn't load codec: %s", plugin);
+        splash(HZ*2, true, msgbuf);
+        return fd;
+    }
+    
+    plugin_size = 0;
+    
+    do {
+        rc = read(fd, &pluginbuf[0], PLUGIN_BUFFER_SIZE);
+        if (rc < 0)
+            return PLUGIN_ERROR;
+        plugin_size += rc;
+    } while (rc > 0) ;
+    close(fd);
+        
+    return codec_load_ram(pluginbuf, plugin_size, parameter, NULL, 0);
+}
+
+#endif
+
 int plugin_load(const char* plugin, void* parameter)
 {
     enum plugin_status (*plugin_start)(struct plugin_api* api, void* param);
