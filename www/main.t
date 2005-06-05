@@ -8,14 +8,20 @@ Archos Jukebox 5000, 6000, Studio, Recorder, FM Recorder, Recorder V2 and
 Ondio MP3 players.
 
 <p> Rockbox is a complete rewrite and uses no fragments of the original
-firmware. It boasts <a href="/docs/features.html">numerous features</a> while
-remaining <a href="/twiki/pub/Main/RockboxManual/rockbox-manual-2.4.pdf">easy
-to use</a>.
+firmware. It boasts <a href="/twiki/bin/view/Main/FeatureComparison">numerous
+features</a> while remaining <a
+href="/twiki/pub/Main/RockboxManual/rockbox-manual-2.4.pdf">easy to use</a>.
 
 <p> Installing Rockbox does not harm your Archos, it works the same way you
 upgrade your ordinary Archos firmware.
 
 <h2>News</h2>
+
+<p><i>2005-02-08</i>: <a
+href="http://www.rockbox.org/twiki/bin/view/Main/RockboxShots">Evidence</a> of
+Rockbox <a
+href="http://www.rockbox.org/twiki/bin/view/Main/IriverBoot">booting</a> on <a
+href="http://www.rockbox.org/twiki/bin/view/Main/IriverPort">iRiver</a>.
 
 <p><i>2004-12-23</i>: Rockbox v2.4 is <a href="download/">released</a>.
 
