@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 #include <stdbool.h>
+#include <stdio.h>
 #include "config.h"
 #include "sound.h"
 #ifndef SIMULATOR
@@ -25,6 +26,9 @@
 #include "dac.h"
 #include "system.h"
 #include "hwcompat.h"
+#if CONFIG_HWCODEC == MASNONE
+#include "pcm_playback.h"
+#endif
 #endif
 
 #ifndef SIMULATOR
