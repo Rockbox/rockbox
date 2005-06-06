@@ -41,7 +41,6 @@
 
 /* 8 point butterfly (in place) */
 STIN void mdct_butterfly_8(DATA_TYPE *x){
-
   REG_TYPE r0   = x[4] + x[0];
   REG_TYPE r1   = x[4] - x[0];
   REG_TYPE r2   = x[5] + x[1];
@@ -144,88 +143,81 @@ STIN  void mdct_butterfly_32(DATA_TYPE *x){
 	   mdct_butterfly_16(x+16);
 }
 
-/* N/stage point generic N stage butterfly (in place, 2 register) */
-STIN void mdct_butterfly_generic(DATA_TYPE *x,int points,int step){
-
+/* N/stage point generic N stage butterfly (in place, 4 register) */
+void mdct_butterfly_generic(DATA_TYPE *x,int points, int step){
   LOOKUP_T *T   = sincos_lookup0;
   DATA_TYPE *x1        = x + points      - 8;
   DATA_TYPE *x2        = x + (points>>1) - 8;
   REG_TYPE   r0;
   REG_TYPE   r1;
+  REG_TYPE   r2;
+  REG_TYPE   r3;
   
   do{
     r0 = x1[6] - x2[6]; x1[6] += x2[6];
     r1 = x2[7] - x1[7]; x1[7] += x2[7];
+    r2 = x1[4] - x2[4]; x1[4] += x2[4];
+    r3 = x2[5] - x1[5]; x1[5] += x2[5];
     XPROD31( r1, r0, T[0], T[1], &x2[6], &x2[7] ); T+=step;
-
-    r0 = x1[4] - x2[4]; x1[4] += x2[4];
-    r1 = x2[5] - x1[5]; x1[5] += x2[5];
-    XPROD31( r1, r0, T[0], T[1], &x2[4], &x2[5] ); T+=step;
-
+    XPROD31( r3, r2, T[0], T[1], &x2[4], &x2[5] ); T+=step;
+    
     r0 = x1[2] - x2[2]; x1[2] += x2[2];
     r1 = x2[3] - x1[3]; x1[3] += x2[3];
+    r2 = x1[0] - x2[0]; x1[0] += x2[0];
+    r3 = x2[1] - x1[1]; x1[1] += x2[1];
     XPROD31( r1, r0, T[0], T[1], &x2[2], &x2[3] ); T+=step;
-
-    r0 = x1[0] - x2[0]; x1[0] += x2[0];
-    r1 = x2[1] - x1[1]; x1[1] += x2[1];
-    XPROD31( r1, r0, T[0], T[1], &x2[0], &x2[1] ); T+=step;
-
+    XPROD31( r3, r2, T[0], T[1], &x2[0], &x2[1] ); T+=step;
+    
     x1-=8; x2-=8;
   }while(T<sincos_lookup0+1024);
   do{
     r0 = x1[6] - x2[6]; x1[6] += x2[6];
     r1 = x1[7] - x2[7]; x1[7] += x2[7];
+    r2 = x1[4] - x2[4]; x1[4] += x2[4];
+    r3 = x1[5] - x2[5]; x1[5] += x2[5];
     XNPROD31( r0, r1, T[0], T[1], &x2[6], &x2[7] ); T-=step;
+    XNPROD31( r2, r3, T[0], T[1], &x2[4], &x2[5] ); T-=step;
 
-    r0 = x1[4] - x2[4]; x1[4] += x2[4];
-    r1 = x1[5] - x2[5]; x1[5] += x2[5];
-    XNPROD31( r0, r1, T[0], T[1], &x2[4], &x2[5] ); T-=step;
-    
     r0 = x1[2] - x2[2]; x1[2] += x2[2];
     r1 = x1[3] - x2[3]; x1[3] += x2[3];
+    r2 = x1[0] - x2[0]; x1[0] += x2[0];
+    r3 = x1[1] - x2[1]; x1[1] += x2[1];
     XNPROD31( r0, r1, T[0], T[1], &x2[2], &x2[3] ); T-=step;
-
-    r0 = x1[0] - x2[0]; x1[0] += x2[0];
-    r1 = x1[1] - x2[1]; x1[1] += x2[1];
-    XNPROD31( r0, r1, T[0], T[1], &x2[0], &x2[1] ); T-=step;
+    XNPROD31( r2, r3, T[0], T[1], &x2[0], &x2[1] ); T-=step;
 
     x1-=8; x2-=8;
   }while(T>sincos_lookup0);
   do{
     r0 = x2[6] - x1[6]; x1[6] += x2[6];
     r1 = x2[7] - x1[7]; x1[7] += x2[7];
+    r2 = x2[4] - x1[4]; x1[4] += x2[4];
+    r3 = x2[5] - x1[5]; x1[5] += x2[5];
     XPROD31( r0, r1, T[0], T[1], &x2[6], &x2[7] ); T+=step;
-
-    r0 = x2[4] - x1[4]; x1[4] += x2[4];
-    r1 = x2[5] - x1[5]; x1[5] += x2[5];
-    XPROD31( r0, r1, T[0], T[1], &x2[4], &x2[5] ); T+=step;
+    XPROD31( r2, r3, T[0], T[1], &x2[4], &x2[5] ); T+=step;
 
     r0 = x2[2] - x1[2]; x1[2] += x2[2];
     r1 = x2[3] - x1[3]; x1[3] += x2[3];
+    r2 = x2[0] - x1[0]; x1[0] += x2[0];
+    r3 = x2[1] - x1[1]; x1[1] += x2[1];
     XPROD31( r0, r1, T[0], T[1], &x2[2], &x2[3] ); T+=step;
-
-    r0 = x2[0] - x1[0]; x1[0] += x2[0];
-    r1 = x2[1] - x1[1]; x1[1] += x2[1];
-    XPROD31( r0, r1, T[0], T[1], &x2[0], &x2[1] ); T+=step;
+    XPROD31( r2, r3, T[0], T[1], &x2[0], &x2[1] ); T+=step;
 
     x1-=8; x2-=8;
   }while(T<sincos_lookup0+1024);
   do{
     r0 = x1[6] - x2[6]; x1[6] += x2[6];
     r1 = x2[7] - x1[7]; x1[7] += x2[7];
+    r2 = x1[4] - x2[4]; x1[4] += x2[4];
+    r3 = x2[5] - x1[5]; x1[5] += x2[5];
     XNPROD31( r1, r0, T[0], T[1], &x2[6], &x2[7] ); T-=step;
-
-    r0 = x1[4] - x2[4]; x1[4] += x2[4];
-    r1 = x2[5] - x1[5]; x1[5] += x2[5];
-    XNPROD31( r1, r0, T[0], T[1], &x2[4], &x2[5] ); T-=step;
+    XNPROD31( r3, r2, T[0], T[1], &x2[4], &x2[5] ); T-=step;
 
     r0 = x1[2] - x2[2]; x1[2] += x2[2];
     r1 = x2[3] - x1[3]; x1[3] += x2[3];
+    r2 = x1[0] - x2[0]; x1[0] += x2[0];
+    r3 = x2[1] - x1[1]; x1[1] += x2[1];
     XNPROD31( r1, r0, T[0], T[1], &x2[2], &x2[3] ); T-=step;
-
-    r0 = x1[0] - x2[0]; x1[0] += x2[0];
-    r1 = x2[1] - x1[1]; x1[1] += x2[1];
-    XNPROD31( r1, r0, T[0], T[1], &x2[0], &x2[1] ); T-=step;
+    XNPROD31( r3, r2, T[0], T[1], &x2[0], &x2[1] ); T-=step;
 
     x1-=8; x2-=8;
   }while(T>sincos_lookup0);
@@ -246,8 +238,8 @@ STIN void mdct_butterflies(DATA_TYPE *x,int points,int shift) {
 }
 
 
-static const unsigned char bitrev[16] 
-   IDATA_ATTR = {0,8,4,12,2,10,6,14,1,9,5,13,3,11,7,15};
+static const unsigned char bitrev[16] IDATA_ATTR = 
+  {0,8,4,12,2,10,6,14,1,9,5,13,3,11,7,15};
 
 STIN int bitrev12(int x){
   return bitrev[x>>8]|(bitrev[(x&0x0f0)>>4]<<4)|(((int)bitrev[x&0x00f])<<8);

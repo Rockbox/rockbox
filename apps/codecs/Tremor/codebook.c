@@ -140,7 +140,7 @@ int vorbis_staticbook_unpack(oggpack_buffer *opb,static_codebook *s){
    be.  The first-stage decode table catches most words so that
    bitreverse is not in the main execution path. */
 
-static ogg_uint32_t bitreverse(ogg_uint32_t x){
+static inline ogg_uint32_t bitreverse(register ogg_uint32_t x){
   x=    ((x>>16)&0x0000ffff) | ((x<<16)&0xffff0000);
   x=    ((x>> 8)&0x00ff00ff) | ((x<< 8)&0xff00ff00);
   x=    ((x>> 4)&0x0f0f0f0f) | ((x<< 4)&0xf0f0f0f0);
@@ -265,12 +265,13 @@ long vorbis_book_decodev_add(codebook *book,ogg_int32_t *a,
 	a[i++]+=t[j++]>>shift;
     }
   }else{
+    shift = -shift;
     for(i=0;i<n;){
       entry = decode_packed_entry_number(book,b);
       if(entry==-1)return(-1);
       t     = book->valuelist+entry*book->dim;
       for (j=0;j<book->dim;)
-	a[i++]+=t[j++]<<-shift;
+	a[i++]+=t[j++]<<shift;
     }
   }
   return(0);
@@ -293,13 +294,13 @@ long vorbis_book_decodev_set(codebook *book,ogg_int32_t *a,
       }
     }
   }else{
-
+    shift = -shift;
     for(i=0;i<n;){
       entry = decode_packed_entry_number(book,b);
       if(entry==-1)return(-1);
       t     = book->valuelist+entry*book->dim;
       for (j=0;j<book->dim;){
-	a[i++]=t[j++]<<-shift;
+	a[i++]=t[j++]<<shift;
       }
     }
   }
@@ -330,14 +331,14 @@ long vorbis_book_decodevv_add(codebook *book,ogg_int32_t **a,
       }
     }
   }else{
-
+    shift = -shift;
     for(i=offset;i<offset+n;){
       entry = decode_packed_entry_number(book,b);
       if(entry==-1)return(-1);
       {
 	const ogg_int32_t *t = book->valuelist+entry*book->dim;
 	for (j=0;j<book->dim;j++){
-	  a[chptr++][i]+=t[j]<<-shift;
+	  a[chptr++][i]+=t[j]<<shift;
 	  if(chptr==ch){
 	    chptr=0;
 	    i++;

@@ -281,7 +281,7 @@ static LOOKUP_T sincos_lookup0[1026] IDATA_ATTR = {
   };
   
   /* {sin((2*i+1)*PI/4096), cos((2*i+1)*PI/4096)}, with i = 0 to 511 */
-static LOOKUP_T sincos_lookup1[1024] IDATA_ATTR = {
+static LOOKUP_T sincos_lookup1[1024] = {
   X(0x001921fb), X(0x7ffffd88), X(0x004b65ee), X(0x7fffe9cb),
   X(0x007da9d4), X(0x7fffc251), X(0x00afeda8), X(0x7fff8719),
   X(0x00e23160), X(0x7fff3824), X(0x011474f6), X(0x7ffed572),

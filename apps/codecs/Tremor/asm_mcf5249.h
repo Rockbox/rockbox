@@ -49,13 +49,12 @@ static inline ogg_int32_t MULT32(ogg_int32_t x, ogg_int32_t y) {
 }
 
 static inline ogg_int32_t MULT31(ogg_int32_t x, ogg_int32_t y) {
-  ogg_int32_t r;
   asm volatile ("mac.l %[x], %[y], %%acc0;" // multiply
-		"movclr.l %%acc0, %[r];"    // move and clear
-		: [r] "=r" (r)
-		: [x] "r" (x), [y] "r" (y)
+		"movclr.l %%acc0, %[x];"    // move and clear
+		: [x] "+&r" (x)
+		: [y] "r" (y)
 		: "cc");
-  return r;
+  return x;
 }
 
 
@@ -64,11 +63,11 @@ static inline ogg_int32_t MULT31_SHIFT15(ogg_int32_t x, ogg_int32_t y) {
   asm volatile ("mac.l %[x], %[y], %%acc0;"  // multiply
 		"movclr.l %%acc0, %[r];"     // get higher half
 		"mulu.l %[y], %[x];"         // get lower half
-		"asl.l #8, %[r];"    // hi << 17
+		"asl.l #8, %[r];"            // hi << 17
 		"asl.l #8, %[r];"
-		"lsr.l #8, %[x];"    // (unsigned)lo >> 15
+		"lsr.l #8, %[x];"            // (unsigned)lo >> 15
 		"lsr.l #7, %[x];"
-		"or.l %[x], %[r];"   // or
+		"or.l %[x], %[r];"           // or
 		: [r] "=&d" (r), [x] "+d" (x)
 		: [y] "d" (y)
 		: "cc");
@@ -81,18 +80,17 @@ void XPROD31(ogg_int32_t  a, ogg_int32_t  b,
 	     ogg_int32_t  t, ogg_int32_t  v,
 	     ogg_int32_t *x, ogg_int32_t *y)
 { 
-  ogg_int32_t r;
   asm volatile ("mac.l %[a], %[t], %%acc0;"
 		"mac.l %[b], %[v], %%acc0;"
 		"mac.l %[b], %[t], %%acc1;"
 		"msac.l %[a], %[v], %%acc1;"
-		"movclr.l %%acc0, %[r];"
-		"move.l %[r], (%[x]);"
-		"movclr.l %%acc1, %[r];"
-		"move.l %[r], (%[y]);"
-		: [r] "=&r" (r)
+		"movclr.l %%acc0, %[a];"
+		"move.l %[a], (%[x]);"
+		"movclr.l %%acc1, %[a];"
+		"move.l %[a], (%[y]);"
+		: [a] "+&r" (a)
 		: [x] "a" (x), [y] "a" (y),
-		  [a] "r" (a), [b] "r" (b), [t] "r" (t), [v] "r" (v)
+		  [b] "r" (b), [t] "r" (t), [v] "r" (v)
 		: "cc", "memory");
 }
 
@@ -102,23 +100,23 @@ void XNPROD31(ogg_int32_t  a, ogg_int32_t  b,
 	      ogg_int32_t  t, ogg_int32_t  v,
 	      ogg_int32_t *x, ogg_int32_t *y)
 {
-  ogg_int32_t r;
   asm volatile ("mac.l %[a], %[t], %%acc0;"
 		"msac.l %[b], %[v], %%acc0;"
 		"mac.l %[b], %[t], %%acc1;"
 		"mac.l %[a], %[v], %%acc1;"
-		"movclr.l %%acc0, %[r];"
-		"move.l %[r], (%[x]);"
-		"movclr.l %%acc1, %[r];"
-		"move.l %[r], (%[y]);"
-		: [r] "=&r" (r)
+		"movclr.l %%acc0, %[a];"
+		"move.l %[a], (%[x]);"
+		"movclr.l %%acc1, %[a];"
+		"move.l %[a], (%[y]);"
+		: [a] "+&r" (a)
 		: [x] "a" (x), [y] "a" (y),
-		  [a] "r" (a), [b] "r" (b), [t] "r" (t), [v] "r" (v)
+		  [b] "r" (b), [t] "r" (t), [v] "r" (v)
 		: "cc", "memory");
 }
 
 
-/* no faster way of doing this using the MAC? */
+
+/* is there no better way of doing this using the MAC? */
 #define XPROD32(_a, _b, _t, _v, _x, _y)		\
   { (_x)=MULT32(_a,_t)+MULT32(_b,_v);		\
     (_y)=MULT32(_b,_t)-MULT32(_a,_v); }

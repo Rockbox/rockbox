@@ -18,7 +18,7 @@
 
 #include "os_types.h"
 
-/* keep small window table in fast IRAM */
+/* keep small window tables in fast IRAM */
 static LOOKUP_T vwin64[32] IDATA_ATTR = {
   X(0x001f0003), X(0x01168c98), X(0x030333c8), X(0x05dfe3a4),
   X(0x09a49562), X(0x0e45df18), X(0x13b47ef2), X(0x19dcf676),

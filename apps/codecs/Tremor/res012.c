@@ -172,6 +172,7 @@ vorbis_look_residue *res0_look(vorbis_dsp_state *vd,vorbis_info_mode *vm,
   return(look);
 }
 
+#define CHANNELS 2
 
 /* a truncated packet here just means 'stop working'; it's not an error */
 static int _01inverse(vorbis_block *vb,vorbis_look_residue *vl,
@@ -254,6 +255,8 @@ int res1_inverse(vorbis_block *vb,vorbis_look_residue *vl,
     return(0);
 }
 
+
+
 /* duplicate code here as speed is somewhat more important */
 int res2_inverse(vorbis_block *vb,vorbis_look_residue *vl,
 		 ogg_int32_t **in,int *nonzero,int ch){
@@ -291,7 +294,6 @@ int res2_inverse(vorbis_block *vb,vorbis_look_residue *vl,
       for(k=0;k<partitions_per_word && i<partvals;k++,i++)
 	if(info->secondstages[partword[l][k]]&(1<<s)){
 	  codebook *stagebook=look->partbooks[partword[l][k]][s];
-	  
 	  if(stagebook){
 	    if(vorbis_book_decodevv_add(stagebook,in,
 					i*samples_per_partition+beginoff,ch,

@@ -45,7 +45,7 @@ typedef struct {
 static void floor1_free_info(vorbis_info_floor *i){
   vorbis_info_floor1 *info=(vorbis_info_floor1 *)i;
   if(info){
-    memset(info,0,sizeof(*info));
+    //memset(info,0,sizeof(*info));
     _ogg_free(info);
   }
 }
@@ -53,13 +53,13 @@ static void floor1_free_info(vorbis_info_floor *i){
 static void floor1_free_look(vorbis_look_floor *i){
   vorbis_look_floor1 *look=(vorbis_look_floor1 *)i;
   if(look){
-    memset(look,0,sizeof(*look));
+    //memset(look,0,sizeof(*look));
     _ogg_free(look);
   }
 }
 
-static int ilog(unsigned int v){
-  int ret=0;
+static inline int ilog(register unsigned int v){
+  register int ret=0;
   while(v){
     ret++;
     v>>=1;
@@ -124,7 +124,7 @@ static int icomp(const void *a,const void *b){
 static vorbis_look_floor *floor1_look(vorbis_dsp_state *vd,vorbis_info_mode *mi,
                               vorbis_info_floor *in){
 
-  static int *sortpointer[VIF_POSIT+2] IDATA_ATTR;
+  int *sortpointer[VIF_POSIT+2];
   vorbis_info_floor1 *info=(vorbis_info_floor1 *)in;
   vorbis_look_floor1 *look=(vorbis_look_floor1 *)_ogg_calloc(1,sizeof(*look));
   int i,j,n=0;
@@ -216,7 +216,7 @@ static int render_point(int x0,int x1,int y0,int y1,int x){
 #  define XdB(n) (n)
 #endif
 
-static ogg_int32_t FLOOR_fromdB_LOOKUP[256] IDATA_ATTR ={
+static ogg_int32_t FLOOR_fromdB_LOOKUP[256] ={
   XdB(0x000000e5), XdB(0x000000f4), XdB(0x00000103), XdB(0x00000114),
   XdB(0x00000126), XdB(0x00000139), XdB(0x0000014e), XdB(0x00000163),
   XdB(0x0000017a), XdB(0x00000193), XdB(0x000001ad), XdB(0x000001c9),
@@ -313,16 +313,15 @@ static void *floor1_inverse1(vorbis_block *vb,vorbis_look_floor *in){
   vorbis_look_floor1 *look=(vorbis_look_floor1 *)in;
   vorbis_info_floor1 *info=look->vi;
   codec_setup_info   *ci=(codec_setup_info *)vb->vd->vi->codec_setup;
-  
   int i,j,k;
   codebook *books=ci->fullbooks;   
   
   /* unpack wrapped/predicted values from stream */
   if(oggpack_read(&vb->opb,1)==1){
     int *fit_value=(int *)_vorbis_block_alloc(vb,(look->posts)*sizeof(*fit_value));
-    
-    fit_value[0]=oggpack_read(&vb->opb,ilog(look->quant_q-1));
-    fit_value[1]=oggpack_read(&vb->opb,ilog(look->quant_q-1));
+    int ilg = ilog(look->quant_q-1);
+    fit_value[0]=oggpack_read(&vb->opb,ilg);
+    fit_value[1]=oggpack_read(&vb->opb,ilg);
     
     /* partition by partition */
     /* partition by partition */
