@@ -35,13 +35,13 @@ unsigned char* filebuf;    // The rest of the audio buffer
 
 void* codec_malloc(size_t size) {
   void* x;
-  char s[32];
-  static long last_tick = 0;
 
   x=&mallocbuf[mem_ptr];
   mem_ptr+=(size+3)&~3; // Keep memory 32-bit aligned (if it was already?)
 /*
   if(TIME_AFTER(*(local_rb->current_tick), last_tick + HZ)) {
+      char s[32];
+      static long last_tick = 0;
       local_rb->snprintf(s,30,"Memory used: %d",mem_ptr);
       local_rb->lcd_putsxy(0,80,s);
 

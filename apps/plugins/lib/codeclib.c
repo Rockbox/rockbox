@@ -22,6 +22,7 @@
 #include "plugin.h"
 #include "playback.h"
 #include "codeclib.h"
+#include "xxx2wav.h"
 
 struct plugin_api* local_rb;
 
