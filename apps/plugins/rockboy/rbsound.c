@@ -15,7 +15,10 @@ rcvar_t pcm_exports[] =
 	    RCV_END
 };
 
-#if CONFIG_HWCODEC == MASNONE && !defined(SIMULATOR)
+/*#if CONFIG_HWCODEC == MASNONE && !defined(SIMULATOR)
+ * disabled cause it crashes with current audio implementation.. no sound.
+ */
+#if 0
 static short* buf1;
 
 static short front_buf[512];
