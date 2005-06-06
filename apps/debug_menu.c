@@ -354,7 +354,7 @@ bool dbg_os(void)
 }
 #endif
 
-#ifdef HAVE_LCD_BITMAP
+#if CONFIG_HWCODEC != MASNONE
 bool dbg_audio_thread(void)
 {
     char buf[32];
@@ -2038,7 +2038,7 @@ bool debug_menu(void)
 #else
         { "View disk info", dbg_disk_info },
 #endif
-#ifdef HAVE_LCD_BITMAP
+#if CONFIG_HWCODEC != MASNONE
         { "View audio thread", dbg_audio_thread },
 #ifdef PM_DEBUG
         { "pm histogram", peak_meter_histogram},
