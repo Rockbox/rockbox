@@ -166,6 +166,8 @@ static struct codec_api ci;
    variable keeps information about whether to go a next/previous track. */
 static int new_track;
 
+static bool v1first = false;
+
 #ifdef SIMULATOR
 bool audiobuffer_insert_sim(char *buf, size_t length)
 {
@@ -596,7 +598,7 @@ bool audio_load_track(int offset, bool start_play)
     switch (tracks[track_widx].codectype) {
     case AFMT_MPA_L3:
         /* Should check the return value. */
-        mp3info(&tracks[track_widx].id3, trackname, true);
+        mp3info(&tracks[track_widx].id3, trackname, v1first);
         lseek(fd, 0, SEEK_SET);
         get_mp3file_info(fd, &tracks[track_widx].mp3data);
         logf("T:%s", tracks[track_widx].id3.title);
@@ -1127,6 +1129,23 @@ int audio_status(void)
         ret |= AUDIO_STATUS_PAUSE;
     
     return ret;
+}
+
+int audio_get_file_pos(void)
+{
+    return 0;
+}
+
+#ifndef SIMULATOR
+void audio_set_buffer_margin(int seconds)
+{
+    (void)seconds;
+}
+#endif
+
+void mpeg_id3_options(bool _v1first)
+{
+   v1first = _v1first;
 }
 
 void audio_init(void)
