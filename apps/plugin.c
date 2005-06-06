@@ -230,7 +230,9 @@ static const struct plugin_api rockbox_api = {
     mp3_play_pause,
     mp3_play_stop,
     mp3_is_playing,
+#if CONFIG_HWCODEC != MASNONE
     bitswap,
+#endif
 #endif
     
     /* playback control */

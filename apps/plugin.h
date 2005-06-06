@@ -276,7 +276,9 @@ struct plugin_api {
     void (*mp3_play_pause)(bool play);
     void (*mp3_play_stop)(void);
     bool (*mp3_is_playing)(void);
+#if CONFIG_HWCODEC != MASNONE
     void (*bitswap)(unsigned char *data, int length);
+#endif
 #endif
 
     /* playback control */

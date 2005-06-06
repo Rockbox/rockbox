@@ -497,7 +497,9 @@ int talk_file(const char* filename, bool enqueue)
 
     if (size)
     {
+#if CONFIG_HWCODEC != MASNONE
         bitswap(p_thumbnail, size);
+#endif
         queue_clip(p_thumbnail, size, enqueue);
     }
 
