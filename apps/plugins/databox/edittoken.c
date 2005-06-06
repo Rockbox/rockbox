@@ -46,11 +46,16 @@ char *tokentypetostring(int tokentype) {
         case TOKEN_YEAR: return "year";
         case TOKEN_RATING: return "rating";
         case TOKEN_PLAYCOUNT: return "playcount";
+        case TOKEN_AUTORATING: return "autorating";
         case TOKEN_TITLE: return "title";
         case TOKEN_ARTIST: return "artist";
         case TOKEN_ALBUM: return "album";
         case TOKEN_GENRE: return "genre";
         case TOKEN_FILENAME: return "filename";
+        case TOKEN_PLAYTIME: return "playtime";
+        case TOKEN_TRACKNUM: return "track number";
+        case TOKEN_SAMPLERATE: return "sample rate";
+        case TOKEN_BITRATE: return "bitrate";
     }
     return "tokentypeerror";
 }
@@ -61,6 +66,10 @@ char *numidtostring(int numid) {
         case INTVALUE_RATING: return "<rating>";
         case INTVALUE_PLAYCOUNT: return "<playcount>";
         case INTVALUE_AUTORATING: return "<autorating>";
+        case INTVALUE_PLAYTIME: return "<playtime>";
+        case INTVALUE_TRACKNUM: return "<track number>";
+        case INTVALUE_SAMPLERATE: return "<sample rate>";
+        case INTVALUE_BITRATE: return "<bitrate>";
     }
     return "numiderror";
 }

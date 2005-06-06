@@ -54,6 +54,10 @@
 #define TOKEN_FILENAME  125
 #define TOKEN_EDIT      126
 #define TOKEN_AUTORATING 127
+#define TOKEN_PLAYTIME      128
+#define TOKEN_TRACKNUM      129
+#define TOKEN_SAMPLERATE    130
+#define TOKEN_BITRATE       131
 
 #define ACCEPT_EOF          0x1
 #define ACCEPT_BOOLOP       0x2
@@ -70,6 +74,10 @@
 #define INTVALUE_RATING        2
 #define INTVALUE_PLAYCOUNT     3
 #define INTVALUE_AUTORATING    4
+#define INTVALUE_PLAYTIME      5
+#define INTVALUE_TRACKNUM      6
+#define INTVALUE_SAMPLERATE    7
+#define INTVALUE_BITRATE       8
 #define INTVALUE_TITLE        14
 #define INTVALUE_ARTIST       15
 #define INTVALUE_ALBUM        16

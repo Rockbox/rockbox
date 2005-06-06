@@ -44,6 +44,10 @@
 #define INTVALUE_RATING        2
 #define INTVALUE_PLAYCOUNT     3
 #define INTVALUE_AUTORATING    4
+#define INTVALUE_PLAYTIME      5
+#define INTVALUE_TRACKNUM      6
+#define INTVALUE_SAMPLERATE    7
+#define INTVALUE_BITRATE       8
 #define INTVALUE_TITLE        14
 #define INTVALUE_ARTIST       15
 #define INTVALUE_ALBUM        16

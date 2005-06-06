@@ -72,6 +72,18 @@ int getvalue(struct token *token) {
                 case INTVALUE_PLAYCOUNT:
                     loadrundbdata();
                     return currententry->playcount;
+                case INTVALUE_PLAYTIME:
+                    loadsongdata();
+                    return currententry->playtime;
+                case INTVALUE_TRACKNUM:
+                    loadsongdata();
+                    return currententry->track;
+                case INTVALUE_BITRATE:
+                    loadsongdata();
+                    return currententry->bitrate;
+                case INTVALUE_SAMPLERATE:
+                    loadsongdata();
+                    return currententry->samplerate;
                 case INTVALUE_AUTORATING:
                     if(!dbglobal.gotplaycountlimits) {
                         index=dbglobal.currententryindex;

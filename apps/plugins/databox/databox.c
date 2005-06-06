@@ -159,6 +159,11 @@ void buildchoices(int mask) {
         editing.selection_candidates[i++]=TOKEN_YEAR;
         editing.selection_candidates[i++]=TOKEN_RATING;
         editing.selection_candidates[i++]=TOKEN_PLAYCOUNT;
+        editing.selection_candidates[i++]=TOKEN_AUTORATING;
+        editing.selection_candidates[i++]=TOKEN_TRACKNUM;
+        editing.selection_candidates[i++]=TOKEN_PLAYTIME;
+        editing.selection_candidates[i++]=TOKEN_SAMPLERATE;
+        editing.selection_candidates[i++]=TOKEN_BITRATE;
     }
     if(mask&ACCEPT_STRARG) {
         editing.selection_candidates[i++]=TOKEN_STRING;
