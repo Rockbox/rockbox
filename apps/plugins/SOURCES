@@ -6,7 +6,6 @@ favorites.c
 firmware_flash.c
 helloworld.c
 logo.c
-metronome.c
 mosaique.c
 rockbox_flash.c
 search.c
@@ -82,4 +81,5 @@ midi2wav.c
 iriverify.c
 #else
 splitedit.c
+metronome.c
 #endif
