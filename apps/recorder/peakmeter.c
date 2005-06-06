@@ -93,7 +93,7 @@ static void (*trigger_listener)(int) = NULL;
 #define MAS_REG_DQPEAK_R 0
 #endif
 
-#ifndef SIMULATOR
+#if !defined(SIMULATOR) && CONFIG_HWCODEC != MASNONE
 static int peak_meter_src_l = MAS_REG_DQPEAK_L;
 static int peak_meter_src_r = MAS_REG_DQPEAK_R;
 #endif
@@ -516,6 +516,7 @@ void peak_meter_playback(bool playback)
     (void)playback;
 #elif CONFIG_HWCODEC == MASNONE
 /* FIX: not for the sw-based ones yes */
+    (void)playback;
 #else
     if (playback) {
         peak_meter_src_l = MAS_REG_DQPEAK_L;
