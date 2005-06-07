@@ -36,12 +36,11 @@ FLAC__SeekableStreamDecoderReadStatus flac_read_handler(const FLAC__SeekableStre
 
     *bytes=(unsigned)(ci->read_filebuf(buffer,*bytes));
 
-    /* QUESTION: How do I detect the end of the stream? */
-    if (ci->curpos >= ci->filesize) {
+    if (*bytes==0) {
       return FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM;
+    } else {
+      return FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
     }
-
-    return FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
 }
 
 static unsigned char pcmbuf[FLAC_MAX_SUPPORTED_BLOCKSIZE*FLAC_MAX_SUPPORTED_CHANNELS*2] IDATA_ATTR;
@@ -169,13 +168,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
 
   /* This function sets up the buffers and reads the file into RAM */
 
+  next_track:
+
   if (codec_init(api, ci)) {
     return PLUGIN_ERROR;
   }
 
   /* Create a decoder instance */
 
-  next_track:
   flacDecoder=FLAC__seekable_stream_decoder_new();
 
   /* Set up the decoder and the callback functions - this must be done before init */
@@ -211,6 +211,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
     }
     FLAC__seekable_stream_decoder_process_single(flacDecoder);
   }
+
+  /* Flush the libFLAC buffers */
+  FLAC__seekable_stream_decoder_finish(flacDecoder);
 
   if (ci->request_next_track())
     goto next_track;
