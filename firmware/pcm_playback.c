@@ -211,8 +211,7 @@ void pcm_play_data(const unsigned char* start, int size,
     callback_for_more = get_more;
     dma_start(start, size);
     
-    if (get_more == pcm_play_callback)
-        get_more(&next_start, &next_size);
+    get_more(&next_start, &next_size);
 }
 
 void pcm_play_stop(void)
@@ -256,7 +255,6 @@ void DMA0(void) __attribute__ ((interrupt_handler, section(".icode")));
 void DMA0(void)
 {
     int res = DSR0;
-    bool rockboy = callback_for_more != pcm_play_callback;
 
     DSR0 = 1;    /* Clear interrupt */
 
@@ -267,13 +265,11 @@ void DMA0(void)
     }
     else
     {
-        if (callback_for_more && rockboy)
-            callback_for_more(&next_start, &next_size);
         if(next_size)
         {
             SAR0 = (unsigned long)next_start;  /* Source address */
             BCR0 = next_size;                  /* Bytes to transfer */
-            if (callback_for_more && !rockboy)
+            if (callback_for_more)
                 callback_for_more(&next_start, &next_size);
         }
         else
@@ -364,6 +360,17 @@ unsigned int audiobuffer_get_latency(void)
         latency = 0;
     
     return latency;
+}
+
+bool pcm_is_lowdata(void)
+{
+    if (!pcm_is_playing())
+        return false;
+    
+    if (PCMBUF_SIZE - audiobuffer_free <= PCM_WATERMARK)
+        return true;
+        
+    return false;
 }
 
 bool audiobuffer_insert(char *buf, size_t length)

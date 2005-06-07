@@ -106,6 +106,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
     
   /* This function sets up the buffers and reads the file into RAM */
     
+  /* We need to flush reserver memory every track load. */
+  next_track:
   if (codec_init(api, ci)) {
     return PLUGIN_ERROR;
   }
@@ -118,7 +120,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
   callbacks.tell_func=tell_handler;
   callbacks.close_func=close_handler;
 
-  next_track:
   error=ov_open_callbacks(ci,&vf,NULL,0,callbacks);
     
   vi=ov_info(&vf,-1);

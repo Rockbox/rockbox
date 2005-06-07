@@ -114,11 +114,11 @@ char *codecbuf;
 int codecbuflen;
 
 /* Bytes available in the buffer. */
-volatile int codecbufused;
+static volatile int codecbufused;
 
 /* Ring buffer read and write indexes. */
-static int buf_ridx;
-static int buf_widx;
+static volatile int buf_ridx;
+static volatile int buf_widx;
 
 #define MAX_TRACK 10
 struct track_info {
@@ -140,8 +140,8 @@ struct track_info {
 /* Track information (count in file buffer, read/write indexes for
    track ring structure. */
 static int track_count;
-static int track_ridx;
-static int track_widx;
+static volatile int track_ridx;
+static volatile int track_widx;
 static bool track_changed;
 
 /* Playlist position to tell the next track. */
@@ -224,7 +224,6 @@ size_t codec_filebuf_callback(void *ptr, size_t size)
     part_n = MIN(copy_n, codecbuflen - buf_ridx);
     memcpy(buf, &codecbuf[buf_ridx], part_n);
     if (part_n < copy_n) {
-        part_n = copy_n - part_n;
         memcpy(&buf[part_n], &codecbuf[0], copy_n - part_n);
     }
     
@@ -293,6 +292,8 @@ void codec_advance_buffer_loc_callback(void *ptr)
     codec_advance_buffer_callback(amount);
 }
 
+int mp3_get_file_pos(void);
+
 off_t codec_mp3_get_filepos_callback(int newtime)
 {
     int oldtime;
@@ -300,7 +301,7 @@ off_t codec_mp3_get_filepos_callback(int newtime)
     
     oldtime = cur_ti->id3.elapsed;
     cur_ti->id3.elapsed = newtime;
-    newpos = audio_get_file_pos();
+    newpos = mp3_get_file_pos();
     cur_ti->id3.elapsed = oldtime;
     
     return newpos;
@@ -394,6 +395,18 @@ int probe_file_format(const char *filename)
         
 }
 
+void yield_codecs(void)
+{
+#ifndef SIMULATOR
+    if (!pcm_is_playing())
+        sleep(5);
+    while (pcm_is_lowdata())
+        yield();
+#else
+    yield();
+#endif
+}
+
 void audio_fill_file_buffer(void)
 {
     size_t i;
@@ -402,7 +415,9 @@ void audio_fill_file_buffer(void)
     logf("Filling buffer...");
     i = 0;
     while ((off_t)i < tracks[track_widx].filerem) {
-        sleep(5); /* Give codecs some processing time. */
+        /* Give codecs some processing time. */
+        yield_codecs();
+            
         if (!playing) {
             logf("Filling interrupted");
             close(current_fd);
@@ -413,13 +428,13 @@ void audio_fill_file_buffer(void)
         if (fill_bytesleft < MIN(AUDIO_FILE_CHUNK, 
                                  tracks[track_widx].filerem - i))
             break ;
-        
         rc = MIN(AUDIO_FILE_CHUNK, codecbuflen - buf_widx);
         rc = read(current_fd, &codecbuf[buf_widx], rc);
         if (rc <= 0) {
             tracks[track_widx].filerem = 0;
             break ;
         }
+        
         buf_widx += rc;
         if (buf_widx == codecbuflen)
             buf_widx = 0;
@@ -521,7 +536,7 @@ bool loadcodec(const char *trackname, bool start_play)
     
     i = 0;
     while (i < size) {
-        yield();
+        yield_codecs();
         if (!playing) {
             logf("Buffering interrupted");
             close(fd);
@@ -616,7 +631,7 @@ bool audio_load_track(int offset, bool start_play)
     i = 0;
     while (i < size) {
         /* Give codecs some processing time to prevent glitches. */
-        sleep(5);
+        yield_codecs();
         if (!playing) {
             logf("Buffering interrupted");
             close(fd);
@@ -635,7 +650,7 @@ bool audio_load_track(int offset, bool start_play)
             return false;
         }
         buf_widx += rc;
-        if (buf_widx == codecbuflen)
+        if (buf_widx >= codecbuflen)
             buf_widx = 0;
         i += rc;
         tracks[track_widx].available += rc;
@@ -731,6 +746,7 @@ void audio_check_buffer(void)
     for (i = 0; i < MAX_TRACK - track_count; i++) {
         if (++cur_idx >= MAX_TRACK)
             cur_idx = 0;
+        tracks[cur_idx].filesize = 0;
         tracks[cur_idx].available = 0;
     }
     
@@ -806,7 +822,7 @@ bool codec_request_next_track_callback(void)
     if (ci.reload_codec && new_track > 0) {
         if (++track_ridx == MAX_TRACK)
             track_ridx = 0;
-        if (track_ridx == track_widx && tracks[track_ridx].filerem == 0) {
+        if (tracks[track_ridx].filesize == 0) {
             logf("Loading from disk...");
             new_track = 0;
             queue_post(&audio_queue, AUDIO_PLAY, (void *)(last_offset));
@@ -820,7 +836,7 @@ bool codec_request_next_track_callback(void)
             track_ridx = MAX_TRACK-1;
         if (tracks[track_ridx].filesize == 0 || 
             codecbufused+ci.curpos+tracks[track_ridx].filesize
-            + (off_t)tracks[track_ridx].codecsize > codecbuflen) {
+            /*+ (off_t)tracks[track_ridx].codecsize*/ > codecbuflen) {
             logf("Loading from disk...");
             last_offset -= track_count;
             if (last_offset < 0)
@@ -946,7 +962,7 @@ void codec_thread(void)
                     break ;
                 }
                 codecbufused -=codecsize;
-                cur_ti->codecsize = 0;
+                // cur_ti->codecsize = 0;
                 
                 ci.stop_codec = false;
                 wrap = (int)&codecbuf[codecbuflen] - (int)cur_ti->codecbuf;
@@ -1136,6 +1152,68 @@ int audio_get_file_pos(void)
     return 0;
 }
 
+
+/* Copied from mpeg.c. Should be moved somewhere else. */
+int mp3_get_file_pos(void)
+{
+    int pos = -1;
+    struct mp3entry *id3 = audio_current_track();
+    
+    if (id3->vbr)
+    {
+        if (id3->has_toc)
+        {
+            /* Use the TOC to find the new position */
+            unsigned int percent, remainder;
+            int curtoc, nexttoc, plen;
+                        
+            percent = (id3->elapsed*100)/id3->length; 
+            if (percent > 99)
+                percent = 99;
+                        
+            curtoc = id3->toc[percent];
+                        
+            if (percent < 99)
+                nexttoc = id3->toc[percent+1];
+            else
+                nexttoc = 256;
+                        
+            pos = (id3->filesize/256)*curtoc;
+                        
+            /* Use the remainder to get a more accurate position */
+            remainder   = (id3->elapsed*100)%id3->length;
+            remainder   = (remainder*100)/id3->length;
+            plen        = (nexttoc - curtoc)*(id3->filesize/256);
+            pos     += (plen/100)*remainder;
+        }
+        else
+        {
+            /* No TOC exists, estimate the new position */
+            pos = (id3->filesize / (id3->length / 1000)) *
+                (id3->elapsed / 1000);
+        }
+    }
+    else if (id3->bpf && id3->tpf)
+        pos = (id3->elapsed/id3->tpf)*id3->bpf;
+    else
+    {
+        return -1;
+    }
+
+    if (pos >= (int)(id3->filesize - id3->id3v1len))
+    {
+        /* Don't seek right to the end of the file so that we can
+           transition properly to the next song */
+        pos = id3->filesize - id3->id3v1len - 1;
+    }
+    else if (pos < (int)id3->first_frame_offset)
+    {
+        /* skip past id3v2 tag and other leading garbage */
+        pos = id3->first_frame_offset;
+    }
+    return pos;    
+}
+
 #ifndef SIMULATOR
 void audio_set_buffer_margin(int seconds)
 {
@@ -1181,6 +1259,7 @@ void audio_init(void)
     ci.seek_buffer = codec_seek_buffer_callback;
     ci.set_elapsed = codec_set_elapsed_callback;
     
+    queue_init(&audio_queue);
     queue_init(&codec_queue);
     
     create_thread(codec_thread, codec_stack, sizeof(codec_stack),
