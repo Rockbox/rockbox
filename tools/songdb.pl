@@ -7,6 +7,8 @@
 # it runnable standalone on removable drives. See below.
 #
 
+use vorbiscomm;
+
 my $db = "rockbox.id3db";
 my $dir;
 my $strip;
@@ -76,6 +78,36 @@ if(! -d $dir or $help) {
     exit;
 }
 
+sub get_oggtag {
+    my $fn = shift;
+    my %hash;
+
+    my $ogg = vorbiscomm->new($fn);
+
+    $ogg->load;
+
+    # Convert this format into the same format used by the id3 parser hash
+
+    foreach my $k ($ogg->comment_tags())
+    {
+        foreach my $cmmt ($ogg->comment($k))
+        {
+            my $n;
+            if($k =~ /^artist$/i) {
+                $n = 'ARTIST';
+            }
+            elsif($k =~ /^album$/i) {
+                $n = 'ALBUM';
+            }
+            $hash{$n}=$cmmt if($n);
+           # print $k, '=', $cmmt, "\n";
+        }
+    }
+
+    return \%hash;
+}
+
+
 # return ALL directory entries in the given dir
 sub getdir {
     my ($dir) = @_;
@@ -83,7 +115,6 @@ sub getdir {
     $dir =~ s|/$|| if ($dir ne "/");
 
     if (opendir(DIR, $dir)) {
-        #   my @mp3 = grep { /\.mp3$/ && -f "$dir/$_" } readdir(DIR);
         my @all = readdir(DIR);
         closedir DIR;
         return @all;
@@ -97,7 +128,7 @@ sub extractmp3 {
     my ($dir, @files) = @_;
     my @mp3;
     for(@files) {
-        if( /\.mp[23]$/ && -f "$dir/$_" ) {
+        if( (/\.mp[23]$/i || /\.ogg$/i) && -f "$dir/$_" ) {
             push @mp3, $_;
         }
     }
@@ -118,15 +149,15 @@ sub extractdirs {
 
 sub singlefile {
     my ($file) = @_;
+    my $hash;
 
-#    print "Check $file\n";
+    if($file =~ /\.ogg$/i) {
+        $hash = get_oggtag($file);
+    }
+    else {
+        $hash = get_mp3tag($file);
+    }
 
-    my $hash = get_mp3tag($file);
-  #  my $hash = get_mp3info($file);
-
-#    for(keys %$hash) {
-#        print "Info: $_ ".$hash->{$_}."\n";
-#    }
     return $hash; # a hash reference
 }
 
