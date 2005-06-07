@@ -350,25 +350,31 @@ bool codec_seek_buffer_callback(off_t newpos)
     return true;
 }
 
+char *rindex(const char *s, int c)
+{
+    char *p = NULL;
+    
+    if (s == NULL)
+        return NULL;
+    
+    while (*s != '\0') {
+        if (*s == c)
+            p = (char *)s;
+        s++;
+    }
+    
+    return p;
+}
+
 /* Simple file type probing by looking filename extension. */
 int probe_file_format(const char *filename)
 {
-    char suffix[4];
-    char *p;
-    int len, i;
+    char *suffix;
     
-    if (filename == NULL)
+    suffix = rindex(filename, '.');
+    if (suffix == NULL)
         return AFMT_UNKNOWN;
-    
-    len = strlen(filename);
-    if (len < 4)
-        return AFMT_UNKNOWN;
-    
-    p = (char *)&filename[len-3];
-    memset(suffix, 0, sizeof(suffix));
-    for (i = 0; i < 3; i++) {
-        suffix[i] = tolower(p[i]);
-    }
+    suffix += 1;
     
     if (!strcmp("mp3", suffix))
         return AFMT_MPA_L3;
@@ -376,7 +382,7 @@ int probe_file_format(const char *filename)
         return AFMT_OGG_VORBIS;
     else if (!strcmp("wav", suffix))
         return AFMT_PCM_WAV;
-    else if (!strcmp("flac", suffix)) // FIX THIS
+    else if (!strcmp("flac", suffix))
         return AFMT_FLAC;
     else if (!strcmp("mpc", suffix))
         return AFMT_MPC;
@@ -385,11 +391,11 @@ int probe_file_format(const char *filename)
     else if (!strcmp("ape", suffix))
         return AFMT_APE;
     else if (!strcmp("wma", suffix))
-        return AFMT_OGG_VORBIS;
+        return AFMT_WMA;
     else if (!strcmp("a52", suffix))
-        return AFMT_OGG_VORBIS;
-    else if (!strcmp(".rm", suffix))
-        return AFMT_OGG_VORBIS;
+        return AFMT_A52;
+    else if (!strcmp("rm", suffix))
+        return AFMT_REAL;
         
     return AFMT_UNKNOWN;
         
@@ -398,6 +404,7 @@ int probe_file_format(const char *filename)
 void yield_codecs(void)
 {
 #ifndef SIMULATOR
+    yield();
     if (!pcm_is_playing())
         sleep(5);
     while (pcm_is_lowdata())
