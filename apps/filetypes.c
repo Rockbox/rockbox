@@ -43,7 +43,12 @@
 #define MAX_FILETYPES 32
 
 /* max exttypes (extensions stored here) */
+#if CONFIG_HWCODEC == MASNONE
+/* Software codecs require more file extensions */
+#define MAX_EXTTYPES 64
+#else
 #define MAX_EXTTYPES 32
+#endif
 
 /* string buffer length */
 #define STRING_BUFFER_SIZE 512
