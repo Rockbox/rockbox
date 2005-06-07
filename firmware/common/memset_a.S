@@ -39,7 +39,7 @@
  * register usage:
  *  r0 - temporary
  *  r1 - bit mask for rounding to long bounds
- *  r2 - last / first long bound (only if >= 12 bytes)
+ *  r2 - start address +11 for main loop
  *  r4 - start address
  *  r5 - data (spread to all 4 bytes if >= 12 bytes)
  *  r6 - current address (runs down from end to start)
@@ -50,58 +50,57 @@
  */
 
 _memset:
+    neg     r4,r0
+    and     #3,r0       /* r0 = (4 - align_offset) % 4 */
+    add     #4,r0
+    cmp/hs  r0,r6       /* at least one aligned longword to fill? */
     add     r4,r6       /* r6 = end_address */
-
-    mov     r6,r0
-    add     #-12,r0     /* r0 = r6 - 12; don't go below 12 here! */
-    cmp/hs  r4,r0       /* >= 12 bytes to fill? */
-    bf      .start_b2   /* no, jump directly to byte loop */
+    bf      .no_longs   /* no, jump directly to byte loop */
 
     extu.b  r5,r5       /* start: spread data to all 4 bytes */
     swap.b  r5,r0
     or      r0,r5       /* data now in 2 lower bytes of r5 */
     swap.w  r5,r0
     or      r0,r5       /* data now in all 4 bytes of r5 */
-
+    
     mov     #-4,r1      /* r1 = 0xFFFFFFFC */
-
-    mov     r6,r2
-    bra     .start_b1
-    and     r1,r2       /* r2 = last long bound */
+    mov     r6,r0
+    and     r1,r0       /* r0 = last long bound */
+    cmp/hi  r0,r6       /* any leading byte? */
+    bf      .end_b1     /* no: skip loop */
 
     /* leading byte loop: sets 0..3 bytes */
 .loop_b1:
     mov.b   r5,@-r6     /* store byte */
-.start_b1:
-    cmp/hi  r2,r6       /* runs r6 down to last long bound */
-    bt      .loop_b1
+    cmp/hi  r0,r6
+    bt      .loop_b1    /* runs r6 down to last long bound */
 
-    mov     r4,r2
-    add     #11,r2      /* combined for rounding and offset */
-    and     r1,r2       /* r2 = first long bound + 8 */
+.end_b1:
+    mov     r4,r2       /* r2 = start_address... */
+    add     #11,r2      /* ... + 11, combined for rounding and offset */
+    xor     r2,r0
+    tst     #4,r0       /* bit 2 tells whether an even or odd number of */
+    bf      .loop_odd   /* longwords to set */
 
     /* main loop: set 2 longs per pass */
-.loop2_l:
+.loop_2l:
     mov.l   r5,@-r6     /* store first long */
-    cmp/hi  r2,r6       /* runs r6 down to first or second long bound */
+.loop_odd:
+    cmp/hi  r2,r6       /* runs r6 down to first long bound */
     mov.l   r5,@-r6     /* store second long */
-    bt      .loop2_l
+    bt      .loop_2l
 
-    add     #-8,r2      /* correct offset */
-    cmp/hi  r2,r6       /* 1 long left? */
-    bf      .start_b2   /* no, jump to trailing byte loop */
-
-    bra     .start_b2   /* jump to trailing byte loop */
-    mov.l   r5,@-r6     /* store last long */
+.no_longs:
+    cmp/hi  r4,r6       /* any bytes left? */
+    bf      .end_b2     /* no: skip loop */
 
     /* trailing byte loop */
-    .align  2
 .loop_b2:
     mov.b   r5,@-r6     /* store byte */
-.start_b2:
     cmp/hi  r4,r6       /* runs r6 down to the start address */
     bt      .loop_b2
 
+.end_b2:
     rts
     mov     r4,r0       /* return start address */
 
