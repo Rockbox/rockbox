@@ -296,13 +296,10 @@ int mp3_get_file_pos(void);
 
 off_t codec_mp3_get_filepos_callback(int newtime)
 {
-    int oldtime;
     off_t newpos;
     
-    oldtime = cur_ti->id3.elapsed;
     cur_ti->id3.elapsed = newtime;
     newpos = mp3_get_file_pos();
-    cur_ti->id3.elapsed = oldtime;
     
     return newpos;
 }
@@ -360,7 +357,11 @@ int probe_file_format(const char *filename)
         return AFMT_UNKNOWN;
     suffix += 1;
     
-    if (!strcmp("mp3", suffix))
+    if (!strcmp("mp1", suffix))
+        return AFMT_MPA_L1;
+    else if (!strcmp("mp2", suffix))
+        return AFMT_MPA_L2;
+    else if (!strcmp("mp3", suffix))
         return AFMT_MPA_L3;
     else if (!strcmp("ogg", suffix))
         return AFMT_OGG_VORBIS;
@@ -770,10 +771,11 @@ void audio_update_trackinfo(void)
     } else {
         buf_ridx -= ci.curpos;
         codecbufused += ci.curpos;
+        cur_ti->available = cur_ti->filesize;
         
         cur_ti = &tracks[track_ridx];
-        buf_ridx -= cur_ti->filesize;
-        buf_ridx -= cur_ti->codecsize;
+        buf_ridx -= cur_ti->filesize + cur_ti->codecsize;
+        codecbufused += cur_ti->filesize  + cur_ti->codecsize;
         cur_ti->available = cur_ti->filesize;
         if (buf_ridx < 0)
             buf_ridx = codecbuflen + buf_ridx;
