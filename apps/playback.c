@@ -350,28 +350,12 @@ bool codec_seek_buffer_callback(off_t newpos)
     return true;
 }
 
-char *rindex(const char *s, int c)
-{
-    char *p = NULL;
-    
-    if (s == NULL)
-        return NULL;
-    
-    while (*s != '\0') {
-        if (*s == c)
-            p = (char *)s;
-        s++;
-    }
-    
-    return p;
-}
-
 /* Simple file type probing by looking filename extension. */
 int probe_file_format(const char *filename)
 {
     char *suffix;
     
-    suffix = rindex(filename, '.');
+    suffix = strrchr(filename, '.');
     if (suffix == NULL)
         return AFMT_UNKNOWN;
     suffix += 1;
