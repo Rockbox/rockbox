@@ -74,6 +74,7 @@ vorbis2wav.c
 #ifdef IRIVER_H100
 codecvorbis.c
 codecmpa.c
+codecflac.c
 #endif
 wv2wav.c
 mpc2wav.c
