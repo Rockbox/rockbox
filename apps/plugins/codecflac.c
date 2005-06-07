@@ -204,7 +204,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
   FLAC__seekable_stream_decoder_process_until_end_of_metadata(flacDecoder);
 
   /* The main decoder loop */
-  while (FLAC__seekable_stream_decoder_get_state(flacDecoder)!=2) {
+  while (FLAC__seekable_stream_decoder_get_state(flacDecoder)!=FLAC__SEEKABLE_STREAM_DECODER_END_OF_STREAM) {
     rb->yield();
     if (ci->stop_codec || ci->reload_codec) {
       break;
