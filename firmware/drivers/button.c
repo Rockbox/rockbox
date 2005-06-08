@@ -438,19 +438,12 @@ static int button_read(void)
     }
                     
     /* special buttons */
-    if (!button_hold())
-    {
-        data = GPIO1_READ;
-        if ((data & 0x20) == 0)
-            btn |= BUTTON_ON;
-    }
-
-    if (!remote_button_hold())
-    {
-        data = GPIO1_READ;
-        if ((data & 0x40) == 0)
-            btn |= BUTTON_RC_ON;
-    }
+    data = GPIO1_READ;
+    if (!button_hold() && (data & 0x20 == 0))
+        btn |= BUTTON_ON;
+    if (!remote_button_hold() && (data & 0x40 == 0))
+        btn |= BUTTON_RC_ON;
+    
     
 #elif CONFIG_KEYPAD == RECORDER_PAD
 
