@@ -443,7 +443,11 @@ static int button_read(void)
         data = GPIO1_READ;
         if ((data & 0x20) == 0)
             btn |= BUTTON_ON;
+    }
 
+    if (!remote_button_hold())
+    {
+        data = GPIO1_READ;
         if ((data & 0x40) == 0)
             btn |= BUTTON_RC_ON;
     }
