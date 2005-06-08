@@ -480,7 +480,7 @@ void set_cpu_frequency(long frequency)
     switch(frequency)
     {
     case CPUFREQ_MAX:
-        DCR = (DCR & ~0x000001ff) | 1;   /* Refresh timer for bypass
+        DCR = (DCR & ~0x01ff) | 1;   /* Refresh timer for bypass
                                             frequency */
         PLLCR &= ~1;  /* Bypass mode */
         PLLCR = 0x11853005;
@@ -488,7 +488,7 @@ void set_cpu_frequency(long frequency)
         CSCR1 = 0x00002580; /* LCD: 9 wait states */
         while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
                                             This may take up to 10ms! */
-        DCR = (DCR & ~0x000001ff) | 28;   /* Refresh timer */
+        DCR = (DCR & ~0x01ff) | 28;   /* Refresh timer */
         cpu_frequency = CPUFREQ_MAX;
         tick_start(1000/HZ);
         IDECONFIG1 = 0x106000 | (5 << 10); /* BUFEN2 enable + CS2Pre/CS2Post */
@@ -499,7 +499,7 @@ void set_cpu_frequency(long frequency)
         break;
         
     case CPUFREQ_NORMAL:
-        DCR = (DCR & ~0x000001ff) | 1;   /* Refresh timer for bypass
+        DCR = (DCR & ~0x01ff) | 1;   /* Refresh timer for bypass
                                             frequency */
         PLLCR &= ~1;  /* Bypass mode */
         PLLCR = 0x10886001;
@@ -507,7 +507,7 @@ void set_cpu_frequency(long frequency)
         CSCR1 = 0x00000980; /* LCD: 2 wait states */
         while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
                                             This may take up to 10ms! */
-        DCR = (DCR & ~0x000001ff) | 10;   /* Refresh timer */
+        DCR = (DCR & ~0x01ff) | 10;   /* Refresh timer */
         cpu_frequency = CPUFREQ_NORMAL;
         tick_start(1000/HZ);
         IDECONFIG1 = 0x106000 | (5 << 10); /* BUFEN2 enable + CS2Pre/CS2Post */
@@ -517,7 +517,7 @@ void set_cpu_frequency(long frequency)
         MFDR2 = 0x13;
         break;
     default:
-        DCR = (DCR & ~0x000001ff) | 1;   /* Refresh timer for bypass
+        DCR = (DCR & ~0x01ff) | 1;   /* Refresh timer for bypass
                                             frequency */
         PLLCR = 0x00000000;  /* Bypass mode */
         CSCR0 = 0x00000180; /* Flash: 0 wait states */

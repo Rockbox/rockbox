@@ -44,7 +44,7 @@
 #define CSMR3 (*(volatile unsigned long *)(MBAR + 0x0a8))
 #define CSCR3 (*(volatile unsigned long *)(MBAR + 0x0ac))
 
-#define DCR   (*(volatile unsigned long *)(MBAR + 0x100))
+#define DCR   (*(volatile unsigned short *)(MBAR + 0x100))
 #define DACR0 (*(volatile unsigned long *)(MBAR + 0x108))
 #define DMR0  (*(volatile unsigned long *)(MBAR + 0x10c))
 #define DACR1 (*(volatile unsigned long *)(MBAR + 0x110))
