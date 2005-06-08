@@ -27,7 +27,6 @@
 #define MB()
 
 static inline void mcf5249_init_mac(void) {
-  int r;
   asm volatile ("move.l #0x20, %macsr;");  /* frac, truncate, no saturation */
 }
 
