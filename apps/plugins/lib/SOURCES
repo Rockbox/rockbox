@@ -1,4 +1,5 @@
 configfile.c
+highscore.c
 #ifdef HAVE_LCD_BITMAP
 gray_black_display.c
 gray_blockfuncs.c
