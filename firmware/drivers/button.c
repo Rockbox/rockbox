@@ -123,7 +123,7 @@ static void button_tick(void)
                                which doesn't shut down easily with the OFF
                                key */
 #ifdef HAVE_SW_POWEROFF
-                            if (btn == BUTTON_OFF &&
+                            if ((btn == BUTTON_OFF || btn == BUTTON_RC_STOP) &&
 #ifndef IRIVER_H100
                                 !charger_inserted() &&
 #endif
