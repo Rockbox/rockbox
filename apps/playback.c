@@ -637,6 +637,12 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         logf("F:%d", tracks[track_widx].id3.frequency);
         tracks[track_widx].taginfo_ready = true;
         break ;
+
+    /* If we don't know how to read the metadata, just store the filename */
+    default:
+        strncpy(tracks[track_widx].id3.path,trackname,sizeof(tracks[track_widx].id3.path));
+        tracks[track_widx].taginfo_ready = true;
+        break;
     }
     
     track_count++;
