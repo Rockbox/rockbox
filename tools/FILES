@@ -11,6 +11,7 @@ sample.emacs
 buildzip.pl
 romsizetest.pl
 wn2rdf.pl
+dict2rdf.pl
 make.inc
 makesrc.inc
 fwpatcher/*.[ch]
