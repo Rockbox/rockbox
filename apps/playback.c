@@ -614,6 +614,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         
     /* Load codec specific track tag information. */
     switch (tracks[track_widx].codectype) {
+    case AFMT_MPA_L2:
     case AFMT_MPA_L3:
         /* Should check the return value. */
         mp3info(&tracks[track_widx].id3, trackname, v1first);
