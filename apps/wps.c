@@ -636,6 +636,7 @@ long wps_show(void)
             case WPS_INCVOL | BUTTON_REPEAT:
 #ifdef WPS_RC_INCVOL
             case WPS_RC_INCVOL:
+            case WPS_RC_INCVOL | BUTTON_REPEAT:
 #endif
                 global_settings.volume++;
                 if (setvol()) {
@@ -649,6 +650,7 @@ long wps_show(void)
             case WPS_DECVOL | BUTTON_REPEAT:
 #ifdef WPS_RC_DECVOL
             case WPS_RC_DECVOL:
+            case WPS_RC_DECVOL | BUTTON_REPEAT:
 #endif
                 global_settings.volume--;
                 if (setvol()) {
