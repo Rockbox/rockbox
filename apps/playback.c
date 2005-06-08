@@ -565,19 +565,18 @@ bool loadcodec(const char *trackname, bool start_play)
     return true;
 }
 
-bool audio_load_track(int offset, bool start_play)
+bool audio_load_track(int offset, bool start_play, int peek_offset)
 {
     char *trackname;
     int fd;
     off_t size;
     int rc, i;
     int copy_n;
-    int last_offset = 0;
     
     if (track_count >= MAX_TRACK)
         return false;
         
-    trackname = playlist_peek(last_offset);
+    trackname = playlist_peek(peek_offset);
     if (!trackname) {
         return false;
     }
@@ -639,7 +638,6 @@ bool audio_load_track(int offset, bool start_play)
         break ;
     }
     
-    last_offset++;
     track_count++;
     i = tracks[track_widx].filepos;
     while (i < size) {
@@ -694,11 +692,13 @@ bool audio_load_track(int offset, bool start_play)
 
 void audio_insert_tracks(int offset, bool start_playing)
 {
+    int peek_offset = 0;
     fill_bytesleft = codecbuflen - codecbufused;
     filling = true;
-    while (audio_load_track(offset, start_playing)) {
+    while (audio_load_track(offset, start_playing, peek_offset)) {
         start_playing = false;
         offset = 0;
+        peek_offset++;
     }
     filling = false;
 }
