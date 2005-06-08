@@ -190,8 +190,8 @@ irq_handler:
         
         /* Set up the DRAM controller. The refresh is based on the 11.2896MHz
            clock (5.6448MHz bus frequency). We haven't yet started the PLL */
-        move.l #0x80050000,%d0
-        move.l %d0,(0x100,%a0) /* DCR - Synchronous, 80 cycle refresh */
+        move.l #0x80010000,%d0
+        move.l %d0,(0x100,%a0) /* DCR - Synchronous, 32 cycle refresh */
 
         /* Note: we place the SDRAM on an 0x1000000 (16M) offset because
            the 5249 BGA chip has a fault which disables the use of A24. The
