@@ -70,19 +70,22 @@ void i2c_close(void)
 int i2c_write(int device, unsigned char *buf, int count)
 {
     int i;
+    int rc;
 
-    if (i2c_gen_start(device) == -1)
+    rc = i2c_gen_start(device);
+    if (rc < 0)
     {
         DEBUGF("i2c: gen_start failed (d=%d)", device);
-        return -1;
+        return rc*10 - 1;
     }
 
     for (i=0; i<count; i++)
     {
-        if (i2c_write_byte(device, buf[i]) == -1)
+        rc = i2c_write_byte(device, buf[i]);
+        if (rc < 0)
         {
             DEBUGF("i2c: write failed at (d=%d,i=%d)", device, i);
-            return i-1;
+            return rc*10 - 2;
         }
     }
 
@@ -110,23 +113,25 @@ int i2c_write_byte(int device, unsigned char data)
     if (count >= MAX_LOOP)
         return -1;
 
+    count = 0;
+    
     /* Wait for interrupt flag */
     while (!(regs[O_MBSR] & IFF) && count < MAX_LOOP)
     {
         yield();
-        count++;            
+        count++;  
     }
 
     if (count >= MAX_LOOP)
-        return -1;
+        return -2;
 
     regs[O_MBSR] &= ~IFF;       /* Clear interrupt flag  */
     
     if (!(regs[O_MBSR] & ICF))  /* Check that transfer is complete */
-        return -1;      
+        return -3;      
 
     if (regs[O_MBSR] & RXAK)    /* Check that the byte has been ACKed */
-        return -1;
+        return -4;
     
     return 0;
 }
@@ -140,14 +145,17 @@ int i2c_gen_start(int device)
         
     /* Wait for bus to become free */
     while ((regs[O_MBSR] & IBB) && (count < MAX_LOOP))
+    {
+        yield();
         count++;
+    }
                 
     if (count >= MAX_LOOP)
         return -1;
 
     regs[O_MBCR] |= MSTA | MTX;         /* Generate START */
 
-    return 0;   
+    return 0;
 }  
 
 void i2c_gen_stop(int device)
