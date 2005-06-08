@@ -29,12 +29,9 @@
 #include "system.h"
 #include "font.h"
 
-/* All zeros and ones bitmaps for area filling */  
-static const unsigned char zeros[16] = { 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-};
-static const unsigned char ones[16]  = { 
-    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+/* All zeros and ones bitmaps for area filling */
+static const unsigned char zeros[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+static const unsigned char ones[8]  = {
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
 };
 
@@ -66,6 +63,16 @@ struct scrollinfo {
 static volatile int scrolling_lines=0; /* Bitpattern of which lines are scrolling */
 
 #ifndef SIMULATOR
+static int countdown;                   /* for remote plugging debounce */
+static bool last_remote_status = false;
+static bool init_remote = false;        /* scroll thread should init lcd */
+static bool remote_initialized = false;
+
+/* cached settings values, for hotplug init */
+static bool cached_invert = false;
+static int cached_contrast = 32;
+static int cached_roll = 0;
+
 static void scroll_thread(void);
 static long scroll_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 #endif
@@ -209,18 +216,25 @@ void lcd_remote_write_command_ex(int cmd, int data)
 
 void lcd_remote_powersave(bool on)
 {
-    lcd_remote_write_command(LCD_REMOTE_CNTL_DISPLAY_ON_OFF | (on ? 0 : 1));
-    lcd_remote_write_command(LCD_REMOTE_CNTL_ENTIRE_ON_OFF | (on ? 1 : 0));
+    if (remote_initialized)
+    {
+        lcd_remote_write_command(LCD_REMOTE_CNTL_DISPLAY_ON_OFF | (on ? 0 : 1));
+        lcd_remote_write_command(LCD_REMOTE_CNTL_ENTIRE_ON_OFF | (on ? 1 : 0));
+    }
 }
 
 void lcd_remote_set_contrast(int val)
 {
-    lcd_remote_write_command_ex(LCD_REMOTE_CNTL_SELECT_VOLTAGE, val);
+    cached_contrast = val;
+    if (remote_initialized)
+        lcd_remote_write_command_ex(LCD_REMOTE_CNTL_SELECT_VOLTAGE, val);
 }
 
 void lcd_remote_set_invert_display(bool yesno)
 {
-    lcd_remote_write_command(LCD_REMOTE_CNTL_REVERSE_ON_OFF | yesno);
+    cached_invert = yesno;
+    if (remote_initialized)
+        lcd_remote_write_command(LCD_REMOTE_CNTL_REVERSE_ON_OFF | yesno);
 }
 
 int lcd_remote_default_contrast(void)
@@ -377,21 +391,67 @@ void lcd_remote_clear_display(void)
 }
 
 #ifndef SIMULATOR
-/*
- * Update the display.
- * This must be called after all other LCD functions that change the display.
- */
-void lcd_remote_update (void) __attribute__ ((section (".icode")));
-void lcd_remote_update (void)
-{
-    int y;
 
-    /* Copy display bitmap to hardware */
-    for (y = 0; y < LCD_REMOTE_HEIGHT / 8; y++)
+static void remote_lcd_init(void)
+{
+    lcd_remote_write_command(LCD_REMOTE_CNTL_ADC_REVERSE);
+    lcd_remote_write_command(LCD_REMOTE_CNTL_SHL_REVERSE);
+    lcd_remote_write_command(LCD_REMOTE_CNTL_SELECT_BIAS | 0x0);
+
+    lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x5);
+    sleep(1);
+    lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x6);
+    sleep(1);
+    lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x7);
+    
+    lcd_remote_write_command(LCD_REMOTE_CNTL_SELECT_REGULATOR | 0x4); // 0x4 Select regulator @ 5.0 (default);
+    
+    sleep(1);
+    
+    lcd_remote_write_command(LCD_REMOTE_CNTL_INIT_LINE | 0x0); // init line
+    lcd_remote_write_command(LCD_REMOTE_CNTL_SET_PAGE_ADDRESS | 0x0); // page address
+    lcd_remote_write_command_ex(0x10, 0x00); // Column MSB + LSB
+
+    lcd_remote_write_command(LCD_REMOTE_CNTL_DISPLAY_ON_OFF | 1);
+    
+    remote_initialized = true;
+
+    lcd_remote_set_contrast(cached_contrast);
+    lcd_remote_set_invert_display(cached_invert);
+    lcd_remote_roll(cached_roll);
+}
+
+static void remote_tick(void)
+{
+    bool current_status;
+
+    current_status = ((GPIO_READ & 0x40000000) == 0);
+    /* Only report when the status has changed */
+    if (current_status != last_remote_status)
     {
-        lcd_remote_write_command(LCD_REMOTE_CNTL_SET_PAGE_ADDRESS | y);
-        lcd_remote_write_command_ex(0x10, 0x04);
-        lcd_remote_write_data(lcd_remote_framebuffer[y], LCD_REMOTE_WIDTH);
+        last_remote_status = current_status;
+        countdown = current_status ? HZ : 1;
+    }
+    else
+    {
+        /* Count down until it gets negative */
+        if (countdown >= 0)
+            countdown--;
+
+        if (countdown == 0)
+        {
+            if (current_status)
+            {
+                init_remote = true;   
+                /* request init in scroll_thread */
+            }
+            else
+            {
+                CLK_LO;
+                CS_HI;
+                remote_initialized = false;
+            }
+        }
     }
 }
 
@@ -406,36 +466,34 @@ void lcd_remote_init(void)
     GPIO_ENABLE     |= 0x10010800;
     GPIO1_ENABLE    |= 0x00040004;
     
-    CLK_LO;
-    CS_HI;
-    
-    lcd_remote_write_command(LCD_REMOTE_CNTL_ADC_REVERSE);
-    lcd_remote_write_command(LCD_REMOTE_CNTL_SHL_REVERSE);
-    lcd_remote_write_command(LCD_REMOTE_CNTL_SELECT_BIAS | 0x0);
-    
-    lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x5);
-    sleep(1);
-    lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x6);
-    sleep(1);
-    lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x7);
-    
-    lcd_remote_write_command(LCD_REMOTE_CNTL_SELECT_REGULATOR | 0x4); // 0x4 Select regulator @ 5.0 (default);
-    
-    sleep(1);
-    
-    lcd_remote_write_command(LCD_REMOTE_CNTL_INIT_LINE | 0x0); // init line
-    lcd_remote_write_command(LCD_REMOTE_CNTL_SET_PAGE_ADDRESS | 0x0); // page address
-    lcd_remote_write_command_ex(0x10, 0x00); // Column MSB + LSB
-    
-    lcd_remote_write_command(LCD_REMOTE_CNTL_DISPLAY_ON_OFF | 1);
-    
     lcd_remote_clear_display();
-    lcd_remote_update();
-    
+
+    tick_add_task(remote_tick);
     create_thread(scroll_thread, scroll_stack,
                   sizeof(scroll_stack), scroll_name);
 }
 
+
+/*
+ * Update the display.
+ * This must be called after all other LCD functions that change the display.
+ */
+void lcd_remote_update (void) __attribute__ ((section (".icode")));
+void lcd_remote_update (void)
+{
+    int y;
+    
+    if (!remote_initialized)
+        return;
+
+    /* Copy display bitmap to hardware */
+    for (y = 0; y < LCD_REMOTE_HEIGHT / 8; y++)
+    {
+        lcd_remote_write_command(LCD_REMOTE_CNTL_SET_PAGE_ADDRESS | y);
+        lcd_remote_write_command_ex(0x10, 0x04);
+        lcd_remote_write_data(lcd_remote_framebuffer[y], LCD_REMOTE_WIDTH);
+    }
+}
 
 /*
  * Update a fraction of the display.
@@ -445,6 +503,9 @@ void lcd_remote_update_rect (int x_start, int y,
                       int width, int height)
 {
     int ymax;
+    
+    if (!remote_initialized)
+        return;
 
     /* The Y coordinates have to work on even 8 pixel rows */
     ymax = (y + height-1)/8;
@@ -478,13 +539,18 @@ void lcd_remote_update_rect (int x_start, int y,
 void lcd_remote_roll(int lines)
 {
     char data[2];
-
-    lines &= LCD_REMOTE_HEIGHT-1;
-    data[0] = lines & 0xff;
-    data[1] = lines >> 8;
     
-    lcd_remote_write_command(LCD_REMOTE_CNTL_INIT_LINE | 0x0); // init line
-    lcd_remote_write_data(data, 2);
+    cached_roll = lines;
+
+    if (remote_initialized)
+    {
+        lines &= LCD_REMOTE_HEIGHT-1;
+        data[0] = lines & 0xff;
+        data[1] = lines >> 8;
+    
+        lcd_remote_write_command(LCD_REMOTE_CNTL_INIT_LINE | 0x0); // init line
+        lcd_remote_write_data(data, 2);
+    }
 }
 
 #endif
@@ -925,6 +991,14 @@ static void scroll_thread(void)
     scrolling_lines = 0;
 
     while ( 1 ) {
+
+        if (init_remote)   /* request to initialize the remote lcd */
+        {
+            init_remote = false; /* clear request */
+            remote_lcd_init();
+            lcd_remote_update();
+        }
+
         for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
             /* really scroll? */
             if ( !(scrolling_lines&(1<<index)) )
