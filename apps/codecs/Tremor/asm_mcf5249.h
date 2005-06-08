@@ -28,12 +28,7 @@
 
 static inline void mcf5249_init_mac(void) {
   int r;
-  asm volatile ("move.l #0x20, %%macsr;"  /* frac, truncate, no saturation */
-                "movclr.l %%acc0, %[r];"  /* clear accumulators */
-                "move.l %%acc0, %%acc1;"
-                "move.l %%acc0, %%acc2;"
-                "move.l %%acc0, %%acc3;"
-                : [r] "=r" (r));
+  asm volatile ("move.l #0x20, %%macsr;");  /* frac, truncate, no saturation */
 }
 
 static inline ogg_int32_t MULT32(ogg_int32_t x, ogg_int32_t y) {

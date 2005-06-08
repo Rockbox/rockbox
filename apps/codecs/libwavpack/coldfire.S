@@ -66,9 +66,9 @@ decorr_stereo_pass_cont_mcf5249:
         asl.l   %d0, %d1
         move.l  %d1, %a3
 
-        move.l  #0x20, %macsr           | set fractional mode for MAC
-        move.l  #0, %acc1               | acc1 = 0x00 0000 80 (for rounding)
-        move.l  #0x800000, %accext01
+        moveq.l #0x20, %d6
+        move.l  %d6, %macsr             | set fractional mode for MAC
+        move.l  #0x800000, %accext01    | acc1 = 0x00 0000 80 (for rounding)
         
         move.l  #1024<<17, %d6          | d6 & d7 are weight clipping limits
         move.l  #-1024<<17, %d7         | (only used by negative terms)
