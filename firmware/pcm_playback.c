@@ -383,7 +383,7 @@ bool audiobuffer_insert(char *buf, size_t length)
         return false;
     }
     
-    if (!pcm_is_playing()) {
+    if (!pcm_is_playing() && !pcm_paused) {
         pcm_boost(true);
         if (audiobuffer_free < PCMBUF_SIZE - CHUNK_SIZE*2)
             pcm_play_start();
