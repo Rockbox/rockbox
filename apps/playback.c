@@ -135,6 +135,7 @@ struct track_info {
     volatile int available;
     bool taginfo_ready;
     int playlist_offset;
+    int elapsed_start;
 };
 
 /* Track information (count in file buffer, read/write indexes for
@@ -143,9 +144,6 @@ static int track_count;
 static volatile int track_ridx;
 static volatile int track_widx;
 static bool track_changed;
-
-/* Playlist position to tell the next track. */
-static int last_offset;
 
 /* Partially loaded song's file handle to continue buffering later. */
 static int current_fd;
@@ -167,6 +165,9 @@ static struct codec_api ci;
 static int new_track;
 
 static bool v1first = false;
+
+static void mp3_set_elapsed(struct mp3entry* id3);
+int mp3_get_file_pos(void);
 
 #ifdef SIMULATOR
 bool audiobuffer_insert_sim(char *buf, size_t length)
@@ -193,6 +194,7 @@ void codec_set_elapsed_callback(unsigned int value)
 #else
     latency = 0;
 #endif
+    value += cur_ti->elapsed_start;
     if (value < latency) {
         cur_ti->id3.elapsed = 0;
     } else if (value - latency > cur_ti->id3.elapsed 
@@ -252,7 +254,6 @@ void* codec_request_buffer_callback(size_t *realsize, size_t reqsize)
     }
     
     while ((int)*realsize > cur_ti->available) {
-        // logf("Buffer wait: %d", cur_ti->available);
         yield();
         if (ci.stop_codec) {
             return NULL;
@@ -273,15 +274,24 @@ void* codec_request_buffer_callback(size_t *realsize, size_t reqsize)
 
 void codec_advance_buffer_callback(size_t amount)
 {
-    if ((int)amount > cur_ti->available)
-        amount = cur_ti->available;
+    if ((int)amount > cur_ti->available + cur_ti->filerem)
+        amount = cur_ti->available + cur_ti->filerem;
         
-    cur_ti->available -= amount;
-    codecbufused -= amount;
-    buf_ridx += amount;
-    if (buf_ridx >= codecbuflen)
-        buf_ridx -= codecbuflen;
+    if ((int)amount > cur_ti->available) {
+        codecbufused = 0;
+        buf_ridx = buf_widx;
+        cur_ti->available = 0;
+        while ((int)amount < cur_ti->available)
+            yield();
+    } else {
+        cur_ti->available -= amount;
+        codecbufused -= amount;
+        buf_ridx += amount;
+        if (buf_ridx >= codecbuflen)
+            buf_ridx -= codecbuflen;
+    }
     ci.curpos += amount;
+    cur_ti->id3.offset = ci.curpos;
 }
 
 void codec_advance_buffer_loc_callback(void *ptr)
@@ -291,8 +301,6 @@ void codec_advance_buffer_loc_callback(void *ptr)
     amount = (int)ptr - (int)&codecbuf[buf_ridx];
     codec_advance_buffer_callback(amount);
 }
-
-int mp3_get_file_pos(void);
 
 off_t codec_mp3_get_filepos_callback(int newtime)
 {
@@ -360,6 +368,8 @@ int probe_file_format(const char *filename)
     if (!strcmp("mp1", suffix))
         return AFMT_MPA_L1;
     else if (!strcmp("mp2", suffix))
+        return AFMT_MPA_L2;
+    else if (!strcmp("mpa", suffix))
         return AFMT_MPA_L2;
     else if (!strcmp("mp3", suffix))
         return AFMT_MPA_L3;
@@ -465,8 +475,9 @@ bool loadcodec(const char *trackname, bool start_play)
         logf("Codec: Vorbis");
         codec_path = CODEC_VORBIS;
         break;
+    case AFMT_MPA_L2:
     case AFMT_MPA_L3:
-        logf("Codec: MPA L3");
+        logf("Codec: MPA L2/L3");
         codec_path = CODEC_MPA_L3;
         break;
     case AFMT_PCM_WAV:
@@ -561,11 +572,12 @@ bool audio_load_track(int offset, bool start_play)
     off_t size;
     int rc, i;
     int copy_n;
+    int last_offset = 0;
     
     if (track_count >= MAX_TRACK)
         return false;
         
-    trackname = playlist_peek(offset);
+    trackname = playlist_peek(last_offset);
     if (!trackname) {
         return false;
     }
@@ -573,7 +585,7 @@ bool audio_load_track(int offset, bool start_play)
     fd = open(trackname, O_RDONLY);
     if (fd < 0)
         return false;
-        
+    
     size = filesize(fd);
     tracks[track_widx].filerem = size;
     tracks[track_widx].filesize = size;
@@ -608,6 +620,17 @@ bool audio_load_track(int offset, bool start_play)
         mp3info(&tracks[track_widx].id3, trackname, v1first);
         lseek(fd, 0, SEEK_SET);
         get_mp3file_info(fd, &tracks[track_widx].mp3data);
+        if (offset) {
+            lseek(fd, offset, SEEK_SET);
+            tracks[track_widx].id3.offset = offset;
+            mp3_set_elapsed(&tracks[track_widx].id3);
+            tracks[track_widx].elapsed_start = tracks[track_widx].id3.elapsed;
+            tracks[track_widx].filepos = offset;
+            tracks[track_widx].filerem = tracks[track_widx].filesize - offset;
+            ci.curpos = offset;
+        } else {
+            lseek(fd, 0, SEEK_SET);
+        }
         logf("T:%s", tracks[track_widx].id3.title);
         logf("L:%d", tracks[track_widx].id3.length);
         logf("O:%d", tracks[track_widx].id3.first_frame_offset);
@@ -616,11 +639,9 @@ bool audio_load_track(int offset, bool start_play)
         break ;
     }
     
-    playlist_next(0);
     last_offset++;
     track_count++;
-    lseek(fd, 0, SEEK_SET);
-    i = 0;
+    i = tracks[track_widx].filepos;
     while (i < size) {
         /* Give codecs some processing time to prevent glitches. */
         yield_codecs();
@@ -671,12 +692,13 @@ bool audio_load_track(int offset, bool start_play)
     return true;
 }
 
-void audio_insert_tracks(bool start_playing)
+void audio_insert_tracks(int offset, bool start_playing)
 {
     fill_bytesleft = codecbuflen - codecbufused;
     filling = true;
-    while (audio_load_track(last_offset, start_playing)) {
+    while (audio_load_track(offset, start_playing)) {
         start_playing = false;
+        offset = 0;
     }
     filling = false;
 }
@@ -695,8 +717,7 @@ void audio_play_start(int offset)
 #ifndef SIMULATOR
     pcm_set_boost_mode(true);
 #endif
-    last_offset = offset;
-    audio_insert_tracks(true);
+    audio_insert_tracks(offset, true);
 #ifndef SIMULATOR
     pcm_set_boost_mode(false);
     ata_sleep();
@@ -748,7 +769,7 @@ void audio_check_buffer(void)
     
     /* Load new files to fill the entire buffer. */
     if (tracks[track_widx].filerem == 0)
-        audio_insert_tracks(false);
+        audio_insert_tracks(0, false);
 
 #ifndef SIMULATOR    
     pcm_set_boost_mode(false);
@@ -813,35 +834,35 @@ bool codec_request_next_track_callback(void)
     
     /* Advance to next track. */
     if (ci.reload_codec && new_track > 0) {
+        playlist_next(1);
         if (++track_ridx == MAX_TRACK)
             track_ridx = 0;
         if (tracks[track_ridx].filesize == 0) {
             logf("Loading from disk...");
             new_track = 0;
-            queue_post(&audio_queue, AUDIO_PLAY, (void *)(last_offset));
+            queue_post(&audio_queue, AUDIO_PLAY, 0);
             return false;
         }
     }
     
     /* Advance to previous track. */
     else if (ci.reload_codec && new_track < 0) {
+        playlist_next(-1);
         if (--track_ridx < 0)
             track_ridx = MAX_TRACK-1;
         if (tracks[track_ridx].filesize == 0 || 
             codecbufused+ci.curpos+tracks[track_ridx].filesize
             /*+ (off_t)tracks[track_ridx].codecsize*/ > codecbuflen) {
             logf("Loading from disk...");
-            last_offset -= track_count;
-            if (last_offset < 0)
-                last_offset = 0;
             new_track = 0;
-            queue_post(&audio_queue, AUDIO_PLAY, (void *)(last_offset));
+            queue_post(&audio_queue, AUDIO_PLAY, 0);
             return false;
         }
     }
     
     /* Codec requested track change (next track). */
     else {
+        playlist_next(1);
         if (++track_ridx >= MAX_TRACK)
             track_ridx = 0;
         
@@ -1085,9 +1106,10 @@ void audio_next(void)
     
     /* Detect if disk is spinning.. */
     if (filling) {
+        playlist_next(1);
         playing = false;
         ci.stop_codec = true;
-        queue_post(&audio_queue, AUDIO_PLAY, (void *)(last_offset));
+        queue_post(&audio_queue, AUDIO_PLAY, 0);
     }
 }
 
@@ -1101,11 +1123,10 @@ void audio_prev(void)
 #endif
         
     if (filling) {
+        playlist_next(-1);
         playing = false;
         ci.stop_codec = true;
-        if (--last_offset < 0)
-            last_offset = 0;
-        queue_post(&audio_queue, AUDIO_PLAY, (void *)(last_offset));
+        queue_post(&audio_queue, AUDIO_PLAY, 0);
     }
     //queue_post(&audio_queue, AUDIO_PREV, 0);
 }
@@ -1145,6 +1166,62 @@ int audio_get_file_pos(void)
     return 0;
 }
 
+
+/* Copied from mpeg.c. Should be moved somewhere else. */
+static void mp3_set_elapsed(struct mp3entry* id3)
+{
+    if ( id3->vbr ) {
+        if ( id3->has_toc ) {
+            /* calculate elapsed time using TOC */
+            int i;
+            unsigned int remainder, plen, relpos, nextpos;
+
+            /* find wich percent we're at */
+            for (i=0; i<100; i++ )
+            {
+                if ( id3->offset < (int)(id3->toc[i] * (id3->filesize / 256)) )
+                {
+                    break;
+                }
+            }
+            
+            i--;
+            if (i < 0)
+                i = 0;
+
+            relpos = id3->toc[i];
+
+            if (i < 99)
+            {
+                nextpos = id3->toc[i+1];
+            }
+            else
+            {
+                nextpos = 256; 
+            }
+
+            remainder = id3->offset - (relpos * (id3->filesize / 256));
+
+            /* set time for this percent (divide before multiply to prevent
+               overflow on long files. loss of precision is negligible on
+               short files) */
+            id3->elapsed = i * (id3->length / 100);
+
+            /* calculate remainder time */
+            plen = (nextpos - relpos) * (id3->filesize / 256);
+            id3->elapsed += (((remainder * 100) / plen) *
+                             (id3->length / 10000));
+        }
+        else {
+            /* no TOC exists. set a rough estimate using average bitrate */
+            int tpk = id3->length / (id3->filesize / 1024);
+            id3->elapsed = id3->offset / 1024 * tpk;
+        }
+    }
+    else
+        /* constant bitrate == simple frame calculation */
+        id3->elapsed = id3->offset / id3->bpf * id3->tpf;
+}
 
 /* Copied from mpeg.c. Should be moved somewhere else. */
 int mp3_get_file_pos(void)
