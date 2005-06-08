@@ -91,7 +91,7 @@ static vorbis_info_floor *floor1_unpack (vorbis_info *vi,oggpack_buffer *opb){
     for(k=0;k<(1<<info->class_subs[j]);k++){
       info->class_subbook[j][k]=oggpack_read(opb,8)-1;
       if(info->class_subbook[j][k]<-1 || info->class_subbook[j][k]>=ci->books)
-	goto err_out;
+        goto err_out;
     }
   }
 
@@ -104,7 +104,7 @@ static vorbis_info_floor *floor1_unpack (vorbis_info *vi,oggpack_buffer *opb){
     for(;k<count;k++){
       int t=info->postlist[k+2]=oggpack_read(opb,rangebits);
       if(t<0 || t>=(1<<rangebits))
-	goto err_out;
+        goto err_out;
     }
   }
   info->postlist[0]=0;
@@ -179,12 +179,12 @@ static vorbis_look_floor *floor1_look(vorbis_dsp_state *vd,vorbis_info_mode *mi,
     for(j=0;j<i+2;j++){
       int x=info->postlist[j];
       if(x>lx && x<currentx){
-	lo=j;
-	lx=x;
+        lo=j;
+        lx=x;
       }
       if(x<hx && x>currentx){
-	hi=j;
-	hx=x;
+        hi=j;
+        hx=x;
       }
     }
     look->loneighbor[i]=lo;
@@ -216,7 +216,8 @@ static int render_point(int x0,int x1,int y0,int y1,int x){
 #  define XdB(n) (n)
 #endif
 
-static ogg_int32_t FLOOR_fromdB_LOOKUP[256] ={
+/* keep the floor lookup table in fast IRAM */
+static ogg_int32_t FLOOR_fromdB_LOOKUP[256] IDATA_ATTR = {
   XdB(0x000000e5), XdB(0x000000f4), XdB(0x00000103), XdB(0x00000114),
   XdB(0x00000126), XdB(0x00000139), XdB(0x0000014e), XdB(0x00000163),
   XdB(0x0000017a), XdB(0x00000193), XdB(0x000001ad), XdB(0x000001c9),
@@ -334,20 +335,20 @@ static void *floor1_inverse1(vorbis_block *vb,vorbis_look_floor *in){
 
       /* decode the partition's first stage cascade value */
       if(csubbits){
-	cval=vorbis_book_decode(books+info->class_book[classv],&vb->opb);
+        cval=vorbis_book_decode(books+info->class_book[classv],&vb->opb);
 
-	if(cval==-1)goto eop;
+        if(cval==-1)goto eop;
       }
 
       for(k=0;k<cdim;k++){
-	int book=info->class_subbook[classv][cval&(csub-1)];
-	cval>>=csubbits;
-	if(book>=0){
-	  if((fit_value[j+k]=vorbis_book_decode(books+book,&vb->opb))==-1)
-	    goto eop;
-	}else{
-	  fit_value[j+k]=0;
-	}
+        int book=info->class_subbook[classv][cval&(csub-1)];
+        cval>>=csubbits;
+        if(book>=0){
+          if((fit_value[j+k]=vorbis_book_decode(books+book,&vb->opb))==-1)
+            goto eop;
+        }else{
+          fit_value[j+k]=0;
+        }
       }
       j+=cdim;
     }
@@ -355,38 +356,38 @@ static void *floor1_inverse1(vorbis_block *vb,vorbis_look_floor *in){
     /* unwrap positive values and reconsitute via linear interpolation */
     for(i=2;i<look->posts;i++){
       int predicted=render_point(info->postlist[look->loneighbor[i-2]],
-				 info->postlist[look->hineighbor[i-2]],
-				 fit_value[look->loneighbor[i-2]],
-				 fit_value[look->hineighbor[i-2]],
-				 info->postlist[i]);
+                                 info->postlist[look->hineighbor[i-2]],
+                                 fit_value[look->loneighbor[i-2]],
+                                 fit_value[look->hineighbor[i-2]],
+                                 info->postlist[i]);
       int hiroom=look->quant_q-predicted;
       int loroom=predicted;
       int room=(hiroom<loroom?hiroom:loroom)<<1;
       int val=fit_value[i];
 
       if(val){
-	if(val>=room){
-	  if(hiroom>loroom){
-	    val = val-loroom;
-	  }else{
-	  val = -1-(val-hiroom);
-	  }
-	}else{
-	  if(val&1){
-	    val= -((val+1)>>1);
-	  }else{
-	    val>>=1;
-	  }
-	}
+        if(val>=room){
+          if(hiroom>loroom){
+            val = val-loroom;
+          }else{
+          val = -1-(val-hiroom);
+          }
+        }else{
+          if(val&1){
+            val= -((val+1)>>1);
+          }else{
+            val>>=1;
+          }
+        }
 
-	fit_value[i]=val+predicted;
-	fit_value[look->loneighbor[i-2]]&=0x7fff;
-	fit_value[look->hineighbor[i-2]]&=0x7fff;
+        fit_value[i]=val+predicted;
+        fit_value[look->loneighbor[i-2]]&=0x7fff;
+        fit_value[look->hineighbor[i-2]]&=0x7fff;
 
       }else{
-	fit_value[i]=predicted|0x8000;
+        fit_value[i]=predicted|0x8000;
       }
-	
+        
     }
 
     return(fit_value);
@@ -396,7 +397,7 @@ static void *floor1_inverse1(vorbis_block *vb,vorbis_look_floor *in){
 }
 
 static int floor1_inverse2(vorbis_block *vb,vorbis_look_floor *in,void *memo,
-			  ogg_int32_t *out){
+                          ogg_int32_t *out){
   vorbis_look_floor1 *look=(vorbis_look_floor1 *)in;
   vorbis_info_floor1 *info=look->vi;
 
@@ -414,14 +415,14 @@ static int floor1_inverse2(vorbis_block *vb,vorbis_look_floor *in,void *memo,
       int current=look->forward_index[j];
       int hy=fit_value[current]&0x7fff;
       if(hy==fit_value[current]){
-	
-	hy*=info->mult;
-	hx=info->postlist[current];
-	
-	render_line(lx,hx,ly,hy,out);
-	
-	lx=hx;
-	ly=hy;
+        
+        hy*=info->mult;
+        hx=info->postlist[current];
+        
+        render_line(lx,hx,ly,hy,out);
+        
+        lx=hx;
+        ly=hy;
       }
     }
     for(j=hx;j<n;j++)out[j]*=ly; /* be certain */    

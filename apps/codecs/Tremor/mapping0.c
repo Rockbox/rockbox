@@ -52,7 +52,7 @@ typedef struct {
 
   int ch;
   long lastframe; /* if a different mode is called, we need to 
-		     invalidate decay */
+                     invalidate decay */
 } vorbis_look_mapping0;
 
 static void mapping0_free_info(vorbis_info_mapping *i){
@@ -83,7 +83,7 @@ static void mapping0_free_look(vorbis_look_mapping *look){
 }
 
 static vorbis_look_mapping *mapping0_look(vorbis_dsp_state *vd,vorbis_info_mode *vm,
-			  vorbis_info_mapping *m){
+                          vorbis_info_mapping *m){
   int i;
   vorbis_info          *vi=vd->vi;
   codec_setup_info     *ci=(codec_setup_info *)vi->codec_setup;
@@ -147,10 +147,10 @@ static vorbis_info_mapping *mapping0_unpack(vorbis_info *vi,oggpack_buffer *opb)
       int testA=info->coupling_ang[i]=oggpack_read(opb,ilog(vi->channels));
 
       if(testM<0 || 
-	 testA<0 || 
-	 testM==testA || 
-	 testM>=vi->channels ||
-	 testA>=vi->channels) goto err_out;
+         testA<0 || 
+         testM==testA || 
+         testM>=vi->channels ||
+         testA>=vi->channels) goto err_out;
     }
 
   }
@@ -237,16 +237,16 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
     int ch_in_bundle=0;
     for(j=0;j<vi->channels;j++){
       if(info->chmuxlist[j]==i){
-	if(nonzero[j])
-	  zerobundle[ch_in_bundle]=1;
-	else
-	  zerobundle[ch_in_bundle]=0;
-	pcmbundle[ch_in_bundle++]=vb->pcm[j];
+        if(nonzero[j])
+          zerobundle[ch_in_bundle]=1;
+        else
+          zerobundle[ch_in_bundle]=0;
+        pcmbundle[ch_in_bundle++]=vb->pcm[j];
       }
     }
 
     look->residue_func[i]->inverse(vb,look->residue_look[i],
-				   pcmbundle,zerobundle,ch_in_bundle);
+                                   pcmbundle,zerobundle,ch_in_bundle);
   }
 
   //for(j=0;j<vi->channels;j++)
@@ -263,21 +263,21 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
       ogg_int32_t ang=pcmA[j];
       
       if(mag>0)
-	if(ang>0){
-	  pcmM[j]=mag;
-	  pcmA[j]=mag-ang;
-	}else{
-	  pcmA[j]=mag;
-	  pcmM[j]=mag+ang;
-	}
+        if(ang>0){
+          pcmM[j]=mag;
+          pcmA[j]=mag-ang;
+        }else{
+          pcmA[j]=mag;
+          pcmM[j]=mag+ang;
+        }
       else
-	if(ang>0){
-	  pcmM[j]=mag;
-	  pcmA[j]=mag+ang;
-	}else{
-	  pcmA[j]=mag;
-	  pcmM[j]=mag-ang;
-	}
+        if(ang>0){
+          pcmM[j]=mag;
+          pcmA[j]=mag+ang;
+        }else{
+          pcmA[j]=mag;
+          pcmM[j]=mag-ang;
+        }
     }
   }
 
@@ -303,13 +303,13 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
     ogg_int32_t *pcm=vb->pcm[i];
     
       if(nonzero[i]) {
-	mdct_backward(n, pcm, pcm);
-	/* window the data */
-	_vorbis_apply_window(pcm,b->window,ci->blocksizes,vb->lW,vb->W,vb->nW);
+        mdct_backward(n, pcm, pcm);
+        /* window the data */
+        _vorbis_apply_window(pcm,b->window,ci->blocksizes,vb->lW,vb->W,vb->nW);
       }
       else 
-	memset(pcm, 0, sizeof(ogg_int32_t)*n);
-  }
+        memset(pcm, 0, sizeof(ogg_int32_t)*n);
+   }
 
   //for(j=0;j<vi->channels;j++)
   //_analysis_output("imdct",seq+j,vb->pcm[j],-24,n,0,0);

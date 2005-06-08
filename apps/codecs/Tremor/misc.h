@@ -37,7 +37,7 @@ void* alloca(size_t size);
   
 #ifndef  _LOW_ACCURACY_
 /* 64 bit multiply */
-//#include <sys/types.h>
+/* #include <sys/types.h> */
 
 #if BYTE_ORDER==LITTLE_ENDIAN
 union magic {

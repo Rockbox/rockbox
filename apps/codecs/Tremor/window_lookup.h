@@ -18,8 +18,10 @@
 
 #include "os_types.h"
 
-/* keep small window tables in fast IRAM */
-static LOOKUP_T vwin64[32] IDATA_ATTR = {
+/* Oggenc 1.1 seems to use exclusively windows sizes 256, 2048
+   keep the most common sizes in fast IRAM; 
+   because we have the available space also 128, 512 */
+static LOOKUP_T vwin64[32]   = {
   X(0x001f0003), X(0x01168c98), X(0x030333c8), X(0x05dfe3a4),
   X(0x09a49562), X(0x0e45df18), X(0x13b47ef2), X(0x19dcf676),
   X(0x20a74d83), X(0x27f7137c), X(0x2fabb05a), X(0x37a1105a),
@@ -151,7 +153,7 @@ static LOOKUP_T vwin512[256] IDATA_ATTR  = {
   X(0x7ffffdcd), X(0x7fffff6d), X(0x7fffffed), X(0x7fffffff),
 };
 
-static LOOKUP_T vwin1024[512] IDATA_ATTR = {
+static LOOKUP_T vwin1024[512]  = {
   X(0x00001f02), X(0x0001170e), X(0x00030724), X(0x0005ef40),
   X(0x0009cf59), X(0x000ea767), X(0x0014775e), X(0x001b3f2e),
   X(0x0022fec8), X(0x002bb618), X(0x00356508), X(0x00400b81),
@@ -541,8 +543,6 @@ static LOOKUP_T vwin2048[1024] IDATA_ATTR = {
   X(0x7ffffffe), X(0x7fffffff), X(0x7fffffff), X(0x7fffffff),
 };
 
-/* The remaining large window sizes are used only for very low
-   quality Vorbis files so we don't bother to put them in IRAM */
 static LOOKUP_T vwin4096[2048] = {
   X(0x000001f0), X(0x00001171), X(0x00003072), X(0x00005ef5),
   X(0x00009cf8), X(0x0000ea7c), X(0x00014780), X(0x0001b405),

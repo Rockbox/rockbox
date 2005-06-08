@@ -26,8 +26,8 @@
 
 
 /* IRAM buffer keep the block pcm data; only for windows size upto 2048
-   for space restrictions. No real compromise, larger window sizes
-   are only used for very low quality settings (q<0?) */
+   for space restrictions. 
+   libVorbis 1.1 Oggenc doesn't use larger windows anyway. */
 /* max 2 channels on the ihp-1xx (stereo), 2048 samples (2*2048*4=16Kb)  */
 #define IRAM_PCM_END      2048    
 #define CHANNELS          2          
@@ -80,12 +80,12 @@ int vorbis_synthesis(vorbis_block *vb,ogg_packet *op,int decodep){
       /* use statically allocated iram buffer */
       vb->pcm = ipcm_vect;
       for(i=0; i<CHANNELS; i++)
-	vb->pcm[i] = &ipcm_buff[i*IRAM_PCM_END];  
+        vb->pcm[i] = &ipcm_buff[i*IRAM_PCM_END];  
     } else {
       /* dynamic allocation (slower) */
       vb->pcm=(ogg_int32_t **)_vorbis_block_alloc(vb,sizeof(*vb->pcm)*vi->channels);
       for(i=0;i<vi->channels;i++)
-	vb->pcm[i]=(ogg_int32_t *)_vorbis_block_alloc(vb,vb->pcmend*sizeof(*vb->pcm[i]));
+        vb->pcm[i]=(ogg_int32_t *)_vorbis_block_alloc(vb,vb->pcmend*sizeof(*vb->pcm[i]));
     }
       
     /* unpack_header enforces range checking */
