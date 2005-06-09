@@ -872,9 +872,11 @@ void audio_update_trackinfo(void)
         buf_ridx += cur_ti->codecsize;
         if (buf_ridx >= codecbuflen)
             buf_ridx -= codecbuflen;
+#ifndef SIMULATOR        
         pcm_crossfade_start();
         if (!filling)
             pcm_set_boost_mode(false);
+#endif
     } else {
         buf_ridx -= ci.curpos;
         codecbufused += ci.curpos;
