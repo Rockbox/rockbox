@@ -501,6 +501,7 @@ void pcm_play_init(void)
     memset(&audiobuffer[0], 0, audiobuffer_pos);
     pcm_play_add_chunk(&audiobuffer[0], audiobuffer_pos, NULL);
     pcm_play_start();
+    cpu_boost(false);
 
     crossfade_enabled = false;
 }

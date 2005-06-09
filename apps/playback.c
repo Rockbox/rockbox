@@ -365,31 +365,31 @@ int probe_file_format(const char *filename)
         return AFMT_UNKNOWN;
     suffix += 1;
     
-    if (!strcmp("mp1", suffix))
+    if (!strcasecmp("mp1", suffix))
         return AFMT_MPA_L1;
-    else if (!strcmp("mp2", suffix))
+    else if (!strcasecmp("mp2", suffix))
         return AFMT_MPA_L2;
-    else if (!strcmp("mpa", suffix))
+    else if (!strcasecmp("mpa", suffix))
         return AFMT_MPA_L2;
-    else if (!strcmp("mp3", suffix))
+    else if (!strcasecmp("mp3", suffix))
         return AFMT_MPA_L3;
-    else if (!strcmp("ogg", suffix))
+    else if (!strcasecmp("ogg", suffix))
         return AFMT_OGG_VORBIS;
-    else if (!strcmp("wav", suffix))
+    else if (!strcasecmp("wav", suffix))
         return AFMT_PCM_WAV;
-    else if (!strcmp("flac", suffix))
+    else if (!strcasecmp("flac", suffix))
         return AFMT_FLAC;
-    else if (!strcmp("mpc", suffix))
+    else if (!strcasecmp("mpc", suffix))
         return AFMT_MPC;
-    else if (!strcmp("aac", suffix))
+    else if (!strcasecmp("aac", suffix))
         return AFMT_AAC;
-    else if (!strcmp("ape", suffix))
+    else if (!strcasecmp("ape", suffix))
         return AFMT_APE;
-    else if (!strcmp("wma", suffix))
+    else if (!strcasecmp("wma", suffix))
         return AFMT_WMA;
-    else if (!strcmp("a52", suffix))
+    else if (!strcasecmp("a52", suffix))
         return AFMT_A52;
-    else if (!strcmp("rm", suffix))
+    else if (!strcasecmp("rm", suffix))
         return AFMT_REAL;
         
     return AFMT_UNKNOWN;
