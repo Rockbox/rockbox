@@ -439,7 +439,7 @@ mad_fixed_t mad_f_mul_inline(mad_fixed_t x, mad_fixed_t y)
   hi; \
 })
 /* Define dummy mad_f_scale64 to prevent libmad from defining MAD_F_SCALEBITS
-   below. Having MAD_F_SCALEBITS defined screws up the PRESHIFT macro in synth.h
+   below. Having MAD_F_SCALEBITS defined screws up the PRESHIFT macro in synth.c
  */
 #define mad_f_scale64(hi, lo) (lo)
 
