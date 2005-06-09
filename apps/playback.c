@@ -68,7 +68,7 @@ static volatile bool paused;
 #define CODEC_WAV      "/.rockbox/codecs/codecwav.rock";
 
 #define AUDIO_WATERMARK    0x70000
-#define AUDIO_FILE_CHUNK   (1024*256)
+#define AUDIO_FILE_CHUNK   (1024*512)
 
 #define AUDIO_PLAY         1
 #define AUDIO_STOP         2
@@ -106,6 +106,9 @@ static const char codec_thread_name[] = "codec";
 
 /* Is file buffer currently being refilled? */
 static volatile bool filling;
+
+/* Interrupts buffer filling. */
+static volatile bool interrupt;
 
 /* Ring buffer where tracks and codecs are loaded. */
 char *codecbuf;
@@ -398,8 +401,8 @@ int probe_file_format(const char *filename)
 
 void yield_codecs(void)
 {
-#ifndef SIMULATOR
     yield();
+#ifndef SIMULATOR
     if (!pcm_is_playing())
         sleep(5);
     while (pcm_is_lowdata())
@@ -420,7 +423,7 @@ void audio_fill_file_buffer(void)
         /* Give codecs some processing time. */
         yield_codecs();
             
-        if (!playing) {
+        if (interrupt) {
             logf("Filling interrupted");
             close(current_fd);
             current_fd = -1;
@@ -540,7 +543,7 @@ bool loadcodec(const char *trackname, bool start_play)
     i = 0;
     while (i < size) {
         yield_codecs();
-        if (!playing) {
+        if (interrupt) {
             logf("Buffering interrupted");
             close(fd);
             return false;
@@ -610,7 +613,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     logf("%s", trackname);
     logf("Buffering track:%d/%d", track_widx, track_ridx);
     
-    if (!playing) {
+    if (interrupt) {
         close(fd);
         return false;
     }
@@ -717,7 +720,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     while (i < size) {
         /* Give codecs some processing time to prevent glitches. */
         yield_codecs();
-        if (!playing) {
+        if (interrupt) {
             logf("Buffering interrupted");
             close(fd);
             return false;
@@ -803,8 +806,14 @@ void audio_check_buffer(void)
     int i;
     int cur_idx;
     
+    /* Fill buffer as full as possible for cross-fader. */
+#ifndef SIMULATOR
+    if (cur_ti->id3.length - cur_ti->id3.elapsed < 20000)
+        pcm_set_boost_mode(true);
+#endif
+    
     /* Start buffer filling as necessary. */
-    if (codecbufused > AUDIO_WATERMARK || !playing)
+    if (codecbufused > AUDIO_WATERMARK || !interrupt)
         return ;
     
     filling = true;
@@ -863,6 +872,9 @@ void audio_update_trackinfo(void)
         buf_ridx += cur_ti->codecsize;
         if (buf_ridx >= codecbuflen)
             buf_ridx -= codecbuflen;
+        pcm_crossfade_start();
+        if (!filling)
+            pcm_set_boost_mode(false);
     } else {
         buf_ridx -= ci.curpos;
         codecbufused += ci.curpos;
@@ -978,14 +990,13 @@ void audio_thread(void)
         queue_wait_w_tmo(&audio_queue, &ev, 0);
         switch (ev.id) {
             case AUDIO_PLAY:
+                interrupt = false;
                 ci.stop_codec = true;
                 ci.reload_codec = false;
                 ci.seek_time = 0;
 #ifndef SIMULATOR
                 pcm_play_stop();
-                pcm_play_pause(true);
 #endif
-                playing = true;
                 paused = false;
                 audio_play_start((int)ev.data);
                 break ;
@@ -993,8 +1004,8 @@ void audio_thread(void)
             case AUDIO_STOP:
 #ifndef SIMULATOR
                 pcm_play_stop();
+                pcm_play_pause(true);
 #endif
-                paused = false;
                 break ;
                 
             case AUDIO_PAUSE:
@@ -1017,6 +1028,7 @@ void audio_thread(void)
                 ci.stop_codec = true;
                 logf("USB Connection");
                 pcm_play_stop();
+                pcm_play_pause(true);
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 usb_wait_for_disconnect(&audio_queue);
                 break ;
@@ -1076,12 +1088,14 @@ void codec_thread(void)
                 logf("Codec finished");
             }
                 
-            queue_post(&audio_queue, AUDIO_CODEC_DONE, (void *)status);
             if (playing && !ci.stop_codec && !ci.reload_codec) {
                 audio_change_track();
+            } else if (ci.reload_codec) {
+                interrupt = true;
             } else {
                 playing = false;
             }
+            queue_post(&audio_queue, AUDIO_CODEC_DONE, (void *)status);
         }
     }
 }
@@ -1129,17 +1143,17 @@ bool audio_has_changed_track(void)
 void audio_play(int offset)
 {
     logf("audio_play");
-    playing = false;
     ci.stop_codec = true;
+    playing = false;
+#ifndef SIMULATOR
+    pcm_play_pause(true);
+#endif
     queue_post(&audio_queue, AUDIO_PLAY, (void *)offset);
 }
 
 void audio_stop(void)
 {
     logf("audio_stop");
-    if (!playing)
-        return ;
-        
     playing = false;
     ci.stop_codec = true;
     if (current_fd) {
@@ -1147,6 +1161,9 @@ void audio_stop(void)
         current_fd = -1;
     }
     queue_post(&audio_queue, AUDIO_STOP, 0);
+#ifndef SIMULATOR
+    pcm_play_pause(true);
+#endif
 }
 
 void audio_pause(void)
@@ -1174,16 +1191,17 @@ void audio_next(void)
     logf("audio_next");
     new_track = 1;
     ci.reload_codec = true;
-#ifndef SIMULATOR
-    pcm_play_stop();
-#endif
     
     /* Detect if disk is spinning.. */
     if (filling) {
-        playlist_next(1);
-        playing = false;
+        interrupt = true;
         ci.stop_codec = true;
+        playlist_next(1);
         queue_post(&audio_queue, AUDIO_PLAY, 0);
+    } else {
+#ifndef SIMULATOR
+    pcm_play_stop();
+#endif
     }
 }
 
@@ -1197,9 +1215,9 @@ void audio_prev(void)
 #endif
         
     if (filling) {
-        playlist_next(-1);
-        playing = false;
+        interrupt = true;
         ci.stop_codec = true;
+        playlist_next(-1);
         queue_post(&audio_queue, AUDIO_PLAY, 0);
     }
     //queue_post(&audio_queue, AUDIO_PREV, 0);
@@ -1377,7 +1395,8 @@ void audio_init(void)
                   - MALLOC_BUFSIZE - GUARD_BUFSIZE;
     //codecbuflen = 2*512*1024;
     codecbufused = 0;
-    filling = 0;
+    filling = false;
+    interrupt = false;
     codecbuf = &audiobuf[MALLOC_BUFSIZE];
     playing = false;
     paused = false;

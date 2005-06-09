@@ -381,6 +381,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
       /* Flush the buffer if it is full. */
       if(OutputPtr==OutputBufferEnd)
       {
+        rb->yield();
 #ifdef DEBUG_GAPLESS
         rb->write(fd, OutputBuffer, OUTPUT_BUFFER_SIZE);
 #endif

@@ -56,6 +56,11 @@ static volatile size_t audiobuffer_free;
 static size_t audiobuffer_fillpos;
 static bool boost_mode;
 
+static bool crossfade_active;
+static int crossfade_pos;
+static int crossfade_amount;
+static int crossfade_rem;
+
 static unsigned char *next_start;
 static long next_size;
 
@@ -106,6 +111,9 @@ void pcm_boost(bool state)
 {
     static bool boost_state = false;
     
+    if (crossfade_active)
+        return ;
+        
     if (state != boost_state) {
         cpu_boost(state);
         boost_state = state;
@@ -334,6 +342,7 @@ void pcm_watermark_callback(int bytes_left)
     
     /* Fill audio buffer by boosting cpu */
     pcm_boost(true);
+    crossfade_active = false;
 }
 
 void pcm_set_boost_mode(bool state)
@@ -373,11 +382,43 @@ bool pcm_is_lowdata(void)
     return false;
 }
 
+void pcm_crossfade_start(void)
+{
+    if (audiobuffer_free > CHUNK_SIZE * 4) {
+        return ;
+    }
+    pcm_boost(true);
+    crossfade_active = true;
+    crossfade_pos = audiobuffer_pos;
+    crossfade_amount = (PCMBUF_SIZE - audiobuffer_free - CHUNK_SIZE * 22)/2;
+    crossfade_rem = crossfade_amount;
+    audiobuffer_fillpos = 0;
+    
+    crossfade_pos -= crossfade_amount*2;
+    if (crossfade_pos < 0)
+        crossfade_pos = PCMBUF_SIZE + crossfade_pos;
+}
+
+static __inline
+void crossfade(short *buf, const short *buf2, int length)
+{
+    while (length--) {
+        *buf = (int)((*buf * ((crossfade_rem)*1000/crossfade_amount))/1000);
+        *buf += (int)((*buf2 * ((crossfade_amount-crossfade_rem)*1000/crossfade_amount))/1000);
+        buf++;
+        buf2++;
+        if (--crossfade_rem <= 0) {
+            crossfade_active = false;
+            break ;
+        }
+    }
+}
+
 bool audiobuffer_insert(char *buf, size_t length)
 {
     size_t copy_n = 0;
     
-    if (audiobuffer_free < length + CHUNK_SIZE) {
+    if (audiobuffer_free < length + CHUNK_SIZE && !crossfade_active) {
         if (!boost_mode)
             pcm_boost(false);
         return false;
@@ -385,19 +426,35 @@ bool audiobuffer_insert(char *buf, size_t length)
     
     if (!pcm_is_playing() && !pcm_paused) {
         pcm_boost(true);
+        crossfade_active = false;
         if (audiobuffer_free < PCMBUF_SIZE - CHUNK_SIZE*2)
             pcm_play_start();
     }
 
     while (length > 0) {
-        copy_n = MIN(length, PCMBUF_SIZE - audiobuffer_pos - 
-                     audiobuffer_fillpos);
-        copy_n = MIN(CHUNK_SIZE, copy_n);
-        memcpy(&audiobuffer[audiobuffer_pos+audiobuffer_fillpos],
-               buf, copy_n);
-        buf += copy_n;
-        audiobuffer_free -= copy_n;
-        length -= copy_n;
+        if (!crossfade_active) {
+            copy_n = MIN(length, PCMBUF_SIZE - audiobuffer_pos - 
+                        audiobuffer_fillpos);
+            copy_n = MIN(CHUNK_SIZE, copy_n);
+            
+            memcpy(&audiobuffer[audiobuffer_pos+audiobuffer_fillpos],
+                   buf, copy_n);
+            buf += copy_n;
+            audiobuffer_free -= copy_n;
+            length -= copy_n;
+            
+        } else {
+            copy_n = MIN(length, PCMBUF_SIZE - (unsigned int)crossfade_pos);
+            
+            crossfade((short *)&audiobuffer[crossfade_pos], 
+                      (const short *)buf, copy_n/2);
+            buf += copy_n;
+            length -= copy_n;
+            crossfade_pos += copy_n;
+            if (crossfade_pos >= PCMBUF_SIZE)
+                crossfade_pos -= PCMBUF_SIZE;
+            continue ;
+        }
         
         /* Pre-buffer to meet CHUNK_SIZE requirement */
         if (copy_n + audiobuffer_fillpos < CHUNK_SIZE && length == 0) {
@@ -452,6 +509,7 @@ void pcm_play_start(void)
     int size;
     char *start;
     
+    crossfade_active = false;
     if(!pcm_is_playing())
     {
         size = MIN(desc->size, 32768);
