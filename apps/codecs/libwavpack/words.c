@@ -42,19 +42,19 @@
 #define DIV2 32		// 20/343 of samples
 
 // this macro retrieves the specified median breakpoint (without frac; min = 1)
-#define GET_MED(med) (((wps->w.median [med] [chan]) >> 4) + 1)
+#define GET_MED(med) (((c->median [med]) >> 4) + 1)
 
 // These macros update the specified median breakpoints. Note that the median
 // is incremented when the sample is higher than the median, else decremented.
 // They are designed so that the median will never drop below 1 and the value
 // is essentially stationary if there are 2 increments for every 5 decrements.
 
-#define INC_MED0() (wps->w.median [0] [chan] += ((wps->w.median [0] [chan] + DIV0) / DIV0) * 5)
-#define DEC_MED0() (wps->w.median [0] [chan] -= ((wps->w.median [0] [chan] + (DIV0-2)) / DIV0) * 2)
-#define INC_MED1() (wps->w.median [1] [chan] += ((wps->w.median [1] [chan] + DIV1) / DIV1) * 5)
-#define DEC_MED1() (wps->w.median [1] [chan] -= ((wps->w.median [1] [chan] + (DIV1-2)) / DIV1) * 2)
-#define INC_MED2() (wps->w.median [2] [chan] += ((wps->w.median [2] [chan] + DIV2) / DIV2) * 5)
-#define DEC_MED2() (wps->w.median [2] [chan] -= ((wps->w.median [2] [chan] + (DIV2-2)) / DIV2) * 2)
+#define INC_MED0() (c->median [0] += ((c->median [0] + DIV0) / DIV0) * 5)
+#define DEC_MED0() (c->median [0] -= ((c->median [0] + (DIV0-2)) / DIV0) * 2)
+#define INC_MED1() (c->median [1] += ((c->median [1] + DIV1) / DIV1) * 5)
+#define DEC_MED1() (c->median [1] -= ((c->median [1] + (DIV1-2)) / DIV1) * 2)
+#define INC_MED2() (c->median [2] += ((c->median [2] + DIV2) / DIV2) * 5)
+#define DEC_MED2() (c->median [2] -= ((c->median [2] + (DIV2-2)) / DIV2) * 2)
 
 #define count_bits(av) ( \
  (av) < (1 << 8) ? nbits_table [av] : \
@@ -149,14 +149,14 @@ int read_entropy_vars (WavpackStream *wps, WavpackMetadata *wpmd)
     if (wpmd->byte_length != ((wps->wphdr.flags & MONO_FLAG) ? 6 : 12))
 	return FALSE;
 
-    wps->w.median [0] [0] = exp2s (byteptr [0] + (byteptr [1] << 8));
-    wps->w.median [1] [0] = exp2s (byteptr [2] + (byteptr [3] << 8));
-    wps->w.median [2] [0] = exp2s (byteptr [4] + (byteptr [5] << 8));
+    wps->w.c [0].median [0] = exp2s (byteptr [0] + (byteptr [1] << 8));
+    wps->w.c [0].median [1] = exp2s (byteptr [2] + (byteptr [3] << 8));
+    wps->w.c [0].median [2] = exp2s (byteptr [4] + (byteptr [5] << 8));
 
     if (!(wps->wphdr.flags & MONO_FLAG)) {
-	wps->w.median [0] [1] = exp2s (byteptr [6] + (byteptr [7] << 8));
-	wps->w.median [1] [1] = exp2s (byteptr [8] + (byteptr [9] << 8));
-	wps->w.median [2] [1] = exp2s (byteptr [10] + (byteptr [11] << 8));
+	wps->w.c [1].median [0] = exp2s (byteptr [6] + (byteptr [7] << 8));
+	wps->w.c [1].median [1] = exp2s (byteptr [8] + (byteptr [9] << 8));
+	wps->w.c [1].median [2] = exp2s (byteptr [10] + (byteptr [11] << 8));
     }
 
     return TRUE;
@@ -173,11 +173,11 @@ int read_hybrid_profile (WavpackStream *wps, WavpackMetadata *wpmd)
     uchar *endptr = byteptr + wpmd->byte_length;
 
     if (wps->wphdr.flags & HYBRID_BITRATE) {
-	wps->w.slow_level [0] = exp2s (byteptr [0] + (byteptr [1] << 8));
+	wps->w.c [0].slow_level = exp2s (byteptr [0] + (byteptr [1] << 8));
 	byteptr += 2;
 
 	if (!(wps->wphdr.flags & MONO_FLAG)) {
-	    wps->w.slow_level [1] = exp2s (byteptr [0] + (byteptr [1] << 8));
+	    wps->w.c [1].slow_level = exp2s (byteptr [0] + (byteptr [1] << 8));
 	    byteptr += 2;
 	}
     }
@@ -220,22 +220,22 @@ static void update_error_limit (WavpackStream *wps)
 
     if (wps->wphdr.flags & MONO_FLAG) {
 	if (wps->wphdr.flags & HYBRID_BITRATE) {
-	    int slow_log_0 = (wps->w.slow_level [0] + SLO) >> SLS;
+	    int slow_log_0 = (wps->w.c [0].slow_level + SLO) >> SLS;
 
 	    if (slow_log_0 - bitrate_0 > -0x100)
-		wps->w.error_limit [0] = exp2s (slow_log_0 - bitrate_0 + 0x100);
+		wps->w.c [0].error_limit = exp2s (slow_log_0 - bitrate_0 + 0x100);
 	    else
-		wps->w.error_limit [0] = 0;
+		wps->w.c [0].error_limit = 0;
 	}
 	else
-	    wps->w.error_limit [0] = exp2s (bitrate_0);
+	    wps->w.c [0].error_limit = exp2s (bitrate_0);
     }
     else {
 	int bitrate_1 = (wps->w.bitrate_acc [1] += wps->w.bitrate_delta [1]) >> 16;
 
 	if (wps->wphdr.flags & HYBRID_BITRATE) {
-	    int slow_log_0 = (wps->w.slow_level [0] + SLO) >> SLS;
-	    int slow_log_1 = (wps->w.slow_level [1] + SLO) >> SLS;
+	    int slow_log_0 = (wps->w.c [0].slow_level + SLO) >> SLS;
+	    int slow_log_1 = (wps->w.c [1].slow_level + SLO) >> SLS;
 
 	    if (wps->wphdr.flags & HYBRID_BALANCE) {
 		int balance = (slow_log_1 - slow_log_0 + bitrate_1 + 1) >> 1;
@@ -255,18 +255,18 @@ static void update_error_limit (WavpackStream *wps)
 	    }
 
 	    if (slow_log_0 - bitrate_0 > -0x100)
-		wps->w.error_limit [0] = exp2s (slow_log_0 - bitrate_0 + 0x100);
+		wps->w.c [0].error_limit = exp2s (slow_log_0 - bitrate_0 + 0x100);
 	    else
-		wps->w.error_limit [0] = 0;
+		wps->w.c [0].error_limit = 0;
 
 	    if (slow_log_1 - bitrate_1 > -0x100)
-		wps->w.error_limit [1] = exp2s (slow_log_1 - bitrate_1 + 0x100);
+		wps->w.c [1].error_limit = exp2s (slow_log_1 - bitrate_1 + 0x100);
 	    else
-		wps->w.error_limit [1] = 0;
+		wps->w.c [1].error_limit = 0;
 	}
 	else {
-	    wps->w.error_limit [0] = exp2s (bitrate_0);
-	    wps->w.error_limit [1] = exp2s (bitrate_1);
+	    wps->w.c [0].error_limit = exp2s (bitrate_0);
+	    wps->w.c [1].error_limit = exp2s (bitrate_1);
 	}
     }
 }
@@ -283,21 +283,23 @@ static ulong read_code (Bitstream *bs, ulong maxcode);
 
 long get_words (WavpackStream *wps, int nchans, int nsamples, long *buffer)
 {
-    ulong tsamples = nsamples * nchans, ones_count, low, mid, high;
-    int next8, sign, chan;
+    ulong ones_count, low, mid, high;
+    register struct entropy_data *c;
     long *bptr = buffer;
 
-    while (tsamples--) {
+    nsamples *= nchans;
 
-	chan = (nchans == 1) ? 0 : (~tsamples & 1);
+    while (nsamples--) {
 
-	if (!(wps->w.median [0] [0] & ~1) && !wps->w.holding_zero && !wps->w.holding_one && !(wps->w.median [0] [1] & ~1)) {
+	c = wps->w.c + ((nchans == 1) ? 0 : (~nsamples & 1));
+
+	if (!(wps->w.c [0].median [0] & ~1) && !wps->w.holding_zero && !wps->w.holding_one && !(wps->w.c [1].median [0] & ~1)) {
 	    ulong mask;
 	    int cbits;
 
 	    if (wps->w.zeros_acc) {
 		if (--wps->w.zeros_acc) {
-		    wps->w.slow_level [chan] -= (wps->w.slow_level [chan] + SLO) >> SLS;
+		    c->slow_level -= (c->slow_level + SLO) >> SLS;
 		    *bptr++ = 0;
 		    continue;
 		}
@@ -319,8 +321,9 @@ long get_words (WavpackStream *wps, int nchans, int nsamples, long *buffer)
 		}
 
 		if (wps->w.zeros_acc) {
-		    wps->w.slow_level [chan] -= (wps->w.slow_level [chan] + SLO) >> SLS;
-		    CLEAR (wps->w.median);
+		    c->slow_level -= (c->slow_level + SLO) >> SLS;
+		    CLEAR (wps->w.c [0].median);
+		    CLEAR (wps->w.c [1].median);
 		    *bptr++ = 0;
 		    continue;
 		}
@@ -330,6 +333,8 @@ long get_words (WavpackStream *wps, int nchans, int nsamples, long *buffer)
 	if (wps->w.holding_zero)
 	    ones_count = wps->w.holding_zero = 0;
 	else {
+	    int next8;
+
 	    if (wps->wvbits.bc < 8) {
 		if (++(wps->wvbits.ptr) == wps->wvbits.end)
 		    wps->wvbits.wrap (&wps->wvbits);
@@ -388,7 +393,7 @@ long get_words (WavpackStream *wps, int nchans, int nsamples, long *buffer)
 	    wps->w.holding_zero = ~wps->w.holding_one & 1;
 	}
 
-	if ((wps->wphdr.flags & HYBRID_FLAG) && !chan)
+	if ((wps->wphdr.flags & HYBRID_FLAG) && (nchans == 1 || (nsamples & 1)))
 	    update_error_limit (wps);
 
 	if (ones_count == 0) {
@@ -422,23 +427,19 @@ long get_words (WavpackStream *wps, int nchans, int nsamples, long *buffer)
 
 	mid = (high + low + 1) >> 1;
 
-	if (!wps->w.error_limit [chan])
+	if (!c->error_limit)
 	    mid = read_code (&wps->wvbits, high - low) + low;
-	else while (high - low > wps->w.error_limit [chan]) {
+	else while (high - low > c->error_limit) {
 	    if (getbit (&wps->wvbits))
 		mid = (high + (low = mid) + 1) >> 1;
 	    else
 		mid = ((high = mid - 1) + low + 1) >> 1;
 	}
 
-	sign = getbit (&wps->wvbits);
+	*bptr++ = getbit (&wps->wvbits) ? ~mid : mid;
 
-	if (wps->wphdr.flags & HYBRID_BITRATE) {
-	    wps->w.slow_level [chan] -= (wps->w.slow_level [chan] + SLO) >> SLS;
-	    wps->w.slow_level [chan] += mylog2 (mid);
-	}
-
-	*bptr++ = sign ? ~mid : mid;
+	if (wps->wphdr.flags & HYBRID_BITRATE)
+	    c->slow_level = c->slow_level - ((c->slow_level + SLO) >> SLS) + mylog2 (mid);
     }
 
     return nchans == 1 ? (bptr - buffer) : ((bptr - buffer) / 2);

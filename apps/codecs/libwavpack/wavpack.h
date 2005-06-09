@@ -187,24 +187,29 @@ struct decorr_pass {
     long samples_A [MAX_TERM], samples_B [MAX_TERM];
 };
 
+struct entropy_data {
+    ulong median [3], slow_level, error_limit;
+};
+
 typedef struct {
     WavpackHeader wphdr;
+    Bitstream wvbits;
+
+    struct {
+	ulong bitrate_delta [2], bitrate_acc [2];
+	ulong pend_data, holding_one, zeros_acc;
+	int holding_zero, pend_count;
+	struct entropy_data c [2];
+    } w;
 
     int num_terms, mute_error;
     ulong sample_index, crc;
-    Bitstream wvbits;
 
     uchar int32_sent_bits, int32_zeros, int32_ones, int32_dups;
     uchar float_flags, float_shift, float_max_exp, float_norm_exp;
  
     struct decorr_pass decorr_passes [MAX_NTERMS];
 
-    struct {
-	ulong bitrate_delta [2], bitrate_acc [2];
-	ulong median [3] [2], slow_level [2], error_limit [2];
-	ulong pend_data, holding_one, zeros_acc;
-	int holding_zero, pend_count;
-    } w;
 } WavpackStream;
 
 // flags for float_flags:
@@ -223,8 +228,8 @@ typedef struct {
 // and the provided utilities used instead.
 
 typedef struct {
-    WavpackConfig config;
     WavpackStream stream;
+    WavpackConfig config;
 
     uchar read_buffer [1024];
     char error_message [80];
