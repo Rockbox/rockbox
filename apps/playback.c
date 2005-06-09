@@ -572,6 +572,9 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     off_t size;
     int rc, i;
     int copy_n;
+    /* Used by the FLAC metadata parser */
+    unsigned long totalsamples;
+    unsigned char* buf;
     
     if (track_count >= MAX_TRACK)
         return false;
@@ -637,6 +640,70 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         logf("F:%d", tracks[track_widx].id3.frequency);
         tracks[track_widx].taginfo_ready = true;
         break ;
+
+    case AFMT_FLAC:
+        /* A simple parser to read vital metadata from a FLAC file - length, frequency, bitrate etc. */
+        /* This code should either be moved to a seperate file, or discarded in favour of the libFLAC code */
+        /* The FLAC stream specification can be found at http://flac.sourceforge.net/format.html#stream */
+
+        /* Use the trackname part of the id3 structure as a temporary buffer */
+        buf=tracks[track_widx].id3.path;
+
+        lseek(fd, 0, SEEK_SET);
+
+        rc = read(fd, buf, 4);
+        if (rc < 4) {
+          close(fd);
+          return false;
+        }
+
+        if (memcmp(buf,"fLaC",4)!=0) {          
+          logf("%s is not a FLAC file\n",trackname);
+          close(fd);
+          return(false);
+        }
+
+        while (1) {
+          rc = read(fd, buf, 4);
+          i = (buf[1]<<16)|(buf[2]<<8)|buf[3];  /* The length of the block */
+
+          if ((buf[0]&0x7f)==0) {    /* 0 is the STREAMINFO block */
+            rc = read(fd, buf, i);  /* FIXME: Don't trust the value of i */
+            if (rc < 0) {
+              close(fd);
+              return false;
+            }
+            tracks[track_widx].id3.vbr=true;   /* All FLAC files are VBR */
+            tracks[track_widx].id3.filesize=filesize(fd);
+
+            tracks[track_widx].id3.frequency=(buf[10]<<12)|(buf[11]<<4)|((buf[12]&0xf0)>>4);
+
+            /* NOT NEEDED: bitspersample=(((buf[12]&0x01)<<4)|((buf[13]&0xf0)>>4))+1; */
+
+            /* totalsamples is a 36-bit field, but we assume <= 32 bits are used */
+            totalsamples=(buf[14]<<24)|(buf[15]<<16)|(buf[16]<<8)|buf[17];
+
+            /* Calculate track length (in ms) and estimate the bitrate (in kbit/s) */
+            tracks[track_widx].id3.length=(totalsamples/tracks[track_widx].id3.frequency)*1000;
+            tracks[track_widx].id3.bitrate=(filesize(fd)*8)/tracks[track_widx].id3.length;
+          } else if ((buf[0]&0x7f)==4) {     /* 4 is the VORBIS_COMMENT block */
+
+            /* The next i bytes of the file contain the VORBIS COMMENTS - just skip them for now. */
+            lseek(fd, i, SEEK_CUR);
+
+          } else {
+            if (buf[0]&0x80) { /* If we have reached the last metadata block, abort. */
+              break;
+            } else {
+              lseek(fd, i, SEEK_CUR);   /* Skip to next metadata block */
+            }
+          }
+        }
+
+        lseek(fd, 0, SEEK_SET);
+        strncpy(tracks[track_widx].id3.path,trackname,sizeof(tracks[track_widx].id3.path));
+        tracks[track_widx].taginfo_ready = true;
+        break;
 
     /* If we don't know how to read the metadata, just store the filename */
     default:
