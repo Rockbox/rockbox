@@ -25,7 +25,7 @@
 #define SOKOBAN_TITLE       "Sokoban"
 #define SOKOBAN_TITLE_FONT  2
 
-#define LEVELS_FILE         "/.rockbox/sokoban.levels"
+#define LEVELS_FILE         PLUGIN_DIR "/sokoban.levels"
 
 #define ROWS                16
 #define COLS                20
