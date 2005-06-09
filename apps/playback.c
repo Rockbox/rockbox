@@ -813,7 +813,7 @@ void audio_check_buffer(void)
 #endif
     
     /* Start buffer filling as necessary. */
-    if (codecbufused > AUDIO_WATERMARK || !interrupt)
+    if (codecbufused > AUDIO_WATERMARK || interrupt || !playing)
         return ;
     
     filling = true;
