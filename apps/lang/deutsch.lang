@@ -3093,3 +3093,9 @@ desc: in info menu;  name for external disk with multivolume (Ondio; keep short!
 eng: "MMC:"
 voice: "Multimediakarte"
 new: "MMC:"
+
+id: LANG_CROSSFADE
+desc: in playback settings
+eng: "Crossfade"
+voice: "Überblenden"
+new: "Überblenden"
