@@ -150,6 +150,7 @@ sub buildzip {
 
     buildlangs(".rockbox/langs");
 
+    `rm -f $zip`;
     `find .rockbox | zip $zip -@ >/dev/null`;
 
     if($image) {
