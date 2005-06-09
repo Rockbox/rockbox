@@ -27,6 +27,7 @@
 #define FLAC_MAX_SUPPORTED_CHANNELS  2
 
 static struct plugin_api* rb;
+static uint32_t samplesdone;
 
 /* Called when the FLAC decoder needs some FLAC data to decode */
 FLAC__SeekableStreamDecoderReadStatus flac_read_handler(const FLAC__SeekableStreamDecoder *dec, 
@@ -71,6 +72,9 @@ FLAC__StreamDecoderWriteStatus flac_write_handler(const FLAC__SeekableStreamDeco
        pcmbuf[(d_samp*2)+1] = buf[c_chan][c_samp]&0xff;
      }
    } 
+
+   samplesdone+=samples;
+   ci->set_elapsed(samplesdone/(ci->id3->frequency/1000));
 
    while (!ci->audiobuffer_insert(pcmbuf, data_size))
      rb->yield();
@@ -203,6 +207,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
   /* The first thing to do is to parse the metadata */
   FLAC__seekable_stream_decoder_process_until_end_of_metadata(flacDecoder);
 
+  samplesdone=0;
+  ci->set_elapsed(0);
   /* The main decoder loop */
   while (FLAC__seekable_stream_decoder_get_state(flacDecoder)!=FLAC__SEEKABLE_STREAM_DECODER_END_OF_STREAM) {
     rb->yield();
