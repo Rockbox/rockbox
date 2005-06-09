@@ -486,8 +486,8 @@ int solitaire_help(void){
 
 /* the menu */
 /* text displayed changes depending on the 'when' parameter */
-int solitaire_menu(unsigned char when) {
-    
+int solitaire_menu(unsigned char when)
+{
     static char menu[2][MENU_LENGTH][13] = 
         { { "Start Game",
             "",
@@ -502,6 +502,10 @@ int solitaire_menu(unsigned char when) {
     int i;
     int cursor=0;
     int button;
+    int fh;
+
+    rb->lcd_getstringsize("A", NULL, &fh);
+    fh++;
     
     if(when!=MENU_BEFOREGAME && when!=MENU_DURINGGAME)
         when = MENU_DURINGGAME;
@@ -513,9 +517,9 @@ int solitaire_menu(unsigned char when) {
         rb->lcd_putsxy(20, 1, "Solitaire");
         
         for(i = 0; i<MENU_LENGTH; i++){
-            rb->lcd_putsxy(1, 17+9*i, menu[when][i]);
+            rb->lcd_putsxy(1, 17+fh*i, menu[when][i]);
             if(cursor == i)
-                rb->lcd_invertrect(0,17-1+9*i, LCD_WIDTH, 9);
+                rb->lcd_invertrect(0,17+fh*i, LCD_WIDTH, fh);
         }
 
         rb->lcd_update();
