@@ -234,7 +234,7 @@ void pcm_play_stop(void)
     pcmbuf_unplayed_bytes = 0;
     next_start = NULL;
     next_size = 0;
-    pcm_boost(false);
+    pcm_set_boost_mode(false);
 }
 
 void pcm_play_pause(bool play)
@@ -252,6 +252,7 @@ void pcm_play_pause(bool play)
         IIS2CONFIG = 0x800;
         pcm_paused = true;
     }
+    pcm_boost(false);
 }
 
 bool pcm_is_playing(void)
@@ -348,9 +349,8 @@ void pcm_watermark_callback(int bytes_left)
 
 void pcm_set_boost_mode(bool state)
 {
-	boost_mode = state;
-        if (boost_mode)
-            pcm_boost(true);
+    boost_mode = state;
+    pcm_boost(state);
 }
 
 void audiobuffer_add_event(void (*event_handler)(void))
@@ -385,7 +385,7 @@ bool pcm_is_lowdata(void)
 
 void pcm_crossfade_start(void)
 {
-    if (audiobuffer_free > CHUNK_SIZE * 4) {
+    if (audiobuffer_free > CHUNK_SIZE * 4 || !crossfade_enabled) {
         return ;
     }
     pcm_boost(true);
@@ -433,7 +433,7 @@ bool audiobuffer_insert(char *buf, size_t length)
     }
 
     while (length > 0) {
-        if (crossfade_enabled && crossfade_active) {
+        if (crossfade_active) {
             copy_n = MIN(length, PCMBUF_SIZE - (unsigned int)crossfade_pos);
             
             crossfade((short *)&audiobuffer[crossfade_pos], 

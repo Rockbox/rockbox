@@ -68,7 +68,7 @@ static volatile bool paused;
 #define CODEC_WAV      "/.rockbox/codecs/codecwav.rock";
 
 #define AUDIO_WATERMARK    0x70000
-#define AUDIO_FILE_CHUNK   (1024*512)
+#define AUDIO_FILE_CHUNK   (1024*32)
 
 #define AUDIO_PLAY         1
 #define AUDIO_STOP         2
@@ -106,9 +106,6 @@ static const char codec_thread_name[] = "codec";
 
 /* Is file buffer currently being refilled? */
 static volatile bool filling;
-
-/* Interrupts buffer filling. */
-static volatile bool interrupt;
 
 /* Ring buffer where tracks and codecs are loaded. */
 char *codecbuf;
@@ -423,7 +420,7 @@ void audio_fill_file_buffer(void)
         /* Give codecs some processing time. */
         yield_codecs();
             
-        if (interrupt) {
+        if (!queue_empty(&audio_queue)) {
             logf("Filling interrupted");
             close(current_fd);
             current_fd = -1;
@@ -543,7 +540,7 @@ bool loadcodec(const char *trackname, bool start_play)
     i = 0;
     while (i < size) {
         yield_codecs();
-        if (interrupt) {
+        if (!queue_empty(&audio_queue)) {
             logf("Buffering interrupted");
             close(fd);
             return false;
@@ -610,10 +607,12 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     }
     tracks[track_widx].filebuf = &codecbuf[buf_widx];
         
-    logf("%s", trackname);
+    //logf("%s", trackname);
     logf("Buffering track:%d/%d", track_widx, track_ridx);
     
-    if (interrupt) {
+    if (!queue_empty(&audio_queue)) {
+        logf("Interrupted!");
+        ci.stop_codec = true;
         close(fd);
         return false;
     }
@@ -637,10 +636,12 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         } else {
             lseek(fd, 0, SEEK_SET);
         }
+        /*
         logf("T:%s", tracks[track_widx].id3.title);
         logf("L:%d", tracks[track_widx].id3.length);
         logf("O:%d", tracks[track_widx].id3.first_frame_offset);
         logf("F:%d", tracks[track_widx].id3.frequency);
+        */
         tracks[track_widx].taginfo_ready = true;
         break ;
 
@@ -715,12 +716,13 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         break;
     }
     
+    track_changed = true;
     track_count++;
     i = tracks[track_widx].filepos;
     while (i < size) {
         /* Give codecs some processing time to prevent glitches. */
         yield_codecs();
-        if (interrupt) {
+        if (!queue_empty(&audio_queue)) {
             logf("Buffering interrupted");
             close(fd);
             return false;
@@ -734,6 +736,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         copy_n = MIN((int)fill_bytesleft, copy_n);
         rc = read(fd, &codecbuf[buf_widx], copy_n);
         if (rc < 0) {
+            logf("File error!");
             close(fd);
             return false;
         }
@@ -782,10 +785,9 @@ void audio_insert_tracks(int offset, bool start_playing)
 
 void audio_play_start(int offset)
 {
-    memset(&tracks, 0, sizeof(struct track_info));
+    memset(&tracks, 0, sizeof(struct track_info) * MAX_TRACK);
     sound_set(SOUND_VOLUME, global_settings.volume);
     track_count = 0;
-    track_changed = true;
     track_widx = 0;
     track_ridx = 0;
     buf_ridx = 0;
@@ -808,12 +810,13 @@ void audio_check_buffer(void)
     
     /* Fill buffer as full as possible for cross-fader. */
 #ifndef SIMULATOR
-    if (cur_ti->id3.length - cur_ti->id3.elapsed < 20000)
+    if (cur_ti->id3.length - cur_ti->id3.elapsed < 20000 && playing)
         pcm_set_boost_mode(true);
 #endif
     
     /* Start buffer filling as necessary. */
-    if (codecbufused > AUDIO_WATERMARK || interrupt || !playing)
+    if (codecbufused > AUDIO_WATERMARK || !queue_empty(&audio_queue) 
+        || !playing || ci.stop_codec || ci.reload_codec)
         return ;
     
     filling = true;
@@ -915,7 +918,7 @@ void audio_change_track(void)
 
 bool codec_request_next_track_callback(void)
 {
-    if (ci.stop_codec || !playing)
+    if (ci.stop_codec || !playing || !queue_empty(&audio_queue))
         return false;
     
     logf("Request new track");
@@ -989,21 +992,20 @@ void audio_thread(void)
         yield();
         audio_check_buffer();
         
-        queue_wait_w_tmo(&audio_queue, &ev, 0);
+        queue_wait_w_tmo(&audio_queue, &ev, 10);
         switch (ev.id) {
             case AUDIO_PLAY:
-                interrupt = false;
                 ci.stop_codec = true;
                 ci.reload_codec = false;
                 ci.seek_time = 0;
 #ifndef SIMULATOR
                 pcm_play_stop();
 #endif
-                paused = false;
                 audio_play_start((int)ev.data);
                 break ;
                 
             case AUDIO_STOP:
+                paused = false;
 #ifndef SIMULATOR
                 pcm_play_stop();
                 pcm_play_pause(true);
@@ -1092,12 +1094,11 @@ void codec_thread(void)
                 
             if (playing && !ci.stop_codec && !ci.reload_codec) {
                 audio_change_track();
-            } else if (ci.reload_codec) {
-                interrupt = true;
-            } else {
-                playing = false;
+                continue ;
+            } else if (ci.stop_codec) {
+                //playing = false;
             }
-            queue_post(&audio_queue, AUDIO_CODEC_DONE, (void *)status);
+            //queue_post(&audio_queue, AUDIO_CODEC_DONE, (void *)status);
         }
     }
 }
@@ -1146,7 +1147,6 @@ void audio_play(int offset)
 {
     logf("audio_play");
     ci.stop_codec = true;
-    playing = false;
 #ifndef SIMULATOR
     pcm_play_pause(true);
 #endif
@@ -1157,6 +1157,7 @@ void audio_stop(void)
 {
     logf("audio_stop");
     playing = false;
+    paused = false;
     ci.stop_codec = true;
     if (current_fd) {
         close(current_fd);
@@ -1196,7 +1197,6 @@ void audio_next(void)
     
     /* Detect if disk is spinning.. */
     if (filling) {
-        interrupt = true;
         ci.stop_codec = true;
         playlist_next(1);
         queue_post(&audio_queue, AUDIO_PLAY, 0);
@@ -1217,7 +1217,6 @@ void audio_prev(void)
 #endif
         
     if (filling) {
-        interrupt = true;
         ci.stop_codec = true;
         playlist_next(-1);
         queue_post(&audio_queue, AUDIO_PLAY, 0);
@@ -1398,7 +1397,6 @@ void audio_init(void)
     //codecbuflen = 2*512*1024;
     codecbufused = 0;
     filling = false;
-    interrupt = false;
     codecbuf = &audiobuf[MALLOC_BUFSIZE];
     playing = false;
     paused = false;
