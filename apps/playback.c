@@ -770,9 +770,8 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     return true;
 }
 
-void audio_insert_tracks(int offset, bool start_playing)
+void audio_insert_tracks(int offset, bool start_playing, int peek_offset)
 {
-    int peek_offset = 0;
     fill_bytesleft = codecbuflen - codecbufused;
     filling = true;
     while (audio_load_track(offset, start_playing, peek_offset)) {
@@ -796,7 +795,7 @@ void audio_play_start(int offset)
 #ifndef SIMULATOR
     pcm_set_boost_mode(true);
 #endif
-    audio_insert_tracks(offset, true);
+    audio_insert_tracks(offset, true, 0);
 #ifndef SIMULATOR
     pcm_set_boost_mode(false);
     ata_sleep();
@@ -855,7 +854,7 @@ void audio_check_buffer(void)
     
     /* Load new files to fill the entire buffer. */
     if (tracks[track_widx].filerem == 0)
-        audio_insert_tracks(0, false);
+        audio_insert_tracks(0, false, 1);
 
 #ifndef SIMULATOR    
     pcm_set_boost_mode(false);
