@@ -75,7 +75,8 @@ FLAC__StreamDecoderWriteStatus flac_write_handler(const FLAC__SeekableStreamDeco
 
    samplesdone+=samples;
    ci->set_elapsed(samplesdone/(ci->id3->frequency/1000));
-
+   
+   rb->yield();
    while (!ci->audiobuffer_insert(pcmbuf, data_size))
      rb->yield();
 

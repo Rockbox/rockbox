@@ -142,6 +142,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
       rb->yield();
       if (ci->stop_codec || ci->reload_codec)
         break ;
+        
+      rb->yield();
       while (!ci->audiobuffer_insert(pcmbuf, n))
         rb->yield();
 	    

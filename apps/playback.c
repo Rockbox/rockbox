@@ -1150,6 +1150,7 @@ void audio_play(int offset)
 #ifndef SIMULATOR
     pcm_play_pause(true);
 #endif
+    paused = false;
     queue_post(&audio_queue, AUDIO_PLAY, (void *)offset);
 }
 
