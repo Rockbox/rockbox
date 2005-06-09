@@ -83,7 +83,7 @@ sub buildzip {
     
     if($notplayer) {
         `cp $ROOT/apps/plugins/sokoban.levels .rockbox/`; # sokoban levels
-        `cp $ROOT/apps/plugins/snake2.levels .rockbox/`; # snake2 levels
+        `cp $ROOT/apps/plugins/snake2.levels .rockbox/rocks/`; # snake2 levels
 
         mkdir ".rockbox/fonts", 0777;
 
