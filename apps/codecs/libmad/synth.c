@@ -102,7 +102,21 @@ void mad_synth_mute(struct mad_synth *synth)
 
 /* possible DCT speed optimization */
 
-# if defined(OPT_SPEED) && defined(MAD_F_MLX)
+/* This is a Coldfire version of the OPT_SPEED optimisation below, but in the
+   case of Coldfire it doesn't lose any more precision than we would ordinarily
+   lose, */
+# ifdef FPM_COLDFIRE_EMAC
+#  define OPT_DCTO
+#  define MUL(x, y) \
+    ({ \
+       mad_fixed64hi_t hi; \
+       asm volatile("mac.l %[a], %[b], %%acc0\n\t" \
+                    "movclr.l %%acc0, %[hi]" \
+                    : [hi] "=r" (hi) \
+                    : [a] "r" ((x)), [b] "r" ((y))); \
+       hi; \
+     })
+# elif defined(OPT_SPEED) && defined(MAD_F_MLX)
 #  define OPT_DCTO
 #  define MUL(x, y)  \
     ({ mad_fixed64hi_t hi;  \
@@ -555,8 +569,8 @@ void synth_full(struct mad_synth *, struct mad_frame const *,
  * DESCRIPTION:	perform full frequency PCM synthesis
  */
 
-/* optimised version of synth full, requires OPT_SSO at the moment */
-# if CONFIG_CPU==MCF5249 && defined(OPT_SSO) && !defined(SIMULATOR)
+/* optimised version of synth_full */
+# ifdef FPM_COLDFIRE_EMAC 
 static
 void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
 		unsigned int nch, unsigned int ns)
@@ -566,10 +580,9 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
   mad_fixed_t const (*sbsample)[36][32];
   mad_fixed_t (*fe)[8], (*fx)[8], (*fo)[8];
   mad_fixed_t const (*Dptr)[32];
-  mad_fixed64hi_t hi = 0;
-  mad_fixed64lo_t lo;
+  mad_fixed64hi_t hi;
 
-  asm volatile("move.l #0, %macsr"); /* need integer mode */
+  asm volatile("move.l #0x20, %macsr"); /* fractional mode */
   
   for (ch = 0; ch < nch; ++ch) {
     sbsample = &frame->sbsample[ch];
@@ -613,10 +626,12 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
         "mac.l %%d5, %%a5, 16(%4), %%a5, %%acc0\n\t"
         "mac.l %%d6, %%a5, 8(%4), %%a5, %%acc0\n\t"
         "mac.l %%d7, %%a5, %%acc0\n\t"
-        "movclr.l %%acc0, %0"
-        : "=ad" (lo) : "a" (*fx), "a" (*Dptr + po), "a" (*fe), "a" (*Dptr + pe) : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
+        "movclr.l %%acc0, %0\n\t"
+        : "=r" (hi) 
+        : "a" (*fx), "a" (*Dptr + po), "a" (*fe), "a" (*Dptr + pe) 
+        : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
 
-      *pcm1++ = SHIFT(MLZ(hi, lo));
+      *pcm1++ = hi << 3; /* shift result to libmad's fixed point format */
 
       pcm2 = pcm1 + 30;
 
@@ -646,13 +661,13 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
           "mac.l %%d2, %%a5, 56(%4), %%a5, %%acc0\n\t"
           "mac.l %%d1, %%a5, (%4), %%a5, %%acc0\n\t"
           "mac.l %%d0, %%a5, %%acc0\n\t"
-          "movclr.l %%acc0, %0"
-          : "=ad" (lo) 
+          "movclr.l %%acc0, %0\n\t"
+          : "=r" (hi) 
           : "a" (*fo), "a" (*Dptr + po), "a" (*fe), "a" (*Dptr + pe) 
           : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
 
-	*pcm1++ = SHIFT(MLZ(hi, lo));
-
+	*pcm1++ = hi << 3;
+        
         asm volatile(
           "movem.l (%1), %%d0-%%d7\n\t"
           "move.l 60(%2), %%a5\n\t"
@@ -674,12 +689,12 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
           "mac.l %%d2, %%a5, 68(%4), %%a5, %%acc0\n\t"
           "mac.l %%d1, %%a5, 60(%4), %%a5, %%acc0\n\t"
           "mac.l %%d0, %%a5, %%acc0\n\t"
-          "movclr.l %%acc0, %0"
-          : "=ad" (lo) 
+          "movclr.l %%acc0, %0\n\t"
+          : "=r" (hi) 
           : "a" (*fe), "a" (*Dptr - pe), "a" (*fo), "a" (*Dptr - po) 
           : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
 
-	*pcm2-- = SHIFT(MLZ(hi, lo));
+	*pcm2-- = hi << 3;
 
 	++fo;
       }
@@ -696,11 +711,11 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
         "mac.l %%d5, %%a5, 16(%2), %%a5, %%acc0\n\t"
         "mac.l %%d6, %%a5, 8(%2), %%a5, %%acc0\n\t"
         "mac.l %%d7, %%a5, %%acc0\n\t"
-        "movclr.l %%acc0, %0" 
-        : "=ad" (lo) : "a" (*fo), "a" (*Dptr + po) 
+        "movclr.l %%acc0, %0\n\t"
+        : "=r" (hi) : "a" (*fo), "a" (*Dptr + po) 
         : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
 
-      *pcm1 = SHIFT(-MLZ(hi, lo));
+      *pcm1 = -(hi << 3);
       pcm1 += 16;
 
       phase = (phase + 1) % 16;

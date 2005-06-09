@@ -420,6 +420,29 @@ mad_fixed_t mad_f_mul_inline(mad_fixed_t x, mad_fixed_t y)
 
 #  define MAD_F_SCALEBITS  MAD_F_FRACBITS
 
+# elif defined(FPM_COLDFIRE_EMAC)
+
+/* mad_f_mul using the Coldfire MCF5249 EMAC unit. Loses 3 bits of accuracy.
+   Note that we don't define any of the libmad accumulator macros, as
+   any functions that use these should have the relevant sections rewritten
+   in assembler to utilise the EMAC accumulators properly.
+   Assumes the default +/- 3.28 fixed point format 
+ */
+#define mad_f_mul(x, y) \
+({ \
+  mad_fixed64hi_t hi; \
+  asm volatile("mac.l %[a], %[b], %%acc0\n\t" \
+               "movclr.l %%acc0, %[hi]\n\t" \
+               "asl.l #3, %[hi]" \
+               : [hi] "=d" (hi) \
+               : [a] "r" ((x)), [b] "r" ((y))); \
+  hi; \
+})
+/* Define dummy mad_f_scale64 to prevent libmad from defining MAD_F_SCALEBITS
+   below. Having MAD_F_SCALEBITS defined screws up the PRESHIFT macro in synth.h
+ */
+#define mad_f_scale64(hi, lo) (lo)
+
 /* --- Default ------------------------------------------------------------- */
 
 # elif defined(FPM_DEFAULT)
