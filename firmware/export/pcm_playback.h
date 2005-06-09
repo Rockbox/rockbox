@@ -45,5 +45,6 @@ bool pcm_is_lowdata(void);
 void pcm_crossfade_start(void);
 unsigned int audiobuffer_get_latency(void);
 bool audiobuffer_insert(char *buf, size_t length);
+void pcm_crossfade_enable(bool on_off);
 
 #endif

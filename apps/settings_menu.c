@@ -60,6 +60,10 @@ void dac_line_in(bool enable);
 #include "lcd-remote.h"
 #endif
 
+#if CONFIG_HWCODEC == MASNONE
+#include "pcm_playback.h"
+#endif
+
 #ifdef HAVE_CHARGING
 static bool car_adapter_mode(void)
 {
@@ -1055,6 +1059,17 @@ static bool id3_order(void)
                              mpeg_id3_options);
 }
 
+#if CONFIG_HWCODEC == MASNONE
+static bool crossfade(void)
+{
+    bool rc = set_bool( str(LANG_CROSSFADE), &global_settings.crossfade );
+#ifndef SIMULATOR
+    pcm_crossfade_enable(global_settings.crossfade);
+#endif
+    return rc;
+}
+#endif
+
 static bool playback_settings_menu(void)
 {
     int m;
@@ -1068,6 +1083,9 @@ static bool playback_settings_menu(void)
         { ID2P(LANG_WIND_MENU), ff_rewind_settings_menu },
         { ID2P(LANG_MP3BUFFER_MARGIN), buffer_margin },
         { ID2P(LANG_FADE_ON_STOP), set_fade_on_stop },
+#if CONFIG_HWCODEC == MASNONE
+        { ID2P(LANG_CROSSFADE), crossfade },
+#endif
         { ID2P(LANG_ID3_ORDER), id3_order },
     };
 

@@ -56,6 +56,7 @@ static volatile size_t audiobuffer_free;
 static size_t audiobuffer_fillpos;
 static bool boost_mode;
 
+static bool crossfade_enabled;
 static bool crossfade_active;
 static int crossfade_pos;
 static int crossfade_amount;
@@ -432,18 +433,7 @@ bool audiobuffer_insert(char *buf, size_t length)
     }
 
     while (length > 0) {
-        if (!crossfade_active) {
-            copy_n = MIN(length, PCMBUF_SIZE - audiobuffer_pos - 
-                        audiobuffer_fillpos);
-            copy_n = MIN(CHUNK_SIZE, copy_n);
-            
-            memcpy(&audiobuffer[audiobuffer_pos+audiobuffer_fillpos],
-                   buf, copy_n);
-            buf += copy_n;
-            audiobuffer_free -= copy_n;
-            length -= copy_n;
-            
-        } else {
+        if (crossfade_enabled && crossfade_active) {
             copy_n = MIN(length, PCMBUF_SIZE - (unsigned int)crossfade_pos);
             
             crossfade((short *)&audiobuffer[crossfade_pos], 
@@ -453,7 +443,17 @@ bool audiobuffer_insert(char *buf, size_t length)
             crossfade_pos += copy_n;
             if (crossfade_pos >= PCMBUF_SIZE)
                 crossfade_pos -= PCMBUF_SIZE;
-            continue ;
+            continue ;            
+        } else {
+            copy_n = MIN(length, PCMBUF_SIZE - audiobuffer_pos - 
+                        audiobuffer_fillpos);
+            copy_n = MIN(CHUNK_SIZE, copy_n);
+            
+            memcpy(&audiobuffer[audiobuffer_pos+audiobuffer_fillpos],
+                   buf, copy_n);
+            buf += copy_n;
+            audiobuffer_free -= copy_n;
+            length -= copy_n;
         }
         
         /* Pre-buffer to meet CHUNK_SIZE requirement */
@@ -501,6 +501,13 @@ void pcm_play_init(void)
     memset(&audiobuffer[0], 0, audiobuffer_pos);
     pcm_play_add_chunk(&audiobuffer[0], audiobuffer_pos, NULL);
     pcm_play_start();
+
+    crossfade_enabled = false;
+}
+
+void pcm_crossfade_enable(bool on_off)
+{
+    crossfade_enabled = on_off;
 }
 
 void pcm_play_start(void)

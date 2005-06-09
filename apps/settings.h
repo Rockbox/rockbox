@@ -152,6 +152,10 @@ struct user_settings
     bool mdb_enable; /* true/false */
     bool superbass; /* true/false */
 
+#if CONFIG_HWCODEC == MASNONE
+    bool crossfade;
+#endif
+
     int rec_quality;   /* 0-7 */
     int rec_source;    /* 0=mic, 1=line, 2=S/PDIF */
     int rec_frequency; /* 0 = 44.1kHz

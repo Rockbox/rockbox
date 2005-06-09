@@ -72,7 +72,9 @@ struct user_settings global_settings;
 #ifdef HAVE_RECORDING
 const char rec_base_directory[] = REC_BASE_DIR;
 #endif
-
+#if CONFIG_HWCODEC == MASNONE
+#include "pcm_playback.h"
+#endif
 
 #define CONFIG_BLOCK_VERSION 21
 #define CONFIG_BLOCK_SIZE 512
@@ -382,6 +384,10 @@ static const struct bit_entry hd_bits[] =
     {4, S_O(rec_trigger_mode ), 1, "trigger mode", "off,no rearm,rearm"},
 #endif
 
+#if CONFIG_HWCODEC == MASNONE
+    {1, S_O(crossfade), false, "crossfade", off_on},
+#endif
+    
     /* new stuff to be added at the end */
 		    
     /* Sum of all bit sizes must not grow beyond 0xB8*8 = 1472 */
@@ -812,6 +818,10 @@ void settings_apply(void)
         lang_load(buf);
         talk_init(); /* use voice of same language */
     }
+
+#if CONFIG_HWCODEC == MASNONE && !defined(SIMULATOR)
+    pcm_crossfade_enable(global_settings.crossfade);
+#endif
 }
 
 
