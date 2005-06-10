@@ -1152,6 +1152,7 @@ void audio_play(int offset)
     pcm_play_pause(true);
 #endif
     paused = false;
+    playing = true;
     queue_post(&audio_queue, AUDIO_PLAY, (void *)offset);
 }
 
