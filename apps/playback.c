@@ -438,8 +438,8 @@ void audio_fill_file_buffer(void)
         }
         
         buf_widx += rc;
-        if (buf_widx == codecbuflen)
-            buf_widx = 0;
+        if (buf_widx >= codecbuflen)
+            buf_widx -= codecbuflen;
         i += rc;
         tracks[track_widx].available += rc;
         fill_bytesleft -= rc;
@@ -552,7 +552,7 @@ bool loadcodec(const char *trackname, bool start_play)
             return false;
         buf_widx += rc;
         if (buf_widx >= codecbuflen)
-            buf_widx = 0;
+            buf_widx -= codecbuflen;
         i += rc;
     }
     close(fd);
@@ -598,7 +598,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     
     /* Load the codec */
     if (buf_widx >= codecbuflen)
-        buf_widx = 0;
+        buf_widx -= codecbuflen;
         
     tracks[track_widx].codecbuf = &codecbuf[buf_widx];
     if (!loadcodec(trackname, start_play)) {
@@ -742,15 +742,15 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         }
         buf_widx += rc;
         if (buf_widx >= codecbuflen)
-            buf_widx = 0;
+            buf_widx -= codecbuflen;
         i += rc;
         tracks[track_widx].available += rc;
         tracks[track_widx].filerem -= rc;
+        codecbufused += rc;
         fill_bytesleft -= rc;
     }
     
     tracks[track_widx].filepos = i;
-    codecbufused += i;
     
     /* Leave the file handle open for faster buffer refill. */
     if (tracks[track_widx].filerem != 0) {
@@ -809,8 +809,8 @@ void audio_check_buffer(void)
     
     /* Fill buffer as full as possible for cross-fader. */
 #ifndef SIMULATOR
-    if (cur_ti->id3.length > 0 &&
-        cur_ti->id3.length - cur_ti->id3.elapsed < 20000 && playing)
+    if (pcm_is_crossfade_enabled() && cur_ti->id3.length > 0
+        && cur_ti->id3.length - cur_ti->id3.elapsed < 20000 && playing)
         pcm_set_boost_mode(true);
 #endif
     
@@ -873,6 +873,7 @@ void audio_update_trackinfo(void)
         
         cur_ti = &tracks[track_ridx];
         buf_ridx += cur_ti->codecsize;
+        codecbufused -= cur_ti->codecsize;
         if (buf_ridx >= codecbuflen)
             buf_ridx -= codecbuflen;
 #ifndef SIMULATOR        
@@ -989,7 +990,7 @@ void audio_thread(void)
     struct event ev;
     
     while (1) {
-        yield();
+        sleep(50);
         audio_check_buffer();
         
         queue_wait_w_tmo(&audio_queue, &ev, 10);

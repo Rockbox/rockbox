@@ -99,15 +99,6 @@ static void dma_start(const void *addr, long size)
     DCR0 = DMA_INT | DMA_EEXT | DMA_CS | DMA_SINC | DMA_START;
 }
 
-/* Stops the DMA transfer and interrupt */
-static void dma_stop(void)
-{
-    pcm_playing = false;
-
-    /* Reset the FIFO */
-    IIS2CONFIG = 0x800;
-}
-
 void pcm_boost(bool state)
 {
     static bool boost_state = false;
@@ -119,6 +110,16 @@ void pcm_boost(bool state)
         cpu_boost(state);
         boost_state = state;
     }
+}
+
+/* Stops the DMA transfer and interrupt */
+static void dma_stop(void)
+{
+    pcm_playing = false;
+
+    /* Reset the FIFO */
+    IIS2CONFIG = 0x800;
+    pcm_boost(false);
 }
 
 /* set volume of the main channel */
@@ -385,6 +386,7 @@ bool pcm_is_lowdata(void)
 
 void pcm_crossfade_start(void)
 {
+    //logf("cf:%d", audiobuffer_free / CHUNK_SIZE);
     if (audiobuffer_free > CHUNK_SIZE * 4 || !crossfade_enabled) {
         return ;
     }
@@ -493,6 +495,7 @@ void pcm_play_init(void)
     pcmbuf_read_index = 0;
     pcmbuf_write_index = 0;
     pcmbuf_unplayed_bytes = 0;
+    crossfade_enabled = false;
     pcm_play_set_watermark(PCM_WATERMARK, pcm_watermark_callback);
     
     /* Play a small chunk of zeroes to initialize the playback system. */
@@ -501,14 +504,17 @@ void pcm_play_init(void)
     memset(&audiobuffer[0], 0, audiobuffer_pos);
     pcm_play_add_chunk(&audiobuffer[0], audiobuffer_pos, NULL);
     pcm_play_start();
-    cpu_boost(false);
 
-    crossfade_enabled = false;
 }
 
 void pcm_crossfade_enable(bool on_off)
 {
     crossfade_enabled = on_off;
+}
+
+bool pcm_is_crossfade_enabled(void)
+{
+    return crossfade_enabled;
 }
 
 void pcm_play_start(void)
