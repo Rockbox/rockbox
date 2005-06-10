@@ -598,7 +598,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     int rc, i;
     int copy_n;
     /* Used by the FLAC metadata parser */
-    unsigned long totalsamples;
+    unsigned long totalsamples,bytespersample,channels,bitspersample,numbytes;
     unsigned char* buf;
     
     if (track_count >= MAX_TRACK)
@@ -676,6 +676,57 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         */
         tracks[track_widx].taginfo_ready = true;
         break ;
+
+    case AFMT_PCM_WAV:
+        /* Use the trackname part of the id3 structure as a temporary buffer */
+        buf=tracks[track_widx].id3.path;
+
+        lseek(fd, 0, SEEK_SET);
+
+        rc = read(fd, buf, 44);
+        if (rc < 44) {
+          close(fd);
+          return false;
+        }
+
+        if ((memcmp(buf,"RIFF",4)!=0) || 
+            (memcmp(&buf[8],"WAVEfmt",7)!=0)) {
+          logf("%s is not a WAV file\n",trackname);
+          close(fd);
+          return(false);
+        }
+
+        /* FIX: Correctly parse WAV header - we assume canonical 
+           44-byte header */
+
+        bitspersample=buf[34];
+        channels=buf[22];
+
+        if ((bitspersample!=16) || (channels != 2)) {
+          logf("Unsupported WAV file - %d bitspersample, %d channels\n",
+               bitspersample,channels);
+          close(fd);
+          return(false);
+        }
+
+        bytespersample=((bitspersample/8)*channels);
+        numbytes=(buf[40]|(buf[41]<<8)|(buf[42]<<16)|(buf[43]<<24));
+        totalsamples=numbytes/bytespersample;
+
+        tracks[track_widx].id3.vbr=false;   /* All WAV files are CBR */
+        tracks[track_widx].id3.filesize=filesize(fd);
+        tracks[track_widx].id3.frequency=buf[24]|(buf[25]<<8)|(buf[26]<<16)|(buf[27]<<24);
+
+        /* Calculate track length (in ms) and estimate the bitrate (in kbit/s) */
+        tracks[track_widx].id3.length=(totalsamples/tracks[track_widx].id3.frequency)*1000;
+        tracks[track_widx].id3.bitrate=(tracks[track_widx].id3.frequency*bytespersample)/1024;
+
+        lseek(fd, 0, SEEK_SET);
+        strncpy(tracks[track_widx].id3.path,trackname,sizeof(tracks[track_widx].id3.path));
+        tracks[track_widx].taginfo_ready = true;
+
+        break;
+    
 
     case AFMT_FLAC:
         /* A simple parser to read vital metadata from a FLAC file - length, frequency, bitrate etc. */
