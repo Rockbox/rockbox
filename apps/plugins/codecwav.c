@@ -21,14 +21,16 @@
 #include "playback.h"
 #include "lib/codeclib.h"
 
+#define BYTESWAP(x) (((x>>8) & 0xff) | ((x<<8) & 0xff00))
+
+/* Number of bytes to process in one iteration */
+#define WAV_CHUNK_SIZE 16384
+
 #ifndef SIMULATOR
 extern char iramcopy[];
 extern char iramstart[];
 extern char iramend[];
 #endif
-
-/* This is probably a waste of IRAM, but why not? */
-static unsigned char wavbuf[16384] IDATA_ATTR;
 
 /* this is the plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* parm)
@@ -37,8 +39,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
   struct codec_api* ci = (struct codec_api*)parm;
   unsigned long samplerate,numbytes,totalsamples,samplesdone,nsamples;
   int channels,bytespersample,bitspersample;
-  unsigned int i,j,n;
+  unsigned int i;
+  size_t n;
   int endofstream;
+  unsigned char* header;
+  unsigned short* wavbuf;
 
   /* Generic plugin initialisation */
   TEST_PLUGIN_API(api);
@@ -62,39 +67,38 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
 
   /* FIX: Correctly parse WAV header - we assume canonical 44-byte header */
 
-  n=(unsigned)(ci->read_filebuf(wavbuf,44));
+  header=ci->request_buffer(&n,44);
   if (n!=44) {
     return PLUGIN_ERROR;
   }
-  if ((memcmp(wavbuf,"RIFF",4)!=0) || (memcmp(&wavbuf[8],"WAVEfmt",7)!=0)) {
+  if ((memcmp(header,"RIFF",4)!=0) || (memcmp(&header[8],"WAVEfmt",7)!=0)) {
     return PLUGIN_ERROR;
   }
 
-  samplerate=wavbuf[24]|(wavbuf[25]<<8)|(wavbuf[26]<<16)|(wavbuf[27]<<24);
-  bitspersample=wavbuf[34];
-  channels=wavbuf[22];
+  samplerate=header[24]|(header[25]<<8)|(header[26]<<16)|(header[27]<<24);
+  bitspersample=header[34];
+  channels=header[22];
   bytespersample=((bitspersample/8)*channels);
-  numbytes=(wavbuf[40]|(wavbuf[41]<<8)|(wavbuf[42]<<16)|(wavbuf[43]<<24));
+  numbytes=(header[40]|(header[41]<<8)|(header[42]<<16)|(header[43]<<24));
   totalsamples=numbytes/bytespersample;
 
   if ((bitspersample!=16) || (channels != 2)) {
     return PLUGIN_ERROR;
   }
-    
+
+  ci->advance_buffer(44);
+
   /* The main decoder loop */
 
   samplesdone=0;
   ci->set_elapsed(0);
   endofstream=0;
   while (!endofstream) {
-    rb->yield();
     if (ci->stop_codec || ci->reload_codec) {
       break;
     }
 
-    n=(unsigned)(ci->read_filebuf(wavbuf,sizeof(wavbuf)));
-
-    rb->yield();
+    wavbuf=ci->request_buffer(&n,WAV_CHUNK_SIZE);
 
     if (n==0) break; /* End of stream */
 
@@ -110,18 +114,17 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
     }
 
     /* Byte-swap data */
-    for (i=0;i<n;i+=2) {
-        j=wavbuf[i];
-        wavbuf[i]=wavbuf[i+1];
-        wavbuf[i+1]=j;
+    for (i=0;i<n/2;i++) {
+      wavbuf[i]=BYTESWAP(wavbuf[i]);
     }
 
     samplesdone+=nsamples;
     ci->set_elapsed(samplesdone/(ci->id3->frequency/1000));
    
-    rb->yield();
-    while (!ci->audiobuffer_insert(wavbuf, n))
+    while (!ci->audiobuffer_insert((unsigned char*)wavbuf, n))
       rb->yield();
+
+    ci->advance_buffer(n);
   }
 
   if (ci->request_next_track())
