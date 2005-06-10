@@ -719,7 +719,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
 
         /* Calculate track length (in ms) and estimate the bitrate (in kbit/s) */
         tracks[track_widx].id3.length=(totalsamples/tracks[track_widx].id3.frequency)*1000;
-        tracks[track_widx].id3.bitrate=(tracks[track_widx].id3.frequency*bytespersample)/1024;
+        tracks[track_widx].id3.bitrate=(tracks[track_widx].id3.frequency*bytespersample)/(1024/8);
 
         lseek(fd, 0, SEEK_SET);
         strncpy(tracks[track_widx].id3.path,trackname,sizeof(tracks[track_widx].id3.path));
