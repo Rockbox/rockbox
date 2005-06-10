@@ -26,24 +26,25 @@
 #if CONFIG_CPU == MCF5249
 struct regs
 {
-    unsigned int d[6]; /* d2-d7 */
-    unsigned int a[5]; /* a2-a6 */
-    void         *sp;  /* Stack pointer (a7) */
+    unsigned int d[6];   /* d2-d7 */
+    unsigned int a[5];   /* a2-a6 */
+    void         *sp;    /* Stack pointer (a7) */
+    void         *start; /* Thread start address, or NULL when started */
 };
 #elif CONFIG_CPU == SH7034
 struct regs
 {
-    unsigned int  r[7]; /* Registers r8 thru r14 */
-    void          *sp;  /* Stack pointer (r15) */
-    void*         pr;   /* Procedure register */
+    unsigned int r[7];   /* Registers r8 thru r14 */
+    void         *sp;    /* Stack pointer (r15) */
+    void         *pr;    /* Procedure register */
+    void         *start; /* Thread start address, or NULL when started */
 };
-
 #elif CONFIG_CPU == TCC730
 struct regs
 {
-  void *sp;  /* Stack pointer (a15) */
-  void *start; /* Thread start address */
-  int started; /* 0 when not started */
+    void *sp;    /* Stack pointer (a15) */
+    void *start; /* Thread start address */
+    int started; /* 0 when not started */
 };
 #endif
 
@@ -74,7 +75,10 @@ static inline void load_context(const void* addr) __attribute__ ((always_inline)
  */
 static inline void store_context(void* addr)
 {
-    asm volatile ("movem.l %%d2-%%d7/%%a2-%%a7,(%0)\n\t" : : "a" (addr));
+    asm volatile (
+        "movem.l %%d2-%%d7/%%a2-%%a7,(%0)\n"
+        : : "a" (addr)
+    );
 }
 
 /*--------------------------------------------------------------------------- 
@@ -83,7 +87,16 @@ static inline void store_context(void* addr)
  */
 static inline void load_context(const void* addr)
 {
-    asm volatile ("movem.l (%0),%%d2-%%d7/%%a2-%%a7\n\t" : : "a" (addr));
+    asm volatile (
+        "movem.l (%0),%%d2-%%d7/%%a2-%%a7\n"  /* Load context */
+        "move.l  (48,%0),%%d0            \n"  /* Get start address */
+        "beq.b   .running                \n"  /* NULL -> already running */
+        "clr.l   (48,%0)                 \n"  /* Clear start address.. */
+        "move.l  %%d0,%0                 \n"
+        "jmp     (%0)                    \n"  /* ..and start the thread */
+    ".running:                           \n"
+        : : "a" (addr) : "d0" /* only! */
+    );
 }
 
 #elif CONFIG_CPU == SH7034
@@ -93,36 +106,49 @@ static inline void load_context(const void* addr)
  */
 static inline void store_context(void* addr)
 {
-    asm volatile ("add #36, %0\n\t"
-                  "sts.l pr,  @-%0\n\t"
-                  "mov.l r15, @-%0\n\t"
-                  "mov.l r14, @-%0\n\t"
-                  "mov.l r13, @-%0\n\t"
-                  "mov.l r12, @-%0\n\t"
-                  "mov.l r11, @-%0\n\t"
-                  "mov.l r10, @-%0\n\t"
-                  "mov.l r9,  @-%0\n\t"
-                  "mov.l r8,  @-%0" : : "r" (addr));
+    asm volatile (
+        "add     #36,%0    \n"
+        "sts.l   pr, @-%0  \n"
+        "mov.l   r15,@-%0  \n"
+        "mov.l   r14,@-%0  \n"
+        "mov.l   r13,@-%0  \n"
+        "mov.l   r12,@-%0  \n"
+        "mov.l   r11,@-%0  \n"
+        "mov.l   r10,@-%0  \n"
+        "mov.l   r9, @-%0  \n"
+        "mov.l   r8, @-%0  \n"
+        : : "r" (addr)
+    );
 }
 
-/*--------------------------------------------------------------------------- 
+/*---------------------------------------------------------------------------
  * Load non-volatile context.
  *---------------------------------------------------------------------------
  */
 static inline void load_context(const void* addr)
 {
-    asm volatile ("mov.l @%0+,r8\n\t"
-                  "mov.l @%0+,r9\n\t"
-                  "mov.l @%0+,r10\n\t"
-                  "mov.l @%0+,r11\n\t"
-                  "mov.l @%0+,r12\n\t"
-                  "mov.l @%0+,r13\n\t"
-                  "mov.l @%0+,r14\n\t"
-                  "mov.l @%0+,r15\n\t"
-                  "mov.l @%0,%0\n\t"
-                  "lds %0,pr\n\t"
-                  "mov.l %0, @(0, r15)" : "+r" (addr));
+    asm volatile (
+        "mov.l   @%0+,r8   \n"
+        "mov.l   @%0+,r9   \n"
+        "mov.l   @%0+,r10  \n"
+        "mov.l   @%0+,r11  \n"
+        "mov.l   @%0+,r12  \n"
+        "mov.l   @%0+,r13  \n"
+        "mov.l   @%0+,r14  \n"
+        "mov.l   @%0+,r15  \n"
+        "lds.l   @%0+,pr   \n"
+        "mov.l   @%0,r0    \n"  /* Get start address */
+        "tst     r0,r0     \n"
+        "bt      .running  \n"  /* NULL -> already running */
+        "lds     r0,pr     \n"
+        "mov     #0,r0     \n"
+        "rts               \n"  /* Start the thread */
+        "mov.l   r0,@%0    \n"  /* Clear start address */
+    ".running:             \n"
+        : : "r" (addr) : "r0" /* only! */
+    );
 }
+
 #elif CONFIG_CPU == TCC730
 /*--------------------------------------------------------------------------- 
  * Store non-volatile context.
@@ -177,7 +203,6 @@ static inline void load_context(const void* addr)
 void switch_thread(void)
 {
     int current;
-    int next;
     unsigned int *stackptr;
 
 #ifdef SIMULATOR
@@ -189,35 +214,35 @@ void switch_thread(void)
         /* Enter sleep mode, woken up on interrupt */
 #if CONFIG_CPU == MCF5249
         asm volatile ("stop #0x2000");
+#elif CONFIG_CPU == SH7034
+        SBYCR &= 0x7F;
+        asm volatile ("sleep");
 #elif CONFIG_CPU == TCC730
-	/* Sleep mode is triggered by the SYS instr on CalmRisc16.
+	    /* Sleep mode is triggered by the SYS instr on CalmRisc16.
          * Unfortunately, the manual doesn't specify which arg to use.
          __asm__ volatile ("sys #0x0f");
          0x1f seems to trigger a reset;
          0x0f is the only one other argument used by Archos.
          */
-#else
-        SBYCR &= 0x7F;
-        asm volatile ("sleep");
 #endif
     }
     
 #endif
-    next = current = current_thread;
-
-    if (++next >= num_threads)
-        next = 0;
-    current_thread = next;
+    current = current_thread;
     store_context(&thread_contexts[current]);
     
+#if CONFIG_CPU != TCC730
     /* Check if the current thread stack is overflown */
-    stackptr = thread_stack[current]; 
-#if ! (defined(IRIVER_H100) || (CONFIG_CPU == TCC730))
+    stackptr = thread_stack[current];
     if(stackptr[0] != DEADBEEF)
        panicf("Stkov %s", thread_name[current]);
 #endif
-       
-    load_context(&thread_contexts[next]);
+
+    if (++current >= num_threads)
+        current = 0;
+
+    current_thread = current;
+    load_context(&thread_contexts[current]);
 }
 
 void sleep_thread(void)
@@ -239,47 +264,39 @@ void wake_up_thread(void)
 int create_thread(void* function, void* stack, int stack_size,
                   const char *name)
 {
-   unsigned int i;
-   unsigned int stacklen;
-   unsigned int *stackptr;
-   struct regs *regs;
-        
-   if (num_threads >= MAXTHREADS)
-      return -1;
+    unsigned int i;
+    unsigned int stacklen;
+    unsigned int *stackptr;
+    struct regs *regs;
 
-   /* Munge the stack to make it easy to spot stack overflows */
-   stacklen = stack_size / sizeof(int);
-   stackptr = stack;
-   for(i = 0;i < stacklen;i++)
-   {
-     stackptr[i] = DEADBEEF;
-   }
+    if (num_threads >= MAXTHREADS)
+        return -1;
 
-   /* Store interesting information */
-   thread_name[num_threads] = name;
-   thread_stack[num_threads] = stack;
-   thread_stack_size[num_threads] = stack_size;
-   regs = &thread_contexts[num_threads];
-#if CONFIG_CPU == MCF5249
-   store_context(regs);
-   regs->sp = (void*)(((unsigned int)stack + stack_size - 4) & ~3);
-   /* Put the return address on the stack */
-   *(unsigned long *)(regs->sp) = (int)function;
-#elif CONFIG_CPU == SH7034
-   store_context(regs);
-   /* Subtract 4 to leave room for the PR push in load_context()
-      Align it on an even 32 bit boundary */
-   regs->sp = (void*)(((unsigned int)stack + stack_size - 4) & ~3);
-   regs->pr = function;
+    /* Munge the stack to make it easy to spot stack overflows */
+    stacklen = stack_size / sizeof(int);
+    stackptr = stack;
+    for(i = 0;i < stacklen;i++)
+    {
+        stackptr[i] = DEADBEEF;
+    }
+
+    /* Store interesting information */
+    thread_name[num_threads] = name;
+    thread_stack[num_threads] = stack;
+    thread_stack_size[num_threads] = stack_size;
+    regs = &thread_contexts[num_threads];
+#if (CONFIG_CPU == MCF5249) || (CONFIG_CPU == SH7034)
+    /* Align stack to an even 32 bit boundary */
+    regs->sp = (void*)(((unsigned int)stack + stack_size) & ~3);
 #elif CONFIG_CPU == TCC730
    /* Align stack on word boundary */
-   regs->sp = (void*)(((unsigned long)stack + stack_size - 2) & ~1);
-   regs->start = (void*)function;
-   regs->started = 0;
+    regs->sp = (void*)(((unsigned long)stack + stack_size - 2) & ~1);
+    regs->started = 0;
 #endif
+    regs->start = (void*)function;
 
-   wake_up_thread();
-   return num_threads++; /* return the current ID, e.g for remove_thread() */
+    wake_up_thread();
+    return num_threads++; /* return the current ID, e.g for remove_thread() */
 }
 
 /*--------------------------------------------------------------------------- 
@@ -316,7 +333,9 @@ void init_threads(void)
     thread_name[0] = main_thread_name;
     thread_stack[0] = stackbegin;
     thread_stack_size[0] = (int)stackend - (int)stackbegin;
-#if CONFIG_CPU == TCC730
+#if (CONFIG_CPU == MCF5249) || (CONFIG_CPU == SH7034)
+    thread_contexts[0].start = 0; /* thread 0 already running */
+#elif CONFIG_CPU == TCC730
     thread_contexts[0].started = 1;
 #endif
     num_sleepers = 0;
@@ -324,18 +343,18 @@ void init_threads(void)
 
 int thread_stack_usage(int threadnum)
 {
-   unsigned int i;
-   unsigned int *stackptr = thread_stack[threadnum];
+    unsigned int i;
+    unsigned int *stackptr = thread_stack[threadnum];
 
-   if(threadnum >= num_threads)
-      return -1;
-   
-   for(i = 0;i < thread_stack_size[threadnum]/sizeof(int);i++)
-   {
-      if(stackptr[i] != DEADBEEF)
-         break;
-   }
-   
-   return ((thread_stack_size[threadnum] - i * 4) * 100) /
-      thread_stack_size[threadnum];
+    if(threadnum >= num_threads)
+        return -1;
+
+    for(i = 0;i < thread_stack_size[threadnum]/sizeof(int);i++)
+    {
+        if(stackptr[i] != DEADBEEF)
+            break;
+    }
+
+    return ((thread_stack_size[threadnum] - i * sizeof(int)) * 100) /
+        thread_stack_size[threadnum];
 }
