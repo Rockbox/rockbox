@@ -1254,7 +1254,7 @@ void audio_stop(void)
     playing = false;
     paused = false;
     ci.stop_codec = true;
-    if (current_fd) {
+    if (current_fd > 0) {
         close(current_fd);
         current_fd = -1;
     }
