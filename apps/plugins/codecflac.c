@@ -57,6 +57,7 @@ FLAC__StreamDecoderWriteStatus flac_write_handler(const FLAC__SeekableStreamDeco
    unsigned int c_samp, c_chan, d_samp;
    uint32_t data_size = frame->header.blocksize * frame->header.channels * 2; /* Assume 16-bit words */
    uint32_t samples = frame->header.blocksize;
+   int yieldcounter = 0;
 
 
    if (samples*frame->header.channels > (FLAC_MAX_SUPPORTED_BLOCKSIZE*FLAC_MAX_SUPPORTED_CHANNELS)) {
@@ -70,6 +71,10 @@ FLAC__StreamDecoderWriteStatus flac_write_handler(const FLAC__SeekableStreamDeco
      for(c_chan = 0; c_chan < frame->header.channels; c_chan++, d_samp++) {
        pcmbuf[d_samp*2] = (buf[c_chan][c_samp]&0xff00)>>8;
        pcmbuf[(d_samp*2)+1] = buf[c_chan][c_samp]&0xff;
+       if (yieldcounter++ == 100) {
+         rb->yield();
+         yieldcounter = 0;
+       }
      }
    } 
 

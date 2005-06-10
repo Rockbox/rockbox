@@ -198,6 +198,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
   int fd;
 #endif
   int i;
+  int yieldcounter = 0;
   
   /* Generic plugin inititialisation */
 
@@ -217,6 +218,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
   /* Create a decoder instance */
 
   ci->configure(CODEC_SET_FILEBUF_LIMIT, (int *)(1024*1024*2));
+  ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*16));
   
   next_track:
   memset(&Stream, 0, sizeof(struct mad_stream));
@@ -379,10 +381,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
         goto song_end;
       }
   
+      if (yieldcounter++ == 200) {
+        rb->yield();
+        yieldcounter = 0;
+      }
+      
       /* Flush the buffer if it is full. */
       if(OutputPtr==OutputBufferEnd)
       {
-        rb->yield();
 #ifdef DEBUG_GAPLESS
         rb->write(fd, OutputBuffer, OUTPUT_BUFFER_SIZE);
 #endif

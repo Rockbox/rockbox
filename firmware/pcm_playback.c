@@ -351,7 +351,8 @@ void pcm_watermark_callback(int bytes_left)
 void pcm_set_boost_mode(bool state)
 {
     boost_mode = state;
-    pcm_boost(state);
+    if (state)
+        pcm_boost(true);
 }
 
 void audiobuffer_add_event(void (*event_handler)(void))
