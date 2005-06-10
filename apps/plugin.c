@@ -334,7 +334,9 @@ int codec_load_ram(char* pluginptr, size_t size, void *parameter, void* ptr2, si
 {
     enum plugin_status (*plugin_start)(struct plugin_api* api, void* param);
     int copy_n;
+    int status;
     
+    plugin_size = size;
     if ((int)&pluginbuf != (int)pluginptr) {
         /* zero out plugin buffer to ensure a properly zeroed bss area */
         memset(pluginbuf, 0, PLUGIN_BUFFER_SIZE);
@@ -357,7 +359,11 @@ int codec_load_ram(char* pluginptr, size_t size, void *parameter, void* ptr2, si
     
     invalidate_icache();
     
-    return plugin_start((struct plugin_api*) &rockbox_api, parameter);
+    plugin_loaded = true;
+    status = plugin_start((struct plugin_api*) &rockbox_api, parameter);
+    plugin_loaded = false;
+    
+    return status;
 }
 
 int codec_load_file(const char *plugin, void *parameter)
