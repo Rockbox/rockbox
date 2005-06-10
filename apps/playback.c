@@ -67,8 +67,9 @@ static volatile bool paused;
 #define CODEC_FLAC     "/.rockbox/codecs/codecflac.rock";
 #define CODEC_WAV      "/.rockbox/codecs/codecwav.rock";
 
-#define AUDIO_WATERMARK    0x70000
-#define AUDIO_FILE_CHUNK   (1024*32)
+#define AUDIO_WATERMARK      (1024*256)
+#define AUDIO_FILE_CHUNK     (1024*32)
+#define AUDIO_INITIAL_CHUNK  (1024*1024*2)
 
 #define AUDIO_PLAY         1
 #define AUDIO_STOP         2
@@ -163,6 +164,9 @@ static struct codec_api ci;
 /* When we change a song and buffer is not in filling state, this
    variable keeps information about whether to go a next/previous track. */
 static int new_track;
+
+/* If we have just started playing, don't fill the whole file buffer. */
+static unsigned int first_bufferfill;
 
 static bool v1first = false;
 
@@ -716,6 +720,12 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         break;
     }
     
+    /* Limit buffering size at first run. */
+    if (first_bufferfill && fill_bytesleft >= first_bufferfill) {
+        fill_bytesleft = first_bufferfill;
+        first_bufferfill = 0;
+    }
+        
     track_changed = true;
     track_count++;
     i = tracks[track_widx].filepos;
@@ -1153,6 +1163,7 @@ void audio_play(int offset)
 #endif
     paused = false;
     playing = true;
+    first_bufferfill = AUDIO_INITIAL_CHUNK;
     queue_post(&audio_queue, AUDIO_PLAY, (void *)offset);
 }
 
