@@ -240,7 +240,6 @@ void pcm_play_stop(void)
 
 void pcm_play_pause(bool play)
 {
-    pcm_paused = !play;
     if(pcm_paused && play && pcmbuf_unplayed_bytes)
     {
         /* Enable the FIFO and force one write to it */
@@ -251,6 +250,7 @@ void pcm_play_pause(bool play)
     {
         IIS2CONFIG = 0x800;
     }
+    pcm_paused = !play;
     pcm_boost(false);
 }
 
