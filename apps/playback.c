@@ -261,6 +261,7 @@ void* codec_request_buffer_callback(size_t *realsize, size_t reqsize)
     while ((int)*realsize > cur_ti->available) {
         yield();
         if (ci.stop_codec) {
+            *realsize = 0;
             return NULL;
         }
     }
@@ -286,7 +287,7 @@ void codec_advance_buffer_callback(size_t amount)
         codecbufused = 0;
         buf_ridx = buf_widx;
         cur_ti->available = 0;
-        while ((int)amount < cur_ti->available)
+        while ((int)amount < cur_ti->available && !ci.stop_codec)
             yield();
     } else {
         cur_ti->available -= amount;
@@ -427,7 +428,8 @@ void yield_codecs(void)
 #ifndef SIMULATOR
     if (!pcm_is_playing())
         sleep(5);
-    while (pcm_is_lowdata())
+    while (pcm_is_lowdata() && !ci.stop_codec && 
+           playing && queue_empty(&audio_queue))
         yield();
 #else
     yield();

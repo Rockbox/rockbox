@@ -240,18 +240,16 @@ void pcm_play_stop(void)
 
 void pcm_play_pause(bool play)
 {
+    pcm_paused = !play;
     if(pcm_paused && play && pcmbuf_unplayed_bytes)
     {
         /* Enable the FIFO and force one write to it */
         IIS2CONFIG = (pcm_freq << 12) | 0x300;
         DCR0 |= DMA_START;
-        
-        pcm_paused = false;
     }
     else if(!pcm_paused && !play)
     {
         IIS2CONFIG = 0x800;
-        pcm_paused = true;
     }
     pcm_boost(false);
 }
