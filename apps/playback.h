@@ -35,6 +35,13 @@
 #define AFMT_REAL        0x0800  // Realaudio
 #define AFMT_UNKNOWN     0x1000  // Unknown file format
 
+#define CODEC_SET_FILEBUF_WATERMARK     1
+#define CODEC_SET_FILEBUF_CHUNKSIZE     2
+#define CODEC_SET_FILEBUF_LIMIT         3
+
+/* Not yet implemented. */
+#define CODEC_SET_AUDIOBUF_WATERMARK    4
+
 struct codec_api {
     off_t  filesize;
     off_t  curpos;
@@ -60,6 +67,8 @@ struct codec_api {
     bool (*seek_buffer)(off_t newpos);
     off_t (*mp3_get_filepos)(int newtime);
     bool (*request_next_track)(void);
+    
+    void (*configure)(int setting, void *value);
 };
 
 #endif

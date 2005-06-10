@@ -67,9 +67,8 @@ static volatile bool paused;
 #define CODEC_FLAC     "/.rockbox/codecs/codecflac.rock";
 #define CODEC_WAV      "/.rockbox/codecs/codecwav.rock";
 
-#define AUDIO_WATERMARK      (1024*256)
-#define AUDIO_FILE_CHUNK     (1024*32)
-#define AUDIO_INITIAL_CHUNK  (1024*1024*2)
+#define AUDIO_DEFAULT_WATERMARK      (1024*256)
+#define AUDIO_DEFAULT_FILECHUNK      (1024*32)
 
 #define AUDIO_PLAY         1
 #define AUDIO_STOP         2
@@ -165,8 +164,10 @@ static struct codec_api ci;
    variable keeps information about whether to go a next/previous track. */
 static int new_track;
 
-/* If we have just started playing, don't fill the whole file buffer. */
-static unsigned int first_bufferfill;
+/* Configuration */
+static int conf_bufferlimit;
+static int conf_watermark;
+static int conf_filechunk;
 
 static bool v1first = false;
 
@@ -359,6 +360,26 @@ bool codec_seek_buffer_callback(off_t newpos)
     return true;
 }
 
+void codec_configure_callback(int setting, void *value)
+{
+    switch (setting) {
+    case CODEC_SET_FILEBUF_WATERMARK:
+        conf_watermark = (unsigned int)value;
+        break;
+        
+    case CODEC_SET_FILEBUF_CHUNKSIZE:
+        conf_filechunk = (unsigned int)value;
+        break;
+        
+    case CODEC_SET_FILEBUF_LIMIT:
+        conf_bufferlimit = (unsigned int)value;
+        break;
+        
+    default:
+        logf("Illegal key: %d", setting);
+    }
+}
+
 /* Simple file type probing by looking filename extension. */
 int probe_file_format(const char *filename)
 {
@@ -431,10 +452,10 @@ void audio_fill_file_buffer(void)
             return ;
         }
         
-        if (fill_bytesleft < MIN(AUDIO_FILE_CHUNK, 
+        if (fill_bytesleft < MIN((unsigned int)conf_filechunk, 
                                  tracks[track_widx].filerem - i))
             break ;
-        rc = MIN(AUDIO_FILE_CHUNK, codecbuflen - buf_widx);
+        rc = MIN(conf_filechunk, codecbuflen - buf_widx);
         rc = read(current_fd, &codecbuf[buf_widx], rc);
         if (rc <= 0) {
             tracks[track_widx].filerem = 0;
@@ -535,7 +556,7 @@ bool loadcodec(const char *trackname, bool start_play)
     }
     
     size = filesize(fd);
-    if ((off_t)fill_bytesleft < size + AUDIO_WATERMARK) {
+    if ((off_t)fill_bytesleft < size + conf_watermark) {
         logf("Not enough space");
         close(fd);
         return false;
@@ -550,7 +571,7 @@ bool loadcodec(const char *trackname, bool start_play)
             return false;
         }
         
-        copy_n = MIN(AUDIO_FILE_CHUNK, codecbuflen - buf_widx);
+        copy_n = MIN(conf_filechunk, codecbuflen - buf_widx);
         rc = read(fd, &codecbuf[buf_widx], copy_n);
         if (rc < 0)
             return false;
@@ -603,7 +624,14 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     /* Load the codec */
     if (buf_widx >= codecbuflen)
         buf_widx -= codecbuflen;
-        
+    
+    /* Set default values */
+    if (start_play) {
+        conf_bufferlimit = 0;
+        conf_watermark = AUDIO_DEFAULT_WATERMARK;
+        conf_filechunk = AUDIO_DEFAULT_FILECHUNK;
+    }
+    
     tracks[track_widx].codecbuf = &codecbuf[buf_widx];
     if (!loadcodec(trackname, start_play)) {
         close(fd);
@@ -720,18 +748,19 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         break;
     }
     
-    /* Limit buffering size at first run. */
-    if (first_bufferfill && fill_bytesleft >= first_bufferfill) {
-        fill_bytesleft = first_bufferfill;
-        first_bufferfill = 0;
-    }
-        
     track_changed = true;
     track_count++;
     i = tracks[track_widx].filepos;
     while (i < size) {
         /* Give codecs some processing time to prevent glitches. */
         yield_codecs();
+        
+        /* Limit buffering size at first run. */
+        if (conf_bufferlimit && (int)fill_bytesleft >= conf_bufferlimit) {
+            fill_bytesleft = conf_bufferlimit;
+            conf_bufferlimit = 0;
+        }
+        
         if (!queue_empty(&audio_queue)) {
             logf("Buffering interrupted");
             close(fd);
@@ -741,7 +770,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         if (fill_bytesleft == 0)
             break ;
         
-        copy_n = MIN(AUDIO_FILE_CHUNK, codecbuflen - buf_widx);
+        copy_n = MIN(conf_filechunk, codecbuflen - buf_widx);
         copy_n = MIN(size - i, copy_n);
         copy_n = MIN((int)fill_bytesleft, copy_n);
         rc = read(fd, &codecbuf[buf_widx], copy_n);
@@ -825,7 +854,7 @@ void audio_check_buffer(void)
 #endif
     
     /* Start buffer filling as necessary. */
-    if (codecbufused > AUDIO_WATERMARK || !queue_empty(&audio_queue) 
+    if (codecbufused > conf_watermark || !queue_empty(&audio_queue) 
         || !playing || ci.stop_codec || ci.reload_codec)
         return ;
     
@@ -1163,7 +1192,6 @@ void audio_play(int offset)
 #endif
     paused = false;
     playing = true;
-    first_bufferfill = AUDIO_INITIAL_CHUNK;
     queue_post(&audio_queue, AUDIO_PLAY, (void *)offset);
 }
 
@@ -1435,6 +1463,7 @@ void audio_init(void)
     ci.mp3_get_filepos = codec_mp3_get_filepos_callback;
     ci.seek_buffer = codec_seek_buffer_callback;
     ci.set_elapsed = codec_set_elapsed_callback;
+    ci.configure = codec_configure_callback;
     
     queue_init(&audio_queue);
     queue_init(&codec_queue);

@@ -104,7 +104,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
   rb->memcpy(iramstart, iramcopy, iramend-iramstart);
   #endif
     
-  /* This function sets up the buffers and reads the file into RAM */
+  ci->configure(CODEC_SET_FILEBUF_LIMIT, (int *)(1024*1024*2));
     
   /* We need to flush reserver memory every track load. */
   next_track:

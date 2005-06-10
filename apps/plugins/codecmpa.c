@@ -216,8 +216,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
 
   /* Create a decoder instance */
 
-  next_track:
+  ci->configure(CODEC_SET_FILEBUF_LIMIT, (int *)(1024*1024*2));
   
+  next_track:
   memset(&Stream, 0, sizeof(struct mad_stream));
   memset(&Frame, 0, sizeof(struct mad_frame));
   memset(&Synth, 0, sizeof(struct mad_synth));
