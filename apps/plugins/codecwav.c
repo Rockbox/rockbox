@@ -24,7 +24,7 @@
 #define BYTESWAP(x) (((x>>8) & 0xff) | ((x<<8) & 0xff00))
 
 /* Number of bytes to process in one iteration */
-#define WAV_CHUNK_SIZE 16384
+#define WAV_CHUNK_SIZE (1024*4)
 
 #ifndef SIMULATOR
 extern char iramcopy[];
@@ -58,6 +58,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
 
   ci->configure(CODEC_SET_FILEBUF_LIMIT, (int *)(1024*1024*10));
   ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
+  ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*256));
 
   next_track:
 
@@ -121,6 +122,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
     samplesdone+=nsamples;
     ci->set_elapsed(samplesdone/(ci->id3->frequency/1000));
    
+    rb->yield();
     while (!ci->audiobuffer_insert((unsigned char*)wavbuf, n))
       rb->yield();
 
