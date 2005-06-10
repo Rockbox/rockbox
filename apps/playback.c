@@ -809,7 +809,8 @@ void audio_check_buffer(void)
     
     /* Fill buffer as full as possible for cross-fader. */
 #ifndef SIMULATOR
-    if (cur_ti->id3.length - cur_ti->id3.elapsed < 20000 && playing)
+    if (cur_ti->id3.length > 0 &&
+        cur_ti->id3.length - cur_ti->id3.elapsed < 20000 && playing)
         pcm_set_boost_mode(true);
 #endif
     
