@@ -33,7 +33,7 @@
 #define CHANNELS          2          
 
 static ogg_int32_t *ipcm_vect[CHANNELS] IDATA_ATTR;
-static ogg_int32_t ipcm_buff[CHANNELS*IRAM_PCM_END] IDATA_ATTR;
+static ogg_int32_t ipcm_buff[CHANNELS*IRAM_PCM_END] IDATA_ATTR LINE_ATTR;
 
 int vorbis_synthesis(vorbis_block *vb,ogg_packet *op,int decodep){
   vorbis_dsp_state     *vd=vb->vd;
@@ -73,10 +73,10 @@ int vorbis_synthesis(vorbis_block *vb,ogg_packet *op,int decodep){
   vb->sequence=op->packetno-3; /* first block is third packet */
   vb->eofflag=op->e_o_s;
 
-  if(decodep){
+  if(decodep && vi->channels<=CHANNELS){
     /* alloc pcm passback storage */
     vb->pcmend=ci->blocksizes[vb->W];
-    if (vi->channels <= CHANNELS && vb->pcmend<=IRAM_PCM_END) { 
+    if (vb->pcmend<=IRAM_PCM_END) { 
       /* use statically allocated iram buffer */
       vb->pcm = ipcm_vect;
       for(i=0; i<CHANNELS; i++)

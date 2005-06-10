@@ -21,6 +21,9 @@
 
 #if CONFIG_CPU == MCF5249 && !defined(SIMULATOR)
 
+/* attribute for 16-byte alignment */
+#define LINE_ATTR   __attribute__ ((aligned (16)))
+
 #ifndef _V_WIDE_MATH
 #define _V_WIDE_MATH
 
@@ -107,15 +110,14 @@ void XNPROD31(ogg_int32_t  a, ogg_int32_t  b,
 }
 
 
-
-
-#if 1 /* Canonical definition */
+#if 1
+/* canonical definition */
 #define XPROD32(_a, _b, _t, _v, _x, _y)         \
   { (_x)=MULT32(_a,_t)+MULT32(_b,_v);           \
     (_y)=MULT32(_b,_t)-MULT32(_a,_v); }
 #else
-/* Thom Johansen suggestion; this could loose the lsb by overflow
-   but does it matter in practice? */
+/* Thom Johansen's suggestion; this could loose the LSB by overflow;
+   Does it matter in practice? */
 #define XPROD32(_a, _b, _t, _v, _x, _y)     \
   asm volatile ("mac.l %[a], %[t], %%acc0;" \
                 "mac.l %[b], %[v], %%acc0;" \
@@ -129,14 +131,82 @@ void XNPROD31(ogg_int32_t  a, ogg_int32_t  b,
                 : [a] "r" (_a), [b] "r" (_b), \
                   [t] "r" (_t), [v] "r" (_v) \
                 : "cc");
-#endif 
+#endif
 
 
-/* asm versions of vector multiplication for window.c */
+/* asm versions of vector operations for block.c, window.c */
 /* assumes MAC is initialized & accumulators cleared */
+static inline 
+void mcf5249_vect_add(ogg_int32_t *x, ogg_int32_t *y, int n)
+{
+  /* align to 16 bytes */
+  while(n>0 && (int)x&16) {
+    *x++ += *y++;
+    n--;
+  }
+  asm volatile ("bra 1f;"
+                "0:"                          /* loop start */
+                "movem.l (%[x]), %%d0-%%d3;"  /* fetch values */
+                "movem.l (%[y]), %%a0-%%a3;"
+                /* add */
+                "add.l %%a0, %%d0;"
+                "add.l %%a1, %%d1;"
+                "add.l %%a2, %%d2;"
+                "add.l %%a3, %%d3;"
+                /* store and advance */
+                "movem.l %%d0-%%d3, (%[x]);"  
+                "lea.l (4*4, %[x]), %[x];"
+                "lea.l (4*4, %[y]), %[y];"
+                "subq.l #4, %[n];"     /* done 4 elements */
+                "1: cmpi.l #4, %[n];"
+                "bge 0b;"
+                : [n] "+d" (n), [x] "+a" (x), [y] "+a" (y)
+                : : "%d0", "%d1", "%d2", "%d3", "%a0", "%a1", "%a2", "%a3",
+                    "cc", "memory");
+  /* add final elements */
+  while (n>0) {
+    *x++ += *y++;
+    n--;
+  }
+}
+
+static inline 
+void mcf5249_vect_copy(ogg_int32_t *x, ogg_int32_t *y, int n)
+{
+  /* align to 16 bytes */
+  while(n>0 && (int)x&16) {
+    *x++ = *y++;
+    n--;
+  }  
+  asm volatile ("bra 1f;"
+                "0:"                                    /* loop start */
+                "movem.l (%[y]), %%d0-%%d3;"            /* fetch values */
+                "movem.l %%d0-%%d3, (%[x]);"            /* store */
+                "lea.l (4*4, %[x]), %[x];"              /* advance */
+                "lea.l (4*4, %[y]), %[y];"
+                "subq.l #4, %[n];"                      /* done 4 elements */
+                "1: cmpi.l #4, %[n];"
+                "bge 0b;"
+                : [n] "+d" (n), [x] "+a" (x), [y] "+a" (y)
+                : : "%d0", "%d1", "%d2", "%d3", "cc", "memory");
+  /* copy final elements */
+  while (n>0) {
+    *x++ = *y++;
+    n--;
+  }
+}
+
+
 static inline 
 void mcf5249_vect_mult_fw(ogg_int32_t *data, LOOKUP_T *window, int n)
 {
+  /* ensure data is aligned to 16-bytes */
+  while(n>0 && (int)data%16) {
+    *data = MULT31(*data, *window);
+    data++;
+    window++;
+    n--;
+  }
   asm volatile ("movem.l (%[d]), %%d0-%%d3;"  /* loop start */
                 "movem.l (%[w]), %%a0-%%a3;"  /* pre-fetch registers */
                 "lea.l (4*4, %[w]), %[w];"
@@ -184,6 +254,13 @@ void mcf5249_vect_mult_fw(ogg_int32_t *data, LOOKUP_T *window, int n)
 static inline 
 void mcf5249_vect_mult_bw(ogg_int32_t *data, LOOKUP_T *window, int n)
 {
+  /* ensure at least data is aligned to 16-bytes */
+  while(n>0 && (int)data%16) {
+    *data = MULT31(*data, *window);
+    data++;
+    window--;
+    n--;
+  }
   asm volatile ("lea.l (-3*4, %[w]), %[w];"     /* loop start */
                 "movem.l (%[d]), %%d0-%%d3;"    /* pre-fetch registers */
                 "movem.l (%[w]), %%a0-%%a3;"
@@ -232,6 +309,11 @@ void mcf5249_vect_mult_bw(ogg_int32_t *data, LOOKUP_T *window, int n)
 static inline 
 void mcf5249_vect_zero(ogg_int32_t *ptr, int n)
 {
+  /* ensure ptr is aligned to 16-bytes */
+  while(n>0 && (int)ptr%16) {
+    *ptr++ = 0;
+    n--;
+  }
   asm volatile ("clr.l %%d0;"
                 "clr.l %%d1;"
                 "clr.l %%d2;"
@@ -241,23 +323,16 @@ void mcf5249_vect_zero(ogg_int32_t *ptr, int n)
                 "bra 1f;"
                 "0: movem.l %%d0-%%d3, (%[ptr]);"
                 "lea (4*4, %[ptr]), %[ptr];"
-                "subq.l #4, %[n];"
+                "subq.l #4, %[n];"  /* done 4 elements */
                 "1: bgt 0b;"
-                /* remaing elements */
-                "tst.l %[n];"
-                "beq 1f;"      /* n=0 */
-                "clr.l (%[ptr])+;"
-                "subq.l #1, %[n];"
-                "beq 1f;"     /* n=1 */
-                "clr.l (%[ptr])+;"
-                "subq.l #1, %[n];"
-                "beq 1f;"     /* n=2 */
-                /* otherwise n = 3 */
-                "clr.l (%[ptr])+;"
-                "1:"
                 : [n] "+d" (n), [ptr] "+a" (ptr)
                 :
                 : "%d0","%d1","%d2","%d3","cc","memory");
+  /* clear remaining elements */
+  while(n>0) {
+    *ptr++ = 0;
+    n--;
+  }
 }
 
 #endif
@@ -272,4 +347,6 @@ static inline ogg_int32_t CLIP_TO_15(register ogg_int32_t x) {
 }
 
 #endif
+#else
+#define LINE_ATTR
 #endif

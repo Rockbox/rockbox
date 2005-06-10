@@ -202,10 +202,6 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
   int   nonzero[CHANNELS];
   void *floormemo[CHANNELS];
 
-  /* test for too many channels; 
-     (maybe this is can be checked at the stream level?) */
-  if (vi->channels > CHANNELS) return (-1);
-
   /* time domain information decode (note that applying the
      information would have to happen later; we'll probably add a
      function entry to the harness for that later */
@@ -286,13 +282,14 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
   //_analysis_output("residue",seq+j,vb->pcm[j],-8,n/2,0,0);
 
   /* compute and apply spectral envelope */
+#if 0
   for(i=0;i<vi->channels;i++){
     ogg_int32_t *pcm=vb->pcm[i];
     int submap=info->chmuxlist[i];
     look->floor_func[submap]->
       inverse2(vb,look->floor_look[submap],floormemo[i],pcm);
   } 
-
+#endif
   //for(j=0;j<vi->channels;j++)
   //_analysis_output("mdct",seq+j,vb->pcm[j],-24,n/2,0,1);
 
@@ -301,8 +298,11 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
 
   for(i=0;i<vi->channels;i++){
     ogg_int32_t *pcm=vb->pcm[i];
+    int submap=info->chmuxlist[i];
     
-      if(nonzero[i]) {
+    if(nonzero[i]) {
+	look->floor_func[submap]->
+	  inverse2(vb,look->floor_look[submap],floormemo[i],pcm);
         mdct_backward(n, pcm, pcm);
         /* window the data */
         _vorbis_apply_window(pcm,b->window,ci->blocksizes,vb->lW,vb->W,vb->nW);

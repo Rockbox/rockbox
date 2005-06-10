@@ -341,10 +341,6 @@ void mdct_backward(int n, DATA_TYPE *in, DATA_TYPE *out) {
   int shift;
   int step;
 
-#if CONFIG_CPU == MCF5249
-  /* mcf5249_init_mac(); */  /* should be redundant */
-#endif
-
   for (shift=6;!(n&(1<<shift));shift++);
   shift=13-shift;
   step=2<<shift;
