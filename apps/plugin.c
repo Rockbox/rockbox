@@ -357,9 +357,8 @@ int codec_load_ram(char* pluginptr, size_t size, void *parameter, void* ptr2, si
         return -1;
     }
     
-    invalidate_icache();
-    
     plugin_loaded = true;
+    invalidate_icache();
     status = plugin_start((struct plugin_api*) &rockbox_api, parameter);
     plugin_loaded = false;
     
