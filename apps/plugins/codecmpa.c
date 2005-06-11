@@ -244,7 +244,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
   first = false;
 #endif
 
-  samplesdone = 0;
   first_frame = false;
   file_end = 0;
   OutputPtr = OutputBuffer;
@@ -257,6 +256,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
   ci->advance_buffer(size);
   
   samplecount = ci->id3->length * (ci->id3->frequency / 100) / 10;
+  samplesdone = ci->id3->elapsed * (ci->id3->frequency / 100) / 10;
   /* rb->snprintf(buf2, sizeof(buf2), "sc: %d", samplecount);
   rb->splash(0, true, buf2);
   rb->snprintf(buf2, sizeof(buf2), "length: %d", ci->id3->length);

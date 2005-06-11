@@ -137,7 +137,6 @@ struct track_info {
     volatile int available;
     bool taginfo_ready;
     int playlist_offset;
-    int elapsed_start;
 };
 
 /* Track information (count in file buffer, read/write indexes for
@@ -201,7 +200,6 @@ void codec_set_elapsed_callback(unsigned int value)
 #else
     latency = 0;
 #endif
-    value += cur_ti->elapsed_start;
     if (value < latency) {
         cur_ti->id3.elapsed = 0;
     } else if (value - latency > cur_ti->id3.elapsed 
@@ -673,7 +671,6 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
             lseek(fd, offset, SEEK_SET);
             tracks[track_widx].id3.offset = offset;
             mp3_set_elapsed(&tracks[track_widx].id3);
-            tracks[track_widx].elapsed_start = tracks[track_widx].id3.elapsed;
             tracks[track_widx].filepos = offset;
             tracks[track_widx].filerem = tracks[track_widx].filesize - offset;
             ci.curpos = offset;
@@ -1038,6 +1035,8 @@ void audio_update_trackinfo(void)
     }
         
     ci.filesize = cur_ti->filesize;
+    cur_ti->id3.elapsed = 0;
+    cur_ti->id3.offset = 0;
     ci.id3 = (struct mp3entry *)&cur_ti->id3;
     ci.mp3data = (struct mp3info *)&cur_ti->mp3data;
     ci.curpos = 0;
