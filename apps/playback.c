@@ -984,13 +984,13 @@ void audio_update_trackinfo(void)
             pcm_set_boost_mode(false);
 #endif
     } else {
-        buf_ridx -= ci.curpos;
-        codecbufused += ci.curpos;
+        buf_ridx -= ci.curpos + cur_ti->codecsize;
+        codecbufused += ci.curpos + cur_ti->codecsize;
         cur_ti->available = cur_ti->filesize;
         
         cur_ti = &tracks[track_ridx];
-        buf_ridx -= cur_ti->filesize + cur_ti->codecsize;
-        codecbufused += cur_ti->filesize  + cur_ti->codecsize;
+        buf_ridx -= cur_ti->filesize;
+        codecbufused += cur_ti->filesize;
         cur_ti->available = cur_ti->filesize;
         if (buf_ridx < 0)
             buf_ridx = codecbuflen + buf_ridx;
@@ -1168,8 +1168,6 @@ void codec_thread(void)
                     playing = false;
                     break ;
                 }
-                codecbufused -=codecsize;
-                // cur_ti->codecsize = 0;
                 
                 ci.stop_codec = false;
                 wrap = (int)&codecbuf[codecbuflen] - (int)cur_ti->codecbuf;
