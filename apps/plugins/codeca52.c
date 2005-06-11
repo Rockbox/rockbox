@@ -36,8 +36,9 @@ static a52_state_t * state;
 unsigned long samplesdone;
 unsigned long frequency;
 
-/* A post-processing buffer used outside liba52 */
+/* Two buffers used outside liba52 */
 static uint8_t buf[3840] IDATA_ATTR;
+static int16_t int16_samples[256*2] IDATA_ATTR;
 
 static inline int16_t convert (int32_t i)
 {
@@ -47,7 +48,6 @@ static inline int16_t convert (int32_t i)
 
 void output_audio(sample_t* samples,int flags) {
   int i;
-  static int16_t int16_samples[256*2];
 
   flags &= A52_CHANNEL_MASK | A52_LFE;
 
