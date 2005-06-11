@@ -844,7 +844,10 @@ static bool dirbrowse(void)
                 if (!tc.filesindir)
                     break;
 
-                if (tc.dircursor) {
+                /* start scrolling when at 1/3 of the screen */
+                if (tc.dircursor >=
+                        tree_max_on_screen - (2 * tree_max_on_screen) / 3
+                        || (tc.dirstart == 0 && tc.dircursor > 0)) {
                     put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, false);
                     tc.dircursor--;
                     put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, true);
@@ -906,7 +909,9 @@ static bool dirbrowse(void)
                     break;
 
                 if (tc.dircursor + tc.dirstart + 1 < numentries ) {
-                    if(tc.dircursor+1 < tree_max_on_screen) {
+                    /* start scrolling when at 2/3 of the screen */
+                    if(tc.dircursor < (2 * tree_max_on_screen) / 3 ||
+                            numentries - tc.dirstart <= tree_max_on_screen) {
                         put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, false);
                         tc.dircursor++;
                         put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, true);

@@ -319,6 +319,10 @@ int menu_show(int m)
             case MENU_PREV:
             case MENU_PREV | BUTTON_REPEAT:
                 if (menus[m].cursor) {
+                    /* keep the cursor at 1/3 of the screen */
+                    if (menus[m].top && menus[m].cursor - menus[m].top <
+                            menu_lines - (2 * menu_lines) / 3)
+                        menus[m].top--;
                     /* move up */
                     put_cursor(m, menus[m].cursor-1);
                 }
@@ -327,7 +331,6 @@ int menu_show(int m)
                     menus[m].top = menus[m].itemcount-(menu_lines+1);
                     if (menus[m].top < 0)
                         menus[m].top = 0;
-                    menus[m].cursor = menus[m].itemcount-1;
                     put_cursor(m, menus[m].itemcount-1);
                 }
                 break;
@@ -335,6 +338,10 @@ int menu_show(int m)
             case MENU_NEXT:
             case MENU_NEXT | BUTTON_REPEAT:
                 if (menus[m].cursor < menus[m].itemcount-1) {
+                    /* keep the cursor at 2/3 of the screen */
+                    if (menus[m].itemcount - menus[m].top > menu_lines &&
+                        menus[m].cursor - menus[m].top >= (2 * menu_lines) / 3)
+                        menus[m].top++;
                     /* move down */
                     put_cursor(m, menus[m].cursor+1);
                 }
