@@ -46,6 +46,7 @@ extern "C" {
 #include <stdlib.h>
 //#include <string.h>
 
+#include "../codec.h"
 #include "config_types.h"
 #include "decoder.h"
 #include "math.h"

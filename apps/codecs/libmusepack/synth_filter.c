@@ -54,7 +54,7 @@ typedef mpc_int32_t ptrdiff_t;
 #endif
 
 
-static const MPC_SAMPLE_FORMAT  Di_opt [32] [16] = {
+static const MPC_SAMPLE_FORMAT  Di_opt [32] [16] IDATA_ATTR = {
     { _(  0), _( -29), _( 213), _( -459), _( 2037), _(-5153), _(  6574), _(-37489), _(75038), _(37489), _(6574), _( 5153), _(2037), _( 459), _(213), _(29) },
     { _( -1), _( -31), _( 218), _( -519), _( 2000), _(-5517), _(  5959), _(-39336), _(74992), _(35640), _(7134), _( 4788), _(2063), _( 401), _(208), _(26) },
     { _( -1), _( -35), _( 222), _( -581), _( 1952), _(-5879), _(  5288), _(-41176), _(74856), _(33791), _(7640), _( 4425), _(2080), _( 347), _(202), _(24) },
@@ -334,6 +334,10 @@ static void Calculate_New_V ( const MPC_SAMPLE_FORMAT * Sample, MPC_SAMPLE_FORMA
 static void Synthese_Filter_float_internal(MPC_SAMPLE_FORMAT * OutData,MPC_SAMPLE_FORMAT * V,const MPC_SAMPLE_FORMAT * Y)
 {
     mpc_uint32_t n;
+    
+    #if CONFIG_CPU==MCF5249 && !defined(SIMULATOR)
+    asm volatile ("move.l #0x20, %macsr"); /* fractional emac mode */
+    #endif
     for ( n = 0; n < 36; n++, Y += 32 ) {
         V -= 64;
         Calculate_New_V ( Y, V );
@@ -346,6 +350,37 @@ static void Synthese_Filter_float_internal(MPC_SAMPLE_FORMAT * OutData,MPC_SAMPL
             
             
             for ( k = 0; k < 32; k++, D += 16, V++ ) {
+                #if CONFIG_CPU==MCF5249 && !defined(SIMULATOR)
+                asm volatile (
+                    "movem.l (%[D]), %%d0-%%d3\n\t"
+                    "move.l (%[V]), %%a5\n\t"
+                    "mac.l %%d0, %%a5, (96*4, %[V]), %%a5, %%acc0\n\t"
+                    "mac.l %%d1, %%a5, (128*4, %[V]), %%a5, %%acc0\n\t"
+                    "mac.l %%d2, %%a5, (224*4, %[V]), %%a5, %%acc0\n\t"
+                    "mac.l %%d3, %%a5, (256*4, %[V]), %%a5, %%acc0\n\t"
+                    "movem.l (4*4, %[D]), %%d0-%%d3\n\t"
+                    "mac.l %%d0, %%a5, (352*4, %[V]), %%a5, %%acc0\n\t"
+                    "mac.l %%d1, %%a5, (384*4, %[V]), %%a5, %%acc0\n\t"
+                    "mac.l %%d2, %%a5, (480*4, %[V]), %%a5, %%acc0\n\t"
+                    "mac.l %%d3, %%a5, (512*4, %[V]), %%a5, %%acc0\n\t"
+                    "movem.l (8*4, %[D]), %%d0-%%d3\n\t"
+                    "mac.l %%d0, %%a5, (608*4, %[V]), %%a5, %%acc0\n\t"
+                    "mac.l %%d1, %%a5, (640*4, %[V]), %%a5, %%acc0\n\t"
+                    "mac.l %%d2, %%a5, (736*4, %[V]), %%a5, %%acc0\n\t"
+                    "mac.l %%d3, %%a5, (768*4, %[V]), %%a5, %%acc0\n\t"
+                    "movem.l (12*4, %[D]), %%d0-%%d3\n\t"
+                    "mac.l %%d0, %%a5, (864*4, %[V]), %%a5, %%acc0\n\t"
+                    "mac.l %%d1, %%a5, (896*4, %[V]), %%a5, %%acc0\n\t"
+                    "mac.l %%d2, %%a5, (992*4, %[V]), %%a5, %%acc0\n\t"
+                    "mac.l %%d3, %%a5, %%acc0\n\t"
+                    "movclr.l %%acc0, %%d0\n\t"
+                    "asl.l #1, %%d0\n\t"
+                    "move.l %%d0, (%[Data])\n\t"
+                    "addq.l #8, %[Data]"
+                    : [Data] "+a" (Data)
+                    : [V] "a" (V), [D] "a" (D)
+                    : "d0", "d1", "d2", "d3", "a5");
+                #else
                 *Data = MPC_SHL(
                     MPC_MULTIPLY_FRACT(V[  0],D[ 0]) + MPC_MULTIPLY_FRACT(V[ 96],D[ 1]) + MPC_MULTIPLY_FRACT(V[128],D[ 2]) + MPC_MULTIPLY_FRACT(V[224],D[ 3])
                     + MPC_MULTIPLY_FRACT(V[256],D[ 4]) + MPC_MULTIPLY_FRACT(V[352],D[ 5]) + MPC_MULTIPLY_FRACT(V[384],D[ 6]) + MPC_MULTIPLY_FRACT(V[480],D[ 7])
@@ -354,6 +389,7 @@ static void Synthese_Filter_float_internal(MPC_SAMPLE_FORMAT * OutData,MPC_SAMPL
                     , 2);
                 
                 Data += 2;
+                #endif
             }
             V -= 32;//bleh
             OutData+=64;
