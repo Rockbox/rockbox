@@ -51,13 +51,10 @@ void output_audio(sample_t* samples,int flags) {
 
   flags &= A52_CHANNEL_MASK | A52_LFE;
 
-  if (flags==A52_STEREO) {
-    for (i = 0; i < 256; i++) {
-        int16_samples[2*i] = convert (samples[i]);
-        int16_samples[2*i+1] = convert (samples[i+256]);
-    }
-  } else {
-    DEBUGF("ERROR: unsupported format: %d\n",flags);
+  /* We may need to check the output format in flags - I'm not sure... */
+  for (i = 0; i < 256; i++) {
+    int16_samples[2*i] = convert (samples[i]);
+    int16_samples[2*i+1] = convert (samples[i+256]);
   }
 
   rb->yield();
