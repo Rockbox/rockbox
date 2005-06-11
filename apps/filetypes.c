@@ -40,7 +40,11 @@
 #define MAX_PLUGIN_LENGTH 32
 
 /* max filetypes (plugins & icons stored here) */
+#if CONFIG_HWCODEC == MASNONE
+#define MAX_FILETYPES 64
+#else
 #define MAX_FILETYPES 32
+#endif
 
 /* max exttypes (extensions stored here) */
 #if CONFIG_HWCODEC == MASNONE
