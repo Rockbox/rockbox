@@ -1544,6 +1544,7 @@ void audio_init(void)
     playing = false;
     paused = false;
     track_changed = false;
+    current_fd = -1;
     
     logf("abuf:%0x", PCMBUF_SIZE);
     logf("fbuf:%0x", codecbuflen);
