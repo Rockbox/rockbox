@@ -831,11 +831,13 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         tracks[track_widx].id3.bitrate=(buf[48]|(buf[49]<<8)|(buf[50]<<16)|(buf[51]<<24))/1000;
         tracks[track_widx].id3.vbr=true;
 
-        /* I don't yet know how to calculate the totalsamples */
-        totalsamples=0;
-
-        /* Calculate the length in ms */
-        tracks[track_widx].id3.length=(totalsamples/tracks[track_widx].id3.frequency)*1000;
+        if (tracks[track_widx].id3.bitrate!=0) {
+          /* A _really_ stupid and inaccurate calculation, but the best
+             I can do at the moment. */
+          tracks[track_widx].id3.length=(tracks[track_widx].filesize)/(tracks[track_widx].id3.bitrate/8);
+        } else {
+          tracks[track_widx].id3.length=0;
+        }
 
         lseek(fd, 0, SEEK_SET);
         strncpy(tracks[track_widx].id3.path,trackname,sizeof(tracks[track_widx].id3.path));

@@ -147,7 +147,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
       rb->yield();
       while (!ci->audiobuffer_insert(pcmbuf, n))
         rb->yield();
-	    
+
+      ci->set_elapsed(ov_time_tell(&vf));
+
 #if BYTE_ORDER == BIG_ENDIAN
       for (i=0;i<n;i+=2) { 
         x=pcmbuf[i]; pcmbuf[i]=pcmbuf[i+1]; pcmbuf[i+1]=x;
