@@ -66,6 +66,7 @@ static volatile bool paused;
 #define CODEC_MPA_L3   "/.rockbox/codecs/codecmpa.rock";
 #define CODEC_FLAC     "/.rockbox/codecs/codecflac.rock";
 #define CODEC_WAV      "/.rockbox/codecs/codecwav.rock";
+#define CODEC_A52      "/.rockbox/codecs/codeca52.rock";
 
 #define AUDIO_DEFAULT_WATERMARK      (1024*256)
 #define AUDIO_DEFAULT_FILECHUNK      (1024*32)
@@ -413,7 +414,7 @@ int probe_file_format(const char *filename)
         return AFMT_APE;
     else if (!strcasecmp("wma", suffix))
         return AFMT_WMA;
-    else if (!strcasecmp("a52", suffix))
+    else if ((!strcasecmp("a52", suffix)) || (!strcasecmp("ac3", suffix)))
         return AFMT_A52;
     else if (!strcasecmp("rm", suffix))
         return AFMT_REAL;
@@ -514,6 +515,10 @@ bool loadcodec(const char *trackname, bool start_play)
     case AFMT_FLAC:
         logf("Codec: FLAC");
         codec_path = CODEC_FLAC;
+        break;
+    case AFMT_A52:
+        logf("Codec: A52");
+        codec_path = CODEC_A52;
         break;
     default:
         logf("Codec: Unsupported");

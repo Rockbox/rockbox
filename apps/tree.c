@@ -77,6 +77,7 @@ const struct filetype filetypes[] = {
     { ".wma", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
     { ".wav", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
     { ".flac", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
+    { ".ac3", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
 #endif
     { ".m3u", TREE_ATTR_M3U, Playlist, LANG_PLAYLIST },
     { ".cfg", TREE_ATTR_CFG, Config, VOICE_EXT_CFG },

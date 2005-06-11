@@ -76,6 +76,7 @@ codecvorbis.c
 codecmpa.c
 codecflac.c
 codecwav.c
+codeca52.c
 #endif
 wv2wav.c
 mpc2wav.c
