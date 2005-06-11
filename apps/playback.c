@@ -431,8 +431,6 @@ void yield_codecs(void)
     while (pcm_is_lowdata() && !ci.stop_codec && 
            playing && queue_empty(&audio_queue))
         yield();
-#else
-    yield();
 #endif
 }
 
@@ -658,7 +656,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         close(fd);
         return false;
     }
-        
+    
     /* Load codec specific track tag information. */
     switch (tracks[track_widx].codectype) {
     case AFMT_MPA_L2:
@@ -666,7 +664,8 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         /* Should check the return value. */
         mp3info(&tracks[track_widx].id3, trackname, v1first);
         lseek(fd, 0, SEEK_SET);
-        get_mp3file_info(fd, &tracks[track_widx].mp3data);
+        /* This is too slow to execute on some files. */
+        // get_mp3file_info(fd, &tracks[track_widx].mp3data);
         if (offset) {
             lseek(fd, offset, SEEK_SET);
             tracks[track_widx].id3.offset = offset;

@@ -44,7 +44,7 @@
 /* Must be a power of 2 */
 #define NUM_PCM_BUFFERS      (PCMBUF_SIZE / CHUNK_SIZE)
 #define NUM_PCM_BUFFERS_MASK (NUM_PCM_BUFFERS - 1)
-#define PCM_WATERMARK        0x10000
+#define PCM_WATERMARK        (CHUNK_SIZE * 3)
 
 static bool pcm_playing;
 static bool pcm_paused;
@@ -103,7 +103,7 @@ void pcm_boost(bool state)
 {
     static bool boost_state = false;
     
-    if (crossfade_active)
+    if (crossfade_active || boost_mode)
         return ;
         
     if (state != boost_state) {
@@ -348,9 +348,9 @@ void pcm_watermark_callback(int bytes_left)
 
 void pcm_set_boost_mode(bool state)
 {
-    boost_mode = state;
     if (state)
         pcm_boost(true);
+    boost_mode = state;
 }
 
 void audiobuffer_add_event(void (*event_handler)(void))
@@ -377,7 +377,7 @@ bool pcm_is_lowdata(void)
     if (!pcm_is_playing())
         return false;
     
-    if (PCMBUF_SIZE - audiobuffer_free <= PCM_WATERMARK)
+    if (pcmbuf_unplayed_bytes < PCM_WATERMARK)
         return true;
         
     return false;
@@ -421,8 +421,7 @@ bool audiobuffer_insert(char *buf, size_t length)
     size_t copy_n = 0;
     
     if (audiobuffer_free < length + CHUNK_SIZE && !crossfade_active) {
-        if (!boost_mode)
-            pcm_boost(false);
+        pcm_boost(false);
         return false;
     }
     
@@ -448,7 +447,7 @@ bool audiobuffer_insert(char *buf, size_t length)
         } else {
             copy_n = MIN(length, PCMBUF_SIZE - audiobuffer_pos - 
                         audiobuffer_fillpos);
-            copy_n = MIN(CHUNK_SIZE, copy_n);
+            copy_n = MIN(CHUNK_SIZE - audiobuffer_fillpos, copy_n);
             
             memcpy(&audiobuffer[audiobuffer_pos+audiobuffer_fillpos],
                    buf, copy_n);
@@ -467,8 +466,7 @@ bool audiobuffer_insert(char *buf, size_t length)
         
         while (!pcm_play_add_chunk(&audiobuffer[audiobuffer_pos], 
                                    copy_n, NULL)) {
-            if (!boost_mode)
-                pcm_boost(false);
+            pcm_boost(false);
             yield();
         }
         
