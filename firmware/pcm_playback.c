@@ -238,8 +238,11 @@ void pcm_play_stop(void)
     pcm_set_boost_mode(false);
 }
 
+/* Pausing will cause irregular crashes. Should be fixed. */
 void pcm_play_pause(bool play)
 {
+    return ;
+    
     if(pcm_paused && play && pcmbuf_unplayed_bytes)
     {
         /* Enable the FIFO and force one write to it */
