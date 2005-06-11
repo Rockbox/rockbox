@@ -149,6 +149,12 @@ void a52_decode_data (file_info_struct* file_info, uint8_t * start, uint8_t * en
 
 #define BUFFER_SIZE 4096
 
+#ifdef USE_IRAM
+extern char iramcopy[];
+extern char iramstart[];
+extern char iramend[];
+#endif
+
 /* this is the plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* file)
 {
@@ -159,7 +165,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
   TEST_PLUGIN_API(api);
   rb = api;
 
-
+#ifdef USE_IRAM
+  rb->memcpy(iramstart, iramcopy, iramend-iramstart);
+#endif
+  
   /* This function sets up the buffers and reads the file into RAM */
 
   if (local_init(file,"/ac3test.wav",&file_info,api)) {
