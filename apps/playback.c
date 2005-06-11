@@ -804,6 +804,47 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         tracks[track_widx].taginfo_ready = true;
         break;
 
+    case AFMT_OGG_VORBIS:
+        /* A simple parser to read vital metadata from an Ogg Vorbis file */
+
+        /* Use the trackname part of the id3 structure as a temporary buffer */
+        buf=tracks[track_widx].id3.path;
+
+        lseek(fd, 0, SEEK_SET);
+
+        rc = read(fd, buf, 58);
+        if (rc < 4) {
+          close(fd);
+          return false;
+        }
+
+        if ((memcmp(buf,"OggS",4)!=0) || (memcmp(&buf[29],"vorbis",6)!=0)) {
+          logf("%s is not an Ogg Vorbis file\n",trackname);
+          close(fd);
+          return(false);
+        }
+
+        /* Ogg stores integers in little-endian format. */
+        tracks[track_widx].id3.filesize=filesize(fd);
+        tracks[track_widx].id3.frequency=buf[40]|(buf[41]<<8)|(buf[42]<<16)|(buf[43]<<24);
+        channels=buf[39];
+
+        /* We should calculate an accurate average bps, but for now, just take
+           the "nominal bitrate" from the Ogg header */
+        tracks[track_widx].id3.bitrate=(buf[48]|(buf[49]<<8)|(buf[50]<<16)|(buf[51]<<24))/1000;
+        tracks[track_widx].id3.vbr=true;
+
+        /* I don't yet know how to calculate the totalsamples */
+        totalsamples=0;
+
+        /* Calculate the length in ms */
+        tracks[track_widx].id3.length=(totalsamples/tracks[track_widx].id3.frequency)*1000;
+
+        lseek(fd, 0, SEEK_SET);
+        strncpy(tracks[track_widx].id3.path,trackname,sizeof(tracks[track_widx].id3.path));
+        tracks[track_widx].taginfo_ready = true;
+        break;
+
     /* If we don't know how to read the metadata, just store the filename */
     default:
         strncpy(tracks[track_widx].id3.path,trackname,sizeof(tracks[track_widx].id3.path));
