@@ -141,6 +141,31 @@ typedef int16_t quantizer_t;
 #if 0
 #define MUL(a,b) ((int)(((int64_t)(a) * (b) + (1 << 29)) >> 30))
 #define MUL_L(a,b) ((int)(((int64_t)(a) * (b) + (1 << 25)) >> 26))
+#elif CONFIG_CPU==MCF5249 && !defined(SIMULATOR)
+/* loses 1 bit of accuracy */
+#define MUL(a, b) \
+({ \
+    int32_t t; \
+    asm volatile ( \
+        "mac.l %[A], %[B], %%acc0\n\t" \
+        "movclr.l %%acc0, %[t]\n\t" \
+        "asl.l #1, %[t]" \
+        : [t] "=d" (t) \
+        : [A] "r" ((a)), [B] "r" ((b))); \
+    t; \
+})
+/* loses 5 bits of accuracy */
+#define MUL_L(a, b) \
+({ \
+    int32_t t; \
+    asm volatile ( \
+        "mac.l %[A], %[B], %%acc0\n\t" \
+        "movclr.l %%acc0, %[t]\n\t" \
+        "asl.l #5, %[t]" \
+        : [t] "=d" (t) \
+        : [A] "r" ((a)), [B] "r" ((b))); \
+    t; \
+})
 #elif 1
 #define MUL(a,b) \
 ({ int32_t _ta=(a), _tb=(b), _tc; \

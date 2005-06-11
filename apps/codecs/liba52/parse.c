@@ -48,6 +48,9 @@ typedef struct {
     int q4_ptr;
 } quantizer_set_t;
 
+static a52_state_t istate IDATA_ATTR;
+static sample_t isamples[256*12]  IDATA_ATTR;
+
 static uint8_t halfrate[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3};
 
 a52_state_t * a52_init (uint32_t mm_accel)
@@ -55,6 +58,12 @@ a52_state_t * a52_init (uint32_t mm_accel)
     a52_state_t * state;
     int i;
 
+    #if CONFIG_CPU==MCF5249 && !defined(SIMULATOR)
+    asm volatile ("move.l #0x30, %macsr"); /* frac. mode with rounding */
+    #endif
+    /* 
+      this needs to come back if we ever want two decoder instances
+      simultenously. NOTE, you also need to remove comments in a52_free.
     state = (a52_state_t *) malloc (sizeof (a52_state_t));
     if (state == NULL)
 	return NULL;
@@ -65,6 +74,9 @@ a52_state_t * a52_init (uint32_t mm_accel)
 	return NULL;
     }
 
+    */
+    state = &istate;
+    state->samples = isamples;
     for (i = 0; i < 256 * 12; i++)
 	state->samples[i] = 0;
 
@@ -940,6 +952,9 @@ int a52_block (a52_state_t * state)
 
 void a52_free (a52_state_t * state)
 {
+    (void)state;
+    /*
     free (state->samples);
     free (state);
+    */
 }
