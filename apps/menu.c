@@ -317,6 +317,9 @@ int menu_show(int m)
         
         switch( key ) {
             case MENU_PREV:
+#ifdef MENU_RC_PREV
+            case MENU_RC_PREV:
+#endif
             case MENU_PREV | BUTTON_REPEAT:
                 if (menus[m].cursor) {
                     /* keep the cursor at 1/3 of the screen */
@@ -336,6 +339,9 @@ int menu_show(int m)
                 break;
 
             case MENU_NEXT:
+#ifdef MENU_RC_NEXT
+            case MENU_RC_NEXT:
+#endif
             case MENU_NEXT | BUTTON_REPEAT:
                 if (menus[m].cursor < menus[m].itemcount-1) {
                     /* keep the cursor at 2/3 of the screen */
@@ -357,6 +363,9 @@ int menu_show(int m)
 #ifdef MENU_ENTER2
             case MENU_ENTER2:
 #endif
+#ifdef MENU_RC_ENTER
+            case MENU_RC_ENTER:
+#endif
                 /* Erase current display state */
                 lcd_clear_display();
                 return menus[m].cursor;
@@ -367,6 +376,9 @@ int menu_show(int m)
 #endif
 #ifdef MENU_EXIT3
             case MENU_EXIT3:
+#endif
+#ifdef MENU_RC_EXIT
+            case MENU_RC_EXIT:
 #endif
                 lcd_stop_scroll();
                 exit = true;

@@ -992,6 +992,9 @@ static bool dirbrowse(void)
 #endif
 
             case TREE_MENU:
+#ifdef TREE_RC_MENU
+            case TREE_RC_MENU:
+#endif
 #ifdef TREE_MENU_PRE
                 if (lastbutton != TREE_MENU_PRE)
                     break;
