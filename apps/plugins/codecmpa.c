@@ -172,7 +172,8 @@ const unsigned char *OutputBufferEnd=OutputBuffer+OUTPUT_BUFFER_SIZE;
 
 mad_fixed_t mad_frame_overlap[2][32][18] IDATA_ATTR;
 unsigned char mad_main_data[MAD_BUFFER_MDLEN] IDATA_ATTR;
-
+/* TODO: what latency does layer 1 have? */
+int mpeg_latency[3] = { 0, 481, 529 };
 #ifdef USE_IRAM
 extern char iramcopy[];
 extern char iramstart[];
@@ -185,6 +186,7 @@ extern char iramend[];
 enum plugin_status plugin_start(struct plugin_api* api, void* parm)
 {
   struct codec_api *ci = (struct codec_api *)parm;
+  struct mp3info *info;
   int Status=0;
   size_t size;
   int file_end;
@@ -199,6 +201,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
 #endif
   int i;
   int yieldcounter = 0;
+  int stop_skip, start_skip;
   
   /* Generic plugin inititialisation */
 
@@ -220,7 +223,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
   ci->configure(CODEC_SET_FILEBUF_LIMIT, (int *)(1024*1024*2));
   ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*16));
   
-  next_track:
   memset(&Stream, 0, sizeof(struct mad_stream));
   memset(&Frame, 0, sizeof(struct mad_frame));
   memset(&Synth, 0, sizeof(struct mad_synth));
@@ -235,6 +237,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
   memset(mad_frame_overlap, 0, sizeof(mad_frame_overlap));
   Frame.overlap = &mad_frame_overlap;
   Stream.main_data = &mad_main_data;
+  /* This label might need to be moved above all the init code, but I don't
+     think reiniting the codec is necessary for MPEG. It might even be unwanted
+     for gapless playback */
+  next_track:
   
 #ifdef DEBUG_GAPLESS
   if (first)
@@ -243,7 +249,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
     fd = rb->open("/second.pcm", O_WRONLY | O_CREAT);
   first = false;
 #endif
-
+  
+  info = ci->mp3data;
   first_frame = false;
   file_end = 0;
   OutputPtr = OutputBuffer;
@@ -254,9 +261,29 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
   
   ci->request_buffer(&size, ci->id3->first_frame_offset);
   ci->advance_buffer(size);
+ 
+  if (info->enc_delay >= 0 && info->enc_padding >= 0) {
+      stop_skip = info->enc_padding - mpeg_latency[info->layer];
+      if (stop_skip < 0) stop_skip = 0;
+      start_skip = info->enc_delay + mpeg_latency[info->layer];
+  } else {
+      stop_skip = 0;
+      /* We want to skip this amount anyway */
+      start_skip = mpeg_latency[info->layer];
+  }
   
-  samplecount = ci->id3->length * (ci->id3->frequency / 100) / 10;
-  samplesdone = ci->id3->elapsed * (ci->id3->frequency / 100) / 10;
+  /* NOTE: currently this doesn't work, the below calculated samples_count
+     seems to be right, but sometimes libmad just can't supply us with
+     all the data we need... */
+  if (info->frame_count) {
+      /* TODO: 1152 is the frame size in samples for MPEG1 layer 2 and layer 3,
+         it's probably not correct at all for MPEG2 and layer 1 */
+      samplecount = info->frame_count*1152 - (start_skip + stop_skip);
+      samplesdone = ci->id3->elapsed * (ci->id3->frequency / 100) / 10;
+  } else {
+      samplecount = ci->id3->length * (ci->id3->frequency / 100) / 10;
+      samplesdone = ci->id3->elapsed * (ci->id3->frequency / 100) / 10;
+  }
   /* rb->snprintf(buf2, sizeof(buf2), "sc: %d", samplecount);
   rb->splash(0, true, buf2);
   rb->snprintf(buf2, sizeof(buf2), "length: %d", ci->id3->length);
@@ -304,7 +331,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
         /* This makes the codec to support partially corrupted files too. */
         if (file_end == 30)
             break ;
-      
+        
         /* Fill the buffer */
         Stream.error = 0;
         file_end++;
@@ -345,18 +372,22 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
     //}
     
     /* Convert MAD's numbers to an array of 16-bit LE signed integers */
-    for(i=0;i<Synth.pcm.length;i++)
+    /* We skip start_skip number of samples here, this should only happen for
+       very first frame in the stream. */
+    /* TODO: possible for start_skip to exceed one frames worth of samples? */
+    for (i = start_skip;i<Synth.pcm.length;i++)
     {
+      start_skip = 0; /* not very elegant, and might want to keep this value */
       samplesdone++;
       //if (ci->mp3data->padding > 0) {
       //  ci->mp3data->padding--;
       //  continue ;
       //}
-      if (!first_frame) {
+      /*if (!first_frame) {
         if (detect_silence(Synth.pcm.samples[0][i]))
             continue ;
         first_frame = true;
-      }
+      }*/
       
       /* Left channel */
       Sample=scale(Synth.pcm.samples[0][i],&d0);
