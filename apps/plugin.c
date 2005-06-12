@@ -347,7 +347,7 @@ int codec_load_ram(char* pluginptr, size_t size, void *parameter, void* ptr2, si
         
         size -= copy_n;
         if (size > 0) {
-            memcpy(ptr2, &pluginptr[copy_n], size);
+            memcpy(&pluginbuf[copy_n], ptr2, size);
         }
     }
     

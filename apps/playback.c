@@ -1145,10 +1145,7 @@ bool codec_request_next_track_callback(void)
             track_ridx = 0;
         
         if (track_ridx == track_widx && tracks[track_ridx].filerem == 0) {
-            if (ci.reload_codec) {
-            } else {
-                logf("No more tracks");
-            }
+            logf("No more tracks");
             new_track = 0;
             return false;
         }
@@ -1256,7 +1253,7 @@ void codec_thread(void)
                 ci.stop_codec = false;
                 wrap = (int)&codecbuf[codecbuflen] - (int)cur_ti->codecbuf;
                 status = codec_load_ram(cur_ti->codecbuf,  codecsize, 
-                                        &ci, &codecbuf[0], codecbuflen);
+                                        &ci, &codecbuf[0], wrap);
                 break ;
 
 #ifndef SIMULATOR                
@@ -1272,7 +1269,8 @@ void codec_thread(void)
         case CODEC_LOAD:
             if (status != PLUGIN_OK) {
                 logf("Codec failure");
-                // playing = false;
+                splash(HZ*2, true, "Codec failure");
+                playing = false;
             } else {
                 logf("Codec finished");
             }
