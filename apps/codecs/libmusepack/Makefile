@@ -14,7 +14,8 @@ ifdef APPEXTRA
 INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
 endif
 
-CFLAGS = $(GCCOPTS) \
+MUSEPACKOPTS = -O2
+CFLAGS = $(GCCOPTS) $(MUSEPACKOPTS)\
 $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
 
 # This sets up 'SRC' based on the files mentioned in SOURCES

@@ -99,7 +99,23 @@ static inline MPC_SAMPLE_FORMAT MPC_MULTIPLY_EX(MPC_SAMPLE_FORMAT item1,MPC_SAMP
 #ifdef MPC_HAVE_MULHIGH
 #define MPC_MULTIPLY_FRACT(X,Y) _MulHigh(X,Y)
 #else
+#if CONFIG_CPU==MCF5249 && !defined(SIMULATOR)
+/* loses one bit of accuracy.
+   the rest of the macros won't be as easy as this... */
+#define MPC_MULTIPLY_FRACT(X,Y) \
+    ({ \
+        MPC_SAMPLE_FORMAT t; \
+        asm volatile ( \
+            "mac.l %[A], %[B], %%acc0\n\t" \
+            "movclr.l %%acc0, %[t]\n\t" \
+            "asr.l #1, %[t]\n\t" \
+            : [t] "=d" (t) \
+            : [A] "r" ((X)), [B] "r" ((Y))); \
+        t; \
+    })
+#else
 #define MPC_MULTIPLY_FRACT(X,Y) MPC_MULTIPLY_EX(X,Y,32)
+#endif
 #endif
 
 #define MPC_MAKE_FRACT_CONST(X) (MPC_SAMPLE_FORMAT)((X) * (double)(((mpc_int64_t)1)<<32) )
