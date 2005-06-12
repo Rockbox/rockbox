@@ -317,10 +317,11 @@ int menu_show(int m)
         
         switch( key ) {
             case MENU_PREV:
+            case MENU_PREV | BUTTON_REPEAT:
 #ifdef MENU_RC_PREV
             case MENU_RC_PREV:
+            case MENU_RC_PREV | BUTTON_REPEAT:
 #endif
-            case MENU_PREV | BUTTON_REPEAT:
                 if (menus[m].cursor) {
                     /* keep the cursor at 1/3 of the screen */
                     if (menus[m].top && menus[m].cursor - menus[m].top <
@@ -339,10 +340,11 @@ int menu_show(int m)
                 break;
 
             case MENU_NEXT:
+            case MENU_NEXT | BUTTON_REPEAT:
 #ifdef MENU_RC_NEXT
             case MENU_RC_NEXT:
+            case MENU_RC_NEXT | BUTTON_REPEAT:
 #endif
-            case MENU_NEXT | BUTTON_REPEAT:
                 if (menus[m].cursor < menus[m].itemcount-1) {
                     /* keep the cursor at 2/3 of the screen */
                     if (menus[m].itemcount - menus[m].top > menu_lines &&

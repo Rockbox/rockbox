@@ -470,9 +470,16 @@ long wps_show(void)
 
         switch(button)
         {
+#ifdef WPS_RC_BROWSE
+            case WPS_RC_BROWSE:
+#endif
             case WPS_BROWSE:
 #ifdef WPS_BROWSE_PRE
-                if (lastbutton != WPS_BROWSE_PRE)
+                if ((lastbutton != WPS_BROWSE_PRE)
+#ifdef WPS_RC_BROWSE_PRE
+                    && (lastbutton != WPS_RC_BROWSE_PRE)
+#endif
+                    )
                     break;
 #endif
 #ifdef HAVE_LCD_CHARCELLS

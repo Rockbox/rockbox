@@ -468,8 +468,13 @@ static bool ask_resume(bool ask_once)
 #else
             case TREE_RUN:
 #endif
+
+#ifdef TREE_RC_RUN_PRE
+            case TREE_RC_RUN_PRE:  /* catch the press, not the release */
+#else
 #ifdef TREE_RC_RUN
             case TREE_RC_RUN:
+#endif
 #endif
                 ignore_power = false;
                 /* Don't ignore the power button for subsequent calls */
@@ -722,6 +727,9 @@ static bool dirbrowse(void)
                 button = button_get(true);
                 switch (button) {
                     case TREE_RUN:
+#ifdef TREE_RC_RUN
+                    case TREE_RC_RUN:
+#endif
                         rolo_load("/" BOOTFILE);
                         stop = true;
                         break;
@@ -747,10 +755,17 @@ static bool dirbrowse(void)
 #ifdef TREE_RC_ENTER
             case TREE_RC_ENTER:
 #endif
+#ifdef TREE_RC_RUN
+            case TREE_RC_RUN:
+#endif
             case TREE_RUN:
 #ifdef TREE_RUN_PRE
-                if ((button == TREE_RUN) &&
-                    (lastbutton != TREE_RUN_PRE))
+                if (((button == TREE_RUN)
+#ifdef TREE_RC_RUN_PRE
+                    || (button == TREE_RC_RUN))
+                        && ((lastbutton != TREE_RC_RUN_PRE)
+#endif
+                    && (lastbutton != TREE_RUN_PRE)))
                     break;
 #endif
                 if ( !numentries )
@@ -1014,8 +1029,15 @@ static bool dirbrowse(void)
                 break;
 
             case TREE_WPS:
+#ifdef TREE_RC_WPS
+            case TREE_RC_WPS:
+#endif
 #ifdef TREE_WPS_PRE
-                if (lastbutton != TREE_WPS_PRE)
+                if ((lastbutton != TREE_WPS_PRE)
+#ifdef TREE_RC_WPS
+                    && (lastbutton != TREE_RC_WPS_PRE)
+#endif
+                    )
                     break;
 #endif
                 /* don't enter wps from plugin browser etc */
@@ -1059,6 +1081,9 @@ static bool dirbrowse(void)
 #endif
 
             case TREE_CONTEXT:
+#ifdef TREE_RC_CONTEXT
+            case TREE_RC_CONTEXT:
+#endif
 #ifdef TREE_CONTEXT2
             case TREE_CONTEXT2:
 #endif
