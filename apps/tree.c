@@ -752,9 +752,6 @@ static bool dirbrowse(void)
             case TREE_ENTER:
             case TREE_ENTER | BUTTON_REPEAT:
 #endif
-#ifdef TREE_RC_ENTER
-            case TREE_RC_ENTER:
-#endif
 #ifdef TREE_RC_RUN
             case TREE_RC_RUN:
 #endif
