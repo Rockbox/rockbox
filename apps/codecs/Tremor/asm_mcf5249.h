@@ -110,14 +110,16 @@ void XNPROD31(ogg_int32_t  a, ogg_int32_t  b,
 }
 
 
-#if 1
+#if 0
 /* canonical definition */
 #define XPROD32(_a, _b, _t, _v, _x, _y)         \
   { (_x)=MULT32(_a,_t)+MULT32(_b,_v);           \
     (_y)=MULT32(_b,_t)-MULT32(_a,_v); }
-#else
-/* Thom Johansen's suggestion; this could loose the LSB by overflow;
-   Does it matter in practice? */
+#endif
+
+/* this could lose the LSB by overflow, but i don't think it'll ever happen.
+   if anyone think they can hear a bug caused by this, please try the above
+   version. */
 #define XPROD32(_a, _b, _t, _v, _x, _y)     \
   asm volatile ("mac.l %[a], %[t], %%acc0;" \
                 "mac.l %[b], %[v], %%acc0;" \
@@ -131,7 +133,6 @@ void XNPROD31(ogg_int32_t  a, ogg_int32_t  b,
                 : [a] "r" (_a), [b] "r" (_b), \
                   [t] "r" (_t), [v] "r" (_v) \
                 : "cc");
-#endif
 
 
 /* asm versions of vector operations for block.c, window.c */
