@@ -605,9 +605,10 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     off_t size;
     int rc, i;
     int copy_n;
-    /* Used by the FLAC metadata parser */
+    /* Used by the metadata parsers */
     unsigned long totalsamples,bytespersample,channels,bitspersample,numbytes;
     unsigned char* buf;
+    int j,eof;
     
     if (track_count >= MAX_TRACK)
         return false;
@@ -803,6 +804,18 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     case AFMT_OGG_VORBIS:
         /* A simple parser to read vital metadata from an Ogg Vorbis file */
 
+        /* An Ogg File is split into pages, each starting with the string 
+           "OggS".  Each page has a timestamp (in PCM samples) referred to as
+           the "granule position".
+
+           An Ogg Vorbis has the following structure:
+            1) Identification header (containing samplerate, numchannels, etc)
+            2) Comment header - containing the Vorbis Comments
+            3) Setup header - containing codec setup information
+            4) Many audio packets...
+
+        */
+
         /* Use the trackname part of the id3 structure as a temporary buffer */
         buf=tracks[track_widx].id3.path;
 
@@ -825,18 +838,48 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         tracks[track_widx].id3.frequency=buf[40]|(buf[41]<<8)|(buf[42]<<16)|(buf[43]<<24);
         channels=buf[39];
 
-        /* We should calculate an accurate average bps, but for now, just take
-           the "nominal bitrate" from the Ogg header */
-        tracks[track_widx].id3.bitrate=(buf[48]|(buf[49]<<8)|(buf[50]<<16)|(buf[51]<<24))/1000;
-        tracks[track_widx].id3.vbr=true;
+        /* We now need to search for the last page in the file - identified by 
+	   by ('O','g','g','S',0) and retrieve totalsamples */
 
-        if (tracks[track_widx].id3.bitrate!=0) {
-          /* A _really_ stupid and inaccurate calculation, but the best
-             I can do at the moment. */
-          tracks[track_widx].id3.length=(tracks[track_widx].filesize)/(tracks[track_widx].id3.bitrate/8);
-        } else {
-          tracks[track_widx].id3.length=0;
+        lseek(fd, -32*1024, SEEK_END);
+        eof=0;
+        j=0; /* The number of bytes currently in buffer */
+        i=0;
+        totalsamples=0;
+        while (!eof) {
+          rc = read(fd, &buf[j], MAX_PATH-j);
+          if (rc <= 0) { 
+            eof=1;
+          } else { 
+            j+=rc;
+          }
+          /* Inefficient (but simple) search */
+          i=0;
+          while (i < (j-5)) {
+            if (memcmp(&buf[i],"OggS",5)==0) {
+              if (i < (j-10)) {
+                totalsamples=(buf[i+6])|(buf[i+7]<<8)|(buf[i+8]<<16)|(buf[i+9]<<24);
+                j=0;  /* We can discard the rest of the buffer */
+              } else {
+                break;
+              }
+            } else {
+              i++;
+            }
+          }
+          if (i < (j-5)) {
+            /* Move OggS to start of buffer */
+            while(i>0) buf[i--]=buf[j--];
+          } else {
+            j=0;
+          }
         }
+    
+        tracks[track_widx].id3.length=(totalsamples/tracks[track_widx].id3.frequency)*1000;
+
+        /* The following calculation should use datasize, not filesize (i.e. exclude comments etc) */
+        tracks[track_widx].id3.bitrate=(filesize(fd)*8)/tracks[track_widx].id3.length;
+        tracks[track_widx].id3.vbr=true;
 
         lseek(fd, 0, SEEK_SET);
         strncpy(tracks[track_widx].id3.path,trackname,sizeof(tracks[track_widx].id3.path));
