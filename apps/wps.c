@@ -592,9 +592,16 @@ long wps_show(void)
                 break;
 
                 /* menu key functions */
+#ifdef WPS_RC_MENU
+            case WPS_RC_MENU:
+#endif
             case WPS_MENU:
 #ifdef WPS_MENU_PRE
-                if (lastbutton != WPS_MENU_PRE)
+                if ((lastbutton != WPS_MENU_PRE)
+#ifdef WPS_RC_MENU_PRE
+                    && (lastbutton != WPS_RC_MENU_PRE)
+#endif
+                    )
                     break;
 #endif
                 lcd_stop_scroll();
