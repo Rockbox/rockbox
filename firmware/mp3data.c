@@ -32,6 +32,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include "debug.h"
+#include "logf.h"
 #include "mp3data.h"
 #include "file.h"
 #include "buffer.h"
@@ -379,6 +380,12 @@ int get_mp3file_info(int fd, struct mp3info *info)
         return -1;
 
     memset(info, 0, sizeof(struct mp3info));
+    /* These two are needed for proper LAME gapless MP3 playback */
+    /* TODO: These can be found in a LAME Info header as well, but currently
+       they are only looked for in a Xing header. Xing and Info headers have
+       the exact same format, but Info headers are used for CBR files. */
+    info->enc_delay = -1;
+    info->enc_padding = -1;
     if(!mp3headerinfo(info, header))
         return -2;
 
@@ -448,6 +455,22 @@ int get_mp3file_info(int fd, struct mp3info *info)
         if(vbrheader[7] & VBR_TOC_FLAG) /* Is table-of-contents there? */
         {
             memcpy( info->toc, vbrheader+i, 100 );
+            i += 100;
+        }
+        if (vbrheader[7] & VBR_QUALITY_FLAG)
+        {
+            /* We don't care about this, but need to skip it */
+            i += 4;
+        }
+        i += 21;
+        info->enc_delay = (vbrheader[i] << 4) | (vbrheader[i + 1] >> 4);
+        info->enc_padding = ((vbrheader[i + 1] & 0x0f) << 8) | vbrheader[i + 2];
+        if (!(info->enc_delay >= 0 && info->enc_delay <= 1152 && 
+            info->enc_padding >= 0 && info->enc_padding <= 2*1152))
+        {
+           /* Invalid data */
+           info->enc_delay = -1;
+           info->enc_padding = -1;
         }
     }
 
@@ -488,7 +511,6 @@ int get_mp3file_info(int fd, struct mp3info *info)
                                      vbrheader[12], vbrheader[13]);
         info->frame_count = BYTES2INT(vbrheader[14], vbrheader[15],
                                       vbrheader[16], vbrheader[17]);
- 
         info->file_time = info->frame_count * info->frame_time;
         info->bitrate = info->byte_count * 8 / info->file_time;
 

@@ -47,13 +47,15 @@ struct mp3info {
     long byte_count;  /* File size in bytes */
     long file_time;   /* Length of the whole file in milliseconds */
     int vbr_header_pos;
+    int enc_delay;    /* Encoder delay, fetched from LAME header */
+    int enc_padding;  /* Padded samples added to last frame. LAME header */
 };
 
 /* Xing header information */
-#define VBR_FRAMES_FLAG 0x01
-#define VBR_BYTES_FLAG  0x02
-#define VBR_TOC_FLAG    0x04
-
+#define VBR_FRAMES_FLAG  0x01
+#define VBR_BYTES_FLAG   0x02
+#define VBR_TOC_FLAG     0x04
+#define VBR_QUALITY_FLAG 0x08
 
 unsigned long find_next_frame(int fd, long *offset, long max_offset, unsigned long last_header);
 unsigned long mem_find_next_frame(int startpos, long *offset, long max_offset,
