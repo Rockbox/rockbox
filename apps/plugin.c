@@ -378,14 +378,10 @@ int codec_load_file(const char *plugin, void *parameter)
         return fd;
     }
     
-    plugin_size = 0;
-    
-    do {
-        rc = read(fd, &pluginbuf[0], PLUGIN_BUFFER_SIZE);
-        if (rc < 0)
-            return PLUGIN_ERROR;
-        plugin_size += rc;
-    } while (rc > 0) ;
+    rc = read(fd, &pluginbuf[0], PLUGIN_BUFFER_SIZE);
+    if (rc <= 0)
+        return PLUGIN_ERROR;
+    plugin_size = rc;
     close(fd);
         
     return codec_load_ram(pluginbuf, plugin_size, parameter, NULL, 0);
