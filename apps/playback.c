@@ -666,7 +666,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         mp3info(&tracks[track_widx].id3, trackname, v1first);
         lseek(fd, 0, SEEK_SET);
         /* This is too slow to execute on some files. */
-        // get_mp3file_info(fd, &tracks[track_widx].mp3data);
+        get_mp3file_info(fd, &tracks[track_widx].mp3data);
         if (offset) {
             lseek(fd, offset, SEEK_SET);
             tracks[track_widx].id3.offset = offset;
@@ -1272,7 +1272,7 @@ void codec_thread(void)
         case CODEC_LOAD:
             if (status != PLUGIN_OK) {
                 logf("Codec failure");
-                playing = false;
+                // playing = false;
             } else {
                 logf("Codec finished");
             }
