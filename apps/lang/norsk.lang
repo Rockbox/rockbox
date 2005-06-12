@@ -1174,25 +1174,25 @@ id: LANG_PLAYER_KEYBOARD_ABORT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_PLAYER_KEYBOARD_ACCEPT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_PLAYER_KEYBOARD_BACKSPACE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_PLAYER_KEYBOARD_DELETE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_GENRE
 desc: ID3 frame 'genre'
@@ -1528,7 +1528,7 @@ id: LANG_PLAYLIST_MENU
 desc: in main menu.
 eng: "Playlist Options"
 voice: "Playlist Options"
-new: "Spilleliste-innstillinger"
+new: "Spillelisteinnstillinger"
 
 id: LANG_PLAYLIST_INSERT_COUNT
 desc: splash number of tracks inserted
@@ -1828,7 +1828,7 @@ id: LANG_BOOKMARK_SETTINGS
 desc: in general settings
 eng: "Bookmarking"
 voice: "Bookmarking"
-new: "Setter bokmerke"
+new: "Bokmerking"
 
 id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
 desc: prompt for user to decide to create a bookmark
@@ -2830,7 +2830,7 @@ id: LANG_STEREO_WIDTH
 desc: in sound_settings
 eng: "Stereo width"
 voice: "Stereo width"
-new: "Stereo-bredde"
+new: "Stereobredde"
 
 id: LANG_CHANNEL_CUSTOM
 desc: in sound_settings
@@ -3065,3 +3065,9 @@ desc: in info menu;  name for external disk with multivolume (Ondio; keep short!
 eng: "MMC:"
 voice: "Multimediakort"
 new: "MMC:" 
+
+id: LANG_CROSSFADE
+desc: in playback settings
+eng: "Crossfade"
+voice: "Crossfade"
+new: "Kryssfade"
