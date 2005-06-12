@@ -337,11 +337,58 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                            TEXT("Success"), MB_OK);
         }
         break;
+    case WM_USER:
+        /* command line driven patch button */
+        SetWindowText(controls[EDIT_FILENAME], (LPCTSTR)wParam);
+        SendMessage(hwnd, WM_COMMAND, 0, (LPARAM)(controls[BUTTON_PATCH]) );
+        break;
     default:
         return DefWindowProc(hwnd, msg, wParam, lParam);
     }
     return 0;
 }
+
+void getargs(LPTSTR p, int * argc, LPCTSTR * argv, int MAXARGS)
+{
+    int quote=FALSE,whitespace=FALSE;
+    LPCTSTR tok=p;
+    *argc=0;
+    while(*argc<MAXARGS)
+    {
+        if((*p==TEXT(' ') || *p==TEXT('\0')) && !quote)
+        {
+            if(!whitespace)
+            {
+                whitespace=TRUE;
+                *argv++ = tok;
+                (*argc)++;
+            };
+            if(*p==TEXT('\0'))
+                break;  // end of cmd line
+            *p=TEXT('\0');
+            p++;
+        }
+        else
+        {
+            if(whitespace)
+                tok=p;
+            whitespace=FALSE;
+            if(*p==TEXT('\"'))
+            {
+                *p=TEXT(' ');
+                if(!quote)
+                {
+                    p++;
+                    tok=p;
+                } 
+                quote = !quote;
+            }
+            else p++;
+        }
+    }
+}
+
+#define MAXARGC 4
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance,
                    LPSTR command_line, int command_show) 
@@ -349,6 +396,13 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance,
     HWND window;
     WNDCLASSEX wc;
     MSG msg;
+    int argc;
+    LPCTSTR argv[MAXARGC] = { NULL };
+    LPTSTR cmdline = GetCommandLine();
+
+    getargs(cmdline, &argc, argv, MAXARGC);
+    if (argc > 1)
+        command_show = SW_HIDE;
     
     rbicon = LoadIcon(instance, MAKEINTRESOURCE(IDI_RBICON));
     ZeroMemory(&wc, sizeof(wc));
@@ -368,6 +422,12 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance,
     if (!window) return 0;
 
     ShowWindow(window, command_show);
+
+    if (argc > 1) {
+        SendMessage(window, WM_USER, (WPARAM)(argv[1]), 0);
+        SendMessage(window, WM_CLOSE, 0, 0);
+    }
+
     while (GetMessage(&msg, 0, 0, 0) > 0) {
         if (!IsDialogMessage(window, &msg)) {
             TranslateMessage(&msg);
