@@ -171,7 +171,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
 #endif
 
   ci->configure(CODEC_SET_FILEBUF_LIMIT, (int *)(1024*1024*2));
-  ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*16));
+  ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*128));
 
   next_track:
 
