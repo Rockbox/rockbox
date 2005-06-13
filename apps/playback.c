@@ -82,6 +82,7 @@ static volatile bool paused;
 #define AUDIO_FF_REWIND    7
 #define AUDIO_FLUSH_RELOAD 8
 #define AUDIO_CODEC_DONE   9
+#define AUDIO_FLUSH        10
 
 #define CODEC_LOAD       1
 #define CODEC_LOAD_DISK  2
@@ -283,24 +284,30 @@ void codec_advance_buffer_callback(size_t amount)
 {
     if ((int)amount > cur_ti->available + cur_ti->filerem)
         amount = cur_ti->available + cur_ti->filerem;
-        
+    
+    try_again:
     if ((int)amount > cur_ti->available) {
+        if (filling) {
+            while (filling)
+                yield();
+            goto try_again;
+        }
         codecbufused = 0;
         buf_ridx = 0;
         buf_widx = 0;
-        cur_ti->start_pos += amount;
+        cur_ti->start_pos = ci.curpos + amount;
         amount -= cur_ti->available;
         ci.curpos += cur_ti->available;
         cur_ti->available = 0;
-        while ((int)amount < cur_ti->available && !ci.stop_codec)
+        while ((int)amount > cur_ti->available && !ci.stop_codec)
             yield();
-    } else {
-        cur_ti->available -= amount;
-        codecbufused -= amount;
-        buf_ridx += amount;
-        if (buf_ridx >= codecbuflen)
-            buf_ridx -= codecbuflen;
     }
+    
+    buf_ridx += amount;
+    if (buf_ridx >= codecbuflen)
+        buf_ridx -= codecbuflen;
+    cur_ti->available -= amount;
+    codecbufused -= amount;
     ci.curpos += amount;
     cur_ti->id3.offset = ci.curpos;
 }
@@ -447,6 +454,7 @@ void audio_fill_file_buffer(void)
     size_t i;
     int rc;
     
+    tracks[track_widx].start_pos = ci.curpos;
     logf("Filling buffer...");
     i = 0;
     while ((off_t)i < tracks[track_widx].filerem) {
@@ -455,8 +463,8 @@ void audio_fill_file_buffer(void)
             
         if (!queue_empty(&audio_queue)) {
             logf("Filling interrupted");
-            close(current_fd);
-            current_fd = -1;
+            //close(current_fd);
+            //current_fd = -1;
             return ;
         }
         
@@ -480,13 +488,9 @@ void audio_fill_file_buffer(void)
     
     codecbufused += i;
     tracks[track_widx].filerem -= i;
-    tracks[track_widx].start_pos = tracks[track_widx].filepos;
     tracks[track_widx].filepos += i;
     logf("Done:%d", tracks[track_widx].available);
     if (tracks[track_widx].filerem == 0) {
-        if (++track_widx == MAX_TRACK)
-            track_widx = 0;
-        tracks[track_widx].filerem = 0;
         close(current_fd);
         current_fd = -1;
     }
@@ -667,7 +671,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     
     if (!queue_empty(&audio_queue)) {
         logf("Interrupted!");
-        ci.stop_codec = true;
+        //ci.stop_codec = true;
         close(fd);
         return false;
     }
@@ -949,8 +953,11 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         break;
     }
     
-    track_changed = true;
-    track_count++;
+    if (start_play) {
+        track_count++;
+        track_changed = true;
+    }
+        
     i = tracks[track_widx].start_pos;
     while (i < size) {
         /* Give codecs some processing time to prevent glitches. */
@@ -990,6 +997,9 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         fill_bytesleft -= rc;
     }
     
+    if (!start_play)
+        track_count++;
+        
     tracks[track_widx].filepos = i;
     
     /* Leave the file handle open for faster buffer refill. */
@@ -1042,6 +1052,19 @@ void audio_play_start(int offset)
 #endif
 }
 
+void audio_clear_track_entries(void)
+{
+    int cur_idx;
+    int i;
+    
+    cur_idx = track_widx;
+    for (i = 0; i < MAX_TRACK - track_count; i++) {
+        if (++cur_idx >= MAX_TRACK)
+            cur_idx = 0;
+        memset(&tracks[cur_idx], 0, sizeof(struct track_info));
+    }
+}
+
 void audio_check_buffer(void)
 {
     int i;
@@ -1077,22 +1100,24 @@ void audio_check_buffer(void)
     }
     
     track_count = i;
-    if (tracks[cur_idx].filerem != 0)
+    if (tracks[track_widx].filerem != 0)
         track_count++;
     
     /* Mark all other entries null. */
-    cur_idx = track_widx;
-    for (i = 0; i < MAX_TRACK - track_count; i++) {
-        if (++cur_idx >= MAX_TRACK)
-            cur_idx = 0;
-        tracks[cur_idx].filesize = 0;
-        tracks[cur_idx].available = 0;
-    }
+    audio_clear_track_entries();
     
     /* Try to load remainings of the file. */
     if (tracks[track_widx].filerem > 0)
         audio_fill_file_buffer();
     
+    /* Increase track write index as necessary. */
+    if (tracks[track_widx].filerem == 0 && tracks[track_widx].filesize != 0) {
+        if (++track_widx == MAX_TRACK)
+            track_widx = 0;
+        logf("new ti: %d", track_widx);
+    }
+    
+    logf("ti: %d", track_widx);
     /* Load new files to fill the entire buffer. */
     if (tracks[track_widx].filerem == 0)
         audio_insert_tracks(0, false, 1);
@@ -1224,15 +1249,30 @@ bool codec_request_next_track_callback(void)
     return true;    
 }
 
+/* Invalidates all but currently playing track. */
+void audio_invalidate_tracks(void)
+{
+    if (track_count == 0) {
+        queue_post(&audio_queue, AUDIO_PLAY, 0);
+        return ;
+    }
+    
+    track_count = 1;
+    track_widx = track_ridx;
+    audio_clear_track_entries();
+    codecbufused = cur_ti->available;
+    buf_widx = buf_ridx + cur_ti->available;
+    if (buf_widx >= codecbuflen)
+        buf_widx -= codecbuflen;
+}
+
 void audio_thread(void)
 {
     struct event ev;
     
     while (1) {
-        sleep(50);
         audio_check_buffer();
-        
-        queue_wait_w_tmo(&audio_queue, &ev, 10);
+        queue_wait_w_tmo(&audio_queue, &ev, 100);
         switch (ev.id) {
             case AUDIO_PLAY:
                 ci.stop_codec = true;
@@ -1259,6 +1299,10 @@ void audio_thread(void)
                 break ;
             
             case AUDIO_NEXT:
+                break ;
+                
+            case AUDIO_FLUSH:
+                audio_invalidate_tracks();
                 break ;
                 
             case AUDIO_CODEC_DONE:
@@ -1476,6 +1520,7 @@ void audio_ff_rewind(int newpos)
 void audio_flush_and_reload_tracks(void)
 {
     logf("flush & reload");
+    queue_post(&audio_queue, AUDIO_FLUSH, 0);
 }
 
 void audio_error_clear(void)
