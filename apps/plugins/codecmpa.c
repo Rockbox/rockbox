@@ -305,12 +305,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
         sample_loc = ci->seek_time/1000 * ci->id3->frequency;
         newpos = ci->mp3_get_filepos(ci->seek_time-1);
         if (ci->seek_buffer(newpos)) {
-            ci->seek_time = 0;
             if (sample_loc >= samplecount + samplesdone)
                 break ;
             samplecount += samplesdone - sample_loc;
             samplesdone = sample_loc;
         }
+        ci->seek_time = 0;
     }
 
     /* Lock buffers */

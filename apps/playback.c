@@ -125,19 +125,19 @@ static volatile int buf_widx;
 
 #define MAX_TRACK 10
 struct track_info {
-    struct mp3entry id3;
-    struct mp3info mp3data;
-    char *codecbuf;
-    size_t codecsize;
-    int codectype;
+    struct mp3entry id3;     /* TAG metadata */
+    struct mp3info mp3data;  /* MP3 metadata */
+    char *codecbuf;          /* Pointer to codec buffer */
+    size_t codecsize;        /* Codec length in bytes */
+    int codectype;           /* Codec type (example AFMT_MPA_L3) */
     
-    volatile char *filebuf;
-    off_t filerem;
-    off_t filesize;
-    off_t filepos;
-    volatile int available;
-    bool taginfo_ready;
-    int playlist_offset;
+    off_t filerem;           /* Remaining bytes of file NOT in buffer */
+    off_t filesize;          /* File total length */
+    off_t filepos;           /* Read position of file for next buffer fill */
+    off_t start_pos;         /* Position to first bytes of file in buffer */
+    volatile int available;  /* Available bytes to read from buffer */
+    bool taginfo_ready;      /* Is metadata read */
+    int playlist_offset;     /* File location in playlist */
 };
 
 /* Track information (count in file buffer, read/write indexes for
@@ -286,7 +286,11 @@ void codec_advance_buffer_callback(size_t amount)
         
     if ((int)amount > cur_ti->available) {
         codecbufused = 0;
-        buf_ridx = buf_widx;
+        buf_ridx = 0;
+        buf_widx = 0;
+        cur_ti->start_pos += amount;
+        amount -= cur_ti->available;
+        ci.curpos += cur_ti->available;
         cur_ti->available = 0;
         while ((int)amount < cur_ti->available && !ci.stop_codec)
             yield();
@@ -343,7 +347,8 @@ bool codec_seek_buffer_callback(off_t newpos)
     if (ci.curpos - difference < 0)
         difference = ci.curpos;
     
-    if (codecbufused + difference > codecbuflen) {
+    if (ci.curpos - difference < cur_ti->start_pos) {
+        logf("Seek failed (reload song)");
         /* We need to reload the song. FIX THIS! */
         return false;
     }
@@ -473,8 +478,9 @@ void audio_fill_file_buffer(void)
         fill_bytesleft -= rc;
     }
     
-    tracks[track_widx].filerem -= i;
     codecbufused += i;
+    tracks[track_widx].filerem -= i;
+    tracks[track_widx].start_pos = tracks[track_widx].filepos;
     tracks[track_widx].filepos += i;
     logf("Done:%d", tracks[track_widx].available);
     if (tracks[track_widx].filerem == 0) {
@@ -653,7 +659,8 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         close(fd);
         return false;
     }
-    tracks[track_widx].filebuf = &codecbuf[buf_widx];
+    // tracks[track_widx].filebuf = &codecbuf[buf_widx];
+    tracks[track_widx].start_pos = 0;
         
     //logf("%s", trackname);
     logf("Buffering track:%d/%d", track_widx, track_ridx);
@@ -681,6 +688,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
             tracks[track_widx].filepos = offset;
             tracks[track_widx].filerem = tracks[track_widx].filesize - offset;
             ci.curpos = offset;
+            tracks[track_widx].start_pos = offset;
         } else {
             lseek(fd, 0, SEEK_SET);
         }
@@ -943,7 +951,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     
     track_changed = true;
     track_count++;
-    i = tracks[track_widx].filepos;
+    i = tracks[track_widx].start_pos;
     while (i < size) {
         /* Give codecs some processing time to prevent glitches. */
         yield_codecs();
