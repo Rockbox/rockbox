@@ -68,6 +68,7 @@ static volatile bool paused;
 #define CODEC_WAV      "/.rockbox/codecs/codecwav.rock";
 #define CODEC_A52      "/.rockbox/codecs/codeca52.rock";
 #define CODEC_MPC      "/.rockbox/codecs/codecmpc.rock";
+#define CODEC_WAVPACK  "/.rockbox/codecs/codecwavpack.rock";
 
 #define AUDIO_DEFAULT_WATERMARK      (1024*256)
 #define AUDIO_DEFAULT_FILECHUNK      (1024*32)
@@ -417,6 +418,8 @@ int probe_file_format(const char *filename)
         return AFMT_A52;
     else if (!strcasecmp("rm", suffix))
         return AFMT_REAL;
+    else if (!strcasecmp("wv", suffix))
+        return AFMT_WAVPACK;
         
     return AFMT_UNKNOWN;
         
@@ -520,6 +523,10 @@ bool loadcodec(const char *trackname, bool start_play)
     case AFMT_MPC:
         logf("Codec: Musepack");
         codec_path = CODEC_MPC;
+        break;
+    case AFMT_WAVPACK:
+        logf("Codec: WAVPACK");
+        codec_path = CODEC_WAVPACK;
         break;
     default:
         logf("Codec: Unsupported");
@@ -735,7 +742,6 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         tracks[track_widx].taginfo_ready = true;
 
         break;
-    
 
     case AFMT_FLAC:
         /* A simple parser to read vital metadata from a FLAC file - length, frequency, bitrate etc. */
@@ -883,6 +889,48 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
 
         lseek(fd, 0, SEEK_SET);
         strncpy(tracks[track_widx].id3.path,trackname,sizeof(tracks[track_widx].id3.path));
+        tracks[track_widx].taginfo_ready = true;
+        break;
+
+    case AFMT_WAVPACK:
+        /* A simple parser to read basic information from a WavPack file.
+         * This will fail on WavPack files that don't have the WavPack header
+         * as the first thing (i.e. self-extracting WavPack files) or WavPack
+         * files that have so much extra RIFF data stored in the first block
+         * that they don't have samples (very rare, I would think).
+         */
+
+        /* Use the trackname part of the id3 structure as a temporary buffer */
+        buf=tracks[track_widx].id3.path;
+
+        lseek(fd, 0, SEEK_SET);
+
+        rc = read(fd, buf, 32);
+        if (rc < 32) {
+            close(fd);
+            return false;
+        }
+
+        if (memcmp (buf, "wvpk", 4) != 0 || buf [9] != 4 || buf [8] < 2) {          
+            logf ("%s is not a WavPack file\n", trackname);
+            close (fd);
+            return (false);
+        }
+
+        tracks[track_widx].id3.vbr = true;   /* All WavPack files are VBR */
+        tracks[track_widx].id3.filesize = filesize (fd);
+        tracks[track_widx].id3.frequency = 44100;
+
+        if ((buf [20] | buf [21] | buf [22] | buf [23]) &&
+            (buf [12] & buf [13] & buf [14] & buf [15]) != 0xff) {
+                totalsamples = (buf[15] << 24) | (buf[14] << 16) | (buf[13] << 8) | buf[12];
+                tracks[track_widx].id3.length = (totalsamples + 220) / 441 * 10;
+                tracks[track_widx].id3.bitrate = filesize (fd) /
+                    (tracks[track_widx].id3.length / 8);
+        }
+
+        lseek (fd, 0, SEEK_SET);
+        strncpy (tracks[track_widx].id3.path, trackname, sizeof (tracks[track_widx].id3.path));
         tracks[track_widx].taginfo_ready = true;
         break;
 

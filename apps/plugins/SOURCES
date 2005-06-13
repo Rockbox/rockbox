@@ -78,6 +78,7 @@ codecflac.c
 codecwav.c
 codeca52.c
 codecmpc.c
+codecwavpack.c
 #endif
 wv2wav.c
 mpc2wav.c

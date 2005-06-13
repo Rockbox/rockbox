@@ -34,6 +34,7 @@
 #define AFMT_A52         0x0400  // A/52 (aka AC3) audio
 #define AFMT_REAL        0x0800  // Realaudio
 #define AFMT_UNKNOWN     0x1000  // Unknown file format
+#define AFMT_WAVPACK     0x2000  // WavPack
 
 #define CODEC_SET_FILEBUF_WATERMARK     1
 #define CODEC_SET_FILEBUF_CHUNKSIZE     2
