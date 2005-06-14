@@ -865,10 +865,10 @@ mpc_decoder_read_bitstream_sv7(mpc_decoder *d)
     for (n=1; n <= d->Max_Band; ++n, ++ResL, ++ResR)
     {
         idx   = mpc_decoder_huffman_decode_fast(d, d->HuffHdr);
-        *ResL = (idx!=4) ? *(ResL-1) + idx : mpc_decoder_bitstream_read(d, 4);
+        *ResL = (idx!=4) ? *(ResL-1) + idx : (int)mpc_decoder_bitstream_read(d, 4);
 
         idx   = mpc_decoder_huffman_decode_fast(d, d->HuffHdr);
-        *ResR = (idx!=4) ? *(ResR-1) + idx : mpc_decoder_bitstream_read(d, 4);
+        *ResR = (idx!=4) ? *(ResR-1) + idx : (int)mpc_decoder_bitstream_read(d, 4);
 
         if (d->MS_used && !(*ResL==0 && *ResR==0)) {
             d->MS_Flag[n] = mpc_decoder_bitstream_read(d, 1);
@@ -902,31 +902,31 @@ mpc_decoder_read_bitstream_sv7(mpc_decoder *d)
             {
             case 1:
                 idx  = mpc_decoder_huffman_decode_fast(d, d->HuffDSCF);
-                L[0] = (idx!=8) ? L[2] + idx : mpc_decoder_bitstream_read(d, 6);
+                L[0] = (idx!=8) ? L[2] + idx : (int)mpc_decoder_bitstream_read(d, 6);
                 idx  = mpc_decoder_huffman_decode_fast(d, d->HuffDSCF);
-                L[1] = (idx!=8) ? L[0] + idx : mpc_decoder_bitstream_read(d, 6);
+                L[1] = (idx!=8) ? L[0] + idx : (int)mpc_decoder_bitstream_read(d, 6);
                 L[2] = L[1];
                 break;
             case 3:
                 idx  = mpc_decoder_huffman_decode_fast(d,  d->HuffDSCF);
-                L[0] = (idx!=8) ? L[2] + idx : mpc_decoder_bitstream_read(d, 6);
+                L[0] = (idx!=8) ? L[2] + idx : (int)mpc_decoder_bitstream_read(d, 6);
                 L[1] = L[0];
                 L[2] = L[1];
                 break;
             case 2:
                 idx  = mpc_decoder_huffman_decode_fast(d,  d->HuffDSCF);
-                L[0] = (idx!=8) ? L[2] + idx : mpc_decoder_bitstream_read(d, 6);
+                L[0] = (idx!=8) ? L[2] + idx : (int)mpc_decoder_bitstream_read(d, 6);
                 L[1] = L[0];
                 idx  = mpc_decoder_huffman_decode_fast(d,  d->HuffDSCF);
-                L[2] = (idx!=8) ? L[1] + idx : mpc_decoder_bitstream_read(d, 6);
+                L[2] = (idx!=8) ? L[1] + idx : (int)mpc_decoder_bitstream_read(d, 6);
                 break;
             case 0:
                 idx  = mpc_decoder_huffman_decode_fast(d,  d->HuffDSCF);
-                L[0] = (idx!=8) ? L[2] + idx : mpc_decoder_bitstream_read(d, 6);
+                L[0] = (idx!=8) ? L[2] + idx : (int)mpc_decoder_bitstream_read(d, 6);
                 idx  = mpc_decoder_huffman_decode_fast(d,  d->HuffDSCF);
-                L[1] = (idx!=8) ? L[0] + idx : mpc_decoder_bitstream_read(d, 6);
+                L[1] = (idx!=8) ? L[0] + idx : (int)mpc_decoder_bitstream_read(d, 6);
                 idx  = mpc_decoder_huffman_decode_fast(d,  d->HuffDSCF);
-                L[2] = (idx!=8) ? L[1] + idx : mpc_decoder_bitstream_read(d, 6);
+                L[2] = (idx!=8) ? L[1] + idx : (int)mpc_decoder_bitstream_read(d, 6);
                 break;
             default:
                 return;
@@ -942,31 +942,31 @@ mpc_decoder_read_bitstream_sv7(mpc_decoder *d)
             {
             case 1:
                 idx  = mpc_decoder_huffman_decode_fast(d,  d->HuffDSCF);
-                R[0] = (idx!=8) ? R[2] + idx : mpc_decoder_bitstream_read(d, 6);
+                R[0] = (idx!=8) ? R[2] + idx : (int)mpc_decoder_bitstream_read(d, 6);
                 idx  = mpc_decoder_huffman_decode_fast(d,  d->HuffDSCF);
-                R[1] = (idx!=8) ? R[0] + idx : mpc_decoder_bitstream_read(d, 6);
+                R[1] = (idx!=8) ? R[0] + idx : (int)mpc_decoder_bitstream_read(d, 6);
                 R[2] = R[1];
                 break;
             case 3:
                 idx  = mpc_decoder_huffman_decode_fast(d,  d->HuffDSCF);
-                R[0] = (idx!=8) ? R[2] + idx : mpc_decoder_bitstream_read(d, 6);
+                R[0] = (idx!=8) ? R[2] + idx : (int)mpc_decoder_bitstream_read(d, 6);
                 R[1] = R[0];
                 R[2] = R[1];
                 break;
             case 2:
                 idx  = mpc_decoder_huffman_decode_fast(d,  d->HuffDSCF);
-                R[0] = (idx!=8) ? R[2] + idx : mpc_decoder_bitstream_read(d, 6);
+                R[0] = (idx!=8) ? R[2] + idx : (int)mpc_decoder_bitstream_read(d, 6);
                 R[1] = R[0];
                 idx  = mpc_decoder_huffman_decode_fast(d,  d->HuffDSCF);
-                R[2] = (idx!=8) ? R[1] + idx : mpc_decoder_bitstream_read(d, 6);
+                R[2] = (idx!=8) ? R[1] + idx : (int)mpc_decoder_bitstream_read(d, 6);
                 break;
             case 0:
                 idx  = mpc_decoder_huffman_decode_fast(d,  d->HuffDSCF);
-                R[0] = (idx!=8) ? R[2] + idx : mpc_decoder_bitstream_read(d, 6);
+                R[0] = (idx!=8) ? R[2] + idx : (int)mpc_decoder_bitstream_read(d, 6);
                 idx  = mpc_decoder_huffman_decode_fast(d,  d->HuffDSCF);
-                R[1] = (idx!=8) ? R[0] + idx : mpc_decoder_bitstream_read(d, 6);
+                R[1] = (idx!=8) ? R[0] + idx : (int)mpc_decoder_bitstream_read(d, 6);
                 idx  = mpc_decoder_huffman_decode_fast(d,  d->HuffDSCF);
-                R[2] = (idx!=8) ? R[1] + idx : mpc_decoder_bitstream_read(d, 6);
+                R[2] = (idx!=8) ? R[1] + idx : (int)mpc_decoder_bitstream_read(d, 6);
                 break;
             default:
                 return;
