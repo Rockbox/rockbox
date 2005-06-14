@@ -47,12 +47,12 @@ unsigned short uda1380_defaults[2*NUM_DEFAULT_REGS] =
 {
         REG_0,        EN_DAC | EN_INT | EN_DEC | SYSCLK_256FS | WSPLL_25_50,
         REG_I2S,      I2S_IFMT_IIS,
-        REG_PWR,      PON_PLL | PON_HP | PON_DAC | EN_AVC | PON_AVC | PON_BIAS,
+        REG_PWR,      PON_PLL | PON_DAC | PON_BIAS,   /* PON_HP is enabled later */
         REG_AMIX,     AMIX_RIGHT(0x10) | AMIX_LEFT(0x10), /* 00=max, 3f=mute */
         REG_MASTER_VOL, MASTER_VOL_LEFT(0x20) | MASTER_VOL_RIGHT(0x20), /* 00=max, ff=mute */
         REG_MIX_VOL,    MIX_VOL_CHANNEL_1(0) | MIX_VOL_CHANNEL_2(0xff), /* 00=max, ff=mute */
         REG_EQ,         0,
-        REG_MUTE,       MUTE_CH2, /* Mute channel 2 (digital decimation filter) */
+        REG_MUTE,       MUTE_MASTER, /* Mute everything to start with */ 
         REG_MIX_CTL,    0,
         REG_DEC_VOL,    0,
         REG_PGA,        MUTE_ADC,
@@ -134,12 +134,25 @@ int uda1380_init(void)
     if (uda1380_set_regs() == -1)
         return -1;
     
+    /* Sleep a while, then power on headphone amp */
+    sleep(HZ/8);
+    uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] | PON_HP);
+
+    /* Sleep a little more, then disable the master mute */
+    sleep(HZ/8);
+    uda1380_write_reg(REG_MUTE, MUTE_CH2);
+    
     return 0;
 }
 
 /* Nice shutdown of UDA1380 codec */
 void uda1380_close(void)
 {
-    uda1380_write_reg(REG_PWR, 0);  /* Disable power    */
+    /* First enable mute and sleep a while */
+    uda1380_write_reg(REG_MUTE, MUTE_MASTER);
+    sleep(HZ/8);
+
+    /* Then power off the rest of the chip */
+    uda1380_write_reg(REG_PWR, 0);
     uda1380_write_reg(REG_0, 0);    /* Disable codec    */
 }
