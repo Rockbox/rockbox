@@ -17,8 +17,15 @@
  *
  ****************************************************************************/
 
-#ifndef _AUDIO_H
-#define _AUDIO_H
+#ifndef _PLAYBACK_H
+#define _PLAYBACK_H
+
+#include <stdlib.h>
+#include <ctype.h>
+#include <stdbool.h>
+
+#include "id3.h"
+#include "mp3data.h"
 
 /* Supported file types. */
 #define AFMT_MPA_L1      0x0001  // MPEG Audio layer 1
@@ -44,6 +51,24 @@
 
 /* Not yet implemented. */
 #define CODEC_SET_AUDIOBUF_WATERMARK    4
+
+#define MAX_TRACK 10
+struct track_info {
+    struct mp3entry id3;     /* TAG metadata */
+    struct mp3info mp3data;  /* MP3 metadata */
+    char *codecbuf;          /* Pointer to codec buffer */
+    size_t codecsize;        /* Codec length in bytes */
+    int codectype;           /* Codec type (example AFMT_MPA_L3) */
+    
+    off_t filerem;           /* Remaining bytes of file NOT in buffer */
+    off_t filesize;          /* File total length */
+    off_t filepos;           /* Read position of file for next buffer fill */
+    off_t start_pos;         /* Position to first bytes of file in buffer */
+    volatile int available;  /* Available bytes to read from buffer */
+    bool taginfo_ready;      /* Is metadata read */
+    int playlist_offset;     /* File location in playlist */
+};
+
 
 /* Codec Interface */
 struct codec_api {

@@ -50,4 +50,5 @@ recorder/recording.c
 #endif
 #ifdef IRIVER_H100
 playback.c
+metadata.c
 #endif
