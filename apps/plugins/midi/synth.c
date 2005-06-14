@@ -270,7 +270,7 @@ inline void stopVoice(struct SynthObject * so)
 }
 
 
-inline signed short int synthVoice()
+inline signed short int synthVoice(void)
 {
     so = &voices[currentVoice];
     wf = so->wf;
@@ -387,7 +387,7 @@ inline void synthSample(int * mixL, int * mixR)
     {
         if(voices[currentVoice].isUsed==1)
         {
-            sample = synthVoice(currentVoice);
+            sample = synthVoice();
             *mixL += (sample*chPanLeft[voices[currentVoice].ch])>>7;
             *mixR += (sample*chPanRight[voices[currentVoice].ch])>>7;
         }
