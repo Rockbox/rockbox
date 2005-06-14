@@ -69,12 +69,26 @@ int probe_file_format(const char *filename)
         
 }
 
+unsigned short a52_bitrates[]={32,40,48,56,64,80,96,
+                               112,128,160,192,224,256,320,
+                               384,448,512,576,640};
+
+/* Only store frame sizes for 44.1KHz - others are simply multiples 
+   of the bitrate */
+unsigned short a52_441framesizes[]=
+      {69*2,70*2,87*2,88*2,104*2,105*2,121*2,122*2,
+       139*2,140*2,174*2,175*2,208*2,209*2,243*2,244*2,
+       278*2,279*2,348*2,349*2,417*2,418*2,487*2,488*2,
+       557*2,558*2,696*2,697*2,835*2,836*2,975*2,976*2,
+       1114*2,1115*2,1253*2,1254*2,1393*2,1394*2};
+
 /* Get metadata for track - return false if parsing showed problems with the
    file that would prevent playback. */
 
 bool get_metadata(struct track_info* track, int fd, const char* trackname,
                   bool v1first) {
   unsigned long totalsamples,bytespersample,channels,bitspersample,numbytes;
+  int bytesperframe;
   unsigned char* buf;
   int i,j,eof;
   int rc;
@@ -328,6 +342,62 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
 
       lseek (fd, 0, SEEK_SET);
       strncpy (track->id3.path, trackname, sizeof (track->id3.path));
+      track->taginfo_ready = true;
+      break;
+
+  case AFMT_A52:
+      /* Use the trackname part of the id3 structure as a temporary buffer */
+      buf=track->id3.path;
+
+      lseek(fd, 0, SEEK_SET);
+
+      /* We just need the first 5 bytes */
+      rc = read(fd, buf, 5);
+      if (rc < 5) {
+        return false;
+      }
+
+      if ((buf[0]!=0x0b) || (buf[1]!=0x77)) { 
+         logf("%s is not an A52/AC3 file\n",trackname);
+         return false;
+      }
+
+      i = buf[4]&0x3e;
+      if (i > 36) {
+        logf("A52: Invalid frmsizecod: %d\n",i);
+        return false;
+      }
+      track->id3.bitrate=a52_bitrates[i>>1];
+
+      track->id3.vbr=false;
+      track->id3.filesize = filesize (fd);
+
+      switch (buf[4]&0xc0) {
+        case 0x00: 
+          track->id3.frequency=48000; 
+          bytesperframe=track->id3.bitrate*2*2;
+          break;
+        case 0x40: 
+          track->id3.frequency=44100;
+          bytesperframe=a52_441framesizes[i];
+          break;
+        case 0x80: 
+          track->id3.frequency=32000; 
+          bytesperframe=track->id3.bitrate*3*2;
+          break;
+        default: 
+          logf("A52: Invalid samplerate code: 0x%02x\n",buf[4]&0xc0);
+          return false;
+          break;
+      }
+
+      /* One A52 frame contains 6 blocks, each containing 256 samples */
+      totalsamples=(track->filesize/bytesperframe)*6*256;
+
+      track->id3.length=(totalsamples/track->id3.frequency)*1000;
+
+      lseek(fd, 0, SEEK_SET);
+      strncpy(track->id3.path,trackname,sizeof(track->id3.path));
       track->taginfo_ready = true;
       break;
 
