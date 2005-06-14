@@ -229,6 +229,7 @@ void pcm_play_data(const unsigned char* start, int size,
 
 void pcm_play_stop(void)
 {
+    pcm_set_boost_mode(false);
     if (pcm_playing) {
         uda1380_enable_output(false);
         pcm_boost(false);
@@ -243,7 +244,6 @@ void pcm_play_stop(void)
     pcmbuf_write_index = 0;
     next_start = NULL;
     next_size = 0;
-    pcm_set_boost_mode(false);
 }
 
 void pcm_play_pause(bool play)
@@ -391,11 +391,11 @@ bool pcm_is_lowdata(void)
     return false;
 }
 
-void pcm_crossfade_start(void)
+bool pcm_crossfade_start(void)
 {
     //logf("cf:%d", audiobuffer_free / CHUNK_SIZE);
     if (audiobuffer_free > CHUNK_SIZE * 4 || !crossfade_enabled) {
-        return ;
+        return false;
     }
     pcm_boost(true);
     crossfade_active = true;
@@ -407,6 +407,7 @@ void pcm_crossfade_start(void)
     crossfade_pos -= crossfade_amount*2;
     if (crossfade_pos < 0)
         crossfade_pos = PCMBUF_SIZE + crossfade_pos;
+    return true;
 }
 
 static __inline

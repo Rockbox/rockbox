@@ -1102,7 +1102,7 @@ void audio_check_buffer(void)
     }
     
     track_count = i;
-    if (tracks[track_widx].filerem != 0)
+    if (tracks[track_widx].filesize != 0)
         track_count++;
     
     /* Mark all other entries null. */
@@ -1487,6 +1487,8 @@ void audio_next(void)
         ci.stop_codec = true;
         playlist_next(1);
         queue_post(&audio_queue, AUDIO_PLAY, 0);
+    } else if (!pcm_crossfade_start()) {
+        pcm_play_stop();
     }
 }
 
