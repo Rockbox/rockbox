@@ -86,7 +86,7 @@ const int log = 0;
 		return;
 
 #ifdef SIMULATOR
-if (log) printf("%c%02X", (effect<10)?('0'+effect):('A'+effect-10), value);
+if (log) DEBUGF("%c%02X", (effect<10)?('0'+effect):('A'+effect-10), value);
 #endif 
 
 	/* Linearisation of the effect number... */
@@ -99,7 +99,7 @@ if (log) printf("%c%02X", (effect<10)?('0'+effect):('A'+effect-10), value);
 	}
 
 #ifdef SIMULATOR
-if (log) printf(" - %2d %02X", effect, value);
+if (log) DEBUGF(" - %2d %02X", effect, value);
 #endif 
 
 #if 0 // This should be handled in itrender.c!
@@ -234,7 +234,7 @@ if (log) printf(" - %2d %02X", effect, value);
 	}
 
 #ifdef SIMULATOR
-if (log) printf(" - %2d %02X", effect, value);
+if (log) DEBUGF(" - %2d %02X", effect, value);
 #endif
  
 	/* Inverse linearisation... */
@@ -244,7 +244,7 @@ if (log) printf(" - %2d %02X", effect, value);
 	}
 
 #ifdef SIMULATOR
-if (log) printf(" - %c%02X\n", 'A'+effect-1, value);
+if (log) DEBUGF(" - %c%02X\n", 'A'+effect-1, value);
 #endif
  
 	entry->effect = effect;
