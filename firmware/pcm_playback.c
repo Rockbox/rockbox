@@ -382,7 +382,7 @@ unsigned int audiobuffer_get_latency(void)
 
 bool pcm_is_lowdata(void)
 {
-    if (!pcm_is_playing())
+    if (!pcm_is_playing() || pcm_paused)
         return false;
     
     if (pcmbuf_unplayed_bytes < PCM_WATERMARK)

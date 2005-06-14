@@ -29,6 +29,7 @@
 #include "file.h"
 #include "kernel.h"
 #include "sprintf.h"
+#include "logf.h"
 #include "screens.h"
 #include "misc.h"
 #include "mas.h"
@@ -374,15 +375,18 @@ int codec_load_file(const char *plugin, void *parameter)
     fd = open(plugin, O_RDONLY);
     if (fd < 0) {
         snprintf(msgbuf, sizeof(msgbuf)-1, "Couldn't load codec: %s", plugin);
+        logf("Codec load error:%d", fd);
         splash(HZ*2, true, msgbuf);
         return fd;
     }
     
     rc = read(fd, &pluginbuf[0], PLUGIN_BUFFER_SIZE);
-    if (rc <= 0)
-        return PLUGIN_ERROR;
-    plugin_size = rc;
     close(fd);
+    if (rc <= 0) {
+        logf("Codec read error");
+        return PLUGIN_ERROR;
+    }
+    plugin_size = rc;
         
     return codec_load_ram(pluginbuf, plugin_size, parameter, NULL, 0);
 }

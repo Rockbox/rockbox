@@ -463,8 +463,6 @@ void audio_fill_file_buffer(void)
             
         if (!queue_empty(&audio_queue)) {
             logf("Filling interrupted");
-            //close(current_fd);
-            //current_fd = -1;
             return ;
         }
         
@@ -1002,6 +1000,11 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         
     tracks[track_widx].filepos = i;
     
+    if (current_fd >= 0) {
+        close(current_fd);
+        current_fd = -1;
+    }
+    
     /* Leave the file handle open for faster buffer refill. */
     if (tracks[track_widx].filerem != 0) {
         current_fd = fd;
@@ -1010,7 +1013,6 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     } else {
         logf("Completely buf.");
         close(fd);
-        current_fd = -1;
         if (++track_widx >= MAX_TRACK) {
             track_widx = 0;
         }
@@ -1485,10 +1487,6 @@ void audio_next(void)
         ci.stop_codec = true;
         playlist_next(1);
         queue_post(&audio_queue, AUDIO_PLAY, 0);
-    } else {
-#ifndef SIMULATOR
-    pcm_play_stop();
-#endif
     }
 }
 

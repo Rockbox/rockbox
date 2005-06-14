@@ -31,7 +31,7 @@ int i2c_write(int device, unsigned char *buf, int count);
 void i2c_close(void);
 
 
-#define MAX_LOOP    0x10000     /* TODO: select a better value */
+#define MAX_LOOP    0x100     /* TODO: select a better value */
 
 /* PLLCR control */
 #define QSPISEL (1 << 11)		/* Selects QSPI or I2C interface */
