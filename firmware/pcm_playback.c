@@ -116,8 +116,6 @@ void pcm_boost(bool state)
 static void dma_stop(void)
 {
     pcm_playing = false;
-    uda1380_enable_output(false);
-    pcm_boost(false);
 
     /* Reset the FIFO */
     IIS2CONFIG = 0x800;
@@ -225,14 +223,17 @@ void pcm_play_data(const unsigned char* start, int size,
     get_more(&next_start, &next_size);
     
     /* Sleep a while, then power on audio output */
-   sleep(HZ/16);
-   uda1380_enable_output(true);
+    sleep(HZ/16);
+    uda1380_enable_output(true);
 }
 
 void pcm_play_stop(void)
 {
-    if (pcm_playing)
+    if (pcm_playing) {
+        uda1380_enable_output(false);
+        pcm_boost(false);
         dma_stop();
+    }
     pcmbuf_unplayed_bytes = 0;
     last_chunksize = 0;
     audiobuffer_pos = 0;
@@ -245,11 +246,8 @@ void pcm_play_stop(void)
     pcm_set_boost_mode(false);
 }
 
-/* Pausing will cause irregular crashes. Should be fixed. */
 void pcm_play_pause(bool play)
 {
-    return ;
-    
     if(pcm_paused && play && pcmbuf_unplayed_bytes)
     {
         /* Enable the FIFO and force one write to it */
