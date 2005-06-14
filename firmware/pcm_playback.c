@@ -116,10 +116,11 @@ void pcm_boost(bool state)
 static void dma_stop(void)
 {
     pcm_playing = false;
+    uda1380_enable_output(false);
+    pcm_boost(false);
 
     /* Reset the FIFO */
     IIS2CONFIG = 0x800;
-    pcm_boost(false);
 }
 
 /* set volume of the main channel */
@@ -222,17 +223,23 @@ void pcm_play_data(const unsigned char* start, int size,
     dma_start(start, size);
     
     get_more(&next_start, &next_size);
+    
+    /* Sleep a while, then power on audio output */
+   sleep(HZ/16);
+   uda1380_enable_output(true);
 }
 
 void pcm_play_stop(void)
 {
-    dma_stop();
+    if (pcm_playing)
+        dma_stop();
+    pcmbuf_unplayed_bytes = 0;
+    last_chunksize = 0;
     audiobuffer_pos = 0;
     audiobuffer_fillpos = 0;
     audiobuffer_free = PCMBUF_SIZE;
     pcmbuf_read_index = 0;
     pcmbuf_write_index = 0;
-    pcmbuf_unplayed_bytes = 0;
     next_start = NULL;
     next_size = 0;
     pcm_set_boost_mode(false);
@@ -431,7 +438,7 @@ bool audiobuffer_insert(char *buf, size_t length)
     if (!pcm_is_playing() && !pcm_paused) {
         pcm_boost(true);
         crossfade_active = false;
-        if (audiobuffer_free < PCMBUF_SIZE - CHUNK_SIZE*2)
+        if (audiobuffer_free < PCMBUF_SIZE - CHUNK_SIZE*4)
             pcm_play_start();
     }
 
@@ -497,14 +504,6 @@ void pcm_play_init(void)
     pcmbuf_unplayed_bytes = 0;
     crossfade_enabled = false;
     pcm_play_set_watermark(PCM_WATERMARK, pcm_watermark_callback);
-    
-    /* Play a small chunk of zeroes to initialize the playback system. */
-    audiobuffer_pos = 32000;
-    audiobuffer_free -= audiobuffer_pos;
-    memset(&audiobuffer[0], 0, audiobuffer_pos);
-    pcm_play_add_chunk(&audiobuffer[0], audiobuffer_pos, NULL);
-    pcm_play_start();
-
 }
 
 void pcm_crossfade_enable(bool on_off)

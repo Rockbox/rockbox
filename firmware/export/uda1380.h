@@ -27,6 +27,7 @@
 #define _UDA1380_H
 
 extern int uda1380_init(void);
+extern void uda1380_enable_output(bool enable);
 extern int uda1380_setvol(int vol);
 extern int uda1380_mute(int mute);
 extern void uda1380_close(void);

@@ -128,19 +128,26 @@ int uda1380_set_regs(void)
     return 0;
 }
 
+/* Silently enable / disable audio output */
+void uda1380_enable_output(bool enable)
+{
+    if (enable) {
+        uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] | PON_HP);
+        
+        /* Sleep a while, then disable the master mute */
+        sleep(HZ/8);
+        uda1380_write_reg(REG_MUTE, MUTE_CH2);
+    } else {
+        uda1380_write_reg(REG_MUTE, MUTE_MASTER);
+        uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] & ~PON_HP);
+    }
+}
+
 /* Initialize UDA1380 codec with default register values (uda1380_defaults) */
 int uda1380_init(void)
 {
     if (uda1380_set_regs() == -1)
         return -1;
-    
-    /* Sleep a while, then power on headphone amp */
-    sleep(HZ/8);
-    uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] | PON_HP);
-
-    /* Sleep a little more, then disable the master mute */
-    sleep(HZ/8);
-    uda1380_write_reg(REG_MUTE, MUTE_CH2);
     
     return 0;
 }
