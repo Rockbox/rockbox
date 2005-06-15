@@ -45,9 +45,11 @@
 #define ONDIO_PAD       2
 #define IRIVER_H100_PAD 3
 #define GMINI100_PAD    4
+#define IRIVER_H300_PAD 3
 
 /* CONFIG_REMOTE_KEYPAD */
-#define H100_REMOTE 0 
+#define H100_REMOTE 0
+#define H300_REMOTE 1
 
 /* CONFIG_BATTERY */
 #define BATT_LIION2200  2200 /* FM/V2 recorder type */
@@ -60,6 +62,8 @@
 #define LCD_SSD1815  1 /* as used by Archos Recorders and Ondios */
 #define LCD_SSD1801  2 /* as used by Archos Player/Studio */
 #define LCD_S1D15E06 3 /* as used by iRiver H100 series */
+#define LCD_H300     4 /* as used by iRiver H300 series, exact model name is
+                          unknown at the time of this writing */
 
 /* CONFIG_BACKLIGHT */
 #define BL_PA14_LO  0 /* Player, PA14 low active */
@@ -94,6 +98,8 @@
 #include "config-ondiofm.h"
 #elif defined(IRIVER_H100)
 #include "config-h100.h"
+#elif defined(IRIVER_H300)
+#include "config-h300.h"
 #elif defined(ARCHOS_GMINI120)
 #include "config-gmini120.h"
 #elif defined(ARCHOS_GMINISP)
