@@ -380,7 +380,8 @@ appsdir='\$(ROOTDIR)/apps'
   echo "6 - Archos Gmini SP"
   echo "7 - Archos Ondio SP"
   echo "8 - Archos Ondio FM"
-  echo "9 - Iriver H100"
+  echo "9 - iRiver H120/H140"
+  echo "10 - iRiver H320/H340"
 
   getit=`input`;
 
@@ -393,6 +394,19 @@ appsdir='\$(ROOTDIR)/apps'
     tool="$rootdir/tools/scramble"
     output="archos.mod"
     appextra="player"
+    archosrom="$pwd/rombox.ucl"
+    flash="$pwd/rockbox.ucl"
+    plugins="yes"
+    codecs=""
+    ;;
+
+   2)
+    archos="recorder"
+    target="-DARCHOS_RECORDER"
+    shcc
+    tool="$rootdir/tools/scramble"
+    output="ajbrec.ajz"
+    appextra="recorder"
     archosrom="$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
@@ -493,17 +507,18 @@ appsdir='\$(ROOTDIR)/apps'
     codecs="libmad liba52 libFLAC libTremor libwavpack dumb libmusepack"
     ;;
 
-   2)
-    archos="recorder"
-    target="-DARCHOS_RECORDER"
-    shcc
-    tool="$rootdir/tools/scramble"
-    output="ajbrec.ajz"
+   10)
+    archos="h300"
+    target="-DIRIVER_H300"
+    memory=32 # always
+    coldfirecc
+    tool="$rootdir/tools/scramble -add=h120"
+    output="rockbox.iriver"
     appextra="recorder"
-    archosrom="$pwd/rombox.ucl"
-    flash="$pwd/rockbox.ucl"
+    archosrom=""
+    flash=""
     plugins="yes"
-    codecs=""
+    codecs="libmad liba52 libFLAC libTremor libwavpack dumb libmusepack"
     ;;
 
    *)
