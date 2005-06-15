@@ -171,6 +171,10 @@ bool audiobuffer_insert(char *buf, size_t length)
     return true;
 }
 
+void audiobuffer_add_event(void (*event_handler)(void))
+{
+}
+
 unsigned int audiobuffer_get_latency()
 {
     return 0;
@@ -416,6 +420,11 @@ void codec_configure_callback(int setting, void *value)
     }
 }
 
+void codec_track_changed(void)
+{
+    track_changed = true;
+}
+
 void yield_codecs(void)
 {
     yield();
@@ -603,6 +612,8 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         
     trackname = playlist_peek(peek_offset);
     if (!trackname) {
+        logf("End-of-playlist");
+        conf_watermark = 0;
         return false;
     }
     
@@ -668,7 +679,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     
     if (start_play) {
         track_count++;
-        track_changed = true;
+        audiobuffer_add_event(codec_track_changed);
     }
         
     i = tracks[track_widx].start_pos;
@@ -872,13 +883,15 @@ void audio_update_trackinfo(void)
     ci.mp3data = (struct mp3info *)&cur_ti->mp3data;
     ci.curpos = 0;
     ci.taginfo_ready = (bool *)&cur_ti->taginfo_ready;
-    track_changed = true;
+    audiobuffer_add_event(codec_track_changed);
 }
 
 void audio_change_track(void)
 {
     if (track_ridx == track_widx) {
         logf("No more tracks");
+        while (pcm_is_playing())
+            yield();
         playing = false;
         return ;
     }

@@ -43,6 +43,7 @@ void pcm_play_set_watermark(int numbytes, void (*callback)(int bytes_left));
 void pcm_set_boost_mode(bool state);
 bool pcm_is_lowdata(void);
 bool pcm_crossfade_start(void);
+void audiobuffer_add_event(void (*event_handler)(void));
 unsigned int audiobuffer_get_latency(void);
 bool audiobuffer_insert(char *buf, size_t length);
 bool pcm_is_crossfade_enabled(void);

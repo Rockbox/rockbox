@@ -62,6 +62,8 @@ static int crossfade_pos;
 static int crossfade_amount;
 static int crossfade_rem;
 
+static void (*pcm_event_handler)(void);
+
 static unsigned char *next_start;
 static long next_size;
 
@@ -202,6 +204,8 @@ static void pcm_play_callback(unsigned char** start, long* size)
     {
         /* No more buffers */
         *size = 0;
+        if (pcm_event_handler)
+            pcm_event_handler();
     }
 #if 1
     if(pcmbuf_unplayed_bytes <= pcmbuf_watermark)
@@ -363,8 +367,7 @@ void pcm_set_boost_mode(bool state)
 
 void audiobuffer_add_event(void (*event_handler)(void))
 {
-    while (!pcm_play_add_chunk(NULL, 0, event_handler))
-        yield();
+    pcm_event_handler = event_handler;
 }
 
 unsigned int audiobuffer_get_latency(void)
@@ -474,10 +477,11 @@ bool audiobuffer_insert(char *buf, size_t length)
         copy_n += audiobuffer_fillpos;
         
         while (!pcm_play_add_chunk(&audiobuffer[audiobuffer_pos], 
-                                   copy_n, NULL)) {
+                                   copy_n, pcm_event_handler)) {
             pcm_boost(false);
             yield();
         }
+        pcm_event_handler = NULL;
         
         audiobuffer_pos += copy_n;
         audiobuffer_fillpos = 0;
@@ -502,6 +506,7 @@ void pcm_play_init(void)
     pcmbuf_write_index = 0;
     pcmbuf_unplayed_bytes = 0;
     crossfade_enabled = false;
+    pcm_event_handler = NULL;
     pcm_play_set_watermark(PCM_WATERMARK, pcm_watermark_callback);
 }
 
