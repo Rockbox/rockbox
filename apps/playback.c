@@ -1405,6 +1405,9 @@ void audio_init(void)
                   codec_thread_name);
     create_thread(audio_thread, audio_stack, sizeof(audio_stack),
                   audio_thread_name);
+#ifndef SIMULATOR
+    audio_is_initialized = true;
+#endif
 }
 
 
