@@ -173,6 +173,7 @@ bool audiobuffer_insert(char *buf, size_t length)
 
 void audiobuffer_add_event(void (*event_handler)(void))
 {
+    (void)event_handler;
 }
 
 unsigned int audiobuffer_get_latency()

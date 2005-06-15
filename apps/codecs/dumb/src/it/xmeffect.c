@@ -25,6 +25,9 @@
 #include "dumb.h"
 #include "internal/it.h"
 
+#ifdef SIMULATOR
+#include "debug.h"
+#endif
 
 
 #if 0
