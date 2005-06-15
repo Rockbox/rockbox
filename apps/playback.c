@@ -161,13 +161,58 @@ static bool v1first = false;
 static void mp3_set_elapsed(struct mp3entry* id3);
 int mp3_get_file_pos(void);
 
+/* Simulator stubs. */
 #ifdef SIMULATOR
-bool audiobuffer_insert_sim(char *buf, size_t length)
+bool audiobuffer_insert(char *buf, size_t length)
 {
     (void)buf;
     (void)length;
     
     return true;
+}
+
+unsigned int audiobuffer_get_latency()
+{
+    return 0;
+}
+
+void pcm_play_stop(void)
+{
+}
+
+bool pcm_is_playing(void)
+{
+    return false;
+}
+
+bool pcm_is_lowdata(void)
+{
+    return false;
+}
+
+bool pcm_crossfade_start(void)
+{
+    return false;
+}
+
+void pcm_set_boost_mode(bool state)
+{
+    (void)state;
+}
+
+bool pcm_is_crossfade_enabled(void)
+{
+    return false;
+}
+
+void pcm_play_pause(bool state)
+{
+    (void)state;
+}
+
+int ata_sleep(void)
+{
+    return 0;
 }
 #endif
 
@@ -181,11 +226,8 @@ void codec_set_elapsed_callback(unsigned int value)
 {
     unsigned int latency;
 
-#ifndef SIMULATOR
     latency = audiobuffer_get_latency();
-#else
-    latency = 0;
-#endif
+    
     if (value < latency) {
         cur_ti->id3.elapsed = 0;
     } else if (value - latency > cur_ti->id3.elapsed 
@@ -328,9 +370,7 @@ bool codec_seek_buffer_callback(off_t newpos)
     if (difference >= 0) {
         logf("seek: +%d", difference);
         codec_advance_buffer_callback(difference);
-#ifndef SIMULATOR
         pcm_play_stop();
-#endif
         return true;
     }
     
@@ -351,9 +391,7 @@ bool codec_seek_buffer_callback(off_t newpos)
     if (buf_ridx < 0)
         buf_ridx = codecbuflen + buf_ridx;
     ci.curpos -= difference;
-#ifndef SIMULATOR
     pcm_play_stop();
-#endif
     
     return true;
 }
@@ -381,13 +419,11 @@ void codec_configure_callback(int setting, void *value)
 void yield_codecs(void)
 {
     yield();
-#ifndef SIMULATOR
     if (!pcm_is_playing())
         sleep(5);
     while (pcm_is_lowdata() && !ci.stop_codec && 
            playing && queue_empty(&audio_queue))
         yield();
-#endif
 }
 
 void audio_fill_file_buffer(void)
@@ -723,14 +759,10 @@ void audio_play_start(int offset)
     buf_ridx = 0;
     buf_widx = 0;
     codecbufused = 0;
-#ifndef SIMULATOR
     pcm_set_boost_mode(true);
-#endif
     audio_insert_tracks(offset, true, 0);
-#ifndef SIMULATOR
     pcm_set_boost_mode(false);
     ata_sleep();
-#endif
 }
 
 void audio_clear_track_entries(void)
@@ -752,11 +784,9 @@ void audio_check_buffer(void)
     int cur_idx;
     
     /* Fill buffer as full as possible for cross-fader. */
-#ifndef SIMULATOR
     if (pcm_is_crossfade_enabled() && cur_ti->id3.length > 0
         && cur_ti->id3.length - cur_ti->id3.elapsed < 20000 && playing)
         pcm_set_boost_mode(true);
-#endif
     
     /* Start buffer filling as necessary. */
     if (codecbufused > conf_watermark || !queue_empty(&audio_queue) 
@@ -764,9 +794,7 @@ void audio_check_buffer(void)
         return ;
     
     filling = true;
-#ifndef SIMULATOR
     pcm_set_boost_mode(true);
-#endif
     
     fill_bytesleft = codecbuflen - codecbufused;
     
@@ -803,11 +831,9 @@ void audio_check_buffer(void)
     if (tracks[track_widx].filerem == 0)
         audio_insert_tracks(0, false, 1);
 
-#ifndef SIMULATOR    
     pcm_set_boost_mode(false);
     if (playing)
         ata_sleep();
-#endif
     filling = false;
 }
 
@@ -822,11 +848,10 @@ void audio_update_trackinfo(void)
         codecbufused -= cur_ti->codecsize;
         if (buf_ridx >= codecbuflen)
             buf_ridx -= codecbuflen;
-#ifndef SIMULATOR        
+            
         pcm_crossfade_start();
         if (!filling)
             pcm_set_boost_mode(false);
-#endif
     } else {
         buf_ridx -= ci.curpos + cur_ti->codecsize;
         codecbufused += ci.curpos + cur_ti->codecsize;
@@ -959,18 +984,14 @@ void audio_thread(void)
                 ci.stop_codec = true;
                 ci.reload_codec = false;
                 ci.seek_time = 0;
-#ifndef SIMULATOR
                 pcm_play_stop();
-#endif
                 audio_play_start((int)ev.data);
                 break ;
                 
             case AUDIO_STOP:
                 paused = false;
-#ifndef SIMULATOR
                 pcm_play_stop();
                 pcm_play_pause(true);
-#endif
                 break ;
                 
             case AUDIO_PAUSE:
@@ -1111,9 +1132,7 @@ void audio_play(int offset)
 {
     logf("audio_play");
     ci.stop_codec = true;
-#ifndef SIMULATOR
     pcm_play_pause(true);
-#endif
     paused = false;
     playing = true;
     queue_post(&audio_queue, AUDIO_PLAY, (void *)offset);
@@ -1130,17 +1149,13 @@ void audio_stop(void)
         current_fd = -1;
     }
     queue_post(&audio_queue, AUDIO_STOP, 0);
-#ifndef SIMULATOR
     pcm_play_pause(true);
-#endif
 }
 
 void audio_pause(void)
 {
     logf("audio_pause");
-#ifndef SIMULATOR
     pcm_play_pause(false);
-#endif
     paused = true;
     //queue_post(&audio_queue, AUDIO_PAUSE, 0);
 }
@@ -1148,9 +1163,7 @@ void audio_pause(void)
 void audio_resume(void)
 {
     logf("audio_resume");
-#ifndef SIMULATOR
     pcm_play_pause(true);
-#endif
     paused = false;
     //queue_post(&audio_queue, AUDIO_RESUME, 0);
 }
@@ -1167,11 +1180,10 @@ void audio_next(void)
         playlist_next(1);
         queue_post(&audio_queue, AUDIO_PLAY, 0);
     } 
-#ifndef SIMULATOR    
+    
     else if (!pcm_crossfade_start()) {
         pcm_play_stop();
     }
-#endif
 }
 
 void audio_prev(void)
@@ -1179,9 +1191,7 @@ void audio_prev(void)
     logf("audio_prev");
     new_track = -1;
     ci.reload_codec = true;
-#ifndef SIMULATOR
     pcm_play_stop();
-#endif
         
     if (filling) {
         ci.stop_codec = true;
@@ -1377,11 +1387,7 @@ void audio_init(void)
     
     /* Initialize codec api. */    
     ci.read_filebuf = codec_filebuf_callback;
-#ifndef SIMULATOR
     ci.audiobuffer_insert = audiobuffer_insert;
-#else
-    ci.audiobuffer_insert = audiobuffer_insert_sim;
-#endif
     ci.get_codec_memory = get_codec_memory_callback;
     ci.request_buffer = codec_request_buffer_callback;
     ci.advance_buffer = codec_advance_buffer_callback;
@@ -1399,9 +1405,6 @@ void audio_init(void)
                   codec_thread_name);
     create_thread(audio_thread, audio_stack, sizeof(audio_stack),
                   audio_thread_name);
-#ifndef SIMULATOR
-    audio_is_initialized = true;
-#endif
 }
 
 
