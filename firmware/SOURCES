@@ -45,8 +45,9 @@ drivers/lcd-player-charset.c
 drivers/lcd-player.c
 #endif
 #ifdef HAVE_LCD_BITMAP
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
+#if CONFIG_LCD == LCD_S1D15E06
 drivers/lcd-h100.c
+#elif CONFIG_LCD == LCD_H300
 #else
 drivers/lcd-recorder.c
 #endif
