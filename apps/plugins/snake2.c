@@ -33,7 +33,7 @@ Head and Tail are stored
 #define WIDTH  28
 #define HEIGHT 16
 
-#ifdef IRIVER_H100
+#if LCD_WIDTH >= 160 && LCD_HEIGHT >= 128
     #define MULTIPLIER 5 /*Modifier for porting on other screens*/
     #define MODIFIER_1 5
     #define MODIFIER_2 3
@@ -616,7 +616,7 @@ void draw_apple( void )
 {
     int x,y;
 
-#ifdef IRIVER_H100
+#if LCD_WIDTH >= 160 && LCD_HEIGHT >= 128
     char pscore[5], counter[4];
 
     rb->lcd_bitmap(snakebmp,0,0,BMPWIDTH_snakebmp,BMPHEIGHT_snakebmp,false);
@@ -1287,7 +1287,7 @@ void game_init(void)
         rb->lcd_clear_display();
         redraw();
 
-#ifdef IRIVER_H100
+#if LCD_WIDTH >= 160 && LCD_HEIGHT >= 128
 
         rb->lcd_bitmap(snakebmp,0,0,BMPWIDTH_snakebmp,BMPWIDTH_snakebmp,false);
         
