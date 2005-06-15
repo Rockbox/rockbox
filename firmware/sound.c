@@ -23,6 +23,9 @@
 #ifndef SIMULATOR
 #include "i2c.h"
 #include "mas.h"
+#ifdef HAVE_UDA1380
+#include "uda1380.h"
+#endif
 #include "dac.h"
 #include "system.h"
 #include "hwcompat.h"
@@ -85,6 +88,10 @@ static const int numdecimals[] =
 static const int steps[] =
 {
     1,    /* Volume */
+#ifdef HAVE_UDA1380
+    2,    /* Bass */
+    2,    /* Treble */
+#endif
     1,    /* Bass */
     1,    /* Treble */
     1,    /* Balance */
@@ -109,6 +116,9 @@ static const int minval[] =
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     -12,  /* Bass */
     -12,  /* Treble */
+#elif defined(HAVE_UDA1380)
+    0,    /* Bass */
+    0,    /* Treble */
 #else
     -15,  /* Bass */
     -15,  /* Treble */
@@ -135,6 +145,9 @@ static const int maxval[] =
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     12,   /* Bass */
     12,   /* Treble */
+#elif defined(HAVE_UDA1380)
+    24,   /* Bass */
+    6,    /* Treble */
 #else
     15,   /* Bass */
     15,   /* Treble */
