@@ -29,6 +29,8 @@
 
 #define CONFIG_I2C I2C_H100
 
+#define HAVE_UDA1380
+
 /* Type of mobile power */
 #define CONFIG_BATTERY BATT_LIPOL1300
 
