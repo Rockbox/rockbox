@@ -91,9 +91,10 @@ static const int steps[] =
 #ifdef HAVE_UDA1380
     2,    /* Bass */
     2,    /* Treble */
-#endif
+#else
     1,    /* Bass */
     1,    /* Treble */
+#endif
     1,    /* Balance */
     1,    /* Loudness */
     1,    /* AVC */
@@ -174,6 +175,9 @@ static const int defaultval[] =
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     6,    /* Bass */
     6,    /* Treble */
+#elif defined(HAVE_UDA1380)
+    0,    /* Bass */
+    0,    /* Treble */
 #else
     7,    /* Bass */
     7,    /* Treble */
