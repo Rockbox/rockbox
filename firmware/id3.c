@@ -673,8 +673,8 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                 
                 unicode_munge( ptag, &bytesread );
                 tag = *ptag; 
-                tag[bytesread + 1] = 0;
-                bufferpos += bytesread + 2;
+                tag[bytesread++] = 0;
+                bufferpos += bytesread;
                 if( tr->ppFunc )
                     bufferpos = tr->ppFunc(entry, tag, bufferpos);
                 break;
