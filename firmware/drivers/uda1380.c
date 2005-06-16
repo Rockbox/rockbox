@@ -96,8 +96,8 @@ int uda1380_setvol(int vol)
 
     uda1380_volume = vol;
     /* Simple linear volume crossfade curves */
-    vol_l = MAX(uda1380_balance*0xff/100, 0);
-    vol_r = MAX(-uda1380_balance*0xff/100, 0);
+    vol_l = MAX(uda1380_balance*(255 - vol)/100 + vol, vol);
+    vol_r = MAX(-uda1380_balance*(255 - vol)/100 + vol, vol);
     return uda1380_write_reg(REG_MASTER_VOL,
                              MASTER_VOL_LEFT(vol_l) | MASTER_VOL_RIGHT(vol_r));
 }
