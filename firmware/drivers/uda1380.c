@@ -39,26 +39,27 @@
 int uda1380_write_reg(unsigned char reg, unsigned short value);
 unsigned short uda1380_regs[0x30];
 
-/* Definition of a good (?) configuration to start with */
-/* Not enabling ADC for now.. */
+/* Definition of a playback configuration to start with */
 
 #define NUM_DEFAULT_REGS 13
-unsigned short uda1380_defaults[2*NUM_DEFAULT_REGS] = 
+unsigned short uda1380_defaults[2*NUM_DEFAULT_REGS] =
 {
-        REG_0,        EN_DAC | EN_INT | EN_DEC | SYSCLK_256FS | WSPLL_25_50,
-        REG_I2S,      I2S_IFMT_IIS,
-        REG_PWR,      PON_PLL | PON_DAC | PON_BIAS,   /* PON_HP is enabled later */
-        REG_AMIX,     AMIX_RIGHT(0x10) | AMIX_LEFT(0x10), /* 00=max, 3f=mute */
-        REG_MASTER_VOL, MASTER_VOL_LEFT(0x20) | MASTER_VOL_RIGHT(0x20), /* 00=max, ff=mute */
-        REG_MIX_VOL,    MIX_VOL_CHANNEL_1(0) | MIX_VOL_CHANNEL_2(0xff), /* 00=max, ff=mute */
-        REG_EQ,         0,
-        REG_MUTE,       MUTE_MASTER, /* Mute everything to start with */ 
-        REG_MIX_CTL,    0,
-        REG_DEC_VOL,    0,
-        REG_PGA,        MUTE_ADC,
-        REG_ADC,        SKIP_DCFIL,
-        REG_AGC,        0
+   REG_0,          EN_DAC | EN_INT | EN_DEC | SYSCLK_256FS | WSPLL_25_50,
+   REG_I2S,        I2S_IFMT_IIS,
+   REG_PWR,        PON_PLL | PON_DAC | PON_BIAS,                   /* PON_HP is enabled later */
+   REG_AMIX,       AMIX_RIGHT(0x3f) | AMIX_LEFT(0x3f),             /* 00=max, 3f=mute */
+   REG_MASTER_VOL, MASTER_VOL_LEFT(0x20) | MASTER_VOL_RIGHT(0x20), /* 00=max, ff=mute */
+   REG_MIX_VOL,    MIX_VOL_CH_1(0) | MIX_VOL_CH_2(0xff),           /* 00=max, ff=mute */
+   REG_EQ,         EQ_MODE_MAX,                                    /* Bass and tremble = 0 dB */
+   REG_MUTE,       MUTE_MASTER,                                    /* Mute everything to start with */ 
+   REG_MIX_CTL,    0,
+   REG_DEC_VOL,    0,
+   REG_PGA,        MUTE_ADC,
+   REG_ADC,        SKIP_DCFIL,
+   REG_AGC,        0
 };
+
+  
 
 /* Returns 0 if register was written or -1 if write failed */
 int uda1380_write_reg(unsigned char reg, unsigned short value)
@@ -91,6 +92,22 @@ int uda1380_setvol(int vol)
 {
     return uda1380_write_reg(REG_MASTER_VOL,
                              MASTER_VOL_LEFT(vol) | MASTER_VOL_RIGHT(vol));
+}
+
+/** 
+ * Sets the bass value (0-15)
+ */
+void uda1380_set_bass(int value)
+{
+    uda1380_write_reg(REG_EQ, (uda1380_regs[REG_EQ] & ~BASS_MASK) | BASSL(value) | BASSR(value));
+}
+
+/**
+ * Sets the treble value (0-3)
+ */
+void uda1380_set_treble(int value)
+{
+    uda1380_write_reg(REG_EQ, (uda1380_regs[REG_EQ] & ~TREBLE_MASK) | TREBLEL(value) | TREBLER(value));
 }
 
 /**
@@ -162,4 +179,82 @@ void uda1380_close(void)
     /* Then power off the rest of the chip */
     uda1380_write_reg(REG_PWR, 0);
     uda1380_write_reg(REG_0, 0);    /* Disable codec    */
+}
+
+/**
+ * Calling this function enables the UDA1380 to send
+ * sound samples over the I2S bus, which is connected
+ * to the processor's IIS1 interface. 
+ *
+ * source_mic: true=record from microphone, false=record from line-in
+ */
+void uda1380_enable_recording(bool source_mic)
+{
+   uda1380_write_reg(REG_0, uda1380_regs[REG_0] | EN_ADC);
+
+    if (source_mic)
+    {
+        uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] | PON_LNA | PON_ADCL);
+        uda1380_write_reg(REG_ADC, (uda1380_regs[REG_ADC] & VGA_GAIN_MASK) | SEL_LNA | SEL_MIC | EN_DCFIL);   /* VGA_GAIN: 0=0 dB, F=30dB */
+        uda1380_write_reg(REG_PGA, 0);
+    } else
+    {
+        uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] | PON_PGAL | PON_ADCL | PON_PGAR | PON_ADCR);
+        uda1380_write_reg(REG_ADC, EN_DCFIL);
+        uda1380_write_reg(REG_PGA, (uda1380_regs[REG_PGA] & PGA_GAIN_MASK) | PGA_GAINL(0) | PGA_GAINR(0)); /* PGA_GAIN: 0=0 dB, F=24dB */
+    }
+
+    uda1380_write_reg(REG_I2S,     uda1380_regs[REG_I2S] | I2S_MODE_MASTER);
+    uda1380_write_reg(REG_MIX_CTL, MIX_MODE(3));   /* Not sure which mode is the best one.. */
+
+}
+
+/** 
+ * Stop sending samples on the I2S bus 
+ */
+void uda1380_disable_recording(void)
+{
+    uda1380_write_reg(REG_PGA, MUTE_ADC);
+    sleep(HZ/8);
+    
+    uda1380_write_reg(REG_I2S, I2S_IFMT_IIS);
+    uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] & ~(PON_LNA | PON_ADCL | PON_ADCR | PON_PGAL | PON_PGAR));
+    uda1380_write_reg(REG_0,   uda1380_regs[REG_0] & ~EN_ADC);
+    uda1380_write_reg(REG_ADC, SKIP_DCFIL);
+}
+
+/**
+ * Set recording gain and volume
+ * 
+ * mic_gain    : range    0 .. 15 ->   0 .. 30 dB gain
+ * linein_gain : range    0 .. 15 ->   0 .. 24 dB gain
+ * 
+ * adc_volume  : range -127 .. 48 -> -63 .. 24 dB gain
+ *   note that 0 -> 0 dB gain..
+ */
+void uda1380_set_recvol(int mic_gain, int linein_gain, int adc_volume)
+{
+    uda1380_write_reg(REG_DEC_VOL, DEC_VOLL(adc_volume) | DEC_VOLR(adc_volume));
+    uda1380_write_reg(REG_PGA, (uda1380_regs[REG_PGA] & ~PGA_GAIN_MASK) | PGA_GAINL(linein_gain) | PGA_GAINR(linein_gain));
+    uda1380_write_reg(REG_ADC, (uda1380_regs[REG_ADC] & ~VGA_GAIN_MASK) | VGA_GAIN(mic_gain));
+}
+
+
+/** 
+ * Enable or disable recording monitor (so one can listen to the recording)
+ * 
+ */
+void uda1380_set_monitor(int enable)
+{
+    if (enable)
+    {
+        /* enable channel 2 */
+        uda1380_write_reg(REG_MIX_VOL, (uda1380_regs[REG_MIX_VOL] & 0x00FF) | MIX_VOL_CH_2(0));
+        uda1380_write_reg(REG_MUTE, 0);
+    } else
+    {
+        /* mute channel 2 */
+        uda1380_write_reg(REG_MUTE, MUTE_CH2);
+        uda1380_write_reg(REG_MIX_VOL, (uda1380_regs[REG_MIX_VOL] & 0x00FF) | MIX_VOL_CH_2(0xff));
+    }
 }

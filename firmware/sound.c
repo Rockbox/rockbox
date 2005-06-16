@@ -498,6 +498,8 @@ void sound_set(int setting, int value)
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
             tmp = ((value * 8) & 0xff) << 8;
             mas_codec_writereg(0x14, tmp & 0xff00);
+#elif defined(HAVE_UDA1380)
+            uda1380_set_bass(value >> 1);
 #elif CONFIG_HWCODEC == MAS3507D
             mas_writereg(MAS_REG_KBASS, bass_table[value+15]);
             current_bass = value * 10;
@@ -509,6 +511,8 @@ void sound_set(int setting, int value)
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
             tmp = ((value * 8) & 0xff) << 8;
             mas_codec_writereg(0x15, tmp & 0xff00);
+#elif defined(HAVE_UDA1380)
+            uda1380_set_treble(value >> 1);
 #elif CONFIG_HWCODEC == MAS3507D
             mas_writereg(MAS_REG_KTREBLE, treble_table[value+15]);
             current_treble = value * 10;
