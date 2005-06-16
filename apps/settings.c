@@ -76,7 +76,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "pcm_playback.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 21
+#define CONFIG_BLOCK_VERSION 22
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -181,8 +181,13 @@ static const struct bit_entry rtc_bits[] =
     /* sound */
     {7, S_O(volume), 70, "volume", NULL }, /* 0...100 */
     {8 | SIGNED, S_O(balance), 0, "balance", NULL }, /* -100...100 */
+#if CONFIG_HWCODEC != MASNONE /* any MAS */
     {5 | SIGNED, S_O(bass), 0, "bass", NULL }, /* -15..+15 / -12..+12 */
     {5 | SIGNED, S_O(treble), 0, "treble", NULL }, /* -15..+15 / -12..+12 */
+#elif defined HAVE_UDA1380
+    {5, S_O(bass), 0, "bass", NULL }, /* 0..+24 */
+    {3, S_O(treble), 0, "treble", NULL }, /* 0..+6 */
+#endif
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     {5, S_O(loudness), 0, "loudness", NULL }, /* 0...17 */
     {3, S_O(avc), 0, "auto volume", "off,20ms,2,4,8" },
