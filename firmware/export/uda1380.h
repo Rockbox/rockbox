@@ -23,6 +23,7 @@
 extern int uda1380_init(void);
 extern void uda1380_enable_output(bool enable);
 extern int uda1380_setvol(int vol);
+extern void uda1380_set_balance(int bal);
 extern void uda1380_set_bass(int value);
 extern void uda1380_set_treble(int value);
 extern int uda1380_mute(int mute);

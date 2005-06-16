@@ -38,6 +38,8 @@
 
 int uda1380_write_reg(unsigned char reg, unsigned short value);
 unsigned short uda1380_regs[0x30];
+short uda1380_balance;
+short uda1380_volume;
 
 /* Definition of a playback configuration to start with */
 
@@ -90,8 +92,23 @@ int uda1380_write_reg(unsigned char reg, unsigned short value)
  */
 int uda1380_setvol(int vol)
 {
+    int vol_l, vol_r;
+
+    uda1380_volume = vol;
+    /* Simple linear volume crossfade curves */
+    vol_l = MAX(uda1380_balance*0xff/100, 0);
+    vol_r = MAX(-uda1380_balance*0xff/100, 0);
     return uda1380_write_reg(REG_MASTER_VOL,
-                             MASTER_VOL_LEFT(vol) | MASTER_VOL_RIGHT(vol));
+                             MASTER_VOL_LEFT(vol_l) | MASTER_VOL_RIGHT(vol_r));
+}
+
+/**
+ * Sets stereo balance
+ */
+void uda1380_set_balance(int bal)
+{
+    uda1380_balance = bal;
+    uda1380_setvol(uda1380_volume);
 }
 
 /** 
@@ -165,7 +182,9 @@ int uda1380_init(void)
 {
     if (uda1380_set_regs() == -1)
         return -1;
-    
+    uda1380_balance = 0;
+    uda1380_volume = 0x20; /* Taken from uda1380_defaults */
+
     return 0;
 }
 

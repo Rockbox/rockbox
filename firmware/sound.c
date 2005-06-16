@@ -491,6 +491,8 @@ void sound_set(int setting, int value)
 #elif CONFIG_HWCODEC == MAS3507D
             current_balance = value * 960 / 100; /* tenth of dB */
             set_prescaled_volume();
+#elif defined(HAVE_UDA1380)
+            uda1380_set_balance(value);
 #endif
             break;
 
