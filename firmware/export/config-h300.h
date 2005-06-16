@@ -39,6 +39,9 @@
 /* Define this if the platform can charge batteries */
 #define HAVE_CHARGING 1
 
+/* define this if the hardware can be powered off while charging */
+#define HAVE_POWEROFF_WHILE_CHARGING
+
 /* The start address index for ROM builds */
 #define ROM_START 0x11010
 
