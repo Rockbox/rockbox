@@ -69,4 +69,9 @@ void lcd_remote_backlight_off(int val)
 {
     (void)val;
 }
+
+void lcd_remote_set_flip(bool yesno)
+{
+    (void)yesno;
+}
 #endif
