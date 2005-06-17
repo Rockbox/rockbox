@@ -41,7 +41,7 @@
 #ifdef CONFIG_TUNER
 #include "fmradio.h"
 #endif
-#ifdef IRIVER_H100
+#ifdef HAVE_UDA1380
 #include "uda1380.h"
 #endif
 
@@ -888,7 +888,7 @@ void shutdown_hw(void)
         sleep(HZ/10);
 
     mp3_shutdown();
-#ifdef IRIVER_H100
+#ifdef HAVE_UDA1380
     uda1380_close();
 #endif
 #if CONFIG_KEYPAD == ONDIO_PAD
