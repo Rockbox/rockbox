@@ -385,8 +385,9 @@ struct plugin_api {
 };
 
 /* defined by the plugin loader (plugin.c) */
-#ifdef IRIVER_H100
-int codec_load_ram(char* pluginptr, size_t size, void *parameter, void* ptr2, size_t bufwrap);
+#if CONFIG_HWCODEC == MASNONE
+int codec_load_ram(char* pluginptr, size_t size, void *parameter, void* ptr2,
+                   size_t bufwrap);
 int codec_load_file(const char* plugin, void* parameter);
 #endif
 

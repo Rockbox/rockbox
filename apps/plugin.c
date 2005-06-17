@@ -330,8 +330,9 @@ static const struct plugin_api rockbox_api = {
     strcasestr,
 };
 
-#ifdef IRIVER_H100
-int codec_load_ram(char* pluginptr, size_t size, void *parameter, void* ptr2, size_t bufwrap)
+#if CONFIG_HWCODEC == MASNONE
+int codec_load_ram(char* pluginptr, size_t size, void *parameter, void* ptr2,
+                   size_t bufwrap)
 {
     enum plugin_status (*plugin_start)(struct plugin_api* api, void* param);
     int copy_n;
