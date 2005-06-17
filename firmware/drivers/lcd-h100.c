@@ -257,12 +257,14 @@ void lcd_set_flip(bool yesno)
     {
         lcd_write_command(LCD_CNTL_COLUMN_ADDRESS_DIR | 1);
         lcd_write_command(LCD_CNTL_COMMON_OUTPUT_STATUS | 0);
+        lcd_write_command_ex(LCD_CNTL_DUTY_SET, 0x20, 0);
         xoffset = 160 - LCD_WIDTH; /* 160 colums minus the 160 we have */
     }
     else 
     {
         lcd_write_command(LCD_CNTL_COLUMN_ADDRESS_DIR | 0);
         lcd_write_command(LCD_CNTL_COMMON_OUTPUT_STATUS | 1);
+        lcd_write_command_ex(LCD_CNTL_DUTY_SET, 0x20, 1);
         xoffset = 0;
     }
 }
