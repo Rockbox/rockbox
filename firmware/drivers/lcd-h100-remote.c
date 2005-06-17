@@ -38,6 +38,9 @@ static const unsigned char ones[8]  = {
 static int curfont = FONT_SYSFIXED;
 static int xmargin = 0;
 static int ymargin = 0;
+#ifndef SIMULATOR
+static int xoffset; /* needed for flip */
+#endif
 
 unsigned char lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH]
 #ifndef SIMULATOR
@@ -70,6 +73,7 @@ static bool remote_initialized = false;
 
 /* cached settings values, for hotplug init */
 static bool cached_invert = false;
+static bool cached_flip = false;
 static int cached_contrast = 32;
 static int cached_roll = 0;
 
@@ -206,13 +210,16 @@ void lcd_remote_write_command_ex(int cmd, int data)
 #define LCD_REMOTE_CNTL_DISPLAY_ON_OFF      0xae
 #define LCD_REMOTE_CNTL_ENTIRE_ON_OFF       0xa4
 #define LCD_REMOTE_CNTL_REVERSE_ON_OFF      0xa6
-#define LCD_REMOTE_CTNL_NOP                 0xe3
+#define LCD_REMOTE_CNTL_NOP                 0xe3
 #define LCD_REMOTE_CNTL_POWER_CONTROL       0x2b
 #define LCD_REMOTE_CNTL_SELECT_REGULATOR    0x20
 #define LCD_REMOTE_CNTL_SELECT_BIAS         0xa2
 #define LCD_REMOTE_CNTL_SELECT_VOLTAGE      0x81
 #define LCD_REMOTE_CNTL_INIT_LINE           0x40
 #define LCD_REMOTE_CNTL_SET_PAGE_ADDRESS    0xB0
+
+#define LCD_REMOTE_CNTL_HIGHCOL             0x10    /* Upper column address */
+#define LCD_REMOTE_CNTL_LOWCOL              0x00    /* Lower column address */
 
 void lcd_remote_powersave(bool on)
 {
@@ -235,6 +242,30 @@ void lcd_remote_set_invert_display(bool yesno)
     cached_invert = yesno;
     if (remote_initialized)
         lcd_remote_write_command(LCD_REMOTE_CNTL_REVERSE_ON_OFF | yesno);
+}
+
+/* turn the display upside down (call lcd_remote_update() afterwards) */
+void lcd_remote_set_flip(bool yesno)
+{
+    cached_flip = yesno;
+    if (yesno)
+    {
+        xoffset = 0;
+        if (remote_initialized)
+        {
+            lcd_remote_write_command(LCD_REMOTE_CNTL_ADC_NORMAL);
+            lcd_remote_write_command(LCD_REMOTE_CNTL_SHL_NORMAL);
+        }
+    }
+    else
+    {
+        xoffset = 132 - LCD_REMOTE_WIDTH;
+        if (remote_initialized)
+        {
+            lcd_remote_write_command(LCD_REMOTE_CNTL_ADC_REVERSE);
+            lcd_remote_write_command(LCD_REMOTE_CNTL_SHL_REVERSE);
+        }
+    }
 }
 
 int lcd_remote_default_contrast(void)
@@ -394,8 +425,6 @@ void lcd_remote_clear_display(void)
 
 static void remote_lcd_init(void)
 {
-    lcd_remote_write_command(LCD_REMOTE_CNTL_ADC_REVERSE);
-    lcd_remote_write_command(LCD_REMOTE_CNTL_SHL_REVERSE);
     lcd_remote_write_command(LCD_REMOTE_CNTL_SELECT_BIAS | 0x0);
 
     lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x5);
@@ -416,6 +445,7 @@ static void remote_lcd_init(void)
     
     remote_initialized = true;
 
+    lcd_remote_set_flip(cached_flip);
     lcd_remote_set_contrast(cached_contrast);
     lcd_remote_set_invert_display(cached_invert);
     lcd_remote_roll(cached_roll);
@@ -490,7 +520,8 @@ void lcd_remote_update (void)
     for (y = 0; y < LCD_REMOTE_HEIGHT / 8; y++)
     {
         lcd_remote_write_command(LCD_REMOTE_CNTL_SET_PAGE_ADDRESS | y);
-        lcd_remote_write_command_ex(0x10, 0x04);
+        lcd_remote_write_command(LCD_REMOTE_CNTL_HIGHCOL | ((xoffset>>4) & 0xf));
+        lcd_remote_write_command(LCD_REMOTE_CNTL_LOWCOL | (xoffset & 0xf));
         lcd_remote_write_data(lcd_remote_framebuffer[y], LCD_REMOTE_WIDTH);
     }
 }
@@ -522,8 +553,11 @@ void lcd_remote_update_rect (int x_start, int y,
     for (; y <= ymax; y++)
     {        
         lcd_remote_write_command(LCD_REMOTE_CNTL_SET_PAGE_ADDRESS | y);
-        lcd_remote_write_command_ex(0x10, 0x00);
-        lcd_remote_write_data(&lcd_remote_framebuffer[y][x_start], width);        
+        lcd_remote_write_command(LCD_REMOTE_CNTL_HIGHCOL
+                                 | (((x_start+xoffset)>>4) & 0xf));
+        lcd_remote_write_command(LCD_REMOTE_CNTL_LOWCOL 
+                                 | ((x_start+xoffset) & 0xf));
+        lcd_remote_write_data(&lcd_remote_framebuffer[y][x_start], width);
     }
 }
 

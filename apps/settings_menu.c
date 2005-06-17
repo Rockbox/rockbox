@@ -101,6 +101,17 @@ static bool remote_invert(void)
                                 lcd_remote_set_invert_display);
      return rc;
 }
+
+static bool remote_flip_display(void)
+{
+    bool rc = set_bool( str(LANG_FLIP_DISPLAY),
+                        &global_settings.remote_flip_display);
+    
+    lcd_remote_set_flip(global_settings.remote_flip_display);
+    lcd_remote_update();
+
+    return rc;
+}
 #endif
 
 #ifdef CONFIG_BACKLIGHT
@@ -1262,8 +1273,8 @@ static bool lcd_remote_settings_menu(void)
         { ID2P(LANG_BACKLIGHT),       remote_backlight_timer },
         { ID2P(LANG_CONTRAST),        remote_contrast },
         { ID2P(LANG_INVERT),          remote_invert },
-/*        { ID2P(LANG_FLIP_DISPLAY),    remote_flip_display },
-        { ID2P(LANG_INVERT_CURSOR),   invert_cursor },*/
+        { ID2P(LANG_FLIP_DISPLAY),    remote_flip_display },
+/*        { ID2P(LANG_INVERT_CURSOR),   invert_cursor },*/
     };
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL,

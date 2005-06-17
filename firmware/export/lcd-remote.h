@@ -79,7 +79,7 @@ extern void lcd_remote_clearpixel(int x, int y);
 extern void lcd_remote_invertpixel(int x, int y);
 extern void lcd_remote_roll(int pixels);
 extern void lcd_remote_set_invert_display(bool yesno);
-//extern void lcd_set_flip(bool yesno);
+extern void lcd_remote_set_flip(bool yesno);
 extern void lcd_remote_bidir_scroll(int threshold);
 extern void lcd_remote_scroll_step(int pixels);
 extern void lcd_remote_setfont(int font);
