@@ -445,6 +445,9 @@ static char* get_tag(struct mp3entry* cid3,
                 case 's':  /* File Size (in kilobytes) */
                     snprintf(buf, buf_size, "%d", id3->filesize / 1024);
                     return buf;
+
+                case 'c':  /* File Codec */
+                    return id3_get_codec(id3);
             }
             break;
 

@@ -531,7 +531,7 @@ bool loadcodec(const char *trackname, bool start_play)
         codec_path = NULL;
     }
     
-    tracks[track_widx].codectype = filetype;
+    tracks[track_widx].id3.codectype = filetype;
     tracks[track_widx].codecsize = 0;
     if (codec_path == NULL)
         return false;
@@ -540,7 +540,7 @@ bool loadcodec(const char *trackname, bool start_play)
         prev_track = track_widx - 1;
         if (prev_track < 0)
             prev_track = MAX_TRACK-1;
-        if (track_count > 0 && filetype == tracks[prev_track].codectype) {
+        if (track_count > 0 && filetype == tracks[prev_track].id3.codectype) {
             logf("Reusing prev. codec");
             return true;
         }
@@ -667,8 +667,8 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
 
     /* Starting playback from an offset is only support in MPA at the moment */
     if (offset > 0) {
-      if ((tracks[track_widx].codectype==AFMT_MPA_L2) ||
-          (tracks[track_widx].codectype==AFMT_MPA_L3)) {
+      if ((tracks[track_widx].id3.codectype==AFMT_MPA_L2) ||
+          (tracks[track_widx].id3.codectype==AFMT_MPA_L3)) {
         lseek(fd, offset, SEEK_SET);
         tracks[track_widx].id3.offset = offset;
         mp3_set_elapsed(&tracks[track_widx].id3);
@@ -955,7 +955,7 @@ bool codec_request_next_track_callback(void)
     
     ci.reload_codec = false;
     
-    if (cur_ti->codectype != tracks[track_ridx].codectype) {
+    if (cur_ti->id3.codectype != tracks[track_ridx].id3.codectype) {
         if (--track_ridx < 0)
             track_ridx = MAX_TRACK-1;
         logf("New codec");

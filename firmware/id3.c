@@ -33,6 +33,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <ctype.h>
+#include "config.h"
 #include "file.h"
 #include "debug.h"
 #include "atoi.h"
@@ -77,6 +78,31 @@ static const char* const genres[] = {
     "Duet", "Punk Rock", "Drum Solo", "A capella", "Euro-House", "Dance Hall"
 };
 
+static const char* const codec_labels[] = {
+  "???",  /* Unknown file format */
+
+#if CONFIG_HWCODEC==MASNONE
+  "MP1",  /* MPEG Audio layer 1 */
+#endif
+
+  "MP2",  /* MPEG Audio layer 2 */
+  "MP3",  /* MPEG Audio layer 3 */
+
+#if CONFIG_HWCODEC==MASNONE
+  "WAV",  /* Uncompressed PCM in a WAV file */
+  "OGG",  /* Ogg Vorbis */
+  "FLAC", /* FLAC */
+  "MPC",  /* Musepack */
+  "AAC",  /* AAC */
+  "APE",  /* Monkey's Audio */
+  "WMA",  /* Windows Media Audio */
+  "AC3",  /* A/52 (aka AC3) audio */
+  "RA",   /* Realaudio */
+  "WV",   /* WavPack */
+#endif
+  NULL
+};
+
 char* id3_get_genre(const struct mp3entry* id3)
 {
     if( id3->genre_string )
@@ -85,6 +111,15 @@ char* id3_get_genre(const struct mp3entry* id3)
     if (id3->genre < sizeof(genres)/sizeof(char*))
         return (char*)genres[id3->genre];
     return NULL;
+}
+
+char* id3_get_codec(const struct mp3entry* id3)
+{
+  if ((id3->codectype >= 0) && (id3->codectype < AFMT_ENDMARKER)) {
+    return (char*)codec_labels[id3->codectype];
+  } else {
+    return NULL;
+  }
 }
 
 /*
@@ -763,6 +798,19 @@ static int getsonglength(int fd, struct mp3entry *entry)
     entry->frequency = info.frequency;
     entry->version = info.version;
     entry->layer = info.layer;
+    switch(entry->layer) {
+#if CONFIG_HWCODEC==MASNONE
+        case 0:
+            entry->codectype=AFMT_MPA_L1;
+            break;
+#endif
+        case 1:
+            entry->codectype=AFMT_MPA_L2;
+            break;
+        case 2:
+            entry->codectype=AFMT_MPA_L3;
+            break;
+    }
 
     /* If the file time hasn't been established, this may be a fixed
        rate MP3, so just use the default formula */

@@ -19,7 +19,36 @@
 #ifndef ID3_H
 #define ID3_H
 
+#include "config.h"
 #include "file.h"
+
+/* Audio file types. */
+/* NOTE: When adding new audio types, also add to codec_labels[] in id3.c */
+enum {
+    AFMT_UNKNOWN = 0,  /* Unknown file format */
+
+#if CONFIG_HWCODEC==MASNONE
+    AFMT_MPA_L1,       /* MPEG Audio layer 1 */
+#endif
+
+    AFMT_MPA_L2,       /* MPEG Audio layer 2 */
+    AFMT_MPA_L3,       /* MPEG Audio layer 3 */
+
+#if CONFIG_HWCODEC==MASNONE
+    AFMT_PCM_WAV,      /* Uncompressed PCM in a WAV file */
+    AFMT_OGG_VORBIS,   /* Ogg Vorbis */
+    AFMT_FLAC,         /* FLAC */
+    AFMT_MPC,          /* Musepack */
+    AFMT_AAC,          /* AAC */
+    AFMT_APE,          /* Monkey's Audio */
+    AFMT_WMA,          /* Windows Media Audio */
+    AFMT_A52,          /* A/52 (aka AC3) audio */
+    AFMT_REAL,         /* Realaudio */
+    AFMT_WAVPACK,      /* WavPack */
+#endif
+
+    AFMT_ENDMARKER     /* THIS MUST BE THE LAST VALUE */
+};
 
 struct mp3entry {
     char path[MAX_PATH];
@@ -33,6 +62,7 @@ struct mp3entry {
     int tracknum;
     int version;
     int layer;
+    int codectype;
     int year;
     unsigned char id3version;
     unsigned char genre;
@@ -76,5 +106,6 @@ enum {
 
 bool mp3info(struct mp3entry *entry, const char *filename, bool v1first);
 char* id3_get_genre(const struct mp3entry* id3);
+char* id3_get_codec(const struct mp3entry* id3);
 
 #endif

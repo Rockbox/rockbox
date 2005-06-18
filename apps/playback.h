@@ -27,23 +27,6 @@
 #include "id3.h"
 #include "mp3data.h"
 
-/* Supported file types. */
-#define AFMT_MPA_L1      0x0001  // MPEG Audio layer 1
-#define AFMT_MPA_L2      0x0002  // MPEG Audio layer 2
-#define AFMT_MPA_L3      0x0004  // MPEG Audio layer 3
-  /* (MPEG-1, 2, 2.5 layers 1, 2 and 3 */
-#define AFMT_PCM_WAV     0x0008  // Uncompressed PCM in a WAV file
-#define AFMT_OGG_VORBIS  0x0010  // Ogg Vorbis
-#define AFMT_FLAC        0x0020  // FLAC
-#define AFMT_MPC         0x0040  // Musepack
-#define AFMT_AAC         0x0080  // AAC
-#define AFMT_APE         0x0100  // Monkey's Audio
-#define AFMT_WMA         0x0200  // Windows Media Audio
-#define AFMT_A52         0x0400  // A/52 (aka AC3) audio
-#define AFMT_REAL        0x0800  // Realaudio
-#define AFMT_UNKNOWN     0x1000  // Unknown file format
-#define AFMT_WAVPACK     0x2000  // WavPack
-
 /* File buffer configuration keys. */
 #define CODEC_SET_FILEBUF_WATERMARK     1
 #define CODEC_SET_FILEBUF_CHUNKSIZE     2
@@ -58,7 +41,6 @@ struct track_info {
     struct mp3info mp3data;  /* MP3 metadata */
     char *codecbuf;          /* Pointer to codec buffer */
     size_t codecsize;        /* Codec length in bytes */
-    int codectype;           /* Codec type (example AFMT_MPA_L3) */
     
     off_t filerem;           /* Remaining bytes of file NOT in buffer */
     off_t filesize;          /* File total length */
