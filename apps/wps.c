@@ -84,24 +84,6 @@ static bool setvol(void)
     return false;
 }
 
-static void display_keylock_text(bool locked)
-{
-    char* s;
-    lcd_stop_scroll();
-#ifdef HAVE_LCD_CHARCELLS
-    if(locked)
-        s = str(LANG_KEYLOCK_ON_PLAYER);
-    else
-        s = str(LANG_KEYLOCK_OFF_PLAYER);
-#else
-    if(locked)
-        s = str(LANG_KEYLOCK_ON_RECORDER);
-    else
-        s = str(LANG_KEYLOCK_OFF_RECORDER);
-#endif
-    splash(HZ, true, s);
-}
-
 static bool ffwd_rew(int button)
 {
     static const int ff_rew_steps[] = {
@@ -321,12 +303,32 @@ static void fade(bool fade_in)
 }
 
 
+#ifdef WPS_KEYLOCK
+static void display_keylock_text(bool locked)
+{
+    char* s;
+    lcd_stop_scroll();
+#ifdef HAVE_LCD_CHARCELLS
+    if(locked)
+        s = str(LANG_KEYLOCK_ON_PLAYER);
+    else
+        s = str(LANG_KEYLOCK_OFF_PLAYER);
+#else
+    if(locked)
+        s = str(LANG_KEYLOCK_ON_RECORDER);
+    else
+        s = str(LANG_KEYLOCK_OFF_RECORDER);
+#endif
+    splash(HZ, true, s);
+}
+
 static void waitfor_nokey(void)
 {
     /* wait until all keys are released */
     while (button_get(false) != BUTTON_NONE)
         yield();
 }
+#endif
 
 /* demonstrates showing different formats from playtune */
 long wps_show(void)
@@ -624,6 +626,7 @@ long wps_show(void)
                 restore = true;
                 break;
 
+#ifdef WPS_KEYLOCK
             /* key lock */
             case WPS_KEYLOCK:
             case WPS_KEYLOCK | BUTTON_REPEAT:
@@ -632,6 +635,7 @@ long wps_show(void)
                 restore = true;
                 waitfor_nokey();
                 break;
+#endif
 
 #if CONFIG_KEYPAD == RECORDER_PAD
                 /* play settings */
