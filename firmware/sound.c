@@ -519,7 +519,7 @@ void sound_set(int setting, int value)
 #elif CONFIG_HWCODEC == MAS3507D
             current_volume = -780 + (value * 960 / 100); /* tenth of dB */
             set_prescaled_volume();
-#elif CONFIG_HWCODEC == MASNONE
+#elif defined(HAVE_UDA1380)
             current_volume = -840 + (value * 840 / 100); /* tenth of dB */
             set_volume();
 #endif
