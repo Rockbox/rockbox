@@ -105,17 +105,16 @@ static bool is_mp3frameheader(unsigned long head)
         return false;
     if (!(head & LAYER_MASK)) /* no layer? */
         return false;
+#if CONFIG_HWCODEC != MASNONE
+    /* The MAS can't decode layer 1, so treat layer 1 data as invalid */
+    if ((head & LAYER_MASK) == LAYER_MASK)
+        return false;
+#endif
     if ((head & BITRATE_MASK) == BITRATE_MASK) /* bad bitrate? */
         return false;
     if (!(head & BITRATE_MASK)) /* no bitrate? */
         return false;
     if ((head & SAMPLERATE_MASK) == SAMPLERATE_MASK) /* bad sample rate? */
-        return false;
-    if (((head >> 19) & 1) == 1 &&
-        ((head >> 17) & 3) == 3 &&
-        ((head >> 16) & 1) == 1)
-        return false;
-    if ((head & 0xffff0000) == 0xfffe0000)
         return false;
     
     return true;
