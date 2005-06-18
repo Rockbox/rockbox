@@ -223,6 +223,18 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
     if (ci->stop_codec || ci->reload_codec) {
       break;
     }
+
+    if (ci->seek_time) {
+        int sample_loc;
+
+        sample_loc = ci->seek_time/1000 * ci->id3->frequency;
+        if (FLAC__seekable_stream_decoder_seek_absolute(flacDecoder,sample_loc)) {
+          samplesdone=sample_loc;
+          ci->set_elapsed(samplesdone/(ci->id3->frequency/1000));
+        }
+        ci->seek_time = 0;
+    }
+
     FLAC__seekable_stream_decoder_process_single(flacDecoder);
   }
 
