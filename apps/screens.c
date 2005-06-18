@@ -93,7 +93,8 @@ void usb_display_info(void)
     lcd_clear_display();
 
 #ifdef HAVE_LCD_BITMAP
-    lcd_bitmap(usb_logo, 6, 16, BMPWIDTH_usb_logo, BMPHEIGHT_usb_logo, false);
+    /* Center bitmap on screen */
+    lcd_bitmap(usb_logo, LCD_WIDTH/2-BMPWIDTH_usb_logo/2, LCD_HEIGHT/2-BMPHEIGHT_usb_logo/2, BMPWIDTH_usb_logo, BMPHEIGHT_usb_logo, false);
     status_draw(true);
     lcd_update();
 #else
