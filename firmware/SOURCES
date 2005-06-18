@@ -123,7 +123,7 @@ drivers/lcd-h100-remote.c
 #if defined(HAVE_UDA1380) && !defined(SIMULATOR)
 drivers/uda1380.c
 #endif
-#if CONFIG_HWCODEC == MASNONE
+#if (CONFIG_HWCODEC == MASNONE) && !defined(SIMULATOR)
 pcm_playback.c
 #endif
 sound.c
