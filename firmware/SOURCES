@@ -102,7 +102,7 @@ crt0.S
 #endif
 mp3_playback.c
 mp3data.c
-#ifndef IRIVER_H100
+#if CONFIG_HWCODEC != MASNONE
 mpeg.c
 #endif
 #ifndef WIN32 /* the win32 sim has its own versin of these: */
@@ -117,11 +117,13 @@ bitswap.S
 descramble.S
 #endif
 drivers/lcd.S
-#ifdef IRIVER_H100
+#ifdef HAVE_REMOTE_LCD
 drivers/lcd-h100-remote.c
-#ifndef SIMULATOR
-drivers/uda1380.c
-pcm_playback.c
 #endif
+#if defined(HAVE_UDA1380) && !defined(SIMULATOR)
+drivers/uda1380.c
+#endif
+#if CONFIG_HWCODEC == MASNONE
+pcm_playback.c
 #endif
 sound.c
