@@ -498,9 +498,10 @@ bool loadcodec(const char *trackname, bool start_play)
         logf("Codec: Vorbis");
         codec_path = CODEC_VORBIS;
         break;
+    case AFMT_MPA_L1:
     case AFMT_MPA_L2:
     case AFMT_MPA_L3:
-        logf("Codec: MPA L2/L3");
+        logf("Codec: MPA L1/L2/L3");
         codec_path = CODEC_MPA_L3;
         break;
     case AFMT_PCM_WAV:

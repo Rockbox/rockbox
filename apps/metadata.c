@@ -95,6 +95,7 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
     
   /* Load codec specific track tag information. */
   switch (track->codectype) {
+  case AFMT_MPA_L1:
   case AFMT_MPA_L2:
   case AFMT_MPA_L3:
       /* Should check the return value. */

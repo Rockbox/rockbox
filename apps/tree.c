@@ -73,6 +73,7 @@ const struct filetype filetypes[] = {
     { ".mpa", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
 #if CONFIG_HWCODEC == MASNONE
     /* Temporary hack to allow playlist creation */
+    { ".mp1", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
     { ".ogg", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
     { ".wma", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
     { ".wav", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
