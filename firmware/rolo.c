@@ -87,7 +87,7 @@ int rolo_load(const char* filename)
 {
     int fd;
     long length;
-#ifdef IRIVER_H100
+#if CONFIG_CPU == MCF5249
     int i;
     unsigned long checksum,file_checksum;
 #else
