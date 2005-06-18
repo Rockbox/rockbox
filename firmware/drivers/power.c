@@ -36,9 +36,6 @@ static int fmstatus = 0;
 
 void radio_set_status(int status)
 {
-#ifdef IRIVER_H100
-    fmstatus = status;
-#else
     fmstatus = status;
 #ifdef HAVE_TUNER_PWR_CTRL
     if (status)
@@ -48,7 +45,6 @@ void radio_set_status(int status)
     }
     else
         or_b(0x04, &PADRL); /* drive PA2 high for tuner disable */
-#endif
 #endif
 }
 
@@ -63,7 +59,7 @@ int radio_get_status(void)
 
 void power_init(void)
 {
-#ifdef IRIVER_H100
+#if CONFIG_CPU == MCF5249
     GPIO1_OUT |= 0x00080000;
     GPIO1_ENABLE |= 0x00080000;
     GPIO1_FUNCTION |= 0x00080000;
@@ -98,7 +94,7 @@ void power_init(void)
 
 bool charger_inserted(void)
 {     
-#ifdef IRIVER_H100
+#if CONFIG_CPU == MCF5249
     return (GPIO1_READ & 0x00400000)?true:false;
 #elif defined(GMINI_ARCH)
     return (P7 & 0x80) == 0;
@@ -158,7 +154,7 @@ void ide_power_enable(bool on)
 {
     (void)on;
 
-#ifdef IRIVER_H100
+#if CONFIG_CPU == MCF5249
     if(on)
         GPIO_OUT &= ~0x80000000;
     else
@@ -211,7 +207,7 @@ void ide_power_enable(bool on)
 
 bool ide_powered(void)
 {
-#ifdef IRIVER_H100
+#if CONFIG_CPU == MCF5249
     return (GPIO_OUT & 0x80000000)?false:true;
 #elif defined(GMINI_ARCH)
     return (P1 & 0x08?true:false);
@@ -242,7 +238,7 @@ bool ide_powered(void)
 void power_off(void)
 {
     set_irq_level(HIGHEST_IRQ_LEVEL);
-#ifdef IRIVER_H100
+#if CONFIG_CPU == MCF5249
     GPIO1_OUT &= ~0x00080000;
 #elif defined(GMINI_ARCH)
     P1 &= ~1;
