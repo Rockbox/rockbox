@@ -108,6 +108,10 @@
   "., INS     MODE\n" \
   "/, (1)     RECORD\n"
 
+#elif CONFIG_KEYPAD == IRIVER_H300_PAD
+#define KEYBOARD_SPECIFIC \
+  "[not written yet]"
+
 #elif CONFIG_KEYPAD == GMINI100_PAD
 #define KEYBOARD_SPECIFIC \
   "8, Up      UP\n" \
