@@ -34,7 +34,8 @@ void button_clear_queue(void);
 void button_set_flip(bool flip); /* turn 180 degrees */
 #endif
 
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+    (CONFIG_KEYPAD == IRIVER_H300_PAD)
 bool button_hold(void);
 bool remote_button_hold(void);
 #endif
@@ -59,6 +60,27 @@ bool remote_button_hold(void);
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
 
 /* iRiver H100 specific button codes */
+#define  BUTTON_SELECT        0x0100
+#define  BUTTON_MODE          0x0200
+#define  BUTTON_REC           0x0400
+#define  BUTTON_ON            0x0001
+#define  BUTTON_OFF           0x0002
+#define  BUTTON_UP            0x0010
+#define  BUTTON_DOWN          0x0020
+
+#define BUTTON_RC_ON          (BUTTON_REMOTE | 0x00010000)
+#define BUTTON_RC_STOP        (BUTTON_REMOTE | 0x00020000)
+#define BUTTON_RC_VOL         (BUTTON_REMOTE | 0x00040000)
+#define BUTTON_RC_BITRATE     (BUTTON_REMOTE | 0x00200000)
+#define BUTTON_RC_REC         (BUTTON_REMOTE | 0x00400000)
+#define BUTTON_RC_SOURCE      (BUTTON_REMOTE | 0x00800000)
+#define BUTTON_RC_MENU        (BUTTON_REMOTE | 0x01000000)
+#define BUTTON_RC_FF          (BUTTON_REMOTE | 0x02000000)
+#define BUTTON_RC_REW         (BUTTON_REMOTE | 0x04000000)
+
+#elif CONFIG_KEYPAD == IRIVER_H300_PAD
+
+/* iRiver H300 specific button codes */
 #define  BUTTON_SELECT        0x0100
 #define  BUTTON_MODE          0x0200
 #define  BUTTON_REC           0x0400

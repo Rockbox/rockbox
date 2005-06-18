@@ -45,7 +45,7 @@
 #define ONDIO_PAD       2
 #define IRIVER_H100_PAD 3
 #define GMINI100_PAD    4
-#define IRIVER_H300_PAD 3
+#define IRIVER_H300_PAD 5
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 0
