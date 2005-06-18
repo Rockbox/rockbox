@@ -327,6 +327,10 @@ static const struct plugin_api rockbox_api = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
+#ifdef ROCKBOX_HAS_LOGF
+    logf,
+#endif
+
 };
 
 #if CONFIG_HWCODEC == MASNONE

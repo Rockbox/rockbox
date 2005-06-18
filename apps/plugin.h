@@ -60,6 +60,7 @@
 #endif
 
 #ifdef PLUGIN
+
 #if defined(DEBUG) || defined(SIMULATOR)
 #undef DEBUGF
 #define DEBUGF  rb->debugf
@@ -69,6 +70,14 @@
 #define DEBUGF(...)
 #define LDEBUGF(...)
 #endif
+
+#ifdef ROCKBOX_HAS_LOGF
+#undef LOGF
+#define LOGF rb->logf
+#else
+#define LOGF(...)
+#endif
+
 #endif
 
 #ifdef SIMULATOR
@@ -381,6 +390,9 @@ struct plugin_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */     
        
+#ifdef ROCKBOX_HAS_LOGF
+    void (*logf)(const char *fmt, ...);
+#endif
 };
 
 /* defined by the plugin loader (plugin.c) */
