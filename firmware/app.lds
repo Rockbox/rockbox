@@ -117,7 +117,7 @@ _pluginbuf = 0;
 
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGINSIZE - STUBOFFSET
 
-#ifdef IRIVER_H100
+#if CONFIG_CPU == MCF5249
 #define DRAMORIG 0x31000000 + STUBOFFSET
 #define IRAMORIG 0x10000000
 #define IRAMSIZE 0x10000
@@ -184,7 +184,7 @@ SECTIONS
         _iramend = .;
     } > IRAM
 
-#ifdef IRIVER_H100
+#if CONFIG_CPU == MCF5249
     .stack :
     {
        *(.stack)
@@ -204,7 +204,7 @@ SECTIONS
     } > DRAM
 #endif
 
-#ifdef IRIVER_H100
+#if CONFIG_CPU == MCF5249
     .bss ADDR(.data) + SIZEOF(.data) + SIZEOF(.iram):
 #else
     .bss :
