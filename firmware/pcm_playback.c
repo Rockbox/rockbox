@@ -40,6 +40,8 @@
 #include "button.h"
 #include <string.h>
 
+#ifdef HAVE_UDA1380
+
 #define CHUNK_SIZE           32768
 /* Must be a power of 2 */
 #define NUM_PCM_BUFFERS      (PCMBUF_SIZE / CHUNK_SIZE)
@@ -523,3 +525,5 @@ void pcm_play_start(void)
         pcm_play_data(start, size, pcm_play_callback);
     }
 }
+
+#endif /* HAVE_UDA1380 */
