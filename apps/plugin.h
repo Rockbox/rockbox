@@ -78,12 +78,12 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 39
+#define PLUGIN_API_VERSION 40
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 32
+#define PLUGIN_MIN_API_VERSION 40
 
 /* plugin return codes */
 enum plugin_status {
@@ -177,6 +177,7 @@ struct plugin_api {
     void (*splash)(int ticks, bool center, const char *fmt, ...);
 
 #ifdef HAVE_REMOTE_LCD
+    /* remote lcd */
     void (*remote_clear_display)(void);
     void (*remote_puts)(int x, int y, const unsigned char *string);
     void (*remote_lcd_puts_scroll)(int x, int y, const unsigned char* string);
@@ -202,12 +203,10 @@ struct plugin_api {
     int  (*remote_getstringsize)(const unsigned char *str, int *w, int *h);
     void (*remote_update)(void);
     void (*remote_update_rect)(int x, int y, int width, int height);
-//    void (*remote_scrollbar)(int x, int y, int width, int height, int items,
-//                      int min_shown, int max_shown, int orientation);
-    //void (*remote_checkbox)(int x, int y, int width, int height, bool checked);
+
     void (*remote_backlight_on)(void);
-    void (*remote_backlight_off)(void);    
-	 unsigned char* lcd_remote_framebuffer;
+    void (*remote_backlight_off)(void);
+    unsigned char* lcd_remote_framebuffer;
 #endif
 
     /* button */
@@ -215,6 +214,9 @@ struct plugin_api {
     long (*button_get_w_tmo)(int ticks);
     int (*button_status)(void);
     void (*button_clear_queue)(void);
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
+    bool (*button_hold)(void);
+#endif
 
     /* file */
     int (*PREFIX(open))(const char* pathname, int flags);
@@ -238,6 +240,7 @@ struct plugin_api {
     DIR* (*PREFIX(opendir))(const char* name);
     int (*PREFIX(closedir))(DIR* dir);
     struct dirent* (*PREFIX(readdir))(DIR* dir);
+    int (*PREFIX(mkdir))(const char *name, int mode);
 
     /* kernel/ system */
     void (*PREFIX(sleep))(int ticks);
@@ -250,6 +253,10 @@ struct plugin_api {
     void (*reset_poweroff_timer)(void);
 #ifndef SIMULATOR
     int (*system_memory_guard)(int newmode);
+    long *cpu_frequency;
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    void (*cpu_boost)(bool on_off);
+#endif
 #endif
 
     /* strings and memory */
@@ -268,6 +275,7 @@ struct plugin_api {
     char *(*strchr)(const char *s, int c);
     char *(*strcat)(char *s1, const char *s2);
     int (*memcmp)(const void *s1, const void *s2, size_t n);
+    char *(*strcasestr) (const char* phaystack, const char* pneedle);
 
     /* sound */
     void (*sound_set)(int setting, int value);
@@ -279,7 +287,15 @@ struct plugin_api {
 #if CONFIG_HWCODEC != MASNONE
     void (*bitswap)(unsigned char *data, int length);
 #endif
+#if CONFIG_HWCODEC == MASNONE
+    void (*pcm_play_data)(const unsigned char *start, int size,
+		    void (*get_more)(unsigned char** start, long*size));
+    void (*pcm_play_stop)(void);
+    void (*pcm_set_frequency)(unsigned int frequency);
+    bool (*pcm_is_playing)(void);
+    void (*pcm_play_pause)(bool play);
 #endif
+#endif /* !SIMULATOR */
 
     /* playback control */
     void (*PREFIX(audio_play))(int offset);
@@ -314,6 +330,12 @@ struct plugin_api {
     int (*mas_codec_readreg)(int reg);
 #endif
 #endif
+
+    /* tag database */
+    struct tagdb_header *tagdbheader;
+    int *tagdb_fd;
+    int *tagdb_initialized;
+    int (*tagdb_init) (void);
 
     /* misc */
     void (*srand)(unsigned int seed);
@@ -351,37 +373,14 @@ struct plugin_api {
     void (*peak_meter_set_use_dbfs)(int use);
     int (*peak_meter_get_use_dbfs)(void);
 #endif
-
-    /* new stuff at the end, sort into place next time
-       the API gets incompatible */
-#ifndef SIMULATOR
-    long *cpu_frequency;
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    void (*cpu_boost)(bool on_off);
-#endif
-#endif
-    int (*PREFIX(mkdir))(const char *name, int mode);
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
-    bool (*button_hold)(void);
-#endif
-#if (CONFIG_HWCODEC == MASNONE) && !defined(SIMULATOR)
-    void (*pcm_play_data)(const unsigned char *start, int size,
-		    void (*get_more)(unsigned char** start, long*size));
-    void (*pcm_play_stop)(void);    
-    void (*pcm_set_frequency)(unsigned int frequency);
-    bool (*pcm_is_playing)(void);
-    void (*pcm_set_volume)(int volume);
-    void (*pcm_play_pause)(bool play);
-#endif
 #ifdef HAVE_LCD_BITMAP
     int (*read_bmp_file)(char* filename, int *get_width, int *get_height,
                          char *bitmap, int maxsize);
 #endif
-    struct tagdb_header *tagdbheader;
-    int *tagdb_fd;
-    int *tagdb_initialized;
-    int (*tagdb_init) (void);
-    char *(*strcasestr) (const char* phaystack, const char* pneedle);
+
+    /* new stuff at the end, sort into place next time
+       the API gets incompatible */     
+       
 };
 
 /* defined by the plugin loader (plugin.c) */

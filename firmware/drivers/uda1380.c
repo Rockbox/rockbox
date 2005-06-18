@@ -85,33 +85,15 @@ int uda1380_write_reg(unsigned char reg, unsigned short value)
 }
 
 /**
- * Sets the master volume
- *
- * \param vol Range [0..255] 0=max, 255=mute
- *
+ * Sets left and right master volume  (0(max) to 252(muted))
  */
-int uda1380_setvol(int vol)
+int uda1380_setvol(int vol_l, int vol_r)
 {
-    int vol_l, vol_r;
-
-    uda1380_volume = vol;
-    /* Simple linear volume crossfade curves */
-    vol_l = MAX(uda1380_balance*(255 - vol)/100 + vol, vol);
-    vol_r = MAX(-uda1380_balance*(255 - vol)/100 + vol, vol);
     return uda1380_write_reg(REG_MASTER_VOL,
                              MASTER_VOL_LEFT(vol_l) | MASTER_VOL_RIGHT(vol_r));
 }
 
 /**
- * Sets stereo balance
- */
-void uda1380_set_balance(int bal)
-{
-    uda1380_balance = bal;
-    uda1380_setvol(uda1380_volume);
-}
-
-/** 
  * Sets the bass value (0-15)
  */
 void uda1380_set_bass(int value)

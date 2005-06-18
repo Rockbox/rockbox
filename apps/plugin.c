@@ -136,6 +136,7 @@ static const struct plugin_api rockbox_api = {
     backlight_set_timeout,
     splash,
 #ifdef HAVE_REMOTE_LCD
+    /* remote lcd */
     lcd_remote_clear_display,
     lcd_remote_puts,
     lcd_remote_puts_scroll,
@@ -158,9 +159,7 @@ static const struct plugin_api rockbox_api = {
     lcd_remote_getstringsize,
     lcd_remote_update,
     lcd_remote_update_rect,
-    //id (*scrollbar)(int x, int y, int width, int height, int items,
-    //                int min_shown, int max_shown, int orientation);
-    //void (*remote_checkbox)(int x, int y, int width, int height, bool checked);
+
     lcd_remote_backlight_on,
     lcd_remote_backlight_off,
     &lcd_remote_framebuffer[0][0],
@@ -170,6 +169,9 @@ static const struct plugin_api rockbox_api = {
     button_get_w_tmo,
     button_status,
     button_clear_queue,
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
+    button_hold,
+#endif
 
     /* file */
     (open_func)PREFIX(open),
@@ -193,6 +195,7 @@ static const struct plugin_api rockbox_api = {
     PREFIX(opendir),
     PREFIX(closedir),
     PREFIX(readdir),
+    PREFIX(mkdir),
 
     /* kernel/ system */
     PREFIX(sleep),
@@ -205,6 +208,10 @@ static const struct plugin_api rockbox_api = {
     reset_poweroff_timer,
 #ifndef SIMULATOR
     system_memory_guard,
+    &cpu_frequency,
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    cpu_boost,
+#endif
 #endif
 
     /* strings and memory */
@@ -223,6 +230,7 @@ static const struct plugin_api rockbox_api = {
     strchr,
     strcat,
     memcmp,
+    strcasestr,
 
     /* sound */
     sound_set,
@@ -234,8 +242,15 @@ static const struct plugin_api rockbox_api = {
 #if CONFIG_HWCODEC != MASNONE
     bitswap,
 #endif
+#if CONFIG_HWCODEC == MASNONE
+    pcm_play_data,    
+    pcm_play_stop,
+    pcm_set_frequency,
+    pcm_is_playing,
+    pcm_play_pause,
 #endif
-    
+#endif
+
     /* playback control */
     PREFIX(audio_play),
     audio_stop,
@@ -270,6 +285,12 @@ static const struct plugin_api rockbox_api = {
 #endif
 #endif /* !simulator and HWCODEC != MASNONE */
 
+    /* tag database */
+    &tagdbheader,
+    &tagdb_fd,
+    &tagdb_initialized,
+    tagdb_init,
+
     /* misc */
     srand,
     rand,
@@ -299,35 +320,13 @@ static const struct plugin_api rockbox_api = {
     peak_meter_set_use_dbfs,
     peak_meter_get_use_dbfs,
 #endif
-
-    /* new stuff at the end, sort into place next time
-       the API gets incompatible */
-#ifndef SIMULATOR
-    &cpu_frequency,
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    cpu_boost,
-#endif
-#endif
-    PREFIX(mkdir),
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
-    button_hold,
-#endif
-#if (CONFIG_HWCODEC == MASNONE) && !defined(SIMULATOR)
-    pcm_play_data,    
-    pcm_play_stop,
-    pcm_set_frequency,
-    pcm_is_playing,
-    pcm_set_volume,
-    pcm_play_pause,
-#endif
 #ifdef HAVE_LCD_BITMAP
     read_bmp_file,
 #endif
-    &tagdbheader,
-    &tagdb_fd,
-    &tagdb_initialized,
-    tagdb_init,
-    strcasestr,
+
+    /* new stuff at the end, sort into place next time
+       the API gets incompatible */
+
 };
 
 #if CONFIG_HWCODEC == MASNONE

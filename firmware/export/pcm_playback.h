@@ -31,7 +31,6 @@ void pcm_play_data(const unsigned char* start, int size,
 void pcm_play_stop(void);
 void pcm_play_pause(bool play);
 bool pcm_is_playing(void);
-void pcm_set_volume(int volume);
 
 /* These functions are for playing chained buffers of PCM data */
 void pcm_play_init(void);

@@ -123,20 +123,6 @@ static void dma_stop(void)
     IIS2CONFIG = 0x800;
 }
 
-/* set volume of the main channel */
-void pcm_set_volume(int volume)
-{
-   if(volume > 0)
-   {
-       uda1380_mute(0);
-       uda1380_setvol(0xff - volume); 
-   }
-   else
-   {
-       uda1380_mute(1);
-   } 
-}
-
 /* sets frequency of input to DAC */
 void pcm_set_frequency(unsigned int frequency)
 {
