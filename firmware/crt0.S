@@ -115,9 +115,8 @@ irq_handler:
 	pop r1, r0
 	ret_irq
 
-#elif CONFIG_CPU == MCF5249
-
-        /* Platform:     iRiver H1xx */
+#elif defined(IRIVER_H100)
+        /* Platform:     iRiver H120/H140 */
         move.w #0x2700,%sr
 
         move.l #vectors,%d0
