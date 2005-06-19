@@ -856,8 +856,10 @@ bool mp3info(struct mp3entry *entry, const char *filename, bool v1first)
     if(-1 == fd)
         return true;
 
+#if CONFIG_HWCODEC != MASNONE
     memset(entry, 0, sizeof(struct mp3entry));
-   
+#endif
+	
     strncpy(entry->path, filename, sizeof(entry->path));
  
     entry->title = NULL;
