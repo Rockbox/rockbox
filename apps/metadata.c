@@ -25,6 +25,7 @@
 #include "mp3_playback.h"
 #include "mp3data.h"
 #include "logf.h"
+#include "atoi.h"
 
 /* Simple file type probing by looking filename extension. */
 int probe_file_format(const char *filename)
@@ -84,6 +85,8 @@ unsigned short a52_441framesizes[]=
 
 /* Get metadata for track - return false if parsing showed problems with the
    file that would prevent playback. */
+
+static bool get_apetag_info (struct mp3entry *entry, int fd);
 
 bool get_metadata(struct track_info* track, int fd, const char* trackname,
                   bool v1first) {
@@ -341,6 +344,7 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
                   (track->id3.length / 8);
       }
 
+      get_apetag_info (&track->id3, fd);    /* use any apetag info we find */
       lseek (fd, 0, SEEK_SET);
       strncpy (track->id3.path, trackname, sizeof (track->id3.path));
       track->taginfo_ready = true;
@@ -411,3 +415,291 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
 
   return true;
 }
+
+/************************* APE TAG HANDLING CODE ****************************/
+
+/*
+ * This is a first pass at APEv2 tag handling. I'm not sure if this should
+ * reside here, but I wanted to modify as little as possible since I don't
+ * have a feel for the complete system. It may be that APEv2 tags should be
+ * added to the ID3 handling code in the firmware directory. APEv2 tags are
+ * used in WavPack files and Musepack files by default, however they are
+ * also used in MP3 files sometimes (by Foobar2000). Also, WavPack files can
+ * also use ID3v1 tags (but not ID3v2), so it seems like some universal tag
+ * handler might be a reasonable approach.
+ *
+ * This code does not currently handle APEv1 tags, but I believe that this
+ * is not a problem because they were only used in Monkey's Audio files which
+ * will probably never be playable in RockBox (and certainly not by this CPU).
+ */
+
+#define APETAG_HEADER_FORMAT "8LLLL"
+#define APETAG_HEADER_LENGTH 32
+#define APETAG_DATA_LIMIT 4096
+
+struct apetag_header {
+    char id [8];
+    long version, length, item_count, flags;
+    char res [8];
+};
+
+static struct apetag {
+    struct apetag_header header;
+    char data [APETAG_DATA_LIMIT];
+} temp_apetag;
+
+static int get_apetag_item (struct apetag *tag,
+                            const char *item,
+                            char *value,
+                            int size);
+
+static int load_apetag (int fd, struct apetag *tag);
+static void UTF8ToAnsi (unsigned char *pUTF8);
+
+/*
+ * This function searches the specified file for an APEv2 tag and uses any
+ * information found there to populate the appropriate fields in the specified
+ * mp3entry structure. A temporary buffer is used to hold the tag during this
+ * operation. For now, the actual string data that needs to be held during the
+ * life of the track entry is stored in the "id3v2buf" field (which should not
+ * be used for any file that has an APEv2 tag). This limits the total space
+ * for the artist, title, album, composer and genre strings to 300 characters.
+ */
+
+static bool get_apetag_info (struct mp3entry *entry, int fd)
+{
+    int rem_space = sizeof (entry->id3v2buf), str_space;
+    char *temp_buffer = entry->id3v2buf;
+
+    if (rem_space <= 1 || !load_apetag (fd, &temp_apetag))
+        return false;
+
+    if (get_apetag_item (&temp_apetag, "year", temp_buffer, rem_space))
+        entry->year = atoi (temp_buffer);
+
+    if (get_apetag_item (&temp_apetag, "track", temp_buffer, rem_space))
+        entry->tracknum = atoi (temp_buffer);
+
+    if (get_apetag_item (&temp_apetag, "artist", temp_buffer, rem_space)) {
+        UTF8ToAnsi (entry->artist = temp_buffer);
+        str_space = strlen (temp_buffer) + 1;
+        temp_buffer += str_space;
+        rem_space -= str_space;
+    }
+
+    if (rem_space > 1 &&
+        get_apetag_item (&temp_apetag, "title", temp_buffer, rem_space)) {
+            UTF8ToAnsi (entry->title = temp_buffer);
+            str_space = strlen (temp_buffer) + 1;
+            temp_buffer += str_space;
+            rem_space -= str_space;
+    }
+
+    if (rem_space > 1 &&
+        get_apetag_item (&temp_apetag, "album", temp_buffer, rem_space)) {
+            UTF8ToAnsi (entry->album = temp_buffer);
+            str_space = strlen (temp_buffer) + 1;
+            temp_buffer += str_space;
+            rem_space -= str_space;
+    }
+
+    if (rem_space > 1 &&
+        get_apetag_item (&temp_apetag, "genre", temp_buffer, rem_space)) {
+            UTF8ToAnsi (entry->genre_string = temp_buffer);
+            str_space = strlen (temp_buffer) + 1;
+            temp_buffer += str_space;
+            rem_space -= str_space;
+    }
+
+    if (rem_space > 1 &&
+        get_apetag_item (&temp_apetag, "composer", temp_buffer, rem_space))
+            UTF8ToAnsi (entry->composer = temp_buffer);
+
+    return true;
+}
+
+/*
+ * Helper function to convert little-endian structures to easily usable native
+ * format using a format string (this does nothing on a little-endian machine).
+ */ 
+
+static void little_endian_to_native (void *data, char *format)
+{
+    unsigned char *cp = (unsigned char *) data;
+    long temp;
+
+    while (*format) {
+        switch (*format) {
+            case 'L':
+                temp = cp [0] + ((long) cp [1] << 8) + ((long) cp [2] << 16) + ((long) cp [3] << 24);
+                * (long *) cp = temp;
+                cp += 4;
+                break;
+
+            case 'S':
+                temp = cp [0] + (cp [1] << 8);
+                * (short *) cp = (short) temp;
+                cp += 2;
+                break;
+
+            default:
+                if (*format >= '0' && *format <= '9')
+                    cp += *format - '0';
+
+                break;
+        }
+
+        format++;
+    }
+}
+
+/*
+ * Attempt to obtain the named string-type item from the specified APEv2 tag.
+ * The tag value will be copied to "value" (including an appended terminating
+ * NULL) and the length of the string (including the NULL) will be returned.
+ * If the data will not fit in the specified "size" then it will be truncated
+ * early (but still terminated). If the specified item is not found then 0 is
+ * returned and written to the first character of "value". If "value" is
+ * passed in as NULL, then the specified size is ignored and the actual size
+ * required to store the value is returned.
+ *
+ * Note that this function does not work on binary tag data; only UTF-8
+ * encoded strings. However, numeric data (like ReplayGain) is usually stored
+ * as strings.
+ *
+ * Also, APEv2 tags may have multiple values for a given item and these will
+ * all be copied to "value" with NULL separators (this is why the total data
+ * size is returned). Of course, it is possible to ignore any additional
+ * values by simply using up to the first NULL.
+ */
+
+static int get_apetag_item (struct apetag *tag,
+                            const char *item,
+                            char *value,
+                            int size)
+{
+    if (value && size)
+        *value = 0;
+
+    if (tag->header.id [0] == 'A') {
+        char *p = tag->data;
+        char *q = p + tag->header.length - APETAG_HEADER_LENGTH;
+        int i;
+
+        for (i = 0; i < tag->header.item_count; ++i) {
+            int vsize, flags, isize;
+
+            vsize = * (long *) p; p += 4;
+            flags = * (long *) p; p += 4;
+            isize = strlen (p);
+
+            little_endian_to_native (&vsize, "L");
+            little_endian_to_native (&flags, "L");
+
+            if (p + isize + vsize + 1 > q)
+                break;
+
+            if (isize && vsize && !stricmp (item, p) && !(flags & 6)) {
+
+                if (value) {
+                    if (vsize + 1 > size)
+                        vsize = size - 1;
+
+                    memcpy (value, p + isize + 1, vsize);
+                    value [vsize] = 0;
+                }
+
+                return vsize + 1;
+            }
+            else
+                p += isize + vsize + 1;
+        }
+    }
+
+    return 0;
+}
+
+/*
+ * Attempt to load an APEv2 tag from the specified file into the specified
+ * structure. If the APEv2 tag will not fit into the predefined data size,
+ * then the tag is not loaded. A return value of TRUE indicates success.
+ */
+
+static int load_apetag (int fd, struct apetag *tag)
+{
+    if (lseek (fd, -APETAG_HEADER_LENGTH, SEEK_END) == -1 ||
+        read (fd, &tag->header, APETAG_HEADER_LENGTH) != APETAG_HEADER_LENGTH ||
+        strncmp (tag->header.id, "APETAGEX", 8)) {
+            tag->header.id [0] = 0;
+            return false;
+    }
+
+    little_endian_to_native (&tag->header, APETAG_HEADER_FORMAT);
+
+    if (tag->header.version == 2000 && tag->header.item_count &&
+        tag->header.length > APETAG_HEADER_LENGTH &&
+        tag->header.length < APETAG_DATA_LIMIT) {
+
+            int data_size = tag->header.length - APETAG_HEADER_LENGTH;
+
+            if (lseek (fd, -tag->header.length, SEEK_END) == -1 ||
+                read (fd, tag->data, data_size) != data_size) {
+                    tag->header.id [0] = 0;
+                    return false;
+            }
+            else
+                return true;
+    }
+
+    tag->header.id [0] = 0;
+    return false;
+}
+
+/*
+ * This is a *VERY* boneheaded attempt to convert UTF-8 unicode character
+ * strings to ANSI. It simply maps the 16-bit Unicode characters that are
+ * less than 0x100 directly to an 8-bit value, and turns all the rest into
+ * question marks. This can be done "in-place" because the resulting string
+ * can only get smaller.
+ */
+
+static void UTF8ToAnsi (unsigned char *pUTF8)
+{
+    unsigned char *pAnsi = pUTF8;
+    unsigned short widechar = 0;
+    int trail_bytes = 0;
+
+    while (*pUTF8) {
+        if (*pUTF8 & 0x80) {
+            if (*pUTF8 & 0x40) {
+                if (trail_bytes) {
+                    trail_bytes = 0;
+                    *pAnsi++ = widechar < 0x100 ? widechar : '?';
+                }
+                else {
+                    char temp = *pUTF8;
+
+                    while (temp & 0x80) {
+                        trail_bytes++;
+                        temp <<= 1;
+                    }
+
+                    widechar = temp >> trail_bytes--;
+                }
+            }
+            else if (trail_bytes) {
+                widechar = (widechar << 6) | (*pUTF8 & 0x3f);
+
+                if (!--trail_bytes)
+                    *pAnsi++ = widechar < 0x100 ? widechar : '?';
+            }
+        }
+        else
+            *pAnsi++ = *pUTF8;
+
+        pUTF8++;
+    }
+
+    *pAnsi = 0;
+}
+
