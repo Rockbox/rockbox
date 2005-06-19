@@ -229,7 +229,10 @@ int sound_default(int setting)
 }
 
 #ifndef SIMULATOR
-#if CONFIG_HWCODEC == MAS3507D
+#if CONFIG_HWCODEC == MAS3507D /* volume/balance/treble/bass interdependency */
+#define VOLUME_MIN -780
+#define VOLUME_MAX  180
+
 static const unsigned int bass_table[] =
 {
     0x9e400, /* -15dB */
@@ -320,19 +323,41 @@ static const unsigned int prescale_table[] =
     0xe9400  /* 15dB */
 };
 
-/* all values in tenth of dB */
-int current_volume = 0;   /* -780..+180 */
-int current_balance = 0;  /* -960..+960 */
-int current_treble = 0;   /* -150..+150 */
-int current_bass = 0;     /* -150..+150 */
-
-/* convert tenth of dB volume to register value */
+/* convert tenth of dB volume to dac3550 register value */
 static int tenthdb2reg(int db) {
     if (db < -540)
         return (db + 780) / 30;
     else
         return (db + 660) / 15;
 }
+#endif
+
+#ifdef HAVE_UDA1380  /* volume/balance/treble/bass interdependency */
+#define VOLUME_MIN -840
+#define VOLUME_MAX  0
+
+/* convert tenth of dB volume to master volume register value */
+static int tenthdb2master(int db) {
+    if (db < -720)                  /* 1.5 dB steps */
+        return (2940 - db) / 15;
+    else if (db < -660)             /* 0.75 dB steps */
+        return (1110 - db) * 2 / 15;
+    else if (db < -520)             /* 0.5 dB steps */
+        return (520 - db) / 5;
+    else                            /* 0.25 dB steps */
+        return -db * 2 / 5;
+}
+#endif
+
+#if (CONFIG_HWCODEC == MAS3507D) || defined HAVE_UDA1380
+ /* volume/balance/treble/bass interdependency main part */
+#define VOLUME_RANGE (VOLUME_MAX - VOLUME_MIN)
+
+/* all values in tenth of dB    MAS3507D    UDA1380  */
+int current_volume = 0;    /* -780..+180  -840..   0 */
+int current_balance = 0;   /* -960..+960  -840..+840 */
+int current_treble = 0;    /* -150..+150     0.. +60 */
+int current_bass = 0;      /* -150..+150     0..+240 */
 
 static void set_prescaled_volume(void)
 {
@@ -344,70 +369,39 @@ static void set_prescaled_volume(void)
         prescale = 0;  /* no need to prescale if we don't boost
                           bass or treble */
 
+#if CONFIG_HWCODEC == MAS3507D
     mas_writereg(MAS_REG_KPRESCALE, prescale_table[prescale/10]);
+#else /* UDA1380 */
+    uda1380_set_mixer_vol(prescale*2/5, prescale*2/5);
+    /* The needed range of 0..-24 dB is fortunately linear */
+#endif
 
-    /* gain up the analog volume to compensate the prescale reduction gain,
-     * but limit to +18 dB (the maximum the DAC can do */
-    if (current_volume + prescale > 180)
-        prescale = 180 - current_volume;
+    /* gain up the analog volume to compensate the prescale gain reduction,
+     * but limit to the possible maximum */
+    if (current_volume + prescale > VOLUME_MAX)
+        prescale = VOLUME_MAX - current_volume;
     l = r = current_volume + prescale;
 
     if (current_balance > 0)
     {
         l -= current_balance;
-        if (l < -780)
-            l = -780;
+        if (l < VOLUME_MIN)
+            l = VOLUME_MIN;
     }
     if (current_balance < 0)
     {
         r += current_balance;
-        if (r < -780)
-            r = -780;
+        if (r < VOLUME_MIN)
+            r = VOLUME_MIN;
     }
 
+#if CONFIG_HWCODEC == MAS3507D
     dac_volume(tenthdb2reg(l), tenthdb2reg(r), false);
-}
-#elif CONFIG_HWCODEC == MASNONE
-#ifdef HAVE_UDA1380  /* iriver H1x0 + H3x0 */
-/* all values in tenth of dB */
-int current_volume = 0;   /* -840..0 */
-int current_balance = 0;  /* -840..+840 */
-
-/* convert tenth of dB volume to register value */
-static int tenthdb2reg(int db) {
-    if (db < -720)                  /* 1.5 dB steps */
-        return (2940 - db) / 15;
-    else if (db < -660)             /* 0.75 dB steps */
-        return (1110 - db) * 2 / 15;
-    else if (db < -520)             /* 0.5 dB steps */
-        return (520 - db) / 5;
-    else                            /* 0.25 dB steps */
-        return -db * 2 / 5;
-}
-
-static void set_volume(void)
-{
-    int l, r;
-
-    l = r = current_volume;
-
-    if (current_balance > 0)
-    {
-        l -= current_balance;
-        if (l < -840)
-            l = -840;
-    }
-    if (current_balance < 0)
-    {
-        r += current_balance;
-        if (r < -840)
-            r = -840;
-    }
-
-    uda1380_setvol(tenthdb2reg(l), tenthdb2reg(r));
-}
+#else /* UDA1380 */
+    uda1380_set_master_vol(tenthdb2master(l), tenthdb2master(r));
 #endif
-#endif /* MASNONE */
+}
+#endif /* (CONFIG_HWCODEC == MAS3507D) || defined HAVE_UDA1380 */
 #endif /* !SIMULATOR */
 
 int channel_configuration = SOUND_CHAN_STEREO;
@@ -516,12 +510,9 @@ void sound_set(int setting, int value)
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
             tmp = 0x7f00 * value / 100;
             mas_codec_writereg(0x10, tmp & 0xff00);
-#elif CONFIG_HWCODEC == MAS3507D
-            current_volume = -780 + (value * 960 / 100); /* tenth of dB */
-            set_prescaled_volume();
-#elif defined(HAVE_UDA1380)
-            current_volume = -840 + (value * 840 / 100); /* tenth of dB */
-            set_volume();
+#elif (CONFIG_HWCODEC == MAS3507D) || defined HAVE_UDA1380
+            current_volume = VOLUME_MIN + (value * VOLUME_RANGE / 100);
+            set_prescaled_volume();                   /* tenth of dB */
 #endif
             break;
 
@@ -529,12 +520,9 @@ void sound_set(int setting, int value)
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
             tmp = ((value * 127 / 100) & 0xff) << 8;
             mas_codec_writereg(0x11, tmp & 0xff00);
-#elif CONFIG_HWCODEC == MAS3507D
-            current_balance = value * 960 / 100; /* tenth of dB */
+#elif CONFIG_HWCODEC == MAS3507D || defined HAVE_UDA1380
+            current_balance = value * VOLUME_RANGE / 100; /* tenth of dB */
             set_prescaled_volume();
-#elif defined(HAVE_UDA1380)
-            current_balance = value * 840 / 100; /* tenth of dB */
-            set_volume();
 #endif
             break;
 
@@ -548,6 +536,8 @@ void sound_set(int setting, int value)
             set_prescaled_volume();
 #elif defined(HAVE_UDA1380)
             uda1380_set_bass(value >> 1);
+            current_bass = value * 10;
+            set_prescaled_volume();
 #endif
             break;
 
@@ -561,6 +551,8 @@ void sound_set(int setting, int value)
             set_prescaled_volume();
 #elif defined(HAVE_UDA1380)
             uda1380_set_treble(value >> 1);
+            current_treble = value * 10;
+            set_prescaled_volume();
 #endif
             break;
             

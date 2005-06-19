@@ -54,7 +54,7 @@ unsigned short uda1380_defaults[2*NUM_DEFAULT_REGS] =
    REG_MIX_VOL,    MIX_VOL_CH_1(0) | MIX_VOL_CH_2(0xff),           /* 00=max, ff=mute */
    REG_EQ,         EQ_MODE_MAX,                                    /* Bass and tremble = 0 dB */
    REG_MUTE,       MUTE_MASTER,                                    /* Mute everything to start with */ 
-   REG_MIX_CTL,    0,
+   REG_MIX_CTL,    MIX_CTL_MIX,                                    /* Enable mixer */
    REG_DEC_VOL,    0,
    REG_PGA,        MUTE_ADC,
    REG_ADC,        SKIP_DCFIL,
@@ -87,14 +87,23 @@ int uda1380_write_reg(unsigned char reg, unsigned short value)
 /**
  * Sets left and right master volume  (0(max) to 252(muted))
  */
-int uda1380_setvol(int vol_l, int vol_r)
+int uda1380_set_master_vol(int vol_l, int vol_r)
 {
     return uda1380_write_reg(REG_MASTER_VOL,
                              MASTER_VOL_LEFT(vol_l) | MASTER_VOL_RIGHT(vol_r));
 }
 
 /**
- * Sets the bass value (0-15)
+ * Sets mixer volume for both channels (0(max) to 228(muted))
+ */
+int uda1380_set_mixer_vol(int channel1, int channel2)
+{
+    return uda1380_write_reg(REG_MIX_VOL,
+                             MIX_VOL_CH_1(channel1) | MIX_VOL_CH_2(channel2));
+}
+
+/**
+ * Sets the bass value (0-12)
  */
 void uda1380_set_bass(int value)
 {

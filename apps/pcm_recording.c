@@ -73,7 +73,7 @@ bool pcm_rec_screen(void)
     //cpu_boost(true);
 
     uda1380_enable_output(true);
-    uda1380_setvol(play_vol, play_vol);
+    uda1380_set_master_vol(play_vol, play_vol);
       
     rec_monitor = 0;     // No record feedback
     rec_source  = 1;     // Mic
