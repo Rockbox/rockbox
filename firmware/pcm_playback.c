@@ -27,6 +27,7 @@
 #include "uda1380.h"
 #include "system.h"
 #endif
+#include "logf.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -225,6 +226,7 @@ void pcm_play_stop(void)
     if (pcm_playing) {
         uda1380_enable_output(false);
         pcm_boost(false);
+        sleep(HZ/16);
         dma_stop();
     }
     pcmbuf_unplayed_bytes = 0;
@@ -384,36 +386,38 @@ bool pcm_is_lowdata(void)
 
 bool pcm_crossfade_start(void)
 {
-    //logf("cf:%d", audiobuffer_free / CHUNK_SIZE);
-    if (audiobuffer_free > CHUNK_SIZE * 4 || !crossfade_enabled) {
+    if (PCMBUF_SIZE - audiobuffer_free < CHUNK_SIZE * 4 || !crossfade_enabled) {
         return false;
     }
+    logf("crossfading!");
     pcm_boost(true);
     crossfade_active = true;
     crossfade_pos = audiobuffer_pos;
-    crossfade_amount = (PCMBUF_SIZE - audiobuffer_free - CHUNK_SIZE * 22)/2;
+    crossfade_amount = (PCMBUF_SIZE - audiobuffer_free - (CHUNK_SIZE * 4))/2;
     crossfade_rem = crossfade_amount;
     audiobuffer_fillpos = 0;
     
     crossfade_pos -= crossfade_amount*2;
     if (crossfade_pos < 0)
-        crossfade_pos = PCMBUF_SIZE + crossfade_pos;
+        crossfade_pos += PCMBUF_SIZE;
     return true;
 }
 
 static __inline
 void crossfade(short *buf, const short *buf2, int length)
 {
-    while (length--) {
-        *buf = (int)((*buf * ((crossfade_rem)*1000/crossfade_amount))/1000);
-        *buf += (int)((*buf2 * ((crossfade_amount-crossfade_rem)*1000/crossfade_amount))/1000);
-        buf++;
-        buf2++;
-        if (--crossfade_rem <= 0) {
-            crossfade_active = false;
-            break ;
-        }
+    int i, size;
+    
+    logf("cfi: %d/%d", length, crossfade_rem);
+    size = MIN(length, crossfade_rem);
+    for (i = 0; i < length; i++) {
+        /* This is not yet realtime, needs optimizations for crossfade to work. */
+        buf[i] = ((buf[i] * ((crossfade_rem)*1000/crossfade_amount))/1000)
+          + ((buf2[i] * ((crossfade_amount-crossfade_rem)*1000/crossfade_amount))/1000);
     }
+    
+    if (--crossfade_rem <= 0)
+        crossfade_active = false;
 }
 
 bool audiobuffer_insert(char *buf, size_t length)
