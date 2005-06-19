@@ -47,7 +47,8 @@
 /* Must be a power of 2 */
 #define NUM_PCM_BUFFERS      (PCMBUF_SIZE / CHUNK_SIZE)
 #define NUM_PCM_BUFFERS_MASK (NUM_PCM_BUFFERS - 1)
-#define PCM_WATERMARK        (CHUNK_SIZE * 6)
+#define PCM_WATERMARK        (CHUNK_SIZE * 4)
+#define PCM_CF_WATERMARK     (PCMBUF_SIZE - CHUNK_SIZE*4)
 
 static bool pcm_playing;
 static bool pcm_paused;
@@ -345,7 +346,8 @@ void pcm_watermark_callback(int bytes_left)
     
     /* Fill audio buffer by boosting cpu */
     pcm_boost(true);
-    crossfade_active = false;
+    if (bytes_left <= CHUNK_SIZE * 2)
+        crossfade_active = false;
 }
 
 void pcm_set_boost_mode(bool state)
@@ -378,7 +380,7 @@ bool pcm_is_lowdata(void)
     if (!pcm_is_playing() || pcm_paused)
         return false;
     
-    if (pcmbuf_unplayed_bytes < PCM_WATERMARK)
+    if (pcmbuf_unplayed_bytes < PCM_WATERMARK || crossfade_active)
         return true;
         
     return false;
@@ -386,14 +388,22 @@ bool pcm_is_lowdata(void)
 
 bool pcm_crossfade_start(void)
 {
-    if (PCMBUF_SIZE - audiobuffer_free < CHUNK_SIZE * 4 || !crossfade_enabled) {
+    if (PCMBUF_SIZE - audiobuffer_free < CHUNK_SIZE * 8 || !crossfade_enabled) {
         return false;
     }
     logf("crossfading!");
+    
+    if (audiobuffer_fillpos) {
+        while (!pcm_play_add_chunk(&audiobuffer[audiobuffer_pos], 
+                                   audiobuffer_fillpos, pcm_event_handler)) {
+            yield();
+        }
+        pcm_event_handler = NULL;
+    }
     pcm_boost(true);
     crossfade_active = true;
     crossfade_pos = audiobuffer_pos;
-    crossfade_amount = (PCMBUF_SIZE - audiobuffer_free - (CHUNK_SIZE * 4))/2;
+    crossfade_amount = (PCMBUF_SIZE - audiobuffer_free - (CHUNK_SIZE * 6))/2;
     crossfade_rem = crossfade_amount;
     audiobuffer_fillpos = 0;
     
@@ -404,20 +414,22 @@ bool pcm_crossfade_start(void)
 }
 
 static __inline
-void crossfade(short *buf, const short *buf2, int length)
+int crossfade(short *buf, const short *buf2, int length)
 {
     int i, size;
+    int val1 = (crossfade_rem)*1000/crossfade_amount;
+    int val2 = (crossfade_amount-crossfade_rem)*1000/crossfade_amount;
     
     logf("cfi: %d/%d", length, crossfade_rem);
     size = MIN(length, crossfade_rem);
     for (i = 0; i < length; i++) {
-        /* This is not yet realtime, needs optimizations for crossfade to work. */
-        buf[i] = ((buf[i] * ((crossfade_rem)*1000/crossfade_amount))/1000)
-          + ((buf2[i] * ((crossfade_amount-crossfade_rem)*1000/crossfade_amount))/1000);
+        buf[i] = ((buf[i] * val1) + (buf2[i] * val2)) / 1000;
     }
-    
-    if (--crossfade_rem <= 0)
+    crossfade_rem -= i;
+    if (crossfade_rem <= 0)
         crossfade_active = false;
+     
+    return size;
 }
 
 bool audiobuffer_insert(char *buf, size_t length)
@@ -440,7 +452,7 @@ bool audiobuffer_insert(char *buf, size_t length)
         if (crossfade_active) {
             copy_n = MIN(length, PCMBUF_SIZE - (unsigned int)crossfade_pos);
             
-            crossfade((short *)&audiobuffer[crossfade_pos], 
+            copy_n = 2 * crossfade((short *)&audiobuffer[crossfade_pos], 
                       (const short *)buf, copy_n/2);
             buf += copy_n;
             length -= copy_n;
@@ -497,9 +509,13 @@ void pcm_play_init(void)
     pcmbuf_read_index = 0;
     pcmbuf_write_index = 0;
     pcmbuf_unplayed_bytes = 0;
-    crossfade_enabled = false;
+    crossfade_active = false;
     pcm_event_handler = NULL;
-    pcm_play_set_watermark(PCM_WATERMARK, pcm_watermark_callback);
+    if (crossfade_enabled) {
+        pcm_play_set_watermark(PCM_CF_WATERMARK, pcm_watermark_callback);
+    } else {
+        pcm_play_set_watermark(PCM_WATERMARK, pcm_watermark_callback);
+    }
 }
 
 void pcm_crossfade_enable(bool on_off)
