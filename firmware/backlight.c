@@ -63,7 +63,6 @@ static unsigned int remote_backlight_timeout = 5;
 #define BL_PWM_COUNT    100
 /* Cycle interval in ms */
 #define BL_PWM_INTERVAL      5000
-#define BL_PWM_INTERVAL_IDLE 500000
 #define BL_DIM_SPEED    4
 #define __backlight_on __backlight_fade_in
 #define __backlight_off __backlight_fade_out
@@ -116,6 +115,7 @@ void TIMER1(void) __attribute__ ((interrupt_handler));
 void TIMER1(void)
 {
     int timer_period;
+    bool idle = false;
 #ifdef HAVE_REMOTE_LCD_DIMMABLE
     int new_timer_period;
 #endif
@@ -133,6 +133,7 @@ void TIMER1(void)
             timer_period = timer_period * bl_pwm_counter / BL_PWM_COUNT;
             bl_dim_state = DIM_STATE_MAIN;
         } else {
+            idle = true;
             if (bl_dim_current)
                 GPIO1_OUT &= ~0x00020000;
             else
@@ -144,6 +145,7 @@ void TIMER1(void)
         bl_pwm_remote_counter = 0;
         if (bl_dim_remote_current > 0 && 
             bl_dim_remote_current < BL_PWM_COUNT) {
+            idle = false;
             GPIO_OUT &= ~0x00000800;
             bl_pwm_remote_counter = bl_dim_remote_current;
             if (bl_dim_state == DIM_STATE_START) {
@@ -204,7 +206,6 @@ void TIMER1(void)
     }
     
     if (bl_cycle_counter >= BL_DIM_SPEED) {
-        bool idle = true;
         if (bl_dim_target > bl_dim_current) {
             bl_dim_current++;
             idle = false;
