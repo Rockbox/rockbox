@@ -159,7 +159,7 @@
 #define PDOR1_R  (*(volatile unsigned long *)(MBAR2 + 0x044))
 #define PDOR2_L  (*(volatile unsigned long *)(MBAR2 + 0x054))
 #define PDOR2_R  (*(volatile unsigned long *)(MBAR2 + 0x064))
-#define PDIR3    (*(volatile unsigned long *)(MBAR2 + 0x074))
+#define PDIR2    (*(volatile unsigned long *)(MBAR2 + 0x074))
 #define PDOR3    (*(volatile unsigned long *)(MBAR2 + 0x074))
 #define UCHANNELTRANSMIT  (*(volatile unsigned long *)(MBAR2 + 0x084))
 #define U1CHANNELRECEIVE  (*(volatile unsigned long *)(MBAR2 + 0x088))
@@ -262,5 +262,8 @@
 /* DMAROUTE config */
 #define DMA0_REQ_AUDIO_1     0x80
 #define DMA0_REQ_AUDIO_2     0x81
+#define DMA1_REQ_AUDIO_1     0x8000
+#define DMA1_REQ_AUDIO_2     0x8100
+
 
 #endif

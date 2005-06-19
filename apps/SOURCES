@@ -51,4 +51,7 @@ recorder/recording.c
 #ifdef IRIVER_H100
 playback.c
 metadata.c
+#ifndef SIMULATOR
+pcm_recording.c
+#endif
 #endif

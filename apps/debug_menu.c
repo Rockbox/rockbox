@@ -58,6 +58,9 @@
 #include "ata_mmc.h"
 #endif
 #include "logfdisp.h"
+#if defined(IRIVER_H100) && !defined(SIMULATOR)
+extern bool pcm_rec_screen(void);
+#endif
 
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
@@ -1799,6 +1802,9 @@ bool debug_menu(void)
 #endif
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
         { "CPU frequency", dbg_cpufreq },
+#endif
+#if defined(IRIVER_H100) && !defined(SIMULATOR)
+        { "PCM recording", pcm_rec_screen },
 #endif
 #if CONFIG_CPU == SH7034
 #ifdef HAVE_LCD_BITMAP

@@ -63,6 +63,9 @@
 #if (CONFIG_HWCODEC == MASNONE)
 #include "pcm_playback.h"
 #endif
+#if defined(IRIVER_H100) && !defined(SIMULATOR)
+#include "pcm_record.h"
+#endif
 
 #ifdef CONFIG_TUNER
 #include "radio.h"
@@ -292,6 +295,9 @@ void init(void)
 
 #if (CONFIG_HWCODEC == MASNONE)
     pcm_init();
+#endif
+#if defined(IRIVER_H100) && !defined(SIMULATOR)
+    pcm_init_recording();
 #endif
 #ifdef HAVE_CHARGING
     car_adapter_mode_init();

@@ -126,4 +126,7 @@ drivers/uda1380.c
 #if (CONFIG_HWCODEC == MASNONE) && !defined(SIMULATOR)
 pcm_playback.c
 #endif
+#if defined(IRIVER_H100) && !defined(SIMULATOR)
+pcm_record.c
+#endif
 sound.c

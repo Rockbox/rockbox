@@ -200,7 +200,7 @@ void uda1380_close(void)
  */
 void uda1380_enable_recording(bool source_mic)
 {
-   uda1380_write_reg(REG_0, uda1380_regs[REG_0] | EN_ADC);
+    uda1380_write_reg(REG_0, uda1380_regs[REG_0] | EN_ADC);
 
     if (source_mic)
     {
@@ -213,6 +213,8 @@ void uda1380_enable_recording(bool source_mic)
         uda1380_write_reg(REG_ADC, EN_DCFIL);
         uda1380_write_reg(REG_PGA, (uda1380_regs[REG_PGA] & PGA_GAIN_MASK) | PGA_GAINL(0) | PGA_GAINR(0)); /* PGA_GAIN: 0=0 dB, F=24dB */
     }
+
+    sleep(HZ/8);
 
     uda1380_write_reg(REG_I2S,     uda1380_regs[REG_I2S] | I2S_MODE_MASTER);
     uda1380_write_reg(REG_MIX_CTL, MIX_MODE(3));   /* Not sure which mode is the best one.. */
