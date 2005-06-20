@@ -2759,7 +2759,7 @@ id: LANG_MDB_CENTER
 desc:  in sound settings
 eng: "MDB Center frequency"
 voice: "MDB Center frequency"
-new: "MDB keskitaajuus
+new: "MDB keskitaajuus"
 
 id: LANG_MDB_SHAPE
 desc:  in sound settings
