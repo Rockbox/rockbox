@@ -1407,35 +1407,43 @@ static bool add_dir(char* dirname, int len, int fd)
         }
         else {
             int x = strlen(entry->d_name);
-            if ((!strcasecmp(&entry->d_name[x-4], ".mp3")) ||
-                (!strcasecmp(&entry->d_name[x-4], ".mp2")) ||
-                (!strcasecmp(&entry->d_name[x-4], ".mpa")))
-            {
-                char buf[8];
-                write(fd, dirname, strlen(dirname));
-                write(fd, "/", 1);
-                write(fd, entry->d_name, x);
-                write(fd, "\n", 1);
+            int xl;
+            unsigned int i;
 
-                plsize++;
-                snprintf(buf, sizeof buf, "%d", plsize);
+            /* add all supported audio files to playlists */
+            for (i=0; i < sizeof(filetypes); i++) {
+                if (filetypes[i].tree_attr == TREE_ATTR_MPA) {
+                    xl=strlen(filetypes[i].extension);
+                    if (!strcasecmp(&entry->d_name[x-xl],
+                                    filetypes[i].extension))
+                    {
+                        char buf[8];
+                        write(fd, dirname, strlen(dirname));
+                        write(fd, "/", 1);
+                        write(fd, entry->d_name, x);
+                        write(fd, "\n", 1);
+
+                        plsize++;
+                        snprintf(buf, sizeof buf, "%d", plsize);
 #ifdef HAVE_LCD_BITMAP
-                lcd_puts(0,4,buf);
-                lcd_update();
+                        lcd_puts(0,4,buf);
+                        lcd_update();
 #else
-                x = 10;
-                if (plsize > 999)
-                    x=7;
-                else {
-                    if (plsize > 99)
-                        x=8;
-                    else {
-                        if (plsize > 9)
-                            x=9;
+                        x = 10;
+                        if (plsize > 999)
+                            x=7;
+                        else {
+                            if (plsize > 99)
+                                x=8;
+                            else {
+                                if (plsize > 9)
+                                    x=9;
+                            }
+                        }
+                        lcd_puts(x,0,buf);
+#endif
                     }
                 }
-                lcd_puts(x,0,buf);
-#endif
             }
         }
     }
@@ -1461,11 +1469,20 @@ bool create_playlist(void)
     if (fd < 0)
         return false;
 
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    cpu_boost(true);
+#endif
+    
     snprintf(filename, sizeof(filename), "%s",
              tc.currdir[1] ? tc.currdir : "/");
     plsize = 0;
     add_dir(filename, sizeof(filename), fd);
     close(fd);
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    cpu_boost(true);
+#endif
+    
     sleep(HZ);
 
     return true;
