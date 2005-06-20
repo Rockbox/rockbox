@@ -1048,6 +1048,7 @@ void audio_thread(void)
 #ifndef SIMULATOR                
             case SYS_USB_CONNECTED:
                 playing = false;
+                filling = false;
                 ci.stop_codec = true;
                 logf("USB Connection");
                 pcm_play_stop();
