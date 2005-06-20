@@ -83,8 +83,9 @@ void backlight_start_timer(void)
         return ;
         
     /* Prevent cpu frequency changes while dimming. */
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
     cpu_boost(true);
-    
+#endif    
     count = 1;
     bl_timer_active = true;
 
@@ -155,7 +156,9 @@ void TIMER1(void)
 
     if (idle) 
     {
-        cpu_boost(false);
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+        cpu_boost(true);
+#endif    
         bl_timer_active = false;
         TMR1 = 0;
     }
@@ -177,7 +180,9 @@ void backlight_allow_timer(bool on)
 
     if (!timer_allowed && bl_timer_active)
     {
-        cpu_boost(false);
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+        cpu_boost(true);
+#endif    
         bl_dim_current = bl_dim_target;
         bl_timer_active = false;
         TMR1 = 0;

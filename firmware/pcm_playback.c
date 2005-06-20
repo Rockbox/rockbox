@@ -114,7 +114,9 @@ void pcm_boost(bool state)
         return ;
         
     if (state != boost_state) {
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
         cpu_boost(state);
+#endif    
         boost_state = state;
     }
 }
