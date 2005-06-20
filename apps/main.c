@@ -276,6 +276,13 @@ void init(void)
               global_settings.mdb_enable,
               global_settings.superbass);
     audio_init();
+#if (CONFIG_HWCODEC == MASNONE)
+    pcm_init();
+    sound_settings_apply();
+#endif
+#if defined(IRIVER_H100) && !defined(SIMULATOR)
+    pcm_init_recording();
+#endif
     talk_init();
 
 #ifdef AUTOROCK
@@ -293,12 +300,6 @@ void init(void)
     }
 #endif /* #ifdef AUTOROCK */
 
-#if (CONFIG_HWCODEC == MASNONE)
-    pcm_init();
-#endif
-#if defined(IRIVER_H100) && !defined(SIMULATOR)
-    pcm_init_recording();
-#endif
 #ifdef HAVE_CHARGING
     car_adapter_mode_init();
 #endif
