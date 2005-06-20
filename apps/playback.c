@@ -239,6 +239,9 @@ void codec_set_elapsed_callback(unsigned int value)
 {
     unsigned int latency;
 
+    if (ci.stop_codec)
+        return ;
+        
     latency = audiobuffer_get_latency();
     
     if (value < latency) {
@@ -751,7 +754,7 @@ void audio_play_start(int offset)
     buf_widx = 0;
     codecbufused = 0;
     pcm_set_boost_mode(true);
-        
+    
     fill_bytesleft = codecbuflen;
     filling = true;
     last_peek_offset = 0;

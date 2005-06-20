@@ -367,8 +367,7 @@ unsigned int audiobuffer_get_latency(void)
     int latency;
     
     /* This has to be done better. */
-    latency = (PCMBUF_SIZE - audiobuffer_free - audiobuffer_fillpos
-        - CHUNK_SIZE)/4 / (44100/1000);
+    latency = (PCMBUF_SIZE - audiobuffer_free - CHUNK_SIZE)/4 / (44100/1000);
     if (latency < 0)
         latency = 0;
     
