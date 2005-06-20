@@ -1480,7 +1480,7 @@ bool create_playlist(void)
     close(fd);
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    cpu_boost(true);
+    cpu_boost(false);
 #endif
     
     sleep(HZ);
