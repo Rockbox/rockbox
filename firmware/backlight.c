@@ -82,6 +82,9 @@ void backlight_start_timer(void)
     if (bl_timer_active)
         return ;
         
+    /* Prevent cpu frequency changes while dimming. */
+    cpu_boost(true);
+    
     count = 1;
     bl_timer_active = true;
 
@@ -152,6 +155,7 @@ void TIMER1(void)
 
     if (idle) 
     {
+        cpu_boost(false);
         bl_timer_active = false;
         TMR1 = 0;
     }
@@ -173,6 +177,7 @@ void backlight_allow_timer(bool on)
 
     if (!timer_allowed && bl_timer_active)
     {
+        cpu_boost(false);
         bl_dim_current = bl_dim_target;
         bl_timer_active = false;
         TMR1 = 0;
