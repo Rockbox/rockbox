@@ -414,6 +414,9 @@ static void crossfade_start(void)
             yield();
         }
         pcm_event_handler = NULL;
+        audiobuffer_pos += audiobuffer_fillpos;
+        if (audiobuffer_pos >= PCMBUF_SIZE)
+            audiobuffer_pos -= PCMBUF_SIZE;
     }
     pcm_boost(true);
     crossfade_active = true;
