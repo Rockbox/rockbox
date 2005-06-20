@@ -203,7 +203,7 @@ bool pcm_is_lowdata(void)
     return false;
 }
 
-bool pcm_crossfade_start(void)
+bool pcm_crossfade_init(void)
 {
     return false;
 }
@@ -863,7 +863,7 @@ void audio_update_trackinfo(void)
         if (buf_ridx >= codecbuflen)
             buf_ridx -= codecbuflen;
             
-        pcm_crossfade_start();
+        pcm_crossfade_init();
         if (!filling)
             pcm_set_boost_mode(false);
     } else {
@@ -1213,7 +1213,7 @@ static void initiate_track_change(int peek_index)
         queue_post(&audio_queue, AUDIO_PLAY, 0);
     } 
     
-    else if (!pcm_crossfade_start()) {
+    else if (!pcm_crossfade_init()) {
         //pcm_play_stop();
     }
 }
