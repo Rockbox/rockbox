@@ -35,6 +35,7 @@ void set_cpu_frequency(long frequency);
 void cpu_boost(bool on_off);
 #else
 #define FREQ CPU_FREQ
+#define cpu_boost(on_off)
 #endif
 
 #define BAUDRATE 9600
