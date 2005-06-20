@@ -27,6 +27,13 @@ void backlight_off(void);
 void backlight_tick(void);
 int  backlight_get_timeout(void);
 void backlight_set_timeout(int index);
+#if CONFIG_BACKLIGHT == BL_IRIVER
+void backlight_set_fade_in(int index);
+void backlight_set_fade_out(int index);
+void backlight_allow_timer(bool on);
+#else
+#define backlight_allow_timer(on)
+#endif
 bool backlight_get_on_when_charging(void);
 void backlight_set_on_when_charging(bool yesno);
 void remote_backlight_on(void);

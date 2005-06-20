@@ -393,7 +393,14 @@ static const struct bit_entry hd_bits[] =
 #if CONFIG_HWCODEC == MASNONE
     {1, S_O(crossfade), false, "crossfade", off_on},
 #endif
-    
+
+#if CONFIG_BACKLIGHT == BL_IRIVER
+    /* backlight fading */
+    {2, S_O(backlight_fade_in), 1, "backlight fade in", "off,500ms,1s,2s"},
+    {3, S_O(backlight_fade_out), 3, "backlight fade out",
+        "off,500ms,1s,2s,3s,4s,5s,10s"},
+#endif
+
     /* new stuff to be added at the end */
             
     /* Sum of all bit sizes must not grow beyond 0xB8*8 = 1472 */
@@ -765,6 +772,10 @@ void settings_apply(void)
 #endif
     backlight_set_timeout(global_settings.backlight_timeout);
     backlight_set_on_when_charging(global_settings.backlight_on_when_charging);
+#if CONFIG_BACKLIGHT == BL_IRIVER
+    backlight_set_fade_in(global_settings.backlight_fade_in);
+    backlight_set_fade_out(global_settings.backlight_fade_out);
+#endif
     ata_spindown(global_settings.disk_spindown);
 #if CONFIG_HWCODEC == MAS3507D
     dac_line_in(global_settings.line_in);

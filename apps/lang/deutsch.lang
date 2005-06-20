@@ -3099,3 +3099,15 @@ desc: in playback settings
 eng: "Crossfade"
 voice: "Überblenden"
 new: "Überblenden"
+
+id: LANG_BACKLIGHT_FADE_IN
+desc: in settings_menu
+eng: "Backlight fade in"
+voice: "Beleuchtung einblenden"
+new: "Beleuchtung einblenden"
+
+id: LANG_BACKLIGHT_FADE_OUT
+desc: in settings_menu
+eng: "Backlight fade out"
+voice: "Beleuchtung ausblenden"
+new: "Beleuchtung ausblenden"

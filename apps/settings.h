@@ -202,6 +202,10 @@ struct user_settings
                                1=always,
                                then according to timeout_values[] */
     bool backlight_on_when_charging;
+#if CONFIG_BACKLIGHT == BL_IRIVER
+    int backlight_fade_in;  /* backlight fade in timing: 0..3 */
+    int backlight_fade_out; /* backlight fade in timing: 0..7 */
+#endif
     int battery_capacity; /* in mAh */
     int battery_type;  /* for units which can take multiple types (Ondio). */
 

@@ -60,34 +60,20 @@ static unsigned int remote_backlight_timeout = 5;
 #endif
 
 #if CONFIG_BACKLIGHT == BL_IRIVER
+/* backlight fading */
+#define BL_PWM_INTERVAL 5000  /* Cycle interval in µs */
 #define BL_PWM_COUNT    100
-/* Cycle interval in ms */
-#define BL_PWM_INTERVAL      5000
-#define BL_DIM_SPEED    4
-#define __backlight_on __backlight_fade_in
-#define __backlight_off __backlight_fade_out
-
-#define DIM_STATE_START  0
-#define DIM_STATE_MAIN   1
-#define DIM_STATE_REMOTE 2
+static const char backlight_fade_value[8] = { 0, 1, 2, 4, 6, 8, 10, 20 };
+static int fade_in_count = 1;
+static int fade_out_count = 4;
+static bool timer_allowed = true;
 
 static bool bl_timer_active = false;
 static int bl_dim_current = BL_PWM_COUNT;
 static int bl_dim_target  = BL_PWM_COUNT;
 static int bl_pwm_counter = 0;
 static volatile int bl_cycle_counter = 0;
-
-/* Unfortunately we can't dim H1xx remote lcd :/ */
-#ifdef HAVE_REMOTE_LCD_DIMMABLE
-#define lcd_remote_backlight_on __backlight_fade_remote_in
-#define lcd_remote_backlight_off __backlight_fade_remote_out
-static int bl_dim_remote_current = BL_PWM_COUNT;
-static int bl_dim_remote_target = BL_PWM_COUNT;
-static int bl_pwm_remote_counter = 0;
-static bool bl_dim_next_interval;
-#endif
-
-static int bl_dim_state = 0;
+static enum {DIM_STATE_START, DIM_STATE_MAIN} bl_dim_state = DIM_STATE_START;
 
 void backlight_start_timer(void)
 {
@@ -116,123 +102,60 @@ void TIMER1(void)
 {
     int timer_period;
     bool idle = false;
-#ifdef HAVE_REMOTE_LCD_DIMMABLE
-    int new_timer_period;
-#endif
 
-    timer_period = FREQ/20000 * BL_PWM_INTERVAL / 100 / 32;
+    timer_period = FREQ / 2000 * BL_PWM_INTERVAL / 1000 / 32;
     switch (bl_dim_state) {
-    /* New cycle */
-    case DIM_STATE_START:
+      /* New cycle */
+      case DIM_STATE_START:
         bl_pwm_counter = 0;
         bl_cycle_counter++;
         
-        if (bl_dim_current > 0 && bl_dim_current < BL_PWM_COUNT) {
+        if (bl_dim_current > 0 && bl_dim_current < BL_PWM_COUNT) 
+        {
             GPIO1_OUT &= ~0x00020000;
             bl_pwm_counter = bl_dim_current;
             timer_period = timer_period * bl_pwm_counter / BL_PWM_COUNT;
             bl_dim_state = DIM_STATE_MAIN;
-        } else {
-            idle = true;
+        } 
+        else
+        {
             if (bl_dim_current)
                 GPIO1_OUT &= ~0x00020000;
             else
                 GPIO1_OUT |= 0x00020000;
+            if (bl_dim_current == bl_dim_target)
+                idle = true;
         }
         
-#ifdef HAVE_REMOTE_LCD_DIMMABLE
-        bl_dim_next_interval = 0;
-        bl_pwm_remote_counter = 0;
-        if (bl_dim_remote_current > 0 && 
-            bl_dim_remote_current < BL_PWM_COUNT) {
-            idle = false;
-            GPIO_OUT &= ~0x00000800;
-            bl_pwm_remote_counter = bl_dim_remote_current;
-            if (bl_dim_state == DIM_STATE_START) {
-                timer_period = timer_period * bl_pwm_remote_counter 
-                               / BL_PWM_COUNT;
-                bl_dim_state = DIM_STATE_REMOTE;
-                break ;
-            }
-            
-            new_timer_period = timer_period * bl_pwm_remote_counter
-                                / BL_PWM_COUNT;
-            if (new_timer_period < timer_period) {
-                bl_dim_next_interval = timer_period - new_timer_period;
-                timer_period = new_timer_period;
-                bl_dim_state = DIM_STATE_REMOTE;
-            } else {
-                bl_dim_next_interval = new_timer_period - timer_period;
-            }
-        } else {
-            if (bl_dim_remote_current)
-                GPIO_OUT &= ~0x00000800;
-            else
-                GPIO_OUT |= 0x00000800;
-        }
-#endif        
         break ;
         
-    /* Dim main screen */
-    case DIM_STATE_MAIN:
+      /* Dim main screen */
+      case DIM_STATE_MAIN:
         GPIO1_OUT |= 0x00020000;
-#ifdef HAVE_REMOTE_LCD_DIMMABLE
-        if (bl_dim_next_interval) {
-            timer_period = bl_dim_next_interval;
-            bl_dim_next_interval = 0;
-            bl_dim_state = DIM_STATE_REMOTE;
-            break ;
-        }
-#endif
         bl_dim_state = DIM_STATE_START;
         timer_period = timer_period * (BL_PWM_COUNT - bl_pwm_counter) / BL_PWM_COUNT;
         break ;
 
-#ifdef HAVE_REMOTE_LCD_DIMMABLE
-    /* Dim remote lcd */
-    case DIM_STATE_REMOTE:
-        GPIO_OUT |= 0x00000800;
-        if (bl_dim_next_interval) {
-            timer_period = bl_dim_next_interval;
-            bl_dim_next_interval = 0;
-            bl_dim_state = DIM_STATE_MAIN;
-            break ;
-        }
-    
-        bl_dim_state = DIM_STATE_START;
-        timer_period = timer_period * (BL_PWM_COUNT - bl_pwm_remote_counter) / BL_PWM_COUNT;
-        break ;
-#endif
     }
     
-    if (bl_cycle_counter >= BL_DIM_SPEED) {
-        if (bl_dim_target > bl_dim_current) {
-            bl_dim_current++;
-            idle = false;
-        }
-        else if (bl_dim_target < bl_dim_current) {
-            bl_dim_current--;
-            idle = false;
-        }
-#ifdef HAVE_REMOTE_LCD_DIMMABLE
-        if (bl_dim_remote_target > bl_dim_remote_current) {
-            bl_dim_remote_current++;
-            idle = false;
-        }
-        else if (bl_dim_remote_target < bl_dim_remote_current) {
-            bl_dim_remote_current--;
-            idle = false;
-        }
-#endif
+    if ((bl_dim_target > bl_dim_current) && (bl_cycle_counter >= fade_in_count))
+    {
+        bl_dim_current++;
         bl_cycle_counter = 0;
-        
-        /* Save CPU & battery when idle, stop timer */
-        if (idle) {
-            bl_timer_active = false;
-            TMR1 = 0;
-        }
     }
-    
+
+    if ((bl_dim_target < bl_dim_current) && (bl_cycle_counter >= fade_out_count))
+    {
+        bl_dim_current--;
+        bl_cycle_counter = 0;
+    }
+
+    if (idle) 
+    {
+        bl_timer_active = false;
+        TMR1 = 0;
+    }
+
     TRR1 = timer_period;
     TCN1 = 0;
     TER1 = 0xff; /* Clear all events */
@@ -244,38 +167,44 @@ static void __backlight_dim(int value)
     backlight_start_timer();
 }
 
-static void __backlight_fade_in(void)
+void backlight_allow_timer(bool on)
 {
-    __backlight_dim(BL_PWM_COUNT);
+    timer_allowed = on;
+
+    if (!timer_allowed && bl_timer_active)
+    {
+        bl_dim_current = bl_dim_target;
+        bl_timer_active = false;
+        TMR1 = 0;
+
+        if (bl_dim_current)
+            GPIO1_OUT &= ~0x00020000;
+        else
+            GPIO1_OUT |= 0x00020000;
+    }
 }
 
-static void __backlight_fade_out(void)
+void backlight_set_fade_in(int index)
 {
-    __backlight_dim(0);
+    fade_in_count = backlight_fade_value[index];
 }
 
-#ifdef HAVE_REMOTE_LCD_DIMMABLE
-static void __backlight_dim_remote(int value)
+void backlight_set_fade_out(int index)
 {
-    bl_dim_remote_target = value;
-}
-
-static void __backlight_fade_remote_in(void)
-{
-    __backlight_dim_remote(BL_PWM_COUNT);
-}
-
-static void __backlight_fade_remote_out(void)
-{
-    __backlight_dim_remote(0);
+    fade_out_count = backlight_fade_value[index];
 }
 #endif
 
-#else
 static void __backlight_off(void)
 {
 #if CONFIG_BACKLIGHT == BL_IRIVER
-    GPIO1_OUT  |= 0x00020000;
+    if (timer_allowed && (fade_out_count > 0))
+        __backlight_dim(0);
+    else
+    {
+        bl_dim_target = bl_dim_current = 0;
+        GPIO1_OUT  |= 0x00020000;
+    }
 #elif CONFIG_BACKLIGHT == BL_RTC
     /* Disable square wave */
     rtc_write(0x0a, rtc_read(0x0a) & ~0x40);
@@ -291,7 +220,13 @@ static void __backlight_off(void)
 static void __backlight_on(void)
 {
 #if CONFIG_BACKLIGHT == BL_IRIVER
-    GPIO1_OUT  &= ~0x00020000;
+    if (timer_allowed && (fade_in_count > 0))
+        __backlight_dim(BL_PWM_COUNT);
+    else
+    {
+        bl_dim_target = bl_dim_current = BL_PWM_COUNT;
+        GPIO1_OUT  &= ~0x00020000;
+    }
 #elif CONFIG_BACKLIGHT == BL_RTC
     /* Enable square wave */
     rtc_write(0x0a, rtc_read(0x0a) | 0x40);
@@ -304,7 +239,6 @@ static void __backlight_on(void)
     P1 |= 0x10;
 #endif
 }
-#endif
 
 void backlight_thread(void)
 {

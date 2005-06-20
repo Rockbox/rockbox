@@ -547,6 +547,8 @@ int plugin_register_timer(int cycles, int prio, void (*timer_callback)(void))
 
     if (prescale > 8 || cycles == 0 || prio < 1 || prio > 15)
         return 0; /* error, we can't do such period, bad argument */
+        
+    backlight_allow_timer(false); /* stop backlight from messing with the timer */
 #if CONFIG_CPU == SH7034
     and_b(~0x10, &TSTR); /* Stop the timer 4 */
     and_b(~0x10, &TSNC); /* No synchronization */
@@ -575,6 +577,7 @@ void plugin_unregister_timer(void)
     IPRD = (IPRD & 0xFF0F); /* disable interrupt */
     pfn_timer = NULL;
 #endif
+    backlight_allow_timer(true);
 }
 
 #if CONFIG_CPU == SH7034
