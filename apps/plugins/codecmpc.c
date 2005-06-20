@@ -41,10 +41,9 @@ seek_impl(void *data, mpc_int32_t offset)
 {  
   struct codec_api* ci = (struct codec_api*)data;
 
-  /* We don't support seeking yet. */
-  (void)ci;
-  (void)offset;
-  return 0;
+  /* WARNING: assumes we don't need to skip too far into the past,
+     this might not be supported by the buffering layer yet */
+  return ci->seek_buffer(offset);
 }
 
 mpc_int32_t
@@ -82,7 +81,8 @@ shift_signed(MPC_SAMPLE_FORMAT val, int shift)
 #define OUTPUT_BUFFER_SIZE 65536 /* Must be an integer multiple of 4. */
 
 unsigned char OutputBuffer[OUTPUT_BUFFER_SIZE];
-MPC_SAMPLE_FORMAT sample_buffer[MPC_DECODER_BUFFER_LENGTH];
+/* temporary, we probably have better use for iram than this */
+MPC_SAMPLE_FORMAT sample_buffer[MPC_DECODER_BUFFER_LENGTH] IDATA_ATTR;
 unsigned char *OutputPtr=OutputBuffer;
 const unsigned char *OutputBufferEnd=OutputBuffer+OUTPUT_BUFFER_SIZE;
 
