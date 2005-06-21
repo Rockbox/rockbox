@@ -38,10 +38,9 @@
  *
  * register usage:
  *  r0 - temporary
- *  r1 - bit mask for rounding to long bounds
- *  r2 - start address +11 for main loop
+ *  r1 - start address +11 for main loop
  *  r4 - start address
- *  r5 - data (spread to all 4 bytes if >= 12 bytes)
+ *  r5 - data (spread to all 4 bytes when using long stores)
  *  r6 - current address (runs down from end to start)
  *
  * The instruction order below is devised in a way to utilize the pipelining
@@ -63,22 +62,23 @@ _memset:
     swap.w  r5,r0
     or      r0,r5       /* data now in all 4 bytes of r5 */
     
-    mov     #-4,r1      /* r1 = 0xFFFFFFFC */
     mov     r6,r0
-    and     r1,r0       /* r0 = last long bound */
-    cmp/hi  r0,r6       /* any leading byte? */
-    bf      .end_b1     /* no: skip loop */
+    tst     #3,r0       /* r0 already long aligned? */
+    bt      .end_b1     /* yes: skip loop */
 
     /* leading byte loop: sets 0..3 bytes */
 .loop_b1:
-    mov.b   r5,@-r6     /* store byte */
-    cmp/hi  r0,r6
-    bt      .loop_b1    /* runs r6 down to last long bound */
+    mov.b   r5,@-r0     /* store byte */
+    tst     #3,r0       /* r0 long aligned? */
+    bf      .loop_b1    /* runs r0 down until long aligned */
+    
+    mov     r0,r6       /* r6 = last long bound */
+    nop                 /* keep alignment */
 
 .end_b1:
-    mov     r4,r2       /* r2 = start_address... */
-    add     #11,r2      /* ... + 11, combined for rounding and offset */
-    xor     r2,r0
+    mov     r4,r1       /* r1 = start_address... */
+    add     #11,r1      /* ... + 11, combined for rounding and offset */
+    xor     r1,r0
     tst     #4,r0       /* bit 2 tells whether an even or odd number of */
     bf      .loop_odd   /* longwords to set */
 
@@ -86,7 +86,7 @@ _memset:
 .loop_2l:
     mov.l   r5,@-r6     /* store first long */
 .loop_odd:
-    cmp/hi  r2,r6       /* runs r6 down to first long bound */
+    cmp/hi  r1,r6       /* runs r6 down to first long bound */
     mov.l   r5,@-r6     /* store second long */
     bt      .loop_2l
 
@@ -111,21 +111,78 @@ _memset:
     .type       memset,@function
 
 /* Fills a memory region with specified byte value
- * This version is not optimized at all
+ * This version is optimized for speed
+ *
+ * arguments:
+ *  (4,%sp)  - start address
+ *  (8,%sp)  - data
+ *  (12,%sp) - length
+ *
+ * return value:
+ *  %d0 - start address (like ANSI version)
+ *
+ * register usage:
+ *  %d0 - data (spread to all 4 bytes when using long stores)
+ *  %d1 - temporary
+ *  %a0 - start address
+ *  %a1 - current address (runs down from end to start)
  */
 memset:
-        move.l  (4,%sp),%a0     /* Start address */
-        move.l  (8,%sp),%d0    /* Value */
-        move.l  (12,%sp),%d1    /* Length */
-        lea.l   (%d1,%a0),%a1 /* a1 = a0+d1 */
+    move.l  (4,%sp),%a0     /* start address */
+    move.l  (8,%sp),%d0     /* data */
+    move.l  (12,%sp),%a1    /* length */
 
-        bra.b   .byteloopend
-        
-.byteloop:
-        move.b  %d0,(%a0)+
-.byteloopend:
-        cmp.l   %a0,%a1
-        bne.b   .byteloop
-        
-        rts
+    move.l  %a0,%d1
+    neg.l   %d1
+    and.l   #3,%d1          /* %d1 = (4 - align_offset) % 4 */
+    addq.l  #4,%d1
+    cmp.l   %d1,%a1         /* at least one aligned longword to fill? */
+    add.l   %a0,%a1         /* %a1 = end address; doesn't change flags */
+    blo.b   .no_longs       /* no, jump directly to byte loop */
+
+    and.l   #0xFF,%d0       /* start: spread data to all 4 bytes */
+    move.l  %d0,%d1
+    lsl.l   #8,%d1
+    or.l    %d1,%d0         /* data now in 2 lower bytes of %d0 */
+    move.l  %d0,%d1
+    swap    %d0
+    or.l    %d1,%d0         /* data now in all 4 bytes of %d0 */
+
+    mov.l   %a1,%d1
+    and.l   #0xFFFFFFFC,%d1 /* %d1 = last long bound */
+    cmp.l   %d1,%a1         /* any bytes to set? */
+    bls.b   .end_b1         /* no: skip byte loop */
+
+    /* leading byte loop: sets 0..3 bytes */
+.loop_b1:
+    move.b  %d0,-(%a1)      /* store byte */
+    cmp.l   %d1,%a1         /* runs %a1 down to last long bound */
+    bhi.b   .loop_b1
+    
+.end_b1:
+    move.l  %a0,%d1         /* %d1 = start address ... */
+    addq.l  #3,%d1          /* ... +3, account for possible trailing bytes */
+    
+    /* main loop: set longs */
+.loop_l:
+    move.l  %d0,-(%a1)      /* store longword */
+    cmp.l   %d1,%a1         /* runs %a1 down to first long bound */
+    bhi.b   .loop_l
+
+.no_longs:
+    cmp.l   %a0,%a1         /* any bytes left? */
+    bls.b   .end_b2         /* no: skip loop */
+
+    /* trailing byte loop */
+.loop_b2:
+    move.b  %d0,-(%a1)      /* store byte */
+    cmp.l   %a0,%a1         /* runs %a1 down to start address */
+    bhi.b   .loop_b2
+
+.end_b2:
+    move.l  %a0,%d0         /* return start address */
+    rts
+
+.end:
+    .size   memset,.end-memset
 #endif

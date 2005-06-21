@@ -33,8 +33,11 @@ common/strncpy.c
 common/strrchr.c
 common/strtok.c
 common/timefuncs.c
-#if (CONFIG_CPU == SH7034)
+#if CONFIG_CPU == SH7034
 common/memcpy_a.S
+common/memset_a.S
+#elif CONFIG_CPU == MCF5249
+common/memcpy.c
 common/memset_a.S
 #else
 common/memcpy.c
@@ -99,7 +102,7 @@ kernel.c
 rolo.c
 thread.c
 crt0.S
-#endif
+#endif  
 mp3_playback.c
 mp3data.c
 #if CONFIG_HWCODEC != MASNONE
