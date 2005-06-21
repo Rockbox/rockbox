@@ -33,6 +33,7 @@
 #include "panic.h"
 #include "power.h"
 #include "file.h"
+#include "buffer.h"
 #include "rolo.h"
 #include "usb.h"
 #include "powermgmt.h"
@@ -113,6 +114,7 @@ void main(void)
     power_init();
     system_init();
     kernel_init();
+    buffer_init();
     lcd_init();
     show_logo();
     set_irq_level(0);
@@ -180,14 +182,8 @@ void main(void)
     }
 
     {   // rolo the firmware
-        int fd;
-        static const char filename[] = BOOTFILE; 
-        fd = open(filename, O_RDONLY);
-        if(fd >= 0) /* no complaint if it doesn't exit */
-        {
-            close(fd);
-            rolo_load((char*)filename); /* start if it does */
-        }
+        static const char filename[] = "/" BOOTFILE; 
+        rolo_load((char*)filename); /* won't return if started */
 
         lcd_clear_display();
         lcd_puts(0, 0, "No firmware");
