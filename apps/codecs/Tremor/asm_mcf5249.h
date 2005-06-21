@@ -110,8 +110,7 @@ void XNPROD31(ogg_int32_t  a, ogg_int32_t  b,
 }
 
 
-#if 0
-/* canonical definition */
+#if 0    /* canonical Tremor definition */
 #define XPROD32(_a, _b, _t, _v, _x, _y)         \
   { (_x)=MULT32(_a,_t)+MULT32(_b,_v);           \
     (_y)=MULT32(_b,_t)-MULT32(_a,_v); }
@@ -133,7 +132,6 @@ void XNPROD31(ogg_int32_t  a, ogg_int32_t  b,
                 : [a] "r" (_a), [b] "r" (_b), \
                   [t] "r" (_t), [v] "r" (_v) \
                 : "cc");
-
 
 /* asm versions of vector operations for block.c, window.c */
 /* assumes MAC is initialized & accumulators cleared */
@@ -306,7 +304,9 @@ void mcf5249_vect_mult_bw(ogg_int32_t *data, LOOKUP_T *window, int n)
                     "cc", "memory");
 }
 
-
+#if 0  
+/* this routine is subsumed by Jens' asm optimised memset which appears
+   to be more efficient anyway; will eventually be deleted */
 static inline 
 void mcf5249_vect_zero(ogg_int32_t *ptr, int n)
 {
@@ -335,6 +335,7 @@ void mcf5249_vect_zero(ogg_int32_t *ptr, int n)
     n--;
   }
 }
+#endif
 
 #endif
 

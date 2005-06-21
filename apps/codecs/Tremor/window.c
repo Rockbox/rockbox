@@ -16,6 +16,7 @@
  ********************************************************************/
 
 #include "config-tremor.h"
+#include <string.h>
 #include <math.h>
 #include "os.h"
 #include "misc.h"
@@ -68,11 +69,12 @@ void _vorbis_apply_window(ogg_int32_t *d,const void *window_p[2],
   long rightend=rightbegin+rn/2;
 
 #if CONFIG_CPU == MCF5249
-  /* mcf5249_init_mac(); */ /* shouldn't be needed, but just in case */
-  mcf5249_vect_zero(&d[0], leftbegin);
+  memset((void *)&d[0], 0, sizeof(ogg_int32_t)*leftbegin);
+  /* mcf5249_vect_zero(&d[0], leftbegin); */
   mcf5249_vect_mult_fw(&d[leftbegin], &window[lW][0], leftend-leftbegin);
   mcf5249_vect_mult_bw(&d[rightbegin], &window[nW][rn/2-1], rightend-rightbegin);
-  mcf5249_vect_zero(&d[rightend], n-rightend);
+  memset((void *)&d[rightend], 0, sizeof(ogg_int32_t)*(n-rightend));
+  /* mcf5249_vect_zero(&d[rightend], n-rightend); */
 #else  
   int i,p;
 
