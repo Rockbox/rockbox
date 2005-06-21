@@ -141,7 +141,9 @@ SECTIONS
     {
         loadaddress = .;
         _loadaddress = .;
+        KEEP(*(.resetvectors));
         *(.resetvectors);
+        KEEP(*(.vectors));
         *(.vectors);
     } > DRAM
 
@@ -149,13 +151,14 @@ SECTIONS
     {
         . = ALIGN(0x200);
         *(.init.text)
-        *(.text)
+        *(.text*)
         . = ALIGN(0x4);
     } > DRAM
 
     .rodata :
     {
-        *(.rodata)
+        *(.rodata)  /* problems without this, dunno why */
+        *(.rodata*)
         *(.rodata.str1.1)
         *(.rodata.str1.4)
         . = ALIGN(0x4);
@@ -170,7 +173,7 @@ SECTIONS
     .data : AT ( _datacopy )
     {
         _datastart = .;
-        *(.data)
+        *(.data*)
         . = ALIGN(0x4);
         _dataend  = .;
         _iramcopy = .;
@@ -211,7 +214,7 @@ SECTIONS
 #endif
     {
        _edata = .;
-        *(.bss)
+        *(.bss*)
         *(COMMON)
         . = ALIGN(0x4);
        _end = .;
