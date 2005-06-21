@@ -309,7 +309,7 @@ static const struct bit_entry hd_bits[] =
     {8, S_O(disk_spindown), 5, "disk spindown", NULL },
 #endif
     /* browser */
-    {3, S_O(dirfilter), SHOW_MUSIC, 
+    {3, S_O(dirfilter), SHOW_SUPPORTED, 
         "show files", "all,supported,music,playlists,id3 database" },
     {1, S_O(sort_case), false, "sort case", off_on },
     {1, S_O(browse_current), false, "follow playlist", off_on },
