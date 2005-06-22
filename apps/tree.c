@@ -820,7 +820,7 @@ static bool dirbrowse(void)
                 break;
 
 #ifdef TREE_OFF
-#ifndef HAVE_SW_POWEROFF
+#if (CONFIG_KEYPAD == RECORDER_PAD) && !defined(HAVE_SW_POWEROFF)
             case TREE_OFF:
                 if (*tc.dirfilter < NUM_FILTER_MODES)
                 {
@@ -839,7 +839,7 @@ static bool dirbrowse(void)
                 }
                 break;
 #endif
-#if defined(HAVE_CHARGING) && !defined(IRIVER_H100)
+#if defined(HAVE_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
             case TREE_OFF | BUTTON_REPEAT:
                 if (charger_inserted()) {
                     charging_splash();

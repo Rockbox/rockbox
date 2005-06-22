@@ -16,6 +16,9 @@
 
 #define CONFIG_KEYPAD GMINI100_PAD
 
+/* Define this if you have a software controlled poweroff */
+#define HAVE_SW_POWEROFF
+
 #ifndef SIMULATOR
 
 /* Define this if you have a TCC730 (CalmRISC16) */
@@ -39,9 +42,6 @@
 
 #define CPU_FREQ 30000000
 /* approximate value (and false in general since freq is variable) */
-
-/* Define this if you have a software controlled poweroff */
-#define HAVE_SW_POWEROFF
 
 /* Always enable debug till we stabilize */
 #define EMULATOR

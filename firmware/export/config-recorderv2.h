@@ -14,6 +14,9 @@
 /* define this if you have a real-time clock */
 #define HAVE_RTC 1
 
+/* Define this if you have a software controlled poweroff */
+#define HAVE_SW_POWEROFF
+
 #ifndef SIMULATOR
 
 /* Define this if you have a SH7034 */
@@ -72,9 +75,6 @@
 
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_RTC /* on I2C controlled RTC port */
-
-/* Define this if you have a software controlled poweroff */
-#define HAVE_SW_POWEROFF
 
 #define CONFIG_LCD LCD_SSD1815
 

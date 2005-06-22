@@ -22,6 +22,9 @@
 /* Define this if you have an remote lcd */
 #define HAVE_REMOTE_LCD
 
+/* Define this if you have a software controlled poweroff */
+#define HAVE_SW_POWEROFF
+
 #ifndef SIMULATOR
 
 /* Define this if you have a Motorola SCF5249 */
@@ -63,9 +66,6 @@
 #define FIRMWARE_OFFSET_FILE_DATA 8
 
 #define USB_IRIVERSTYLE
-
-/* Define this if you have a software controlled poweroff */
-#define HAVE_SW_POWEROFF
 
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ

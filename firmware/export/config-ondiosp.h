@@ -8,6 +8,9 @@
 /* define this if you have an Ondio style 6-key keyboard */
 #define CONFIG_KEYPAD ONDIO_PAD
 
+/* Define this if you have a software controlled poweroff */
+#define HAVE_SW_POWEROFF
+
 #ifndef SIMULATOR
 
 /* Define this if you have a SH7034 */
@@ -63,9 +66,6 @@
 
 /* Define this if the MAS SIBI line can be controlled via PB8 */
 #define HAVE_MAS_SIBI_CONTROL
-
-/* Define this if you have a software controlled poweroff */
-#define HAVE_SW_POWEROFF
 
 /* define this if more than one device/partition can be used */
 #define HAVE_MULTIVOLUME
