@@ -228,10 +228,7 @@ bool dbg_audio_thread(void)
     char buf[32];
     int button;
     int line;
-    int center, height;
     bool done = false;
-    lcd_getstringsize(" ", &center, &height);
-    center = (height/2)-3;
 
     ticks = boost_ticks = 0;
 
@@ -259,7 +256,7 @@ bool dbg_audio_thread(void)
         lcd_puts(0, line++, buf);
 
         /* Playable space left */
-        scrollbar(0, line*height + center, LCD_WIDTH, 6, PCMBUF_SIZE, 0, 
+        scrollbar(0, line*8, LCD_WIDTH, 6, PCMBUF_SIZE, 0,
                   PCMBUF_SIZE-audiobuffer_free, HORIZONTAL);
         line++;
 
@@ -267,7 +264,7 @@ bool dbg_audio_thread(void)
         lcd_puts(0, line++, buf);
 
         /* Playable space left */
-        scrollbar(0, line*height + center, LCD_WIDTH, 6, codecbuflen, 0, 
+        scrollbar(0, line*8, LCD_WIDTH, 6, codecbuflen, 0, 
                   codecbufused, HORIZONTAL);
         line++;
 
@@ -1800,7 +1797,7 @@ bool dbg_save_roms(void)
         write(fd, (void *)0, 0x10000);
         close(fd);
     }
-    
+
     fd = creat("/internal_rom_2000000-203FFFF.bin", O_WRONLY);
     if(fd >= 0)
     {
