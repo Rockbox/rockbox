@@ -745,9 +745,12 @@ static void format_display(char* buf,
     unsigned char tag_length;
     
     /* needed for images (ifdef is to kill a warning on player)*/
+    int n;
 #ifdef HAVE_LCD_BITMAP
-    int n, ret;
+    int ret;
+    const char *pos, *posn;
     char imgtmp[32];
+    char imgname[MAX_PATH];
 #endif
 
     *subline_time_mult = DEFAULT_SUBLINE_TIME_MULTIPLIER;
@@ -786,28 +789,66 @@ static void format_display(char* buf,
                 ++fmt;
                 break;
 
-            case 'x': /* image support */
+            case 'x': /* image support (format: %xn|filename|x|y|) */
 #ifdef HAVE_LCD_BITMAP
-                strncpy(imgtmp, fmt+1, 1);
-                n = atoi(imgtmp); /* get image number */
-                if (!img[n].loaded) {
-                    /* image not loaded, get extra info. */
-                    strncpy(imgtmp, fmt+2, 3);
-                    img[n].x = atoi(imgtmp);
-                    strncpy(imgtmp, fmt+5, 3);
-                    img[n].y = atoi(imgtmp);
-                    /* and load the image */
-                    snprintf(imgtmp, 32, "/.rockbox/img_%d.bmp", n);
-                    ret = read_bmp_file(imgtmp, &img[n].w, &img[n].h, img_buf_ptr, img_buf_free);
-                    if (ret > 0) {
-                        img[n].ptr = img_buf_ptr;
-                        img_buf_ptr += ret;
-                        img_buf_free -= ret;
+                /* get image number */
+                pos = strchr(fmt, '|'); /* get the first '|' */
+                if ((pos - fmt) < 32) {
+                    strncpy(imgtmp, fmt+1, pos - fmt - 1);
+                    imgtmp[pos - fmt - 1] = 0;
+                    n = atoi(imgtmp);
+                    
+                    /* check image number, and load state. */
+                    if ((n < MAX_IMAGES) && (!img[n].loaded)) {
+                        /* Get filename */
+                        pos = strchr(fmt+3, '|'); /* get the second '|' */
+                        if ((pos - fmt) < 32) {
+                            strncpy(imgtmp, fmt+3, pos - fmt - 3); /* get the filename */
+                            imgtmp[pos - fmt - 3] = 0;
+                        } else {
+                            /* hm.. filename is to long... */
+                            *imgtmp = 0;
+                        }
+                        snprintf(imgname, MAX_PATH, "/.rockbox/%s", imgtmp);
+
+                        /* Get X-position */
+                        posn = strchr(pos+1, '|'); /* get the 3th '|' */
+                        if ((posn - fmt) < 32) {
+                            strncpy(imgtmp, pos+1, posn - pos - 1);
+                            imgtmp[posn - pos - 1] = 0;
+                            img[n].x = atoi(imgtmp);
+                        } else {
+                            img[n].x = 0;
+                        }
+
+                        /* Get Y-position */
+                        pos = posn;
+                        posn = strchr(pos+1, '|'); /* get the 4th '|' */
+                        if ((posn - fmt) < 32) {
+                            strncpy(imgtmp, pos+1, posn - pos - 1);
+                            imgtmp[posn - pos - 1] = 0;
+                            img[n].y = atoi(imgtmp);
+                        } else {
+                            img[n].y = 0;
+                        }
+                        
+                        /* and load the image */
+                        ret = read_bmp_file(imgname, &img[n].w, &img[n].h, img_buf_ptr, img_buf_free);
+                        if (ret > 0) {
+                            img[n].ptr = img_buf_ptr;
+                            img_buf_ptr += ret;
+                            img_buf_free -= ret;
+                        }
+                        img[n].loaded = true;
                     }
-                    img[n].loaded = true;
                 }
 #endif
-                fmt += 8;
+                /* skip the tag */
+/* WARNING! This will crash if there's a syntax error in the wps file */
+                for (n = 0; n < 4; n++) {
+                    fmt = strchr(fmt+1, '|'); /* get the next '|' */
+                }
+                fmt++;
                 break;
                 
 
