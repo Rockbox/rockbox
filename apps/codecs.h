@@ -16,12 +16,12 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _PLUGIN_H_
-#define _PLUGIN_H_
+#ifndef _CODECS_H_
+#define _CODECS_H_
 
-/* instruct simulator code to not redefine any symbols when compiling plugins.
-   (the PLUGIN macro is defined in apps/plugins/Makefile) */
-#ifdef PLUGIN
+/* instruct simulator code to not redefine any symbols when compiling codecs.
+   (the CODEC macro is defined in apps/codecs/Makefile) */
+#ifdef CODEC
 #define NO_REDEFINES_PLEASE
 #endif
 
@@ -59,7 +59,7 @@
 #include "lcd-remote.h"
 #endif
 
-#ifdef PLUGIN
+#ifdef CODEC
 
 #if defined(DEBUG) || defined(SIMULATOR)
 #undef DEBUGF
@@ -80,12 +80,7 @@
 
 #endif
 
-/* These three sizes must match the ones set in plugins/plugin.lds */
-#if MEM >= 32
-#define PLUGIN_BUFFER_SIZE 0xC0000
-#else
-#define PLUGIN_BUFFER_SIZE 0x8000
-#endif
+/* This size must match the one set in ../plugins/plugin.lds */
 #define CODEC_BUFFER_SIZE 0x3C000
 
 #ifdef SIMULATOR
@@ -95,54 +90,93 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 40
+#define CODEC_API_VERSION 40
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 40
+#define CODEC_MIN_API_VERSION 40
 
-/* plugin return codes */
-enum plugin_status {
-    PLUGIN_OK = 0,
-    PLUGIN_USB_CONNECTED,
+/* codec return codes */
+enum codec_status {
+    CODEC_OK = 0,
+    CODEC_USB_CONNECTED,
 
-    PLUGIN_WRONG_API_VERSION = -1,
-    PLUGIN_WRONG_MODEL = -2,
-    PLUGIN_ERROR = -3,
+    CODEC_WRONG_API_VERSION = -1,
+    CODEC_WRONG_MODEL = -2,
+    CODEC_ERROR = -3,
 };
-
-/* different (incompatible) plugin models */
-enum model {
-    PLAYER,
-    RECORDER
-};
-
-#ifdef HAVE_LCD_CHARCELLS
-#define MODEL PLAYER
-#else
-#define MODEL RECORDER
-#endif
 
 /* compatibility test macro */
-#define TEST_PLUGIN_API(_api_) \
+#define TEST_CODEC_API(_api_) \
 do { \
- int _rc_ = _api_->plugin_test(PLUGIN_API_VERSION, MODEL, MEM); \
+ int _rc_ = _api_->codec_test(CODEC_API_VERSION, 1, MEM); \
  if (_rc_<0) \
      return _rc_; \
 } while(0)
 
 /* NOTE: To support backwards compatibility, only add new functions at
          the end of the structure.  Every time you add a new function,
-         remember to increase PLUGIN_API_VERSION.  If you make changes to the
-         existing APIs then also update PLUGIN_MIN_API_VERSION to current
+         remember to increase CODEC_API_VERSION.  If you make changes to the
+         existing APIs then also update CODEC_MIN_API_VERSION to current
          version
  */
-struct plugin_api {
+struct codec_api {
     /* these two fields must always be first, to ensure
-       TEST_PLUGIN_API will always work */
+       TEST_CODEC_API will always work */
     int version;
-    int (*plugin_test)(int api_version, int model, int memsize);
+    int (*codec_test)(int api_version, int model, int memsize);
+
+    off_t  filesize;          /* Total file length */
+    off_t  curpos;            /* Current buffer position */
+    
+    /* For gapless mp3 */
+    struct mp3entry *id3;     /* TAG metadata pointer */
+    struct mp3info *mp3data;  /* MP3 metadata pointer */
+    bool *taginfo_ready;      /* Is metadata read */
+    
+    /* Codec should periodically check if stop_codec is set to true.
+       In case it's, codec must return with PLUGIN_OK status immediately. */
+    bool stop_codec;
+    /* Codec should periodically check if reload_codec is set to true.
+       In case it's, codec should reload itself without exiting. */
+    bool reload_codec;
+    /* If seek_time != 0, codec should seek to that song position (in ms)
+       if codec supports seeking. */
+    int seek_time;
+    
+    /* Returns buffer to malloc array. Only codeclib should need this. */
+    void* (*get_codec_memory)(size_t *size);
+    /* Insert PCM data into audio buffer for playback. Playback will start
+       automatically. */
+    bool (*audiobuffer_insert)(char *data, size_t length);
+    /* Set song position in WPS (value in ms). */
+    void (*set_elapsed)(unsigned int value);
+    
+    /* Read next <size> amount bytes from file buffer to <ptr>.
+       Will return number of bytes read or 0 if end of file. */
+    size_t (*read_filebuf)(void *ptr, size_t size);
+    /* Request pointer to file buffer which can be used to read
+       <realsize> amount of data. <reqsize> tells the buffer system
+       how much data it should try to allocate. If <realsize> is 0,
+       end of file is reached. */
+    void* (*request_buffer)(size_t *realsize, size_t reqsize);
+    /* Advance file buffer position by <amount> amount of bytes. */
+    void (*advance_buffer)(size_t amount);
+    /* Advance file buffer to a pointer location inside file buffer. */
+    void (*advance_buffer_loc)(void *ptr);
+    /* Seek file buffer to position <newpos> beginning of file. */
+    bool (*seek_buffer)(off_t newpos);
+    /* Calculate mp3 seek position from given time data in ms. */
+    off_t (*mp3_get_filepos)(int newtime);
+    /* Request file change from file buffer. Returns true is next
+       track is available and changed. If return value is false,
+       codec should exit immediately with PLUGIN_OK status. */
+    bool (*request_next_track)(void);
+    
+    /* Configure different codec buffer parameters. */
+    void (*configure)(int setting, void *value);
+
 
     /* lcd */
     void (*lcd_clear_display)(void);
@@ -193,48 +227,6 @@ struct plugin_api {
     void (*backlight_set_timeout)(int index);
     void (*splash)(int ticks, bool center, const char *fmt, ...);
 
-#ifdef HAVE_REMOTE_LCD
-    /* remote lcd */
-    void (*remote_clear_display)(void);
-    void (*remote_puts)(int x, int y, const unsigned char *string);
-    void (*remote_lcd_puts_scroll)(int x, int y, const unsigned char* string);
-    void (*remote_lcd_stop_scroll)(void);
-    void (*remote_set_contrast)(int x);
-
-    void (*remote_putsxy)(int x, int y, const unsigned char *string);
-    void (*remote_puts_style)(int x, int y, const unsigned char *str, int style);
-    void (*remote_puts_scroll_style)(int x, int y, const unsigned char* string,
-                                  int style);
-    void (*remote_bitmap)(const unsigned char *src, int x, int y,
-                       int nx, int ny, bool clear);
-    void (*remote_drawline)(int x1, int y1, int x2, int y2);
-    void (*remote_clearline)(int x1, int y1, int x2, int y2);
-    void (*remote_drawpixel)(int x, int y);
-    void (*remote_clearpixel)(int x, int y);
-    void (*remote_setfont)(int font);
-    struct font* (*remote_font_get)(int font);
-    void (*remote_clearrect)(int x, int y, int nx, int ny);
-    void (*remote_fillrect)(int x, int y, int nx, int ny);
-    void (*remote_drawrect)(int x, int y, int nx, int ny);
-    void (*remote_invertrect)(int x, int y, int nx, int ny);
-    int  (*remote_getstringsize)(const unsigned char *str, int *w, int *h);
-    void (*remote_update)(void);
-    void (*remote_update_rect)(int x, int y, int width, int height);
-
-    void (*remote_backlight_on)(void);
-    void (*remote_backlight_off)(void);
-    unsigned char* lcd_remote_framebuffer;
-#endif
-
-    /* button */
-    long (*button_get)(bool block);
-    long (*button_get_w_tmo)(int ticks);
-    int (*button_status)(void);
-    void (*button_clear_queue)(void);
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
-    bool (*button_hold)(void);
-#endif
-
     /* file */
     int (*PREFIX(open))(const char* pathname, int flags);
     int (*close)(int fd);
@@ -245,7 +237,7 @@ struct plugin_api {
     int (*PREFIX(remove))(const char* pathname);
     int (*PREFIX(rename))(const char* path, const char* newname);
     int (*PREFIX(ftruncate))(int fd, off_t length);
-    off_t (*PREFIX(filesize))(int fd);
+
     int (*fdprintf)(int fd, const char *fmt, ...);
     int (*read_line)(int fd, char* buffer, int buffer_size);
     bool (*settings_parseline)(char* line, char** name, char** value);
@@ -362,13 +354,8 @@ struct plugin_api {
     int (*kbd_input)(char* buffer, int buflen);
     struct tm* (*get_time)(void);
     int  (*set_time)(const struct tm *tm);
-    void* (*plugin_get_buffer)(int* buffer_size);
     void* (*plugin_get_audio_buffer)(int* buffer_size);
-#ifndef SIMULATOR
-    int (*plugin_register_timer)(int cycles, int prio, void (*timer_callback)(void));
-    void (*plugin_unregister_timer)(void);
-#endif
-    void (*plugin_tsr)(void (*exit_callback)(void));
+
 #if defined(DEBUG) || defined(SIMULATOR)
     void (*debugf)(const char *fmt, ...);
 #endif
@@ -403,15 +390,14 @@ struct plugin_api {
 #endif
 };
 
-int plugin_load(const char* plugin, void* parameter);
-void* plugin_get_buffer(int *buffer_size);
-void* plugin_get_audio_buffer(int *buffer_size);
-int plugin_register_timer(int cycles, int prio, void (*timer_callback)(void));
-void plugin_unregister_timer(void);
-void plugin_tsr(void (*exit_callback)(void));
+/* defined by the codec loader (codec.c) */
+#if CONFIG_HWCODEC == MASNONE
+int codec_load_ram(char* codecptr, size_t size, void* ptr2, size_t bufwrap);
+int codec_load_file(const char* codec);
+#endif
 
-/* defined by the plugin */
-enum plugin_status plugin_start(struct plugin_api* rockbox, void* parameter)
+/* defined by the codec */
+enum codec_status codec_start(struct codec_api* rockbox, void* parameter)
     __attribute__ ((section (".entry")));
 
 #endif

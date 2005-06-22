@@ -10,20 +10,97 @@
 INCLUDES = -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I$(FIRMDIR)/common \
  -I$(FIRMDIR)/drivers -I$(APPSDIR) -Ilib -I$(BUILDDIR)
 CFLAGS = $(GCCOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
- -DMEM=${MEMORYSIZE}
+ -DMEM=${MEMORYSIZE} -DCODEC
 
 ifdef APPEXTRA
    INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
 endif
 
+ifdef SOFTWARECODECS
+   CODECLIBS = -lmad -la52 -lFLAC -lTremor -lwavpack -lmusepack
+endif
+
+# we "borrow" the plugin LDS file
+LDS := $(APPSDIR)/plugins/plugin.lds
+
+LINKCODEC := $(OBJDIR)/codeclink.lds
+DEPFILE = $(OBJDIR)/dep-codecs
+
+# This sets up 'SRC' based on the files mentioned in SOURCES
+include $(TOOLSDIR)/makesrc.inc
+
+ROCKS := $(SRC:%.c=$(OBJDIR)/%.codec)
+SOURCES = $(SRC)
+ELFS := $(SRC:%.c=$(OBJDIR)/%.elf)
+OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
+# as created by the cross-compiler for win32:
+DEFS := $(SRC:%.c=$(OBJDIR)/%.def)
+DIRS = .
+
 .PHONY: libmad liba52 libFLAC libTremor libwavpack dumb libmusepack
 
 OUTPUT = $(SOFTWARECODECS)
 
-all: $(OUTPUT)
+all: $(OUTPUT) $(ROCKS) $(DEPFILE)
+
+ifndef SIMVER
+$(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKCODEC)
+	$(SILENT)(file=`basename $@`; \
+	echo "LD $$file"; \
+	$(CC) $(GCCOPTS) -O -nostdlib -o $@ $< -L$(BUILDDIR) $(CODECLIBS) -lcodec -lgcc -T$(LINKCODEC) -Wl,-Map,$(OBJDIR)/$*.map)
+
+$(OBJDIR)/%.codec : $(OBJDIR)/%.elf
+	@echo "OBJCOPY "`basename $@`
+	@$(OC) -O binary $< $@
+else
+
+ifeq ($(SIMVER), x11)
+###################################################
+# This is the X11 simulator version
+
+$(OBJDIR)/%.codec : $(OBJDIR)/%.o  $(BUILDDIR)/libplugin.a
+	@echo "LD "`basename $@`
+	@$(CC) $(CFLAGS) -shared $< -L$(BUILDDIR)  $(CODECLIBS) -lplugin -o $@
+ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
+# 'x' must be kept or you'll have "Win32 error 5"
+#     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
+#         #define ERROR_ACCESS_DENIED 5L
+else
+	@chmod -x $@
+endif
+
+else # end of x11-simulator
+###################################################
+# This is the win32 simulator version
+DLLTOOLFLAGS = --export-all
+DLLWRAPFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 -mno-cygwin
+
+$(OBJDIR)/%.codec : $(OBJDIR)/%.o  $(BUILDDIR)/libplugin.a
+	@echo "DLL "`basename $@`
+	@$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $<
+	@$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< $(BUILDDIR)/libplugin.a \
+                $(patsubst -l%,$(BUILDDIR)/lib%.a,$(CODECLIBS)) -o $@
+ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
+# 'x' must be kept or you'll have "Win32 error 5"
+#     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
+#         #define ERROR_ACCESS_DENIED 5L
+else
+	@chmod -x $@
+endif
+endif # end of win32-simulator
+
+endif # end of simulator section
 
 include $(TOOLSDIR)/make.inc
 
+$(BUILDDIR)/libcodec.a:
+	@echo "MAKE in codecs/lib"
+	@mkdir -p $(OBJDIR)/lib
+	@$(MAKE) -C lib OBJDIR=$(OBJDIR)/lib
+
+$(LINKCODEC): $(LDS)
+	@echo "build $@"
+	@cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) -DCODEC $(INCLUDES) $(TARGET) $(DEFINES) -E -P - >$@
 
 libmad:
 	@echo "MAKE in libmad"

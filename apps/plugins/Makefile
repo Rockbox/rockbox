@@ -22,7 +22,6 @@ endif
 
 LDS := plugin.lds
 LINKFILE := $(OBJDIR)/pluginlink.lds
-LINKCODEC := $(OBJDIR)/codeclink.lds
 DEPFILE = $(OBJDIR)/dep-plugins
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
@@ -55,13 +54,7 @@ ifndef SIMVER
 $(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKFILE) $(LINKCODEC) $(BUILDDIR)/libplugin.a
 	$(SILENT)(file=`basename $@`; \
 	echo "LD $$file"; \
-	match=`grep $$file CODECS`; \
-	if test -z "$$match"; then \
-	  LINKWITH=$(LINKFILE); \
-	else \
-	  LINKWITH=$(LINKCODEC); \
-	fi; \
-	$(CC) $(GCCOPTS) -O -nostdlib -o $@ $< -L$(BUILDDIR) $(CODECLIBS) -lplugin -lgcc -T$$LINKWITH -Wl,-Map,$(OBJDIR)/$*.map)
+	$(CC) $(GCCOPTS) -O -nostdlib -o $@ $< -L$(BUILDDIR) $(CODECLIBS) -lplugin -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/$*.map)
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.elf
 	@echo "OBJCOPY "`basename $@`
@@ -108,17 +101,13 @@ endif # end of simulator section
 include $(TOOLSDIR)/make.inc
 
 $(BUILDDIR)/libplugin.a:
-	@echo "MAKE in lib"
+	@echo "MAKE in plugin/lib"
 	@mkdir -p $(OBJDIR)/lib
 	@$(MAKE) -C lib OBJDIR=$(OBJDIR)/lib
 
 $(LINKFILE): $(LDS)
 	@echo "build $@"
 	@cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P - >$@
-
-$(LINKCODEC): $(LDS)
-	@echo "build $@"
-	@cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) -DCODEC $(INCLUDES) $(TARGET) $(DEFINES) -E -P - >$@
 
 $(SUBDIRS):
 	@echo "MAKE in $@"

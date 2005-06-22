@@ -22,10 +22,10 @@
 #if (CONFIG_HWCODEC == MASNONE)
 /* software codec platforms, not for simulator */
 
-#include "plugin.h"
+#include "codecs.h"
 #include "xxx2wav.h"
 
-static struct plugin_api* local_rb;
+static struct codec_api* local_rb;
 
 int mem_ptr;
 int bufsize;
@@ -33,11 +33,12 @@ unsigned char* audiobuf;     // The actual audio buffer from Rockbox
 unsigned char* mallocbuf;  // 512K from the start of audio buffer
 unsigned char* filebuf;    // The rest of the audio buffer
 
-void* codec_malloc(size_t size) {
-  void* x;
+void* codec_malloc(size_t size)
+{
+    void* x;
 
-  x=&mallocbuf[mem_ptr];
-  mem_ptr+=(size+3)&~3; // Keep memory 32-bit aligned (if it was already?)
+    x=&mallocbuf[mem_ptr];
+    mem_ptr+=(size+3)&~3; // Keep memory 32-bit aligned (if it was already?)
 /*
   if(TIME_AFTER(*(local_rb->current_tick), last_tick + HZ)) {
       char s[32];
@@ -48,24 +49,26 @@ void* codec_malloc(size_t size) {
       last_tick = *(local_rb->current_tick);
       local_rb->lcd_update();
   }*/
-  return(x);
+    return(x);
 }
 
-void* codec_calloc(size_t nmemb, size_t size) {
-  void* x;
-  x = codec_malloc(nmemb*size);
-  local_rb->memset(x,0,nmemb*size);
-  return(x);
+void* codec_calloc(size_t nmemb, size_t size)
+{
+    void* x;
+    x = codec_malloc(nmemb*size);
+    local_rb->memset(x,0,nmemb*size);
+    return(x);
 }
 
-void* codec_alloca(size_t size) {
-  void* x;
-  x = codec_malloc(size);
-  return(x);
+void* codec_alloca(size_t size)
+{
+    void* x;
+    x = codec_malloc(size);
+    return(x);
 }
 
 void codec_free(void* ptr) {
-  (void)ptr;
+    (void)ptr;
 }
 
 void* codec_realloc(void* ptr, size_t size) {
@@ -146,6 +149,7 @@ void display_status(file_info_struct* file_info) {
   }
 }
 
+#if 0
 static unsigned char wav_header[44]={'R','I','F','F',    //  0 - ChunkID
                               0,0,0,0,            //  4 - ChunkSize (filesize-8)
                               'W','A','V','E',    //  8 - Format
@@ -160,14 +164,18 @@ static unsigned char wav_header[44]={'R','I','F','F',    //  0 - ChunkID
                               'd','a','t','a',    // 36 - Subchunk2ID
                               0,0,0,0             // 40 - Subchunk2Size
                              };
+#endif
 
-
-void xxx2wav_set_api(struct plugin_api* rb)
+void xxx2wav_set_api(struct codec_api* rb)
 {
     local_rb = rb;
 }
 
-int local_init(char* infilename, char* outfilename, file_info_struct* file_info, struct plugin_api* rb) {
+#if 0
+int local_init(char* infilename, char* outfilename,
+               file_info_struct* file_info,
+               struct codec_api* rb)
+{
   char s[32];
   int i,n,bytesleft;
 
@@ -218,7 +226,8 @@ int local_init(char* infilename, char* outfilename, file_info_struct* file_info,
   return(0);
 }
 
-void close_wav(file_info_struct* file_info) {
+void close_wav(file_info_struct* file_info)
+{
   int x;
   int filesize=local_rb->filesize(file_info->outfile);
 
@@ -256,4 +265,6 @@ void close_wav(file_info_struct* file_info) {
   local_rb->write(file_info->outfile,wav_header,sizeof(wav_header));
   local_rb->close(file_info->outfile);
 }
+#endif /* 0 */
+
 #endif /* CONFIG_HWCODEC == MASNONE */

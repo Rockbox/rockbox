@@ -17,21 +17,22 @@
  *
  ****************************************************************************/
 
-/* Various "helper functions" common to all the xxx2wav decoder plugins  */
+/* "helper functions" common to all codecs  */
 
 #include "plugin.h"
 #include "playback.h"
 #include "codeclib.h"
 #include "xxx2wav.h"
 
-struct plugin_api* local_rb;
+struct codec_api *local_rb;
 
-int codec_init(struct plugin_api* rb, struct codec_api* ci) {
+int codec_init(struct codec_api* rb)
+{
     local_rb = rb;
     
     xxx2wav_set_api(rb);
     mem_ptr = 0;
-    mallocbuf = (unsigned char *)ci->get_codec_memory((size_t *)&bufsize);
+    mallocbuf = (unsigned char *)rb->get_codec_memory((size_t *)&bufsize);
   
     return 0;
 }

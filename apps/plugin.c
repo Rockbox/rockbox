@@ -332,60 +332,6 @@ static const struct plugin_api rockbox_api = {
 
 };
 
-#if CONFIG_HWCODEC == MASNONE
-int codec_load_ram(char* codecptr, size_t size, void *parameter, void* ptr2,
-                   size_t bufwrap)
-{
-    enum plugin_status (*plugin_start)(struct plugin_api* api, void* param);
-    int copy_n;
-    int status;
-    
-    if ((char *)&codecbuf[0] != codecptr) {
-        /* zero out codec buffer to ensure a properly zeroed bss area */
-        memset(codecbuf, 0, CODEC_BUFFER_SIZE);
-        
-        size = MIN(size, CODEC_BUFFER_SIZE);
-        copy_n = MIN(size, bufwrap);
-        memcpy(codecbuf, codecptr, copy_n);         
-        size -= copy_n;
-        if (size > 0) {
-            memcpy(&codecbuf[copy_n], ptr2, size);
-        }
-    }
-    plugin_start = (void*)&codecbuf;
-        
-    invalidate_icache();
-    status = plugin_start((struct plugin_api*) &rockbox_api, parameter);
-    
-    return status;
-}
-
-int codec_load_file(const char *plugin, void *parameter)
-{
-    char msgbuf[80];
-    int fd;
-    int rc;
-    
-    fd = open(plugin, O_RDONLY);
-    if (fd < 0) {
-        snprintf(msgbuf, sizeof(msgbuf)-1, "Couldn't load codec: %s", plugin);
-        logf("Codec load error:%d", fd);
-        splash(HZ*2, true, msgbuf);
-        return fd;
-    }
-    
-    rc = read(fd, &codecbuf[0], CODEC_BUFFER_SIZE);
-    close(fd);
-    if (rc <= 0) {
-        logf("Codec read error");
-        return PLUGIN_ERROR;
-    }
-        
-    return codec_load_ram(codecbuf, (size_t)rc, parameter, NULL, 0);
-}
-
-#endif
-
 int plugin_load(const char* plugin, void* parameter)
 {
     enum plugin_status (*plugin_start)(struct plugin_api* api, void* param);

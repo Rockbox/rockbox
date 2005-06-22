@@ -48,9 +48,10 @@ recorder/radio.c
 #ifdef HAVE_RECORDING
 recorder/recording.c
 #endif
-#ifdef IRIVER_H100
+#if CONFIG_HWCODEC == MASNONE
 playback.c
 metadata.c
+codecs.c
 #ifndef SIMULATOR
 pcm_recording.c
 #endif

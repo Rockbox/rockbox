@@ -48,7 +48,7 @@ sub buildzip {
     mkdir ".rockbox/langs", 0777;
     mkdir ".rockbox/rocks", 0777;
     mkdir ".rockbox/codecs", 0777;
-    `find apps -name "codec*.rock" ! -empty | xargs --replace=foo cp foo .rockbox/codecs/`;
+    `find apps -name "*.codec" ! -empty | xargs --replace=foo cp foo .rockbox/codecs/`;
     `find apps -name "*.rock" -o -name "*.ovl" ! -empty ! -name "codec*.rock" | xargs --replace=foo cp foo .rockbox/rocks/`;
 
     open VIEWERS, "$ROOT/apps/plugins/viewers.config" or

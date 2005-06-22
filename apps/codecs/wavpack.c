@@ -17,13 +17,13 @@
  *
  ****************************************************************************/
 
-#include "plugin.h"
+#include "codec.h"
 
 #include <codecs/libwavpack/wavpack.h>
 #include "playback.h"
 #include "lib/codeclib.h"
 
-static struct plugin_api *rb;
+static struct codec_api *rb;
 static struct codec_api *ci;
 
 #define BUFFER_SIZE 4096
@@ -41,18 +41,18 @@ extern char iramstart[];
 extern char iramend[];
 #endif
 
-/* this is the plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parm)
+/* this is the codec entry point */
+enum codec_status codec_start(struct codec_api* api, void* parm)
 {
     WavpackContext *wpc;
     char error [80];
     int bps, nchans;
 
-    /* Generic plugin initialisation */
-    TEST_PLUGIN_API(api);
+    /* Generic codec initialisation */
+    TEST_CODEC_API(api);
 
     rb = api;
-    ci = (struct codec_api*) parm;
+    ci = api;
 
 #ifndef SIMULATOR
     rb->memcpy(iramstart, iramcopy, iramend-iramstart);
@@ -64,15 +64,15 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
 
     next_track:
 
-    if (codec_init(api, ci))
-        return PLUGIN_ERROR;
+    if (codec_init(api))
+        return CODEC_ERROR;
 
     /* Create a decoder instance */
 
     wpc = WavpackOpenFileInput (read_callback, error);
 
     if (!wpc)
-        return PLUGIN_ERROR;
+        return CODEC_ERROR;
 
     bps = WavpackGetBytesPerSample (wpc);
     nchans = WavpackGetReducedChannels (wpc);
@@ -181,5 +181,5 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
     if (ci->request_next_track())
         goto next_track;
 
-    return PLUGIN_OK;
+    return CODEC_OK;
 }

@@ -17,7 +17,7 @@
  *
  ****************************************************************************/
 
-#include "plugin.h"
+#include "codec.h"
 
 #include <codecs/libFLAC/include/FLAC/seekable_stream_decoder.h>
 #include "playback.h"
@@ -26,7 +26,7 @@
 #define FLAC_MAX_SUPPORTED_BLOCKSIZE 4608
 #define FLAC_MAX_SUPPORTED_CHANNELS  2
 
-static struct plugin_api* rb;
+static struct codec_api* rb;
 static uint32_t samplesdone;
 
 /* Called when the FLAC decoder needs some FLAC data to decode */
@@ -159,14 +159,14 @@ extern char iramstart[];
 extern char iramend[];
 #endif
 
-/* this is the plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parm)
+/* this is the codec entry point */
+enum codec_status codec_start(struct codec_api* api, void* parm)
 {
-  struct codec_api* ci = (struct codec_api*)parm;
-  FLAC__SeekableStreamDecoder* flacDecoder;
+    struct codec_api* ci = api;
+    FLAC__SeekableStreamDecoder* flacDecoder;
 
-  /* Generic plugin initialisation */
-  TEST_PLUGIN_API(api);
+  /* Generic codec initialisation */
+  TEST_CODEC_API(api);
 
   /* if you are using a global api pointer, don't forget to copy it!
      otherwise you will get lovely "I04: IllInstr" errors... :-) */
@@ -182,8 +182,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
 
   next_track:
 
-  if (codec_init(api, ci)) {
-    return PLUGIN_ERROR;
+  if (codec_init(api)) {
+    return CODEC_ERROR;
   }
 
   /* Create a decoder instance */
@@ -209,7 +209,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
 
   /* QUESTION: What do we do when the init fails? */
   if (FLAC__seekable_stream_decoder_init(flacDecoder)) {
-    return PLUGIN_ERROR;
+    return CODEC_ERROR;
   }
 
   /* The first thing to do is to parse the metadata */
@@ -244,5 +244,5 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
   if (ci->request_next_track())
     goto next_track;
 
-  return PLUGIN_OK;
+  return CODEC_OK;
 }

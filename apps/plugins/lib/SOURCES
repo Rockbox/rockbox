@@ -34,9 +34,8 @@ gray_verline.c
 #ifdef HAVE_LCD_CHARCELLS
 playergfx.c
 #endif
+#if 0
 #if CONFIG_HWCODEC == MASNONE /* software codec platforms */
 xxx2wav.c
-#ifdef IRIVER_H100
-codeclib.c
 #endif
 #endif

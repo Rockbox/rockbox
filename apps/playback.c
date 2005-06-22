@@ -33,7 +33,7 @@
 #include "debug.h"
 #include "sprintf.h"
 #include "settings.h"
-#include "plugin.h"
+#include "codecs.h"
 #include "wps.h"
 #include "wps-display.h"
 #include "audio.h"
@@ -63,13 +63,13 @@
 static volatile bool playing;
 static volatile bool paused;
 
-#define CODEC_VORBIS   "/.rockbox/codecs/codecvorbis.rock";
-#define CODEC_MPA_L3   "/.rockbox/codecs/codecmpa.rock";
-#define CODEC_FLAC     "/.rockbox/codecs/codecflac.rock";
-#define CODEC_WAV      "/.rockbox/codecs/codecwav.rock";
-#define CODEC_A52      "/.rockbox/codecs/codeca52.rock";
-#define CODEC_MPC      "/.rockbox/codecs/codecmpc.rock";
-#define CODEC_WAVPACK  "/.rockbox/codecs/codecwavpack.rock";
+#define CODEC_VORBIS   "/.rockbox/codecs/vorbis.codec";
+#define CODEC_MPA_L3   "/.rockbox/codecs/mpa.codec";
+#define CODEC_FLAC     "/.rockbox/codecs/flac.codec";
+#define CODEC_WAV      "/.rockbox/codecs/wav.codec";
+#define CODEC_A52      "/.rockbox/codecs/a52.codec";
+#define CODEC_MPC      "/.rockbox/codecs/mpc.codec";
+#define CODEC_WAVPACK  "/.rockbox/codecs/wavpack.codec";
 
 #define AUDIO_FILL_CYCLE             (1024*256)
 #define AUDIO_DEFAULT_WATERMARK      (1024*256)
@@ -153,7 +153,7 @@ static struct track_info tracks[MAX_TRACK];
 static volatile struct track_info *cur_ti;
 
 /* Codec API including function callbacks. */
-static struct codec_api ci;
+extern struct codec_api ci;
 
 /* When we change a song and buffer is not in filling state, this
    variable keeps information about whether to go a next/previous track. */
@@ -1074,7 +1074,7 @@ void codec_thread(void)
         switch (ev.id) {
             case CODEC_LOAD_DISK:
                 ci.stop_codec = false;
-                status = codec_load_file((char *)ev.data, &ci);
+                status = codec_load_file((char *)ev.data);
                 break ;
                 
             case CODEC_LOAD:
@@ -1089,7 +1089,7 @@ void codec_thread(void)
                 ci.stop_codec = false;
                 wrap = (int)&codecbuf[codecbuflen] - (int)cur_ti->codecbuf;
                 status = codec_load_ram(cur_ti->codecbuf,  codecsize, 
-                                        &ci, &codecbuf[0], wrap);
+                                        &codecbuf[0], wrap);
                 break ;
 
 #ifndef SIMULATOR                
@@ -1103,7 +1103,7 @@ void codec_thread(void)
         switch (ev.id) {
         case CODEC_LOAD_DISK:
         case CODEC_LOAD:
-            if (status != PLUGIN_OK) {
+            if (status != CODEC_OK) {
                 logf("Codec failure");
                 splash(HZ*2, true, "Codec failure");
                 playing = false;

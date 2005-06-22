@@ -67,22 +67,15 @@ alpine_cdc.c
 #endif
 
 #if CONFIG_HWCODEC == MASNONE /* software codec platforms */
+#if 0
 mpa2wav.c
 a52towav.c
 flac2wav.c
 vorbis2wav.c
-#ifdef IRIVER_H100
-codecvorbis.c
-codecmpa.c
-codecflac.c
-codecwav.c
-codeca52.c
-codecmpc.c
-codecwavpack.c
-#endif
 wv2wav.c
 mpc2wav.c
 midi2wav.c
+#endif
 iriverify.c
 #else
 splitedit.c

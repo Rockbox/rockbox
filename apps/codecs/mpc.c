@@ -17,12 +17,12 @@
  *
  ****************************************************************************/
 
-#include "plugin.h"
+#include "codec.h"
 #include "playback.h"
 #include "lib/codeclib.h"
 #include <codecs/libmusepack/musepack.h>
 
-static struct plugin_api* rb;
+static struct codec_api* rb;
 mpc_decoder decoder;
 
 /*
@@ -92,10 +92,10 @@ extern char iramstart[];
 extern char iramend[];
 #endif
 
-/* this is the plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parm)
+/* this is the codec entry point */
+enum codec_status codec_start(struct codec_api* api, void* parm)
 {
-  struct codec_api* ci = (struct codec_api*)parm;
+    struct codec_api* ci = api;
   unsigned short Sample;
   unsigned long samplesdone;
   unsigned long frequency;
@@ -103,9 +103,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
   unsigned int i;
   mpc_reader reader;
 
-  /* Generic plugin inititialisation */
+  /* Generic codec inititialisation */
 
-  TEST_PLUGIN_API(api);
+  TEST_CODEC_API(api);
   rb = api;
 
 #ifndef SIMULATOR
@@ -117,8 +117,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
 
   next_track:
 
-  if (codec_init(api, ci)) {
-    return PLUGIN_ERROR;
+  if (codec_init(api)) {
+    return CODEC_ERROR;
   }
 
   /* Create a decoder instance */
@@ -134,14 +134,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
   mpc_streaminfo info;
   mpc_streaminfo_init(&info);
   if (mpc_streaminfo_read(&info, &reader) != ERROR_CODE_OK) {
-    return PLUGIN_ERROR;  
+    return CODEC_ERROR;  
   }
   frequency=info.sample_freq;
 
   /* instantiate a decoder with our file reader */
   mpc_decoder_setup(&decoder, &reader);
   if (!mpc_decoder_initialize(&decoder, &info)) {
-    return PLUGIN_ERROR;
+    return CODEC_ERROR;
   }
 
   /* Initialise the output buffer. */
@@ -158,7 +158,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
     status = mpc_decoder_decode(&decoder, sample_buffer, 0, 0);
     if (status == (unsigned)(-1)) {
       //decode error
-      return PLUGIN_ERROR;
+      return CODEC_ERROR;
     }
     else                    //status>0
     {
@@ -209,6 +209,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
   if (ci->request_next_track())
     goto next_track;
 
-  return PLUGIN_OK;
+  return CODEC_OK;
 }
 

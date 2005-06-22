@@ -17,7 +17,7 @@
  *
  ****************************************************************************/
 
-#include "plugin.h"
+#include "codec.h"
 #include "playback.h"
 #include "lib/codeclib.h"
 
@@ -32,11 +32,11 @@ extern char iramstart[];
 extern char iramend[];
 #endif
 
-/* this is the plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parm)
+/* this is the codec entry point */
+enum codec_status codec_start(struct codec_api* api, void* parm)
 {
-  struct plugin_api* rb = (struct plugin_api*)api;
-  struct codec_api* ci = (struct codec_api*)parm;
+    struct codec_api* rb = api;
+    struct codec_api* ci = api;
   unsigned long samplerate,numbytes,totalsamples,samplesdone,nsamples;
   int channels,bytespersample,bitspersample;
   unsigned int i;
@@ -45,8 +45,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
   unsigned char* header;
   unsigned short* wavbuf;
 
-  /* Generic plugin initialisation */
-  TEST_PLUGIN_API(api);
+  /* Generic codec initialisation */
+  TEST_CODEC_API(api);
 
   /* if you are using a global api pointer, don't forget to copy it!
      otherwise you will get lovely "I04: IllInstr" errors... :-) */
@@ -62,18 +62,18 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
 
   next_track:
 
-  if (codec_init(api, ci)) {
-    return PLUGIN_ERROR;
+  if (codec_init(api)) {
+    return CODEC_ERROR;
   }
 
   /* FIX: Correctly parse WAV header - we assume canonical 44-byte header */
 
   header=ci->request_buffer(&n,44);
   if (n!=44) {
-    return PLUGIN_ERROR;
+    return CODEC_ERROR;
   }
   if ((memcmp(header,"RIFF",4)!=0) || (memcmp(&header[8],"WAVEfmt",7)!=0)) {
-    return PLUGIN_ERROR;
+    return CODEC_ERROR;
   }
 
   samplerate=header[24]|(header[25]<<8)|(header[26]<<16)|(header[27]<<24);
@@ -84,7 +84,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
   totalsamples=numbytes/bytespersample;
 
   if ((bitspersample!=16) || (channels != 2)) {
-    return PLUGIN_ERROR;
+    return CODEC_ERROR;
   }
 
   ci->advance_buffer(44);
@@ -132,5 +132,5 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
   if (ci->request_next_track())
     goto next_track;
 
-  return PLUGIN_OK;
+  return CODEC_OK;
 }

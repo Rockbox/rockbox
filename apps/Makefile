@@ -57,6 +57,7 @@ endif
 dep: $(DEPFILE)
 
 build-codecs:
+	@$(MAKE) -C codecs/lib OBJDIR=$(OBJDIR)/codecs/lib
 	@$(MAKE) -C codecs OBJDIR=$(OBJDIR)/codecs
 
 rocks:

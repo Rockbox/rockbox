@@ -17,7 +17,7 @@
  *
  ****************************************************************************/
 
-#include "plugin.h"
+#include "codec.h"
 
 #include <inttypes.h>  /* Needed by a52.h */
 #include <codecs/liba52/config-a52.h>
@@ -28,7 +28,7 @@
 
 #define BUFFER_SIZE 4096
 
-struct plugin_api* rb;
+struct codec_api* rb;
 struct codec_api* ci;
 
 static float gain = 1;
@@ -154,17 +154,17 @@ extern char iramstart[];
 extern char iramend[];
 #endif
 
-/* this is the plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parm)
+/* this is the codec entry point */
+enum codec_status codec_start(struct codec_api* api, void* parm)
 {
   size_t n;
   unsigned char* filebuf;
 
-  /* Generic plugin initialisation */
-  TEST_PLUGIN_API(api);
+  /* Generic codec initialisation */
+  TEST_CODEC_API(api);
 
   rb = api;
-  ci = (struct codec_api*)parm;
+  ci = (struct codec_api*)api;
 
 #ifndef SIMULATOR
   rb->memcpy(iramstart, iramcopy, iramend-iramstart);
@@ -175,8 +175,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
 
   next_track:
 
-  if (codec_init(api, ci)) {
-  return PLUGIN_ERROR;
+  if (codec_init(api)) {
+      return CODEC_ERROR;
   }
 
   /* Intialise the A52 decoder and check for success */
@@ -206,5 +206,5 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
 
 //NOT NEEDED??:  a52_free (state);
 
-  return PLUGIN_OK;
+  return CODEC_OK;
 }
