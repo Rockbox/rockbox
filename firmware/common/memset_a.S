@@ -166,8 +166,8 @@ memset:
     bhi.b   .loop_b1
     
 .end_b1:
-    move.l  %a0,%d1
-    add.l   #31,%d1
+    moveq.l #31,%d1
+    add.l   %a0,%d1
     and.l   #0xFFFFFFF0,%d1 /* %d1 = first line bound + 16 */
     cmp.l   %d1,%a1         /* at least one full line to fill? */
     blo.b   .no_lines       /* no, jump to longword loop */
