@@ -1,0 +1,9 @@
+#ifdef IRIVER_H100
+vorbis.c
+mpa.c
+flac.c
+wav.c
+a52.c
+mpc.c
+wavpack.c
+#endif
