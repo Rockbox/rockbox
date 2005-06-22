@@ -28,7 +28,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <sprintf.h>
-#include <stdbool.h>
 #include "config.h"
 #include "lcd-remote.h"
 #include "logf.h"
