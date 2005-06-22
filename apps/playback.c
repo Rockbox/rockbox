@@ -135,7 +135,7 @@ static int last_peek_offset;
 
 /* Track information (count in file buffer, read/write indexes for
    track ring structure. */
-static int track_count;
+int track_count;
 static volatile int track_ridx;
 static volatile int track_widx;
 static bool track_changed;
