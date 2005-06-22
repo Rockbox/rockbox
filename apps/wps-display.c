@@ -48,6 +48,27 @@
 #include "icons.h"
 #include "widgets.h"
 #include "peakmeter.h"
+
+/* Image stuff */
+#include "bmp.h"
+#include "atoi.h"
+#define MAX_IMAGES 10
+#define IMG_BUFSIZE (LCD_HEIGHT * LCD_WIDTH) / 8
+static unsigned char img_buf[IMG_BUFSIZE]; /* image buffer */
+static unsigned char* img_buf_ptr = img_buf; /* where are in image buffer? */
+
+static int img_buf_free = IMG_BUFSIZE; /* free space in image buffer */
+
+struct {
+    unsigned char* ptr;     /* pointer */
+    int x;                  /* x-pos */
+    int y;                  /* y-pos */
+    int w;                  /* width */
+    int h;                  /* height */
+    bool loaded;            /* load state */
+} img[MAX_IMAGES] ;
+
+
 #endif
 
 #define WPS_CONFIG ROCKBOX_DIR "/default.wps"
@@ -86,6 +107,18 @@ static int curr_subline[MAX_LINES];
 static int ff_rewind_count;
 bool wps_time_countup = true;
 static bool wps_loaded = false;
+
+#ifdef HAVE_LCD_BITMAP
+/* Display images */
+static void wps_display_images(void) {
+    int n;
+    for (n = 0; n < MAX_IMAGES; n++) {
+        if (img[n].loaded) {
+            lcd_bitmap(img[n].ptr, img[n].x, img[n].y, img[n].w, img[n].h, false);
+        }
+    }
+}
+#endif
 
 /* Set format string to use for WPS, splitting it into lines */
 static void wps_format(const char* fmt)
@@ -218,6 +251,9 @@ bool wps_load(const char* file, bool display)
                 }
                 if (any_defined_line)
                 {
+#ifdef HAVE_LCD_BITMAP                    
+                    wps_display_images();
+#endif                    
                     lcd_update();
                     sleep(HZ/2);
                 }
@@ -707,6 +743,12 @@ static void format_display(char* buf,
     char* value = NULL;
     int level = 0;
     unsigned char tag_length;
+    
+    /* needed for images (ifdef is to kill a warning on player)*/
+#ifdef HAVE_LCD_BITMAP
+    int n, ret;
+    char imgtmp[32];
+#endif
 
     *subline_time_mult = DEFAULT_SUBLINE_TIME_MULTIPLIER;
 
@@ -743,6 +785,31 @@ static void format_display(char* buf,
                 *flags |= WPS_REFRESH_SCROLL;
                 ++fmt;
                 break;
+
+            case 'x': /* image support */
+#ifdef HAVE_LCD_BITMAP
+                strncpy(imgtmp, fmt+1, 1);
+                n = atoi(imgtmp); /* get image number */
+                if (!img[n].loaded) {
+                    /* image not loaded, get extra info. */
+                    strncpy(imgtmp, fmt+2, 3);
+                    img[n].x = atoi(imgtmp);
+                    strncpy(imgtmp, fmt+5, 3);
+                    img[n].y = atoi(imgtmp);
+                    /* and load the image */
+                    snprintf(imgtmp, 32, "/.rockbox/img_%d.bmp", n);
+                    ret = read_bmp_file(imgtmp, &img[n].w, &img[n].h, img_buf_ptr, img_buf_free);
+                    if (ret > 0) {
+                        img[n].ptr = img_buf_ptr;
+                        img_buf_ptr += ret;
+                        img_buf_free -= ret;
+                    }
+                    img[n].loaded = true;
+                }
+#endif
+                fmt += 8;
+                break;
+                
 
             case '%':
             case '|':
@@ -981,6 +1048,7 @@ bool wps_refresh(struct mp3entry* id3,
         }
 #ifdef HAVE_LCD_BITMAP
         if (update_line) {
+            wps_display_images();
             lcd_update_rect(0, i*h + offset, LCD_WIDTH, h);
         }
 #endif
@@ -1020,6 +1088,7 @@ bool wps_display(struct mp3entry* id3,
         lcd_puts(0, 0, str(LANG_END_PLAYLIST_PLAYER));
 #else
         lcd_puts(0, 2, str(LANG_END_PLAYLIST_RECORDER));
+        wps_display_images();
         lcd_update();
 #endif
         global_settings.resume_index = -1;
@@ -1050,6 +1119,9 @@ bool wps_display(struct mp3entry* id3,
     yield();
     wps_refresh(id3, nid3, 0, WPS_REFRESH_ALL);
     status_draw(true);
+#ifdef HAVE_LCD_BITMAP    
+    wps_display_images();
+#endif
     lcd_update();
     return false;
 }
