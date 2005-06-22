@@ -46,6 +46,7 @@ char *strcat(char *dest, const char *src)
 
 size_t read_handler(void *ptr, size_t size, size_t nmemb, void *datasource)
 {
+    (void)datasource;
     return rb->read_filebuf(ptr, nmemb*size);
 }
 
@@ -66,6 +67,7 @@ int close_handler(void *datasource)
 
 long tell_handler(void *datasource)
 {
+    (void)datasource;
     return rb->curpos;
 }
 
@@ -80,7 +82,7 @@ extern char iramend[];
 static char pcmbuf[4096] IDATA_ATTR;
 
 /* this is the codec entry point */
-enum codec_status codec_start(struct codec_api* api, void* parm)
+enum codec_status codec_start(struct codec_api* api)
 {
     ov_callbacks callbacks;
     OggVorbis_File vf;

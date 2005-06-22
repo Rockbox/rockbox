@@ -297,7 +297,7 @@ const struct codec_api ci = {
 
 int codec_load_ram(char* codecptr, size_t size, void* ptr2, size_t bufwrap)
 {
-    enum codec_status (*codec_start)(const struct codec_api* api, void* param);
+    enum codec_status (*codec_start)(const struct codec_api* api);
     int copy_n;
     int status;
     
@@ -316,7 +316,7 @@ int codec_load_ram(char* codecptr, size_t size, void* ptr2, size_t bufwrap)
     codec_start = (void*)&codecbuf;
         
     invalidate_icache();
-    status = codec_start(&ci, NULL);
+    status = codec_start(&ci);
     
     return status;
 }

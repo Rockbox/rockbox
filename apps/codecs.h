@@ -397,7 +397,7 @@ int codec_load_file(const char* codec);
 #endif
 
 /* defined by the codec */
-enum codec_status codec_start(struct codec_api* rockbox, void* parameter)
+enum codec_status codec_start(struct codec_api* rockbox)
     __attribute__ ((section (".entry")));
 
 #endif

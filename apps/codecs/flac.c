@@ -160,7 +160,7 @@ extern char iramend[];
 #endif
 
 /* this is the codec entry point */
-enum codec_status codec_start(struct codec_api* api, void* parm)
+enum codec_status codec_start(struct codec_api* api)
 {
     struct codec_api* ci = api;
     FLAC__SeekableStreamDecoder* flacDecoder;

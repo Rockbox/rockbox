@@ -257,7 +257,7 @@ long resample(long *in, long *out, int num, struct resampler *s)
 }
 
 /* this is the codec entry point */
-enum codec_status codec_start(struct codec_api* api, void* parm)
+enum codec_status codec_start(struct codec_api* api)
 {
     struct codec_api *ci = api;
     struct mp3info *info;
@@ -279,7 +279,6 @@ enum codec_status codec_start(struct codec_api* api, void* parm)
     struct resampler lr = { 0, 0, 0 }, rr = { 0, 0, 0 };
     long length;  
     /* Generic codec inititialisation */
-    (void)parm;
 
     TEST_CODEC_API(api);
     rb = api;
