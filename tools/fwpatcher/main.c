@@ -235,7 +235,7 @@ int PatchFirmware()
             DeleteFile(name1);
             DeleteFile(name2);
             /* all is fine, rename the patched file to original name of the firmware */
-            if (MoveFileEx(name3, fn, MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING)) {
+            if (DeleteFile(fn) && MoveFile(name3, fn)) {
                 return 1;
             }
             else {
