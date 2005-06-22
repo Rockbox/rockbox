@@ -59,17 +59,19 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
                          long length)
 {
     long i;
+    unsigned char* localdest = dest;
 
     for(i = 0;i < length;i++)
-        *dest++ = *source++;
+        *localdest++ = *source++;
 
 #if CONFIG_CPU == MCF5249
-    asm volatile (" move.l #0,%d0");
-    asm volatile (" move.l #0x30000000,%d0");
-    asm volatile (" movec.l %d0,%vbr");
-    asm volatile (" move.l 0x30000000,%sp");
-    asm volatile (" move.l 0x30000004,%a0");
-    asm volatile (" jmp (%a0)");
+    asm (
+        "movec.l %0,%%vbr    \n"
+        "move.l  (%0)+,%%sp  \n"
+        "move.l  (%0),%0     \n"
+        "jmp     (%0)        \n"
+        : : "a"(dest)
+    );
 #endif
 }
 #endif
