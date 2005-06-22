@@ -73,7 +73,7 @@
 #endif
 
 /* This size must match the one set in ../plugins/plugin.lds */
-#define CODEC_BUFFER_SIZE 0x3C000
+#define CODEC_BUFFER_SIZE 0x40000
 
 #ifdef SIMULATOR
 #define PREFIX(_x_) sim_ ## _x_

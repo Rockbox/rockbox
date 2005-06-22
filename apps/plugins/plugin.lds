@@ -23,7 +23,7 @@ OUTPUT_FORMAT(elf32-sh)
 #endif
 
 #ifdef CODEC
-#define CODEC_SIZE 0x3C000
+#define CODEC_SIZE 0x40000
 #else
 #define CODEC_SIZE 0
 #endif
