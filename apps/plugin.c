@@ -61,22 +61,21 @@
 #include "lcd-remote.h"
 #endif
 
-#if MEM >= 32
-#define PLUGIN_BUFFER_SIZE 0xC0000
-#else
-#define PLUGIN_BUFFER_SIZE 0x8000
-#endif
-
 #ifdef SIMULATOR
 static unsigned char pluginbuf[PLUGIN_BUFFER_SIZE];
+#if CONFIG_HWCODEC == MASNONE
+static unsigned char codecbuf[CODEC_BUFFER_SIZE];
+#endif
 void *sim_plugin_load(char *plugin, int *fd);
 void sim_plugin_close(int fd);
 #else
 #define sim_plugin_close(x)
 extern unsigned char pluginbuf[];
+extern unsigned char codecbuf[];
 #include "bitswap.h"
 #endif
 
+/* for actual plugins only, not for codecs */
 static bool plugin_loaded = false;
 static int  plugin_size = 0;
 #ifndef SIMULATOR
@@ -334,38 +333,29 @@ static const struct plugin_api rockbox_api = {
 };
 
 #if CONFIG_HWCODEC == MASNONE
-int codec_load_ram(char* pluginptr, size_t size, void *parameter, void* ptr2,
+int codec_load_ram(char* codecptr, size_t size, void *parameter, void* ptr2,
                    size_t bufwrap)
 {
     enum plugin_status (*plugin_start)(struct plugin_api* api, void* param);
     int copy_n;
     int status;
     
-    plugin_size = size;
-    if ((int)&pluginbuf != (int)pluginptr) {
-        /* zero out plugin buffer to ensure a properly zeroed bss area */
-        memset(pluginbuf, 0, PLUGIN_BUFFER_SIZE);
+    if ((char *)&codecbuf[0] != codecptr) {
+        /* zero out codec buffer to ensure a properly zeroed bss area */
+        memset(codecbuf, 0, CODEC_BUFFER_SIZE);
         
-        size = MIN(size, PLUGIN_BUFFER_SIZE);
+        size = MIN(size, CODEC_BUFFER_SIZE);
         copy_n = MIN(size, bufwrap);
-        memcpy(pluginbuf, pluginptr, copy_n);
-        
+        memcpy(codecbuf, codecptr, copy_n);         
         size -= copy_n;
         if (size > 0) {
-            memcpy(&pluginbuf[copy_n], ptr2, size);
+            memcpy(&codecbuf[copy_n], ptr2, size);
         }
     }
-    
-    plugin_start = (void*)&pluginbuf;
-    
-    if (plugin_size <= 0) {
-        return -1;
-    }
-    
-    plugin_loaded = true;
+    plugin_start = (void*)&codecbuf;
+        
     invalidate_icache();
     status = plugin_start((struct plugin_api*) &rockbox_api, parameter);
-    plugin_loaded = false;
     
     return status;
 }
@@ -384,15 +374,14 @@ int codec_load_file(const char *plugin, void *parameter)
         return fd;
     }
     
-    rc = read(fd, &pluginbuf[0], PLUGIN_BUFFER_SIZE);
+    rc = read(fd, &codecbuf[0], CODEC_BUFFER_SIZE);
     close(fd);
     if (rc <= 0) {
         logf("Codec read error");
         return PLUGIN_ERROR;
     }
-    plugin_size = rc;
         
-    return codec_load_ram(pluginbuf, plugin_size, parameter, NULL, 0);
+    return codec_load_ram(codecbuf, (size_t)rc, parameter, NULL, 0);
 }
 
 #endif

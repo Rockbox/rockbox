@@ -22,6 +22,7 @@ endif
 
 LDS := plugin.lds
 LINKFILE := $(OBJDIR)/pluginlink.lds
+LINKCODEC := $(OBJDIR)/codeclink.lds
 DEPFILE = $(OBJDIR)/dep-plugins
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
@@ -51,9 +52,16 @@ endif
 all: $(BUILDDIR)/libplugin.a $(ROCKS) $(SUBDIRS) $(DEPFILE)
 
 ifndef SIMVER
-$(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKFILE) $(BUILDDIR)/libplugin.a
-	@echo "LD "`basename $@`
-	@$(CC) $(GCCOPTS) -O -nostdlib -o $@ $< -L$(BUILDDIR) $(CODECLIBS) -lplugin -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/$*.map
+$(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKFILE) $(LINKCODEC) $(BUILDDIR)/libplugin.a
+	$(SILENT)(file=`basename $@`; \
+	echo "LD $$file"; \
+	match=`grep $$file CODECS`; \
+	if test -z "$$match"; then \
+	  LINKWITH=$(LINKFILE); \
+	else \
+	  LINKWITH=$(LINKCODEC); \
+	fi; \
+	$(CC) $(GCCOPTS) -O -nostdlib -o $@ $< -L$(BUILDDIR) $(CODECLIBS) -lplugin -lgcc -T$$LINKWITH -Wl,-Map,$(OBJDIR)/$*.map)
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.elf
 	@echo "OBJCOPY "`basename $@`
@@ -104,11 +112,13 @@ $(BUILDDIR)/libplugin.a:
 	@mkdir -p $(OBJDIR)/lib
 	@$(MAKE) -C lib OBJDIR=$(OBJDIR)/lib
 
-# MEM should be passed on to this makefile with the chosen memory size given
-# in number of MB
 $(LINKFILE): $(LDS)
 	@echo "build $@"
 	@cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P - >$@
+
+$(LINKCODEC): $(LDS)
+	@echo "build $@"
+	@cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) -DCODEC $(INCLUDES) $(TARGET) $(DEFINES) -E -P - >$@
 
 $(SUBDIRS):
 	@echo "MAKE in $@"

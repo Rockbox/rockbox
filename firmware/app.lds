@@ -101,12 +101,16 @@ _pluginbuf = 0;
 
 #else
 
-
-
 #if MEMORYSIZE >= 32
 #define PLUGINSIZE 0xC0000
 #else
 #define PLUGINSIZE 0x8000
+#endif
+
+#if CONFIG_HWCODEC == MASNONE
+#define CODECSIZE 0x3C000
+#else
+#define CODECSIZE 0
 #endif
 
 #ifdef DEBUG
@@ -115,7 +119,7 @@ _pluginbuf = 0;
 #define STUBOFFSET 0
 #endif
 
-#define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGINSIZE - STUBOFFSET
+#define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGINSIZE - STUBOFFSET - CODECSIZE
 
 #if CONFIG_CPU == MCF5249
 #define DRAMORIG 0x31000000 + STUBOFFSET
@@ -127,7 +131,11 @@ _pluginbuf = 0;
 #define IRAMSIZE 0x1000
 #endif
 
-#define ENDADDR  (DRAMORIG + DRAMSIZE)
+/* End of the audio buffer, where the codec buffer starts */
+#define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE)
+
+/* Where the codec buffer ends, and the plugin buffer starts */
+#define ENDADDR (ENDAUDIOADDR + CODECSIZE)
 
 MEMORY
 {
@@ -226,11 +234,17 @@ SECTIONS
         audiobuffer = .;
     } > DRAM
 
-    .audiobufend ENDADDR:
+    .audiobufend ENDAUDIOADDR:
     {
         audiobufend = .;
         _audiobufend = .;
     } > DRAM
+
+    .codec ENDAUDIOADDR:
+    {
+        codecbuf = .;
+        _codecbuf = .;
+    }
 
     .plugin ENDADDR:
     {

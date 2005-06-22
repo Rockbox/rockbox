@@ -119,10 +119,10 @@ static const char codec_thread_name[] = "codec";
 static volatile bool filling;
 
 /* Ring buffer where tracks and codecs are loaded. */
-char *codecbuf;
+static char *codecbuf;
 
 /* Total size of the ring buffer. */
-int codecbuflen;
+static int codecbuflen;
 
 /* Bytes available in the buffer. */
 static volatile int codecbufused;

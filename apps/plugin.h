@@ -80,6 +80,14 @@
 
 #endif
 
+/* These three sizes must match the ones set in plugins/plugin.lds */
+#if MEM >= 32
+#define PLUGIN_BUFFER_SIZE 0xC0000
+#else
+#define PLUGIN_BUFFER_SIZE 0x8000
+#endif
+#define CODEC_BUFFER_SIZE 0x3C000
+
 #ifdef SIMULATOR
 #define PREFIX(_x_) sim_ ## _x_
 #else
