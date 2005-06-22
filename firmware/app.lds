@@ -108,7 +108,7 @@ _pluginbuf = 0;
 #endif
 
 #if CONFIG_HWCODEC == MASNONE
-#define CODECSIZE 0x3C000
+#define CODECSIZE 0x40000
 #else
 #define CODECSIZE 0
 #endif

@@ -86,7 +86,6 @@
 #else
 #define PLUGIN_BUFFER_SIZE 0x8000
 #endif
-#define CODEC_BUFFER_SIZE 0x3C000
 
 #ifdef SIMULATOR
 #define PREFIX(_x_) sim_ ## _x_

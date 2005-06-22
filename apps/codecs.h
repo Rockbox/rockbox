@@ -72,7 +72,8 @@
 
 #endif
 
-/* This size must match the one set in ../plugins/plugin.lds */
+/* This size must match the one set in ../plugins/plugin.lds and
+   ../../firmware/app.lds */
 #define CODEC_BUFFER_SIZE 0x40000
 
 #ifdef SIMULATOR
