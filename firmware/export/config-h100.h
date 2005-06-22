@@ -22,6 +22,8 @@
 /* Define this if you have an remote lcd */
 #define HAVE_REMOTE_LCD
 
+#define CONFIG_LCD LCD_S1D15E06
+
 #ifndef SIMULATOR
 
 /* Define this if you have a Motorola SCF5249 */
@@ -53,8 +55,6 @@
 
 /* Define this if you have ATA power-off control */
 #define HAVE_ATA_POWER_OFF
-
-#define CONFIG_LCD LCD_S1D15E06
 
 /* Offset ( in the firmware file's header ) to the file CRC */
 #define FIRMWARE_OFFSET_FILE_CRC 0
