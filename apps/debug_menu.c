@@ -226,6 +226,7 @@ bool dbg_audio_thread(void)
     char buf[32];
     int button;
     int line;
+    bool done = false;
 
     ticks = boost_ticks = 0;
 
@@ -233,13 +234,14 @@ bool dbg_audio_thread(void)
     
     lcd_setmargins(0, 0);
     
-    while(1)
+    while(!done)
     {
         button = button_get_w_tmo(HZ/5);
         switch(button)
         {
             case SETTINGS_CANCEL:
-                return false;
+                done = true;
+                break;
         }
 
         line = 0;
