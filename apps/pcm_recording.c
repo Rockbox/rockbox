@@ -51,6 +51,7 @@
 #include "uda1380.h"
 #include "pcm_record.h"
 
+#ifdef HAVE_UDA1380
 
 bool pcm_rec_screen(void)
 {
@@ -223,4 +224,7 @@ bool pcm_rec_screen(void)
  
     return true;   
 }
+
+#endif
+
     
