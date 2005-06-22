@@ -147,3 +147,4 @@ clean:
 	@$(MAKE) -C libwavpack clean OBJDIR=$(OBJDIR)/libwavpack
 	@$(MAKE) -C libmusepack clean OBJDIR=$(OBJDIR)/libmusepack
 	@$(MAKE) -C dumb clean OBJDIR=$(OBJDIR)/dumb
+	@$(MAKE) -C lib clean OBJDIR=$(OBJDIR)/lib

@@ -40,7 +40,7 @@ $(OUTPUT): $(OBJS)
 include $(TOOLSDIR)/make.inc
 
 clean:
-	@echo "cleaning lib"
+	@echo "cleaning codecs/lib"
 	@rm -f $(OBJS) $(OUTPUT) $(DEPFILE)
 
 -include $(DEPFILE)
