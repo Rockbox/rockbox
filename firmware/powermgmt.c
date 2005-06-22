@@ -125,7 +125,8 @@ static const short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
     { 280, 325, 341, 353, 364, 374, 385, 395, 409, 427, 475 }, /* alkaline */
     { 310, 355, 363, 369, 372, 374, 376, 378, 380, 386, 405 }  /* NiMH */
 #elif CONFIG_BATTERY == BATT_LIPOL1300
-    { 333, 341, 349, 358, 365, 373, 370, 386, 393, 400, 409 }
+    /* Below 337 the backlight starts flickering during HD access */
+    { 337, 358, 365, 369, 372, 377, 383, 389, 397, 406, 413 }
 #else /* NiMH */
     /* original values were taken directly after charging, but it should show
        100% after turning off the device for some hours, too */
