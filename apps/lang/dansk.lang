@@ -3076,4 +3076,16 @@ id: LANG_CROSSFADE
 desc: in playback settings
 eng: "Crossfade"
 voice: "Crossfade"
-new: "Sammenbland"
+new: "Glidende overgang"
+
+id: LANG_BACKLIGHT_FADE_IN
+desc: in settings_menu
+eng: "Backlight fade in"
+voice: "Backlight fade in"
+new: "Baggrundslys dæmpning ved tænd"
+
+id: LANG_BACKLIGHT_FADE_OUT
+desc: in settings_menu
+eng: "Backlight fade out"
+voice: "Backlight fade out"
+new: "Baggrundslys dæmpning ved sluk"
