@@ -286,13 +286,12 @@ void init(void)
     talk_init();
 
 #ifdef AUTOROCK
-    if (!usb_detect())
     {
         int fd;
         static const char filename[] = PLUGIN_DIR "/autostart.rock"; 
 
         fd = open(filename, O_RDONLY);
-        if(fd >= 0) /* no complaint if it doesn't exit */
+        if(fd >= 0) /* no complaint if it doesn't exist */
         {
             close(fd);
             plugin_load((char*)filename, NULL); /* start if it does */
