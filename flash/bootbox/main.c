@@ -9,6 +9,10 @@
  *
  * Copyright (C) 2005 by Jörg Hohensohn  aka [IDC]Dragon
  *
+ * This is "Bootbox", a minimalistic loader, rescue firmware for just
+ *   booting into a full features one. Aside from that it does charging
+ *   and USB mode, to enable copying the desired firmware.
+ *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
  *
@@ -105,6 +109,15 @@ int charging_screen(void)
     return rc;
 }
 #endif /* HAVE_CHARGING */
+
+#ifdef HAVE_MMC
+int mmc_remove_request(void)
+{
+    /* A dummy function here, we won't access the card
+       before entering USB mode */
+    return 0;
+}
+#endif /* HAVE_MMC */
 
 
 void main(void)
