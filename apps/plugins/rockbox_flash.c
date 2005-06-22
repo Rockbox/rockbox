@@ -376,7 +376,7 @@ tCheckResult CheckImageFile(char* filename, int space, tImageHeader* pHeader,
         rb->close(fd);
         return eTooBig;
     }
-    else if (filesize < 40000) /* give it some reasonable lower limit */
+    else if (filesize < 10000) /* give it some reasonable lower limit */
     {
         rb->close(fd);
         return eTooSmall;
