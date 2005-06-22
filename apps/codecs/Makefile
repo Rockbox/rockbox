@@ -58,9 +58,9 @@ ifeq ($(SIMVER), x11)
 ###################################################
 # This is the X11 simulator version
 
-$(OBJDIR)/%.codec : $(OBJDIR)/%.o  $(BUILDDIR)/libplugin.a
+$(OBJDIR)/%.codec : $(OBJDIR)/%.o  $(BUILDDIR)/libcodec.a
 	@echo "LD "`basename $@`
-	@$(CC) $(CFLAGS) -shared $< -L$(BUILDDIR)  $(CODECLIBS) -lplugin -o $@
+	@$(CC) $(CFLAGS) -shared $< -L$(BUILDDIR)  $(CODECLIBS) -lcodec -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
@@ -75,10 +75,10 @@ else # end of x11-simulator
 DLLTOOLFLAGS = --export-all
 DLLWRAPFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 -mno-cygwin
 
-$(OBJDIR)/%.codec : $(OBJDIR)/%.o  $(BUILDDIR)/libplugin.a
+$(OBJDIR)/%.codec : $(OBJDIR)/%.o  $(BUILDDIR)/libcodec.a
 	@echo "DLL "`basename $@`
 	@$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $<
-	@$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< $(BUILDDIR)/libplugin.a \
+	@$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< $(BUILDDIR)/libcodec.a \
                 $(patsubst -l%,$(BUILDDIR)/lib%.a,$(CODECLIBS)) -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
