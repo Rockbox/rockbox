@@ -24,7 +24,6 @@
 #include <ctype.h>
 #include "debug.h"
 #include "button.h"
-#include "lcd.h"
 #include "dir.h"
 #include "file.h"
 #include "kernel.h"
@@ -49,12 +48,6 @@
 #include "database.h"
 #if (CONFIG_HWCODEC == MASNONE)
 #include "pcm_playback.h"
-#endif
-
-#ifdef HAVE_LCD_BITMAP
-#include "peakmeter.h"
-#include "widgets.h"
-#include "bmp.h"
 #endif
 
 #ifdef SIMULATOR
@@ -96,49 +89,6 @@ const struct codec_api ci = {
     NULL,
     NULL,
     
-    /* lcd */
-    lcd_clear_display,
-    lcd_puts,
-    lcd_puts_scroll,
-    lcd_stop_scroll,
-    lcd_set_contrast,
-#ifdef HAVE_LCD_CHARCELLS
-    lcd_define_pattern,
-    lcd_get_locked_pattern,
-    lcd_unlock_pattern,
-    lcd_putc,
-    lcd_put_cursor,
-    lcd_remove_cursor,
-    PREFIX(lcd_icon),
-#else
-    lcd_putsxy,
-    lcd_puts_style,
-    lcd_puts_scroll_style,
-    lcd_bitmap,
-    lcd_drawline,
-    lcd_clearline,
-    lcd_drawpixel,
-    lcd_clearpixel,
-    lcd_setfont,
-    font_get,
-    lcd_clearrect,
-    lcd_fillrect,
-    lcd_drawrect,
-    lcd_invertrect,
-    lcd_getstringsize,
-    lcd_update,
-    lcd_update_rect,
-    scrollbar,
-    checkbox,
-    &lcd_framebuffer[0][0],
-    lcd_blit,
-#ifndef SIMULATOR
-    lcd_roll,
-#endif
-#endif
-    backlight_on,
-    backlight_off,
-    backlight_set_timeout,
     splash,
 
     /* file */
@@ -281,9 +231,6 @@ const struct codec_api ci = {
     peak_meter_scale_value,
     peak_meter_set_use_dbfs,
     peak_meter_get_use_dbfs,
-#endif
-#ifdef HAVE_LCD_BITMAP
-    read_bmp_file,
 #endif
 
     /* new stuff at the end, sort into place next time

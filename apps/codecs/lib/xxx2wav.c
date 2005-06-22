@@ -112,6 +112,8 @@ void qsort(void *base, size_t nmemb, size_t size, int(*compar)(const void *, con
   local_rb->qsort(base,nmemb,size,compar);
 }
 
+#if 0
+
 void display_status(file_info_struct* file_info) {
   char s[32];
   unsigned long ticks_taken;
@@ -149,7 +151,6 @@ void display_status(file_info_struct* file_info) {
   }
 }
 
-#if 0
 static unsigned char wav_header[44]={'R','I','F','F',    //  0 - ChunkID
                               0,0,0,0,            //  4 - ChunkSize (filesize-8)
                               'W','A','V','E',    //  8 - Format
