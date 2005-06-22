@@ -163,6 +163,7 @@ bool dbg_audio_thread(void)
     struct audio_debug d;
 
     lcd_setmargins(0, 0);
+    lcd_setfont(FONT_SYSFIXED);
     
     while(1)
     {
@@ -237,6 +238,7 @@ bool dbg_audio_thread(void)
     tick_add_task(dbg_audio_task);
     
     lcd_setmargins(0, 0);
+    lcd_setfont(FONT_SYSFIXED);
     
     while(!done)
     {
