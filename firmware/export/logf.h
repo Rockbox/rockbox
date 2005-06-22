@@ -19,6 +19,7 @@
 #ifndef LOGF_H
 #define LOGF_H
 #include <config.h>
+#include <stdbool.h>
 
 #ifdef ROCKBOX_HAS_LOGF
 
