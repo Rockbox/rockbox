@@ -25,12 +25,10 @@
 #include "mp3data.h"
 #include "lib/codeclib.h"
 
-static struct codec_api* rb;
-
-struct mad_stream  Stream IDATA_ATTR;
-struct mad_frame  Frame IDATA_ATTR;
-struct mad_synth  Synth IDATA_ATTR;
-mad_timer_t      Timer;
+struct mad_stream Stream IDATA_ATTR;
+struct mad_frame Frame IDATA_ATTR;
+struct mad_synth Synth IDATA_ATTR;
+mad_timer_t Timer;
 struct dither d0, d1;
 
 /* The following function is used inside libmad - let's hope it's never
@@ -44,8 +42,8 @@ void abort(void) {
    taken from the coolplayer project - coolplayer.sourceforge.net */
 
 struct dither {
-	mad_fixed_t error[3];
-	mad_fixed_t random;
+    mad_fixed_t error[3];
+    mad_fixed_t random;
 };
 
 # define SAMPLE_DEPTH	16
@@ -58,117 +56,112 @@ struct dither {
 static __inline
 unsigned long prng(unsigned long state)
 {
-  return (state * 0x0019660dL + 0x3c6ef35fL) & 0xffffffffL;
+    return (state * 0x0019660dL + 0x3c6ef35fL) & 0xffffffffL;
 }
 
 /*
  * NAME:        dither()
  * DESCRIPTION:	dither and scale sample
  */
-static __inline
-signed int dither(mad_fixed_t sample, struct dither *dither)
+inline int dither(mad_fixed_t sample, struct dither *dither)
 {
-  unsigned int scalebits;
-  mad_fixed_t output, mask, random;
+    unsigned int scalebits;
+    mad_fixed_t output, mask, random;
 
-  enum {
-    MIN = -MAD_F_ONE,
-    MAX =  MAD_F_ONE - 1
-  };
+    enum {
+        MIN = -MAD_F_ONE,
+        MAX =  MAD_F_ONE - 1
+     };
 
-  /* noise shape */
-  sample += dither->error[0] - dither->error[1] + dither->error[2];
+    /* noise shape */
+    sample += dither->error[0] - dither->error[1] + dither->error[2];
 
-  dither->error[2] = dither->error[1];
-  dither->error[1] = dither->error[0] / 2;
+    dither->error[2] = dither->error[1];
+    dither->error[1] = dither->error[0]/2;
 
-  /* bias */
-  output = sample + (1L << (MAD_F_FRACBITS + 1 - SAMPLE_DEPTH - 1));
+    /* bias */
+    output = sample + (1L << (MAD_F_FRACBITS + 1 - SAMPLE_DEPTH - 1));
 
-  scalebits = MAD_F_FRACBITS + 1 - SAMPLE_DEPTH;
-  mask = (1L << scalebits) - 1;
+    scalebits = MAD_F_FRACBITS + 1 - SAMPLE_DEPTH;
+    mask = (1L << scalebits) - 1;
 
-  /* dither */
-  random  = prng(dither->random);
-  output += (random & mask) - (dither->random & mask);
+    /* dither */
+    random  = prng(dither->random);
+    output += (random & mask) - (dither->random & mask);
 
-  //dither->random = random;
+    //dither->random = random;
 
-  /* clip */
-  if (output > MAX) {
-    output = MAX;
+    /* clip */
+    if (output > MAX) {
+        output = MAX;
+ 
+        if (sample > MAX)
+            sample = MAX;
+    } else if (output < MIN) {
+        output = MIN;
 
-    if (sample > MAX)
-      sample = MAX;
-  }
-  else if (output < MIN) {
-    output = MIN;
+        if (sample < MIN)
+            sample = MIN;
+    }
 
-    if (sample < MIN)
-      sample = MIN;
-  }
+    /* quantize */
+    output &= ~mask;
 
-  /* quantize */
-  output &= ~mask;
+    /* error feedback */
+    dither->error[0] = sample - output;
 
-  /* error feedback */
-  dither->error[0] = sample - output;
-
-  /* scale */
-  return output >> scalebits;
+    /* scale */
+    return output >> scalebits;
 }
 
-static __inline
-signed int detect_silence(mad_fixed_t sample)
+inline int detect_silence(mad_fixed_t sample)
 {
-  unsigned int scalebits;
-  mad_fixed_t output, mask;
+    unsigned int scalebits;
+    mad_fixed_t output, mask;
 
-  enum {
-    MIN = -MAD_F_ONE,
-    MAX =  MAD_F_ONE - 1
-  };
+    enum {
+        MIN = -MAD_F_ONE,
+        MAX =  MAD_F_ONE - 1
+    };
 
-  /* bias */
-  output = sample + (1L << (MAD_F_FRACBITS + 1 - SAMPLE_DEPTH - 1));
+    /* bias */
+    output = sample + (1L << (MAD_F_FRACBITS + 1 - SAMPLE_DEPTH - 1));
 
-  scalebits = MAD_F_FRACBITS + 1 - SAMPLE_DEPTH;
-  mask = (1L << scalebits) - 1;
+    scalebits = MAD_F_FRACBITS + 1 - SAMPLE_DEPTH;
+    mask = (1L << scalebits) - 1;
 
-  /* clip */
-  if (output > MAX) {
-    output = MAX;
+    /* clip */
+    if (output > MAX) {
+        output = MAX;
 
-    if (sample > MAX)
-      sample = MAX;
-  }
-  else if (output < MIN) {
-    output = MIN;
+        if (sample > MAX)
+            sample = MAX;
+    } else if (output < MIN) {
+        output = MIN;
 
-    if (sample < MIN)
-      sample = MIN;
-  }
+        if (sample < MIN)
+            sample = MIN;
+    }
 
-  /* quantize */
-  output &= ~mask;
+    /* quantize */
+    output &= ~mask;
 
-  /* scale */
-  output >>= scalebits + 4;
+    /* scale */
+    output >>= scalebits + 4;
   
-  if (output == 0x00 || output == 0xff)
-    return 1;
+    if (output == 0x00 || output == 0xff)
+        return 1;
     
-  return 0;
+    return 0;
 }
-#define SHRT_MAX 32767
 
-#define INPUT_CHUNK_SIZE        8192
-#define OUTPUT_BUFFER_SIZE	65536 /* Must be an integer multiple of 4. */
+#define INPUT_CHUNK_SIZE   8192
+#define OUTPUT_BUFFER_SIZE 65536 /* Must be an integer multiple of 4. */
 
 unsigned char OutputBuffer[OUTPUT_BUFFER_SIZE];
 unsigned char *OutputPtr;
-unsigned char *GuardPtr=NULL;
-const unsigned char *OutputBufferEnd=OutputBuffer+OUTPUT_BUFFER_SIZE;
+unsigned char *GuardPtr = NULL;
+const unsigned char *OutputBufferEnd = OutputBuffer + OUTPUT_BUFFER_SIZE;
 long resampled_data[2][5000]; /* enough to cope with 11khz upsampling */
 
 mad_fixed_t mad_frame_overlap[2][32][18] IDATA_ATTR;
@@ -261,7 +254,7 @@ enum codec_status codec_start(struct codec_api* api)
 {
     struct codec_api *ci = api;
     struct mp3info *info;
-    int Status=0;
+    int Status = 0;
     size_t size;
     int file_end;
     unsigned short Sample;
@@ -281,10 +274,9 @@ enum codec_status codec_start(struct codec_api* api)
     /* Generic codec inititialisation */
 
     TEST_CODEC_API(api);
-    rb = api;
 
 #ifdef USE_IRAM
-    rb->memcpy(iramstart, iramcopy, iramend-iramstart);
+    ci->memcpy(iramstart, iramcopy, iramend - iramstart);
 #endif
 
     /* This function sets up the buffers and reads the file into RAM */
@@ -298,10 +290,10 @@ enum codec_status codec_start(struct codec_api* api)
     ci->configure(CODEC_SET_FILEBUF_LIMIT, (int *)(1024*1024*2));
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*16));
   
-    memset(&Stream, 0, sizeof(struct mad_stream));
-    memset(&Frame, 0, sizeof(struct mad_frame));
-    memset(&Synth, 0, sizeof(struct mad_synth));
-    memset(&Timer, 0, sizeof(mad_timer_t));
+    ci->memset(&Stream, 0, sizeof(struct mad_stream));
+    ci->memset(&Frame, 0, sizeof(struct mad_frame));
+    ci->memset(&Synth, 0, sizeof(struct mad_synth));
+    ci->memset(&Timer, 0, sizeof(mad_timer_t));
   
     mad_stream_init(&Stream);
     mad_frame_init(&Frame);
@@ -319,9 +311,9 @@ enum codec_status codec_start(struct codec_api* api)
   
 #ifdef DEBUG_GAPLESS
     if (first)
-        fd = rb->open("/first.pcm", O_WRONLY | O_CREAT);
+        fd = ci->open("/first.pcm", O_WRONLY | O_CREAT);
     else
-        fd = rb->open("/second.pcm", O_WRONLY | O_CREAT);
+        fd = ci->open("/second.pcm", O_WRONLY | O_CREAT);
     first = false;
 #endif
   
@@ -331,7 +323,7 @@ enum codec_status codec_start(struct codec_api* api)
     OutputPtr = OutputBuffer;
     
     while (!*ci->taginfo_ready)
-        rb->yield();
+        ci->yield();
   
     ci->request_buffer(&size, ci->id3->first_frame_offset);
     ci->advance_buffer(size);
@@ -367,7 +359,7 @@ enum codec_status codec_start(struct codec_api* api)
     lr.delta = rr.delta = ci->id3->frequency*65536/44100; 
     /* This is the decoding loop. */
     while (1) {
-        rb->yield();
+        ci->yield();
         if (ci->stop_codec || ci->reload_codec) { 
             break ;
         }
@@ -401,7 +393,7 @@ enum codec_status codec_start(struct codec_api* api)
         if(mad_frame_decode(&Frame,&Stream))
         {
             if (Stream.error == MAD_FLAG_INCOMPLETE || Stream.error == MAD_ERROR_BUFLEN) {
-                // rb->splash(HZ*1, true, "Incomplete");
+                // ci->splash(HZ*1, true, "Incomplete");
                 /* This makes the codec to support partially corrupted files too. */
                 if (file_end == 30)
                     break ;
@@ -434,10 +426,6 @@ enum codec_status codec_start(struct codec_api* api)
         /* ?? Do we need the timer module? */
         // mad_timer_add(&Timer,Frame.header.duration);
 
-/* DAVE: This can be used to attenuate the audio */
-//    if(DoFilter)
-//      ApplyFilter(&Frame);   
-
         mad_synth_frame(&Synth,&Frame);
     
         //if (!first_frame) {
@@ -452,7 +440,7 @@ enum codec_status codec_start(struct codec_api* api)
         length = resample((long *)&Synth.pcm.samples[0][start_skip], resampled_data[0], Synth.pcm.length, &lr);
         if (MAD_NCHANNELS(&Frame.header) == 2)
             resample((long *)&Synth.pcm.samples[1][start_skip], resampled_data[1], Synth.pcm.length, &rr);
-        for (i = 0;i<length;i++)
+        for (i = 0; i < length; i++)
         {
             start_skip = 0; /* not very elegant, and might want to keep this value */
             samplesdone++;
@@ -467,42 +455,42 @@ enum codec_status codec_start(struct codec_api* api)
               }*/
       
             /* Left channel */
-            Sample=scale(resampled_data[0][i],&d0);
-            *(OutputPtr++)=Sample>>8;
-            *(OutputPtr++)=Sample&0xff;
+            Sample = scale(resampled_data[0][i], &d0);
+            *(OutputPtr++) = Sample >> 8;
+            *(OutputPtr++) = Sample & 0xff;
 
             /* Right channel. If the decoded stream is monophonic then
              * the right output channel is the same as the left one.
              */
-            if(MAD_NCHANNELS(&Frame.header)==2)
-                Sample=scale(resampled_data[1][i],&d1);
-            *(OutputPtr++)=Sample>>8;
-            *(OutputPtr++)=Sample&0xff;
+            if (MAD_NCHANNELS(&Frame.header) == 2)
+                Sample = scale(resampled_data[1][i], &d1);
+            *(OutputPtr++) = Sample >> 8;
+            *(OutputPtr++) = Sample & 0xff;
       
             samplecount--;
             if (samplecount == 0) {
 #ifdef DEBUG_GAPLESS
-                rb->write(fd, OutputBuffer, (int)OutputPtr-(int)OutputBuffer);
+                ci->write(fd, OutputBuffer, (int)OutputPtr - (int)OutputBuffer);
 #endif
-                while (!ci->audiobuffer_insert(OutputBuffer, (int)OutputPtr-(int)OutputBuffer))
-                    rb->yield();
+                while (!ci->audiobuffer_insert(OutputBuffer, (int)OutputPtr - (int)OutputBuffer))
+                    ci->yield();
                 goto song_end;
             }
   
             if (yieldcounter++ == 200) {
-                rb->yield();
+                ci->yield();
                 yieldcounter = 0;
             }
       
             /* Flush the buffer if it is full. */
-            if(OutputPtr==OutputBufferEnd)
+            if (OutputPtr == OutputBufferEnd)
             {
 #ifdef DEBUG_GAPLESS
-                rb->write(fd, OutputBuffer, OUTPUT_BUFFER_SIZE);
+                ci->write(fd, OutputBuffer, OUTPUT_BUFFER_SIZE);
 #endif
                 while (!ci->audiobuffer_insert(OutputBuffer, OUTPUT_BUFFER_SIZE))
-                    rb->yield();
-                OutputPtr=OutputBuffer;
+                    ci->yield();
+                OutputPtr = OutputBuffer;
             }
         }
         ci->set_elapsed(samplesdone / (ci->id3->frequency/1000));
@@ -510,7 +498,7 @@ enum codec_status codec_start(struct codec_api* api)
   
   song_end:
 #ifdef DEBUG_GAPLESS
-    rb->close(fd);
+    ci->close(fd);
 #endif
     Stream.error = 0;
   
