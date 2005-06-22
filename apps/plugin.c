@@ -63,15 +63,11 @@
 
 #ifdef SIMULATOR
 static unsigned char pluginbuf[PLUGIN_BUFFER_SIZE];
-#if CONFIG_HWCODEC == MASNONE
-static unsigned char codecbuf[CODEC_BUFFER_SIZE];
-#endif
 void *sim_plugin_load(char *plugin, int *fd);
 void sim_plugin_close(int fd);
 #else
 #define sim_plugin_close(x)
 extern unsigned char pluginbuf[];
-extern unsigned char codecbuf[];
 #include "bitswap.h"
 #endif
 
