@@ -16,6 +16,7 @@ plugins/viewers.config
 plugins/snake2.levels
 SOURCES
 plugins/SOURCES
+plugins/CODECS
 plugins/lib/SOURCES
 plugins/rockboy/*.[ch]
 plugins/rockboy/Makefile
