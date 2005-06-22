@@ -61,6 +61,9 @@
 #if defined(IRIVER_H100) && !defined(SIMULATOR)
 extern bool pcm_rec_screen(void);
 #endif
+#if CONFIG_HWCODEC == MASNONE
+#include "pcm_playback.h"
+#endif
 
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
@@ -151,7 +154,8 @@ bool dbg_os(void)
 }
 #endif
 
-#if CONFIG_HWCODEC != MASNONE && defined HAVE_LCD_BITMAP
+#ifdef HAVE_LCD_BITMAP
+#if CONFIG_HWCODEC != MASNONE
 bool dbg_audio_thread(void)
 {
     char buf[32];
@@ -202,8 +206,79 @@ bool dbg_audio_thread(void)
     }
     return false;
 }
-#endif
+#else
+extern size_t audiobuffer_free;
+extern int codecbuflen;
+extern int codecbufused;
 
+static int ticks, boost_ticks;
+
+void dbg_audio_task(void)
+{
+    if(FREQ > CPUFREQ_NORMAL)
+        boost_ticks++;
+
+    ticks++;
+}
+
+bool dbg_audio_thread(void)
+{
+    char buf[32];
+    int button;
+    int line;
+
+    ticks = boost_ticks = 0;
+
+    tick_add_task(dbg_audio_task);
+    
+    lcd_setmargins(0, 0);
+    
+    while(1)
+    {
+        button = button_get_w_tmo(HZ/5);
+        switch(button)
+        {
+            case SETTINGS_CANCEL:
+                return false;
+        }
+
+        line = 0;
+        
+        lcd_clear_display();
+
+        snprintf(buf, sizeof(buf), "pcm buf: %d/%d",
+                 PCMBUF_SIZE-(int)audiobuffer_free, PCMBUF_SIZE);
+        lcd_puts(0, line++, buf);
+
+        /* Playable space left */
+        scrollbar(0, line*8, LCD_WIDTH, 4, PCMBUF_SIZE, 0, 
+                  PCMBUF_SIZE-audiobuffer_free, HORIZONTAL);
+        line++;
+
+        snprintf(buf, sizeof(buf), "codec buf: %d/%d", codecbufused, codecbuflen);
+        lcd_puts(0, line++, buf);
+
+        /* Playable space left */
+        scrollbar(0, line*8, LCD_WIDTH, 4, codecbuflen, 0, 
+                  codecbufused, HORIZONTAL);
+        line++;
+
+        snprintf(buf, sizeof(buf), "cpu freq: %dMHz", (int)FREQ/1000000+1);
+        lcd_puts(0, line++, buf);
+
+        snprintf(buf, sizeof(buf), "boost ratio: %d%%",
+                 boost_ticks * 100 / ticks);
+        lcd_puts(0, line++, buf);
+
+        lcd_update();
+    }
+
+    tick_remove_task(dbg_audio_task);
+    
+    return false;
+}
+#endif
+#endif
 
 /* Tool function to calculate a CRC16 across some buffer */
 unsigned short crc_16(const unsigned char* buf, unsigned len)
@@ -1835,7 +1910,7 @@ bool debug_menu(void)
 #else
         { "View disk info", dbg_disk_info },
 #endif
-#if CONFIG_HWCODEC != MASNONE && defined HAVE_LCD_BITMAP
+#ifdef HAVE_LCD_BITMAP
         { "View audio thread", dbg_audio_thread },
 #ifdef PM_DEBUG
         { "pm histogram", peak_meter_histogram},

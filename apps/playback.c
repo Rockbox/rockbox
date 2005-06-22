@@ -122,10 +122,10 @@ static volatile bool filling;
 static char *codecbuf;
 
 /* Total size of the ring buffer. */
-static int codecbuflen;
+int codecbuflen;
 
 /* Bytes available in the buffer. */
-static volatile int codecbufused;
+int codecbufused;
 
 /* Ring buffer read and write indexes. */
 static volatile int buf_ridx;

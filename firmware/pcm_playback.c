@@ -56,7 +56,7 @@ static int pcm_freq = 0x6; /* 44.1 is default */
 
 static char *audiobuffer;
 static size_t audiobuffer_pos;
-static volatile size_t audiobuffer_free;
+size_t audiobuffer_free;
 static size_t audiobuffer_fillpos;
 static bool boost_mode;
 
