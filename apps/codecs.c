@@ -65,7 +65,7 @@ extern void* plugin_get_audio_buffer(int *buffer_size);
 
 static int codec_test(int api_version, int model, int memsize);
 
-const struct codec_api ci = {
+struct codec_api ci = {
     CODEC_API_VERSION,
     codec_test,
 
