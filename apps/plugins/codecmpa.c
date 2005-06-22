@@ -169,6 +169,7 @@ unsigned char OutputBuffer[OUTPUT_BUFFER_SIZE];
 unsigned char *OutputPtr;
 unsigned char *GuardPtr=NULL;
 const unsigned char *OutputBufferEnd=OutputBuffer+OUTPUT_BUFFER_SIZE;
+long resampled_data[2][5000]; /* enough to cope with 11khz upsampling */
 
 mad_fixed_t mad_frame_overlap[2][32][18] IDATA_ATTR;
 unsigned char mad_main_data[MAD_BUFFER_MDLEN] IDATA_ATTR;
@@ -181,6 +182,79 @@ extern char iramend[];
 #endif
 
 #undef DEBUG_GAPLESS
+
+struct resampler {
+    long last_sample, phase, delta;
+};
+
+#if CONFIG_CPU==MCF5249 && !defined(SIMULATOR)
+
+#define INIT() asm volatile ("move.l #0xb0, %macsr") /* frac, round, clip */
+#define FRACMUL(x, y) \
+({ \
+    long t; \
+    asm volatile ("mac.l %[a], %[b], %%acc0\n\t" \
+                  "movclr.l %%acc0, %[t]\n\t" \
+                  : [t] "=r" (t) : [a] "r" (x), [b] "r" (y)); \
+    t; \
+})
+
+#else
+
+#define INIT()
+#define FRACMUL(x, y) (long)(((long long)(x)*(long long)(y)) << 1)
+#endif
+
+/* linear resampling, introduces one sample delay, because of our inability to
+   look into the future at the end of a frame */
+long downsample(long *in, long *out, int num, struct resampler *s)
+{
+    long i = 1, pos;
+    long last = s->last_sample;
+
+    INIT();
+    pos = s->phase >> 16;
+    /* check if we need last sample of previous frame for interpolation */
+    if (pos > 0)
+        last = in[pos - 1];
+    out[0] = last + FRACMUL((s->phase & 0xffff) << 15, in[pos] - last);
+    s->phase += s->delta;
+    while ((pos = s->phase >> 16) < num) {
+        out[i++] = in[pos - 1] + FRACMUL((s->phase & 0xffff) << 15, in[pos] - in[pos - 1]);
+        s->phase += s->delta;
+    }
+    /* wrap phase accumulator back to start of next frame */
+    s->phase -= num << 16;
+    s->last_sample = in[num - 1];
+    return i;
+}
+
+long upsample(long *in, long *out, int num, struct resampler *s)
+{
+    long i = 0, pos;
+
+    INIT();
+    while ((pos = s->phase >> 16) == 0) {
+        out[i++] = s->last_sample + FRACMUL((s->phase & 0xffff) << 15, in[pos] - s->last_sample);
+        s->phase += s->delta;
+    }
+    while ((pos = s->phase >> 16) < num) {
+        out[i++] = in[pos - 1] + FRACMUL((s->phase & 0xffff) << 15, in[pos] - in[pos - 1]);
+        s->phase += s->delta;
+    }
+    /* wrap phase accumulator back to start of next frame */
+    s->phase -= num << 16;
+    s->last_sample = in[num - 1];
+    return i;
+}
+
+long resample(long *in, long *out, int num, struct resampler *s)
+{
+    if (s->delta >= (1 << 16))
+        return downsample(in, out, num, s);
+    else
+        return upsample(in, out, num, s);
+}
 
 /* this is the plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* parm)
@@ -202,7 +276,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
   int i;
   int yieldcounter = 0;
   int stop_skip, start_skip;
-  
+  struct resampler lr = { 0, 0, 0 }, rr = { 0, 0, 0 };
+  long length;  
   /* Generic plugin inititialisation */
 
   TEST_PLUGIN_API(api);
@@ -213,7 +288,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
 #endif
 
   /* This function sets up the buffers and reads the file into RAM */
-
+  
   if (codec_init(api, ci)) {
     return PLUGIN_ERROR;
   }
@@ -258,7 +333,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
   while (!*ci->taginfo_ready)
     rb->yield();
   
-  
   ci->request_buffer(&size, ci->id3->first_frame_offset);
   ci->advance_buffer(size);
  
@@ -290,7 +364,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
   rb->splash(HZ*5, true, buf2);
   rb->snprintf(buf2, sizeof(buf2), "frequency: %d", ci->id3->frequency);
   rb->splash(HZ*5, true, buf2); */
-  
+  lr.delta = rr.delta = ci->id3->frequency*65536/44100; 
   /* This is the decoding loop. */
   while (1) {
     rb->yield();
@@ -375,7 +449,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
     /* We skip start_skip number of samples here, this should only happen for
        very first frame in the stream. */
     /* TODO: possible for start_skip to exceed one frames worth of samples? */
-    for (i = start_skip;i<Synth.pcm.length;i++)
+    length = resample((long *)&Synth.pcm.samples[0][start_skip], resampled_data[0], Synth.pcm.length, &lr);
+    if (MAD_NCHANNELS(&Frame.header) == 2)
+        resample((long *)&Synth.pcm.samples[1][start_skip], resampled_data[1], Synth.pcm.length, &rr);
+    for (i = 0;i<length;i++)
     {
       start_skip = 0; /* not very elegant, and might want to keep this value */
       samplesdone++;
@@ -390,7 +467,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
       }*/
       
       /* Left channel */
-      Sample=scale(Synth.pcm.samples[0][i],&d0);
+      Sample=scale(resampled_data[0][i],&d0);
       *(OutputPtr++)=Sample>>8;
       *(OutputPtr++)=Sample&0xff;
 
@@ -398,7 +475,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parm)
        * the right output channel is the same as the left one.
        */
       if(MAD_NCHANNELS(&Frame.header)==2)
-        Sample=scale(Synth.pcm.samples[1][i],&d1);
+        Sample=scale(resampled_data[1][i],&d1);
       *(OutputPtr++)=Sample>>8;
       *(OutputPtr++)=Sample&0xff;
       
