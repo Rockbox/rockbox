@@ -1207,7 +1207,7 @@ bool set_time_screen(const char* string, struct tm *tm)
 }
 #endif /* defined(HAVE_LCD_BITMAP) && defined (HAVE_RTC) */
 
-#if CONFIG_KEYPAD == RECORDER_PAD || CONFIG_KEYPAD == IRIVER_H100_PAD
+#if (CONFIG_KEYPAD == RECORDER_PAD) && !defined(HAVE_SW_POWEROFF)
 bool shutdown_screen(void)
 {
     int button;
