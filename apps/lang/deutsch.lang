@@ -3111,3 +3111,9 @@ desc: in settings_menu
 eng: "Backlight fade out"
 voice: "Beleuchtung ausblenden"
 new: "Beleuchtung ausblenden"
+
+id: LANG_SHUFFLE_PLAYLIST
+desc: in playlist menu, reshuffles the order in which songs are played
+eng: "Reshuffle"
+voice: "Neu mischen"
+new: "Neu mischen"
