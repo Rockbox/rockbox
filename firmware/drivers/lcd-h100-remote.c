@@ -100,8 +100,8 @@ static const unsigned char ones[8]  = {
 static volatile int scrolling_lines=0; /* Bitpattern of which lines are scrolling */
 #ifndef SIMULATOR
 static void scroll_thread(void);
-#endif
 static long scroll_stack[DEFAULT_STACK_SIZE/sizeof(long)];
+#endif
 static const char scroll_name[] = "remote_scroll";
 static char scroll_ticks = 12; /* # of ticks between updates*/
 static int scroll_delay = HZ/2; /* ticks delay before start */
