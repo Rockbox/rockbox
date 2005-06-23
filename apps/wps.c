@@ -44,8 +44,8 @@
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "peakmeter.h"
-#include "action.h"
 #endif
+#include "action.h"
 #include "lang.h"
 #include "bookmark.h"
 #include "misc.h"
