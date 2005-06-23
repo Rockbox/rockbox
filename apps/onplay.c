@@ -582,7 +582,6 @@ int onplay(char* file, int attr, int from)
     }
 
     /* DIY menu handling, since we want to exit after selection */
-    button_clear_queue();
     if (i)
     {
         m = menu_init( items, i, onplay_callback, NULL, NULL, NULL );
