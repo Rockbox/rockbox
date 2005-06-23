@@ -3105,3 +3105,9 @@ desc: in settings_menu
 eng: "Backlight fade out"
 voice: "Backlight fade out"
 new:
+
+id: LANG_SHUFFLE_PLAYLIST
+desc: in playlist menu, shuffles the playlist.
+eng: "Shuffle playlist"
+voice: "Shuffle playlist"
+new:

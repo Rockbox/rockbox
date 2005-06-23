@@ -134,6 +134,18 @@ static bool list_viewers(void)
     return false;
 }
 
+static bool shuffle_playlist(void)
+{
+    int seed, index;
+
+    seed = playlist_get_seed(NULL);
+    index = playlist_get_first_index(NULL);
+
+    playlist_shuffle(seed, index);
+    
+    return false;
+}
+
 static bool save_playlist(void)
 {
     char filename[MAX_PATH+1];
@@ -237,8 +249,8 @@ static bool view_playlist(void)
 /* Sub-menu for playlist options */
 static bool playlist_options(void)
 {
-    struct menu_item items[10]; 
-    struct playlist_args args[10]; /* increase these 2 if you add entries! */
+    struct menu_item items[11]; 
+    struct playlist_args args[11]; /* increase these 2 if you add entries! */
     int m, i=0, pstart=0, result;
     bool ret = false;
 
@@ -262,6 +274,11 @@ static bool playlist_options(void)
         items[i].function = save_playlist;
         i++;
         pstart++;
+        
+        items[i].desc = ID2P(LANG_SHUFFLE_PLAYLIST);
+        items[i].function = shuffle_playlist;
+        i++;
+        pstart++;      
     }
        
     if (context == CONTEXT_TREE)
