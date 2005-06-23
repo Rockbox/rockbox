@@ -438,7 +438,7 @@ static int runcurrent(void)
 #endif /* MEM == 8 */
 
     if(usb_inserted()
-#ifdef HAVE_USB_POWER
+#if defined(HAVE_USB_POWER) && (CURRENT_USB < CURRENT_NORMAL)
        || usb_powered()
 #endif
     )
