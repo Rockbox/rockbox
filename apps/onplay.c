@@ -136,12 +136,8 @@ static bool list_viewers(void)
 
 static bool shuffle_playlist(void)
 {
-    int seed, index;
-
-    seed = playlist_get_seed(NULL);
-    index = playlist_get_first_index(NULL);
-
-    playlist_shuffle(seed, index);
+    playlist_sort(NULL, true);
+    playlist_randomise(NULL, current_tick, true);    
     
     return false;
 }
