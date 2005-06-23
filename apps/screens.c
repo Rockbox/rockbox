@@ -1368,6 +1368,7 @@ bool browse_id3(void)
                     menu_pos = 0;
                 break;
             
+            case SETTINGS_OK2:
             case SETTINGS_CANCEL:
                 lcd_stop_scroll();
                 /* eat release event */
