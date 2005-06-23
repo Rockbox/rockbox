@@ -115,11 +115,12 @@
 #define WPS_INCVOL     BUTTON_UP
 #define WPS_DECVOL     BUTTON_DOWN
 #define WPS_PAUSE      BUTTON_OFF
-#define WPS_MENU       (BUTTON_MENU | BUTTON_REPEAT)
+/* #define WPS_MENU    Ondio can't have both main menu and context menu in wps */
 #define WPS_BROWSE     (BUTTON_MENU | BUTTON_REL)
 #define WPS_BROWSE_PRE BUTTON_MENU
 #define WPS_KEYLOCK    (BUTTON_MENU | BUTTON_DOWN)
 #define WPS_EXIT       (BUTTON_OFF | BUTTON_REPEAT)
+#define WPS_CONTEXT    (BUTTON_MENU | BUTTON_REPEAT)
 
 #elif CONFIG_KEYPAD == GMINI100_PAD
 #define WPS_NEXT       (BUTTON_RIGHT | BUTTON_REL)

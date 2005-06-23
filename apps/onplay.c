@@ -51,6 +51,7 @@
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #endif
+#include "main_menu.h"
 
 #define DEFAULT_PLAYLIST_NAME "/dynamic.m3u"
 
@@ -488,6 +489,19 @@ bool create_dir(void)
     return true;
 }
 
+static bool exit_to_main;
+
+/* catch MENU_EXIT_MENU within context menu to call the main menu afterwards */
+static int onplay_callback(int key, int menu)
+{
+    (void)menu;
+
+    if (key == MENU_EXIT_MENU)
+        exit_to_main = true;
+
+    return key;
+}
+
 int onplay(char* file, int attr, int from)
 {
     struct menu_item items[8]; /* increase this if you add entries! */
@@ -495,6 +509,7 @@ int onplay(char* file, int attr, int from)
 
     onplay_result = ONPLAY_OK;
     context=from;
+    exit_to_main = false;
     selected_file = file;
     selected_file_attr = attr;
 
@@ -523,7 +538,7 @@ int onplay(char* file, int attr, int from)
             i++;
         }
         
-#ifdef HAVE_MULTIVOLUME        
+#ifdef HAVE_MULTIVOLUME
         if (!(attr & ATTR_VOLUME)) /* no rename+delete for volumes */
 #endif
         {
@@ -570,11 +585,14 @@ int onplay(char* file, int attr, int from)
     button_clear_queue();
     if (i)
     {
-        m = menu_init( items, i, NULL, NULL, NULL, NULL );
+        m = menu_init( items, i, onplay_callback, NULL, NULL, NULL );
         result = menu_show(m);
         if (result >= 0)
             items[result].function();
         menu_exit(m);
+        
+        if (exit_to_main)
+            result = main_menu();
 
 #ifdef HAVE_LCD_BITMAP
         if (global_settings.statusbar)

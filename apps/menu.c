@@ -376,8 +376,8 @@ int menu_show(int m)
 #ifdef MENU_EXIT2
             case MENU_EXIT2:
 #endif
-#ifdef MENU_EXIT3
-            case MENU_EXIT3:
+#ifdef MENU_EXIT_MENU
+            case MENU_EXIT_MENU:
 #endif
 #ifdef MENU_RC_EXIT
             case MENU_RC_EXIT:

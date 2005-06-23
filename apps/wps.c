@@ -616,6 +616,7 @@ long wps_show(void)
                 break;
 
                 /* menu key functions */
+#ifdef WPS_MENU
 #ifdef WPS_RC_MENU
             case WPS_RC_MENU:
 #endif
@@ -640,6 +641,7 @@ long wps_show(void)
 #endif
                 restore = true;
                 break;
+#endif /* WPS_MENU */
 
 #ifdef WPS_KEYLOCK
             /* key lock */
