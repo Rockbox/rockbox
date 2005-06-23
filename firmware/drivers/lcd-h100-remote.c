@@ -19,6 +19,7 @@
 
 #include "config.h"
 #include "cpu.h"
+#include "lcd.h"
 #include "lcd-remote.h"
 #include "kernel.h"
 #include "thread.h"
@@ -29,64 +30,25 @@
 #include "system.h"
 #include "font.h"
 
-/* All zeros and ones bitmaps for area filling */
-static const unsigned char zeros[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-static const unsigned char ones[8]  = {
-    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
-};
+/*** definitions ***/
 
-static int curfont = FONT_SYSFIXED;
-static int xmargin = 0;
-static int ymargin = 0;
-#ifndef SIMULATOR
-static int xoffset; /* needed for flip */
-#endif
+#define LCD_REMOTE_CNTL_ADC_NORMAL          0xa0
+#define LCD_REMOTE_CNTL_ADC_REVERSE         0xa1
+#define LCD_REMOTE_CNTL_SHL_NORMAL          0xc0
+#define LCD_REMOTE_CNTL_SHL_REVERSE         0xc8
+#define LCD_REMOTE_CNTL_DISPLAY_ON_OFF      0xae
+#define LCD_REMOTE_CNTL_ENTIRE_ON_OFF       0xa4
+#define LCD_REMOTE_CNTL_REVERSE_ON_OFF      0xa6
+#define LCD_REMOTE_CNTL_NOP                 0xe3
+#define LCD_REMOTE_CNTL_POWER_CONTROL       0x2b
+#define LCD_REMOTE_CNTL_SELECT_REGULATOR    0x20
+#define LCD_REMOTE_CNTL_SELECT_BIAS         0xa2
+#define LCD_REMOTE_CNTL_SELECT_VOLTAGE      0x81
+#define LCD_REMOTE_CNTL_INIT_LINE           0x40
+#define LCD_REMOTE_CNTL_SET_PAGE_ADDRESS    0xB0
 
-unsigned char lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH]
-#ifndef SIMULATOR
-              __attribute__ ((section(".idata")))
-#endif	
-		;
-		
-#define SCROLL_SPACING 3
-#define SCROLLABLE_LINES 26
-
-struct scrollinfo {
-    char line[MAX_PATH + LCD_REMOTE_WIDTH/2 + SCROLL_SPACING + 2];
-    int len;    /* length of line in chars */
-    int width;  /* length of line in pixels */
-    int offset;
-    int startx;
-    bool backward; /* scroll presently forward or backward? */
-    bool bidir;
-    bool invert; /* invert the scrolled text */
-    long start_tick;
-};
-
-static volatile int scrolling_lines=0; /* Bitpattern of which lines are scrolling */
-
-#ifndef SIMULATOR
-static int countdown;                   /* for remote plugging debounce */
-static bool last_remote_status = false;
-static bool init_remote = false;        /* scroll thread should init lcd */
-static bool remote_initialized = false;
-
-/* cached settings values, for hotplug init */
-static bool cached_invert = false;
-static bool cached_flip = false;
-static int cached_contrast = 32;
-static int cached_roll = 0;
-
-static void scroll_thread(void);
-static long scroll_stack[DEFAULT_STACK_SIZE/sizeof(long)];
-#endif
-static const char scroll_name[] = "remote_scroll";
-static char scroll_ticks = 12; /* # of ticks between updates*/
-static int scroll_delay = HZ/2; /* ticks delay before start */
-static char scroll_step = 6;  /* pixels per scroll step */
-static int bidir_limit = 50;  /* percent */
-static struct scrollinfo scroll[SCROLLABLE_LINES];
-
+#define LCD_REMOTE_CNTL_HIGHCOL             0x10    /* Upper column address */
+#define LCD_REMOTE_CNTL_LOWCOL              0x00    /* Lower column address */
 
 #define CS_LO       GPIO1_OUT &= ~0x00000004
 #define CS_HI       GPIO1_OUT |= 0x00000004
@@ -99,6 +61,59 @@ static struct scrollinfo scroll[SCROLLABLE_LINES];
 
 /* delay loop */
 #define DELAY   do { int _x; for(_x=0;_x<3;_x++);} while (0)
+
+#define SCROLLABLE_LINES 13
+
+/*** globals ***/
+
+unsigned char lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH]
+#ifndef SIMULATOR
+              __attribute__ ((section(".idata")))
+#endif	
+		;
+		
+static int curfont = FONT_SYSFIXED;
+static int xmargin = 0;
+static int ymargin = 0;
+#ifndef SIMULATOR
+static int xoffset; /* needed for flip */
+
+/* remote hotplug */
+static int countdown;  /* for remote plugging debounce */
+static bool last_remote_status = false;
+static bool init_remote = false;  /* scroll thread should init lcd */
+static bool remote_initialized = false;
+/* cached settings values */
+static bool cached_invert = false;
+static bool cached_flip = false;
+static int cached_contrast = 32;
+static int cached_roll = 0;
+#endif
+
+/* All zeros and ones bitmaps for area filling */
+static const unsigned char zeros[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+static const unsigned char ones[8]  = {
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
+};
+
+/* scrolling */
+static volatile int scrolling_lines=0; /* Bitpattern of which lines are scrolling */
+static void scroll_thread(void);
+static long scroll_stack[DEFAULT_STACK_SIZE/sizeof(long)];
+static const char scroll_name[] = "remote_scroll";
+static char scroll_ticks = 12; /* # of ticks between updates*/
+static int scroll_delay = HZ/2; /* ticks delay before start */
+static char scroll_step = 6;  /* pixels per scroll step */
+static int bidir_limit = 50;  /* percent */
+static struct scrollinfo scroll[SCROLLABLE_LINES];
+
+static const char scroll_tick_table[16] = {
+ /* Hz values:
+    1, 1.25, 1.55, 2, 2.5, 3.12, 4, 5, 6.25, 8.33, 10, 12.5, 16.7, 20, 25, 33 */
+    100, 80, 64, 50, 40, 32, 25, 20, 16, 12, 10, 8, 6, 5, 4, 3
+};
+
+/*** driver routines ***/
 
 #ifndef SIMULATOR
 void lcd_remote_backlight_on(void)
@@ -115,8 +130,8 @@ void lcd_remote_write_command(int cmd)
 {
     int i;
     
-    CS_LO;
     RS_LO;
+    CS_LO;
     
     for (i = 0; i < 8; i++)
     {
@@ -140,8 +155,8 @@ void lcd_remote_write_data(const unsigned char* p_bytes, int count)
     int i, j;
     int data;
     
-    CS_LO;
     RS_HI;
+    CS_LO;
     
     for (i = 0; i < count; i++)
     {
@@ -202,24 +217,16 @@ void lcd_remote_write_command_ex(int cmd, int data)
     
     CS_HI;
 }
+#endif /* !SIMULATOR */
 
-#define LCD_REMOTE_CNTL_ADC_NORMAL          0xa0
-#define LCD_REMOTE_CNTL_ADC_REVERSE         0xa1
-#define LCD_REMOTE_CNTL_SHL_NORMAL          0xc0
-#define LCD_REMOTE_CNTL_SHL_REVERSE         0xc8
-#define LCD_REMOTE_CNTL_DISPLAY_ON_OFF      0xae
-#define LCD_REMOTE_CNTL_ENTIRE_ON_OFF       0xa4
-#define LCD_REMOTE_CNTL_REVERSE_ON_OFF      0xa6
-#define LCD_REMOTE_CNTL_NOP                 0xe3
-#define LCD_REMOTE_CNTL_POWER_CONTROL       0x2b
-#define LCD_REMOTE_CNTL_SELECT_REGULATOR    0x20
-#define LCD_REMOTE_CNTL_SELECT_BIAS         0xa2
-#define LCD_REMOTE_CNTL_SELECT_VOLTAGE      0x81
-#define LCD_REMOTE_CNTL_INIT_LINE           0x40
-#define LCD_REMOTE_CNTL_SET_PAGE_ADDRESS    0xB0
+/*** hardware configuration ***/
 
-#define LCD_REMOTE_CNTL_HIGHCOL             0x10    /* Upper column address */
-#define LCD_REMOTE_CNTL_LOWCOL              0x00    /* Lower column address */
+int lcd_remote_default_contrast(void)
+{
+    return 32;
+}
+
+#ifndef SIMULATOR
 
 void lcd_remote_powersave(bool on)
 {
@@ -268,15 +275,441 @@ void lcd_remote_set_flip(bool yesno)
     }
 }
 
-int lcd_remote_default_contrast(void)
+/* Rolls up the lcd display by the specified amount of lines.
+ * Lines that are rolled out over the top of the screen are
+ * rolled in from the bottom again. This is a hardware 
+ * remapping only and all operations on the lcd are affected.
+ * -> 
+ * @param int lines - The number of lines that are rolled. 
+ *  The value must be 0 <= pixels < LCD_REMOTE_HEIGHT. */
+void lcd_remote_roll(int lines)
 {
-    return 32;
+    char data[2];
+    
+    cached_roll = lines;
+
+    if (remote_initialized)
+    {
+        lines &= LCD_REMOTE_HEIGHT-1;
+        data[0] = lines & 0xff;
+        data[1] = lines >> 8;
+    
+        lcd_remote_write_command(LCD_REMOTE_CNTL_INIT_LINE | 0x0); // init line
+        lcd_remote_write_data(data, 2);
+    }
 }
 
-#endif
+/* The actual LCD init */
+static void remote_lcd_init(void)
+{
+    lcd_remote_write_command(LCD_REMOTE_CNTL_SELECT_BIAS | 0x0);
 
-void lcd_remote_bitmap(const unsigned char *src, int x, int y, int nx, int ny, bool clear) __attribute__ ((section (".icode")));
-void lcd_remote_bitmap(const unsigned char *src, int x, int y, int nx, int ny, bool clear)
+    lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x5);
+    sleep(1);
+    lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x6);
+    sleep(1);
+    lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x7);
+    
+    lcd_remote_write_command(LCD_REMOTE_CNTL_SELECT_REGULATOR | 0x4); // 0x4 Select regulator @ 5.0 (default);
+    
+    sleep(1);
+    
+    lcd_remote_write_command(LCD_REMOTE_CNTL_INIT_LINE | 0x0); // init line
+    lcd_remote_write_command(LCD_REMOTE_CNTL_SET_PAGE_ADDRESS | 0x0); // page address
+    lcd_remote_write_command_ex(0x10, 0x00); // Column MSB + LSB
+
+    lcd_remote_write_command(LCD_REMOTE_CNTL_DISPLAY_ON_OFF | 1);
+    
+    remote_initialized = true;
+
+    lcd_remote_set_flip(cached_flip);
+    lcd_remote_set_contrast(cached_contrast);
+    lcd_remote_set_invert_display(cached_invert);
+    lcd_remote_roll(cached_roll);
+}
+
+/* Monitor remote hotswap */
+static void remote_tick(void)
+{
+    bool current_status;
+
+    current_status = ((GPIO_READ & 0x40000000) == 0);
+    /* Only report when the status has changed */
+    if (current_status != last_remote_status)
+    {
+        last_remote_status = current_status;
+        countdown = current_status ? HZ : 1;
+    }
+    else
+    {
+        /* Count down until it gets negative */
+        if (countdown >= 0)
+            countdown--;
+
+        if (countdown == 0)
+        {
+            if (current_status)
+            {
+                init_remote = true;   
+                /* request init in scroll_thread */
+            }
+            else
+            {
+                CLK_LO;
+                CS_HI;
+                remote_initialized = false;
+            }
+        }
+    }
+}
+
+/* Initialise ports and kick off monitor */
+void lcd_remote_init(void)
+{
+    GPIO_FUNCTION   |= 0x10010800;  /* GPIO11: Backlight
+                                       GPIO16: RS
+                                       GPIO28: CLK */
+    
+    GPIO1_FUNCTION  |= 0x00040004;  /* GPIO34: CS
+                                       GPIO50: Data */
+    GPIO_ENABLE     |= 0x10010800;
+    GPIO1_ENABLE    |= 0x00040004;
+    
+    lcd_remote_clear_display();
+
+    tick_add_task(remote_tick);
+    create_thread(scroll_thread, scroll_stack,
+                  sizeof(scroll_stack), scroll_name);
+}
+
+/*** update functions ***/
+
+/* Update the display.
+   This must be called after all other LCD functions that change the display. */
+void lcd_remote_update(void) __attribute__ ((section (".icode")));
+void lcd_remote_update(void)
+{
+    int y;
+    
+    if (!remote_initialized)
+        return;
+
+    /* Copy display bitmap to hardware */
+    for (y = 0; y < LCD_REMOTE_HEIGHT / 8; y++)
+    {
+        lcd_remote_write_command(LCD_REMOTE_CNTL_SET_PAGE_ADDRESS | y);
+        lcd_remote_write_command(LCD_REMOTE_CNTL_HIGHCOL | ((xoffset>>4) & 0xf));
+        lcd_remote_write_command(LCD_REMOTE_CNTL_LOWCOL | (xoffset & 0xf));
+        lcd_remote_write_data(lcd_remote_framebuffer[y], LCD_REMOTE_WIDTH);
+    }
+}
+
+/* Update a fraction of the display. */
+void lcd_remote_update_rect(int, int, int, int) __attribute__ ((section (".icode")));
+void lcd_remote_update_rect(int x_start, int y, int width, int height)
+{
+    int ymax;
+    
+    if (!remote_initialized)
+        return;
+
+    /* The Y coordinates have to work on even 8 pixel rows */
+    ymax = (y + height-1)/8;
+    y /= 8;
+
+    if(x_start + width > LCD_REMOTE_WIDTH)
+        width = LCD_REMOTE_WIDTH - x_start;
+    if (width <= 0)
+        return; /* nothing left to do, 0 is harmful to lcd_write_data() */
+    if(ymax >= LCD_REMOTE_HEIGHT/8)
+        ymax = LCD_REMOTE_HEIGHT/8-1;
+
+    /* Copy specified rectange bitmap to hardware */
+    for (; y <= ymax; y++)
+    {        
+        lcd_remote_write_command(LCD_REMOTE_CNTL_SET_PAGE_ADDRESS | y);
+        lcd_remote_write_command(LCD_REMOTE_CNTL_HIGHCOL
+                                 | (((x_start+xoffset)>>4) & 0xf));
+        lcd_remote_write_command(LCD_REMOTE_CNTL_LOWCOL 
+                                 | ((x_start+xoffset) & 0xf));
+        lcd_remote_write_data(&lcd_remote_framebuffer[y][x_start], width);
+    }
+}
+#endif /* !SIMULATOR */
+
+/*** parameter handling ***/
+
+void lcd_remote_setmargins(int x, int y)
+{
+    xmargin = x;
+    ymargin = y;
+}
+
+int lcd_remote_getxmargin(void)
+{
+    return xmargin;
+}
+
+int lcd_remote_getymargin(void)
+{
+    return ymargin;
+}
+
+
+void lcd_remote_setfont(int newfont)
+{
+    curfont = newfont;
+}
+
+int lcd_remote_getstringsize(const unsigned char *str, int *w, int *h)
+{
+    return font_getstringsize(str, w, h, curfont);
+}
+
+/*** drawing functions ***/
+
+void lcd_remote_clear_display(void)
+{
+    memset(lcd_remote_framebuffer, 0, sizeof lcd_remote_framebuffer);
+}
+
+/* Set a single pixel */
+void lcd_remote_drawpixel(int x, int y)
+{
+    REMOTE_DRAW_PIXEL(x,y);
+}
+
+/* Clear a single pixel */
+void lcd_remote_clearpixel(int x, int y)
+{
+    REMOTE_CLEAR_PIXEL(x,y);
+}
+
+/* Invert a single pixel */
+void lcd_remote_invertpixel(int x, int y)
+{
+    REMOTE_INVERT_PIXEL(x,y);
+}
+
+void lcd_remote_drawline(int x1, int y1, int x2, int y2)
+{
+    int numpixels;
+    int i;
+    int deltax, deltay;
+    int d, dinc1, dinc2;
+    int x, xinc1, xinc2;
+    int y, yinc1, yinc2;
+
+    deltax = abs(x2 - x1);
+    deltay = abs(y2 - y1);
+
+    if(deltax >= deltay)
+    {
+        numpixels = deltax;
+        d = 2 * deltay - deltax;
+        dinc1 = deltay * 2;
+        dinc2 = (deltay - deltax) * 2;
+        xinc1 = 1;
+        xinc2 = 1;
+        yinc1 = 0;
+        yinc2 = 1;
+    }
+    else
+    {
+        numpixels = deltay;
+        d = 2 * deltax - deltay;
+        dinc1 = deltax * 2;
+        dinc2 = (deltax - deltay) * 2;
+        xinc1 = 0;
+        xinc2 = 1;
+        yinc1 = 1;
+        yinc2 = 1;
+    }
+    numpixels++; /* include endpoints */
+
+    if(x1 > x2)
+    {
+        xinc1 = -xinc1;
+        xinc2 = -xinc2;
+    }
+
+    if(y1 > y2)
+    {
+        yinc1 = -yinc1;
+        yinc2 = -yinc2;
+    }
+
+    x = x1;
+    y = y1;
+
+    for(i=0; i<numpixels; i++)
+    {
+        REMOTE_DRAW_PIXEL(x,y);
+
+        if(d < 0)
+        {
+            d += dinc1;
+            x += xinc1;
+            y += yinc1;
+        }
+        else
+        {
+            d += dinc2;
+            x += xinc2;
+            y += yinc2;
+        }
+    }
+}
+
+void lcd_remote_clearline(int x1, int y1, int x2, int y2)
+{
+    int numpixels;
+    int i;
+    int deltax, deltay;
+    int d, dinc1, dinc2;
+    int x, xinc1, xinc2;
+    int y, yinc1, yinc2;
+
+    deltax = abs(x2 - x1);
+    deltay = abs(y2 - y1);
+
+    if(deltax >= deltay)
+    {
+        numpixels = deltax;
+        d = 2 * deltay - deltax;
+        dinc1 = deltay * 2;
+        dinc2 = (deltay - deltax) * 2;
+        xinc1 = 1;
+        xinc2 = 1;
+        yinc1 = 0;
+        yinc2 = 1;
+    }
+    else
+    {
+        numpixels = deltay;
+        d = 2 * deltax - deltay;
+        dinc1 = deltax * 2;
+        dinc2 = (deltax - deltay) * 2;
+        xinc1 = 0;
+        xinc2 = 1;
+        yinc1 = 1;
+        yinc2 = 1;
+    }
+    numpixels++; /* include endpoints */
+
+    if(x1 > x2)
+    {
+        xinc1 = -xinc1;
+        xinc2 = -xinc2;
+    }
+
+    if(y1 > y2)
+    {
+        yinc1 = -yinc1;
+        yinc2 = -yinc2;
+    }
+
+    x = x1;
+    y = y1;
+
+    for(i=0; i<numpixels; i++)
+    {
+        REMOTE_CLEAR_PIXEL(x,y);
+
+        if(d < 0)
+        {
+            d += dinc1;
+            x += xinc1;
+            y += yinc1;
+        }
+        else
+        {
+            d += dinc2;
+            x += xinc2;
+            y += yinc2;
+        }
+    }
+}
+
+void lcd_remote_drawrect(int x, int y, int nx, int ny)
+{
+    int i;
+
+    if (x > LCD_REMOTE_WIDTH)
+    {
+        return;
+    }
+    
+    if (y > LCD_REMOTE_HEIGHT)
+    {
+        return;
+    }
+
+    if (x + nx > LCD_REMOTE_WIDTH)
+    {
+        nx = LCD_REMOTE_WIDTH - x;
+    }
+    
+    if (y + ny > LCD_REMOTE_HEIGHT)
+    {
+        ny = LCD_REMOTE_HEIGHT - y;
+    }
+
+    /* vertical lines */
+    for (i = 0; i < ny; i++)
+    {
+        REMOTE_DRAW_PIXEL(x, (y + i));
+        REMOTE_DRAW_PIXEL((x + nx - 1), (y + i));
+    }
+
+    /* horizontal lines */
+    for (i = 0; i < nx; i++)
+    {
+        REMOTE_DRAW_PIXEL((x + i),y);
+        REMOTE_DRAW_PIXEL((x + i),(y + ny - 1));
+    }
+}
+
+/* Clear a rectangular area at (x, y), size (nx, ny) */
+void lcd_remote_clearrect(int x, int y, int nx, int ny)
+{
+    int i;
+    for (i = 0; i < nx; i++)
+        lcd_remote_bitmap(zeros, x+i, y, 1, ny, true);
+}
+
+/* Fill a rectangular area at (x, y), size (nx, ny) */
+void lcd_remote_fillrect(int x, int y, int nx, int ny)
+{
+    int i;
+    for (i = 0; i < nx; i++)
+        lcd_remote_bitmap(ones, x+i, y, 1, ny, true);
+}
+
+/* Invert a rectangular area at (x, y), size (nx, ny) */
+void lcd_remote_invertrect(int x, int y, int nx, int ny)
+{
+    int i, j;
+
+    if (x > LCD_REMOTE_WIDTH)
+        return;
+    if (y > LCD_REMOTE_HEIGHT)
+        return;
+
+    if (x + nx > LCD_REMOTE_WIDTH)
+        nx = LCD_REMOTE_WIDTH - x;
+    if (y + ny > LCD_REMOTE_HEIGHT)
+        ny = LCD_REMOTE_HEIGHT - y;
+
+    for (i = 0; i < nx; i++)
+        for (j = 0; j < ny; j++)
+            REMOTE_INVERT_PIXEL((x + i), (y + j));
+}
+
+void lcd_remote_bitmap(const unsigned char *src, int x, int y, int nx, int ny,
+                       bool clear) __attribute__ ((section (".icode")));
+void lcd_remote_bitmap(const unsigned char *src, int x, int y, int nx, int ny,
+                       bool clear)
 {
     const unsigned char *src_col;
     unsigned char *dst, *dst_col;
@@ -377,272 +810,6 @@ void lcd_remote_bitmap(const unsigned char *src, int x, int y, int nx, int ny, b
     }
 }
 
-void lcd_remote_drawrect(int x, int y, int nx, int ny)
-{
-    int i;
-
-    if (x > LCD_REMOTE_WIDTH)
-    {
-        return;
-    }
-    
-    if (y > LCD_REMOTE_HEIGHT)
-    {
-        return;
-    }
-
-    if (x + nx > LCD_REMOTE_WIDTH)
-    {
-        nx = LCD_REMOTE_WIDTH - x;
-    }
-    
-    if (y + ny > LCD_REMOTE_HEIGHT)
-    {
-        ny = LCD_REMOTE_HEIGHT - y;
-    }
-
-    /* vertical lines */
-    for (i = 0; i < ny; i++)
-    {
-        REMOTE_DRAW_PIXEL(x, (y + i));
-        REMOTE_DRAW_PIXEL((x + nx - 1), (y + i));
-    }
-
-    /* horizontal lines */
-    for (i = 0; i < nx; i++)
-    {
-        REMOTE_DRAW_PIXEL((x + i),y);
-        REMOTE_DRAW_PIXEL((x + i),(y + ny - 1));
-    }
-}
-
-void lcd_remote_clear_display(void)
-{
-    memset(lcd_remote_framebuffer, 0, sizeof lcd_remote_framebuffer);
-}
-
-#ifndef SIMULATOR
-
-static void remote_lcd_init(void)
-{
-    lcd_remote_write_command(LCD_REMOTE_CNTL_SELECT_BIAS | 0x0);
-
-    lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x5);
-    sleep(1);
-    lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x6);
-    sleep(1);
-    lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x7);
-    
-    lcd_remote_write_command(LCD_REMOTE_CNTL_SELECT_REGULATOR | 0x4); // 0x4 Select regulator @ 5.0 (default);
-    
-    sleep(1);
-    
-    lcd_remote_write_command(LCD_REMOTE_CNTL_INIT_LINE | 0x0); // init line
-    lcd_remote_write_command(LCD_REMOTE_CNTL_SET_PAGE_ADDRESS | 0x0); // page address
-    lcd_remote_write_command_ex(0x10, 0x00); // Column MSB + LSB
-
-    lcd_remote_write_command(LCD_REMOTE_CNTL_DISPLAY_ON_OFF | 1);
-    
-    remote_initialized = true;
-
-    lcd_remote_set_flip(cached_flip);
-    lcd_remote_set_contrast(cached_contrast);
-    lcd_remote_set_invert_display(cached_invert);
-    lcd_remote_roll(cached_roll);
-}
-
-static void remote_tick(void)
-{
-    bool current_status;
-
-    current_status = ((GPIO_READ & 0x40000000) == 0);
-    /* Only report when the status has changed */
-    if (current_status != last_remote_status)
-    {
-        last_remote_status = current_status;
-        countdown = current_status ? HZ : 1;
-    }
-    else
-    {
-        /* Count down until it gets negative */
-        if (countdown >= 0)
-            countdown--;
-
-        if (countdown == 0)
-        {
-            if (current_status)
-            {
-                init_remote = true;   
-                /* request init in scroll_thread */
-            }
-            else
-            {
-                CLK_LO;
-                CS_HI;
-                remote_initialized = false;
-            }
-        }
-    }
-}
-
-void lcd_remote_init(void)
-{
-    GPIO_FUNCTION   |= 0x10010800;  /* GPIO11: Backlight
-                                       GPIO16: RS
-                                       GPIO28: CLK */
-    
-    GPIO1_FUNCTION  |= 0x00040004;  /* GPIO34: CS
-                                       GPIO50: Data */
-    GPIO_ENABLE     |= 0x10010800;
-    GPIO1_ENABLE    |= 0x00040004;
-    
-    lcd_remote_clear_display();
-
-    tick_add_task(remote_tick);
-    create_thread(scroll_thread, scroll_stack,
-                  sizeof(scroll_stack), scroll_name);
-}
-
-
-/*
- * Update the display.
- * This must be called after all other LCD functions that change the display.
- */
-void lcd_remote_update (void) __attribute__ ((section (".icode")));
-void lcd_remote_update (void)
-{
-    int y;
-    
-    if (!remote_initialized)
-        return;
-
-    /* Copy display bitmap to hardware */
-    for (y = 0; y < LCD_REMOTE_HEIGHT / 8; y++)
-    {
-        lcd_remote_write_command(LCD_REMOTE_CNTL_SET_PAGE_ADDRESS | y);
-        lcd_remote_write_command(LCD_REMOTE_CNTL_HIGHCOL | ((xoffset>>4) & 0xf));
-        lcd_remote_write_command(LCD_REMOTE_CNTL_LOWCOL | (xoffset & 0xf));
-        lcd_remote_write_data(lcd_remote_framebuffer[y], LCD_REMOTE_WIDTH);
-    }
-}
-
-/*
- * Update a fraction of the display.
- */
-void lcd_remote_update_rect (int, int, int, int) __attribute__ ((section (".icode")));
-void lcd_remote_update_rect (int x_start, int y,
-                      int width, int height)
-{
-    int ymax;
-    
-    if (!remote_initialized)
-        return;
-
-    /* The Y coordinates have to work on even 8 pixel rows */
-    ymax = (y + height-1)/8;
-    y /= 8;
-
-    if(x_start + width > LCD_REMOTE_WIDTH)
-        width = LCD_REMOTE_WIDTH - x_start;
-    if (width <= 0)
-        return; /* nothing left to do, 0 is harmful to lcd_write_data() */
-    if(ymax >= LCD_REMOTE_HEIGHT/8)
-        ymax = LCD_REMOTE_HEIGHT/8-1;
-
-    /* Copy specified rectange bitmap to hardware */
-    for (; y <= ymax; y++)
-    {        
-        lcd_remote_write_command(LCD_REMOTE_CNTL_SET_PAGE_ADDRESS | y);
-        lcd_remote_write_command(LCD_REMOTE_CNTL_HIGHCOL
-                                 | (((x_start+xoffset)>>4) & 0xf));
-        lcd_remote_write_command(LCD_REMOTE_CNTL_LOWCOL 
-                                 | ((x_start+xoffset) & 0xf));
-        lcd_remote_write_data(&lcd_remote_framebuffer[y][x_start], width);
-    }
-}
-
-/**
- * Rolls up the lcd display by the specified amount of lines.
- * Lines that are rolled out over the top of the screen are
- * rolled in from the bottom again. This is a hardware 
- * remapping only and all operations on the lcd are affected.
- * -> 
- * @param int lines - The number of lines that are rolled. 
- *  The value must be 0 <= pixels < LCD_REMOTE_HEIGHT.
- */
-void lcd_remote_roll(int lines)
-{
-    char data[2];
-    
-    cached_roll = lines;
-
-    if (remote_initialized)
-    {
-        lines &= LCD_REMOTE_HEIGHT-1;
-        data[0] = lines & 0xff;
-        data[1] = lines >> 8;
-    
-        lcd_remote_write_command(LCD_REMOTE_CNTL_INIT_LINE | 0x0); // init line
-        lcd_remote_write_data(data, 2);
-    }
-}
-
-#endif
-
-
-void lcd_remote_setmargins(int x, int y)
-{
-    xmargin = x;
-    ymargin = y;
-}
-
-int lcd_remote_getxmargin(void)
-{
-    return xmargin;
-}
-
-int lcd_remote_getymargin(void)
-{
-    return ymargin;
-}
-
-
-void lcd_remote_setfont(int newfont)
-{
-    curfont = newfont;
-}
-
-int lcd_remote_getstringsize(const unsigned char *str, int *w, int *h)
-{
-    return font_getstringsize(str, w, h, curfont);
-}
-
-/* put a string at a given char position */
-void lcd_remote_puts(int x, int y, const unsigned char *str)
-{
-    lcd_remote_puts_style(x, y, str, STYLE_DEFAULT);
-}
-
-void lcd_remote_puts_style(int x, int y, const unsigned char *str, int style)
-{
-    int xpos,ypos,w,h;
-
-    /* make sure scrolling is turned off on the line we are updating */
-    //scrolling_lines &= ~(1 << y);
-
-    if(!str || !str[0])
-        return;
-
-    lcd_remote_getstringsize(str, &w, &h);
-    xpos = xmargin + x*w / strlen(str);
-    ypos = ymargin + y*h;
-    lcd_remote_putsxy(xpos, ypos, str);
-    lcd_remote_clearrect(xpos + w, ypos, LCD_REMOTE_WIDTH - (xpos + w), h);
-    if (style & STYLE_INVERT)
-        lcd_remote_invertrect(xpos, ypos, LCD_REMOTE_WIDTH - xpos, h);
-
-}
-
 /* put a string at a given pixel position, skipping first ofs pixel columns */
 static void lcd_remote_putsxyofs(int x, int y, int ofs, const unsigned char *str)
 {
@@ -703,46 +870,35 @@ void lcd_remote_putsxy(int x, int y, const unsigned char *str)
     lcd_remote_putsxyofs(x, y, 0, str);
 }
 
+/*** line oriented text output ***/
 
-/*
- * Clear a rectangular area at (x, y), size (nx, ny)
- */
-void lcd_remote_clearrect (int x, int y, int nx, int ny)
+/* put a string at a given char position */
+void lcd_remote_puts(int x, int y, const unsigned char *str)
 {
-    int i;
-    for (i = 0; i < nx; i++)
-        lcd_remote_bitmap (zeros, x+i, y, 1, ny, true);
+    lcd_remote_puts_style(x, y, str, STYLE_DEFAULT);
 }
 
-/*
- * Fill a rectangular area at (x, y), size (nx, ny)
- */
-void lcd_remote_fillrect (int x, int y, int nx, int ny)
+void lcd_remote_puts_style(int x, int y, const unsigned char *str, int style)
 {
-    int i;
-    for (i = 0; i < nx; i++)
-        lcd_remote_bitmap (ones, x+i, y, 1, ny, true);
-}
+    int xpos,ypos,w,h;
 
-/* Invert a rectangular area at (x, y), size (nx, ny) */
-void lcd_remote_invertrect (int x, int y, int nx, int ny)
-{
-    int i, j;
+    /* make sure scrolling is turned off on the line we are updating */
+    //scrolling_lines &= ~(1 << y);
 
-    if (x > LCD_REMOTE_WIDTH)
-        return;
-    if (y > LCD_REMOTE_HEIGHT)
+    if(!str || !str[0])
         return;
 
-    if (x + nx > LCD_REMOTE_WIDTH)
-        nx = LCD_REMOTE_WIDTH - x;
-    if (y + ny > LCD_REMOTE_HEIGHT)
-        ny = LCD_REMOTE_HEIGHT - y;
+    lcd_remote_getstringsize(str, &w, &h);
+    xpos = xmargin + x*w / strlen(str);
+    ypos = ymargin + y*h;
+    lcd_remote_putsxy(xpos, ypos, str);
+    lcd_remote_clearrect(xpos + w, ypos, LCD_REMOTE_WIDTH - (xpos + w), h);
+    if (style & STYLE_INVERT)
+        lcd_remote_invertrect(xpos, ypos, LCD_REMOTE_WIDTH - xpos, h);
 
-    for (i = 0; i < nx; i++)
-        for (j = 0; j < ny; j++)
-            REMOTE_INVERT_PIXEL((x + i), (y + j));
 }
+
+/*** scrolling ***/
 
 /* Reverse the invert setting of the scrolling line (if any) at given char
    position.  Setting will go into affect next time line scrolls. */
@@ -756,168 +912,29 @@ void lcd_remote_invertscroll(int x, int y)
     s->invert = !s->invert;
 }
 
-void lcd_remote_drawline( int x1, int y1, int x2, int y2 )
+void lcd_remote_stop_scroll(void)
 {
-    int numpixels;
-    int i;
-    int deltax, deltay;
-    int d, dinc1, dinc2;
-    int x, xinc1, xinc2;
-    int y, yinc1, yinc2;
-
-    deltax = abs(x2 - x1);
-    deltay = abs(y2 - y1);
-
-    if(deltax >= deltay)
-    {
-        numpixels = deltax;
-        d = 2 * deltay - deltax;
-        dinc1 = deltay * 2;
-        dinc2 = (deltay - deltax) * 2;
-        xinc1 = 1;
-        xinc2 = 1;
-        yinc1 = 0;
-        yinc2 = 1;
-    }
-    else
-    {
-        numpixels = deltay;
-        d = 2 * deltax - deltay;
-        dinc1 = deltax * 2;
-        dinc2 = (deltax - deltay) * 2;
-        xinc1 = 0;
-        xinc2 = 1;
-        yinc1 = 1;
-        yinc2 = 1;
-    }
-    numpixels++; /* include endpoints */
-
-    if(x1 > x2)
-    {
-        xinc1 = -xinc1;
-        xinc2 = -xinc2;
-    }
-
-    if(y1 > y2)
-    {
-        yinc1 = -yinc1;
-        yinc2 = -yinc2;
-    }
-
-    x = x1;
-    y = y1;
-
-    for(i=0; i<numpixels; i++)
-    {
-        REMOTE_DRAW_PIXEL(x,y);
-
-        if(d < 0)
-        {
-            d += dinc1;
-            x += xinc1;
-            y += yinc1;
-        }
-        else
-        {
-            d += dinc2;
-            x += xinc2;
-            y += yinc2;
-        }
-    }
+    scrolling_lines=0;
 }
 
-void lcd_remote_clearline( int x1, int y1, int x2, int y2 )
+void lcd_remote_scroll_speed(int speed)
 {
-    int numpixels;
-    int i;
-    int deltax, deltay;
-    int d, dinc1, dinc2;
-    int x, xinc1, xinc2;
-    int y, yinc1, yinc2;
-
-    deltax = abs(x2 - x1);
-    deltay = abs(y2 - y1);
-
-    if(deltax >= deltay)
-    {
-        numpixels = deltax;
-        d = 2 * deltay - deltax;
-        dinc1 = deltay * 2;
-        dinc2 = (deltay - deltax) * 2;
-        xinc1 = 1;
-        xinc2 = 1;
-        yinc1 = 0;
-        yinc2 = 1;
-    }
-    else
-    {
-        numpixels = deltay;
-        d = 2 * deltax - deltay;
-        dinc1 = deltax * 2;
-        dinc2 = (deltax - deltay) * 2;
-        xinc1 = 0;
-        xinc2 = 1;
-        yinc1 = 1;
-        yinc2 = 1;
-    }
-    numpixels++; /* include endpoints */
-
-    if(x1 > x2)
-    {
-        xinc1 = -xinc1;
-        xinc2 = -xinc2;
-    }
-
-    if(y1 > y2)
-    {
-        yinc1 = -yinc1;
-        yinc2 = -yinc2;
-    }
-
-    x = x1;
-    y = y1;
-
-    for(i=0; i<numpixels; i++)
-    {
-        REMOTE_CLEAR_PIXEL(x,y);
-
-        if(d < 0)
-        {
-            d += dinc1;
-            x += xinc1;
-            y += yinc1;
-        }
-        else
-        {
-            d += dinc2;
-            x += xinc2;
-            y += yinc2;
-        }
-    }
+    scroll_ticks = scroll_tick_table[speed];
 }
 
-/*
- * Set a single pixel
- */
-void lcd_remote_drawpixel(int x, int y)
+void lcd_remote_scroll_step(int step)
 {
-    REMOTE_DRAW_PIXEL(x,y);
+    scroll_step = step;
 }
 
-/*
- * Clear a single pixel
- */
-void lcd_remote_clearpixel(int x, int y)
+void lcd_remote_scroll_delay(int ms)
 {
-    REMOTE_CLEAR_PIXEL(x,y);
+    scroll_delay = ms / (HZ / 10);
 }
 
-/*
- * Invert a single pixel
- */
-void lcd_remote_invertpixel(int x, int y)
+void lcd_remote_bidir_scroll(int percent)
 {
-    REMOTE_INVERT_PIXEL(x,y);
+    bidir_limit = percent;
 }
 
 void lcd_remote_puts_scroll(int x, int y, const unsigned char *string)
@@ -980,37 +997,6 @@ void lcd_remote_puts_scroll_style(int x, int y, const unsigned char *string, int
     else
         /* force a bit switch-off since it doesn't scroll */
         scrolling_lines &= ~(1<<y);
-}
-
-void lcd_remote_stop_scroll(void)
-{
-    scrolling_lines=0;
-}
-
-static const char scroll_tick_table[16] = {
- /* Hz values:
-    1, 1.25, 1.55, 2, 2.5, 3.12, 4, 5, 6.25, 8.33, 10, 12.5, 16.7, 20, 25, 33 */
-    100, 80, 64, 50, 40, 32, 25, 20, 16, 12, 10, 8, 6, 5, 4, 3
-};
-
-void lcd_remote_scroll_speed(int speed)
-{
-    scroll_ticks = scroll_tick_table[speed];
-}
-
-void lcd_remote_scroll_step(int step)
-{
-    scroll_step = step;
-}
-
-void lcd_remote_scroll_delay(int ms)
-{
-    scroll_delay = ms / (HZ / 10);
-}
-
-void lcd_remote_bidir_scroll(int percent)
-{
-    bidir_limit = percent;
 }
 
 #ifndef SIMULATOR

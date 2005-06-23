@@ -64,20 +64,6 @@ extern unsigned char extended_font_player[NO_EXTENDED_LCD_CHARS][8];
 
 /*** generic code ***/
 
-struct scrollinfo {
-    int mode;
-    char text[MAX_PATH];
-    int textlen;
-    int offset;
-    int turn_offset;
-    int startx;
-    int starty;
-    long scroll_start_tick;
-    int direction; /* +1 for right or -1 for left*/
-    int jump_scroll;
-    int jump_scroll_steps;
-};
-
 #define MAX_CURSOR_CHARS 8
 struct cursorinfo {
     int len;
