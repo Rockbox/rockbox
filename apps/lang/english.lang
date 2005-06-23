@@ -3107,7 +3107,7 @@ voice: "Backlight fade out"
 new:
 
 id: LANG_SHUFFLE_PLAYLIST
-desc: in playlist menu, shuffles the playlist.
-eng: "Shuffle playlist"
-voice: "Shuffle playlist"
+desc: in playlist menu, reshuffles the order in which songs are played
+eng: "Reshuffle"
+voice: "Reshuffle"
 new:
