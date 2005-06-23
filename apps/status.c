@@ -40,13 +40,15 @@
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
 #include "button.h"
 #endif
+#include "usb.h"
 
 static enum playmode ff_mode;
 
 static long switch_tick;
-static int  battery_charge_step = 0;
-static bool plug_state;
 static bool battery_state = true;
+#ifdef HAVE_CHARGING
+static int  battery_charge_step = 0;
+#endif
 
 struct status_info {
     int battlevel;
@@ -63,6 +65,10 @@ struct status_info {
 #if CONFIG_LED == LED_VIRTUAL
 	bool led; /* disk LED simulation in the status bar */
 #endif
+#ifdef HAVE_USB_POWER
+    bool usb_power;
+#endif
+
 };
 
 void status_init(void)
@@ -170,6 +176,9 @@ void status_draw(bool force_redraw)
 #if CONFIG_LED == LED_VIRTUAL
     info.led = led_read(HZ/2); /* delay should match polling interval */
 #endif
+#ifdef HAVE_USB_POWER
+    info.usb_power = usb_powered();
+#endif
 
     /* only redraw if forced to, or info has changed */
     if (force_redraw ||
@@ -183,10 +192,10 @@ void status_draw(bool force_redraw)
     /* players always "redraw" */
     {
 #endif
-        
+
+#ifdef HAVE_CHARGING
         if (info.inserted) {
             battery_state = true;
-            plug_state = true;
 #if defined(HAVE_CHARGE_CTRL) || CONFIG_BATTERY == BATT_LIION2200
             /* zero battery run time if charging */
             if (charge_state > 0) {
@@ -212,8 +221,9 @@ void status_draw(bool force_redraw)
                 }
             }
         }
-        else {
-            plug_state=false;
+        else
+#endif /* HAVE_CHARGING */
+        {
             if (info.battery_safe)
                 battery_state = true;
             else {
@@ -228,8 +238,18 @@ void status_draw(bool force_redraw)
 
 #ifdef HAVE_LCD_BITMAP
         if (battery_state)
-            statusbar_icon_battery(info.battlevel, plug_state);
-            
+            statusbar_icon_battery(info.battlevel);
+
+        /* draw power plug if charging */
+        if (info.inserted)
+            lcd_bitmap(bitmap_icons_7x8[Icon_Plug], ICON_PLUG_X_POS,
+                       STATUSBAR_Y_POS, ICON_PLUG_WIDTH, STATUSBAR_HEIGHT, false);
+#ifdef HAVE_USB_POWER
+        else if (info.usb_power)
+            lcd_bitmap(bitmap_icons_7x8[Icon_USBPlug], ICON_PLUG_X_POS,
+                       STATUSBAR_Y_POS, ICON_PLUG_WIDTH, STATUSBAR_HEIGHT, false);
+#endif
+
         info.redraw_volume = statusbar_icon_volume(info.volume);
         statusbar_icon_play_state(current_playmode() + Icon_Play);
         switch (info.repeat) {

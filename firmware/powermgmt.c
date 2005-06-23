@@ -437,7 +437,12 @@ static int runcurrent(void)
     current = CURRENT_NORMAL;
 #endif /* MEM == 8 */
 
-    if(usb_inserted()) {
+    if(usb_inserted()
+#ifdef HAVE_USB_POWER
+       || usb_powered()
+#endif
+    )
+    {
         current = CURRENT_USB;
     }
 

@@ -58,6 +58,7 @@ const unsigned char bitmap_icons_6x8[LastIcon][6] =
 const unsigned char bitmap_icons_7x8[][7] =
 {
     {0x08,0x1c,0x3e,0x3e,0x3e,0x14,0x14}, /* Power plug */
+    {0x1c,0x14,0x3e,0x2a,0x22,0x1c,0x08}, /* USB plug */
     {0x00,0x1c,0x1c,0x3e,0x7f,0x00,0x00}, /* Speaker */
     {0x01,0x1e,0x1c,0x3e,0x7f,0x20,0x40}, /* Speaker mute */
     {0x00,0x7f,0x7f,0x3e,0x1c,0x08,0x00}, /* Play */
@@ -239,7 +240,7 @@ const unsigned char rockbox160x53[] = {
 /*
  * Print battery icon to status bar
  */
-void statusbar_icon_battery(int percent, bool charging)
+void statusbar_icon_battery(int percent)
 {
     int i;
     int fill;
@@ -292,11 +293,6 @@ void statusbar_icon_battery(int percent, bool charging)
                    STATUSBAR_Y_POS, "?");
         lcd_setfont(FONT_UI);
     }
-    
-    /* draw power plug if charging */
-    if (charging)
-        lcd_bitmap(bitmap_icons_7x8[Icon_Plug], ICON_PLUG_X_POS,
-                   STATUSBAR_Y_POS, ICON_PLUG_WIDTH, STATUSBAR_HEIGHT, false);
 }
 
 /*

@@ -43,6 +43,7 @@ enum icons_5x8 {
 
 enum icons_7x8 {
     Icon_Plug,
+    Icon_USBPlug,
     Icon_Speaker,
     Icon_Mute,
     Icon_Play,
@@ -97,7 +98,7 @@ extern const unsigned char rockbox160x53[];
 #define TIME_X_END            STATUSBAR_WIDTH-1
 
 extern void statusbar_wipe(void);
-extern void statusbar_icon_battery(int percent, bool charging);
+extern void statusbar_icon_battery(int percent);
 extern bool statusbar_icon_volume(int percent);
 extern void statusbar_icon_play_state(int state);
 extern void statusbar_icon_play_mode(int mode);

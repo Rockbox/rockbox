@@ -47,18 +47,21 @@ void screen_dump(void);   /* Nasty again. Defined in apps/ too */
 
 #if !defined(SIMULATOR) && !defined(USB_NONE)
 
-/* Messages from usb_tick */
+/* Messages from usb_tick and thread states */
 #define USB_INSERTED    1
 #define USB_EXTRACTED   2
 #ifdef HAVE_MMC
 #define USB_REENABLE    3
 #endif
+#ifdef HAVE_USB_POWER
+#define USB_POWERED     4
 
-/* Thread states */
-#define EXTRACTING      1
-#define EXTRACTED       2
-#define INSERTED        3
-#define INSERTING       4
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define USBPOWER_BUTTON BUTTON_F1
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define USBPOWER_BUTTON BUTTON_MENU
+#endif
+#endif /* HAVE_USB_POWER */
 
 /* The ADC tick reads one channel per tick, and we want to check 3 successive
    readings on the USB voltage channel. This doesn't apply to the Player, but
@@ -221,8 +224,15 @@ static void usb_thread(void)
                     screen_dump();
                 }
                 else
-                {
 #endif
+#ifdef HAVE_USB_POWER
+                if(button_status() == USBPOWER_BUTTON)
+                {
+                    usb_state = USB_POWERED;
+                }
+                else
+#endif
+                {
                     /* Tell all threads that they have to back off the ATA.
                        We subtract one for our own thread. */
                     num_acks_to_expect =
@@ -230,11 +240,9 @@ static void usb_thread(void)
                     waiting_for_ack = true;
                     DEBUGF("USB inserted. Waiting for ack from %d threads...\n",
                            num_acks_to_expect);
-#ifdef HAVE_LCD_BITMAP
                 }
-#endif
                 break;
-       
+
             case SYS_USB_CONNECTED_ACK:
                 if(waiting_for_ack)
                 {
@@ -259,33 +267,37 @@ static void usb_thread(void)
 
             case USB_EXTRACTED:
 #ifdef HAVE_LCD_BITMAP
-                if(!do_screendump_instead_of_usb)
+                if(do_screendump_instead_of_usb)
+                    break;
+#endif
+#ifdef HAVE_USB_POWER
+                if(usb_state == USB_POWERED)
                 {
-#endif
-                    if(usb_state == USB_INSERTED)
-                    {
-                        /* Only disable the USB mode if we really have enabled it
-                           some threads might not have acknowledged the
-                           insertion */
-                        usb_slave_mode(false);
-                    }
-
                     usb_state = USB_EXTRACTED;
-                    
-                    /* Tell all threads that we are back in business */
-                    num_acks_to_expect =
-                        queue_broadcast(SYS_USB_DISCONNECTED, NULL) - 1;
-                    waiting_for_ack = true;
-                    DEBUGF("USB extracted. Waiting for ack from %d threads...\n",
-                           num_acks_to_expect);
-#ifdef HAVE_LCD_CHARCELLS
-                    lcd_icon(ICON_USB, false);
-#endif
-#ifdef HAVE_LCD_BITMAP
+                    break;
                 }
 #endif
+                if(usb_state == USB_INSERTED)
+                {
+                    /* Only disable the USB mode if we really have enabled it
+                       some threads might not have acknowledged the
+                       insertion */
+                    usb_slave_mode(false);
+                }
+
+                usb_state = USB_EXTRACTED;
+
+                /* Tell all threads that we are back in business */
+                num_acks_to_expect =
+                    queue_broadcast(SYS_USB_DISCONNECTED, NULL) - 1;
+                waiting_for_ack = true;
+                DEBUGF("USB extracted. Waiting for ack from %d threads...\n",
+                       num_acks_to_expect);
+#ifdef HAVE_LCD_CHARCELLS
+                lcd_icon(ICON_USB, false);
+#endif
                 break;
-        
+
             case SYS_USB_DISCONNECTED_ACK:
                 if(waiting_for_ack)
                 {
@@ -474,6 +486,13 @@ bool usb_inserted(void)
 {
     return usb_state == USB_INSERTED;
 }
+
+#ifdef HAVE_USB_POWER
+bool usb_powered(void)
+{
+    return usb_state == USB_POWERED;
+}
+#endif
 
 #else
 

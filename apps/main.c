@@ -230,6 +230,10 @@ void init(void)
                 usb_screen();
                 mounted = true; /* mounting done @ end of USB mode */
             }
+#ifdef HAVE_USB_POWER
+        if (usb_powered())      /* avoid deadlock */
+            break;
+#endif
     }
 
     if (!mounted)

@@ -76,6 +76,9 @@
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_RTC /* on I2C controlled RTC port */
 
+/* define this if the unit can be powered or charged via USB */
+#define HAVE_USB_POWER
+
 #define CONFIG_LCD LCD_SSD1815
 
 #define BOOTFILE_EXT ".ajz"

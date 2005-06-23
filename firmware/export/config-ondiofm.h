@@ -90,6 +90,9 @@
 
 #define CONFIG_LCD LCD_SSD1815
 
+/* define this if the unit can be powered or charged via USB */
+#define HAVE_USB_POWER
+
 #define BOOTFILE_EXT ".ajz"
 #define BOOTFILE "ajbrec" BOOTFILE_EXT
 
