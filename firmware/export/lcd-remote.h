@@ -52,7 +52,7 @@ extern void lcd_remote_puts_scroll_style(int x, int y, const unsigned char* stri
                                          int style);
                                                                
 extern void lcd_remote_update(void);
-extern void lcd_remote_update_rect int x_start, int y, int width, int height);
+extern void lcd_remote_update_rect(int x_start, int y, int width, int height);
 
 /* Memory copy of display bitmap */
 extern unsigned char lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH];
