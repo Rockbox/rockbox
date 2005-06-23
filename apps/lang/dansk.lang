@@ -34,7 +34,7 @@ id: LANG_DEBUG
 desc: in the main menu
 eng: "Debug (Keep Out!)"
 voice: "Debug, keep out!"
-new: "Debug, bliv væk!"
+new: "Fejlfinding, bliv væk!"
 
 id: LANG_USB
 desc: in the main menu
@@ -82,7 +82,7 @@ id: LANG_PLAYINDICES_PLAYLIST
 desc: in playlist.indices() when playlist is full *WARNING* this and next ID are only used in this function.
 eng: "Playlist"
 voice: ""
-new: "Spilleliste"
+new: "Musikliste"
 
 id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
@@ -154,7 +154,7 @@ id: LANG_RESUME
 desc: in settings_menu
 eng: "Resume"
 voice: "Resume"
-new: "Forsæt v. boot"
+new: "Forsæt v. tænd"
 
 id: LANG_OFF
 desc: Used in a lot of places
@@ -178,7 +178,7 @@ id: LANG_BACKLIGHT
 desc: in settings_menu
 eng: "Backlight"
 voice: "Backlight"
-new: "Baggrundslys"
+new: "Lys"
 
 id: LANG_SCROLL
 desc: in settings_menu
@@ -3082,10 +3082,10 @@ id: LANG_BACKLIGHT_FADE_IN
 desc: in settings_menu
 eng: "Backlight fade in"
 voice: "Backlight fade in"
-new: "Baggrundslys dæmpning ved tænd"
+new: "Tænd lys langsomt"
 
 id: LANG_BACKLIGHT_FADE_OUT
 desc: in settings_menu
 eng: "Backlight fade out"
 voice: "Backlight fade out"
-new: "Baggrundslys dæmpning ved sluk"
+new: "Dæmp lys"
