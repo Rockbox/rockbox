@@ -702,9 +702,6 @@ static int onplay_menu(int index)
         {
             case 0:
                 /* delete track */
-                if (current)
-                    audio_stop();
-
                 playlist_delete(viewer.playlist, tracks[index].index);
 
                 if (current)
@@ -954,16 +951,12 @@ bool playlist_viewer_ex(char* filename)
                 }
                 else if (!viewer.playlist)
                 {
-                    /* Stop current track and play new track */
-                    audio_stop();
+                    /* play new track */
                     playlist_start(tracks[INDEX(viewer.cursor_pos)].index, 0);
                     update_playlist(false);
                 }
                 else
                 {
-                    /* Play track from playlist on disk */
-                    audio_stop();
-
                     /* New playlist */
                     if (playlist_set_current(viewer.playlist) < 0)
                         goto exit;
