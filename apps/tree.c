@@ -110,6 +110,7 @@ static bool reload_dir = false;
 
 static bool start_wps = false;
 static bool dirbrowse(void);
+static int curr_context = false;
 
 bool check_rockboxdir(void)
 {
@@ -625,10 +626,14 @@ static bool check_changed_id3mode(bool currmode)
     if (currmode != (global_settings.dirfilter == SHOW_ID3DB)) {
         currmode = global_settings.dirfilter == SHOW_ID3DB;
         if (currmode) {
+            curr_context=CONTEXT_ID3DB;
             db_load(&tc);
         }
         else
+        {
+            curr_context=CONTEXT_TREE;
             ft_load(&tc, NULL);
+        }
     }
     return currmode;
 }
@@ -659,6 +664,11 @@ static bool dirbrowse(void)
     unsigned lastbutton = 0;
     char* currdir = tc.currdir; /* just a shortcut */
     bool id3db = *tc.dirfilter == SHOW_ID3DB;
+
+    if (id3db)
+        curr_context=CONTEXT_ID3DB;
+    else
+        curr_context=CONTEXT_TREE;
 
 #ifdef HAVE_LCD_BITMAP
     tree_max_on_screen = recalc_screen_height();
@@ -1059,7 +1069,7 @@ static bool dirbrowse(void)
                 /* don't enter f2 from plugin browser */
                 if (*tc.dirfilter < NUM_FILTER_MODES)
                 {
-                    if (quick_screen(CONTEXT_TREE, BUTTON_F2))
+                    if (quick_screen(curr_context, BUTTON_F2))
                         reload_dir = true;
                     restore = true;
 
@@ -1071,7 +1081,7 @@ static bool dirbrowse(void)
                 /* don't enter f3 from plugin browser */
                 if (*tc.dirfilter < NUM_FILTER_MODES)
                 {
-                    if (quick_screen(CONTEXT_TREE, BUTTON_F3))
+                    if (quick_screen(curr_context, BUTTON_F3))
                         reload_dir = true;
                     tree_max_on_screen = recalc_screen_height();
                     restore = true;
@@ -1091,7 +1101,7 @@ static bool dirbrowse(void)
                 int attr = 0;
 
                 if(!numentries)
-                    onplay_result = onplay(NULL, 0);
+                    onplay_result = onplay(NULL, 0, curr_context);
                 else {
                     if (currdir[1])
                         snprintf(buf, sizeof buf, "%s/%s",
@@ -1099,9 +1109,19 @@ static bool dirbrowse(void)
                     else
                         snprintf(buf, sizeof buf, "/%s",
                                  dircache[tc.dircursor+tc.dirstart].name);
-                    if (!id3db)
+                    if (id3db)
+                        switch (tc.currtable)
+                        {
+                            case allsongs:
+                            case songs4album:
+                            case songs4artist:
+                            case searchsongs:
+                                attr=TREE_ATTR_MPA;
+                                break;
+                        }
+                    else
                         attr = dircache[tc.dircursor+tc.dirstart].attr;
-                    onplay_result = onplay(buf, attr);
+                    onplay_result = onplay(buf, attr, curr_context);
                 }
                 
                 switch (onplay_result)

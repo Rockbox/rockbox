@@ -33,6 +33,7 @@
 #include "onplay.h"
 #include "talk.h"
 #include "misc.h"
+#include "action.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -728,7 +729,7 @@ static int onplay_menu(int index)
                 break;
             case 2:
             {
-                onplay(tracks[index].name, TREE_ATTR_MPA);
+                onplay(tracks[index].name, TREE_ATTR_MPA, CONTEXT_TREE);
 
                 if (!viewer.playlist)
                     ret = 1;

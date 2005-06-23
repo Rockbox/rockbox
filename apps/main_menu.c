@@ -32,7 +32,6 @@
 #include "debug_menu.h"
 #include "sprintf.h"
 #include <string.h>
-#include "playlist.h"
 #include "settings.h"
 #include "settings_menu.h"
 #include "power.h"
@@ -41,7 +40,6 @@
 #include "status.h"
 #include "fat.h"
 #include "bookmark.h"
-#include "wps.h"
 #include "buffer.h"
 #include "screens.h"
 #include "playlist_menu.h"
@@ -342,7 +340,6 @@ bool info_menu(void)
 
     /* info menu */
     static const struct menu_item items[] = {
-        { ID2P(LANG_MENU_SHOW_ID3_INFO), browse_id3        },
         { ID2P(LANG_INFO_MENU),          show_info         },
         { ID2P(LANG_VERSION),            show_credits      },
 #ifndef SIMULATOR
@@ -373,8 +370,8 @@ bool main_menu(void)
     /* main menu */
     struct menu_item items[9];
 
-    items[i].desc = ID2P(LANG_BOOKMARK_MENU);
-    items[i++].function = bookmark_menu;
+    items[i].desc = ID2P(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS);
+    items[i++].function = bookmark_mrb_load;
 
     items[i].desc = ID2P(LANG_SOUND_SETTINGS);
     items[i++].function = sound_menu;

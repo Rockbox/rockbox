@@ -19,7 +19,7 @@
 #ifndef _ONPLAY_H_
 #define _ONPLAY_H_
 
-int onplay(char* file, int attr);
+int onplay(char* file, int attr, int from_screen);
 
 enum {
     ONPLAY_OK,

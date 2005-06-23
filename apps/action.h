@@ -24,5 +24,6 @@
 #define CONTEXT_TREE                                    2
 #define CONTEXT_RECORD                                  3
 #define CONTEXT_MAINMENU                                4
+#define CONTEXT_ID3DB                                   5
 
 #endif

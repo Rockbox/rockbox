@@ -53,7 +53,6 @@
 #define RECENT_BOOKMARK_FILE ROCKBOX_DIR "/most-recent.bmark"
 
 static bool  add_bookmark(const char* bookmark_file_name, const char* bookmark);
-static bool  bookmark_load_menu(void);
 static bool  check_bookmark(const char* bookmark);
 static char* create_bookmark(void);
 static bool  delete_bookmark(const char* bookmark_file_name, int bookmark_id);
@@ -87,38 +86,6 @@ static char global_bookmark[MAX_BOOKMARK_SIZE];
 static char global_filename[MAX_PATH];
 
 /* ----------------------------------------------------------------------- */
-/* Displays the bookmark menu options for the user to decide.  This is an  */
-/* interface function.                                                     */
-/* ----------------------------------------------------------------------- */
-bool bookmark_menu(void)
-{
-    int m;
-    bool result;
-
-    static const struct menu_item items[] = {
-        { ID2P(LANG_BOOKMARK_MENU_CREATE), bookmark_create_menu},
-        { ID2P(LANG_BOOKMARK_MENU_LIST), bookmark_load_menu},
-        { ID2P(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS), bookmark_mrb_load},
-    };
-
-    m=menu_init( items, sizeof items / sizeof(struct menu_item), NULL,
-                 NULL, NULL, NULL);
-
-#ifdef HAVE_LCD_CHARCELLS
-    status_set_param(true);
-#endif
-    result = menu_run(m);
-#ifdef HAVE_LCD_CHARCELLS
-    status_set_param(false);
-#endif
-    menu_exit(m);
-
-    settings_save();
-
-    return result;
-}
-
-/* ----------------------------------------------------------------------- */
 /* This is the interface function from the main menu.                      */
 /* ----------------------------------------------------------------------- */
 bool bookmark_create_menu(void)
@@ -133,7 +100,7 @@ bool bookmark_create_menu(void)
 /* for the user.  The user can then select a bookmark to load.             */
 /* If no file/directory is currently playing, the menu item does not work. */
 /* ----------------------------------------------------------------------- */
-static bool bookmark_load_menu(void)
+bool bookmark_load_menu(void)
 {
     bool success = true;
     int  offset;
@@ -628,6 +595,8 @@ static char* select_bookmark(const char* bookmark_file_name)
     int bookmark_count = 0;
 
 #ifdef HAVE_LCD_BITMAP
+    int x = lcd_getxmargin();
+    int y = lcd_getymargin();
     lcd_setmargins(0, 0);
 #endif
 
@@ -711,6 +680,9 @@ static char* select_bookmark(const char* bookmark_file_name)
 #endif
 #ifdef SETTINGS_OK2
             case SETTINGS_OK2:
+#endif
+#ifdef HAVE_LCD_BITMAP
+                lcd_setmargins(x, y);
 #endif
                 return NULL;
 
@@ -1139,6 +1111,31 @@ static bool generate_bookmark_file_name(const char *in)
     }
 
     return true;
+}
+
+/* ----------------------------------------------------------------------- */
+/* Returns the bookmark name for the current playlist                      */
+/* ----------------------------------------------------------------------- */
+bool bookmark_exist(void)
+{
+    bool exist=false;
+
+    if(system_check())
+    {
+        char* name = playlist_get_name(NULL, global_temp_buffer,
+                                       sizeof(global_temp_buffer));
+        if (generate_bookmark_file_name(name))
+        {
+            int fd=open(global_bookmark_file_name, O_RDONLY);
+            if (fd >=0)
+            {
+                close(fd);
+                exist=true;
+            }
+        }
+    }
+
+    return exist;
 }
 
 /* ----------------------------------------------------------------------- */

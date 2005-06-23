@@ -45,10 +45,67 @@
 #include "onplay.h"
 #include "filetypes.h"
 #include "plugin.h"
+#include "bookmark.h"
+#include "wps.h"
+#include "action.h"
+#ifdef HAVE_LCD_BITMAP
+#include "icons.h"
+#endif
 
+#define DEFAULT_PLAYLIST_NAME "/dynamic.m3u"
+
+static int context;
 static char* selected_file = NULL;
 static int selected_file_attr = 0;
 static int onplay_result = ONPLAY_OK;
+
+/* For playlist options */
+struct playlist_args {
+    int position;
+    bool queue;
+};
+
+/* ----------------------------------------------------------------------- */
+/* Displays the bookmark menu options for the user to decide.  This is an  */
+/* interface function.                                                     */
+/* ----------------------------------------------------------------------- */
+bool bookmark_menu(void)
+{
+    int i,m;
+    bool result;
+    struct menu_item items[3];
+
+    i=0;
+
+    if ((audio_status() & AUDIO_STATUS_PLAY))
+    {
+        items[i].desc = ID2P(LANG_BOOKMARK_MENU_CREATE);
+        items[i].function = bookmark_create_menu;
+        i++;
+
+        if (bookmark_exist())
+        {
+            items[i].desc = ID2P(LANG_BOOKMARK_MENU_LIST);
+            items[i].function = bookmark_load_menu;
+            i++;
+        }
+    }
+
+    m=menu_init( items, i, NULL, NULL, NULL, NULL );
+
+#ifdef HAVE_LCD_CHARCELLS
+    status_set_param(true);
+#endif
+    result = menu_run(m);
+#ifdef HAVE_LCD_CHARCELLS
+    status_set_param(false);
+#endif
+    menu_exit(m);
+
+    settings_save();
+
+    return result;
+}
 
 static bool list_viewers(void)
 {
@@ -70,17 +127,28 @@ static bool list_viewers(void)
         splash(HZ*2, true, "No viewers found");
     }
 
-    if(ret == PLUGIN_USB_CONNECTED)
-       onplay_result = ONPLAY_RELOAD_DIR;
+    if (ret == PLUGIN_USB_CONNECTED)
+        onplay_result = ONPLAY_RELOAD_DIR;
 
     return false;
 }
 
-/* For playlist options */
-struct playlist_args {
-    int position;
-    bool queue;
-};
+static bool save_playlist(void)
+{
+    char filename[MAX_PATH+1];
+
+    strncpy(filename, DEFAULT_PLAYLIST_NAME, sizeof(filename));
+
+    if (!kbd_input(filename, sizeof(filename)))
+    {
+        playlist_save(NULL, filename);
+
+        /* reload in case playlist was saved to cwd */
+        onplay_result = ONPLAY_RELOAD_DIR;
+    }
+
+    return false;
+}
 
 static bool add_to_playlist(int position, bool queue)
 {
@@ -168,12 +236,13 @@ static bool view_playlist(void)
 /* Sub-menu for playlist options */
 static bool playlist_options(void)
 {
-    struct menu_item items[7]; 
-    struct playlist_args args[7]; /* increase these 2 if you add entries! */
+    struct menu_item items[10]; 
+    struct playlist_args args[10]; /* increase these 2 if you add entries! */
     int m, i=0, pstart=0, result;
     bool ret = false;
 
-    if ((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_M3U)
+    if ((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_M3U &&
+        context == CONTEXT_TREE)
     {
         items[i].desc = ID2P(LANG_VIEW);
         items[i].function = view_playlist;
@@ -183,43 +252,64 @@ static bool playlist_options(void)
 
     if (audio_status() & AUDIO_STATUS_PLAY)
     {
-        items[i].desc = ID2P(LANG_INSERT);
-        args[i].position = PLAYLIST_INSERT;
-        args[i].queue = false;
+        items[i].desc = ID2P(LANG_VIEW_DYNAMIC_PLAYLIST);
+        items[i].function = playlist_viewer;
         i++;
+        pstart++;
         
-        items[i].desc = ID2P(LANG_INSERT_FIRST);
-        args[i].position = PLAYLIST_INSERT_FIRST;
-        args[i].queue = false;
+        items[i].desc = ID2P(LANG_SAVE_DYNAMIC_PLAYLIST);
+        items[i].function = save_playlist;
         i++;
-        
-        items[i].desc = ID2P(LANG_INSERT_LAST);
-        args[i].position = PLAYLIST_INSERT_LAST;
-        args[i].queue = false;
-        i++;
-        
-        items[i].desc = ID2P(LANG_QUEUE);
-        args[i].position = PLAYLIST_INSERT;
-        args[i].queue = true;
-        i++;
-        
-        items[i].desc = ID2P(LANG_QUEUE_FIRST);
-        args[i].position = PLAYLIST_INSERT_FIRST;
-        args[i].queue = true;
-        i++;
-        
-        items[i].desc = ID2P(LANG_QUEUE_LAST);
-        args[i].position = PLAYLIST_INSERT_LAST;
-        args[i].queue = true;
-        i++;
+        pstart++;
     }
-    else if (((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_MPA) ||
-             (selected_file_attr & ATTR_DIRECTORY))
+       
+    if (context == CONTEXT_TREE)
     {
-        items[i].desc = ID2P(LANG_INSERT);
-        args[i].position = PLAYLIST_INSERT;
-        args[i].queue = false;
+        items[i].desc = ID2P(LANG_CREATE_PLAYLIST);
+        items[i].function = create_playlist;
         i++;
+        pstart++;
+
+        if (audio_status() & AUDIO_STATUS_PLAY)
+        {
+            items[i].desc = ID2P(LANG_INSERT);
+            args[i].position = PLAYLIST_INSERT;
+            args[i].queue = false;
+            i++;
+
+            items[i].desc = ID2P(LANG_INSERT_FIRST);
+            args[i].position = PLAYLIST_INSERT_FIRST;
+            args[i].queue = false;
+            i++;
+
+            items[i].desc = ID2P(LANG_INSERT_LAST);
+            args[i].position = PLAYLIST_INSERT_LAST;
+            args[i].queue = false;
+            i++;
+
+            items[i].desc = ID2P(LANG_QUEUE);
+            args[i].position = PLAYLIST_INSERT;
+            args[i].queue = true;
+            i++;
+
+            items[i].desc = ID2P(LANG_QUEUE_FIRST);
+            args[i].position = PLAYLIST_INSERT_FIRST;
+            args[i].queue = true;
+            i++;
+
+            items[i].desc = ID2P(LANG_QUEUE_LAST);
+            args[i].position = PLAYLIST_INSERT_LAST;
+            args[i].queue = true;
+            i++;
+        }
+        else if (((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_MPA) ||
+                 (selected_file_attr & ATTR_DIRECTORY))
+        {
+            items[i].desc = ID2P(LANG_INSERT);
+            args[i].position = PLAYLIST_INSERT;
+            args[i].queue = false;
+            i++;
+        }
     }
 
     m = menu_init( items, i, NULL, NULL, NULL, NULL );
@@ -385,11 +475,11 @@ bool create_dir(void)
 
     pathlen = strlen(dirname);
     rc = kbd_input(dirname + pathlen, (sizeof dirname)-pathlen);
-    if(rc < 0)
+    if (rc < 0)
         return false;
 
     rc = mkdir(dirname, 0);
-    if(rc < 0) {
+    if (rc < 0) {
         splash(HZ, true, "%s %s", str(LANG_CREATE_DIR), str(LANG_FAILED));
     } else {
         onplay_result = ONPLAY_RELOAD_DIR;
@@ -398,24 +488,38 @@ bool create_dir(void)
     return true;
 }
 
-int onplay(char* file, int attr)
+int onplay(char* file, int attr, int from)
 {
-    struct menu_item items[6]; /* increase this if you add entries! */
+    struct menu_item items[8]; /* increase this if you add entries! */
     int m, i=0, result;
 
     onplay_result = ONPLAY_OK;
+    context=from;
+    selected_file = file;
+    selected_file_attr = attr;
 
-    if(file)
+    if (context == CONTEXT_WPS ||
+        context == CONTEXT_TREE ||
+        context == CONTEXT_ID3DB)
     {
-        selected_file = file;
-        selected_file_attr = attr;
-        
-        if (((attr & TREE_ATTR_MASK) == TREE_ATTR_MPA) ||
-            (attr & ATTR_DIRECTORY) ||
-            ((attr & TREE_ATTR_MASK) == TREE_ATTR_M3U))
+        if ((audio_status() & AUDIO_STATUS_PLAY))
         {
-            items[i].desc = ID2P(LANG_PLAYLIST);
-            items[i].function = playlist_options;
+            items[i].desc = ID2P(LANG_BOOKMARK_MENU);
+            items[i].function = bookmark_menu;
+            i++;
+        }
+
+        items[i].desc = ID2P(LANG_PLAYLIST);
+        items[i].function = playlist_options;
+        i++;
+    }
+
+    if (file)
+    {
+        if (context == CONTEXT_WPS)
+        {
+            items[i].desc = ID2P(LANG_MENU_SHOW_ID3_INFO);
+            items[i].function = browse_id3;
             i++;
         }
         
@@ -423,11 +527,14 @@ int onplay(char* file, int attr)
         if (!(attr & ATTR_VOLUME)) /* no rename+delete for volumes */
 #endif
         {
-            items[i].desc = ID2P(LANG_RENAME);
-            items[i].function = rename_file;
-            i++;
-        
-            if (!(attr & ATTR_DIRECTORY))
+            if (context == CONTEXT_TREE)
+            {
+                items[i].desc = ID2P(LANG_RENAME);
+                items[i].function = rename_file;
+                i++;
+            }
+
+            if (!(attr & ATTR_DIRECTORY) && context == CONTEXT_TREE)
             {
                 items[i].desc = ID2P(LANG_DELETE);
                 items[i].function = delete_file;
@@ -435,13 +542,16 @@ int onplay(char* file, int attr)
             }
             else
             {
-                items[i].desc = ID2P(LANG_DELETE_DIR);
-                items[i].function = delete_dir;
-                i++;
+                if (context == CONTEXT_TREE)
+                {
+                    items[i].desc = ID2P(LANG_DELETE_DIR);
+                    items[i].function = delete_dir;
+                    i++;
+                }
             }
         }
 
-        if (!(attr & ATTR_DIRECTORY))
+        if (!(attr & ATTR_DIRECTORY) && attr)
         {
             items[i].desc = ID2P(LANG_ONPLAY_OPEN_WITH);
             items[i].function = list_viewers;
@@ -449,16 +559,30 @@ int onplay(char* file, int attr)
         }
     }
 
-    items[i].desc = ID2P(LANG_CREATE_DIR);
-    items[i].function = create_dir;
-    i++;
+    if (context == CONTEXT_TREE)
+    {
+        items[i].desc = ID2P(LANG_CREATE_DIR);
+        items[i].function = create_dir;
+        i++;
+    }
 
     /* DIY menu handling, since we want to exit after selection */
-    m = menu_init( items, i, NULL, NULL, NULL, NULL );
-    result = menu_show(m);
-    if (result >= 0)
-        items[result].function();
-    menu_exit(m);
+    button_clear_queue();
+    if (i)
+    {
+        m = menu_init( items, i, NULL, NULL, NULL, NULL );
+        result = menu_show(m);
+        if (result >= 0)
+            items[result].function();
+        menu_exit(m);
+
+#ifdef HAVE_LCD_BITMAP
+        if (global_settings.statusbar)
+            lcd_setmargins(0, STATUSBAR_HEIGHT);
+        else
+            lcd_setmargins(0, 0);
+#endif
+    }
 
     return onplay_result;
 }

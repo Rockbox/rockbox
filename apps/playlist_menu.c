@@ -20,33 +20,12 @@
 #include <string.h>
 
 #include "menu.h"
-#include "file.h"
 #include "keyboard.h"
 #include "playlist.h"
 #include "tree.h"
 #include "settings.h"
-#include "playlist_viewer.h"
 #include "talk.h"
 #include "lang.h"
-
-#define DEFAULT_PLAYLIST_NAME "/dynamic.m3u"
-
-static bool save_playlist(void)
-{
-    char filename[MAX_PATH+1];
-
-    strncpy(filename, DEFAULT_PLAYLIST_NAME, sizeof(filename));
-
-    if (!kbd_input(filename, sizeof(filename)))
-    {
-        playlist_save(NULL, filename);
-        
-        /* reload in case playlist was saved to cwd */
-        reload_directory();
-    }
-
-    return false;
-}
 
 static bool recurse_directory(void)
 {
@@ -67,9 +46,6 @@ bool playlist_menu(void)
     bool result;
 
     static const struct menu_item items[] = {
-        { ID2P(LANG_CREATE_PLAYLIST),       create_playlist   },
-        { ID2P(LANG_VIEW_DYNAMIC_PLAYLIST), playlist_viewer   },
-        { ID2P(LANG_SAVE_DYNAMIC_PLAYLIST), save_playlist     },
         { ID2P(LANG_RECURSE_DIRECTORY),     recurse_directory },
     };
 

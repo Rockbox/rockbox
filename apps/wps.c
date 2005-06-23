@@ -50,6 +50,7 @@
 #include "bookmark.h"
 #include "misc.h"
 #include "sound.h"
+#include "onplay.h"
 
 #define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
                                 /* 3% of 30min file == 54s step size */
@@ -472,6 +473,12 @@ long wps_show(void)
 
         switch(button)
         {
+#ifdef WPS_CONTEXT
+            case WPS_CONTEXT:
+                onplay(id3->path, TREE_ATTR_MPA, CONTEXT_WPS);
+                restore = true;
+                break;
+#endif
 #ifdef WPS_RC_BROWSE
             case WPS_RC_BROWSE:
 #endif
@@ -502,6 +509,14 @@ long wps_show(void)
             case WPS_PAUSE:
 #ifdef WPS_RC_PAUSE
             case WPS_RC_PAUSE:
+#endif
+#ifdef WPS_PAUSE_PRE
+                if ((lastbutton != WPS_PAUSE_PRE)
+#ifdef WPS_RC_PAUSE_PRE
+                    && (lastbutton != WPS_RC_PAUSE_PRE)
+#endif
+                    )
+                    break;
 #endif
                 if ( paused )
                 {
