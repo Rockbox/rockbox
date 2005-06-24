@@ -8,13 +8,12 @@
  * $Id$
  *
  *
- * Copyright (C) 2003 Jörg Hohensohn
+ * Copyright (C) 2003-2005 Jörg Hohensohn
  *
  * Alpine CD changer Project
  * This is a feasibility study for Archos emulating an Alpine M-Bus CD changer.
  * 
- * Currently realized as a plugin, which can't control the mp3 playback.
- * It "just" follows all radio commands and answers accordingly.
+ * Currently it will do seeks and change tracks, but nothing like disks.
  * The debug version shows a dump of the M-Bus communication on screen.
  *
  * Usage: Start plugin, it will stay in the background and do the emulation.
