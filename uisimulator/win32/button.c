@@ -143,7 +143,7 @@ void button_event(int key, bool pressed)
     if (pressed)
         btn |= new_btn;
     else
-        btn &= !new_btn;
+        btn &= ~new_btn;
 
     /* Lots of stuff copied from real button.c. Not good, I think... */
 
