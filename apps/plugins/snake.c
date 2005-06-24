@@ -142,7 +142,9 @@ void frame (void)
                 default:
                     if (board[x][y]==snakelength) {
                         board[x][y]=0;
-                        rb->lcd_clearrect(x*4,y*4,4,4);
+                        rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                        rb->lcd_fillrect(x*4,y*4,4,4);
+                        rb->lcd_set_drawmode(DRMODE_SOLID);
                     }
                     else 
                         board[x][y]++;

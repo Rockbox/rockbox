@@ -154,7 +154,9 @@ static void draw_calendar(struct shown *shown)
         rb->lcd_putsxy(ws, (row * h) + 5 ,buffer);
         if (shown->mday == j)
         {
-            rb->lcd_invertrect(ws, row*h+5, space, h);
+            rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+            rb->lcd_fillrect(ws, row*h+5, space, h);
+            rb->lcd_set_drawmode(DRMODE_SOLID);
             shown->wday = pos;
         }
         ws += space;
@@ -520,7 +522,9 @@ static void show_lines(int selected, struct shown *shown)
         k++;
         i++;
     }
-    rb->lcd_invertrect(0, (pos) * h, LCD_WIDTH, h);
+    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+    rb->lcd_fillrect(0, (pos) * h, LCD_WIDTH, h);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
 }
 
 static void update_memos_shown(struct shown *shown)

@@ -115,9 +115,19 @@ extern void lcd_jump_scroll_delay(int ms);
 
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
 
+/* draw modes */
+#define DRMODE_COMPLEMENT 0
+#define DRMODE_BG         1
+#define DRMODE_FG         2
+#define DRMODE_SOLID      3
+#define DRMODE_INVERSEVID 4 /* used as bit modifier for basic modes */
+
 #define DRAW_PIXEL(x,y) lcd_framebuffer[(y)/8][(x)] |= (1<<((y)&7))
 #define CLEAR_PIXEL(x,y) lcd_framebuffer[(y)/8][(x)] &= ~(1<<((y)&7))
 #define INVERT_PIXEL(x,y) lcd_framebuffer[(y)/8][(x)] ^= (1<<((y)&7))
+
+typedef void tLCDPixelFunc(int x, int y); /* for b&w */
+typedef void tLCDBlockFunc(unsigned char *address, unsigned mask, unsigned bits);
 
 /* Memory copy of display bitmap */
 extern unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
@@ -125,23 +135,25 @@ extern unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
 extern void lcd_set_invert_display(bool yesno);
 extern void lcd_set_flip(bool yesno);
 extern void lcd_roll(int pixels);
+
+extern void lcd_set_drawmode(int mode);
+extern int  lcd_get_drawmode(void);
 extern void lcd_setmargins(int xmargin, int ymargin);
 extern int  lcd_getxmargin(void);
 extern int  lcd_getymargin(void);
 extern void lcd_setfont(int font);
 extern int  lcd_getstringsize(const unsigned char *str, int *w, int *h);
+
 extern void lcd_drawpixel(int x, int y);
-extern void lcd_clearpixel(int x, int y);
-extern void lcd_invertpixel(int x, int y);
 extern void lcd_drawline(int x1, int y1, int x2, int y2);
-extern void lcd_clearline(int x1, int y1, int x2, int y2);
-extern void lcd_drawrect(int x, int y, int nx, int ny);
-extern void lcd_clearrect(int x, int y, int nx, int ny);
-extern void lcd_fillrect(int x, int y, int nx, int ny);
-extern void lcd_invertrect(int x, int y, int nx, int ny);
+extern void lcd_hline(int x1, int x2, int y);
+extern void lcd_vline(int x, int y1, int y2);
+extern void lcd_drawrect(int x, int y, int width, int height);
+extern void lcd_fillrect(int x, int y, int width, int height);
 extern void lcd_bitmap(const unsigned char *src, int x, int y, int nx, int ny,
 			bool clear);
 extern void lcd_putsxy(int x, int y, const unsigned char *string);
+
 extern void lcd_invertscroll(int x, int y);
 extern void lcd_bidir_scroll(int threshold);
 extern void lcd_scroll_step(int pixels);

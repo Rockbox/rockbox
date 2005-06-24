@@ -210,7 +210,9 @@ static void update_data(void)
 
     rb->lcd_getstringsize(buf, &w, &h);
 
-    rb->lcd_clearrect(0, 0, LCD_WIDTH, h);
+    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    rb->lcd_fillrect(0, 0, LCD_WIDTH, h);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
     rb->lcd_puts(0, 0, buf);
     rb->lcd_update_rect(0, 0, LCD_WIDTH, h);
 }
@@ -253,7 +255,9 @@ int splitedit_get_loop_mode(void)
  */
 static void update_icons(void)
 {
-    rb->lcd_clearrect(0, LCD_HEIGHT - BMPHEIGHT, LCD_WIDTH, BMPHEIGHT);
+    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    rb->lcd_fillrect(0, LCD_HEIGHT - BMPHEIGHT, LCD_WIDTH, BMPHEIGHT);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
 
     /* The CUT icon */
     rb->lcd_bitmap(CUT_BMP,
@@ -380,9 +384,11 @@ void splitedit_set_split_x(int newx)
     /* remove old split point from screen, only if moved */
     if (split_x != newx)
     {
-        rb->lcd_invertrect (minx, OSCI_Y, 5, 1);
-        rb->lcd_invertrect (split_x-1 > 0 ? split_x - 1: 0, OSCI_Y + 1, 3, 1);
-        rb->lcd_invertrect (split_x, OSCI_Y + 2, 1, OSCI_HEIGHT - 2);
+        rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+        rb->lcd_fillrect(minx, OSCI_Y, 5, 1);
+        rb->lcd_fillrect(split_x-1 > 0 ? split_x - 1: 0, OSCI_Y + 1, 3, 1);
+        rb->lcd_fillrect(split_x, OSCI_Y + 2, 1, OSCI_HEIGHT - 2);
+        rb->lcd_set_drawmode(DRMODE_SOLID);
         rb->lcd_update_rect(minx, OSCI_Y, 5, OSCI_HEIGHT);
     }
 
@@ -398,9 +404,11 @@ void splitedit_set_split_x(int newx)
 
     /* display new split point */
     minx = split_x - 2 > 0 ? split_x - 2: 0;
-    rb->lcd_invertrect (minx, OSCI_Y, 5, 1);
-    rb->lcd_invertrect (split_x - 1 > 0 ? split_x - 1: 0, OSCI_Y + 1, 3, 1);
-    rb->lcd_invertrect (split_x, OSCI_Y + 2, 1, OSCI_HEIGHT - 2);
+    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+    rb->lcd_fillrect(minx, OSCI_Y, 5, 1);
+    rb->lcd_fillrect(split_x - 1 > 0 ? split_x - 1: 0, OSCI_Y + 1, 3, 1);
+    rb->lcd_fillrect(split_x, OSCI_Y + 2, 1, OSCI_HEIGHT - 2);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
     rb->lcd_update_rect(minx, OSCI_Y, 5, OSCI_HEIGHT);
 }
 
@@ -417,7 +425,9 @@ int splitedit_get_split_x(void)
  */
 static void update_osci(void)
 {
-    rb->lcd_clearrect(OSCI_X, OSCI_Y, OSCI_WIDTH, OSCI_HEIGHT);
+    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    rb->lcd_fillrect(OSCI_X, OSCI_Y, OSCI_WIDTH, OSCI_HEIGHT);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
     redraw_osci();
     splitedit_set_split_x(splitedit_get_split_x());
     rb->lcd_update_rect(OSCI_X, OSCI_Y, OSCI_WIDTH, OSCI_HEIGHT);
@@ -485,7 +495,9 @@ static void scroll(struct mp3entry *mp3)
  */
 void splitedit_zoom_in(struct mp3entry *mp3)
 {
-    rb->lcd_clearrect(OSCI_X, OSCI_Y, OSCI_WIDTH, OSCI_HEIGHT);
+    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    rb->lcd_fillrect(OSCI_X, OSCI_Y, OSCI_WIDTH, OSCI_HEIGHT);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
     zoom(mp3, 3, 4);
     rb->lcd_update_rect(OSCI_X, OSCI_Y, LCD_WIDTH, OSCI_HEIGHT);
     update_osci();
@@ -497,7 +509,9 @@ void splitedit_zoom_in(struct mp3entry *mp3)
  */
 void splitedit_zoom_out(struct mp3entry *mp3)
 {
-    rb->lcd_clearrect(OSCI_X, OSCI_Y, LCD_WIDTH, OSCI_HEIGHT);
+    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    rb->lcd_fillrect(OSCI_X, OSCI_Y, LCD_WIDTH, OSCI_HEIGHT);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
     zoom(mp3, 4, 3);
     rb->lcd_update_rect(OSCI_X, OSCI_Y, LCD_WIDTH, OSCI_HEIGHT);
     update_osci();
@@ -823,7 +837,9 @@ static void save_editor(struct mp3entry *mp3, int splittime)
 
             case SE_SAVE:
                 rb->lcd_stop_scroll();
-                rb->lcd_clearrect(0, 6*8, LCD_WIDTH, LCD_HEIGHT);
+                rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                rb->lcd_fillrect(0, 6*8, LCD_WIDTH, LCD_HEIGHT);
+                rb->lcd_set_drawmode(DRMODE_SOLID);
                 saved = save
                 (
                     mp3,
@@ -919,7 +935,9 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 }
 
                 /* make room */
-                rb->lcd_clearrect(lastx + 1, OSCI_Y, x - lastx, OSCI_HEIGHT);
+                rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                rb->lcd_fillrect(lastx + 1, OSCI_Y, x - lastx, OSCI_HEIGHT);
+                rb->lcd_set_drawmode(DRMODE_SOLID);
                 /* draw a value */
                 if (osci_buffer[x - OSCI_X] > 0)
                 {
@@ -937,8 +955,10 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 /* mark the current position */
                 if (lastx != x)
                 {
-                    rb->lcd_invertrect(lastx, OSCI_Y, 1, OSCI_HEIGHT);
-                    rb->lcd_invertrect(x, OSCI_Y, 1, OSCI_HEIGHT);
+                    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+                    rb->lcd_fillrect(lastx, OSCI_Y, 1, OSCI_HEIGHT);
+                    rb->lcd_fillrect(x, OSCI_Y, 1, OSCI_HEIGHT);
+                    rb->lcd_set_drawmode(DRMODE_SOLID);
                 }
 
                 /* mark the split point */
@@ -946,11 +966,13 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 {
                     if ((lastx < split_x) && (x >= split_x))
                     {
-                        rb->lcd_invertrect
+                        rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+                        rb->lcd_fillrect
                         (
                             split_x, OSCI_Y + 2,
                             1, OSCI_HEIGHT - 2
                         );
+                        rb->lcd_set_drawmode(DRMODE_SOLID);
                     }
                     rb->lcd_drawline(split_x -2, OSCI_Y, split_x + 2, OSCI_Y);
                     rb->lcd_drawline(split_x-1, OSCI_Y+1, split_x +1,OSCI_Y+1);

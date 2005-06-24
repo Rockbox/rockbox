@@ -98,7 +98,7 @@ void roll_credits(void)
 
     int height;
     int width;
-
+    
     lcd_setfont(FONT_UI);
 
     lcd_getstringsize("A", &width, &height);
@@ -109,7 +109,9 @@ void roll_credits(void)
             lcd_putsxy(0, i*height+y, line+i<numnames?credits[line+i]:"");
         snprintf(buffer, sizeof(buffer), " [Credits] %2d/%2d  ",
                  line+1, numnames);
-        lcd_clearrect(0, 0, LCD_WIDTH, height);
+        lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        lcd_fillrect(0, 0, LCD_WIDTH, height);
+        lcd_set_drawmode(DRMODE_SOLID);
         lcd_putsxy(0, 0, buffer);
         lcd_update();
 
@@ -126,6 +128,5 @@ void roll_credits(void)
         }
 
     }
-    return;
 }
 #endif

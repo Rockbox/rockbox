@@ -65,7 +65,6 @@ static int  drawMode = DRAW_MODE_FILLED;
 void cleanup(void *parameter)
 {
     (void)parameter;
-    
     /* restore to default roll position.
        Looks funny if you forget to do this... */
     rb->lcd_roll(0);
@@ -91,13 +90,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     int  lastLeft = 0;
     int  lastRight = 0;
     int  lasty = 0;
-
+    
     bool exit = false;
 
     TEST_PLUGIN_API(api);
     (void)parameter;
     rb = api;
-
+    
     /* the main loop */
     while (!exit) {
 
@@ -106,8 +105,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         right = rb->mas_codec_readreg(0xD) / (MAX_PEAK / (LCD_WIDTH / 2 - 2));
 
         /* delete current line */
-        rb->lcd_clearline(0, y, LCD_WIDTH-1, y);
+        rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        rb->lcd_drawline(0, y, LCD_WIDTH-1, y);
 
+        rb->lcd_set_drawmode(DRMODE_SOLID);
         switch (drawMode) {
             case DRAW_MODE_FILLED:
                 rb->lcd_drawline(LCD_WIDTH / 2 + 1        , y, 

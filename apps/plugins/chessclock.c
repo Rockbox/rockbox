@@ -216,7 +216,11 @@ static void show_pause_mode(bool enabled)
     if (enabled)
         rb->lcd_bitmap(pause_icon, 52, 0, 7, 8, true);
     else
-        rb->lcd_clearrect(52, 0, 7, 8);
+    {
+        rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        rb->lcd_fillrect(52, 0, 7, 8);
+        rb->lcd_set_drawmode(DRMODE_SOLID);
+    }
 }
 #endif
 

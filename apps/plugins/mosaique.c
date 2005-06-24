@@ -63,6 +63,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_clear_display();
+    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
 #else
     if (!pgfx_init(rb, 4, 2))
     {
@@ -101,10 +102,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         }
 
 #ifdef HAVE_LCD_BITMAP
-        rb->lcd_invertrect(LARGE-x, HAUT-y, 2*x+1, 1);
-        rb->lcd_invertrect(LARGE-x, HAUT+y, 2*x+1, 1);
-        rb->lcd_invertrect(LARGE-x, HAUT-y+1, 1, 2*y-1);
-        rb->lcd_invertrect(LARGE+x, HAUT-y+1, 1, 2*y-1);
+        rb->lcd_fillrect(LARGE-x, HAUT-y, 2*x+1, 1);
+        rb->lcd_fillrect(LARGE-x, HAUT+y, 2*x+1, 1);
+        rb->lcd_fillrect(LARGE-x, HAUT-y+1, 1, 2*y-1);
+        rb->lcd_fillrect(LARGE+x, HAUT-y+1, 1, 2*y-1);
         rb->lcd_update();
 #else
         pgfx_invertrect(LARGE-x, HAUT-y, 2*x+1, 1);
@@ -120,7 +121,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         switch (button)
         {
             case MOSAIQUE_QUIT:
-#ifdef HAVE_LCD_CHARCELLS
+#ifdef HAVE_LCD_BITMAP
+                rb->lcd_set_drawmode(DRMODE_SOLID);
+#else
                 pgfx_release();
 #endif
                 return PLUGIN_OK;
@@ -148,7 +151,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             default:
                 if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
                 {
-#ifdef HAVE_LCD_CHARCELLS
+#ifdef HAVE_LCD_BITMAP
+                    rb->lcd_set_drawmode(DRMODE_SOLID);
+#else
                     pgfx_release();
 #endif
                     return PLUGIN_USB_CONNECTED;

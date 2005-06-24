@@ -87,11 +87,11 @@ static const struct plugin_api rockbox_api = {
     plugin_test,
     
     /* lcd */
+    lcd_set_contrast,
     lcd_clear_display,
     lcd_puts,
     lcd_puts_scroll,
     lcd_stop_scroll,
-    lcd_set_contrast,
 #ifdef HAVE_LCD_CHARCELLS
     lcd_define_pattern,
     lcd_get_locked_pattern,
@@ -101,30 +101,28 @@ static const struct plugin_api rockbox_api = {
     lcd_remove_cursor,
     PREFIX(lcd_icon),
 #else
+#ifndef SIMULATOR
+    lcd_roll,
+#endif
+    lcd_set_drawmode,
+    lcd_get_drawmode,
+    lcd_setfont,
+    lcd_getstringsize,
+    lcd_drawpixel,
+    lcd_drawline,
+    lcd_drawrect,
+    lcd_fillrect,
+    lcd_bitmap,
     lcd_putsxy,
     lcd_puts_style,
     lcd_puts_scroll_style,
-    lcd_bitmap,
-    lcd_drawline,
-    lcd_clearline,
-    lcd_drawpixel,
-    lcd_clearpixel,
-    lcd_setfont,
-    font_get,
-    lcd_clearrect,
-    lcd_fillrect,
-    lcd_drawrect,
-    lcd_invertrect,
-    lcd_getstringsize,
+    &lcd_framebuffer[0][0],
+    lcd_blit,
     lcd_update,
     lcd_update_rect,
     scrollbar,
     checkbox,
-    &lcd_framebuffer[0][0],
-    lcd_blit,
-#ifndef SIMULATOR
-    lcd_roll,
-#endif
+    font_get,
 #endif
     backlight_on,
     backlight_off,
@@ -395,6 +393,9 @@ int plugin_load(const char* plugin, void* parameter)
     /* explicitly casting the pointer here to avoid touching every plugin. */
 
     button_clear_queue();
+#ifdef HAVE_LCD_BITMAP
+    lcd_set_drawmode(DRMODE_SOLID);
+#endif
     
     plugin_loaded = false;
 

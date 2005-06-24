@@ -356,12 +356,13 @@ static void select_item(char *title, int curr_item, size_t item_i) {
   x = MENU_X + MENU_ITEM_PAD;
   w = MENU_WIDTH - 2 * MENU_ITEM_PAD;
 
+  rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
   /* if there is a current item, then deselect it */
   if (curr_item >= 0) {
     /* deselect old item */
     y = MENU_Y + h + MENU_ITEM_PAD * 2; /* account for title */
     y += h * curr_item;
-    rb->lcd_invertrect(x, y, w, h);
+    rb->lcd_fillrect(x, y, w, h);
   }
 
   /* select new item */
@@ -370,7 +371,8 @@ static void select_item(char *title, int curr_item, size_t item_i) {
   /* select new item */
   y = MENU_Y + h + MENU_ITEM_PAD * 2; /* account for title */
   y += h * curr_item;
-  rb->lcd_invertrect(x, y, w, h);
+  rb->lcd_fillrect(x, y, w, h);
+  rb->lcd_set_drawmode(DRMODE_SOLID);
 
   /* update the menu window */
   rb->lcd_update_rect(MENU_RECT);
@@ -392,7 +394,9 @@ static void draw_menu(char *title, char **items, size_t num_items)  {
   
   /* draw the outline */
   rb->lcd_fillrect(SHADOW_RECT);
-  rb->lcd_clearrect(MENU_RECT);
+  rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+  rb->lcd_fillrect(MENU_RECT);
+  rb->lcd_set_drawmode(DRMODE_SOLID);
   rb->lcd_drawrect(MENU_RECT);
 
   /* calculate x/y */
@@ -406,8 +410,10 @@ static void draw_menu(char *title, char **items, size_t num_items)  {
     rb->lcd_drawline(MENU_X, i, MENU_X + MENU_WIDTH, i);
 
   /* clear title rect */
-  rb->lcd_clearrect((LCD_WIDTH - w) / 2 - 2, y - 2, w + 4, h);
-  
+  rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+  rb->lcd_fillrect((LCD_WIDTH - w) / 2 - 2, y - 2, w + 4, h);
+  rb->lcd_set_drawmode(DRMODE_SOLID);
+
   /* draw centered title on screen */
   rb->lcd_putsxy((LCD_WIDTH - w)/2, y, title);
   

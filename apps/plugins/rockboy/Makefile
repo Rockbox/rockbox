@@ -8,7 +8,7 @@
 #
 
 INCLUDES = -I$(APPSDIR) -I.. -I. -I$(FIRMDIR)/include -I$(FIRMDIR)/export \
- -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers -I$(BUILDDIR)
+ -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers -I$(OUTDIR) -I$(BUILDDIR)
 CFLAGS = $(GCCOPTS) -O3 $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
  -DMEM=${MEMORYSIZE} -DPLUGIN
 

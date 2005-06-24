@@ -110,13 +110,16 @@ static void draw_frame(int fstart_x,int fstop_x,int fstart_y,int fstop_y)
 static void draw_block(int x, int y, int block, int frame, bool clear)
 {
     int i, a, b;
+
     for(i=0;i < 4;i++) {
         if (clear)
         {
+            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
             for (a = 0; a < 3; a++)
                 for (b = 0; b < 4; b++)
-                    rb->lcd_clearpixel(start_x + x + block_data[block][frame][1][i] * 4 - b,
+                    rb->lcd_drawpixel(start_x + x + block_data[block][frame][1][i] * 4 - b,
                                    start_y + y + block_data[block][frame][0][i] * 3 + a);
+            rb->lcd_set_drawmode(DRMODE_SOLID);
         }
         else
         {
@@ -196,12 +199,19 @@ static bool valid_position(int x, int y, int block, int frame)
 static void from_virtual(void)
 {
     int x,y;
+
     for(y = 0; y < max_y; y++)
         for(x = 1; x < max_x - 1; x++)
             if(*(virtual + (y * max_x) + x) != 0)
+            {
                 rb->lcd_drawpixel(start_x + x, start_y + y);
+            }
             else
-                rb->lcd_clearpixel(start_x + x, start_y + y);
+            {
+                rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                rb->lcd_drawpixel(start_x + x, start_y + y);
+                rb->lcd_set_drawmode(DRMODE_SOLID);
+            }
 }
 
 static void move_block(int x,int y,int f)
@@ -362,7 +372,9 @@ static int game_loop(void)
         
         if(gameover())
         {
-            rb->lcd_clearrect(0, 52, LCD_WIDTH, LCD_HEIGHT - 52);
+            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            rb->lcd_fillrect(0, 52, LCD_WIDTH, LCD_HEIGHT - 52);
+            rb->lcd_set_drawmode(DRMODE_SOLID);
             rb->lcd_putsxy(2, 52, "You lose!");
             rb->lcd_update();
             rb->sleep(HZ * 3);

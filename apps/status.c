@@ -187,7 +187,9 @@ void status_draw(bool force_redraw)
         info.redraw_volume ||
         memcmp(&info, &lastinfo, sizeof(struct status_info)))
     {
-        lcd_clearrect(0,0,LCD_WIDTH,8);
+        lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        lcd_fillrect(0,0,LCD_WIDTH,8);
+        lcd_set_drawmode(DRMODE_SOLID);
 #else
     /* players always "redraw" */
     {
@@ -326,7 +328,9 @@ static void draw_buttonbar_btn(int num, const char* caption)
         lcd_putsxy(xpos + (button_width - text_width)/2, ypos, caption);
     }
     
-    lcd_invertrect(xpos, ypos, button_width - 1, fh);
+    lcd_set_drawmode(DRMODE_COMPLEMENT);
+    lcd_fillrect(xpos, ypos, button_width - 1, fh);
+    lcd_set_drawmode(DRMODE_SOLID);
 }
 
 static char stored_caption1[8];
@@ -363,7 +367,9 @@ void buttonbar_unset(void)
 
 void buttonbar_draw(void)
 {
-    lcd_clearrect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
+    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    lcd_fillrect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
+    lcd_set_drawmode(DRMODE_SOLID);
     draw_buttonbar_btn(0, stored_caption1);
     draw_buttonbar_btn(1, stored_caption2);
     draw_buttonbar_btn(2, stored_caption3);

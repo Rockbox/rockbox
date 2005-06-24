@@ -518,8 +518,11 @@ int solitaire_menu(unsigned char when)
         
         for(i = 0; i<MENU_LENGTH; i++){
             rb->lcd_putsxy(1, 17+fh*i, menu[when][i]);
-            if(cursor == i)
-                rb->lcd_invertrect(0,17+fh*i, LCD_WIDTH, fh);
+            if(cursor == i) {
+                rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+                rb->lcd_fillrect(0,17+fh*i, LCD_WIDTH, fh);
+                rb->lcd_set_drawmode(DRMODE_SOLID);
+            }
         }
 
         rb->lcd_update();
@@ -877,12 +880,15 @@ int solitaire(void){
                 if(c==NOT_A_CARD) {
                     /* draw the cursor on empty columns */
                     if(cur_col == i){
-                        rb->lcd_invertrect(i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+2, 2, CARD_WIDTH-3, CARD_HEIGHT-1);
+                        rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+                        rb->lcd_fillrect(i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+2, 2, CARD_WIDTH-3, CARD_HEIGHT-1);
                     }
                     break;
                 }
                 /* clear the card's spot */
-                rb->lcd_clearrect(i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM, j+1, CARD_WIDTH, CARD_HEIGHT-1);
+                rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                rb->lcd_fillrect(i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM, j+1, CARD_WIDTH, CARD_HEIGHT-1);
+                rb->lcd_set_drawmode(DRMODE_SOLID);
                 /* known card */
                 if(deck[c].known){
                     rb->lcd_bitmap(numbers[deck[c].num], i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+1, j, 8, 8, true);
@@ -896,7 +902,9 @@ int solitaire(void){
                 }
                 /* cursor (or not) */
                 if(c == cur_card){
-                    rb->lcd_invertrect(i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+1, j+1, CARD_WIDTH-1, CARD_HEIGHT-1);
+                    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+                    rb->lcd_fillrect(i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+1, j+1, CARD_WIDTH-1, CARD_HEIGHT-1);
+                    rb->lcd_set_drawmode(DRMODE_SOLID);
                     /* go to the next card */
                     c = deck[c].next;
                     if(c == NOT_A_CARD) break;
@@ -941,7 +949,9 @@ int solitaire(void){
             rb->lcd_drawline(LCD_WIDTH - CARD_WIDTH+1,(i+1)*CARD_HEIGHT,LCD_WIDTH - 1,(i+1)*CARD_HEIGHT);
             /* draw the cursor on one of the stacks */
             if(cur_col == STACKS_COL + i){
-                rb->lcd_invertrect(LCD_WIDTH - CARD_WIDTH+1, i*CARD_HEIGHT + 1, CARD_WIDTH-1, CARD_HEIGHT-1);
+                rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+                rb->lcd_fillrect(LCD_WIDTH - CARD_WIDTH+1, i*CARD_HEIGHT + 1, CARD_WIDTH-1, CARD_HEIGHT-1);
+                rb->lcd_set_drawmode(DRMODE_SOLID);
             }
         }
 
@@ -952,16 +962,18 @@ int solitaire(void){
             rb->lcd_drawline(LCD_WIDTH - CARD_WIDTH+1,LCD_HEIGHT-1,LCD_WIDTH - 1,LCD_HEIGHT-1);
             if(cur_rem != NOT_A_CARD){
                 rb->lcd_bitmap(numbers[deck[cur_rem].num], LCD_WIDTH - CARD_WIDTH+1, LCD_HEIGHT-CARD_HEIGHT, 8, 8, true);
-                 rb->lcd_bitmap(colors[deck[cur_rem].color], LCD_WIDTH - CARD_WIDTH+7, LCD_HEIGHT-CARD_HEIGHT, 8, 8, true);
-                 /* draw a selected card */
-                 if(sel_card == cur_rem){
+                rb->lcd_bitmap(colors[deck[cur_rem].color], LCD_WIDTH - CARD_WIDTH+7, LCD_HEIGHT-CARD_HEIGHT, 8, 8, true);
+                /* draw a selected card */
+                if(sel_card == cur_rem){
                     rb->lcd_drawrect(LCD_WIDTH - CARD_WIDTH+1, LCD_HEIGHT-CARD_HEIGHT,CARD_WIDTH-1, CARD_HEIGHT-1);
-                 }
+                }
             }
         }
         /* draw the cursor */
         if(cur_col == REM_COL){
-            rb->lcd_invertrect(LCD_WIDTH - CARD_WIDTH+1, LCD_HEIGHT-CARD_HEIGHT,CARD_WIDTH-1, CARD_HEIGHT-1);
+            rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+            rb->lcd_fillrect(LCD_WIDTH - CARD_WIDTH+1, LCD_HEIGHT-CARD_HEIGHT,CARD_WIDTH-1, CARD_HEIGHT-1);
+            rb->lcd_set_drawmode(DRMODE_SOLID);
         }
             
 

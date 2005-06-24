@@ -264,7 +264,7 @@ bool dbg_audio_thread(void)
         lcd_puts(0, line++, buf);
 
         /* Playable space left */
-        scrollbar(0, line*8, LCD_WIDTH, 6, codecbuflen, 0, 
+        scrollbar(0, line*8, LCD_WIDTH, 6, codecbuflen, 0,
                   codecbufused, HORIZONTAL);
         line++;
 
@@ -1142,8 +1142,10 @@ bool view_battery(void)
                 x = 0;
                 for (i = BAT_LAST_VAL - 1; i >= 0; i--) {
                     y = (power_history[i] - minv) * BAT_YSPACE / (maxv - minv);
-                    lcd_clearline(x, LCD_HEIGHT-1, x, 20);
-                    lcd_drawline(x, LCD_HEIGHT-1, x, 
+                    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                    lcd_drawline(x, LCD_HEIGHT-1, x, 20);
+                    lcd_set_drawmode(DRMODE_SOLID);
+                    lcd_drawline(x, LCD_HEIGHT-1, x,
                                  MIN(MAX(LCD_HEIGHT-1 - y, 20), LCD_HEIGHT-1));
                     x++;
                 }

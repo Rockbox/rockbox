@@ -394,9 +394,11 @@ void cal_initial (void)
     n = 1;
     prev_m = m;
     prev_n = n;
-    rb->lcd_invertrect( X_0_POS + n*REC_WIDTH + 1,
-                        Y_1_POS + m*REC_HEIGHT + 1,
-                        REC_WIDTH - 1, REC_HEIGHT - 1);
+    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+    rb->lcd_fillrect( X_0_POS + n*REC_WIDTH + 1,
+                      Y_1_POS + m*REC_HEIGHT + 1,
+                      REC_WIDTH - 1, REC_HEIGHT - 1);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
     rb->lcd_update();
 
     /* initial mem and output display*/
@@ -689,13 +691,15 @@ void moveButton(void){
             break;
     }
 
-    rb->lcd_invertrect( X_0_POS + prev_n*REC_WIDTH + 1,
-                        Y_1_POS + prev_m*REC_HEIGHT + 1,
-                        REC_WIDTH - 1, REC_HEIGHT - 1);
+    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+    rb->lcd_fillrect( X_0_POS + prev_n*REC_WIDTH + 1,
+                      Y_1_POS + prev_m*REC_HEIGHT + 1,
+                      REC_WIDTH - 1, REC_HEIGHT - 1);
 
-    rb->lcd_invertrect( X_0_POS + n*REC_WIDTH + 1,
-                        Y_1_POS + m*REC_HEIGHT + 1,
-                        REC_WIDTH - 1, REC_HEIGHT - 1);
+    rb->lcd_fillrect( X_0_POS + n*REC_WIDTH + 1,
+                      Y_1_POS + m*REC_HEIGHT + 1,
+                      REC_WIDTH - 1, REC_HEIGHT - 1);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
 
     rb->lcd_update_rect( X_0_POS + prev_n*REC_WIDTH + 1,
                         Y_1_POS + prev_m*REC_HEIGHT + 1,
@@ -718,9 +722,11 @@ void printButtonGroups(int group)
     for (i = 0; i < 5; i++){
         for (j = 3; j <= 4; j++){
             rb->lcd_getstringsize( buttonChar[group][i][j],&w,&h);
-            rb->lcd_clearrect( X_0_POS + j*REC_WIDTH + 1,
-                               Y_1_POS + i*REC_HEIGHT + 1,
-                               REC_WIDTH - 1, REC_HEIGHT - 1);
+            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            rb->lcd_fillrect( X_0_POS + j*REC_WIDTH + 1,
+                              Y_1_POS + i*REC_HEIGHT + 1,
+                              REC_WIDTH - 1, REC_HEIGHT - 1);
+            rb->lcd_set_drawmode(DRMODE_SOLID);
             rb->lcd_putsxy( X_0_POS + j*REC_WIDTH + (REC_WIDTH - w)/2,
                             TEXT_2_POS + i*REC_HEIGHT,
                             buttonChar[group][i][j] );
@@ -729,17 +735,21 @@ void printButtonGroups(int group)
     for (i = 0; i <= 0; i++){
         for (j = 0; j <= 2; j++){
             rb->lcd_getstringsize( buttonChar[group][i][j],&w,&h);
-            rb->lcd_clearrect( X_0_POS + j*REC_WIDTH + 1,
-                               Y_1_POS + i*REC_HEIGHT + 1,
-                               REC_WIDTH - 1, REC_HEIGHT - 1);
+            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            rb->lcd_fillrect( X_0_POS + j*REC_WIDTH + 1,
+                              Y_1_POS + i*REC_HEIGHT + 1,
+                              REC_WIDTH - 1, REC_HEIGHT - 1);
+            rb->lcd_set_drawmode(DRMODE_SOLID);
             rb->lcd_putsxy( X_0_POS + j*REC_WIDTH + (REC_WIDTH - w)/2,
                             TEXT_2_POS + i*REC_HEIGHT,
                             buttonChar[group][i][j] );
         }
     }
-    rb->lcd_invertrect( X_0_POS + 2*REC_WIDTH + 1,
-                        Y_1_POS + 0*REC_HEIGHT + 1,
-                        REC_WIDTH - 1, REC_HEIGHT - 1);
+    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+    rb->lcd_fillrect( X_0_POS + 2*REC_WIDTH + 1,
+                      Y_1_POS + 0*REC_HEIGHT + 1,
+                      REC_WIDTH - 1, REC_HEIGHT - 1);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
     rb->lcd_update_rect( X_0_POS, Y_1_POS,
                          REC_WIDTH*5, REC_HEIGHT*5);
 }
@@ -750,10 +760,11 @@ void flashButton(int b)
 {
     int i = b/5; int j = b - i*5;
     int k;
+    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
     for (k=1*2;k>0;k--){
-        rb->lcd_invertrect( X_0_POS + j*REC_WIDTH + 1,
-                            Y_1_POS + i*REC_HEIGHT + 1,
-                            REC_WIDTH - 1, REC_HEIGHT - 1);
+        rb->lcd_fillrect( X_0_POS + j*REC_WIDTH + 1,
+                          Y_1_POS + i*REC_HEIGHT + 1,
+                          REC_WIDTH - 1, REC_HEIGHT - 1);
         rb->lcd_update_rect( X_0_POS + j*REC_WIDTH + 1,
                             Y_1_POS + i*REC_HEIGHT + 1,
                             REC_WIDTH - 1, REC_HEIGHT - 1);
@@ -762,6 +773,7 @@ void flashButton(int b)
             rb->sleep(HZ/22);
 
     }
+    rb->lcd_set_drawmode(DRMODE_SOLID);
 }
 
 /* -----------------------------------------------------------------------
@@ -778,7 +790,9 @@ void deleteAnimation(int pos)
 
     for (k=1;k<=4;k++){
         rb->sleep(HZ/32);
-        rb->lcd_clearrect(1+pos*6, TEXT_1_POS, 6, 8);
+        rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        rb->lcd_fillrect(1+pos*6, TEXT_1_POS, 6, 8);
+        rb->lcd_set_drawmode(DRMODE_SOLID);
         rb->lcd_fillrect(1+pos*6+1+k, TEXT_1_POS+k,
                          (5-2*k)>0?(5-2*k):1, (7-2*k)>0?(7-2*k):1 );
         rb->lcd_update_rect(1+pos*6, TEXT_1_POS, 6, 8);

@@ -73,8 +73,11 @@ void print(char *word, int invert) {
     if (printing.font_h*printing.line >= LCD_HEIGHT)
         return;
     rb->lcd_putsxy(printing.font_w*printing.position,printing.font_h*printing.line,word);
-    if(invert)
-        rb->lcd_invertrect(printing.font_w*printing.position,printing.font_h*printing.line,printing.font_w*strlen,printing.font_h);
+    if(invert) {
+        rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+        rb->lcd_fillrect(printing.font_w*printing.position,printing.font_h*printing.line,printing.font_w*strlen,printing.font_h);
+        rb->lcd_set_drawmode(DRMODE_SOLID);
+    }
     rb->lcd_update_rect(printing.font_w*printing.position,printing.font_h*printing.line,printing.font_w*strlen,printing.font_h);
     printing.position=newpos;
 }

@@ -535,9 +535,11 @@ static int make_food(int index) {
 static void clear_food(int index)
 {
     /* remove the old food from the screen */
-    rb->lcd_clearrect(foodx[index] + FIELD_RECT_X, 
-                  foody[index] + FIELD_RECT_Y, 
-                  FOOD_SIZE, FOOD_SIZE);
+    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    rb->lcd_fillrect(foodx[index] + FIELD_RECT_X,
+                     foody[index] + FIELD_RECT_Y,
+                     FOOD_SIZE, FOOD_SIZE);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
 }
 
 /**
@@ -550,11 +552,13 @@ static void draw_food(int index)
 {
     /* draw the food object */
     rb->lcd_fillrect(foodx[index] + FIELD_RECT_X, 
-                 foody[index] + FIELD_RECT_Y, 
-                 FOOD_SIZE, FOOD_SIZE);
-    rb->lcd_clearrect(foodx[index] + FIELD_RECT_X + 1, 
-                  foody[index] + FIELD_RECT_Y + 1, 
-                  FOOD_SIZE - 2, FOOD_SIZE - 2);
+                     foody[index] + FIELD_RECT_Y,
+                     FOOD_SIZE, FOOD_SIZE);
+    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    rb->lcd_fillrect(foodx[index] + FIELD_RECT_X + 1,
+                     foody[index] + FIELD_RECT_Y + 1,
+                     FOOD_SIZE - 2, FOOD_SIZE - 2);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
 }
 
 /**
@@ -742,8 +746,10 @@ static void init_wormlet(void)
     }
 
     /* draw the game field */
-    rb->lcd_invertrect(0, 0, FIELD_RECT_WIDTH + 2, FIELD_RECT_HEIGHT + 2);
-    rb->lcd_invertrect(1, 1, FIELD_RECT_WIDTH, FIELD_RECT_HEIGHT);
+    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+    rb->lcd_fillrect(0, 0, FIELD_RECT_WIDTH + 2, FIELD_RECT_HEIGHT + 2);
+    rb->lcd_fillrect(1, 1, FIELD_RECT_WIDTH, FIELD_RECT_HEIGHT);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
 
     /* make everything visible */
     rb->lcd_update();
@@ -841,12 +847,15 @@ static void draw_worm(struct worm *w)
         rb->lcd_drawpixel(x + FIELD_RECT_X, y + FIELD_RECT_Y);
     }
 
+    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+
     /* clear the space behind the worm */
     x = w->x[w->tail] ;
     y = w->y[w->tail] ;
     if (x >= 0 && x < FIELD_RECT_WIDTH && y >= 0 && y < FIELD_RECT_HEIGHT) {
-        rb->lcd_clearpixel(x + FIELD_RECT_X, y + FIELD_RECT_Y);
+        rb->lcd_drawpixel(x + FIELD_RECT_X, y + FIELD_RECT_Y);
     }
+    rb->lcd_set_drawmode(DRMODE_SOLID);
 }
 
 /**
@@ -1155,7 +1164,9 @@ static void score_board(void)
     char* buf2 = NULL;
     int i;
     int y = 0;
-    rb->lcd_clearrect(FIELD_RECT_WIDTH + 2, 0, LCD_WIDTH - FIELD_RECT_WIDTH - 2, LCD_HEIGHT);
+    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    rb->lcd_fillrect(FIELD_RECT_WIDTH + 2, 0, LCD_WIDTH - FIELD_RECT_WIDTH - 2, LCD_HEIGHT);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
     for (i = 0; i < worm_count; i++) {
         int score = get_score(&worms[i]);
     
@@ -1202,8 +1213,10 @@ static void score_board(void)
         rb->lcd_putsxy(FIELD_RECT_WIDTH + 3, y+8, buf2);
 
         if (!worms[i].alive){
-            rb->lcd_invertrect(FIELD_RECT_WIDTH + 2, y, 
-                               LCD_WIDTH - FIELD_RECT_WIDTH - 2, 17);
+            rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+            rb->lcd_fillrect(FIELD_RECT_WIDTH + 2, y,
+                             LCD_WIDTH - FIELD_RECT_WIDTH - 2, 17);
+            rb->lcd_set_drawmode(DRMODE_SOLID);
         }
         y += 19;
     }

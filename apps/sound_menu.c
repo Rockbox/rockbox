@@ -633,7 +633,9 @@ bool rectrigger(void)
             "%s",
             trig_durations[global_settings.rec_stop_gap]);
 
-        lcd_clearrect(0, stat_height, LCD_WIDTH, LCD_HEIGHT - stat_height);
+        lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        lcd_fillrect(0, stat_height, LCD_WIDTH, LCD_HEIGHT - stat_height);
+        lcd_set_drawmode(DRMODE_SOLID);
         status_draw(true);
 
         /* reselect FONT_SYSFONT as status_draw has changed the font */
@@ -650,8 +652,11 @@ bool rectrigger(void)
             y = stat_height + i * h;
             x = LCD_WIDTH - w;
             lcd_putsxy(x, y, str);
-            if ((int)selected == (i + offset))
-                lcd_invertrect(x, y, w, h);
+            if ((int)selected == (i + offset)) {
+                lcd_set_drawmode(DRMODE_COMPLEMENT);
+                lcd_fillrect(x, y, w, h);
+                lcd_set_drawmode(DRMODE_SOLID);
+            }
         }
 
         scrollbar(0, stat_height,

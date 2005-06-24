@@ -835,7 +835,8 @@ unsigned short peak_meter_scale_value(unsigned short val, int meterwidth){
  *                    width > 3
  * @param int height - The height of the peak meter. height > 3
  */
-void peak_meter_draw(int x, int y, int width, int height) {
+void peak_meter_draw(int x, int y, int width, int height) 
+{
     int left = 0, right = 0;
     static int last_left = 0, last_right = 0;
     int meterwidth = width - 3;
@@ -930,7 +931,9 @@ void peak_meter_draw(int x, int y, int width, int height) {
     }
 
     /* draw the peak meter */
-    lcd_clearrect(x, y, width, height);
+    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    lcd_fillrect(x, y, width, height);
+    lcd_set_drawmode(DRMODE_SOLID);
 
     /* draw left */
     lcd_fillrect (x, y, left, height / 2 - 2 );
@@ -956,17 +959,20 @@ void peak_meter_draw(int x, int y, int width, int height) {
     lcd_drawline(x + meterwidth, y,
                  x + meterwidth, y + height - 2);
     
+    lcd_set_drawmode(DRMODE_COMPLEMENT);
     /* draw dots for scale marks */
     for (i = 0; i < db_scale_count; i++) {
         /* The x-coordinates of interesting scale mark points 
            have been calculated before */
-        lcd_invertpixel(db_scale_lcd_coord[i], y + height / 2 - 1);
+        lcd_drawpixel(db_scale_lcd_coord[i], y + height / 2 - 1);
     }
+
 
 #ifdef HAVE_RECORDING
     if (trig_status != TRIG_OFF) {
         int start_trigx, stop_trigx, ycenter;
 
+        lcd_set_drawmode(DRMODE_SOLID);
         ycenter = y + height / 2;
         /* display threshold value */
         start_trigx = x+peak_meter_scale_value(trig_strt_threshold,meterwidth);
@@ -983,7 +989,8 @@ void peak_meter_draw(int x, int y, int width, int height) {
 #ifdef PM_DEBUG
     /* display a bar to show how many calls to peak_meter_peek 
        have ocurred since the last display */
-    lcd_invertrect(x, y, tmp, 3);
+    lcd_set_drawmode(DRMODE_COMPLEMENT);
+    lcd_fillrect(x, y, tmp, 3);
 
     if (tmp < PEEKS_PER_DRAW_SIZE) {
         peeks_per_redraw[tmp]++;
@@ -996,12 +1003,14 @@ void peak_meter_draw(int x, int y, int width, int height) {
 
     /* display a bar to show how many ticks have passed since 
        the last redraw */
-    lcd_invertrect(x, y + height / 2, current_tick - pm_tick, 2);
+    lcd_fillrect(x, y + height / 2, current_tick - pm_tick, 2);
     pm_tick = current_tick;
 #endif
 
     last_left = left;
     last_right = right;
+
+    lcd_set_drawmode(DRMODE_SOLID);
 }
 
 #ifdef HAVE_RECORDING

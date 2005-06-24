@@ -17,7 +17,7 @@
  *
  ****************************************************************************/
 
-#include <plugin.h>
+#include "plugin.h"
 
 #include "autoconf.h"
 
@@ -50,6 +50,16 @@ void savestate(int fd);
 #define isdigit(c) ((c) >= '0' && (c) <= '9')
 #define isalpha(c) (((c) >= 'a' && (c) <= 'z') || ((c) >= 'A' && ((c) <= 'Z')))
 #define isalnum(c) (isdigit(c) || (isalpha(c)))
+
+/* FIXME: This is a q&d fix for these #defines not being available from
+ * rockbox' lcd.h because rockboy has its own lcd.h. Renaming the file and
+ * adapting the other files produced weird errors I couldn't figure out
+ *    -- amiconn  20050624 -- */
+#define DRMODE_COMPLEMENT 0
+#define DRMODE_BG         1
+#define DRMODE_FG         2
+#define DRMODE_SOLID      3
+#define DRMODE_INVERSEVID 4 /* used as bit modifier for basic modes */
 
 #ifdef SIMULATOR
 #undef opendir

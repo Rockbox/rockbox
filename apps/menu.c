@@ -116,7 +116,7 @@ void put_cursorxy(int x, int y, bool on)
     /* place the cursor */
     if(on) {
 #ifdef HAVE_LCD_BITMAP
-        lcd_bitmap ( bitmap_icons_6x8[Cursor], 
+        lcd_bitmap ( bitmap_icons_6x8[Cursor],
                      xpos, ypos, 4, 8, true);
 #else
         lcd_putc(x, y, CURSOR_CHAR);
@@ -125,7 +125,9 @@ void put_cursorxy(int x, int y, bool on)
     else {
 #if defined(HAVE_LCD_BITMAP)
         /* I use xy here since it needs to disregard the margins */
-        lcd_clearrect (xpos, ypos, 4, 8);
+        lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        lcd_fillrect (xpos, ypos, 4, 8);
+        lcd_set_drawmode(DRMODE_SOLID);
 #else
         lcd_putc(x, y, ' ');
 #endif

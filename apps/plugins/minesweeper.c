@@ -383,8 +383,10 @@ int minesweeper(void)
         }
 
         /* display the cursor */
-        rb->lcd_invertrect(x*8,y*8,8,8);
-    
+        rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+        rb->lcd_fillrect(x*8,y*8,8,8);
+        rb->lcd_set_drawmode(DRMODE_SOLID);
+
         /* update the screen */
         rb->lcd_update();
         

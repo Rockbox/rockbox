@@ -82,8 +82,10 @@ static void snow_move(void)
     for (i=0; i<NUM_PARTICLES; i++) {
         if (particle_exists(i)) {
 #ifdef HAVE_LCD_BITMAP
-            rb->lcd_clearrect(particles[i][0],particles[i][1],
-                              FLAKE_WIDTH,FLAKE_WIDTH);
+            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            rb->lcd_fillrect(particles[i][0],particles[i][1],
+                             FLAKE_WIDTH,FLAKE_WIDTH);
+            rb->lcd_set_drawmode(DRMODE_SOLID);
 #else
             pgfx_clearpixel(particles[i][0],particles[i][1]);
 #endif

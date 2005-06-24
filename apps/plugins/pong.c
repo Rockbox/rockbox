@@ -72,10 +72,14 @@ struct pong {
 
 void singlepad(int x, int y, int set)
 {
-    if(set)
+    if(set) {
         rb->lcd_fillrect(x, y, PAD_WIDTH, PAD_HEIGHT);
-    else
-        rb->lcd_clearrect(x, y, PAD_WIDTH, PAD_HEIGHT);
+    }
+    else {
+        rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        rb->lcd_fillrect(x, y, PAD_WIDTH, PAD_HEIGHT);
+        rb->lcd_set_drawmode(DRMODE_SOLID);
+    }
 }
 
 void pad(struct pong *p, int pad)
@@ -241,7 +245,9 @@ void ball(struct pong *p)
         score(p, 0);
 
     /* clear old position */
-    rb->lcd_clearrect(x, y, BALL_WIDTH, BALL_HEIGTH);
+    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    rb->lcd_fillrect(x, y, BALL_WIDTH, BALL_HEIGTH);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
 
     /* draw the new ball position */
     rb->lcd_fillrect(newx, newy, BALL_WIDTH, BALL_HEIGTH);

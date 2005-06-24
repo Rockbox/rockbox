@@ -94,12 +94,12 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 40
+#define PLUGIN_API_VERSION 41
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 40
+#define PLUGIN_MIN_API_VERSION 41
 
 /* plugin return codes */
 enum plugin_status {
@@ -144,11 +144,11 @@ struct plugin_api {
     int (*plugin_test)(int api_version, int model, int memsize);
 
     /* lcd */
+    void (*lcd_set_contrast)(int x);
     void (*lcd_clear_display)(void);
     void (*lcd_puts)(int x, int y, const unsigned char *string);
     void (*lcd_puts_scroll)(int x, int y, const unsigned char* string);
     void (*lcd_stop_scroll)(void);
-    void (*lcd_set_contrast)(int x);
 #ifdef HAVE_LCD_CHARCELLS
     void (*lcd_define_pattern)(int which,const char *pattern);
     unsigned char (*lcd_get_locked_pattern)(void);
@@ -158,34 +158,32 @@ struct plugin_api {
     void (*lcd_remove_cursor)(void);
     void (*PREFIX(lcd_icon))(int icon, bool enable);
 #else
+#ifndef SIMULATOR
+    void (*lcd_roll)(int pixels);
+#endif
+    void (*lcd_set_drawmode)(int mode);
+    int  (*lcd_get_drawmode)(void);
+    void (*lcd_setfont)(int font);
+    int  (*lcd_getstringsize)(const unsigned char *str, int *w, int *h);
+    void (*lcd_drawpixel)(int x, int y);
+    void (*lcd_drawline)(int x1, int y1, int x2, int y2);
+    void (*lcd_drawrect)(int x, int y, int nx, int ny);
+    void (*lcd_fillrect)(int x, int y, int nx, int ny);
+    void (*lcd_bitmap)(const unsigned char *src, int x, int y,
+                       int nx, int ny, bool clear);
     void (*lcd_putsxy)(int x, int y, const unsigned char *string);
     void (*lcd_puts_style)(int x, int y, const unsigned char *str, int style);
     void (*lcd_puts_scroll_style)(int x, int y, const unsigned char* string,
                                   int style);
-    void (*lcd_bitmap)(const unsigned char *src, int x, int y,
-                       int nx, int ny, bool clear);
-    void (*lcd_drawline)(int x1, int y1, int x2, int y2);
-    void (*lcd_clearline)(int x1, int y1, int x2, int y2);
-    void (*lcd_drawpixel)(int x, int y);
-    void (*lcd_clearpixel)(int x, int y);
-    void (*lcd_setfont)(int font);
-    struct font* (*font_get)(int font);
-    void (*lcd_clearrect)(int x, int y, int nx, int ny);
-    void (*lcd_fillrect)(int x, int y, int nx, int ny);
-    void (*lcd_drawrect)(int x, int y, int nx, int ny);
-    void (*lcd_invertrect)(int x, int y, int nx, int ny);
-    int  (*lcd_getstringsize)(const unsigned char *str, int *w, int *h);
+    unsigned char* lcd_framebuffer;
+    void (*lcd_blit) (const unsigned char* p_data, int x, int y, int width,
+                      int height, int stride);
     void (*lcd_update)(void);
     void (*lcd_update_rect)(int x, int y, int width, int height);
     void (*scrollbar)(int x, int y, int width, int height, int items,
                       int min_shown, int max_shown, int orientation);
     void (*checkbox)(int x, int y, int width, int height, bool checked);
-    unsigned char* lcd_framebuffer;
-    void (*lcd_blit) (const unsigned char* p_data, int x, int y, int width,
-                      int height, int stride);
-#ifndef SIMULATOR
-    void (*lcd_roll)(int pixels);
-#endif
+    struct font* (*font_get)(int font);
 #endif
     void (*backlight_on)(void);
     void (*backlight_off)(void);

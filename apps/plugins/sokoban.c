@@ -825,14 +825,16 @@ static bool sokoban_loop(void)
             if (current_info.level.level > current_info.max_level) {
                 rb->lcd_putsxy(10, 20, "You WIN!!");
 
+                rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
                 for (i = 0; i < 30000 ; i++) {
-                    rb->lcd_invertrect(0, 0, 111, 63);
+                    rb->lcd_fillrect(0, 0, 111, 63);
                     rb->lcd_update();
 
                     button = rb->button_get(false);
                     if (button && ((button & BUTTON_REL) != BUTTON_REL))
                         break;
                 }
+                rb->lcd_set_drawmode(DRMODE_SOLID);
 
                 return PLUGIN_OK;
             }

@@ -845,11 +845,15 @@ void splash(int ticks,       /* how long the splash is displayed */
     if(center && (y > 2)) {
         if(maxw < (LCD_WIDTH -4)) {
             int xx = (LCD_WIDTH-maxw)/2 - 2;
-            lcd_clearrect(xx, y-2, maxw+4, LCD_HEIGHT-y*2+4);
+            lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            lcd_fillrect(xx, y-2, maxw+4, LCD_HEIGHT-y*2+4);
+            lcd_set_drawmode(DRMODE_SOLID);
             lcd_drawrect(xx, y-2, maxw+4, LCD_HEIGHT-y*2+4);
         }
         else {
-            lcd_clearrect(0, y-2, LCD_WIDTH, LCD_HEIGHT-y*2+4);
+            lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            lcd_fillrect(0, y-2, LCD_WIDTH, LCD_HEIGHT-y*2+4);
+            lcd_set_drawmode(DRMODE_SOLID);
             lcd_drawline(0, y-2, LCD_WIDTH-1, y-2);
             lcd_drawline(0, LCD_HEIGHT-y+2, LCD_WIDTH-1, LCD_HEIGHT-y+2);
         }
@@ -965,6 +969,7 @@ bool set_time_screen(const char* string, struct tm *tm)
     unsigned int width, height;
     unsigned int separator_width, weekday_width;
     unsigned int line_height, prev_line_height;
+    int lastmode = lcd_get_drawmode();
 
     static const int dayname[] = {
         LANG_WEEKDAY_SUNDAY,
@@ -1108,10 +1113,12 @@ bool set_time_screen(const char* string, struct tm *tm)
         cursor[5][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
         cursor[5][INDEX_WIDTH] = width;
 
-        lcd_invertrect(cursor[cursorpos][INDEX_X],
-                       cursor[cursorpos][INDEX_Y] + lcd_getymargin(),
-                       cursor[cursorpos][INDEX_WIDTH],
-                       line_height);
+        lcd_set_drawmode(DRMODE_COMPLEMENT);
+        lcd_fillrect(cursor[cursorpos][INDEX_X],
+                     cursor[cursorpos][INDEX_Y] + lcd_getymargin(),
+                     cursor[cursorpos][INDEX_WIDTH],
+                     line_height);
+        lcd_set_drawmode(DRMODE_SOLID);
 
         lcd_puts(0, 4, str(LANG_TIME_SET));
         lcd_puts(0, 5, str(LANG_TIME_REVERT));
@@ -1203,6 +1210,7 @@ bool set_time_screen(const char* string, struct tm *tm)
         }
     }
 
+    lcd_set_drawmode(lastmode);
     return false;
 }
 #endif /* defined(HAVE_LCD_BITMAP) && defined (HAVE_RTC) */

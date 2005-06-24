@@ -54,14 +54,16 @@ void scrollbar(int x, int y, int width, int height, int items, int min_shown,
     /* draw box */
     lcd_drawrect(x, y, width, height);
 
+    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+
     /* clear edge pixels */
-    lcd_clearpixel(x, y);
-    lcd_clearpixel((x + width - 1), y);
-    lcd_clearpixel(x, (y + height - 1));
-    lcd_clearpixel((x + width - 1), (y + height - 1));
+    lcd_drawpixel(x, y);
+    lcd_drawpixel((x + width - 1), y);
+    lcd_drawpixel(x, (y + height - 1));
+    lcd_drawpixel((x + width - 1), (y + height - 1));
 
     /* clear pixels in progress bar */
-    lcd_clearrect(x + 1, y + 1, width - 2, height - 2);
+    lcd_fillrect(x + 1, y + 1, width - 2, height - 2);
 
     /* min should be min */
     if(min_shown < max_shown) {
@@ -111,6 +113,8 @@ void scrollbar(int x, int y, int width, int height, int items, int min_shown,
         size = 1;
     }
 
+    lcd_set_drawmode(DRMODE_SOLID);
+
     if(orientation == VERTICAL)
         lcd_fillrect(x + 1, y + start + 1, width - 2, size);
     else
@@ -133,11 +137,13 @@ void checkbox(int x, int y, int width, int height, bool checked)
     lcd_drawrect(x, y, width, height);
 
     if (checked){
-	lcd_drawline(x + 2, y + 2, x + width - 2 - 1 , y + height - 2 - 1);
-	lcd_drawline(x + 2, y + height - 2 - 1, x + width - 2 - 1, y + 2);
+        lcd_drawline(x + 2, y + 2, x + width - 2 - 1 , y + height - 2 - 1);
+        lcd_drawline(x + 2, y + height - 2 - 1, x + width - 2 - 1, y + 2);
     } else {
-	/* be sure to clear box */
-	lcd_clearrect(x + 1, y + 1, width - 2, height - 2);
+        /* be sure to clear box */
+        lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        lcd_fillrect(x + 1, y + 1, width - 2, height - 2);
+        lcd_set_drawmode(DRMODE_SOLID);
     }
 }
 

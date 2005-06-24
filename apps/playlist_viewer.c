@@ -854,9 +854,11 @@ bool playlist_viewer_ex(char* filename)
 #ifdef HAVE_LCD_BITMAP
             if (global_settings.invert_cursor)
             {
-                lcd_invertrect(
+                lcd_set_drawmode(DRMODE_COMPLEMENT);
+                lcd_fillrect(
                     MARGIN_X, MARGIN_Y+(viewer.cursor_pos*viewer.line_height),
                     LCD_WIDTH, viewer.line_height);
+                lcd_set_drawmode(DRMODE_SOLID);
                 lcd_invertscroll(LINE_X, viewer.cursor_pos);
             }
             else

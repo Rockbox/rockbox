@@ -195,8 +195,12 @@ int kbd_input(char* text, int buflen)
 #ifdef KBD_MODES
             if (!line_edit)
 #endif
+            {
                 /* highlight the key that has focus */
-                lcd_invertrect(font_w * x, 8 + font_h * y, font_w, font_h);
+                lcd_set_drawmode(DRMODE_COMPLEMENT);
+                lcd_fillrect(font_w * x, 8 + font_h * y, font_w, font_h);
+                lcd_set_drawmode(DRMODE_SOLID);
+            }
 
             status_draw(true);
         

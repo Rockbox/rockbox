@@ -620,7 +620,9 @@ void draw_apple( void )
     char pscore[5], counter[4];
 
     rb->lcd_bitmap(snakebmp,0,0,BMPWIDTH_snakebmp,BMPHEIGHT_snakebmp,false);
-    rb->lcd_clearrect(0,0,BMPWIDTH_snakeupbmp,BMPHEIGHT_snakeupbmp);
+    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    rb->lcd_fillrect(0,0,BMPWIDTH_snakeupbmp,BMPHEIGHT_snakeupbmp);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
     rb->lcd_bitmap(snakeupbmp,0,0,BMPWIDTH_snakeupbmp,BMPHEIGHT_snakeupbmp,false);
 
     rb->snprintf(counter,sizeof(counter),"%d",applecount);
@@ -838,7 +840,9 @@ void redraw (void)
 */
 void draw_snake_bit(int currentbit, int previousbit, int x, int y)
 {
-    rb->lcd_clearrect(CENTER_X+x*MULTIPLIER,CENTER_Y+y*MULTIPLIER,MODIFIER_1,MODIFIER_1);
+    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER,CENTER_Y+y*MULTIPLIER,MODIFIER_1,MODIFIER_1);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
 
     switch(currentbit)
     {
@@ -1065,8 +1069,10 @@ void move( void )
     /*clear tail*/
     if(applecountdown <= 0) 
     {
-        rb->lcd_clearrect(CENTER_X+tailx*MULTIPLIER,CENTER_Y+taily*MULTIPLIER,MODIFIER_1,MODIFIER_1);
-        
+        rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        rb->lcd_fillrect(CENTER_X+tailx*MULTIPLIER,CENTER_Y+taily*MULTIPLIER,MODIFIER_1,MODIFIER_1);
+        rb->lcd_set_drawmode(DRMODE_SOLID);
+
         taildir = board[tailx][taily];
         board[tailx][taily] = 0;
 

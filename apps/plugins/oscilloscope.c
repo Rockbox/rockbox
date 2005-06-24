@@ -146,7 +146,9 @@ void timer_isr(void)
                 x = 0;
         }
         
-        rb->lcd_clearline(x, 0, x, LCD_HEIGHT-1);
+        rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        rb->lcd_drawline(x, 0, x, LCD_HEIGHT-1);
+        rb->lcd_set_drawmode(DRMODE_SOLID);
 
         switch (draw_mode)
         {
@@ -189,7 +191,7 @@ void timer_isr(void)
 void cleanup(void *parameter)
 {
     (void)parameter;
-    
+
     rb->plugin_unregister_timer();
 }
 
@@ -202,7 +204,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     TEST_PLUGIN_API(api);
     (void)parameter;
     rb = api;
-
+    
     rb->plugin_register_timer(FREQ / 67, 1, timer_isr);
 
     while (!exit)

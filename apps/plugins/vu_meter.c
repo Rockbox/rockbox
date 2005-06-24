@@ -213,7 +213,9 @@ void change_settings(void)
             }
         }
 
-        rb->lcd_invertrect(0, selected_setting*8+8,111,8);
+        rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+        rb->lcd_fillrect(0, selected_setting*8+8,111,8);
+        rb->lcd_set_drawmode(DRMODE_SOLID);
         rb->lcd_update();
 
         switch(rb->button_get_w_tmo(1))

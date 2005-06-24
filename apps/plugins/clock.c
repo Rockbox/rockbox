@@ -476,7 +476,9 @@ void save_settings(bool interface)
 
         if(interface)
         {
-            rb->lcd_clearrect(0, 56, 112, 8);
+            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            rb->lcd_fillrect(0, 56, 112, 8);
+            rb->lcd_set_drawmode(DRMODE_SOLID);
             rb->snprintf(buf, sizeof(buf), "Saved Settings");
             rb->lcd_getstringsize(buf, &buf_w, &buf_h);
             rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 56, buf);
@@ -486,7 +488,9 @@ void save_settings(bool interface)
     {
         if(interface)
         {
-            rb->lcd_clearrect(0, 56, 112, 8);
+            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            rb->lcd_fillrect(0, 56, 112, 8);
+            rb->lcd_set_drawmode(DRMODE_SOLID);
             rb->snprintf(buf, sizeof(buf), "Save Failed");
             rb->lcd_getstringsize(buf, &buf_w, &buf_h);
             rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 56, buf);
@@ -529,14 +533,18 @@ void load_settings(void)
             rb->read(fd, &settings, sizeof(struct saved_settings));
             rb->close(fd);
 
-            rb->lcd_clearrect(0, 56, 112, 8);
+            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            rb->lcd_fillrect(0, 56, 112, 8);
+            rb->lcd_set_drawmode(DRMODE_SOLID);
             rb->snprintf(buf, sizeof(buf), "Loaded Settings");
             rb->lcd_getstringsize(buf, &buf_w, &buf_h);
             rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 56, buf);
         }
         else /* bail out */
         {
-            rb->lcd_clearrect(0, 56, 112, 8);
+            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            rb->lcd_fillrect(0, 56, 112, 8);
+            rb->lcd_set_drawmode(DRMODE_SOLID);
             rb->snprintf(buf, sizeof(buf), "Old Settings File");
             rb->lcd_getstringsize(buf, &buf_w, &buf_h);
             rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 56, buf);
@@ -545,7 +553,9 @@ void load_settings(void)
     }
     else /* bail out */
     {
-        rb->lcd_clearrect(0, 56, 112, 8);
+        rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        rb->lcd_fillrect(0, 56, 112, 8);
+        rb->lcd_set_drawmode(DRMODE_SOLID);
         rb->snprintf(buf, sizeof(buf), "No Settings File");
         rb->lcd_getstringsize(buf, &buf_w, &buf_h);
         rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 56, buf);
@@ -1014,8 +1024,7 @@ void show_logo(bool animate, bool show_clock_text)
 {
     int y_position;
 
-    unsigned char *clogo = 0;
-    clogo = (unsigned char *)clocklogo;
+    unsigned char *clogo = (unsigned char *)clocklogo;
 
     rb->snprintf(buf, sizeof(buf), "Clock %s", CLOCK_VERSION);
     rb->lcd_getstringsize(buf, &buf_w, &buf_h);
@@ -1026,8 +1035,10 @@ void show_logo(bool animate, bool show_clock_text)
         /* move down the screen */
         for(y_position = 0; y_position <= 26; y_position++)
         {
-            rb->lcd_clearline(0, y_position/2-1, 111, y_position/2-1);
-            rb->lcd_clearline(0, y_position/2+38, 111, y_position/2+38);
+            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            rb->lcd_drawline(0, y_position/2-1, 111, y_position/2-1);
+            rb->lcd_drawline(0, y_position/2+38, 111, y_position/2+38);
+            rb->lcd_set_drawmode(DRMODE_SOLID);
             rb->lcd_bitmap(clogo, 0, y_position/2, 112, 37, true);
             if(show_clock_text)
                 rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 48, buf);
@@ -1036,8 +1047,10 @@ void show_logo(bool animate, bool show_clock_text)
         /* bounce back up a little */
         for(y_position = 26; y_position >= 16; y_position--)
         {
-            rb->lcd_clearline(0, y_position/2-1, 111, y_position/2-1);
-            rb->lcd_clearline(0, y_position/2+38, 111, y_position/2+38);
+            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            rb->lcd_drawline(0, y_position/2-1, 111, y_position/2-1);
+            rb->lcd_drawline(0, y_position/2+38, 111, y_position/2+38);
+            rb->lcd_set_drawmode(DRMODE_SOLID);
             rb->lcd_bitmap(clogo, 0, y_position/2, 112, 37, true);
             if(show_clock_text)
                 rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 48, buf);
@@ -1046,8 +1059,10 @@ void show_logo(bool animate, bool show_clock_text)
         /* and go back down again */
         for(y_position = 16; y_position <= 20; y_position++)
         {
-            rb->lcd_clearline(0, y_position/2-1, 111, y_position/2-1);
-            rb->lcd_clearline(0, y_position/2+38, 111, y_position/2+38);
+            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            rb->lcd_drawline(0, y_position/2-1, 111, y_position/2-1);
+            rb->lcd_drawline(0, y_position/2+38, 111, y_position/2+38);
+            rb->lcd_set_drawmode(DRMODE_SOLID);
             rb->lcd_bitmap(clogo, 0, y_position/2, 112, 37, true);
             if(show_clock_text)
                 rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 48, buf);
@@ -1076,7 +1091,9 @@ void exit_logo(void)
     /* fly downwards */
     for(y_position = 20; y_position <= 128; y_position++)
     {
-        rb->lcd_clearline(0, y_position/2-1, 111, y_position/2-1);
+        rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        rb->lcd_drawline(0, y_position/2-1, 111, y_position/2-1);
+        rb->lcd_set_drawmode(DRMODE_SOLID);
         rb->lcd_bitmap(clogo, 0, y_position/2, 112, 37, true);
         rb->lcd_update();
     }
@@ -1112,7 +1129,9 @@ bool roll_credits(void)
     /* fly in text from the left */
     for(credits_pos = 0 - credits_w; credits_pos <= (LCD_WIDTH/2)-(credits_w/2); credits_pos++)
     {
-        rb->lcd_clearline(credits_pos-1, 0, credits_pos-1, 8);
+        rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        rb->lcd_drawline(credits_pos-1, 0, credits_pos-1, 8);
+        rb->lcd_set_drawmode(DRMODE_SOLID);
         rb->lcd_putsxy(credits_pos, 0, elapsednames);
         rb->lcd_update(); /* update the whole lcd to slow down the loop */
     }
@@ -1121,7 +1140,9 @@ bool roll_credits(void)
     for(progress_pos = LCD_WIDTH; progress_pos >= 40; progress_pos--)
     {
         rb->scrollbar(progress_pos, 9, LCD_WIDTH-progress_pos, 7, numnames*4, 0, progress_percent, HORIZONTAL);
-        rb->lcd_clearline(0, 0, 0, 30);
+        rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        rb->lcd_drawline(0, 0, 0, 30);
+        rb->lcd_set_drawmode(DRMODE_SOLID);
         rb->lcd_update(); /* update the whole lcd to slow down the loop */
     }
 
@@ -1146,7 +1167,9 @@ bool roll_credits(void)
         /* line 1 flies in */
         for (namepos=0-name_w; namepos < (LCD_WIDTH/2)-(name_w/2)-2; namepos++)
         {
-            rb->lcd_clearrect(0, 48, 112, 8); /* clear any trails left behind */
+            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            rb->lcd_fillrect(0, 48, 112, 8); /* clear any trails left behind */
+            rb->lcd_set_drawmode(DRMODE_SOLID);
             rb->lcd_putsxy(namepos, 48, name);
             rb->lcd_update();
 
@@ -1163,7 +1186,9 @@ bool roll_credits(void)
         /* now line 2 flies in */
         for(jobpos=LCD_WIDTH; jobpos > (LCD_WIDTH/2)-(job_w+2)/2; jobpos--) /* we use (job_w+2) to ensure it fits on the LCD */
         {
-            rb->lcd_clearrect(0, 56, 112, 8); /* clear trails */
+            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            rb->lcd_fillrect(0, 56, 112, 8); /* clear trails */
+            rb->lcd_set_drawmode(DRMODE_SOLID);
             rb->lcd_putsxy(jobpos, 56, job);
             rb->lcd_update();
 
@@ -1185,7 +1210,9 @@ bool roll_credits(void)
             namepos++;
             jobpos--;
 
-            rb->lcd_clearrect(0, 48, 112, 16);
+            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            rb->lcd_fillrect(0, 48, 112, 16);
+            rb->lcd_set_drawmode(DRMODE_SOLID);
             rb->lcd_putsxy(namepos, 48, name);
             rb->lcd_putsxy(jobpos, 56, job);
             rb->lcd_update();
@@ -1204,7 +1231,9 @@ bool roll_credits(void)
         jobpos=((LCD_WIDTH/2)-(job_w+2)/2)-8;
         while(namepos<LCD_WIDTH || jobpos > 0-job_w)
         {
-            rb->lcd_clearrect(0, 48, 112, 16); /* clear trails */
+            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            rb->lcd_fillrect(0, 48, 112, 16); /* clear trails */
+            rb->lcd_set_drawmode(DRMODE_SOLID);
             rb->lcd_putsxy(namepos, 48, name);
             rb->lcd_putsxy(jobpos, 56, job);
             rb->lcd_update();
@@ -1233,7 +1262,9 @@ bool roll_credits(void)
     /* now make the text exit to the right */
     for(credits_pos = (LCD_WIDTH/2)-(credits_w/2); credits_pos <= 112; credits_pos++)
     {
-        rb->lcd_clearline(credits_pos-1, 0, credits_pos-1, 8);
+        rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        rb->lcd_drawline(credits_pos-1, 0, credits_pos-1, 8);
+        rb->lcd_set_drawmode(DRMODE_SOLID);
         rb->lcd_putsxy(credits_pos, 0, elapsednames);
         rb->lcd_update();
     }
@@ -1241,7 +1272,9 @@ bool roll_credits(void)
     /* fold progressbar in to the right */
     for(progress_pos = 42; progress_pos < 112; progress_pos++)
     {
-        rb->lcd_clearline(progress_pos-1, 8, progress_pos-1, 16);
+        rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        rb->lcd_drawline(progress_pos-1, 8, progress_pos-1, 16);
+        rb->lcd_set_drawmode(DRMODE_SOLID);
         rb->scrollbar(progress_pos, 9, LCD_WIDTH-progress_pos, 7, numnames*4, 0, progress_percent, HORIZONTAL);
         rb->lcd_update(); /* update the whole lcd to slow down the loop */
     }
@@ -1292,7 +1325,7 @@ bool show_credits(void)
 
 void cleanup(void *parameter)
 {
-    (void)parameter;  /* unused */
+    (void)parameter;
 
     if(settings.save_mode == 1)
         save_settings(true);
@@ -1306,12 +1339,16 @@ void cleanup(void *parameter)
  *************/
 void cursor(int x, int y, int w, int h)
 {
-    rb->lcd_invertrect(x, y, w, h);
+    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+    rb->lcd_fillrect(x, y, w, h);
 
-    rb->lcd_clearpixel(x, y);
-    rb->lcd_clearpixel(x+w-1, y);
-    rb->lcd_clearpixel(x, y+h-1);
-    rb->lcd_clearpixel(x+w-1, y+h-1);
+    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    rb->lcd_drawpixel(x, y);
+    rb->lcd_drawpixel(x+w-1, y);
+    rb->lcd_drawpixel(x, y+h-1);
+    rb->lcd_drawpixel(x+w-1, y+h-1);
+    
+    rb->lcd_set_drawmode(DRMODE_SOLID);
 }
 
 /******************
@@ -1670,7 +1707,9 @@ bool f3_screen(void)
                         analog_dummy = analog_y;
                         for(; analog_y>analog_dummy-8; analog_y--)
                         {
-                            rb->lcd_clearrect(0, 32, 112, 32);
+                            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                            rb->lcd_fillrect(0, 32, 112, 32);
+                            rb->lcd_set_drawmode(DRMODE_SOLID);
                             draw_settings();
                             cursor(0, analog_y, 112, 8);
                             rb->lcd_update();
@@ -1686,7 +1725,9 @@ bool f3_screen(void)
                         analog_dummy = analog_y;
                         for(; analog_y<analog_dummy+8; analog_y++)
                         {
-                            rb->lcd_clearrect(0, 32, 112, 32);
+                            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                            rb->lcd_fillrect(0, 32, 112, 32);
+                            rb->lcd_set_drawmode(DRMODE_SOLID);
                             draw_settings();
                             cursor(0, analog_y, 112, 8);
                             rb->lcd_update();
@@ -1758,7 +1799,9 @@ bool f3_screen(void)
                         digital_dummy = digital_y;
                         for(; digital_y>digital_dummy-8; digital_y--)
                         {
-                            rb->lcd_clearrect(0, 32, 112, 32);
+                            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                            rb->lcd_fillrect(0, 32, 112, 32);
+                            rb->lcd_set_drawmode(DRMODE_SOLID);
                             draw_settings();
                             cursor(0, digital_y, 112, 8);
                             rb->lcd_update();
@@ -1774,7 +1817,9 @@ bool f3_screen(void)
                         digital_dummy = digital_y;
                         for(; digital_y<digital_dummy+8; digital_y++)
                         {
-                            rb->lcd_clearrect(0, 32, 112, 32);
+                            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                            rb->lcd_fillrect(0, 32, 112, 32);
+                            rb->lcd_set_drawmode(DRMODE_SOLID);
                             draw_settings();
                             cursor(0, digital_y, 112, 8);
                             rb->lcd_update();
@@ -1846,7 +1891,9 @@ bool f3_screen(void)
                         lcd_dummy = lcd_y;
                         for(; lcd_y>lcd_dummy-8; lcd_y--)
                         {
-                            rb->lcd_clearrect(0, 32, 112, 32);
+                            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                            rb->lcd_fillrect(0, 32, 112, 32);
+                            rb->lcd_set_drawmode(DRMODE_SOLID);
                             draw_settings();
                             cursor(0, lcd_y, 112, 8);
                             rb->lcd_update();
@@ -1862,7 +1909,9 @@ bool f3_screen(void)
                         lcd_dummy = lcd_y;
                         for(; lcd_y<lcd_dummy+8; lcd_y++)
                         {
-                            rb->lcd_clearrect(0, 32, 112, 32);
+                            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                            rb->lcd_fillrect(0, 32, 112, 32);
+                            rb->lcd_set_drawmode(DRMODE_SOLID);
                             draw_settings();
                             cursor(0, lcd_y, 112, 8);
                             rb->lcd_update();
@@ -1935,7 +1984,9 @@ bool f3_screen(void)
                         full_dummy = full_y;
                         for(; full_y>full_dummy-8; full_y--)
                         {
-                            rb->lcd_clearrect(0, 32, 112, 32);
+                            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                            rb->lcd_fillrect(0, 32, 112, 32);
+                            rb->lcd_set_drawmode(DRMODE_SOLID);
                             draw_settings();
                             cursor(0, full_y, 112, 8);
                             rb->lcd_update();
@@ -1951,7 +2002,9 @@ bool f3_screen(void)
                         full_dummy = full_y;
                         for(; full_y<full_dummy+8; full_y++)
                         {
-                            rb->lcd_clearrect(0, 32, 112, 32);
+                            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                            rb->lcd_fillrect(0, 32, 112, 32);
+                            rb->lcd_set_drawmode(DRMODE_SOLID);
                             draw_settings();
                             cursor(0, full_y, 112, 8);
                             rb->lcd_update();
@@ -2115,7 +2168,9 @@ void general_settings(void)
                         cursor_dummy = cursor_y;
                         for(; cursor_y>cursor_dummy-8; cursor_y--)
                         {
-                            rb->lcd_clearrect(0, 16, 112, 32);
+                            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                            rb->lcd_fillrect(0, 16, 112, 32);
+                            rb->lcd_set_drawmode(DRMODE_SOLID);
 
                             rb->lcd_puts(2, 2, "Reset Settings");
                             rb->lcd_puts(2, 3, "Save Settings");
@@ -2150,7 +2205,9 @@ void general_settings(void)
                         cursor_dummy = cursor_y;
                         for(; cursor_y<cursor_dummy+8; cursor_y++)
                         {
-                            rb->lcd_clearrect(0, 16, 112, 32);
+                            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                            rb->lcd_fillrect(0, 16, 112, 32);
+                            rb->lcd_set_drawmode(DRMODE_SOLID);
 
                             rb->lcd_puts(2, 2, "Reset Settings");
                             rb->lcd_puts(2, 3, "Save Settings");
@@ -2313,7 +2370,9 @@ void draw_extras(int year, int day, int month, int hour, int minute, int second)
         /* Invert the whole LCD as the seconds go */
         if(settings.digital_seconds == 3)
         {
-            rb->lcd_invertrect(0, 0, fill, 64);
+            rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+            rb->lcd_fillrect(0, 0, fill, 64);
+            rb->lcd_set_drawmode(DRMODE_SOLID);
         }
     }
     else if(settings.clock == 3) /* LCD mode */
@@ -2349,7 +2408,9 @@ void draw_extras(int year, int day, int month, int hour, int minute, int second)
         /* Invert the whole LCD as the seconds go */
         if(settings.lcd_seconds == 3)
         {
-            rb->lcd_invertrect(0, 0, fill, 64);
+            rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+            rb->lcd_fillrect(0, 0, fill, 64);
+            rb->lcd_set_drawmode(DRMODE_SOLID);
         }
     }
     else if(settings.clock == 4) /* Fullscreen mode */
@@ -2368,7 +2429,9 @@ void draw_extras(int year, int day, int month, int hour, int minute, int second)
         }
         if(settings.fullscreen_invertseconds)
         {
-            rb->lcd_invertrect(0, 0, fill, 64);
+            rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+            rb->lcd_fillrect(0, 0, fill, 64);
+            rb->lcd_set_drawmode(DRMODE_SOLID);
         }
     }
 }
@@ -2424,7 +2487,9 @@ void select_mode(void)
                         cursor_dummy = cursor_y;
                         for(; cursor_y>cursor_dummy-8; cursor_y--)
                         {
-                            rb->lcd_clearrect(0, 8, 112, 40);
+                            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                            rb->lcd_fillrect(0, 8, 112, 40);
+                            rb->lcd_set_drawmode(DRMODE_SOLID);
 
                             rb->lcd_puts(0, 0, "MODE SELECTOR");
                             rb->lcd_puts(2, 1, "Analog");
@@ -2456,7 +2521,9 @@ void select_mode(void)
                         cursor_dummy = cursor_y;
                         for(; cursor_y<cursor_dummy+8; cursor_y++)
                         {
-                            rb->lcd_clearrect(0, 8, 112, 40);
+                            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                            rb->lcd_fillrect(0, 8, 112, 40);
+                            rb->lcd_set_drawmode(DRMODE_SOLID);
 
                             rb->lcd_puts(0, 0, "MODE SELECTOR");
                             rb->lcd_puts(2, 1, "Analog");
@@ -2516,7 +2583,9 @@ void counter_finished(void)
         rb->lcd_bitmap(times_up, 0, xpos, 112, 50, true);
 
         /* invert lcd */
-        rb->lcd_invertrect(0, 0, 112, 64);
+        rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+        rb->lcd_fillrect(0, 0, 112, 64);
+        rb->lcd_set_drawmode(DRMODE_SOLID);
 
         rb->lcd_update();
 
@@ -2667,14 +2736,16 @@ void counter_options(void)
         rb->checkbox(1, 25, 8, 6, !counting_up);
 
         /* draw a cursor */
+        rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
         switch(cursorpos)
         {
-            case 1: rb->lcd_invertrect(0, 16, 112, 8); break;
-            case 2: rb->lcd_invertrect(0, 24, 112, 8); break;
-            case 3: rb->lcd_invertrect(24, 40, 06, 8); break;
-            case 4: rb->lcd_invertrect(36, 40, 12, 8); break;
-            case 5: rb->lcd_invertrect(54, 40, 12, 8); break;
+            case 1: rb->lcd_fillrect(0, 16, 112, 8); break;
+            case 2: rb->lcd_fillrect(0, 24, 112, 8); break;
+            case 3: rb->lcd_fillrect(24, 40, 06, 8); break;
+            case 4: rb->lcd_fillrect(36, 40, 12, 8); break;
+            case 5: rb->lcd_fillrect(54, 40, 12, 8); break;
         }
+        rb->lcd_set_drawmode(DRMODE_SOLID);
 
         if(cursorpos > 2)
             editing_target = true;
@@ -2807,7 +2878,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     TEST_PLUGIN_API(api);
     (void)parameter;
     rb = api;
-
+    
     /* universal font */
     rb->lcd_setfont(FONT_SYSFIXED);
 

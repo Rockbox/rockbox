@@ -151,7 +151,9 @@ static void draw_spot(int p, int x, int y)
         rb->lcd_bitmap (picture[p-1], x, y, 16, 16, true);
     } else {
         rb->lcd_drawrect(x, y, 16, 16);
-        rb->lcd_clearrect(x+1, y+1, 14, 14);
+        rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        rb->lcd_fillrect(x+1, y+1, 14, 14);
+        rb->lcd_set_drawmode(DRMODE_SOLID);
         rb->snprintf(s, sizeof(s), "%d", p);
         rb->lcd_putsxy(x+2, y+4, s);
     }

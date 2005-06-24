@@ -92,10 +92,12 @@ static void clear_cursor(void) {
     int i,j;
     i = (cursor_pos%5)*16;
     j = (cursor_pos/5)*16;
-    rb->lcd_clearline(i, j, i+15, j);
-    rb->lcd_clearline(i, j+15, i+15, j+15);
-    rb->lcd_clearline(i, j, i, j+15);
-    rb->lcd_clearline(i+15, j, i+15, j+15);
+    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    rb->lcd_drawline(i, j, i+15, j);
+    rb->lcd_drawline(i, j+15, i+15, j+15);
+    rb->lcd_drawline(i, j, i, j+15);
+    rb->lcd_drawline(i+15, j, i+15, j+15);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
 }
 
 /* check if the puzzle is finished */
@@ -167,7 +169,9 @@ static void flipit_init(void) {
     cursor_pos = 0;
     draw_cursor();
     moves = 0;
-    rb->lcd_clearrect(80, 0, 32, 64);
+    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    rb->lcd_fillrect(80, 0, 32, 64);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
     rb->lcd_drawrect(80, 0, 32, 64);
     rb->lcd_putsxy(81, 10, "Flips");
     rb->snprintf(s, sizeof(s), "%d", moves);

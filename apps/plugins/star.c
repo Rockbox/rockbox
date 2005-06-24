@@ -838,7 +838,9 @@ static int star_menu(void)
 
         for (i = 0 ; i < char_height ; i++)
         {
-            rb->lcd_clearrect (2, 30, 7, 4 * 8);
+            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            rb->lcd_fillrect (2, 30, 7, 4 * 8);
+            rb->lcd_set_drawmode(DRMODE_SOLID);
             rb->lcd_bitmap(arrow_bmp[anim_arrow[(anim_state & 0x38) >> 3]],
                            2, menu_offset_y + menu_y * 8 + move_y * i, 7, 8,
                            false);
