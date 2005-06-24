@@ -78,7 +78,7 @@
 #define MAX_PLAYLIST_ENTRIES 200
 
 /* Default playlist name for saving */
-#define DEFAULT_PLAYLIST_NAME "/viewer.m3u"
+#define DEFAULT_VIEWER_PLAYLIST_NAME "/viewer.m3u"
 
 /* Index of track on display line _pos */
 #define INDEX(_pos) (viewer.first_display_index - viewer.first_index + (_pos))
@@ -797,7 +797,7 @@ static bool save_playlist(void)
 {
     char filename[MAX_PATH+1];
 
-    strncpy(filename, DEFAULT_PLAYLIST_NAME, sizeof(filename));
+    strncpy(filename, DEFAULT_VIEWER_PLAYLIST_NAME, sizeof(filename));
 
     if (!kbd_input(filename, sizeof(filename)))
     {

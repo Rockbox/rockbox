@@ -53,8 +53,6 @@
 #endif
 #include "main_menu.h"
 
-#define DEFAULT_PLAYLIST_NAME "/dynamic.m3u"
-
 static int context;
 static char* selected_file = NULL;
 static int selected_file_attr = 0;
@@ -146,7 +144,7 @@ static bool save_playlist(void)
 {
     char filename[MAX_PATH+1];
 
-    strncpy(filename, DEFAULT_PLAYLIST_NAME, sizeof(filename));
+    strncpy(filename, DEFAULT_DYNAMIC_PLAYLIST_NAME, sizeof(filename));
 
     if (!kbd_input(filename, sizeof(filename)))
     {

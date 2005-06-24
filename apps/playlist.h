@@ -58,6 +58,8 @@ struct playlist_info
 #define PLAYLIST_ATTR_QUEUED    0x01
 #define PLAYLIST_ATTR_INSERTED  0x02
 
+#define DEFAULT_DYNAMIC_PLAYLIST_NAME "/dynamic.m3u"
+
 struct playlist_track_info
 {
     char filename[MAX_PATH]; /* path name of mp3 file               */
