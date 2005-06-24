@@ -52,6 +52,7 @@
 #include "icons.h"
 #endif
 #include "main_menu.h"
+#include "sound_menu.h"
 
 static int context;
 static char* selected_file = NULL;
@@ -520,6 +521,13 @@ int onplay(char* file, int attr, int from)
     selected_file = file;
     selected_file_attr = attr;
 
+    if (context == CONTEXT_WPS)
+    {
+        items[i].desc = ID2P(LANG_SOUND_SETTINGS);
+        items[i].function = sound_menu;
+        i++;
+    }
+        
     if (context == CONTEXT_WPS ||
         context == CONTEXT_TREE ||
         context == CONTEXT_ID3DB)
@@ -527,15 +535,15 @@ int onplay(char* file, int attr, int from)
         items[i].desc = ID2P(LANG_PLAYLIST);
         items[i].function = playlist_options;
         i++;
-
-        if ((audio_status() & AUDIO_STATUS_PLAY))
-        {
-            items[i].desc = ID2P(LANG_BOOKMARK_MENU);
-            items[i].function = bookmark_menu;
-            i++;
-        }
     }
 
+    if (context == CONTEXT_WPS)
+    {
+        items[i].desc = ID2P(LANG_BOOKMARK_MENU);
+        items[i].function = bookmark_menu;
+        i++;
+    }
+        
     if (file)
     {
         if (context == CONTEXT_WPS)
