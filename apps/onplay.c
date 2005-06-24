@@ -257,7 +257,8 @@ static bool playlist_options(void)
         pstart++;
     }
 
-    if (audio_status() & AUDIO_STATUS_PLAY)
+    if (audio_status() & AUDIO_STATUS_PLAY &&
+        context == CONTEXT_WPS)
     {
         items[i].desc = ID2P(LANG_VIEW_DYNAMIC_PLAYLIST);
         items[i].function = playlist_viewer;
@@ -277,11 +278,6 @@ static bool playlist_options(void)
        
     if (context == CONTEXT_TREE)
     {
-        items[i].desc = ID2P(LANG_CREATE_PLAYLIST);
-        items[i].function = create_playlist;
-        i++;
-        pstart++;
-
         if (audio_status() & AUDIO_STATUS_PLAY)
         {
             items[i].desc = ID2P(LANG_INSERT);
@@ -528,16 +524,16 @@ int onplay(char* file, int attr, int from)
         context == CONTEXT_TREE ||
         context == CONTEXT_ID3DB)
     {
+        items[i].desc = ID2P(LANG_PLAYLIST);
+        items[i].function = playlist_options;
+        i++;
+
         if ((audio_status() & AUDIO_STATUS_PLAY))
         {
             items[i].desc = ID2P(LANG_BOOKMARK_MENU);
             items[i].function = bookmark_menu;
             i++;
         }
-
-        items[i].desc = ID2P(LANG_PLAYLIST);
-        items[i].function = playlist_options;
-        i++;
     }
 
     if (file)
