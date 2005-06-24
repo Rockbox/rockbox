@@ -418,7 +418,7 @@ static int button_read(void)
                     else
                         btn = BUTTON_RC_VOL_DOWN;
                 else
-                    btn = BUTTON_RC_VOL;
+                    btn = BUTTON_RC_MODE;
             else
                 if (data < 0x58)
                     btn = BUTTON_RC_VOL_UP;
