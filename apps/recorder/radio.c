@@ -443,7 +443,9 @@ bool radio_screen(void)
             /* Only display the peak meter when not recording */
             if(!audio_status())
             {
-                lcd_clearrect(0, 8 + fh*(top_of_screen + 3), LCD_WIDTH, fh);
+                lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                lcd_fillrect(0, 8 + fh*(top_of_screen + 3), LCD_WIDTH, fh);
+                lcd_set_drawmode(DRMODE_SOLID);
                 peak_meter_draw(0, 8 + fh*(top_of_screen + 3), LCD_WIDTH, fh);
                 lcd_update_rect(0, 8 + fh*(top_of_screen + 3), LCD_WIDTH, fh);
             }
@@ -477,7 +479,9 @@ bool radio_screen(void)
                 }
                 else
                 {
-                    lcd_clearrect(0, 8 + top_of_screen*fh, LCD_WIDTH, fh);
+                    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                    lcd_fillrect(0, 8 + top_of_screen*fh, LCD_WIDTH, fh);
+                    lcd_set_drawmode(DRMODE_SOLID);
                 }
                 
                 freq = curr_freq / 100000;

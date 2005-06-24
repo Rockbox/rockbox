@@ -126,8 +126,8 @@ extern void lcd_jump_scroll_delay(int ms);
 #define CLEAR_PIXEL(x,y) lcd_framebuffer[(y)/8][(x)] &= ~(1<<((y)&7))
 #define INVERT_PIXEL(x,y) lcd_framebuffer[(y)/8][(x)] ^= (1<<((y)&7))
 
-typedef void tLCDPixelFunc(int x, int y); /* for b&w */
-typedef void tLCDBlockFunc(unsigned char *address, unsigned mask, unsigned bits);
+typedef void lcd_pixelfunc_type(int x, int y); /* for b&w */
+typedef void lcd_blockfunc_type(unsigned char *address, unsigned mask, unsigned bits);
 
 /* Memory copy of display bitmap */
 extern unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];

@@ -390,7 +390,7 @@ static void nopixel(int x, int y)
     (void)y;
 }
 
-tLCDPixelFunc* pixelfunc[8] = {flippixel, nopixel, setpixel, setpixel,
+lcd_pixelfunc_type* pixelfunc[8] = {flippixel, nopixel, setpixel, setpixel,
                                nopixel, clearpixel, nopixel, clearpixel};
                                
 static void flipblock(unsigned char *address, unsigned mask, unsigned bits)
@@ -413,7 +413,7 @@ static void solidblock(unsigned char *address, unsigned mask, unsigned bits)
     *address = (*address & ~mask) | (bits & mask);
 }
 
-tLCDBlockFunc* blockfunc[4] = {flipblock, bgblock, fgblock, solidblock};
+lcd_blockfunc_type* blockfunc[4] = {flipblock, bgblock, fgblock, solidblock};
 
 /*** drawing functions ***/
 
@@ -443,7 +443,7 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
     int d, dinc1, dinc2;
     int x, xinc1, xinc2;
     int y, yinc1, yinc2;
-    tLCDPixelFunc *pfunc = pixelfunc[drawmode];
+    lcd_pixelfunc_type *pfunc = pixelfunc[drawmode];
 
     deltax = abs(x2 - x1);
     deltay = abs(y2 - y1);
@@ -511,7 +511,7 @@ void lcd_hline(int x1, int x2, int y)
     int x;
     unsigned char *dst;
     unsigned char mask, bits;
-    tLCDBlockFunc *bfunc;
+    lcd_blockfunc_type *bfunc;
 
     /* direction flip */
     if (x2 < x1)
@@ -546,7 +546,7 @@ void lcd_vline(int x, int y1, int y2)
     int ny;
     unsigned char *dst;
     unsigned char mask_top, mask_bottom, bits;
-    tLCDBlockFunc *bfunc;
+    lcd_blockfunc_type *bfunc;
 
     /* direction flip */
     if (y2 < y1)
@@ -606,7 +606,7 @@ void lcd_drawrect(int x, int y, int width, int height)
 }
 
 /* helper function for lcd_fillrect() */
-static void fillrow(tLCDBlockFunc *bfunc, unsigned char *address,
+static void fillrow(lcd_blockfunc_type *bfunc, unsigned char *address,
                     int width, unsigned mask, unsigned bits)
 {
     int i;
@@ -621,7 +621,7 @@ void lcd_fillrect(int x, int y, int width, int height)
     int ny;
     unsigned char *dst;
     unsigned char mask_top, mask_bottom, bits;
-    tLCDBlockFunc *bfunc;
+    lcd_blockfunc_type *bfunc;
     bool fillopt = (drawmode & DRMODE_INVERSEVID) ? 
                    (drawmode & DRMODE_BG) : (drawmode & DRMODE_FG);
 
