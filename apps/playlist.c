@@ -149,7 +149,7 @@ static int randomise_playlist(struct playlist_info* playlist,
                               bool write);
 static int sort_playlist(struct playlist_info* playlist, bool start_current,
                          bool write);
-static int get_next_index(struct playlist_info* playlist, int steps,
+static int get_next_index(const struct playlist_info* playlist, int steps,
                           int repeat_mode);
 static void find_and_set_playlist_index(struct playlist_info* playlist,
                                         unsigned int seek);
@@ -828,7 +828,7 @@ static int sort_playlist(struct playlist_info* playlist, bool start_current,
  * returns the index of the track that is "steps" away from current playing
  * track.
  */
-static int get_next_index(struct playlist_info* playlist, int steps,
+static int get_next_index(const struct playlist_info* playlist, int steps,
                           int repeat_mode)
 {
     int current_index = playlist->index;
