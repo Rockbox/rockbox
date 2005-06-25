@@ -854,9 +854,14 @@ static void format_display(char* buf,
                 }
 #endif
                 /* skip the tag */
-/* WARNING! This will crash if there's a syntax error in the wps file */
                 for (n = 0; n < 4; n++) {
-                    fmt = strchr(fmt+1, '|'); /* get the next '|' */
+                    char *ptr;
+                    ptr = strchr(fmt+1, '|'); /* get the next '|' */
+                    if(ptr)
+                        fmt=ptr;
+                    else
+                        /* syntax error, bail out of loop */
+                        break;
                 }
                 fmt++;
                 break;
