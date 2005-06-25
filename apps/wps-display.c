@@ -219,6 +219,16 @@ bool wps_load(const char* file, bool display)
 
         if (numread > 0)
         {
+#ifdef HAVE_LCD_BITMAP
+            /* reset image buffer */
+            img_buf_ptr = img_buf;
+            img_buf_free = IMG_BUFSIZE;
+            
+            /* set images to unloaded */
+            for (i = 0; i < MAX_IMAGES; i++) {
+                img[i].loaded = false;
+            }
+#endif
             buffer[numread] = 0;
             wps_format(buffer);
         }
