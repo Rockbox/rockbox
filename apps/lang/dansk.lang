@@ -1522,7 +1522,7 @@ id: LANG_INSERT_FIRST
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
 eng: "Insert next"
 voice: "Insert next"
-new: "Indsæt næste"
+new: "Indsæt som næste"
 
 id: LANG_SAVE_DYNAMIC_PLAYLIST
 desc: in playlist menu.
@@ -3089,3 +3089,15 @@ desc: in settings_menu
 eng: "Backlight fade out"
 voice: "Backlight fade out"
 new: "Dæmp lys"
+
+id: LANG_SHUFFLE_PLAYLIST
+desc: in playlist menu, reshuffles the order in which songs are played
+eng: "Reshuffle"
+voice: "Reshuffle"
+new: "Bland igen"
+
+id: LANG_INSERT_SHUFFLED
+desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
+eng: "Insert shuffled"
+voice: 
+new: "Indsæt blandet"
