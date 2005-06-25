@@ -3079,7 +3079,7 @@ new: "Trigger aktiv"
 id: LANG_LCD_REMOTE_MENU
 desc: in the display sub menu
 eng: "Remote-LCD Einstellungen"
-voice: ""
+voice:
 new:
 
 id: LANG_DISK_NAME_INTERNAL
@@ -3117,3 +3117,9 @@ desc: in playlist menu, reshuffles the order in which songs are played
 eng: "Reshuffle"
 voice: "Neu mischen"
 new: "Neu mischen"
+
+id: LANG_INSERT_SHUFFLED
+desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
+eng: "Insert shuffled"
+voice: ""
+new: "Zufällig einfügen"
