@@ -862,14 +862,15 @@ static void stop_playing(void)
 
 static void update_playlist(void)
 {
-    int index;
-    struct trackdata *track;
-
     if (num_tracks_in_memory() > 0)
     {
-        track = get_trackdata(0);
-        index = playlist_next(track->id3.index);
-        track->id3.index = index;
+        struct trackdata *track = get_trackdata(0);
+        track->id3.index = playlist_next(track->id3.index);
+    }
+    else
+    {
+        /* End of playlist */
+        playlist_next(playlist_amount());
     }
 }
 
@@ -1189,6 +1190,9 @@ static void mpeg_thread(void)
                     if (new_file(1) < 0) {
                         DEBUGF("No more files to play\n");
                         filling = false;
+
+                        update_playlist();
+                        current_track_counter++;
                     } else {
                         /* Make it read more data */
                         filling = true;

@@ -149,7 +149,8 @@ static int randomise_playlist(struct playlist_info* playlist,
                               bool write);
 static int sort_playlist(struct playlist_info* playlist, bool start_current,
                          bool write);
-static int get_next_index(const struct playlist_info* playlist, int steps);
+static int get_next_index(struct playlist_info* playlist, int steps,
+                          int repeat_mode);
 static void find_and_set_playlist_index(struct playlist_info* playlist,
                                         unsigned int seek);
 static int compare(const void* p1, const void* p2);
@@ -399,13 +400,15 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
 /*
  * Add track to playlist at specified position.  There are three special
  * positions that can be specified:
- *     PLAYLIST_PREPEND      - Add track at beginning of playlist
- *     PLAYLIST_INSERT       - Add track after current song.  NOTE: If there
- *                             are already inserted tracks then track is added
- *                             to the end of the insertion list.
- *     PLAYLIST_INSERT_FIRST - Add track immediately after current song, no
- *                             matter what other tracks have been inserted.
- *     PLAYLIST_INSERT_LAST  - Add track to end of playlist
+ *     PLAYLIST_PREPEND         - Add track at beginning of playlist
+ *     PLAYLIST_INSERT          - Add track after current song.  NOTE: If
+ *                                there are already inserted tracks then track
+ *                                is added to the end of the insertion list
+ *     PLAYLIST_INSERT_FIRST    - Add track immediately after current song, no
+ *                                matter what other tracks have been inserted
+ *     PLAYLIST_INSERT_LAST     - Add track to end of playlist
+ *     PLAYLIST_INSERT_SHUFFLED - Add track at some random point between the
+ *                                current playing track and end of playlist
  */
 static int add_track_to_playlist(struct playlist_info* playlist,
                                  const char *filename, int position,
@@ -459,6 +462,24 @@ static int add_track_to_playlist(struct playlist_info* playlist,
 
             flags = PLAYLIST_INSERT_TYPE_APPEND;
             break;
+        case PLAYLIST_INSERT_SHUFFLED:
+        {
+            int offset;
+            int n = playlist->amount -
+                rotate_index(playlist, playlist->index);
+            
+            if (n > 0)
+                offset = rand() % n;
+            else
+                offset = 0;
+
+            position = playlist->index + offset + 1;
+            if (position >= playlist->amount)
+                position -= playlist->amount;
+
+            insert_position = position;
+            break;
+        }
     }
     
     if (queue)
@@ -807,7 +828,8 @@ static int sort_playlist(struct playlist_info* playlist, bool start_current,
  * returns the index of the track that is "steps" away from current playing
  * track.
  */
-static int get_next_index(const struct playlist_info* playlist, int steps)
+static int get_next_index(struct playlist_info* playlist, int steps,
+                          int repeat_mode)
 {
     int current_index = playlist->index;
     int next_index    = -1;
@@ -815,8 +837,18 @@ static int get_next_index(const struct playlist_info* playlist, int steps)
     if (playlist->amount <= 0)
         return -1;
 
-    switch (global_settings.repeat_mode)
+    if (repeat_mode == -1)
+        repeat_mode = global_settings.repeat_mode;
+
+    if (repeat_mode == REPEAT_SHUFFLE &&
+        (!global_settings.playlist_shuffle || playlist->amount <= 1))
+        repeat_mode = REPEAT_ALL;
+
+    switch (repeat_mode)
     {
+        case REPEAT_SHUFFLE:
+            /* Treat repeat shuffle just like repeat off.  At end of playlist,
+               play will be resumed in playlist_next() */
         case REPEAT_OFF:
         {
             current_index = rotate_index(playlist, current_index);
@@ -1634,7 +1666,13 @@ int playlist_start(int start_index, int offset)
 bool playlist_check(int steps)
 {
     struct playlist_info* playlist = &current_playlist;
-    int index = get_next_index(playlist, steps);
+    int index = get_next_index(playlist, steps, -1);
+
+    if (index < 0 && steps >= 0 &&
+        global_settings.repeat_mode == REPEAT_SHUFFLE)
+        /* shuffle repeat is the same as repeat all for check purposes */
+        index = get_next_index(playlist, steps, REPEAT_ALL);
+
     return (index >= 0);
 }
 
@@ -1649,7 +1687,7 @@ char* playlist_peek(int steps)
     int index;
     bool control_file;
 
-    index = get_next_index(playlist, steps);
+    index = get_next_index(playlist, steps, -1);
     if (index < 0)
         return NULL;
 
@@ -1705,7 +1743,7 @@ int playlist_next(int steps)
         /* We need to delete all the queued songs */
         for (i=0, j=steps; i<j; i++)
         {
-            index = get_next_index(playlist, i);
+            index = get_next_index(playlist, i, -1);
             
             if (playlist->indices[index] & PLAYLIST_QUEUE_MASK)
             {
@@ -1715,7 +1753,25 @@ int playlist_next(int steps)
         }
     }
 
-    index = get_next_index(playlist, steps);
+    index = get_next_index(playlist, steps, -1);
+
+    if (index < 0)
+    {
+        /* end of playlist... or is it */
+        if (global_settings.repeat_mode == REPEAT_SHUFFLE &&
+            global_settings.playlist_shuffle &&
+            playlist->amount > 1)
+        {
+            /* Repeat shuffle mode.  Re-shuffle playlist and resume play */
+            playlist->first_index = global_settings.resume_first_index = 0;
+            sort_playlist(playlist, false, false);
+            randomise_playlist(playlist, current_tick, false, true);
+            playlist_start(0, 0);
+        }
+
+        return index;
+    }
+
     playlist->index = index;
 
     if (playlist->last_insert_pos >= 0 && steps > 0)

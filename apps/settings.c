@@ -203,7 +203,7 @@ static const struct bit_entry rtc_bits[] =
     {16 | SIGNED, S_O(resume_first_index), 0, NULL, NULL },
     {32 | SIGNED, S_O(resume_offset), -1, NULL, NULL },
     {32 | SIGNED, S_O(resume_seed), -1, NULL, NULL },
-    {2, S_O(repeat_mode), REPEAT_ALL, "repeat", "off,all,one" },
+    {2, S_O(repeat_mode), REPEAT_ALL, "repeat", "off,all,one,shuffle" },
     /* LCD */
     {6, S_O(contrast), 40, "contrast", NULL },
 #ifdef CONFIG_BACKLIGHT

@@ -585,9 +585,13 @@ bool quick_screen(int context, int button)
                     case REPEAT_ONE:
                         ptr = str(LANG_REPEAT_ONE);
                         break;
+        
+                    case REPEAT_SHUFFLE:
+                        ptr = str(LANG_SHUFFLE);
+                        break;
                 }
         
-                lcd_getstringsize(str(LANG_REPEAT),&w,&h);
+                lcd_getstringsize(str(LANG_SHUFFLE),&w,&h);
                 lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2, str(LANG_REPEAT));
                 lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h, str(LANG_F2_MODE));
                 lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2, ptr);

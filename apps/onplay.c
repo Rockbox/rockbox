@@ -244,8 +244,8 @@ static bool view_playlist(void)
 /* Sub-menu for playlist options */
 static bool playlist_options(void)
 {
-    struct menu_item items[11]; 
-    struct playlist_args args[11]; /* increase these 2 if you add entries! */
+    struct menu_item items[12]; 
+    struct playlist_args args[12]; /* increase these 2 if you add entries! */
     int m, i=0, pstart=0, result;
     bool ret = false;
 
@@ -296,6 +296,11 @@ static bool playlist_options(void)
             args[i].queue = false;
             i++;
 
+            items[i].desc = ID2P(LANG_INSERT_SHUFFLED);
+            args[i].position = PLAYLIST_INSERT_SHUFFLED;
+            args[i].queue = false;
+            i++;
+         
             items[i].desc = ID2P(LANG_QUEUE);
             args[i].position = PLAYLIST_INSERT;
             args[i].queue = true;

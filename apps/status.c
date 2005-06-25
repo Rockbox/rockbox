@@ -260,6 +260,7 @@ void status_draw(bool force_redraw)
                 break;
 
             case REPEAT_ALL:
+            case REPEAT_SHUFFLE:
                 statusbar_icon_play_mode(Icon_Repeat);
                 break;
         }

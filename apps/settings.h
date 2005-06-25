@@ -224,7 +224,7 @@ struct user_settings
 
     /* misc options */
 
-    int repeat_mode;   /* 0=off 1=repeat all 2=repeat one  */
+    int repeat_mode;   /* 0=off 1=repeat all 2=repeat one 3=shuffle */
     int dirfilter;     /* 0=display all, 1=only supported, 2=only music,
                           3=dirs+playlists, 4=ID3 database */
     bool sort_case;    /* dir sort order: 0=case insensitive, 1=sensitive */
@@ -387,7 +387,8 @@ extern const char rec_base_directory[];
 #define SETTINGS_ALL 3 /* both */
 
 /* repeat mode options */
-enum { REPEAT_OFF, REPEAT_ALL, REPEAT_ONE, NUM_REPEAT_MODES };
+enum { REPEAT_OFF, REPEAT_ALL, REPEAT_ONE, REPEAT_SHUFFLE,
+NUM_REPEAT_MODES };
 
 /* dir filter options */
 /* Note: Any new filter modes need to be added before NUM_FILTER_MODES.

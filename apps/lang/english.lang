@@ -3111,3 +3111,8 @@ desc: in playlist menu, reshuffles the order in which songs are played
 eng: "Reshuffle"
 voice: "Reshuffle"
 new:
+
+id: LANG_INSERT_SHUFFLED
+desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
+eng: "Insert shuffled"
+new:

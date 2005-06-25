@@ -584,12 +584,13 @@ static bool repeat_mode(void)
     static const struct opt_items names[] = { 
         { STR(LANG_OFF) },
         { STR(LANG_REPEAT_ALL) },
-        { STR(LANG_REPEAT_ONE) }
+        { STR(LANG_REPEAT_ONE) },
+        { STR(LANG_SHUFFLE) },
     };
     int old_repeat = global_settings.repeat_mode;
 
     result = set_option( str(LANG_REPEAT), &global_settings.repeat_mode,
-                         INT, names, 3, NULL );
+                         INT, names, 4, NULL );
 
     if (old_repeat != global_settings.repeat_mode)
         audio_flush_and_reload_tracks();
