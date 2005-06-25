@@ -332,7 +332,7 @@ static void nopixel(int x, int y)
 }
 
 lcd_pixelfunc_type* pixelfunc[8] = {flippixel, nopixel, setpixel, setpixel,
-                               nopixel, clearpixel, nopixel, clearpixel};
+                                    nopixel, clearpixel, nopixel, clearpixel};
                                
 static void flipblock(unsigned char *address, unsigned mask, unsigned bits)
 {
@@ -361,10 +361,9 @@ lcd_blockfunc_type* blockfunc[4] = {flipblock, bgblock, fgblock, solidblock};
 /* Clear the whole display */
 void lcd_clear_display(void)
 {
-    if (drawmode & DRMODE_INVERSEVID)
-        memset (lcd_framebuffer, 0xFF, sizeof lcd_framebuffer);
-    else
-        memset (lcd_framebuffer, 0, sizeof lcd_framebuffer);
+    unsigned bits = (drawmode & DRMODE_INVERSEVID) ? 0xFFu : 0;
+
+    memset(lcd_framebuffer, bits, sizeof lcd_framebuffer);
     scrolling_lines = 0;
 }
 

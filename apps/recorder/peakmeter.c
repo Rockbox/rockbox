@@ -938,8 +938,7 @@ void peak_meter_draw(int x, int y, int width, int height)
     /* draw left */
     lcd_fillrect (x, y, left, height / 2 - 2 );
     if (peak_meter_max_l > 0) {
-        lcd_drawline(x + peak_meter_max_l, y, 
-                     x + peak_meter_max_l, y + height / 2 - 2 );
+        lcd_vline(x + peak_meter_max_l, y, y + height / 2 - 2 );
     }
     if (peak_meter_l_clip) {
         lcd_fillrect(x + meterwidth, y, 3, height / 2 - 1);
@@ -948,17 +947,15 @@ void peak_meter_draw(int x, int y, int width, int height)
     /* draw right */
     lcd_fillrect(x, y + height / 2 + 1, right, height / 2 - 2);
     if (peak_meter_max_r > 0) {
-        lcd_drawline( x + peak_meter_max_r, y + height / 2, 
-                      x + peak_meter_max_r, y + height - 2);
+        lcd_vline( x + peak_meter_max_r, y + height / 2, y + height - 2);
     }
     if (peak_meter_r_clip) {
         lcd_fillrect(x + meterwidth, y + height / 2, 3, height / 2 - 1);
     }
 
     /* draw scale end */
-    lcd_drawline(x + meterwidth, y,
-                 x + meterwidth, y + height - 2);
-    
+    lcd_vline(x + meterwidth, y, y + height - 2);
+
     lcd_set_drawmode(DRMODE_COMPLEMENT);
     /* draw dots for scale marks */
     for (i = 0; i < db_scale_count; i++) {
@@ -976,12 +973,12 @@ void peak_meter_draw(int x, int y, int width, int height)
         ycenter = y + height / 2;
         /* display threshold value */
         start_trigx = x+peak_meter_scale_value(trig_strt_threshold,meterwidth);
-        lcd_drawline(start_trigx, ycenter - 2, start_trigx, ycenter);
+        lcd_vline(start_trigx, ycenter - 2, ycenter);
         start_trigx ++;
         if (start_trigx < LCD_WIDTH) lcd_drawpixel(start_trigx, ycenter - 1);
 
         stop_trigx = x + peak_meter_scale_value(trig_stp_threshold,meterwidth);
-        lcd_drawline(stop_trigx, ycenter - 2, stop_trigx, ycenter);
+        lcd_vline(stop_trigx, ycenter - 2, ycenter);
         if (stop_trigx > 0) lcd_drawpixel(stop_trigx - 1, ycenter - 1);
     }
 #endif
@@ -1196,7 +1193,7 @@ bool peak_meter_histogram(void) {
 
         for (i = 0; i < PEEKS_PER_DRAW_SIZE; i++) {
             x = peeks_per_redraw[i] * (LCD_WIDTH - 1)/ max;
-            lcd_drawline(0, y + i, x, y + i);
+            lcd_hline(0, x, y + i);
         }
 
         y = PEEKS_PER_DRAW_SIZE + 1;
@@ -1208,7 +1205,7 @@ bool peak_meter_histogram(void) {
 
         for (i = 0; i < TICKS_PER_DRAW_SIZE; i++) {
             x = ticks_per_redraw[i] * (LCD_WIDTH - 1)/ max;
-            lcd_drawline(0, y + i, x, y + i);
+            lcd_hline(0, x, y + i);
         }
         lcd_update();
         

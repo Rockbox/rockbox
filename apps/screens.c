@@ -854,8 +854,8 @@ void splash(int ticks,       /* how long the splash is displayed */
             lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
             lcd_fillrect(0, y-2, LCD_WIDTH, LCD_HEIGHT-y*2+4);
             lcd_set_drawmode(DRMODE_SOLID);
-            lcd_drawline(0, y-2, LCD_WIDTH-1, y-2);
-            lcd_drawline(0, LCD_HEIGHT-y+2, LCD_WIDTH-1, LCD_HEIGHT-y+2);
+            lcd_hline(0, LCD_WIDTH-1, y-2);
+            lcd_hline(0, LCD_WIDTH-1, LCD_HEIGHT-y+2);
         }
     }
     else

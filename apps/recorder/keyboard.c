@@ -167,7 +167,7 @@ int kbd_input(char* text, int buflen)
                 lcd_putsxy(0, 8+i * font_h, line[i]);
             
             /* separator */
-            lcd_drawline(0, main_y - margin, LCD_WIDTH - 1, main_y - margin);
+            lcd_hline(0, LCD_WIDTH - 1, main_y - margin);
             
             /* write out the text */
             curpos = MIN(editpos, max_chars - MIN(len - editpos, 2));
@@ -184,7 +184,7 @@ int kbd_input(char* text, int buflen)
 
             /* cursor */
             i = (curpos + 1) * font_w;
-            lcd_drawline(i, main_y, i, main_y + font_h);
+            lcd_vline(i, main_y, main_y + font_h);
 
 #if CONFIG_KEYPAD == RECORDER_PAD
             /* draw the status bar */

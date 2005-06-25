@@ -62,18 +62,16 @@ void draw_battery(int xbase, int ybase, int len, int wid, int percent)
     }
 
     /* top batt. edge */ 
-    lcd_drawline(xbase, ybase, xbase+len-2, ybase); 
+    lcd_hline(xbase, xbase+len-2, ybase);
 
     /* bot batt. edge */ 
-    lcd_drawline(xbase, ybase+wid, 
-                 xbase+len-2, ybase+wid); 
+    lcd_hine(xbase, xbase+len-2, ybase+wid);
 
     /* left batt. edge */ 
-    lcd_drawline(xbase, ybase, xbase, ybase+wid); 
+    lcd_vline(xbase, ybase, ybase+wid);
 
     /* right batt. edge */ 
-    lcd_drawline(xbase+len, ybase+1, 
-                 xbase+len, ybase+wid-1); 
+    lcd_vline(xbase+len, ybase+1, ybase+wid-1); 
 
     /* 2 dots that account for the nub on the right side of the battery */ 
     lcd_drawpixel(xbase+len-1, ybase+1); 
@@ -85,8 +83,8 @@ void draw_battery(int xbase, int ybase, int len, int wid, int percent)
         bar_len = capacity; 
 
         for(i = 0; i < bar_wid+1; i++) { 
-            lcd_drawline(xbase+bar_xoffset, ybase+bar_yoffset+i, 
-                         xbase+bar_xoffset+bar_len, ybase+bar_yoffset+i); 
+            lcd_hline(xbase+bar_xoffset,
+                      xbase+bar_xoffset+bar_len, ybase+bar_yoffset+i); 
         } 
     } 
 	lcd_update();
