@@ -33,7 +33,7 @@ use F3 to see how many mines are left (supposing all your flags are correct)
 
 #ifdef HAVE_LCD_BITMAP
 
-//what the minesweeper() function can return       
+//what the minesweeper() function can return
 #define MINESWEEPER_USB  3
 #define MINESWEEPER_QUIT 2
 #define MINESWEEPER_LOSE 1
@@ -81,13 +81,13 @@ static unsigned char num[9][8] = {
                 4567
                 890a
                 bcde
-                
+
       in binary b84f
                 c951
                 d062
                 ea73
     */
-     
+
     /* 0 */
     {0x00, /* ........ */
      0x00, /* ........ */
@@ -185,9 +185,8 @@ typedef struct tile {
 } tile;
 
 /* the height and width of the field */
-/* could be variable if malloc worked in the API :) */
-const int height = LCD_HEIGHT/8;
-const int width = LCD_WIDTH/8;
+int height = LCD_HEIGHT/8;
+int width = LCD_WIDTH/8;
 
 /* the minefield */
 tile minefield[LCD_HEIGHT/8][LCD_WIDTH/8];
@@ -200,13 +199,13 @@ int mine_num = 0;
 /* as neighbors */
 void discover(int, int);
 void discover(int x, int y){
-    
+
     if(x<0) return;
     if(y<0) return;
     if(x>width-1) return;
     if(y>height-1) return;
     if(minefield[y][x].known) return;
-    
+
     minefield[y][x].known = 1;
     if(minefield[y][x].neighbors == 0){
         discover(x-1,y-1);
@@ -225,7 +224,7 @@ void discover(int x, int y){
 /* init not mine related elements of the mine field */
 void minesweeper_init(void){
     int i,j;
-    
+
     for(i=0;i<height;i++){
         for(j=0;j<width;j++){
             minefield[i][j].known = 0;
@@ -253,7 +252,7 @@ void minesweeper_putmines(int p, int x, int y){
             minefield[i][j].neighbors = 0;
         }
     }
-    
+
     /* we need to compute the neighbor element for each tile */
     for(i=0;i<height;i++){
         for(j=0;j<width;j++){
@@ -285,10 +284,10 @@ int minesweeper(void)
     int i,j;
     int button;
     int lastbutton = BUTTON_NONE;
-    
+
     /* the cursor coordinates */
     int x=0,y=0;
-    
+
     /* number of tiles left on the game */
     int tiles_left=width*height;
 
@@ -302,18 +301,21 @@ int minesweeper(void)
     i = 0;
     while(true){
         rb->lcd_clear_display();
-    
+
         rb->lcd_puts(0,0,"Mine Sweeper");
 
         rb->snprintf(str, 20, "%d%% mines", p);
-        rb->lcd_puts(0,1,str);
-        rb->lcd_puts(0,2,"down / up");
+        rb->lcd_puts(0,2,str);
+        rb->lcd_puts(0,3,"down / up");
+        rb->snprintf(str, 20, "%d cols x %d rows", width, height);
+        rb->lcd_puts(0,4,str);
+        rb->lcd_puts(0,5,"left x right ");
 #if CONFIG_KEYPAD == RECORDER_PAD
-        rb->lcd_puts(0,4,"ON to start");
+        rb->lcd_puts(0,6,"ON to start");
 #elif CONFIG_KEYPAD == ONDIO_PAD
-        rb->lcd_puts(0,4,"MODE to start");
+        rb->lcd_puts(0,6,"MODE to start");
 #elif CONFIG_KEYPAD == IRIVER_H100_PAD
-        rb->lcd_puts(0,4,"SELECT to start");
+        rb->lcd_puts(0,6,"SELECT to start");
 #endif
 
         rb->lcd_update();
@@ -322,13 +324,19 @@ int minesweeper(void)
         button = rb->button_get(true);
         switch(button){
             case BUTTON_DOWN:
-            case BUTTON_LEFT:
                 p = (p + 98)%100;
                 break;
-            
+
             case BUTTON_UP:
-            case BUTTON_RIGHT:
                 p = (p + 2)%100;
+                break;
+
+            case BUTTON_RIGHT:
+                height = height%(LCD_HEIGHT/8)+1;
+                break;
+
+            case BUTTON_LEFT:
+                width = width%(LCD_WIDTH/8)+1;
                 break;
 
             case MINESWP_START:/* start playing */
@@ -346,7 +354,7 @@ int minesweeper(void)
         if(i==1)
             break;
     }
-    
+
 
     /********************
     *       init        *
@@ -359,10 +367,10 @@ int minesweeper(void)
     **********************/
 
     while(true){
-    
+
         //clear the screen buffer
         rb->lcd_clear_display();
-    
+
         //display the mine field
         for(i=0;i<height;i++){
             for(j=0;j<width;j++){
@@ -371,8 +379,8 @@ int minesweeper(void)
                     if(minefield[i][j].mine){
                         rb->lcd_putsxy(j*8+1,i*8+1,"b");
                     } else if(minefield[i][j].neighbors){
-                        rb->lcd_bitmap(num[minefield[i][j].neighbors],j*8,i*8,8,8,false); 
-                    } 
+                        rb->lcd_bitmap(num[minefield[i][j].neighbors],j*8,i*8,8,8,false);
+                    }
                 } else if(minefield[i][j].flag) {
                     rb->lcd_drawline(j*8+2,i*8+2,j*8+5,i*8+5);
                     rb->lcd_drawline(j*8+2,i*8+5,j*8+5,i*8+2);
@@ -389,31 +397,31 @@ int minesweeper(void)
 
         /* update the screen */
         rb->lcd_update();
-        
+
         button = rb->button_get(true);
         switch(button){
             /* quit minesweeper (you really shouldn't use this button ...) */
             case MINESWP_QUIT:
                 return MINESWEEPER_QUIT;
-            
+
                 /* move cursor left */
             case BUTTON_LEFT:
             case (BUTTON_LEFT | BUTTON_REPEAT):
                 x = (x + width - 1)%width;
                 break;
-            
+
                 /* move cursor right */
             case BUTTON_RIGHT:
             case (BUTTON_RIGHT | BUTTON_REPEAT):
                 x = (x + 1)%width;
                 break;
-            
+
                 /* move cursor down */
             case BUTTON_DOWN:
             case (BUTTON_DOWN | BUTTON_REPEAT):
                 y = (y + 1)%height;
                 break;
-            
+
                 /* move cursor up */
             case BUTTON_UP:
             case (BUTTON_UP | BUTTON_REPEAT):
@@ -442,8 +450,8 @@ int minesweeper(void)
                 if(tiles_left == mine_num){
                     return MINESWEEPER_WIN;
                 }
-                break; 
-            
+                break;
+
                 /* toggle flag under cursor */
             case MINESWP_TOGGLE:
 #ifdef MINESWP_TOGGLE_PRE
@@ -476,7 +484,7 @@ int minesweeper(void)
         if (button != BUTTON_NONE)
             lastbutton = button;
     }
- 
+
 }
 
 /* plugin entry point */
@@ -494,18 +502,18 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             case MINESWEEPER_WIN:
                 rb->splash(HZ*2, true, "You Win :)");
                 break;
-                
+
             case MINESWEEPER_LOSE:
                 rb->splash(HZ*2, true, "You Lost :(");
                 break;
-                
+
             case MINESWEEPER_USB:
                 return PLUGIN_USB_CONNECTED;
-                
+
             case MINESWEEPER_QUIT:
                 exit = true;
                 break;
-                
+
             default:
                 break;
         }
