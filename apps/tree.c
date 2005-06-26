@@ -554,7 +554,7 @@ static void start_resume(bool just_powered_on)
                global_settings.resume_index,
                global_settings.resume_offset);
 
-        if (!ask_resume(just_powered_on) && just_powered_on )
+        if (!ask_resume(just_powered_on) )
             return;
 
         if (playlist_resume() != -1)
