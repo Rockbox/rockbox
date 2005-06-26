@@ -830,6 +830,13 @@ unsigned char move_card(unsigned char dest_col, unsigned char src_card){
 #define SOLITAIRE_QUIT 1
 #define SOLITAIRE_USB 2
 
+#if ( LCD_WIDTH > ( CARD_WIDTH * 8 ) )
+#   define BIG_SCREEN 1
+#else
+#   define BIG_SCREEN 0
+#endif
+#define LCD_WIDTH2 (LCD_WIDTH - BIG_SCREEN)
+
 /* the game */
 int solitaire(void){
 
@@ -838,11 +845,7 @@ int solitaire(void){
     unsigned char c;
     int biggest_col_length;
 
-    struct tm time;
-    time = *(rb->get_time());
-    rb->srand( ( ( ( time.tm_year + 365 * time.tm_yday ) * 24
-                + time.tm_hour ) * 60 + time.tm_min ) * 60 + time.tm_sec );
-
+    rb->srand( *rb->current_tick );
 
     switch(solitaire_menu(MENU_BEFOREGAME)) {
         case MENU_QUIT:
@@ -941,44 +944,50 @@ int solitaire(void){
                 }
             }
             if(c != NOT_A_CARD) {
-                rb->lcd_bitmap(numbers[deck[c].num], LCD_WIDTH - CARD_WIDTH+1, i*CARD_HEIGHT, 8, 8, true);
+                rb->lcd_bitmap(numbers[deck[c].num], LCD_WIDTH2 - CARD_WIDTH+1, i*CARD_HEIGHT, 8, 8, true);
             }
-            rb->lcd_bitmap(colors[i], LCD_WIDTH - CARD_WIDTH+7, i*CARD_HEIGHT, 8, 8, true);
+            rb->lcd_bitmap(colors[i], LCD_WIDTH2 - CARD_WIDTH+7, i*CARD_HEIGHT, 8, 8, true);
             /* draw a selected card */
             if(c != NOT_A_CARD) {
                 if(sel_card == c){
-                    rb->lcd_drawrect(LCD_WIDTH - CARD_WIDTH+1, i*CARD_HEIGHT + 1, CARD_WIDTH-1, CARD_HEIGHT-1);
+                    rb->lcd_drawrect(LCD_WIDTH2 - CARD_WIDTH+1, i*CARD_HEIGHT + 1, CARD_WIDTH-1, CARD_HEIGHT-1);
                 }
             }
-            rb->lcd_drawline(LCD_WIDTH - CARD_WIDTH+1,i*CARD_HEIGHT,LCD_WIDTH - 1,i*CARD_HEIGHT);
-            rb->lcd_drawline(LCD_WIDTH - CARD_WIDTH,i*CARD_HEIGHT+1,LCD_WIDTH - CARD_WIDTH,(i+1)*CARD_HEIGHT-1);
-            rb->lcd_drawline(LCD_WIDTH - CARD_WIDTH+1,(i+1)*CARD_HEIGHT,LCD_WIDTH - 1,(i+1)*CARD_HEIGHT);
+            rb->lcd_drawline(LCD_WIDTH2 - CARD_WIDTH+1, i*CARD_HEIGHT,LCD_WIDTH2 - 1,i*CARD_HEIGHT);
+            rb->lcd_drawline(LCD_WIDTH2 - CARD_WIDTH,i*CARD_HEIGHT+1,LCD_WIDTH2 - CARD_WIDTH,(i+1)*CARD_HEIGHT-1);
+            rb->lcd_drawline(LCD_WIDTH2 - CARD_WIDTH+1,(i+1)*CARD_HEIGHT,LCD_WIDTH2 - 1,(i+1)*CARD_HEIGHT);
+#if BIG_SCREEN
+            rb->lcd_drawline(LCD_WIDTH2,i*CARD_HEIGHT+1,LCD_WIDTH2,(i+1)*CARD_HEIGHT-1);
+#endif
             /* draw the cursor on one of the stacks */
             if(cur_col == STACKS_COL + i){
                 rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-                rb->lcd_fillrect(LCD_WIDTH - CARD_WIDTH+1, i*CARD_HEIGHT + 1, CARD_WIDTH-1, CARD_HEIGHT-1);
+                rb->lcd_fillrect(LCD_WIDTH2 - CARD_WIDTH+1, i*CARD_HEIGHT + 1, CARD_WIDTH-1, CARD_HEIGHT-1);
                 rb->lcd_set_drawmode(DRMODE_SOLID);
             }
         }
 
         /* draw the remains */
         if(rem != NOT_A_CARD) {
-            rb->lcd_drawline(LCD_WIDTH - CARD_WIDTH+1,LCD_HEIGHT-CARD_HEIGHT-1,LCD_WIDTH - 1,LCD_HEIGHT-CARD_HEIGHT-1);
-            rb->lcd_drawline(LCD_WIDTH - CARD_WIDTH,LCD_HEIGHT-CARD_HEIGHT,LCD_WIDTH - CARD_WIDTH,LCD_HEIGHT-2);
-            rb->lcd_drawline(LCD_WIDTH - CARD_WIDTH+1,LCD_HEIGHT-1,LCD_WIDTH - 1,LCD_HEIGHT-1);
+            rb->lcd_drawline(LCD_WIDTH2 - CARD_WIDTH+1,LCD_HEIGHT-CARD_HEIGHT-1,LCD_WIDTH2 - 1,LCD_HEIGHT-CARD_HEIGHT-1);
+            rb->lcd_drawline(LCD_WIDTH2 - CARD_WIDTH,LCD_HEIGHT-CARD_HEIGHT,LCD_WIDTH2 - CARD_WIDTH,LCD_HEIGHT-2);
+            rb->lcd_drawline(LCD_WIDTH2 - CARD_WIDTH+1,LCD_HEIGHT-1,LCD_WIDTH2 - 1,LCD_HEIGHT-1);
+#if BIG_SCREEN
+             rb->lcd_drawline(LCD_WIDTH2,LCD_HEIGHT-CARD_HEIGHT,LCD_WIDTH2,LCD_HEIGHT-2);
+#endif
             if(cur_rem != NOT_A_CARD){
-                rb->lcd_bitmap(numbers[deck[cur_rem].num], LCD_WIDTH - CARD_WIDTH+1, LCD_HEIGHT-CARD_HEIGHT, 8, 8, true);
-                rb->lcd_bitmap(colors[deck[cur_rem].color], LCD_WIDTH - CARD_WIDTH+7, LCD_HEIGHT-CARD_HEIGHT, 8, 8, true);
+                rb->lcd_bitmap(numbers[deck[cur_rem].num], LCD_WIDTH2 - CARD_WIDTH+1, LCD_HEIGHT-CARD_HEIGHT, 8, 8, true);
+                rb->lcd_bitmap(colors[deck[cur_rem].color], LCD_WIDTH2 - CARD_WIDTH+7, LCD_HEIGHT-CARD_HEIGHT, 8, 8, true);
                 /* draw a selected card */
                 if(sel_card == cur_rem){
-                    rb->lcd_drawrect(LCD_WIDTH - CARD_WIDTH+1, LCD_HEIGHT-CARD_HEIGHT,CARD_WIDTH-1, CARD_HEIGHT-1);
+                    rb->lcd_drawrect(LCD_WIDTH2 - CARD_WIDTH+1, LCD_HEIGHT-CARD_HEIGHT,CARD_WIDTH-1, CARD_HEIGHT-1);
                 }
             }
         }
         /* draw the cursor */
         if(cur_col == REM_COL){
             rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-            rb->lcd_fillrect(LCD_WIDTH - CARD_WIDTH+1, LCD_HEIGHT-CARD_HEIGHT,CARD_WIDTH-1, CARD_HEIGHT-1);
+            rb->lcd_fillrect(LCD_WIDTH2 - CARD_WIDTH+1, LCD_HEIGHT-CARD_HEIGHT,CARD_WIDTH-1, CARD_HEIGHT-1);
             rb->lcd_set_drawmode(DRMODE_SOLID);
         }
 
