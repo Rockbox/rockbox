@@ -19,6 +19,7 @@
 #ifndef _SCREENS_H_
 #define _SCREENS_H_
 
+#include "config.h"
 #include "timefuncs.h"
 
 void usb_display_info(void);
