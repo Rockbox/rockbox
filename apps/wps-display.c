@@ -758,9 +758,9 @@ static void format_display(char* buf,
     int n;
 #ifdef HAVE_LCD_BITMAP
     int ret;
-    const char *pos, *posn;
-    char imgtmp[32];
+    char *pos, *posn;
     char imgname[MAX_PATH];
+    char *ptr;
 #endif
 
     *subline_time_mult = DEFAULT_SUBLINE_TIME_MULTIPLIER;
@@ -803,47 +803,55 @@ static void format_display(char* buf,
 #ifdef HAVE_LCD_BITMAP
                 /* get image number */
                 pos = strchr(fmt, '|'); /* get the first '|' */
-                if ((pos - fmt) < 32) {
-                    strncpy(imgtmp, fmt+1, pos - fmt - 1);
-                    imgtmp[pos - fmt - 1] = 0;
-                    n = atoi(imgtmp);
+                ptr = (char *)fmt+1;
+                if (pos && ((pos - ptr) < (int)sizeof(temp_buf))) {
+                    memcpy(temp_buf, ptr, pos - ptr);
+                    temp_buf[pos - ptr] = 0;
+                    n = atoi(temp_buf);
+                    ptr = pos+1;
                     
                     /* check image number, and load state. */
                     if ((n < MAX_IMAGES) && (!img[n].loaded)) {
                         /* Get filename */
-                        pos = strchr(fmt+3, '|'); /* get the second '|' */
-                        if ((pos - fmt) < 32) {
-                            strncpy(imgtmp, fmt+3, pos - fmt - 3); /* get the filename */
-                            imgtmp[pos - fmt - 3] = 0;
-                        } else {
-                            /* hm.. filename is to long... */
-                            *imgtmp = 0;
+                        pos = strchr(ptr, '|'); /* get the second '|' */
+                        if ((pos - ptr) < (int)sizeof(temp_buf)) {
+                            memcpy(temp_buf, ptr, pos - ptr); /* get the filename */
+                            temp_buf[pos - ptr] = 0;
+                            snprintf(imgname, MAX_PATH, "/.rockbox/%s", temp_buf);
                         }
-                        snprintf(imgname, MAX_PATH, "/.rockbox/%s", imgtmp);
+                        else {
+                            /* filename too long! */
+                            imgname[0]=0;
+                        }
 
                         /* Get X-position */
-                        posn = strchr(pos+1, '|'); /* get the 3th '|' */
-                        if ((posn - fmt) < 32) {
-                            strncpy(imgtmp, pos+1, posn - pos - 1);
-                            imgtmp[posn - pos - 1] = 0;
-                            img[n].x = atoi(imgtmp);
-                        } else {
-                            img[n].x = 0;
+                        ptr=pos+1;
+                        posn = strchr(ptr, '|'); /* get the 3th '|' */
+                        if ((posn - ptr) < (int)sizeof(temp_buf)) {
+                            memcpy(temp_buf, ptr, posn - ptr);
+                            temp_buf[posn - ptr] = 0;
+                            img[n].x = atoi(temp_buf);
                         }
+                        else
+                            /* weird syntax, get out */
+                            break;
 
                         /* Get Y-position */
                         pos = posn;
-                        posn = strchr(pos+1, '|'); /* get the 4th '|' */
-                        if ((posn - fmt) < 32) {
-                            strncpy(imgtmp, pos+1, posn - pos - 1);
-                            imgtmp[posn - pos - 1] = 0;
-                            img[n].y = atoi(imgtmp);
-                        } else {
-                            img[n].y = 0;
+                        ptr = posn+1;
+                        posn = strchr(ptr, '|'); /* get the 4th '|' */
+                        if ((posn - ptr) < (int)sizeof(temp_buf)) {
+                            memcpy(temp_buf, ptr, posn - ptr);
+                            temp_buf[posn - ptr] = 0;
+                            img[n].y = atoi(temp_buf);
                         }
+                        else
+                            /* weird syntax, get out */
+                            break;
                         
                         /* and load the image */
-                        ret = read_bmp_file(imgname, &img[n].w, &img[n].h, img_buf_ptr, img_buf_free);
+                        ret = read_bmp_file(imgname, &img[n].w, &img[n].h, img_buf_ptr,
+                                            img_buf_free);
                         if (ret > 0) {
                             img[n].ptr = img_buf_ptr;
                             img_buf_ptr += ret;
