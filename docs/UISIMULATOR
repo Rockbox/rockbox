@@ -45,6 +45,7 @@ Terminology
         [ Makefile created, archos subdirectory created ]
 
         $ make
+        $ make install
         $ ./rockboxui
 
     Note that the simulator uses a local subdirectory named 'archos' as "root
