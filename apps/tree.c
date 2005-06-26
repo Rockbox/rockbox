@@ -1066,12 +1066,12 @@ static bool dirbrowse(void)
                 }
                 break;
 
-#ifdef BUTTON_F2
-            case BUTTON_F2:
+#ifdef TREE_QUICK
+            case TREE_QUICK:
                 /* don't enter f2 from plugin browser */
                 if (*tc.dirfilter < NUM_FILTER_MODES)
                 {
-                    if (quick_screen(curr_context, BUTTON_F2))
+                    if (quick_screen(curr_context, TREE_QUICK))
                         reload_dir = true;
                     restore = true;
 
@@ -1079,6 +1079,9 @@ static bool dirbrowse(void)
                     break;
                 }
 
+#endif
+
+#ifdef BUTTON_F3
             case BUTTON_F3:
                 /* don't enter f3 from plugin browser */
                 if (*tc.dirfilter < NUM_FILTER_MODES)

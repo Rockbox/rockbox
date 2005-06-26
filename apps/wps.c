@@ -655,27 +655,32 @@ long wps_show(void)
                 break;
 #endif
 
-#if CONFIG_KEYPAD == RECORDER_PAD
+#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H100_PAD)
                 /* play settings */
-            case BUTTON_F2:
-                if (quick_screen(CONTEXT_WPS, BUTTON_F2))
+            case WPS_QUICK:
+                if (quick_screen(CONTEXT_WPS, WPS_QUICK))
                     return SYS_USB_CONNECTED;
                 restore = true;
+		lastbutton = 0;
                 break;
 
                 /* screen settings */
+#ifdef BUTTON_F3
             case BUTTON_F3:
                 if (quick_screen(CONTEXT_WPS, BUTTON_F3))
                     return SYS_USB_CONNECTED;
                 restore = true;
                 break;
+#endif
 
                 /* pitch screen */
+#if CONFIG_KEYPAD == RECORDER_PAD
             case BUTTON_ON | BUTTON_REPEAT:
                 if (2 == pitch_screen())
                     return SYS_USB_CONNECTED;
                 restore = true;
                 break;
+#endif
 #endif
 
                 /* stop and exit wps */

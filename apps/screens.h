@@ -33,6 +33,13 @@ int mmc_remove_request(void);
 #if CONFIG_KEYPAD == RECORDER_PAD
 int pitch_screen(void);
 bool quick_screen(const int, const int);
+#define SCREENS_QUICK   BUTTON_F2
+#endif
+ 
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
+bool quick_screen(const int, const int);
+#define SCREENS_QUICK   BUTTON_ON 
+   /* Long press already detected so not needed here */
 #endif
 
 void splash(int ticks,       /* how long */

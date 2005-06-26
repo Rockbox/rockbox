@@ -513,7 +513,9 @@ int pitch_screen(void)
     else
         return 0;
 }
+#endif
 
+#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H100_PAD)
 bool quick_screen(int context, int button)
 {
     bool exit = false;
@@ -535,7 +537,12 @@ bool quick_screen(int context, int button)
 
         switch(button)
         {
-            case BUTTON_F2:
+#if CONFIG_KEYPAD == RECORDER_PAD
+            case SCREENS_QUICK:
+#endif
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
+            case SCREENS_QUICK | BUTTON_REPEAT:
+#endif
                 /* Shuffle mode */
                 lcd_putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_SHUFFLE));
                 lcd_putsxy(0, LCD_HEIGHT/2 - h, str(LANG_F2_MODE));
@@ -596,6 +603,7 @@ bool quick_screen(int context, int button)
                 lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h, str(LANG_F2_MODE));
                 lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2, ptr);
                 break;
+#ifdef BUTTON_F3
             case BUTTON_F3:
                 /* Scrollbar */
                 lcd_putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_F3_SCROLL));
@@ -620,6 +628,7 @@ bool quick_screen(int context, int button)
                 lcd_getstringsize(ptr,&w,&h);
                 lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
                 break;
+#endif
         }
 
         lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
@@ -641,8 +650,8 @@ bool quick_screen(int context, int button)
             key = button | key;
             
         switch (key) {
-            case BUTTON_F2 | BUTTON_LEFT:
-            case BUTTON_F2 | BUTTON_LEFT | BUTTON_REPEAT:
+            case SCREENS_QUICK | BUTTON_LEFT:
+            case SCREENS_QUICK | BUTTON_LEFT | BUTTON_REPEAT:
                 global_settings.playlist_shuffle =
                     !global_settings.playlist_shuffle;
 
@@ -656,22 +665,23 @@ bool quick_screen(int context, int button)
                 used = true;
                 break;
 
-            case BUTTON_F2 | BUTTON_DOWN:
-            case BUTTON_F2 | BUTTON_DOWN | BUTTON_REPEAT:
+            case SCREENS_QUICK | BUTTON_DOWN:
+            case SCREENS_QUICK | BUTTON_DOWN | BUTTON_REPEAT:
                 global_settings.dirfilter++;
                 if ( global_settings.dirfilter >= NUM_FILTER_MODES )
                     global_settings.dirfilter = 0;
                 used = true;
                 break;
 
-            case BUTTON_F2 | BUTTON_RIGHT:
-            case BUTTON_F2 | BUTTON_RIGHT | BUTTON_REPEAT:
+            case SCREENS_QUICK | BUTTON_RIGHT:
+            case SCREENS_QUICK | BUTTON_RIGHT | BUTTON_REPEAT:
                 global_settings.repeat_mode++;
                 if ( global_settings.repeat_mode >= NUM_REPEAT_MODES )
                     global_settings.repeat_mode = 0;
                 used = true;
                 break;
 
+#ifdef BUTTON_F3
             case BUTTON_F3 | BUTTON_LEFT:
             case BUTTON_F3 | BUTTON_LEFT | BUTTON_REPEAT:
                 global_settings.scrollbar = !global_settings.scrollbar;
@@ -679,15 +689,15 @@ bool quick_screen(int context, int button)
                 break;
 
             case BUTTON_F3 | BUTTON_RIGHT:
-            case BUTTON_F3 | BUTTON_RIGHT | BUTTON_REPEAT:
+//            case BUTTON_F3 | BUTTON_RIGHT | BUTTON_REPEAT:
                 global_settings.statusbar = !global_settings.statusbar;
                 used = true;
                 break;
 
             case BUTTON_F3 | BUTTON_DOWN:
-            case BUTTON_F3 | BUTTON_DOWN | BUTTON_REPEAT:
+//            case BUTTON_F3 | BUTTON_DOWN | BUTTON_REPEAT:
             case BUTTON_F3 | BUTTON_UP:
-            case BUTTON_F3 | BUTTON_UP | BUTTON_REPEAT:
+//            case BUTTON_F3 | BUTTON_UP | BUTTON_REPEAT:
                 global_settings.flip_display = !global_settings.flip_display;
                 button_set_flip(global_settings.flip_display);
                 lcd_set_flip(global_settings.flip_display);
@@ -695,7 +705,8 @@ bool quick_screen(int context, int button)
                 break;
 
             case BUTTON_F3 | BUTTON_REL:
-            case BUTTON_F2 | BUTTON_REL:
+#endif
+            case SCREENS_QUICK | BUTTON_REL:
             
                 if( used )
                     exit = true;
@@ -719,12 +730,13 @@ bool quick_screen(int context, int button)
     
     switch( button )
     {
-        case BUTTON_F2:
+        case SCREENS_QUICK:
 
             if ( oldrepeat != global_settings.repeat_mode )
                 audio_flush_and_reload_tracks();
 
             break;
+#ifdef BUTTON_F3
         case BUTTON_F3:
 
             if (global_settings.statusbar)
@@ -733,6 +745,7 @@ bool quick_screen(int context, int button)
                 lcd_setmargins(0, 0);
                 
             break;
+#endif
     }
     
     lcd_setfont(FONT_UI);
