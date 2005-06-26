@@ -479,6 +479,7 @@ long wps_show(void)
                 restore = true;
                 break;
 #endif
+
 #ifdef WPS_RC_BROWSE
             case WPS_RC_BROWSE:
 #endif
@@ -501,22 +502,22 @@ long wps_show(void)
                 if (global_settings.browse_current &&
                     current_track_path[0] != '\0')
                     set_current_file(current_track_path);
-                
+
                 return 0;
                 break;
 
                 /* play/pause */
             case WPS_PAUSE:
+#ifdef WPS_PAUSE_PRE
+                if (lastbutton != WPS_PAUSE_PRE)
+                    break;
+#endif
 #ifdef WPS_RC_PAUSE
             case WPS_RC_PAUSE:
-#endif
-#ifdef WPS_PAUSE_PRE
-                if ((lastbutton != WPS_PAUSE_PRE)
 #ifdef WPS_RC_PAUSE_PRE
-                    && (lastbutton != WPS_RC_PAUSE_PRE)
-#endif
-                    )
+                if ((button == WPS_RC_PAUSE) && (lastbutton != WPS_RC_PAUSE_PRE))
                     break;
+#endif
 #endif
                 if ( paused )
                 {
@@ -615,19 +616,19 @@ long wps_show(void)
                 audio_next();
                 break;
 
-                /* menu key functions */
 #ifdef WPS_MENU
-#ifdef WPS_RC_MENU
-            case WPS_RC_MENU:
-#endif
+            /* menu key functions */
             case WPS_MENU:
 #ifdef WPS_MENU_PRE
-                if ((lastbutton != WPS_MENU_PRE)
-#ifdef WPS_RC_MENU_PRE
-                    && (lastbutton != WPS_RC_MENU_PRE)
-#endif
-                    )
+                if (lastbutton != WPS_MENU_PRE)
                     break;
+#endif
+#ifdef WPS_RC_MENU
+            case WPS_RC_MENU:
+#ifdef WPS_RC_MENU_PRE
+                if ((button == WPS_RC_MENU) && (lastbutton != WPS_RC_MENU_PRE))
+                    break;
+#endif
 #endif
                 lcd_stop_scroll();
 
