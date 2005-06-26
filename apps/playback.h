@@ -27,10 +27,19 @@
 #include "id3.h"
 #include "mp3data.h"
 
-/* File buffer configuration keys. */
-#define CODEC_SET_FILEBUF_WATERMARK     1
-#define CODEC_SET_FILEBUF_CHUNKSIZE     2
-#define CODEC_SET_FILEBUF_LIMIT         3
+enum {
+    CODEC_SET_FILEBUF_WATERMARK = 1,
+    CODEC_SET_FILEBUF_CHUNKSIZE,
+    CODEC_SET_FILEBUF_LIMIT,
+    CODEC_DSP_ENABLE,
+    DSP_SET_FREQUENCY,
+    DSP_SET_CLIP_MIN,
+    DSP_SET_CLIP_MAX,
+    DSP_SET_SAMPLE_DEPTH,
+    DSP_SET_STEREO_MODE,
+    DSP_RESET,
+    DSP_DITHER
+};
 
 /* Not yet implemented. */
 #define CODEC_SET_AUDIOBUF_WATERMARK    4

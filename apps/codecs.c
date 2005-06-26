@@ -88,6 +88,7 @@ struct codec_api ci = {
     NULL,
     NULL,
     NULL,
+    NULL,
     
     splash,
 

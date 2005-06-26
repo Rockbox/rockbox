@@ -67,6 +67,7 @@ static int crossfade_pos;
 static int crossfade_amount;
 static int crossfade_rem;
 
+static char *guardbuf;
 static void (*pcm_event_handler)(void);
 
 static unsigned char *next_start;
@@ -258,7 +259,6 @@ void pcm_play_pause(bool play)
         IIS2CONFIG = 0x800;
     }
     pcm_paused = !play;
-    pcm_boost(false);
 }
 
 bool pcm_is_playing(void)
@@ -401,15 +401,8 @@ bool pcm_crossfade_init(void)
     
 }
 
-static void crossfade_start(void)
+void pcm_flush_fillpos(void)
 {
-    if (!crossfade_init)
-        return ;
-        
-    crossfade_init = 0;
-    if (PCMBUF_SIZE - audiobuffer_free < CHUNK_SIZE * 6)
-        return ;
-        
     if (audiobuffer_fillpos) {
         while (!pcm_play_add_chunk(&audiobuffer[audiobuffer_pos], 
                                    audiobuffer_fillpos, pcm_event_handler)) {
@@ -419,13 +412,26 @@ static void crossfade_start(void)
         audiobuffer_pos += audiobuffer_fillpos;
         if (audiobuffer_pos >= PCMBUF_SIZE)
             audiobuffer_pos -= PCMBUF_SIZE;
+        audiobuffer_free -= audiobuffer_fillpos;
+        audiobuffer_fillpos = 0;
     }
+}
+
+static void crossfade_start(void)
+{
+    if (!crossfade_init)
+        return ;
+        
+    crossfade_init = 0;
+    if (PCMBUF_SIZE - audiobuffer_free < CHUNK_SIZE * 6)
+        return ;
+    
+    pcm_flush_fillpos();
     pcm_boost(true);
     crossfade_active = true;
     crossfade_pos = audiobuffer_pos;
     crossfade_amount = (PCMBUF_SIZE - audiobuffer_free - (CHUNK_SIZE * 2))/2;
     crossfade_rem = crossfade_amount;
-    audiobuffer_fillpos = 0;
     
     crossfade_pos -= crossfade_amount*2;
     if (crossfade_pos < 0)
@@ -451,12 +457,11 @@ int crossfade(short *buf, const short *buf2, int length)
     return size;
 }
 
-bool audiobuffer_insert(char *buf, size_t length)
+inline static bool prepare_insert(size_t length)
 {
-    size_t copy_n = 0;
-    
     crossfade_start();
-    if (audiobuffer_free < length + CHUNK_SIZE && !crossfade_active) {
+    if (audiobuffer_free < length + audiobuffer_fillpos
+           + CHUNK_SIZE && !crossfade_active) {
         pcm_boost(false);
         return false;
     }
@@ -467,7 +472,94 @@ bool audiobuffer_insert(char *buf, size_t length)
         if (audiobuffer_free < PCMBUF_SIZE - CHUNK_SIZE*4)
             pcm_play_start();
     }
+    
+    return true;
+}
 
+void* pcm_request_buffer(size_t length, size_t *realsize)
+{
+    void *ptr = NULL;
+    
+    if (!prepare_insert(length)) {
+        *realsize = 0;
+        return NULL;
+    }
+    
+    if (crossfade_active) {
+        *realsize = MIN(length, PCMBUF_GUARD);
+        ptr = &guardbuf[0];
+    } else {
+        *realsize = MIN(length, PCMBUF_SIZE - audiobuffer_pos
+                            - audiobuffer_fillpos);
+        if (*realsize < length) {
+            *realsize += MIN((long)(length - *realsize), PCMBUF_GUARD);
+            //logf("gbr:%d/%d", *realsize, length);
+        }
+        ptr = &audiobuffer[audiobuffer_pos + audiobuffer_fillpos];
+    }
+    
+    return ptr;
+}
+
+void pcm_flush_buffer(size_t length)
+{
+    int copy_n;
+    char *buf;
+    
+    if (crossfade_active) {
+        buf = &guardbuf[0];
+        length = MIN(length, PCMBUF_GUARD);
+        while (length > 0 && crossfade_active) {
+            copy_n = MIN(length, PCMBUF_SIZE - (unsigned int)crossfade_pos);
+            copy_n = 2 * crossfade((short *)&audiobuffer[crossfade_pos], 
+                    (const short *)buf, copy_n/2);
+            buf += copy_n;
+            length -= copy_n;
+            crossfade_pos += copy_n;
+            if (crossfade_pos >= PCMBUF_SIZE)
+                crossfade_pos -= PCMBUF_SIZE;
+        }
+        
+        if (length > 0) {
+            memcpy(&audiobuffer[audiobuffer_pos], buf, length);
+            audiobuffer_fillpos = length;
+            goto try_flush;
+        }
+    } else {
+       /* if (length == 0) {
+            pcm_flush_fillpos();
+            audiobuffer_pos = 0;
+            return ;
+        } */
+    
+        audiobuffer_fillpos += length;
+        
+        try_flush:
+        if (audiobuffer_fillpos < CHUNK_SIZE && PCMBUF_SIZE
+            - audiobuffer_pos - audiobuffer_fillpos > 0)
+            return ;
+        
+        copy_n = MIN((long)(audiobuffer_fillpos - (PCMBUF_SIZE 
+                    - audiobuffer_pos)), PCMBUF_GUARD);
+        if (copy_n > 0) {
+            //logf("guard buf used:%d", copy_n);
+            audiobuffer_fillpos -= copy_n;
+            pcm_flush_fillpos();
+            memcpy(&audiobuffer[0], &guardbuf[0], copy_n);
+            audiobuffer_fillpos = copy_n;
+            goto try_flush;
+        }
+        pcm_flush_fillpos();
+    }
+}
+
+bool pcm_insert_buffer(char *buf, size_t length)
+{
+    size_t copy_n = 0;
+    
+    if (!prepare_insert(length))
+        return false;
+        
     while (length > 0) {
         if (crossfade_active) {
             copy_n = MIN(length, PCMBUF_SIZE - (unsigned int)crossfade_pos);
@@ -521,7 +613,8 @@ bool audiobuffer_insert(char *buf, size_t length)
 void pcm_play_init(void)
 {
     audiobuffer = &audiobuf[(audiobufend - audiobuf) - 
-                            PCMBUF_SIZE];
+                            PCMBUF_SIZE - PCMBUF_GUARD];
+    guardbuf = &audiobuffer[PCMBUF_SIZE];
     audiobuffer_free = PCMBUF_SIZE;
     audiobuffer_pos = 0;
     audiobuffer_fillpos = 0;
@@ -532,11 +625,6 @@ void pcm_play_init(void)
     crossfade_active = false;
     crossfade_init = false;
     pcm_event_handler = NULL;
-    if (crossfade_enabled) {
-        pcm_play_set_watermark(PCM_CF_WATERMARK, pcm_watermark_callback);
-    } else {
-        pcm_play_set_watermark(PCM_WATERMARK, pcm_watermark_callback);
-    }
 }
 
 void pcm_crossfade_enable(bool on_off)
@@ -555,6 +643,11 @@ void pcm_play_start(void)
     int size;
     char *start;
     
+    if (crossfade_enabled) {
+        pcm_play_set_watermark(PCM_CF_WATERMARK, pcm_watermark_callback);
+    } else {
+        pcm_play_set_watermark(PCM_WATERMARK, pcm_watermark_callback);
+    }
     crossfade_active = false;
     if(!pcm_is_playing())
     {

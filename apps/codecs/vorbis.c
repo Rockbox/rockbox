@@ -21,6 +21,7 @@
 
 #include "Tremor/ivorbisfile.h"
 #include "playback.h"
+#include "dsp.h"
 #include "lib/codeclib.h"
 
 static struct codec_api* rb;
@@ -92,10 +93,6 @@ enum codec_status codec_start(struct codec_api* api)
     long n;
     int current_section;
     int eof;
-#if BYTE_ORDER == BIG_ENDIAN
-    int i;
-    char x;
-#endif
 
     TEST_CODEC_API(api);
 
@@ -110,15 +107,27 @@ enum codec_status codec_start(struct codec_api* api)
     rb->configure(CODEC_SET_FILEBUF_LIMIT, (int *)(1024*1024*2));
     rb->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*64));
     
-    /* We need to flush reserver memory every track load. */
+    rb->configure(DSP_DITHER, (bool *)false);
+    rb->configure(DSP_SET_STEREO_MODE, (int *)STEREO_INTERLEAVED);
+    rb->configure(DSP_SET_SAMPLE_DEPTH, (int *)(16));
+    
+/* We need to flush reserver memory every track load. */
   next_track:
     if (codec_init(rb)) {
         return CODEC_ERROR;
     }
 
-
+    while (!rb->taginfo_ready)
+        rb->yield();
+    
+    if (rb->id3->frequency != NATIVE_FREQUENCY) {
+        rb->configure(DSP_SET_FREQUENCY, (long *)(rb->id3->frequency));
+        rb->configure(CODEC_DSP_ENABLE, (bool *)true);
+    } else {
+        rb->configure(CODEC_DSP_ENABLE, (bool *)false);
+    }
+    
     /* Create a decoder instance */
-
     callbacks.read_func=read_handler;
     callbacks.seek_func=seek_handler;
     callbacks.tell_func=tell_handler;
@@ -148,17 +157,10 @@ enum codec_status codec_start(struct codec_api* api)
             if (rb->stop_codec || rb->reload_codec)
                 break ;
         
-            rb->yield();
             while (!rb->audiobuffer_insert(pcmbuf, n))
                 rb->yield();
 
             rb->set_elapsed(ov_time_tell(&vf));
-
-#if BYTE_ORDER == BIG_ENDIAN
-            for (i=0;i<n;i+=2) { 
-                x=pcmbuf[i]; pcmbuf[i]=pcmbuf[i+1]; pcmbuf[i+1]=x;
-            }
-#endif
         }
     }
   

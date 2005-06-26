@@ -52,6 +52,7 @@ recorder/recording.c
 playback.c
 metadata.c
 codecs.c
+dsp.c
 #ifndef SIMULATOR
 pcm_recording.c
 #endif

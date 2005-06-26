@@ -24,6 +24,7 @@
 #include <codecs/liba52/a52.h>
 
 #include "playback.h"
+#include "dsp.h"
 #include "lib/codeclib.h"
 
 #define BUFFER_SIZE 4096
@@ -173,12 +174,26 @@ enum codec_status codec_start(struct codec_api* api)
   ci->configure(CODEC_SET_FILEBUF_LIMIT, (int *)(1024*1024*2));
   ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*128));
 
+  ci->configure(DSP_DITHER, (bool *)false);
+  ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_INTERLEAVED);
+  ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(16));
+  
   next_track:
 
   if (codec_init(api)) {
       return CODEC_ERROR;
   }
 
+  while (!rb->taginfo_ready)
+      rb->yield();
+    
+  if (rb->id3->frequency != NATIVE_FREQUENCY) {
+      rb->configure(DSP_SET_FREQUENCY, (long *)(rb->id3->frequency));
+      rb->configure(CODEC_DSP_ENABLE, (bool *)true);
+  } else {
+      rb->configure(CODEC_DSP_ENABLE, (bool *)false);
+  }
+    
   /* Intialise the A52 decoder and check for success */
   state = a52_init (0); // Parameter is "accel"
 

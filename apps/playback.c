@@ -49,6 +49,7 @@
 #include "playback.h"
 #include "pcm_playback.h"
 #include "buffer.h"
+#include "dsp.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "peakmeter.h"
@@ -171,12 +172,26 @@ int mp3_get_file_pos(void);
 
 /* Simulator stubs. */
 #ifdef SIMULATOR
-bool audiobuffer_insert(char *buf, size_t length)
+bool pcm_insert_buffer(char *buf, size_t length)
 {
     (void)buf;
     (void)length;
     
     return true;
+}
+
+void pcm_flush_buffer(size_t length)
+{
+    (void)length;
+}
+
+
+void* pcm_request_buffer(size_t length, size_t *realsize)
+{
+    (void)length;
+    (void)realsize;
+    
+    return NULL;
 }
 
 void audiobuffer_add_event(void (*event_handler)(void))
@@ -229,6 +244,92 @@ int ata_sleep(void)
 }
 #endif
 
+bool codec_audiobuffer_insert_callback(char *buf, size_t length)
+{
+    char *dest;
+    size_t realsize;
+    int factor;
+    int next_channel = 0;
+    int processed_length;
+    
+    /* If non-interleaved stereo mode. */
+    if (dsp_config.stereo_mode == STEREO_NONINTERLEAVED) {
+        next_channel = length / 2;
+    }
+    
+    if (dsp_config.sample_depth > 16) {
+        length /= 2;
+        factor = 1;
+    } else {
+        factor = 0;
+    }
+            
+    while (length > 0) {
+        /* Request a few extra bytes for resampling. */
+        /* FIXME: Required extra bytes SHOULD be calculated. */
+        while ((dest = pcm_request_buffer(length+16384, &realsize)) == NULL)
+            yield();
+        
+        if (realsize < 16384) {
+            pcm_flush_buffer(0);
+            continue ;
+        }
+        
+        realsize -= 16384;
+        
+        if (next_channel) {
+            processed_length = dsp_process(dest, buf, realsize / 4) * 2;
+            dsp_process(dest, buf + next_channel, realsize / 4);
+        } else {
+            processed_length = dsp_process(dest, buf, realsize / 2);
+        }
+        pcm_flush_buffer(processed_length);
+        length -= realsize;
+        buf += realsize << factor;
+    }
+    
+    return true;
+}
+
+bool codec_audiobuffer_insert_split_callback(void *ch1, void *ch2, 
+                                             size_t length)
+{
+    char *dest;
+    size_t realsize;
+    int factor;
+    int processed_length;
+    
+    /* non-interleaved stereo mode. */
+    if (dsp_config.sample_depth > 16) {
+        factor = 0;
+    } else {
+        length /= 2;
+        factor = 1;
+    }
+    
+    while (length > 0) {
+        /* Request a few extra bytes for resampling. */
+        while ((dest = pcm_request_buffer(length+4096, &realsize)) == NULL)
+            yield();
+        
+        if (realsize < 4096) {
+            pcm_flush_buffer(0);
+            continue ;
+        }
+        
+        realsize -= 4096;
+        
+        processed_length = dsp_process(dest, ch1, realsize / 4) * 2;
+        dsp_process(dest, ch2, realsize / 4);
+        pcm_flush_buffer(processed_length);
+        length -= realsize;
+        ch1 += realsize >> factor;
+        ch2 += realsize >> factor;
+    }
+    
+    return true;
+}
+
 void* get_codec_memory_callback(size_t *size)
 {
     *size = MALLOC_BUFSIZE;
@@ -260,7 +361,7 @@ size_t codec_filebuf_callback(void *ptr, size_t size)
     
     if (ci.stop_codec || !playing)
         return 0;
-        
+    
     copy_n = MIN((off_t)size, (off_t)cur_ti->available + cur_ti->filerem);
     
     while (copy_n > cur_ti->available) {
@@ -283,7 +384,7 @@ size_t codec_filebuf_callback(void *ptr, size_t size)
         buf_ridx -= codecbuflen;
     ci.curpos += copy_n;
     cur_ti->available -= copy_n;
-    codecbufused -= copy_n;    
+    codecbufused -= copy_n;
     
     return copy_n;
 }
@@ -427,8 +528,18 @@ void codec_configure_callback(int setting, void *value)
         conf_bufferlimit = (unsigned int)value;
         break;
         
+    case CODEC_DSP_ENABLE:
+        if ((bool)value)
+            ci.audiobuffer_insert = codec_audiobuffer_insert_callback;
+        else
+            ci.audiobuffer_insert = pcm_insert_buffer;
+        break ;
+
+#ifndef SIMULATOR        
     default:
-        logf("Illegal key: %d", setting);
+        if (!dsp_configure(setting, value))
+            logf("Illegal key: %d", setting);
+#endif
     }
 }
 
@@ -647,6 +758,8 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         conf_bufferlimit = 0;
         conf_watermark = AUDIO_DEFAULT_WATERMARK;
         conf_filechunk = AUDIO_DEFAULT_FILECHUNK;
+        dsp_configure(DSP_RESET, 0);
+        ci.configure(CODEC_DSP_ENABLE, false);
     }
     
     tracks[track_widx].codecbuf = &codecbuf[buf_widx];
@@ -697,7 +810,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         copy_n = MIN(size - i, copy_n);
         copy_n = MIN((int)fill_bytesleft, copy_n);
         rc = read(fd, &codecbuf[buf_widx], copy_n);
-        if (rc < 0) {
+        if (rc <= 0) {
             logf("File error!");
             close(fd);
             return false;
@@ -1152,7 +1265,7 @@ struct mp3entry* audio_next_track(void)
 
 bool audio_has_changed_track(void)
 {
-    if (track_changed && track_count > 0) {
+    if (track_changed && track_count > 0 && playing) {
         if (!cur_ti->taginfo_ready)
             return false;
         track_changed = false;
@@ -1384,6 +1497,7 @@ int mp3_get_file_pos(void)
 void audio_set_buffer_margin(int seconds)
 {
     (void)seconds;
+    logf("bufmargin: %d", seconds);
 }
 #endif
 
@@ -1395,7 +1509,7 @@ void mpeg_id3_options(bool _v1first)
 void audio_init(void)
 {
     logf("audio api init");
-    codecbuflen = audiobufend - audiobuf - PCMBUF_SIZE 
+    codecbuflen = audiobufend - audiobuf - PCMBUF_SIZE - PCMBUF_GUARD
                   - MALLOC_BUFSIZE - GUARD_BUFSIZE;
     //codecbuflen = 2*512*1024;
     codecbufused = 0;
@@ -1412,7 +1526,8 @@ void audio_init(void)
     
     /* Initialize codec api. */    
     ci.read_filebuf = codec_filebuf_callback;
-    ci.audiobuffer_insert = audiobuffer_insert;
+    ci.audiobuffer_insert = pcm_insert_buffer;
+    ci.audiobuffer_insert_split = codec_audiobuffer_insert_split_callback;
     ci.get_codec_memory = get_codec_memory_callback;
     ci.request_buffer = codec_request_buffer_callback;
     ci.advance_buffer = codec_advance_buffer_callback;

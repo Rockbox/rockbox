@@ -22,6 +22,7 @@
 #include <codecs/libwavpack/wavpack.h>
 #include "playback.h"
 #include "lib/codeclib.h"
+#include "dsp.h"
 
 static struct codec_api *rb;
 static struct codec_api *ci;
@@ -61,14 +62,27 @@ enum codec_status codec_start(struct codec_api* api)
     ci->configure(CODEC_SET_FILEBUF_LIMIT, (int *)(1024*1024*10));
     ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*128));
+  
+    ci->configure(DSP_DITHER, (bool *)false);
+    ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_INTERLEAVED);
+    ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(16));
 
     next_track:
 
     if (codec_init(api))
         return CODEC_ERROR;
 
+    while (!rb->taginfo_ready)
+        ci->yield();
+        
+    if (ci->id3->frequency != NATIVE_FREQUENCY) {
+        ci->configure(DSP_SET_FREQUENCY, (long *)(ci->id3->frequency));
+        ci->configure(CODEC_DSP_ENABLE, (bool *)true);
+    } else {
+        ci->configure(CODEC_DSP_ENABLE, (bool *)false);
+    }
+    
     /* Create a decoder instance */
-
     wpc = WavpackOpenFileInput (read_callback, error);
 
     if (!wpc)

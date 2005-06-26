@@ -20,6 +20,7 @@
 #include "codec.h"
 #include "playback.h"
 #include "lib/codeclib.h"
+#include "dsp.h"
 
 #define BYTESWAP(x) (((x>>8) & 0xff) | ((x<<8) & 0xff00))
 
@@ -60,12 +61,26 @@ enum codec_status codec_start(struct codec_api* api)
   ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
   ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*256));
 
+  ci->configure(DSP_DITHER, (bool *)false);
+  ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_INTERLEAVED);
+  ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(16));
+  
   next_track:
 
   if (codec_init(api)) {
     return CODEC_ERROR;
   }
 
+  while (!rb->taginfo_ready)
+      rb->yield();
+    
+  if (rb->id3->frequency != NATIVE_FREQUENCY) {
+      rb->configure(DSP_SET_FREQUENCY, (long *)(rb->id3->frequency));
+      rb->configure(CODEC_DSP_ENABLE, (bool *)true);
+  } else {
+      rb->configure(CODEC_DSP_ENABLE, (bool *)false);
+  }
+    
   /* FIX: Correctly parse WAV header - we assume canonical 44-byte header */
 
   header=ci->request_buffer(&n,44);
@@ -116,7 +131,7 @@ enum codec_status codec_start(struct codec_api* api)
 
     /* Byte-swap data */
     for (i=0;i<n/2;i++) {
-      wavbuf[i]=BYTESWAP(wavbuf[i]);
+      wavbuf[i]=SWAB16(wavbuf[i]);
     }
 
     samplesdone+=nsamples;
