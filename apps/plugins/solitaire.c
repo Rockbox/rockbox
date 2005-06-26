@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2004 dionoea (Antoine Cellerier)
+ * Copyright (C) 2004-2005 dionoea (Antoine Cellerier)
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -328,10 +328,10 @@ typedef struct card {
 
 unsigned char next_random_card(card *deck){
     unsigned char i,r;
-    
+
     r = rb->rand()%(COLORS * CARDS_PER_COLOR)+1;
     i = 0;
-    
+
     while(r>0){
         i = (i + 1)%(COLORS * CARDS_PER_COLOR);
         if(!deck[i].used) r--;
@@ -352,7 +352,7 @@ int solitaire_help(void){
     int lastbutton = BUTTON_NONE;
 
     while(1){
-    
+
         rb->lcd_clear_display();
 
 #if CONFIG_KEYPAD == RECORDER_PAD
@@ -382,7 +382,7 @@ int solitaire_help(void){
 #endif
 
         rb->lcd_update();
-    
+
         button = rb->button_get(true);
         switch(button){
             case SOL_UP:
@@ -459,7 +459,7 @@ int solitaire_help(void){
 
             case SOL_QUIT:
                 return HELP_QUIT;
-                
+
             default:
                 if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
                     return HELP_USB;
@@ -488,7 +488,7 @@ int solitaire_help(void){
 /* text displayed changes depending on the 'when' parameter */
 int solitaire_menu(unsigned char when)
 {
-    static char menu[2][MENU_LENGTH][13] = 
+    static char menu[2][MENU_LENGTH][13] =
         { { "Start Game",
             "",
             "Help",
@@ -498,7 +498,7 @@ int solitaire_menu(unsigned char when)
             "Help",
             "Quit"}
         };
-    
+
     int i;
     int cursor=0;
     int button;
@@ -506,16 +506,16 @@ int solitaire_menu(unsigned char when)
 
     rb->lcd_getstringsize("A", NULL, &fh);
     fh++;
-    
+
     if(when!=MENU_BEFOREGAME && when!=MENU_DURINGGAME)
         when = MENU_DURINGGAME;
-    
+
     while(1){
-        
+
         rb->lcd_clear_display();
 
         rb->lcd_putsxy(20, 1, "Solitaire");
-        
+
         for(i = 0; i<MENU_LENGTH; i++){
             rb->lcd_putsxy(1, 17+fh*i, menu[when][i]);
             if(cursor == i) {
@@ -556,7 +556,7 @@ int solitaire_menu(unsigned char when)
                         break;
                 }
                 break;
-            
+
             case SOL_MENU_INFO:
 #if defined(SOL_MENU_INFO2) && defined(SOL_MENU_INFO3)
             case SOL_MENU_INFO2:
@@ -612,7 +612,7 @@ void solitaire_init(void){
             deck[i*CARDS_PER_COLOR+j].next = NOT_A_CARD;
         }
     }
-    
+
     /* deal the cards ... */
     /* ... in the columns */
     for(i=0; i<COL_NUM; i++){
@@ -632,29 +632,29 @@ void solitaire_init(void){
     /* ... shuffle what's left of the deck */
     rem = next_random_card(deck);
     c = rem;
-    
+
     for(i=1; i<COLORS * CARDS_PER_COLOR - COL_NUM * (COL_NUM + 1)/2; i++){
         deck[c].next = next_random_card(deck);
         c = deck[c].next;
     }
 
     /* we now finished dealing the cards. The game can start ! (at last) */
-    
+
     /* init the stack */
-    for(i = 0; i<COLORS;i++){
+    for(i = 0; i<COLORS; i++){
         stacks[i] = NOT_A_CARD;
     }
-    
+
     /* the cursor starts on upper left card */
     cur_card = cols[0];
     cur_col = 0;
-    
+
     /* no card is selected */
     sel_card = NOT_A_CARD;
-    
+
     /* init the remainder */
     cur_rem = NOT_A_CARD;
-} 
+}
 
 /* find the column number in which 'card' can be found */
 unsigned char find_card_col(unsigned char card){
@@ -724,15 +724,15 @@ unsigned char move_card(unsigned char dest_col, unsigned char src_card){
 
     /* the last card of dest_col */
     unsigned char dest_card;
-    
+
     /* the card under src_card */
     unsigned char src_card_prev;
-    
+
     /* you can't move no card (at least, it doesn't have any consequence) */
     if(src_card == NOT_A_CARD) return MOVE_NOT_OK;
     /* you can't put a card back on the remains' stack */
     if(dest_col == REM_COL) return MOVE_NOT_OK;
-    
+
     src_col = find_card_col(src_card);
     dest_card = find_last_card(dest_col);
     src_card_prev = find_prev_card(src_card);
@@ -743,7 +743,7 @@ unsigned char move_card(unsigned char dest_col, unsigned char src_card){
        && deck[src_card].next != NOT_A_CARD){
         return MOVE_NOT_OK;
     }
-    
+
     /* if we (that means dest) are on one of the 7 columns ... */
     if(dest_col < COL_NUM){
         /* ... check is we are on an empty color and that the src is a king */
@@ -774,7 +774,7 @@ unsigned char move_card(unsigned char dest_col, unsigned char src_card){
             /* this is a winning combination */
             stacks[dest_col - STACKS_COL] = src_card;
         }
-        /* ... or check if the cards follow one another, have the same 
+        /* ... or check if the cards follow one another, have the same
          * color and {that src has no .next element or is from the remains'
          * stack} */
         else if(deck[dest_card].color == deck[src_card].color
@@ -794,7 +794,7 @@ unsigned char move_card(unsigned char dest_col, unsigned char src_card){
         /* you can't move a card back to the remains' stack */
         return MOVE_NOT_OK;
     }
-    
+
     /* if the src card is from the remains' stack, we don't want to take
      * the following cards */
     if(src_col == REM_COL){
@@ -832,12 +832,18 @@ unsigned char move_card(unsigned char dest_col, unsigned char src_card){
 
 /* the game */
 int solitaire(void){
-    
+
     int i,j;
     int button, lastbutton = 0;
     unsigned char c;
     int biggest_col_length;
-    
+
+    struct tm time;
+    time = *(rb->get_time());
+    rb->srand( ( ( ( time.tm_year + 365 * time.tm_yday ) * 24
+                + time.tm_hour ) * 60 + time.tm_min ) * 60 + time.tm_sec );
+
+
     switch(solitaire_menu(MENU_BEFOREGAME)) {
         case MENU_QUIT:
             return SOLITAIRE_QUIT;
@@ -847,14 +853,14 @@ int solitaire(void){
     }
 
     solitaire_init();
-   
+
     while(true){
-        
+
         rb->lcd_clear_display();
 
         /* get the biggest column length so that display can be "optimized" */
         biggest_col_length = 0;
-        
+
         for(i=0;i<COL_NUM;i++){
             j = 0;
             c = cols[i];
@@ -864,14 +870,14 @@ int solitaire(void){
             }
             if(j>biggest_col_length) biggest_col_length = j;
         }
-        
+
         /* check if there are cards remaining in the game. */
         /* if there aren't any, that means you won :) */
         if(biggest_col_length == 0 && rem == NOT_A_CARD){
             rb->splash(HZ*2, true, "You Won :)");
             return SOLITAIRE_WIN;
         }
-        
+
         /* draw the columns */
         for(i=0;i<COL_NUM;i++){
             c = cols[i];
@@ -975,14 +981,14 @@ int solitaire(void){
             rb->lcd_fillrect(LCD_WIDTH - CARD_WIDTH+1, LCD_HEIGHT-CARD_HEIGHT,CARD_WIDTH-1, CARD_HEIGHT-1);
             rb->lcd_set_drawmode(DRMODE_SOLID);
         }
-            
+
 
         rb->lcd_update();
-        
+
         /* what to do when a key is pressed ... */
         button = rb->button_get(true);
         switch(button){
-            
+
             /* move cursor to the last card of the previous column */
             /* or to the previous color stack */
             /* or to the remains stack */
@@ -1004,7 +1010,7 @@ int solitaire(void){
                 }
                 cur_card  = find_last_card(cur_col);
                 break;
-            
+
             /* move cursor to the last card of the next column */
             /* or to the next color stack */
             /* or to the remains stack */
@@ -1026,7 +1032,7 @@ int solitaire(void){
                 }
                 cur_card = find_last_card(cur_col);
                 break;
-            
+
             /* move cursor to card that's bellow */
             case SOL_DOWN:
 #ifdef SOL_DOWN_PRE
@@ -1053,7 +1059,7 @@ int solitaire(void){
                     }
                 }
                 break;
-            
+
             /* move cursor to card that's above */
             case SOL_UP:
 #ifdef SOL_UP_PRE
@@ -1117,7 +1123,7 @@ int solitaire(void){
                     }
                 }
                 break;
-            
+
             /* If the card on the top of the remains can be put where */
             /* the cursor is, go ahead */
             case SOL_REM2CUR:
@@ -1153,6 +1159,7 @@ int solitaire(void){
                     break;
                 }
                 if(rem != NOT_A_CARD) {
+                    int cur_rem_old = cur_rem;
                     /* draw new cards form the remains of the deck */
                     if(cur_rem == NOT_A_CARD){
                         cur_rem = rem;
@@ -1169,15 +1176,19 @@ int solitaire(void){
                     if(i == CARDS_PER_DRAW){
                         cur_rem = NOT_A_CARD;
                     }
+                    /* if cursor was on remains' stack when new cards were
+                     * drawn, put cursor on top of remains' stack */
+                    if(cur_col == REM_COL && cur_card == cur_rem_old)
+                        cur_card = cur_rem;
                 }
                 break;
-            
+
             /* Show the menu */
             case SOL_QUIT:
                 switch(solitaire_menu(MENU_DURINGGAME)){
                     case MENU_QUIT:
                         return SOLITAIRE_QUIT;
-                        
+
                     case MENU_USB:
                         return SOLITAIRE_USB;
 
@@ -1190,13 +1201,16 @@ int solitaire(void){
                     return SOLITAIRE_USB;
                 break;
         }
-        
+
         if(button != BUTTON_NONE)
             lastbutton = button;
 
         /* fix incoherences concerning cur_col and cur_card */
         c = find_card_col(cur_card);
         if(c != NOT_A_COL && c != cur_col)
+            cur_card = find_last_card(cur_col);
+
+        if(cur_card == NOT_A_CARD && find_last_card(cur_col) != NOT_A_CARD)
             cur_card = find_last_card(cur_col);
     }
 }
@@ -1210,10 +1224,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     (void)parameter;
     rb = api;
     /* end of plugin init */
-    
+
     /* Welcome to Solitaire ! */
     rb->splash(HZ*2, true, "Welcome to Solitaire !");
-    
+
     /* play the game :) */
     /* Keep playing if a game was won (that means display the menu after */
     /* winning instead of quiting) */
