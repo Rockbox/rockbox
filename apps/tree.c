@@ -431,7 +431,7 @@ static int showdir(void)
     return tc.filesindir;
 }
 
-static bool ask_resume(bool ask_once)
+static bool ask_resume(bool just_powered_on)
 {
     int button;
     bool stop = false;
@@ -449,7 +449,7 @@ static bool ask_resume(bool ask_once)
 #endif
 
     /* always resume? */
-    if ( global_settings.resume == RESUME_ON)
+    if ( global_settings.resume == RESUME_ON || ! just_powered_on)
         return true;
 
     lcd_clear_display();
@@ -475,9 +475,7 @@ static bool ask_resume(bool ask_once)
 #ifdef TREE_RC_RUN_PRE
             case TREE_RC_RUN_PRE:  /* catch the press, not the release */
 #else
-#ifdef TREE_RC_RUN
             case TREE_RC_RUN:
-#endif
 #endif
                 ignore_power = false;
                 /* Don't ignore the power button for subsequent calls */
@@ -485,7 +483,7 @@ static bool ask_resume(bool ask_once)
 
 #ifdef TREE_POWER_BTN
                 /* Initially ignore the button which powers on the box. It
-                   might still be pressed since booting. */
+		 *                    might still be pressed since booting. */
             case TREE_POWER_BTN:
             case TREE_POWER_BTN | BUTTON_REPEAT:
                 if(!ignore_power)
@@ -497,6 +495,7 @@ static bool ask_resume(bool ask_once)
                 ignore_power = false;
                 break;
 #endif
+
                 /* Handle sys events, ignore button releases */
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED ||
@@ -506,7 +505,7 @@ static bool ask_resume(bool ask_once)
         }
     }
 
-    if ( global_settings.resume == RESUME_ASK_ONCE && ask_once) {
+    if ( global_settings.resume == RESUME_ASK_ONCE && just_powered_on) {
         global_settings.resume_index = -1;
         settings_save();
     }
@@ -547,15 +546,15 @@ void reload_directory(void)
     reload_dir = true;
 }
 
-static void start_resume(bool ask_once)
+static void start_resume(bool just_powered_on)
 {
-    if ( global_settings.resume &&
+    if ( ( global_settings.resume || ! just_powered_on ) &&
          global_settings.resume_index != -1 ) {
         DEBUGF("Resume index %X offset %X\n",
                global_settings.resume_index,
                global_settings.resume_offset);
 
-        if (!ask_resume(ask_once))
+        if (!ask_resume(just_powered_on) && just_powered_on )
             return;
 
         if (playlist_resume() != -1)
@@ -565,8 +564,9 @@ static void start_resume(bool ask_once)
 
             start_wps = true;
         }
-        else
-            return;
+        else return;
+    } else if (! just_powered_on) {
+        splash(HZ*2, true, str(LANG_NOTHING_TO_RESUME));
     }
 }
 

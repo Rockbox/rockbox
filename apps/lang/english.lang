@@ -159,8 +159,8 @@ new:
 
 id: LANG_RESUME
 desc: in settings_menu
-eng: "Resume"
-voice: "Resume"
+eng: "Resume on startup"
+voice: "Resume on startup"
 new:
 
 id: LANG_OFF
@@ -3123,6 +3123,12 @@ id: LANG_SHUFFLE_PLAYLIST
 desc: in playlist menu, reshuffles the order in which songs are played
 eng: "Reshuffle"
 voice: "Reshuffle"
+new:
+
+id: LANG_NOTHING_TO_RESUME
+desc: Error message displayed when resume button pressed but no playlist
+eng: "Nothing to resume"
+voice: ""
 new:
 
 id: LANG_INSERT_SHUFFLED
