@@ -475,7 +475,9 @@ static bool ask_resume(bool just_powered_on)
 #ifdef TREE_RC_RUN_PRE
             case TREE_RC_RUN_PRE:  /* catch the press, not the release */
 #else
+#ifdef TREE_RC_RUN
             case TREE_RC_RUN:
+#endif   
 #endif
                 ignore_power = false;
                 /* Don't ignore the power button for subsequent calls */
