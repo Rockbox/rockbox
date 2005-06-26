@@ -324,7 +324,7 @@ bool radio_screen(void)
             case BUTTON_LEFT:
                 curr_freq -= FREQ_STEP;
                 if(curr_freq < MIN_FREQ)
-                    curr_freq = MIN_FREQ;
+                    curr_freq = MAX_FREQ;
 
                 radio_set(RADIO_FREQUENCY, curr_freq);
                 curr_preset = find_preset(curr_freq);
@@ -336,7 +336,7 @@ bool radio_screen(void)
             case BUTTON_RIGHT:
                 curr_freq += FREQ_STEP;
                 if(curr_freq > MAX_FREQ)
-                    curr_freq = MAX_FREQ;
+                    curr_freq = MIN_FREQ;
                 
                 radio_set(RADIO_FREQUENCY, curr_freq);
                 curr_preset = find_preset(curr_freq);
