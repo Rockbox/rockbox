@@ -105,8 +105,14 @@ static bool ffwd_rew(int button)
     while (!exit) {
         switch ( button ) {
             case WPS_FFWD:
+#ifdef WPS_RC_FFWD 
+            case WPS_RC_FFWD:
+#endif
                  direction = 1;
             case WPS_REW:
+#ifdef WPS_RC_REW
+            case WPS_RC_REW:
+#endif
                 if (ff_rewind)
                 {
                     if (direction == 1)
@@ -186,6 +192,10 @@ static bool ffwd_rew(int button)
 
             case WPS_PREV:
             case WPS_NEXT: 
+#ifdef WPS_RC_PREV
+            case WPS_RC_PREV:
+            case WPS_RC_NEXT:
+#endif
                 audio_ff_rewind(id3->elapsed+ff_rewind_count);
                 ff_rewind_count = 0;
                 ff_rewind = false;
@@ -576,7 +586,7 @@ long wps_show(void)
             case WPS_REW:
 #ifdef WPS_RC_FFWD
             case WPS_RC_FFWD:
-            case WPS_RC_RWD:
+            case WPS_RC_REW:
 #endif
                 ffwd_rew(button);
                 break;
@@ -589,6 +599,10 @@ long wps_show(void)
 #endif
 #ifdef WPS_RC_PREV
             case WPS_RC_PREV:
+#ifdef WPS_RC_PREV_PRE
+                if ((button == WPS_RC_PREV) && (lastbutton != WPS_RC_PREV_PRE))
+                    break;
+#endif
 #endif
                 if (!id3 || (id3->elapsed < 3*1000)) {
                     audio_prev();
@@ -612,6 +626,10 @@ long wps_show(void)
 #endif
 #ifdef WPS_RC_NEXT
             case WPS_RC_NEXT:
+#ifdef WPS_RC_NEXT_PRE
+                if ((button == WPS_RC_NEXT) && (lastbutton != WPS_RC_NEXT_PRE))
+                    break;
+#endif
 #endif
                 audio_next();
                 break;
