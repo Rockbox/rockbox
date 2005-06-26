@@ -535,11 +535,10 @@ void codec_configure_callback(int setting, void *value)
             ci.audiobuffer_insert = pcm_insert_buffer;
         break ;
 
-#ifndef SIMULATOR        
     default:
-        if (!dsp_configure(setting, value))
+        if (!dsp_configure(setting, value)) {
             logf("Illegal key: %d", setting);
-#endif
+        }
     }
 }
 
