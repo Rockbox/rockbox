@@ -896,6 +896,8 @@ static bool dirbrowse(void)
                         restore = true;
                     }
                     else {
+                        if (button & BUTTON_REPEAT)
+                            break;
                         if (numentries < tree_max_on_screen) {
                             put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor,
                                          false);
@@ -950,6 +952,8 @@ static bool dirbrowse(void)
                 else if (id3db && (tc.firstpos || tc.dirfull)) {
                     if (tc.dircursor + tc.dirstart + tc.firstpos + 1 >= tc.dirlength) {
                         /* wrap and load first dir segment */
+                        if (button & BUTTON_REPEAT)
+                            break;
                         tc.firstpos = tc.dirstart = tc.dircursor = 0;
                     }
                     else {
@@ -960,6 +964,8 @@ static bool dirbrowse(void)
                     restore = true;
                 }
                 else {
+                    if (button & BUTTON_REPEAT)
+                        break;
                     if(numentries < tree_max_on_screen) {
                         put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, false);
                         tc.dirstart = tc.dircursor = 0;
