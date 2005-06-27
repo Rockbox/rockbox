@@ -1606,7 +1606,7 @@ id: LANG_RECURSE_DIRECTORY_QUESTION
 desc: Asked from onplay screen
 eng: "Recursively?"
 voice: ""
-new: "Indsæundermapper?"
+new: "Indsæt undermapper?"
 
 id: LANG_CUSTOM_FONT
 desc: in setting_menu()
