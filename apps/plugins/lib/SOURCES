@@ -1,6 +1,6 @@
 configfile.c
 highscore.c
-#ifdef HAVE_LCD_BITMAP
+#if (CONFIG_LCD == LCD_SSD1815) && !defined(SIMULATOR)
 gray_black_display.c
 gray_blockfuncs.c
 gray_clear_display.c
