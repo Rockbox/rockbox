@@ -32,7 +32,7 @@ int codec_init(struct codec_api* rb)
     
     xxx2wav_set_api(rb);
     mem_ptr = 0;
-    mallocbuf = (unsigned char *)rb->get_codec_memory((size_t *)&bufsize);
+    mallocbuf = (unsigned char *)rb->get_codec_memory((long *)&bufsize);
   
     return 0;
 }
