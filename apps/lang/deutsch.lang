@@ -146,9 +146,9 @@ new: "Sortiere Groß-/Kleinschreibung"
 
 id: LANG_RESUME
 desc: in settings_menu
-eng: "Resume"
-voice: "Fortsetzen"
-new: "Fortsetzen"
+eng: "Resume on startup"
+voice: "Beim Start fortsetzen"
+new: "Beim Start fortsetzen"
 
 id: LANG_OFF
 desc: Used in a lot of places
@@ -3007,80 +3007,80 @@ new: "Alarm ausgeschaltet"
 id: LANG_RECORD_TRIGGER
 desc: in recording settings_menu
 eng: "Trigger"
-voice:
+voice: 
 new: "Trigger"
 
 id: LANG_RECORD_START_THRESHOLD
 desc: in recording settings_menu
 eng: "Start above"
-voice:
+voice: 
 new: "Starte oberhalb"
 
 id: LANG_RECORD_MIN_DURATION
 desc: in recording settings_menu
 eng: "for at least"
-voice:
+voice: 
 new: "für mindestens"
 
 id: LANG_RECORD_STOP_THRESHOLD
 desc: in recording settings_menu
 eng: "Stop below"
-voice:
+voice: 
 new: "Stoppe unterhalb"
 
 id: LANG_RECORD_STOP_POSTREC
 desc: in recording settings_menu
 eng: "for at least"
-voice:
+voice: 
 new: "für mindestens"
 
 id: LANG_RECORD_STOP_GAP
 desc: in recording settings_menu
-eng: "presplit gap"
-voice:
+eng: "Presplit gap"
+voice: 
 new: "Aufnahme teilen nach"
 
 id: LANG_RECORD_TRIGGER_MODE
 desc: in recording settings_menu
 eng: "Trigger"
-voice:
+voice: 
 new: "Trigger"
 
 id: LANG_RECORD_TRIG_NOREARM
 desc: in recording settings_menu
 eng: "Once"
-voice:
+voice: 
 new: "Einmal"
 
 id: LANG_RECORD_TRIG_REARM
 desc: in recording settings_menu
 eng: "Repeat"
-voice:
+voice: 
 new: "Mehrfach"
 
 id: LANG_DB_INF
 desc: -inf db for values below measurement
 eng: "-inf"
-voice:
+voice: 
 new: "-unendl."
 
 id: LANG_RECORD_TRIG_IDLE
 desc: waiting for threshold
 eng: "Trigger idle"
-voice:
+voice: 
 new: "Trigger inaktiv"
 
 id: LANG_RECORD_TRIGGER_ACTIVE
 desc: 
 eng: "Trigger active"
-voice:
+voice: 
 new: "Trigger aktiv"
 
 id: LANG_LCD_REMOTE_MENU
 desc: in the display sub menu
-eng: "Remote-LCD Einstellungen"
-voice:
-new:
+eng: "Remote-LCD Settings"
+voice: 
+new: Remote-LCD Einstellungen"
 
 id: LANG_DISK_NAME_INTERNAL
 desc: in info menu; name for internal disk with multivolume (keep short!)
@@ -3123,3 +3123,9 @@ desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
 eng: "Insert shuffled"
 voice: ""
 new: "Zufällig einfügen"
+
+id: LANG_NOTHING_TO_RESUME
+desc: Error message displayed when resume button pressed but no playlist
+eng: "Nothing to resume"
+voice: ""
+new: "Nichts fortzusetzen"
