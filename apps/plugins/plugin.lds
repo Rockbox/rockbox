@@ -22,19 +22,9 @@ OUTPUT_FORMAT(elf32-sh)
 #define DRAMORIG 0x09000000 + STUBOFFSET
 #endif
 
+#define PLUGIN_LENGTH PLUGIN_BUFFER_SIZE
+
 #ifdef CODEC
-#define CODEC_SIZE 0x40000
-#else
-#define CODEC_SIZE 0
-#endif
-
-#if MEMORYSIZE >= 32
-#define PLUGIN_LENGTH 0xC0000
-#else
-#define PLUGIN_LENGTH 0x8000
-#endif
-
-#if CODEC_SIZE > 0
 #define THIS_LENGTH CODEC_SIZE
 #else
 #define THIS_LENGTH PLUGIN_LENGTH

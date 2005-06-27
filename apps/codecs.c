@@ -16,6 +16,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
+
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
@@ -52,7 +54,7 @@
 
 #ifdef SIMULATOR
 #if CONFIG_HWCODEC == MASNONE
-static unsigned char codecbuf[CODEC_BUFFER_SIZE];
+static unsigned char codecbuf[CODEC_SIZE];
 #endif
 void *sim_codec_load(char *plugin, int *fd);
 void sim_codec_close(int fd);
@@ -251,9 +253,9 @@ int codec_load_ram(char* codecptr, size_t size, void* ptr2, size_t bufwrap)
     
     if ((char *)&codecbuf[0] != codecptr) {
         /* zero out codec buffer to ensure a properly zeroed bss area */
-        memset(codecbuf, 0, CODEC_BUFFER_SIZE);
+        memset(codecbuf, 0, CODEC_SIZE);
         
-        size = MIN(size, CODEC_BUFFER_SIZE);
+        size = MIN(size, CODEC_SIZE);
         copy_n = MIN(size, bufwrap);
         memcpy(codecbuf, codecptr, copy_n);         
         size -= copy_n;
@@ -283,7 +285,7 @@ int codec_load_file(const char *plugin)
         return fd;
     }
     
-    rc = read(fd, &codecbuf[0], CODEC_BUFFER_SIZE);
+    rc = read(fd, &codecbuf[0], CODEC_SIZE);
     close(fd);
     if (rc <= 0) {
         logf("Codec read error");

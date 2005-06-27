@@ -11,6 +11,9 @@
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 
+/* The number of bytes reserved for loadable plugins */
+#define PLUGIN_BUFFER_SIZE 0x8000
+
 #ifndef SIMULATOR
 
 /* Define this if you have a SH7034 */

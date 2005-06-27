@@ -108,4 +108,8 @@
 /* no known platform */
 #endif
 
+#ifndef CODEC_SIZE
+#define CODEC_SIZE 0
+#endif
+
 #endif

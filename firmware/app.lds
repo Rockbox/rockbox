@@ -101,17 +101,9 @@ _pluginbuf = 0;
 
 #else
 
-#if MEMORYSIZE >= 32
-#define PLUGINSIZE 0xC0000
-#else
-#define PLUGINSIZE 0x8000
-#endif
+#define PLUGINSIZE PLUGIN_BUFFER_SIZE
+#define CODECSIZE CODEC_SIZE
 
-#if CONFIG_HWCODEC == MASNONE
-#define CODECSIZE 0x40000
-#else
-#define CODECSIZE 0
-#endif
 
 #ifdef DEBUG
 #define STUBOFFSET 0x10000

@@ -14,6 +14,9 @@
 /* define this if you have a real-time clock */
 #define HAVE_RTC 1
 
+/* The number of bytes reserved for loadable plugins */
+#define PLUGIN_BUFFER_SIZE 0x8000
+
 #ifndef SIMULATOR
 
 /* Define this if you have a MAS3587F */

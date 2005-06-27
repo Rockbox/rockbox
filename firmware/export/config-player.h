@@ -8,6 +8,9 @@
 /* define this if you have the Player's keyboard */
 #define CONFIG_KEYPAD PLAYER_PAD
 
+/* The number of bytes reserved for loadable plugins */
+#define PLUGIN_BUFFER_SIZE 0x8000
+
 #ifndef SIMULATOR
 
 /* Define this if you have a SH7034 */
