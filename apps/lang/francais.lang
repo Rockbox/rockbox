@@ -157,9 +157,9 @@ new: "Tri sur MAJ/min"
 
 id: LANG_RESUME
 desc: in settings_menu
-eng: "Resume"
-voice: "Reprendre"
-new: "Reprendre"
+eng: "Resume on startup"
+voice: "Reprendre au démarrage"
+new: "Reprendre au démarrage"
 
 id: LANG_OFF
 desc: Used in a lot of places
@@ -1498,13 +1498,13 @@ new: "Erreur retournée par l'extension"
 id: LANG_BOOT_CHANGED
 desc: File browser discovered the boot file was changed
 eng: "Boot changed"
-voice: ""
+voice: "Fichier de démarrage modifié"
 new: "Fichier de démarrage modifié"
 
 id: LANG_REBOOT_NOW
 desc: Do you want to reboot?
 eng: "Reboot now?"
-voice: ""
+voice: "Redémarrer maintenant ?"
 new: "Redémarrer?"
 
 id: LANG_QUEUE_LAST
@@ -3103,3 +3103,39 @@ desc: in info menu;  name for external disk with multivolume (Ondio; keep short!
 eng: "MMC:"
 voice: "Carte mémoire"
 new: "MMC:"
+
+id: LANG_CROSSFADE
+desc: in playback settings
+eng: "Crossfade"
+voice: "Fondu enchaîné"
+new: "Fondu enchaîné"
+
+id: LANG_BACKLIGHT_FADE_IN
+desc: in settings_menu
+eng: "Backlight fade in"
+voice: "Marche rétro-éclairage doux"
+new: "Marche rétro-éclairage doux"
+
+id: LANG_BACKLIGHT_FADE_OUT
+desc: in settings_menu
+eng: "Backlight fade out"
+voice: "Arrêt rétro-éclairage doux"
+new: "Arrêt rétro-éclairage doux"
+
+id: LANG_SHUFFLE_PLAYLIST
+desc: in playlist menu, reshuffles the order in which songs are played
+eng: "Reshuffle"
+voice: "Remélanger"
+new: "Remélanger"
+
+id: LANG_NOTHING_TO_RESUME
+desc: Error message displayed when resume button pressed but no playlist
+eng: "Nothing to resume"
+voice: "Il n'y à rien a reprendre"
+new: "Rien à reprendre"
+
+id: LANG_INSERT_SHUFFLED
+desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
+eng: "Insert shuffled"
+voice: "Insérer mélangé"
+new: "Insérer mélangé"
