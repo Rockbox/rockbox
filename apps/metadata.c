@@ -83,6 +83,9 @@ unsigned short a52_441framesizes[]=
        557*2,558*2,696*2,697*2,835*2,836*2,975*2,976*2,
        1114*2,1115*2,1253*2,1254*2,1393*2,1394*2};
 
+const long wavpack_sample_rates [] = { 6000, 8000, 9600, 11025, 12000, 16000,
+    22050, 24000, 32000, 44100, 48000, 64000, 88200, 96000, 192000 };
+
 /* Get metadata for track - return false if parsing showed problems with the
    file that would prevent playback. */
 
@@ -334,12 +337,18 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
 
       track->id3.vbr = true;   /* All WavPack files are VBR */
       track->id3.filesize = filesize (fd);
-      track->id3.frequency = 44100;
 
       if ((buf [20] | buf [21] | buf [22] | buf [23]) &&
           (buf [12] & buf [13] & buf [14] & buf [15]) != 0xff) {
+              int srindx = ((buf [26] >> 7) & 1) + ((buf [27] << 1) & 14);
+
+              if (srindx == 15)
+                  track->id3.frequency = 44100;
+              else
+                  track->id3.frequency = wavpack_sample_rates [srindx];
+
               totalsamples = (buf[15] << 24) | (buf[14] << 16) | (buf[13] << 8) | buf[12];
-              track->id3.length = (totalsamples + 220) / 441 * 10;
+              track->id3.length = totalsamples / (track->id3.frequency / 100) * 10;
               track->id3.bitrate = filesize (fd) /
                   (track->id3.length / 8);
       }

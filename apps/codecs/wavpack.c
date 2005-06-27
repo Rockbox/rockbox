@@ -47,7 +47,7 @@ enum codec_status codec_start(struct codec_api* api)
 {
     WavpackContext *wpc;
     char error [80];
-    int bps, nchans;
+    int bps, nchans, sr_100;
 
     /* Generic codec initialisation */
     TEST_CODEC_API(api);
@@ -90,6 +90,7 @@ enum codec_status codec_start(struct codec_api* api)
 
     bps = WavpackGetBytesPerSample (wpc);
     nchans = WavpackGetReducedChannels (wpc);
+    sr_100 = ci->id3->frequency / 100;
 
     ci->set_elapsed (0);
 
@@ -99,7 +100,7 @@ enum codec_status codec_start(struct codec_api* api)
         long nsamples;  
 
         if (ci->seek_time && ci->taginfo_ready && ci->id3->length) {
-            int curpos_ms = (WavpackGetSampleIndex (wpc) + 220) / 441 * 10;
+            int curpos_ms = WavpackGetSampleIndex (wpc) / sr_100 * 10;
             int n, d, skip;
 
             if (ci->seek_time > curpos_ms) {
@@ -121,7 +122,7 @@ enum codec_status codec_start(struct codec_api* api)
             if (!wpc)
                 break;
 
-            ci->set_elapsed ((int)((long long) WavpackGetSampleIndex (wpc) * 1000 / 44100));
+            ci->set_elapsed (WavpackGetSampleIndex (wpc) / sr_100 * 10);
             rb->yield ();
         }
 
@@ -189,7 +190,7 @@ enum codec_status codec_start(struct codec_api* api)
         while (!ci->audiobuffer_insert ((char *) temp_buffer, nsamples * 4))
             rb->yield ();
 
-        ci->set_elapsed ((WavpackGetSampleIndex (wpc) + 220) / 441 * 10);
+        ci->set_elapsed (WavpackGetSampleIndex (wpc) / sr_100 * 10);
     }
 
     if (ci->request_next_track())
