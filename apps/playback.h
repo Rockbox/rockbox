@@ -49,7 +49,7 @@ struct track_info {
     struct mp3entry id3;     /* TAG metadata */
     struct mp3info mp3data;  /* MP3 metadata */
     char *codecbuf;          /* Pointer to codec buffer */
-    size_t codecsize;        /* Codec length in bytes */
+    long codecsize;        /* Codec length in bytes */
     
     off_t filerem;           /* Remaining bytes of file NOT in buffer */
     off_t filesize;          /* File total length */

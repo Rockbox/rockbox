@@ -55,9 +55,9 @@ static bool pcm_paused;
 static int pcm_freq = 0x6; /* 44.1 is default */
 
 static char *audiobuffer;
-static size_t audiobuffer_pos;
-size_t audiobuffer_free;
-static size_t audiobuffer_fillpos;
+static long audiobuffer_pos;
+long audiobuffer_free;
+static long audiobuffer_fillpos;
 static bool boost_mode;
 
 static bool crossfade_enabled;
@@ -457,7 +457,7 @@ int crossfade(short *buf, const short *buf2, int length)
     return size;
 }
 
-inline static bool prepare_insert(size_t length)
+inline static bool prepare_insert(long length)
 {
     crossfade_start();
     if (audiobuffer_free < length + audiobuffer_fillpos
@@ -476,7 +476,7 @@ inline static bool prepare_insert(size_t length)
     return true;
 }
 
-void* pcm_request_buffer(size_t length, size_t *realsize)
+void* pcm_request_buffer(long length, long *realsize)
 {
     void *ptr = NULL;
     
@@ -487,13 +487,15 @@ void* pcm_request_buffer(size_t length, size_t *realsize)
     
     if (crossfade_active) {
         *realsize = MIN(length, PCMBUF_GUARD);
+        //logf("cfb:%d/%d", *realsize, length);
         ptr = &guardbuf[0];
     } else {
         *realsize = MIN(length, PCMBUF_SIZE - audiobuffer_pos
                             - audiobuffer_fillpos);
         if (*realsize < length) {
+            //logf("gbr1:%d/%d", *realsize, length);
             *realsize += MIN((long)(length - *realsize), PCMBUF_GUARD);
-            //logf("gbr:%d/%d", *realsize, length);
+            //logf("gbr2:%d/%d", *realsize, length);
         }
         ptr = &audiobuffer[audiobuffer_pos + audiobuffer_fillpos];
     }
@@ -501,16 +503,18 @@ void* pcm_request_buffer(size_t length, size_t *realsize)
     return ptr;
 }
 
-void pcm_flush_buffer(size_t length)
+void pcm_flush_buffer(long length)
 {
     int copy_n;
     char *buf;
     
     if (crossfade_active) {
+        //logf("cfbf");
         buf = &guardbuf[0];
         length = MIN(length, PCMBUF_GUARD);
         while (length > 0 && crossfade_active) {
-            copy_n = MIN(length, PCMBUF_SIZE - (unsigned int)crossfade_pos);
+            //logf("cfl:%d", length);
+            copy_n = MIN(length, PCMBUF_SIZE - crossfade_pos);
             copy_n = 2 * crossfade((short *)&audiobuffer[crossfade_pos], 
                     (const short *)buf, copy_n/2);
             buf += copy_n;
@@ -521,7 +525,8 @@ void pcm_flush_buffer(size_t length)
         }
         
         while (length > 0) {
-            copy_n = MIN(length, PCMBUF_SIZE - (unsigned)audiobuffer_pos);
+            //logf("cfl2:%d", length);
+            copy_n = MIN(length, PCMBUF_SIZE - audiobuffer_pos);
             memcpy(&audiobuffer[audiobuffer_pos], buf, copy_n);
             audiobuffer_fillpos = copy_n;
             buf += copy_n;
@@ -538,12 +543,12 @@ void pcm_flush_buffer(size_t length)
         - audiobuffer_pos - audiobuffer_fillpos > 0)
         return ;
     
-    copy_n = MIN((long)(audiobuffer_fillpos - (PCMBUF_SIZE 
-                - audiobuffer_pos)), PCMBUF_GUARD);
+    copy_n = audiobuffer_fillpos - (PCMBUF_SIZE - audiobuffer_pos);
     if (copy_n > 0) {
-        //logf("guard buf used:%d", copy_n);
+        //logf("gbu:%d/%d/%d", copy_n, audiobuffer_fillpos, audiobuffer_pos);
         audiobuffer_fillpos -= copy_n;
         pcm_flush_fillpos();
+        copy_n = MIN(copy_n, PCMBUF_GUARD);
         memcpy(&audiobuffer[0], &guardbuf[0], copy_n);
         audiobuffer_fillpos = copy_n;
         goto try_flush;
@@ -551,16 +556,16 @@ void pcm_flush_buffer(size_t length)
     pcm_flush_fillpos();
 }
 
-bool pcm_insert_buffer(char *buf, size_t length)
+bool pcm_insert_buffer(char *buf, long length)
 {
-    size_t copy_n = 0;
+    long copy_n = 0;
     
     if (!prepare_insert(length))
         return false;
         
     while (length > 0) {
         if (crossfade_active) {
-            copy_n = MIN(length, PCMBUF_SIZE - (unsigned int)crossfade_pos);
+            copy_n = MIN(length, PCMBUF_SIZE - crossfade_pos);
             
             copy_n = 2 * crossfade((short *)&audiobuffer[crossfade_pos], 
                       (const short *)buf, copy_n/2);

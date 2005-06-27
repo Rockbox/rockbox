@@ -139,24 +139,24 @@ struct codec_api {
     int seek_time;
     
     /* Returns buffer to malloc array. Only codeclib should need this. */
-    void* (*get_codec_memory)(size_t *size);
+    void* (*get_codec_memory)(long *size);
     /* Insert PCM data into audio buffer for playback. Playback will start
        automatically. */
-    bool (*audiobuffer_insert)(char *data, size_t length);
-    bool (*audiobuffer_insert_split)(void *ch1, void *ch2, size_t length);
+    bool (*audiobuffer_insert)(char *data, long length);
+    bool (*audiobuffer_insert_split)(void *ch1, void *ch2, long length);
     /* Set song position in WPS (value in ms). */
     void (*set_elapsed)(unsigned int value);
     
     /* Read next <size> amount bytes from file buffer to <ptr>.
        Will return number of bytes read or 0 if end of file. */
-    size_t (*read_filebuf)(void *ptr, size_t size);
+    long (*read_filebuf)(void *ptr, long size);
     /* Request pointer to file buffer which can be used to read
        <realsize> amount of data. <reqsize> tells the buffer system
        how much data it should try to allocate. If <realsize> is 0,
        end of file is reached. */
-    void* (*request_buffer)(size_t *realsize, size_t reqsize);
+    void* (*request_buffer)(long *realsize, long reqsize);
     /* Advance file buffer position by <amount> amount of bytes. */
-    void (*advance_buffer)(size_t amount);
+    void (*advance_buffer)(long amount);
     /* Advance file buffer to a pointer location inside file buffer. */
     void (*advance_buffer_loc)(void *ptr);
     /* Seek file buffer to position <newpos> beginning of file. */

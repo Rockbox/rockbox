@@ -145,7 +145,7 @@ static bool track_changed;
 static int current_fd;
 
 /* Information about how many bytes left on the buffer re-fill run. */
-static size_t fill_bytesleft;
+static long fill_bytesleft;
 
 /* Track info structure about songs in the file buffer. */
 static struct track_info tracks[MAX_TRACK];
@@ -172,7 +172,7 @@ int mp3_get_file_pos(void);
 
 /* Simulator stubs. */
 #ifdef SIMULATOR
-bool pcm_insert_buffer(char *buf, size_t length)
+bool pcm_insert_buffer(char *buf, long length)
 {
     (void)buf;
     (void)length;
@@ -180,13 +180,13 @@ bool pcm_insert_buffer(char *buf, size_t length)
     return true;
 }
 
-void pcm_flush_buffer(size_t length)
+void pcm_flush_buffer(long length)
 {
     (void)length;
 }
 
 
-void* pcm_request_buffer(size_t length, size_t *realsize)
+void* pcm_request_buffer(long length, long *realsize)
 {
     (void)length;
     (void)realsize;
@@ -244,10 +244,10 @@ int ata_sleep(void)
 }
 #endif
 
-bool codec_audiobuffer_insert_callback(char *buf, size_t length)
+bool codec_audiobuffer_insert_callback(char *buf, long length)
 {
     char *dest;
-    size_t realsize;
+    long realsize;
     int factor;
     int next_channel = 0;
     int processed_length;
@@ -292,10 +292,10 @@ bool codec_audiobuffer_insert_callback(char *buf, size_t length)
 }
 
 bool codec_audiobuffer_insert_split_callback(void *ch1, void *ch2, 
-                                             size_t length)
+                                             long length)
 {
     char *dest;
-    size_t realsize;
+    long realsize;
     int factor;
     int processed_length;
     
@@ -330,7 +330,7 @@ bool codec_audiobuffer_insert_split_callback(void *ch1, void *ch2,
     return true;
 }
 
-void* get_codec_memory_callback(size_t *size)
+void* get_codec_memory_callback(long *size)
 {
     *size = MALLOC_BUFSIZE;
     return &audiobuf[0];
@@ -353,7 +353,7 @@ void codec_set_elapsed_callback(unsigned int value)
     }
 }
 
-size_t codec_filebuf_callback(void *ptr, size_t size)
+long codec_filebuf_callback(void *ptr, long size)
 {
     char *buf = (char *)ptr;
     int copy_n;
@@ -389,9 +389,9 @@ size_t codec_filebuf_callback(void *ptr, size_t size)
     return copy_n;
 }
 
-void* codec_request_buffer_callback(size_t *realsize, size_t reqsize)
+void* codec_request_buffer_callback(long *realsize, long reqsize)
 {
-    size_t part_n;
+    long part_n;
     
     if (ci.stop_codec || !playing) {
         *realsize = 0;
@@ -423,7 +423,7 @@ void* codec_request_buffer_callback(size_t *realsize, size_t reqsize)
     return (char *)&codecbuf[buf_ridx];
 }
 
-void codec_advance_buffer_callback(size_t amount)
+void codec_advance_buffer_callback(long amount)
 {
     if ((int)amount > cur_ti->available + cur_ti->filerem)
         amount = cur_ti->available + cur_ti->filerem;
@@ -457,7 +457,7 @@ void codec_advance_buffer_callback(size_t amount)
 
 void codec_advance_buffer_loc_callback(void *ptr)
 {
-    size_t amount;
+    long amount;
     
     amount = (int)ptr - (int)&codecbuf[buf_ridx];
     codec_advance_buffer_callback(amount);
@@ -560,7 +560,7 @@ void yield_codecs(void)
 
 void audio_fill_file_buffer(void)
 {
-    size_t i, size;
+    long i, size;
     int rc;
     
     if (current_fd < 0)
@@ -587,10 +587,10 @@ void audio_fill_file_buffer(void)
             buf_widx -= codecbuflen;
         i += rc;
         tracks[track_widx].available += rc;
+        codecbufused += rc;
         fill_bytesleft -= rc;
     }
     
-    codecbufused += i;
     tracks[track_widx].filerem -= i;
     tracks[track_widx].filepos += i;
     /*logf("Filled:%d/%d", tracks[track_widx].available,
@@ -1176,7 +1176,7 @@ void audio_thread(void)
 void codec_thread(void)
 {
     struct event ev;
-    size_t codecsize;
+    long codecsize;
     int status;
     int wrap;
     
