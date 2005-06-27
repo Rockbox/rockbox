@@ -523,7 +523,7 @@ void pcm_flush_buffer(size_t length)
         while (length > 0) {
             copy_n = MIN(length, PCMBUF_SIZE - (unsigned)audiobuffer_pos);
             memcpy(&audiobuffer[audiobuffer_pos], buf, copy_n);
-            audiobuffer_fillpos = length;
+            audiobuffer_fillpos = copy_n;
             buf += copy_n;
             length -= copy_n;
             if (length > 0)
