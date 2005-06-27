@@ -520,37 +520,35 @@ void pcm_flush_buffer(size_t length)
                 crossfade_pos -= PCMBUF_SIZE;
         }
         
-        if (length > 0) {
-            memcpy(&audiobuffer[audiobuffer_pos], buf, length);
+        while (length > 0) {
+            copy_n = MIN(length, PCMBUF_SIZE - (unsigned)audiobuffer_pos);
+            memcpy(&audiobuffer[audiobuffer_pos], buf, copy_n);
             audiobuffer_fillpos = length;
-            goto try_flush;
+            buf += copy_n;
+            length -= copy_n;
+            if (length > 0)
+                pcm_flush_fillpos();
         }
-    } else {
-       /* if (length == 0) {
-            pcm_flush_fillpos();
-            audiobuffer_pos = 0;
-            return ;
-        } */
-    
-        audiobuffer_fillpos += length;
-        
-        try_flush:
-        if (audiobuffer_fillpos < CHUNK_SIZE && PCMBUF_SIZE
-            - audiobuffer_pos - audiobuffer_fillpos > 0)
-            return ;
-        
-        copy_n = MIN((long)(audiobuffer_fillpos - (PCMBUF_SIZE 
-                    - audiobuffer_pos)), PCMBUF_GUARD);
-        if (copy_n > 0) {
-            //logf("guard buf used:%d", copy_n);
-            audiobuffer_fillpos -= copy_n;
-            pcm_flush_fillpos();
-            memcpy(&audiobuffer[0], &guardbuf[0], copy_n);
-            audiobuffer_fillpos = copy_n;
-            goto try_flush;
-        }
-        pcm_flush_fillpos();
     }
+    
+    audiobuffer_fillpos += length;
+    
+    try_flush:
+    if (audiobuffer_fillpos < CHUNK_SIZE && PCMBUF_SIZE
+        - audiobuffer_pos - audiobuffer_fillpos > 0)
+        return ;
+    
+    copy_n = MIN((long)(audiobuffer_fillpos - (PCMBUF_SIZE 
+                - audiobuffer_pos)), PCMBUF_GUARD);
+    if (copy_n > 0) {
+        //logf("guard buf used:%d", copy_n);
+        audiobuffer_fillpos -= copy_n;
+        pcm_flush_fillpos();
+        memcpy(&audiobuffer[0], &guardbuf[0], copy_n);
+        audiobuffer_fillpos = copy_n;
+        goto try_flush;
+    }
+    pcm_flush_fillpos();
 }
 
 bool pcm_insert_buffer(char *buf, size_t length)
