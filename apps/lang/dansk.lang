@@ -152,8 +152,8 @@ new: "Sorter versal-sensitivt"
 
 id: LANG_RESUME
 desc: in settings_menu
-eng: "Resume"
-voice: "Resume"
+eng: "Resume on startup"
+voice: "Resume on startup"
 new: "Forsæt v. tænd"
 
 id: LANG_OFF
@@ -3101,3 +3101,9 @@ desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
 eng: "Insert shuffled"
 voice: 
 new: "Indsæt blandet"
+
+id: LANG_NOTHING_TO_RESUME
+desc: Error message displayed when resume button pressed but no playlist
+eng: "Nothing to resume"
+voice: ""
+new: "Intet at fortsætte"
