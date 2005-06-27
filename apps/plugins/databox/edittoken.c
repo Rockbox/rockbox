@@ -98,7 +98,7 @@ void buildtoken(int tokentype,struct token *token) {
         case TOKEN_STRING:
             do {
                 rb->splash(HZ*2,true,"Enter String.");
-            } while(rb->kbd_input(token->spelling, 254));
+            } while(rb->kbd_input(token->spelling, SPELLING_LENGTH));
             break;
         case TOKEN_YEAR:
             token->kind=TOKEN_NUMIDENTIFIER;

@@ -84,9 +84,11 @@
 #define INTVALUE_GENRE        17
 #define INTVALUE_FILENAME     18
 
+#define SPELLING_LENGTH 100
+
 struct token {
     char kind;
-    char spelling[255];
+    char spelling[SPELLING_LENGTH + 1];
     long intvalue;
 };
 char *tokentypetostring(int tokentype);
