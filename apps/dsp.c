@@ -16,6 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <string.h>
 #include "kernel.h"
 #include "logf.h"
 
@@ -227,7 +228,7 @@ long upsample(long *out, long *in, int num, struct resampler *s)
 }
 
 #define MAX_CHUNK_SIZE 1024
-static char samplebuf[MAX_CHUNK_SIZE*4];
+static char samplebuf[MAX_CHUNK_SIZE];
 /* enough to cope with 11khz upsampling */
 long resampled[MAX_CHUNK_SIZE * 4];
 
@@ -353,6 +354,7 @@ bool dsp_configure(int setting, void *value)
 {
     switch (setting) {
     case DSP_SET_FREQUENCY:
+        memset(resample, 0, sizeof(resample));
         dsp_config.frequency = (int)value;
         resample[0].delta = resample[1].delta = 
             (unsigned long)value*65536/NATIVE_FREQUENCY;
