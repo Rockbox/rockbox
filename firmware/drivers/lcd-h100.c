@@ -39,7 +39,7 @@
 #define LCD_CNTL_TEMP_GRADIENT_SELECT   0x4e
 #define LCD_CNTL_OSC_FREQUENCY          0x5f
 #define LCD_CNTL_ON_OFF                 0xae
-#define LCD_CNTL_OSC_ON_OFF             0xab
+#define LCD_CNTL_OSC_ON_OFF             0xaa
 #define LCD_CNTL_OFF_MODE               0xbe
 #define LCD_CNTL_REVERSE                0xa6
 #define LCD_CNTL_ALL_LIGHTING           0xa4
@@ -171,25 +171,26 @@ void lcd_init(void)
     sleep(1);
     GPIO1_OUT |= 0x00004000;
     sleep(1);
-    
-    lcd_write_command(LCD_CNTL_ON_OFF | 1); /* LCD ON */
+
     lcd_write_command(LCD_CNTL_COLUMN_ADDRESS_DIR | 0);   /* Normal */
     lcd_write_command(LCD_CNTL_COMMON_OUTPUT_STATUS | 1); /* Reverse dir */
     lcd_write_command(LCD_CNTL_REVERSE | 0); /* Reverse OFF */
     lcd_write_command(LCD_CNTL_ALL_LIGHTING | 0); /* Normal */
-    lcd_write_command(LCD_CNTL_OFF_MODE | 1); /* OFF -> VCC on drivers */
-    lcd_write_command(LCD_CNTL_NLINE_ON_OFF | 1); /* N-line ON */
-
     lcd_write_command_ex(LCD_CNTL_DUTY_SET, 0x20, 1);
+    lcd_write_command(LCD_CNTL_OFF_MODE | 1); /* OFF -> VCC on drivers */
     lcd_write_command_ex(LCD_CNTL_VOLTAGE_SELECT, 3, -1);
     lcd_write_command_ex(LCD_CNTL_ELECTRONIC_VOLUME, 0x1c, -1);
     lcd_write_command_ex(LCD_CNTL_TEMP_GRADIENT_SELECT, 0, -1);
+
     lcd_write_command_ex(LCD_CNTL_LINE_INVERT_DRIVE, 0x10, -1);
+    lcd_write_command(LCD_CNTL_NLINE_ON_OFF | 1); /* N-line ON */
+
     lcd_write_command_ex(LCD_CNTL_OSC_FREQUENCY, 3, -1);
     lcd_write_command(LCD_CNTL_OSC_ON_OFF | 1); /* Oscillator ON */
-    lcd_write_command_ex(LCD_CNTL_POWER_CONTROL, 0x17, -1);
 
-    sleep(1);
+    lcd_write_command_ex(LCD_CNTL_POWER_CONTROL, 0x16, -1);
+    sleep(HZ/10);                               /* 100 ms pause */
+    lcd_write_command_ex(LCD_CNTL_POWER_CONTROL, 0x17, -1);
 
     lcd_write_command_ex(LCD_CNTL_DISPLAY_START_LINE, 0, -1);
     lcd_write_command_ex(LCD_CNTL_GRAY_SCALE_PATTERN, 0x42, -1);
@@ -198,6 +199,7 @@ void lcd_init(void)
     
     lcd_clear_display();
     lcd_update();
+    lcd_write_command(LCD_CNTL_ON_OFF | 1); /* LCD ON */
 
     create_thread(scroll_thread, scroll_stack,
                   sizeof(scroll_stack), scroll_name);
