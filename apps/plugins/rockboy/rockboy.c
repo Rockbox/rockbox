@@ -67,17 +67,6 @@ void *my_malloc(size_t size)
 {
     void *alloc;
 
-    if (!audio_bufferbase)
-    {
-        audio_bufferbase = audio_bufferpointer
-            = rb->plugin_get_audio_buffer(&audio_buffer_free);
-#if MEM <= 8 && !defined(SIMULATOR)
-        /* loaded as an overlay, protect from overwriting ourselves */
-        if ((unsigned)(ovl_start_addr - (unsigned char *)audio_bufferbase) 
-            < audio_buffer_free)
-            audio_buffer_free = ovl_start_addr - (unsigned char *)audio_bufferbase;
-#endif
-    }
     if (size + 4 > audio_buffer_free)
         return 0;
     alloc = audio_bufferpointer;
@@ -108,6 +97,17 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         rb->splash(HZ*3, true, "Play gameboy ROM file! (.gb/.gbc)");
         return PLUGIN_OK;
     }
+    if (!audio_bufferbase) {
+        audio_bufferbase = audio_bufferpointer
+            = rb->plugin_get_audio_buffer(&audio_buffer_free);
+#if MEM <= 8 && !defined(SIMULATOR)
+        /* loaded as an overlay, protect from overwriting ourselves */
+        if ((unsigned)(ovl_start_addr - (unsigned char *)audio_bufferbase) 
+            < audio_buffer_free)
+            audio_buffer_free = ovl_start_addr - (unsigned char *)audio_bufferbase;
+#endif
+    }
+
 #ifdef USE_IRAM
     memcpy(iramstart, iramcopy, iramend-iramstart);
 #endif
