@@ -37,6 +37,8 @@ OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 DEFS := $(SRC:%.c=$(OBJDIR)/%.def)
 DIRS = .
 
+CODECDEPS = $(LINKCODEC) $(BUILDDIR)/libcodec.a
+
 .PHONY: libmad liba52 libFLAC libTremor libwavpack dumb libmusepack
 
 OUTPUT = $(SOFTWARECODECS)
@@ -44,10 +46,23 @@ OUTPUT = $(SOFTWARECODECS)
 all: $(OUTPUT) $(ROCKS) $(DEPFILE)
 
 ifndef SIMVER
-$(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKCODEC)
-	$(SILENT)(file=`basename $@`; \
+ELFIT =	$(SILENT)(file=`basename $@`; \
 	echo "LD $$file"; \
 	$(CC) $(GCCOPTS) -O -nostdlib -o $@ $< -L$(BUILDDIR) $(CODECLIBS) -lcodec -lgcc -T$(LINKCODEC) -Wl,-Map,$(OBJDIR)/$*.map)
+
+.elf.o:
+	$(ELFIT)
+
+$(OBJDIR)/mpa.elf: $(OBJDIR)/mpa.o $(CODECDEPS) $(BUILDDIR)/libmad.a
+$(OBJDIR)/a52.elf: $(OBJDIR)/a52.o $(CODECDEPS) $(BUILDDIR)/liba52.a
+$(OBJDIR)/flac.elf: $(OBJDIR)/flac.o $(CODECDEPS) $(BUILDDIR)/libFLAC.a
+$(OBJDIR)/vorbis.elf: $(OBJDIR)/vorbis.o $(CODECDEPS) $(BUILDDIR)/libTremor.a
+$(OBJDIR)/mpc.elf: $(OBJDIR)/mpc.o $(CODECDEPS) $(BUILDDIR)/libmusepack.a
+$(OBJDIR)/wav.elf: $(OBJDIR)/wav.o $(CODECDEPS)
+$(OBJDIR)/wavpack.elf: $(OBJDIR)/wavpack.o $(CODECDEPS) $(BUILDDIR)/libwavpack.a
+
+$(OBJDIR)/%.elf: $(OBJDIR)/%.o $(CODECDEPS)
+	$(ELFIT)
 
 $(OBJDIR)/%.codec : $(OBJDIR)/%.elf
 	@echo "OBJCOPY "`basename $@`
