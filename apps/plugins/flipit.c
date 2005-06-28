@@ -71,9 +71,9 @@ static unsigned char cursor_pic[32] = {
 /* draw a spot at the coordinates (x,y), range of p is 0-19 */
 static void draw_spot(int p) {
     ptr = spot_pic[spots[p]];
-    rb->lcd_bitmap (ptr, (p%5)*16+1, (p/5)*16+1, 14, 8, true);
+    rb->lcd_bitmap (ptr, (p%5)*16+1, (p/5)*16+1, 14, 8);
     ptr += 14;
-    rb->lcd_bitmap (ptr, (p%5)*16+1, (p/5)*16+9, 14, 6, true);
+    rb->lcd_bitmap (ptr, (p%5)*16+1, (p/5)*16+9, 14, 6);
 }
 
 /* draw the cursor at the current cursor position */
@@ -81,10 +81,12 @@ static void draw_cursor(void) {
     int i,j;
     i = (cursor_pos%5)*16;
     j = (cursor_pos/5)*16;
+    rb->lcd_set_drawmode(DRMODE_FG);
     ptr = cursor_pic;
-    rb->lcd_bitmap (ptr, i, j, 16, 8, false);
+    rb->lcd_bitmap (ptr, i, j, 16, 8);
     ptr += 16;
-    rb->lcd_bitmap (ptr, i, j+8, 16, 8, false);
+    rb->lcd_bitmap (ptr, i, j+8, 16, 8);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
 }
 
 /* clear the cursor where it is */

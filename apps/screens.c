@@ -94,7 +94,9 @@ void usb_display_info(void)
 
 #ifdef HAVE_LCD_BITMAP
     /* Center bitmap on screen */
-    lcd_bitmap(usb_logo, LCD_WIDTH/2-BMPWIDTH_usb_logo/2, LCD_HEIGHT/2-BMPHEIGHT_usb_logo/2, BMPWIDTH_usb_logo, BMPHEIGHT_usb_logo, false);
+    lcd_bitmap(usb_logo, LCD_WIDTH/2-BMPWIDTH_usb_logo/2,
+               LCD_HEIGHT/2-BMPHEIGHT_usb_logo/2, BMPWIDTH_usb_logo,
+               BMPHEIGHT_usb_logo);
     status_draw(true);
     lcd_update();
 #else
@@ -231,14 +233,16 @@ void charging_display_info(bool animate)
     if (!animate)
     {   /* draw the outline */
         /* middle part */
-        lcd_bitmap(charging_logo, pox_x, pox_y + 8, sizeof(charging_logo), 8, true);
+        lcd_bitmap(charging_logo, pox_x, pox_y + 8, sizeof(charging_logo), 8);
+        lcd_set_drawmode(DRMODE_FG);
         /* upper line */
         charging_logo[0] = charging_logo[1] = 0x00; 
         memset(charging_logo+2, 0x80, 34);
-        lcd_bitmap(charging_logo, pox_x, pox_y, sizeof(charging_logo), 8, false);
+        lcd_bitmap(charging_logo, pox_x, pox_y, sizeof(charging_logo), 8);
         /* lower line */
         memset(charging_logo+2, 0x01, 34);
-        lcd_bitmap(charging_logo, pox_x, pox_y + 16, sizeof(charging_logo), 8, false);
+        lcd_bitmap(charging_logo, pox_x, pox_y + 16, sizeof(charging_logo), 8);
+        lcd_set_drawmode(DRMODE_SOLID);
     }
     else
     {   /* animate the middle part */
@@ -253,7 +257,7 @@ void charging_display_info(bool animate)
                 charging_logo[i] = 0x01 << bitpos;
             }
         }
-        lcd_bitmap(charging_logo, pox_x, pox_y + 8, sizeof(charging_logo), 8, true);
+        lcd_bitmap(charging_logo, pox_x, pox_y + 8, sizeof(charging_logo), 8);
         phase++;
     }
     lcd_update();
@@ -411,7 +415,7 @@ int pitch_screen(void)
             lcd_getstringsize(ptr,&w,&h);
             lcd_putsxy((LCD_WIDTH-w)/2, 0, ptr);
             lcd_bitmap(bitmap_icons_7x8[Icon_UpArrow],
-                       LCD_WIDTH/2 - 3, h*2, 7, 8, true);
+                       LCD_WIDTH/2 - 3, h*2, 7, 8);
 
             snprintf(buf, sizeof buf, "%d.%d%%", pitch / 10, pitch % 10 );
             lcd_getstringsize(buf,&w,&h);
@@ -421,13 +425,13 @@ int pitch_screen(void)
             lcd_getstringsize(ptr,&w,&h);
             lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
             lcd_bitmap(bitmap_icons_7x8[Icon_DownArrow],
-                       LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8, true);
+                       LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8);
 
             ptr = str(LANG_PAUSE);
             lcd_getstringsize(ptr,&w,&h);
             lcd_putsxy((LCD_WIDTH-(w/2))/2, LCD_HEIGHT/2 - h/2, ptr);
             lcd_bitmap(bitmap_icons_7x8[Icon_Pause],
-                       (LCD_WIDTH-(w/2))/2-10, LCD_HEIGHT/2 - h/2, 7, 8, true);
+                       (LCD_WIDTH-(w/2))/2-10, LCD_HEIGHT/2 - h/2, 7, 8);
 
             lcd_update();
         }
@@ -632,11 +636,11 @@ bool quick_screen(int context, int button)
         }
 
         lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
-                   LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8, true);
+                   LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8);
         lcd_bitmap(bitmap_icons_7x8[Icon_DownArrow],
-                   LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8, true);
+                   LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8);
         lcd_bitmap(bitmap_icons_7x8[Icon_FastForward],
-                   LCD_WIDTH/2 + 8, LCD_HEIGHT/2 - 4, 7, 8, true);
+                   LCD_WIDTH/2 + 8, LCD_HEIGHT/2 - 4, 7, 8);
 
         lcd_update();
         key = button_get(true);

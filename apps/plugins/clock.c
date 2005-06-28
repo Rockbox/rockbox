@@ -788,9 +788,9 @@ bool colon, bool lcd)
         if(settings.digital_12h)
         {
             if(hour > 12)
-                rb->lcd_bitmap(pm, 97, 55, 15, 8, true);
+                rb->lcd_bitmap(pm, 97, 55, 15, 8);
             else
-                rb->lcd_bitmap(am, 1, 55, 15, 8, true);
+                rb->lcd_bitmap(am, 1, 55, 15, 8);
         }
     }
     else
@@ -798,9 +798,9 @@ bool colon, bool lcd)
         if(settings.lcd_12h)
         {
             if(hour > 12)
-                rb->lcd_bitmap(pm, 97, 55, 15, 8, true);
+                rb->lcd_bitmap(pm, 97, 55, 15, 8);
             else
-                rb->lcd_bitmap(am, 1, 55, 15, 8, true);
+                rb->lcd_bitmap(am, 1, 55, 15, 8);
         }
     }
 
@@ -881,138 +881,138 @@ void binary(int hour, int minute, int second)
      *****/
     if(temphour >= 32)
     {
-        rb->lcd_bitmap(bitmap_1, 0, 1, 15, 20, true);
+        rb->lcd_bitmap(bitmap_1, 0, 1, 15, 20);
         temphour -= 32;
     }
     else
-        rb->lcd_bitmap(bitmap_0, 0, 1, 15, 20, true);
+        rb->lcd_bitmap(bitmap_0, 0, 1, 15, 20);
     if(temphour >= 16)
     {
-        rb->lcd_bitmap(bitmap_1, 19, 1, 15, 20, true);
+        rb->lcd_bitmap(bitmap_1, 19, 1, 15, 20);
         temphour -= 16;
     }
     else
-        rb->lcd_bitmap(bitmap_0, 19, 1, 15, 20, true);
+        rb->lcd_bitmap(bitmap_0, 19, 1, 15, 20);
     if(temphour >= 8)
     {
-        rb->lcd_bitmap(bitmap_1, 38, 1, 15, 20, true);
+        rb->lcd_bitmap(bitmap_1, 38, 1, 15, 20);
         temphour -= 8;
     }
     else
-        rb->lcd_bitmap(bitmap_0, 38, 1, 15, 20, true);
+        rb->lcd_bitmap(bitmap_0, 38, 1, 15, 20);
     if(temphour >= 4)
     {
-        rb->lcd_bitmap(bitmap_1, 57, 1, 15, 20, true);
+        rb->lcd_bitmap(bitmap_1, 57, 1, 15, 20);
         temphour -= 4;
     }
     else
-        rb->lcd_bitmap(bitmap_0, 57, 1, 15, 20, true);
+        rb->lcd_bitmap(bitmap_0, 57, 1, 15, 20);
     if(temphour >= 2)
     {
-         rb->lcd_bitmap(bitmap_1, 76, 1, 15, 20, true);
+        rb->lcd_bitmap(bitmap_1, 76, 1, 15, 20);
         temphour -= 2;
     }
     else
-        rb->lcd_bitmap(bitmap_0, 76, 1, 15, 20, true);
+        rb->lcd_bitmap(bitmap_0, 76, 1, 15, 20);
     if(temphour >= 1)
     {
-        rb->lcd_bitmap(bitmap_1, 95, 1, 15, 20, true);
+        rb->lcd_bitmap(bitmap_1, 95, 1, 15, 20);
         temphour -= 1;
     }
     else
-        rb->lcd_bitmap(bitmap_0, 95, 1, 15, 20, true);
+        rb->lcd_bitmap(bitmap_0, 95, 1, 15, 20);
 
     /*********
      * MINUTES
      ********/
     if(tempmin >= 32)
     {
-        rb->lcd_bitmap(bitmap_1, 0, 21, 15, 20, true);
+        rb->lcd_bitmap(bitmap_1, 0, 21, 15, 20);
         tempmin -= 32;
     }
     else
-        rb->lcd_bitmap(bitmap_0, 0, 21, 15, 20, true);
+        rb->lcd_bitmap(bitmap_0, 0, 21, 15, 20);
     if(tempmin >= 16)
     {
-         rb->lcd_bitmap(bitmap_1, 19, 21, 15, 20, true);
+        rb->lcd_bitmap(bitmap_1, 19, 21, 15, 20);
         tempmin -= 16;
     }
     else
-        rb->lcd_bitmap(bitmap_0, 19, 21, 15, 20, true);
+        rb->lcd_bitmap(bitmap_0, 19, 21, 15, 20);
     if(tempmin >= 8)
     {
-         rb->lcd_bitmap(bitmap_1, 38, 21, 15, 20, true);
+        rb->lcd_bitmap(bitmap_1, 38, 21, 15, 20);
         tempmin -= 8;
     }
     else
-        rb->lcd_bitmap(bitmap_0, 38, 21, 15, 20, true);
+        rb->lcd_bitmap(bitmap_0, 38, 21, 15, 20);
     if(tempmin >= 4)
     {
-         rb->lcd_bitmap(bitmap_1, 57, 21, 15, 20, true);
+        rb->lcd_bitmap(bitmap_1, 57, 21, 15, 20);
         tempmin -= 4;
     }
     else
-        rb->lcd_bitmap(bitmap_0, 57, 21, 15, 20, true);
+        rb->lcd_bitmap(bitmap_0, 57, 21, 15, 20);
     if(tempmin >= 2)
     {
-        rb->lcd_bitmap(bitmap_1, 76, 21, 15, 20, true);
+        rb->lcd_bitmap(bitmap_1, 76, 21, 15, 20);
         tempmin -= 2;
     }
     else
-        rb->lcd_bitmap(bitmap_0, 76, 21, 15, 20, true);
+        rb->lcd_bitmap(bitmap_0, 76, 21, 15, 20);
     if(tempmin >= 1)
     {
-        rb->lcd_bitmap(bitmap_1, 95, 21, 15, 20, true);
+        rb->lcd_bitmap(bitmap_1, 95, 21, 15, 20);
         tempmin -= 1;
     }
     else
-        rb->lcd_bitmap(bitmap_0, 95, 21, 15, 20, true);
+        rb->lcd_bitmap(bitmap_0, 95, 21, 15, 20);
 
     /*********
      * SECONDS
      ********/
     if(tempsec >= 32)
     {
-         rb->lcd_bitmap(bitmap_1, 0, 42, 15, 20, true);
+        rb->lcd_bitmap(bitmap_1, 0, 42, 15, 20);
         tempsec -= 32;
     }
     else
-        rb->lcd_bitmap(bitmap_0, 0, 42, 15, 20, true);
+        rb->lcd_bitmap(bitmap_0, 0, 42, 15, 20);
     if(tempsec >= 16)
     {
-        rb->lcd_bitmap(bitmap_1, 19, 42, 15, 20, true);
+        rb->lcd_bitmap(bitmap_1, 19, 42, 15, 20);
         tempsec -= 16;
     }
     else
-        rb->lcd_bitmap(bitmap_0, 19, 42, 15, 20, true);
+        rb->lcd_bitmap(bitmap_0, 19, 42, 15, 20);
     if(tempsec >= 8)
     {
-        rb->lcd_bitmap(bitmap_1, 38, 42, 15, 20, true);
+        rb->lcd_bitmap(bitmap_1, 38, 42, 15, 20);
         tempsec -= 8;
     }
     else
-        rb->lcd_bitmap(bitmap_0, 38, 42, 15, 20, true);
+        rb->lcd_bitmap(bitmap_0, 38, 42, 15, 20);
     if(tempsec >= 4)
     {
-         rb->lcd_bitmap(bitmap_1, 57, 42, 15, 20, true);
+        rb->lcd_bitmap(bitmap_1, 57, 42, 15, 20);
         tempsec -= 4;
     }
     else
-        rb->lcd_bitmap(bitmap_0, 57, 42, 15, 20, true);
+        rb->lcd_bitmap(bitmap_0, 57, 42, 15, 20);
     if(tempsec >= 2)
     {
-         rb->lcd_bitmap(bitmap_1, 76, 42, 15, 20, true);
+        rb->lcd_bitmap(bitmap_1, 76, 42, 15, 20);
         tempsec -= 2;
     }
     else
-        rb->lcd_bitmap(bitmap_0, 76, 42, 15, 20, true);
+        rb->lcd_bitmap(bitmap_0, 76, 42, 15, 20);
     if(tempsec >= 1)
     {
-        rb->lcd_bitmap(bitmap_1, 95, 42, 15, 20, true);
+        rb->lcd_bitmap(bitmap_1, 95, 42, 15, 20);
         tempsec -= 1;
     }
     else
-        rb->lcd_bitmap(bitmap_0, 95, 42, 15, 20, true);
+        rb->lcd_bitmap(bitmap_0, 95, 42, 15, 20);
 
     rb->lcd_update();
 }
@@ -1039,7 +1039,7 @@ void show_logo(bool animate, bool show_clock_text)
             rb->lcd_drawline(0, y_position/2-1, 111, y_position/2-1);
             rb->lcd_drawline(0, y_position/2+38, 111, y_position/2+38);
             rb->lcd_set_drawmode(DRMODE_SOLID);
-            rb->lcd_bitmap(clogo, 0, y_position/2, 112, 37, true);
+            rb->lcd_bitmap(clogo, 0, y_position/2, 112, 37);
             if(show_clock_text)
                 rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 48, buf);
             rb->lcd_update();
@@ -1051,7 +1051,7 @@ void show_logo(bool animate, bool show_clock_text)
             rb->lcd_drawline(0, y_position/2-1, 111, y_position/2-1);
             rb->lcd_drawline(0, y_position/2+38, 111, y_position/2+38);
             rb->lcd_set_drawmode(DRMODE_SOLID);
-            rb->lcd_bitmap(clogo, 0, y_position/2, 112, 37, true);
+            rb->lcd_bitmap(clogo, 0, y_position/2, 112, 37);
             if(show_clock_text)
                 rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 48, buf);
             rb->lcd_update();
@@ -1063,7 +1063,7 @@ void show_logo(bool animate, bool show_clock_text)
             rb->lcd_drawline(0, y_position/2-1, 111, y_position/2-1);
             rb->lcd_drawline(0, y_position/2+38, 111, y_position/2+38);
             rb->lcd_set_drawmode(DRMODE_SOLID);
-            rb->lcd_bitmap(clogo, 0, y_position/2, 112, 37, true);
+            rb->lcd_bitmap(clogo, 0, y_position/2, 112, 37);
             if(show_clock_text)
                 rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 48, buf);
             rb->lcd_update();
@@ -1071,7 +1071,7 @@ void show_logo(bool animate, bool show_clock_text)
     }
     else /* don't animate, just show */
     {
-        rb->lcd_bitmap(clogo, 0, 10, 112, 37, true);
+        rb->lcd_bitmap(clogo, 0, 10, 112, 37);
         if(show_clock_text)
             rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 48, buf);
         rb->lcd_update();
@@ -1094,7 +1094,7 @@ void exit_logo(void)
         rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
         rb->lcd_drawline(0, y_position/2-1, 111, y_position/2-1);
         rb->lcd_set_drawmode(DRMODE_SOLID);
-        rb->lcd_bitmap(clogo, 0, y_position/2, 112, 37, true);
+        rb->lcd_bitmap(clogo, 0, y_position/2, 112, 37);
         rb->lcd_update();
     }
 }
@@ -1511,9 +1511,9 @@ bool f1_screen(void)
 void draw_checkbox(bool setting, int x, int y)
 {
     if(setting) /* checkbox is on */
-        rb->lcd_bitmap(checkbox_full, x, y, 8, 6, true);
+        rb->lcd_bitmap(checkbox_full, x, y, 8, 6);
     else /* checkbox is off */
-        rb->lcd_bitmap(checkbox_empty, x, y, 8, 6, true);
+        rb->lcd_bitmap(checkbox_empty, x, y, 8, 6);
 }
 
 void draw_settings(void)
@@ -1544,18 +1544,18 @@ void draw_settings(void)
         draw_checkbox(settings.analog_digits, 1, 33);
 
         if(settings.analog_date == 0)
-            rb->lcd_bitmap(checkbox_empty, 1, 41, 8, 6, true);
+            rb->lcd_bitmap(checkbox_empty, 1, 41, 8, 6);
         else if(settings.analog_date == 1)
-            rb->lcd_bitmap(checkbox_half, 1, 41, 8, 6, true);
+            rb->lcd_bitmap(checkbox_half, 1, 41, 8, 6);
         else
-            rb->lcd_bitmap(checkbox_full, 1, 41, 8, 6, true);
+            rb->lcd_bitmap(checkbox_full, 1, 41, 8, 6);
 
         if(settings.analog_time == 0)
-            rb->lcd_bitmap(checkbox_empty, 1, 49, 8, 6, true);
+            rb->lcd_bitmap(checkbox_empty, 1, 49, 8, 6);
         else if(settings.analog_time == 1)
-            rb->lcd_bitmap(checkbox_half, 1, 49, 8, 6, true);
+            rb->lcd_bitmap(checkbox_half, 1, 49, 8, 6);
         else
-            rb->lcd_bitmap(checkbox_full, 1, 49, 8, 6, true);
+            rb->lcd_bitmap(checkbox_full, 1, 49, 8, 6);
 
         draw_checkbox(settings.analog_secondhand, 1, 57);
     }
@@ -1584,20 +1584,20 @@ void draw_settings(void)
 
         /* Draw checkboxes */
         if(settings.digital_date == 0)
-            rb->lcd_bitmap(checkbox_empty, 1, 33, 8, 6, true);
+            rb->lcd_bitmap(checkbox_empty, 1, 33, 8, 6);
         else if(settings.digital_date == 1)
-            rb->lcd_bitmap(checkbox_half, 1, 33, 8, 6, true);
+            rb->lcd_bitmap(checkbox_half, 1, 33, 8, 6);
         else
-            rb->lcd_bitmap(checkbox_full, 1, 33, 8, 6, true);
+            rb->lcd_bitmap(checkbox_full, 1, 33, 8, 6);
 
         if(settings.digital_seconds == 0)
-            rb->lcd_bitmap(checkbox_empty, 1, 41, 8, 6, true);
+            rb->lcd_bitmap(checkbox_empty, 1, 41, 8, 6);
         else if(settings.digital_seconds == 1)
-            rb->lcd_bitmap(checkbox_onethird, 1, 41, 8, 6, true);
+            rb->lcd_bitmap(checkbox_onethird, 1, 41, 8, 6);
         else if(settings.digital_seconds == 2)
-            rb->lcd_bitmap(checkbox_twothird, 1, 41, 8, 6, true);
+            rb->lcd_bitmap(checkbox_twothird, 1, 41, 8, 6);
         else
-            rb->lcd_bitmap(checkbox_full, 1, 41, 8, 6, true);
+            rb->lcd_bitmap(checkbox_full, 1, 41, 8, 6);
 
         draw_checkbox(settings.digital_blinkcolon, 1, 49);
         draw_checkbox(settings.digital_12h, 1, 57);
@@ -1627,20 +1627,20 @@ void draw_settings(void)
 
         /* Draw checkboxes */
         if(settings.lcd_date == 0)
-            rb->lcd_bitmap(checkbox_empty, 1, 33, 8, 6, true);
+            rb->lcd_bitmap(checkbox_empty, 1, 33, 8, 6);
         else if(settings.lcd_date == 1)
-            rb->lcd_bitmap(checkbox_half, 1, 33, 8, 6, true);
+            rb->lcd_bitmap(checkbox_half, 1, 33, 8, 6);
         else
-            rb->lcd_bitmap(checkbox_full, 1, 33, 8, 6, true);
+            rb->lcd_bitmap(checkbox_full, 1, 33, 8, 6);
 
         if(settings.lcd_seconds == 0)
-            rb->lcd_bitmap(checkbox_empty, 1, 41, 8, 6, true);
+            rb->lcd_bitmap(checkbox_empty, 1, 41, 8, 6);
         else if(settings.lcd_seconds == 1)
-            rb->lcd_bitmap(checkbox_onethird, 1, 41, 8, 6, true);
+            rb->lcd_bitmap(checkbox_onethird, 1, 41, 8, 6);
         else if(settings.lcd_seconds == 2)
-            rb->lcd_bitmap(checkbox_twothird, 1, 41, 8, 6, true);
+            rb->lcd_bitmap(checkbox_twothird, 1, 41, 8, 6);
         else
-            rb->lcd_bitmap(checkbox_full, 1, 41, 8, 6, true);
+            rb->lcd_bitmap(checkbox_full, 1, 41, 8, 6);
 
         draw_checkbox(settings.lcd_blinkcolon, 1, 49);
         draw_checkbox(settings.lcd_12h, 1, 57);
@@ -2131,16 +2131,16 @@ void general_settings(void)
         rb->lcd_getstringsize(buf, &buf_w, &buf_h);
         rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 56, buf);
 
-        rb->lcd_bitmap(arrow, 1, 17, 8, 6, true);
-        rb->lcd_bitmap(arrow, 1, 25, 8, 6, true);
+        rb->lcd_bitmap(arrow, 1, 17, 8, 6);
+        rb->lcd_bitmap(arrow, 1, 25, 8, 6);
         draw_checkbox(settings.display_counter, 1, 33);
 
         if(settings.save_mode == 1)
-            rb->lcd_bitmap(checkbox_onethird, 1, 41, 8, 6, true);
+            rb->lcd_bitmap(checkbox_onethird, 1, 41, 8, 6);
         else if(settings.save_mode == 2)
-            rb->lcd_bitmap(checkbox_twothird, 1, 41, 8, 6, true);
+            rb->lcd_bitmap(checkbox_twothird, 1, 41, 8, 6);
         else
-            rb->lcd_bitmap(checkbox_full, 1, 41, 8, 6, true);
+            rb->lcd_bitmap(checkbox_full, 1, 41, 8, 6);
 
         switch(cursorpos)
         {
@@ -2181,15 +2181,15 @@ void general_settings(void)
                                 rb->lcd_puts(2, 5, "Save: Automatic");
                             else
                                 rb->lcd_puts(2, 5, "Save: Manually");
-                            rb->lcd_bitmap(arrow, 1, 17, 8, 6, true);
-                            rb->lcd_bitmap(arrow, 1, 25, 8, 6, true);
+                            rb->lcd_bitmap(arrow, 1, 17, 8, 6);
+                            rb->lcd_bitmap(arrow, 1, 25, 8, 6);
                             draw_checkbox(settings.display_counter, 1, 33);
                             if(settings.save_mode == 1)
-                                rb->lcd_bitmap(checkbox_onethird, 1, 41, 8, 6, true);
+                                rb->lcd_bitmap(checkbox_onethird, 1, 41, 8, 6);
                             else if(settings.save_mode == 2)
-                                rb->lcd_bitmap(checkbox_twothird, 1, 41, 8, 6, true);
+                                rb->lcd_bitmap(checkbox_twothird, 1, 41, 8, 6);
                             else
-                                rb->lcd_bitmap(checkbox_full, 1, 41, 8, 6, true);
+                                rb->lcd_bitmap(checkbox_full, 1, 41, 8, 6);
 
                             cursor(0, cursor_y, 112, 8);
                             rb->lcd_update();
@@ -2218,15 +2218,15 @@ void general_settings(void)
                                 rb->lcd_puts(2, 5, "Save: Automatic");
                             else
                                 rb->lcd_puts(2, 5, "Save: Manually");
-                            rb->lcd_bitmap(arrow, 1, 17, 8, 6, true);
-                            rb->lcd_bitmap(arrow, 1, 25, 8, 6, true);
+                            rb->lcd_bitmap(arrow, 1, 17, 8, 6);
+                            rb->lcd_bitmap(arrow, 1, 25, 8, 6);
                             draw_checkbox(settings.display_counter, 1, 33);
                             if(settings.save_mode == 1)
-                                rb->lcd_bitmap(checkbox_onethird, 1, 41, 8, 6, true);
+                                rb->lcd_bitmap(checkbox_onethird, 1, 41, 8, 6);
                             else if(settings.save_mode == 2)
-                                rb->lcd_bitmap(checkbox_twothird, 1, 41, 8, 6, true);
+                                rb->lcd_bitmap(checkbox_twothird, 1, 41, 8, 6);
                             else
-                                rb->lcd_bitmap(checkbox_full, 1, 41, 8, 6, true);
+                                rb->lcd_bitmap(checkbox_full, 1, 41, 8, 6);
 
                             cursor(0, cursor_y, 112, 8);
                             rb->lcd_update();
@@ -2323,9 +2323,9 @@ void draw_extras(int year, int day, int month, int hour, int minute, int second)
             if(settings.analog_time == 2)
             {
                 if(current_time->tm_hour > 12) /* PM */
-                    rb->lcd_bitmap(pm, 96, 1, 15, 8, true);
+                    rb->lcd_bitmap(pm, 96, 1, 15, 8);
                 else /* AM */
-                    rb->lcd_bitmap(am, 96, 1, 15, 8, true);
+                    rb->lcd_bitmap(am, 96, 1, 15, 8);
             }
         }
 
@@ -2460,11 +2460,11 @@ void select_mode(void)
         rb->lcd_puts(0, 7, "PLAY:Go|OFF:Cancel");
 
         /* draw an arrow next to all of them */
-        rb->lcd_bitmap(arrow, 1, 9, 8, 6, true);
-        rb->lcd_bitmap(arrow, 1, 17, 8, 6, true);
-        rb->lcd_bitmap(arrow, 1, 25, 8, 6, true);
-        rb->lcd_bitmap(arrow, 1, 33, 8, 6, true);
-        rb->lcd_bitmap(arrow, 1, 41, 8, 6, true);
+        rb->lcd_bitmap(arrow, 1, 9, 8, 6);
+        rb->lcd_bitmap(arrow, 1, 17, 8, 6);
+        rb->lcd_bitmap(arrow, 1, 25, 8, 6);
+        rb->lcd_bitmap(arrow, 1, 33, 8, 6);
+        rb->lcd_bitmap(arrow, 1, 41, 8, 6);
 
         /* draw line selector */
         switch(cursorpos)
@@ -2501,11 +2501,11 @@ void select_mode(void)
                             rb->lcd_puts(0, 7, "PLAY:Go|OFF:Cancel");
 
                             /* draw an arrow next to all of them */
-                            rb->lcd_bitmap(arrow, 1, 9, 8, 6, true);
-                            rb->lcd_bitmap(arrow, 1, 17, 8, 6, true);
-                            rb->lcd_bitmap(arrow, 1, 25, 8, 6, true);
-                            rb->lcd_bitmap(arrow, 1, 33, 8, 6, true);
-                            rb->lcd_bitmap(arrow, 1, 41, 8, 6, true);
+                            rb->lcd_bitmap(arrow, 1, 9, 8, 6);
+                            rb->lcd_bitmap(arrow, 1, 17, 8, 6);
+                            rb->lcd_bitmap(arrow, 1, 25, 8, 6);
+                            rb->lcd_bitmap(arrow, 1, 33, 8, 6);
+                            rb->lcd_bitmap(arrow, 1, 41, 8, 6);
 
                             cursor(0, cursor_y, 112, 8);
                             rb->lcd_update();
@@ -2535,11 +2535,11 @@ void select_mode(void)
                             rb->lcd_puts(0, 7, "PLAY:Go|OFF:Cancel");
 
                             /* draw an arrow next to all of them */
-                            rb->lcd_bitmap(arrow, 1, 9, 8, 6, true);
-                            rb->lcd_bitmap(arrow, 1, 17, 8, 6, true);
-                            rb->lcd_bitmap(arrow, 1, 25, 8, 6, true);
-                            rb->lcd_bitmap(arrow, 1, 33, 8, 6, true);
-                            rb->lcd_bitmap(arrow, 1, 41, 8, 6, true);
+                            rb->lcd_bitmap(arrow, 1, 9, 8, 6);
+                            rb->lcd_bitmap(arrow, 1, 17, 8, 6);
+                            rb->lcd_bitmap(arrow, 1, 25, 8, 6);
+                            rb->lcd_bitmap(arrow, 1, 33, 8, 6);
+                            rb->lcd_bitmap(arrow, 1, 41, 8, 6);
 
                             cursor(0, cursor_y, 112, 8);
                             rb->lcd_update();
@@ -2580,7 +2580,7 @@ void counter_finished(void)
         rb->lcd_clear_display();
 
         /* draw "TIME'S UP" text */
-        rb->lcd_bitmap(times_up, 0, xpos, 112, 50, true);
+        rb->lcd_bitmap(times_up, 0, xpos, 112, 50);
 
         /* invert lcd */
         rb->lcd_set_drawmode(DRMODE_COMPLEMENT);

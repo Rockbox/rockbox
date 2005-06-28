@@ -57,8 +57,8 @@ extern void lcd_icon(int icon, bool enable);
 
 #if defined(SIMULATOR) || defined(HAVE_LCD_BITMAP)
 /* performance function */
-extern void lcd_blit(const unsigned char* p_data, int x, int y, int width,
-                     int height, int stride);
+extern void lcd_blit(const unsigned char* data, int x, int by, int width,
+                     int bheight, int stride);
 
 extern void lcd_update(void);
 /* update a fraction of the screen */
@@ -150,8 +150,9 @@ extern void lcd_hline(int x1, int x2, int y);
 extern void lcd_vline(int x, int y1, int y2);
 extern void lcd_drawrect(int x, int y, int width, int height);
 extern void lcd_fillrect(int x, int y, int width, int height);
-extern void lcd_bitmap(const unsigned char *src, int x, int y, int nx, int ny,
-			bool clear);
+extern void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
+                            int stride, int x, int y, int width, int height);
+extern void lcd_bitmap(const unsigned char *src, int x, int y, int nx, int ny);
 extern void lcd_putsxy(int x, int y, const unsigned char *string);
 
 extern void lcd_invertscroll(int x, int y);

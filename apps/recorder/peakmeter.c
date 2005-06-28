@@ -1108,7 +1108,7 @@ void peak_meter_draw_trig(int xpos, int ypos) {
             scrollbar(x, ypos + 1, TRIGBAR_WIDTH, TRIG_HEIGHT - 2,
                       TRIGBAR_WIDTH, 0, 0, HORIZONTAL);
             lcd_bitmap(bitmap_icons_7x8[Icon_Stop], xpos, ypos,
-                       ICON_PLAY_STATE_WIDTH, STATUSBAR_HEIGHT, false);
+                       ICON_PLAY_STATE_WIDTH, STATUSBAR_HEIGHT);
             break;
 
         case TRIG_STEADY:
@@ -1118,7 +1118,7 @@ void peak_meter_draw_trig(int xpos, int ypos) {
             scrollbar(x, ypos + 1, TRIGBAR_WIDTH, TRIG_HEIGHT - 2,
                       TRIGBAR_WIDTH, 0, TRIGBAR_WIDTH - time_left, HORIZONTAL);
             lcd_bitmap(bitmap_icons_7x8[Icon_Stop], xpos, ypos,
-                       ICON_PLAY_STATE_WIDTH, STATUSBAR_HEIGHT, false);
+                       ICON_PLAY_STATE_WIDTH, STATUSBAR_HEIGHT);
             break;
 
         case TRIG_GO:
@@ -1127,7 +1127,7 @@ void peak_meter_draw_trig(int xpos, int ypos) {
                       TRIGBAR_WIDTH, TRIGBAR_WIDTH, TRIGBAR_WIDTH, HORIZONTAL);
             lcd_bitmap(bitmap_icons_7x8[Icon_Record],
                        TRIG_WIDTH - ICON_PLAY_STATE_WIDTH, ypos,
-                       ICON_PLAY_STATE_WIDTH, STATUSBAR_HEIGHT, false);
+                       ICON_PLAY_STATE_WIDTH, STATUSBAR_HEIGHT);
             break;
 
         case TRIG_POSTREC:
@@ -1137,7 +1137,7 @@ void peak_meter_draw_trig(int xpos, int ypos) {
                       TRIGBAR_WIDTH, time_left, TRIGBAR_WIDTH, HORIZONTAL);
             lcd_bitmap(bitmap_icons_7x8[Icon_Record],
                        TRIG_WIDTH - ICON_PLAY_STATE_WIDTH, ypos,
-                       ICON_PLAY_STATE_WIDTH, STATUSBAR_HEIGHT, false);
+                       ICON_PLAY_STATE_WIDTH, STATUSBAR_HEIGHT);
             break;
     }
 

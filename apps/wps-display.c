@@ -112,11 +112,13 @@ static bool wps_loaded = false;
 /* Display images */
 static void wps_display_images(void) {
     int n;
+    lcd_set_drawmode(DRMODE_FG);
     for (n = 0; n < MAX_IMAGES; n++) {
         if (img[n].loaded) {
-            lcd_bitmap(img[n].ptr, img[n].x, img[n].y, img[n].w, img[n].h, false);
+            lcd_bitmap(img[n].ptr, img[n].x, img[n].y, img[n].w, img[n].h);
         }
     }
+    lcd_set_drawmode(DRMODE_SOLID);
 }
 #endif
 

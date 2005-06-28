@@ -395,8 +395,7 @@ static int showdir(void)
                 offset = (line_height - 8) / 2;
             lcd_bitmap(icon,
                        CURSOR_X * 6 + CURSOR_WIDTH,
-                       MARGIN_Y+(i-start)*line_height + offset,
-                       6, 8, true);
+                       MARGIN_Y+(i-start)*line_height + offset, 6, 8);
 #else
             if (icon < 0 )
                 icon = Unknown;

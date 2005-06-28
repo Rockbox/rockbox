@@ -214,7 +214,7 @@ static void show_pause_mode(bool enabled)
     static const char pause_icon[] = {0x00,0x7f,0x7f,0x00,0x7f,0x7f,0x00};
     
     if (enabled)
-        rb->lcd_bitmap(pause_icon, 52, 0, 7, 8, true);
+        rb->lcd_bitmap(pause_icon, 52, 0, 7, 8);
     else
     {
         rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);

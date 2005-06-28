@@ -870,7 +870,7 @@ bool f2_rec_screen(void)
         snprintf(buf, 32, "%d", global_settings.rec_quality);
         lcd_putsxy(0, LCD_HEIGHT/2-h, buf);
         lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
-                   LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8, true);
+                   LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8);
 
         /* Frequency */
         snprintf(buf, sizeof buf, "%s:", str(LANG_RECORDING_FREQUENCY));
@@ -880,7 +880,7 @@ bool f2_rec_screen(void)
         lcd_getstringsize(ptr, &w, &h);
         lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
         lcd_bitmap(bitmap_icons_7x8[Icon_DownArrow],
-                   LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8, true);
+                   LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8);
 
         /* Channel mode */
         switch ( global_settings.rec_channels ) {
@@ -901,7 +901,7 @@ bool f2_rec_screen(void)
         lcd_getstringsize(ptr, &w, &h);
         lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2, ptr);
         lcd_bitmap(bitmap_icons_7x8[Icon_FastForward], 
-                   LCD_WIDTH/2 + 8, LCD_HEIGHT/2 - 4, 7, 8, true);
+                   LCD_WIDTH/2 + 8, LCD_HEIGHT/2 - 4, 7, 8);
 
         lcd_update();
 
@@ -995,14 +995,14 @@ bool f3_rec_screen(void)
         lcd_getstringsize(ptr, &w, &h);
         lcd_putsxy(0, LCD_HEIGHT/2-h, ptr);
         lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
-                   LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8, true);
+                   LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8);
 
         /* trigger setup */
         ptr = str(LANG_RECORD_TRIGGER);
         lcd_getstringsize(ptr,&w,&h);
         lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h*2, ptr);
         lcd_bitmap(bitmap_icons_7x8[Icon_DownArrow],
-                   LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8, true);
+                   LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8);
 
         lcd_update();
 

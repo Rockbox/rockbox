@@ -229,7 +229,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     while (1) {
 #ifdef HAVE_LCD_BITMAP
         rb->lcd_clear_display();
-        rb->lcd_bitmap(LOGO, x, y, LOGO_WIDTH, LOGO_HEIGHT, false);
+        rb->lcd_bitmap(LOGO, x, y, LOGO_WIDTH, LOGO_HEIGHT);
 #ifdef REMOTE_LOGO
         rb->remote_clear_display();
         rb->remote_bitmap(REMOTE_LOGO,

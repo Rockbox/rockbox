@@ -323,7 +323,7 @@ bool statusbar_icon_volume(int percent)
     if (volume==0) {
         lcd_bitmap(bitmap_icons_7x8[Icon_Mute], 
                    ICON_VOLUME_X_POS + ICON_VOLUME_WIDTH / 2 - 4,
-                   STATUSBAR_Y_POS, 7, STATUSBAR_HEIGHT, false);
+                   STATUSBAR_Y_POS, 7, STATUSBAR_HEIGHT);
     }
     else {
         /* We want to redraw the icon later on */
@@ -371,7 +371,7 @@ bool statusbar_icon_volume(int percent)
 void statusbar_icon_play_state(int state)
 {
     lcd_bitmap(bitmap_icons_7x8[state], ICON_PLAY_STATE_X_POS, STATUSBAR_Y_POS,
-               ICON_PLAY_STATE_WIDTH, STATUSBAR_HEIGHT, false);
+               ICON_PLAY_STATE_WIDTH, STATUSBAR_HEIGHT);
 }
 
 /*
@@ -380,7 +380,7 @@ void statusbar_icon_play_state(int state)
 void statusbar_icon_play_mode(int mode)
 {
     lcd_bitmap(bitmap_icons_7x8[mode], ICON_PLAY_MODE_X_POS, STATUSBAR_Y_POS,
-               ICON_PLAY_MODE_WIDTH, STATUSBAR_HEIGHT, false);
+               ICON_PLAY_MODE_WIDTH, STATUSBAR_HEIGHT);
 }
 
 /*
@@ -389,7 +389,7 @@ void statusbar_icon_play_mode(int mode)
 void statusbar_icon_shuffle(void)
 {
     lcd_bitmap(bitmap_icons_7x8[Icon_Shuffle], ICON_SHUFFLE_X_POS, 
-               STATUSBAR_Y_POS, ICON_SHUFFLE_WIDTH, STATUSBAR_HEIGHT, false);
+               STATUSBAR_Y_POS, ICON_SHUFFLE_WIDTH, STATUSBAR_HEIGHT);
 }
 
 /*
@@ -398,7 +398,7 @@ void statusbar_icon_shuffle(void)
 void statusbar_icon_lock(void)
 {
     lcd_bitmap(bitmap_icons_5x8[Icon_Lock], LOCK_X_POS, 
-               STATUSBAR_Y_POS, 5, 8, false);
+               STATUSBAR_Y_POS, 5, 8);
 }
 
 #if CONFIG_LED == LED_VIRTUAL
@@ -408,7 +408,7 @@ void statusbar_icon_lock(void)
 void statusbar_led(void)
 {
     lcd_bitmap(bitmap_icon_disk, ICON_DISK_X_POS, 
-               STATUSBAR_Y_POS, ICON_DISK_WIDTH, STATUSBAR_HEIGHT, false);
+               STATUSBAR_Y_POS, ICON_DISK_WIDTH, STATUSBAR_HEIGHT);
 }
 #endif
 

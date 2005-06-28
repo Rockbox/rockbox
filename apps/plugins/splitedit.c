@@ -262,18 +262,18 @@ static void update_icons(void)
     /* The CUT icon */
     rb->lcd_bitmap(CUT_BMP,
         LCD_WIDTH / 3 / 2 - BMPWIDTH / 2, LCD_HEIGHT - BMPHEIGHT,
-        BMPWIDTH, BMPHEIGHT, true);
+        BMPWIDTH, BMPHEIGHT);
 
     /* The loop mode icon */
     rb->lcd_bitmap(LOOP_BMP[splitedit_get_loop_mode()],
         LCD_WIDTH/3 + LCD_WIDTH/3 / 2 - BMPWIDTH/2, LCD_HEIGHT - BMPHEIGHT,
-        BMPWIDTH, BMPHEIGHT, true);
+        BMPWIDTH, BMPHEIGHT);
 
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     /* The scale icon */
     rb->lcd_bitmap(SCALE_BMP[rb->peak_meter_get_use_dbfs()],
         2 *LCD_WIDTH/3 + LCD_WIDTH/3 / 2 - BMPWIDTH/2, LCD_HEIGHT - BMPHEIGHT,
-        BMPWIDTH, BMPHEIGHT, true);
+        BMPWIDTH, BMPHEIGHT);
 #else
     {
         static int idx;
@@ -281,7 +281,7 @@ static void update_icons(void)
         idx = 1 - idx;
         rb->lcd_bitmap(SCALE_BMP[idx],
             2 *LCD_WIDTH/3 + LCD_WIDTH/3 / 2 - BMPWIDTH/2, LCD_HEIGHT - BMPHEIGHT,
-            BMPWIDTH, BMPHEIGHT, true);
+            BMPWIDTH, BMPHEIGHT);
     }
 #endif
 

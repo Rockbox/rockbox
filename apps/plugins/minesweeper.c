@@ -379,7 +379,9 @@ int minesweeper(void)
                     if(minefield[i][j].mine){
                         rb->lcd_putsxy(j*8+1,i*8+1,"b");
                     } else if(minefield[i][j].neighbors){
-                        rb->lcd_bitmap(num[minefield[i][j].neighbors],j*8,i*8,8,8,false);
+                        rb->lcd_set_drawmode(DRMODE_FG);
+                        rb->lcd_bitmap(num[minefield[i][j].neighbors],j*8,i*8,8,8);
+                        rb->lcd_set_drawmode(DRMODE_SOLID);
                     }
                 } else if(minefield[i][j].flag) {
                     rb->lcd_drawline(j*8+2,i*8+2,j*8+5,i*8+5);

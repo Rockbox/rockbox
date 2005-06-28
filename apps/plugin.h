@@ -87,12 +87,12 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 41
+#define PLUGIN_API_VERSION 42
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 41
+#define PLUGIN_MIN_API_VERSION 42
 
 /* plugin return codes */
 enum plugin_status {
@@ -160,17 +160,21 @@ struct plugin_api {
     int  (*lcd_getstringsize)(const unsigned char *str, int *w, int *h);
     void (*lcd_drawpixel)(int x, int y);
     void (*lcd_drawline)(int x1, int y1, int x2, int y2);
-    void (*lcd_drawrect)(int x, int y, int nx, int ny);
-    void (*lcd_fillrect)(int x, int y, int nx, int ny);
+    void (*lcd_hline)(int x1, int x2, int y);
+    void (*lcd_vline)(int x, int y1, int y2);
+    void (*lcd_drawrect)(int x, int y, int width, int height);
+    void (*lcd_fillrect)(int x, int y, int width, int height);
+    void (*lcd_bitmap_part)(const unsigned char *src, int src_x, int src_y,
+                            int stride, int x, int y, int width, int height);
     void (*lcd_bitmap)(const unsigned char *src, int x, int y,
-                       int nx, int ny, bool clear);
+                       int width, int height);
     void (*lcd_putsxy)(int x, int y, const unsigned char *string);
     void (*lcd_puts_style)(int x, int y, const unsigned char *str, int style);
     void (*lcd_puts_scroll_style)(int x, int y, const unsigned char* string,
                                   int style);
     unsigned char* lcd_framebuffer;
-    void (*lcd_blit) (const unsigned char* p_data, int x, int y, int width,
-                      int height, int stride);
+    void (*lcd_blit) (const unsigned char* data, int x, int by, int width,
+                      int bheight, int stride);
     void (*lcd_update)(void);
     void (*lcd_update_rect)(int x, int y, int width, int height);
     void (*scrollbar)(int x, int y, int width, int height, int items,

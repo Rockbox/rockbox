@@ -269,9 +269,9 @@ static void addclock(void)
     /* draw a circle */
     for(i=0; i < 60; i+=3) {
         rb->lcd_drawline( xminute[i],
-                      yminute[i],
-                      xminute[(i+1)%60],
-                      yminute[(i+1)%60]);
+                          yminute[i],
+                          xminute[(i+1)%60],
+                          yminute[(i+1)%60]);
     }
 }
 #endif /* HAVE_RTC */
@@ -303,16 +303,17 @@ static int scrollit(void)
             return -1;
 
         rb->lcd_clear_display();
+        rb->lcd_set_drawmode(DRMODE_FG);
 
         for(i=0, yy=y, xx=x; i< LETTERS_ON_SCREEN; i++) {
             letter = rock[(i+textpos) % rocklen ];
 
             rb->lcd_bitmap((char *)char_gen_12x16[letter-0x20],
-                       xx, table[yy&(TABLE_SIZE-1)],
-                       11, 16, false);
+                           xx, table[yy&(TABLE_SIZE-1)], 11, 16);
             yy += YADD;
             xx+= LCD_WIDTH/LETTERS_ON_SCREEN;
         }
+        rb->lcd_set_drawmode(DRMODE_SOLID);
 #ifdef HAVE_RTC
         addclock();
 #endif
@@ -393,13 +394,15 @@ static int loopit(void)
             rb->lcd_putsxy(0, LCD_HEIGHT -  8, buffer);
             timeout--;
         }
+        rb->lcd_set_drawmode(DRMODE_FG);
         for(i=0, yy=y, xx=x;
             i<rocklen;
             i++, yy+=values[NUM_YDIST].num, xx+=values[NUM_XDIST].num)
             rb->lcd_bitmap((char *)char_gen_12x16[rock[i]-0x20],
                            xtable[xx&(TABLE_SIZE-1)], table[yy&(TABLE_SIZE-1)],
-                           11, 16, false);
+                           11, 16);
         rb->lcd_update();
+        rb->lcd_set_drawmode(DRMODE_SOLID);
 
         ysanke+= values[NUM_YSANKE].num;
         xsanke+= values[NUM_XSANKE].num;

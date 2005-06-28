@@ -245,11 +245,11 @@ void status_draw(bool force_redraw)
         /* draw power plug if charging */
         if (info.inserted)
             lcd_bitmap(bitmap_icons_7x8[Icon_Plug], ICON_PLUG_X_POS,
-                       STATUSBAR_Y_POS, ICON_PLUG_WIDTH, STATUSBAR_HEIGHT, false);
+                       STATUSBAR_Y_POS, ICON_PLUG_WIDTH, STATUSBAR_HEIGHT);
 #ifdef HAVE_USB_POWER
         else if (info.usb_power)
             lcd_bitmap(bitmap_icons_7x8[Icon_USBPlug], ICON_PLUG_X_POS,
-                       STATUSBAR_Y_POS, ICON_PLUG_WIDTH, STATUSBAR_HEIGHT, false);
+                       STATUSBAR_Y_POS, ICON_PLUG_WIDTH, STATUSBAR_HEIGHT);
 #endif
 
         info.redraw_volume = statusbar_icon_volume(info.volume);
