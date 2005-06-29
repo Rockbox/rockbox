@@ -986,7 +986,9 @@ void audio_update_trackinfo(void)
         if (buf_ridx >= codecbuflen)
             buf_ridx -= codecbuflen;
             
-        pcm_crossfade_init();
+        if (!pcm_crossfade_init())
+            pcm_flush_audio();
+            
         if (!filling)
             pcm_set_boost_mode(false);
     } else {
@@ -1140,7 +1142,8 @@ void audio_thread(void)
                 ci.stop_codec = true;
                 ci.reload_codec = false;
                 ci.seek_time = 0;
-                pcm_flush_audio();
+                if (!pcm_crossfade_init())
+                    pcm_flush_audio();
                 audio_play_start((int)ev.data);
                 break ;
                 
@@ -1349,7 +1352,7 @@ static void initiate_track_change(int peek_index)
     } 
     
     else if (!pcm_crossfade_init()) {
-        //pcm_play_stop();
+        pcm_flush_audio();
     }
 }
 
