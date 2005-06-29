@@ -50,7 +50,6 @@ drivers/lcd-player.c
 #ifdef HAVE_LCD_BITMAP
 #if CONFIG_LCD == LCD_S1D15E06
 drivers/lcd-h100.c
-#elif CONFIG_LCD == LCD_H300
 #else
 drivers/lcd-recorder.c
 #endif
