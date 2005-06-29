@@ -397,6 +397,12 @@ eng: "(PLAY/STOP)"
 voice: ""
 new:
 
+id: LANG_RESUME_ASK 	 
+desc: DEPRECATED
+eng: "" 	 
+voice: "" 	 
+new: 	 
+
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
 eng: "Key Lock ON"
@@ -839,6 +845,12 @@ id: LANG_MONTH_DECEMBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Dec"
 voice: "December"
+new:
+
+id: LANG_RESUME_SETTING_ASK_ONCE 	 
+desc: DEPRECATED 	 
+eng: "" 	 
+voice: "" 	 
 new:
 
 id: LANG_BATTERY_DISPLAY
