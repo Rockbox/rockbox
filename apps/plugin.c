@@ -138,7 +138,9 @@ static const struct plugin_api rockbox_api = {
     lcd_remote_puts,
     lcd_remote_puts_scroll,
     lcd_remote_stop_scroll,
+#ifndef SIMULATOR
     lcd_remote_roll,
+#endif
     lcd_remote_set_drawmode,
     lcd_remote_get_drawmode,
     lcd_remote_setfont,
