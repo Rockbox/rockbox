@@ -519,7 +519,8 @@ int pitch_screen(void)
 }
 #endif
 
-#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H100_PAD)
+#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H100_PAD) ||\
+    (CONFIG_KEYPAD == IRIVER_H300_PAD)
 bool quick_screen(int context, int button)
 {
     bool exit = false;
@@ -544,7 +545,7 @@ bool quick_screen(int context, int button)
 #if CONFIG_KEYPAD == RECORDER_PAD
             case SCREENS_QUICK:
 #endif
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
             case SCREENS_QUICK | BUTTON_REPEAT:
 #endif
                 /* Shuffle mode */
