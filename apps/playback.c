@@ -61,6 +61,7 @@
 #include "sound.h"
 #include "metadata.h"
 
+static volatile bool codec_loaded;
 static volatile bool playing;
 static volatile bool paused;
 
@@ -213,9 +214,18 @@ bool pcm_is_playing(void)
     return false;
 }
 
+bool pcm_is_crossfade_active(void)
+{
+    return false;
+}
+
 bool pcm_is_lowdata(void)
 {
     return false;
+}
+
+void pcm_flush_audio(void)
+{
 }
 
 bool pcm_crossfade_init(void)
@@ -487,7 +497,8 @@ bool codec_seek_buffer_callback(off_t newpos)
     if (difference >= 0) {
         logf("seek: +%d", difference);
         codec_advance_buffer_callback(difference);
-        pcm_play_stop();
+        if (!pcm_is_crossfade_active())
+            pcm_play_stop();
         return true;
     }
     
@@ -508,6 +519,7 @@ bool codec_seek_buffer_callback(off_t newpos)
     if (buf_ridx < 0)
         buf_ridx = codecbuflen + buf_ridx;
     ci.curpos -= difference;
+    if (!pcm_is_crossfade_active())
     pcm_play_stop();
     
     return true;
@@ -554,7 +566,7 @@ void yield_codecs(void)
     if (!pcm_is_playing())
         sleep(5);
     while (pcm_is_lowdata() && !ci.stop_codec && 
-           playing && queue_empty(&audio_queue))
+           playing && queue_empty(&audio_queue) && codecbufused > (128*1024))
         yield();
 }
 
@@ -937,8 +949,7 @@ void audio_check_buffer(void)
     
     /* Limit buffering size at first run. */
     if (conf_bufferlimit && (int)fill_bytesleft >= conf_bufferlimit) {
-        fill_bytesleft = conf_bufferlimit;
-        conf_bufferlimit = 0;
+        fill_bytesleft = conf_bufferlimit - codecbufused;
     }
     
     /* Try to load remainings of the file. */
@@ -956,6 +967,7 @@ void audio_check_buffer(void)
         last_peek_offset++;
     } else if (tracks[track_widx].filerem == 0 || fill_bytesleft == 0) {
         filling = false;
+        conf_bufferlimit = 0;
         pcm_set_boost_mode(false);
         if (playing)
             ata_sleep();
@@ -1128,7 +1140,7 @@ void audio_thread(void)
                 ci.stop_codec = true;
                 ci.reload_codec = false;
                 ci.seek_time = 0;
-                //pcm_play_stop();
+                pcm_flush_audio();
                 audio_play_start((int)ev.data);
                 break ;
                 
@@ -1195,6 +1207,7 @@ void codec_thread(void)
         switch (ev.id) {
             case CODEC_LOAD_DISK:
                 ci.stop_codec = false;
+                codec_loaded = true;
                 status = codec_load_file((char *)ev.data);
                 break ;
                 
@@ -1209,6 +1222,7 @@ void codec_thread(void)
                 
                 ci.stop_codec = false;
                 wrap = (int)&codecbuf[codecbuflen] - (int)cur_ti->codecbuf;
+                codec_loaded = true;
                 status = codec_load_ram(cur_ti->codecbuf,  codecsize, 
                                         &codecbuf[0], wrap);
                 break ;
@@ -1220,6 +1234,8 @@ void codec_thread(void)
                 break ;
 #endif
         }
+
+        codec_loaded = false;
         
         switch (ev.id) {
         case CODEC_LOAD_DISK:
@@ -1297,6 +1313,8 @@ void audio_stop(void)
 {
     logf("audio_stop");
     queue_post(&audio_queue, AUDIO_STOP, 0);
+    while (playing || codec_loaded)
+        yield();
 }
 
 void audio_pause(void)
@@ -1524,6 +1542,7 @@ void audio_init(void)
     filling = false;
     codecbuf = &audiobuf[MALLOC_BUFSIZE];
     playing = false;
+    codec_loaded = false;
     paused = false;
     track_changed = false;
     current_fd = -1;

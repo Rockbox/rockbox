@@ -35,6 +35,7 @@ void pcm_play_data(const unsigned char* start, int size,
 void pcm_play_stop(void);
 void pcm_play_pause(bool play);
 bool pcm_is_playing(void);
+bool pcm_is_crossfade_active(void);
 
 /* These functions are for playing chained buffers of PCM data */
 void pcm_play_init(void);
@@ -45,6 +46,7 @@ void pcm_play_set_watermark(int numbytes, void (*callback)(int bytes_left));
 
 void pcm_set_boost_mode(bool state);
 bool pcm_is_lowdata(void);
+void pcm_flush_buffer(long length);
 bool pcm_crossfade_init(void);
 void audiobuffer_add_event(void (*event_handler)(void));
 unsigned int audiobuffer_get_latency(void);
