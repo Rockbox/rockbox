@@ -379,10 +379,10 @@ voice: ""
 new: "ist voll!"
 
 id: LANG_RESUME_ASK
-desc: question asked at the begining when resume is on
-eng: "Resume?"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Fortsetzen?"
+new:
 
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
@@ -835,10 +835,10 @@ voice: "Dezember"
 new: "Dez"
 
 id: LANG_RESUME_SETTING_ASK_ONCE
-desc: in settings_menu
-eng: "Ask Once"
-voice: "einmalig fragen"
-new: "einmalig fragen"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new:
 
 id: LANG_BATTERY_DISPLAY
 desc: Battery type title
