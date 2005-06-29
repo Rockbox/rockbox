@@ -544,8 +544,8 @@ long wps_show(void)
                     else
                         audio_pause();
                     settings_save();
-#ifndef HAVE_RTC
-                    ata_flush();
+#if !defined(HAVE_RTC) && !defined(HAVE_SW_POWEROFF)
+                    ata_flush();   /* make sure resume info is saved */
 #endif
                 }
                 break;
