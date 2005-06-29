@@ -252,7 +252,7 @@ static bool update(void)
 
     /* save resume data */
     if ( id3 &&
-         global_settings.resume_offset != id3->offset ) {
+         (global_settings.resume_offset != id3->offset || track_changed)) {
  
         if (!playlist_get_resume_info(&global_settings.resume_index))
         {
