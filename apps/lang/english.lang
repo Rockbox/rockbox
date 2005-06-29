@@ -397,11 +397,11 @@ eng: "(PLAY/STOP)"
 voice: ""
 new:
 
-id: LANG_RESUME_ASK 	 
+id: LANG_RESUME_ASK
 desc: DEPRECATED
-eng: "" 	 
-voice: "" 	 
-new: 	 
+eng: ""
+voice: ""
+new:
 
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
