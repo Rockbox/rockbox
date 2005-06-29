@@ -397,7 +397,7 @@ void lcd_clear_display(void)
 /* Set a single pixel */
 void lcd_drawpixel(int x, int y)
 {
-    if (((unsigned)x < LCD_WIDTH) || ((unsigned)y < LCD_HEIGHT))
+    if (((unsigned)x < LCD_WIDTH) && ((unsigned)y < LCD_HEIGHT))
         lcd_pixelfuncs[drawmode](x, y);
 }
 

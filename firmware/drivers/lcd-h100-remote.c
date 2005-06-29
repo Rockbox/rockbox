@@ -558,7 +558,7 @@ void lcd_remote_clear_display(void)
 /* Set a single pixel */
 void lcd_remote_drawpixel(int x, int y)
 {
-    if (((unsigned)x < LCD_REMOTE_WIDTH) || ((unsigned)y < LCD_REMOTE_HEIGHT))
+    if (((unsigned)x < LCD_REMOTE_WIDTH) && ((unsigned)y < LCD_REMOTE_HEIGHT))
         lcd_remote_pixelfuncs[drawmode](x, y);
 }
 
