@@ -3079,8 +3079,8 @@ new: "Trigger aktiv"
 id: LANG_LCD_REMOTE_MENU
 desc: in the display sub menu
 eng: "Remote-LCD Settings"
-voice: 
-new: Remote-LCD Einstellungen"
+voice:
+new: "Remote-LCD Einstellungen"
 
 id: LANG_DISK_NAME_INTERNAL
 desc: in info menu; name for internal disk with multivolume (keep short!)
