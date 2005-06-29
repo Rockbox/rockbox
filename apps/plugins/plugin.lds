@@ -51,12 +51,12 @@ MEMORY
 SECTIONS
 {
     .text : {
-        *(.entry)
-        *(.text)
+        KEEP(*(.entry))
+        *(.text*)
     } > PLUGIN_RAM
 
     .data : {
-        *(.data)
+        *(.data*)
     } > PLUGIN_RAM
 
     /DISCARD/ : {
@@ -64,13 +64,11 @@ SECTIONS
     }
 
     .bss : {
-        *(.bss)
+        *(.bss*)
     } > PLUGIN_RAM
 
     .rodata : {
-        *(.rodata)
-        *(.rodata.str1.1)
-        *(.rodata.str1.4)
+        *(.rodata*)
         . = ALIGN(0x4);
 #ifdef ARCH_IRIVER
         iramcopy = .;
@@ -86,4 +84,9 @@ SECTIONS
         iramend = .;
     } > PLUGIN_IRAM
 #endif
+    /* Special trick to avoid a linker error when no other sections are
+       left after garbage collection (plugin not for this platform) */
+    .comment 0 : {
+        KEEP(*(.comment))
+    }
 }

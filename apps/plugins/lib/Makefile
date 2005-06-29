@@ -20,6 +20,11 @@ endif
 CFLAGS = $(GCCOPTS) \
 $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE} -DPLUGIN
 
+# Sectioned compilation for target
+ifndef SIMVER
+	CFLAGS += -ffunction-sections -fdata-sections
+endif
+
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc
 
