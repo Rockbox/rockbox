@@ -693,15 +693,15 @@ bool quick_screen(int context, int button)
                 break;
 
             case BUTTON_F3 | BUTTON_RIGHT:
-//            case BUTTON_F3 | BUTTON_RIGHT | BUTTON_REPEAT:
+            case BUTTON_F3 | BUTTON_RIGHT | BUTTON_REPEAT:
                 global_settings.statusbar = !global_settings.statusbar;
                 used = true;
                 break;
 
             case BUTTON_F3 | BUTTON_DOWN:
-//            case BUTTON_F3 | BUTTON_DOWN | BUTTON_REPEAT:
+            case BUTTON_F3 | BUTTON_DOWN | BUTTON_REPEAT:
             case BUTTON_F3 | BUTTON_UP:
-//            case BUTTON_F3 | BUTTON_UP | BUTTON_REPEAT:
+            case BUTTON_F3 | BUTTON_UP | BUTTON_REPEAT:
                 global_settings.flip_display = !global_settings.flip_display;
                 button_set_flip(global_settings.flip_display);
                 lcd_set_flip(global_settings.flip_display);

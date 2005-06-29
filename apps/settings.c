@@ -197,7 +197,7 @@ static const struct bit_entry rtc_bits[] =
         "stereo,mono,custom,mono left,mono right,karaoke" },
     {8, S_O(stereo_width), 100, "stereo width", NULL},
     /* playback */
-    {2, S_O(resume), RESUME_ASK, "resume", "off,ask,ask once,on" },
+    {2, S_O(resume), false, "resume", off_on },
     {1, S_O(playlist_shuffle), false, "shuffle", off_on },
     {16 | SIGNED, S_O(resume_index), -1, NULL, NULL },
     {16 | SIGNED, S_O(resume_first_index), 0, NULL, NULL },

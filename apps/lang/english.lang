@@ -391,12 +391,6 @@ eng: "Is Full!"
 voice: ""
 new:
 
-id: LANG_RESUME_ASK
-desc: question asked at the begining when resume is on
-eng: "Resume?"
-voice: ""
-new:
-
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
 eng: "(PLAY/STOP)"
@@ -845,12 +839,6 @@ id: LANG_MONTH_DECEMBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Dec"
 voice: "December"
-new:
-
-id: LANG_RESUME_SETTING_ASK_ONCE
-desc: in settings_menu
-eng: "Ask Once"
-voice: "Ask Once"
 new:
 
 id: LANG_BATTERY_DISPLAY

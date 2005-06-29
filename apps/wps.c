@@ -252,7 +252,6 @@ static bool update(void)
 
     /* save resume data */
     if ( id3 &&
-         global_settings.resume &&
          global_settings.resume_offset != id3->offset ) {
  
         if (!playlist_get_resume_info(&global_settings.resume_index))
@@ -391,7 +390,7 @@ long wps_show(void)
 
             /* if another thread paused audio, we are probably in car mode,
                about to shut down. lets save the settings. */
-            if (paused && global_settings.resume) {
+            if (paused) {
                 settings_save();
 #ifndef HAVE_RTC
                 ata_flush();
@@ -544,12 +543,10 @@ long wps_show(void)
                         fade(0);
                     else
                         audio_pause();
-                    if (global_settings.resume) {
-                        settings_save();
+                    settings_save();
 #ifndef HAVE_RTC
-                        ata_flush();
+                    ata_flush();
 #endif
-                    }
                 }
                 break;
 

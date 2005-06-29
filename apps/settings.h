@@ -78,11 +78,6 @@
 
 /* data structures */
 
-#define RESUME_OFF 0
-#define RESUME_ASK 1
-#define RESUME_ASK_ONCE 2
-#define RESUME_ON  3
-
 #define BOOKMARK_NO  0
 #define BOOKMARK_YES 1
 #define BOOKMARK_ASK 2
@@ -211,7 +206,7 @@ struct user_settings
 
     /* resume settings */
 
-    int resume;        /* resume option: 0=off, 1=ask, 2=on */
+    bool resume;        /* resume option: 0=off, 1=on */
     int resume_index;  /* index in playlist (-1 for no active resume) */
     int resume_first_index;  /* index of first track in playlist */
     int resume_offset; /* byte offset in mp3 file */

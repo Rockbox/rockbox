@@ -447,13 +447,11 @@ int ft_enter(struct tree_context* c)
         }
 
         if ( play ) {
-            if ( global_settings.resume ) {
-                /* the resume_index must always be the index in the
-                   shuffled list in case shuffle is enabled */
-                global_settings.resume_index = start_index;
-                global_settings.resume_offset = 0;
-                settings_save();
-            }
+            /* the resume_index must always be the index in the
+               shuffled list in case shuffle is enabled */
+            global_settings.resume_index = start_index;
+            global_settings.resume_offset = 0;
+            settings_save();
 
             start_wps = true;
         }

@@ -656,14 +656,7 @@ static bool sort_dir(void)
 
 static bool resume(void)
 {
-    static const struct opt_items names[] = {
-        { STR(LANG_SET_BOOL_NO) }, 
-        { STR(LANG_RESUME_SETTING_ASK) },
-        { STR(LANG_RESUME_SETTING_ASK_ONCE) },
-        { STR(LANG_SET_BOOL_YES) }
-    };
-    return set_option( str(LANG_RESUME), &global_settings.resume, INT,
-                       names, 4, NULL );
+    return set_bool( str(LANG_RESUME), &global_settings.resume); 
 }
 
 static bool autocreatebookmark(void)

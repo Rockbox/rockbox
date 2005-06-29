@@ -220,7 +220,8 @@ void button_init(void)
 #endif /* CONFIG_KEYPAD */
 
     queue_init(&button_queue);
-    lastbtn = 0;
+    button_read();
+    lastbtn = button_read();
     tick_add_task(button_tick);
     reset_poweroff_timer();
 

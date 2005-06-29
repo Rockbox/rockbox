@@ -430,92 +430,6 @@ static int showdir(void)
     return tc.filesindir;
 }
 
-static bool ask_resume(bool just_powered_on)
-{
-    int button;
-    bool stop = false;
-    static bool ignore_power = true;
-
-#ifdef HAVE_LCD_CHARCELLS
-    lcd_double_height(false);
-#endif
-
-#ifdef HAVE_ALARM_MOD
-    if ( rtc_check_alarm_started(true) ) {
-       rtc_enable_alarm(false);
-       return true;
-    }
-#endif
-
-    /* always resume? */
-    if ( global_settings.resume == RESUME_ON || ! just_powered_on)
-        return true;
-
-    lcd_clear_display();
-    lcd_puts(0,0,str(LANG_RESUME_ASK));
-#ifdef HAVE_LCD_CHARCELLS
-    status_draw(false);
-    lcd_puts(0,1,str(LANG_RESUME_CONFIRM_PLAYER));
-#else
-    lcd_puts(0,1,str(LANG_CONFIRM_WITH_PLAY_RECORDER));
-    lcd_puts(0,2,str(LANG_CANCEL_WITH_ANY_RECORDER));
-#endif
-    lcd_update();
-
-    while (!stop) {
-        button = button_get(true);
-        switch (button) {
-#ifdef TREE_RUN_PRE
-            case TREE_RUN_PRE:  /* catch the press, not the release */
-#else
-            case TREE_RUN:
-#endif
-
-#ifdef TREE_RC_RUN_PRE
-            case TREE_RC_RUN_PRE:  /* catch the press, not the release */
-#else
-#ifdef TREE_RC_RUN
-            case TREE_RC_RUN:
-#endif   
-#endif
-                ignore_power = false;
-                /* Don't ignore the power button for subsequent calls */
-                return true;
-
-#ifdef TREE_POWER_BTN
-                /* Initially ignore the button which powers on the box. It
-		 *                    might still be pressed since booting. */
-            case TREE_POWER_BTN:
-            case TREE_POWER_BTN | BUTTON_REPEAT:
-                if(!ignore_power)
-                    stop = true;
-                break;
-
-                /* No longer ignore the power button after it was released */
-            case TREE_POWER_BTN | BUTTON_REL:
-                ignore_power = false;
-                break;
-#endif
-
-                /* Handle sys events, ignore button releases */
-            default:
-                if(default_event_handler(button) == SYS_USB_CONNECTED ||
-                   (!IS_SYSEVENT(button) && !(button & BUTTON_REL)))
-                    stop = true;
-                break;
-        }
-    }
-
-    if ( global_settings.resume == RESUME_ASK_ONCE && just_powered_on) {
-        global_settings.resume_index = -1;
-        settings_save();
-    }
-
-    ignore_power = false; 
-    /* Don't ignore the power button for subsequent calls */
-    return false;
-}
-
 /* load tracks from specified directory to resume play */
 void resume_directory(const char *dir)
 {
@@ -549,15 +463,26 @@ void reload_directory(void)
 
 static void start_resume(bool just_powered_on)
 {
-    if ( ( global_settings.resume || ! just_powered_on ) &&
-         global_settings.resume_index != -1 ) {
+    bool do_resume = false;
+    
+    if ( global_settings.resume_index != -1 ) {
         DEBUGF("Resume index %X offset %X\n",
                global_settings.resume_index,
                global_settings.resume_offset);
 
-        if (!ask_resume(just_powered_on) )
-            return;
+#ifdef HAVE_ALARM_MOD
+        if ( rtc_check_alarm_started(true) ) {
+           rtc_enable_alarm(false);
+           do_resume = true;
+        }
+#endif
 
+        /* always resume? */
+        if ( global_settings.resume || ! just_powered_on)
+            do_resume = true;
+
+        if (! do_resume) return;
+    
         if (playlist_resume() != -1)
         {
             playlist_start(global_settings.resume_index,
