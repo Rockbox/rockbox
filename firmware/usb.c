@@ -353,6 +353,11 @@ bool usb_detect(void)
 #ifdef USB_GMINISTYLE
     current_status = (P5 & 0x10)?true:false;
 #endif
+#ifdef IRIVER_H300
+    /* TODO: add proper code code for H300 USB style */
+    current_status = false;
+#endif
+    
     return current_status;
 }
 
