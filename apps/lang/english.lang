@@ -847,10 +847,10 @@ eng: "Dec"
 voice: "December"
 new:
 
-id: LANG_RESUME_SETTING_ASK_ONCE 	 
-desc: DEPRECATED 	 
-eng: "" 	 
-voice: "" 	 
+id: LANG_RESUME_SETTING_ASK_ONCE
+desc: DEPRECATED
+eng: ""
+voice: ""
 new:
 
 id: LANG_BATTERY_DISPLAY
