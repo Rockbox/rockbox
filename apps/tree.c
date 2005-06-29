@@ -133,7 +133,9 @@ void browse_root(void)
     check_rockboxdir();
 
     strcpy(tc.currdir, "/");
-    
+#ifdef HAVE_LCD_CHARCELLS
+    lcd_double_height(false);
+#endif
 #ifndef SIMULATOR
     dirbrowse();
 
