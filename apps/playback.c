@@ -152,7 +152,7 @@ static long fill_bytesleft;
 static struct track_info tracks[MAX_TRACK];
 
 /* Pointer to track info structure about current song playing. */
-static volatile struct track_info *cur_ti;
+static struct track_info *cur_ti;
 
 /* Codec API including function callbacks. */
 extern struct codec_api ci;
@@ -160,6 +160,9 @@ extern struct codec_api ci;
 /* When we change a song and buffer is not in filling state, this
    variable keeps information about whether to go a next/previous track. */
 static int new_track;
+
+/* Callback function to call when current track has really changed. */
+void (*track_changed_callback)(struct track_info *ti);
 
 /* Configuration */
 static int conf_bufferlimit;
@@ -554,10 +557,15 @@ void codec_configure_callback(int setting, void *value)
     }
 }
 
+void audio_set_track_changed_event(void (*handler)(struct track_info *ti))
+{
+    track_changed_callback = handler;
+}
+
 void codec_track_changed(void)
 {
     track_changed = true;
-    // queue_post(&audio_queue, AUDIO_TRACK_CHANGED, 0);
+    queue_post(&audio_queue, AUDIO_TRACK_CHANGED, 0);
 }
 
 void yield_codecs(void)
@@ -1174,6 +1182,8 @@ void audio_thread(void)
                 break ;
                 
             case AUDIO_TRACK_CHANGED:
+                if (track_changed_callback)
+                    track_changed_callback(cur_ti);
                 break ;
                 
             case AUDIO_CODEC_DONE:
@@ -1549,6 +1559,7 @@ void audio_init(void)
     paused = false;
     track_changed = false;
     current_fd = -1;
+    track_changed_callback = NULL;
     
     logf("abuf:%0x", PCMBUF_SIZE);
     logf("fbuf:%0x", codecbuflen);

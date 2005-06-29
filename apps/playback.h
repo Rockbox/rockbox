@@ -60,6 +60,9 @@ struct track_info {
     int playlist_offset;     /* File location in playlist */
 };
 
+/* Functions */
+void audio_set_track_changed_event(void (*handler)(struct track_info *ti));
+
 #endif
 
 
