@@ -73,7 +73,7 @@ static volatile bool paused;
 #define CODEC_WAVPACK  "/.rockbox/codecs/wavpack.codec";
 
 #define AUDIO_FILL_CYCLE             (1024*256)
-#define AUDIO_DEFAULT_WATERMARK      (1024*256)
+#define AUDIO_DEFAULT_WATERMARK      (1024*512)
 #define AUDIO_DEFAULT_FILECHUNK      (1024*32)
 
 #define AUDIO_PLAY         1
@@ -724,11 +724,12 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     off_t size;
     int rc, i;
     int copy_n;
-    
+
     if (track_count >= MAX_TRACK || tracks[track_widx].filesize != 0
         || current_fd >= 0)
         return false;
-        
+    
+    logf("Buffering track:%d/%d", track_widx, track_ridx);
     trackname = playlist_peek(peek_offset);
     if (!trackname) {
         logf("End-of-playlist");
@@ -737,8 +738,10 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     }
     
     fd = open(trackname, O_RDONLY);
-    if (fd < 0)
+    if (fd < 0) {
+        logf("Open failed");
         return false;
+    }
     
     size = filesize(fd);
     tracks[track_widx].filerem = size;
@@ -770,7 +773,6 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     tracks[track_widx].start_pos = 0;
         
     //logf("%s", trackname);
-    logf("Buffering track:%d/%d", track_widx, track_ridx);
     
     if (!get_metadata(&tracks[track_widx],fd,trackname,v1first)) {
       close(fd);
@@ -896,10 +898,15 @@ void initialize_buffer_fill(void)
 {
     int cur_idx, i;
     
-    pcm_set_boost_mode(true);
     
     fill_bytesleft = codecbuflen - codecbufused;
     tracks[track_widx].start_pos = ci.curpos;
+
+    if (filling)
+        return ;
+
+    filling = true;
+    pcm_set_boost_mode(true);
     
     /* Calculate real track count after throwing away old tracks. */
     cur_idx = track_ridx;
@@ -926,10 +933,7 @@ void audio_check_buffer(void)
         || !playing || ci.stop_codec || ci.reload_codec) && !filling)
         return ;
     
-    if (!filling) {
-        initialize_buffer_fill();
-        filling = true;
-    }
+    initialize_buffer_fill();
     
     /* Limit buffering size at first run. */
     if (conf_bufferlimit && (int)fill_bytesleft >= conf_bufferlimit) {
@@ -1097,6 +1101,11 @@ void audio_invalidate_tracks(void)
     }
     
     track_count = 1;
+    last_peek_offset = 1;
+    if (cur_ti->filerem == 0 && current_fd >= 0) {
+        close(current_fd);
+        current_fd = -1;
+    }
     track_widx = track_ridx;
     audio_clear_track_entries();
     codecbufused = cur_ti->available;
