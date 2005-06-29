@@ -606,30 +606,42 @@ bool pcm_insert_buffer(char *buf, long length)
     
     if (!prepare_insert(length))
         return false;
-        
-    while (length > 0) {
-        if (crossfade_active) {
+
+    
+    if (crossfade_active) {
+        while (length > 0 && crossfade_active) {
             copy_n = MIN(length, PCMBUF_SIZE - crossfade_pos);
-            
-            copy_n = 2 * crossfade((short *)&audiobuffer[crossfade_pos], 
-                      (const short *)buf, copy_n/2);
+                
+            copy_n = 2 * crossfade((short *)&audiobuffer[crossfade_pos],
+                                    (const short *)buf, copy_n/2);
             buf += copy_n;
             length -= copy_n;
             crossfade_pos += copy_n;
             if (crossfade_pos >= PCMBUF_SIZE)
                 crossfade_pos -= PCMBUF_SIZE;
-            continue ;            
-        } else {
-            copy_n = MIN(length, PCMBUF_SIZE - audiobuffer_pos - 
-                        audiobuffer_fillpos);
-            copy_n = MIN(CHUNK_SIZE - audiobuffer_fillpos, copy_n);
-            
-            memcpy(&audiobuffer[audiobuffer_pos+audiobuffer_fillpos],
-                   buf, copy_n);
-            buf += copy_n;
-            audiobuffer_free -= copy_n;
-            length -= copy_n;
         }
+        
+        while (length > 0) {
+            copy_n = MIN(length, PCMBUF_SIZE - audiobuffer_pos);
+            memcpy(&audiobuffer[audiobuffer_pos], buf, copy_n);
+            audiobuffer_fillpos = copy_n;
+            buf += copy_n;
+            length -= copy_n;
+            if (length > 0)
+                pcm_flush_fillpos();
+        }
+    }
+        
+    while (length > 0) {
+        copy_n = MIN(length, PCMBUF_SIZE - audiobuffer_pos -
+                    audiobuffer_fillpos);
+        copy_n = MIN(CHUNK_SIZE - audiobuffer_fillpos, copy_n);
+
+        memcpy(&audiobuffer[audiobuffer_pos+audiobuffer_fillpos],
+                buf, copy_n);
+        buf += copy_n;
+        audiobuffer_free -= copy_n;
+        length -= copy_n;
         
         /* Pre-buffer to meet CHUNK_SIZE requirement */
         if (copy_n + audiobuffer_fillpos < CHUNK_SIZE && length == 0) {
