@@ -57,7 +57,8 @@ use F3 to see how many mines are left (supposing all your flags are correct)
 #define MINESWP_DISCOVER (BUTTON_MENU | BUTTON_REPEAT)
 #define MINESWP_INFO (BUTTON_MENU | BUTTON_OFF)
 
-#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+      (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define MINESWP_QUIT BUTTON_OFF
 #define MINESWP_START BUTTON_SELECT
 #define MINESWP_TOGGLE BUTTON_SELECT

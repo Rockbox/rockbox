@@ -85,7 +85,8 @@ static struct plugin_api* rb;
 #define SOL_MENU_RUN BUTTON_RIGHT
 #define SOL_MENU_INFO BUTTON_MENU
 
-#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+      (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define SOL_QUIT BUTTON_OFF
 #define SOL_UP BUTTON_UP
 #define SOL_DOWN BUTTON_DOWN
@@ -124,7 +125,8 @@ static struct plugin_api* rb;
 #define HELP_SOL_CUR2STACK "RIGHT..: Put the card under the cursor on one of the 4 final color stacks."
 #define HELP_SOL_REM2STACK "UP..: Put the card on top of the remains' stack on one of the 4 final color stacks."
 
-#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+      (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define HELP_SOL_MOVE "SELECT: Select cards, Move cards, reveal hidden cards ..."
 #define HELP_SOL_DRAW "REC: Un-select a card if it was selected. Else, draw 3 new cards out of the remains' stack."
 #define HELP_SOL_REM2CUR "PLAY+LEFT: Put the card on top of the remains' stack on top of the cursor."

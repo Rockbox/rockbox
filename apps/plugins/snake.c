@@ -42,7 +42,8 @@ dir is the current direction of the snake - 0=up, 1=right, 2=down, 3=left;
 #define SNAKE_QUIT BUTTON_OFF
 #define SNAKE_PLAYPAUSE BUTTON_MENU
 
-#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+      (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define SNAKE_QUIT BUTTON_OFF
 #define SNAKE_PLAYPAUSE BUTTON_ON
 

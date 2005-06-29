@@ -19,7 +19,8 @@
 #include "databox.h"
 
 /* variable button definitions */
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+    (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define DBX_SELECT BUTTON_SELECT
 #define DBX_STOP   BUTTON_OFF
 #elif CONFIG_KEYPAD == RECORDER_PAD

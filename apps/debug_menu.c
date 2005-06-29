@@ -927,7 +927,8 @@ bool dbg_cpufreq(void)
             cpu_boost(false);
             break;
 
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+    (CONFIG_KEYPAD == IRIVER_H300_PAD)
         case BUTTON_SELECT:
 #else
         case BUTTON_PLAY:

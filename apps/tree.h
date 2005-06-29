@@ -23,7 +23,8 @@
 #include <applimits.h>
 #include <file.h>
 
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+    (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define TREE_NEXT      BUTTON_DOWN
 #define TREE_PREV      BUTTON_UP
 #define TREE_EXIT      BUTTON_LEFT

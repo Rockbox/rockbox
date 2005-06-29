@@ -23,7 +23,8 @@
 #include <stdbool.h>
 
 /* button definitions */
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+    (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define MENU_NEXT       BUTTON_DOWN
 #define MENU_PREV       BUTTON_UP
 #define MENU_EXIT       BUTTON_LEFT

@@ -22,7 +22,8 @@
 #include "playlist.h" 
 
 /* button definitions */
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+    (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define WPS_NEXT       (BUTTON_RIGHT | BUTTON_REL)
 #define WPS_NEXT_PRE   BUTTON_RIGHT
 #define WPS_PREV       (BUTTON_LEFT | BUTTON_REL)
