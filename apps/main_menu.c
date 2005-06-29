@@ -80,7 +80,7 @@ int show_logo( void )
 
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_clear_display();
-    lcd_remote_bitmap(rockbox112x37,10,14,112,37, false);
+    lcd_remote_bitmap(rockbox112x37,10,14,112,37);
 #endif
 
     snprintf(version, sizeof(version), "Ver. %s", appsversion);

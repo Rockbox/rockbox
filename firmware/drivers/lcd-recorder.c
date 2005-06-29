@@ -392,7 +392,7 @@ static void nopixel(int x, int y)
     (void)y;
 }
 
-lcd_pixelfunc_type* pixelfunc[8] = {
+lcd_pixelfunc_type* lcd_pixelfuncs[8] = {
     flippixel, nopixel, setpixel, setpixel,
     nopixel, clearpixel, nopixel, clearpixel
 };
@@ -437,7 +437,7 @@ static void solidinvblock(unsigned char *address, unsigned mask, unsigned bits)
     *address = (*address & ~mask) | (~bits & mask);
 }
 
-lcd_blockfunc_type* blockfunc[8] = {
+lcd_blockfunc_type* lcd_blockfuncs[8] = {
     flipblock, bgblock, fgblock, solidblock,
     flipinvblock, bginvblock, fginvblock, solidinvblock
 };
@@ -457,7 +457,7 @@ void lcd_clear_display(void)
 void lcd_drawpixel(int x, int y)
 {
     if (((unsigned)x < LCD_WIDTH) || ((unsigned)y < LCD_HEIGHT))
-        pixelfunc[drawmode](x, y);
+        lcd_pixelfuncs[drawmode](x, y);
 }
 
 /* Draw a line */
@@ -469,7 +469,7 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
     int d, dinc1, dinc2;
     int x, xinc1, xinc2;
     int y, yinc1, yinc2;
-    lcd_pixelfunc_type *pfunc = pixelfunc[drawmode];
+    lcd_pixelfunc_type *pfunc = lcd_pixelfuncs[drawmode];
 
     deltax = abs(x2 - x1);
     deltay = abs(y2 - y1);
@@ -557,7 +557,7 @@ void lcd_hline(int x1, int x2, int y)
     if (x2 >= LCD_WIDTH)
         x2 = LCD_WIDTH-1;
         
-    bfunc = blockfunc[drawmode];
+    bfunc = lcd_blockfuncs[drawmode];
     dst   = &lcd_framebuffer[y>>3][x1];
     mask  = 1 << (y & 7);
 
@@ -591,7 +591,7 @@ void lcd_vline(int x, int y1, int y2)
     if (y2 >= LCD_HEIGHT)
         y2 = LCD_HEIGHT-1;
         
-    bfunc = blockfunc[drawmode];
+    bfunc = lcd_blockfuncs[drawmode];
     dst   = &lcd_framebuffer[y1>>3][x];
     ny    = y2 - (y1 & ~7);
     mask  = 0xFFu << (y1 & 7);
@@ -657,7 +657,7 @@ void lcd_fillrect(int x, int y, int width, int height)
               (drawmode & DRMODE_BG) : (drawmode & DRMODE_FG);
     if (fillopt &&(drawmode & DRMODE_INVERSEVID))
         bits = 0;
-    bfunc = blockfunc[drawmode];
+    bfunc = lcd_blockfuncs[drawmode];
     dst   = &lcd_framebuffer[y>>3][x];
     ny    = height - 1 + (y & 7);
     mask  = 0xFFu << (y & 7);
@@ -742,7 +742,7 @@ void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
     shift  = y & 7;
     ny     = height - 1 + shift + src_y;
 
-    bfunc  = blockfunc[drawmode];
+    bfunc  = lcd_blockfuncs[drawmode];
     mask   = 0xFFu << (shift + src_y);
     mask_bottom = 0xFFu >> (7 - (ny & 7));
     

@@ -72,9 +72,10 @@ unsigned char lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH]
 #endif	
 		;
 		
-static int curfont = FONT_SYSFIXED;
+static int drawmode = DRMODE_SOLID;
 static int xmargin = 0;
 static int ymargin = 0;
+static int curfont = FONT_SYSFIXED;
 #ifndef SIMULATOR
 static int xoffset; /* needed for flip */
 
@@ -89,12 +90,6 @@ static bool cached_flip = false;
 static int cached_contrast = 32;
 static int cached_roll = 0;
 #endif
-
-/* All zeros and ones bitmaps for area filling */
-static const unsigned char zeros[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-static const unsigned char ones[8]  = {
-    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
-};
 
 /* scrolling */
 static volatile int scrolling_lines=0; /* Bitpattern of which lines are scrolling */
@@ -397,10 +392,10 @@ void lcd_remote_update(void)
         return;
 
     /* Copy display bitmap to hardware */
-    for (y = 0; y < LCD_REMOTE_HEIGHT / 8; y++)
+    for (y = 0; y < LCD_REMOTE_HEIGHT/8; y++)
     {
         lcd_remote_write_command(LCD_REMOTE_CNTL_SET_PAGE_ADDRESS | y);
-        lcd_remote_write_command(LCD_REMOTE_CNTL_HIGHCOL | ((xoffset>>4) & 0xf));
+        lcd_remote_write_command(LCD_REMOTE_CNTL_HIGHCOL | ((xoffset >> 4) & 0xf));
         lcd_remote_write_command(LCD_REMOTE_CNTL_LOWCOL | (xoffset & 0xf));
         lcd_remote_write_data(lcd_remote_framebuffer[y], LCD_REMOTE_WIDTH);
     }
@@ -408,38 +403,48 @@ void lcd_remote_update(void)
 
 /* Update a fraction of the display. */
 void lcd_remote_update_rect(int, int, int, int) __attribute__ ((section (".icode")));
-void lcd_remote_update_rect(int x_start, int y, int width, int height)
+void lcd_remote_update_rect(int x, int y, int width, int height)
 {
     int ymax;
-    
+
     if (!remote_initialized)
         return;
 
     /* The Y coordinates have to work on even 8 pixel rows */
-    ymax = (y + height-1)/8;
-    y /= 8;
+    ymax = (y + height-1) >> 3;
+    y >>= 3;
 
-    if(x_start + width > LCD_REMOTE_WIDTH)
-        width = LCD_REMOTE_WIDTH - x_start;
+    if(x + width > LCD_REMOTE_WIDTH)
+        width = LCD_REMOTE_WIDTH - x;
     if (width <= 0)
         return; /* nothing left to do, 0 is harmful to lcd_write_data() */
     if(ymax >= LCD_REMOTE_HEIGHT/8)
         ymax = LCD_REMOTE_HEIGHT/8-1;
+        
+    x += xoffset;
 
     /* Copy specified rectange bitmap to hardware */
     for (; y <= ymax; y++)
     {        
         lcd_remote_write_command(LCD_REMOTE_CNTL_SET_PAGE_ADDRESS | y);
-        lcd_remote_write_command(LCD_REMOTE_CNTL_HIGHCOL
-                                 | (((x_start+xoffset)>>4) & 0xf));
-        lcd_remote_write_command(LCD_REMOTE_CNTL_LOWCOL 
-                                 | ((x_start+xoffset) & 0xf));
-        lcd_remote_write_data(&lcd_remote_framebuffer[y][x_start], width);
+        lcd_remote_write_command(LCD_REMOTE_CNTL_HIGHCOL | ((x >> 4) & 0xf));
+        lcd_remote_write_command(LCD_REMOTE_CNTL_LOWCOL | (x & 0xf));
+        lcd_remote_write_data(&lcd_remote_framebuffer[y][x], width);
     }
 }
 #endif /* !SIMULATOR */
 
 /*** parameter handling ***/
+
+void lcd_remote_set_drawmode(int mode)
+{
+    drawmode = mode & (DRMODE_SOLID|DRMODE_INVERSEVID);
+}
+
+int lcd_remote_get_drawmode(void)
+{
+    return drawmode;
+}
 
 void lcd_remote_setmargins(int x, int y)
 {
@@ -468,31 +473,98 @@ int lcd_remote_getstringsize(const unsigned char *str, int *w, int *h)
     return font_getstringsize(str, w, h, curfont);
 }
 
+/*** low-level drawing functions ***/
+
+static void setpixel(int x, int y)
+{
+    REMOTE_DRAW_PIXEL(x, y);
+}
+
+static void clearpixel(int x, int y)
+{
+    REMOTE_CLEAR_PIXEL(x, y);
+}
+
+static void flippixel(int x, int y)
+{
+    REMOTE_INVERT_PIXEL(x, y);
+}
+
+static void nopixel(int x, int y)
+{
+    (void)x;
+    (void)y;
+}
+
+lcd_pixelfunc_type* lcd_remote_pixelfuncs[8] = {
+    flippixel, nopixel, setpixel, setpixel,
+    nopixel, clearpixel, nopixel, clearpixel
+};
+                               
+static void flipblock(unsigned char *address, unsigned mask, unsigned bits)
+{
+    *address ^= (bits & mask);
+}
+
+static void bgblock(unsigned char *address, unsigned mask, unsigned bits)
+{
+    *address &= (bits | ~mask);
+}
+
+static void fgblock(unsigned char *address, unsigned mask, unsigned bits)
+{
+    *address |= (bits & mask);
+}
+
+static void solidblock(unsigned char *address, unsigned mask, unsigned bits)
+{
+    *address = (*address & ~mask) | (bits & mask);
+}
+
+static void flipinvblock(unsigned char *address, unsigned mask, unsigned bits)
+{
+    *address ^= (~bits & mask);
+}
+
+static void bginvblock(unsigned char *address, unsigned mask, unsigned bits)
+{
+    *address &= ~(bits & mask);
+}
+
+static void fginvblock(unsigned char *address, unsigned mask, unsigned bits)
+{
+    *address |= (~bits & mask);
+}
+
+static void solidinvblock(unsigned char *address, unsigned mask, unsigned bits)
+{
+    *address = (*address & ~mask) | (~bits & mask);
+}
+
+lcd_blockfunc_type* lcd_remote_blockfuncs[8] = {
+    flipblock, bgblock, fgblock, solidblock,
+    flipinvblock, bginvblock, fginvblock, solidinvblock
+};
+
 /*** drawing functions ***/
 
+/* Clear the whole display */
 void lcd_remote_clear_display(void)
 {
-    memset(lcd_remote_framebuffer, 0, sizeof lcd_remote_framebuffer);
+    unsigned bits = (drawmode & DRMODE_INVERSEVID) ? 0xFFu : 0;
+
+    memset(lcd_remote_framebuffer, bits, sizeof lcd_remote_framebuffer);
+    scrolling_lines = 0;
 }
 
 /* Set a single pixel */
 void lcd_remote_drawpixel(int x, int y)
 {
-    REMOTE_DRAW_PIXEL(x,y);
+    if (((unsigned)x < LCD_REMOTE_WIDTH) || ((unsigned)y < LCD_REMOTE_HEIGHT))
+        lcd_remote_pixelfuncs[drawmode](x, y);
 }
 
-/* Clear a single pixel */
-void lcd_remote_clearpixel(int x, int y)
-{
-    REMOTE_CLEAR_PIXEL(x,y);
-}
-
-/* Invert a single pixel */
-void lcd_remote_invertpixel(int x, int y)
-{
-    REMOTE_INVERT_PIXEL(x,y);
-}
-
+/* Draw a line */
 void lcd_remote_drawline(int x1, int y1, int x2, int y2)
 {
     int numpixels;
@@ -501,20 +573,21 @@ void lcd_remote_drawline(int x1, int y1, int x2, int y2)
     int d, dinc1, dinc2;
     int x, xinc1, xinc2;
     int y, yinc1, yinc2;
+    lcd_pixelfunc_type *pfunc = lcd_remote_pixelfuncs[drawmode];
 
     deltax = abs(x2 - x1);
     deltay = abs(y2 - y1);
+    xinc2 = 1;
+    yinc2 = 1;
 
-    if(deltax >= deltay)
+    if (deltax >= deltay)
     {
         numpixels = deltax;
         d = 2 * deltay - deltax;
         dinc1 = deltay * 2;
         dinc2 = (deltay - deltax) * 2;
         xinc1 = 1;
-        xinc2 = 1;
         yinc1 = 0;
-        yinc2 = 1;
     }
     else
     {
@@ -523,19 +596,17 @@ void lcd_remote_drawline(int x1, int y1, int x2, int y2)
         dinc1 = deltax * 2;
         dinc2 = (deltax - deltay) * 2;
         xinc1 = 0;
-        xinc2 = 1;
         yinc1 = 1;
-        yinc2 = 1;
     }
     numpixels++; /* include endpoints */
 
-    if(x1 > x2)
+    if (x1 > x2)
     {
         xinc1 = -xinc1;
         xinc2 = -xinc2;
     }
 
-    if(y1 > y2)
+    if (y1 > y2)
     {
         yinc1 = -yinc1;
         yinc2 = -yinc2;
@@ -544,11 +615,12 @@ void lcd_remote_drawline(int x1, int y1, int x2, int y2)
     x = x1;
     y = y1;
 
-    for(i=0; i<numpixels; i++)
+    for (i = 0; i < numpixels; i++)
     {
-        REMOTE_DRAW_PIXEL(x,y);
+        if (((unsigned)x < LCD_REMOTE_WIDTH) && ((unsigned)y < LCD_REMOTE_HEIGHT))
+            pfunc(x, y);
 
-        if(d < 0)
+        if (d < 0)
         {
             d += dinc1;
             x += xinc1;
@@ -563,253 +635,290 @@ void lcd_remote_drawline(int x1, int y1, int x2, int y2)
     }
 }
 
-void lcd_remote_clearline(int x1, int y1, int x2, int y2)
+/* Draw a horizontal line (optimised) */
+void lcd_remote_hline(int x1, int x2, int y)
 {
-    int numpixels;
-    int i;
-    int deltax, deltay;
-    int d, dinc1, dinc2;
-    int x, xinc1, xinc2;
-    int y, yinc1, yinc2;
+    int x;
+    unsigned char *dst;
+    unsigned mask;
+    lcd_blockfunc_type *bfunc;
 
-    deltax = abs(x2 - x1);
-    deltay = abs(y2 - y1);
-
-    if(deltax >= deltay)
+    /* direction flip */
+    if (x2 < x1)
     {
-        numpixels = deltax;
-        d = 2 * deltay - deltax;
-        dinc1 = deltay * 2;
-        dinc2 = (deltay - deltax) * 2;
-        xinc1 = 1;
-        xinc2 = 1;
-        yinc1 = 0;
-        yinc2 = 1;
-    }
-    else
-    {
-        numpixels = deltay;
-        d = 2 * deltax - deltay;
-        dinc1 = deltax * 2;
-        dinc2 = (deltax - deltay) * 2;
-        xinc1 = 0;
-        xinc2 = 1;
-        yinc1 = 1;
-        yinc2 = 1;
-    }
-    numpixels++; /* include endpoints */
-
-    if(x1 > x2)
-    {
-        xinc1 = -xinc1;
-        xinc2 = -xinc2;
-    }
-
-    if(y1 > y2)
-    {
-        yinc1 = -yinc1;
-        yinc2 = -yinc2;
-    }
-
-    x = x1;
-    y = y1;
-
-    for(i=0; i<numpixels; i++)
-    {
-        REMOTE_CLEAR_PIXEL(x,y);
-
-        if(d < 0)
-        {
-            d += dinc1;
-            x += xinc1;
-            y += yinc1;
-        }
-        else
-        {
-            d += dinc2;
-            x += xinc2;
-            y += yinc2;
-        }
-    }
-}
-
-void lcd_remote_drawrect(int x, int y, int nx, int ny)
-{
-    int i;
-
-    if (x > LCD_REMOTE_WIDTH)
-    {
-        return;
+        x = x1;
+        x1 = x2;
+        x2 = x;
     }
     
-    if (y > LCD_REMOTE_HEIGHT)
-    {
-        return;
-    }
-
-    if (x + nx > LCD_REMOTE_WIDTH)
-    {
-        nx = LCD_REMOTE_WIDTH - x;
-    }
+    /* nothing to draw? */
+    if (((unsigned)y >= LCD_REMOTE_HEIGHT) || (x1 >= LCD_REMOTE_WIDTH) 
+        || (x2 < 0))
+        return;  
     
-    if (y + ny > LCD_REMOTE_HEIGHT)
-    {
-        ny = LCD_REMOTE_HEIGHT - y;
-    }
-
-    /* vertical lines */
-    for (i = 0; i < ny; i++)
-    {
-        REMOTE_DRAW_PIXEL(x, (y + i));
-        REMOTE_DRAW_PIXEL((x + nx - 1), (y + i));
-    }
-
-    /* horizontal lines */
-    for (i = 0; i < nx; i++)
-    {
-        REMOTE_DRAW_PIXEL((x + i),y);
-        REMOTE_DRAW_PIXEL((x + i),(y + ny - 1));
-    }
-}
-
-/* Clear a rectangular area at (x, y), size (nx, ny) */
-void lcd_remote_clearrect(int x, int y, int nx, int ny)
-{
-    int i;
-    for (i = 0; i < nx; i++)
-        lcd_remote_bitmap(zeros, x+i, y, 1, ny, true);
-}
-
-/* Fill a rectangular area at (x, y), size (nx, ny) */
-void lcd_remote_fillrect(int x, int y, int nx, int ny)
-{
-    int i;
-    for (i = 0; i < nx; i++)
-        lcd_remote_bitmap(ones, x+i, y, 1, ny, true);
-}
-
-/* Invert a rectangular area at (x, y), size (nx, ny) */
-void lcd_remote_invertrect(int x, int y, int nx, int ny)
-{
-    int i, j;
-
-    if (x > LCD_REMOTE_WIDTH)
-        return;
-    if (y > LCD_REMOTE_HEIGHT)
-        return;
-
-    if (x + nx > LCD_REMOTE_WIDTH)
-        nx = LCD_REMOTE_WIDTH - x;
-    if (y + ny > LCD_REMOTE_HEIGHT)
-        ny = LCD_REMOTE_HEIGHT - y;
-
-    for (i = 0; i < nx; i++)
-        for (j = 0; j < ny; j++)
-            REMOTE_INVERT_PIXEL((x + i), (y + j));
-}
-
-void lcd_remote_bitmap(const unsigned char *src, int x, int y, int nx, int ny,
-                       bool clear) __attribute__ ((section (".icode")));
-void lcd_remote_bitmap(const unsigned char *src, int x, int y, int nx, int ny,
-                       bool clear)
-{
-    const unsigned char *src_col;
-    unsigned char *dst, *dst_col;
-    unsigned int data, mask1, mask2, mask3, mask4;
-    int stride, shift;
-    
-    if (((unsigned) x >= LCD_REMOTE_WIDTH) || ((unsigned) y >= LCD_REMOTE_HEIGHT))
-    {
-        return;
-    }
-    
-    stride = nx;    /* otherwise right-clipping will destroy the image */
-
-    if (((unsigned) (x + nx)) >= LCD_REMOTE_WIDTH)
-    {
-        nx = LCD_REMOTE_WIDTH - x;
-    }
-    
-    if (((unsigned) (y + ny)) >= LCD_REMOTE_HEIGHT)
-    {
-        ny = LCD_REMOTE_HEIGHT - y;
-    }
+    /* clipping */
+    if (x1 < 0)
+        x1 = 0;
+    if (x2 >= LCD_REMOTE_WIDTH)
+        x2 = LCD_REMOTE_WIDTH-1;
         
-    dst = &lcd_remote_framebuffer[y >> 3][x];
-    shift = y & 7;
-    
-    if (!shift && clear)  /* shortcut for byte aligned match with clear */
+    bfunc = lcd_remote_blockfuncs[drawmode];
+    dst   = &lcd_remote_framebuffer[y>>3][x1];
+    mask  = 1 << (y & 7);
+
+    for (x = x1; x <= x2; x++)
+        bfunc(dst++, mask, 0xFFu);
+}
+
+/* Draw a vertical line (optimised) */
+void lcd_remote_vline(int x, int y1, int y2)
+{
+    int ny;
+    unsigned char *dst;
+    unsigned mask, mask_bottom;
+    lcd_blockfunc_type *bfunc;
+
+    /* direction flip */
+    if (y2 < y1)
     {
-        while (ny >= 8)   /* all full rows */
+        ny = y1;
+        y1 = y2;
+        y2 = ny;
+    }
+
+    /* nothing to draw? */
+    if (((unsigned)x >= LCD_REMOTE_WIDTH) || (y1 >= LCD_REMOTE_HEIGHT) 
+        || (y2 < 0))
+        return;  
+    
+    /* clipping */
+    if (y1 < 0)
+        y1 = 0;
+    if (y2 >= LCD_REMOTE_HEIGHT)
+        y2 = LCD_REMOTE_HEIGHT-1;
+        
+    bfunc = lcd_remote_blockfuncs[drawmode];
+    dst   = &lcd_remote_framebuffer[y1>>3][x];
+    ny    = y2 - (y1 & ~7);
+    mask  = 0xFFu << (y1 & 7);
+    mask_bottom = 0xFFu >> (7 - (ny & 7));
+
+    for (; ny >= 8; ny -= 8)
+    {
+        bfunc(dst, mask, 0xFFu);
+        dst += LCD_REMOTE_WIDTH;
+        mask = 0xFFu;
+    }
+    mask_bottom &= mask;
+    bfunc(dst, mask_bottom, 0xFFu);
+}
+
+/* Draw a rectangular box */
+void lcd_remote_drawrect(int x, int y, int width, int height)
+{
+    if ((width <= 0) || (height <= 0))
+        return;
+
+    int x2 = x + width - 1;
+    int y2 = y + height - 1;
+
+    lcd_remote_vline(x, y, y2);
+    lcd_remote_vline(x2, y, y2);
+    lcd_remote_hline(x, x2, y);
+    lcd_remote_hline(x, x2, y2);
+}
+
+/* Fill a rectangular area */
+void lcd_remote_fillrect(int x, int y, int width, int height)
+{
+    int ny, i;
+    unsigned char *dst;
+    unsigned mask, mask_bottom;
+    unsigned bits = 0xFFu;
+    lcd_blockfunc_type *bfunc;
+    bool fillopt;
+
+    /* nothing to draw? */
+    if ((width <= 0) || (height <= 0) || (x >= LCD_REMOTE_WIDTH) 
+        || (y >= LCD_REMOTE_HEIGHT) || (x + width <= 0) || (y + height <= 0))
+        return;
+
+    /* clipping */
+    if (x < 0)
+    {
+        width += x;
+        x = 0;
+    }
+    if (y < 0)
+    {
+        height += y;
+        y = 0;
+    }
+    if (x + width > LCD_REMOTE_WIDTH)
+        width = LCD_REMOTE_WIDTH - x;
+    if (y + height > LCD_REMOTE_HEIGHT)
+        height = LCD_REMOTE_HEIGHT - y;
+    
+    fillopt = (drawmode & DRMODE_INVERSEVID) ? 
+              (drawmode & DRMODE_BG) : (drawmode & DRMODE_FG);
+    if (fillopt &&(drawmode & DRMODE_INVERSEVID))
+        bits = 0;
+    bfunc = lcd_remote_blockfuncs[drawmode];
+    dst   = &lcd_remote_framebuffer[y>>3][x];
+    ny    = height - 1 + (y & 7);
+    mask  = 0xFFu << (y & 7);
+    mask_bottom = 0xFFu >> (7 - (ny & 7));
+
+    for (; ny >= 8; ny -= 8)
+    {
+        if (fillopt && (mask == 0xFFu))
+            memset(dst, bits, width);
+        else
         {
-            memcpy(dst, src, nx);
+            unsigned char *dst_row = dst;
+
+            for (i = width; i > 0; i--)
+                bfunc(dst_row++, mask, 0xFFu);
+        }
+
+        dst += LCD_REMOTE_WIDTH;
+        mask = 0xFFu;
+    }
+    mask_bottom &= mask;
+
+    if (fillopt && (mask_bottom == 0xFFu))
+        memset(dst, bits, width);
+    else
+    {
+        for (i = width; i > 0; i--)
+            bfunc(dst++, mask_bottom, 0xFFu);
+    }
+}
+
+/* About Rockbox' internal bitmap format:
+ *
+ * A bitmap contains one bit for every pixel that defines if that pixel is
+ * black (1) or white (0). Bits within a byte are arranged vertically, LSB
+ * at top.
+ * The bytes are stored in row-major order, with byte 0 being top left,
+ * byte 1 2nd from left etc. The first row of bytes defines pixel rows
+ * 0..7, the second row defines pixel row 8..15 etc.
+ *
+ * This is the same as the internal lcd hw format. */
+
+/* Draw a partial bitmap */
+void lcd_remote_bitmap_part(const unsigned char *src, int src_x, int src_y,
+                            int stride, int x, int y, int width, int height)
+                            __attribute__ ((section(".icode")));
+void lcd_remote_bitmap_part(const unsigned char *src, int src_x, int src_y,
+                            int stride, int x, int y, int width, int height)
+{
+    int shift, ny, i;
+    unsigned char *dst;
+    unsigned mask, mask_bottom;
+    lcd_blockfunc_type *bfunc;
+
+    /* nothing to draw? */
+    if ((width <= 0) || (height <= 0) || (x >= LCD_REMOTE_WIDTH) 
+        || (y >= LCD_REMOTE_HEIGHT) || (x + width <= 0) || (y + height <= 0))
+        return;
+        
+    /* clipping */
+    if (x < 0)
+    {
+        width += x;
+        src_x -= x;
+        x = 0;
+    }
+    if (y < 0)
+    {
+        height += y;
+        src_y -= y;
+        y = 0;
+    }
+    if (x + width > LCD_REMOTE_WIDTH)
+        width = LCD_REMOTE_WIDTH - x;
+    if (y + height > LCD_REMOTE_HEIGHT)
+        height = LCD_REMOTE_HEIGHT - y;
+
+    src    += stride * (src_y >> 3) + src_x; /* move starting point */
+    src_y  &= 7;
+    y      -= src_y;
+    dst    = &lcd_remote_framebuffer[y>>3][x];
+    shift  = y & 7;
+    ny     = height - 1 + shift + src_y;
+
+    bfunc  = lcd_remote_blockfuncs[drawmode];
+    mask   = 0xFFu << (shift + src_y);
+    mask_bottom = 0xFFu >> (7 - (ny & 7));
+    
+    if (shift == 0)
+    {
+        bool copyopt = (drawmode == DRMODE_SOLID);
+
+        for (; ny >= 8; ny -= 8)
+        {
+            if (copyopt && (mask == 0xFFu))
+                memcpy(dst, src, width);
+            else
+            {
+                const unsigned char *src_row = src;
+                unsigned char *dst_row = dst;
+
+                for (i = width; i > 0; i--)
+                    bfunc(dst_row++, mask, *src_row++);
+            }
+
             src += stride;
             dst += LCD_REMOTE_WIDTH;
-            ny -= 8;
+            mask = 0xFFu;
         }
-        if (ny == 0)     /* nothing left to do? */
-        {
-            return;
-        }
-        /* last partial row to do by default routine */
-    }
+        mask_bottom &= mask;
 
-    ny += shift;
-
-    /* Calculate bit masks */
-    mask4 = ~(0xfe << ((ny-1) & 7));  /* data mask for last partial row */
-    
-    if (clear)
-    {
-        mask1 = ~(0xff << shift); /* clearing of first partial row */
-        mask2 = 0;                /* clearing of intermediate (full) rows */
-        mask3 = ~mask4;           /* clearing of last partial row */
-        if (ny <= 8)
+        if (copyopt && (mask_bottom == 0xFFu))
+            memcpy(dst, src, width);
+        else
         {
-            mask3 |= mask1;
+            for (i = width; i > 0; i--)
+                bfunc(dst++, mask_bottom, *src++);
         }
     }
     else
     {
-        mask1 = mask2 = mask3 = 0xff;
-    }
-
-    /* Loop for each column */
-    for (x = 0; x < nx; x++)
-    {
-        src_col = src++;
-        dst_col = dst++;
-        data = 0;
-        y = 0;
-
-        if (ny > 8)
+        for (x = 0; x < width; x++)
         {
-            /* First partial row */
-            data = *src_col << shift;
-            *dst_col = (*dst_col & mask1) | data;
-            src_col += stride;
-            dst_col += LCD_REMOTE_WIDTH;
-            data >>= 8;
-
-            /* Intermediate rows */
-            for (y = 8; y < ny-8; y += 8)
+            const unsigned char *src_col = src++;
+            unsigned char *dst_col = dst++;
+            unsigned mask_col = mask;
+            unsigned data = 0;
+            
+            for (y = ny; y >= 8; y -= 8)
             {
                 data |= *src_col << shift;
-                *dst_col = (*dst_col & mask2) | data;
+
+                if (mask_col & 0xFFu)
+                {
+                    bfunc(dst_col, mask_col, data);
+                    mask_col = 0xFFu;
+                }
+                else
+                    mask_col >>= 8;
+
                 src_col += stride;
                 dst_col += LCD_REMOTE_WIDTH;
                 data >>= 8;
             }
-        }
-
-        /* Last partial row */
-        if (y + shift < ny)
-        {
             data |= *src_col << shift;
+            bfunc(dst_col, mask_col & mask_bottom, data);
         }
-        
-        *dst_col = (*dst_col & mask3) | (data & mask4);
     }
+}
+
+/* Draw a full bitmap */
+void lcd_remote_bitmap(const unsigned char *src, int x, int y, int width,
+                       int height)
+{
+    lcd_remote_bitmap_part(src, 0, 0, width, x, y, width, height);
 }
 
 /* put a string at a given pixel position, skipping first ofs pixel columns */
@@ -820,7 +929,8 @@ static void lcd_remote_putsxyofs(int x, int y, int ofs, const unsigned char *str
 
     while ((ch = *str++) != '\0' && x < LCD_REMOTE_WIDTH)
     {
-        int gwidth, width;
+        int width;
+        const unsigned char *bits;
 
         /* check input range */
         if (ch < pf->firstchar || ch >= pf->firstchar+pf->size)
@@ -828,40 +938,21 @@ static void lcd_remote_putsxyofs(int x, int y, int ofs, const unsigned char *str
         ch -= pf->firstchar;
 
         /* get proportional width and glyph bits */
-        gwidth = pf->width ? pf->width[ch] : pf->maxwidth;
-        width = MIN (gwidth, LCD_REMOTE_WIDTH - x);
+        width = pf->width ? pf->width[ch] : pf->maxwidth;
 
-        if (ofs != 0)
+        if (ofs > width)
         {
-            if (ofs > width)
-            {
-                ofs -= width;
-                continue;
-            }
-            width -= ofs;
+            ofs -= width;
+            continue;
         }
 
-        if (width > 0)
-        {
-            unsigned int i;
-            const unsigned char* bits = pf->bits +
-                (pf->offset ? pf->offset[ch] 
-                            : ((pf->height + 7) / 8 * pf->maxwidth * ch));
+        bits = pf->bits + (pf->offset ?
+               pf->offset[ch] : ((pf->height + 7) / 8 * pf->maxwidth * ch));
 
-            if (ofs != 0)
-            {
-                for (i = 0; i < pf->height; i += 8)
-                {
-                    lcd_remote_bitmap (bits + ofs, x, y + i, width,
-                                MIN(8, pf->height - i), true);
-                    bits += gwidth;
-                }
-            }
-            else
-                lcd_remote_bitmap ((unsigned char*) bits, x, y, gwidth,
-                            pf->height, true);
-            x += width;
-        }
+        lcd_remote_bitmap_part(bits, ofs, 0, width, x, y, width - ofs,
+                               pf->height);
+        
+        x += width - ofs;
         ofs = 0;
     }
 }
@@ -883,9 +974,10 @@ void lcd_remote_puts(int x, int y, const unsigned char *str)
 void lcd_remote_puts_style(int x, int y, const unsigned char *str, int style)
 {
     int xpos,ypos,w,h;
+    int lastmode = lcd_remote_get_drawmode();
 
     /* make sure scrolling is turned off on the line we are updating */
-    //scrolling_lines &= ~(1 << y);
+    scrolling_lines &= ~(1 << y);
 
     if(!str || !str[0])
         return;
@@ -894,10 +986,14 @@ void lcd_remote_puts_style(int x, int y, const unsigned char *str, int style)
     xpos = xmargin + x*w / strlen(str);
     ypos = ymargin + y*h;
     lcd_remote_putsxy(xpos, ypos, str);
-    lcd_remote_clearrect(xpos + w, ypos, LCD_REMOTE_WIDTH - (xpos + w), h);
+    lcd_remote_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    lcd_remote_fillrect(xpos + w, ypos, LCD_REMOTE_WIDTH - (xpos + w), h);
     if (style & STYLE_INVERT)
-        lcd_remote_invertrect(xpos, ypos, LCD_REMOTE_WIDTH - xpos, h);
-
+    {
+        lcd_remote_set_drawmode(DRMODE_COMPLEMENT);
+        lcd_remote_fillrect(xpos, ypos, LCD_REMOTE_WIDTH - xpos, h);
+    }
+    lcd_remote_set_drawmode(lastmode);
 }
 
 /*** scrolling ***/
@@ -1008,6 +1104,7 @@ static void scroll_thread(void)
     struct scrollinfo* s;
     int index;
     int xpos, ypos;
+    int lastmode;
 
     /* initialize scroll struct array */
     scrolling_lines = 0;
@@ -1061,10 +1158,17 @@ static void scroll_thread(void)
                     s->offset %= s->width;
             }
 
-            lcd_remote_clearrect(xpos, ypos, LCD_REMOTE_WIDTH - xpos, pf->height);
+            lastmode = lcd_remote_get_drawmode();
+            lcd_remote_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            lcd_remote_fillrect(xpos, ypos, LCD_REMOTE_WIDTH - xpos, pf->height);
+            lcd_remote_set_drawmode(DRMODE_SOLID);
             lcd_remote_putsxyofs(xpos, ypos, s->offset, s->line);
             if (s->invert)
-                lcd_remote_invertrect(xpos, ypos, LCD_REMOTE_WIDTH - xpos, pf->height);
+            {
+                lcd_remote_set_drawmode(DRMODE_COMPLEMENT);
+                lcd_remote_fillrect(xpos, ypos, LCD_REMOTE_WIDTH - xpos, pf->height);
+            }
+            lcd_remote_set_drawmode(lastmode);
             lcd_remote_update_rect(xpos, ypos, LCD_REMOTE_WIDTH - xpos, pf->height);
         }
 

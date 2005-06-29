@@ -231,11 +231,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
         rb->lcd_clear_display();
         rb->lcd_bitmap(LOGO, x, y, LOGO_WIDTH, LOGO_HEIGHT);
 #ifdef REMOTE_LOGO
-        rb->remote_clear_display();
-        rb->remote_bitmap(REMOTE_LOGO,
+        rb->lcd_remote_clear_display();
+        rb->lcd_remote_bitmap(REMOTE_LOGO,
                 (x * (REMOTE_WIDTH - REMOTE_LOGO_WIDTH)) / (DISPLAY_WIDTH - LOGO_WIDTH),
                 (y * (REMOTE_HEIGHT - REMOTE_LOGO_HEIGHT)) / (DISPLAY_HEIGHT - LOGO_HEIGHT),
-                REMOTE_LOGO_WIDTH, REMOTE_LOGO_HEIGHT, false);
+                REMOTE_LOGO_WIDTH, REMOTE_LOGO_HEIGHT);
 #endif
 #else
         pgfx_clear_display();
@@ -266,7 +266,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
 #ifdef HAVE_LCD_BITMAP
         rb->lcd_update();
 #ifdef REMOTE_LOGO
-        rb->remote_update();
+        rb->lcd_remote_update();
 #endif
 #else
         if (cpos != old_cpos) {

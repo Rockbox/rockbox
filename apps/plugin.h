@@ -189,35 +189,39 @@ struct plugin_api {
 
 #ifdef HAVE_REMOTE_LCD
     /* remote lcd */
-    void (*remote_clear_display)(void);
-    void (*remote_puts)(int x, int y, const unsigned char *string);
-    void (*remote_lcd_puts_scroll)(int x, int y, const unsigned char* string);
-    void (*remote_lcd_stop_scroll)(void);
-    void (*remote_set_contrast)(int x);
+    void (*lcd_remote_set_contrast)(int x);
+    void (*lcd_remote_clear_display)(void);
+    void (*lcd_remote_puts)(int x, int y, const unsigned char *string);
+    void (*lcd_remote_lcd_puts_scroll)(int x, int y, const unsigned char* string);
+    void (*lcd_remote_lcd_stop_scroll)(void);
 
-    void (*remote_putsxy)(int x, int y, const unsigned char *string);
-    void (*remote_puts_style)(int x, int y, const unsigned char *str, int style);
-    void (*remote_puts_scroll_style)(int x, int y, const unsigned char* string,
-                                  int style);
-    void (*remote_bitmap)(const unsigned char *src, int x, int y,
-                       int nx, int ny, bool clear);
-    void (*remote_drawline)(int x1, int y1, int x2, int y2);
-    void (*remote_clearline)(int x1, int y1, int x2, int y2);
-    void (*remote_drawpixel)(int x, int y);
-    void (*remote_clearpixel)(int x, int y);
-    void (*remote_setfont)(int font);
-    struct font* (*remote_font_get)(int font);
-    void (*remote_clearrect)(int x, int y, int nx, int ny);
-    void (*remote_fillrect)(int x, int y, int nx, int ny);
-    void (*remote_drawrect)(int x, int y, int nx, int ny);
-    void (*remote_invertrect)(int x, int y, int nx, int ny);
-    int  (*remote_getstringsize)(const unsigned char *str, int *w, int *h);
-    void (*remote_update)(void);
-    void (*remote_update_rect)(int x, int y, int width, int height);
+    void (*lcd_remote_roll)(int pixels);
+
+    void (*lcd_remote_set_drawmode)(int mode);
+    int  (*lcd_remote_get_drawmode)(void);
+    void (*lcd_remote_setfont)(int font);
+    int  (*lcd_remote_getstringsize)(const unsigned char *str, int *w, int *h);
+    void (*lcd_remote_drawpixel)(int x, int y);
+    void (*lcd_remote_drawline)(int x1, int y1, int x2, int y2);
+    void (*lcd_remote_hline)(int x1, int x2, int y);
+    void (*lcd_remote_vline)(int x, int y1, int y2);
+    void (*lcd_remote_drawrect)(int x, int y, int nx, int ny);
+    void (*lcd_remote_fillrect)(int x, int y, int nx, int ny);
+    void (*lcd_remote_bitmap_part)(const unsigned char *src, int src_x,
+                                   int src_y, int stride, int x, int y,
+                                   int width, int height);
+    void (*lcd_remote_bitmap)(const unsigned char *src, int x, int y, int nx,
+                              int ny);
+    void (*lcd_remote_putsxy)(int x, int y, const unsigned char *string);
+    void (*lcd_remote_puts_style)(int x, int y, const unsigned char *str, int style);
+    void (*lcd_remote_puts_scroll_style)(int x, int y, const unsigned char* string,
+                                         int style);
+    unsigned char* lcd_remote_framebuffer;
+    void (*lcd_remote_update)(void);
+    void (*lcd_remote_update_rect)(int x, int y, int width, int height);
 
     void (*remote_backlight_on)(void);
     void (*remote_backlight_off)(void);
-    unsigned char* lcd_remote_framebuffer;
 #endif
 
     /* button */

@@ -92,8 +92,10 @@ static void snow_move(void)
 #ifdef HAVE_REMOTE_LCD
             if (particles[i][0] <= LCD_REMOTE_WIDTH 
                     && particles[i][1] <= LCD_REMOTE_HEIGHT) {
-                rb->remote_clearrect(particles[i][0],particles[i][1],
-                                     FLAKE_WIDTH,FLAKE_WIDTH);
+                rb->lcd_remote_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                rb->lcd_remote_fillrect(particles[i][0],particles[i][1],
+                                        FLAKE_WIDTH,FLAKE_WIDTH);
+                rb->lcd_remote_set_drawmode(DRMODE_SOLID);
             }
 #endif
             switch ((rb->rand()%7)) {
@@ -122,8 +124,8 @@ static void snow_move(void)
 #ifdef HAVE_REMOTE_LCD
             if (particles[i][0] <= LCD_REMOTE_WIDTH 
                     && particles[i][1] <= LCD_REMOTE_HEIGHT) {
-                rb->remote_bitmap(flake,particles[i][0],particles[i][1],
-                                  FLAKE_WIDTH,FLAKE_WIDTH,true);
+                rb->lcd_remote_bitmap(flake,particles[i][0],particles[i][1],
+                                      FLAKE_WIDTH,FLAKE_WIDTH);
             }
 #endif
         }
@@ -148,7 +150,7 @@ static void snow_init(void)
     pgfx_clear_display();
 #endif
 #ifdef HAVE_REMOTE_LCD
-    rb->remote_clear_display();
+    rb->lcd_remote_clear_display();
 #endif
 }
 
@@ -175,7 +177,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         pgfx_update();
 #endif
 #ifdef HAVE_REMOTE_LCD
-        rb->remote_update();
+        rb->lcd_remote_update();
 #endif
         rb->sleep(HZ/20);
         

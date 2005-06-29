@@ -122,9 +122,9 @@ extern void lcd_jump_scroll_delay(int ms);
 #define DRMODE_SOLID      3
 #define DRMODE_INVERSEVID 4 /* used as bit modifier for basic modes */
 
-#define DRAW_PIXEL(x,y) lcd_framebuffer[(y)/8][(x)] |= (1<<((y)&7)) 	 
-#define CLEAR_PIXEL(x,y) lcd_framebuffer[(y)/8][(x)] &= ~(1<<((y)&7))
-#define INVERT_PIXEL(x,y) lcd_framebuffer[(y)/8][(x)] ^= (1<<((y)&7))
+#define DRAW_PIXEL(x,y) lcd_framebuffer[(y)>>3][(x)] |= (1<<((y)&7))
+#define CLEAR_PIXEL(x,y) lcd_framebuffer[(y)>>3][(x)] &= ~(1<<((y)&7))
+#define INVERT_PIXEL(x,y) lcd_framebuffer[(y)>>3][(x)] ^= (1<<((y)&7))
 
 typedef void lcd_pixelfunc_type(int x, int y); /* for b&w */
 typedef void lcd_blockfunc_type(unsigned char *address, unsigned mask, unsigned bits);
@@ -143,6 +143,10 @@ extern int  lcd_getxmargin(void);
 extern int  lcd_getymargin(void);
 extern void lcd_setfont(int font);
 extern int  lcd_getstringsize(const unsigned char *str, int *w, int *h);
+
+/* low level drawing function pointer arrays */
+extern lcd_pixelfunc_type* lcd_pixelfuncs[8];
+extern lcd_blockfunc_type* lcd_blockfuncs[8];
 
 extern void lcd_drawpixel(int x, int y);
 extern void lcd_drawline(int x1, int y1, int x2, int y2);
