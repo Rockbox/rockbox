@@ -1159,7 +1159,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 break;
 
 #if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == ONDIO_PAD) \
-    || (CONFIG_KEYPAD == IRIVER_H100_PAD)
+    || (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
             case VIEWER_MODE_PAGE:
                 /* Page-overlap mode */
                 if (++page_mode == PAGE_MODES)
@@ -1191,7 +1191,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 break;
 #endif
 
-#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H100_PAD)
+#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H100_PAD) \
+  || (CONFIG_KEYPAD == IRIVER_H300_PAD)
             case VIEWER_LINE_UP:
             case VIEWER_LINE_UP | BUTTON_REPEAT:
                 /* Scroll up one line */
