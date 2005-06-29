@@ -37,7 +37,7 @@ bool quick_screen(const int, const int);
 #define SCREENS_QUICK   BUTTON_F2
 #endif
  
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 bool quick_screen(const int, const int);
 #define SCREENS_QUICK   BUTTON_MODE
    /* Long press already detected so not needed here */
