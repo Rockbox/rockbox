@@ -1,13 +1,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define ARTISTLEN        32
-#define ALBUMLEN         68
-#define SONGLEN          92
-#define GENRELEN         20
-#define FILELEN          212
-#define SONGARRAYLEN     48
-#define ALBUMARRAYLEN    38
+#define ARTISTLEN        60
+#define ALBUMLEN         64
+#define SONGLEN          120
+#define GENRELEN         28
+#define FILELEN          176
+#define SONGARRAYLEN     715
+#define ALBUMARRAYLEN    186
 
 
 #define BE32(_x_) (((_x_ & 0xff000000) >> 24) | \
@@ -64,7 +64,21 @@ struct AlbumEntry {
    int song[SONGARRAYLEN];
 } AlbumEntry;
 
-FILE *fp;
+struct RundbHeader {
+   int version;
+   int entrycount;
+} RundbHeader;
+
+struct RundbEntry {
+   int file;
+   int hash;
+   short rating;
+   short voladj;
+   int playcount;
+   int lastplayed;
+} RundbEntry;
+
+FILE *fp,*fp2;
 
 void showsong(int offset) {
    fseek(fp,offset,SEEK_SET);
@@ -111,8 +125,21 @@ void showartist(int offset) {
    }
 }
 
+void showrundb(int offset) {
+    fseek(fp2,offset,SEEK_SET);
+    fread(&RundbEntry,sizeof(struct RundbEntry),1,fp2);
+   RundbEntry.hash=BE32(RundbEntry.hash);
+   RundbEntry.playcount=BE32(RundbEntry.playcount);
+   RundbEntry.lastplayed=BE32(RundbEntry.lastplayed);
+   RundbEntry.rating=BE16(RundbEntry.rating);
+   RundbEntry.voladj=BE16(RundbEntry.voladj);
+    printf("Offset: 0x%x\nHash: 0x%x\nRating: %d\nVoladj: 0x%x\n",offset,RundbEntry.hash,RundbEntry.rating,RundbEntry.voladj);
+    printf("Playcount: 0x%x\nLastplayed: %d\n",RundbEntry.playcount,RundbEntry.lastplayed);
+}
+
 int main() {
-   fp=fopen("rockbox.id3db","r");
+   fp=fopen("rockbox.tagdb","r");
+   fp2=fopen("rockbox.rundb","r");
    int *p,i,temp,temp2,temp3,temp4;
    if(fp<0) return -1;
    fread(&header,sizeof(header),1,fp);
@@ -120,6 +147,14 @@ int main() {
    for(i=0;i<17;i++) {
 	   *p=BE32(*p);
 	   p++;
+   }
+   if(fp2>=0) {
+       fread(&RundbHeader,sizeof(RundbHeader),1,fp2);
+       p=&RundbHeader;
+       for(i=0;i<2;i++) {
+           *p=BE32(*p);
+           p++;
+       }
    }
    printf("db version    : 0x%x\n",header.version&0xFF);
    printf("Artist start  : 0x%x\n",header.artiststart);
@@ -138,6 +173,10 @@ int main() {
    printf("Songarraylen  : %d\n",header.songarraylen);
    printf("Albumarraylen : %d\n",header.albumarraylen);
    printf("Rundb dirty   : %d\n",header.rundbdirty);
+   if(fp2>=0) {
+       printf("Rundb version : 0x%x\n",RundbHeader.version&0xFF);
+       printf("Rundb entrys  : %d\n",RundbHeader.entrycount);
+   }
    if( sizeof(struct SongEntry)!=(header.songlen+header.genrelen+16)) {
 		printf("Song Entry Size mismatch.. update the code to correct size.\n");
               return;
@@ -156,7 +195,9 @@ printf("Artist Entry Size mismatch.. update the code to correct size.\n");
    }
 
    do {
-     printf("\n\nShow artist(1)/album(2)/song(3)/file(4) ? ");
+     printf("\n\nShow artist(1)/album(2)/song(3)/file(4)");
+     if(fp2>=0) printf("/rundb(5)");
+     printf(" ? ");
      fflush(stdout);
      temp=temp2=temp3=0;
      scanf("%d",&temp);
@@ -197,6 +238,11 @@ printf("Artist Entry Size mismatch.. update the code to correct size.\n");
                              showfile(header.filestart +
                                              temp2*sizeof(struct FileEntry));
 		     break;
+         case 5:    if(temp2==-1)
+                             showrundb(temp3);
+                    else
+                             showrundb(8+temp2*sizeof(struct RundbEntry));
+             break;
              default:
 		     return;
 		     break;
