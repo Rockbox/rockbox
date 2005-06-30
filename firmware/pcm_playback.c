@@ -137,6 +137,7 @@ static void dma_stop(void)
 {
     pcm_playing = false;
 
+    DCR0 = 0;
     /* Reset the FIFO */
     IIS2CONFIG = 0x800;
 }
@@ -260,12 +261,19 @@ void pcm_play_pause(bool play)
 {
     if(pcm_paused && play && pcmbuf_unplayed_bytes)
     {
+        logf("unpause");
+        /* Reset chunk size so dma has enough data to fill the fifo. */
+        SAR0 = (unsigned long)next_start;
+        BCR0 = next_size;
         /* Enable the FIFO and force one write to it */
         IIS2CONFIG = (pcm_freq << 12) | 0x300;
-        DCR0 |= DMA_START;
+        DCR0 |= DMA_EEXT | DMA_START;
     }
     else if(!pcm_paused && !play)
     {
+        logf("pause");
+        /* Disable DMA peripheral request. */
+        DCR0 &= ~DMA_EEXT;
         IIS2CONFIG = 0x800;
     }
     pcm_paused = !play;
@@ -283,7 +291,7 @@ void DMA0(void)
     int res = DSR0;
 
     DSR0 = 1;    /* Clear interrupt */
-
+    
     /* Stop on error */
     if(res & 0x70)
     {
