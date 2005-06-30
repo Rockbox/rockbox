@@ -69,8 +69,7 @@ static void button_tick(void)
     int diff;
     int btn;
 
-#if !defined(HAVE_MMC) && (CONFIG_KEYPAD != IRIVER_H100_PAD) \
-  && (CONFIG_KEYPAD != GMINI100_PAD)
+#if (CONFIG_KEYPAD == PLAYER_PAD) || (CONFIG_KEYPAD == RECORDER_PAD)
 
     /* Post events for the remote control */
     btn = remote_control_rx();
@@ -359,7 +358,7 @@ static int button_read(void)
 
     int data;
 
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 
     static bool hold_button = false;
     static bool remote_hold_button = false;
