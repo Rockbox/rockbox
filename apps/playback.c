@@ -1003,8 +1003,7 @@ void audio_update_trackinfo(void)
         if (buf_ridx >= codecbuflen)
             buf_ridx -= codecbuflen;
             
-        if (!pcm_crossfade_init())
-            pcm_flush_audio();
+        pcm_crossfade_init();
             
         if (!filling)
             pcm_set_boost_mode(false);
@@ -1156,11 +1155,11 @@ void audio_thread(void)
         switch (ev.id) {
             case AUDIO_PLAY:
                 logf("starting...");
+                playing = true;
                 ci.stop_codec = true;
                 ci.reload_codec = false;
                 ci.seek_time = 0;
-                if (!pcm_crossfade_init())
-                    pcm_flush_audio();
+                pcm_crossfade_init();
                 audio_play_start((int)ev.data);
                 break ;
                 
@@ -1325,9 +1324,10 @@ void audio_play(int offset)
 {
     logf("audio_play");
     ci.stop_codec = true;
+    if (!pcm_crossfade_init())
+        pcm_flush_audio();
     pcm_play_pause(true);
     paused = false;
-    playing = true;
     queue_post(&audio_queue, AUDIO_PLAY, (void *)offset);
 }
 

@@ -415,7 +415,7 @@ bool pcm_crossfade_init(void)
  */
 void pcm_flush_audio(void)
 {
-    if (crossfade_init || crossfade_active)
+    if (crossfade_init || crossfade_active || !pcm_playing)
         return ;
 
     crossfade_mode = CFM_FLUSH;
@@ -640,30 +640,15 @@ bool pcm_insert_buffer(char *buf, long length)
         memcpy(&audiobuffer[audiobuffer_pos+audiobuffer_fillpos],
                 buf, copy_n);
         buf += copy_n;
-        audiobuffer_free -= copy_n;
+        audiobuffer_fillpos += copy_n;
         length -= copy_n;
         
         /* Pre-buffer to meet CHUNK_SIZE requirement */
         if (copy_n + audiobuffer_fillpos < CHUNK_SIZE && length == 0) {
-            audiobuffer_fillpos += copy_n;
             return true;
         }
-        
-        copy_n += audiobuffer_fillpos;
-        
-        while (!pcm_play_add_chunk(&audiobuffer[audiobuffer_pos], 
-                                   copy_n, pcm_event_handler)) {
-            pcm_boost(false);
-            yield();
-        }
-        pcm_event_handler = NULL;
-        
-        audiobuffer_pos += copy_n;
-        audiobuffer_fillpos = 0;
-        
-        if (audiobuffer_pos >= PCMBUF_SIZE) {
-            audiobuffer_pos = 0;
-        }
+
+        pcm_flush_fillpos();
     }
 
     return true;
