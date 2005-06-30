@@ -23,10 +23,12 @@
 #define NUM_PARTICLES (LCD_WIDTH * LCD_HEIGHT / 72)
 #define SNOW_HEIGHT LCD_HEIGHT
 #define SNOW_WIDTH LCD_WIDTH
+#define MYLCD(fn) rb->lcd_ ## fn
 #else
 #define NUM_PARTICLES 10
 #define SNOW_HEIGHT 14
 #define SNOW_WIDTH 20
+#define MYLCD(fn) pgfx_ ## fn
 #endif
 
 /* variable button definitions */
@@ -81,14 +83,14 @@ static void snow_move(void)
 
     for (i=0; i<NUM_PARTICLES; i++) {
         if (particle_exists(i)) {
+            MYLCD(set_drawmode)(DRMODE_SOLID|DRMODE_INVERSEVID);
 #ifdef HAVE_LCD_BITMAP
-            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
             rb->lcd_fillrect(particles[i][0],particles[i][1],
                              FLAKE_WIDTH,FLAKE_WIDTH);
-            rb->lcd_set_drawmode(DRMODE_SOLID);
 #else
-            pgfx_clearpixel(particles[i][0],particles[i][1]);
+            pgfx_drawpixel(particles[i][0],particles[i][1]);
 #endif
+            MYLCD(set_drawmode)(DRMODE_SOLID);
 #ifdef HAVE_REMOTE_LCD
             if (particles[i][0] <= LCD_REMOTE_WIDTH 
                     && particles[i][1] <= LCD_REMOTE_HEIGHT) {
@@ -141,14 +143,12 @@ static void snow_init(void)
         particles[i][0]=-1;
         particles[i][1]=-1;
     }        
-#ifdef HAVE_LCD_BITMAP
-    rb->lcd_clear_display();
-#else
+#ifdef HAVE_LCD_CHARCELLS
     pgfx_display(0, 0); /* display three times */
     pgfx_display(4, 0);
     pgfx_display(8, 0);
-    pgfx_clear_display();
 #endif
+    MYLCD(clear_display)();
 #ifdef HAVE_REMOTE_LCD
     rb->lcd_remote_clear_display();
 #endif
@@ -171,11 +171,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     snow_init();
     while (1) {
         snow_move();
-#ifdef HAVE_LCD_BITMAP
-        rb->lcd_update();
-#else
-        pgfx_update();
-#endif
+        MYLCD(update)();
 #ifdef HAVE_REMOTE_LCD
         rb->lcd_remote_update();
 #endif

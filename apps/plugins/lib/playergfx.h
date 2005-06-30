@@ -30,16 +30,20 @@ bool pgfx_init(struct plugin_api* newrb, int cwidth, int cheight);
 void pgfx_release(void);
 void pgfx_display(int cx, int cy);
 void pgfx_update(void);
+
+void pgfx_set_drawmode(int mode);
+int  pgfx_get_drawmode(void);
+
 void pgfx_clear_display(void);
 void pgfx_drawpixel(int x, int y);
-void pgfx_clearpixel(int x, int y);
-void pgfx_invertpixel(int x, int y);
 void pgfx_drawline(int x1, int y1, int x2, int y2);
-void pgfx_clearline(int x1, int y1, int x2, int y2);
-void pgfx_invertline(int x1, int y1, int x2, int y2);
-void pgfx_invertrect (int x, int y, int nx, int ny);
-void pgfx_bitmap (const unsigned char *src, int x, int y, int nx, int ny,
-                  bool clear);
+void pgfx_hline(int x1, int x2, int y);
+void pgfx_vline(int x, int y1, int y2);
+void pgfx_drawrect(int x, int y, int width, int height);
+void pgfx_fillrect(int x, int y, int width, int height);
+void pgfx_bitmap_part(const unsigned char *src, int src_x, int src_y,
+                      int stride, int x, int y, int width, int height);
+void pgfx_bitmap(const unsigned char *src, int x, int y, int width, int height);
 
 #endif /* HAVE_LCD_CHARCELLS */
 #endif /* __PGFX_H__ */

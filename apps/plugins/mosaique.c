@@ -22,9 +22,11 @@
 #ifdef HAVE_LCD_BITMAP
 #define LARGE ((LCD_WIDTH - 2) / 2)
 #define HAUT  ((LCD_HEIGHT - 2) / 2)
+#define MYLCD(fn) rb->lcd_ ## fn
 #else
 #define LARGE 9
 #define HAUT  6
+#define MYLCD(fn) pgfx_ ## fn
 #endif
 
 /* variable button definitions */
@@ -62,18 +64,16 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     TEST_PLUGIN_API(api);
     (void)parameter;
 
-#ifdef HAVE_LCD_BITMAP
-    rb->lcd_clear_display();
-    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-#else
+#ifdef HAVE_LCD_CHARCELLS
     if (!pgfx_init(rb, 4, 2))
     {
         rb->splash(HZ*2, true, "Old LCD :(");
         return PLUGIN_OK;
     }
     pgfx_display(3, 0);
-    pgfx_clear_display();
 #endif
+    MYLCD(clear_display)();
+    MYLCD(set_drawmode)(DRMODE_COMPLEMENT);
     while (1) {
 
         x+=sx;
@@ -102,19 +102,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             sy = -sy;
         }
 
-#ifdef HAVE_LCD_BITMAP
-        rb->lcd_fillrect(LARGE-x, HAUT-y, 2*x+1, 1);
-        rb->lcd_fillrect(LARGE-x, HAUT+y, 2*x+1, 1);
-        rb->lcd_fillrect(LARGE-x, HAUT-y+1, 1, 2*y-1);
-        rb->lcd_fillrect(LARGE+x, HAUT-y+1, 1, 2*y-1);
-        rb->lcd_update();
-#else
-        pgfx_invertrect(LARGE-x, HAUT-y, 2*x+1, 1);
-        pgfx_invertrect(LARGE-x, HAUT+y, 2*x+1, 1);
-        pgfx_invertrect(LARGE-x, HAUT-y+1, 1, 2*y-1);
-        pgfx_invertrect(LARGE+x, HAUT-y+1, 1, 2*y-1);
-        pgfx_update();
-#endif
+        MYLCD(fillrect)(LARGE-x, HAUT-y, 2*x+1, 1);
+        MYLCD(fillrect)(LARGE-x, HAUT+y, 2*x+1, 1);
+        MYLCD(fillrect)(LARGE-x, HAUT-y+1, 1, 2*y-1);
+        MYLCD(fillrect)(LARGE+x, HAUT-y+1, 1, 2*y-1);
+        MYLCD(update)();
 
         rb->sleep(HZ/timer);
         
@@ -122,9 +114,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         switch (button)
         {
             case MOSAIQUE_QUIT:
-#ifdef HAVE_LCD_BITMAP
-                rb->lcd_set_drawmode(DRMODE_SOLID);
-#else
+                MYLCD(set_drawmode)(DRMODE_SOLID);
+#ifdef HAVE_LCD_CHARCELLS
                 pgfx_release();
 #endif
                 return PLUGIN_OK;
@@ -141,20 +132,15 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 sy = rb->rand() % (HAUT/2) + 1;
                 x=0;
                 y=0;
-#ifdef HAVE_LCD_BITMAP
-                rb->lcd_clear_display();
-#else
-                pgfx_clear_display();
-#endif
+                MYLCD(clear_display)();
                 break;
 
 
             default:
                 if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
                 {
-#ifdef HAVE_LCD_BITMAP
-                    rb->lcd_set_drawmode(DRMODE_SOLID);
-#else
+                    MYLCD(set_drawmode)(DRMODE_SOLID);
+#ifdef HAVE_LCD_CHARCELLS
                     pgfx_release();
 #endif
                     return PLUGIN_USB_CONNECTED;
