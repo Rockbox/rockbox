@@ -8,5 +8,4 @@ drivers/*.[chS]
 export/*.h
 include/*.h
 include/sys/*.h
-win32.mak
 SOURCES
