@@ -42,7 +42,7 @@ $(OBJDIR)/thread.o: thread.c export/thread.h
 	$(SILENT)echo "CC thread.c"
 	$(SILENT)$(CC) -c -O -fomit-frame-pointer $(CFLAGS) $< -o $@
 
-$(OBJDIR)/sysfont.o: fonts/clR6x8.bdf
+$(OBJDIR)/sysfont.o: ../fonts/rockbox_default.bdf
 	@echo "CONVBDF"
 	$(SILENT)$(TOOLSDIR)/convbdf -c -o $(OBJDIR)/sysfont.c $<
 	@echo "CC sysfont.c"
