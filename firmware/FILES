@@ -9,5 +9,4 @@ export/*.h
 include/*.h
 include/sys/*.h
 win32.mak
-fonts/*.bdf
 SOURCES
