@@ -24,7 +24,7 @@
 #ifdef ROCKBOX_HAS_LOGF
 
 #define MAX_LOGF_LINES 1000
-#define MAX_LOGF_ENTRY 256
+#define MAX_LOGF_ENTRY 30
 #define MAX_LOGF_DATASIZE (MAX_LOGF_ENTRY*MAX_LOGF_LINES)
 
 extern unsigned char logfbuffer[MAX_LOGF_LINES][MAX_LOGF_ENTRY];
