@@ -36,6 +36,7 @@ bool logfdisplay(void)
 {
     int w, h;
     int lines;
+    int columns;
     int i;
     int button;
 
@@ -50,6 +51,14 @@ bool logfdisplay(void)
              0
 #endif
              :LCD_HEIGHT)/h;
+    columns = (lcd?
+#ifdef HAVE_REMOTE_LCD
+             LCD_REMOTE_WIDTH
+#else
+             0
+#endif
+             :LCD_WIDTH)/w;
+            
     if(!lines)
         return false;
 
@@ -59,7 +68,7 @@ bool logfdisplay(void)
     do {
         index = logfindex;
         for(i = lines-1; i>=0; i--) {
-            unsigned char buffer[MAX_LOGF_ENTRY + 1];
+            unsigned char buffer[columns + 1];
 
             if(--index < 0) {
                 if(logfwrap)
@@ -68,8 +77,8 @@ bool logfdisplay(void)
                     break; /* done */
             }
         
-            memcpy(buffer, logfbuffer[index], MAX_LOGF_ENTRY);
-            buffer[MAX_LOGF_ENTRY]=0;
+            memcpy(buffer, logfbuffer[index], columns);
+            buffer[columns]=0;
             lcd_puts(0, i, buffer);
         }
         lcd_update();
