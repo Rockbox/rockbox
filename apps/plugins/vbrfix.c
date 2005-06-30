@@ -274,7 +274,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void *parameter)
 
     audiobuf = rb->plugin_get_audio_buffer(&audiobuflen);
     
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost(true);
+#endif
+
     vbr_fix(parameter);
 
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost(false);
+#endif
     return PLUGIN_OK;
 }
