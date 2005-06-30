@@ -396,40 +396,56 @@ lcd_pixelfunc_type* lcd_pixelfuncs[8] = {
 };
                                
 static void flipblock(unsigned char *address, unsigned mask, unsigned bits)
+                      __attribute__ ((section(".icode")));
+static void flipblock(unsigned char *address, unsigned mask, unsigned bits)
 {
     *address ^= (bits & mask);
 }
 
+static void bgblock(unsigned char *address, unsigned mask, unsigned bits)
+                    __attribute__ ((section(".icode")));
 static void bgblock(unsigned char *address, unsigned mask, unsigned bits)
 {
     *address &= (bits | ~mask);
 }
 
 static void fgblock(unsigned char *address, unsigned mask, unsigned bits)
+                    __attribute__ ((section(".icode")));
+static void fgblock(unsigned char *address, unsigned mask, unsigned bits)
 {
     *address |= (bits & mask);
 }
 
+static void solidblock(unsigned char *address, unsigned mask, unsigned bits)
+                       __attribute__ ((section(".icode")));
 static void solidblock(unsigned char *address, unsigned mask, unsigned bits)
 {
     *address = (*address & ~mask) | (bits & mask);
 }
 
 static void flipinvblock(unsigned char *address, unsigned mask, unsigned bits)
+                         __attribute__ ((section(".icode")));
+static void flipinvblock(unsigned char *address, unsigned mask, unsigned bits)
 {
     *address ^= (~bits & mask);
 }
 
+static void bginvblock(unsigned char *address, unsigned mask, unsigned bits)
+                       __attribute__ ((section(".icode")));
 static void bginvblock(unsigned char *address, unsigned mask, unsigned bits)
 {
     *address &= ~(bits & mask);
 }
 
 static void fginvblock(unsigned char *address, unsigned mask, unsigned bits)
+                       __attribute__ ((section(".icode")));
+static void fginvblock(unsigned char *address, unsigned mask, unsigned bits)
 {
     *address |= (~bits & mask);
 }
 
+static void solidinvblock(unsigned char *address, unsigned mask, unsigned bits)
+                          __attribute__ ((section(".icode")));
 static void solidinvblock(unsigned char *address, unsigned mask, unsigned bits)
 {
     *address = (*address & ~mask) | (~bits & mask);
@@ -601,8 +617,8 @@ void lcd_vline(int x, int y1, int y2)
         dst += LCD_WIDTH;
         mask = 0xFFu;
     }
-    mask_bottom &= mask;
-    bfunc(dst, mask_bottom, 0xFFu);
+    mask &= mask_bottom;
+    bfunc(dst, mask, 0xFFu);
 }
 
 /* Draw a rectangular box */
@@ -676,14 +692,14 @@ void lcd_fillrect(int x, int y, int width, int height)
         dst += LCD_WIDTH;
         mask = 0xFFu;
     }
-    mask_bottom &= mask;
+    mask &= mask_bottom;
 
-    if (fillopt && (mask_bottom == 0xFFu))
+    if (fillopt && (mask == 0xFFu))
         memset(dst, bits, width);
     else
     {
         for (i = width; i > 0; i--)
-            bfunc(dst++, mask_bottom, 0xFFu);
+            bfunc(dst++, mask, 0xFFu);
     }
 }
 
@@ -765,14 +781,14 @@ void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
             dst += LCD_WIDTH;
             mask = 0xFFu;
         }
-        mask_bottom &= mask;
+        mask &= mask_bottom;
 
-        if (copyopt && (mask_bottom == 0xFFu))
+        if (copyopt && (mask == 0xFFu))
             memcpy(dst, src, width);
         else
         {
             for (i = width; i > 0; i--)
-                bfunc(dst++, mask_bottom, *src++);
+                bfunc(dst++, mask, *src++);
         }
     }
     else

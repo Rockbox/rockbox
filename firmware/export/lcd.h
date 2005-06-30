@@ -113,21 +113,22 @@ extern void lcd_jump_scroll(int mode); /* 0=off, 1=once, ..., ALWAYS */
 extern void lcd_jump_scroll_delay(int ms);
 #endif
 
-#if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
-
-/* draw modes */
+/* Draw modes */
 #define DRMODE_COMPLEMENT 0
 #define DRMODE_BG         1
 #define DRMODE_FG         2
 #define DRMODE_SOLID      3
 #define DRMODE_INVERSEVID 4 /* used as bit modifier for basic modes */
 
+/* Low-level drawing function types */
+typedef void lcd_pixelfunc_type(int x, int y); /* for b&w */
+typedef void lcd_blockfunc_type(unsigned char *address, unsigned mask, unsigned bits);
+
+#if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
+
 #define DRAW_PIXEL(x,y) lcd_framebuffer[(y)>>3][(x)] |= (1<<((y)&7))
 #define CLEAR_PIXEL(x,y) lcd_framebuffer[(y)>>3][(x)] &= ~(1<<((y)&7))
 #define INVERT_PIXEL(x,y) lcd_framebuffer[(y)>>3][(x)] ^= (1<<((y)&7))
-
-typedef void lcd_pixelfunc_type(int x, int y); /* for b&w */
-typedef void lcd_blockfunc_type(unsigned char *address, unsigned mask, unsigned bits);
 
 /* Memory copy of display bitmap */
 extern unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
@@ -156,7 +157,8 @@ extern void lcd_drawrect(int x, int y, int width, int height);
 extern void lcd_fillrect(int x, int y, int width, int height);
 extern void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
                             int stride, int x, int y, int width, int height);
-extern void lcd_bitmap(const unsigned char *src, int x, int y, int nx, int ny);
+extern void lcd_bitmap(const unsigned char *src, int x, int y, int width,
+                       int height);
 extern void lcd_putsxy(int x, int y, const unsigned char *string);
 
 extern void lcd_invertscroll(int x, int y);
