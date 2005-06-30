@@ -679,6 +679,18 @@ sed > autoconf.h \
 EOF
 
 if test "$simulator" = "yes"; then
+  # verify that we have a sed version we can use!
+  lines=`echo "moo" | sed -e '/moo/cline1\nline2\nline3' | wc -l`
+  if test "$lines" -eq "1"; then
+    echo "You have a broken sed version. You must upgrade to be able to "
+    echo "generate a fine Makefile. See details at:"
+    echo "http://www.rockbox.org/twiki/bin/view/Main/BrokenSed"
+    exit
+  else
+    version=`sed --version | head -n 1`
+    echo "$version is a fine sed"
+  fi
+
   # add simul make stuff on the #SIMUL# line
   simmagic='/#SIMUL#/c\	@$(MAKE) -C $(SIMDIR) OBJDIR=$(BUILDDIR)/sim\n	@$(MAKE) -C $(ROOTDIR)/uisimulator/common OBJDIR=$(BUILDDIR)/comsim'
 else
