@@ -399,6 +399,7 @@ struct plugin_api {
 #ifdef ROCKBOX_HAS_LOGF
     void (*logf)(const char *fmt, ...);
 #endif
+    int (*strncmp)(const char *, const char *, size_t);
 };
 
 int plugin_load(const char* plugin, void* parameter);

@@ -329,7 +329,7 @@ static const struct plugin_api rockbox_api = {
 #ifdef ROCKBOX_HAS_LOGF
     logf,
 #endif
-
+    strncmp,
 };
 
 int plugin_load(const char* plugin, void* parameter)
