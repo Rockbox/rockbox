@@ -811,6 +811,15 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         ci.curpos = offset;
         tracks[track_widx].start_pos = offset;
       }
+      else if (tracks[track_widx].id3.codectype==AFMT_WAVPACK) {
+        lseek(fd, offset, SEEK_SET);
+        tracks[track_widx].id3.offset = offset;
+        tracks[track_widx].id3.elapsed = tracks[track_widx].id3.length / 2;
+        tracks[track_widx].filepos = offset;
+        tracks[track_widx].filerem = tracks[track_widx].filesize - offset;
+        ci.curpos = offset;
+        tracks[track_widx].start_pos = offset;
+      }
     } 
     
     if (start_play) {

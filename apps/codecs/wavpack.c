@@ -33,7 +33,9 @@ static long temp_buffer [BUFFER_SIZE] IDATA_ATTR;
 
 static long read_callback (void *buffer, long bytes)
 {
-    return ci->read_filebuf (buffer, bytes);
+    long retval = ci->read_filebuf (buffer, bytes);
+    ci->id3->offset = ci->curpos;
+    return retval;
 }
 
 #ifndef SIMULATOR
