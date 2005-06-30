@@ -45,18 +45,19 @@ static void displayremote(void)
     /* TODO: we should have a debug option that enables/disables this! */
     int w, h;
     int lines;
+    int columns;
     int i;
     int index;
 
     lcd_remote_getstringsize("A", &w, &h);
     lines = LCD_REMOTE_HEIGHT/h;
-
+    columns = LCD_REMOTE_WIDTH/w;
     lcd_remote_setmargins(0, 0);
     lcd_remote_clear_display();
     
     index = logfindex;
     for(i = lines-1; i>=0; i--) {
-        unsigned char buffer[MAX_LOGF_ENTRY+1];
+        unsigned char buffer[columns+1];
 
         if(--index < 0) {
             if(logfwrap)
@@ -65,8 +66,8 @@ static void displayremote(void)
                 break; /* done */
         }
         
-        memcpy(buffer, logfbuffer[index], MAX_LOGF_ENTRY);
-        buffer[MAX_LOGF_ENTRY]=0;
+        memcpy(buffer, logfbuffer[index], columns);
+        buffer[columns]=0;
         lcd_remote_puts(0, i, buffer);
     }
     lcd_remote_update();   
