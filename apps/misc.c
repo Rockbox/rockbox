@@ -278,7 +278,7 @@ bool clean_shutdown(void)
 #ifdef SIMULATOR
     exit(0);
 #else
-#ifndef IRIVER_H100
+#ifndef HAVE_POWEROFF_WHILE_CHARGING
     if(!charger_inserted())
 #endif
     {

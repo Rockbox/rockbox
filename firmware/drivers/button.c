@@ -127,7 +127,7 @@ static void button_tick(void)
 #else
                             if (btn == BUTTON_OFF &&
 #endif
-#ifndef IRIVER_H100
+#ifndef HAVE_POWEROFF_WHILE_CHARGING
                                 !charger_inserted() &&
 #endif
                                 repeat_count > POWEROFF_COUNT)
