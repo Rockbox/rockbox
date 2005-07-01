@@ -279,3 +279,17 @@ void uda1380_set_monitor(int enable)
         uda1380_write_reg(REG_MIX_VOL, (uda1380_regs[REG_MIX_VOL] & 0x00FF) | MIX_VOL_CH_2(0xff));
     }
 }
+
+/* Change the order of the noise chaper, 5th order is recommended above 32kHz */
+void uda1380_set_nsorder(int order)
+{
+    switch(order)
+    {
+    case 5:
+        uda1380_write_reg(REG_MIX_CTL, uda1380_regs[REG_MIX_CTL] | MIX_CTL_SEL_NS);
+        break;
+    case 3:
+    default:
+        uda1380_write_reg(REG_MIX_CTL, uda1380_regs[REG_MIX_CTL] & ~MIX_CTL_SEL_NS);
+    }
+}

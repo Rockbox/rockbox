@@ -28,6 +28,7 @@ extern void uda1380_set_bass(int value);
 extern void uda1380_set_treble(int value);
 extern int uda1380_mute(int mute);
 extern void uda1380_close(void);
+extern void uda1380_set_nsorder(int order);
 
 extern void uda1380_enable_recording(bool source_mic);
 extern void uda1380_disable_recording(void);
@@ -135,6 +136,7 @@ extern void uda1380_set_monitor(int enable);
 #define REG_MIX_CTL         0x14
 #define MIX_CTL_MIX_POS     (1 << 13)
 #define MIX_CTL_MIX         (1 << 12)
+#define MIX_CTL_SEL_NS      (1 << 14)
 
 /* REG_DEC_VOL: Decimator (ADC) volume control */
 #define REG_DEC_VOL         0x20

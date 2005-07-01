@@ -106,6 +106,7 @@ static void dma_start(const void *addr, long size)
 
     /* Reset the audio FIFO */
     IIS2CONFIG = 0x800;
+    EBU1CONFIG = 0x800;
     
     /* Set up DMA transfer  */
     SAR0 = ((unsigned long)addr); /* Source address */
@@ -113,7 +114,9 @@ static void dma_start(const void *addr, long size)
     BCR0 = size;                  /* Bytes to transfer */
 
     /* Enable the FIFO and force one write to it */
-    IIS2CONFIG = (pcm_freq << 12) | 0x300;
+    IIS2CONFIG = (pcm_freq << 12) | 0x300 | 4 << 2;
+    /* Also send the audio to S/PDIF */
+    EBU1CONFIG = 7 << 12 |  3 << 8 | 5 << 2;
     DCR0 = DMA_INT | DMA_EEXT | DMA_CS | DMA_SINC | DMA_START;
 }
 
@@ -140,6 +143,7 @@ static void dma_stop(void)
     DCR0 = 0;
     /* Reset the FIFO */
     IIS2CONFIG = 0x800;
+    EBU1CONFIG = 0x800;
 }
 
 /* sets frequency of input to DAC */
@@ -148,16 +152,17 @@ void pcm_set_frequency(unsigned int frequency)
     switch(frequency)
     {
     case 11025:
-        pcm_freq = 0x2;
+        pcm_freq = 0x4;
+        uda1380_set_nsorder(3);
         break;
     case 22050:
-        pcm_freq = 0x4;
+        pcm_freq = 0x6;
+        uda1380_set_nsorder(3);
         break;
     case 44100:
-        pcm_freq = 0x6;
-        break;
     default:
-        pcm_freq = 0x6;
+        pcm_freq = 0xC;
+        uda1380_set_nsorder(5);
         break;
     }
 }
@@ -266,7 +271,8 @@ void pcm_play_pause(bool play)
         SAR0 = (unsigned long)next_start;
         BCR0 = next_size;
         /* Enable the FIFO and force one write to it */
-        IIS2CONFIG = (pcm_freq << 12) | 0x300;
+        IIS2CONFIG = (pcm_freq << 12) | 0x300 | 4 << 2;
+        EBU1CONFIG = 7 << 12 |  3 << 8 | 5 << 2;
         DCR0 |= DMA_EEXT | DMA_START;
     }
     else if(!pcm_paused && !play)
@@ -275,6 +281,7 @@ void pcm_play_pause(bool play)
         /* Disable DMA peripheral request. */
         DCR0 &= ~DMA_EEXT;
         IIS2CONFIG = 0x800;
+        EBU1CONFIG = 0x800;
     }
     pcm_paused = !play;
 }
