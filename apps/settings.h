@@ -204,6 +204,10 @@ struct user_settings
     int battery_capacity; /* in mAh */
     int battery_type;  /* for units which can take multiple types (Ondio). */
 
+#ifdef HAVE_SPDIF_POWER
+    bool spdif_enable; /* S/PDIF power on/off */
+#endif
+    
     /* resume settings */
 
     bool resume;        /* resume option: 0=off, 1=on */

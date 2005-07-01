@@ -45,6 +45,8 @@
 #include "talk.h"
 #include "timefuncs.h"
 #include "misc.h"
+#include "power.h"
+
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
 #endif
@@ -659,6 +661,18 @@ static bool resume(void)
     return set_bool( str(LANG_RESUME), &global_settings.resume); 
 }
 
+#ifdef HAVE_SPDIF_POWER
+static bool spdif(void)
+{
+     bool rc = set_bool_options(str(LANG_SPDIF_ENABLE),
+                                &global_settings.spdif_enable,
+                                STR(LANG_ON),
+                                STR(LANG_OFF),
+                                spdif_power_enable);
+     return rc;
+}
+#endif
+
 static bool autocreatebookmark(void)
 {
     bool retval = false;
@@ -1120,6 +1134,9 @@ static bool playback_settings_menu(void)
         { ID2P(LANG_FADE_ON_STOP), set_fade_on_stop },
 #if CONFIG_HWCODEC == MASNONE
         { ID2P(LANG_CROSSFADE), crossfade },
+#endif
+#ifdef HAVE_SPDIF_POWER
+        { ID2P(LANG_SPDIF_ENABLE), spdif },
 #endif
         { ID2P(LANG_ID3_ORDER), id3_order },
     };

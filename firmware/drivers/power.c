@@ -71,7 +71,7 @@ void power_init(void)
     GPIO_ENABLE |= 0x80000000;
     GPIO_FUNCTION |= 0x80000000;
 #ifdef HAVE_SPDIF_POWER
-    spdif_power_enable(true);
+    spdif_power_enable(false);
 #endif
 #else
 #ifdef HAVE_POWEROFF_ON_PB5

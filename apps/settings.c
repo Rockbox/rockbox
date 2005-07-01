@@ -400,7 +400,11 @@ static const struct bit_entry hd_bits[] =
     {3, S_O(backlight_fade_out), 3, "backlight fade out",
         "off,500ms,1s,2s,3s,4s,5s,10s"},
 #endif
-
+    
+#ifdef HAVE_SPDIF_POWER
+    {1, S_O(spdif_enable), false, "spdif enable", off_on},
+#endif
+    
     /* new stuff to be added at the end */
             
     /* Sum of all bit sizes must not grow beyond 0xB8*8 = 1472 */
@@ -839,6 +843,10 @@ void settings_apply(void)
 
 #if CONFIG_HWCODEC == MASNONE && !defined(SIMULATOR)
     pcm_crossfade_enable(global_settings.crossfade);
+#endif
+
+#ifdef HAVE_SPDIF_POWER
+    spdif_power_enable(global_settings.spdif_enable);
 #endif
 }
 
