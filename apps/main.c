@@ -59,6 +59,7 @@
 #include "talk.h"
 #include "plugin.h"
 #include "misc.h"
+#include "database.h"
 
 #if (CONFIG_HWCODEC == MASNONE)
 #include "pcm_playback.h"
