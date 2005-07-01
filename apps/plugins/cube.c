@@ -86,12 +86,17 @@ static long matrice[3][3];
 static int nb_points = 8;
 
 #ifdef HAVE_LCD_BITMAP
+#define MYLCD(fn) rb->lcd_ ## fn
+#define DIST (10*LCD_HEIGHT/16)
 static int x_off = LCD_WIDTH/2;
 static int y_off = LCD_HEIGHT/2;
 #else
+#define MYLCD(fn) pgfx_ ## fn
+#define DIST 9
 static int x_off = 10;
 static int y_off = 7;
 #endif
+
 static int z_off = 600;
 
 /* Precalculated sine and cosine * 10000 (four digit fixed point math) */
@@ -116,7 +121,7 @@ static int sin_table[91] =
     9848,9876,9902,9925,9945,
     9961,9975,9986,9993,9998,
     10000
-};
+};  
 
 static struct plugin_api* rb;
 
@@ -239,12 +244,6 @@ static void cube_viewport(void)
     }
 }
 
-#ifdef HAVE_LCD_BITMAP
-#define DIST (10*LCD_HEIGHT/16)
-#else
-#define DIST 9
-#endif
-
 static void cube_init(void)
 {
     /* Original 3D-position of cube's corners */
@@ -260,11 +259,7 @@ static void cube_init(void)
 
 static void line(int a, int b)
 {
-#ifdef HAVE_LCD_BITMAP
-    rb->lcd_drawline(point2D[a].x, point2D[a].y, point2D[b].x, point2D[b].y);
-#else
-    pgfx_drawline(point2D[a].x, point2D[a].y, point2D[b].x, point2D[b].y);
-#endif
+    MYLCD(drawline)(point2D[a].x, point2D[a].y, point2D[b].x, point2D[b].y);
 }
 
 static void cube_draw(void)
@@ -325,11 +320,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         else
             rb->sleep(4);
 
-#ifdef HAVE_LCD_BITMAP
-        rb->lcd_clear_display();
-#else
-        pgfx_clear_display();
-#endif
+        MYLCD(clear_display)();
         cube_rotate(xa,ya,za);
         cube_viewport();
         cube_draw();
@@ -341,7 +332,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                          xs, ys, zs, highspeed);
             rb->lcd_putsxy(0, LCD_HEIGHT-8, buffer);
         }
-        rb->lcd_update();
 #else
         if (t_disp>0)
         {
@@ -364,8 +354,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 pgfx_display(3, 0);
             }
         }
-        pgfx_update();
 #endif
+        MYLCD(update)();
 
         xa+=xs;
         if (xa>359)
