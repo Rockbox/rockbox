@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id
+ * $Id$
  *
  * Copyright (C) 2005 by Michiel van der Kolk
  *
@@ -98,7 +98,8 @@ int tagdb_init(void)
 #endif
     if ( (tagdbheader.version&0xFF) != TAGDB_VERSION)
     {
-        splash(HZ,true,"Unsupported database version %d!", tagdbheader.version&0xFF);
+        splash(HZ,true,"Unsupported database version %d!",
+               tagdbheader.version&0xFF);
         return -1;
     }
 
@@ -125,20 +126,23 @@ void tagdb_shutdown(void)
 
 /*** TagDatabase code ***/
 
-void writetagdbheader(void) {
+void writetagdbheader(void)
+{
     lseek(tagdb_fd,0,SEEK_SET);
     write(tagdb_fd, &tagdbheader, 68);
     fsync(tagdb_fd);
 }
 
-void writefentry(void) {
+void writefentry(void)
+{
     lseek(tagdb_fd,currentfeoffset,SEEK_SET);
     write(tagdb_fd,sbuf,tagdbheader.filelen);
     write(tagdb_fd,&fe.hash,12);
     fsync(tagdb_fd);
 }
 
-void getfentrybyoffset(int offset) {
+void getfentrybyoffset(int offset)
+{
     memset(&fe,0,sizeof(struct file_entry));
     lseek(tagdb_fd,offset,SEEK_SET);
     read(tagdb_fd,sbuf,tagdbheader.filelen);
@@ -150,7 +154,8 @@ void getfentrybyoffset(int offset) {
 
 #define getfentrybyrecord(_x_)  getfentrybyoffset(FILERECORD2OFFSET(_x_))
 
-int getfentrybyfilename(char *fname) {
+int getfentrybyfilename(char *fname)
+{
     int min=0;
     int max=tagdbheader.filecount;
     while(min<max) {
@@ -168,7 +173,8 @@ int getfentrybyfilename(char *fname) {
     return 0;
 }
 
-int getfentrybyhash(int hash) {
+int getfentrybyhash(int hash)
+{
     int min=0;
     for(min=0;min<tagdbheader.filecount;min++) {
         getfentrybyrecord(min);
@@ -178,12 +184,15 @@ int getfentrybyhash(int hash) {
     return 0;
 }
 
-int deletefentry(char *fname) {
+int deletefentry(char *fname)
+{
     if(!getfentrybyfilename(fname))
         return 0;
     int restrecord = currentferecord+1; 
     if(currentferecord!=tagdbheader.filecount) /* file is not last entry */
-         tagdb_shiftdown(FILERECORD2OFFSET(currentferecord),FILERECORD2OFFSET(restrecord),(tagdbheader.filecount-restrecord)*FILEENTRY_SIZE);
+         tagdb_shiftdown(FILERECORD2OFFSET(currentferecord),
+                         FILERECORD2OFFSET(restrecord),
+                         (tagdbheader.filecount-restrecord)*FILEENTRY_SIZE);
     ftruncate(tagdb_fd,lseek(tagdb_fd,0,SEEK_END)-FILEENTRY_SIZE);
     tagdbheader.filecount--;
     update_fentryoffsets(restrecord,tagdbheader.filecount);
@@ -191,7 +200,8 @@ int deletefentry(char *fname) {
     return 1;
 }
 
-void update_fentryoffsets(int start, int end) {
+void update_fentryoffsets(int start, int end)
+{
     int i;
     for(i=start;i<end;i++) {
         getfentrybyrecord(i);
@@ -206,12 +216,14 @@ void update_fentryoffsets(int start, int end) {
              }
          }
          if(fe.rundbentry!=-1) {
-              splash(HZ*2,true, "o.o.. found a rundbentry? o.o; didn't update it, update the code o.o;");
+              splash(HZ*2,true, "o.o.. found a rundbentry? o.o; didn't update "
+                     "it, update the code o.o;");
          }
     }
 }
 
-int tagdb_shiftdown(int targetoffset, int startingoffset, int bytes) {
+int tagdb_shiftdown(int targetoffset, int startingoffset, int bytes)
+{
     int amount;
     if(targetoffset>=startingoffset) {
         splash(HZ*2,true,"Woah. no beeping way. (tagdb_shiftdown)");
@@ -225,7 +237,8 @@ int tagdb_shiftdown(int targetoffset, int startingoffset, int bytes) {
         written=write(tagdb_fd,sbuf,amount);
         targetoffset+=written;
         if(amount!=written) {
-            splash(HZ*2,true,"Something went very wrong. expect database corruption. (tagdb_shiftdown)");
+            splash(HZ*2,true,"Something went very wrong. expect database "
+                   "corruption. (tagdb_shiftdown)");
             return 0;
         }
         lseek(tagdb_fd,startingoffset,SEEK_SET);
@@ -234,7 +247,8 @@ int tagdb_shiftdown(int targetoffset, int startingoffset, int bytes) {
     return 1;
 }
 
-int tagdb_shiftup(int targetoffset, int startingoffset, int bytes) {
+int tagdb_shiftup(int targetoffset, int startingoffset, int bytes)
+{
     int amount,amount2;
     int readpos,writepos,filelen;
     if(targetoffset<=startingoffset) {
@@ -250,13 +264,15 @@ int tagdb_shiftup(int targetoffset, int startingoffset, int bytes) {
         lseek(tagdb_fd,readpos,SEEK_SET);
         amount2=read(tagdb_fd,sbuf,amount);
         if(amount2!=amount) {
-             splash(HZ*2,true,"Something went very wrong. expect database corruption. (tagdb_shiftup)");
+             splash(HZ*2,true,"Something went very wrong. expect database "
+                    "corruption. (tagdb_shiftup)");
              return 0;
         }
         lseek(tagdb_fd,writepos,SEEK_SET);
         amount=write(tagdb_fd,sbuf,amount2);
         if(amount2!=amount) {
-            splash(HZ*2,true,"Something went very wrong. expect database corruption. (tagdb_shiftup)");
+            splash(HZ*2,true,"Something went very wrong. expect database "
+                   "corruption. (tagdb_shiftup)");
             return 0;
         }
         bytes-=amount;
@@ -280,7 +296,8 @@ static struct rundb_entry rundbentry;
 
 /*** RuntimeDatabase code ***/
 
-void rundb_track_changed(struct track_info *ti) {
+void rundb_track_changed(struct track_info *ti)
+{
     increaseplaycount();
     logf("rundb new track: %s", ti->id3.path);
     loadruntimeinfo(ti->id3.path);
@@ -327,7 +344,8 @@ int rundb_init(void)
 #endif
     if ( (rundbheader.version&0xFF) != RUNDB_VERSION)
     {
-        splash(HZ,true,"Unsupported runtime database version %d!", rundbheader.version&0xFF);
+        splash(HZ,true,"Unsupported runtime database version %d!",
+               rundbheader.version&0xFF);
         return -1;
     }
 
@@ -339,7 +357,8 @@ int rundb_init(void)
 #endif
 }
 
-void writerundbheader(void) {
+void writerundbheader(void)
+{
   lseek(rundb_fd,0,SEEK_SET);
   write(rundb_fd, &rundbheader, 8);
   fsync(rundb_fd);
@@ -361,7 +380,8 @@ void getrundbentrybyoffset(int offset) {
 #endif
 }
 
-int getrundbentrybyhash(int hash) {
+int getrundbentrybyhash(int hash)
+{
     int min=0;
     for(min=0;min<rundbheader.entrycount;min++) {
         getrundbentrybyrecord(min);
@@ -372,15 +392,17 @@ int getrundbentrybyhash(int hash) {
     return 0;
 }
 
-void writerundbentry(void) {
-    if(rundbentry.hash==0) // 0 = invalid rundb info.
+void writerundbentry(void)
+{
+    if(rundbentry.hash==0) /* 0 = invalid rundb info. */
        return;
     lseek(rundb_fd,currentreoffset,SEEK_SET);
     write(rundb_fd,&rundbentry,20);
     fsync(rundb_fd);
 }
 
-void loadruntimeinfo(char *filename) {
+void loadruntimeinfo(char *filename)
+{
     memset(&rundbentry,0,sizeof(struct rundb_entry));
     valid_file=0;
     if(!getfentrybyfilename(filename)) 
@@ -390,16 +412,18 @@ void loadruntimeinfo(char *filename) {
         logf("load rundbentry: 0x%x",fe.rundbentry);
         getrundbentrybyoffset(fe.rundbentry);
         if(fe.hash!=rundbentry.hash) {
-            logf("Rundb: Hash mismatch. trying to repair entry.",fe.hash,rundbentry.hash);
+            logf("Rundb: Hash mismatch. trying to repair entry.",
+                 fe.hash,rundbentry.hash);
             addrundbentry();
         }
     }
-    else  // add new rundb entry.
+    else  /* add new rundb entry. */
         addrundbentry();
 }
 
-void addrundbentry() {
-    // first search for an entry with an equal hash.
+void addrundbentry()
+{
+    /* first search for an entry with an equal hash. */
     if(getrundbentrybyhash(fe.hash)) {
         logf("Found existing rundb entry: 0x%x",currentreoffset);
         fe.rundbentry=currentreoffset;
@@ -417,15 +441,17 @@ void addrundbentry() {
     rundbsize=lseek(rundb_fd,0,SEEK_END);
 }
 
-void increaseplaycount(void) {
-    if(rundbentry.hash==0) // 0 = invalid rundb info.
+void increaseplaycount(void)
+{
+    if(rundbentry.hash==0) /* 0 = invalid rundb info. */
        return;
     rundbentry.playcount++;
     writerundbentry();
 }
 
-void setrating(int rating) {
-    if(rundbentry.hash==0) // 0 = invalid rundb info.
+void setrating(int rating)
+{
+    if(rundbentry.hash==0) /* 0 = invalid rundb info. */
        return;
     rundbentry.rating=rating;
     writerundbentry();
