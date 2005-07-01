@@ -512,7 +512,7 @@ appsdir='\$(ROOTDIR)/apps'
     target="-DIRIVER_H300"
     memory=32 # always
     coldfirecc
-    tool="$rootdir/tools/scramble -add=h120"
+    tool="$rootdir/tools/scramble -add=h300"
     output="rockbox.iriver"
     appextra="recorder"
     archosrom=""
