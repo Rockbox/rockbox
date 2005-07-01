@@ -30,13 +30,15 @@ struct entry {
         loadedalbumname,
         loadedartistname;
     char *filename;
-    long hash;
-    long songentry;
+    long hash,rundbhash;
+    long songentry,rundbfe;
     long rundbentry;
     short year;
     short bitrate;
-    long rating;
+    short rating;
     long playcount;
+    long lastplayed;
+    short voladj;
     char *title;
     char *genre;
     long artistoffset;

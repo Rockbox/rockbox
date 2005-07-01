@@ -54,13 +54,12 @@
 #define INTVALUE_GENRE        17
 #define INTVALUE_FILENAME     18
 
-/* static char *spelling[] = { "not", "and", "or",">",">=","<", "<=","==","!=",
-            "contains","(",")" }; */
+#define SPELLING_LENGTH 100
 
 struct token {
-      unsigned char kind;
-      char spelling[255]; // 255 should make it aligned again..
-      long intvalue;
+    char kind;
+    char spelling[SPELLING_LENGTH + 3];
+    long intvalue;
 };
 
 char *getstring(struct token *token);

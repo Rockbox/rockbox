@@ -88,7 +88,7 @@
 
 struct token {
     char kind;
-    char spelling[SPELLING_LENGTH + 1];
+    char spelling[SPELLING_LENGTH + 3];
     long intvalue;
 };
 char *tokentypetostring(int tokentype);

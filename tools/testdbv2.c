@@ -128,12 +128,13 @@ void showartist(int offset) {
 void showrundb(int offset) {
     fseek(fp2,offset,SEEK_SET);
     fread(&RundbEntry,sizeof(struct RundbEntry),1,fp2);
-   RundbEntry.hash=BE32(RundbEntry.hash);
-   RundbEntry.playcount=BE32(RundbEntry.playcount);
-   RundbEntry.lastplayed=BE32(RundbEntry.lastplayed);
-   RundbEntry.rating=BE16(RundbEntry.rating);
-   RundbEntry.voladj=BE16(RundbEntry.voladj);
-    printf("Offset: 0x%x\nHash: 0x%x\nRating: %d\nVoladj: 0x%x\n",offset,RundbEntry.hash,RundbEntry.rating,RundbEntry.voladj);
+    RundbEntry.file=BE32(RundbEntry.file);
+    RundbEntry.hash=BE32(RundbEntry.hash);
+    RundbEntry.playcount=BE32(RundbEntry.playcount);
+    RundbEntry.lastplayed=BE32(RundbEntry.lastplayed);
+    RundbEntry.rating=BE16(RundbEntry.rating);
+    RundbEntry.voladj=BE16(RundbEntry.voladj);
+    printf("Offset: 0x%x\nFileEntry: 0x%x\nHash: 0x%x\nRating: %d\nVoladj: 0x%x\n",offset,RundbEntry.file,RundbEntry.hash,RundbEntry.rating,RundbEntry.voladj);
     printf("Playcount: 0x%x\nLastplayed: %d\n",RundbEntry.playcount,RundbEntry.lastplayed);
 }
 

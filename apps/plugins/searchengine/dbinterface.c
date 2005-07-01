@@ -29,6 +29,7 @@
 #define FILEENTRY_SIZE    (rb->tagdbheader->filelen+12)
 #define ALBUMENTRY_SIZE   (rb->tagdbheader->albumlen+4+rb->tagdbheader->songarraylen*4)
 #define ARTISTENTRY_SIZE  (rb->tagdbheader->artistlen+rb->tagdbheader->albumarraylen*4)
+#define RUNDBENTRY_SIZE   20
 
 #define FILERECORD2OFFSET(_x_) (rb->tagdbheader->filestart + _x_ * FILEENTRY_SIZE)
 
@@ -45,7 +46,7 @@ int database_init() {
     // zero all entries.
     for(i=0;i<sizeof(struct entry)*rb->tagdbheader->filecount;i++) 
         *(p++)=0;
-    if(*rb->tagdb_initialized!=1) {
+    if(!*rb->tagdb_initialized) {
         if(!rb->tagdb_init()) {
             // failed loading db
             return -1;
@@ -110,8 +111,18 @@ void loadsongdata() {
 }
 
 void loadrundbdata() {
-    // we don't do this yet.
     currententry->loadedrundbdata=1;
+    if(!*rb->rundb_initialized) 
+        return;
+    if(currententry->rundbentry==-1)
+        return;
+    rb->lseek(*rb->rundb_fd,currententry->rundbentry,SEEK_SET);
+    currententry->rundbfe=readlong(*rb->rundb_fd);
+    currententry->rundbhash=readlong(*rb->rundb_fd);
+    currententry->rating=readshort(*rb->rundb_fd);
+    currententry->voladj=readshort(*rb->rundb_fd);
+    currententry->playcount=readlong(*rb->rundb_fd);
+    currententry->lastplayed=readlong(*rb->rundb_fd);
 }
 
 void loadartistname() {

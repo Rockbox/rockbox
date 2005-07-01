@@ -329,6 +329,9 @@ static const struct plugin_api rockbox_api = {
 #ifdef ROCKBOX_HAS_LOGF
     logf,
 #endif
+    &rundbheader,
+    &rundb_fd,
+    &rundb_initialized,            
     strncmp,
 };
 

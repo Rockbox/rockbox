@@ -74,6 +74,9 @@ void tagdb_shutdown(void);
 
 #define TAGDB_VERSION 3
 
+extern int rundb_fd, rundb_initialized;
+extern struct rundb_header rundbheader;
+
 struct rundb_header {
         int version;
         int entrycount;
@@ -92,4 +95,9 @@ extern struct rundb_header rundbheader;
 
 #define RUNDB_VERSION 1
 
+void tagdb_shutdown(void);
+void addrundbentry(void);
+void loadruntimeinfo(char *filename);
+void increaseplaycount(void);
+void setrating(int rating);
 #endif

@@ -288,6 +288,7 @@ void init(void)
     pcm_init_recording();
 #endif
     talk_init();
+    rundb_init();
 
 #ifdef AUTOROCK
     {

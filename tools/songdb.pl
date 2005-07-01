@@ -9,7 +9,7 @@
 
 use vorbiscomm;
 
-my $db = "rockbox.id3db";
+my $db = "rockbox.tagdb";
 my $dir;
 my $strip;
 my $add;
@@ -626,7 +626,7 @@ if ($db) {
         my $str = $f."\x00" x ($maxfilelen- length($f));
 	my $id3 = $entries{$f}; 
         print DB $str;
-	dumpint(0);
+	    dumpint(0); # TODO: add hashing; 0 for now.
         dumpint($id3->{'songoffset'});
         dumpint(-1);
     }
