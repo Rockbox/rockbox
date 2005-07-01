@@ -731,7 +731,6 @@ static void transfer_end(unsigned char** ppbuf, int* psize)
 
                 queue_post(&mpeg_queue, MPEG_TRACK_CHANGE, 0);
                 playing = false;
-                is_playing = false;
             }
             *psize = 0; /* no more transfer */
         }
@@ -869,8 +868,9 @@ static void update_playlist(void)
     }
     else
     {
-        /* End of playlist */
-        playlist_next(playlist_amount());
+        /* End of playlist? */
+        if (playlist_next(playlist_amount()) < 0)
+            is_playing = false;
     }
 }
 

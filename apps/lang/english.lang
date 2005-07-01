@@ -3142,3 +3142,9 @@ desc: in playback settings menu. enable/disable the optical out
 eng: "Optical output"
 voice:
 new:
+
+id: LANG_NEXT_FOLDER
+desc: in settings_menu.  Should we move to next folder when current one ends
+eng: "Move to Next Folder"
+voice:
+new:

@@ -321,6 +321,7 @@ struct user_settings
                                then according to timeout_values[] */
 #endif
     
+    bool next_folder; /* move to next folder */
 };
 
 enum optiontype { INT, BOOL };

@@ -404,7 +404,9 @@ static const struct bit_entry hd_bits[] =
 #ifdef HAVE_SPDIF_POWER
     {1, S_O(spdif_enable), false, "spdif enable", off_on},
 #endif
-    
+
+    {1, S_O(next_folder), false, "move to next folder", off_on },
+
     /* new stuff to be added at the end */
             
     /* Sum of all bit sizes must not grow beyond 0xB8*8 = 1472 */

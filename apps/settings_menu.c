@@ -1119,6 +1119,11 @@ static bool crossfade(void)
 }
 #endif
 
+static bool next_folder(void)
+{
+    return set_bool( str(LANG_NEXT_FOLDER), &global_settings.next_folder );
+}
+
 static bool playback_settings_menu(void)
 {
     int m;
@@ -1139,6 +1144,7 @@ static bool playback_settings_menu(void)
         { ID2P(LANG_SPDIF_ENABLE), spdif },
 #endif
         { ID2P(LANG_ID3_ORDER), id3_order },
+        { ID2P(LANG_NEXT_FOLDER), next_folder },
     };
 
     bool old_shuffle = global_settings.playlist_shuffle;

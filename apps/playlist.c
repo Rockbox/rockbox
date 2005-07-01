@@ -137,11 +137,11 @@ static void update_playlist_filename(struct playlist_info* playlist,
 static int add_indices_to_playlist(struct playlist_info* playlist,
                                    char* buffer, int buflen);
 static int add_track_to_playlist(struct playlist_info* playlist,
-                                 const char *filename, int position, 
+                                 const char *filename, int position,
                                  bool queue, int seek_pos);
 static int add_directory_to_playlist(struct playlist_info* playlist,
-                                     const char *dirname, int *position, bool queue,
-                                     int *count, bool recurse);
+                                     const char *dirname, int *position,
+                                     bool queue, int *count, bool recurse);
 static int remove_track_from_playlist(struct playlist_info* playlist,
                                       int position, bool write);
 static int randomise_playlist(struct playlist_info* playlist,
@@ -156,6 +156,8 @@ static void find_and_set_playlist_index(struct playlist_info* playlist,
 static int compare(const void* p1, const void* p2);
 static int get_filename(struct playlist_info* playlist, int seek,
                         bool control_file, char *buf, int buf_length);
+static int get_next_directory(char *dir);
+static int check_subdir_for_music(char *dir, char *subdir);
 static int format_track_path(char *dest, char *src, int buf_length, int max,
                              char *dir);
 static void display_playlist_count(int count, const char *fmt);
@@ -251,7 +253,8 @@ static void create_control(struct playlist_info* playlist)
     {
         if (check_rockboxdir())
         {
-            splash(HZ*2, true, "%s (%d)", str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR),
+            splash(HZ*2, true, "%s (%d)",
+                str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR),
                 playlist->control_fd);
         }
         playlist->control_created = false;
@@ -316,8 +319,7 @@ static void update_playlist_filename(struct playlist_info* playlist,
     playlist->dirlen = dirlen;
     
     snprintf(playlist->filename, sizeof(playlist->filename),
-        "%s%s%s", 
-        dir, sep, file);
+        "%s%s%s", dir, sep, file);
 }
 
 /*
@@ -353,7 +355,7 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
         talk_buffer_steal(); /* we use the mp3 buffer, need to tell */
 
         buffer = audiobuf;
-        buflen = (audiobufend - audiobuf);        
+        buflen = (audiobufend - audiobuf);
     }
     
     store_index = true;
@@ -373,8 +375,8 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
             if((*p == '\n') || (*p == '\r'))
             {
                 store_index = true;
-            } 
-            else if(store_index) 
+            }
+            else if(store_index)
             {
                 store_index = false;
 
@@ -398,7 +400,7 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
 }
 
 /*
- * Add track to playlist at specified position.  There are three special
+ * Add track to playlist at specified position.  There are five special
  * positions that can be specified:
  *     PLAYLIST_PREPEND         - Add track at beginning of playlist
  *     PLAYLIST_INSERT          - Add track after current song.  NOTE: If
@@ -552,8 +554,8 @@ static int add_track_to_playlist(struct playlist_info* playlist,
  * Insert directory into playlist.  May be called recursively.
  */
 static int add_directory_to_playlist(struct playlist_info* playlist,
-                                     const char *dirname, int *position, bool queue,
-                                     int *count, bool recurse)
+                                     const char *dirname, int *position,
+                                     bool queue, int *count, bool recurse)
 {
     char buf[MAX_PATH+1];
     char *count_str;
@@ -801,8 +803,8 @@ static int sort_playlist(struct playlist_info* playlist, bool start_current,
     unsigned int current = playlist->indices[playlist->index];
 
     if (playlist->amount > 0)
-        qsort(playlist->indices, playlist->amount, sizeof(playlist->indices[0]),
-            compare);
+        qsort(playlist->indices, playlist->amount,
+            sizeof(playlist->indices[0]), compare);
 
     if (start_current)
         find_and_set_playlist_index(playlist, current);
@@ -1018,6 +1020,166 @@ static int get_filename(struct playlist_info* playlist, int seek,
 }
 
 /*
+ * search through all the directories (starting with the current) to find
+ * one that has tracks to play
+ */
+static int get_next_directory(char *dir)
+{
+    struct playlist_info* playlist = &current_playlist;
+    int result = -1;
+    int dirfilter = global_settings.dirfilter;
+    char *start_dir = NULL;
+    bool exit = false;
+    struct tree_context* tc = tree_get_context();
+
+    /* start with current directory */
+    strncpy(dir, playlist->filename, playlist->dirlen-1);
+    dir[playlist->dirlen-1] = '\0';
+
+    /* use the tree browser dircache to load files */
+    global_settings.dirfilter = SHOW_ALL;
+
+    while (!exit)
+    {
+        struct entry *files;
+        int num_files = 0;
+        int i;
+
+        if (ft_load(tc, (dir[0]=='\0')?"/":dir) < 0)
+        {
+            splash(HZ*2, true, str(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));
+            exit = true;
+            result = -1;
+            break;
+        }
+        
+        files = (struct entry*) tc->dircache;
+        num_files = tc->filesindir;
+
+        for (i=0; i<num_files; i++)
+        {
+            /* user abort */
+            if (button_get(false) == SETTINGS_CANCEL)
+            {
+                result = -1;
+                exit = true;
+                break;
+            }
+            
+            if (files[i].attr & ATTR_DIRECTORY)
+            {
+                if (!start_dir)
+                {
+                    result = check_subdir_for_music(dir, files[i].name);
+                    if (result != -1)
+                    {
+                        exit = true;
+                        break;
+                    }
+                }
+                else if (!strcmp(start_dir, files[i].name))
+                    start_dir = NULL;
+            }
+        }
+
+        if (!exit)
+        {
+            /* move down to parent directory.  current directory name is
+               stored as the starting point for the search in parent */
+            start_dir = strrchr(dir, '/');
+            if (start_dir)
+            {
+                *start_dir = '\0';
+                start_dir++;
+            }
+            else
+                break;
+        }
+    }
+
+    /* we've overwritten the dircache so tree browser will need to be
+       reloaded */
+    reload_directory();
+
+    /* restore dirfilter */
+    global_settings.dirfilter = dirfilter;
+
+    return result;
+}
+
+/*
+ * Checks if there are any music files in the dir or any of its
+ * subdirectories.  May be called recursively.
+ */
+static int check_subdir_for_music(char *dir, char *subdir)
+{
+    int result = -1;
+    int dirlen = strlen(dir);
+    int num_files = 0;
+    int i;
+    struct entry *files;
+    bool has_music = false;
+    bool has_subdir = false;
+    struct tree_context* tc = tree_get_context();
+
+    snprintf(dir+dirlen, MAX_PATH-dirlen, "/%s", subdir);
+    
+    if (ft_load(tc, dir) < 0)
+    {
+        splash(HZ*2, true, str(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));
+        return -2;
+    }
+    
+    files = (struct entry*) tc->dircache;
+    num_files = tc->filesindir;
+    
+    for (i=0; i<num_files; i++)
+    {
+        if (files[i].attr & ATTR_DIRECTORY)
+            has_subdir = true;
+        else if ((files[i].attr & TREE_ATTR_MASK) == TREE_ATTR_MPA)
+        {
+            has_music = true;
+            break;
+        }
+    }
+
+    if (has_music)
+        return 0;
+
+    if (has_subdir)
+    {
+        for (i=0; i<num_files; i++)
+        {
+            if (button_get(false) == SETTINGS_CANCEL)
+            {
+                result = -2;
+                break;
+            }
+
+            if (files[i].attr & ATTR_DIRECTORY)
+            {
+                result = check_subdir_for_music(dir, files[i].name);
+                if (!result)
+                    break;
+            }
+        }
+    }
+
+    if (result < 0)
+    {
+        dir[dirlen] = '\0';
+
+        /* we now need to reload our current directory */
+        if(ft_load(tc, dir) < 0)
+            splash(HZ*2, true,
+                str(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));        
+    }
+
+    return result;
+}
+
+/*
  * Returns absolute path of track
  */
 static int format_track_path(char *dest, char *src, int buf_length, int max,
@@ -1034,7 +1196,7 @@ static int format_track_path(char *dest, char *src, int buf_length, int max,
         i++;
 
     /* Now work back killing white space */
-    while((src[i-1] == ' ') || 
+    while((src[i-1] == ' ') ||
           (src[i-1] == '\t'))
         i--;
 
@@ -1189,7 +1351,8 @@ void playlist_init(void)
     playlist->fd = -1;
     playlist->control_fd = -1;
     playlist->max_playlist_size = global_settings.max_files_in_playlist;
-    playlist->indices = buffer_alloc(playlist->max_playlist_size * sizeof(int));
+    playlist->indices = buffer_alloc(
+        playlist->max_playlist_size * sizeof(int));
     playlist->buffer_size =
         AVERAGE_FILENAME_LENGTH * global_settings.max_files_in_dir;
     playlist->buffer = buffer_alloc(playlist->buffer_size);
@@ -1451,7 +1614,7 @@ int playlist_resume(void)
 
                 /* to ignore any extra newlines */
                 current_command = resume_comment;
-            } 
+            }
             else if(newline)
             {
                 newline = false;
@@ -1599,7 +1762,7 @@ int playlist_resume(void)
     return 0;
 }
 
-/* 
+/*
  * Add track to in_ram playlist.  Used when playing directories.
  */
 int playlist_add(const char *filename)
@@ -1607,7 +1770,7 @@ int playlist_add(const char *filename)
     struct playlist_info* playlist = &current_playlist;
     int len = strlen(filename);
     
-    if((len+1 > playlist->buffer_size - playlist->buffer_end_pos) || 
+    if((len+1 > playlist->buffer_size - playlist->buffer_end_pos) ||
        (playlist->amount >= playlist->max_playlist_size))
     {
         display_buffer_full();
@@ -1634,7 +1797,7 @@ int playlist_shuffle(int random_seed, int start_index)
     if (start_index >= 0 && global_settings.play_selected)
     {
         /* store the seek position before the shuffle */
-        seek_pos = playlist->indices[start_index];        
+        seek_pos = playlist->indices[start_index];
         playlist->index = global_settings.resume_first_index =
             playlist->first_index = start_index;
         start_current = true;
@@ -1669,8 +1832,10 @@ bool playlist_check(int steps)
     int index = get_next_index(playlist, steps, -1);
 
     if (index < 0 && steps >= 0 &&
-        global_settings.repeat_mode == REPEAT_SHUFFLE)
-        /* shuffle repeat is the same as repeat all for check purposes */
+        (global_settings.repeat_mode == REPEAT_SHUFFLE ||
+         global_settings.next_folder))
+        /* shuffle repeat and move to next folder are the same as repeat all
+           for check purposes */
         index = get_next_index(playlist, steps, REPEAT_ALL);
 
     return (index >= 0);
@@ -1767,6 +1932,25 @@ int playlist_next(int steps)
             sort_playlist(playlist, false, false);
             randomise_playlist(playlist, current_tick, false, true);
             playlist_start(0, 0);
+            index = 0;
+        }
+        else if (global_settings.next_folder && playlist->in_ram)
+        {
+            char dir[MAX_PATH+1];
+
+            if (!get_next_directory(dir))
+            {
+                /* start playing new directory */
+                if (playlist_create(dir, NULL) != -1)
+                {
+                    ft_build_playlist(tree_get_context(), 0);
+                    if (global_settings.playlist_shuffle)
+                        playlist_shuffle(current_tick, -1);
+                    
+                    playlist_start(0, 0);
+                    index = 0;
+                }
+            }
         }
 
         return index;
@@ -1969,8 +2153,8 @@ void playlist_close(struct playlist_info* playlist)
  * Insert track into playlist at specified position (or one of the special
  * positions).  Returns position where track was inserted or -1 if error.
  */
-int playlist_insert_track(struct playlist_info* playlist, const char *filename,
-                          int position, bool queue)
+int playlist_insert_track(struct playlist_info* playlist,
+                          const char *filename, int position, bool queue)
 {
     int result;
     
@@ -2120,7 +2304,7 @@ int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
 
                 if (count == PLAYLIST_DISPLAY_COUNT)
                     audio_flush_and_reload_tracks();
-            }            
+            }
         }
 
         /* let the other threads work */
@@ -2139,7 +2323,7 @@ int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
     return result;
 }
 
-/* 
+/*
  * Delete track at specified index.  If index is PLAYLIST_DELETE_CURRENT then
  * we want to delete the current playing track.
  */
@@ -2372,7 +2556,7 @@ char *playlist_get_name(const struct playlist_info* playlist, char *buf,
     return buf;
 }
 
-/* Fills info structure with information about track at specified index. 
+/* Fills info structure with information about track at specified index.
    Returns 0 on success and -1 on failure */
 int playlist_get_track_info(struct playlist_info* playlist, int index,
                             struct playlist_track_info* info)
