@@ -62,6 +62,7 @@ struct track_info {
 
 /* Functions */
 void audio_set_track_changed_event(void (*handler)(struct track_info *ti));
+void audio_invalidate_tracks(void);
 
 #endif
 

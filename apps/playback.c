@@ -117,6 +117,8 @@ __attribute__ ((section(".idata")))
 ;
 static const char codec_thread_name[] = "codec";
 
+static struct mutex mutex_bufferfill;
+
 /* Is file buffer currently being refilled? */
 static volatile bool filling;
 
@@ -436,27 +438,50 @@ void* codec_request_buffer_callback(long *realsize, long reqsize)
     return (char *)&codecbuf[buf_ridx];
 }
 
+static bool rebuffer_and_seek(int newpos)
+{
+    int fd;
+    
+    logf("Re-buffering song");
+    mutex_lock(&mutex_bufferfill);
+
+    /* (Re-)open current track's file handle. */
+    fd = open(playlist_peek(0), O_RDONLY);
+    if (fd < 0) {
+        logf("Open failed!");
+        mutex_unlock(&mutex_bufferfill);
+        return false;
+    }
+    if (current_fd >= 0)
+        close(current_fd);
+    current_fd = fd;
+        
+    /* Clear codec buffer. */
+    audio_invalidate_tracks();
+    codecbufused = 0;
+    buf_ridx = buf_widx = 0;
+    cur_ti->filerem = cur_ti->filesize - newpos;
+    cur_ti->filepos = newpos;
+    cur_ti->start_pos = newpos;
+    ci.curpos = newpos;
+    cur_ti->available = 0;
+    lseek(current_fd, newpos, SEEK_SET);
+    pcm_flush_audio();
+        
+    mutex_unlock(&mutex_bufferfill);
+
+    return true;
+}
+
 void codec_advance_buffer_callback(long amount)
 {
-    if ((int)amount > cur_ti->available + cur_ti->filerem)
+    if (amount > cur_ti->available + cur_ti->filerem)
         amount = cur_ti->available + cur_ti->filerem;
     
-    try_again:
-    if ((int)amount > cur_ti->available) {
-        if (filling) {
-            while (filling)
-                yield();
-            goto try_again;
-        }
-        codecbufused = 0;
-        buf_ridx = 0;
-        buf_widx = 0;
-        cur_ti->start_pos = ci.curpos + amount;
-        amount -= cur_ti->available;
-        ci.curpos += cur_ti->available;
-        cur_ti->available = 0;
-        while ((int)amount > cur_ti->available && !ci.stop_codec)
-            yield();
+    if (amount > cur_ti->available) {
+        if (!rebuffer_and_seek(ci.curpos + amount))
+            ci.stop_codec = true;
+        return ;
     }
     
     buf_ridx += amount;
@@ -495,8 +520,9 @@ bool codec_seek_buffer_callback(off_t newpos)
     
     if (newpos >= cur_ti->filesize)
         newpos = cur_ti->filesize - 1;
-    
+     
     difference = newpos - ci.curpos;
+    /* Seeking forward */
     if (difference >= 0) {
         logf("seek: +%d", difference);
         codec_advance_buffer_callback(difference);
@@ -504,17 +530,17 @@ bool codec_seek_buffer_callback(off_t newpos)
             pcm_play_stop();
         return true;
     }
-    
+
+    /* Seeking backward */
     difference = -difference;
     if (ci.curpos - difference < 0)
         difference = ci.curpos;
     
-    if (ci.curpos - difference < cur_ti->start_pos) {
-        logf("Seek failed (reload song)");
-        /* We need to reload the song. FIX THIS! */
-        return false;
-    }
-    
+    /* We need to reload the song. */
+    if (newpos < cur_ti->start_pos)
+        return rebuffer_and_seek(newpos);
+
+    /* Seeking inside buffer space. */
     logf("seek: -%d", difference);
     codecbufused += difference;
     cur_ti->available += difference;
@@ -582,10 +608,14 @@ void audio_fill_file_buffer(void)
 {
     long i, size;
     int rc;
-    
+
     if (current_fd < 0)
         return ;
-        
+
+    /* Throw away buffered codec. */
+    if (tracks[track_widx].start_pos != 0)
+        tracks[track_widx].codecsize = 0;
+    
     i = 0;
     size = MIN(tracks[track_widx].filerem, AUDIO_FILL_CYCLE);
     while (i < size) {
@@ -615,10 +645,6 @@ void audio_fill_file_buffer(void)
     tracks[track_widx].filepos += i;
     /*logf("Filled:%d/%d", tracks[track_widx].available,
                        tracks[track_widx].filerem);*/
-    if (tracks[track_widx].filerem == 0) {
-        close(current_fd);
-        current_fd = -1;
-    }
 }
 
 bool loadcodec(const char *trackname, bool start_play)
@@ -745,8 +771,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     int rc, i;
     int copy_n;
 
-    if (track_count >= MAX_TRACK || tracks[track_widx].filesize != 0
-        || current_fd >= 0)
+    if (track_count >= MAX_TRACK || tracks[track_widx].filesize != 0)
         return false;
     
     logf("Buffering track:%d/%d", track_widx, track_ridx);
@@ -1026,6 +1051,7 @@ void audio_update_trackinfo(void)
     ci.id3 = (struct mp3entry *)&cur_ti->id3;
     ci.mp3data = (struct mp3info *)&cur_ti->mp3data;
     ci.curpos = 0;
+    cur_ti->start_pos = 0;
     ci.taginfo_ready = (bool *)&cur_ti->taginfo_ready;
     audiobuffer_add_event(codec_track_changed);
 }
@@ -1132,10 +1158,6 @@ void audio_invalidate_tracks(void)
     
     track_count = 1;
     last_peek_offset = 1;
-    if (cur_ti->filerem == 0 && current_fd >= 0) {
-        close(current_fd);
-        current_fd = -1;
-    }
     track_widx = track_ridx;
     audio_clear_track_entries();
     codecbufused = cur_ti->available;
@@ -1150,7 +1172,11 @@ void audio_thread(void)
     
     while (1) {
         yield_codecs();
+
+        mutex_lock(&mutex_bufferfill);
         audio_check_buffer();
+        mutex_unlock(&mutex_bufferfill);
+        
         queue_wait_w_tmo(&audio_queue, &ev, 0);
         switch (ev.id) {
             case AUDIO_PLAY:
@@ -1587,7 +1613,8 @@ void audio_init(void)
     ci.seek_buffer = codec_seek_buffer_callback;
     ci.set_elapsed = codec_set_elapsed_callback;
     ci.configure = codec_configure_callback;
-    
+
+    mutex_init(&mutex_bufferfill);
     queue_init(&audio_queue);
     queue_init(&codec_queue);
     
