@@ -172,7 +172,7 @@ int getfentrybyfilename(char *fname)
     }
     return 0;
 }
-
+#if 0
 int getfentrybyhash(int hash)
 {
     int min=0;
@@ -284,6 +284,7 @@ int tagdb_shiftup(int targetoffset, int startingoffset, int bytes)
         return 0;
     }
 }
+#endif
 
 /*** end TagDatabase code ***/
 
