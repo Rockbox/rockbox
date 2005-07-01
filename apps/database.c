@@ -288,14 +288,13 @@ void rundb_track_changed(struct track_info *ti) {
 
 int rundb_init(void)
 {
+#if CONFIG_HWCODEC != MASNONE
+    return -1;
+#else
     unsigned char* ptr = (char*)&rundbheader.version;
 #ifdef ROCKBOX_LITTLE_ENDIAN
     int i, *p;
 #endif
-
-#if CONFIG_HWCODEC != MASNONE
-    return -1;
-#else
     if(!tagdb_initialized) /* forget it.*/
         return -1;
     
