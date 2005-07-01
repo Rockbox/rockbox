@@ -3134,17 +3134,17 @@ new:
 id: LANG_INSERT_SHUFFLED
 desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
 eng: "Insert shuffled"
-voice:
+voice: "Insert shuffled"
 new:
 
 id: LANG_SPDIF_ENABLE
 desc: in playback settings menu. enable/disable the optical out
 eng: "Optical output"
-voice:
+voice: "Optical output"
 new:
 
 id: LANG_NEXT_FOLDER
 desc: in settings_menu.  Should we move to next folder when current one ends
 eng: "Move to Next Folder"
-voice:
+voice: "Move to Next Folder"
 new:
