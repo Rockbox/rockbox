@@ -382,7 +382,7 @@ id: LANG_RESUME_ASK
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
@@ -838,7 +838,7 @@ id: LANG_RESUME_SETTING_ASK_ONCE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_BATTERY_DISPLAY
 desc: Battery type title
@@ -3079,7 +3079,7 @@ new: "Trigger aktiv"
 id: LANG_LCD_REMOTE_MENU
 desc: in the display sub menu
 eng: "Remote-LCD Settings"
-voice:
+voice: 
 new: "Remote-LCD Einstellungen"
 
 id: LANG_DISK_NAME_INTERNAL
@@ -3118,14 +3118,26 @@ eng: "Reshuffle"
 voice: "Neu mischen"
 new: "Neu mischen"
 
-id: LANG_INSERT_SHUFFLED
-desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
-eng: "Insert shuffled"
-voice: ""
-new: "Zufällig einfügen"
-
 id: LANG_NOTHING_TO_RESUME
 desc: Error message displayed when resume button pressed but no playlist
 eng: "Nothing to resume"
 voice: ""
 new: "Nichts fortzusetzen"
+
+id: LANG_INSERT_SHUFFLED
+desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
+eng: "Insert shuffled"
+voice: "Zufällig einfügen"
+new: "Zufällig einfügen"
+
+id: LANG_SPDIF_ENABLE
+desc: in playback settings menu. enable/disable the optical out
+eng: "Optical output"
+voice: "Optischer Ausgang"
+new: "Optischer Ausgang"
+
+id: LANG_NEXT_FOLDER
+desc: in settings_menu.  Should we move to next folder when current one ends
+eng: "Move to Next Folder"
+voice: "In nächstes Verzeichnis wechseln"
+new: "In nächstes Verzeichnis wechseln"
