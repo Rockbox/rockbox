@@ -574,7 +574,7 @@ static int button_read(void)
     return retval;
 }
 
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 bool button_hold(void)
 {
     return (GPIO1_READ & 0x00000002)?true:false;
