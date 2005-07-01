@@ -470,6 +470,12 @@ static bool rebuffer_and_seek(int newpos)
         
     mutex_unlock(&mutex_bufferfill);
 
+    while (cur_ti->available == 0 && cur_ti->filerem > 0) {
+        yield();
+        if (ci.stop_codec)
+            return false;
+    }
+    
     return true;
 }
 
@@ -1415,10 +1421,21 @@ void audio_prev(void)
 
 void audio_ff_rewind(int newpos)
 {
+    int counter;
+    
     logf("rewind: %d", newpos);
-    /* Does not work yet. */
-    if (playing)
+    /* Keep playback paused until seek is complete. */
+    if (playing) {
         ci.seek_time = newpos+1;
+        counter = 30;
+        pcm_flush_audio();
+        while (ci.seek_time) {
+            sleep(10);
+            if (counter-- == 0)
+                break ;
+        }
+        pcm_play_stop();
+    }
 }
 
 void audio_flush_and_reload_tracks(void)
