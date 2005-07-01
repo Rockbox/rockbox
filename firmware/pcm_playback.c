@@ -270,8 +270,9 @@ void pcm_play_pause(bool play)
     {
         logf("unpause");
         /* Reset chunk size so dma has enough data to fill the fifo. */
-        SAR0 = (unsigned long)next_start;
-        BCR0 = next_size;
+        /* This shouldn't be needed anymore. */
+        //SAR0 = (unsigned long)next_start;
+        //BCR0 = next_size;
         /* Enable the FIFO and force one write to it */
         IIS2CONFIG = (pcm_freq << 12) | 0x300 | 4 << 2;
         EBU1CONFIG = 7 << 12 |  3 << 8 | 5 << 2;
