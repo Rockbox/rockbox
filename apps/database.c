@@ -293,6 +293,9 @@ int rundb_init(void)
     int i, *p;
 #endif
 
+#if CONFIG_HWCODEC != MASNONE
+    return -1;
+#else
     if(!tagdb_initialized) /* forget it.*/
         return -1;
     
@@ -334,6 +337,7 @@ int rundb_init(void)
     memset(&rundbentry,0,sizeof(struct rundb_entry));
     rundbsize=lseek(rundb_fd,0,SEEK_END);
     return 0;
+#endif
 }
 
 void writerundbheader(void) {
