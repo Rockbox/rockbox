@@ -882,9 +882,13 @@ static void track_change(void)
     /* Reset the AVC */
     sound_set(SOUND_AVC, -1);
 #endif /* #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F) */
-    remove_current_tag();
 
-    update_playlist();
+    if (num_tracks_in_memory() > 0)
+    {
+        remove_current_tag();
+        update_playlist();
+    }
+
     current_track_counter++;
 }
 
