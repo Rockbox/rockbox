@@ -247,9 +247,9 @@ void pcm_play_data(const unsigned char* start, int size,
     get_more(&next_start, &next_size);
     dma_start(start, size);
     
-    /* Sleep a while, then power on audio output */
-    sleep(HZ/16);
-    uda1380_enable_output(true);
+    /* Sleep a while, then unmute audio output */
+    sleep(1);
+    uda1380_mute(false);
 }
 
 void pcm_play_stop(void)
@@ -257,9 +257,9 @@ void pcm_play_stop(void)
     crossfade_active = false;
     pcm_set_boost_mode(false);
     if (pcm_playing) {
-        uda1380_enable_output(false);
+        uda1380_mute(true);
         pcm_boost(false);
-        sleep(HZ/16);
+        sleep(1);
         dma_stop();
     }
 }
@@ -277,10 +277,14 @@ void pcm_play_pause(bool play)
         IIS2CONFIG = (pcm_freq << 12) | 0x300 | 4 << 2;
         EBU1CONFIG = 7 << 12 |  3 << 8 | 5 << 2;
         DCR0 |= DMA_EEXT | DMA_START;
+        sleep(1);
+        uda1380_mute(false);
     }
     else if(!pcm_paused && !play)
     {
         logf("pause");
+        uda1380_mute(true);
+        
         /* Disable DMA peripheral request. */
         DCR0 &= ~DMA_EEXT;
         IIS2CONFIG = 0x800;
@@ -695,6 +699,11 @@ void pcm_play_init(void)
     crossfade_active = false;
     crossfade_init = false;
     pcm_event_handler = NULL;
+
+    /* Turn on headphone power with audio output muted. */
+    uda1380_mute(true);
+    sleep(HZ/4);
+    uda1380_enable_output(true);
 }
 
 void pcm_crossfade_enable(bool on_off)
