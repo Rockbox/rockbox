@@ -954,7 +954,7 @@ void initialize_buffer_fill(void)
     
     
     fill_bytesleft = codecbuflen - codecbufused;
-    tracks[track_widx].start_pos = ci.curpos;
+    cur_ti->start_pos = ci.curpos;
 
     if (filling)
         return ;
