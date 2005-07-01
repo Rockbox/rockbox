@@ -83,6 +83,8 @@ static void (*pcm_event_handler)(void);
 static unsigned char *next_start;
 static long next_size;
 
+static int last_chunksize = 0;
+
 struct pcmbufdesc
 {
     void *addr;
@@ -107,7 +109,7 @@ static void dma_start(const void *addr, long size)
     /* Reset the audio FIFO */
     IIS2CONFIG = 0x800;
     EBU1CONFIG = 0x800;
-    
+
     /* Set up DMA transfer  */
     SAR0 = ((unsigned long)addr); /* Source address */
     DAR0 = (unsigned long)&PDOR3; /* Destination address */
@@ -144,6 +146,18 @@ static void dma_stop(void)
     /* Reset the FIFO */
     IIS2CONFIG = 0x800;
     EBU1CONFIG = 0x800;
+    
+    pcmbuf_unplayed_bytes = 0;
+    last_chunksize = 0;
+    audiobuffer_pos = 0;
+    audiobuffer_fillpos = 0;
+    audiobuffer_free = PCMBUF_SIZE;
+    pcmbuf_read_index = 0;
+    pcmbuf_write_index = 0;
+    next_start = NULL;
+    next_size = 0;
+    crossfade_init = 0;
+    pcm_paused = false;
 }
 
 /* sets frequency of input to DAC */
@@ -174,8 +188,6 @@ int pcm_play_num_used_buffers(void)
 {
     return (pcmbuf_write_index - pcmbuf_read_index) & NUM_PCM_BUFFERS_MASK;
 }
-
-static int last_chunksize = 0;
 
 static void pcm_play_callback(unsigned char** start, long* size)
 {
@@ -232,9 +244,8 @@ void pcm_play_data(const unsigned char* start, int size,
                    void (*get_more)(unsigned char** start, long* size))
 {
     callback_for_more = get_more;
-    dma_start(start, size);
-    
     get_more(&next_start, &next_size);
+    dma_start(start, size);
     
     /* Sleep a while, then power on audio output */
     sleep(HZ/16);
@@ -251,15 +262,6 @@ void pcm_play_stop(void)
         sleep(HZ/16);
         dma_stop();
     }
-    pcmbuf_unplayed_bytes = 0;
-    last_chunksize = 0;
-    audiobuffer_pos = 0;
-    audiobuffer_fillpos = 0;
-    audiobuffer_free = PCMBUF_SIZE;
-    pcmbuf_read_index = 0;
-    pcmbuf_write_index = 0;
-    next_start = NULL;
-    next_size = 0;
 }
 
 void pcm_play_pause(bool play)
@@ -298,11 +300,13 @@ void DMA0(void)
     int res = DSR0;
 
     DSR0 = 1;    /* Clear interrupt */
+    DCR0 &= ~DMA_EEXT;
     
     /* Stop on error */
     if(res & 0x70)
     {
        dma_stop();
+       logf("DMA Error");
     }
     else
     {
@@ -310,6 +314,7 @@ void DMA0(void)
         {
             SAR0 = (unsigned long)next_start;  /* Source address */
             BCR0 = next_size;                  /* Bytes to transfer */
+            DCR0 |= DMA_EEXT;
             if (callback_for_more)
                 callback_for_more(&next_start, &next_size);
         }
@@ -317,6 +322,7 @@ void DMA0(void)
         {
             /* Finished playing */
             dma_stop();
+            logf("DMA No Data");
         }
     }
     
@@ -442,7 +448,11 @@ void pcm_flush_fillpos(void)
     if (audiobuffer_fillpos) {
         while (!pcm_play_add_chunk(&audiobuffer[audiobuffer_pos], 
                                    audiobuffer_fillpos, pcm_event_handler)) {
+            pcm_boost(false);
             yield();
+            /* This is a fatal error situation that should never happen. */
+            if (!pcm_playing)
+                break ;
         }
         pcm_event_handler = NULL;
         audiobuffer_pos += audiobuffer_fillpos;
@@ -527,7 +537,7 @@ inline static bool prepare_insert(long length)
         return false;
     }
     
-    if (!pcm_is_playing() && !pcm_paused) {
+    if (!pcm_is_playing()) {
         pcm_boost(true);
         crossfade_active = false;
         if (audiobuffer_free < PCMBUF_SIZE - CHUNK_SIZE*4)
@@ -659,7 +669,7 @@ bool pcm_insert_buffer(char *buf, long length)
         length -= copy_n;
         
         /* Pre-buffer to meet CHUNK_SIZE requirement */
-        if (copy_n + audiobuffer_fillpos < CHUNK_SIZE && length == 0) {
+        if (audiobuffer_fillpos < CHUNK_SIZE && length == 0) {
             return true;
         }
 
