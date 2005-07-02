@@ -170,9 +170,6 @@ void main(void)
     while (usb_detect())
     {   /* enter USB mode early, before trying to mount */
         if (button_get_w_tmo(HZ/10) == SYS_USB_CONNECTED)
-#ifdef HAVE_MMC
-        if (!mmc_touched() || (mmc_remove_request() == SYS_MMC_EXTRACTED))
-#endif
         {
             usb_screen();
         }
