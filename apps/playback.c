@@ -1422,6 +1422,9 @@ void audio_play(int offset)
     ci.stop_codec = true;
     if (!pcm_crossfade_init())
         pcm_flush_audio();
+    else
+        codec_track_changed();
+        
     pcm_play_pause(true);
     paused = false;
     queue_post(&audio_queue, AUDIO_PLAY, (void *)offset);
