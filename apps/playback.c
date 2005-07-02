@@ -561,7 +561,7 @@ bool codec_seek_buffer_callback(off_t newpos)
         buf_ridx = codecbuflen + buf_ridx;
     ci.curpos -= difference;
     if (!pcm_is_crossfade_active())
-    pcm_play_stop();
+        pcm_play_stop();
     
     return true;
 }
@@ -1093,8 +1093,6 @@ void audio_update_trackinfo(void)
         if (buf_ridx >= codecbuflen)
             buf_ridx -= codecbuflen;
             
-        pcm_crossfade_init();
-            
         if (!filling)
             pcm_set_boost_mode(false);
     } else {
@@ -1118,7 +1116,10 @@ void audio_update_trackinfo(void)
     ci.curpos = 0;
     cur_ti->start_pos = 0;
     ci.taginfo_ready = (bool *)&cur_ti->taginfo_ready;
-    audiobuffer_add_event(codec_track_changed);
+    if (!pcm_crossfade_init())
+        audiobuffer_add_event(codec_track_changed);
+    else
+        codec_track_changed();
 }
 
 static void audio_stop_playback(void)
