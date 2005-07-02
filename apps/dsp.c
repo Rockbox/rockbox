@@ -269,7 +269,6 @@ void convert_stereo_mode(long *dest, long *src, int samplecount)
     }
 }
 
-/* Not yet functional. */
 void scale_up(long *dest, short *src, int samplecount)
 {
     int i;
@@ -287,8 +286,6 @@ void scale_up_convert_stereo_mode(long *dest, short *src, int samplecount)
     for (i = 0; i < samplecount; i++) {
         dest[i] = (long)(src[i*2+0] << SAMPLE_DEPTH);
         dest[i+samplecount] = (long)(src[i*2+1] << SAMPLE_DEPTH);
-        //dest[i] = (long)(((src[i*2 + 0] << 8)&0x7fff) | ((1L << 31) & src[i*2+0]<<15));
-        //dest[i+samplecount] = (long)(((src[i*2 + 1] << 8)&0x7fff) | ((1L << 31) & src[i*2+1]<<15));
     }
 }
 
@@ -307,21 +304,22 @@ int dsp_process(char *dest, char *src, int samplecount)
         p = src;
         /* Scale up to 32-bit samples. */
         if (dsp_config.sample_depth <= SAMPLE_DEPTH) {
-            if (dsp_config.stereo_mode == STEREO_INTERLEAVED)
+            if (dsp_config.stereo_mode == STEREO_INTERLEAVED) {
                 scale_up_convert_stereo_mode((long *)samplebuf, 
                                              (short *)p, copy_n);
-            else
+            } else {
                 scale_up((long *)samplebuf, (short *)p, copy_n);
+            }
             p = samplebuf;
             fracbits = 31;
         }
         
         /* Convert to non-interleaved stereo. */
         else if (dsp_config.stereo_mode == STEREO_INTERLEAVED) {
-            convert_stereo_mode((long *)samplebuf, (long *)p, copy_n);
+            convert_stereo_mode((long *)samplebuf, (long *)p, copy_n / 2);
             p = samplebuf;
-        }
-            
+        } 
+        
         /* Apply DSP functions. */
         if (dsp_config.stereo_mode == STEREO_INTERLEAVED) {
             channel = 0;
@@ -329,6 +327,12 @@ int dsp_process(char *dest, char *src, int samplecount)
             p += copy_n * 2;
             channel = 1;
             process((short *)dest, (long *)p, copy_n / 2);
+            dest += rc;
+        } else if (dsp_config.stereo_mode == STEREO_MONO) {
+            channel = 0;
+            rc = process((short *)dest, (long *)p, copy_n) * 4;
+            channel = 1;
+            process((short *)dest, (long *)p, copy_n);
             dest += rc;
         } else {
             rc = process((short *)dest, (long *)p, copy_n) * 2;

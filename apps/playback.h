@@ -58,10 +58,15 @@ struct track_info {
     volatile int available;  /* Available bytes to read from buffer */
     bool taginfo_ready;      /* Is metadata read */
     int playlist_offset;     /* File location in playlist */
+    bool event_sent;         /* Has event callback functions been called? */
 };
 
 /* Functions */
 void audio_set_track_changed_event(void (*handler)(struct track_info *ti));
+void audio_set_track_buffer_event(void (*handler)(struct mp3entry *id3,
+                                                  bool last_track));
+void audio_set_track_unbufer_event(void (*handler)(struct mp3entry *id3,
+                                                   bool disk_spinning));
 void audio_invalidate_tracks(void);
 
 #endif

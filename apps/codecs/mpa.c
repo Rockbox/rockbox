@@ -57,15 +57,6 @@ extern char iramstart[];
 extern char iramend[];
 #endif
 
-/*
-long resample(long *in, long *out, int num, struct resampler *s)
-{
-    if (s->delta >= (1 << 16))
-        return downsample(in, out, num, s);
-    else
-        return upsample(in, out, num, s);
-}
-*/
 /* this is the codec entry point */
 enum codec_status codec_start(struct codec_api* api)
 {
@@ -79,9 +70,10 @@ enum codec_status codec_start(struct codec_api* api)
     unsigned int samplesdone;
     bool first_frame;
     int stop_skip, start_skip;
-    // struct resampler lr = { 0, 0, 0 }, rr = { 0, 0, 0 };
+    int current_stereo_mode = -1;
+    int frequency_divider;
+    
     /* Generic codec inititialisation */
-
     TEST_CODEC_API(api);
 
 #ifdef USE_IRAM
@@ -102,7 +94,6 @@ enum codec_status codec_start(struct codec_api* api)
     ci->configure(DSP_SET_CLIP_MAX, (int *)(MAD_F_ONE - 1));
     ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(MAD_F_FRACBITS));
     ci->configure(DSP_DITHER, (bool *)false);
-    ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_NONINTERLEAVED);
     ci->configure(CODEC_DSP_ENABLE, (bool *)true);
     
     ci->memset(&Stream, 0, sizeof(struct mad_stream));
@@ -128,6 +119,7 @@ enum codec_status codec_start(struct codec_api* api)
     first_frame = false;
     file_end = 0;
     OutputPtr = OutputBuffer;
+    frequency_divider = ci->id3->frequency / 100;
     
     while (!*ci->taginfo_ready)
         ci->yield();
@@ -154,16 +146,16 @@ enum codec_status codec_start(struct codec_api* api)
         /* TODO: 1152 is the frame size in samples for MPEG1 layer 2 and layer 3,
            it's probably not correct at all for MPEG2 and layer 1 */
         samplecount = info->frame_count*1152 - (start_skip + stop_skip);
-        samplesdone = ci->id3->elapsed * (ci->id3->frequency / 100) / 10;
+        samplesdone = ci->id3->elapsed * frequency_divider / 10;
     } else {
-        samplecount = ci->id3->length * (ci->id3->frequency / 100) / 10;
-        samplesdone = ci->id3->elapsed * (ci->id3->frequency / 100) / 10;
+        samplecount = ci->id3->length * frequency_divider / 10;
+        samplesdone = ci->id3->elapsed * frequency_divider / 10;
     }
     
     /* This is the decoding loop. */
     while (1) {
         ci->yield();
-        if (ci->stop_codec || ci->reload_codec) { 
+        if (ci->stop_codec || ci->reload_codec) {
             break ;
         }
     
@@ -171,11 +163,12 @@ enum codec_status codec_start(struct codec_api* api)
             unsigned int sample_loc;
             int newpos;
         
-            sample_loc = ci->seek_time/1000 * ci->id3->frequency;
+            sample_loc = ci->seek_time * frequency_divider / 10;
             newpos = ci->mp3_get_filepos(ci->seek_time-1);
+            if (sample_loc >= samplecount + samplesdone)
+                break ;
+            
             if (ci->seek_buffer(newpos)) {
-                if (sample_loc >= samplecount + samplesdone)
-                    break ;
                 samplecount += samplesdone - sample_loc;
                 samplesdone = sample_loc;
             }
@@ -232,17 +225,28 @@ enum codec_status codec_start(struct codec_api* api)
         /* We skip start_skip number of samples here, this should only happen for
            very first frame in the stream. */
         /* TODO: possible for start_skip to exceed one frames worth of samples? */
-        //length = resample((long *)&Synth.pcm.samples[0][start_skip], resampled_data[0], Synth.pcm.length, &lr);
-        //if (MAD_NCHANNELS(&Frame.header) == 2)
-        //    resample((long *)&Synth.pcm.samples[1][start_skip], resampled_data[1], Synth.pcm.length, &rr);
-        ci->audiobuffer_insert_split(&Synth.pcm.samples[0][start_skip], 
-                                     &Synth.pcm.samples[1][start_skip],
-                                     (Synth.pcm.length - start_skip) * 4);
+        
+        if (MAD_NCHANNELS(&Frame.header) == 2) {
+            if (current_stereo_mode != STEREO_NONINTERLEAVED) {
+                ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_NONINTERLEAVED);
+                current_stereo_mode = STEREO_NONINTERLEAVED;
+            }
+            ci->audiobuffer_insert_split(&Synth.pcm.samples[0][start_skip],
+                                         &Synth.pcm.samples[1][start_skip],
+                                         (Synth.pcm.length - start_skip) * 4);
+        } else {
+            if (current_stereo_mode != STEREO_MONO) {
+                ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_MONO);
+                current_stereo_mode = STEREO_MONO;
+            }
+            ci->audiobuffer_insert((char *)&Synth.pcm.samples[0][start_skip],
+                                   (Synth.pcm.length - start_skip) * 4);
+        }
         start_skip = 0; /* not very elegant, and might want to keep this value */
         
         samplesdone += Synth.pcm.length;
         samplecount -= Synth.pcm.length;
-        ci->set_elapsed(samplesdone / (ci->id3->frequency/1000));
+        ci->set_elapsed(samplesdone / (frequency_divider / 10));
     }
   
     Stream.error = 0;

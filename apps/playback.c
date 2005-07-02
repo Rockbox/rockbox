@@ -165,6 +165,8 @@ static int new_track;
 
 /* Callback function to call when current track has really changed. */
 void (*track_changed_callback)(struct track_info *ti);
+void (*track_buffer_callback)(struct mp3entry *id3, bool last_track);
+void (*track_unbuffer_callback)(struct mp3entry *id3, bool disk_spinning);
 
 /* Configuration */
 static int conf_bufferlimit;
@@ -266,10 +268,14 @@ bool codec_audiobuffer_insert_callback(char *buf, long length)
     int factor;
     int next_channel = 0;
     int processed_length;
+    int mono = 0;
     
     /* If non-interleaved stereo mode. */
-    if (dsp_config.stereo_mode == STEREO_NONINTERLEAVED) {
+    if (dsp_config.stereo_mode == STEREO_NONINTERLEAVED)
         next_channel = length / 2;
+    else if (dsp_config.stereo_mode == STEREO_MONO) {
+        length *= 2;
+        mono = 1;
     }
     
     if (dsp_config.sample_depth > 16) {
@@ -296,11 +302,11 @@ bool codec_audiobuffer_insert_callback(char *buf, long length)
             processed_length = dsp_process(dest, buf, realsize / 4) * 2;
             dsp_process(dest, buf + next_channel, realsize / 4);
         } else {
-            processed_length = dsp_process(dest, buf, realsize / 2);
+            processed_length = dsp_process(dest, buf, realsize >> (mono + 1));
         }
         pcm_flush_buffer(processed_length);
         length -= realsize;
-        buf += realsize << factor;
+        buf += realsize << (factor + mono);
     }
     
     return true;
@@ -587,6 +593,18 @@ void codec_configure_callback(int setting, void *value)
             logf("Illegal key: %d", setting);
         }
     }
+}
+
+void audio_set_track_buffer_event(void (*handler)(struct mp3entry *id3,
+                                                  bool last_track))
+{
+    track_buffer_callback = handler;
+}
+
+void audio_set_track_unbuffer_event(void (*handler)(struct mp3entry *id3,
+                                                    bool disk_spinning))
+{
+    track_unbuffer_callback = handler;
 }
 
 void audio_set_track_changed_event(void (*handler)(struct track_info *ti))
@@ -934,6 +952,10 @@ void audio_play_start(int offset)
     last_peek_offset = 0;
     if (audio_load_track(offset, true, 0)) {
         last_peek_offset++;
+        if (track_buffer_callback) {
+            cur_ti->event_sent = true;
+            track_buffer_callback(&cur_ti->id3, true);
+        }
         ata_sleep();
     } else {
         logf("Failure");
@@ -950,7 +972,43 @@ void audio_clear_track_entries(void)
     for (i = 0; i < MAX_TRACK - track_count; i++) {
         if (++cur_idx >= MAX_TRACK)
             cur_idx = 0;
+
+        /* Send event to notify that track has finished. */
+        if (track_unbuffer_callback && tracks[cur_idx].event_sent)
+            track_unbuffer_callback(&tracks[cur_idx].id3, filling);
         memset(&tracks[cur_idx], 0, sizeof(struct track_info));
+    }
+}
+
+/* Send callback events to notify about new tracks. */
+static void generate_postbuffer_events(void)
+{
+    int i;
+    int cur_ridx, event_count;
+    
+    if (!track_buffer_callback)
+        return ;
+
+    /* At first determine how many unsent events we have. */
+    cur_ridx = track_ridx;
+    event_count = 0;
+    for (i = 0; i < track_count; i++) {
+        if (!tracks[cur_ridx].event_sent)
+            event_count++;
+        if (++cur_ridx >= MAX_TRACK)
+            cur_ridx -= MAX_TRACK;
+    }
+
+    /* Now sent these events. */
+    cur_ridx = track_ridx;
+    for (i = 0; i < track_count; i++) {
+        if (!tracks[cur_ridx].event_sent) {
+            tracks[cur_ridx].event_sent = true;
+            event_count--;
+            track_buffer_callback(&tracks[cur_ridx].id3, event_count == 0);
+        }
+        if (++cur_ridx >= MAX_TRACK)
+            cur_ridx -= MAX_TRACK;
     }
 }
 
@@ -1014,6 +1072,7 @@ void audio_check_buffer(void)
     if (audio_load_track(0, false, last_peek_offset)) {
         last_peek_offset++;
     } else if (tracks[track_widx].filerem == 0 || fill_bytesleft == 0) {
+        generate_postbuffer_events();
         filling = false;
         conf_bufferlimit = 0;
         pcm_set_boost_mode(false);
@@ -1069,6 +1128,8 @@ void audio_change_track(void)
         logf("No more tracks");
         while (pcm_is_playing())
             yield();
+        track_count = 0;
+        audio_clear_track_entries();
         playing = false;
         return ;
     }
@@ -1206,6 +1267,8 @@ void audio_thread(void)
                 }
                 pcm_play_stop();
                 pcm_play_pause(true);
+                track_count = 0;
+                audio_clear_track_entries();
                 break ;
                 
             case AUDIO_PAUSE:
@@ -1233,6 +1296,8 @@ void audio_thread(void)
 
 #ifndef SIMULATOR                
             case SYS_USB_CONNECTED:
+                track_count = 0;
+                audio_clear_track_entries();
                 playing = false;
                 filling = false;
                 ci.stop_codec = true;
@@ -1269,6 +1334,8 @@ void codec_thread(void)
                 codecsize = cur_ti->codecsize;
                 if (codecsize == 0) {
                     logf("Codec slot is empty!");
+                    track_count = 0;
+                    audio_clear_track_entries();
                     playing = false;
                     break ;
                 }
@@ -1296,6 +1363,8 @@ void codec_thread(void)
             if (status != CODEC_OK) {
                 logf("Codec failure");
                 splash(HZ*2, true, "Codec failure");
+                track_count = 0;
+                audio_clear_track_entries();
                 playing = false;
             } else {
                 logf("Codec finished");
@@ -1597,6 +1666,18 @@ void mpeg_id3_options(bool _v1first)
    v1first = _v1first;
 }
 
+/*
+void test_buffer_event(struct mp3entry *id3, bool last_track)
+{
+    logf("be:%d%s", last_track, id3->title);
+}
+
+void test_unbuffer_event(struct mp3entry *id3, bool disk_spinning)
+{
+    logf("ube:%d%s", disk_spinning, id3->title);
+}
+*/
+
 void audio_init(void)
 {
     logf("audio api init");
@@ -1611,12 +1692,19 @@ void audio_init(void)
     paused = false;
     track_changed = false;
     current_fd = -1;
+    track_buffer_callback = NULL;
+    track_unbuffer_callback = NULL;
     track_changed_callback = NULL;
     
     logf("abuf:%0x", PCMBUF_SIZE);
     logf("fbuf:%0x", codecbuflen);
     logf("mbuf:%0x", MALLOC_BUFSIZE);
-    
+
+    /*
+    audio_set_track_buffer_event(test_buffer_event);
+    audio_set_track_unbuffer_event(test_unbuffer_event);
+    */
+
     /* Initialize codec api. */    
     ci.read_filebuf = codec_filebuf_callback;
     ci.audiobuffer_insert = pcm_insert_buffer;
