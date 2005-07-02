@@ -50,14 +50,14 @@
 #define LCD_REMOTE_CNTL_HIGHCOL             0x10    /* Upper column address */
 #define LCD_REMOTE_CNTL_LOWCOL              0x00    /* Lower column address */
 
-#define CS_LO       GPIO1_OUT &= ~0x00000004
-#define CS_HI       GPIO1_OUT |= 0x00000004
-#define CLK_LO      GPIO_OUT &= ~0x10000000
-#define CLK_HI      GPIO_OUT |= 0x10000000
-#define DATA_LO     GPIO1_OUT &= ~0x00040000
-#define DATA_HI     GPIO1_OUT |= 0x00040000
-#define RS_LO       GPIO_OUT &= ~0x00010000
-#define RS_HI       GPIO_OUT |= 0x00010000
+#define CS_LO      and_l(~0x00000004, &GPIO1_OUT)
+#define CS_HI      or_l(0x00000004, &GPIO1_OUT)
+#define CLK_LO     and_l(~0x10000000, &GPIO_OUT)
+#define CLK_HI     or_l(0x10000000, &GPIO_OUT)
+#define DATA_LO    and_l(~0x00040000, &GPIO1_OUT)
+#define DATA_HI    or_l(0x00040000, &GPIO1_OUT)
+#define RS_LO      and_l(~0x00010000, &GPIO_OUT)
+#define RS_HI      or_l(0x00010000, &GPIO_OUT)
 
 /* delay loop */
 #define DELAY   do { int _x; for(_x=0;_x<3;_x++);} while (0)
@@ -115,12 +115,12 @@ static const char scroll_tick_table[16] = {
 #ifndef SIMULATOR
 void lcd_remote_backlight_on(void)
 {
-    GPIO_OUT &= ~0x00000800;
+    and_l(~0x00000800, &GPIO_OUT);
 }
 
 void lcd_remote_backlight_off(void)
 {
-    GPIO_OUT |= 0x00000800;
+    or_l(0x00000800, &GPIO_OUT);
 }
 
 void lcd_remote_write_command(int cmd)
@@ -363,14 +363,14 @@ static void remote_tick(void)
 /* Initialise ports and kick off monitor */
 void lcd_remote_init(void)
 {
-    GPIO_FUNCTION   |= 0x10010800;  /* GPIO11: Backlight
-                                       GPIO16: RS
-                                       GPIO28: CLK */
+    or_l(0x10010800, &GPIO_FUNCTION); /* GPIO11: Backlight
+                                         GPIO16: RS
+                                         GPIO28: CLK */
     
-    GPIO1_FUNCTION  |= 0x00040004;  /* GPIO34: CS
-                                       GPIO50: Data */
-    GPIO_ENABLE     |= 0x10010800;
-    GPIO1_ENABLE    |= 0x00040004;
+    or_l(0x00040004, &GPIO1_FUNCTION); /* GPIO34: CS
+                                          GPIO50: Data */
+    or_l(0x10010800, &GPIO_ENABLE);
+    or_l(0x00040004, &GPIO1_ENABLE);
     
     lcd_remote_clear_display();
 

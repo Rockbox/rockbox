@@ -114,7 +114,7 @@ void TIMER1(void)
         
         if (bl_dim_current > 0 && bl_dim_current < BL_PWM_COUNT) 
         {
-            GPIO1_OUT &= ~0x00020000;
+            and_l(~0x00020000, &GPIO1_OUT);
             bl_pwm_counter = bl_dim_current;
             timer_period = timer_period * bl_pwm_counter / BL_PWM_COUNT;
             bl_dim_state = DIM_STATE_MAIN;
@@ -122,9 +122,9 @@ void TIMER1(void)
         else
         {
             if (bl_dim_current)
-                GPIO1_OUT &= ~0x00020000;
+                and_l(~0x00020000, &GPIO1_OUT);
             else
-                GPIO1_OUT |= 0x00020000;
+                or_l(0x00020000, &GPIO1_OUT);
             if (bl_dim_current == bl_dim_target)
                 idle = true;
         }
@@ -133,7 +133,7 @@ void TIMER1(void)
         
       /* Dim main screen */
       case DIM_STATE_MAIN:
-        GPIO1_OUT |= 0x00020000;
+        or_l(0x00020000, &GPIO1_OUT);
         bl_dim_state = DIM_STATE_START;
         timer_period = timer_period * (BL_PWM_COUNT - bl_pwm_counter) / BL_PWM_COUNT;
         break ;
@@ -182,9 +182,9 @@ void backlight_allow_timer(bool on)
         TMR1 = 0;
 
         if (bl_dim_current)
-            GPIO1_OUT &= ~0x00020000;
+            and_l(~0x00020000, &GPIO1_OUT);
         else
-            GPIO1_OUT |= 0x00020000;
+            or_l(0x00020000, &GPIO1_OUT);
     }
 }
 
@@ -207,7 +207,7 @@ static void __backlight_off(void)
     else
     {
         bl_dim_target = bl_dim_current = 0;
-        GPIO1_OUT  |= 0x00020000;
+        or_l(0x00020000, &GPIO1_OUT);
     }
 #elif CONFIG_BACKLIGHT == BL_RTC
     /* Disable square wave */
@@ -229,7 +229,7 @@ static void __backlight_on(void)
     else
     {
         bl_dim_target = bl_dim_current = BL_PWM_COUNT;
-        GPIO1_OUT  &= ~0x00020000;
+        and_l(~0x00020000, &GPIO1_OUT);
     }
 #elif CONFIG_BACKLIGHT == BL_RTC
     /* Enable square wave */
@@ -409,8 +409,8 @@ void backlight_init(void)
                   sizeof(backlight_stack), backlight_thread_name);
                   
 #if CONFIG_BACKLIGHT == BL_IRIVER
-    GPIO1_ENABLE  |= 0x00020000;
-    GPIO1_FUNCTION |= 0x00020000;
+    or_l(0x00020000, &GPIO1_ENABLE);
+    or_l(0x00020000, &GPIO1_FUNCTION);
 #elif CONFIG_BACKLIGHT == BL_PA14_LO || CONFIG_BACKLIGHT == BL_PA14_HI
     PACR1 &= ~0x3000;    /* Set PA14 (backlight control) to GPIO */
     or_b(0x40, &PAIORH); /* ..and output */

@@ -81,25 +81,48 @@ enum {
 
 #if CONFIG_CPU == SH7034
 #define or_b(mask, address) \
-  asm                                     \
-    ("or.b\t%0,@(r0,gbr)"                 \
-     :                                    \
+  asm                                       \
+    ("or.b %0,@(r0,gbr)"                    \
+     :                                      \
      : /* %0 */ I_CONSTRAINT((char)(mask)), \
        /* %1 */ "z"(address-GBR))
 
 #define and_b(mask, address) \
   asm                                       \
-    ("and.b\t%0,@(r0,gbr)"                  \
+    ("and.b %0,@(r0,gbr)"                   \
      :                                      \
-     : /* %0 */ I_CONSTRAINT((char)(mask)),         \
+     : /* %0 */ I_CONSTRAINT((char)(mask)), \
        /* %1 */ "z"(address-GBR))
 
 #define xor_b(mask, address) \
   asm                                        \
-    ("xor.b\t%0,@(r0,gbr)"                   \
+    ("xor.b %0,@(r0,gbr)"                    \
      :                                       \
-     : /* %0 */ I_CONSTRAINT((char)(mask)), \
+     : /* %0 */ I_CONSTRAINT((char)(mask)),  \
        /* %1 */ "z"(address-GBR))
+
+#elif CONFIG_CPU == MCF5249
+#define or_l(mask, address) \
+  asm                       \
+    ("or.l %0,(%1)"         \
+     :                      \
+     : /* %0 */ "d"(mask),  \
+       /* %1 */ "a"(address))
+
+#define and_l(mask, address) \
+  asm                        \
+    ("and.l %0,(%1)"         \
+     :                       \
+     : /* %0 */ "d"(mask),   \
+       /* %1 */ "a"(address))
+
+#define eor_l(mask, address) \
+  asm                        \
+    ("eor.l %0,(%1)"         \
+     :                       \
+     : /* %0 */ "d"(mask),   \
+       /* %1 */ "a"(address))
+
 #endif
 
 #ifndef SIMULATOR
