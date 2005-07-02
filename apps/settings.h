@@ -322,6 +322,7 @@ struct user_settings
 #endif
     
     bool next_folder; /* move to next folder */
+    bool runtimedb;   /* runtime database active? */
 };
 
 enum optiontype { INT, BOOL };

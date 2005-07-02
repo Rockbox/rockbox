@@ -101,4 +101,5 @@ void loadruntimeinfo(char *filename);
 void increaseplaycount(void);
 void setrating(int rating);
 int rundb_init(void);
+void rundb_shutdown(void);
 #endif

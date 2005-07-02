@@ -569,6 +569,7 @@ static bool check_changed_id3mode(bool currmode)
 static void tree_prepare_usb(void *parameter)
 {
     (void) parameter;
+    rundb_shutdown();
     tagdb_shutdown();
 }
 
@@ -1120,6 +1121,7 @@ static bool dirbrowse(void)
                     == SYS_USB_CONNECTED)
                 {
                     tagdb_init(); /* re-init database */
+                    rundb_init();
                     if(*tc.dirfilter > NUM_FILTER_MODES)
                         /* leave sub-browsers after usb, doing otherwise
                            might be confusing to the user */
@@ -1474,7 +1476,8 @@ void tree_init(void)
     tc.dirfilter = &global_settings.dirfilter;
 
     tagdb_init();
-    
+    rundb_init();
+
     tc.name_buffer_size = AVERAGE_FILENAME_LENGTH * max_files;
     tc.name_buffer = buffer_alloc(tc.name_buffer_size);
 

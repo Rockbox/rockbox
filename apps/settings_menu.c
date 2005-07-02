@@ -46,6 +46,7 @@
 #include "timefuncs.h"
 #include "misc.h"
 #include "power.h"
+#include "database.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
@@ -1124,6 +1125,24 @@ static bool next_folder(void)
     return set_bool( str(LANG_NEXT_FOLDER), &global_settings.next_folder );
 }
 
+static bool runtimedb(void)
+{
+    bool rc;
+    bool old = global_settings.runtimedb;
+
+    rc = set_bool_options( str(LANG_RUNTIMEDB_ACTIVE),
+                           &global_settings.runtimedb,
+                           STR(LANG_SET_BOOL_YES),
+                           STR(LANG_SET_BOOL_NO),
+                           NULL);
+    if (old && !global_settings.runtimedb)
+        rundb_shutdown();
+    if (!old && global_settings.runtimedb)
+        rundb_init();
+
+    return rc;
+}
+
 static bool playback_settings_menu(void)
 {
     int m;
@@ -1145,6 +1164,7 @@ static bool playback_settings_menu(void)
 #endif
         { ID2P(LANG_ID3_ORDER), id3_order },
         { ID2P(LANG_NEXT_FOLDER), next_folder },
+        { ID2P(LANG_RUNTIMEDB_ACTIVE), runtimedb },
     };
 
     bool old_shuffle = global_settings.playlist_shuffle;

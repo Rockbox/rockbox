@@ -406,6 +406,7 @@ static const struct bit_entry hd_bits[] =
 #endif
 
     {1, S_O(next_folder), false, "move to next folder", off_on },
+    {1, S_O(runtimedb), false, "gather runtime data", off_on },
 
     /* new stuff to be added at the end */
             

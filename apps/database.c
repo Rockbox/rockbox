@@ -315,6 +315,9 @@ int rundb_init(void)
 #endif
     if(!tagdb_initialized) /* forget it.*/
         return -1;
+        
+    if(!global_settings.runtimedb) /* user doesn't care */
+        return -1;
     
     rundb_fd = open(ROCKBOX_DIR "/rockbox.rundb", O_CREAT|O_RDWR);
     if (rundb_fd < 0) {
@@ -356,6 +359,13 @@ int rundb_init(void)
     rundbsize=lseek(rundb_fd,0,SEEK_END);
     return 0;
 #endif
+}
+
+void rundb_shutdown(void)
+{
+    if (rundb_fd >= 0)
+        close(rundb_fd);
+    rundb_initialized = 0;
 }
 
 void writerundbheader(void)

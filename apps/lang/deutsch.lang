@@ -3140,4 +3140,10 @@ id: LANG_NEXT_FOLDER
 desc: in settings_menu.  Should we move to next folder when current one ends
 eng: "Move to Next Folder"
 voice: "In nächstes Verzeichnis wechseln"
-new: "In nächstes Verzeichnis wechseln"
+new: "In nächstes Verzeichnis wechseln" 
+
+id: LANG_RUNTIMEDB_ACTIVE
+desc: in settings_menu.
+eng: "Gather runtime data (experimental)"
+voice: "Spielzeitdaten sammeln"
+new: "Spielzeitdaten sammeln (experimentell)"
