@@ -653,7 +653,7 @@ void lcd_remote_drawline(int x1, int y1, int x2, int y2)
 void lcd_remote_hline(int x1, int x2, int y)
 {
     int x;
-    unsigned char *dst;
+    unsigned char *dst, *dst_end;
     unsigned mask;
     lcd_blockfunc_type *bfunc;
 
@@ -680,8 +680,10 @@ void lcd_remote_hline(int x1, int x2, int y)
     dst   = &lcd_remote_framebuffer[y>>3][x1];
     mask  = 1 << (y & 7);
 
-    for (x = x1; x <= x2; x++)
+    dst_end = dst + x2 - x1;
+    do
         bfunc(dst++, mask, 0xFFu);
+    while (dst <= dst_end);
 }
 
 /* Draw a vertical line (optimised) */
@@ -745,8 +747,8 @@ void lcd_remote_drawrect(int x, int y, int width, int height)
 /* Fill a rectangular area */
 void lcd_remote_fillrect(int x, int y, int width, int height)
 {
-    int ny, i;
-    unsigned char *dst;
+    int ny;
+    unsigned char *dst, *dst_end;
     unsigned mask, mask_bottom;
     unsigned bits = 0xFFu;
     lcd_blockfunc_type *bfunc;
@@ -791,8 +793,10 @@ void lcd_remote_fillrect(int x, int y, int width, int height)
         {
             unsigned char *dst_row = dst;
 
-            for (i = width; i > 0; i--)
+            dst_end = dst_row + width;
+            do
                 bfunc(dst_row++, mask, 0xFFu);
+            while (dst_row < dst_end);
         }
 
         dst += LCD_REMOTE_WIDTH;
@@ -804,8 +808,10 @@ void lcd_remote_fillrect(int x, int y, int width, int height)
         memset(dst, bits, width);
     else
     {
-        for (i = width; i > 0; i--)
+        dst_end = dst + width;
+        do
             bfunc(dst++, mask, 0xFFu);
+        while (dst < dst_end);
     }
 }
 
@@ -827,8 +833,8 @@ void lcd_remote_bitmap_part(const unsigned char *src, int src_x, int src_y,
 void lcd_remote_bitmap_part(const unsigned char *src, int src_x, int src_y,
                             int stride, int x, int y, int width, int height)
 {
-    int shift, ny, i;
-    unsigned char *dst;
+    int shift, ny;
+    unsigned char *dst, *dst_end;
     unsigned mask, mask_bottom;
     lcd_blockfunc_type *bfunc;
 
@@ -879,8 +885,10 @@ void lcd_remote_bitmap_part(const unsigned char *src, int src_x, int src_y,
                 const unsigned char *src_row = src;
                 unsigned char *dst_row = dst;
 
-                for (i = width; i > 0; i--)
+                dst_end = dst_row + width;
+                do
                     bfunc(dst_row++, mask, *src_row++);
+                while (dst_row < dst_end);
             }
 
             src += stride;
@@ -893,13 +901,16 @@ void lcd_remote_bitmap_part(const unsigned char *src, int src_x, int src_y,
             memcpy(dst, src, width);
         else
         {
-            for (i = width; i > 0; i--)
+            dst_end = dst + width;
+            do
                 bfunc(dst++, mask, *src++);
+            while (dst < dst_end);
         }
     }
     else
     {
-        for (x = 0; x < width; x++)
+        dst_end = dst + width;
+        do
         {
             const unsigned char *src_col = src++;
             unsigned char *dst_col = dst++;
@@ -925,6 +936,7 @@ void lcd_remote_bitmap_part(const unsigned char *src, int src_x, int src_y,
             data |= *src_col << shift;
             bfunc(dst_col, mask_col & mask_bottom, data);
         }
+        while (dst < dst_end);
     }
 }
 

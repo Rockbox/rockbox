@@ -317,7 +317,7 @@ void pgfx_hline(int x1, int x2, int y)
 void pgfx_vline(int x, int y1, int y2)
 {
     int y;
-    unsigned char *dst;
+    unsigned char *dst, *dst_end;
     unsigned mask;
     lcd_blockfunc_type *bfunc;
 
@@ -344,8 +344,10 @@ void pgfx_vline(int x, int y1, int y2)
     dst   = &gfx_buffer[pixel_height * (x/5) + y1];
     mask  = 0x10 >> (x % 5);
 
-    for (y = y1; y <= y2; y++)
+    dst_end = dst + y2 - y1;
+    do
         bfunc(dst++, mask, 0x1F);
+    while (dst <= dst_end);
 }
 
 /* Draw a rectangular box */
@@ -366,8 +368,8 @@ void pgfx_drawrect(int x, int y, int width, int height)
 /* Fill a rectangular area */
 void pgfx_fillrect(int x, int y, int width, int height)
 {
-    int nx, i;
-    unsigned char *dst;
+    int nx;
+    unsigned char *dst, *dst_end;
     unsigned mask, mask_right;
     lcd_blockfunc_type *bfunc;
 
@@ -402,16 +404,20 @@ void pgfx_fillrect(int x, int y, int width, int height)
     {
         unsigned char *dst_col = dst;
 
-        for (i = height; i > 0; i--)
+        dst_end = dst_col + height;
+        do
             bfunc(dst_col++, mask, 0x1F);
+        while (dst_col < dst_end);
 
         dst += pixel_height;
         mask = 0x1F;
     }
     mask &= mask_right;
 
-    for (i = height; i > 0; i--)
+    dst_end = dst + height;
+    do
         bfunc(dst++, mask, 0x1F);
+    while (dst < dst_end);
 }
 
 /* About PlayerGFX internal bitmap format:
@@ -429,7 +435,7 @@ void pgfx_bitmap_part(const unsigned char *src, int src_x, int src_y,
                       int stride, int x, int y, int width, int height)
 {
     int nx, shift;
-    unsigned char *dst;
+    unsigned char *dst, *dst_end;
     unsigned mask, mask_right;
     lcd_blockfunc_type *bfunc;
 
@@ -465,10 +471,11 @@ void pgfx_bitmap_part(const unsigned char *src, int src_x, int src_y,
     mask  = 0x1F >> (x % 5);
     mask_right = 0x1F0 >> (nx % 5);
     
-    for (y = 0; y < height; y++)
+    dst_end = dst + height;
+    do
     {
         const unsigned char *src_row = src;
-        unsigned char *dst_row = dst;
+        unsigned char *dst_row = dst++;
         unsigned mask_row = mask;
         unsigned data = *src_row++;
         int extrabits = shift;
@@ -493,8 +500,8 @@ void pgfx_bitmap_part(const unsigned char *src, int src_x, int src_y,
         bfunc(dst_row, mask_row & mask_right, data >> extrabits);
 
         src += stride;
-        dst++;
     }
+    while (dst < dst_end);
 }
 
 /* Draw a full bitmap */
