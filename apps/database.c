@@ -62,7 +62,7 @@ int tagdb_shiftup(int targetoffset, int startingoffset, int bytes);
                     
 static char sbuf[1024];
 static struct file_entry fe;
-static int currentfeoffset, currentferecord;
+static long currentfeoffset, currentferecord;
 
 int tagdb_fd = -1;
 int tagdb_initialized = 0;
@@ -292,7 +292,7 @@ int rundb_fd = -1;
 int rundb_initialized = 0;
 struct rundb_header rundbheader;
 
-static int valid_file, currentreoffset,rundbsize;
+static long valid_file, currentreoffset,rundbsize;
 static struct rundb_entry rundbentry;
 
 /*** RuntimeDatabase code ***/
