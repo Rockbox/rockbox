@@ -1466,9 +1466,10 @@ static void initiate_track_change(int peek_index)
         queue_post(&audio_queue, AUDIO_PLAY, 0);
     } 
     
-    else if (!pcm_crossfade_init()) {
+    else if (!pcm_crossfade_init())
         pcm_flush_audio();
-    }
+    else
+        codec_track_changed();
 }
 
 void audio_next(void)
