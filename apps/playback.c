@@ -1121,6 +1121,23 @@ void audio_update_trackinfo(void)
     audiobuffer_add_event(codec_track_changed);
 }
 
+static void audio_stop_playback(void)
+{
+    paused = false;
+    playing = false;
+    ci.stop_codec = true;
+    if (current_fd >= 0) {
+        close(current_fd);
+        current_fd = -1;
+    }
+    pcm_play_stop();
+    pcm_play_pause(true);
+    track_count = 0;
+    filling = true;
+    audio_clear_track_entries();
+    filling = false;
+}
+
 void audio_change_track(void)
 {
     logf("change track");
@@ -1128,9 +1145,7 @@ void audio_change_track(void)
         logf("No more tracks");
         while (pcm_is_playing())
             yield();
-        track_count = 0;
-        audio_clear_track_entries();
-        playing = false;
+        audio_stop_playback();
         return ;
     }
     
@@ -1257,18 +1272,7 @@ void audio_thread(void)
                 break ;
                 
             case AUDIO_STOP:
-                paused = false;
-                filling = false;
-                playing = false;
-                ci.stop_codec = true;
-                if (current_fd >= 0) {
-                    close(current_fd);
-                    current_fd = -1;
-                }
-                pcm_play_stop();
-                pcm_play_pause(true);
-                track_count = 0;
-                audio_clear_track_entries();
+                audio_stop_playback();
                 break ;
                 
             case AUDIO_PAUSE:
@@ -1296,14 +1300,8 @@ void audio_thread(void)
 
 #ifndef SIMULATOR                
             case SYS_USB_CONNECTED:
-                track_count = 0;
-                audio_clear_track_entries();
-                playing = false;
-                filling = false;
-                ci.stop_codec = true;
                 logf("USB Connection");
-                pcm_play_stop();
-                pcm_play_pause(true);
+                audio_stop_playback();
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 usb_wait_for_disconnect(&audio_queue);
                 break ;
@@ -1334,9 +1332,7 @@ void codec_thread(void)
                 codecsize = cur_ti->codecsize;
                 if (codecsize == 0) {
                     logf("Codec slot is empty!");
-                    track_count = 0;
-                    audio_clear_track_entries();
-                    playing = false;
+                    audio_stop_playback();
                     break ;
                 }
                 
@@ -1363,9 +1359,7 @@ void codec_thread(void)
             if (status != CODEC_OK) {
                 logf("Codec failure");
                 splash(HZ*2, true, "Codec failure");
-                track_count = 0;
-                audio_clear_track_entries();
-                playing = false;
+                audio_stop_playback();
             } else {
                 logf("Codec finished");
             }
