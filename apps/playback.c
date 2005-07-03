@@ -1714,17 +1714,21 @@ void mpeg_id3_options(bool _v1first)
    v1first = _v1first;
 }
 
-
 void test_buffer_event(struct mp3entry *id3, bool last_track)
 {
+    (void)id3;
+    (void)last_track;
+    
     logf("be:%d%s", last_track, id3->title);
 }
 
 void test_unbuffer_event(struct mp3entry *id3, bool last_track)
 {
+    (void)id3;
+    (void)last_track;
+    
     logf("ube:%d%s", last_track, id3->title);
 }
-
 
 void audio_init(void)
 {
@@ -1750,7 +1754,7 @@ void audio_init(void)
 
     audio_set_track_buffer_event(test_buffer_event);
     audio_set_track_unbuffer_event(test_unbuffer_event);
-
+    
     /* Initialize codec api. */    
     ci.read_filebuf = codec_filebuf_callback;
     ci.audiobuffer_insert = pcm_insert_buffer;
