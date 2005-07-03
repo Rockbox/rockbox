@@ -162,7 +162,7 @@ static int new_track;
 /* Callback function to call when current track has really changed. */
 void (*track_changed_callback)(struct track_info *ti);
 void (*track_buffer_callback)(struct mp3entry *id3, bool last_track);
-void (*track_unbuffer_callback)(struct mp3entry *id3, bool disk_spinning);
+void (*track_unbuffer_callback)(struct mp3entry *id3, bool last_track);
 
 /* Configuration */
 static int conf_bufferlimit;
@@ -598,7 +598,7 @@ void audio_set_track_buffer_event(void (*handler)(struct mp3entry *id3,
 }
 
 void audio_set_track_unbuffer_event(void (*handler)(struct mp3entry *id3,
-                                                    bool disk_spinning))
+                                                    bool last_track))
 {
     track_unbuffer_callback = handler;
 }
@@ -990,17 +990,37 @@ void audio_play_start(int offset)
 
 void audio_clear_track_entries(void)
 {
-    int cur_idx;
+    int cur_idx, event_count;
     int i;
     
+    cur_idx = track_widx;
+    event_count = 0;
+    for (i = 0; i < MAX_TRACK - track_count; i++) {
+        if (++cur_idx >= MAX_TRACK)
+            cur_idx = 0;
+
+        if (tracks[cur_idx].event_sent)
+            event_count++;
+            
+        if (!track_unbuffer_callback)
+            memset(&tracks[cur_idx], 0, sizeof(struct track_info));
+    }
+
+    if (!track_unbuffer_callback)
+        return ;
+        
     cur_idx = track_widx;
     for (i = 0; i < MAX_TRACK - track_count; i++) {
         if (++cur_idx >= MAX_TRACK)
             cur_idx = 0;
 
-        /* Send event to notify that track has finished. */
-        if (track_unbuffer_callback && tracks[cur_idx].event_sent)
-            track_unbuffer_callback(&tracks[cur_idx].id3, filling);
+        /* Send an event to notify that track has finished. */
+        if (tracks[cur_idx].event_sent) {
+            tracks[cur_idx].event_sent = true;
+            event_count--;
+            track_unbuffer_callback(&tracks[cur_idx].id3, event_count == 0);
+        }
+        
         memset(&tracks[cur_idx], 0, sizeof(struct track_info));
     }
 }
@@ -1163,7 +1183,6 @@ static void audio_stop_playback(void)
     pcm_play_stop();
     pcm_play_pause(true);
     track_count = 0;
-    filling = true;
     audio_clear_track_entries();
     filling = false;
 }
@@ -1695,17 +1714,17 @@ void mpeg_id3_options(bool _v1first)
    v1first = _v1first;
 }
 
-/*
+
 void test_buffer_event(struct mp3entry *id3, bool last_track)
 {
     logf("be:%d%s", last_track, id3->title);
 }
 
-void test_unbuffer_event(struct mp3entry *id3, bool disk_spinning)
+void test_unbuffer_event(struct mp3entry *id3, bool last_track)
 {
-    logf("ube:%d%s", disk_spinning, id3->title);
+    logf("ube:%d%s", last_track, id3->title);
 }
-*/
+
 
 void audio_init(void)
 {
@@ -1729,10 +1748,8 @@ void audio_init(void)
     logf("fbuf:%0x", codecbuflen);
     logf("mbuf:%0x", MALLOC_BUFSIZE);
 
-    /*
     audio_set_track_buffer_event(test_buffer_event);
     audio_set_track_unbuffer_event(test_unbuffer_event);
-    */
 
     /* Initialize codec api. */    
     ci.read_filebuf = codec_filebuf_callback;
