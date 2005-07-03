@@ -94,6 +94,19 @@ struct mp3entry {
     /* resume related */
     int offset;            /* bytes played */
     int index;             /* playlist index */
+
+    /* FileEntry fields */
+    long fileentryoffset;
+    long filehash;
+    long songentryoffset;
+    long rundbentryoffset;
+
+    /* runtime database fields */
+    long rundbhash;
+    short rating;
+    short voladjust;
+    long playcount;
+    long lastplayed;
 };
 
 enum {

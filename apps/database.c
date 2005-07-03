@@ -48,21 +48,23 @@
 
 /* internal functions */
 void writetagdbheader(void);
-void writefentry(void);
-void getfentrybyoffset(int offset);
+void writefentry(struct mp3entry *id);
+void getfentrybyoffset(struct mp3entry *id,int offset);
 void update_fentryoffsets(int start, int end);
 void writerundbheader(void);
-void getrundbentrybyoffset(int offset);
-void writerundbentry(void);
-int getfentrybyfilename(char *fname);
+void getrundbentrybyoffset(struct mp3entry *id,int offset);
+void writerundbentry(struct mp3entry *id);
+int getfentrybyfilename(struct mp3entry *id);
+void clearfileentryinfo(struct mp3entry *id);
+void clearruntimeinfo(struct mp3entry *id);
+int findrundbentry(struct mp3entry *id);
+
 int getfentrybyhash(int hash);
 int deletefentry(char *fname);
 int tagdb_shiftdown(int targetoffset, int startingoffset, int bytes);
 int tagdb_shiftup(int targetoffset, int startingoffset, int bytes);
                     
-static char sbuf[1024];
-static struct file_entry fe;
-static long currentfeoffset, currentferecord;
+static char sbuf[MAX_PATH];
 
 int tagdb_fd = -1;
 int tagdb_initialized = 0;
@@ -133,36 +135,42 @@ void writetagdbheader(void)
     fsync(tagdb_fd);
 }
 
-void writefentry(void)
-{
-    lseek(tagdb_fd,currentfeoffset,SEEK_SET);
-    write(tagdb_fd,sbuf,tagdbheader.filelen);
-    write(tagdb_fd,&fe.hash,12);
-    fsync(tagdb_fd);
+void writefentry(struct mp3entry *id)
+{   long temp;
+    if(!id->fileentryoffset)
+        return;
+    lseek(tagdb_fd,id->fileentryoffset,SEEK_SET);
+    write(tagdb_fd,id->path,tagdbheader.filelen);
+    temp=id->filehash;
+    write(tagdb_fd,&temp,4);
+    temp=id->songentryoffset;
+    write(tagdb_fd,&temp,4);
+    temp=id->rundbentryoffset;
+    write(tagdb_fd,&temp,4);
 }
 
-void getfentrybyoffset(int offset)
-{
-    memset(&fe,0,sizeof(struct file_entry));
+void getfentrybyoffset(struct mp3entry *id,int offset)
+{   
+    clearfileentryinfo(id);
     lseek(tagdb_fd,offset,SEEK_SET);
     read(tagdb_fd,sbuf,tagdbheader.filelen);
-    read(tagdb_fd,&fe.hash,12);
-    fe.name=sbuf;
-    currentfeoffset=offset;
-    currentferecord=(offset-tagdbheader.filestart)/FILEENTRY_SIZE;
+    id->fileentryoffset=offset;
+    read(tagdb_fd,&id->filehash,4);
+    read(tagdb_fd,&id->songentryoffset,4);
+    read(tagdb_fd,&id->rundbentryoffset,4);
 }
 
-#define getfentrybyrecord(_x_)  getfentrybyoffset(FILERECORD2OFFSET(_x_))
+#define getfentrybyrecord(_y_,_x_)  getfentrybyoffset(_y_,FILERECORD2OFFSET(_x_))
 
-int getfentrybyfilename(char *fname)
+int getfentrybyfilename(struct mp3entry *id)
 {
     int min=0;
     int max=tagdbheader.filecount;
     while(min<max) {
         int mid=(min+max)/2;
         int compare;
-        getfentrybyrecord(mid);
-        compare=strcasecmp(fname,fe.name);
+        getfentrybyrecord(id,mid);
+        compare=strcasecmp(id->path,sbuf);
         if(compare==0)
             return 1;
         else if(compare<0)
@@ -170,8 +178,10 @@ int getfentrybyfilename(char *fname)
         else
             min=mid+1;
     }
+    clearfileentryinfo(id);
     return 0;
 }
+
 #if 0
 int getfentrybyhash(int hash)
 {
@@ -292,16 +302,28 @@ int rundb_fd = -1;
 int rundb_initialized = 0;
 struct rundb_header rundbheader;
 
-static long valid_file, currentreoffset,rundbsize;
-static struct rundb_entry rundbentry;
+static long rundbsize;
 
 /*** RuntimeDatabase code ***/
 
-void rundb_track_changed(struct track_info *ti)
-{
-    increaseplaycount();
-    logf("rundb new track: %s", ti->id3.path);
-    loadruntimeinfo(ti->id3.path);
+void rundb_unbuffer_track(struct mp3entry *id, bool last_track) {
+    writeruntimeinfo(id);
+    if(last_track) {
+        fsync(rundb_fd);
+        fsync(tagdb_fd);
+    }
+}
+
+void rundb_track_change(struct track_info *ti) {
+    ti->id3.playcount++;
+}
+
+void rundb_buffer_track(struct mp3entry *id, bool last_track) {
+    loadruntimeinfo(id);
+    if(last_track) {
+        fsync(rundb_fd);
+        fsync(tagdb_fd);
+    }
 }
 
 int rundb_init(void)
@@ -354,8 +376,9 @@ int rundb_init(void)
     }
 
     rundb_initialized = 1;
-    audio_set_track_changed_event(&rundb_track_changed);
-    memset(&rundbentry,0,sizeof(struct rundb_entry));
+    audio_set_track_buffer_event(&rundb_buffer_track);
+    audio_set_track_changed_event(&rundb_track_change);
+    audio_set_track_unbuffer_event(&rundb_unbuffer_track);
     rundbsize=lseek(rundb_fd,0,SEEK_END);
     return 0;
 #endif
@@ -366,106 +389,128 @@ void rundb_shutdown(void)
     if (rundb_fd >= 0)
         close(rundb_fd);
     rundb_initialized = 0;
+    audio_set_track_buffer_event(NULL);
+    audio_set_track_unbuffer_event(NULL);
 }
 
 void writerundbheader(void)
 {
   lseek(rundb_fd,0,SEEK_SET);
   write(rundb_fd, &rundbheader, 8);
-  fsync(rundb_fd);
 }
 
-#define getrundbentrybyrecord(_x_)  getrundbentrybyoffset(8+_x_*20)
+#define getrundbentrybyrecord(_y_,_x_)  getrundbentrybyoffset(_y_,8+_x_*20)
 
-void getrundbentrybyoffset(int offset) {
-    lseek(rundb_fd,offset,SEEK_SET);
-    read(rundb_fd,&rundbentry,20);
-    currentreoffset=offset;
+void getrundbentrybyoffset(struct mp3entry *id,int offset) {
+    lseek(rundb_fd,offset+4,SEEK_SET); // skip fileentry offset
+    id->rundbentryoffset=offset;
+    read(rundb_fd,&id->rundbhash,4);
+    read(rundb_fd,&id->rating,2);
+    read(rundb_fd,&id->voladjust,2);
+    read(rundb_fd,&id->playcount,4);
+    read(rundb_fd,&id->lastplayed,4);
 #ifdef ROCKBOX_LITTLE_ENDIAN
-    rundbentry.fileentry=BE32(rundbentry.fileentry);
-    rundbentry.hash=BE32(rundbentry.hash);
-    rundbentry.rating=BE16(rundbentry.rating);
-    rundbentry.voladjust=BE16(rundbentry.voladjust);
-    rundbentry.playcount=BE32(rundbentry.playcount);
-    rundbentry.lastplayed=BE32(rundbentry.lastplayed);
+    id->rundbhash=BE32(id->rundbhash);
+    id->rating=BE16(id->rating);
+    id->voladjust=BE16(id->voladjust);
+    id->playcount=BE32(id->playcount);
+    id->lastplayed=BE32(id->lastplayed);
 #endif
 }
 
-int getrundbentrybyhash(int hash)
+int getrundbentrybyhash(struct mp3entry *id)
 {
     int min=0;
     for(min=0;min<rundbheader.entrycount;min++) {
-        getrundbentrybyrecord(min);
-        if(hash==rundbentry.hash)
+        getrundbentrybyrecord(id,min);
+        if(id->filehash==id->rundbhash)
              return 1;
     }
-    memset(&rundbentry,0,sizeof(struct rundb_entry));
+    clearruntimeinfo(id);
     return 0;
 }
 
-void writerundbentry(void)
+void writerundbentry(struct mp3entry *id)
 {
-    if(rundbentry.hash==0) /* 0 = invalid rundb info. */
+    if(id->rundbhash==0) /* 0 = invalid rundb info. */
        return;
-    lseek(rundb_fd,currentreoffset,SEEK_SET);
-    write(rundb_fd,&rundbentry,20);
-    fsync(rundb_fd);
+    lseek(rundb_fd,id->rundbentryoffset,SEEK_SET);
+    write(rundb_fd,&id->fileentryoffset,4);
+    write(rundb_fd,&id->rundbhash,4);
+    write(rundb_fd,&id->rating,2);
+    write(rundb_fd,&id->voladjust,2);
+    write(rundb_fd,&id->playcount,4);
+    write(rundb_fd,&id->lastplayed,4);
 }
 
-void loadruntimeinfo(char *filename)
+void writeruntimeinfo(struct mp3entry *id) {
+    if(!id->rundbhash) 
+        addrundbentry(id);
+    else
+        writerundbentry(id);
+}
+
+void clearfileentryinfo(struct mp3entry *id) {
+    id->fileentryoffset=0;
+    id->filehash=0;
+    id->songentryoffset=0;
+    id->rundbentryoffset=0;
+}
+
+void clearruntimeinfo(struct mp3entry *id) {
+    id->rundbhash=0;
+    id->rating=0;
+    id->voladjust=0;
+    id->playcount=0;
+    id->lastplayed=0;
+}
+
+void loadruntimeinfo(struct mp3entry *id)
 {
-    memset(&rundbentry,0,sizeof(struct rundb_entry));
-    valid_file=0;
-    if(!getfentrybyfilename(filename)) 
+    clearruntimeinfo(id);
+    clearfileentryinfo(id);
+    if(!getfentrybyfilename(id)) {
+        logf("tagdb fail: %s",id->path);
         return; /* file is not in tagdatabase, could not load. */
-    valid_file=1;
-    if(fe.rundbentry!=-1&&fe.rundbentry<rundbsize) {
-        logf("load rundbentry: 0x%x",fe.rundbentry);
-        getrundbentrybyoffset(fe.rundbentry);
-        if(fe.hash!=rundbentry.hash) {
+    }
+    if(id->rundbentryoffset!=-1&&id->rundbentryoffset<rundbsize) {
+        logf("load rundbentry: 0x%x",id->rundbentryoffset);
+        getrundbentrybyoffset(id,id->rundbentryoffset);
+        if(id->filehash!=id->rundbhash) {
             logf("Rundb: Hash mismatch. trying to repair entry.",
-                 fe.hash,rundbentry.hash);
-            addrundbentry();
+                id->filehash,id->rundbhash);
+            findrundbentry(id);
         }
     }
-    else  /* add new rundb entry. */
-        addrundbentry();
+    else {
+      if(!findrundbentry(id))
+          logf("rundb:no entry and not found.");
+    }
 }
 
-void addrundbentry()
+int findrundbentry(struct mp3entry *id) {
+    if(getrundbentrybyhash(id)) {
+        logf("Found existing rundb entry: 0x%x",id->rundbentryoffset);
+        writefentry(id);
+        return 1;
+    }
+    clearruntimeinfo(id);
+    return 0;
+}
+
+void addrundbentry(struct mp3entry *id)
 {
     /* first search for an entry with an equal hash. */
-    if(getrundbentrybyhash(fe.hash)) {
-        logf("Found existing rundb entry: 0x%x",currentreoffset);
-        fe.rundbentry=currentreoffset;
-        writefentry();
-        return;
-    }
+/*    if(findrundbentry(id)) 
+           return; disabled cause this SHOULD have been checked at the buffer event.. */
     rundbheader.entrycount++;
     writerundbheader();
-    fe.rundbentry=currentreoffset=lseek(rundb_fd,0,SEEK_END);
-    logf("Add rundb entry: 0x%x hash: 0x%x",fe.rundbentry,fe.hash);
-    rundbentry.hash=fe.hash;
-    rundbentry.fileentry=currentfeoffset;
-    writefentry();
-    writerundbentry();
+    id->rundbentryoffset=lseek(rundb_fd,0,SEEK_END);
+    logf("Add rundb entry: 0x%x hash: 0x%x",id->rundbentryoffset,id->filehash);
+    id->rundbhash=id->filehash;
+    writefentry(id);
+    writerundbentry(id);
     rundbsize=lseek(rundb_fd,0,SEEK_END);
-}
-
-void increaseplaycount(void)
-{
-    if(rundbentry.hash==0) /* 0 = invalid rundb info. */
-       return;
-    rundbentry.playcount++;
-    writerundbentry();
-}
-
-void setrating(int rating)
-{
-    if(rundbentry.hash==0) /* 0 = invalid rundb info. */
-       return;
-    rundbentry.rating=rating;
-    writerundbentry();
 }
 
 /*** end RuntimeDatabase code ***/

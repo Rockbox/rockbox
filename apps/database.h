@@ -59,13 +59,6 @@ struct tagdb_header {
         int rundbdirty;
 };
 
-struct file_entry {
-        char *name;
-        int hash;
-        int songentry;
-        int rundbentry;
-};
-
 extern struct tagdb_header tagdbheader;
 extern int tagdb_fd;
 
@@ -82,24 +75,15 @@ struct rundb_header {
         int entrycount;
 };
 
-struct rundb_entry {
-        int fileentry;
-        int hash;
-        short rating;
-        short voladjust;
-        int playcount;
-        int lastplayed;
-};
 
 extern struct rundb_header rundbheader;
 
 #define RUNDB_VERSION 1
 
 void tagdb_shutdown(void);
-void addrundbentry(void);
-void loadruntimeinfo(char *filename);
-void increaseplaycount(void);
-void setrating(int rating);
+void addrundbentry(struct mp3entry *id);
+void loadruntimeinfo(struct mp3entry *id);
+void writeruntimeinfo(struct mp3entry *id);
 int rundb_init(void);
 void rundb_shutdown(void);
 #endif

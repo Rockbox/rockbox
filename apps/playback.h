@@ -65,7 +65,7 @@ struct track_info {
 void audio_set_track_changed_event(void (*handler)(struct track_info *ti));
 void audio_set_track_buffer_event(void (*handler)(struct mp3entry *id3,
                                                   bool last_track));
-void audio_set_track_unbufer_event(void (*handler)(struct mp3entry *id3,
+void audio_set_track_unbuffer_event(void (*handler)(struct mp3entry *id3,
                                                    bool last_track));
 void audio_invalidate_tracks(void);
 
