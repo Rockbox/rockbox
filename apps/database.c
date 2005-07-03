@@ -393,8 +393,11 @@ void rundb_shutdown(void)
     if (rundb_fd >= 0)
         close(rundb_fd);
     rundb_initialized = 0;
+#if CONFIG_HWCODEC == MASNONE
     audio_set_track_buffer_event(NULL);
     audio_set_track_unbuffer_event(NULL);
+    audio_set_track_changed_event(NULL);
+#endif
 }
 
 void writerundbheader(void)
