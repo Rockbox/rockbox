@@ -783,6 +783,33 @@ bool loadcodec(const char *trackname, bool start_play)
     return true;
 }
 
+bool read_next_metadata(void)
+{
+    int fd;
+    char *trackname;
+    int next_track;
+    int status;
+
+    trackname = playlist_peek(last_peek_offset);
+    if (!trackname)
+        return false;
+
+    fd = open(trackname, O_RDONLY);
+    if (fd < 0)
+        return false;
+
+    next_track = track_ridx + 1;
+    if (next_track >= MAX_TRACK)
+        next_track -= MAX_TRACK;
+
+    /* Start buffer refilling also because we need to spin-up the disk. */
+    filling = true;
+    status = get_metadata(&tracks[next_track],fd,trackname,v1first);
+    close(fd);
+
+    return status;
+}
+
 bool audio_load_track(int offset, bool start_play, int peek_offset)
 {
     char *trackname;
@@ -838,10 +865,12 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     tracks[track_widx].start_pos = 0;
         
     //logf("%s", trackname);
-    
-    if (!get_metadata(&tracks[track_widx],fd,trackname,v1first)) {
-      close(fd);
-      return false;
+
+    if (!tracks[track_widx].taginfo_ready) {
+        if (!get_metadata(&tracks[track_widx],fd,trackname,v1first)) {
+            close(fd);
+            return false;
+        }
     }
 
     /* Starting playback from an offset is only support in MPA at the moment */
@@ -1068,10 +1097,14 @@ void audio_check_buffer(void)
     if (audio_load_track(0, false, last_peek_offset)) {
         last_peek_offset++;
     } else if (tracks[track_widx].filerem == 0 || fill_bytesleft == 0) {
+        if (track_count <= 1)
+            read_next_metadata();
+            
         generate_postbuffer_events();
         filling = false;
         conf_bufferlimit = 0;
         pcm_set_boost_mode(false);
+            
         if (playing)
             ata_sleep();
     }
@@ -1243,6 +1276,7 @@ void audio_invalidate_tracks(void)
     buf_widx = buf_ridx + cur_ti->available;
     if (buf_widx >= codecbuflen)
         buf_widx -= codecbuflen;
+    read_next_metadata();
 }
 
 void audio_thread(void)
