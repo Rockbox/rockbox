@@ -466,28 +466,29 @@ void clearruntimeinfo(struct mp3entry *id) {
 }
 
 void loadruntimeinfo(struct mp3entry *id)
-{   int blahthisiscrapandyouknowitcauseidonthavetimetofindaproperwaytofixitsoblah;
+{
     clearruntimeinfo(id);
     clearfileentryinfo(id);
     if(!getfentrybyfilename(id)) {
         logf("tagdb fail: %s",id->path);
         return; /* file is not in tagdatabase, could not load. */
     }
-    if(id->rundbentryoffset!=-1&&id->rundbentryoffset<rundbsize) {
-        logf("load rundbentry: 0x%x",id->rundbentryoffset);
-        getrundbentrybyoffset(id,id->rundbentryoffset);
-        if(id->filehash!=id->rundbhash) {
+    if(id->rundbentryoffset!=-1 && id->rundbentryoffset<rundbsize) {
+        logf("load rundbentry: 0x%x", id->rundbentryoffset);
+        getrundbentrybyoffset(id, id->rundbentryoffset);
+        if(id->filehash != id->rundbhash) {
             logf("Rundb: Hash mismatch. trying to repair entry.",
-                id->filehash,id->rundbhash);
+                 id->filehash, id->rundbhash);
             findrundbentry(id);
         }
     }
+#ifdef ROCKBOX_HAS_LOGF
     else {
-      if(!findrundbentry(id)) {
-          logf("rundb:no entry and not found.");
-          blahthisiscrapandyouknowitcauseidonthavetimetofindaproperwaytofixitsoblah=1;
-      }
+        if(!findrundbentry(id)) {
+            logf("rundb:no entry and not found.");
+        }
     }
+#endif
 }
 
 int findrundbentry(struct mp3entry *id) {
