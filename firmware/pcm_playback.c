@@ -277,7 +277,7 @@ void pcm_play_pause(bool play)
         IIS2CONFIG = (pcm_freq << 12) | 0x300 | 4 << 2;
         EBU1CONFIG = 7 << 12 |  3 << 8 | 5 << 2;
         DCR0 |= DMA_EEXT | DMA_START;
-        sleep(1);
+        sleep(HZ/8);
         uda1380_mute(false);
     }
     else if(!pcm_paused && !play)
