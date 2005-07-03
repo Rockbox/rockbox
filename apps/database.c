@@ -482,12 +482,12 @@ void loadruntimeinfo(struct mp3entry *id)
             findrundbentry(id);
         }
     }
+    else 
 #ifdef ROCKBOX_HAS_LOGF
-    else {
-        if(!findrundbentry(id)) {
+        if(!findrundbentry(id))
             logf("rundb:no entry and not found.");
-        }
-    }
+#else
+        findrundbentry(id);
 #endif
 }
 
