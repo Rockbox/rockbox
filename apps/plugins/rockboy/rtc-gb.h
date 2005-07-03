@@ -1,7 +1,7 @@
 
 
-#ifndef __RTC_H__
-#define __RTC_H__
+#ifndef __RTC_GB_H__
+#define __RTC_GB_H__
 
 
 struct rtc

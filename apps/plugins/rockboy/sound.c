@@ -5,7 +5,7 @@
 #include "defs.h"
 #include "pcm.h"
 #include "sound.h"
-#include "cpu.h"
+#include "cpu-gb.h"
 #include "hw.h"
 #include "regs.h"
 #include "rc.h"

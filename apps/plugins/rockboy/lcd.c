@@ -1,12 +1,11 @@
 
 
-#include "config.h"
 #include "rockmacros.h"
 #include "defs.h"
 #include "regs.h"
 #include "hw.h"
 #include "mem.h"
-#include "lcd.h"
+#include "lcd-gb.h"
 #include "rc.h"
 #include "fb.h"
 #include "palette.h"

@@ -4,12 +4,12 @@
 #include <stdio.h>
 
 #include "defs.h"
-#include "cpu.h"
+#include "cpu-gb.h"
 #include "cpuregs.h"
 #include "hw.h"
 #include "regs.h"
-#include "lcd.h"
-#include "rtc.h"
+#include "lcd-gb.h"
+#include "rtc-gb.h"
 #include "mem.h"
 #include "sound.h"
 

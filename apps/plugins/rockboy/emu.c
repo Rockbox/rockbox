@@ -5,12 +5,12 @@
 #include "defs.h"
 #include "regs.h"
 #include "hw.h"
-#include "cpu.h"
+#include "cpu-gb.h"
 #include "mem.h"
-#include "lcd.h"
+#include "lcd-gb.h"
 #include "rc.h"
 #include "sound.h"
-#include "rtc.h"
+#include "rtc-gb.h"
 
 static int framelen = 16743;
 static int framecount;

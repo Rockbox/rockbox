@@ -51,16 +51,6 @@ void savestate(int fd);
 #define isalpha(c) (((c) >= 'a' && (c) <= 'z') || ((c) >= 'A' && ((c) <= 'Z')))
 #define isalnum(c) (isdigit(c) || (isalpha(c)))
 
-/* FIXME: This is a q&d fix for these #defines not being available from
- * rockbox' lcd.h because rockboy has its own lcd.h. Renaming the file and
- * adapting the other files produced weird errors I couldn't figure out
- *    -- amiconn  20050624 -- */
-#define DRMODE_COMPLEMENT 0
-#define DRMODE_BG         1
-#define DRMODE_FG         2
-#define DRMODE_SOLID      3
-#define DRMODE_INVERSEVID 4 /* used as bit modifier for basic modes */
-
 #ifdef SIMULATOR
 #undef opendir
 #define opendir(a)      rb->sim_opendir((a))
@@ -72,22 +62,12 @@ void savestate(int fd);
 #define open(a,b)       rb->sim_open((a),(b))
 #undef lseek
 #define lseek(a,b,c)    rb->sim_lseek((a),(b),(c))
-#define ICODE_ATTR
-#define IDATA_ATTR	 
 #else /* !SIMULATOR */
 #define opendir(a)      rb->opendir((a))
 #define closedir(a)     rb->closedir((a))
 #define mkdir(a,b)      rb->mkdir((a),(b))
 #define open(a,b)       rb->open((a),(b))
 #define lseek(a,b,c)    rb->lseek((a),(b),(c))
-#if CONFIG_CPU == MCF5249
-#define ICODE_ATTR	__attribute__ ((section(".icode")))
-#define IDATA_ATTR	__attribute__ ((section(".idata")))
-#define USE_IRAM	1
-#else
-#define ICODE_ATTR	
-#define IDATA_ATTR	 
-#endif
 #endif /* !SIMULATOR */
 
 #define strcat(a,b)     rb->strcat((a),(b))

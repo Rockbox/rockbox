@@ -4,7 +4,7 @@
 
 #include "rockmacros.h"
 #include "defs.h"
-#include "cpu.h"
+#include "cpu-gb.h"
 #include "mem.h"
 #include "fastmem.h"
 #include "regs.h"

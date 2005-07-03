@@ -4,9 +4,9 @@
 
 #include "defs.h"
 #include "hw.h"
-#include "cpu.h"
+#include "cpu-gb.h"
 #include "regs.h"
-#include "lcd.h"
+#include "lcd-gb.h"
 
 
 #define C (cpu.lcdc)

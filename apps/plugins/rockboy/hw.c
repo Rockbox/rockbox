@@ -3,10 +3,10 @@
 
 #include "rockmacros.h"
 #include "defs.h"
-#include "cpu.h"
+#include "cpu-gb.h"
 #include "hw.h"
 #include "regs.h"
-#include "lcd.h"
+#include "lcd-gb.h"
 #include "mem.h"
 #include "fastmem.h"
 

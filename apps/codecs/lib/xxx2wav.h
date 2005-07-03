@@ -19,14 +19,7 @@
 
 /* Various "helper functions" common to all the xxx2wav decoder plugins  */
 
-#if CONFIG_CPU == MCF5249 && !defined(SIMULATOR)
-#define ICODE_ATTR	__attribute__ ((section(".icode")))
-#define IDATA_ATTR	__attribute__ ((section(".idata")))
-#define USE_IRAM	1
-#else
-#define ICODE_ATTR	
-#define IDATA_ATTR	 
-#endif
+#include "config.h"
 
 /* the main data structure of the program */
 typedef struct {

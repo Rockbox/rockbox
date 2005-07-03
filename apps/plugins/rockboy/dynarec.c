@@ -4,7 +4,7 @@
 #include "defs.h"
 #include "regs.h"
 #include "hw.h"
-#include "cpu.h"
+#include "cpu-gb.h"
 #include "lcdc.h"
 #include "mem.h"
 #include "fastmem.h"

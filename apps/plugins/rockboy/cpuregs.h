@@ -7,7 +7,7 @@
 
 
 #include "defs.h"
-#include "cpu.h"
+#include "cpu-gb.h"
 
 #define LB(r) ((r).b[LO][LO])
 #define HB(r) ((r).b[LO][HI])

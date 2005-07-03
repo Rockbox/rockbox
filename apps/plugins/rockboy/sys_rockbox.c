@@ -21,7 +21,7 @@
 #include "fb.h"
 #include "input.h"
 #include "rc.h"
-#include "lcd.h"
+#include "lcd-gb.h"
 #include "hw.h"
 #include "config.h"
 

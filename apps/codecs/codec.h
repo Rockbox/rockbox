@@ -21,15 +21,6 @@
 
 #include "config.h"
 
-#if CONFIG_CPU == MCF5249 && !defined(SIMULATOR)
-#define ICODE_ATTR	__attribute__ ((section(".icode")))
-#define IDATA_ATTR	__attribute__ ((section(".idata")))
-#define USE_IRAM	1
-#else
-#define ICODE_ATTR	
-#define IDATA_ATTR	 
-#endif
-
 #include <sys/types.h>
 
 /* Get these functions 'out of the way' of the standard functions. Not doing

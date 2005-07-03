@@ -22,15 +22,6 @@
 
 /* Various codec "helper functions" */
 
-#if CONFIG_CPU == MCF5249 && !defined(SIMULATOR)
-#define ICODE_ATTR	__attribute__ ((section(".icode")))
-#define IDATA_ATTR	__attribute__ ((section(".idata")))
-#define USE_IRAM	1
-#else
-#define ICODE_ATTR	
-#define IDATA_ATTR	 
-#endif
-
 extern int mem_ptr;
 extern int bufsize;
 extern unsigned char* mallocbuf;  // 512K from the start of MP3 buffer

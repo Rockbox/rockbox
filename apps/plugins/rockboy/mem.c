@@ -6,8 +6,8 @@
 #include "hw.h"
 #include "regs.h"
 #include "mem.h"
-#include "rtc.h"
-#include "lcd.h"
+#include "rtc-gb.h"
+#include "lcd-gb.h"
 #include "lcdc.h"
 #include "sound.h"
 

@@ -1,7 +1,7 @@
 
 
-#ifndef __LCD_H__
-#define __LCD_H__
+#ifndef __LCD_GB_H__
+#define __LCD_GB_H__
 
 #include "defs.h"
 
@@ -52,13 +52,6 @@ extern struct lcd lcd;
 extern struct scan scan;
 
 
-
-
-
-#endif
-
-
-
 void updatepatpix(void) ICODE_ATTR;
 void tilebuf(void);
 void bg_scan(void);
@@ -76,3 +69,8 @@ void vram_write(int a, byte b);
 void vram_dirty(void);
 void pal_dirty(void);
 void lcd_reset(void);
+
+#endif
+
+
+
