@@ -53,7 +53,7 @@ unsigned short uda1380_defaults[2*NUM_DEFAULT_REGS] =
    REG_MASTER_VOL, MASTER_VOL_LEFT(0x20) | MASTER_VOL_RIGHT(0x20), /* 00=max, ff=mute */
    REG_MIX_VOL,    MIX_VOL_CH_1(0) | MIX_VOL_CH_2(0xff),           /* 00=max, ff=mute */
    REG_EQ,         EQ_MODE_MAX,                                    /* Bass and tremble = 0 dB */
-   REG_MUTE,       MUTE_MASTER,                                    /* Mute everything to start with */ 
+   REG_MUTE,       MUTE_MASTER | MUTE_CH2,                         /* Mute everything to start with */
    REG_MIX_CTL,    MIX_CTL_MIX,                                    /* Enable mixer */
    REG_DEC_VOL,    0,
    REG_PGA,        MUTE_ADC,
@@ -158,8 +158,6 @@ void uda1380_enable_output(bool enable)
 {
     if (enable) {
         uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] | PON_HP);
-        /* Don't unmute audio output here */
-        // uda1380_write_reg(REG_MUTE, MUTE_CH2);
     } else {
         uda1380_write_reg(REG_MUTE, MUTE_MASTER);
         uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] & ~PON_HP);

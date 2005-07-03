@@ -248,7 +248,7 @@ void pcm_play_data(const unsigned char* start, int size,
     dma_start(start, size);
     
     /* Sleep a while, then unmute audio output */
-    sleep(1);
+    sleep(HZ/8);
     uda1380_mute(false);
 }
 
@@ -353,8 +353,14 @@ void pcm_init(void)
     ICR4 = (ICR4 & 0xffff00ff) | 0x00001c00;
     IMR &= ~(1<<14);      /* bit 14 is DMA0 */
     
-    pcm_play_init();
     pcm_set_frequency(44100);
+    
+    /* Turn on headphone power with audio output muted. */
+    uda1380_mute(true);
+    sleep(HZ/4);
+    uda1380_enable_output(true);
+    
+    pcm_play_init();
 }
 
 void pcm_play_set_watermark(int numbytes, void (*callback)(int bytes_left))
@@ -699,11 +705,6 @@ void pcm_play_init(void)
     crossfade_active = false;
     crossfade_init = false;
     pcm_event_handler = NULL;
-
-    /* Turn on headphone power with audio output muted. */
-    uda1380_mute(true);
-    sleep(HZ/4);
-    uda1380_enable_output(true);
 }
 
 void pcm_crossfade_enable(bool on_off)
