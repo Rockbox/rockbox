@@ -256,9 +256,9 @@ void pcm_play_stop(void)
 {
     crossfade_active = false;
     pcm_set_boost_mode(false);
+    pcm_boost(false);
     if (pcm_playing) {
         uda1380_mute(true);
-        pcm_boost(false);
         sleep(1);
         dma_stop();
     }
