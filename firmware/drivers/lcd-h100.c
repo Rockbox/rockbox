@@ -60,11 +60,7 @@
 
 /*** globals ***/
 
-unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH]
-#ifndef SIMULATOR
-              __attribute__ ((section(".idata")))
-#endif
-              ;
+unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH] IDATA_ATTR;
 
 static int drawmode = DRMODE_SOLID;
 static int xmargin = 0;

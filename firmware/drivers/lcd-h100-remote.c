@@ -67,10 +67,7 @@
 /*** globals ***/
 
 unsigned char lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH]
-#ifndef SIMULATOR
-              __attribute__ ((section(".idata")))
-#endif	
-		;
+                                     IDATA_ATTR;
 		
 static int drawmode = DRMODE_SOLID;
 static int xmargin = 0;

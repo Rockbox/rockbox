@@ -110,11 +110,7 @@ static const char audio_thread_name[] = "audio";
 
 /* Codec thread. */
 static struct event_queue codec_queue;
-static long codec_stack[(DEFAULT_STACK_SIZE + 0x2500)/sizeof(long)]
-#ifndef SIMULATOR
-__attribute__ ((section(".idata")))
-#endif
-;
+static long codec_stack[(DEFAULT_STACK_SIZE + 0x2500)/sizeof(long)] IDATA_ATTR;
 static const char codec_thread_name[] = "codec";
 
 static struct mutex mutex_bufferfill;
