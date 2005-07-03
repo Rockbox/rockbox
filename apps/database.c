@@ -376,9 +376,13 @@ int rundb_init(void)
     }
 
     rundb_initialized = 1;
+/* hooks disabled for archos, rendering the runtime database not working,
+ * re enable when these callbacks are implemented in mpeg.c */
+#if CONFIG_HWCODEC == MASNONE
     audio_set_track_buffer_event(&rundb_buffer_track);
     audio_set_track_changed_event(&rundb_track_change);
     audio_set_track_unbuffer_event(&rundb_unbuffer_track);
+#endif
     rundbsize=lseek(rundb_fd,0,SEEK_END);
     return 0;
 #endif
