@@ -466,7 +466,7 @@ void clearruntimeinfo(struct mp3entry *id) {
 }
 
 void loadruntimeinfo(struct mp3entry *id)
-{
+{   int blahthisiscrapandyouknowitcauseidonthavetimetofindaproperwaytofixitsoblah;
     clearruntimeinfo(id);
     clearfileentryinfo(id);
     if(!getfentrybyfilename(id)) {
@@ -483,8 +483,10 @@ void loadruntimeinfo(struct mp3entry *id)
         }
     }
     else {
-      if(!findrundbentry(id))
+      if(!findrundbentry(id)) {
           logf("rundb:no entry and not found.");
+          blahthisiscrapandyouknowitcauseidonthavetimetofindaproperwaytofixitsoblah=1;
+      }
     }
 }
 
