@@ -68,6 +68,7 @@ alpine_cdc.c
 
 #if CONFIG_HWCODEC == MASNONE /* software codec platforms */
 iriverify.c
+wav2wv.c
 #else
 splitedit.c
 metronome.c
