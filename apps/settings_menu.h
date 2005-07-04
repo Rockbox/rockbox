@@ -22,5 +22,6 @@
 #include "menu.h"
 
 bool settings_menu(void);
+bool manage_settings_menu(void);
 
 #endif

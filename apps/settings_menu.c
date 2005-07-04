@@ -1480,7 +1480,7 @@ static bool time_settings_menu(void)
 }
 #endif
 
-static bool manage_settings_menu(void)
+bool manage_settings_menu(void)
 {
     int m;
     bool result;
@@ -1542,7 +1542,6 @@ static bool system_settings_menu(void)
 #ifdef HAVE_CHARGING
         { ID2P(LANG_CAR_ADAPTER_MODE), car_adapter_mode       },
 #endif
-        { ID2P(LANG_MANAGE_MENU),      manage_settings_menu   },
     };
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL,

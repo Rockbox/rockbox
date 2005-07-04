@@ -368,7 +368,7 @@ bool main_menu(void)
     int i = 0;
 
     /* main menu */
-    struct menu_item items[9];
+    struct menu_item items[10];
 
     items[i].desc = ID2P(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS);
     items[i++].function = bookmark_mrb_load;
@@ -378,6 +378,9 @@ bool main_menu(void)
 
     items[i].desc = ID2P(LANG_GENERAL_SETTINGS);
     items[i++].function = settings_menu;
+
+    items[i].desc = ID2P(LANG_MANAGE_MENU);
+    items[i++].function = manage_settings_menu;
 
 #ifdef CONFIG_TUNER
     if(radio_hardware_present()) {
