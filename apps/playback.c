@@ -805,6 +805,7 @@ bool read_next_metadata(void)
     /* Start buffer refilling also because we need to spin-up the disk. */
     filling = true;
     status = get_metadata(&tracks[next_track],fd,trackname,v1first);
+    track_changed = true;
     close(fd);
 
     return status;
