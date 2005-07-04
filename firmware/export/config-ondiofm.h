@@ -7,6 +7,7 @@
 /* LCD dimensions */
 #define LCD_WIDTH  112
 #define LCD_HEIGHT 64
+#define LCD_DEPTH  1
 
 /* define this if you have an Ondio style 6-key keyboard */
 #define CONFIG_KEYPAD ONDIO_PAD

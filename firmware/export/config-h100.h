@@ -7,10 +7,12 @@
 /* LCD dimensions */
 #define LCD_WIDTH  160
 #define LCD_HEIGHT 128
+#define LCD_DEPTH  2
 
 /* remote LCD */
 #define LCD_REMOTE_WIDTH  128
 #define LCD_REMOTE_HEIGHT 64
+#define LCD_REMOTE_DEPTH  1
 
 #define CONFIG_KEYPAD IRIVER_H100_PAD
 

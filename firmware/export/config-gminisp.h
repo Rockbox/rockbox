@@ -7,6 +7,7 @@
 /* LCD dimensions */
 #define LCD_WIDTH  128
 #define LCD_HEIGHT 64
+#define LCD_DEPTH  1
 
 #define CONFIG_KEYPAD GMINI100_PAD
 
