@@ -343,7 +343,7 @@ static char* get_dir(char* buf, int buf_size, const char* path, int level)
 
 /* Get the tag specified by the two characters at fmt.
  *
- * id3      - ID3 data to get tag values from.
+ * cid3      - ID3 data to get tag values from.
  * nid3     - next-song ID3 data to get tag values from.
  * tag      - string (of two characters) specifying the tag to get.
  * buf      - buffer to certain tags, such as track number, play time or
@@ -660,8 +660,20 @@ static char* get_tag(struct mp3entry* cid3,
                 return buf;
             }
             break;
+       case 'r':  /* Runtime database Information */
+            switch(tag[1])
+                {
+                     case 'p':  /* Playcount */
+                         *flags |= WPS_REFRESH_STATIC;
+                         snprintf(buf, buf_size, "%ld", cid3->playcount);
+                         return buf;
+                     case 'r':  /* Rating */
+                         *flags |= WPS_REFRESH_STATIC;
+                         snprintf(buf, buf_size, "%d", cid3->rating);
+                         return buf;
+                }
+            break;
     }
-
     return NULL;
 }
 
