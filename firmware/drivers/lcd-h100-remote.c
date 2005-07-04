@@ -68,7 +68,7 @@
 
 unsigned char lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH]
                                      IDATA_ATTR;
-		
+
 static int drawmode = DRMODE_SOLID;
 static int xmargin = 0;
 static int ymargin = 0;
@@ -380,7 +380,7 @@ void lcd_remote_init(void)
 
 /* Update the display.
    This must be called after all other LCD functions that change the display. */
-void lcd_remote_update(void) __attribute__ ((section (".icode")));
+void lcd_remote_update(void) ICODE_ATTR;
 void lcd_remote_update(void)
 {
     int y;
@@ -399,7 +399,7 @@ void lcd_remote_update(void)
 }
 
 /* Update a fraction of the display. */
-void lcd_remote_update_rect(int, int, int, int) __attribute__ ((section (".icode")));
+void lcd_remote_update_rect(int, int, int, int) ICODE_ATTR;
 void lcd_remote_update_rect(int x, int y, int width, int height)
 {
     int ymax;
@@ -497,56 +497,56 @@ lcd_pixelfunc_type* lcd_remote_pixelfuncs[8] = {
 };
                                
 static void flipblock(unsigned char *address, unsigned mask, unsigned bits)
-                      __attribute__ ((section(".icode")));
+                      ICODE_ATTR;
 static void flipblock(unsigned char *address, unsigned mask, unsigned bits)
 {
-    *address ^= (bits & mask);
+    *address ^= bits & mask;
 }
 
 static void bgblock(unsigned char *address, unsigned mask, unsigned bits)
-                    __attribute__ ((section(".icode")));
+                    ICODE_ATTR;
 static void bgblock(unsigned char *address, unsigned mask, unsigned bits)
 {
-    *address &= (bits | ~mask);
+    *address &= bits | ~mask;
 }
 
 static void fgblock(unsigned char *address, unsigned mask, unsigned bits)
-                    __attribute__ ((section(".icode")));
+                    ICODE_ATTR;
 static void fgblock(unsigned char *address, unsigned mask, unsigned bits)
 {
-    *address |= (bits & mask);
+    *address |= bits & mask;
 }
 
 static void solidblock(unsigned char *address, unsigned mask, unsigned bits)
-                       __attribute__ ((section(".icode")));
+                       ICODE_ATTR;
 static void solidblock(unsigned char *address, unsigned mask, unsigned bits)
 {
     *address = (*address & ~mask) | (bits & mask);
 }
 
 static void flipinvblock(unsigned char *address, unsigned mask, unsigned bits)
-                         __attribute__ ((section(".icode")));
+                         ICODE_ATTR;
 static void flipinvblock(unsigned char *address, unsigned mask, unsigned bits)
 {
-    *address ^= (~bits & mask);
+    *address ^= ~bits & mask;
 }
 
 static void bginvblock(unsigned char *address, unsigned mask, unsigned bits)
-                       __attribute__ ((section(".icode")));
+                       ICODE_ATTR;
 static void bginvblock(unsigned char *address, unsigned mask, unsigned bits)
 {
     *address &= ~(bits & mask);
 }
 
 static void fginvblock(unsigned char *address, unsigned mask, unsigned bits)
-                       __attribute__ ((section(".icode")));
+                       ICODE_ATTR;
 static void fginvblock(unsigned char *address, unsigned mask, unsigned bits)
 {
-    *address |= (~bits & mask);
+    *address |= ~bits & mask;
 }
 
 static void solidinvblock(unsigned char *address, unsigned mask, unsigned bits)
-                          __attribute__ ((section(".icode")));
+                          ICODE_ATTR;
 static void solidinvblock(unsigned char *address, unsigned mask, unsigned bits)
 {
     *address = (*address & ~mask) | (~bits & mask);
@@ -714,7 +714,7 @@ void lcd_remote_vline(int x, int y1, int y2)
     dst   = &lcd_remote_framebuffer[y1>>3][x];
     ny    = y2 - (y1 & ~7);
     mask  = 0xFFu << (y1 & 7);
-    mask_bottom = 0xFFu >> (7 - (ny & 7));
+    mask_bottom = 0xFFu >> (~ny & 7);
 
     for (; ny >= 8; ny -= 8)
     {
@@ -780,7 +780,7 @@ void lcd_remote_fillrect(int x, int y, int width, int height)
     dst   = &lcd_remote_framebuffer[y>>3][x];
     ny    = height - 1 + (y & 7);
     mask  = 0xFFu << (y & 7);
-    mask_bottom = 0xFFu >> (7 - (ny & 7));
+    mask_bottom = 0xFFu >> (~ny & 7);
 
     for (; ny >= 8; ny -= 8)
     {
@@ -826,7 +826,7 @@ void lcd_remote_fillrect(int x, int y, int width, int height)
 /* Draw a partial bitmap */
 void lcd_remote_bitmap_part(const unsigned char *src, int src_x, int src_y,
                             int stride, int x, int y, int width, int height)
-                            __attribute__ ((section(".icode")));
+                            ICODE_ATTR;
 void lcd_remote_bitmap_part(const unsigned char *src, int src_x, int src_y,
                             int stride, int x, int y, int width, int height)
 {
@@ -867,8 +867,8 @@ void lcd_remote_bitmap_part(const unsigned char *src, int src_x, int src_y,
 
     bfunc  = lcd_remote_blockfuncs[drawmode];
     mask   = 0xFFu << (shift + src_y);
-    mask_bottom = 0xFFu >> (7 - (ny & 7));
-    
+    mask_bottom = 0xFFu >> (~ny & 7);
+
     if (shift == 0)
     {
         bool copyopt = (drawmode == DRMODE_SOLID);
