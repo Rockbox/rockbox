@@ -1476,7 +1476,6 @@ void tree_init(void)
     tc.dirfilter = &global_settings.dirfilter;
 
     tagdb_init();
-    rundb_init();
 
     tc.name_buffer_size = AVERAGE_FILENAME_LENGTH * max_files;
     tc.name_buffer = buffer_alloc(tc.name_buffer_size);

@@ -263,7 +263,7 @@ void init(void)
     status_init();
     playlist_init();
     tree_init();
-
+        
     /* No buffer allocation (see buffer.c) may take place after the call to
        audio_init() since the mpeg thread takes the rest of the buffer space */
     mp3_init( global_settings.volume,
@@ -289,6 +289,9 @@ void init(void)
     pcm_init_recording();
 #endif
     talk_init();
+    /* runtime database has to be initialized after audio_init() */
+    rundb_init();
+        
 
 #ifdef AUTOROCK
     {
