@@ -382,6 +382,7 @@ int rundb_init(void)
     audio_set_track_buffer_event(&rundb_buffer_track);
     audio_set_track_changed_event(&rundb_track_change);
     audio_set_track_unbuffer_event(&rundb_unbuffer_track);
+    logf("rundb inited.");
 #endif
     rundbsize=lseek(rundb_fd,0,SEEK_END);
     return 0;
@@ -451,6 +452,7 @@ void writerundbentry(struct mp3entry *id)
 }
 
 void writeruntimeinfo(struct mp3entry *id) {
+    logf("rundb write");
     if(!id->rundbhash) 
         addrundbentry(id);
     else
@@ -474,6 +476,7 @@ void clearruntimeinfo(struct mp3entry *id) {
 
 void loadruntimeinfo(struct mp3entry *id)
 {
+    logf("rundb load");
     clearruntimeinfo(id);
     clearfileentryinfo(id);
     if(!getfentrybyfilename(id)) {

@@ -3154,3 +3154,15 @@ desc: in settings_menu.
 eng: "Gather runtime data (experimental)"
 voice: "Gather runtime data"
 new:
+
+id: LANG_MENU_SET_RATING
+desc: in wps context menu
+eng: "Set song rating"
+voice: "Set song rating"
+new:
+
+id: LANG_RATING
+desc: in set_rating
+eng: "Rating:"
+voice "Rating"
+new:
