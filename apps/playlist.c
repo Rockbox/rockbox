@@ -2010,6 +2010,31 @@ int playlist_get_resume_info(int *resume_index)
     return 0;
 }
 
+/* Update resume info for current playing song.  Returns -1 on error. */
+int playlist_update_resume_info(const struct mp3entry* id3)
+{
+    struct playlist_info* playlist = &current_playlist;
+
+    if (id3)
+    {
+        if (global_settings.resume_index != playlist->index ||
+            global_settings.resume_offset != id3->offset)
+        {
+            global_settings.resume_index = playlist->index;
+            global_settings.resume_offset = id3->offset;
+            settings_save();
+        }
+    }
+    else
+    {
+        global_settings.resume_index = -1;
+        global_settings.resume_offset = -1;
+        settings_save();
+    }
+
+    return 0;
+}
+
 /* Returns index of current playing track for display purposes.  This value
    should not be used for resume purposes as it doesn't represent the actual
    index into the playlist */

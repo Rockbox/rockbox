@@ -92,7 +92,7 @@ extern char* playlist_peek(int steps);
 extern bool playlist_check(int steps);
 extern int playlist_next(int steps);
 extern int playlist_amount(void);
-extern void update_file_pos( int id, int pos );
+extern int playlist_update_resume_info(const struct mp3entry* id3);
 
 /* list of tracks in memory */
 #define MAX_TRACK_ENTRIES (1<<4) /* Must be power of 2 */
@@ -872,6 +872,8 @@ static void update_playlist(void)
         if (playlist_next(playlist_amount()) < 0)
             is_playing = false;
     }
+
+    playlist_update_resume_info(audio_current_track());
 }
 
 static void track_change(void)
@@ -1036,6 +1038,11 @@ static void mpeg_thread(void)
         {
             queue_wait_w_tmo(&mpeg_queue, &ev, 0);
         }
+        else if (playing)
+        {
+            /* periodically update resume info */
+            queue_wait_w_tmo(&mpeg_queue, &ev, HZ/2);
+        }
         else
         {
             DEBUGF("S R:%x W:%x SW:%x\n",
@@ -1108,6 +1115,10 @@ static void mpeg_thread(void)
                 DEBUGF("MPEG_STOP\n");
                 is_playing = false;
                 paused = false;
+
+                if (playing)
+                    playlist_update_resume_info(audio_current_track());
+
                 stop_playing();
                 mpeg_stop_done = true;
                 break;
@@ -1120,6 +1131,7 @@ static void mpeg_thread(void)
                 pause_tick = current_tick;
                 pause_track = current_track_counter;
                 mp3_play_pause(false);
+                playlist_update_resume_info(audio_current_track());
                 break;
 
             case MPEG_RESUME:
@@ -1564,6 +1576,11 @@ static void mpeg_thread(void)
                 init_recording_done = true;
                 break;
 #endif /* #if CONFIG_HWCODEC == MAS3587F */
+
+            case SYS_TIMEOUT:
+                if (playing)
+                    playlist_update_resume_info(audio_current_track());
+                break;
             }
 #if CONFIG_HWCODEC == MAS3587F
         }

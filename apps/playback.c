@@ -1320,9 +1320,12 @@ void audio_thread(void)
                 ci.seek_time = 0;
                 pcm_crossfade_init();
                 audio_play_start((int)ev.data);
+                playlist_update_resume_info(audio_current_track());
                 break ;
                 
             case AUDIO_STOP:
+                if (playing)
+                    playlist_update_resume_info(audio_current_track());
                 audio_stop_playback();
                 break ;
                 
@@ -1342,6 +1345,7 @@ void audio_thread(void)
             case AUDIO_TRACK_CHANGED:
                 if (track_changed_callback)
                     track_changed_callback(cur_ti);
+                playlist_update_resume_info(audio_current_track());
                 break ;
                 
             case AUDIO_CODEC_DONE:
@@ -1357,6 +1361,10 @@ void audio_thread(void)
                 usb_wait_for_disconnect(&audio_queue);
                 break ;
 #endif
+            case SYS_TIMEOUT:
+                if (playing)
+                    playlist_update_resume_info(audio_current_track());
+                break;
         }
     }
 }

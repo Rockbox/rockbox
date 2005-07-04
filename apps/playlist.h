@@ -23,6 +23,7 @@
 #include <stdbool.h>
 #include "file.h"
 #include "kernel.h"
+#include "id3.h"
 
 /* playlist data */
 
@@ -79,6 +80,7 @@ bool playlist_check(int steps);
 char *playlist_peek(int steps);
 int playlist_next(int steps);
 int playlist_get_resume_info(int *resume_index);
+int playlist_update_resume_info(const struct mp3entry* id3);
 int playlist_get_display_index(void);
 int playlist_amount(void);
 

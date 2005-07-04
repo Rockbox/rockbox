@@ -250,22 +250,6 @@ static bool update(void)
 
     status_draw(false);
 
-    /* save resume data */
-    if ( id3 &&
-         (global_settings.resume_offset != id3->offset || track_changed)) {
- 
-        if (!playlist_get_resume_info(&global_settings.resume_index))
-        {
-            global_settings.resume_offset = id3->offset;
-            settings_save();
-        }
-    }
-    else if ( !id3 && track_changed ) {
-        global_settings.resume_index = -1;
-        global_settings.resume_offset = -1;
-        settings_save();
-    }
-
     return retcode;
 }
 
