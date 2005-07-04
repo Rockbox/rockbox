@@ -31,12 +31,12 @@ void bs_open_read (Bitstream *bs, uchar *buffer_start, uchar *buffer_end, read_s
     bs->end = buffer_end;
 
     if (file) {
-	bs->ptr = bs->end - 1;
-	bs->file_bytes = file_bytes;
-	bs->file = file;
+        bs->ptr = bs->end - 1;
+        bs->file_bytes = file_bytes;
+        bs->file = file;
     }
     else
-	bs->ptr = bs->buf - 1;
+        bs->ptr = bs->buf - 1;
 
     bs->wrap = bs_read;
 }
@@ -49,29 +49,68 @@ void bs_open_read (Bitstream *bs, uchar *buffer_start, uchar *buffer_end, read_s
 static void bs_read (Bitstream *bs)
 {
     if (bs->file && bs->file_bytes) {
-	ulong bytes_read, bytes_to_read = bs->end - bs->buf;
+        ulong bytes_read, bytes_to_read = bs->end - bs->buf;
 
-	if (bytes_to_read > bs->file_bytes)
-	    bytes_to_read = bs->file_bytes;
+        if (bytes_to_read > bs->file_bytes)
+            bytes_to_read = bs->file_bytes;
 
-	bytes_read = bs->file (bs->buf, bytes_to_read);
+        bytes_read = bs->file (bs->buf, bytes_to_read);
 
-	if (bytes_read) {
-	    bs->end = bs->buf + bytes_read;
-	    bs->file_bytes -= bytes_read;
-	}
-	else {
-	    memset (bs->buf, -1, bs->end - bs->buf);
-	    bs->error = 1;
-	}
+        if (bytes_read) {
+            bs->end = bs->buf + bytes_read;
+            bs->file_bytes -= bytes_read;
+        }
+        else {
+            memset (bs->buf, -1, bs->end - bs->buf);
+            bs->error = 1;
+        }
     }
     else
-	bs->error = 1;
+        bs->error = 1;
 
     if (bs->error)
-	memset (bs->buf, -1, bs->end - bs->buf);
+        memset (bs->buf, -1, bs->end - bs->buf);
 
     bs->ptr = bs->buf;
+}
+
+// Open the specified BitStream using the specified buffer pointers. It is
+// assumed that enough buffer space has been allocated for all data that will
+// be written, otherwise an error will be generated.
+
+static void bs_write (Bitstream *bs);
+
+void bs_open_write (Bitstream *bs, uchar *buffer_start, uchar *buffer_end)
+{
+    bs->error = bs->sr = bs->bc = 0;
+    bs->ptr = bs->buf = buffer_start;
+    bs->end = buffer_end;
+    bs->wrap = bs_write;
+}
+
+// This function is only called from the putbit() and putbits() macros when
+// the buffer is full, which is now flagged as an error.
+
+static void bs_write (Bitstream *bs)
+{
+    bs->ptr = bs->buf;
+    bs->error = 1;
+}
+
+// This function forces a flushing write of the specified BitStream, and
+// returns the total number of bytes written into the buffer.
+
+ulong bs_close_write (Bitstream *bs)
+{
+    ulong bytes_written;
+
+    if (bs->error)
+        return (ulong) -1;
+
+    while (bs->bc || ((bs->ptr - bs->buf) & 1)) putbit_1 (bs);
+    bytes_written = bs->ptr - bs->buf;
+    CLEAR (*bs);
+    return bytes_written;
 }
 
 /////////////////////// Endian Correction Routines ////////////////////////////
@@ -82,27 +121,27 @@ void little_endian_to_native (void *data, char *format)
     long temp;
 
     while (*format) {
-	switch (*format) {
-	    case 'L':
-		temp = cp [0] + ((long) cp [1] << 8) + ((long) cp [2] << 16) + ((long) cp [3] << 24);
-		* (long *) cp = temp;
-		cp += 4;
-		break;
+        switch (*format) {
+            case 'L':
+                temp = cp [0] + ((long) cp [1] << 8) + ((long) cp [2] << 16) + ((long) cp [3] << 24);
+                * (long *) cp = temp;
+                cp += 4;
+                break;
 
-	    case 'S':
-		temp = cp [0] + (cp [1] << 8);
-		* (short *) cp = (short) temp;
-		cp += 2;
-		break;
+            case 'S':
+                temp = cp [0] + (cp [1] << 8);
+                * (short *) cp = (short) temp;
+                cp += 2;
+                break;
 
-	    default:
-		if (*format >= '0' && *format <= '9')
-		    cp += *format - '0';
+            default:
+                if (*format >= '0' && *format <= '9')
+                    cp += *format - '0';
 
-		break;
-	}
+                break;
+        }
 
-	format++;
+        format++;
     }
 }
 
@@ -112,28 +151,28 @@ void native_to_little_endian (void *data, char *format)
     long temp;
 
     while (*format) {
-	switch (*format) {
-	    case 'L':
-		temp = * (long *) cp;
-		*cp++ = (uchar) temp;
-		*cp++ = (uchar) (temp >> 8);
-		*cp++ = (uchar) (temp >> 16);
-		*cp++ = (uchar) (temp >> 24);
-		break;
+        switch (*format) {
+            case 'L':
+                temp = * (long *) cp;
+                *cp++ = (uchar) temp;
+                *cp++ = (uchar) (temp >> 8);
+                *cp++ = (uchar) (temp >> 16);
+                *cp++ = (uchar) (temp >> 24);
+                break;
 
-	    case 'S':
-		temp = * (short *) cp;
-		*cp++ = (uchar) temp;
-		*cp++ = (uchar) (temp >> 8);
-		break;
+            case 'S':
+                temp = * (short *) cp;
+                *cp++ = (uchar) temp;
+                *cp++ = (uchar) (temp >> 8);
+                break;
 
-	    default:
-		if (*format >= '0' && *format <= '9')
-		    cp += *format - '0';
+            default:
+                if (*format >= '0' && *format <= '9')
+                    cp += *format - '0';
 
-		break;
-	}
+                break;
+        }
 
-	format++;
+        format++;
     }
 }

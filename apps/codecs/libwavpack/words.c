@@ -29,7 +29,7 @@
 
 //////////////////////////////// local macros /////////////////////////////////
 
-#define LIMIT_ONES 16	// maximum consecutive 1s sent for "div" data
+#define LIMIT_ONES 16   // maximum consecutive 1s sent for "div" data
 
 // these control the time constant "slow_level" which is used for hybrid mode
 // that controls bitrate as a function of residual level (HYBRID_BITRATE).
@@ -37,9 +37,9 @@
 #define SLO ((1 << (SLS - 1)))
 
 // these control the time constant of the 3 median level breakpoints
-#define DIV0 128	// 5/7 of samples
-#define DIV1 64		// 10/49 of samples
-#define DIV2 32		// 20/343 of samples
+#define DIV0 128        // 5/7 of samples
+#define DIV1 64         // 10/49 of samples
+#define DIV2 32         // 20/343 of samples
 
 // this macro retrieves the specified median breakpoint (without frac; min = 1)
 #define GET_MED(med) (((c->median [med]) >> 4) + 1)
@@ -66,23 +66,45 @@
 
 ///////////////////////////// local table storage ////////////////////////////
 
+const ulong bitset [] = {
+    1L << 0, 1L << 1, 1L << 2, 1L << 3,
+    1L << 4, 1L << 5, 1L << 6, 1L << 7,
+    1L << 8, 1L << 9, 1L << 10, 1L << 11,
+    1L << 12, 1L << 13, 1L << 14, 1L << 15,
+    1L << 16, 1L << 17, 1L << 18, 1L << 19,
+    1L << 20, 1L << 21, 1L << 22, 1L << 23,
+    1L << 24, 1L << 25, 1L << 26, 1L << 27,
+    1L << 28, 1L << 29, 1L << 30, 1L << 31
+};
+
+const ulong bitmask [] = {
+    (1L << 0) - 1, (1L << 1) - 1, (1L << 2) - 1, (1L << 3) - 1,
+    (1L << 4) - 1, (1L << 5) - 1, (1L << 6) - 1, (1L << 7) - 1,
+    (1L << 8) - 1, (1L << 9) - 1, (1L << 10) - 1, (1L << 11) - 1,
+    (1L << 12) - 1, (1L << 13) - 1, (1L << 14) - 1, (1L << 15) - 1,
+    (1L << 16) - 1, (1L << 17) - 1, (1L << 18) - 1, (1L << 19) - 1,
+    (1L << 20) - 1, (1L << 21) - 1, (1L << 22) - 1, (1L << 23) - 1,
+    (1L << 24) - 1, (1L << 25) - 1, (1L << 26) - 1, (1L << 27) - 1,
+    (1L << 28) - 1, (1L << 29) - 1, (1L << 30) - 1, 0x7fffffff
+};
+
 const char nbits_table [] = {
-    0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4,	// 0 - 15
-    5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,	// 16 - 31
-    6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,	// 32 - 47
-    6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,	// 48 - 63
-    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,	// 64 - 79
-    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,	// 80 - 95
-    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,	// 96 - 111
-    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,	// 112 - 127
-    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,	// 128 - 143
-    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,	// 144 - 159
-    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,	// 160 - 175
-    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,	// 176 - 191
-    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,	// 192 - 207
-    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,	// 208 - 223
-    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,	// 224 - 239
-    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8	// 240 - 255
+    0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4,     // 0 - 15
+    5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,     // 16 - 31
+    6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,     // 32 - 47
+    6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,     // 48 - 63
+    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,     // 64 - 79
+    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,     // 80 - 95
+    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,     // 96 - 111
+    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,     // 112 - 127
+    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,     // 128 - 143
+    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,     // 144 - 159
+    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,     // 160 - 175
+    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,     // 176 - 191
+    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,     // 192 - 207
+    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,     // 208 - 223
+    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,     // 224 - 239
+    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8      // 240 - 255
 };
 
 static const uchar log2_table [] = {
@@ -136,6 +158,11 @@ static const char ones_count_table [] = {
 
 ///////////////////////////// executable code ////////////////////////////////
 
+void init_words (WavpackStream *wps)
+{
+    CLEAR (wps->w);
+}
+
 static int mylog2 (unsigned long avalue);
 
 // Read the median log2 values from the specifed metadata structure, convert
@@ -147,19 +174,53 @@ int read_entropy_vars (WavpackStream *wps, WavpackMetadata *wpmd)
     uchar *byteptr = wpmd->data;
 
     if (wpmd->byte_length != ((wps->wphdr.flags & MONO_FLAG) ? 6 : 12))
-	return FALSE;
+        return FALSE;
 
     wps->w.c [0].median [0] = exp2s (byteptr [0] + (byteptr [1] << 8));
     wps->w.c [0].median [1] = exp2s (byteptr [2] + (byteptr [3] << 8));
     wps->w.c [0].median [2] = exp2s (byteptr [4] + (byteptr [5] << 8));
 
     if (!(wps->wphdr.flags & MONO_FLAG)) {
-	wps->w.c [1].median [0] = exp2s (byteptr [6] + (byteptr [7] << 8));
-	wps->w.c [1].median [1] = exp2s (byteptr [8] + (byteptr [9] << 8));
-	wps->w.c [1].median [2] = exp2s (byteptr [10] + (byteptr [11] << 8));
+        wps->w.c [1].median [0] = exp2s (byteptr [6] + (byteptr [7] << 8));
+        wps->w.c [1].median [1] = exp2s (byteptr [8] + (byteptr [9] << 8));
+        wps->w.c [1].median [2] = exp2s (byteptr [10] + (byteptr [11] << 8));
     }
 
     return TRUE;
+}
+
+// Allocates the correct space in the metadata structure and writes the
+// current median values to it. Values are converted from 32-bit unsigned
+// to our internal 16-bit mylog2 values, and read_entropy_vars () is called
+// to read the values back because we must compensate for the loss through
+// the log function.
+
+void write_entropy_vars (WavpackStream *wps, WavpackMetadata *wpmd)
+{
+    uchar *byteptr;
+    int temp;
+
+    byteptr = wpmd->data = wpmd->temp_data;
+    wpmd->id = ID_ENTROPY_VARS;
+
+    *byteptr++ = temp = mylog2 (wps->w.c [0].median [0]);
+    *byteptr++ = temp >> 8;
+    *byteptr++ = temp = mylog2 (wps->w.c [0].median [1]);
+    *byteptr++ = temp >> 8;
+    *byteptr++ = temp = mylog2 (wps->w.c [0].median [2]);
+    *byteptr++ = temp >> 8;
+
+    if (!(wps->wphdr.flags & MONO_FLAG)) {
+        *byteptr++ = temp = mylog2 (wps->w.c [1].median [0]);
+        *byteptr++ = temp >> 8;
+        *byteptr++ = temp = mylog2 (wps->w.c [1].median [1]);
+        *byteptr++ = temp >> 8;
+        *byteptr++ = temp = mylog2 (wps->w.c [1].median [2]);
+        *byteptr++ = temp >> 8;
+    }
+
+    wpmd->byte_length = byteptr - (uchar *) wpmd->data;
+    read_entropy_vars (wps, wpmd);
 }
 
 // Read the hybrid related values from the specifed metadata structure, convert
@@ -173,37 +234,37 @@ int read_hybrid_profile (WavpackStream *wps, WavpackMetadata *wpmd)
     uchar *endptr = byteptr + wpmd->byte_length;
 
     if (wps->wphdr.flags & HYBRID_BITRATE) {
-	wps->w.c [0].slow_level = exp2s (byteptr [0] + (byteptr [1] << 8));
-	byteptr += 2;
+        wps->w.c [0].slow_level = exp2s (byteptr [0] + (byteptr [1] << 8));
+        byteptr += 2;
 
-	if (!(wps->wphdr.flags & MONO_FLAG)) {
-	    wps->w.c [1].slow_level = exp2s (byteptr [0] + (byteptr [1] << 8));
-	    byteptr += 2;
-	}
+        if (!(wps->wphdr.flags & MONO_FLAG)) {
+            wps->w.c [1].slow_level = exp2s (byteptr [0] + (byteptr [1] << 8));
+            byteptr += 2;
+        }
     }
 
     wps->w.bitrate_acc [0] = (long)(byteptr [0] + (byteptr [1] << 8)) << 16;
     byteptr += 2;
 
     if (!(wps->wphdr.flags & MONO_FLAG)) {
-	wps->w.bitrate_acc [1] = (long)(byteptr [0] + (byteptr [1] << 8)) << 16;
-	byteptr += 2;
+        wps->w.bitrate_acc [1] = (long)(byteptr [0] + (byteptr [1] << 8)) << 16;
+        byteptr += 2;
     }
 
     if (byteptr < endptr) {
-	wps->w.bitrate_delta [0] = exp2s ((short)(byteptr [0] + (byteptr [1] << 8)));
-	byteptr += 2;
+        wps->w.bitrate_delta [0] = exp2s ((short)(byteptr [0] + (byteptr [1] << 8)));
+        byteptr += 2;
 
-	if (!(wps->wphdr.flags & MONO_FLAG)) {
-	    wps->w.bitrate_delta [1] = exp2s ((short)(byteptr [0] + (byteptr [1] << 8)));
-	    byteptr += 2;
-	}
+        if (!(wps->wphdr.flags & MONO_FLAG)) {
+            wps->w.bitrate_delta [1] = exp2s ((short)(byteptr [0] + (byteptr [1] << 8)));
+            byteptr += 2;
+        }
 
-	if (byteptr < endptr)
-	    return FALSE;
+        if (byteptr < endptr)
+            return FALSE;
     }
     else
-	wps->w.bitrate_delta [0] = wps->w.bitrate_delta [1] = 0;
+        wps->w.bitrate_delta [0] = wps->w.bitrate_delta [1] = 0;
 
     return TRUE;
 }
@@ -214,60 +275,60 @@ int read_hybrid_profile (WavpackStream *wps, WavpackMetadata *wpmd)
 // currently implemented) this is calculated from the slow_level values and the
 // bitrate accumulators. Note that the bitrate accumulators can be changing.
 
-static void update_error_limit (WavpackStream *wps)
+void update_error_limit (struct words_data *w, ulong flags)
 {
-    int bitrate_0 = (wps->w.bitrate_acc [0] += wps->w.bitrate_delta [0]) >> 16;
+    int bitrate_0 = (w->bitrate_acc [0] += w->bitrate_delta [0]) >> 16;
 
-    if (wps->wphdr.flags & MONO_FLAG) {
-	if (wps->wphdr.flags & HYBRID_BITRATE) {
-	    int slow_log_0 = (wps->w.c [0].slow_level + SLO) >> SLS;
+    if (flags & MONO_FLAG) {
+        if (flags & HYBRID_BITRATE) {
+            int slow_log_0 = (w->c [0].slow_level + SLO) >> SLS;
 
-	    if (slow_log_0 - bitrate_0 > -0x100)
-		wps->w.c [0].error_limit = exp2s (slow_log_0 - bitrate_0 + 0x100);
-	    else
-		wps->w.c [0].error_limit = 0;
-	}
-	else
-	    wps->w.c [0].error_limit = exp2s (bitrate_0);
+            if (slow_log_0 - bitrate_0 > -0x100)
+                w->c [0].error_limit = exp2s (slow_log_0 - bitrate_0 + 0x100);
+            else
+                w->c [0].error_limit = 0;
+        }
+        else
+            w->c [0].error_limit = exp2s (bitrate_0);
     }
     else {
-	int bitrate_1 = (wps->w.bitrate_acc [1] += wps->w.bitrate_delta [1]) >> 16;
+        int bitrate_1 = (w->bitrate_acc [1] += w->bitrate_delta [1]) >> 16;
 
-	if (wps->wphdr.flags & HYBRID_BITRATE) {
-	    int slow_log_0 = (wps->w.c [0].slow_level + SLO) >> SLS;
-	    int slow_log_1 = (wps->w.c [1].slow_level + SLO) >> SLS;
+        if (flags & HYBRID_BITRATE) {
+            int slow_log_0 = (w->c [0].slow_level + SLO) >> SLS;
+            int slow_log_1 = (w->c [1].slow_level + SLO) >> SLS;
 
-	    if (wps->wphdr.flags & HYBRID_BALANCE) {
-		int balance = (slow_log_1 - slow_log_0 + bitrate_1 + 1) >> 1;
+            if (flags & HYBRID_BALANCE) {
+                int balance = (slow_log_1 - slow_log_0 + bitrate_1 + 1) >> 1;
 
-		if (balance > bitrate_0) {
-		    bitrate_1 = bitrate_0 * 2;
-		    bitrate_0 = 0;
-		}
-		else if (-balance > bitrate_0) {
-		    bitrate_0 = bitrate_0 * 2;
-		    bitrate_1 = 0;
-		}
-		else {
-		    bitrate_1 = bitrate_0 + balance;
-		    bitrate_0 = bitrate_0 - balance;
-		}
-	    }
+                if (balance > bitrate_0) {
+                    bitrate_1 = bitrate_0 * 2;
+                    bitrate_0 = 0;
+                }
+                else if (-balance > bitrate_0) {
+                    bitrate_0 = bitrate_0 * 2;
+                    bitrate_1 = 0;
+                }
+                else {
+                    bitrate_1 = bitrate_0 + balance;
+                    bitrate_0 = bitrate_0 - balance;
+                }
+            }
 
-	    if (slow_log_0 - bitrate_0 > -0x100)
-		wps->w.c [0].error_limit = exp2s (slow_log_0 - bitrate_0 + 0x100);
-	    else
-		wps->w.c [0].error_limit = 0;
+            if (slow_log_0 - bitrate_0 > -0x100)
+                w->c [0].error_limit = exp2s (slow_log_0 - bitrate_0 + 0x100);
+            else
+                w->c [0].error_limit = 0;
 
-	    if (slow_log_1 - bitrate_1 > -0x100)
-		wps->w.c [1].error_limit = exp2s (slow_log_1 - bitrate_1 + 0x100);
-	    else
-		wps->w.c [1].error_limit = 0;
-	}
-	else {
-	    wps->w.c [0].error_limit = exp2s (bitrate_0);
-	    wps->w.c [1].error_limit = exp2s (bitrate_1);
-	}
+            if (slow_log_1 - bitrate_1 > -0x100)
+                w->c [1].error_limit = exp2s (slow_log_1 - bitrate_1 + 0x100);
+            else
+                w->c [1].error_limit = 0;
+        }
+        else {
+            w->c [0].error_limit = exp2s (bitrate_0);
+            w->c [1].error_limit = exp2s (bitrate_1);
+        }
     }
 }
 
@@ -281,168 +342,171 @@ static ulong read_code (Bitstream *bs, ulong maxcode);
 // of WORD_EOF indicates that the end of the bitstream was reached (all 1s) or
 // some other error occurred.
 
-long get_words (WavpackStream *wps, int nchans, int nsamples, long *buffer)
+long get_words (long *buffer, int nsamples, ulong flags,
+                struct words_data *w, Bitstream *bs)
 {
-    ulong ones_count, low, mid, high;
-    register struct entropy_data *c;
-    long *bptr = buffer;
+    register struct entropy_data *c = w->c;
+    int csamples;
 
-    nsamples *= nchans;
+    if (!(flags & MONO_FLAG))
+        nsamples *= 2;
 
-    while (nsamples--) {
+    for (csamples = 0; csamples < nsamples; ++csamples) {
+        ulong ones_count, low, mid, high;
 
-	c = wps->w.c + ((nchans == 1) ? 0 : (~nsamples & 1));
+        if (!(flags & MONO_FLAG))
+            c = w->c + (csamples & 1);
 
-	if (!(wps->w.c [0].median [0] & ~1) && !wps->w.holding_zero && !wps->w.holding_one && !(wps->w.c [1].median [0] & ~1)) {
-	    ulong mask;
-	    int cbits;
+        if (!(w->c [0].median [0] & ~1) && !w->holding_zero && !w->holding_one && !(w->c [1].median [0] & ~1)) {
+            ulong mask;
+            int cbits;
 
-	    if (wps->w.zeros_acc) {
-		if (--wps->w.zeros_acc) {
-		    c->slow_level -= (c->slow_level + SLO) >> SLS;
-		    *bptr++ = 0;
-		    continue;
-		}
-	    }
-	    else {
-		for (cbits = 0; cbits < 33 && getbit (&wps->wvbits); ++cbits);
+            if (w->zeros_acc) {
+                if (--w->zeros_acc) {
+                    c->slow_level -= (c->slow_level + SLO) >> SLS;
+                    *buffer++ = 0;
+                    continue;
+                }
+            }
+            else {
+                for (cbits = 0; cbits < 33 && getbit (bs); ++cbits);
 
-		if (cbits == 33)
-		    break;
+                if (cbits == 33)
+                    break;
 
-		if (cbits < 2)
-		    wps->w.zeros_acc = cbits;
-		else {
-		    for (mask = 1, wps->w.zeros_acc = 0; --cbits; mask <<= 1)
-			if (getbit (&wps->wvbits))
-			    wps->w.zeros_acc |= mask;
+                if (cbits < 2)
+                    w->zeros_acc = cbits;
+                else {
+                    for (mask = 1, w->zeros_acc = 0; --cbits; mask <<= 1)
+                        if (getbit (bs))
+                            w->zeros_acc |= mask;
 
-		    wps->w.zeros_acc |= mask;
-		}
+                    w->zeros_acc |= mask;
+                }
 
-		if (wps->w.zeros_acc) {
-		    c->slow_level -= (c->slow_level + SLO) >> SLS;
-		    CLEAR (wps->w.c [0].median);
-		    CLEAR (wps->w.c [1].median);
-		    *bptr++ = 0;
-		    continue;
-		}
-	    }
-	}
+                if (w->zeros_acc) {
+                    c->slow_level -= (c->slow_level + SLO) >> SLS;
+                    CLEAR (w->c [0].median);
+                    CLEAR (w->c [1].median);
+                    *buffer++ = 0;
+                    continue;
+                }
+            }
+        }
 
-	if (wps->w.holding_zero)
-	    ones_count = wps->w.holding_zero = 0;
-	else {
-	    int next8;
+        if (w->holding_zero)
+            ones_count = w->holding_zero = 0;
+        else {
+            int next8;
 
-	    if (wps->wvbits.bc < 8) {
-		if (++(wps->wvbits.ptr) == wps->wvbits.end)
-		    wps->wvbits.wrap (&wps->wvbits);
+            if (bs->bc < 8) {
+                if (++(bs->ptr) == bs->end)
+                    bs->wrap (bs);
 
-		next8 = (wps->wvbits.sr |= *(wps->wvbits.ptr) << wps->wvbits.bc) & 0xff;
-		wps->wvbits.bc += 8;
-	    }
-	    else
-		next8 = wps->wvbits.sr & 0xff;
+                next8 = (bs->sr |= *(bs->ptr) << bs->bc) & 0xff;
+                bs->bc += 8;
+            }
+            else
+                next8 = bs->sr & 0xff;
 
-	    if (next8 == 0xff) {
-		wps->wvbits.bc -= 8;
-		wps->wvbits.sr >>= 8;
+            if (next8 == 0xff) {
+                bs->bc -= 8;
+                bs->sr >>= 8;
 
-		for (ones_count = 8; ones_count < (LIMIT_ONES + 1) && getbit (&wps->wvbits); ++ones_count);
+                for (ones_count = 8; ones_count < (LIMIT_ONES + 1) && getbit (bs); ++ones_count);
 
-		if (ones_count == (LIMIT_ONES + 1))
-		    break;
+                if (ones_count == (LIMIT_ONES + 1))
+                    break;
 
-		if (ones_count == LIMIT_ONES) {
-		    ulong mask;
-		    int cbits;
+                if (ones_count == LIMIT_ONES) {
+                    ulong mask;
+                    int cbits;
 
-		    for (cbits = 0; cbits < 33 && getbit (&wps->wvbits); ++cbits);
+                    for (cbits = 0; cbits < 33 && getbit (bs); ++cbits);
 
-		    if (cbits == 33)
-			break;
+                    if (cbits == 33)
+                        break;
 
-		    if (cbits < 2)
-			ones_count = cbits;
-		    else {
-			for (mask = 1, ones_count = 0; --cbits; mask <<= 1)
-			    if (getbit (&wps->wvbits))
-				ones_count |= mask;
+                    if (cbits < 2)
+                        ones_count = cbits;
+                    else {
+                        for (mask = 1, ones_count = 0; --cbits; mask <<= 1)
+                            if (getbit (bs))
+                                ones_count |= mask;
 
-			ones_count |= mask;
-		    }
+                        ones_count |= mask;
+                    }
 
-		    ones_count += LIMIT_ONES;
-		}
-	    }
-	    else {
-		wps->wvbits.bc -= (ones_count = ones_count_table [next8]) + 1;
-		wps->wvbits.sr >>= ones_count + 1;
-	    }
+                    ones_count += LIMIT_ONES;
+                }
+            }
+            else {
+                bs->bc -= (ones_count = ones_count_table [next8]) + 1;
+                bs->sr >>= ones_count + 1;
+            }
 
-	    if (wps->w.holding_one) {
-		wps->w.holding_one = ones_count & 1;
-		ones_count = (ones_count >> 1) + 1;
-	    }
-	    else {
-		wps->w.holding_one = ones_count & 1;
-		ones_count >>= 1;
-	    }
+            if (w->holding_one) {
+                w->holding_one = ones_count & 1;
+                ones_count = (ones_count >> 1) + 1;
+            }
+            else {
+                w->holding_one = ones_count & 1;
+                ones_count >>= 1;
+            }
 
-	    wps->w.holding_zero = ~wps->w.holding_one & 1;
-	}
+            w->holding_zero = ~w->holding_one & 1;
+        }
 
-	if ((wps->wphdr.flags & HYBRID_FLAG) && (nchans == 1 || (nsamples & 1)))
-	    update_error_limit (wps);
+        if ((flags & HYBRID_FLAG) && ((flags & MONO_FLAG) || !(csamples & 1)))
+            update_error_limit (w, flags);
 
-	if (ones_count == 0) {
-	    low = 0;
-	    high = GET_MED (0) - 1;
-	    DEC_MED0 ();
-	}
-	else {
-	    low = GET_MED (0);
-	    INC_MED0 ();
+        if (ones_count == 0) {
+            low = 0;
+            high = GET_MED (0) - 1;
+            DEC_MED0 ();
+        }
+        else {
+            low = GET_MED (0);
+            INC_MED0 ();
 
-	    if (ones_count == 1) {
-		high = low + GET_MED (1) - 1;
-		DEC_MED1 ();
-	    }
-	    else {
-		low += GET_MED (1);
-		INC_MED1 ();
+            if (ones_count == 1) {
+                high = low + GET_MED (1) - 1;
+                DEC_MED1 ();
+            }
+            else {
+                low += GET_MED (1);
+                INC_MED1 ();
 
-		if (ones_count == 2) {
-		    high = low + GET_MED (2) - 1;
-		    DEC_MED2 ();
-		}
-		else {
-		    low += (ones_count - 2) * GET_MED (2);
-		    high = low + GET_MED (2) - 1;
-		    INC_MED2 ();
-		}
-	    }
-	}
+                if (ones_count == 2) {
+                    high = low + GET_MED (2) - 1;
+                    DEC_MED2 ();
+                }
+                else {
+                    low += (ones_count - 2) * GET_MED (2);
+                    high = low + GET_MED (2) - 1;
+                    INC_MED2 ();
+                }
+            }
+        }
 
-	mid = (high + low + 1) >> 1;
+        mid = (high + low + 1) >> 1;
 
-	if (!c->error_limit)
-	    mid = read_code (&wps->wvbits, high - low) + low;
-	else while (high - low > c->error_limit) {
-	    if (getbit (&wps->wvbits))
-		mid = (high + (low = mid) + 1) >> 1;
-	    else
-		mid = ((high = mid - 1) + low + 1) >> 1;
-	}
+        if (!c->error_limit)
+            mid = read_code (bs, high - low) + low;
+        else while (high - low > c->error_limit) {
+            if (getbit (bs))
+                mid = (high + (low = mid) + 1) >> 1;
+            else
+                mid = ((high = mid - 1) + low + 1) >> 1;
+        }
 
-	*bptr++ = getbit (&wps->wvbits) ? ~mid : mid;
+        *buffer++ = getbit (bs) ? ~mid : mid;
 
-	if (wps->wphdr.flags & HYBRID_BITRATE)
-	    c->slow_level = c->slow_level - ((c->slow_level + SLO) >> SLS) + mylog2 (mid);
+        if (flags & HYBRID_BITRATE)
+            c->slow_level = c->slow_level - ((c->slow_level + SLO) >> SLS) + mylog2 (mid);
     }
 
-    return nchans == 1 ? (bptr - buffer) : ((bptr - buffer) / 2);
+    return (flags & MONO_FLAG) ? csamples : (csamples / 2);
 }
 
 // Read a single unsigned value from the specified bitstream with a value
@@ -457,19 +521,193 @@ static ulong read_code (Bitstream *bs, ulong maxcode)
     ulong extras = (1L << bitcount) - maxcode - 1, code;
 
     if (!bitcount)
-	return 0;
+        return 0;
 
     getbits (&code, bitcount - 1, bs);
     code &= (1L << (bitcount - 1)) - 1;
 
     if (code >= extras) {
-	code = (code << 1) - extras;
+        code = (code << 1) - extras;
 
-	if (getbit (bs))
-	    ++code;
+        if (getbit (bs))
+            ++code;
     }
 
     return code;
+}
+
+// This function is an optimized version of send_word() that only handles
+// lossless (error_limit == 0). It does not return a value because it always
+// encodes the exact value passed.
+
+void send_word_lossless (WavpackStream *wps, long value, int chan)
+{
+    register struct words_data *w = &wps->w;
+    register struct entropy_data *c = w->c + chan;
+    int sign = (value < 0) ? 1 : 0;
+    ulong ones_count, low, high;
+
+    if (!(wps->w.c [0].median [0] & ~1) && !wps->w.holding_zero && !(wps->w.c [1].median [0] & ~1)) {
+        if (wps->w.zeros_acc) {
+            if (value)
+                flush_word (wps);
+            else {
+                wps->w.zeros_acc++;
+                return;
+            }
+        }
+        else if (value) {
+            putbit_0 (&wps->wvbits);
+        }
+        else {
+            CLEAR (wps->w.c [0].median);
+            CLEAR (wps->w.c [1].median);
+            wps->w.zeros_acc = 1;
+            return;
+        }
+    }
+
+    if (sign)
+        value = ~value;
+
+    if ((unsigned long) value < GET_MED (0)) {
+        ones_count = low = 0;
+        high = GET_MED (0) - 1;
+        DEC_MED0 ();
+    }
+    else {
+        low = GET_MED (0);
+        INC_MED0 ();
+
+        if (value - low < GET_MED (1)) {
+            ones_count = 1;
+            high = low + GET_MED (1) - 1;
+            DEC_MED1 ();
+        }
+        else {
+            low += GET_MED (1);
+            INC_MED1 ();
+
+            if (value - low < GET_MED (2)) {
+                ones_count = 2;
+                high = low + GET_MED (2) - 1;
+                DEC_MED2 ();
+            }
+            else {
+                ones_count = 2 + (value - low) / GET_MED (2);
+                low += (ones_count - 2) * GET_MED (2);
+                high = low + GET_MED (2) - 1;
+                INC_MED2 ();
+            }
+        }
+    }
+
+    if (wps->w.holding_zero) {
+        if (ones_count)
+            wps->w.holding_one++;
+
+        flush_word (wps);
+
+        if (ones_count) {
+            wps->w.holding_zero = 1;
+            ones_count--;
+        }
+        else
+            wps->w.holding_zero = 0;
+    }
+    else
+        wps->w.holding_zero = 1;
+
+    wps->w.holding_one = ones_count * 2;
+
+    if (high != low) {  
+        ulong maxcode = high - low, code = value - low;
+        int bitcount = count_bits (maxcode);
+        ulong extras = bitset [bitcount] - maxcode - 1;
+
+        if (code < extras) {
+            wps->w.pend_data |= code << wps->w.pend_count;
+            wps->w.pend_count += bitcount - 1;
+        }
+        else {
+            wps->w.pend_data |= ((code + extras) >> 1) << wps->w.pend_count;
+            wps->w.pend_count += bitcount - 1;
+            wps->w.pend_data |= ((code + extras) & 1) << wps->w.pend_count++;
+        }
+    }
+
+    wps->w.pend_data |= ((long) sign << wps->w.pend_count++);
+
+    if (!wps->w.holding_zero)
+        flush_word (wps);
+}
+
+// Used by send_word() and send_word_lossless() to actually send most the
+// accumulated data onto the bitstream. This is also called directly from
+// clients when all words have been sent.
+
+void flush_word (WavpackStream *wps)
+{
+    if (wps->w.zeros_acc) {
+        int cbits = count_bits (wps->w.zeros_acc);
+
+        while (cbits--) {
+            putbit_1 (&wps->wvbits);
+        }
+
+        putbit_0 (&wps->wvbits);
+
+        while (wps->w.zeros_acc > 1) {
+            putbit (wps->w.zeros_acc & 1, &wps->wvbits);
+            wps->w.zeros_acc >>= 1;
+        }
+
+        wps->w.zeros_acc = 0;
+    }
+
+    if (wps->w.holding_one) {
+        if (wps->w.holding_one >= LIMIT_ONES) {
+            int cbits;
+
+            putbits ((1L << LIMIT_ONES) - 1, LIMIT_ONES + 1, &wps->wvbits);
+            wps->w.holding_one -= LIMIT_ONES;
+            cbits = count_bits (wps->w.holding_one);
+
+            while (cbits--) {
+                putbit_1 (&wps->wvbits);
+            }
+
+            putbit_0 (&wps->wvbits);
+
+            while (wps->w.holding_one > 1) {
+                putbit (wps->w.holding_one & 1, &wps->wvbits);
+                wps->w.holding_one >>= 1;
+            }
+
+            wps->w.holding_zero = 0;
+        }
+        else
+            putbits (bitmask [wps->w.holding_one], wps->w.holding_one, &wps->wvbits);
+
+        wps->w.holding_one = 0;
+    }
+
+    if (wps->w.holding_zero) {
+        putbit_0 (&wps->wvbits);
+        wps->w.holding_zero = 0;
+    }
+
+    if (wps->w.pend_count) {
+
+        while (wps->w.pend_count > 24) {
+            putbit (wps->w.pend_data & 1, &wps->wvbits);
+            wps->w.pend_data >>= 1;
+            wps->w.pend_count--;
+        }
+
+        putbits (wps->w.pend_data, wps->w.pend_count, &wps->wvbits);
+        wps->w.pend_data = wps->w.pend_count = 0;
+    }
 }
 
 // The concept of a base 2 logarithm is used in many parts of WavPack. It is
@@ -492,19 +730,28 @@ static int mylog2 (unsigned long avalue)
     int dbits;
 
     if ((avalue += avalue >> 9) < (1 << 8)) {
-	dbits = nbits_table [avalue];
-	return (dbits << 8) + log2_table [(avalue << (9 - dbits)) & 0xff];
+        dbits = nbits_table [avalue];
+        return (dbits << 8) + log2_table [(avalue << (9 - dbits)) & 0xff];
     }
     else {
-	if (avalue < (1L << 16))
-	    dbits = nbits_table [avalue >> 8] + 8;
-	else if (avalue < (1L << 24))
-	    dbits = nbits_table [avalue >> 16] + 16;
-	else
-	    dbits = nbits_table [avalue >> 24] + 24;
+        if (avalue < (1L << 16))
+            dbits = nbits_table [avalue >> 8] + 8;
+        else if (avalue < (1L << 24))
+            dbits = nbits_table [avalue >> 16] + 16;
+        else
+            dbits = nbits_table [avalue >> 24] + 24;
 
-	return (dbits << 8) + log2_table [(avalue >> (dbits - 9)) & 0xff];
+        return (dbits << 8) + log2_table [(avalue >> (dbits - 9)) & 0xff];
     }
+}
+
+// This function returns the log2 for the specified 32-bit signed value.
+// All input values are valid and the return values are in the range of
+// +/- 8192.
+
+int log2s (long value)
+{
+    return (value < 0) ? -mylog2 (-value) : mylog2 (value);
 }
 
 // This function returns the original integer represented by the supplied
@@ -517,26 +764,39 @@ long exp2s (int log)
     ulong value;
 
     if (log < 0)
-	return -exp2s (-log);
+        return -exp2s (-log);
 
     value = exp2_table [log & 0xff] | 0x100;
 
     if ((log >>= 8) <= 9)
-	return value >> (9 - log);
+        return value >> (9 - log);
     else
-	return value << (log - 9);
+        return value << (log - 9);
 }
 
 // These two functions convert internal weights (which are normally +/-1024)
 // to and from an 8-bit signed character version for storage in metadata. The
 // weights are clipped here in the case that they are outside that range.
 
+char store_weight (int weight)
+{
+    if (weight > 1024)
+        weight = 1024;
+    else if (weight < -1024)
+        weight = -1024;
+
+    if (weight > 0)
+        weight -= (weight + 64) >> 7;
+
+    return (weight + 4) >> 3;
+}
+
 int restore_weight (char weight)
 {
     int result;
 
     if ((result = (int) weight << 3) > 0)
-	result += (result + 64) >> 7;
+        result += (result + 64) >> 7;
 
     return result;
 }

@@ -2,6 +2,7 @@ bits.c
 float.c
 metadata.c
 unpack.c
+pack.c
 words.c
 wputils.c
 #if CONFIG_CPU==MCF5249 && !defined(SIMULATOR)
