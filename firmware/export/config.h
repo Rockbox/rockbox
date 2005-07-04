@@ -115,7 +115,8 @@
 /* IRAM usage */
 #if !defined(SIMULATOR) &&   /* Not for simulators */ \
     (((CONFIG_CPU == SH7034) && !defined(PLUGIN)) || /* SH1 archos: core only */ \
-    (CONFIG_CPU == MCF5249)) /* Coldfire: core, plugins, codecs */
+    (CONFIG_CPU == MCF5249) || /* Coldfire: core, plugins, codecs */ \
+    (CONFIG_CPU == TCC730))  /* CalmRISC16: core, (plugins, codecs) */
 #define ICODE_ATTR	__attribute__ ((section(".icode")))
 #define IDATA_ATTR	__attribute__ ((section(".idata")))
 #define USE_IRAM
