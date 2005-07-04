@@ -47,7 +47,8 @@
 /* Must be a power of 2 */
 #define NUM_PCM_BUFFERS      (PCMBUF_SIZE / CHUNK_SIZE)
 #define NUM_PCM_BUFFERS_MASK (NUM_PCM_BUFFERS - 1)
-#define PCM_WATERMARK        (CHUNK_SIZE * 6)
+//#define PCM_WATERMARK        (CHUNK_SIZE * 6)
+#define PCM_WATERMARK        (PCMBUF_SIZE - CHUNK_SIZE*8)
 #define PCM_CF_WATERMARK     (PCMBUF_SIZE - CHUNK_SIZE*8)
 
 static bool pcm_playing;
@@ -259,7 +260,6 @@ void pcm_play_stop(void)
     pcm_boost(false);
     if (pcm_playing) {
         uda1380_mute(true);
-        sleep(1);
         dma_stop();
     }
 }
