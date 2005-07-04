@@ -32,7 +32,7 @@
 #include "lcd-remote.h"
 #endif
 
-#ifdef CONFIG_BACKLIGHT
+#if defined(CONFIG_BACKLIGHT) && !defined(BOOTLOADER)
 
 const char backlight_timeout_value[19] =
 {
