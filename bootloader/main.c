@@ -141,10 +141,10 @@ void start_firmware(void)
     /* Reset the cookie for the crt0 crash check */
     asm(" move.l #0,%d0");
     asm(" move.l %d0,0x10017ffc");
-    asm(" move.l #0x30000000,%d0");
+    asm(" move.l #0x31000000,%d0");
     asm(" movec.l %d0,%vbr");
-    asm(" move.l 0x30000000,%sp");
-    asm(" move.l 0x30000004,%a0");
+    asm(" move.l 0x31000000,%sp");
+    asm(" move.l 0x31000004,%a0");
     asm(" jmp (%a0)");
 }
 
