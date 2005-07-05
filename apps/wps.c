@@ -660,7 +660,7 @@ long wps_show(void)
                 if (quick_screen(CONTEXT_WPS, WPS_QUICK))
                     return SYS_USB_CONNECTED;
                 restore = true;
-		lastbutton = 0;
+                lastbutton = 0;
                 break;
 
                 /* screen settings */

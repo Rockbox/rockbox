@@ -46,7 +46,7 @@ bool alarm_screen(void)
 
     rtc_get_alarm(&h, &m);
 
-    if (m > 60 || h > 24) {	/* after battery-change RTC-values are out of range */
+    if (m > 60 || h > 24) { /* after battery-change RTC-values are out of range */
         m = 0;
         h = 12;
     } else {
@@ -86,7 +86,7 @@ bool alarm_screen(void)
                 lcd_puts(0,1,str(LANG_ALARM_MOD_SHUTDOWN));
                 lcd_update();
                 sleep(HZ);
-		done = true;
+                done = true;
             } else {
                 lcd_clear_display();
                 lcd_puts(0,0,str(LANG_ALARM_MOD_ERROR));
@@ -142,9 +142,9 @@ bool alarm_screen(void)
         case BUTTON_MENU:
 #endif
             lcd_clear_display();
-	    lcd_puts(0,0,str(LANG_ALARM_MOD_DISABLE));
-	    lcd_update();
-	    sleep(HZ);
+            lcd_puts(0,0,str(LANG_ALARM_MOD_DISABLE));
+            lcd_update();
+            sleep(HZ);
             rtc_enable_alarm(false);
             done = true;
             break;

@@ -304,7 +304,7 @@ struct plugin_api {
 #endif
 #if CONFIG_HWCODEC == MASNONE
     void (*pcm_play_data)(const unsigned char *start, int size,
-		    void (*get_more)(unsigned char** start, long*size));
+    void (*get_more)(unsigned char** start, long*size));
     void (*pcm_play_stop)(void);
     void (*pcm_set_frequency)(unsigned int frequency);
     bool (*pcm_is_playing)(void);

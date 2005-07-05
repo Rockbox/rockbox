@@ -32,6 +32,11 @@
 /* to refresh only those lines that change over time */
 #define WPS_REFRESH_NON_STATIC (WPS_REFRESH_ALL & ~WPS_REFRESH_STATIC & ~WPS_REFRESH_SCROLL)
 
+/* alignments */
+#define WPS_ALIGN_RIGHT 32
+#define WPS_ALIGN_CENTER 64
+#define WPS_ALIGN_LEFT 128
+
 
 void wps_format_time(char* buf, int buf_size, long time);
 bool wps_refresh(struct mp3entry* id3, struct mp3entry* nid3,

@@ -39,8 +39,8 @@ static int fracbits;
 #define SAMPLE_DEPTH     16
 
 /*
- * NAME:		prng()
- * DESCRIPTION:	32-bit pseudo-random number generator
+ * NAME:        prng()
+ * DESCRIPTION: 32-bit pseudo-random number generator
  */
 static __inline
 unsigned long prng(unsigned long state)
@@ -93,7 +93,7 @@ inline void dsp_clip(long *sample, long *output)
 
 /*
  * NAME:        dither()
- * DESCRIPTION:	dither and scale sample
+ * DESCRIPTION: dither and scale sample
  */
 inline int scale_dither_clip(long sample)
 {

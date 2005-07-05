@@ -808,7 +808,22 @@ static void format_display(char* buf,
             case 0:
                 *buf++ = '%';
                 break;
-
+            case 'a':
+                ++fmt;
+                switch (*fmt)
+                {
+                    case 'l':
+                        *flags |= WPS_ALIGN_LEFT; 
+                        break;
+                    case 'c':
+                        *flags |= WPS_ALIGN_CENTER; 
+                        break;
+                    case 'r':
+                        *flags |= WPS_ALIGN_RIGHT; 
+                        break;
+                } 
+                ++fmt;
+                break;
             case 's':
                 *flags |= WPS_REFRESH_SCROLL;
                 ++fmt;
@@ -830,9 +845,11 @@ static void format_display(char* buf,
                         /* Get filename */
                         pos = strchr(ptr, '|'); /* get the second '|' */
                         if ((pos - ptr) < (int)sizeof(temp_buf)) {
-                            memcpy(temp_buf, ptr, pos - ptr); /* get the filename */
+                            memcpy(temp_buf, ptr, pos - ptr); 
+                            /* get the filename */
                             temp_buf[pos - ptr] = 0;
-                            snprintf(imgname, MAX_PATH, "/.rockbox/%s", temp_buf);
+                            snprintf(imgname, MAX_PATH, "/.rockbox/%s", 
+                                     temp_buf);
                         }
                         else {
                             /* filename too long! */
@@ -1110,8 +1127,27 @@ bool wps_refresh(struct mp3entry* id3,
                 /* scroll line */
                 if ((refresh_mode & WPS_REFRESH_SCROLL) ||
                     new_subline_refresh) {
-                    lcd_puts_scroll(0, i, buf);
+                    int strw,strh;
+                    int ypos,xpos;
+
+                    lcd_getstringsize(buf, &strw, &strh);
+                    ypos = (i*strh)+lcd_getymargin();
                     update_line = true;
+
+                    if (strw>LCD_WIDTH) {
+                        lcd_puts_scroll(0, i, buf);
+                    } else {
+                        if (flags & WPS_ALIGN_CENTER)
+                        {
+                            xpos = (LCD_WIDTH - strw) / 2;
+                            lcd_putsxy(xpos, ypos, buf);
+                        } else if (flags & WPS_ALIGN_RIGHT) {
+                            xpos = (LCD_WIDTH - strw);
+                            lcd_putsxy(xpos, ypos, buf);
+                        } else {
+                            lcd_putsxy(0, ypos, buf);
+                        }
+                    }
                 }
             }
             else if (flags & (WPS_REFRESH_DYNAMIC | WPS_REFRESH_STATIC))
@@ -1120,8 +1156,21 @@ bool wps_refresh(struct mp3entry* id3,
                 if ((refresh_mode & (WPS_REFRESH_DYNAMIC|WPS_REFRESH_STATIC)) ||
                     new_subline_refresh)
                 {
+                    int ypos,xpos;
+                    int strw,strh;
+
+                    lcd_getstringsize(buf, &strw, &strh);
+                    ypos = (i*strh)+lcd_getymargin();
                     update_line = true;
-                    lcd_puts(0, i, buf);
+                    if (flags & WPS_ALIGN_CENTER) {
+                        xpos = (LCD_WIDTH - strw) / 2;
+                        lcd_putsxy(xpos, ypos, buf);
+                    } else if (flags & WPS_ALIGN_RIGHT) {
+                        xpos = (LCD_WIDTH - strw);
+                        lcd_putsxy(xpos, ypos, buf);
+                    } else {
+                        lcd_putsxy(0, ypos, buf);
+                    }
                 }
             }
         }

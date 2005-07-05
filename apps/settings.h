@@ -312,7 +312,7 @@ struct user_settings
     int sort_dir; /* 0=alpha, 1=date (old first), 2=date (new first) */
     
 #ifdef HAVE_REMOTE_LCD
-	 /* remote lcd */
+    /* remote lcd */
     int remote_contrast;   /* lcd contrast:          0-63 0=low 63=high            */
     bool remote_invert;    /* invert display */
     bool remote_flip_display; /* turn display (and button layout) by 180 degrees */

@@ -380,7 +380,7 @@ static bool recdirectory(void)
 static bool reconstartup(void)
 {
     return set_bool(str(LANG_RECORD_STARTUP),
-		    &global_settings.rec_startup);
+                    &global_settings.rec_startup);
 }
 
 #endif /* MAS3587F */

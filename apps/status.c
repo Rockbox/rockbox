@@ -63,7 +63,7 @@ struct status_info {
     bool battery_safe;
     bool redraw_volume; /* true if the volume gauge needs updating */
 #if CONFIG_LED == LED_VIRTUAL
-	bool led; /* disk LED simulation in the status bar */
+    bool led; /* disk LED simulation in the status bar */
 #endif
 #ifdef HAVE_USB_POWER
     bool usb_power;

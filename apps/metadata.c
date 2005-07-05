@@ -301,7 +301,7 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
           if (memcmp(&buf[i],"OggS",5)==0) {
             if (i < (j-17)) {
               totalsamples=(buf[i+6])|(buf[i+7]<<8)|(buf[i+8]<<16)|(buf[i+9]<<24);
-	      last_serialno=(buf[i+14])|(buf[i+15]<<8)|(buf[i+16]<<16)|(buf[i+17]<<24);
+              last_serialno=(buf[i+14])|(buf[i+15]<<8)|(buf[i+16]<<16)|(buf[i+17]<<24);
               j=0;  /* We can discard the rest of the buffer */
             } else {
               break;
@@ -321,11 +321,11 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
       /* This file has mutiple vorbis bitstreams (or is corrupt) */
       /* FIXME we should display an error here */
       if (serialno != last_serialno) {
-	      track->taginfo_ready=false;
-	      logf("serialno mismatch");
-	      logf("%ld", serialno);
-	      logf("%ld", last_serialno);
-	      return false;
+              track->taginfo_ready=false;
+              logf("serialno mismatch");
+              logf("%ld", serialno);
+              logf("%ld", last_serialno);
+              return false;
       }
   
       track->id3.samples=totalsamples;
@@ -794,24 +794,24 @@ static bool get_vorbis_comments (struct mp3entry *entry, int fd)
      * packet extends to the third page).
      */
     for (i = 0; i < segments; i++) {
-	    packet_remaining += temp[i];
-	    /* The last segment of a packet is always < 255 bytes */
-	    if (temp[i] < 255) {
-		    break;
-	    }
+        packet_remaining += temp[i];
+        /* The last segment of a packet is always < 255 bytes */
+        if (temp[i] < 255) {
+            break;
+        }
     }
 
     /* Now read in packet header (type and id string) */
     if(read(fd, temp, 7) < 7) {
-	    return false;
+        return false;
     }
 
     /* The first byte of a packet is the packet type; comment packets are
      * type 3.
      */
     if ((temp[0] != 3) || (memcmp(temp + 1,"vorbis",6)!=0)) {
-	    logf("Not a vorbis comment packet");
-	    return false;
+        logf("Not a vorbis comment packet");
+        return false;
     }
 
     packet_remaining -= 7;
@@ -831,7 +831,7 @@ static bool get_vorbis_comments (struct mp3entry *entry, int fd)
     little_endian_to_native(&comment_count, "L");
     packet_remaining -= (vendor_length + 8);
     if ( packet_remaining <= 0 ) {
-	    return true;
+        return true;
     }
 
     for ( i = 0; i < comment_count; i++ ) {
@@ -843,10 +843,10 @@ static bool get_vorbis_comments (struct mp3entry *entry, int fd)
 
         little_endian_to_native(&comment_length, "L");
 
-	/* Quit if we've passed the end of the page */
-	packet_remaining -= (comment_length + 4);
+        /* Quit if we've passed the end of the page */
+        packet_remaining -= (comment_length + 4);
         if ( packet_remaining <= 0 ) {
-    	    return true;
+            return true;
         }
 
         /* Skip comment if it won't fit in buffer */
@@ -876,37 +876,37 @@ static bool get_vorbis_comments (struct mp3entry *entry, int fd)
             name_length = 5;
             p = &(entry->genre_string);
         } else if (strncasecmp(temp, "DATE=", 5) == 0) {
-	    int j=0;
-	    /* verify that this is a number */
-	    /* Note: vorbis uses UTF-8 for its comments, so it is
-	     * safe to compare the values against ASCII 0 and 9
-	     */
-	    while ( j < (comment_length - 5) ) {
-		    if ( (temp[5+j] < '0') || (temp[5+j] > '9') ) {
-			    break;
-		    }
-		    j++;
-	    }
-	    if  ( j == (comment_length - 5) ) {
+            int j=0;
+            /* verify that this is a number */
+            /* Note: vorbis uses UTF-8 for its comments, so it is
+             * safe to compare the values against ASCII 0 and 9
+             */
+            while ( j < (comment_length - 5) ) {
+                if ( (temp[5+j] < '0') || (temp[5+j] > '9') ) {
+                    break;
+                }
+                j++;
+            }
+            if  ( j == (comment_length - 5) ) {
                 p = NULL;
                 entry->year = atoi(temp + 5);
-	    }
+            }
         } else if (strncasecmp(temp, "TRACKNUMBER=", 12) == 0) {
-	    int j=0;
-	    /* verify that this is a number */
-	    /* Note: vorbis uses UTF-8 for its comments, so it is
-	     * safe to compare the values against ASCII 0 and 9
-	     */
-	    while ( j < (comment_length - 12) ) {
-		    if ( (temp[12+j] < '0') || (temp[12+j] > '9') ) {
-			    break;
-		    }
-		    j++;
-	    }
-	    if  ( j == (comment_length - 12) ) {
+            int j=0;
+            /* verify that this is a number */
+            /* Note: vorbis uses UTF-8 for its comments, so it is
+             * safe to compare the values against ASCII 0 and 9
+             */
+            while ( j < (comment_length - 12) ) {
+                if ( (temp[12+j] < '0') || (temp[12+j] > '9') ) {
+                   break;
+                }
+                j++;
+            }
+            if  ( j == (comment_length - 12) ) {
                 p = NULL;
                 entry->tracknum = atoi(temp + 12);
-	    }
+            }
         } else {
             p = NULL;
         }
