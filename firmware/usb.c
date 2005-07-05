@@ -253,6 +253,7 @@ static void usb_thread(void)
 #ifdef USB_REALLY_BRAVE
                         usb_slave_mode(true);
                         usb_state = USB_INSERTED;
+                        cpu_idle_mode(true);
 #else
                         system_reboot();
 #endif
@@ -283,6 +284,7 @@ static void usb_thread(void)
                        some threads might not have acknowledged the
                        insertion */
                     usb_slave_mode(false);
+                    cpu_idle_mode(false);
                 }
 
                 usb_state = USB_EXTRACTED;
