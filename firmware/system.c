@@ -30,6 +30,7 @@ long cpu_frequency = CPU_FREQ;
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 int boost_counter = 0;
+bool cpu_idle = false;
 void cpu_boost(bool on_off)
 {
     if(on_off)
@@ -45,7 +46,10 @@ void cpu_boost(bool on_off)
         /* Lower the frequency if the counter reaches 0 */
         if(--boost_counter == 0)
         {
-            set_cpu_frequency(CPUFREQ_NORMAL);
+            if(cpu_idle)
+                set_cpu_frequency(CPUFREQ_DEFAULT);
+            else
+                set_cpu_frequency(CPUFREQ_NORMAL);
         }
 
         /* Safety measure */
@@ -53,6 +57,22 @@ void cpu_boost(bool on_off)
             boost_counter = 0;
     }
 }
+
+void cpu_idle_mode(bool on_off)
+{
+    cpu_idle = on_off;
+
+    /* We need to adjust the frequency immediately if the CPU
+       isn't boosted */
+    if(boost_counter == 0)
+    {
+        if(cpu_idle)
+            set_cpu_frequency(CPUFREQ_DEFAULT);
+        else
+            set_cpu_frequency(CPUFREQ_NORMAL);
+    }
+}
+
 #endif
 
 #if CONFIG_CPU == TCC730

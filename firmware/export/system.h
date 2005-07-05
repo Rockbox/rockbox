@@ -33,9 +33,11 @@ extern long cpu_frequency;
 #define FREQ cpu_frequency
 void set_cpu_frequency(long frequency);
 void cpu_boost(bool on_off);
+void cpu_idle_mode(bool on_off);
 #else
 #define FREQ CPU_FREQ
 #define cpu_boost(on_off)
+#define cpu_idle_mode(on_off)
 #endif
 
 #define BAUDRATE 9600
