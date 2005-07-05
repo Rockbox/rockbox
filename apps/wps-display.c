@@ -1127,6 +1127,7 @@ bool wps_refresh(struct mp3entry* id3,
                 /* scroll line */
                 if ((refresh_mode & WPS_REFRESH_SCROLL) ||
                     new_subline_refresh) {
+#ifdef HAVE_LCD_BITMAP
                     int strw,strh;
                     int ypos,xpos;
 
@@ -1148,6 +1149,10 @@ bool wps_refresh(struct mp3entry* id3,
                             lcd_putsxy(0, ypos, buf);
                         }
                     }
+#else
+                    lcd_puts_scroll(0, i, buf);
+                    update_line = true;
+#endif
                 }
             }
             else if (flags & (WPS_REFRESH_DYNAMIC | WPS_REFRESH_STATIC))
@@ -1156,6 +1161,7 @@ bool wps_refresh(struct mp3entry* id3,
                 if ((refresh_mode & (WPS_REFRESH_DYNAMIC|WPS_REFRESH_STATIC)) ||
                     new_subline_refresh)
                 {
+#ifdef HAVE_LCD_BITMAP
                     int ypos,xpos;
                     int strw,strh;
 
@@ -1171,6 +1177,10 @@ bool wps_refresh(struct mp3entry* id3,
                     } else {
                         lcd_putsxy(0, ypos, buf);
                     }
+#else
+                    update_line = true;
+                    lcd_puts(0, i, buf);
+#endif
                 }
             }
         }
