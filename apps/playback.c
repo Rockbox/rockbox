@@ -819,9 +819,19 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     int rc, i;
     int copy_n;
 
-    if (track_count >= MAX_TRACK || tracks[track_widx].filesize != 0)
+    /* Stop buffer filling if there is no free track entries. */
+    if (track_count >= MAX_TRACK) {
+        fill_bytesleft = 0;
         return false;
-    
+    }
+
+    /* Don't start loading track if the current write position already
+       contains a BUFFERED track. The entry may contain the metadata
+       which is ok. */
+    if (tracks[track_widx].filesize != 0)
+        return false;
+
+    /* Get track name from current playlist read position. */
     logf("Buffering track:%d/%d", track_widx, track_ridx);
     trackname = playlist_peek(peek_offset);
     if (!trackname) {
@@ -835,7 +845,8 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         logf("Open failed");
         return false;
     }
-    
+
+    /* Initialize track entry. */
     size = filesize(fd);
     tracks[track_widx].filerem = size;
     tracks[track_widx].filesize = size;
@@ -844,7 +855,6 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     tracks[track_widx].taginfo_ready = false;
     tracks[track_widx].playlist_offset = offset;
     
-    /* Load the codec */
     if (buf_widx >= codecbuflen)
         buf_widx -= codecbuflen;
     
@@ -856,17 +866,19 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         dsp_configure(DSP_RESET, 0);
         ci.configure(CODEC_DSP_ENABLE, false);
     }
-    
+
+    /* Load the codec. */
     tracks[track_widx].codecbuf = &codecbuf[buf_widx];
     if (!loadcodec(trackname, start_play)) {
         close(fd);
+        /* Stop buffer filling if codec load failed. */
+        fill_bytesleft = 0;
         return false;
     }
     // tracks[track_widx].filebuf = &codecbuf[buf_widx];
     tracks[track_widx].start_pos = 0;
         
-    //logf("%s", trackname);
-
+    /* Get track metadata if we don't already have it. */
     if (!tracks[track_widx].taginfo_ready) {
         if (!get_metadata(&tracks[track_widx],fd,trackname,v1first)) {
             close(fd);
@@ -902,7 +914,8 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         track_count++;
         audiobuffer_add_event(codec_track_changed);
     }
-        
+
+    /* Do some initial file buffering. */
     i = tracks[track_widx].start_pos;
     size = MIN(size, AUDIO_FILL_CYCLE);
     while (i < size) {
@@ -1189,9 +1202,16 @@ static void audio_stop_playback(void)
     filling = false;
 }
 
+/* Request the next track with new codec. */
 void audio_change_track(void)
 {
     logf("change track");
+    
+    /* Wait for new track data. */
+    while (track_ridx == track_widx && filling)
+        yield();
+
+    /* If we are not filling, then it must be end-of-playlist. */
     if (track_ridx == track_widx) {
         logf("No more tracks");
         while (pcm_is_playing())
@@ -1216,9 +1236,13 @@ bool codec_request_next_track_callback(void)
     
     /* Advance to next track. */
     if (ci.reload_codec && new_track > 0) {
-        last_peek_offset--;
+        /* Wait for new track data. */
+        while (track_ridx == track_widx && filling)
+            yield();
+            
         if (!playlist_check(1))
             return false;
+        last_peek_offset--;
         playlist_next(1);
         if (++track_ridx == MAX_TRACK)
             track_ridx = 0;
@@ -1232,9 +1256,9 @@ bool codec_request_next_track_callback(void)
     
     /* Advance to previous track. */
     else if (ci.reload_codec && new_track < 0) {
-        last_peek_offset++;
         if (!playlist_check(-1))
             return false;
+        last_peek_offset++;
         playlist_next(-1);
         if (--track_ridx < 0)
             track_ridx = MAX_TRACK-1;
@@ -1250,9 +1274,13 @@ bool codec_request_next_track_callback(void)
     
     /* Codec requested track change (next track). */
     else {
-        last_peek_offset--;
+        /* Wait for new track data. */
+        while (track_ridx == track_widx && filling)
+            yield();
+            
         if (!playlist_check(1))
             return false;
+        last_peek_offset--;
         playlist_next(1);
         if (++track_ridx >= MAX_TRACK)
             track_ridx = 0;
