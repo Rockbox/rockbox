@@ -25,7 +25,7 @@
 /* Audio file types. */
 /* NOTE: When adding new audio types, also add to codec_labels[] in id3.c */
 enum {
-    AFMT_UNKNOWN = 0,  /* Unknown file format */
+    AFMT_UNKNOWN = 1,  /* Unknown file format */
 
 #if CONFIG_HWCODEC==MASNONE
     AFMT_MPA_L1,       /* MPEG Audio layer 1 */

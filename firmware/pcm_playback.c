@@ -127,7 +127,7 @@ void pcm_boost(bool state)
 {
     static bool boost_state = false;
     
-    if (crossfade_active || boost_mode)
+    if (crossfade_init || crossfade_active || boost_mode)
         return ;
         
     if (state != boost_state) {
@@ -158,6 +158,7 @@ static void dma_stop(void)
     next_start = NULL;
     next_size = 0;
     crossfade_init = 0;
+    crossfade_active = 0;
     pcm_paused = false;
 }
 
@@ -255,13 +256,12 @@ void pcm_play_data(const unsigned char* start, int size,
 
 void pcm_play_stop(void)
 {
-    crossfade_active = false;
-    pcm_set_boost_mode(false);
-    pcm_boost(false);
     if (pcm_playing) {
         uda1380_mute(true);
         dma_stop();
     }
+    pcm_set_boost_mode(false);
+    pcm_boost(false);
 }
 
 void pcm_play_pause(bool play)
@@ -436,6 +436,7 @@ bool pcm_crossfade_init(void)
         return false;
     }
     logf("crossfading!");
+    pcm_boost(true);
     crossfade_mode = CFM_CROSSFADE;
     crossfade_init = true;
     

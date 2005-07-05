@@ -119,11 +119,11 @@ enum codec_status codec_start(struct codec_api* api)
     first_frame = false;
     file_end = 0;
     OutputPtr = OutputBuffer;
-    frequency_divider = ci->id3->frequency / 100;
     
     while (!*ci->taginfo_ready)
         ci->yield();
   
+    frequency_divider = ci->id3->frequency / 100;
     ci->configure(DSP_SET_FREQUENCY, (int *)ci->id3->frequency);
     
     ci->request_buffer(&size, ci->id3->first_frame_offset);

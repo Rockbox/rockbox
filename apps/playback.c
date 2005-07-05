@@ -1236,16 +1236,19 @@ bool codec_request_next_track_callback(void)
     
     /* Advance to next track. */
     if (ci.reload_codec && new_track > 0) {
-        /* Wait for new track data. */
-        while (track_ridx == track_widx && filling)
-            yield();
-            
         if (!playlist_check(1))
             return false;
         last_peek_offset--;
         playlist_next(1);
         if (++track_ridx == MAX_TRACK)
             track_ridx = 0;
+            
+        /* Wait for new track data (codectype 0 is invalid). When a correct
+           codectype is set, we can assume that the filesize is correct. */
+        while (tracks[track_ridx].id3.codectype == 0 && filling
+               && !ci.stop_codec)
+            yield();
+            
         if (tracks[track_ridx].filesize == 0) {
             logf("Loading from disk...");
             new_track = 0;
@@ -1274,10 +1277,6 @@ bool codec_request_next_track_callback(void)
     
     /* Codec requested track change (next track). */
     else {
-        /* Wait for new track data. */
-        while (track_ridx == track_widx && filling)
-            yield();
-            
         if (!playlist_check(1))
             return false;
         last_peek_offset--;
@@ -1285,7 +1284,13 @@ bool codec_request_next_track_callback(void)
         if (++track_ridx >= MAX_TRACK)
             track_ridx = 0;
         
-        if (track_ridx == track_widx && tracks[track_ridx].filerem == 0) {
+        /* Wait for new track data (codectype 0 is invalid). When a correct
+           codectype is set, we can assume that the filesize is correct. */
+        while (tracks[track_ridx].id3.codectype == 0 && filling
+               && !ci.stop_codec)
+            yield();
+            
+        if (tracks[track_ridx].filesize == 0) {
             logf("No more tracks");
             new_track = 0;
             return false;
