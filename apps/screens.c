@@ -40,11 +40,12 @@
 #include "action.h"
 #include "talk.h"
 #include "misc.h"
-#include "id3.h" 
+#include "id3.h"
 #include "screens.h"
 #include "debug.h"
 #include "led.h"
 #include "sound.h"
+#include "wps-display.h"
 #ifdef HAVE_MMC
 #include "ata_mmc.h"
 #endif
@@ -60,7 +61,7 @@ static const unsigned char usb_logo[] = {
     0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x81, 0x81, 0x81, 0x81,
     0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
     0x01, 0x01, 0x01, 0x01, 0xf1, 0x4f, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40,
-    0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0xc0, 
+    0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0xc0,
     0x00, 0x00, 0xe0, 0x1c, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04,
     0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04,
     0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x06, 0x81, 0xc0, 0xe0, 0xe0, 0xe0, 0xe0,
@@ -68,7 +69,7 @@ static const unsigned char usb_logo[] = {
     0x0c, 0x0e, 0x0e, 0x06, 0x06, 0x06, 0x06, 0x06, 0x0f, 0x1f, 0x1f, 0x1f, 0x1f,
     0x0f, 0x00, 0x00, 0x00, 0x00, 0x00, 0xe0, 0xc0, 0xc0, 0x80, 0x80, 0x00, 0x00,
     0x00, 0x00, 0xe0, 0x1f, 0x00, 0xf8, 0x06, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02,
-    0x02, 0x02, 0x02, 0x82, 0x7e, 0x00, 0xc0, 0x3e, 0x01, 
+    0x02, 0x02, 0x02, 0x82, 0x7e, 0x00, 0xc0, 0x3e, 0x01,
     0x70, 0x4f, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40,
     0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40,
     0x40, 0x40, 0x40, 0x40, 0x40, 0x80, 0x00, 0x07, 0x0f, 0x1f, 0x1f, 0x1f, 0x1f,
@@ -76,7 +77,7 @@ static const unsigned char usb_logo[] = {
     0x1f, 0x3f, 0x7b, 0xf3, 0xe3, 0xc3, 0x83, 0x83, 0x83, 0x83, 0xe3, 0xe3, 0xe3,
     0xe3, 0xe3, 0xe3, 0x03, 0x03, 0x03, 0x3f, 0x1f, 0x1f, 0x0f, 0x0f, 0x07, 0x02,
     0xc0, 0x3e, 0x01, 0xe0, 0x9f, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-    0x80, 0x80, 0xf0, 0x0f, 0x80, 0x78, 0x07, 0x00, 0x00, 
+    0x80, 0x80, 0xf0, 0x0f, 0x80, 0x78, 0x07, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x0c, 0x10, 0x20, 0x40, 0x40, 0x80, 0x80,
@@ -84,7 +85,7 @@ static const unsigned char usb_logo[] = {
     0x80, 0x80, 0x80, 0x80, 0x80, 0x81, 0x81, 0x81, 0x81, 0x81, 0x87, 0x87, 0x87,
     0x87, 0x87, 0x87, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xf0,
     0x0f, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04,
-    0x04, 0x04, 0x04, 0x04, 0x07, 0x00, 0x00, 0x00, 0x00, 
+    0x04, 0x04, 0x04, 0x04, 0x07, 0x00, 0x00, 0x00, 0x00,
 };
 #endif
 
@@ -148,7 +149,7 @@ int mmc_remove_request(void)
     splash(1, true, str(LANG_REMOVE_MMC));
     if (global_settings.talk_menu)
         talk_id(LANG_REMOVE_MMC, false);
-    
+
     while (1)
     {
         queue_wait_w_tmo(&button_queue, &ev, HZ/2);
@@ -156,7 +157,7 @@ int mmc_remove_request(void)
         {
             case SYS_MMC_EXTRACTED:
                 return SYS_MMC_EXTRACTED;
-            
+
             case SYS_USB_DISCONNECTED:
                 return SYS_USB_DISCONNECTED;
         }
@@ -223,20 +224,20 @@ void charging_display_info(bool animate)
         animate = false;
 #endif /* HAVE_CHARGE_CTRL */
 
-    
+
     /* middle part */
     memset(charging_logo+3, 0x00, 32);
     charging_logo[0] = 0x3C;
     charging_logo[1] = 0x24;
     charging_logo[2] = charging_logo[35] = 0xFF;
-    
+
     if (!animate)
     {   /* draw the outline */
         /* middle part */
         lcd_bitmap(charging_logo, pox_x, pox_y + 8, sizeof(charging_logo), 8);
         lcd_set_drawmode(DRMODE_FG);
         /* upper line */
-        charging_logo[0] = charging_logo[1] = 0x00; 
+        charging_logo[0] = charging_logo[1] = 0x00;
         memset(charging_logo+2, 0x80, 34);
         lcd_bitmap(charging_logo, pox_x, pox_y, sizeof(charging_logo), 8);
         /* lower line */
@@ -252,7 +253,7 @@ void charging_display_info(bool animate)
             {   /* draw a "bubble" here */
                 unsigned bitpos;
                 bitpos = (phase + i/8) % 15; /* "bounce" effect */
-                if (bitpos > 7) 
+                if (bitpos > 7)
                     bitpos = 14 - bitpos;
                 charging_logo[i] = 0x01 << bitpos;
             }
@@ -274,7 +275,7 @@ static const unsigned char logo_pattern[] = {
 
 static void logo_lock_patterns(bool on)
 {
-    int i; 
+    int i;
 
     if (on)
     {
@@ -301,7 +302,7 @@ void charging_display_info(bool animate)
     snprintf(buf, sizeof(buf), "%s %d.%02dV", logo_chars,
              battery_voltage / 100, battery_voltage % 100);
     lcd_puts(0, 1, buf);
-    
+
     memcpy(buf, logo_pattern, 28); /* copy logo patterns */
 
     if (!animate) /* build the screen */
@@ -323,7 +324,7 @@ void charging_display_info(bool animate)
         }
         phase++;
     }
-    
+
     for (i = 0; i < 4; i++)
         lcd_define_pattern(logo_chars[i], buf + 7 * i);
 }
@@ -410,7 +411,7 @@ int pitch_screen(void)
 
             lcd_clear_display();
             lcd_setfont(FONT_SYSFIXED);
-    
+
             ptr = str(LANG_PITCH_UP);
             lcd_getstringsize(ptr,&w,&h);
             lcd_putsxy((LCD_WIDTH-w)/2, 0, ptr);
@@ -528,7 +529,7 @@ bool quick_screen(int context, int button)
     int w, h, key;
     char buf[32];
     int oldrepeat = global_settings.repeat_mode;
-    
+
     /* just to stop compiler warning */
     context = context;
     lcd_setfont(FONT_SYSFIXED);
@@ -551,8 +552,8 @@ bool quick_screen(int context, int button)
                 /* Shuffle mode */
                 lcd_putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_SHUFFLE));
                 lcd_putsxy(0, LCD_HEIGHT/2 - h, str(LANG_F2_MODE));
-                lcd_putsxy(0, LCD_HEIGHT/2, 
-                           global_settings.playlist_shuffle ? 
+                lcd_putsxy(0, LCD_HEIGHT/2,
+                           global_settings.playlist_shuffle ?
                            str(LANG_ON) : str(LANG_OFF));
 
                 /* Directory Filter */
@@ -560,15 +561,15 @@ bool quick_screen(int context, int button)
                     case SHOW_ALL:
                         ptr = str(LANG_FILTER_ALL);
                         break;
-        
+
                     case SHOW_SUPPORTED:
                         ptr = str(LANG_FILTER_SUPPORTED);
                         break;
-        
+
                     case SHOW_MUSIC:
                         ptr = str(LANG_FILTER_MUSIC);
                         break;
-                        
+
                     case SHOW_PLAYLIST:
                         ptr = str(LANG_FILTER_PLAYLIST);
                         break;
@@ -577,7 +578,7 @@ bool quick_screen(int context, int button)
                         ptr = str(LANG_FILTER_ID3DB);
                         break;
                 }
-        
+
                 snprintf(buf, sizeof buf, "%s:", str(LANG_FILTER));
                 lcd_getstringsize(buf,&w,&h);
                 lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h*2, buf);
@@ -589,20 +590,20 @@ bool quick_screen(int context, int button)
                     case REPEAT_OFF:
                         ptr = str(LANG_OFF);
                         break;
-        
+
                     case REPEAT_ALL:
                         ptr = str(LANG_REPEAT_ALL);
                         break;
-        
+
                     case REPEAT_ONE:
                         ptr = str(LANG_REPEAT_ONE);
                         break;
-        
+
                     case REPEAT_SHUFFLE:
                         ptr = str(LANG_SHUFFLE);
                         break;
                 }
-        
+
                 lcd_getstringsize(str(LANG_SHUFFLE),&w,&h);
                 lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2, str(LANG_REPEAT));
                 lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h, str(LANG_F2_MODE));
@@ -613,17 +614,17 @@ bool quick_screen(int context, int button)
                 /* Scrollbar */
                 lcd_putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_F3_SCROLL));
                 lcd_putsxy(0, LCD_HEIGHT/2 - h, str(LANG_F3_BAR));
-                lcd_putsxy(0, LCD_HEIGHT/2, 
+                lcd_putsxy(0, LCD_HEIGHT/2,
                            global_settings.scrollbar ? str(LANG_ON) : str(LANG_OFF));
-    
+
                 /* Status bar */
                 ptr = str(LANG_F3_STATUS);
                 lcd_getstringsize(ptr,&w,&h);
                 lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2, ptr);
                 lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h, str(LANG_F3_BAR));
-                lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2, 
+                lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2,
                            global_settings.statusbar ? str(LANG_ON) : str(LANG_OFF));
-    
+
                 /* Flip */
                 ptr = str(LANG_FLIP_DISPLAY);
                 lcd_getstringsize(ptr,&w,&h);
@@ -636,7 +637,7 @@ bool quick_screen(int context, int button)
 #endif
         }
 
-        lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
+        lcd_bitmap(bitmap_icons_7x8[Icon_FastBackward],
                    LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8);
         lcd_bitmap(bitmap_icons_7x8[Icon_DownArrow],
                    LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8);
@@ -645,15 +646,15 @@ bool quick_screen(int context, int button)
 
         lcd_update();
         key = button_get(true);
-        
-        /*  
+
+        /*
          *  This is a temporary kludge so that the F2 & F3 menus operate in exactly
          *  the same manner up until the full F2/F3 configurable menus are complete
-         */  
-          
+         */
+
         if( key == BUTTON_LEFT || key == BUTTON_RIGHT || key == BUTTON_DOWN || key == ( BUTTON_LEFT | BUTTON_REPEAT ) || key == ( BUTTON_RIGHT  | BUTTON_REPEAT ) || key == ( BUTTON_DOWN  | BUTTON_REPEAT ) )
             key = button | key;
-            
+
         switch (key) {
             case SCREENS_QUICK | BUTTON_LEFT:
             case SCREENS_QUICK | BUTTON_LEFT | BUTTON_REPEAT:
@@ -712,12 +713,12 @@ bool quick_screen(int context, int button)
             case BUTTON_F3 | BUTTON_REL:
 #endif
             case SCREENS_QUICK | BUTTON_REL:
-            
+
                 if( used )
                     exit = true;
 
                 used = true;
-                    
+
                 break;
 
             case BUTTON_OFF | BUTTON_REL:
@@ -732,7 +733,7 @@ bool quick_screen(int context, int button)
     }
 
     settings_save();
-    
+
     switch( button )
     {
         case SCREENS_QUICK:
@@ -748,11 +749,11 @@ bool quick_screen(int context, int button)
                 lcd_setmargins(0, STATUSBAR_HEIGHT);
             else
                 lcd_setmargins(0, 0);
-                
+
             break;
 #endif
     }
-    
+
     lcd_setfont(FONT_UI);
 
     return false;
@@ -794,13 +795,13 @@ void splash(int ticks,       /* how long the splash is displayed */
 #endif
 
 #ifdef HAVE_LCD_CHARCELLS
-    lcd_double_height (false);    
+    lcd_double_height (false);
 #endif
     va_start( ap, fmt );
     vsnprintf( splash_buf, sizeof(splash_buf), fmt, ap );
 
     if(center) {
-        
+
         /* first a pass to measure sizes */
         next = strtok_r(splash_buf, " ", &store);
         while (next) {
@@ -965,7 +966,7 @@ static void say_time(int cursorpos, const struct tm *tm)
         value = tm->tm_mday;
         break;
     }
-    
+
     if (cursorpos == 4) /* month */
         talk_id(LANG_MONTH_JANUARY + tm->tm_mon, false);
     else
@@ -1019,7 +1020,7 @@ bool set_time_screen(const char* string, struct tm *tm)
     char cursor[][3] = {{ 0,  8, 12}, {18,  8, 12}, {36,  8, 12},
                         {24, 16, 24}, {54, 16, 18}, {78, 16, 12}};
     char daysinmonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    
+
     int monthname_len = 0, dayname_len = 0;
 
     int *valptr = NULL;
@@ -1205,7 +1206,7 @@ bool set_time_screen(const char* string, struct tm *tm)
                 break;
             case BUTTON_DOWN:
             case BUTTON_DOWN | BUTTON_REPEAT:
-                *valptr = (*valptr + steps - min - 1) % 
+                *valptr = (*valptr + steps - min - 1) %
                     steps + min;
                 if(*valptr == 0)
                     *valptr = min;
@@ -1259,7 +1260,7 @@ bool shutdown_screen(void)
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
                     return true;
-                
+
                 /* Return if any other button was pushed, or if there
                    was a timeout. We ignore RELEASE events, since we may
                    have been called by a button down event, and the user might
@@ -1295,27 +1296,30 @@ bool browse_id3(void)
         {
             case 0:
                 lcd_puts(0, 0, str(LANG_ID3_TITLE));
-                lcd_puts_scroll(0, 1, id3->title ? id3->title : 
+                lcd_puts_scroll(0, 1, id3->title ? id3->title :
                                 (char*)str(LANG_ID3_NO_TITLE));
                 break;
 
             case 1:
                 lcd_puts(0, 0, str(LANG_ID3_ARTIST));
-                lcd_puts_scroll(0, 1, 
-                                id3->artist ? id3->artist : 
+                lcd_puts_scroll(0, 1,
+                                id3->artist ? id3->artist :
                                 (char*)str(LANG_ID3_NO_ARTIST));
                 break;
 
             case 2:
                 lcd_puts(0, 0, str(LANG_ID3_ALBUM));
-                lcd_puts_scroll(0, 1, id3->album ? id3->album : 
+                lcd_puts_scroll(0, 1, id3->album ? id3->album :
                                 (char*)str(LANG_ID3_NO_ALBUM));
                 break;
 
             case 3:
                 lcd_puts(0, 0, str(LANG_ID3_TRACKNUM));
-                
-                if (id3->tracknum) {
+
+                if (id3->track_string) {
+                    lcd_puts_scroll(0, 1, id3->track_string);
+                }
+                else if (id3->tracknum) {
                     snprintf(scroll_text,sizeof(scroll_text), "%d",
                              id3->tracknum);
                     lcd_puts_scroll(0, 1, scroll_text);
@@ -1326,15 +1330,24 @@ bool browse_id3(void)
 
             case 4:
                 lcd_puts(0, 0, str(LANG_ID3_GENRE));
-                lcd_puts_scroll(0, 1,
-                                id3_get_genre(id3) ?
-                                id3_get_genre(id3) :
-                                (char*)str(LANG_ID3_NO_INFO));
+
+                if (id3->genre_string) {
+                    lcd_puts_scroll(0, 1, id3->genre_string);
+                }
+                else {
+                  lcd_puts_scroll(0, 1,
+                                  id3_get_genre(id3) ?
+                                  id3_get_genre(id3) :
+                                  (char*)str(LANG_ID3_NO_INFO));
+                }
                 break;
 
             case 5:
                 lcd_puts(0, 0, str(LANG_ID3_YEAR));
-                if (id3->year) {
+                if (id3->year_string) {
+                    lcd_puts_scroll(0, 1, id3->year_string);
+                }
+                else if (id3->year) {
                     snprintf(scroll_text,sizeof(scroll_text), "%d",
                              id3->year);
                     lcd_puts_scroll(0, 1, scroll_text);
@@ -1345,9 +1358,7 @@ bool browse_id3(void)
 
             case 6:
                 lcd_puts(0, 0, str(LANG_ID3_LENGHT));
-                snprintf(scroll_text,sizeof(scroll_text), "%d:%02d",
-                         (int) (id3->length / 60000),
-                         (int) (id3->length % 60000 / 1000) );
+                wps_format_time(scroll_text, sizeof(scroll_text), id3->length);
                 lcd_puts(0, 1, scroll_text);
                 break;
 
@@ -1361,7 +1372,7 @@ bool browse_id3(void)
 
             case 8:
                 lcd_puts(0, 0, str(LANG_ID3_BITRATE));
-                snprintf(scroll_text,sizeof(scroll_text), "%d kbps", 
+                snprintf(scroll_text,sizeof(scroll_text), "%d kbps",
                          id3->bitrate);
                 lcd_puts(0, 1, scroll_text);
                 break;

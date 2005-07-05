@@ -225,7 +225,7 @@ bool wps_load(const char* file, bool display)
             /* reset image buffer */
             img_buf_ptr = img_buf;
             img_buf_free = IMG_BUFSIZE;
-            
+
             /* set images to unloaded */
             for (i = 0; i < MAX_IMAGES; i++) {
                 img[i].loaded = false;
@@ -263,9 +263,9 @@ bool wps_load(const char* file, bool display)
                 }
                 if (any_defined_line)
                 {
-#ifdef HAVE_LCD_BITMAP                    
+#ifdef HAVE_LCD_BITMAP
                     wps_display_images();
-#endif                    
+#endif
                     lcd_update();
                     sleep(HZ/2);
                 }
@@ -285,7 +285,7 @@ bool wps_load(const char* file, bool display)
  * buf_size - size of buffer.
  * time     - time to format, in milliseconds.
  */
-static void format_time(char* buf, int buf_size, long time)
+void wps_format_time(char* buf, int buf_size, long time)
 {
     if ( time < 3600000 ) {
       snprintf(buf, buf_size, "%d:%02d",
@@ -544,18 +544,19 @@ static char* get_tag(struct mp3entry* cid3,
 
                 case 'c':  /* Current Time in Song */
                     *flags |= WPS_REFRESH_DYNAMIC;
-                    format_time(buf, buf_size, id3->elapsed + ff_rewind_count);
+                    wps_format_time(buf, buf_size,
+                                    id3->elapsed + ff_rewind_count);
                     return buf;
 
                 case 'r': /* Remaining Time in Song */
                     *flags |= WPS_REFRESH_DYNAMIC;
-                    format_time(buf, buf_size,
-                                id3->length - id3->elapsed - ff_rewind_count);
+                    wps_format_time(buf, buf_size,
+                                    id3->length - id3->elapsed - ff_rewind_count);
                     return buf;
 
                 case 't':  /* Total Time */
                     *flags |= WPS_REFRESH_STATIC;
-                    format_time(buf, buf_size, id3->length);
+                    wps_format_time(buf, buf_size, id3->length);
                     return buf;
 
 #ifdef HAVE_LCD_BITMAP
@@ -767,7 +768,7 @@ static void format_display(char* buf,
     char* value = NULL;
     int level = 0;
     unsigned char tag_length;
-    
+
     /* needed for images (ifdef is to kill a warning on player)*/
     int n;
 #ifdef HAVE_LCD_BITMAP
@@ -823,7 +824,7 @@ static void format_display(char* buf,
                     temp_buf[pos - ptr] = 0;
                     n = atoi(temp_buf);
                     ptr = pos+1;
-                    
+
                     /* check image number, and load state. */
                     if ((n < MAX_IMAGES) && (!img[n].loaded)) {
                         /* Get filename */
@@ -862,7 +863,7 @@ static void format_display(char* buf,
                         else
                             /* weird syntax, get out */
                             break;
-                        
+
                         /* and load the image */
                         ret = read_bmp_file(imgname, &img[n].w, &img[n].h, img_buf_ptr,
                                             img_buf_free);
@@ -887,7 +888,7 @@ static void format_display(char* buf,
                 }
                 fmt++;
                 break;
-                
+
 
             case '%':
             case '|':
@@ -1068,7 +1069,7 @@ bool wps_refresh(struct mp3entry* id3,
 #ifdef HAVE_LCD_BITMAP
             /* progress */
             if (flags & refresh_mode & WPS_REFRESH_PLAYER_PROGRESS) {
-                scrollbar(0, i*h + offset + 1, LCD_WIDTH, 6,
+                scrollbar(0, i*h + offset + (h > 7 ? (h - 6) / 2 : 1), LCD_WIDTH, 6,
                           id3->length?id3->length:1, 0,
                           id3->length?id3->elapsed + ff_rewind_count:0,
                           HORIZONTAL);
@@ -1197,7 +1198,7 @@ bool wps_display(struct mp3entry* id3,
     yield();
     wps_refresh(id3, nid3, 0, WPS_REFRESH_ALL);
     status_draw(true);
-#ifdef HAVE_LCD_BITMAP    
+#ifdef HAVE_LCD_BITMAP
     wps_display_images();
 #endif
     lcd_update();
@@ -1284,7 +1285,7 @@ static void draw_player_fullbar(char* buf, int buf_size,
     time=(id3->elapsed + ff_rewind_count);
 
     memset(timestr, 0, sizeof(timestr));
-    format_time(timestr, sizeof(timestr), time);
+    wps_format_time(timestr, sizeof(timestr), time);
     for(lcd_char_pos=0; lcd_char_pos<6; lcd_char_pos++) {
         digits[lcd_char_pos] = map_fullbar_char(timestr[lcd_char_pos]);
     }
