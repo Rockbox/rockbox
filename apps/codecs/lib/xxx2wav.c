@@ -91,11 +91,7 @@ int memcmp(const void *s1, const void *s2, size_t n) {
 }
 
 void* memchr(const void *s, int c, size_t n) {
-  /* TO DO: Implement for Tremor */
-  (void)s;
-  (void)c;
-  (void)n;
-  return(NULL);
+    return(local_rb->memchr(s,c,n));
 }
 
 void* memmove(const void *s1, const void *s2, size_t n) {

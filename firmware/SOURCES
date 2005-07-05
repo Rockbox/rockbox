@@ -14,6 +14,7 @@ common/file.c
 common/disk.c
 common/errno.c
 common/memcmp.c
+common/memchr.c
 common/qsort.c
 common/random.c
 common/sprintf.c

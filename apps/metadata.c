@@ -91,9 +91,14 @@ const long wavpack_sample_rates [] = { 6000, 8000, 9600, 11025, 12000, 16000,
 
 static bool get_apetag_info (struct mp3entry *entry, int fd);
 
+static bool get_vorbis_comments (struct mp3entry *entry, int fd);
+
+static void little_endian_to_native (void *data, char *format);
+
 bool get_metadata(struct track_info* track, int fd, const char* trackname,
                   bool v1first) {
   unsigned long totalsamples,bytespersample,channels,bitspersample,numbytes;
+  unsigned long serialno=0, last_serialno=0;
   int bytesperframe;
   unsigned char* buf;
   int i,j,eof;
@@ -259,13 +264,29 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         return(false);
       }
 
+      /* We need to ensure the serial number from this page is the
+       * same as the one from the last page (since we only support
+       * a single bitstream).
+       */
+      serialno = buf[14]|(buf[15]<<8)|(buf[16]<<16)|(buf[17]<<24);
+
       /* Ogg stores integers in little-endian format. */
       track->id3.filesize=filesize(fd);
       track->id3.frequency=buf[40]|(buf[41]<<8)|(buf[42]<<16)|(buf[43]<<24);
       channels=buf[39];
 
+      if ( !get_vorbis_comments(&(track->id3), fd) ) {
+    logf("get_vorbis_comments failed");
+        return(false);
+      }
+
+      /* Set id3 genre to something bogus, otherwise vorbis tracks
+       * without genre tags will show up as 'Blues'
+       */
+      track->id3.genre=255;
+
       /* We now need to search for the last page in the file - identified by 
-	   by ('O','g','g','S',0) and retrieve totalsamples */
+       by ('O','g','g','S',0) and retrieve totalsamples */
 
       lseek(fd, -32*1024, SEEK_END);
       eof=0;
@@ -283,8 +304,9 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         i=0;
         while (i < (j-5)) {
           if (memcmp(&buf[i],"OggS",5)==0) {
-            if (i < (j-10)) {
+            if (i < (j-17)) {
               totalsamples=(buf[i+6])|(buf[i+7]<<8)|(buf[i+8]<<16)|(buf[i+9]<<24);
+	      last_serialno=(buf[i+14])|(buf[i+15]<<8)|(buf[i+16]<<16)|(buf[i+17]<<24);
               j=0;  /* We can discard the rest of the buffer */
             } else {
               break;
@@ -300,7 +322,18 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
           j=0;
         }
       }
+
+      /* This file has mutiple vorbis bitstreams (or is corrupt) */
+      /* FIXME we should display an error here */
+      if (serialno != last_serialno) {
+	      track->taginfo_ready=false;
+	      logf("serialno mismatch");
+	      logf("%ld", serialno);
+	      logf("%ld", last_serialno);
+	      return false;
+      }
   
+      track->id3.samples=totalsamples;
       track->id3.length=(totalsamples/track->id3.frequency)*1000;
 
       /* The following calculation should use datasize, not filesize (i.e. exclude comments etc) */
@@ -710,5 +743,191 @@ static void UTF8ToAnsi (unsigned char *pUTF8)
     }
 
     *pAnsi = 0;
+}
+
+/* This function extracts the information stored in the Vorbis comment header
+ * and stores it in id3v2buf of the current track.  Currently the combined
+ * lengths of title, genre, album, and artist must be no longer than 296 bytes
+ * (the remaining 4 bytes are the null bytes at the end of the strings).  This
+ * is wrong, since vorbis comments can be up to 2^32 - 1 bytes long.  In
+ * practice I don't think this limitation will cause a problem.
+ *
+ * According to the docs, a vorbis bitstream *must* have a comment packet even
+ * if that packet is empty.  Therefore if this function returns false the
+ * bitstream is corrupt and shouldn't be used.
+ *
+ * Additionally, vorbis comments *may* take up more than one Ogg page, and this
+ * only looks at the first page of comments.
+ */
+static bool get_vorbis_comments (struct mp3entry *entry, int fd)
+{
+    int vendor_length;
+    int comment_count;
+    int comment_length;
+    int i = 0;
+    unsigned char temp[300];
+    int buffer_remaining = sizeof(entry->id3v2buf);
+    char *buffer = entry->id3v2buf;
+    char **p = NULL;
+    int segments;
+    int packet_remaining = 0;
+
+    /* Comments are in second Ogg page */
+    if ( lseek(fd, 58, SEEK_SET) < 0 ) {
+        return false;
+    }
+
+    /* Minimum header length for Ogg pages is 27 */
+    if (read(fd, temp, 27) < 27) {
+        return false;
+    }
+
+    if (memcmp(temp,"OggS",4)!=0) {
+      logf("1: Not an Ogg Vorbis file");
+      return(false);
+    }
+
+    segments=temp[26];
+    /* read in segment table */
+    if (read(fd, temp, segments) < segments) {
+        return false;
+    }
+
+    /* The second packet in a vorbis stream is the comment packet.  It *may*
+     * extend beyond the second page, but usually does not.  Here we find the
+     * length of the comment packet (or the rest of the page if the comment
+     * packet extends to the third page).
+     */
+    for (i = 0; i < segments; i++) {
+	    packet_remaining += temp[i];
+	    /* The last segment of a packet is always < 255 bytes */
+	    if (temp[i] < 255) {
+		    break;
+	    }
+    }
+
+    /* Now read in packet header (type and id string) */
+    if(read(fd, temp, 7) < 7) {
+	    return false;
+    }
+
+    /* The first byte of a packet is the packet type; comment packets are
+     * type 3.
+     */
+    if ((temp[0] != 3) || (memcmp(temp + 1,"vorbis",6)!=0)) {
+	    logf("Not a vorbis comment packet");
+	    return false;
+    }
+
+    packet_remaining -= 7;
+
+
+    /* We've read in all header info, now start reading comments */
+
+    if (read(fd, &vendor_length, 4) < 4) {
+        return false;
+    }
+    little_endian_to_native(&vendor_length, "L");
+    lseek(fd, vendor_length, SEEK_CUR);
+
+    if (read(fd, &comment_count, 4) < 4) {
+        return false;
+    }
+    little_endian_to_native(&comment_count, "L");
+    packet_remaining -= (vendor_length + 8);
+    if ( packet_remaining <= 0 ) {
+	    return true;
+    }
+
+    for ( i = 0; i < comment_count; i++ ) {
+        int name_length = 0;
+
+        if (read(fd, &comment_length, 4) < 4) {
+            return false;
+        }
+
+        little_endian_to_native(&comment_length, "L");
+
+	/* Quit if we've passed the end of the page */
+	packet_remaining -= (comment_length + 4);
+        if ( packet_remaining <= 0 ) {
+    	    return true;
+        }
+
+        /* Skip comment if it won't fit in buffer */
+        if ( (unsigned int)comment_length >= sizeof(temp) ) {
+            lseek(fd, comment_length, SEEK_CUR);
+            continue;
+        }
+
+        if ( read(fd, temp, comment_length) < comment_length ) {
+            return false;
+        }
+
+        temp[comment_length] = '\0';
+        UTF8ToAnsi(temp);
+        comment_length = strlen(temp);
+
+        if (strncasecmp(temp, "TITLE=", 6) == 0) {
+            name_length = 5;
+            p = &(entry->title);
+        } else if (strncasecmp(temp, "ALBUM=", 6) == 0) {
+            name_length = 5;
+            p = &(entry->album);
+        } else if (strncasecmp(temp, "ARTIST=", 7) == 0) {
+            name_length = 6;
+            p = &(entry->artist);
+        } else if (strncasecmp(temp, "GENRE=", 6) == 0) {
+            name_length = 5;
+            p = &(entry->genre_string);
+        } else if (strncasecmp(temp, "DATE=", 5) == 0) {
+	    int j=0;
+	    /* verify that this is a number */
+	    /* Note: vorbis uses UTF-8 for its comments, so it is
+	     * safe to compare the values against ASCII 0 and 9
+	     */
+	    while ( j < (comment_length - 5) ) {
+		    if ( (temp[5+j] < '0') || (temp[5+j] > '9') ) {
+			    break;
+		    }
+		    j++;
+	    }
+	    if  ( j == (comment_length - 5) ) {
+                p = NULL;
+                entry->year = atoi(temp + 5);
+	    }
+        } else if (strncasecmp(temp, "TRACKNUMBER=", 12) == 0) {
+	    int j=0;
+	    /* verify that this is a number */
+	    /* Note: vorbis uses UTF-8 for its comments, so it is
+	     * safe to compare the values against ASCII 0 and 9
+	     */
+	    while ( j < (comment_length - 12) ) {
+		    if ( (temp[12+j] < '0') || (temp[12+j] > '9') ) {
+			    break;
+		    }
+		    j++;
+	    }
+	    if  ( j == (comment_length - 12) ) {
+                p = NULL;
+                entry->tracknum = atoi(temp + 12);
+	    }
+        } else {
+            p = NULL;
+        }
+
+        if (p) {
+            comment_length -= (name_length + 1);
+            if ( comment_length < buffer_remaining ) {
+                strncpy(buffer, temp + name_length + 1, comment_length);
+                buffer[comment_length] = '\0';
+                *p = buffer;
+                buffer += comment_length + 1;
+                buffer_remaining -= comment_length + 1;
+            }
+        }
+    }
+
+    return true;
 }
 

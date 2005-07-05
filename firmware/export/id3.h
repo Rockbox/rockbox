@@ -78,6 +78,9 @@ struct mp3entry {
     unsigned int length;   /* song length */
     unsigned int elapsed;  /* ms played */
 
+    /* Added for Vorbis */
+    unsigned long samples; /* number of samples in track */
+
     /* MP3 stream specific info */
     long bpf;              /* bytes per frame */
     long tpf;              /* time per frame */

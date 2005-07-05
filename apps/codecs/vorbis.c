@@ -20,6 +20,7 @@
 #include "codecs.h"
 
 #include "Tremor/ivorbisfile.h"
+#include "Tremor/ogg.h"
 #include "playback.h"
 #include "dsp.h"
 #include "lib/codeclib.h"
@@ -51,12 +52,27 @@ size_t read_handler(void *ptr, size_t size, size_t nmemb, void *datasource)
     return rb->read_filebuf(ptr, nmemb*size);
 }
 
-int seek_handler(void *datasource, ogg_int64_t offset, int whence)
-{
-    /* We are not seekable at the moment */
+int initial_seek_handler(void *datasource, ogg_int64_t offset, int whence) {
     (void)datasource;
     (void)offset;
     (void)whence;
+    return -1;
+}
+
+int seek_handler(void *datasource, ogg_int64_t offset, int whence)
+{
+    (void)datasource;
+
+    if ( whence == SEEK_CUR ) {
+      offset += rb->curpos;
+    } else if ( whence == SEEK_END ) {
+      offset += rb->filesize;
+    }
+
+    if (rb->seek_buffer(offset)) {
+      return 0;
+    }
+
     return -1;
 }
 
@@ -93,22 +109,26 @@ enum codec_status codec_start(struct codec_api* api)
     long n;
     int current_section;
     int eof;
+    ogg_int64_t vf_offsets[2];
+    ogg_int64_t vf_dataoffsets;
+    ogg_uint32_t vf_serialnos;
+    ogg_int64_t vf_pcmlengths[2];
+    int current_stereo_mode = -1;
 
     TEST_CODEC_API(api);
 
     /* if you are using a global api pointer, don't forget to copy it!
-       otherwise you will get lovely "I04: IllInstr" errors... :-) */
+         otherwise you will get lovely "I04: IllInstr" errors... :-) */
     rb = api;
 
-#ifdef USE_IRAM
+    #ifdef USE_IRAM
     rb->memcpy(iramstart, iramcopy, iramend-iramstart);
-#endif
-    
+    #endif
+        
     rb->configure(CODEC_SET_FILEBUF_LIMIT, (int *)(1024*1024*2));
     rb->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*64));
-    
+
     rb->configure(DSP_DITHER, (bool *)false);
-    rb->configure(DSP_SET_STEREO_MODE, (int *)STEREO_INTERLEAVED);
     rb->configure(DSP_SET_SAMPLE_DEPTH, (int *)(16));
     
 /* We need to flush reserver memory every track load. */
@@ -129,44 +149,123 @@ enum codec_status codec_start(struct codec_api* api)
     
     /* Create a decoder instance */
     callbacks.read_func=read_handler;
-    callbacks.seek_func=seek_handler;
+    callbacks.seek_func=initial_seek_handler;
     callbacks.tell_func=tell_handler;
     callbacks.close_func=close_handler;
 
+    /* Open a non-seekable stream */
     error=ov_open_callbacks(rb,&vf,NULL,0,callbacks);
     
+    /* If the non-seekable open was successful, we need to supply the missing
+     * data to make it seekable.  This is a hack, but it's reasonable since we
+     * don't want to read the whole file into the buffer before we start
+     * playing.  Using Tremor's seekable open routine would cause us to do
+     * this, so we pretend not to be seekable at first.  Then we fill in the
+     * missing fields of vf with 1) information in rb->id3, and 2) info
+     * obtained by Tremor in the above ov_open call.
+     *
+     * Note that this assumes there is only ONE logical Vorbis bitstream in our
+     * physical Ogg bitstream.  This is verified in metadata.c, well before we
+     * get here.
+     */
+    if ( !error ) {
+	    //rb->logf("no error");
+	/* FIXME Should these be dynamically allocated? */
+        vf.offsets = vf_offsets;
+        vf.dataoffsets = &vf_dataoffsets;
+        vf.serialnos = &vf_serialnos;
+        vf.pcmlengths = vf_pcmlengths;
+
+        vf.offsets[0] = 0;
+        vf.offsets[1] = rb->id3->filesize;
+        vf.dataoffsets[0] = vf.offset;
+        vf.pcmlengths[0] = 0;
+        vf.pcmlengths[1] = rb->id3->samples;
+        vf.serialnos[0] = vf.current_serialno;
+        vf.callbacks.seek_func=seek_handler;
+        vf.seekable = 1;
+        vf.offset = 58; /* length of Ogg header */
+	vf.end = rb->id3->filesize;
+        vf.ready_state = OPENED;
+        vf.links = 1;
+	
+	/*if(ov_raw_seek(&vf,0)){
+		rb->logf("seek err");
+	}
+	*/
+
+    } else {
+	    //rb->logf("ov_open: %d", error);
+    }
+        
     vi=ov_info(&vf,-1);
 
     if (vi==NULL) {
-        // rb->splash(HZ*2, true, "Vorbis Error");
+        //rb->splash(HZ*2, true, "Vorbis Error");
         return CODEC_ERROR;
     }
-  
+
+    rb->configure(DSP_SET_FREQUENCY, (int *)rb->id3->frequency);
+
+    if (vi->channels == 2) {
+        if (current_stereo_mode != STEREO_INTERLEAVED) {
+  	    rb->configure(DSP_SET_STEREO_MODE, (int *)STEREO_INTERLEAVED);
+	    current_stereo_mode = STEREO_INTERLEAVED;
+        }
+    } else if (vi->channels == 1) {
+	if (current_stereo_mode != STEREO_MONO) {
+  	    rb->configure(DSP_SET_STEREO_MODE, (int *)STEREO_MONO);
+	    current_stereo_mode = STEREO_MONO;
+	}
+    }
+
     eof=0;
+    rb->yield();
     while (!eof) {
+        if (rb->stop_codec || rb->reload_codec)
+            break ;
+
+        if (rb->seek_time) {
+	    
+            if (ov_time_seek(&vf, rb->seek_time)) {
+		//rb->logf("ov_time_seek failed");
+            }
+            rb->seek_time = 0;
+        }
+                
         /* Read host-endian signed 16 bit PCM samples */
         n=ov_read(&vf,pcmbuf,sizeof(pcmbuf),&current_section);
 
         if (n==0) {
             eof=1;
-        }
-        else if (n < 0) {
+        } else if (n < 0) {
             DEBUGF("Error decoding frame\n");
         } else {
-            rb->yield();
-            if (rb->stop_codec || rb->reload_codec)
-                break ;
-        
-            while (!rb->audiobuffer_insert(pcmbuf, n))
+            while (!rb->audiobuffer_insert(pcmbuf, n)) {
                 rb->yield();
-
-            rb->set_elapsed(ov_time_tell(&vf));
+		if ( rb->seek_time ) {
+			/* Hmmm, a seek was requested. Throw out the
+			 * buffer and go back to the top of the loop.
+			 */
+			break;
+		}
+	    }
+	    if ( !rb->seek_time ) {
+            	rb->set_elapsed(ov_time_tell(&vf));
+		rb->yield();
+	    }
         }
     }
-  
-    if (rb->request_next_track())
-        goto next_track;
     
+    if (rb->request_next_track()) {
+	/* Clean things up for the next track */
+        vf.dataoffsets = NULL;
+        vf.offsets = NULL;
+        vf.serialnos = NULL;
+        vf.pcmlengths = NULL;
+	ov_clear(&vf);
+        goto next_track;
+    }
+        
     return CODEC_OK;
 }
-
