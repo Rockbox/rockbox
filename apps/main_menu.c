@@ -362,9 +362,10 @@ bool info_menu(void)
 }
 
 #ifdef HAVE_LCD_CHARCELLS
-static void do_shutdown(void)
+static bool do_shutdown(void)
 {
     sys_poweroff(false);
+    return false;
 }
 #endif
     
