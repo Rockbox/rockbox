@@ -420,10 +420,10 @@ unsigned int audiobuffer_get_latency(void)
 
 bool pcm_is_lowdata(void)
 {
-    if (!pcm_is_playing() || pcm_paused)
+    if (!pcm_is_playing() || pcm_paused || crossfade_init || crossfade_active)
         return false;
     
-    if (pcmbuf_unplayed_bytes < PCM_WATERMARK || crossfade_active)
+    if (pcmbuf_unplayed_bytes < PCM_WATERMARK)
         return true;
         
     return false;
@@ -435,7 +435,7 @@ bool pcm_crossfade_init(void)
         || crossfade_active) {
         return false;
     }
-    logf("crossfading!");
+    logf("pcm_crossfade_init");
     pcm_boost(true);
     crossfade_mode = CFM_CROSSFADE;
     crossfade_init = true;
@@ -478,13 +478,16 @@ void pcm_flush_fillpos(void)
 
 static void crossfade_start(void)
 {
+    int bytesleft = pcmbuf_unplayed_bytes;
+    
     crossfade_init = 0;
-    if (PCMBUF_SIZE - audiobuffer_free < CHUNK_SIZE * 4) {
-        if (crossfade_mode == CFM_FLUSH)
-            pcm_play_stop();
+    if (bytesleft < CHUNK_SIZE * 3) {
+        logf("crossfade rejected");
+        pcm_play_stop();
         return ;
     }
-        
+
+    logf("crossfade_start");
     pcm_flush_fillpos();
     pcm_boost(true);
     crossfade_active = true;
@@ -492,12 +495,12 @@ static void crossfade_start(void)
 
     switch (crossfade_mode) {
         case CFM_CROSSFADE:
-            crossfade_amount = (PCMBUF_SIZE - audiobuffer_free - (CHUNK_SIZE * 2))/2;
+            crossfade_amount = (bytesleft - (CHUNK_SIZE * 2))/2;
             crossfade_rem = crossfade_amount;
             break ;
 
         case CFM_FLUSH:
-            crossfade_amount = (PCMBUF_SIZE - audiobuffer_free - (CHUNK_SIZE * 2))/2;
+            crossfade_amount = (bytesleft - (CHUNK_SIZE * 2))/2;
             crossfade_rem = crossfade_amount;
             break ;
     }
@@ -586,7 +589,7 @@ void* pcm_request_buffer(long length, long *realsize)
 
 bool pcm_is_crossfade_active(void)
 {
-    return crossfade_active;
+    return crossfade_active || crossfade_init;
 }
 
 void pcm_flush_buffer(long length)

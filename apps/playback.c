@@ -614,13 +614,16 @@ void codec_track_changed(void)
     queue_post(&audio_queue, AUDIO_TRACK_CHANGED, 0);
 }
 
+/* Give codecs or file buffering the right amount of processing time
+   to prevent pcm audio buffer from going empty. */
 void yield_codecs(void)
 {
     yield();
     if (!pcm_is_playing())
         sleep(5);
-    while (pcm_is_lowdata() && !ci.stop_codec && 
-           playing && queue_empty(&audio_queue) && codecbufused > (128*1024))
+    while ((pcm_is_crossfade_active() || pcm_is_lowdata())
+            && !ci.stop_codec && playing && queue_empty(&audio_queue)
+            && codecbufused > (128*1024))
         yield();
 }
 
