@@ -23,7 +23,6 @@
 
 #include "playback.h"
 #include "dsp.h"
-#include "mp3data.h"
 #include "lib/codeclib.h"
 
 struct mad_stream Stream IDATA_ATTR;
@@ -61,7 +60,6 @@ extern char iramend[];
 enum codec_status codec_start(struct codec_api* api)
 {
     struct codec_api *ci = api;
-    struct mp3info *info;
     int Status = 0;
     size_t size;
     int file_end;
@@ -115,7 +113,6 @@ enum codec_status codec_start(struct codec_api* api)
        for gapless playback */
   next_track:
   
-    info = ci->mp3data;
     first_frame = false;
     file_end = 0;
     OutputPtr = OutputBuffer;
@@ -128,24 +125,24 @@ enum codec_status codec_start(struct codec_api* api)
     
     ci->request_buffer(&size, ci->id3->first_frame_offset);
     ci->advance_buffer(size);
- 
-    if (info->enc_delay >= 0 && info->enc_padding >= 0) {
-        stop_skip = info->enc_padding - mpeg_latency[info->layer];
+
+    if (ci->id3->lead_trim >= 0 && ci->id3->tail_trim >= 0) {
+        stop_skip = ci->id3->tail_trim - mpeg_latency[ci->id3->layer];
         if (stop_skip < 0) stop_skip = 0;
-        start_skip = info->enc_delay + mpeg_latency[info->layer];
+        start_skip = ci->id3->lead_trim + mpeg_latency[ci->id3->layer];
     } else {
         stop_skip = 0;
         /* We want to skip this amount anyway */
-        start_skip = mpeg_latency[info->layer];
+        start_skip = mpeg_latency[ci->id3->layer];
     }
   
     /* NOTE: currently this doesn't work, the below calculated samples_count
        seems to be right, but sometimes libmad just can't supply us with
        all the data we need... */
-    if (info->frame_count) {
+    if (ci->id3->frame_count) {
         /* TODO: 1152 is the frame size in samples for MPEG1 layer 2 and layer 3,
            it's probably not correct at all for MPEG2 and layer 1 */
-        samplecount = info->frame_count*1152 - (start_skip + stop_skip);
+        samplecount = ci->id3->frame_count*1152 - (start_skip + stop_skip);
         samplesdone = ci->id3->elapsed * frequency_divider / 10;
     } else {
         samplecount = ci->id3->length * frequency_divider / 10;

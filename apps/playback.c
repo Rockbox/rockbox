@@ -39,7 +39,6 @@
 #include "audio.h"
 #include "logf.h"
 #include "mp3_playback.h"
-#include "mp3data.h"
 #include "usb.h"
 #include "status.h"
 #include "main_menu.h"
@@ -738,7 +737,6 @@ bool loadcodec(const char *trackname, bool start_play)
         cur_ti = &tracks[track_widx];
         ci.filesize = cur_ti->filesize;
         ci.id3 = (struct mp3entry *)&cur_ti->id3;
-        ci.mp3data = (struct mp3info *)&cur_ti->mp3data;
         ci.taginfo_ready = (bool *)&cur_ti->taginfo_ready;
         ci.curpos = 0;
         playing = true;
@@ -1179,7 +1177,6 @@ void audio_update_trackinfo(void)
     cur_ti->id3.elapsed = 0;
     cur_ti->id3.offset = 0;
     ci.id3 = (struct mp3entry *)&cur_ti->id3;
-    ci.mp3data = (struct mp3info *)&cur_ti->mp3data;
     ci.curpos = 0;
     cur_ti->start_pos = 0;
     ci.taginfo_ready = (bool *)&cur_ti->taginfo_ready;

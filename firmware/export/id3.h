@@ -19,6 +19,7 @@
 #ifndef ID3_H
 #define ID3_H
 
+#include <stdbool.h>
 #include "config.h"
 #include "file.h"
 
@@ -78,12 +79,16 @@ struct mp3entry {
     unsigned int length;   /* song length */
     unsigned int elapsed;  /* ms played */
 
+    int lead_trim;         /* Number of samples to skip at the beginning */
+    int tail_trim;         /* Number of samples to remove from the end */
+
     /* Added for Vorbis */
     unsigned long samples; /* number of samples in track */
 
     /* MP3 stream specific info */
     long bpf;              /* bytes per frame */
     long tpf;              /* time per frame */
+    long frame_count;      /* number of frames in the file (if VBR) */
 
     /* Xing VBR fields */
     bool vbr;

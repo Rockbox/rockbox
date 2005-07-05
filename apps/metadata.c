@@ -23,7 +23,6 @@
 
 #include "metadata.h"
 #include "mp3_playback.h"
-#include "mp3data.h"
 #include "logf.h"
 #include "atoi.h"
 
@@ -111,10 +110,6 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
   case AFMT_MPA_L3:
       /* Should check the return value. */
       mp3info(&track->id3, trackname, v1first);
-      lseek(fd, 0, SEEK_SET);
-
-      /* This is too slow to execute on some files. */
-      get_mp3file_info(fd, &track->mp3data);
       lseek(fd, 0, SEEK_SET);
 
       /*

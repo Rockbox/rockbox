@@ -44,10 +44,9 @@ enum {
 /* Not yet implemented. */
 #define CODEC_SET_AUDIOBUF_WATERMARK    4
 
-#define MAX_TRACK 10
+#define MAX_TRACK 32
 struct track_info {
     struct mp3entry id3;     /* TAG metadata */
-    struct mp3info mp3data;  /* MP3 metadata */
     char *codecbuf;          /* Pointer to codec buffer */
     long codecsize;        /* Codec length in bytes */
     

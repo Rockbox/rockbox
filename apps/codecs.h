@@ -121,7 +121,6 @@ struct codec_api {
     
     /* For gapless mp3 */
     struct mp3entry *id3;     /* TAG metadata pointer */
-    struct mp3info *mp3data;  /* MP3 metadata pointer */
     bool *taginfo_ready;      /* Is metadata read */
     
     /* Codec should periodically check if stop_codec is set to true.

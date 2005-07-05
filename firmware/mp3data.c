@@ -266,7 +266,7 @@ static int fileread(int fd, unsigned char *c)
 #if defined(IRIVER_H100) && !defined(SIMULATOR)
     /* We don't want to eat all cpu power. Maybe better way to do this
        should be implemented. */
-    while (pcm_is_lowdata())
+    if (pcm_is_lowdata())
         yield();
 #endif
     

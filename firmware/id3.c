@@ -832,9 +832,14 @@ static int getsonglength(int fd, struct mp3entry *entry)
 
     entry->tpf = info.frame_time;
     entry->bpf = info.frame_size;
+    entry->frame_count = info.frame_count;
     
     entry->vbr = info.is_vbr;
     entry->has_toc = info.has_toc;
+
+    entry->lead_trim = info.enc_delay;
+    entry->tail_trim = info.enc_padding;
+    
     memcpy(entry->toc, info.toc, sizeof(info.toc));
 
     entry->vbr_header_pos = info.vbr_header_pos;

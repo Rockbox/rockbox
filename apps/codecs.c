@@ -74,7 +74,6 @@ struct codec_api ci = {
     0, /* filesize */
     0, /* curpos */
     NULL, /* id3 */
-    NULL, /* mp3data */
     NULL, /* taginfo_ready */
     false, /* stop_codec */
     false, /* reload_codec */
