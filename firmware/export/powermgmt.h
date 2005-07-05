@@ -92,18 +92,22 @@ extern charge_state_type charge_state;
 #endif /* defined(HAVE_CHARGE_CTRL) || (CONFIG_BATTERY == BATT_LIION2200) */
 
 #ifdef HAVE_MMC  /* Values for Ondio */
-#define CURRENT_NORMAL     95  /* average, nearly proportional to 1/U */
-#define CURRENT_USB         1  /* host powered in USB mode; avoid zero-div */
-#define CURRENT_BACKLIGHT   0  /* no backlight */
+# define CURRENT_NORMAL     95  /* average, nearly proportional to 1/U */
+# define CURRENT_USB         1  /* host powered in USB mode; avoid zero-div */
+# define CURRENT_BACKLIGHT   0  /* no backlight */
 #else            /* Values for HD based jukeboxes */
-#define CURRENT_NORMAL    145  /* usual current in mA when using the AJB including some disk/backlight/... activity */
-#define CURRENT_USB       500  /* usual current in mA in USB mode */
-#define CURRENT_BACKLIGHT  30  /* additional current when backlight is always on */
+# ifdef IRIVER_H100
+#  define CURRENT_NORMAL    80
+# else
+#  define CURRENT_NORMAL    145  /* usual current in mA when using the AJB including some disk/backlight/... activity */
+# endif /* not IRIVER_H100 */
+# define CURRENT_USB       500  /* usual current in mA in USB mode */
+# define CURRENT_BACKLIGHT  30  /* additional current when backlight is always on */
 
-#define CURRENT_MIN_CHG    70  /* minimum charge current */
-#define MIN_CHG_V        8500  /* at 8.5v charger voltage get CURRENT_MIN_CHG */
-#define CURRENT_MAX_CHG   350  /* maximum charging current */
-#define MAX_CHG_V       10250  /* anything over 10.25v gives CURRENT_MAX_CHG */
+# define CURRENT_MIN_CHG    70  /* minimum charge current */
+# define MIN_CHG_V        8500  /* at 8.5v charger voltage get CURRENT_MIN_CHG */
+# define CURRENT_MAX_CHG   350  /* maximum charging current */
+# define MAX_CHG_V       10250  /* anything over 10.25v gives CURRENT_MAX_CHG */
 #endif /* HAVE_MMC */
 
 extern unsigned int bat;       /* filtered battery voltage, centivolts */
