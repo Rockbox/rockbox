@@ -79,6 +79,7 @@ static const char* const genres[] = {
 };
 
 static const char* const codec_labels[] = {
+  "ERR",  /* Invalid codec type */
   "???",  /* Unknown file format */
 
 #if CONFIG_HWCODEC==MASNONE
