@@ -84,7 +84,7 @@ sub get_oggtag {
 
     my $ogg = vorbiscomm->new($fn);
 
-    $ogg->load;
+    my $h= $ogg->load;
 
     # Convert this format into the same format used by the id3 parser hash
 
@@ -100,7 +100,6 @@ sub get_oggtag {
                 $n = 'ALBUM';
             }
             $hash{$n}=$cmmt if($n);
-           # print $k, '=', $cmmt, "\n";
         }
     }
 
@@ -147,6 +146,88 @@ sub extractdirs {
     return @dirs;
 }
 
+# CRC32 32KB of data (use less if there isn't 32KB available)
+
+sub crc32 {
+    my ($filename, $index) = @_;
+
+    my $len = 32*1024;
+
+    if(!open(FILE, "<$filename")) {
+        print "failed to open \"$filename\" $!\n";
+        return -2;
+    }
+
+    # read $data from index $index to $buffer from the file, may return fewer
+    # bytes when dealing with a very small file.
+    #
+    # TODO: make sure we don't include a trailer with metadata when doing this.
+    # Like a id3v1 tag.
+    my $nread = sysread FILE, $buffer, $len, $index;
+
+    close(FILE);
+
+    my @crc_table = 
+    ( # CRC32 lookup table for polynomial 0x04C11DB7
+        0x00000000, 0x04C11DB7, 0x09823B6E, 0x0D4326D9, 0x130476DC, 0x17C56B6B,
+        0x1A864DB2, 0x1E475005, 0x2608EDB8, 0x22C9F00F, 0x2F8AD6D6, 0x2B4BCB61,
+        0x350C9B64, 0x31CD86D3, 0x3C8EA00A, 0x384FBDBD, 0x4C11DB70, 0x48D0C6C7,
+        0x4593E01E, 0x4152FDA9, 0x5F15ADAC, 0x5BD4B01B, 0x569796C2, 0x52568B75,
+        0x6A1936C8, 0x6ED82B7F, 0x639B0DA6, 0x675A1011, 0x791D4014, 0x7DDC5DA3,
+        0x709F7B7A, 0x745E66CD, 0x9823B6E0, 0x9CE2AB57, 0x91A18D8E, 0x95609039,
+        0x8B27C03C, 0x8FE6DD8B, 0x82A5FB52, 0x8664E6E5, 0xBE2B5B58, 0xBAEA46EF,
+        0xB7A96036, 0xB3687D81, 0xAD2F2D84, 0xA9EE3033, 0xA4AD16EA, 0xA06C0B5D,
+        0xD4326D90, 0xD0F37027, 0xDDB056FE, 0xD9714B49, 0xC7361B4C, 0xC3F706FB,
+        0xCEB42022, 0xCA753D95, 0xF23A8028, 0xF6FB9D9F, 0xFBB8BB46, 0xFF79A6F1,
+        0xE13EF6F4, 0xE5FFEB43, 0xE8BCCD9A, 0xEC7DD02D, 0x34867077, 0x30476DC0,
+        0x3D044B19, 0x39C556AE, 0x278206AB, 0x23431B1C, 0x2E003DC5, 0x2AC12072,
+        0x128E9DCF, 0x164F8078, 0x1B0CA6A1, 0x1FCDBB16, 0x018AEB13, 0x054BF6A4,
+        0x0808D07D, 0x0CC9CDCA, 0x7897AB07, 0x7C56B6B0, 0x71159069, 0x75D48DDE,
+        0x6B93DDDB, 0x6F52C06C, 0x6211E6B5, 0x66D0FB02, 0x5E9F46BF, 0x5A5E5B08,
+        0x571D7DD1, 0x53DC6066, 0x4D9B3063, 0x495A2DD4, 0x44190B0D, 0x40D816BA,
+        0xACA5C697, 0xA864DB20, 0xA527FDF9, 0xA1E6E04E, 0xBFA1B04B, 0xBB60ADFC,
+        0xB6238B25, 0xB2E29692, 0x8AAD2B2F, 0x8E6C3698, 0x832F1041, 0x87EE0DF6,
+        0x99A95DF3, 0x9D684044, 0x902B669D, 0x94EA7B2A, 0xE0B41DE7, 0xE4750050,
+        0xE9362689, 0xEDF73B3E, 0xF3B06B3B, 0xF771768C, 0xFA325055, 0xFEF34DE2,
+        0xC6BCF05F, 0xC27DEDE8, 0xCF3ECB31, 0xCBFFD686, 0xD5B88683, 0xD1799B34,
+        0xDC3ABDED, 0xD8FBA05A, 0x690CE0EE, 0x6DCDFD59, 0x608EDB80, 0x644FC637,
+        0x7A089632, 0x7EC98B85, 0x738AAD5C, 0x774BB0EB, 0x4F040D56, 0x4BC510E1,
+        0x46863638, 0x42472B8F, 0x5C007B8A, 0x58C1663D, 0x558240E4, 0x51435D53,
+        0x251D3B9E, 0x21DC2629, 0x2C9F00F0, 0x285E1D47, 0x36194D42, 0x32D850F5,
+        0x3F9B762C, 0x3B5A6B9B, 0x0315D626, 0x07D4CB91, 0x0A97ED48, 0x0E56F0FF,
+        0x1011A0FA, 0x14D0BD4D, 0x19939B94, 0x1D528623, 0xF12F560E, 0xF5EE4BB9,
+        0xF8AD6D60, 0xFC6C70D7, 0xE22B20D2, 0xE6EA3D65, 0xEBA91BBC, 0xEF68060B,
+        0xD727BBB6, 0xD3E6A601, 0xDEA580D8, 0xDA649D6F, 0xC423CD6A, 0xC0E2D0DD,
+        0xCDA1F604, 0xC960EBB3, 0xBD3E8D7E, 0xB9FF90C9, 0xB4BCB610, 0xB07DABA7,
+        0xAE3AFBA2, 0xAAFBE615, 0xA7B8C0CC, 0xA379DD7B, 0x9B3660C6, 0x9FF77D71,
+        0x92B45BA8, 0x9675461F, 0x8832161A, 0x8CF30BAD, 0x81B02D74, 0x857130C3,
+        0x5D8A9099, 0x594B8D2E, 0x5408ABF7, 0x50C9B640, 0x4E8EE645, 0x4A4FFBF2,
+        0x470CDD2B, 0x43CDC09C, 0x7B827D21, 0x7F436096, 0x7200464F, 0x76C15BF8,
+        0x68860BFD, 0x6C47164A, 0x61043093, 0x65C52D24, 0x119B4BE9, 0x155A565E,
+        0x18197087, 0x1CD86D30, 0x029F3D35, 0x065E2082, 0x0B1D065B, 0x0FDC1BEC,
+        0x3793A651, 0x3352BBE6, 0x3E119D3F, 0x3AD08088, 0x2497D08D, 0x2056CD3A,
+        0x2D15EBE3, 0x29D4F654, 0xC5A92679, 0xC1683BCE, 0xCC2B1D17, 0xC8EA00A0,
+        0xD6AD50A5, 0xD26C4D12, 0xDF2F6BCB, 0xDBEE767C, 0xE3A1CBC1, 0xE760D676,
+        0xEA23F0AF, 0xEEE2ED18, 0xF0A5BD1D, 0xF464A0AA, 0xF9278673, 0xFDE69BC4,
+        0x89B8FD09, 0x8D79E0BE, 0x803AC667, 0x84FBDBD0, 0x9ABC8BD5, 0x9E7D9662,
+        0x933EB0BB, 0x97FFAD0C, 0xAFB010B1, 0xAB710D06, 0xA6322BDF, 0xA2F33668,
+        0xBCB4666D, 0xB8757BDA, 0xB5365D03, 0xB1F740B4
+        );
+
+    my $crc = 0xffffffff;
+    for ($i = 0; $i < $nread; $i++) {
+        # get the numeric for the byte of the $i index
+        $buf = ord(substr($buffer, $i, 1));
+
+        $crc = ($crc << 8) ^ $crc_table[(($crc >> 24) ^ $buf) & 0xFF];
+
+    #    printf("%08x\n", $crc);
+    }
+
+    return $crc;
+
+}
+
 sub singlefile {
     my ($file) = @_;
     my $hash;
@@ -156,6 +237,10 @@ sub singlefile {
     }
     else {
         $hash = get_mp3tag($file);
+
+        my $info = get_mp3info($file);
+        
+        $hash->{FILECRC} = crc32($file, $info->{headersize});
     }
 
     return $hash; # a hash reference
@@ -626,9 +711,10 @@ if ($db) {
         my $str = $f."\x00" x ($maxfilelen- length($f));
 	my $id3 = $entries{$f}; 
         print DB $str;
-	    dumpint(0); # TODO: add hashing; 0 for now.
-        dumpint($id3->{'songoffset'});
-        dumpint(-1);
+        #print STDERR "CRC: ".."\n";
+        dumpint($id3->{'FILECRC'});    # CRC32 of the song data
+        dumpint($id3->{'songoffset'}); # offset to song data
+        dumpint(-1); # what's this for?
     }
 
     close(DB);
@@ -836,223 +922,6 @@ sub use_winamp_genres {
 }
 
 =pod
-
-=item remove_mp3tag (FILE [, VERSION, BUFFER])
-
-Can remove ID3v1 or ID3v2 tags.  VERSION should be C<1> for ID3v1,
-C<2> for ID3v2, and C<ALL> for both.
-
-For ID3v1, removes last 128 bytes from file if those last 128 bytes begin
-with the text 'TAG'.  File will be 128 bytes shorter.
-
-For ID3v2, removes ID3v2 tag.  Because an ID3v2 tag is at the
-beginning of the file, we rewrite the file after removing the tag data.
-The buffer for rewriting the file is 4MB.  BUFFER (in bytes) ca
-change the buffer size.
-
-Returns the number of bytes removed, or -1 if no tag removed,
-or undef if there is an error.
-
-=cut
-
-sub remove_mp3tag {
-	my($file, $version, $buf) = @_;
-	my($fh, $return);
-
-	$buf ||= 4096*1024;  # the bigger the faster
-	$version ||= 1;
-
-	if (not (defined $file && $file ne '')) {
-		$@ = "No file specified";
-		return undef;
-	}
-
-	if (not -s $file) {
-		$@ = "File is empty";
-		return undef;
-	}
-
-	if (ref $file) { # filehandle passed
-		$fh = $file;
-	} else {
-		$fh = gensym;
-		if (not open $fh, "+< $file\0") {
-			$@ = "Can't open $file: $!";
-			return undef;
-		}
-	}
-
-	binmode $fh;
-
-	if ($version eq 1 || $version eq 'ALL') {
-		seek $fh, -128, 2;
-		my $tell = tell $fh;
-		if (<$fh> =~ /^TAG/) {
-			truncate $fh, $tell or warn "Can't truncate '$file': $!";
-			$return += 128;
-		}
-	}
-
-	if ($version eq 2 || $version eq 'ALL') {
-		my $h = _get_v2head($fh);
-		if ($h) {
-			local $\;
-			seek $fh, 0, 2;
-			my $eof = tell $fh;
-			my $off = $h->{tag_size};
-
-			while ($off < $eof) {
-				seek $fh, $off, 0;
-				read $fh, my($bytes), $buf;
-				seek $fh, $off - $h->{tag_size}, 0;
-				print $fh $bytes;
-				$off += $buf;
-			}
-
-			truncate $fh, $eof - $h->{tag_size}
-				or warn "Can't truncate '$file': $!";
-			$return += $h->{tag_size};
-		}
-	}
-
-	_close($file, $fh);
-
-	return $return || -1;
-}
-
-
-=pod
-
-=item set_mp3tag (FILE, TITLE, ARTIST, ALBUM, YEAR, COMMENT, GENRE [, TRACKNUM])
-
-=item set_mp3tag (FILE, $HASHREF)
-
-Adds/changes tag information in an MP3 audio file.  Will clobber
-any existing information in file.
-
-Fields are TITLE, ARTIST, ALBUM, YEAR, COMMENT, GENRE.  All fields have
-a 30-byte limit, except for YEAR, which has a four-byte limit, and GENRE,
-which is one byte in the file.  The GENRE passed in the function is a
-case-insensitive text string representing a genre found in C<@mp3_genres>.
-
-Will accept either a list of values, or a hashref of the type
-returned by C<get_mp3tag>.
-
-If TRACKNUM is present (for ID3v1.1), then the COMMENT field can only be
-28 bytes.
-
-ID3v2 support may come eventually.  Note that if you set a tag on a file
-with ID3v2, the set tag will be for ID3v1[.1] only, and if you call
-C<get_mp3_tag> on the file, it will show you the (unchanged) ID3v2 tags,
-unless you specify ID3v1.
-
-=cut
-
-sub set_mp3tag {
-	my($file, $title, $artist, $album, $year, $comment, $genre, $tracknum) = @_;
-	my(%info, $oldfh, $ref, $fh);
-	local %v1_tag_fields = %v1_tag_fields;
-
-	# set each to '' if undef
-	for ($title, $artist, $album, $year, $comment, $tracknum, $genre,
-		(@info{@v1_tag_names}))
-		{$_ = defined() ? $_ : ''}
-
-	($ref) = (overload::StrVal($title) =~ /^(?:.*\=)?([^=]*)\((?:[^\(]*)\)$/)
-		if ref $title;
-	# populate data to hashref if hashref is not passed
-	if (!$ref) {
-		(@info{@v1_tag_names}) =
-			($title, $artist, $album, $year, $comment, $tracknum, $genre);
-
-	# put data from hashref into hashref if hashref is passed
-	} elsif ($ref eq 'HASH') {
-		%info = %$title;
-
-	# return otherwise
-	} else {
-		warn(<<'EOT');
-Usage: set_mp3tag (FILE, TITLE, ARTIST, ALBUM, YEAR, COMMENT, GENRE [, TRACKNUM])
-       set_mp3tag (FILE, $HASHREF)
-EOT
-		return undef;
-	}
-
-	if (not (defined $file && $file ne '')) {
-		$@ = "No file specified";
-		return undef;
-	}
-
-	if (not -s $file) {
-		$@ = "File is empty";
-		return undef;
-	}
-
-	# comment field length 28 if ID3v1.1
-	$v1_tag_fields{COMMENT} = 28 if $info{TRACKNUM};
-
-
-	# only if -w is on
-	if ($^W) {
-		# warn if fields too long
-		foreach my $field (keys %v1_tag_fields) {
-			$info{$field} = '' unless defined $info{$field};
-			if (length($info{$field}) > $v1_tag_fields{$field}) {
-				warn "Data too long for field $field: truncated to " .
-					 "$v1_tag_fields{$field}";
-			}
-		}
-
-		if ($info{GENRE}) {
-			warn "Genre `$info{GENRE}' does not exist\n"
-				unless exists $mp3_genres{$info{GENRE}};
-		}
-	}
-
-	if ($info{TRACKNUM}) {
-		$info{TRACKNUM} =~ s/^(\d+)\/(\d+)$/$1/;
-		unless ($info{TRACKNUM} =~ /^\d+$/ &&
-			$info{TRACKNUM} > 0 && $info{TRACKNUM} < 256) {
-			warn "Tracknum `$info{TRACKNUM}' must be an integer " .
-				"from 1 and 255\n" if $^W;
-			$info{TRACKNUM} = '';
-		}
-	}
-
-	if (ref $file) { # filehandle passed
-		$fh = $file;
-	} else {
-		$fh = gensym;
-		if (not open $fh, "+< $file\0") {
-			$@ = "Can't open $file: $!";
-			return undef;
-		}
-	}
-
-	binmode $fh;
-	$oldfh = select $fh;
-	seek $fh, -128, 2;
-	# go to end of file if no tag, beginning of file if tag
-	seek $fh, (<$fh> =~ /^TAG/ ? -128 : 0), 2;
-
-	# get genre value
-	$info{GENRE} = $info{GENRE} && exists $mp3_genres{$info{GENRE}} ?
-		$mp3_genres{$info{GENRE}} : 255;  # some default genre
-
-	local $\;
-	# print TAG to file
-	if ($info{TRACKNUM}) {
-		print pack "a3a30a30a30a4a28xCC", 'TAG', @info{@v1_tag_names};
-	} else {
-		print pack "a3a30a30a30a4a30C", 'TAG', @info{@v1_tag_names[0..4, 6]};
-	}
-
-	select $oldfh;
-
-	_close($file, $fh);
-
-	return 1;
-}
 
 =pod
 
@@ -1402,6 +1271,8 @@ sub get_mp3info {
 
     my $vbr = _get_vbr($fh, $h, \$off);
 
+    $h->{headersize}=$off; # data size prepending the actual mp3 data
+
     seek $fh, 0, 2;
     $eof = tell $fh;
     seek $fh, -128, 2;
@@ -1458,6 +1329,8 @@ sub _get_info {
 	# should we just return if ! FRAMES?
     $i->{FRAME_LENGTH}	= int($h->{size} / $i->{FRAMES}) if $i->{FRAMES};
     $i->{FREQUENCY}		= $frequency_tbl[3 * $h->{IDR} + $h->{sampling_freq}];
+
+    $i->{headersize} = $h->{headersize};
 
     return $i;
 }
