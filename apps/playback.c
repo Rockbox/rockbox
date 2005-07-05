@@ -873,6 +873,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
             return false;
         }
     }
+    tracks[track_widx].id3.elapsed = 0;
 
     /* Starting playback from an offset is only support in MPA at the moment */
     if (offset > 0) {
@@ -1157,7 +1158,7 @@ void audio_update_trackinfo(void)
         if (buf_ridx < 0)
             buf_ridx = codecbuflen + buf_ridx;
     }
-        
+    
     ci.filesize = cur_ti->filesize;
     cur_ti->id3.elapsed = 0;
     cur_ti->id3.offset = 0;
@@ -1436,7 +1437,7 @@ void codec_thread(void)
 
 struct mp3entry* audio_current_track(void)
 {
-    logf("audio_current_track");
+    // logf("audio_current_track");
     
     if (track_count > 0 && cur_ti->taginfo_ready)
         return (struct mp3entry *)&cur_ti->id3;
@@ -1515,7 +1516,7 @@ void audio_resume(void)
 static void initiate_track_change(int peek_index)
 {
     if (!playlist_check(peek_index))
-            return ;
+        return ;
             
     new_track = peek_index;
     ci.reload_codec = true;

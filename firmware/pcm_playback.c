@@ -431,7 +431,8 @@ bool pcm_is_lowdata(void)
 
 bool pcm_crossfade_init(void)
 {
-    if (PCMBUF_SIZE - audiobuffer_free < CHUNK_SIZE * 8 || !crossfade_enabled) {
+    if (PCMBUF_SIZE - audiobuffer_free < CHUNK_SIZE * 8 || !crossfade_enabled
+        || crossfade_active) {
         return false;
     }
     logf("crossfading!");
