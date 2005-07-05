@@ -44,6 +44,7 @@
 #ifdef HAVE_UDA1380
 #include "uda1380.h"
 #endif
+#include "logf.h"
 
 /*
  * Define DEBUG_FILE to create a csv (spreadsheet) with battery information
@@ -389,7 +390,7 @@ static void handle_auto_poweroff(void)
         if(TIME_AFTER(current_tick, last_event_tick    + timeout) &&
            TIME_AFTER(current_tick, last_disk_activity + timeout))
         {
-            shutdown_hw();
+            sys_poweroff(true);
         }
     }
     else
@@ -412,11 +413,7 @@ static void handle_auto_poweroff(void)
 #endif
                 {
                     DEBUGF("Sleep timer timeout. Shutting off...\n");
-                    /* Make sure that the disk isn't spinning when
-                       we cut the power */
-                    while(ata_disk_is_active())
-                       sleep(HZ);
-                    shutdown_hw();
+                    sys_poweroff(true);
                 }
             }
         }
@@ -876,6 +873,14 @@ void powermgmt_init(void)
 }
 
 #endif /* SIMULATOR */
+
+void sys_poweroff(bool halt)
+{
+    logf("sys_poweroff(%d)", halt);
+    queue_post(&button_queue, SYS_POWEROFF, NULL);
+    while(halt)
+        yield();
+}
 
 /* Various hardware housekeeping tasks relating to shutting down the jukebox */
 void shutdown_hw(void) 

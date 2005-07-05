@@ -361,6 +361,13 @@ bool info_menu(void)
     return result;
 }
 
+#ifdef HAVE_LCD_CHARCELLS
+static void do_shutdown(void)
+{
+    sys_poweroff(false);
+}
+#endif
+    
 bool main_menu(void)
 {
     int m;
@@ -405,7 +412,7 @@ bool main_menu(void)
 
 #ifdef HAVE_LCD_CHARCELLS
     items[i].desc = ID2P(LANG_SHUTDOWN);
-    items[i++].function = clean_shutdown;
+    items[i++].function = do_shutdown;
 #endif
     
     m=menu_init( items, i, NULL, NULL, NULL, NULL );
