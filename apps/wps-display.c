@@ -1138,6 +1138,11 @@ bool wps_refresh(struct mp3entry* id3,
                     if (strw>LCD_WIDTH) {
                         lcd_puts_scroll(0, i, buf);
                     } else {
+                        /* clear the line first */
+                        lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                        lcd_fillrect(0, ypos, LCD_WIDTH, strh);
+                        lcd_set_drawmode(DRMODE_SOLID);
+                        
                         if (flags & WPS_ALIGN_CENTER)
                         {
                             xpos = (LCD_WIDTH - strw) / 2;
@@ -1168,6 +1173,12 @@ bool wps_refresh(struct mp3entry* id3,
                     lcd_getstringsize(buf, &strw, &strh);
                     ypos = (i*strh)+lcd_getymargin();
                     update_line = true;
+                    
+                    /* clear the line first */
+                    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                    lcd_fillrect(0, ypos, LCD_WIDTH, strh);
+                    lcd_set_drawmode(DRMODE_SOLID);
+
                     if (flags & WPS_ALIGN_CENTER) {
                         xpos = (LCD_WIDTH - strw) / 2;
                         lcd_putsxy(xpos, ypos, buf);
