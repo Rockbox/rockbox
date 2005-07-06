@@ -17,6 +17,11 @@
  *
  ****************************************************************************/
 #include "config.h"
+
+#ifdef HAVE_ALARM_MOD
+
+#include <stdbool.h>
+
 #include "options.h"
 
 #include "lcd.h"
@@ -28,72 +33,78 @@
 #include "settings.h"
 #include "power.h"
 #include "status.h"
+#include "icons.h"
 #include "rtc.h"
-#include <stdbool.h>
+#include "misc.h"
+#include "screens.h"
 
 #include "lang.h"
 #include "power.h"
 #include "alarm_menu.h"
 #include "backlight.h"
 
-#ifdef HAVE_ALARM_MOD
+#define MARGIN_Y (global_settings.statusbar ? STATUSBAR_HEIGHT : 0)
 
 bool alarm_screen(void)
 {
-    /* get alarm time from RTC */
-
-    int h, m, hour, minute;
+    int h, m;
+    bool done=false;
+    char buf[32];
+    struct tm *tm;
+    int togo;
+    int button;
+    bool update = true;
 
     rtc_get_alarm(&h, &m);
 
-    if (m > 60 || h > 24) { /* after battery-change RTC-values are out of range */
+    /* After a battery change the RTC values are out of range */
+    if (m > 60 || h > 24) {
         m = 0;
         h = 12;
     } else {
         m = m / 5 * 5; /* 5 min accuracy should be enough */
     }
 
-    bool done=false;
-    char buf[32]; 
-
-    lcd_clear_display();
-    lcd_setfont(FONT_SYSFIXED);
-    lcd_setmargins(0, 0);
-    lcd_puts(0,1, str(LANG_ALARM_MOD_KEYS));
-    
     while(!done) {
-        snprintf(buf, 32, str(LANG_ALARM_MOD_TIME), h, m);
-        lcd_puts(0,0, buf);
-        lcd_update();
+        if(update)
+        {
+            lcd_clear_display();
+            status_draw(true);
+            lcd_setfont(FONT_SYSFIXED);
+            lcd_setmargins(0, MARGIN_Y);
+            lcd_puts(0, 3, str(LANG_ALARM_MOD_KEYS));
+            update = false;
+        }
         
-        switch(button_get(true)) {
+        snprintf(buf, 32, str(LANG_ALARM_MOD_TIME), h, m);
+        lcd_puts(0, 1, buf);
+        lcd_update();
+
+        button = button_get_w_tmo(HZ);
+        
+        switch(button) {
         case BUTTON_PLAY:
             /* prevent that an alarm occurs in the shutdown procedure */
             /* accept alarms only if they are in 2 minutes or more */
-            hour = rtc_read(0x03);
-            hour = ((hour & 0x30) >> 4) * 10 + (hour & 0x0f);
-            minute = rtc_read(0x02);
-            minute = ((minute & 0x70) >> 4) * 10 + (minute & 0x0f);
-            int togo = (m + h * 60 - minute - hour * 60 + 1440) % 1440;
+            tm = get_time();
+            togo = (m + h * 60 - tm->tm_min - tm->tm_hour * 60 + 1440) % 1440;
             if (togo > 1) {
-                lcd_clear_display();
-                snprintf(buf, 32, str(LANG_ALARM_MOD_TIME_TO_GO), togo / 60, togo % 60);
-                lcd_puts(0,0, buf);
-                lcd_update();
                 rtc_init();
                 rtc_set_alarm(h,m);
                 rtc_enable_alarm(true);
+<<<<<<< alarm_menu.c
+                splash(HZ*2, true, str(LANG_ALARM_MOD_TIME_TO_GO),
+                       togo / 60, togo % 60);
+		done = true;
+=======
                 lcd_puts(0,1,str(LANG_ALARM_MOD_SHUTDOWN));
                 lcd_update();
                 sleep(HZ);
                 done = true;
+>>>>>>> 1.7
             } else {
-                lcd_clear_display();
-                lcd_puts(0,0,str(LANG_ALARM_MOD_ERROR));
-                lcd_update();
-                sleep(HZ);
-                lcd_clear_display();
-                lcd_puts(0,1,str(LANG_ALARM_MOD_KEYS));
+                splash(HZ, true, str(LANG_ALARM_MOD_ERROR));
+                update = true;
             }
             break;
 
@@ -141,12 +152,28 @@ bool alarm_screen(void)
         case BUTTON_STOP:
         case BUTTON_MENU:
 #endif
+<<<<<<< alarm_menu.c
+=======
             lcd_clear_display();
             lcd_puts(0,0,str(LANG_ALARM_MOD_DISABLE));
             lcd_update();
             sleep(HZ);
+>>>>>>> 1.7
             rtc_enable_alarm(false);
+            splash(HZ*2, true, str(LANG_ALARM_MOD_DISABLE));
             done = true;
+            break;
+
+        case BUTTON_NONE:
+            status_draw(false);
+            break;
+
+        default:
+            if(default_event_handler(button) == SYS_USB_CONNECTED)
+            {
+                rtc_enable_alarm(false);
+                return true;
+            }
             break;
         }
     }
