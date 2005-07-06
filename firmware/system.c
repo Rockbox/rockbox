@@ -440,9 +440,16 @@ void UIE (void) /* Unexpected Interrupt or Exception */
     snprintf(str,sizeof(str),"at %08x",pc);
     lcd_puts(0,1,str);
     lcd_update();
+    
+    /* set cpu frequency to 11mhz (to prevent overheating) */
+    DCR = (DCR & ~0x01ff) | 1;
+    PLLCR = 0x00000000;
 
     while (1)
     {
+        /* check for the ON button (and !hold) */
+        if ((GPIO1_READ & 0x22) == 0)
+            system_reboot();
     }
 }
 
