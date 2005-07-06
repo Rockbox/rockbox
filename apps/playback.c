@@ -1333,6 +1333,27 @@ void audio_invalidate_tracks(void)
     read_next_metadata();
 }
 
+static void initiate_track_change(int peek_index)
+{
+    if (!playlist_check(peek_index))
+        return ;
+            
+    new_track = peek_index;
+    ci.reload_codec = true;
+    
+    /* Detect if disk is spinning.. */
+    if (filling) {
+        ci.stop_codec = true;
+        playlist_next(peek_index);
+        queue_post(&audio_queue, AUDIO_PLAY, 0);
+    } 
+    
+    else if (!pcm_crossfade_init())
+        pcm_flush_audio();
+    else
+        codec_track_changed();
+}
+
 void audio_thread(void)
 {
     struct event ev;
@@ -1364,13 +1385,26 @@ void audio_thread(void)
                 break ;
                 
             case AUDIO_PAUSE:
+                logf("audio_pause");
+                pcm_play_pause(false);
+                paused = true;
                 break ;
                 
             case AUDIO_RESUME:
+                logf("audio_resume");
+                pcm_play_pause(true);
+                paused = false;
                 break ;
             
             case AUDIO_NEXT:
+                logf("audio_next");
+                initiate_track_change(1);
                 break ;
+                
+            case AUDIO_PREV:
+                logf("audio_prev");
+                initiate_track_change(-1);
+                break;
                 
             case AUDIO_FLUSH:
                 audio_invalidate_tracks();
@@ -1532,51 +1566,22 @@ void audio_stop(void)
 
 void audio_pause(void)
 {
-    logf("audio_pause");
-    pcm_play_pause(false);
-    paused = true;
-    //queue_post(&audio_queue, AUDIO_PAUSE, 0);
+    queue_post(&audio_queue, AUDIO_PAUSE, 0);
 }
 
 void audio_resume(void)
 {
-    logf("audio_resume");
-    pcm_play_pause(true);
-    paused = false;
-    //queue_post(&audio_queue, AUDIO_RESUME, 0);
-}
-
-static void initiate_track_change(int peek_index)
-{
-    if (!playlist_check(peek_index))
-        return ;
-            
-    new_track = peek_index;
-    ci.reload_codec = true;
-    
-    /* Detect if disk is spinning.. */
-    if (filling) {
-        ci.stop_codec = true;
-        playlist_next(peek_index);
-        queue_post(&audio_queue, AUDIO_PLAY, 0);
-    } 
-    
-    else if (!pcm_crossfade_init())
-        pcm_flush_audio();
-    else
-        codec_track_changed();
+    queue_post(&audio_queue, AUDIO_RESUME, 0);
 }
 
 void audio_next(void)
 {
-    logf("audio_next");
-    initiate_track_change(1);
+    queue_post(&audio_queue, AUDIO_NEXT, 0);
 }
 
 void audio_prev(void)
 {
-    logf("audio_prev");
-    initiate_track_change(-1);
+    queue_post(&audio_queue, AUDIO_PREV, 0);
 }
 
 void audio_ff_rewind(int newpos)
