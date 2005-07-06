@@ -27,7 +27,6 @@
 #define NATIVE_FREQUENCY       44100
 #define STEREO_INTERLEAVED     0
 #define STEREO_NONINTERLEAVED  1
-/* Not supported yet. */
 #define STEREO_MONO            2
 
 struct dsp_configuration {

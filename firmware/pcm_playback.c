@@ -47,8 +47,7 @@
 /* Must be a power of 2 */
 #define NUM_PCM_BUFFERS      (PCMBUF_SIZE / CHUNK_SIZE)
 #define NUM_PCM_BUFFERS_MASK (NUM_PCM_BUFFERS - 1)
-//#define PCM_WATERMARK        (CHUNK_SIZE * 6)
-#define PCM_WATERMARK        (PCMBUF_SIZE - CHUNK_SIZE*8)
+#define PCM_WATERMARK        (CHUNK_SIZE * 10)
 #define PCM_CF_WATERMARK     (PCMBUF_SIZE - CHUNK_SIZE*8)
 
 static bool pcm_playing;
