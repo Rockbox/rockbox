@@ -92,16 +92,9 @@ bool alarm_screen(void)
                 rtc_init();
                 rtc_set_alarm(h,m);
                 rtc_enable_alarm(true);
-<<<<<<< alarm_menu.c
                 splash(HZ*2, true, str(LANG_ALARM_MOD_TIME_TO_GO),
                        togo / 60, togo % 60);
 		done = true;
-=======
-                lcd_puts(0,1,str(LANG_ALARM_MOD_SHUTDOWN));
-                lcd_update();
-                sleep(HZ);
-                done = true;
->>>>>>> 1.7
             } else {
                 splash(HZ, true, str(LANG_ALARM_MOD_ERROR));
                 update = true;
@@ -152,13 +145,6 @@ bool alarm_screen(void)
         case BUTTON_STOP:
         case BUTTON_MENU:
 #endif
-<<<<<<< alarm_menu.c
-=======
-            lcd_clear_display();
-            lcd_puts(0,0,str(LANG_ALARM_MOD_DISABLE));
-            lcd_update();
-            sleep(HZ);
->>>>>>> 1.7
             rtc_enable_alarm(false);
             splash(HZ*2, true, str(LANG_ALARM_MOD_DISABLE));
             done = true;
