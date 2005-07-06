@@ -16,7 +16,7 @@ struct scan
 {
 	int bg[64];
 	int wnd[64];
-#ifdef GRAYSCALE
+#if LCD_DEPTH == 2
         byte buf[4][256];
 #else
         byte buf[8][256];

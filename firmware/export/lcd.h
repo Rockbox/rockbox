@@ -121,7 +121,7 @@ extern void lcd_jump_scroll_delay(int ms);
 #define DRMODE_INVERSEVID 4 /* used as bit modifier for basic modes */
 
 /* Low-level drawing function types */
-typedef void lcd_pixelfunc_type(int x, int y); /* for b&w */
+typedef void lcd_pixelfunc_type(int x, int y);
 typedef void lcd_blockfunc_type(unsigned char *address, unsigned mask, unsigned bits);
 
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
@@ -131,7 +131,12 @@ typedef void lcd_blockfunc_type(unsigned char *address, unsigned mask, unsigned 
 #define INVERT_PIXEL(x,y) lcd_framebuffer[(y)>>3][(x)] ^= (1<<((y)&7))
 
 /* Memory copy of display bitmap */
+#if LCD_DEPTH == 1
 extern unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
+#elif LCD_DEPTH == 2
+#define MAX_LEVEL 3
+extern unsigned char lcd_framebuffer[LCD_HEIGHT/4][LCD_WIDTH];
+#endif
 
 extern void lcd_set_invert_display(bool yesno);
 extern void lcd_set_flip(bool yesno);
@@ -164,6 +169,20 @@ extern void lcd_putsxy(int x, int y, const unsigned char *string);
 extern void lcd_invertscroll(int x, int y);
 extern void lcd_bidir_scroll(int threshold);
 extern void lcd_scroll_step(int pixels);
+
+#if LCD_DEPTH > 1
+extern void lcd_set_foreground(int brightness);
+extern int lcd_get_foreground(void);
+extern void lcd_set_background(int brightness);
+extern int lcd_get_background(void);
+extern void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
+                            int stride, int x, int y, int width, int height);
+extern void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width,
+                       int height);
+#else /* LCD_DEPTH == 1 */
+#define lcd_mono_bitmap lcd_bitmap
+#define lcd_mono_bitmap_part lcd_bitmap_part
+#endif
 
 #endif /* CHARCELLS / BITMAP */
 

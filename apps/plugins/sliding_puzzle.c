@@ -149,7 +149,7 @@ static unsigned char picture[20][32] = {
 static void draw_spot(int p, int x, int y)
 {
     if (pic || p==20) {
-        rb->lcd_bitmap (picture[p-1], x, y, 16, 16);
+        rb->lcd_mono_bitmap (picture[p-1], x, y, 16, 16);
     } else {
         rb->lcd_drawrect(x, y, 16, 16);
         rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);

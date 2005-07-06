@@ -461,8 +461,8 @@ static void display_playlist(void)
                 int offset=0;
                 if ( viewer.line_height > 8 )
                     offset = (viewer.line_height - 8) / 2;
-                lcd_bitmap(bitmap_icons_6x8[File], 
-                    CURSOR_X * 6 + CURSOR_WIDTH, 
+                lcd_mono_bitmap(bitmap_icons_6x8[File], 
+                    CURSOR_X * 6 + CURSOR_WIDTH,
                     MARGIN_Y+(i*viewer.line_height) + offset, 6, 8);
 #else
                 lcd_putc(LINE_X-1, i, File);

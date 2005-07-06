@@ -1062,7 +1062,7 @@ static void chip8_update_display(void)
     }
 #ifdef SIMULATOR
     rb->lcd_set_drawmode(DRMODE_SOLID);
-    rb->lcd_bitmap(lcd_framebuf[0], CHIP8_X, CHIP8_Y, CHIP8_LCDWIDTH, CHIP8_HEIGHT);
+    rb->lcd_mono_bitmap(lcd_framebuf[0], CHIP8_X, CHIP8_Y, CHIP8_LCDWIDTH, CHIP8_HEIGHT);
     rb->lcd_update();
 #else
     rb->lcd_blit(lcd_framebuf[0], CHIP8_X, CHIP8_Y>>3, CHIP8_LCDWIDTH, CHIP8_HEIGHT>>3

@@ -902,8 +902,8 @@ int solitaire(void){
                 rb->lcd_set_drawmode(DRMODE_SOLID);
                 /* known card */
                 if(deck[c].known){
-                    rb->lcd_bitmap(numbers[deck[c].num], i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+1, j, 8, 8);
-                    rb->lcd_bitmap(colors[deck[c].color], i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+7, j, 8, 8);
+                    rb->lcd_mono_bitmap(numbers[deck[c].num], i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+1, j, 8, 8);
+                    rb->lcd_mono_bitmap(colors[deck[c].color], i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+7, j, 8, 8);
                 }
                 /* draw top line of the card */
                 rb->lcd_drawline(i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+1,j,i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+CARD_WIDTH-1,j);
@@ -946,9 +946,9 @@ int solitaire(void){
                 }
             }
             if(c != NOT_A_CARD) {
-                rb->lcd_bitmap(numbers[deck[c].num], LCD_WIDTH2 - CARD_WIDTH+1, i*CARD_HEIGHT, 8, 8);
+                rb->lcd_mono_bitmap(numbers[deck[c].num], LCD_WIDTH2 - CARD_WIDTH+1, i*CARD_HEIGHT, 8, 8);
             }
-            rb->lcd_bitmap(colors[i], LCD_WIDTH2 - CARD_WIDTH+7, i*CARD_HEIGHT, 8, 8);
+            rb->lcd_mono_bitmap(colors[i], LCD_WIDTH2 - CARD_WIDTH+7, i*CARD_HEIGHT, 8, 8);
             /* draw a selected card */
             if(c != NOT_A_CARD) {
                 if(sel_card == c){
@@ -978,8 +978,8 @@ int solitaire(void){
              rb->lcd_drawline(LCD_WIDTH2,LCD_HEIGHT-CARD_HEIGHT,LCD_WIDTH2,LCD_HEIGHT-2);
 #endif
             if(cur_rem != NOT_A_CARD){
-                rb->lcd_bitmap(numbers[deck[cur_rem].num], LCD_WIDTH2 - CARD_WIDTH+1, LCD_HEIGHT-CARD_HEIGHT, 8, 8);
-                rb->lcd_bitmap(colors[deck[cur_rem].color], LCD_WIDTH2 - CARD_WIDTH+7, LCD_HEIGHT-CARD_HEIGHT, 8, 8);
+                rb->lcd_mono_bitmap(numbers[deck[cur_rem].num], LCD_WIDTH2 - CARD_WIDTH+1, LCD_HEIGHT-CARD_HEIGHT, 8, 8);
+                rb->lcd_mono_bitmap(colors[deck[cur_rem].color], LCD_WIDTH2 - CARD_WIDTH+7, LCD_HEIGHT-CARD_HEIGHT, 8, 8);
                 /* draw a selected card */
                 if(sel_card == cur_rem){
                     rb->lcd_drawrect(LCD_WIDTH2 - CARD_WIDTH+1, LCD_HEIGHT-CARD_HEIGHT,CARD_WIDTH-1, CARD_HEIGHT-1);

@@ -260,18 +260,18 @@ static void update_icons(void)
     rb->lcd_set_drawmode(DRMODE_SOLID);
 
     /* The CUT icon */
-    rb->lcd_bitmap(CUT_BMP,
+    rb->lcd_mono_bitmap(CUT_BMP,
         LCD_WIDTH / 3 / 2 - BMPWIDTH / 2, LCD_HEIGHT - BMPHEIGHT,
         BMPWIDTH, BMPHEIGHT);
 
     /* The loop mode icon */
-    rb->lcd_bitmap(LOOP_BMP[splitedit_get_loop_mode()],
+    rb->lcd_mono_bitmap(LOOP_BMP[splitedit_get_loop_mode()],
         LCD_WIDTH/3 + LCD_WIDTH/3 / 2 - BMPWIDTH/2, LCD_HEIGHT - BMPHEIGHT,
         BMPWIDTH, BMPHEIGHT);
 
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     /* The scale icon */
-    rb->lcd_bitmap(SCALE_BMP[rb->peak_meter_get_use_dbfs()],
+    rb->lcd_mono_bitmap(SCALE_BMP[rb->peak_meter_get_use_dbfs()],
         2 *LCD_WIDTH/3 + LCD_WIDTH/3 / 2 - BMPWIDTH/2, LCD_HEIGHT - BMPHEIGHT,
         BMPWIDTH, BMPHEIGHT);
 #else
@@ -279,7 +279,7 @@ static void update_icons(void)
         static int idx;
         if (idx < 0 || idx > 1) idx = 0;
         idx = 1 - idx;
-        rb->lcd_bitmap(SCALE_BMP[idx],
+        rb->lcd_mono_bitmap(SCALE_BMP[idx],
             2 *LCD_WIDTH/3 + LCD_WIDTH/3 / 2 - BMPWIDTH/2, LCD_HEIGHT - BMPHEIGHT,
             BMPWIDTH, BMPHEIGHT);
     }

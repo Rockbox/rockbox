@@ -75,7 +75,7 @@ int show_logo( void )
     lcd_bitmap(rockbox112x37, 0, 10, 112, 37);
 #endif
 #if LCD_WIDTH >= 160
-    lcd_bitmap(rockbox160x53, 0, 10, 160, 53);
+    lcd_bitmap(rockbox160x53x2, 0, 10, 160, 53);
 #endif
 
 #ifdef HAVE_REMOTE_LCD

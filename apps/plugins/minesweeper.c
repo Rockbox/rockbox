@@ -381,7 +381,7 @@ int minesweeper(void)
                         rb->lcd_putsxy(j*8+1,i*8+1,"b");
                     } else if(minefield[i][j].neighbors){
                         rb->lcd_set_drawmode(DRMODE_FG);
-                        rb->lcd_bitmap(num[minefield[i][j].neighbors],j*8,i*8,8,8);
+                        rb->lcd_mono_bitmap(num[minefield[i][j].neighbors],j*8,i*8,8,8);
                         rb->lcd_set_drawmode(DRMODE_SOLID);
                     }
                 } else if(minefield[i][j].flag) {

@@ -278,54 +278,54 @@ void change_settings(void)
 }
 
 void draw_analog_minimeters(void) {
-    rb->lcd_bitmap(sound_speaker, 0, 12, 4, 8);
+    rb->lcd_mono_bitmap(sound_speaker, 0, 12, 4, 8);
     rb->lcd_set_drawmode(DRMODE_FG);
     if(5<left_needle_top_x)
-        rb->lcd_bitmap(sound_low_level, 5, 12, 2, 8);
+        rb->lcd_mono_bitmap(sound_low_level, 5, 12, 2, 8);
     if(12<left_needle_top_x)
-        rb->lcd_bitmap(sound_med_level, 7, 12, 2, 8);
+        rb->lcd_mono_bitmap(sound_med_level, 7, 12, 2, 8);
     if(24<left_needle_top_x)
-        rb->lcd_bitmap(sound_high_level, 9, 12, 2, 8);
+        rb->lcd_mono_bitmap(sound_high_level, 9, 12, 2, 8);
     if(40<left_needle_top_x)
-        rb->lcd_bitmap(sound_max_level, 12, 12, 3, 8);
+        rb->lcd_mono_bitmap(sound_max_level, 12, 12, 3, 8);
 
     rb->lcd_set_drawmode(DRMODE_SOLID);
-    rb->lcd_bitmap(sound_speaker, 54, 12, 4, 8);
+    rb->lcd_mono_bitmap(sound_speaker, 54, 12, 4, 8);
     rb->lcd_set_drawmode(DRMODE_FG);
     if(5<(right_needle_top_x-56))
-        rb->lcd_bitmap(sound_low_level, 59, 12, 2, 8);
+        rb->lcd_mono_bitmap(sound_low_level, 59, 12, 2, 8);
     if(12<(right_needle_top_x-56))
-        rb->lcd_bitmap(sound_med_level, 61, 12, 2, 8);
+        rb->lcd_mono_bitmap(sound_med_level, 61, 12, 2, 8);
     if(24<(right_needle_top_x-56))
-        rb->lcd_bitmap(sound_high_level, 63, 12, 2, 8);
+        rb->lcd_mono_bitmap(sound_high_level, 63, 12, 2, 8);
     if(40<(right_needle_top_x-56))
-        rb->lcd_bitmap(sound_max_level, 66, 12, 3, 8);
+        rb->lcd_mono_bitmap(sound_max_level, 66, 12, 3, 8);
     rb->lcd_set_drawmode(DRMODE_SOLID);
 }
 
 void draw_digital_minimeters(void) {
-    rb->lcd_bitmap(sound_speaker, 34, 24, 4, 8);
+    rb->lcd_mono_bitmap(sound_speaker, 34, 24, 4, 8);
     rb->lcd_set_drawmode(DRMODE_FG);
     if(1<num_left_leds)
-        rb->lcd_bitmap(sound_low_level, 39, 24, 2, 8);
+        rb->lcd_mono_bitmap(sound_low_level, 39, 24, 2, 8);
     if(2<num_left_leds)
-        rb->lcd_bitmap(sound_med_level, 41, 24, 2, 8);
+        rb->lcd_mono_bitmap(sound_med_level, 41, 24, 2, 8);
     if(5<num_left_leds)
-        rb->lcd_bitmap(sound_high_level, 43, 24, 2, 8);
+        rb->lcd_mono_bitmap(sound_high_level, 43, 24, 2, 8);
     if(8<num_left_leds)
-        rb->lcd_bitmap(sound_max_level, 46, 24, 3, 8);
+        rb->lcd_mono_bitmap(sound_max_level, 46, 24, 3, 8);
 
     rb->lcd_set_drawmode(DRMODE_SOLID);
-    rb->lcd_bitmap(sound_speaker, 34, 40, 4, 8);
+    rb->lcd_mono_bitmap(sound_speaker, 34, 40, 4, 8);
     rb->lcd_set_drawmode(DRMODE_FG);
     if(1<(num_right_leds))
-        rb->lcd_bitmap(sound_low_level, 39, 40, 2, 8);
+        rb->lcd_mono_bitmap(sound_low_level, 39, 40, 2, 8);
     if(2<(num_right_leds))
-        rb->lcd_bitmap(sound_med_level, 41, 40, 2, 8);
+        rb->lcd_mono_bitmap(sound_med_level, 41, 40, 2, 8);
     if(5<(num_right_leds))
-        rb->lcd_bitmap(sound_high_level, 43, 40, 2, 8);
+        rb->lcd_mono_bitmap(sound_high_level, 43, 40, 2, 8);
     if(8<(num_right_leds))
-        rb->lcd_bitmap(sound_max_level, 46, 40, 3, 8);
+        rb->lcd_mono_bitmap(sound_max_level, 46, 40, 3, 8);
     rb->lcd_set_drawmode(DRMODE_SOLID);
 }
 
@@ -359,8 +359,8 @@ void analog_meter(void) {
 
     /* Needle covers */
     rb->lcd_set_drawmode(DRMODE_FG);
-    rb->lcd_bitmap(needle_cover, 22, 59, 13, 5);
-    rb->lcd_bitmap(needle_cover, 78, 59, 13, 5);
+    rb->lcd_mono_bitmap(needle_cover, 22, 59, 13, 5);
+    rb->lcd_mono_bitmap(needle_cover, 78, 59, 13, 5);
     rb->lcd_set_drawmode(DRMODE_SOLID);
 
     /* Show Left/Right */
@@ -396,10 +396,10 @@ void digital_meter(void) {
     rb->lcd_set_drawmode(DRMODE_FG);
     /* LEDS */
     for(i=0; i<num_left_leds; i++)
-        rb->lcd_bitmap(led, i*9+2+i, 14, 9, 5);
+        rb->lcd_mono_bitmap(led, i*9+2+i, 14, 9, 5);
 
     for(i=0; i<num_right_leds; i++)
-        rb->lcd_bitmap(led, i*9+2+i, 52, 9, 5);
+        rb->lcd_mono_bitmap(led, i*9+2+i, 52, 9, 5);
 
     rb->lcd_set_drawmode(DRMODE_SOLID);
 

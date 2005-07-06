@@ -485,11 +485,11 @@ static void star_display_board_info(void)
     rb->lcd_putsxy(0, label_offset_y, str_info);
 
     if (control == STAR_CONTROL_BALL)
-        rb->lcd_bitmap (ball_bmp, 103, label_offset_y + 1, STAR_TILE_SIZE,
-                        STAR_TILE_SIZE);
+        rb->lcd_mono_bitmap (ball_bmp, 103, label_offset_y + 1, STAR_TILE_SIZE,
+                             STAR_TILE_SIZE);
     else
-        rb->lcd_bitmap (block_bmp, 103, label_offset_y + 1, STAR_TILE_SIZE,
-                        STAR_TILE_SIZE);
+        rb->lcd_mono_bitmap (block_bmp, 103, label_offset_y + 1, STAR_TILE_SIZE,
+                             STAR_TILE_SIZE);
 
     rb->lcd_update_rect(0, label_offset_y, LCD_WIDTH, char_height);
 }
@@ -520,37 +520,37 @@ static int star_load_level(int current_level)
                     break;
 
                 case STAR_WALL:
-                    rb->lcd_bitmap (wall_bmp,
-                                    STAR_OFFSET_X + x * STAR_TILE_SIZE,
-                                    STAR_OFFSET_Y + y * STAR_TILE_SIZE,
-                                    STAR_TILE_SIZE, STAR_TILE_SIZE);
+                    rb->lcd_mono_bitmap (wall_bmp,
+                                         STAR_OFFSET_X + x * STAR_TILE_SIZE,
+                                         STAR_OFFSET_Y + y * STAR_TILE_SIZE,
+                                         STAR_TILE_SIZE, STAR_TILE_SIZE);
                     break;
 
                 case STAR_STAR:
-                    rb->lcd_bitmap (star_bmp,
-                                    STAR_OFFSET_X + x * STAR_TILE_SIZE,
-                                    STAR_OFFSET_Y + y * STAR_TILE_SIZE,
-                                    STAR_TILE_SIZE, STAR_TILE_SIZE);
+                    rb->lcd_mono_bitmap (star_bmp,
+                                         STAR_OFFSET_X + x * STAR_TILE_SIZE,
+                                         STAR_OFFSET_Y + y * STAR_TILE_SIZE,
+                                         STAR_TILE_SIZE, STAR_TILE_SIZE);
                     star_count++;
                     break;
 
                 case STAR_BALL:
                     ball_x = x;
                     ball_y = y;
-                    rb->lcd_bitmap (ball_bmp,
-                                    STAR_OFFSET_X + x * STAR_TILE_SIZE,
-                                    STAR_OFFSET_Y + y * STAR_TILE_SIZE,
-                                    STAR_TILE_SIZE, STAR_TILE_SIZE);
+                    rb->lcd_mono_bitmap (ball_bmp,
+                                         STAR_OFFSET_X + x * STAR_TILE_SIZE,
+                                         STAR_OFFSET_Y + y * STAR_TILE_SIZE,
+                                         STAR_TILE_SIZE, STAR_TILE_SIZE);
                     break;
 
 
                 case STAR_BLOCK:
                     block_x = x;
                     block_y = y;
-                    rb->lcd_bitmap (block_bmp,
-                                    STAR_OFFSET_X + x * STAR_TILE_SIZE,
-                                    STAR_OFFSET_Y + y * STAR_TILE_SIZE,
-                                    STAR_TILE_SIZE, STAR_TILE_SIZE);
+                    rb->lcd_mono_bitmap (block_bmp,
+                                         STAR_OFFSET_X + x * STAR_TILE_SIZE,
+                                         STAR_OFFSET_Y + y * STAR_TILE_SIZE,
+                                         STAR_TILE_SIZE, STAR_TILE_SIZE);
                     break;
             }
             ptr_tab++;
@@ -665,7 +665,7 @@ static int star_run_game(void)
             {
                 for (i = 0 ; i < 7 ; i++)
                 {
-                    rb->lcd_bitmap(
+                    rb->lcd_mono_bitmap(
                         ball_bmp,
                         STAR_OFFSET_X + ball_x * STAR_TILE_SIZE + move_x * i,
                         STAR_OFFSET_Y + ball_y * STAR_TILE_SIZE + move_y * i,
@@ -697,7 +697,7 @@ static int star_run_game(void)
             {
                 for (i = 0 ; i < 7 ; i++)
                 {
-                    rb->lcd_bitmap(
+                    rb->lcd_mono_bitmap(
                         block_bmp,
                         STAR_OFFSET_X + block_x * STAR_TILE_SIZE + move_x * i,
                         STAR_OFFSET_Y + block_y * STAR_TILE_SIZE + move_y * i,
@@ -766,8 +766,8 @@ static int star_menu(void)
         }
 
         move_y = 0;
-        rb->lcd_bitmap(arrow_bmp[anim_arrow[(anim_state & 0x38) >> 3]],
-                       2, menu_offset_y + menu_y * char_height, 7, 8);
+        rb->lcd_mono_bitmap(arrow_bmp[anim_arrow[(anim_state & 0x38) >> 3]],
+                            2, menu_offset_y + menu_y * char_height, 7, 8);
         rb->lcd_update_rect (2, menu_offset_y + menu_y * 8, 8, 8);
         rb->sleep(STAR_SLEEP);
         anim_state++;
@@ -842,8 +842,8 @@ static int star_menu(void)
             rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
             rb->lcd_fillrect (2, 30, 7, 4 * 8);
             rb->lcd_set_drawmode(DRMODE_FG);
-            rb->lcd_bitmap(arrow_bmp[anim_arrow[(anim_state & 0x38) >> 3]],
-                           2, menu_offset_y + menu_y * 8 + move_y * i, 7, 8);
+            rb->lcd_mono_bitmap(arrow_bmp[anim_arrow[(anim_state & 0x38) >> 3]],
+                                2, menu_offset_y + menu_y * 8 + move_y * i, 7, 8);
             rb->lcd_update_rect(2, 30, 8, 4 * 8);
             anim_state++;
             rb->sleep(STAR_SLEEP);

@@ -23,24 +23,16 @@
 #include "uisw32.h"
 #include "lcd.h"
 
-// BITMAPINFO2
+// BITMAPINFO256
 typedef struct
 {
 	BITMAPINFOHEADER bmiHeader;
-	RGBQUAD bmiColors[2];
-} BITMAPINFO2;
+	RGBQUAD bmiColors[256];
+} BITMAPINFO256;
 
-#ifdef HAVE_LCD_BITMAP
+extern char            bitmap[LCD_HEIGHT][LCD_WIDTH]; // the ui display
+extern BITMAPINFO256   bmi; // bitmap information
 
-extern unsigned char        display[LCD_WIDTH][LCD_HEIGHT/8]; // the display
-#else
-#define DISP_X              112
-#define DISP_Y              64
-#endif
-
-
-extern char                 bitmap[LCD_HEIGHT][LCD_WIDTH]; // the ui display
-extern BITMAPINFO2          bmi; // bitmap information
-
+void simlcdinit(void);
 
 #endif // #ifndef __LCDWIN32_H__

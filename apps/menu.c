@@ -116,7 +116,7 @@ void put_cursorxy(int x, int y, bool on)
     /* place the cursor */
     if(on) {
 #ifdef HAVE_LCD_BITMAP
-        lcd_bitmap(bitmap_icons_6x8[Cursor], xpos, ypos, 4, 8);
+        lcd_mono_bitmap(bitmap_icons_6x8[Cursor], xpos, ypos, 4, 8);
 #else
         lcd_putc(x, y, CURSOR_CHAR);
 #endif

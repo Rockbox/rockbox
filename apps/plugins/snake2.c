@@ -625,11 +625,11 @@ void draw_apple( void )
     char pscore[5], counter[4];
 
     rb->lcd_set_drawmode(DRMODE_FG);
-    rb->lcd_bitmap(snakebmp,0,0,BMPWIDTH_snakebmp,BMPHEIGHT_snakebmp);
+    rb->lcd_mono_bitmap(snakebmp,0,0,BMPWIDTH_snakebmp,BMPHEIGHT_snakebmp);
     rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
     rb->lcd_fillrect(0,0,BMPWIDTH_snakeupbmp,BMPHEIGHT_snakeupbmp);
     rb->lcd_set_drawmode(DRMODE_FG);
-    rb->lcd_bitmap(snakeupbmp,0,0,BMPWIDTH_snakeupbmp,BMPHEIGHT_snakeupbmp);
+    rb->lcd_mono_bitmap(snakeupbmp,0,0,BMPWIDTH_snakeupbmp,BMPHEIGHT_snakeupbmp);
     rb->lcd_set_drawmode(DRMODE_SOLID);
 
     rb->snprintf(counter,sizeof(counter),"%d",applecount);
@@ -1303,7 +1303,7 @@ void game_init(void)
 #if LCD_WIDTH >= 160 && LCD_HEIGHT >= 128
 
         rb->lcd_set_drawmode(DRMODE_FG);
-        rb->lcd_bitmap(snakebmp,0,0,BMPWIDTH_snakebmp,BMPWIDTH_snakebmp);
+        rb->lcd_mono_bitmap(snakebmp,0,0,BMPWIDTH_snakebmp,BMPWIDTH_snakebmp);
         rb->lcd_set_drawmode(DRMODE_SOLID);
 
         rb->snprintf(plevel,sizeof(plevel),"%d",level);

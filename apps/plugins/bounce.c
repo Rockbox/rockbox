@@ -309,8 +309,8 @@ static int scrollit(void)
         for(i=0, yy=y, xx=x; i< LETTERS_ON_SCREEN; i++) {
             letter = rock[(i+textpos) % rocklen ];
 
-            rb->lcd_bitmap((char *)char_gen_12x16[letter-0x20],
-                           xx, table[yy&(TABLE_SIZE-1)], 11, 16);
+            rb->lcd_mono_bitmap((char *)char_gen_12x16[letter-0x20],
+                                xx, table[yy&(TABLE_SIZE-1)], 11, 16);
             yy += YADD;
             xx+= LCD_WIDTH/LETTERS_ON_SCREEN;
         }
@@ -399,9 +399,9 @@ static int loopit(void)
         for(i=0, yy=y, xx=x;
             i<rocklen;
             i++, yy+=values[NUM_YDIST].num, xx+=values[NUM_XDIST].num)
-            rb->lcd_bitmap((char *)char_gen_12x16[rock[i]-0x20],
-                           xtable[xx&(TABLE_SIZE-1)], table[yy&(TABLE_SIZE-1)],
-                           11, 16);
+            rb->lcd_mono_bitmap((char *)char_gen_12x16[rock[i]-0x20],
+                                xtable[xx&(TABLE_SIZE-1)],
+                                table[yy&(TABLE_SIZE-1)], 11, 16);
         rb->lcd_update();
         rb->lcd_set_drawmode(DRMODE_SOLID);
 

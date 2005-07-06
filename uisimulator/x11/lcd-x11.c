@@ -40,11 +40,19 @@
 #include "lcd-x11.h"
 #include "lcd-playersim.h"
 
-extern unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
+#if LCD_DEPTH == 2
+#define YBLOCK 4
+#define BITOFFS 1  /* take the MSB of each pixel */
+#else
+#define YBLOCK 8
+#define BITOFFS 0
+#endif
+
 extern void screen_resized(int width, int height);
 
 #ifdef HAVE_LCD_BITMAP
-unsigned char lcd_framebuffer_copy[LCD_HEIGHT/8][LCD_WIDTH];
+extern unsigned char lcd_framebuffer[LCD_HEIGHT/YBLOCK][LCD_WIDTH];
+unsigned char lcd_framebuffer_copy[LCD_HEIGHT/YBLOCK][LCD_WIDTH];
 
 void lcd_update (void)
 {
@@ -55,21 +63,21 @@ void lcd_update (void)
     int cp=0;
     struct coordinate clearpoints[LCD_WIDTH * LCD_HEIGHT];
 
-    for(y=0; y<LCD_HEIGHT; y+=8) {
+    for(y=0; y<LCD_HEIGHT; y+=YBLOCK) {
         for(x=0; x<LCD_WIDTH; x++) {
-            if(lcd_framebuffer[y/8][x] || lcd_framebuffer_copy[y/8][x]) {
+            if(lcd_framebuffer[y/YBLOCK][x] || lcd_framebuffer_copy[y/YBLOCK][x]) {
                 /* one or more bits/pixels are changed */
                 unsigned char diff =
-                    lcd_framebuffer[y/8][x] ^ lcd_framebuffer_copy[y/8][x];
+                    lcd_framebuffer[y/YBLOCK][x] ^ lcd_framebuffer_copy[y/YBLOCK][x];
 
-                for(bit=0; bit<8; bit++) {
-                    if(lcd_framebuffer[y/8][x]&(1<<bit)) {
+                for(bit=0; bit<YBLOCK; bit++) {
+                    if(lcd_framebuffer[y/YBLOCK][x]&(1<<(bit*LCD_DEPTH+BITOFFS))) {
                         /* set a dot */
                         points[p].x = x + MARGIN_X;
                         points[p].y = y+bit + MARGIN_Y;
                         p++; /* increase the point counter */
                     }
-                    else if(diff &(1<<bit)) {
+                    else if(diff &(1<<(bit*LCD_DEPTH+BITOFFS))) {
                         /* clear a dot */
                         clearpoints[cp].x = x + MARGIN_X;
                         clearpoints[cp].y = y+bit + MARGIN_Y;
@@ -110,33 +118,33 @@ void lcd_update_rect(int x_start, int y_start,
     fprintf(stderr, "%04d: lcd_update_rect(%d, %d, %d, %d)\n",
             counter++, x_start, y_start, width, height);
 #endif
-    /* The Y coordinates have to work on even 8 pixel rows */
-    ymax = (yline + height)/8;
-    yline /= 8;
+    /* The Y coordinates have to work on even YBLOCK pixel rows */
+    ymax = (yline + height)/YBLOCK;
+    yline /= YBLOCK;
 
     xmax = x_start + width;
 
     if(xmax > LCD_WIDTH)
         xmax = LCD_WIDTH;
-    if(ymax >= LCD_HEIGHT/8)
-        ymax = LCD_HEIGHT/8-1;
+    if(ymax >= LCD_HEIGHT/YBLOCK)
+        ymax = LCD_HEIGHT/YBLOCK-1;
 
     for(; yline<=ymax; yline++) {
-        y = yline * 8;
+        y = yline * YBLOCK;
         for(x=x_start; x<xmax; x++) {
             if(lcd_framebuffer[yline][x] || lcd_framebuffer_copy[yline][x]) {
                 /* one or more bits/pixels are changed */
                 unsigned char diff =
                   lcd_framebuffer[yline][x] ^ lcd_framebuffer_copy[yline][x];
 
-                for(bit=0; bit<8; bit++) {
-                    if(lcd_framebuffer[yline][x]&(1<<bit)) {
+                for(bit=0; bit<YBLOCK; bit++) {
+                    if(lcd_framebuffer[yline][x]&(1<<(bit*LCD_DEPTH+BITOFFS))) {
                         /* set a dot */
                         points[p].x = x + MARGIN_X;
                         points[p].y = y+bit + MARGIN_Y;
                         p++; /* increase the point counter */
                     }
-                    else if(diff &(1<<bit)) {
+                    else if(diff &(1<<(bit*LCD_DEPTH+BITOFFS))) {
                         /* clear a dot */
                         clearpoints[cp].x = x + MARGIN_X;
                         clearpoints[cp].y = y+bit + MARGIN_Y;

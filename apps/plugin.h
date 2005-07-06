@@ -164,10 +164,10 @@ struct plugin_api {
     void (*lcd_vline)(int x, int y1, int y2);
     void (*lcd_drawrect)(int x, int y, int width, int height);
     void (*lcd_fillrect)(int x, int y, int width, int height);
-    void (*lcd_bitmap_part)(const unsigned char *src, int src_x, int src_y,
-                            int stride, int x, int y, int width, int height);
-    void (*lcd_bitmap)(const unsigned char *src, int x, int y,
-                       int width, int height);
+    void (*lcd_mono_bitmap_part)(const unsigned char *src, int src_x, int src_y,
+                                 int stride, int x, int y, int width, int height);
+    void (*lcd_mono_bitmap)(const unsigned char *src, int x, int y,
+                            int width, int height);
     void (*lcd_putsxy)(int x, int y, const unsigned char *string);
     void (*lcd_puts_style)(int x, int y, const unsigned char *str, int style);
     void (*lcd_puts_scroll_style)(int x, int y, const unsigned char* string,

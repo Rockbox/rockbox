@@ -118,8 +118,8 @@ static void snow_move(void)
             }
             if (particle_exists(i))
 #ifdef HAVE_LCD_BITMAP
-                rb->lcd_bitmap(flake,particles[i][0],particles[i][1],
-                               FLAKE_WIDTH,FLAKE_WIDTH);
+                rb->lcd_mono_bitmap(flake,particles[i][0],particles[i][1],
+                                    FLAKE_WIDTH,FLAKE_WIDTH);
 #else
                 pgfx_drawpixel(particles[i][0],particles[i][1]);
 #endif

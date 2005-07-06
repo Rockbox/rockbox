@@ -136,35 +136,81 @@ int read_line(int fd, char* buffer, int buffer_size)
 }
 
 #ifdef HAVE_LCD_BITMAP
-extern unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
+
+#if LCD_DEPTH <= 8
+#define BMP_NUMCOLORS (1 << LCD_DEPTH)
+#else
+#define BMP_NUMCOLORS 0
+#endif
+
+#if LCD_DEPTH == 1
+#define BMP_BPP 1
+#define BMP_LINESIZE ((LCD_WIDTH/8 + 3) & ~3)
+#elif LCD_DEPTH <= 4
+#define BMP_BPP 4
+#define BMP_LINESIZE ((LCD_WIDTH/2 + 3) & ~3)
+#elif LCD_DEPTH <= 8
+#define BMP_BPP 8
+#define BMP_LINESIZE ((LCD_WIDTH + 3) & ~3)
+#elif LCD_DEPTH <= 16
+#define BMP_BPP 16
+#define BMP_LINESIZE ((LCD_WIDTH*2 + 3) & ~3)
+#else
+#define BMP_BPP 24
+#define BMP_LINESIZE ((LCD_WIDTH*3 + 3) & ~3)
+#endif
+
+#define BMP_HEADERSIZE (54 + 4 * BMP_NUMCOLORS)
+#define BMP_DATASIZE   (BMP_LINESIZE * LCD_HEIGHT)
+#define BMP_TOTALSIZE  (BMP_HEADERSIZE + BMP_DATASIZE)
+
+#define LE16_CONST(x) (x)&0xff, ((x)>>8)&0xff
+#define LE32_CONST(x) (x)&0xff, ((x)>>8)&0xff, ((x)>>16)&0xff, ((x)>>24)&0xff
+
 static const unsigned char bmpheader[] =
 {
-    0x42, 0x4d, 0x3e, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3e, 0x00,
-    0x00, 0x00, 0x28, 0x00, 0x00, 0x00, LCD_WIDTH, 0x00, 0x00, 0x00, LCD_HEIGHT, 0x00,
-    0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00,
-#if LCD_WIDTH == 160
- 0x00, 0x00, 0x00, 0x0a,
-#else
- 0x00, 0x00, 0x00, 0x04,
+    0x42, 0x4d,                 /* 'BM' */
+    LE32_CONST(BMP_TOTALSIZE),  /* Total file size */
+    0x00, 0x00, 0x00, 0x00,     /* Reserved */
+    LE32_CONST(BMP_HEADERSIZE), /* Offset to start of pixel data */
+
+    0x28, 0x00, 0x00, 0x00,     /* Size of (2nd) header */
+    LE32_CONST(LCD_WIDTH),      /* Width in pixels */
+    LE32_CONST(LCD_HEIGHT),     /* Height in pixels */
+    0x01, 0x00,                 /* Number of planes (always 1) */
+    LE16_CONST(BMP_BPP),        /* Bits per pixel 1/4/8/16/24 */
+    0x00, 0x00, 0x00, 0x00,     /* Compression mode, 0 = none */
+    LE32_CONST(BMP_DATASIZE),   /* Size of bitmap data */
+    0xc4, 0x0e, 0x00, 0x00,     /* Horizontal resolution (pixels/meter) */
+    0xc4, 0x0e, 0x00, 0x00,     /* Vertical resolution (pixels/meter) */
+    LE32_CONST(BMP_NUMCOLORS),  /* Number of used colours */
+    LE32_CONST(BMP_NUMCOLORS),  /* Number of important colours */
+
+#if LCD_DEPTH == 1
+    0x90, 0xee, 0x90, 0x00,     /* Colour #0 */
+    0x00, 0x00, 0x00, 0x00      /* Colour #1 */
+#elif LCD_DEPTH == 2
+    0xe6, 0xd8, 0xad, 0x00,     /* Colour #0 */
+    0x99, 0x90, 0x73, 0x00,     /* Colour #1 */
+    0x4c, 0x48, 0x39, 0x00,     /* Colour #2 */
+    0x00, 0x00, 0x00, 0x00      /* Colour #3 */
 #endif
-    0x00, 0x00, 0xc4, 0x0e, 0x00, 0x00, 0xc4, 0x0e, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-#ifdef IRIVER_H100
-    0xe6, 0xd8, 0xad,
-#else
-    0x90, 0xee, 0x90,
-#endif
-    0x00, 0x00, 0x00,
-    0x00, 0x00
 };
 
 void screen_dump(void)
 {
     int fh;
-    int bx, by, ix, iy;
-    int src_byte, src_mask, dst_mask;
+    int bx, by, iy;
+    int src_byte;
     char filename[MAX_PATH];
-    static unsigned char line_block[8][(LCD_WIDTH/8+3) & ~3];
+#if LCD_DEPTH == 1
+    int ix, src_mask, dst_mask;
+    static unsigned char line_block[8][BMP_LINESIZE];
+#elif LCD_DEPTH == 2
+    int src_byte2;
+    static unsigned char line_block[4][BMP_LINESIZE];
+#endif
+
 #ifdef HAVE_RTC
     struct tm *tm = get_time();
     
@@ -213,6 +259,7 @@ void screen_dump(void)
     write(fh, bmpheader, sizeof(bmpheader));
 
     /* BMP image goes bottom up */
+#if LCD_DEPTH == 1
     for (by = LCD_HEIGHT/8 - 1; by >= 0; by--)
     {
         memset(&line_block[0][0], 0, sizeof(line_block));
@@ -236,6 +283,26 @@ void screen_dump(void)
         
         write(fh, &line_block[0][0], sizeof(line_block));
     }
+#elif LCD_DEPTH == 2
+    for (by = LCD_HEIGHT/4 - 1; by >= 0; by--)
+    {
+        memset(&line_block[0][0], 0, sizeof(line_block));
+
+        for (bx = 0; bx < LCD_WIDTH/2; bx++)
+        {
+            src_byte = lcd_framebuffer[by][2*bx];
+            src_byte2 = lcd_framebuffer[by][2*bx+1];
+            for (iy = 3; iy >= 0; iy--)
+            {
+                line_block[iy][bx] = ((src_byte & 3) << 4) | (src_byte2 & 3);
+                src_byte >>= 2;
+                src_byte2 >>= 2;
+            }
+        }
+
+        write(fh, &line_block[0][0], sizeof(line_block));
+    }
+#endif
     close(fh);
 }
 #endif

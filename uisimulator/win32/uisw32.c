@@ -239,6 +239,8 @@ BOOL GUIStartup ()
 
     if (hGUIWnd == NULL)
         return FALSE;
+    
+    simlcdinit();    
 
     return TRUE;
 }

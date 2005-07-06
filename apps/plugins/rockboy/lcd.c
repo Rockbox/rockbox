@@ -786,7 +786,7 @@ void lcd_refreshline(void)
         recolor(BUF+WX, 0x04, 160-WX);
     }
     spr_scan();
-#ifdef GRAYSCALE
+#if LCD_DEPTH == 2
     if (scanline_ind == 3)
 #else
     if (scanline_ind == 7)
@@ -800,7 +800,7 @@ void lcd_refreshline(void)
 #if LCD_HEIGHT == 64
     scanline_ind = (scanline_ind+1) % 8;
 #else
-#ifdef GRAYSCALE
+#if LCD_DEPTH == 2
     scanline_ind = (scanline_ind+1) % 4;
 #else
     scanline_ind = (scanline_ind+1) % 8;

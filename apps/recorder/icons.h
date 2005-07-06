@@ -72,7 +72,7 @@ extern const unsigned char bitmap_icon_disk[];
 extern const unsigned char rockbox112x37[];
 #endif
 #if LCD_WIDTH >= 160
-extern const unsigned char rockbox160x53[];
+extern const unsigned char rockbox160x53x2[];
 #endif
 
 #define STATUSBAR_X_POS       0

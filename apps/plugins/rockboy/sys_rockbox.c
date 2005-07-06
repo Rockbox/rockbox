@@ -245,21 +245,21 @@ void vid_update(int scanline)
       scanline-=16;
     else if (fb.mode==2)
       scanline-=8;
-#ifdef GRAYSCALE
+#if LCD_DEPTH == 2
     scanline_remapped = scanline / 4;
 #else
     scanline_remapped = scanline / 8;
 #endif	    
     frameb = rb->lcd_framebuffer + scanline_remapped * LCD_WIDTH;
     while (cnt < 160) {
-#ifdef GRAYSCALE
+#if LCD_DEPTH == 2
         *(frameb++) = (scan.buf[0][cnt]&0x3) |
                       ((scan.buf[1][cnt]&0x3)<<2) |
                       ((scan.buf[2][cnt]&0x3)<<4) |
                       ((scan.buf[3][cnt]&0x3)<<6);
         cnt++;
     }
-    rb->lcd_update_rect(0, scanline & ~3, LCD_WIDTH, 4); //8);
+    rb->lcd_update_rect(0, scanline & ~3, LCD_WIDTH, 4);
 #else	    
         register unsigned scrbyte = 0;
         if (scan.buf[0][cnt] & 0x02)  scrbyte |= 0x01;
@@ -274,7 +274,7 @@ void vid_update(int scanline)
         cnt++;
     }
     rb->lcd_update_rect(0, scanline & ~7, LCD_WIDTH, 8);
-#endif /* GRAYSCALE */
+#endif /* LCD_DEPTH */
 #endif /* LCD_HEIGHT */
 }
 
