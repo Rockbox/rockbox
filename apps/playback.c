@@ -1208,11 +1208,11 @@ void audio_change_track(void)
     logf("change track");
     
     /* Wait for new track data. */
-    while (track_ridx == track_widx && filling)
+    while (track_count <= 1 && filling)
         yield();
 
     /* If we are not filling, then it must be end-of-playlist. */
-    if (track_ridx == track_widx) {
+    if (track_count <= 1) {
         logf("No more tracks");
         while (pcm_is_playing())
             yield();
