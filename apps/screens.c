@@ -1435,7 +1435,7 @@ bool set_rating(void)
     bool exit = false;
     char rating_text[20];
 
-    if (!(audio_status() & AUDIO_STATUS_PLAY))
+    if (!(audio_status() & AUDIO_STATUS_PLAY)||id3==NULL)
         return false;
     while (!exit)
     {
