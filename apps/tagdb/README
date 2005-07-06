@@ -1,0 +1,9 @@
+The code is currently a working mess... needs cleanup
+also it should be transformed into rockbox-format (header in each file).
+
+things that work:
+* DB creation
+
+things that don't work (yet)
+* Sorting
+* reading files to parse the tags
