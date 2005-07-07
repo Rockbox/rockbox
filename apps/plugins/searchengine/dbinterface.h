@@ -51,7 +51,6 @@ struct entry {
 };
 
 extern struct entry *currententry;
-extern struct entry *entryarray;
 extern struct dbglobals dbglobal;
 
 int database_init(void);
