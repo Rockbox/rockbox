@@ -1126,12 +1126,13 @@ static void mpeg_thread(void)
             case MPEG_PAUSE:
                 DEBUGF("MPEG_PAUSE\n");
                 /* Stop the current stream */
+                if (playing)
+                    playlist_update_resume_info(audio_current_track());
                 paused = true;
                 playing = false;
                 pause_tick = current_tick;
                 pause_track = current_track_counter;
                 mp3_play_pause(false);
-                playlist_update_resume_info(audio_current_track());
                 break;
 
             case MPEG_RESUME:
