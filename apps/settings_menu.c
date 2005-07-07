@@ -836,15 +836,7 @@ static bool battery_type(void)
 static bool timedate_set(void)
 {
     struct tm tm;
-    int timedate[8];
     bool result;
-
-    timedate[0] = rtc_read(0x03); /* hour   */
-    timedate[1] = rtc_read(0x02); /* minute */
-    timedate[2] = rtc_read(0x01); /* second */
-    timedate[3] = rtc_read(0x07); /* year   */
-    timedate[4] = rtc_read(0x06); /* month  */
-    timedate[5] = rtc_read(0x05); /* day    */
 
     /* Make a local copy of the time struct */
     memcpy(&tm, get_time(), sizeof(struct tm));
