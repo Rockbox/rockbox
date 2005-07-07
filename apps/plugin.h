@@ -207,11 +207,11 @@ struct plugin_api {
     void (*lcd_remote_vline)(int x, int y1, int y2);
     void (*lcd_remote_drawrect)(int x, int y, int nx, int ny);
     void (*lcd_remote_fillrect)(int x, int y, int nx, int ny);
-    void (*lcd_remote_bitmap_part)(const unsigned char *src, int src_x,
-                                   int src_y, int stride, int x, int y,
+    void (*lcd_remote_mono_bitmap_part)(const unsigned char *src, int src_x,
+                                        int src_y, int stride, int x, int y,
+                                        int width, int height);
+    void (*lcd_remote_mono_bitmap)(const unsigned char *src, int x, int y,
                                    int width, int height);
-    void (*lcd_remote_bitmap)(const unsigned char *src, int x, int y, int nx,
-                              int ny);
     void (*lcd_remote_putsxy)(int x, int y, const unsigned char *string);
     void (*lcd_remote_puts_style)(int x, int y, const unsigned char *str, int style);
     void (*lcd_remote_puts_scroll_style)(int x, int y, const unsigned char* string,

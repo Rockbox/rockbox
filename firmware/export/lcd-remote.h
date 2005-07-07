@@ -86,5 +86,8 @@ extern void lcd_remote_invertscroll(int x, int y);
 extern void lcd_remote_bidir_scroll(int threshold);
 extern void lcd_remote_scroll_step(int pixels);
 
+#define lcd_remote_mono_bitmap lcd_remote_bitmap
+#define lcd_remote_mono_bitmap_part lcd_remote_bitmap_part
+
 #endif
 #endif

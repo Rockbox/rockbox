@@ -45,5 +45,8 @@ void pgfx_bitmap_part(const unsigned char *src, int src_x, int src_y,
                       int stride, int x, int y, int width, int height);
 void pgfx_bitmap(const unsigned char *src, int x, int y, int width, int height);
 
+#define pgfx_mono_bitmap_part pgfx_bitmap_part
+#define pgfx_mono_bitmap pgfx_bitmap
+
 #endif /* HAVE_LCD_CHARCELLS */
 #endif /* __PGFX_H__ */
