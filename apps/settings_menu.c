@@ -595,7 +595,8 @@ static bool repeat_mode(void)
     result = set_option( str(LANG_REPEAT), &global_settings.repeat_mode,
                          INT, names, 4, NULL );
 
-    if (old_repeat != global_settings.repeat_mode)
+    if (old_repeat != global_settings.repeat_mode &&
+        (audio_status() & AUDIO_STATUS_PLAY))
         audio_flush_and_reload_tracks();
 
     return result;

@@ -738,7 +738,8 @@ bool quick_screen(int context, int button)
     {
         case SCREENS_QUICK:
 
-            if ( oldrepeat != global_settings.repeat_mode )
+            if ( oldrepeat != global_settings.repeat_mode &&
+                (audio_status() & AUDIO_STATUS_PLAY) )
                 audio_flush_and_reload_tracks();
 
             break;
