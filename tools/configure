@@ -649,6 +649,13 @@ else
 
  echo "Using $CC $gccver ($gccnum)"
 
+ if test "$gccnum" -ge "400"; then 
+   # gcc 4.0 is just *so* much pickier on arguments that differ in signedness
+   # so we ignore that warnings for now
+   # -Wno-pointer-sign
+   GCCOPTS="$GCCOPTS -Wno-pointer-sign"
+ fi
+
 fi
 
 if test "X$ccache" = "Xyes"; then
