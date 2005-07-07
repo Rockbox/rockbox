@@ -626,6 +626,45 @@ void yield_codecs(void)
         yield();
 }
 
+/* FIXME: This code should be made more generic and move to metadata.c */
+void strip_id3v1_tag(void)
+{
+    int i;
+    static const unsigned char tag[] = "TAG";
+    int tagptr;
+    bool found = true;
+
+    if (codecbufused >= 128)
+    {
+        tagptr = buf_widx - 128;
+        if (tagptr < 0)
+            tagptr += codecbuflen;
+        
+        for(i = 0;i < 3;i++)
+        {
+            if(tagptr >= codecbuflen)
+                tagptr -= codecbuflen;
+            
+            if(codecbuf[tagptr] != tag[i])
+            {
+                found = false;
+                break;
+            }
+            
+            tagptr++;
+        }
+        
+        if(found)
+        {
+            /* Skip id3v1 tag */
+            logf("Skipping ID3v1 tag\n");
+            buf_widx -= 128;
+            tracks[track_widx].available -= 128;
+            codecbufused -= 128;
+        }
+    }
+}
+
 void audio_fill_file_buffer(void)
 {
     long i, size;
@@ -651,6 +690,7 @@ void audio_fill_file_buffer(void)
         rc = read(current_fd, &codecbuf[buf_widx], rc);
         if (rc <= 0) {
             tracks[track_widx].filerem = 0;
+            strip_id3v1_tag();
             break ;
         }
         
@@ -965,6 +1005,9 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     } else {
         logf("Completely buf.");
         close(fd);
+
+        strip_id3v1_tag();
+        
         if (++track_widx >= MAX_TRACK) {
             track_widx = 0;
         }
