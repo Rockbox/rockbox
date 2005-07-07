@@ -376,7 +376,7 @@ long wps_show(void)
                about to shut down. lets save the settings. */
             if (paused) {
                 settings_save();
-#ifndef HAVE_RTC
+#if !defined(HAVE_RTC) && !defined(HAVE_SW_POWEROFF)
                 ata_flush();
 #endif
             }
