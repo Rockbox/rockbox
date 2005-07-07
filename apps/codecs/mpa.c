@@ -39,12 +39,6 @@ void abort(void) {
 
 
 #define INPUT_CHUNK_SIZE   8192
-#define OUTPUT_BUFFER_SIZE 65536 /* Must be an integer multiple of 4. */
-
-unsigned char OutputBuffer[OUTPUT_BUFFER_SIZE];
-unsigned char *OutputPtr;
-unsigned char *GuardPtr = NULL;
-const unsigned char *OutputBufferEnd = OutputBuffer + OUTPUT_BUFFER_SIZE;
 
 mad_fixed_t mad_frame_overlap[2][32][18] IDATA_ATTR;
 unsigned char mad_main_data[MAD_BUFFER_MDLEN] IDATA_ATTR;
@@ -115,7 +109,6 @@ enum codec_status codec_start(struct codec_api* api)
   
     first_frame = false;
     file_end = 0;
-    OutputPtr = OutputBuffer;
     
     while (!*ci->taginfo_ready)
         ci->yield();
@@ -195,7 +188,7 @@ enum codec_status codec_start(struct codec_api* api)
             }
             else if(MAD_RECOVERABLE(Stream.error))
             {
-                if(Stream.error!=MAD_ERROR_LOSTSYNC || Stream.this_frame!=GuardPtr)
+                if(Stream.error!=MAD_ERROR_LOSTSYNC)
                 {
                     // rb->splash(HZ*1, true, "Recoverable...!");
                 }
@@ -209,9 +202,9 @@ enum codec_status codec_start(struct codec_api* api)
                 Status=1;
                 break;
             }
+            break ;
         }
-        if (Stream.next_frame)
-            ci->advance_buffer_loc((void *)Stream.next_frame);
+        
         file_end = false;
         /* ?? Do we need the timer module? */
         // mad_timer_add(&Timer,Frame.header.duration);
@@ -222,7 +215,7 @@ enum codec_status codec_start(struct codec_api* api)
         /* We skip start_skip number of samples here, this should only happen for
            very first frame in the stream. */
         /* TODO: possible for start_skip to exceed one frames worth of samples? */
-        
+
         if (MAD_NCHANNELS(&Frame.header) == 2) {
             if (current_stereo_mode != STEREO_NONINTERLEAVED) {
                 ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_NONINTERLEAVED);
@@ -241,6 +234,11 @@ enum codec_status codec_start(struct codec_api* api)
         }
         start_skip = 0; /* not very elegant, and might want to keep this value */
         
+        if (Stream.next_frame)
+            ci->advance_buffer_loc((void *)Stream.next_frame);
+        else
+            ci->advance_buffer(size);
+            
         samplesdone += Synth.pcm.length;
         samplecount -= Synth.pcm.length;
         ci->set_elapsed(samplesdone / (frequency_divider / 10));

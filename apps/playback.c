@@ -659,12 +659,12 @@ void audio_fill_file_buffer(void)
             buf_widx -= codecbuflen;
         i += rc;
         tracks[track_widx].available += rc;
+        tracks[track_widx].filerem -= rc;
+        tracks[track_widx].filepos += rc;
         codecbufused += rc;
         fill_bytesleft -= rc;
     }
     
-    tracks[track_widx].filerem -= i;
-    tracks[track_widx].filepos += i;
     /*logf("Filled:%d/%d", tracks[track_widx].available,
                        tracks[track_widx].filerem);*/
 }
@@ -890,26 +890,29 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
 
     /* Starting playback from an offset is only support in MPA at the moment */
     if (offset > 0) {
-      if ((tracks[track_widx].id3.codectype==AFMT_MPA_L2) ||
-          (tracks[track_widx].id3.codectype==AFMT_MPA_L3)) {
-        lseek(fd, offset, SEEK_SET);
-        tracks[track_widx].id3.offset = offset;
-        mp3_set_elapsed(&tracks[track_widx].id3);
-        tracks[track_widx].filepos = offset;
-        tracks[track_widx].filerem = tracks[track_widx].filesize - offset;
-        ci.curpos = offset;
-        tracks[track_widx].start_pos = offset;
-      }
-      else if (tracks[track_widx].id3.codectype==AFMT_WAVPACK) {
-        lseek(fd, offset, SEEK_SET);
-        tracks[track_widx].id3.offset = offset;
-        tracks[track_widx].id3.elapsed = tracks[track_widx].id3.length / 2;
-        tracks[track_widx].filepos = offset;
-        tracks[track_widx].filerem = tracks[track_widx].filesize - offset;
-        ci.curpos = offset;
-        tracks[track_widx].start_pos = offset;
-      }
-    } 
+        switch (tracks[track_widx].id3.codectype) {
+        case AFMT_MPA_L2:
+        case AFMT_MPA_L3:
+            lseek(fd, offset, SEEK_SET);
+            tracks[track_widx].id3.offset = offset;
+            mp3_set_elapsed(&tracks[track_widx].id3);
+            tracks[track_widx].filepos = offset;
+            tracks[track_widx].filerem = tracks[track_widx].filesize - offset;
+            ci.curpos = offset;
+            tracks[track_widx].start_pos = offset;
+            break;
+
+        case AFMT_WAVPACK:
+            lseek(fd, offset, SEEK_SET);
+            tracks[track_widx].id3.offset = offset;
+            tracks[track_widx].id3.elapsed = tracks[track_widx].id3.length / 2;
+            tracks[track_widx].filepos = offset;
+            tracks[track_widx].filerem = tracks[track_widx].filesize - offset;
+            ci.curpos = offset;
+            tracks[track_widx].start_pos = offset;
+            break;
+        }
+    }
     
     if (start_play) {
         track_count++;
@@ -1795,6 +1798,8 @@ void audio_init(void)
     track_buffer_callback = NULL;
     track_unbuffer_callback = NULL;
     track_changed_callback = NULL;
+    /* Just to prevent cur_ti never be anything random. */
+    cur_ti = &tracks[0];
     
     logf("abuf:%0x", PCMBUF_SIZE);
     logf("fbuf:%0x", codecbuflen);

@@ -146,7 +146,7 @@ static void dma_stop(void)
     /* Reset the FIFO */
     IIS2CONFIG = 0x800;
     EBU1CONFIG = 0x800;
-    
+
     pcmbuf_unplayed_bytes = 0;
     last_chunksize = 0;
     audiobuffer_pos = 0;
@@ -213,7 +213,8 @@ static void pcm_play_callback(unsigned char** start, long* size)
     if(pcm_play_num_used_buffers())
     {
         /* Play max 64K at a time */
-        sz = MIN(desc->size, 32768);
+        //sz = MIN(desc->size, 32768);
+        sz = desc->size;
         *start = desc->addr;
         *size = sz;
 
@@ -245,11 +246,21 @@ void pcm_play_data(const unsigned char* start, int size,
                    void (*get_more)(unsigned char** start, long* size))
 {
     callback_for_more = get_more;
+    /** FIXME: This is a temporary fix to prevent playback glitches when
+      * playing the first file. We will just drop the first frame to prevent
+      * that problem from occurring.
+      * Some debug data:
+      *   - This problem will occur only when the first file.
+      *   - First frame will be totally corrupt and the song will begin
+      *     from the next frame. But at the next time (when the bug has
+      *     already happened), the song will start from first frame.
+      *   - Dropping some frames directly from (mpa) codec will also
+      *     prevent the problem from happening. So it's unlikely you can
+      *     find the explanation for this bug from this file.
+      */
+    get_more((unsigned char **)&start, (long *)&size); // REMOVE THIS TO TEST
     get_more(&next_start, &next_size);
     dma_start(start, size);
-    
-    /* Sleep a while, then unmute audio output */
-    sleep(HZ/8);
     uda1380_mute(false);
 }
 
@@ -310,7 +321,7 @@ void DMA0(void)
     if(res & 0x70)
     {
        dma_stop();
-       logf("DMA Error");
+       logf("DMA Error:0x%04x", res);
     }
     else
     {
@@ -326,7 +337,7 @@ void DMA0(void)
         {
             /* Finished playing */
             dma_stop();
-            logf("DMA No Data");
+            logf("DMA No Data:0x%04x", res);
         }
     }
     
@@ -431,7 +442,7 @@ bool pcm_is_lowdata(void)
 bool pcm_crossfade_init(void)
 {
     if (PCMBUF_SIZE - audiobuffer_free < CHUNK_SIZE * 8 || !crossfade_enabled
-        || crossfade_active) {
+        || crossfade_active || crossfade_init) {
         return false;
     }
     logf("pcm_crossfade_init");
@@ -457,21 +468,27 @@ void pcm_flush_audio(void)
 
 void pcm_flush_fillpos(void)
 {
-    if (audiobuffer_fillpos) {
-        while (!pcm_play_add_chunk(&audiobuffer[audiobuffer_pos], 
-                                   audiobuffer_fillpos, pcm_event_handler)) {
+    int copy_n;
+
+    copy_n = MIN(audiobuffer_fillpos, CHUNK_SIZE);
+    
+    if (copy_n) {
+        while (!pcm_play_add_chunk(&audiobuffer[audiobuffer_pos],
+                                   copy_n, pcm_event_handler)) {
             pcm_boost(false);
             yield();
             /* This is a fatal error situation that should never happen. */
-            if (!pcm_playing)
+            if (!pcm_playing) {
+                logf("pcm_flush_fillpos error");
                 break ;
+            }
         }
         pcm_event_handler = NULL;
-        audiobuffer_pos += audiobuffer_fillpos;
+        audiobuffer_pos += copy_n;
         if (audiobuffer_pos >= PCMBUF_SIZE)
             audiobuffer_pos -= PCMBUF_SIZE;
-        audiobuffer_free -= audiobuffer_fillpos;
-        audiobuffer_fillpos = 0;
+        audiobuffer_free -= copy_n;
+        audiobuffer_fillpos -= copy_n;
     }
 }
 
@@ -541,7 +558,7 @@ int crossfade(short *buf, const short *buf2, int length)
     return size;
 }
 
-inline static bool prepare_insert(long length)
+static bool prepare_insert(long length)
 {
     if (crossfade_init)
         crossfade_start();
@@ -566,9 +583,10 @@ void* pcm_request_buffer(long length, long *realsize)
 {
     void *ptr = NULL;
     
-    if (!prepare_insert(length)) {
-        *realsize = 0;
-        return NULL;
+    while (audiobuffer_free < length + audiobuffer_fillpos
+           + CHUNK_SIZE && !crossfade_active) {
+        pcm_boost(false);
+        yield();
     }
     
     if (crossfade_active) {
@@ -595,6 +613,8 @@ void pcm_flush_buffer(long length)
 {
     int copy_n;
     char *buf;
+
+    prepare_insert(length);
     
     if (crossfade_active) {
         buf = &guardbuf[0];
@@ -620,14 +640,14 @@ void pcm_flush_buffer(long length)
                 pcm_flush_fillpos();
         }
     }
-    
+
     audiobuffer_fillpos += length;
-    
+
     try_flush:
     if (audiobuffer_fillpos < CHUNK_SIZE && PCMBUF_SIZE
         - audiobuffer_pos - audiobuffer_fillpos > 0)
         return ;
-    
+
     copy_n = audiobuffer_fillpos - (PCMBUF_SIZE - audiobuffer_pos);
     if (copy_n > 0) {
         audiobuffer_fillpos -= copy_n;
@@ -699,15 +719,9 @@ void pcm_play_init(void)
     audiobuffer = &audiobuf[(audiobufend - audiobuf) - 
                             PCMBUF_SIZE - PCMBUF_GUARD];
     guardbuf = &audiobuffer[PCMBUF_SIZE];
-    audiobuffer_free = PCMBUF_SIZE;
-    audiobuffer_pos = 0;
-    audiobuffer_fillpos = 0;
-    boost_mode = 0;
-    pcmbuf_read_index = 0;
-    pcmbuf_write_index = 0;
-    pcmbuf_unplayed_bytes = 0;
-    crossfade_active = false;
-    crossfade_init = false;
+
+    /* Call dma_stop to initialize everything. */
+    dma_stop();
     pcm_event_handler = NULL;
 }
 
@@ -723,9 +737,8 @@ bool pcm_is_crossfade_enabled(void)
 
 void pcm_play_start(void)
 {
-    struct pcmbufdesc *desc = &pcmbuffers[pcmbuf_read_index];
-    int size;
-    char *start;
+    unsigned long size;
+    unsigned char *start;
     
     if (crossfade_enabled) {
         pcm_play_set_watermark(PCM_CF_WATERMARK, pcm_watermark_callback);
@@ -736,11 +749,7 @@ void pcm_play_start(void)
     
     if(!pcm_is_playing())
     {
-        size = MIN(desc->size, 32768);
-        start = desc->addr;
-        last_chunksize = size;
-        desc->size -= size;
-        desc->addr += size;
+        pcm_play_callback(&start, &size);
         pcm_play_data(start, size, pcm_play_callback);
     }
 }
