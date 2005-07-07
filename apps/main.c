@@ -98,6 +98,9 @@ void init(void)
     init_threads();
     buffer_init();
     lcd_init();
+#ifdef HAVE_REMOTE_LCD
+    lcd_remote_init();
+#endif
     font_init();
     show_logo();
     lang_init();
@@ -148,11 +151,9 @@ void init(void)
     settings_reset();
     
     lcd_init();
-    
-#ifdef HAVE_REMOTE_LCD    
+#ifdef HAVE_REMOTE_LCD
     lcd_remote_init();
 #endif
-
     font_init();
     show_logo();
     lang_init();
@@ -291,7 +292,7 @@ void init(void)
     talk_init();
     /* runtime database has to be initialized after audio_init() */
     rundb_init();
-        
+
 
 #ifdef AUTOROCK
     {

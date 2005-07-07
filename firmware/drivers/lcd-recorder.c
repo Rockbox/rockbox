@@ -885,7 +885,7 @@ void lcd_putsxy(int x, int y, const unsigned char *str)
 void lcd_puts_style(int x, int y, const unsigned char *str, int style)
 {
     int xpos,ypos,w,h;
-    int lastmode = lcd_get_drawmode();
+    int lastmode = drawmode;
 
     /* make sure scrolling is turned off on the line we are updating */
     scrolling_lines &= ~(1 << y);
@@ -897,14 +897,14 @@ void lcd_puts_style(int x, int y, const unsigned char *str, int style)
     xpos = xmargin + x*w / strlen(str);
     ypos = ymargin + y*h;
     lcd_putsxy(xpos, ypos, str);
-    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
     lcd_fillrect(xpos + w, ypos, LCD_WIDTH - (xpos + w), h);
     if (style & STYLE_INVERT)
     {
-        lcd_set_drawmode(DRMODE_COMPLEMENT);
+        drawmode = DRMODE_COMPLEMENT;
         lcd_fillrect(xpos, ypos, LCD_WIDTH - xpos, h);
     }
-    lcd_set_drawmode(lastmode);
+    drawmode = lastmode;
 }
 
 /* put a string at a given char position */
@@ -1066,17 +1066,17 @@ static void scroll_thread(void)
                     s->offset %= s->width;
             }
 
-            lastmode = lcd_get_drawmode();
-            lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            lastmode = drawmode;
+            drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
             lcd_fillrect(xpos, ypos, LCD_WIDTH - xpos, pf->height);
-            lcd_set_drawmode(DRMODE_SOLID);
+            drawmode = DRMODE_SOLID;
             lcd_putsxyofs(xpos, ypos, s->offset, s->line);
             if (s->invert)
             {
-                lcd_set_drawmode(DRMODE_COMPLEMENT);
+                drawmode = DRMODE_COMPLEMENT;
                 lcd_fillrect(xpos, ypos, LCD_WIDTH - xpos, pf->height);
             }
-            lcd_set_drawmode(lastmode);
+            drawmode = lastmode;
             lcd_update_rect(xpos, ypos, LCD_WIDTH - xpos, pf->height);
         }
 

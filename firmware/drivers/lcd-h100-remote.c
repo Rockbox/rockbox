@@ -90,10 +90,8 @@ static int cached_roll = 0;
 
 /* scrolling */
 static volatile int scrolling_lines=0; /* Bitpattern of which lines are scrolling */
-#ifndef SIMULATOR
 static void scroll_thread(void);
 static long scroll_stack[DEFAULT_STACK_SIZE/sizeof(long)];
-#endif
 static const char scroll_name[] = "remote_scroll";
 static char scroll_ticks = 12; /* # of ticks between updates*/
 static int scroll_delay = HZ/2; /* ticks delay before start */
@@ -355,7 +353,18 @@ static void remote_tick(void)
             }
         }
     }
+}  
+#endif /* !SIMULATOR */
+
+/* LCD init */
+#ifdef SIMULATOR
+
+void lcd_remote_init(void)
+{
+    create_thread(scroll_thread, scroll_stack,
+                  sizeof(scroll_stack), scroll_name);
 }
+#else /* !SIMULATOR */
 
 /* Initialise ports and kick off monitor */
 void lcd_remote_init(void)
@@ -997,7 +1006,7 @@ void lcd_remote_puts(int x, int y, const unsigned char *str)
 void lcd_remote_puts_style(int x, int y, const unsigned char *str, int style)
 {
     int xpos,ypos,w,h;
-    int lastmode = lcd_remote_get_drawmode();
+    int lastmode = drawmode;
 
     /* make sure scrolling is turned off on the line we are updating */
     scrolling_lines &= ~(1 << y);
@@ -1009,14 +1018,14 @@ void lcd_remote_puts_style(int x, int y, const unsigned char *str, int style)
     xpos = xmargin + x*w / strlen(str);
     ypos = ymargin + y*h;
     lcd_remote_putsxy(xpos, ypos, str);
-    lcd_remote_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
     lcd_remote_fillrect(xpos + w, ypos, LCD_REMOTE_WIDTH - (xpos + w), h);
     if (style & STYLE_INVERT)
     {
-        lcd_remote_set_drawmode(DRMODE_COMPLEMENT);
+        drawmode = DRMODE_COMPLEMENT;
         lcd_remote_fillrect(xpos, ypos, LCD_REMOTE_WIDTH - xpos, h);
     }
-    lcd_remote_set_drawmode(lastmode);
+    drawmode = lastmode;
 }
 
 /*** scrolling ***/
@@ -1120,7 +1129,6 @@ void lcd_remote_puts_scroll_style(int x, int y, const unsigned char *string, int
         scrolling_lines &= ~(1<<y);
 }
 
-#ifndef SIMULATOR
 static void scroll_thread(void)
 {
     struct font* pf;
@@ -1134,13 +1142,14 @@ static void scroll_thread(void)
 
     while ( 1 ) {
 
+#ifndef SIMULATOR
         if (init_remote)   /* request to initialize the remote lcd */
         {
             init_remote = false; /* clear request */
             remote_lcd_init();
             lcd_remote_update();
         }
-
+#endif
         for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
             /* really scroll? */
             if ( !(scrolling_lines&(1<<index)) )
@@ -1181,22 +1190,21 @@ static void scroll_thread(void)
                     s->offset %= s->width;
             }
 
-            lastmode = lcd_remote_get_drawmode();
-            lcd_remote_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            lastmode = drawmode;
+            drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
             lcd_remote_fillrect(xpos, ypos, LCD_REMOTE_WIDTH - xpos, pf->height);
-            lcd_remote_set_drawmode(DRMODE_SOLID);
+            drawmode = DRMODE_SOLID;
             lcd_remote_putsxyofs(xpos, ypos, s->offset, s->line);
             if (s->invert)
             {
-                lcd_remote_set_drawmode(DRMODE_COMPLEMENT);
+                drawmode = DRMODE_COMPLEMENT;
                 lcd_remote_fillrect(xpos, ypos, LCD_REMOTE_WIDTH - xpos, pf->height);
             }
-            lcd_remote_set_drawmode(lastmode);
+            drawmode = lastmode;
             lcd_remote_update_rect(xpos, ypos, LCD_REMOTE_WIDTH - xpos, pf->height);
         }
 
         sleep(scroll_ticks);
     }
 }
-#endif /* SIMULATOR */
 
