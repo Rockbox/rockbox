@@ -167,7 +167,7 @@ static void remove_all_tags(void)
 
 static struct trackdata *get_trackdata(int offset)
 {
-    if(offset > num_tracks_in_memory())
+    if(offset >= num_tracks_in_memory())
         return NULL;
     else
        return &trackdata[(track_read_idx + offset) & MAX_TRACK_ENTRIES_MASK];
