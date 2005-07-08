@@ -35,6 +35,14 @@
 #include "power.h"
 #include "file.h"
 
+#ifdef IRIVER_H100
+#define MODEL_NUMBER 1
+#define DRAM_START 0x30000000
+#else
+#define MODEL_NUMBER 0
+#define DRAM_START 0x31000000
+#endif
+
 int line = 0;
 
 int usb_screen(void)
@@ -88,7 +96,7 @@ int load_firmware(void)
     unsigned long chksum;
     unsigned long sum;
     int i;
-    unsigned char *buf = (unsigned char *)0x31000000;
+    unsigned char *buf = (unsigned char *)DRAM_START;
     char str[80];
     
     fd = open("/rockbox.iriver", O_RDONLY);
@@ -119,7 +127,7 @@ int load_firmware(void)
 
     close(fd);
 
-    sum = 0;
+    sum = MODEL_NUMBER;
     
     for(i = 0;i < len;i++) {
         sum += buf[i];
@@ -135,16 +143,17 @@ int load_firmware(void)
     return 0;
 }
 
+
 void start_firmware(void)
 {
     asm(" move.w #0x2700,%sr");
     /* Reset the cookie for the crt0 crash check */
     asm(" move.l #0,%d0");
     asm(" move.l %d0,0x10017ffc");
-    asm(" move.l #0x31000000,%d0");
+    asm(" move.l %0,%%d0" :: "i"(DRAM_START));
     asm(" movec.l %d0,%vbr");
-    asm(" move.l 0x31000000,%sp");
-    asm(" move.l 0x31000004,%a0");
+    asm(" move.l %0,%%sp" :: "m"(*(int *)DRAM_START));
+    asm(" move.l %0,%%a0" :: "m"(*(int *)(DRAM_START+4)));
     asm(" jmp (%a0)");
 }
 
