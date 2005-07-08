@@ -202,13 +202,14 @@ void main(void)
 
     sleep(HZ/50); /* Allow the button driver to check the buttons */
 
-    if(button_status() & BUTTON_REC || rc_on_button) {
+    if(button_status() & BUTTON_REC) {
         lcd_puts(0, 8, "Starting original firmware...");
         lcd_update();
         start_iriver_fw();
     }
 
-    if(on_button & button_hold()) {
+    if(on_button & button_hold() ||
+       rc_on_button & remote_button_hold()) {
         lcd_puts(0, 8, "HOLD switch on, power off...");
         lcd_update();
         sleep(HZ*2);
@@ -217,14 +218,6 @@ void main(void)
         asm(" move.l %d0,0x10017ffc");
         power_off();
     }
-#if 0
-    if((button_status() & BUTTON_RC_ON) & remote_button_hold()) {
-        lcd_puts(0, 8, "HOLD switch on, power off...");
-        lcd_update();
-        sleep(HZ/2);
-        power_off();
-    }
-#endif
 
     rc = ata_init();
     if(rc)
