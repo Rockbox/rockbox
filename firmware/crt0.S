@@ -190,28 +190,44 @@ irq_handler:
         
     /* Set up the DRAM controller. The refresh is based on the 11.2896MHz
        clock (5.6448MHz bus frequency). We haven't yet started the PLL */
-    move.w  #0x8001,%d0
-    move.w  %d0,(0x100,%a0) /* DCR - Synchronous, 32 cycle refresh */
+#ifdef IRIVER_H100
+    move.w  #0x8202,%d0 /* DCR - Synchronous, 64 cycle refresh */
+#else
+    move.w  #0x8001,%d0 /* DCR - Synchronous, 32 cycle refresh */
+#endif
+    move.w  %d0,(0x100,%a0)
 
-    /* Note: we place the SDRAM on an 0x1000000 (16M) offset because
+    /* Note on 32Mbyte models:
+       We place the SDRAM on an 0x1000000 (16M) offset because
        the 5249 BGA chip has a fault which disables the use of A24. The
        suggested workaround by FreeScale is to offset the base address by
        half the DRAM size and increase the mask to the double.
        In our case this means that we set the base address 16M ahead and
        use a 64M mask.
     */
-    move.l  #0x31002520,%d0
-    move.l  %d0,(0x108,%a0) /* DACR0 - Base 0x31000000, Banks on 23 and up,
+#ifdef IRIVER_H100
+    move.l  #0x30002320,%d0 /* DACR0 - Base 0x30000000, Banks on 21 and up,
                                CAS latency 1, No refresh yet */
+    move.l  %d0,(0x108,%a0)
+    move.l  #0x00fc0001,%d0 /* Size: 16M */
+    move.l  %d0,(0x10c,%a0) /* DMR0 - 32Mb */
+#else
+    move.l  #0x31002520,%d0 /* DACR0 - Base 0x31000000, Banks on 23 and up,
+                               CAS latency 1, No refresh yet */
+    move.l  %d0,(0x108,%a0)
     move.l  #0x03fc0001,%d0 /* Size: 64M because of workaround above */
     move.l  %d0,(0x10c,%a0) /* DMR0 - 32Mb */
+#endif
 
     /* Precharge */
-    move.l  #0x31002528,%d0
-    move.l  %d0,(0x108,%a0) /* DACR0[IP] = 1, next access will issue a
+    move.l  #8,%d0
+    or.l  %d0,(0x108,%a0)   /* DACR0[IP] = 1, next access will issue a
                                Precharge command */
     move.l  #0xabcd1234,%d0
-    move.l  %d0,0x31000000  /* Issue precharge command */
+    move.l  %d0,0x30000000  /* Issue precharge command by writing somewhere
+                               in the SDRAM. (The 0x30000000 address is
+                               mirrored on 32Mbyte devices so it works on
+                               all models.) */
 
     /* Let it refresh */
     move.l  #1000,%d0
@@ -220,19 +236,19 @@ irq_handler:
     bne     .delayloop
         
     /* Refresh */
-    move.l  #0x3100a520,%d0
-    move.l  %d0,(0x108,%a0) /* Enable refresh */
+    move.l #0x8000,%d0
+    or.l   %d0,(0x108,%a0) /* Enable refresh */
 
     /* Mode Register init */
-    move.l  #0x3100a560,%d0 /* DACR0[IMRS] = 1, next access will set the
-                               Mode Register */
-    move.l  %d0,(0x108,%a0)
+    move.l #0x40,%d0       /* DACR0[IMRS] = 1, next access will set the
+                              Mode Register */
+    or.l  %d0,(0x108,%a0)
 
     move.l  #0xabcd1234,%d0
-    move.l  %d0,0x31000800  /* A12=1 means CASL=1 (a0 is not connected) */
+    move.l  %d0,0x30000800 /* A12=1 means CASL=1 (a0 is not connected) */
 
-    move.l  #0x3100a520,%d0 /* Back to normal, the DRAM is now ready */
-    move.l  %d0,(0x108,%a0)
+    move.l  #0xffffffbf,%d0
+    and.l  %d0,(0x108,%a0)  /* Back to normal, the DRAM is now ready */
 #endif
 
     /* Invalicate cache */
@@ -244,7 +260,11 @@ irq_handler:
     movec.l %d0,%cacr
 
     /* Cache enabled in SDRAM only, buffered writes enabled */
+#ifdef IRIVER_H100
+    move.l  #0x3003c020,%d0
+#else
     move.l  #0x3103c020,%d0
+#endif
     movec.l %d0,%acr0
     moveq.l #0,%d0
     movec.l %d0,%acr1
