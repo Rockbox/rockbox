@@ -481,17 +481,17 @@ int lcd_remote_getstringsize(const unsigned char *str, int *w, int *h)
 
 static void setpixel(int x, int y)
 {
-    REMOTE_DRAW_PIXEL(x, y);
+    lcd_remote_framebuffer[y>>3][x] |= 1 << (y & 7);
 }
 
 static void clearpixel(int x, int y)
 {
-    REMOTE_CLEAR_PIXEL(x, y);
+    lcd_remote_framebuffer[y>>3][x] &= ~(1 << (y & 7));
 }
 
 static void flippixel(int x, int y)
 {
-    REMOTE_INVERT_PIXEL(x, y);
+    lcd_remote_framebuffer[y>>3][x] ^= 1 << (y & 7);
 }
 
 static void nopixel(int x, int y)

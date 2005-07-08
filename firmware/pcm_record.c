@@ -328,7 +328,7 @@ void pcmrec_callback(bool flush)
             if (y < 2) y=2;
             if (y >= LCD_REMOTE_HEIGHT-2) y = LCD_REMOTE_HEIGHT-2;
     
-            REMOTE_DRAW_PIXEL(x,y);
+            lcd_remote_drawpixel(x,y);
             
             offset += (EACH_BUFFER_SIZE/2) / LCD_REMOTE_WIDTH;  
         }

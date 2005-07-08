@@ -126,10 +126,6 @@ typedef void lcd_blockfunc_type(unsigned char *address, unsigned mask, unsigned 
 
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
 
-#define DRAW_PIXEL(x,y) lcd_framebuffer[(y)>>3][(x)] |= (1<<((y)&7))
-#define CLEAR_PIXEL(x,y) lcd_framebuffer[(y)>>3][(x)] &= ~(1<<((y)&7))
-#define INVERT_PIXEL(x,y) lcd_framebuffer[(y)>>3][(x)] ^= (1<<((y)&7))
-
 /* Memory copy of display bitmap */
 #if LCD_DEPTH == 1
 extern unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];

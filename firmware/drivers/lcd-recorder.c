@@ -371,17 +371,17 @@ int lcd_getstringsize(const unsigned char *str, int *w, int *h)
 
 static void setpixel(int x, int y)
 {
-    DRAW_PIXEL(x, y);
+    lcd_framebuffer[y>>3][x] |= 1 << (y & 7);
 }
 
 static void clearpixel(int x, int y)
 {
-    CLEAR_PIXEL(x, y);
+    lcd_framebuffer[y>>3][x] &= ~(1 << (y & 7));
 }
 
 static void flippixel(int x, int y)
 {
-    INVERT_PIXEL(x, y);
+    lcd_framebuffer[y>>3][x] ^= 1 << (y & 7);
 }
 
 static void nopixel(int x, int y)

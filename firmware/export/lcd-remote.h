@@ -26,10 +26,6 @@
 
 #ifdef HAVE_REMOTE_LCD
 
-#define REMOTE_DRAW_PIXEL(x,y)	 lcd_remote_framebuffer[(y)>>3][(x)] |= (1<<((y)&7))
-#define REMOTE_CLEAR_PIXEL(x,y)	 lcd_remote_framebuffer[(y)>>3][(x)] &= ~(1<<((y)&7))
-#define REMOTE_INVERT_PIXEL(x,y) lcd_remote_framebuffer[(y)>>3][(x)] ^= (1<<((y)&7))
-
 #define STYLE_DEFAULT 0
 #define STYLE_INVERT  1
 
