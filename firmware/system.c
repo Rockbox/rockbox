@@ -502,6 +502,14 @@ void system_init(void)
                   : : : "d0");
 }
 
+#ifdef IRIVER_H100
+#define MAX_REFRESH_TIMER 56
+#define NORMAL_REFRESH_TIMER 20
+#else
+#define MAX_REFRESH_TIMER 28
+#define NORMAL_REFRESH_TIMER 10
+#endif
+
 void set_cpu_frequency (long) __attribute__ ((section (".icode")));
 void set_cpu_frequency(long frequency)
 {
@@ -516,7 +524,7 @@ void set_cpu_frequency(long frequency)
         CSCR1 = 0x00002580; /* LCD: 9 wait states */
         while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
                                             This may take up to 10ms! */
-        DCR = (DCR & ~0x01ff) | 28;   /* Refresh timer */
+        DCR = (DCR & ~0x01ff) | MAX_REFRESH_TIMER;   /* Refresh timer */
         cpu_frequency = CPUFREQ_MAX;
         tick_start(1000/HZ);
         IDECONFIG1 = 0x106000 | (5 << 10); /* BUFEN2 enable + CS2Pre/CS2Post */
@@ -535,7 +543,7 @@ void set_cpu_frequency(long frequency)
         CSCR1 = 0x00000980; /* LCD: 2 wait states */
         while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
                                             This may take up to 10ms! */
-        DCR = (DCR & ~0x01ff) | 10;   /* Refresh timer */
+        DCR = (DCR & ~0x01ff) | NORMAL_REFRESH_TIMER;   /* Refresh timer */
         cpu_frequency = CPUFREQ_NORMAL;
         tick_start(1000/HZ);
         IDECONFIG1 = 0x106000 | (5 << 10); /* BUFEN2 enable + CS2Pre/CS2Post */
