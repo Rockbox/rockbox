@@ -82,7 +82,7 @@ unsigned char adc_scan(int channel);
 unsigned short adc_read(int channel);
 void adc_init(void);
 
-#ifdef IRIVER_H120
+#ifdef IRIVER_H100_SERIES
 unsigned char adc_scan(int channel);
 #endif
 
