@@ -59,7 +59,7 @@ XrmOptionDescRec options [] = {
 char *progclass = "rockboxui";
 
 char *defaults [] = {
-#ifdef IRIVER_H100
+#ifdef IRIVER_H100_SERIES
     ".background: lightblue",
 #elif defined ARCHOS_GMINI120
     ".background: royalblue",

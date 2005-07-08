@@ -75,8 +75,8 @@ typedef unsigned short wchar_t;
 #define UI_LCD_WIDTH                112
 #define UI_LCD_HEIGHT               64 // (80 for real aspect)
 
-#elif defined(IRIVER_H100)
-#define UI_TITLE                    "iriver H100"
+#elif defined(IRIVER_H100_SERIES)
+#define UI_TITLE                    "iriver H1x0"
 #define UI_WIDTH                    379 // width of GUI window
 #define UI_HEIGHT                   508 // height of GUI window
 #define UI_LCD_BGCOLOR              90, 145, 90 // bkgnd color of LCD (no backlight)
