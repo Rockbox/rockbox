@@ -665,7 +665,7 @@ if ($db) {
     #### Build filename offset info
     my $l=$fileindex;
     my %filenamepos;
-    for $f (sort keys %entries) {
+    for $f (sort {uc($a) cmp uc($b)} keys %entries) {
         $filenamepos{$f}= $l;
 	$l += $fileentrysize;
     }
@@ -710,7 +710,7 @@ if ($db) {
     #### TABLE of file names ###
     # path1
 
-    for (sort {uc($a) cmp uc($b)} %entries) {
+    for $f (sort {uc($a) cmp uc($b)} %entries) {
         my $str = $f."\x00" x ($maxfilelen- length($f));
 	my $id3 = $entries{$f}; 
         print DB $str;
