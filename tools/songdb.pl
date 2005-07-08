@@ -710,14 +710,14 @@ if ($db) {
     #### TABLE of file names ###
     # path1
 
-    for $f (sort keys %entries) {
+    for (sort {uc($a) cmp uc($b)} %entries) {
         my $str = $f."\x00" x ($maxfilelen- length($f));
 	my $id3 = $entries{$f}; 
         print DB $str;
         #print STDERR "CRC: ".."\n";
         dumpint($id3->{'FILECRC'});    # CRC32 of the song data
         dumpint($id3->{'songoffset'}); # offset to song data
-        dumpint(-1); # what's this for?
+        dumpint(-1); # offset to rundb data. always set to -1. this is updated by rockbox code on the player.
     }
 
     close(DB);
