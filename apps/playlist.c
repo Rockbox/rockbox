@@ -651,7 +651,8 @@ static int add_directory_to_playlist(struct playlist_info* playlist,
             {
                 display_playlist_count(*count, count_str);
 
-                if (*count == PLAYLIST_DISPLAY_COUNT)
+                if (*count == PLAYLIST_DISPLAY_COUNT &&
+                    (audio_status() & AUDIO_STATUS_PLAY))
                     audio_flush_and_reload_tracks();
             }
             
@@ -2196,8 +2197,12 @@ int playlist_insert_track(struct playlist_info* playlist,
 
     if (result != -1)
     {
+        mutex_lock(&playlist->control_mutex);
         fsync(playlist->control_fd);
-        audio_flush_and_reload_tracks();
+        mutex_unlock(&playlist->control_mutex);
+
+        if (audio_status() & AUDIO_STATUS_PLAY)
+            audio_flush_and_reload_tracks();
     }
 
     return result;
@@ -2232,10 +2237,15 @@ int playlist_insert_directory(struct playlist_info* playlist,
 
     result = add_directory_to_playlist(playlist, dirname, &position, queue,
         &count, recurse);
+
+    mutex_lock(&playlist->control_mutex);
     fsync(playlist->control_fd);
+    mutex_unlock(&playlist->control_mutex);
 
     display_playlist_count(count, count_str);
-    audio_flush_and_reload_tracks();
+
+    if (audio_status() & AUDIO_STATUS_PLAY)
+        audio_flush_and_reload_tracks();
 
     return result;
 }
@@ -2327,7 +2337,8 @@ int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
             {
                 display_playlist_count(count, count_str);
 
-                if (count == PLAYLIST_DISPLAY_COUNT)
+                if (count == PLAYLIST_DISPLAY_COUNT &&
+                    (audio_status() & AUDIO_STATUS_PLAY))
                     audio_flush_and_reload_tracks();
             }
         }
@@ -2337,13 +2348,18 @@ int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
     }
 
     close(fd);
+
+    mutex_lock(&playlist->control_mutex);
     fsync(playlist->control_fd);
+    mutex_unlock(&playlist->control_mutex);
 
     if (temp_ptr)
         *temp_ptr = '/';
 
     display_playlist_count(count, count_str);
-    audio_flush_and_reload_tracks();
+
+    if (audio_status() & AUDIO_STATUS_PLAY)
+        audio_flush_and_reload_tracks();
 
     return result;
 }
@@ -2370,7 +2386,7 @@ int playlist_delete(struct playlist_info* playlist, int index)
 
     result = remove_track_from_playlist(playlist, index, true);
     
-    if (result != -1)
+    if (result != -1 && (audio_status() & AUDIO_STATUS_PLAY))
         audio_flush_and_reload_tracks();
 
     return result;
@@ -2458,8 +2474,12 @@ int playlist_move(struct playlist_info* playlist, int index, int new_index)
                 }
             }
 
+            mutex_lock(&playlist->control_mutex);
             fsync(playlist->control_fd);
-            audio_flush_and_reload_tracks();
+            mutex_unlock(&playlist->control_mutex);
+
+            if (audio_status() & AUDIO_STATUS_PLAY)
+                audio_flush_and_reload_tracks();
         }
     }
 
@@ -2479,7 +2499,7 @@ int playlist_randomise(struct playlist_info* playlist, unsigned int seed,
 
     result = randomise_playlist(playlist, seed, start_current, true);
 
-    if (result != -1)
+    if (result != -1 && (audio_status() & AUDIO_STATUS_PLAY))
         audio_flush_and_reload_tracks();
 
     return result;
@@ -2497,7 +2517,7 @@ int playlist_sort(struct playlist_info* playlist, bool start_current)
 
     result = sort_playlist(playlist, start_current, true);
 
-    if (result != -1)
+    if (result != -1 && (audio_status() & AUDIO_STATUS_PLAY))
         audio_flush_and_reload_tracks();
 
     return result;
