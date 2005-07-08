@@ -459,9 +459,11 @@ bool pcm_crossfade_init(void)
  */
 void pcm_flush_audio(void)
 {
-    if (crossfade_init || crossfade_active || !pcm_playing)
+    if (crossfade_init || crossfade_active || !pcm_playing) {
+        pcm_play_stop();
         return ;
-
+    }
+    
     crossfade_mode = CFM_FLUSH;
     crossfade_init = true;
 }

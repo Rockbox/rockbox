@@ -922,6 +922,8 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     /* Get track metadata if we don't already have it. */
     if (!tracks[track_widx].taginfo_ready) {
         if (!get_metadata(&tracks[track_widx],fd,trackname,v1first)) {
+            logf("Metadata error!");
+            tracks[track_widx].filesize = 0;
             close(fd);
             return false;
         }
@@ -973,8 +975,10 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         copy_n = MIN(size - i, copy_n);
         copy_n = MIN((int)fill_bytesleft, copy_n);
         rc = read(fd, &codecbuf[buf_widx], copy_n);
-        if (rc <= 0) {
+        if (rc < copy_n) {
             logf("File error!");
+            tracks[track_widx].filesize = 0;
+            tracks[track_widx].filerem = 0;
             close(fd);
             return false;
         }
@@ -1047,6 +1051,7 @@ void audio_play_start(int offset)
     } else {
         logf("Failure");
     }
+
     pcm_set_boost_mode(false);
 }
 
@@ -1127,11 +1132,12 @@ void initialize_buffer_fill(void)
     fill_bytesleft = codecbuflen - codecbufused;
     cur_ti->start_pos = ci.curpos;
 
+    pcm_set_boost_mode(true);
+    
     if (filling)
         return ;
 
     filling = true;
-    pcm_set_boost_mode(true);
     
     /* Calculate real track count after throwing away old tracks. */
     cur_idx = track_ridx;
@@ -1337,8 +1343,10 @@ bool codec_request_next_track_callback(void)
             yield();
             
         if (tracks[track_ridx].filesize == 0) {
-            logf("No more tracks");
+            logf("No more tracks [2]");
+            ci.stop_codec = true;
             new_track = 0;
+            queue_post(&codec_queue, CODEC_LOAD, 0);
             return false;
         }
     }
@@ -1346,9 +1354,10 @@ bool codec_request_next_track_callback(void)
     ci.reload_codec = false;
     
     if (cur_ti->id3.codectype != tracks[track_ridx].id3.codectype) {
+        logf("New codec:%d/%d", cur_ti->id3.codectype,
+                tracks[track_ridx].id3.codectype);
         if (--track_ridx < 0)
             track_ridx = MAX_TRACK-1;
-        logf("New codec");
         new_track = 0;
         return false;
     }
@@ -1386,7 +1395,7 @@ static void initiate_track_change(int peek_index)
             
     new_track = peek_index;
     ci.reload_codec = true;
-    
+
     /* Detect if disk is spinning.. */
     if (filling) {
         ci.stop_codec = true;
@@ -1396,8 +1405,8 @@ static void initiate_track_change(int peek_index)
     
     else if (!pcm_crossfade_init())
         pcm_flush_audio();
-    else
-        codec_track_changed();
+        
+    codec_track_changed();
 }
 
 void audio_thread(void)
@@ -1594,8 +1603,7 @@ void audio_play(int offset)
     ci.stop_codec = true;
     if (!pcm_crossfade_init())
         pcm_flush_audio();
-    else
-        codec_track_changed();
+    codec_track_changed();
         
     pcm_play_pause(true);
     paused = false;
@@ -1813,7 +1821,7 @@ void test_buffer_event(struct mp3entry *id3, bool last_track)
     (void)id3;
     (void)last_track;
     
-    logf("be:%d%s", last_track, id3->title);
+    logf("be:%d%s", last_track, id3->path);
 }
 
 void test_unbuffer_event(struct mp3entry *id3, bool last_track)
@@ -1821,7 +1829,7 @@ void test_unbuffer_event(struct mp3entry *id3, bool last_track)
     (void)id3;
     (void)last_track;
     
-    logf("ube:%d%s", last_track, id3->title);
+    logf("ube:%d%s", last_track, id3->path);
 }
 
 void audio_init(void)
