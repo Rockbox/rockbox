@@ -39,13 +39,29 @@ BITMAPINFO256 bmi =
 
 #ifdef HAVE_LCD_BITMAP
 
+#ifdef HAVE_REMOTE_LCD
+char remote_bitmap[LCD_REMOTE_HEIGHT][LCD_REMOTE_WIDTH];
+
+RGBQUAD remote_color_zero = {UI_REMOTE_BGCOLORLIGHT, 0};
+RGBQUAD remote_color_max  = {0, 0, 0, 0};
+
+BITMAPINFO256 remote_bmi =
+{
+  {sizeof (BITMAPINFOHEADER),
+   LCD_REMOTE_WIDTH, -LCD_REMOTE_HEIGHT, 1, 8,
+   BI_RGB, 0, 0, 0, 2, 2,
+  },
+  {} /* colour lookup table gets filled later */
+};
+#endif
+
 #if LCD_DEPTH == 1
 extern unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH]; /* the display */
 #elif LCD_DEPTH == 2
 extern unsigned char lcd_framebuffer[LCD_HEIGHT/4][LCD_WIDTH]; /* the display */
 #endif
 
-void lcd_update()
+void lcd_update(void)
 {
     int x, y;
     RECT r;
@@ -109,19 +125,67 @@ void lcd_update_rect(int x_start, int y_start,
     InvalidateRect (hGUIWnd, &r, FALSE);
 }
 
+#ifdef HAVE_REMOTE_LCD
+
+extern unsigned char lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH];
+
 void lcd_remote_update(void)
 {
-    
+    int x, y;
+    RECT r;
+
+    if (hGUIWnd == NULL)
+        _endthread ();
+
+    for (x = 0; x < LCD_REMOTE_WIDTH; x++)
+        for (y = 0; y < LCD_REMOTE_HEIGHT; y++)
+            remote_bitmap[y][x] = ((lcd_remote_framebuffer[y/8][x] >> (y & 7)) & 1);
+
+    /* Invalidate only the window part that actually did change */
+    GetClientRect (hGUIWnd, &r);
+    r.left = UI_REMOTE_POSX * r.right / UI_WIDTH;
+    r.top = UI_REMOTE_POSY * r.bottom / UI_HEIGHT;
+    r.right = (UI_REMOTE_POSX + UI_REMOTE_WIDTH) * r.right / UI_WIDTH;
+    r.bottom = (UI_REMOTE_POSY + UI_REMOTE_HEIGHT) * r.bottom / UI_HEIGHT;
+    InvalidateRect (hGUIWnd, &r, FALSE);
 }
 
 void lcd_remote_update_rect(int x_start, int y_start,
-                            int width, int height)
+                           int width, int height)
 {
-    (void)x_start;
-    (void)y_start;
-    (void)width;
-    (void)height;
+    int x, y;
+    int xmax, ymax;
+    RECT r;
+
+    ymax = y_start + height;
+    xmax = x_start + width;
+    
+    if (hGUIWnd == NULL)
+        _endthread ();
+
+    if(xmax > LCD_REMOTE_WIDTH)
+        xmax = LCD_REMOTE_WIDTH;
+    if(ymax >= LCD_REMOTE_HEIGHT)
+        ymax = LCD_REMOTE_HEIGHT;
+
+    for (x = x_start; x < xmax; x++)
+        for (y = y_start; y < ymax; y++)
+            remote_bitmap[y][x] = ((lcd_remote_framebuffer[y/8][x] >> (y & 7)) & 1);
+
+    /* Invalidate only the window part that actually did change */
+    GetClientRect (hGUIWnd, &r);
+    r.left   = (UI_REMOTE_POSX + (UI_REMOTE_WIDTH * x_start / LCD_REMOTE_WIDTH))
+               * r.right / UI_WIDTH;
+    r.top    = (UI_REMOTE_POSY + (UI_REMOTE_HEIGHT * y_start / LCD_REMOTE_HEIGHT))
+               * r.bottom / UI_HEIGHT;
+    r.right  = (UI_REMOTE_POSX + (UI_REMOTE_WIDTH * xmax / LCD_REMOTE_WIDTH))
+               * r.right / UI_WIDTH;
+    r.bottom = (UI_REMOTE_POSY + (UI_REMOTE_HEIGHT * ymax / LCD_REMOTE_HEIGHT))
+               * r.bottom / UI_HEIGHT;
+    InvalidateRect (hGUIWnd, &r, FALSE);
 }
+
+#endif /* HAVE_REMOTE_LCD */
 #endif /* HAVE_LCD_BITMAP */
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -131,7 +195,7 @@ extern bool lcd_display_redraw;
 extern unsigned char hardware_buffer_lcd[11][2];
 static unsigned char lcd_buffer_copy[11][2];
 
-void lcd_update()
+void lcd_update(void)
 {
     int x, y;
     bool changed = false;
@@ -224,11 +288,32 @@ void lcdcolors(int index, int count, RGBQUAD *start, RGBQUAD *end)
     }
 }
 
+#ifdef HAVE_REMOTE_LCD
+/* set a range of bitmap indices to a gradient from startcolour to endcolour */
+void lcdremotecolors(int index, int count, RGBQUAD *start, RGBQUAD *end)
+{
+    int i;
+    count--;
+    for (i = 0; i <= count; i++)
+    {
+        remote_bmi.bmiColors[i+index].rgbRed = start->rgbRed
+                              + (end->rgbRed - start->rgbRed) * i / count;
+        remote_bmi.bmiColors[i+index].rgbGreen = start->rgbGreen
+                              + (end->rgbGreen - start->rgbGreen) * i / count;
+        remote_bmi.bmiColors[i+index].rgbBlue = start->rgbBlue
+                              + (end->rgbBlue - start->rgbBlue) * i / count;
+    }
+}
+#endif
+
 /* initialise simulator lcd driver */
 void simlcdinit(void)
 {
     bmi.bmiHeader.biClrUsed = (1<<LCD_DEPTH);
     bmi.bmiHeader.biClrImportant = (1<<LCD_DEPTH);
     lcdcolors(0, (1<<LCD_DEPTH), &color_zero, &color_max);
+#ifdef HAVE_REMOTE_LCD
+    lcdremotecolors(0, (1<<LCD_REMOTE_DEPTH), &remote_color_zero, &remote_color_max);
+#endif
 }
 

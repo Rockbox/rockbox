@@ -182,7 +182,16 @@ LRESULT CALLBACK GUIWndProc (
                            0, 0, LCD_WIDTH, LCD_HEIGHT,
                            bitmap, (BITMAPINFO *) &bmi, DIB_RGB_COLORS,
                            SRCCOPY);
-            
+#ifdef HAVE_REMOTE_LCD
+            StretchDIBits (hDc,
+                           UI_REMOTE_POSX * r.right / UI_WIDTH,
+                           UI_REMOTE_POSY * r.bottom / UI_HEIGHT,
+                           UI_REMOTE_WIDTH * r.right / UI_WIDTH,
+                           UI_REMOTE_HEIGHT * r.bottom / UI_HEIGHT,
+                           0, 0, LCD_REMOTE_WIDTH, LCD_REMOTE_HEIGHT,
+                           remote_bitmap, (BITMAPINFO *) &remote_bmi,
+                           DIB_RGB_COLORS, SRCCOPY);
+#endif
             EndPaint (hWnd, &ps);
             return TRUE;
         }
@@ -240,7 +249,7 @@ BOOL GUIStartup ()
     if (hGUIWnd == NULL)
         return FALSE;
     
-    simlcdinit();    
+    simlcdinit();
 
     return TRUE;
 }

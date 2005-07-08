@@ -76,16 +76,22 @@ typedef unsigned short wchar_t;
 #define UI_LCD_HEIGHT               64 // (80 for real aspect)
 
 #elif defined(IRIVER_H100)
-#define UI_TITLE                    "iRiver H100"
-#define UI_WIDTH                    352 // width of GUI window
-#define UI_HEIGHT                   377 // height of GUI window
+#define UI_TITLE                    "iriver H100"
+#define UI_WIDTH                    379 // width of GUI window
+#define UI_HEIGHT                   508 // height of GUI window
 #define UI_LCD_BGCOLOR              90, 145, 90 // bkgnd color of LCD (no backlight)
 #define UI_LCD_BGCOLORLIGHT         230, 216, 173 // bkgnd color of LCD (backlight)
 #define UI_LCD_BLACK                0, 0, 0 // black
-#define UI_LCD_POSX                 96 // x position of lcd
-#define UI_LCD_POSY                 28 // y position of lcd
+#define UI_LCD_POSX                 109 // x position of lcd
+#define UI_LCD_POSY                 23 // y position of lcd
 #define UI_LCD_WIDTH                160
 #define UI_LCD_HEIGHT               128
+#define UI_REMOTE_BGCOLOR           90, 145, 90 // bkgnd of remote lcd (no bklight)
+#define UI_REMOTE_BGCOLORLIGHT      250, 180, 130 // bkgnd of remote lcd (bklight)
+#define UI_REMOTE_POSX              50  // x position of remote lcd
+#define UI_REMOTE_POSY              403 // y position of remote lcd
+#define UI_REMOTE_WIDTH             128
+#define UI_REMOTE_HEIGHT            64
 
 #elif defined(ARCHOS_GMINI120)
 #define UI_TITLE                    "Gmini 120"

@@ -33,6 +33,11 @@ typedef struct
 extern char            bitmap[LCD_HEIGHT][LCD_WIDTH]; // the ui display
 extern BITMAPINFO256   bmi; // bitmap information
 
+#ifdef HAVE_REMOTE_LCD
+extern char            remote_bitmap[LCD_REMOTE_HEIGHT][LCD_REMOTE_WIDTH];
+extern BITMAPINFO256   remote_bmi; // bitmap information
+#endif
+
 void simlcdinit(void);
 
 #endif // #ifndef __LCDWIN32_H__
