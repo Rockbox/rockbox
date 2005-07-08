@@ -13,6 +13,8 @@ CCOPTS="-W -Wall -O -nostdlib -ffreestanding -Wstrict-prototypes"
 
 use_logf="#undef ROCKBOX_HAS_LOGF"
 
+scriptver=`echo '$Revision$' | sed -e 's:\\$::g' -e 's/Revision: //'`
+
 #
 # Begin Function Definitions
 #
