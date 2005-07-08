@@ -14,7 +14,7 @@ OUTPUT_FORMAT(elf32-sh)
 #define STUBOFFSET 0
 #endif
 
-#if defined(IRIVER_H100) || defined(IRIVER_H300)
+#if defined(IRIVER_H120) || defined(IRIVER_H300)
 #define ARCH_IRIVER
 #endif
 

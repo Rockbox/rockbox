@@ -98,6 +98,8 @@
 #include "config-ondiofm.h"
 #elif defined(IRIVER_H100)
 #include "config-h100.h"
+#elif defined(IRIVER_H120)
+#include "config-h120.h"
 #elif defined(IRIVER_H300)
 #include "config-h300.h"
 #elif defined(ARCHOS_GMINI120)

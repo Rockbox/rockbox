@@ -116,7 +116,7 @@ irq_handler:
     pop r1, r0
     ret_irq
 
-#elif defined(IRIVER_H100)
+#elif defined(IRIVER_H100_SERIES)
     /* Platform:     iRiver H120/H140 */
     move.w  #0x2700,%sr
 

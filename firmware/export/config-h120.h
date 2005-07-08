@@ -1,5 +1,5 @@
 /*
- * This config file is for iriver iHP-100, iHP-110, iHP-115
+ * This config file is for iriver H120 and H140
  */
 #define IRIVER_H100_SERIES 1
 

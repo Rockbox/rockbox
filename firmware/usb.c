@@ -349,7 +349,7 @@ bool usb_detect(void)
 #ifdef USB_PLAYERSTYLE
     current_status = (PADR & 0x8000)?false:true;
 #endif
-#ifdef IRIVER_H100
+#ifdef IRIVER_H120
     current_status = (GPIO1_READ & 0x80)?true:false;
 #endif
 #ifdef USB_GMINISTYLE
@@ -428,7 +428,7 @@ void usb_init(void)
     usb_monitor_enabled = false;
     countdown = -1;
 
-#ifdef IRIVER_H100
+#ifdef IRIVER_H120
     GPIO_OUT &= ~0x01000000;      /* GPIO24 is the Cypress chip power */
     GPIO_ENABLE |= 0x01000000;
     GPIO_FUNCTION |= 0x01000000;
