@@ -1,3 +1,7 @@
+#if defined(MEM) && (MEM > 16)
+#error "re-run configure this just so wrong"
+#endif
+
 /*
  * This config file is for iriver iHP-100, iHP-110, iHP-115
  */
