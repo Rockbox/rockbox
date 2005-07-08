@@ -14,12 +14,16 @@ OUTPUT_FORMAT(elf32-sh)
 #define STUBOFFSET 0
 #endif
 
-#if defined(IRIVER_H120) || defined(IRIVER_H300)
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300)
 #define ARCH_IRIVER
 #endif
 
-#ifdef ARCH_IRIVER
+#if defined(IRIVER_H120) || defined(IRIVER_H300)
 #define DRAMORIG 0x31000000
+#define IRAMORIG 0x10010000
+#define IRAMSIZE 0x8000
+#elif defined(IRIVER_H100)
+#define DRAMORIG 0x30000000
 #define IRAMORIG 0x10010000
 #define IRAMSIZE 0x8000
 #else
