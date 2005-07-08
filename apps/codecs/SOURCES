@@ -1,4 +1,4 @@
-#ifdef IRIVER_H100
+#ifdef IRIVER_H100_SERIES
 vorbis.c
 mpa.c
 flac.c
