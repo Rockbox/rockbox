@@ -234,6 +234,9 @@ sub singlefile {
 
     if($file =~ /\.ogg$/i) {
         $hash = get_oggtag($file);
+
+        # CRC from 0 until we figure out exactly where the audio data starts!
+        $hash->{FILECRC} = crc32($file, 0);
     }
     else {
         $hash = get_mp3tag($file);
