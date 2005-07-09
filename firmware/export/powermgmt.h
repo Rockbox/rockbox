@@ -96,11 +96,11 @@ extern charge_state_type charge_state;
 # define CURRENT_USB         1  /* host powered in USB mode; avoid zero-div */
 # define CURRENT_BACKLIGHT   0  /* no backlight */
 #else            /* Values for HD based jukeboxes */
-# ifdef IRIVER_H100
+# ifdef IRIVER_H100_SERIES
 #  define CURRENT_NORMAL    80
 # else
 #  define CURRENT_NORMAL    145  /* usual current in mA when using the AJB including some disk/backlight/... activity */
-# endif /* not IRIVER_H100 */
+# endif /* not IRIVER_H100_SERIES */
 # define CURRENT_USB       500  /* usual current in mA in USB mode */
 # define CURRENT_BACKLIGHT  30  /* additional current when backlight is always on */
 
