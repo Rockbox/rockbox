@@ -45,6 +45,13 @@
 
 int line = 0;
 
+char *modelname[] =
+{
+    "H120/140",
+    "H110/115",
+    "H300"
+};
+
 int usb_screen(void)
 {
    return 0;
@@ -94,6 +101,7 @@ int load_firmware(void)
     int rc;
     int len;
     unsigned long chksum;
+    char model[5];
     unsigned long sum;
     int i;
     unsigned char *buf = (unsigned char *)DRAM_START;
@@ -116,6 +124,16 @@ int load_firmware(void)
         return -2;
 
     snprintf(str, 80, "Checksum: %x", chksum);
+    lcd_puts(0, line++, str);
+    lcd_update();
+
+    rc = read(fd, model, 4);
+    if(rc < 4)
+        return -3;
+
+    model[4] = 0;
+    
+    snprintf(str, 80, "Model name: %s", model);
     lcd_puts(0, line++, str);
     lcd_update();
 
@@ -197,12 +215,13 @@ void main(void)
 
     lcd_setfont(FONT_SYSFIXED);
 
-    snprintf(buf, 256, "Rockboot version 2");
+    snprintf(buf, 256, "Rockboot version 3");
     lcd_puts(0, line++, buf);
 
     sleep(HZ/50); /* Allow the button driver to check the buttons */
 
-    if(button_status() & BUTTON_REC) {
+    if(button_status() & BUTTON_REC ||
+       button_status() & BUTTON_RC_REC) {
         lcd_puts(0, 8, "Starting original firmware...");
         lcd_update();
         start_iriver_fw();
