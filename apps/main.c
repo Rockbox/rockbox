@@ -64,7 +64,7 @@
 #if (CONFIG_HWCODEC == MASNONE)
 #include "pcm_playback.h"
 #endif
-#if defined(IRIVER_H100) && !defined(SIMULATOR)
+#if defined(IRIVER_H100_SERIES) && !defined(SIMULATOR)
 #include "pcm_record.h"
 #endif
 
@@ -286,7 +286,7 @@ void init(void)
     pcm_init();
     sound_settings_apply();
 #endif
-#if defined(IRIVER_H100) && !defined(SIMULATOR)
+#if defined(IRIVER_H100_SERIES) && !defined(SIMULATOR)
     pcm_init_recording();
 #endif
     talk_init();
