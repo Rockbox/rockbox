@@ -581,15 +581,18 @@ fi
 
   case $option in
     [Bb])
-      if [ "$archos" = "h100" ]; then
-          extradefines="-DBOOTLOADER" # for target makefile symbol EXTRA_DEFINES
-          appsdir='\$(ROOTDIR)/bootloader'
-          apps="bootloader"
-      else
-          extradefines="-DBOOTLOADER -ffunction-sections -fdata-sections"
-          appsdir='\$(ROOTDIR)/flash/bootbox'
-          apps="bootbox"
-      fi
+      case $archos in
+          h100|h120)
+              extradefines="-DBOOTLOADER" # for target makefile symbol EXTRA_DEFINES
+              appsdir='\$(ROOTDIR)/bootloader'
+              apps="bootloader"
+              ;;
+          *)
+              extradefines="-DBOOTLOADER -ffunction-sections -fdata-sections"
+              appsdir='\$(ROOTDIR)/flash/bootbox'
+              apps="bootbox"
+              ;;
+      esac
       bootloader="1"
       echo "Bootloader build selected"
       ;;
