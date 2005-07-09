@@ -217,11 +217,12 @@ void main(void)
 
     snprintf(buf, 256, "Rockboot version 3");
     lcd_puts(0, line++, buf);
+    lcd_update();
 
     sleep(HZ/50); /* Allow the button driver to check the buttons */
 
-    if(button_status() & BUTTON_REC ||
-       button_status() & BUTTON_RC_REC) {
+    if(((button_status() & BUTTON_REC) == BUTTON_REC) ||
+       ((button_status() & BUTTON_RC_REC) == BUTTON_RC_REC)) {
         lcd_puts(0, 8, "Starting original firmware...");
         lcd_update();
         start_iriver_fw();
