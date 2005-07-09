@@ -7,7 +7,11 @@
 # $Id$
 #
 
+#value for crosscompiling on linux
 PREFIX=i586-mingw32msvc-
+
+#value for compiling on cygwin
+#PREFIX=
 
 TARGET = fwpatchernu.exe
 TARGETU = fwpatcher.exe
@@ -16,8 +20,14 @@ WINDRES = $(PREFIX)windres
 CC = $(PREFIX)gcc
 
 UNICODE = -DUNICODE -D_UNICODE
+
+#values for crosscompiling on linux
 CFLAGS = -I. -Os -s -fomit-frame-pointer
 LDFLAGS = -lmingw32 -mwindows -s
+
+#values for compiling on cygwin
+#CFLAGS = -I. -Os -s -fomit-frame-pointer -mno-cygwin -DNOCYGWIN
+#LDFLAGS = -lmingw32 -mwindows -s -mno-cygwin
 
 OBJS= resource.o iriver.o main.o md5.o
 OBJSU= resource.o iriveru.o mainu.o md5.o
@@ -30,7 +40,7 @@ $(TARGET): $(OBJS)
 $(TARGETU): $(OBJSU)
 	$(CC) $(LDFLAGS) $(OBJSU) -o $@
 
-resource.o: resource.rc bootloader.bin rockbox.ico
+resource.o: resource.rc bootloader-h100.bin bootloader-h120.bin rockbox.ico
 	$(WINDRES) -v $< $@
 
 iriveru.o: iriver.c iriver.h

@@ -39,9 +39,19 @@
 
 #define CTL_NUM 4
 
-/* include precalculated checksums */
-static char *checksums[] = {
-#include "checksums.h"
+struct sumpairs {
+    char *unpatched;
+    char *patched;
+};
+
+/* precalculated checksums for H110/H115 */
+static struct sumpairs h100pairs[] = {
+#include "h100sums.h"
+};
+
+/* precalculated checksums for H120/H140 */
+static struct sumpairs h120pairs[] = {
+#include "h120sums.h"
 };
 
 HICON rbicon;
@@ -156,6 +166,17 @@ int mkboot(TCHAR *infile, TCHAR *outfile, unsigned char *bldata, int bllen)
 
 /* end mkboot.c excerpt */
 
+int intable(char *md5, struct sumpairs *table, int len)
+{
+    int i;
+    for (i = 0; i < len; i++) {
+        if (strncmp(md5, table[i].unpatched, 32) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 int FileMD5(TCHAR *name, char *md5)
 {
     int i, read;
@@ -182,7 +203,7 @@ int FileMD5(TCHAR *name, char *md5)
     return 1;
 }
 
-int PatchFirmware()
+int PatchFirmware(int series, int table_entry)
 {
     TCHAR fn[MAX_PATH];
     TCHAR name1[MAX_PATH], name2[MAX_PATH], name3[MAX_PATH];
@@ -192,9 +213,19 @@ int PatchFirmware()
     unsigned char md5sum_str[256];
     DWORD blsize;
     int i;
-      
-    /* get pointer to bootloader.bin */
-    res = FindResource(NULL, MAKEINTRESOURCE(IDI_BOOTLOADER), TEXT("BIN"));
+    struct sumpairs *sums;
+    
+    /* get pointer to the correct bootloader.bin */
+    switch(series) {
+        case 100:
+            res = FindResource(NULL, MAKEINTRESOURCE(IDI_BOOTLOADERH100), TEXT("BIN"));
+            sums = &h100pairs[0];
+            break;
+        case 120:
+            res = FindResource(NULL, MAKEINTRESOURCE(IDI_BOOTLOADERH120), TEXT("BIN"));
+            sums = &h120pairs[0];
+            break;
+    }
     resload = LoadResource(NULL, res);
     bootloader = (unsigned char *)LockResource(resload);
     blsize = SizeofResource(NULL, res);
@@ -229,26 +260,24 @@ int PatchFirmware()
                    TEXT("Error"), MB_ICONERROR);
         goto error;
     }
-    for (i = 0; i < sizeof(checksums)/sizeof(char *); ++i) {
-        if (strncmp(checksums[i], md5sum_str, 32) == 0) {
-            /* delete temp files */
-            DeleteFile(name1);
-            DeleteFile(name2);
-            /* all is fine, rename the patched file to original name of the firmware */
-            if (DeleteFile(fn) && MoveFile(name3, fn)) {
-                return 1;
-            }
-            else {
-                DeleteFile(name3); /* Deleting a perfectly good firmware here really */
-                MessageBox(NULL,
-                           TEXT("Couldn't modify existing file.\n")
-                           TEXT("Check if file is write protected, then try again."),
-                           TEXT("Error"), MB_ICONERROR);
-                return 0;
-            }
+    if (strncmp(sums[table_entry].patched, md5sum_str, 32) == 0) {
+        /* delete temp files */
+        DeleteFile(name1);
+        DeleteFile(name2);
+        /* all is fine, rename the patched file to original name of the firmware */
+        if (DeleteFile(fn) && MoveFile(name3, fn)) {
+            return 1;
+        }
+        else {
+            DeleteFile(name3); /* Deleting a perfectly good firmware here really */
+            MessageBox(NULL,
+                       TEXT("Couldn't modify existing file.\n")
+                       TEXT("Check if file is write protected, then try again."),
+                       TEXT("Error"), MB_ICONERROR);
+            return 0;
         }
     }
-    MessageBox(NULL, 
+    MessageBox(NULL,
                TEXT("Checksum doesn't match known good patched firmware.\n")
                TEXT("Download another firmware image, then try again."),
                TEXT("Error"), MB_ICONERROR);
@@ -286,8 +315,10 @@ int FileDialog(TCHAR *fn)
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-   int i;
+   int i, series, table_entry;
+   unsigned char md5sum_str[256];
    switch (msg) {
+   TCHAR fn[MAX_PATH];
    case WM_CREATE:
        /* text label */
        controls[LABEL_FILENAME] = 
@@ -332,9 +363,31 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         }
         /* user pressed patch button */
         if (((HWND)lParam == controls[BUTTON_PATCH])) {
-            if (PatchFirmware())
-                MessageBox(NULL, TEXT("Firmware patched successfully"),
-                           TEXT("Success"), MB_OK);
+            GetWindowText(controls[EDIT_FILENAME], fn, MAX_PATH);
+            if (!FileMD5(fn, md5sum_str)) {
+                MessageBox(NULL, TEXT("Couldn't open firmware"), TEXT("Fail"), MB_OK);
+            }
+            else {
+                /* Check firmware against md5sums in h120sums and h100sums */
+                series = 0;
+                table_entry = intable(md5sum_str, &h120pairs[0],
+                                      sizeof(h120pairs)/sizeof(struct sumpairs));
+                if (table_entry >= 0) {
+                    series = 120;
+                }
+                else {
+                    table_entry = intable(md5sum_str, &h100pairs[0],
+                                          sizeof(h100pairs)/sizeof(struct sumpairs));
+                    if (table_entry >= 0)
+                        series = 100;
+                }
+                if (series == 0) {
+                    MessageBox(NULL, TEXT("Unrecognised firmware"), TEXT("Fail"), MB_OK);
+                }
+                else if (PatchFirmware(series, table_entry))
+                    MessageBox(NULL, TEXT("Firmware patched successfully"),
+                               TEXT("Success"), MB_OK);
+            }
         }
         break;
     case WM_USER:
