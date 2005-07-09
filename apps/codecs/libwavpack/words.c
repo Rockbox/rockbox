@@ -66,28 +66,6 @@
 
 ///////////////////////////// local table storage ////////////////////////////
 
-const ulong bitset [] = {
-    1L << 0, 1L << 1, 1L << 2, 1L << 3,
-    1L << 4, 1L << 5, 1L << 6, 1L << 7,
-    1L << 8, 1L << 9, 1L << 10, 1L << 11,
-    1L << 12, 1L << 13, 1L << 14, 1L << 15,
-    1L << 16, 1L << 17, 1L << 18, 1L << 19,
-    1L << 20, 1L << 21, 1L << 22, 1L << 23,
-    1L << 24, 1L << 25, 1L << 26, 1L << 27,
-    1L << 28, 1L << 29, 1L << 30, 1L << 31
-};
-
-const ulong bitmask [] = {
-    (1L << 0) - 1, (1L << 1) - 1, (1L << 2) - 1, (1L << 3) - 1,
-    (1L << 4) - 1, (1L << 5) - 1, (1L << 6) - 1, (1L << 7) - 1,
-    (1L << 8) - 1, (1L << 9) - 1, (1L << 10) - 1, (1L << 11) - 1,
-    (1L << 12) - 1, (1L << 13) - 1, (1L << 14) - 1, (1L << 15) - 1,
-    (1L << 16) - 1, (1L << 17) - 1, (1L << 18) - 1, (1L << 19) - 1,
-    (1L << 20) - 1, (1L << 21) - 1, (1L << 22) - 1, (1L << 23) - 1,
-    (1L << 24) - 1, (1L << 25) - 1, (1L << 26) - 1, (1L << 27) - 1,
-    (1L << 28) - 1, (1L << 29) - 1, (1L << 30) - 1, 0x7fffffff
-};
-
 const char nbits_table [] = {
     0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4,     // 0 - 15
     5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,     // 16 - 31
@@ -536,177 +514,183 @@ static ulong read_code (Bitstream *bs, ulong maxcode)
     return code;
 }
 
-// This function is an optimized version of send_word() that only handles
-// lossless (error_limit == 0). It does not return a value because it always
-// encodes the exact value passed.
-
-void send_word_lossless (WavpackStream *wps, long value, int chan)
+void send_words (long *buffer, int nsamples, ulong flags,
+                 struct words_data *w, Bitstream *bs)
 {
-    register struct words_data *w = &wps->w;
-    register struct entropy_data *c = w->c + chan;
-    int sign = (value < 0) ? 1 : 0;
-    ulong ones_count, low, high;
+    register struct entropy_data *c = w->c;
 
-    if (!(wps->w.c [0].median [0] & ~1) && !wps->w.holding_zero && !(wps->w.c [1].median [0] & ~1)) {
-        if (wps->w.zeros_acc) {
-            if (value)
-                flush_word (wps);
-            else {
-                wps->w.zeros_acc++;
-                return;
+    if (!(flags & MONO_FLAG))
+        nsamples *= 2;
+
+    while (nsamples--) {
+        long value = *buffer++;
+        int sign = (value < 0) ? 1 : 0;
+        ulong ones_count, low, high;
+
+        if (!(flags & MONO_FLAG))
+            c = w->c + (~nsamples & 1);
+
+        if (!(w->c [0].median [0] & ~1) && !w->holding_zero && !(w->c [1].median [0] & ~1)) {
+            if (w->zeros_acc) {
+                if (value)
+                    flush_word (w, bs);
+                else {
+                    w->zeros_acc++;
+                    continue;
+                }
             }
-        }
-        else if (value) {
-            putbit_0 (&wps->wvbits);
-        }
-        else {
-            CLEAR (wps->w.c [0].median);
-            CLEAR (wps->w.c [1].median);
-            wps->w.zeros_acc = 1;
-            return;
-        }
-    }
-
-    if (sign)
-        value = ~value;
-
-    if ((unsigned long) value < GET_MED (0)) {
-        ones_count = low = 0;
-        high = GET_MED (0) - 1;
-        DEC_MED0 ();
-    }
-    else {
-        low = GET_MED (0);
-        INC_MED0 ();
-
-        if (value - low < GET_MED (1)) {
-            ones_count = 1;
-            high = low + GET_MED (1) - 1;
-            DEC_MED1 ();
-        }
-        else {
-            low += GET_MED (1);
-            INC_MED1 ();
-
-            if (value - low < GET_MED (2)) {
-                ones_count = 2;
-                high = low + GET_MED (2) - 1;
-                DEC_MED2 ();
+            else if (value) {
+                putbit_0 (bs);
             }
             else {
-                ones_count = 2 + (value - low) / GET_MED (2);
-                low += (ones_count - 2) * GET_MED (2);
-                high = low + GET_MED (2) - 1;
-                INC_MED2 ();
+                CLEAR (w->c [0].median);
+                CLEAR (w->c [1].median);
+                w->zeros_acc = 1;
+                continue;
             }
         }
-    }
 
-    if (wps->w.holding_zero) {
-        if (ones_count)
-            wps->w.holding_one++;
+        if (sign)
+            value = ~value;
 
-        flush_word (wps);
+        if ((unsigned long) value < GET_MED (0)) {
+            ones_count = low = 0;
+            high = GET_MED (0) - 1;
+            DEC_MED0 ();
+        }
+        else {
+            low = GET_MED (0);
+            INC_MED0 ();
 
-        if (ones_count) {
-            wps->w.holding_zero = 1;
-            ones_count--;
+            if (value - low < GET_MED (1)) {
+                ones_count = 1;
+                high = low + GET_MED (1) - 1;
+                DEC_MED1 ();
+            }
+            else {
+                low += GET_MED (1);
+                INC_MED1 ();
+
+                if (value - low < GET_MED (2)) {
+                    ones_count = 2;
+                    high = low + GET_MED (2) - 1;
+                    DEC_MED2 ();
+                }
+                else {
+                    ones_count = 2 + (value - low) / GET_MED (2);
+                    low += (ones_count - 2) * GET_MED (2);
+                    high = low + GET_MED (2) - 1;
+                    INC_MED2 ();
+                }
+            }
+        }
+
+        if (w->holding_zero) {
+            if (ones_count)
+                w->holding_one++;
+
+            flush_word (w, bs);
+
+            if (ones_count) {
+                w->holding_zero = 1;
+                ones_count--;
+            }
+            else
+                w->holding_zero = 0;
         }
         else
-            wps->w.holding_zero = 0;
-    }
-    else
-        wps->w.holding_zero = 1;
+            w->holding_zero = 1;
 
-    wps->w.holding_one = ones_count * 2;
+        w->holding_one = ones_count * 2;
 
-    if (high != low) {  
-        ulong maxcode = high - low, code = value - low;
-        int bitcount = count_bits (maxcode);
-        ulong extras = bitset [bitcount] - maxcode - 1;
+        if (high != low) {  
+            ulong maxcode = high - low, code = value - low;
+            int bitcount = count_bits (maxcode);
+            ulong extras = (1L << bitcount) - maxcode - 1;
 
-        if (code < extras) {
-            wps->w.pend_data |= code << wps->w.pend_count;
-            wps->w.pend_count += bitcount - 1;
+            if (code < extras) {
+                w->pend_data |= code << w->pend_count;
+                w->pend_count += bitcount - 1;
+            }
+            else {
+                w->pend_data |= ((code + extras) >> 1) << w->pend_count;
+                w->pend_count += bitcount - 1;
+                w->pend_data |= ((code + extras) & 1) << w->pend_count++;
+            }
         }
-        else {
-            wps->w.pend_data |= ((code + extras) >> 1) << wps->w.pend_count;
-            wps->w.pend_count += bitcount - 1;
-            wps->w.pend_data |= ((code + extras) & 1) << wps->w.pend_count++;
-        }
+
+        w->pend_data |= ((long) sign << w->pend_count++);
+
+        if (!w->holding_zero)
+            flush_word (w, bs);
     }
-
-    wps->w.pend_data |= ((long) sign << wps->w.pend_count++);
-
-    if (!wps->w.holding_zero)
-        flush_word (wps);
 }
 
 // Used by send_word() and send_word_lossless() to actually send most the
 // accumulated data onto the bitstream. This is also called directly from
 // clients when all words have been sent.
 
-void flush_word (WavpackStream *wps)
+void flush_word (struct words_data *w, Bitstream *bs)
 {
-    if (wps->w.zeros_acc) {
-        int cbits = count_bits (wps->w.zeros_acc);
+    int cbits;
+
+    if (w->zeros_acc) {
+        cbits = count_bits (w->zeros_acc);
 
         while (cbits--) {
-            putbit_1 (&wps->wvbits);
+            putbit_1 (bs);
         }
 
-        putbit_0 (&wps->wvbits);
+        putbit_0 (bs);
 
-        while (wps->w.zeros_acc > 1) {
-            putbit (wps->w.zeros_acc & 1, &wps->wvbits);
-            wps->w.zeros_acc >>= 1;
+        while (w->zeros_acc > 1) {
+            putbit (w->zeros_acc & 1, bs);
+            w->zeros_acc >>= 1;
         }
 
-        wps->w.zeros_acc = 0;
+        w->zeros_acc = 0;
     }
 
-    if (wps->w.holding_one) {
-        if (wps->w.holding_one >= LIMIT_ONES) {
-            int cbits;
-
-            putbits ((1L << LIMIT_ONES) - 1, LIMIT_ONES + 1, &wps->wvbits);
-            wps->w.holding_one -= LIMIT_ONES;
-            cbits = count_bits (wps->w.holding_one);
+    if (w->holding_one) {
+        if (w->holding_one >= LIMIT_ONES) {
+            putbits ((1L << LIMIT_ONES) - 1, LIMIT_ONES + 1, bs);
+            w->holding_one -= LIMIT_ONES;
+            cbits = count_bits (w->holding_one);
 
             while (cbits--) {
-                putbit_1 (&wps->wvbits);
+                putbit_1 (bs);
             }
 
-            putbit_0 (&wps->wvbits);
+            putbit_0 (bs);
 
-            while (wps->w.holding_one > 1) {
-                putbit (wps->w.holding_one & 1, &wps->wvbits);
-                wps->w.holding_one >>= 1;
+            while (w->holding_one > 1) {
+                putbit (w->holding_one & 1, bs);
+                w->holding_one >>= 1;
             }
 
-            wps->w.holding_zero = 0;
+            w->holding_zero = 0;
         }
         else
-            putbits (bitmask [wps->w.holding_one], wps->w.holding_one, &wps->wvbits);
+            putbits ((1L << w->holding_one) - 1, w->holding_one, bs);
 
-        wps->w.holding_one = 0;
+        w->holding_one = 0;
     }
 
-    if (wps->w.holding_zero) {
-        putbit_0 (&wps->wvbits);
-        wps->w.holding_zero = 0;
+    if (w->holding_zero) {
+        putbit_0 (bs);
+        w->holding_zero = 0;
     }
 
-    if (wps->w.pend_count) {
+    if (w->pend_count) {
 
-        while (wps->w.pend_count > 24) {
-            putbit (wps->w.pend_data & 1, &wps->wvbits);
-            wps->w.pend_data >>= 1;
-            wps->w.pend_count--;
+        while (w->pend_count > 24) {
+            putbit (w->pend_data & 1, bs);
+            w->pend_data >>= 1;
+            w->pend_count--;
         }
 
-        putbits (wps->w.pend_data, wps->w.pend_count, &wps->wvbits);
-        wps->w.pend_data = wps->w.pend_count = 0;
+        putbits (w->pend_data, w->pend_count, bs);
+        w->pend_data = w->pend_count = 0;
     }
 }
 

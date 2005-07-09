@@ -234,10 +234,6 @@ typedef struct {
     WavpackStream stream;
     WavpackConfig config;
 
-    WavpackMetadata *metadata;
-    ulong metabytes;
-    int metacount;
-
     uchar *wrapper_data;
     int wrapper_bytes;
  
@@ -364,7 +360,9 @@ int check_crc_error (WavpackContext *wpc);
 // pack.c
 
 void pack_init (WavpackContext *wpc);
-int pack_block (WavpackContext *wpc, long *buffer);
+int pack_start_block (WavpackContext *wpc);
+int pack_samples (WavpackContext *wpc, long *buffer, ulong sample_count);
+int pack_finish_block (WavpackContext *wpc);
 
 // metadata.c stuff
 
@@ -381,8 +379,11 @@ void write_entropy_vars (WavpackStream *wps, WavpackMetadata *wpmd);
 int read_hybrid_profile (WavpackStream *wps, WavpackMetadata *wpmd);
 long get_words (long *buffer, int nsamples, ulong flags,
                 struct words_data *w, Bitstream *bs);
-void send_word_lossless (WavpackStream *wps, long value, int chan);
-void flush_word (WavpackStream *wps);
+void send_word_lossless (long value, int chan,
+                         struct words_data *w, Bitstream *bs);
+void send_words (long *buffer, int nsamples, ulong flags,
+                 struct words_data *w, Bitstream *bs);
+void flush_word (struct words_data *w, Bitstream *bs);
 int log2s (long value);
 long exp2s (int log);
 char store_weight (int weight);
@@ -421,9 +422,10 @@ int WavpackGetBytesPerSample (WavpackContext *wpc);
 int WavpackGetNumChannels (WavpackContext *wpc);
 int WavpackGetReducedChannels (WavpackContext *wpc);
 WavpackContext *WavpackOpenFileOutput (void);
-void WavpackSetOutputBuffer (WavpackContext *wpc, uchar *begin, uchar *end);
 int WavpackSetConfiguration (WavpackContext *wpc, WavpackConfig *config, ulong total_samples);
 void WavpackAddWrapper (WavpackContext *wpc, void *data, ulong bcount);
-ulong WavpackPackSamples (WavpackContext *wpc, long *sample_buffer, ulong sample_count);
+int WavpackStartBlock (WavpackContext *wpc, uchar *begin, uchar *end);
+int WavpackPackSamples (WavpackContext *wpc, long *sample_buffer, ulong sample_count);
+ulong WavpackFinishBlock (WavpackContext *wpc);
 
 

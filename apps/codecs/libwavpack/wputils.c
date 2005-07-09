@@ -365,17 +365,6 @@ WavpackContext *WavpackOpenFileOutput (void)
     return &wpc;
 }
 
-// Set the output buffer limits. This must be done before calling
-// WavpackPackSamples(), but also may be done afterward to adjust
-// the usable buffer. Note that writing CANNOT wrap in the buffer; the
-// entire output block must fit in the buffer.
-
-void WavpackSetOutputBuffer (WavpackContext *wpc, uchar *begin, uchar *end)
-{
-    wpc->stream.blockbuff = begin;
-    wpc->stream.blockend = end;
-}
-
 // Set configuration for writing WavPack files. This must be done before
 // sending any actual samples, however it is okay to send wrapper or other
 // metadata before calling this. The "config" structure contains the following
@@ -450,35 +439,33 @@ int WavpackSetConfiguration (WavpackContext *wpc, WavpackConfig *config, ulong t
     if (!(config->flags & CONFIG_JOINT_OVERRIDE) || (config->flags & CONFIG_JOINT_STEREO))
         flags |= JOINT_STEREO;
 
+    flags |= INITIAL_BLOCK | FINAL_BLOCK;
+
+    if (num_chans == 1) {
+        flags &= ~(JOINT_STEREO | CROSS_DECORR | HYBRID_BALANCE);
+        flags |= MONO_FLAG;
+    }
+
+    flags &= ~MAG_MASK;
+    flags += (1 << MAG_LSB) * ((flags & BYTES_STORED) * 8 + 7);
+
     memcpy (wps->wphdr.ckID, "wvpk", 4);
     wps->wphdr.ckSize = sizeof (WavpackHeader) - 8;
     wps->wphdr.total_samples = wpc->total_samples;
     wps->wphdr.version = 0x403;
     wps->wphdr.flags = flags;
 
-    wps->wphdr.flags |= INITIAL_BLOCK;
-    wps->wphdr.flags |= FINAL_BLOCK;
-
-    if (num_chans == 1) {
-        wps->wphdr.flags &= ~(JOINT_STEREO | CROSS_DECORR | HYBRID_BALANCE);
-        wps->wphdr.flags |= MONO_FLAG;
-    }
-
     pack_init (wpc);
     return TRUE;
 }
 
 // Add wrapper (currently RIFF only) to WavPack blocks. This should be called
-// before sending any audio samples for the RIFF header or after all samples
-// have been sent for any RIFF trailer. WavpackFlushSamples() should be called
-// between sending the last samples and calling this for trailer data to make
-// sure that headers and trailers don't get mixed up in very short files. If
-// the exact contents of the RIFF header are not known because, for example,
-// the file duration is uncertain or trailing chunks are possible, simply write
-// a "dummy" header of the correct length. When all data has been written it
-// will be possible to read the first block written and update the header
-// directly. An example of this can be found in the Audition filter. A
-// return of FALSE indicates an error.
+// before sending any audio samples. If the exact contents of the RIFF header
+// are not known because, for example, the file duration is uncertain or
+// trailing chunks are possible, simply write a "dummy" header of the correct
+// length. When all data has been written it will be possible to read the
+// first block written and update the header directly. An example of this can
+// be found in the Audition filter.
 
 void WavpackAddWrapper (WavpackContext *wpc, void *data, ulong bcount)
 {
@@ -486,38 +473,45 @@ void WavpackAddWrapper (WavpackContext *wpc, void *data, ulong bcount)
     wpc->wrapper_bytes = bcount;
 }
 
+// Start a WavPack block to be stored in the specified buffer. This must be
+// called before calling WavpackPackSamples(). Note that writing CANNOT wrap
+// in the buffer; the entire output block must fit in the buffer.
+
+int WavpackStartBlock (WavpackContext *wpc, uchar *begin, uchar *end)
+{
+    wpc->stream.blockbuff = begin;
+    wpc->stream.blockend = end;
+    return pack_start_block (wpc);
+}
+
 // Pack the specified samples. Samples must be stored in longs in the native
 // endian format of the executing processor. The number of samples specified
 // indicates composite samples (sometimes called "frames"). So, the actual
 // number of data points would be this "sample_count" times the number of
-// channels. Note that samples are accumulated here until enough exist to
-// create a complete WavPack block (or several blocks for multichannel audio).
-// If an application wants to break a block at a specific sample, then it must
-// simply call WavpackFlushSamples() to force an early termination. Completed
-// WavPack blocks are send to the function provided in the initial call to
-// WavpackOpenFileOutput(). A return of FALSE indicates an error.
+// channels. The caller must decide how many samples to place in each
+// WavPack block (1/2 second is common), but this function may be called as
+// many times as desired to build the final block (and performs the actual
+// compression during the call). A return of FALSE indicates an error.
 
-ulong WavpackPackSamples (WavpackContext *wpc, long *sample_buffer, ulong sample_count)
+int WavpackPackSamples (WavpackContext *wpc, long *sample_buffer, ulong sample_count)
+{
+    if (!sample_count || pack_samples (wpc, sample_buffer, sample_count))
+        return TRUE;
+
+    strcpy_loc (wpc->error_message, "output buffer overflowed!");
+    return FALSE;
+}
+
+// Finish the WavPack block being built, returning the total size of the
+// block in bytes. Note that the possible conversion of the WavPack header to
+// little-endian takes place here.
+
+ulong WavpackFinishBlock (WavpackContext *wpc)
 {
     WavpackStream *wps = &wpc->stream;
-    ulong flags = wps->wphdr.flags;
     ulong bcount;
-    int result;
 
-    flags &= ~MAG_MASK;
-    flags += (1 << MAG_LSB) * ((flags & BYTES_STORED) * 8 + 7);
-
-    wps->wphdr.block_index = wps->sample_index;
-    wps->wphdr.block_samples = sample_count;
-    wps->wphdr.flags = flags;
-
-    result = pack_block (wpc, sample_buffer);
-
-    if (!result) {
-        strcpy_loc (wpc->error_message, "output buffer overflowed!");
-        return 0;
-    }
-
+    pack_finish_block (wpc);
     bcount = ((WavpackHeader *) wps->blockbuff)->ckSize + 8;
     native_to_little_endian ((WavpackHeader *) wps->blockbuff, WavpackHeaderFormat);
 

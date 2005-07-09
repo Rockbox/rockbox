@@ -92,6 +92,10 @@ static void wvupdate (long start_tick,
 #endif
 }
 
+#define TEMP_SAMPLES 4096
+
+static long temp_buffer [TEMP_SAMPLES] IDATA_ATTR;
+
 static int wav2wv (char *filename)
 {
     int in_fd, out_fd, num_chans, error = false, last_buttons;
@@ -144,7 +148,6 @@ static int wav2wv (char *filename)
     }
 
     wpc = WavpackOpenFileOutput ();
-    WavpackSetOutputBuffer (wpc, output_buffer, output_buffer + 0x100000);
 
     rb->memset (&config, 0, sizeof (config));
     config.bits_per_sample = 16;
@@ -152,6 +155,8 @@ static int wav2wv (char *filename)
     config.sample_rate = native_header.SampleRate;
     num_chans = config.num_channels = native_header.NumChannels;
 	total_samples = native_header.data_ckSize / native_header.BlockAlign;
+
+//  config.flags |= CONFIG_HIGH_FLAG;
 
     if (!WavpackSetConfiguration (wpc, &config, total_samples)) {
         rb->splash(HZ*2, true, "internal error!");
@@ -178,7 +183,7 @@ static int wav2wv (char *filename)
     wvupdate (start_tick, native_header.SampleRate, total_samples, 0, 0, 0);
 
     for (samples_remaining = total_samples; samples_remaining;) {
-        unsigned long samples_count, bytes_count;
+        unsigned long samples_count, samples_to_pack, bytes_count;
         int cnt, buttons;
         long value, *lp;
         char *cp;
@@ -197,33 +202,48 @@ static int wav2wv (char *filename)
         }
 
         total_bytes_read += bytes_count;
-        cp = (char *) input_buffer + bytes_count;
-        lp = input_buffer + samples_count * num_chans;
-        cnt = samples_count;
+        WavpackStartBlock (wpc, output_buffer, output_buffer + 0x100000);
+        samples_to_pack = samples_count;
+        cp = (char *) input_buffer;
 
-        if (num_chans == 2)
-            while (cnt--) {
-                value = *--cp << 8;
-                value += *--cp & 0xff;
-                *--lp = value;
-                value = *--cp << 8;
-                value += *--cp & 0xff;
-                *--lp = value;
-            } 
-        else
-            while (cnt--) {
-                value = *--cp << 8;
-                value += *--cp & 0xff;
-                *--lp = value;
-            } 
+        while (samples_to_pack) {
+            unsigned long samples_this_pass = TEMP_SAMPLES / num_chans;
 
-        bytes_count = WavpackPackSamples (wpc, input_buffer, samples_count);
+            if (samples_this_pass > samples_to_pack)
+                samples_this_pass = samples_to_pack;
 
-        if (!bytes_count) {
-            rb->splash(HZ*2, true, "internal error!");
-            error = true;
-            break;
+            lp = temp_buffer;
+            cnt = samples_this_pass;
+
+            if (num_chans == 2)
+                while (cnt--) {
+                    value = *cp++ & 0xff;
+                    value += *cp++ << 8;
+                    *lp++ = value;
+                    value = *cp++ & 0xff;
+                    value += *cp++ << 8;
+                    *lp++ = value;
+                } 
+            else
+                while (cnt--) {
+                    value = *cp++ & 0xff;
+                    value += *cp++ << 8;
+                    *lp++ = value;
+                } 
+
+            if (!WavpackPackSamples (wpc, temp_buffer, samples_this_pass)) {
+                rb->splash(HZ*2, true, "internal error!");
+                error = true;
+                break;
+            }
+
+            samples_to_pack -= samples_this_pass;
         }
+
+        if (error)
+            break;
+
+        bytes_count = WavpackFinishBlock (wpc);
 
         if (rb->write (out_fd, output_buffer, bytes_count) != (long) bytes_count) {
             rb->splash(HZ*2, true, "could not write file!");

@@ -28,7 +28,7 @@
 // values indicate cross channel decorrelation (in stereo only).
 
 static const char default_terms [] = { 18,18,2,3,-2,0 };
-static const char high_terms [] = { 18,18,2,3,-2,18,2,4,7,5,3,6,8,-1,18,2,0 };
+static const char high_terms [] = { 18,18,2,3,-2,18,2,4,7,5,3,6,0 };
 static const char fast_terms [] = { 17,17,0 };
 
 ///////////////////////////// executable code ////////////////////////////////
@@ -205,56 +205,6 @@ static void write_config_info (WavpackContext *wpc, WavpackMetadata *wpmd)
 }
 
 // Pack an entire block of samples (either mono or stereo) into a completed
-// WavPack block. This function is actually a shell for pack_samples() and
-// performs tasks like handling any shift required by the format, preprocessing
-// of floating point data or integer data over 24 bits wide, and implementing
-// the "extra" mode (via the extra?.c modules). It is assumed that there is
-// sufficient space for the completed block at "wps->blockbuff" and that
-// "wps->blockend" points to the end of the available space. A return value of
-// FALSE indicates an error.
-
-static int pack_samples (WavpackContext *wpc, long *buffer);
-
-int pack_block (WavpackContext *wpc, long *buffer)
-{
-    WavpackStream *wps = &wpc->stream;
-    ulong flags = wps->wphdr.flags, sflags = wps->wphdr.flags;
-    ulong sample_count = wps->wphdr.block_samples;
-
-    if (flags & SHIFT_MASK) {
-        int shift = (flags & SHIFT_MASK) >> SHIFT_LSB;
-        int mag = (flags & MAG_MASK) >> MAG_LSB;
-        ulong cnt = sample_count;
-        long *ptr = buffer;
-
-        if (flags & MONO_FLAG)
-            while (cnt--)
-                *ptr++ >>= shift;
-        else
-            while (cnt--) {
-                *ptr++ >>= shift;
-                *ptr++ >>= shift;
-            }
-
-        if ((mag -= shift) < 0)
-            flags &= ~MAG_MASK;
-        else
-            flags -= (1 << MAG_LSB) * shift;
-
-        wps->wphdr.flags = flags;
-    }
-
-    if (!pack_samples (wpc, buffer)) {
-        wps->wphdr.flags = sflags;
-        return FALSE;
-    }
-    else {
-        wps->wphdr.flags = sflags;
-        return TRUE;
-    }
-}
-
-// Pack an entire block of samples (either mono or stereo) into a completed
 // WavPack block. It is assumed that there is sufficient space for the
 // completed block at "wps->blockbuff" and that "wps->blockend" points to the
 // end of the available space. A return value of FALSE indicates an error.
@@ -265,20 +215,17 @@ int pack_block (WavpackContext *wpc, long *buffer)
 // the caller must look at the ckSize field of the written WavpackHeader, NOT
 // the one in the WavpackStream.
 
-static int pack_samples (WavpackContext *wpc, long *buffer)
+int pack_start_block (WavpackContext *wpc)
 {
     WavpackStream *wps = &wpc->stream;
-    ulong sample_count = wps->wphdr.block_samples;
-    ulong flags = wps->wphdr.flags, data_count;
-    struct decorr_pass *dpp;
     WavpackMetadata wpmd;
-    int tcount, m = 0;
-    ulong crc, i;
-    long *bptr;
 
-    crc = 0xffffffff;
-    wps->wphdr.ckSize = sizeof (WavpackHeader) - 8;
     memcpy (wps->blockbuff, &wps->wphdr, sizeof (WavpackHeader));
+
+    ((WavpackHeader *) wps->blockbuff)->ckSize = sizeof (WavpackHeader) - 8;
+    ((WavpackHeader *) wps->blockbuff)->block_index = wps->sample_index;
+    ((WavpackHeader *) wps->blockbuff)->block_samples = 0;
+    ((WavpackHeader *) wps->blockbuff)->crc = 0xffffffff;
 
     if (wpc->wrapper_bytes) {
         wpmd.id = ID_RIFF_HEADER;
@@ -289,9 +236,6 @@ static int pack_samples (WavpackContext *wpc, long *buffer)
         wpc->wrapper_data = NULL;
         wpc->wrapper_bytes = 0;
     }
-
-    if (!sample_count)
-        return TRUE;
 
     write_decorr_terms (wps, &wpmd);
     copy_metadata (&wpmd, wps->blockbuff, wps->blockend);
@@ -309,7 +253,7 @@ static int pack_samples (WavpackContext *wpc, long *buffer)
     copy_metadata (&wpmd, wps->blockbuff, wps->blockend);
     free_metadata (&wpmd);
 
-    if ((flags & INITIAL_BLOCK) && !wps->sample_index) {
+    if ((wps->wphdr.flags & INITIAL_BLOCK) && !wps->sample_index) {
         write_config_info (wpc, &wpmd);
         copy_metadata (&wpmd, wps->blockbuff, wps->blockend);
         free_metadata (&wpmd);
@@ -317,13 +261,37 @@ static int pack_samples (WavpackContext *wpc, long *buffer)
 
     bs_open_write (&wps->wvbits, wps->blockbuff + ((WavpackHeader *) wps->blockbuff)->ckSize + 12, wps->blockend);
 
+    return TRUE;
+}
+
+static void decorr_stereo_pass (struct decorr_pass *dpp, long *bptr, long *eptr, int m);
+static void decorr_stereo_pass_18 (struct decorr_pass *dpp, long *bptr, long *eptr);
+static void decorr_stereo_pass_17 (struct decorr_pass *dpp, long *bptr, long *eptr);
+static void decorr_stereo_pass_m2 (struct decorr_pass *dpp, long *bptr, long *eptr);
+
+int pack_samples (WavpackContext *wpc, long *buffer, ulong sample_count)
+{
+    WavpackStream *wps = &wpc->stream;
+    ulong flags = wps->wphdr.flags;
+    struct decorr_pass *dpp;
+    long *bptr, *eptr;
+    int tcount, m;
+    ulong crc;
+
+    if (!sample_count)
+        return TRUE;
+
+    eptr = buffer + sample_count * ((flags & MONO_FLAG) ? 1 : 2);
+    m = ((WavpackHeader *) wps->blockbuff)->block_samples & (MAX_TERM - 1);
+    crc = ((WavpackHeader *) wps->blockbuff)->crc;
+
     /////////////////////// handle lossless mono mode /////////////////////////
 
     if (!(flags & HYBRID_FLAG) && (flags & MONO_FLAG))
-        for (bptr = buffer, i = 0; i < sample_count; ++i) {
+        for (bptr = buffer; bptr < eptr;) {
             long code;
 
-            crc = crc * 3 + (code = *bptr++);
+            crc = crc * 3 + (code = *bptr);
 
             for (tcount = wps->num_terms, dpp = wps->decorr_passes; tcount--; dpp++) {
                 long sam;
@@ -347,68 +315,123 @@ static int pack_samples (WavpackContext *wpc, long *buffer)
             }
 
             m = (m + 1) & (MAX_TERM - 1);
-            send_word_lossless (wps, code, 0);
+            *bptr++ = code;
         }
 
     //////////////////// handle the lossless stereo mode //////////////////////
 
-    else if (!(flags & HYBRID_FLAG) && !(flags & MONO_FLAG))
-        for (bptr = buffer, i = 0; i < sample_count; ++i, bptr += 2) {
-            long left, right, sam_A, sam_B;
-
-            crc = crc * 3 + (left = bptr [0]);
-            crc = crc * 3 + (right = bptr [1]);
-
-            if (flags & JOINT_STEREO)
-                right += ((left -= right) >> 1);
-
-            for (tcount = wps->num_terms, dpp = wps->decorr_passes; tcount-- ; dpp++) {
-                if (dpp->term > 0) {
-                    if (dpp->term > MAX_TERM) {
-                        if (dpp->term & 1) {
-                            sam_A = 2 * dpp->samples_A [0] - dpp->samples_A [1];
-                            sam_B = 2 * dpp->samples_B [0] - dpp->samples_B [1];
-                        }
-                        else {
-                            sam_A = (3 * dpp->samples_A [0] - dpp->samples_A [1]) >> 1;
-                            sam_B = (3 * dpp->samples_B [0] - dpp->samples_B [1]) >> 1;
-                        }
-
-                        dpp->samples_A [1] = dpp->samples_A [0];
-                        dpp->samples_B [1] = dpp->samples_B [0];
-                        dpp->samples_A [0] = left;
-                        dpp->samples_B [0] = right;
-                    }
-                    else {
-                        int k = (m + dpp->term) & (MAX_TERM - 1);
-
-                        sam_A = dpp->samples_A [m];
-                        sam_B = dpp->samples_B [m];
-                        dpp->samples_A [k] = left;
-                        dpp->samples_B [k] = right;
-                    }
-
-                    left -= apply_weight_i (dpp->weight_A, sam_A);
-                    right -= apply_weight_i (dpp->weight_B, sam_B);
-                    update_weight (dpp->weight_A, 2, sam_A, left);
-                    update_weight (dpp->weight_B, 2, sam_B, right);
-                }
-                else {
-                    sam_A = (dpp->term == -2) ? right : dpp->samples_A [0];
-                    sam_B = (dpp->term == -1) ? left : dpp->samples_B [0];
-                    dpp->samples_A [0] = right;
-                    dpp->samples_B [0] = left;
-                    left -= apply_weight_i (dpp->weight_A, sam_A);
-                    right -= apply_weight_i (dpp->weight_B, sam_B);
-                    update_weight_clip (dpp->weight_A, 2, sam_A, left);
-                    update_weight_clip (dpp->weight_B, 2, sam_B, right);
-                }
+    else if (!(flags & HYBRID_FLAG) && !(flags & MONO_FLAG)) {
+        if (flags & JOINT_STEREO)
+            for (bptr = buffer; bptr < eptr; bptr += 2) {
+                crc = crc * 9 + (bptr [0] * 3) + bptr [1];
+                bptr [1] += ((bptr [0] -= bptr [1]) >> 1);
             }
+        else
+            for (bptr = buffer; bptr < eptr; bptr += 2)
+                crc = crc * 9 + (bptr [0] * 3) + bptr [1];
 
-            m = (m + 1) & (MAX_TERM - 1);
-            send_word_lossless (wps, left, 0);
-            send_word_lossless (wps, right, 1);
+        for (tcount = wps->num_terms, dpp = wps->decorr_passes; tcount-- ; dpp++) {
+            if (dpp->term == 17)
+                decorr_stereo_pass_17 (dpp, buffer, eptr);
+            else if (dpp->term == 18)
+                decorr_stereo_pass_18 (dpp, buffer, eptr);
+            else if (dpp->term >= 1 && dpp->term <= 7)
+                decorr_stereo_pass (dpp, buffer, eptr, m);
+            else if (dpp->term == -2)
+                decorr_stereo_pass_m2 (dpp, buffer, eptr);
         }
+    }
+
+    send_words (buffer, sample_count, flags, &wps->w, &wps->wvbits);
+    ((WavpackHeader *) wps->blockbuff)->crc = crc;
+    ((WavpackHeader *) wps->blockbuff)->block_samples += sample_count;
+    wps->sample_index += sample_count;
+
+    return TRUE;
+}
+
+static void decorr_stereo_pass (struct decorr_pass *dpp, long *bptr, long *eptr, int m)
+{
+    int k = (m + dpp->term) & (MAX_TERM - 1);
+    long sam;
+
+    while (bptr < eptr) {
+        dpp->samples_A [k] = bptr [0];
+        bptr [0] -= apply_weight_i (dpp->weight_A, (sam = dpp->samples_A [m]));
+        update_weight (dpp->weight_A, 2, sam, bptr [0]);
+        bptr++;
+        dpp->samples_B [k] = bptr [0];
+        bptr [0] -= apply_weight_i (dpp->weight_B, (sam = dpp->samples_B [m]));
+        update_weight (dpp->weight_B, 2, sam, bptr [0]);
+        bptr++;
+        m = (m + 1) & (MAX_TERM - 1);
+        k = (k + 1) & (MAX_TERM - 1);
+    }
+}
+
+static void decorr_stereo_pass_18 (struct decorr_pass *dpp, long *bptr, long *eptr)
+{
+    long sam;
+
+    while (bptr < eptr) {
+        sam = (3 * dpp->samples_A [0] - dpp->samples_A [1]) >> 1;
+        dpp->samples_A [1] = dpp->samples_A [0];
+        dpp->samples_A [0] = bptr [0];
+        bptr [0] -= apply_weight_i (dpp->weight_A, sam);
+        update_weight (dpp->weight_A, 2, sam, bptr [0]);
+        bptr++;
+        sam = (3 * dpp->samples_B [0] - dpp->samples_B [1]) >> 1;
+        dpp->samples_B [1] = dpp->samples_B [0];
+        dpp->samples_B [0] = bptr [0];
+        bptr [0] -= apply_weight_i (dpp->weight_B, sam);
+        update_weight (dpp->weight_B, 2, sam, bptr [0]);
+        bptr++;
+    }
+}
+
+static void decorr_stereo_pass_m2 (struct decorr_pass *dpp, long *bptr, long *eptr)
+{
+    long sam_A, sam_B;
+
+    for (; bptr < eptr; bptr += 2) {
+        sam_A = bptr [1];
+        sam_B = dpp->samples_B [0];
+        dpp->samples_B [0] = bptr [0];
+        bptr [0] -= apply_weight_i (dpp->weight_A, sam_A);
+        update_weight_clip (dpp->weight_A, 2, sam_A, bptr [0]);
+        bptr [1] -= apply_weight_i (dpp->weight_B, sam_B);
+        update_weight_clip (dpp->weight_B, 2, sam_B, bptr [1]);
+    }
+}
+
+static void decorr_stereo_pass_17 (struct decorr_pass *dpp, long *bptr, long *eptr)
+{
+    long sam;
+
+    while (bptr < eptr) {
+		sam = 2 * dpp->samples_A [0] - dpp->samples_A [1];
+        dpp->samples_A [1] = dpp->samples_A [0];
+        dpp->samples_A [0] = bptr [0];
+        bptr [0] -= apply_weight_i (dpp->weight_A, sam);
+        update_weight (dpp->weight_A, 2, sam, bptr [0]);
+        bptr++;
+		sam = 2 * dpp->samples_B [0] - dpp->samples_B [1];
+        dpp->samples_B [1] = dpp->samples_B [0];
+        dpp->samples_B [0] = bptr [0];
+        bptr [0] -= apply_weight_i (dpp->weight_B, sam);
+        update_weight (dpp->weight_B, 2, sam, bptr [0]);
+        bptr++;
+    }
+}
+
+int pack_finish_block (WavpackContext *wpc)
+{
+    WavpackStream *wps = &wpc->stream;
+    struct decorr_pass *dpp;
+    ulong data_count;
+    int tcount, m;
+
+    m = ((WavpackHeader *) wps->blockbuff)->block_samples & (MAX_TERM - 1);
 
     if (m)
         for (tcount = wps->num_terms, dpp = wps->decorr_passes; tcount--; dpp++)
@@ -426,7 +449,7 @@ static int pack_samples (WavpackContext *wpc, long *buffer)
                 }
             }
 
-    flush_word (wps);
+    flush_word (&wps->w, &wps->wvbits);
     data_count = bs_close_write (&wps->wvbits);
 
     if (data_count) {
@@ -443,8 +466,5 @@ static int pack_samples (WavpackContext *wpc, long *buffer)
             return FALSE;
     }
 
-    ((WavpackHeader *) wps->blockbuff)->crc = crc;
-
-    wps->sample_index += sample_count;
     return TRUE;
 }
