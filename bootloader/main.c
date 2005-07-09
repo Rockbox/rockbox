@@ -35,12 +35,12 @@
 #include "power.h"
 #include "file.h"
 
+#define DRAM_START 0x31000000
+
 #ifdef IRIVER_H100
 #define MODEL_NUMBER 1
-#define DRAM_START 0x30000000
 #else
 #define MODEL_NUMBER 0
-#define DRAM_START 0x31000000
 #endif
 
 int line = 0;
