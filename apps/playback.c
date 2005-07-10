@@ -1648,11 +1648,15 @@ void audio_stop(void)
 void audio_pause(void)
 {
     queue_post(&audio_queue, AUDIO_PAUSE, 0);
+    while (!paused && playing)
+        yield();
 }
 
 void audio_resume(void)
 {
     queue_post(&audio_queue, AUDIO_RESUME, 0);
+    while (paused && playing)
+        yield();
 }
 
 void audio_next(void)
