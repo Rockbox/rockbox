@@ -42,7 +42,11 @@
 #include "usb.h"
 #include "powermgmt.h"
 
-int line = 0;
+#ifdef BUTTON_OFF
+    static const int offbutton = BUTTON_OFF;
+#else
+    static const int offbutton = BUTTON_STOP;
+#endif
 
 void usb_screen(void)
 {
@@ -72,11 +76,6 @@ int charging_screen(void)
 {
     unsigned int button;
     int rc = 0;
-#ifdef BUTTON_OFF
-    const unsigned int offbutton = BUTTON_OFF;
-#else
-    const unsigned int offbutton = BUTTON_STOP;
-#endif
 
     ide_power_enable(false); /* power down the disk, else would be spinning */
 
@@ -119,6 +118,29 @@ int mmc_remove_request(void)
 }
 #endif /* HAVE_MMC */
 
+/* prompt user to plug USB and fix a problem */
+void prompt_usb(const char* msg1, const char* msg2)
+{
+    int button;
+    lcd_clear_display();
+    lcd_puts(0, 0, msg1);
+    lcd_puts(0, 1, msg2);
+#ifdef HAVE_LCD_BITMAP
+    lcd_puts(0, 2, "Insert USB cable");
+    lcd_puts(0, 3, "and fix it.");
+    lcd_update();
+#endif
+    do 
+    {
+        button = button_get(true);
+        if (button == offbutton)
+        {
+            power_off();
+        }
+    } while (button != SYS_USB_CONNECTED);
+    usb_screen();
+    system_reboot();
+}
 
 void main(void)
 {
@@ -178,31 +200,14 @@ void main(void)
     rc = disk_mount_all();
     if (rc<=0)
     {
-        lcd_clear_display();
-        lcd_puts(0, 0, "No partition");
-        lcd_puts(0, 1, "found.");
-#ifdef HAVE_LCD_BITMAP
-        lcd_puts(0, 2, "Insert USB cable");
-        lcd_puts(0, 3, "and fix it.");
-        lcd_update();
-#endif
-        while(button_get(true) != SYS_USB_CONNECTED) {};
-        usb_screen();
-        system_reboot();
+        prompt_usb("No partition", "found.");
     }
 
     {   // rolo the firmware
         static const char filename[] = "/" BOOTFILE; 
         rolo_load((char*)filename); /* won't return if started */
 
-        lcd_clear_display();
-        lcd_puts(0, 0, "No firmware");
-        lcd_puts(0, 1, filename);
-#ifdef HAVE_LCD_BITMAP
-        lcd_update();
-#endif
-        while(!(button_get(true) & BUTTON_REL));
-        system_reboot();
+        prompt_usb("No firmware", filename);
     }
 
 
