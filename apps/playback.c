@@ -831,6 +831,16 @@ bool read_next_metadata(void)
     int next_track;
     int status;
 
+    next_track = track_widx;
+    if (tracks[track_widx].taginfo_ready)
+        next_track++;
+        
+    if (next_track >= MAX_TRACK)
+        next_track -= MAX_TRACK;
+
+    if (tracks[next_track].taginfo_ready)
+        return true;
+        
     trackname = playlist_peek(last_peek_offset);
     if (!trackname)
         return false;
@@ -838,11 +848,7 @@ bool read_next_metadata(void)
     fd = open(trackname, O_RDONLY);
     if (fd < 0)
         return false;
-
-    next_track = track_ridx + 1;
-    if (next_track >= MAX_TRACK)
-        next_track -= MAX_TRACK;
-
+        
     /* Start buffer refilling also because we need to spin-up the disk. */
     filling = true;
     status = get_metadata(&tracks[next_track],fd,trackname,v1first);
@@ -1187,8 +1193,8 @@ void audio_check_buffer(void)
     if (audio_load_track(0, false, last_peek_offset)) {
         last_peek_offset++;
     } else if (tracks[track_widx].filerem == 0 || fill_bytesleft == 0) {
-        if (audio_next_track() == NULL)
-            read_next_metadata();
+        /* Read next unbuffered track's metadata as necessary. */
+        read_next_metadata();
             
         generate_postbuffer_events();
         filling = false;
