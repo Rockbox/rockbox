@@ -1436,7 +1436,8 @@ void audio_thread(void)
                 ci.stop_codec = true;
                 ci.reload_codec = false;
                 ci.seek_time = 0;
-                pcm_crossfade_init();
+                if (!pcm_crossfade_init())
+                    pcm_flush_audio();
                 audio_play_start((int)ev.data);
                 playlist_update_resume_info(audio_current_track());
                 break ;
@@ -1651,19 +1652,9 @@ void audio_prev(void)
 
 void audio_ff_rewind(int newpos)
 {
-    int counter;
-    
     logf("rewind: %d", newpos);
-    /* Keep playback paused until seek is complete. */
     if (playing) {
         ci.seek_time = newpos+1;
-        counter = 30;
-        pcm_flush_audio();
-        while (ci.seek_time) {
-            sleep(10);
-            if (counter-- == 0)
-                break ;
-        }
         pcm_play_stop();
     }
 }
