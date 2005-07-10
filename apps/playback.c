@@ -860,8 +860,10 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     int rc, i;
     int copy_n;
 
-    /* Stop buffer filling if there is no free track entries. */
-    if (track_count >= MAX_TRACK) {
+    /* Stop buffer filling if there is no free track entries.
+       Don't fill up the last track entry (we wan't to store next track
+       metadata there). */
+    if (track_count >= MAX_TRACK - 1) {
         fill_bytesleft = 0;
         return false;
     }
@@ -1185,7 +1187,7 @@ void audio_check_buffer(void)
     if (audio_load_track(0, false, last_peek_offset)) {
         last_peek_offset++;
     } else if (tracks[track_widx].filerem == 0 || fill_bytesleft == 0) {
-        if (track_count <= 1)
+        if (audio_next_track() == NULL)
             read_next_metadata();
             
         generate_postbuffer_events();
@@ -1193,10 +1195,8 @@ void audio_check_buffer(void)
         conf_bufferlimit = 0;
         pcm_set_boost_mode(false);
             
-        if (playing) {
-            ata_flush();
+        if (playing)
             ata_sleep();
-        }
     }
 }
 
