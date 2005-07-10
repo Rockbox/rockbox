@@ -1036,7 +1036,7 @@ void audio_play_start(int offset)
         close(current_fd);
         current_fd = -1;
     }
-    
+
     memset(&tracks, 0, sizeof(struct track_info) * MAX_TRACK);
     sound_set(SOUND_VOLUME, global_settings.volume);
     track_count = 0;
@@ -1367,7 +1367,7 @@ bool codec_request_next_track_callback(void)
             logf("No more tracks [2]");
             ci.stop_codec = true;
             new_track = 0;
-            queue_post(&codec_queue, CODEC_LOAD, 0);
+            queue_post(&audio_queue, AUDIO_PLAY, 0);
             return false;
         }
     }

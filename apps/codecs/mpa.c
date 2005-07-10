@@ -110,7 +110,7 @@ enum codec_status codec_start(struct codec_api* api)
     first_frame = false;
     file_end = 0;
     
-    while (!*ci->taginfo_ready)
+    while (!*ci->taginfo_ready && !ci->stop_codec)
         ci->yield();
   
     frequency_divider = ci->id3->frequency / 100;

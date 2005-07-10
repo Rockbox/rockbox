@@ -137,7 +137,7 @@ enum codec_status codec_start(struct codec_api* api)
         return CODEC_ERROR;
     }
 
-    while (!rb->taginfo_ready)
+    while (!*rb->taginfo_ready && !rb->stop_codec)
         rb->yield();
     
     if (rb->id3->frequency != NATIVE_FREQUENCY) {
