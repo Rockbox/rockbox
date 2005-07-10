@@ -331,7 +331,7 @@ struct codec_api {
 
 /* defined by the codec loader (codec.c) */
 #if CONFIG_HWCODEC == MASNONE
-int codec_load_ram(char* codecptr, size_t size, void* ptr2, size_t bufwrap);
+int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap);
 int codec_load_file(const char* codec);
 #endif
 

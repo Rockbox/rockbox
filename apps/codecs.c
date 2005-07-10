@@ -56,8 +56,9 @@
 #if CONFIG_HWCODEC == MASNONE
 static unsigned char codecbuf[CODEC_SIZE];
 #endif
-void *sim_codec_load(char *plugin, int *fd);
-void sim_codec_close(int fd);
+void *sim_codec_load_ram(char* codecptr, int size,
+        void* ptr2, int bufwrap, int *pd);
+void sim_codec_close(int pd);
 #else
 #define sim_codec_close(x)
 extern unsigned char codecbuf[];
@@ -245,11 +246,12 @@ struct codec_api ci = {
     memchr,
 };
 
-int codec_load_ram(char* codecptr, size_t size, void* ptr2, size_t bufwrap)
+int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap)
 {
     enum codec_status (*codec_start)(const struct codec_api* api);
-    int copy_n;
     int status;
+#ifndef SIMULATOR
+    int copy_n;
     
     if ((char *)&codecbuf[0] != codecptr) {
         /* zero out codec buffer to ensure a properly zeroed bss area */
@@ -265,8 +267,19 @@ int codec_load_ram(char* codecptr, size_t size, void* ptr2, size_t bufwrap)
     }
     codec_start = (void*)&codecbuf;
         
+#else /* SIMULATOR */
+    int pd;
+    
+    codec_start = sim_codec_load_ram(codecptr, size, ptr2, bufwrap, &pd);
+    if (pd < 0)
+        return CODEC_ERROR;
+#endif /* SIMULATOR */
+
     invalidate_icache();
     status = codec_start(&ci);
+#ifdef SIMULATOR
+    sim_codec_close(pd);
+#endif
     
     return status;
 }
@@ -294,7 +307,7 @@ int codec_load_file(const char *plugin)
         logf("Codec read error");
         return CODEC_ERROR;
     }
-        
+
     return codec_load_ram(codecbuf, (size_t)rc, NULL, 0);
 }
 

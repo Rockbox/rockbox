@@ -307,6 +307,78 @@ int sim_fsync(int fd)
 #include <dlfcn.h>
 #endif
 
+void *sim_codec_load_ram(char* codecptr, int size, 
+        void* ptr2, int bufwrap, int *pd_fd)
+{
+    void *pd;
+    char *path = "archos/_temp_codec.dll";
+    int (*codec_start)(void * api);
+    int fd;
+    int copy_n;
+#ifdef WIN32
+    char buf[256];
+#endif
+
+    /* We have to create the dynamic link library file from ram
+     * so we could simulate the codec loading.
+     */
+    *pd_fd = -1;
+    fd = open(path, O_WRONLY | O_CREAT, S_IRWXU);
+    if (fd < 0) {
+        DEBUGF("failed to open for write: %s\n", path);
+        return NULL;
+    }
+
+    if (bufwrap == 0)
+        bufwrap = size;
+        
+    copy_n = bufwrap < size ? bufwrap : size;
+    if (write(fd, codecptr, copy_n) != copy_n) {
+        DEBUGF("write failed");
+        return NULL;
+    }
+    size -= copy_n;
+    if (size > 0) {
+        if (write(fd, ptr2, size) != size) {
+            DEBUGF("write failed [2]");
+            return NULL;
+        }
+    }
+    close(fd);
+    
+    /* Now load the library. */
+    pd = dlopen(path, RTLD_NOW);
+    if (!pd) {
+        DEBUGF("failed to load %s\n", path); 
+#ifdef WIN32
+        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), 0,
+                      buf, sizeof buf, NULL);
+        DEBUGF("dlopen(%s): %s\n", path, buf);
+#else
+        DEBUGF("dlopen(%s): %s\n", path, dlerror());
+#endif
+        dlclose(pd);
+        return NULL;
+    }
+
+    codec_start = dlsym(pd, "codec_start");
+    if (!codec_start) {
+        codec_start = dlsym(pd, "_codec_start");
+        if (!codec_start) {
+            dlclose(pd);
+            return NULL;
+        }
+    }
+
+    *pd_fd = (int)pd;
+    return codec_start;
+}
+
+void sim_codec_close(int pd)
+{
+        dlclose((void *)pd);
+}
+
 void *sim_plugin_load(char *plugin, int *fd)
 {
     void* pd;

@@ -191,15 +191,16 @@ void pcm_flush_buffer(long length)
 
 void* pcm_request_buffer(long length, long *realsize)
 {
-    (void)length;
-    (void)realsize;
+    static char temp_audiobuffer[32768];
+
+    *realsize = MIN((int)sizeof(temp_audiobuffer), length);
     
-    return NULL;
+    return temp_audiobuffer;
 }
 
 void audiobuffer_add_event(void (*event_handler)(void))
 {
-    (void)event_handler;
+    event_handler();
 }
 
 unsigned int audiobuffer_get_latency()
@@ -1287,6 +1288,18 @@ void audio_change_track(void)
     queue_post(&codec_queue, CODEC_LOAD, 0);
 }
 
+static int get_codec_base_type(int type)
+{
+    switch (type) {
+        case AFMT_MPA_L1:
+        case AFMT_MPA_L2:
+        case AFMT_MPA_L3:
+            return AFMT_MPA_L3;
+    }
+
+    return type;
+}
+
 bool codec_request_next_track_callback(void)
 {
     if (ci.stop_codec || !playing)
@@ -1361,7 +1374,9 @@ bool codec_request_next_track_callback(void)
     
     ci.reload_codec = false;
     
-    if (cur_ti->id3.codectype != tracks[track_ridx].id3.codectype) {
+    /* Check if the next codec is the same file. */
+    if (get_codec_base_type(cur_ti->id3.codectype) !=
+        get_codec_base_type(tracks[track_ridx].id3.codectype)) {
         logf("New codec:%d/%d", cur_ti->id3.codectype,
                 tracks[track_ridx].id3.codectype);
         if (--track_ridx < 0)
@@ -1436,7 +1451,7 @@ void audio_thread(void)
                 ci.stop_codec = true;
                 ci.reload_codec = false;
                 ci.seek_time = 0;
-                if (!pcm_crossfade_init())
+                if (!pcm_crossfade_init() && !pcm_is_crossfade_active())
                     pcm_flush_audio();
                 audio_play_start((int)ev.data);
                 playlist_update_resume_info(audio_current_track());
