@@ -35,6 +35,8 @@ LINKFILE = $(OBJDIR)/linkage.lds
 MAXINFILE = $(OBJDIR)/romstart.temp
 MAXOUTFILE = $(OBJDIR)/romstart
 
+LIBROCKBOX = $(BUILDDIR)/librockbox.a
+
 all: $(BUILDDIR)/$(BINARY) $(FLASHFILE)
 
 dep: $(DEPFILE)
@@ -49,7 +51,7 @@ $(MAXOUTFILE):
 	@cat $(MAXINFILE) | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - > $(MAXOUTFILE)
 	@rm $(MAXINFILE)
 
-$(OBJDIR)/bootbox.elf : $(OBJS) $(LINKFILE) $(DEPFILE)
+$(OBJDIR)/bootbox.elf : $(OBJS) $(LINKFILE) $(DEPFILE) $(LIBROCKBOX)
 	@echo "LD bootbox.elf"
 	$(CC) $(GCCOPTS) -Wl,--gc-sections -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -L$(BUILDDIR)/firmware -lrockbox -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/bootbox.map
 
