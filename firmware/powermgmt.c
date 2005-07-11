@@ -443,6 +443,7 @@ static int runcurrent(void)
         current = CURRENT_USB;
     }
 
+#ifndef BOOTLOADER
     if ((backlight_get_timeout() == 1) /* LED always on */
 #ifdef HAVE_CHARGE_CTRL
         || (charger_inserted() && backlight_get_on_when_charging())
@@ -450,6 +451,7 @@ static int runcurrent(void)
        ) {
         current += CURRENT_BACKLIGHT;
     }
+#endif
 
     return(current);
 }
