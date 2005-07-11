@@ -58,7 +58,7 @@
 #include "ata_mmc.h"
 #endif
 #include "logfdisp.h"
-#if defined(IRIVER_H100) && !defined(SIMULATOR)
+#if defined(IRIVER_H100_SERIES) && !defined(SIMULATOR)
 extern bool pcm_rec_screen(void);
 #endif
 #if CONFIG_HWCODEC == MASNONE
@@ -1568,7 +1568,7 @@ bool debug_menu(void)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
         { "CPU frequency", dbg_cpufreq },
 #endif
-#if defined(IRIVER_H100) && !defined(SIMULATOR)
+#if defined(IRIVER_H100_SERIES) && !defined(SIMULATOR)
         { "PCM recording", pcm_rec_screen },
 #endif
 #if CONFIG_CPU == SH7034
