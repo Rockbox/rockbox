@@ -82,7 +82,7 @@ int charging_screen(void)
     do
     {
         button = button_get_w_tmo(HZ/2);
-        if (button == (BUTTON_ON | BUTTON_REL))
+        if (button == BUTTON_ON)
             rc = 2;
         else if (usb_detect())
             rc = 3;
