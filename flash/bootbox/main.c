@@ -42,12 +42,6 @@
 #include "usb.h"
 #include "powermgmt.h"
 
-#ifdef BUTTON_OFF
-    static const int offbutton = BUTTON_OFF;
-#else
-    static const int offbutton = BUTTON_STOP;
-#endif
-
 void usb_screen(void)
 {
     lcd_clear_display();
@@ -88,21 +82,12 @@ int charging_screen(void)
     do
     {
         button = button_get_w_tmo(HZ/2);
-#ifdef BUTTON_ON
         if (button == (BUTTON_ON | BUTTON_REL))
-#else
-        if (button == (BUTTON_RIGHT | BUTTON_REL))
-#endif
-            rc = 3;
-        else if (button == offbutton)
             rc = 2;
-        else
-        {
-            if (usb_detect())
-                rc = 4;
-            else if (!charger_inserted())
-                rc = 1;
-        }
+        else if (usb_detect())
+            rc = 3;
+        else if (!charger_inserted())
+            rc = 1;
     } while (!rc);
 
     return rc;
@@ -133,7 +118,7 @@ void prompt_usb(const char* msg1, const char* msg2)
     do 
     {
         button = button_get(true);
-        if (button == offbutton)
+        if (button == SYS_POWEROFF)
         {
             power_off();
         }
@@ -166,7 +151,7 @@ void main(void)
         )
     {
         rc = charging_screen(); /* display a "charging" screen */
-        if (rc == 1 || rc == 2)  /* charger removed or "Off/Stop" pressed */
+        if (rc == 1)            /* charger removed */
             power_off();
         /* "On" pressed or USB connected: proceed */
         show_logo();  /* again, to provide better visual feedback */

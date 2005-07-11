@@ -198,7 +198,7 @@ void init(void)
         )
     {
         rc = charging_screen(); /* display a "charging" screen */
-        if (rc == 1 || rc == 2)  /* charger removed or "Off/Stop" pressed */
+        if (rc == 1)            /* charger removed */
             power_off();
         /* "On" pressed or USB connected: proceed */
         show_logo();  /* again, to provide better visual feedback */

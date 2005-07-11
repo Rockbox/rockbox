@@ -339,11 +339,6 @@ int charging_screen(void)
 {
     unsigned int button;
     int rc = 0;
-#ifdef BUTTON_OFF
-    const unsigned int offbutton = BUTTON_OFF;
-#else
-    const unsigned int offbutton = BUTTON_STOP;
-#endif
 
     ide_power_enable(false); /* power down the disk, else would be spinning */
 
@@ -365,21 +360,12 @@ int charging_screen(void)
         status_draw(false);
         charging_display_info(true);
         button = button_get_w_tmo(HZ/3);
-#ifdef BUTTON_ON
-        if (button == (BUTTON_ON | BUTTON_REL))
-#else
-        if (button == (BUTTON_RIGHT | BUTTON_REL))
-#endif
-            rc = 3;
-        else if (button == offbutton)
+        if (button == BUTTON_ON)
             rc = 2;
-        else
-        {
-            if (usb_detect())
-                rc = 4;
-            else if (!charger_inserted())
-                rc = 1;
-        }
+        else if (usb_detect())
+            rc = 3;
+        else if (!charger_inserted())
+            rc = 1;
     } while (!rc);
 
 #ifdef HAVE_LCD_CHARCELLS
