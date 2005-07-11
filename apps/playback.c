@@ -1678,6 +1678,7 @@ void audio_ff_rewind(int newpos)
     if (playing) {
         ci.seek_time = newpos+1;
         pcm_play_stop();
+        paused = false;
     }
 }
 
