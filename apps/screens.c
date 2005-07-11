@@ -176,7 +176,7 @@ unsigned short adc_read(int channel)
 }
 #endif
 
-#ifdef HAVE_CHARGING
+#if defined(HAVE_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
 
 #ifdef HAVE_LCD_BITMAP
 void charging_display_info(bool animate)
@@ -373,7 +373,7 @@ int charging_screen(void)
 #endif
     return rc;
 }
-#endif /* HAVE_CHARGING */
+#endif /* HAVE_CHARGING && !HAVE_POWEROFF_WHILE_CHARGING */
 
 
 #if CONFIG_KEYPAD == RECORDER_PAD
