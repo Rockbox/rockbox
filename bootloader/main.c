@@ -183,6 +183,7 @@ void main(void)
     bool rc_on_button = false;
     bool on_button = false;
     int data;
+    int adc_battery, battery_voltage, batt_int, batt_frac;
 
     /* Read the buttons early */
 
@@ -197,6 +198,10 @@ void main(void)
     if ((data & 0x40) == 0)
         rc_on_button = true;
 
+    /* Backlight ON */
+    or_l(0x00020000, &GPIO1_ENABLE);
+    or_l(0x00020000, &GPIO1_FUNCTION);
+
     power_init();
     system_init();
     kernel_init();
@@ -205,6 +210,13 @@ void main(void)
     /* Set up waitstates for the peripherals */
     set_cpu_frequency(0); /* PLL off */
 #endif
+    
+    /* UDA1380 RESET */
+    GPIO_OUT |= (1<<29);
+    GPIO_ENABLE |= (1<<29);
+    GPIO_FUNCTION |= (1<<29);
+    sleep(HZ/100);
+    GPIO_OUT &= ~(1<<29);
     
     backlight_init();
     set_irq_level(0);
@@ -215,8 +227,7 @@ void main(void)
 
     lcd_setfont(FONT_SYSFIXED);
 
-    snprintf(buf, 256, "Rockboot version 3");
-    lcd_puts(0, line++, buf);
+    lcd_puts(0, line++, "Rockboot version CVS");
     lcd_update();
 
     sleep(HZ/50); /* Allow the button driver to check the buttons */
@@ -239,18 +250,34 @@ void main(void)
         power_off();
     }
 
+    adc_battery = adc_read(ADC_BATTERY);
+
+    battery_voltage = (adc_battery * BATTERY_SCALE_FACTOR) / 10000;
+    batt_int = battery_voltage / 100;
+    batt_frac = battery_voltage % 100;
+    
+    snprintf(buf, 32, "Batt: %d.%02dV", batt_int, batt_frac);
+    lcd_puts(0, line++, buf);
+    lcd_update();
+
+    if(battery_voltage <= 300) {
+        line++;
+        lcd_puts(0, line++, "WARNING! BATTERY LOW!!");
+        lcd_update();
+        sleep(HZ*2);
+    }
+    
     rc = ata_init();
     if(rc)
     {
-#ifdef HAVE_LCD_BITMAP
         char str[32];
         lcd_clear_display();
         snprintf(str, 31, "ATA error: %d", rc);
-        lcd_puts(0, 1, str);
+        lcd_puts(0, line++, str);
+        lcd_puts(0, line++, "Insert USB cable and press");
+        lcd_puts(0, line++, "a button");
         lcd_update();
         while(!(button_get(true) & BUTTON_REL));
-#endif
-        panicf("ata: %d", rc);
     }
 
     /* A hack to enter USB mode without using the USB thread */
