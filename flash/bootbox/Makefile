@@ -82,6 +82,6 @@ clean:
 	@echo "cleaning bootbox"
 	@-rm -f $(OBJS) $(BUILDDIR)/$(BINARY) $(OBJDIR)/bootbox.asm $(OBJDIR)/rockbox.ucl \
 	$(OBJDIR)/bootbox.bin $(OBJDIR)/bootbox.elf $(OBJDIR)/*.map \
-	$(LINKFILE) $(MAXOUTFILE) $(DEPFILE)
+	$(LINKFILE) $(MAXOUTFILE) $(DEPFILE) $(FLASHFILE)
 
 -include $(DEPFILE)
