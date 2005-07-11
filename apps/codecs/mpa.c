@@ -111,7 +111,7 @@ enum codec_status codec_start(struct codec_api* api)
     file_end = 0;
     
     while (!*ci->taginfo_ready && !ci->stop_codec)
-        ci->yield();
+        ci->sleep(1);
   
     frequency_divider = ci->id3->frequency / 100;
     ci->configure(DSP_SET_FREQUENCY, (int *)ci->id3->frequency);

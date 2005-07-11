@@ -478,7 +478,7 @@ void pcm_flush_fillpos(void)
         while (!pcm_play_add_chunk(&audiobuffer[audiobuffer_pos],
                                    copy_n, pcm_event_handler)) {
             pcm_boost(false);
-            yield();
+            sleep(1);
             /* This is a fatal error situation that should never happen. */
             if (!pcm_playing) {
                 logf("pcm_flush_fillpos error");
@@ -588,7 +588,7 @@ void* pcm_request_buffer(long length, long *realsize)
     while (audiobuffer_free < length + audiobuffer_fillpos
            + CHUNK_SIZE && !crossfade_active) {
         pcm_boost(false);
-        yield();
+        sleep(1);
     }
     
     if (crossfade_active) {

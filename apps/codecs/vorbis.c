@@ -179,7 +179,7 @@ enum codec_status codec_start(struct codec_api* api)
     }
 
     while (!*rb->taginfo_ready && !rb->stop_codec)
-        rb->yield();
+        rb->sleep(1);
 
     /* Create a decoder instance */
     callbacks.read_func=read_handler;
@@ -263,7 +263,7 @@ enum codec_status codec_start(struct codec_api* api)
             DEBUGF("Error decoding frame\n");
         } else {
             while (!rb->audiobuffer_insert(pcmbuf, n)) {
-                rb->yield();
+                rb->sleep(1);
                 if ( rb->seek_time ) {
                    /* Hmmm, a seek was requested. Throw out the
                     * buffer and go back to the top of the loop.

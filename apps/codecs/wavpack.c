@@ -75,7 +75,7 @@ enum codec_status codec_start(struct codec_api* api)
         return CODEC_ERROR;
 
     while (!*rb->taginfo_ready && !ci->stop_codec)
-        ci->yield();
+        ci->sleep(1);
         
     if (ci->id3->frequency != NATIVE_FREQUENCY) {
         ci->configure(DSP_SET_FREQUENCY, (long *)(ci->id3->frequency));
@@ -190,7 +190,7 @@ enum codec_status codec_start(struct codec_api* api)
             break;
 
         while (!ci->audiobuffer_insert ((char *) temp_buffer, nsamples * 4))
-            rb->yield ();
+            rb->sleep (1);
 
         ci->set_elapsed (WavpackGetSampleIndex (wpc) / sr_100 * 10);
     }
