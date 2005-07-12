@@ -18,6 +18,7 @@
  ****************************************************************************/
 #include "config.h"
 #include "cpu.h"
+#include "system.h"
 #include "kernel.h"
 #include "thread.h"
 #include "adc.h"
@@ -111,11 +112,11 @@ static unsigned char adcdata[NUM_ADC_CHANNELS];
 
 #define CS_LO  GPIO_OUT &= ~0x80
 #define CS_HI  GPIO_OUT |= 0x80
-#define CLK_LO GPIO_OUT &= ~0x00400000
-#define CLK_HI GPIO_OUT |= 0x00400000
+#define CLK_LO and_l(~0x00400000, &GPIO_OUT)
+#define CLK_HI or_l(0x00400000, &GPIO_OUT)
 #define DO     (GPIO_READ & 0x80000000)
-#define DI_LO  GPIO_OUT &= ~0x00200000
-#define DI_HI  GPIO_OUT |= 0x00200000
+#define DI_LO  and_l(~0x00200000, &GPIO_OUT)
+#define DI_HI  or_l(0x00200000, &GPIO_OUT)
 
 /* delay loop */
 #define DELAY   do { int _x; for(_x=0;_x<10;_x++);} while (0)
@@ -194,13 +195,13 @@ static void adc_tick(void)
 
 void adc_init(void)
 {
-    GPIO_FUNCTION |= 0x80600080; /* GPIO7:  CS
-                                    GPIO21: Data In (to the ADC)
-                                    GPIO22: CLK
-                                    GPIO31: Data Out (from the ADC) */
-    GPIO_ENABLE |= 0x00600080;
-    GPIO_OUT |= 0x80;         /* CS high */
-    GPIO_OUT &= ~0x00400000;  /* CLK low */
+    or_l(0x80600080, &GPIO_FUNCTION); /* GPIO7:  CS
+                                         GPIO21: Data In (to the ADC)
+                                         GPIO22: CLK
+                                         GPIO31: Data Out (from the ADC) */
+    or_l(0x00600080, &GPIO_ENABLE);
+    or_l(0x80, &GPIO_OUT);          /* CS high */
+    and_l(~0x00400000, &GPIO_OUT);  /* CLK low */
 
     adc_scan(ADC_BATTERY);
     

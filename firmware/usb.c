@@ -134,13 +134,13 @@ static void usb_enable(bool on)
     if(on)
     {
         /* Power on the Cypress chip */
-        GPIO_OUT |= 0x01000000;
+        or_l(0x01000000, &GPIO_OUT);
         sleep(2);
     }
     else
     {
         /* Power off the Cypress chip */
-        GPIO_OUT &= ~0x01000000;        
+        and_l(~0x01000000, &GPIO_OUT);
     }
     
 #else
@@ -429,11 +429,11 @@ void usb_init(void)
     countdown = -1;
 
 #ifdef USB_IRIVERSTYLE
-    GPIO_OUT &= ~0x01000000;      /* GPIO24 is the Cypress chip power */
-    GPIO_ENABLE |= 0x01000000;
-    GPIO_FUNCTION |= 0x01000000;
+    and_l(~0x01000000, &GPIO_OUT);     /* GPIO24 is the Cypress chip power */
+    or_l(0x01000000, &GPIO_ENABLE);
+    or_l(0x01000000, &GPIO_FUNCTION);
     
-    GPIO1_FUNCTION |= 0x00000080; /* GPIO39 is the USB detect input */
+    or_l(0x00000080, &GPIO1_FUNCTION); /* GPIO39 is the USB detect input */
 #endif
 
     usb_enable(false);

@@ -60,16 +60,16 @@ int radio_get_status(void)
 void power_init(void)
 {
 #if CONFIG_CPU == MCF5249
-    GPIO1_OUT |= 0x00080000;
-    GPIO1_ENABLE |= 0x00080000;
-    GPIO1_FUNCTION |= 0x00080000;
+    or_l(0x00080000, &GPIO1_OUT);
+    or_l(0x00080000, &GPIO1_ENABLE);
+    or_l(0x00080000, &GPIO1_FUNCTION);
 
 #ifdef BOOTLOADER
     /* Hard drive power default = off in bootloader*/
-    GPIO_OUT |= 0x80000000;
+    or_l(0x80000000, &GPIO_OUT);
 #endif
-    GPIO_ENABLE |= 0x80000000;
-    GPIO_FUNCTION |= 0x80000000;
+    or_l(0x80000000, &GPIO_ENABLE);
+    or_l(0x80000000, &GPIO_FUNCTION);
 #ifdef HAVE_SPDIF_POWER
     spdif_power_enable(false);
 #endif
@@ -139,17 +139,17 @@ void charger_enable(bool on)
 #ifdef HAVE_SPDIF_POWER
 void spdif_power_enable(bool on)
 {
-    GPIO1_FUNCTION |= 0x01000000;
-    GPIO1_ENABLE |= 0x01000000;
+    or_l(0x01000000, &GPIO1_FUNCTION);
+    or_l(0x01000000, &GPIO1_ENABLE);
 
 #ifdef SPDIF_POWER_INVERTED
     if(!on)
 #else
     if(on)
 #endif
-        GPIO1_OUT &= ~0x01000000;
+        and_l(~0x01000000, &GPIO1_OUT);
     else
-        GPIO1_OUT |= 0x01000000;
+        or_l(0x01000000, &GPIO1_OUT);
 }
 #endif
 
@@ -160,9 +160,9 @@ void ide_power_enable(bool on)
 
 #if CONFIG_CPU == MCF5249
     if(on)
-        GPIO_OUT &= ~0x80000000;
+        and_l(~0x80000000, &GPIO_OUT);
     else
-        GPIO_OUT |= 0x80000000;
+        or_l(0x80000000, &GPIO_OUT);
 #elif defined(GMINI_ARCH)
     if(on)
         P1 |= 0x08;
@@ -243,7 +243,7 @@ void power_off(void)
 {
     set_irq_level(HIGHEST_IRQ_LEVEL);
 #if CONFIG_CPU == MCF5249
-    GPIO1_OUT &= ~0x00080000;
+    and_l(~0x00080000, &GPIO1_OUT);
 #elif defined(GMINI_ARCH)
     P1 &= ~1;
     P1CON &= ~1;

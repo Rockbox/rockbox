@@ -1092,10 +1092,10 @@ int ata_hard_reset(void)
     or_b(0x02, &PADRH); /* negate _RESET */
     sleep(1); /* > 2ms */
 #elif CONFIG_CPU == MCF5249
-    GPIO_OUT &= ~0x00080000;
+    and_l(~0x00080000, &GPIO_OUT);
     sleep(1); /* > 25us */
 
-    GPIO_OUT |= 0x00080000;
+    or_l(0x00080000, &GPIO_OUT);
     sleep(1); /* > 25us */
 #elif CONFIG_CPU == TCC730
 
@@ -1234,12 +1234,12 @@ void ata_enable(bool on)
     or_b(0x80, &PAIORL);
 #elif CONFIG_CPU == MCF5249
     if(on)
-        GPIO_OUT &= ~0x0040000;
+        and_l(~0x0040000, &GPIO_OUT);
     else
-        GPIO_OUT |= 0x0040000;
+        or_l(0x0040000, &GPIO_OUT);
     
-    GPIO_ENABLE |= 0x00040000;
-    GPIO_FUNCTION |= 0x00040000;
+    or_l(0x00040000, &GPIO_ENABLE);
+    or_l(0x00040000, &GPIO_FUNCTION);
 #elif CONFIG_CPU == TCC730
 
 #endif
@@ -1408,14 +1408,14 @@ int ata_init(void)
     PACR2 &= 0xBFFF; /* GPIO function for PA7 (IDE enable) */
 #elif CONFIG_CPU == MCF5249
     /* Enable disk LED & ISD chip power control */
-    GPIO_OUT &= ~0x0000240;
-    GPIO_ENABLE |= 0x00000240;
-    GPIO_FUNCTION |= 0x00000200;
+    and_l(~0x0000240, &GPIO_OUT);
+    or_l(0x00000240, &GPIO_ENABLE);
+    or_l(0x00000200, &GPIO_FUNCTION);
     
     /* ATA reset */
-    GPIO_OUT |= 0x00080000;
-    GPIO_ENABLE |= 0x00080000;
-    GPIO_FUNCTION |= 0x00080000;
+    or_l(0x00080000, &GPIO_OUT);
+    or_l(0x00080000, &GPIO_ENABLE);
+    or_l(0x00080000, &GPIO_FUNCTION);
 
     /* FYI: The IDECONFIGx registers are set by set_cpu_frequency() */
 #endif
