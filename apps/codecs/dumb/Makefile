@@ -79,7 +79,6 @@ endif
 
 all: config-if-necessary
 	@$(MAKE) --no-print-directory $(ALL_TARGETS)
-	$(call ECHO,DUMB has been built. Run $(APOST)make install$(APOST) to install it.)
 
 install: config-if-necessary
 	@$(MAKE) --no-print-directory $(ALL_TARGETS:%=install-%)
