@@ -9,7 +9,7 @@
 *
 * Copyright (C) 2002 Damien Teney
 * modified to use int instead of float math by Andreas Zwirtes
-* binary fixed point format and LCD aspect handling by Jens Arnold
+* binary fixed point format, LCD aspect handling and solid mode by Jens Arnold
 *
 * All files in this archive are subject to the GNU General Public License.
 * See the file COPYING in the source tree root for full license agreement.
@@ -20,13 +20,14 @@
 ***************************************************************************/
 #include "plugin.h"
 #include "playergfx.h"
+#include "xlcd.h"
 
 /* Loops that the values are displayed */
 #define DISP_TIME 30
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
-#define CUBE_QUIT (BUTTON_OFF | BUTTON_REL)
+#define CUBE_QUIT  BUTTON_OFF
 #define CUBE_X_INC BUTTON_RIGHT
 #define CUBE_X_DEC BUTTON_LEFT
 #define CUBE_Y_INC BUTTON_UP
@@ -36,7 +37,7 @@
 #define CUBE_HIGHSPEED BUTTON_PLAY
 
 #elif CONFIG_KEYPAD == PLAYER_PAD
-#define CUBE_QUIT (BUTTON_STOP | BUTTON_REL)
+#define CUBE_QUIT  BUTTON_STOP
 #define CUBE_X_INC BUTTON_RIGHT
 #define CUBE_X_DEC BUTTON_LEFT
 #define CUBE_Y_INC (BUTTON_ON | BUTTON_RIGHT)
@@ -46,7 +47,7 @@
 #define CUBE_HIGHSPEED BUTTON_PLAY
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
-#define CUBE_QUIT (BUTTON_OFF | BUTTON_REL)
+#define CUBE_QUIT  BUTTON_OFF
 #define CUBE_X_INC BUTTON_RIGHT
 #define CUBE_X_DEC BUTTON_LEFT
 #define CUBE_Y_INC BUTTON_UP
@@ -58,33 +59,17 @@
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define CUBE_QUIT (BUTTON_OFF | BUTTON_REL)
+#define CUBE_QUIT  BUTTON_OFF
 #define CUBE_X_INC BUTTON_RIGHT
 #define CUBE_X_DEC BUTTON_LEFT
 #define CUBE_Y_INC BUTTON_UP
 #define CUBE_Y_DEC BUTTON_DOWN
 #define CUBE_Z_INC (BUTTON_ON | BUTTON_UP)
 #define CUBE_Z_DEC (BUTTON_ON | BUTTON_DOWN)
-#define CUBE_HIGHSPEED_PRE BUTTON_SELECT
-#define CUBE_HIGHSPEED (BUTTON_SELECT | BUTTON_REL)
+#define CUBE_MODE  BUTTON_MODE
+#define CUBE_HIGHSPEED BUTTON_SELECT
 
 #endif
-
-struct point_3D {
-    long x, y, z;
-};
-
-struct point_2D {
-    long x, y;
-};
-
-static struct point_3D sommet[8];
-static struct point_3D point3D[8];
-static struct point_2D point2D[8];
-
-static long matrice[3][3];
-
-static int nb_points = 8;
 
 #ifdef HAVE_LCD_BITMAP
 #define MYLCD(fn) rb->lcd_ ## fn
@@ -104,11 +89,72 @@ static int y_off = 7;
 #define ASPECT 300 /* = 1.175 */
 #endif /* !LCD_BITMAP */
 
+struct point_3D {
+    long x, y, z;
+};
 
+struct point_2D {
+    long x, y;
+};
+
+struct line {
+    int start, end;
+};
+
+#if LCD_DEPTH > 1
+struct face {
+    int corner1, corner2, corner3, corner4;
+};
+
+struct zsort {
+    int place;
+    long sum;
+};
+#endif
+
+/* initial, unrotated cube corners */
+static const struct point_3D sommet[8] =
+{
+    {-DIST, -DIST, -DIST},
+    { DIST, -DIST, -DIST},
+    { DIST,  DIST, -DIST},
+    {-DIST,  DIST, -DIST},
+    {-DIST, -DIST,  DIST},
+    { DIST, -DIST,  DIST},
+    { DIST,  DIST,  DIST},
+    {-DIST,  DIST,  DIST}
+};
+
+/* The 12 lines forming the edges */
+static const struct line lines[12] =
+{
+    {0, 1}, {1, 2}, {2, 3}, {3, 0},
+    {4, 5}, {5, 6}, {6, 7}, {7, 4},
+    {0, 4}, {1, 5}, {2, 6}, {3, 7}
+};
+
+#if LCD_DEPTH > 1
+/* The 6 faces of the cube */
+static const struct face faces[6] =
+{
+    {0, 1, 2, 3}, {4, 5, 6, 7},
+    {0, 1, 5, 4}, {3, 2, 6, 7},
+    {0, 3, 7, 4}, {1, 2, 6, 5}
+};
+
+static bool solid = true;
+#endif
+
+static struct point_3D point3D[8];
+static struct point_2D point2D[8];
+
+static long matrice[3][3];
+
+static int nb_points = 8;
 static long z_off = 600;
 
 /* Precalculated sine and cosine * 16384 (fixed point 18.14) */
-static short sin_table[91] =
+static const short sin_table[91] =
 {
         0,   285,   571,   857,  1142,  1427,  1712,  1996,  2280,  2563,
      2845,  3126,  3406,  3685,  3963,  4240,  4516,  4790,  5062,  5334,
@@ -248,39 +294,75 @@ static void cube_viewport(void)
     }
 }
 
-static void cube_init(void)
+#if LCD_DEPTH > 1
+static int compfunc(const void * a, const void * b)
 {
-    /* Original 3D-position of cube's corners */
-    sommet[0].x = -DIST;  sommet[0].y = -DIST;  sommet[0].z = -DIST;
-    sommet[1].x =  DIST;  sommet[1].y = -DIST;  sommet[1].z = -DIST;
-    sommet[2].x =  DIST;  sommet[2].y =  DIST;  sommet[2].z = -DIST;
-    sommet[3].x = -DIST;  sommet[3].y =  DIST;  sommet[3].z = -DIST;
-    sommet[4].x =  DIST;  sommet[4].y = -DIST;  sommet[4].z =  DIST;
-    sommet[5].x = -DIST;  sommet[5].y = -DIST;  sommet[5].z =  DIST;
-    sommet[6].x = -DIST;  sommet[6].y =  DIST;  sommet[6].z =  DIST;
-    sommet[7].x =  DIST;  sommet[7].y =  DIST;  sommet[7].z =  DIST;
+	return ((struct zsort *)b)->sum - ((struct zsort *)a)->sum;
 }
-
-static void line(int a, int b)
-{
-    MYLCD(drawline)(point2D[a].x, point2D[a].y, point2D[b].x, point2D[b].y);
-}
+#endif
 
 static void cube_draw(void)
 {
-    /* Draws front face */
-    line(0,1); line(1,2);
-    line(2,3); line(3,0);
+	int i;
+#if LCD_DEPTH > 1
+    int place;
+	struct zsort z_avgs_f[6];
 
-    /* Draws rear face */
-    line(4,5); line(5,6);
-    line(6,7); line(7,4);
+    if (solid)
+    {
+		for (i = 0; i < 6; i++)
+		{
+			z_avgs_f[i].place = i;
+			z_avgs_f[i].sum = point3D[faces[i].corner1].z
+                            + point3D[faces[i].corner2].z
+                            + point3D[faces[i].corner3].z
+                            + point3D[faces[i].corner4].z;
+        }
 
-    /* Draws  the other edges */
-    line(0,5);
-    line(1,4);
-    line(2,7);
-    line(3,6);
+		rb->qsort(z_avgs_f, 6, sizeof(struct zsort), compfunc);
+
+		for (i = 3; i < 6; i++) 
+        {   /* we can only see the front 3 faces at best */
+			switch(z_avgs_f[i].place) 
+            {
+				case 0:
+				case 1:
+				    rb->lcd_set_foreground(2*MAX_LEVEL/3);
+					break;
+				case 2:
+				case 3:
+				    rb->lcd_set_foreground(MAX_LEVEL/3);
+				break;
+				case 4:
+				case 5:
+				    rb->lcd_set_foreground(0);
+				break;
+			}
+			place = z_avgs_f[i].place;
+			xlcd_filltriangle(point2D[faces[place].corner1].x,
+			                  point2D[faces[place].corner1].y,
+			                  point2D[faces[place].corner2].x,
+			                  point2D[faces[place].corner2].y,
+			                  point2D[faces[place].corner3].x,
+			                  point2D[faces[place].corner3].y);
+			xlcd_filltriangle(point2D[faces[place].corner1].x,
+			                  point2D[faces[place].corner1].y,
+			                  point2D[faces[place].corner3].x,
+			                  point2D[faces[place].corner3].y,
+			                  point2D[faces[place].corner4].x,
+			                  point2D[faces[place].corner4].y);
+		}
+		rb->lcd_set_foreground(0);
+    }
+    else
+#endif /* LCD_DEPTH > 1 */
+    {
+        for (i = 0; i < 12; i++)
+            MYLCD(drawline)(point2D[lines[i].start].x,
+                            point2D[lines[i].start].y,
+                            point2D[lines[i].end].x,
+                            point2D[lines[i].end].y);
+    }
 }
 
 
@@ -305,6 +387,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb = api;
 
 #ifdef HAVE_LCD_BITMAP
+#if LCD_DEPTH > 1
+    xlcd_init(rb);
+#endif
     rb->lcd_setfont(FONT_SYSFIXED);
 #else
     if (!pgfx_init(rb, 4, 2))
@@ -315,11 +400,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     pgfx_display(3, 0);
 #endif
 
-    cube_init();
-
     while(!exit)
     {
-        if (highspeed) 
+        if (highspeed)
             rb->yield();
         else
             rb->sleep(4);
@@ -416,6 +499,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                     zs=-10;
                 t_disp=DISP_TIME;
                 break;
+#ifdef CUBE_MODE
+            case CUBE_MODE:
+                solid = !solid;
+                break;
+#endif
             case CUBE_HIGHSPEED:
 #ifdef CUBE_HIGHSPEED_PRE
                 if (lastbutton!=CUBE_HIGHSPEED_PRE)
