@@ -101,7 +101,7 @@ void newfunc(void (*func)(void))
 }
 
 
-int create_thread(void* fp, void* sp, int stk_size)
+int create_thread(void (*fp)(void), void* sp, int stk_size)
 {
     pthread_t tid;
     int i;

@@ -261,7 +261,7 @@ void wake_up_thread(void)
  * Return ID if context area could be allocated, else -1.
  *---------------------------------------------------------------------------
  */
-int create_thread(void* function, void* stack, int stack_size,
+int create_thread(void (*function)(void), void* stack, int stack_size,
                   const char *name)
 {
     unsigned int i;

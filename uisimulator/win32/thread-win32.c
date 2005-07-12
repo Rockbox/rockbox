@@ -32,7 +32,7 @@ DWORD WINAPI runthread (LPVOID lpParameter)
     return 0;
 }
 
-int create_thread(void* fp, void* sp, int stk_size)
+int create_thread(void (*fp)(void), void* sp, int stk_size)
 {
     DWORD dwThreadID;
 
