@@ -141,8 +141,12 @@ void spdif_power_enable(bool on)
 {
     GPIO1_FUNCTION |= 0x01000000;
     GPIO1_ENABLE |= 0x01000000;
-    
+
+#ifdef SPDIF_POWER_INVERTED
+    if(!on)
+#else
     if(on)
+#endif
         GPIO1_OUT &= ~0x01000000;
     else
         GPIO1_OUT |= 0x01000000;

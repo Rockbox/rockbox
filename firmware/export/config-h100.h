@@ -94,3 +94,4 @@
 
 /* Define this if you can control the S/PDIF power */
 #define HAVE_SPDIF_POWER
+#define SPDIF_POWER_INVERTED
