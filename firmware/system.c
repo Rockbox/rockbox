@@ -306,7 +306,7 @@ void system_init(void)
 #elif CONFIG_CPU == MCF5249
 
 #define default_interrupt(name) \
-  extern __attribute__((weak,alias("UIE"))) void name (void);
+  extern __attribute__((weak,alias("UIE"))) void name (void)
 
 static const char* const irqname[] = {
     "", "", "AccessErr","AddrErr","IllInstr", "", "","",
