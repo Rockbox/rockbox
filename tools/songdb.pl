@@ -106,6 +106,16 @@ sub get_oggtag {
     return \%hash;
 }
 
+sub get_ogginfo {
+    my $fn = shift;
+    my %hash;
+
+    my $ogg = vorbiscomm->new($fn);
+
+    my $h= $ogg->load;
+
+    return $ogg->{'INFO'};
+}
 
 # return ALL directory entries in the given dir
 sub getdir {
@@ -231,17 +241,19 @@ sub crc32 {
 sub singlefile {
     my ($file) = @_;
     my $hash;
+    my $info;
 
     if($file =~ /\.ogg$/i) {
         $hash = get_oggtag($file);
 
-        # CRC from 0 until we figure out exactly where the audio data starts!
-        $hash->{FILECRC} = crc32($file, 0);
+	$info = get_ogginfo($file);
+
+        $hash->{FILECRC} = crc32($file, $info->{audio_offset});
     }
     else {
         $hash = get_mp3tag($file);
 
-        my $info = get_mp3info($file);
+        $info = get_mp3info($file);
         
         $hash->{FILECRC} = crc32($file, $info->{headersize});
     }

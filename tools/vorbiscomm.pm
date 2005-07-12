@@ -415,6 +415,50 @@ sub _loadComments
     $data->{'INFO'}{'offset'} = $byteCount;
 
     $data->{'COMMENTS'} = \%comments;
+
+    # Now find the offset of the first page
+    # with audio data.
+    while(_findPage($fh))
+    {
+	$byteCount = tell($fh) - 4;
+
+	# version flag
+	read($fh, $buffer, 1);
+	if (ord($buffer) != 0x00)
+	{
+	    warn "Invalid stream structure version: " .
+		sprintf("%x", ord($buffer));
+	    return;
+ 	}
+
+ 	# header type flag
+ 	read($fh, $buffer, 1);
+ 	# Audio data starts as a fresh packet on a new page, so
+	# if header_type is odd it's not a fresh packet
+	next if ( ord($buffer) % 2 );
+
+	# skip past granule position, stream_serial_number,
+	# page_sequence_number, and crc
+	read($fh, $buffer, 20);
+
+	# page_segments
+	read($fh, $buffer, 1);
+	my $page_segments = ord($buffer);
+
+	# skip past the segment table
+	read($fh, $buffer, $page_segments);
+
+	# read packet_type byte
+	read($fh, $buffer, 1);
+
+	# Not an audio packet. All audio packet numbers are even
+	next if ( ord($buffer) % 2 );
+
+	# Found the first audio packet
+	last;
+    }
+
+    $data->{'INFO'}{'audio_offset'} = $byteCount;
 }
 
 sub _calculateTrackLength
