@@ -110,8 +110,8 @@ void adc_init(void)
 
 static unsigned char adcdata[NUM_ADC_CHANNELS];
 
-#define CS_LO  GPIO_OUT &= ~0x80
-#define CS_HI  GPIO_OUT |= 0x80
+#define CS_LO  and_l(~0x80, &GPIO_OUT)
+#define CS_HI  or_l(0x80, &GPIO_OUT)
 #define CLK_LO and_l(~0x00400000, &GPIO_OUT)
 #define CLK_HI or_l(0x00400000, &GPIO_OUT)
 #define DO     (GPIO_READ & 0x80000000)
