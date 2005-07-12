@@ -19,7 +19,7 @@
 
 #ifndef _UDA1380_H
 #define _UDA1380_H
-
+extern void uda1380_reset(void);
 extern int uda1380_init(void);
 extern void uda1380_enable_output(bool enable);
 extern int uda1380_set_master_vol(int vol_l, int vol_r);

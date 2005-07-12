@@ -164,17 +164,20 @@ void uda1380_enable_output(bool enable)
     }
 }
 
+void uda1380_reset(void)
+{
+    /* RESET signal */
+    or_l(1<<29, &GPIO_OUT);
+    or_l(1<<29, &GPIO_ENABLE);
+    or_l(1<<29, &GPIO_FUNCTION);
+    sleep(HZ/100);
+    and_l(~(1<<29), &GPIO_OUT);
+}
+
 /* Initialize UDA1380 codec with default register values (uda1380_defaults) */
 int uda1380_init(void)
 {
-    /* RESET signal */
-    GPIO_OUT |= (1<<29);
-    GPIO_ENABLE |= (1<<29);
-    GPIO_FUNCTION |= (1<<29);
-
-    sleep(HZ/100);
-    
-    GPIO_OUT &= ~(1<<29);
+    uda1380_reset();
     
     if (uda1380_set_regs() == -1)
         return -1;
