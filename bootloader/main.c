@@ -34,6 +34,7 @@
 #include "panic.h"
 #include "power.h"
 #include "file.h"
+#include "uda1380.h"
 
 #define DRAM_START 0x31000000
 
@@ -45,13 +46,6 @@
 
 int line = 0;
 
-char *modelname[] =
-{
-    "H120/140",
-    "H110/115",
-    "H300"
-};
-
 int usb_screen(void)
 {
    return 0;
@@ -59,22 +53,22 @@ int usb_screen(void)
 
 static void usb_enable(bool on)
 {
-    GPIO_OUT &= ~0x01000000;      /* GPIO24 is the Cypress chip power */
-    GPIO_ENABLE |= 0x01000000;
-    GPIO_FUNCTION |= 0x01000000;
+    and_l(~0x01000000, &GPIO_OUT);      /* GPIO24 is the Cypress chip power */
+    or_l(0x01000000, &GPIO_ENABLE);
+    or_l(0x01000000, &GPIO_FUNCTION);
     
-    GPIO1_FUNCTION |= 0x00000080; /* GPIO39 is the USB detect input */
+    or_l(0x00000080, &GPIO1_FUNCTION); /* GPIO39 is the USB detect input */
 
     if(on)
     {
         /* Power on the Cypress chip */
-        GPIO_OUT |= 0x01000000;
+        or_l(0x01000000, &GPIO_OUT);
         sleep(2);
     }
     else
     {
         /* Power off the Cypress chip */
-        GPIO_OUT &= ~0x01000000;        
+        and_l(~0x01000000, &GPIO_OUT);
     }
 }
 
@@ -188,8 +182,8 @@ void main(void)
     /* Read the buttons early */
 
     /* Set GPIO33, GPIO37, GPIO38  and GPIO52 as general purpose inputs */
-    GPIO1_FUNCTION |= 0x00100062;
-    GPIO1_ENABLE &= ~0x00100062;
+    or_l(0x00100062, &GPIO1_FUNCTION);
+    and_l(~0x00100062, &GPIO1_ENABLE);
 
     data = GPIO1_READ;
     if ((data & 0x20) == 0)
@@ -210,13 +204,8 @@ void main(void)
     /* Set up waitstates for the peripherals */
     set_cpu_frequency(0); /* PLL off */
 #endif
-    
-    /* UDA1380 RESET */
-    GPIO_OUT |= (1<<29);
-    GPIO_ENABLE |= (1<<29);
-    GPIO_FUNCTION |= (1<<29);
-    sleep(HZ/100);
-    GPIO_OUT &= ~(1<<29);
+
+    uda1380_reset();
     
     backlight_init();
     set_irq_level(0);
