@@ -327,6 +327,7 @@ struct codec_api {
 #endif
 
     void *(*memchr)(const void *s1, int c, size_t n);
+    void (*set_offset)(unsigned int value);
 };
 
 /* defined by the codec loader (codec.c) */

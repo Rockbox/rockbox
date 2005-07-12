@@ -244,6 +244,7 @@ struct codec_api ci = {
 #endif
 
     memchr,
+    NULL,
 };
 
 int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap)
@@ -292,7 +293,7 @@ int codec_load_file(const char *plugin)
     
     /* zero out codec buffer to ensure a properly zeroed bss area */
     memset(codecbuf, 0, CODEC_SIZE);
-	
+
     fd = open(plugin, O_RDONLY);
     if (fd < 0) {
         snprintf(msgbuf, sizeof(msgbuf)-1, "Couldn't load codec: %s", plugin);

@@ -227,8 +227,8 @@ enum codec_status codec_start(struct codec_api* api)
     if ( rb->id3->offset ) {
         rb->advance_buffer(rb->id3->offset);
         ov_raw_seek(&vf,rb->id3->offset);
-        rb->id3->offset = ov_raw_tell(&vf);
         rb->set_elapsed(ov_time_tell(&vf));
+        rb->set_offset(ov_raw_tell(&vf));
     }
 
     eof=0;
@@ -272,7 +272,7 @@ enum codec_status codec_start(struct codec_api* api)
                 }
         }
             if ( !rb->seek_time ) {
-                rb->id3->offset = ov_raw_tell(&vf);
+                rb->set_offset(ov_raw_tell(&vf));
                 rb->set_elapsed(ov_time_tell(&vf));
                 rb->yield();
             }

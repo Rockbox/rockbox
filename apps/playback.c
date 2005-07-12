@@ -370,6 +370,25 @@ void codec_set_elapsed_callback(unsigned int value)
     }
 }
 
+void codec_set_offset_callback(unsigned int value)
+{
+    unsigned int latency;
+
+    if (ci.stop_codec)
+        return ;
+        
+    /* The 1000 here is a hack.  audiobuffer_get_latency() should
+     * be more accurate
+     */
+    latency = (audiobuffer_get_latency() + 1000) * cur_ti->id3.bitrate / 8;
+    
+    if (value < latency) {
+        cur_ti->id3.offset = 0;
+    } else if (value - latency > (unsigned int)cur_ti->id3.offset ) {
+        cur_ti->id3.offset = value - latency;
+    }
+}
+
 long codec_filebuf_callback(void *ptr, long size)
 {
     char *buf = (char *)ptr;
@@ -498,7 +517,7 @@ void codec_advance_buffer_callback(long amount)
     cur_ti->available -= amount;
     codecbufused -= amount;
     ci.curpos += amount;
-    cur_ti->id3.offset = ci.curpos;
+    codec_set_offset_callback(ci.curpos);
 }
 
 void codec_advance_buffer_loc_callback(void *ptr)
@@ -1896,6 +1915,7 @@ void audio_init(void)
     ci.mp3_get_filepos = codec_mp3_get_filepos_callback;
     ci.seek_buffer = codec_seek_buffer_callback;
     ci.set_elapsed = codec_set_elapsed_callback;
+    ci.set_offset = codec_set_offset_callback;
     ci.configure = codec_configure_callback;
 
     mutex_init(&mutex_bufferfill);
