@@ -48,8 +48,11 @@ sub buildzip {
     mkdir ".rockbox/langs", 0777;
     mkdir ".rockbox/rocks", 0777;
     mkdir ".rockbox/codecs", 0777;
-    `find apps -name "*.codec" ! -empty | xargs --replace=foo cp foo .rockbox/codecs/`;
-    `find apps "(" -name "*.rock" -o -name "*.ovl" ")" ! -empty ! -name "codec*.rock" | xargs --replace=foo cp foo .rockbox/rocks/`;
+
+    my $c = 'find apps -name "*.codec" ! -empty -exec cp {} .rockbox/codecs/ \;';
+    print `$c`;
+    $c= 'find apps "(" -name "*.rock" -o -name "*.ovl" ")" ! -empty -exec cp {} .rockbox/rocks/ \;';
+    print `$c`;
 
     open VIEWERS, "$ROOT/apps/plugins/viewers.config" or
         die "can't open viewers.config";
