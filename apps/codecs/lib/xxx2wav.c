@@ -25,7 +25,7 @@
 #include "codecs.h"
 #include "xxx2wav.h"
 
-static struct codec_api* local_rb;
+extern struct codec_api* local_rb;
 
 int mem_ptr;
 int bufsize;
@@ -38,7 +38,7 @@ void* codec_malloc(size_t size)
     void* x;
 
     x=&mallocbuf[mem_ptr];
-    mem_ptr+=(size+3)&~3; // Keep memory 32-bit aligned (if it was already?)
+    mem_ptr+=(size+3)&~3; /* Keep memory 32-bit aligned */
 
     return(x);
 }
@@ -66,23 +66,23 @@ void* codec_realloc(void* ptr, size_t size)
 {
     void* x;
     (void)ptr;
-  x = codec_malloc(size);
-  return(x);
+    x = codec_malloc(size);
+    return(x);
 }
 
 void *memcpy(void *dest, const void *src, size_t n)
 {
-  return(local_rb->memcpy(dest,src,n));
+    return(local_rb->memcpy(dest,src,n));
 }
 
 void *memset(void *s, int c, size_t n)
 {
-  return(local_rb->memset(s,c,n));
+    return(local_rb->memset(s,c,n));
 }
 
 int memcmp(const void *s1, const void *s2, size_t n)
 {
-  return(local_rb->memcmp(s1,s2,n));
+    return(local_rb->memcmp(s1,s2,n));
 }
 
 void* memchr(const void *s, int c, size_t n)
@@ -96,20 +96,16 @@ void* memmove(const void *s1, const void *s2, size_t n)
     char* src=(char*)s2;
     size_t i;
     
-    for (i=0;i<n;i++) { dest[i]=src[i]; }
+    for (i=0;i<n;i++)
+        dest[i]=src[i];
 
     return(dest);
 }
 
 void qsort(void *base, size_t nmemb, size_t size,
-           int(*compar)(const void *, const void *)) {
-    local_rb->qsort(base,nmemb,size,compar);
-}
-
-
-void xxx2wav_set_api(struct codec_api* rb)
+           int(*compar)(const void *, const void *))
 {
-    local_rb = rb;
+    local_rb->qsort(base,nmemb,size,compar);
 }
 
 #endif /* CONFIG_HWCODEC == MASNONE */

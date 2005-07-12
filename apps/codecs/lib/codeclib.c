@@ -29,8 +29,6 @@ struct codec_api *local_rb;
 int codec_init(struct codec_api* rb)
 {
     local_rb = rb;
-    
-    xxx2wav_set_api(rb);
     mem_ptr = 0;
     mallocbuf = (unsigned char *)rb->get_codec_memory((long *)&bufsize);
   

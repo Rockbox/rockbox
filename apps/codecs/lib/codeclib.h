@@ -24,7 +24,7 @@
 
 extern int mem_ptr;
 extern int bufsize;
-extern unsigned char* mallocbuf;  // 512K from the start of MP3 buffer
+extern unsigned char* mallocbuf;  /* 512K from the start of MP3 buffer */
 
 void* codec_malloc(size_t size);
 void* codec_calloc(size_t nmemb, size_t size);
