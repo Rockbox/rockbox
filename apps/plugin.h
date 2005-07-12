@@ -285,7 +285,7 @@ struct plugin_api {
     int (*strncasecmp)(const char *s1, const char *s2, size_t n);
     void* (*memset)(void *dst, int c, size_t length);
     void* (*memcpy)(void *out, const void *in, size_t n);
-    const char *_ctype_;
+    const unsigned char *_ctype_;
     int (*atoi)(const char *str);
     char *(*strchr)(const char *s, int c);
     char *(*strcat)(char *s1, const char *s2);
