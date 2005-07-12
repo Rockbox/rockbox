@@ -87,7 +87,7 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 44
+#define PLUGIN_API_VERSION 45
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -403,6 +403,16 @@ struct plugin_api {
     int *rundb_fd;
     int *rundb_initialized;            
     int (*strncmp)(const char *, const char *, size_t);
+#if LCD_DEPTH > 1
+    void (*lcd_set_foreground)(int brightness);
+    int  (*lcd_get_foreground)(void);
+    void (*lcd_set_background)(int brightness);
+    int  (*lcd_get_background)(void);
+    void (*lcd_bitmap_part)(const unsigned char *src, int src_x, int src_y,
+                            int stride, int x, int y, int width, int height);
+    void (*lcd_bitmap)(const unsigned char *src, int x, int y, int width,
+                       int height);
+#endif
 };
 
 int plugin_load(const char* plugin, void* parameter);

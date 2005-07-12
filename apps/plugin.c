@@ -333,6 +333,14 @@ static const struct plugin_api rockbox_api = {
     &rundb_fd,
     &rundb_initialized,            
     strncmp,
+#if LCD_DEPTH > 1
+    lcd_set_foreground,
+    lcd_get_foreground,
+    lcd_set_background,
+    lcd_get_background,
+    lcd_bitmap_part,
+    lcd_bitmap,
+#endif
 };
 
 int plugin_load(const char* plugin, void* parameter)
