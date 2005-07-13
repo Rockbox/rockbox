@@ -73,6 +73,7 @@ struct user_settings global_settings;
 const char rec_base_directory[] = REC_BASE_DIR;
 #endif
 #if CONFIG_HWCODEC == MASNONE
+#include "pcmbuf.h"
 #include "pcm_playback.h"
 #endif
 
@@ -845,7 +846,7 @@ void settings_apply(void)
     }
 
 #if CONFIG_HWCODEC == MASNONE && !defined(SIMULATOR)
-    pcm_crossfade_enable(global_settings.crossfade);
+    pcmbuf_crossfade_enable(global_settings.crossfade);
 #endif
 
 #ifdef HAVE_SPDIF_POWER

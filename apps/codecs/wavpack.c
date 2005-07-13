@@ -189,7 +189,7 @@ enum codec_status codec_start(struct codec_api* api)
         if (ci->stop_codec || ci->reload_codec)
             break;
 
-        while (!ci->audiobuffer_insert ((char *) temp_buffer, nsamples * 4))
+        while (!ci->pcmbuf_insert ((char *) temp_buffer, nsamples * 4))
             rb->sleep (1);
 
         ci->set_elapsed (WavpackGetSampleIndex (wpc) / sr_100 * 10);

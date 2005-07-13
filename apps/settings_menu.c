@@ -64,6 +64,7 @@ void dac_line_in(bool enable);
 #endif
 
 #if CONFIG_HWCODEC == MASNONE
+#include "pcmbuf.h"
 #include "pcm_playback.h"
 #endif
 
@@ -1107,7 +1108,7 @@ static bool crossfade(void)
 {
     bool rc = set_bool( str(LANG_CROSSFADE), &global_settings.crossfade );
 #ifndef SIMULATOR
-    pcm_crossfade_enable(global_settings.crossfade);
+    pcmbuf_crossfade_enable(global_settings.crossfade);
 #endif
     return rc;
 }

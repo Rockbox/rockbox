@@ -137,8 +137,8 @@ struct codec_api {
     void* (*get_codec_memory)(long *size);
     /* Insert PCM data into audio buffer for playback. Playback will start
        automatically. */
-    bool (*audiobuffer_insert)(char *data, long length);
-    bool (*audiobuffer_insert_split)(void *ch1, void *ch2, long length);
+    bool (*pcmbuf_insert)(char *data, long length);
+    bool (*pcmbuf_insert_split)(void *ch1, void *ch2, long length);
     /* Set song position in WPS (value in ms). */
     void (*set_elapsed)(unsigned int value);
     
@@ -238,8 +238,7 @@ struct codec_api {
     void (*bitswap)(unsigned char *data, int length);
 #endif
 #if CONFIG_HWCODEC == MASNONE
-    void (*pcm_play_data)(const unsigned char *start, int size,
-    void (*get_more)(unsigned char** start, long*size));
+    void (*pcm_play_data)(void (*get_more)(unsigned char** start, long*size));
     void (*pcm_play_stop)(void);
     void (*pcm_set_frequency)(unsigned int frequency);
     bool (*pcm_is_playing)(void);

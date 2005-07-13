@@ -49,6 +49,7 @@ recorder/radio.c
 recorder/recording.c
 #endif
 #if CONFIG_HWCODEC == MASNONE
+pcmbuf.c
 playback.c
 metadata.c
 codecs.c

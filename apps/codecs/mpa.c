@@ -221,16 +221,16 @@ enum codec_status codec_start(struct codec_api* api)
                 ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_NONINTERLEAVED);
                 current_stereo_mode = STEREO_NONINTERLEAVED;
             }
-            ci->audiobuffer_insert_split(&Synth.pcm.samples[0][start_skip],
-                                         &Synth.pcm.samples[1][start_skip],
-                                         (Synth.pcm.length - start_skip) * 4);
+            ci->pcmbuf_insert_split(&Synth.pcm.samples[0][start_skip],
+                                    &Synth.pcm.samples[1][start_skip],
+                                    (Synth.pcm.length - start_skip) * 4);
         } else {
             if (current_stereo_mode != STEREO_MONO) {
                 ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_MONO);
                 current_stereo_mode = STEREO_MONO;
             }
-            ci->audiobuffer_insert((char *)&Synth.pcm.samples[0][start_skip],
-                                   (Synth.pcm.length - start_skip) * 4);
+            ci->pcmbuf_insert((char *)&Synth.pcm.samples[0][start_skip],
+                              (Synth.pcm.length - start_skip) * 4);
         }
         start_skip = 0; /* not very elegant, and might want to keep this value */
         

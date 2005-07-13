@@ -46,6 +46,7 @@
 #include "screens.h"
 #include "playlist.h"
 #include "playback.h"
+#include "pcmbuf.h"
 #include "pcm_playback.h"
 #include "buffer.h"
 #include "dsp.h"
@@ -173,91 +174,7 @@ static bool v1first = false;
 static void mp3_set_elapsed(struct mp3entry* id3);
 int mp3_get_file_pos(void);
 
-/* Simulator stubs. */
-#ifdef SIMULATOR
-bool pcm_insert_buffer(char *buf, long length)
-{
-    (void)buf;
-    (void)length;
-    
-    return true;
-}
-
-void pcm_flush_buffer(long length)
-{
-    (void)length;
-}
-
-
-void* pcm_request_buffer(long length, long *realsize)
-{
-    static char temp_audiobuffer[32768];
-
-    *realsize = MIN((int)sizeof(temp_audiobuffer), length);
-    
-    return temp_audiobuffer;
-}
-
-void audiobuffer_add_event(void (*event_handler)(void))
-{
-    event_handler();
-}
-
-unsigned int audiobuffer_get_latency()
-{
-    return 0;
-}
-
-void pcm_play_stop(void)
-{
-}
-
-bool pcm_is_playing(void)
-{
-    return false;
-}
-
-bool pcm_is_crossfade_active(void)
-{
-    return false;
-}
-
-bool pcm_is_lowdata(void)
-{
-    return false;
-}
-
-void pcm_flush_audio(void)
-{
-}
-
-bool pcm_crossfade_init(void)
-{
-    return false;
-}
-
-void pcm_set_boost_mode(bool state)
-{
-    (void)state;
-}
-
-bool pcm_is_crossfade_enabled(void)
-{
-    return false;
-}
-
-void pcm_play_pause(bool state)
-{
-    (void)state;
-}
-
-int ata_sleep(void)
-{
-    return 0;
-}
-#endif
-
-bool codec_audiobuffer_insert_callback(char *buf, long length)
+bool codec_pcmbuf_insert_callback(char *buf, long length)
 {
     char *dest;
     long realsize;
@@ -284,11 +201,11 @@ bool codec_audiobuffer_insert_callback(char *buf, long length)
     while (length > 0) {
         /* Request a few extra bytes for resampling. */
         /* FIXME: Required extra bytes SHOULD be calculated. */
-        while ((dest = pcm_request_buffer(length+16384, &realsize)) == NULL)
+        while ((dest = pcmbuf_request_buffer(length+16384, &realsize)) == NULL)
             yield();
         
         if (realsize < 16384) {
-            pcm_flush_buffer(0);
+            pcmbuf_flush_buffer(0);
             continue ;
         }
         
@@ -300,7 +217,7 @@ bool codec_audiobuffer_insert_callback(char *buf, long length)
         } else {
             processed_length = dsp_process(dest, buf, realsize >> (mono + 1));
         }
-        pcm_flush_buffer(processed_length);
+        pcmbuf_flush_buffer(processed_length);
         length -= realsize;
         buf += realsize << (factor + mono);
     }
@@ -308,7 +225,7 @@ bool codec_audiobuffer_insert_callback(char *buf, long length)
     return true;
 }
 
-bool codec_audiobuffer_insert_split_callback(void *ch1, void *ch2, 
+bool codec_pcmbuf_insert_split_callback(void *ch1, void *ch2,
                                              long length)
 {
     char *dest;
@@ -326,11 +243,11 @@ bool codec_audiobuffer_insert_split_callback(void *ch1, void *ch2,
     
     while (length > 0) {
         /* Request a few extra bytes for resampling. */
-        while ((dest = pcm_request_buffer(length+4096, &realsize)) == NULL)
+        while ((dest = pcmbuf_request_buffer(length+4096, &realsize)) == NULL)
             yield();
         
         if (realsize < 4096) {
-            pcm_flush_buffer(0);
+            pcmbuf_flush_buffer(0);
             continue ;
         }
         
@@ -338,7 +255,7 @@ bool codec_audiobuffer_insert_split_callback(void *ch1, void *ch2,
         
         processed_length = dsp_process(dest, ch1, realsize / 4) * 2;
         dsp_process(dest, ch2, realsize / 4);
-        pcm_flush_buffer(processed_length);
+        pcmbuf_flush_buffer(processed_length);
         length -= realsize;
         ch1 += realsize >> factor;
         ch2 += realsize >> factor;
@@ -360,7 +277,7 @@ void codec_set_elapsed_callback(unsigned int value)
     if (ci.stop_codec)
         return ;
         
-    latency = audiobuffer_get_latency();
+    latency = pcmbuf_get_latency();
     
     if (value < latency) {
         cur_ti->id3.elapsed = 0;
@@ -377,10 +294,10 @@ void codec_set_offset_callback(unsigned int value)
     if (ci.stop_codec)
         return ;
         
-    /* The 1000 here is a hack.  audiobuffer_get_latency() should
+    /* The 1000 here is a hack.  pcmbuf_get_latency() should
      * be more accurate
      */
-    latency = (audiobuffer_get_latency() + 1000) * cur_ti->id3.bitrate / 8;
+    latency = (pcmbuf_get_latency() + 1000) * cur_ti->id3.bitrate / 8;
     
     if (value < latency) {
         cur_ti->id3.offset = 0;
@@ -487,7 +404,7 @@ static bool rebuffer_and_seek(int newpos)
     ci.curpos = newpos;
     cur_ti->available = 0;
     lseek(current_fd, newpos, SEEK_SET);
-    pcm_flush_audio();
+    pcmbuf_flush_audio();
         
     mutex_unlock(&mutex_bufferfill);
 
@@ -553,8 +470,8 @@ bool codec_seek_buffer_callback(off_t newpos)
     if (difference >= 0) {
         logf("seek: +%d", difference);
         codec_advance_buffer_callback(difference);
-        if (!pcm_is_crossfade_active())
-            pcm_play_stop();
+        if (!pcmbuf_is_crossfade_active())
+            pcmbuf_play_stop();
         return true;
     }
 
@@ -575,8 +492,8 @@ bool codec_seek_buffer_callback(off_t newpos)
     if (buf_ridx < 0)
         buf_ridx = codecbuflen + buf_ridx;
     ci.curpos -= difference;
-    if (!pcm_is_crossfade_active())
-        pcm_play_stop();
+    if (!pcmbuf_is_crossfade_active())
+        pcmbuf_play_stop();
     
     return true;
 }
@@ -598,9 +515,9 @@ void codec_configure_callback(int setting, void *value)
         
     case CODEC_DSP_ENABLE:
         if ((bool)value)
-            ci.audiobuffer_insert = codec_audiobuffer_insert_callback;
+            ci.pcmbuf_insert = codec_pcmbuf_insert_callback;
         else
-            ci.audiobuffer_insert = pcm_insert_buffer;
+            ci.pcmbuf_insert = pcmbuf_insert_buffer;
         break ;
 
     default:
@@ -640,7 +557,7 @@ void yield_codecs(void)
     yield();
     if (!pcm_is_playing())
         sleep(5);
-    while ((pcm_is_crossfade_active() || pcm_is_lowdata())
+    while ((pcmbuf_is_crossfade_active() || pcmbuf_is_lowdata())
             && !ci.stop_codec && playing && queue_empty(&audio_queue)
             && codecbufused > (128*1024))
         yield();
@@ -1067,7 +984,7 @@ void audio_play_start(int offset)
     buf_ridx = 0;
     buf_widx = 0;
     codecbufused = 0;
-    pcm_set_boost_mode(true);
+    pcmbuf_set_boost_mode(true);
     
     fill_bytesleft = codecbuflen;
     filling = true;
@@ -1082,7 +999,7 @@ void audio_play_start(int offset)
         logf("Failure");
     }
 
-    pcm_set_boost_mode(false);
+    pcmbuf_set_boost_mode(false);
 }
 
 void audio_clear_track_entries(void)
@@ -1162,7 +1079,7 @@ void initialize_buffer_fill(void)
     fill_bytesleft = codecbuflen - codecbufused;
     cur_ti->start_pos = ci.curpos;
 
-    pcm_set_boost_mode(true);
+    pcmbuf_set_boost_mode(true);
     
     if (filling)
         return ;
@@ -1222,10 +1139,12 @@ void audio_check_buffer(void)
         generate_postbuffer_events();
         filling = false;
         conf_bufferlimit = 0;
-        pcm_set_boost_mode(false);
-            
+        pcmbuf_set_boost_mode(false);
+
+#ifndef SIMULATOR                    
         if (playing)
             ata_sleep();
+#endif
     }
 }
 
@@ -1242,7 +1161,7 @@ void audio_update_trackinfo(void)
             buf_ridx -= codecbuflen;
             
         if (!filling)
-            pcm_set_boost_mode(false);
+            pcmbuf_set_boost_mode(false);
     } else {
         buf_ridx -= ci.curpos + cur_ti->codecsize;
         codecbufused += ci.curpos + cur_ti->codecsize;
@@ -1263,8 +1182,8 @@ void audio_update_trackinfo(void)
     ci.curpos = 0;
     cur_ti->start_pos = 0;
     ci.taginfo_ready = (bool *)&cur_ti->taginfo_ready;
-    if (!pcm_crossfade_init())
-        audiobuffer_add_event(codec_track_changed);
+    if (!pcmbuf_crossfade_init())
+        pcmbuf_add_event(codec_track_changed);
     else
         codec_track_changed();
 }
@@ -1278,7 +1197,7 @@ static void audio_stop_playback(void)
         close(current_fd);
         current_fd = -1;
     }
-    pcm_play_stop();
+    pcmbuf_play_stop();
     pcm_play_pause(true);
     track_count = 0;
     audio_clear_track_entries();
@@ -1448,8 +1367,8 @@ static void initiate_track_change(int peek_index)
         queue_post(&audio_queue, AUDIO_PLAY, 0);
     } 
     
-    else if (!pcm_crossfade_init())
-        pcm_flush_audio();
+    else if (!pcmbuf_crossfade_init())
+        pcmbuf_flush_audio();
         
     codec_track_changed();
 }
@@ -1473,8 +1392,8 @@ void audio_thread(void)
                 ci.stop_codec = true;
                 ci.reload_codec = false;
                 ci.seek_time = 0;
-                if (!pcm_crossfade_init() && !pcm_is_crossfade_active())
-                    pcm_flush_audio();
+                if (!pcmbuf_crossfade_init() && !pcmbuf_is_crossfade_active())
+                    pcmbuf_flush_audio();
                 audio_play_start((int)ev.data);
                 playlist_update_resume_info(audio_current_track());
                 break ;
@@ -1650,8 +1569,8 @@ void audio_play(int offset)
 {
     logf("audio_play");
     ci.stop_codec = true;
-    if (!pcm_crossfade_init())
-        pcm_flush_audio();
+    if (!pcmbuf_crossfade_init())
+        pcmbuf_flush_audio();
     codec_track_changed();
         
     pcm_play_pause(true);
@@ -1696,7 +1615,7 @@ void audio_ff_rewind(int newpos)
     logf("rewind: %d", newpos);
     if (playing) {
         ci.seek_time = newpos+1;
-        pcm_play_stop();
+        pcmbuf_play_stop();
         paused = false;
     }
 }
@@ -1905,8 +1824,8 @@ void audio_init(void)
     
     /* Initialize codec api. */    
     ci.read_filebuf = codec_filebuf_callback;
-    ci.audiobuffer_insert = pcm_insert_buffer;
-    ci.audiobuffer_insert_split = codec_audiobuffer_insert_split_callback;
+    ci.pcmbuf_insert = pcmbuf_insert_buffer;
+    ci.pcmbuf_insert_split = codec_pcmbuf_insert_split_callback;
     ci.get_codec_memory = get_codec_memory_callback;
     ci.request_buffer = codec_request_buffer_callback;
     ci.advance_buffer = codec_advance_buffer_callback;

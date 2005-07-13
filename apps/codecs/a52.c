@@ -59,7 +59,7 @@ void output_audio(sample_t* samples,int flags) {
   }
 
   rb->yield();
-  while(!ci->audiobuffer_insert((unsigned char*)int16_samples,256*2*2))
+  while(!ci->pcmbuf_insert((unsigned char*)int16_samples,256*2*2))
     rb->yield();
 }
 

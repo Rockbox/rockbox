@@ -138,7 +138,7 @@ enum codec_status codec_start(struct codec_api* api)
     ci->set_elapsed(samplesdone/(ci->id3->frequency/1000));
    
     rb->yield();
-    while (!ci->audiobuffer_insert((unsigned char*)wavbuf, n))
+    while (!ci->pcmbuf_insert((unsigned char*)wavbuf, n))
       rb->yield();
 
     ci->advance_buffer(n);

@@ -62,7 +62,7 @@
 #include "database.h"
 
 #if (CONFIG_HWCODEC == MASNONE)
-#include "pcm_playback.h"
+#include "pcmbuf.h"
 #endif
 #if defined(IRIVER_H100_SERIES) && !defined(SIMULATOR)
 #include "pcm_record.h"
@@ -283,7 +283,7 @@ void init(void)
               global_settings.superbass);
     audio_init();
 #if (CONFIG_HWCODEC == MASNONE)
-    pcm_init();
+    pcmbuf_init();
     sound_settings_apply();
 #endif
 #if defined(IRIVER_H100_SERIES) && !defined(SIMULATOR)

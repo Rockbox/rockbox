@@ -33,7 +33,36 @@
 
 extern char having_new_lcd;
 
+/* Stubs for PCM audio playback. */
+bool pcm_is_playing(void)
+{
+    return false;
+}
 
+void pcm_play_pause(bool state)
+{
+    (void)state;
+}
+
+bool pcm_is_paused(void)
+{
+    return false;
+}
+
+void pcm_play_stop(void)
+{
+}
+
+void pcm_init(void)
+{
+}
+
+void pcm_play_data(void (*get_more)(unsigned char** start, long* size))
+{
+    (void)get_more;
+}
+
+/* Generic firmware stubs. */
 void backlight_on(void)
 {
   /* we could do something better here! */

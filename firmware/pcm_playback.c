@@ -43,60 +43,12 @@
 
 #ifdef HAVE_UDA1380
 
-#define CHUNK_SIZE           32768
-/* Must be a power of 2 */
-#define NUM_PCM_BUFFERS      (PCMBUF_SIZE / CHUNK_SIZE)
-#define NUM_PCM_BUFFERS_MASK (NUM_PCM_BUFFERS - 1)
-#define PCM_WATERMARK        (CHUNK_SIZE * 10)
-#define PCM_CF_WATERMARK     (PCMBUF_SIZE - CHUNK_SIZE*8)
-
 static bool pcm_playing;
 static bool pcm_paused;
 static int pcm_freq = 0x6; /* 44.1 is default */
 
-static char *audiobuffer;
-static long audiobuffer_pos;
-long audiobuffer_free;
-static long audiobuffer_fillpos;
-static bool boost_mode;
-
-/* Crossfade modes. If CFM_CROSSFADE is selected, normal
- * crossfader will activate. Selecting CFM_FLUSH is a special
- * operation that only overwrites the pcm buffer without crossfading.
- */
-enum {
-    CFM_CROSSFADE,
-    CFM_FLUSH
-};
-
-static int crossfade_mode;
-static bool crossfade_enabled;
-static bool crossfade_active;
-static bool crossfade_init;
-static int crossfade_pos;
-static int crossfade_amount;
-static int crossfade_rem;
-
-static char *guardbuf;
-static void (*pcm_event_handler)(void);
-
 static unsigned char *next_start;
 static long next_size;
-
-static int last_chunksize = 0;
-
-struct pcmbufdesc
-{
-    void *addr;
-    int size;
-    void (*callback)(void); /* Call this when the buffer has been played */
-} pcmbuffers[NUM_PCM_BUFFERS];
-
-volatile int pcmbuf_read_index;
-volatile int pcmbuf_write_index;
-int pcmbuf_unplayed_bytes;
-int pcmbuf_watermark;
-void (*pcmbuf_watermark_callback)(int bytes_left);
 
 /* Set up the DMA transfer that kicks in when the audio FIFO gets empty */
 static void dma_start(const void *addr, long size)
@@ -122,21 +74,6 @@ static void dma_start(const void *addr, long size)
     DCR0 = DMA_INT | DMA_EEXT | DMA_CS | DMA_SINC | DMA_START;
 }
 
-void pcm_boost(bool state)
-{
-    static bool boost_state = false;
-    
-    if (crossfade_init || crossfade_active || boost_mode)
-        return ;
-        
-    if (state != boost_state) {
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-        cpu_boost(state);
-#endif    
-        boost_state = state;
-    }
-}
-
 /* Stops the DMA transfer and interrupt */
 static void dma_stop(void)
 {
@@ -147,17 +84,8 @@ static void dma_stop(void)
     IIS2CONFIG = 0x800;
     EBU1CONFIG = 0x800;
 
-    pcmbuf_unplayed_bytes = 0;
-    last_chunksize = 0;
-    audiobuffer_pos = 0;
-    audiobuffer_fillpos = 0;
-    audiobuffer_free = PCMBUF_SIZE;
-    pcmbuf_read_index = 0;
-    pcmbuf_write_index = 0;
     next_start = NULL;
     next_size = 0;
-    crossfade_init = 0;
-    crossfade_active = 0;
     pcm_paused = false;
 }
 
@@ -185,67 +113,13 @@ void pcm_set_frequency(unsigned int frequency)
 /* the registered callback function to ask for more mp3 data */
 static void (*callback_for_more)(unsigned char**, long*) = NULL;
 
-int pcm_play_num_used_buffers(void)
+void pcm_play_data(void (*get_more)(unsigned char** start, long* size))
 {
-    return (pcmbuf_write_index - pcmbuf_read_index) & NUM_PCM_BUFFERS_MASK;
-}
-
-static void pcm_play_callback(unsigned char** start, long* size)
-{
-    struct pcmbufdesc *desc = &pcmbuffers[pcmbuf_read_index];
-    int sz;
-
-    pcmbuf_unplayed_bytes -= last_chunksize;
-    audiobuffer_free += last_chunksize;
+    unsigned char *start;
+    long size;
     
-    
-    if(desc->size == 0)
-    {
-        /* The buffer is finished, call the callback function */
-        if(desc->callback)
-            desc->callback();
-
-        /* Advance to the next buffer */
-        pcmbuf_read_index = (pcmbuf_read_index + 1) & NUM_PCM_BUFFERS_MASK;
-        desc = &pcmbuffers[pcmbuf_read_index];
-    }
-    
-    if(pcm_play_num_used_buffers())
-    {
-        /* Play max 64K at a time */
-        //sz = MIN(desc->size, 32768);
-        sz = desc->size;
-        *start = desc->addr;
-        *size = sz;
-
-        /* Update the buffer descriptor */
-        desc->size -= sz;
-        desc->addr += sz;
-
-        last_chunksize = sz;
-    }
-    else
-    {
-        /* No more buffers */
-        *size = 0;
-        if (pcm_event_handler)
-            pcm_event_handler();
-    }
-#if 1
-    if(pcmbuf_unplayed_bytes <= pcmbuf_watermark)
-    {
-        if(pcmbuf_watermark_callback)
-        {
-            pcmbuf_watermark_callback(pcmbuf_unplayed_bytes);
-        }
-    }
-#endif
-}
-
-void pcm_play_data(const unsigned char* start, int size,
-                   void (*get_more)(unsigned char** start, long* size))
-{
     callback_for_more = get_more;
+    
     /** FIXME: This is a temporary fix to prevent playback glitches when
       * playing the first file. We will just drop the first frame to prevent
       * that problem from occurring.
@@ -259,6 +133,7 @@ void pcm_play_data(const unsigned char* start, int size,
       *     find the explanation for this bug from this file.
       */
     get_more((unsigned char **)&start, (long *)&size); // REMOVE THIS TO TEST
+    get_more((unsigned char **)&start, (long *)&size);
     get_more(&next_start, &next_size);
     dma_start(start, size);
     uda1380_mute(false);
@@ -270,13 +145,11 @@ void pcm_play_stop(void)
         uda1380_mute(true);
         dma_stop();
     }
-    pcm_set_boost_mode(false);
-    pcm_boost(false);
 }
 
 void pcm_play_pause(bool play)
 {
-    if(pcm_paused && play && pcmbuf_unplayed_bytes)
+    if(pcm_paused && play && next_size)
     {
         logf("unpause");
         /* Reset chunk size so dma has enough data to fill the fifo. */
@@ -301,6 +174,11 @@ void pcm_play_pause(bool play)
         EBU1CONFIG = 0x800;
     }
     pcm_paused = !play;
+}
+
+bool pcm_is_paused(void)
+{
+    return pcm_paused;
 }
 
 bool pcm_is_playing(void)
@@ -370,390 +248,8 @@ void pcm_init(void)
     sleep(HZ/4);
     uda1380_enable_output(true);
     
-    pcm_play_init();
-}
-
-void pcm_play_set_watermark(int numbytes, void (*callback)(int bytes_left))
-{
-    pcmbuf_watermark = numbytes;
-    pcmbuf_watermark_callback = callback;
-}
-
-bool pcm_play_add_chunk(void *addr, int size, void (*callback)(void))
-{
-    /* We don't use the last buffer, since we can't see the difference
-       between the full and empty condition */
-    if(pcm_play_num_used_buffers() < (NUM_PCM_BUFFERS - 2))
-    {
-        pcmbuffers[pcmbuf_write_index].addr = addr;
-        pcmbuffers[pcmbuf_write_index].size = size;
-        pcmbuffers[pcmbuf_write_index].callback = callback;
-        pcmbuf_write_index = (pcmbuf_write_index+1) & NUM_PCM_BUFFERS_MASK;
-        pcmbuf_unplayed_bytes += size;
-        return true;
-    }
-    else
-        return false;
-}
-
-void pcm_watermark_callback(int bytes_left)
-{
-    /* Fill audio buffer by boosting cpu */
-    pcm_boost(true);
-    if (bytes_left <= CHUNK_SIZE * 2)
-        crossfade_active = false;
-}
-
-void pcm_set_boost_mode(bool state)
-{
-    if (state)
-        pcm_boost(true);
-    boost_mode = state;
-}
-
-void audiobuffer_add_event(void (*event_handler)(void))
-{
-    pcm_event_handler = event_handler;
-}
-
-unsigned int audiobuffer_get_latency(void)
-{
-    int latency;
-    
-    /* This has to be done better. */
-    latency = (PCMBUF_SIZE - audiobuffer_free - CHUNK_SIZE)/4 / (44100/1000);
-    if (latency < 0)
-        latency = 0;
-    
-    return latency;
-}
-
-bool pcm_is_lowdata(void)
-{
-    if (!pcm_is_playing() || pcm_paused || crossfade_init || crossfade_active)
-        return false;
-    
-    if (pcmbuf_unplayed_bytes < PCM_WATERMARK)
-        return true;
-        
-    return false;
-}
-
-bool pcm_crossfade_init(void)
-{
-    if (PCMBUF_SIZE - audiobuffer_free < CHUNK_SIZE * 8 || !crossfade_enabled
-        || crossfade_active || crossfade_init) {
-        return false;
-    }
-    logf("pcm_crossfade_init");
-    pcm_boost(true);
-    crossfade_mode = CFM_CROSSFADE;
-    crossfade_init = true;
-    
-    return true;
-    
-}
-
-/** Initialize a track switch so that audio playback will not stop but
- *  the switch to next track would happen as soon as possible.
- */
-void pcm_flush_audio(void)
-{
-    if (crossfade_init || crossfade_active || !pcm_playing) {
-        pcm_play_stop();
-        return ;
-    }
-    
-    crossfade_mode = CFM_FLUSH;
-    crossfade_init = true;
-}
-
-void pcm_flush_fillpos(void)
-{
-    int copy_n;
-
-    copy_n = MIN(audiobuffer_fillpos, CHUNK_SIZE);
-    
-    if (copy_n) {
-        while (!pcm_play_add_chunk(&audiobuffer[audiobuffer_pos],
-                                   copy_n, pcm_event_handler)) {
-            pcm_boost(false);
-            sleep(1);
-            /* This is a fatal error situation that should never happen. */
-            if (!pcm_playing) {
-                logf("pcm_flush_fillpos error");
-                break ;
-            }
-        }
-        pcm_event_handler = NULL;
-        audiobuffer_pos += copy_n;
-        if (audiobuffer_pos >= PCMBUF_SIZE)
-            audiobuffer_pos -= PCMBUF_SIZE;
-        audiobuffer_free -= copy_n;
-        audiobuffer_fillpos -= copy_n;
-    }
-}
-
-static void crossfade_start(void)
-{
-    int bytesleft = pcmbuf_unplayed_bytes;
-    
-    crossfade_init = 0;
-    if (bytesleft < CHUNK_SIZE * 3) {
-        logf("crossfade rejected");
-        pcm_play_stop();
-        return ;
-    }
-
-    logf("crossfade_start");
-    pcm_flush_fillpos();
-    pcm_boost(true);
-    crossfade_active = true;
-    crossfade_pos = audiobuffer_pos;
-
-    switch (crossfade_mode) {
-        case CFM_CROSSFADE:
-            crossfade_amount = (bytesleft - (CHUNK_SIZE * 2))/2;
-            crossfade_rem = crossfade_amount;
-            break ;
-
-        case CFM_FLUSH:
-            crossfade_amount = (bytesleft - (CHUNK_SIZE * 2))/2;
-            crossfade_rem = crossfade_amount;
-            break ;
-    }
-    
-    crossfade_pos -= crossfade_amount*2;
-    if (crossfade_pos < 0)
-        crossfade_pos += PCMBUF_SIZE;
-}
-
-static __inline
-int crossfade(short *buf, const short *buf2, int length)
-{
-    int size, i;
-    int val1, val2;
-    
-    size = MIN(length, crossfade_rem);
-    switch (crossfade_mode) {
-        case CFM_CROSSFADE:
-            val1 = (crossfade_rem<<10)/crossfade_amount;
-            val2 = ((crossfade_amount-crossfade_rem)<<10)/crossfade_amount;
-            
-            for (i = 0; i < size; i++) {
-                buf[i] = ((buf[i] * val1) + (buf2[i] * val2)) >> 10;
-            }
-            break ;
-
-        case CFM_FLUSH:
-            for (i = 0; i < size; i++) {
-                buf[i] = buf2[i];
-            }
-            //memcpy((char *)buf, (char *)buf2, size*2);
-            break ;
-    }
-    
-    crossfade_rem -= size;
-    if (crossfade_rem <= 0)
-        crossfade_active = false;
-    
-    return size;
-}
-
-static bool prepare_insert(long length)
-{
-    if (crossfade_init)
-        crossfade_start();
-    
-    if (audiobuffer_free < length + audiobuffer_fillpos
-           + CHUNK_SIZE && !crossfade_active) {
-        pcm_boost(false);
-        return false;
-    }
-    
-    if (!pcm_is_playing()) {
-        pcm_boost(true);
-        crossfade_active = false;
-        if (audiobuffer_free < PCMBUF_SIZE - CHUNK_SIZE*4)
-            pcm_play_start();
-    }
-    
-    return true;
-}
-
-void* pcm_request_buffer(long length, long *realsize)
-{
-    void *ptr = NULL;
-    
-    while (audiobuffer_free < length + audiobuffer_fillpos
-           + CHUNK_SIZE && !crossfade_active) {
-        pcm_boost(false);
-        sleep(1);
-    }
-    
-    if (crossfade_active) {
-        *realsize = MIN(length, PCMBUF_GUARD);
-        ptr = &guardbuf[0];
-    } else {
-        *realsize = MIN(length, PCMBUF_SIZE - audiobuffer_pos
-                            - audiobuffer_fillpos);
-        if (*realsize < length) {
-            *realsize += MIN((long)(length - *realsize), PCMBUF_GUARD);
-        }
-        ptr = &audiobuffer[audiobuffer_pos + audiobuffer_fillpos];
-    }
-    
-    return ptr;
-}
-
-bool pcm_is_crossfade_active(void)
-{
-    return crossfade_active || crossfade_init;
-}
-
-void pcm_flush_buffer(long length)
-{
-    int copy_n;
-    char *buf;
-
-    prepare_insert(length);
-    
-    if (crossfade_active) {
-        buf = &guardbuf[0];
-        length = MIN(length, PCMBUF_GUARD);
-        while (length > 0 && crossfade_active) {
-            copy_n = MIN(length, PCMBUF_SIZE - crossfade_pos);
-            copy_n = 2 * crossfade((short *)&audiobuffer[crossfade_pos], 
-                    (const short *)buf, copy_n/2);
-            buf += copy_n;
-            length -= copy_n;
-            crossfade_pos += copy_n;
-            if (crossfade_pos >= PCMBUF_SIZE)
-                crossfade_pos -= PCMBUF_SIZE;
-        }
-        
-        while (length > 0) {
-            copy_n = MIN(length, PCMBUF_SIZE - audiobuffer_pos);
-            memcpy(&audiobuffer[audiobuffer_pos], buf, copy_n);
-            audiobuffer_fillpos = copy_n;
-            buf += copy_n;
-            length -= copy_n;
-            if (length > 0)
-                pcm_flush_fillpos();
-        }
-    }
-
-    audiobuffer_fillpos += length;
-
-    try_flush:
-    if (audiobuffer_fillpos < CHUNK_SIZE && PCMBUF_SIZE
-        - audiobuffer_pos - audiobuffer_fillpos > 0)
-        return ;
-
-    copy_n = audiobuffer_fillpos - (PCMBUF_SIZE - audiobuffer_pos);
-    if (copy_n > 0) {
-        audiobuffer_fillpos -= copy_n;
-        pcm_flush_fillpos();
-        copy_n = MIN(copy_n, PCMBUF_GUARD);
-        memcpy(&audiobuffer[0], &guardbuf[0], copy_n);
-        audiobuffer_fillpos = copy_n;
-        goto try_flush;
-    }
-    pcm_flush_fillpos();
-}
-
-bool pcm_insert_buffer(char *buf, long length)
-{
-    long copy_n = 0;
-    
-    if (!prepare_insert(length))
-        return false;
-
-    
-    if (crossfade_active) {
-        while (length > 0 && crossfade_active) {
-            copy_n = MIN(length, PCMBUF_SIZE - crossfade_pos);
-                
-            copy_n = 2 * crossfade((short *)&audiobuffer[crossfade_pos],
-                                    (const short *)buf, copy_n/2);
-            buf += copy_n;
-            length -= copy_n;
-            crossfade_pos += copy_n;
-            if (crossfade_pos >= PCMBUF_SIZE)
-                crossfade_pos -= PCMBUF_SIZE;
-        }
-        
-        while (length > 0) {
-            copy_n = MIN(length, PCMBUF_SIZE - audiobuffer_pos);
-            memcpy(&audiobuffer[audiobuffer_pos], buf, copy_n);
-            audiobuffer_fillpos = copy_n;
-            buf += copy_n;
-            length -= copy_n;
-            if (length > 0)
-                pcm_flush_fillpos();
-        }
-    }
-        
-    while (length > 0) {
-        copy_n = MIN(length, PCMBUF_SIZE - audiobuffer_pos -
-                    audiobuffer_fillpos);
-        copy_n = MIN(CHUNK_SIZE - audiobuffer_fillpos, copy_n);
-
-        memcpy(&audiobuffer[audiobuffer_pos+audiobuffer_fillpos],
-                buf, copy_n);
-        buf += copy_n;
-        audiobuffer_fillpos += copy_n;
-        length -= copy_n;
-        
-        /* Pre-buffer to meet CHUNK_SIZE requirement */
-        if (audiobuffer_fillpos < CHUNK_SIZE && length == 0) {
-            return true;
-        }
-
-        pcm_flush_fillpos();
-    }
-
-    return true;
-}
-
-void pcm_play_init(void)
-{
-    audiobuffer = &audiobuf[(audiobufend - audiobuf) - 
-                            PCMBUF_SIZE - PCMBUF_GUARD];
-    guardbuf = &audiobuffer[PCMBUF_SIZE];
-
     /* Call dma_stop to initialize everything. */
     dma_stop();
-    pcm_event_handler = NULL;
-}
-
-void pcm_crossfade_enable(bool on_off)
-{
-    crossfade_enabled = on_off;
-}
-
-bool pcm_is_crossfade_enabled(void)
-{
-    return crossfade_enabled;
-}
-
-void pcm_play_start(void)
-{
-    unsigned long size;
-    unsigned char *start;
-    
-    if (crossfade_enabled) {
-        pcm_play_set_watermark(PCM_CF_WATERMARK, pcm_watermark_callback);
-    } else {
-        pcm_play_set_watermark(PCM_WATERMARK, pcm_watermark_callback);
-    }
-    crossfade_active = false;
-    
-    if(!pcm_is_playing())
-    {
-        pcm_play_callback(&start, &size);
-        pcm_play_data(start, size, pcm_play_callback);
-    }
 }
 
 #endif /* HAVE_UDA1380 */

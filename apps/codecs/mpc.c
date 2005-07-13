@@ -166,7 +166,7 @@ enum codec_status codec_start(struct codec_api *api)
                 /* Flush the buffer if it is full. */
                 if (OutputPtr == OutputBufferEnd) {
                     ci->yield();
-                    while (!ci->audiobuffer_insert(OutputBuffer, OUTPUT_BUFFER_SIZE))
+                    while (!ci->pcmbuf_insert(OutputBuffer, OUTPUT_BUFFER_SIZE))
                         ci->yield();
                     ci->set_elapsed(samplesdone/(frequency/1000));
                     OutputPtr = OutputBuffer;
@@ -178,7 +178,7 @@ enum codec_status codec_start(struct codec_api *api)
     /* Flush the remaining data in the output buffer */
     if (OutputPtr > OutputBuffer) {
         ci->yield();
-        while (!ci->audiobuffer_insert(OutputBuffer, OutputPtr - OutputBuffer))
+        while (!ci->pcmbuf_insert(OutputBuffer, OutputPtr - OutputBuffer))
             ci->yield();
     }
 

@@ -262,7 +262,7 @@ enum codec_status codec_start(struct codec_api* api)
         } else if (n < 0) {
             DEBUGF("Error decoding frame\n");
         } else {
-            while (!rb->audiobuffer_insert(pcmbuf, n)) {
+            while (!rb->pcmbuf_insert(pcmbuf, n)) {
                 rb->sleep(1);
                 if ( rb->seek_time ) {
                    /* Hmmm, a seek was requested. Throw out the
