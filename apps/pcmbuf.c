@@ -149,7 +149,6 @@ static void pcmbuf_callback(unsigned char** start, long* size)
             pcmbuf_event_handler();
     }
 
-    logf("cbfm:%d", *size);
     if(pcmbuf_unplayed_bytes <= pcmbuf_watermark)
     {
         if(pcmbuf_watermark_event)
