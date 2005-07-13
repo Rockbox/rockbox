@@ -139,7 +139,7 @@ void button_event(int key, bool pressed)
 #endif
         break;
     }
-
+    
     if (pressed)
         btn |= new_btn;
     else
@@ -154,63 +154,63 @@ void button_event(int key, bool pressed)
     {
         queue_post(&button_queue, BUTTON_REL | diff, NULL);
     }
-
-    if ( btn )
-    {
-        /* normal keypress */
-        if ( btn != lastbtn )
-        {
-            post = true;
-            repeat = false;
-            repeat_speed = REPEAT_INTERVAL_START;
-
-        }
-        else /* repeat? */
-        {
-            if ( repeat )
-            {
-                count--;
-                if (count == 0)
-                {
-                    post = true;
-                    /* yes we have repeat */
-                    repeat_speed--;
-                    if (repeat_speed < REPEAT_INTERVAL_FINISH)
-                       repeat_speed = REPEAT_INTERVAL_FINISH;
-                    count = repeat_speed;
-
-                    repeat_count++;
-                }
-            }
-            else
-            {
-                if (count++ > REPEAT_START)
-                {
-                    post = true;
-                    repeat = true;
-                    repeat_count = 0;
-                    /* initial repeat */
-                    count = REPEAT_INTERVAL_START;
-                }
-            }
-        }
-
-        if ( post )
-        {
-            if(repeat)
-                queue_post(&button_queue, BUTTON_REPEAT | btn, NULL);
-            else
-                queue_post(&button_queue, btn, NULL);
-
-            backlight_on();
-        }
-        }
     else
     {
-        repeat = false;
-        count = 0;
-    }
+        if ( btn )
+        {
+            /* normal keypress */
+            if ( btn != lastbtn )
+            {
+                post = true;
+                repeat = false;
+                repeat_speed = REPEAT_INTERVAL_START;
 
+            }
+            else /* repeat? */
+            {
+                if ( repeat )
+                {
+                    count--;
+                    if (count == 0)
+                    {
+                        post = true;
+                        /* yes we have repeat */
+                        repeat_speed--;
+                        if (repeat_speed < REPEAT_INTERVAL_FINISH)
+                            repeat_speed = REPEAT_INTERVAL_FINISH;
+                        count = repeat_speed;
+
+                        repeat_count++;
+                    }
+                }
+                else
+                {
+                    if (count++ > REPEAT_START)
+                    {
+                        post = true;
+                        repeat = true;
+                        repeat_count = 0;
+                        /* initial repeat */
+                        count = REPEAT_INTERVAL_START;
+                    }
+                }
+            }
+            if ( post )
+            {
+                if(repeat)
+                    queue_post(&button_queue, BUTTON_REPEAT | btn, NULL);
+                else
+                    queue_post(&button_queue, btn, NULL);
+
+                backlight_on();
+            }
+        }
+        else
+        {
+            repeat = false;
+            count = 0;
+        }
+    }
     lastbtn = btn & ~(BUTTON_REL | BUTTON_REPEAT);
 }
 
