@@ -9,7 +9,7 @@
 *
 * Copyright (C) 2002 Damien Teney
 * modified to use int instead of float math by Andreas Zwirtes
-* binary fixed point format, LCD aspect handling and solid mode by Jens Arnold
+* heavily extended by Jens Arnold
 *
 * All files in this archive are subject to the GNU General Public License.
 * See the file COPYING in the source tree root for full license agreement.
@@ -27,47 +27,57 @@
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
-#define CUBE_QUIT  BUTTON_OFF
-#define CUBE_X_INC BUTTON_RIGHT
-#define CUBE_X_DEC BUTTON_LEFT
-#define CUBE_Y_INC BUTTON_UP
-#define CUBE_Y_DEC BUTTON_DOWN
-#define CUBE_Z_INC BUTTON_F2
-#define CUBE_Z_DEC BUTTON_F1
-#define CUBE_HIGHSPEED BUTTON_PLAY
+#define CUBE_QUIT          BUTTON_OFF
+#define CUBE_X_INC         BUTTON_RIGHT
+#define CUBE_X_DEC         BUTTON_LEFT
+#define CUBE_Y_INC         BUTTON_UP
+#define CUBE_Y_DEC         BUTTON_DOWN
+#define CUBE_Z_INC         BUTTON_F2
+#define CUBE_Z_DEC         BUTTON_F1
+#define CUBE_MODE          BUTTON_F3
+#define CUBE_PAUSE         BUTTON_PLAY
+#define CUBE_HIGHSPEED     BUTTON_ON
 
 #elif CONFIG_KEYPAD == PLAYER_PAD
-#define CUBE_QUIT  BUTTON_STOP
-#define CUBE_X_INC BUTTON_RIGHT
-#define CUBE_X_DEC BUTTON_LEFT
-#define CUBE_Y_INC (BUTTON_ON | BUTTON_RIGHT)
-#define CUBE_Y_DEC (BUTTON_ON | BUTTON_LEFT)
-#define CUBE_Z_INC (BUTTON_MENU | BUTTON_RIGHT)
-#define CUBE_Z_DEC (BUTTON_MENU | BUTTON_LEFT)
-#define CUBE_HIGHSPEED BUTTON_PLAY
+#define CUBE_QUIT          BUTTON_STOP
+#define CUBE_X_INC         BUTTON_RIGHT
+#define CUBE_X_DEC         BUTTON_LEFT
+#define CUBE_Y_INC         (BUTTON_ON | BUTTON_RIGHT)
+#define CUBE_Y_DEC         (BUTTON_ON | BUTTON_LEFT)
+#define CUBE_Z_INC         (BUTTON_MENU | BUTTON_RIGHT)
+#define CUBE_Z_DEC         (BUTTON_MENU | BUTTON_LEFT)
+#define CUBE_MODE_PRE      BUTTON_MENU
+#define CUBE_MODE          (BUTTON_MENU | BUTTON_REL)
+#define CUBE_PAUSE         BUTTON_PLAY
+#define CUBE_HIGHSPEED_PRE BUTTON_ON
+#define CUBE_HIGHSPEED     (BUTTON_ON | BUTTON_REL)
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
-#define CUBE_QUIT  BUTTON_OFF
-#define CUBE_X_INC BUTTON_RIGHT
-#define CUBE_X_DEC BUTTON_LEFT
-#define CUBE_Y_INC BUTTON_UP
-#define CUBE_Y_DEC BUTTON_DOWN
-#define CUBE_Z_INC (BUTTON_MENU | BUTTON_UP)
-#define CUBE_Z_DEC (BUTTON_MENU | BUTTON_DOWN)
-#define CUBE_HIGHSPEED_PRE BUTTON_MENU
-#define CUBE_HIGHSPEED (BUTTON_MENU | BUTTON_REL)
+#define CUBE_QUIT          BUTTON_OFF
+#define CUBE_X_INC         BUTTON_RIGHT
+#define CUBE_X_DEC         BUTTON_LEFT
+#define CUBE_Y_INC         BUTTON_UP
+#define CUBE_Y_DEC         BUTTON_DOWN
+#define CUBE_Z_INC         (BUTTON_MENU | BUTTON_UP)
+#define CUBE_Z_DEC         (BUTTON_MENU | BUTTON_DOWN)
+#define CUBE_MODE_PRE      BUTTON_MENU
+#define CUBE_MODE          (BUTTON_MENU | BUTTON_REL)
+#define CUBE_PAUSE         (BUTTON_MENU | BUTTON_LEFT)
+#define CUBE_HIGHSPEED     (BUTTON_MENU | BUTTON_RIGHT)
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define CUBE_QUIT  BUTTON_OFF
-#define CUBE_X_INC BUTTON_RIGHT
-#define CUBE_X_DEC BUTTON_LEFT
-#define CUBE_Y_INC BUTTON_UP
-#define CUBE_Y_DEC BUTTON_DOWN
-#define CUBE_Z_INC (BUTTON_ON | BUTTON_UP)
-#define CUBE_Z_DEC (BUTTON_ON | BUTTON_DOWN)
-#define CUBE_MODE  BUTTON_MODE
-#define CUBE_HIGHSPEED BUTTON_SELECT
+#define CUBE_QUIT          BUTTON_OFF
+#define CUBE_X_INC         BUTTON_RIGHT
+#define CUBE_X_DEC         BUTTON_LEFT
+#define CUBE_Y_INC         BUTTON_UP
+#define CUBE_Y_DEC         BUTTON_DOWN
+#define CUBE_Z_INC         (BUTTON_ON | BUTTON_UP)
+#define CUBE_Z_DEC         (BUTTON_ON | BUTTON_DOWN)
+#define CUBE_MODE          BUTTON_MODE
+#define CUBE_PAUSE_PRE     BUTTON_ON
+#define CUBE_PAUSE         (BUTTON_ON | BUTTON_REL)
+#define CUBE_HIGHSPEED     BUTTON_SELECT
 
 #endif
 
@@ -101,16 +111,10 @@ struct line {
     int start, end;
 };
 
-#if LCD_DEPTH > 1
 struct face {
-    int corner1, corner2, corner3, corner4;
+    int corner[4];
+    int line[4];
 };
-
-struct zsort {
-    int place;
-    long sum;
-};
-#endif
 
 /* initial, unrotated cube corners */
 static const struct point_3D sommet[8] =
@@ -129,28 +133,47 @@ static const struct point_3D sommet[8] =
 static const struct line lines[12] =
 {
     {0, 1}, {1, 2}, {2, 3}, {3, 0},
-    {4, 5}, {5, 6}, {6, 7}, {7, 4},
+    {4, 7}, {7, 6}, {6, 5}, {5, 4},
     {0, 4}, {1, 5}, {2, 6}, {3, 7}
 };
 
-#if LCD_DEPTH > 1
-/* The 6 faces of the cube */
+static bool lines_drawn[12];
+
+/* The 6 faces of the cube; points are in clockwise order when viewed
+   from the outside */
 static const struct face faces[6] =
 {
-    {0, 1, 2, 3}, {4, 5, 6, 7},
-    {0, 1, 5, 4}, {3, 2, 6, 7},
-    {0, 3, 7, 4}, {1, 2, 6, 5}
+    {{0, 1, 2, 3}, {0, 1, 2, 3}},
+    {{4, 7, 6, 5}, {4, 5, 6, 7}},
+    {{0, 4, 5, 1}, {8, 7, 9, 0}},
+    {{2, 6, 7, 3}, {10, 5, 11, 2}},
+    {{0, 3, 7, 4}, {3, 11, 4, 8}},
+    {{1, 5, 6, 2}, {9, 6, 10, 1}}
 };
 
-static bool solid = true;
+#if LCD_DEPTH > 1
+static const int face_colors[6] = 
+{
+    2*MAX_LEVEL/3, 2*MAX_LEVEL/3, MAX_LEVEL/3, MAX_LEVEL/3, 0, 0
+};
 #endif
+
+enum {
+#if LCD_DEPTH > 1
+    SOLID,
+#endif
+    HIDDEN_LINES,
+    WIREFRAME,
+    NUM_MODES
+};
+
+static int mode = 0;
 
 static struct point_3D point3D[8];
 static struct point_2D point2D[8];
-
 static long matrice[3][3];
 
-static int nb_points = 8;
+static const int nb_points = 8;
 static long z_off = 600;
 
 /* Precalculated sine and cosine * 16384 (fixed point 18.14) */
@@ -294,93 +317,103 @@ static void cube_viewport(void)
     }
 }
 
-#if LCD_DEPTH > 1
-static int compfunc(const void * a, const void * b)
-{
-    return ((struct zsort *)b)->sum - ((struct zsort *)a)->sum;
-}
-#endif
-
 static void cube_draw(void)
 {
-    int i;
-#if LCD_DEPTH > 1
-    int place;
-    struct zsort z_avgs_f[6];
+    int i, j, line;
 
-    if (solid)
+    switch (mode)
     {
+#if LCD_DEPTH > 1
+      case SOLID:
+
         for (i = 0; i < 6; i++)
         {
-            z_avgs_f[i].place = i;
-            z_avgs_f[i].sum = point3D[faces[i].corner1].z
-                            + point3D[faces[i].corner2].z
-                            + point3D[faces[i].corner3].z
-                            + point3D[faces[i].corner4].z;
-        }
+            /* backface culling; if the shape winds counter-clockwise, we are
+             * looking at the backface, and the (simplified) cross product
+             * is < 0. Do not draw it. */
+            if (0 >= (point2D[faces[i].corner[1]].x - point2D[faces[i].corner[0]].x)
+                   * (point2D[faces[i].corner[2]].y - point2D[faces[i].corner[1]].y)
+                   - (point2D[faces[i].corner[1]].y - point2D[faces[i].corner[0]].y)
+                   * (point2D[faces[i].corner[2]].x - point2D[faces[i].corner[1]].x))
+                continue;
 
-        rb->qsort(z_avgs_f, 6, sizeof(struct zsort), compfunc);
+            rb->lcd_set_foreground(face_colors[i]);
+            xlcd_filltriangle(point2D[faces[i].corner[0]].x,
+                              point2D[faces[i].corner[0]].y,
+                              point2D[faces[i].corner[1]].x,
+                              point2D[faces[i].corner[1]].y,
+                              point2D[faces[i].corner[2]].x,
+                              point2D[faces[i].corner[2]].y);
+            xlcd_filltriangle(point2D[faces[i].corner[0]].x,
+                              point2D[faces[i].corner[0]].y,
+                              point2D[faces[i].corner[2]].x,
+                              point2D[faces[i].corner[2]].y,
+                              point2D[faces[i].corner[3]].x,
+                              point2D[faces[i].corner[3]].y);
 
-        for (i = 3; i < 6; i++) 
-        {   /* we can only see the front 3 faces at best */
-            switch(z_avgs_f[i].place) 
-            {
-                case 0:
-                case 1:
-                    rb->lcd_set_foreground(2*MAX_LEVEL/3);
-                    break;
-                case 2:
-                case 3:
-                    rb->lcd_set_foreground(MAX_LEVEL/3);
-                    break;
-                case 4:
-                case 5:
-                    rb->lcd_set_foreground(0);
-                    break;
-            }
-            place = z_avgs_f[i].place;
-            xlcd_filltriangle(point2D[faces[place].corner1].x,
-                              point2D[faces[place].corner1].y,
-                              point2D[faces[place].corner2].x,
-                              point2D[faces[place].corner2].y,
-                              point2D[faces[place].corner3].x,
-                              point2D[faces[place].corner3].y);
-            xlcd_filltriangle(point2D[faces[place].corner1].x,
-                              point2D[faces[place].corner1].y,
-                              point2D[faces[place].corner3].x,
-                              point2D[faces[place].corner3].y,
-                              point2D[faces[place].corner4].x,
-                              point2D[faces[place].corner4].y);
         }
         rb->lcd_set_foreground(0);
-    }
-    else
+        break;
 #endif /* LCD_DEPTH > 1 */
-    {
+
+      case HIDDEN_LINES:
+
+        rb->memset(lines_drawn, 0, sizeof(lines_drawn));
+        for (i = 0; i < 6; i++)
+        {
+            /* backface culling; if the shape winds counter-clockwise, we are
+             * looking at the backface, and the (simplified) cross product
+             * is < 0. Do not draw it. */
+            if (0 >= (point2D[faces[i].corner[1]].x - point2D[faces[i].corner[0]].x)
+                   * (point2D[faces[i].corner[2]].y - point2D[faces[i].corner[1]].y)
+                   - (point2D[faces[i].corner[1]].y - point2D[faces[i].corner[0]].y)
+                   * (point2D[faces[i].corner[2]].x - point2D[faces[i].corner[1]].x))
+                continue;
+
+            for (j = 0; j < 4; j++)
+            {
+                line = faces[i].line[j];
+                if (!lines_drawn[line])
+                {
+                    lines_drawn[line] = true;
+                    MYLCD(drawline)(point2D[lines[line].start].x,
+                                    point2D[lines[line].start].y,
+                                    point2D[lines[line].end].x,
+                                    point2D[lines[line].end].y);
+                }
+            }
+        }
+        break;
+      
+      case WIREFRAME:
+
         for (i = 0; i < 12; i++)
             MYLCD(drawline)(point2D[lines[i].start].x,
                             point2D[lines[i].start].y,
                             point2D[lines[i].end].x,
                             point2D[lines[i].end].y);
+        break;
     }
 }
 
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    int t_disp=0;
     char buffer[30];
+    int t_disp = 0;
 
     int button;
-    int lastbutton=0;
-    int xa=0;
-    int ya=0;
-    int za=0;
-    int xs=1;
-    int ys=3;
-    int zs=1;
-    bool highspeed=0;
-    bool exit=0;
+    int lastbutton = BUTTON_NONE;
+    int xa = 0;
+    int ya = 0;
+    int za = 0;
+    int xs = 1;
+    int ys = 3;
+    int zs = 1;
+    bool highspeed = false;
+    bool paused = false;
+    bool redraw = true;
+    bool exit = false;
 
     TEST_PLUGIN_API(api);
     (void)(parameter);
@@ -407,20 +440,27 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         else
             rb->sleep(4);
 
-        MYLCD(clear_display)();
-        cube_rotate(xa,ya,za);
-        cube_viewport();
-        cube_draw();
+        if (redraw)
+        {
+            MYLCD(clear_display)();
+            cube_rotate(xa, ya, za);
+            cube_viewport();
+            cube_draw();
+            redraw = false;
+        }
+
 #ifdef HAVE_LCD_BITMAP
-        if (t_disp>0)
+        if (t_disp > 0)
         {
             t_disp--;
             rb->snprintf(buffer, sizeof(buffer), "x:%d y:%d z:%d h:%d",
                          xs, ys, zs, highspeed);
             rb->lcd_putsxy(0, LCD_HEIGHT-8, buffer);
+            if (t_disp == 0)
+                redraw = true;
         }
 #else
-        if (t_disp>0)
+        if (t_disp > 0)
         {
             if (t_disp == DISP_TIME)
             {
@@ -444,80 +484,98 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
         MYLCD(update)();
 
-        xa+=xs;
-        if (xa>359)
-            xa-=360;
-        if (xa<0)
-            xa+=360;
-        ya+=ys;
-        if (ya>359)
-            ya-=360;
-        if (ya<0)
-            ya+=360;
-        za+=zs;
-        if (za>359)
-            za-=360;
-        if (za<0)
-            za+=360;
+        if (!paused)
+        {
+            xa += xs;
+            if (xa > 359)
+                xa -= 360;
+            if (xa < 0)
+                xa += 360;
+            ya += ys;
+            if (ya > 359)
+                ya -= 360;
+            if (ya < 0)
+                ya += 360;
+            za += zs;
+            if (za > 359)
+                za -= 360;
+            if (za < 0)
+                za += 360;
+            redraw = true;
+        }
 
         button = rb->button_get(false);
-        switch(button)
+        switch (button)
         {
             case CUBE_X_INC:
-                xs+=1;
-                if (xs>10)
-                    xs=10;
-                t_disp=DISP_TIME;
+                if (xs < 10)
+                    xs++;
+                t_disp = DISP_TIME;
                 break;
+
             case CUBE_X_DEC:
-                xs-=1;
-                if (xs<-10)
-                    xs=-10;
-                t_disp=DISP_TIME;
+                if (xs > -10)
+                    xs--;
+                t_disp = DISP_TIME;
                 break;
+
             case CUBE_Y_INC:
-                ys+=1;
-                if (ys>10)
-                    ys=10;
-                t_disp=DISP_TIME;
+                if (ys < 10)
+                    ys++;
+                t_disp = DISP_TIME;
                 break;
+
             case CUBE_Y_DEC:
-                ys-=1;
-                if (ys<-10)
-                    ys=-10;
-                t_disp=DISP_TIME;
+                if (ys > -10)
+                    ys--;
+                t_disp = DISP_TIME;
                 break;
+
             case CUBE_Z_INC:
-                zs+=1;
-                if (zs>10)
-                    zs=10;
-                t_disp=DISP_TIME;
+                if (zs < 10)
+                    zs++;
+                t_disp = DISP_TIME;
                 break;
+
             case CUBE_Z_DEC:
-                zs-=1;
-                if (zs<-10)
-                    zs=-10;
-                t_disp=DISP_TIME;
+                if (zs > -10)
+                    zs--;
+                t_disp = DISP_TIME;
                 break;
-#ifdef CUBE_MODE
+
             case CUBE_MODE:
-                solid = !solid;
-                break;
-#endif
-            case CUBE_HIGHSPEED:
-#ifdef CUBE_HIGHSPEED_PRE
-                if (lastbutton!=CUBE_HIGHSPEED_PRE)
+#ifdef CUBE_MODE_PRE
+                if (lastbutton != CUBE_MODE_PRE)
                     break;
 #endif
-                highspeed=!highspeed;
-                t_disp=DISP_TIME;
+                if (++mode >= NUM_MODES)
+                    mode = 0;
+                redraw = true;
                 break;
+
+            case CUBE_PAUSE:
+#ifdef CUBE_PAUSE_PRE
+                if (lastbutton != CUBE_PAUSE_PRE)
+                    break;
+#endif
+                paused = !paused;
+                break;
+
+            case CUBE_HIGHSPEED:
+#ifdef CUBE_HIGHSPEED_PRE
+                if (lastbutton != CUBE_HIGHSPEED_PRE)
+                    break;
+#endif
+                highspeed = !highspeed;
+                t_disp = DISP_TIME;
+                break;
+
             case CUBE_QUIT:
-                exit=1;
+                exit = true;
                 break;
 
             default:
-                if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
                 {
 #ifdef HAVE_LCD_CHARCELLS
                     pgfx_release();
@@ -526,8 +584,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 }
                 break;
         }
-        if (button!=BUTTON_NONE)
-            lastbutton=button;
+        if (button != BUTTON_NONE)
+            lastbutton = button;
     }
     
 #ifdef HAVE_LCD_CHARCELLS
