@@ -297,62 +297,62 @@ static void cube_viewport(void)
 #if LCD_DEPTH > 1
 static int compfunc(const void * a, const void * b)
 {
-	return ((struct zsort *)b)->sum - ((struct zsort *)a)->sum;
+    return ((struct zsort *)b)->sum - ((struct zsort *)a)->sum;
 }
 #endif
 
 static void cube_draw(void)
 {
-	int i;
+    int i;
 #if LCD_DEPTH > 1
     int place;
-	struct zsort z_avgs_f[6];
+    struct zsort z_avgs_f[6];
 
     if (solid)
     {
-		for (i = 0; i < 6; i++)
-		{
-			z_avgs_f[i].place = i;
-			z_avgs_f[i].sum = point3D[faces[i].corner1].z
+        for (i = 0; i < 6; i++)
+        {
+            z_avgs_f[i].place = i;
+            z_avgs_f[i].sum = point3D[faces[i].corner1].z
                             + point3D[faces[i].corner2].z
                             + point3D[faces[i].corner3].z
                             + point3D[faces[i].corner4].z;
         }
 
-		rb->qsort(z_avgs_f, 6, sizeof(struct zsort), compfunc);
+        rb->qsort(z_avgs_f, 6, sizeof(struct zsort), compfunc);
 
-		for (i = 3; i < 6; i++) 
+        for (i = 3; i < 6; i++) 
         {   /* we can only see the front 3 faces at best */
-			switch(z_avgs_f[i].place) 
+            switch(z_avgs_f[i].place) 
             {
-				case 0:
-				case 1:
-				    rb->lcd_set_foreground(2*MAX_LEVEL/3);
-					break;
-				case 2:
-				case 3:
-				    rb->lcd_set_foreground(MAX_LEVEL/3);
-				break;
-				case 4:
-				case 5:
-				    rb->lcd_set_foreground(0);
-				break;
-			}
-			place = z_avgs_f[i].place;
-			xlcd_filltriangle(point2D[faces[place].corner1].x,
-			                  point2D[faces[place].corner1].y,
-			                  point2D[faces[place].corner2].x,
-			                  point2D[faces[place].corner2].y,
-			                  point2D[faces[place].corner3].x,
-			                  point2D[faces[place].corner3].y);
-			xlcd_filltriangle(point2D[faces[place].corner1].x,
-			                  point2D[faces[place].corner1].y,
-			                  point2D[faces[place].corner3].x,
-			                  point2D[faces[place].corner3].y,
-			                  point2D[faces[place].corner4].x,
-			                  point2D[faces[place].corner4].y);
-		}
-		rb->lcd_set_foreground(0);
+                case 0:
+                case 1:
+                    rb->lcd_set_foreground(2*MAX_LEVEL/3);
+                    break;
+                case 2:
+                case 3:
+                    rb->lcd_set_foreground(MAX_LEVEL/3);
+                    break;
+                case 4:
+                case 5:
+                    rb->lcd_set_foreground(0);
+                    break;
+            }
+            place = z_avgs_f[i].place;
+            xlcd_filltriangle(point2D[faces[place].corner1].x,
+                              point2D[faces[place].corner1].y,
+                              point2D[faces[place].corner2].x,
+                              point2D[faces[place].corner2].y,
+                              point2D[faces[place].corner3].x,
+                              point2D[faces[place].corner3].y);
+            xlcd_filltriangle(point2D[faces[place].corner1].x,
+                              point2D[faces[place].corner1].y,
+                              point2D[faces[place].corner3].x,
+                              point2D[faces[place].corner3].y,
+                              point2D[faces[place].corner4].x,
+                              point2D[faces[place].corner4].y);
+        }
+        rb->lcd_set_foreground(0);
     }
     else
 #endif /* LCD_DEPTH > 1 */
