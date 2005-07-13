@@ -37,11 +37,6 @@
 #include "file.h"
 #include "buffer.h"
 
-#if defined(IRIVER_H100) && !defined(SIMULATOR)
-#include "pcm_playback.h"
-#include "kernel.h"
-#endif
-
 #define DEBUG_VERBOSE
 
 #define BYTES2INT(b1,b2,b3,b4) (((long)(b1 & 0xFF) << (3*8)) |      \
@@ -262,14 +257,7 @@ static unsigned long __find_next_frame(int fd, long *offset, long max_offset,
 }
 
 static int fileread(int fd, unsigned char *c)
-{
-#if defined(IRIVER_H100) && !defined(SIMULATOR)
-    /* We don't want to eat all cpu power. Maybe better way to do this
-       should be implemented. */
-    if (pcm_is_lowdata())
-        yield();
-#endif
-    
+{    
     return read(fd, c, 1);
 }
 

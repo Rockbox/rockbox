@@ -62,6 +62,7 @@
 extern bool pcm_rec_screen(void);
 #endif
 #if CONFIG_HWCODEC == MASNONE
+#include "pcmbuf.h"
 #include "pcm_playback.h"
 #endif
 
