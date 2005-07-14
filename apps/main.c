@@ -63,6 +63,8 @@
 
 #if (CONFIG_HWCODEC == MASNONE)
 #include "pcmbuf.h"
+#else
+#define pcmbuf_init()
 #endif
 #if defined(IRIVER_H100_SERIES) && !defined(SIMULATOR)
 #include "pcm_record.h"
@@ -126,7 +128,7 @@ void init(void)
               global_settings.mdb_enable,
               global_settings.superbass);
     audio_init();
-    pcmbuf_init();
+    pcmbuf_init();    
     button_clear_queue(); /* Empty the keyboard buffer */
 }
 
