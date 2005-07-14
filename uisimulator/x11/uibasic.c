@@ -214,6 +214,39 @@ void screenhack()
     app_main();
 }
 
+/* used for the player sim */
+void drawdots(int color, struct coordinate *points, int count)
+{
+    XtAppLock(app);
+    XSetForeground(dpy, draw_gc, getcolor[color==0?0:3].pixel);
+
+    while (count--) {
+        XFillRectangle(dpy, window, draw_gc,
+                       points[count].x*display_zoom,
+                       points[count].y*display_zoom,
+                       display_zoom,
+                       display_zoom);
+    }
+    XtAppUnlock(app);
+}
+
+/* used for the player sim */
+void drawrectangles(int color, struct rectangle *points, int count)
+{
+    XtAppLock(app);
+
+    XSetForeground(dpy, draw_gc, getcolor[color==0?0:3].pixel);
+    while (count--) {
+        XFillRectangle(dpy, window, draw_gc,
+                       points[count].x*display_zoom,
+                       points[count].y*display_zoom,
+                       points[count].width*display_zoom,
+                       points[count].height*display_zoom);
+    }
+    XtAppUnlock(app);
+}
+
+
 void screen_redraw()
 {
     /* draw a border around the screen */
