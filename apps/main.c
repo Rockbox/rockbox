@@ -126,6 +126,7 @@ void init(void)
               global_settings.mdb_enable,
               global_settings.superbass);
     audio_init();
+    pcmbuf_init();
     button_clear_queue(); /* Empty the keyboard buffer */
 }
 
