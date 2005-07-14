@@ -276,6 +276,10 @@ void lcd_backlight (bool on)
 void lcdcolors(int index, int count, RGBQUAD *start, RGBQUAD *end)
 {
     int i;
+
+    bmi.bmiHeader.biClrUsed = index + count;
+    bmi.bmiHeader.biClrImportant = index + count;
+
     count--;
     for (i = 0; i <= count; i++)
     {
@@ -293,6 +297,10 @@ void lcdcolors(int index, int count, RGBQUAD *start, RGBQUAD *end)
 void lcdremotecolors(int index, int count, RGBQUAD *start, RGBQUAD *end)
 {
     int i;
+    
+    remote_bmi.bmiHeader.biClrUsed = index + count;
+    remote_bmi.bmiHeader.biClrImportant = index + count;
+
     count--;
     for (i = 0; i <= count; i++)
     {
@@ -309,8 +317,6 @@ void lcdremotecolors(int index, int count, RGBQUAD *start, RGBQUAD *end)
 /* initialise simulator lcd driver */
 void simlcdinit(void)
 {
-    bmi.bmiHeader.biClrUsed = (1<<LCD_DEPTH);
-    bmi.bmiHeader.biClrImportant = (1<<LCD_DEPTH);
     lcdcolors(0, (1<<LCD_DEPTH), &color_zero, &color_max);
 #ifdef HAVE_REMOTE_LCD
     lcdremotecolors(0, (1<<LCD_REMOTE_DEPTH), &remote_color_zero, &remote_color_max);
