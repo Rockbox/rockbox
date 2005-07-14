@@ -232,8 +232,8 @@ enum codec_status codec_start(struct codec_api* api)
     }
 
     eof=0;
-    rb->yield();
     while (!eof) {
+        rb->yield();
         if (rb->stop_codec || rb->reload_codec)
             break ;
 
@@ -264,18 +264,11 @@ enum codec_status codec_start(struct codec_api* api)
         } else {
             while (!rb->pcmbuf_insert(pcmbuf, n)) {
                 rb->sleep(1);
-                if ( rb->seek_time ) {
-                   /* Hmmm, a seek was requested. Throw out the
-                    * buffer and go back to the top of the loop.
-                    */
-                   break;
-                }
         }
-            if ( !rb->seek_time ) {
-                rb->set_offset(ov_raw_tell(&vf));
-                rb->set_elapsed(ov_time_tell(&vf));
-                rb->yield();
-            }
+
+        rb->set_offset(ov_raw_tell(&vf));
+        rb->set_elapsed(ov_time_tell(&vf));
+
         }
     }
     
