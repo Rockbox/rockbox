@@ -100,6 +100,8 @@ static signed char speed[]={
   1,2,3,3,3,2,1,0,-1,-2,-2,-2,-1,0,0,1,
 };
 
+#define LETTER_WIDTH 12 /* pixels wide */
+
 const unsigned char char_gen_12x16[][22] =
 {
     { 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00 },
@@ -277,6 +279,8 @@ static void addclock(void)
 }
 #endif /* HAVE_RTC */
 
+#define DRAW_WIDTH (LCD_WIDTH + LETTER_WIDTH)
+
 static int scrollit(void)
 {
     int b;
@@ -312,7 +316,7 @@ static int scrollit(void)
             rb->lcd_mono_bitmap((char *)char_gen_12x16[letter-0x20],
                                 xx, table[yy&(TABLE_SIZE-1)], 11, 16);
             yy += YADD;
-            xx+= LCD_WIDTH/LETTERS_ON_SCREEN;
+            xx+= DRAW_WIDTH/LETTERS_ON_SCREEN;
         }
         rb->lcd_set_drawmode(DRMODE_SOLID);
 #ifdef HAVE_RTC
@@ -322,8 +326,8 @@ static int scrollit(void)
 
         x-= XSPEED;
         
-        if(x < 0) {
-            x += LCD_WIDTH/LETTERS_ON_SCREEN;
+        if(x < -LETTER_WIDTH) {
+            x += DRAW_WIDTH/LETTERS_ON_SCREEN;
             y += YADD;
             textpos++;
         }
