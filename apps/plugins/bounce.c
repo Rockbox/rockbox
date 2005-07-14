@@ -24,7 +24,7 @@
 #define SS_TITLE       "Bouncer"
 #define SS_TITLE_FONT  2
 
-#define LETTERS_ON_SCREEN 12
+#define LETTERS_ON_SCREEN (LCD_WIDTH/10)
 
 #define YSPEED 2
 #define XSPEED 3
@@ -279,7 +279,14 @@ static void addclock(void)
 }
 #endif /* HAVE_RTC */
 
-#define DRAW_WIDTH (LCD_WIDTH + LETTER_WIDTH)
+#define DRAW_WIDTH (LCD_WIDTH + LETTER_WIDTH*2)
+
+#if LCD_DEPTH > 1
+static const int face_colors[] = 
+{
+    0, 2*MAX_LEVEL/3, MAX_LEVEL/3
+};
+#endif
 
 static int scrollit(void)
 {
@@ -312,7 +319,9 @@ static int scrollit(void)
 
         for(i=0, yy=y, xx=x; i< LETTERS_ON_SCREEN; i++) {
             letter = rock[(i+textpos) % rocklen ];
-
+#if LCD_DEPTH > 1
+            rb->lcd_set_foreground(face_colors[ letter % 3] );
+#endif
             rb->lcd_mono_bitmap((char *)char_gen_12x16[letter-0x20],
                                 xx, table[yy&(TABLE_SIZE-1)], 11, 16);
             yy += YADD;
