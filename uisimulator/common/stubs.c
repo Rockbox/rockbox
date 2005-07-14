@@ -57,9 +57,10 @@ void pcm_init(void)
 {
 }
 
+void (*sound_get_pcm)(unsigned char** start, long* size);
 void pcm_play_data(void (*get_more)(unsigned char** start, long* size))
 {
-    (void)get_more;
+    sound_get_pcm = get_more;
 }
 
 /* Generic firmware stubs. */
@@ -94,7 +95,6 @@ int ata_write_sectors(IF_MV2(int drive,)
         FILE* f;
         char name[32];
 
-        DEBUGF("Writing sector %X\n",start+i);
         sprintf(name,"sector%lX.bin",start+i);
         f=fopen(name,"w");
         if (f) {

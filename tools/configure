@@ -12,6 +12,7 @@
 CCOPTS="-W -Wall -O -nostdlib -ffreestanding -Wstrict-prototypes"
 
 use_logf="#undef ROCKBOX_HAS_LOGF"
+use_simsound="#undef ROCKBOX_HAS_SIMSOUND"
 
 scriptver=`echo '$Revision$' | sed -e 's:\\$::g' -e 's/Revision: //'`
 
@@ -82,7 +83,14 @@ simcc () {
    LDOPTS='-L/usr/X11R6/lib -lX11 -lm -lXt -lXmu -lnsl -ldl -lpthread'
    if [ "$simver" = "win32" ]; then
      crosswincc # setup cross-compiler
-   fi
+   else
+     if test -n "$codecs"; then
+       if test -f "/usr/include/linux/soundcard.h"; then
+         # We have a header file so we can build the sound code
+         use_simsound="#define ROCKBOX_HAS_SIMSOUND 1"
+       fi # header file present
+     fi # has codecs
+   fi # not a cross-compiler
    ;;
 
    FreeBSD)
@@ -691,6 +699,7 @@ fi
 sed > autoconf.h \
  -e "s,@ENDIAN@,${defendian},g" \
  -e "s,^#undef ROCKBOX_HAS_LOGF,$use_logf,g" \
+ -e "s,@SIMSOUND@,$use_simsound,g" \
 <<EOF
 /* This header was made by configure */
 #ifndef __BUILD_AUTOCONF_H
@@ -701,6 +710,10 @@ sed > autoconf.h \
 
 /* Define this if you build rockbox to support the logf logging and display */
 #undef ROCKBOX_HAS_LOGF
+
+/* Define this if you have the linux/soundcard.h header and thus can compile
+   the sound-playing code in the X11 sim */
+@SIMSOUND@
 
 #endif /* __BUILD_AUTOCONF_H */
 EOF

@@ -17,11 +17,17 @@
  *
  ****************************************************************************/
 
+#include "autoconf.h"
+
 #include <stdio.h>
 #include <pthread.h>
 
 #include "kernel.h"
 #include <sys/time.h>
+
+#ifdef ROCKBOX_HAS_SIMSOUND
+#include "sound.h"
+#endif
 
 long current_tick = 0;
 extern void button_tick(void);
@@ -77,8 +83,19 @@ void init_threads(void)
     /* get mutex to only allow one thread running at a time */
     pthread_mutex_lock(&mp);
 
+    /* start a tick thread */
     pthread_create(&tick_tid, NULL, (void *(*)(void *)) update_tick_thread, 
                    NULL);
+
+#ifdef ROCKBOX_HAS_SIMSOUND /* start thread that plays PCM data */
+    {
+        pthread_t sound_tid;
+        pthread_create(&sound_tid, NULL,
+                       (void *(*)(void *)) sound_playback_thread, 
+                       NULL);
+    }
+#endif
+
 }
 /* 
    int pthread_create(pthread_t *new_thread_ID,

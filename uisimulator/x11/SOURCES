@@ -9,3 +9,6 @@ screenhack.c
 thread.c
 uibasic.c
 visual.c
+#if CONFIG_HWCODEC == MASNONE
+sound.c
+#endif
