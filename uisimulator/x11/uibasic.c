@@ -58,18 +58,42 @@ XrmOptionDescRec options [] = {
 };
 char *progclass = "rockboxui";
 
-char *defaults [] = {
 #ifdef IRIVER_H100_SERIES
-    ".background: lightblue",
+#define BGCOLOR "lightblue"
 #elif defined ARCHOS_GMINI120
-    ".background: royalblue",
+#define BGCOLOR "royalblue"
 #else
-    ".background: lightgreen",
+#define BGCOLOR "lightgreen"
 #endif
+
+
+char *defaults [] = {
+    ".background: " BGCOLOR,
     ".foreground: black",
     "*help:       false",
     0
 };
+
+static XColor getcolor[4];
+
+/* set a range of bitmap indices to a gradient from startcolour to endcolour
+   inherited from the win32 sim code by Jens Arnold */
+static void lcdcolors(int index, int count, XColor *start, XColor *end)
+{
+    int i;
+    count--;
+    for (i = 0; i <= count; i++)
+    {
+        getcolor[i+index].red = start->red
+            + (end->red - start->red) * i / count;
+        getcolor[i+index].green = start->green
+            + (end->green - start->green) * i / count;
+        getcolor[i+index].blue = start->blue
+            + (end->blue - start->blue) * i / count;
+        XAllocColor (dpy, cmap, &getcolor[i+index]);
+    }
+}
+
 
 void init_window ()
 {
@@ -77,11 +101,32 @@ void init_window ()
     XWindowAttributes xgwa;
 
     XGetWindowAttributes (dpy, window, &xgwa);
+    XColor bg;
+    XColor fg;
 
     cmap = xgwa.colormap;
 
+    XParseColor (dpy, cmap, BGCOLOR, &bg);
+    XParseColor (dpy, cmap, "black", &fg);
+    getcolor[0] = bg;
+    getcolor[1] = bg;
+    getcolor[2] = bg;
+    getcolor[3] = bg;
+
+    lcdcolors(0, 4, &bg, &fg);
+
+#if 0
+    for(i=0; i<4; i++) {
+        printf("color %d: %d %d %d\n",
+               i,
+               getcolor[i].red,
+               getcolor[i].green,
+               getcolor[i].blue);
+    }
+#endif
+    
     gcv.function = GXxor;
-    gcv.foreground = get_pixel_resource("foreground", "Foreground", dpy, cmap);
+    gcv.foreground = getcolor[3].pixel;
     draw_gc = XCreateGC (dpy, window, GCForeground, &gcv);
 
     screen_resized(LCD_WIDTH, LCD_HEIGHT);
@@ -94,8 +139,8 @@ void screen_resized(int width, int height)
     maxy = height;
 
     XtAppLock(app);
-    XSetForeground(dpy, draw_gc,
-                   get_pixel_resource("background", "Background", dpy, cmap));
+    XSetForeground(dpy, draw_gc, getcolor[0].pixel);
+
     XFillRectangle(dpy, window, draw_gc, 0, 0, width*display_zoom,
                    height*display_zoom);
     XtAppUnlock(app);
@@ -106,13 +151,7 @@ void screen_resized(int width, int height)
 void drawrect(int color, int x1, int y1, int x2, int y2)
 {
     XtAppLock(app);
-    if (color==0)
-        XSetForeground(dpy, draw_gc,
-                       get_pixel_resource("background", "Background", dpy, cmap));
-    else
-        XSetForeground(dpy, draw_gc,
-                       get_pixel_resource("foreground", "Foreground", dpy, cmap));
-
+    XSetForeground(dpy, draw_gc, getcolor[color].pixel);
     XFillRectangle(dpy, window, draw_gc, x1*display_zoom, y1*display_zoom,
                    x2*display_zoom, y2*display_zoom);
     XtAppUnlock(app);
@@ -124,15 +163,10 @@ static void help(void)
            "usage: " PROGNAME "\n");
 }
 
-void drawline(int color, int x1, int y1, int x2, int y2)
+static void drawline(int color, int x1, int y1, int x2, int y2)
 {
     XtAppLock(app);
-    if (color==0)
-        XSetForeground(dpy, draw_gc,
-                       get_pixel_resource("background", "Background", dpy, cmap));
-    else
-        XSetForeground(dpy, draw_gc,
-                       get_pixel_resource("foreground", "Foreground", dpy, cmap));
+    XSetForeground(dpy, draw_gc, getcolor[color].pixel);
 
     XDrawLine(dpy, window, draw_gc,
               (int)(x1*display_zoom),
@@ -142,73 +176,20 @@ void drawline(int color, int x1, int y1, int x2, int y2)
     XtAppUnlock(app);
 }
 
-void drawdot(int color, int x, int y)
+void dots(int *colors, struct coordinate *points, int count)
 {
+    int color;
     XtAppLock(app);
-    if (color==0)
-        XSetForeground(dpy, draw_gc,
-                       get_pixel_resource("background", "Background", dpy, cmap));
-    else
-        XSetForeground(dpy, draw_gc,
-                       get_pixel_resource("foreground", "Foreground", dpy, cmap));
-
-    XFillRectangle(dpy, window, draw_gc, x*display_zoom, y*display_zoom,
-                   display_zoom, display_zoom);
-    XtAppUnlock(app);
-}
-
-void drawdots(int color, struct coordinate *points, int count)
-{
-    XtAppLock(app);
-    if (color==0)
-        XSetForeground(dpy, draw_gc,
-                       get_pixel_resource("background", "Background", dpy, cmap));
-    else
-        XSetForeground(dpy, draw_gc,
-                       get_pixel_resource("foreground", "Foreground", dpy, cmap));
 
     while (count--) {
+        color = colors[count];
+        XSetForeground(dpy, draw_gc, getcolor[color].pixel);
         XFillRectangle(dpy, window, draw_gc,
                        points[count].x*display_zoom,
                        points[count].y*display_zoom,
                        display_zoom,
                        display_zoom);
     }
-    XtAppUnlock(app);
-}
-
-void drawrectangles(int color, struct rectangle *points, int count)
-{
-    XtAppLock(app);
-    if (color==0)
-        XSetForeground(dpy, draw_gc,
-                       get_pixel_resource("background", "Background", dpy, cmap));
-    else
-        XSetForeground(dpy, draw_gc,
-                       get_pixel_resource("foreground", "Foreground", dpy, cmap));
-
-    while (count--) {
-        XFillRectangle(dpy, window, draw_gc,
-                       points[count].x*display_zoom,
-                       points[count].y*display_zoom,
-                       points[count].width*display_zoom,
-                       points[count].height*display_zoom);
-    }
-    XtAppUnlock(app);
-}
-
-void drawtext(int color, int x, int y, char *text)
-{
-    XtAppLock(app);
-    if (color==0)
-        XSetForeground(dpy, draw_gc,
-                       get_pixel_resource("background", "Background", dpy, cmap));
-    else
-        XSetForeground(dpy, draw_gc,
-                       get_pixel_resource("foreground", "Foreground", dpy, cmap));
-
-    XDrawString(dpy, window, draw_gc, x*display_zoom, y*display_zoom, text,
-                strlen(text));
     XtAppUnlock(app);
 }
 

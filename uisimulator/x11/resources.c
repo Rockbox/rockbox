@@ -21,9 +21,6 @@ extern char *progname;
 extern char *progclass;
 extern XrmDatabase db;
 
-static unsigned int get_time_resource (char *res_name, char *res_class,
-				       Bool sec_p);
-
 #ifndef isupper
 # define isupper(c)  ((c) >= 'A' && (c) <= 'Z')
 #endif
@@ -79,57 +76,6 @@ get_boolean_resource (char *res_name, char *res_class)
   return 0;
 }
 
-int 
-get_integer_resource (char *res_name, char *res_class)
-{
-  int val;
-  char c, *s = get_string_resource (res_name, res_class);
-  char *ss = s;
-  if (!s) return 0;
-
-  while (*ss && *ss <= ' ') ss++;			/* skip whitespace */
-
-  if (ss[0] == '0' && (ss[1] == 'x' || ss[1] == 'X'))	/* 0x: parse as hex */
-    {
-      if (1 == sscanf (ss+2, "%x %c", &val, &c))
-	{
-	  free (s);
-	  return val;
-	}
-    }
-  else							/* else parse as dec */
-    {
-      if (1 == sscanf (ss, "%d %c", &val, &c))
-	{
-	  free (s);
-	  return val;
-	}
-    }
-
-  fprintf (stderr, "%s: %s must be an integer, not %s.\n",
-	   progname, res_name, s);
-  free (s);
-  return 0;
-}
-
-double
-get_float_resource (char *res_name, char *res_class)
-{
-  double val;
-  char c, *s = get_string_resource (res_name, res_class);
-  if (! s) return 0.0;
-  if (1 == sscanf (s, " %lf %c", &val, &c))
-    {
-      free (s);
-      return val;
-    }
-  fprintf (stderr, "%s: %s must be a float, not %s.\n",
-	   progname, res_name, s);
-  free (s);
-  return 0.0;
-}
-
-
 unsigned int
 get_pixel_resource (char *res_name, char *res_class,
 		    Display *dpy, Colormap cmap)
@@ -165,67 +111,3 @@ get_pixel_resource (char *res_name, char *res_class,
 	  : WhitePixel (dpy, DefaultScreen (dpy)));
 }
 
-
-int
-parse_time (const char *string, Bool seconds_default_p, Bool silent_p)
-{
-  unsigned int h, m, s;
-  char c;
-  if (3 == sscanf (string,   " %u : %2u : %2u %c", &h, &m, &s, &c))
-    ;
-  else if (2 == sscanf (string, " : %2u : %2u %c", &m, &s, &c) ||
-	   2 == sscanf (string,    " %u : %2u %c", &m, &s, &c))
-    h = 0;
-  else if (1 == sscanf (string,       " : %2u %c", &s, &c))
-    h = m = 0;
-  else if (1 == sscanf (string,          " %u %c",
-			(seconds_default_p ? &s : &m), &c))
-    {
-      h = 0;
-      if (seconds_default_p) m = 0;
-      else s = 0;
-    }
-  else
-    {
-      if (! silent_p)
-	fprintf (stderr, "%s: invalid time interval specification \"%s\".\n",
-		 progname, string);
-      return -1;
-    }
-  if (s >= 60 && (h != 0 || m != 0))
-    {
-      if (! silent_p)
-	fprintf (stderr, "%s: seconds > 59 in \"%s\".\n", progname, string);
-      return -1;
-    }
-  if (m >= 60 && h > 0)
-    {
-      if (! silent_p)
-	fprintf (stderr, "%s: minutes > 59 in \"%s\".\n", progname, string);
-      return -1;
-    }
-  return ((h * 60 * 60) + (m * 60) + s);
-}
-
-static unsigned int 
-get_time_resource (char *res_name, char *res_class, Bool sec_p)
-{
-  int val;
-  char *s = get_string_resource (res_name, res_class);
-  if (!s) return 0;
-  val = parse_time (s, sec_p, False);
-  free (s);
-  return (val < 0 ? 0 : val);
-}
-
-unsigned int 
-get_seconds_resource (char *res_name, char *res_class)
-{
-  return get_time_resource (res_name, res_class, True);
-}
-
-unsigned int 
-get_minutes_resource (char *res_name, char *res_class)
-{
-  return get_time_resource (res_name, res_class, False);
-}

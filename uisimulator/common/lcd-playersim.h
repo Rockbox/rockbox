@@ -30,7 +30,10 @@ struct rectangle {
 
 void drawdots(int color, struct coordinate *coord, int count);
 void drawdot(int color, int x, int y);
-void drawline(int color, int x1, int y1, int x2, int y2);
 void drawrect(int color, int x1, int y1, int x2, int y2);
 void drawrectangles(int color, struct rectangle *rects, int count);
+
+
+void dots(int *colors, struct coordinate *points, int count);
+
 
