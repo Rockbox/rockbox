@@ -315,7 +315,6 @@ static int scrollit(void)
             return -1;
 
         rb->lcd_clear_display();
-        rb->lcd_set_drawmode(DRMODE_FG);
 
         for(i=0, yy=y, xx=x; i< LETTERS_ON_SCREEN; i++) {
             letter = rock[(i+textpos) % rocklen ];
@@ -327,7 +326,6 @@ static int scrollit(void)
             yy += YADD;
             xx+= DRAW_WIDTH/LETTERS_ON_SCREEN;
         }
-        rb->lcd_set_drawmode(DRMODE_SOLID);
 #ifdef HAVE_RTC
         addclock();
 #endif
@@ -408,7 +406,6 @@ static int loopit(void)
             rb->lcd_putsxy(0, LCD_HEIGHT -  8, buffer);
             timeout--;
         }
-        rb->lcd_set_drawmode(DRMODE_FG);
         for(i=0, yy=y, xx=x;
             i<rocklen;
             i++, yy+=values[NUM_YDIST].num, xx+=values[NUM_XDIST].num)
@@ -416,7 +413,6 @@ static int loopit(void)
                                 xtable[xx&(TABLE_SIZE-1)],
                                 table[yy&(TABLE_SIZE-1)], 11, 16);
         rb->lcd_update();
-        rb->lcd_set_drawmode(DRMODE_SOLID);
 
         ysanke+= values[NUM_YSANKE].num;
         xsanke+= values[NUM_XSANKE].num;
@@ -471,13 +467,18 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_putsxy(LCD_WIDTH/2-len, LCD_HEIGHT-(2*h), off);
     rb->lcd_update();
     rb->sleep(HZ);
-    
+    rb->lcd_set_drawmode(DRMODE_FG);
+
     do {
         h = loopit();
         if (h > 0)
             h = scrollit();
+#if LCD_DEPTH > 1
+        rb->lcd_set_foreground(0);
+#endif
     } while(h > 0);
     
+    rb->lcd_set_drawmode(DRMODE_SOLID);
     rb->lcd_setfont(FONT_UI);
     
     return (h == 0) ? PLUGIN_OK : PLUGIN_USB_CONNECTED;
