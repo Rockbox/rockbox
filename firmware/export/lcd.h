@@ -168,13 +168,14 @@ extern void lcd_scroll_step(int pixels);
 
 #if LCD_DEPTH > 1
 extern void lcd_set_foreground(int brightness);
-extern int lcd_get_foreground(void);
+extern int  lcd_get_foreground(void);
 extern void lcd_set_background(int brightness);
-extern int lcd_get_background(void);
+extern int  lcd_get_background(void);
+extern void lcd_set_drawinfo(int mode, int fg_brightness, int bg_brightness);
 extern void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
                             int stride, int x, int y, int width, int height);
 extern void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width,
-                       int height);
+                            int height);
 #else /* LCD_DEPTH == 1 */
 #define lcd_mono_bitmap lcd_bitmap
 #define lcd_mono_bitmap_part lcd_bitmap_part

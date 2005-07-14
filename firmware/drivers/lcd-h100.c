@@ -302,6 +302,13 @@ int lcd_get_background(void)
     return ~bg_pattern & 3;
 }
 
+void lcd_set_drawinfo(int mode, int fg_brightness, int bg_brightness)
+{
+    lcd_set_drawmode(mode);
+    lcd_set_foreground(fg_brightness);
+    lcd_set_background(bg_brightness);
+}
+
 void lcd_setmargins(int x, int y)
 {
     xmargin = x;
