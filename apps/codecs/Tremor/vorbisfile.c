@@ -1548,6 +1548,10 @@ long ov_read(OggVorbis_File *vf,char *buffer,int bytes_req,int *bitstream){
 
   if(vf->ready_state<OPENED)return(OV_EINVAL);
 
+#if CONFIG_CPU == MCF5249 && !defined(SIMULATOR)
+  mcf5249_init_mac();
+#endif
+
   while(1){
     if(vf->ready_state==INITSET){
       samples=vorbis_synthesis_pcmout(&vf->vd,&pcm);
