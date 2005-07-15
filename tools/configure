@@ -52,6 +52,16 @@ crosswincc () {
  endian="little" # windows is little endian
 }
 
+checksoundcard () {
+    if test -n "$codecs"; then
+        if test -f "/usr/include/sys/soundcard.h"; then
+         # We have a header file so we can build the sound code
+            use_simsound="#define ROCKBOX_HAS_SIMSOUND 1"
+        fi # header file present
+    fi # has codecs
+}
+
+
 simcc () {
 
  # default tool setup for native building
@@ -73,6 +83,7 @@ simcc () {
        # x11 version
        GCCOPTS="$GCCOPTS"
        LDOPTS='-L/usr/X11R6/lib -lSM -lICE -lXt -lX11 -lXmu -lSM -lICE -lX11 -lpthread'
+       checksoundcard
    fi
    output="rockboxui.exe" # use this as output binary name
    ;;
@@ -82,14 +93,9 @@ simcc () {
    GCCOPTS="$GCCOPTS"
    LDOPTS='-L/usr/X11R6/lib -lX11 -lm -lXt -lXmu -lnsl -ldl -lpthread'
    if [ "$simver" = "win32" ]; then
-     crosswincc # setup cross-compiler
+       crosswincc # setup cross-compiler
    else
-     if test -n "$codecs"; then
-       if test -f "/usr/include/linux/soundcard.h"; then
-         # We have a header file so we can build the sound code
-         use_simsound="#define ROCKBOX_HAS_SIMSOUND 1"
-       fi # header file present
-     fi # has codecs
+       checksoundcard
    fi # not a cross-compiler
    ;;
 
