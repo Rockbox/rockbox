@@ -845,7 +845,7 @@ void settings_apply(void)
         talk_init(); /* use voice of same language */
     }
 
-#if CONFIG_HWCODEC == MASNONE && !defined(SIMULATOR)
+#if CONFIG_HWCODEC == MASNONE
     pcmbuf_crossfade_enable(global_settings.crossfade);
 #endif
 

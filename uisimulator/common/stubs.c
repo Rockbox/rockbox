@@ -32,11 +32,12 @@
 #include "ata.h" /* for volume definitions */
 
 extern char having_new_lcd;
+static bool playing = false;
 
 /* Stubs for PCM audio playback. */
 bool pcm_is_playing(void)
 {
-    return false;
+    return playing;
 }
 
 void pcm_play_pause(bool state)
@@ -51,6 +52,7 @@ bool pcm_is_paused(void)
 
 void pcm_play_stop(void)
 {
+    playing = false;
 }
 
 void pcm_init(void)
@@ -61,6 +63,7 @@ void (*sound_get_pcm)(unsigned char** start, long* size);
 void pcm_play_data(void (*get_more)(unsigned char** start, long* size))
 {
     sound_get_pcm = get_more;
+    playing = true;
 }
 
 /* Generic firmware stubs. */

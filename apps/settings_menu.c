@@ -1107,9 +1107,8 @@ static bool id3_order(void)
 static bool crossfade(void)
 {
     bool rc = set_bool( str(LANG_CROSSFADE), &global_settings.crossfade );
-#ifndef SIMULATOR
     pcmbuf_crossfade_enable(global_settings.crossfade);
-#endif
+
     return rc;
 }
 #endif
