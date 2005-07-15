@@ -844,7 +844,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     tracks[track_widx].filesize = size;
     tracks[track_widx].filepos = 0;
     tracks[track_widx].available = 0;
-    // tracks[track_widx].taginfo_ready = false;
+    tracks[track_widx].taginfo_ready = false;
     tracks[track_widx].playlist_offset = offset;
     
     if (buf_widx >= codecbuflen)
@@ -1141,7 +1141,7 @@ void audio_check_buffer(void)
     } else if (tracks[track_widx].filerem == 0 || fill_bytesleft == 0) {
         /* Read next unbuffered track's metadata as necessary. */
         read_next_metadata();
-            
+        
         generate_postbuffer_events();
         filling = false;
         conf_bufferlimit = 0;
