@@ -59,7 +59,7 @@ int main (int argc, char* argv[]) {
     /* print old checksum */
     fseek (pFile, CHECKSUM_BIT, SEEK_SET);
     byte = fgetc(pFile);
-    printf("Old checksum: 0x%02x\n", (unsigned char) byte);
+    printf("Old checksum: 0x%02x\n", byte & 0xff);
 
     /* get file size*/
     fseek(pFile,0,SEEK_END);
@@ -85,7 +85,7 @@ int main (int argc, char* argv[]) {
     for (i = CHECKSUM_START; i < length; i++) {
         checksum += inbuf[i];
     }
-    printf("New checksum: 0x%02x\n", (unsigned char) checksum);
+    printf("New checksum: 0x%02x\n", checksum & 0xff);
 
     /* save new checksum */
     inbuf[CHECKSUM_BIT] = (unsigned char) checksum;
