@@ -396,9 +396,10 @@ appsdir='\$(ROOTDIR)/apps'
   echo "6 - Archos Gmini SP"
   echo "7 - Archos Ondio SP"
   echo "8 - Archos Ondio FM"
-  echo "9 - iRiver H120/H140"
-  echo "10 - iRiver H320/H340"
-  echo "11 - iRiver iHP-100/iHP-110/iHP-115"
+  echo "9 - iriver H120/H140"
+  echo "10 - iriver H320/H340"
+  echo "11 - iriver iHP-100/iHP-110/iHP-115"
+  echo "12 - iAudio X5"
 
   getit=`input`;
 
@@ -545,6 +546,20 @@ appsdir='\$(ROOTDIR)/apps'
     coldfirecc
     tool="$rootdir/tools/scramble -add=h100"
     output="rockbox.iriver"
+    appextra="recorder"
+    archosrom=""
+    flash=""
+    plugins="yes"
+    codecs="libmad liba52 libFLAC libTremor libwavpack dumb libmusepack"
+    ;;
+
+   12)
+    archos="x5"
+    target="-DIAUDIO_X5"
+    memory=32 # always
+    coldfirecc
+    tool="$rootdir/tools/scramble -add=x5" # wrong, must be fixed
+    output="rockbox.iaudio"
     appextra="recorder"
     archosrom=""
     flash=""
