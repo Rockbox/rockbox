@@ -34,6 +34,8 @@ static inline void mcf5249_init_mac(void) {
 }
 
 static inline ogg_int32_t MULT32(ogg_int32_t x, ogg_int32_t y) {
+
+  mcf5249_init_mac();
   asm volatile ("mac.l %[x], %[y], %%acc0;"    /* multiply & shift  */
                 "movclr.l %%acc0, %[x];"       /* move & clear acc */
                 "asr.l #1, %[x];"              /* no overflow test */
@@ -44,6 +46,8 @@ static inline ogg_int32_t MULT32(ogg_int32_t x, ogg_int32_t y) {
 }
 
 static inline ogg_int32_t MULT31(ogg_int32_t x, ogg_int32_t y) {
+
+  mcf5249_init_mac();
   asm volatile ("mac.l %[x], %[y], %%acc0;" /* multiply */
                 "movclr.l %%acc0, %[x];"    /* move and clear */
                 : [x] "+&r" (x)
@@ -55,6 +59,8 @@ static inline ogg_int32_t MULT31(ogg_int32_t x, ogg_int32_t y) {
 
 static inline ogg_int32_t MULT31_SHIFT15(ogg_int32_t x, ogg_int32_t y) {
   ogg_int32_t r;
+
+  mcf5249_init_mac();
   asm volatile ("mac.l %[x], %[y], %%acc0;"  /* multiply */
                 "movclr.l %%acc0, %[r];"     /* get higher half */
                 "mulu.l %[y], %[x];"         /* get lower half */
@@ -75,6 +81,7 @@ void XPROD31(ogg_int32_t  a, ogg_int32_t  b,
              ogg_int32_t  t, ogg_int32_t  v,
              ogg_int32_t *x, ogg_int32_t *y)
 { 
+  mcf5249_init_mac();
   asm volatile ("mac.l %[a], %[t], %%acc0;"
                 "mac.l %[b], %[v], %%acc0;"
                 "mac.l %[b], %[t], %%acc1;"
@@ -95,6 +102,7 @@ void XNPROD31(ogg_int32_t  a, ogg_int32_t  b,
               ogg_int32_t  t, ogg_int32_t  v,
               ogg_int32_t *x, ogg_int32_t *y)
 {
+  mcf5249_init_mac();
   asm volatile ("mac.l %[a], %[t], %%acc0;"
                 "msac.l %[b], %[v], %%acc0;"
                 "mac.l %[b], %[t], %%acc1;"
@@ -120,6 +128,7 @@ void XNPROD31(ogg_int32_t  a, ogg_int32_t  b,
    if anyone think they can hear a bug caused by this, please try the above
    version. */
 #define XPROD32(_a, _b, _t, _v, _x, _y)     \
+  mcf5249_init_mac(); \
   asm volatile ("mac.l %[a], %[t], %%acc0;" \
                 "mac.l %[b], %[v], %%acc0;" \
                 "mac.l %[b], %[t], %%acc1;" \
@@ -138,6 +147,7 @@ void XNPROD31(ogg_int32_t  a, ogg_int32_t  b,
 static inline 
 void mcf5249_vect_add(ogg_int32_t *x, ogg_int32_t *y, int n)
 {
+  mcf5249_init_mac();
   /* align to 16 bytes */
   while(n>0 && (int)x&16) {
     *x++ += *y++;
@@ -172,6 +182,7 @@ void mcf5249_vect_add(ogg_int32_t *x, ogg_int32_t *y, int n)
 static inline 
 void mcf5249_vect_copy(ogg_int32_t *x, ogg_int32_t *y, int n)
 {
+  mcf5249_init_mac();
   /* align to 16 bytes */
   while(n>0 && (int)x&16) {
     *x++ = *y++;
@@ -199,6 +210,7 @@ void mcf5249_vect_copy(ogg_int32_t *x, ogg_int32_t *y, int n)
 static inline 
 void mcf5249_vect_mult_fw(ogg_int32_t *data, LOOKUP_T *window, int n)
 {
+  mcf5249_init_mac();
   /* ensure data is aligned to 16-bytes */
   while(n>0 && (int)data%16) {
     *data = MULT31(*data, *window);
@@ -253,6 +265,7 @@ void mcf5249_vect_mult_fw(ogg_int32_t *data, LOOKUP_T *window, int n)
 static inline 
 void mcf5249_vect_mult_bw(ogg_int32_t *data, LOOKUP_T *window, int n)
 {
+  mcf5249_init_mac();
   /* ensure at least data is aligned to 16-bytes */
   while(n>0 && (int)data%16) {
     *data = MULT31(*data, *window);
