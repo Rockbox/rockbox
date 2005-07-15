@@ -872,44 +872,21 @@ static bool get_vorbis_comments (struct mp3entry *entry, int fd)
         } else if (strncasecmp(temp, "ARTIST=", 7) == 0) {
             name_length = 6;
             p = &(entry->artist);
+        } else if (strncasecmp(temp, "COMPOSER=", 9) == 0) {
+            name_length = 8;
+            p = &(entry->composer);
         } else if (strncasecmp(temp, "GENRE=", 6) == 0) {
             name_length = 5;
             p = &(entry->genre_string);
         } else if (strncasecmp(temp, "DATE=", 5) == 0) {
-            int j=0;
-            /* verify that this is a number */
-            /* Note: vorbis uses UTF-8 for its comments, so it is
-             * safe to compare the values against ASCII 0 and 9
-             */
-            while ( j < (comment_length - 5) ) {
-                if ( (temp[5+j] < '0') || (temp[5+j] > '9') ) {
-                    break;
-                }
-                j++;
-            }
-            if  ( j == (comment_length - 5) ) {
-                p = NULL;
-                entry->year = atoi(temp + 5);
-            }
+            name_length = 4;
+            p = &(entry->year_string);
         } else if (strncasecmp(temp, "TRACKNUMBER=", 12) == 0) {
-            int j=0;
-            /* verify that this is a number */
-            /* Note: vorbis uses UTF-8 for its comments, so it is
-             * safe to compare the values against ASCII 0 and 9
-             */
-            while ( j < (comment_length - 12) ) {
-                if ( (temp[12+j] < '0') || (temp[12+j] > '9') ) {
-                   break;
-                }
-                j++;
-            }
-            if  ( j == (comment_length - 12) ) {
-                p = NULL;
-                entry->tracknum = atoi(temp + 12);
-            }
+            name_length = 11;
+            p = &(entry->track_string);
         } else {
-            p = NULL;
-        }
+		p = NULL;
+	}
 
         if (p) {
             comment_length -= (name_length + 1);

@@ -1291,6 +1291,10 @@ int ov_pcm_seek(OggVorbis_File *vf,ogg_int64_t pos){
   if(ret<0)return(ret);
   _make_decode_ready(vf);
 
+#if CONFIG_CPU == MCF5249 && !defined(SIMULATOR)
+  mcf5249_init_mac();
+#endif
+
   /* discard leading packets we don't need for the lapping of the
      position we want; don't decode them */
 
