@@ -131,7 +131,11 @@ int codecbufused;
 static volatile int buf_ridx;
 static volatile int buf_widx;
 
+/* Step count to the next unbuffered track. */
 static int last_peek_offset;
+
+/* Index of the last buffered track. */
+static int last_index;
 
 /* Track information (count in file buffer, read/write indexes for
    track ring structure. */
@@ -817,6 +821,8 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     if (tracks[track_widx].filesize != 0)
         return false;
 
+    last_index = playlist_get_display_index();
+        
     /* Get track name from current playlist read position. */
     logf("Buffering track:%d/%d", track_widx, track_ridx);
     trackname = playlist_peek(peek_offset);
@@ -1368,9 +1374,6 @@ static void initiate_track_change(int peek_index)
         playlist_next(peek_index);
         queue_post(&audio_queue, AUDIO_PLAY, 0);
     } 
-    
-    else if (!pcmbuf_crossfade_init())
-        pcmbuf_flush_audio();
         
     codec_track_changed();
 }
@@ -1389,13 +1392,16 @@ void audio_thread(void)
         queue_wait_w_tmo(&audio_queue, &ev, 0);
         switch (ev.id) {
             case AUDIO_PLAY:
+                /* Refuse to start playback if we are already playing
+                   the requested track. */
+                if (last_index == playlist_get_display_index() && playing)
+                    break ;
                 logf("starting...");
                 playing = true;
                 ci.stop_codec = true;
                 ci.reload_codec = false;
                 ci.seek_time = 0;
-                if (!pcmbuf_crossfade_init() && !pcmbuf_is_crossfade_active())
-                    pcmbuf_flush_audio();
+                pcmbuf_crossfade_init();
                 audio_play_start((int)ev.data);
                 playlist_update_resume_info(audio_current_track());
                 break ;
@@ -1570,13 +1576,7 @@ bool audio_has_changed_track(void)
 void audio_play(int offset)
 {
     logf("audio_play");
-    ci.stop_codec = true;
-    if (!pcmbuf_crossfade_init())
-        pcmbuf_flush_audio();
-    codec_track_changed();
-        
-    pcm_play_pause(true);
-    paused = false;
+    last_index = -1;
     queue_post(&audio_queue, AUDIO_PLAY, (void *)offset);
 }
 

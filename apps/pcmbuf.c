@@ -228,6 +228,7 @@ bool pcmbuf_crossfade_init(void)
 {
     if (PCMBUF_SIZE - audiobuffer_free < CHUNK_SIZE * 8 || !crossfade_enabled
         || crossfade_active || crossfade_init) {
+        pcmbuf_flush_audio();
         return false;
     }
     logf("pcmbuf_crossfade_init");
