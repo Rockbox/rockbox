@@ -51,6 +51,8 @@ int usb_screen(void)
    return 0;
 }
 
+char version[] = APPSVERSION;
+
 static void usb_enable(bool on)
 {
     and_l(~0x01000000, &GPIO_OUT);      /* GPIO24 is the Cypress chip power */
@@ -216,7 +218,8 @@ void main(void)
 
     lcd_setfont(FONT_SYSFIXED);
 
-    lcd_puts(0, line++, "Rockboot version CVS");
+    snprintf(buf, sizeof(buf), "Rockboot version %s", version);
+    lcd_puts(0, line++, buf);
     lcd_update();
 
     sleep(HZ/50); /* Allow the button driver to check the buttons */

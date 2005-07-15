@@ -26,6 +26,10 @@ ifdef APPEXTRA
    INCLUDES += -I$(APPEXTRA)
 endif
 
+ifndef VERSION
+VERSION=$(shell date +%y%m%d-%H%M)
+endif
+
 CFLAGS = $(GCCOPTS) $(INCLUDES) $(TARGET) $(DEFINES)			\
  -DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
 
