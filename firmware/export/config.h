@@ -37,6 +37,7 @@
 /* CONFIG_CPU */
 #define SH7034  7034
 #define MCF5249 5249
+#define MCF5250 5250
 #define TCC730   730   /* lacking a proper abbrivation */
 
 /* CONFIG_KEYPAD */
@@ -46,10 +47,12 @@
 #define IRIVER_H100_PAD 3
 #define GMINI100_PAD    4
 #define IRIVER_H300_PAD 5
+#define IAUDIO_X5_PAD   6
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 0
 #define H300_REMOTE 1
+#define X5_REMOTE   2
 
 /* CONFIG_BATTERY */
 #define BATT_LIION2200  2200 /* FM/V2 recorder type */
@@ -64,6 +67,8 @@
 #define LCD_S1D15E06 3 /* as used by iRiver H100 series */
 #define LCD_H300     4 /* as used by iRiver H300 series, exact model name is
                           unknown at the time of this writing */
+#define LCD_X5       5 /* as used by iAudio X5 series, exact model name is
+                          unknown at the time of this writing */
 
 /* CONFIG_BACKLIGHT */
 #define BL_PA14_LO  0 /* Player, PA14 low active */
@@ -77,6 +82,7 @@
 #define I2C_ONDIO    1 /* Ondio style */
 #define I2C_GMINI    2 /* Gmini style */
 #define I2C_H100     3 /* iRiver h100 style */
+#define I2C_IAUDIO   4 /* iAuido style */
 
 /* CONFIG_LED */
 #define LED_REAL     1 /* SW controlled LED (Archos recorders, player, Gmini) */
@@ -106,6 +112,8 @@
 #include "config-gmini120.h"
 #elif defined(ARCHOS_GMINISP)
 #include "config-gminisp.h"
+#elif defined(IAUDIO_X5)
+#include "config-iaudiox5.h"
 #else
 /* no known platform */
 #endif
