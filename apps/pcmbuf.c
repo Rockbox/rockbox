@@ -312,7 +312,7 @@ static void crossfade_start(void)
     int bytesleft = pcmbuf_unplayed_bytes;
     
     crossfade_init = 0;
-    if (bytesleft < CHUNK_SIZE * 3) {
+    if (bytesleft < CHUNK_SIZE * 4) {
         logf("crossfade rejected");
         pcmbuf_play_stop();
         return ;
@@ -399,7 +399,10 @@ static bool prepare_insert(long length)
 void* pcmbuf_request_buffer(long length, long *realsize)
 {
     void *ptr = NULL;
-    
+
+    if (crossfade_init)
+        crossfade_start();
+        
     while (audiobuffer_free < length + audiobuffer_fillpos
            + CHUNK_SIZE && !crossfade_active) {
         pcmbuf_boost(false);
