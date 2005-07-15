@@ -57,6 +57,7 @@ checksoundcard () {
         if test -f "/usr/include/sys/soundcard.h"; then
          # We have a header file so we can build the sound code
             use_simsound="#define ROCKBOX_HAS_SIMSOUND 1"
+            echo "Enabled PCM sound playback in simulator"
         fi # header file present
     fi # has codecs
 }
