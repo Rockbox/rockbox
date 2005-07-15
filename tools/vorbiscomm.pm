@@ -64,10 +64,11 @@ sub load
     $data{'filename'} = $file;
     $data{'fileHandle'} = \*FILE;
 
-    _init(\%data);
-    _loadInfo(\%data);
-    _loadComments(\%data);
-    _calculateTrackLength(\%data);
+    if (_init(\%data)) {
+        _loadInfo(\%data);
+        _loadComments(\%data);
+        _calculateTrackLength(\%data);
+    }
 
     close FILE;
 
@@ -92,8 +93,12 @@ sub info
 sub comment_tags 
 {
     my $self = shift;
+   
+    if ( $self && $self->{'COMMENT_KEYS'} ) {
+        return @{$self->{'COMMENT_KEYS'}};
+    }
 
-    return @{$self->{'COMMENT_KEYS'}};
+    return undef;
 }
 
 sub comment 
@@ -160,6 +165,7 @@ sub _init
     }
 
     $data->{'startInfoHeader'} = $byteCount;
+    return 1; # Success
 }
 
 sub _checkHeader
