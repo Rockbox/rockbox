@@ -1204,9 +1204,9 @@ static void audio_stop_playback(void)
         close(current_fd);
         current_fd = -1;
     }
+    pcmbuf_play_stop();
     while (codec_loaded)
         yield();
-    pcmbuf_play_stop();
     pcm_play_pause(true);
     track_count = 0;
     audio_clear_track_entries();
