@@ -114,6 +114,9 @@ enum codec_status codec_start(struct codec_api* api)
         ci->sleep(1);
   
     frequency_divider = ci->id3->frequency / 100;
+    if (frequency_divider <= 0)
+        frequency_divider = 441;
+        
     ci->configure(DSP_SET_FREQUENCY, (int *)ci->id3->frequency);
     
     ci->request_buffer(&size, ci->id3->first_frame_offset);

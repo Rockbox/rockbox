@@ -241,9 +241,9 @@ int process(short *dest, long *src, int samplecount)
     
     /* Resample as necessary */
     if (dsp_config.frequency > NATIVE_FREQUENCY)
-        length = upsample(resampled, src, samplecount, &resample[channel]);
-    else if (dsp_config.frequency < NATIVE_FREQUENCY)
         length = downsample(resampled, src, samplecount, &resample[channel]);
+    else if (dsp_config.frequency < NATIVE_FREQUENCY)
+        length = upsample(resampled, src, samplecount, &resample[channel]);
     else
         p = src;
     
@@ -358,6 +358,11 @@ bool dsp_configure(int setting, void *value)
 {
     switch (setting) {
     case DSP_SET_FREQUENCY:
+        debugf("set frequency: %d\n", (int)value);
+        if ((int)value == 0) {
+            dsp_config.frequency = NATIVE_FREQUENCY;
+            break ;
+        }
         memset(resample, 0, sizeof(resample));
         dsp_config.frequency = (int)value;
         resample[0].delta = resample[1].delta = 

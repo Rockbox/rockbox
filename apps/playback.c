@@ -792,7 +792,9 @@ bool read_next_metadata(void)
         
     /* Start buffer refilling also because we need to spin-up the disk. */
     filling = true;
+    tracks[next_track].id3.codectype = probe_file_format(trackname);
     status = get_metadata(&tracks[next_track],fd,trackname,v1first);
+    tracks[next_track].id3.codectype = 0;
     track_changed = true;
     close(fd);
 
@@ -844,7 +846,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     tracks[track_widx].filesize = size;
     tracks[track_widx].filepos = 0;
     tracks[track_widx].available = 0;
-    tracks[track_widx].taginfo_ready = false;
+    //tracks[track_widx].taginfo_ready = false;
     tracks[track_widx].playlist_offset = offset;
     
     if (buf_widx >= codecbuflen)
@@ -1008,7 +1010,7 @@ void audio_play_start(int offset)
     pcmbuf_set_boost_mode(false);
 }
 
-void audio_clear_track_entries(void)
+void audio_clear_track_entries(bool buffered_only)
 {
     int cur_idx, event_count;
     int i;
@@ -1036,12 +1038,12 @@ void audio_clear_track_entries(void)
 
         /* Send an event to notify that track has finished. */
         if (tracks[cur_idx].event_sent) {
-            tracks[cur_idx].event_sent = true;
             event_count--;
             track_unbuffer_callback(&tracks[cur_idx].id3, event_count == 0);
         }
-        
-        memset(&tracks[cur_idx], 0, sizeof(struct track_info));
+
+        if (tracks[cur_idx].event_sent || !buffered_only)
+            memset(&tracks[cur_idx], 0, sizeof(struct track_info));
     }
 }
 
@@ -1051,9 +1053,6 @@ static void generate_postbuffer_events(void)
     int i;
     int cur_ridx, event_count;
     
-    if (!track_buffer_callback)
-        return ;
-
     /* At first determine how many unsent events we have. */
     cur_ridx = track_ridx;
     event_count = 0;
@@ -1070,7 +1069,10 @@ static void generate_postbuffer_events(void)
         if (!tracks[cur_ridx].event_sent) {
             tracks[cur_ridx].event_sent = true;
             event_count--;
-            track_buffer_callback(&tracks[cur_ridx].id3, event_count == 0);
+            /* We still want to set event_sent flags even if not using
+               event callbacks. */
+            if (track_buffer_callback)
+                track_buffer_callback(&tracks[cur_ridx].id3, event_count == 0);
         }
         if (++cur_ridx >= MAX_TRACK)
             cur_ridx -= MAX_TRACK;
@@ -1106,8 +1108,8 @@ void initialize_buffer_fill(void)
     if (tracks[track_widx].filesize != 0)
         track_count++;
     
-    /* Mark all other entries null. */
-    audio_clear_track_entries();
+    /* Mark all buffered entries null (not metadata for next track). */
+    audio_clear_track_entries(true);
 }
 
 void audio_check_buffer(void)
@@ -1209,7 +1211,8 @@ static void audio_stop_playback(void)
         yield();
     pcm_play_pause(true);
     track_count = 0;
-    audio_clear_track_entries();
+    /* Mark all entries null. */
+    audio_clear_track_entries(false);
 }
 
 /* Request the next track with new codec. */
@@ -1352,7 +1355,8 @@ void audio_invalidate_tracks(void)
     track_count = 1;
     last_peek_offset = 1;
     track_widx = track_ridx;
-    audio_clear_track_entries();
+    /* Mark all other entries null (also buffered wrong metadata). */
+    audio_clear_track_entries(false);
     codecbufused = cur_ti->available;
     buf_widx = buf_ridx + cur_ti->available;
     if (buf_widx >= codecbuflen)
