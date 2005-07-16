@@ -55,3 +55,4 @@ codecs/dumb/src/it/*
 codecs/libmusepack/*
 codecs/lib/*.[ch]
 codecs/lib/Makefile
+codecs/lib/SOURCES
