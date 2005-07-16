@@ -3140,10 +3140,22 @@ id: LANG_NEXT_FOLDER
 desc: in settings_menu.  Should we move to next folder when current one ends
 eng: "Move to Next Folder"
 voice: "In nächstes Verzeichnis wechseln"
-new: "In nächstes Verzeichnis wechseln" 
+new: "In nächstes Verzeichnis wechseln"
 
 id: LANG_RUNTIMEDB_ACTIVE
 desc: in settings_menu.
 eng: "Gather runtime data (experimental)"
 voice: "Spielzeitdaten sammeln"
 new: "Spielzeitdaten sammeln (experimentell)"
+
+id: LANG_MENU_SET_RATING
+desc: in wps context menu
+eng: "Set song rating"
+voice: "Set song rating"
+new: "Titel bewerten"
+
+id: LANG_RATING
+desc: in set_rating
+eng: "Rating:"
+voice:
+new: "Bewertung:"
