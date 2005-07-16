@@ -178,94 +178,60 @@ static bool v1first = false;
 static void mp3_set_elapsed(struct mp3entry* id3);
 int mp3_get_file_pos(void);
 
-bool codec_pcmbuf_insert_callback(char *buf, long length)
+bool codec_pcmbuf_insert_split_callback(void *ch1, void *ch2,
+                                        long length)
 {
+    char* src[2];
     char *dest;
-    long realsize;
-    int factor;
-    int next_channel = 0;
-    int processed_length;
-    int mono = 0;
-    
-    /* If non-interleaved stereo mode. */
-    if (dsp_config.stereo_mode == STEREO_NONINTERLEAVED)
-        next_channel = length / 2;
-    else if (dsp_config.stereo_mode == STEREO_MONO) {
-        length *= 2;
-        mono = 1;
+    long input_size;
+    long output_size;
+
+    src[0] = ch1;
+    src[1] = ch2;
+
+    if (dsp_stereo_mode() == STEREO_NONINTERLEAVED)
+    {
+        length *= 2;    /* Length is per channel */
     }
-    
-    if (dsp_config.sample_depth > 16) {
-        length /= 2;
-        factor = 1;
-    } else {
-        factor = 0;
-    }
-            
+
     while (length > 0) {
-        /* Request a few extra bytes for resampling. */
-        /* FIXME: Required extra bytes SHOULD be calculated. */
-        while ((dest = pcmbuf_request_buffer(length+16384, &realsize)) == NULL)
+        while ((dest = pcmbuf_request_buffer(dsp_output_size(length), 
+            &output_size)) == NULL) {
             yield();
-        
-        if (realsize < 16384) {
+        }
+
+        input_size = dsp_input_size(output_size);
+        /* Guard against rounding errors (output_size can be too large). */
+        input_size = MIN(input_size, length);
+
+        if (input_size <= 0) {
             pcmbuf_flush_buffer(0);
-            continue ;
+            continue;
         }
-        
-        realsize -= 16384;
-        
-        if (next_channel) {
-            processed_length = dsp_process(dest, buf, realsize / 4) * 2;
-            dsp_process(dest, buf + next_channel, realsize / 4);
-        } else {
-            processed_length = dsp_process(dest, buf, realsize >> (mono + 1));
-        }
-        pcmbuf_flush_buffer(processed_length);
-        length -= realsize;
-        buf += realsize << (factor + mono);
+
+        output_size = dsp_process(dest, src, input_size);
+        pcmbuf_flush_buffer(output_size);
+        length -= input_size;
     }
-    
+
     return true;
 }
 
-bool codec_pcmbuf_insert_split_callback(void *ch1, void *ch2,
-                                             long length)
+bool codec_pcmbuf_insert_callback(char *buf, long length)
 {
-    char *dest;
-    long realsize;
-    int factor;
-    int processed_length;
-    
-    /* non-interleaved stereo mode. */
-    if (dsp_config.sample_depth > 16) {
-        factor = 0;
-    } else {
-        length /= 2;
-        factor = 1;
+    /* TODO: The audiobuffer API should probably be updated, and be based on
+     *       pcmbuf_insert_split().
+     */
+    long real_length = length;
+
+    if (dsp_stereo_mode() == STEREO_NONINTERLEAVED)
+    {
+        length /= 2;    /* Length is per channel */
     }
-    
-    while (length > 0) {
-        /* Request a few extra bytes for resampling. */
-        while ((dest = pcmbuf_request_buffer(length+4096, &realsize)) == NULL)
-            yield();
-        
-        if (realsize < 4096) {
-            pcmbuf_flush_buffer(0);
-            continue ;
-        }
-        
-        realsize -= 4096;
-        
-        processed_length = dsp_process(dest, ch1, realsize / 4) * 2;
-        dsp_process(dest, ch2, realsize / 4);
-        pcmbuf_flush_buffer(processed_length);
-        length -= realsize;
-        ch1 += realsize >> factor;
-        ch2 += realsize >> factor;
-    }
-    
-    return true;
+
+    /* Second channel is only used for non-interleaved stereo. */
+    return codec_pcmbuf_insert_split_callback(buf, buf + (real_length / 2),
+        length);
 }
 
 void* get_codec_memory_callback(long *size)

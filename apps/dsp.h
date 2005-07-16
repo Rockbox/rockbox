@@ -21,7 +21,6 @@
 #define _DSP_H
 
 #include <stdlib.h>
-#include <ctype.h>
 #include <stdbool.h>
 
 #define NATIVE_FREQUENCY       44100
@@ -29,19 +28,10 @@
 #define STEREO_NONINTERLEAVED  1
 #define STEREO_MONO            2
 
-struct dsp_configuration {
-    long frequency;
-    long clip_min, clip_max;
-    int sample_depth;
-    bool dither_enabled;
-    int stereo_mode;
-};
-
-extern struct dsp_configuration dsp_config;
-
-int dsp_process(char *dest, char *src, int samplecount);
+long dsp_process(char *dest, char *src[], long size);
+long dsp_input_size(long size);
+long dsp_output_size(long size);
+int dsp_stereo_mode(void);
 bool dsp_configure(int setting, void *value);
 
 #endif
-
-
