@@ -279,6 +279,7 @@ enum codec_status codec_start(struct codec_api* api)
         vf.serialnos = NULL;
         vf.pcmlengths = NULL;
         ov_clear(&vf);
+	previous_section = -1;
         goto next_track;
     }
         
