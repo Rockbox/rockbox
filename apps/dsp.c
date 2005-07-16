@@ -358,7 +358,6 @@ bool dsp_configure(int setting, void *value)
 {
     switch (setting) {
     case DSP_SET_FREQUENCY:
-        debugf("set frequency: %d\n", (int)value);
         if ((int)value == 0) {
             dsp_config.frequency = NATIVE_FREQUENCY;
             break ;
