@@ -213,7 +213,7 @@ void lcd_blit(const unsigned char* data, int x, int by, int width,
     /* Copy display bitmap to hardware */
     while (bheight--)
     {
-        lcd_write_command_ex(LCD_CNTL_PAGE, by++ & 0xf, -1);
+        lcd_write_command_ex(LCD_CNTL_PAGE, by++, -1);
         lcd_write_command_ex(LCD_CNTL_COLUMN, x, -1);
 
         lcd_write_command(LCD_CNTL_DATA_WRITE);
