@@ -521,7 +521,7 @@ void set_cpu_frequency(long frequency)
         PLLCR &= ~1;  /* Bypass mode */
         PLLCR = 0x11853005;
         CSCR0 = 0x00000980; /* Flash: 2 wait state */
-        CSCR1 = 0x00002580; /* LCD: 9 wait states */
+        CSCR1 = 0x00000980; /* LCD: 2 wait states */
         while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
                                             This may take up to 10ms! */
         DCR = (DCR & ~0x01ff) | MAX_REFRESH_TIMER;   /* Refresh timer */
@@ -540,7 +540,7 @@ void set_cpu_frequency(long frequency)
         PLLCR &= ~1;  /* Bypass mode */
         PLLCR = 0x10886001;
         CSCR0 = 0x00000180; /* Flash: 0 wait states */
-        CSCR1 = 0x00000980; /* LCD: 2 wait states */
+        CSCR1 = 0x00000180; /* LCD: 0 wait states */
         while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
                                             This may take up to 10ms! */
         DCR = (DCR & ~0x01ff) | NORMAL_REFRESH_TIMER;   /* Refresh timer */
