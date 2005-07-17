@@ -1265,7 +1265,7 @@ bool browse_id3(void)
     struct mp3entry* id3 = audio_current_track();
     int button;
     int menu_pos = 0;
-    int menu_max = 8;
+    int menu_max = 10;
     bool exit = false;
     char scroll_text[MAX_PATH];
 
