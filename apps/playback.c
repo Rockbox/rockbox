@@ -1156,10 +1156,12 @@ void audio_update_trackinfo(void)
     ci.curpos = 0;
     cur_ti->start_pos = 0;
     ci.taginfo_ready = (bool *)&cur_ti->taginfo_ready;
-    if (!pcmbuf_crossfade_init())
-        pcmbuf_add_event(codec_track_changed);
-    else
+    if (pcmbuf_is_crossfade_enabled() && !pcmbuf_is_crossfade_active()) {
+        pcmbuf_crossfade_init();
         codec_track_changed();
+    } else {
+        pcmbuf_add_event(codec_track_changed);
+    }
 }
 
 static void audio_stop_playback(void)
@@ -1343,8 +1345,10 @@ static void initiate_track_change(int peek_index)
         ci.stop_codec = true;
         playlist_next(peek_index);
         queue_post(&audio_queue, AUDIO_PLAY, 0);
-    } 
-        
+    } else {
+        pcmbuf_crossfade_init();
+    }
+
     codec_track_changed();
 }
 
@@ -1371,7 +1375,8 @@ void audio_thread(void)
                 ci.stop_codec = true;
                 ci.reload_codec = false;
                 ci.seek_time = 0;
-                pcmbuf_crossfade_init();
+                if (!pcmbuf_is_crossfade_active())
+                    pcmbuf_crossfade_init();
                 audio_play_start((int)ev.data);
                 playlist_update_resume_info(audio_current_track());
                 break ;
