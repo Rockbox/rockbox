@@ -703,6 +703,8 @@ bool loadcodec(const char *trackname, bool start_play)
     size = filesize(fd);
     if ((off_t)fill_bytesleft < size + conf_watermark) {
         logf("Not enough space");
+        /* Set codectype back to zero to indicate no codec was loaded. */
+        tracks[track_widx].id3.codectype = 0;
         fill_bytesleft = 0;
         close(fd);
         return false;
@@ -833,6 +835,9 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         close(fd);
         /* Stop buffer filling if codec load failed. */
         fill_bytesleft = 0;
+        /* Set filesize to zero to indicate no file was loaded. */
+        tracks[track_widx].filesize = 0;
+        tracks[track_widx].filerem = 0;
         return false;
     }
     // tracks[track_widx].filebuf = &codecbuf[buf_widx];
@@ -1070,10 +1075,12 @@ void initialize_buffer_fill(void)
             cur_idx = 0;
     }
     
-    track_count = i;
-    if (tracks[track_widx].filesize != 0)
-        track_count++;
-    
+    track_count = i + 1;
+    if (tracks[track_widx].filesize == 0) {
+        if (--track_widx < 0)
+            track_widx = MAX_TRACK - 1;
+    }
+
     /* Mark all buffered entries null (not metadata for next track). */
     audio_clear_track_entries(true);
 }
@@ -1491,8 +1498,8 @@ void codec_thread(void)
         case CODEC_LOAD:
             if (status != CODEC_OK) {
                 logf("Codec failure");
-                splash(HZ*2, true, "Codec failure");
                 audio_stop_playback();
+                splash(HZ*2, true, "Codec failure");
             } else {
                 logf("Codec finished");
             }
