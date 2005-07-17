@@ -101,7 +101,7 @@ static long calculate_channel_peak_average(int channel, unsigned short *addr,
     addr = &addr[channel];
     average = 0;
     
-    if (pcm_playing && !pcm_paused && addr != NULL)
+    if (pcm_playing && !pcm_paused && addr != NULL && size)
     {
         /* Calculate the zero point and remove DC offset (should be around 32768) */
         zero_point = 0;
@@ -164,7 +164,7 @@ static long calculate_channel_peak_average(int channel, unsigned short *addr,
 void pcm_calculate_peaks(int *left, int *right)
 {
     unsigned short *addr = (unsigned short *)SAR0;
-    long size = MIN(512, BCR0);
+    long size = MIN(512, BCR0 / 2);
         
     if (left != NULL)
         *left = calculate_channel_peak_average(0, addr, size);
