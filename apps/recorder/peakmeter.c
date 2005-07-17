@@ -32,6 +32,10 @@
 #include "lang.h"
 #include "peakmeter.h"
 
+#if CONFIG_HWCODEC == MASNONE
+#include "pcm_playback.h"
+#endif
+
 /* no inline in simulator mode */
 #ifdef SIMULATOR
 #define inline
@@ -552,9 +556,9 @@ inline void peak_meter_peek(void)
     int left = 8000;
     int right = 9000;
 #elif CONFIG_HWCODEC == MASNONE
-    /* FIX */
-    int left = 9000;
-    int right = 8000;
+    int left;
+    int right;
+    pcm_calculate_peaks(&left, &right);
 #else
    /* read the peak values */
     int left  = mas_codec_readreg(peak_meter_src_l);
@@ -729,8 +733,7 @@ static int peak_meter_read_l (void)
 #ifdef SIMULATOR
     peak_meter_l = 8000;
 #elif CONFIG_HWCODEC == MASNONE
-    /* FIX */
-    peak_meter_l = 8000;
+    pcm_calculate_peaks(&peak_meter_l, NULL);
 #else
     /* reset peak_meter_l so that subsequent calls of
        peak_meter_peek doesn't get fooled by an old
@@ -758,8 +761,7 @@ static int peak_meter_read_r (void) {
 #ifdef SIMULATOR
     peak_meter_l = 8000;
 #elif CONFIG_HWCODEC == MASNONE
-    /* FIX */
-    peak_meter_r = 8000;
+    pcm_calculate_peaks(NULL, &peak_meter_r);
 #else
     /* reset peak_meter_r so that subsequent calls of
        peak_meter_peek doesn't get fooled by an old

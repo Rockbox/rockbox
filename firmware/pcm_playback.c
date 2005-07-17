@@ -89,6 +89,89 @@ static void dma_stop(void)
     pcm_paused = false;
 }
 
+#define PEEK_SAMPLE_COUNT 64
+static long calculate_channel_peak_average(int channel, unsigned short *addr,
+                                           long size)
+{
+    int i;
+    long min, max;
+    int count, min_count, max_count;
+    unsigned long average, zero_point;
+
+    addr = &addr[channel];
+    average = 0;
+    
+    if (pcm_playing && !pcm_paused && addr != NULL)
+    {
+        /* Calculate the zero point and remove DC offset (should be around 32768) */
+        zero_point = 0;
+        for (i = 0; i < size; i++)
+            zero_point += addr[i*2];
+        zero_point /= i;
+
+        /*for (i = 0; i < size; i++) {
+            long peak = addr[i*2] - 32768;
+            if (peak < 0)
+                peak = 0;
+            average += peak;
+        }
+        average /= i;*/
+        
+        count = 0;
+
+        while (size > PEEK_SAMPLE_COUNT)
+        {
+            min = zero_point;
+            max = zero_point;
+            min_count = 1;
+            max_count = 1;
+            
+            for (i = 0; i < PEEK_SAMPLE_COUNT; i++)
+            {
+                unsigned long value = *addr;
+                if (value < zero_point) {
+                    min += value;
+                    min_count++;
+                }
+                if (value > zero_point) {
+                    max += value;
+                    max_count++;
+                }
+                addr = &addr[2];
+            }
+
+            min /= min_count;
+            max /= max_count;
+            
+            size -= PEEK_SAMPLE_COUNT;
+            average += (max - min) / 2;
+            //average += (max - zero_point) + (zero_point - min);
+            //average += zero_point - min;
+            count += 1;
+        }
+
+        if (count)
+        {
+            average /= count;
+            /* I don't know why this is needed. Should be fixed. */
+            average = zero_point - average;
+        }
+    }
+
+    return average;
+}
+
+void pcm_calculate_peaks(int *left, int *right)
+{
+    unsigned short *addr = (unsigned short *)SAR0;
+    long size = MIN(512, BCR0);
+        
+    if (left != NULL)
+        *left = calculate_channel_peak_average(0, addr, size);
+    if (right != NULL)
+        *right = calculate_channel_peak_average(1, addr, size);;
+}
+
 /* sets frequency of input to DAC */
 void pcm_set_frequency(unsigned int frequency)
 {
