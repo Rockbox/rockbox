@@ -145,9 +145,9 @@ new: "Sortera skiftlägeskänsligt"
 
 id: LANG_RESUME
 desc: in settings_menu
-eng: "Resume"
-voice: "Resume"
-new: "Återuppta"
+eng: "Resume on startup"
+voice: "Resume on startup"
+new: "Återuppta vid start"
 
 id: LANG_OFF
 desc: Used in a lot of places
@@ -378,10 +378,10 @@ voice: ""
 new: "Är full!"
 
 id: LANG_RESUME_ASK
-desc: question asked at the begining when resume is on
-eng: "Resume?"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Återuppta?"
+new: ""
 
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
@@ -798,10 +798,10 @@ voice: "September"
 new: "Sep"
 
 id: LANG_RESUME_SETTING_ASK_ONCE
-desc: in settings_menu
-eng: "Ask Once"
-voice: "Ask Once"
-new: "Fråga en gång" 
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: "" 
 
 id: LANG_WEEKDAY_FRIDAY
 desc: Maximum 3-letter abbreviation for weekday
@@ -2557,6 +2557,7 @@ new: ""
 
 id: VOICE_EXT_FONT
 desc: spoken only, for file extension
+
 eng: ""
 voice: "font"
 new: ""
@@ -3071,3 +3072,62 @@ eng: "Crossfade"
 voice: "Crossfade"
 new: "Crossfade"
 
+id: LANG_BACKLIGHT_FADE_IN
+desc: in settings_menu
+eng: "Backlight fade in"
+voice: "Backlight fade in"
+new: "Intoning av motljus"
+
+id: LANG_BACKLIGHT_FADE_OUT
+desc: in settings_menu
+eng: "Backlight fade out"
+voice: "Backlight fade out"
+new: "Uttoning av motljus"
+
+id: LANG_SHUFFLE_PLAYLIST
+desc: in playlist menu, reshuffles the order in which songs are played
+eng: "Reshuffle"
+voice: "Reshuffle"
+new: "Blanda om"
+
+id: LANG_NOTHING_TO_RESUME
+desc: Error message displayed when resume button pressed but no playlist
+eng: "Nothing to resume"
+voice: ""
+new: "Inget att återta"
+
+id: LANG_INSERT_SHUFFLED
+desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
+eng: "Insert shuffled"
+voice: "Insert shuffled"
+new: "Sätt in blandat"
+
+id: LANG_SPDIF_ENABLE
+desc: in playback settings menu. enable/disable the optical out
+eng: "Optical output"
+voice: "Optical output"
+new: "Optisk utgång"
+
+id: LANG_NEXT_FOLDER
+desc: in settings_menu.  Should we move to next folder when current one ends
+eng: "Move to Next Folder"
+voice: "Move to Next Folder"
+new: "Flytta till nästa mapp"
+
+id: LANG_RUNTIMEDB_ACTIVE
+desc: in settings_menu.
+eng: "Gather runtime data (experimental)"
+voice: "Gather runtime data"
+new: "Samla kördata (experimentell)"
+
+id: LANG_MENU_SET_RATING
+desc: in wps context menu
+eng: "Set song rating"
+voice: "Set song rating"
+new: "Värdera sången"
+
+id: LANG_RATING
+desc: in set_rating
+eng: "Rating:"
+voice: 
+new: "Värdering:"
