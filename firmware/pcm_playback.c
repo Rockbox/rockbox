@@ -70,7 +70,7 @@ static void dma_start(const void *addr, long size)
     /* Enable the FIFO and force one write to it */
     IIS2CONFIG = (pcm_freq << 12) | 0x300 | 4 << 2;
     /* Also send the audio to S/PDIF */
-    EBU1CONFIG = 7 << 12 |  3 << 8 | 5 << 2;
+    EBU1CONFIG = (7 << 12) | (3 << 8) | (1 << 5) | (5 << 2);
     DCR0 = DMA_INT | DMA_EEXT | DMA_CS | DMA_SINC | DMA_START;
 }
 
@@ -241,7 +241,7 @@ void pcm_play_pause(bool play)
         //BCR0 = next_size;
         /* Enable the FIFO and force one write to it */
         IIS2CONFIG = (pcm_freq << 12) | 0x300 | 4 << 2;
-        EBU1CONFIG = 7 << 12 |  3 << 8 | 5 << 2;
+        EBU1CONFIG = (7 << 12) | (3 << 8) | (1 << 5) | (5 << 2);
         DCR0 |= DMA_EEXT | DMA_START;
         
         uda1380_mute(false);
