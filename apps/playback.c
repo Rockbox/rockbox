@@ -1075,10 +1075,12 @@ void initialize_buffer_fill(void)
             cur_idx = 0;
     }
     
-    track_count = i + 1;
+    track_count = i;
     if (tracks[track_widx].filesize == 0) {
         if (--track_widx < 0)
             track_widx = MAX_TRACK - 1;
+    } else {
+        track_count++;
     }
 
     /* Mark all buffered entries null (not metadata for next track). */
