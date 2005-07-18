@@ -303,7 +303,7 @@ void system_init(void)
 
 
 
-#elif CONFIG_CPU == MCF5249
+#elif defined(CPU_COLDFIRE)
 
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIE"))) void name (void)
@@ -1104,7 +1104,7 @@ int system_memory_guard(int newmode)
 
 void system_reboot (void)
 {
-#if CONFIG_CPU == MCF5249
+#ifdef CPU_COLDFIRE
     set_cpu_frequency(0);
     
     asm(" move.w #0x2700,%sr");

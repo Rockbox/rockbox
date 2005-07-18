@@ -37,7 +37,7 @@ common/timefuncs.c
 #if CONFIG_CPU == SH7034
 common/memcpy_a.S
 common/memset_a.S
-#elif CONFIG_CPU == MCF5249
+#elif defined(CPU_COLDFIRE)
 common/memcpy.c
 common/memset_a.S
 #else

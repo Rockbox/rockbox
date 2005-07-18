@@ -103,7 +103,7 @@ enum {
      : /* %0 */ I_CONSTRAINT((char)(mask)),  \
        /* %1 */ "z"(address-GBR))
 
-#elif CONFIG_CPU == MCF5249
+#elif defined(CPU_COLDFIRE)
 #define or_l(mask, address) \
   asm                       \
     ("or.l %0,(%1)"         \
@@ -182,7 +182,7 @@ static inline unsigned long SWAB32(unsigned long value)
 
 #define invalidate_icache()
 
-#elif CONFIG_CPU == MCF5249
+#elif defined(CPU_COLDFIRE)
 #define HIGHEST_IRQ_LEVEL (7<<8)
 static inline int set_irq_level(int level)
 {

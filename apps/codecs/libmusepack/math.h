@@ -99,7 +99,7 @@ static inline MPC_SAMPLE_FORMAT MPC_MULTIPLY_EX(MPC_SAMPLE_FORMAT item1,MPC_SAMP
 #ifdef MPC_HAVE_MULHIGH
 #define MPC_MULTIPLY_FRACT(X,Y) _MulHigh(X,Y)
 #else
-#if CONFIG_CPU==MCF5249 && !defined(SIMULATOR)
+#ifdef CPU_COLDFIRE && !defined(SIMULATOR)
 /* loses one bit of accuracy.
    the rest of the macros won't be as easy as this... */
 #define MPC_MULTIPLY_FRACT(X,Y) \

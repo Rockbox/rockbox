@@ -23,7 +23,7 @@
 #include "kernel.h"
 #include "cpu.h"
 
-#if CONFIG_CPU == MCF5249
+#ifdef CPU_COLDFIRE
 struct regs
 {
     unsigned int d[6];   /* d2-d7 */
@@ -68,7 +68,7 @@ void switch_thread(void) __attribute__ ((section(".icode")));
 static inline void store_context(void* addr) __attribute__ ((always_inline));
 static inline void load_context(const void* addr) __attribute__ ((always_inline));
 
-#if CONFIG_CPU == MCF5249
+#ifdef CPU_COLDFIRE
 /*--------------------------------------------------------------------------- 
  * Store non-volatile context.
  *---------------------------------------------------------------------------
@@ -212,7 +212,7 @@ void switch_thread(void)
     while (num_sleepers == num_threads)
     {
         /* Enter sleep mode, woken up on interrupt */
-#if CONFIG_CPU == MCF5249
+#ifdef CPU_COLDFIRE
         asm volatile ("stop #0x2000");
 #elif CONFIG_CPU == SH7034
         SBYCR &= 0x7F;
@@ -285,7 +285,7 @@ int create_thread(void (*function)(void), void* stack, int stack_size,
     thread_stack[num_threads] = stack;
     thread_stack_size[num_threads] = stack_size;
     regs = &thread_contexts[num_threads];
-#if (CONFIG_CPU == MCF5249) || (CONFIG_CPU == SH7034)
+#if defined(CPU_COLDFIRE) || (CONFIG_CPU == SH7034)
     /* Align stack to an even 32 bit boundary */
     regs->sp = (void*)(((unsigned int)stack + stack_size) & ~3);
 #elif CONFIG_CPU == TCC730
@@ -333,7 +333,7 @@ void init_threads(void)
     thread_name[0] = main_thread_name;
     thread_stack[0] = stackbegin;
     thread_stack_size[0] = (int)stackend - (int)stackbegin;
-#if (CONFIG_CPU == MCF5249) || (CONFIG_CPU == SH7034)
+#if defined(CPU_COLDFIRE) || (CONFIG_CPU == SH7034)
     thread_contexts[0].start = 0; /* thread 0 already running */
 #elif CONFIG_CPU == TCC730
     thread_contexts[0].started = 1;

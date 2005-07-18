@@ -118,6 +118,11 @@
 /* no known platform */
 #endif
 
+/* define for all cpus from coldfire family */
+#if (CONFIG_CPU == MCF5249) || (CONFIG_CPU == MCF5250)
+#define CPU_COLDFIRE
+#endif
+
 #ifndef CODEC_SIZE
 #define CODEC_SIZE 0
 #endif

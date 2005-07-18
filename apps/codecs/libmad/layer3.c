@@ -1765,7 +1765,7 @@ void imdct36(mad_fixed_t const x[18], mad_fixed_t y[36])
  * DESCRIPTION:	perform X[18]->x[36] IMDCT
  */
 
-# if CONFIG_CPU==MCF5249 && !defined(SIMULATOR)
+# ifdef CPU_COLDFIRE && !defined(SIMULATOR)
 /* emac optimized imdct36, it is very ugly and i hope to replace it soon.
  * for now it is actually somewhat faster than the stock implementation. 
  */
@@ -2633,7 +2633,7 @@ void imdct36(mad_fixed_t const X[18], mad_fixed_t x[36])
 
   x[26] = x[27] = MAD_F_MLZ(hi, lo) + t5;
 }
-#endif /* MCF5249 */
+#endif /* CPU_COLDFIRE */
 
 #  endif
 
@@ -2729,7 +2729,7 @@ void III_imdct_l(mad_fixed_t const X[18], mad_fixed_t z[36],
  * DESCRIPTION:	perform IMDCT and windowing for short blocks
  */
 
-# if CONFIG_CPU==MCF5249 && !defined(SIMULATOR)
+# ifdef CPU_COLDFIRE && !defined(SIMULATOR)
 void III_imdct_s(mad_fixed_t const X[18], mad_fixed_t z[36]);
 #else
 

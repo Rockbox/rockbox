@@ -713,7 +713,7 @@ bool dbg_ports(void)
                 return false;
         }
     }
-#elif CONFIG_CPU == MCF5249
+#elif defined(CPU_COLDFIRE)
     unsigned int gpio_out;
     unsigned int gpio1_out;
     unsigned int gpio_read;
@@ -1563,7 +1563,7 @@ bool debug_menu(void)
 #if CONFIG_CPU == SH7034
         { "Dump ROM contents", dbg_save_roms },
 #endif
-#if CONFIG_CPU == SH7034 || CONFIG_CPU == MCF5249
+#if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE)
         { "View I/O ports", dbg_ports },
 #endif
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ

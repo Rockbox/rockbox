@@ -68,7 +68,7 @@ void _vorbis_apply_window(ogg_int32_t *d,const void *window_p[2],
   long rightbegin=n/2+n/4-rn/4;
   long rightend=rightbegin+rn/2;
 
-#if CONFIG_CPU == MCF5249
+#ifdef CPU_COLDFIRE
   memset((void *)&d[0], 0, sizeof(ogg_int32_t)*leftbegin);
   /* mcf5249_vect_zero(&d[0], leftbegin); */
   mcf5249_vect_mult_fw(&d[leftbegin], &window[lW][0], leftend-leftbegin);

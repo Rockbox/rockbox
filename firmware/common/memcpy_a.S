@@ -170,7 +170,7 @@ _memcpy:
     mov     r7,r0       /* return dest start address */
 .end:
     .size   _memcpy,.end-_memcpy
-#elif CONFIG_CPU == MCF5249
+#elif defined(CPU_COLDFIRE)
     .align      2
     .global     memcpy
     .type       memcpy,@function

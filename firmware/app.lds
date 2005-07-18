@@ -1,7 +1,7 @@
 #include "config.h"
 
 ENTRY(start)
-#if CONFIG_CPU == MCF5249
+#ifdef CPU_COLDFIRE
 OUTPUT_FORMAT(elf32-m68k)
 #elif CONFIG_CPU == TCC730
 OUTPUT_FORMAT(elf32-calmrisc16)
@@ -187,7 +187,7 @@ SECTIONS
         _iramend = .;
     } > IRAM
 
-#if CONFIG_CPU == MCF5249
+#ifdef CPU_COLDFIRE
     .stack :
     {
        *(.stack)
@@ -207,7 +207,7 @@ SECTIONS
     } > DRAM
 #endif
 
-#if CONFIG_CPU == MCF5249
+#ifdef CPU_COLDFIRE
     .bss ADDR(.data) + SIZEOF(.data) + SIZEOF(.iram):
 #else
     .bss :

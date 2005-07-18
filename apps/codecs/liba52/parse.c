@@ -58,7 +58,7 @@ a52_state_t * a52_init (uint32_t mm_accel)
     a52_state_t * state;
     int i;
 
-    #if CONFIG_CPU==MCF5249 && !defined(SIMULATOR)
+    #ifdef CPU_COLDFIRE && !defined(SIMULATOR)
     asm volatile ("move.l #0x30, %macsr"); /* frac. mode with rounding */
     #endif
     /* 

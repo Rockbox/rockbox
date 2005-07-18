@@ -205,7 +205,7 @@ void IMIA0(void)
 
     TSR0 &= ~0x01;
 }
-#elif CONFIG_CPU == MCF5249
+#elif defined(CPU_COLDFIRE)
 void tick_start(unsigned int interval_in_ms)
 {
     unsigned int count;

@@ -24,7 +24,7 @@
 # ifndef LIBMAD_GLOBAL_H
 # define LIBMAD_GLOBAL_H
 
-#if CONFIG_CPU==MCF5249 && !defined(SIMULATOR)
+#ifdef CPU_COLDFIRE && !defined(SIMULATOR)
 #define FPM_COLDFIRE_EMAC
 #else
 #define FPM_DEFAULT

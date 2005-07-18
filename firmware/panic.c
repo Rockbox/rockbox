@@ -43,7 +43,7 @@ void panicf( const char *fmt, ...)
     /* Disable interrupts */
 #if CONFIG_CPU == SH7034
     asm volatile ("ldc\t%0,sr" : : "r"(15<<4));
-#elif CONFIG_CPU == MCF5249
+#elif defined(CPU_COLDFIRE)
     asm volatile ("move.w #0x2700,%sr");
 #endif
 #endif

@@ -335,7 +335,7 @@ static void Synthese_Filter_float_internal(MPC_SAMPLE_FORMAT * OutData,MPC_SAMPL
 {
     mpc_uint32_t n;
     
-    #if CONFIG_CPU==MCF5249 && !defined(SIMULATOR)
+    #ifdef CPU_COLDFIRE && !defined(SIMULATOR)
     asm volatile ("move.l #0x20, %macsr"); /* fractional emac mode */
     #endif
     for ( n = 0; n < 36; n++, Y += 32 ) {
@@ -350,7 +350,7 @@ static void Synthese_Filter_float_internal(MPC_SAMPLE_FORMAT * OutData,MPC_SAMPL
             
             
             for ( k = 0; k < 32; k++, D += 16, V++ ) {
-                #if CONFIG_CPU==MCF5249 && !defined(SIMULATOR)
+                #ifdef CPU_COLDFIRE && !defined(SIMULATOR)
                 asm volatile (
                     "movem.l (%[D]), %%d0-%%d3\n\t"
                     "move.l (%[V]), %%a5\n\t"

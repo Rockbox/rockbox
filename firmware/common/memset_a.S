@@ -106,7 +106,7 @@ _memset:
 
 .end:
     .size   _memset,.end-_memset
-#elif CONFIG_CPU == MCF5249
+#elif defined(CPU_COLDFIRE)
     .global     memset
     .type       memset,@function
 

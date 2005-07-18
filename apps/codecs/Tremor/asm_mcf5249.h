@@ -19,7 +19,7 @@
 
 #include "os_types.h"
 
-#if CONFIG_CPU == MCF5249 && !defined(SIMULATOR)
+#ifdef CPU_COLDFIRE && !defined(SIMULATOR)
 
 /* attribute for 16-byte alignment */
 #define LINE_ATTR   __attribute__ ((aligned (16)))
