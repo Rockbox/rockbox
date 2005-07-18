@@ -654,6 +654,167 @@ bool dbg_partitions(void)
     return false;
 }
 
+#ifdef CPU_COLDFIRE
+bool dbg_spdif(void)
+{
+    char buf[128];
+    int button;
+    int line;
+    unsigned int control;
+    int x;
+    char *s;
+    int category;
+    int generation;
+    unsigned int interruptstat;
+    bool valnogood, symbolerr, parityerr;
+
+    lcd_setmargins(0, 0);
+    lcd_clear_display();
+    lcd_setfont(FONT_SYSFIXED);
+
+    while(1)
+    {
+        line = 0;
+
+        control = EBU1RCVCCHANNEL1;
+        interruptstat = INTERRUPTSTAT;
+        INTERRUPTCLEAR = 0x03c00000;
+
+        valnogood = (interruptstat & 0x01000000)?true:false;
+        symbolerr = (interruptstat & 0x00800000)?true:false;
+        parityerr = (interruptstat & 0x00400000)?true:false;
+        
+        snprintf(buf, sizeof(buf), "Val: %s Sym: %s Par: %s",
+                 valnogood?"--":"OK",
+                 symbolerr?"--":"OK",
+                 parityerr?"--":"OK");
+        lcd_puts(0, line++, buf);
+
+        snprintf(buf, sizeof(buf), "Status word: %08x", (int)control);
+        lcd_puts(0, line++, buf);
+
+        line++;
+        
+        x = control >> 31;
+        snprintf(buf, sizeof(buf), "PRO: %d (%s)",
+                 x, x?"Professional":"Consumer");
+        lcd_puts(0, line++, buf);
+        
+        x = (control >> 30) & 1;
+        snprintf(buf, sizeof(buf), "Audio: %d (%s)",
+                 x, x?"Non-PCM":"PCM");
+        lcd_puts(0, line++, buf);
+        
+        x = (control >> 29) & 1;
+        snprintf(buf, sizeof(buf), "Copy: %d (%s)",
+                 x, x?"Permitted":"Inhibited");
+        lcd_puts(0, line++, buf);
+        
+        x = (control >> 27) & 7;
+        switch(x)
+        {
+        case 0:
+            s = "None";
+            break;
+        case 1:
+            s = "50/15us";
+            break;
+        default:
+            s = "Reserved";
+            break;
+        }
+        snprintf(buf, sizeof(buf), "Preemphasis: %d (%s)", x, s);
+        lcd_puts(0, line++, buf);
+
+        x = (control >> 24) & 3;
+        snprintf(buf, sizeof(buf), "Mode: %d", x);
+        lcd_puts(0, line++, buf);
+        
+        category = (control >> 17) & 127;
+        switch(category)
+        {
+        case 0x00:
+            s = "General";
+            break;
+        case 0x40:
+            s = "Audio CD";
+            break;
+        default:
+            s = "Unknown";
+        }
+        snprintf(buf, sizeof(buf), "Category: 0x%02x (%s)", category, s);
+        lcd_puts(0, line++, buf);
+        
+        x = (control >> 16) & 1;
+        generation = x;
+        if(((category & 0x70) == 0x10) ||
+           ((category & 0x70) == 0x40) ||
+           ((category & 0x78) == 0x38))
+        {
+            generation = !generation;
+        }
+        snprintf(buf, sizeof(buf), "Generation: %d (%s)",
+                 x, generation?"Original":"No ind.");
+        lcd_puts(0, line++, buf);
+        
+        x = (control >> 12) & 15;
+        snprintf(buf, sizeof(buf), "Source: %d", x);
+        lcd_puts(0, line++, buf);
+        
+        x = (control >> 8) & 15;
+        switch(x)
+        {
+        case 0:
+            s = "Unspecified";
+            break;
+        case 8:
+            s = "A (Left)";
+            break;
+        case 4:
+            s = "B (Right)";
+            break;
+        default:
+            s = "";
+            break;
+        }
+        snprintf(buf, sizeof(buf), "Channel: %d (%s)", x, s);
+        lcd_puts(0, line++, buf);
+        
+        x = (control >> 4) & 15;
+        switch(x)
+        {
+        case 0:
+            s = "44.1kHz";
+            break;
+        case 0x4:
+            s = "48kHz";
+            break;
+        case 0xc:
+            s = "32kHz";
+            break;
+        }
+        snprintf(buf, sizeof(buf), "Frequency: %d (%s)", x, s);
+        lcd_puts(0, line++, buf);
+        
+        x = (control >> 2) & 3;
+        snprintf(buf, sizeof(buf), "Clock accuracy: %d", x);
+        lcd_puts(0, line++, buf);
+        
+        lcd_update();
+        button = button_get_w_tmo(HZ/10);
+
+        switch(button)
+        {
+        case SETTINGS_CANCEL:
+        case SETTINGS_OK2:
+                return false;
+        }
+    }
+
+    return false;
+}
+#endif
+
 #ifdef HAVE_LCD_BITMAP
 /* Test code!!! */
 bool dbg_ports(void)
@@ -939,6 +1100,7 @@ bool dbg_cpufreq(void)
             break;
             
         case SETTINGS_CANCEL:
+        case SETTINGS_OK2:
             return false;
         }
     }
@@ -1571,6 +1733,7 @@ bool debug_menu(void)
 #endif
 #if defined(IRIVER_H100_SERIES) && !defined(SIMULATOR)
         { "PCM recording", pcm_rec_screen },
+        { "S/PDIF analyzer", dbg_spdif },
 #endif
 #if CONFIG_CPU == SH7034
         { "Catch mem accesses", dbg_set_memory_guard },
