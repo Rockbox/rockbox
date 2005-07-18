@@ -36,7 +36,7 @@
 #define SAMPLE_BUF_SIZE     256
 #define RESAMPLE_BUF_SIZE   (256 * 4)   /* Enough for 11,025 Hz -> 44,100 Hz*/
 
-#ifdef CPU_COLDFIRE && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
 
 #define INIT() asm volatile ("move.l #0xb0, %macsr") /* frac, round, clip */
 /* Multiply 2 32-bit integers and return the 32 most significant bits of the

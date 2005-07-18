@@ -299,7 +299,7 @@ FLAC_API FLAC__StreamDecoderState FLAC__stream_decoder_init(FLAC__StreamDecoder 
 	 */
 	FLAC__cpu_info(&decoder->private_->cpuinfo);
 	/* first default to the non-asm routines */
-#ifdef CPU_COLDFIRE && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
         decoder->private_->local_lpc_restore_signal = FLAC__lpc_restore_signal_mcf5249;
         decoder->private_->local_lpc_restore_signal_16bit = FLAC__lpc_restore_signal_mcf5249;
         decoder->private_->local_lpc_restore_signal_16bit_order8 = FLAC__lpc_restore_signal_mcf5249;

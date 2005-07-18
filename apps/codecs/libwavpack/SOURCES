@@ -5,7 +5,7 @@ unpack.c
 pack.c
 words.c
 wputils.c
-#ifdef CPU_COLDFIRE && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
 coldfire.S
 #endif
 

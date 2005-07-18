@@ -1291,7 +1291,7 @@ int ov_pcm_seek(OggVorbis_File *vf,ogg_int64_t pos){
   if(ret<0)return(ret);
   _make_decode_ready(vf);
 
-#ifdef CPU_COLDFIRE && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
   mcf5249_init_mac();
 #endif
 
@@ -1552,7 +1552,7 @@ long ov_read(OggVorbis_File *vf,char *buffer,int bytes_req,int *bitstream){
 
   if(vf->ready_state<OPENED)return(OV_EINVAL);
 
-#ifdef CPU_COLDFIRE && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
   mcf5249_init_mac();
 #endif
 

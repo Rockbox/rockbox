@@ -286,7 +286,7 @@ int read_config_info (WavpackContext *wpc, WavpackMetadata *wpmd)
 // samples unpacked, which can be less than the number requested if an error
 // occurs or the end of the block is reached.
 
-#ifdef CPU_COLDFIRE && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
 extern void decorr_stereo_pass_cont_mcf5249 (struct decorr_pass *dpp, long *buffer, long sample_count);
 #else
 static void decorr_stereo_pass_cont (struct decorr_pass *dpp, long *buffer, long sample_count);
@@ -348,7 +348,7 @@ long unpack_samples (WavpackContext *wpc, long *buffer, ulong sample_count)
         else
             for (tcount = wps->num_terms, dpp = wps->decorr_passes; tcount--; dpp++) {
                 decorr_stereo_pass (dpp, buffer, 8);
-#ifdef CPU_COLDFIRE && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
                 decorr_stereo_pass_cont_mcf5249 (dpp, buffer + 16, sample_count - 8);
 #else
                 decorr_stereo_pass_cont (dpp, buffer + 16, sample_count - 8);
@@ -510,7 +510,7 @@ static void decorr_stereo_pass (struct decorr_pass *dpp, long *buffer, long samp
     dpp->weight_B = weight_B;
 }
 
-#ifndef CPU_COLDFIRE || defined(SIMULATOR)
+#if !defined(CPU_COLDFIRE) || defined(SIMULATOR)
 
 static void decorr_stereo_pass_cont (struct decorr_pass *dpp, long *buffer, long sample_count)
 {
