@@ -38,12 +38,6 @@
 
 #define DRAM_START 0x31000000
 
-#ifdef IRIVER_H100
-#define MODEL_NUMBER 1
-#else
-#define MODEL_NUMBER 0
-#endif
-
 int line = 0;
 
 int usb_screen(void)

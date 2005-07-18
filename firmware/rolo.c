@@ -127,7 +127,7 @@ int rolo_load(const char* filename)
         return -1;
     }
 
-    checksum = 0;
+    checksum = MODEL_NUMBER;
     
     for(i = 0;i < length;i++) {
         checksum += audiobuf[i];

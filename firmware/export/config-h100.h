@@ -7,6 +7,9 @@
  */
 #define IRIVER_H100_SERIES 1
 
+/* For Rolo and boot loader */
+#define MODEL_NUMBER 1
+
 /* define this if you have recording possibility */
 /*#define HAVE_RECORDING 1*/
 
