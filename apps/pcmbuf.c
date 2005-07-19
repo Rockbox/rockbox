@@ -85,7 +85,7 @@ volatile int pcmbuf_write_index;
 int pcmbuf_unplayed_bytes;
 int pcmbuf_watermark;
 void (*pcmbuf_watermark_event)(int bytes_left);
-static int last_chunksize;
+//static int last_chunksize;
 
 static void pcmbuf_boost(bool state)
 {
@@ -110,11 +110,6 @@ int pcmbuf_num_used_buffers(void)
 static void pcmbuf_callback(unsigned char** start, long* size)
 {
     struct pcmbufdesc *desc = &pcmbuffers[pcmbuf_read_index];
-    int sz;
-
-    pcmbuf_unplayed_bytes -= last_chunksize;
-    audiobuffer_free += last_chunksize;
-    
     
     if(desc->size == 0)
     {
@@ -129,17 +124,15 @@ static void pcmbuf_callback(unsigned char** start, long* size)
     
     if(pcmbuf_num_used_buffers())
     {
-        /* Play max 64K at a time */
-        //sz = MIN(desc->size, 32768);
-        sz = desc->size;
+        pcmbuf_unplayed_bytes -= desc->size;
+        audiobuffer_free += desc->size;
+    
         *start = desc->addr;
-        *size = sz;
+        *size = desc->size;
 
         /* Update the buffer descriptor */
-        desc->size -= sz;
-        desc->addr += sz;
-
-        last_chunksize = sz;
+        desc->addr += desc->size;
+        desc->size = 0;
     }
     else
     {
@@ -243,7 +236,7 @@ bool pcmbuf_crossfade_init(void)
 void pcmbuf_play_stop(void)
 {
     pcm_play_stop();
-    last_chunksize = 0;
+    //last_chunksize = 0;
     pcmbuf_unplayed_bytes = 0;
     pcmbuf_read_index = 0;
     pcmbuf_write_index = 0;
@@ -278,6 +271,7 @@ void pcmbuf_flush_audio(void)
         return ;
     }
     
+    pcmbuf_boost(true);
     crossfade_mode = CFM_FLUSH;
     crossfade_init = true;
 }
@@ -296,7 +290,8 @@ void pcmbuf_flush_fillpos(void)
             /* This is a fatal error situation that should never happen. */
             if (!pcm_is_playing()) {
                 logf("pcm_flush_fillpos error");
-                break ;
+                pcm_play_data(pcmbuf_callback);
+                return ;
             }
         }
         pcmbuf_event_handler = NULL;
@@ -320,7 +315,7 @@ static void crossfade_start(void)
     }
 
     logf("crossfade_start");
-    pcmbuf_flush_fillpos();
+    audiobuffer_fillpos = 0;
     pcmbuf_boost(true);
     crossfade_active = true;
     crossfade_pos = audiobuffer_pos;
@@ -384,7 +379,7 @@ static bool prepare_insert(long length)
         pcmbuf_boost(false);
         return false;
     }
-    
+
     if (!pcm_is_playing()) {
         pcmbuf_boost(true);
         crossfade_active = false;

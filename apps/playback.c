@@ -392,7 +392,7 @@ void codec_advance_buffer_callback(long amount)
     if (amount > cur_ti->available + cur_ti->filerem)
         amount = cur_ti->available + cur_ti->filerem;
     
-    if (amount > cur_ti->available) {
+    if (amount > cur_ti->available && !filling) {
         if (!rebuffer_and_seek(ci.curpos + amount))
             ci.stop_codec = true;
         return ;
@@ -1346,16 +1346,16 @@ static void initiate_track_change(int peek_index)
     if (!playlist_check(peek_index))
         return ;
             
-    new_track = peek_index;
-    ci.reload_codec = true;
-
     /* Detect if disk is spinning.. */
     if (filling) {
         ci.stop_codec = true;
         playlist_next(peek_index);
         queue_post(&audio_queue, AUDIO_PLAY, 0);
     } else {
-        pcmbuf_crossfade_init();
+        new_track = peek_index;
+        ci.reload_codec = true;
+        if (!pcmbuf_is_crossfade_enabled())
+            pcmbuf_flush_audio();
     }
 
     codec_track_changed();
@@ -1384,8 +1384,9 @@ void audio_thread(void)
                 ci.stop_codec = true;
                 ci.reload_codec = false;
                 ci.seek_time = 0;
-                if (!pcmbuf_is_crossfade_active())
-                    pcmbuf_crossfade_init();
+                pcmbuf_crossfade_init();
+                while (codec_loaded)
+                    yield();
                 audio_play_start((int)ev.data);
                 playlist_update_resume_info(audio_current_track());
                 break ;
