@@ -58,6 +58,14 @@
 #define SOKOBAN_LEVEL_REPEAT BUTTON_SELECT
 #endif
 
+#if LCD_DEPTH > 1
+#if HAVE_LCD_COLOR
+#define MEDIUM_GRAY ((struct rgb){LCD_MAX_RED/2, LCD_MAX_GREEN/2, LCD_MAX_BLUE/2})
+#else
+#define MEDIUM_GRAY (LCD_MAX_LEVEL/2)
+#endif
+#endif
+
 static void init_undo(void);
 static void undo(void);
 static void add_undo(int button);
@@ -391,7 +399,6 @@ static void update_screen(void)
 {
     int b = 0, c = 0;
     int rows = 0, cols = 0;
-    int i, j;
     char s[25];
     
 #if LCD_HEIGHT >= 128
@@ -411,10 +418,19 @@ static void update_screen(void)
                 break;
 
             case '#': /* this is a wall */
-                for (i = c; i < c + magnify; i++)
-                    for (j = b; j < b + magnify; j++)
-                        if ((i ^ j) & 1)
-                            rb->lcd_drawpixel(i, j);
+#if LCD_DEPTH > 1
+                rb->lcd_set_foreground(MEDIUM_GRAY);
+                rb->lcd_fillrect(c, b, magnify, magnify);
+                rb->lcd_set_foreground(LCD_BLACK);
+#else
+                {
+                    int i, j;
+                    for (i = c; i < c + magnify; i++)
+                        for (j = b; j < b + magnify; j++)
+                            if ((i ^ j) & 1)
+                                rb->lcd_drawpixel(i, j);
+                }
+#endif
                 break;
 
             case '.': /* this is a home location */
@@ -427,12 +443,20 @@ static void update_screen(void)
                 break;
 
             case '@': /* this is you */
-                rb->lcd_drawline(c+1, b, c+2, b);
-                rb->lcd_drawline(c, b+1, c+3, b+1);
-                rb->lcd_drawline(c+1, b+2, c+2, b+2);
+                {
+                    int max = magnify - 1;
+                    int middle = max / 2;
+                    int ldelta = (middle + 1) / 2;
 
-                rb->lcd_drawpixel(c, b+3);
-                rb->lcd_drawpixel(c+3, b+3);
+                    rb->lcd_drawline(c, b+middle, c+max, b+middle);
+                    rb->lcd_drawline(c+middle, b, c+middle, b+max-ldelta);
+                    rb->lcd_drawline(c+max-middle, b, 
+                                     c+max-middle, b+max-ldelta);
+                    rb->lcd_drawline(c+middle, b+max-ldelta,
+                                     c+middle-ldelta, b+max);
+                    rb->lcd_drawline(c+max-middle, b+max-ldelta, 
+                                     c+max-middle+ldelta, b+max);
+                }
                 break;
 
             case '%': /* this is a box on a home spot */ 
@@ -893,6 +917,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_putsxy(3, 26, "[M-LEFT] - Level");
     rb->lcd_putsxy(3, 36, "[M-UP] Same Level");
     rb->lcd_putsxy(3, 46, "[M-RIGHT] + Level");
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+      (CONFIG_KEYPAD == IRIVER_H300_PAD)
+    rb->lcd_putsxy(3,  6, "[STOP] To Stop");
+    rb->lcd_putsxy(3, 16, "[PLAY] To Undo");
+    rb->lcd_putsxy(3, 26, "[REC] - Level");
+    rb->lcd_putsxy(3, 36, "[SELECT] Same Level");
+    rb->lcd_putsxy(3, 46, "[MODE] + Level");
 #endif
 
     rb->lcd_update();
