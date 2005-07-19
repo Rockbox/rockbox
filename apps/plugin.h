@@ -403,10 +403,17 @@ struct plugin_api {
     int *rundb_initialized;            
     int (*strncmp)(const char *, const char *, size_t);
 #if LCD_DEPTH > 1
+#ifdef HAVE_LCD_COLOR
+    void       (*lcd_set_foreground)(struct rgb color);
+    struct rgb (*lcd_get_foreground)(void);
+    void       (*lcd_set_background)(struct rgb color);
+    struct rgb (*lcd_get_background)(void);
+#else
     void (*lcd_set_foreground)(int brightness);
     int  (*lcd_get_foreground)(void);
     void (*lcd_set_background)(int brightness);
     int  (*lcd_get_background)(void);
+#endif
     void (*lcd_bitmap_part)(const unsigned char *src, int src_x, int src_y,
                             int stride, int x, int y, int width, int height);
     void (*lcd_bitmap)(const unsigned char *src, int x, int y, int width,

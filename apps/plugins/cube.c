@@ -152,10 +152,18 @@ static const struct face faces[6] =
 };
 
 #if LCD_DEPTH > 1
-static const int face_colors[6] = 
+#ifdef HAVE_LCD_COLOR
+static const struct rgb face_colors[6] =
+{
+    {LCD_MAX_RED, 0, 0},   {LCD_MAX_RED, 0, 0},  {0, LCD_MAX_GREEN, 0},
+    {0, LCD_MAX_GREEN, 0}, {0, 0, LCD_MAX_BLUE}, {0, 0, LCD_MAX_BLUE}
+};
+#else
+static const int face_colors[6] =
 {
     2*LCD_MAX_LEVEL/3, 2*LCD_MAX_LEVEL/3, LCD_MAX_LEVEL/3, LCD_MAX_LEVEL/3, 0, 0
 };
+#endif
 #endif
 
 enum {
@@ -352,7 +360,7 @@ static void cube_draw(void)
                               point2D[faces[i].corner[3]].y);
 
         }
-        rb->lcd_set_foreground(0);
+        rb->lcd_set_foreground(LCD_BLACK);
         break;
 #endif /* LCD_DEPTH > 1 */
 

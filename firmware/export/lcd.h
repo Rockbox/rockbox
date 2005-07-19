@@ -135,9 +135,12 @@ struct rgb {
     unsigned char green;
     unsigned char blue;
 };
+#define LCD_BLACK ((struct rgb){0, 0, 0})
+#define LCD_WHITE ((struct rgb){LCD_MAX_RED, LCD_MAX_GREEN, LCD_MAX_BLUE})
 #else /* monochrome */
 #define LCD_MAX_LEVEL ((1 << LCD_DEPTH) - 1)
-
+#define LCD_BLACK 0
+#define LCD_WHITE LCD_MAX_LEVEL
 #endif
 
 /* Memory copy of display bitmap */

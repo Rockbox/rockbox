@@ -282,10 +282,17 @@ static void addclock(void)
 #define DRAW_WIDTH (LCD_WIDTH + LETTER_WIDTH*2)
 
 #if LCD_DEPTH > 1
-static const int face_colors[] = 
+#ifdef HAVE_LCD_COLOR
+static const struct rgb face_colors[] =
+{
+    LCD_BLACK, {0, 0, LCD_MAX_BLUE}, {LCD_MAX_RED, 0, 0}
+};
+#else
+static const int face_colors[] =
 {
     0, 2*LCD_MAX_LEVEL/3, LCD_MAX_LEVEL/3
 };
+#endif
 #endif
 
 static int scrollit(void)
@@ -474,7 +481,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         if (h > 0)
             h = scrollit();
 #if LCD_DEPTH > 1
-        rb->lcd_set_foreground(0);
+        rb->lcd_set_foreground(LCD_BLACK);
 #endif
     } while(h > 0);
     

@@ -855,7 +855,11 @@ void splash(int ticks,       /* how long the splash is displayed */
         int xx = (LCD_WIDTH-maxw)/2 - 2;
         /* The new graphics routines handle clipping, so no need to check */
 #if LCD_DEPTH > 1
+#ifdef HAVE_LCD_COLOR
+        lcd_set_background((struct rgb){LCD_MAX_RED-1, LCD_MAX_GREEN-1, LCD_MAX_BLUE-1});
+#else
         lcd_set_background(LCD_MAX_LEVEL-1);
+#endif
 #endif
         lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
         lcd_fillrect(xx, y-2, maxw+4, LCD_HEIGHT-y*2+4);
@@ -903,7 +907,7 @@ void splash(int ticks,       /* how long the splash is displayed */
         next = strtok_r(NULL, " ", &store);
     }
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH > 1)
-    lcd_set_background(LCD_MAX_LEVEL);
+    lcd_set_background(LCD_WHITE);
 #endif
     lcd_update();
 
