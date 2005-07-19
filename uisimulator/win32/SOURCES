@@ -10,3 +10,4 @@ panic-win32.c
 string-win32.c
 thread-win32.c
 uisw32.c
+sound.c

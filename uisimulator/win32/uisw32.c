@@ -21,12 +21,14 @@
 #include <process.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include "autoconf.h"
 #include "uisw32.h"
 #include "resource.h"
 #include "button.h"
 #include "thread.h"
 #include "thread-win32.h"
 #include "kernel.h"
+#include "sound.h"
 
 #ifndef LR_VGACOLOR             /* Should be under MINGW32 builds? */
 #define LR_VGACOLOR LR_COLOR
@@ -44,6 +46,9 @@ unsigned int                        uThreadID; // id of mod thread
 PBYTE                               lpKeys;
 bool                                bActive; // window active?
 HANDLE                              hGUIThread; // thread for GUI
+#ifdef ROCKBOX_HAS_SIMSOUND
+HANDLE                              hSoundThread; // thread for sound
+#endif
 bool                                bIsWinNT; // Windows NT derivate?
 
 bool lcd_display_redraw=true; // Used for player simulator
@@ -262,6 +267,9 @@ int GUIDown ()
 
     DestroyWindow (hGUIWnd);
     CloseHandle (hGUIThread);
+#ifdef ROCKBOX_HAS_SIMSOUND
+    CloseHandle (hSoundThread);
+#endif
 
     for (i = 0; i < nThreads; i++)
     {
@@ -312,6 +320,14 @@ int WINAPI WinMain (
 
     if (hGUIThread == NULL)
         return MessageBox (NULL, "Error creating gui thread!", "Error", MB_OK);
+
+#ifdef ROCKBOX_HAS_SIMSOUND
+    hSoundThread = CreateThread (NULL, 0, (LPTHREAD_START_ROUTINE)
+        sound_playback_thread, NULL, 0, &dwThreadID);
+
+    if (hGUIThread == NULL)
+        MessageBox (NULL, "Error creating sound thread!", "Warning", MB_OK);
+#endif
 
     GUIMessageLoop ();
 
