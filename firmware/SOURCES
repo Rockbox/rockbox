@@ -49,9 +49,9 @@ drivers/lcd-player-charset.c
 drivers/lcd-player.c
 #endif
 #ifdef HAVE_LCD_BITMAP
-#if CONFIG_LCD == LCD_S1D15E06
+#if LCD_DEPTH == 2
 drivers/lcd-h100.c
-#else
+#elif LCD_DEPTH == 1
 drivers/lcd-recorder.c
 #endif
 #endif

@@ -1,16 +1,19 @@
+/* For Rolo and boot loader */
+#define MODEL_NUMBER 2
+
 /* define this if you have recording possibility */
 /*#define HAVE_RECORDING 1*/
 
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP 1
 
-/* For Rolo and boot loader */
-#define MODEL_NUMBER 2
+/* define this if you have a colour LCD */
+#define HAVE_LCD_COLOR 1
 
 /* LCD dimensions */
 #define LCD_WIDTH  220
 #define LCD_HEIGHT 176
-#define LCD_DEPTH  18
+#define LCD_DEPTH  18   /* 262.144 colours */
 
 /* remote LCD */
 #define LCD_REMOTE_WIDTH  128

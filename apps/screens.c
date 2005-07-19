@@ -855,7 +855,7 @@ void splash(int ticks,       /* how long the splash is displayed */
         int xx = (LCD_WIDTH-maxw)/2 - 2;
         /* The new graphics routines handle clipping, so no need to check */
 #if LCD_DEPTH > 1
-        lcd_set_background(MAX_LEVEL-1);
+        lcd_set_background(LCD_MAX_LEVEL-1);
 #endif
         lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
         lcd_fillrect(xx, y-2, maxw+4, LCD_HEIGHT-y*2+4);
@@ -903,7 +903,7 @@ void splash(int ticks,       /* how long the splash is displayed */
         next = strtok_r(NULL, " ", &store);
     }
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH > 1)
-    lcd_set_background(MAX_LEVEL);
+    lcd_set_background(LCD_MAX_LEVEL);
 #endif
     lcd_update();
 

@@ -8,10 +8,13 @@
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP 1
 
+/* define this if you have a colour LCD */
+#define HAVE_LCD_COLOR 1
+
 /* LCD dimensions */
 #define LCD_WIDTH  160
 #define LCD_HEIGHT 128
-#define LCD_DEPTH  18   /* 260.000 colors */
+#define LCD_DEPTH  18   /* 262.144 colors */
 
 /* remote LCD */
 #define LCD_REMOTE_WIDTH  128

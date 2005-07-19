@@ -412,7 +412,7 @@ int plugin_load(const char* plugin, void* parameter)
     button_clear_queue();
 #ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH > 1
-    lcd_set_drawinfo(DRMODE_SOLID, 0, MAX_LEVEL);
+    lcd_set_drawinfo(DRMODE_SOLID, 0, LCD_MAX_LEVEL);
 #else
     lcd_set_drawmode(DRMODE_SOLID);
 #endif

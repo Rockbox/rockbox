@@ -284,7 +284,7 @@ static void addclock(void)
 #if LCD_DEPTH > 1
 static const int face_colors[] = 
 {
-    0, 2*MAX_LEVEL/3, MAX_LEVEL/3
+    0, 2*LCD_MAX_LEVEL/3, LCD_MAX_LEVEL/3
 };
 #endif
 
@@ -451,7 +451,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     
     len = 1;
     rb->lcd_getstringsize(off, &w, &h);
-    
+
     /* Get horizontel centering for text */
     len *= w;
     if (len%2 != 0)

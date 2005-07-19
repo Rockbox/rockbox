@@ -154,7 +154,7 @@ static const struct face faces[6] =
 #if LCD_DEPTH > 1
 static const int face_colors[6] = 
 {
-    2*MAX_LEVEL/3, 2*MAX_LEVEL/3, MAX_LEVEL/3, MAX_LEVEL/3, 0, 0
+    2*LCD_MAX_LEVEL/3, 2*LCD_MAX_LEVEL/3, LCD_MAX_LEVEL/3, LCD_MAX_LEVEL/3, 0, 0
 };
 #endif
 

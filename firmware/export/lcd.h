@@ -124,13 +124,26 @@ extern void lcd_jump_scroll_delay(int ms);
 typedef void lcd_pixelfunc_type(int x, int y);
 typedef void lcd_blockfunc_type(unsigned char *address, unsigned mask, unsigned bits);
 
-#if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
+#ifdef HAVE_LCD_BITMAP
+
+#ifdef HAVE_LCD_COLOR
+#define LCD_MAX_RED   ((1 << (LCD_DEPTH/3)) - 1)
+#define LCD_MAX_GREEN ((1 << (LCD_DEPTH/3)) - 1)
+#define LCD_MAX_BLUE  ((1 << (LCD_DEPTH/3)) - 1)
+struct rgb {
+    unsigned char red;
+    unsigned char green;
+    unsigned char blue;
+};
+#else /* monochrome */
+#define LCD_MAX_LEVEL ((1 << LCD_DEPTH) - 1)
+
+#endif
 
 /* Memory copy of display bitmap */
 #if LCD_DEPTH == 1
 extern unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
 #elif LCD_DEPTH == 2
-#define MAX_LEVEL 3
 extern unsigned char lcd_framebuffer[LCD_HEIGHT/4][LCD_WIDTH];
 #endif
 
@@ -167,11 +180,20 @@ extern void lcd_bidir_scroll(int threshold);
 extern void lcd_scroll_step(int pixels);
 
 #if LCD_DEPTH > 1
+#ifdef HAVE_LCD_COLOR
+extern void       lcd_set_foreground(struct rgb color);
+extern struct rgb lcd_get_foreground(void);
+extern void       lcd_set_background(struct rgb color);
+extern struct rgb lcd_get_background(void);
+extern void       lcd_set_drawinfo(int mode, struct rgb fg_color,
+                                   struct rgb bg_color);
+#else /* monochrome */
 extern void lcd_set_foreground(int brightness);
 extern int  lcd_get_foreground(void);
 extern void lcd_set_background(int brightness);
 extern int  lcd_get_background(void);
 extern void lcd_set_drawinfo(int mode, int fg_brightness, int bg_brightness);
+#endif
 extern void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
                             int stride, int x, int y, int width, int height);
 extern void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width,
@@ -181,7 +203,7 @@ extern void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width,
 #define lcd_mono_bitmap_part lcd_bitmap_part
 #endif
 
-#endif /* CHARCELLS / BITMAP */
+#endif /* HAVE_LCD_BITMAP */
 
 /* internal usage, but in multiple drivers */
 #ifdef HAVE_LCD_BITMAP 
