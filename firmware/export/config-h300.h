@@ -4,6 +4,9 @@
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP 1
 
+/* For Rolo and boot loader */
+#define MODEL_NUMBER 2
+
 /* LCD dimensions */
 #define LCD_WIDTH  220
 #define LCD_HEIGHT 176
