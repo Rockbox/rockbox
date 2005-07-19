@@ -175,9 +175,11 @@ void main(void)
     int data;
     int adc_battery, battery_voltage, batt_int, batt_frac;
 
-    /* Read the buttons early */
+    /* We want to read the buttons as early as possible, before the user
+       releases the ON button */
 
-    /* Set GPIO33, GPIO37, GPIO38  and GPIO52 as general purpose inputs */
+    /* Set GPIO33, GPIO37, GPIO38  and GPIO52 as general purpose inputs
+       (The ON and Hold buttons on the main unit and the remote) */
     or_l(0x00100062, &GPIO1_FUNCTION);
     and_l(~0x00100062, &GPIO1_ENABLE);
 
@@ -192,7 +194,17 @@ void main(void)
     or_l(0x00020000, &GPIO1_ENABLE);
     or_l(0x00020000, &GPIO1_FUNCTION);
 
+    /* Set the default state of the hard drive power to OFF */
+    ide_power_enable(false);
+    
     power_init();
+
+    /* Power on the hard drive early, to speed up the loading */
+    if(!((on_button && button_hold()) ||
+         (rc_on_button && remote_button_hold()))) {
+        ide_power_enable(true);
+    }
+    
     system_init();
     kernel_init();
 
@@ -212,12 +224,14 @@ void main(void)
 
     lcd_setfont(FONT_SYSFIXED);
 
-    snprintf(buf, sizeof(buf), "Rockboot version %s", version);
+    lcd_puts(0, line++, "Rockbox boot loader");
+    snprintf(buf, sizeof(buf), "Version %s", version);
     lcd_puts(0, line++, buf);
     lcd_update();
 
     sleep(HZ/50); /* Allow the button driver to check the buttons */
 
+    /* Holding REC while starting runs the original firmware */
     if(((button_status() & BUTTON_REC) == BUTTON_REC) ||
        ((button_status() & BUTTON_RC_REC) == BUTTON_RC_REC)) {
         lcd_puts(0, 8, "Starting original firmware...");
@@ -225,8 +239,10 @@ void main(void)
         start_iriver_fw();
     }
 
-    if(on_button & button_hold() ||
-       rc_on_button & remote_button_hold()) {
+    /* Don't start if the Hold button is active on the device you
+       are starting with */
+    if((on_button && button_hold()) ||
+       (rc_on_button && remote_button_hold())) {
         lcd_puts(0, 8, "HOLD switch on, power off...");
         lcd_update();
         sleep(HZ*2);
@@ -280,6 +296,9 @@ void main(void)
         {
             ata_spin(); /* Prevent the drive from spinning down */
             sleep(HZ);
+            
+            /* Backlight OFF */
+            or_l(0x00020000, &GPIO1_OUT);
         }
 
         system_reboot();
