@@ -301,7 +301,12 @@ void main(void)
             or_l(0x00020000, &GPIO1_OUT);
         }
 
-        system_reboot();
+        usb_enable(false);
+        ata_init(); /* Reinitialize ATA and continue booting */
+        
+        lcd_clear_display();
+        line = 0;
+        lcd_update();
     }
     
     disk_init();
