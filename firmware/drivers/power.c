@@ -64,9 +64,9 @@ void power_init(void)
     or_l(0x00080000, &GPIO1_ENABLE);
     or_l(0x00080000, &GPIO1_FUNCTION);
 
-#ifdef BOOTLOADER
-    /* Hard drive power default = off in bootloader*/
-    or_l(0x80000000, &GPIO_OUT);
+#ifndef BOOTLOADER
+    /* The boot loader controls the power */
+    ide_power_enable(true);
 #endif
     or_l(0x80000000, &GPIO_ENABLE);
     or_l(0x80000000, &GPIO_FUNCTION);
