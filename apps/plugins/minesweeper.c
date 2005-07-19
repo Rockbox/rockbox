@@ -69,8 +69,8 @@ use F3 to see how many mines are left (supposing all your flags are correct)
 
 #if LCD_DEPTH > 1
 #if HAVE_LCD_COLOR
-#define LIGHT_GRAY ((struct rgb){2*MAX_RED/3, 2*MAX_GREEN/3, 2*MAX_BLUE/3})
-#define DARK_GRAY  ((struct rgb){MAX_RED/3, MAX_GREEN/3, MAX_BLUE/3})
+#define LIGHT_GRAY ((struct rgb){2*LCD_MAX_RED/3, 2*LCD_MAX_GREEN/3, 2*LCD_MAX_BLUE/3})
+#define DARK_GRAY  ((struct rgb){LCD_MAX_RED/3, LCD_MAX_GREEN/3, LCD_MAX_BLUE/3})
 #else
 #define LIGHT_GRAY (2*LCD_MAX_LEVEL/3)
 #define DARK_GRAY  (LCD_MAX_LEVEL/3)
