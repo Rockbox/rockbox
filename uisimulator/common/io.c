@@ -154,11 +154,7 @@ int sim_open(const char *name, int o)
         sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
 
         debugf("We open the real file '%s'\n", buffer);
-#ifdef WIN32
-        return open(buffer, opts);
-#else
         return open(buffer, opts, 0666);
-#endif
     }
     fprintf(stderr, "WARNING, bad file name lacks slash: %s\n",
             name);
