@@ -17,18 +17,41 @@
  *
  ****************************************************************************/
 
+#define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
 #include "thread-win32.h"
+#include "kernel.h"
 
 HANDLE              lpThreads[256];
 int                 nThreads = 0,
                     nPos = 0;
 long                current_tick = 0;
+CRITICAL_SECTION    CriticalSection;
 
+
+void yield(void)
+{
+    LeaveCriticalSection(&CriticalSection);
+    /* Don't need a sleep here, and it can be bad, e.g., for audio playback.
+     * Increases CPU usage a lot though. Only sleep if CPU isn't boosted
+     * could be a solution.
+     */
+    /* Sleep(1); */
+    EnterCriticalSection(&CriticalSection);
+}
+
+void sim_sleep(int ticks)
+{
+    LeaveCriticalSection(&CriticalSection);
+    Sleep((1000/HZ) * ticks);
+    EnterCriticalSection(&CriticalSection);
+}
 
 DWORD WINAPI runthread (LPVOID lpParameter)
 {
+    EnterCriticalSection(&CriticalSection);
     ((void(*)())lpParameter) ();
+    LeaveCriticalSection(&CriticalSection);
     return 0;
 }
 
@@ -54,4 +77,6 @@ int create_thread(void (*fp)(void), void* sp, int stk_size)
 
 void init_threads(void)
 {
+    InitializeCriticalSection(&CriticalSection);
+    EnterCriticalSection(&CriticalSection);
 }

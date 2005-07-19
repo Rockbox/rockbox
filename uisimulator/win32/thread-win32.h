@@ -20,3 +20,4 @@
 extern HANDLE               lpThreads[256];
 extern int                  nPos,
                             nThreads;
+extern CRITICAL_SECTION     CriticalSection;

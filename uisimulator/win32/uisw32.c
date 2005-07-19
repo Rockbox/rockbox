@@ -262,10 +262,9 @@ int GUIDown ()
 
     DestroyWindow (hGUIWnd);
     CloseHandle (hGUIThread);
+
     for (i = 0; i < nThreads; i++)
     {
-        ResumeThread (lpThreads[i]);
-        WaitForSingleObject (lpThreads[i], 1);
         CloseHandle (lpThreads[i]);
     }
     return 0;
@@ -280,13 +279,6 @@ void GUIMessageLoop ()
     {
         TranslateMessage (&msg);
         DispatchMessage (&msg);
-        if (msg.message == TM_YIELD)
-        {
-            SuspendThread (lpThreads[nPos]);
-            if (++nPos >= nThreads)
-                nPos = 0;
-            ResumeThread (lpThreads[nPos]);
-        }
     }
 }
 

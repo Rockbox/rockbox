@@ -107,7 +107,6 @@ typedef unsigned short wchar_t;
 
 #endif
 
-#define TM_YIELD                    WM_USER + 101 // thread message for yield
 #define TIMER_EVENT                 0x34928340
 
 extern HWND                         hGUIWnd; // the GUI window handle

@@ -34,18 +34,6 @@ int set_irq_level (int level)
     return (_lv = level);
 }
 
-void sim_sleep(int ticks)
-{
-    Sleep (1000 / HZ * ticks);
-}
-
-
-void yield (void)
-{
-    Sleep (1); /* prevent busy loop */
-    PostThreadMessage (GetWindowThreadProcessId (hGUIWnd,NULL), TM_YIELD, 0, 0);
-}
-
 void queue_init(struct event_queue *q)
 {
     q->read = 0;
