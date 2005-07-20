@@ -392,7 +392,7 @@ void codec_advance_buffer_callback(long amount)
     if (amount > cur_ti->available + cur_ti->filerem)
         amount = cur_ti->available + cur_ti->filerem;
     
-    if (amount > cur_ti->available && !filling) {
+    if (amount > cur_ti->available) {
         if (!rebuffer_and_seek(ci.curpos + amount))
             ci.stop_codec = true;
         return ;
