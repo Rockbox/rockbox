@@ -1573,6 +1573,11 @@ void audio_stop(void)
         yield();
 }
 
+bool mp3_pause_done(void)
+{
+    return paused;
+}
+
 void audio_pause(void)
 {
     queue_post(&audio_queue, AUDIO_PAUSE, 0);
