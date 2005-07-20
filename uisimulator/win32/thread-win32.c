@@ -19,8 +19,10 @@
 
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
+#include <time.h>
 #include "thread-win32.h"
 #include "kernel.h"
+#include "debug.h"
 
 HANDLE              lpThreads[256];
 int                 nThreads = 0,
@@ -31,12 +33,22 @@ CRITICAL_SECTION    CriticalSection;
 
 void yield(void)
 {
+    static clock_t last = 0;
+    clock_t now;
+
     LeaveCriticalSection(&CriticalSection);
-    /* Don't need a sleep here, and it can be bad, e.g., for audio playback.
-     * Increases CPU usage a lot though. Only sleep if CPU isn't boosted
-     * could be a solution.
+    /* Don't call Sleep() too often (as the smallest sleep really is a bit
+     * longer). This keeps CPU usage low, yet allows sound playback to work
+     * well (at least on one particular computer).
      */
-    /* Sleep(1); */
+    now = clock();
+
+    if (now - last > CLOCKS_PER_SEC / 200)
+    {
+        last = now;
+        Sleep(1);
+    }
+
     EnterCriticalSection(&CriticalSection);
 }
 
