@@ -109,6 +109,7 @@ else
 ifeq ($(SIMVER), win32)
 # OK, this is ugly but we need it on the link line to make it do right
 EXTRAOBJ = $(BUILDDIR)/sim/uisw32-res.o
+LDOPTS += -lwinmm
 endif
 
 
