@@ -933,7 +933,9 @@ static bool buffer_margin(void)
     };
     
     ret = set_option(str(LANG_MP3BUFFER_MARGIN), &global_settings.buffer_margin,
-                        INT, names, 8, audio_set_buffer_margin);
+                        INT, names, 8, NULL);
+    audio_set_buffer_margin(global_settings.buffer_margin);
+    
     return ret;
 }
 #else
@@ -1139,8 +1141,9 @@ static bool crossfade(void)
     };
     bool ret;
     ret=set_option( str(LANG_CROSSFADE), &global_settings.crossfade,
-                   INT, names, 8, audio_set_crossfade_amount);
-    
+                   INT, names, 8, NULL);
+    audio_set_crossfade_amount(global_settings.crossfade);
+                   
     return ret;
 }
 
