@@ -66,6 +66,13 @@ void pcm_play_data(void (*get_more)(unsigned char** start, long* size))
     playing = true;
 }
 
+#if CONFIG_HWCODEC != MASNONE
+void audio_set_buffer_margin(int seconds)
+{
+     (void)seconds;
+}
+#endif
+
 /* Generic firmware stubs. */
 void backlight_on(void)
 {
