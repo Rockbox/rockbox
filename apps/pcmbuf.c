@@ -262,7 +262,6 @@ void pcmbuf_init(long bufsize)
                             pcmbuf_size - PCMBUF_GUARD];
     guardbuf = &audiobuffer[pcmbuf_size];
     pcmbuf_event_handler = NULL;
-    pcm_init();
     pcmbuf_play_stop();
 }
 

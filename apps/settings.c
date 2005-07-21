@@ -851,7 +851,7 @@ void settings_apply(void)
     }
 
 #if CONFIG_HWCODEC == MASNONE
-    audio_set_crossfade_amount(global_settings.crossfade*2);
+    audio_set_crossfade_amount(global_settings.crossfade);
 #endif
 
 #ifdef HAVE_SPDIF_POWER

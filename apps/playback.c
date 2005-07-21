@@ -1777,16 +1777,25 @@ void audio_set_buffer_margin(int setting)
 void audio_set_crossfade_amount(int seconds)
 {
     long size;
+    bool was_playing = playing;
+    int offset;
 
-    /* Playback has to be stopped before changing the buffer size. */
-    audio_stop_playback();
+    /* Store the track resume position */
+    if (playing)
+        offset = cur_ti->id3.offset;
 
+    /* Multiply by two to get the real value (0s, 2s, 4s, ...) */
+    seconds *= 2;
+    
     /* Buffer has to be at least 2s long. */
     seconds += 2;
     logf("buf len: %d", seconds);
     size = seconds * (NATIVE_FREQUENCY*4);
     if (pcmbuf_get_bufsize() == size)
         return ;
+
+    /* Playback has to be stopped before changing the buffer size. */
+    audio_stop_playback();
 
     /* Re-initialize audio system. */
     pcmbuf_init(size);
@@ -1795,6 +1804,10 @@ void audio_set_crossfade_amount(int seconds)
                   - PCMBUF_GUARD - MALLOC_BUFSIZE - GUARD_BUFSIZE;
     logf("abuf:%dB", pcmbuf_get_bufsize());
     logf("fbuf:%dB", codecbuflen);
+
+    /* Restart playback. */
+    if (was_playing)
+        audio_play(offset);
 }
 
 void mpeg_id3_options(bool _v1first)
@@ -1821,6 +1834,7 @@ void test_unbuffer_event(struct mp3entry *id3, bool last_track)
 void audio_init(void)
 {
     logf("audio api init");
+    pcm_init();
     codecbufused = 0;
     filling = false;
     codecbuf = &audiobuf[MALLOC_BUFSIZE];
