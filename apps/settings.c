@@ -77,7 +77,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "pcm_playback.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 22
+#define CONFIG_BLOCK_VERSION 23
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -198,7 +198,7 @@ static const struct bit_entry rtc_bits[] =
         "stereo,mono,custom,mono left,mono right,karaoke" },
     {8, S_O(stereo_width), 100, "stereo width", NULL},
     /* playback */
-    {2, S_O(resume), false, "resume", off_on },
+    {1, S_O(resume), false, "resume", off_on },
     {1, S_O(playlist_shuffle), false, "shuffle", off_on },
     {16 | SIGNED, S_O(resume_index), -1, NULL, NULL },
     {16 | SIGNED, S_O(resume_first_index), 0, NULL, NULL },
@@ -301,7 +301,12 @@ static const struct bit_entry hd_bits[] =
     {4, S_O(ff_rewind_min_step), FF_REWIND_1000, 
         "scan min step", "1,2,3,4,5,6,8,10,15,20,25,30,45,60" },
     {4, S_O(ff_rewind_accel), 3, "scan accel", NULL },
+#if CONFIG_HWCODEC == MASNONE
+    {3, S_O(buffer_margin), 0, "antiskip",
+        "5s,15s,30s,1min,2min,3min,5min,10min" },
+#else
     {3, S_O(buffer_margin), 0, "antiskip", NULL },
+#endif
     /* disk */
 #ifndef HAVE_MMC
 #ifdef HAVE_ATA_POWER_OFF
@@ -392,7 +397,7 @@ static const struct bit_entry hd_bits[] =
 #endif
 
 #if CONFIG_HWCODEC == MASNONE
-    {1, S_O(crossfade), false, "crossfade", off_on},
+    {3, S_O(crossfade), 0, "crossfade", "off,2s,4s,6s,8s,10s,12s,14s"},
 #endif
 
 #if CONFIG_BACKLIGHT == BL_IRIVER
@@ -846,7 +851,7 @@ void settings_apply(void)
     }
 
 #if CONFIG_HWCODEC == MASNONE
-    pcmbuf_crossfade_enable(global_settings.crossfade);
+    audio_set_crossfade_amount(global_settings.crossfade*2);
 #endif
 
 #ifdef HAVE_SPDIF_POWER

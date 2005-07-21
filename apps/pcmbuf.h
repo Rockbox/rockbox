@@ -22,10 +22,8 @@
 /* Guard buffer for crossfader when dsp is enabled. */
 #define PCMBUF_GUARD  32768
 
-/* PCM audio buffer. */
-#define PCMBUF_SIZE   (1*1024*1024)
-
-void pcmbuf_init(void);
+void pcmbuf_init(long bufsize);
+long pcmbuf_get_bufsize(void);
 
 void pcmbuf_play_stop(void);
 bool pcmbuf_is_crossfade_active(void);

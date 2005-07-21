@@ -621,7 +621,7 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
     playstart_tick = 0;
     cumulative_ticks = 0;
     callback_for_more = 0;
-    audio_is_initialized = false;
+    audio_is_initialized = true;
 #endif
 }
 void mp3_shutdown(void)

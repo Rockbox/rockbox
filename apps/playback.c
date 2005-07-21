@@ -172,6 +172,7 @@ void (*track_unbuffer_callback)(struct mp3entry *id3, bool last_track);
 static int conf_bufferlimit;
 static int conf_watermark;
 static int conf_filechunk;
+static int buffer_margin;
 
 static bool v1first = false;
 
@@ -468,11 +469,21 @@ bool codec_seek_buffer_callback(off_t newpos)
     return true;
 }
 
+static void set_filebuf_watermark(int seconds)
+{
+    long bytes;
+
+    bytes = MAX((int)cur_ti->id3.bitrate * seconds * (1000/8), conf_watermark);
+    bytes = MIN(bytes, codecbuflen / 2);
+    conf_watermark = bytes;
+}
+
 void codec_configure_callback(int setting, void *value)
 {
     switch (setting) {
     case CODEC_SET_FILEBUF_WATERMARK:
         conf_watermark = (unsigned int)value;
+        set_filebuf_watermark(buffer_margin);
         break;
         
     case CODEC_SET_FILEBUF_CHUNKSIZE:
@@ -852,6 +863,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
             return false;
         }
     }
+    set_filebuf_watermark(buffer_margin);
     tracks[track_widx].id3.elapsed = 0;
 
     /* Starting playback from an offset is only support in MPA at the moment */
@@ -1754,13 +1766,36 @@ int mp3_get_file_pos(void)
     return pos;    
 }
 
-#ifndef SIMULATOR
-void audio_set_buffer_margin(int seconds)
+void audio_set_buffer_margin(int setting)
 {
-    (void)seconds;
-    logf("bufmargin: %d", seconds);
+    int lookup[] = {5, 15, 30, 60, 120, 180, 300, 600};
+    buffer_margin = lookup[setting];
+    logf("buffer margin: %ds", buffer_margin);
+    set_filebuf_watermark(buffer_margin);
 }
-#endif
+
+void audio_set_crossfade_amount(int seconds)
+{
+    long size;
+
+    /* Playback has to be stopped before changing the buffer size. */
+    audio_stop_playback();
+
+    /* Buffer has to be at least 2s long. */
+    seconds += 2;
+    logf("buf len: %d", seconds);
+    size = seconds * (NATIVE_FREQUENCY*4);
+    if (pcmbuf_get_bufsize() == size)
+        return ;
+
+    /* Re-initialize audio system. */
+    pcmbuf_init(size);
+    pcmbuf_crossfade_enable(seconds > 2);
+    codecbuflen = audiobufend - audiobuf - pcmbuf_get_bufsize()
+                  - PCMBUF_GUARD - MALLOC_BUFSIZE - GUARD_BUFSIZE;
+    logf("abuf:%dB", pcmbuf_get_bufsize());
+    logf("fbuf:%dB", codecbuflen);
+}
 
 void mpeg_id3_options(bool _v1first)
 {
@@ -1786,9 +1821,6 @@ void test_unbuffer_event(struct mp3entry *id3, bool last_track)
 void audio_init(void)
 {
     logf("audio api init");
-    codecbuflen = audiobufend - audiobuf - PCMBUF_SIZE - PCMBUF_GUARD
-                  - MALLOC_BUFSIZE - GUARD_BUFSIZE;
-    //codecbuflen = 2*512*1024;
     codecbufused = 0;
     filling = false;
     codecbuf = &audiobuf[MALLOC_BUFSIZE];
@@ -1803,10 +1835,6 @@ void audio_init(void)
     /* Just to prevent cur_ti never be anything random. */
     cur_ti = &tracks[0];
     
-    logf("abuf:%0x", PCMBUF_SIZE);
-    logf("fbuf:%0x", codecbuflen);
-    logf("mbuf:%0x", MALLOC_BUFSIZE);
-
     audio_set_track_buffer_event(test_buffer_event);
     audio_set_track_unbuffer_event(test_unbuffer_event);
     
@@ -1833,9 +1861,6 @@ void audio_init(void)
                   codec_thread_name);
     create_thread(audio_thread, audio_stack, sizeof(audio_stack),
                   audio_thread_name);
-#ifndef SIMULATOR
-    audio_is_initialized = true;
-#endif
 }
 
 

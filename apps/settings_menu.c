@@ -917,12 +917,33 @@ static bool max_files_in_playlist(void)
                    NULL, 1000, 1000, 20000 );
 }
 
+#if CONFIG_HWCODEC == MASNONE
+static bool buffer_margin(void)
+{
+    int ret;
+    static const struct opt_items names[] = {
+        { "5s", TALK_ID(5, UNIT_SEC) },
+        { "15s", TALK_ID(15, UNIT_SEC) },
+        { "30s", TALK_ID(30, UNIT_SEC) },
+        { "1min", TALK_ID(1, UNIT_MIN) },
+        { "2min", TALK_ID(2, UNIT_MIN) },
+        { "3min", TALK_ID(3, UNIT_MIN) },
+        { "5min", TALK_ID(5, UNIT_MIN) },
+        { "10min", TALK_ID(10, UNIT_MIN) }
+    };
+    
+    ret = set_option(str(LANG_MP3BUFFER_MARGIN), &global_settings.buffer_margin,
+                        INT, names, 8, audio_set_buffer_margin);
+    return ret;
+}
+#else
 static bool buffer_margin(void)
 {
     return set_int(str(LANG_MP3BUFFER_MARGIN), "s", UNIT_SEC,
                    &global_settings.buffer_margin,
                    audio_set_buffer_margin, 1, 0, 7 );
 }
+#endif
 
 static bool ff_rewind_min_step(void)
 { 
@@ -1106,11 +1127,23 @@ static bool id3_order(void)
 #if CONFIG_HWCODEC == MASNONE
 static bool crossfade(void)
 {
-    bool rc = set_bool( str(LANG_CROSSFADE), &global_settings.crossfade );
-    pcmbuf_crossfade_enable(global_settings.crossfade);
-
-    return rc;
+    static const struct opt_items names[] = {
+        { STR(LANG_OFF) },
+        { "2s", TALK_ID(2, UNIT_SEC) },
+        { "4s", TALK_ID(4, UNIT_SEC) },
+        { "6s", TALK_ID(6, UNIT_SEC) },
+        { "8s", TALK_ID(8, UNIT_SEC) },
+        { "10s", TALK_ID(10, UNIT_SEC) },
+        { "12s", TALK_ID(12, UNIT_SEC) },
+        { "14s", TALK_ID(14, UNIT_SEC) },
+    };
+    bool ret;
+    ret=set_option( str(LANG_CROSSFADE), &global_settings.crossfade,
+                   INT, names, 8, audio_set_crossfade_amount);
+    
+    return ret;
 }
+
 #endif
 
 static bool next_folder(void)
