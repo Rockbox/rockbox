@@ -1778,7 +1778,7 @@ void audio_set_crossfade_amount(int seconds)
 {
     long size;
     bool was_playing = playing;
-    int offset;
+    int offset = 0;
 
     /* Store the track resume position */
     if (playing)
