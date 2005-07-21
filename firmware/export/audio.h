@@ -71,6 +71,7 @@ struct mp3entry* audio_current_track(void);
 struct mp3entry* audio_next_track(void);
 bool audio_has_changed_track(void);
 void audio_get_debugdata(struct audio_debug *dbgdata);
+void audio_set_crossfade_amount(int seconds);
 void audio_set_buffer_margin(int seconds);
 unsigned int audio_error(void);
 void audio_error_clear(void);

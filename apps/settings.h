@@ -150,7 +150,7 @@ struct user_settings
     bool superbass; /* true/false */
 
 #if CONFIG_HWCODEC == MASNONE
-    bool crossfade;
+    int crossfade;
 #endif
 
     int rec_quality;   /* 0-7 */
