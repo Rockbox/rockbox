@@ -325,7 +325,7 @@ int WINAPI WinMain (
     hSoundThread = CreateThread (NULL, 0, (LPTHREAD_START_ROUTINE)
         sound_playback_thread, NULL, 0, &dwThreadID);
 
-    if (hGUIThread == NULL)
+    if (hSoundThread == NULL)
         MessageBox (NULL, "Error creating sound thread!", "Warning", MB_OK);
 #endif
 
