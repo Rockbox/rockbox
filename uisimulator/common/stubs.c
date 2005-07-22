@@ -66,7 +66,7 @@ void pcm_play_data(void (*get_more)(unsigned char** start, long* size))
     playing = true;
 }
 
-long pcm_get_bytes_waiting(long)
+long pcm_get_bytes_waiting(void)
 {
     return 0;
 }
