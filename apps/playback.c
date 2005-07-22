@@ -1799,6 +1799,8 @@ void audio_set_crossfade(int type)
     audio_stop_playback();
 
     /* Re-initialize audio system. */
+    if (was_playing)
+        splash(0, true, str(LANG_RESTARTING_PLAYBACK));
     pcmbuf_init(size);
     pcmbuf_crossfade_enable(seconds > 2);
     codecbuflen = audiobufend - audiobuf - pcmbuf_get_bufsize()
@@ -1807,8 +1809,15 @@ void audio_set_crossfade(int type)
     logf("fbuf:%dB", codecbuflen);
 
     /* Restart playback. */
-    if (was_playing)
+    if (was_playing) {
         audio_play(offset);
+
+        /* Wait for the playback to start again (and display the splash
+           screen during that period. */
+        playing = true;
+        while (playing && !codec_loaded)
+            yield();
+    }
 }
 
 void mpeg_id3_options(bool _v1first)

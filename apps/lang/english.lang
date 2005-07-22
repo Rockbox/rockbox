@@ -3178,3 +3178,10 @@ desc: in playback settings, crossfade option
 eng: "Mix"
 voice: "Mix"
 new:
+
+id: LANG_RESTARTING_PLAYBACK
+desc: splash screen displayed when pcm buffer size is changed
+eng: "Restarting playback..."
+voice: "Restarting playback..."
+new:
+
