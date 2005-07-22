@@ -385,8 +385,12 @@ voice: ""
 new: "Er fuld!"
 
 id: LANG_RESUME_ASK
-desc: question asked at the begining when resume is on
-eng: "Resume?"
+### Description changed! Previous description was:
+### "question asked at the begining when resume is on"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "Resume?"
+eng: ""
 voice: ""
 new: "Forsæt?"
 
@@ -835,9 +839,15 @@ voice: "December"
 new: "Dec"
 
 id: LANG_RESUME_SETTING_ASK_ONCE
-desc: in settings_menu
-eng: "Ask Once"
-voice: "Ask Once"
+### Description changed! Previous description was:
+### "in settings_menu"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "Ask Once"
+eng: ""
+### English phrase was changed! Voice set to english. Previous voice was:
+### "Ask Once"
+voice: ""
 new: "Spørg én gang"
 
 id: LANG_BATTERY_DISPLAY
@@ -3099,7 +3109,7 @@ new: "Bland igen"
 id: LANG_INSERT_SHUFFLED
 desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
 eng: "Insert shuffled"
-voice: 
+voice: "Insert shuffled"
 new: "Indsæt blandet"
 
 id: LANG_NOTHING_TO_RESUME
@@ -3107,3 +3117,33 @@ desc: Error message displayed when resume button pressed but no playlist
 eng: "Nothing to resume"
 voice: ""
 new: "Intet at fortsætte"
+
+id: LANG_SPDIF_ENABLE
+desc: in playback settings menu. enable/disable the optical out
+eng: "Optical output"
+voice: "Optical output"
+new: "Optisk udgang"
+
+id: LANG_NEXT_FOLDER
+desc: in settings_menu.  Should we move to next folder when current one ends
+eng: "Move to Next Folder"
+voice: "Move to Next Folder"
+new: "Fortsæt med næste mappe"
+
+id: LANG_RUNTIMEDB_ACTIVE
+desc: in settings_menu.
+eng: "Gather runtime data (experimental)"
+voice: "Gather runtime data"
+new: "Indsaml brugs-data"
+
+id: LANG_MENU_SET_RATING
+desc: in wps context menu
+eng: "Set song rating"
+voice: "Set song rating"
+new: "Sæt bedømmelse"
+
+id: LANG_RATING
+desc: in set_rating
+eng: "Rating:"
+voice: "Rating" 
+new: "Bedømmelse:"
