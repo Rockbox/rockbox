@@ -41,7 +41,8 @@
 #define KBD_CURSOR_LEFT (BUTTON_ON | BUTTON_LEFT)
 #define KBD_SELECT BUTTON_SELECT
 #define KBD_PAGE_FLIP BUTTON_MODE
-#define KBD_DONE BUTTON_ON
+#define KBD_DONE_PRE BUTTON_ON
+#define KBD_DONE (BUTTON_ON | BUTTON_REL)
 #define KBD_ABORT BUTTON_OFF
 #define KBD_BACKSPACE BUTTON_REC
 
@@ -336,6 +337,10 @@ int kbd_input(char* text, int buflen)
 
             case KBD_DONE:
                 /* accepts what was entered and continues */
+#ifdef KBD_DONE_PRE
+                if (lastbutton != KBD_DONE_PRE)
+                    break;
+#endif
                 done = true;
                 break;
 
