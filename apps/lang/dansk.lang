@@ -385,11 +385,7 @@ voice: ""
 new: "Er fuld!"
 
 id: LANG_RESUME_ASK
-### Description changed! Previous description was:
-### "question asked at the begining when resume is on"
 desc: DEPRECATED
-### English phrase was changed! Previous translation was made on:
-### "Resume?"
 eng: ""
 voice: ""
 new: "Forsæt?"
@@ -839,14 +835,8 @@ voice: "December"
 new: "Dec"
 
 id: LANG_RESUME_SETTING_ASK_ONCE
-### Description changed! Previous description was:
-### "in settings_menu"
 desc: DEPRECATED
-### English phrase was changed! Previous translation was made on:
-### "Ask Once"
 eng: ""
-### English phrase was changed! Voice set to english. Previous voice was:
-### "Ask Once"
 voice: ""
 new: "Spørg én gang"
 
@@ -3147,3 +3137,21 @@ desc: in set_rating
 eng: "Rating:"
 voice: "Rating" 
 new: "Bedømmelse:"
+
+id: LANG_CROSSFADE_DURATION
+desc: in playback settings
+eng: "Crossfade duration"
+voice: "Crossfade duration"
+new: "Længde af glidende overgang"
+
+id: LANG_MIX
+desc: in playback settings, crossfade option
+eng: "Mix"
+voice: "Mix"
+new: "Kort glidende overgang"
+
+id: LANG_RESTARTING_PLAYBACK
+desc: splash screen displayed when pcm buffer size is changed
+eng: "Restarting playback..."
+voice: "Restarting playback..."
+new: "Genstarter afspilning..."
