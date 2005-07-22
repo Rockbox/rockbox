@@ -397,7 +397,7 @@ static const struct bit_entry hd_bits[] =
 #endif
 
 #if CONFIG_HWCODEC == MASNONE
-    {3, S_O(crossfade), 0, "crossfade", "off,2s,4s,6s,8s,10s,12s,14s"},
+    {3, S_O(crossfade_duration), 0, "crossfade duration", "1s,2s,4s,6s,8s,10s,12s,14s"},
 #endif
 
 #if CONFIG_BACKLIGHT == BL_IRIVER
@@ -414,6 +414,10 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(next_folder), false, "move to next folder", off_on },
     {1, S_O(runtimedb), false, "gather runtime data", off_on },
 
+#if CONFIG_HWCODEC == MASNONE
+    {2, S_O(crossfade), 0, "crossfade type", "off,crossfade,mix"},
+#endif
+    
     /* new stuff to be added at the end */
             
     /* Sum of all bit sizes must not grow beyond 0xB8*8 = 1472 */
@@ -851,7 +855,7 @@ void settings_apply(void)
     }
 
 #if CONFIG_HWCODEC == MASNONE
-    audio_set_crossfade_amount(global_settings.crossfade);
+    audio_set_crossfade(global_settings.crossfade);
 #endif
 
 #ifdef HAVE_SPDIF_POWER

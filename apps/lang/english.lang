@@ -3166,3 +3166,15 @@ desc: in set_rating
 eng: "Rating:"
 voice "Rating"
 new:
+
+id: LANG_CROSSFADE_DURATION
+desc: in playback settings
+eng: "Crossfade duration"
+voice: "Crossfade duration"
+new:
+
+id: LANG_MIX
+desc: in playback settings, crossfade option
+eng: "Mix"
+voice: "Mix"
+new:

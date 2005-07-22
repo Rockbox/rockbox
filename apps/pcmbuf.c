@@ -69,6 +69,7 @@ static bool boost_mode;
  */
 enum {
     CFM_CROSSFADE,
+    CFM_MIX,
     CFM_FLUSH
 };
 
@@ -221,7 +222,7 @@ bool pcmbuf_is_lowdata(void)
     return false;
 }
 
-bool pcmbuf_crossfade_init(void)
+bool pcmbuf_crossfade_init(int type)
 {
     if (pcmbuf_size - audiobuffer_free < CHUNK_SIZE * 8 || !crossfade_enabled
         || crossfade_active || crossfade_init) {
@@ -230,7 +231,18 @@ bool pcmbuf_crossfade_init(void)
     }
     logf("pcmbuf_crossfade_init");
     pcmbuf_boost(true);
-    crossfade_mode = CFM_CROSSFADE;
+
+    switch (type) {
+    case CROSSFADE_MODE_CROSSFADE:
+        crossfade_mode = CFM_CROSSFADE;
+        break;
+    case CROSSFADE_MODE_MIX:
+        crossfade_mode = CFM_MIX;
+        break;
+    default:
+        return false;
+    }
+        
     crossfade_init = true;
     
     return true;
@@ -330,6 +342,7 @@ static void crossfade_start(void)
     crossfade_pos = audiobuffer_pos;
 
     switch (crossfade_mode) {
+        case CFM_MIX:
         case CFM_CROSSFADE:
             crossfade_amount = (bytesleft - (CHUNK_SIZE * 2))/2;
             crossfade_rem = crossfade_amount;
@@ -354,6 +367,15 @@ int crossfade(short *buf, const short *buf2, int length)
     
     size = MIN(length, crossfade_rem);
     switch (crossfade_mode) {
+        /* Mix two streams. */
+        case CFM_MIX:
+            /* Bias & add & clip. */
+            for (i = 0; i < size; i++) {
+                buf[i] = MIN(MAX(buf[i] + buf2[i], -32768), 32767);
+            }
+            break ;
+
+        /* Fade two streams. */
         case CFM_CROSSFADE:
             val1 = (crossfade_rem<<10)/crossfade_amount;
             val2 = ((crossfade_amount-crossfade_rem)<<10)/crossfade_amount;
@@ -363,6 +385,7 @@ int crossfade(short *buf, const short *buf2, int length)
             }
             break ;
 
+        /* Join two streams. */
         case CFM_FLUSH:
             for (i = 0; i < size; i++) {
                 buf[i] = buf2[i];

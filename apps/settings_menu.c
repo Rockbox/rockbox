@@ -1131,6 +1131,22 @@ static bool crossfade(void)
 {
     static const struct opt_items names[] = {
         { STR(LANG_OFF) },
+        { STR(LANG_CROSSFADE) },
+        { STR(LANG_MIX) },
+    };
+    bool ret;
+
+    ret = set_option( str(LANG_CROSSFADE),
+                     &global_settings.crossfade, INT, names, 3, NULL);
+    audio_set_crossfade(global_settings.crossfade);
+
+    return ret;
+}
+
+static bool crossfade_duration(void)
+{
+    static const struct opt_items names[] = {
+        { "1s", TALK_ID(1, UNIT_SEC) },
         { "2s", TALK_ID(2, UNIT_SEC) },
         { "4s", TALK_ID(4, UNIT_SEC) },
         { "6s", TALK_ID(6, UNIT_SEC) },
@@ -1140,13 +1156,12 @@ static bool crossfade(void)
         { "14s", TALK_ID(14, UNIT_SEC) },
     };
     bool ret;
-    ret=set_option( str(LANG_CROSSFADE), &global_settings.crossfade,
-                   INT, names, 8, NULL);
-    audio_set_crossfade_amount(global_settings.crossfade);
+    ret=set_option( str(LANG_CROSSFADE_DURATION),
+                    &global_settings.crossfade_duration, INT, names, 8, NULL);
+    audio_set_crossfade(global_settings.crossfade);
                    
     return ret;
 }
-
 #endif
 
 static bool next_folder(void)
@@ -1187,6 +1202,7 @@ static bool playback_settings_menu(void)
         { ID2P(LANG_FADE_ON_STOP), set_fade_on_stop },
 #if CONFIG_HWCODEC == MASNONE
         { ID2P(LANG_CROSSFADE), crossfade },
+        { ID2P(LANG_CROSSFADE_DURATION), crossfade_duration },
 #endif
 #ifdef HAVE_SPDIF_POWER
         { ID2P(LANG_SPDIF_ENABLE), spdif },

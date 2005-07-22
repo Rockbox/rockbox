@@ -106,6 +106,10 @@
 #define TRIG_DURATION_COUNT 13
 extern char *trig_durations[TRIG_DURATION_COUNT];
 
+#define CROSSFADE_MODE_OFF       0
+#define CROSSFADE_MODE_CROSSFADE 1
+#define CROSSFADE_MODE_MIX       2
+
 /* These define "virtual pointers", which could either be a literal string,
    or a mean a string ID if the pointer is in a certain range.
    This helps to save space for menus and options. */
@@ -151,6 +155,7 @@ struct user_settings
 
 #if CONFIG_HWCODEC == MASNONE
     int crossfade;
+    int crossfade_duration;
 #endif
 
     int rec_quality;   /* 0-7 */

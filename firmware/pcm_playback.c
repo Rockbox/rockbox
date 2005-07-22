@@ -286,7 +286,7 @@ void DMA0(void)
     /* Stop on error */
     if(res & 0x70)
     {
-       dma_stop();
+       pcm_play_stop();
        logf("DMA Error:0x%04x", res);
     }
     else
@@ -302,7 +302,7 @@ void DMA0(void)
         else
         {
             /* Finished playing */
-            dma_stop();
+            pcm_play_stop();
             logf("DMA No Data:0x%04x", res);
         }
     }

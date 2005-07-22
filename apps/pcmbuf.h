@@ -36,7 +36,7 @@ void pcmbuf_set_watermark(int numbytes, void (*callback)(int bytes_left));
 void pcmbuf_set_boost_mode(bool state);
 bool pcmbuf_is_lowdata(void);
 void pcmbuf_flush_audio(void);
-bool pcmbuf_crossfade_init(void);
+bool pcmbuf_crossfade_init(int type);
 void pcmbuf_add_event(void (*event_handler)(void));
 unsigned int pcmbuf_get_latency(void);
 bool pcmbuf_insert_buffer(char *buf, long length);
