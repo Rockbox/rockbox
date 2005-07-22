@@ -164,7 +164,7 @@ static long calculate_channel_peak_average(int channel, unsigned short *addr,
 void pcm_calculate_peaks(int *left, int *right)
 {
     unsigned short *addr = (unsigned short *)SAR0;
-    long size = MIN(512, BCR0 / 2);
+    long size = MIN(512, (BCR0 & 0xffffff) / 2);
         
     if (left != NULL)
         *left = calculate_channel_peak_average(0, addr, size);
@@ -220,6 +220,11 @@ void pcm_play_data(void (*get_more)(unsigned char** start, long* size))
     get_more(&next_start, &next_size);
     dma_start(start, size);
     uda1380_mute(false);
+}
+
+long pcm_get_bytes_waiting(void)
+{
+    return next_size + (BCR0 & 0xffffff);
 }
 
 void pcm_play_stop(void)

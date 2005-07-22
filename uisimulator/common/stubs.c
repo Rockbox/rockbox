@@ -66,6 +66,11 @@ void pcm_play_data(void (*get_more)(unsigned char** start, long* size))
     playing = true;
 }
 
+long pcm_get_bytes_waiting(long)
+{
+    return 0;
+}
+
 #if CONFIG_HWCODEC != MASNONE
 void audio_set_buffer_margin(int seconds)
 {

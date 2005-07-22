@@ -265,10 +265,7 @@ void codec_set_offset_callback(unsigned int value)
     if (ci.stop_codec)
         return ;
         
-    /* The 1000 here is a hack.  pcmbuf_get_latency() should
-     * be more accurate
-     */
-    latency = (pcmbuf_get_latency() + 1000) * cur_ti->id3.bitrate / 8;
+    latency = pcmbuf_get_latency() * cur_ti->id3.bitrate / 8;
     
     if (value < latency) {
         cur_ti->id3.offset = 0;

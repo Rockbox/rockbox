@@ -202,8 +202,8 @@ unsigned int pcmbuf_get_latency(void)
 {
     int latency;
     
-    /* This has to be done better. */
-    latency = (pcmbuf_size - audiobuffer_free - CHUNK_SIZE)/4 / (44100/1000);
+    latency = (pcmbuf_unplayed_bytes + pcm_get_bytes_waiting())
+                / 4 / (44100/1000);
     if (latency < 0)
         latency = 0;
     
