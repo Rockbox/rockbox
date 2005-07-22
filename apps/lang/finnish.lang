@@ -3072,3 +3072,69 @@ desc: in info menu;  name for external disk with multivolume (Ondio; keep short!
 eng: "MMC:"
 voice: "Multimedia card"
 new: "MMC:"
+
+id: LANG_CROSSFADE
+desc: in playback settings
+eng: "Crossfade"
+voice: "Crossfade"
+new: "Ristivaihto"
+
+id: LANG_CROSSFADE_DURATION
+desc: in playback settings
+eng: "Crossfade duration"
+voice: ""
+new: "Ristivaihdon kesto"
+
+id: LANG_SHUFFLE_PLAYLIST
+desc: in playlist menu, reshuffles the order in which songs are played
+eng: "Reshuffle"
+voice: "Reshuffle"
+new: "Sekoita uudelleen"
+
+id: LANG_INSERT_SHUFFLED
+desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
+eng: "Insert shuffled"
+voice: ""
+new: "Lisää ja sekoita"
+
+id: LANG_SPDIF_ENABLE
+desc: in playback settings menu. enable/disable the optical out
+eng: "Optical output"
+voice: "Optical output"
+new: "Optinen lähtö"
+
+id: LANG_NEXT_FOLDER
+desc: in settings_menu.  Should we move to next folder when current one ends
+eng: "Move to Next Folder"
+voice: "Move to Next Folder"
+new: "Jatka toistoa seuraavasta hakemistosta"
+
+id: LANG_RUNTIMEDB_ACTIVE
+desc: in settings_menu.
+eng: "Gather runtime data (experimental)"
+voice: "Gather runtime data"
+new: "Kerää soittotilastoja (koekäytössä)"
+
+id: LANG_MENU_SET_RATING
+desc: in wps context menu
+eng: "Set song rating"
+voice: ""
+new: "Pisteytä kappale"
+
+id: LANG_RATING
+desc: in set_rating
+eng: "Rating:"
+voice "Rating"
+new: "Luokittelu:"
+
+id: LANG_MIX
+desc: in playback settings, crossfade option
+eng: "Mix"
+voice: "Mix"
+new: "Miksaus"
+
+id: LANG_RESTARTING_PLAYBACK
+desc: splash screen displayed when pcm buffer size is changed
+eng: "Restarting playback..."
+voice: "Restarting playback..."
+new: "Jatketaan toistoa..."
