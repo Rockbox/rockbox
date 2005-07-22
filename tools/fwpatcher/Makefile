@@ -21,8 +21,12 @@ CC = $(PREFIX)gcc
 
 UNICODE = -DUNICODE -D_UNICODE
 
+ifndef VERSION
+VERSION=$(shell date +%y%m%d-%H%M)
+endif
+
 #values for crosscompiling on linux
-CFLAGS = -I. -Os -s -fomit-frame-pointer
+CFLAGS = -DAPPSVERSION=\"$(VERSION)\" -I. -Os -s -fomit-frame-pointer
 LDFLAGS = -lmingw32 -mwindows -s
 
 #values for compiling on cygwin

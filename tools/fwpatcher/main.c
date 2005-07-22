@@ -39,6 +39,8 @@
 
 #define CTL_NUM 4
 
+TCHAR appsversion[] = TEXT("Rockbox firmware patcher V" APPSVERSION);
+
 struct sumpairs {
     char *unpatched;
     char *patched;
@@ -468,7 +470,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance,
     wc.lpszClassName = TEXT("patcher");
     RegisterClassEx(&wc);
 
-    window = CreateWindowEx(0, TEXT("patcher"), TEXT("Rockbox firmware patcher"),
+    window = CreateWindowEx(0, TEXT("patcher"), appsversion,
                             WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU |
                             WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT,
                             WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0, instance, NULL);
