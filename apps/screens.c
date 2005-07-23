@@ -722,7 +722,12 @@ bool quick_screen(int context, int button)
 
     switch( button )
     {
-        case SCREENS_QUICK:
+#if CONFIG_KEYPAD == RECORDER_PAD
+          case SCREENS_QUICK:
+#endif
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+          case SCREENS_QUICK | BUTTON_REPEAT:
+#endif
 
             if ( oldrepeat != global_settings.repeat_mode &&
                 (audio_status() & AUDIO_STATUS_PLAY) )
