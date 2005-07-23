@@ -1392,6 +1392,8 @@ void audio_thread(void)
                     break ;
                 logf("starting...");
                 playing = true;
+                paused = false;
+                pcm_play_pause(true);
                 ci.stop_codec = true;
                 ci.reload_codec = false;
                 ci.seek_time = 0;
