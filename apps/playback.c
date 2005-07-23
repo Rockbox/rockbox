@@ -1181,6 +1181,7 @@ void audio_update_trackinfo(void)
     } else {
         pcmbuf_add_event(codec_track_changed);
     }
+    last_index = playlist_get_display_index();
 }
 
 static void audio_stop_playback(void)
