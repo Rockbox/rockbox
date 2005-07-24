@@ -3185,3 +3185,56 @@ eng: "Restarting playback..."
 voice: "Restarting playback..."
 new:
 
+id: LANG_REPLAYGAIN
+desc: in replaygain
+eng: "Replaygain"
+voice "Replaygain"
+new:
+
+id: LANG_REPLAYGAIN_ENABLE
+desc: in replaygain
+eng: "Enable replaygain"
+voice "Enable replaygain"
+new:
+
+id: LANG_REPLAYGAIN_NOCLIP
+desc: in replaygain
+eng: "Prevent clipping"
+voice "Prevent clipping"
+new:
+
+id: LANG_REPLAYGAIN_MODE
+desc: in replaygain
+eng: "Replaygain type"
+voice "Replaygain type"
+new:
+
+id: LANG_TRACK_GAIN
+desc: in replaygain
+eng: "Track gain"
+voice "Track gain"
+new:
+
+id: LANG_ALBUM_GAIN
+desc: in replaygain
+eng: "Album gain"
+voice "Album gain"
+new:
+
+id: LANG_ID3_TRACK_GAIN
+desc: in browse_id3
+eng: "[Track gain]"
+voice ""
+new:
+
+id: LANG_ID3_ALBUM_GAIN
+desc: in browse_id3
+eng: "[Album gain]"
+voice ""
+new:
+
+id: LANG_ID3_NO_GAIN
+desc: in browse_id3
+eng: "<No gain>"
+voice ""
+new:

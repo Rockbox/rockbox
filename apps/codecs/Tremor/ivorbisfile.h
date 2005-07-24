@@ -121,6 +121,8 @@ extern vorbis_comment *ov_comment(OggVorbis_File *vf,int link);
 
 extern long ov_read(OggVorbis_File *vf,char *buffer,int length,
 		    int *bitstream);
+extern long ov_read_fixed(OggVorbis_File *vf,ogg_int32_t ***pcm_channels,
+                          int length,int *bitstream);
 
 #ifdef __cplusplus
 }

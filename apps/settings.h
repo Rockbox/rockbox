@@ -328,6 +328,12 @@ struct user_settings
     
     bool next_folder; /* move to next folder */
     bool runtimedb;   /* runtime database active? */
+
+#if CONFIG_HWCODEC == MASNONE
+    bool replaygain;        /* enable replaygain */
+    bool replaygain_track;  /* true for track gain, false for album gain */
+    bool replaygain_noclip; /* scale to prevent clips */
+#endif
 };
 
 enum optiontype { INT, BOOL };

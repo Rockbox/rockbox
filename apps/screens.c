@@ -1274,7 +1274,11 @@ bool browse_id3(void)
     struct mp3entry* id3 = audio_current_track();
     int button;
     int menu_pos = 0;
+#if CONFIG_HWCODEC == MASNONE
+    int menu_max = 12;
+#else
     int menu_max = 10;
+#endif
     bool exit = false;
     char scroll_text[MAX_PATH];
 
@@ -1381,6 +1385,21 @@ bool browse_id3(void)
                 lcd_puts(0, 0, str(LANG_ID3_PATH));
                 lcd_puts_scroll(0, 1, id3->path);
                 break;
+#if CONFIG_HWCODEC == MASNONE
+            case 11:
+                lcd_puts(0, 0, str(LANG_ID3_TRACK_GAIN));
+                lcd_puts(0, 1, id3->track_gain_str 
+                    ? id3->track_gain_str 
+                    : (char*) str(LANG_ID3_NO_GAIN));
+                break;
+
+            case 12:
+                lcd_puts(0, 0, str(LANG_ID3_ALBUM_GAIN));
+                lcd_puts(0, 1, id3->album_gain_str 
+                    ? id3->album_gain_str 
+                    : (char*) str(LANG_ID3_NO_GAIN));
+                break;
+#endif
         }
         lcd_update();
 

@@ -33,5 +33,6 @@ long dsp_input_size(long size);
 long dsp_output_size(long size);
 int dsp_stereo_mode(void);
 bool dsp_configure(int setting, void *value);
+void dsp_set_replaygain(bool always);
 
 #endif

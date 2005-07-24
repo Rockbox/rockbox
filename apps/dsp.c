@@ -16,11 +16,14 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <inttypes.h>
 #include <string.h>
 #include "dsp.h"
 #include "kernel.h"
 #include "playback.h"
 #include "system.h"
+#include "settings.h"
+#include "debug.h"
 
 /* The "dither" code to convert the 24-bit samples produced by libmad was
  * taken from the coolplayer project - coolplayer.sourceforge.net
@@ -35,6 +38,7 @@
 #define NATIVE_DEPTH        16
 #define SAMPLE_BUF_SIZE     256
 #define RESAMPLE_BUF_SIZE   (256 * 4)   /* Enough for 11,025 Hz -> 44,100 Hz*/
+#define DEFAULT_REPLAYGAIN  0x01000000
 
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
 
@@ -45,16 +49,31 @@
 #define FRACMUL(x, y) \
 ({ \
     long t; \
-    asm volatile ("mac.l %[a], %[b], %%acc0\n\t" \
+    asm volatile ("mac.l    %[a], %[b], %%acc0\n\t" \
                   "movclr.l %%acc0, %[t]\n\t" \
                   : [t] "=r" (t) : [a] "r" (x), [b] "r" (y)); \
     t; \
+})
+/* Multiply 2 32-bit integers and of the 40 most significat bits of the 
+ * result, return the 32 least significant bits. I.e., like FRACMUL with one
+ * of the arguments shifted 8 bits to the right.
+ */
+#define FRACMUL_8(x, y) \
+({ \
+    long t; \
+    long u; \
+    asm volatile ("mac.l    %[a], %[b], %%acc0\n\t" \
+                  "move.l   %%accext01, %[u]\n\t" \
+                  "movclr.l %%acc0, %[t]\n\t" \
+                  : [t] "=r" (t), [u] "=r" (u) : [a] "r" (x), [b] "r" (y)); \
+    (t << 8) | (u & 0xff); \
 })
 
 #else
 
 #define INIT()
 #define FRACMUL(x, y) (long) (((((long long) (x)) * ((long long) (y))) >> 32))
+#define FRACMUL_8(x, y) (long) (((((long long) (x)) * ((long long) (y))) >> 24))
 
 #endif
 
@@ -63,11 +82,17 @@ struct dsp_config
     long frequency;
     long clip_min;
     long clip_max;
+    long track_gain;
+    long album_gain;
+    long track_peak;
+    long album_peak;
+    long replaygain;
     int sample_depth;
     int sample_bytes;
     int stereo_mode;
     int frac_bits;
     bool dither_enabled;
+    bool new_gain;
 };
 
 struct resample_data
@@ -197,8 +222,6 @@ static long downsample(long *dst, long *src, int count,
     int pos = phase >> 16;
     int i = 1;
 
-    INIT();
-
     /* Do we need last sample of previous frame for interpolation? */
     if (pos > 0)
     {
@@ -231,8 +254,6 @@ static long upsample(long *dst, long *src, int count, struct resample_data *r)
     long last_sample = r->last_sample;
     int i = 0;
     int pos;
-
-    INIT();
 
     while ((pos = phase >> 16) == 0)
     {
@@ -352,6 +373,40 @@ static long dither_sample(long sample, long bias, long mask,
     return output;
 }
 
+/* Apply a constant gain to the samples (e.g., for ReplayGain). May update
+ * the src array if gain was applied.
+ * Note that this must be called before the resampler.
+ */
+static void apply_gain(long* src[], int count)
+{
+    if (dsp.replaygain)
+    {
+        long* s0 = src[0];
+        long* s1 = src[1];
+        long* d0 = &sample_buf[0];
+        long* d1 = (s0 == s1) ? d0 : &sample_buf[SAMPLE_BUF_SIZE / 2];
+        long gain = dsp.replaygain;
+        long i;
+        
+        
+        src[0] = d0;
+        src[1] = d1;
+        
+        for (i = 0; i < count; i++)
+        {
+            *d0++ = FRACMUL_8(*s0++, gain);
+        }
+        
+        if (s0 != s1)
+        {
+            for (i = 0; i < count; i++)
+            {
+                *d1++ = FRACMUL_8(*s1++, gain);
+            }
+        }
+    }
+}
+
 static void write_samples(short* dst, long* src[], int count)
 {
     long* s0 = src[0];
@@ -397,11 +452,14 @@ long dsp_process(char* dst, char* src[], long size)
     int samples;
 
     size /= dsp.sample_bytes * factor;
+    INIT();
+    dsp_set_replaygain(false);
 
     while (size > 0)
     {
         samples = convert_to_internal(src, size, tmp);
         size -= samples;
+        apply_gain(tmp, samples);
         samples = resample(tmp, samples);
         write_samples((short*) dst, tmp, samples);
         written += samples;
@@ -514,9 +572,14 @@ bool dsp_configure(int setting, void *value)
         dsp.stereo_mode = STEREO_NONINTERLEAVED;
         dsp.clip_max =  ((1 << WORD_FRACBITS) - 1);
         dsp.clip_min = -((1 << WORD_FRACBITS));
+        dsp.track_gain = 0;
+        dsp.album_gain = 0;
+        dsp.track_peak = 0;
+        dsp.album_peak = 0;
         dsp.frequency = NATIVE_FREQUENCY;
         dsp.sample_depth = NATIVE_DEPTH;
         dsp.frac_bits = WORD_FRACBITS;
+        dsp.new_gain = true;
         break;
 
     case DSP_DITHER:
@@ -524,9 +587,74 @@ bool dsp_configure(int setting, void *value)
         dsp.dither_enabled = (bool) value;
         break;
 
+    case DSP_SET_TRACK_GAIN:
+        dsp.track_gain = (long) value;
+        dsp.new_gain = true;
+        break;
+
+    case DSP_SET_ALBUM_GAIN:
+        dsp.album_gain = (long) value;
+        dsp.new_gain = true;
+        break;
+
+    case DSP_SET_TRACK_PEAK:
+        dsp.track_peak = (long) value;
+        dsp.new_gain = true;
+        break;
+
+    case DSP_SET_ALBUM_PEAK:
+        dsp.album_peak = (long) value;
+        dsp.new_gain = true;
+        break;
+
     default:
         return 0;
     }
 
     return 1;
+}
+
+void dsp_set_replaygain(bool always)
+{
+    if (always || dsp.new_gain)
+    {
+        long gain = 0;
+
+        dsp.new_gain = false;
+    
+        if (global_settings.replaygain || global_settings.replaygain_noclip)
+        {
+            long peak;
+
+            if (global_settings.replaygain)
+            {
+                gain = (global_settings.replaygain_track || !dsp.album_gain)
+                    ? dsp.track_gain : dsp.album_gain;
+            }
+            
+            peak = (global_settings.replaygain_track || !dsp.album_peak)
+                ? dsp.track_peak : dsp.album_peak;
+            
+            if (gain == 0)
+            {
+                /* So that noclip can work even with no gain information. */
+                gain = DEFAULT_REPLAYGAIN;
+            }
+            
+            if (global_settings.replaygain_noclip && (peak != 0)
+                && ((((int64_t) gain * peak) >> 24) >= DEFAULT_REPLAYGAIN))
+            {
+                gain = (((int64_t) DEFAULT_REPLAYGAIN << 24) / peak);
+            }
+            
+            if (gain == DEFAULT_REPLAYGAIN)
+            {
+                /* Nothing to do, disable processing. */
+                gain = 0;
+    
+            }
+        }
+
+        dsp.replaygain = gain;
+    }
 }

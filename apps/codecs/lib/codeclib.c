@@ -23,6 +23,7 @@
 #include "playback.h"
 #include "codeclib.h"
 #include "xxx2wav.h"
+#include "id3.h"
 
 struct codec_api *local_rb;
 
@@ -33,4 +34,12 @@ int codec_init(struct codec_api* rb)
     mallocbuf = (unsigned char *)rb->get_codec_memory((long *)&bufsize);
   
     return 0;
+}
+
+void codec_set_replaygain(struct mp3entry* id3)
+{
+    local_rb->configure(DSP_SET_TRACK_GAIN, (long *) id3->track_gain);
+    local_rb->configure(DSP_SET_ALBUM_GAIN, (long *) id3->album_gain);
+    local_rb->configure(DSP_SET_TRACK_PEAK, (long *) id3->track_peak);
+    local_rb->configure(DSP_SET_ALBUM_PEAK, (long *) id3->album_peak);
 }

@@ -37,4 +37,4 @@ int memcmp(const void *s1, const void *s2, size_t n);
 void* memmove(const void *s1, const void *s2, size_t n);
 
 int codec_init(struct codec_api* rb);
-
+void codec_set_replaygain(struct mp3entry* id3);

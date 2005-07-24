@@ -38,7 +38,11 @@ enum {
     DSP_SET_SAMPLE_DEPTH,
     DSP_SET_STEREO_MODE,
     DSP_RESET,
-    DSP_DITHER
+    DSP_DITHER,
+    DSP_SET_TRACK_GAIN,
+    DSP_SET_ALBUM_GAIN,
+    DSP_SET_TRACK_PEAK,
+    DSP_SET_ALBUM_PEAK
 };
 
 /* Not yet implemented. */

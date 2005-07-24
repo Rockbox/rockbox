@@ -179,6 +179,11 @@ SECTIONS
         _iramcopy = .;
     } > DRAM
 
+    /DISCARD/ : 
+    {
+        *(.eh_frame)
+    }
+
     .iram IRAMORIG : AT ( _iramcopy)
     {
         _iramstart = .;

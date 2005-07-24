@@ -1604,3 +1604,47 @@ long ov_read(OggVorbis_File *vf,char *buffer,int bytes_req,int *bitstream){
     return(samples);
   }
 }
+
+/* input values: pcm_channels) a float vector per channel of output
+                length) the sample length being read by the app
+
+   return values: <0) error/hole in data (OV_HOLE), partial open (OV_EINVAL)
+                   0) EOF
+                  n) number of samples of PCM actually returned.  The
+                  below works on a packet-by-packet basis, so the
+                  return length is not related to the 'length' passed
+                  in, just guaranteed to fit.
+
+           *section) set to the logical bitstream number */
+
+long ov_read_fixed(OggVorbis_File *vf,ogg_int32_t ***pcm_channels,int length,
+                  int *bitstream){
+  if(vf->ready_state<OPENED)return(OV_EINVAL);
+
+#if CONFIG_CPU == MCF5249
+  mcf5249_init_mac();
+#endif
+
+  while(1){
+    if(vf->ready_state==INITSET){
+      ogg_int32_t **pcm;
+      long samples=vorbis_synthesis_pcmout(&vf->vd,&pcm);
+      if(samples){
+       if(pcm_channels)*pcm_channels=pcm;
+       if(samples>length)samples=length;
+       vorbis_synthesis_read(&vf->vd,samples);
+       vf->pcm_offset+=samples;
+       if(bitstream)*bitstream=vf->current_link;
+       return samples;
+
+      }
+    }
+
+    /* suck in another packet */
+    {
+      int ret=_fetch_and_process_packet(vf,1,1);
+      if(ret==OV_EOF)return(0);
+      if(ret<=0)return(ret);
+    }
+  }
+}

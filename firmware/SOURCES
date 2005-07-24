@@ -129,6 +129,9 @@ drivers/uda1380.c
 #if (CONFIG_HWCODEC == MASNONE) && !defined(SIMULATOR)
 pcm_playback.c
 #endif
+#if CONFIG_HWCODEC == MASNONE
+replaygain.c
+#endif
 #if defined(HAVE_UDA1380) && !defined(SIMULATOR)
 pcm_record.c
 #endif

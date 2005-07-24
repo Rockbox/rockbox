@@ -66,6 +66,7 @@ void dac_line_in(bool enable);
 #if CONFIG_HWCODEC == MASNONE
 #include "pcmbuf.h"
 #include "pcm_playback.h"
+#include "dsp.h"
 #endif
 
 #ifdef HAVE_CHARGING
@@ -1187,6 +1188,56 @@ static bool runtimedb(void)
     return rc;
 }
 
+#if CONFIG_HWCODEC == MASNONE
+static bool replaygain(void)
+{
+    bool result = set_bool(str(LANG_REPLAYGAIN_ENABLE), 
+        &global_settings.replaygain);
+        
+    dsp_set_replaygain(true);
+    return result;
+}
+
+static bool replaygain_mode(void)
+{
+    bool result = set_bool_options(str(LANG_REPLAYGAIN_MODE), 
+        &global_settings.replaygain_track, 
+        STR(LANG_TRACK_GAIN), 
+        STR(LANG_ALBUM_GAIN), 
+        NULL);
+
+    dsp_set_replaygain(true);
+    return result;
+}
+
+static bool replaygain_noclip(void)
+{
+    bool result = set_bool(str(LANG_REPLAYGAIN_NOCLIP), 
+        &global_settings.replaygain_noclip);
+
+    dsp_set_replaygain(true);
+    return result;
+}
+
+static bool replaygain_settings_menu(void)
+{
+    int m;
+    bool result;
+
+    static const struct menu_item items[] = {
+        { ID2P(LANG_REPLAYGAIN_ENABLE), replaygain },
+        { ID2P(LANG_REPLAYGAIN_NOCLIP), replaygain_noclip },
+        { ID2P(LANG_REPLAYGAIN_MODE), replaygain_mode },
+    };
+
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
+    result = menu_run(m);
+    menu_exit(m);
+    return result;
+}
+#endif
+
 static bool playback_settings_menu(void)
 {
     int m;
@@ -1203,6 +1254,7 @@ static bool playback_settings_menu(void)
 #if CONFIG_HWCODEC == MASNONE
         { ID2P(LANG_CROSSFADE), crossfade },
         { ID2P(LANG_CROSSFADE_DURATION), crossfade_duration },
+        { ID2P(LANG_REPLAYGAIN), replaygain_settings_menu },
 #endif
 #ifdef HAVE_SPDIF_POWER
         { ID2P(LANG_SPDIF_ENABLE), spdif },

@@ -53,13 +53,13 @@ enum {
 
 struct mp3entry {
     char path[MAX_PATH];
-    char *title;
-    char *artist;
-    char *album;
-    char* genre_string ;
-    char* track_string ;
-    char* year_string ;
-    char* composer ;
+    char* title;
+    char* artist;
+    char* album;
+    char* genre_string;
+    char* track_string;
+    char* year_string;
+    char* composer;
     int tracknum;
     int version;
     int layer;
@@ -115,6 +115,17 @@ struct mp3entry {
     short voladjust;
     long playcount;
     long lastplayed;
+    
+    /* replaygain support */
+    
+#if CONFIG_HWCODEC == MASNONE
+    char* track_gain_str;
+    char* album_gain_str;
+    long track_gain;    /* 7.24 signed fixed point. 0 for no gain. */
+    long album_gain;
+    long track_peak;    /* 7.24 signed fixed point. 0 for no peak. */
+    long album_peak;
+#endif
 };
 
 enum {

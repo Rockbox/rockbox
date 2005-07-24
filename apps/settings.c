@@ -416,6 +416,9 @@ static const struct bit_entry hd_bits[] =
 
 #if CONFIG_HWCODEC == MASNONE
     {2, S_O(crossfade), 0, "crossfade type", "off,crossfade,mix"},
+    {1, S_O(replaygain), false, "replaygain", off_on },
+    {1, S_O(replaygain_track), false, "replaygain type", "track,album" },
+    {1, S_O(replaygain_noclip), false, "replaygain noclip", off_on },
 #endif
     
     /* new stuff to be added at the end */

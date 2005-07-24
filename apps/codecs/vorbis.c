@@ -105,16 +105,11 @@ bool vorbis_set_codec_parameters(OggVorbis_File *vf)
         return false;
     }
 
-    if (rb->id3->frequency != NATIVE_FREQUENCY) {
-        rb->configure(CODEC_DSP_ENABLE, (bool *)true);
-    } else {
-        rb->configure(CODEC_DSP_ENABLE, (bool *)false);
-    }
-
     rb->configure(DSP_SET_FREQUENCY, (int *)rb->id3->frequency);
+    codec_set_replaygain(rb->id3);
 
     if (vi->channels == 2) {
-          rb->configure(DSP_SET_STEREO_MODE, (int *)STEREO_INTERLEAVED);
+          rb->configure(DSP_SET_STEREO_MODE, (int *)STEREO_NONINTERLEAVED);
     } else if (vi->channels == 1) {
           rb->configure(DSP_SET_STEREO_MODE, (int *)STEREO_MONO);
     }
@@ -129,14 +124,12 @@ extern char iramend[];
 #endif
 
 
-/* reserve the PCM buffer in the IRAM area */
-static char pcmbuf[4096] IDATA_ATTR;
-
 /* this is the codec entry point */
 enum codec_status codec_start(struct codec_api* api)
 {
     ov_callbacks callbacks;
     OggVorbis_File vf;
+    ogg_int32_t** pcm;
 
     int error;
     long n;
@@ -157,10 +150,12 @@ enum codec_status codec_start(struct codec_api* api)
     #ifdef USE_IRAM
     rb->memcpy(iramstart, iramcopy, iramend-iramstart);
     #endif
-        
-    rb->configure(DSP_DITHER, (bool *)false);
-    rb->configure(DSP_SET_SAMPLE_DEPTH, (int *)(16));
 
+    rb->configure(CODEC_DSP_ENABLE, (bool *)true);
+    rb->configure(DSP_DITHER, (bool *)false);
+    rb->configure(DSP_SET_SAMPLE_DEPTH, (long *) (24));
+    rb->configure(DSP_SET_CLIP_MAX, (long *)  ((1 << 24) - 1));
+    rb->configure(DSP_SET_CLIP_MIN, (long *) -((1 << 24) - 1));
     /* Note: These are sane defaults for these values.  Perhaps
      * they should be set differently based on quality setting
      */
@@ -244,9 +239,9 @@ enum codec_status codec_start(struct codec_api* api)
             }
             rb->seek_time = 0;
         }
-                
-        /* Read host-endian signed 16 bit PCM samples */
-        n=ov_read(&vf,pcmbuf,sizeof(pcmbuf),&current_section);
+
+        /* Read host-endian signed 24-bit PCM samples */
+        n=ov_read_fixed(&vf,&pcm,1024,&current_section);
 
         /* Change DSP and buffer settings for this bitstream */
         if ( current_section != previous_section ) {
@@ -262,9 +257,10 @@ enum codec_status codec_start(struct codec_api* api)
         } else if (n < 0) {
             DEBUGF("Error decoding frame\n");
         } else {
-            while (!rb->pcmbuf_insert(pcmbuf, n)) {
+            while (!rb->pcmbuf_insert_split(pcm[0], pcm[1], 
+                n * sizeof(ogg_int32_t))) {
                 rb->sleep(1);
-        }
+            }
 
         rb->set_offset(ov_raw_tell(&vf));
         rb->set_elapsed(ov_time_tell(&vf));

@@ -25,6 +25,8 @@
 #include "mp3_playback.h"
 #include "logf.h"
 #include "atoi.h"
+#include "replaygain.h"
+#include "debug.h"
 
 /* Simple file type probing by looking filename extension. */
 int probe_file_format(const char *filename)
@@ -271,7 +273,7 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
       channels=buf[39];
 
       if ( !get_vorbis_comments(&(track->id3), fd) ) {
-    logf("get_vorbis_comments failed");
+        logf("get_vorbis_comments failed");
         return(false);
       }
 
@@ -283,7 +285,7 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
       /* We now need to search for the last page in the file - identified by 
        by ('O','g','g','S',0) and retrieve totalsamples */
 
-      lseek(fd, -32*1024, SEEK_END);
+      lseek(fd, -64*1024, SEEK_END);    /* A page is always < 64 kB */
       eof=0;
       j=0; /* The number of bytes currently in buffer */
       i=0;
@@ -300,6 +302,7 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         while (i < (j-5)) {
           if (memcmp(&buf[i],"OggS",5)==0) {
             if (i < (j-17)) {
+              /* Note that this only reads the low 32 bits of a 64 bit value */
               totalsamples=(buf[i+6])|(buf[i+7]<<8)|(buf[i+8]<<16)|(buf[i+9]<<24);
               last_serialno=(buf[i+14])|(buf[i+15]<<8)|(buf[i+16]<<16)|(buf[i+17]<<24);
               j=0;  /* We can discard the rest of the buffer */
@@ -761,7 +764,7 @@ static bool get_vorbis_comments (struct mp3entry *entry, int fd)
     int comment_length;
     int i = 0;
     unsigned char temp[300];
-    int buffer_remaining = sizeof(entry->id3v2buf);
+    int buffer_remaining = sizeof(entry->id3v2buf) + sizeof(entry->id3v1buf);
     char *buffer = entry->id3v2buf;
     char **p = NULL;
     int segments;
@@ -884,8 +887,36 @@ static bool get_vorbis_comments (struct mp3entry *entry, int fd)
         } else if (strncasecmp(temp, "TRACKNUMBER=", 12) == 0) {
             name_length = 11;
             p = &(entry->track_string);
+        } else if ((strncasecmp(temp, "RG_RADIO=", 9) == 0)
+            && !entry->track_gain) {
+            entry->track_gain = get_replaygain(&temp[9]);
+            name_length = 8;
+            p = &(entry->track_gain_str);
+        } else if (strncasecmp(temp, "REPLAYGAIN_TRACK_GAIN=", 22) == 0) {
+            entry->track_gain = get_replaygain(&temp[22]);
+            name_length = 21;
+            p = &(entry->track_gain_str);
+        } else if ((strncasecmp(temp, "RG_AUDIOPHILE=", 14) == 0)
+            && !entry->album_gain) {
+            entry->album_gain = get_replaygain(&temp[14]);
+            name_length = 13;
+            p = &(entry->album_gain_str);
+        } else if (strncasecmp(temp, "REPLAYGAIN_ALBUM_GAIN=", 22) == 0) {
+            entry->album_gain = get_replaygain(&temp[22]);
+            name_length = 21;
+            p = &(entry->album_gain_str);
+        } else if ((strncasecmp(temp, "RG_PEAK=", 8) == 0)
+            && !entry->track_peak) {
+            entry->track_peak = get_replaypeak(&temp[8]);
+            p = NULL;
+        } else if (strncasecmp(temp, "REPLAYGAIN_TRACK_PEAK=", 22) == 0) {
+            entry->track_peak = get_replaypeak(&temp[22]);
+            p = NULL;
+        } else if (strncasecmp(temp, "REPLAYGAIN_ALBUM_PEAK=", 22) == 0) {
+            entry->album_peak = get_replaypeak(&temp[22]);
+            p = NULL;
         } else {
-		p = NULL;
+            p = NULL;
 	}
 
         if (p) {
@@ -899,7 +930,6 @@ static bool get_vorbis_comments (struct mp3entry *entry, int fd)
             }
         }
     }
-
+    
     return true;
 }
-
