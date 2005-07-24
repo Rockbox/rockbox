@@ -1246,7 +1246,7 @@ bool codec_request_next_track_callback(void)
         return false;
     
     logf("Request new track");
-    
+
     /* Advance to next track. */
     if (ci.reload_codec && new_track > 0) {
         if (!playlist_check(new_track))
@@ -1356,6 +1356,18 @@ static void initiate_track_change(int peek_index)
 {
     if (!playlist_check(peek_index))
         return ;
+
+    if (global_settings.repeat_mode == REPEAT_ONE) {
+        if (!paused)
+            pcm_play_pause(false);
+
+        audio_ff_rewind(0);
+
+        if (!paused)
+            pcm_play_pause(true);
+
+	return;
+    }
             
     /* Detect if disk is spinning.. */
     if (filling) {
