@@ -87,7 +87,7 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 45
+#define PLUGIN_API_VERSION 46
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -418,6 +418,10 @@ struct plugin_api {
                             int stride, int x, int y, int width, int height);
     void (*lcd_bitmap)(const unsigned char *src, int x, int y, int width,
                        int height);
+#endif
+#ifdef HAVE_LCD_BITMAP
+    int (*font_getstringsize)(const unsigned char *str, int *w, int *h,
+                              int fontnumber);
 #endif
 };
 
