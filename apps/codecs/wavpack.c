@@ -77,12 +77,14 @@ enum codec_status codec_start(struct codec_api* api)
     while (!*rb->taginfo_ready && !ci->stop_codec)
         ci->sleep(1);
         
-    if (ci->id3->frequency != NATIVE_FREQUENCY) {
-        ci->configure(DSP_SET_FREQUENCY, (long *)(ci->id3->frequency));
-        ci->configure(CODEC_DSP_ENABLE, (bool *)true);
-    } else {
-        ci->configure(CODEC_DSP_ENABLE, (bool *)false);
+    if (ci->id3->frequency != NATIVE_FREQUENCY ||
+        ci->global_settings->replaygain) {
+            ci->configure(CODEC_DSP_ENABLE, (bool *)true);
+            ci->configure(DSP_SET_FREQUENCY, (long *)(ci->id3->frequency));
+            codec_set_replaygain(rb->id3);
     }
+    else
+        ci->configure(CODEC_DSP_ENABLE, (bool *)false);
     
     /* Create a decoder instance */
     wpc = WavpackOpenFileInput (read_callback, error);

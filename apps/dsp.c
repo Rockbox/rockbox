@@ -397,7 +397,7 @@ static void apply_gain(long* src[], int count)
             *d0++ = FRACMUL_8(*s0++, gain);
         }
         
-        if (s0 != s1)
+        if (src [0] != src [1])
         {
             for (i = 0; i < count; i++)
             {

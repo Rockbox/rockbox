@@ -520,11 +520,34 @@ static bool get_apetag_info (struct mp3entry *entry, int fd)
     if (get_apetag_item (&temp_apetag, "track", temp_buffer, rem_space))
         entry->tracknum = atoi (temp_buffer);
 
-    if (get_apetag_item (&temp_apetag, "artist", temp_buffer, rem_space)) {
-        UTF8ToAnsi (entry->artist = temp_buffer);
-        str_space = strlen (temp_buffer) + 1;
-        temp_buffer += str_space;
-        rem_space -= str_space;
+    if (get_apetag_item (&temp_apetag, "replaygain_track_peak", temp_buffer, rem_space))
+        entry->track_peak = get_replaypeak (temp_buffer);
+
+    if (get_apetag_item (&temp_apetag, "replaygain_album_peak", temp_buffer, rem_space))
+        entry->album_peak = get_replaypeak (temp_buffer);
+
+    if (rem_space > 1 &&
+        get_apetag_item (&temp_apetag, "replaygain_track_gain", temp_buffer, rem_space)) {
+            entry->track_gain = get_replaygain (entry->track_gain_str = temp_buffer);
+            str_space = strlen (temp_buffer) + 1;
+            temp_buffer += str_space;
+            rem_space -= str_space;
+    }
+
+    if (rem_space > 1 &&
+        get_apetag_item (&temp_apetag, "replaygain_album_gain", temp_buffer, rem_space)) {
+            entry->album_gain = get_replaygain (entry->album_gain_str = temp_buffer);
+            str_space = strlen (temp_buffer) + 1;
+            temp_buffer += str_space;
+            rem_space -= str_space;
+    }
+
+    if (rem_space > 1 &&
+        get_apetag_item (&temp_apetag, "artist", temp_buffer, rem_space)) {
+            UTF8ToAnsi (entry->artist = temp_buffer);
+            str_space = strlen (temp_buffer) + 1;
+            temp_buffer += str_space;
+            rem_space -= str_space;
     }
 
     if (rem_space > 1 &&
