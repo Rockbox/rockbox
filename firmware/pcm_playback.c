@@ -89,87 +89,68 @@ static void dma_stop(void)
     pcm_paused = false;
 }
 
-#define PEEK_SAMPLE_COUNT 64
-static long calculate_channel_peak_average(int channel, unsigned short *addr,
-                                           long size)
-{
-    int i;
-    long min, max;
-    int count, min_count, max_count;
-    unsigned long average, zero_point;
+/*
+ * This function goes directly into the DMA buffer to calculate the left and
+ * right peak values. To avoid missing peaks it tries to look forward a full
+ * refresh period (1/20 sec) although it's always possible that the entire
+ * period will not be visible. To reduce CPU load it only looks at every
+ * third sample, and this can be reduced even further if needed (even every
+ * tenth sample would still be pretty accurate).
+ */
 
-    addr = &addr[channel];
-    average = 0;
-    
-    if (pcm_playing && !pcm_paused && addr != NULL && size)
-    {
-        /* Calculate the zero point and remove DC offset (should be around 32768) */
-        zero_point = 0;
-        for (i = 0; i < size; i++)
-            zero_point += addr[i*2];
-        zero_point /= i;
-
-        /*for (i = 0; i < size; i++) {
-            long peak = addr[i*2] - 32768;
-            if (peak < 0)
-                peak = 0;
-            average += peak;
-        }
-        average /= i;*/
-        
-        count = 0;
-
-        while (size > PEEK_SAMPLE_COUNT)
-        {
-            min = zero_point;
-            max = zero_point;
-            min_count = 1;
-            max_count = 1;
-            
-            for (i = 0; i < PEEK_SAMPLE_COUNT; i++)
-            {
-                unsigned long value = *addr;
-                if (value < zero_point) {
-                    min += value;
-                    min_count++;
-                }
-                if (value > zero_point) {
-                    max += value;
-                    max_count++;
-                }
-                addr = &addr[2];
-            }
-
-            min /= min_count;
-            max /= max_count;
-            
-            size -= PEEK_SAMPLE_COUNT;
-            average += (max - min) / 2;
-            //average += (max - zero_point) + (zero_point - min);
-            //average += zero_point - min;
-            count += 1;
-        }
-
-        if (count)
-        {
-            average /= count;
-            /* I don't know why this is needed. Should be fixed. */
-            average = zero_point - average;
-        }
-    }
-
-    return average;
-}
+#define PEAK_SAMPLES    2205    /* 44100 sample rate / 20 Hz refresh */
+#define PEAK_STRIDE     3       /* every 3rd sample is plenty... */
 
 void pcm_calculate_peaks(int *left, int *right)
 {
-    unsigned short *addr = (unsigned short *)SAR0;
-    long size = MIN(512, (BCR0 & 0xffffff) / 2);
-        
-    if (left != NULL)
-        *left = calculate_channel_peak_average(0, addr, size);
-    if (right != NULL)
-        *right = calculate_channel_peak_average(1, addr, size);;
+    long samples = (BCR0 & 0xffffff) / 4;
+    short *addr = (short *) (SAR0 & ~3);
+
+    if (samples > PEAK_SAMPLES)
+        samples = PEAK_SAMPLES;
+
+    samples /= PEAK_STRIDE;
+
+    if (left && right) {
+        int left_peak = 0, right_peak = 0, value;    
+
+        while (samples--) {
+            if ((value = addr [0]) > left_peak)
+                left_peak = value;
+            else if (-value > left_peak)
+                left_peak = -value;
+
+            if ((value = addr [PEAK_STRIDE | 1]) > right_peak)
+                right_peak = value;
+            else if (-value > right_peak)
+                right_peak = -value;
+
+            addr += PEAK_STRIDE * 2;
+        }
+
+        *left = left_peak;
+        *right = right_peak;
+    }
+    else if (left || right) {
+        int peak_value = 0, value;
+
+        if (right)
+            addr += (PEAK_STRIDE | 1);
+
+        while (samples--) {
+            if ((value = addr [0]) > peak_value)
+                peak_value = value;
+            else if (-value > peak_value)
+                peak_value = -value;
+
+            addr += PEAK_STRIDE * 2;
+        }
+
+        if (left)
+            *left = peak_value;
+        else
+            *right = peak_value;
+    }
 }
 
 /* sets frequency of input to DAC */
