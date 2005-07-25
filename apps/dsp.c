@@ -108,7 +108,7 @@ struct dither_data
     long random;
 };
 
-static struct dsp_config dsp;
+static struct dsp_config dsp IDATA_ATTR;
 static struct dither_data dither_data[2] IDATA_ATTR;
 static struct resample_data resample_data[2] IDATA_ATTR;
 
@@ -387,7 +387,6 @@ static void apply_gain(long* src[], int count)
         long* d1 = (s0 == s1) ? d0 : &sample_buf[SAMPLE_BUF_SIZE / 2];
         long gain = dsp.replaygain;
         long i;
-        
         
         src[0] = d0;
         src[1] = d1;
