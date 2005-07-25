@@ -94,7 +94,7 @@ void calc_mandelbrot_set(void){
     
     start_tick = last_yield = *rb->current_tick;
     
-    gray_clear_display();
+    gray_ub_clear_display();
 
     x_fact = (x_max - x_min) / LCD_WIDTH;
     y_fact = (y_max - y_min) / LCD_HEIGHT;
@@ -124,7 +124,7 @@ void calc_mandelbrot_set(void){
             if  (n_iter > max_iter){
                 brightness = 0; // black
             } else {
-                brightness = 255 - (31 * (n_iter & 7));
+                brightness = 255 - (32 * (n_iter & 7));
             }
             graybuffer[y_pixel]=brightness;
             /* be nice to other threads:
@@ -134,7 +134,7 @@ void calc_mandelbrot_set(void){
                 last_yield = *rb->current_tick;
             }
         }
-        gray_drawgraymap(graybuffer, x_pixel, 0, 1, LCD_HEIGHT, 1);
+        gray_ub_gray_bitmap(graybuffer, x_pixel, 0, 1, LCD_HEIGHT);
     }
 }
 
@@ -142,7 +142,7 @@ void cleanup(void *parameter)
 {
     (void)parameter;
     
-    gray_release_buffer();
+    gray_release();
 }
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
@@ -156,17 +156,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb = api;
     (void)parameter;
 
-    /* This plugin uses the grayscale framework, so initialize */
-    gray_init(api);
-
     /* get the remainder of the plugin buffer */
     gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
 
     /* initialize the grayscale buffer:
      * 112 pixels wide, 8 rows (64 pixels) high, (try to) reserve
      * 16 bitplanes for 17 shades of gray.*/
-    grayscales = gray_init_buffer(gbuf, gbuf_size, 112, 8, 16, NULL) + 1;
-    if (grayscales != 17){
+    grayscales = gray_init(rb, gbuf, gbuf_size, false, 112, 8, 8, NULL) + 1;
+    if (grayscales != 9){
         rb->snprintf(buff, sizeof(buff), "%d", grayscales);
         rb->lcd_puts(0, 1, buff);
         rb->lcd_update();
@@ -174,7 +171,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         return(0);
     }
 
-    gray_show_display(true); /* switch on grayscale overlay */
+    gray_show(true); /* switch on greyscale overlay */
 
     init_mandelbrot_set();
     lcd_aspect_ratio = ((LCD_WIDTH<<13) / LCD_HEIGHT)<<13;
@@ -189,7 +186,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         button = rb->button_get(true);
         switch (button) {
         case MANDELBROT_QUIT:
-            gray_release_buffer();
+            gray_release();
             return PLUGIN_OK;
 
         case MANDELBROT_ZOOM_OUT:
@@ -270,7 +267,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         if (button != BUTTON_NONE)
             lastbutton = button;
     }
-    gray_release_buffer();
+    gray_release();
     return PLUGIN_OK;
 }
 #endif

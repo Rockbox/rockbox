@@ -1523,7 +1523,7 @@ void cleanup(void *parameter)
 {
     (void)parameter;
     
-    gray_show_display(false); 
+    gray_show(false); 
 }
 
 /* interactively scroll around the image */
@@ -1548,13 +1548,12 @@ int scroll_bmp(struct t_disp* pdisp)
             move = MIN(10, pdisp->x);
             if (move > 0)
             {
-                gray_scroll_right(move, false); /* scroll right */
+                gray_ub_scroll_right(move); /* scroll right */
                 pdisp->x -= move;
-                gray_drawgraymap(
-                    pdisp->bitmap + pdisp->y * pdisp->stride + pdisp->x,
-                    0, MAX(0, (LCD_HEIGHT-pdisp->height)/2), // x, y
-                    move, MIN(LCD_HEIGHT, pdisp->height), // w, h
-                    pdisp->stride);
+                gray_ub_gray_bitmap_part(
+                    pdisp->bitmap, pdisp->x, pdisp->y, pdisp->stride,
+                    0, MAX(0, (LCD_HEIGHT-pdisp->height)/2), /* x, y */
+                    move, MIN(LCD_HEIGHT, pdisp->height));   /* w, h */
             }
             break;
 
@@ -1563,13 +1562,13 @@ int scroll_bmp(struct t_disp* pdisp)
             move = MIN(10, pdisp->width - pdisp->x - LCD_WIDTH);
             if (move > 0)
             {
-                gray_scroll_left(move, false); /* scroll left */
+                gray_ub_scroll_left(move); /* scroll left */
                 pdisp->x += move;
-                gray_drawgraymap(
-                    pdisp->bitmap + pdisp->y * pdisp->stride + pdisp->x + LCD_WIDTH - move,
+                gray_ub_gray_bitmap_part(
+                    pdisp->bitmap, pdisp->x + LCD_WIDTH - move,
+                    pdisp->y, pdisp->stride,
                     LCD_WIDTH - move, MAX(0, (LCD_HEIGHT-pdisp->height)/2), /* x, y */
-                    move, MIN(LCD_HEIGHT, pdisp->height), /* w, h */
-                    pdisp->stride);
+                    move, MIN(LCD_HEIGHT, pdisp->height));   /* w, h */
             }
             break;
 
@@ -1578,16 +1577,12 @@ int scroll_bmp(struct t_disp* pdisp)
             move = MIN(8, pdisp->y);
             if (move > 0)
             {
-                if (move == 8)
-                    gray_scroll_down8(false); /* scroll down by 8 pixel */
-                else
-                    gray_scroll_down(move, false); /* scroll down 1..7 pixel */
+                gray_ub_scroll_down(move); /* scroll down */
                 pdisp->y -= move;
-                gray_drawgraymap(
-                    pdisp->bitmap + pdisp->y * pdisp->stride + pdisp->x,
-                    MAX(0, (LCD_WIDTH-pdisp->width)/2), 0, /* x, y */
-                    MIN(LCD_WIDTH, pdisp->width), move, /* w, h */
-                    pdisp->stride);
+                gray_ub_gray_bitmap_part(
+                    pdisp->bitmap, pdisp->x, pdisp->y, pdisp->stride,
+                    MAX(0, (LCD_WIDTH-pdisp->width)/2), 0,   /* x, y */
+                    MIN(LCD_WIDTH, pdisp->width), move);     /* w, h */
             }
             break;
 
@@ -1596,16 +1591,13 @@ int scroll_bmp(struct t_disp* pdisp)
             move = MIN(8, pdisp->height - pdisp->y - LCD_HEIGHT);
             if (move > 0)
             {
-                if (move == 8)
-                    gray_scroll_up8(false); /* scroll up by 8 pixel */
-                else
-                    gray_scroll_up(move, false); /* scroll up 1..7 pixel */
+                gray_ub_scroll_up(move); /* scroll up */
                 pdisp->y += move;
-                gray_drawgraymap(
-                    pdisp->bitmap + (pdisp->y + LCD_HEIGHT - move) * pdisp->stride + pdisp->x,
+                gray_ub_gray_bitmap_part(
+                    pdisp->bitmap, pdisp->x,
+                    pdisp->y + LCD_HEIGHT - move, pdisp->stride,
                     MAX(0, (LCD_WIDTH-pdisp->width)/2), LCD_HEIGHT - move, /* x, y */
-                    MIN(LCD_WIDTH, pdisp->width), move, /* w, h */
-                    pdisp->stride);
+                    MIN(LCD_WIDTH, pdisp->width), move);     /* w, h */
             }
             break;
 
@@ -1806,7 +1798,7 @@ int main(char* filename)
     int fd;
     int filesize;
     int grayscales;
-    int graysize; // helper
+    long graysize; // helper
     unsigned char* buf_jpeg; /* compressed JPEG image */
     static struct jpeg jpg; /* too large for stack */
     int status;
@@ -1830,7 +1822,7 @@ int main(char* filename)
     /* initialize the grayscale buffer:
      * 112 pixels wide, 8 rows (64 pixels) high, (try to) reserve
      * 32 bitplanes for 33 shades of gray. (uses 28856 bytes)*/
-    grayscales = gray_init_buffer(buf, buf_size, 112, 8, 32, &graysize) + 1;
+    grayscales = gray_init(rb, buf, buf_size, false, 112, 8, 32, &graysize) + 1;
     buf += graysize;
     buf_size -= graysize;
     if (grayscales < 33 || buf_size <= 0)
@@ -1907,16 +1899,15 @@ int main(char* filename)
         rb->lcd_puts(0, 3, print);
         rb->lcd_update();
 
-        gray_clear_display();
-        gray_drawgraymap(
-            p_disp->bitmap + p_disp->y * p_disp->stride + p_disp->x,
+        gray_ub_clear_display();
+        gray_ub_gray_bitmap_part(
+            p_disp->bitmap, p_disp->x, p_disp->y, p_disp->stride,
             MAX(0, (LCD_WIDTH - p_disp->width) / 2),
             MAX(0, (LCD_HEIGHT - p_disp->height) / 2),
             MIN(LCD_WIDTH, p_disp->width),
-            MIN(LCD_HEIGHT, p_disp->height),
-            p_disp->stride);
+            MIN(LCD_HEIGHT, p_disp->height));
 
-        gray_show_display(true); /* switch on grayscale overlay */
+        gray_show(true); /* switch on grayscale overlay */
 
         /* drawing is now finished, play around with scrolling
          * until you press OFF or connect USB
@@ -1952,12 +1943,12 @@ int main(char* filename)
             break;
         }
 
-        gray_show_display(false); /* switch off overlay */
+        gray_show(false); /* switch off overlay */
 
     }
     while (status != PLUGIN_OK && status != PLUGIN_USB_CONNECTED);
 
-    gray_release_buffer(); /* deinitialize */
+    gray_release(); /* deinitialize */
 
     return status;
 }
@@ -1972,9 +1963,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     TEST_PLUGIN_API(api);
 
     rb = api; /* copy to global api pointer */
-
-    /* This plugin uses the grayscale framework, so initialize */
-    gray_init(api);
 
     return main((char*)parameter);
 }

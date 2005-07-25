@@ -44,7 +44,7 @@ void cleanup(void *parameter)
 {
     (void)parameter;
 
-    gray_release_buffer(); /* switch off overlay and deinitialize */
+    gray_release(); /* switch off overlay and deinitialize */
     /* restore normal backlight setting */
     rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
 }
@@ -55,7 +55,7 @@ int main(void)
     int shades, time;
     int x, y, i;
     int button, scroll_amount;
-    bool black_border;
+    bool black_border = false;
 
     static const unsigned char rockbox[] = {
     /* ...........................................
@@ -138,73 +138,74 @@ int main(void)
     /* get the remainder of the plugin buffer */
     gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
 
-    /* initialize the grayscale buffer:
+    /* initialize the greyscale buffer:
      * 112 pixels wide, 7 rows (56 pixels) high, (try to) reserve
-     * 32 bitplanes for 33 shades of gray. (uses 25268 bytes)*/
-    shades = gray_init_buffer(gbuf, gbuf_size, 112, 7, 32, NULL) + 1;
+     * 32 bitplanes for 33 shades of grey. */
+    shades = gray_init(rb, gbuf, gbuf_size, true, 112, 7, 32, NULL) + 1;
 
-    /* place grayscale overlay 1 row down */
-    gray_position_display(0, 1);
+    /* place greyscale overlay 1 row down */
+    gray_set_position(0, 1);
 
     rb->snprintf(pbuf, sizeof(pbuf), "Shades: %d", shades);
     rb->lcd_puts(0, 0, pbuf);
     rb->lcd_update();
 
-    gray_show_display(true);  /* switch on grayscale overlay */
+    gray_show(true);          /* switch on greyscale overlay */
 
     time = *rb->current_tick; /* start time measurement */
 
-    gray_set_foreground(150);
-    gray_fillrect(0, 0, 112, 56); /* fill everything with gray 150 */
+    gray_set_background(150);
+    gray_clear_display();     /* fill everything with grey 150 */
 
-    /* draw a dark gray line star background */
+    /* draw a dark grey line star background */
     gray_set_foreground(80);
-    for (y = 0; y < 56; y += 8)        /* horizontal part */
+    for (y = 0; y < 56; y += 8)           /* horizontal part */
     {
-        gray_drawline(0, y, 111, 55 - y); /* gray lines */
+        gray_drawline(0, y, 111, 55 - y); /* grey lines */
     }
-    for (x = 10; x < 112; x += 10)     /* vertical part */
+    for (x = 10; x < 112; x += 10)        /* vertical part */
     {
-        gray_drawline(x, 0, 111 - x, 55); /* gray lines */
+        gray_drawline(x, 0, 111 - x, 55); /* grey lines */
     }
 
     gray_set_foreground(0);
     gray_drawrect(0, 0, 112, 56);   /* black border */
 
-    /* draw gray tones */
+    /* draw grey tones */
     for (i = 0; i < 86; i++)           
     {
         x = 13 + i;
         gray_set_foreground(3 * i);
-        gray_verline(x, 6, 49);     /* vertical lines */
+        gray_vline(x, 6, 49);       /* vertical lines */
     }
 
-    gray_set_drawmode(GRAY_DRAW_INVERSE);
+    gray_set_drawmode(DRMODE_COMPLEMENT);
     gray_fillrect(13, 29, 86, 21);   /* invert rectangle (lower half) */
     gray_drawline(13, 27, 98, 27);   /* invert a line */
 
     /* show bitmaps (1 bit and 8 bit) */
-    gray_set_drawinfo(GRAY_DRAW_SOLID, 255, 100);
-    gray_drawbitmap(rockbox, 14, 13, 43, 7, 43);   /* opaque */
-    gray_set_drawinfo(GRAY_DRAW_FG, 0, -1);
-    gray_drawbitmap(showing, 58, 13, 39, 7, 39); /* transparent */
+    gray_set_drawinfo(DRMODE_SOLID, 255, 100);
+    gray_mono_bitmap(rockbox, 14, 13, 43, 7); /* opaque */
+    gray_set_drawinfo(DRMODE_FG, 0, 100);
+    gray_mono_bitmap(showing, 58, 13, 39, 7); /* transparent */
+    gray_gray_bitmap(grayscale_gray, 28, 35, 55, 7);
 
-    gray_drawgraymap(grayscale_gray, 28, 35, 55, 7, 55);
+    gray_update();
 
     time = *rb->current_tick - time;  /* end time measurement */
 
     rb->snprintf(pbuf, sizeof(pbuf), "Shades: %d, %d.%02ds", shades,
                  time / 100, time % 100);
     rb->lcd_puts(0, 0, pbuf);
-    gray_deferred_update();             /* schedule an lcd_update() */
+    gray_deferred_lcd_update();       /* schedule an lcd_update() */
 
     /* drawing is now finished, play around with scrolling 
      * until you press OFF or connect USB
      */
+    gray_set_background(255);
     while (true)
     {
         scroll_amount = 1;
-        black_border = false;
 
         button = rb->button_get(true);
 
@@ -213,31 +214,49 @@ int main(void)
             return PLUGIN_USB_CONNECTED;
 
         if (button & GRAYSCALE_SHIFT)
-            black_border = true;
-            
+        {
+            if (!black_border)
+            {
+                gray_set_background(0);
+                black_border = true;
+            }
+        }
+        else
+        {
+            if (black_border)
+            {
+                gray_set_background(255);
+                black_border = false;
+            }
+        }
+
         if (button & BUTTON_REPEAT)
             scroll_amount = 4;
 
-        switch(button & ~(GRAYSCALE_SHIFT | BUTTON_REPEAT))
+        switch (button & ~(GRAYSCALE_SHIFT | BUTTON_REPEAT))
         {
             case BUTTON_LEFT:
 
-                gray_scroll_left(scroll_amount, black_border); /* scroll left */
+                gray_scroll_left(scroll_amount);  /* scroll left */
+                gray_update();
                 break;
 
             case BUTTON_RIGHT:
 
-                gray_scroll_right(scroll_amount, black_border); /* scroll right */
+                gray_scroll_right(scroll_amount); /* scroll right */
+                gray_update();
                 break;
 
             case BUTTON_UP:
 
-                gray_scroll_up(scroll_amount, black_border); /* scroll up */
+                gray_scroll_up(scroll_amount);    /* scroll up */
+                gray_update();
                 break;
 
             case BUTTON_DOWN:
 
-                gray_scroll_down(scroll_amount, black_border); /* scroll down */
+                gray_scroll_down(scroll_amount);  /* scroll down */
+                gray_update();
                 break;
 
             case BUTTON_OFF:
@@ -259,9 +278,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     rb = api; // copy to global api pointer
     (void)parameter;
-
-    /* This plugin uses the grayscale framework, so initialize */
-    gray_init(api);
 
     return main();
 }
