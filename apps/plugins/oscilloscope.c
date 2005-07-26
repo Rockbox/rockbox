@@ -192,7 +192,7 @@ void cleanup(void *parameter)
 {
     (void)parameter;
 
-    rb->plugin_unregister_timer();
+    rb->timer_unregister();
 }
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
@@ -205,7 +205,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     (void)parameter;
     rb = api;
     
-    rb->plugin_register_timer(FREQ / 67, 1, timer_isr);
+    rb->timer_register(1, NULL, FREQ / 67, 1, timer_isr);
 
     while (!exit)
     {

@@ -101,6 +101,7 @@ hwcompat.c
 kernel.c
 rolo.c
 thread.c
+timer.c
 crt0.S
 #endif  
 mp3_playback.c

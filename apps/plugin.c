@@ -45,6 +45,7 @@
 #include "mp3data.h"
 #include "powermgmt.h"
 #include "system.h"
+#include "timer.h"
 #include "sound.h"
 #include "database.h"
 #if (CONFIG_HWCODEC == MASNONE)
@@ -74,9 +75,6 @@ extern unsigned char pluginbuf[];
 /* for actual plugins only, not for codecs */
 static bool plugin_loaded = false;
 static int  plugin_size = 0;
-#ifndef SIMULATOR
-static void (*pfn_timer)(void) = NULL; /* user timer handler */
-#endif
 static void (*pfn_tsr_exit)(void) = NULL; /* TSR exit callback */
 
 static int plugin_test(int api_version, int model, int memsize);
@@ -116,6 +114,14 @@ static const struct plugin_api rockbox_api = {
     lcd_fillrect,
     lcd_mono_bitmap_part,
     lcd_mono_bitmap,
+#if LCD_DEPTH > 1
+    lcd_set_foreground,
+    lcd_get_foreground,
+    lcd_set_background,
+    lcd_get_background,
+    lcd_bitmap_part,
+    lcd_bitmap,
+#endif
     lcd_putsxy,
     lcd_puts_style,
     lcd_puts_scroll_style,
@@ -126,6 +132,7 @@ static const struct plugin_api rockbox_api = {
     scrollbar,
     checkbox,
     font_get,
+    font_getstringsize,
 #endif
     backlight_on,
     backlight_off,
@@ -211,6 +218,9 @@ static const struct plugin_api rockbox_api = {
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     cpu_boost,
 #endif
+    timer_register,
+    timer_unregister,
+    timer_set_period,
 #endif
 
     /* strings and memory */
@@ -220,6 +230,7 @@ static const struct plugin_api rockbox_api = {
     strlen,
     strrchr,
     strcmp,
+    strncmp,
     strcasecmp,
     strncasecmp,
     memset,
@@ -289,6 +300,10 @@ static const struct plugin_api rockbox_api = {
     &tagdb_fd,
     &tagdb_initialized,
     tagdb_init,
+    /* runtime database */
+    &rundbheader,
+    &rundb_fd,
+    &rundb_initialized,            
 
     /* misc */
     srand,
@@ -299,13 +314,12 @@ static const struct plugin_api rockbox_api = {
     set_time,
     plugin_get_buffer,
     plugin_get_audio_buffer,
-#ifndef SIMULATOR
-    plugin_register_timer,
-    plugin_unregister_timer,
-#endif
     plugin_tsr,
 #if defined(DEBUG) || defined(SIMULATOR)
     debugf,
+#endif
+#ifdef ROCKBOX_HAS_LOGF
+    logf,
 #endif
     &global_settings,
     mp3info,
@@ -326,24 +340,6 @@ static const struct plugin_api rockbox_api = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
-#ifdef ROCKBOX_HAS_LOGF
-    logf,
-#endif
-    &rundbheader,
-    &rundb_fd,
-    &rundb_initialized,            
-    strncmp,
-#if LCD_DEPTH > 1
-    lcd_set_foreground,
-    lcd_get_foreground,
-    lcd_set_background,
-    lcd_get_background,
-    lcd_bitmap_part,
-    lcd_bitmap,
-#endif
-#ifdef HAVE_LCD_BITMAP
-    font_getstringsize,
-#endif
 };
 
 int plugin_load(const char* plugin, void* parameter)
@@ -485,68 +481,6 @@ void* plugin_get_audio_buffer(int* buffer_size)
     *buffer_size = audiobufend - audiobuf;
     return audiobuf;
 }
-
-#ifndef SIMULATOR
-/* Register a periodic time callback, called every "cycles" CPU clocks. 
-   Note that this function will be called in interrupt context! */
-int plugin_register_timer(int cycles, int prio, void (*timer_callback)(void))
-{
-    int phi = 0; /* bits for the prescaler */
-    int prescale = 1;
-
-    while (cycles > 0x10000)
-    {   /* work out the smallest prescaler that makes it fit */
-        phi++;
-        prescale *= 2;
-        cycles /= 2;
-    }
-
-    if (prescale > 8 || cycles == 0 || prio < 1 || prio > 15)
-        return 0; /* error, we can't do such period, bad argument */
-        
-    backlight_allow_timer(false); /* stop backlight from messing with the timer */
-#if CONFIG_CPU == SH7034
-    and_b(~0x10, &TSTR); /* Stop the timer 4 */
-    and_b(~0x10, &TSNC); /* No synchronization */
-    and_b(~0x10, &TMDR); /* Operate normally */
-
-    pfn_timer = timer_callback; /* install 2nd level ISR */
-
-    and_b(~0x01, &TSR4);
-    TIER4 = 0xF9; /* Enable GRA match interrupt */
-
-    GRA4 = (unsigned short)(cycles - 1);
-    TCR4 = 0x20 | phi; /* clear at GRA match, set prescaler */
-    IPRD = (IPRD & 0xFF0F) | prio << 4; /* interrupt priority */
-    or_b(0x10, &TSTR); /* start timer 4 */
-#else
-    pfn_timer = timer_callback;
-#endif
-    return cycles * prescale; /* return the actual period, in CPU clocks */
-}
-
-/* disable the user timer */
-void plugin_unregister_timer(void)
-{
-#if CONFIG_CPU == SH7034
-    and_b(~0x10, &TSTR); /* stop the timer 4 */
-    IPRD = (IPRD & 0xFF0F); /* disable interrupt */
-    pfn_timer = NULL;
-#endif
-    backlight_allow_timer(true);
-}
-
-#if CONFIG_CPU == SH7034
-/* interrupt handler for user timer */
-#pragma interrupt
-void IMIA4(void)
-{
-    if (pfn_timer != NULL)
-        pfn_timer(); /* call the user timer function */
-    and_b(~0x01, &TSR4); /* clear the interrupt */
-}
-#endif /* CONFIG_CPU == SH7034 */
-#endif /* #ifndef SIMULATOR */
 
 /* The plugin wants to stay resident after leaving its main function, e.g.
    runs from timer or own thread. The callback is registered to later 

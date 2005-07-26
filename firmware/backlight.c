@@ -27,6 +27,7 @@
 #include "usb.h"
 #include "power.h"
 #include "system.h"
+#include "timer.h"
 
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
@@ -66,7 +67,6 @@ static unsigned int remote_backlight_timeout = 5;
 static const char backlight_fade_value[8] = { 0, 1, 2, 4, 6, 8, 10, 20 };
 static int fade_in_count = 1;
 static int fade_out_count = 4;
-static bool timer_allowed = true;
 
 static bool bl_timer_active = false;
 static int bl_dim_current = BL_PWM_COUNT;
@@ -75,44 +75,20 @@ static int bl_pwm_counter = 0;
 static volatile int bl_cycle_counter = 0;
 static enum {DIM_STATE_START, DIM_STATE_MAIN} bl_dim_state = DIM_STATE_START;
 
-void backlight_start_timer(void)
-{
-    unsigned int count;
-    
-    if (bl_timer_active)
-        return ;
-        
-    /* Prevent cpu frequency changes while dimming. */
-    cpu_boost(true);
-    count = 1;
-    bl_timer_active = true;
-
-    /* We are using timer 1 */
-    TRR1 = count; /* The reference count */
-    TCN1 = 0; /* reset the timer */
-    TMR1 = 0x011d; /* prescaler=2, restart, CLK/16, enabled */
-
-    TER1 = 0xff; /* Clear all events */
-    
-    /* ICR2 (Timer2) */
-    ICR0 = (ICR0 & 0xffff00ff) | 0x00009000; /* Interrupt on level 4.0 */
-    IMR &= ~(1<<10);
-}
-
-void TIMER1(void) __attribute__ ((interrupt_handler));
-void TIMER1(void)
+static void backlight_isr(void)
 {
     int timer_period;
     bool idle = false;
-
-    timer_period = FREQ / 2000 * BL_PWM_INTERVAL / 1000 / 32;
-    switch (bl_dim_state) {
+    
+    timer_period = FREQ / 1000 * BL_PWM_INTERVAL / 1000;
+    switch (bl_dim_state) 
+    {
       /* New cycle */
       case DIM_STATE_START:
         bl_pwm_counter = 0;
         bl_cycle_counter++;
         
-        if (bl_dim_current > 0 && bl_dim_current < BL_PWM_COUNT) 
+        if (bl_dim_current > 0 && bl_dim_current < BL_PWM_COUNT)
         {
             and_l(~0x00020000, &GPIO1_OUT);
             bl_pwm_counter = bl_dim_current;
@@ -125,6 +101,7 @@ void TIMER1(void)
                 and_l(~0x00020000, &GPIO1_OUT);
             else
                 or_l(0x00020000, &GPIO1_OUT);
+
             if (bl_dim_current == bl_dim_target)
                 idle = true;
         }
@@ -137,9 +114,8 @@ void TIMER1(void)
         bl_dim_state = DIM_STATE_START;
         timer_period = timer_period * (BL_PWM_COUNT - bl_pwm_counter) / BL_PWM_COUNT;
         break ;
-
     }
-    
+
     if ((bl_dim_target > bl_dim_current) && (bl_cycle_counter >= fade_in_count))
     {
         bl_dim_current++;
@@ -155,37 +131,50 @@ void TIMER1(void)
     if (idle) 
     {
         cpu_boost(false);
+        timer_unregister();
         bl_timer_active = false;
-        TMR1 = 0;
     }
-
-    TRR1 = timer_period;
-    TCN1 = 0;
-    TER1 = 0xff; /* Clear all events */
+    else
+        timer_set_period(timer_period);
 }
 
-static void __backlight_dim(int value)
+static void backlight_switch(void)
+{
+    if (bl_dim_target > (BL_PWM_COUNT/2))
+    {
+        and_l(~0x00020000, &GPIO1_OUT);
+        bl_dim_current = BL_PWM_COUNT;
+    }
+    else
+    {
+        or_l(0x00020000, &GPIO1_OUT);
+        bl_dim_current = 0;
+    }
+}
+
+static void backlight_release_timer(void)
+{
+    cpu_boost(false);
+    timer_unregister();
+    bl_timer_active = false;
+    backlight_switch();
+}
+
+static void backlight_dim(int value)
 {
     bl_dim_target = value;
-    backlight_start_timer();
-}
 
-void backlight_allow_timer(bool on)
-{
-    timer_allowed = on;
+    if (bl_timer_active)
+        return ;
 
-    if (!timer_allowed && bl_timer_active)
+    if (timer_register(0, backlight_release_timer, 1, 0, backlight_isr))
     {
-        cpu_boost(false);
-        bl_dim_current = bl_dim_target;
-        bl_timer_active = false;
-        TMR1 = 0;
-
-        if (bl_dim_current)
-            and_l(~0x00020000, &GPIO1_OUT);
-        else
-            or_l(0x00020000, &GPIO1_OUT);
+        /* Prevent cpu frequency changes while dimming. */
+        cpu_boost(true);
+        bl_timer_active = true;
     }
+    else
+        backlight_switch();
 }
 
 void backlight_set_fade_in(int index)
@@ -202,8 +191,8 @@ void backlight_set_fade_out(int index)
 static void __backlight_off(void)
 {
 #if CONFIG_BACKLIGHT == BL_IRIVER
-    if (timer_allowed && (fade_out_count > 0))
-        __backlight_dim(0);
+    if (fade_out_count > 0)
+        backlight_dim(0);
     else
     {
         bl_dim_target = bl_dim_current = 0;
@@ -224,8 +213,8 @@ static void __backlight_off(void)
 static void __backlight_on(void)
 {
 #if CONFIG_BACKLIGHT == BL_IRIVER
-    if (timer_allowed && (fade_in_count > 0))
-        __backlight_dim(BL_PWM_COUNT);
+    if (fade_in_count > 0)
+        backlight_dim(BL_PWM_COUNT);
     else
     {
         bl_dim_target = bl_dim_current = BL_PWM_COUNT;

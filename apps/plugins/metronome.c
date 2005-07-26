@@ -235,7 +235,7 @@ void cleanup(void *parameter)
 {
     (void)parameter;
 
-    rb->plugin_unregister_timer();
+    rb->timer_unregister();
     rb->mp3_play_stop(); /* stop audio ISR */
     led(0);
 }
@@ -278,7 +278,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
         rb->mp3_play_stop(); // stop audio ISR
 
     calc_period();
-    rb->plugin_register_timer(((*rb->cpu_frequency)/1024), 1, timer_callback);
+    rb->timer_register(1, NULL, (*rb->cpu_frequency)/1024, 1, timer_callback);
 
     draw_display();
 

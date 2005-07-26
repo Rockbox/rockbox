@@ -388,7 +388,7 @@ void timer4_isr(void)
             else
             {
                 gPlay.bVideoUnderrun = true;
-                rb->plugin_unregister_timer(); // disable ourselves
+                rb->timer_unregister(); // disable ourselves
                 return; // no data available
             }
         }
@@ -490,7 +490,7 @@ int SeekTo(int fd, int nPos)
     if (gPlay.bHasAudio)
         rb->mp3_play_stop(); // stop audio ISR
     if (gPlay.bHasVideo)
-        rb->plugin_unregister_timer(); // stop the timer
+        rb->timer_unregister(); // stop the timer
 
     rb->lseek(fd, nPos, SEEK_SET);
 
@@ -538,9 +538,9 @@ int SeekTo(int fd, int nPos)
         gPlay.bVideoUnderrun = false;
         // start display interrupt
 #if FREQ == 12000000 /* Ondio speed kludge */
-        rb->plugin_register_timer(gPlay.nFrameTimeAdjusted, 1, timer4_isr);
+        rb->timer_register(1, NULL, gPlay.nFrameTimeAdjusted, 1, timer4_isr);
 #else
-        rb->plugin_register_timer(gFileHdr.video_frametime, 1, timer4_isr);
+        rb->timer_register(1, NULL, gFileHdr.video_frametime, 1, timer4_isr);
 #endif
     }
 
@@ -553,7 +553,7 @@ void Cleanup(void *fd)
     rb->close(*(int*)fd); // close the file
 
     if (gPlay.bHasVideo)
-        rb->plugin_unregister_timer(); // stop video ISR, now I can use the display again
+        rb->timer_unregister(); // stop video ISR, now I can use the display again
 
     if (gPlay.bHasAudio)
         rb->mp3_play_stop(); // stop audio ISR
@@ -705,7 +705,7 @@ int PlayTick(int fd)
                 if (gPlay.bHasAudio)
                     rb->mp3_play_pause(false); // pause audio
                 if (gPlay.bHasVideo)
-                    rb->plugin_unregister_timer(); // stop the timer
+                    rb->timer_unregister(); // stop the timer
             }
             else if (gPlay.state == paused)
             {
@@ -719,10 +719,10 @@ int PlayTick(int fd)
                 if (gPlay.bHasVideo)
                 {   // start the video
 #if FREQ == 12000000 /* Ondio speed kludge */
-                    rb->plugin_register_timer(
+                    rb->timer_register(1, NULL,
                         gPlay.nFrameTimeAdjusted, 1, timer4_isr);
 #else
-                    rb->plugin_register_timer(
+                    rb->timer_register(1, NULL,
                         gFileHdr.video_frametime, 1, timer4_isr);
 #endif
                 }

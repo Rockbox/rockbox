@@ -48,6 +48,7 @@
 #include "pcm_playback.h"
 #endif
 #include "settings.h"
+#include "timer.h"
 #include "thread.h"
 #include "playlist.h"
 #ifdef HAVE_LCD_BITMAP
@@ -87,12 +88,12 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 46
+#define PLUGIN_API_VERSION 47
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 42
+#define PLUGIN_MIN_API_VERSION 47
 
 /* plugin return codes */
 enum plugin_status {
@@ -168,6 +169,23 @@ struct plugin_api {
                                  int stride, int x, int y, int width, int height);
     void (*lcd_mono_bitmap)(const unsigned char *src, int x, int y,
                             int width, int height);
+#if LCD_DEPTH > 1
+#ifdef HAVE_LCD_COLOR
+    void       (*lcd_set_foreground)(struct rgb color);
+    struct rgb (*lcd_get_foreground)(void);
+    void       (*lcd_set_background)(struct rgb color);
+    struct rgb (*lcd_get_background)(void);
+#else
+    void (*lcd_set_foreground)(int brightness);
+    int  (*lcd_get_foreground)(void);
+    void (*lcd_set_background)(int brightness);
+    int  (*lcd_get_background)(void);
+#endif
+    void (*lcd_bitmap_part)(const unsigned char *src, int src_x, int src_y,
+                            int stride, int x, int y, int width, int height);
+    void (*lcd_bitmap)(const unsigned char *src, int x, int y, int width,
+                       int height);
+#endif
     void (*lcd_putsxy)(int x, int y, const unsigned char *string);
     void (*lcd_puts_style)(int x, int y, const unsigned char *str, int style);
     void (*lcd_puts_scroll_style)(int x, int y, const unsigned char* string,
@@ -181,6 +199,8 @@ struct plugin_api {
                       int min_shown, int max_shown, int orientation);
     void (*checkbox)(int x, int y, int width, int height, bool checked);
     struct font* (*font_get)(int font);
+    int  (*font_getstringsize)(const unsigned char *str, int *w, int *h,
+                               int fontnumber);
 #endif
     void (*backlight_on)(void);
     void (*backlight_off)(void);
@@ -272,6 +292,11 @@ struct plugin_api {
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     void (*cpu_boost)(bool on_off);
 #endif
+    bool (*timer_register)(int reg_prio, void (*unregister_callback)(void),
+                           long cycles, int int_prio,
+                           void (*timer_callback)(void));
+    void (*timer_unregister)(void);
+    bool (*timer_set_period)(long count);
 #endif
 
     /* strings and memory */
@@ -281,6 +306,7 @@ struct plugin_api {
     size_t (*strlen)(const char *str);
     char * (*strrchr)(const char *s, int c);
     int (*strcmp)(const char *, const char *);
+    int (*strncmp)(const char *, const char *, size_t);
     int (*strcasecmp)(const char *, const char *);
     int (*strncasecmp)(const char *s1, const char *s2, size_t n);
     void* (*memset)(void *dst, int c, size_t length);
@@ -350,6 +376,10 @@ struct plugin_api {
     int *tagdb_fd;
     int *tagdb_initialized;
     int (*tagdb_init) (void);
+    /* runtime database */
+    struct rundb_header *rundbheader;
+    int *rundb_fd;
+    int *rundb_initialized;            
 
     /* misc */
     void (*srand)(unsigned int seed);
@@ -361,13 +391,12 @@ struct plugin_api {
     int  (*set_time)(const struct tm *tm);
     void* (*plugin_get_buffer)(int* buffer_size);
     void* (*plugin_get_audio_buffer)(int* buffer_size);
-#ifndef SIMULATOR
-    int (*plugin_register_timer)(int cycles, int prio, void (*timer_callback)(void));
-    void (*plugin_unregister_timer)(void);
-#endif
     void (*plugin_tsr)(void (*exit_callback)(void));
 #if defined(DEBUG) || defined(SIMULATOR)
     void (*debugf)(const char *fmt, ...);
+#endif
+#ifdef ROCKBOX_HAS_LOGF
+    void (*logf)(const char *fmt, ...);
 #endif
     struct user_settings* global_settings;
     bool (*mp3info)(struct mp3entry *entry, const char *filename, bool v1first);
@@ -395,41 +424,11 @@ struct plugin_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */     
        
-#ifdef ROCKBOX_HAS_LOGF
-    void (*logf)(const char *fmt, ...);
-#endif
-    struct rundb_header *rundbheader;
-    int *rundb_fd;
-    int *rundb_initialized;            
-    int (*strncmp)(const char *, const char *, size_t);
-#if LCD_DEPTH > 1
-#ifdef HAVE_LCD_COLOR
-    void       (*lcd_set_foreground)(struct rgb color);
-    struct rgb (*lcd_get_foreground)(void);
-    void       (*lcd_set_background)(struct rgb color);
-    struct rgb (*lcd_get_background)(void);
-#else
-    void (*lcd_set_foreground)(int brightness);
-    int  (*lcd_get_foreground)(void);
-    void (*lcd_set_background)(int brightness);
-    int  (*lcd_get_background)(void);
-#endif
-    void (*lcd_bitmap_part)(const unsigned char *src, int src_x, int src_y,
-                            int stride, int x, int y, int width, int height);
-    void (*lcd_bitmap)(const unsigned char *src, int x, int y, int width,
-                       int height);
-#endif
-#ifdef HAVE_LCD_BITMAP
-    int (*font_getstringsize)(const unsigned char *str, int *w, int *h,
-                              int fontnumber);
-#endif
 };
 
 int plugin_load(const char* plugin, void* parameter);
 void* plugin_get_buffer(int *buffer_size);
 void* plugin_get_audio_buffer(int *buffer_size);
-int plugin_register_timer(int cycles, int prio, void (*timer_callback)(void));
-void plugin_unregister_timer(void);
 void plugin_tsr(void (*exit_callback)(void));
 
 /* defined by the plugin */

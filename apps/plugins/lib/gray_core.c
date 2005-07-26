@@ -257,11 +257,11 @@ void gray_show(bool enable)
     if (enable)
     {
         _gray_info.flags |= _GRAY_RUNNING;
-        _gray_rb->plugin_register_timer(FREQ / 67, 1, _timer_isr);
+        _gray_rb->timer_register(1, NULL, FREQ / 67, 1, _timer_isr);
     }
     else
     {
-        _gray_rb->plugin_unregister_timer();
+        _gray_rb->timer_unregister();
         _gray_info.flags &= ~_GRAY_RUNNING;
         _gray_rb->lcd_update(); /* restore whatever there was before */
     }

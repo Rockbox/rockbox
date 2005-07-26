@@ -230,15 +230,15 @@ void timer_set_mode(int mode)
 
     if (mode == TM_RX_TIMEOUT)
     {
-        rb->plugin_register_timer(gTimer.timeout, 11, timer4_isr);
+        rb->timer_register(1, NULL, gTimer.timeout, 11, timer4_isr);
     }
     else if (mode == TM_TRANSMIT)
     {
-        rb->plugin_register_timer(gTimer.transmit, 14, timer4_isr);
+        rb->timer_register(1, NULL, gTimer.transmit, 14, timer4_isr);
     }
     else
     {
-        rb->plugin_unregister_timer();
+        rb->timer_unregister();
     }
 }
 
@@ -252,7 +252,7 @@ void timer4_isr(void) /* IMIA4 */
         break;
     case TM_RX_TIMEOUT:
         receive_timeout_isr();
-        rb->plugin_unregister_timer(); /* single shot */
+        rb->timer_unregister(); /* single shot */
         break;
     default:
         timer_set_mode(TM_OFF); /* spurious interrupt */
