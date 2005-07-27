@@ -260,9 +260,9 @@ void gray_ub_scroll_up(int count)
         asm (
             "mov     #0,r6       \n"  /* x = 0 */
             "mova    .su_shifttbl,r0 \n"  /* calculate jump destination for */
-            "mov.b   @(r0,%5),%5 \n"  /* shift amount from table */
+            "mov.b   @(r0,%[cnt]),%[cnt] \n"  /* shift amount from table */
             "bra     .su_cloop   \n"  /* skip table */
-            "add     r0,%5       \n"
+            "add     r0,%[cnt]   \n"
 
             ".align  2           \n"
         ".su_shifttbl:           \n"  /* shift jump offset table */
@@ -276,7 +276,7 @@ void gray_ub_scroll_up(int count)
             ".byte   .su_shift7 - .su_shifttbl \n"
 
         ".su_cloop:              \n"  /* repeat for every column */
-            "mov     %1,r2       \n"  /* get start address */
+            "mov     %[addr],r2  \n"  /* get start address */
             "mov     #0,r3       \n"  /* current_plane = 0 */
 
         ".su_oloop:              \n"  /* repeat for every bitplane */
@@ -285,12 +285,12 @@ void gray_ub_scroll_up(int count)
             "mov     #0,r1       \n"  /* fill with zero */
 
         ".su_iloop:              \n"  /* repeat for all rows */
-            "sub     %2,r4       \n"  /* address -= width */
+            "sub     %[wide],r4  \n"  /* address -= width */
             "mov.b   @r4,r0      \n"  /* get data byte */
             "shll8   r1          \n"  /* old data to 2nd byte */
             "extu.b  r0,r0       \n"  /* extend unsigned */
             "or      r1,r0       \n"  /* combine old data */
-            "jmp     @%5         \n"  /* jump into shift "path" */
+            "jmp     @%[cnt]     \n"  /* jump into shift "path" */
             "extu.b  r0,r1       \n"  /* store data for next round */
 
         ".su_shift6:             \n"  /* shift right by 0..7 bits */
@@ -312,28 +312,76 @@ void gray_ub_scroll_up(int count)
 
             "mov.b   r0,@r4      \n"  /* store data */
             "add     #1,r5       \n"  /* current_row++ */
-            "cmp/hi  r5,%3       \n"  /* current_row < bheight - shift ? */
+            "cmp/hi  r5,%[rows]  \n"  /* current_row < bheight - shift ? */
             "bt      .su_iloop   \n"
 
-            "add     %4,r2       \n"  /* start_address += plane_size */
+            "add     %[psiz],r2  \n"  /* start_address += plane_size */
             "add     #1,r3       \n"  /* current_plane++ */
-            "cmp/hi  r3,%0       \n"  /* current_plane < depth ? */
+            "cmp/hi  r3,%[dpth]  \n"  /* current_plane < depth ? */
             "bt      .su_oloop   \n"
 
-            "add     #1,%1       \n"  /* start_address++ */
+            "add     #1,%[addr]  \n"  /* start_address++ */
             "add     #1,r6       \n"  /* x++ */
-            "cmp/hi  r6,%2       \n"  /* x < width ? */
+            "cmp/hi  r6,%[wide]  \n"  /* x < width ? */
             "bt      .su_cloop   \n"
             : /* outputs */
             : /* inputs */
-            /* %0 */ "r"(_gray_info.depth),
-            /* %1 */ "r"(_gray_info.plane_data + _gray_info.plane_size - blockshift),
-            /* %2 */ "r"(_gray_info.width),
-            /* %3 */ "r"(_gray_info.bheight - shift),
-            /* %4 */ "r"(_gray_info.plane_size),
-            /* %5 */ "r"(count)
+            [dpth]"r"(_gray_info.depth),
+            [addr]"r"(_gray_info.plane_data + _gray_info.plane_size - blockshift),
+            [wide]"r"(_gray_info.width),
+            [rows]"r"(_gray_info.bheight - shift),
+            [psiz]"r"(_gray_info.plane_size),
+            [cnt] "r"(count)
             : /* clobbers */
             "r0", "r1", "r2", "r3", "r4", "r5", "r6"
+        );
+#elif defined(CPU_COLDFIRE) && (LCD_DEPTH == 2)
+        /* scroll column by column to minimize flicker */
+        asm (
+            "move.l  %[wide],%%d4\n"  /* columns = width */
+            "add.l   %[cnt],%[cnt]   \n"  /* shift 2 bits per pixel */
+
+        ".su_cloop:              \n"  /* repeat for every column */
+            "move.l  %[addr],%%a0\n"  /* get start address */
+            "move.l  %[dpth],%%d2\n"  /* planes = depth */
+
+        ".su_oloop:              \n"  /* repeat for every bitplane */
+            "move.l  %%a0,%%a1   \n"  /* get start address */
+            "move.l  %[rows],%%d3\n"  /* rows = row_count */
+            "clr.l   %%d1        \n"  /* fill with zero */
+
+        ".su_iloop:              \n"  /* repeat for all rows */
+            "sub.l   %[wide],%%a1\n"  /* address -= width */
+
+            "clr.l   %%d0        \n"
+            "move.b  (%%a1),%%d0 \n"  /* get data byte */
+            "lsl.l   #8,%%d1     \n"  /* old data to 2nd byte */
+            "or.l    %%d1,%%d0   \n"  /* combine old data */
+            "clr.l   %%d1        \n"
+            "move.b  %%d0,%%d1   \n"  /* keep data for next round */
+            "lsr.l   %[cnt],%%d0 \n"  /* shift right */
+            "move.b  %%d0,(%%a1) \n"  /* store data */
+
+            "subq.l  #1,%%d3     \n"  /* rows-- */
+            "bne.b   .su_iloop   \n"
+
+            "add.l   %[psiz],%%a0\n"  /* start_address += plane_size */
+            "subq.l  #1,%%d2     \n"  /* planes-- */
+            "bne.b   .su_oloop   \n"
+
+            "lea.l   (1,%[addr]),%[addr] \n"  /* start_address++ */
+            "subq.l  #1,%%d4     \n"  /* columns-- */
+            "bne.b   .su_cloop   \n"
+            : /* outputs */
+            : /* inputs */
+            [psiz]"r"(_gray_info.plane_size),
+            [dpth]"r"(_gray_info.depth),
+            [wide]"r"(_gray_info.width),
+            [rows]"r"(_gray_info.bheight - shift),
+            [addr]"a"(_gray_info.plane_data + _gray_info.plane_size - blockshift),
+            [cnt] "d"(count)
+            : /* clobbers */
+            "a0", "a1", "d0", "d1", "d2", "d3", "d4"
         );
 #endif
     }
@@ -396,9 +444,9 @@ void gray_ub_scroll_down(int count)
         asm (
             "mov     #0,r6       \n"  /* x = 0 */
             "mova    .sd_shifttbl,r0 \n"  /* calculate jump destination for */
-            "mov.b   @(r0,%5),%5 \n"  /* shift amount from table */
+            "mov.b   @(r0,%[cnt]),%[cnt] \n"  /* shift amount from table */
             "bra     .sd_cloop   \n"  /* skip table */
-            "add     r0,%5       \n"
+            "add     r0,%[cnt]   \n"
 
             ".align  2           \n"
         ".sd_shifttbl:           \n"  /* shift jump offset table */
@@ -412,7 +460,7 @@ void gray_ub_scroll_down(int count)
             ".byte   .sd_shift7 - .sd_shifttbl \n"
 
         ".sd_cloop:              \n"  /* repeat for every column */
-            "mov     %1,r2       \n"  /* get start address */
+            "mov     %[addr],r2  \n"  /* get start address */
             "mov     #0,r3       \n"  /* current_plane = 0 */
 
         ".sd_oloop:              \n"  /* repeat for every bitplane */
@@ -423,7 +471,7 @@ void gray_ub_scroll_down(int count)
         ".sd_iloop:              \n"  /* repeat for all rows */
             "shlr8   r1          \n"  /* shift right to get residue */
             "mov.b   @r4,r0      \n"  /* get data byte */
-            "jmp     @%5         \n"  /* jump into shift "path" */
+            "jmp     @%[cnt]     \n"  /* jump into shift "path" */
             "extu.b  r0,r0       \n"  /* extend unsigned */
 
         ".sd_shift6:             \n"  /* shift left by 0..7 bits */
@@ -445,30 +493,75 @@ void gray_ub_scroll_down(int count)
 
             "or      r0,r1       \n"  /* combine with last residue */
             "mov.b   r1,@r4      \n"  /* store data */
-            "add     %2,r4       \n"  /* address += width */
+            "add     %[wide],r4  \n"  /* address += width */
             "add     #1,r5       \n"  /* current_row++ */
-            "cmp/hi  r5,%3       \n"  /* current_row < bheight - shift ? */
+            "cmp/hi  r5,%[rows]  \n"  /* current_row < bheight - shift ? */
             "bt      .sd_iloop   \n"
 
-            "add     %4,r2       \n"  /* start_address += plane_size */
+            "add     %[psiz],r2  \n"  /* start_address += plane_size */
             "add     #1,r3       \n"  /* current_plane++ */
-            "cmp/hi  r3,%0       \n"  /* current_plane < depth ? */
+            "cmp/hi  r3,%[dpth]  \n"  /* current_plane < depth ? */
             "bt      .sd_oloop   \n"
 
-            "add     #1,%1       \n"  /* start_address++ */
+            "add     #1,%[addr]  \n"  /* start_address++ */
             "add     #1,r6       \n"  /* x++ */
-            "cmp/hi  r6,%2       \n"  /* x < width ? */
+            "cmp/hi  r6,%[wide]  \n"  /* x < width ? */
             "bt      .sd_cloop   \n"
             : /* outputs */
             : /* inputs */
-            /* %0 */ "r"(_gray_info.depth),
-            /* %1 */ "r"(_gray_info.plane_data + blockshift),
-            /* %2 */ "r"(_gray_info.width),
-            /* %3 */ "r"(_gray_info.bheight - shift),
-            /* %4 */ "r"(_gray_info.plane_size),
-            /* %5 */ "r"(count)
+            [dpth]"r"(_gray_info.depth),
+            [addr]"r"(_gray_info.plane_data + blockshift),
+            [wide]"r"(_gray_info.width),
+            [rows]"r"(_gray_info.bheight - shift),
+            [psiz]"r"(_gray_info.plane_size),
+            [cnt] "r"(count)
             : /* clobbers */
             "r0", "r1", "r2", "r3", "r4", "r5", "r6"
+        );
+#elif defined(CPU_COLDFIRE) && (LCD_DEPTH == 2)
+        /* scroll column by column to minimize flicker */
+        asm (
+            "move.l  %[wide],%%d4\n"  /* columns = width */
+            "add.l   %[cnt],%[cnt]   \n"  /* shift 2 bits per pixel */
+
+        ".sd_cloop:              \n"  /* repeat for every column */
+            "move.l  %[addr],%%a0\n"  /* get start address */
+            "move.l  %[dpth],%%d2\n"  /* planes = depth */
+
+        ".sd_oloop:              \n"  /* repeat for every bitplane */
+            "move.l  %%a0,%%a1   \n"  /* get start address */
+            "move.l  %[rows],%%d3\n"  /* rows = row_count */
+            "clr.l   %%d1        \n"  /* fill with zero */
+
+        ".sd_iloop:              \n"  /* repeat for all rows */
+            "lsr.l   #8,%%d1     \n"  /* shift right to get residue */
+            "clr.l   %%d0        \n"
+            "move.b  (%%a1),%%d0 \n"  /* get data byte */
+            "lsl.l   %[cnt],%%d0 \n"
+            "or.l    %%d0,%%d1   \n"  /* combine with last residue */
+            "move.b  %%d1,(%%a1) \n"  /* store data */
+
+            "add.l   %[wide],%%a1\n"  /* address += width */
+            "subq.l  #1,%%d3     \n"  /* rows-- */
+            "bne.b   .sd_iloop   \n"
+
+            "add.l   %[psiz],%%a0\n"  /* start_address += plane_size */
+            "subq.l  #1,%%d2     \n"  /* planes-- */
+            "bne.b   .sd_oloop   \n"
+
+            "lea.l   (1,%[addr]),%[addr] \n"  /* start_address++ */
+            "subq.l  #1,%%d4     \n"  /* columns-- */
+            "bne.b   .sd_cloop   \n"
+            : /* outputs */
+            : /* inputs */
+            [dpth]"r"(_gray_info.depth),
+            [wide]"r"(_gray_info.width),
+            [rows]"r"(_gray_info.bheight - shift),
+            [psiz]"r"(_gray_info.plane_size),
+            [addr]"a"(_gray_info.plane_data + blockshift),
+            [cnt] "d"(count)
+            : /* clobbers */
+            "a0", "a1", "d0", "d1", "d2", "d3", "d4"
         );
 #endif
     }

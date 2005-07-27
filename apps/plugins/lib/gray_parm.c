@@ -55,7 +55,7 @@ int  gray_get_drawmode(void)
 /* Set the foreground shade for subsequent drawing operations */
 void gray_set_foreground(int brightness)
 {
-    unsigned data = MULU16(_LEVEL_FAC * _gray_info.depth, brightness & 0xFF) + 127;
+    unsigned data = MULU16(_gray_info.depth, brightness & 0xFF) + 127;
 
     _gray_info.fg_brightness = (data + (data >> 8)) >> 8; /* approx. data / 255 */
 }
@@ -63,14 +63,14 @@ void gray_set_foreground(int brightness)
 /* Return the current foreground shade */
 int  gray_get_foreground(void)
 {
-    return (_gray_info.fg_brightness * 255 + ((_LEVEL_FAC * _gray_info.depth) >> 1))
-           / (_LEVEL_FAC * _gray_info.depth);
+    return (_gray_info.fg_brightness * 255 + (_gray_info.depth >> 1))
+           / _gray_info.depth;
 }
 
 /* Set the background shade for subsequent drawing operations */
 void gray_set_background(int brightness)
 {
-    unsigned data = MULU16(_LEVEL_FAC * _gray_info.depth, brightness & 0xFF) + 127;
+    unsigned data = MULU16(_gray_info.depth, brightness & 0xFF) + 127;
 
     _gray_info.bg_brightness = (data + (data >> 8)) >> 8; /* approx. data / 255 */
 }
@@ -78,8 +78,8 @@ void gray_set_background(int brightness)
 /* Return the current background shade */
 int  gray_get_background(void)
 {
-    return (_gray_info.bg_brightness * 255 + ((_LEVEL_FAC * _gray_info.depth) >> 1))
-           / (_LEVEL_FAC * _gray_info.depth);
+    return (_gray_info.bg_brightness * 255 + (_gray_info.depth >> 1))
+           / _gray_info.depth;
 }
 
 /* Set draw mode, foreground and background shades at once */

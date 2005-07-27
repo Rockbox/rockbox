@@ -1,6 +1,6 @@
 configfile.c
 highscore.c
-#if (CONFIG_LCD == LCD_SSD1815) && !defined(SIMULATOR)
+#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4) && !defined(SIMULATOR)
 gray_core.c
 gray_draw.c
 gray_parm.c

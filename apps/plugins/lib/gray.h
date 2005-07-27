@@ -113,8 +113,6 @@ void gray_ub_scroll_down(int count);
 #define _PBLOCK_EXP 2
 #endif
 #define _PBLOCK (1 << _PBLOCK_EXP)
-#define _MAX_DEPTH (32 / LCD_DEPTH)
-#define _LEVEL_FAC ((1 << LCD_DEPTH) - 1)
 
 /* flag definitions */
 #define _GRAY_RUNNING          0x0001  /* greyscale overlay is running */
