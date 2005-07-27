@@ -26,15 +26,7 @@
 #ifndef SIMULATOR /* not for simulator by now */
 #include "plugin.h"
 
-#if CONFIG_LCD == LCD_SSD1815 /* only for Recorder/Ondio displays */
-/*
-  FIX:
-
-  This would be a lot nicer if it depended on HAVE_LCD_BITMAP only, but we
-  need to fix the grayscale lib for Gmini and iRiver. Either with true
-  grayscale or 1bit.
-
-*/
+#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
 #include "gray.h"
 
 /* variable button definitions */
@@ -48,8 +40,8 @@
 #define JPEG_ZOOM_OUT (BUTTON_MENU | BUTTON_REPEAT)
 
 #elif CONFIG_KEYPAD == IRIVER_H100_PAD
-#define JPEG_ZOOM_IN BUTTON_ON
-#define JPEG_ZOOM_OUT BUTTON_SELECT
+#define JPEG_ZOOM_IN BUTTON_SELECT
+#define JPEG_ZOOM_OUT BUTTON_MODE
 
 #endif
 
@@ -59,6 +51,7 @@ static struct plugin_api* rb;
 
 /* for portability of below JPEG code */
 #define MEMSET(p,v,c) rb->memset(p,v,c)
+#define MEMCPY(d,s,c) rb->memcpy(d,s,c)
 #define INLINE static inline
 #define ENDIAN_SWAP16(n) n /* only for poor little endian machines */
 
@@ -943,8 +936,8 @@ void default_huff_tbl(struct jpeg* p_jpeg)
         }
     };
 
-    p_jpeg->hufftable[0] = luma_table;
-    p_jpeg->hufftable[1] = chroma_table;
+    MEMCPY(&p_jpeg->hufftable[0], &luma_table, sizeof(luma_table));
+    MEMCPY(&p_jpeg->hufftable[1], &chroma_table, sizeof(chroma_table));
 
     return;
 }
@@ -1515,9 +1508,6 @@ int root_size;
 
 /************************* Implementation ***************************/
 
-#define ZOOM_IN  100 // return codes for below function
-#define ZOOM_OUT 101
-
 /* switch off overlay, for handling SYS_ events */
 void cleanup(void *parameter)
 {
@@ -1525,6 +1515,12 @@ void cleanup(void *parameter)
     
     gray_show(false); 
 }
+
+#define VSCROLL (LCD_HEIGHT/8)
+#define HSCROLL (LCD_WIDTH/10)
+                             
+#define ZOOM_IN  100 // return codes for below function
+#define ZOOM_OUT 101
 
 /* interactively scroll around the image */
 int scroll_bmp(struct t_disp* pdisp)
@@ -1545,7 +1541,7 @@ int scroll_bmp(struct t_disp* pdisp)
         {
         case BUTTON_LEFT:
         case BUTTON_LEFT | BUTTON_REPEAT:
-            move = MIN(10, pdisp->x);
+            move = MIN(HSCROLL, pdisp->x);
             if (move > 0)
             {
                 gray_ub_scroll_right(move); /* scroll right */
@@ -1559,7 +1555,7 @@ int scroll_bmp(struct t_disp* pdisp)
 
         case BUTTON_RIGHT:
         case BUTTON_RIGHT | BUTTON_REPEAT:
-            move = MIN(10, pdisp->width - pdisp->x - LCD_WIDTH);
+            move = MIN(HSCROLL, pdisp->width - pdisp->x - LCD_WIDTH);
             if (move > 0)
             {
                 gray_ub_scroll_left(move); /* scroll left */
@@ -1574,7 +1570,7 @@ int scroll_bmp(struct t_disp* pdisp)
 
         case BUTTON_UP:
         case BUTTON_UP | BUTTON_REPEAT:
-            move = MIN(8, pdisp->y);
+            move = MIN(VSCROLL, pdisp->y);
             if (move > 0)
             {
                 gray_ub_scroll_down(move); /* scroll down */
@@ -1588,7 +1584,7 @@ int scroll_bmp(struct t_disp* pdisp)
 
         case BUTTON_DOWN:
         case BUTTON_DOWN | BUTTON_REPEAT:
-            move = MIN(8, pdisp->height - pdisp->y - LCD_HEIGHT);
+            move = MIN(VSCROLL, pdisp->height - pdisp->y - LCD_HEIGHT);
             if (move > 0)
             {
                 gray_ub_scroll_up(move); /* scroll up */
@@ -1746,7 +1742,13 @@ struct t_disp* get_image(struct jpeg* p_jpg, int ds)
 
     /* the actual decoding */
     time = *rb->current_tick;
+#if !defined(SIMULATOR) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
+    rb->cpu_boost(true);
     status = jpeg_decode(p_jpg, p_disp->bitmap, ds, cb_progess);
+    rb->cpu_boost(false);
+#else
+    status = jpeg_decode(p_jpg, p_disp->bitmap, ds, cb_progess);
+#endif
     if (status)
     {
         rb->splash(HZ*2, true, "decode error %d", status);
@@ -1819,10 +1821,9 @@ int main(char* filename)
     buf = rb->plugin_get_audio_buffer(&buf_size); /* start munching memory */
 
 
-    /* initialize the grayscale buffer:
-     * 112 pixels wide, 8 rows (64 pixels) high, (try to) reserve
-     * 32 bitplanes for 33 shades of gray. (uses 28856 bytes)*/
-    grayscales = gray_init(rb, buf, buf_size, false, 112, 8, 32, &graysize) + 1;
+    /* initialize the grayscale buffer: 32 bitplanes for 33 shades of gray. */
+    grayscales = gray_init(rb, buf, buf_size, false, LCD_WIDTH,
+                           (LCD_HEIGHT*LCD_DEPTH/8), 32, &graysize) + 1;
     buf += graysize;
     buf_size -= graysize;
     if (grayscales < 33 || buf_size <= 0)
