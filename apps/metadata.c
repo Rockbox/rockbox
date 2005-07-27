@@ -528,7 +528,7 @@ static bool get_apetag_info (struct mp3entry *entry, int fd)
 
     if (rem_space > 1 &&
         get_apetag_item (&temp_apetag, "replaygain_track_gain", temp_buffer, rem_space)) {
-            entry->track_gain = get_replaygain (entry->track_gain_str = temp_buffer);
+            entry->track_gain = get_replaygain (entry->track_gain_string = temp_buffer);
             str_space = strlen (temp_buffer) + 1;
             temp_buffer += str_space;
             rem_space -= str_space;
@@ -536,7 +536,7 @@ static bool get_apetag_info (struct mp3entry *entry, int fd)
 
     if (rem_space > 1 &&
         get_apetag_item (&temp_apetag, "replaygain_album_gain", temp_buffer, rem_space)) {
-            entry->album_gain = get_replaygain (entry->album_gain_str = temp_buffer);
+            entry->album_gain = get_replaygain (entry->album_gain_string = temp_buffer);
             str_space = strlen (temp_buffer) + 1;
             temp_buffer += str_space;
             rem_space -= str_space;
@@ -910,37 +910,13 @@ static bool get_vorbis_comments (struct mp3entry *entry, int fd)
         } else if (strncasecmp(temp, "TRACKNUMBER=", 12) == 0) {
             name_length = 11;
             p = &(entry->track_string);
-        } else if ((strncasecmp(temp, "RG_RADIO=", 9) == 0)
-            && !entry->track_gain) {
-            entry->track_gain = get_replaygain(&temp[9]);
-            name_length = 8;
-            p = &(entry->track_gain_str);
-        } else if (strncasecmp(temp, "REPLAYGAIN_TRACK_GAIN=", 22) == 0) {
-            entry->track_gain = get_replaygain(&temp[22]);
-            name_length = 21;
-            p = &(entry->track_gain_str);
-        } else if ((strncasecmp(temp, "RG_AUDIOPHILE=", 14) == 0)
-            && !entry->album_gain) {
-            entry->album_gain = get_replaygain(&temp[14]);
-            name_length = 13;
-            p = &(entry->album_gain_str);
-        } else if (strncasecmp(temp, "REPLAYGAIN_ALBUM_GAIN=", 22) == 0) {
-            entry->album_gain = get_replaygain(&temp[22]);
-            name_length = 21;
-            p = &(entry->album_gain_str);
-        } else if ((strncasecmp(temp, "RG_PEAK=", 8) == 0)
-            && !entry->track_peak) {
-            entry->track_peak = get_replaypeak(&temp[8]);
-            p = NULL;
-        } else if (strncasecmp(temp, "REPLAYGAIN_TRACK_PEAK=", 22) == 0) {
-            entry->track_peak = get_replaypeak(&temp[22]);
-            p = NULL;
-        } else if (strncasecmp(temp, "REPLAYGAIN_ALBUM_PEAK=", 22) == 0) {
-            entry->album_peak = get_replaypeak(&temp[22]);
-            p = NULL;
         } else {
+            int value_length = parse_replaygain(temp, NULL, entry, buffer, 
+                buffer_remaining);
+            buffer_remaining -= value_length;
+            buffer += value_length;
             p = NULL;
-	}
+        }
 
         if (p) {
             comment_length -= (name_length + 1);

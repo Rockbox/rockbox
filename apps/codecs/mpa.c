@@ -118,6 +118,7 @@ enum codec_status codec_start(struct codec_api* api)
         frequency_divider = 441;
         
     ci->configure(DSP_SET_FREQUENCY, (int *)ci->id3->frequency);
+    codec_set_replaygain(ci->id3);
     
     ci->request_buffer(&size, ci->id3->first_frame_offset);
     ci->advance_buffer(size);
@@ -144,7 +145,7 @@ enum codec_status codec_start(struct codec_api* api)
         samplecount = ci->id3->length * frequency_divider / 10;
         samplesdone = ci->id3->elapsed * frequency_divider / 10;
     }
-    
+
     /* This is the decoding loop. */
     while (1) {
         ci->yield();

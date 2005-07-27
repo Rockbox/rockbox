@@ -1388,15 +1388,15 @@ bool browse_id3(void)
 #if CONFIG_HWCODEC == MASNONE
             case 11:
                 lcd_puts(0, 0, str(LANG_ID3_TRACK_GAIN));
-                lcd_puts(0, 1, id3->track_gain_str 
-                    ? id3->track_gain_str 
+                lcd_puts(0, 1, id3->track_gain_string 
+                    ? id3->track_gain_string
                     : (char*) str(LANG_ID3_NO_GAIN));
                 break;
 
             case 12:
                 lcd_puts(0, 0, str(LANG_ID3_ALBUM_GAIN));
-                lcd_puts(0, 1, id3->album_gain_str 
-                    ? id3->album_gain_str 
+                lcd_puts(0, 1, id3->album_gain_string
+                    ? id3->album_gain_string
                     : (char*) str(LANG_ID3_NO_GAIN));
                 break;
 #endif

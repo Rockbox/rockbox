@@ -20,7 +20,11 @@
 #ifndef _REPLAYGAIN_H
 #define _REPLAYGAIN_H
 
+#include "id3.h"
+
 long get_replaygain(const char* str);
 long get_replaypeak(const char* str);
+long parse_replaygain(const char* key, const char* value, 
+    struct mp3entry* entry, char* buffer, int length);
 
 #endif

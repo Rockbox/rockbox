@@ -41,6 +41,7 @@
 #include "id3.h"
 #include "mp3data.h"
 #include "system.h"
+#include "replaygain.h"
 
 #define UNSYNC(b0,b1,b2,b3) (((long)(b0 & 0x7F) << (3*7)) | \
                              ((long)(b1 & 0x7F) << (2*7)) | \
@@ -163,6 +164,10 @@ char* id3_get_codec(const struct mp3entry* id3)
         Many ID3 symbolic names come in more than one form. You can add both 
         forms, each referencing the same variable in struct mp3entry. 
         If both forms are present, the last found will be used.
+        Note that the offset can be zero, in which case no entry will be set
+        in the mp3entry struct; the frame is still read into the buffer and
+        the special processing function is called (several times, if there
+        are several frames with the same name).
             
     4. Alternately, use the TAG_LIST_ENTRY macro with
          ID3 tag symbolic name, 
@@ -305,6 +310,34 @@ static int parsegenre( struct mp3entry* entry, char* tag, int bufferpos )
     }
 }
 
+#if CONFIG_HWCODEC == MASNONE
+/* parse user defined text, looking for replaygain information. */
+static int parseuser( struct mp3entry* entry, char* tag, int bufferpos )
+{
+    char* value = NULL;
+    int desc_len = strlen(tag);
+    int value_len = 0;
+    
+    if ((tag - entry->id3v2buf + desc_len + 2) < bufferpos) {
+        /* At least part of the value was read, so we can safely try to 
+         * parse it 
+         */
+        
+        value = tag + desc_len + 1;
+        value_len = parse_replaygain(tag, value, entry, tag, 
+            bufferpos - (tag - entry->id3v2buf));
+    }
+    
+    if (value_len) {
+        bufferpos = tag - entry->id3v2buf + value_len;
+    } else {
+        bufferpos = tag - entry->id3v2buf;
+    }
+
+    return bufferpos;
+}
+#endif
+
 static const struct tag_resolver taglist[] = {
     { "TPE1", 4, offsetof(struct mp3entry, artist), NULL },
     { "TP1",  3, offsetof(struct mp3entry, artist), NULL },
@@ -319,6 +352,9 @@ static const struct tag_resolver taglist[] = {
     { "TCOM", 4, offsetof(struct mp3entry, composer), NULL },
     { "TCON", 4, offsetof(struct mp3entry, genre_string), &parsegenre },
     { "TCO",  3, offsetof(struct mp3entry, genre_string), &parsegenre },
+#if CONFIG_HWCODEC == MASNONE
+    { "TXXX", 4, 0, &parseuser },
+#endif
 };
 
 #define TAGLIST_SIZE ((int)(sizeof(taglist) / sizeof(taglist[0])))
@@ -327,12 +363,12 @@ static const struct tag_resolver taglist[] = {
    string.  If it is, we attempt to convert it to a 8-bit ASCII string
    (for valid 8-bit ASCII characters).  If it's not unicode, we leave
    it alone.  At some point we should fully support unicode strings */
-static int unicode_munge(char** string, int *len) {
+static int unicode_munge(char* string, int *len) {
    long tmp;
    bool le = false;
    int i;
-   char *str = *string;
-   char *outstr = *string;
+   char *str = string;
+   char *outstr = string;
    bool bom = false;
    int outlen;
 
@@ -343,8 +379,14 @@ static int unicode_munge(char** string, int *len) {
    
    /* Type 0x00 is ordinary ISO 8859-1 */
    if(str[0] == 0x00) {
-      (*len)--;
-      (*string)++; /* Skip the encoding type byte */
+      int i = --(*len);
+
+      /* We must move the string to the left */
+      while (i--) {
+         string[0] = string[1];
+         string++;
+      }
+
       return 0;
    }
 
@@ -352,53 +394,59 @@ static int unicode_munge(char** string, int *len) {
    if(str[0] == 0x01 || str[0] == 0x02) {
       (*len)--;
       str++;
-      tmp = BYTES2INT(0, 0, str[0], str[1]);
-
-      /* Now check if there is a BOM (zero-width non-breaking space, 0xfeff)
-         and if it is in little or big endian format */
-      if(tmp == 0xfffe) { /* Little endian? */
-	 bom = true;
-         le = true;
-         str += 2;
-	 (*len)-=2;
-      }
-
-      if(tmp == 0xfeff) { /* Big endian? */
-	 bom = true;
-         str += 2;
-	 (*len)-=2;
-      }
-
-      /* If there is no BOM (which is a specification violation),
-	 let's try to guess it. If one of the bytes is 0x00, it is
-	 probably the most significant one. */
-      if(!bom) {
-	 if(str[1] == 0)
-	    le = true;
-      }
-      
       i = 0;
-
-      outlen = *len / 2;
-      
+   
+      /* Handle frames with more than one string (needed for TXXX frames).
+       */
       do {
-         if(le) {
-            if(str[1])
-               outstr[i++] = '.';
-            else
-               outstr[i++] = str[0];
-         } else {
-            if(str[0])
-               outstr[i++] = '.';
-            else
-               outstr[i++] = str[1];
+         tmp = BYTES2INT(0, 0, str[0], str[1]);
+    
+         /* Now check if there is a BOM (zero-width non-breaking space, 0xfeff)
+            and if it is in little or big endian format */
+         if(tmp == 0xfffe) { /* Little endian? */
+            bom = true;
+            le = true;
+            str += 2;
+            (*len)-=2;
          }
+    
+         if(tmp == 0xfeff) { /* Big endian? */
+            bom = true;
+            str += 2;
+            (*len)-=2;
+         }
+    
+         /* If there is no BOM (which is a specification violation),
+    	    let's try to guess it. If one of the bytes is 0x00, it is
+    	    probably the most significant one. */
+         if(!bom) {
+            if(str[1] == 0)
+               le = true;
+         }
+      
+         outlen = *len / 2;
+
+         do {
+            if(le) {
+               if(str[1])
+                  outstr[i++] = '.';
+               else
+                  outstr[i++] = str[0];
+            } else {
+               if(str[0])
+                  outstr[i++] = '.';
+               else
+                  outstr[i++] = str[1];
+            }
+            str += 2;
+         } while((str[0] || str[1]) && (i < outlen));
+
          str += 2;
-      } while((str[0] || str[1]) && (i < outlen));
+         outstr[i++] = 0; /* Terminate the string */
+      } while(i < outlen);
 
-      *len = i;
+      *len = i - 1;
 
-      outstr[i] = 0; /* Terminate the string */
       return 0;
    }
 
@@ -686,29 +734,33 @@ static void setid3v2title(int fd, struct mp3entry *entry)
 
         for (i=0; i<TAGLIST_SIZE; i++) {
             const struct tag_resolver* tr = &taglist[i];
-            char** ptag =  (char**) (((char*)entry) + tr->offset);
+            char** ptag = tr->offset ? (char**) (((char*)entry) + tr->offset)
+                : NULL;
             char* tag;
             
-            if( !*ptag && !memcmp( header, tr->tag, tr->tag_length ) ) { 
-
+            if( (!ptag || !*ptag) && !memcmp( header, tr->tag, tr->tag_length ) ) { 
+                
                 /* found a tag matching one in tagList, and not yet filled */
+                tag = buffer + bufferpos;
+
                 if(global_unsynch && version <= ID3_VER_2_3)
-                    bytesread = read_unsynched(fd, buffer + bufferpos,
-                                               framelen);
+                    bytesread = read_unsynched(fd, tag, framelen);
                 else
-                    bytesread = read(fd, buffer + bufferpos, framelen);
+                    bytesread = read(fd, tag, framelen);
                 
                 if( bytesread != framelen )
                     return;
                 
                 size -= bytesread;
-                *ptag = buffer + bufferpos;
-
-                if(unsynch || (global_unsynch && version >= ID3_VER_2_4))
-                    bytesread = unsynchronize_frame(*ptag, bytesread);
                 
-                unicode_munge( ptag, &bytesread );
-                tag = *ptag; 
+                if(unsynch || (global_unsynch && version >= ID3_VER_2_4))
+                    bytesread = unsynchronize_frame(tag, bytesread);
+                
+                unicode_munge( tag, &bytesread );
+
+                if (ptag)
+                    *ptag = tag;
+
                 /* remove trailing spaces */
                 while ( bytesread > 0 && isspace(tag[bytesread-1]))
                     bytesread--;

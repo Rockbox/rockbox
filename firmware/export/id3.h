@@ -119,8 +119,8 @@ struct mp3entry {
     /* replaygain support */
     
 #if CONFIG_HWCODEC == MASNONE
-    char* track_gain_str;
-    char* album_gain_str;
+    char* track_gain_string;
+    char* album_gain_string;
     long track_gain;    /* 7.24 signed fixed point. 0 for no gain. */
     long album_gain;
     long track_peak;    /* 7.24 signed fixed point. 0 for no peak. */
