@@ -20,16 +20,7 @@
 #ifndef SIMULATOR 
 #include "plugin.h"
 
-#if CONFIG_LCD == LCD_SSD1815 /* only for Recorder/Ondio displays */
-/*
-  FIX:
-
-  This would be a lot nicer if it depended on HAVE_LCD_BITMAP only, but we
-  need to fix the grayscale lib for Gmini and iRiver. Either with true
-  grayscale or 1bit.
-
-*/
-
+#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
 #include "gray.h"
 
 /* variable button definitions */
@@ -53,11 +44,11 @@
 
 #elif CONFIG_KEYPAD == IRIVER_H100_PAD
 #define MANDELBROT_QUIT BUTTON_OFF
-#define MANDELBROT_ZOOM_IN BUTTON_ON
-#define MANDELBROT_ZOOM_OUT BUTTON_SELECT
-#define MANDELBROT_MAXITER_INC (BUTTON_MODE | BUTTON_RIGHT)
-#define MANDELBROT_MAXITER_DEC (BUTTON_MODE | BUTTON_LEFT)
-#define MANDELBROT_RESET (BUTTON_MODE | BUTTON_SELECT)
+#define MANDELBROT_ZOOM_IN BUTTON_SELECT
+#define MANDELBROT_ZOOM_OUT BUTTON_MODE
+#define MANDELBROT_MAXITER_INC (BUTTON_ON | BUTTON_RIGHT)
+#define MANDELBROT_MAXITER_DEC (BUTTON_ON | BUTTON_LEFT)
+#define MANDELBROT_RESET BUTTON_REC
 #endif
 
 static struct plugin_api* rb;
@@ -75,8 +66,13 @@ static unsigned char graybuffer[LCD_HEIGHT];
 
 
 void init_mandelbrot_set(void){
-    x_min = -5<<25;  // -2.0<<26
+#if CONFIG_LCD == LCD_LCD_SSD1815 /* non-square aspect */
+    x_min = -5<<25;  // -2.5<<26
     x_max =  1<<26;  //  1.0<<26
+#else
+    x_min = -2<<26;  // -2.0<<26
+    x_max =  3<<24;  //  0.75<<26
+#endif
     y_min = -1<<26;  // -1.0<<26
     y_max =  1<<26;  //  1.0<<26
     delta = (x_max - x_min) >> 3;  // /8
@@ -162,7 +158,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* initialize the grayscale buffer:
      * 112 pixels wide, 8 rows (64 pixels) high, (try to) reserve
      * 16 bitplanes for 17 shades of gray.*/
-    grayscales = gray_init(rb, gbuf, gbuf_size, false, 112, 8, 8, NULL) + 1;
+    grayscales = gray_init(rb, gbuf, gbuf_size, false, LCD_WIDTH, 
+                           (LCD_HEIGHT*LCD_DEPTH/8), 8, NULL) + 1;
     if (grayscales != 9){
         rb->snprintf(buff, sizeof(buff), "%d", grayscales);
         rb->lcd_puts(0, 1, buff);
