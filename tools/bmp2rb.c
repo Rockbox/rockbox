@@ -86,29 +86,27 @@ int readlong(void* value)
     return bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24);
 }
 
-unsigned char brightness(unsigned char red, unsigned char green,
-                         unsigned char blue)
+unsigned char brightness(struct RGBQUAD color)
 {
-    return (3 * (unsigned int)red + 6 * (unsigned int)green 
-              + (unsigned int)blue) / 10;
+    return (3 * (unsigned int)color.rgbRed + 6 * (unsigned int)color.rgbGreen
+              + (unsigned int)color.rgbBlue) / 10;
 }
 
 /****************************************************************************
  * read_bmp_file()
  *
- * Reads an uncompressed BMP file and puts the data in a 1-pixel-per-byte
- * array, sorted by brightness. Returns 0 on success.
+ * Reads an uncompressed BMP file and puts the data in a 4-byte-per-pixel
+ * (RGBQUAD) array. Returns 0 on success.
  *
  ***************************************************************************/
 
 int read_bmp_file(char* filename,
                   long *get_width,  /* in pixels */
                   long *get_height, /* in pixels */
-                  unsigned char **bitmap)
+                  struct RGBQUAD **bitmap)
 {
     struct Fileheader fh;
     struct RGBQUAD palette[256];
-    unsigned char bright[256];
 
     int fd = open(filename, O_RDONLY);
     unsigned short data;
@@ -157,11 +155,6 @@ int read_bmp_file(char* filename,
             close(fd);
             return 4;
         }
-
-        /* Precalculate weighted brightnesses for the palette */
-        for (i = 0; i < numcolors; i++)
-            bright[i] = brightness(palette[i].rgbRed, palette[i].rgbGreen,
-                                   palette[i].rgbBlue);
     }
 
     width = readlong(&fh.Width);
@@ -170,7 +163,7 @@ int read_bmp_file(char* filename,
 
     size = padded_width * height; /* read this many bytes */
     bmp = (unsigned char *)malloc(size);
-    *bitmap = (unsigned char *)malloc(width * height);
+    *bitmap = (struct RGBQUAD *)malloc(width * height * sizeof(struct RGBQUAD));
 
     if ((bmp == NULL) || (*bitmap == NULL))
     {
@@ -202,9 +195,9 @@ int read_bmp_file(char* filename,
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
-                data = (bmp[(height - 1 - row) * padded_width + col / 8] 
+                data = (bmp[(height - 1 - row) * padded_width + col / 8]
                         >> (~col & 7)) & 1;
-                (*bitmap)[row * width + col] = bright[data];
+                (*bitmap)[row * width + col] = palette[data];
             }
         break;
 
@@ -214,7 +207,7 @@ int read_bmp_file(char* filename,
             {
                 data = (bmp[(height - 1 - row) * padded_width + col / 2] 
                         >> (4 * (~col & 1))) & 0x0F;
-                (*bitmap)[row * width + col] = bright[data];
+                (*bitmap)[row * width + col] = palette[data];
             }
         break;
 
@@ -223,7 +216,7 @@ int read_bmp_file(char* filename,
             for (col = 0; col < width; col++)
             {
                 data = bmp[(height - 1 - row) * padded_width + col];
-                (*bitmap)[row * width + col] = bright[data];
+                (*bitmap)[row * width + col] = palette[data];
             }
         break;
         
@@ -232,8 +225,13 @@ int read_bmp_file(char* filename,
             for (col = 0; col < width; col++)
             {
                 data = readshort(&bmp[(height - 1 - row) * padded_width + 2 * col]);
-                (*bitmap)[row * width + col] = brightness((data >> 7) & 0xF8, 
-                                       (data >> 2) & 0xF8, (data << 3) & 0xF8);
+                (*bitmap)[row * width + col].rgbRed =
+                    ((data >> 7) & 0xF8) | ((data >> 12) & 0x07);
+                (*bitmap)[row * width + col].rgbGreen =
+                    ((data >> 2) & 0xF8) | ((data >> 7) & 0x07);
+                (*bitmap)[row * width + col].rgbBlue =
+                    ((data << 3) & 0xF8) | ((data >> 2) & 0x07);
+                (*bitmap)[row * width + col].rgbReserved = 0;
             }
         break;
 
@@ -242,18 +240,22 @@ int read_bmp_file(char* filename,
             for (col = 0; col < width; col++)
             {
                 i = (height - 1 - row) * padded_width + 3 * col;
-                (*bitmap)[row * width + col] =
-                         brightness(bmp[i+2], bmp[i+1], bmp[i]);
+                (*bitmap)[row * width + col].rgbRed = bmp[i+2];
+                (*bitmap)[row * width + col].rgbGreen = bmp[i+1];
+                (*bitmap)[row * width + col].rgbBlue = bmp[i];
+                (*bitmap)[row * width + col].rgbReserved = 0;
             }
         break;
 
       case 32:
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
-            {
+            {            
                 i = (height - 1 - row) * padded_width + 4 * col;
-                (*bitmap)[row * width + col] =
-                         brightness(bmp[i+2], bmp[i+1], bmp[i]);
+                (*bitmap)[row * width + col].rgbRed = bmp[i+2];
+                (*bitmap)[row * width + col].rgbGreen = bmp[i+1];
+                (*bitmap)[row * width + col].rgbBlue = bmp[i];
+                (*bitmap)[row * width + col].rgbReserved = 0;
             }
         break;
 
@@ -270,11 +272,11 @@ int read_bmp_file(char* filename,
 /****************************************************************************
  * transform_bitmap()
  *
- * Transform a 1-byte-per-pixel bitmap into one of the supported
+ * Transform a 4-byte-per-pixel bitmap (RGBQUAD) into one of the supported
  * destination formats
  ****************************************************************************/
 
-int transform_bitmap(const unsigned char *src, long width, long height,
+int transform_bitmap(const struct RGBQUAD *src, long width, long height,
                      int format, unsigned char **dest, long *dst_width,
                      long *dst_height)
 {
@@ -296,6 +298,11 @@ int transform_bitmap(const unsigned char *src, long width, long height,
       case 2: /* Iriver H1x0 4-grey */
         dst_w = width;
         dst_h = (height + 3) / 4;
+        break;
+
+      case 3: /* Canonical 8-bit grayscale */
+        dst_w = width;
+        dst_h = height;
         break;
 
       default: /* unknown */
@@ -320,7 +327,7 @@ int transform_bitmap(const unsigned char *src, long width, long height,
             for (col = 0; col < width; col++)
             {
                 (*dest)[(row/8) * dst_w + col] |= 
-                       (~src[row * width + col] & 0x80) >> (~row & 7);
+                       (~brightness(src[row * width + col]) & 0x80) >> (~row & 7);
             }
         break;
 
@@ -329,7 +336,7 @@ int transform_bitmap(const unsigned char *src, long width, long height,
             for (col = 0; col < width; col++)
             {
                 (*dest)[row * dst_w + (col/8)] |= 
-                       (~src[row * width + col] & 0x80) >> (col & 7);
+                       (~brightness(src[row * width + col]) & 0x80) >> (col & 7);
             }
         break;
 
@@ -338,7 +345,15 @@ int transform_bitmap(const unsigned char *src, long width, long height,
             for (col = 0; col < width; col++)
             {
                 (*dest)[(row/4) * dst_w + col] |=
-                       (~src[row * width + col] & 0xC0) >> (2 * (~row & 3));
+                       (~brightness(src[row * width + col]) & 0xC0) >> (2 * (~row & 3));
+            }
+        break;
+
+      case 3: /* Canonical 8-bit grayscale */
+        for (row = 0; row < height; row++)
+            for (col = 0; col < width; col++)
+            {
+                (*dest)[row * dst_w + col] = brightness(src[row * width + col]);
             }
         break;
     }
@@ -388,7 +403,7 @@ void generate_c_source(char *id, long width, long height,
  * Outputs an ascii picture of the bitmap
  ****************************************************************************/
 
-void generate_ascii(long width, long height, unsigned char *bitmap)
+void generate_ascii(long width, long height, struct RGBQUAD *bitmap)
 {
     FILE *f;
     long x, y;
@@ -400,7 +415,7 @@ void generate_ascii(long width, long height, unsigned char *bitmap)
     {
         for (x = 0; x < width; x++)
         {
-            fprintf(f, (bitmap[y * width + x] & 0x80) ? " " : "*");
+            fprintf(f, (brightness(bitmap[y * width + x]) & 0x80) ? " " : "*");
         }
         fprintf(f, "\n");
     }
@@ -415,6 +430,7 @@ void print_usage(void)
            "\t         0  Archos recorder, Ondio, Gmini 120/SP, Iriver H1x0 mono\n"
            "\t         1  Archos player graphics library\n"
            "\t         2  Iriver H1x0 4-grey\n"
+           "\t         3  Canonical 8-bit grayscale\n"
            , APPLICATION_NAME);
     printf("build date: " __DATE__ "\n\n");
 }
@@ -426,7 +442,7 @@ int main(int argc, char **argv)
     int i;
     int ascii = false;
     int format = 0;
-    unsigned char *bitmap = NULL;
+    struct RGBQUAD *bitmap = NULL;
     unsigned char *t_bitmap = NULL;
     long width, height;
     long t_width, t_height;
