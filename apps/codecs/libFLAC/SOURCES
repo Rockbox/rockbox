@@ -8,6 +8,7 @@ format.c
 lpc.c
 md5.c
 memory.c
+metadata_object.c
 seekable_stream_decoder.c
 stream_decoder.c
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)

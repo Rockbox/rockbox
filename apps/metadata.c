@@ -92,7 +92,7 @@ const long wavpack_sample_rates [] = { 6000, 8000, 9600, 11025, 12000, 16000,
 
 static bool get_apetag_info (struct mp3entry *entry, int fd);
 
-static bool get_vorbis_comments (struct mp3entry *entry, int fd);
+static bool get_vorbis_comments (struct mp3entry *entry, size_t bytes_remaining, int fd);
 
 static void little_endian_to_native (void *data, char *format);
 
@@ -104,6 +104,9 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
   unsigned char* buf;
   int i,j,eof;
   int rc;
+  int segments; /* for Vorbis*/
+  size_t bytes_remaining = 0; /* for Vorbis */
+
     
   /* Load codec specific track tag information. */
   switch (track->id3.codectype) {
@@ -215,7 +218,10 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         } else if ((buf[0]&0x7f)==4) {     /* 4 is the VORBIS_COMMENT block */
 
           /* The next i bytes of the file contain the VORBIS COMMENTS - just skip them for now. */
-          lseek(fd, i, SEEK_CUR);
+          //lseek(fd, i, SEEK_CUR);
+          if (!get_vorbis_comments(&(track->id3), i, fd)) {
+              return false;
+          }
 
         } else {
           if (buf[0]&0x80) { /* If we have reached the last metadata block, abort. */
@@ -272,12 +278,61 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
       track->id3.frequency=buf[40]|(buf[41]<<8)|(buf[42]<<16)|(buf[43]<<24);
       channels=buf[39];
 
-      if ( !get_vorbis_comments(&(track->id3), fd) ) {
+      /* Comments are in second Ogg page */
+      if ( lseek(fd, 58, SEEK_SET) < 0 ) {
+          return false;
+      }
+
+      /* Minimum header length for Ogg pages is 27 */
+      if (read(fd, buf, 27) < 27) {
+          return false;
+      }
+
+      if (memcmp(buf,"OggS",4)!=0) {
+        logf("1: Not an Ogg Vorbis file");
+        return(false);
+      }
+
+      segments=buf[26];
+      /* read in segment table */
+      if (read(fd, buf, segments) < segments) {
+          return false;
+      }
+
+      /* The second packet in a vorbis stream is the comment packet.  It *may*
+       * extend beyond the second page, but usually does not.  Here we find the
+       * length of the comment packet (or the rest of the page if the comment
+       * packet extends to the third page).
+       */
+      for (i = 0; i < segments; i++) {
+          bytes_remaining += buf[i];
+          /* The last segment of a packet is always < 255 bytes */
+          if (buf[i] < 255) {
+              break;
+          }
+      }
+
+      /* Now read in packet header (type and id string) */
+      if(read(fd, buf, 7) < 7) {
+          return false;
+      }
+
+      /* The first byte of a packet is the packet type; comment packets are
+       * type 3.
+       */
+      if ((buf[0] != 3) || (memcmp(buf + 1,"vorbis",6)!=0)) {
+          logf("Not a vorbis comment packet");
+          return false;
+      }
+
+      bytes_remaining -= 7;
+
+      if ( !get_vorbis_comments(&(track->id3), bytes_remaining, fd) ) {
         logf("get_vorbis_comments failed");
         return(false);
       }
 
-      /* Set id3 genre to something bogus, otherwise vorbis tracks
+      /* Set id3v1 genre to 255 (effectively 'none'), otherwise vorbis tracks
        * without genre tags will show up as 'Blues'
        */
       track->id3.genre=255;
@@ -780,7 +835,7 @@ static void UTF8ToAnsi (unsigned char *pUTF8)
  * Additionally, vorbis comments *may* take up more than one Ogg page, and this
  * only looks at the first page of comments.
  */
-static bool get_vorbis_comments (struct mp3entry *entry, int fd)
+static bool get_vorbis_comments (struct mp3entry *entry, size_t bytes_remaining, int fd)
 {
     int vendor_length;
     int comment_count;
@@ -790,58 +845,6 @@ static bool get_vorbis_comments (struct mp3entry *entry, int fd)
     int buffer_remaining = sizeof(entry->id3v2buf) + sizeof(entry->id3v1buf);
     char *buffer = entry->id3v2buf;
     char **p = NULL;
-    int segments;
-    int packet_remaining = 0;
-
-    /* Comments are in second Ogg page */
-    if ( lseek(fd, 58, SEEK_SET) < 0 ) {
-        return false;
-    }
-
-    /* Minimum header length for Ogg pages is 27 */
-    if (read(fd, temp, 27) < 27) {
-        return false;
-    }
-
-    if (memcmp(temp,"OggS",4)!=0) {
-      logf("1: Not an Ogg Vorbis file");
-      return(false);
-    }
-
-    segments=temp[26];
-    /* read in segment table */
-    if (read(fd, temp, segments) < segments) {
-        return false;
-    }
-
-    /* The second packet in a vorbis stream is the comment packet.  It *may*
-     * extend beyond the second page, but usually does not.  Here we find the
-     * length of the comment packet (or the rest of the page if the comment
-     * packet extends to the third page).
-     */
-    for (i = 0; i < segments; i++) {
-        packet_remaining += temp[i];
-        /* The last segment of a packet is always < 255 bytes */
-        if (temp[i] < 255) {
-            break;
-        }
-    }
-
-    /* Now read in packet header (type and id string) */
-    if(read(fd, temp, 7) < 7) {
-        return false;
-    }
-
-    /* The first byte of a packet is the packet type; comment packets are
-     * type 3.
-     */
-    if ((temp[0] != 3) || (memcmp(temp + 1,"vorbis",6)!=0)) {
-        logf("Not a vorbis comment packet");
-        return false;
-    }
-
-    packet_remaining -= 7;
-
 
     /* We've read in all header info, now start reading comments */
 
@@ -855,8 +858,8 @@ static bool get_vorbis_comments (struct mp3entry *entry, int fd)
         return false;
     }
     little_endian_to_native(&comment_count, "L");
-    packet_remaining -= (vendor_length + 8);
-    if ( packet_remaining <= 0 ) {
+    bytes_remaining -= (vendor_length + 8);
+    if ( bytes_remaining <= 0 ) {
         return true;
     }
 
@@ -870,8 +873,8 @@ static bool get_vorbis_comments (struct mp3entry *entry, int fd)
         little_endian_to_native(&comment_length, "L");
 
         /* Quit if we've passed the end of the page */
-        packet_remaining -= (comment_length + 4);
-        if ( packet_remaining <= 0 ) {
+        bytes_remaining -= (comment_length + 4);
+        if ( bytes_remaining <= 0 ) {
             return true;
         }
 
@@ -929,6 +932,6 @@ static bool get_vorbis_comments (struct mp3entry *entry, int fd)
             }
         }
     }
-    
+
     return true;
 }

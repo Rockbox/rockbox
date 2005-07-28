@@ -887,6 +887,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
             tracks[track_widx].start_pos = offset;
             break;
         case AFMT_OGG_VORBIS:
+        case AFMT_FLAC:
             tracks[track_widx].id3.offset = offset;
             break;
         }
@@ -1366,7 +1367,7 @@ static void initiate_track_change(int peek_index)
         if (!paused)
             pcm_play_pause(true);
 
-	return;
+        return;
     }
             
     /* Detect if disk is spinning.. */

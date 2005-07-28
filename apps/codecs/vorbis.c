@@ -33,21 +33,6 @@ static struct codec_api* rb;
 
 int errno;
 
-size_t strlen(const char *s)
-{
-    return(rb->strlen(s));
-}
-
-char *strcpy(char *dest, const char *src)
-{
-    return(rb->strcpy(dest,src));
-}
-
-char *strcat(char *dest, const char *src)
-{
-    return(rb->strcat(dest,src));
-}
-
 size_t read_handler(void *ptr, size_t size, size_t nmemb, void *datasource)
 {
     (void)datasource;

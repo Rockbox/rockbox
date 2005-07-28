@@ -70,6 +70,31 @@ void* codec_realloc(void* ptr, size_t size)
     return(x);
 }
 
+size_t strlen(const char *s)
+{
+    return(local_rb->strlen(s));
+}
+
+char *strcpy(char *dest, const char *src)
+{
+    return(local_rb->strcpy(dest,src));
+}
+
+char *strcat(char *dest, const char *src)
+{
+    return(local_rb->strcat(dest,src));
+}
+
+int strcmp(const char *s1, const char *s2)
+{
+    return(local_rb->strcmp(s1,s2));
+}
+
+int strncasecmp(const char *s1, const char *s2, size_t n)
+{
+    return(local_rb->strncasecmp(s1,s2,n));
+}
+
 void *memcpy(void *dest, const void *src, size_t n)
 {
     return(local_rb->memcpy(dest,src,n));
