@@ -332,11 +332,6 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         return(false);
       }
 
-      /* Set id3v1 genre to 255 (effectively 'none'), otherwise vorbis tracks
-       * without genre tags will show up as 'Blues'
-       */
-      track->id3.genre=255;
-
       /* We now need to search for the last page in the file - identified by 
        by ('O','g','g','S',0) and retrieve totalsamples */
 
@@ -848,6 +843,11 @@ static bool get_vorbis_comments (struct mp3entry *entry, size_t bytes_remaining,
 
     /* We've read in all header info, now start reading comments */
 
+    /* Set id3v1 genre to 255 (effectively 'none'), otherwise tracks
+     * without genre tags will show up as 'Blues'
+     */
+    track->id3.genre=255;
+
     if (read(fd, &vendor_length, 4) < 4) {
         return false;
     }
@@ -866,6 +866,11 @@ static bool get_vorbis_comments (struct mp3entry *entry, size_t bytes_remaining,
     for ( i = 0; i < comment_count; i++ ) {
         int name_length = 0;
 
+        if (bytes_remaining < 4) {
+            break;
+        }
+        bytes_remaining -= 4;
+
         if (read(fd, &comment_length, 4) < 4) {
             return false;
         }
@@ -873,10 +878,10 @@ static bool get_vorbis_comments (struct mp3entry *entry, size_t bytes_remaining,
         little_endian_to_native(&comment_length, "L");
 
         /* Quit if we've passed the end of the page */
-        bytes_remaining -= (comment_length + 4);
-        if ( bytes_remaining <= 0 ) {
-            return true;
+        if ( bytes_remaining < (unsigned)comment_length ) {
+            break;
         }
+        bytes_remaining -= (comment_length);
 
         /* Skip comment if it won't fit in buffer */
         if ( (unsigned int)comment_length >= sizeof(temp) ) {
@@ -931,6 +936,11 @@ static bool get_vorbis_comments (struct mp3entry *entry, size_t bytes_remaining,
                 buffer_remaining -= comment_length + 1;
             }
         }
+    }
+
+    /* Skip to the end of the block */
+    if (bytes_remaining) {
+        lseek(fd, bytes_remaining, SEEK_CUR);
     }
 
     return true;
