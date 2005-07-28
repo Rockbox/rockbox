@@ -846,7 +846,7 @@ static bool get_vorbis_comments (struct mp3entry *entry, size_t bytes_remaining,
     /* Set id3v1 genre to 255 (effectively 'none'), otherwise tracks
      * without genre tags will show up as 'Blues'
      */
-    track->id3.genre=255;
+    entry->genre=255;
 
     if (read(fd, &vendor_length, 4) < 4) {
         return false;
