@@ -77,7 +77,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "pcm_playback.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 23
+#define CONFIG_BLOCK_VERSION 24
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -228,7 +228,7 @@ static const struct bit_entry rtc_bits[] =
     {1, S_O(volume_type), 0, "volume display", graphic_numeric },
     {1, S_O(battery_display), 0, "battery display", graphic_numeric },
     {1, S_O(timeformat), 0, "time format", "24hour,12hour" },
-#endif
+#endif /* HAVE_LCD_BITMAP */
     {1, S_O(show_icons), true, "show icons", off_on },
     /* system */
     {4, S_O(poweroff), 10,
@@ -252,9 +252,6 @@ static const struct bit_entry rtc_bits[] =
     {8, S_O(last_frequency), 0, NULL, NULL }, /* Default: MIN_FREQ */
 #endif
 
-    /* new stuff to be added here */
-    /* If values are just added to the end, no need to bump the version. */
-
 #if BATTERY_TYPES_COUNT > 1
     {1, S_O(battery_type), 0, "battery type", "alkaline,nimh" },
 #endif
@@ -268,7 +265,10 @@ static const struct bit_entry rtc_bits[] =
     {1, S_O(remote_flip_display), false, "remote flip display", off_on },
 #endif
 
-    /* Current sum of bits: 259 (worst case) */
+    /* new stuff to be added here */
+    /* If values are just added to the end, no need to bump the version. */
+
+    /* Current sum of bits: 268 (worst case, but w/o remote lcd) */
     /* Sum of all bit sizes must not grow beyond 288! */
 };
 
@@ -288,7 +288,13 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(caption_backlight), false, "caption backlight", off_on },
 #endif
     {4, S_O(scroll_speed), 9, "scroll speed", NULL }, /* 0...15 */
+#ifdef HAVE_LCD_BITMAP
+#if LCD_WIDTH > 127
+    {8, S_O(scroll_step), 6, "scroll step", NULL }, /* 1...160 */
+#else
     {7, S_O(scroll_step), 6, "scroll step", NULL }, /* 1...112 */
+#endif
+#endif /* HAVE_LCD_BITMAP */
     {8, S_O(scroll_delay), 100, "scroll delay", NULL }, /* 0...250 */
     {8, S_O(bidir_limit), 50, "bidir limit", NULL }, /* 0...200 */
 #ifdef HAVE_LCD_CHARCELLS
@@ -313,7 +319,7 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(disk_poweroff), false, "disk poweroff", off_on },
 #endif
     {8, S_O(disk_spindown), 5, "disk spindown", NULL },
-#endif
+#endif /* HAVE_MMC */
     /* browser */
     {3, S_O(dirfilter), SHOW_SUPPORTED, 
         "show files", "all,supported,music,playlists,id3 database" },
@@ -366,6 +372,13 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(rec_directory), 0, /* rec_base_directory */
         "rec directory", REC_BASE_DIR ",current" },
 #endif
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+    {7, S_O(mdb_strength), 0, "mdb strength", NULL},
+    {7, S_O(mdb_harmonics), 0, "mdb harmonics", NULL},
+    {9, S_O(mdb_center), 0, "mdb center", NULL},
+    {9, S_O(mdb_shape), 0, "mdb shape", NULL},
+    {1, S_O(mdb_enable), 0, "mdb enable", off_on},
+#endif
 #if CONFIG_HWCODEC == MAS3507D
     {1, S_O(line_in), false, "line in", off_on },
 #endif
@@ -374,14 +387,8 @@ static const struct bit_entry hd_bits[] =
     {2, S_O(talk_file), 0, "talk file", off_number_spell_hover },
     {1, S_O(talk_menu), true, "talk menu", off_on },
 
-    /* If values are just added to the end, no need to bump the version. */
     {2, S_O(sort_file), 0, "sort files", "alpha,oldest,newest,type" },
     {2, S_O(sort_dir), 0, "sort dirs", "alpha,oldest,newest" },
-    {7, S_O(mdb_strength), 0, "mdb strength", NULL},
-    {7, S_O(mdb_harmonics), 0, "mdb harmonics", NULL},
-    {9, S_O(mdb_center), 0, "mdb center", NULL},
-    {9, S_O(mdb_shape), 0, "mdb shape", NULL},
-    {1, S_O(mdb_enable), 0, "mdb enable", off_on},
     {1, S_O(id3_v1_first), 0, "id3 tag priority", "v2-v1,v1-v2"},
 
 #ifdef HAVE_RECORDING
@@ -421,8 +428,9 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(replaygain_noclip), false, "replaygain noclip", off_on },
 #endif
     
+    /* If values are just added to the end, no need to bump the version. */
     /* new stuff to be added at the end */
-            
+
     /* Sum of all bit sizes must not grow beyond 0xB8*8 = 1472 */
 };
 
@@ -938,7 +946,7 @@ void settings_load(int which)
         }
         if (which & SETTINGS_HD)
         {
-            load_bit_table(hd_bits, sizeof(hd_bits)/sizeof(hd_bits[0]), 
+            load_bit_table(hd_bits, sizeof(hd_bits)/sizeof(hd_bits[0]),
                 RTC_BLOCK_SIZE*8);
         }
         

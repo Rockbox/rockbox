@@ -93,9 +93,9 @@ static volatile int scrolling_lines=0; /* Bitpattern of which lines are scrollin
 static void scroll_thread(void);
 static long scroll_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 static const char scroll_name[] = "remote_scroll";
-static char scroll_ticks = 12; /* # of ticks between updates*/
+static int scroll_ticks = 12; /* # of ticks between updates*/
 static int scroll_delay = HZ/2; /* ticks delay before start */
-static char scroll_step = 6;  /* pixels per scroll step */
+static int scroll_step = 6;  /* pixels per scroll step */
 static int bidir_limit = 50;  /* percent */
 static struct scrollinfo scroll[SCROLLABLE_LINES];
 

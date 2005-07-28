@@ -78,10 +78,10 @@ struct cursorinfo {
 static void scroll_thread(void);
 static char scroll_stack[DEFAULT_STACK_SIZE];
 static const char scroll_name[] = "scroll";
-static char scroll_ticks = 12; /* # of ticks between updates */
+static int scroll_ticks = 12; /* # of ticks between updates */
 static int scroll_delay = HZ/2; /* delay before starting scroll */
 static int jump_scroll_delay = HZ/4; /* delay between jump scroll jumps */
-static char scroll_spacing = 3; /* spaces between end and start of text */
+static int scroll_spacing = 3; /* spaces between end and start of text */
 static int bidir_limit = 50;  /* percent */
 static int jump_scroll = 0; /* 0=off, 1=once, ..., JUMP_SCROLL_ALWAYS */
 
