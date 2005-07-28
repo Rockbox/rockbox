@@ -53,12 +53,12 @@
 
 static struct plugin_api* rb;
 static char buff[32];
-static int lcd_aspect_ratio;
-static int x_min;
-static int x_max;
-static int y_min;
-static int y_max;
-static int delta;
+static long aspect;
+static long x_min;
+static long x_max;
+static long y_min;
+static long y_max;
+static long delta;
 static int max_iter;
 static unsigned char *gbuf;
 static unsigned int gbuf_size = 0;
@@ -66,15 +66,15 @@ static unsigned char graybuffer[LCD_HEIGHT];
 
 
 void init_mandelbrot_set(void){
-#if CONFIG_LCD == LCD_LCD_SSD1815 /* non-square aspect */
-    x_min = -5<<25;  // -2.5<<26
-    x_max =  1<<26;  //  1.0<<26
-#else
-    x_min = -2<<26;  // -2.0<<26
-    x_max =  3<<24;  //  0.75<<26
+#if CONFIG_LCD == LCD_SSD1815 /* Recorder, Ondio. */
+    x_min = -38<<22;  // -2.375<<26
+    x_max =  15<<22;  //  0.9375<<26
+#else  /* Iriver H1x0 */
+    x_min = -36<<22;  // -2.25<<26
+    x_max =  12<<22;  //  0.75<<26
 #endif
-    y_min = -1<<26;  // -1.0<<26
-    y_max =  1<<26;  //  1.0<<26
+    y_min = -19<<22;  // -1.1875<<26
+    y_max =  19<<22;  //  1.1875<<26
     delta = (x_max - x_min) >> 3;  // /8
     max_iter = 25;
 }
@@ -84,8 +84,8 @@ void calc_mandelbrot_set(void){
     long start_tick, last_yield;
     int n_iter;
     int x_pixel, y_pixel;
-    int x, x2, y, y2, a, b;
-    int x_fact, y_fact;
+    long x, x2, y, y2, a, b;
+    long x_fact, y_fact;
     int brightness;
     
     start_tick = last_yield = *rb->current_tick;
@@ -95,10 +95,10 @@ void calc_mandelbrot_set(void){
     x_fact = (x_max - x_min) / LCD_WIDTH;
     y_fact = (y_max - y_min) / LCD_HEIGHT;
     
-    for (x_pixel = 0; x_pixel<LCD_WIDTH; x_pixel++){
-        a = (x_pixel * x_fact) + x_min;
-        for(y_pixel = LCD_HEIGHT-1; y_pixel>=0; y_pixel--){
-            b = (y_pixel * y_fact) + y_min;
+    a = x_min;
+    for (x_pixel = 0; x_pixel < LCD_WIDTH; x_pixel++){
+        b = y_min;
+        for(y_pixel = LCD_HEIGHT-1; y_pixel >= 0; y_pixel--){
             x = 0;
             y = 0;
             n_iter = 0;
@@ -116,7 +116,6 @@ void calc_mandelbrot_set(void){
             }
 
             // "coloring"
-            brightness = 0;
             if  (n_iter > max_iter){
                 brightness = 0; // black
             } else {
@@ -129,8 +128,10 @@ void calc_mandelbrot_set(void){
                 rb->yield();
                 last_yield = *rb->current_tick;
             }
+            b += y_fact;
         }
         gray_ub_gray_bitmap(graybuffer, x_pixel, 0, 1, LCD_HEIGHT);
+        a += x_fact;
     }
 }
 
@@ -156,9 +157,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
 
     /* initialize the grayscale buffer:
-     * 112 pixels wide, 8 rows (64 pixels) high, (try to) reserve
-     * 16 bitplanes for 17 shades of gray.*/
-    grayscales = gray_init(rb, gbuf, gbuf_size, false, LCD_WIDTH, 
+     * 8 bitplanes for 9 shades of gray.*/
+    grayscales = gray_init(rb, gbuf, gbuf_size, false, LCD_WIDTH,
                            (LCD_HEIGHT*LCD_DEPTH/8), 8, NULL) + 1;
     if (grayscales != 9){
         rb->snprintf(buff, sizeof(buff), "%d", grayscales);
@@ -171,7 +171,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     gray_show(true); /* switch on greyscale overlay */
 
     init_mandelbrot_set();
-    lcd_aspect_ratio = ((LCD_WIDTH<<13) / LCD_HEIGHT)<<13;
+    aspect = ((y_max - y_min) / ((x_max-x_min)>>13))<<13;
 
     /* main loop */
     while (true){
@@ -187,10 +187,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             return PLUGIN_OK;
 
         case MANDELBROT_ZOOM_OUT:
-            x_min -= ((delta>>13)*(lcd_aspect_ratio>>13));
-            x_max += ((delta>>13)*(lcd_aspect_ratio>>13));
-            y_min -= delta;
-            y_max += delta;
+            x_min -= delta;
+            x_max += delta;
+            y_min -= ((delta>>13)*(aspect>>13));
+            y_max += ((delta>>13)*(aspect>>13));
             delta = (x_max - x_min) >> 3;
             redraw = true;
             break;
@@ -204,23 +204,23 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #ifdef MANDELBROT_ZOOM_IN2
         case MANDELBROT_ZOOM_IN2:
 #endif
-            x_min += ((delta>>13)*(lcd_aspect_ratio>>13));
-            x_max -= ((delta>>13)*(lcd_aspect_ratio>>13));
-            y_min += delta;
-            y_max -= delta;
+            x_min += delta;
+            x_max -= delta;
+            y_min += ((delta>>13)*(aspect>>13));
+            y_max -= ((delta>>13)*(aspect>>13));
             delta = (x_max - x_min) >> 3;
             redraw = true;
             break;
 
         case BUTTON_UP:
-            y_min -= delta;
-            y_max -= delta;
+            y_min += delta;
+            y_max += delta;
             redraw = true;
             break;
 
         case BUTTON_DOWN:
-            y_min += delta;
-            y_max += delta;
+            y_min -= delta;
+            y_max -= delta;
             redraw = true;
             break;
 
