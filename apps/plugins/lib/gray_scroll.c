@@ -339,7 +339,6 @@ void gray_ub_scroll_up(int count)
         /* scroll column by column to minimize flicker */
         asm (
             "move.l  %[wide],%%d4\n"  /* columns = width */
-            "add.l   %[cnt],%[cnt]   \n"  /* shift 2 bits per pixel */
 
         ".su_cloop:              \n"  /* repeat for every column */
             "move.l  %[addr],%%a0\n"  /* get start address */
@@ -379,7 +378,7 @@ void gray_ub_scroll_up(int count)
             [wide]"r"(_gray_info.width),
             [rows]"r"(_gray_info.bheight - shift),
             [addr]"a"(_gray_info.plane_data + _gray_info.plane_size - blockshift),
-            [cnt] "d"(count)
+            [cnt] "d"(2 * count)
             : /* clobbers */
             "a0", "a1", "d0", "d1", "d2", "d3", "d4"
         );
@@ -522,7 +521,6 @@ void gray_ub_scroll_down(int count)
         /* scroll column by column to minimize flicker */
         asm (
             "move.l  %[wide],%%d4\n"  /* columns = width */
-            "add.l   %[cnt],%[cnt]   \n"  /* shift 2 bits per pixel */
 
         ".sd_cloop:              \n"  /* repeat for every column */
             "move.l  %[addr],%%a0\n"  /* get start address */
@@ -559,7 +557,7 @@ void gray_ub_scroll_down(int count)
             [rows]"r"(_gray_info.bheight - shift),
             [psiz]"r"(_gray_info.plane_size),
             [addr]"a"(_gray_info.plane_data + blockshift),
-            [cnt] "d"(count)
+            [cnt] "d"(2 * count)
             : /* clobbers */
             "a0", "a1", "d0", "d1", "d2", "d3", "d4"
         );
