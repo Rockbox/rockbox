@@ -18,9 +18,9 @@
 
 #include "os_types.h"
 
-/* Oggenc 1.1 seems to use exclusively windows sizes 256, 2048
-   keep the most common sizes in fast IRAM; 
-   because we have the available space also 128, 512 */
+/* libvorbis currently only use the window sizes 256 and 2048, so only put
+ * them in fast IRAM.
+ */
 static LOOKUP_T vwin64[32]   = {
   X(0x001f0003), X(0x01168c98), X(0x030333c8), X(0x05dfe3a4),
   X(0x09a49562), X(0x0e45df18), X(0x13b47ef2), X(0x19dcf676),
@@ -32,7 +32,7 @@ static LOOKUP_T vwin64[32]   = {
   X(0x7fdd78a5), X(0x7ff6ec6d), X(0x7ffed0e9), X(0x7ffffc3f),
 };
 
-static LOOKUP_T vwin128[64] IDATA_ATTR LINE_ATTR = {
+static LOOKUP_T vwin128[64] = {
   X(0x0007c04d), X(0x0045bb89), X(0x00c18b87), X(0x017ae294),
   X(0x02714a4e), X(0x03a4217a), X(0x05129952), X(0x06bbb24f),
   X(0x089e38a1), X(0x0ab8c073), X(0x0d09a228), X(0x0f8ef6bd),
@@ -51,7 +51,7 @@ static LOOKUP_T vwin128[64] IDATA_ATTR LINE_ATTR = {
   X(0x7ffdcf39), X(0x7fff6dac), X(0x7fffed01), X(0x7fffffc4),
 };
 
-static LOOKUP_T vwin256[128] IDATA_ATTR LINE_ATTR = {
+static LOOKUP_T vwin256[128] IDATA_ATTR = {
   X(0x0001f018), X(0x00117066), X(0x00306e9e), X(0x005ee5f1),
   X(0x009ccf26), X(0x00ea208b), X(0x0146cdea), X(0x01b2c87f),
   X(0x022dfedf), X(0x02b85ced), X(0x0351cbbd), X(0x03fa317f),
@@ -86,7 +86,7 @@ static LOOKUP_T vwin256[128] IDATA_ATTR LINE_ATTR = {
   X(0x7fffdcd2), X(0x7ffff6d6), X(0x7ffffed0), X(0x7ffffffc),
 };
 
-static LOOKUP_T vwin512[256] IDATA_ATTR LINE_ATTR  = {
+static LOOKUP_T vwin512[256] = {
   X(0x00007c06), X(0x00045c32), X(0x000c1c62), X(0x0017bc4c),
   X(0x00273b7a), X(0x003a9955), X(0x0051d51c), X(0x006cede7),
   X(0x008be2a9), X(0x00aeb22a), X(0x00d55b0d), X(0x00ffdbcc),
@@ -284,7 +284,7 @@ static LOOKUP_T vwin1024[512]  = {
   X(0x7fffffdd), X(0x7ffffff7), X(0x7fffffff), X(0x7fffffff),
 };
 
-static LOOKUP_T vwin2048[1024] IDATA_ATTR LINE_ATTR = {
+static LOOKUP_T vwin2048[1024] IDATA_ATTR = {
   X(0x000007c0), X(0x000045c4), X(0x0000c1ca), X(0x00017bd3),
   X(0x000273de), X(0x0003a9eb), X(0x00051df9), X(0x0006d007),
   X(0x0008c014), X(0x000aee1e), X(0x000d5a25), X(0x00100428),

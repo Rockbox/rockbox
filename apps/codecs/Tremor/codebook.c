@@ -210,6 +210,7 @@ static inline long decode_packed_entry_number(codebook *book,
    addmul==2 -> multiplicitive */
 
 /* returns the [original, not compacted] entry number or -1 on eof *********/
+long vorbis_book_decode(codebook *book, oggpack_buffer *b) ICODE_ATTR;
 long vorbis_book_decode(codebook *book, oggpack_buffer *b){
   long packed_entry=decode_packed_entry_number(book,b);
   if(packed_entry>=0)

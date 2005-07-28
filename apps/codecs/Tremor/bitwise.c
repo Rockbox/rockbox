@@ -22,7 +22,7 @@
 #include <string.h>
 #include "ogg.h"
 
-static const unsigned long mask[] =
+static const unsigned long mask[] IDATA_ATTR =
 {0x00000000,0x00000001,0x00000003,0x00000007,0x0000000f,
  0x0000001f,0x0000003f,0x0000007f,0x000000ff,0x000001ff,
  0x000003ff,0x000007ff,0x00000fff,0x00001fff,0x00003fff,
@@ -79,6 +79,7 @@ void oggpack_readinit(oggpack_buffer *b,ogg_reference *r){
                       }
 
 /* Read in bits without advancing the bitptr; bits <= 32 */
+long oggpack_look(oggpack_buffer *b,int bits) ICODE_ATTR;
 long oggpack_look(oggpack_buffer *b,int bits){
   unsigned long m=mask[bits];
   unsigned long ret=0;
@@ -139,6 +140,7 @@ long oggpack_look(oggpack_buffer *b,int bits){
 }
 
 /* limited to 32 at a time */
+void oggpack_adv(oggpack_buffer *b,int bits) ICODE_ATTR;
 void oggpack_adv(oggpack_buffer *b,int bits){
   bits+=b->headbit;
   b->headbit=bits&7;

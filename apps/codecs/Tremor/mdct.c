@@ -144,6 +144,7 @@ STIN  void mdct_butterfly_32(DATA_TYPE *x){
 }
 
 /* N/stage point generic N stage butterfly (in place, 4 register) */
+void mdct_butterfly_generic(DATA_TYPE *x,int points, int step) ICODE_ATTR;
 void mdct_butterfly_generic(DATA_TYPE *x,int points, int step){
   LOOKUP_T *T   = sincos_lookup0;
   DATA_TYPE *x1        = x + points      - 8;
