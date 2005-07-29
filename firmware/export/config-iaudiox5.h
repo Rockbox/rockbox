@@ -47,6 +47,8 @@
 
 #define CONFIG_I2C I2C_IAUDIO
 
+#define HAVE_TLV320
+
 /* Define this if the platform can charge batteries */
 #define HAVE_CHARGING 1
 
