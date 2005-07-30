@@ -1306,8 +1306,10 @@ bool codec_request_next_track_callback(void)
     
     /* Codec requested track change (next track). */
     else {
-        if (!playlist_check(1))
+        if (!playlist_check(1)) {
+            ci.reload_codec = false;
             return false;
+        }
         last_peek_offset--;
         playlist_next(1);
         if (++track_ridx >= MAX_TRACK)
@@ -1321,8 +1323,10 @@ bool codec_request_next_track_callback(void)
             
         if (tracks[track_ridx].filesize == 0) {
             logf("No more tracks [2]");
-            ci.reload_codec = false;
+            ci.stop_codec = true;
             new_track = 0;
+            last_index = -1;
+            queue_post(&audio_queue, AUDIO_PLAY, 0);
             return false;
         }
     }
