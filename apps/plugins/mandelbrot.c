@@ -168,7 +168,7 @@ void recalc_parameters(void)
     y_step = (y_max - y_min) / LCD_HEIGHT;
     y_delta = MUL64(y_step, (LCD_HEIGHT/8));
     step_log2 = MIN(ilog2_fp(x_step), ilog2_fp(y_step));
-    max_iter = MAX(10, 10 - 15 * step_log2);
+    max_iter = MAX(10, -15 * step_log2 - 50);
 }
 
 void init_mandelbrot_set(void)
