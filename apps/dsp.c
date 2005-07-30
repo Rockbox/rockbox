@@ -43,8 +43,8 @@
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
 
 #define INIT() asm volatile ("move.l #0xb0, %macsr") /* frac, round, clip */
-/* Multiply 2 32-bit integers and return the 32 most significant bits of the
- * result.
+/* Multiply two S.31 fractional integers and return the sign bit and the
+ * 31 most significant bits of the result.
  */
 #define FRACMUL(x, y) \
 ({ \
@@ -54,9 +54,8 @@
                   : [t] "=r" (t) : [a] "r" (x), [b] "r" (y)); \
     t; \
 })
-/* Multiply 2 32-bit integers and of the 40 most significat bits of the 
- * result, return the 32 least significant bits. I.e., like FRACMUL with one
- * of the arguments shifted 8 bits to the right.
+/* Multiply one S.31-bit and one S7.24 fractional integer and return the
+ * sign bit and the 31 most significant bits of the result.
  */
 #define FRACMUL_8(x, y) \
 ({ \
@@ -72,7 +71,7 @@
 #else
 
 #define INIT()
-#define FRACMUL(x, y) (long) (((((long long) (x)) * ((long long) (y))) >> 32))
+#define FRACMUL(x, y) (long) (((((long long) (x)) * ((long long) (y))) >> 31))
 #define FRACMUL_8(x, y) (long) (((((long long) (x)) * ((long long) (y))) >> 24))
 
 #endif
