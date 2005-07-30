@@ -96,11 +96,6 @@ static volatile bool paused;
 #define MALLOC_BUFSIZE (512*1024)
 #define GUARD_BUFSIZE  (8*1024)
 
-/* TODO:
-    Handle playlist_peek in mpeg.c
-    Track changing
-*/
-
 extern bool audio_is_initialized;
 
 /* Buffer control thread. */
@@ -758,7 +753,7 @@ bool read_next_metadata(void)
     if (tracks[next_track].taginfo_ready)
         return true;
         
-    trackname = playlist_peek(last_peek_offset);
+    trackname = playlist_peek(last_peek_offset + 1);
     if (!trackname)
         return false;
 
@@ -780,7 +775,7 @@ bool read_next_metadata(void)
 bool audio_load_track(int offset, bool start_play, int peek_offset)
 {
     char *trackname;
-    int fd;
+    int fd = -1;
     off_t size;
     int rc, i;
     int copy_n;
@@ -799,23 +794,32 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     if (tracks[track_widx].filesize != 0)
         return false;
 
-    last_index = playlist_get_display_index();
-        
+    last_index = playlist_get_display_index() - 1
+               + playlist_get_first_index(NULL);
+    if (last_index >= playlist_amount())
+        last_index -= playlist_amount();
+
+    peek_again:
     /* Get track name from current playlist read position. */
     logf("Buffering track:%d/%d", track_widx, track_ridx);
-    trackname = playlist_peek(peek_offset);
+    /* Handle broken playlists. */
+    while ( (trackname = playlist_peek(peek_offset)) != NULL) {
+        fd = open(trackname, O_RDONLY);
+        if (fd < 0) {
+            logf("Open failed");
+            /* Delete invalid entry from playlist. */
+            playlist_delete(NULL, last_index);
+            continue ;
+        }
+        break ;
+    }
+    
     if (!trackname) {
         logf("End-of-playlist");
         conf_watermark = 0;
         return false;
     }
     
-    fd = open(trackname, O_RDONLY);
-    if (fd < 0) {
-        logf("Open failed");
-        return false;
-    }
-
     /* Initialize track entry. */
     size = filesize(fd);
     tracks[track_widx].filerem = size;
@@ -823,7 +827,8 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     tracks[track_widx].filepos = 0;
     tracks[track_widx].available = 0;
     //tracks[track_widx].taginfo_ready = false;
-    tracks[track_widx].playlist_offset = offset;
+    tracks[track_widx].playlist_offset = peek_offset;
+    last_peek_offset = peek_offset;
     
     if (buf_widx >= codecbuflen)
         buf_widx -= codecbuflen;
@@ -846,6 +851,13 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         /* Set filesize to zero to indicate no file was loaded. */
         tracks[track_widx].filesize = 0;
         tracks[track_widx].filerem = 0;
+
+        /* Try skipping to next track. */
+        if (fill_bytesleft > 0) {
+            /* Delete invalid entry from playlist. */
+            playlist_delete(NULL, last_index);
+            goto peek_again;
+        }
         return false;
     }
     // tracks[track_widx].filebuf = &codecbuf[buf_widx];
@@ -857,7 +869,9 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
             logf("Metadata error!");
             tracks[track_widx].filesize = 0;
             close(fd);
-            return false;
+            /* Delete invalid entry from playlist. */
+            playlist_delete(NULL, last_index);
+            goto peek_again;
         }
     }
     set_filebuf_watermark(buffer_margin);
@@ -977,9 +991,8 @@ void audio_play_start(int offset)
     
     fill_bytesleft = codecbuflen;
     filling = true;
-    last_peek_offset = 0;
+    last_peek_offset = -1;
     if (audio_load_track(offset, true, 0)) {
-        last_peek_offset++;
         if (track_buffer_callback) {
             cur_ti->event_sent = true;
             track_buffer_callback(&cur_ti->id3, true);
@@ -1123,8 +1136,8 @@ void audio_check_buffer(void)
     }
     
     /* Load new files to fill the entire buffer. */
-    if (audio_load_track(0, false, last_peek_offset)) {
-        last_peek_offset++;
+    if (audio_load_track(0, false, last_peek_offset + 1)) {
+    
     } else if (tracks[track_widx].filerem == 0 || fill_bytesleft == 0) {
         /* Read next unbuffered track's metadata as necessary. */
         read_next_metadata();
@@ -1342,7 +1355,7 @@ void audio_invalidate_tracks(void)
     }
     
     track_count = 1;
-    last_peek_offset = 1;
+    last_peek_offset = 0;
     track_widx = track_ridx;
     /* Mark all other entries null (also buffered wrong metadata). */
     audio_clear_track_entries(false);
@@ -1372,7 +1385,6 @@ static void initiate_track_change(int peek_index)
             
     /* Detect if disk is spinning.. */
     if (filling) {
-        ci.stop_codec = true;
         playlist_next(peek_index);
         queue_post(&audio_queue, AUDIO_PLAY, 0);
     } else {
