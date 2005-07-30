@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2004 Matthias Wientapper
+ * Heavily extended 2005 Jens Arnold
  *
  *
  * All files in this archive are subject to the GNU General Public License.
@@ -53,57 +54,161 @@
 
 static struct plugin_api* rb;
 static char buff[32];
-static long aspect;
-static long x_min;
-static long x_max;
-static long y_min;
-static long y_max;
-static long delta;
-static int max_iter;
+
+/* Fixed point format: 6 bits integer part incl. sign, 58 bits fractional part */
+static long long x_min;
+static long long x_max;
+static long long x_step;
+static long long x_delta;
+static long long y_min;
+static long long y_max;
+static long long y_step;
+static long long y_delta;
+
+static int px_min = 0;
+static int px_max = LCD_WIDTH;
+static int py_min = 0;
+static int py_max = LCD_HEIGHT;
+
+static int step_log2;
+static unsigned max_iter;
+
 static unsigned char *gbuf;
 static unsigned int gbuf_size = 0;
 static unsigned char graybuffer[LCD_HEIGHT];
 
+#if CONFIG_CPU == SH7034
+long long mul64(long long f1, long long f2);
 
-void init_mandelbrot_set(void){
-#if CONFIG_LCD == LCD_SSD1815 /* Recorder, Ondio. */
-    x_min = -38<<22;  // -2.375<<26
-    x_max =  15<<22;  //  0.9375<<26
-#else  /* Iriver H1x0 */
-    x_min = -36<<22;  // -2.25<<26
-    x_max =  12<<22;  //  0.75<<26
+asm (
+    /* 64bit * 64bit -> 64bit multiplication. Works for both signed and unsigned */
+    ".global _mul64      \n"
+    ".type   _mul64,@function\n"
+"_mul64:                 \n"  /* Notation: abcd * efgh, where each letter */
+    "mov.l   r8,@-r15    \n"  /* represents 16 bits. Called with: */
+    "mov.l   r9,@-r15    \n"  /* r4 = ab, r5 = cd, r6 = ef, r7 = gh */
+
+    "swap.w  r5,r2       \n"  /* r2 = dc */
+    "mulu    r2,r7       \n"  /* c * h */
+    "swap.w  r7,r3       \n"  /* r3 = hg */
+    "sts     macl,r1     \n"  /* r1 = c * h */
+    "mulu    r5,r3       \n"  /* d * g */
+    "clrt                \n"
+    "sts     macl,r9     \n"  /* r9 = d * g */
+    "addc    r9,r1       \n"  /* r1 += r9 */
+    "movt    r0          \n"  /* move carry to r0 */
+    "mov     r1,r9       \n"  /* r0r1 <<= 16 */
+    "xtrct   r0,r9       \n"
+    "mulu    r5,r7       \n"  /* d * h */
+    "mov     r9,r0       \n"
+    "shll16  r1          \n"
+    "sts     macl,r9     \n"  /* r9 = d * h */
+    "mov     #0,r8       \n"  /* r8 = 0 */
+    "clrt                \n"  /* r0r1 += r8r9 */
+    "mulu    r4,r7       \n"  /* b * h */
+    "addc    r9,r1       \n"
+    "addc    r8,r0       \n"
+    "sts     macl,r8     \n"  /* r8 = b * h */
+    "mulu    r2,r3       \n"  /* c * g */
+    "add     r8,r0       \n"  /* r0r1 += r8 << 32 */
+    "sts     macl,r8     \n"  /* r8 = c * g */
+    "mulu    r5,r6       \n"  /* d * f */
+    "add     r8,r0       \n"  /* r0r1 += r8 << 32 */
+    "sts     macl,r8     \n"  /* r8 = d * f */
+    "mulu    r4,r3       \n"  /* b * g */
+    "add     r8,r0       \n"  /* r0r1 += r8 << 32 */
+    "sts     macl,r8     \n"  /* r8 = b * g */
+    "mulu    r2,r6       \n"  /* c * f */
+    "swap.w  r4,r2       \n"  /* r2 = ba */
+    "sts     macl,r9     \n"  /* r9 = c * f */
+    "mulu    r2,r7       \n"  /* a * h */
+    "add     r9,r8       \n"  /* r8 += r9 */
+    "swap.w  r6,r3       \n"  /* r3 = fe */
+    "sts     macl,r9     \n"  /* r9 = a * h */
+    "mulu    r5,r3       \n"  /* d * e */
+    "add     r9,r8       \n"  /* r8 += r9 */
+    "sts     macl,r9     \n"  /* r9 = d * e */
+    "add     r9,r8       \n"  /* r8 += r9 */
+    "shll16  r8          \n"  /* r8 <<= 16 */
+    "add     r8,r0       \n"  /* r0r1 += r8 << 32 */
+
+    "mov.l   @r15+,r9    \n"
+    "rts                 \n"
+    "mov.l   @r15+,r8    \n"
+);
+#define MUL64(a, b) mul64(a, b)
+#else
+#define MUL64(a, b) ((a)*(b))
 #endif
-    y_min = -19<<22;  // -1.1875<<26
-    y_max =  19<<22;  //  1.1875<<26
-    delta = (x_max - x_min) >> 3;  // /8
-    max_iter = 25;
+
+int ilog2_fp(long long value) /* calculate integer log2(value_fp_6.58) */
+{
+    int i = 0;
+
+    if (value <= 0) {
+        return -32767;
+    } else if (value > (1LL<<58)) {
+        while (value >= (2LL<<58)) {
+            value >>= 1;
+            i++;
+        }
+    } else {
+        while (value < (1LL<<58)) {
+            value <<= 1;
+            i--;
+        }
+    }
+    return i;
 }
 
-void calc_mandelbrot_set(void){
-    
+void recalc_parameters(void)
+{
+    x_step = (x_max - x_min) / LCD_WIDTH;
+    x_delta = MUL64(x_step, (LCD_WIDTH/8));
+    y_step = (y_max - y_min) / LCD_HEIGHT;
+    y_delta = MUL64(y_step, (LCD_HEIGHT/8));
+    step_log2 = MIN(ilog2_fp(x_step), ilog2_fp(y_step));
+    max_iter = MAX(10, 10 - 15 * step_log2);
+}
+
+void init_mandelbrot_set(void)
+{
+#if CONFIG_LCD == LCD_SSD1815 /* Recorder, Ondio. */
+    x_min = -38LL<<54;  // -2.375<<58
+    x_max =  15LL<<54;  //  0.9375<<58
+#else  /* Iriver H1x0 */
+    x_min = -36LL<<54;  // -2.25<<58
+    x_max =  12LL<<54;  //  0.75<<58
+#endif
+    y_min = -19LL<<54;  // -1.1875<<58
+    y_max =  19LL<<54;  //  1.1875<<58
+    recalc_parameters();
+}
+
+void calc_mandelbrot_32(void)
+{
     long start_tick, last_yield;
-    int n_iter;
-    int x_pixel, y_pixel;
+    unsigned n_iter;
+    long long a64, b64;
     long x, x2, y, y2, a, b;
-    long x_fact, y_fact;
+    int p_x, p_y;
     int brightness;
-    
+
     start_tick = last_yield = *rb->current_tick;
     
-    gray_ub_clear_display();
-
-    x_fact = (x_max - x_min) / LCD_WIDTH;
-    y_fact = (y_max - y_min) / LCD_HEIGHT;
-    
-    a = x_min;
-    for (x_pixel = 0; x_pixel < LCD_WIDTH; x_pixel++){
-        b = y_min;
-        for(y_pixel = LCD_HEIGHT-1; y_pixel >= 0; y_pixel--){
+    for (p_x = 0, a64 = x_min; p_x <= px_max; p_x++, a64 += x_step) {
+        if (p_x < px_min)
+            continue;
+        a = a64 >> 32;
+        for (p_y = LCD_HEIGHT-1, b64 = y_min; p_y >= py_min; p_y--, b64 += y_step) {
+            if (p_y >= py_max)
+                continue;
+            b = b64 >> 32;
             x = 0;
             y = 0;
             n_iter = 0;
 
-            while (++n_iter<=max_iter) {
+            while (++n_iter <= max_iter) {
                 x >>= 13;
                 y >>= 13;
                 x2 = x * x;
@@ -121,17 +226,67 @@ void calc_mandelbrot_set(void){
             } else {
                 brightness = 255 - (32 * (n_iter & 7));
             }
-            graybuffer[y_pixel]=brightness;
+            graybuffer[p_y]=brightness;
+            /* be nice to other threads:
+             * if at least one tick has passed, yield */
+            if  (*rb->current_tick > last_yield) {
+                rb->yield();
+                last_yield = *rb->current_tick;
+            }
+        }
+        gray_ub_gray_bitmap_part(graybuffer, 0, py_min, 1,
+                                 p_x, py_min, 1, py_max-py_min);
+    }
+}
+
+void calc_mandelbrot_64(void)
+{
+    long start_tick, last_yield;
+    unsigned n_iter;
+    long long x, x2, y, y2, a, b;
+    int p_x, p_y;
+    int brightness;
+
+    start_tick = last_yield = *rb->current_tick;
+    
+    for (p_x = 0, a = x_min; p_x < px_max; p_x++, a += x_step) {
+        if (p_x < px_min)
+            continue;
+        for (p_y = LCD_HEIGHT-1, b = y_min; p_y >= py_min; p_y--, b += y_step) {
+            if (p_y >= py_max)
+                continue;
+            x = 0;
+            y = 0;
+            n_iter = 0;
+
+            while (++n_iter<=max_iter) {
+                x >>= 29;
+                y >>= 29;
+                x2 = MUL64(x, x);
+                y2 = MUL64(y, y);
+                
+                if (x2 + y2 > (4LL<<58)) break;
+                
+                y = 2 * MUL64(x, y) + b;
+                x = x2 - y2 + a;
+            }
+
+            // "coloring"
+            if  (n_iter > max_iter){
+                brightness = 0; // black
+            } else {
+                brightness = 255 - (32 * (n_iter & 7));
+            }
+            graybuffer[p_y]=brightness;
             /* be nice to other threads:
              * if at least one tick has passed, yield */
             if  (*rb->current_tick > last_yield){
                 rb->yield();
                 last_yield = *rb->current_tick;
             }
-            b += y_fact;
         }
-        gray_ub_gray_bitmap(graybuffer, x_pixel, 0, 1, LCD_HEIGHT);
-        a += x_fact;
+        gray_ub_gray_bitmap_part(graybuffer, 0, py_min, 1,
+                                 p_x, py_min, 1, py_max-py_min);
     }
 }
 
@@ -142,12 +297,16 @@ void cleanup(void *parameter)
     gray_release();
 }
 
+#define REDRAW_NONE    0
+#define REDRAW_PARTIAL 1
+#define REDRAW_FULL    2
+
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int button;
     int lastbutton = BUTTON_NONE;
     int grayscales;
-    bool redraw = true;
+    int redraw = REDRAW_FULL;
 
     TEST_PLUGIN_API(api);
     rb = api;
@@ -160,7 +319,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
      * 8 bitplanes for 9 shades of gray.*/
     grayscales = gray_init(rb, gbuf, gbuf_size, false, LCD_WIDTH,
                            (LCD_HEIGHT*LCD_DEPTH/8), 8, NULL) + 1;
-    if (grayscales != 9){
+    if (grayscales != 9) {
         rb->snprintf(buff, sizeof(buff), "%d", grayscales);
         rb->lcd_puts(0, 1, buff);
         rb->lcd_update();
@@ -168,18 +327,28 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         return(0);
     }
 
-    gray_show(true); /* switch on greyscale overlay */
+    gray_show(true); /* switch on grayscale overlay */
 
     init_mandelbrot_set();
-    aspect = ((y_max - y_min) / ((x_max-x_min)>>13))<<13;
 
     /* main loop */
-    while (true){
-        if(redraw)
-            calc_mandelbrot_set();
+    while (true) {
+        if (redraw > REDRAW_NONE) {
+            if (redraw == REDRAW_FULL)
+                gray_ub_clear_display();
 
-        redraw = false;
-        
+            if (step_log2 <= -13) /* select precision */
+                calc_mandelbrot_64();
+            else
+                calc_mandelbrot_32();
+
+            px_min = 0;
+            px_max = LCD_WIDTH;
+            py_min = 0;
+            py_max = LCD_HEIGHT;
+            redraw = REDRAW_NONE;
+        }
+
         button = rb->button_get(true);
         switch (button) {
         case MANDELBROT_QUIT:
@@ -187,12 +356,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             return PLUGIN_OK;
 
         case MANDELBROT_ZOOM_OUT:
-            x_min -= delta;
-            x_max += delta;
-            y_min -= ((delta>>13)*(aspect>>13));
-            y_max += ((delta>>13)*(aspect>>13));
-            delta = (x_max - x_min) >> 3;
-            redraw = true;
+            x_min -= x_delta;
+            x_max += x_delta;
+            y_min -= y_delta;
+            y_max += y_delta;
+            recalc_parameters();
+            redraw = REDRAW_FULL;
             break;
 
 
@@ -204,55 +373,61 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #ifdef MANDELBROT_ZOOM_IN2
         case MANDELBROT_ZOOM_IN2:
 #endif
-            x_min += delta;
-            x_max -= delta;
-            y_min += ((delta>>13)*(aspect>>13));
-            y_max -= ((delta>>13)*(aspect>>13));
-            delta = (x_max - x_min) >> 3;
-            redraw = true;
+            x_min += x_delta;
+            x_max -= x_delta;
+            y_min += y_delta;
+            y_max -= y_delta;
+            recalc_parameters();
+            redraw = REDRAW_FULL;
             break;
 
         case BUTTON_UP:
-            y_min += delta;
-            y_max += delta;
-            redraw = true;
+            y_min += y_delta;
+            y_max += y_delta;
+            gray_ub_scroll_down(LCD_HEIGHT/8);
+            py_max = (LCD_HEIGHT/8);
+            redraw = REDRAW_PARTIAL;
             break;
 
         case BUTTON_DOWN:
-            y_min -= delta;
-            y_max -= delta;
-            redraw = true;
+            y_min -= y_delta;
+            y_max -= y_delta;
+            gray_ub_scroll_up(LCD_HEIGHT/8);
+            py_min = (LCD_HEIGHT-LCD_HEIGHT/8);
+            redraw = REDRAW_PARTIAL;
             break;
 
         case BUTTON_LEFT:
-            x_min -= delta;
-            x_max -= delta;
-            redraw = true;
+            x_min -= x_delta;
+            x_max -= x_delta;
+            gray_ub_scroll_right(LCD_WIDTH/8);
+            px_max = (LCD_WIDTH/8);
+            redraw = REDRAW_PARTIAL;
             break;
 
         case BUTTON_RIGHT:
-            x_min += delta;
-            x_max += delta;
-            redraw = true;
+            x_min += x_delta;
+            x_max += x_delta;
+            gray_ub_scroll_left(LCD_WIDTH/8);
+            px_min = (LCD_WIDTH-LCD_WIDTH/8);
+            redraw = REDRAW_PARTIAL;
             break;
 
         case MANDELBROT_MAXITER_DEC:
-            if (max_iter>5){
-                max_iter -= 5;
-                redraw = true;
+            if (max_iter >= 15) {
+                max_iter -= max_iter >> 1;
+                redraw = REDRAW_FULL;
             }
             break;
 
         case MANDELBROT_MAXITER_INC:
-            if (max_iter < 195){
-                max_iter += 5;
-                redraw = true;
-            }
+            max_iter += max_iter >> 1;
+            redraw = REDRAW_FULL;
             break;
 
         case MANDELBROT_RESET:
             init_mandelbrot_set();
-            redraw = true;
+            redraw = REDRAW_FULL;
             break;
 
         default:
