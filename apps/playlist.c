@@ -1169,7 +1169,14 @@ static int check_subdir_for_music(char *dir, char *subdir)
 
     if (result < 0)
     {
-        dir[dirlen] = '\0';
+        if (dirlen)
+        {
+            dir[dirlen] = '\0';
+        }
+        else
+        {
+            strcpy(dir, "/");
+        }
 
         /* we now need to reload our current directory */
         if(ft_load(tc, dir) < 0)
