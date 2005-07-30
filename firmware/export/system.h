@@ -125,6 +125,10 @@ enum {
      : /* %0 */ "d"(mask),   \
        /* %1 */ "a"(address))
 
+static inline void mcf5249_init_mac(void) {
+      asm volatile ("move.l #0x20, %macsr;");  /* frac, truncate, no saturation */
+}
+
 #endif
 
 #ifndef SIMULATOR

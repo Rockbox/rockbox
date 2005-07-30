@@ -24,6 +24,7 @@
 #include "playback.h"
 #include "dsp.h"
 #include "lib/codeclib.h"
+#include "system.h"
 
 struct mad_stream Stream IDATA_ATTR;
 struct mad_frame Frame IDATA_ATTR;
@@ -92,7 +93,10 @@ enum codec_status codec_start(struct codec_api* api)
     ci->memset(&Frame, 0, sizeof(struct mad_frame));
     ci->memset(&Synth, 0, sizeof(struct mad_synth));
     ci->memset(&Timer, 0, sizeof(mad_timer_t));
-  
+    
+#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+    mcf5249_init_mac();
+#endif
     mad_stream_init(&Stream);
     mad_frame_init(&Frame);
     mad_synth_init(&Synth);

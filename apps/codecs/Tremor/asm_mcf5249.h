@@ -29,10 +29,6 @@
 
 #define MB()
 
-static inline void mcf5249_init_mac(void) {
-  asm volatile ("move.l #0x20, %macsr;");  /* frac, truncate, no saturation */
-}
-
 static inline ogg_int32_t MULT32(ogg_int32_t x, ogg_int32_t y) {
 
   asm volatile ("mac.l %[x], %[y], %%acc0;"    /* multiply & shift  */

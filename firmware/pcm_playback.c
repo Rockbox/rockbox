@@ -184,19 +184,6 @@ void pcm_play_data(void (*get_more)(unsigned char** start, long* size))
     
     callback_for_more = get_more;
     
-    /** FIXME: This is a temporary fix to prevent playback glitches when
-      * playing the first file. We will just drop the first frame to prevent
-      * that problem from occurring.
-      * Some debug data:
-      *   - This problem will occur only when the first file.
-      *   - First frame will be totally corrupt and the song will begin
-      *     from the next frame. But at the next time (when the bug has
-      *     already happened), the song will start from first frame.
-      *   - Dropping some frames directly from (mpa) codec will also
-      *     prevent the problem from happening. So it's unlikely you can
-      *     find the explanation for this bug from this file.
-      */
-    get_more((unsigned char **)&start, (long *)&size); // REMOVE THIS TO TEST
     get_more((unsigned char **)&start, (long *)&size);
     get_more(&next_start, &next_size);
     dma_start(start, size);
