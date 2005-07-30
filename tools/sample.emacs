@@ -16,7 +16,7 @@
 
 (defvar my-style-selective-mode-hook nil
   "Holds a list of predicate and hooks pairs. (list (PREDICATE . HOOK)
-...) It is used by my-mode-selective-mood-hook-function for choosing
+...) It is used by my-mode-selective-mode-hook-function for choosing
 the right hook to run.")
 
 (defun my-style-selective-mode-hook-function ()
