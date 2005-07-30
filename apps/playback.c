@@ -795,7 +795,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         return false;
 
     last_index = playlist_get_display_index() - 1
-               + playlist_get_first_index(NULL);
+               + playlist_get_first_index(NULL) + peek_offset;
     if (last_index >= playlist_amount())
         last_index -= playlist_amount();
 
