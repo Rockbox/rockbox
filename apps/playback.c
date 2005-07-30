@@ -1321,9 +1321,8 @@ bool codec_request_next_track_callback(void)
             
         if (tracks[track_ridx].filesize == 0) {
             logf("No more tracks [2]");
-            ci.stop_codec = true;
+            ci.reload_codec = false;
             new_track = 0;
-            queue_post(&audio_queue, AUDIO_PLAY, 0);
             return false;
         }
     }
