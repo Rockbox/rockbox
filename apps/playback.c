@@ -779,6 +779,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     off_t size;
     int rc, i;
     int copy_n;
+    int playlist_index;
 
     /* Stop buffer filling if there is no free track entries.
        Don't fill up the last track entry (we wan't to store next track
@@ -794,10 +795,11 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     if (tracks[track_widx].filesize != 0)
         return false;
 
-    last_index = playlist_get_display_index() - 1
-               + playlist_get_first_index(NULL) + peek_offset;
-    if (last_index >= playlist_amount())
-        last_index -= playlist_amount();
+    last_index = playlist_get_display_index();
+    playlist_index = playlist_get_display_index() - 1
+                    + playlist_get_first_index(NULL) + peek_offset;
+    if (playlist_index >= playlist_amount())
+        playlist_index -= playlist_amount();
 
     peek_again:
     /* Get track name from current playlist read position. */
@@ -808,7 +810,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         if (fd < 0) {
             logf("Open failed");
             /* Delete invalid entry from playlist. */
-            playlist_delete(NULL, last_index);
+            playlist_delete(NULL, playlist_index);
             continue ;
         }
         break ;
@@ -855,7 +857,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         /* Try skipping to next track. */
         if (fill_bytesleft > 0) {
             /* Delete invalid entry from playlist. */
-            playlist_delete(NULL, last_index);
+            playlist_delete(NULL, playlist_index);
             goto peek_again;
         }
         return false;
@@ -870,7 +872,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
             tracks[track_widx].filesize = 0;
             close(fd);
             /* Delete invalid entry from playlist. */
-            playlist_delete(NULL, last_index);
+            playlist_delete(NULL, playlist_index);
             goto peek_again;
         }
     }
