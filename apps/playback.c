@@ -282,7 +282,7 @@ long codec_filebuf_callback(void *ptr, long size)
     
     while (copy_n > cur_ti->available) {
         yield();
-        if (ci.stop_codec)
+        if (ci.stop_codec || ci.reload_codec)
             return 0;
     }
     
@@ -321,7 +321,7 @@ void* codec_request_buffer_callback(long *realsize, long reqsize)
     
     while ((int)*realsize > cur_ti->available) {
         yield();
-        if (ci.stop_codec) {
+        if (ci.stop_codec || ci.reload_codec) {
             *realsize = 0;
             return NULL;
         }
@@ -373,7 +373,7 @@ static bool rebuffer_and_seek(int newpos)
 
     while (cur_ti->available == 0 && cur_ti->filerem > 0) {
         yield();
-        if (ci.stop_codec)
+        if (ci.stop_codec || ci.reload_codec)
             return false;
     }
 
