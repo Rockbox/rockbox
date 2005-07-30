@@ -1373,10 +1373,15 @@ void audio_invalidate_tracks(void)
 
 static void initiate_track_change(int peek_index)
 {
+    int repeat_mode = global_settings.repeat_mode;
+
     if (!playlist_check(peek_index))
         return ;
 
-    if (global_settings.repeat_mode == REPEAT_ONE) {
+    /* Handle the special case of repeat mode and only
+     * one track, or REPEAT_ONE mode */
+    if ((repeat_mode == REPEAT_ONE) ||
+	((repeat_mode != REPEAT_OFF) && (playlist_amount() == 1))) {
         if (!paused)
             pcm_play_pause(false);
 

@@ -1841,7 +1841,7 @@ bool playlist_check(int steps)
 
     if (index < 0 && steps >= 0 &&
         (global_settings.repeat_mode == REPEAT_SHUFFLE ||
-         global_settings.next_folder))
+         (global_settings.next_folder && playlist->in_ram)))
         /* shuffle repeat and move to next folder are the same as repeat all
            for check purposes */
         index = get_next_index(playlist, steps, REPEAT_ALL);
