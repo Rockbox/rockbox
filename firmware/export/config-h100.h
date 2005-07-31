@@ -52,7 +52,8 @@
 /* Define this if you have a Motorola SCF5249 */
 #define CONFIG_CPU MCF5249
 
-#define CONFIG_I2C I2C_H100
+/* Define this if you want to use coldfire's i2c interface */
+#define CONFIG_I2C I2C_COLDFIRE
 
 #define HAVE_UDA1380
 

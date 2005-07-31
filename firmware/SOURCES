@@ -79,8 +79,8 @@ drivers/fmradio_i2c.c
 tuner_philips.c
 #endif
 #endif
-#if CONFIG_I2C == I2C_H100
-drivers/i2c-h100.c
+#if CONFIG_I2C == I2C_COLDFIRE
+drivers/i2c-coldfire.c
 #else
 drivers/i2c.c
 #endif

@@ -81,8 +81,7 @@
 #define I2C_PLAYREC  0 /* Archos Player/Recorder style */
 #define I2C_ONDIO    1 /* Ondio style */
 #define I2C_GMINI    2 /* Gmini style */
-#define I2C_H100     3 /* iRiver h100 style */
-#define I2C_IAUDIO   4 /* iAuido style */
+#define I2C_COLDFIRE 3 /* Coldfire style */
 
 /* CONFIG_LED */
 #define LED_REAL     1 /* SW controlled LED (Archos recorders, player, Gmini) */

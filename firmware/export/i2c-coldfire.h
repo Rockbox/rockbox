@@ -18,13 +18,13 @@
  ****************************************************************************/
 
 /*
- *  Driver for MCF5249's I2C interface
+ *  Driver for MCF52xx's I2C interface
  *  2005-02-17 hubble@mochine.com
  *
  */
  
-#ifndef _I2C_H100_H
-#define _I2C_H100_H
+#ifndef _I2C_COLDFIRE_H
+#define _I2C_COLDFIRE_H
 
 void i2c_init(void);
 int i2c_write(int device, unsigned char *buf, int count);

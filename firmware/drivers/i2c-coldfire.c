@@ -21,7 +21,7 @@
 #include "kernel.h"
 #include "debug.h"
 #include "system.h"
-#include "i2c-h100.h"
+#include "i2c-coldfire.h"
 
 #define I2C_DEVICE_1    ((volatile unsigned char *)&MADR)
 #define I2C_DEVICE_2    ((volatile unsigned char *)&MADR2)
@@ -37,6 +37,7 @@ static volatile unsigned char *i2c_get_addr(int device);
 
 void i2c_init(void)
 {
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
     /* Audio Codec */
     MADR = 0x6c; /* iRiver firmware uses this addr */
     MBDR = 0;    /* iRiver firmware does this */
@@ -48,22 +49,21 @@ void i2c_init(void)
     MBDR2 = 0;
     MBCR2 = IEN;
 #endif
+
+#endif
 }
 
 void i2c_close(void)
 {
     MBCR  = 0;
-
-#if 0 
     MBCR2 = 0;
-#endif
 }
 
 /**
  * Writes bytes to the selected device.
  *
- * Use device=1 for bus 1 at 0x40000280 (Audio Codec)
- * Use device=2 for bus 2 at 0x80000440 (Tuner ?)
+ * Use device=1 for bus 1 at 0x40000280
+ * Use device=2 for bus 2 at 0x80000440
  * 
  * Returns number of bytes successfully send or -1 if START failed
  */
@@ -106,33 +106,33 @@ int i2c_write_byte(int device, unsigned char data)
     /* Wait for bus busy */
     while (!(regs[O_MBSR] & IBB) && count < MAX_LOOP)
     {
-        yield();  
+        yield();
         count++;
     }
-    
+
     if (count >= MAX_LOOP)
         return -1;
 
     count = 0;
-    
+
     /* Wait for interrupt flag */
     while (!(regs[O_MBSR] & IFF) && count < MAX_LOOP)
     {
         yield();
-        count++;  
+        count++;
     }
 
     if (count >= MAX_LOOP)
         return -2;
 
     regs[O_MBSR] &= ~IFF;       /* Clear interrupt flag  */
-    
+
     if (!(regs[O_MBSR] & ICF))  /* Check that transfer is complete */
-        return -3;      
+        return -3;
 
     if (regs[O_MBSR] & RXAK)    /* Check that the byte has been ACKed */
         return -4;
-    
+
     return 0;
 }
 
@@ -142,14 +142,14 @@ int i2c_gen_start(int device)
 {
     volatile unsigned char *regs = i2c_get_addr(device);
     long count = 0;
-        
+
     /* Wait for bus to become free */
     while ((regs[O_MBSR] & IBB) && (count < MAX_LOOP))
     {
         yield();
         count++;
     }
-                
+
     if (count >= MAX_LOOP)
         return -1;
 
@@ -169,6 +169,6 @@ volatile unsigned char *i2c_get_addr(int device)
 {
     if (device == 1)
         return I2C_DEVICE_1;
-    
-    return I2C_DEVICE_2;        
+
+    return I2C_DEVICE_2;
 }
