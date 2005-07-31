@@ -33,7 +33,7 @@ print HFILE <<MOO
 /* this is the array for holding the string pointers.
    It will be initialized at runtime. */
 extern unsigned char *language_strings[];
-/* this contains the concatenation of all strings, separated by \0 chars */
+/* this contains the concatenation of all strings, separated by \\0 chars */
 extern const unsigned char language_builtin[];
 
 /* The enum below contains all available strings */
