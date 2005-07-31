@@ -29,7 +29,7 @@
 #include "file.h"
 #include "buffer.h"
 
-#include "i2c-h100.h"
+#include "i2c-coldfire.h"
 #include "uda1380.h"
 
 /* ------------------------------------------------- */
