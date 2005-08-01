@@ -75,66 +75,58 @@ static unsigned max_iter;
 
 static unsigned char *gbuf;
 static unsigned int gbuf_size = 0;
-static unsigned char graybuffer[LCD_HEIGHT];
+static unsigned char graybuffer[LCD_HEIGHT];   
 
 #if CONFIG_CPU == SH7034
 long long mul64(long long f1, long long f2);
 
 asm (
     /* 64bit * 64bit -> 64bit multiplication. Works for both signed and unsigned */
-    ".global _mul64      \n"
-    ".type   _mul64,@function\n"
-"_mul64:                 \n"  /* Notation: abcd * efgh, where each letter */
-    "mov.l   r8,@-r15    \n"  /* represents 16 bits. Called with: */
-    "mov.l   r9,@-r15    \n"  /* r4 = ab, r5 = cd, r6 = ef, r7 = gh */
-
-    "swap.w  r5,r2       \n"  /* r2 = dc */
-    "mulu    r2,r7       \n"  /* c * h */
+    ".global _mul64      \n"  /* Notation: abcd * efgh, where each letter */
+    ".type   _mul64,@function\n" /* represents 16 bits. Called with: */
+"_mul64:                 \n"  /* r4 = ab, r5 = cd, r6 = ef, r7 = gh */
+    "swap.w  r4,r2       \n"  /* r2 = ba */
+    "mulu    r2,r7       \n"  /* a * h */
+    "swap.w  r6,r3       \n"  /* r3 = fe */
+    "sts     macl,r0     \n"  /* r0 = a * h */
+    "mulu    r5,r3       \n"  /* d * e */
     "swap.w  r7,r3       \n"  /* r3 = hg */
-    "sts     macl,r1     \n"  /* r1 = c * h */
+    "sts     macl,r1     \n"  /* r1 = d * e */
+    "mulu    r4,r3       \n"  /* b * g */
+    "add     r1,r0       \n"  /* r0 += r1 */
+    "swap.w  r5,r2       \n"  /* r2 = dc */
+    "sts     macl,r1     \n"  /* r1 = b * g */
+    "mulu    r2,r6       \n"  /* c * f */
+    "add     r1,r0       \n"  /* r0 += r1 */
+    "sts     macl,r1     \n"  /* r1 = c * f */
+    "mulu    r4,r7       \n"  /* b * h */
+    "add     r1,r0       \n"  /* r0 += r1 */
+    "shll16  r0          \n"  /* r0 <<= 16 */
+    "sts     macl,r1     \n"  /* r1 = b * h */
+    "mulu    r2,r3       \n"  /* c * g */
+    "add     r1,r0       \n"  /* r0 += r1 */
+    "sts     macl,r1     \n"  /* r1 = c * g */
+    "mulu    r5,r6       \n"  /* d * f */
+    "add     r1,r0       \n"  /* r0 += r1 */
+    "sts     macl,r1     \n"  /* r1 = d * f */
+    "mulu    r5,r7       \n"  /* d * h */
+    "add     r1,r0       \n"  /* r0 += r1 */
+    "sts     macl,r1     \n"  /* r1 = d * h */
+    "mulu    r2,r7       \n"  /* c * h */
+    "sts     macl,r2     \n"  /* r2 = c * h */
     "mulu    r5,r3       \n"  /* d * g */
     "clrt                \n"
-    "sts     macl,r9     \n"  /* r9 = d * g */
-    "addc    r9,r1       \n"  /* r1 += r9 */
-    "movt    r0          \n"  /* move carry to r0 */
-    "mov     r1,r9       \n"  /* r0r1 <<= 16 */
-    "xtrct   r0,r9       \n"
-    "mulu    r5,r7       \n"  /* d * h */
-    "mov     r9,r0       \n"
-    "shll16  r1          \n"
-    "sts     macl,r9     \n"  /* r9 = d * h */
-    "mov     #0,r8       \n"  /* r8 = 0 */
-    "clrt                \n"  /* r0r1 += r8r9 */
-    "mulu    r4,r7       \n"  /* b * h */
-    "addc    r9,r1       \n"
-    "addc    r8,r0       \n"
-    "sts     macl,r8     \n"  /* r8 = b * h */
-    "mulu    r2,r3       \n"  /* c * g */
-    "add     r8,r0       \n"  /* r0r1 += r8 << 32 */
-    "sts     macl,r8     \n"  /* r8 = c * g */
-    "mulu    r5,r6       \n"  /* d * f */
-    "add     r8,r0       \n"  /* r0r1 += r8 << 32 */
-    "sts     macl,r8     \n"  /* r8 = d * f */
-    "mulu    r4,r3       \n"  /* b * g */
-    "add     r8,r0       \n"  /* r0r1 += r8 << 32 */
-    "sts     macl,r8     \n"  /* r8 = b * g */
-    "mulu    r2,r6       \n"  /* c * f */
-    "swap.w  r4,r2       \n"  /* r2 = ba */
-    "sts     macl,r9     \n"  /* r9 = c * f */
-    "mulu    r2,r7       \n"  /* a * h */
-    "add     r9,r8       \n"  /* r8 += r9 */
-    "swap.w  r6,r3       \n"  /* r3 = fe */
-    "sts     macl,r9     \n"  /* r9 = a * h */
-    "mulu    r5,r3       \n"  /* d * e */
-    "add     r9,r8       \n"  /* r8 += r9 */
-    "sts     macl,r9     \n"  /* r9 = d * e */
-    "add     r9,r8       \n"  /* r8 += r9 */
-    "shll16  r8          \n"  /* r8 <<= 16 */
-    "add     r8,r0       \n"  /* r0r1 += r8 << 32 */
-
-    "mov.l   @r15+,r9    \n"
+    "sts     macl,r3     \n"  /* r3 = d * g */
+    "addc    r2,r3       \n"  /* r3 += r2, carry->r2 */
+    "movt    r2          \n"
+    "mov     r3,r4       \n"  /* r2r3 <<= 16 */
+    "xtrct   r2,r4       \n"
+    "mov     r4,r2       \n"
+    "shll16  r3          \n"
+    "clrt                \n"  /* r0r1 += r2r3 */
+    "addc    r3,r1       \n"
     "rts                 \n"
-    "mov.l   @r15+,r8    \n"
+    "addc    r2,r0       \n"
 );
 #define MUL64(a, b) mul64(a, b)
 #else
