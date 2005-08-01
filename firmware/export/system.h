@@ -154,7 +154,7 @@ static inline unsigned short SWAB16(unsigned short value)
     result[ 7..0] = value[15..8];
   */
 {
-    short result;
+    unsigned short result;
     asm volatile ("swap.b\t%1,%0" : "=r"(result) : "r"(value));
     return result;
 }
@@ -165,7 +165,7 @@ static inline unsigned long SWAW32(unsigned long value)
     result[15.. 0] = value[31..16];
   */
 {
-    long result;
+    unsigned long result;
     asm volatile ("swap.w\t%1,%0" : "=r"(result) : "r"(value));
     return result;
 }
