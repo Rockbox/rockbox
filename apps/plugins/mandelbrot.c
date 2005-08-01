@@ -109,20 +109,20 @@ asm (
     "mulu    r5,r6       \n"  /* d * f */
     "add     r1,r0       \n"  /* r0 += r1 */
     "sts     macl,r1     \n"  /* r1 = d * f */
-    "mulu    r5,r7       \n"  /* d * h */
-    "add     r1,r0       \n"  /* r0 += r1 */
-    "sts     macl,r1     \n"  /* r1 = d * h */
     "mulu    r2,r7       \n"  /* c * h */
+    "add     r1,r0       \n"  /* r0 += r1 */
     "sts     macl,r2     \n"  /* r2 = c * h */
     "mulu    r5,r3       \n"  /* d * g */
     "clrt                \n"
     "sts     macl,r3     \n"  /* r3 = d * g */
     "addc    r2,r3       \n"  /* r3 += r2, carry->r2 */
     "movt    r2          \n"
-    "mov     r3,r4       \n"  /* r2r3 <<= 16 */
-    "xtrct   r2,r4       \n"
-    "mov     r4,r2       \n"
+    "mulu    r5,r7       \n"  /* d * h */
+    "mov     r3,r1       \n"  /* r2r3 <<= 16 */
+    "xtrct   r2,r1       \n"
+    "mov     r1,r2       \n"
     "shll16  r3          \n"
+    "sts     macl,r1     \n"  /* r1 = d * h */
     "clrt                \n"  /* r0r1 += r2r3 */
     "addc    r3,r1       \n"
     "rts                 \n"
