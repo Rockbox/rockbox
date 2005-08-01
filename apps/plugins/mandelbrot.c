@@ -129,6 +129,50 @@ asm (
     "addc    r2,r0       \n"
 );
 #define MUL64(a, b) mul64(a, b)
+
+#elif defined CPU_COLDFIRE
+long long mul64(long long f1, long long f2);
+
+asm (
+    /* 64bit * 64bit -> 64bit multiplication. Works for both signed and unsigned */
+    ".section .text,\"ax\",@progbits\n"
+    ".global mul64       \n"    /* Notation: abcd * efgh, where each letter */
+    ".type   mul64,@function\n" /* represents 16 bits. */
+"mul64:                  \n"
+    "lea.l   (-16,%sp),%sp   \n"
+    "movem.l %d2-%d5,(%sp)   \n"
+
+    "movem.l (20,%sp),%d0-%d3\n" /* %d0%d1 = abcd, %d2%d3 = efgh */
+    "mulu.l  %d3,%d0     \n"  /* %d0 = ab * gh */
+    "mulu.l  %d1,%d2     \n"  /* %d2 = cd * ef */
+    "add.l   %d2,%d0     \n"  /* %d0 += %d2 */
+    "move.l  %d1,%d4     \n"  
+    "swap    %d4         \n"  /* %d4 = dc */
+    "move.l  %d3,%d5     \n"
+    "swap    %d5         \n"  /* %d5 = hg */
+    "move.l  %d4,%d2     \n"
+    "mulu.w  %d5,%d2     \n"  /* %d2 = c * g */
+    "add.l   %d2,%d0     \n"  /* %d0 += %d2 */
+    "mulu.w  %d3,%d4     \n"  /* %d4 = c * h */
+    "mulu.w  %d1,%d5     \n"  /* %d5 = d * h */
+    "add.l   %d4,%d5     \n"  /* %d5 += %d4 */
+    "subx.l  %d4,%d4     \n"
+    "neg.l   %d4         \n"  /* carry -> %d4 */
+    "swap    %d4         \n"
+    "clr.w   %d4         \n"
+    "swap    %d5         \n" 
+    "move.w  %d5,%d4     \n"
+    "clr.w   %d5         \n"  /* %d4%d5 <<= 16 */
+    "mulu.w  %d3,%d1     \n"  /* %d1 = d * h */
+    "add.l   %d5,%d1     \n"
+    "addx.l  %d4,%d0     \n"  /* %d0%d1 += %d4%d5 */
+
+    "movem.l (%sp),%d2-%d5   \n"
+    "lea.l   (16,%sp),%sp\n"
+    "rts                 \n"
+);
+#define MUL64(a, b) mul64(a, b)
+
 #else
 #define MUL64(a, b) ((a)*(b))
 #endif
@@ -407,13 +451,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
         case MANDELBROT_MAXITER_DEC:
             if (max_iter >= 15) {
-                max_iter -= max_iter >> 1;
+                max_iter -= max_iter / 3;
                 redraw = REDRAW_FULL;
             }
             break;
 
         case MANDELBROT_MAXITER_INC:
-            max_iter += max_iter >> 1;
+            max_iter += max_iter / 2;
             redraw = REDRAW_FULL;
             break;
 
