@@ -26,9 +26,13 @@
 
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
 
-/* max static loadable fonts buffer*/
+/* max static loadable font buffer size */
 #ifndef MAX_FONT_SIZE
-#define MAX_FONT_SIZE	4000	/* max total fontsize allocation*/
+#if LCD_HEIGHT > 64
+#define MAX_FONT_SIZE   10000
+#else
+#define MAX_FONT_SIZE	4000
+#endif
 #endif
 
 /*

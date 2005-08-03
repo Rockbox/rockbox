@@ -14,6 +14,10 @@ if($ARGV[0] eq "-v") {
     shift @ARGV;
 }
 
+my $target = $ARGV[0];
+my $cppdef = $target;
+
+my $exe = $ARGV[1];
 
 sub filesize {
     my ($filename)=@_;
@@ -95,13 +99,26 @@ sub buildzip {
         closedir DIR;
 
         my $maxfont;
-        open(HEADER, "<$ROOT/firmware/export/font.h");
-        while(<HEADER>) {
-            if(/^\#define MAX_FONT_SIZE[ \t]*(\d+)/) {
+
+        open(SIZE, ">ziptemp");
+        print SIZE <<STOP
+\#include "font.h"
+Font Size We Want: MAX_FONT_SIZE
+STOP
+;
+        close(SIZE);
+        my $c="cat ziptemp | gcc $cppdef -I. -I../firmware/export -E -P -";
+        # print STDERR "C: $c\n";
+        open(GETSIZE, "$c|");
+
+        while(<GETSIZE>) {
+            if($_ =~ /^Font Size We Want: (\d*)/) {
                 $maxfont = $1;
+                last;
             }
         }
-        close(HEADER);
+        close(GETSIZE);
+        unlink("ziptemp");
         die "no decent max font size" if ($maxfont < 2000);
         
         for(@fonts) {
@@ -181,10 +198,6 @@ sub runone {
     buildzip("rockbox.zip", $target,
              ($type eq "player")?0:1);
 };
-
-my $target = $ARGV[0];
-
-my $exe = $ARGV[1];
 
 if(!$exe) {
     # not specified, guess!
