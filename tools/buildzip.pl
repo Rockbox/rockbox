@@ -14,6 +14,8 @@ if($ARGV[0] eq "-v") {
     shift @ARGV;
 }
 
+my $firmdir="$ROOT/firmware";
+
 my $target = $ARGV[0];
 my $cppdef = $target;
 
@@ -107,7 +109,7 @@ Font Size We Want: MAX_FONT_SIZE
 STOP
 ;
         close(SIZE);
-        my $c="cat ziptemp | gcc $cppdef -I. -I../firmware/export -E -P -";
+        my $c="cat ziptemp | gcc $cppdef -I. -I$firmdir/export -E -P -";
         # print STDERR "C: $c\n";
         open(GETSIZE, "$c|");
 
