@@ -1265,19 +1265,21 @@ bool codec_request_next_track_callback(void)
 
     /* Advance to next track. */
     if (ci.reload_codec && new_track > 0) {
-        if (!playlist_check(new_track))
+        if (!playlist_check(new_track)) {
+            ci.reload_codec = false;
             return false;
+        }
         last_peek_offset--;
         playlist_next(new_track);
         if (++track_ridx == MAX_TRACK)
             track_ridx = 0;
-            
+        
         /* Wait for new track data (codectype 0 is invalid). When a correct
            codectype is set, we can assume that the filesize is correct. */
         while (tracks[track_ridx].id3.codectype == 0 && filling
                && !ci.stop_codec)
             yield();
-            
+        
         if (tracks[track_ridx].filesize == 0) {
             logf("Loading from disk...");
             new_track = 0;
@@ -1288,8 +1290,10 @@ bool codec_request_next_track_callback(void)
     
     /* Advance to previous track. */
     else if (ci.reload_codec && new_track < 0) {
-        if (!playlist_check(new_track))
+        if (!playlist_check(new_track)) {
+            ci.reload_codec = false;
             return false;
+        }
         last_peek_offset++;
         playlist_next(new_track);
         if (--track_ridx < 0)
@@ -1373,26 +1377,9 @@ void audio_invalidate_tracks(void)
 
 static void initiate_track_change(int peek_index)
 {
-    int repeat_mode = global_settings.repeat_mode;
-
     if (!playlist_check(peek_index))
         return ;
 
-    /* Handle the special case of repeat mode and only
-     * one track, or REPEAT_ONE mode */
-    if ((repeat_mode == REPEAT_ONE) ||
-	((repeat_mode != REPEAT_OFF) && (playlist_amount() == 1))) {
-        if (!paused)
-            pcm_play_pause(false);
-
-        audio_ff_rewind(0);
-
-        if (!paused)
-            pcm_play_pause(true);
-
-        return;
-    }
-            
     /* Detect if disk is spinning.. */
     if (filling) {
         playlist_next(peek_index);
@@ -1421,10 +1408,6 @@ void audio_thread(void)
         queue_wait_w_tmo(&audio_queue, &ev, 0);
         switch (ev.id) {
             case AUDIO_PLAY:
-                /* Refuse to start playback if we are already playing
-                   the requested track. */
-                if (last_index == playlist_get_display_index() && playing)
-                    break ;
                 logf("starting...");
                 playing = true;
                 paused = false;
