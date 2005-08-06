@@ -43,7 +43,7 @@
 #endif
 #ifdef HAVE_UDA1380
 #include "uda1380.h"
-#eilf HAVE_TLV320
+#elif HAVE_TLV320
 #include "tlv320.h"
 #endif
 #include "logf.h"
@@ -905,7 +905,7 @@ void shutdown_hw(void)
     mp3_shutdown();
 #ifdef HAVE_UDA1380
     uda1380_close();
-#eilf HAVE_TLV320
+#elif HAVE_TLV320
     tlv320_close();
 #endif
 #if CONFIG_KEYPAD == ONDIO_PAD
