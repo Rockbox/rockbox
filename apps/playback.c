@@ -1283,6 +1283,7 @@ bool codec_request_next_track_callback(void)
         if (tracks[track_ridx].filesize == 0) {
             logf("Loading from disk...");
             new_track = 0;
+            last_index = -1;
             queue_post(&audio_queue, AUDIO_PLAY, 0);
             return false;
         }
@@ -1303,6 +1304,7 @@ bool codec_request_next_track_callback(void)
             /*+ (off_t)tracks[track_ridx].codecsize*/ > codecbuflen) {
             logf("Loading from disk...");
             new_track = 0;
+            last_index = -1;
             queue_post(&audio_queue, AUDIO_PLAY, 0);
             return false;
         }
@@ -1408,6 +1410,15 @@ void audio_thread(void)
         queue_wait_w_tmo(&audio_queue, &ev, 0);
         switch (ev.id) {
             case AUDIO_PLAY:
+                 /* Refuse to start playback if we are already playing
+                    the requested track. This is needed because when skipping
+                    tracks fast, AUDIO_PLAY commands will get queued with the
+                    the same track and playback will stutter. */
+                if (last_index == playlist_get_display_index() && playing) {
+                    logf("already playing req. track");
+                    break ;
+                }
+                
                 logf("starting...");
                 playing = true;
                 paused = false;
