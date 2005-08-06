@@ -22,10 +22,15 @@
 
 /*** definitions ***/
 
-extern void tlv320_reset(void);
-extern int tlv320_init(void);
-extern int tlv320_set_headphone_vol(int vol_l, int vol_r);
-extern int tlv320_mute(bool mute);
+extern void tlv320_init();
+extern void tlv320_reset();
+extern void tlv320_enable_output(bool enable);
+extern void tlv320_set_headphone_vol(int vol_l, int vol_r);
+extern void tlv320_set_linein_vol(int vol_l, int vol_r);
+extern void tlv320_mute(bool mute);
+extern void tlv320_close();
+extern void tlv320_enable_recording(bool source_mic);
+extern void tlv320_disable_recording();
 
 #define HEADPHONE_MUTE 0x30 /* 0110000 = -73db */
 
@@ -35,8 +40,8 @@ extern int tlv320_mute(bool mute);
 /* REG_LLIV: Left line input channel volume control */
 #define REG_LLIV        0x0
 #define LLIV_LRS        (0 << 8)    /* simultaneous volume/mute update  */
-#define LIM             (1 << 7)    /* Left line input mute             */
-#define LIV             ((x) & 0x1f)/* Left line input volume control   */
+#define LLIV_LIM        (1 << 7)    /* Left line input mute             */
+#define LLIV_LIV        ((x) & 0x1f)/* Left line input volume control   */
 
 /* REG_RLIV: Right line input channel volume control */
 #define REG_RLIV        0x1
@@ -75,7 +80,7 @@ extern int tlv320_mute(bool mute);
 
 /* REG_PC: Power Down Control */
 #define REG_PC          0x6
-#define PC_OFF          (0 << 7)    /* Device power     */
+#define PC_ON           (0 << 7)    /* Device power     */
 #define PC_CLK          (0 << 6)    /* Clock            */
 #define PC_OSC          (0 << 5)    /* Oscillator       */
 #define PC_OUT          (0 << 4)    /* Outputs          */

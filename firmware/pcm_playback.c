@@ -24,7 +24,11 @@
 #ifndef SIMULATOR
 #include "cpu.h"
 #include "i2c.h"
+#if defined(HAVE_UDA1380)
 #include "uda1380.h"
+#elif defined(HAVE_TLV320)
+#include "tlv320.h"
+#endif
 #include "system.h"
 #endif
 #include "logf.h"
@@ -181,13 +185,18 @@ void pcm_play_data(void (*get_more)(unsigned char** start, long* size))
 {
     unsigned char *start;
     long size;
-    
+
     callback_for_more = get_more;
-    
+
     get_more((unsigned char **)&start, (long *)&size);
     get_more(&next_start, &next_size);
     dma_start(start, size);
+
+#if defined(HAVE_UDA1380)
     uda1380_mute(false);
+#elif defined(HAVE_TLV320)
+    tlv320_mute(false);
+#endif
 }
 
 long pcm_get_bytes_waiting(void)
@@ -198,7 +207,12 @@ long pcm_get_bytes_waiting(void)
 void pcm_play_stop(void)
 {
     if (pcm_playing) {
+
+#if defined(HAVE_UDA1380)
         uda1380_mute(true);
+#elif defined(HAVE_TLV320)
+        tlv320_mute(true);
+#endif
         dma_stop();
     }
 }
@@ -216,14 +230,23 @@ void pcm_play_pause(bool play)
         IIS2CONFIG = (pcm_freq << 12) | 0x300 | 4 << 2;
         EBU1CONFIG = (7 << 12) | (3 << 8) | (1 << 5) | (5 << 2);
         DCR0 |= DMA_EEXT | DMA_START;
-        
+
+#if defined(HAVE_UDA1380)
         uda1380_mute(false);
+#elif defined(HAVE_TLV320)
+        tlv320_mute(false);
+#endif
     }
     else if(!pcm_paused && !play)
     {
         logf("pause");
+
+#if defined(HAVE_UDA1380)
         uda1380_mute(true);
-        
+#elif defined(HAVE_TLV320)
+        tlv320_mute(true);
+#endif
+
         /* Disable DMA peripheral request. */
         DCR0 &= ~DMA_EEXT;
         IIS2CONFIG = 0x800;
@@ -250,7 +273,7 @@ void DMA0(void)
 
     DSR0 = 1;    /* Clear interrupt */
     DCR0 &= ~DMA_EEXT;
-    
+
     /* Stop on error */
     if(res & 0x70)
     {
@@ -274,7 +297,7 @@ void DMA0(void)
             logf("DMA No Data:0x%04x", res);
         }
     }
-    
+
     IPR |= (1<<14); /* Clear pending interrupt request */
 }
 
@@ -282,8 +305,12 @@ void pcm_init(void)
 {
     pcm_playing = false;
     pcm_paused = false;
-    
+
+#if defined(HAVE_UDA1380)
     uda1380_init();
+#elif defined(HAVE_TLV320)
+    tlv320_init();
+#endif
 
     BUSMASTER_CTRL = 0x81; /* PARK[1,0]=10 + BCR24BIT */
     DIVR0 = 54;            /* DMA0 is mapped into vector 54 in system.c */
@@ -292,18 +319,25 @@ void pcm_init(void)
 
     /* Reset the audio FIFO */
     IIS2CONFIG = 0x800;
-    
+
     /* Enable interrupt at level 7, priority 0 */
     ICR4 = (ICR4 & 0xffff00ff) | 0x00001c00;
     IMR &= ~(1<<14);      /* bit 14 is DMA0 */
-    
+
     pcm_set_frequency(44100);
-    
+
     /* Turn on headphone power with audio output muted. */
+#if defined(HAVE_UDA1380)
     uda1380_mute(true);
+#elif defined(HAVE_TLV320)
+    tlv320_mute(true);
+#endif
     sleep(HZ/4);
+#if defined(HAVE_UDA1380)
     uda1380_enable_output(true);
-    
+#elif defined(HAVE_TLV320)
+    tlv320_enable_output(true);
+#endif
     /* Call dma_stop to initialize everything. */
     dma_stop();
 }

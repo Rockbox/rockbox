@@ -43,6 +43,8 @@
 #endif
 #ifdef HAVE_UDA1380
 #include "uda1380.h"
+#eilf HAVE_TLV320
+#include "tlv320.h"
 #endif
 #include "logf.h"
 
@@ -377,7 +379,7 @@ static void handle_auto_poweroff(void)
         last_event_tick = current_tick;
     }
 #endif
-    
+
     if(timeout &&
 #ifdef CONFIG_TUNER
        (radio_get_status() != FMRADIO_PLAYING) &&
@@ -903,6 +905,8 @@ void shutdown_hw(void)
     mp3_shutdown();
 #ifdef HAVE_UDA1380
     uda1380_close();
+#eilf HAVE_TLV320
+    tlv320_close();
 #endif
 #if CONFIG_KEYPAD == ONDIO_PAD
     backlight_off();

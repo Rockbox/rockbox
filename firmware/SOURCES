@@ -126,6 +126,8 @@ drivers/lcd-h100-remote.c
 #endif
 #if defined(HAVE_UDA1380) && !defined(SIMULATOR)
 drivers/uda1380.c
+#elif defined(HAVE_TLV320) && !defined(SIMULATOR)
+drivers/tlv320.c
 #endif
 #if (CONFIG_HWCODEC == MASNONE) && !defined(SIMULATOR)
 pcm_playback.c
@@ -133,7 +135,7 @@ pcm_playback.c
 #if CONFIG_HWCODEC == MASNONE
 replaygain.c
 #endif
-#if defined(HAVE_UDA1380) && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
 pcm_record.c
 #endif
 sound.c

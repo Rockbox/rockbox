@@ -25,6 +25,8 @@
 #include "mas.h"
 #ifdef HAVE_UDA1380
 #include "uda1380.h"
+#elif HAVE_TLV320
+#include "tlv320.h"
 #endif
 #include "dac.h"
 #include "system.h"
