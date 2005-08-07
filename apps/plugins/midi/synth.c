@@ -67,7 +67,7 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
             chPanLeft[a]=64;     /* Center                          */
         chPanRight[a]=64;        /* Center                          */
         chPat[a]=0;              /* Ac Gr Piano                     */
-        chPW[a]=64;              /* .. not .. bent ?                */
+        chPW[a]=256;              /* .. not .. bent ?                */
     }
     for(a=0; a<128; a++)
     {
@@ -281,7 +281,7 @@ inline signed short int synthVoice(void)
         so->cp += so->delta;
     }
 
-    cpShifted = so->cp >> 10;
+    cpShifted = so->cp >> 10;   //Was 10
 
     if( (cpShifted > (wf->numSamples) && (so->state != STATE_RAMPDOWN)))
     {
@@ -295,7 +295,7 @@ inline signed short int synthVoice(void)
     {
         if(wf->mode & LOOP_REVERSE)
         {
-            so->cp = (wf->endLoop)<<10;
+            so->cp = (wf->endLoop)<<10; //Was 10
             cpShifted = wf->endLoop;
             s2=getSample((cpShifted));
             } else
@@ -310,7 +310,7 @@ inline signed short int synthVoice(void)
         so->loopState = STATE_LOOPING;
         if((wf->mode & (24)) == 0)
         {
-            so->cp = (wf->startLoop)<<10;
+            so->cp = (wf->startLoop)<<10; //Was 10
             cpShifted = wf->startLoop;
             s2=getSample((cpShifted));
         } else
@@ -321,8 +321,8 @@ inline signed short int synthVoice(void)
     }
 
     /* Better, working, linear interpolation    */
-    s1=getSample((cpShifted));
-    s = s1 + ((signed)((s2 - s1) * (so->cp & 1023))>>10);
+    s1=getSample((cpShifted));              //\|/ Was 1023)) >> 10
+    s = s1 + ((signed)((s2 - s1) * (so->cp & 1023))>>10);   //Was 10
 
 
 /* ADSR COMMENT WOULD GO FROM HERE.........*/

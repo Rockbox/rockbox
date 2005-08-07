@@ -39,7 +39,7 @@ int sim_sound_init(void)
   int channels;
   int rate;
 
-  fd = open("/dev/dsp", O_WRONLY);
+  fd = open("/dev/dsp1", O_WRONLY);
   if(-1 == fd)
     return 1;
 
