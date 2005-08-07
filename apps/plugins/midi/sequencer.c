@@ -72,7 +72,7 @@ void findDelta(struct SynthObject * so, int ch, int note)
     struct GWaveform * wf = patchSet[chPat[ch]]->waveforms[patchSet[chPat[ch]]->noteTable[note]];
     so->wf=wf;                  // \|/ was 10
     so->delta = (((gustable[note]<<10) / (wf->rootFreq)) * wf->sampRate / (SAMPLE_RATE));
- //   so->delta = (so->delta * pitchTbl[chPW[ch]])>> 16;
+    so->delta = (so->delta * pitchTbl[chPW[ch]])>> 16;
 }
 
 void setPW(int ch, int msb, int lsb)
