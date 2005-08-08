@@ -28,6 +28,7 @@
 #include "debug.h"
 #include "system.h"
 #include "font.h"
+#include "bidi.h"
 
 /*** definitions ***/
 
@@ -991,6 +992,9 @@ static void lcd_putsxyofs(int x, int y, int ofs, const unsigned char *str)
 {
     int ch;
     struct font* pf = font_get(curfont);
+
+    if (bidi_support_enabled)
+        str = bidi_l2v(str, 1);
 
     while ((ch = *str++) != '\0' && x < LCD_WIDTH)
     {

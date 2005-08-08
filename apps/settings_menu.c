@@ -38,6 +38,7 @@
 #include "fat.h"                /* For dotfile settings */
 #include "sleeptimer.h"
 #include "powermgmt.h"
+#include "bidi.h"
 #include "rtc.h"
 #include "ata.h"
 #include "tree.h"
@@ -276,6 +277,18 @@ static bool invert_cursor(void)
                             STR(LANG_INVERT_CURSOR_BAR),
                             STR(LANG_INVERT_CURSOR_POINTER),
                             NULL);
+}
+
+/**
+ * Menu to reverse Hebrew and Arabic text according to BiDi algorythm
+ */
+static bool bidi_support(void)
+{
+    return set_bool_options( str(LANG_BIDI_SUPPORT),
+                             &global_settings.bidi_support,
+                             STR(LANG_SET_BOOL_YES),
+                             STR(LANG_SET_BOOL_NO),
+                             set_bidi_support);
 }
 
 /**
@@ -1421,6 +1434,7 @@ static bool lcd_settings_menu(void)
         { ID2P(LANG_INVERT),          invert },
         { ID2P(LANG_FLIP_DISPLAY),    flip_display },
         { ID2P(LANG_INVERT_CURSOR),   invert_cursor },
+        { ID2P(LANG_BIDI_SUPPORT),    bidi_support },
 #endif
     };
 

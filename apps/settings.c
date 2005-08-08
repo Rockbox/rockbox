@@ -40,6 +40,7 @@
 #include "power.h"
 #include "backlight.h"
 #include "powermgmt.h"
+#include "bidi.h"
 #include "status.h"
 #include "atoi.h"
 #include "screens.h"
@@ -265,10 +266,14 @@ static const struct bit_entry rtc_bits[] =
     {1, S_O(remote_flip_display), false, "remote flip display", off_on },
 #endif
 
+#ifdef HAVE_LCD_BITMAP /* move to LCD next time we bump version */
+    {1, S_O(bidi_support), false, "bidi hebrew/arabic", off_on },
+#endif
+
     /* new stuff to be added here */
     /* If values are just added to the end, no need to bump the version. */
 
-    /* Current sum of bits: 268 (worst case, but w/o remote lcd) */
+    /* Current sum of bits: 277 (worst case, but w/o remote lcd) */
     /* Sum of all bit sizes must not grow beyond 288! */
 };
 
@@ -820,6 +825,7 @@ void settings_apply(void)
 #endif
 
 #ifdef HAVE_LCD_BITMAP
+    set_bidi_support(global_settings.bidi_support);
     lcd_set_invert_display(global_settings.invert);
     lcd_set_flip(global_settings.flip_display);
     button_set_flip(global_settings.flip_display);

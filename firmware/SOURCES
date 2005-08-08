@@ -49,6 +49,7 @@ drivers/lcd-player-charset.c
 drivers/lcd-player.c
 #endif
 #ifdef HAVE_LCD_BITMAP
+bidi.c
 #if LCD_DEPTH == 2
 drivers/lcd-h100.c
 #elif LCD_DEPTH == 1

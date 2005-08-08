@@ -3238,3 +3238,9 @@ desc: in browse_id3
 eng: "<No gain>"
 voice ""
 new:
+
+id: LANG_BIDI_SUPPORT
+desc: in settings_menu, option to enable reversal of hebrew/arabic text
+eng: "BiDi Hebrew/Arabic"
+voice ""
+new:
