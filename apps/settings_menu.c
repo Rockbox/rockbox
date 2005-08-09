@@ -1434,7 +1434,6 @@ static bool lcd_settings_menu(void)
         { ID2P(LANG_INVERT),          invert },
         { ID2P(LANG_FLIP_DISPLAY),    flip_display },
         { ID2P(LANG_INVERT_CURSOR),   invert_cursor },
-        { ID2P(LANG_BIDI_SUPPORT),    bidi_support },
 #endif
     };
 
@@ -1510,6 +1509,7 @@ static bool display_settings_menu(void)
 #ifdef HAVE_LCD_BITMAP
         { ID2P(LANG_BARS_MENU),       bars_settings_menu },
         { ID2P(LANG_PM_MENU),         peak_meter_menu },
+        { ID2P(LANG_BIDI_SUPPORT),    bidi_support },
 #endif
     };
 
