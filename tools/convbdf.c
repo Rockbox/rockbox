@@ -528,6 +528,11 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
                 maxwidth = width;
             pf->width[encoding-pf->firstchar] = width;
 
+            if(maxwidth > 16) {
+                fprintf(stderr, "Error: Too wide characters (>16 pixels)\n");
+                return 0;
+            }
+            
             /* clear bitmap*/
             memset(ch_bitmap, 0, BITMAP_BYTES(width) * pf->height);
 
@@ -743,8 +748,7 @@ int rotleft(unsigned char *dst, bitmap_t *src, unsigned int width,
             src_mask >>= 1;    /* next input bit */
             if (src_mask == 0) /* input word done? */
             {
-                src_mask = 1 << (sizeof (bitmap_t) * 8 - 1);
-                i++;           /* next input word */
+                continue;
             }
         }
 
