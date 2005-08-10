@@ -51,20 +51,38 @@ extern char iramstart[];
 extern char iramend[];
 #endif
 
+struct codec_api *ci;
+unsigned int samplecount;
+unsigned int samplesdone;
+int stop_skip, start_skip;
+int current_stereo_mode = -1;
+int frequency_divider;
+unsigned int current_frequency = 0;
+
+void recalc_samplecount(void)
+{
+    /* NOTE: currently this doesn't work, the below calculated samples_count
+       seems to be right, but sometimes we just don't have all the data we
+       need... */
+    if (ci->id3->frame_count) {
+        /* TODO: 1152 is the frame size in samples for MPEG1 layer 2 and layer 3,
+           it's probably not correct at all for MPEG2 and layer 1 */
+        samplecount = ci->id3->frame_count*1152 - (start_skip + stop_skip);
+    } else {
+        samplecount = ci->id3->length * frequency_divider / 10;
+    }
+}
+
 /* this is the codec entry point */
 enum codec_status codec_start(struct codec_api* api)
 {
-    struct codec_api *ci = api;
     int Status = 0;
     size_t size;
     int file_end;
     char *InputBuffer;
-    unsigned int samplecount;
-    unsigned int samplesdone;
     bool first_frame;
-    int stop_skip, start_skip;
-    int current_stereo_mode = -1;
-    int frequency_divider;
+
+    ci = api;
     
     /* Generic codec inititialisation */
     TEST_CODEC_API(api);
@@ -122,6 +140,7 @@ enum codec_status codec_start(struct codec_api* api)
         frequency_divider = 441;
         
     ci->configure(DSP_SET_FREQUENCY, (int *)ci->id3->frequency);
+    current_frequency = ci->id3->frequency;
     codec_set_replaygain(ci->id3);
     
     ci->request_buffer(&size, ci->id3->first_frame_offset);
@@ -136,20 +155,9 @@ enum codec_status codec_start(struct codec_api* api)
         /* We want to skip this amount anyway */
         start_skip = mpeg_latency[ci->id3->layer];
     }
-  
-    /* NOTE: currently this doesn't work, the below calculated samples_count
-       seems to be right, but sometimes libmad just can't supply us with
-       all the data we need... */
-    if (ci->id3->frame_count) {
-        /* TODO: 1152 is the frame size in samples for MPEG1 layer 2 and layer 3,
-           it's probably not correct at all for MPEG2 and layer 1 */
-        samplecount = ci->id3->frame_count*1152 - (start_skip + stop_skip);
-        samplesdone = ci->id3->elapsed * frequency_divider / 10;
-    } else {
-        samplecount = ci->id3->length * frequency_divider / 10;
-        samplesdone = ci->id3->elapsed * frequency_divider / 10;
-    }
 
+    samplesdone = ci->id3->elapsed * frequency_divider / 10;
+    
     /* This is the decoding loop. */
     while (1) {
         ci->yield();
@@ -158,20 +166,18 @@ enum codec_status codec_start(struct codec_api* api)
         }
     
         if (ci->seek_time) {
-            unsigned int sample_loc;
             int newpos;
         
-            sample_loc = ci->seek_time * frequency_divider / 10;
+            samplesdone = (ci->seek_time-1) * frequency_divider / 10;
             newpos = ci->mp3_get_filepos(ci->seek_time-1);
-            if (sample_loc >= samplecount + samplesdone)
-                break ;
-            
-            if (ci->seek_buffer(newpos)) {
-                samplecount += samplesdone - sample_loc;
-                samplesdone = sample_loc;
+
+            if (!ci->seek_buffer(newpos)) {
+                goto next_track;
             }
             ci->seek_time = 0;
         }
+
+        recalc_samplecount();
 
         /* Lock buffers */
         if (Stream.error == 0) {
@@ -224,6 +230,14 @@ enum codec_status codec_start(struct codec_api* api)
            very first frame in the stream. */
         /* TODO: possible for start_skip to exceed one frames worth of samples? */
 
+        if(Frame.header.samplerate != current_frequency) {
+            current_frequency = Frame.header.samplerate;
+            frequency_divider = current_frequency / 100;
+            ci->configure(DSP_SWITCH_FREQUENCY,
+                          (int *)current_frequency);
+            recalc_samplecount();
+        }
+        
         if (MAD_NCHANNELS(&Frame.header) == 2) {
             if (current_stereo_mode != STEREO_NONINTERLEAVED) {
                 ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_NONINTERLEAVED);
@@ -248,7 +262,6 @@ enum codec_status codec_start(struct codec_api* api)
             ci->advance_buffer(size);
             
         samplesdone += Synth.pcm.length;
-        samplecount -= Synth.pcm.length;
         ci->set_elapsed(samplesdone / (frequency_divider / 10));
     }
   
