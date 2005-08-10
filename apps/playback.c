@@ -264,7 +264,7 @@ void codec_set_offset_callback(unsigned int value)
     
     if (value < latency) {
         cur_ti->id3.offset = 0;
-    } else if (value - latency > (unsigned int)cur_ti->id3.offset ) {
+    } else {
         cur_ti->id3.offset = value - latency;
     }
 }
