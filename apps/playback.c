@@ -196,12 +196,20 @@ bool codec_pcmbuf_insert_split_callback(void *ch1, void *ch2,
             yield();
         }
 
+        /* Get the real input_size for output_size bytes, guarding
+         * against resampling buffer overflows. */
         input_size = dsp_input_size(output_size);
-        /* Guard against rounding errors (output_size can be too large). */
-        input_size = MIN(input_size, length);
-
+        if (input_size > length) {
+            DEBUGF("Error: dsp_input_size(%ld=dsp_output_size(%ld))=%ld > %ld\n",
+                   output_size, length, input_size, length);
+            input_size = length;
+        }
+        
         if (input_size <= 0) {
             pcmbuf_flush_buffer(0);
+            DEBUGF("Warning: dsp_input_size(%ld=dsp_output_size(%ld))=%ld <= 0\n",
+                   output_size, length, input_size);
+            /* should we really continue, or should we break? */
             continue;
         }
 

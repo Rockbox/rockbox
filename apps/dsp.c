@@ -474,13 +474,9 @@ long dsp_process(char* dst, char* src[], long size)
  * the number of samples generated depends on the current state of the
  * resampler).
  */
+/* dsp_input_size MUST be called afterwards */
 long dsp_output_size(long size)
 {
-    if (dsp.stereo_mode == STEREO_MONO)
-    {
-        size *= 2;
-    }
-
     if (dsp.sample_depth > NATIVE_DEPTH)
     {
         size /= 2;
@@ -492,7 +488,22 @@ long dsp_output_size(long size)
             + (dsp.frequency - 1)) / dsp.frequency);
     }
 
-    return (size + 3) & ~3;
+    /* round to the next multiple of 2 (these are shorts) */
+    size = (size + 1) & ~1;
+
+    if (dsp.stereo_mode == STEREO_MONO)
+    {
+        size *= 2;
+    }
+
+    /* now we have the size in bytes for two resampled channels,
+     * and the size in (short) must not exceed RESAMPLE_BUF_SIZE to
+     * avoid resample buffer overflow. One must call dsp_input_size()
+     * to get the correct input buffer size. */
+    if (size > RESAMPLE_BUF_SIZE*2)
+        size = RESAMPLE_BUF_SIZE*2;
+
+    return size;
 }
 
 /* Given size bytes of output buffer, calculate number of bytes of input
@@ -500,21 +511,28 @@ long dsp_output_size(long size)
  */
 long dsp_input_size(long size)
 {
+    /* convert to number of output stereo samples. */
+    size /= 2;
+
+    /* Mono means we need half input samples to fill the output buffer */
     if (dsp.stereo_mode == STEREO_MONO)
-    {
         size /= 2;
-    }
 
-    if (dsp.sample_depth > NATIVE_DEPTH)
-    {
-        size *= 2;
-    }
-
+    /* size is now the number of resampled input samples. Convert to
+       original input samples. */
     if (dsp.frequency != NATIVE_FREQUENCY)
     {
-        size = (long) ((((unsigned long) size * dsp.frequency)
-            + (NATIVE_FREQUENCY - 1)) / NATIVE_FREQUENCY);
+        /* Use the real resampling delta =
+         *  (unsigned long) dsp.frequency * 65536 / NATIVE_FREQUENCY, and
+         * round towards zero to avoid buffer overflows. */
+        size = ((unsigned long)size * resample_data[0].delta) >> 16;
     }
+
+    /* Convert back to bytes. */
+    if (dsp.sample_depth > NATIVE_DEPTH)
+        size *= 4;
+    else
+        size *= 2;
 
     return size;
 }
