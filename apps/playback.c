@@ -870,6 +870,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         if (!get_metadata(&tracks[track_widx],fd,trackname,v1first)) {
             logf("Metadata error!");
             tracks[track_widx].filesize = 0;
+            tracks[track_widx].filerem = 0;
             close(fd);
             /* Delete invalid entry from playlist. */
             playlist_delete(NULL, playlist_index);
