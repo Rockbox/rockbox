@@ -19,7 +19,7 @@ upgrade your ordinary Archos firmware.
 
 <p><i>2005-08-08</i>: We will have a <a
 href="http://www.rockbox.org/mail/archive/rockbox-archive-2005-08/0130.shtml">Feature
-Freeze</a> starting on August 22nd, aiming at releasing Rockbox 2.5 at
+Freeze</a> starting on August 22nd, aiming at releasing Rockbox 2.5 on
 September 5.
 
 <p><i>2005-06-06</i>: Rockbox plays MP3 and Ogg Vorbis music on the iRiver
