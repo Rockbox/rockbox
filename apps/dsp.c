@@ -529,8 +529,10 @@ bool dsp_configure(int setting, void *value)
     switch (setting)
     {
     case DSP_SET_FREQUENCY:
-        dsp.frequency = ((int) value == 0) ? NATIVE_FREQUENCY : (int) value;
         memset(resample_data, 0, sizeof(resample_data));
+        /* Fall through!!! */
+    case DSP_SWITCH_FREQUENCY:
+        dsp.frequency = ((int) value == 0) ? NATIVE_FREQUENCY : (int) value;
         resample_data[0].delta = resample_data[1].delta =
             (unsigned long) dsp.frequency * 65536 / NATIVE_FREQUENCY;
         break;
