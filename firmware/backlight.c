@@ -162,6 +162,10 @@ static void backlight_release_timer(void)
 
 static void backlight_dim(int value)
 {
+    /* protect from extraneous calls with the same target value */
+    if (value == bl_dim_target)
+        return;
+
     bl_dim_target = value;
 
     if (bl_timer_active)
