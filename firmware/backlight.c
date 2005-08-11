@@ -44,6 +44,7 @@ const char backlight_timeout_value[19] =
 #define BACKLIGHT_OFF 2
 #define REMOTE_BACKLIGHT_ON 3
 #define REMOTE_BACKLIGHT_OFF 4
+#define BACKLIGHT_UNBOOST_CPU 5
 
 static void backlight_thread(void);
 static long backlight_stack[DEFAULT_STACK_SIZE/sizeof(long)];
@@ -130,7 +131,7 @@ static void backlight_isr(void)
 
     if (idle) 
     {
-        cpu_boost(false);
+        queue_post(&backlight_queue, BACKLIGHT_UNBOOST_CPU, NULL);
         timer_unregister();
         bl_timer_active = false;
     }
@@ -293,7 +294,13 @@ void backlight_thread(void)
             case BACKLIGHT_OFF:
                 __backlight_off();
                 break;
-                
+
+#if CONFIG_BACKLIGHT == BL_IRIVER
+            case BACKLIGHT_UNBOOST_CPU:
+                cpu_boost(false);
+                break;
+#endif
+
             case SYS_USB_CONNECTED:
                 /* Tell the USB thread that we are safe */
                 DEBUGF("backlight_thread got SYS_USB_CONNECTED\n");
