@@ -738,6 +738,18 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                 : NULL;
             char* tag;
             
+            /* Only ID3_VER_2_2 uses frames with three-character names. */
+            if (((version == ID3_VER_2_2) && (tr->tag_length != 3))
+                || ((version > ID3_VER_2_2) && (tr->tag_length != 4))) {
+                continue;
+            }
+
+            /* Note that parser functions sometimes set *ptag to NULL, so
+             * the "!*ptag" check here doesn't always have the desired
+             * effect. Should the parser functions (parsegenre in
+             * particular) be updated to handle the case of being called
+             * multiple times, or should the "*ptag" check be removed?
+             */
             if( (!ptag || !*ptag) && !memcmp( header, tr->tag, tr->tag_length ) ) { 
                 
                 /* found a tag matching one in tagList, and not yet filled */
