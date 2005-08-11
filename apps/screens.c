@@ -46,11 +46,16 @@
 #include "led.h"
 #include "sound.h"
 #include "wps-display.h"
+#if defined(HAVE_LCD_BITMAP)
+#include "widgets.h"
+#endif
 #ifdef HAVE_MMC
 #include "ata_mmc.h"
 #endif
 
 #ifdef HAVE_LCD_BITMAP
+#define SCROLLBAR_WIDTH  6
+
 #define BMPHEIGHT_usb_logo 32
 #define BMPWIDTH_usb_logo 100
 static const unsigned char usb_logo[] = {
@@ -1269,156 +1274,186 @@ bool shutdown_screen(void)
 }
 #endif
 
+int draw_id3_item(int line, int top, int header, const char* body)
+{
+    if (line >= top)
+    {
+#if defined(HAVE_LCD_BITMAP)
+        const int rows = LCD_HEIGHT / font_get(FONT_UI)->height;
+#else
+        const int rows = 2;
+#endif
+        int y = line - top;
+
+        if (y < rows)
+        {
+            lcd_puts(0, y, str(header));
+        }
+
+        if (++y < rows)
+        {
+            lcd_puts_scroll(0, y,
+                body ? (const unsigned char*) body : str(LANG_ID3_NO_INFO));
+        }
+    }
+
+    return line + 2;
+}
+
+#if CONFIG_HWCODEC == MASNONE
+#define ID3_ITEMS   13
+#else
+#define ID3_ITEMS   11
+#endif
+
 bool browse_id3(void)
 {
-    struct mp3entry* id3 = audio_current_track();
-    int button;
-    int menu_pos = 0;
-#if CONFIG_HWCODEC == MASNONE
-    int menu_max = 12;
+    char buf[32];
+    const struct mp3entry* id3 = audio_current_track();
+#if defined(HAVE_LCD_BITMAP)
+    const int y_margin = lcd_getymargin();
+    const int line_height = font_get(FONT_UI)->height;
+    const int rows = (LCD_HEIGHT - y_margin) / line_height;
+    const bool show_scrollbar = global_settings.scrollbar
+        && (ID3_ITEMS * 2 > rows);
 #else
-    int menu_max = 10;
+    const int rows = 2;
 #endif
+    const int top_max = (ID3_ITEMS * 2) - (rows & ~1);
+    int top = 0;
+    int button;
     bool exit = false;
-    char scroll_text[MAX_PATH];
 
-    if (!(audio_status() & AUDIO_STATUS_PLAY))
+    if (!id3 || (!(audio_status() & AUDIO_STATUS_PLAY)))
+    {
         return false;
+    }
+
+#if defined(HAVE_LCD_BITMAP)
+    lcd_setmargins(show_scrollbar ? SCROLLBAR_WIDTH : 0, y_margin);
+#endif
 
     while (!exit)
     {
+        int line = 0;
+        int old_top = top;
+        char* body;
+
         lcd_clear_display();
+        status_draw(true);
+        line = draw_id3_item(line, top, LANG_ID3_TITLE,  id3->title);
+        line = draw_id3_item(line, top, LANG_ID3_ARTIST, id3->artist);
+        line = draw_id3_item(line, top, LANG_ID3_ALBUM,  id3->album);
 
-        switch (menu_pos)
+        if (id3->track_string)
         {
-            case 0:
-                lcd_puts(0, 0, str(LANG_ID3_TITLE));
-                lcd_puts_scroll(0, 1, id3->title ? id3->title :
-                                (char*)str(LANG_ID3_NO_TITLE));
-                break;
-
-            case 1:
-                lcd_puts(0, 0, str(LANG_ID3_ARTIST));
-                lcd_puts_scroll(0, 1,
-                                id3->artist ? id3->artist :
-                                (char*)str(LANG_ID3_NO_ARTIST));
-                break;
-
-            case 2:
-                lcd_puts(0, 0, str(LANG_ID3_ALBUM));
-                lcd_puts_scroll(0, 1, id3->album ? id3->album :
-                                (char*)str(LANG_ID3_NO_ALBUM));
-                break;
-
-            case 3:
-                lcd_puts(0, 0, str(LANG_ID3_TRACKNUM));
-
-                if (id3->track_string) {
-                    lcd_puts_scroll(0, 1, id3->track_string);
-                }
-                else if (id3->tracknum) {
-                    snprintf(scroll_text,sizeof(scroll_text), "%d",
-                             id3->tracknum);
-                    lcd_puts_scroll(0, 1, scroll_text);
-                }
-                else
-                    lcd_puts_scroll(0, 1, str(LANG_ID3_NO_TRACKNUM));
-                break;
-
-            case 4:
-                lcd_puts(0, 0, str(LANG_ID3_GENRE));
-
-                if (id3->genre_string) {
-                    lcd_puts_scroll(0, 1, id3->genre_string);
-                }
-                else {
-                  lcd_puts_scroll(0, 1,
-                                  id3_get_genre(id3) ?
-                                  id3_get_genre(id3) :
-                                  (char*)str(LANG_ID3_NO_INFO));
-                }
-                break;
-
-            case 5:
-                lcd_puts(0, 0, str(LANG_ID3_YEAR));
-                if (id3->year_string) {
-                    lcd_puts_scroll(0, 1, id3->year_string);
-                }
-                else if (id3->year) {
-                    snprintf(scroll_text,sizeof(scroll_text), "%d",
-                             id3->year);
-                    lcd_puts_scroll(0, 1, scroll_text);
-                }
-                else
-                    lcd_puts_scroll(0, 1, str(LANG_ID3_NO_INFO));
-                break;
-
-            case 6:
-                lcd_puts(0, 0, str(LANG_ID3_LENGHT));
-                wps_format_time(scroll_text, sizeof(scroll_text), id3->length);
-                lcd_puts(0, 1, scroll_text);
-                break;
-
-            case 7:
-                lcd_puts(0, 0, str(LANG_ID3_PLAYLIST));
-                snprintf(scroll_text,sizeof(scroll_text), "%d/%d",
-                         playlist_get_display_index(), playlist_amount());
-                lcd_puts_scroll(0, 1, scroll_text);
-                break;
-
-
-            case 8:
-                lcd_puts(0, 0, str(LANG_ID3_BITRATE));
-                snprintf(scroll_text,sizeof(scroll_text), "%d kbps",
-                         id3->bitrate);
-                lcd_puts(0, 1, scroll_text);
-                break;
-
-            case 9:
-                lcd_puts(0, 0, str(LANG_ID3_FRECUENCY));
-                snprintf(scroll_text,sizeof(scroll_text), "%d Hz",
-                         id3->frequency);
-                lcd_puts(0, 1, scroll_text);
-                break;
-
-            case 10:
-                lcd_puts(0, 0, str(LANG_ID3_PATH));
-                lcd_puts_scroll(0, 1, id3->path);
-                break;
-#if CONFIG_HWCODEC == MASNONE
-            case 11:
-                lcd_puts(0, 0, str(LANG_ID3_TRACK_GAIN));
-                lcd_puts(0, 1, id3->track_gain_string 
-                    ? id3->track_gain_string
-                    : (char*) str(LANG_ID3_NO_GAIN));
-                break;
-
-            case 12:
-                lcd_puts(0, 0, str(LANG_ID3_ALBUM_GAIN));
-                lcd_puts(0, 1, id3->album_gain_string
-                    ? id3->album_gain_string
-                    : (char*) str(LANG_ID3_NO_GAIN));
-                break;
-#endif
+            body = id3->track_string;
         }
-        lcd_update();
-
-        button = button_get(true);
-
-        switch(button)
+        else if (id3->tracknum)
         {
+            snprintf(buf, sizeof(buf), "%d", id3->tracknum);
+            body = buf;
+        }
+        else
+        {
+            body = NULL;
+        }
+
+        line = draw_id3_item(line, top, LANG_ID3_TRACKNUM, body);
+
+        body = id3->genre_string ? id3->genre_string : id3_get_genre(id3);
+        line = draw_id3_item(line, top, LANG_ID3_GENRE, body);
+
+        if (id3->year_string)
+        {
+            body = id3->year_string;
+        }
+        else if (id3->year)
+        {
+            snprintf(buf, sizeof(buf), "%d", id3->year);
+            body = buf;
+        }
+        else
+        {
+            body = NULL;
+        }
+
+        line = draw_id3_item(line, top, LANG_ID3_YEAR, body);
+
+        wps_format_time(buf, sizeof(buf), id3->length);
+        line = draw_id3_item(line, top, LANG_ID3_LENGHT, buf);
+
+        snprintf(buf, sizeof(buf), "%d/%d", playlist_get_display_index(),
+            playlist_amount());
+        line = draw_id3_item(line, top, LANG_ID3_PLAYLIST, buf);
+
+        snprintf(buf, sizeof(buf), "%d kbps", id3->bitrate);
+        line = draw_id3_item(line, top, LANG_ID3_BITRATE, buf);
+
+        snprintf(buf, sizeof(buf), "%d Hz", id3->frequency);
+        line = draw_id3_item(line, top, LANG_ID3_FRECUENCY, buf);
+
+#if CONFIG_HWCODEC == MASNONE
+        line = draw_id3_item(line, top, LANG_ID3_TRACK_GAIN,
+            id3->track_gain_string);
+
+        line = draw_id3_item(line, top, LANG_ID3_ALBUM_GAIN,
+            id3->album_gain_string);
+#endif
+
+        line = draw_id3_item(line, top, LANG_ID3_PATH, id3->path);
+
+#if defined(HAVE_LCD_BITMAP)
+        if (show_scrollbar)
+        {
+            scrollbar(0, y_margin, SCROLLBAR_WIDTH - 1, rows * line_height,
+                ID3_ITEMS * 2 + (rows & 1), top, top + rows, VERTICAL);
+        }
+#endif
+
+        while (!exit && (top == old_top))
+        {
+            status_draw(false);
+            lcd_update();
+            button = button_get_w_tmo(HZ / 2);
+
+            switch(button)
+            {
+            /* It makes more sense to have the keys mapped "backwards" when
+             * scrolling a list.
+             */
+#if defined(HAVE_LCD_BITMAP)
+            case SETTINGS_INC:
+            case SETTINGS_INC | BUTTON_REPEAT:
+#else
             case SETTINGS_DEC:
-                if (menu_pos > 0)
-                    menu_pos--;
-                else
-                    menu_pos = menu_max;
+#endif
+                if (top > 0)
+                {
+                    top -= 2;
+                }
+                else if (!(button & BUTTON_REPEAT))
+                {
+                    top = top_max;
+                }
+
                 break;
 
+#if defined(HAVE_LCD_BITMAP)
+            case SETTINGS_DEC:
+            case SETTINGS_DEC | BUTTON_REPEAT:
+#else
             case SETTINGS_INC:
-                if (menu_pos < menu_max)
-                    menu_pos++;
-                else
-                    menu_pos = 0;
+#endif
+                if (top < top_max)
+                {
+                    top += 2;
+                }
+                else if (!(button & BUTTON_REPEAT))
+                {
+                    top = 0;
+                }
+
                 break;
 
 #ifdef SETTINGS_OK2
@@ -1426,17 +1461,22 @@ bool browse_id3(void)
 #endif
             case SETTINGS_CANCEL:
                 lcd_stop_scroll();
-                /* eat release event */
+                /* Eat release event */
                 button_get(true);
                 exit = true;
                 break;
 
             default:
-                if(default_event_handler(button) ==  SYS_USB_CONNECTED)
+                if (default_event_handler(button) == SYS_USB_CONNECTED)
+                {
                     return true;
+                }
+
                 break;
+            }
         }
     }
+
     return false;
 }
 

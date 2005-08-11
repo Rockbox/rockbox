@@ -11,7 +11,7 @@
 # If you re-order things or remove entries, you must bump the binary language
 # file version number in both the 'binlang' tool and the language loader code.
 #
-# The "voice' entry contains how we want the speech UI to pronounce this. 
+# The "voice' entry contains how we want the speech UI to pronounce this.
 #
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -233,7 +233,7 @@ id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
 eng: "Are You Sure?"
 voice: ""
-new: 
+new:
 
 id: LANG_RESET_DONE_SETTING
 desc: visual confirmation after settings reset
@@ -470,20 +470,20 @@ voice: ""
 new:
 
 id: LANG_ID3_NO_TITLE
-desc: in wps when no title is avaible
-eng: "<No Title>"
+desc: DEPRECATED
+eng: ""
 voice: ""
 new:
 
 id: LANG_ID3_ARTIST
-desc: in wps 
+desc: in wps
 eng: "[Artist]"
 voice: ""
 new:
 
 id: LANG_ID3_NO_ARTIST
-desc: in wps when no artist is avaible
-eng: "<No Artist>"
+desc: DEPRECATED
+eng: ""
 voice: ""
 new:
 
@@ -494,8 +494,8 @@ voice: ""
 new:
 
 id: LANG_ID3_NO_ALBUM
-desc: in wps when no album is avaible
-eng: "<No Album>"
+desc: DEPRECATED
+eng: ""
 voice: ""
 new:
 
@@ -506,8 +506,8 @@ voice: ""
 new:
 
 id: LANG_ID3_NO_TRACKNUM
-desc: in wps if no track number is avaible
-eng: "<No Tracknum>"
+desc: DEPRECATED
+eng: ""
 voice: ""
 new:
 
@@ -539,7 +539,7 @@ id: LANG_ID3_PATH
 desc: in wps
 eng: "[Path]"
 voice: ""
-new: 
+new:
 
 id: LANG_PITCH_UP
 desc: in wps
@@ -593,7 +593,7 @@ id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
 eng: "End Of Song List"
 voice: ""
-new: 
+new:
 
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
@@ -647,37 +647,37 @@ id: LANG_PM_MENU
 desc: in the display menu
 eng: "Peak Meter"
 voice: "Peak Meter"
-new: 
+new:
 
 id: LANG_PM_RELEASE
 desc: in the peak meter menu
 eng: "Peak Release"
 voice: "Peak Release"
-new: 
+new:
 
 id: LANG_PM_PEAK_HOLD
 desc: in the peak meter menu
 eng: "Peak Hold Time"
 voice: "Peak Hold Time"
-new: 
+new:
 
 id: LANG_PM_CLIP_HOLD
 desc: in the peak meter menu
 eng: "Clip Hold Time"
 voice: "Clip Hold Time"
-new: 
+new:
 
 id: LANG_PM_ETERNAL
 desc: in the peak meter menu
 eng: "Eternal"
 voice: "Eternal"
-new: 
+new:
 
 id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
 eng: "Units Per Read"
 voice: "Units Per Read"
-new: 
+new:
 
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
@@ -708,7 +708,7 @@ desc: confirm to reset settings
 eng: "PLAY=Reset"
 voice: ""
 new:
- 
+
 id: LANG_RESET_CANCEL
 desc: confirm to reset settings
 eng: "OFF=Cancel"
@@ -1133,43 +1133,43 @@ id: LANG_FAILED
 desc: Something failed. To be appended after above actions
 eng: "Failed"
 voice: ""
-new: 
+new:
 
 id: LANG_ALARM_MOD_ALARM_MENU
 desc: The name of the additional entry in the main menu for the RTC alarm mod.
 eng: "Wake-Up Alarm"
 voice: "Wake-Up Alarm"
-new: 
+new:
 
 id: LANG_ALARM_MOD_TIME
 desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
 eng: "Alarm Time: %02d:%02d"
 voice: ""
-new: 
+new:
 
 id: LANG_ALARM_MOD_TIME_TO_GO
 desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
 eng: "Waking Up In %d:%02d"
 voice: ""
-new: 
+new:
 
 id: LANG_ALARM_MOD_SHUTDOWN
 desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
 eng: "Alarm Set"
 voice: ""
-new: 
+new:
 
 id: LANG_ALARM_MOD_ERROR
 desc: The text that tells that the time is incorrect (for the RTC alarm mod).
 eng: "Alarm Time Is Too Soon!"
 voice: ""
-new: 
+new:
 
 id: LANG_ALARM_MOD_KEYS
 desc: Shown key functions in alarm menu (for the RTC alarm mod).
 eng: "PLAY=Set OFF=Cancel"
 voice: ""
-new: 
+new:
 
 id: LANG_CREATE_PLAYLIST
 desc: Menu option for creating a playlist
@@ -1253,7 +1253,7 @@ id: LANG_SETTINGS_LOADED2
 desc: Feedback shown when a .cfg file is loaded
 eng: "Loaded"
 voice: ""
-new: 
+new:
 
 id: LANG_FADE_ON_STOP
 desc: options menu to set fade on stop or pause
@@ -1301,37 +1301,37 @@ id: LANG_SAVE_SETTINGS
 desc: in system_settings_menu()
 eng: "Write .cfg file"
 voice: "Write configuration file"
-new: 
+new:
 
 id: LANG_SETTINGS_SAVED1
 desc: Feedback shown when a .cfg file is saved
 eng: "Settings"
 voice: ""
-new: 
+new:
 
 id: LANG_SETTINGS_SAVED2
 desc: Feedback shown when a .cfg file is saved
 eng: "Saved"
 voice: ""
-new: 
+new:
 
 id: LANG_VBRFIX_STOP_PLAY
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: LANG_VBRFIX_NOT_VBR
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: LANG_VBRFIX
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:
 
 id: LANG_INVERT_CURSOR
 desc: in settings_menu
@@ -1663,7 +1663,7 @@ id: LANG_CAR_ADAPTER_MODE
 desc: Displayed for setting car adapter mode to on/off
 eng: "Car Adapter Mode"
 voice: "Car Adapter Mode"
-new: 
+new:
 
 id: LANG_LINE_IN
 desc:  in settings_menu
@@ -3234,8 +3234,8 @@ voice ""
 new:
 
 id: LANG_ID3_NO_GAIN
-desc: in browse_id3
-eng: "<No gain>"
+desc: DEPRECATED
+eng: ""
 voice ""
 new:
 
