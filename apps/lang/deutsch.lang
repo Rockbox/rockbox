@@ -457,22 +457,22 @@ voice: ""
 new: "[Titel]"
 
 id: LANG_ID3_NO_TITLE
-desc: in wps when no title is avaible
-eng: "<No Title>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "<unbekannt>"
+new:
 
 id: LANG_ID3_ARTIST
-desc: in wps 
+desc: in wps
 eng: "[Artist]"
 voice: ""
 new: "[Künstler]"
 
 id: LANG_ID3_NO_ARTIST
-desc: in wps when no artist is avaible
-eng: "<No Artist>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "<unbekannt>"
+new:
 
 id: LANG_ID3_ALBUM
 desc: in wps
@@ -481,10 +481,10 @@ voice: ""
 new: "[Album]"
 
 id: LANG_ID3_NO_ALBUM
-desc: in wps when no album is avaible
-eng: "<No Album>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "<unbekannt>"
+new:
 
 id: LANG_ID3_TRACKNUM
 desc: in wps
@@ -493,10 +493,10 @@ voice: ""
 new: "[Song Nr.]"
 
 id: LANG_ID3_NO_TRACKNUM
-desc: in wps if no track number is avaible
-eng: "<No Tracknum>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "<unbekannt>"
+new:
 
 id: LANG_ID3_LENGHT
 desc: in wps
@@ -3157,5 +3157,95 @@ new: "Titel bewerten"
 id: LANG_RATING
 desc: in set_rating
 eng: "Rating:"
-voice:
+voice: 
 new: "Bewertung:"
+
+id: LANG_CROSSFADE_DURATION
+desc: in playback settings
+eng: "Crossfade duration"
+voice: "Überblenddauer"
+new: "Überblenddauer"
+
+id: LANG_MIX
+desc: in playback settings, crossfade option
+eng: "Mix"
+voice: "Mischen"
+new: "Mischen"
+
+id: LANG_RESTARTING_PLAYBACK
+desc: splash screen displayed when pcm buffer size is changed
+eng: "Restarting playback..."
+voice: "Neustart der Wiedergabe..."
+new: "Neustart der Wiedergabe..."
+
+id: LANG_REPLAYGAIN
+desc: in replaygain
+eng: "Replaygain"
+voice:
+new: "Lautstärkeanpassung"
+
+id: LANG_REPLAYGAIN_ENABLE
+desc: in replaygain
+eng: "Enable replaygain"
+voice:
+new: "Lautstärkeanpassung aktivieren"
+
+id: LANG_REPLAYGAIN_NOCLIP
+desc: in replaygain
+eng: "Prevent clipping"
+voice:
+new: "Übersteuerung verhindern"
+
+id: LANG_REPLAYGAIN_MODE
+desc: in replaygain
+eng: "Replaygain type"
+voice:
+new: "Lautstärkeanpassungstyp"
+
+id: LANG_TRACK_GAIN
+desc: in replaygain
+eng: "Track gain"
+voice:
+new: "Titellautstärke"
+
+id: LANG_ALBUM_GAIN
+desc: in replaygain
+eng: "Album gain"
+voice:
+new: "Albumlautstärke"
+
+id: LANG_ID3_TRACK_GAIN
+desc: in browse_id3
+eng: "[Track gain]"
+voice:
+new: "[Titellautstärke]"
+
+id: LANG_ID3_ALBUM_GAIN
+desc: in browse_id3
+eng: "[Album gain]"
+voice:
+new: "[Albumlautstärke]"
+
+id: LANG_ID3_NO_GAIN
+desc: DEPRECATED
+eng: ""
+voice:
+new:
+
+id: LANG_BIDI_SUPPORT
+desc: in settings_menu, option to enable reversal of hebrew/arabic text
+eng: "BiDi Hebrew/Arabic"
+voice:
+new: "BiDi Hebräisch/Arabisch"
+
+id: LANG_REPLAYGAIN_PREAMP
+desc: in browse_id3
+eng: "Pre-amp"
+voice: 
+new: "Vorverstärkung"
+
+id: LANG_UNIT_DB
+desc: in browse_id3
+eng: "dB"
+voice:
+new: "dB"
