@@ -57,6 +57,14 @@ sub buildzip {
 
     my $c = 'find apps -name "*.codec" ! -empty -exec cp {} .rockbox/codecs/ \;';
     print `$c`;
+
+    my @call = `find .rockbox/codecs`;
+    if(!$call[0]) {
+        # no codec was copied, remove directory again
+        unlink(".rockbox/codecs");
+    }
+
+
     $c= 'find apps "(" -name "*.rock" -o -name "*.ovl" ")" ! -empty -exec cp {} .rockbox/rocks/ \;';
     print `$c`;
 
