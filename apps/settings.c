@@ -431,6 +431,7 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(replaygain), false, "replaygain", off_on },
     {1, S_O(replaygain_track), false, "replaygain type", "track,album" },
     {1, S_O(replaygain_noclip), false, "replaygain noclip", off_on },
+    {8, S_O(replaygain_preamp), 0, "replaygain preamp", NULL },
 #endif
     
     /* If values are just added to the end, no need to bump the version. */
@@ -1388,7 +1389,8 @@ bool set_int(const char* string,
              void (*function)(int),
              int step,
              int min,
-             int max )
+             int max,
+             void (*formatter)(char*, int, int, const char*) )
 {
     bool done = false;
     int button;
@@ -1407,7 +1409,16 @@ bool set_int(const char* string,
 
     while (!done) {
         char str[32];
-        snprintf(str,sizeof str,"%d %s  ", *variable, unit);
+        
+        if (formatter) 
+        {
+            formatter(str, sizeof str, *variable, unit);
+        }
+        else
+        {
+            snprintf(str,sizeof str,"%d %s  ", *variable, unit);
+        }
+
         lcd_puts(0, 1, str);
 #ifdef HAVE_LCD_BITMAP
         status_draw(true);

@@ -95,7 +95,7 @@ static bool remote_contrast(void)
     return set_int( str(LANG_CONTRAST), "", UNIT_INT,
                     &global_settings.remote_contrast, 
                     lcd_remote_set_contrast, 1, MIN_CONTRAST_SETTING,
-                    MAX_CONTRAST_SETTING );
+                    MAX_CONTRAST_SETTING, NULL );
 }
 
 static bool remote_invert(void)
@@ -235,7 +235,7 @@ static bool contrast(void)
     return set_int( str(LANG_CONTRAST), "", UNIT_INT,
                     &global_settings.contrast, 
                     lcd_set_contrast, 1, MIN_CONTRAST_SETTING,
-                    MAX_CONTRAST_SETTING );
+                    MAX_CONTRAST_SETTING, NULL );
 }
 
 #ifdef HAVE_LCD_BITMAP
@@ -322,7 +322,7 @@ static bool peak_meter_fps_menu(void) {
     bool retval = false;
     retval = set_int( "Refresh rate", "/s", UNIT_PER_SEC,
              &peak_meter_fps,
-             NULL, 1, 5, 40);
+             NULL, 1, 5, 40, NULL);
     return retval;
 }
 #endif /* PM_DEBUG */
@@ -420,7 +420,7 @@ static bool peak_meter_release(void)  {
     retval = set_int( str(LANG_PM_RELEASE), str(LANG_PM_UNITS_PER_READ),
                       LANG_PM_UNITS_PER_READ,
                       &global_settings.peak_meter_release,
-                      NULL, 1, 1, 0x7e);
+                      NULL, 1, 1, 0x7e, NULL);
 
     peak_meter_init_times(global_settings.peak_meter_release,
         global_settings.peak_meter_hold, 
@@ -488,7 +488,7 @@ static bool peak_meter_min(void) {
         int min = -global_settings.peak_meter_min;
 
         retval =  set_int(str(LANG_PM_MIN), str(LANG_PM_DBFS), UNIT_DB,
-            &min, NULL, 1, -89, range_max);
+            &min, NULL, 1, -89, range_max, NULL);
 
         global_settings.peak_meter_min = - min;
     } 
@@ -499,7 +499,7 @@ static bool peak_meter_min(void) {
 
         retval =  set_int(str(LANG_PM_MIN), "%", UNIT_PERCENT,
             &min, NULL, 
-            1, 0, global_settings.peak_meter_max - 1);
+            1, 0, global_settings.peak_meter_max - 1, NULL);
 
         global_settings.peak_meter_min = (unsigned char)min;
     }
@@ -522,7 +522,7 @@ static bool peak_meter_max(void) {
         int max = -global_settings.peak_meter_max;;
 
         retval =  set_int(str(LANG_PM_MAX), str(LANG_PM_DBFS), UNIT_DB,
-            &max, NULL, 1, range_min, 0);
+            &max, NULL, 1, range_min, 0, NULL);
 
         global_settings.peak_meter_max = - max;
 
@@ -534,7 +534,7 @@ static bool peak_meter_max(void) {
 
         retval =  set_int(str(LANG_PM_MAX), "%", UNIT_PERCENT,
             &max, NULL, 
-            1, global_settings.peak_meter_min + 1, 100);
+            1, global_settings.peak_meter_min + 1, 100, NULL);
 
         global_settings.peak_meter_max = (unsigned char)max;
     }
@@ -765,7 +765,7 @@ static bool scroll_speed(void)
 {
     return set_int(str(LANG_SCROLL), "", UNIT_INT,
                    &global_settings.scroll_speed,
-                   &lcd_scroll_speed, 1, 0, 15 );
+                   &lcd_scroll_speed, 1, 0, 15, NULL );
 }
 
 
@@ -774,7 +774,7 @@ static bool scroll_delay(void)
     int dummy = global_settings.scroll_delay * (HZ/10);
     int rc = set_int(str(LANG_SCROLL_DELAY), "ms", UNIT_MS,
                      &dummy, 
-                     &lcd_scroll_delay, 100, 0, 2500 );
+                     &lcd_scroll_delay, 100, 0, 2500, NULL );
     global_settings.scroll_delay = dummy / (HZ/10);
     return rc;
 }
@@ -784,7 +784,7 @@ static bool scroll_step(void)
 {
     return set_int(str(LANG_SCROLL_STEP_EXAMPLE), "pixels", UNIT_PIXEL,
                    &global_settings.scroll_step,
-                   &lcd_scroll_step, 1, 1, LCD_WIDTH );
+                   &lcd_scroll_step, 1, 1, LCD_WIDTH, NULL );
 }
 #endif
 
@@ -792,7 +792,7 @@ static bool bidir_limit(void)
 {
     return set_int(str(LANG_BIDIR_SCROLL), "%", UNIT_PERCENT,
                    &global_settings.bidir_limit, 
-                   &lcd_bidir_scroll, 25, 0, 200 );
+                   &lcd_bidir_scroll, 25, 0, 200, NULL );
 }
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -816,7 +816,7 @@ static bool jump_scroll_delay(void)
     int dummy = global_settings.jump_scroll_delay * (HZ/10);
     int rc = set_int(str(LANG_JUMP_SCROLL_DELAY), "ms", UNIT_MS,
                      &dummy, 
-                     &lcd_jump_scroll_delay, 100, 0, 2500 );
+                     &lcd_jump_scroll_delay, 100, 0, 2500, NULL );
     global_settings.jump_scroll_delay = dummy / (HZ/10);
     return rc;
 }
@@ -831,7 +831,7 @@ static bool battery_capacity(void)
     return set_int(str(LANG_BATTERY_CAPACITY), "mAh", UNIT_MAH,
                    &global_settings.battery_capacity, 
                    &set_battery_capacity, 50, BATTERY_CAPACITY_MIN,
-                   BATTERY_CAPACITY_MAX );
+                   BATTERY_CAPACITY_MAX, NULL );
 }
 
 #if BATTERY_TYPES_COUNT > 1
@@ -895,7 +895,7 @@ static bool spindown(void)
 {
     return set_int(str(LANG_SPINDOWN), "s", UNIT_SEC,
                    &global_settings.disk_spindown,
-                   ata_spindown, 1, 3, 254 );
+                   ata_spindown, 1, 3, 254, NULL );
 }
 
 #ifdef HAVE_ATA_POWER_OFF
@@ -921,14 +921,14 @@ static bool max_files_in_dir(void)
 {
     return set_int(str(LANG_MAX_FILES_IN_DIR), "", UNIT_INT,
                    &global_settings.max_files_in_dir,
-                   NULL, 50, 50, 10000 );
+                   NULL, 50, 50, 10000, NULL );
 }
 
 static bool max_files_in_playlist(void)
 {
     return set_int(str(LANG_MAX_FILES_IN_PLAYLIST), "", UNIT_INT,
                    &global_settings.max_files_in_playlist,
-                   NULL, 1000, 1000, 20000 );
+                   NULL, 1000, 1000, 20000, NULL );
 }
 
 #if CONFIG_HWCODEC == MASNONE
@@ -957,7 +957,7 @@ static bool buffer_margin(void)
 {
     return set_int(str(LANG_MP3BUFFER_MARGIN), "s", UNIT_SEC,
                    &global_settings.buffer_margin,
-                   audio_set_buffer_margin, 1, 0, 7 );
+                   audio_set_buffer_margin, 1, 0, 7, NULL );
 }
 #endif
 
@@ -1232,6 +1232,25 @@ static bool replaygain_noclip(void)
     return result;
 }
 
+void replaygain_preamp_format(char* buffer, int buffer_size, int value, 
+    const char* unit)
+{
+    int v = abs(value);
+    
+    snprintf(buffer, buffer_size, "%s%d.%d %s", value < 0 ? "-" : "",
+        v / 10, v % 10, unit);
+}
+
+static bool replaygain_preamp(void)
+{
+    bool result = set_int(str(LANG_REPLAYGAIN_PREAMP), str(LANG_UNIT_DB), 
+        UNIT_DB, &global_settings.replaygain_preamp, NULL, 1, -120, 120, 
+        replaygain_preamp_format);
+
+    dsp_set_replaygain(true);
+    return result;
+}
+
 static bool replaygain_settings_menu(void)
 {
     int m;
@@ -1241,6 +1260,7 @@ static bool replaygain_settings_menu(void)
         { ID2P(LANG_REPLAYGAIN_ENABLE), replaygain },
         { ID2P(LANG_REPLAYGAIN_NOCLIP), replaygain_noclip },
         { ID2P(LANG_REPLAYGAIN_MODE), replaygain_mode },
+        { ID2P(LANG_REPLAYGAIN_PREAMP), replaygain_preamp },
     };
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL,

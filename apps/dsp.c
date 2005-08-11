@@ -23,13 +23,14 @@
 #include "playback.h"
 #include "system.h"
 #include "settings.h"
+#include "replaygain.h"
 #include "debug.h"
 
 /* The "dither" code to convert the 24-bit samples produced by libmad was
  * taken from the coolplayer project - coolplayer.sourceforge.net
  */
 
-/* 16-bit samples are scaled based on these constants. The shift should be 
+/* 16-bit samples are scaled based on these constants. The shift should be
  * no more than 15.
  */
 #define WORD_SHIFT          12
@@ -336,7 +337,7 @@ static inline long clip_sample(long sample)
     return sample;
 }
 
-/* The "dither" code to convert the 24-bit samples produced by libmad was 
+/* The "dither" code to convert the 24-bit samples produced by libmad was
  * taken from the coolplayer project - coolplayer.sourceforge.net
  */
 
@@ -386,15 +387,15 @@ static void apply_gain(long* src[], int count)
         long* d1 = (s0 == s1) ? d0 : &sample_buf[SAMPLE_BUF_SIZE / 2];
         long gain = dsp.replaygain;
         long i;
-        
+
         src[0] = d0;
         src[1] = d1;
-        
+
         for (i = 0; i < count; i++)
         {
             *d0++ = FRACMUL_8(*s0++, gain);
         }
-        
+
         if (src [0] != src [1])
         {
             for (i = 0; i < count; i++)
@@ -639,7 +640,7 @@ void dsp_set_replaygain(bool always)
         long gain = 0;
 
         dsp.new_gain = false;
-    
+
         if (global_settings.replaygain || global_settings.replaygain_noclip)
         {
             long peak;
@@ -648,28 +649,36 @@ void dsp_set_replaygain(bool always)
             {
                 gain = (global_settings.replaygain_track || !dsp.album_gain)
                     ? dsp.track_gain : dsp.album_gain;
+
+                if (global_settings.replaygain_preamp)
+                {
+                    long preamp = get_replaygain_int(
+                        global_settings.replaygain_preamp * 10);
+
+                    gain = (long) ((((int64_t) gain * preamp)) >> 24);
+                }
             }
-            
+
             peak = (global_settings.replaygain_track || !dsp.album_peak)
                 ? dsp.track_peak : dsp.album_peak;
-            
+
             if (gain == 0)
             {
                 /* So that noclip can work even with no gain information. */
                 gain = DEFAULT_REPLAYGAIN;
             }
-            
+
             if (global_settings.replaygain_noclip && (peak != 0)
                 && ((((int64_t) gain * peak) >> 24) >= DEFAULT_REPLAYGAIN))
             {
                 gain = (((int64_t) DEFAULT_REPLAYGAIN << 24) / peak);
             }
-            
+
             if (gain == DEFAULT_REPLAYGAIN)
             {
                 /* Nothing to do, disable processing. */
                 gain = 0;
-    
+
             }
         }
 

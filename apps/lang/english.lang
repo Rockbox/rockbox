@@ -3244,3 +3244,15 @@ desc: in settings_menu, option to enable reversal of hebrew/arabic text
 eng: "BiDi Hebrew/Arabic"
 voice ""
 new:
+
+id: LANG_REPLAYGAIN_PREAMP
+desc: in browse_id3
+eng: "Pre-amp"
+voice "Preamp"
+new:
+
+id: LANG_UNIT_DB
+desc: in browse_id3
+eng: "dB"
+voice ""
+new:

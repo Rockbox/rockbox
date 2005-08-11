@@ -22,6 +22,7 @@
 
 #include "id3.h"
 
+long get_replaygain_int(long int_gain);
 long get_replaygain(const char* str);
 long get_replaypeak(const char* str);
 long parse_replaygain(const char* key, const char* value, 

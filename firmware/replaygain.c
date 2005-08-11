@@ -305,6 +305,18 @@ static long convert_gain(long gain)
     return gain;
 }
 
+long get_replaygain_int(long int_gain)
+{
+    long gain = 0;
+    
+    if (int_gain)
+    {
+        gain = convert_gain(int_gain * FP_ONE / 100);
+    }
+    
+    return gain;
+}
+
 long get_replaygain(const char* str)
 {
     long gain = 0;
