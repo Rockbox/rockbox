@@ -37,15 +37,17 @@ static volatile unsigned char *i2c_get_addr(int device);
 
 void i2c_init(void)
 {
+    /* I2C Clock divisor = 576 => 119.952 MHz / 2 / 576 = 104.125 kHz */
+    MFDR = 0x14;
+    MFDR2 = 0x14;
+
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
     /* Audio Codec */
-    MADR = 0x6c; /* iRiver firmware uses this addr */
     MBDR = 0;    /* iRiver firmware does this */
     MBCR = IEN;  /* Enable interface */
 
 #if 0
     /* FM Tuner */
-    MADR2 = 0x6c;
     MBDR2 = 0;
     MBCR2 = IEN;
 #endif

@@ -529,9 +529,6 @@ void set_cpu_frequency(long frequency)
         tick_start(1000/HZ);
         IDECONFIG1 = 0x106000 | (5 << 10); /* BUFEN2 enable + CS2Pre/CS2Post */
         IDECONFIG2 = 0x40000 | (1 << 8); /* TA enable + CS2wait */
-        /* I2C Clock divisor = 576 => 119.952 MHz / 2 / 576 = 104.125 kHz */
-        MFDR = 0x14;
-        MFDR2 = 0x14;
         break;
         
     case CPUFREQ_NORMAL:
@@ -548,9 +545,6 @@ void set_cpu_frequency(long frequency)
         tick_start(1000/HZ);
         IDECONFIG1 = 0x106000 | (5 << 10); /* BUFEN2 enable + CS2Pre/CS2Post */
         IDECONFIG2 = 0x40000 | (0 << 8); /* TA enable + CS2wait */
-        /* I2C Clock divisor = 240 => 47.9808 MHz / 2 / 240 = 99.96 kHz */
-        MFDR = 0x0f;  
-        MFDR2 = 0x0f;
         break;
     default:
         DCR = (DCR & ~0x01ff) | 1;   /* Refresh timer for bypass
@@ -562,9 +556,6 @@ void set_cpu_frequency(long frequency)
         tick_start(1000/HZ);
         IDECONFIG1 = 0x106000 | (1 << 10); /* BUFEN2 enable + CS2Pre/CS2Post */
         IDECONFIG2 = 0x40000 | (0 << 8); /* TA enable + CS2wait */
-        /* I2C Clock divisor = 56 => 11.2896 MHz / 56 = 100.8 kHz */
-        MFDR = 0x06;
-        MFDR2 = 0x06;
         break;
     }
 }
