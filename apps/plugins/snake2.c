@@ -472,7 +472,7 @@ int load_all_levels(void)
 void iohiscore(void)
 {
     int fd;
-    unsigned int compare,init=0;
+    unsigned int compare;
 
     /* clear the buffer we're about to load the highscore data into */
     rb->memset(phscore, 0, sizeof(phscore));
