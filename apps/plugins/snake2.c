@@ -484,7 +484,7 @@ void iohiscore(void)
     if(hiscore > compare){
         rb->snprintf(phscore,sizeof(phscore),"%d",hiscore);        
         rb->lseek(fd,0,SEEK_SET);
-        rb->write(fd,phscore,rb->strlen(phscore));
+        rb->write(fd,phscore,4);
     }
     else
         hiscore = compare;   
@@ -1291,6 +1291,7 @@ void game_init(void)
     dead=0;
     apple=0;
     score=0;
+    applecount=0;
 
     clear_board();
     load_level( level_from_file );
