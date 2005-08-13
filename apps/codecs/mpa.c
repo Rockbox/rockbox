@@ -79,8 +79,8 @@ enum codec_status codec_start(struct codec_api* api)
     int Status = 0;
     size_t size;
     int file_end;
+    int frame_skip;
     char *InputBuffer;
-    bool first_frame;
 
     ci = api;
     
@@ -129,7 +129,6 @@ enum codec_status codec_start(struct codec_api* api)
        for gapless playback */
   next_track:
   
-    first_frame = false;
     file_end = 0;
     
     while (!*ci->taginfo_ready && !ci->stop_codec)
@@ -157,9 +156,13 @@ enum codec_status codec_start(struct codec_api* api)
     }
 
     samplesdone = ci->id3->elapsed * frequency_divider / 10;
+    frame_skip = start_skip;
+    recalc_samplecount();
     
     /* This is the decoding loop. */
     while (1) {
+        int framelength;
+
         ci->yield();
         if (ci->stop_codec || ci->reload_codec) {
             break ;
@@ -175,9 +178,8 @@ enum codec_status codec_start(struct codec_api* api)
                 goto next_track;
             }
             ci->seek_time = 0;
+            if (newpos == 0) frame_skip = start_skip;
         }
-
-        recalc_samplecount();
 
         /* Lock buffers */
         if (Stream.error == 0) {
@@ -224,11 +226,12 @@ enum codec_status codec_start(struct codec_api* api)
         // mad_timer_add(&Timer,Frame.header.duration);
 
         mad_synth_frame(&Synth,&Frame);
+        framelength = Synth.pcm.length;
     
         /* Convert MAD's numbers to an array of 16-bit LE signed integers */
-        /* We skip start_skip number of samples here, this should only happen for
+        /* We skip frame_skip number of samples here, this should only happen for
            very first frame in the stream. */
-        /* TODO: possible for start_skip to exceed one frames worth of samples? */
+        /* TODO: possible for frame_skip to exceed one frames worth of samples? */
 
         if(Frame.header.samplerate != current_frequency) {
             current_frequency = Frame.header.samplerate;
@@ -238,30 +241,40 @@ enum codec_status codec_start(struct codec_api* api)
             recalc_samplecount();
         }
         
+        if (stop_skip > 0)
+        {
+            long max = samplecount - samplesdone;
+            
+            if (max < 0) max = 0;
+            if (max < framelength) framelength = max;
+            if (framelength == 0) break;
+        }
+
         if (MAD_NCHANNELS(&Frame.header) == 2) {
             if (current_stereo_mode != STEREO_NONINTERLEAVED) {
                 ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_NONINTERLEAVED);
                 current_stereo_mode = STEREO_NONINTERLEAVED;
             }
-            ci->pcmbuf_insert_split(&Synth.pcm.samples[0][start_skip],
-                                    &Synth.pcm.samples[1][start_skip],
-                                    (Synth.pcm.length - start_skip) * 4);
+            ci->pcmbuf_insert_split(&Synth.pcm.samples[0][frame_skip],
+                                    &Synth.pcm.samples[1][frame_skip],
+                                    (framelength - frame_skip) * 4);
         } else {
             if (current_stereo_mode != STEREO_MONO) {
                 ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_MONO);
                 current_stereo_mode = STEREO_MONO;
             }
-            ci->pcmbuf_insert((char *)&Synth.pcm.samples[0][start_skip],
-                              (Synth.pcm.length - start_skip) * 4);
+            ci->pcmbuf_insert((char *)&Synth.pcm.samples[0][frame_skip],
+                              (framelength - frame_skip) * 4);
         }
-        start_skip = 0; /* not very elegant, and might want to keep this value */
+        
+        frame_skip = 0;
         
         if (Stream.next_frame)
             ci->advance_buffer_loc((void *)Stream.next_frame);
         else
             ci->advance_buffer(size);
-            
-        samplesdone += Synth.pcm.length;
+
+        samplesdone += framelength;
         ci->set_elapsed(samplesdone / (frequency_divider / 10));
     }
   
