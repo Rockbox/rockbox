@@ -473,18 +473,21 @@ void iohiscore(void)
 {
     int fd;
     unsigned int compare,init=0;
- 
-    rb->snprintf(phscore,sizeof(phscore),"%d",init);        
 
-    fd = rb->open(HISCORE_FILE,O_RDWR | O_CREAT); 
-    rb->read(fd,phscore,4);
+    /* clear the buffer we're about to load the highscore data into */
+    rb->memset(phscore, 0, sizeof(phscore));
+
+    fd = rb->open(HISCORE_FILE,O_RDWR | O_CREAT);
+
+    /* highscore used to %d, is now %d\n
+       Deal with no file or bad file */
+    rb->read(fd,phscore, sizeof(phscore));
 
     compare = rb->atoi(phscore);
 
     if(hiscore > compare){
-        rb->snprintf(phscore,sizeof(phscore),"%d",hiscore);        
         rb->lseek(fd,0,SEEK_SET);
-        rb->write(fd,phscore,4);
+        rb->fdprintf(fd, "%d\n", hiscore);
     }
     else
         hiscore = compare;   
