@@ -19,7 +19,7 @@
 
 #include "cpu.h"
 #include "kernel.h"
-#include "debug.h"
+#include "logf.h"
 #include "system.h"
 #include "i2c-coldfire.h"
 
@@ -37,28 +37,28 @@ static volatile unsigned char *i2c_get_addr(int device);
 
 void i2c_init(void)
 {
+    /* The FM chip has no pullup for SCL, so we have to bit-bang the
+       I2C for that one. */
+    or_l(0x00800000, &GPIO1_OUT);
+    or_l(0x00000008, &GPIO_OUT);
+    or_l(0x00800000, &GPIO1_ENABLE);
+    or_l(0x00000008, &GPIO_ENABLE);
+    or_l(0x00800000, &GPIO1_FUNCTION);
+    or_l(0x00000008, &GPIO_FUNCTION);
+
     /* I2C Clock divisor = 576 => 119.952 MHz / 2 / 576 = 104.125 kHz */
     MFDR = 0x14;
-    MFDR2 = 0x14;
 
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
     /* Audio Codec */
     MBDR = 0;    /* iRiver firmware does this */
     MBCR = IEN;  /* Enable interface */
-
-#if 0
-    /* FM Tuner */
-    MBDR2 = 0;
-    MBCR2 = IEN;
-#endif
-
 #endif
 }
 
 void i2c_close(void)
 {
     MBCR  = 0;
-    MBCR2 = 0;
 }
 
 /**
@@ -77,7 +77,7 @@ int i2c_write(int device, unsigned char *buf, int count)
     rc = i2c_gen_start(device);
     if (rc < 0)
     {
-        DEBUGF("i2c: gen_start failed (d=%d)", device);
+        logf("i2c: gen_start failed (d=%d)", device);
         return rc*10 - 1;
     }
 
@@ -86,7 +86,7 @@ int i2c_write(int device, unsigned char *buf, int count)
         rc = i2c_write_byte(device, buf[i]);
         if (rc < 0)
         {
-            DEBUGF("i2c: write failed at (d=%d,i=%d)", device, i);
+            logf("i2c: write failed at (d=%d,i=%d)", device, i);
             return rc*10 - 2;
         }
     }
