@@ -2518,7 +2518,7 @@ id: VOICE_CHAR_H
 desc: spoken only, for spelling
 eng: ""
 voice: "H"
-new: 
+new: ""
 
 id: VOICE_CHAR_I
 desc: spoken only, for spelling
@@ -2548,145 +2548,145 @@ id: VOICE_CHAR_M
 desc: spoken only, for spelling
 eng: ""
 voice: "M"
-new: 
+new: ""
 
 id: VOICE_CHAR_N
 desc: spoken only, for spelling
 eng: ""
 voice: "N"
-new: 
+new: ""
 
 id: VOICE_CHAR_O
 desc: spoken only, for spelling
 eng: ""
 voice: "O"
-new: 
+new: ""
 
 id: VOICE_CHAR_P
 desc: spoken only, for spelling
 eng: ""
 voice: "P"
-new: 
+new: ""
 
 id: VOICE_CHAR_Q
 desc: spoken only, for spelling
 eng: ""
 voice: "Q"
-new: 
+new: ""
 
 id: VOICE_CHAR_R
 desc: spoken only, for spelling
 eng: ""
 voice: "R"
-new: 
+new: ""
 
 id: VOICE_CHAR_S
 desc: spoken only, for spelling
 eng: ""
 voice: "S"
-new: 
+new: ""
 
 id: VOICE_CHAR_T
 desc: spoken only, for spelling
 eng: ""
 voice: "T"
-new: 
+new: ""
 
 id: VOICE_CHAR_U
 desc: spoken only, for spelling
 eng: ""
 voice: "U"
-new: 
+new: ""
 
 id: VOICE_CHAR_V
 desc: spoken only, for spelling
 eng: ""
 voice: "V"
-new: 
+new: ""
 
 id: VOICE_CHAR_W
 desc: spoken only, for spelling
 eng: ""
 voice: "W"
-new: 
+new: ""
 
 id: VOICE_CHAR_X
 desc: spoken only, for spelling
 eng: ""
 voice: "X"
-new: 
+new: ""
 
 id: VOICE_CHAR_Y
 desc: spoken only, for spelling
 eng: ""
 voice: "Y"
-new: 
+new: ""
 
 id: VOICE_CHAR_Z
 desc: spoken only, for spelling
 eng: ""
 voice: "Z"
-new: 
+new: ""
 
 id: VOICE_CURRENT_TIME
 desc: spoken only, for wall clock announce
 eng: ""
 voice: "huidige tijd:"
-new: 
+new: ""
 
 id: VOICE_EXT_AJZ
 desc: spoken only, for file extension
 eng: ""
 voice: "firmware"
-new: 
+new: ""
 
 id: VOICE_EXT_BMARK
 desc: spoken only, for file extension and the word in general
 eng: ""
 voice: "bladwijzer"
-new: 
+new: ""
 
 id: VOICE_EXT_CFG
 desc: spoken only, for file extension
 eng: ""
 voice: "configuratie"
-new: 
+new: ""
 
 id: VOICE_EXT_FONT
 desc: spoken only, for file extension
 eng: ""
 voice: "lettertype"
-new: 
+new: ""
 
 id: VOICE_EXT_MPA
 desc: spoken only, for file extension
 eng: ""
 voice: "audio"
-new: 
+new: ""
 
 id: VOICE_EXT_ROCK
 desc: spoken only, for file extension
 eng: ""
 voice: "plugin"
-new: 
+new: ""
 
 id: VOICE_EXT_TXT
 desc: spoken only, for file extension
 eng: ""
 voice: "text"
-new: 
+new: ""
 
 id: VOICE_EXT_UCL
 desc: spoken only, for file extension
 eng: ""
 voice: "flash"
-new: 
+new: ""
 
 id: VOICE_EXT_WPS
 desc: spoken only, for file extension
 eng: ""
-voice: "while-playing-screen"
-new: 
+voice: "Het terwijl spelen scherm"
+new: ""
 
 id: LANG_FM_EDIT_PRESET
 desc: in radio screen
@@ -2733,8 +2733,8 @@ new: "MDB Sterkte"
 id: LANG_MDB_HARMONICS
 desc: in sound settings
 eng: "MDB Harmonics"
-voice: "MDB Harmonics"
-new: 
+voice: "MDB boventonen"
+new: "MDB boventonen"
 
 id: LANG_MDB_CENTER
 desc: in sound settings
@@ -2806,13 +2806,13 @@ id: LANG_INSTALLATION_INCOMPLETE
 desc: in browse root
 eng: "Installation incomplete"
 voice: "Installatie mislukt"
-new: "installatie mislut"
+new: "Installatie mislult"
 
 id: LANG_REMOVE_MMC
 desc: before acknowledging usb in case an MMC is inserted (Ondio)
 eng: "Please remove inserted MMC"
-voice: "Verwijder multimedia kaart AUB"
-new: "Verwijder ingestoken MMC"
+voice: "Verwijder omgestoken multimedia kaart AUB"
+new: "Verwijder ingestoken MMC AUB"
 
 id: VOICE_DOT
 desc: spoken only, for spelling
@@ -2829,8 +2829,8 @@ new:
 id: LANG_STEREO_WIDTH
 desc: in sound_settings
 eng: "Stereo width"
-voice: ""
-new: 
+voice: "Stereo breedte"
+new: "Stereo breedte"
 
 id: LANG_CHANNEL_CUSTOM
 desc: in sound_settings
@@ -2907,7 +2907,7 @@ new: "Alkaline"
 id: LANG_BATTERY_TYPE_NIMH
 desc: in battery settings
 eng: "NiMH"
-voice: "Nickel metal hydride"
+voice: "Nikkel metaal hydride"
 new: "NiMH" 
 
 id: LANG_POINT
@@ -2956,7 +2956,7 @@ id: LANG_ID3DB_ALL_SONGS
 desc: ID3 virtual folder name
 eng: "<All songs>"
 voice: "Alle nummers"
-new: "Alle nummers"
+new: "<Alle nummers>"
 
 id: LANG_PLAYLIST
 desc: Used when you need to say playlist, also voiced
@@ -3099,5 +3099,17 @@ new: "Voeg in geschud"
 id: LANG_NOTHING_TO_RESUME
 desc: Error message displayed when resume button pressed but no playlist
 eng: "Nothing to resume"
-voice: "Niets te ervatten"
+voice: "Niets te hervatten"
 new: "Niets te hervatten" 
+
+id: LANG_SPDIF_ENABLE
+desc: in playback settings menu. enable/disable the optical out
+eng: "Optical output"
+voice: "Optische uitgang"
+new: "Optische uitgang"
+
+id: LANG_NEXT_FOLDER
+desc: in settings_menu.  Should we move to next folder when current one ends
+eng: "Move to Next Folder"
+voice: "Ga naar volgende map"
+new: "Ga naar volgende map"
