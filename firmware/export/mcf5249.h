@@ -60,8 +60,7 @@
 #define TCN1  (*(volatile unsigned short *)(MBAR + 0x18c))
 #define TER1  (*(volatile unsigned short *)(MBAR + 0x190))
 
-#define UMR10  (*(volatile unsigned char *)(MBAR + 0x1c0))
-#define UMR20  (*(volatile unsigned char *)(MBAR + 0x1c0))
+#define UMR0   (*(volatile unsigned char *)(MBAR + 0x1c0))
 #define USR0   (*(volatile unsigned char *)(MBAR + 0x1c4))
 #define UCSR0  (*(volatile unsigned char *)(MBAR + 0x1c4))
 #define UCR0   (*(volatile unsigned char *)(MBAR + 0x1c8))
@@ -78,8 +77,7 @@
 #define UOP10  (*(volatile unsigned char *)(MBAR + 0x1f8))
 #define UOP00  (*(volatile unsigned char *)(MBAR + 0x1fc))
 
-#define UMR11  (*(volatile unsigned char *)(MBAR + 0x200))
-#define UMR21  (*(volatile unsigned char *)(MBAR + 0x200))
+#define UMR1   (*(volatile unsigned char *)(MBAR + 0x200))
 #define USR1   (*(volatile unsigned char *)(MBAR + 0x204))
 #define UCSR1  (*(volatile unsigned char *)(MBAR + 0x204))
 #define UCR1   (*(volatile unsigned char *)(MBAR + 0x208))
