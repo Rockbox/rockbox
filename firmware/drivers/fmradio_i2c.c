@@ -25,7 +25,7 @@
 #include "system.h"
 #include "string.h"
 
-#if (CONFIG_TUNER == TEA5767)
+#if (CONFIG_TUNER & TEA5767)
 #if (CONFIG_I2C == I2C_COLDFIRE)
 /* cute little functions, atomic read-modify-write */
 /* SDA is GPIO1,23 */
