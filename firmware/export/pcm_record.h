@@ -48,4 +48,6 @@ unsigned long pcm_num_recorded_bytes(void);
 void pcm_pause_recording(void);
 void pcm_resume_recording(void);
 
+void pcmrec_set_mux(int source);
+
 #endif

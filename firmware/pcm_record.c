@@ -655,4 +655,13 @@ static void pcmrec_thread(void)
     logf("thread pcmrec done");
 }
 
-
+void pcmrec_set_mux(int source)
+{
+    if(source == 0)
+        and_l(~0x00800000, &GPIO_OUT);  /* Line In */
+    else
+        or_l(0x00800000, &GPIO_OUT);    /* FM radio */
+        
+    or_l(0x00800000, &GPIO_ENABLE);
+    or_l(0x00800000, &GPIO_FUNCTION);
+}
