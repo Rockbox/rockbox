@@ -3256,3 +3256,9 @@ desc: in browse_id3
 eng: "dB"
 voice ""
 new:
+
+id: LANG_ID3_VBR
+desc: in browse_id3
+eng: " (VBR)"
+voice ""
+new:

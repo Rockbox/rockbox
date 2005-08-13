@@ -1308,7 +1308,7 @@ int draw_id3_item(int line, int top, int header, const char* body)
 
 bool browse_id3(void)
 {
-    char buf[32];
+    char buf[64];
     const struct mp3entry* id3 = audio_current_track();
 #if defined(HAVE_LCD_BITMAP)
     const int y_margin = lcd_getymargin();
@@ -1387,7 +1387,8 @@ bool browse_id3(void)
             playlist_amount());
         line = draw_id3_item(line, top, LANG_ID3_PLAYLIST, buf);
 
-        snprintf(buf, sizeof(buf), "%d kbps", id3->bitrate);
+        snprintf(buf, sizeof(buf), "%d kbps%s", id3->bitrate, 
+            id3->vbr ? str(LANG_ID3_VBR) : (const unsigned char*) "");
         line = draw_id3_item(line, top, LANG_ID3_BITRATE, buf);
 
         snprintf(buf, sizeof(buf), "%d Hz", id3->frequency);
