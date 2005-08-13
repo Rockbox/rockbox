@@ -7,9 +7,6 @@
  */
 #define IRIVER_H100_SERIES 1
 
-#define CONFIG_TUNER TEA5767
-#define CONFIG_TUNER_XTAL 32768000
-
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 1
 
@@ -51,6 +48,9 @@
 #define PLUGIN_BUFFER_SIZE 0xC0000
 
 #ifndef SIMULATOR
+
+#define CONFIG_TUNER TEA5767
+#define CONFIG_TUNER_XTAL 32768000
 
 /* Define this if you have a Motorola SCF5249 */
 #define CONFIG_CPU MCF5249
