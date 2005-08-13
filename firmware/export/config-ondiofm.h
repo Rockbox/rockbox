@@ -52,6 +52,7 @@
 
 /* Define this if you have an FM Radio */
 #define CONFIG_TUNER (S1A0903X01 | TEA5767) /* to be decided at runtime */
+#define CONFIG_TUNER_XTAL 13000000
 
 /* Define this if the tuner is switched on by software */
 #define HAVE_TUNER_PWR_CTRL

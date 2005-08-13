@@ -17,7 +17,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
+#include "config.h"
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
@@ -38,7 +38,12 @@ void philips_set(int setting, int value)
             write_bytes[0] = 0x80; /* mute */
             write_bytes[1] = 0x00;
             write_bytes[2] = 0x00;
+#if CONFIG_TUNER_XTAL == 32768000
+            write_bytes[3] = 0x1A; /* 32.768MHz, soft mute,
+                                      stereo noise cancelling */
+#else
             write_bytes[3] = 0x0A; /* soft mute, stereo noise cancelling */
+#endif
             write_bytes[4] = 0x00;
             if (value) /* sleep */
             {
@@ -49,7 +54,12 @@ void philips_set(int setting, int value)
         case RADIO_FREQUENCY:
             {
                 int n;
+#if CONFIG_TUNER_XTAL == 32768000
+                n = (4 * (value - 225000)) / 32768;
+#else
                 n = (4 * (value - 225000)) / 50000;
+#endif
+                logf("n=%d", n);
                 write_bytes[0] = (write_bytes[0] & 0xC0) | (n >> 8);
                 write_bytes[1] = n & 0xFF;
             }
