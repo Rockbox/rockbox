@@ -406,11 +406,12 @@ int get_mp3file_info(int fd, struct mp3info *info)
             vbrheader = frame + 17;
     }
 
-    if (!memcmp(vbrheader, "Xing", 4))
+    if (!memcmp(vbrheader, "Xing", 4)
+        || !memcmp(vbrheader, "Info", 4))
     {
         int i = 8; /* Where to start parsing info */
 
-        DEBUGF("Xing header\n");
+        DEBUGF("Xing/Info header\n");
 
         /* Remember where in the file the Xing header is */
         info->vbr_header_pos = lseek(fd, 0, SEEK_CUR) - info->frame_size;
@@ -427,10 +428,9 @@ int get_mp3file_info(int fd, struct mp3info *info)
         if(!mp3headerinfo(info, header))
             return -5;
 
-        /* Yes, it is a VBR file */
-        info->is_vbr = true;
-        info->is_xing_vbr = true;
-        
+        /* Is it a VBR file? */
+        info->is_vbr = info->is_xing_vbr = !memcmp(vbrheader, "Xing", 4);
+
         if(vbrheader[7] & VBR_FRAMES_FLAG) /* Is the frame count there? */
         {
             info->frame_count = BYTES2INT(vbrheader[i], vbrheader[i+1],
@@ -531,13 +531,6 @@ int get_mp3file_info(int fd, struct mp3info *info)
            offset += j;
            DEBUGF("%03d: %x (%x)\n", i, offset - bytecount, j);
         }
-    }
-
-    /* Is it a LAME Info frame? */
-    if (!memcmp(vbrheader, "Info", 4))
-    {
-        /* Make sure we skip this frame in playback */
-        bytecount += info->frame_size;
     }
 
     return bytecount;
