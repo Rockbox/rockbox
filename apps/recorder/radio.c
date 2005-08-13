@@ -55,6 +55,11 @@
 
 #ifdef CONFIG_TUNER
 
+#if CONFIG_HWCODEC == MASNONE
+#include "uda1380.h"
+#include "pcm_record.h"
+#endif
+
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define FM_MENU BUTTON_F1
 #define FM_PRESET BUTTON_F2
@@ -64,6 +69,10 @@
 #define FM_EXIT (BUTTON_ON | BUTTON_REL)
 #define FM_PRESET_ADD BUTTON_F1
 #define FM_PRESET_ACTION BUTTON_F3
+#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+#define FM_MENU BUTTON_MODE
+#define FM_STOP BUTTON_OFF
+#define FM_EXIT (BUTTON_ON | BUTTON_REL)
 #elif CONFIG_KEYPAD == ONDIO_PAD /* restricted keypad */
 #define FM_MENU (BUTTON_MENU | BUTTON_REPEAT)
 #define FM_RECORD (BUTTON_MENU | BUTTON_REL)
@@ -91,6 +100,7 @@ static int num_presets; /* The number of presets in the preset list */
 void radio_load_presets(void);
 bool handle_radio_presets(void);
 bool radio_menu(void);
+bool radio_add_preset(void);
 
 #if CONFIG_TUNER == S1A0903X01 /* FM recorder */
 #define radio_set samsung_set
@@ -163,7 +173,7 @@ bool radio_screen(void)
 {
     char buf[MAX_PATH];
     bool done = false;
-    int button;
+    int button, lastbutton = BUTTON_NONE;
     int freq;
     bool tuned;
     bool stereo = false;
@@ -175,7 +185,7 @@ bool radio_screen(void)
     int timeout = current_tick + HZ/10;
     bool screen_freeze = false;
     bool have_recorded = false;
-    unsigned int seconds;
+    unsigned int seconds = 0;
     unsigned int last_seconds = 0;
     int hours, minutes;
     bool keep_playing = false;
@@ -195,11 +205,14 @@ bool radio_screen(void)
     radio_load_presets();
 
 #ifndef SIMULATOR
+#if CONFIG_HWCODEC != MASNONE
     if(rec_create_directory() > 0)
         have_recorded = true;
+#endif
     
     audio_stop();
-    
+
+#if CONFIG_HWCODEC != MASNONE
     mpeg_init_recording();
 
     sound_settings_apply();
@@ -222,6 +235,14 @@ bool radio_screen(void)
     
     mpeg_set_recording_gain(sound_default(SOUND_LEFT_GAIN),
                             sound_default(SOUND_RIGHT_GAIN), false);
+#else
+    uda1380_enable_recording(false);
+    uda1380_set_recvol(0, 0, 10);
+    uda1380_set_monitor(true);
+
+    /* Set the input multiplexer to FM */
+    pcmrec_set_mux(1);
+#endif
 #endif
 
     curr_freq = global_settings.last_frequency * FREQ_STEP + MIN_FREQ;
@@ -434,6 +455,9 @@ bool radio_screen(void)
                 break;
         }
 
+        if (button != BUTTON_NONE)
+            lastbutton = button;
+        
         peak_meter_peek();
 
         if(!screen_freeze)
@@ -464,7 +488,9 @@ bool radio_screen(void)
             }
             
 #ifndef SIMULATOR
+#if CONFIG_HWCODEC != MASNONE
             seconds = mpeg_recorded_time() / HZ;
+#endif
 #endif
             if(update_screen || seconds > last_seconds)
             {
@@ -545,21 +571,28 @@ bool radio_screen(void)
         }
     }
     
+#if CONFIG_HWCODEC != MASNONE
     audio_init_playback();
+#endif
 
     sound_settings_apply();
 
     if(keep_playing)
     {
+#if CONFIG_HWCODEC != MASNONE
         /* Enable the Left and right A/D Converter */
         mpeg_set_recording_gain(sound_default(SOUND_LEFT_GAIN),
                                 sound_default(SOUND_RIGHT_GAIN), false);
         mas_codec_writereg(6, 0x4000);
+#endif
         radio_set_status(FMRADIO_POWERED); /* leave it powered */
     }
     else
     {
         radio_stop();
+#if CONFIG_HWCODEC == MASNONE
+        pcmrec_set_mux(0); /* Line In */
+#endif
     }
 
 #endif
@@ -641,7 +674,7 @@ static void rebuild_preset_menu(void)
     }
 }
 
-static bool radio_add_preset(void)
+bool radio_add_preset(void)
 {
     char buf[27];
 
@@ -840,6 +873,7 @@ bool handle_radio_presets(void)
 }
 
 #ifndef SIMULATOR
+#if CONFIG_HWCODEC != MASNONE
 static bool fm_recording_settings(void)
 {
     bool ret;
@@ -859,6 +893,7 @@ static bool fm_recording_settings(void)
     }
     return ret;
 }
+#endif
 #endif
 
 char monomode_menu_string[32];
@@ -922,7 +957,9 @@ bool radio_menu(void)
     menu_insert(m, -1, monomode_menu_string, toggle_mono_mode);
     menu_insert(m, -1, ID2P(LANG_SOUND_SETTINGS), sound_menu);
 #ifndef SIMULATOR
+#if CONFIG_HWCODEC != MASNONE
     menu_insert(m, -1, ID2P(LANG_RECORDING_SETTINGS), fm_recording_settings);
+#endif
 #endif
 
     result = menu_run(m);

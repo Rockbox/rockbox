@@ -7,6 +7,9 @@
  */
 #define IRIVER_H100_SERIES 1
 
+#define CONFIG_TUNER TEA5767
+#define CONFIG_TUNER_XTAL 32768000
+
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 1
 
