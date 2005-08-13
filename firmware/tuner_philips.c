@@ -59,7 +59,6 @@ void philips_set(int setting, int value)
 #else
                 n = (4 * (value - 225000)) / 50000;
 #endif
-                logf("n=%d", n);
                 write_bytes[0] = (write_bytes[0] & 0xC0) | (n >> 8);
                 write_bytes[1] = n & 0xFF;
             }
