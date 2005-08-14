@@ -830,6 +830,7 @@ bool dbg_ports(void)
     int batt_int, batt_frac;
 
 #ifdef HAVE_LCD_BITMAP
+    lcd_setfont(FONT_SYSFIXED);
     lcd_setmargins(0, 0);
 #endif
     lcd_clear_display();
@@ -1129,6 +1130,7 @@ bool view_battery(void)
     
 #ifdef HAVE_LCD_BITMAP
     lcd_setmargins(0, 0);
+    lcd_setfont(FONT_SYSFIXED);
 #endif
     while(1)
     {
