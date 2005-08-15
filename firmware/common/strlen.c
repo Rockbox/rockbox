@@ -31,6 +31,7 @@ QUICKREF
 	strlen ansi pure
 */
 
+#include "config.h"
 #include <_ansi.h>
 #include <string.h>
 #include <limits.h>
@@ -55,7 +56,7 @@ QUICKREF
 
 size_t
 _DEFUN (strlen, (str),
-	_CONST char *str) __attribute__ ((section (".icode")));
+	_CONST char *str) ICODE_ATTR;
 
 size_t
 _DEFUN (strlen, (str),

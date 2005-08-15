@@ -32,6 +32,7 @@ QUICKREF
         memcpy ansi pure
 	*/
 
+#include "config.h"
 #include <_ansi.h>
 #include <stddef.h>
 #include <limits.h>
@@ -53,7 +54,7 @@ _PTR
 _DEFUN (memcpy, (dst0, src0, len0),
 	_PTR dst0 _AND
 	_CONST _PTR src0 _AND
-	size_t len0) __attribute__ ((section (".icode")));
+	size_t len0) ICODE_ATTR;
 
 _PTR
 _DEFUN (memcpy, (dst0, src0, len0),
