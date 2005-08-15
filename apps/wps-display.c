@@ -1142,6 +1142,10 @@ bool wps_refresh(struct mp3entry* id3,
                         lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
                         lcd_fillrect(0, ypos, LCD_WIDTH, strh);
                         lcd_set_drawmode(DRMODE_SOLID);
+
+                        /* Nasty hack: we output an empty scrolling string,
+                           which will reset the scroller for that line */
+                        lcd_puts_scroll(0, i, "");
                         
                         if (flags & WPS_ALIGN_CENTER)
                         {
@@ -1179,6 +1183,10 @@ bool wps_refresh(struct mp3entry* id3,
                     lcd_fillrect(0, ypos, LCD_WIDTH, strh);
                     lcd_set_drawmode(DRMODE_SOLID);
 
+                    /* Nasty hack: we output an empty scrolling string,
+                       which will reset the scroller for that line */
+                    lcd_puts_scroll(0, i, "");
+                        
                     if (flags & WPS_ALIGN_CENTER) {
                         xpos = (LCD_WIDTH - strw) / 2;
                         lcd_putsxy(xpos, ypos, buf);
