@@ -411,6 +411,7 @@ void backlight_init(void)
 #if CONFIG_BACKLIGHT == BL_IRIVER
     or_l(0x00020000, &GPIO1_ENABLE);
     or_l(0x00020000, &GPIO1_FUNCTION);
+    and_l(~0x00020000, &GPIO1_OUT);  /* Start with the backlight ON */
 #elif CONFIG_BACKLIGHT == BL_PA14_LO || CONFIG_BACKLIGHT == BL_PA14_HI
     PACR1 &= ~0x3000;    /* Set PA14 (backlight control) to GPIO */
     or_b(0x40, &PAIORH); /* ..and output */
