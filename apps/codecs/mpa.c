@@ -226,7 +226,7 @@ enum codec_status codec_start(struct codec_api* api)
         // mad_timer_add(&Timer,Frame.header.duration);
 
         mad_synth_frame(&Synth,&Frame);
-        framelength = Synth.pcm.length;
+        framelength = Synth.pcm.length - frame_skip;
     
         /* Convert MAD's numbers to an array of 16-bit LE signed integers */
         /* We skip frame_skip number of samples here, this should only happen for
@@ -257,14 +257,14 @@ enum codec_status codec_start(struct codec_api* api)
             }
             ci->pcmbuf_insert_split(&Synth.pcm.samples[0][frame_skip],
                                     &Synth.pcm.samples[1][frame_skip],
-                                    (framelength - frame_skip) * 4);
+                                    framelength * 4);
         } else {
             if (current_stereo_mode != STEREO_MONO) {
                 ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_MONO);
                 current_stereo_mode = STEREO_MONO;
             }
             ci->pcmbuf_insert((char *)&Synth.pcm.samples[0][frame_skip],
-                              (framelength - frame_skip) * 4);
+                              framelength * 4);
         }
         
         frame_skip = 0;
