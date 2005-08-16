@@ -25,6 +25,7 @@
 #include "dsp.h"
 #include "lib/codeclib.h"
 #include "system.h"
+#include <inttypes.h>
 
 struct mad_stream Stream IDATA_ATTR;
 struct mad_frame Frame IDATA_ATTR;
@@ -52,11 +53,10 @@ extern char iramend[];
 #endif
 
 struct codec_api *ci;
-unsigned int samplecount;
-unsigned int samplesdone;
+int64_t samplecount;
+int64_t samplesdone;
 int stop_skip, start_skip;
 int current_stereo_mode = -1;
-int frequency_divider;
 unsigned int current_frequency = 0;
 
 void recalc_samplecount(void)
@@ -67,10 +67,12 @@ void recalc_samplecount(void)
     if (ci->id3->frame_count) {
         /* TODO: 1152 is the frame size in samples for MPEG1 layer 2 and layer 3,
            it's probably not correct at all for MPEG2 and layer 1 */
-        samplecount = ci->id3->frame_count*1152 - (start_skip + stop_skip);
+        samplecount = ((int64_t) ci->id3->frame_count) * 1152;
     } else {
-        samplecount = ci->id3->length * frequency_divider / 10;
+        samplecount = ((int64_t) ci->id3->length) * current_frequency / 10;
     }
+    
+    samplecount -= start_skip + stop_skip;
 }
 
 /* this is the codec entry point */
@@ -134,10 +136,6 @@ enum codec_status codec_start(struct codec_api* api)
     while (!*ci->taginfo_ready && !ci->stop_codec)
         ci->sleep(1);
   
-    frequency_divider = ci->id3->frequency / 100;
-    if (frequency_divider <= 0)
-        frequency_divider = 441;
-        
     ci->configure(DSP_SET_FREQUENCY, (int *)ci->id3->frequency);
     current_frequency = ci->id3->frequency;
     codec_set_replaygain(ci->id3);
@@ -155,7 +153,7 @@ enum codec_status codec_start(struct codec_api* api)
         start_skip = mpeg_latency[ci->id3->layer];
     }
 
-    samplesdone = ci->id3->elapsed * frequency_divider / 10;
+    samplesdone = ((int64_t) ci->id3->elapsed) * current_frequency / 1000;
     frame_skip = start_skip;
     recalc_samplecount();
     
@@ -171,7 +169,8 @@ enum codec_status codec_start(struct codec_api* api)
         if (ci->seek_time) {
             int newpos;
         
-            samplesdone = (ci->seek_time-1) * frequency_divider / 10;
+            samplesdone = ((int64_t) (ci->seek_time - 1)) 
+                * current_frequency / 1000;
             newpos = ci->mp3_get_filepos(ci->seek_time-1);
 
             if (!ci->seek_buffer(newpos)) {
@@ -235,7 +234,6 @@ enum codec_status codec_start(struct codec_api* api)
 
         if(Frame.header.samplerate != current_frequency) {
             current_frequency = Frame.header.samplerate;
-            frequency_divider = current_frequency / 100;
             ci->configure(DSP_SWITCH_FREQUENCY,
                           (int *)current_frequency);
             recalc_samplecount();
@@ -243,10 +241,10 @@ enum codec_status codec_start(struct codec_api* api)
         
         if (stop_skip > 0)
         {
-            long max = samplecount - samplesdone;
+            int64_t max = samplecount - samplesdone;
             
             if (max < 0) max = 0;
-            if (max < framelength) framelength = max;
+            if (max < framelength) framelength = (int) max;
             if (framelength == 0) break;
         }
 
@@ -275,7 +273,7 @@ enum codec_status codec_start(struct codec_api* api)
             ci->advance_buffer(size);
 
         samplesdone += framelength;
-        ci->set_elapsed(samplesdone / (frequency_divider / 10));
+        ci->set_elapsed(samplesdone / (current_frequency / 1000));
     }
   
     Stream.error = 0;
