@@ -20,9 +20,7 @@
 #include <windows.h>
 #include <stdio.h>
 
-char debugmembuf[100];
-char debugbuf[200];
-
+char debugmembuf[200];
 
 void debug( const char *message )
 {

@@ -24,8 +24,8 @@
 #include "cpu.h"
 
 #ifdef DEBUG
-static char debugmembuf[100];
-static char debugbuf[200];
+static char debugmembuf[200];
+static char debugbuf[400];
 #endif
 
 #ifndef SIMULATOR /* allow non archos platforms to display output */
