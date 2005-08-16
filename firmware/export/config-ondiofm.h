@@ -18,6 +18,10 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x8000
 
+/* Define this if you have an FM Radio */
+#define CONFIG_TUNER (S1A0903X01 | TEA5767) /* to be decided at runtime */
+#define CONFIG_TUNER_XTAL 13000000
+
 #ifndef SIMULATOR
 
 /* Define this if you have a SH7034 */
@@ -49,10 +53,6 @@
 
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 24
-
-/* Define this if you have an FM Radio */
-#define CONFIG_TUNER (S1A0903X01 | TEA5767) /* to be decided at runtime */
-#define CONFIG_TUNER_XTAL 13000000
 
 /* Define this if the tuner is switched on by software */
 #define HAVE_TUNER_PWR_CTRL

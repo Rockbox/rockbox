@@ -16,33 +16,63 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <stdbool.h>
+#include "config.h"
 #include "debug.h"
+#include "tuner.h"
 
 #ifdef CONFIG_TUNER
 
-static int fmstatus = 0;
+static int frequency = 0;
+static bool mono = false;
 
-static int fmradio_reg[3];
-
-int fmradio_read(int addr)
+void radio_set(int setting, int value)
 {
-    if(addr == 0)
-        return fmradio_reg[2]; /* To please the hardware detection */
-    else
+    switch(setting)
     {
-        if(addr == 3)
-        {
-            /* Fake a good radio station at 99.4MHz */
-            if(((fmradio_reg[1] >> 3) & 0xffff) == 11010)
-                return 0x100000 | 85600;
-        }
+        case RADIO_SLEEP:
+            break;
+
+        case RADIO_FREQUENCY:
+            frequency = value;
+            break;
+
+        case RADIO_MUTE:
+            break;
+
+        case RADIO_FORCE_MONO:
+            mono = value?true:false;
+            break;
+
+        default:
+            return;
     }
-    return 0;
 }
 
-void fmradio_set(int addr, int data)
+int radio_get(int setting)
 {
-    fmradio_reg[addr] = data;
+    int val = 0;
+    
+    switch(setting)
+    {
+        case RADIO_PRESENT:
+            val = 1; /* true */
+            break;
+
+        case RADIO_TUNED:
+            if(frequency == 99500000)
+                val = 1;
+            break;
+
+        case RADIO_STEREO:
+            if(frequency == 99500000)
+                val = mono?0:1;
+            break;
+
+        case RADIO_ALL: /* debug query */
+            break;
+    }
+    return val;
 }
 
 #endif

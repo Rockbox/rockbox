@@ -102,6 +102,10 @@ bool handle_radio_presets(void);
 bool radio_menu(void);
 bool radio_add_preset(void);
 
+#ifdef SIMULATOR
+void radio_set(int setting, int value);
+int radio_get(int setting);
+#else
 #if CONFIG_TUNER == S1A0903X01 /* FM recorder */
 #define radio_set samsung_set
 #define radio_get samsung_get
@@ -112,9 +116,11 @@ bool radio_add_preset(void);
 void (*radio_set)(int setting, int value);
 int (*radio_get)(int setting);
 #endif
+#endif
 
 void radio_init(void)
 {
+#ifndef SIMULATOR
 #if CONFIG_TUNER == (S1A0903X01 | TEA5767)
     if (read_hw_mask() & TUNER_MODEL)
     {
@@ -126,6 +132,7 @@ void radio_init(void)
         radio_set = samsung_set;
         radio_get = samsung_get;
     }
+#endif
 #endif
     radio_stop();
 }

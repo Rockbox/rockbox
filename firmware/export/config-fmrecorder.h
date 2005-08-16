@@ -21,6 +21,9 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x8000
 
+/* Define this if you have an FM Radio */
+#define CONFIG_TUNER S1A0903X01
+
 #ifndef SIMULATOR
 
 /* Define this if you have a MAS3587F */
@@ -61,9 +64,6 @@
 
 /* FM recorders can wake up from RTC alarm */
 #define HAVE_ALARM_MOD 1
-
-/* Define this if you have an FM Radio */
-#define CONFIG_TUNER S1A0903X01
 
 /* How to detect USB */
 #define USB_FMRECORDERSTYLE 1
