@@ -303,7 +303,7 @@ bool show_info(void)
 
 static bool plugin_browse(void)
 {
-    return rockbox_browse(PLUGIN_DIR, SHOW_PLUGINS);
+    return rockbox_browse(PLUGIN_DIR, SHOW_PLUGINS, true);
 }
 
 #ifdef HAVE_RECORDING
