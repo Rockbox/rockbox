@@ -50,9 +50,9 @@
 #define IAUDIO_X5_PAD   6
 
 /* CONFIG_REMOTE_KEYPAD */
-#define H100_REMOTE 0
-#define H300_REMOTE 1
-#define X5_REMOTE   2
+#define H100_REMOTE 1
+#define H300_REMOTE 2
+#define X5_REMOTE   3
 
 /* CONFIG_BATTERY */
 #define BATT_LIION2200  2200 /* FM/V2 recorder type */
