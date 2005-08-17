@@ -66,7 +66,7 @@
                   "move.l   %%accext01, %[u]\n\t" \
                   "movclr.l %%acc0, %[t]\n\t" \
                   : [t] "=r" (t), [u] "=r" (u) : [a] "r" (x), [b] "r" (y)); \
-    (t << 8) | (u & 0xff); \
+    (t << 7) | ((u & 0xff) >> 1); \
 })
 
 #else
