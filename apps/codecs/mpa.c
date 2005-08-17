@@ -69,7 +69,7 @@ void recalc_samplecount(void)
            it's probably not correct at all for MPEG2 and layer 1 */
         samplecount = ((int64_t) ci->id3->frame_count) * 1152;
     } else {
-        samplecount = ((int64_t) ci->id3->length) * current_frequency / 10;
+        samplecount = ((int64_t) ci->id3->length) * current_frequency / 1000;
     }
     
     samplecount -= start_skip + stop_skip;
