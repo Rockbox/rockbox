@@ -1,84 +1,98 @@
-# $Id$
+# $Id: islenska.lang,v 1.63 2005/08/17
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
+
+voice: "Sound Settings"
 new: "Hljóðstillingar"
 
 id: LANG_GENERAL_SETTINGS
 desc: in the main menu
 eng: "General Settings"
-voice: 
+
+voice: "General Settings"
 new: "Almennarstillingar"
 
 id: LANG_INFO
 desc: in the main menu
 eng: "Info"
+
+voice: "Info"
 new: "Upplýsingar"
 
 id: LANG_VERSION
 desc: in the main menu
 eng: "Version"
+
+voice: "Version"
 new: "Útgáfa"
 
 id: LANG_DEBUG
 desc: in the main menu
 eng: "Debug (Keep Out!)"
+
+voice: "Debug, keep out!"
 new: "Villuleit (ekki fikta!)"
 
 id: LANG_USB
 desc: in the main menu
 eng: "USB (Sim)"
+voice: ""
 new: "USB (Sim)"
 
 id: LANG_ROCKBOX_INFO
 desc: displayed topmost on the info screen
 eng: "Rockbox Info:"
+voice: ""
 new: "Rockbox Upplýsingar:"
 
 id: LANG_BUFFER_STAT_PLAYER
 desc: the buffer size player-screen width, %d MB %d fraction of MB
 eng: "Buf: %d.%03dMB"
+voice: ""
 new: "Min: %d.%03dMB"
 
 id: LANG_BUFFER_STAT_RECORDER
 desc: the buffer size recorder-screen width, %d MB %d fraction of MB
 eng: "Buffer: %d.%03dMB"
+voice: ""
 new: "Minni: %d.%03dMB"
-
 
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
 eng: "Battery: Charging"
+voice: ""
 new: "Rafhlaða: hleðsla"
-
 
 id: LANG_PLAYLIST_LOAD
 desc: displayed on screen while loading a playlist
 eng: "Loading..."
+voice: ""
 new: "Hleðsla..."
 
 id: LANG_PLAYLIST_SHUFFLE
 desc: displayed on screen while shuffling a playlist
 eng: "Shuffling..."
+voice: ""
 new: "Uppstokkun..."
 
-
 id: LANG_PLAYINDICES_PLAYLIST
-desc: in playlist.indices() when playlist is full
+desc: in playlist.indices() when playlist is full *WARNING* this and next ID are only used in this function.
 eng: "Playlist"
+voice: ""
 new: "Lagalisti"
 
 id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
 eng: "Buffer Full"
+voice: ""
 new: "Minni fullt"
-
-
 
 id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
 eng: "Save Failed"
+voice: ""
 new: "Visti mislukkað"
 
 id: LANG_SETTINGS_BATTERY_PLAYER
@@ -90,1038 +104,1335 @@ new: "Deila?"
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
 eng: "Save Failed"
+voice: ""
 new: "Visti mislukkað
 
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
 eng: "No partition?"
+voice: ""
 new: "Eingin skipting?"
 
 id: LANG_TIME_SET
 desc: used in set_time()
 eng: "ON To Set"
+voice: ""
 new: "À til að stilla"
 
 id: LANG_TIME_REVERT
 desc: used in set_time()
 eng: "OFF To Revert"
+voice: ""
 new: "AF till að hætta við"
-
 
 id: LANG_CONTRAST
 desc: in settings_menu
 eng: "Contrast"
+
+voice: "Contrast"
 new: "Birtuskil"
 
 id: LANG_SHUFFLE
 desc: in settings_menu
 eng: "Shuffle"
+
+voice: "Shuffle"
 new: "Stokka"
 
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play Selected First"
-new: "Spila valið fyrst"
 
+voice: "Play Selected File First"
+new: "Spila valið fyrst"
 
 id: LANG_SORT_CASE
 desc: in settings_menu
 eng: "Sort Case Sensitive"
+
+voice: "Sort Case Sensitive"
 new: "Raða efitr litlum/atórum bókstöfum"
 
 id: LANG_RESUME
 desc: in settings_menu
-eng: "Resume"
+### English phrase was changed! Previous translation was made on:
+### "Resume"
+eng: "Resume on startup"
+### English phrase was changed! Voice set to english. Previous voice was:
+### ""
+voice: "Resume on startup"
 new: "Halda áfram"
 
 id: LANG_OFF
 desc: Used in a lot of places
 eng: "Off"
+
+voice: "Off"
 new: "AF"
 
 id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
 eng: "Ask"
+
+voice: "Ask"
 new: "Spyrja"
 
 id: LANG_ON
 desc: Used in a lot of places
 eng: "On"
+
+voice: "On"
 new: "Á"
 
 id: LANG_BACKLIGHT
 desc: in settings_menu
 eng: "Backlight"
+
+voice: "Backlight"
 new: "Skjáljós"
 
 id: LANG_SCROLL
 desc: in settings_menu
 eng: "Scroll Speed Setting Example"
+voice: ""
 new: "Skrunuhraði stillingar dæmi"
 
 id: LANG_DISCHARGE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_TIME
 desc: in settings_menu
 eng: "Set Time/Date"
+
+voice: "Set Time and Date"
 new: "Stilla tíman/dagsetninguna"
 
 id: LANG_SPINDOWN
 desc: in settings_menu
 eng: "Disk Spindown"
+
+voice: "Disk Spindown"
 new: "Slökkva á harðadiskinum"
 
 id: LANG_FFRW_STEP
 desc: in settings_menu
 eng: "FF/RW Min Step"
+
+voice: "Minimum Step"
 new: "FF/RW min. skref"
 
 id: LANG_FFRW_ACCEL
 desc: in settings_menu
 eng: "FF/RW Accel"
+
+voice: "Acceleration"
 new: "FF/RW hraði"
 
 id: LANG_FOLLOW
 desc: in settings_menu
 eng: "Follow Playlist"
-new: "Fara eftir lagalistanum"
 
+voice: "Follow Playlist"
+new: "Fara eftir lagalistanum"
 
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
 eng: "Are You Sure?"
+voice: ""
 new: "Ertu viss?"
-
 
 id: LANG_RESET_DONE_SETTING
 desc: visual confirmation after settings reset
 eng: "Settings"
+voice: ""
 new: "Stillingar"
 
 id: LANG_RESET_DONE_CLEAR
 desc: visual confirmation after settings reset
 eng: "Cleared"
-new: "Núllstilla"
+voice: ""
+new: "Núllstilt"
 
 id: LANG_RESET_DONE_CANCEL
 desc: Visual confirmation of cancelation
 eng: "Canceled"
-new: "Hætti við" 
+voice: ""
+new: "Hætti við"
 
 id: LANG_CASE_MENU
-desc: in fileview_settings_menu()
-eng: "Sort Mode"
-new: "Röðun"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: 
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
-eng: "Scroll"
+### English phrase was changed! Previous translation was made on:
+### "Scroll"
+eng: "Scrolling"
+### English phrase was changed! Voice set to english. Previous voice was:
+### ""
+voice: "Scrolling"
 new: "Skruna"
 
 id: LANG_RESET
 desc: in system_settings_menu()
 eng: "Reset Settings"
+
+voice: "Reset Settings"
 new: "Endurstilla"
 
 id: LANG_PLAYBACK
 desc: in settings_menu()
 eng: "Playback"
+
+voice: "Playback"
 new: "Spilastillingar"
 
 id: LANG_FILE
 desc: in settings_menu()
 eng: "File View"
+
+voice: "File View"
 new: "Skrástillingar"
 
 id: LANG_DISPLAY
 desc: in settings_menu()
 eng: "Display"
+
+voice: "Display"
 new: "Skjár"
 
 id: LANG_SYSTEM
 desc: in settings_menu()
 eng: "System"
+
+voice: "System"
 new: "Kerfi"
 
 id: LANG_VOLUME
 desc: in sound_settings
 eng: "Volume"
+
+voice: "Volume"
 new: "Hljóðstyrkni"
 
 id: LANG_BALANCE
 desc: in sound_settings
 eng: "Balance"
-new: "Jafnvægi" 
+
+voice: "Balance"
+new: "Jafnvægi"
 
 id: LANG_BASS
 desc: in sound_settings
 eng: "Bass"
+
+voice: "Bass"
 new: "Bassi"
 
 id: LANG_TREBLE
 desc: in sound_settings
 eng: "Treble"
+
+voice: "Treble"
 new: "Diskant"
 
 id: LANG_LOUDNESS
 desc: in sound_settings
 eng: "Loudness"
+
+voice: "Loudness"
 new: "Hljóðstyrkur"
 
 id: LANG_BBOOST
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_DECAY
 desc: in sound_settings
 eng: "AV Decay Time"
+voice: ""
 new: "SH Tímafall"
- 
+
 id: LANG_CHANNEL_MENU
 desc: in sound_settings
 eng: "Channels"
+
+voice: "Channels"
 new: "Rásir"
 
 id: LANG_CHANNEL
 desc: in sound_settings
 eng: "Channel Configuration"
+voice: ""
 new: "Rásauppsetning"
 
 id: LANG_CHANNEL_STEREO
 desc: in sound_settings
 eng: "Stereo"
+
+voice: "Stereo"
 new: "Stereó"
 
 id: LANG_CHANNEL_MONO
 desc: in sound_settings
 eng: "Mono"
+
+voice: "Mono"
 new: "Mónó"
 
 id: LANG_CHANNEL_LEFT
 desc: in sound_settings
 eng: "Mono Left"
+
+voice: "Mono Left"
 new: "Mónó vinstri"
 
 id: LANG_CHANNEL_RIGHT
 desc: in sound_settings
 eng: "Mono Right"
+
+voice: "Mono Right"
 new: "Mónó hægri"
 
 id: LANG_AUTOVOL
 desc: in sound_settings
 eng: "Auto Volume"
+
+voice: "Auto Volume"
 new: "Sjálfvirk hljóðstilling"
 
 id: LANG_SHOWDIR_ERROR_BUFFER
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Dir Buffer"
+voice: ""
 new: "Skráakerfisminni"
 
 id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Is Full!"
-new: "Er fullt!"
-
-id: LANG_RESUME_ASK
-desc: question asked at the begining when resume is on
-eng: "Resume?"
-new: "Halda áfram?"
+voice: ""
+new: 
 
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
 eng: "(PLAY/STOP)"
+voice: ""
 new: "(Já/Nei)
 
+id: LANG_RESUME_ASK
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: 
 
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
 eng: "Key Lock ON"
+voice: ""
 new: "Lás á"
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
 eng: "Key Lock OFF"
+voice: ""
 new: "Lás af"
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
 eng: "Key Lock Is ON"
+voice: ""
 new: "Takkalás á"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key Lock Is OFF"
+voice: ""
 new: "Takkalás af"
 
 id: LANG_MUTE_ON_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_MUTE_OFF_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_MUTE_ON_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_MUTE_OFF_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_INFO
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_SCREEN
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_TITLE
 desc: in wps
 eng: "[Title]"
+voice: ""
 new: "[Heiti]"
 
 id: LANG_ID3_NO_TITLE
-desc: in wps when no title is avaible
-eng: "<No Title>"
+### Description changed! Previous description was:
+### "in wps when no title is avaible"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "<No Title>"
+eng: ""
+voice: ""
 new: "<Ekkert heiti>"
 
 id: LANG_ID3_ARTIST
-desc: in wps 
+### Description changed! Previous description was:
+### "in wps "
+desc: in wps
 eng: "[Artist]"
+voice: ""
 new: "[Listamaður]
 
 id: LANG_ID3_NO_ARTIST
-desc: in wps when no artist is avaible
-eng: "<No Artist>"
+### Description changed! Previous description was:
+### "in wps when no artist is avaible"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "<No Artist>"
+eng: ""
+voice: ""
 new: "<Enginn listamaður>"
 
 id: LANG_ID3_ALBUM
 desc: in wps
 eng: "[Album]"
+voice: ""
 new: "[Hljómplata]
 
 id: LANG_ID3_NO_ALBUM
-desc: in wps when no album is avaible
-eng: "<No Album>"
+### Description changed! Previous description was:
+### "in wps when no album is avaible"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "<No Album>"
+eng: ""
+voice: ""
 new: "<Enginn Hljómplata>"
 
 id: LANG_ID3_TRACKNUM
 desc: in wps
 eng: "[Tracknum]"
+voice: ""
 new: "[Lagnúmer]"
 
 id: LANG_ID3_NO_TRACKNUM
-desc: in wps if no track number is avaible
-eng: "<No Tracknum>"
+### Description changed! Previous description was:
+### "in wps if no track number is avaible"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "<No Tracknum>"
+eng: ""
+voice: ""
 new: "<Ekkert Lagnúmer>"
 
 id: LANG_ID3_LENGHT
 desc: in wps
 eng: "[Length]"
+voice: ""
 new: "[Lengd]"
 
 id: LANG_ID3_PLAYLIST
 desc: in wps
 eng: "[Playlist]"
+voice: ""
 new: "[Lagalisti]"
 
 id: LANG_ID3_BITRATE
 desc: in wps
 eng: "[Bitrate]"
+voice: ""
 new: "[Gæði]"
 
 id: LANG_ID3_FRECUENCY
 desc: in wps
 eng: "[Frequency]"
+voice: ""
 new: "[Tíðni]"
 
 id: LANG_ID3_PATH
 desc: in wps
 eng: "[Path]"
+voice: ""
 new: "[Slóð]"
 
 id: LANG_PITCH_UP
 desc: in wps
 eng: "Pitch Up"
+voice: ""
 new: "Hækka tónhæð"
 
 id: LANG_PITCH_DOWN
 desc: in wps
 eng: "Pitch Down"
+voice: ""
 new: "Lækka tónhæð"
 
 id: LANG_PAUSE
 desc: in wps
 eng: "Pause"
+voice: ""
 new: "Pása"
 
 id: LANG_F2_MODE
 desc: in wps F2 pressed
 eng: "Mode:"
+voice: ""
 new: "Háttur:"
-
 
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
 eng: "Status"
+voice: ""
 new: "Staða"
 
 id: LANG_F3_SCROLL
 desc: in wps F3 pressed
 eng: "Scroll"
+voice: ""
 new: "Skruna"
 
 id: LANG_F3_BAR
 desc: in wps F3 pressed
 eng: "Bar"
+voice: ""
 new: "Súla"
 
 id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
 eng: "End Of List"
+voice: ""
 new: "Endir af lagalista"
-
 
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
 eng: "End Of Song List"
+voice: ""
 new: "Listi búinn"
-
 
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
 eng: "Idle Poweroff"
+
+voice: "Idle Poweroff"
 new: "Slökkva ef ekki í notkun"
 
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
 eng: "New Language"
+voice: ""
 new: "Nýtt tungumál"
 
 id: LANG_FILTER
 desc: setting name for dir filter
 eng: "Show Files"
+
+voice: "Show Files"
 new: "Sýna skrár"
 
 id: LANG_FILTER_MUSIC
 desc: show only music-related files
 eng: "Music"
+
+voice: "Music"
 new: "Tónlist"
 
 id: LANG_FILTER_SUPPORTED
 desc: show all file types supported by Rockbox
 eng: "Supported"
+
+voice: "Supported"
 new: "Studdar skrár"
 
 id: LANG_FILTER_ALL
 desc: show all files
 eng: "All"
+
+voice: "All"
 new: "Allt"
 
 id: LANG_SET_BOOL_YES
 desc: bool true representation
 eng: "Yes"
+
+voice: "Yes"
 new: "Já"
 
 id: LANG_SET_BOOL_NO
 desc: bool false representation
 eng: "No"
+
+voice: "No"
 new: "Nei"
 
 id: LANG_PM_MENU
 desc: in the display menu
 eng: "Peak Meter"
+
+voice: "Peak Meter"
 new: "Hámarksmælir"
 
-id:   LANG_PM_RELEASE
+id: LANG_PM_RELEASE
 desc: in the peak meter menu
 eng: "Peak Release"
+
+voice: "Peak Release"
 new: "Hámarks losun"
 
 id: LANG_PM_PEAK_HOLD
 desc: in the peak meter menu
 eng: "Peak Hold Time"
+
+voice: "Peak Hold Time"
 new: "Hámarks biðtími"
 
 id: LANG_PM_CLIP_HOLD
 desc: in the peak meter menu
 eng: "Clip Hold Time"
+
+voice: "Clip Hold Time"
 new: "Bita Biðtími"
 
 id: LANG_PM_ETERNAL
 desc: in the peak meter menu
 eng: "Eternal"
+
+voice: "Eternal"
 new: "Eilífur"
 
 id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
 eng: "Units Per Read"
+
+voice: "Units Per Read"
 new: "Einingar við lestur" 
 
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
 eng: "Backlight On When Plugged"
+
+voice: "Backlight On When Plugged"
 new: "Skjáljós á þegar í sambandi"
 
 id: LANG_REPEAT
 desc: in settings_menu
 eng: "Repeat"
+
+voice: "Repeat"
 new: "Endurtaka"
 
 id: LANG_REPEAT_ALL
 desc: repeat playlist once all songs have completed
 eng: "All"
+
+voice: "All"
 new: "Öll"
 
 id: LANG_REPEAT_ONE
 desc: repeat one song
 eng: "One"
+
+voice: "One"
 new: "Eitt"
 
 id: LANG_RESET_CONFIRM
 desc: confirm to reset settings
 eng: "PLAY=Reset"
+voice: ""
 new: "PLAY=Endurstilla"
- 
+
 id: LANG_RESET_CANCEL
 desc: confirm to reset settings
 eng: "OFF=Cancel"
+voice: ""
 new: "OFF=Hætta Við"
-
 
 id: LANG_TIMEFORMAT
 desc: select the time format of time in status bar
 eng: "Time Format"
+
+voice: "Time Format"
 new: "Tímakerfi"
 
 id: LANG_12_HOUR_CLOCK
 desc: option for 12 hour clock
 eng: "12 Hour Clock"
+
+voice: "12 Hour Clock"
 new: "12 Tímar AM/PM"
 
 id: LANG_24_HOUR_CLOCK
 desc: option for 24 hour clock
 eng: "24 Hour Clock"
+
+voice: "24 Hour Clock"
 new: "24 Tímar"
 
 id: LANG_WEEKDAY_SUNDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Sun"
+voice: ""
 new: "Sun"
 
 id: LANG_WEEKDAY_MONDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Mon"
+voice: ""
 new: "Mán"
 
 id: LANG_WEEKDAY_TUESDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Tue"
+voice: ""
 new: "Þri"
 
 id: LANG_WEEKDAY_WEDNESDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Wed"
+voice: ""
 new: "Mið"
 
 id: LANG_WEEKDAY_THURSDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Thu"
+voice: ""
 new: "Fim"
 
 id: LANG_WEEKDAY_FRIDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Fri"
+voice: ""
 new: "Fös"
 
 id: LANG_WEEKDAY_SATURDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Sat"
+voice: ""
 new: "Lau"
 
 id: LANG_MONTH_JANUARY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Jan"
+
+voice: "January"
 new: "Jan"
 
 id: LANG_MONTH_FEBRUARY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Feb"
+
+voice: "February"
 new: "Feb"
 
 id: LANG_MONTH_MARCH
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Mar"
+
+voice: "March"
 new: "Mar"
 
 id: LANG_MONTH_APRIL
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Apr"
+
+voice: "April"
 new: "Apr"
 
 id: LANG_MONTH_MAY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "May"
+
+voice: "May"
 new: "Maí"
 
 id: LANG_MONTH_JUNE
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Jun"
+
+voice: "June"
 new: "Jún"
 
 id: LANG_MONTH_JULY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Jul"
+
+voice: "July"
 new: "Júl"
 
 id: LANG_MONTH_AUGUST
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Aug"
+
+voice: "August"
 new: "Áug"
 
 id: LANG_MONTH_SEPTEMBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Sep"
+
+voice: "September"
 new: "Sep"
 
 id: LANG_MONTH_OCTOBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Oct"
+
+voice: "October"
 new: "Ókt"
 
 id: LANG_MONTH_NOVEMBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Nov"
+
+voice: "November"
 new: "Nóv"
 
 id: LANG_MONTH_DECEMBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Dec"
+
+voice: "December"
 new: "Des"
 
-
 id: LANG_RESUME_SETTING_ASK_ONCE
-desc: in settings_menu
-eng: "Ask Once"
-new: "Spyrja einusinni"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: 
 
 id: LANG_BATTERY_DISPLAY
 desc: Battery type title
 eng: "Battery Display"
+
+voice: "Battery Display"
 new: "Rafhlöðu skjár"
 
 id: LANG_VOLUME_DISPLAY
 desc: Volume type title
 eng: "Volume Display"
+
+voice: "Volume Display"
 new: "Hljóðstyrki skjár"
 
 id: LANG_DISPLAY_GRAPHIC
 desc: Label for type of icon display
 eng: "Graphic"
+
+voice: "Graphic"
 new: "Myndrænn"
 
 id: LANG_DISPLAY_NUMERIC
 desc: Label for type of icon display
 eng: "Numeric"
+
+voice: "Numeric"
 new: "Í tölum"
 
 id: LANG_PM_PERFORMANCE
 desc: in the peak meter menu
 eng: "Performance"
+
+voice: "Performance"
 new: "Afkastageta"
 
 id: LANG_PM_HIGH_PERFORMANCE
 desc: in the peak meter menu
 eng: "High performance"
+
+voice: "High performance"
 new: "Há afkastageta"
 
 id: LANG_PM_ENERGY_SAVER
 desc: in the peak meter menu
 eng: "Save Energy"
+
+voice: "Save Energy"
 new: "Spara orku"
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
 eng: "Scale"
+
+voice: "Scale"
 new: "Mælikvarði"
 
 id: LANG_PM_DBFS
 desc: in the peak meter menu
 eng: "Logarithmic(dB)"
+
+voice: "Logarithmic decibel"
 new: "Lógaritmi(dB)"
 
 id: LANG_PM_LINEAR
 desc: in the peak meter menu
 eng: "Linear(%)"
+
+voice: "Linear percent"
 new: "Línulegur(%)"
 
 id: LANG_PM_MIN
 desc: in the peak meter menu
 eng: "Minimum Of Range"
+
+voice: "Minimum Of Range"
 new: "Lágmark af sviði"
 
 id: LANG_PM_MAX
 desc: in the peak meter menu
 eng: "Maximum Of Range"
+
+voice: "Maximum Of Range"
 new: "Hámark af sviði"
 
 id: LANG_RECORDING
 desc: in the main menu
 eng: "Recording"
+
+voice: "Recording"
 new: "Hljóðritun"
 
 id: LANG_RECORDING_GAIN
 desc: in the recording screen
 eng: "Gain"
+voice: ""
 new: "Bæta"
 
 id: LANG_RECORDING_LEFT
 desc: in the recording screen
 eng: "Left"
+voice: ""
 new: "Vinstri"
 
 id: LANG_RECORDING_RIGHT
 desc: in the recording screen
 eng: "Right"
+voice: ""
 new: "Hægri"
 
 id: LANG_RECORDING_QUALITY
 desc: in the recording settings
 eng: "Quality"
+
+voice: "Quality"
 new: "Gæði"
 
 id: LANG_RECORDING_FREQUENCY
 desc: in the recording settings
 eng: "Frequency"
+
+voice: "Frequency"
 new: "Tíðni"
 
 id: LANG_RECORDING_SOURCE
 desc: in the recording settings
 eng: "Source"
+
+voice: "Source"
 new: "Uppspretta"
 
 id: LANG_RECORDING_CHANNELS
 desc: in the recording settings
 eng: "Channels"
+
+voice: "Channels"
 new: "Rásir"
 
 id: LANG_RECORDING_SRC_MIC
 desc: in the recording settings
 eng: "Mic"
+
+voice: "Microphone"
 new: "Hljóðnemi"
 
 id: LANG_RECORDING_SRC_LINE
 desc: in the recording settings
 eng: "Line In"
+
+voice: "Line In"
 new: "Lína inn"
 
 id: LANG_RECORDING_SRC_DIGITAL
 desc: in the recording settings
 eng: "Digital"
+
+voice: "Digital"
 new: "Stafrænn"
 
 id: LANG_RECORDING_SETTINGS
 desc: in the main menu
 eng: "Recording Settings"
+
+voice: "Recording Settings"
 new: "Hljóðritunarstillingar"
 
 id: LANG_DISK_STAT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_DISK_FREE_STAT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_POWEROFF
 desc: disk poweroff flag
 eng: "Disk Poweroff"
+
+voice: "Disk Poweroff"
 new: "Slökkva á diski"
 
 id: LANG_FILTER_PLAYLIST
 desc: show only playlist
 eng: "Playlists"
+
+voice: "Playlists"
 new: "Lagalisti"
 
 id: LANG_BATTERY_TIME
 desc: battery level in % and estimated time remaining
 eng: "%d%% %dh %dm"
+
+voice: "Battery level"
 new: "%d%% %ds %dmin"
 
 id: LANG_SLEEP_TIMER
 desc: sleep timer setting
 eng: "Sleep Timer"
+
+voice: "Sleep Timer"
 new: "Svefntími"
 
 id: LANG_MP3BUFFER_MARGIN
 desc: MP3 buffer margin time
 eng: "Anti-Skip Buffer"
+
+voice: "Anti-Skip Buffer"
 new: "Anti-Skip minni"
 
 id: LANG_BIDIR_SCROLL
 desc: Bidirectional scroll limit
 eng: "Bidirectional Scroll Limit"
+
+voice: "Bidirectional Scroll Limit"
 new: "Tvístefnu kruna mörk"
 
 id: LANG_SCROLL_DELAY
 desc: Delay before scrolling
 eng: "Scroll Start Delay"
+
+voice: "Scroll Start Delay"
 new: "Byrjunar skrunabið"
 
 id: LANG_SCROLL_STEP
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size"
+
+voice: "Scroll Step Size"
 new: "Skruna skrefastærð"
 
 id: LANG_SCROLL_STEP_EXAMPLE
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size Setting Example Text"
+voice: ""
 new: "Skruna skrefastærða dæmi" 
 
 id: LANG_SCROLL_SPEED
 desc: in display_settings_menu()
 eng: "Scroll Speed"
+
+voice: "Scroll Speed"
 new: "Skrunahraði"
 
 id: LANG_TRICKLE_CHARGE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_BATTERY_TOPOFF_CHARGE
 desc: in info display, shows that top off charge is running
 eng: "Battery: Top-Off Chg"
+voice: ""
 new: "Rafhlaða: Að klára hlöðun"
 
 id: LANG_BATTERY_TRICKLE_CHARGE
 desc: in info display, shows that trickle charge is running
 eng: "Battery: Trickle Chg"
+voice: ""
 new: "Rafhlaða: Stöðug hlöðun"
 
 id: LANG_BATTERY_CAPACITY
 desc: in settings_menu
 eng: "Battery Capacity"
-new: "Rafhlaða stærð"
 
+voice: "Battery Capacity"
+new: "Rafhlaða stærð"
 
 id: LANG_MENU_SETTING_CANCEL
 desc: Visual confirmation of canceling a changed setting
 eng: "Canceled"
+voice: ""
 new: "Hætt við"
-
 
 id: LANG_QUEUE
 desc: The verb/action Queue
 eng: "Queue"
+
+voice: "Queue"
 new: "Biðröð"
 
 id: LANG_DELETE
 desc: The verb/action Delete
 eng: "Delete"
+
+voice: "Delete"
 new: "Eyða"
 
 id: LANG_REALLY_DELETE
 desc: Really Delete?
 eng: "Delete?"
+voice: ""
 new: "Eyða?"
 
 id: LANG_DELETED
 desc: A file has beed deleted
 eng: "Deleted"
+voice: ""
 new: "Eytt"
 
 id: LANG_RENAME
 desc: The verb/action Rename
 eng: "Rename"
+
+voice: "Rename"
 new: "Umskíra"
 
 id: LANG_FAILED
 desc: Something failed. To be appended after above actions
 eng: "Failed"
+voice: ""
 new: "Mislukkað"
 
 id: LANG_ALARM_MOD_ALARM_MENU
 desc: The name of the additional entry in the main menu for the RTC alarm mod.
 eng: "Wake-Up Alarm"
+
+voice: "Wake-Up Alarm"
 new: "Vekjaraklukka"
 
 id: LANG_ALARM_MOD_TIME
 desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
 eng: "Alarm Time: %02d:%02d"
+voice: ""
 new: "Viðvörunartími: %02d:%02d"
- 
+
 id: LANG_ALARM_MOD_TIME_TO_GO
 desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
 eng: "Waking Up In %d:%02d"
+voice: ""
 new: "Vek eftir %d:%02d"
 
 id: LANG_ALARM_MOD_SHUTDOWN
 desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
 eng: "Alarm Set"
+voice: ""
 new: "Viðvörun stillt"
 
 id: LANG_ALARM_MOD_ERROR
 desc: The text that tells that the time is incorrect (for the RTC alarm mod).
 eng: "Alarm Time Is Too Soon!"
+voice: ""
 new: "Viðvörunartími ekki réttur!"
 
 id: LANG_ALARM_MOD_KEYS
 desc: Shown key functions in alarm menu (for the RTC alarm mod).
 eng: "PLAY=Set OFF=Cancel"
+voice: ""
 new: "PLAY=Vista OFF=Hætta við"
 
 id: LANG_CREATE_PLAYLIST
 desc: Menu option for creating a playlist
 eng: "Create Playlist"
+
+voice: "Create Playlist"
 new: "Búa til lagalista"
 
 id: LANG_CREATING
 desc: Screen feedback during playlist creation
 eng: "Creating"
+voice: ""
 new: "Að búa til"
 
 id: LANG_PLAYER_KEYBOARD_BACKSPACE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_PLAYER_KEYBOARD_DELETE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_PLAYER_KEYBOARD_ACCEPT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_PLAYER_KEYBOARD_ABORT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_MENU_SHOW_ID3_INFO
 desc: Menu option to start id3 viewer
 eng: "Show ID3 Info"
+
+voice: "Show ID3 Info"
 new: "Sýna ID3 Uppl."
 
 id: LANG_ID3_GENRE
 desc: ID3 frame 'genre'
 eng: "[Genre]"
+voice: ""
 new: "[Tegund]"
 
 id: LANG_ID3_YEAR
 desc: ID3 info 'year'
 eng: "[Year]"
+voice: ""
 new: "[Ár]"
 
 id: LANG_ID3_NO_INFO
 desc: ID3 info is missing
 eng: "<No Info>"
+voice: ""
 new: "<Engar uppl.>"
 
 id: LANG_RECORDING_TIME
 desc: Display of recorded time
 eng: "Time:"
+voice: ""
 new: "Tími:"
 
 id: LANG_RECORDING_SIZE
 desc: Display of recorded file size
 eng: "Size:"
+voice: ""
 new: "Stærð:"
-
 
 id: LANG_SETTINGS_LOADED1
 desc: Feedback shown when a .cfg file is loaded
 eng: "Settings"
+voice: ""
 new: "Stillingar"
 
 id: LANG_SETTINGS_LOADED2
 desc: Feedback shown when a .cfg file is loaded
 eng: "Loaded"
+voice: ""
 new: "Hlaðin"
 
 id: LANG_FADE_ON_STOP
 desc: options menu to set fade on stop or pause
 eng: "Fade On Stop/Pause"
+
+voice: "Fade On Stop and Pause"
 new: "Dofnun við Stop/Pásu"
 
 id: LANG_SOKOBAN_ON
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_INVERT
 desc: in settings_menu
 eng: "LCD Mode"
+
+voice: "LCD Mode"
 new: "Kristalskjáar stilling"
 
 id: LANG_CHANNEL_STEREO_NARROW_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_CHANNEL_STEREO_NARROW_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_CHANNEL_STEREO_WIDE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_CHANNEL_KARAOKE
 desc: in sound_settings
 eng: "Karaoke"
+
+voice: "Karaoke"
 new: "Karaoke"
 
 id: LANG_SAVE_SETTINGS
 desc: in system_settings_menu()
 eng: "Write .cfg file"
+
+voice: "Write configuration file"
 new: "Skrifa .cfg skrá"
 
 id: LANG_SETTINGS_SAVED1
 desc: Feedback shown when a .cfg file is saved
 eng: "Settings"
+voice: ""
 new: "Stillingar"
 
 id: LANG_SETTINGS_SAVED2
 desc: Feedback shown when a .cfg file is saved
 eng: "Saved"
+voice: ""
 new: "Vistað"
 
 id: LANG_VBRFIX_STOP_PLAY
@@ -1145,106 +1456,144 @@ new:
 id: LANG_INVERT_CURSOR
 desc: in settings_menu
 eng: "Line Selector"
+
+voice: "Line Selector"
 new: "Val lína"
 
 id: LANG_RECORDING_EDITABLE
 desc: Editable recordings setting
 eng: "Independent frames"
+
+voice: "Independent frames"
 new: "Sjálfstæðir rammar"
 
 id: LANG_STATUS_BAR
 desc: display menu, F3 substitute
 eng: "Status Bar"
+
+voice: "Status Bar"
 new: "Stöðu súla"
 
 id: LANG_SCROLL_BAR
 desc: display menu, F3 substitute
 eng: "Scroll Bar"
+
+voice: "Scroll Bar"
 new: "Skruna súla"
 
 id: LANG_CAPTION_BACKLIGHT
 desc: in settings_menu
 eng: "Caption backlight"
-new: "Laganafna skjáljós"
+
+voice: "Caption backlight"
+new: "Upplysingar ljós"
 
 id: LANG_INVERT_CURSOR_POINTER
 desc: in settings_menu
 eng: "Pointer"
+
+voice: "Pointer"
 new: "vísir"
 
 id: LANG_INVERT_CURSOR_BAR
 desc: in settings_menu
 eng: "Bar(Inverse)"
+
+voice: "Inverse Bar"
 new: "Súla(öfug)"
 
 id: LANG_INVERT_LCD_NORMAL
 desc: in settings_menu
 eng: "Normal"
+
+voice: "Normal"
 new: "Eðlilegt"
 
 id: LANG_INVERT_LCD_INVERSE
 desc: in settings_menu
 eng: "Inverse"
+
+voice: "Inverse"
 new: "Öfugt"
 
 id: LANG_MAX_FILES_IN_DIR
 desc: in settings_menu
 eng: "Max files in dir browser"
+
+voice: "Max files in directory browser"
 new: "Háma. skrár í Skjali"
 
 id: LANG_MAX_FILES_IN_PLAYLIST
 desc: in settings_menu
 eng: "Max playlist size"
+
+voice: "Max playlist size"
 new: "Háma. lagalista stærð"
 
 id: LANG_JUMP_SCROLL
 desc: (player) menu altarnative for jump scroll
 eng: "Jump scroll"
+
+voice: "Jump scroll"
 new: "Skopp skrun"
 
 id: LANG_ONE_TIME
 desc: (player) the jump scroll shall be done "one time"
 eng: "One time"
+
+voice: "One time"
 new: "Einu sinni"
 
 id: LANG_ALWAYS
 desc: (player) the jump scroll shall be done "always"
 eng: "Always"
+
+voice: "Always"
 new: "Alltaf"
 
 id: LANG_JUMP_SCROLL_DELAY
 desc: (player) Delay before making a jump scroll
 eng: "Jump Scroll Delay"
+
+voice: "Jump Scroll Delay"
 new: "Skopp skrunabið"
 
 id: LANG_RECORD_TIMESPLIT
 desc: Prompt for record timer interval setting, in the record settings menu
 eng: "Time Split"
+
+voice: "Time Split"
 new: "Tíma aðskili"
 
 id: LANG_RECORD_TIMESPLIT_REC
 desc: Display of record timer interval setting, on the record screen
 eng: "Split time:"
+voice: ""
 new: "Aðskilninga tími:"
 
 id: LANG_SHOW_ICONS
 desc: in settings_menu
 eng: "Show Icons"
+
+voice: "Show Icons"
 new: "Sýna táknmyndir"
 
 id: LANG_DISK_FULL
 desc: in recording screen
 eng: "The disk is full. Press OFF to continue."
+voice: ""
 new: "Harðidiskurin er fullur. Ýtið á AF til að halda áfram"
 
 id: LANG_CONFIRM_WITH_PLAY_RECORDER
 desc: Generic recorder string to use to confirm
 eng: "PLAY = Yes"
+voice: ""
 new: "PLAY = Já"
 
 id: LANG_CANCEL_WITH_ANY_RECORDER
 desc: Generic recorder string to use to cancel
 eng: "Any Other = No"
+voice: ""
 new: "Allt annað = Nei"
 
 ##
@@ -1254,26 +1603,31 @@ new: "Allt annað = Nei"
 id: LANG_PLUGIN_CANT_OPEN
 desc: Plugin open error message
 eng: "Can't open %s"
+voice: ""
 new: "Get ekki opnað %s"
 
 id: LANG_READ_FAILED
 desc: There was an error reading a file
 eng: "Failed reading %s"
+voice: ""
 new: "Lestrar villa %s"
 
 id: LANG_PLUGIN_WRONG_MODEL
 desc: The plugin is not compatible with the archos model trying to run it
 eng: "Incompatible model"
+voice: ""
 new: "Rangur spilari"
 
 id: LANG_PLUGIN_WRONG_VERSION
 desc: The plugin is not compatible with the rockbox version trying to run it
 eng: "Incompatible version"
+voice: ""
 new: "Röng Útgáfa"
 
 id: LANG_PLUGIN_ERROR
 desc: The plugin return an error code
 eng: "Plugin returned error"
+voice: ""
 new: "Plugin villa"
 
 ##
@@ -1283,212 +1637,256 @@ new: "Plugin villa"
 id: LANG_BOOT_CHANGED
 desc: File browser discovered the boot file was changed
 eng: "Boot changed"
+voice: ""
 new: "Ræsi skrá breytt"
 
 id: LANG_REBOOT_NOW
 desc: Do you want to reboot?
 eng: "Reboot now?"
+voice: ""
 new: "Endurræsa now?"
-
 
 id: LANG_QUEUE_LAST
 desc: in onplay menu.  queue a track/playlist at end of playlist.
 eng: "Queue last"
+
+voice: "Queue last"
 new: "Aftast í röð"
 
 id: LANG_INSERT
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
 eng: "Insert"
+
+voice: "Insert"
 new: "Bæta"
 
 id: LANG_INSERT_LAST
 desc: in onplay menu.  append a track/playlist into dynamic playlist.
 eng: "Insert last"
+
+voice: "Insert last"
 new: "Bæta síðast"
 
 id: LANG_QUEUE_FIRST
 desc: in onplay menu.  queue a track/playlist into dynamic playlist.
 eng: "Queue next"
+
+voice: "Queue next"
 new: "Næst í röð"
 
 id: LANG_INSERT_FIRST
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
 eng: "Insert next"
+
+voice: "Insert next"
 new: "Bæta næst"
 
 id: LANG_SAVE_DYNAMIC_PLAYLIST
 desc: in playlist menu.
 eng: "Save Current Playlist"
+
+voice: "Save Current Playlist"
 new: "Vista núnotaða lagalista"
 
 id: LANG_PLAYLIST_MENU
 desc: in main menu.
 eng: "Playlist Options"
+
+voice: "Playlist Options"
 new: "Lagalista stillinga"
 
 id: LANG_PLAYLIST_INSERT_COUNT
 desc: splash number of tracks inserted
 eng: "Inserted %d tracks (%s)"
+voice: ""
 new: "Bætti %d lögum (%S)
 
 id: LANG_PLAYLIST_QUEUE_COUNT
 desc: splash number of tracks queued
 eng: "Queued %d tracks (%s)"
+voice: ""
 new: "Raðaði %d lögum (%s)"
 
 id: LANG_PLAYLIST_SAVE_COUNT
 desc: splash number of tracks saved
 eng: "Saved %d tracks (%s)"
+voice: ""
 new: "Vistaði %d lögum (%s)"
 
 id: LANG_OFF_ABORT
 desc: Used on recorder models
 eng: "OFF to abort"
+voice: ""
 new: "AF til að slíta vinnslu"
 
 id: LANG_STOP_ABORT
 desc: Used on player models
 eng: "STOP to abort"
+voice: ""
 new: "STOPP til að hætta vinnslu"
 
 id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
 desc: Playlist error
 eng: "Error updating playlist control file"
+voice: ""
 new: "Villa í að endurnýa lagalista stjórn skrá"
 
 id: LANG_PLAYLIST_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing playlist file"
+voice: ""
 new: "Villa í að opna lagalista skrá"
 
 id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing playlist control file"
+voice: ""
 new: "Villa í að opna lagalista stjórn skrá"
 
 id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing directory"
+voice: ""
 new: "Villa í að opna Skjal"
 
 id: LANG_PLAYLIST_CONTROL_INVALID
 desc: Playlist resume error
 eng: "Playlist control file is invalid"
+voice: ""
 new: "Lagalista stjórnar skrá er ógild"
 
 id: LANG_RECURSE_DIRECTORY
 desc: In playlist menu
 eng: "Recursively Insert Directories"
+
+voice: "Recursively Insert Directories"
 new: "Bæta öllum Skrám í lagalistaskrá"
 
 id: LANG_RECURSE_DIRECTORY_QUESTION
 desc: Asked from onplay screen
 eng: "Recursively?"
+voice: ""
 new: "Bæta við undirskám?"
 
 id: LANG_CUSTOM_FONT
 desc: in setting_menu()
 eng: "Browse Fonts"
+
+voice: "Browse Fonts"
 new: "Skoða Bókstafi"
 
 id: LANG_FIRMWARE
 desc: in the main menu
 eng: "Browse Firmwares"
+
+voice: "Browse Firmwares"
 new: "Skoða Stýrikerfi"
 
 id: LANG_LANGUAGE
 desc: in settings_menu
 eng: "Language"
+
+voice: "Language"
 new: "Tungumál"
 
 id: LANG_WHILE_PLAYING
 desc: in settings_menu()
 eng: "Browse .wps files"
+
+voice: "Browse while-playing-screen files"
 new: "Skoða .wps skráir"
 
 id: LANG_CUSTOM_CFG
 desc: in setting_menu()
 eng: "Browse .cfg files"
+
+voice: "Browse configuration files"
 new: "Skoða .cfg skráir"
 
 id: LANG_PLUGINS
 desc: in main_menu()
 eng: "Browse Plugins"
+
+voice: "Browse Plugins"
 new: "Skoða hugbúnað"
 
 id: LANG_CAR_ADAPTER_MODE
 desc: Displayed for setting car adapter mode to on/off
 eng: "Car Adapter Mode"
+
+voice: "Car Adapter Mode"
 new: "Bíla stilling"
 
 id: LANG_LINE_IN
-desc:  in settings_menu
+desc: in settings_menu
 eng: "Line In"
+
 voice: "Line In"
 new: "Lína inn"
 
 id: LANG_NO_FILES
-desc:  in settings_menu
+desc: in settings_menu
 eng: "No files"
 voice: ""
 new: "Eingar Skrár"
 
 id: LANG_BUTTONBAR_MENU
-desc:  in button bar
+desc: in button bar
 eng: "Menu"
 voice: ""
 new: "Valmynd"
 
 id: LANG_FM_BUTTONBAR_PRESETS
-desc:  in button bar
+desc: in button bar
 eng: "Preset"
 voice: ""
 new: "Forstilling"
 
 id: LANG_FM_SAVE_PRESET
-desc:  DEPRECATED
+desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_FM_DELETE_PRESET
-desc:  in radio screen
+desc: in radio screen
 eng: "Remove preset"
 voice: ""
 new: "Eyða forstillingu"
 
 id: LANG_FM_STATION
-desc:  in radio screen
+desc: in radio screen
 eng: "Station: %d.%dMHz"
 voice: ""
 new: "Stöð: %d.%dMHz
 
 id: LANG_FM_PRESET_SAVE_FAILED
-desc:  in radio screen
+desc: in radio screen
 eng: "Preset save failed"
 voice: ""
 new: "Forstillinga vistun mislukkuð" 
 
 id: LANG_FM_NO_PRESETS
-desc:  DEPRECATED
+desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_FM_NO_FREE_PRESETS
-desc:  in radio screen
+desc: in radio screen
 eng: "The preset list is full"
 voice: ""
 new: "Forstillingarlisti er fullur"
 
 id: LANG_FM_RADIO
-desc:  in main menu
+desc: in main menu
 eng: "FM Radio"
-voice: ""
+
+voice: "FM Radio"
 new: "FM útvarp"
 
 id: LANG_FM_BUTTONBAR_RECORD
-desc:  in main menu
+desc: in main menu
 eng: "Record"
 voice: ""
 new: "Hljóðrita"
@@ -1496,13 +1894,15 @@ new: "Hljóðrita"
 id: LANG_VIEW_DYNAMIC_PLAYLIST
 desc: in playlist menu.
 eng: "View Current Playlist"
-voice: ""
+
+voice: "View Current Playlist"
 new: "Skoða núgildandi lagalista"
 
 id: LANG_MOVE
 desc: The verb/action Move
 eng: "Move"
-voice: ""
+
+voice: "Move"
 new: "Færa"
 
 id: LANG_MOVE_FAILED
@@ -1514,7 +1914,8 @@ new: "Færsla mislukkuð"
 id: LANG_FLIP_DISPLAY
 desc: in settings_menu, option to turn display+buttos by 180 degreed
 eng: "Upside Down"
-voice: ""
+
+voice: "Upside Down"
 new: "Á hvolfi"
 
 id: LANG_RECORD_PRERECORD
@@ -1526,23 +1927,26 @@ new: "Forhljóðritun"
 id: LANG_RECORD_PRERECORD_TIME
 desc: in recording settings_menu
 eng: "Prerecord time"
-voice: ""
+
+voice: "Pre-Record time"
 new: "Forhljóðritunar tími"
 
 #Auto bookmark prompts
+
 id: LANG_BOOKMARK_AUTOLOAD_QUERY
 desc: prompt for user to decide to create a bookmark
-voice: ""
 eng: "Load Last Bookmark?"
+voice: ""
 new: "Hlaða síðasta bókamerki?"
 
 id: LANG_AUTO_BOOKMARK_QUERY
 desc: prompt for user to decide to create an bookmark
-voice: ""
 eng: "Create a Bookmark?"
+voice: ""
 new: "Skapa nýtt bókamerki?"
 
 # Bookmark Select Menu Text
+
 id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
 desc: From the auto-load screen, allows user to list all bookmarks
 eng: "Down = List"
@@ -1564,13 +1968,15 @@ new: "Bókamerki"
 id: LANG_BOOKMARK_SELECT_INDEX_TEXT
 desc: Used on the bookmark select window to label index number
 eng: "Index"
-voice: ""
+
+voice: "Index"
 new: "Vísitala"
 
 id: LANG_BOOKMARK_SELECT_TIME_TEXT
 desc: Used on the bookmark select window to label elapsed time
 eng: "Time"
-voice: ""
+
+voice: "Time"
 new: "Tími"
 
 id: LANG_BOOKMARK_SELECT_PLAY
@@ -1586,6 +1992,7 @@ voice: ""
 new: "Á+Spila = Eyða"
 
 # Bookmark creation/failure text
+
 id: LANG_BOOKMARK_CREATE_SUCCESS
 desc: Indicates bookmark was successfully created
 eng: "Bookmark Created"
@@ -1599,6 +2006,7 @@ voice: ""
 new: "Bókamerki mislukkað"
 
 # Bookmark creation/failure text
+
 id: LANG_BOOKMARK_LOAD_EMPTY
 desc: Indicates bookmark was empty
 eng: "Bookmark Empty"
@@ -1606,199 +2014,233 @@ voice: ""
 new: "Bókamerki tómt"
 
 # Bookmark Settings Text
+
 id: LANG_BOOKMARK_SETTINGS
 desc: in general settings
 eng: "Bookmarking"
-voice: ""
+
+voice: "Bookmarking"
 new: "Bókamerki"
 
 id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
 desc: prompt for user to decide to create a bookmark
 eng: "Load Last Bookmark"
-voice: ""
+
+voice: "Load Last Bookmark"
 new: "Hlaða síðdasta Bókamerki"
 
 id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
 desc: prompt for user to decide to create an bookmark
 eng: "Bookmark on Stop"
-voice: ""
+
+voice: "Bookmark on Stop"
 new: "Skapa bókamark ef stoppað"
 
 id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
 desc: Configuration option to maintain a list of recent bookmarks
 eng: "Maintain a List of Recent Bookmarks?"
-voice: ""
+
+voice: "Maintain a List of Recent Bookmarks?"
 new: "Halda við lista af nýum Bókamerkjum?"
 
 id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
 desc: Save in recent bookmarks only
 eng: "Yes - Recent only"
-voice: ""
+
+voice: "Yes - Recent only"
 new: "Já - Bara ný"
 
 id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
 desc: Save in recent bookmarks only
 eng: "Ask - Recent only"
-voice: ""
-new: "Spyrja - Bara ný"
 
+voice: "Ask - Recent only"
+new: "Spyrja - Bara ný"
 
 id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
 desc: Save only on bookmark for each playlist in recent bookmarks
-voice: ""
 eng: "Unique only"
+
+voice: "Unique only"
 new: "Bara einstæð"
 
 # Main Bookmarks Menu
+
 id: LANG_BOOKMARK_MENU
 desc: Text on main menu to get to bookmark commands
 eng: "Bookmarks"
-voice: ""
+
+voice: "Bookmarks"
 new: "Bókamerki"
 
 id: LANG_BOOKMARK_MENU_CREATE
 desc: Used off of the bookmark menu to create a bookmark
 eng: "Create Bookmark"
-voice: ""
+
+voice: "Create Bookmark"
 new: "Skapa bókamerki"
 
 id: LANG_BOOKMARK_MENU_LIST
 desc: Used off of the bookmark menu to list available bookmarks for the currently playing directory or M3U
 eng: "List Bookmarks"
-voice: ""
+
+voice: "List Bookmarks"
 new: "Sýna bókamerki"
 
 id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
 desc: Text for the menu text to access the most recent bookmarks list
 eng: "Recent Bookmarks"
-voice: ""
+
+voice: "Recent Bookmarks"
 new: "Ný bókamerki"
 
 id: LANG_INFO_MENU
 desc: in the info sub menu
 eng: "Rockbox Info"
-voice: ""
+
+voice: "Rockbox Info"
 new: "Rockbox upplýsingar"
 
 id: LANG_RECORDING_MENU
 desc: in the recording sub menu
 eng: "Recording screen"
-voice: ""
+
+voice: "Recording screen"
 new: "Hjlóðritunarskjár"
 
 id: LANG_WIND_MENU
 desc: in the playback sub menu
 eng: "FFwd/Rewind"
-voice: ""
+
+voice: "Fast forward and Rewind"
 new: "Spóla áfram/aftur á bak
 
 id: LANG_LCD_MENU
 desc: in the display sub menu
 eng: "LCD Settings"
-voice: ""
+
+voice: "LCD Settings"
 new: "Kristallskjáar stillingar"
 
 id: LANG_BARS_MENU
 desc: in the display sub menu
 eng: "Status-/Scrollbar"
-voice: ""
+
+voice: "Status- and Scrollbar"
 new: "Stöðu-/flettistik
 
 id: LANG_BATTERY_MENU
 desc: in the system sub menu
 eng: "Battery"
-voice: ""
+
+voice: "Battery"
 new: "Batterí"
 
 id: LANG_DISK_MENU
 desc: in the system sub menu
 eng: "Disk"
-voice: ""
+
+voice: "Disk"
 new: "Harðidiskur"
 
 id: LANG_TIME_MENU
 desc: in the system sub menu
 eng: "Time & Date"
-voice: ""
+
+voice: "Time and Date"
 new: "Tíminn & dagsetning"
 
 # Limits
+
 id: LANG_LIMITS_MENU
 desc: in the system sub menu
 eng: "Limits"
-voice: ""
+
+voice: "Limits"
 new: "Takmörk"
 
 id: LANG_MANAGE_MENU
 desc: in the system sub menu
 eng: "Manage Settings"
-voice: ""
+
+voice: "Manage Settings"
 new: "Halda við stillingar"
 
 id: LANG_RECORD_DIRECTORY
 desc: in recording settings_menu
 eng: "Directory"
-voice: ""
+
+voice: "Directory"
 new: "Skrá"
 
 id: LANG_RECORD_CURRENT_DIR
 desc: in recording directory options
 eng: "Current dir"
-voice: ""
+
+voice: "Current directory"
 new: "Þetta skjal"
 
 id: LANG_CREATE_DIR
 desc: in main menu
 eng: "Create directory"
-voice: ""
+
+voice: "Create directory"
 new: "Skapa skjal"
 
 id: LANG_VIEW
 desc: in on+play menu
 eng: "View"
-voice: ""
+
+voice: "View"
 new: "Skoða"
 
 id: LANG_SHOW_INDICES
 desc: in playlist viewer menu
 eng: "Show Indices"
-voice: ""
+
+voice: "Show Indices"
 new: "Sýna Vísitölur"
 
 id: LANG_TRACK_DISPLAY
 desc: in playlist viewer on+play menu
 eng: "Track Display"
-voice: ""
+
+voice: "Track Display"
 new: "Laga Skjár"
 
 id: LANG_DISPLAY_TRACK_NAME_ONLY
 desc: track display options
 eng: "Track name only"
-voice: ""
+
+voice: "Track name only"
 new: "Bara laga nafn"
 
 id: LANG_DISPLAY_FULL_PATH
 desc: track display options
 eng: "Full path"
-voice: ""
+
+voice: "Full path"
 new: "fullt skrár nafn"
 
 id: LANG_REMOVE
 desc: in playlist viewer on+play menu
 eng: "Remove"
-voice: ""
+
+voice: "Remove"
 new: "Eyða"
 
 id: LANG_FILE_OPTIONS
 desc: in playlist viewer on+play menu
 eng: "File Options"
-voice: ""
+
+voice: "File Options"
 new: "Skráar Stillingar"
 
 id: LANG_BUTTON_BAR
 desc: in settings menu
 eng: "Button bar"
-voice: ""
+
+voice: "Button bar"
 new: "Hnappa stik"
 
 id: LANG_DIRBROWSE_F1
@@ -1825,593 +2267,602 @@ id: VOICE_ZERO
 desc: spoken only, for composing numbers
 eng: ""
 voice: "0"
-new:
+new: 
 
 id: VOICE_ONE
 desc: spoken only, for composing numbers
 eng: ""
 voice: "1"
-new:
+new: 
 
 id: VOICE_TWO
 desc: spoken only, for composing numbers
 eng: ""
 voice: "2"
-new:
+new: 
 
 id: VOICE_THREE
 desc: spoken only, for composing numbers
 eng: ""
 voice: "3"
-new:
+new: 
 
 id: VOICE_FOUR
 desc: spoken only, for composing numbers
 eng: ""
 voice: "4"
-new:
+new: 
 
 id: VOICE_FIFE
 desc: spoken only, for composing numbers
 eng: ""
 voice: "5"
-new:
+new: 
 
 id: VOICE_SIX
 desc: spoken only, for composing numbers
 eng: ""
 voice: "6"
-new:
+new: 
 
 id: VOICE_SEVEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "7"
-new:
+new: 
 
 id: VOICE_EIGHT
 desc: spoken only, for composing numbers
 eng: ""
 voice: "8"
-new:
+new: 
 
 id: VOICE_NINE
 desc: spoken only, for composing numbers
 eng: ""
 voice: "9"
-new:
+new: 
 
 id: VOICE_TEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "10"
-new:
+new: 
 
 id: VOICE_ELEVEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "11"
-new:
+new: 
 
 id: VOICE_TWELVE
 desc: spoken only, for composing numbers
 eng: ""
 voice: "12"
-new:
+new: 
 
 id: VOICE_THIRTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "13"
-new:
+new: 
 
 id: VOICE_FOURTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "14"
-new:
+new: 
 
 id: VOICE_FIFTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "15"
-new:
+new: 
 
 id: VOICE_SIXTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "16"
-new:
+new: 
 
 id: VOICE_SEVENTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "17"
-new:
+new: 
 
 id: VOICE_EIGHTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "18"
-new:
+new: 
 
 id: VOICE_NINETEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "19"
-new:
+new: 
 
 id: VOICE_TWENTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "20"
-new:
+new: 
 
 id: VOICE_THIRTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "30"
-new:
+new: 
 
 id: VOICE_FORTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "40"
-new:
+new: 
 
 id: VOICE_FIFTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "50"
-new:
+new: 
 
 id: VOICE_SIXTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "60"
-new:
+new: 
 
 id: VOICE_SEVENTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "70"
-new:
+new: 
 
 id: VOICE_EIGHTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "80"
-new:
+new: 
 
 id: VOICE_NINETY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "90"
-new:
+new: 
 
 id: VOICE_HUNDRED
 desc: spoken only, for composing numbers
 eng: ""
 voice: "hundred"
-new:
+new: 
 
 id: VOICE_BILLION
 desc: spoken only, for composing numbers
 eng: ""
 voice: "billion"
-new:
+new: 
 
 id: VOICE_MILLION
 desc: spoken only, for composing numbers
 eng: ""
 voice: "million"
-new:
+new: 
 
 id: VOICE_THOUSAND
 desc: spoken only, for composing numbers
 eng: ""
 voice: "thousand"
-new:
+new: 
 
 id: VOICE_MINUS
 desc: spoken only, for composing numbers
 eng: ""
 voice: "minus"
-new:
+new: 
 
 id: VOICE_PLUS
 desc: spoken only, for composing numbers
 eng: ""
 voice: "plus"
-new:
+new: 
 
 id: VOICE_POINT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: VOICE_MILLISECONDS
 desc: spoken only, a unit postfix
 eng: ""
 voice: "milliseconds"
-new:
+new: 
 
 id: VOICE_SECOND
 desc: spoken only, a unit postfix
 eng: ""
 voice: "second"
-new:
+new: 
 
 id: VOICE_SECONDS
 desc: spoken only, a unit postfix
 eng: ""
 voice: "seconds"
-new:
+new: 
 
 id: VOICE_MINUTE
 desc: spoken only, a unit postfix
 eng: ""
 voice: "minute"
-new:
+new: 
 
 id: VOICE_MINUTES
 desc: spoken only, a unit postfix
 eng: ""
 voice: "minutes"
-new:
+new: 
 
 id: VOICE_HOUR
 desc: spoken only, a unit postfix
 eng: ""
 voice: "hour"
-new:
+new: 
 
 id: VOICE_HOURS
 desc: spoken only, a unit postfix
 eng: ""
 voice: "hours"
-new:
+new: 
 
 id: VOICE_KHZ
 desc: spoken only, a unit postfix
 eng: ""
 voice: "kilohertz"
-new:
+new: 
 
 id: VOICE_DB
 desc: spoken only, a unit postfix
 eng: ""
 voice: "decibel"
-new:
+new: 
 
 id: VOICE_PERCENT
 desc: spoken only, a unit postfix
 eng: ""
 voice: "percent"
-new:
+new: 
 
 id: VOICE_MEGABYTE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: VOICE_GIGABYTE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: VOICE_MILLIAMPHOURS
 desc: spoken only, a unit postfix
 eng: ""
 voice: "milli-amp hours"
-new:
+new: 
 
 id: VOICE_PIXEL
 desc: spoken only, a unit postfix
 eng: ""
 voice: "pixel"
-new:
+new: 
 
 id: VOICE_PER_SEC
 desc: spoken only, a unit postfix
 eng: ""
 voice: "per second"
-new:
+new: 
 
 id: VOICE_HERTZ
 desc: spoken only, a unit postfix
 eng: ""
 voice: "hertz"
-new:
+new: 
 
 #carry on adding normal LANG_ strings below
 
 id: LANG_VOICE
 desc: root of voice menu
 eng: "Voice"
-voice: ""
+
+voice: "Voice"
 new: "Tal"
 
 id: LANG_VOICE_MENU
 desc: item of voice menu, enable/disable the voice UI
 eng: "Voice Menus"
-voice: ""
+
+voice: "Voice Menus"
 new: "Tal stillingar"
 
 id: LANG_VOICE_DIR
 desc: item of voice menu, set the "talkbox" mode for directories
 eng: "Voice Directories"
-voice: ""
+
+voice: "Voice Directories"
 new: "Tal Skrár"
 
 id: LANG_VOICE_FILE
 desc: item of voice menu, set the voive mode for files
 eng: "Voice Filenames"
-voice: ""
+
+voice: "Voice Filenames"
 new: "Tal Skjalanöfn"
 
 id: LANG_VOICE_NUMBER
 desc: "talkbox" mode for files+directories
 eng: "Numbers"
-voice: ""
+
+voice: "Numbers"
 new: "Tölur"
 
 id: LANG_VOICE_DIR_ENTER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_VOICE_DIR_HOVER
 desc: "talkbox" mode for directories + files
 eng: ".talk mp3 clip"
-voice: ""
+
+voice: "talk mp3 clip"
 new: ".talk mp3 skrá"
 
 id: VOICE_FILE
 desc: spoken only, prefix for file number
 eng: ""
 voice: "file"
-new:
+new: 
 
 id: VOICE_DIR
 desc: spoken only, prefix for directory number
 eng: ""
 voice: "folder"
-new:
+new: 
 
 id: LANG_VOICE_SPELL
 desc: "talkbox" mode for files+directories
 eng: "Spell"
-voice: ""
+
+voice: "Spell"
 new: "Bókstafa"
 
 id: VOICE_CHAR_A
 desc: spoken only, for spelling
 eng: ""
 voice: "A"
-new:
+new: 
 
 id: VOICE_CHAR_B
 desc: spoken only, for spelling
 eng: ""
 voice: "B"
-new:
+new: 
 
 id: VOICE_CHAR_C
 desc: spoken only, for spelling
 eng: ""
 voice: "C"
-new:
+new: 
 
 id: VOICE_CHAR_D
 desc: spoken only, for spelling
 eng: ""
 voice: "D"
-new:
+new: 
 
 id: VOICE_CHAR_E
 desc: spoken only, for spelling
 eng: ""
 voice: "E"
-new:
+new: 
 
 id: VOICE_CHAR_F
 desc: spoken only, for spelling
 eng: ""
 voice: "F"
-new:
+new: 
 
 id: VOICE_CHAR_G
 desc: spoken only, for spelling
 eng: ""
 voice: "G"
-new:
+new: 
 
 id: VOICE_CHAR_H
 desc: spoken only, for spelling
 eng: ""
 voice: "H"
-new:
+new: 
 
 id: VOICE_CHAR_I
 desc: spoken only, for spelling
 eng: ""
 voice: "I"
-new:
+new: 
 
 id: VOICE_CHAR_J
 desc: spoken only, for spelling
 eng: ""
 voice: "J"
-new:
+new: 
 
 id: VOICE_CHAR_K
 desc: spoken only, for spelling
 eng: ""
 voice: "K"
-new:
+new: 
 
 id: VOICE_CHAR_L
 desc: spoken only, for spelling
 eng: ""
 voice: "L"
-new:
+new: 
 
 id: VOICE_CHAR_M
 desc: spoken only, for spelling
 eng: ""
 voice: "M"
-new:
+new: 
 
 id: VOICE_CHAR_N
 desc: spoken only, for spelling
 eng: ""
 voice: "N"
-new:
+new: 
 
 id: VOICE_CHAR_O
 desc: spoken only, for spelling
 eng: ""
 voice: "O"
-new:
+new: 
 
 id: VOICE_CHAR_P
 desc: spoken only, for spelling
 eng: ""
 voice: "P"
-new:
+new: 
 
 id: VOICE_CHAR_Q
 desc: spoken only, for spelling
 eng: ""
 voice: "Q"
-new:
+new: 
 
 id: VOICE_CHAR_R
 desc: spoken only, for spelling
 eng: ""
 voice: "R"
-new:
+new: 
 
 id: VOICE_CHAR_S
 desc: spoken only, for spelling
 eng: ""
 voice: "S"
-new:
+new: 
 
 id: VOICE_CHAR_T
 desc: spoken only, for spelling
 eng: ""
 voice: "T"
-new:
+new: 
 
 id: VOICE_CHAR_U
 desc: spoken only, for spelling
 eng: ""
 voice: "U"
-new:
+new: 
 
 id: VOICE_CHAR_V
 desc: spoken only, for spelling
 eng: ""
 voice: "V"
-new:
+new: 
 
 id: VOICE_CHAR_W
 desc: spoken only, for spelling
 eng: ""
 voice: "W"
-new:
+new: 
 
 id: VOICE_CHAR_X
 desc: spoken only, for spelling
 eng: ""
 voice: "X"
-new:
+new: 
 
 id: VOICE_CHAR_Y
 desc: spoken only, for spelling
 eng: ""
 voice: "Y"
-new:
+new: 
 
 id: VOICE_CHAR_Z
 desc: spoken only, for spelling
 eng: ""
 voice: "Z"
-new:
+new: 
 
 id: VOICE_EXT_MPA
 desc: spoken only, for file extension
 eng: ""
 voice: "audio"
-new:
+new: 
 
 id: VOICE_EXT_CFG
 desc: spoken only, for file extension
 eng: ""
 voice: "configuration"
-new:
+new: 
 
 id: VOICE_EXT_WPS
 desc: spoken only, for file extension
 eng: ""
 voice: "while-playing-screen"
-new:
+new: 
 
 id: VOICE_EXT_TXT
 desc: spoken only, for file extension
 eng: ""
 voice: "text"
-new:
+new: 
 
 id: VOICE_EXT_ROCK
 desc: spoken only, for file extension
 eng: ""
 voice: "plugin"
-new:
+new: 
 
 id: VOICE_EXT_FONT
 desc: spoken only, for file extension
 eng: ""
 voice: "font"
-new:
+new: 
 
 id: VOICE_EXT_BMARK
 desc: spoken only, for file extension and the word in general
 eng: ""
 voice: "bookmark"
-new:
+new: 
 
 id: VOICE_EXT_UCL
 desc: spoken only, for file extension
 eng: ""
 voice: "flash"
-new:
+new: 
 
 id: VOICE_EXT_AJZ
 desc: spoken only, for file extension
 eng: ""
 voice: "firmware"
-new:
+new: 
 
 id: LANG_DELETE_DIR
 desc: in on+play menu
 eng: "Delete directory"
-voice: ""
+
+voice: "delete directory"
 new: "Eyða skrjali"
 
 id: VOICE_CURRENT_TIME
 desc: spoken only, for wall clock announce
 eng: ""
 voice: "Current time:"
-new:
+new: 
 
 #Filetypes
+
 id: LANG_FILETYPES_EXTENSION_FULL
 desc: Extension array full
 eng: "Extension array full"
@@ -2439,151 +2890,168 @@ new: "Skjalatípu strengis minni tómmt"
 id: LANG_ONPLAY_OPEN_WITH
 desc: Onplay open with
 eng: "Open with"
-voice: ""
+
+voice: "open with"
 new: "Opna með"
 
 id: LANG_SORT_DIR
 desc: browser sorting setting
 eng: "Sort Directories"
-voice: ""
+
+voice: "sort directories"
 new: "Sortera Skráir"
 
 id: LANG_SORT_FILE
 desc: browser sorting setting
 eng: "Sort Files"
-voice: ""
+
+voice: "sort files"
 new: "Sortera skrár"
 
 id: LANG_SORT_ALPHA
 desc: browser sorting setting
 eng: "Alphabetical"
-voice: ""
+
+voice: "Alphabetical"
 new: "Eftir Stafróinu"
 
 id: LANG_SORT_DATE
 desc: browser sorting setting
 eng: "by date"
-voice: ""
+
+voice: "by date"
 new: "Eftir dagsetningu"
 
 id: LANG_SORT_DATE_REVERSE
 desc: browser sorting setting
 eng: "by newest date"
-voice: ""
+
+voice: "by newest date"
 new: "Eftir nýustu dagsetningu"
 
 id: LANG_SORT_TYPE
 desc: browser sorting setting
 eng: "by type"
-voice: ""
+
+voice: "by type"
 new: "Eftir típa"
 
 id: LANG_FM_EDIT_PRESET
-desc:  in radio screen
+desc: in radio screen
 eng: "Edit preset"
 voice: ""
 new: "Breyta stillingu"
 
 id: LANG_FM_MONO_MODE
-desc:  in radio screen
+desc: in radio screen
 eng: "Force mono"
 voice: ""
 new: "Neyða mónó hljóð"
 
 id: LANG_FM_BUTTONBAR_EXIT
-desc:  in radio screen
+desc: in radio screen
 eng: "Exit"
 voice: ""
 new: "Út"
 
 id: LANG_FM_BUTTONBAR_EDIT
-desc:  DEPRECATED
+desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_FM_BUTTONBAR_ADD
-desc:  in radio screen
+desc: in radio screen
 eng: "Add"
 voice: ""
 new: "Bæta við"
 
 id: LANG_FM_BUTTONBAR_ACTION
-desc:  in radio screen
+desc: in radio screen
 eng: "Action"
 voice: ""
 new: "Gera"
 
 id: LANG_MDB_STRENGTH
-desc:  in sound settings
+desc: in sound settings
 eng: "MDB Strength"
-voice: ""
+
+voice: "MDB Strength"
 new: "MDB Sterkleiki"
 
 id: LANG_MDB_HARMONICS
-desc:  in sound settings
+desc: in sound settings
 eng: "MDB Harmonics"
-voice: ""
+
+voice: "MDB Harmonics"
 new: "MDB hljómfræði"
 
 id: LANG_MDB_CENTER
-desc:  in sound settings
+desc: in sound settings
 eng: "MDB Center frequency"
-voice: ""
+
+voice: "MDB Center frequency"
 new: "MDB mið tíðni" 
 
 id: LANG_MDB_SHAPE
-desc:  in sound settings
+desc: in sound settings
 eng: "MDB Shape"
-voice: ""
+
+voice: "MDB Shape"
 new: "MDB hljóð form"
 
 id: LANG_MDB_ENABLE
-desc:  in sound settings
+desc: in sound settings
 eng: "MDB Enable"
-voice: ""
+
+voice: "MDB Enable"
 new: "MDB á"
 
 id: LANG_SUPERBASS
-desc:  in sound settings
+desc: in sound settings
 eng: "Super bass"
-voice: ""
+
+voice: "Super bass"
 new: "Súper bassi"
 
 id: LANG_SHUTDOWN
-desc:  in main menu
+desc: in main menu
 eng: "Shut down"
-voice: ""
+
+voice: "Shut down"
 new: "Keyra niður"
 
 id: LANG_SHUTTINGDOWN
-desc:  in main menu
+desc: in main menu
 eng: "Shutting down..."
 voice: ""
 new: "Að keyra niður..."
 
 id: LANG_CONFIRM_SHUTDOWN
-desc:  in shutdown screen
+desc: in shutdown screen
 eng: "Press OFF to shut down"
 voice: ""
 new: "Halda Af til ad keyra niður"
 
 id: LANG_ID3_ORDER
-desc:  in playback settings screen
+desc: in playback settings screen
 eng: "ID3 tag priority"
-voice: ""
+
+voice: "ID3 tag priority"
 new: "ID3 forgangur"
 
 id: LANG_ID3_V1_FIRST
-desc:  in playback settings screen
+desc: in playback settings screen
 eng: "V1 then V2"
-voice: ""
+
+voice: "Version 1 then version 2"
 new: "V1 síðan V2"
 
 id: LANG_ID3_V2_FIRST
-desc:  in playback settings screen
+desc: in playback settings screen
 eng: "V2 then V1"
-voice: ""
+
+voice: "Version 2 then version 1"
 new: "V2 síðan V1"
 
 id: LANG_NO_ROCKBOX_DIR
@@ -2601,37 +3069,43 @@ new: "Uppsetning ófullkomin"
 id: LANG_REMOVE_MMC
 desc: before acknowledging usb in case an MMC is inserted (Ondio)
 eng: "Please remove inserted MMC"
-voice: ""
+
+voice: "Please remove multimedia card"
 new: "Vinsamlegast fjarlægjið MMC-Kortið"
 
 id: VOICE_DOT
 desc: spoken only, for spelling
 eng: ""
-voice: ""
-new:
+
+voice: "dot"
+new: ""
 
 id: VOICE_PAUSE
 desc: spoken only, for spelling, a split second of silence (difficult to author)
 eng: ""
-voice: ""
-new:
+
+voice: " "
+new: ""
 
 id: LANG_STEREO_WIDTH
 desc: in sound_settings
 eng: "Stereo width"
-voice: ""
+
+voice: "Stereo width"
 new: "Stereó vídd"
 
 id: LANG_CHANNEL_CUSTOM
 desc: in sound_settings
 eng: "Custom"
-voice: ""
+
+voice: "Custom"
 new: "Siðvenja"
 
 id: LANG_FILTER_ID3DB
 desc: show ID3 database
 eng: "ID3 database"
-voice: ""
+
+voice: "ID3 database"
 new: "ID3 gagnagrunn"
 
 id: LANG_ID3DB_ARTISTS
@@ -2685,50 +3159,54 @@ new: "Fann %d"
 id: LANG_BATTERY_TYPE
 desc: in battery settings
 eng: "Battery Type"
-voice: ""
+
+voice: "Battery type"
 new: "Batterígerð"
 
 id: LANG_BATTERY_TYPE_ALKALINE
 desc: in battery settings
 eng: "Alkaline"
-voice: ""
+
+voice: "Alkaline"
 new: "Alkaline"
 
 id: LANG_BATTERY_TYPE_NIMH
 desc: in battery settings
 eng: "NiMH"
-voice: ""
+
+voice: "Nickel metal hydride"
 new: "NiMH"
 
 id: LANG_POINT
 desc: decimal separator for composing numbers
 eng: "."
-voice: ""
-new:
+
+voice: "point"
+new: 
 
 id: LANG_BYTE
 desc: a unit postfix
 eng: "B"
 voice: ""
-new:
+new: 
 
 id: LANG_KILOBYTE
 desc: a unit postfix, also voiced
 eng: "KB"
 voice: "kilobyte"
-new:
+new: 
 
 id: LANG_MEGABYTE
 desc: a unit postfix, also voiced
 eng: "MB"
 voice: "megabyte"
-new:
+new: 
 
 id: LANG_GIGABYTE
 desc: a unit postfix, also voiced
 eng: "GB"
 voice: "gigabyte"
-new:
+new: 
 
 id: LANG_DISK_SIZE_INFO
 desc: disk size info
@@ -2739,7 +3217,8 @@ new: "Harðidiskur"
 id: LANG_DISK_FREE_INFO
 desc: disk size info
 eng: "Free:"
-voice: ""
+
+voice: "Free diskspace:"
 new: "Laust pláss"
 
 id: LANG_ID3DB_ALL_SONGS
@@ -2751,79 +3230,94 @@ new: "<Öll lög>"
 id: LANG_PLAYLIST
 desc: Used when you need to say playlist, also voiced
 eng: "Playlist"
-voice: ""
+
+voice: "Playlist"
 new: "Lagalisti"
 
 id: LANG_RECORD_STARTUP
 desc: Start Rockbox in Recording screen
 eng: "Show recording screen on startup"
-voice: ""
+
+voice: "Show recording screen on startup"
 new: "Sýna Upptökusjá þegar kveikt er á"
 
 id: LANG_ALARM_MOD_DISABLE
 desc: Announce that the RTC alarm has been turned off
 eng: "Alarm Disabled"
-voice: ""
+
+voice: "Alarm Disabled"
 new: "Viðvörun óvirk"
 
-###########################
 id: LANG_RECORD_TRIGGER
 desc: in recording settings_menu
 eng: "Trigger"
+voice: ""
 new: "Gikkur"
 
 id: LANG_RECORD_START_THRESHOLD
 desc: in recording settings_menu
 eng: "Start above"
+voice: ""
 new: "Byrja fyrir ofan"
 
 id: LANG_RECORD_MIN_DURATION
 desc: in recording settings_menu
 eng: "for at least"
+voice: ""
 new: "að minnstakosti"
 
 id: LANG_RECORD_STOP_THRESHOLD
 desc: in recording settings_menu
 eng: "Stop below"
+voice: ""
 new: "Hætta fyrir neðan"
 
 id: LANG_RECORD_STOP_POSTREC
 desc: in recording settings_menu
 eng: "for at least"
+voice: ""
 new: "að minnstakosti"
 
 id: LANG_RECORD_STOP_GAP
 desc: in recording settings_menu
 eng: "Presplit gap"
+voice: ""
 new: "Skiptisbil"
 
 id: LANG_RECORD_TRIGGER_MODE
 desc: in recording settings_menu
 eng: "Trigger"
+voice: ""
 new: "Gikkur"
 
 id: LANG_RECORD_TRIG_NOREARM
 desc: in recording settings_menu
 eng: "Once"
+voice: ""
 new: "Einusinni"
 
 id: LANG_RECORD_TRIG_REARM
 desc: in recording settings_menu
 eng: "Repeat"
+voice: ""
 new: "Endurtaka"
 
 id: LANG_DB_INF
 desc: -inf db for values below measurement
 eng: "-inf"
+voice: ""
 new: "-inf"
 
 id: LANG_RECORD_TRIG_IDLE
 desc: waiting for threshold
 eng: "Trigger idle"
+voice: ""
 new: "Gikkur laus"
 
 id: LANG_RECORD_TRIGGER_ACTIVE
+desc: 
 eng: "Trigger active"
+voice: ""
 new: "Gikkur virkur"
 
 id: LANG_LCD_REMOTE_MENU
@@ -2835,11 +3329,187 @@ new: "Fjarstýringaskjá stillingar"
 id: LANG_DISK_NAME_INTERNAL
 desc: in info menu; name for internal disk with multivolume (keep short!)
 eng: "Int:"
-voice: ""
+
+voice: "Internal"
 new: "Innb:"
 
 id: LANG_DISK_NAME_MMC
 desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
 eng: "MMC:"
-voice: 
+
+voice: "Multimedia card"
 new: "MMC:"
+
+id: LANG_CROSSFADE
+desc: in playback settings
+eng: "Crossfade"
+
+voice: "Crossfade"
+new: "Blanda enda lags í næsta lag"
+
+id: LANG_BACKLIGHT_FADE_IN
+desc: in settings_menu
+eng: "Backlight fade in"
+
+voice: "Backlight fade in"
+new: "Upplita skjá"
+
+id: LANG_BACKLIGHT_FADE_OUT
+desc: in settings_menu
+eng: "Backlight fade out"
+
+voice: "Backlight fade out"
+new: "Dimma skjá"
+
+id: LANG_SHUFFLE_PLAYLIST
+desc: in playlist menu, reshuffles the order in which songs are played
+eng: "Reshuffle"
+
+voice: "Reshuffle"
+new: "Stokka lög"
+
+id: LANG_NOTHING_TO_RESUME
+desc: Error message displayed when resume button pressed but no playlist
+eng: "Nothing to resume"
+voice: ""
+new: "Ekkert til að halda áfram að spila"
+
+id: LANG_INSERT_SHUFFLED
+desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
+eng: "Insert shuffled"
+
+voice: "Insert shuffled"
+new: "Bæta við á slembi"
+
+id: LANG_SPDIF_ENABLE
+desc: in playback settings menu. enable/disable the optical out
+eng: "Optical output"
+
+voice: "Optical output"
+new: "Ljósleiðar úttak"
+
+id: LANG_NEXT_FOLDER
+desc: in settings_menu.  Should we move to next folder when current one ends
+eng: "Move to Next Folder"
+
+voice: "Move to Next Folder"
+new: "Áfram til næstu skrár"
+
+id: LANG_RUNTIMEDB_ACTIVE
+desc: in settings_menu.
+eng: "Gather runtime data (experimental)"
+
+voice: "Gather runtime data"
+new: "Safna upplýsingum um spilatíma"
+
+id: LANG_MENU_SET_RATING
+desc: in wps context menu
+eng: "Set song rating"
+
+voice: "Set song rating"
+new: "Gefa lag einkun"
+
+id: LANG_RATING
+desc: in set_rating
+eng: "Rating:"
+voice: 
+new: "Einkun"
+
+id: LANG_CROSSFADE_DURATION
+desc: in playback settings
+eng: "Crossfade duration"
+
+voice: "Crossfade duration"
+new: "Blöndunarlengd"
+
+id: LANG_MIX
+desc: in playback settings, crossfade option
+eng: "Mix"
+
+voice: "Mix"
+new: "Blanda"
+
+id: LANG_RESTARTING_PLAYBACK
+desc: splash screen displayed when pcm buffer size is changed
+eng: "Restarting playback..."
+
+voice: "Restarting playback..."
+new: "Endurhefja spilun..."
+
+id: LANG_REPLAYGAIN
+desc: in replaygain
+eng: "Replaygain"
+voice: 
+new: "Replaygain"
+
+id: LANG_REPLAYGAIN_ENABLE
+desc: in replaygain
+eng: "Enable replaygain"
+voice: 
+new: "Nota replaygain"
+
+id: LANG_REPLAYGAIN_NOCLIP
+desc: in replaygain
+eng: "Prevent clipping"
+voice: 
+new: "Hindra úrklippi"
+
+id: LANG_REPLAYGAIN_MODE
+desc: in replaygain
+eng: "Replaygain type"
+voice: 
+new: "Replaygain gerð"
+
+id: LANG_TRACK_GAIN
+desc: in replaygain
+eng: "Track gain"
+voice: 
+new: "Lag hækkun"
+
+id: LANG_ALBUM_GAIN
+desc: in replaygain
+eng: "Album gain"
+voice: 
+new: "Albúm hækkun"
+
+id: LANG_ID3_TRACK_GAIN
+desc: in browse_id3
+eng: "[Track gain]"
+voice: 
+new: "[Lag hækkun]"
+
+id: LANG_ID3_ALBUM_GAIN
+desc: in browse_id3
+eng: "[Album gain]"
+voice: 
+new: "[Albúm hækkun]"
+
+id: LANG_ID3_NO_GAIN
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: 
+
+id: LANG_BIDI_SUPPORT
+desc: in settings_menu, option to enable reversal of hebrew/arabic text
+eng: "BiDi Hebrew/Arabic"
+voice: 
+new: "Tvístefna hebreska/arabíska"
+
+id: LANG_REPLAYGAIN_PREAMP
+desc: in browse_id3
+eng: "Pre-amp"
+voice: ""
+new: "Pre-amp"
+
+id: LANG_UNIT_DB
+desc: in browse_id3
+eng: "dB"
+voice: ""
+new: "Gagnagrunn"
+
+id: LANG_ID3_VBR
+desc: in browse_id3
+eng: " (VBR)"
+voice: ""
+new: " (VBR)"
