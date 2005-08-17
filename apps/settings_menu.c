@@ -1020,17 +1020,17 @@ static bool browse_current(void)
 
 static bool custom_wps_browse(void)
 {
-    return rockbox_browse(ROCKBOX_DIR, SHOW_WPS);
+    return rockbox_browse(ROCKBOX_DIR, SHOW_WPS, true);
 }
 
 static bool custom_cfg_browse(void)
 {
-    return rockbox_browse(ROCKBOX_DIR, SHOW_CFG);
+    return rockbox_browse(ROCKBOX_DIR, SHOW_CFG, true);
 }
 
 static bool language_browse(void)
 {
-    return rockbox_browse(ROCKBOX_DIR LANG_DIR, SHOW_LNG);
+    return rockbox_browse(ROCKBOX_DIR LANG_DIR, SHOW_LNG, true);
 }
 
 static bool voice_menus(void)
@@ -1092,7 +1092,7 @@ static bool voice_menu(void)
 #ifdef HAVE_LCD_BITMAP
 static bool font_browse(void)
 {
-    return rockbox_browse(ROCKBOX_DIR FONT_DIR, SHOW_FONT);
+    return rockbox_browse(ROCKBOX_DIR FONT_DIR, SHOW_FONT, true);
 }
 
 static bool scroll_bar(void)
@@ -1543,7 +1543,7 @@ static bool display_settings_menu(void)
 
 static bool firmware_browse(void)
 {
-    return rockbox_browse(ROCKBOX_DIR, SHOW_MOD);
+    return rockbox_browse(ROCKBOX_DIR, SHOW_MOD, true);
 }
 
 static bool battery_settings_menu(void)
