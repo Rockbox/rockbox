@@ -150,7 +150,6 @@ struct tree_context {
     int cursorpos[MAX_DIR_LEVELS];
     char currdir[MAX_PATH]; /* file use */
     int *dirfilter; /* file use */
-    bool hidedirs;
     int filesindir;
     int dirsindir; /* file use */
     int dirlength; /* total number of entries in dir, incl. those not loaded */
@@ -187,7 +186,7 @@ void tree_get_filetypes(const struct filetype**, int*);
 void tree_init(void);
 void browse_root(void);
 void set_current_file(char *path);
-bool rockbox_browse(const char *root, int dirfilter, bool hidedirs);
+bool rockbox_browse(const char *root, int dirfilter);
 bool create_playlist(void);
 void resume_directory(const char *dir);
 char *getcwd(char *buf, int size);

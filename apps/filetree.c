@@ -218,8 +218,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
             (((len == 1) &&
             (!strncmp(entry->d_name, ".", 1))) ||
             ((len == 2) &&
-            (!strncmp(entry->d_name, "..", 2))) ||
-            c->hidedirs)) {
+            (!strncmp(entry->d_name, "..", 2))))) {
             i--;
             continue;
         }
@@ -258,19 +257,19 @@ int ft_load(struct tree_context* c, const char* tempdir)
 #endif
         
         /* filter out non-visible files */
-        if (!(dptr->attr & ATTR_DIRECTORY) && (
+        if ((!(dptr->attr & ATTR_DIRECTORY) && (
             (*c->dirfilter == SHOW_PLAYLIST &&
              (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_M3U) ||
             ((*c->dirfilter == SHOW_MUSIC &&
              (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_MPA) &&
              (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_M3U) ||
-            (*c->dirfilter == SHOW_SUPPORTED && !filetype_supported(dptr->attr)) ||
+            (*c->dirfilter == SHOW_SUPPORTED && !filetype_supported(dptr->attr)))) ||
             (*c->dirfilter == SHOW_WPS && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_WPS) ||
             (*c->dirfilter == SHOW_CFG && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_CFG) ||
             (*c->dirfilter == SHOW_LNG && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_LNG) ||
             (*c->dirfilter == SHOW_MOD && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_MOD) ||
             (*c->dirfilter == SHOW_FONT && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_FONT) ||
-            (*c->dirfilter == SHOW_PLUGINS && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_ROCK)))
+            (*c->dirfilter == SHOW_PLUGINS && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_ROCK))
         {
             i--;
             continue;
