@@ -390,10 +390,10 @@ voice: ""
 new: "plein !"
 
 id: LANG_RESUME_ASK
-desc: question asked at the begining when resume is on
-eng: "Resume?"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Reprendre?"
+new: ""
 
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
@@ -846,10 +846,10 @@ voice: "Décembre"
 new: "Déc"
 
 id: LANG_RESUME_SETTING_ASK_ONCE
-desc: in settings_menu
-eng: "Ask Once"
-voice: "Demander une fois"
-new: "Demander une fois"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_BATTERY_DISPLAY
 desc: Battery type title
@@ -3139,3 +3139,15 @@ desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
 eng: "Insert shuffled"
 voice: "Insérer mélangé"
 new: "Insérer mélangé"
+
+id: LANG_SPDIF_ENABLE
+desc: in playback settings menu. enable/disable the optical out
+eng: "Optical output"
+voice: "Sortie digitale"
+new: "Sortie digitale"
+
+id: LANG_NEXT_FOLDER
+desc: in settings_menu.  Should we move to next folder when current one ends
+eng: "Move to Next Folder"
+voice: "Procéder au prochain répertoire"
+new: "Procéder au prochain rép."
