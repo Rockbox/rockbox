@@ -1447,7 +1447,7 @@ bool create_playlist(void)
     return true;
 }
 
-bool rockbox_browse(const char *root, int dirfilter)
+bool rockbox_browse(const char *root, int dirfilter, bool hidedirs)
 {
     static struct tree_context backup;
 
@@ -1456,6 +1456,7 @@ bool rockbox_browse(const char *root, int dirfilter)
     memcpy(tc.currdir, root, sizeof(tc.currdir));
     start_wps = false;
     tc.dirfilter = &dirfilter;
+    tc.hidedirs = hidedirs;
     
     dirbrowse();
 

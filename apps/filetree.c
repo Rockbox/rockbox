@@ -218,7 +218,8 @@ int ft_load(struct tree_context* c, const char* tempdir)
             (((len == 1) &&
             (!strncmp(entry->d_name, ".", 1))) ||
             ((len == 2) &&
-            (!strncmp(entry->d_name, "..", 2))))) {
+            (!strncmp(entry->d_name, "..", 2))) ||
+            c->hidedirs)) {
             i--;
             continue;
         }
