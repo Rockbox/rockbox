@@ -343,6 +343,8 @@ bool settings_parseline(char* line, char** name, char** value)
 static bool clean_shutdown(void (*callback)(void *), void *parameter)
 {
 #ifdef SIMULATOR
+    (void)callback;
+    (void)parameter;
     exit(0);
 #else
 #ifndef HAVE_POWEROFF_WHILE_CHARGING
