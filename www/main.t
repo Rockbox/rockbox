@@ -17,6 +17,8 @@ upgrade your ordinary Archos firmware.
 
 <h2>News</h2>
 
+<p><i>2005-08-18</i>: At 13:59 CET. First multimeter "beep" for the h300.
+
 <p><i>2005-08-08</i>: We will have a <a
 href="http://www.rockbox.org/mail/archive/rockbox-archive-2005-08/0130.shtml">Feature
 Freeze</a> starting on August 22nd, aiming at releasing Rockbox 2.5 on
@@ -30,12 +32,6 @@ href="http://www.rockbox.org/twiki/bin/view/Main/RockboxShots">Evidence</a> of
 Rockbox <a
 href="http://www.rockbox.org/twiki/bin/view/Main/IriverBoot">booting</a> on <a
 href="http://www.rockbox.org/twiki/bin/view/Main/IriverPort">iRiver</a>.
-
-<p><i>2004-12-23</i>: Rockbox v2.4 is <a href="download/">released</a>.
-
-<p><i>2004-12-17</i>: Rockbox started from <a href="/twiki/bin/view/Main/FlashingRockbox">flash ROM</a> finally available for players.
-
-<p><i>2004-12-16</i>: The <a href="/twiki/bin/view/Main/RockboxManual">Rockbox 2.3 manual</a> is out. Thanks go to Christi Alice Scarborough for her outstanding work!
 
 <p><i><small>(Old news items have moved to a 
 <a href="history.html">separate page</a>.)</small></i>
