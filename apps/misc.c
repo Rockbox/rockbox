@@ -340,7 +340,7 @@ bool settings_parseline(char* line, char** name, char** value)
     return true;
 }
 
-bool clean_shutdown(void)
+static bool clean_shutdown(void (*callback)(void *), void *parameter)
 {
 #ifdef SIMULATOR
     exit(0);
@@ -351,6 +351,8 @@ bool clean_shutdown(void)
     {
         lcd_clear_display();
         splash(0, true, str(LANG_SHUTTINGDOWN));
+        if (callback != NULL)
+            callback(parameter);
         shutdown_hw();
     }
 #endif
@@ -425,9 +427,7 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
                 usb_screen();
             return SYS_USB_CONNECTED;
         case SYS_POWEROFF:
-            if (callback != NULL)
-                callback(parameter);
-            if (!clean_shutdown())
+            if (!clean_shutdown(callback, parameter))
                 return SYS_POWEROFF;
             break;
 #ifdef HAVE_CHARGING
