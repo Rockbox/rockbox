@@ -55,7 +55,8 @@
                   : [t] "=r" (t) : [a] "r" (x), [b] "r" (y)); \
     t; \
 })
-/* Multiply one S.31-bit and one S7.24 fractional integer and return the
+
+/* Multiply one S.31-bit and one S8.23 fractional integer and return the
  * sign bit and the 31 most significant bits of the result.
  */
 #define FRACMUL_8(x, y) \
@@ -66,14 +67,37 @@
                   "move.l   %%accext01, %[u]\n\t" \
                   "movclr.l %%acc0, %[t]\n\t" \
                   : [t] "=r" (t), [u] "=r" (u) : [a] "r" (x), [b] "r" (y)); \
-    (t << 7) | ((u & 0xff) >> 1); \
+    (t << 8) | (u & 0xff); \
+})
+
+/* Multiply one S.31-bit and one S8.23 fractional integer and return the
+ * sign bit and the 31 most significant bits of the result. Load next value
+ * to multiply with into x from s (and increase s); x must contain the
+ * initial value.
+ */
+#define FRACMUL_8_LOOP(x, y, s) \
+({ \
+    long t; \
+    long u; \
+    asm volatile ("mac.l    %[a], %[b], (%[c])+, %[a], %%acc0\n\t" \
+                  "move.l   %%accext01, %[u]\n\t" \
+                  "movclr.l %%acc0, %[t]\n\t" \
+                  : [a] "+r" (x), [c] "+a" (s), [t] "=r" (t), [u] "=r" (u) \
+                  : [b] "r" (y)); \
+    (t << 8) | (u & 0xff); \
 })
 
 #else
 
 #define INIT()
 #define FRACMUL(x, y) (long) (((((long long) (x)) * ((long long) (y))) >> 31))
-#define FRACMUL_8(x, y) (long) (((((long long) (x)) * ((long long) (y))) >> 24))
+#define FRACMUL_8(x, y) (long) (((((long long) (x)) * ((long long) (y))) >> 23))
+#define FRACMUL_8_LOOP(x, y, s) \
+({ \
+    long t = x; \
+    x = *(s)++; \
+    (long) (((((long long) (t)) * ((long long) (y))) >> 23)); \
+})
 
 #endif
 
@@ -86,7 +110,7 @@ struct dsp_config
     long album_gain;
     long track_peak;
     long album_peak;
-    long replaygain;
+    long replaygain;    /* Note that this is in S8.23 format. */
     int sample_depth;
     int sample_bytes;
     int stereo_mode;
@@ -323,15 +347,15 @@ static inline int resample(long* src[], int count)
     return new_count;
 }
 
-static inline long clip_sample(long sample)
+static inline long clip_sample(long sample, long min, long max)
 {
-    if (sample > dsp.clip_max)
+    if (sample > max)
     {
-        sample = dsp.clip_max;
+        sample = max;
     }
-    else if (sample < dsp.clip_min)
+    else if (sample < min)
     {
-        sample = dsp.clip_min;
+        sample = min;
     }
 
     return sample;
@@ -346,6 +370,8 @@ static long dither_sample(long sample, long bias, long mask,
 {
     long output;
     long random;
+    long min;
+    long max;
 
     /* Noise shape and bias */
 
@@ -363,8 +389,10 @@ static long dither_sample(long sample, long bias, long mask,
 
     /* Clip and quantize */
 
-    sample = clip_sample(sample);
-    output = clip_sample(output) & ~mask;
+    min = dsp.clip_min;
+    max = dsp.clip_max;
+    sample = clip_sample(sample, min, max);
+    output = clip_sample(output, min, max) & ~mask;
 
     /* Error feedback */
 
@@ -386,21 +414,25 @@ static void apply_gain(long* src[], int count)
         long* d0 = &sample_buf[0];
         long* d1 = (s0 == s1) ? d0 : &sample_buf[SAMPLE_BUF_SIZE / 2];
         long gain = dsp.replaygain;
+        long s;
         long i;
 
         src[0] = d0;
         src[1] = d1;
+        s = *s0++;
 
         for (i = 0; i < count; i++)
         {
-            *d0++ = FRACMUL_8(*s0++, gain);
+            *d0++ = FRACMUL_8_LOOP(s, gain, s0);
         }
 
         if (src [0] != src [1])
         {
+            s = *s1++;
+
             for (i = 0; i < count; i++)
             {
-                *d1++ = FRACMUL_8(*s1++, gain);
+                *d1++ = FRACMUL_8_LOOP(s, gain, s1);
             }
         }
     }
@@ -427,10 +459,13 @@ static void write_samples(short* dst, long* src[], int count)
     }
     else
     {
+        long min = dsp.clip_min;
+        long max = dsp.clip_max;
+
         while (count-- > 0)
         {
-            *dst++ = (short) (clip_sample(*s0++) >> scale);
-            *dst++ = (short) (clip_sample(*s1++) >> scale);
+            *dst++ = (short) (clip_sample(*s0++, min, max) >> scale);
+            *dst++ = (short) (clip_sample(*s1++, min, max) >> scale);
         }
     }
 }
@@ -682,6 +717,7 @@ void dsp_set_replaygain(bool always)
             }
         }
 
-        dsp.replaygain = gain;
+        /* Store in S8.23 format to simplify calculations. */
+        dsp.replaygain = gain >> 1;
     }
 }
