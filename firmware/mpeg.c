@@ -546,7 +546,6 @@ void rec_tick (void) __attribute__ ((section (".icode")));
 void rec_tick(void)
 {
     int i;
-    int num_bytes;
     int delay;
     char data;
 
@@ -616,11 +615,7 @@ void rec_tick(void)
         {
             /* Signal to save the data if we are running out of buffer
                space */
-            num_bytes = audiobuf_write - audiobuf_read;
-            if(num_bytes < 0)
-                num_bytes += audiobuflen;
-
-            if (audiobuflen - num_bytes < MPEG_RECORDING_LOW_WATER 
+            if (audiobuflen - get_unsaved_space() < MPEG_RECORDING_LOW_WATER
                 && saving_status == NOT_SAVING)
             {
                 saving_status = BUFFER_FULL;
