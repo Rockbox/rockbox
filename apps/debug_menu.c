@@ -85,6 +85,7 @@ bool dbg_os(void)
 
 #ifdef HAVE_LCD_BITMAP
     lcd_setmargins(0, 0);
+    lcd_setfont(FONT_SYSFIXED);
 #endif
     lcd_clear_display();
 
@@ -118,9 +119,6 @@ bool dbg_os(void)
     int usage;
     int currval = 0;
 
-#ifdef HAVE_LCD_BITMAP
-    lcd_setmargins(0, 0);
-#endif
     lcd_clear_display();
 
     while(1)
@@ -892,9 +890,7 @@ bool dbg_ports(void)
     int battery_voltage;
     int batt_int, batt_frac;
 
-#ifdef HAVE_LCD_BITMAP
     lcd_setmargins(0, 0);
-#endif
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
 
@@ -972,9 +968,6 @@ bool dbg_ports(void)
     int batt_int, batt_frac;
     int currval = 0;
 
-#ifdef HAVE_LCD_BITMAP
-    lcd_setmargins(0, 0);
-#endif
     lcd_clear_display();
 
     while(1)
@@ -1064,9 +1057,9 @@ bool dbg_cpufreq(void)
 
 #ifdef HAVE_LCD_BITMAP
     lcd_setmargins(0, 0);
+    lcd_setfont(FONT_SYSFIXED);
 #endif
     lcd_clear_display();
-    lcd_setfont(FONT_SYSFIXED);
 
     while(1)
     {
