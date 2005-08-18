@@ -1636,7 +1636,7 @@ unsigned int rec_timesplit_seconds(void)
  * Time strings used for the trigger durations.
  * Keep synchronous to trigger_times in settings_apply_trigger
  */
-char *trig_durations[TRIG_DURATION_COUNT] =
+const char * const trig_durations[TRIG_DURATION_COUNT] =
 {
     "0s", "1s", "2s", "5s",
     "10s", "15s", "20s", "25s", "30s",

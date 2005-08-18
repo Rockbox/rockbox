@@ -104,7 +104,7 @@
 #define TRIG_MODE_REARM 2
 
 #define TRIG_DURATION_COUNT 13
-extern char *trig_durations[TRIG_DURATION_COUNT];
+extern const char * const trig_durations[TRIG_DURATION_COUNT];
 
 #define CROSSFADE_MODE_OFF       0
 #define CROSSFADE_MODE_CROSSFADE 1
