@@ -72,6 +72,7 @@
 #elif CONFIG_KEYPAD == IRIVER_H100_PAD
 #define FM_MENU BUTTON_MODE
 #define FM_STOP BUTTON_OFF
+#define FM_EXIT_PRE BUTTON_SELECT
 #define FM_EXIT (BUTTON_SELECT | BUTTON_REL)
 #elif CONFIG_KEYPAD == ONDIO_PAD /* restricted keypad */
 #define FM_MENU (BUTTON_MENU | BUTTON_REPEAT)
@@ -341,6 +342,10 @@ bool radio_screen(void)
 #endif /* #ifdef FM_RECORD */
 
             case FM_EXIT:
+#ifdef FM_EXIT_PRE
+                if(lastbutton != FM_EXIT_PRE)
+                    break;
+#endif
 #ifndef SIMULATOR
                 if(audio_status() == AUDIO_STATUS_RECORD)
                     audio_stop();
