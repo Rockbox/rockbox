@@ -314,8 +314,8 @@ void rundb_unbuffer_track(struct mp3entry *id, bool last_track) {
     }
 }
 
-void rundb_track_change(struct track_info *ti) {
-    ti->id3.playcount++;
+void rundb_track_change(struct mp3entry *id) {
+    id->playcount++;
 }
 
 void rundb_buffer_track(struct mp3entry *id, bool last_track) {

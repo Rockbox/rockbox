@@ -159,7 +159,7 @@ extern struct codec_api ci;
 static int new_track;
 
 /* Callback function to call when current track has really changed. */
-void (*track_changed_callback)(struct track_info *ti);
+void (*track_changed_callback)(struct mp3entry *id3);
 void (*track_buffer_callback)(struct mp3entry *id3, bool last_track);
 void (*track_unbuffer_callback)(struct mp3entry *id3, bool last_track);
 
@@ -520,7 +520,7 @@ void audio_set_track_unbuffer_event(void (*handler)(struct mp3entry *id3,
     track_unbuffer_callback = handler;
 }
 
-void audio_set_track_changed_event(void (*handler)(struct track_info *ti))
+void audio_set_track_changed_event(void (*handler)(struct mp3entry *id3))
 {
     track_changed_callback = handler;
 }
@@ -1476,7 +1476,7 @@ void audio_thread(void)
                 
             case AUDIO_TRACK_CHANGED:
                 if (track_changed_callback)
-                    track_changed_callback(cur_ti);
+                    track_changed_callback(&cur_ti->id3);
                 playlist_update_resume_info(audio_current_track());
                 break ;
                 
