@@ -191,12 +191,6 @@ void pcm_play_data(void (*get_more)(unsigned char** start, long* size))
     get_more((unsigned char **)&start, (long *)&size);
     get_more(&next_start, &next_size);
     dma_start(start, size);
-
-#if defined(HAVE_UDA1380)
-    uda1380_mute(false);
-#elif defined(HAVE_TLV320)
-    tlv320_mute(false);
-#endif
 }
 
 long pcm_get_bytes_waiting(void)
@@ -207,12 +201,6 @@ long pcm_get_bytes_waiting(void)
 void pcm_play_stop(void)
 {
     if (pcm_playing) {
-
-#if defined(HAVE_UDA1380)
-        uda1380_mute(true);
-#elif defined(HAVE_TLV320)
-        tlv320_mute(true);
-#endif
         dma_stop();
     }
 }
@@ -230,22 +218,10 @@ void pcm_play_pause(bool play)
         IIS2CONFIG = (pcm_freq << 12) | 0x300 | 4 << 2;
         EBU1CONFIG = (7 << 12) | (3 << 8) | (1 << 5) | (5 << 2);
         DCR0 |= DMA_EEXT | DMA_START;
-
-#if defined(HAVE_UDA1380)
-        uda1380_mute(false);
-#elif defined(HAVE_TLV320)
-        tlv320_mute(false);
-#endif
     }
     else if(!pcm_paused && !play)
     {
         logf("pause");
-
-#if defined(HAVE_UDA1380)
-        uda1380_mute(true);
-#elif defined(HAVE_TLV320)
-        tlv320_mute(true);
-#endif
 
         /* Disable DMA peripheral request. */
         DCR0 &= ~DMA_EEXT;
@@ -326,11 +302,11 @@ void pcm_init(void)
 
     pcm_set_frequency(44100);
 
-    /* Turn on headphone power with audio output muted. */
+    /* Turn on headphone power */
 #if defined(HAVE_UDA1380)
-    uda1380_mute(true);
+    uda1380_mute(false);
 #elif defined(HAVE_TLV320)
-    tlv320_mute(true);
+    tlv320_mute(false);
 #endif
     sleep(HZ/4);
 #if defined(HAVE_UDA1380)
