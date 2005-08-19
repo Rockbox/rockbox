@@ -1,26 +1,24 @@
 #define _PAGE_ Daily builds
 #include "head.t"
 
-<h2>Daily builds for different models</h2>
+<h2>Daily Builds for Different Models</h2>
 
 <p>These are automated daily builds of the code in CVS. They contain all the
-latest features. They may also contain bugs and/or undocumented changes... <a href="/docs/devicechart.html">identify your model</a>
+latest features. They may also contain bugs and/or undocumented changes... <a
+href="/twiki/bin/view/Main/DeviceChart">identify your model</a>
 
-<p>
-<!--#exec cmd="./dailymod.pl" -->
-<h2>Source tarballs</h2>
-
-<!--#exec cmd="./dailysrc.pl" -->
-
-<p>Please also look at the <a href="/twiki/bin/view/Main/DocsIndex">documentation</a> for do-it-yourselfers.
-
+<h2>Daily Build</h2>
 <a name="target_builds"></a>
 <a name="daily_builds"></a>
+<!--#exec cmd="./dailymod.pl" -->
+<h2>Daily Changelog</h2>
+<!--#exec cmd="./dailysrc.pl" -->
 
-<h2>CVS compile status</h2>
+<h2>CVS Compile Status</h2>
 
-<p>This table shows which targets are currently compilable from the CVS code, and how many compiler warnings the build generates. "OK" means no warnings.
-The batch timestamp is GMT.
+<p>This table shows which targets are currently compilable from the CVS code,
+and how many compiler warnings the build generates. 0 (zero) means no
+warnings.  The batch timestamp is GMT.
 
 <p>
 <!--#include virtual="buildstatus.link" -->
@@ -28,39 +26,23 @@ The batch timestamp is GMT.
 <a name="bleeding_edge"></a>
 <h2>Bleeding edge builds</h2>
 
-<p>These builds are as "bleeding edge" as you can get. They are updated every 20 minutes. (See status on the first line in the above table). 
+<p>These builds are as "bleeding edge" as you can get. They are updated on
+every source change. (See status on the first line in the above table).
 
-<p><b>Note: These are not complete installation archives.</b> Unless you really know what you are doing, you probably want to download the daily build instead.
+<p>These are complete installation archives.
 
-<p><table class=dailymod><tr valign=top>
-<td>
-<a href="auto/build-player/archos.mod">Player</a>
-(<a href="auto/build-player/rocks.zip">rocks</a>)<br>
+<p>
 
-<a href="auto/build-playerdebug/archos.mod">Player debug</a>
-(<a href="auto/build-playerdebug/rocks.zip">rocks</a>)<br>
-
-</td>
-<td>
-<a href="auto/build-recorder/ajbrec.ajz">Recorder</a>
-(<a href="auto/build-recorder/rocks.zip">rocks</a>)<br>
-
-<a href="auto/build-recorderdebug/ajbrec.ajz">Recorder debug</a>
-(<a href="auto/build-recorderdebug/rocks.zip">rocks</a>)<br>
-
-<a href="auto/build-ondiosp/ajbrec.ajz">Ondio SP</a>
-<a href="auto/build-ondiofm/ajbrec.ajz">Ondio FM</a>
-
-</td>
-<td>
-<a href="auto/build-fmrecorder/ajbrec.ajz">FM Recorder</a>
-(<a href="auto/build-fmrecorder/rocks.zip">rocks</a>)<br>
-<a href="auto/build-recorderv2/ajbrec.ajz">V2 Recorder</a>
-(<a href="auto/build-recorderv2/rocks.zip">rocks</a>)<br>
-<a href="auto/build-recorder8mb/ajbrec.ajz">8MB Recorder</a>
-(<a href="auto/build-recorder8mb/rocks.zip">rocks</a>)<br>
-</td>
-</tr></table>
+<a href="auto/build-player/rockbox.zip">Player</a>
+<a href="auto/build-recorder/rockbox.zip">Recorder</a>
+<a href="auto/build-ondiosp/rockbox.zip">Ondio SP</a>
+<a href="auto/build-ondiofm/rockbox.zip">Ondio FM</a>
+<a href="auto/build-fmrecorder/rockbox.zip">FM Recorder</a>
+<a href="auto/build-recorderv2/rockbox.zip">V2 Recorder</a>
+<a href="auto/build-recorder8mb/rockbox.zip">8MB Recorder</a>
+<a href="auto/build-h100/rockbox.zip">iriver h100</a>
+<a href="auto/build-h120/rockbox.zip">iriver h120</a>
+<a href="auto/build-source/rockbox-bleeding.tar.gz">source</a>
 
 <p>
 <a href="/twiki/bin/view/Main/UsingCVS">How to use CVS</a>.
