@@ -47,21 +47,23 @@
 #include "hwcompat.h"
 #endif /* !SIMULATOR */
 
+#ifndef SIMULATOR
+extern unsigned long mas_version_code;
+#endif
+
 #if CONFIG_HWCODEC == MAS3587F
-static void init_recording(void);
-static void start_prerecording(void);
-static void start_recording(void);
-static void stop_recording(void);
-static int get_unsaved_space(void);
-static void pause_recording(void);
-static void resume_recording(void);
+extern enum /* from mp3_playback.c */
+{
+    MPEG_DECODER,
+    MPEG_ENCODER
+} mpeg_mode;
 #endif /* CONFIG_HWCODEC == MAS3587F */
 
-#ifndef SIMULATOR
-static int get_unplayed_space(void);
-static int get_playable_space(void);
-static int get_unswapped_space(void);
-#endif /* !SIMULATOR */
+extern char* playlist_peek(int steps);
+extern bool playlist_check(int steps);
+extern int playlist_next(int steps);
+extern int playlist_amount(void);
+extern int playlist_update_resume_info(const struct mp3entry* id3);
 
 #define MPEG_PLAY         1
 #define MPEG_STOP         2
@@ -82,20 +84,6 @@ static int get_unswapped_space(void);
 #define MPEG_SAVE_DATA    102
 #define MPEG_STOP_DONE    103
 
-#if CONFIG_HWCODEC == MAS3587F
-extern enum /* from mp3_playback.c */
-{
-    MPEG_DECODER,
-    MPEG_ENCODER
-} mpeg_mode;
-#endif /* CONFIG_HWCODEC == MAS3587F */
-
-extern char* playlist_peek(int steps);
-extern bool playlist_check(int steps);
-extern int playlist_next(int steps);
-extern int playlist_amount(void);
-extern int playlist_update_resume_info(const struct mp3entry* id3);
-
 /* list of tracks in memory */
 #define MAX_TRACK_ENTRIES (1<<4) /* Must be power of 2 */
 #define MAX_TRACK_ENTRIES_MASK (MAX_TRACK_ENTRIES - 1)
@@ -109,26 +97,131 @@ struct trackdata
 
 static struct trackdata trackdata[MAX_TRACK_ENTRIES];
 
-static bool v1first = false;
-
 static unsigned int current_track_counter = 0;
 static unsigned int last_track_counter = 0;
 
 #ifndef SIMULATOR
-
 static int track_read_idx = 0;
 static int track_write_idx = 0;
+#endif /* !SIMULATOR */
 
+static const char mpeg_thread_name[] = "mpeg";
+static unsigned int mpeg_errno;
+
+static bool v1first = false;
+
+static bool playing = false;    /* We are playing an MP3 stream */
+static bool is_playing = false; /* We are (attempting to) playing MP3 files */
+static bool paused;             /* playback is paused */
+
+#ifdef SIMULATOR
+static char mpeg_stack[DEFAULT_STACK_SIZE];
+static struct mp3entry taginfo;
+
+#else /* !SIMULATOR */
+static struct event_queue mpeg_queue;
+static long mpeg_stack[(DEFAULT_STACK_SIZE + 0x1000)/sizeof(long)];
+
+static int audiobuflen;
+static int audiobuf_write;
+static int audiobuf_swapwrite;
+static int audiobuf_read;
+
+static int mpeg_file;
+
+static bool play_pending; /* We are about to start playing */
+static bool filling;      /* We are filling the buffer with data from disk */
+static bool dma_underrun; /* True when the DMA has stopped because of
+                             slow disk reading (read error, shaking) */
+static bool mpeg_stop_done;
+
+static int last_dma_tick = 0;
+static int last_dma_chunk_size;
+
+static long low_watermark;          /* Dynamic low watermark level */
+static long low_watermark_margin;   /* Extra time in seconds for watermark */
+static long lowest_watermark_level; /* Debug value to observe the buffer
+                                       usage */
+#if CONFIG_HWCODEC == MAS3587F
+static char recording_filename[MAX_PATH]; /* argument to thread */
+static char delayed_filename[MAX_PATH];   /* internal copy of above */
+
+static bool init_recording_done;
+static bool init_playback_done;
+static bool prerecording;        /* True if prerecording is enabled */
+static bool is_prerecording;     /* True if we are prerecording */
+static bool is_recording;        /* We are recording */
+static bool disable_xing_header; /* When splitting files */
+
+static enum {
+    NOT_SAVING = 0,  /* reasons to save data, sorted by importance */
+    BUFFER_FULL,
+    NEW_FILE,
+    STOP_RECORDING
+} saving_status;
+
+static int rec_frequency_index; /* For create_xing_header() calls */
+static int rec_version_index;   /* For create_xing_header() calls */
+
+static int prerecord_buffer[MPEG_MAX_PRERECORD_SECONDS]; 
+                    /* Array of buffer indexes for each prerecorded second */
+static int prerecord_index;       /* Current index in the prerecord buffer */
+static int prerecording_max_seconds;     /* Max number of seconds to store */
+static int prerecord_count;   /* Number of seconds in the prerecord buffer */
+static int prerecord_timeout; /* The tick count of the next prerecord data
+                                 store */
+
+unsigned long record_start_time; /* Value of current_tick when recording
+                                    was started */
+unsigned long pause_start_time;  /* Value of current_tick when pause was
+                                    started */
+static unsigned long num_rec_bytes;
+static unsigned long num_recorded_frames;
+
+/* Shadow MAS registers */
+unsigned long shadow_encoder_control = 0;
+#endif /* CONFIG_HWCODEC == MAS3587F */
+
+#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+unsigned long shadow_io_control_main = 0;
+unsigned long shadow_soft_mute = 0;
+unsigned shadow_codec_reg0;
+#endif /* (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F) */
+
+#ifdef HAVE_RECORDING
+const unsigned char empty_id3_header[] =
+{
+    'I', 'D', '3', 0x03, 0x00, 0x00,
+    0x00, 0x00, 0x1f, 0x76 /* Size is 4096 minus 10 bytes for the header */
+};
+#endif /* HAVE_RECORDING */
+
+
+static int get_unplayed_space(void);
+static int get_playable_space(void);
+static int get_unswapped_space(void);
+#endif /* !SIMULATOR */
+
+#if CONFIG_HWCODEC == MAS3587F
+static void init_recording(void);
+static void start_prerecording(void);
+static void start_recording(void);
+static void stop_recording(void);
+static int get_unsaved_space(void);
+static void pause_recording(void);
+static void resume_recording(void);
+#endif /* CONFIG_HWCODEC == MAS3587F */
+
+
+#ifndef SIMULATOR
 static int num_tracks_in_memory(void)
 {
     return (track_write_idx - track_read_idx) & MAX_TRACK_ENTRIES_MASK;
 }
-#endif /* !SIMULATOR */
 
-#ifndef SIMULATOR
+#ifdef DEBUG_TAGS
 static void debug_tags(void)
 {
-#ifdef DEBUG_TAGS
     int i;
 
     for(i = 0;i < MAX_TRACK_ENTRIES;i++)
@@ -137,8 +230,10 @@ static void debug_tags(void)
     }
     DEBUGF("read: %d, write :%d\n", track_read_idx, track_write_idx);
     DEBUGF("num_tracks_in_memory: %d\n", num_tracks_in_memory());
-#endif /* DEBUG_TAGS */
 }
+#else /* !DEBUG_TAGS */
+#define debug_tags()
+#endif /* !DEBUG_TAGS */
 
 static void remove_current_tag(void)
 {
@@ -305,88 +400,8 @@ unsigned long mpeg_get_last_header(void)
 #endif /* !SIMULATOR */
 }
 
-static bool paused; /* playback is paused */
 
-static unsigned int mpeg_errno;
-
-#ifdef SIMULATOR
-static bool is_playing = false;
-static bool playing = false;
-#else /* !SIMULATOR */
-static int last_dma_tick = 0;
-
-extern unsigned long mas_version_code;
-
-static struct event_queue mpeg_queue;
-static long mpeg_stack[(DEFAULT_STACK_SIZE + 0x1000)/sizeof(long)];
-static const char mpeg_thread_name[] = "mpeg";
-
-static int audiobuflen;
-static int audiobuf_write;
-static int audiobuf_swapwrite;
-static int audiobuf_read;
-
-static int last_dma_chunk_size;
-
-static bool playing; /* We are playing an MP3 stream */
-static bool play_pending; /* We are about to start playing */
-static bool is_playing; /* We are (attempting to) playing MP3 files */
-static bool filling; /* We are filling the buffer with data from disk */
-static bool dma_underrun; /* True when the DMA has stopped because of
-                             slow disk reading (read error, shaking) */
-static long low_watermark; /* Dynamic low watermark level */
-static long low_watermark_margin; /* Extra time in seconds for watermark */
-static long lowest_watermark_level; /* Debug value to observe the buffer
-                                      usage */
-#if CONFIG_HWCODEC == MAS3587F
-static bool is_recording; /* We are recording */
-unsigned long record_start_time; /* Value of current_tick when recording
-                                    was started */
-unsigned long pause_start_time; /* Value of current_tick when pause was
-                                   started */
-static enum {       
-    NOT_SAVING = 0,  /* reasons to save data, sorted by importance */
-    BUFFER_FULL,
-    NEW_FILE,
-    STOP_RECORDING
-} saving_status;
-
-static char recording_filename[MAX_PATH]; /* argument to thread */
-static char delayed_filename[MAX_PATH]; /* internal copy of above */
-static int rec_frequency_index; /* For create_xing_header() calls */
-static int rec_version_index;   /* For create_xing_header() calls */
-static bool disable_xing_header; /* When splitting files */
-
-static bool prerecording; /* True if prerecording is enabled */
-static bool is_prerecording; /* True if we are prerecording */
-static int prerecord_buffer[MPEG_MAX_PRERECORD_SECONDS]; /* Array of buffer
-                                                            indexes for each
-                                                            prerecorded
-                                                            second */
-static int prerecord_index; /* Current index in the prerecord buffer */
-static int prerecording_max_seconds;   /* Max number of seconds to store */
-static int prerecord_count; /* Number of seconds in the prerecord buffer */
-static int prerecord_timeout; /* The tick count of the next prerecord data store */
-
-/* Shadow MAS registers */
-unsigned long shadow_encoder_control = 0;
-#endif /* CONFIG_HWCODEC == MAS3587F */
-
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
-unsigned long shadow_io_control_main = 0;
-unsigned long shadow_soft_mute = 0;
-unsigned shadow_codec_reg0;
-#endif /* (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F) */
-
-static int mpeg_file;
-
-/* Synchronization variables */
-#if CONFIG_HWCODEC == MAS3587F
-static bool init_recording_done;
-static bool init_playback_done;
-#endif /* CONFIG_HWCODEC == MAS3587F */
-static bool mpeg_stop_done;
-
+#ifndef SIMULATOR
 static void recalculate_watermark(int bitrate)
 {
     int bytes_per_sec;
@@ -518,15 +533,6 @@ static int get_unsaved_space(void)
         space += audiobuflen;
     return space;
 }
-#endif /* CONFIG_HWCODEC == MAS3587F */
-
-#if CONFIG_HWCODEC == MAS3587F
-#ifdef DEBUG
-static long timing_info_index = 0;
-static long timing_info[1024];
-#endif /* DEBUG */
-static unsigned long num_rec_bytes;
-static unsigned long num_recorded_frames;
 
 static void drain_dma_buffer(void)
 {
@@ -541,6 +547,11 @@ static void drain_dma_buffer(void)
         while (!(PBDRH & 0x80));
     }
 }
+
+#ifdef DEBUG
+static long timing_info_index = 0;
+static long timing_info[1024];
+#endif /* DEBUG */
 
 void rec_tick (void) __attribute__ ((section (".icode")));
 void rec_tick(void)
@@ -983,14 +994,6 @@ static bool swap_one_chunk(void)
 
     return true;
 }
-
-#ifdef HAVE_RECORDING
-const unsigned char empty_id3_header[] =
-{
-    'I', 'D', '3', 0x03, 0x00, 0x00,
-    0x00, 0x00, 0x1f, 0x76 /* Size is 4096 minus 10 bytes for the header */
-};
-#endif /* HAVE_RECORDING */
 
 static void mpeg_thread(void)
 {
@@ -1551,15 +1554,13 @@ static void mpeg_thread(void)
                 is_playing = false;
                 paused = false;
                 stop_playing();
-#ifndef SIMULATOR //CHECKME
-                
+
                 /* Tell the USB thread that we are safe */
                 DEBUGF("mpeg_thread got SYS_USB_CONNECTED\n");
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
 
                 /* Wait until the USB cable is extracted again */
                 usb_wait_for_disconnect(&mpeg_queue);
-#endif /* !SIMULATOR */
                 break;
 #endif /* !USB_NONE */
                 
@@ -1913,10 +1914,6 @@ static void mpeg_thread(void)
 }
 #endif /* !SIMULATOR */
 
-#ifdef SIMULATOR
-static struct mp3entry taginfo;
-#endif /* SIMULATOR */
-
 void mpeg_id3_options(bool _v1first)
 {
    v1first = _v1first;
@@ -1969,11 +1966,7 @@ void audio_init_playback(void)
 
 
 /****************************************************************************
- **
- **
- ** Recording functions
- **
- **
+ * Recording functions
  ***************************************************************************/
 void mpeg_init_recording(void)
 {
@@ -2528,7 +2521,6 @@ void audio_stop(void)
     is_playing = false;
     playing = false;
 #endif /* SIMULATOR */
-    
 }
 
 void audio_pause(void)
@@ -2659,8 +2651,6 @@ void audio_error_clear(void)
 }
 
 #ifdef SIMULATOR
-static char mpeg_stack[DEFAULT_STACK_SIZE];
-static const char mpeg_thread_name[] = "mpeg";
 static void mpeg_thread(void)
 {
     struct mp3entry* id3;
