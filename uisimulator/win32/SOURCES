@@ -5,7 +5,6 @@ dir-win32.c
 #endif
 kernel.c
 lcd-win32.c
-mpeg-win32.c
 panic-win32.c
 string-win32.c
 thread-win32.c
