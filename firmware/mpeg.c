@@ -19,6 +19,9 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "config.h"
+
+#if CONFIG_HWCODEC != MASNONE
+
 #include "debug.h"
 #include "panic.h"
 #include "id3.h"
@@ -33,6 +36,7 @@
 #include "buffer.h"
 #include "mp3_playback.h"
 #include "sound.h"
+#include "bitswap.h"
 #ifndef SIMULATOR
 #include "i2c.h"
 #include "mas.h"
@@ -41,9 +45,7 @@
 #include "usb.h"
 #include "file.h"
 #include "hwcompat.h"
-#endif /* #ifndef SIMULATOR */
-
-#include "bitswap.h"
+#endif /* !SIMULATOR */
 
 #if CONFIG_HWCODEC == MAS3587F
 static void init_recording(void);
@@ -53,13 +55,13 @@ static void stop_recording(void);
 static int get_unsaved_space(void);
 static void pause_recording(void);
 static void resume_recording(void);
-#endif /* #if CONFIG_HWCODEC == MAS3587F */
+#endif /* CONFIG_HWCODEC == MAS3587F */
 
 #ifndef SIMULATOR
 static int get_unplayed_space(void);
 static int get_playable_space(void);
 static int get_unswapped_space(void);
-#endif /* #ifndef SIMULATOR */
+#endif /* !SIMULATOR */
 
 #define MPEG_PLAY         1
 #define MPEG_STOP         2
@@ -86,7 +88,7 @@ extern enum /* from mp3_playback.c */
     MPEG_DECODER,
     MPEG_ENCODER
 } mpeg_mode;
-#endif /* #if CONFIG_HWCODEC == MAS3587F */
+#endif /* CONFIG_HWCODEC == MAS3587F */
 
 extern char* playlist_peek(int steps);
 extern bool playlist_check(int steps);
@@ -121,7 +123,7 @@ static int num_tracks_in_memory(void)
 {
     return (track_write_idx - track_read_idx) & MAX_TRACK_ENTRIES_MASK;
 }
-#endif /* #ifndef SIMULATOR */
+#endif /* !SIMULATOR */
 
 #ifndef SIMULATOR
 static void debug_tags(void)
@@ -135,7 +137,7 @@ static void debug_tags(void)
     }
     DEBUGF("read: %d, write :%d\n", track_read_idx, track_write_idx);
     DEBUGF("num_tracks_in_memory: %d\n", num_tracks_in_memory());
-#endif /* #ifdef DEBUG_TAGS */
+#endif /* DEBUG_TAGS */
 }
 
 static void remove_current_tag(void)
@@ -172,7 +174,7 @@ static struct trackdata *get_trackdata(int offset)
     else
        return &trackdata[(track_read_idx + offset) & MAX_TRACK_ENTRIES_MASK];
 }
-#endif /* #ifndef SIMULATOR */
+#endif /* !SIMULATOR */
 
 static void set_elapsed(struct mp3entry* id3)
 {
@@ -293,16 +295,14 @@ unsigned long mpeg_get_last_header(void)
 {
 #ifdef SIMULATOR
     return 0;
-#elif CONFIG_HWCODEC != MASNONE
+#else /* !SIMULATOR */
     unsigned long tmp[2];
 
     /* Read the frame data from the MAS and reconstruct it with the
        frame sync and all */
     mas_readmem(MAS_BANK_D0, MAS_D0_MPEG_STATUS_1, tmp, 2);
     return 0xffe00000 | ((tmp[0] & 0x7c00) << 6) | (tmp[1] & 0xffff);
-#else
-    return 0;
-#endif
+#endif /* !SIMULATOR */
 }
 
 static bool paused; /* playback is paused */
@@ -312,7 +312,7 @@ static unsigned int mpeg_errno;
 #ifdef SIMULATOR
 static bool is_playing = false;
 static bool playing = false;
-#else
+#else /* !SIMULATOR */
 static int last_dma_tick = 0;
 
 extern unsigned long mas_version_code;
@@ -370,13 +370,13 @@ static int prerecord_timeout; /* The tick count of the next prerecord data store
 
 /* Shadow MAS registers */
 unsigned long shadow_encoder_control = 0;
-#endif /* #if CONFIG_HWCODEC == MAS3587F */
+#endif /* CONFIG_HWCODEC == MAS3587F */
 
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
 unsigned long shadow_io_control_main = 0;
 unsigned long shadow_soft_mute = 0;
 unsigned shadow_codec_reg0;
-#endif
+#endif /* (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F) */
 
 static int mpeg_file;
 
@@ -384,7 +384,7 @@ static int mpeg_file;
 #if CONFIG_HWCODEC == MAS3587F
 static bool init_recording_done;
 static bool init_playback_done;
-#endif /* #if CONFIG_HWCODEC == MAS3587F */
+#endif /* CONFIG_HWCODEC == MAS3587F */
 static bool mpeg_stop_done;
 
 static void recalculate_watermark(int bitrate)
@@ -465,7 +465,7 @@ static int dbg_cnt2us(unsigned int cnt)
 {
     return (cnt * 10000) / (FREQ/800);
 }
-#endif /* #ifdef DEBUG */
+#endif /* DEBUG */
 
 static int get_unplayed_space(void)
 {
@@ -518,13 +518,13 @@ static int get_unsaved_space(void)
         space += audiobuflen;
     return space;
 }
-#endif /* #if CONFIG_HWCODEC == MAS3587F */
+#endif /* CONFIG_HWCODEC == MAS3587F */
 
 #if CONFIG_HWCODEC == MAS3587F
 #ifdef DEBUG
 static long timing_info_index = 0;
 static long timing_info[1024];
-#endif /* #ifdef DEBUG */
+#endif /* DEBUG */
 static unsigned long num_rec_bytes;
 static unsigned long num_recorded_frames;
 
@@ -554,7 +554,7 @@ void rec_tick(void)
 #ifdef DEBUG
         timing_info[timing_info_index++] = current_tick;
         TCNT2 = 0;
-#endif /* #ifdef DEBUG */
+#endif /* DEBUG */
         /* Note: Although this loop is run in interrupt context, further
          * optimisation will do no good. The MAS would then deliver bad
          * frames occasionally, as observed in extended experiments. */
@@ -589,7 +589,7 @@ void rec_tick(void)
 #ifdef DEBUG
         timing_info[timing_info_index++] = TCNT2 + (i << 16);
         timing_info_index &= 0x3ff;
-#endif /* #ifdef DEBUG */
+#endif /* DEBUG */
 
         num_rec_bytes += i;
 
@@ -625,7 +625,7 @@ void rec_tick(void)
         }
     }
 }
-#endif /* #if CONFIG_HWCODEC == MAS3587F */
+#endif /* CONFIG_HWCODEC == MAS3587F */
 
 void playback_tick(void)
 {
@@ -878,7 +878,7 @@ static void track_change(void)
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     /* Reset the AVC */
     sound_set(SOUND_AVC, -1);
-#endif /* #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F) */
+#endif /* (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F) */
 
     if (num_tracks_in_memory() > 0)
     {
@@ -904,7 +904,7 @@ void hexdump(const unsigned char *buf, int len)
     }
     DEBUGF("\n");
 }
-#endif /* #ifdef DEBUG */
+#endif /* DEBUG */
 
 static void start_playback_if_ready(void)
 {
@@ -943,7 +943,6 @@ static void start_playback_if_ready(void)
     }
 }
 
-#if CONFIG_HWCODEC != MASNONE
 static bool swap_one_chunk(void)
 {
     int free_space_left;
@@ -984,7 +983,6 @@ static bool swap_one_chunk(void)
 
     return true;
 }
-#endif
 
 #ifdef HAVE_RECORDING
 const unsigned char empty_id3_header[] =
@@ -992,11 +990,10 @@ const unsigned char empty_id3_header[] =
     'I', 'D', '3', 0x03, 0x00, 0x00,
     0x00, 0x00, 0x1f, 0x76 /* Size is 4096 minus 10 bytes for the header */
 };
-#endif
+#endif /* HAVE_RECORDING */
 
 static void mpeg_thread(void)
 {
-#if CONFIG_HWCODEC != MASNONE
     static int pause_tick = 0;
     static unsigned int pause_track = 0;
     struct event ev;
@@ -1013,7 +1010,7 @@ static void mpeg_thread(void)
     int save_endpos = 0;
     int rc;
     long offset;
-#endif /* #if CONFIG_HWCODEC == MAS3587F */
+#endif /* CONFIG_HWCODEC == MAS3587F */
 
     is_playing = false;
     play_pending = false;
@@ -1025,7 +1022,7 @@ static void mpeg_thread(void)
 #if CONFIG_HWCODEC == MAS3587F
         if(mpeg_mode == MPEG_DECODER)
         {
-#endif /* #if CONFIG_HWCODEC == MAS3587F */
+#endif /* CONFIG_HWCODEC == MAS3587F */
         yield();
 
         /* Swap if necessary, and don't block on the queue_wait() */
@@ -1056,7 +1053,7 @@ static void mpeg_thread(void)
                 /* Silence the A/D input, it may be on because the radio
                    may be playing */
                 mas_codec_writereg(6, 0x0000);
-#endif /* #ifdef CONFIG_TUNER */
+#endif /* CONFIG_TUNER */
 
                 /* Stop the current stream */
                 play_pending = false;
@@ -1447,10 +1444,10 @@ static void mpeg_thread(void)
                                      amount_to_read);
 #if MEM == 8
                 amount_to_read = MIN(0x100000, amount_to_read);
-#endif /* #if MEM == 8 */
+#endif /* MEM == 8 */
 #ifdef HAVE_MMC /* MMC is slow, so don't read too large chunks */
                 amount_to_read = MIN(0x40000, amount_to_read);
-#endif
+#endif /* HAVE_MMC */
 
                 /* Read as much mpeg data as we can fit in the buffer */
                 if(mpeg_file >= 0)
@@ -1554,7 +1551,7 @@ static void mpeg_thread(void)
                 is_playing = false;
                 paused = false;
                 stop_playing();
-#ifndef SIMULATOR
+#ifndef SIMULATOR //CHECKME
                 
                 /* Tell the USB thread that we are safe */
                 DEBUGF("mpeg_thread got SYS_USB_CONNECTED\n");
@@ -1562,16 +1559,16 @@ static void mpeg_thread(void)
 
                 /* Wait until the USB cable is extracted again */
                 usb_wait_for_disconnect(&mpeg_queue);
-#endif /* #ifndef SIMULATOR */
+#endif /* !SIMULATOR */
                 break;
-#endif /* #ifndef USB_NONE */
+#endif /* !USB_NONE */
                 
 #if CONFIG_HWCODEC == MAS3587F
             case MPEG_INIT_RECORDING:
                 init_recording();
                 init_recording_done = true;
                 break;
-#endif /* #if CONFIG_HWCODEC == MAS3587F */
+#endif /* CONFIG_HWCODEC == MAS3587F */
 
             case SYS_TIMEOUT:
                 if (playing)
@@ -1738,7 +1735,7 @@ static void mpeg_thread(void)
                                    timing_info[i*2+1] >> 16);
                         }
                     }
-#endif /* #ifdef DEBUG1 */
+#endif /* DEBUG1 */
 
                     if (prerecording)
                     {
@@ -1911,67 +1908,42 @@ static void mpeg_thread(void)
                     break;
             }
         }
-#endif /* #if CONFIG_HWCODEC == MAS3587F */
+#endif /* CONFIG_HWCODEC == MAS3587F */
     }
-#else /* HWCODEC != NONE */
-    struct event ev;
-    
-    while(1)
-    {
-        queue_wait(&mpeg_queue, &ev);
-        
-        switch(ev.id)
-        {
-        case MPEG_STOP:
-            mpeg_stop_done = true;
-            break;
-            
-        case SYS_USB_CONNECTED:
-            /* Tell the USB thread that we are safe */
-            DEBUGF("mpeg_thread got SYS_USB_CONNECTED\n");
-            usb_acknowledge(SYS_USB_CONNECTED_ACK);
-
-            /* Wait until the USB cable is extracted again */
-            usb_wait_for_disconnect(&mpeg_queue);
-            break;
-        }
-    }
-#endif
 }
-#endif /* SIMULATOR */
+#endif /* !SIMULATOR */
 
 #ifdef SIMULATOR
 static struct mp3entry taginfo;
-#endif /* #ifdef SIMULATOR */
+#endif /* SIMULATOR */
 
 void mpeg_id3_options(bool _v1first)
 {
    v1first = _v1first;
 }
 
-#ifndef IRIVER_H100
 struct mp3entry* audio_current_track()
 {
 #ifdef SIMULATOR
     return &taginfo;
-#else
+#else /* !SIMULATOR */
     if(num_tracks_in_memory())
         return &get_trackdata(0)->id3;
     else
         return NULL;
-#endif /* #ifdef SIMULATOR */
+#endif /* !SIMULATOR */
 }
 
 struct mp3entry* audio_next_track()
 {
 #ifdef SIMULATOR
     return &taginfo;
-#else
+#else /* !SIMULATOR */
     if(num_tracks_in_memory() > 1)
         return &get_trackdata(1)->id3;
     else
         return NULL;
-#endif /* #ifdef SIMULATOR */
+#endif /* !SIMULATOR */
 }
 
 bool audio_has_changed_track(void)
@@ -1983,7 +1955,6 @@ bool audio_has_changed_track(void)
     }
     return false;
 }
-#endif
 
 #if CONFIG_HWCODEC == MAS3587F
 void audio_init_playback(void)
@@ -2087,7 +2058,6 @@ static void init_recording(void)
         mas_readmem(MAS_BANK_D0, MAS_D0_APP_RUNNING, &val, 1);
     } while(!(val & 0x40));
 
-#if 1
     /* We have started the recording application with monitoring OFF.
        This is because we want to record at least one frame to fill the DMA
        buffer, because the silly MAS will not negate EOD until at least one
@@ -2106,7 +2076,6 @@ static void init_recording(void)
     } while(val & 1);
 
     drain_dma_buffer();
-#endif
     mpeg_mode = MPEG_ENCODER;
 
     DEBUGF("MAS Recording application started\n");
@@ -2356,7 +2325,7 @@ int mpeg_get_mas_pllfreq(void)
     else
         return 24576000;
 }
-#endif
+#endif /* CONFIG_TUNER & S1A0903X01 */
 
 /* try to make some kind of beep, also in recording mode */
 void audio_beep(int duration)
@@ -2432,7 +2401,7 @@ unsigned long mpeg_num_recorded_bytes(void)
         return 0;
 }
 
-#elif (CONFIG_HWCODEC == MASNONE) || defined(SIMULATOR)
+#elif defined(SIMULATOR)
 
 /* dummies coming up
 
@@ -2508,9 +2477,8 @@ void mpeg_set_recording_options(int frequency, int quality,
     (void)editable;
     (void)prerecord_time;
 }
-#endif
+#endif /* CONFIG_HWCODEC == MAS3587F; SIMULATOR */
 
-#ifndef IRIVER_H100
 void audio_play(int offset)
 {
 #ifdef SIMULATOR
@@ -2530,7 +2498,7 @@ void audio_play(int offset)
             continue;
         }
 #ifdef HAVE_MPEG_PLAY
-	real_mpeg_play(trackname);
+        real_mpeg_play(trackname);
 #endif
         playlist_next(steps);
         taginfo.offset = offset;
@@ -2539,11 +2507,11 @@ void audio_play(int offset)
         playing = true;
         break;
     } while(1);
-#else
+#else /* !SIMULATOR */
     is_playing = true;
     
     queue_post(&mpeg_queue, MPEG_PLAY, (void*)offset);
-#endif /* #ifdef SIMULATOR */
+#endif /* !SIMULATOR */
 
     mpeg_errno = 0;
 }
@@ -2555,11 +2523,11 @@ void audio_stop(void)
     queue_post(&mpeg_queue, MPEG_STOP, NULL);
     while(!mpeg_stop_done)
         yield();
-#else
+#else /* SIMULATOR */
     paused = false;
     is_playing = false;
     playing = false;
-#endif /* #ifndef SIMULATOR */
+#endif /* SIMULATOR */
     
 }
 
@@ -2567,29 +2535,29 @@ void audio_pause(void)
 {
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_PAUSE, NULL);
-#else
+#else /* SIMULATOR */
     is_playing = true;
     playing = false;
     paused = true;
-#endif /* #ifndef SIMULATOR */
+#endif /* SIMULATOR */
 }
 
 void audio_resume(void)
 {
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_RESUME, NULL);
-#else
+#else /* SIMULATOR */
     is_playing = true;
     playing = true;
     paused = false;
-#endif /* #ifndef SIMULATOR */
+#endif /* SIMULATOR */
 }
 
 void audio_next(void)
 {
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_NEXT, NULL);
-#else
+#else /* SIMULATOR */
     char* file;
     int steps = 1;
     int index;
@@ -2610,14 +2578,14 @@ void audio_next(void)
         playing = true;
         break;
     } while(1);
-#endif /* #ifndef SIMULATOR */
+#endif /* SIMULATOR */
 }
 
 void audio_prev(void)
 {
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_PREV, NULL);
-#else
+#else /* SIMULATOR */
     char* file;
     int steps = -1;
     int index;
@@ -2637,23 +2605,23 @@ void audio_prev(void)
         playing = true;
         break;
     } while(1);
-#endif /* #ifndef SIMULATOR */
+#endif /* SIMULATOR */
 }
 
 void audio_ff_rewind(int newtime)
 {
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_FF_REWIND, (void *)newtime);
-#else
+#else /* SIMULATOR */
     (void)newtime;
-#endif /* #ifndef SIMULATOR */
+#endif /* SIMULATOR */
 }
 
 void audio_flush_and_reload_tracks(void)
 {
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_FLUSH_RELOAD, NULL);
-#endif /* #ifndef SIMULATOR*/
+#endif /* !SIMULATOR*/
 }
 
 int audio_status(void)
@@ -2672,7 +2640,7 @@ int audio_status(void)
 
     if(is_prerecording)
         ret |= AUDIO_STATUS_PRERECORD;
-#endif /* #if CONFIG_HWCODEC == MAS3587F */
+#endif /* CONFIG_HWCODEC == MAS3587F */
 
     if(mpeg_errno)
         ret |= AUDIO_STATUS_ERROR;
@@ -2710,7 +2678,7 @@ static void mpeg_thread(void)
         sleep(HZ);
     }
 }
-#endif /* #ifdef SIMULATOR */
+#endif /* SIMULATOR */
 
 void audio_init(void)
 {
@@ -2719,7 +2687,7 @@ void audio_init(void)
 #ifndef SIMULATOR
     audiobuflen = audiobufend - audiobuf;
     queue_init(&mpeg_queue);
-#endif /* #ifndef SIMULATOR */
+#endif /* !SIMULATOR */
     create_thread(mpeg_thread, mpeg_stack,
                   sizeof(mpeg_stack), mpeg_thread_name);
 
@@ -2730,7 +2698,7 @@ void audio_init(void)
         and_b(~0x08, &PADRH);
     else
         or_b(0x08, &PADRH);
-#endif /* #if CONFIG_HWCODEC == MAS3587F */
+#endif /* CONFIG_HWCODEC == MAS3587F */
 
 #ifdef DEBUG
     dbg_timer_start();
@@ -2738,4 +2706,4 @@ void audio_init(void)
 #endif /* DEBUG */
 }
 
-#endif /* IRIVER_H100 */
+#endif /* CONFIG_HWCODEC != MASNONE */
