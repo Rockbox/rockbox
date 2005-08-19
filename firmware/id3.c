@@ -603,11 +603,28 @@ static void setid3v2title(int fd, struct mp3entry *entry)
     global_flags = header[5];
     
     /* Skip the extended header if it is present */
-    if(version >= ID3_VER_2_4) {
-        if(global_flags & 0x40) {
+    if(global_flags & 0x40) {
+        if(version == ID3_VER_2_3) {
+            if(10 != read(fd, header, 10))
+                return;
+            /* The 2.3 extended header size doesn't include the following
+               data, so we have to find out the size by checking the flags.
+               Also, it is not unsynched. */
+            framelen = BYTES2INT(header[0], header[1], header[2], header[3]) +
+                BYTES2INT(header[6], header[7], header[8], header[9]);
+            flags = BYTES2INT(0, 0, header[4], header[5]);
+            if(flags & 0x8000)
+                framelen += 4;   /* CRC */
+
+            lseek(fd, framelen - 10, SEEK_CUR);
+        }
+        
+        if(version >= ID3_VER_2_4) {
             if(4 != read(fd, header, 4))
                 return;
-            
+
+            /* The 2.4 extended header size does include the entire header,
+               so here we can just skip it. This header is unsynched. */
             framelen = UNSYNC(header[0], header[1], 
                               header[2], header[3]);
 
