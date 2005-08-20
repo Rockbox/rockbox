@@ -210,8 +210,7 @@ static void load_voicefile(void)
     cpu_boost(true);
     buf = (unsigned char *)(&p_voicefile->index) +
         (p_voicefile->id1_max + p_voicefile->id2_max) * sizeof(struct clip_entry);
-    length = file_size - offsetof(struct voicefile, index) -
-               (p_voicefile->id1_max - p_voicefile->id2_max) * sizeof(struct clip_entry);
+    length = file_size - (buf - audiobuf);
                
     for (i = 0; i < length; i++)
     {
