@@ -576,7 +576,6 @@ void mp3_reset_playtime(void)
     playstart_tick = current_tick;
 }
 
-
 bool mp3_is_playing(void)
 {
     return playing;
@@ -624,17 +623,10 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
     audio_is_initialized = true;
 #endif
 }
+
 void mp3_shutdown(void)
 {
     /* a dummy */
-}
-void mp3_play_data(const unsigned char* start, int size,
-                   void (*get_more)(unsigned char** start, int* size))
-{
-    /* a dummy */
-    (void)start;
-    (void)size;
-    (void)get_more;
 }
 
 void mp3_play_stop(void)
@@ -653,4 +645,10 @@ unsigned char* mp3_get_pos(void)
     /* a dummy */
     return (unsigned char *)0x1234;
 }
+
+bool mp3_is_playing(void)
+{
+    return playing;
+}
+
 #endif /* CONFIG_HWCODEC == MASNONE */

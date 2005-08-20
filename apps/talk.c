@@ -32,7 +32,11 @@
 #include "lang.h"
 #include "talk.h"
 #include "id3.h"
+#include "logf.h"
 #include "bitswap.h"
+#if CONFIG_HWCODEC == MASNONE
+#include "playback.h"
+#endif
 
 /***************** Constants *****************/
 
@@ -88,6 +92,7 @@ static int filehandle; /* global, so the MMC variant can keep the file open */
 static unsigned char* p_silence; /* VOICE_PAUSE clip, used for termination */
 static long silence_len; /* length of the VOICE_PAUSE clip */
 static unsigned char* p_lastclip; /* address of latest clip, for silence add */
+static unsigned long voicefile_size = 0; /* size of the loaded voice file */
 
 
 /***************** Private prototypes *****************/
@@ -114,10 +119,28 @@ static int open_voicefile(void)
     }
 
     snprintf(buf, sizeof(buf), ROCKBOX_DIR LANG_DIR "/%s.voice", p_lang);
-
+    
     return open(buf, O_RDONLY);
 }
 
+int talk_get_bufsize(void)
+{
+    return voicefile_size;
+}
+
+#ifdef SIMULATOR
+static unsigned short BSWAP16(unsigned short value)
+{
+    return (value >> 8) | (value << 8);
+}
+
+static unsigned long BSWAP32(unsigned long value)
+{
+    unsigned long hi = BSWAP16(value >> 16);
+    unsigned long lo = BSWAP16(value & 0xffff);
+    return (lo << 16) | hi;
+}
+#endif
 
 /* load the voice file into the mp3 buffer */
 static void load_voicefile(void)
@@ -125,6 +148,10 @@ static void load_voicefile(void)
     int load_size;
     int got_size;
     int file_size;
+#if CONFIG_HWCODEC == MASNONE    
+    int length, i;
+    unsigned char *buf, temp;
+#endif
 
     filehandle = open_voicefile();
     if (filehandle < 0) /* failed to open */
@@ -141,8 +168,20 @@ static void load_voicefile(void)
 #endif
 
     got_size = read(filehandle, audiobuf, load_size);
-    if (got_size == load_size /* success */
-        && ((struct voicefile*)audiobuf)->table /* format check */
+    if (got_size != load_size /* failure */)
+        goto load_err;
+            
+#ifdef SIMULATOR
+    logf("Byte swapping voice file");
+    p_voicefile = (struct voicefile*)audiobuf;
+    p_voicefile->version = BSWAP32(p_voicefile->version);
+    p_voicefile->table = BSWAP32(p_voicefile->table);
+    p_voicefile->id1_max = BSWAP32(p_voicefile->id1_max);
+    p_voicefile->id2_max = BSWAP32(p_voicefile->id2_max);
+    p_voicefile = NULL;
+#endif
+
+    if (((struct voicefile*)audiobuf)->table /* format check */
            == offsetof(struct voicefile, index))
     {
         p_voicefile = (struct voicefile*)audiobuf;
@@ -155,7 +194,42 @@ static void load_voicefile(void)
     else
        goto load_err;
 
-#ifdef HAVE_MMC 
+#ifdef SIMULATOR
+    for (i = 0; i < p_voicefile->id1_max + p_voicefile->id2_max; i++)
+    {
+        struct clip_entry *ce;
+        ce = &p_voicefile->index[i];
+        ce->offset = BSWAP32(ce->offset);
+        ce->size = BSWAP32(ce->size);
+    }
+#endif
+
+    /* Do a bitswap as necessary. */
+#if CONFIG_HWCODEC == MASNONE
+    logf("Bitswapping voice file.");
+    cpu_boost(true);
+    buf = (unsigned char *)(&p_voicefile->index) +
+        (p_voicefile->id1_max + p_voicefile->id2_max) * sizeof(struct clip_entry);
+    length = file_size - offsetof(struct voicefile, index) -
+               (p_voicefile->id1_max - p_voicefile->id2_max) * sizeof(struct clip_entry);
+               
+    for (i = 0; i < length; i++)
+    {
+        temp = buf[i];
+        buf[i] = ((temp >> 7) & 0x01)
+                | ((temp >> 5) & 0x02)
+                | ((temp >> 3) & 0x04)
+                | ((temp >> 1) & 0x08)
+                | ((temp << 1) & 0x10)
+                | ((temp << 3) & 0x20)
+                | ((temp << 5) & 0x40)
+                | ((temp << 7) & 0x80);
+    }
+    cpu_boost(false);
+    
+#endif
+
+#ifdef HAVE_MMC
     /* load the index table, now that we know its size from the header */
     load_size = (p_voicefile->id1_max + p_voicefile->id2_max)
                 * sizeof(struct clip_entry);
@@ -193,7 +267,11 @@ static void mp3_callback(unsigned char** start, int* size)
 
     if (queue[queue_read].len > 0) /* current clip not finished? */
     {   /* feed the next 64K-1 chunk */
+#if CONFIG_HWCODEC != MASNONE
         sent = MIN(queue[queue_read].len, 0xFFFF);
+#else
+        sent = queue[queue_read].len;
+#endif
         *start = queue[queue_read].buf;
         *size = sent;
         return;
@@ -207,7 +285,11 @@ re_check:
 
     if (QUEUE_LEVEL) /* queue is not empty? */
     {   /* start next clip */
+#if CONFIG_HWCODEC != MASNONE
         sent = MIN(queue[queue_read].len, 0xFFFF);
+#else
+        sent = queue[queue_read].len;
+#endif
         *start = p_lastclip = queue[queue_read].buf;
         *size = sent;
         curr_hd[0] = p_lastclip[1];
@@ -286,7 +368,7 @@ static int shutup(void)
     /* nothing to do, was frame boundary or not our clip */
     mp3_play_stop();
     queue_write = queue_read = 0; /* reset the queue */
-
+    
     return 0;
 }
 
@@ -317,7 +399,11 @@ static int queue_clip(unsigned char* buf, long size, bool enqueue)
     if (queue_level == 0)
     {   /* queue was empty, we have to do the initial start */
         p_lastclip = buf;
+#if CONFIG_HWCODEC != MASNONE
         sent = MIN(size, 0xFFFF); /* DMA can do no more */
+#else
+        sent = size;
+#endif
         mp3_play_data(buf, sent, mp3_callback);
         curr_hd[0] = buf[1];
         curr_hd[1] = buf[2];
@@ -400,12 +486,19 @@ void talk_init(void)
 #else
     filehandle = open_voicefile();
     has_voicefile = (filehandle >= 0); /* test if we can open it */
+    voicefile_size = 0;
+    
     if (has_voicefile)
     {
+        voicefile_size = filesize(filehandle);
+#if CONFIG_HWCODEC == MASNONE
+        voice_init();
+#endif
         close(filehandle); /* close again, this was just to detect presence */
         filehandle = -1;
     }
 #endif
+
 }
 
 
@@ -432,8 +525,10 @@ int talk_id(long id, bool enqueue)
     unsigned char* clipbuf;
     int unit;
 
+#if CONFIG_HWCODEC != MASNONE
     if (audio_status()) /* busy, buffer in use */
         return -1; 
+#endif
 
     if (p_voicefile == NULL && has_voicefile)
         load_voicefile(); /* reload needed */
@@ -514,8 +609,10 @@ int talk_number(long n, bool enqueue)
     int level = 0; /* mille count */
     long mil = 1000000000; /* highest possible "-illion" */
 
+#if CONFIG_HWCODEC != MASNONE
     if (audio_status()) /* busy, buffer in use */
         return -1; 
+#endif
 
     if (!enqueue)
         shutup(); /* cut off all the pending stuff */
@@ -593,8 +690,10 @@ int talk_value(long n, int unit, bool enqueue)
         VOICE_HERTZ,
     };
 
+#if CONFIG_HWCODEC != MASNONE
     if (audio_status()) /* busy, buffer in use */
         return -1; 
+#endif
 
     if (unit < 0 || unit >= UNIT_LAST)
         unit_id = -1;
@@ -625,8 +724,10 @@ int talk_spell(const char* spell, bool enqueue)
 {
     char c; /* currently processed char */
     
+#if CONFIG_HWCODEC != MASNONE
     if (audio_status()) /* busy, buffer in use */
         return -1; 
+#endif
 
     if (!enqueue)
         shutup(); /* cut off all the pending stuff */

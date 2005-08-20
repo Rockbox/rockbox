@@ -132,9 +132,12 @@ struct dither_data
     long random;
 };
 
-static struct dsp_config dsp IDATA_ATTR;
+static struct dsp_config dsp_conf[2] IDATA_ATTR;
 static struct dither_data dither_data[2] IDATA_ATTR;
-static struct resample_data resample_data[2] IDATA_ATTR;
+static struct resample_data resample_data[2][2] IDATA_ATTR;
+
+extern int current_codec;
+struct dsp_config *dsp;
 
 /* The internal format is 32-bit samples, non-interleaved, stereo. This
  * format is similar to the raw output from several codecs, so the amount
@@ -155,20 +158,20 @@ static int convert_to_internal(char* src[], int count, long* dst[])
 {
     count = MIN(SAMPLE_BUF_SIZE / 2, count);
 
-    if ((dsp.sample_depth <= NATIVE_DEPTH)
-        || (dsp.stereo_mode == STEREO_INTERLEAVED))
+    if ((dsp->sample_depth <= NATIVE_DEPTH)
+        || (dsp->stereo_mode == STEREO_INTERLEAVED))
     {
         dst[0] = &sample_buf[0];
-        dst[1] = (dsp.stereo_mode == STEREO_MONO)
+        dst[1] = (dsp->stereo_mode == STEREO_MONO)
             ? dst[0] : &sample_buf[SAMPLE_BUF_SIZE / 2];
     }
     else
     {
         dst[0] = (long*) src[0];
-        dst[1] = (long*) ((dsp.stereo_mode == STEREO_MONO) ? src[0] : src[1]);
+        dst[1] = (long*) ((dsp->stereo_mode == STEREO_MONO) ? src[0] : src[1]);
     }
 
-    if (dsp.sample_depth <= NATIVE_DEPTH)
+    if (dsp->sample_depth <= NATIVE_DEPTH)
     {
         short* s0 = (short*) src[0];
         long* d0 = dst[0];
@@ -176,7 +179,7 @@ static int convert_to_internal(char* src[], int count, long* dst[])
         int scale = WORD_SHIFT;
         int i;
 
-        if (dsp.stereo_mode == STEREO_INTERLEAVED)
+        if (dsp->stereo_mode == STEREO_INTERLEAVED)
         {
             for (i = 0; i < count; i++)
             {
@@ -184,7 +187,7 @@ static int convert_to_internal(char* src[], int count, long* dst[])
                 *d1++ = *s0++ << scale;
             }
         }
-        else if (dsp.stereo_mode == STEREO_NONINTERLEAVED)
+        else if (dsp->stereo_mode == STEREO_NONINTERLEAVED)
         {
             short* s1 = (short*) src[1];
 
@@ -202,7 +205,7 @@ static int convert_to_internal(char* src[], int count, long* dst[])
             }
         }
     }
-    else if (dsp.stereo_mode == STEREO_INTERLEAVED)
+    else if (dsp->stereo_mode == STEREO_INTERLEAVED)
     {
         long* s0 = (long*) src[0];
         long* d0 = dst[0];
@@ -216,18 +219,18 @@ static int convert_to_internal(char* src[], int count, long* dst[])
         }
     }
 
-    if (dsp.stereo_mode == STEREO_NONINTERLEAVED)
+    if (dsp->stereo_mode == STEREO_NONINTERLEAVED)
     {
-        src[0] += count * dsp.sample_bytes;
-        src[1] += count * dsp.sample_bytes;
+        src[0] += count * dsp->sample_bytes;
+        src[1] += count * dsp->sample_bytes;
     }
-    else if (dsp.stereo_mode == STEREO_INTERLEAVED)
+    else if (dsp->stereo_mode == STEREO_INTERLEAVED)
     {
-        src[0] += count * dsp.sample_bytes * 2;
+        src[0] += count * dsp->sample_bytes * 2;
     }
     else
     {
-        src[0] += count * dsp.sample_bytes;
+        src[0] += count * dsp->sample_bytes;
     }
 
     return count;
@@ -310,29 +313,33 @@ static inline int resample(long* src[], int count)
 {
     long new_count;
 
-    if (dsp.frequency != NATIVE_FREQUENCY)
+    if (dsp->frequency != NATIVE_FREQUENCY)
     {
         long* d0 = &resample_buf[0];
         /* Only process the second channel if needed. */
         long* d1 = (src[0] == src[1]) ? d0
             : &resample_buf[RESAMPLE_BUF_SIZE / 2];
 
-        if (dsp.frequency < NATIVE_FREQUENCY)
+        if (dsp->frequency < NATIVE_FREQUENCY)
         {
-            new_count = upsample(d0, src[0], count, &resample_data[0]);
+            new_count = upsample(d0, src[0], count,
+                            &resample_data[current_codec][0]);
 
             if (d0 != d1)
             {
-                upsample(d1, src[1], count, &resample_data[1]);
+                upsample(d1, src[1], count,
+                    &resample_data[current_codec][1]);
             }
         }
         else
         {
-            new_count = downsample(d0, src[0], count, &resample_data[0]);
+            new_count = downsample(d0, src[0], count,
+                            &resample_data[current_codec][0]);
 
             if (d0 != d1)
             {
-                downsample(d1, src[1], count, &resample_data[1]);
+                downsample(d1, src[1], count,
+                    &resample_data[current_codec][1]);
             }
         }
 
@@ -389,8 +396,8 @@ static long dither_sample(long sample, long bias, long mask,
 
     /* Clip and quantize */
 
-    min = dsp.clip_min;
-    max = dsp.clip_max;
+    min = dsp->clip_min;
+    max = dsp->clip_max;
     sample = clip_sample(sample, min, max);
     output = clip_sample(output, min, max) & ~mask;
 
@@ -407,13 +414,13 @@ static long dither_sample(long sample, long bias, long mask,
  */
 static void apply_gain(long* src[], int count)
 {
-    if (dsp.replaygain)
+    if (dsp->replaygain)
     {
         long* s0 = src[0];
         long* s1 = src[1];
         long* d0 = &sample_buf[0];
         long* d1 = (s0 == s1) ? d0 : &sample_buf[SAMPLE_BUF_SIZE / 2];
-        long gain = dsp.replaygain;
+        long gain = dsp->replaygain;
         long s;
         long i;
 
@@ -442,11 +449,11 @@ static void write_samples(short* dst, long* src[], int count)
 {
     long* s0 = src[0];
     long* s1 = src[1];
-    int scale = dsp.frac_bits + 1 - NATIVE_DEPTH;
+    int scale = dsp->frac_bits + 1 - NATIVE_DEPTH;
 
-    if (dsp.dither_enabled)
+    if (dsp->dither_enabled)
     {
-        long bias = (1L << (dsp.frac_bits - NATIVE_DEPTH));
+        long bias = (1L << (dsp->frac_bits - NATIVE_DEPTH));
         long mask = (1L << scale) - 1;
 
         while (count-- > 0)
@@ -459,8 +466,8 @@ static void write_samples(short* dst, long* src[], int count)
     }
     else
     {
-        long min = dsp.clip_min;
-        long max = dsp.clip_max;
+        long min = dsp->clip_min;
+        long max = dsp->clip_max;
 
         while (count-- > 0)
         {
@@ -482,10 +489,13 @@ long dsp_process(char* dst, char* src[], long size)
 {
     long* tmp[2];
     long written = 0;
-    long factor = (dsp.stereo_mode != STEREO_MONO) ? 2 : 1;
+    long factor;
     int samples;
 
-    size /= dsp.sample_bytes * factor;
+    dsp = &dsp_conf[current_codec];
+
+    factor = (dsp->stereo_mode != STEREO_MONO) ? 2 : 1;
+    size /= dsp->sample_bytes * factor;
     INIT();
     dsp_set_replaygain(false);
 
@@ -513,21 +523,23 @@ long dsp_process(char* dst, char* src[], long size)
 /* dsp_input_size MUST be called afterwards */
 long dsp_output_size(long size)
 {
-    if (dsp.sample_depth > NATIVE_DEPTH)
+    dsp = &dsp_conf[current_codec];
+    
+    if (dsp->sample_depth > NATIVE_DEPTH)
     {
         size /= 2;
     }
 
-    if (dsp.frequency != NATIVE_FREQUENCY)
+    if (dsp->frequency != NATIVE_FREQUENCY)
     {
         size = (long) ((((unsigned long) size * NATIVE_FREQUENCY)
-            + (dsp.frequency - 1)) / dsp.frequency);
+            + (dsp->frequency - 1)) / dsp->frequency);
     }
 
     /* round to the next multiple of 2 (these are shorts) */
     size = (size + 1) & ~1;
 
-    if (dsp.stereo_mode == STEREO_MONO)
+    if (dsp->stereo_mode == STEREO_MONO)
     {
         size *= 2;
     }
@@ -547,25 +559,28 @@ long dsp_output_size(long size)
  */
 long dsp_input_size(long size)
 {
+    dsp = &dsp_conf[current_codec];
+    
     /* convert to number of output stereo samples. */
     size /= 2;
 
     /* Mono means we need half input samples to fill the output buffer */
-    if (dsp.stereo_mode == STEREO_MONO)
+    if (dsp->stereo_mode == STEREO_MONO)
         size /= 2;
 
     /* size is now the number of resampled input samples. Convert to
        original input samples. */
-    if (dsp.frequency != NATIVE_FREQUENCY)
+    if (dsp->frequency != NATIVE_FREQUENCY)
     {
         /* Use the real resampling delta =
-         *  (unsigned long) dsp.frequency * 65536 / NATIVE_FREQUENCY, and
+         *  (unsigned long) dsp->frequency * 65536 / NATIVE_FREQUENCY, and
          * round towards zero to avoid buffer overflows. */
-        size = ((unsigned long)size * resample_data[0].delta) >> 16;
+        size = ((unsigned long)size *
+            resample_data[current_codec][0].delta) >> 16;
     }
 
     /* Convert back to bytes. */
-    if (dsp.sample_depth > NATIVE_DEPTH)
+    if (dsp->sample_depth > NATIVE_DEPTH)
         size *= 4;
     else
         size *= 2;
@@ -575,90 +590,96 @@ long dsp_input_size(long size)
 
 int dsp_stereo_mode(void)
 {
-    return dsp.stereo_mode;
+    dsp = &dsp_conf[current_codec];
+    
+    return dsp->stereo_mode;
 }
 
 bool dsp_configure(int setting, void *value)
 {
+    dsp = &dsp_conf[current_codec];
+
     switch (setting)
     {
     case DSP_SET_FREQUENCY:
-        memset(resample_data, 0, sizeof(resample_data));
+        memset(&resample_data[current_codec][0], 0,
+            sizeof(struct resample_data) * 2);
         /* Fall through!!! */
     case DSP_SWITCH_FREQUENCY:
-        dsp.frequency = ((int) value == 0) ? NATIVE_FREQUENCY : (int) value;
-        resample_data[0].delta = resample_data[1].delta =
-            (unsigned long) dsp.frequency * 65536 / NATIVE_FREQUENCY;
+        dsp->frequency = ((int) value == 0) ? NATIVE_FREQUENCY : (int) value;
+        resample_data[current_codec][0].delta =
+            resample_data[current_codec][1].delta =
+            (unsigned long) dsp->frequency * 65536 / NATIVE_FREQUENCY;
         break;
 
     case DSP_SET_CLIP_MIN:
-        dsp.clip_min = (long) value;
+        dsp->clip_min = (long) value;
         break;
 
     case DSP_SET_CLIP_MAX:
-        dsp.clip_max = (long) value;
+        dsp->clip_max = (long) value;
         break;
 
     case DSP_SET_SAMPLE_DEPTH:
-        dsp.sample_depth = (long) value;
+        dsp->sample_depth = (long) value;
 
-        if (dsp.sample_depth <= NATIVE_DEPTH)
+        if (dsp->sample_depth <= NATIVE_DEPTH)
         {
-            dsp.frac_bits = WORD_FRACBITS;
-            dsp.sample_bytes = sizeof(short);
-            dsp.clip_max =  ((1 << WORD_FRACBITS) - 1);
-            dsp.clip_min = -((1 << WORD_FRACBITS));
+            dsp->frac_bits = WORD_FRACBITS;
+            dsp->sample_bytes = sizeof(short);
+            dsp->clip_max =  ((1 << WORD_FRACBITS) - 1);
+            dsp->clip_min = -((1 << WORD_FRACBITS));
         }
         else
         {
-            dsp.frac_bits = (long) value;
-            dsp.sample_bytes = sizeof(long);
+            dsp->frac_bits = (long) value;
+            dsp->sample_bytes = sizeof(long);
         }
 
         break;
 
     case DSP_SET_STEREO_MODE:
-        dsp.stereo_mode = (long) value;
+        dsp->stereo_mode = (long) value;
         break;
 
     case DSP_RESET:
-        dsp.dither_enabled = false;
-        dsp.stereo_mode = STEREO_NONINTERLEAVED;
-        dsp.clip_max =  ((1 << WORD_FRACBITS) - 1);
-        dsp.clip_min = -((1 << WORD_FRACBITS));
-        dsp.track_gain = 0;
-        dsp.album_gain = 0;
-        dsp.track_peak = 0;
-        dsp.album_peak = 0;
-        dsp.frequency = NATIVE_FREQUENCY;
-        dsp.sample_depth = NATIVE_DEPTH;
-        dsp.frac_bits = WORD_FRACBITS;
-        dsp.new_gain = true;
+        dsp->dither_enabled = false;
+        dsp->stereo_mode = STEREO_NONINTERLEAVED;
+        dsp->clip_max =  ((1 << WORD_FRACBITS) - 1);
+        dsp->clip_min = -((1 << WORD_FRACBITS));
+        dsp->track_gain = 0;
+        dsp->album_gain = 0;
+        dsp->track_peak = 0;
+        dsp->album_peak = 0;
+        dsp->frequency = NATIVE_FREQUENCY;
+        dsp->sample_depth = NATIVE_DEPTH;
+        dsp->frac_bits = WORD_FRACBITS;
+        dsp->new_gain = true;
         break;
 
     case DSP_DITHER:
         memset(dither_data, 0, sizeof(dither_data));
-        dsp.dither_enabled = (bool) value;
+        dsp->dither_enabled = (bool) value;
         break;
 
     case DSP_SET_TRACK_GAIN:
-        dsp.track_gain = (long) value;
-        dsp.new_gain = true;
+        dsp->track_gain = (long) value;
+        dsp->new_gain = true;
         break;
 
     case DSP_SET_ALBUM_GAIN:
-        dsp.album_gain = (long) value;
-        dsp.new_gain = true;
+        dsp->album_gain = (long) value;
+        dsp->new_gain = true;
         break;
 
     case DSP_SET_TRACK_PEAK:
-        dsp.track_peak = (long) value;
-        dsp.new_gain = true;
+        dsp->track_peak = (long) value;
+        dsp->new_gain = true;
         break;
 
     case DSP_SET_ALBUM_PEAK:
-        dsp.album_peak = (long) value;
-        dsp.new_gain = true;
+        dsp->album_peak = (long) value;
+        dsp->new_gain = true;
         break;
 
     default:
@@ -670,11 +691,13 @@ bool dsp_configure(int setting, void *value)
 
 void dsp_set_replaygain(bool always)
 {
-    if (always || dsp.new_gain)
+    dsp = &dsp_conf[current_codec];
+    
+    if (always || dsp->new_gain)
     {
         long gain = 0;
 
-        dsp.new_gain = false;
+        dsp->new_gain = false;
 
         if (global_settings.replaygain || global_settings.replaygain_noclip)
         {
@@ -682,8 +705,8 @@ void dsp_set_replaygain(bool always)
 
             if (global_settings.replaygain)
             {
-                gain = (global_settings.replaygain_track || !dsp.album_gain)
-                    ? dsp.track_gain : dsp.album_gain;
+                gain = (global_settings.replaygain_track || !dsp->album_gain)
+                    ? dsp->track_gain : dsp->album_gain;
 
                 if (global_settings.replaygain_preamp)
                 {
@@ -694,8 +717,8 @@ void dsp_set_replaygain(bool always)
                 }
             }
 
-            peak = (global_settings.replaygain_track || !dsp.album_peak)
-                ? dsp.track_peak : dsp.album_peak;
+            peak = (global_settings.replaygain_track || !dsp->album_peak)
+                ? dsp->track_peak : dsp->album_peak;
 
             if (gain == 0)
             {
@@ -718,6 +741,6 @@ void dsp_set_replaygain(bool always)
         }
 
         /* Store in S8.23 format to simplify calculations. */
-        dsp.replaygain = gain >> 1;
+        dsp->replaygain = gain >> 1;
     }
 }

@@ -22,7 +22,7 @@ settings_menu.c
 sleeptimer.c
 sound_menu.c
 status.c
-#ifndef SIMULATOR
+#if !defined(SIMULATOR) || CONFIG_HWCODEC == MASNONE
 talk.c
 #endif
 tree.c

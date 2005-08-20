@@ -273,6 +273,7 @@ void button_set_flip(bool yesno)
     (void)yesno;
 }
 
+#if CONFIG_HWCODEC != MASNONE
 void talk_init(void)
 {
 }
@@ -320,6 +321,7 @@ int talk_spell(char* spell, bool enqueue)
 
 const char* const dir_thumbnail_name = "_dirname.talk";
 const char* const file_thumbnail_ext = ".talk";
+#endif
 
 /* FIXME: this shoudn't be a stub, rather the real thing.
    I'm afraid on Win32/X11 it'll be hard to kill a thread from outside. */

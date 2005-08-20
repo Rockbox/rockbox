@@ -34,6 +34,7 @@
 #include "buffer.h"
 #include "settings.h"
 #include "audio.h"
+#include "dsp.h"
 
 #define CHUNK_SIZE           PCMBUF_GUARD
 /* Must be a power of 2 */
@@ -86,9 +87,11 @@ struct pcmbufdesc
 volatile int pcmbuf_read_index;
 volatile int pcmbuf_write_index;
 int pcmbuf_unplayed_bytes;
+int pcmbuf_mix_used_bytes;
 int pcmbuf_watermark;
 void (*pcmbuf_watermark_event)(int bytes_left);
 static int last_chunksize;
+static long mixpos = 0;
 
 static void pcmbuf_boost(bool state)
 {
@@ -173,6 +176,7 @@ bool pcmbuf_add_chunk(void *addr, int size, void (*callback)(void))
         pcmbuffers[pcmbuf_write_index].callback = callback;
         pcmbuf_write_index = (pcmbuf_write_index+1) & NUM_PCM_BUFFERS_MASK;
         pcmbuf_unplayed_bytes += size;
+        pcmbuf_mix_used_bytes = MAX(0, pcmbuf_mix_used_bytes - size);
         return true;
     }
     else
@@ -254,6 +258,7 @@ void pcmbuf_play_stop(void)
     pcm_play_stop();
     last_chunksize = 0;
     pcmbuf_unplayed_bytes = 0;
+    pcmbuf_mix_used_bytes = 0;
     pcmbuf_read_index = 0;
     pcmbuf_write_index = 0;
     audiobuffer_pos = 0;
@@ -295,6 +300,13 @@ void pcmbuf_flush_audio(void)
     pcmbuf_boost(true);
     crossfade_mode = CFM_FLUSH;
     crossfade_init = true;
+}
+
+/* Force playback. */
+void pcmbuf_play_start(void)
+{
+    if (!pcm_is_playing() && pcmbuf_unplayed_bytes)
+        pcm_play_data(pcmbuf_callback);
 }
 
 void pcmbuf_flush_fillpos(void)
@@ -560,6 +572,98 @@ bool pcmbuf_insert_buffer(char *buf, long length)
     }
 
     return true;
+}
+
+/* Generates a constant square wave sound with a given frequency
+   in Hertz for a duration in milliseconds. */
+void pcmbuf_beep(int frequency, int duration, int amplitude)
+{
+    int state = 0, count = 0;
+    int interval = NATIVE_FREQUENCY / frequency;
+    int pos;
+    short *buf = (short *)audiobuffer;
+    int bufsize = pcmbuf_size / 2;
+    
+    /* FIXME: Should start playback. */
+    //if (pcmbuf_unplayed_bytes * 1000 < 4 * NATIVE_FREQUENCY * duration)
+    //    return ;
+
+    pos = (audiobuffer_pos - pcmbuf_unplayed_bytes) / 2;
+    if (pos < 0)
+        pos += bufsize;
+
+    duration = NATIVE_FREQUENCY / 1000 * duration;
+    while (duration-- > 0)
+    {
+        if (state) {
+            buf[pos] = MIN(MAX(buf[pos] + amplitude, -32768), 32767);
+            if (++pos >= bufsize)
+                pos = 0;
+            buf[pos] = MIN(MAX(buf[pos] + amplitude, -32768), 32767);
+        } else {
+            buf[pos] = MIN(MAX(buf[pos] - amplitude, -32768), 32767);
+            if (++pos >= bufsize)
+                pos = 0;
+            buf[pos] = MIN(MAX(buf[pos] - amplitude, -32768), 32767);
+        }
+        
+        if (++count >= interval)
+        {
+            count = 0;
+            if (state)
+                state = 0;
+            else
+                state = 1;
+        }
+        pos++;
+        if (pos >= bufsize)
+            pos = 0;
+    }
+}
+
+/* Returns pcm buffer usage in percents (0 to 100). */
+int pcmbuf_usage(void)
+{
+    return pcmbuf_unplayed_bytes * 100 / pcmbuf_size;
+}
+
+int pcmbuf_mix_usage(void)
+{
+    return pcmbuf_mix_used_bytes * 100 / pcmbuf_unplayed_bytes;
+}
+
+void pcmbuf_reset_mixpos(void)
+{
+    int bufsize = pcmbuf_size / 2;
+
+    pcmbuf_mix_used_bytes = 0;
+    mixpos = (audiobuffer_pos - pcmbuf_unplayed_bytes) / 2;
+    if (mixpos < 0)
+        mixpos += bufsize;
+    if (mixpos >= bufsize)
+        mixpos -= bufsize;
+}
+
+void pcmbuf_mix(char *buf, long length)
+{
+    short *ibuf = (short *)buf;
+    short *obuf = (short *)audiobuffer;
+    int bufsize = pcmbuf_size / 2;
+
+    if (pcmbuf_mix_used_bytes == 0)
+        pcmbuf_reset_mixpos();
+    
+    pcmbuf_mix_used_bytes += length;
+    length /= 2;
+
+    while (length-- > 0) {
+        obuf[mixpos] = MIN(MAX(obuf[mixpos] + *ibuf*4, -32768), 32767);
+        
+        ibuf++;
+        mixpos++;
+        if (mixpos >= bufsize)
+            mixpos = 0;
+    }
 }
 
 void pcmbuf_crossfade_enable(bool on_off)

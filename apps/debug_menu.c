@@ -208,8 +208,8 @@ bool dbg_audio_thread(void)
 }
 #else
 extern size_t audiobuffer_free;
-extern int codecbuflen;
-extern int codecbufused;
+extern int filebuflen;
+extern int filebufused;
 extern int track_count;
 
 static int ticks, boost_ticks;
@@ -260,12 +260,12 @@ bool dbg_audio_thread(void)
                   bufsize-audiobuffer_free, HORIZONTAL);
         line++;
 
-        snprintf(buf, sizeof(buf), "codec: %d/%d", codecbufused, codecbuflen);
+        snprintf(buf, sizeof(buf), "codec: %d/%d", filebufused, filebuflen);
         lcd_puts(0, line++, buf);
 
         /* Playable space left */
-        scrollbar(0, line*8, LCD_WIDTH, 6, codecbuflen, 0,
-                  codecbufused, HORIZONTAL);
+        scrollbar(0, line*8, LCD_WIDTH, 6, filebuflen, 0,
+                  filebufused, HORIZONTAL);
         line++;
 
         snprintf(buf, sizeof(buf), "track count: %d", track_count);

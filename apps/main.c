@@ -129,6 +129,9 @@ void init(void)
               global_settings.mdb_enable,
               global_settings.superbass);
     button_clear_queue(); /* Empty the keyboard buffer */
+#if CONFIG_HWCODEC == MASNONE
+    talk_init();
+#endif
 }
 
 #else

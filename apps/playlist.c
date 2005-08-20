@@ -1413,9 +1413,14 @@ int playlist_resume(void)
     };
 
     /* use mp3 buffer for maximum load speed */
+#if CONFIG_HWCODEC != MASNONE
     talk_buffer_steal(); /* we use the mp3 buffer, need to tell */
     buflen = (audiobufend - audiobuf);
     buffer = audiobuf;
+#else
+    buflen = (audiobufend - audiobuf - talk_get_bufsize());
+    buffer = &audiobuf[talk_get_bufsize()];
+#endif
 
     empty_playlist(playlist, true);
 
@@ -1827,7 +1832,9 @@ int playlist_start(int start_index, int offset)
     struct playlist_info* playlist = &current_playlist;
 
     playlist->index = start_index;
+#if CONFIG_HWCODEC != MASNONE
     talk_buffer_steal(); /* will use the mp3 buffer */
+#endif
     audio_play(offset);
 
     return 0;

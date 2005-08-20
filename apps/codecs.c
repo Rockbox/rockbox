@@ -54,7 +54,7 @@
 
 #ifdef SIMULATOR
 #if CONFIG_HWCODEC == MASNONE
-static unsigned char codecbuf[CODEC_SIZE];
+unsigned char codecbuf[CODEC_SIZE];
 #endif
 void *sim_codec_load_ram(char* codecptr, int size,
         void* ptr2, int bufwrap, int *pd);
@@ -67,6 +67,8 @@ extern unsigned char codecbuf[];
 extern void* plugin_get_audio_buffer(int *buffer_size);
 
 static int codec_test(int api_version, int model, int memsize);
+
+struct codec_api ci_voice;
 
 struct codec_api ci = {
     CODEC_API_VERSION,
@@ -247,7 +249,8 @@ struct codec_api ci = {
     NULL,
 };
 
-int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap)
+int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,
+                   struct codec_api *api)
 {
     enum codec_status (*codec_start)(const struct codec_api* api);
     int status;
@@ -277,7 +280,7 @@ int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap)
 #endif /* SIMULATOR */
 
     invalidate_icache();
-    status = codec_start(&ci);
+    status = codec_start(api);
 #ifdef SIMULATOR
     sim_codec_close(pd);
 #endif
@@ -285,7 +288,7 @@ int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap)
     return status;
 }
 
-int codec_load_file(const char *plugin)
+int codec_load_file(const char *plugin, struct codec_api *api)
 {
     char msgbuf[80];
     int fd;
@@ -309,7 +312,7 @@ int codec_load_file(const char *plugin)
         return CODEC_ERROR;
     }
 
-    return codec_load_ram(codecbuf, (size_t)rc, NULL, 0);
+    return codec_load_ram(codecbuf, (size_t)rc, NULL, 0, api);
 }
 
 static int codec_test(int api_version, int model, int memsize)

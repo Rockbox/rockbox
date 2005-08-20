@@ -704,10 +704,3 @@ int sound_get_pitch(void)
 }
 #endif
 
-#if CONFIG_HWCODEC == MASNONE
-bool mp3_is_playing(void)
-{
-    /* a dummy */
-    return false;
-}
-#endif

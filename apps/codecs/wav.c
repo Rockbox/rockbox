@@ -71,15 +71,12 @@ enum codec_status codec_start(struct codec_api* api)
     return CODEC_ERROR;
   }
 
-  while (!rb->taginfo_ready)
+  while (!*rb->taginfo_ready)
       rb->yield();
-    
-  if (rb->id3->frequency != NATIVE_FREQUENCY) {
-      rb->configure(DSP_SET_FREQUENCY, (long *)(rb->id3->frequency));
-      rb->configure(CODEC_DSP_ENABLE, (bool *)true);
-  } else {
-      rb->configure(CODEC_DSP_ENABLE, (bool *)false);
-  }
+
+  /* Always enable DSP to support voice ui. */
+  rb->configure(CODEC_DSP_ENABLE, (bool *)true);
+  rb->configure(DSP_SET_FREQUENCY, (long *)(rb->id3->frequency));
     
   /* FIX: Correctly parse WAV header - we assume canonical 44-byte header */
 
