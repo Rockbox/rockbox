@@ -11,6 +11,7 @@ rockbox_flash.c
 search.c
 snow.c
 sort.c
+stats.c
 stopwatch.c
 vbrfix.c
 viewer.c
