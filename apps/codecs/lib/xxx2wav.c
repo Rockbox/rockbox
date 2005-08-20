@@ -37,6 +37,9 @@ void* codec_malloc(size_t size)
 {
     void* x;
 
+    if (mem_ptr + size > bufsize)
+        return NULL;
+    
     x=&mallocbuf[mem_ptr];
     mem_ptr+=(size+3)&~3; /* Keep memory 32-bit aligned */
 
@@ -47,6 +50,8 @@ void* codec_calloc(size_t nmemb, size_t size)
 {
     void* x;
     x = codec_malloc(nmemb*size);
+    if (x == NULL)
+        return NULL;
     local_rb->memset(x,0,nmemb*size);
     return(x);
 }

@@ -335,6 +335,7 @@ struct user_settings
     bool replaygain_track;  /* true for track gain, false for album gain */
     bool replaygain_noclip; /* scale to prevent clips */
     int  replaygain_preamp; /* scale replaygained tracks by this */
+    int  beep;              /* system beep volume when changing tracks etc. */
 #endif
 };
 

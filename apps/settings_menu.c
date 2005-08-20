@@ -1269,6 +1269,21 @@ static bool replaygain_settings_menu(void)
     menu_exit(m);
     return result;
 }
+
+static bool beep(void)
+{
+    static const struct opt_items names[] = {
+        { STR(LANG_OFF) },
+        { STR(LANG_WEAK) },
+        { STR(LANG_MODERATE) },
+        { STR(LANG_STRONG) },
+    };
+    bool ret;
+    ret=set_option( str(LANG_BEEP),
+                    &global_settings.beep, INT, names, 4, NULL);
+        
+    return ret;
+}
 #endif
 
 static bool playback_settings_menu(void)
@@ -1288,6 +1303,7 @@ static bool playback_settings_menu(void)
         { ID2P(LANG_CROSSFADE), crossfade },
         { ID2P(LANG_CROSSFADE_DURATION), crossfade_duration },
         { ID2P(LANG_REPLAYGAIN), replaygain_settings_menu },
+        { ID2P(LANG_BEEP), beep },
 #endif
 #ifdef HAVE_SPDIF_POWER
         { ID2P(LANG_SPDIF_ENABLE), spdif },

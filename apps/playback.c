@@ -1654,13 +1654,15 @@ void audio_thread(void)
             
             case AUDIO_NEXT:
                 logf("audio_next");
-                pcmbuf_beep(5000, 100, 5000);
+                if (global_settings.beep)
+                    pcmbuf_beep(5000, 100, 2500*global_settings.beep);
                 initiate_track_change(1);
                 break ;
                 
             case AUDIO_PREV:
                 logf("audio_prev");
-                pcmbuf_beep(5000, 100, 5000);
+                if (global_settings.beep)
+                    pcmbuf_beep(5000, 100, 2500*global_settings.beep);
                 initiate_track_change(-1);
                 break;
                 

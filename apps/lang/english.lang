@@ -3262,3 +3262,27 @@ desc: in browse_id3
 eng: " (VBR)"
 voice ""
 new:
+
+id: LANG_BEEP
+desc: in playback settings
+eng: "Beep volume"
+voice "Beep volume"
+new:
+
+id: LANG_WEAK
+desc: in beep volume in playback settings
+eng: "Weak"
+voice "Weak"
+new:
+
+id: LANG_MODERATE
+desc: in beep volume in playback settings
+eng: "Moderate"
+voice "Moderate"
+new:
+
+id: LANG_STRONG
+desc: in beep volume in playback settings
+eng: "Strong"
+voice "Strong"
+new:

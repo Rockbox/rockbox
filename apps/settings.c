@@ -432,6 +432,7 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(replaygain_track), false, "replaygain type", "track,album" },
     {1, S_O(replaygain_noclip), false, "replaygain noclip", off_on },
     {8 | SIGNED, S_O(replaygain_preamp), 0, "replaygain preamp", NULL },
+    {2, S_O(beep), 0, "off,weak,moderate,strong", NULL },
 #endif
     
     /* If values are just added to the end, no need to bump the version. */
