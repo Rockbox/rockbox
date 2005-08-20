@@ -641,7 +641,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
      * We must have at least minframesize bytes left for the 
      * remaining frames to be interesting 
      */
-    while(size >= minframesize ) {
+    while (size >= minframesize && bufferpos < buffersize - 1) {
         flags = 0;
         
         /* Read frame header and check length */
