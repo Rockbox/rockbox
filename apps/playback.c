@@ -1454,7 +1454,9 @@ bool codec_request_next_track_callback(void)
 {
     if (current_codec == CODEC_IDX_VOICE) {
         voice_remaining = 0;
-        return !ci_voice.stop_codec;
+        /* Terminate the codec if they are messages waiting on the queue or
+           core has been requested the codec to be terminated. */
+        return !ci_voice.stop_codec && queue_empty(&voice_codec_queue);
     }
         
     if (ci.stop_codec || !playing)
@@ -1679,7 +1681,7 @@ void audio_thread(void)
 
 #ifndef SIMULATOR                
             case SYS_USB_CONNECTED:
-                logf("USB Connection");
+                logf("USB: Audio core");
                 audio_stop_playback();
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 usb_wait_for_disconnect(&audio_queue);
@@ -1737,6 +1739,12 @@ void codec_thread(void)
 
 #ifndef SIMULATOR                
             case SYS_USB_CONNECTED:
+                while (voice_codec_loaded) {
+                    if (current_codec != CODEC_IDX_VOICE)
+                        swap_codec();
+                    sleep(1);
+                }
+                logf("USB: Audio codec");
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 usb_wait_for_disconnect(&codec_queue);
                 break ;
@@ -1816,6 +1824,7 @@ void voice_codec_thread(void)
 
 #ifndef SIMULATOR                
             case SYS_USB_CONNECTED:
+                logf("USB: Voice codec");
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 usb_wait_for_disconnect(&voice_codec_queue);
                 break ;
