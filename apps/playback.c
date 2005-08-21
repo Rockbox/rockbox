@@ -1799,6 +1799,7 @@ void voice_codec_thread(void)
     voice_codec_loaded = false;
     while (1) {
         status = 0;
+        voice_is_playing = false;
         queue_wait(&voice_codec_queue, &ev);
         switch (ev.id) {
             case CODEC_LOAD_DISK:
