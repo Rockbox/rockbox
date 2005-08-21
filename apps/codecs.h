@@ -79,7 +79,7 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 40
+#define CODEC_API_VERSION 41
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -327,6 +327,8 @@ struct codec_api {
 
     void *(*memchr)(const void *s1, int c, size_t n);
     void (*set_offset)(unsigned int value);
+    /* Codec should call this function when it has done the seeking. */
+    void (*seek_complete)(void);
 };
 
 /* defined by the codec loader (codec.c) */

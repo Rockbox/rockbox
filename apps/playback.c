@@ -539,7 +539,6 @@ static bool rebuffer_and_seek(int newpos)
     ci.curpos = newpos;
     cur_ti->available = 0;
     lseek(current_fd, newpos, SEEK_SET);
-    pcmbuf_flush_audio();
         
     mutex_unlock(&mutex_bufferfill);
 
@@ -602,6 +601,11 @@ off_t codec_mp3_get_filepos_callback(int newtime)
     return newpos;
 }
 
+void codec_seek_complete_callback(void)
+{
+    pcmbuf_flush_audio();
+}
+
 bool codec_seek_buffer_callback(off_t newpos)
 {
     int difference;
@@ -620,8 +624,6 @@ bool codec_seek_buffer_callback(off_t newpos)
     if (difference >= 0) {
         logf("seek: +%d", difference);
         codec_advance_buffer_callback(difference);
-        if (!pcmbuf_is_crossfade_active())
-            pcmbuf_play_stop();
         return true;
     }
 
@@ -642,8 +644,6 @@ bool codec_seek_buffer_callback(off_t newpos)
     if (buf_ridx < 0)
         buf_ridx = filebuflen + buf_ridx;
     ci.curpos -= difference;
-    if (!pcmbuf_is_crossfade_active())
-        pcmbuf_play_stop();
     
     return true;
 }
@@ -1939,8 +1939,8 @@ void audio_ff_rewind(int newpos)
 {
     logf("rewind: %d", newpos);
     if (playing) {
-        ci.seek_time = newpos+1;
         pcmbuf_play_stop();
+        ci.seek_time = newpos+1;
         paused = false;
     }
 }
@@ -2215,6 +2215,7 @@ void audio_init(void)
     ci.request_next_track = codec_request_next_track_callback;
     ci.mp3_get_filepos = codec_mp3_get_filepos_callback;
     ci.seek_buffer = codec_seek_buffer_callback;
+    ci.seek_complete = codec_seek_complete_callback;
     ci.set_elapsed = codec_set_elapsed_callback;
     ci.set_offset = codec_set_offset_callback;
     ci.configure = codec_configure_callback;

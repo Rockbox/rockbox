@@ -177,7 +177,10 @@ enum codec_status codec_start(struct codec_api* api)
                 goto next_track;
             }
             ci->seek_time = 0;
-            if (newpos == 0) frame_skip = start_skip;
+            if (newpos == 0)
+                frame_skip = start_skip;
+            /* Optional but good thing to do. */
+            ci->seek_complete();
         }
 
         /* Lock buffers */

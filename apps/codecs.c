@@ -247,6 +247,7 @@ struct codec_api ci = {
 
     memchr,
     NULL,
+    NULL,
 };
 
 int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,
