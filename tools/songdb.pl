@@ -17,6 +17,7 @@ my $verbose;
 my $help;
 my $dirisalbum;
 my $dirisalbumname;
+my $crc = 1;
 
 while($ARGV[0]) {
     if($ARGV[0] eq "--db") {
@@ -41,6 +42,10 @@ while($ARGV[0]) {
     }				
     elsif($ARGV[0] eq "--verbose") {
         $verbose = 1;
+        shift @ARGV;
+    }
+    elsif($ARGV[0] eq "--nocrc") {
+        $crc = 0;
         shift @ARGV;
     }
     elsif($ARGV[0] eq "--dirisalbum") {
@@ -87,6 +92,9 @@ Options:
   --db <file>   What to call the output file. Defaults to rockbox.tagdb
   --strip <path> Removes this string from the left of all file names
   --add <path>  Adds this string to the left of all file names
+  --nocrc       Disables the CRC32 checksums. It makes the output database not
+                suitable for runtimedb but it makes this script run much
+                faster.
   --verbose     Shows more details while working
   --help        This text  
 MOO
@@ -181,6 +189,10 @@ sub crc32 {
     my ($filename, $index) = @_;
 
     my $len = 32*1024;
+
+    if(!$crc) {
+        return 1; # fixed bad CRC when disabled!
+    }
 
     if(!open(FILE, "<$filename")) {
         print "failed to open \"$filename\" $!\n";
