@@ -78,7 +78,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "pcm_playback.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 24
+#define CONFIG_BLOCK_VERSION 25
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -205,7 +205,7 @@ static const struct bit_entry rtc_bits[] =
     {16 | SIGNED, S_O(resume_first_index), 0, NULL, NULL },
     {32 | SIGNED, S_O(resume_offset), -1, NULL, NULL },
     {32 | SIGNED, S_O(resume_seed), -1, NULL, NULL },
-    {2, S_O(repeat_mode), REPEAT_ALL, "repeat", "off,all,one,shuffle" },
+    {3, S_O(repeat_mode), REPEAT_ALL, "repeat", "off,all,one,shuffle,ab" },
     /* LCD */
     {6, S_O(contrast), 40, "contrast", NULL },
 #ifdef CONFIG_BACKLIGHT

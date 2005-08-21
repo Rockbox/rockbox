@@ -47,6 +47,7 @@
 #include "sprintf.h"
 #include "talk.h"
 #include "misc.h"
+#include "abrepeat.h"
 
 #define MAX_BOOKMARKS 10
 #define MAX_BOOKMARK_SIZE  350
@@ -778,6 +779,12 @@ static void display_bookmark(const char* bookmark,
     /* bookmark shuffle and repeat states*/
     switch (repeat_mode)
     {
+#ifdef AB_REPEAT_ENABLE
+        case REPEAT_AB:
+            statusbar_icon_play_mode(Icon_RepeatAB);
+            break;
+#endif
+
         case REPEAT_ONE:
             statusbar_icon_play_mode(Icon_RepeatOne);
             break;

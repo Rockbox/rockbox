@@ -79,4 +79,44 @@ int audio_get_file_pos(void);
 void audio_beep(int duration);
 void audio_init_playback(void);
 
+/***********************************************************************/
+/* audio event handling */
+
+/* subscribe to one or more audio event(s) by OR'ing together the desired */
+/* event IDs (defined below); a handler is called with a solitary event ID */
+/* (so switch() is okay) and possibly some useful data (depending on the */
+/* event); a handler must return one of the return codes defined below */
+
+typedef int (*AUDIO_EVENT_HANDLER)(unsigned short event, unsigned long data);
+
+void audio_register_event_handler(AUDIO_EVENT_HANDLER handler, unsigned short mask);
+
+/***********************************************************************/
+/* handler return codes */
+
+#define AUDIO_EVENT_RC_IGNORED      200 
+    /* indicates that no action was taken or the event was not recognized */
+
+#define AUDIO_EVENT_RC_HANDLED      201 
+    /* indicates that the event was handled and some action was taken which renders 
+    the original event invalid; USE WITH CARE!; this return code aborts all further 
+    processing of the given event */
+
+/***********************************************************************/
+/* audio event IDs */
+
+#define AUDIO_EVENT_POS_REPORT      (1<<0)  
+    /* sends a periodic song position report to handlers; a report is sent on
+    each kernal tick; the number of ticks per second is defined by HZ; on each 
+    report the current song position is passed in 'data'; if a handler takes an 
+    action that changes the song or the song position it must return 
+    AUDIO_EVENT_RC_HANDLED which suppresses the event for any remaining handlers */
+
+#define AUDIO_EVENT_END_OF_TRACK    (1<<1) 
+    /* generated when the end of the currently playing track is reached; no
+    data is passed; if the handler implements some alternate end-of-track
+    processing it should return AUDIO_EVENT_RC_HANDLED which suppresses the
+    event for any remaining handlers as well as the normal end-of-track 
+    processing */
+
 #endif

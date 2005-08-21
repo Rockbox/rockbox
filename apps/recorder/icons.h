@@ -58,6 +58,7 @@ enum icons_7x8 {
     Icon_Shuffle,
     Icon_DownArrow,
     Icon_UpArrow,
+    Icon_RepeatAB,
     Icon_Last
 };
 

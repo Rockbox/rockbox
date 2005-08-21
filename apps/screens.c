@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Björn Stenberg
+ * Copyright (C) 2002 Bjï¿½n Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -45,6 +45,7 @@
 #include "debug.h"
 #include "led.h"
 #include "sound.h"
+#include "abrepeat.h"
 #include "wps-display.h"
 #if defined(HAVE_LCD_BITMAP)
 #include "widgets.h"
@@ -593,6 +594,12 @@ bool quick_screen(int context, int button)
                     case REPEAT_SHUFFLE:
                         ptr = str(LANG_SHUFFLE);
                         break;
+
+#ifdef AB_REPEAT_ENABLE
+                    case REPEAT_AB:
+                        ptr = str(LANG_REPEAT_AB);
+                        break;
+#endif
                 }
 
                 lcd_getstringsize(str(LANG_REPEAT),&w,&h);

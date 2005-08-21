@@ -2,6 +2,7 @@
 logfdisp.c
 #endif
 alarm_menu.c
+abrepeat.c
 bookmark.c
 credits.c
 debug_menu.c

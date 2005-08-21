@@ -3286,3 +3286,9 @@ desc: in beep volume in playback settings
 eng: "Strong"
 voice "Strong"
 new:
+
+id: LANG_REPEAT_AB
+desc: repeat one song
+eng: "A-B"
+voice: "A-B"
+new:

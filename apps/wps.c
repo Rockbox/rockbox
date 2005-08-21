@@ -51,6 +51,7 @@
 #include "misc.h"
 #include "sound.h"
 #include "onplay.h"
+#include "abrepeat.h"
 
 #define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
                                 /* 3% of 30min file == 54s step size */
@@ -347,6 +348,11 @@ long wps_show(void)
         lcd_setmargins(0, 0);
 #endif
 
+#ifdef AB_REPEAT_ENABLE
+    ab_repeat_init();
+    ab_reset_markers();
+#endif
+
     ff_rewind = false;
 
     if(audio_status() & AUDIO_STATUS_PLAY)
@@ -585,6 +591,19 @@ long wps_show(void)
                     break;
 #endif
 #endif
+
+#ifdef AB_REPEAT_ENABLE
+                /* if we're in A/B repeat mode and the current position
+                   is past the A marker, jump back to the A marker... */
+                if ( ab_repeat_mode_enabled() && ab_after_A_marker(id3->elapsed) )
+                {
+                    ab_jump_to_A_marker();
+                    update_track = true;
+                    break;
+                }
+                /* ...otherwise, do it normally */
+#endif
+
                 if (!id3 || (id3->elapsed < 3*1000)) {
                     audio_prev();
                 }
@@ -612,6 +631,19 @@ long wps_show(void)
                     break;
 #endif
 #endif
+
+#ifdef AB_REPEAT_ENABLE
+                /* if we're in A/B repeat mode and the current position is
+                   before the A marker, jump to the A marker... */
+                if ( ab_repeat_mode_enabled() && ab_before_A_marker(id3->elapsed) )
+                {
+                    ab_jump_to_A_marker();
+                    update_track = true;
+                    break;
+                }
+                /* ...otherwise, do it normally */
+#endif
+
                 audio_next();
                 break;
 
@@ -674,13 +706,49 @@ long wps_show(void)
 
                 /* pitch screen */
 #if CONFIG_KEYPAD == RECORDER_PAD
-            case BUTTON_ON | BUTTON_REPEAT:
+            case BUTTON_ON | BUTTON_UP:
+            case BUTTON_ON | BUTTON_DOWN:
                 if (2 == pitch_screen())
                     return SYS_USB_CONNECTED;
                 restore = true;
                 break;
 #endif
 #endif
+
+#ifdef AB_REPEAT_ENABLE
+
+#ifdef WPS_AB_SET_A_MARKER
+            /* set A marker for A-B repeat */
+            case WPS_AB_SET_A_MARKER:
+                if (ab_repeat_mode_enabled())
+                    ab_set_A_marker(id3->elapsed);
+                break;
+#endif
+
+#ifdef WPS_AB_SET_B_MARKER
+            /* set B marker for A-B repeat and jump to A */
+            case WPS_AB_SET_B_MARKER:
+                if (ab_repeat_mode_enabled())
+                {
+                    ab_set_B_marker(id3->elapsed);
+                    ab_jump_to_A_marker();
+                    update_track = true;
+                }
+                break;
+#endif
+
+#ifdef WPS_AB_RESET_AB_MARKERS
+            /* reset A&B markers */
+            case WPS_AB_RESET_AB_MARKERS:
+                if (ab_repeat_mode_enabled())
+                {
+                    ab_reset_markers();
+                    update_track = true;
+                }
+                break;
+#endif
+
+#endif /* AB_REPEAT_ENABLE */
 
                 /* stop and exit wps */
 #ifdef WPS_EXIT
@@ -706,6 +774,7 @@ long wps_show(void)
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
                     return SYS_USB_CONNECTED;
+                update_track = true;
                 break;
         }
 
@@ -734,6 +803,9 @@ long wps_show(void)
             lcd_stop_scroll();
             bookmark_autobookmark();
             audio_stop();
+#ifdef AB_REPEAT_ENABLE
+            ab_reset_markers();
+#endif
 
             /* Keys can be locked when exiting, so either unlock here
                or implement key locking in tree.c too */

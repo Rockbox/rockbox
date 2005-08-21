@@ -85,6 +85,7 @@
 #include "misc.h"
 #include "button.h"
 #include "filetree.h"
+#include "abrepeat.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "widgets.h"
@@ -867,6 +868,9 @@ static int get_next_index(const struct playlist_info* playlist, int steps,
         }
 
         case REPEAT_ONE:
+#ifdef AB_REPEAT_ENABLE
+        case REPEAT_AB:
+#endif
             next_index = current_index;
             break;
 
@@ -1916,7 +1920,11 @@ int playlist_next(int steps)
     struct playlist_info* playlist = &current_playlist;
     int index;
 
-    if (steps > 0 && global_settings.repeat_mode != REPEAT_ONE)
+    if ( (steps > 0)
+#ifdef AB_REPEAT_ENABLE
+    && (global_settings.repeat_mode != REPEAT_AB)
+#endif
+    && (global_settings.repeat_mode != REPEAT_ONE) )
     {
         int i, j;
 

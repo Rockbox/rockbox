@@ -280,6 +280,52 @@ static struct trackdata *get_trackdata(int offset)
 }
 #endif /* !SIMULATOR */
 
+/***********************************************************************/
+/* audio event handling */
+
+#define MAX_EVENT_HANDLERS 10
+struct event_handlers_table
+{
+    AUDIO_EVENT_HANDLER handler;
+    unsigned short mask;
+};
+static struct event_handlers_table event_handlers[MAX_EVENT_HANDLERS];
+static int event_handlers_count = 0;
+
+void audio_register_event_handler(AUDIO_EVENT_HANDLER handler, unsigned short mask)
+{
+    if (event_handlers_count < MAX_EVENT_HANDLERS)
+    {
+        event_handlers[event_handlers_count].handler = handler;
+        event_handlers[event_handlers_count].mask = mask;
+        event_handlers_count++;
+    }
+}
+
+/* dispatch calls each handler in the order registered and returns after some
+   handler actually handles the event (the event is assumed to no longer be valid
+   after this, due to the handler changing some condition); returns true if someone
+   handled the event, which is expected to cause the caller to skip its own handling
+   of the event */
+#ifndef SIMULATOR
+static bool audio_dispatch_event(unsigned short event, unsigned long data)
+{
+    int i = 0;
+    for(i=0; i < event_handlers_count; i++)
+    {
+        if ( event_handlers[i].mask & event )
+        {
+            int rc = event_handlers[i].handler(event, data);
+            if ( rc == AUDIO_EVENT_RC_HANDLED )
+                return true;
+        }
+    }
+    return false;
+}
+#endif
+
+/***********************************************************************/
+
 static void set_elapsed(struct mp3entry* id3)
 {
     if ( id3->vbr ) {
@@ -730,9 +776,10 @@ void rec_tick(void)
 
 void playback_tick(void)
 {
-    get_trackdata(0)->id3.elapsed +=
-        (current_tick - last_dma_tick) * 1000 / HZ;
+    struct trackdata *ptd = get_trackdata(0);
+    ptd->id3.elapsed += (current_tick - last_dma_tick) * 1000 / HZ;
     last_dma_tick = current_tick;
+    audio_dispatch_event(AUDIO_EVENT_POS_REPORT, (unsigned long)ptd->id3.elapsed);
 }
 
 static void reset_mp3_buffer(void)
@@ -762,8 +809,11 @@ static void transfer_end(unsigned char** ppbuf, int* psize)
         {
             if (audiobuf_read == get_trackdata(track_offset)->mempos)
             {
-                queue_post(&mpeg_queue, MPEG_TRACK_CHANGE, 0);
-                track_offset++;
+                if ( ! audio_dispatch_event(AUDIO_EVENT_END_OF_TRACK, 0) )
+                {
+                    queue_post(&mpeg_queue, MPEG_TRACK_CHANGE, 0);
+                    track_offset++;
+                }
             }
         }
         
@@ -823,10 +873,12 @@ static void transfer_end(unsigned char** ppbuf, int* psize)
             }
             else
             {
-                DEBUGF("No more MP3 data. Stopping.\n");
-
-                queue_post(&mpeg_queue, MPEG_TRACK_CHANGE, 0);
-                playing = false;
+                if ( ! audio_dispatch_event(AUDIO_EVENT_END_OF_TRACK, 0) )
+                {
+                    DEBUGF("No more MP3 data. Stopping.\n");
+                    queue_post(&mpeg_queue, MPEG_TRACK_CHANGE, 0);
+                    playing = false;
+                }
             }
             *psize = 0; /* no more transfer */
         }

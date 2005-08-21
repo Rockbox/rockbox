@@ -21,6 +21,8 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x8000
 
+#define AB_REPEAT_ENABLE 1
+
 #ifndef SIMULATOR
 
 /* Define this if you have a SH7034 */

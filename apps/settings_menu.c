@@ -46,6 +46,7 @@
 #include "talk.h"
 #include "timefuncs.h"
 #include "misc.h"
+#include "abrepeat.h"
 #include "power.h"
 #include "database.h"
 
@@ -604,11 +605,14 @@ static bool repeat_mode(void)
         { STR(LANG_REPEAT_ALL) },
         { STR(LANG_REPEAT_ONE) },
         { STR(LANG_SHUFFLE) },
+#ifdef AB_REPEAT_ENABLE
+        { STR(LANG_REPEAT_AB) }
+#endif
     };
     int old_repeat = global_settings.repeat_mode;
 
     result = set_option( str(LANG_REPEAT), &global_settings.repeat_mode,
-                         INT, names, 4, NULL );
+                         INT, names, NUM_REPEAT_MODES, NULL );
 
     if (old_repeat != global_settings.repeat_mode &&
         (audio_status() & AUDIO_STATUS_PLAY))

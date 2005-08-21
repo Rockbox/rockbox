@@ -24,6 +24,8 @@
 /* Define this if you have an FM Radio */
 #define CONFIG_TUNER S1A0903X01
 
+#define AB_REPEAT_ENABLE 1
+
 #ifndef SIMULATOR
 
 /* Define this if you have a MAS3587F */

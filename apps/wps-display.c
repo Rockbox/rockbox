@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Björn Stenberg
+ * Copyright (C) 2002 Bjï¿½n Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -44,6 +44,7 @@
 #include "sprintf.h"
 #include "backlight.h"
 #include "button.h"
+#include "abrepeat.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
@@ -1214,11 +1215,18 @@ bool wps_refresh(struct mp3entry* id3,
 
 #ifdef HAVE_LCD_BITMAP
             /* progress */
-            if (flags & refresh_mode & WPS_REFRESH_PLAYER_PROGRESS) {
-                scrollbar(0, i*h + offset + (h > 7 ? (h - 6) / 2 : 1), LCD_WIDTH, 6,
-                          id3->length?id3->length:1, 0,
-                          id3->length?id3->elapsed + ff_rewind_count:0,
-                          HORIZONTAL);
+            if (flags & refresh_mode & WPS_REFRESH_PLAYER_PROGRESS) 
+            {
+#define PROGRESS_BAR_HEIGHT 6 /* this should probably be defined elsewhere; config-*.h perhaps? */
+                int sby = i*h + offset + (h > 7 ? (h - 6) / 2 : 1);
+                scrollbar(0, sby, LCD_WIDTH, PROGRESS_BAR_HEIGHT,
+                    id3->length?id3->length:1, 0,
+                    id3->length?id3->elapsed + ff_rewind_count:0,
+                    HORIZONTAL);
+#ifdef AB_REPEAT_ENABLE
+                if ( ab_repeat_mode_enabled() )
+                    ab_draw_markers(id3->length, 0, sby, LCD_WIDTH, PROGRESS_BAR_HEIGHT);
+#endif
                 update_line = true;
             }
             if (flags & refresh_mode & WPS_REFRESH_PEAK_METER) {

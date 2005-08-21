@@ -27,6 +27,7 @@
 #include "mp3_playback.h"
 #include "audio.h"
 #include "wps.h"
+#include "abrepeat.h"
 #ifdef HAVE_RTC
 #include "timefuncs.h"
 #endif
@@ -262,6 +263,12 @@ void status_draw(bool force_redraw)
         info.redraw_volume = statusbar_icon_volume(info.volume);
         statusbar_icon_play_state(current_playmode() + Icon_Play);
         switch (info.repeat) {
+#ifdef AB_REPEAT_ENABLE
+            case REPEAT_AB:
+                statusbar_icon_play_mode(Icon_RepeatAB);
+                break;
+#endif
+
             case REPEAT_ONE:
                 statusbar_icon_play_mode(Icon_RepeatOne);
                 break;
