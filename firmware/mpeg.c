@@ -84,6 +84,9 @@ extern int playlist_update_resume_info(const struct mp3entry* id3);
 #define MPEG_SAVE_DATA    102
 #define MPEG_STOP_DONE    103
 
+/* indicator for MPEG_NEED_DATA */
+#define GENERATE_UNBUFFER_EVENTS ((void*)1)
+
 /* list of tracks in memory */
 #define MAX_TRACK_ENTRIES (1<<4) /* Must be power of 2 */
 #define MAX_TRACK_ENTRIES_MASK (MAX_TRACK_ENTRIES - 1)
@@ -93,6 +96,7 @@ struct trackdata
     struct mp3entry id3;
     int mempos;
     int load_ahead_index;
+    bool event_sent;
 };
 
 static struct trackdata trackdata[MAX_TRACK_ENTRIES];
@@ -104,6 +108,11 @@ static unsigned int last_track_counter = 0;
 static int track_read_idx = 0;
 static int track_write_idx = 0;
 #endif /* !SIMULATOR */
+
+/* Callback function to call when current track has really changed. */
+void (*track_changed_callback)(struct mp3entry *id3);
+void (*track_buffer_callback)(struct mp3entry *id3, bool last_track);
+void (*track_unbuffer_callback)(struct mp3entry *id3, bool last_track);
 
 static const char mpeg_thread_name[] = "mpeg";
 static unsigned int mpeg_errno;
@@ -400,8 +409,89 @@ unsigned long mpeg_get_last_header(void)
 #endif /* !SIMULATOR */
 }
 
+void audio_set_track_buffer_event(void (*handler)(struct mp3entry *id3,
+                                                  bool last_track))
+{
+    track_buffer_callback = handler;
+}
+
+void audio_set_track_unbuffer_event(void (*handler)(struct mp3entry *id3,
+                                                    bool last_track))
+{
+    track_unbuffer_callback = handler;
+}
+
+void audio_set_track_changed_event(void (*handler)(struct mp3entry *id3))
+{
+    track_changed_callback = handler;
+}
 
 #ifndef SIMULATOR
+/* Send callback events to notify about removing old tracks. */
+static void generate_unbuffer_events(void)
+{
+    int i;
+    int event_count = 0;
+    int numentries = MAX_TRACK_ENTRIES - num_tracks_in_memory();
+    int cur_idx = track_write_idx;
+    
+    for (i = 0; i < numentries; i++)
+    {
+        if (trackdata[cur_idx].event_sent)
+            event_count++;
+
+        cur_idx = (cur_idx + 1) & MAX_TRACK_ENTRIES_MASK;
+    }
+
+    cur_idx = track_write_idx;
+
+    for (i = 0; i < numentries; i++)
+    {
+        /* Send an event to notify that track has finished. */
+        if (trackdata[cur_idx].event_sent)
+        {
+            event_count--;
+            if (track_unbuffer_callback)
+                track_unbuffer_callback(&trackdata[cur_idx].id3,
+                                        event_count == 0);
+            trackdata[cur_idx].event_sent = false;
+        }
+        cur_idx = (cur_idx + 1) & MAX_TRACK_ENTRIES_MASK;
+    }
+}
+
+/* Send callback events to notify about new tracks. */
+static void generate_postbuffer_events(void)
+{
+    int i;
+    int event_count = 0;
+    int numentries = num_tracks_in_memory();
+    int cur_idx = track_read_idx;
+
+    for (i = 0; i < numentries; i++)
+    {
+        if (!trackdata[cur_idx].event_sent)
+            event_count++;
+
+        cur_idx = (cur_idx + 1) & MAX_TRACK_ENTRIES_MASK;
+    }
+
+    cur_idx = track_read_idx;
+
+    for (i = 0; i < numentries; i++)
+    {
+        if (!trackdata[cur_idx].event_sent)
+        {
+            event_count--;
+            if (track_buffer_callback)
+                track_buffer_callback(&trackdata[cur_idx].id3,
+                                      event_count == 0);
+            trackdata[cur_idx].event_sent = true;
+        }
+        cur_idx = (cur_idx + 1) & MAX_TRACK_ENTRIES_MASK;
+    }
+}
+
 static void recalculate_watermark(int bitrate)
 {
     int bytes_per_sec;
@@ -684,7 +774,7 @@ static void transfer_end(unsigned char** ppbuf, int* psize)
         if(!filling && unplayed_space_left < low_watermark)
         {
             filling = true;
-            queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+            queue_post(&mpeg_queue, MPEG_NEED_DATA, GENERATE_UNBUFFER_EVENTS);
         }
         
         if(unplayed_space_left)
@@ -862,6 +952,7 @@ static void stop_playing(void)
         close(mpeg_file);
     mpeg_file = -1;
     remove_all_tags();
+    generate_unbuffer_events();
     reset_mp3_buffer();
 }
 
@@ -894,6 +985,8 @@ static void track_change(void)
     if (num_tracks_in_memory() > 0)
     {
         remove_current_tag();
+        if (track_changed_callback)
+            track_changed_callback(audio_current_track());
         update_playlist();
     }
 
@@ -935,9 +1028,15 @@ static void start_playback_if_ready(void)
            !filling || dma_underrun)
         {
             DEBUGF("P\n");
-            play_pending = false;
+            if (play_pending) /* don't do this when recovering from DMA underrun */
+            {
+                generate_postbuffer_events(); /* signal first track as buffered */
+                if (track_changed_callback)
+                    track_changed_callback(audio_current_track());
+                play_pending = false;
+            }
             playing = true;
-			
+
             last_dma_chunk_size = MIN(0x2000, get_unplayed_space_current_song());
             mp3_play_data(audiobuf + audiobuf_read, last_dma_chunk_size, transfer_end);
             dma_underrun = false;
@@ -1066,6 +1165,7 @@ static void mpeg_thread(void)
 
                 reset_mp3_buffer();
                 remove_all_tags();
+                generate_unbuffer_events();
 
                 if(mpeg_file >= 0)
                     close(mpeg_file);
@@ -1170,7 +1270,7 @@ static void mpeg_thread(void)
                     /* should we start reading more data? */
                     if(!filling && (unplayed_space_left < low_watermark)) {
                         filling = true;
-                        queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+                        queue_post(&mpeg_queue, MPEG_NEED_DATA, GENERATE_UNBUFFER_EVENTS);
                         play_pending = true;
                     } else if(unswapped_space_left &&
                               unswapped_space_left > unplayed_space_left) {
@@ -1194,6 +1294,7 @@ static void mpeg_thread(void)
 
                     reset_mp3_buffer();
                     remove_all_tags();
+                    generate_unbuffer_events();
 
                     /* Open the next file */
                     if (mpeg_file >= 0)
@@ -1233,6 +1334,7 @@ static void mpeg_thread(void)
 
                 reset_mp3_buffer();
                 remove_all_tags();
+                generate_unbuffer_events();
 
                 /* Open the next file */
                 if (mpeg_file >= 0)
@@ -1324,7 +1426,7 @@ static void mpeg_thread(void)
                     {
                         /* We need to load more data before starting */
                         filling = true;
-                        queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
+                        queue_post(&mpeg_queue, MPEG_NEED_DATA, GENERATE_UNBUFFER_EVENTS);
                         play_pending = true;
                     }
                     else
@@ -1348,6 +1450,7 @@ static void mpeg_thread(void)
                         /* We have to reload the current track */
                         close(mpeg_file);
                         remove_all_non_current_tags();
+                        generate_unbuffer_events();
                         mpeg_file = -1;
                     }
 
@@ -1396,6 +1499,7 @@ static void mpeg_thread(void)
 
                     close(mpeg_file);
                     remove_all_non_current_tags();
+                    generate_unbuffer_events();
                     mpeg_file = -1;
                     reload_track = true;
                 }
@@ -1407,8 +1511,8 @@ static void mpeg_thread(void)
                 if(reload_track && new_file(1) >= 0)
                 {
                     /* Tell ourselves that we want more data */
-                    queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
                     filling = true;
+                    queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
                 }
 
                 break;
@@ -1425,12 +1529,16 @@ static void mpeg_thread(void)
 
                 /* Make sure that we don't fill the entire buffer */
                 free_space_left -= MPEG_HIGH_WATER;
+                
+                if (ev.data == GENERATE_UNBUFFER_EVENTS)
+                    generate_unbuffer_events();
 
                 /* do we have any more buffer space to fill? */
                 if(free_space_left <= 0)
                 {
                     DEBUGF("0\n");
                     filling = false;
+                    generate_postbuffer_events();
                     ata_sleep();
                     break;
                 }
@@ -1575,7 +1683,7 @@ static void mpeg_thread(void)
                 if (playing)
                     playlist_update_resume_info(audio_current_track());
                 break;
-            }
+        }
 #if CONFIG_HWCODEC == MAS3587F
         }
         else
@@ -2673,6 +2781,9 @@ static void mpeg_thread(void)
 void audio_init(void)
 {
     mpeg_errno = 0;
+    track_buffer_callback = NULL;
+    track_unbuffer_callback = NULL;
+    track_changed_callback = NULL;
 
 #ifndef SIMULATOR
     audiobuflen = audiobufend - audiobuf;

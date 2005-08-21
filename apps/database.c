@@ -43,7 +43,13 @@
 #include "keyboard.h"
 #include "database.h"
 #include "autoconf.h"
+
+#if CONFIG_HWCODEC == MASNONE
 #include "playback.h"
+#else
+#include "mpeg.h"
+#endif
+
 #include "logf.h"
 
 /* internal functions */
@@ -328,9 +334,6 @@ void rundb_buffer_track(struct mp3entry *id, bool last_track) {
 
 int rundb_init(void)
 {
-#if CONFIG_HWCODEC != MASNONE
-    return -1;
-#else
     unsigned char* ptr = (char*)&rundbheader.version;
 #ifdef ROCKBOX_LITTLE_ENDIAN
     int i, *p;
@@ -376,17 +379,13 @@ int rundb_init(void)
     }
 
     rundb_initialized = 1;
-/* hooks disabled for archos, rendering the runtime database not working,
- * re enable when these callbacks are implemented in mpeg.c */
-#if CONFIG_HWCODEC == MASNONE
     audio_set_track_buffer_event(&rundb_buffer_track);
     audio_set_track_changed_event(&rundb_track_change);
     audio_set_track_unbuffer_event(&rundb_unbuffer_track);
     logf("rundb inited.");
-#endif
+
     rundbsize=lseek(rundb_fd,0,SEEK_END);
     return 0;
-#endif
 }
 
 void rundb_shutdown(void)
@@ -394,11 +393,9 @@ void rundb_shutdown(void)
     if (rundb_fd >= 0)
         close(rundb_fd);
     rundb_initialized = 0;
-#if CONFIG_HWCODEC == MASNONE
     audio_set_track_buffer_event(NULL);
     audio_set_track_unbuffer_event(NULL);
     audio_set_track_changed_event(NULL);
-#endif
 }
 
 void writerundbheader(void)
