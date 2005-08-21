@@ -98,8 +98,14 @@ static void draw_player_fullbar(char* buf, int buf_size,
 static char map_fullbar_char(char ascii_val);
 #endif
 
+struct align_pos {
+    char* left;
+    char* center;
+    char* right;
+};
 static char format_buffer[FORMAT_BUFFER_SIZE];
 static char* format_lines[MAX_LINES][MAX_SUBLINES];
+static struct align_pos format_align[MAX_LINES][MAX_SUBLINES];
 static unsigned char line_type[MAX_LINES][MAX_SUBLINES];
 static unsigned short time_mult[MAX_LINES][MAX_SUBLINES];
 static long subline_expire_time[MAX_LINES];
@@ -631,6 +637,7 @@ static char* get_tag(struct mp3entry* cid3,
                         return "b";
                     else
                         return NULL;
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
                 case 'h': /* hold */
                     *flags |= WPS_REFRESH_DYNAMIC;
                     if (button_hold())
@@ -643,6 +650,7 @@ static char* get_tag(struct mp3entry* cid3,
                         return "r";
                     else
                         return NULL;
+#endif
             }
             break;
 
@@ -826,6 +834,7 @@ static void format_display(char* buf,
                            struct mp3entry* id3,
                            struct mp3entry* nid3, /* next song's id3 */
                            const char* fmt,
+                           struct align_pos* align,
                            unsigned short* subline_time_mult,
                            unsigned char* flags)
 {
@@ -838,6 +847,8 @@ static void format_display(char* buf,
 
     /* needed for images (ifdef is to kill a warning on player)*/
     int n;
+    int cur_align;
+    char* cur_align_start;
 #ifdef HAVE_LCD_BITMAP
     int ret;
     char *pos, *posn;
@@ -845,7 +856,13 @@ static void format_display(char* buf,
     char *ptr;
 #endif
 
+    cur_align_start = buf;
+    cur_align = WPS_ALIGN_LEFT;
     *subline_time_mult = DEFAULT_SUBLINE_TIME_MULTIPLIER;
+
+    align->left = 0;
+    align->center = 0;
+    align->right = 0;
 
     while (fmt && *fmt && buf < buf_end)
     {
@@ -877,18 +894,36 @@ static void format_display(char* buf,
                 break;
             case 'a':
                 ++fmt;
+                /* remember where the current aligned text started */
+                switch (cur_align)
+                {
+                    case WPS_ALIGN_LEFT:
+                        align->left = cur_align_start;
+                        break;
+
+                    case WPS_ALIGN_CENTER:
+                        align->center = cur_align_start;
+                        break;
+
+                    case WPS_ALIGN_RIGHT:
+                        align->right = cur_align_start;
+                        break;
+                }
+                /* start a new alignment */
                 switch (*fmt)
                 {
                     case 'l':
-                        *flags |= WPS_ALIGN_LEFT; 
+                        cur_align = WPS_ALIGN_LEFT;
                         break;
                     case 'c':
-                        *flags |= WPS_ALIGN_CENTER; 
+                        cur_align = WPS_ALIGN_CENTER;
                         break;
                     case 'r':
-                        *flags |= WPS_ALIGN_RIGHT; 
+                        cur_align = WPS_ALIGN_RIGHT;
                         break;
                 } 
+                *buf++=0;
+                cur_align_start = buf;
                 ++fmt;
                 break;
             case 's':
@@ -1013,10 +1048,26 @@ static void format_display(char* buf,
         }
     }
 
+    /* remember where the current aligned text started */
+    switch (cur_align)
+    {
+        case WPS_ALIGN_LEFT:
+            align->left = cur_align_start;
+            break;
+
+        case WPS_ALIGN_CENTER:
+            align->center = cur_align_start;
+            break;
+
+        case WPS_ALIGN_RIGHT:
+            align->right = cur_align_start;
+            break;
+    }
+
     *buf = 0;
 
     /* if resulting line is an empty line, set the subline time to 0 */
-    if (*buf_start == 0)
+    if (buf - buf_start == 0)
         *subline_time_mult = 0;
 
     /* If no flags have been set, the line didn't contain any format codes.
@@ -1118,6 +1169,7 @@ bool wps_refresh(struct mp3entry* id3,
                        line type flags for this subline */
                     format_display(buf, sizeof(buf), id3, nid3,
                                    format_lines[i][curr_subline[i]],
+                                   &format_align[i][curr_subline[i]],
                                    &time_mult[i][curr_subline[i]],
                                    &line_type[i][curr_subline[i]]);
 
@@ -1144,8 +1196,18 @@ bool wps_refresh(struct mp3entry* id3,
             new_subline_refresh)
         {
             flags = 0;
+#ifdef HAVE_LCD_BITMAP
+            int left_width,   left_xpos;
+            int center_width, center_xpos;
+            int right_width,  right_xpos;
+            int space_width;
+            int string_height;
+            int ypos;
+#endif
+
             format_display(buf, sizeof(buf), id3, nid3,
                            format_lines[i][curr_subline[i]],
+                           &format_align[i][curr_subline[i]],
                            &time_mult[i][curr_subline[i]],
                            &flags);
             line_type[i][curr_subline[i]] = flags;
@@ -1188,6 +1250,120 @@ bool wps_refresh(struct mp3entry* id3,
                     draw_player_progress(id3, ff_rewind_count);
             }
 #endif
+#ifdef HAVE_LCD_BITMAP
+            /* calculate different string sizes and positions */
+            lcd_getstringsize(" ", &space_width, &string_height);
+            if (format_align[i][curr_subline[i]].left != 0) {
+                lcd_getstringsize(format_align[i][curr_subline[i]].left,
+                                  &left_width, &string_height);
+            }
+            else {
+                left_width = 0;
+            }
+            left_xpos = 0;
+
+            if (format_align[i][curr_subline[i]].center != 0) {
+                lcd_getstringsize(format_align[i][curr_subline[i]].center,
+                                  &center_width, &string_height);
+            }
+            else {
+                center_width = 0;
+            }
+            center_xpos=(LCD_WIDTH - center_width) / 2;
+
+            if (format_align[i][curr_subline[i]].right != 0) {
+                lcd_getstringsize(format_align[i][curr_subline[i]].right,
+                                  &right_width, &string_height);
+            }
+            else {
+                right_width = 0;
+            }
+            right_xpos = (LCD_WIDTH - right_width);
+
+            /* Checks for overlapping strings.
+               If needed the overlapping strings will be merged, separated by a
+               space */
+
+            /* CASE 1: left and centered string overlap */
+            /* there is a left string, need to merge left and center */
+            if ((left_width != 0 && center_width != 0) &&
+                (left_xpos + left_width + space_width > center_xpos)) {
+                /* replace the former separator '\0' of left and 
+                   center string with a space */
+                *(--format_align[i][curr_subline[i]].center) = ' ';
+                /* calculate the new width and position of the merged string */
+                left_width = left_width + space_width + center_width;
+                left_xpos = 0;
+                /* there is no centered string anymore */
+                center_width = 0;
+            }
+            /* there is no left string, move center to left */
+            if ((left_width == 0 && center_width != 0) &&
+                (left_xpos + left_width > center_xpos)) {
+                /* move the center string to the left string */
+                format_align[i][curr_subline[i]].left = format_align[i][curr_subline[i]].center;
+                /* calculate the new width and position of the string */
+                left_width = center_width;
+                left_xpos = 0;
+                /* there is no centered string anymore */
+                center_width = 0;
+            }
+
+            /* CASE 2: centered and right string overlap */
+            /* there is a right string, need to merge center and right */
+            if ((center_width != 0 && right_width != 0) &&
+                (center_xpos + center_width + space_width > right_xpos)) {
+                /* replace the former separator '\0' of center and 
+                   right string with a space */
+                *(--format_align[i][curr_subline[i]].right) = ' ';
+                /* move the center string to the right after merge */
+                format_align[i][curr_subline[i]].right = format_align[i][curr_subline[i]].center;
+                /* calculate the new width and position of the merged string */
+                right_width = center_width + space_width + right_width;
+                right_xpos = (LCD_WIDTH - right_width);
+                /* there is no centered string anymore */
+                center_width = 0;
+            }
+            /* there is no right string, move center to right */
+            if ((center_width != 0 && right_width == 0) &&
+                (center_xpos + center_width > right_xpos)) {
+                /* move the center string to the right string */
+                format_align[i][curr_subline[i]].right = format_align[i][curr_subline[i]].center;
+                /* calculate the new width and position of the string */
+                right_width = center_width;
+                right_xpos = (LCD_WIDTH - right_width);
+                /* there is no centered string anymore */
+                center_width = 0;
+            }
+
+            /* CASE 3: left and right overlap
+               There is no center string anymore, either there never
+               was one or it has been merged in case 1 or 2 */
+            /* there is a left string, need to merge left and right */
+            if ((left_width != 0 && center_width == 0 && right_width != 0) &&
+                (left_xpos + left_width + space_width > right_xpos)) {
+                /* replace the former separator '\0' of left and 
+                   right string with a space */
+                *(--format_align[i][curr_subline[i]].right) = ' ';
+                /* calculate the new width and position of the string */
+                left_width = left_width + space_width + right_width;
+                left_xpos = 0;
+                /* there is no right string anymore */
+                right_width = 0;
+            }
+            /* there is no left string, move right to left */
+            if ((left_width == 0 && center_width == 0 && right_width != 0) &&
+                (left_xpos + left_width > right_xpos)) {
+                /* move the right string to the left string */
+                format_align[i][curr_subline[i]].left = format_align[i][curr_subline[i]].right;
+                /* calculate the new width and position of the string */
+                left_width = right_width;
+                left_xpos = 0;
+                /* there is no right string anymore */
+                right_width = 0;
+            }
+
+#endif
 
             if (flags & WPS_REFRESH_SCROLL) {
 
@@ -1195,34 +1371,33 @@ bool wps_refresh(struct mp3entry* id3,
                 if ((refresh_mode & WPS_REFRESH_SCROLL) ||
                     new_subline_refresh) {
 #ifdef HAVE_LCD_BITMAP
-                    int strw,strh;
-                    int ypos,xpos;
-
-                    lcd_getstringsize(buf, &strw, &strh);
-                    ypos = (i*strh)+lcd_getymargin();
+                    ypos = (i*string_height)+lcd_getymargin();
                     update_line = true;
 
-                    if (strw>LCD_WIDTH) {
-                        lcd_puts_scroll(0, i, buf);
+                    if (left_width>LCD_WIDTH) {
+                        lcd_puts_scroll(0, i, format_align[i][curr_subline[i]].left);
                     } else {
                         /* clear the line first */
                         lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-                        lcd_fillrect(0, ypos, LCD_WIDTH, strh);
+                        lcd_fillrect(0, ypos, LCD_WIDTH, string_height);
                         lcd_set_drawmode(DRMODE_SOLID);
 
                         /* Nasty hack: we output an empty scrolling string,
                            which will reset the scroller for that line */
                         lcd_puts_scroll(0, i, "");
                         
-                        if (flags & WPS_ALIGN_CENTER)
+                        /* print aligned strings */
+                        if (left_width != 0)
                         {
-                            xpos = (LCD_WIDTH - strw) / 2;
-                            lcd_putsxy(xpos, ypos, buf);
-                        } else if (flags & WPS_ALIGN_RIGHT) {
-                            xpos = (LCD_WIDTH - strw);
-                            lcd_putsxy(xpos, ypos, buf);
-                        } else {
-                            lcd_putsxy(0, ypos, buf);
+                            lcd_putsxy(left_xpos, ypos, format_align[i][curr_subline[i]].left);
+                        }
+                        if (center_width != 0)
+                        {
+                            lcd_putsxy(center_xpos, ypos, format_align[i][curr_subline[i]].center);
+                        }
+                        if (right_width != 0)
+                        {
+                            lcd_putsxy(right_xpos, ypos, format_align[i][curr_subline[i]].right);
                         }
                     }
 #else
@@ -1238,30 +1413,30 @@ bool wps_refresh(struct mp3entry* id3,
                     new_subline_refresh)
                 {
 #ifdef HAVE_LCD_BITMAP
-                    int ypos,xpos;
-                    int strw,strh;
-
-                    lcd_getstringsize(buf, &strw, &strh);
-                    ypos = (i*strh)+lcd_getymargin();
+                    ypos = (i*string_height)+lcd_getymargin();
                     update_line = true;
-                    
+
                     /* clear the line first */
                     lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-                    lcd_fillrect(0, ypos, LCD_WIDTH, strh);
+                    lcd_fillrect(0, ypos, LCD_WIDTH, string_height);
                     lcd_set_drawmode(DRMODE_SOLID);
 
                     /* Nasty hack: we output an empty scrolling string,
                        which will reset the scroller for that line */
                     lcd_puts_scroll(0, i, "");
                         
-                    if (flags & WPS_ALIGN_CENTER) {
-                        xpos = (LCD_WIDTH - strw) / 2;
-                        lcd_putsxy(xpos, ypos, buf);
-                    } else if (flags & WPS_ALIGN_RIGHT) {
-                        xpos = (LCD_WIDTH - strw);
-                        lcd_putsxy(xpos, ypos, buf);
-                    } else {
-                        lcd_putsxy(0, ypos, buf);
+                    /* print aligned strings */
+                    if (left_width != 0)
+                    {
+                        lcd_putsxy(left_xpos, ypos, format_align[i][curr_subline[i]].left);
+                    }
+                    if (center_width != 0)
+                    {
+                        lcd_putsxy(center_xpos, ypos, format_align[i][curr_subline[i]].center);
+                    }
+                    if (right_width != 0)
+                    {
+                        lcd_putsxy(right_xpos, ypos, format_align[i][curr_subline[i]].right);
                     }
 #else
                     update_line = true;
@@ -1329,7 +1504,7 @@ bool wps_display(struct mp3entry* id3,
                            "%s%?ia<%ia|%?d2<%d2|(root)>>\n"
                            "%s%?id<%id|%?d1<%d1|(root)>> %?iy<(%iy)|>\n"
                            "\n"
-                           "%pc/%pt [%pp:%pe]\n"
+                           "%al%pc/%pt%ar[%pp:%pe]\n"
                            "%fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>\n"
                            "%pb\n"
                            "%pm\n");
