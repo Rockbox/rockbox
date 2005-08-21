@@ -47,6 +47,10 @@
 
 #ifdef HAVE_UDA1380
 
+#define EBU_DEFPARM        ((7 << 12) | (3 << 8) | (1 << 5) | (5 << 2))
+#define IIS_DEFPARM(freq)  ((freq << 12) | 0x300 | 4 << 2)
+#define IIS_RESET          0x800
+
 static bool pcm_playing;
 static bool pcm_paused;
 static int pcm_freq = 0x6; /* 44.1 is default */
@@ -63,8 +67,8 @@ static void dma_start(const void *addr, long size)
     size &= ~3; /* Size must be multiple of 4 */
 
     /* Reset the audio FIFO */
-    IIS2CONFIG = 0x800;
-    EBU1CONFIG = 0x800;
+    //IIS2CONFIG = IIS_RESET;
+    EBU1CONFIG = IIS_RESET;
 
     /* Set up DMA transfer  */
     SAR0 = ((unsigned long)addr); /* Source address */
@@ -72,9 +76,9 @@ static void dma_start(const void *addr, long size)
     BCR0 = size;                  /* Bytes to transfer */
 
     /* Enable the FIFO and force one write to it */
-    IIS2CONFIG = (pcm_freq << 12) | 0x300 | 4 << 2;
+    IIS2CONFIG = IIS_DEFPARM(pcm_freq);
     /* Also send the audio to S/PDIF */
-    EBU1CONFIG = (7 << 12) | (3 << 8) | (1 << 5) | (5 << 2);
+    EBU1CONFIG = EBU_DEFPARM;
     DCR0 = DMA_INT | DMA_EEXT | DMA_CS | DMA_SINC | DMA_START;
 }
 
@@ -85,8 +89,8 @@ static void dma_stop(void)
 
     DCR0 = 0;
     /* Reset the FIFO */
-    IIS2CONFIG = 0x800;
-    EBU1CONFIG = 0x800;
+    IIS2CONFIG = IIS_RESET | IIS_DEFPARM(pcm_freq);
+    EBU1CONFIG = IIS_RESET;
 
     next_start = NULL;
     next_size = 0;
@@ -215,8 +219,8 @@ void pcm_play_pause(bool play)
         //SAR0 = (unsigned long)next_start;
         //BCR0 = next_size;
         /* Enable the FIFO and force one write to it */
-        IIS2CONFIG = (pcm_freq << 12) | 0x300 | 4 << 2;
-        EBU1CONFIG = (7 << 12) | (3 << 8) | (1 << 5) | (5 << 2);
+        IIS2CONFIG = IIS_DEFPARM(pcm_freq);
+        EBU1CONFIG = EBU_DEFPARM;
         DCR0 |= DMA_EEXT | DMA_START;
     }
     else if(!pcm_paused && !play)
@@ -225,8 +229,8 @@ void pcm_play_pause(bool play)
 
         /* Disable DMA peripheral request. */
         DCR0 &= ~DMA_EEXT;
-        IIS2CONFIG = 0x800;
-        EBU1CONFIG = 0x800;
+        IIS2CONFIG = IIS_RESET | IIS_DEFPARM(pcm_freq);
+        EBU1CONFIG = IIS_RESET;
     }
     pcm_paused = !play;
 }
@@ -282,19 +286,13 @@ void pcm_init(void)
     pcm_playing = false;
     pcm_paused = false;
 
-#if defined(HAVE_UDA1380)
-    uda1380_init();
-#elif defined(HAVE_TLV320)
-    tlv320_init();
-#endif
-
     BUSMASTER_CTRL = 0x81; /* PARK[1,0]=10 + BCR24BIT */
     DIVR0 = 54;            /* DMA0 is mapped into vector 54 in system.c */
     DMAROUTE = (DMAROUTE & 0xffffff00) | DMA0_REQ_AUDIO_1;
     DMACONFIG = 1;   /* DMA0Req = PDOR3 */
 
     /* Reset the audio FIFO */
-    IIS2CONFIG = 0x800;
+    IIS2CONFIG = IIS_RESET;
 
     /* Enable interrupt at level 7, priority 0 */
     ICR4 = (ICR4 & 0xffff00ff) | 0x00001c00;
@@ -302,18 +300,29 @@ void pcm_init(void)
 
     pcm_set_frequency(44100);
 
-    /* Turn on headphone power */
+    /* Prevent pops (resets DAC to zero point) */
+    IIS2CONFIG = IIS_DEFPARM(pcm_freq) | IIS_RESET;
+    
 #if defined(HAVE_UDA1380)
+    /* Initialize default register values. */
+    uda1380_init();
+    
+    /* Turn on headphone power */
+    uda1380_enable_output(true);
+
+    /* Sleep a little so the power can stabilize. */
+    sleep(HZ/4);
+
+    /* Unmute the master channel (DAC should be at zero point now). */
     uda1380_mute(false);
 #elif defined(HAVE_TLV320)
+    tlv320_init();
+    tlv320_enable_output(true);
+    sleep(HZ/4);
     tlv320_mute(false);
 #endif
-    sleep(HZ/4);
-#if defined(HAVE_UDA1380)
-    uda1380_enable_output(true);
-#elif defined(HAVE_TLV320)
-    tlv320_enable_output(true);
-#endif
+
+    
     /* Call dma_stop to initialize everything. */
     dma_stop();
 }
