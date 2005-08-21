@@ -37,7 +37,7 @@ void* codec_malloc(size_t size)
 {
     void* x;
 
-    if (mem_ptr + size > bufsize)
+    if (mem_ptr + (int)size > bufsize)
         return NULL;
     
     x=&mallocbuf[mem_ptr];
