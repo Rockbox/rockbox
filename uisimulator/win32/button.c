@@ -251,7 +251,11 @@ void button_clear_queue(void)
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
 bool button_hold(void) {
     /* temp fix for hold button on irivers */
-    return 0;
+    return false;
+}
+bool remote_button_hold(void) {
+    /* temp fix for hold button on irivers */
+    return false;
 }
 #endif
 
