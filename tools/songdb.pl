@@ -99,6 +99,9 @@ sub get_oggtag {
             elsif($k =~ /^album$/i) {
                 $n = 'ALBUM';
             }
+            elsif($k =~ /^title$/i) {
+                $n = 'TITLE';
+            }
             $hash{$n}=$cmmt if($n);
         }
     }
