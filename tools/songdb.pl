@@ -74,7 +74,23 @@ my $dbver = 3;
 
 if(! -d $dir or $help) {
     print "'$dir' is not a directory\n" if ($dir ne "" and ! -d $dir);
-    print "songdb --path <dir> [--dirisalbum] [--dirisalbumname] [--db <file>] [--strip <path>] [--add <path>] [--verbose] [--help]\n";
+    print <<MOO
+
+songdb --path <dir> [--dirisalbum] [--dirisalbumname] [--db <file>] [--strip <path>] [--add <path>] [--verbose] [--help]
+
+Options:
+
+  --path <dir>  Where your music collection is found
+  --dirisalbum  Use dir name as album name if the album name is missing in the
+                tags
+  --dirisalbumname  Uh, isn\'t this the same as the above?
+  --db <file>   What to call the output file. Defaults to rockbox.tagdb
+  --strip <path> Removes this string from the left of all file names
+  --add <path>  Adds this string to the left of all file names
+  --verbose     Shows more details while working
+  --help        This text  
+MOO
+;
     exit;
 }
 
