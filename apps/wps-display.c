@@ -43,6 +43,7 @@
 #include "powermgmt.h"
 #include "sprintf.h"
 #include "backlight.h"
+#include "button.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
@@ -576,6 +577,72 @@ static char* get_tag(struct mp3entry* cid3,
                     snprintf(buf, buf_size, "%d%%", global_settings.volume);
                     return buf;
 
+            }
+            break;
+            
+        case 'm': /* playback repeat mode */
+            switch (tag[1])
+            {                    
+                case 'f': /* off */
+                    if (global_settings.repeat_mode == REPEAT_OFF)
+                        return "f";
+                    else
+                        return NULL;
+                case 'a': /* all */
+                    if (global_settings.repeat_mode == REPEAT_ALL)
+                        return "a";
+                    else
+                        return NULL;
+                case 'o': /* one */
+                    if (global_settings.repeat_mode == REPEAT_ONE)
+                        return "o";
+                    else
+                        return NULL;
+                case 's': /* shuffle */
+                    if (global_settings.repeat_mode == REPEAT_SHUFFLE)
+                        return "s";
+                    else
+                        return NULL;
+                /* playback status */
+                case 'p': /* play */
+                    *flags |= WPS_REFRESH_DYNAMIC;
+                    int status = audio_status();
+                    if (status == AUDIO_STATUS_PLAY && \
+                        !(status & AUDIO_STATUS_PAUSE))
+                        return "p";
+                    else
+                        return NULL;
+                case 'u': /* pause*/
+                     *flags |= WPS_REFRESH_DYNAMIC;
+                    if (audio_status() & AUDIO_STATUS_PAUSE && \
+                        (! status_get_ffmode()))
+                        return "u";
+                    else
+                        return NULL;
+                case 'w': /* fast forward */
+                    *flags |= WPS_REFRESH_DYNAMIC;
+                    if (status_get_ffmode() == STATUS_FASTFORWARD)
+                        return "w";
+                    else
+                        return NULL;
+                case 'b': /* Fast backwards */
+                    *flags |= WPS_REFRESH_DYNAMIC;
+                    if (status_get_ffmode() == STATUS_FASTBACKWARD)
+                        return "b";
+                    else
+                        return NULL;
+                case 'h': /* hold */
+                    *flags |= WPS_REFRESH_DYNAMIC;
+                    if (button_hold())
+                        return "h";
+                    else
+                        return NULL;
+                case 'r': /* remote hold */
+                    *flags |= WPS_REFRESH_DYNAMIC;
+                    if (remote_button_hold())
+                        return "r";
+                    else
+                        return NULL;
             }
             break;
 

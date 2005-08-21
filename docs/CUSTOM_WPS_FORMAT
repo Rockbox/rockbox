@@ -67,6 +67,18 @@ Playlist/Song Info Tags:
   %pt : Total Track Time
   %pv : Current volume
 
+Repeat mode tags:
+  %mf : repeat off, returns f
+  %ma : repeat all, returns a
+  %mo : repeat one, returns o
+  %ms : repeat shuffle, returns s
+
+Playback mode tags:
+  %mp : play, returns p
+  %mu : pause, returns u
+  %mw : fastforward, returns w
+  %mb : fastbackward, returns b
+
 Conditional Tags (If/Else block):
   %?xx<|> : Conditional: if the tag specified by "xx" has a value, the 
             text between the "<" and the "|" is displayed, else the text

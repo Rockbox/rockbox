@@ -32,6 +32,7 @@ enum playmode
 
 void status_init(void);
 void status_set_ffmode(enum playmode mode);
+enum playmode status_get_ffmode(void);
 #ifdef HAVE_LCD_BITMAP
 bool statusbar(bool state);
 #if CONFIG_KEYPAD == RECORDER_PAD

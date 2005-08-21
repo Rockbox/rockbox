@@ -82,6 +82,13 @@ void status_set_ffmode(enum playmode mode)
     status_draw(false);
 }
 
+enum playmode status_get_ffmode(void)
+{
+    /* only use this function for STATUS_FASTFORWARD or STATUS_FASTBACKWARD */
+    /* use audio_status() for other modes */
+    return ff_mode;
+}
+
 int current_playmode(void)
 {
     int audio_stat = audio_status();
