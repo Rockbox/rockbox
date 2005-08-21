@@ -21,7 +21,7 @@
 
 #include <stdbool.h>
 
-#define MAXTHREADS	10
+#define MAXTHREADS	14
 #define DEFAULT_STACK_SIZE 0x400 /* Bytes */
 
 int create_thread(void (*function)(void), void* stack, int stack_size,
