@@ -207,6 +207,16 @@ static inline unsigned short SWAB16(unsigned short value)
     return (value >> 8) | (value << 8);
 }
 
+static inline unsigned long SWAW32(unsigned long value)
+  /*
+    result[31..16] = value[15.. 0];
+    result[15.. 0] = value[31..16];
+  */
+{
+    asm ("swap    %%0" : "+r"(value));
+    return value;
+}
+
 static inline unsigned long SWAB32(unsigned long value)
   /*
     result[31..24] = value[ 7.. 0];
@@ -215,9 +225,19 @@ static inline unsigned long SWAB32(unsigned long value)
     result[ 7.. 0] = value[31..24];
   */
 {
-    unsigned short hi = SWAB16(value >> 16);
-    unsigned short lo = SWAB16(value & 0xffff);
-    return (lo << 16) | hi;
+    unsigned long mask = 0x00FF00FF;
+    asm (                             /* val  = ABCD */
+        "and.l   %[val],%[mask]  \n"  /* mask = .B.D */
+        "eor.l   %[mask],%[val]  \n"  /* val  = A.C. */
+        "lsl.l   #8,%[mask]      \n"  /* mask = B.D. */
+        "lsr.l   #8,%[val]       \n"  /* val  = .A.C */
+        "or.l    %[mask],%[val]  \n"  /* val  = BADC */
+        "swap    %[val]          \n"  /* val  = DCBA */
+        : /* outputs */
+        [val] "+d"(value),
+        [mask]"+d"(mask)
+    );
+    return value;
 }
 
 static inline void invalidate_icache(void)
