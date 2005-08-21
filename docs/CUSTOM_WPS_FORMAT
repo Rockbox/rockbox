@@ -88,6 +88,14 @@ Conditional Tags (If/Else block):
             so the text in the if and else part can contain all % 
             commands, including conditionals.
 
+Alignment Tags:
+  %al : Text is left aligned
+  %ac : Text is center aligned
+  %ar : Text is right aligned
+
+All alignment tags may be present in on line, but the need to be in the order
+left - center - right. If the aligned texts overlap, they are merged.
+
 Next Song Info
 --------------
 You can display information about the next song - the song that is about to
