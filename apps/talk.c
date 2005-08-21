@@ -214,15 +214,10 @@ static void load_voicefile(void)
                
     for (i = 0; i < length; i++)
     {
-        temp = buf[i];
-        buf[i] = ((temp >> 7) & 0x01)
-                | ((temp >> 5) & 0x02)
-                | ((temp >> 3) & 0x04)
-                | ((temp >> 1) & 0x08)
-                | ((temp << 1) & 0x10)
-                | ((temp << 3) & 0x20)
-                | ((temp << 5) & 0x40)
-                | ((temp << 7) & 0x80);
+        temp   = buf[i];
+        temp   = ((temp >> 4) & 0x0f) | ((temp & 0x0f) << 4);
+        temp   = ((temp >> 2) & 0x33) | ((temp & 0x33) << 2);
+        buf[i] = ((temp >> 1) & 0x55) | ((temp & 0x55) << 1);
     }
     cpu_boost(false);
     
