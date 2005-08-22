@@ -208,7 +208,7 @@ unsigned int pcmbuf_get_latency(void)
     int latency;
     
     latency = (pcmbuf_unplayed_bytes + pcm_get_bytes_waiting())
-                / 4 / (44100/1000);
+                * 1000 / 4 / 44100;
     if (latency < 0)
         latency = 0;
     
