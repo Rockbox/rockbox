@@ -122,39 +122,39 @@ static bool mp3headerinfo(struct mp3info *info, unsigned long header)
     int freqindex;
     
     /* MPEG Audio Version */
-    switch(header & VERSION_MASK) {
+    switch((header & VERSION_MASK) >> 19) {
     case 0:
         /* MPEG version 2.5 is not an official standard */
         info->version = MPEG_VERSION2_5;
         bittable = MPEG_VERSION2 - 1; /* use the V2 bit rate table */
         break;
-        
-    case (1L << 19):
+
+    case 1:
         return false;
 
-    case (2L << 19):
+    case 2:
         /* MPEG version 2 (ISO/IEC 13818-3) */
         info->version = MPEG_VERSION2;
         bittable = MPEG_VERSION2 - 1;
         break;
         
-    case (3L << 19):
+    case 3:
         /* MPEG version 1 (ISO/IEC 11172-3) */
         info->version = MPEG_VERSION1;
         bittable = MPEG_VERSION1 - 1;
         break;
     }
 
-    switch(header & LAYER_MASK) {
+    switch((header & LAYER_MASK) >> 17) {
     case 0:
         return false;
-    case (1L << 17):
+    case 1:
         info->layer = 2;
         break;
-    case (2L << 17):
+    case 2:
         info->layer = 1;
         break;
-    case (3L << 17):
+    case 3:
         info->layer = 0;
         break;
     }
@@ -174,7 +174,7 @@ static bool mp3headerinfo(struct mp3info *info, unsigned long header)
         return false;
 
     info->padding = (header & 0x0200)?1:0;
-    
+
     /* Calculate number of bytes, calculation depends on layer */
     switch(info->layer) {
     case 0:
