@@ -66,42 +66,71 @@ int show_logo(void)
 }
 
 #ifdef HAVE_CHARGING
-int charging_screen(void)
+/*
+bool backlight_get_on_when_charging(void)
+{
+    return false;
+}
+*/
+void charging_screen(void)
 {
     unsigned int button;
-    int rc = 0;
+    const char* msg;
 
     ide_power_enable(false); /* power down the disk, else would be spinning */
 
     lcd_clear_display();
-    lcd_puts(0, 0, "charging...");
-#ifdef HAVE_LCD_BITMAP
-    lcd_update();
-#endif
 
     do
     {
-        button = button_get_w_tmo(HZ/2);
-        if (button == BUTTON_ON)
-            rc = 2;
-        else if (usb_detect())
-            rc = 3;
-        else if (!charger_inserted())
-            rc = 1;
-    } while (!rc);
+#ifdef HAVE_CHARGE_CTRL
+        if (charge_state == 1)
+            msg = "charging";
+        else if (charge_state == 2)
+            msg = "topoff charge";
+        else if (charge_state == 3)
+            msg = "trickle charge";
+        else
+            msg = "not charging";
 
-    return rc;
+#else
+        msg = "charging";
+#endif
+        lcd_puts(0, 0, msg);
+        {
+            char buf[32];
+            int battery_voltage;
+            int batt_int, batt_frac;
+            battery_voltage = (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) / 10000;
+            batt_int = battery_voltage / 100;
+            batt_frac = battery_voltage % 100;
+
+            snprintf(buf, sizeof(buf), "%d.%02dV %d%%",
+                batt_int, batt_frac, battery_level());
+            lcd_puts(0, 1, buf);
+        }
+
+#ifdef HAVE_LCD_BITMAP
+        lcd_update();
+#endif
+        
+        button = button_get_w_tmo(HZ/2);
+#ifdef BUTTON_ON
+        if (button == (BUTTON_ON | BUTTON_REL))
+#else
+        if (button == (BUTTON_RIGHT | BUTTON_REL))
+#endif
+            break; /* start */
+        else
+        {
+            if (usb_detect())
+                break;
+            else if (!charger_inserted())
+                power_off(); /* charger removed: power down */
+        }
+    } while (1);
 }
 #endif /* HAVE_CHARGING */
-
-#ifdef HAVE_MMC
-int mmc_remove_request(void)
-{
-    /* A dummy function here, we won't access the card
-       before entering USB mode */
-    return 0;
-}
-#endif /* HAVE_MMC */
 
 /* prompt user to plug USB and fix a problem */
 void prompt_usb(const char* msg1, const char* msg2)
@@ -150,10 +179,7 @@ void main(void)
 #endif
         )
     {
-        rc = charging_screen(); /* display a "charging" screen */
-        if (rc == 1)            /* charger removed */
-            power_off();
-        /* "On" pressed or USB connected: proceed */
+        charging_screen(); /* display a "charging" screen */
         show_logo();  /* again, to provide better visual feedback */
     }
 #endif
