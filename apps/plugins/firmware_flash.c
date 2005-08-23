@@ -353,7 +353,7 @@ tCheckResult CheckFirmwareFile(char* filename, int chipsize, bool is_romless)
         rb->close(fd);
         return eTooBig;
     }
-    else if (fileleft < 50000) /* give it some reasonable lower limit */
+    else if (fileleft < 20000) /* give it some reasonable lower limit */
     {
         rb->close(fd);
         return eTooSmall;
