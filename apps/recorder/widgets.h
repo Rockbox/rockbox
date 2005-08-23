@@ -21,14 +21,6 @@
 #include <lcd.h>
 
 #ifdef HAVE_LCD_BITMAP
-/* Directions for progressbar and slidebar */
-enum {
-    Grow_Right = 0,
-    Grow_Left,
-    Grow_Down,
-    Grow_Up
-};
-
 /* Orientation for scrollbar */
 enum {
     VERTICAL = 0,
