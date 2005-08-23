@@ -4,7 +4,6 @@ chessclock.c
 cube.c
 favorites.c
 firmware_flash.c
-helloworld.c
 logo.c
 mosaique.c
 rockbox_flash.c
