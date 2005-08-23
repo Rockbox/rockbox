@@ -40,6 +40,14 @@ MEMORY
 }
 SECTIONS
 {
+    .flashheader : 
+    {
+	/* place flash link address first, so the plugin can check */	
+        LONG(FLASHORIG);
+        /* followed by the start address, the first vector takes care of this. */
+        /* If we ever place the table elsewhere, put a constant here. */
+    } > FLASH
+
     .vectors :
     {
         _datacopy = .;

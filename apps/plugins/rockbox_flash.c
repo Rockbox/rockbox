@@ -82,6 +82,7 @@ typedef enum
     eNotUCL,
     eWrongAlgorithm,
     eMultiBlocks,
+    eBadRomLink
 } tCheckResult;
 
 typedef struct 
@@ -438,10 +439,31 @@ tCheckResult CheckImageFile(char* filename, int space, tImageHeader* pHeader,
             rb->close(fd);
             return eReadErr;
         }
-        pHeader->execute = reset_vector;
-        if (reset_vector != ROCKBOX_EXEC) /* nonstandard address? */
+        if (reset_vector >= (UINT32)FB 
+         && reset_vector <  (UINT32)FB+512*1024) /* ROM address? */
+        {
             /* assume in-place, executing directly in flash */
             pHeader->destination = (UINT32)(pos + sizeof(tImageHeader));
+
+            /* for new RomBox, this isn't the reset vector,
+               but the link address, for us to check the position */
+            if(pHeader->destination != reset_vector) /* compare link addr. */
+            {
+                rb->close(fd);
+                return eBadRomLink; /* not matching the start address */
+            }
+
+            /* read the now following reset vector */
+            read = rb->read(fd, &reset_vector, sizeof(reset_vector));
+            fileread += read;
+            if (read != sizeof(reset_vector))
+            {
+                rb->close(fd);
+                return eReadErr;
+            }
+        }
+
+        pHeader->execute = reset_vector;
     }
     
     /* check if we can read the whole file */
@@ -737,6 +759,10 @@ void DoUserDialog(char* filename)
             rb->lcd_puts(0, 2, "Blocksize");
             rb->lcd_puts(0, 3, " too small?");
             break;
+    case eBadRomLink:
+            rb->lcd_puts(0, 1, "RomBox mismatch.");
+            rb->lcd_puts(0, 2, "Wrong ROM position");
+            break;
     default:
             rb->lcd_puts(0, 1, "Check failed.");
             break;
@@ -905,6 +931,9 @@ void DoUserDialog(char* filename)
             break;
     case eMultiBlocks:
             rb->lcd_puts_scroll(0, 1, "File invalid. Blocksize too small?");
+            break;
+    case eBadRomLink:
+            rb->lcd_puts_scroll(0, 1, "BootBox mismatch");
             break;
     default:
             rb->lcd_puts_scroll(0, 1, "Check failed.");
