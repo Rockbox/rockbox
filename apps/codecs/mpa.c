@@ -171,7 +171,8 @@ enum codec_status codec_start(struct codec_api* api)
         
             samplesdone = ((int64_t) (ci->seek_time - 1)) 
                 * current_frequency / 1000;
-            newpos = ci->mp3_get_filepos(ci->seek_time-1);
+            newpos = ci->mp3_get_filepos(ci->seek_time-1) +
+                ci->id3->first_frame_offset;
 
             if (!ci->seek_buffer(newpos)) {
                 goto next_track;
