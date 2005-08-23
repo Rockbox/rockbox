@@ -767,7 +767,7 @@ int rotleft(unsigned char *dst, bitmap_t *src, unsigned int width,
 int gen_c_source(struct font* pf, char *path)
 {
     FILE *ofp;
-    int i;
+    int i, ofr = 0;
     int did_defaultchar = 0;
     int did_syncmsg = 0;
     time_t t = time(0);
@@ -834,8 +834,10 @@ int gen_c_source(struct font* pf, char *path)
          */
         if (pf->offset && 
             (pf->offset[i] == pf->offset[pf->defaultchar-pf->firstchar])) {
-            if (did_defaultchar)
+            if (did_defaultchar) {
+                pf->offrot[i] = pf->offrot[pf->defaultchar-pf->firstchar];
                 continue;
+            }
             did_defaultchar = 1;
         }
 
@@ -881,7 +883,7 @@ int gen_c_source(struct font* pf, char *path)
           unsigned char bytemap[256];
           int y8, ix=0;
           
-          rotleft(bytemap, bits, width, pf->height);
+          int size = rotleft(bytemap, bits, width, pf->height);
           for (y8=0; y8<pf->height; y8+=8) /* column rows */
           {
             for (x=0; x<width; x++) {
@@ -890,6 +892,11 @@ int gen_c_source(struct font* pf, char *path)
             }	
             fprintf(ofp, "\n");
           }
+
+        /* update offrot since bits are now in sorted order */
+        pf->offrot[i] = ofr;
+        ofr += size;
+
         }
 #else
         for (x=BITMAP_WORDS(width)*pf->height; x>0; --x) {
@@ -1040,6 +1047,7 @@ int gen_fnt_file(struct font* pf, char *path)
     writelong(ofp, pf->width? pf->size: 0);	  /* # bytes of width*/
     /* variable font data*/
 #ifdef ROTATE
+    int ofr = 0;
     for (i=0; i<pf->size; ++i)
     {
         bitmap_t* bits = pf->bits + (pf->offset? pf->offset[i]: (pf->height * i));
@@ -1049,13 +1057,19 @@ int gen_fnt_file(struct font* pf, char *path)
   
         if (pf->offset && 
             (pf->offset[i] == pf->offset[pf->defaultchar-pf->firstchar])) {
-            if (did_defaultchar)
+            if (did_defaultchar) {
+                pf->offrot[i] = pf->offrot[pf->defaultchar-pf->firstchar];
                 continue;
+            }
             did_defaultchar = 1;
         }
 
         size = rotleft(bytemap, bits, width, pf->height);
-        writestr(ofp, bytemap, size);
+        writestr(ofp, (char *)bytemap, size);
+
+        /* update offrot since bits are now in sorted order */
+        pf->offrot[i] = ofr;
+        ofr += size;
     }
 
     if (ftell(ofp) & 1)
