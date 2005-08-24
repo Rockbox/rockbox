@@ -17,6 +17,8 @@ upgrade your ordinary Archos firmware.
 
 <h2>News</h2>
 
+<p><i>2005-08-24</i>: Linus ran his first <a href=/twiki/bin/view/Main/IriverBDM>BDM session</a> on his H320.
+
 <p><i>2005-08-18</i>: At 13:59 CET. First multimeter "beep" for the h300.
 
 <p><i>2005-08-08</i>: We will have a <a
