@@ -2104,7 +2104,7 @@ void mp3_play_data(const unsigned char* start, int size,
 
 void audio_set_buffer_margin(int setting)
 {
-    int lookup[] = {5, 15, 30, 60, 120, 180, 300, 600};
+    static const int lookup[] = {5, 15, 30, 60, 120, 180, 300, 600};
     buffer_margin = lookup[setting];
     logf("buffer margin: %ds", buffer_margin);
     set_filebuf_watermark(buffer_margin);
@@ -2116,7 +2116,7 @@ void audio_set_crossfade(int type)
     long size;
     bool was_playing = playing;
     int offset = 0;
-    int lookup[] = {1, 2, 4, 6, 8, 10, 12, 14};
+    static const int lookup[] = {1, 2, 4, 6, 8, 10, 12, 14};
     int seconds = lookup[global_settings.crossfade_duration];
 
     /* Store the track resume position */
