@@ -33,7 +33,7 @@
 
 #define KEYBOARD_LINES 4
 #define KEYBOARD_PAGES 3
-
+#define KEYBOARD_MARGIN 3
 
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
     (CONFIG_KEYPAD == IRIVER_H300_PAD)
@@ -74,33 +74,22 @@
 
 #endif
 
+static const char * const kbdpages[KEYBOARD_PAGES][KEYBOARD_LINES] = {
+    {   "ABCDEFG !?\" @#$%+'", 
+        "HIJKLMN 789 &_()-`",
+        "OPQRSTU 456 §|{}/<",  
+        "VWXYZ.,0123 ~=[]*>" },
 
-static void kbd_setupkeys(const char* line[KEYBOARD_LINES], int page)
-{
-    switch (page) 
-    {
-        case 0:
-            line[0] = "ABCDEFG !?\" @#$%+'";
-            line[1] = "HIJKLMN 789 &_()-`";
-            line[2] = "OPQRSTU 456 §|{}/<";
-            line[3] = "VWXYZ.,0123 ~=[]*>";
-            break;
+    {   "abcdefg ¢£¤¥¦§©®¬",   
+        "hijklmn «»°ºª¹²³¶",
+        "opqrstu ¯±×÷¡¿µ·¨",   
+        "vwxyz., ¼½¾      "  },
 
-        case 1:
-            line[0] = "abcdefg ¢£¤¥¦§©®¬";
-            line[1] = "hijklmn «»°ºª¹²³¶";
-            line[2] = "opqrstu ¯±×÷¡¿µ·¨";
-            line[3] = "vwxyz., ¼½¾      ";
-            break;
-
-        case 2:
-            line[0] = "ÀÁÂÃÄÅÆ ÌÍÎÏ ÈÉÊË";
-            line[1] = "àáâãäåæ ìíîï èéêë";
-            line[2] = "ÓÒÔÕÖØ ÇÐÞÝß ÙÚÛÜ";
-            line[3] = "òóôõöø çðþýÿ ùúûü";
-            break;
-    }
-}
+    {   "ÀÁÂÃÄÅÆ ÌÍÎÏ ÈÉÊË",   
+        "àáâãäåæ ìíîï èéêë",
+        "ÓÒÔÕÖØ ÇÐÞÝß ÙÚÛÜ",
+        "òóôõöø çðþýÿ ùúûü"  },
+};
 
 /* helper function to spell a char if voice UI is enabled */
 static void kbd_spellchar(char c)
@@ -121,18 +110,17 @@ int kbd_input(char* text, int buflen)
 
     int font_w = 0, font_h = 0, i;
     int x = 0, y = 0;
-    int main_x, main_y, max_chars, margin;
+    int main_x, main_y, max_chars;
     int status_y1, status_y2;
     int len;
     int editpos, curpos, leftpos;
     bool redraw = true;
-    const char* line[KEYBOARD_LINES];
+    const char * const *line;
 #ifdef KBD_MODES
     bool line_edit = false;
 #endif
 
     char outline[256];
-    char c = 0;
     struct font* font = font_get(FONT_SYSFIXED);
     int button, lastbutton = 0;
 
@@ -140,8 +128,7 @@ int kbd_input(char* text, int buflen)
     font_w = font->maxwidth;
     font_h = font->height;
 
-    margin = 3;
-    main_y = (KEYBOARD_LINES + 1) * font_h + margin*2;
+    main_y = (KEYBOARD_LINES + 1) * font_h + (2*KEYBOARD_MARGIN);
     main_x = 0;
     status_y1 = LCD_HEIGHT - font_h;
     status_y2 = LCD_HEIGHT;
@@ -149,7 +136,7 @@ int kbd_input(char* text, int buflen)
     editpos = strlen(text);
 
     max_chars = LCD_WIDTH / font_w - 2; /* leave room for < and > */
-    kbd_setupkeys(line, page);
+    line = kbdpages[0];
 
     if (global_settings.talk_menu) /* voice UI? */
         talk_spell(text, true); /* spell initial text */ 
@@ -169,7 +156,7 @@ int kbd_input(char* text, int buflen)
                 lcd_putsxy(0, 8+i * font_h, line[i]);
             
             /* separator */
-            lcd_hline(0, LCD_WIDTH - 1, main_y - margin);
+            lcd_hline(0, LCD_WIDTH - 1, main_y - KEYBOARD_MARGIN);
             
             /* write out the text */
             curpos = MIN(editpos, max_chars - MIN(len - editpos, 2));
@@ -221,10 +208,10 @@ int kbd_input(char* text, int buflen)
                 break;
 
 #ifdef KBD_PAGE_FLIP
-            case KBD_PAGE_FLIP:
+            case KBD_PAGE_FLIP:    
                 if (++page == KEYBOARD_PAGES)
                     page = 0;
-                kbd_setupkeys(line, page);
+                line = kbdpages[page];
                 kbd_spellchar(line[y][x]);
                 break;
 #endif
@@ -242,7 +229,7 @@ int kbd_input(char* text, int buflen)
                 }
                 else
 #endif
-                {
+                {   
                     if (x < (int)strlen(line[y]) - 1)
                         x++;
                     else
@@ -251,7 +238,7 @@ int kbd_input(char* text, int buflen)
 #ifndef KBD_PAGE_FLIP   /* no dedicated flip key - flip page on wrap */
                         if (++page == KEYBOARD_PAGES)
                             page = 0;
-                        kbd_setupkeys(line, page);
+                        line = kbdpages[page];
 #endif
                     }
                     kbd_spellchar(line[y][x]);
@@ -271,7 +258,7 @@ int kbd_input(char* text, int buflen)
                 }
                 else
 #endif
-                {
+                {   
                     if (x)
                         x--;
                     else
@@ -279,7 +266,7 @@ int kbd_input(char* text, int buflen)
 #ifndef KBD_PAGE_FLIP   /* no dedicated flip key - flip page on wrap */
                         if (--page < 0)
                             page = (KEYBOARD_PAGES-1);
-                        kbd_setupkeys(line, page);
+                        line = kbdpages[page];
 #endif
                         x = strlen(line[y]) - 1;
                     }
@@ -364,20 +351,12 @@ int kbd_input(char* text, int buflen)
                 else
 #endif
                 {
-                    if (len < buflen)
+                    if (len + 1 < buflen)
                     {
-                        c = line[y][x];
-                        if (editpos == len)
-                        {
-                            text[len] = c;
-                            text[len+1] = 0;
-                        }
-                        else
-                        {
-                            for (i = len ; i >= editpos; i--)
-                                text[i+1] = text[i];
-                            text[editpos] = c;
-                        }
+                        for (i = len ; i > editpos; i--)
+                            text[i] = text[i-1];
+                        text[len+1] = 0;
+                        text[editpos] = line[y][x];
                         editpos++;
                     }
                 }

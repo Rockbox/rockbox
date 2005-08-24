@@ -102,7 +102,6 @@ int kbd_input(char* text, int buflen)
     int editpos, curpos, leftpos;
     unsigned short* line = kbd_setupkeys(page, &linelen);
     unsigned char temptext[12];
-    char c;
 
     int button, lastbutton = 0;
 
@@ -130,11 +129,11 @@ int kbd_input(char* text, int buflen)
 
             /* Draw insert chars */
             temptext[0] = KEYBOARD_INSERT_LEFT;
-            temptext[1] = line[x%linelen];
+            temptext[1] = line[x];
             temptext[2] = KEYBOARD_INSERT_RIGHT;
             for (i = 1; i < 8; i++)
             {
-                temptext[i+2] = line[(i+x)%linelen];
+                temptext[i+2] = line[(x+i)%linelen];
             }
             temptext[i+2] = 0;
             lcd_puts(1, 0, temptext);
@@ -194,9 +193,7 @@ int kbd_input(char* text, int buflen)
                 }
                 else
                 {
-                    if (x < linelen - 1)
-                        x++;
-                    else
+                    if (++x >= linelen)
                         x = 0;
                     kbd_spellchar(line[x]);
                 }
@@ -214,9 +211,7 @@ int kbd_input(char* text, int buflen)
                 }
                 else
                 {
-                    if (x)
-                        x--;
-                    else
+                    if (--x < 0)
                         x = linelen - 1;
                     kbd_spellchar(line[x]);
                 }
@@ -242,20 +237,12 @@ int kbd_input(char* text, int buflen)
                 }
                 else  /* inserts the selected char */
                 {
-                    if (len < buflen)
+                    if (len + 1 < buflen)
                     {
-                        c = line[x];
-                        if (editpos == len)
-                        {
-                            text[len] = c;
-                            text[len+1] = 0;
-                        }
-                        else
-                        {
-                            for (i = len ; i >= editpos; i--)
-                                text[i+1] = text[i];
-                            text[editpos] = c;
-                        }
+                        for (i = len ; i > editpos; i--)
+                            text[i] = text[i-1];
+                        text[len+1] = 0;
+                        text[editpos] = line[x];
                         editpos++;
                     }
                 }
