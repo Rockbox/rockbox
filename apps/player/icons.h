@@ -28,9 +28,17 @@
 #ifdef HAVE_LCD_CHARCELLS
 
 enum {
-    Unknown = 0x90,
-    Bookmark = 0x16,
-    Plugin, Folder, Mod_Ajz, Language, File, Wps, Playlist, Text, Config,
+    Icon_Unknown = 0x90,
+    Icon_Bookmark = 0x16,
+    Icon_Plugin,
+    Icon_Folder,
+    Icon_Firmware,
+    Icon_Language,
+    Icon_Audio,
+    Icon_Wps,
+    Icon_Playlist,
+    Icon_Text,
+    Icon_Config,
 };
 
 #endif

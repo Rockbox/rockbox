@@ -105,10 +105,10 @@ void filetype_init(void)
 /* The special filetype folder must always be stored at index 0 */
 #ifdef HAVE_LCD_BITMAP
     if (!filetypes[0].icon)
-        filetypes[0].icon = bitmap_icons_6x8[Folder];
+        filetypes[0].icon = bitmap_icons_6x8[Icon_Folder];
 #else
     if (!filetypes[0].icon)
-        filetypes[0].icon = Folder;
+        filetypes[0].icon = Icon_Folder;
     for (i=1; i < MAX_FILETYPES; i++)
         filetypes[i].icon = -1;
 #endif
@@ -370,9 +370,9 @@ static void scan_plugins(void)
                     exttypes[cnt_exttypes].extension=cp;
                     exttypes[cnt_exttypes].type=&filetypes[cnt_filetypes];
 #ifdef HAVE_LCD_BITMAP
-                    exttypes[cnt_exttypes].type->icon = bitmap_icons_6x8[Plugin];
+                    exttypes[cnt_exttypes].type->icon = bitmap_icons_6x8[Icon_Plugin];
 #else
-                    exttypes[cnt_exttypes].type->icon = Plugin;
+                    exttypes[cnt_exttypes].type->icon = Icon_Plugin;
 #endif
                     cnt_exttypes++;
 

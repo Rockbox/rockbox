@@ -27,24 +27,29 @@
 
 #ifdef HAVE_LCD_BITMAP
 
-enum icons_6x8 {
-    Box_Filled, Box_Empty, Slider_Horizontal, File, 
-    Folder,     Directory, Playlist,          Repeat,
-    Selected,   Cursor,    Wps,               Mod_Ajz, 
-    Font,       Language,  Config,            Plugin,
-    Bookmark,
-    LastIcon
-};
-
 /* Symbolic names for icons */
 enum icons_5x8 {
     Icon_Lock
 };
 
+enum icons_6x8 {
+    Icon_Audio,
+    Icon_Folder,
+    Icon_Playlist,
+    Icon_Cursor,
+    Icon_Wps,
+    Icon_Firmware,
+    Icon_Font,
+    Icon_Language,
+    Icon_Config,
+    Icon_Plugin,
+    Icon_Bookmark,
+    LastIcon
+};
+
 enum icons_7x8 {
     Icon_Plug,
     Icon_USBPlug,
-    Icon_Speaker,
     Icon_Mute,
     Icon_Play,
     Icon_Stop,

@@ -527,11 +527,11 @@ int   db_get_icon(struct tree_context* c)
         case songs4album:
         case songs4artist:
         case searchsongs:
-            icon = File;
+            icon = Icon_Audio;
             break;
 
         default:
-            icon = Folder;
+            icon = Icon_Folder;
             break;
     }
 

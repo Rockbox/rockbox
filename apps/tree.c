@@ -68,32 +68,32 @@
 
 /* a table for the know file types */
 const struct filetype filetypes[] = {
-    { ".mp3", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
-    { ".mp2", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
-    { ".mpa", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
+    { ".mp3", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
+    { ".mp2", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
+    { ".mpa", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
 #if CONFIG_HWCODEC == MASNONE
     /* Temporary hack to allow playlist creation */
-    { ".mp1", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
-    { ".ogg", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
-    { ".wma", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
-    { ".wav", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
-    { ".flac", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
-    { ".ac3", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
-    { ".a52", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
-    { ".mpc", TREE_ATTR_MPA, File, VOICE_EXT_MPA },
-    { ".wv",  TREE_ATTR_MPA, File, VOICE_EXT_MPA },
+    { ".mp1", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
+    { ".ogg", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
+    { ".wma", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
+    { ".wav", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
+    { ".flac", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
+    { ".ac3", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
+    { ".a52", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
+    { ".mpc", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
+    { ".wv",  TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
 #endif
-    { ".m3u", TREE_ATTR_M3U, Playlist, LANG_PLAYLIST },
-    { ".cfg", TREE_ATTR_CFG, Config, VOICE_EXT_CFG },
-    { ".wps", TREE_ATTR_WPS, Wps, VOICE_EXT_WPS },
-    { ".lng", TREE_ATTR_LNG, Language, LANG_LANGUAGE },
-    { ".rock",TREE_ATTR_ROCK,Plugin, VOICE_EXT_ROCK },
+    { ".m3u", TREE_ATTR_M3U, Icon_Playlist, LANG_PLAYLIST },
+    { ".cfg", TREE_ATTR_CFG, Icon_Config, VOICE_EXT_CFG },
+    { ".wps", TREE_ATTR_WPS, Icon_Wps, VOICE_EXT_WPS },
+    { ".lng", TREE_ATTR_LNG, Icon_Language, LANG_LANGUAGE },
+    { ".rock",TREE_ATTR_ROCK,Icon_Plugin, VOICE_EXT_ROCK },
 #ifdef HAVE_LCD_BITMAP
-    { ".fnt", TREE_ATTR_FONT,Font, VOICE_EXT_FONT },
+    { ".fnt", TREE_ATTR_FONT,Icon_Font, VOICE_EXT_FONT },
 #endif
-    { ".bmark",TREE_ATTR_BMARK, Bookmark, VOICE_EXT_BMARK },
+    { ".bmark",TREE_ATTR_BMARK, Icon_Bookmark, VOICE_EXT_BMARK },
 #ifdef BOOTFILE_EXT
-    { BOOTFILE_EXT, TREE_ATTR_MOD, Mod_Ajz, VOICE_EXT_AJZ },
+    { BOOTFILE_EXT, TREE_ATTR_MOD, Icon_Firmware, VOICE_EXT_AJZ },
 #endif /* #ifndef SIMULATOR */
 };
 
@@ -400,7 +400,7 @@ static int showdir(void)
                             MARGIN_Y+(i-start)*line_height + offset, 6, 8);
 #else
             if (icon < 0 )
-                icon = Unknown;
+                icon = Icon_Unknown;
             lcd_putc(LINE_X-1, i-start, icon);
 #endif
         }

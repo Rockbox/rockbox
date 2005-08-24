@@ -36,15 +36,9 @@ const unsigned char bitmap_icons_5x8[][5] =
 
 const unsigned char bitmap_icons_6x8[LastIcon][6] =
 {
-    { 0x00, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f }, /* Box_Filled */
-    { 0x00, 0x7f, 0x41, 0x41, 0x41, 0x7f }, /* Box_Empty */
-    { 0x00, 0x3e, 0x7f, 0x63, 0x7f, 0x3e }, /* Slider_Horizontal */
     { 0x60, 0x7f, 0x03, 0x33, 0x3f, 0x00 }, /* Musical note */
     { 0x7e, 0x41, 0x41, 0x42, 0x7e, 0x00 }, /* Folder */
-    { 0x3e, 0x26, 0x26, 0x24, 0x3c, 0x00 }, /* Directory */
     { 0x55, 0x00, 0x55, 0x55, 0x55, 0x55 }, /* Playlist */
-    { 0x39, 0x43, 0x47, 0x71, 0x61, 0x4e }, /* Repeat */
-    { 0x00, 0x1c, 0x3e, 0x3e, 0x3e, 0x1c }, /* Selected */
     { 0x3e, 0x1c, 0x08, 0x00, 0x00, 0x00 }, /* Cursor / Marker */
     { 0x58, 0x5f, 0x42, 0x50, 0x55, 0x55 }, /* WPS file */
     { 0x63, 0x7f, 0x3a, 0x7f, 0x63, 0x00 }, /* Mod or ajz file */
@@ -59,7 +53,6 @@ const unsigned char bitmap_icons_7x8[][7] =
 {
     {0x08,0x1c,0x3e,0x3e,0x3e,0x14,0x14}, /* Power plug */
     {0x1c,0x14,0x3e,0x2a,0x22,0x1c,0x08}, /* USB plug */
-    {0x00,0x1c,0x1c,0x3e,0x7f,0x00,0x00}, /* Speaker */
     {0x01,0x1e,0x1c,0x3e,0x7f,0x20,0x40}, /* Speaker mute */
     {0x00,0x7f,0x7f,0x3e,0x1c,0x08,0x00}, /* Play */
     {0x7f,0x7f,0x7f,0x7f,0x7f,0x7f,0x7f}, /* Stop */
@@ -82,7 +75,8 @@ const unsigned char bitmap_icon_disk[12] =
     {0x15,0x3f,0x7d,0x7B,0x77,0x67,0x79,0x7b,0x57,0x4f,0x47,0x7f};
 #endif
 
-#if  LCD_WIDTH == 112 || LCD_WIDTH == 128 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_WIDTH == 128)
+#if  LCD_WIDTH == 112 || LCD_WIDTH == 128 \
+     || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_WIDTH == 128)
 /* Archos Jukebox/ Ondio + Gmini LCD width / remote lcd of iriver*/
 
 const unsigned char rockbox112x37[]={
@@ -347,29 +341,24 @@ const unsigned char rockbox160x53x2[] = {
  */
 void statusbar_icon_battery(int percent)
 {
-    int i;
     int fill;
     char buffer[5];
     unsigned int width, height;
 
     /* fill battery */
-    fill=percent;
+    fill = percent;
     if (fill < 0)
         fill = 0;
     if (fill > 100)
         fill = 100;
 
-#ifdef SIMULATOR
-    if (global_settings.battery_display && (percent > -1)) {
-#else
-#ifdef HAVE_CHARGE_CTRL /* Recorder */
+#if defined(HAVE_CHARGE_CTRL) && !defined(SIMULATOR) /* Rec v1 target only */
     /* show graphical animation when charging instead of numbers */
     if ((global_settings.battery_display) &&
         (charge_state != 1) &&
         (percent > -1)) {
-#else /* FM */
+#else /* all others */
     if (global_settings.battery_display && (percent > -1)) {
-#endif /* HAVE_CHARGE_CTRL */
 #endif
         /* Numeric display */
         snprintf(buffer, sizeof(buffer), "%3d", fill);
@@ -384,11 +373,10 @@ void statusbar_icon_battery(int percent)
     else {
         /* draw battery */
         lcd_drawrect(ICON_BATTERY_X_POS, STATUSBAR_Y_POS, 17, 7);
-        for (i=2; i < 5; i++)
-            lcd_drawpixel(ICON_BATTERY_X_POS + 17, STATUSBAR_Y_POS + i);
+        lcd_vline(ICON_BATTERY_X_POS + 17, STATUSBAR_Y_POS + 2,
+                  STATUSBAR_Y_POS + 4);
 
         fill = fill * 15 / 100;
-
         lcd_fillrect(ICON_BATTERY_X_POS + 1, STATUSBAR_Y_POS + 1, fill, 5);
     }
 
@@ -405,17 +393,13 @@ void statusbar_icon_battery(int percent)
  */
 bool statusbar_icon_volume(int percent)
 {
-    int i,j;
+    int i;
     int volume;
     int vol;
-    int step=0;
     char buffer[4];
     unsigned int width, height;
     bool needs_redraw = false;
     int type = global_settings.volume_type;
-#if defined(LOADABLE_FONTS)
-    unsigned char *font;
-#endif
     static long switch_tick;
     static int last_volume = -1; /* -1 means "first update ever" */
 
@@ -425,7 +409,7 @@ bool statusbar_icon_volume(int percent)
     if (volume > 100)
         volume = 100;
 
-    if (volume==0) {
+    if (volume == 0) {
         lcd_mono_bitmap(bitmap_icons_7x8[Icon_Mute], 
                         ICON_VOLUME_X_POS + ICON_VOLUME_WIDTH / 2 - 4,
                         STATUSBAR_Y_POS, 7, STATUSBAR_HEIGHT);
@@ -438,7 +422,7 @@ bool statusbar_icon_volume(int percent)
 
         /* If the timeout hasn't yet been reached, we show it numerically
            and tell the caller that we want to be called again */
-        if(TIME_BEFORE(current_tick,switch_tick)) {
+        if (TIME_BEFORE(current_tick,switch_tick)) {
             type = 1;
             needs_redraw = true;
         }
@@ -457,11 +441,8 @@ bool statusbar_icon_volume(int percent)
             /* display volume bar */
             vol = volume * 14 / 100;
             for(i=0; i < vol; i++) {
-                if(i%2 == 0)
-                    step++;
-                for(j=1; j <= step; j++)
-                    lcd_drawpixel(ICON_VOLUME_X_POS + i, 
-                                  STATUSBAR_Y_POS + 7 - j);
+                lcd_vline(ICON_VOLUME_X_POS + i, STATUSBAR_Y_POS + 6 - i / 2,
+                          STATUSBAR_Y_POS + 6);
             }
         }
     }
@@ -475,8 +456,8 @@ bool statusbar_icon_volume(int percent)
  */
 void statusbar_icon_play_state(int state)
 {
-    lcd_mono_bitmap(bitmap_icons_7x8[state], ICON_PLAY_STATE_X_POS, STATUSBAR_Y_POS,
-                    ICON_PLAY_STATE_WIDTH, STATUSBAR_HEIGHT);
+    lcd_mono_bitmap(bitmap_icons_7x8[state], ICON_PLAY_STATE_X_POS,
+                    STATUSBAR_Y_POS, ICON_PLAY_STATE_WIDTH, STATUSBAR_HEIGHT);
 }
 
 /*
@@ -484,8 +465,8 @@ void statusbar_icon_play_state(int state)
  */
 void statusbar_icon_play_mode(int mode)
 {
-    lcd_mono_bitmap(bitmap_icons_7x8[mode], ICON_PLAY_MODE_X_POS, STATUSBAR_Y_POS,
-                    ICON_PLAY_MODE_WIDTH, STATUSBAR_HEIGHT);
+    lcd_mono_bitmap(bitmap_icons_7x8[mode], ICON_PLAY_MODE_X_POS,
+                    STATUSBAR_Y_POS, ICON_PLAY_MODE_WIDTH, STATUSBAR_HEIGHT);
 }
 
 /*
@@ -512,7 +493,7 @@ void statusbar_icon_lock(void)
  */
 void statusbar_led(void)
 {
-    lcd_mono_bitmap(bitmap_icon_disk, ICON_DISK_X_POS, 
+    lcd_mono_bitmap(bitmap_icon_disk, ICON_DISK_X_POS,
                     STATUSBAR_Y_POS, ICON_DISK_WIDTH, STATUSBAR_HEIGHT);
 }
 #endif
@@ -533,7 +514,7 @@ void statusbar_time(int hour, int minute)
         if ( global_settings.timeformat ) { /* 12 hour clock */
             hour %= 12;
             if ( hour == 0 ) {
-                hour +=12;
+                hour += 12;
             }
         }
         snprintf(buffer, sizeof(buffer), "%02d:%02d", hour, minute);
