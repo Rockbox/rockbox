@@ -639,7 +639,6 @@ void radio_load_presets(void)
     char *freq;
     char *name;
     bool done = false;
-    int i;
     int f;
 
     if(!presets_loaded)
@@ -650,8 +649,7 @@ void radio_load_presets(void)
         fd = open(default_filename, O_RDONLY);
         if(fd >= 0)
         {
-            i = 0;
-            while(!done && i < MAX_PRESETS)
+            while(!done && num_presets < MAX_PRESETS)
             {
                 rc = read_line(fd, buf, 128);
                 if(rc > 0)

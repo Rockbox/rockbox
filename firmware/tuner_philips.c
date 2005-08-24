@@ -37,7 +37,7 @@ void philips_set(int setting, int value)
             /* init values */
             write_bytes[0] = 0x80; /* mute */
             write_bytes[1] = 0x00;
-            write_bytes[2] = 0x00;
+            write_bytes[2] = 0x10;
 #if CONFIG_TUNER_XTAL == 32768000
             write_bytes[3] = 0x1A; /* 32.768MHz, soft mute,
                                       stereo noise cancelling */
@@ -55,9 +55,9 @@ void philips_set(int setting, int value)
             {
                 int n;
 #if CONFIG_TUNER_XTAL == 32768000
-                n = (4 * (value - 225000)) / 32768;
+                n = (4 * (value + 225000)) / 32768;
 #else
-                n = (4 * (value - 225000)) / 50000;
+                n = (4 * (value + 225000)) / 50000;
 #endif
                 write_bytes[0] = (write_bytes[0] & 0xC0) | (n >> 8);
                 write_bytes[1] = n & 0xFF;
