@@ -20,6 +20,7 @@
 #include <stdbool.h>
 #include "thread.h"
 #include "panic.h"
+#include "system.h"
 #include "kernel.h"
 #include "cpu.h"
 
@@ -196,7 +197,7 @@ static inline void load_context(const void* addr)
 
 #endif
 
-/*--------------------------------------------------------------------------- 
+/*---------------------------------------------------------------------------
  * Switch thread in round robin fashion.
  *---------------------------------------------------------------------------
  */
@@ -215,7 +216,7 @@ void switch_thread(void)
 #ifdef CPU_COLDFIRE
         asm volatile ("stop #0x2000");
 #elif CONFIG_CPU == SH7034
-        SBYCR &= 0x7F;
+        and_b(0x7F, &SBYCR);
         asm volatile ("sleep");
 #elif CONFIG_CPU == TCC730
 	    /* Sleep mode is triggered by the SYS instr on CalmRisc16.
@@ -357,4 +358,4 @@ int thread_stack_usage(int threadnum)
 
     return ((thread_stack_size[threadnum] - i * sizeof(int)) * 100) /
         thread_stack_size[threadnum];
-}
+}       
