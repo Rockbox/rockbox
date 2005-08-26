@@ -146,9 +146,9 @@ new: "Sortere små/store bokstaver"
 
 id: LANG_RESUME
 desc: in settings_menu
-eng: "Resume"
-voice: "Resume"
-new: "Husk låtposisjon"
+eng: "Resume on startup"
+voice: "Resume on startup"
+new: "Start avspilling ved oppstart"
 
 id: LANG_OFF
 desc: Used in a lot of places
@@ -379,10 +379,10 @@ voice: ""
 new: "er full!"
 
 id: LANG_RESUME_ASK
-desc: question asked at the begining when resume is on
-eng: "Resume?"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "Fortsett?"
+new: ""
 
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
@@ -457,22 +457,22 @@ voice: ""
 new: "[Tittel]"
 
 id: LANG_ID3_NO_TITLE
-desc: in wps when no title is avaible
-eng: "<No Title>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "<Ingen tittel>"
+new: ""
 
 id: LANG_ID3_ARTIST
-desc: in wps 
+desc: in wps
 eng: "[Artist]"
 voice: ""
 new: "[Artist]"
 
 id: LANG_ID3_NO_ARTIST
-desc: in wps when no artist is avaible
-eng: "<No Artist>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "<Ingen artist>"
+new: ""
 
 id: LANG_ID3_ALBUM
 desc: in wps
@@ -481,10 +481,10 @@ voice: ""
 new: "[Album]"
 
 id: LANG_ID3_NO_ALBUM
-desc: in wps when no album is avaible
-eng: "<No Album>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "<Inget album>"
+new: ""
 
 id: LANG_ID3_TRACKNUM
 desc: in wps
@@ -493,10 +493,10 @@ voice: ""
 new: "[Spornum]"
 
 id: LANG_ID3_NO_TRACKNUM
-desc: in wps if no track number is avaible
-eng: "<No Tracknum>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "<Inget spornum>"
+new: ""
 
 id: LANG_ID3_LENGHT
 desc: in wps
@@ -574,13 +574,13 @@ id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
 eng: "End Of List"
 voice: ""
-new: "Listen er slutt"
+new: "Liste ferdig"
 
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
 eng: "End Of Song List"
 voice: ""
-new: "Slutt på spillelisten"
+new: "Spillelisten er ferdig"
 
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
@@ -634,7 +634,7 @@ id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
 eng: "Backlight On When Plugged"
 voice: "Backlight On When Plugged"
-new: "Skjermlys på når strøm koblet til"
+new: "Skjermlys på ved tilkoblet strøm"
 
 id: LANG_PM_CLIP_HOLD
 desc: in the peak meter menu
@@ -799,10 +799,10 @@ voice: "September"
 new: "Sep"
 
 id: LANG_RESUME_SETTING_ASK_ONCE
-desc: in settings_menu
-eng: "Ask Once"
-voice: "Ask Once"
-new: "Spør én gang" 
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: "" 
 
 id: LANG_WEEKDAY_FRIDAY
 desc: Maximum 3-letter abbreviation for weekday
@@ -862,7 +862,7 @@ id: LANG_DISPLAY_GRAPHIC
 desc: Label for type of icon display
 eng: "Graphic"
 voice: "Graphic"
-new: "Grafikk"
+new: "Grafisk"
 
 id: LANG_DISPLAY_NUMERIC
 desc: Label for type of icon display
@@ -880,7 +880,7 @@ id: LANG_PM_ENERGY_SAVER
 desc: in the peak meter menu
 eng: "Save Energy"
 voice: "Save Energy"
-new: "Energisparer"
+new: "Energisparende"
 
 id: LANG_PM_HIGH_PERFORMANCE
 desc: in the peak meter menu
@@ -982,7 +982,7 @@ id: LANG_RECORDING_SRC_LINE
 desc: in the recording settings
 eng: "Line In"
 voice: "Line In"
-new: "Linjeinngang"
+new: "Line in"
 
 id: LANG_RECORDING_SRC_MIC
 desc: in the recording settings
@@ -1030,7 +1030,7 @@ id: LANG_BATTERY_TOPOFF_CHARGE
 desc: in info display, shows that top off charge is running
 eng: "Battery: Top-Off Chg"
 voice: ""
-new: "Batteri: top-Off-lading"
+new: "Batteri: top-off-lading"
 
 id: LANG_BATTERY_TRICKLE_CHARGE
 desc: in info display, shows that trickle charge is running
@@ -1492,7 +1492,7 @@ id: LANG_QUEUE_LAST
 desc: in onplay menu.  queue a track/playlist at end of playlist.
 eng: "Queue last"
 voice: "Queue last"
-new: "Legg til siste i kø"
+new: "Legg til sist i kø"
 
 id: LANG_INSERT
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
@@ -1504,19 +1504,19 @@ id: LANG_INSERT_LAST
 desc: in onplay menu.  append a track/playlist into dynamic playlist.
 eng: "Insert last"
 voice: "Insert last"
-new: "Sett inn siste"
+new: "Sett inn sist"
 
 id: LANG_QUEUE_FIRST
 desc: in onplay menu.  queue a track/playlist into dynamic playlist.
 eng: "Queue next"
-voice: "Legg til neste i kø"
-new: "Legg til neste i kø"
+voice: "Queue next"
+new: "Legg til som neste i kø"
 
 id: LANG_INSERT_FIRST
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
 eng: "Insert next"
 voice: "Sett inn neste"
-new: "Sett inn neste"
+new: "Sett inn som neste"
 
 id: LANG_SAVE_DYNAMIC_PLAYLIST
 desc: in playlist menu.
@@ -1612,7 +1612,7 @@ id: LANG_FIRMWARE
 desc: in the main menu
 eng: "Browse Firmwares"
 voice: "Browse Firmwares"
-new: "Bla igjennom firmware"
+new: "Bla igjennom firmware-filer"
 
 id: LANG_LANGUAGE
 desc: in settings_menu
@@ -1648,7 +1648,7 @@ id: LANG_LINE_IN
 desc: in settings_menu
 eng: "Line In"
 voice: "Line In"
-new: "Linje inn"
+new: "Line in"
 
 id: LANG_NO_FILES
 desc: in settings_menu
@@ -1666,7 +1666,7 @@ id: LANG_FM_BUTTONBAR_PRESETS
 desc: in button bar
 eng: "Preset"
 voice: ""
-new: "ForhåndsInnstilling"
+new: "Forhåndsinnstilling"
 
 id: LANG_FM_SAVE_PRESET
 desc: DEPRECATED
@@ -1846,7 +1846,7 @@ id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
 desc: Configuration option to maintain a list of recent bookmarks
 eng: "Maintain a List of Recent Bookmarks?"
 voice: "Maintain a List of Recent Bookmarks?"
-new: "Opprettholde liste over siste bokmerker?"
+new: "Opprettholde liste over nylige bokmerker?"
 
 id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
 desc: Save in recent bookmarks only
@@ -2350,19 +2350,19 @@ id: LANG_VOICE_MENU
 desc: item of voice menu, enable/disable the voice UI
 eng: "Voice Menus"
 voice: "Voice Menus"
-new: "Stemmemeny"
+new: "Snakkende menyer"
 
 id: LANG_VOICE_DIR
 desc: item of voice menu, set the "talkbox" mode for directories
 eng: "Voice Directories"
 voice: "Voice Directories"
-new: "Stemmekataloger"
+new: "Uttale katalognavn"
 
 id: LANG_VOICE_FILE
 desc: item of voice menu, set the voive mode for files
 eng: "Voice Filenames"
 voice: "Voice Filenames"
-new: "Stemmefilnavn"
+new: "Uttale filnavn"
 
 id: LANG_VOICE_NUMBER
 desc: "talkbox" mode for files+directories
@@ -2692,7 +2692,7 @@ id: LANG_FM_EDIT_PRESET
 desc: in radio screen
 eng: "Edit preset"
 voice: ""
-new: "Editer innstilling"
+new: "Editer forhåndsinnstilling"
 
 id: LANG_FM_MONO_MODE
 desc: in radio screen
@@ -2812,7 +2812,7 @@ id: LANG_REMOVE_MMC
 desc: before acknowledging usb in case an MMC is inserted (Ondio)
 eng: "Please remove inserted MMC"
 voice: "Please remove multimedia card"
-new: "Vennligst fjern MMC-kort"
+new: "Vennligst fjern minnekort"
 
 id: VOICE_DOT
 desc: spoken only, for spelling
@@ -3076,13 +3076,13 @@ id: LANG_BACKLIGHT_FADE_IN
 desc: in settings_menu
 eng: "Backlight fade in"
 voice: "Backlight fade in"
-new: "Skjermlys blende inn"
+new: "Blend inn skjermlys"
 
 id: LANG_BACKLIGHT_FADE_OUT
 desc: in settings_menu
 eng: "Backlight fade out"
 voice: "Backlight fade out"
-new: "Skjermlys blende ut"
+new: "Blend ut skjermlys"
 
 id: LANG_SHUFFLE_PLAYLIST
 desc: in playlist menu, reshuffles the order in which songs are played
@@ -3093,5 +3093,167 @@ new: "Stokk om"
 id: LANG_INSERT_SHUFFLED
 desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
 eng: "Insert shuffled"
-voice: 
+voice: "Insert shuffled"
 new: "Sett inn tilfeldig"
+
+id: LANG_NOTHING_TO_RESUME
+desc: Error message displayed when resume button pressed but no playlist
+eng: "Nothing to resume"
+voice: ""
+new: "Ingenting å fortsette"
+
+id: LANG_SPDIF_ENABLE
+desc: in playback settings menu. enable/disable the optical out
+eng: "Optical output"
+voice: "Optical output"
+new: "Optisk utgang"
+
+id: LANG_NEXT_FOLDER
+desc: in settings_menu.  Should we move to next folder when current one ends
+eng: "Move to Next Folder"
+voice: "Move to Next Folder"
+new: "Fortsett i neste katalog"
+
+id: LANG_RUNTIMEDB_ACTIVE
+desc: in settings_menu.
+eng: "Gather runtime data (experimental)"
+voice: "Gather runtime data"
+new: "Samle bruksdata (eksperimentelt)"
+
+id: LANG_MENU_SET_RATING
+desc: in wps context menu
+eng: "Set song rating"
+voice: "Set song rating"
+new: "Sett sangbedømmelse" 
+
+id: LANG_RATING
+desc: in set_rating
+eng: "Rating:"
+voice:
+new: "Bedømmelse:"
+
+id: LANG_CROSSFADE_DURATION
+desc: in playback settings
+eng: "Crossfade duration"
+voice: "Crossfade duration"
+new: "Kryssfadelengde"
+
+id: LANG_MIX
+desc: in playback settings, crossfade option
+eng: "Mix"
+voice: "Mix"
+new: "Miks"
+
+id: LANG_RESTARTING_PLAYBACK
+desc: splash screen displayed when pcm buffer size is changed
+eng: "Restarting playback..."
+voice: "Restarting playback..."
+new: "Omstarter avspilling..."
+
+id: LANG_REPLAYGAIN
+desc: in replaygain
+eng: "Replaygain"
+voice: 
+new: "Replaygain"
+
+id: LANG_REPLAYGAIN_ENABLE
+desc: in replaygain
+eng: "Enable replaygain"
+voice: 
+new: "Slå på replaygain"
+
+id: LANG_REPLAYGAIN_NOCLIP
+desc: in replaygain
+eng: "Prevent clipping"
+voice: 
+new: "Forhindre forvrengning"
+
+id: LANG_REPLAYGAIN_MODE
+desc: in replaygain
+eng: "Replaygain type"
+voice: 
+new: "Replaygain-type"
+
+id: LANG_TRACK_GAIN
+desc: in replaygain
+eng: "Track gain"
+voice: 
+new: "Spornivå"
+
+id: LANG_ALBUM_GAIN
+desc: in replaygain
+eng: "Album gain"
+voice: 
+new: "Albumnivå" 
+
+id: LANG_ID3_TRACK_GAIN
+desc: in browse_id3
+eng: "[Track gain]"
+voice: 
+new: "[Spornivå]"
+
+id: LANG_ID3_ALBUM_GAIN
+desc: in browse_id3
+eng: "[Album gain]"
+voice: 
+new: "[Albumnivå]"
+
+id: LANG_ID3_NO_GAIN
+desc: DEPRECATED
+eng: ""
+voice: 
+new: 
+
+id: LANG_BIDI_SUPPORT
+desc: in settings_menu, option to enable reversal of hebrew/arabic text
+eng: "BiDi Hebrew/Arabic"
+voice: 
+new: "Toveis hebraisk/arabisk"
+
+id: LANG_REPLAYGAIN_PREAMP
+desc: in browse_id3
+eng: "Pre-amp"
+voice: 
+new: "Forforsterker"
+
+id: LANG_UNIT_DB
+desc: in browse_id3
+eng: "dB"
+voice: 
+new: "dB"
+
+id: LANG_ID3_VBR
+desc: in browse_id3
+eng: " (VBR)"
+voice: 
+new: " (VBR)"
+
+id: LANG_BEEP
+desc: in playback settings
+eng: "Beep volume"
+voice: 
+new: "Pip-volum"
+
+id: LANG_WEAK
+desc: in beep volume in playback settings
+eng: "Weak"
+voice: 
+new: "Svak"
+
+id: LANG_MODERATE
+desc: in beep volume in playback settings
+eng: "Moderate"
+voice: 
+new: "Middels"
+
+id: LANG_STRONG
+desc: in beep volume in playback settings
+eng: "Strong"
+voice: 
+new: "Sterk"
+
+id: LANG_REPEAT_AB
+desc: repeat one song
+eng: "A-B"
+voice: "A-B"
+new: "A-B"
