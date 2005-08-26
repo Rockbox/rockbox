@@ -255,7 +255,7 @@ id: LANG_CASE_MENU
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
@@ -327,7 +327,7 @@ id: LANG_BBOOST
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_DECAY
 desc: in sound_settings
@@ -429,37 +429,37 @@ id: LANG_MUTE_ON_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_MUTE_OFF_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_MUTE_ON_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_MUTE_OFF_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_INFO
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_SCREEN
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_TITLE
 desc: in wps
@@ -468,22 +468,22 @@ voice: ""
 new: "[Titre]"
 
 id: LANG_ID3_NO_TITLE
-desc: in wps when no title is avaible
-eng: "<No Title>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "<Pas de titre>"
+new: ""
 
 id: LANG_ID3_ARTIST
-desc: in wps 
+desc: in wps
 eng: "[Artist]"
 voice: ""
 new: "[Artiste]"
 
 id: LANG_ID3_NO_ARTIST
-desc: in wps when no artist is avaible
-eng: "<No Artist>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "<Pas d'artiste>"
+new: ""
 
 id: LANG_ID3_ALBUM
 desc: in wps
@@ -492,10 +492,10 @@ voice: ""
 new: "[Album]"
 
 id: LANG_ID3_NO_ALBUM
-desc: in wps when no album is avaible
-eng: "<No Album>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "<Pas d'album>"
+new: ""
 
 id: LANG_ID3_TRACKNUM
 desc: in wps
@@ -504,10 +504,10 @@ voice: ""
 new: "[N° Piste]"
 
 id: LANG_ID3_NO_TRACKNUM
-desc: in wps if no track number is avaible
-eng: "<No Tracknum>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "<Pas N° de piste>"
+new: ""
 
 id: LANG_ID3_LENGHT
 desc: in wps
@@ -999,13 +999,13 @@ id: LANG_DISK_STAT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_DISK_FREE_STAT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_POWEROFF
 desc: disk poweroff flag
@@ -1208,8 +1208,8 @@ new:
 id: LANG_MENU_SHOW_ID3_INFO
 desc: Menu option to start id3 viewer
 eng: "Show ID3 Info"
-voice: "Monter Infos ID3"
-new: "Monter Infos ID3"
+voice: "Montrer Infos ID3"
+new: "Montrer Infos ID3"
 
 id: LANG_ID3_GENRE
 desc: ID3 frame 'genre'
@@ -1263,7 +1263,7 @@ id: LANG_SOKOBAN_ON
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_INVERT
 desc: in settings_menu
@@ -1275,19 +1275,19 @@ id: LANG_CHANNEL_STEREO_NARROW_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_CHANNEL_STEREO_NARROW_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_CHANNEL_STEREO_WIDE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_CHANNEL_KARAOKE
 desc: in sound_settings
@@ -1317,19 +1317,19 @@ id: LANG_VBRFIX_STOP_PLAY
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_VBRFIX_NOT_VBR
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_VBRFIX
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_INVERT_CURSOR
 desc: in settings_menu
@@ -1691,7 +1691,7 @@ id: LANG_FM_SAVE_PRESET
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_FM_DELETE_PRESET
 desc: in radio screen
@@ -1715,7 +1715,7 @@ id: LANG_FM_NO_PRESETS
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_FM_NO_FREE_PRESETS
 desc: in radio screen
@@ -2277,7 +2277,7 @@ id: VOICE_POINT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: VOICE_MILLISECONDS
 desc: spoken only, a unit postfix
@@ -2343,13 +2343,13 @@ id: VOICE_MEGABYTE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: VOICE_GIGABYTE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: VOICE_MILLIAMPHOURS
 desc: spoken only, a unit postfix
@@ -2411,7 +2411,7 @@ id: LANG_VOICE_DIR_ENTER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_VOICE_DIR_HOVER
 desc: "talkbox" mode for directories + files
@@ -2639,7 +2639,7 @@ id: VOICE_EXT_UCL
 desc: spoken only, for file extension
 eng: ""
 voice: "flash"
-new:
+new: 
 
 id: VOICE_EXT_AJZ
 desc: spoken only, for file extension
@@ -2660,6 +2660,7 @@ voice: "Temps actuel:"
 new: 
 
 #Filetypes
+
 id: LANG_FILETYPES_EXTENSION_FULL
 desc: Extension array full
 eng: "Extension array full"
@@ -2748,7 +2749,7 @@ id: LANG_FM_BUTTONBAR_EDIT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_FM_BUTTONBAR_ADD
 desc: in radio screen
@@ -3151,3 +3152,148 @@ desc: in settings_menu.  Should we move to next folder when current one ends
 eng: "Move to Next Folder"
 voice: "Procéder au prochain répertoire"
 new: "Procéder au prochain rép."
+
+id: LANG_RUNTIMEDB_ACTIVE
+desc: in settings_menu.
+eng: "Gather runtime data (experimental)"
+voice: "Collectioner temps courant"
+new: "Collectioner temps courant"
+
+id: LANG_MENU_SET_RATING
+desc: in wps context menu
+eng: "Set song rating"
+voice: "Set song rating"
+new: "Ajouter classement"
+
+id: LANG_RATING
+desc: in set_rating
+eng: "Rating:"
+voice: "Classement"
+new: "Classement:"
+
+id: LANG_CROSSFADE_DURATION
+desc: in playback settings
+eng: "Crossfade duration"
+voice: "Durée fondu enchaîné"
+new: "Durée fondu enchaîné"
+
+id: LANG_MIX
+desc: in playback settings, crossfade option
+eng: "Mix"
+voice: "Mélange"
+new: "Mélange"
+
+id: LANG_RESTARTING_PLAYBACK
+desc: splash screen displayed when pcm buffer size is changed
+eng: "Restarting playback..."
+voice: "Restarting playback..."
+new: "Redémarrage lecture"
+
+id: LANG_REPLAYGAIN
+desc: in replaygain
+eng: "Replaygain"
+voice: "Adaption de volume" 
+new: "Adaption de volume"
+
+id: LANG_REPLAYGAIN_ENABLE
+desc: in replaygain
+eng: "Enable replaygain"
+voice: "Activer l'adaption de volume"
+new: "Activer l'adaption de volume"
+
+id: LANG_REPLAYGAIN_NOCLIP
+desc: in replaygain
+eng: "Prevent clipping"
+voice: "Eviter surmodulation" 
+new: "Eviter surmodulation"
+
+id: LANG_REPLAYGAIN_MODE
+desc: in replaygain
+eng: "Replaygain type"
+voice: "Type d'adaption de volume"
+new: "Type d'adaption de volume"
+
+id: LANG_TRACK_GAIN
+desc: in replaygain
+eng: "Track gain"
+voice: "Volume de piste"
+new: "Volume de piste"
+
+id: LANG_ALBUM_GAIN
+desc: in replaygain
+eng: "Album gain"
+voice: "Volume d'album"
+new: "Volume d'album"
+
+id: LANG_ID3_TRACK_GAIN
+desc: in browse_id3
+eng: "[Track gain]"
+voice: "Adaption de volume"
+new: "[Adaption de volume]"
+
+id: LANG_ID3_ALBUM_GAIN
+desc: in browse_id3
+eng: "[Album gain]"
+voice: "Volume d'album"
+new: "[Volume d'album]"
+
+id: LANG_ID3_NO_GAIN
+desc: DEPRECATED
+eng: ""
+voice: 
+new: 
+
+id: LANG_BIDI_SUPPORT
+desc: in settings_menu, option to enable reversal of hebrew/arabic text
+eng: "BiDi Hebrew/Arabic"
+voice: "hébreu/arabe bidirectionell"
+new: "BiDi hébreu/arabe"
+
+id: LANG_REPLAYGAIN_PREAMP
+desc: in browse_id3
+eng: "Pre-amp"
+voice: "Préamplificateur"
+new: "Préamplificateur"
+
+id: LANG_UNIT_DB
+desc: in browse_id3
+eng: "dB"
+voice: "décibel"
+new: "dB"
+
+id: LANG_ID3_VBR
+desc: in browse_id3
+eng: " (VBR)"
+# unsure about that one. Isn't there a better term ?
+voice: "fréquence variable"
+new: " (VBR)"
+
+id: LANG_BEEP
+desc: in playback settings
+eng: "Beep volume"
+voice: "Volume bip"
+new: "Voulume bip"
+
+id: LANG_WEAK
+desc: in beep volume in playback settings
+eng: "Weak"
+voice: "Faible"
+new: "Faible"
+
+id: LANG_MODERATE
+desc: in beep volume in playback settings
+eng: "Moderate"
+voice: "Modéré"
+new: "Modéré"
+
+id: LANG_STRONG
+desc: in beep volume in playback settings
+eng: "Strong"
+voice: "Fort"
+new: "Fort"
+
+id: LANG_REPEAT_AB
+desc: repeat one song
+eng: "A-B"
+voice: "A-B"
+new: "A-B"
