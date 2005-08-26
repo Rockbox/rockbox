@@ -152,7 +152,10 @@ void status_set_usb(bool b)
 
 void status_draw(bool force_redraw)
 {
-    struct status_info info;
+    /* This is static because we use memcmp() below to check for changes, and
+       the unused bytes (due to struct member alignment) might change if
+       the struct is allocated on the stack. */
+    static struct status_info info;
 
 #ifdef HAVE_LCD_BITMAP
     static struct status_info lastinfo;
