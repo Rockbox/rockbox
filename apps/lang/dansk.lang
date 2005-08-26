@@ -463,22 +463,22 @@ voice: ""
 new: "[Titel]"
 
 id: LANG_ID3_NO_TITLE
-desc: in wps when no title is avaible
-eng: "<No Title>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "<ingen titel>"
+new: ""
 
 id: LANG_ID3_ARTIST
-desc: in wps 
+desc: in wps
 eng: "[Artist]"
 voice: ""
 new: "[Kunstner]"
 
 id: LANG_ID3_NO_ARTIST
-desc: in wps when no artist is avaible
-eng: "<No Artist>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "<ingen kunstner>"
+new: ""
 
 id: LANG_ID3_ALBUM
 desc: in wps
@@ -487,10 +487,10 @@ voice: ""
 new: "[Album]"
 
 id: LANG_ID3_NO_ALBUM
-desc: in wps when no album is avaible
-eng: "<No Album>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "<ingen album>"
+new: ""
 
 id: LANG_ID3_TRACKNUM
 desc: in wps
@@ -499,10 +499,10 @@ voice: ""
 new: "[Spornummer]"
 
 id: LANG_ID3_NO_TRACKNUM
-desc: in wps if no track number is avaible
-eng: "<No Tracknum>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "<intet spornummer>"
+new: ""
 
 id: LANG_ID3_LENGHT
 desc: in wps
@@ -3155,3 +3155,111 @@ desc: splash screen displayed when pcm buffer size is changed
 eng: "Restarting playback..."
 voice: "Restarting playback..."
 new: "Genstarter afspilning..."
+
+id: LANG_REPLAYGAIN
+desc: in replaygain
+eng: "Replaygain"
+voice: 
+new: "Lydstyrke korrektion"
+
+id: LANG_REPLAYGAIN_ENABLE
+desc: in replaygain
+eng: "Enable replaygain"
+voice: 
+new: "Aktiver lydstyrke korrektion"
+
+id: LANG_REPLAYGAIN_NOCLIP
+desc: in replaygain
+eng: "Prevent clipping"
+voice: 
+new: "Undgå klipning"
+
+id: LANG_REPLAYGAIN_MODE
+desc: in replaygain
+eng: "Replaygain type"
+voice: 
+new: "Lydstyrke korrektion type"
+
+id: LANG_TRACK_GAIN
+desc: in replaygain
+eng: "Track gain"
+voice: 
+new: "Sang lydstyrke"
+
+id: LANG_ALBUM_GAIN
+desc: in replaygain
+eng: "Album gain"
+voice: 
+new: "Album lydstyrke"
+
+id: LANG_ID3_TRACK_GAIN
+desc: in browse_id3
+eng: "[Track gain]"
+voice: 
+new: "[Sang lydstyrke]"
+
+id: LANG_ID3_ALBUM_GAIN
+desc: in browse_id3
+eng: "[Album gain]"
+voice: 
+new: "[Album lydstyrke]"
+
+id: LANG_ID3_NO_GAIN
+desc: DEPRECATED
+eng: ""
+voice: 
+new: ""
+
+id: LANG_BIDI_SUPPORT
+desc: in settings_menu, option to enable reversal of hebrew/arabic text
+eng: "BiDi Hebrew/Arabic"
+voice: 
+new: "Højre mod venstre sprog"
+
+id: LANG_REPLAYGAIN_PREAMP
+desc: in browse_id3
+eng: "Pre-amp"
+voice: 
+new: "Forforstærkning"
+
+id: LANG_UNIT_DB
+desc: in browse_id3
+eng: "dB"
+voice: 
+new: "dB"
+
+id: LANG_ID3_VBR
+desc: in browse_id3
+eng: " (VBR)"
+voice: 
+new: " (VBR)"
+
+id: LANG_BEEP
+desc: in playback settings
+eng: "Beep volume"
+voice: 
+new: "Bip lydstyrke"
+
+id: LANG_WEAK
+desc: in beep volume in playback settings
+eng: "Weak"
+voice: 
+new: "Svag"
+
+id: LANG_MODERATE
+desc: in beep volume in playback settings
+eng: "Moderate"
+voice: 
+new: "Moderat"
+
+id: LANG_STRONG
+desc: in beep volume in playback settings
+eng: "Strong"
+voice: 
+new: "Kraftig"
+
+id: LANG_REPEAT_AB
+desc: repeat one song
+eng: "A-B"
+voice: "A-B"
+new: "A-B"
