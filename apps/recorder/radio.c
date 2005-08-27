@@ -952,26 +952,25 @@ int radio_menu_cb(int key, int m)
 /* main menu of the radio screen */
 bool radio_menu(void)
 {
-    struct menu_item items[5];
     int m;
     bool result;
-
-    m = menu_init(items, 0, radio_menu_cb, NULL, NULL, NULL);
-
+    
+    static const struct menu_item items[] = {
 #if CONFIG_KEYPAD == ONDIO_PAD /* Ondio has no key for presets, put it in menu */
-    /* fixme: make real string table entries */
-    menu_insert(m, -1, ID2P(LANG_FM_BUTTONBAR_PRESETS), handle_radio_presets);
-    menu_insert(m, -1, ID2P(LANG_FM_BUTTONBAR_ADD), radio_add_preset);
+        { ID2P(LANG_FM_BUTTONBAR_PRESETS), handle_radio_presets },
+        { ID2P(LANG_FM_BUTTONBAR_ADD)    , radio_add_preset     },
 #endif
-    create_monomode_menu();
-    menu_insert(m, -1, monomode_menu_string, toggle_mono_mode);
-    menu_insert(m, -1, ID2P(LANG_SOUND_SETTINGS), sound_menu);
-#ifndef SIMULATOR
-#if CONFIG_HWCODEC != MASNONE
-    menu_insert(m, -1, ID2P(LANG_RECORDING_SETTINGS), fm_recording_settings);
+        { monomode_menu_string           , toggle_mono_mode     },
+        { ID2P(LANG_SOUND_SETTINGS)      , sound_menu           },
+#if !defined(SIMULATOR) && (CONFIG_HWCODEC != MASNONE)
+        { ID2P(LANG_RECORDING_SETTINGS)  , fm_recording_settings},
 #endif
-#endif
+    };
 
+    create_monomode_menu();
+
+    m = menu_init(items, sizeof(items) / sizeof(*items),
+                  radio_menu_cb, NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
     return result;
