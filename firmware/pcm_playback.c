@@ -307,14 +307,16 @@ void pcm_init(void)
     /* Initialize default register values. */
     uda1380_init();
     
-    /* Turn on headphone power */
-    uda1380_enable_output(true);
+    /* Sleep a while so the power can stabilize (especially a long
+       delay is needed for the line out connector). */
+    sleep(HZ);
 
-    /* Sleep a little so the power can stabilize. */
-    sleep(HZ/4);
+    /* Power on FSDAC and HP amp. */
+    uda1380_enable_output(true);
 
     /* Unmute the master channel (DAC should be at zero point now). */
     uda1380_mute(false);
+    
 #elif defined(HAVE_TLV320)
     tlv320_init();
     tlv320_enable_output(true);
