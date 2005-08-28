@@ -3,19 +3,19 @@ id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
 voice: "Sound Settings"
-new: "Ljudinställning"
+new: "Ljud"
 
 id: LANG_GENERAL_SETTINGS
 desc: in the main menu
 eng: "General Settings"
 voice: "General Settings"
-new: "Huvudinställning"
+new: "Inställningar"
 
 id: LANG_INFO
 desc: in the main menu
 eng: "Info"
 voice: "Info"
-new: "Info"
+new: "Information"
 
 id: LANG_VERSION
 desc: in the main menu
@@ -27,7 +27,7 @@ id: LANG_DEBUG
 desc: in the main menu
 eng: "Debug (Keep Out!)"
 voice: "Debug, keep out!"
-new: "Debug (Rör ej!)"
+new: "Felsök (Rör ej!)"
 
 id: LANG_USB
 desc: in the main menu
@@ -63,13 +63,13 @@ id: LANG_PLAYLIST_LOAD
 desc: displayed on screen while loading a playlist
 eng: "Loading..."
 voice: ""
-new: "Laddar..."
+new: "Läser..."
 
 id: LANG_PLAYLIST_SHUFFLE
 desc: displayed on screen while shuffling a playlist
 eng: "Shuffling..."
 voice: ""
-new: "Slumpar..."
+new: "Blandar..."
 
 id: LANG_PLAYINDICES_PLAYLIST
 desc: in playlist.indices() when playlist is full *WARNING* this and next ID are only used in this function.
@@ -129,13 +129,13 @@ id: LANG_SHUFFLE
 desc: in settings_menu
 eng: "Shuffle"
 voice: "Shuffle"
-new: "Slumpa"
+new: "Blanda"
 
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play Selected First"
 voice: "Play Selected File First"
-new: "Spela den valda först"
+new: "Spela vald fil först"
 
 id: LANG_SORT_CASE
 desc: in settings_menu
@@ -171,7 +171,7 @@ id: LANG_BACKLIGHT
 desc: in settings_menu
 eng: "Backlight"
 voice: "Backlight"
-new: "Skärmljus"
+new: "Belysning"
 
 id: LANG_SCROLL
 desc: in settings_menu
@@ -189,25 +189,25 @@ id: LANG_TIME
 desc: in settings_menu
 eng: "Set Time/Date"
 voice: "Set Time and Date"
-new: "Ställ tid/datum"
+new: "Ställ tid och datum"
 
 id: LANG_SPINDOWN
 desc: in settings_menu
 eng: "Disk Spindown"
 voice: "Disk Spindown"
-new: "Diskdeaktivering"
+new: "Stanna disken"
 
 id: LANG_FFRW_STEP
 desc: in settings_menu
 eng: "FF/RW Min Step"
 voice: "Minimum Step"
-new: "FF/RW min. steg"
+new: "Minsta steg vid snabbspolning"
 
 id: LANG_FFRW_ACCEL
 desc: in settings_menu
 eng: "FF/RW Accel"
 voice: "Acceleration"
-new: "FF/RW acceleration"
+new: "Acceleration vid snabbspolning"
 
 id: LANG_FOLLOW
 desc: in settings_menu
@@ -231,13 +231,13 @@ id: LANG_RESET_DONE_CLEAR
 desc: visual confirmation after settings reset
 eng: "Cleared"
 voice: ""
-new: "Nollställd"
+new: "återställda"
 
 id: LANG_RESET_DONE_CANCEL
 desc: Visual confirmation of cancelation
 eng: "Canceled"
 voice: ""
-new: "Avbruten"
+new: "avbrutna"
 
 id: LANG_CASE_MENU
 desc: DEPRECATED
@@ -261,13 +261,13 @@ id: LANG_PLAYBACK
 desc: in settings_menu()
 eng: "Playback"
 voice: "Playback"
-new: "Spelinställning"
+new: "Uppspelning"
 
 id: LANG_FILE
 desc: in settings_menu()
 eng: "File View"
 voice: "File View"
-new: "Filvy"
+new: "Filvisning"
 
 id: LANG_DISPLAY
 desc: in settings_menu()
@@ -279,7 +279,7 @@ id: LANG_SYSTEM
 desc: in settings_menu()
 eng: "System"
 voice: "System"
-new: "Systemet"
+new: "System"
 
 id: LANG_VOLUME
 desc: in sound_settings
@@ -321,7 +321,7 @@ id: LANG_DECAY
 desc: in sound_settings
 eng: "AV Decay Time"
 voice: ""
-new: "AV falltid"
+new: "Falltid för autovolym"
 
 id: LANG_CHANNEL_MENU
 desc: in sound_settings
@@ -333,7 +333,7 @@ id: LANG_CHANNEL
 desc: in sound_settings
 eng: "Channel Configuration"
 voice: ""
-new: "Kanalkonfigurering"
+new: "Kanalkonfiguration"
 
 id: LANG_CHANNEL_STEREO
 desc: in sound_settings
@@ -363,19 +363,19 @@ id: LANG_AUTOVOL
 desc: in sound_settings
 eng: "Auto Volume"
 voice: "Auto Volume"
-new: "Automatvolym"
+new: "Autovolym"
 
 id: LANG_SHOWDIR_ERROR_BUFFER
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Dir Buffer"
 voice: ""
-new: "Filsystembufferten"
+new: "Katalogbufferten"
 
 id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Is Full!"
 voice: ""
-new: "Är full!"
+new: "är full!"
 
 id: LANG_RESUME_ASK
 desc: DEPRECATED
@@ -387,31 +387,31 @@ id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
 eng: "(PLAY/STOP)"
 voice: ""
-new: "(Ja/Nej)"
+new: "SPELA/STOPP"
 
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
 eng: "Key Lock ON"
 voice: ""
-new: "Lås på"
+new: "Knapplås på"
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
 eng: "Key Lock OFF"
 voice: ""
-new: "Lås av"
+new: "Knapplås av"
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
 eng: "Key Lock Is ON"
 voice: ""
-new: "Tangentlåset är PÅ"
+new: "Knapplåset är på"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key Lock Is OFF"
 voice: ""
-new: "Tangentlåset är AV"
+new: "Knapplåset är av"
 
 id: LANG_MUTE_ON_PLAYER
 desc: DEPRECATED
@@ -456,22 +456,22 @@ voice: ""
 new: "[Titel]"
 
 id: LANG_ID3_NO_TITLE
-desc: in wps when no title is avaible
-eng: "<No Title>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "<Ingen titel>"
+new: ""
 
 id: LANG_ID3_ARTIST
-desc: in wps 
+desc: in wps
 eng: "[Artist]"
 voice: ""
 new: "[Artist]"
 
 id: LANG_ID3_NO_ARTIST
-desc: in wps when no artist is avaible
-eng: "<No Artist>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "<Ingen artist>"
+new: ""
 
 id: LANG_ID3_ALBUM
 desc: in wps
@@ -480,22 +480,22 @@ voice: ""
 new: "[Album]"
 
 id: LANG_ID3_NO_ALBUM
-desc: in wps when no album is avaible
-eng: "<No Album>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "<Inget album>"
+new: ""
 
 id: LANG_ID3_TRACKNUM
 desc: in wps
 eng: "[Tracknum]"
 voice: ""
-new: "[Spår]"
+new: "[Spårnummer]"
 
 id: LANG_ID3_NO_TRACKNUM
-desc: in wps if no track number is avaible
-eng: "<No Tracknum>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "<Inget spår>"
+new: ""
 
 id: LANG_ID3_LENGHT
 desc: in wps
@@ -531,13 +531,13 @@ id: LANG_PITCH_UP
 desc: in wps
 eng: "Pitch Up"
 voice: ""
-new: "Höj tonläget"
+new: "Höj tonläge"
 
 id: LANG_PITCH_DOWN
 desc: in wps
 eng: "Pitch Down"
 voice: ""
-new: "Sänk tonläget"
+new: "Sänk tonläge"
 
 id: LANG_PAUSE
 desc: in wps
@@ -549,7 +549,7 @@ id: LANG_F2_MODE
 desc: in wps F2 pressed
 eng: "Mode:"
 voice: ""
-new: "Läge:"
+new: "läge:"
 
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
@@ -567,7 +567,7 @@ id: LANG_F3_BAR
 desc: in wps F3 pressed
 eng: "Bar"
 voice: ""
-new: "List"
+new: "list"
 
 id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
@@ -603,19 +603,19 @@ id: LANG_FILTER_MUSIC
 desc: show only music-related files
 eng: "Music"
 voice: "Music"
-new: "Musik"
+new: "Musikfiler"
 
 id: LANG_FILTER_SUPPORTED
 desc: show all file types supported by Rockbox
 eng: "Supported"
 voice: "Supported"
-new: "Hanterade"
+new: "Alla filer som stödjs"
 
 id: LANG_FILTER_ALL
 desc: show all files
 eng: "All"
 voice: "All"
-new: "Alla"
+new: "Alla filer"
 
 id: LANG_SET_BOOL_YES
 desc: bool true representation
@@ -669,7 +669,7 @@ id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
 eng: "Units Per Read"
 voice: "Units Per Read"
-new: "Enheter per läsning"
+new: "Toppåtergång"
 
 id: LANG_REPEAT
 desc: in settings_menu
@@ -861,7 +861,7 @@ id: LANG_DISPLAY_GRAPHIC
 desc: Label for type of icon display
 eng: "Graphic"
 voice: "Graphic"
-new: "Grafik"
+new: "Grafisk"
 
 id: LANG_DISPLAY_NUMERIC
 desc: Label for type of icon display
@@ -873,13 +873,13 @@ id: LANG_PM_DBFS
 desc: in the peak meter menu
 eng: "Logarithmic(dB)"
 voice: "Logarithmic decibel"
-new: "Logaritmisk(dB)"
+new: "Logaritmisk (dB)"
 
 id: LANG_PM_ENERGY_SAVER
 desc: in the peak meter menu
 eng: "Save Energy"
 voice: "Save Energy"
-new: "Energispar"
+new: "Spara ström"
 
 id: LANG_PM_HIGH_PERFORMANCE
 desc: in the peak meter menu
@@ -891,7 +891,7 @@ id: LANG_PM_LINEAR
 desc: in the peak meter menu
 eng: "Linear(%)"
 voice: "Linear percent"
-new: "Linjär(%)"
+new: "Linjär (%)"
 
 id: LANG_PM_MAX
 desc: in the peak meter menu
@@ -993,31 +993,31 @@ id: LANG_VOLUME_DISPLAY
 desc: Volume type title
 eng: "Volume Display"
 voice: "Volume Display"
-new: "Volymdisplay"
+new: "Volymvisning"
 
 id: LANG_FILTER_PLAYLIST
 desc: show only playlist
 eng: "Playlists"
 voice: "Playlists"
-new: "Låtlistor"
+new: "Spellistor"
 
 id: LANG_POWEROFF
 desc: disk poweroff flag
 eng: "Disk Poweroff"
 voice: "Disk Poweroff"
-new: "Diskavstängning"
+new: "Stäng av disk"
 
 id: LANG_BATTERY_TIME
 desc: battery level in % and estimated time remaining
 eng: "%d%% %dh %dm"
 voice: "Battery level"
-new: "%d%% %dh %dmin"
+new: "%d%% %dh %dm"
 
 id: LANG_SLEEP_TIMER
 desc: sleep timer setting
 eng: "Sleep Timer"
 voice: "Sleep Timer"
-new: "Insomningstid"
+new: "Insomningstimer"
 
 id: LANG_BATTERY_CAPACITY
 desc: in settings_menu
@@ -1041,19 +1041,19 @@ id: LANG_BIDIR_SCROLL
 desc: Bidirectional scroll limit
 eng: "Bidirectional Scroll Limit"
 voice: "Bidirectional Scroll Limit"
-new: "Gräns för dubbelriktad rullning"
+new: "Dubbelriktad rullning"
 
 id: LANG_MP3BUFFER_MARGIN
 desc: MP3 buffer margin time
 eng: "Anti-Skip Buffer"
 voice: "Anti-Skip Buffer"
-new: "Antiskak-buffert"
+new: "Antiskakbuffert"
 
 id: LANG_SCROLL_DELAY
 desc: Delay before scrolling
 eng: "Scroll Start Delay"
 voice: "Scroll Start Delay"
-new: "Fördröjning av rullningsstart"
+new: "Rullningsstart"
 
 id: LANG_SCROLL_SPEED
 desc: in display_settings_menu()
@@ -1071,7 +1071,7 @@ id: LANG_SCROLL_STEP_EXAMPLE
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size Setting Example Text"
 voice: ""
-new: "Exempel för att sätta rullningsstegning"
+new: "Exempel för att sätta rullningssteg"
 
 id: LANG_TRICKLE_CHARGE
 desc: DEPRECATED
@@ -1203,7 +1203,7 @@ id: LANG_ID3_NO_INFO
 desc: ID3 info is missing
 eng: "<No Info>"
 voice: ""
-new: "<Ingen info>"
+new: "<Saknas>"
 
 id: LANG_ID3_YEAR
 desc: ID3 info 'year'
@@ -1215,13 +1215,13 @@ id: LANG_MENU_SHOW_ID3_INFO
 desc: Menu option to start id3 viewer
 eng: "Show ID3 Info"
 voice: "Show ID3 Info"
-new: "Visa ID3 info"
+new: "Visa spårinfo"
 
 id: LANG_FADE_ON_STOP
 desc: options menu to set fade on stop or pause
 eng: "Fade On Stop/Pause"
 voice: "Fade On Stop and Pause"
-new: "Tona bort vid stop/paus"
+new: "Tona bort vid stopp/paus"
 
 id: LANG_RECORDING_SIZE
 desc: Display of recorded file size
@@ -1245,7 +1245,7 @@ id: LANG_SETTINGS_LOADED2
 desc: Feedback shown when a .cfg file is loaded
 eng: "Loaded"
 voice: ""
-new: "Inläst"
+new: "inlästa"
 
 id: LANG_CHANNEL_KARAOKE
 desc: in sound_settings
@@ -1275,7 +1275,7 @@ id: LANG_INVERT
 desc: in settings_menu
 eng: "LCD Mode"
 voice: "LCD Mode"
-new: "LCD-Läge"
+new: "LCD-läge"
 
 id: LANG_SOKOBAN_ON
 desc: DEPRECATED
@@ -1293,13 +1293,13 @@ id: LANG_SETTINGS_SAVED1
 desc: Feedback shown when a .cfg file is saved
 eng: "Settings"
 voice: ""
-new: "Inställning"
+new: "Inställningar"
 
 id: LANG_SETTINGS_SAVED2
 desc: Feedback shown when a .cfg file is saved
 eng: "Saved"
 voice: ""
-new: "Sparad"
+new: "sparade"
 
 id: LANG_VBRFIX_NOT_VBR
 desc: DEPRECATED
@@ -1347,13 +1347,13 @@ id: LANG_CAPTION_BACKLIGHT
 desc: in settings_menu
 eng: "Caption backlight"
 voice: "Caption backlight"
-new: "Rubrikbelysning"
+new: "Spårbytesbelysning"
 
 id: LANG_INVERT_CURSOR_BAR
 desc: in settings_menu
 eng: "Bar(Inverse)"
 voice: "Inverse Bar"
-new: "Streck(Inverterad)"
+new: "Inverterad rad"
 
 id: LANG_INVERT_CURSOR_POINTER
 desc: in settings_menu
@@ -1377,13 +1377,13 @@ id: LANG_MAX_FILES_IN_DIR
 desc: in settings_menu
 eng: "Max files in dir browser"
 voice: "Max files in directory browser"
-new: "Max filer i filväljaren"
+new: "Max filer i kataloglista"
 
 id: LANG_MAX_FILES_IN_PLAYLIST
 desc: in settings_menu
 eng: "Max playlist size"
 voice: "Max playlist size"
-new: "Max storlek på spellistan"
+new: "Max filer i spellista"
 
 id: LANG_JUMP_SCROLL
 desc: (player) menu altarnative for jump scroll
@@ -1407,13 +1407,13 @@ id: LANG_BOOT_CHANGED
 desc: File browser discovered the boot file was changed
 eng: "Boot changed"
 voice: ""
-new: "Ändrad start"
+new: "Ny startfil"
 
 id: LANG_CANCEL_WITH_ANY_RECORDER
 desc: Generic recorder string to use to cancel
 eng: "Any Other = No"
 voice: ""
-new: "Någon annan = Nej"
+new: "Annan = Nej"
 
 id: LANG_CAR_ADAPTER_MODE
 desc: Displayed for setting car adapter mode to on/off
@@ -1425,19 +1425,19 @@ id: LANG_CONFIRM_WITH_PLAY_RECORDER
 desc: Generic recorder string to use to confirm
 eng: "PLAY = Yes"
 voice: ""
-new: "Spela = Ja"
+new: "SPELA = Ja"
 
 id: LANG_CUSTOM_CFG
 desc: in setting_menu()
 eng: "Browse .cfg files"
 voice: "Browse configuration files"
-new: "Se .cfg-filer"
+new: "Lista .cfg-filer"
 
 id: LANG_CUSTOM_FONT
 desc: in setting_menu()
 eng: "Browse Fonts"
 voice: "Browse Fonts"
-new: "Se fonter"
+new: "Lista teckensnitt"
 
 id: LANG_DISK_FULL
 desc: in recording screen
@@ -1449,25 +1449,25 @@ id: LANG_FIRMWARE
 desc: in the main menu
 eng: "Browse Firmwares"
 voice: "Browse Firmwares"
-new: "Se fasta programvaror"
+new: "Lista startfiler"
 
 id: LANG_INSERT
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
 eng: "Insert"
 voice: "Insert"
-new: "Sätt in"
+new: "Infoga"
 
 id: LANG_INSERT_FIRST
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
 eng: "Insert next"
 voice: "Insert next"
-new: "Sätt in nästa"
+new: "Infoga som nästa"
 
 id: LANG_INSERT_LAST
 desc: in onplay menu.  append a track/playlist into dynamic playlist.
 eng: "Insert last"
 voice: "Insert last"
-new: "Sätt in sist"
+new: "Infoga sist"
 
 id: LANG_JUMP_SCROLL_DELAY
 desc: (player) Delay before making a jump scroll
@@ -1509,43 +1509,43 @@ id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
 desc: Playlist error
 eng: "Error updating playlist control file"
 voice: ""
-new: "Fel vid uppdatering av file för spellistekontroll"
+new: "Fel vid uppdatering av filen för spellistekontroll"
 
 id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing directory"
 voice: ""
-new: "Kan inte nå katalogen"
+new: "Kan inte läsa katalogen"
 
 id: LANG_PLAYLIST_INSERT_COUNT
 desc: splash number of tracks inserted
 eng: "Inserted %d tracks (%s)"
 voice: ""
-new: "Insatta %d spår (%s)"
+new: "Infogade %d spår (%s)"
 
 id: LANG_PLAYLIST_MENU
 desc: in main menu.
 eng: "Playlist Options"
 voice: "Playlist Options"
-new: "Val för spellista"
+new: "Spellista"
 
 id: LANG_PLAYLIST_QUEUE_COUNT
 desc: splash number of tracks queued
 eng: "Queued %d tracks (%s)"
 voice: ""
-new: "Köat %d spår (%s)"
+new: "Köade %d spår (%s)"
 
 id: LANG_PLAYLIST_SAVE_COUNT
 desc: splash number of tracks saved
 eng: "Saved %d tracks (%s)"
 voice: ""
-new: "Sparat %d spår (%s)"
+new: "Sparade %d spår (%s)"
 
 id: LANG_PLUGINS
 desc: in main_menu()
 eng: "Browse Plugins"
 voice: "Browse Plugins"
-new: "Se insticksmoduler"
+new: "Insticksmoduler"
 
 id: LANG_PLUGIN_CANT_OPEN
 desc: Plugin open error message
@@ -1557,25 +1557,25 @@ id: LANG_PLUGIN_ERROR
 desc: The plugin return an error code
 eng: "Plugin returned error"
 voice: ""
-new: "Insticksmodulen gav fel"
+new: "Insticksmodulen returnerade fel"
 
 id: LANG_PLUGIN_WRONG_MODEL
 desc: The plugin is not compatible with the archos model trying to run it
 eng: "Incompatible model"
 voice: ""
-new: "Icke kompatibel model"
+new: "Ej kompatibel modell"
 
 id: LANG_PLUGIN_WRONG_VERSION
 desc: The plugin is not compatible with the rockbox version trying to run it
 eng: "Incompatible version"
 voice: ""
-new: "Icke kompatibel version"
+new: "Ej kompatibel version"
 
 id: LANG_QUEUE_FIRST
 desc: in onplay menu.  queue a track/playlist into dynamic playlist.
 eng: "Queue next"
 voice: "Queue next"
-new: "Köa nästa"
+new: "Köa som nästa"
 
 id: LANG_QUEUE_LAST
 desc: in onplay menu.  queue a track/playlist at end of playlist.
@@ -1587,7 +1587,7 @@ id: LANG_READ_FAILED
 desc: There was an error reading a file
 eng: "Failed reading %s"
 voice: ""
-new: "Misslyckad läsning %s"
+new: "Kan inte läsa %s"
 
 id: LANG_REBOOT_NOW
 desc: Do you want to reboot?
@@ -1611,7 +1611,7 @@ id: LANG_RECURSE_DIRECTORY
 desc: In playlist menu
 eng: "Recursively Insert Directories"
 voice: "Recursively Insert Directories"
-new: "Sätt in kataloger rekursivt"
+new: "Infoga kataloger rekursivt"
 
 id: LANG_RECURSE_DIRECTORY_QUESTION
 desc: Asked from onplay screen
@@ -1641,7 +1641,7 @@ id: LANG_WHILE_PLAYING
 desc: in settings_menu()
 eng: "Browse .wps files"
 voice: "Browse while-playing-screen files"
-new: "Se .wps-filer"
+new: "Lista .wps-filer"
 
 id: LANG_BUTTONBAR_MENU
 desc: in button bar
@@ -1677,7 +1677,7 @@ id: LANG_FM_PRESET_SAVE_FAILED
 desc: in radio screen
 eng: "Preset save failed"
 voice: ""
-new: "Fel vid spara förinställningar"
+new: "Kan inte spara förinställningar"
 
 id: LANG_FM_SAVE_PRESET
 desc: DEPRECATED
@@ -1713,7 +1713,7 @@ id: LANG_FM_RADIO
 desc: in main menu
 eng: "FM Radio"
 voice: "FM Radio"
-new: "FM Radio"
+new: "FM-radio"
 
 id: LANG_MOVE
 desc: The verb/action Move
@@ -1725,19 +1725,19 @@ id: LANG_MOVE_FAILED
 desc: Error message displayed in playlist viewer
 eng: "Move failed"
 voice: ""
-new: "Flytten misslyckades"
+new: "Kan inte flytta"
 
 id: LANG_VIEW_DYNAMIC_PLAYLIST
 desc: in playlist menu.
 eng: "View Current Playlist"
 voice: "View Current Playlist"
-new: "Se aktuell spellista"
+new: "Visa aktuell spellista"
 
 id: LANG_FLIP_DISPLAY
 desc: in settings_menu, option to turn display+buttos by 180 degreed
 eng: "Upside Down"
 voice: "Upside Down"
-new: "Upp-och-ner"
+new: "Upp och ner"
 
 id: LANG_RECORD_PRERECORD
 desc: in recording and radio screen
@@ -1761,7 +1761,7 @@ id: LANG_BARS_MENU
 desc: in the display sub menu
 eng: "Status-/Scrollbar"
 voice: "Status- and Scrollbar"
-new: "Status-/Rullningslist"
+new: "Status-/rullningslist"
 
 id: LANG_BATTERY_MENU
 desc: in the system sub menu
@@ -1773,25 +1773,25 @@ id: LANG_BOOKMARK_AUTOLOAD_QUERY
 desc: prompt for user to decide to create a bookmark
 eng: "Load Last Bookmark?"
 voice: ""
-new: "Ladda förra bokmärket?"
+new: "Starta vid bokmärket?"
 
 id: LANG_BOOKMARK_CREATE_FAILURE
 desc: Indicates bookmark was not created
 eng: "Bookmark Failed!"
 voice: ""
-new: "Bokmärket misslyckades!"
+new: "Kan inte skapa bokmärke!"
 
 id: LANG_BOOKMARK_CREATE_SUCCESS
 desc: Indicates bookmark was successfully created
 eng: "Bookmark Created"
 voice: ""
-new: "Bokmärket skapat"
+new: "Bokmärke skapat"
 
 id: LANG_BOOKMARK_LOAD_EMPTY
 desc: Indicates bookmark was empty
 eng: "Bookmark Empty"
 voice: ""
-new: "Tomt bokmärke"
+new: "Inga bokmärken"
 
 id: LANG_BOOKMARK_MENU
 desc: Text on main menu to get to bookmark commands
@@ -1827,13 +1827,13 @@ id: LANG_BOOKMARK_SELECT_DELETE
 desc: Used on the bookmark select window to indicated the bookmark delete option
 eng: "ON+Play = Delete"
 voice: ""
-new: "ON+Play = Ta bort"
+new: "PÅ+SPELA = Ta bort"
 
 id: LANG_BOOKMARK_SELECT_EXIT
 desc: From the bookmark list screen, allows user to exit
 eng: "OFF = Exit"
 voice: ""
-new: "OFF = Utgång"
+new: "AV = Avsluta"
 
 id: LANG_BOOKMARK_SELECT_INDEX_TEXT
 desc: Used on the bookmark select window to label index number
@@ -1845,13 +1845,13 @@ id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
 desc: From the auto-load screen, allows user to list all bookmarks
 eng: "Down = List"
 voice: ""
-new: "Down = Lista"
+new: "NER = Lista"
 
 id: LANG_BOOKMARK_SELECT_PLAY
 desc: Used on the bookmark select window to indicated the play option
 eng: "PLAY = Select"
 voice: ""
-new: "PLAY = Välj"
+new: "SPELA = Välj"
 
 id: LANG_BOOKMARK_SELECT_TIME_TEXT
 desc: Used on the bookmark select window to label elapsed time
@@ -1863,25 +1863,25 @@ id: LANG_BOOKMARK_SETTINGS
 desc: in general settings
 eng: "Bookmarking"
 voice: "Bookmarking"
-new: "Sätt bokmärken"
+new: "Bokmärken"
 
 id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
 desc: prompt for user to decide to create an bookmark
 eng: "Bookmark on Stop"
 voice: "Bookmark on Stop"
-new: "Bokmärke vid stop"
+new: "Bokmärke vid stopp"
 
 id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
 desc: prompt for user to decide to create a bookmark
 eng: "Load Last Bookmark"
 voice: "Load Last Bookmark"
-new: "Ladda senaste bokmärket"
+new: "Starta vid bokmärke"
 
 id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
 desc: Configuration option to maintain a list of recent bookmarks
 eng: "Maintain a List of Recent Bookmarks?"
 voice: "Maintain a List of Recent Bookmarks?"
-new: "Spara en lista av nya bokmärken?"
+new: "Spara en lista av nya bokmärken"
 
 id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
 desc: Save in recent bookmarks only
@@ -1911,13 +1911,13 @@ id: LANG_INFO_MENU
 desc: in the info sub menu
 eng: "Rockbox Info"
 voice: "Rockbox Info"
-new: "Rockbox info"
+new: "Rockboxinfo"
 
 id: LANG_LCD_MENU
 desc: in the display sub menu
 eng: "LCD Settings"
 voice: "LCD Settings"
-new: "LCD-inställning"
+new: "LCD"
 
 id: LANG_LIMITS_MENU
 desc: in the system sub menu
@@ -1929,7 +1929,7 @@ id: LANG_MANAGE_MENU
 desc: in the system sub menu
 eng: "Manage Settings"
 voice: "Manage Settings"
-new: "Administrera inställningar"
+new: "Hantera inställningar"
 
 id: LANG_RECORDING_MENU
 desc: in the recording sub menu
@@ -1941,13 +1941,13 @@ id: LANG_TIME_MENU
 desc: in the system sub menu
 eng: "Time & Date"
 voice: "Time and Date"
-new: "Tid & datum"
+new: "Tid och datum"
 
 id: LANG_WIND_MENU
 desc: in the playback sub menu
 eng: "FFwd/Rewind"
 voice: "Fast forward and Rewind"
-new: "Snabbspolning/Returspolning"
+new: "Snabbspolning"
 
 id: LANG_CREATE_DIR
 desc: in main menu
@@ -2001,7 +2001,7 @@ id: LANG_TRACK_DISPLAY
 desc: in playlist viewer on+play menu
 eng: "Track Display"
 voice: "Track Display"
-new: "Spårvisning"
+new: "Visa spår"
 
 id: LANG_VIEW
 desc: in on+play menu
@@ -2013,7 +2013,7 @@ id: LANG_BUTTON_BAR
 desc: in settings menu
 eng: "Button bar"
 voice: "Button bar"
-new: "Knapprad" 
+new: "Knapprad"
 
 id: LANG_DIRBROWSE_F1
 desc: in dir browser, F1 button bar text
@@ -2343,7 +2343,7 @@ id: LANG_VOICE_DIR_HOVER
 desc: "talkbox" mode for directories + files
 eng: ".talk mp3 clip"
 voice: "talk mp3 clip"
-new: "säg mp3-klippet"
+new: "Spela MP3-klipp"
 
 id: LANG_VOICE_FILE
 desc: item of voice menu, set the voive mode for files
@@ -2769,19 +2769,19 @@ id: LANG_ID3_ORDER
 desc: in playback settings screen
 eng: "ID3 tag priority"
 voice: "ID3 tag priority"
-new: "ID3-tag-prioritet"
+new: "ID3-prioritet"
 
 id: LANG_ID3_V1_FIRST
 desc: in playback settings screen
 eng: "V1 then V2"
 voice: "Version 1 then version 2"
-new: "V1 följt av V2"
+new: "V1, sedan V2"
 
 id: LANG_ID3_V2_FIRST
 desc: in playback settings screen
 eng: "V2 then V1"
 voice: "Version 2 then version 1"
-new: "V2 följt av V1"
+new: "V2, sedan V1"
 
 id: LANG_SHUTDOWN
 desc: in main menu
@@ -2793,13 +2793,13 @@ id: LANG_SHUTTINGDOWN
 desc: in main menu
 eng: "Shutting down..."
 voice: ""
-new: "Avslutar..."
+new: "Stänger av..."
 
 id: LANG_INSTALLATION_INCOMPLETE
 desc: in browse root
 eng: "Installation incomplete"
 voice: ""
-new: "Installationen ofullständig" 
+new: "Installationen ofullständig"
 
 id: LANG_NO_ROCKBOX_DIR
 desc: in browse root
@@ -2829,7 +2829,7 @@ id: LANG_CHANNEL_CUSTOM
 desc: in sound_settings
 eng: "Custom"
 voice: "Custom"
-new: "Anpassning"
+new: "Anpassad"
 
 id: LANG_FILTER_ID3DB
 desc: show ID3 database
@@ -2955,7 +2955,7 @@ id: LANG_ID3DB_ALL_SONGS
 desc: ID3 virtual folder name
 eng: "<All songs>"
 voice: ""
-new: "<Alla sånger>" 
+new: "<Alla sånger>"
 
 id: LANG_PLAYLIST
 desc: Used when you need to say playlist, also voiced
@@ -3051,7 +3051,7 @@ id: LANG_LCD_REMOTE_MENU
 desc: in the display sub menu
 eng: "Remote-LCD Settings"
 voice: ""
-new: "Fjärr-LCD-inställningar"
+new: "Fjärr-LCD"
 
 id: LANG_DISK_NAME_INTERNAL
 desc: in info menu; name for internal disk with multivolume (keep short!)
@@ -3075,13 +3075,13 @@ id: LANG_BACKLIGHT_FADE_IN
 desc: in settings_menu
 eng: "Backlight fade in"
 voice: "Backlight fade in"
-new: "Intoning av motljus"
+new: "Tona in belysning"
 
 id: LANG_BACKLIGHT_FADE_OUT
 desc: in settings_menu
 eng: "Backlight fade out"
 voice: "Backlight fade out"
-new: "Uttoning av motljus"
+new: "Tona ut belysning"
 
 id: LANG_SHUFFLE_PLAYLIST
 desc: in playlist menu, reshuffles the order in which songs are played
@@ -3093,13 +3093,13 @@ id: LANG_NOTHING_TO_RESUME
 desc: Error message displayed when resume button pressed but no playlist
 eng: "Nothing to resume"
 voice: ""
-new: "Inget att återta"
+new: "Inget att fortsätta"
 
 id: LANG_INSERT_SHUFFLED
 desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
 eng: "Insert shuffled"
 voice: "Insert shuffled"
-new: "Sätt in blandat"
+new: "Infoga blandat"
 
 id: LANG_SPDIF_ENABLE
 desc: in playback settings menu. enable/disable the optical out
@@ -3111,7 +3111,7 @@ id: LANG_NEXT_FOLDER
 desc: in settings_menu.  Should we move to next folder when current one ends
 eng: "Move to Next Folder"
 voice: "Move to Next Folder"
-new: "Flytta till nästa mapp"
+new: "Gå till nästa katalog"
 
 id: LANG_RUNTIMEDB_ACTIVE
 desc: in settings_menu.
@@ -3135,70 +3135,124 @@ id: LANG_CROSSFADE_DURATION
 desc: in playback settings
 eng: "Crossfade duration"
 voice: "Crossfade duration"
-new: "Löptid för korstoning"
+new: "Korstoningslängd"
 
 id: LANG_MIX
 desc: in playback settings, crossfade option
 eng: "Mix"
 voice: "Mix"
-new: "Mix"
+new: "Blanda"
 
 id: LANG_RESTARTING_PLAYBACK
 desc: splash screen displayed when pcm buffer size is changed
 eng: "Restarting playback..."
 voice: "Restarting playback..."
-new: "Återuppta uppspelning..."
+new: "Startar om uppspelning..."
 
 id: LANG_REPLAYGAIN
 desc: in replaygain
 eng: "Replaygain"
-voice: 
-new: "Spela upp igen"
+voice: "Replaygain"
+new: "Volymutjämning"
 
 id: LANG_REPLAYGAIN_ENABLE
 desc: in replaygain
 eng: "Enable replaygain"
-voice: 
-new: "Aktivera återuppspelning"
+voice: "Enable replaygain"
+new: "Aktivera volymutjämning"
 
 id: LANG_REPLAYGAIN_NOCLIP
 desc: in replaygain
 eng: "Prevent clipping"
-voice: 
+voice: "Prevent clipping"
 new: "Förhindra klippning"
 
 id: LANG_REPLAYGAIN_MODE
 desc: in replaygain
 eng: "Replaygain type"
-voice: 
-new: "Återuppspelningsläge"
+voice: "Replaygain type"
+new: "Volymutjämningstyp"
 
 id: LANG_TRACK_GAIN
 desc: in replaygain
 eng: "Track gain"
-voice: 
-new: "Spårförstärkning"
+voice: "Track gain"
+new: "Per spår"
 
 id: LANG_ALBUM_GAIN
 desc: in replaygain
 eng: "Album gain"
-voice: 
-new: "Albumförstärkning"
+voice: "Album gain"
+new: "Per album"
 
 id: LANG_ID3_TRACK_GAIN
 desc: in browse_id3
 eng: "[Track gain]"
-voice: 
-new: "[Spårförstärkning]"
+voice: ""
+new: "[Spårvolymutjämning]"
 
 id: LANG_ID3_ALBUM_GAIN
 desc: in browse_id3
 eng: "[Album gain]"
-voice: 
-new: "[Albumförstärkning]"
+voice: ""
+new: "[Albumvolymutjämning]"
 
 id: LANG_ID3_NO_GAIN
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
+
+id: LANG_REPLAYGAIN_PREAMP
 desc: in browse_id3
-eng: "<No gain>"
+eng: "Pre-amp"
 voice: 
-new: "<Ingen förstärkning>"
+new: "Volymljustering"
+
+id: LANG_UNIT_DB
+desc: in browse_id3
+eng: "dB"
+voice: 
+new: "dB"
+
+id: LANG_BIDI_SUPPORT
+desc: in settings_menu, option to enable reversal of hebrew/arabic text
+eng: "BiDi Hebrew/Arabic"
+voice: 
+new: "BiDi Hebrew/Arabic"
+
+id: LANG_ID3_VBR
+desc: in browse_id3
+eng: " (VBR)"
+voice: 
+new: " (VBR)"
+
+id: LANG_BEEP
+desc: in playback settings
+eng: "Beep volume"
+voice: 
+new: "Pipvolym"
+
+id: LANG_WEAK
+desc: in beep volume in playback settings
+eng: "Weak"
+voice: 
+new: "Svag"
+
+id: LANG_MODERATE
+desc: in beep volume in playback settings
+eng: "Moderate"
+voice: 
+new: "Medel"
+
+id: LANG_STRONG
+desc: in beep volume in playback settings
+eng: "Strong"
+voice: 
+new: "Stark"
+
+id: LANG_REPEAT_AB
+desc: repeat one song
+eng: "A-B"
+voice: "A-B"
+new: "A-B"
