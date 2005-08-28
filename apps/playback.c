@@ -131,7 +131,6 @@ static struct mp3entry id3_voice;
 static char *voicebuf;
 static int voice_remaining;
 static bool voice_is_playing;
-static bool voice_cpu_boosted = false;
 static void (*voice_getmore)(unsigned char** start, int* size);
 
 /* Is file buffer currently being refilled? */
@@ -255,16 +254,20 @@ static void swap_codec(void)
     logf("codec resuming:%d", current_codec);
 }
 
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
 static void voice_boost_cpu(bool state)
 {
+    static bool voice_cpu_boosted = false;
+    
     if (state != voice_cpu_boosted)
     {
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
         cpu_boost(state);
-#endif
         voice_cpu_boosted = state;
     }
 }
+#else
+#define voice_boost_cpu(state)   do { } while(0)
+#endif
 
 bool codec_pcmbuf_insert_split_callback(void *ch1, void *ch2,
                                         long length)

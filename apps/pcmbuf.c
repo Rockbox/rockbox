@@ -61,9 +61,6 @@ static int crossfade_pos;
 static int crossfade_amount;
 static int crossfade_rem;
 
-
-static bool boost_mode;
-
 /* Crossfade modes. If CFM_CROSSFADE is selected, normal
  * crossfader will activate. Selecting CFM_FLUSH is a special
  * operation that only overwrites the pcm buffer without crossfading.
@@ -93,6 +90,9 @@ void (*pcmbuf_watermark_event)(int bytes_left);
 static int last_chunksize;
 static long mixpos = 0;
 
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+static bool boost_mode;
+
 void pcmbuf_boost(bool state)
 {
     static bool boost_state = false;
@@ -101,12 +101,18 @@ void pcmbuf_boost(bool state)
         return ;
         
     if (state != boost_state) {
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
         cpu_boost(state);
-#endif    
         boost_state = state;
     }
 }
+
+void pcmbuf_set_boost_mode(bool state)
+{
+    if (state)
+        pcmbuf_boost(true);
+    boost_mode = state;
+}
+#endif
 
 int pcmbuf_num_used_buffers(void)
 {
@@ -189,13 +195,6 @@ void pcmbuf_watermark_callback(int bytes_left)
     pcmbuf_boost(true);
     if (bytes_left <= CHUNK_SIZE * 2)
         crossfade_active = false;
-}
-
-void pcmbuf_set_boost_mode(bool state)
-{
-    if (state)
-        pcmbuf_boost(true);
-    boost_mode = state;
 }
 
 void pcmbuf_add_event(void (*event_handler)(void))
