@@ -131,6 +131,7 @@ static struct mp3entry id3_voice;
 static char *voicebuf;
 static int voice_remaining;
 static bool voice_is_playing;
+static bool voice_cpu_boosted = false;
 static void (*voice_getmore)(unsigned char** start, int* size);
 
 /* Is file buffer currently being refilled? */
@@ -254,6 +255,17 @@ static void swap_codec(void)
     logf("codec resuming:%d", current_codec);
 }
 
+static void voice_boost_cpu(bool state)
+{
+    if (state != voice_cpu_boosted)
+    {
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+        cpu_boost(state);
+#endif
+        voice_cpu_boosted = state;
+    }
+}
+
 bool codec_pcmbuf_insert_split_callback(void *ch1, void *ch2,
                                         long length)
 {
@@ -306,9 +318,9 @@ bool codec_pcmbuf_insert_split_callback(void *ch1, void *ch2,
                 if (voice_is_playing && pcmbuf_usage() > 30
                     && pcmbuf_mix_usage() < 20)
                 {
-                    cpu_boost(true);
+                    voice_boost_cpu(true);
                     swap_codec();
-                    cpu_boost(false);
+                    voice_boost_cpu(false);
                 }
                 break ;
 
@@ -436,8 +448,13 @@ void* voice_request_data(long *realsize, long reqsize)
         {
             swap_codec();
         }
-        if (!voice_is_playing)
+        else if (!voice_is_playing)
+        {
+            voice_boost_cpu(false);
+            if (!pcm_is_playing())
+                pcmbuf_boost(false);
             sleep(HZ/16);
+        }
             
         if (voice_remaining)
         {
@@ -1277,11 +1294,11 @@ void initialize_buffer_fill(void)
     fill_bytesleft = filebuflen - filebufused;
     cur_ti->start_pos = ci.curpos;
 
-    pcmbuf_set_boost_mode(true);
-    
     if (filling)
         return ;
 
+    pcmbuf_set_boost_mode(true);
+    
     filling = true;
     
     /* Calculate real track count after throwing away old tracks. */

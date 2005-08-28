@@ -33,6 +33,7 @@ bool pcmbuf_add_chunk(void *addr, int size, void (*callback)(void));
 int pcmbuf_num_used_buffers(void);
 void pcmbuf_set_watermark(int numbytes, void (*callback)(int bytes_left));
 
+void pcmbuf_boost(bool state);
 void pcmbuf_set_boost_mode(bool state);
 bool pcmbuf_is_lowdata(void);
 void pcmbuf_flush_audio(void);

@@ -93,7 +93,7 @@ void (*pcmbuf_watermark_event)(int bytes_left);
 static int last_chunksize;
 static long mixpos = 0;
 
-static void pcmbuf_boost(bool state)
+void pcmbuf_boost(bool state)
 {
     static bool boost_state = false;
     
