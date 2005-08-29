@@ -99,15 +99,15 @@ static void dma_stop(void)
 
 /*
  * This function goes directly into the DMA buffer to calculate the left and
- * right peak values. To avoid missing peaks it tries to look forward a full
- * refresh period (1/20 sec) although it's always possible that the entire
- * period will not be visible. To reduce CPU load it only looks at every
- * third sample, and this can be reduced even further if needed (even every
- * tenth sample would still be pretty accurate).
+ * right peak values. To avoid missing peaks it tries to look forward two full
+ * peek periods (2/HZ sec, 100% overlap), although it's always possible that
+ * the entire period will not be visible. To reduce CPU load it only looks at
+ * every third sample, and this can be reduced even further if needed (even
+ * every tenth sample would still be pretty accurate).
  */
 
-#define PEAK_SAMPLES    2205    /* 44100 sample rate / 20 Hz refresh */
-#define PEAK_STRIDE     3       /* every 3rd sample is plenty... */
+#define PEAK_SAMPLES  (44100*2/HZ)  /* 44100 samples * 2 / 100 Hz tick */
+#define PEAK_STRIDE   3       /* every 3rd sample is plenty... */
 
 void pcm_calculate_peaks(int *left, int *right)
 {

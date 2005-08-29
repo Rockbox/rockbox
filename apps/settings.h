@@ -250,7 +250,6 @@ struct user_settings
     int peak_meter_hold;      /* hold time for peak meter in 1/100 s */
     int peak_meter_clip_hold; /* hold time for clips */
     bool peak_meter_dbfs;     /* show linear or dbfs values */
-    bool peak_meter_performance;  /* true: high performance, else save energy*/
     int peak_meter_min; /* range minimum */
     int peak_meter_max; /* range maximum */
     bool car_adapter_mode; /* 0=off 1=on */

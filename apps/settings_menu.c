@@ -318,16 +318,6 @@ static bool volume_type(void)
                        INT, names, 2, NULL);
 }
 
-#ifdef PM_DEBUG
-static bool peak_meter_fps_menu(void) {
-    bool retval = false;
-    retval = set_int( "Refresh rate", "/s", UNIT_PER_SEC,
-             &peak_meter_fps,
-             NULL, 1, 5, 40, NULL);
-    return retval;
-}
-#endif /* PM_DEBUG */
-
 /**
  * Menu to set the hold time of normal peaks.
  */
@@ -545,25 +535,6 @@ static bool peak_meter_max(void) {
 }
 
 /**
- * Menu to select wether the meter is in
- * precision or in energy saver mode
- */
-static bool peak_meter_performance(void) {
-    bool retval = false;
-    retval = set_bool_options(str(LANG_PM_PERFORMANCE), 
-        &global_settings.peak_meter_performance, 
-        STR(LANG_PM_HIGH_PERFORMANCE), STR(LANG_PM_ENERGY_SAVER),
-        NULL);
-
-    if (global_settings.peak_meter_performance) {
-        peak_meter_fps = 25;
-    } else {
-        peak_meter_fps = 20;
-    }
-    return retval;
-}
-
-/**
  * Menu to configure the peak meter
  */
 static bool peak_meter_menu(void) 
@@ -575,10 +546,6 @@ static bool peak_meter_menu(void)
         { ID2P(LANG_PM_RELEASE)  , peak_meter_release   },  
         { ID2P(LANG_PM_PEAK_HOLD), peak_meter_hold      },  
         { ID2P(LANG_PM_CLIP_HOLD), peak_meter_clip_hold },
-        { ID2P(LANG_PM_PERFORMANCE), peak_meter_performance },
-#ifdef PM_DEBUG
-        { "Refresh rate" , -1    , peak_meter_fps_menu  },
-#endif
         { ID2P(LANG_PM_SCALE)    , peak_meter_scale     },
         { ID2P(LANG_PM_MIN)      , peak_meter_min       },
         { ID2P(LANG_PM_MAX)      , peak_meter_max       },

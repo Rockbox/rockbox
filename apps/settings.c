@@ -78,7 +78,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "pcm_playback.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 25
+#define CONFIG_BLOCK_VERSION 26
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -349,8 +349,7 @@ static const struct bit_entry hd_bits[] =
     /* peak meter */
     {5, S_O(peak_meter_clip_hold), 16, "peak meter clip hold", /* 0...25 */
         "on,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90,2min,3min,5min,10min,20min,45min,90min" },
-    {1, S_O(peak_meter_performance), false, "peak meter busy", off_on },
-    {5, S_O(peak_meter_hold), 3, "peak meter hold", 
+    {5, S_O(peak_meter_hold), 3, "peak meter hold",
         "off,200ms,300ms,500ms,1,2,3,4,5,6,7,8,9,10,15,20,30,1min" },
     {7, S_O(peak_meter_release), 8, "peak meter release", NULL }, /* 0...126 */
     {1, S_O(peak_meter_dbfs), true, "peak meter dbfs", off_on },

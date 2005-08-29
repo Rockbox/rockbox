@@ -878,21 +878,21 @@ voice: "Numeric"
 new:
 
 id: LANG_PM_PERFORMANCE
-desc: in the peak meter menu
-eng: "Performance"
-voice: "Performance"
+desc: DEPRECATED
+eng: ""
+voice:
 new:
 
 id: LANG_PM_HIGH_PERFORMANCE
-desc: in the peak meter menu
-eng: "High performance"
-voice: "High performance"
+desc: DEPRECATED
+eng: ""
+voice: ""
 new:
 
 id: LANG_PM_ENERGY_SAVER
-desc: in the peak meter menu
-eng: "Save Energy"
-voice: "Save Energy"
+desc: DEPRECATED
+eng: ""
+voice: ""
 new:
 
 id: LANG_PM_SCALE

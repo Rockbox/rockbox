@@ -79,12 +79,12 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 41
+#define CODEC_API_VERSION 42
 
 /* update this to latest version if a change to the api struct breaks
-   backwards compatibility (and please take the opportunity to sort in any 
+   backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 40
+#define CODEC_MIN_API_VERSION 42
 
 /* codec return codes */
 enum codec_status {
@@ -314,8 +314,8 @@ struct codec_api {
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     unsigned short (*peak_meter_scale_value)(unsigned short val,
                                              int meterwidth);
-    void (*peak_meter_set_use_dbfs)(int use);
-    int (*peak_meter_get_use_dbfs)(void);
+    void (*peak_meter_set_use_dbfs)(bool use);
+    bool (*peak_meter_get_use_dbfs)(void);
 #endif
 
     /* new stuff at the end, sort into place next time

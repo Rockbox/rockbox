@@ -304,7 +304,7 @@ bool radio_screen(void)
         if(search_dir)
             button = button_get(false);
         else
-            button = button_get_w_tmo(HZ / peak_meter_fps);
+            button = button_get_w_tmo(HZ / PEAK_METER_FPS);
         switch(button)
         {
             case FM_STOP:
@@ -479,13 +479,10 @@ bool radio_screen(void)
             /* Only display the peak meter when not recording */
             if(!audio_status())
             {
-                lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-                lcd_fillrect(0, 8 + fh*(top_of_screen + 3), LCD_WIDTH, fh);
-                lcd_set_drawmode(DRMODE_SOLID);
                 peak_meter_draw(0, 8 + fh*(top_of_screen + 3), LCD_WIDTH, fh);
                 lcd_update_rect(0, 8 + fh*(top_of_screen + 3), LCD_WIDTH, fh);
             }
-            
+
             if(TIME_AFTER(current_tick, timeout))
             {
                 timeout = current_tick + HZ;

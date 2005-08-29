@@ -19,13 +19,14 @@
 #ifndef __PEAKMETER_H__
 #define __PEAKMETER_H__
 
+#define PEAK_METER_FPS 20
+
 /*#define PM_DEBUG */
 #ifdef PM_DEBUG 
 extern bool peak_meter_histogram(void);
 #endif
 
 extern bool peak_meter_enabled;
-extern int  peak_meter_fps;
 
 extern void peak_meter_playback(bool playback);
 extern void peak_meter_draw(int x, int y, int width, int height);
@@ -39,8 +40,8 @@ extern void peak_meter_set_min(int newmin);
 extern int  peak_meter_get_min(void);
 extern void peak_meter_set_max(int newmax);
 extern int  peak_meter_get_max(void);
-extern void peak_meter_set_use_dbfs(int use);
-extern int  peak_meter_get_use_dbfs(void);
+extern void peak_meter_set_use_dbfs(bool use);
+extern bool peak_meter_get_use_dbfs(void);
 extern int  calc_db (int isample);
 extern int  peak_meter_db2sample(int db);
 extern unsigned short peak_meter_scale_value(unsigned short val, int meterwidth);

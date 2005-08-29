@@ -271,7 +271,7 @@ static void update_icons(void)
 
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     /* The scale icon */
-    rb->lcd_mono_bitmap(SCALE_BMP[rb->peak_meter_get_use_dbfs()],
+    rb->lcd_mono_bitmap(SCALE_BMP[rb->peak_meter_get_use_dbfs() ? 1 : 0],
         2 *LCD_WIDTH/3 + LCD_WIDTH/3 / 2 - BMPWIDTH/2, LCD_HEIGHT - BMPHEIGHT,
         BMPWIDTH, BMPHEIGHT);
 #else
@@ -1134,7 +1134,7 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
 
             case SPLITEDIT_SCALE:
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
-                rb->peak_meter_set_use_dbfs(rb->peak_meter_get_use_dbfs() +1);
+                rb->peak_meter_set_use_dbfs(!rb->peak_meter_get_use_dbfs());
 #endif
                 splitedit_invalidate_osci();
                 update_icons();

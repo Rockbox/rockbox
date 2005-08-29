@@ -88,12 +88,12 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 47
+#define PLUGIN_API_VERSION 48
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 47
+#define PLUGIN_MIN_API_VERSION 48
 
 /* plugin return codes */
 enum plugin_status {
@@ -413,8 +413,8 @@ struct plugin_api {
 #if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
     unsigned short (*peak_meter_scale_value)(unsigned short val,
                                              int meterwidth);
-    void (*peak_meter_set_use_dbfs)(int use);
-    int (*peak_meter_get_use_dbfs)(void);
+    void (*peak_meter_set_use_dbfs)(bool use);
+    bool (*peak_meter_get_use_dbfs)(void);
 #endif
 #ifdef HAVE_LCD_BITMAP
     int (*read_bmp_file)(char* filename, int *get_width, int *get_height,

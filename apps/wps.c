@@ -391,46 +391,29 @@ long wps_show(void)
 #ifdef HAVE_LCD_BITMAP
         /* when the peak meter is enabled we want to have a
             few extra updates to make it look smooth. On the
-            other hand we don't want to waste energy if it 
+            other hand we don't want to waste energy if it
             isn't displayed */
         if (peak_meter_enabled) {
-            int i;
-
-            /* In high performance mode we read out the mas as
-               often as we can. There is no sleep for cpu */
-            if (global_settings.peak_meter_performance) {
-                long next_refresh = current_tick;
-                long next_big_refresh = current_tick + HZ / 5;
-                button = BUTTON_NONE;
-                while (!TIME_AFTER(current_tick, next_big_refresh)) {
-                    button = button_get(false);
-                    if (button != BUTTON_NONE) {
-                        break;
-                    }
-                    peak_meter_peek();
-                    sleep(1);
-
-                    if (TIME_AFTER(current_tick, next_refresh)) {
-                        wps_refresh(id3, nid3, 0, WPS_REFRESH_PEAK_METER);
-                        next_refresh = current_tick + HZ / peak_meter_fps;
-                    }
+            long next_refresh = current_tick;
+            long next_big_refresh = current_tick + HZ / 5;
+            button = BUTTON_NONE;
+            while (TIME_BEFORE(current_tick, next_big_refresh)) {
+                button = button_get(false);
+                if (button != BUTTON_NONE) {
+                    break;
                 }
-            } 
-            
-            /* In energy saver mode the cpu may sleep a 
-               little bit while waiting for buttons */
-            else {
-                for (i = 0; i < 4; i++) {
-                    button = button_get_w_tmo(HZ / peak_meter_fps);
-                    if (button != 0) {
-                        break;
-                    }
+                peak_meter_peek();
+                sleep(0);   /* Sleep until end of current tick. */  
+
+                if (TIME_AFTER(current_tick, next_refresh)) {
                     wps_refresh(id3, nid3, 0, WPS_REFRESH_PEAK_METER);
+                    next_refresh += HZ / PEAK_METER_FPS;
                 }
             }
-        } 
-        
-        /* The peak meter is disabled 
+
+        }
+
+        /* The peak meter is disabled
            -> no additional screen updates needed */
         else {
             button = button_get_w_tmo(HZ/5);
