@@ -866,22 +866,22 @@ voice: "Numerický"
 new: "Numerický"
 
 id: LANG_PM_PERFORMANCE
-desc: in the peak meter menu
-eng: "Performance"
-voice: "Výkon"
-new: "Výkon"
+desc: DEPRECATED
+eng: ""
+voice: 
+new: ""
 
 id: LANG_PM_HIGH_PERFORMANCE
-desc: in the peak meter menu
-eng: "High performance"
-voice: "Vysoký výkon"
-new: "Vysoký výkon"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_PM_ENERGY_SAVER
-desc: in the peak meter menu
-eng: "Save Energy"
-voice: "Spoøit energii"
-new: "Spoøit energii"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu

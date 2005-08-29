@@ -865,22 +865,22 @@ voice: "Numeric"
 new: "Numerisk"
 
 id: LANG_PM_PERFORMANCE
-desc: in the peak meter menu
-eng: "Performance"
-voice: "Performance"
-new: "Ydelse"
+desc: DEPRECATED
+eng: ""
+voice: 
+new: ""
 
 id: LANG_PM_HIGH_PERFORMANCE
-desc: in the peak meter menu
-eng: "High performance"
-voice: "High performance"
-new: "Højtydende"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_PM_ENERGY_SAVER
-desc: in the peak meter menu
-eng: "Save Energy"
-voice: "Save Energy"
-new: "Spar energi"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu

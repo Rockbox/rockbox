@@ -876,22 +876,22 @@ voice: "Numerique"
 new: "Numérique"
 
 id: LANG_PM_PERFORMANCE
-desc: in the peak meter menu
-eng: "Performance"
-voice: "Performance"
-new: "Performance"
+desc: DEPRECATED
+eng: ""
+voice: 
+new: ""
 
 id: LANG_PM_HIGH_PERFORMANCE
-desc: in the peak meter menu
-eng: "High performance"
-voice: "Haute performance"
-new: "Haute performance"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_PM_ENERGY_SAVER
-desc: in the peak meter menu
-eng: "Save Energy"
-voice: "Economie d'énergie"
-new: "Economie d'énergie"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
@@ -3261,10 +3261,11 @@ eng: "dB"
 voice: "décibel"
 new: "dB"
 
+# unsure about that one. Isn't there a better term ?
+
 id: LANG_ID3_VBR
 desc: in browse_id3
 eng: " (VBR)"
-# unsure about that one. Isn't there a better term ?
 voice: "fréquence variable"
 new: " (VBR)"
 
