@@ -55,7 +55,7 @@
 
 #ifdef CONFIG_TUNER
 
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
 #include "uda1380.h"
 #include "pcm_record.h"
 #endif
@@ -213,14 +213,14 @@ bool radio_screen(void)
     radio_load_presets();
 
 #ifndef SIMULATOR
-#if CONFIG_HWCODEC != MASNONE
+#if CONFIG_CODEC != SWCODEC
     if(rec_create_directory() > 0)
         have_recorded = true;
 #endif
     
     audio_stop();
 
-#if CONFIG_HWCODEC != MASNONE
+#if CONFIG_CODEC != SWCODEC
     mpeg_init_recording();
 
     sound_settings_apply();
@@ -497,7 +497,7 @@ bool radio_screen(void)
             }
             
 #ifndef SIMULATOR
-#if CONFIG_HWCODEC != MASNONE
+#if CONFIG_CODEC != SWCODEC
             seconds = mpeg_recorded_time() / HZ;
 #endif
 #endif
@@ -580,7 +580,7 @@ bool radio_screen(void)
         }
     }
     
-#if CONFIG_HWCODEC != MASNONE
+#if CONFIG_CODEC != SWCODEC
     audio_init_playback();
 #endif
 
@@ -588,7 +588,7 @@ bool radio_screen(void)
 
     if(keep_playing)
     {
-#if CONFIG_HWCODEC != MASNONE
+#if CONFIG_CODEC != SWCODEC
         /* Enable the Left and right A/D Converter */
         mpeg_set_recording_gain(sound_default(SOUND_LEFT_GAIN),
                                 sound_default(SOUND_RIGHT_GAIN), false);
@@ -599,7 +599,7 @@ bool radio_screen(void)
     else
     {
         radio_stop();
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
         pcmrec_set_mux(0); /* Line In */
 #endif
     }
@@ -880,7 +880,7 @@ bool handle_radio_presets(void)
 }
 
 #ifndef SIMULATOR
-#if CONFIG_HWCODEC != MASNONE
+#if CONFIG_CODEC != SWCODEC
 static bool fm_recording_settings(void)
 {
     bool ret;
@@ -959,7 +959,7 @@ bool radio_menu(void)
 #endif
         { monomode_menu_string           , toggle_mono_mode     },
         { ID2P(LANG_SOUND_SETTINGS)      , sound_menu           },
-#if !defined(SIMULATOR) && (CONFIG_HWCODEC != MASNONE)
+#if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
         { ID2P(LANG_RECORDING_SETTINGS)  , fm_recording_settings},
 #endif
     };

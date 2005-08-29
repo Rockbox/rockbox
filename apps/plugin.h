@@ -44,7 +44,7 @@
 #include "mpeg.h"
 #include "audio.h"
 #include "mp3_playback.h"
-#if (HWCODEC == MASNONE)
+#if (HWCODEC == SWCODEC)
 #include "pcm_playback.h"
 #endif
 #include "settings.h"
@@ -325,10 +325,10 @@ struct plugin_api {
     void (*mp3_play_pause)(bool play);
     void (*mp3_play_stop)(void);
     bool (*mp3_is_playing)(void);
-#if CONFIG_HWCODEC != MASNONE
+#if CONFIG_CODEC != SWCODEC
     void (*bitswap)(unsigned char *data, int length);
 #endif
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
     void (*pcm_play_data)(void (*get_more)(unsigned char** start, long*size));
     void (*pcm_play_stop)(void);
     void (*pcm_set_frequency)(unsigned int frequency);
@@ -352,20 +352,20 @@ struct plugin_api {
     struct mp3entry* (*audio_current_track)(void);
     void (*audio_flush_and_reload_tracks)(void);
     int (*audio_get_file_pos)(void);
-#if !defined(SIMULATOR) && (CONFIG_HWCODEC != MASNONE)
+#if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
     unsigned long (*mpeg_get_last_header)(void);
 #endif
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     void (*sound_set_pitch)(int pitch);        
 #endif
 
     /* MAS communication */
-#if !defined(SIMULATOR) && (CONFIG_HWCODEC != MASNONE)
+#if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
     int (*mas_readmem)(int bank, int addr, unsigned long* dest, int len);
     int (*mas_writemem)(int bank, int addr, const unsigned long* src, int len);
     int (*mas_readreg)(int reg);
     int (*mas_writereg)(int reg, unsigned int val);
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     int (*mas_codec_writereg)(int reg, unsigned int val);
     int (*mas_codec_readreg)(int reg);
 #endif
@@ -410,7 +410,7 @@ struct plugin_api {
                                      long max_offset, unsigned long last_header);
     int (*battery_level)(void);
     bool (*battery_level_safe)(void);
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     unsigned short (*peak_meter_scale_value)(unsigned short val,
                                              int meterwidth);
     void (*peak_meter_set_use_dbfs)(bool use);

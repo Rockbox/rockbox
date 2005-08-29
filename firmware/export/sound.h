@@ -54,7 +54,7 @@ int sound_val2phys(int setting, int value);
 const char *sound_unit(int setting);
 int sound_numdecimals(int setting);
 int sound_steps(int setting);
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F) || defined(SIMULATOR)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) || defined(SIMULATOR)
 void sound_set_pitch(int permille);
 int sound_get_pitch(void);
 #endif

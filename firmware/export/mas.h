@@ -27,7 +27,7 @@
 /*
 	MAS I2C	defs
 */
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 #define MAS_ADR         0x3c
 #define	MAS_DEV_WRITE   (MAS_ADR | 0x00)
 #define	MAS_DEV_READ    (MAS_ADR | 0x01)
@@ -38,7 +38,7 @@
 #endif
 
 /* registers..*/
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 #define	MAS_DATA_WRITE   0x68
 #define MAS_DATA_READ    0x69
 #define	MAS_CODEC_WRITE  0x6c
@@ -62,7 +62,7 @@
 #define	MAS_REG_KPRESCALE       0xe7
 #define	MAS_REG_KBASS           0x6b
 #define	MAS_REG_KTREBLE         0x6f
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 #define MAS_REG_KMDB_SWITCH     0x21
 #define MAS_REG_KMDB_STR        0x22
 #define MAS_REG_KMDB_HAR        0x23
@@ -78,7 +78,7 @@
 /*
  * MAS commands
  */
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 #define MAS_CMD_READ_ANCILLARY  0x50
 #define MAS_CMD_FAST_PRG_DL     0x60
 #define MAS_CMD_READ_IC_VER     0x70
@@ -101,7 +101,7 @@
 /* 
  * MAS D0 memory cells (MAS3587F / MAS3539F)
  */
-#if CONFIG_HWCODEC == MAS3587F
+#if CONFIG_CODEC == MAS3587F
 #define MAS_D0_APP_SELECT        0x7f6
 #define MAS_D0_APP_RUNNING       0x7f7
 #define MAS_D0_ENCODER_CONTROL   0x7f0
@@ -120,7 +120,7 @@
 #define MAS_D0_MPEG_STATUS_2     0xfd2
 #define MAS_D0_CRC_ERROR_COUNT   0xfd3
 
-#elif CONFIG_HWCODEC == MAS3539F
+#elif CONFIG_CODEC == MAS3539F
 #define MAS_D0_APP_SELECT        0x34b
 #define MAS_D0_APP_RUNNING       0x34c
 /* no encoder :( */

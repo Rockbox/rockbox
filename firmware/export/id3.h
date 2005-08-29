@@ -28,14 +28,14 @@
 enum {
     AFMT_UNKNOWN = 1,  /* Unknown file format */
 
-#if CONFIG_HWCODEC==MASNONE
+#if CONFIG_CODEC==SWCODEC
     AFMT_MPA_L1,       /* MPEG Audio layer 1 */
 #endif
 
     AFMT_MPA_L2,       /* MPEG Audio layer 2 */
     AFMT_MPA_L3,       /* MPEG Audio layer 3 */
 
-#if CONFIG_HWCODEC==MASNONE
+#if CONFIG_CODEC==SWCODEC
     AFMT_PCM_WAV,      /* Uncompressed PCM in a WAV file */
     AFMT_OGG_VORBIS,   /* Ogg Vorbis */
     AFMT_FLAC,         /* FLAC */
@@ -118,7 +118,7 @@ struct mp3entry {
     
     /* replaygain support */
     
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
     char* track_gain_string;
     char* album_gain_string;
     long track_gain;    /* 7.24 signed fixed point. 0 for no gain. */

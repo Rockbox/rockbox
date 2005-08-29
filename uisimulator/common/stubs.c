@@ -71,7 +71,7 @@ long pcm_get_bytes_waiting(void)
     return 0;
 }
 
-#if CONFIG_HWCODEC != MASNONE
+#if CONFIG_CODEC != SWCODEC
 void audio_set_buffer_margin(int seconds)
 {
      (void)seconds;
@@ -273,7 +273,7 @@ void button_set_flip(bool yesno)
     (void)yesno;
 }
 
-#if CONFIG_HWCODEC != MASNONE
+#if CONFIG_CODEC != SWCODEC
 void talk_init(void)
 {
 }

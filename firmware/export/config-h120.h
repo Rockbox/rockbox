@@ -27,7 +27,7 @@
 #define CONFIG_REMOTE_KEYPAD H100_REMOTE
 
 /* Define this if you do software codec */
-#define CONFIG_HWCODEC MASNONE
+#define CONFIG_CODEC SWCODEC
 
 /* Define this if you have an remote lcd */
 #define HAVE_REMOTE_LCD

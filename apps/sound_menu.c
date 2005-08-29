@@ -38,7 +38,7 @@
 #include "talk.h"
 #include "misc.h"
 #include "sound.h"
-#if CONFIG_HWCODEC == MAS3587F
+#if CONFIG_CODEC == MAS3587F
 #include "peakmeter.h"
 #include "mas.h"
 #endif
@@ -171,7 +171,7 @@ static bool treble(void)
     return set_sound(str(LANG_TREBLE), &global_settings.treble, SOUND_TREBLE);
 }
 
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 static bool loudness(void)
 {
     return set_sound(str(LANG_LOUDNESS), &global_settings.loudness, 
@@ -421,7 +421,7 @@ bool sound_menu(void)
         { ID2P(LANG_BALANCE), balance },
         { ID2P(LANG_CHANNEL_MENU), chanconf },
         { ID2P(LANG_STEREO_WIDTH), stereo_width },
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
         { ID2P(LANG_LOUDNESS), loudness },
         { ID2P(LANG_AUTOVOL), avc },
         { ID2P(LANG_SUPERBASS), superbass },
@@ -454,7 +454,7 @@ enum trigger_menu_option
     TRIG_OPTION_COUNT,
 };
 
-#if !defined(SIMULATOR) && CONFIG_HWCODEC == MAS3587F
+#if !defined(SIMULATOR) && CONFIG_CODEC == MAS3587F
 static char* create_thres_str(int threshold)
 {
     static char retval[6];
@@ -846,7 +846,7 @@ bool recording_menu(bool no_source)
     items[i++].function = recdirectory;
     items[i].desc = ID2P(LANG_RECORD_STARTUP);
     items[i++].function = reconstartup;
-#if !defined(SIMULATOR) && CONFIG_HWCODEC == MAS3587F
+#if !defined(SIMULATOR) && CONFIG_CODEC == MAS3587F
     items[i].desc = str(LANG_RECORD_TRIGGER);
     items[i++].function = rectrigger;
 #endif

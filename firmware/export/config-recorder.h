@@ -23,7 +23,7 @@
 #ifndef SIMULATOR
 
 /* Define this if you have a MAS3587F */
-#define CONFIG_HWCODEC MAS3587F
+#define CONFIG_CODEC MAS3587F
 
 /* Define this if you have a SH7034 */
 #define CONFIG_CPU SH7034

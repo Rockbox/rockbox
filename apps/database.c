@@ -44,7 +44,7 @@
 #include "database.h"
 #include "autoconf.h"
 
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
 #include "playback.h"
 #else
 #include "mpeg.h"

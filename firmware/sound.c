@@ -31,7 +31,7 @@
 #include "dac.h"
 #include "system.h"
 #include "hwcompat.h"
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
 #include "pcm_playback.h"
 #endif
 #endif
@@ -40,7 +40,7 @@
 extern bool audio_is_initialized;
 #endif
 
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 extern unsigned long shadow_io_control_main;
 extern unsigned shadow_codec_reg0;
 #endif
@@ -116,7 +116,7 @@ static const int steps[] =
 static const int minval[] =
 {
     0,    /* Volume */
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     -12,  /* Bass */
     -12,  /* Treble */
 #elif defined(HAVE_UDA1380)
@@ -145,7 +145,7 @@ static const int minval[] =
 static const int maxval[] =
 {
     100,  /* Volume */
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     12,   /* Bass */
     12,   /* Treble */
 #elif defined(HAVE_UDA1380)
@@ -174,7 +174,7 @@ static const int maxval[] =
 static const int defaultval[] =
 {
     70,   /* Volume */
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     6,    /* Bass */
     6,    /* Treble */
 #elif defined(HAVE_UDA1380)
@@ -231,7 +231,7 @@ int sound_default(int setting)
 }
 
 #ifndef SIMULATOR
-#if CONFIG_HWCODEC == MAS3507D /* volume/balance/treble/bass interdependency */
+#if CONFIG_CODEC == MAS3507D /* volume/balance/treble/bass interdependency */
 #define VOLUME_MIN -780
 #define VOLUME_MAX  180
 
@@ -351,7 +351,7 @@ static int tenthdb2master(int db) {
 }
 #endif
 
-#if (CONFIG_HWCODEC == MAS3507D) || defined HAVE_UDA1380
+#if (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380
  /* volume/balance/treble/bass interdependency main part */
 #define VOLUME_RANGE (VOLUME_MAX - VOLUME_MIN)
 
@@ -371,7 +371,7 @@ static void set_prescaled_volume(void)
         prescale = 0;  /* no need to prescale if we don't boost
                           bass or treble */
 
-#if CONFIG_HWCODEC == MAS3507D
+#if CONFIG_CODEC == MAS3507D
     mas_writereg(MAS_REG_KPRESCALE, prescale_table[prescale/10]);
 #else /* UDA1380 */
     uda1380_set_mixer_vol(prescale*2/5, prescale*2/5);
@@ -397,13 +397,13 @@ static void set_prescaled_volume(void)
             r = VOLUME_MIN;
     }
 
-#if CONFIG_HWCODEC == MAS3507D
+#if CONFIG_CODEC == MAS3507D
     dac_volume(tenthdb2reg(l), tenthdb2reg(r), false);
 #else /* UDA1380 */
     uda1380_set_master_vol(tenthdb2master(l), tenthdb2master(r));
 #endif
 }
-#endif /* (CONFIG_HWCODEC == MAS3507D) || defined HAVE_UDA1380 */
+#endif /* (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380 */
 #endif /* !SIMULATOR */
 
 int channel_configuration = SOUND_CHAN_STEREO;
@@ -475,12 +475,12 @@ static void set_channel_config(void)
             break;
     }
 
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     mas_writemem(MAS_BANK_D0, MAS_D0_OUT_LL, &val_ll, 1); /* LL */
     mas_writemem(MAS_BANK_D0, MAS_D0_OUT_LR, &val_lr, 1); /* LR */
     mas_writemem(MAS_BANK_D0, MAS_D0_OUT_RL, &val_rl, 1); /* RL */
     mas_writemem(MAS_BANK_D0, MAS_D0_OUT_RR, &val_rr, 1); /* RR */
-#elif CONFIG_HWCODEC == MAS3507D
+#elif CONFIG_CODEC == MAS3507D
     mas_writemem(MAS_BANK_D1, 0x7f8, &val_ll, 1); /* LL */
     mas_writemem(MAS_BANK_D1, 0x7f9, &val_lr, 1); /* LR */
     mas_writemem(MAS_BANK_D1, 0x7fa, &val_rl, 1); /* RL */
@@ -489,7 +489,7 @@ static void set_channel_config(void)
 }
 #endif /* !SIMULATOR */
 
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 unsigned long mdb_shape_shadow = 0;
 unsigned long loudness_shadow = 0;
 #endif
@@ -499,7 +499,7 @@ void sound_set(int setting, int value)
 #ifdef SIMULATOR
     setting = value;
 #else
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     int tmp;
 #endif
 
@@ -509,30 +509,30 @@ void sound_set(int setting, int value)
     switch(setting)
     {
         case SOUND_VOLUME:
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
             tmp = 0x7f00 * value / 100;
             mas_codec_writereg(0x10, tmp & 0xff00);
-#elif (CONFIG_HWCODEC == MAS3507D) || defined HAVE_UDA1380
+#elif (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380
             current_volume = VOLUME_MIN + (value * VOLUME_RANGE / 100);
             set_prescaled_volume();                   /* tenth of dB */
 #endif
             break;
 
         case SOUND_BALANCE:
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
             tmp = ((value * 127 / 100) & 0xff) << 8;
             mas_codec_writereg(0x11, tmp & 0xff00);
-#elif CONFIG_HWCODEC == MAS3507D || defined HAVE_UDA1380
+#elif CONFIG_CODEC == MAS3507D || defined HAVE_UDA1380
             current_balance = value * VOLUME_RANGE / 100; /* tenth of dB */
             set_prescaled_volume();
 #endif
             break;
 
         case SOUND_BASS:
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
             tmp = ((value * 8) & 0xff) << 8;
             mas_codec_writereg(0x14, tmp & 0xff00);
-#elif CONFIG_HWCODEC == MAS3507D
+#elif CONFIG_CODEC == MAS3507D
             mas_writereg(MAS_REG_KBASS, bass_table[value+15]);
             current_bass = value * 10;
             set_prescaled_volume();
@@ -544,10 +544,10 @@ void sound_set(int setting, int value)
             break;
 
         case SOUND_TREBLE:
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
             tmp = ((value * 8) & 0xff) << 8;
             mas_codec_writereg(0x15, tmp & 0xff00);
-#elif CONFIG_HWCODEC == MAS3507D
+#elif CONFIG_CODEC == MAS3507D
             mas_writereg(MAS_REG_KTREBLE, treble_table[value+15]);
             current_treble = value * 10;
             set_prescaled_volume();
@@ -558,7 +558,7 @@ void sound_set(int setting, int value)
 #endif
             break;
             
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
         case SOUND_LOUDNESS:
             loudness_shadow = (loudness_shadow & 0x04) |
                 (MAX(MIN(value * 4, 0x44), 0) << 8);
@@ -635,7 +635,7 @@ void sound_set(int setting, int value)
 
 int sound_val2phys(int setting, int value)
 {
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     int result = 0;
     
     switch(setting)
@@ -660,7 +660,7 @@ int sound_val2phys(int setting, int value)
 #endif
 }
 
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 /* This function works by telling the decoder that we have another
    crystal frequency than we actually have. It will adjust its internal
    parameters and the result is that the audio is played at another pitch.

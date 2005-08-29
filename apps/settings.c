@@ -66,14 +66,14 @@
 #include "version.h"
 #include "rtc.h"
 #include "sound.h"
-#if CONFIG_HWCODEC == MAS3507D
+#if CONFIG_CODEC == MAS3507D
 void dac_line_in(bool enable);
 #endif
 struct user_settings global_settings;
 #ifdef HAVE_RECORDING
 const char rec_base_directory[] = REC_BASE_DIR;
 #endif
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
 #include "pcmbuf.h"
 #include "pcm_playback.h"
 #endif
@@ -183,14 +183,14 @@ static const struct bit_entry rtc_bits[] =
     /* sound */
     {7, S_O(volume), 70, "volume", NULL }, /* 0...100 */
     {8 | SIGNED, S_O(balance), 0, "balance", NULL }, /* -100...100 */
-#if CONFIG_HWCODEC != MASNONE /* any MAS */
+#if CONFIG_CODEC != SWCODEC /* any MAS */
     {5 | SIGNED, S_O(bass), 0, "bass", NULL }, /* -15..+15 / -12..+12 */
     {5 | SIGNED, S_O(treble), 0, "treble", NULL }, /* -15..+15 / -12..+12 */
 #elif defined HAVE_UDA1380
     {5, S_O(bass), 0, "bass", NULL }, /* 0..+24 */
     {3, S_O(treble), 0, "treble", NULL }, /* 0..+6 */
 #endif
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     {5, S_O(loudness), 0, "loudness", NULL }, /* 0...17 */
     {3, S_O(avc), 0, "auto volume", "off,20ms,2,4,8" },
     {1, S_O(superbass), false, "superbass", off_on },
@@ -312,7 +312,7 @@ static const struct bit_entry hd_bits[] =
     {4, S_O(ff_rewind_min_step), FF_REWIND_1000, 
         "scan min step", "1,2,3,4,5,6,8,10,15,20,25,30,45,60" },
     {4, S_O(ff_rewind_accel), 3, "scan accel", NULL },
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
     {3, S_O(buffer_margin), 0, "antiskip",
         "5s,15s,30s,1min,2min,3min,5min,10min" },
 #else
@@ -356,7 +356,7 @@ static const struct bit_entry hd_bits[] =
     {7, S_O(peak_meter_min), 60, "peak meter min", NULL }, /* 0...100 */
     {7, S_O(peak_meter_max), 0, "peak meter max", NULL }, /* 0...100 */
 #endif
-#if CONFIG_HWCODEC == MAS3587F
+#if CONFIG_CODEC == MAS3587F
     /* recording */
     {1, S_O(rec_editable), false, "editable recordings", off_on },
     {4, S_O(rec_timesplit), 0, "rec timesplit", /* 0...15 */
@@ -376,14 +376,14 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(rec_directory), 0, /* rec_base_directory */
         "rec directory", REC_BASE_DIR ",current" },
 #endif
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     {7, S_O(mdb_strength), 0, "mdb strength", NULL},
     {7, S_O(mdb_harmonics), 0, "mdb harmonics", NULL},
     {9, S_O(mdb_center), 0, "mdb center", NULL},
     {9, S_O(mdb_shape), 0, "mdb shape", NULL},
     {1, S_O(mdb_enable), 0, "mdb enable", off_on},
 #endif
-#if CONFIG_HWCODEC == MAS3507D
+#if CONFIG_CODEC == MAS3507D
     {1, S_O(line_in), false, "line in", off_on },
 #endif
     /* voice */
@@ -407,7 +407,7 @@ static const struct bit_entry hd_bits[] =
     {4, S_O(rec_trigger_mode ), 1, "trigger mode", "off,no rearm,rearm"},
 #endif
 
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
     {3, S_O(crossfade_duration), 0, "crossfade duration", "1s,2s,4s,6s,8s,10s,12s,14s"},
 #endif
 
@@ -425,7 +425,7 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(next_folder), false, "move to next folder", off_on },
     {1, S_O(runtimedb), false, "gather runtime data", off_on },
 
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
     {2, S_O(crossfade), 0, "crossfade type", "off,crossfade,mix"},
     {1, S_O(replaygain), false, "replaygain", off_on },
     {1, S_O(replaygain_track), false, "replaygain type", "track,album" },
@@ -776,7 +776,7 @@ void sound_settings_apply(void)
     sound_set(SOUND_VOLUME, global_settings.volume);
     sound_set(SOUND_CHANNELS, global_settings.channel_config);
     sound_set(SOUND_STEREO_WIDTH, global_settings.stereo_width);
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     sound_set(SOUND_LOUDNESS, global_settings.loudness);
     sound_set(SOUND_AVC, global_settings.avc);
     sound_set(SOUND_MDB_STRENGTH, global_settings.mdb_strength);
@@ -811,7 +811,7 @@ void settings_apply(void)
     backlight_set_fade_out(global_settings.backlight_fade_out);
 #endif
     ata_spindown(global_settings.disk_spindown);
-#if CONFIG_HWCODEC == MAS3507D
+#if CONFIG_CODEC == MAS3507D
     dac_line_in(global_settings.line_in);
 #endif
 #ifdef HAVE_ATA_POWER_OFF
@@ -872,7 +872,7 @@ void settings_apply(void)
         talk_init(); /* use voice of same language */
     }
 
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
     audio_set_crossfade(global_settings.crossfade);
 #endif
 

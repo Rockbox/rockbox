@@ -52,7 +52,7 @@ void samsung_set(int setting, int value)
         case RADIO_FREQUENCY:
         {
             int pll_cnt;
-#if CONFIG_HWCODEC == MAS3587F
+#if CONFIG_CODEC == MAS3587F
             /* Shift the MAS internal clock away for certain frequencies to
              * avoid interference. */
             int pitch = 1000;

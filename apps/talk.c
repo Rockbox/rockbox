@@ -34,7 +34,7 @@
 #include "id3.h"
 #include "logf.h"
 #include "bitswap.h"
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
 #include "playback.h"
 #endif
 
@@ -148,7 +148,7 @@ static void load_voicefile(void)
     int load_size;
     int got_size;
     int file_size;
-#if CONFIG_HWCODEC == MASNONE    
+#if CONFIG_CODEC == SWCODEC    
     int length, i;
     unsigned char *buf, temp;
 #endif
@@ -205,7 +205,7 @@ static void load_voicefile(void)
 #endif
 
     /* Do a bitswap as necessary. */
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
     logf("Bitswapping voice file.");
     cpu_boost(true);
     buf = (unsigned char *)(&p_voicefile->index) +
@@ -261,7 +261,7 @@ static void mp3_callback(unsigned char** start, int* size)
 
     if (queue[queue_read].len > 0) /* current clip not finished? */
     {   /* feed the next 64K-1 chunk */
-#if CONFIG_HWCODEC != MASNONE
+#if CONFIG_CODEC != SWCODEC
         sent = MIN(queue[queue_read].len, 0xFFFF);
 #else
         sent = queue[queue_read].len;
@@ -279,7 +279,7 @@ re_check:
 
     if (QUEUE_LEVEL) /* queue is not empty? */
     {   /* start next clip */
-#if CONFIG_HWCODEC != MASNONE
+#if CONFIG_CODEC != SWCODEC
         sent = MIN(queue[queue_read].len, 0xFFFF);
 #else
         sent = queue[queue_read].len;
@@ -393,7 +393,7 @@ static int queue_clip(unsigned char* buf, long size, bool enqueue)
     if (queue_level == 0)
     {   /* queue was empty, we have to do the initial start */
         p_lastclip = buf;
-#if CONFIG_HWCODEC != MASNONE
+#if CONFIG_CODEC != SWCODEC
         sent = MIN(size, 0xFFFF); /* DMA can do no more */
 #else
         sent = size;
@@ -485,7 +485,7 @@ void talk_init(void)
     if (has_voicefile)
     {
         voicefile_size = filesize(filehandle);
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
         voice_init();
 #endif
         close(filehandle); /* close again, this was just to detect presence */
@@ -519,7 +519,7 @@ int talk_id(long id, bool enqueue)
     unsigned char* clipbuf;
     int unit;
 
-#if CONFIG_HWCODEC != MASNONE
+#if CONFIG_CODEC != SWCODEC
     if (audio_status()) /* busy, buffer in use */
         return -1; 
 #endif
@@ -586,7 +586,7 @@ int talk_file(const char* filename, bool enqueue)
 
     if (size)
     {
-#if CONFIG_HWCODEC != MASNONE
+#if CONFIG_CODEC != SWCODEC
         bitswap(p_thumbnail, size);
 #endif
         queue_clip(p_thumbnail, size, enqueue);
@@ -603,7 +603,7 @@ int talk_number(long n, bool enqueue)
     int level = 0; /* mille count */
     long mil = 1000000000; /* highest possible "-illion" */
 
-#if CONFIG_HWCODEC != MASNONE
+#if CONFIG_CODEC != SWCODEC
     if (audio_status()) /* busy, buffer in use */
         return -1; 
 #endif
@@ -684,7 +684,7 @@ int talk_value(long n, int unit, bool enqueue)
         VOICE_HERTZ,
     };
 
-#if CONFIG_HWCODEC != MASNONE
+#if CONFIG_CODEC != SWCODEC
     if (audio_status()) /* busy, buffer in use */
         return -1; 
 #endif
@@ -718,7 +718,7 @@ int talk_spell(const char* spell, bool enqueue)
 {
     char c; /* currently processed char */
     
-#if CONFIG_HWCODEC != MASNONE
+#if CONFIG_CODEC != SWCODEC
     if (audio_status()) /* busy, buffer in use */
         return -1; 
 #endif

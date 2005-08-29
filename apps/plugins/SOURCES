@@ -66,7 +66,7 @@ nim.c
 alpine_cdc.c
 #endif
 
-#if CONFIG_HWCODEC == MASNONE /* software codec platforms */
+#if CONFIG_CODEC == SWCODEC /* software codec platforms */
 iriverify.c
 wav2wv.c
 midi2wav.c

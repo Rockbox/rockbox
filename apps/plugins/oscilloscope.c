@@ -23,7 +23,7 @@
 #include "plugin.h"
 
 #ifdef HAVE_LCD_BITMAP /* and also not for the Player */
-#if CONFIG_HWCODEC != MASNONE /* only for MAS-targets */
+#if CONFIG_CODEC != SWCODEC /* only for MAS-targets */
 
 /* The different drawing modes */
 #define DRAW_MODE_FILLED  0

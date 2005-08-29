@@ -83,14 +83,14 @@ static const char* const codec_labels[] = {
   "ERR",  /* Invalid codec type */
   "???",  /* Unknown file format */
 
-#if CONFIG_HWCODEC==MASNONE
+#if CONFIG_CODEC==SWCODEC
   "MP1",  /* MPEG Audio layer 1 */
 #endif
 
   "MP2",  /* MPEG Audio layer 2 */
   "MP3",  /* MPEG Audio layer 3 */
 
-#if CONFIG_HWCODEC==MASNONE
+#if CONFIG_CODEC==SWCODEC
   "WAV",  /* Uncompressed PCM in a WAV file */
   "OGG",  /* Ogg Vorbis */
   "FLAC", /* FLAC */
@@ -310,7 +310,7 @@ static int parsegenre( struct mp3entry* entry, char* tag, int bufferpos )
     }
 }
 
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
 /* parse user defined text, looking for replaygain information. */
 static int parseuser( struct mp3entry* entry, char* tag, int bufferpos )
 {
@@ -352,7 +352,7 @@ static const struct tag_resolver taglist[] = {
     { "TCOM", 4, offsetof(struct mp3entry, composer), NULL },
     { "TCON", 4, offsetof(struct mp3entry, genre_string), &parsegenre },
     { "TCO",  3, offsetof(struct mp3entry, genre_string), &parsegenre },
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
     { "TXXX", 4, 0, &parseuser },
 #endif
 };
@@ -885,7 +885,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
     entry->version = info.version;
     entry->layer = info.layer;
     switch(entry->layer) {
-#if CONFIG_HWCODEC==MASNONE
+#if CONFIG_CODEC==SWCODEC
         case 0:
             entry->codectype=AFMT_MPA_L1;
             break;
@@ -947,7 +947,7 @@ bool mp3info(struct mp3entry *entry, const char *filename, bool v1first)
     if(-1 == fd)
         return true;
 
-#if CONFIG_HWCODEC != MASNONE
+#if CONFIG_CODEC != SWCODEC
     memset(entry, 0, sizeof(struct mp3entry));
 #endif
 	

@@ -23,7 +23,7 @@ settings_menu.c
 sleeptimer.c
 sound_menu.c
 status.c
-#if !defined(SIMULATOR) || CONFIG_HWCODEC == MASNONE
+#if !defined(SIMULATOR) || CONFIG_CODEC == SWCODEC
 talk.c
 #endif
 tree.c
@@ -49,7 +49,7 @@ recorder/radio.c
 #ifdef HAVE_RECORDING
 recorder/recording.c
 #endif
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
 pcmbuf.c
 playback.c
 metadata.c

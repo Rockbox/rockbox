@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include "config.h"
 
-#if CONFIG_HWCODEC != MASNONE
+#if CONFIG_CODEC != SWCODEC
 
 #include "debug.h"
 #include "panic.h"
@@ -51,13 +51,13 @@
 extern unsigned long mas_version_code;
 #endif
 
-#if CONFIG_HWCODEC == MAS3587F
+#if CONFIG_CODEC == MAS3587F
 extern enum /* from mp3_playback.c */
 {
     MPEG_DECODER,
     MPEG_ENCODER
 } mpeg_mode;
-#endif /* CONFIG_HWCODEC == MAS3587F */
+#endif /* CONFIG_CODEC == MAS3587F */
 
 extern char* playlist_peek(int steps);
 extern bool playlist_check(int steps);
@@ -151,7 +151,7 @@ static long low_watermark;          /* Dynamic low watermark level */
 static long low_watermark_margin;   /* Extra time in seconds for watermark */
 static long lowest_watermark_level; /* Debug value to observe the buffer
                                        usage */
-#if CONFIG_HWCODEC == MAS3587F
+#if CONFIG_CODEC == MAS3587F
 static char recording_filename[MAX_PATH]; /* argument to thread */
 static char delayed_filename[MAX_PATH];   /* internal copy of above */
 
@@ -189,13 +189,13 @@ static unsigned long num_recorded_frames;
 
 /* Shadow MAS registers */
 unsigned long shadow_encoder_control = 0;
-#endif /* CONFIG_HWCODEC == MAS3587F */
+#endif /* CONFIG_CODEC == MAS3587F */
 
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 unsigned long shadow_io_control_main = 0;
 unsigned long shadow_soft_mute = 0;
 unsigned shadow_codec_reg0;
-#endif /* (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F) */
+#endif /* (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
 
 #ifdef HAVE_RECORDING
 const unsigned char empty_id3_header[] =
@@ -211,7 +211,7 @@ static int get_playable_space(void);
 static int get_unswapped_space(void);
 #endif /* !SIMULATOR */
 
-#if CONFIG_HWCODEC == MAS3587F
+#if CONFIG_CODEC == MAS3587F
 static void init_recording(void);
 static void start_prerecording(void);
 static void start_recording(void);
@@ -219,7 +219,7 @@ static void stop_recording(void);
 static int get_unsaved_space(void);
 static void pause_recording(void);
 static void resume_recording(void);
-#endif /* CONFIG_HWCODEC == MAS3587F */
+#endif /* CONFIG_CODEC == MAS3587F */
 
 
 #ifndef SIMULATOR
@@ -661,7 +661,7 @@ static int get_unswapped_space(void)
     return space;
 }
 
-#if CONFIG_HWCODEC == MAS3587F
+#if CONFIG_CODEC == MAS3587F
 static int get_unsaved_space(void)
 {
     int space = audiobuf_write - audiobuf_read;
@@ -772,7 +772,7 @@ void rec_tick(void)
         }
     }
 }
-#endif /* CONFIG_HWCODEC == MAS3587F */
+#endif /* CONFIG_CODEC == MAS3587F */
 
 void playback_tick(void)
 {
@@ -1029,10 +1029,10 @@ static void track_change(void)
 {
     DEBUGF("Track change\n");
 
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     /* Reset the AVC */
     sound_set(SOUND_AVC, -1);
-#endif /* (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F) */
+#endif /* (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
 
     if (num_tracks_in_memory() > 0)
     {
@@ -1157,14 +1157,14 @@ static void mpeg_thread(void)
     int amount_to_read;
     int t1, t2;
     int start_offset;
-#if CONFIG_HWCODEC == MAS3587F
+#if CONFIG_CODEC == MAS3587F
     int amount_to_save;
     int framelen;
     unsigned long saved_header = 0;
     int save_endpos = 0;
     int rc;
     long offset;
-#endif /* CONFIG_HWCODEC == MAS3587F */
+#endif /* CONFIG_CODEC == MAS3587F */
 
     is_playing = false;
     play_pending = false;
@@ -1173,10 +1173,10 @@ static void mpeg_thread(void)
 
     while(1)
     {
-#if CONFIG_HWCODEC == MAS3587F
+#if CONFIG_CODEC == MAS3587F
         if(mpeg_mode == MPEG_DECODER)
         {
-#endif /* CONFIG_HWCODEC == MAS3587F */
+#endif /* CONFIG_CODEC == MAS3587F */
         yield();
 
         /* Swap if necessary, and don't block on the queue_wait() */
@@ -1724,19 +1724,19 @@ static void mpeg_thread(void)
                 break;
 #endif /* !USB_NONE */
                 
-#if CONFIG_HWCODEC == MAS3587F
+#if CONFIG_CODEC == MAS3587F
             case MPEG_INIT_RECORDING:
                 init_recording();
                 init_recording_done = true;
                 break;
-#endif /* CONFIG_HWCODEC == MAS3587F */
+#endif /* CONFIG_CODEC == MAS3587F */
 
             case SYS_TIMEOUT:
                 if (playing)
                     playlist_update_resume_info(audio_current_track());
                 break;
         }
-#if CONFIG_HWCODEC == MAS3587F
+#if CONFIG_CODEC == MAS3587F
         }
         else
         {
@@ -2069,7 +2069,7 @@ static void mpeg_thread(void)
                     break;
             }
         }
-#endif /* CONFIG_HWCODEC == MAS3587F */
+#endif /* CONFIG_CODEC == MAS3587F */
     }
 }
 #endif /* !SIMULATOR */
@@ -2113,7 +2113,7 @@ bool audio_has_changed_track(void)
     return false;
 }
 
-#if CONFIG_HWCODEC == MAS3587F
+#if CONFIG_CODEC == MAS3587F
 void audio_init_playback(void)
 {
     init_playback_done = false;
@@ -2216,7 +2216,7 @@ static void init_recording(void)
        buffer, because the silly MAS will not negate EOD until at least one
        DMA transfer has taken place.
        Now let's wait for some data to be encoded. */
-    sleep(20);
+    sleep(HZ/5);
     
     /* Now set it to Monitoring mode as default, saves power */
     shadow_io_control_main = 0x525;
@@ -2630,7 +2630,7 @@ void mpeg_set_recording_options(int frequency, int quality,
     (void)editable;
     (void)prerecord_time;
 }
-#endif /* CONFIG_HWCODEC == MAS3587F; SIMULATOR */
+#endif /* CONFIG_CODEC == MAS3587F; SIMULATOR */
 
 void audio_play(int offset)
 {
@@ -2786,13 +2786,13 @@ int audio_status(void)
     if(paused)
         ret |= AUDIO_STATUS_PAUSE;
     
-#if CONFIG_HWCODEC == MAS3587F
+#if CONFIG_CODEC == MAS3587F
     if(is_recording && !is_prerecording)
         ret |= AUDIO_STATUS_RECORD;
 
     if(is_prerecording)
         ret |= AUDIO_STATUS_PRERECORD;
-#endif /* CONFIG_HWCODEC == MAS3587F */
+#endif /* CONFIG_CODEC == MAS3587F */
 
     if(mpeg_errno)
         ret |= AUDIO_STATUS_ERROR;
@@ -2846,12 +2846,12 @@ void audio_init(void)
 
     memset(trackdata, sizeof(trackdata), 0);
 
-#if CONFIG_HWCODEC == MAS3587F
+#if CONFIG_CODEC == MAS3587F
     if(read_hw_mask() & PR_ACTIVE_HIGH)
         and_b(~0x08, &PADRH);
     else
         or_b(0x08, &PADRH);
-#endif /* CONFIG_HWCODEC == MAS3587F */
+#endif /* CONFIG_CODEC == MAS3587F */
 
 #ifdef DEBUG
     dbg_timer_start();
@@ -2859,4 +2859,4 @@ void audio_init(void)
 #endif /* DEBUG */
 }
 
-#endif /* CONFIG_HWCODEC != MASNONE */
+#endif /* CONFIG_CODEC != SWCODEC */

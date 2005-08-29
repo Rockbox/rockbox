@@ -61,7 +61,7 @@
 #if defined(IRIVER_H100_SERIES) && !defined(SIMULATOR)
 extern bool pcm_rec_screen(void);
 #endif
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
 #include "pcmbuf.h"
 #include "pcm_playback.h"
 #endif
@@ -154,7 +154,7 @@ bool dbg_os(void)
 #endif
 
 #ifdef HAVE_LCD_BITMAP
-#if CONFIG_HWCODEC != MASNONE
+#if CONFIG_CODEC != SWCODEC
 bool dbg_audio_thread(void)
 {
     char buf[32];

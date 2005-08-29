@@ -21,7 +21,7 @@
 #define CONFIG_CPU SH7034
 
 /* Define this if you have a MAS3539F */
-#define CONFIG_HWCODEC MAS3539F
+#define CONFIG_CODEC MAS3539F
 
 /* Define this to the CPU frequency */
 #define CPU_FREQ      12000000

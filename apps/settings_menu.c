@@ -54,7 +54,7 @@
 #include "peakmeter.h"
 #endif
 #include "lang.h"
-#if CONFIG_HWCODEC == MAS3507D
+#if CONFIG_CODEC == MAS3507D
 void dac_line_in(bool enable);
 #endif
 #ifdef HAVE_ALARM_MOD
@@ -65,7 +65,7 @@ void dac_line_in(bool enable);
 #include "lcd-remote.h"
 #endif
 
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
 #include "pcmbuf.h"
 #include "pcm_playback.h"
 #include "dsp.h"
@@ -879,7 +879,7 @@ static bool poweroff(void)
 #endif /* HAVE_ATA_POWEROFF */
 #endif /* !HAVE_MMC */
 
-#if CONFIG_HWCODEC == MAS3507D
+#if CONFIG_CODEC == MAS3507D
 static bool line_in(void)
 {
     bool rc = set_bool(str(LANG_LINE_IN), &global_settings.line_in);
@@ -902,7 +902,7 @@ static bool max_files_in_playlist(void)
                    NULL, 1000, 1000, 20000, NULL );
 }
 
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
 static bool buffer_margin(void)
 {
     int ret;
@@ -1111,7 +1111,7 @@ static bool id3_order(void)
                              mpeg_id3_options);
 }
 
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
 static bool crossfade(void)
 {
     static const struct opt_items names[] = {
@@ -1172,7 +1172,7 @@ static bool runtimedb(void)
     return rc;
 }
 
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
 static bool replaygain(void)
 {
     bool result = set_bool(str(LANG_REPLAYGAIN_ENABLE), 
@@ -1270,7 +1270,7 @@ static bool playback_settings_menu(void)
         { ID2P(LANG_WIND_MENU), ff_rewind_settings_menu },
         { ID2P(LANG_MP3BUFFER_MARGIN), buffer_margin },
         { ID2P(LANG_FADE_ON_STOP), set_fade_on_stop },
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
         { ID2P(LANG_CROSSFADE), crossfade },
         { ID2P(LANG_CROSSFADE_DURATION), crossfade_duration },
         { ID2P(LANG_REPLAYGAIN), replaygain_settings_menu },
@@ -1654,7 +1654,7 @@ static bool system_settings_menu(void)
         { ID2P(LANG_ALARM_MOD_ALARM_MENU), alarm_screen       },
 #endif
         { ID2P(LANG_LIMITS_MENU),      limits_settings_menu   },
-#if CONFIG_HWCODEC == MAS3507D
+#if CONFIG_CODEC == MAS3507D
         { ID2P(LANG_LINE_IN),          line_in                },
 #endif
 #ifdef HAVE_CHARGING

@@ -100,7 +100,7 @@ static bool is_mp3frameheader(unsigned long head)
         return false;
     if (!(head & LAYER_MASK)) /* no layer? */
         return false;
-#if CONFIG_HWCODEC != MASNONE
+#if CONFIG_CODEC != SWCODEC
     /* The MAS can't decode layer 1, so treat layer 1 data as invalid */
     if ((head & LAYER_MASK) == LAYER_MASK)
         return false;

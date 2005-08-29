@@ -17,7 +17,7 @@
  **************************************************************************/
 #include "plugin.h"
 
-#if defined(HAVE_LCD_BITMAP) && (CONFIG_HWCODEC != MASNONE)
+#if defined(HAVE_LCD_BITMAP) && (CONFIG_CODEC != SWCODEC)
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD

@@ -106,7 +106,7 @@ int current_playmode(void)
         else
             return STATUS_PLAY;
     }
-#if CONFIG_HWCODEC == MAS3587F
+#if CONFIG_CODEC == MAS3587F
     else
     {
         if(audio_stat & AUDIO_STATUS_RECORD)

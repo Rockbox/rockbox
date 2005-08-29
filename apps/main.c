@@ -61,7 +61,7 @@
 #include "misc.h"
 #include "database.h"
 
-#if (CONFIG_HWCODEC == MASNONE)
+#if (CONFIG_CODEC == SWCODEC)
 #include "pcmbuf.h"
 #else
 #define pcmbuf_init()
@@ -129,7 +129,7 @@ void init(void)
               global_settings.mdb_enable,
               global_settings.superbass);
     button_clear_queue(); /* Empty the keyboard buffer */
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
     talk_init();
 #endif
 }
@@ -264,7 +264,7 @@ void init(void)
 
     /* On software codec platforms we have to init audio before
        calling audio_set_buffer_margin(). */
-#if (CONFIG_HWCODEC == MASNONE)
+#if (CONFIG_CODEC == SWCODEC)
     audio_init();
 #endif
     settings_calc_config_sector();
@@ -291,7 +291,7 @@ void init(void)
               global_settings.mdb_shape,
               global_settings.mdb_enable,
               global_settings.superbass);
-#if (CONFIG_HWCODEC == MASNONE)
+#if (CONFIG_CODEC == SWCODEC)
     sound_settings_apply();
 #else
     audio_init();

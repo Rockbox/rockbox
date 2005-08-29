@@ -43,7 +43,7 @@
 /* For ID3 info and VBR header */
 #define MPEG_RESERVED_HEADER_SPACE (4096 + 1500)
 
-#if (CONFIG_HWCODEC == MAS3587F) || defined(SIMULATOR)
+#if (CONFIG_CODEC == MAS3587F) || defined(SIMULATOR)
 void mpeg_init_recording(void);
 void mpeg_record(const char *filename);
 void mpeg_new_file(const char *filename);

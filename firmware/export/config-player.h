@@ -20,7 +20,7 @@
 #define CONFIG_CPU SH7034
 
 /* Define this if you have a MAS3507D */
-#define CONFIG_HWCODEC MAS3507D
+#define CONFIG_CODEC MAS3507D
 
 /* Define this if you have a DAC3550A */
 #define HAVE_DAC3550A

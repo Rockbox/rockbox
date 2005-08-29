@@ -1307,7 +1307,7 @@ int draw_id3_item(int line, int top, int header, const char* body)
     return line + 2;
 }
 
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
 #define ID3_ITEMS   13
 #else
 #define ID3_ITEMS   11
@@ -1401,7 +1401,7 @@ bool browse_id3(void)
         snprintf(buf, sizeof(buf), "%d Hz", id3->frequency);
         line = draw_id3_item(line, top, LANG_ID3_FRECUENCY, buf);
 
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
         line = draw_id3_item(line, top, LANG_ID3_TRACK_GAIN,
             id3->track_gain_string);
 

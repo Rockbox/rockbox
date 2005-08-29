@@ -154,7 +154,7 @@ struct user_settings
     bool mdb_enable; /* true/false */
     bool superbass; /* true/false */
 
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
     int crossfade;
     int crossfade_duration;
 #endif
@@ -330,7 +330,7 @@ struct user_settings
     bool next_folder; /* move to next folder */
     bool runtimedb;   /* runtime database active? */
 
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
     bool replaygain;        /* enable replaygain */
     bool replaygain_track;  /* true for track gain, false for album gain */
     bool replaygain_noclip; /* scale to prevent clips */

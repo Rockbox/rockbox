@@ -19,7 +19,7 @@
 
 /* Various "helper functions" common to all the xxx2wav decoder plugins  */
 
-#if (CONFIG_HWCODEC == MASNONE)
+#if (CONFIG_CODEC == SWCODEC)
 /* software codec platforms, not for simulator */
 
 #include "codecs.h"
@@ -138,4 +138,4 @@ void qsort(void *base, size_t nmemb, size_t size,
     local_rb->qsort(base,nmemb,size,compar);
 }
 
-#endif /* CONFIG_HWCODEC == MASNONE */
+#endif /* CONFIG_CODEC == SWCODEC */

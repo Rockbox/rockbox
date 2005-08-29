@@ -132,7 +132,7 @@ int mas_writemem(int bank, int addr, const unsigned long* src, int len)
 
     j = 0;
     while(len--) {
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
         buf[i++] = 0;
         buf[i++] = ptr[j+1];
         buf[i++] = ptr[j+2];
@@ -232,7 +232,7 @@ static int mas_devread(unsigned long *dest, int len)
             if (i2c_getack()) {
                 for (i=0;len;i++) {
                     len--;
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
                     i2c_inb(0); /* Dummy read */
                     ptr[i*4+0] = 0;
                     ptr[i*4+1] = i2c_inb(0) & 0x0f;
@@ -270,7 +270,7 @@ void mas_reset(void)
 {
     or_b(0x01, &PAIORH);
 
-#if CONFIG_HWCODEC == MAS3507D
+#if CONFIG_CODEC == MAS3507D
     /* PB5 is "MAS enable". make it GPIO output and high */
     PBCR2 &= ~0x0c00;
     or_b(0x20, &PBIORL);
@@ -280,7 +280,7 @@ void mas_reset(void)
     sleep(HZ/100);
     or_b(0x01, &PADRH);
     sleep(HZ/5);
-#elif (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#elif (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     if(old_recorder)
     {
         /* Older recorder models don't invert the POR signal */
@@ -299,7 +299,7 @@ void mas_reset(void)
 #endif
 }
 
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 int mas_direct_config_read(unsigned char reg)
 {
     int ret = 0;

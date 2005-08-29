@@ -32,7 +32,7 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
               bool superbass);
 
 /* exported just for mpeg.c, to keep the recording there */
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 void demand_irq_enable(bool on);
 #endif
 

@@ -85,7 +85,7 @@ drivers/i2c-coldfire.c
 #else
 drivers/i2c.c
 #endif
-#if CONFIG_HWCODEC != MASNONE
+#if CONFIG_CODEC != SWCODEC
 drivers/mas.c
 #endif
 #ifdef HAVE_RTC
@@ -107,7 +107,7 @@ crt0.S
 #endif  
 mp3_playback.c
 mp3data.c
-#if CONFIG_HWCODEC != MASNONE
+#if CONFIG_CODEC != SWCODEC
 mpeg.c
 #endif
 #ifndef WIN32 /* the win32 sim has its own versin of these: */
@@ -130,10 +130,10 @@ drivers/uda1380.c
 #elif defined(HAVE_TLV320) && !defined(SIMULATOR)
 drivers/tlv320.c
 #endif
-#if (CONFIG_HWCODEC == MASNONE) && !defined(SIMULATOR)
+#if (CONFIG_CODEC == SWCODEC) && !defined(SIMULATOR)
 pcm_playback.c
 #endif
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
 replaygain.c
 #endif
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)

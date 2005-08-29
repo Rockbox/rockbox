@@ -38,7 +38,7 @@
 #define CONFIG_I2C I2C_GMINI
 
 /* Define this if you do software codec */
-#define CONFIG_HWCODEC MASNONE
+#define CONFIG_CODEC SWCODEC
 
 /* Type of mobile power, FIXME: probably different, make new type */
 #define CONFIG_BATTERY BATT_LIION2200

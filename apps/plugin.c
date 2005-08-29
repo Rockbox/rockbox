@@ -48,7 +48,7 @@
 #include "timer.h"
 #include "sound.h"
 #include "database.h"
-#if (CONFIG_HWCODEC == MASNONE)
+#if (CONFIG_CODEC == SWCODEC)
 #include "pcm_playback.h"
 #endif
 
@@ -249,10 +249,10 @@ static const struct plugin_api rockbox_api = {
     mp3_play_pause,
     mp3_play_stop,
     mp3_is_playing,
-#if CONFIG_HWCODEC != MASNONE
+#if CONFIG_CODEC != SWCODEC
     bitswap,
 #endif
-#if CONFIG_HWCODEC == MASNONE
+#if CONFIG_CODEC == SWCODEC
     pcm_play_data,    
     pcm_play_stop,
     pcm_set_frequency,
@@ -276,24 +276,24 @@ static const struct plugin_api rockbox_api = {
     audio_current_track,
     audio_flush_and_reload_tracks,
     audio_get_file_pos,
-#if !defined(SIMULATOR) && (CONFIG_HWCODEC != MASNONE)
+#if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
     mpeg_get_last_header,
 #endif
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     sound_set_pitch,
 #endif
 
-#if !defined(SIMULATOR) && (CONFIG_HWCODEC != MASNONE)
+#if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
     /* MAS communication */
     mas_readmem,
     mas_writemem,
     mas_readreg,
     mas_writereg,
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     mas_codec_writereg,
     mas_codec_readreg,
 #endif
-#endif /* !simulator and HWCODEC != MASNONE */
+#endif /* !SIMULATOR && CONFIG_CODEC != SWCODEC */
 
     /* tag database */
     &tagdbheader,
@@ -328,7 +328,7 @@ static const struct plugin_api rockbox_api = {
     find_next_frame,
     battery_level,
     battery_level_safe,
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     peak_meter_scale_value,
     peak_meter_set_use_dbfs,
     peak_meter_get_use_dbfs,

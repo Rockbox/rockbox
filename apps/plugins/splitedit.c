@@ -269,7 +269,7 @@ static void update_icons(void)
         LCD_WIDTH/3 + LCD_WIDTH/3 / 2 - BMPWIDTH/2, LCD_HEIGHT - BMPHEIGHT,
         BMPWIDTH, BMPHEIGHT);
 
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     /* The scale icon */
     rb->lcd_mono_bitmap(SCALE_BMP[rb->peak_meter_get_use_dbfs() ? 1 : 0],
         2 *LCD_WIDTH/3 + LCD_WIDTH/3 / 2 - BMPWIDTH/2, LCD_HEIGHT - BMPHEIGHT,
@@ -909,7 +909,7 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
             {
                 /* read volume info */
                 unsigned short volume;
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
                 volume = rb->mas_codec_readreg(0x0c);
                 volume += rb->mas_codec_readreg(0x0d);
                 volume = volume / 2;
@@ -1074,7 +1074,7 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 lastx = time_to_xpos(mp3->elapsed);
                 break;
 
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 #ifdef SPLITEDIT_SPEED100
             case SPLITEDIT_SPEED150:
                 rb->sound_set_pitch(1500);
@@ -1133,7 +1133,7 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 break;
 
             case SPLITEDIT_SCALE:
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
                 rb->peak_meter_set_use_dbfs(!rb->peak_meter_get_use_dbfs());
 #endif
                 splitedit_invalidate_osci();
@@ -1202,7 +1202,7 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 }
             }
         }
-#if (CONFIG_HWCODEC == MAS3587F) || (CONFIG_HWCODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 #ifdef SPLITEDIT_SPEED100
         rb->sound_set_pitch(1000); /* make sure to reset pitch */
 #endif
