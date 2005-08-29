@@ -877,16 +877,16 @@ voice: "Logarithmic decibel"
 new: "Logaritmisk(dB)"
 
 id: LANG_PM_ENERGY_SAVER
-desc: in the peak meter menu
-eng: "Save Energy"
-voice: "Save Energy"
-new: "Energisparende"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_PM_HIGH_PERFORMANCE
-desc: in the peak meter menu
-eng: "High performance"
-voice: "High performance"
-new: "Beste ytelse"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_PM_LINEAR
 desc: in the peak meter menu
@@ -907,10 +907,10 @@ voice: "Minimum Of Range"
 new: "Minimal verdi"
 
 id: LANG_PM_PERFORMANCE
-desc: in the peak meter menu
-eng: "Performance"
-voice: "Performance"
-new: "Ytelse"
+desc: DEPRECATED
+eng: ""
+voice: 
+new: ""
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
@@ -3129,7 +3129,7 @@ new: "Sett sangbedømmelse"
 id: LANG_RATING
 desc: in set_rating
 eng: "Rating:"
-voice:
+voice: 
 new: "Bedømmelse:"
 
 id: LANG_CROSSFADE_DURATION
