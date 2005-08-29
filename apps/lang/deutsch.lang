@@ -865,22 +865,22 @@ voice: "numerisch"
 new: "numerisch"
 
 id: LANG_PM_PERFORMANCE
-desc: in the peak meter menu
-eng: "Performance"
-voice: "Genauigkeit"
-new: "Genauigkeit"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new:
 
 id: LANG_PM_HIGH_PERFORMANCE
-desc: in the peak meter menu
-eng: "High performance"
-voice: "genauere Anzeige"
-new: "genauere Anzeige"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new:
 
 id: LANG_PM_ENERGY_SAVER
-desc: in the peak meter menu
-eng: "Save Energy"
-voice: "Energie sparen"
-new: "Energie sparen"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new:
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
@@ -3265,20 +3265,20 @@ new: "Piep-Lautstärke"
 id: LANG_WEAK
 desc: in beep volume in playback settings
 eng: "Weak"
-voice: "Schwach"
-new: "Schwach"
+voice: "leise"
+new: "Leise"
 
 id: LANG_MODERATE
 desc: in beep volume in playback settings
 eng: "Moderate"
-voice: "moderat"
-new: "Moderat"
+voice: "mittel"
+new: "Mittel"
 
 id: LANG_STRONG
 desc: in beep volume in playback settings
 eng: "Strong"
-voice: "Stark"
-new: "Stark"
+voice: "laut"
+new: "Laut"
 
 id: LANG_REPEAT_AB
 desc: repeat one song
