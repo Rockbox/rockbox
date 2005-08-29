@@ -460,7 +460,7 @@ id: LANG_ID3_NO_TITLE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_ARTIST
 desc: in wps
@@ -472,7 +472,7 @@ id: LANG_ID3_NO_ARTIST
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_ALBUM
 desc: in wps
@@ -484,7 +484,7 @@ id: LANG_ID3_NO_ALBUM
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_TRACKNUM
 desc: in wps
@@ -496,7 +496,7 @@ id: LANG_ID3_NO_TRACKNUM
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_LENGHT
 desc: in wps
@@ -3181,61 +3181,61 @@ new: "Neustart der Wiedergabe..."
 id: LANG_REPLAYGAIN
 desc: in replaygain
 eng: "Replaygain"
-voice:
+voice: 
 new: "Lautstärkeanpassung"
 
 id: LANG_REPLAYGAIN_ENABLE
 desc: in replaygain
 eng: "Enable replaygain"
-voice:
+voice: 
 new: "Lautstärkeanpassung aktivieren"
 
 id: LANG_REPLAYGAIN_NOCLIP
 desc: in replaygain
 eng: "Prevent clipping"
-voice:
+voice: 
 new: "Übersteuerung verhindern"
 
 id: LANG_REPLAYGAIN_MODE
 desc: in replaygain
 eng: "Replaygain type"
-voice:
+voice: 
 new: "Lautstärkeanpassungstyp"
 
 id: LANG_TRACK_GAIN
 desc: in replaygain
 eng: "Track gain"
-voice:
+voice: 
 new: "Titellautstärke"
 
 id: LANG_ALBUM_GAIN
 desc: in replaygain
 eng: "Album gain"
-voice:
+voice: 
 new: "Albumlautstärke"
 
 id: LANG_ID3_TRACK_GAIN
 desc: in browse_id3
 eng: "[Track gain]"
-voice:
+voice: 
 new: "[Titellautstärke]"
 
 id: LANG_ID3_ALBUM_GAIN
 desc: in browse_id3
 eng: "[Album gain]"
-voice:
+voice: 
 new: "[Albumlautstärke]"
 
 id: LANG_ID3_NO_GAIN
 desc: DEPRECATED
 eng: ""
-voice:
-new:
+voice: 
+new: 
 
 id: LANG_BIDI_SUPPORT
 desc: in settings_menu, option to enable reversal of hebrew/arabic text
 eng: "BiDi Hebrew/Arabic"
-voice:
+voice: 
 new: "BiDi Hebräisch/Arabisch"
 
 id: LANG_REPLAYGAIN_PREAMP
@@ -3247,5 +3247,41 @@ new: "Vorverstärkung"
 id: LANG_UNIT_DB
 desc: in browse_id3
 eng: "dB"
-voice:
+voice: 
 new: "dB"
+
+id: LANG_ID3_VBR
+desc: in browse_id3
+eng: " (VBR)"
+voice: "variable Bitrate"
+new: " (VBR)
+
+id: LANG_BEEP
+desc: in playback settings
+eng: "Beep volume"
+voice: "Piep-Lautstärke"
+new: "Piep-Lautstärke"
+
+id: LANG_WEAK
+desc: in beep volume in playback settings
+eng: "Weak"
+voice: "Schwach"
+new: "Schwach"
+
+id: LANG_MODERATE
+desc: in beep volume in playback settings
+eng: "Moderate"
+voice: "moderat"
+new: "Moderat"
+
+id: LANG_STRONG
+desc: in beep volume in playback settings
+eng: "Strong"
+voice: "Stark"
+new: "Stark"
+
+id: LANG_REPEAT_AB
+desc: repeat one song
+eng: "A-B"
+voice: "A-B"
+new: "A-B"
