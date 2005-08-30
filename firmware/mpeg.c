@@ -777,9 +777,13 @@ void rec_tick(void)
 void playback_tick(void)
 {
     struct trackdata *ptd = get_trackdata(0);
-    ptd->id3.elapsed += (current_tick - last_dma_tick) * 1000 / HZ;
-    last_dma_tick = current_tick;
-    audio_dispatch_event(AUDIO_EVENT_POS_REPORT, (unsigned long)ptd->id3.elapsed);
+    if(ptd)
+    {
+        ptd->id3.elapsed += (current_tick - last_dma_tick) * 1000 / HZ;
+        last_dma_tick = current_tick;
+        audio_dispatch_event(AUDIO_EVENT_POS_REPORT,
+                             (unsigned long)ptd->id3.elapsed);
+    }
 }
 
 static void reset_mp3_buffer(void)
@@ -849,7 +853,9 @@ static void transfer_end(unsigned char** ppbuf, int* psize)
 
             *psize = last_dma_chunk_size & 0xffff;
             *ppbuf = audiobuf + audiobuf_read;
-            get_trackdata(0)->id3.offset += last_dma_chunk_size;
+            track = get_trackdata(0);
+            if(track)
+                track->id3.offset += last_dma_chunk_size;
 
             /* Update the watermark debug level */
             if(unplayed_space_left < lowest_watermark_level)
