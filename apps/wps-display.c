@@ -368,7 +368,8 @@ static char* get_tag(struct mp3entry* cid3,
                      int buf_size,
                      unsigned char* tag_len,
                      unsigned short* subline_time_mult,
-                     unsigned char* flags)
+                     unsigned char* flags,
+                     int *intval)
 {
     struct mp3entry *id3 = cid3; /* default to current song */
 
@@ -380,6 +381,8 @@ static char* get_tag(struct mp3entry* cid3,
 
     *tag_len = 2;
 
+    *intval = 0;
+    
     switch (tag[0])
     {
         case 'I':  /* ID3 Information */
@@ -587,57 +590,32 @@ static char* get_tag(struct mp3entry* cid3,
             }
             break;
             
-        case 'm': /* playback repeat mode */
+        case 'm':
             switch (tag[1])
-            {                    
-                case 'f': /* off */
-                    if (global_settings.repeat_mode == REPEAT_OFF)
-                        return "f";
-                    else
-                        return NULL;
-                case 'a': /* all */
-                    if (global_settings.repeat_mode == REPEAT_ALL)
-                        return "a";
-                    else
-                        return NULL;
-                case 'o': /* one */
-                    if (global_settings.repeat_mode == REPEAT_ONE)
-                        return "o";
-                    else
-                        return NULL;
-                case 's': /* shuffle */
-                    if (global_settings.repeat_mode == REPEAT_SHUFFLE)
-                        return "s";
-                    else
-                        return NULL;
+            {
+                case 'm': /* playback repeat mode */
+                    *intval = global_settings.repeat_mode + 1;
+                    snprintf(buf, buf_size, "%d", *intval);
+                    return buf;
+                    
                 /* playback status */
                 case 'p': /* play */
                     *flags |= WPS_REFRESH_DYNAMIC;
                     int status = audio_status();
+                    *intval = 1;
                     if (status == AUDIO_STATUS_PLAY && \
                         !(status & AUDIO_STATUS_PAUSE))
-                        return "p";
-                    else
-                        return NULL;
-                case 'u': /* pause*/
-                     *flags |= WPS_REFRESH_DYNAMIC;
+                        *intval = 2;
                     if (audio_status() & AUDIO_STATUS_PAUSE && \
                         (! status_get_ffmode()))
-                        return "u";
-                    else
-                        return NULL;
-                case 'w': /* fast forward */
-                    *flags |= WPS_REFRESH_DYNAMIC;
+                        *intval = 3;
                     if (status_get_ffmode() == STATUS_FASTFORWARD)
-                        return "w";
-                    else
-                        return NULL;
-                case 'b': /* Fast backwards */
-                    *flags |= WPS_REFRESH_DYNAMIC;
+                        *intval = 4;
                     if (status_get_ffmode() == STATUS_FASTBACKWARD)
-                        return "b";
-                    else
-                        return NULL;
+                        *intval = 5;
+                    snprintf(buf, buf_size, "%d", *intval);
+                    return buf;
+
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
                 case 'h': /* hold */
                     *flags |= WPS_REFRESH_DYNAMIC;
@@ -758,14 +736,14 @@ static char* get_tag(struct mp3entry* cid3,
  *
  * fmt     - string to skip it. Should point to somewhere after the leading
  *           "<" char (and before or at the last ">").
- * to_else - if true, skip to the else part (after the "|", if any), else skip
- *           to the end (the ">").
+ * num     - number of |'s to skip, or 0 to skip to the end (the ">").
  *
  * Returns the new position in fmt.
  */
-static const char* skip_conditional(const char* fmt, bool to_else)
+static const char* skip_conditional(const char* fmt, int num)
 {
     int level = 1;
+    int count = num;
 
     while (*fmt)
     {
@@ -775,15 +753,20 @@ static const char* skip_conditional(const char* fmt, bool to_else)
                 break;
 
             case '|':
-                if (to_else && (1 == level))
-                    return fmt;
-
+                if(1 == level) {
+                    if(num) {
+                        count--;
+                        if(count == 0)
+                            return fmt;
+                        continue;
+                    }
+                }
                 continue;
 
             case '>':
                 if (0 == --level)
                 {
-                    if (to_else)
+                    if (num)
                         fmt--;
 
                     return fmt;
@@ -845,6 +828,7 @@ static void format_display(char* buf,
     char* value = NULL;
     int level = 0;
     unsigned char tag_length;
+    int intval;
 
     /* needed for images (ifdef is to kill a warning on player)*/
     int n;
@@ -877,7 +861,7 @@ static void format_display(char* buf,
             case '>':
                 if (level > 0)
                 {
-                    fmt = skip_conditional(fmt, false);
+                    fmt = skip_conditional(fmt, 0);
                     level--;
                     continue;
                 }
@@ -1021,7 +1005,8 @@ static void format_display(char* buf,
             case '?':
                 fmt++;
                 value = get_tag(id3, nid3, fmt, temp_buf, sizeof(temp_buf),
-                                &tag_length, subline_time_mult, flags);
+                                &tag_length, subline_time_mult, flags,
+                                &intval);
 
                 while (*fmt && ('<' != *fmt))
                     fmt++;
@@ -1031,14 +1016,18 @@ static void format_display(char* buf,
 
                 /* No value, so skip to else part */
                 if ((!value) || (!strlen(value)))
-                    fmt = skip_conditional(fmt, true);
+                    fmt = skip_conditional(fmt, 1);
+                else
+                    if(intval > 1) /* enum */
+                        fmt = skip_conditional(fmt, intval - 1);
 
                 level++;
                 break;
 
             default:
                 value = get_tag(id3, nid3, fmt, temp_buf, sizeof(temp_buf),
-                                &tag_length, subline_time_mult, flags);
+                                &tag_length, subline_time_mult, flags,
+                                &intval);
                 fmt += tag_length;
 
                 if (value)
