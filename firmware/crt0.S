@@ -360,6 +360,12 @@ vectors:
     mov.l   @(r0,r2),r3
     mov.l   r3,@(r0,r1)
 
+    /* Move the UserBreak vector as well (12) */
+    mov     #12,r0
+    shll2   r0
+    mov.l   @(r0,r2),r3
+    mov.l   r3,@(r0,r1)
+
     /* Move the breakpoint trap vector (32) */
     mov     #32,r0
     shll2   r0
