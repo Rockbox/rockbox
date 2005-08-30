@@ -206,7 +206,7 @@ whichdevel () {
     case $option in
       [Dd])
         echo "define DEBUG"
-        debug="1"
+        debug="-DDEBUG"
         GCCOPTS="$GCCOPTS -g -DDEBUG"
         ;;
       [Ll])

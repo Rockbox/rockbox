@@ -25,6 +25,8 @@ endif
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc
 
+DEFINES = $(DEBUG)
+
 DIRS = .
 
 ifdef APPEXTRA
