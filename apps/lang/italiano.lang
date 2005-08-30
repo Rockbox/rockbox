@@ -2849,7 +2849,7 @@ id: LANG_FILTER_ID3DB
 desc: show ID3 database
 eng: "ID3 database"
 voice: "ID3 database"
-new: 
+new: "Database ID3" 
 
 id: LANG_ID3DB_ARTISTS
 desc: ID3 virtual folder name
@@ -2908,7 +2908,7 @@ new: "Tipo batteria"
 id: LANG_BATTERY_TYPE_ALKALINE
 desc: in battery settings
 eng: "Alkaline"
-voice: "Alkaline"
+voice: "Alcalina"
 new: "Alcalina"
 
 id: LANG_BATTERY_TYPE_NIMH
@@ -2921,37 +2921,37 @@ id: LANG_POINT
 desc: decimal separator for composing numbers
 eng: "."
 voice: "Virgola"
-new: 
+new: ","
 
 id: LANG_BYTE
 desc: a unit postfix
 eng: "B"
-voice: ""
-new: 
+voice: "bait"
+new: "B"
 
 id: LANG_KILOBYTE
 desc: a unit postfix, also voiced
 eng: "KB"
-voice: "KiloBait"
-new: 
+voice: "chilobait"
+new: "KB"
 
 id: LANG_MEGABYTE
 desc: a unit postfix, also voiced
 eng: "MB"
-voice: "MegaBait"
-new: 
+voice: "megabait"
+new: "MB"
 
 id: LANG_GIGABYTE
 desc: a unit postfix, also voiced
 eng: "GB"
-voice: "GigaBait"
-new: 
+voice: "gigabait"
+new: "GB"
 
 id: LANG_DISK_SIZE_INFO
 desc: disk size info
 eng: "Disk:"
 voice: ""
-new: "Disco"
+new: "Disco:"
 
 id: LANG_DISK_FREE_INFO
 desc: disk size info
