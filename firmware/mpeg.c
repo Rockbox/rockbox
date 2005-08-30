@@ -834,10 +834,9 @@ static void transfer_end(unsigned char** ppbuf, int* psize)
                                       space_until_end_of_buffer);
 
             /* several tracks loaded? */
-            if (num_tracks_in_memory() > 1)
+            track = get_trackdata(track_offset);
+            if(track)
             {
-                track = get_trackdata(track_offset);
-                
                 /* will we move across the track boundary? */
                 if (( audiobuf_read < track->mempos ) &&
                     ((audiobuf_read+last_dma_chunk_size) >
