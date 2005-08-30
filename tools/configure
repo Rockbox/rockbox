@@ -226,7 +226,7 @@ whichdevel () {
   done
 
   if [ "yes" = "$simulator" ]; then
-    debug="1"
+    debug="-DDEBUG"
     extradefines="-DSIMULATOR"
     whichsim
   fi
@@ -627,7 +627,7 @@ fi
       echo "Bootloader build selected"
       ;;
     [Ss])
-      debug="1"
+      debug="-DDEBUG"
       simulator="yes"
       extradefines="-DSIMULATOR"
       echo "Simulator build selected"
