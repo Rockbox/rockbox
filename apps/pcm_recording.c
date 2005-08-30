@@ -71,7 +71,7 @@ bool pcm_rec_screen(void)
 
     lcd_setfont(FONT_SYSFIXED);
     lcd_getstringsize("M", &w, &h);
-    lcd_setmargins(global_settings.invert_cursor ? 0 : w, 8);
+    lcd_setmargins(0, 8);
 
     play_vol = 120;
 
