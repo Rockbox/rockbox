@@ -48,13 +48,12 @@
     #define CURSOR_X        (global_settings.scrollbar && \
                              viewer.num_tracks>viewer.num_display_lines?1:0)
     #define CURSOR_Y        0 
-    #define CURSOR_WIDTH    (global_settings.invert_cursor ? 0 : 4)
 
     #define ICON_WIDTH      ((viewer.char_width > 6) ? viewer.char_width : 6)
 
     #define MARGIN_X        ((global_settings.scrollbar && \
                              viewer.num_tracks > viewer.num_display_lines ? \
-                             SCROLLBAR_WIDTH : 0) + CURSOR_WIDTH + \
+                             SCROLLBAR_WIDTH : 0) + \
                              (global_settings.playlist_viewer_icons ? \
                                 ICON_WIDTH : 0))
     #define MARGIN_Y        (global_settings.statusbar ? STATUSBAR_HEIGHT : 0)
@@ -462,7 +461,7 @@ static void display_playlist(void)
                 if ( viewer.line_height > 8 )
                     offset = (viewer.line_height - 8) / 2;
                 lcd_mono_bitmap(bitmap_icons_6x8[Icon_Audio],
-                    CURSOR_X * 6 + CURSOR_WIDTH,
+                    CURSOR_X * 6,
                     MARGIN_Y+(i*viewer.line_height) + offset, 6, 8);
 #else
                 lcd_putc(LINE_X-1, i, Icon_Audio);
@@ -472,7 +471,7 @@ static void display_playlist(void)
             {
                 /* Track we are moving */
 #ifdef HAVE_LCD_BITMAP
-                lcd_putsxy(CURSOR_X * 6 + CURSOR_WIDTH,
+                lcd_putsxy(CURSOR_X * 6,
                     MARGIN_Y+(i*viewer.line_height), "M");
 #else
                 lcd_putc(LINE_X-1, i, 'M');
@@ -482,7 +481,7 @@ static void display_playlist(void)
             {
                 /* Queued track */
 #ifdef HAVE_LCD_BITMAP
-                lcd_putsxy(CURSOR_X * 6 + CURSOR_WIDTH,
+                lcd_putsxy(CURSOR_X * 6,
                     MARGIN_Y+(i*viewer.line_height), "Q");
 #else
                 lcd_putc(LINE_X-1, i, 'Q');
@@ -603,11 +602,10 @@ static void update_display_line(int line, bool scroll)
     if (scroll)
     {
 #ifdef HAVE_LCD_BITMAP
-        if (global_settings.invert_cursor)
-            lcd_puts_scroll_style(LINE_X, line, str, STYLE_INVERT);
-        else
+        lcd_puts_scroll_style(LINE_X, line, str, STYLE_INVERT);
+#else
+        lcd_puts_scroll(LINE_X, line, str);
 #endif
-            lcd_puts_scroll(LINE_X, line, str);
     }
     else
         lcd_puts(LINE_X, line, str);
@@ -851,18 +849,12 @@ bool playlist_viewer_ex(char* filename)
             /* Flash cursor to identify that we are moving a track */
             cursor_on = !cursor_on;
 #ifdef HAVE_LCD_BITMAP
-            if (global_settings.invert_cursor)
-            {
-                lcd_set_drawmode(DRMODE_COMPLEMENT);
-                lcd_fillrect(
-                    MARGIN_X, MARGIN_Y+(viewer.cursor_pos*viewer.line_height),
-                    LCD_WIDTH, viewer.line_height);
-                lcd_set_drawmode(DRMODE_SOLID);
-                lcd_invertscroll(LINE_X, viewer.cursor_pos);
-            }
-            else
-                put_cursorxy(CURSOR_X, CURSOR_Y + viewer.cursor_pos,
-                    cursor_on);
+            lcd_set_drawmode(DRMODE_COMPLEMENT);
+            lcd_fillrect(
+                MARGIN_X, MARGIN_Y+(viewer.cursor_pos*viewer.line_height),
+                LCD_WIDTH, viewer.line_height);
+            lcd_set_drawmode(DRMODE_SOLID);
+            lcd_invertscroll(LINE_X, viewer.cursor_pos);
 
             lcd_update_rect(
                 0, MARGIN_Y + (viewer.cursor_pos * viewer.line_height),

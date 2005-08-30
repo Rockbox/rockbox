@@ -162,7 +162,7 @@ struct tree_context* tree_get_context(void)
 /* pixel margins */
 #define MARGIN_X (global_settings.scrollbar && \
                   tc.filesindir > tree_max_on_screen ? SCROLLBAR_WIDTH : 0) + \
-                  CURSOR_WIDTH + (global_settings.show_icons && ICON_WIDTH > 0 ? ICON_WIDTH :0)
+                  (global_settings.show_icons && ICON_WIDTH > 0 ? ICON_WIDTH :0)
 #define MARGIN_Y (global_settings.statusbar ? STATUSBAR_HEIGHT : 0)
 
 /* position the entry-list starts at */
@@ -175,7 +175,6 @@ struct tree_context* tree_get_context(void)
                       the margins, so this is the amount of lines
                       we add to the cursor Y position to position
                       it on a line */
-#define CURSOR_WIDTH  (global_settings.invert_cursor ? 0 : 4)
 
 #define ICON_WIDTH    6
 
@@ -222,11 +221,10 @@ static void showfileline(int line, char* name, int attr, bool scroll)
     if(scroll) {
 #ifdef HAVE_LCD_BITMAP
         lcd_setfont(FONT_UI);
-        if (global_settings.invert_cursor)
-            lcd_puts_scroll_style(xpos, line, name, STYLE_INVERT);
-        else
+        lcd_puts_scroll_style(xpos, line, name, STYLE_INVERT);
+#else
+        lcd_puts_scroll(xpos, line, name);
 #endif
-            lcd_puts_scroll(xpos, line, name);
     } else
         lcd_puts(xpos, line, name);
 
@@ -396,7 +394,7 @@ static int showdir(void)
             if ( line_height > 8 )
                 offset = (line_height - 8) / 2;
             lcd_mono_bitmap(icon,
-                            CURSOR_X * 6 + CURSOR_WIDTH,
+                            CURSOR_X * 6,
                             MARGIN_Y+(i-start)*line_height + offset, 6, 8);
 #else
             if (icon < 0 )
