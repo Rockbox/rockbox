@@ -677,9 +677,14 @@ static void setid3v2title(int fd, struct mp3entry *entry)
 
         /* Keep track of the total size */
         totframelen = framelen;
-
-        if(framelen == 0)
-            return;
+        
+        DEBUGF("framelen = %d\n", framelen);
+        if(framelen == 0){
+            if (header[0] == 0 && header[1] == 0 && header[2] == 0)
+                return; 
+            else
+                continue;
+        }
 
         unsynch = false;
         data_length_ind = 0;
