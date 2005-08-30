@@ -51,7 +51,8 @@
 #define USB_ENABLE_ONDIOSTYLE 1 /* with PA5 */
 
 /* The start address index for ROM builds */
-#define ROM_START 0x12010
+/* #define ROM_START 0x12010 for behind original Archos */
+#define ROM_START 0x7010 /* for behind BootBox */
 
 /* Define this if the display is mounted upside down */
 #define HAVE_DISPLAY_FLIPPED

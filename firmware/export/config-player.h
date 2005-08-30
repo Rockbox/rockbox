@@ -64,7 +64,8 @@
 #define HAVE_CHARGING 1
 
 /* The start address index for ROM builds */
-#define ROM_START 0xD010
+/* #define ROM_START 0xD010 for behind original Archos */
+#define ROM_START 0x6010 /* for behind BootBox */
 
 /* Software controlled LED */
 #define CONFIG_LED LED_REAL
