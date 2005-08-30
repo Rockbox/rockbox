@@ -34,8 +34,7 @@ const char* db_get_icon(struct tree_context* c);
 #else
 int   db_get_icon(struct tree_context* c);
 #endif
-
-
+int db_get_filename(struct tree_context* c, char *buf, int buflen);
 
 #endif
 

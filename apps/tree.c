@@ -1041,13 +1041,8 @@ static bool dirbrowse(void)
                 if(!numentries)
                     onplay_result = onplay(NULL, 0, curr_context);
                 else {
-                    if (currdir[1])
-                        snprintf(buf, sizeof buf, "%s/%s",
-                                 currdir, dircache[tc.dircursor+tc.dirstart].name);
-                    else
-                        snprintf(buf, sizeof buf, "/%s",
-                                 dircache[tc.dircursor+tc.dirstart].name);
                     if (id3db)
+                    {
                         switch (tc.currtable)
                         {
                             case allsongs:
@@ -1055,10 +1050,23 @@ static bool dirbrowse(void)
                             case songs4artist:
                             case searchsongs:
                                 attr=TREE_ATTR_MPA;
+                                db_get_filename(&tc, buf, sizeof(buf));
                                 break;
                         }
+                    }
                     else
+                    {
                         attr = dircache[tc.dircursor+tc.dirstart].attr;
+
+                        if (currdir[1])
+                            snprintf(buf, sizeof buf, "%s/%s",
+                                     currdir,
+                                     dircache[tc.dircursor+tc.dirstart].name);
+                        else
+                            snprintf(buf, sizeof buf, "/%s",
+                                     dircache[tc.dircursor+tc.dirstart].name);
+                    }
+                    
                     onplay_result = onplay(buf, attr, curr_context);
                 }
                 

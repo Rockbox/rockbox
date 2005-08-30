@@ -278,7 +278,7 @@ static bool playlist_options(void)
         pstart++;      
     }
        
-    if (context == CONTEXT_TREE)
+    if (context == CONTEXT_TREE || context == CONTEXT_ID3DB)
     {
         if (audio_status() & AUDIO_STATUS_PLAY)
         {
@@ -536,7 +536,8 @@ int onplay(char* file, int attr, int from)
         
     if (context == CONTEXT_WPS ||
         context == CONTEXT_TREE ||
-        context == CONTEXT_ID3DB)
+        ((context == CONTEXT_ID3DB) &&
+         (attr & TREE_ATTR_MASK) == TREE_ATTR_MPA))
     {
         items[i].desc = ID2P(LANG_PLAYLIST);
         items[i].function = playlist_options;

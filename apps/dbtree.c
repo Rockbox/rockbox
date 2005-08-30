@@ -478,6 +478,22 @@ void db_exit(struct tree_context* c)
     c->firstpos  = c->pos_history[c->dirlevel];
 }
 
+int db_get_filename(struct tree_context* c, char *buf, int buflen)
+{
+    int rc;
+    int filenum = c->dircursor + c->dirstart;
+    int pathoffset = ((int*)c->dircache)[filenum * c->dentry_size + 1];
+    
+    lseek(tagdb_fd, pathoffset, SEEK_SET);
+    rc = read(tagdb_fd, buf, buflen);
+
+    if (rc < tagdbheader.songlen) {
+        DEBUGF("short path read(%ld) = %d\n", sizeof(buf), rc);
+        return -2;
+    }
+    return 0;
+}
+
 static int db_play_folder(struct tree_context* c)
 {
     char buf[MAX_PATH];
