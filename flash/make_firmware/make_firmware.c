@@ -169,10 +169,17 @@ UINT32 PlaceImage(char* filename, UINT32 pos, UINT8* pFirmware, UINT32 limit)
 
 		if (ucl_header[12] == 0x2B) // uncompressed means "ROMbox", for direct flash execution
 		{
+			UINT8 start_addr[4];
 			UINT8 reset_vec[4];
+			fread(start_addr, 1, sizeof(start_addr), pFile); // read the link address from image
 			fread(reset_vec, 1, sizeof(reset_vec), pFile); // read the reset vector from image
-			fseek(pFile, 0-sizeof(reset_vec), SEEK_CUR); // wind back
-			load_addr = FLASH_START + pos + 16; // behind 16 byte header
+			fseek(pFile, 0-sizeof(start_addr)-sizeof(reset_vec), SEEK_CUR); // wind back
+            load_addr = Read32(start_addr);
+			if (load_addr != FLASH_START + pos + 16) // behind 16 byte header
+            {
+			    printf("Error: Rombox .ucl file is linked to 0x%08X instead of 0x%08X\n", load_addr, FLASH_START + pos + 16);
+			    exit(11);
+            }
 			exec_addr = Read32(reset_vec);
 		}
 	}
