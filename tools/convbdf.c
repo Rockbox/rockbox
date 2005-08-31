@@ -1016,6 +1016,9 @@ int gen_fnt_file(struct font* pf, char *path)
     FILE *ofp;
     int i;
     int did_defaultchar = 0;
+#ifdef ROTATE
+    int ofr = 0;
+#endif
 
     ofp = fopen(path, "wb");
     if (!ofp) {
@@ -1047,7 +1050,6 @@ int gen_fnt_file(struct font* pf, char *path)
     writelong(ofp, pf->width? pf->size: 0);	  /* # bytes of width*/
     /* variable font data*/
 #ifdef ROTATE
-    int ofr = 0;
     for (i=0; i<pf->size; ++i)
     {
         bitmap_t* bits = pf->bits + (pf->offset? pf->offset[i]: (pf->height * i));
