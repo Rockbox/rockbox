@@ -85,7 +85,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         return PLUGIN_ERROR;
     }
     rb->splash(HZ*3, true, "FINISHED PLAYING");
-    return PLUGIN_OK;
+    /* Return PLUGIN_USB_CONNECTED to force a file-tree refresh */
+    return PLUGIN_USB_CONNECTED;
 }
 
 signed char outputBuffer[3000] IDATA_ATTR; /* signed char.. gonna run out of iram ... ! */

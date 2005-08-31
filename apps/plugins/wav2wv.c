@@ -310,5 +310,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void *parameter)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
 #endif
-    return PLUGIN_OK;
+    /* Return PLUGIN_USB_CONNECTED to force a file-tree refresh */
+    return PLUGIN_USB_CONNECTED;
 }

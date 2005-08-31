@@ -94,5 +94,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }
     rb->snprintf(buf,250,"Hits: %d",hits);
     rb->splash(HZ*3,true,buf);
+    if (result!=0) {
+        /* Return PLUGIN_USB_CONNECTED to force a file-tree refresh */
+        return PLUGIN_USB_CONNECTED;
+    }
     return PLUGIN_OK;
 }
