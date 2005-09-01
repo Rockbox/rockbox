@@ -3254,7 +3254,7 @@ id: LANG_ID3_VBR
 desc: in browse_id3
 eng: " (VBR)"
 voice: "variable Bitrate"
-new: " (VBR)
+new: " (VBR)"
 
 id: LANG_BEEP
 desc: in playback settings
