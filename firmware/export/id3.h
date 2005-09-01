@@ -28,26 +28,19 @@
 enum {
     AFMT_UNKNOWN = 1,  /* Unknown file format */
 
-#if CONFIG_CODEC==SWCODEC
     AFMT_MPA_L1,       /* MPEG Audio layer 1 */
-#endif
 
     AFMT_MPA_L2,       /* MPEG Audio layer 2 */
     AFMT_MPA_L3,       /* MPEG Audio layer 3 */
 
-#if CONFIG_CODEC==SWCODEC
     AFMT_PCM_WAV,      /* Uncompressed PCM in a WAV file */
     AFMT_OGG_VORBIS,   /* Ogg Vorbis */
     AFMT_FLAC,         /* FLAC */
     AFMT_MPC,          /* Musepack */
-    AFMT_AAC,          /* AAC */
-    AFMT_APE,          /* Monkey's Audio */
-    AFMT_WMA,          /* Windows Media Audio */
     AFMT_A52,          /* A/52 (aka AC3) audio */
-    AFMT_REAL,         /* Realaudio */
     AFMT_WAVPACK,      /* WavPack */
-#endif
 
+    /* New formats must be added to the end of this list */
     AFMT_ENDMARKER     /* THIS MUST BE THE LAST VALUE */
 };
 

@@ -54,16 +54,8 @@ int probe_file_format(const char *filename)
         return AFMT_FLAC;
     else if (!strcasecmp("mpc", suffix))
         return AFMT_MPC;
-    else if (!strcasecmp("aac", suffix))
-        return AFMT_AAC;
-    else if (!strcasecmp("ape", suffix))
-        return AFMT_APE;
-    else if (!strcasecmp("wma", suffix))
-        return AFMT_WMA;
     else if ((!strcasecmp("a52", suffix)) || (!strcasecmp("ac3", suffix)))
         return AFMT_A52;
-    else if (!strcasecmp("rm", suffix))
-        return AFMT_REAL;
     else if (!strcasecmp("wv", suffix))
         return AFMT_WAVPACK;
         

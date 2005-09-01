@@ -95,11 +95,7 @@ static const char* const codec_labels[] = {
   "OGG",  /* Ogg Vorbis */
   "FLAC", /* FLAC */
   "MPC",  /* Musepack */
-  "AAC",  /* AAC */
-  "APE",  /* Monkey's Audio */
-  "WMA",  /* Windows Media Audio */
   "AC3",  /* A/52 (aka AC3) audio */
-  "RA",   /* Realaudio */
   "WV",   /* WavPack */
 #endif
   NULL
