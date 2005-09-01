@@ -27,6 +27,7 @@
 #ifdef CPU_COLDFIRE
 struct regs
 {
+    unsigned int macsr;  /* EMAC status register */
     unsigned int d[6];   /* d2-d7 */
     unsigned int a[5];   /* a2-a6 */
     void         *sp;    /* Stack pointer (a7) */
@@ -77,31 +78,33 @@ static inline void load_context(const void* addr) __attribute__ ((always_inline)
 static inline void store_context(void* addr)
 {
     asm volatile (
-        "movem.l %%d2-%%d7/%%a2-%%a7,(%0)\n"
-        : : "a" (addr)
+        "move.l  %%macsr,%%d0    \n"
+        "movem.l %%d0/%%d2-%%d7/%%a2-%%a7,(%0)   \n"
+        : : "a" (addr) : "d0" /* only! */
     );
 }
 
-/*--------------------------------------------------------------------------- 
+/*---------------------------------------------------------------------------
  * Load non-volatile context.
  *---------------------------------------------------------------------------
  */
 static inline void load_context(const void* addr)
 {
     asm volatile (
-        "movem.l (%0),%%d2-%%d7/%%a2-%%a7\n"  /* Load context */
-        "move.l  (48,%0),%%d0            \n"  /* Get start address */
-        "beq.b   .running                \n"  /* NULL -> already running */
-        "clr.l   (48,%0)                 \n"  /* Clear start address.. */
-        "move.l  %%d0,%0                 \n"
-        "jmp     (%0)                    \n"  /* ..and start the thread */
-    ".running:                           \n"
+        "movem.l (%0),%%d0/%%d2-%%d7/%%a2-%%a7   \n"  /* Load context */
+        "move.l  %%d0,%%macsr    \n"
+        "move.l  (52,%0),%%d0    \n"  /* Get start address */
+        "beq.b   .running        \n"  /* NULL -> already running */
+        "clr.l   (52,%0)         \n"  /* Clear start address.. */
+        "move.l  %%d0,%0         \n"
+        "jmp     (%0)            \n"  /* ..and start the thread */
+    ".running:                   \n"
         : : "a" (addr) : "d0" /* only! */
     );
 }
 
 #elif CONFIG_CPU == SH7034
-/*--------------------------------------------------------------------------- 
+/*---------------------------------------------------------------------------
  * Store non-volatile context.
  *---------------------------------------------------------------------------
  */
