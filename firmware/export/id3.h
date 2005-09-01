@@ -26,10 +26,9 @@
 /* Audio file types. */
 /* NOTE: When adding new audio types, also add to codec_labels[] in id3.c */
 enum {
-    AFMT_UNKNOWN = 1,  /* Unknown file format */
+    AFMT_UNKNOWN = 0,  /* Unknown file format */
 
     AFMT_MPA_L1,       /* MPEG Audio layer 1 */
-
     AFMT_MPA_L2,       /* MPEG Audio layer 2 */
     AFMT_MPA_L3,       /* MPEG Audio layer 3 */
 
@@ -41,7 +40,6 @@ enum {
     AFMT_WAVPACK,      /* WavPack */
 
     /* New formats must be added to the end of this list */
-    AFMT_ENDMARKER     /* THIS MUST BE THE LAST VALUE */
 };
 
 struct mp3entry {
@@ -56,10 +54,10 @@ struct mp3entry {
     int tracknum;
     int version;
     int layer;
-    int codectype;
     int year;
     unsigned char id3version;
     unsigned char genre;
+    unsigned int codectype;
     unsigned int bitrate;
     unsigned int frequency;
     unsigned int id3v2len;

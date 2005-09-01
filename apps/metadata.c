@@ -29,7 +29,7 @@
 #include "debug.h"
 
 /* Simple file type probing by looking filename extension. */
-int probe_file_format(const char *filename)
+unsigned int probe_file_format(const char *filename)
 {
     char *suffix;
     
@@ -60,7 +60,6 @@ int probe_file_format(const char *filename)
         return AFMT_WAVPACK;
         
     return AFMT_UNKNOWN;
-        
 }
 
 unsigned short a52_bitrates[]={32,40,48,56,64,80,96,

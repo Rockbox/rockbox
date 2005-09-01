@@ -80,17 +80,20 @@ static const char* const genres[] = {
 };
 
 static const char* const codec_labels[] = {
-  "ERR",  /* Invalid codec type */
   "???",  /* Unknown file format */
+
   "MP1",  /* MPEG Audio layer 1 */
   "MP2",  /* MPEG Audio layer 2 */
   "MP3",  /* MPEG Audio layer 3 */
+
+#if CONFIG_CODEC == SWCODEC
   "WAV",  /* Uncompressed PCM in a WAV file */
   "OGG",  /* Ogg Vorbis */
   "FLAC", /* FLAC */
   "MPC",  /* Musepack */
   "AC3",  /* A/52 (aka AC3) audio */
   "WV",   /* WavPack */
+#endif
 };
 
 char* id3_get_genre(const struct mp3entry* id3)
@@ -105,11 +108,11 @@ char* id3_get_genre(const struct mp3entry* id3)
 
 char* id3_get_codec(const struct mp3entry* id3)
 {
-  if ((id3->codectype >= 0) && (id3->codectype < AFMT_ENDMARKER)) {
-    return (char*)codec_labels[id3->codectype];
-  } else {
-    return NULL;
-  }
+    if (id3->codectype < sizeof(codec_labels)/sizeof(char*)) {
+        return (char*)codec_labels[id3->codectype];
+    } else {
+        return NULL;
+    }
 }
 
 /*

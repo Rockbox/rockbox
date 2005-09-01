@@ -833,7 +833,7 @@ bool loadcodec(const char *trackname, bool start_play)
 {
     char msgbuf[80];
     off_t size;
-    int filetype;
+    unsigned int filetype;
     int fd;
     int i, rc;
     const char *codec_path;

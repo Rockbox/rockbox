@@ -22,7 +22,7 @@
 
 #include "playback.h"
 
-int probe_file_format(const char *filename);
+unsigned int probe_file_format(const char *filename);
 bool get_metadata(struct track_info* track, int fd, const char* trackname,
                   bool v1first);
 
