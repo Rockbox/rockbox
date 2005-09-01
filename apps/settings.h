@@ -195,6 +195,8 @@ struct user_settings
 
     int contrast;   /* lcd contrast:          0-63 0=low 63=high            */
     bool invert;    /* invert display */
+    bool invert_cursor; /* invert the current file in dir browser and menu
+                           instead of using the default cursor */
     bool flip_display; /* turn display (and button layout) by 180 degrees */
     bool bidi_support; /* reverse hebrew/arabic chars: 0=off, 1=on */
     int poweroff;   /* power off timer */

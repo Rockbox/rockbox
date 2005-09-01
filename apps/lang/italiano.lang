@@ -1320,10 +1320,10 @@ voice:
 new: ""
 
 id: LANG_INVERT_CURSOR
-desc: DEPRECATED
-eng: ""
-voice: 
-new: 
+desc: In settings_menu
+eng: "Line Selector"
+voice: "Selettore Di Linea"
+new: "Selettore Di Linea"
 
 id: LANG_RECORDING_EDITABLE
 desc: Editable recordings setting
@@ -1350,16 +1350,16 @@ voice: "Retroilluminazione al cambio traccia"
 new: "Retroilluminazione al cambio traccia"
 
 id: LANG_INVERT_CURSOR_POINTER
-desc: DEPRECATED
-eng: ""
-voice: 
-new: 
+desc: in settings_menu
+eng: "Pointer"
+voice: "Puntatore"
+new: "Puntatore"
 
 id: LANG_INVERT_CURSOR_BAR
-desc: DEPRECATED
-eng: ""
-voice: 
-new: 
+desc: in settings_menu
+eng: "Bar(Inverse)"
+voice: "Barra Invertita"
+new: "Barra (Invertita)"
 
 id: LANG_INVERT_LCD_NORMAL
 desc: in settings_menu

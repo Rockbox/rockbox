@@ -36,6 +36,7 @@ enum icons_6x8 {
     Icon_Audio,
     Icon_Folder,
     Icon_Playlist,
+    Icon_Cursor,
     Icon_Wps,
     Icon_Firmware,
     Icon_Font,

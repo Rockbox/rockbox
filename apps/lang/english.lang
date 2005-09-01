@@ -1334,9 +1334,9 @@ voice: ""
 new:
 
 id: LANG_INVERT_CURSOR
-desc: DEPRECATED
-eng: ""
-voice: ""
+desc: in settings_menu
+eng: "Line Selector"
+voice: "Line Selector"
 new:
 
 id: LANG_RECORDING_EDITABLE
@@ -1364,15 +1364,15 @@ voice: "Caption backlight"
 new:
 
 id: LANG_INVERT_CURSOR_POINTER
-desc: DEPRECATED
-eng: ""
-voice: ""
+desc: in settings_menu
+eng: "Pointer"
+voice: "Pointer"
 new:
 
 id: LANG_INVERT_CURSOR_BAR
-desc: DEPRECATED
-eng: ""
-voice: ""
+desc: in settings_menu
+eng: "Bar(Inverse)"
+voice: "Inverse Bar"
 new:
 
 id: LANG_INVERT_LCD_NORMAL

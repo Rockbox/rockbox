@@ -91,11 +91,7 @@ int menu_init(const struct menu_item* mitems, int count, int (*callback)(int, in
               const char *button1, const char *button2, const char *button3);
 void menu_exit(int menu);
 
-#ifdef HAVE_LCD_CHARCELLS
 void put_cursorxy(int x, int y, bool on);
-#else
-#define put_cursorxy(...)
-#endif
 
  /* Returns below define, or number of selected menu item*/
 int menu_show(int m);

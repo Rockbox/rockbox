@@ -348,7 +348,7 @@ bool recording_screen(void)
 
     lcd_setfont(FONT_SYSFIXED);
     lcd_getstringsize("M", &w, &h);
-    lcd_setmargins(0, 8);
+    lcd_setmargins(global_settings.invert_cursor ? 0 : w, 8);
 
     if(rec_create_directory() > 0)
         have_recorded = true;
@@ -598,7 +598,7 @@ bool recording_screen(void)
                     update_countdown = 1; /* Update immediately */
 
                     lcd_setfont(FONT_SYSFIXED);
-                    lcd_setmargins(0, 8);
+                    lcd_setmargins(global_settings.invert_cursor ? 0 : w, 8);
                 }
                 break;
 #endif
@@ -739,7 +739,7 @@ bool recording_screen(void)
                          fmt_gain(SOUND_MIC_GAIN,
                                   global_settings.rec_mic_gain,
                                   buf2, sizeof(buf2)));
-                if (pos++ == cursor)
+                if (global_settings.invert_cursor && (pos++ == cursor))
                     lcd_puts_style(0, 4, buf, STYLE_INVERT);
                 else
                     lcd_puts(0, 4, buf);
@@ -754,7 +754,7 @@ bool recording_screen(void)
                     snprintf(buf, 32, "%s: %s", str(LANG_RECORDING_GAIN),
                              fmt_gain(SOUND_LEFT_GAIN, gain,
                                       buf2, sizeof(buf2)));
-                    if (pos++ == cursor)
+                    if (global_settings.invert_cursor && (pos++ == cursor))
                         lcd_puts_style(0, 4, buf, STYLE_INVERT);
                     else
                         lcd_puts(0, 4, buf);
@@ -763,7 +763,7 @@ bool recording_screen(void)
                              fmt_gain(SOUND_LEFT_GAIN,
                                       global_settings.rec_left_gain,
                                       buf2, sizeof(buf2)));
-                    if (pos++ == cursor)
+                    if (global_settings.invert_cursor && (pos++ == cursor))
                         lcd_puts_style(0, 5, buf, STYLE_INVERT);
                     else
                         lcd_puts(0, 5, buf);
@@ -772,12 +772,15 @@ bool recording_screen(void)
                              fmt_gain(SOUND_RIGHT_GAIN,
                                       global_settings.rec_right_gain,
                                       buf2, sizeof(buf2)));
-                    if (pos++ == cursor)
+                    if (global_settings.invert_cursor && (pos++ == cursor))
                         lcd_puts_style(0, 6, buf, STYLE_INVERT);
                     else
                         lcd_puts(0, 6, buf);
                 }
             }
+
+            if(global_settings.rec_source != SOURCE_SPDIF)
+                put_cursorxy(0, 4 + cursor, true);
 
             if (global_settings.rec_source != SOURCE_LINE) {
                 snprintf(buf, 32, "%s %s [%d]",

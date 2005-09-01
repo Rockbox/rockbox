@@ -78,7 +78,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "pcm_playback.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 27
+#define CONFIG_BLOCK_VERSION 26
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -220,6 +220,7 @@ static const struct bit_entry rtc_bits[] =
     {1, S_O(invert), false, "invert", off_on },
     {1, S_O(flip_display), false, "flip display", off_on },
     /* display */
+    {1, S_O(invert_cursor), false, "invert cursor", off_on },
     {1, S_O(statusbar), true, "statusbar", off_on },
     {1, S_O(scrollbar), true, "scrollbar", off_on },
 #if CONFIG_KEYPAD == RECORDER_PAD
