@@ -82,23 +82,15 @@ static const char* const genres[] = {
 static const char* const codec_labels[] = {
   "ERR",  /* Invalid codec type */
   "???",  /* Unknown file format */
-
-#if CONFIG_CODEC==SWCODEC
   "MP1",  /* MPEG Audio layer 1 */
-#endif
-
   "MP2",  /* MPEG Audio layer 2 */
   "MP3",  /* MPEG Audio layer 3 */
-
-#if CONFIG_CODEC==SWCODEC
   "WAV",  /* Uncompressed PCM in a WAV file */
   "OGG",  /* Ogg Vorbis */
   "FLAC", /* FLAC */
   "MPC",  /* Musepack */
   "AC3",  /* A/52 (aka AC3) audio */
   "WV",   /* WavPack */
-#endif
-  NULL
 };
 
 char* id3_get_genre(const struct mp3entry* id3)
