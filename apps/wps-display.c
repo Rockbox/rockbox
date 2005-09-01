@@ -616,6 +616,7 @@ static char* get_tag(struct mp3entry* cid3,
                     return buf;
 
                 case 'c':  /* File Codec */
+                    *intval = id3->codectype+1;
                     return id3_get_codec(id3);
             }
             break;
@@ -834,6 +835,7 @@ static char* get_tag(struct mp3entry* cid3,
                          return buf;
                      case 'r':  /* Rating */
                          *flags |= WPS_REFRESH_STATIC;
+                         *intval = cid3->rating+1;
                          snprintf(buf, buf_size, "%d", cid3->rating);
                          return buf;
                 }
