@@ -616,7 +616,7 @@ static char* get_tag(struct mp3entry* cid3,
                     return buf;
 
                 case 'c':  /* File Codec */
-                    *intval = id3->codectype-1;
+                    *intval = id3->codectype;
                     return id3_get_codec(id3);
             }
             break;
