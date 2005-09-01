@@ -47,6 +47,7 @@
 #include "abrepeat.h"
 
 #ifdef HAVE_LCD_BITMAP
+#include <ctype.h>
 #include "icons.h"
 #include "widgets.h"
 #include "peakmeter.h"
@@ -54,8 +55,8 @@
 /* Image stuff */
 #include "bmp.h"
 #include "atoi.h"
-#define MAX_IMAGES 10
-#define IMG_BUFSIZE (LCD_HEIGHT * LCD_WIDTH) / 8
+#define MAX_IMAGES 26 /* a-z */
+#define IMG_BUFSIZE (LCD_HEIGHT * LCD_WIDTH * MAX_IMAGES/10) / 8
 static unsigned char img_buf[IMG_BUFSIZE]; /* image buffer */
 static unsigned char* img_buf_ptr = img_buf; /* where are in image buffer? */
 
@@ -68,6 +69,8 @@ struct {
     int w;                  /* width */
     int h;                  /* height */
     bool loaded;            /* load state */
+    bool display;           /* is to be displayed */
+    bool always_display;    /* not using the preload/display mechanism */
 } img[MAX_IMAGES] ;
 
 
@@ -122,7 +125,7 @@ static void wps_display_images(void) {
     int n;
     lcd_set_drawmode(DRMODE_FG);
     for (n = 0; n < MAX_IMAGES; n++) {
-        if (img[n].loaded) {
+        if (img[n].loaded && img[n].display) {
             lcd_mono_bitmap(img[n].ptr, img[n].x, img[n].y, img[n].w, img[n].h);
         }
     }
@@ -160,9 +163,13 @@ static void wps_format(const char* fmt)
     {
         switch (*buf)
         {
-            /* skip % sequences so "%;" doesn't start a new subline */
+            /*
+             * skip % sequences so "%;" doesn't start a new subline
+             * don't skip %x lines (pre-load bitmaps)
+             */
             case '%':
-                buf++;
+                if (*(buf+1) != 'x')
+                    buf++;
                 break;
 
             case '\r': /* CR */
@@ -204,6 +211,107 @@ static void wps_format(const char* fmt)
                     subline = 0;
                 }
                 break;
+
+            case 'x':
+#ifdef HAVE_LCD_BITMAP
+                /* Preload images so the %xd# tag can display it */
+            {
+                int ret = 0;
+                int n;
+                char *ptr = buf+1;
+                char *pos = NULL;
+                char imgname[MAX_PATH];
+                char qual = *ptr;
+                if (qual == 'l' || qual == '|')  /* format:
+                                                    %x|n|filename.bmp|x|y|
+                                                    or
+                                                    %xl|n|filename.bmp|x|y|
+                                                 */
+                {
+                    ptr = strchr(ptr, '|') + 1;
+                    pos = strchr(ptr, '|');
+                    if (pos)
+                    {
+                        /* get the image number */
+                        n = tolower(*ptr) - 'a';
+                        if(n < 0 || n >= MAX_IMAGES)
+                        {
+                            buf++;
+                            break;
+                        }
+                        ptr = pos+1;
+
+                        /* check the image number and load state */
+                        if ((n < MAX_IMAGES) && (!img[n].loaded))
+                        {
+                            /* get filename */
+                            pos = strchr(ptr, '|');
+                            if ((pos - ptr) <
+                                (int)sizeof(imgname)-ROCKBOX_DIR_LEN-2)
+                            {
+                                memcpy(imgname, ROCKBOX_DIR, ROCKBOX_DIR_LEN);
+                                imgname[ROCKBOX_DIR_LEN] = '/';
+                                memcpy(&imgname[ROCKBOX_DIR_LEN+1],
+                                       ptr, pos - ptr);
+                                imgname[ROCKBOX_DIR_LEN+1+pos-ptr] = 0;
+                            }
+                            else
+                                /* filename too long */
+                                imgname[0] = 0;
+
+                            ptr = pos+1;
+
+                            /* get x-position */
+                            pos = strchr(ptr, '|');
+                            if (pos)
+                                img[n].x = atoi(ptr);
+                            else
+                            {
+                                /* weird syntax, bail out */
+                                buf++;
+                                break;
+                            }
+
+                            /* get y-position */
+                            ptr = pos+1;
+                            pos = strchr(ptr, '|');
+                            if (pos)
+                                img[n].y = atoi(ptr);
+                            else
+                            {
+                                /* weird syntax, bail out */
+                                buf++;
+                                break;
+                            }
+
+                            pos++;
+                            
+                            /* reposition buf pointer to next WPS element */
+                            while (*pos && *pos != ';' &&
+                                   *pos != '\r' && *pos != '\n')
+                                pos++;
+
+                            buf = pos;
+
+                            /* load the image */
+                            ret = read_bmp_file(imgname, &img[n].w, &img[n].h,
+                                                img_buf_ptr, img_buf_free);
+                            if (ret > 0)
+                            {
+                                img[n].ptr = img_buf_ptr;
+                                img_buf_ptr += ret;
+                                img_buf_free -= ret;
+                                img[n].loaded = true;
+                                if(qual == '|')
+                                    img[n].always_display = true;
+                            }
+                        }
+                        buf++;
+                    }
+                }
+              }
+#endif
+              break;
         }
         buf++;
     }
@@ -234,9 +342,11 @@ bool wps_load(const char* file, bool display)
             img_buf_ptr = img_buf;
             img_buf_free = IMG_BUFSIZE;
 
-            /* set images to unloaded */
+            /* set images to unloaded and not displayed */
             for (i = 0; i < MAX_IMAGES; i++) {
                 img[i].loaded = false;
+                img[i].display = false;
+                img[i].always_display = false;
             }
 #endif
             buffer[numread] = 0;
@@ -830,17 +940,16 @@ static void format_display(char* buf,
     unsigned char tag_length;
     int intval;
 
-    /* needed for images (ifdef is to kill a warning on player)*/
-    int n;
     int cur_align;
     char* cur_align_start;
 #ifdef HAVE_LCD_BITMAP
-    int ret;
-    char *pos, *posn;
-    char imgname[MAX_PATH];
-    char *ptr;
+    int n;
+    /* Set images to not to be displayed */
+    for (n = 0; n < MAX_IMAGES; n++) {
+        img[n].display = img[n].always_display?true:false;
+    }
 #endif
-
+    
     cur_align_start = buf;
     cur_align = WPS_ALIGN_LEFT;
     *subline_time_mult = DEFAULT_SUBLINE_TIME_MULTIPLIER;
@@ -916,80 +1025,23 @@ static void format_display(char* buf,
                 ++fmt;
                 break;
 
-            case 'x': /* image support (format: %xn|filename|x|y|) */
+            case 'x': /* image support */
 #ifdef HAVE_LCD_BITMAP
-                /* get image number */
-                pos = strchr(fmt, '|'); /* get the first '|' */
-                ptr = (char *)fmt+1;
-                if (pos && ((pos - ptr) < (int)sizeof(temp_buf))) {
-                    memcpy(temp_buf, ptr, pos - ptr);
-                    temp_buf[pos - ptr] = 0;
-                    n = atoi(temp_buf);
-                    ptr = pos+1;
-
-                    /* check image number, and load state. */
-                    if ((n < MAX_IMAGES) && (!img[n].loaded)) {
-                        /* Get filename */
-                        pos = strchr(ptr, '|'); /* get the second '|' */
-                        if ((pos - ptr) < (int)sizeof(temp_buf)) {
-                            memcpy(temp_buf, ptr, pos - ptr); 
-                            /* get the filename */
-                            temp_buf[pos - ptr] = 0;
-                            snprintf(imgname, MAX_PATH, "/.rockbox/%s", 
-                                     temp_buf);
-                        }
-                        else {
-                            /* filename too long! */
-                            imgname[0]=0;
-                        }
-
-                        /* Get X-position */
-                        ptr=pos+1;
-                        posn = strchr(ptr, '|'); /* get the 3th '|' */
-                        if ((posn - ptr) < (int)sizeof(temp_buf)) {
-                            memcpy(temp_buf, ptr, posn - ptr);
-                            temp_buf[posn - ptr] = 0;
-                            img[n].x = atoi(temp_buf);
-                        }
-                        else
-                            /* weird syntax, get out */
-                            break;
-
-                        /* Get Y-position */
-                        pos = posn;
-                        ptr = posn+1;
-                        posn = strchr(ptr, '|'); /* get the 4th '|' */
-                        if ((posn - ptr) < (int)sizeof(temp_buf)) {
-                            memcpy(temp_buf, ptr, posn - ptr);
-                            temp_buf[posn - ptr] = 0;
-                            img[n].y = atoi(temp_buf);
-                        }
-                        else
-                            /* weird syntax, get out */
-                            break;
-
-                        /* and load the image */
-                        ret = read_bmp_file(imgname, &img[n].w, &img[n].h, img_buf_ptr,
-                                            img_buf_free);
-                        if (ret > 0) {
-                            img[n].ptr = img_buf_ptr;
-                            img_buf_ptr += ret;
-                            img_buf_free -= ret;
-                        }
-                        img[n].loaded = true;
+                /* skip preload or regular image tag */
+                if ('l' == *(fmt+1) || '|' == *(fmt+1))
+                {
+                    while (*fmt && *fmt != '\n')
+                        fmt++;
+                }
+                else if ('d' == *(fmt+1))
+                {
+                    fmt+=2;
+                    n = tolower(*fmt) - 'a';
+                    if (n >= 0 && n < MAX_IMAGES && img[n].loaded) {
+                        img[n].display = true;
                     }
                 }
 #endif
-                /* skip the tag */
-                for (n = 0; n < 4; n++) {
-                    char *ptr;
-                    ptr = strchr(fmt+1, '|'); /* get the next '|' */
-                    if(ptr)
-                        fmt=ptr;
-                    else
-                        /* syntax error, bail out of loop */
-                        break;
-                }
                 fmt++;
                 break;
 

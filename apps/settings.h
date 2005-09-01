@@ -27,6 +27,7 @@
 #include "abrepeat.h"
 
 #define ROCKBOX_DIR "/.rockbox"
+#define ROCKBOX_DIR_LEN 9
 #define FONT_DIR "/fonts"
 #define LANG_DIR "/langs"
 #define PLUGIN_DIR ROCKBOX_DIR"/rocks"
