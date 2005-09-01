@@ -99,8 +99,8 @@ static volatile bool paused;
 #define GUARD_BUFSIZE  (8*1024)
 
 /* As defined in plugin.lds */
-#define CODEC_IRAM_ORIGIN   0x10010000
-#define CODEC_IRAM_SIZE     0x8000
+#define CODEC_IRAM_ORIGIN   0x1000c000
+#define CODEC_IRAM_SIZE     0xc000
 
 extern bool audio_is_initialized;
 

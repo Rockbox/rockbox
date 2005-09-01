@@ -88,12 +88,12 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 48
+#define PLUGIN_API_VERSION 49
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 48
+#define PLUGIN_MIN_API_VERSION 49
 
 /* plugin return codes */
 enum plugin_status {

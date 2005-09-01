@@ -116,7 +116,7 @@ _pluginbuf = 0;
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300)
 #define DRAMORIG 0x31000000 + STUBOFFSET
 #define IRAMORIG 0x10000000
-#define IRAMSIZE 0x10000
+#define IRAMSIZE 0xc000
 #else
 #define DRAMORIG 0x09000000 + STUBOFFSET
 #define IRAMORIG 0x0f000000
@@ -197,7 +197,7 @@ SECTIONS
     {
        *(.stack)
        stackbegin = .;
-       . += 0x8000;
+       . += 0x2000;
        stackend = .;
     } > IRAM
 #else
