@@ -269,6 +269,18 @@ static bool flip_display(void)
 }
 
 /**
+ * Menu to set Line Selector Type (Pointer/Bar)
+ */
+static bool invert_cursor(void)
+{
+    return set_bool_options(str(LANG_INVERT_CURSOR),
+                            &global_settings.invert_cursor,
+                            STR(LANG_INVERT_CURSOR_BAR),
+                            STR(LANG_INVERT_CURSOR_POINTER),
+                            NULL);
+}
+ 
+ /**
  * Menu to reverse Hebrew and Arabic text according to BiDi algorythm
  */
 static bool bidi_support(void)
@@ -1428,6 +1440,7 @@ static bool lcd_settings_menu(void)
 #ifdef HAVE_LCD_BITMAP
         { ID2P(LANG_INVERT),          invert },
         { ID2P(LANG_FLIP_DISPLAY),    flip_display },
+        { ID2P(LANG_INVERT_CURSOR),   invert_cursor },
 #endif
     };
 
