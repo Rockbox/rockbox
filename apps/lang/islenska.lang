@@ -1,4 +1,4 @@
-# $Id: islenska.lang,v 1.65 2005/08/17
+# $Id: islenska.lang,v 1.66 2005/09/02 Richard Ottó O'Brien
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -376,7 +376,7 @@ id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Is Full!"
 voice: ""
-new: 
+new: "Er fullur!"
 
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
@@ -865,21 +865,39 @@ voice: "Numeric"
 new: "Í tölum"
 
 id: LANG_PM_PERFORMANCE
-desc: in the peak meter menu
-eng: "Performance"
-voice: "Performance"
+### Description changed! Previous description was:
+### "in the peak meter menu"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "Performance"
+eng: ""
+### English phrase was changed! Voice set to english. Previous voice was:
+### "Performance"
+voice: 
 new: "Afkastageta"
 
 id: LANG_PM_HIGH_PERFORMANCE
-desc: in the peak meter menu
-eng: "High performance"
-voice: "High performance"
+### Description changed! Previous description was:
+### "in the peak meter menu"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "High performance"
+eng: ""
+### English phrase was changed! Voice set to english. Previous voice was:
+### "High performance"
+voice: ""
 new: "Há afkastageta"
 
 id: LANG_PM_ENERGY_SAVER
-desc: in the peak meter menu
-eng: "Save Energy"
-voice: "Save Energy"
+### Description changed! Previous description was:
+### "in the peak meter menu"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "Save Energy"
+eng: ""
+### English phrase was changed! Voice set to english. Previous voice was:
+### "Save Energy"
+voice: ""
 new: "Spara orku"
 
 id: LANG_PM_SCALE
@@ -2942,31 +2960,31 @@ id: LANG_POINT
 desc: decimal separator for composing numbers
 eng: "."
 voice: "point"
-new: 
+new: "."
 
 id: LANG_BYTE
 desc: a unit postfix
 eng: "B"
 voice: ""
-new: 
+new: "B"
 
 id: LANG_KILOBYTE
 desc: a unit postfix, also voiced
 eng: "KB"
 voice: "kilobyte"
-new: 
+new: "KB"
 
 id: LANG_MEGABYTE
 desc: a unit postfix, also voiced
 eng: "MB"
 voice: "megabyte"
-new: 
+new: "MB"
 
 id: LANG_GIGABYTE
 desc: a unit postfix, also voiced
 eng: "GB"
 voice: "gigabyte"
-new: 
+new: "GB"
 
 id: LANG_DISK_SIZE_INFO
 desc: disk size info
@@ -3242,7 +3260,7 @@ id: LANG_REPLAYGAIN_PREAMP
 desc: in browse_id3
 eng: "Pre-amp"
 voice: ""
-new: "fyrir-magnari"
+new: "Fyrir-mögnun"
 
 id: LANG_UNIT_DB
 desc: in browse_id3
@@ -3255,3 +3273,33 @@ desc: in browse_id3
 eng: " (VBR)"
 voice: ""
 new: " (VBR)"
+
+id: LANG_BEEP
+desc: in playback settings
+eng: "Beep volume"
+voice: 
+new: "Beep hljóðstyrkni"
+
+id: LANG_WEAK
+desc: in beep volume in playback settings
+eng: "Weak"
+voice: 
+new: "Lág"
+
+id: LANG_MODERATE
+desc: in beep volume in playback settings
+eng: "Moderate"
+voice: 
+new: "Mið"
+
+id: LANG_STRONG
+desc: in beep volume in playback settings
+eng: "Strong"
+voice: 
+new: "Há"
+
+id: LANG_REPEAT_AB
+desc: repeat one song
+eng: "A-B"
+voice: "A-B"
+new: "A-B"
