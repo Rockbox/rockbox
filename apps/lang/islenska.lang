@@ -865,40 +865,22 @@ voice: "Numeric"
 new: "Í tölum"
 
 id: LANG_PM_PERFORMANCE
-### Description changed! Previous description was:
-### "in the peak meter menu"
 desc: DEPRECATED
-### English phrase was changed! Previous translation was made on:
-### "Performance"
 eng: ""
-### English phrase was changed! Voice set to english. Previous voice was:
-### "Performance"
 voice: 
-new: "Afkastageta"
+new: ""
 
 id: LANG_PM_HIGH_PERFORMANCE
-### Description changed! Previous description was:
-### "in the peak meter menu"
 desc: DEPRECATED
-### English phrase was changed! Previous translation was made on:
-### "High performance"
 eng: ""
-### English phrase was changed! Voice set to english. Previous voice was:
-### "High performance"
 voice: ""
-new: "Há afkastageta"
+new: ""
 
 id: LANG_PM_ENERGY_SAVER
-### Description changed! Previous description was:
-### "in the peak meter menu"
 desc: DEPRECATED
-### English phrase was changed! Previous translation was made on:
-### "Save Energy"
 eng: ""
-### English phrase was changed! Voice set to english. Previous voice was:
-### "Save Energy"
 voice: ""
-new: "Spara orku"
+new: ""
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
