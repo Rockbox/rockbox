@@ -7,6 +7,7 @@ win32.mak
 lang/*.lang
 *.pl
 plugins/*.[ch]
+plugins/*.pl
 plugins/Makefile
 plugins/plugin.lds
 plugins/lib/*.[ch]
