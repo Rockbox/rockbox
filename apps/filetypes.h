@@ -23,7 +23,7 @@
 #include <tree.h>
 #include <menu.h>
 
-int filetype_get_attr(const char*);
+int filetype_get_attr(char*);
 #ifdef HAVE_LCD_BITMAP
 const char* filetype_get_icon(int);
 #else

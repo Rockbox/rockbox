@@ -209,17 +209,18 @@ bool filetype_supported(int attr)
 }
 
 /* get the "dynamic" attribute for an extension */
-int filetype_get_attr(const char* name)
+int filetype_get_attr(char* name)
 {
     int i;
+    char *cp;
 
     for (i=0; i < cnt_exttypes; i++)
     {
         if (exttypes[i].extension)
         {
-            if (!strcasecmp(&name[strlen(name)-
-                                 strlen(exttypes[i].extension)],
-                            exttypes[i].extension))
+            cp=strrchr(name,'.');
+            if (cp) cp++;
+            if ((!strcasecmp(cp,exttypes[i].extension)) && (cp))
             {
                 return ((((unsigned long)exttypes[i].type -
                           (unsigned long)&filetypes[0]) /

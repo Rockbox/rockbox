@@ -68,30 +68,30 @@
 
 /* a table for the know file types */
 const struct filetype filetypes[] = {
-    { ".mp3", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { ".mp2", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { ".mpa", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
+    { "mp3", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
+    { "mp2", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
+    { "mpa", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
 #if CONFIG_CODEC == SWCODEC
     /* Temporary hack to allow playlist creation */
-    { ".mp1", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { ".ogg", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { ".wma", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { ".wav", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { ".flac", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { ".ac3", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { ".a52", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { ".mpc", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
-    { ".wv",  TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
+    { "mp1", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
+    { "ogg", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
+    { "wma", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
+    { "wav", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
+    { "flac", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
+    { "ac3", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
+    { "a52", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
+    { "mpc", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
+    { "wv",  TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
 #endif
-    { ".m3u", TREE_ATTR_M3U, Icon_Playlist, LANG_PLAYLIST },
-    { ".cfg", TREE_ATTR_CFG, Icon_Config, VOICE_EXT_CFG },
-    { ".wps", TREE_ATTR_WPS, Icon_Wps, VOICE_EXT_WPS },
-    { ".lng", TREE_ATTR_LNG, Icon_Language, LANG_LANGUAGE },
-    { ".rock",TREE_ATTR_ROCK,Icon_Plugin, VOICE_EXT_ROCK },
+    { "m3u", TREE_ATTR_M3U, Icon_Playlist, LANG_PLAYLIST },
+    { "cfg", TREE_ATTR_CFG, Icon_Config, VOICE_EXT_CFG },
+    { "wps", TREE_ATTR_WPS, Icon_Wps, VOICE_EXT_WPS },
+    { "lng", TREE_ATTR_LNG, Icon_Language, LANG_LANGUAGE },
+    { "rock",TREE_ATTR_ROCK,Icon_Plugin, VOICE_EXT_ROCK },
 #ifdef HAVE_LCD_BITMAP
-    { ".fnt", TREE_ATTR_FONT,Icon_Font, VOICE_EXT_FONT },
+    { "fnt", TREE_ATTR_FONT,Icon_Font, VOICE_EXT_FONT },
 #endif
-    { ".bmark",TREE_ATTR_BMARK, Icon_Bookmark, VOICE_EXT_BMARK },
+    { "bmark",TREE_ATTR_BMARK, Icon_Bookmark, VOICE_EXT_BMARK },
 #ifdef BOOTFILE_EXT
     { BOOTFILE_EXT, TREE_ATTR_MOD, Icon_Firmware, VOICE_EXT_AJZ },
 #endif /* #ifndef SIMULATOR */
@@ -1375,15 +1375,15 @@ static bool add_dir(char* dirname, int len, int fd)
         }
         else {
             int x = strlen(entry->d_name);
-            int xl;
             unsigned int i;
+            char *cp;
 
             /* add all supported audio files to playlists */
             for (i=0; i < sizeof(filetypes); i++) {
                 if (filetypes[i].tree_attr == TREE_ATTR_MPA) {
-                    xl=strlen(filetypes[i].extension);
-                    if (!strcasecmp(&entry->d_name[x-xl],
-                                    filetypes[i].extension))
+                    cp=strrchr(entry->d_name,'.');
+                    if (cp) cp++;
+                    if ((!strcasecmp(cp,filetypes[i].extension)) && (cp))
                     {
                         char buf[8];
                         write(fd, dirname, strlen(dirname));

@@ -240,7 +240,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
         dptr->attr = entry->attribute;
 
         /* check for known file types */
-        if ( !(dptr->attr & ATTR_DIRECTORY) && (len > 4) )
+        if ( !(dptr->attr & ATTR_DIRECTORY) )
            dptr->attr |= filetype_get_attr(entry->d_name);
 
 #ifdef BOOTFILE

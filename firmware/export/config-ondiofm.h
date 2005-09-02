@@ -99,7 +99,7 @@
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
 
-#define BOOTFILE_EXT ".ajz"
-#define BOOTFILE "ajbrec" BOOTFILE_EXT
+#define BOOTFILE_EXT "ajz"
+#define BOOTFILE "ajbrec." BOOTFILE_EXT
 
 #endif /* SIMULATOR */
