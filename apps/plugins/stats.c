@@ -117,6 +117,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         rb->splash(HZ, true, "Aborted");
         return PLUGIN_OK;
     }
+    update_screen();
     rb->splash(HZ, true, "Done");
     update_screen();
     button = rb->button_get(true);
