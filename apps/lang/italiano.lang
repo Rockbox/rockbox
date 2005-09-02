@@ -1320,7 +1320,7 @@ voice:
 new: ""
 
 id: LANG_INVERT_CURSOR
-desc: In settings_menu
+desc: in settings_menu
 eng: "Line Selector"
 voice: "Selettore Di Linea"
 new: "Selettore Di Linea"
@@ -2386,8 +2386,8 @@ new:
 id: LANG_VOICE_DIR_HOVER
 desc: "talkbox" mode for directories + files
 eng: ".talk mp3 clip"
-voice: "Al passaggio"
-new: "Al passaggio"
+voice: "usando un clip audio"
+new: "Usando un clip audio"
 
 id: VOICE_FILE
 desc: spoken only, prefix for file number
@@ -2404,8 +2404,8 @@ new:
 id: LANG_VOICE_SPELL
 desc: "talkbox" mode for files+directories
 eng: "Spell"
-voice: "Scandisci"
-new: "Scandisci"
+voice: "Spelling"
+new: "Spelling"
 
 id: VOICE_CHAR_A
 desc: spoken only, for spelling
@@ -3058,7 +3058,7 @@ new: "Autoazionamento attivo"
 id: LANG_LCD_REMOTE_MENU
 desc: in the display sub menu
 eng: "Remote-LCD Settings"
-voice: ""
+voice: "Impostazioni LCD telecomando" 
 new: "Impostazioni LCD telecomando" 
 
 id: LANG_DISK_NAME_INTERNAL
@@ -3094,7 +3094,7 @@ new: "Spegnimento retroilluminazione"
 id: LANG_SHUFFLE_PLAYLIST
 desc: in playlist menu, reshuffles the order in which songs are played
 eng: "Reshuffle"
-voice: "Reshuffle"
+voice: "Rimescola"
 new: "Rimescola"
 
 id: LANG_NOTHING_TO_RESUME
@@ -3112,25 +3112,25 @@ new: "Inserisci a caso"
 id: LANG_SPDIF_ENABLE
 desc: in playback settings menu. enable/disable the optical out
 eng: "Optical output"
-voice: "Optical output"
+voice: "Uscita ottica"
 new: "Uscita ottica"
 
 id: LANG_NEXT_FOLDER
 desc: in settings_menu.  Should we move to next folder when current one ends
 eng: "Move to Next Folder"
-voice: "Move to Next Folder"
+voice: "Vai alla cartella seguente"
 new: "Vai alla cartella seguente"
 
 id: LANG_RUNTIMEDB_ACTIVE
 desc: in settings_menu.
 eng: "Gather runtime data (experimental)"
-voice: "Gather runtime data"
+voice: "Registra statistiche esecuzione"
 new: "Registra statistiche esecuzione"
 
 id: LANG_MENU_SET_RATING
 desc: in wps context menu
 eng: "Set song rating"
-voice: "Set song rating"
+voice: "Giudica la canzone"
 new: "Giudica la canzone"
 
 id: LANG_RATING
@@ -3142,7 +3142,7 @@ new: "Voto:"
 id: LANG_CROSSFADE_DURATION
 desc: in playback settings
 eng: "Crossfade duration"
-voice: "Crossfade duration"
+voice: "Durata transizione"
 new: "Durata transizione"
 
 id: LANG_MIX
@@ -3154,7 +3154,7 @@ new: "Mescola (Mix)"
 id: LANG_RESTARTING_PLAYBACK
 desc: splash screen displayed when pcm buffer size is changed
 eng: "Restarting playback..."
-voice: "Restarting playback..."
+voice: "Ripresa esecuzione"
 new: "Ripresa esecuzione..."
 
 id: LANG_REPLAYGAIN
@@ -3214,7 +3214,7 @@ new:
 id: LANG_BIDI_SUPPORT
 desc: in settings_menu, option to enable reversal of hebrew/arabic text
 eng: "BiDi Hebrew/Arabic"
-voice: 
+voice: "Modo bidirezionale (ebreo/arabico)"
 new: "Modo bidirezionale (ebreo/arabico)"
 
 id: LANG_REPLAYGAIN_PREAMP
@@ -3244,19 +3244,19 @@ new: "Volume beep"
 id: LANG_WEAK
 desc: in beep volume in playback settings
 eng: "Weak"
-voice: 
+voice: "Debole"
 new: "Debole"
 
 id: LANG_MODERATE
 desc: in beep volume in playback settings
 eng: "Moderate"
-voice: 
+voice: "Medio"
 new: "Medio"
 
 id: LANG_STRONG
 desc: in beep volume in playback settings
 eng: "Strong"
-voice: 
+voice: "Forte"
 new: "Forte"
 
 id: LANG_REPEAT_AB
