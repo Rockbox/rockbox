@@ -614,19 +614,20 @@ static bool dirbrowse(void)
     lastfirstpos = 0;
 
     if (*tc.dirfilter < NUM_FILTER_MODES) {
-        start_resume(true);
-
 #ifdef HAVE_RECORDING
 #ifndef SIMULATOR
-        if (global_settings.rec_startup && ! start_wps) {
-            /* We fake being in the menu structure by calling the appropriate */
-            /* parent when we drop out of each screen */
+        if (global_settings.rec_startup) {
+            /* We fake being in the menu structure by calling
+               the appropriate parent when we drop out of each screen */
             recording_screen();
             rec_menu();
             main_menu();
         }
+        else
 #endif
 #endif
+        start_resume(true);
+
     }
     
     if (!start_wps) {
