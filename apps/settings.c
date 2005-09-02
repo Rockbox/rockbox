@@ -404,7 +404,7 @@ static const struct bit_entry hd_bits[] =
     {4, S_O(rec_start_duration), 0, "trigger start duration", trig_durations_conf},
     {4, S_O(rec_stop_postrec), 2, "trigger stop postrec", trig_durations_conf},
     {4, S_O(rec_stop_gap), 1, "trigger min gap", trig_durations_conf},
-    {4, S_O(rec_trigger_mode ), 1, "trigger mode", "off,no rearm,rearm"},
+    {4, S_O(rec_trigger_mode ), 0, "trigger mode", "off,once,repeat"},
 #endif
 
 #if CONFIG_CODEC == SWCODEC
