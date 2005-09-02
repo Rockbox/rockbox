@@ -1752,13 +1752,15 @@ static void mpeg_thread(void)
                     if(is_prerecording)
                     {
                         int startpos, i;
+                        int level;
                         
                         /* Go back prerecord_count seconds in the buffer */
                         startpos = prerecord_index - prerecord_count;
                         if(startpos < 0)
                             startpos += prerecording_max_seconds;
 
-                        /* Read the mp3 buffer pointer from the prerecord buffer */
+                        /* Read the mp3 buffer pointer from the prerecord
+                           buffer */
                         startpos = prerecord_buffer[startpos];
 
                         DEBUGF("Start looking at address %x (%x)\n",
@@ -1770,10 +1772,16 @@ static void mpeg_thread(void)
                                             saved_header);
 
                         audiobuf_read = startpos + offset;
-                        
+                        if(audiobuf_read >= audiobuflen)
+                            audiobuf_read -= audiobuflen;
+
                         DEBUGF("New audiobuf_read address: %x (%x)\n",
                                audiobuf+audiobuf_read, audiobuf_read);
 
+                        level = set_irq_level(HIGHEST_IRQ_LEVEL);
+                        num_rec_bytes = get_unsaved_space();
+                        set_irq_level(level);
+                        
                         /* Make room for headers */
                         audiobuf_read -= MPEG_RESERVED_HEADER_SPACE;
                         if(audiobuf_read < 0)
