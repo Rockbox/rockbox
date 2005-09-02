@@ -50,14 +50,14 @@ endif
 .PHONY: $(SUBDIRS)
 all: $(BUILDDIR)/libplugin.a $(ROCKS) $(SUBDIRS) $(DEPFILE)
 
-$(BUILDDIR)/credits.raw: $(DOCSDIR)/CREDITS
+$(OBJDIR)/credits.raw: $(DOCSDIR)/CREDITS
 	@echo "create credits.raw"
 	@perl credits.pl < $< > $@
 
-$(OBJDIR)/credits.o: credits.c $(BUILDDIR)/credits.raw
+$(OBJDIR)/credits.o: credits.c $(OBJDIR)/credits.raw
 	@mkdir -p `dirname $@`
 	@echo "CC $<"
-	@$(CC) $(CFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) -I$(OBJDIR) -c $< -o $@
 
 ifndef SIMVER
 $(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKFILE) $(BUILDDIR)/libplugin.a
