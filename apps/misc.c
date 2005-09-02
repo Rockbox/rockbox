@@ -89,7 +89,7 @@ char *output_dyn_value(char *buf, int buf_size, int value,
             tbuf[i] = '\0';
 
         talk_number(value, true);
-        if (strlen(tbuf))
+        if (tbuf[0] != 0)
         {
             talk_id(LANG_POINT, true);
             talk_spell(tbuf, true);
@@ -99,10 +99,78 @@ char *output_dyn_value(char *buf, int buf_size, int value,
     return buf;
 }
 
+/* Create a filename with a number part in a way that the number is 1
+   higher than the highest numbered file matching the same pattern.
+   It is allowed that buffer and path point to the same memory location,
+   saving a strcpy(). Path must always be given without trailing slash,. */
+char *create_numbered_filename(char *buffer, const char *path,
+                               const char *prefix, const char *suffix,
+                               int numberlen)
+{
+    DIR *dir;
+    struct dirent *entry;
+    int max_num = 0;
+    int pathlen;
+    int prefixlen = strlen(prefix);
+    char fmtstring[12];
+
+    if (buffer != path)
+        strncpy(buffer, path, MAX_PATH);
+
+    pathlen = strlen(buffer);
+
+    dir = opendir(pathlen ? buffer : "/");
+    if (!dir)
+        return NULL;
+
+    while ((entry = readdir(dir)))
+    {
+        int curr_num;
+
+        if (strncasecmp(entry->d_name, prefix, prefixlen)
+            || strcasecmp(entry->d_name + prefixlen + numberlen, suffix))
+            continue;
+
+        curr_num = atoi(entry->d_name + prefixlen);
+        if (curr_num > max_num)
+            max_num = curr_num;
+    }
+    closedir(dir);
+
+    snprintf(fmtstring, sizeof(fmtstring), "/%%s%%0%dd%%s", numberlen);
+    snprintf(buffer + pathlen, MAX_PATH - pathlen, fmtstring, prefix,
+             max_num + 1, suffix);
+
+    return buffer;
+}
+
+#ifdef HAVE_RTC
+/* Create a filename with a date+time part.
+   It is allowed that buffer and path point to the same memory location,
+   saving a strcpy(). Path must always be given without trailing slash. */
+char *create_datetime_filename(char *buffer, const char *path,
+                               const char *prefix, const char *suffix)
+{
+    struct tm *tm = get_time();
+    int pathlen;
+
+    if (buffer != path)
+        strncpy(buffer, path, MAX_PATH);
+
+    pathlen = strlen(buffer);
+    snprintf(buffer + pathlen, MAX_PATH - pathlen,
+             "/%s%02d%02d%02d-%02d%02d%02d%s", prefix,
+             tm->tm_year % 100, tm->tm_mon + 1, tm->tm_mday,
+             tm->tm_hour, tm->tm_min, tm->tm_sec, suffix);
+
+    return buffer;
+}
+#endif /* HAVE_RTC */
+
 /* Read (up to) a line of text from fd into buffer and return number of bytes
  * read (which may be larger than the number of bytes stored in buffer). If
- * an error occurs, -1 is returned (and buffer contains whatever could be 
- * read). A line is terminated by a LF char. Neither LF nor CR chars are 
+ * an error occurs, -1 is returned (and buffer contains whatever could be
+ * read). A line is terminated by a LF char. Neither LF nor CR chars are
  * stored in buffer.
  */
 int read_line(int fd, char* buffer, int buffer_size)
@@ -212,44 +280,9 @@ void screen_dump(void)
 #endif
 
 #ifdef HAVE_RTC
-    struct tm *tm = get_time();
-    
-    snprintf(filename, MAX_PATH, "/dump %04d-%02d-%02d %02d-%02d-%02d.bmp",
-             tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday,
-             tm->tm_hour, tm->tm_min, tm->tm_sec);
+    create_datetime_filename(filename, "", "dump ", ".bmp");
 #else
-    {
-        DIR* dir;
-        int max_dump_file = 1; /* default to dump_0001.bmp */
-        dir = opendir("/");
-        if (dir) /* found */
-        {
-            /* Search for the highest screendump filename present,
-               increment behind that. So even with "holes" 
-               (deleted files), the newest will always have the
-               highest number. */
-            while(true)
-            {   
-                struct dirent* entry;
-                int curr_dump_file;
-                /* walk through the directory content */
-                entry = readdir(dir);
-                if (!entry)
-                {
-                    closedir(dir);
-                    break; /* end of dir */
-                }
-                if (strncasecmp(entry->d_name, "dump_", 5))
-                    continue; /* no screendump file */
-                curr_dump_file = atoi(&entry->d_name[5]);
-                if (curr_dump_file >= max_dump_file)
-                    max_dump_file = curr_dump_file + 1;
-            }
-        }
-        snprintf(filename, MAX_PATH, 
-            "/dump_%04d.bmp", max_dump_file);
-    }
-
+    create_numbered_filename(filename, "", "dump_", ".bmp", 4);
 #endif
 
     fh = creat(filename, O_WRONLY);

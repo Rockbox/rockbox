@@ -27,6 +27,14 @@
 void output_dyn_value(char *buf, int buf_size, int value,
                       const unsigned char **units, bool bin_scale);
 
+char *create_numbered_filename(char *buffer, const char *path, 
+                               const char *prefix, const char *suffix,
+                               int numberlen);
+#ifdef HAVE_RTC
+char *create_datetime_filename(char *buffer, const char *path,
+                               const char *prefix, const char *suffix);
+#endif
+
 /* Read (up to) a line of text from fd into buffer and return number of bytes
  * read (which may be larger than the number of bytes stored in buffer). If 
  * an error occurs, -1 is returned (and buffer contains whatever could be 

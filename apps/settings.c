@@ -1215,61 +1215,45 @@ static void save_cfg_table(const struct bit_entry* p_table, int count, int fd)
 
 bool settings_save_config(void)
 {
-    bool done = false;
-    int fd, i;
+    int fd;
     char filename[MAX_PATH];
-
-    /* find unused filename */
-    for (i=0; ; i++) {
-        snprintf(filename, sizeof filename, ROCKBOX_DIR "/config%02d.cfg", i);
-        fd = open(filename, O_RDONLY);
-        if (fd < 0)
-            break;
-        close(fd);
-    }
+    
+    create_numbered_filename(filename, ROCKBOX_DIR, "config", ".cfg", 2);
 
     /* allow user to modify filename */
-    while (!done) {
+    while (true) {
         if (!kbd_input(filename, sizeof filename)) {
             fd = creat(filename,0);
             if (fd < 0) {
                 lcd_clear_display();
-                lcd_puts(0,0,str(LANG_FAILED));
-                lcd_update();
-                sleep(HZ);
+                splash(HZ, true, str(LANG_FAILED));
             }
             else
-                done = true;
+                break;
         }
-        else
-            break;
+        else {
+            lcd_clear_display();
+            splash(HZ, true, str(LANG_RESET_DONE_CANCEL));
+            return false;
+        }
     }
 
-    /* abort if file couldn't be created */
-    if (!done) {
-        lcd_clear_display();
-        lcd_puts(0,0,str(LANG_RESET_DONE_CANCEL));
-        lcd_update();
-        sleep(HZ);
-        return false;
-    }
-
-    fdprintf(fd, "# .cfg file created by rockbox %s - ", appsversion);
-    fdprintf(fd, "http://www.rockbox.org\r\n#\r\n");
-    fdprintf(fd, "#\r\n# wps / language / font \r\n#\r\n");
+    fdprintf(fd, "# .cfg file created by rockbox %s - "
+                 "http://www.rockbox.org\r\n#\r\n"
+                 "#\r\n# wps / language / font \r\n#\r\n", appsversion);
 
     if (global_settings.wps_file[0] != 0)
         fdprintf(fd, "wps: %s/%s.wps\r\n", ROCKBOX_DIR,
-                global_settings.wps_file);
+                 global_settings.wps_file);
 
     if (global_settings.lang_file[0] != 0)
-        fdprintf(fd, "lang: %s/%s.lng\r\n", ROCKBOX_DIR LANG_DIR, 
-                global_settings.lang_file);
+        fdprintf(fd, "lang: %s/%s.lng\r\n", ROCKBOX_DIR LANG_DIR,
+                 global_settings.lang_file);
 
 #ifdef HAVE_LCD_BITMAP
     if (global_settings.font_file[0] != 0)
         fdprintf(fd, "font: %s/%s.fnt\r\n", ROCKBOX_DIR FONT_DIR,
-                global_settings.font_file);
+                 global_settings.font_file);
 #endif
 
     /* here's the action: write values to file, specified via table */
@@ -1279,10 +1263,8 @@ bool settings_save_config(void)
     close(fd);
 
     lcd_clear_display();
-    lcd_puts(0,0,str(LANG_SETTINGS_SAVED1));
-    lcd_puts(0,1,str(LANG_SETTINGS_SAVED2));
-    lcd_update();
-    sleep(HZ);
+    splash(HZ, true, "%s %s", str(LANG_SETTINGS_SAVED1),
+           str(LANG_SETTINGS_SAVED2));
     return true;
 }
 
