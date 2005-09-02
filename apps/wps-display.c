@@ -127,6 +127,7 @@ static void wps_display_images(void) {
     for (n = 0; n < MAX_IMAGES; n++) {
         if (img[n].loaded && img[n].display) {
             lcd_mono_bitmap(img[n].ptr, img[n].x, img[n].y, img[n].w, img[n].h);
+            lcd_update_rect(img[n].x, img[n].y, img[n].w, img[n].h);
         }
     }
     lcd_set_drawmode(DRMODE_SOLID);
@@ -948,7 +949,7 @@ static void format_display(char* buf,
     int n;
     /* Set images to not to be displayed */
     for (n = 0; n < MAX_IMAGES; n++) {
-        img[n].display = img[n].always_display?true:false;
+        img[n].display = false;
     }
 #endif
     
@@ -1498,12 +1499,19 @@ bool wps_refresh(struct mp3entry* id3,
         }
 #ifdef HAVE_LCD_BITMAP
         if (update_line) {
-            wps_display_images();
             lcd_update_rect(0, i*h + offset, LCD_WIDTH, h);
+            wps_display_images();
         }
 #endif
     }
+
 #ifdef HAVE_LCD_BITMAP
+    /* Display images marked as "always display" */
+    for (i = 0; i < MAX_IMAGES; i++) {
+        img[i].display = img[i].always_display;
+    }
+    wps_display_images();
+    
     /* Now we know wether the peak meter is used.
        So we can enable / disable the peak meter thread */
     peak_meter_enabled = enable_pm;
