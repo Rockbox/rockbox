@@ -52,5 +52,6 @@ bool settings_parseline(char* line, char** name, char** value);
 long default_event_handler_ex(long event, void (*callback)(void *), void *parameter);
 long default_event_handler(long event);
 void car_adapter_mode_init(void);
+extern int show_logo(void);
 
 #endif

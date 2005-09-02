@@ -22,13 +22,11 @@
 
 #include "menu.h"
 #include "tree.h"
-#include "credits.h"
 #include "lcd.h"
 #include "font.h"
 #include "button.h"
 #include "kernel.h"
 #include "main_menu.h"
-#include "version.h"
 #include "debug_menu.h"
 #include "sprintf.h"
 #include <string.h>
@@ -50,83 +48,20 @@
 #include "misc.h"
 #include "lang.h"
 #include "logfdisp.h"
+#include "plugin.h"
+#include "filetypes.h"
 
 #ifdef HAVE_RECORDING
 #include "recording.h"
 #endif
 
-#ifdef HAVE_LCD_BITMAP
-#include "bmp.h"
-#include "icons.h"
-#endif /* End HAVE_LCD_BITMAP */
-
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
 
-int show_logo( void )
-{
-#ifdef HAVE_LCD_BITMAP
-    char version[32];
-    int font_h, font_w;
-
-    lcd_clear_display();
-#if LCD_WIDTH == 112 || LCD_WIDTH == 128
-    lcd_bitmap(rockbox112x37, 0, 10, 112, 37);
-#endif
-#if LCD_WIDTH >= 160
-    lcd_bitmap(rockbox160x53x2, 0, 10, 160, 53);
-#endif
-
-#ifdef HAVE_REMOTE_LCD
-    lcd_remote_clear_display();
-    lcd_remote_bitmap(rockbox112x37,10,14,112,37);
-#endif
-
-    snprintf(version, sizeof(version), "Ver. %s", appsversion);
-    lcd_setfont(FONT_SYSFIXED);
-    lcd_getstringsize("A", &font_w, &font_h);
-    lcd_putsxy((LCD_WIDTH/2) - ((strlen(version)*font_w)/2),
-               LCD_HEIGHT-font_h, version);
-    lcd_update();
-
-#ifdef HAVE_REMOTE_LCD
-    lcd_remote_setfont(FONT_SYSFIXED);
-    lcd_remote_getstringsize("A", &font_w, &font_h);
-    lcd_remote_putsxy((LCD_REMOTE_WIDTH/2) - ((strlen(version)*font_w)/2),
-               LCD_REMOTE_HEIGHT-font_h, version);
-    lcd_remote_update();
-#endif
-
-#else
-    char *rockbox = "  ROCKbox!";
-    lcd_clear_display();
-    lcd_double_height(true);
-    lcd_puts(0, 0, rockbox);
-    lcd_puts(0, 1, appsversion);
-#endif
-
-    return 0;
-}
-
 bool show_credits(void)
 {
-    int j = 0;
-    int btn;
-
-    show_logo();
-#ifdef HAVE_LCD_CHARCELLS
-    lcd_double_height(false);
-#endif
-    
-    for (j = 0; j < 10; j++) {
-        sleep((HZ*2)/10);
-
-        btn = button_get(false);
-        if (btn !=  BUTTON_NONE && !(btn & BUTTON_REL))
-            return false;
-    }
-    roll_credits();
+    plugin_load("/.rockbox/rocks/credits.rock",NULL);
     return false;
 }
 

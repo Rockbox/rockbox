@@ -50,6 +50,15 @@ endif
 .PHONY: $(SUBDIRS)
 all: $(BUILDDIR)/libplugin.a $(ROCKS) $(SUBDIRS) $(DEPFILE)
 
+$(BUILDDIR)/credits.raw: $(DOCSDIR)/CREDITS
+	@echo "create credits.raw"
+	@perl credits.pl < $< > $@
+
+$(OBJDIR)/credits.o: credits.c $(BUILDDIR)/credits.raw
+	@mkdir -p `dirname $@`
+	@echo "CC $<"
+	@$(CC) $(CFLAGS) -c $< -o $@
+
 ifndef SIMVER
 $(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKFILE) $(BUILDDIR)/libplugin.a
 	$(SILENT)(file=`basename $@`; \
@@ -117,7 +126,7 @@ $(SUBDIRS):
 clean:
 	@echo "cleaning plugins"
 	@rm -f $(ROCKS) $(LINKFILE) $(OBJDIR)/*.rock $(DEPFILE) $(ELFS) \
-	$(OBJS) $(DEFS)
+	$(BUILDDIR)/credits.raw $(OBJS) $(DEFS)
 	@$(MAKE) -C lib clean OBJDIR=$(OBJDIR)/lib
 	@$(MAKE) -C rockboy clean OBJDIR=$(OBJDIR)/rockboy
 	@$(MAKE) -C searchengine clean OBJDIR=$(OBJDIR)/searchengine

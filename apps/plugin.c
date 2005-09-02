@@ -98,6 +98,7 @@ static const struct plugin_api rockbox_api = {
     lcd_put_cursor,
     lcd_remove_cursor,
     PREFIX(lcd_icon),
+    lcd_double_height,
 #else
 #ifndef SIMULATOR
     lcd_roll,
@@ -336,10 +337,10 @@ static const struct plugin_api rockbox_api = {
 #ifdef HAVE_LCD_BITMAP
     read_bmp_file,
 #endif
+    show_logo,
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-
 };
 
 int plugin_load(const char* plugin, void* parameter)

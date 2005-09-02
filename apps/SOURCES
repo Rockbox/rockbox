@@ -4,7 +4,6 @@ logfdisp.c
 alarm_menu.c
 abrepeat.c
 bookmark.c
-credits.c
 debug_menu.c
 filetypes.c
 language.c

@@ -91,7 +91,7 @@ Original release, featuring analog / digital modes and a few options.
 /************
  * Prototypes
  ***********/
-void show_logo(bool animate, bool show_clock_text);
+void show_clock_logo(bool animate, bool show_clock_text);
 void exit_logo(void);
 void save_settings(bool interface);
 
@@ -461,7 +461,7 @@ void save_settings(bool interface)
         rb->snprintf(buf, sizeof(buf), "Saving Settings");
         rb->lcd_getstringsize(buf, &buf_w, &buf_h);
         rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 56, buf);
-        show_logo(true, true);
+        show_clock_logo(true, true);
 
         rb->lcd_update();
     }
@@ -523,7 +523,7 @@ void load_settings(void)
     rb->snprintf(buf, sizeof(buf), "Loading Settings");
     rb->lcd_getstringsize(buf, &buf_w, &buf_h);
     rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 56, buf);
-    show_logo(true, true);
+    show_clock_logo(true, true);
     rb->lcd_update();
 
     if(fd >= 0) /* does file exist? */
@@ -1020,7 +1020,7 @@ void binary(int hour, int minute, int second)
 /****************
  * Shows the logo
  ***************/
-void show_logo(bool animate, bool show_clock_text)
+void show_clock_logo(bool animate, bool show_clock_text)
 {
     int y_position;
 
@@ -1151,7 +1151,7 @@ bool roll_credits(void)
     {
         rb->lcd_clear_display();
 
-        show_logo(false, false);
+        show_clock_logo(false, false);
 
         rb->snprintf(elapsednames, sizeof(elapsednames), "[Credits] %02d/%02d", j+1, numnames);
         rb->lcd_putsxy(credits_pos-1, 0, elapsednames);
@@ -1299,7 +1299,7 @@ bool show_credits(void)
     rb->lcd_putsxy(LCD_WIDTH/2-buf_w/2, 56, buf);
 
     /* show the logo with an animation and the clock version text */
-    show_logo(true, true);
+    show_clock_logo(true, true);
 
     rb->lcd_update();
 

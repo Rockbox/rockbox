@@ -40,7 +40,6 @@
 #endif
 #include "audio.h"
 #include "mp3_playback.h"
-#include "main_menu.h"
 #include "thread.h"
 #include "settings.h"
 #include "backlight.h"

@@ -24,6 +24,7 @@
 #include "file.h"
 #include "dir.h"
 #include "lcd.h"
+#include "lcd-remote.h"
 #include "sprintf.h"
 #include "errno.h"
 #include "system.h"
@@ -40,9 +41,16 @@
 #include "powermgmt.h"
 #include "backlight.h"
 #include "atoi.h"
+#include "version.h"
+#include "font.h"
 #ifdef HAVE_MMC
 #include "ata_mmc.h"
 #endif
+
+#ifdef HAVE_LCD_BITMAP
+#include "bmp.h"
+#include "icons.h"
+#endif /* End HAVE_LCD_BITMAP */
 
 /* Format a large-range value for output, using the appropriate unit so that
  * the displayed value is in the range 1 <= display < 1000 (1024 for "binary"
@@ -481,4 +489,49 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
 long default_event_handler(long event)
 {
     return default_event_handler_ex(event, NULL, NULL);
+}
+
+int show_logo( void )
+{
+#ifdef HAVE_LCD_BITMAP
+    char version[32];
+    int font_h, font_w;
+
+    lcd_clear_display();
+#if LCD_WIDTH == 112 || LCD_WIDTH == 128
+    lcd_bitmap(rockbox112x37, 0, 10, 112, 37);
+#endif
+#if LCD_WIDTH >= 160
+    lcd_bitmap(rockbox160x53x2, 0, 10, 160, 53);
+#endif
+
+#ifdef HAVE_REMOTE_LCD
+    lcd_remote_clear_display();
+    lcd_remote_bitmap(rockbox112x37,10,14,112,37);
+#endif
+
+    snprintf(version, sizeof(version), "Ver. %s", appsversion);
+    lcd_setfont(FONT_SYSFIXED);
+    lcd_getstringsize("A", &font_w, &font_h);
+    lcd_putsxy((LCD_WIDTH/2) - ((strlen(version)*font_w)/2),
+               LCD_HEIGHT-font_h, version);
+    lcd_update();
+
+#ifdef HAVE_REMOTE_LCD
+    lcd_remote_setfont(FONT_SYSFIXED);
+    lcd_remote_getstringsize("A", &font_w, &font_h);
+    lcd_remote_putsxy((LCD_REMOTE_WIDTH/2) - ((strlen(version)*font_w)/2),
+               LCD_REMOTE_HEIGHT-font_h, version);
+    lcd_remote_update();
+#endif
+
+#else
+    char *rockbox = "  ROCKbox!";
+    lcd_clear_display();
+    lcd_double_height(true);
+    lcd_puts(0, 0, rockbox);
+    lcd_puts(0, 1, appsversion);
+#endif
+
+    return 0;
 }

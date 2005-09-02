@@ -44,6 +44,7 @@
 #include "mpeg.h"
 #include "audio.h"
 #include "mp3_playback.h"
+#include "misc.h"
 #if (HWCODEC == SWCODEC)
 #include "pcm_playback.h"
 #endif
@@ -88,12 +89,12 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 49
+#define PLUGIN_API_VERSION 50
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 49
+#define PLUGIN_MIN_API_VERSION 50
 
 /* plugin return codes */
 enum plugin_status {
@@ -151,6 +152,7 @@ struct plugin_api {
     void (*lcd_put_cursor)(int x, int y, char cursor_char);
     void (*lcd_remove_cursor)(void);
     void (*PREFIX(lcd_icon))(int icon, bool enable);
+    void (*lcd_double_height)(bool on);
 #else
 #ifndef SIMULATOR
     void (*lcd_roll)(int pixels);
@@ -420,6 +422,7 @@ struct plugin_api {
     int (*read_bmp_file)(char* filename, int *get_width, int *get_height,
                          char *bitmap, int maxsize);
 #endif
+    int (*show_logo)(void);
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */     

@@ -1,6 +1,7 @@
 /* plugins common to all models */
 battery_test.c
 chessclock.c
+credits.c
 cube.c
 favorites.c
 firmware_flash.c

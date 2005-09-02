@@ -152,15 +152,6 @@ $(BUILDDIR)/rombox.ucl: $(OBJDIR)/rombox.bin $(MAXOUTFILE)
 	  echo "fake" > $@; \
 	fi
 
-$(OBJDIR)/credits.raw: $(DOCSDIR)/CREDITS
-	@echo "create credits.raw"
-	@perl credits.pl < $< > $@
-
-$(OBJDIR)/credits.o: credits.c credits.h $(OBJDIR)/credits.raw
-	@mkdir -p `dirname $@`
-	@echo "CC $<"
-	@$(CC) $(CFLAGS) -c $< -o $@
-
 include $(TOOLSDIR)/make.inc
 
 $(OBJDIR)/build.lang: lang/$(LANGUAGE).lang $(TOOLSDIR)/uplang
@@ -180,7 +171,7 @@ clean:
 	@-rm -f $(OBJS) $(BUILDDIR)/$(BINARY) $(OBJDIR)/rockbox.asm	     \
 	$(OBJDIR)/rockbox.bin $(OBJDIR)/rockbox.elf $(OBJDIR)/*.map	     \
 	$(OBJDIR)/lang.o $(OBJDIR)/build.lang $(BUILDDIR)/lang.[ch]	     \
-	$(OBJDIR)/credits.raw $(LINKFILE) $(BUILDDIR)/rockbox.ucl $(LINKROM) \
+	$(LINKFILE) $(BUILDDIR)/rockbox.ucl $(LINKROM)                       \
 	$(BUILDDIR)/rombox.ucl $(OBJDIR)/rombox.bin $(OBJDIR)/rombox.elf     \
 	$(MAXOUTFILE) $(DEPFILE)
 	@$(MAKE) -C plugins clean OBJDIR=$(OBJDIR)/plugins
