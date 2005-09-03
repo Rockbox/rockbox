@@ -1,3 +1,4 @@
+
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
@@ -144,9 +145,9 @@ new: "Case Sensitive lajittelu"
 
 id: LANG_RESUME
 desc: in settings_menu
-eng: "Resume"
-voice: "Resume"
-new: "Jatka"
+eng: "Resume on startup"
+voice: "Jatka toistoa käynnistettäessä"
+new: "Jatka toistoa käynnistettäessä"
 
 id: LANG_OFF
 desc: Used in a lot of places
@@ -377,8 +378,12 @@ voice: ""
 new: "on täynnä!"
 
 id: LANG_RESUME_ASK
-desc: question asked at the begining when resume is on
-eng: "Resume?"
+### Description changed! Previous description was:
+### "question asked at the begining when resume is on"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "Resume?"
+eng: ""
 voice: ""
 new: "Jatka?"
 
@@ -455,20 +460,28 @@ voice: ""
 new: "[Kappale]"
 
 id: LANG_ID3_NO_TITLE
-desc: in wps when no title is avaible
-eng: "<No Title>"
+### Description changed! Previous description was:
+### "in wps when no title is avaible"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "<No Title>"
+eng: ""
 voice: ""
 new: "<Ei nimeä>"
 
 id: LANG_ID3_ARTIST
-desc: in wps 
+desc: in wps
 eng: "[Artist]"
 voice: ""
 new: "[Esittäjä]"
 
 id: LANG_ID3_NO_ARTIST
-desc: in wps when no artist is avaible
-eng: "<No Artist>"
+### Description changed! Previous description was:
+### "in wps when no artist is avaible"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "<No Artist>"
+eng: ""
 voice: ""
 new: "<Ei esittäjää>"
 
@@ -479,8 +492,12 @@ voice: ""
 new: "[Albumi]"
 
 id: LANG_ID3_NO_ALBUM
-desc: in wps when no album is avaible
-eng: "<No Album>"
+### Description changed! Previous description was:
+### "in wps when no album is avaible"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "<No Album>"
+eng: ""
 voice: ""
 new: "<Ei albumia>"
 
@@ -491,8 +508,12 @@ voice: ""
 new: "[Raidan nro]"
 
 id: LANG_ID3_NO_TRACKNUM
-desc: in wps if no track number is avaible
-eng: "<No Tracknum>"
+### Description changed! Previous description was:
+### "in wps if no track number is avaible"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "<No Tracknum>"
+eng: ""
 voice: ""
 new: "<Ei raidan nro:a>"
 
@@ -693,7 +714,7 @@ desc: confirm to reset settings
 eng: "PLAY=Reset"
 voice: ""
 new: "PLAY=Nollaa"
- 
+
 id: LANG_RESET_CANCEL
 desc: confirm to reset settings
 eng: "OFF=Cancel"
@@ -833,9 +854,15 @@ voice: "December"
 new: "Jou"
 
 id: LANG_RESUME_SETTING_ASK_ONCE
-desc: in settings_menu
-eng: "Ask Once"
-voice: "Ask Once"
+### Description changed! Previous description was:
+### "in settings_menu"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "Ask Once"
+eng: ""
+### English phrase was changed! Voice set to english. Previous voice was:
+### "Ask Once"
+voice: ""
 new: "Kysy kerran"
 
 id: LANG_BATTERY_DISPLAY
@@ -863,21 +890,39 @@ voice: "Numeric"
 new: "Numeerinen"
 
 id: LANG_PM_PERFORMANCE
-desc: in the peak meter menu
-eng: "Performance"
-voice: "Performance"
+### Description changed! Previous description was:
+### "in the peak meter menu"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "Performance"
+eng: ""
+### English phrase was changed! Voice set to english. Previous voice was:
+### "Performance"
+voice: 
 new: "Suorituskyky"
 
 id: LANG_PM_HIGH_PERFORMANCE
-desc: in the peak meter menu
-eng: "High performance"
-voice: "High performance"
+### Description changed! Previous description was:
+### "in the peak meter menu"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "High performance"
+eng: ""
+### English phrase was changed! Voice set to english. Previous voice was:
+### "High performance"
+voice: ""
 new: "Korkea suorituskyky"
 
 id: LANG_PM_ENERGY_SAVER
-desc: in the peak meter menu
-eng: "Save Energy"
-voice: "Save Energy"
+### Description changed! Previous description was:
+### "in the peak meter menu"
+desc: DEPRECATED
+### English phrase was changed! Previous translation was made on:
+### "Save Energy"
+eng: ""
+### English phrase was changed! Voice set to english. Previous voice was:
+### "Save Energy"
+voice: ""
 new: "Virransäästö"
 
 id: LANG_PM_SCALE
@@ -1651,73 +1696,73 @@ voice: "Car Adapter Mode"
 new: "Autoadapteritila"
 
 id: LANG_LINE_IN
-desc:  in settings_menu
+desc: in settings_menu
 eng: "Line In"
 voice: "Line In"
 new: "Linjatulo"
 
 id: LANG_NO_FILES
-desc:  in settings_menu
+desc: in settings_menu
 eng: "No files"
 voice: ""
 new: "Ei tiedostoja"
 
 id: LANG_BUTTONBAR_MENU
-desc:  in button bar
+desc: in button bar
 eng: "Menu"
 voice: ""
 new: "Valikko"
 
 id: LANG_FM_BUTTONBAR_PRESETS
-desc:  in button bar
+desc: in button bar
 eng: "Preset"
 voice: ""
 new: "Preset"
 
 id: LANG_FM_SAVE_PRESET
-desc:  DEPRECATED
+desc: DEPRECATED
 eng: ""
 voice: ""
 new: ""
 
 id: LANG_FM_DELETE_PRESET
-desc:  in radio screen
+desc: in radio screen
 eng: "Remove preset"
 voice: ""
 new: "Poista esivalinta"
 
 id: LANG_FM_STATION
-desc:  in radio screen
+desc: in radio screen
 eng: "Station: %d.%dMHz"
 voice: ""
 new: "Asema: %d.%dMHz"
 
 id: LANG_FM_PRESET_SAVE_FAILED
-desc:  in radio screen
+desc: in radio screen
 eng: "Preset save failed"
 voice: ""
 new: "Esivalinnan tallennus epäonnistui"
 
 id: LANG_FM_NO_PRESETS
-desc:  DEPRECATED
+desc: DEPRECATED
 eng: ""
 voice: ""
 new: ""
 
 id: LANG_FM_NO_FREE_PRESETS
-desc:  in radio screen
+desc: in radio screen
 eng: "The preset list is full"
 voice: ""
 new: "Esivalinta-lista täynnä"
 
 id: LANG_FM_RADIO
-desc:  in main menu
+desc: in main menu
 eng: "FM Radio"
 voice: "FM Radio"
 new: "FM Radio"
 
 id: LANG_FM_BUTTONBAR_RECORD
-desc:  in main menu
+desc: in main menu
 eng: "Record"
 voice: ""
 new: "Nauhoitus"
@@ -1759,19 +1804,21 @@ voice: "Pre-Record time"
 new: "Esinauhoitusaika"
 
 #Auto bookmark prompts
+
 id: LANG_BOOKMARK_AUTOLOAD_QUERY
 desc: prompt for user to decide to create a bookmark
-voice: ""
 eng: "Load Last Bookmark?"
+voice: ""
 new: "Avaa edellinen kirjanmerkki?"
 
 id: LANG_AUTO_BOOKMARK_QUERY
 desc: prompt for user to decide to create an bookmark
-voice: ""
 eng: "Create a Bookmark?"
+voice: ""
 new: "Luo kirjanmerkki?"
 
 # Bookmark Select Menu Text
+
 id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
 desc: From the auto-load screen, allows user to list all bookmarks
 eng: "Down = List"
@@ -1815,6 +1862,7 @@ voice: ""
 new: "ON+PLAY = Poista"
 
 # Bookmark creation/failure text
+
 id: LANG_BOOKMARK_CREATE_SUCCESS
 desc: Indicates bookmark was successfully created
 eng: "Bookmark Created"
@@ -1828,6 +1876,7 @@ voice: ""
 new: "Kirjanmerkki epäonnistui!"
 
 # Bookmark creation/failure text
+
 id: LANG_BOOKMARK_LOAD_EMPTY
 desc: Indicates bookmark was empty
 eng: "Bookmark Empty"
@@ -1835,6 +1884,7 @@ voice: ""
 new: "Tyhjä kirjanmerkki"
 
 # Bookmark Settings Text
+
 id: LANG_BOOKMARK_SETTINGS
 desc: in general settings
 eng: "Bookmarking"
@@ -1871,14 +1921,14 @@ eng: "Ask - Recent only"
 voice: "Ask - Recent only"
 new: "Kysy - Vain viimeaikaiset"
 
-
 id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
 desc: Save only on bookmark for each playlist in recent bookmarks
-voice: "Unique only"
 eng: "Unique only"
+voice: "Unique only"
 new: "Yksi per soittolista"
 
 # Main Bookmarks Menu
+
 id: LANG_BOOKMARK_MENU
 desc: Text on main menu to get to bookmark commands
 eng: "Bookmarks"
@@ -1952,6 +2002,7 @@ voice: "Time and Date"
 new: "Aika & Pvm"
 
 # Limits
+
 id: LANG_LIMITS_MENU
 desc: in the system sub menu
 eng: "Limits"
@@ -2641,6 +2692,7 @@ voice: "Current time:"
 new: ""
 
 #Filetypes
+
 id: LANG_FILETYPES_EXTENSION_FULL
 desc: Extension array full
 eng: "Extension array full"
@@ -2708,109 +2760,109 @@ voice: "by type"
 new: "tyypin mukaan"
 
 id: LANG_FM_EDIT_PRESET
-desc:  in radio screen
+desc: in radio screen
 eng: "Edit preset"
 voice: ""
 new: "Muokkaa esivalintoja"
 
 id: LANG_FM_MONO_MODE
-desc:  in radio screen
+desc: in radio screen
 eng: "Force mono"
 voice: ""
 new: "Pakota mono"
 
 id: LANG_FM_BUTTONBAR_EXIT
-desc:  in radio screen
+desc: in radio screen
 eng: "Exit"
 voice: ""
 new: "Poistu"
 
 id: LANG_FM_BUTTONBAR_EDIT
-desc:  DEPRECATED
+desc: DEPRECATED
 eng: ""
 voice: ""
 new: ""
 
 id: LANG_FM_BUTTONBAR_ADD
-desc:  in radio screen
+desc: in radio screen
 eng: "Add"
 voice: ""
 new: "Lisää"
 
 id: LANG_FM_BUTTONBAR_ACTION
-desc:  in radio screen
+desc: in radio screen
 eng: "Action"
 voice: ""
 new: "Toiminto"
 
 id: LANG_MDB_STRENGTH
-desc:  in sound settings
+desc: in sound settings
 eng: "MDB Strength"
 voice: "MDB Strength"
 new: "MDB voimakkuus"
 
 id: LANG_MDB_HARMONICS
-desc:  in sound settings
+desc: in sound settings
 eng: "MDB Harmonics"
 voice: "MDB Harmonics"
 new: "MDB yläsävelet"
 
 id: LANG_MDB_CENTER
-desc:  in sound settings
+desc: in sound settings
 eng: "MDB Center frequency"
 voice: "MDB Center frequency"
 new: "MDB keskitaajuus"
 
 id: LANG_MDB_SHAPE
-desc:  in sound settings
+desc: in sound settings
 eng: "MDB Shape"
 voice: "MDB Shape"
 new: "MDB muoto"
 
 id: LANG_MDB_ENABLE
-desc:  in sound settings
+desc: in sound settings
 eng: "MDB Enable"
 voice: "MDB Enable"
 new: "MDB käytössä"
 
 id: LANG_SUPERBASS
-desc:  in sound settings
+desc: in sound settings
 eng: "Super bass"
 voice: "Super bass"
 new: "Superbasso"
 
 id: LANG_SHUTDOWN
-desc:  in main menu
+desc: in main menu
 eng: "Shut down"
 voice: "Shut down"
 new: "Sammuta"
 
 id: LANG_SHUTTINGDOWN
-desc:  in main menu
+desc: in main menu
 eng: "Shutting down..."
 voice: ""
 new: "Sammutetaan..."
 
 id: LANG_CONFIRM_SHUTDOWN
-desc:  in shutdown screen
+desc: in shutdown screen
 eng: "Press OFF to shut down"
 voice: ""
 new: "Paina OFF sammuttaaksesi"
 
 id: LANG_ID3_ORDER
-desc:  in playback settings screen
+desc: in playback settings screen
 eng: "ID3 tag priority"
 voice: "ID3 tag priority"
 new: "ID3 prioriteetit"
 
 id: LANG_ID3_V1_FIRST
-desc:  in playback settings screen
+desc: in playback settings screen
 eng: "V1 then V2"
 voice: "Version 1 then version 2"
 new: "V1, V2"
 
 id: LANG_ID3_V2_FIRST
-desc:  in playback settings screen
+desc: in playback settings screen
 eng: "V2 then V1"
 voice: "Version 2 then version 1"
 new: "V2, V1"
@@ -2995,64 +3047,76 @@ eng: "Alarm Disabled"
 voice: "Alarm Disabled"
 new: "Herätys pois"
 
-###########################
 id: LANG_RECORD_TRIGGER
 desc: in recording settings_menu
 eng: "Trigger"
+voice: 
 new: "Käynnistin"
 
 id: LANG_RECORD_START_THRESHOLD
 desc: in recording settings_menu
 eng: "Start above"
+voice: 
 new: "Aloita ennen"
 
 id: LANG_RECORD_MIN_DURATION
 desc: in recording settings_menu
 eng: "for at least"
+voice: 
 new: "ainakin"
 
 id: LANG_RECORD_STOP_THRESHOLD
 desc: in recording settings_menu
 eng: "Stop below"
+voice: 
 new: "Lopeta jälkeen"
 
 id: LANG_RECORD_STOP_POSTREC
 desc: in recording settings_menu
 eng: "for at least"
+voice: 
 new: "ainakin"
 
 id: LANG_RECORD_STOP_GAP
 desc: in recording settings_menu
 eng: "Presplit gap"
+voice: 
 new: "Katkoa edeltävä väli"
 
 id: LANG_RECORD_TRIGGER_MODE
 desc: in recording settings_menu
 eng: "Trigger"
+voice: 
 new: "Käynnistin"
 
 id: LANG_RECORD_TRIG_NOREARM
 desc: in recording settings_menu
 eng: "Once"
+voice: 
 new: "Kerran"
 
 id: LANG_RECORD_TRIG_REARM
 desc: in recording settings_menu
 eng: "Repeat"
+voice: 
 new: "Toista"
 
 id: LANG_DB_INF
 desc: -inf db for values below measurement
 eng: "-inf"
+voice: 
 new: "-inf"
 
 id: LANG_RECORD_TRIG_IDLE
 desc: waiting for threshold
 eng: "Trigger idle"
+voice: 
 new: "Tyhjäkäynnistin"
 
 id: LANG_RECORD_TRIGGER_ACTIVE
+desc: 
 eng: "Trigger active"
+voice: 
 new: "Käynnistin aktiivinen"
 
 id: LANG_LCD_REMOTE_MENU
@@ -3066,7 +3130,7 @@ desc: in info menu; name for internal disk with multivolume (keep short!)
 eng: "Int:"
 voice: "Internal"
 new: "Sis:"
-  	 
+
 id: LANG_DISK_NAME_MMC
 desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
 eng: "MMC:"
@@ -3082,7 +3146,7 @@ new: "Ristivaihto"
 id: LANG_CROSSFADE_DURATION
 desc: in playback settings
 eng: "Crossfade duration"
-voice: ""
+voice: "Ristivaihdon kesto"
 new: "Ristivaihdon kesto"
 
 id: LANG_SHUFFLE_PLAYLIST
@@ -3094,7 +3158,7 @@ new: "Sekoita uudelleen"
 id: LANG_INSERT_SHUFFLED
 desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
 eng: "Insert shuffled"
-voice: ""
+voice: "Lisää ja sekoita"
 new: "Lisää ja sekoita"
 
 id: LANG_SPDIF_ENABLE
@@ -3118,13 +3182,13 @@ new: "Kerää soittotilastoja (koekäytössä)"
 id: LANG_MENU_SET_RATING
 desc: in wps context menu
 eng: "Set song rating"
-voice: ""
+voice: "Pisteytä kappale"
 new: "Pisteytä kappale"
 
 id: LANG_RATING
 desc: in set_rating
 eng: "Rating:"
-voice "Rating"
+voice: 
 new: "Luokittelu:"
 
 id: LANG_MIX
@@ -3138,3 +3202,130 @@ desc: splash screen displayed when pcm buffer size is changed
 eng: "Restarting playback..."
 voice: "Restarting playback..."
 new: "Jatketaan toistoa..."
+
+id: LANG_BACKLIGHT_FADE_IN
+desc: in settings_menu
+eng: "Backlight fade in"
+voice: "Taustavalon sisäänhäivytys"
+new: "Taustavalon sisäänhäivytys"
+
+id: LANG_BACKLIGHT_FADE_OUT
+desc: in settings_menu
+eng: "Backlight fade out"
+voice: "Taustavalon poishäivytys"
+new: "Taustavalon poishäivytys"
+
+id: LANG_NOTHING_TO_RESUME
+desc: Error message displayed when resume button pressed but no playlist
+eng: "Nothing to resume"
+voice: "Tyhjä soittolista"
+new: "Tyhjä soittolista"
+
+id: LANG_REPLAYGAIN
+desc: in replaygain
+eng: "Replaygain"
+voice: "Replaygain"
+new: "Replaygain"
+
+id: LANG_REPLAYGAIN_ENABLE
+desc: in replaygain
+eng: "Enable replaygain"
+voice: "Ota käyttöön Replaygain"
+new: "Ota käyttöön Replaygain"
+
+id: LANG_REPLAYGAIN_NOCLIP
+desc: in replaygain
+eng: "Prevent clipping"
+voice: "Estä leikkautuminen"
+new: "Estä leikkautuminen"
+
+id: LANG_REPLAYGAIN_MODE
+desc: in replaygain
+eng: "Replaygain type"
+voice: "Replaygainin tyyppi"
+new: "Replaygainin tyyppi"
+
+id: LANG_TRACK_GAIN
+desc: in replaygain
+eng: "Track gain"
+voice: "Track gain"
+new: "Track gain"
+
+id: LANG_ALBUM_GAIN
+desc: in replaygain
+eng: "Album gain"
+voice: "Album gain"
+new: "Album gain"
+
+id: LANG_ID3_TRACK_GAIN
+desc: in browse_id3
+eng: "[Track gain]"
+voice: "Track gain"
+new: "[Track gain]"
+
+id: LANG_ID3_ALBUM_GAIN
+desc: in browse_id3
+eng: "[Album gain]"
+voice: "Album gain"
+new: "[Album gain]"
+
+id: LANG_ID3_NO_GAIN
+desc: DEPRECATED
+eng: ""
+### Not previously translated
+voice: 
+new: 
+
+id: LANG_BIDI_SUPPORT
+desc: in settings_menu, option to enable reversal of hebrew/arabic text
+eng: "BiDi Hebrew/Arabic"
+voice: "BiDi Hebrea/Arabia"
+new: "BiDi Hebrea/Arabia"
+
+id: LANG_REPLAYGAIN_PREAMP
+desc: in browse_id3
+eng: "Pre-amp"
+voice: "Esivahvistus"
+new: "Esivahvistus"
+
+id: LANG_UNIT_DB
+desc: in browse_id3
+eng: "dB"
+voice: "desibeli"
+new: "dB"
+
+id: LANG_ID3_VBR
+desc: in browse_id3
+eng: " (VBR)"
+voice: ""
+new: " (VBR)"
+
+id: LANG_BEEP
+desc: in playback settings
+eng: "Beep volume"
+voice: "Piippauksen voimakkuus"
+new: "Piippauksen voimakkuus"
+
+id: LANG_WEAK
+desc: in beep volume in playback settings
+eng: "Weak"
+voice: "Heikko"
+new: "Heikko"
+
+id: LANG_MODERATE
+desc: in beep volume in playback settings
+eng: "Moderate"
+voice: "Keskinkertainen"
+new: "Keskinkertainen"
+
+id: LANG_STRONG
+desc: in beep volume in playback settings
+eng: "Strong"
+voice: "Voimakas"
+new: "Voimakas"
+
+id: LANG_REPEAT_AB
+desc: repeat one song
+eng: "A-B"
+voice: "A-B"
+new: "A-B"
