@@ -128,12 +128,12 @@ new: "buffer vol"
 id: LANG_PLAYINDICES_AMOUNT
 desc: number of files in playlist
 eng: "%d files"
-new: "%d lÃªers"
+new: "%d lêers"
 
 id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
 eng: "Save failed"
-new: "BÃªre gebreek"
+new: "Bêre gebreek"
 
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
@@ -143,7 +143,7 @@ new: "Batt. leeg?"
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
 eng: "Save failed"
-new: "BÃªre gebreek"
+new: "Bêre gebreek"
 
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
@@ -323,7 +323,7 @@ new: "Speel"
 id: LANG_FILE
 desc: in settings_menu()
 eng: "File View"
-new: "LÃªers"
+new: "Lêers"
 
 id: LANG_DISPLAY
 desc: in settings_menu()
@@ -783,7 +783,7 @@ new: "Nuwe Taal"
 id: LANG_FILTER
 desc: setting name for dir filter
 eng: "Show Files"
-new: "Wys LÃªers"
+new: "Wys Lêers"
 
 id: LANG_FILTER_MUSIC
 desc: show only music-related files
