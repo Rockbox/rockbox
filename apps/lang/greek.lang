@@ -145,8 +145,8 @@ new: "Ταξινόμηση κατά Πεζά/Κεφαλαία
 
 id: LANG_RESUME
 desc: in settings_menu
-eng: "Resume"
-voice: "Resume"
+eng: "Resume on startup"
+voice: "Resume on startup"
 new: "Συνέχεια"
 
 id: LANG_OFF
@@ -171,7 +171,7 @@ id: LANG_BACKLIGHT
 desc: in settings_menu
 eng: "Backlight"
 voice: "Backlight"
-new: "Οπισθοφωτισμός"
+new: "Φωτισμός"
 
 id: LANG_SCROLL
 desc: in settings_menu
@@ -378,8 +378,8 @@ voice:
 new: "Γεμάτο!"
 
 id: LANG_RESUME_ASK
-desc: question asked at the begining when resume is on
-eng: "Resume?"
+desc: DEPRECATED
+eng: ""
 voice: 
 new: "Συνέχεια;"
 
@@ -456,34 +456,34 @@ voice:
 new: "[Τίτλος]"
 
 id: LANG_ID3_NO_TITLE
-desc: in wps when no title is avaible
-eng: "<No Title>"
+desc: DEPRECATED
+eng: ""
 voice: 
 new: "<Χωρίς Τίτλο>"
 
 id: LANG_ID3_ARTIST
-desc: in wps 
+desc: in wps
 eng: "[Artist]"
 voice: 
 new: "[Καλλιτέχνης]"
 
 id: LANG_ID3_NO_ARTIST
-desc: in wps when no artist is avaible
-eng: "<No Artist>"
+desc: DEPRECATED
+eng: ""
 voice: 
-new: "<Άγνωστος>"
+new: "<’γνωστος>"
 
 id: LANG_ID3_ALBUM
 desc: in wps
 eng: "[Album]"
 voice: 
-new: "[Άλμπουμ]"
+new: "[’λμπουμ]"
 
 id: LANG_ID3_NO_ALBUM
-desc: in wps when no album is avaible
-eng: "<No Album>"
+desc: DEPRECATED
+eng: ""
 voice: 
-new: "<Χωρίς Άλμπουμ>"
+new: "<Χωρίς ’λμπουμ>"
 
 id: LANG_ID3_TRACKNUM
 desc: in wps
@@ -492,8 +492,8 @@ voice:
 new: "[Αριθμός Κομματιού]"
 
 id: LANG_ID3_NO_TRACKNUM
-desc: in wps if no track number is avaible
-eng: "<No Tracknum>"
+desc: DEPRECATED
+eng: ""
 voice: 
 new: "<Xωρίς Αριθμό Κομματιού>"
 
@@ -549,7 +549,7 @@ id: LANG_F2_MODE
 desc: in wps F2 pressed
 eng: "Mode:"
 voice: 
-new: "Mode:"
+new: "Τρόπος:"
 
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
@@ -669,7 +669,7 @@ id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
 eng: "Backlight On When Plugged"
 voice: "Backlight On When Plugged"
-new: "Οποσθοφωτισμός Ενεργός Όταν Συνδεμένο"
+new: "Φωτισμός Ενεργοποιημένος σε Σύνδεση"
 
 id: LANG_REPEAT
 desc: in settings_menu
@@ -834,9 +834,9 @@ voice: "December"
 new: "Δεκ"
 
 id: LANG_RESUME_SETTING_ASK_ONCE
-desc: in settings_menu
-eng: "Ask Once"
-voice: "Ask Once"
+desc: DEPRECATED
+eng: ""
+voice: ""
 new: "Με Ερώτηση"
 
 id: LANG_BATTERY_DISPLAY
@@ -864,21 +864,21 @@ voice: "Numeric"
 new: "Αριθμητική"
 
 id: LANG_PM_PERFORMANCE
-desc: in the peak meter menu
-eng: "Performance"
-voice: "Performance"
+desc: DEPRECATED
+eng: ""
+voice: 
 new: "Επιδόση"
 
 id: LANG_PM_HIGH_PERFORMANCE
-desc: in the peak meter menu
-eng: "High performance"
-voice: "High performance"
+desc: DEPRECATED
+eng: ""
+voice: ""
 new: "Υψηλή Επίδοση"
 
 id: LANG_PM_ENERGY_SAVER
-desc: in the peak meter menu
-eng: "Save Energy"
-voice: "Save Energy"
+desc: DEPRECATED
+eng: ""
+voice: ""
 new: "Εξοικονόμηση Ενέργειας"
 
 id: LANG_PM_SCALE
@@ -937,6 +937,7 @@ new: "Δεξί"
 
 id: LANG_RECORDING_QUALITY
 desc: in the recording settings
+eng: "Quality"
 voice: "Quality"
 new: "Ποιότητα"
 
@@ -1268,7 +1269,7 @@ id: LANG_INVERT
 desc: in settings_menu
 eng: "LCD Mode"
 voice: "LCD Mode"
-new: "LCD Mode"
+new: "Κατάσταση LCD"
 
 id: LANG_CHANNEL_STEREO_NARROW_PLAYER
 desc: DEPRECATED
@@ -1430,7 +1431,7 @@ id: LANG_DISK_FULL
 desc: in recording screen
 eng: "The disk is full. Press OFF to continue."
 voice: ""
-new: "Γεμάτος δίσκος. Πατήστε Απενεργοποίηση για συνέχεια" 
+new: "Ο δίσκος είναι γεμάτος. Πατήστε Απενεργοποίηση για συνέχεια" 
 
 id: LANG_CONFIRM_WITH_PLAY_RECORDER
 desc: Generic recorder string to use to confirm
@@ -1442,7 +1443,7 @@ id: LANG_CANCEL_WITH_ANY_RECORDER
 desc: Generic recorder string to use to cancel
 eng: "Any Other = No"
 voice: ""
-new: "Οποιοδήποτε Άλλο = Όχι"
+new: "Οποιοδήποτε ’λλο = Όχι"
 
 id: LANG_PLUGIN_CANT_OPEN
 desc: Plugin open error message
@@ -1478,7 +1479,7 @@ id: LANG_BOOT_CHANGED
 desc: File browser discovered the boot file was changed
 eng: "Boot changed"
 voice: ""
-new: "Αλλαγή boot"
+new: "Αλλαγή αρχείου εκκίνησης"
 
 id: LANG_REBOOT_NOW
 desc: Do you want to reboot?
@@ -1586,7 +1587,7 @@ id: LANG_PLAYLIST_CONTROL_INVALID
 desc: Playlist resume error
 eng: "Playlist control file is invalid"
 voice: ""
-new: "Άκυρο αρχείο ελέγχου λίστας αναπαραγωγής"
+new: "’κυρο αρχείο ελέγχου λίστας αναπαραγωγής"
 
 id: LANG_RECURSE_DIRECTORY
 desc: In playlist menu
@@ -1820,7 +1821,7 @@ id: LANG_BOOKMARK_LOAD_EMPTY
 desc: Indicates bookmark was empty
 eng: "Bookmark Empty"
 voice: ""
-new: "Σελιδοδείκτης Άδειος"
+new: "Σελιδοδείκτης ’δειος"
 
 id: LANG_BOOKMARK_SETTINGS
 desc: in general settings
@@ -2396,7 +2397,7 @@ id: LANG_VOICE_SPELL
 desc: "talkbox" mode for files+directories
 eng: "Spell"
 voice: "Spell"
-new: "Συλάβιση"
+new: "Συλλαβισμός"
 
 id: VOICE_CHAR_A
 desc: spoken only, for spelling
@@ -2612,7 +2613,7 @@ id: LANG_DELETE_DIR
 desc: in on+play menu
 eng: "Delete directory"
 voice: "delete directory"
-new: "Διαγραφλη καταλόγου"
+new: "Διαγραφή καταλόγου"
 
 id: VOICE_CURRENT_TIME
 desc: spoken only, for wall clock announce
@@ -2636,7 +2637,7 @@ id: LANG_FILETYPES_PLUGIN_NAME_LONG
 desc: Viewer plugin name too long
 eng: "Plugin name too long"
 voice: ""
-new: "Όνομα plugin υπερμεγεθές"
+new: "Όνομα plugin υπερμέγεθες "
 
 id: LANG_FILETYPES_STRING_BUFFER_EMPTY
 desc: Filetype string buffer empty
@@ -2648,7 +2649,7 @@ id: LANG_ONPLAY_OPEN_WITH
 desc: Onplay open with
 eng: "Open with"
 voice: "open with"
-new: "Άνοιγμα μέ"
+new: "’νοιγμα με"
 
 id: LANG_SORT_DIR
 desc: browser sorting setting
@@ -2810,7 +2811,7 @@ id: LANG_REMOVE_MMC
 desc: before acknowledging usb in case an MMC is inserted (Ondio)
 eng: "Please remove inserted MMC"
 voice: "Please remove multimedia card"
-new: "Παρακαλώ αφαιρέστε όποιες MMC"
+new: "Παρακαλώ αφαιρέστε την κάρτα MMC"
 
 id: VOICE_DOT
 desc: spoken only, for spelling
@@ -2852,7 +2853,7 @@ id: LANG_ID3DB_ALBUMS
 desc: ID3 virtual folder name
 eng: "Albums"
 voice: ""
-new: "Άλμπουμς"
+new: "’λμπουμς"
 
 id: LANG_ID3DB_SONGS
 desc: ID3 virtual folder name
@@ -2876,7 +2877,7 @@ id: LANG_ID3DB_SEARCH_ALBUMS
 desc: ID3 virtual folder name
 eng: "Search Albums"
 voice: ""
-new: "Αναζήτηση Άλμπουμ"
+new: "Αναζήτηση ’λμπουμ"
 
 id: LANG_ID3DB_SEARCH_SONGS
 desc: ID3 virtual folder name
@@ -2906,7 +2907,7 @@ id: LANG_BATTERY_TYPE_NIMH
 desc: in battery settings
 eng: "NiMH"
 voice: "Nickel metal hydride"
-new: "NiMH"
+new: "Νικελίου Υβριδίων Μετάλλου"
 
 id: LANG_POINT
 desc: decimal separator for composing numbers
@@ -2973,3 +2974,285 @@ desc: Announce that the RTC alarm has been turned off
 eng: "Alarm Disabled"
 voice: "Alarm Disabled"
 new: "Αφύπνιση Ανενεργή"
+
+id: LANG_RECORD_TRIGGER
+desc: in recording settings_menu
+eng: "Trigger"
+voice: 
+new: "Ενεργοποίηση"
+
+id: LANG_RECORD_START_THRESHOLD
+desc: in recording settings_menu
+eng: "Start above"
+voice: 
+new: "Έναρξη από πάνω"
+
+id: LANG_RECORD_MIN_DURATION
+desc: in recording settings_menu
+eng: "for at least"
+voice: 
+new: "για τουλάχιστον"
+
+id: LANG_RECORD_STOP_THRESHOLD
+desc: in recording settings_menu
+eng: "Stop below"
+voice: 
+new: "Διακοπή στο τέλος"
+
+id: LANG_RECORD_STOP_POSTREC
+desc: in recording settings_menu
+eng: "for at least"
+voice: 
+new: "για τουλάχιστον"
+
+id: LANG_RECORD_STOP_GAP
+desc: in recording settings_menu
+eng: "Presplit gap"
+voice: 
+new: "Κενό διαχώρισης"
+
+id: LANG_RECORD_TRIGGER_MODE
+desc: in recording settings_menu
+eng: "Trigger"
+voice: 
+new: "Ενεργοποίηση"
+
+id: LANG_RECORD_TRIG_NOREARM
+desc: in recording settings_menu
+eng: "Once"
+voice: 
+new: "Μια φορά"
+
+id: LANG_RECORD_TRIG_REARM
+desc: in recording settings_menu
+eng: "Repeat"
+voice: 
+new: "Επανάληψη"
+
+id: LANG_DB_INF
+desc: -inf db for values below measurement
+eng: "-inf"
+voice: 
+new: "-άπειρο"
+
+id: LANG_RECORD_TRIG_IDLE
+desc: waiting for threshold
+eng: "Trigger idle"
+voice: 
+new: "Ενεργοποίηση ελεύθερη"
+
+id: LANG_RECORD_TRIGGER_ACTIVE
+desc: 
+eng: "Trigger active"
+voice: 
+new: "Ενεργοποίηση ενεργή"
+
+id: LANG_LCD_REMOTE_MENU
+desc: in the display sub menu
+eng: "Remote-LCD Settings"
+voice: 
+new: "Επιλογές LCD-Χειριστηρίου"
+
+id: LANG_DISK_NAME_INTERNAL
+desc: in info menu; name for internal disk with multivolume (keep short!)
+eng: "Int:"
+voice: "Internal"
+new: "Εσωτ."
+
+id: LANG_DISK_NAME_MMC
+desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
+eng: "MMC:"
+voice: "Multimedia card"
+new: "MMC"
+
+id: LANG_CROSSFADE
+desc: in playback settings
+eng: "Crossfade"
+voice: "Crossfade"
+new: "Crossfade"
+
+id: LANG_BACKLIGHT_FADE_IN
+desc: in settings_menu
+eng: "Backlight fade in"
+voice: "Backlight fade in"
+new: "Σταδιακή ενεργοποίηση φωτισμού" 
+
+id: LANG_BACKLIGHT_FADE_OUT
+desc: in settings_menu
+eng: "Backlight fade out"
+voice: "Backlight fade out"
+new: "Σταδιακή απενεργοποίηση φωτισμού" 
+
+id: LANG_SHUFFLE_PLAYLIST
+desc: in playlist menu, reshuffles the order in which songs are played
+eng: "Reshuffle"
+voice: "Reshuffle"
+new: "Ανακάτεμα ξανά"
+
+id: LANG_NOTHING_TO_RESUME
+desc: Error message displayed when resume button pressed but no playlist
+eng: "Nothing to resume"
+voice: ""
+new: "Τίποτα για συνέχιση"
+
+id: LANG_INSERT_SHUFFLED
+desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
+eng: "Insert shuffled"
+voice: "Insert shuffled"
+new: "Εισαγωγή ως ανακατεμένο"
+
+id: LANG_SPDIF_ENABLE
+desc: in playback settings menu. enable/disable the optical out
+eng: "Optical output"
+voice: "Optical output"
+new: "Οπτική έξοδος"
+
+id: LANG_NEXT_FOLDER
+desc: in settings_menu.  Should we move to next folder when current one ends
+eng: "Move to Next Folder"
+voice: "Move to Next Folder"
+new: "Μετακίνηση στον επόμενο φάκελο"
+
+id: LANG_RUNTIMEDB_ACTIVE
+desc: in settings_menu.
+eng: "Gather runtime data (experimental)"
+voice: "Gather runtime data"
+new: "Συγκέντρωση δεδομένων χρόνου αναπαραγωγής"
+
+id: LANG_MENU_SET_RATING
+desc: in wps context menu
+eng: "Set song rating"
+voice: "Set song rating"
+new: "Θέστε εκτίμηση κομματιού"
+
+id: LANG_RATING
+desc: in set_rating
+eng: "Rating:"
+voice: 
+new: "Εκτίμηση"
+
+id: LANG_CROSSFADE_DURATION
+desc: in playback settings
+eng: "Crossfade duration"
+voice: "Crossfade duration"
+new: "Διάρκεια Crossfade"
+
+id: LANG_MIX
+desc: in playback settings, crossfade option
+eng: "Mix"
+voice: "Mix"
+new: "Μίξη"
+
+id: LANG_RESTARTING_PLAYBACK
+desc: splash screen displayed when pcm buffer size is changed
+eng: "Restarting playback..."
+voice: "Restarting playback..."
+new: "Επανεκκίνηση αναπαραγωγής"
+
+id: LANG_REPLAYGAIN
+desc: in replaygain
+eng: "Replaygain"
+voice: 
+new: "Replaygain"
+
+id: LANG_REPLAYGAIN_ENABLE
+desc: in replaygain
+eng: "Enable replaygain"
+voice: 
+new: "Ενεργοποίηση Replaygain"
+
+id: LANG_REPLAYGAIN_NOCLIP
+desc: in replaygain
+eng: "Prevent clipping"
+voice: 
+new: "Αποφυγή ψαλιδίσματος (clipping)"
+
+id: LANG_REPLAYGAIN_MODE
+desc: in replaygain
+eng: "Replaygain type"
+voice: 
+new: "Τύπος Replaygain"
+
+id: LANG_TRACK_GAIN
+desc: in replaygain
+eng: "Track gain"
+voice: 
+new: "Replaygain κομματιού"
+
+id: LANG_ALBUM_GAIN
+desc: in replaygain
+eng: "Album gain"
+voice: 
+new: "Replaygain ’λμπουμ"
+
+id: LANG_ID3_TRACK_GAIN
+desc: in browse_id3
+eng: "[Track gain]"
+voice: 
+new: "[Replaygain κομματιού]"
+
+id: LANG_ID3_ALBUM_GAIN
+desc: in browse_id3
+eng: "[Album gain]"
+voice: 
+new: "[Replaygain ’λμπουμ]"
+
+id: LANG_ID3_NO_GAIN
+desc: DEPRECATED
+eng: ""
+voice: 
+new: 
+
+id: LANG_BIDI_SUPPORT
+desc: in settings_menu, option to enable reversal of hebrew/arabic text
+eng: "BiDi Hebrew/Arabic"
+voice: 
+new: "Εβραϊκή/Αραβική Γραφή"
+
+id: LANG_REPLAYGAIN_PREAMP
+desc: in browse_id3
+eng: "Pre-amp"
+voice: 
+new: "Προ-ενίσχυση"
+
+id: LANG_UNIT_DB
+desc: in browse_id3
+eng: "dB"
+voice: 
+new: "dB"
+
+id: LANG_ID3_VBR
+desc: in browse_id3
+eng: " (VBR)"
+voice: 
+new: " (VBR)"
+
+id: LANG_BEEP
+desc: in playback settings
+eng: "Beep volume"
+voice: 
+new: "Ένταση ηχητικού σήματος"
+
+id: LANG_WEAK
+desc: in beep volume in playback settings
+eng: "Weak"
+voice: 
+new: "Αδύναμη"
+
+id: LANG_MODERATE
+desc: in beep volume in playback settings
+eng: "Moderate"
+voice: 
+new: "Μέτρια"
+
+id: LANG_STRONG
+desc: in beep volume in playback settings
+eng: "Strong"
+voice: 
+new: "Δυνατή"
+
+id: LANG_REPEAT_AB
+desc: repeat one song
+eng: "A-B"
+voice: "A-B"
+new: "Α-Β"
