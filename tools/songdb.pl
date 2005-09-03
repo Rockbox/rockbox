@@ -191,7 +191,8 @@ sub crc32 {
     my $len = 32*1024;
 
     if(!$crc) {
-        return 1; # fixed bad CRC when disabled!
+        return 0; # fixed bad CRC when disabled! 
+      # better to set to 0 cause the rundb code will handle it better that way.
     }
 
     if(!open(FILE, "<$filename")) {
