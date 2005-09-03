@@ -457,22 +457,22 @@ voice: ""
 new: "[Titel]"
 
 id: LANG_ID3_NO_TITLE
-desc: in wps when no title is avaible
-eng: "<No Title>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "<geen titel>"
+new: ""
 
 id: LANG_ID3_ARTIST
-desc: in wps 
+desc: in wps
 eng: "[Artist]"
 voice: ""
 new: "[Artiest]"
 
 id: LANG_ID3_NO_ARTIST
-desc: in wps when no artist is avaible
-eng: "<No Artist>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "<geen artiest>"
+new: ""
 
 id: LANG_ID3_ALBUM
 desc: in wps
@@ -481,10 +481,10 @@ voice: ""
 new: "[Album]"
 
 id: LANG_ID3_NO_ALBUM
-desc: in wps when no album is avaible
-eng: "<No Album>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "<geen album>"
+new: ""
 
 id: LANG_ID3_TRACKNUM
 desc: in wps
@@ -493,10 +493,10 @@ voice: ""
 new: "[Tracknum]"
 
 id: LANG_ID3_NO_TRACKNUM
-desc: in wps if no track number is avaible
-eng: "<No Tracknum>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new: "<geen tracknum>"
+new: ""
 
 id: LANG_ID3_LENGHT
 desc: in wps
@@ -859,16 +859,16 @@ voice: "Logarithmisch decibel"
 new: "Logaritmisch(dB)" 
 
 id: LANG_PM_ENERGY_SAVER
-desc: in the peak meter menu
-eng: "Save Energy"
-voice: "Laag(Spaar Energie)"
-new: "Laag(Spaar Energie)" 
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: "" 
 
 id: LANG_PM_HIGH_PERFORMANCE
-desc: in the peak meter menu
-eng: "High performance"
-voice: "Hoog"
-new: "Hoog" 
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: "" 
 
 id: LANG_PM_LINEAR
 desc: in the peak meter menu
@@ -889,10 +889,10 @@ voice: "Minimaal Bereik"
 new: "Minimaal Bereik" 
 
 id: LANG_PM_PERFORMANCE
-desc: in the peak meter menu
-eng: "Performance"
-voice: "Nauwkeurigheid"
-new: "Nauwkeurigheid" 
+desc: DEPRECATED
+eng: ""
+voice: 
+new: "" 
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
@@ -1321,10 +1321,10 @@ voice: ""
 new: ""
 
 id: LANG_INVERT_CURSOR
-desc: in settings_menu
-eng: "Line Selector"
-voice: "Regel Cursor"
-new: "Regel Cursor"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_RECORDING_EDITABLE
 desc: Editable recordings setting
@@ -1351,16 +1351,16 @@ voice: "Backlight Flits"
 new: "Backlight Flits" 
 
 id: LANG_INVERT_CURSOR_BAR
-desc: in settings_menu
-eng: "Bar(Inverse)"
-voice: "Regel(geïnverteerd)"
-new: "Regel(geïnverteerd)" 
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: "" 
 
 id: LANG_INVERT_CURSOR_POINTER
-desc: in settings_menu
-eng: "Pointer"
-voice: "Wijzer"
-new: "Wijzer" 
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: "" 
 
 id: LANG_INVERT_LCD_INVERSE
 desc: in settings_menu
@@ -1756,7 +1756,7 @@ id: LANG_AUTO_BOOKMARK_QUERY
 desc: prompt for user to decide to create an bookmark
 eng: "Create a Bookmark?"
 voice: 
-new: "Maak en bladwijzer?" 
+new: "Maak een bladwijzer?" 
 
 id: LANG_BARS_MENU
 desc: in the display sub menu
@@ -2080,319 +2080,319 @@ id: VOICE_BILLION
 desc: spoken only, for composing numbers
 eng: ""
 voice: "biljoen"
-new: 
+new: "" 
 
 id: VOICE_DB
 desc: spoken only, a unit postfix
 eng: ""
 voice: "decibel"
-new: 
+new: ""
 
 id: VOICE_DIR
 desc: spoken only, prefix for directory number
 eng: ""
 voice: "map"
-new: 
+new: ""
 
 id: VOICE_EIGHT
 desc: spoken only, for composing numbers
 eng: ""
 voice: "8"
-new: 
+new: ""
 
 id: VOICE_EIGHTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "18"
-new: 
+new: ""
 
 id: VOICE_EIGHTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "80"
-new: 
+new: ""
 
 id: VOICE_ELEVEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "11"
-new: 
+new: ""
 
 id: VOICE_FIFE
 desc: spoken only, for composing numbers
 eng: ""
 voice: "5"
-new: 
+new: ""
 
 id: VOICE_FIFTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "15"
-new: 
+new: ""
 
 id: VOICE_FIFTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "50"
-new: 
+new: ""
 
 id: VOICE_FILE
 desc: spoken only, prefix for file number
 eng: ""
 voice: "bestand"
-new: 
+new: ""
 
 id: VOICE_FORTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "40"
-new: 
+new: ""
 
 id: VOICE_FOUR
 desc: spoken only, for composing numbers
 eng: ""
 voice: "4"
-new: 
+new: ""
 
 id: VOICE_FOURTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "14"
-new: 
+new: ""
 
 id: VOICE_GIGABYTE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: ""
 
 id: VOICE_HERTZ
 desc: spoken only, a unit postfix
 eng: ""
 voice: "hertz"
-new: 
+new: ""
 
 id: VOICE_HOUR
 desc: spoken only, a unit postfix
 eng: ""
 voice: "uur"
-new: 
+new: ""
 
 id: VOICE_HOURS
 desc: spoken only, a unit postfix
 eng: ""
 voice: "uren"
-new: 
+new: ""
 
 id: VOICE_HUNDRED
 desc: spoken only, for composing numbers
 eng: ""
 voice: "honderd"
-new: 
+new: ""
 
 id: VOICE_KHZ
 desc: spoken only, a unit postfix
 eng: ""
 voice: "kilohertz"
-new: 
+new: ""
 
 id: VOICE_MEGABYTE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: ""
 
 id: VOICE_MILLIAMPHOURS
 desc: spoken only, a unit postfix
 eng: ""
 voice: "milli-amp uur"
-new: 
+new: ""
 
 id: VOICE_MILLION
 desc: spoken only, for composing numbers
 eng: ""
 voice: "miljoen"
-new: 
+new: ""
 
 id: VOICE_MILLISECONDS
 desc: spoken only, a unit postfix
 eng: ""
 voice: "milliseconden"
-new: 
+new: ""
 
 id: VOICE_MINUS
 desc: spoken only, for composing numbers
 eng: ""
 voice: "minus"
-new: 
+new: ""
 
 id: VOICE_MINUTE
 desc: spoken only, a unit postfix
 eng: ""
 voice: "minuut"
-new: 
+new: ""
 
 id: VOICE_MINUTES
 desc: spoken only, a unit postfix
 eng: ""
 voice: "minuten"
-new: 
+new: ""
 
 id: VOICE_NINE
 desc: spoken only, for composing numbers
 eng: ""
 voice: "9"
-new: 
+new: ""
 
 id: VOICE_NINETEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "19"
-new: 
+new: ""
 
 id: VOICE_NINETY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "90"
-new: 
+new: ""
 
 id: VOICE_ONE
 desc: spoken only, for composing numbers
 eng: ""
 voice: "1"
-new: 
+new: ""
 
 id: VOICE_PERCENT
 desc: spoken only, a unit postfix
 eng: ""
 voice: "procent"
-new: 
+new: ""
 
 id: VOICE_PER_SEC
 desc: spoken only, a unit postfix
 eng: ""
 voice: "per seconde"
-new: 
+new: ""
 
 id: VOICE_PIXEL
 desc: spoken only, a unit postfix
 eng: ""
 voice: "pixel"
-new: 
+new: ""
 
 id: VOICE_PLUS
 desc: spoken only, for composing numbers
 eng: ""
 voice: "plus"
-new: 
+new: ""
 
 id: VOICE_POINT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: ""
 
 id: VOICE_SECOND
 desc: spoken only, a unit postfix
 eng: ""
 voice: "seconde"
-new: 
+new: ""
 
 id: VOICE_SECONDS
 desc: spoken only, a unit postfix
 eng: ""
 voice: "seconden"
-new: 
+new: ""
 
 id: VOICE_SEVEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "7"
-new: 
+new: ""
 
 id: VOICE_SEVENTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "17"
-new: 
+new: ""
 
 id: VOICE_SEVENTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "70"
-new: 
+new: ""
 
 id: VOICE_SIX
 desc: spoken only, for composing numbers
 eng: ""
 voice: "6"
-new: 
+new: ""
 
 id: VOICE_SIXTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "16"
-new: 
+new: ""
 
 id: VOICE_SIXTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "60"
-new: 
+new: ""
 
 id: VOICE_TEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "10"
-new: 
+new: ""
 
 id: VOICE_THIRTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "13"
-new: 
+new: ""
 
 id: VOICE_THIRTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "30"
-new: 
+new: ""
 
 id: VOICE_THOUSAND
 desc: spoken only, for composing numbers
 eng: ""
 voice: "Duizend"
-new: 
+new: ""
 
 id: VOICE_THREE
 desc: spoken only, for composing numbers
 eng: ""
 voice: "3"
-new: 
+new: ""
 
 id: VOICE_TWELVE
 desc: spoken only, for composing numbers
 eng: ""
 voice: "12"
-new: 
+new: ""
 
 id: VOICE_TWENTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "20"
-new: 
+new: ""
 
 id: VOICE_TWO
 desc: spoken only, for composing numbers
 eng: ""
 voice: "2"
-new: 
+new: ""
 
 id: VOICE_ZERO
 desc: spoken only, for composing numbers
 eng: ""
 voice: "0"
-new: 
+new: ""
 
 id: LANG_DELETE_DIR
 desc: in on+play menu
@@ -2476,43 +2476,43 @@ id: VOICE_CHAR_A
 desc: spoken only, for spelling
 eng: ""
 voice: "A"
-new: 
+new: ""
 
 id: VOICE_CHAR_B
 desc: spoken only, for spelling
 eng: ""
 voice: "B"
-new: 
+new: ""
 
 id: VOICE_CHAR_C
 desc: spoken only, for spelling
 eng: ""
 voice: "C"
-new: 
+new: ""
 
 id: VOICE_CHAR_D
 desc: spoken only, for spelling
 eng: ""
 voice: "D"
-new: 
+new: ""
 
 id: VOICE_CHAR_E
 desc: spoken only, for spelling
 eng: ""
 voice: "E"
-new: 
+new: ""
 
 id: VOICE_CHAR_F
 desc: spoken only, for spelling
 eng: ""
 voice: "F"
-new: 
+new: ""
 
 id: VOICE_CHAR_G
 desc: spoken only, for spelling
 eng: ""
 voice: "G"
-new: 
+new: ""
 
 id: VOICE_CHAR_H
 desc: spoken only, for spelling
@@ -2524,25 +2524,25 @@ id: VOICE_CHAR_I
 desc: spoken only, for spelling
 eng: ""
 voice: "I"
-new: 
+new: ""
 
 id: VOICE_CHAR_J
 desc: spoken only, for spelling
 eng: ""
 voice: "J"
-new: 
+new: ""
 
 id: VOICE_CHAR_K
 desc: spoken only, for spelling
 eng: ""
 voice: "K"
-new: 
+new: ""
 
 id: VOICE_CHAR_L
 desc: spoken only, for spelling
 eng: ""
 voice: "L"
-new: 
+new: ""
 
 id: VOICE_CHAR_M
 desc: spoken only, for spelling
@@ -2710,7 +2710,7 @@ id: LANG_FM_BUTTONBAR_EDIT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: ""
 
 id: LANG_FM_BUTTONBAR_ADD
 desc: in radio screen
@@ -2818,13 +2818,13 @@ id: VOICE_DOT
 desc: spoken only, for spelling
 eng: ""
 voice: "punt"
-new: 
+new: ""
 
 id: VOICE_PAUSE
 desc: spoken only, for spelling, a split second of silence (difficult to author)
 eng: ""
 voice: " "
-new: 
+new: ""
 
 id: LANG_STEREO_WIDTH
 desc: in sound_settings
@@ -3113,3 +3113,147 @@ desc: in settings_menu.  Should we move to next folder when current one ends
 eng: "Move to Next Folder"
 voice: "Ga naar volgende map"
 new: "Ga naar volgende map"
+
+id: LANG_RUNTIMEDB_ACTIVE
+desc: in settings_menu.
+eng: "Gather runtime data (experimental)"
+voice: "Verzamel runtime data"
+new: "Verzamel runtime datat"
+
+id: LANG_MENU_SET_RATING
+desc: in wps context menu
+eng: "Set song rating"
+voice: "Nummer beoordeling"
+new: "Nummer beoordeling"
+
+id: LANG_RATING
+desc: in set_rating
+eng: "Rating:"
+voice: "Beoordeling" 
+new: "Beoordeling"
+
+id: LANG_CROSSFADE_DURATION
+desc: in playback settings
+eng: "Crossfade duration"
+voice: "Crossfade lengte"
+new: "Crossfade lengte"
+
+id: LANG_MIX
+desc: in playback settings, crossfade option
+eng: "Mix"
+voice: "Mix"
+new: "Mix" 
+
+id: LANG_RESTARTING_PLAYBACK
+desc: splash screen displayed when pcm buffer size is changed
+eng: "Restarting playback..."
+voice: "Afspelen herstarten..."
+new: "Afspelen herstarten"
+
+id: LANG_REPLAYGAIN
+desc: in replaygain
+eng: "Replaygain"
+voice: "Replaygain"
+new: "Replaygain"
+
+id: LANG_REPLAYGAIN_ENABLE
+desc: in replaygain
+eng: "Enable replaygain"
+voice: "Zet replaygain aan"
+new: "Zet replaygain aan"
+
+id: LANG_REPLAYGAIN_NOCLIP
+desc: in replaygain
+eng: "Prevent clipping"
+voice: "Vookom clipping"
+new: "Voorkom clipping"
+
+id: LANG_REPLAYGAIN_MODE
+desc: in replaygain
+eng: "Replaygain type"
+voice: "Replaygain type"
+new: "Replaygain type"
+
+id: LANG_TRACK_GAIN
+desc: in replaygain
+eng: "Track gain"
+voice: "Track gain"
+new: "Track gain"
+
+id: LANG_ALBUM_GAIN
+desc: in replaygain
+eng: "Album gain"
+voice: "Album gain"
+new: "Album gain"
+
+id: LANG_ID3_TRACK_GAIN
+desc: in browse_id3
+eng: "[Track gain]"
+voice: "[Track gain]"
+new: "[Track gain]"
+
+id: LANG_ID3_ALBUM_GAIN
+desc: in browse_id3
+eng: "[Album gain]"
+voice: "[Album gain]"
+new: "[Album gain]"
+
+id: LANG_ID3_NO_GAIN
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
+
+id: LANG_BIDI_SUPPORT
+desc: in settings_menu, option to enable reversal of hebrew/arabic text
+eng: "BiDi Hebrew/Arabic"
+voice: "BiDi Hebreews/Arabisch"
+new: "BiDi Hebreews/Arabisch"
+
+id: LANG_REPLAYGAIN_PREAMP
+desc: in browse_id3
+eng: "Pre-amp"
+voice: "Voorversterk"
+new: "Voorversterk"
+
+id: LANG_UNIT_DB
+desc: in browse_id3
+eng: "dB"
+voice: "dB"
+new: "dB"
+
+id: LANG_ID3_VBR
+desc: in browse_id3
+eng: " (VBR)"
+voice: "Variabele bitrate"
+new: "(VBR)"
+
+id: LANG_BEEP
+desc: in playback settings
+eng: "Beep volume"
+voice: "Piep volume"
+new: "Piep volume"
+
+id: LANG_WEAK
+desc: in beep volume in playback settings
+eng: "Weak"
+voice: "Zwak"
+new: "Zwak"
+
+id: LANG_MODERATE
+desc: in beep volume in playback settings
+eng: "Moderate"
+voice: "Normaal"
+new: "Normaal"
+
+id: LANG_STRONG
+desc: in beep volume in playback settings
+eng: "Strong"
+voice: "Sterk"
+new: "Sterk"
+
+id: LANG_REPEAT_AB
+desc: repeat one song
+eng: "A-B"
+voice: "A-B"
+new:  "A-B"
