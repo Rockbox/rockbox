@@ -65,24 +65,25 @@ extern int playlist_next(int steps);
 extern int playlist_amount(void);
 extern int playlist_update_resume_info(const struct mp3entry* id3);
 
-#define MPEG_PLAY         1
-#define MPEG_STOP         2
-#define MPEG_PAUSE        3
-#define MPEG_RESUME       4
-#define MPEG_NEXT         5
-#define MPEG_PREV         6
-#define MPEG_FF_REWIND    7
-#define MPEG_FLUSH_RELOAD 8
-#define MPEG_RECORD 9
-#define MPEG_INIT_RECORDING 10
-#define MPEG_INIT_PLAYBACK 11
-#define MPEG_NEW_FILE    12
-#define MPEG_PAUSE_RECORDING 13
-#define MPEG_RESUME_RECORDING 14
-#define MPEG_NEED_DATA    100
-#define MPEG_TRACK_CHANGE 101
-#define MPEG_SAVE_DATA    102
-#define MPEG_STOP_DONE    103
+#define MPEG_PLAY                  1
+#define MPEG_STOP                  2
+#define MPEG_PAUSE                 3
+#define MPEG_RESUME                4
+#define MPEG_NEXT                  5
+#define MPEG_PREV                  6
+#define MPEG_FF_REWIND             7
+#define MPEG_FLUSH_RELOAD          8
+#define MPEG_RECORD                9
+#define MPEG_INIT_RECORDING       10
+#define MPEG_INIT_PLAYBACK        11
+#define MPEG_NEW_FILE             12
+#define MPEG_PAUSE_RECORDING      13
+#define MPEG_RESUME_RECORDING     14
+#define MPEG_NEED_DATA           100
+#define MPEG_TRACK_CHANGE        101
+#define MPEG_SAVE_DATA           102
+#define MPEG_STOP_DONE           103
+#define MPEG_PRERECORDING_TICK   104
 
 /* indicator for MPEG_NEED_DATA */
 #define GENERATE_UNBUFFER_EVENTS ((void*)1)
@@ -155,12 +156,13 @@ static long lowest_watermark_level; /* Debug value to observe the buffer
 static char recording_filename[MAX_PATH]; /* argument to thread */
 static char delayed_filename[MAX_PATH];   /* internal copy of above */
 
+static char xing_buffer[MAX_XING_HEADER_SIZE];
+
 static bool init_recording_done;
 static bool init_playback_done;
 static bool prerecording;        /* True if prerecording is enabled */
 static bool is_prerecording;     /* True if we are prerecording */
 static bool is_recording;        /* We are recording */
-static bool disable_xing_header; /* When splitting files */
 
 static enum {
     NOT_SAVING = 0,  /* reasons to save data, sorted by importance */
@@ -172,8 +174,12 @@ static enum {
 static int rec_frequency_index; /* For create_xing_header() calls */
 static int rec_version_index;   /* For create_xing_header() calls */
 
-static int prerecord_buffer[MPEG_MAX_PRERECORD_SECONDS]; 
-                    /* Array of buffer indexes for each prerecorded second */
+struct prerecord_info {
+    int mempos;
+    unsigned long framecount;
+};
+
+static struct prerecord_info prerecord_buffer[MPEG_MAX_PRERECORD_SECONDS];
 static int prerecord_index;       /* Current index in the prerecord buffer */
 static int prerecording_max_seconds;     /* Max number of seconds to store */
 static int prerecord_count;   /* Number of seconds in the prerecord buffer */
@@ -185,7 +191,10 @@ unsigned long record_start_time; /* Value of current_tick when recording
 unsigned long pause_start_time;  /* Value of current_tick when pause was
                                     started */
 static unsigned long num_rec_bytes;
-static unsigned long num_recorded_frames;
+static unsigned long last_rec_bytes;
+static unsigned long frame_count_start;
+static unsigned long frame_count_end;
+static unsigned long saved_header = 0;
 
 /* Shadow MAS registers */
 unsigned long shadow_encoder_control = 0;
@@ -213,6 +222,8 @@ static int get_unswapped_space(void);
 
 #if CONFIG_CODEC == MAS3587F
 static void init_recording(void);
+static void prepend_header(void);
+static void update_header(void);
 static void start_prerecording(void);
 static void start_recording(void);
 static void stop_recording(void);
@@ -745,17 +756,8 @@ void rec_tick(void)
             if(TIME_AFTER(current_tick, prerecord_timeout))
             {
                 prerecord_timeout = current_tick + HZ;
-
-                /* Store the write pointer every second */
-                prerecord_buffer[prerecord_index++] = audiobuf_write;
-
-                /* Wrap if necessary */
-                if(prerecord_index == prerecording_max_seconds)
-                    prerecord_index = 0;
-
-                /* Update the number of seconds recorded */
-                if(prerecord_count < prerecording_max_seconds)
-                    prerecord_count++;
+                queue_post(&mpeg_queue, MPEG_PRERECORDING_TICK, 0);
+                wake_up_thread();
             }
         }
         else
@@ -1164,10 +1166,9 @@ static void mpeg_thread(void)
     int start_offset;
 #if CONFIG_CODEC == MAS3587F
     int amount_to_save;
-    int framelen;
-    unsigned long saved_header = 0;
     int save_endpos = 0;
     int rc;
+    int level;
     long offset;
 #endif /* CONFIG_CODEC == MAS3587F */
 
@@ -1749,26 +1750,25 @@ static void mpeg_thread(void)
             switch(ev.id)
             {
                 case MPEG_RECORD:
-                    if(is_prerecording)
+                    if (is_prerecording)
                     {
-                        int startpos, i;
-                        int level;
-                        
+                        int startpos;
+
                         /* Go back prerecord_count seconds in the buffer */
                         startpos = prerecord_index - prerecord_count;
                         if(startpos < 0)
                             startpos += prerecording_max_seconds;
 
-                        /* Read the mp3 buffer pointer from the prerecord
-                           buffer */
-                        startpos = prerecord_buffer[startpos];
+                        /* Read the position data from the prerecord buffer */
+                        frame_count_start = prerecord_buffer[startpos].framecount;
+                        startpos = prerecord_buffer[startpos].mempos;
 
                         DEBUGF("Start looking at address %x (%x)\n",
                                audiobuf+startpos, startpos);
 
                         saved_header = mpeg_get_last_header();
                         
-                        mem_find_next_frame(startpos, &offset, 5000,
+                        mem_find_next_frame(startpos, &offset, 1800,
                                             saved_header);
 
                         audiobuf_read = startpos + offset;
@@ -1781,58 +1781,17 @@ static void mpeg_thread(void)
                         level = set_irq_level(HIGHEST_IRQ_LEVEL);
                         num_rec_bytes = get_unsaved_space();
                         set_irq_level(level);
-                        
-                        /* Make room for headers */
-                        audiobuf_read -= MPEG_RESERVED_HEADER_SPACE;
-                        if(audiobuf_read < 0)
-                        {
-                            /* Clear the bottom half */
-                            memset(audiobuf, 0,
-                                   audiobuf_read + MPEG_RESERVED_HEADER_SPACE);
-
-                            /* And the top half */
-                            audiobuf_read += audiobuflen;
-                            memset(audiobuf + audiobuf_read, 0,
-                                   audiobuflen - audiobuf_read);
-                        }
-                        else
-                        {
-                            memset(audiobuf + audiobuf_read, 0,
-                                   MPEG_RESERVED_HEADER_SPACE);
-                        }
-
-                        /* Copy the empty ID3 header */
-                        startpos = audiobuf_read;
-                        for(i = 0;i < (int)sizeof(empty_id3_header);i++)
-                        {
-                            audiobuf[startpos++] = empty_id3_header[i];
-                            if(startpos == audiobuflen)
-                                startpos = 0;
-                        }
-                        
-                        DEBUGF("New audiobuf_read address (reservation): %x\n",
-                               audiobuf+audiobuf_read);
-                        
-                        DEBUGF("Prerecording...\n");
                     }
                     else
                     {
-                        reset_mp3_buffer();
-
+                        frame_count_start = 0;
                         num_rec_bytes = 0;
-                        
-                        /* Advance the write pointer to make
-                           room for an ID3 tag plus a VBR header */
+                        audiobuf_read = MPEG_RESERVED_HEADER_SPACE;
                         audiobuf_write = MPEG_RESERVED_HEADER_SPACE;
-                        memset(audiobuf, 0, MPEG_RESERVED_HEADER_SPACE);
-                        
-                        /* Insert the ID3 header */
-                        memcpy(audiobuf, empty_id3_header,
-                               sizeof(empty_id3_header));
-
-                        DEBUGF("Recording...\n");
                     }
 
+                    prepend_header();
+                    DEBUGF("Recording...\n");
                     start_recording();
 
                     /* Wait until at least one frame is encoded and get the
@@ -1840,7 +1799,7 @@ static void mpeg_thread(void)
                        generation */
                     sleep(HZ/5);
                     saved_header = mpeg_get_last_header();
-                    
+
                     /* delayed until buffer is saved, don't open yet */
                     strcpy(delayed_filename, recording_filename);
                     mpeg_file = -1; 
@@ -1863,40 +1822,9 @@ static void mpeg_thread(void)
 
                     if (mpeg_file >= 0)
                         close(mpeg_file);
-
-                    if (!disable_xing_header && num_rec_bytes > 0)
-                    {
-                        /* Create the Xing header */
-                        mpeg_file = open(recording_filename, O_RDWR);
-                        if (mpeg_file < 0)
-                            panicf("rec upd: %d (%s)", mpeg_file,
-                                   recording_filename);
-
-                        /* If the number of recorded frames have
-                           reached 0x7ffff, we can no longer trust it */
-                        if (num_recorded_frames == 0x7ffff)
-                            num_recorded_frames = 0;
-
-                        /* Also, if we have been prerecording, the frame count
-                           will be wrong */
-                        if (prerecording)
-                            num_recorded_frames = 0;
-                        
-                        /* saved_header is saved right before stopping
-                           the MAS */
-                        framelen = create_xing_header(mpeg_file, 0,
-                                                      num_rec_bytes, audiobuf,
-                                                      num_recorded_frames,
-                                                      saved_header, NULL,
-                                                      false);
-                        
-                        lseek(mpeg_file, MPEG_RESERVED_HEADER_SPACE-framelen,
-                              SEEK_SET);
-                        write(mpeg_file, audiobuf, framelen);
-                        close(mpeg_file);
-                    }
                     mpeg_file = -1;
 
+                    update_header();
 #ifdef DEBUG1
                     {
                         int i;
@@ -1934,37 +1862,41 @@ static void mpeg_thread(void)
                         amount_to_save = get_unsaved_space();
                     }
 
+                    mas_readmem(MAS_BANK_D0, MAS_D0_MPEG_FRAME_COUNT,
+                                &frame_count_end, 1);
+ 
+                    /* capture all values at one point */
+                    level = set_irq_level(HIGHEST_IRQ_LEVEL);
+                    save_endpos = audiobuf_write;
+                    last_rec_bytes = num_rec_bytes;
+                    num_rec_bytes = 0;
+                    set_irq_level(level);
+
                     if (amount_to_save >= 1800)
                     {
                         /* Now find a frame boundary to split at */
-                        save_endpos = audiobuf_write - 1800;
+                        save_endpos -= 1800;
                         if (save_endpos < 0)
                             save_endpos += audiobuflen;
 
                         rc = mem_find_next_frame(save_endpos, &offset, 1800,
                                                  saved_header);
-                        if (rc) /* Header found? */
-                        {
-                            /* offset will now contain the number of bytes to
-                               add to startpos to find the frame boundary */
-                            save_endpos += offset;
-                            if (save_endpos >= audiobuflen)
-                                save_endpos -= audiobuflen;
-                        }
-                        else
-                        {
-                            /* No header found. Let's save the whole buffer. */
-                            save_endpos = audiobuf_write;
-                        }
-                    }
-                    else
-                    {
-                        /* Too few bytes recorded, timeout */
-                        save_endpos = audiobuf_write;
+                        if (!rc) /* No header found, save whole buffer */
+                            offset = 1800;
+
+                        save_endpos += offset;
+                        if (save_endpos >= audiobuflen)
+                            save_endpos -= audiobuflen;
+
+                        last_rec_bytes += offset - 1800;
+                        level = set_irq_level(HIGHEST_IRQ_LEVEL);
+                        num_rec_bytes += 1800 - offset;
+                        set_irq_level(level);
                     }
 
                     saving_status = NEW_FILE;
                     queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
+                    break;
 
                 case MPEG_SAVE_DATA:    
                     if (saving_status == BUFFER_FULL)
@@ -2025,18 +1957,22 @@ static void mpeg_thread(void)
                                 /* Close the current file */
                                 rc = close(mpeg_file);
                                 if (rc < 0)
-                                    panicf("spt cls: %d", rc);
-                                ata_sleep();
+                                    panicf("rec cls: %d", rc);
                                 mpeg_file = -1;
+                                update_header();
+                                ata_sleep();
+
                                 /* copy new filename */
                                 strcpy(delayed_filename, recording_filename);
+                                prepend_header();
+                                frame_count_start = frame_count_end;
                                 break;
 
                             case STOP_RECORDING:
                                 queue_post(&mpeg_queue, MPEG_STOP_DONE, NULL);
                                 /* will close the file */
                                 break;
-                                
+
                             default:
                                 break;
                         }
@@ -2045,6 +1981,24 @@ static void mpeg_thread(void)
                     else /* tell ourselves to save the next chunk */
                         queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
 
+                    break;
+                    
+                case MPEG_PRERECORDING_TICK:
+                    if(!is_prerecording)
+                        break;
+
+                    /* Store the write pointer every second */
+                    prerecord_buffer[prerecord_index].mempos = audiobuf_write;
+                    mas_readmem(MAS_BANK_D0, MAS_D0_MPEG_FRAME_COUNT,
+                                &prerecord_buffer[prerecord_index].framecount, 1);
+
+                    /* Wrap if necessary */
+                    if(++prerecord_index == prerecording_max_seconds)
+                        prerecord_index = 0;
+
+                    /* Update the number of seconds recorded */
+                    if(prerecord_count < prerecording_max_seconds)
+                        prerecord_count++;
                     break;
 
                 case MPEG_INIT_PLAYBACK:
@@ -2257,7 +2211,6 @@ void mpeg_record(const char *filename)
     strncpy(recording_filename, filename, MAX_PATH - 1);
     recording_filename[MAX_PATH - 1] = 0;
     
-    disable_xing_header = false;
     queue_post(&mpeg_queue, MPEG_RECORD, NULL);
 }
 
@@ -2269,6 +2222,64 @@ void mpeg_pause_recording(void)
 void mpeg_resume_recording(void)
 {
     queue_post(&mpeg_queue, MPEG_RESUME_RECORDING, NULL);
+}
+
+static void prepend_header(void)
+{
+    int startpos;
+    unsigned i;
+
+    /* Make room for header */
+    audiobuf_read -= MPEG_RESERVED_HEADER_SPACE;
+    if(audiobuf_read < 0)
+    {
+        /* Clear the bottom half */
+        memset(audiobuf, 0, audiobuf_read + MPEG_RESERVED_HEADER_SPACE);
+
+        /* And the top half */
+        audiobuf_read += audiobuflen;
+        memset(audiobuf + audiobuf_read, 0, audiobuflen - audiobuf_read);
+    }
+    else
+    {
+        memset(audiobuf + audiobuf_read, 0, MPEG_RESERVED_HEADER_SPACE);
+    }
+    /* Copy the empty ID3 header */
+    startpos = audiobuf_read;
+    for(i = 0; i < sizeof(empty_id3_header); i++)
+    {
+        audiobuf[startpos++] = empty_id3_header[i];
+        if(startpos == audiobuflen)
+            startpos = 0;
+    }
+}
+
+static void update_header(void)
+{
+    int fd, framelen;
+    unsigned long frames;
+
+    if (last_rec_bytes > 0)
+    {
+        /* Create the Xing header */
+        fd = open(delayed_filename, O_RDWR);
+        if (fd < 0)
+            panicf("rec upd: %d (%s)", fd, recording_filename);
+
+        frames = frame_count_end - frame_count_start;
+        /* If the number of recorded frames has reached 0x7ffff,
+           we can no longer trust it */
+        if (frame_count_end == 0x7ffff)
+            frames = 0;
+
+        /* saved_header is saved right before stopping the MAS */
+        framelen = create_xing_header(fd, 0, last_rec_bytes, xing_buffer,
+                                      frames, saved_header, NULL, false);
+
+        lseek(fd, MPEG_RESERVED_HEADER_SPACE - framelen, SEEK_SET);
+        write(fd, xing_buffer, framelen);
+        close(fd);
+    }
 }
 
 static void start_prerecording(void)
@@ -2305,8 +2316,6 @@ static void start_prerecording(void)
 static void start_recording(void)
 {
     unsigned long val;
-
-    num_recorded_frames = 0;
 
     if(is_prerecording)
     {
@@ -2386,9 +2395,9 @@ static void stop_recording(void)
 
     is_recording = false;
     is_prerecording = false;
-        
-    /* Read the number of frames recorded */
-    mas_readmem(MAS_BANK_D0, MAS_D0_MPEG_FRAME_COUNT, &num_recorded_frames, 1);
+
+    last_rec_bytes = num_rec_bytes;
+    mas_readmem(MAS_BANK_D0, MAS_D0_MPEG_FRAME_COUNT, &frame_count_end, 1);
 
     /* Start monitoring */
     shadow_io_control_main |= (1 << 10);
@@ -2514,9 +2523,6 @@ void mpeg_new_file(const char *filename)
     strncpy(recording_filename, filename, MAX_PATH - 1);
     recording_filename[MAX_PATH - 1] = 0;
 
-    num_rec_bytes = 0;
-    disable_xing_header = true;
-
     /* Store the current time */
     record_start_time = current_tick;
     if(paused)
@@ -2554,7 +2560,7 @@ unsigned long mpeg_num_recorded_bytes(void)
             if(index < 0)
                 index += prerecording_max_seconds;
             
-            num_bytes = audiobuf_write - prerecord_buffer[index];
+            num_bytes = audiobuf_write - prerecord_buffer[index].mempos;
             if(num_bytes < 0)
                 num_bytes += audiobuflen;
             

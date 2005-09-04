@@ -607,8 +607,8 @@ int count_mp3_frames(int fd, int startpos, int filesize,
 static const char cooltext[] = "Rockbox - rocks your box";
 
 int create_xing_header(int fd, int startpos, int filesize,
-                       unsigned char *buf, int num_frames,
-                       unsigned long header_template,
+                       unsigned char *buf, /* must be at least 288 bytes */
+                       int num_frames, unsigned long header_template,
                        void (*progressfunc)(int), bool generate_toc)
 {
     unsigned long header = 0;
@@ -691,35 +691,40 @@ int create_xing_header(int fd, int startpos, int filesize,
             last_pos = pos;
         }
     }
-
-    /* Use the template header and create a new one.
-       We ignore the Protection bit even if the rest of the stream is
-       protected. (fixme?) */
-    header = xing_header_template & ~(BITRATE_MASK | PROTECTION_MASK);
-    header |= 8 << 12; /* This gives us plenty of space, at least 192 bytes */
-
-    if (!mp3headerinfo(&info, header))
-        return 0;      /* invalid header */
+    
+    /* Check the template header for validity and get some preliminary info. */
+    if (!mp3headerinfo(&info, xing_header_template))
+        return 0;  /* invalid header */
 
     /* Clear the frame */
-    memset(buf, 0, 1500);
+    memset(buf, 0, MAX_XING_HEADER_SIZE);
 
-    /* Write the header to the buffer */
-    long2bytes(buf, header);
-    
-    /* calculate position of VBR header */
-    if ( info.version == MPEG_VERSION1 ) {
+    /* Use the template header and create a new one. */
+    header = xing_header_template & ~(BITRATE_MASK | PROTECTION_MASK);
+
+    /* Calculate position of VBR header and required frame bitrate */
+    if (info.version == MPEG_VERSION1) {
+        header |= 5 << 12;
         if (info.channel_mode == 3) /* mono */
             index = 21;
         else
             index = 36;
     }
     else {
+        if (info.version == MPEG_VERSION2)
+            header |= 8 << 12;
+        else  /* MPEG_VERSION2_5 */
+            header |= 4 << 12;
         if (info.channel_mode == 3) /* mono */
             index = 13;
         else
             index = 21;
     }
+    mp3headerinfo(&info, header);  /* Get final header info */
+    /* Size is now always one of 192, 208 or 288 bytes */
+
+    /* Write the header to the buffer */
+    long2bytes(buf, header);
 
     /* Create the Xing data */
     memcpy(&buf[index], "Xing", 4);

@@ -57,6 +57,8 @@ struct mp3info {
 #define VBR_TOC_FLAG     0x04
 #define VBR_QUALITY_FLAG 0x08
 
+#define MAX_XING_HEADER_SIZE 288
+
 unsigned long find_next_frame(int fd, long *offset, long max_offset, unsigned long last_header);
 unsigned long mem_find_next_frame(int startpos, long *offset, long max_offset,
                                   unsigned long last_header);
