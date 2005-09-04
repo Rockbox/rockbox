@@ -1025,7 +1025,7 @@ id: LANG_BATTERY_TIME
 desc: battery level in % and estimated time remaining
 eng: "%d%% %dh %dm"
 voice: "Battery level"
-new:
+new: "%d%% %dh %dm"
 
 id: LANG_SLEEP_TIMER
 desc: sleep timer setting
@@ -2948,31 +2948,31 @@ id: LANG_POINT
 desc: decimal separator for composing numbers
 eng: "."
 voice: "point"
-new:
+new: "."
 
 id: LANG_BYTE
 desc: a unit postfix
 eng: "B"
 voice: ""
-new:
+new: "B"
 
 id: LANG_KILOBYTE
 desc: a unit postfix, also voiced
 eng: "KB"
 voice: "kilobyte"
-new:
+new: "KB"
 
 id: LANG_MEGABYTE
 desc: a unit postfix, also voiced
 eng: "MB"
 voice: "megabyte"
-new:
+new: "MB"
 
 id: LANG_GIGABYTE
 desc: a unit postfix, also voiced
 eng: "GB"
 voice: "gigabyte"
-new:
+new: "GB"
 
 id: LANG_DISK_SIZE_INFO
 desc: disk size info
@@ -3069,7 +3069,7 @@ id: LANG_DB_INF
 desc: -inf db for values below measurement
 eng: "-inf"
 voice:
-new:
+new: "-inf"
 
 id: LANG_RECORD_TRIG_IDLE
 desc: waiting for threshold
@@ -3099,7 +3099,7 @@ id: LANG_DISK_NAME_MMC
 desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
 eng: "MMC:"
 voice: "Multimedia card"
-new:
+new: "MMC:"
 
 id: LANG_CROSSFADE
 desc: in playback settings
@@ -3255,13 +3255,13 @@ id: LANG_UNIT_DB
 desc: in browse_id3
 eng: "dB"
 voice ""
-new:
+new: "dB"
 
 id: LANG_ID3_VBR
 desc: in browse_id3
 eng: " (VBR)"
 voice ""
-new:
+new: " (VBR)"
 
 id: LANG_BEEP
 desc: in playback settings
@@ -3291,4 +3291,4 @@ id: LANG_REPEAT_AB
 desc: repeat one song
 eng: "A-B"
 voice: "A-B"
-new:
+new: "A-B"
