@@ -111,13 +111,13 @@ static const char audio_thread_name[] = "audio";
 
 /* Codec thread. */
 static struct event_queue codec_queue;
-static long codec_stack[(DEFAULT_STACK_SIZE + 0x2500)/sizeof(long)] IDATA_ATTR;
+static long codec_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)] IDATA_ATTR;
 static const char codec_thread_name[] = "codec";
 
 /* Voice codec thread. */
 static struct event_queue voice_codec_queue;
 /* Not enough IRAM for this. */
-static long voice_codec_stack[(DEFAULT_STACK_SIZE + 0x2500)/sizeof(long)];
+static long voice_codec_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)] IDATA_ATTR;
 static const char voice_codec_thread_name[] = "voice codec";
 
 static struct mutex mutex_bufferfill;
@@ -1635,7 +1635,8 @@ void audio_thread(void)
                     the requested track. This is needed because when skipping
                     tracks fast, AUDIO_PLAY commands will get queued with the
                     the same track and playback will stutter. */
-                if (last_index == playlist_get_display_index() && playing) {
+                if (last_index == playlist_get_display_index() && playing
+                    && pcm_is_playing()) {
                     logf("already playing req. track");
                     break ;
                 }
