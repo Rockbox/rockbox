@@ -550,7 +550,7 @@ id: LANG_F2_MODE
 desc: in wps F2 pressed
 eng: "Mode:"
 voice: 
-new: 
+new: "Mode:"
 
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
@@ -2980,7 +2980,7 @@ id: LANG_RECORD_TRIGGER
 desc: in recording settings_menu
 eng: "Trigger"
 voice: 
-new: 
+new: "Trigger"
 
 id: LANG_RECORD_START_THRESHOLD
 desc: in recording settings_menu
@@ -3010,13 +3010,13 @@ id: LANG_RECORD_STOP_GAP
 desc: in recording settings_menu
 eng: "Presplit gap"
 voice: 
-new: 
+new: "Presplit gap"
 
 id: LANG_RECORD_TRIGGER_MODE
 desc: in recording settings_menu
 eng: "Trigger"
 voice: 
-new: 
+new: "Trigger"
 
 id: LANG_RECORD_TRIG_NOREARM
 desc: in recording settings_menu
@@ -3034,19 +3034,19 @@ id: LANG_DB_INF
 desc: -inf db for values below measurement
 eng: "-inf"
 voice: 
-new: 
+new: "-inf"
 
 id: LANG_RECORD_TRIG_IDLE
 desc: waiting for threshold
 eng: "Trigger idle"
 voice: 
-new: 
+new: "Trigger idle"
 
 id: LANG_RECORD_TRIGGER_ACTIVE
 desc: 
 eng: "Trigger active"
 voice: 
-new: 
+new: "Trigger active"
 
 id: LANG_LCD_REMOTE_MENU
 desc: in the display sub menu
@@ -3118,7 +3118,7 @@ id: LANG_RUNTIMEDB_ACTIVE
 desc: in settings_menu.
 eng: "Gather runtime data (experimental)"
 voice: "Verzamel runtime data"
-new: "Verzamel runtime datat"
+new: "Verzamel runtime data"
 
 id: LANG_MENU_SET_RATING
 desc: in wps context menu
