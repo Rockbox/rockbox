@@ -13,6 +13,7 @@
 #
 # The "voice' entry contains how we want the speech UI to pronounce this.
 #
+
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
@@ -53,19 +54,19 @@ id: LANG_ROCKBOX_INFO
 desc: displayed topmost on the info screen
 eng: "Rockbox Info:"
 voice: ""
-new: "מידע על רוקבוקס:"
+new: ":מידע על רוקבוקס"
 
 id: LANG_BUFFER_STAT_PLAYER
 desc: the buffer size player-screen width, %d MB %d fraction of MB
 eng: "Buf: %d.%03dMB"
 voice: ""
-new: "מאגר: %d.%03dMB"
+new: "זכר: %d.%03dMB"
 
 id: LANG_BUFFER_STAT_RECORDER
 desc: the buffer size recorder-screen width, %d MB %d fraction of MB
 eng: "Buffer: %d.%03dMB"
 voice: ""
-new: "מאגר: %d.%03dMB"
+new: "זיכרון: %d.%03dMB"
 
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
@@ -77,13 +78,13 @@ id: LANG_PLAYLIST_LOAD
 desc: displayed on screen while loading a playlist
 eng: "Loading..."
 voice: ""
-new: "טוען..."
+new: "...טוען"
 
 id: LANG_PLAYLIST_SHUFFLE
 desc: displayed on screen while shuffling a playlist
 eng: "Shuffling..."
 voice: ""
-new: "מערבב..."
+new: "...מערבב"
 
 id: LANG_PLAYINDICES_PLAYLIST
 desc: in playlist.indices() when playlist is full *WARNING* this and next ID are only used in this function.
@@ -95,7 +96,7 @@ id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
 eng: "Buffer Full"
 voice: ""
-new: "זיכרון המאגר מלא"
+new: "הזיכרון מלא"
 
 id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
@@ -107,7 +108,7 @@ id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
 eng: "Partition?"
 voice: ""
-new: "לחלק?"
+new: "?לחלק"
 
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
@@ -119,7 +120,7 @@ id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
 eng: "No partition?"
 voice: ""
-new: "לא לחלק?"
+new: "?לא לחלק"
 
 id: LANG_TIME_SET
 desc: used in set_time()
@@ -143,7 +144,7 @@ id: LANG_SHUFFLE
 desc: in settings_menu
 eng: "Shuffle"
 voice: "Shuffle"
-new: "עירבוב"
+new: "ערבוב"
 
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
@@ -191,13 +192,13 @@ id: LANG_SCROLL
 desc: in settings_menu
 eng: "Scroll Speed Setting Example"
 voice: ""
-new: "דוגמה ארוכה במיוחד להגדרת קצב הגלגול"
+new: "דוגמה ארוכה במיוחד להגדרת קצב הגלילה"
 
 id: LANG_DISCHARGE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_TIME
 desc: in settings_menu
@@ -215,13 +216,13 @@ id: LANG_FFRW_STEP
 desc: in settings_menu
 eng: "FF/RW Min Step"
 voice: "Minimum Step"
-new: "צעד מינימלי"
+new: "צעד מינימלי בהעברה מהירה"
 
 id: LANG_FFRW_ACCEL
 desc: in settings_menu
 eng: "FF/RW Accel"
 voice: "Acceleration"
-new: "האצה"
+new: "תאוצה קדימה/אחורה"
 
 id: LANG_FOLLOW
 desc: in settings_menu
@@ -257,7 +258,7 @@ id: LANG_CASE_MENU
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
@@ -281,7 +282,7 @@ id: LANG_FILE
 desc: in settings_menu()
 eng: "File View"
 voice: "File View"
-new: "הצגת קבצים"
+new: "תצוגת קבצים"
 
 id: LANG_DISPLAY
 desc: in settings_menu()
@@ -329,13 +330,13 @@ id: LANG_BBOOST
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_DECAY
 desc: in sound_settings
 eng: "AV Decay Time"
 voice: ""
-new: "זמן דעיכת AV"
+new: "AV זמן דעיכת"
 
 id: LANG_CHANNEL_MENU
 desc: in sound_settings
@@ -383,13 +384,13 @@ id: LANG_SHOWDIR_ERROR_BUFFER
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Dir Buffer"
 voice: ""
-new: "מאגר זיכרון לתיקיות"
+new: "זיכרון תיקיות"
 
 id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Is Full!"
 voice: ""
-new: "מלא!"
+new: "!מלא"
 
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
@@ -401,7 +402,7 @@ id: LANG_RESUME_ASK
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
@@ -413,7 +414,7 @@ id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
 eng: "Key Lock OFF"
 voice: ""
-new: "נעילת מקשים כבויה"
+new: "נעילת מקשים מבוטלת"
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
@@ -425,43 +426,43 @@ id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key Lock Is OFF"
 voice: ""
-new: "נעילת מקשים כבויה"
+new: "נעילת מקשים מבוטלת"
 
 id: LANG_MUTE_ON_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_MUTE_OFF_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_MUTE_ON_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_MUTE_OFF_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_INFO
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_SCREEN
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_TITLE
 desc: in wps
@@ -473,7 +474,7 @@ id: LANG_ID3_NO_TITLE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_ARTIST
 desc: in wps
@@ -485,7 +486,7 @@ id: LANG_ID3_NO_ARTIST
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_ALBUM
 desc: in wps
@@ -497,7 +498,7 @@ id: LANG_ID3_NO_ALBUM
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_TRACKNUM
 desc: in wps
@@ -509,7 +510,7 @@ id: LANG_ID3_NO_TRACKNUM
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_LENGHT
 desc: in wps
@@ -527,7 +528,7 @@ id: LANG_ID3_BITRATE
 desc: in wps
 eng: "[Bitrate]"
 voice: ""
-new: "[קצב תדירות ביטים]"
+new: "[איכות]"
 
 id: LANG_ID3_FRECUENCY
 desc: in wps
@@ -569,7 +570,7 @@ id: LANG_F3_STATUS
 desc: in wps F3 pressed
 eng: "Status"
 voice: ""
-new: "מעמד"
+new: "מצב"
 
 id: LANG_F3_SCROLL
 desc: in wps F3 pressed
@@ -677,7 +678,7 @@ id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
 eng: "Units Per Read"
 voice: "Units Per Read"
-new: "יחידות לכל קריאה"
+new: "יחידות לקריאה"
 
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
@@ -851,7 +852,7 @@ id: LANG_RESUME_SETTING_ASK_ONCE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_BATTERY_DISPLAY
 desc: Battery type title
@@ -880,20 +881,20 @@ new: "מספרית"
 id: LANG_PM_PERFORMANCE
 desc: DEPRECATED
 eng: ""
-voice:
-new:
+voice: 
+new: 
 
 id: LANG_PM_HIGH_PERFORMANCE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_PM_ENERGY_SAVER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
@@ -1001,13 +1002,13 @@ id: LANG_DISK_STAT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_DISK_FREE_STAT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_POWEROFF
 desc: disk poweroff flag
@@ -1037,7 +1038,7 @@ id: LANG_MP3BUFFER_MARGIN
 desc: MP3 buffer margin time
 eng: "Anti-Skip Buffer"
 voice: "Anti-Skip Buffer"
-new: "מאגר זיכרון נגד קפיצות"
+new: "זיכרון נגד קפיצות"
 
 id: LANG_BIDIR_SCROLL
 desc: Bidirectional scroll limit
@@ -1073,7 +1074,7 @@ id: LANG_TRICKLE_CHARGE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_BATTERY_TOPOFF_CHARGE
 desc: in info display, shows that top off charge is running
@@ -1163,7 +1164,7 @@ id: LANG_ALARM_MOD_ERROR
 desc: The text that tells that the time is incorrect (for the RTC alarm mod).
 eng: "Alarm Time Is Too Soon!"
 voice: ""
-new: "השעה בשעון המעורר מוקדמת מדיי!"
+new: "!השעה בשעון המעורר מוקדמת מדיי"
 
 id: LANG_ALARM_MOD_KEYS
 desc: Shown key functions in alarm menu (for the RTC alarm mod).
@@ -1187,25 +1188,25 @@ id: LANG_PLAYER_KEYBOARD_BACKSPACE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_PLAYER_KEYBOARD_DELETE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_PLAYER_KEYBOARD_ACCEPT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_PLAYER_KEYBOARD_ABORT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_MENU_SHOW_ID3_INFO
 desc: Menu option to start id3 viewer
@@ -1265,7 +1266,7 @@ id: LANG_SOKOBAN_ON
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_INVERT
 desc: in settings_menu
@@ -1277,19 +1278,19 @@ id: LANG_CHANNEL_STEREO_NARROW_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_CHANNEL_STEREO_NARROW_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_CHANNEL_STEREO_WIDE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_CHANNEL_KARAOKE
 desc: in sound_settings
@@ -1319,19 +1320,19 @@ id: LANG_VBRFIX_STOP_PLAY
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_VBRFIX_NOT_VBR
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_VBRFIX
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_INVERT_CURSOR
 desc: in settings_menu
@@ -1391,7 +1392,7 @@ id: LANG_MAX_FILES_IN_DIR
 desc: in settings_menu
 eng: "Max files in dir browser"
 voice: "Max files in directory browser"
-new: "מספר קבצים מקסימלי בתיקיה"
+new: "מספר קבצים מקסימלי בספריה"
 
 id: LANG_MAX_FILES_IN_PLAYLIST
 desc: in settings_menu
@@ -1445,7 +1446,7 @@ id: LANG_DISK_FULL
 desc: in recording screen
 eng: "The disk is full. Press OFF to continue."
 voice: ""
-new: "הדיסק מלא. לחץ על כבה כדי להמשיך."
+new: "להמשיך כדי כבה על לחץ מלא. הדיסק."
 
 id: LANG_CONFIRM_WITH_PLAY_RECORDER
 desc: Generic recorder string to use to confirm
@@ -1666,73 +1667,73 @@ voice: "Car Adapter Mode"
 new: "מצב מכונית"
 
 id: LANG_LINE_IN
-desc:  in settings_menu
+desc: in settings_menu
 eng: "Line In"
 voice: "Line In"
 new: "כניסת שמע"
 
 id: LANG_NO_FILES
-desc:  in settings_menu
+desc: in settings_menu
 eng: "No files"
 voice: ""
 new: "קבצים אין"
 
 id: LANG_BUTTONBAR_MENU
-desc:  in button bar
+desc: in button bar
 eng: "Menu"
 voice: ""
 new: "תפריט"
 
 id: LANG_FM_BUTTONBAR_PRESETS
-desc:  in button bar
+desc: in button bar
 eng: "Preset"
 voice: ""
 new: "תחנה קבועה"
 
 id: LANG_FM_SAVE_PRESET
-desc:  DEPRECATED
+desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_FM_DELETE_PRESET
-desc:  in radio screen
+desc: in radio screen
 eng: "Remove preset"
 voice: ""
 new: "הסר תחנה קבועה"
 
 id: LANG_FM_STATION
-desc:  in radio screen
+desc: in radio screen
 eng: "Station: %d.%dMHz"
 voice: ""
 new: "תחנה: %d.%dMHz"
 
 id: LANG_FM_PRESET_SAVE_FAILED
-desc:  in radio screen
+desc: in radio screen
 eng: "Preset save failed"
 voice: ""
 new: "שמירת התחנה הקבועה נכשלה"
 
 id: LANG_FM_NO_PRESETS
-desc:  DEPRECATED
+desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_FM_NO_FREE_PRESETS
-desc:  in radio screen
+desc: in radio screen
 eng: "The preset list is full"
 voice: ""
 new: "רשימת התחנות הקבועות מראש נכשלה"
 
 id: LANG_FM_RADIO
-desc:  in main menu
+desc: in main menu
 eng: "FM Radio"
 voice: "FM Radio"
 new: "FM רדיו"
 
 id: LANG_FM_BUTTONBAR_RECORD
-desc:  in main menu
+desc: in main menu
 eng: "Record"
 voice: ""
 new: "הקלטה"
@@ -1774,19 +1775,21 @@ voice: "Pre-Record time"
 new: "שעון הקלטה מראש"
 
 #Auto bookmark prompts
+
 id: LANG_BOOKMARK_AUTOLOAD_QUERY
 desc: prompt for user to decide to create a bookmark
-voice: ""
 eng: "Load Last Bookmark?"
+voice: ""
 new: "?לטעון סימניה אחרונה"
 
 id: LANG_AUTO_BOOKMARK_QUERY
 desc: prompt for user to decide to create an bookmark
-voice: ""
 eng: "Create a Bookmark?"
+voice: ""
 new: "?ליצור סימניה"
 
 # Bookmark Select Menu Text
+
 id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
 desc: From the auto-load screen, allows user to list all bookmarks
 eng: "Down = List"
@@ -1830,6 +1833,7 @@ voice: ""
 new: "הפעל+נגן = מחיקה"
 
 # Bookmark creation/failure text
+
 id: LANG_BOOKMARK_CREATE_SUCCESS
 desc: Indicates bookmark was successfully created
 eng: "Bookmark Created"
@@ -1843,6 +1847,7 @@ voice: ""
 new: "!יצירת סימניה נכשלה"
 
 # Bookmark creation/failure text
+
 id: LANG_BOOKMARK_LOAD_EMPTY
 desc: Indicates bookmark was empty
 eng: "Bookmark Empty"
@@ -1850,6 +1855,7 @@ voice: ""
 new: "סימניות אין"
 
 # Bookmark Settings Text
+
 id: LANG_BOOKMARK_SETTINGS
 desc: in general settings
 eng: "Bookmarking"
@@ -1886,14 +1892,14 @@ eng: "Ask - Recent only"
 voice: "Ask - Recent only"
 new: "שאל - אחרונות בלבד"
 
-
 id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
 desc: Save only on bookmark for each playlist in recent bookmarks
-voice: "Unique only"
 eng: "Unique only"
+voice: "Unique only"
 new: "מיוחדים בלבד"
 
 # Main Bookmarks Menu
+
 id: LANG_BOOKMARK_MENU
 desc: Text on main menu to get to bookmark commands
 eng: "Bookmarks"
@@ -1946,7 +1952,7 @@ id: LANG_BARS_MENU
 desc: in the display sub menu
 eng: "Status-/Scrollbar"
 voice: "Status- and Scrollbar"
-new: "מצב - ושורת גלילה"
+new: "שורת מצב ושורת וגלילה"
 
 id: LANG_BATTERY_MENU
 desc: in the system sub menu
@@ -1967,6 +1973,7 @@ voice: "Time and Date"
 new: "תאריך וזמן"
 
 # Limits
+
 id: LANG_LIMITS_MENU
 desc: in the system sub menu
 eng: "Limits"
@@ -2069,307 +2076,307 @@ id: VOICE_ZERO
 desc: spoken only, for composing numbers
 eng: ""
 voice: "0"
-new:
+new: 
 
 id: VOICE_ONE
 desc: spoken only, for composing numbers
 eng: ""
 voice: "1"
-new:
+new: 
 
 id: VOICE_TWO
 desc: spoken only, for composing numbers
 eng: ""
 voice: "2"
-new:
+new: 
 
 id: VOICE_THREE
 desc: spoken only, for composing numbers
 eng: ""
 voice: "3"
-new:
+new: 
 
 id: VOICE_FOUR
 desc: spoken only, for composing numbers
 eng: ""
 voice: "4"
-new:
+new: 
 
 id: VOICE_FIFE
 desc: spoken only, for composing numbers
 eng: ""
 voice: "5"
-new:
+new: 
 
 id: VOICE_SIX
 desc: spoken only, for composing numbers
 eng: ""
 voice: "6"
-new:
+new: 
 
 id: VOICE_SEVEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "7"
-new:
+new: 
 
 id: VOICE_EIGHT
 desc: spoken only, for composing numbers
 eng: ""
 voice: "8"
-new:
+new: 
 
 id: VOICE_NINE
 desc: spoken only, for composing numbers
 eng: ""
 voice: "9"
-new:
+new: 
 
 id: VOICE_TEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "10"
-new:
+new: 
 
 id: VOICE_ELEVEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "11"
-new:
+new: 
 
 id: VOICE_TWELVE
 desc: spoken only, for composing numbers
 eng: ""
 voice: "12"
-new:
+new: 
 
 id: VOICE_THIRTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "13"
-new:
+new: 
 
 id: VOICE_FOURTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "14"
-new:
+new: 
 
 id: VOICE_FIFTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "15"
-new:
+new: 
 
 id: VOICE_SIXTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "16"
-new:
+new: 
 
 id: VOICE_SEVENTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "17"
-new:
+new: 
 
 id: VOICE_EIGHTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "18"
-new:
+new: 
 
 id: VOICE_NINETEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "19"
-new:
+new: 
 
 id: VOICE_TWENTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "20"
-new:
+new: 
 
 id: VOICE_THIRTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "30"
-new:
+new: 
 
 id: VOICE_FORTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "40"
-new:
+new: 
 
 id: VOICE_FIFTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "50"
-new:
+new: 
 
 id: VOICE_SIXTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "60"
-new:
+new: 
 
 id: VOICE_SEVENTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "70"
-new:
+new: 
 
 id: VOICE_EIGHTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "80"
-new:
+new: 
 
 id: VOICE_NINETY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "90"
-new:
+new: 
 
 id: VOICE_HUNDRED
 desc: spoken only, for composing numbers
 eng: ""
 voice: "hundred"
-new:
+new: 
 
 id: VOICE_BILLION
 desc: spoken only, for composing numbers
 eng: ""
 voice: "billion"
-new:
+new: 
 
 id: VOICE_MILLION
 desc: spoken only, for composing numbers
 eng: ""
 voice: "million"
-new:
+new: 
 
 id: VOICE_THOUSAND
 desc: spoken only, for composing numbers
 eng: ""
 voice: "thousand"
-new:
+new: 
 
 id: VOICE_MINUS
 desc: spoken only, for composing numbers
 eng: ""
 voice: "minus"
-new:
+new: 
 
 id: VOICE_PLUS
 desc: spoken only, for composing numbers
 eng: ""
 voice: "plus"
-new:
+new: 
 
 id: VOICE_POINT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: VOICE_MILLISECONDS
 desc: spoken only, a unit postfix
 eng: ""
 voice: "milliseconds"
-new:
+new: 
 
 id: VOICE_SECOND
 desc: spoken only, a unit postfix
 eng: ""
 voice: "second"
-new:
+new: 
 
 id: VOICE_SECONDS
 desc: spoken only, a unit postfix
 eng: ""
 voice: "seconds"
-new:
+new: 
 
 id: VOICE_MINUTE
 desc: spoken only, a unit postfix
 eng: ""
 voice: "minute"
-new:
+new: 
 
 id: VOICE_MINUTES
 desc: spoken only, a unit postfix
 eng: ""
 voice: "minutes"
-new:
+new: 
 
 id: VOICE_HOUR
 desc: spoken only, a unit postfix
 eng: ""
 voice: "hour"
-new:
+new: 
 
 id: VOICE_HOURS
 desc: spoken only, a unit postfix
 eng: ""
 voice: "hours"
-new:
+new: 
 
 id: VOICE_KHZ
 desc: spoken only, a unit postfix
 eng: ""
 voice: "kilohertz"
-new:
+new: 
 
 id: VOICE_DB
 desc: spoken only, a unit postfix
 eng: ""
 voice: "decibel"
-new:
+new: 
 
 id: VOICE_PERCENT
 desc: spoken only, a unit postfix
 eng: ""
 voice: "percent"
-new:
+new: 
 
 id: VOICE_MEGABYTE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: VOICE_GIGABYTE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: VOICE_MILLIAMPHOURS
 desc: spoken only, a unit postfix
 eng: ""
 voice: "milli-amp hours"
-new:
+new: 
 
 id: VOICE_PIXEL
 desc: spoken only, a unit postfix
 eng: ""
 voice: "pixel"
-new:
+new: 
 
 id: VOICE_PER_SEC
 desc: spoken only, a unit postfix
 eng: ""
 voice: "per second"
-new:
+new: 
 
 id: VOICE_HERTZ
 desc: spoken only, a unit postfix
 eng: ""
 voice: "hertz"
-new:
+new: 
 
 #carry on adding normal LANG_ strings below
 
@@ -2407,7 +2414,7 @@ id: LANG_VOICE_DIR_ENTER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_VOICE_DIR_HOVER
 desc: "talkbox" mode for directories + files
@@ -2419,13 +2426,13 @@ id: VOICE_FILE
 desc: spoken only, prefix for file number
 eng: ""
 voice: "file"
-new:
+new: 
 
 id: VOICE_DIR
 desc: spoken only, prefix for directory number
 eng: ""
 voice: "folder"
-new:
+new: 
 
 id: LANG_VOICE_SPELL
 desc: "talkbox" mode for files+directories
@@ -2437,211 +2444,211 @@ id: VOICE_CHAR_A
 desc: spoken only, for spelling
 eng: ""
 voice: "A"
-new:
+new: 
 
 id: VOICE_CHAR_B
 desc: spoken only, for spelling
 eng: ""
 voice: "B"
-new:
+new: 
 
 id: VOICE_CHAR_C
 desc: spoken only, for spelling
 eng: ""
 voice: "C"
-new:
+new: 
 
 id: VOICE_CHAR_D
 desc: spoken only, for spelling
 eng: ""
 voice: "D"
-new:
+new: 
 
 id: VOICE_CHAR_E
 desc: spoken only, for spelling
 eng: ""
 voice: "E"
-new:
+new: 
 
 id: VOICE_CHAR_F
 desc: spoken only, for spelling
 eng: ""
 voice: "F"
-new:
+new: 
 
 id: VOICE_CHAR_G
 desc: spoken only, for spelling
 eng: ""
 voice: "G"
-new:
+new: 
 
 id: VOICE_CHAR_H
 desc: spoken only, for spelling
 eng: ""
 voice: "H"
-new:
+new: 
 
 id: VOICE_CHAR_I
 desc: spoken only, for spelling
 eng: ""
 voice: "I"
-new:
+new: 
 
 id: VOICE_CHAR_J
 desc: spoken only, for spelling
 eng: ""
 voice: "J"
-new:
+new: 
 
 id: VOICE_CHAR_K
 desc: spoken only, for spelling
 eng: ""
 voice: "K"
-new:
+new: 
 
 id: VOICE_CHAR_L
 desc: spoken only, for spelling
 eng: ""
 voice: "L"
-new:
+new: 
 
 id: VOICE_CHAR_M
 desc: spoken only, for spelling
 eng: ""
 voice: "M"
-new:
+new: 
 
 id: VOICE_CHAR_N
 desc: spoken only, for spelling
 eng: ""
 voice: "N"
-new:
+new: 
 
 id: VOICE_CHAR_O
 desc: spoken only, for spelling
 eng: ""
 voice: "O"
-new:
+new: 
 
 id: VOICE_CHAR_P
 desc: spoken only, for spelling
 eng: ""
 voice: "P"
-new:
+new: 
 
 id: VOICE_CHAR_Q
 desc: spoken only, for spelling
 eng: ""
 voice: "Q"
-new:
+new: 
 
 id: VOICE_CHAR_R
 desc: spoken only, for spelling
 eng: ""
 voice: "R"
-new:
+new: 
 
 id: VOICE_CHAR_S
 desc: spoken only, for spelling
 eng: ""
 voice: "S"
-new:
+new: 
 
 id: VOICE_CHAR_T
 desc: spoken only, for spelling
 eng: ""
 voice: "T"
-new:
+new: 
 
 id: VOICE_CHAR_U
 desc: spoken only, for spelling
 eng: ""
 voice: "U"
-new:
+new: 
 
 id: VOICE_CHAR_V
 desc: spoken only, for spelling
 eng: ""
 voice: "V"
-new:
+new: 
 
 id: VOICE_CHAR_W
 desc: spoken only, for spelling
 eng: ""
 voice: "W"
-new:
+new: 
 
 id: VOICE_CHAR_X
 desc: spoken only, for spelling
 eng: ""
 voice: "X"
-new:
+new: 
 
 id: VOICE_CHAR_Y
 desc: spoken only, for spelling
 eng: ""
 voice: "Y"
-new:
+new: 
 
 id: VOICE_CHAR_Z
 desc: spoken only, for spelling
 eng: ""
 voice: "Z"
-new:
+new: 
 
 id: VOICE_EXT_MPA
 desc: spoken only, for file extension
 eng: ""
 voice: "audio"
-new:
+new: 
 
 id: VOICE_EXT_CFG
 desc: spoken only, for file extension
 eng: ""
 voice: "configuration"
-new:
+new: 
 
 id: VOICE_EXT_WPS
 desc: spoken only, for file extension
 eng: ""
 voice: "while-playing-screen"
-new:
+new: 
 
 id: VOICE_EXT_TXT
 desc: spoken only, for file extension
 eng: ""
 voice: "text"
-new:
+new: 
 
 id: VOICE_EXT_ROCK
 desc: spoken only, for file extension
 eng: ""
 voice: "plugin"
-new:
+new: 
 
 id: VOICE_EXT_FONT
 desc: spoken only, for file extension
 eng: ""
 voice: "font"
-new:
+new: 
 
 id: VOICE_EXT_BMARK
 desc: spoken only, for file extension and the word in general
 eng: ""
 voice: "bookmark"
-new:
+new: 
 
 id: VOICE_EXT_UCL
 desc: spoken only, for file extension
 eng: ""
 voice: "flash"
-new:
+new: 
 
 id: VOICE_EXT_AJZ
 desc: spoken only, for file extension
 eng: ""
 voice: "firmware"
-new:
+new: 
 
 id: LANG_DELETE_DIR
 desc: in on+play menu
@@ -2653,9 +2660,10 @@ id: VOICE_CURRENT_TIME
 desc: spoken only, for wall clock announce
 eng: ""
 voice: "Current time:"
-new:
+new: 
 
 #Filetypes
+
 id: LANG_FILETYPES_EXTENSION_FULL
 desc: Extension array full
 eng: "Extension array full"
@@ -2678,7 +2686,7 @@ id: LANG_FILETYPES_STRING_BUFFER_EMPTY
 desc: Filetype string buffer empty
 eng: "Filetype string buffer empty"
 voice: ""
-new: "מאגר מחרוזות סוגי הקבצים ריק"
+new: "זיכרון סוגי הקבצים ריק"
 
 id: LANG_ONPLAY_OPEN_WITH
 desc: Onplay open with
@@ -2723,109 +2731,109 @@ voice: "by type"
 new: "לפי סוג"
 
 id: LANG_FM_EDIT_PRESET
-desc:  in radio screen
+desc: in radio screen
 eng: "Edit preset"
 voice: ""
 new: "ערוך תחנה קבועה"
 
 id: LANG_FM_MONO_MODE
-desc:  in radio screen
+desc: in radio screen
 eng: "Force mono"
 voice: ""
 new: "כפה מונו"
 
 id: LANG_FM_BUTTONBAR_EXIT
-desc:  in radio screen
+desc: in radio screen
 eng: "Exit"
 voice: ""
 new: "יציאה"
 
 id: LANG_FM_BUTTONBAR_EDIT
-desc:  DEPRECATED
+desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_FM_BUTTONBAR_ADD
-desc:  in radio screen
+desc: in radio screen
 eng: "Add"
 voice: ""
 new: "הוסף"
 
 id: LANG_FM_BUTTONBAR_ACTION
-desc:  in radio screen
+desc: in radio screen
 eng: "Action"
 voice: ""
 new: "פעולה"
 
 id: LANG_MDB_STRENGTH
-desc:  in sound settings
+desc: in sound settings
 eng: "MDB Strength"
 voice: "MDB Strength"
 new: "MDB חוזק"
 
 id: LANG_MDB_HARMONICS
-desc:  in sound settings
+desc: in sound settings
 eng: "MDB Harmonics"
 voice: "MDB Harmonics"
 new: "MDB הרמוניית"
 
 id: LANG_MDB_CENTER
-desc:  in sound settings
+desc: in sound settings
 eng: "MDB Center frequency"
 voice: "MDB Center frequency"
 new: "MDB מרכז תדירות"
 
 id: LANG_MDB_SHAPE
-desc:  in sound settings
+desc: in sound settings
 eng: "MDB Shape"
 voice: "MDB Shape"
 new: "MDB צורת"
 
 id: LANG_MDB_ENABLE
-desc:  in sound settings
+desc: in sound settings
 eng: "MDB Enable"
 voice: "MDB Enable"
 new: "פעיל MDB"
 
 id: LANG_SUPERBASS
-desc:  in sound settings
+desc: in sound settings
 eng: "Super bass"
 voice: "Super bass"
 new: "סופר בס"
 
 id: LANG_SHUTDOWN
-desc:  in main menu
+desc: in main menu
 eng: "Shut down"
 voice: "Shut down"
 new: "כיבוי"
 
 id: LANG_SHUTTINGDOWN
-desc:  in main menu
+desc: in main menu
 eng: "Shutting down..."
 voice: ""
 new: "...מכבה"
 
 id: LANG_CONFIRM_SHUTDOWN
-desc:  in shutdown screen
+desc: in shutdown screen
 eng: "Press OFF to shut down"
 voice: ""
 new: "לחץ על כבה כדי לכבות"
 
 id: LANG_ID3_ORDER
-desc:  in playback settings screen
+desc: in playback settings screen
 eng: "ID3 tag priority"
 voice: "ID3 tag priority"
 new: "ID3 עדיפות תווית"
 
 id: LANG_ID3_V1_FIRST
-desc:  in playback settings screen
+desc: in playback settings screen
 eng: "V1 then V2"
 voice: "Version 1 then version 2"
 new: "2 מאשר גרסה 1 גרסה"
 
 id: LANG_ID3_V2_FIRST
-desc:  in playback settings screen
+desc: in playback settings screen
 eng: "V2 then V1"
 voice: "Version 2 then version 1"
 new: "1 מאשר גרסה 2 גרסה"
@@ -2852,13 +2860,13 @@ id: VOICE_DOT
 desc: spoken only, for spelling
 eng: ""
 voice: "dot"
-new:
+new: 
 
 id: VOICE_PAUSE
 desc: spoken only, for spelling, a split second of silence (difficult to author)
 eng: ""
 voice: " "
-new:
+new: 
 
 id: LANG_STEREO_WIDTH
 desc: in sound_settings
@@ -3010,83 +3018,82 @@ eng: "Alarm Disabled"
 voice: "Alarm Disabled"
 new: "שעון מעורר מבוטל"
 
-###########################
 id: LANG_RECORD_TRIGGER
 desc: in recording settings_menu
 eng: "Trigger"
-voice:
+voice: 
 new: "גורם הפעלה"
 
 id: LANG_RECORD_START_THRESHOLD
 desc: in recording settings_menu
 eng: "Start above"
-voice:
+voice: 
 new: "התחל לפני"
 
 id: LANG_RECORD_MIN_DURATION
 desc: in recording settings_menu
 eng: "for at least"
-voice:
+voice: 
 new: "למשך לפחות"
 
 id: LANG_RECORD_STOP_THRESHOLD
 desc: in recording settings_menu
 eng: "Stop below"
-voice:
+voice: 
 new: "עצור אחרי"
 
 id: LANG_RECORD_STOP_POSTREC
 desc: in recording settings_menu
 eng: "for at least"
-voice:
+voice: 
 new: "למשך לפחות"
 
 id: LANG_RECORD_STOP_GAP
 desc: in recording settings_menu
 eng: "Presplit gap"
-voice:
+voice: 
 new: "חלק מראש את הרווח"
 
 id: LANG_RECORD_TRIGGER_MODE
 desc: in recording settings_menu
 eng: "Trigger"
-voice:
+voice: 
 new: "גורם הפעלה"
 
 id: LANG_RECORD_TRIG_NOREARM
 desc: in recording settings_menu
 eng: "Once"
-voice:
+voice: 
 new: "פעם אחת"
 
 id: LANG_RECORD_TRIG_REARM
 desc: in recording settings_menu
 eng: "Repeat"
-voice:
+voice: 
 new: "חזרה"
 
 id: LANG_DB_INF
 desc: -inf db for values below measurement
 eng: "-inf"
-voice:
+voice: 
 new: "-inf"
 
 id: LANG_RECORD_TRIG_IDLE
 desc: waiting for threshold
 eng: "Trigger idle"
-voice:
+voice: 
 new: "גורם ההפעלה ממתין"
 
 id: LANG_RECORD_TRIGGER_ACTIVE
-desc:
+desc: 
 eng: "Trigger active"
-voice:
+voice: 
 new: "גורם ההפעלה מופעל"
 
 id: LANG_LCD_REMOTE_MENU
 desc: in the display sub menu
 eng: "Remote-LCD Settings"
-voice:
+voice: 
 new: "הגדרות מסך השלט"
 
 id: LANG_DISK_NAME_INTERNAL
@@ -3123,7 +3130,7 @@ id: LANG_SHUFFLE_PLAYLIST
 desc: in playlist menu, reshuffles the order in which songs are played
 eng: "Reshuffle"
 voice: "Reshuffle"
-new: "עירבוב מחדש"
+new: "ערבוב מחדש"
 
 id: LANG_NOTHING_TO_RESUME
 desc: Error message displayed when resume button pressed but no playlist
@@ -3164,7 +3171,7 @@ new: "קבע דירוג שיר"
 id: LANG_RATING
 desc: in set_rating
 eng: "Rating:"
-voice "Rating"
+voice: 
 new: "דירוג:"
 
 id: LANG_CROSSFADE_DURATION
@@ -3177,7 +3184,7 @@ id: LANG_MIX
 desc: in playback settings, crossfade option
 eng: "Mix"
 voice: "Mix"
-new: "עירבוב"
+new: "ערבוב"
 
 id: LANG_RESTARTING_PLAYBACK
 desc: splash screen displayed when pcm buffer size is changed
@@ -3188,103 +3195,103 @@ new: "...מאתחל את ההשמעה"
 id: LANG_REPLAYGAIN
 desc: in replaygain
 eng: "Replaygain"
-voice "Replaygain"
+voice: 
 new: "עוצמה חוזרת"
 
 id: LANG_REPLAYGAIN_ENABLE
 desc: in replaygain
 eng: "Enable replaygain"
-voice "Enable replaygain"
+voice: 
 new: "עוצמה חוזרת פעילה"
 
 id: LANG_REPLAYGAIN_NOCLIP
 desc: in replaygain
 eng: "Prevent clipping"
-voice "Prevent clipping"
+voice: 
 new: "מנע עיוותים"
 
 id: LANG_REPLAYGAIN_MODE
 desc: in replaygain
 eng: "Replaygain type"
-voice "Replaygain type"
+voice: 
 new: "סוג עוצמה חוזרת"
 
 id: LANG_TRACK_GAIN
 desc: in replaygain
 eng: "Track gain"
-voice "Track gain"
+voice: 
 new: "עוצמה חוזרת לפי שיר"
 
 id: LANG_ALBUM_GAIN
 desc: in replaygain
 eng: "Album gain"
-voice "Album gain"
+voice: 
 new: "עוצמה חוזרת לפי אלבום"
 
 id: LANG_ID3_TRACK_GAIN
 desc: in browse_id3
 eng: "[Track gain]"
-voice ""
+voice: 
 new: "[עוצמה חוזרת שיר]"
 
 id: LANG_ID3_ALBUM_GAIN
 desc: in browse_id3
 eng: "[Album gain]"
-voice ""
+voice: 
 new: "[עוצמה חוזרת אלבום]"
 
 id: LANG_ID3_NO_GAIN
 desc: DEPRECATED
 eng: ""
-voice ""
-new:
+voice: 
+new: 
 
 id: LANG_BIDI_SUPPORT
 desc: in settings_menu, option to enable reversal of hebrew/arabic text
 eng: "BiDi Hebrew/Arabic"
-voice ""
+voice: 
 new: "עברית/ערבית דו-כיוונית"
 
 id: LANG_REPLAYGAIN_PREAMP
 desc: in browse_id3
 eng: "Pre-amp"
-voice "Preamp"
+voice: 
 new: "קדם-מגבר"
 
 id: LANG_UNIT_DB
 desc: in browse_id3
 eng: "dB"
-voice ""
+voice: 
 new: "dB"
 
 id: LANG_ID3_VBR
 desc: in browse_id3
 eng: " (VBR)"
-voice ""
+voice: 
 new: " (VBR)"
 
 id: LANG_BEEP
 desc: in playback settings
 eng: "Beep volume"
-voice "Beep volume"
+voice: 
 new: "עוצמת הצפצוף"
 
 id: LANG_WEAK
 desc: in beep volume in playback settings
 eng: "Weak"
-voice "Weak"
+voice: 
 new: "חלש"
 
 id: LANG_MODERATE
 desc: in beep volume in playback settings
 eng: "Moderate"
-voice "Moderate"
+voice: 
 new: "בינוני"
 
 id: LANG_STRONG
 desc: in beep volume in playback settings
 eng: "Strong"
-voice "Strong"
+voice: 
 new: "חזק"
 
 id: LANG_REPEAT_AB
