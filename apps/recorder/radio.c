@@ -76,6 +76,7 @@
 #define FM_EXIT (BUTTON_SELECT | BUTTON_REL)
 #elif CONFIG_KEYPAD == ONDIO_PAD /* restricted keypad */
 #define FM_MENU (BUTTON_MENU | BUTTON_REPEAT)
+#define FM_RECORD_DBLPRE BUTTON_MENU
 #define FM_RECORD (BUTTON_MENU | BUTTON_REL)
 #define FM_STOP (BUTTON_OFF | BUTTON_REL)
 #define FM_EXIT (BUTTON_OFF | BUTTON_REPEAT)
@@ -182,6 +183,9 @@ bool radio_screen(void)
     char buf[MAX_PATH];
     bool done = false;
     int button, lastbutton = BUTTON_NONE;
+#ifdef FM_RECORD_DBLPRE
+    unsigned long rec_lastclick = 0;
+#endif
     int freq;
     bool tuned;
     bool stereo = false;
@@ -323,6 +327,18 @@ bool radio_screen(void)
 
 #ifdef FM_RECORD
             case FM_RECORD:
+#ifdef FM_RECORD_DBLPRE
+                if (lastbutton != FM_RECORD_DBLPRE)
+                {
+                    rec_lastclick = 0;
+                    break;
+                }
+                if (current_tick - rec_lastclick > HZ/2)
+                {
+                    rec_lastclick = current_tick;
+                    break;
+                }    
+#endif
 #ifndef SIMULATOR
                 if(audio_status() == AUDIO_STATUS_RECORD)
                 {

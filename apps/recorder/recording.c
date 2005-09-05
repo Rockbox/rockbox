@@ -66,18 +66,23 @@
 #define REC_SETTINGS BUTTON_F1
 #define REC_F2 BUTTON_F2
 #define REC_F3 BUTTON_F3
+
 #elif CONFIG_KEYPAD == ONDIO_PAD /* only limited features */
 #define REC_STOPEXIT BUTTON_OFF
-#define REC_RECPAUSE BUTTON_RIGHT
-#define REC_INC BUTTON_UP
-#define REC_DEC BUTTON_DOWN
-#define REC_NEXT (BUTTON_MENU | BUTTON_REL) 
+#define REC_RECPAUSE_PRE BUTTON_MENU
+#define REC_RECPAUSE (BUTTON_MENU | BUTTON_REL)
+#define REC_INC BUTTON_RIGHT
+#define REC_DEC BUTTON_LEFT
+#define REC_NEXT BUTTON_DOWN
+#define REC_PREV BUTTON_UP
 #define REC_SETTINGS (BUTTON_MENU | BUTTON_REPEAT) 
+
 #elif CONFIG_KEYPAD == IRIVER_H100_PAD
 #define REC_STOPEXIT BUTTON_OFF
 #define REC_RECPAUSE BUTTON_ON
 #define REC_INC BUTTON_RIGHT
 #define REC_DEC BUTTON_LEFT
+
 #elif CONFIG_KEYPAD == GMINI100_PAD
 #define REC_STOPEXIT BUTTON_OFF
 #define REC_RECPAUSE BUTTON_ON
@@ -150,11 +155,7 @@ void adjust_cursor(void)
             cursor = 0;
     
         if(cursor > 2)
-#ifdef REC_PREV /* normal case, stop at the end */
             cursor = 2;
-#else
-            cursor = 0; /* only 1 button, cycle through */
-#endif
     }
     else
     {
@@ -254,6 +255,7 @@ static void trigger_listener(int trigger_status)
 bool recording_screen(void)
 {
     long button;
+    long lastbutton = BUTTON_NONE;
     bool done = false;
     char buf[32];
     char buf2[32];
@@ -395,6 +397,10 @@ bool recording_screen(void)
                 break;
 
             case REC_RECPAUSE:
+#ifdef REC_RECPAUSE_PRE
+                if (lastbutton != REC_RECPAUSE_PRE)
+                    break;
+#endif
                 /* Only act if the mpeg is stopped */
                 if(!(audio_stat & AUDIO_STATUS_RECORD))
                 {
@@ -622,6 +628,8 @@ bool recording_screen(void)
                 default_event_handler(button);
                 break;
         }
+        if (button != BUTTON_NONE)
+            lastbutton = button;
 
         lcd_setfont(FONT_SYSFIXED);
 
