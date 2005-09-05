@@ -2512,6 +2512,7 @@ void audio_beep(int duration)
         * it doesn't affect the (pre-)recording. */
         mas_codec_writereg(0, shadow_codec_reg0 ^ 1);
         mas_codec_writereg(0, shadow_codec_reg0);
+        yield();
     }
     while (current_tick - starttick < duration);
 }
@@ -2681,7 +2682,7 @@ void audio_play(int offset)
     } while(1);
 #else /* !SIMULATOR */
     is_playing = true;
-    
+
     queue_post(&mpeg_queue, MPEG_PLAY, (void*)offset);
 #endif /* !SIMULATOR */
 
