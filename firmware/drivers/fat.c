@@ -1059,8 +1059,15 @@ static void fat_time(unsigned short* date,
     {
         if (0 == *date)
         {
-            /* set to 1 August 2003 */
-            *date = ((2003 - 1980) << 9) | (8 << 5) | 1;
+/* Macros to convert a 2-digit string to a decimal constant. 
+   (YEAR), MONTH and DAY are set by the date command, which outputs
+   DAY as 00..31 and MONTH as 01..12. The leading zero would lead to
+   misinterpretation as an octal constant. */
+#define S100(x) 1 ## x
+#define C2DIG2DEC(x) (S100(x)-100)
+            /* set to build date */
+            *date = ((YEAR - 1980) << 9) | (C2DIG2DEC(MONTH) << 5) 
+                  | C2DIG2DEC(DAY);
         }
         else
         {

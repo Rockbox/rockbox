@@ -814,6 +814,7 @@ export BUILDDIR=@PWD@
 export LANGUAGE=@LANGUAGE@
 export MEMORYSIZE=@MEMORY@
 export VERSION=\$(shell date +%y%m%d-%H%M)
+export BUILDDATE=\$(shell date +'-DYEAR=%Y -DMONTH=%m -DDAY=%d')
 export MKFIRMWARE=@TOOL@
 export BINARY=@OUTPUT@
 export APPEXTRA=@APPEXTRA@
