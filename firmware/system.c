@@ -891,14 +891,13 @@ void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
         /* try to restart firmware if ON is pressed */
 #if CONFIG_KEYPAD == PLAYER_PAD
         if (!(PADR & 0x0020))
-            rolo_load("/archos.mod");
 #elif CONFIG_KEYPAD == RECORDER_PAD
 #ifdef HAVE_FMADC
         if (!(PCDR & 0x0008))
 #else
         if (!(PBDR & 0x0100))
 #endif
-            rolo_load("/ajbrec.ajz");
+            system_reboot();
 #endif
     }
 }
