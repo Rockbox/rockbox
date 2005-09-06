@@ -86,6 +86,9 @@
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
 
+/* Define this for S/PDIF input available */
+#define HAVE_SPDIF_IN
+
 #define CONFIG_LCD LCD_SSD1815
 
 #define BOOTFILE_EXT "ajz"

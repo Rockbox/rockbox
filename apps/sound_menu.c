@@ -255,11 +255,13 @@ static bool recsource(void)
     static const struct opt_items names[] = {
         { STR(LANG_RECORDING_SRC_MIC) },
         { STR(LANG_RECORDING_SRC_LINE) },
-        { STR(LANG_RECORDING_SRC_DIGITAL) }
+#ifdef HAVE_SPDIF_IN
+        { STR(LANG_RECORDING_SRC_DIGITAL) },
+#endif
     };
     return set_option(str(LANG_RECORDING_SOURCE),
-                      &global_settings.rec_source, INT,
-                      names, 3, NULL );
+                      &global_settings.rec_source, INT, names,
+                      sizeof(names)/sizeof(struct opt_items), NULL );
 }
 
 static bool recfrequency(void)

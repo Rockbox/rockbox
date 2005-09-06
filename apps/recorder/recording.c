@@ -93,9 +93,14 @@
 bool f2_rec_screen(void);
 bool f3_rec_screen(void);
 
-#define SOURCE_MIC 0
-#define SOURCE_LINE 1
+#define SOURCE_MIC   0
+#define SOURCE_LINE  1
+#ifdef HAVE_SPDIF_IN
 #define SOURCE_SPDIF 2
+#define MAX_SOURCE   SOURCE_SPDIF
+#else
+#define MAX_SOURCE   SOURCE_LINE
+#endif
 
 #define MAX_FILE_SIZE 0x7FF00000 /* 2 GB - 1 MB */
 
@@ -699,8 +704,7 @@ bool recording_screen(void)
                 last_seconds = 0;
             }
 
-            /* Show mic gain if input source is Mic */
-            if(global_settings.rec_source == 0)
+            if(global_settings.rec_source == SOURCE_MIC)
             {
                 snprintf(buf, 32, "%s: %s", str(LANG_RECORDING_GAIN),
                          fmt_gain(SOUND_MIC_GAIN,
@@ -746,7 +750,9 @@ bool recording_screen(void)
                 }
             }
 
+#ifdef SOURCE_SPDIF
             if(global_settings.rec_source != SOURCE_SPDIF)
+#endif
                 put_cursorxy(0, 4 + cursor, true);
 
             if (global_settings.rec_source != SOURCE_LINE) {
@@ -987,7 +993,7 @@ bool f3_rec_screen(void)
             case BUTTON_LEFT:
             case BUTTON_F3 | BUTTON_LEFT:
                 global_settings.rec_source++;
-                if(global_settings.rec_source > 2)
+                if(global_settings.rec_source > MAX_SOURCE)
                     global_settings.rec_source = 0;
                 used = true;
                 break;

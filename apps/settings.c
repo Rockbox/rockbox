@@ -78,7 +78,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "pcm_playback.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 26
+#define CONFIG_BLOCK_VERSION 27
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -364,8 +364,11 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(rec_channels), 0, "rec channels", "stereo,mono" },
     {4, S_O(rec_mic_gain), 8, "rec mic gain", NULL },
     {3, S_O(rec_quality), 5, "rec quality", NULL },
-    {2, S_O(rec_source), 0, /* 0=mic */
-        "rec source", "mic,line,spdif" },
+#ifdef HAVE_SPDIF_IN
+    {2, S_O(rec_source), 0 /* 0=mic */, "rec source", "mic,line,spdif" },
+#else
+    {1, S_O(rec_source), 0 /* 0=mic */, "rec source", "mic,line" },
+#endif
     {3, S_O(rec_frequency), 0, /* 0=44.1kHz */
         "rec frequency", "44,48,32,22,24,16" },
     {4, S_O(rec_left_gain), 2, /* 0dB */
