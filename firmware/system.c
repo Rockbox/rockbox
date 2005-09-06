@@ -897,8 +897,8 @@ void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
 #else
         if (!(PBDR & 0x0100))
 #endif
-            system_reboot();
 #endif
+            system_reboot();
     }
 }
 
