@@ -567,11 +567,11 @@ bool radio_screen(void)
                 buttonbar_draw();
 #endif                
                 lcd_update();
-                
-                update_screen = false;
             }
             /* Only force the redraw if update_screen is true */
             status_draw(update_screen);
+                
+            update_screen = false;
         }
 
         if(audio_status() & AUDIO_STATUS_ERROR)
