@@ -617,7 +617,10 @@ static char* get_tag(struct mp3entry* cid3,
                     return buf;
 
                 case 'c':  /* File Codec */
-                    *intval = id3->codectype;
+                    if(id3->codectype == AFMT_UNKNOWN)
+                        *intval = AFMT_NUM_CODECS;
+                    else
+                        *intval = id3->codectype;
                     return id3_get_codec(id3);
             }
             break;
@@ -697,6 +700,7 @@ static char* get_tag(struct mp3entry* cid3,
                 case 'v': /* volume */
                     *flags |= WPS_REFRESH_DYNAMIC;
                     snprintf(buf, buf_size, "%d%%", global_settings.volume);
+                    *intval = global_settings.volume / 10 + 1;
                     return buf;
 
             }
@@ -752,9 +756,15 @@ static char* get_tag(struct mp3entry* cid3,
                 {
                     int l = battery_level();
                     if (l > -1)
+                    {
                         snprintf(buf, buf_size, "%d%%", l);
+                        *intval = l / 20 + 1;
+                    }
                     else
+                    {
+                        *intval = 6;
                         return "?%";
+                    }
                     return buf;
                 }
 
@@ -857,6 +867,7 @@ static const char* skip_conditional(const char* fmt, int num)
 {
     int level = 1;
     int count = num;
+    const char *last_alternative = NULL;
 
     while (*fmt)
     {
@@ -867,6 +878,7 @@ static const char* skip_conditional(const char* fmt, int num)
 
             case '|':
                 if(1 == level) {
+                    last_alternative = fmt;
                     if(num) {
                         count--;
                         if(count == 0)
@@ -879,10 +891,18 @@ static const char* skip_conditional(const char* fmt, int num)
             case '>':
                 if (0 == --level)
                 {
-                    if (num)
-                        fmt--;
+                    /* We're just skipping to the end */
+                    if(num == 0)
+                        return fmt;
 
-                    return fmt;
+                    /* If we are parsing an enum, we'll return the selected
+                       item. If there weren't enough items in the enum, we'll
+                       return the last one found. */
+                    if(count && last_alternative)
+                    {
+                        return last_alternative;
+                    }
+                    return fmt - 1;
                 }
                 continue;
 
@@ -1069,9 +1089,10 @@ static void format_display(char* buf,
                 if ('<' == *fmt)
                     fmt++;
 
-                /* No value, so skip to else part */
+                /* No value, so skip to else part, using a sufficiently high
+                   value to "hit" the last part of the conditional */
                 if ((!value) || (!strlen(value)))
-                    fmt = skip_conditional(fmt, 1);
+                    fmt = skip_conditional(fmt, 1000);
                 else
                     if(intval > 1) /* enum */
                         fmt = skip_conditional(fmt, intval - 1);

@@ -40,6 +40,8 @@ enum {
     AFMT_WAVPACK,      /* WavPack */
 
     /* New formats must be added to the end of this list */
+
+    AFMT_NUM_CODECS
 };
 
 struct mp3entry {
