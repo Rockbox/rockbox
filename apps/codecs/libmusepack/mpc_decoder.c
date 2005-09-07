@@ -1173,6 +1173,10 @@ void mpc_decoder_setup(mpc_decoder *d, mpc_reader *r)
   mpc_decoder_initialisiere_quantisierungstabellen(d, 1.0f);
   mpc_decoder_init_huffman_sv6(d);
   mpc_decoder_init_huffman_sv7(d);
+
+  #if defined(CPU_COLDFIRE)&& !defined(SIMULATOR)
+  coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_ROUND | EMAC_SATURATE);
+  #endif
 }
 
 static void mpc_decoder_set_streaminfo(mpc_decoder *d, mpc_streaminfo *si)

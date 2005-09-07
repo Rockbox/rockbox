@@ -43,7 +43,6 @@
 
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
 
-#define INIT() asm volatile ("move.l #0xb0, %macsr") /* frac, round, clip */
 /* Multiply two S.31 fractional integers and return the sign bit and the
  * 31 most significant bits of the result.
  */
@@ -89,7 +88,6 @@
 
 #else
 
-#define INIT()
 #define FRACMUL(x, y) (long) (((((long long) (x)) * ((long long) (y))) >> 31))
 #define FRACMUL_8(x, y) (long) (((((long long) (x)) * ((long long) (y))) >> 23))
 #define FRACMUL_8_LOOP(x, y, s) \
@@ -492,11 +490,17 @@ long dsp_process(char* dst, char* src[], long size)
     long factor;
     int samples;
 
+    #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+    /* set emac unit for dsp processing, and save old macsr, we're running in
+       codec thread context at this point, so can't clobber it */
+    unsigned long old_macsr = coldfire_get_macsr();
+    coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_ROUND | EMAC_SATURATE);
+    #endif
+    
     dsp = &dsp_conf[current_codec];
 
     factor = (dsp->stereo_mode != STEREO_MONO) ? 2 : 1;
     size /= dsp->sample_bytes * factor;
-    INIT();
     dsp_set_replaygain(false);
 
     while (size > 0)
@@ -510,7 +514,10 @@ long dsp_process(char* dst, char* src[], long size)
         dst += samples * sizeof(short) * 2;
         yield();
     }
-
+    #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+    /* set old macsr again */
+    coldfire_set_macsr(old_macsr);
+    #endif
     return written * sizeof(short) * 2;
 }
 

@@ -20,6 +20,7 @@
 /* Global declarations to be used in rockbox software codecs */
 
 #include "config.h"
+#include "system.h"
 
 #include <sys/types.h>
 

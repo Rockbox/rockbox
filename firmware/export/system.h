@@ -125,8 +125,21 @@ enum {
      : /* %0 */ "d"(mask),   \
        /* %1 */ "a"(address))
 
-static inline void mcf5249_init_mac(void) {
-      asm volatile ("move.l #0x20, %macsr;");  /* frac, truncate, no saturation */
+#define EMAC_ROUND      0x10
+#define EMAC_FRACTIONAL 0x20
+#define EMAC_SATURATE   0x80
+
+static inline void coldfire_set_macsr(const unsigned long flags)
+{
+    asm volatile ("move.l %0, %%macsr" : : "r" (flags));
+}
+
+static inline unsigned long coldfire_get_macsr(void)
+{
+    unsigned long m;
+    
+    asm volatile ("move.l %%macsr, %0" : "=r" (m));
+    return m;
 }
 
 #endif

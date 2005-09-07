@@ -762,6 +762,12 @@ int ov_clear(OggVorbis_File *vf){
 
 int ov_open_callbacks(void *f,OggVorbis_File *vf,char *initial,long ibytes,
     ov_callbacks callbacks){
+  #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+  /* this seems to be the closest we get to an init function, let's init emac
+     here. rounding is disabled because of MULT31_SHIFT15, which will be
+     inaccurate with rounding in its current incarnation */
+  coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
+  #endif
   int ret=_ov_open1(f,vf,initial,ibytes,callbacks);
   if(ret)return ret;
   return _ov_open2(vf);
@@ -1287,14 +1293,11 @@ int ov_pcm_seek_page(OggVorbis_File *vf,ogg_int64_t pos){
 int ov_pcm_seek(OggVorbis_File *vf,ogg_int64_t pos){
   ogg_packet op={0,0,0,0,0,0};
   ogg_page og={0,0,0,0};
+
   int thisblock,lastblock=0;
   int ret=ov_pcm_seek_page(vf,pos);
   if(ret<0)return(ret);
   _make_decode_ready(vf);
-
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
-  mcf5249_init_mac();
-#endif
 
   /* discard leading packets we don't need for the lapping of the
      position we want; don't decode them */
@@ -1553,10 +1556,6 @@ long ov_read(OggVorbis_File *vf,char *buffer,int bytes_req,int *bitstream){
 
   if(vf->ready_state<OPENED)return(OV_EINVAL);
 
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
-  mcf5249_init_mac();
-#endif
-
   while(1){
     if(vf->ready_state==INITSET){
       samples=vorbis_synthesis_pcmout(&vf->vd,&pcm);
@@ -1621,10 +1620,6 @@ long ov_read(OggVorbis_File *vf,char *buffer,int bytes_req,int *bitstream){
 long ov_read_fixed(OggVorbis_File *vf,ogg_int32_t ***pcm_channels,int length,
                   int *bitstream){
   if(vf->ready_state<OPENED)return(OV_EINVAL);
-
-#if CONFIG_CPU == MCF5249
-  mcf5249_init_mac();
-#endif
 
   while(1){
     if(vf->ready_state==INITSET){

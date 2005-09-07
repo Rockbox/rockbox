@@ -335,9 +335,6 @@ static void Synthese_Filter_float_internal(MPC_SAMPLE_FORMAT * OutData,MPC_SAMPL
 {
     mpc_uint32_t n;
     
-    #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
-    asm volatile ("move.l #0x20, %macsr"); /* fractional emac mode */
-    #endif
     for ( n = 0; n < 36; n++, Y += 32 ) {
         V -= 64;
         Calculate_New_V ( Y, V );

@@ -1775,8 +1775,6 @@ void imdct36(mad_fixed_t const X[18], mad_fixed_t x[36])
   mad_fixed_t t[16];
   /* assumes FRACBITS = 28 */
   asm volatile (
-    "move.l #0xb0, %%d0\n\t"        /* frac. mode, saturate, round */
-    "move.l %%d0, %%macsr\n\t"
     "move.l (4*4, %[X]), %%d0\n\t"
     "move.l #0x0ec835e8, %%d1\n\t"
     "mac.l %%d0, %%d1, (13*4, %[X]), %%d0, %%acc0\n\t"

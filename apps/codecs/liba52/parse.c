@@ -59,7 +59,7 @@ a52_state_t * a52_init (uint32_t mm_accel)
     int i;
 
     #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
-    asm volatile ("move.l #0x30, %macsr"); /* frac. mode with rounding */
+    coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_ROUND | EMAC_SATURATE);
     #endif
     /* 
       this needs to come back if we ever want two decoder instances

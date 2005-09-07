@@ -42,6 +42,11 @@ void mad_synth_init(struct mad_synth *synth)
   synth->pcm.samplerate = 0;
   synth->pcm.channels   = 0;
   synth->pcm.length     = 0;
+  #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+  /* init the emac unit here, since this function should always be called
+     before using libmad */
+  coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE | EMAC_ROUND);
+  #endif
 }
 
 /*
@@ -582,8 +587,6 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
   mad_fixed_t const (*Dptr)[32];
   mad_fixed64hi_t hi;
 
-  asm volatile("move.l #0x20, %macsr"); /* fractional mode */
-  
   for (ch = 0; ch < nch; ++ch) {
     sbsample = &frame->sbsample[ch];
     filter   = &synth->filter[ch];

@@ -114,9 +114,6 @@ enum codec_status codec_start(struct codec_api* api)
     ci->memset(&Synth, 0, sizeof(struct mad_synth));
     ci->memset(&Timer, 0, sizeof(mad_timer_t));
     
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
-    mcf5249_init_mac();
-#endif
     mad_stream_init(&Stream);
     mad_frame_init(&Frame);
     mad_synth_init(&Synth);

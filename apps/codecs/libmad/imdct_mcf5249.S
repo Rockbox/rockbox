@@ -32,7 +32,6 @@ III_imdct_s:
      * get more low bits out of the accext01 register _before_ doing the
      * movclrs.
      */
-    move.l #0xb0, %macsr                /* frac mode, saturation, rounding */
     sub.l %a0, %a0                      /* clear loop variable */
 .imdctloop:                             /* outer loop label */
     lea.l imdct_s, %a1                  /* load pointer to imdct coefs in a1 */
