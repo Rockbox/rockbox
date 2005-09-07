@@ -33,6 +33,8 @@
 #include "thread-win32.h"
 #include "debug.h"
 
+void pcm_play_stop(void);
+
 static void sound_play_chunk(HWAVEOUT wave_out, LPWAVEHDR header, 
     HANDLE event)
 {
@@ -141,6 +143,8 @@ void sound_playback_thread(void)
             sound_play_chunk(wave_out, &header1, event);
             sound_play_chunk(wave_out, &header2, event);
         }
+        
+        pcm_play_stop();
         
         DEBUGF("stopping simulator playback\n");
 
