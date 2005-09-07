@@ -51,6 +51,7 @@
 #include "icons.h"
 #include "widgets.h"
 #include "peakmeter.h"
+#include "screens.h"
 
 /* Image stuff */
 #include "bmp.h"
