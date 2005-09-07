@@ -56,8 +56,8 @@
 /* Image stuff */
 #include "bmp.h"
 #include "atoi.h"
-#define MAX_IMAGES 26 /* a-z */
-#define IMG_BUFSIZE (LCD_HEIGHT * LCD_WIDTH * MAX_IMAGES/10) / 8
+#define MAX_IMAGES (26*2) /* a-z and A-Z */
+#define IMG_BUFSIZE (LCD_HEIGHT * LCD_WIDTH * MAX_IMAGES/25) / 8
 static unsigned char img_buf[IMG_BUFSIZE]; /* image buffer */
 static unsigned char* img_buf_ptr = img_buf; /* where are in image buffer? */
 
@@ -81,7 +81,7 @@ struct {
 
 #ifdef HAVE_LCD_BITMAP
 #define MAX_LINES (LCD_HEIGHT/5+1)
-#define FORMAT_BUFFER_SIZE 800
+#define FORMAT_BUFFER_SIZE 1600
 #else
 #define MAX_LINES 2
 #define FORMAT_BUFFER_SIZE 400
@@ -238,17 +238,24 @@ static void wps_format(const char* fmt)
                     pos = strchr(ptr, '|');
                     if (pos)
                     {
-                        /* get the image number */
-                        n = tolower(*ptr) - 'a';
+                        /* get the image ID */
+                        n = *ptr;
+                        if(n >= 'a' && n <= 'z')
+                            n -= 'a';
+                        if(n >= 'A' && n <= 'Z')
+                            n = n - 'A' + 26;
+
                         if(n < 0 || n >= MAX_IMAGES)
                         {
-                            buf++;
+                            /* Skip the rest of the line */
+                            while(*buf != '\n')
+                                buf++;
                             break;
                         }
                         ptr = pos+1;
 
                         /* check the image number and load state */
-                        if ((n < MAX_IMAGES) && (!img[n].loaded))
+                        if (!img[n].loaded)
                         {
                             /* get filename */
                             pos = strchr(ptr, '|');
@@ -1061,7 +1068,14 @@ static void format_display(char* buf,
                 else if ('d' == *(fmt+1))
                 {
                     fmt+=2;
-                    n = tolower(*fmt) - 'a';
+
+                    /* get the image ID */
+                    n = *fmt;
+                    if(n >= 'a' && n <= 'z')
+                        n -= 'a';
+                    if(n >= 'A' && n <= 'Z')
+                        n = n - 'A' + 26;
+                        
                     if (n >= 0 && n < MAX_IMAGES && img[n].loaded) {
                         img[n].display = true;
                     }
