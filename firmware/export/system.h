@@ -129,9 +129,9 @@ enum {
 #define EMAC_FRACTIONAL 0x20
 #define EMAC_SATURATE   0x80
 
-static inline void coldfire_set_macsr(const unsigned long flags)
+static inline void coldfire_set_macsr(unsigned long flags)
 {
-    asm volatile ("move.l %0, %%macsr" : : "r" (flags));
+    asm volatile ("move.l %0, %%macsr" : : "i,r" (flags));
 }
 
 static inline unsigned long coldfire_get_macsr(void)
