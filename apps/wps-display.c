@@ -124,9 +124,13 @@ static bool wps_loaded = false;
 /* Display images */
 static void wps_display_images(void) {
     int n;
-    lcd_set_drawmode(DRMODE_FG);
     for (n = 0; n < MAX_IMAGES; n++) {
         if (img[n].loaded && img[n].display) {
+            if(img[n].always_display)
+                lcd_set_drawmode(DRMODE_FG);
+            else
+                lcd_set_drawmode(DRMODE_SOLID);
+
             lcd_mono_bitmap(img[n].ptr, img[n].x, img[n].y, img[n].w, img[n].h);
             lcd_update_rect(img[n].x, img[n].y, img[n].w, img[n].h);
         }
@@ -692,6 +696,7 @@ static char* get_tag(struct mp3entry* cid3,
                     return "\x01";
 #endif
                 case 's': /* shuffle */
+                    *flags |= WPS_REFRESH_DYNAMIC;
                     if ( global_settings.playlist_shuffle )
                         return "s";
                     else
@@ -711,6 +716,7 @@ static char* get_tag(struct mp3entry* cid3,
             switch (tag[1])
             {
                 case 'm': /* playback repeat mode */
+                    *flags |= WPS_REFRESH_DYNAMIC;
                     *intval = global_settings.repeat_mode + 1;
                     snprintf(buf, buf_size, "%d", *intval);
                     return buf;
@@ -963,15 +969,10 @@ static void format_display(char* buf,
     int level = 0;
     unsigned char tag_length;
     int intval;
-
     int cur_align;
     char* cur_align_start;
 #ifdef HAVE_LCD_BITMAP
     int n;
-    /* Set images to not to be displayed */
-    for (n = 0; n < MAX_IMAGES; n++) {
-        img[n].display = false;
-    }
 #endif
     
     cur_align_start = buf;
@@ -1167,6 +1168,11 @@ bool wps_refresh(struct mp3entry* id3,
        or sleep is called but who knows...)
     */
     bool enable_pm = false;
+
+    /* Set images to not to be displayed */
+    for (i = 0; i < MAX_IMAGES; i++) {
+        img[i].display = false;
+    }
 #endif
 
     /* reset to first subline if refresh all flag is set */
@@ -1522,15 +1528,15 @@ bool wps_refresh(struct mp3entry* id3,
 #ifdef HAVE_LCD_BITMAP
         if (update_line) {
             lcd_update_rect(0, i*h + offset, LCD_WIDTH, h);
-            wps_display_images();
         }
 #endif
     }
 
 #ifdef HAVE_LCD_BITMAP
-    /* Display images marked as "always display" */
+    /* Display all images */
     for (i = 0; i < MAX_IMAGES; i++) {
-        img[i].display = img[i].always_display;
+        if(img[i].always_display)
+           img[i].display = img[i].always_display;
     }
     wps_display_images();
     
