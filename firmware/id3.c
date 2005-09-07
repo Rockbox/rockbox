@@ -76,7 +76,11 @@ static const char* const genres[] = {
     "Chanson", "Opera", "Chamber Music", "Sonata", "Symphony", "Booty Bass",
     "Primus", "Porn Groove", "Satire", "Slow Jam", "Club", "Tango", "Samba",
     "Folklore", "Ballad", "Power Ballad", "Rhythmic Soul", "Freestyle",
-    "Duet", "Punk Rock", "Drum Solo", "A capella", "Euro-House", "Dance Hall"
+    "Duet", "Punk Rock", "Drum Solo", "A capella", "Euro-House", "Dance Hall",
+    "Goa", "Bass", "Club-House", "Hardcore", "Terror", "Indie", "BritPop",
+    "Negerpunk", "Punk", "Beat", "Rap", "Metal", "Metal", "Crossover",
+    "Christian", "Rock", "Merengue", "Salsa", "Metal", "Anime", "Jpop",
+    "Synthpop"
 };
 
 static const char* const codec_labels[] = {
