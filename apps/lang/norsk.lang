@@ -898,13 +898,13 @@ id: LANG_PM_MAX
 desc: in the peak meter menu
 eng: "Maximum Of Range"
 voice: "Maximum Of Range"
-new: "Maksimal verdi"
+new: "Største verdi"
 
 id: LANG_PM_MIN
 desc: in the peak meter menu
 eng: "Minimum Of Range"
 voice: "Minimum Of Range"
-new: "Minimal verdi"
+new: "Minste verdi"
 
 id: LANG_PM_PERFORMANCE
 desc: DEPRECATED
