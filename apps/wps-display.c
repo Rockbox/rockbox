@@ -45,13 +45,13 @@
 #include "backlight.h"
 #include "button.h"
 #include "abrepeat.h"
+#include "screens.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include <ctype.h>
 #include "icons.h"
 #include "widgets.h"
 #include "peakmeter.h"
-#include "screens.h"
 
 /* Image stuff */
 #include "bmp.h"
