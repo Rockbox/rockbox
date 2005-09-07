@@ -5,6 +5,13 @@
 # - Rune Wiinberg
 # - Jakob Givoni
 # - Jonas Häggqvist
+# 
+# Try to follow the guidelines from http://www.sslug.dk/locale/ Specifically
+# try to avoid english words at (almost) all costs.
+# 
+# Local conventions:
+# "Settings" is removed from translations used in the menu since it's all
+# settings there ("Sound Settings > Lyd").
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -82,7 +89,7 @@ id: LANG_PLAYINDICES_PLAYLIST
 desc: in playlist.indices() when playlist is full *WARNING* this and next ID are only used in this function.
 eng: "Playlist"
 voice: ""
-new: "Musikliste"
+new: "Spilleliste"
 
 id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
@@ -142,7 +149,7 @@ id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play Selected First"
 voice: "Play Selected File First"
-new: "Start v. valgte"
+new: "Spil valgte først"
 
 id: LANG_SORT_CASE
 desc: in settings_menu
@@ -154,7 +161,7 @@ id: LANG_RESUME
 desc: in settings_menu
 eng: "Resume on startup"
 voice: "Resume on startup"
-new: "Forsæt v. tænd"
+new: "Forsæt ved tænd"
 
 id: LANG_OFF
 desc: Used in a lot of places
@@ -208,19 +215,19 @@ id: LANG_FFRW_STEP
 desc: in settings_menu
 eng: "FF/RW Min Step"
 voice: "Minimum Step"
-new: "Spol min trin"
+new: "Spol mindste trin"
 
 id: LANG_FFRW_ACCEL
 desc: in settings_menu
 eng: "FF/RW Accel"
 voice: "Acceleration"
-new: "Spol accel"
+new: "Spol acceleration"
 
 id: LANG_FOLLOW
 desc: in settings_menu
 eng: "Follow Playlist"
 voice: "Follow Playlist"
-new: "Følg musikliste"
+new: "Følg spilleliste"
 
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
@@ -382,7 +389,7 @@ id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Is Full!"
 voice: ""
-new: "Er fuld!"
+new: "er fuld!"
 
 id: LANG_RESUME_ASK
 desc: DEPRECATED
@@ -514,7 +521,7 @@ id: LANG_ID3_PLAYLIST
 desc: in wps
 eng: "[Playlist]"
 voice: ""
-new: "[Musikliste]"
+new: "[Spilleliste]"
 
 id: LANG_ID3_BITRATE
 desc: in wps
@@ -586,13 +593,13 @@ id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
 eng: "End Of Song List"
 voice: ""
-new: "<Slut på liste>"
+new: "Slut på liste"
 
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
 eng: "Idle Poweroff"
 voice: "Idle Poweroff"
-new: "Auto. sluk"
+new: "Automatisk sluk"
 
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
@@ -664,13 +671,13 @@ id: LANG_PM_ETERNAL
 desc: in the peak meter menu
 eng: "Eternal"
 voice: "Eternal"
-new: "Evig"
+new: "Uendelig"
 
 id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
 eng: "Units Per Read"
 voice: "Units Per Read"
-new: "Enheder pr. læsning"
+new: "Enheder per læsning"
 
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
@@ -904,13 +911,13 @@ id: LANG_PM_MIN
 desc: in the peak meter menu
 eng: "Minimum Of Range"
 voice: "Minimum Of Range"
-new: "Min. råderum"
+new: "Mindste værdi"
 
 id: LANG_PM_MAX
 desc: in the peak meter menu
 eng: "Maximum Of Range"
 voice: "Maximum Of Range"
-new: "Maks. råderum"
+new: "Største værdi"
 
 id: LANG_RECORDING
 desc: in the main menu
@@ -1006,7 +1013,7 @@ id: LANG_FILTER_PLAYLIST
 desc: show only playlist
 eng: "Playlists"
 voice: "Playlists"
-new: "Musiklister"
+new: "Spillelister"
 
 id: LANG_BATTERY_TIME
 desc: battery level in % and estimated time remaining
@@ -1180,7 +1187,7 @@ id: LANG_CREATE_PLAYLIST
 desc: Menu option for creating a playlist
 eng: "Create Playlist"
 voice: "Create Playlist"
-new: "Lav musikliste"
+new: "Lav spilleliste"
 
 id: LANG_CREATING
 desc: Screen feedback during playlist creation
@@ -1216,7 +1223,7 @@ id: LANG_MENU_SHOW_ID3_INFO
 desc: Menu option to start id3 viewer
 eng: "Show ID3 Info"
 voice: "Show ID3 Info"
-new: "Vis ID3 info"
+new: "Vis metadata"
 
 id: LANG_ID3_GENRE
 desc: ID3 frame 'genre'
@@ -1276,7 +1283,7 @@ id: LANG_INVERT
 desc: in settings_menu
 eng: "LCD Mode"
 voice: "LCD Mode"
-new: "LCD tilstand"
+new: "Skærm tilstand"
 
 id: LANG_CHANNEL_STEREO_NARROW_PLAYER
 desc: DEPRECATED
@@ -1390,7 +1397,7 @@ id: LANG_MAX_FILES_IN_PLAYLIST
 desc: in settings_menu
 eng: "Max playlist size"
 voice: "Max playlist size"
-new: "Maks musikliste størrelse" 
+new: "Maks spilleliste størrelse" 
 
 id: LANG_JUMP_SCROLL
 desc: (player) menu altarnative for jump scroll
@@ -1528,13 +1535,13 @@ id: LANG_SAVE_DYNAMIC_PLAYLIST
 desc: in playlist menu.
 eng: "Save Current Playlist"
 voice: "Save Current Playlist"
-new: "Gem denne musikliste"
+new: "Gem denne spilleliste"
 
 id: LANG_PLAYLIST_MENU
 desc: in main menu.
 eng: "Playlist Options"
 voice: "Playlist Options"
-new: "Musiklister"
+new: "Spillelister"
 
 id: LANG_PLAYLIST_INSERT_COUNT
 desc: splash number of tracks inserted
@@ -1576,13 +1583,13 @@ id: LANG_PLAYLIST_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing playlist file"
 voice: ""
-new: "Fejl ved tilgang af musikliste fil"
+new: "Fejl ved tilgang af spilleliste fil"
 
 id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing playlist control file"
 voice: ""
-new: "Fejl ved tilgang af musikliste kontrol fil"
+new: "Fejl ved tilgang af spilleliste kontrol fil"
 
 id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
 desc: Playlist error
@@ -1594,7 +1601,7 @@ id: LANG_PLAYLIST_CONTROL_INVALID
 desc: Playlist resume error
 eng: "Playlist control file is invalid"
 voice: ""
-new: "Musikliste kontrol fil er ugyldig"
+new: "Spilleliste kontrol fil er ugyldig"
 
 id: LANG_RECURSE_DIRECTORY
 desc: In playlist menu
@@ -1696,7 +1703,7 @@ id: LANG_FM_PRESET_SAVE_FAILED
 desc: in radio screen
 eng: "Preset save failed"
 voice: ""
-new: "Station gem fejlede"
+new: "Station kunne ikke gemmes"
 
 id: LANG_FM_NO_PRESETS
 desc: DEPRECATED
@@ -1726,7 +1733,7 @@ id: LANG_VIEW_DYNAMIC_PLAYLIST
 desc: in playlist menu.
 eng: "View Current Playlist"
 voice: "View Current Playlist"
-new: "Vis nuværende musikliste"
+new: "Vis nuværende spilleliste"
 
 id: LANG_MOVE
 desc: The verb/action Move
@@ -1918,7 +1925,7 @@ id: LANG_LCD_MENU
 desc: in the display sub menu
 eng: "LCD Settings"
 voice: "LCD Settings"
-new: "LCD indstillinger"
+new: "Skærm indstillinger"
 
 id: LANG_BARS_MENU
 desc: in the display sub menu
@@ -2038,7 +2045,7 @@ id: LANG_DIRBROWSE_F3
 desc: in dir browser, F3 button bar text
 eng: "LCD"
 voice: ""
-new: "LCD"
+new: "Skærm"
 
 id: VOICE_ZERO
 desc: spoken only, for composing numbers
@@ -2680,7 +2687,7 @@ id: LANG_SORT_DATE
 desc: browser sorting setting
 eng: "by date"
 voice: "by date"
-new: "efter dato"
+new: "Efter dato"
 
 id: LANG_SORT_DATE_REVERSE
 desc: browser sorting setting
@@ -2968,7 +2975,7 @@ id: LANG_PLAYLIST
 desc: Used when you need to say playlist, also voiced
 eng: "Playlist"
 voice: "Playlist"
-new: "Musikliste"
+new: "Spilleliste"
 
 id: LANG_RECORD_STARTUP
 desc: Start Rockbox in Recording screen
@@ -3058,7 +3065,7 @@ id: LANG_LCD_REMOTE_MENU
 desc: in the display sub menu
 eng: "Remote-LCD Settings"
 voice: 
-new: "Fjernbetjenings-LCD indstillinger"
+new: "Fjernbetjenings-skærm indstillinger"
 
 id: LANG_DISK_NAME_INTERNAL
 desc: in info menu; name for internal disk with multivolume (keep short!)
