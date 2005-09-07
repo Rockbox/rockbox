@@ -1234,6 +1234,15 @@ static int write_long_name(struct fat_file* file,
     return 0;
 }
 
+static int fat_checkname(const unsigned char* newname)
+{
+    /* More sanity checks are probably needed */
+    if ( newname[strlen(newname) - 1] == '.' ) {
+        return -1;
+    }
+    return 0;
+}
+
 static int add_dir_entry(struct fat_dir* dir,
                          struct fat_file* file,
                          const char* name,
@@ -1255,6 +1264,15 @@ static int add_dir_entry(struct fat_dir* dir,
 
     LDEBUGF( "add_dir_entry(%s,%lx)\n",
              name, file->firstcluster);
+
+    /* Don't check dotdirs name for validity */
+    if (dotdir == false) {
+        rc = fat_checkname(name);
+        if (rc < 0) {
+            /* filename is invalid */
+            return rc * 10 - 1;
+        }
+    }
 
 #ifdef HAVE_MULTIVOLUME
     file->volume = dir->file.volume; /* inherit the volume, to make sure */
@@ -1282,7 +1300,7 @@ static int add_dir_entry(struct fat_dir* dir,
     
     rc = fat_seek(&dir->file, 0);
     if (rc < 0)
-        return rc * 10 - 1;
+        return rc * 10 - 2;
 
     /* step 1: search for free entries and check for duplicate shortname */
     for (sector = 0; !done; sector++)
@@ -1293,7 +1311,7 @@ static int add_dir_entry(struct fat_dir* dir,
         if (rc < 0) {
             DEBUGF( "add_dir_entry() - Couldn't read dir"
                     " (error code %d)\n", rc);
-            return rc * 10 - 2;
+            return rc * 10 - 3;
         }
 
         if (rc == 0) { /* current end of dir reached */
