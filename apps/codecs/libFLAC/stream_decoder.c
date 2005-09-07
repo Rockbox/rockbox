@@ -184,6 +184,10 @@ FLAC_API const char * const FLAC__StreamDecoderErrorStatusString[] = {
  * Class constructor/destructor
  *
  ***********************************************************************/
+FLAC__StreamDecoder _sd;
+FLAC__StreamDecoderPrivate _sdprivate IDATA_ATTR;
+FLAC__StreamDecoderProtected _sdprotected IDATA_ATTR;
+
 FLAC_API FLAC__StreamDecoder *FLAC__stream_decoder_new(void)
 {
 	FLAC__StreamDecoder *decoder;
@@ -191,38 +195,41 @@ FLAC_API FLAC__StreamDecoder *FLAC__stream_decoder_new(void)
 
 	FLAC__ASSERT(sizeof(int) >= 4); /* we want to die right away if this is not true */
 
-	decoder = (FLAC__StreamDecoder*)calloc(1, sizeof(FLAC__StreamDecoder));
+	decoder = &_sd;
+    /*decoder = (FLAC__StreamDecoder*)calloc(1, sizeof(FLAC__StreamDecoder));
 	if(decoder == 0) {
 		return 0;
-	}
+	}*/
 
-	decoder->protected_ = (FLAC__StreamDecoderProtected*)calloc(1, sizeof(FLAC__StreamDecoderProtected));
+	decoder->protected_ = &_sdprotected;
+    /*decoder->protected_ = (FLAC__StreamDecoderProtected*)calloc(1, sizeof(FLAC__StreamDecoderProtected));
 	if(decoder->protected_ == 0) {
 		free(decoder);
 		return 0;
-	}
+	}*/
 
-	decoder->private_ = (FLAC__StreamDecoderPrivate*)calloc(1, sizeof(FLAC__StreamDecoderPrivate));
+	decoder->private_ = &_sdprivate;
+    /*decoder->private_ = (FLAC__StreamDecoderPrivate*)calloc(1, sizeof(FLAC__StreamDecoderPrivate));
 	if(decoder->private_ == 0) {
 		free(decoder->protected_);
 		free(decoder);
 		return 0;
-	}
+	}*/
 
 	decoder->private_->input = FLAC__bitbuffer_new();
 	if(decoder->private_->input == 0) {
-		free(decoder->private_);
+		/*free(decoder->private_);
 		free(decoder->protected_);
-		free(decoder);
+		free(decoder);*/
 		return 0;
 	}
 
 	decoder->private_->metadata_filter_ids_capacity = 16;
 	if(0 == (decoder->private_->metadata_filter_ids = (FLAC__byte*)malloc((FLAC__STREAM_METADATA_APPLICATION_ID_LEN/8) * decoder->private_->metadata_filter_ids_capacity))) {
 		FLAC__bitbuffer_delete(decoder->private_->input);
-		free(decoder->private_);
+		/*free(decoder->private_);
 		free(decoder->protected_);
-		free(decoder);
+		free(decoder);*/
 		return 0;
 	}
 
@@ -264,9 +271,9 @@ FLAC_API void FLAC__stream_decoder_delete(FLAC__StreamDecoder *decoder)
 	for(i = 0; i < FLAC__MAX_CHANNELS; i++)
 		FLAC__format_entropy_coding_method_partitioned_rice_contents_clear(&decoder->private_->partitioned_rice_contents[i]);
 
-	free(decoder->private_);
+	/*free(decoder->private_);
 	free(decoder->protected_);
-	free(decoder);
+	free(decoder);*/
 }
 
 /***********************************************************************

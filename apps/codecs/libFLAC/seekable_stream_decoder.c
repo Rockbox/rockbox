@@ -135,35 +135,42 @@ FLAC_API const char * const FLAC__SeekableStreamDecoderLengthStatusString[] = {
  *
  ***********************************************************************/
 
+FLAC__SeekableStreamDecoder _ssd;
+FLAC__SeekableStreamDecoderProtected _ssdprotected IDATA_ATTR;
+FLAC__SeekableStreamDecoderPrivate _ssdprivate IDATA_ATTR;
+
 FLAC_API FLAC__SeekableStreamDecoder *FLAC__seekable_stream_decoder_new(void)
 {
 	FLAC__SeekableStreamDecoder *decoder;
 
 	FLAC__ASSERT(sizeof(int) >= 4); /* we want to die right away if this is not true */
 
-	decoder = (FLAC__SeekableStreamDecoder*)calloc(1, sizeof(FLAC__SeekableStreamDecoder));
+    decoder = &_ssd;
+    /*decoder = (FLAC__SeekableStreamDecoder*)calloc(1, sizeof(FLAC__SeekableStreamDecoder));
 	if(decoder == 0) {
 		return 0;
-	}
+	}*/
 
-	decoder->protected_ = (FLAC__SeekableStreamDecoderProtected*)calloc(1, sizeof(FLAC__SeekableStreamDecoderProtected));
+	decoder->protected_ = &_ssdprotected;
+    /*decoder->protected_ = (FLAC__SeekableStreamDecoderProtected*)calloc(1, sizeof(FLAC__SeekableStreamDecoderProtected));
 	if(decoder->protected_ == 0) {
 		free(decoder);
 		return 0;
-	}
+	}*/
 
-	decoder->private_ = (FLAC__SeekableStreamDecoderPrivate*)calloc(1, sizeof(FLAC__SeekableStreamDecoderPrivate));
+	decoder->private_ = &_ssdprivate;
+    /*decoder->private_ = (FLAC__SeekableStreamDecoderPrivate*)calloc(1, sizeof(FLAC__SeekableStreamDecoderPrivate));
 	if(decoder->private_ == 0) {
 		free(decoder->protected_);
 		free(decoder);
 		return 0;
-	}
+	}*/
 
 	decoder->private_->stream_decoder = FLAC__stream_decoder_new();
 	if(0 == decoder->private_->stream_decoder) {
-		free(decoder->private_);
+		/*free(decoder->private_);
 		free(decoder->protected_);
-		free(decoder);
+		free(decoder);*/
 		return 0;
 	}
 
@@ -185,9 +192,9 @@ FLAC_API void FLAC__seekable_stream_decoder_delete(FLAC__SeekableStreamDecoder *
 
 	FLAC__stream_decoder_delete(decoder->private_->stream_decoder);
 
-	free(decoder->private_);
+	/*free(decoder->private_);
 	free(decoder->protected_);
-	free(decoder);
+	free(decoder);*/
 }
 
 /***********************************************************************

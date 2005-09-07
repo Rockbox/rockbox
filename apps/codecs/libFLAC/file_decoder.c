@@ -100,6 +100,8 @@ FLAC_API const char * const FLAC__FileDecoderStateString[] = {
  * Class constructor/destructor
  *
  ***********************************************************************/
+FLAC_FileDecoderProtected _fdprotected;
+FLAC_FileDecoderPrivate _fdprivate;
 
 FLAC_API FLAC__FileDecoder *FLAC__file_decoder_new()
 {
@@ -112,24 +114,26 @@ FLAC_API FLAC__FileDecoder *FLAC__file_decoder_new()
 		return 0;
 	}
 
-	decoder->protected_ = (FLAC__FileDecoderProtected*)calloc(1, sizeof(FLAC__FileDecoderProtected));
+	decoder->protected = &_fdprotected;
+    /*decoder->protected_ = (FLAC__FileDecoderProtected*)calloc(1, sizeof(FLAC__FileDecoderProtected));
 	if(decoder->protected_ == 0) {
 		free(decoder);
 		return 0;
-	}
+	}*/
 
-	decoder->private_ = (FLAC__FileDecoderPrivate*)calloc(1, sizeof(FLAC__FileDecoderPrivate));
+	decoder->private_ = &_fdprivate;
+    /*decoder->private_ = (FLAC__FileDecoderPrivate*)calloc(1, sizeof(FLAC__FileDecoderPrivate));
 	if(decoder->private_ == 0) {
 		free(decoder->protected_);
 		free(decoder);
 		return 0;
-	}
+	}*/
 
 	decoder->private_->seekable_stream_decoder = FLAC__seekable_stream_decoder_new();
 	if(0 == decoder->private_->seekable_stream_decoder) {
-		free(decoder->private_);
+		/*free(decoder->private_);
 		free(decoder->protected_);
-		free(decoder);
+		free(decoder);*/
 		return 0;
 	}
 
@@ -153,9 +157,9 @@ FLAC_API void FLAC__file_decoder_delete(FLAC__FileDecoder *decoder)
 
 	FLAC__seekable_stream_decoder_delete(decoder->private_->seekable_stream_decoder);
 
-	free(decoder->private_);
+	/*free(decoder->private_);
 	free(decoder->protected_);
-	free(decoder);
+	free(decoder);*/
 }
 
 /***********************************************************************
