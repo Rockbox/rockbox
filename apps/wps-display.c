@@ -1559,24 +1559,21 @@ bool wps_refresh(struct mp3entry* id3,
 bool wps_display(struct mp3entry* id3,
                  struct mp3entry* nid3)
 {
-    lcd_clear_display();
-
     if (!id3 && !(audio_status() & AUDIO_STATUS_PLAY))
     {
-#ifdef HAVE_LCD_CHARCELLS
-        lcd_puts(0, 0, str(LANG_END_PLAYLIST_PLAYER));
-#else
-        lcd_puts(0, 2, str(LANG_END_PLAYLIST_RECORDER));
-        wps_display_images();
-        lcd_update();
-#endif
         global_settings.resume_index = -1;
+#ifdef HAVE_LCD_CHARCELLS
+        splash(HZ, true, str(LANG_END_PLAYLIST_PLAYER));
+#else
         status_draw(true);
-        sleep(HZ);
+        splash(HZ, true, str(LANG_END_PLAYLIST_RECORDER));
+#endif
         return true;
     }
     else
     {
+        lcd_clear_display();
+
         if (!wps_loaded) {
             if ( !format_buffer[0] ) {
 #ifdef HAVE_LCD_BITMAP
