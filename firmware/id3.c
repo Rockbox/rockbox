@@ -77,9 +77,10 @@ static const char* const genres[] = {
     "Primus", "Porn Groove", "Satire", "Slow Jam", "Club", "Tango", "Samba",
     "Folklore", "Ballad", "Power Ballad", "Rhythmic Soul", "Freestyle",
     "Duet", "Punk Rock", "Drum Solo", "A capella", "Euro-House", "Dance Hall",
-    "Goa", "Bass", "Club-House", "Hardcore", "Terror", "Indie", "BritPop",
-    "Negerpunk", "Punk", "Beat", "Rap", "Metal", "Metal", "Crossover",
-    "Christian", "Rock", "Merengue", "Salsa", "Metal", "Anime", "Jpop",
+    "Goa", "Drum & Bass", "Club-House", "Hardcore", "Terror", "Indie",
+    "BritPop", "Negerpunk", "Polsk Punk", "Beat", "Christian Gangsta Rap",
+    "Heavy Metal", "Black Metal", "Crossover", "Contemporary Christian",
+    "Christian Rock", "Merengue", "Salsa", "Trash Metal", "Anime", "Jpop",
     "Synthpop"
 };
 
