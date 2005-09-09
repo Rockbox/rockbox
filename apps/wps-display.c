@@ -41,6 +41,7 @@
 #include "mas.h"
 #include "lang.h"
 #include "powermgmt.h"
+#include "power.h"
 #include "sprintf.h"
 #include "backlight.h"
 #include "button.h"
@@ -791,6 +792,14 @@ static char* get_tag(struct mp3entry* cid3,
                         strncpy(buf, "?h ?m", buf_size);
                     return buf;
                 }
+                
+		case 'p': /* External power plugged in? */
+		{
+		    if(charger_inserted())
+			return "p";
+		    else
+			return NULL;
+		}
             }
             break;
 
