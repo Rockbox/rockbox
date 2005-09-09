@@ -906,17 +906,16 @@ static int getsonglength(int fd, struct mp3entry *entry)
     
     if(filetime == 0)
     {
-        /* 
-         * Now song length is 
-         * ((filesize)/(bytes per frame))*(time per frame) 
-         */
-        filetime = entry->filesize/info.frame_size*info.frame_time;
+        filetime = (entry->filesize - bytecount) / (info.bitrate / 8);
+        /* bitrate is in kbps so this delivers milliseconds. Doing bitrate / 8
+         * instead of filesize * 8 is exact, because mpeg audio bitrates are
+         * always multiples of 8, and it avoids overflows. */
     }
 
     entry->tpf = info.frame_time;
     entry->bpf = info.frame_size;
     entry->frame_count = info.frame_count;
-    
+
     entry->vbr = info.is_vbr;
     entry->has_toc = info.has_toc;
 
