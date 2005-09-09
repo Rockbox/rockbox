@@ -192,12 +192,12 @@ sub crc32 {
 
     if(!$crc) {
         return 0; # fixed bad CRC when disabled! 
-      # better to set to 0 cause the rundb code will handle it better that way.
+        # The runtimedb treats a CRC zero as CRC disabled!
     }
 
     if(!open(FILE, "<$filename")) {
         print "failed to open \"$filename\" $!\n";
-        return -2;
+        return 0;
     }
 
     # read $data from index $index to $buffer from the file, may return fewer
@@ -266,8 +266,14 @@ sub crc32 {
     #    printf("%08x\n", $crc);
     }
 
-    return $crc;
+    if($crc == 0) {
+        # rule out the very small risk that this actually returns a zero, as
+        # the current rockbox code assumes a zero CRC means it is disabled!
+        # TODO: fix the Rockbox code. This is just a hack.
+        return 1;
+    }
 
+    return $crc;
 }
 
 sub singlefile {
