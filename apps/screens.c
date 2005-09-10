@@ -1398,7 +1398,7 @@ bool browse_id3(void)
             id3->vbr ? str(LANG_ID3_VBR) : (const unsigned char*) "");
         line = draw_id3_item(line, top, LANG_ID3_BITRATE, buf);
 
-        snprintf(buf, sizeof(buf), "%d Hz", id3->frequency);
+        snprintf(buf, sizeof(buf), "%ld Hz", id3->frequency);
         line = draw_id3_item(line, top, LANG_ID3_FRECUENCY, buf);
 
 #if CONFIG_CODEC == SWCODEC

@@ -598,7 +598,7 @@ static char* get_tag(struct mp3entry* cid3,
                     return buf;
 
                 case 'f':  /* File Frequency */
-                    snprintf(buf, buf_size, "%d", id3->frequency);
+                    snprintf(buf, buf_size, "%ld", id3->frequency);
                     return buf;
 
                 case 'p':  /* File Path */
@@ -626,7 +626,7 @@ static char* get_tag(struct mp3entry* cid3,
                     }
 
                 case 's':  /* File Size (in kilobytes) */
-                    snprintf(buf, buf_size, "%d", id3->filesize / 1024);
+                    snprintf(buf, buf_size, "%ld", id3->filesize / 1024);
                     return buf;
 
                 case 'c':  /* File Codec */

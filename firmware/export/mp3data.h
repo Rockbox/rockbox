@@ -20,9 +20,9 @@
 #ifndef _MP3DATA_H_
 #define _MP3DATA_H_
 
-#define MPEG_VERSION2_5 0
-#define MPEG_VERSION1   1
-#define MPEG_VERSION2   2
+#define MPEG_VERSION1   0
+#define MPEG_VERSION2   1
+#define MPEG_VERSION2_5 2
 
 struct mp3info {
     /* Standard MP3 frame header fields */
@@ -30,23 +30,25 @@ struct mp3info {
     int layer;
     bool protection;
     int bitrate;
-    int frequency;
+    long frequency;
     int padding;
     int channel_mode;
     int mode_extension;
     int emphasis;
-    int frame_size; /* Frame size in bytes */
-    int frame_time; /* Frame duration in milliseconds */
+    int frame_size;   /* Frame size in bytes */
+    int frame_samples; /* Samples per frame */
+    int ft_num;       /* Numerator of frametime in milliseconds */
+    int ft_den;       /* Denominator of frametime in milliseconds */
 
-    bool is_vbr;     /* True if the file is VBR */
-    bool has_toc;    /* True if there is a VBR header in the file */
+    bool is_vbr;      /* True if the file is VBR */
+    bool has_toc;     /* True if there is a VBR header in the file */
     bool is_xing_vbr; /* True if the VBR header is of Xing type */
     bool is_vbri_vbr; /* True if the VBR header is of VBRI type */
     unsigned char toc[100];
-    long frame_count; /* Number of frames in the file (if VBR) */
-    long byte_count;  /* File size in bytes */
-    long file_time;   /* Length of the whole file in milliseconds */
-    int vbr_header_pos;
+    unsigned long frame_count; /* Number of frames in the file (if VBR) */
+    unsigned long byte_count;  /* File size in bytes */
+    unsigned long file_time;   /* Length of the whole file in milliseconds */
+    unsigned long vbr_header_pos;
     int enc_delay;    /* Encoder delay, fetched from LAME header */
     int enc_padding;  /* Padded samples added to last frame. LAME header */
 };

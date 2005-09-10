@@ -863,10 +863,10 @@ static int getid3v2len(int fd)
  */
 static int getsonglength(int fd, struct mp3entry *entry)
 {
-    unsigned int filetime = 0;
+    unsigned long filetime = 0;
     struct mp3info info;
-    int bytecount;
-    
+    long bytecount;
+
     /* Start searching after ID3v2 header */ 
     if(-1 == lseek(fd, entry->id3v2len, SEEK_SET))
         return 0;
@@ -912,8 +912,6 @@ static int getsonglength(int fd, struct mp3entry *entry)
          * always multiples of 8, and it avoids overflows. */
     }
 
-    entry->tpf = info.frame_time;
-    entry->bpf = info.frame_size;
     entry->frame_count = info.frame_count;
 
     entry->vbr = info.is_vbr;

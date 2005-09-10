@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <limits.h>
 #include "debug.h"
 #include "logf.h"
 #include "mp3data.h"
@@ -39,7 +40,7 @@
 
 #define DEBUG_VERBOSE
 
-#define BYTES2INT(b1,b2,b3,b4) (((long)(b1 & 0xFF) << (3*8)) |      \
+#define BYTES2INT(b1,b2,b3,b4) (((long)(b1 & 0xFF) << (3*8)) | \
                                 ((long)(b2 & 0xFF) << (2*8)) | \
                                 ((long)(b3 & 0xFF) << (1*8)) | \
                                 ((long)(b4 & 0xFF) << (0*8)))
@@ -58,37 +59,34 @@
 #define ORIGINAL_MASK (1L << 2)
 #define EMPHASIS_MASK 3L
 
-/* Table of bitrates for MP3 files, all values in kilo.
- * Indexed by version, layer and value of bit 15-12 in header.
- */
-const int bitrate_table[2][3][16] =
-{
-    {
-        {0,32,64,96,128,160,192,224,256,288,320,352,384,416,448,0},
-        {0,32,48,56, 64,80, 96, 112,128,160,192,224,256,320,384,0},
-        {0,32,40,48, 56,64, 80, 96, 112,128,160,192,224,256,320,0}
-    },
-    {
-        {0,32,48,56,64,80,96,112,128,144,160,176,192,224,256,0},
-        {0, 8,16,24,32,40,48, 56, 64, 80, 96,112,128,144,160,0},
-        {0, 8,16,24,32,40,48, 56, 64, 80, 96,112,128,144,160,0}
-    }
+/* MPEG Version table, sorted by version index */
+static const signed char version_table[4] = {
+    MPEG_VERSION2_5, -1, MPEG_VERSION2, MPEG_VERSION1
 };
 
-/* Table of samples per frame for MP3 files.
- * Indexed by layer. Multiplied with 1000.
- */
-const long bs[3] = {384000, 1152000, 1152000};
+/* Bitrate table for mpeg audio, indexed by row index and birate index */
+static const short bitrates[5][16] = {
+    {0,32,64,96,128,160,192,224,256,288,320,352,384,416,448,0}, /* V1 L1 */
+    {0,32,48,56, 64, 80, 96,112,128,160,192,224,256,320,384,0}, /* V1 L2 */
+    {0,32,40,48, 56, 64, 80, 96,112,128,160,192,224,256,320,0}, /* V1 L3 */
+    {0,32,48,56, 64, 80, 96,112,128,144,160,176,192,224,256,0}, /* V2 L1 */
+    {0, 8,16,24, 32, 40, 48, 56, 64, 80, 96,112,128,144,160,0}  /* V2 L2+L3 */
+};
 
-/* Table of sample frequency for MP3 files.
- * Indexed by version and layer.
- */
-
-const int freqtab[][4] =
+/* Bitrate pointer table, indexed by version and layer */
+static const short *bitrate_table[3][3] =
 {
-    {11025, 12000, 8000, 0},  /* MPEG version 2.5 */
-    {44100, 48000, 32000, 0}, /* MPEG Version 1 */
-    {22050, 24000, 16000, 0}, /* MPEG version 2 */
+    {bitrates[0], bitrates[1], bitrates[2]},
+    {bitrates[3], bitrates[4], bitrates[4]},
+    {bitrates[3], bitrates[4], bitrates[4]}
+};
+
+/* Sampling frequency table, indexed by version and frequency index */
+static const long freq_table[3][3] =
+{
+    {44100, 48000, 32000}, /* MPEG Version 1 */
+    {22050, 24000, 16000}, /* MPEG version 2 */
+    {11025, 12000,  8000}, /* MPEG version 2.5 */
 };
 
 /* check if 'head' is a valid mp3 frame header */
@@ -117,97 +115,77 @@ static bool is_mp3frameheader(unsigned long head)
 
 static bool mp3headerinfo(struct mp3info *info, unsigned long header)
 {
-    int bittable = 0;
-    int bitindex;
-    int freqindex;
-    
+    int bitindex, freqindex;
+
     /* MPEG Audio Version */
-    switch((header & VERSION_MASK) >> 19) {
-    case 0:
-        /* MPEG version 2.5 is not an official standard */
-        info->version = MPEG_VERSION2_5;
-        bittable = MPEG_VERSION2 - 1; /* use the V2 bit rate table */
-        break;
-
-    case 1:
+    info->version = version_table[(header & VERSION_MASK) >> 19];
+    if (info->version < 0)
         return false;
 
-    case 2:
-        /* MPEG version 2 (ISO/IEC 13818-3) */
-        info->version = MPEG_VERSION2;
-        bittable = MPEG_VERSION2 - 1;
-        break;
-        
-    case 3:
-        /* MPEG version 1 (ISO/IEC 11172-3) */
-        info->version = MPEG_VERSION1;
-        bittable = MPEG_VERSION1 - 1;
-        break;
-    }
-
-    switch((header & LAYER_MASK) >> 17) {
-    case 0:
+    /* Layer */
+    info->layer = 3 - ((header & LAYER_MASK) >> 17);
+    if (info->layer == 3)
         return false;
-    case 1:
-        info->layer = 2;
-        break;
-    case 2:
-        info->layer = 1;
-        break;
-    case 3:
-        info->layer = 0;
-        break;
-    }
 
-    info->protection = (header & PROTECTION_MASK)?true:false;
+    info->protection = (header & PROTECTION_MASK) ? true : false;
     
     /* Bitrate */
-    bitindex = (header & 0xf000) >> 12;
-    info->bitrate = bitrate_table[bittable][info->layer][bitindex];
+    bitindex = (header & BITRATE_MASK) >> 12;
+    info->bitrate = bitrate_table[info->version][info->layer][bitindex];
     if(info->bitrate == 0)
         return false;
-    
-    /* Sampling frequency */
-    freqindex = (header & 0x0C00) >> 10;
-    info->frequency = freqtab[info->version][freqindex];
-    if(info->frequency == 0)
-        return false;
 
-    info->padding = (header & 0x0200)?1:0;
+    /* Sampling frequency */
+    freqindex = (header & SAMPLERATE_MASK) >> 10;
+    if (freqindex == 3)
+        return false;
+    info->frequency = freq_table[info->version][freqindex];
+
+    info->padding = (header & PADDING_MASK) ? 1 : 0;
 
     /* Calculate number of bytes, calculation depends on layer */
-    switch(info->layer) {
-    case 0:
-        info->frame_size = info->bitrate * 48000;
-        info->frame_size /=
-            freqtab[info->version][freqindex] << bittable;
-        break;
-    case 1:
-    case 2:
-        info->frame_size = info->bitrate * 144000;
-        info->frame_size /=
-            freqtab[info->version][freqindex] << bittable;
-        break;
-    default:
-        info->frame_size = 1;
+    if (info->layer == 0) {
+        info->frame_samples = 384;
+        info->frame_size = (12000 * info->bitrate / info->frequency 
+                            + info->padding) * 4;
+    }
+    else {
+        if ((info->version > MPEG_VERSION1) && (info->layer == 2))
+            info->frame_samples = 576;
+        else
+            info->frame_samples = 1152;
+        info->frame_size = (1000/8) * info->frame_samples * info->bitrate
+                           / info->frequency + info->padding;
     }
     
-    info->frame_size += info->padding;
+    /* Frametime fraction calculation.
+       This fraction is reduced as far as possible. */
+    if (freqindex != 0) { /* 48/32/24/16/12/8 kHz */
+        /* integer number of milliseconds, denominator == 1 */
+        info->ft_num = 1000 * info->frame_samples / info->frequency;
+        info->ft_den = 1;
+    }
+    else {                /* 44.1/22.05/11.025 kHz */
+        if (info->layer == 0) {
+            info->ft_num = 147000 * 384 / info->frequency;
+            info->ft_den = 147;
+        }
+        else {
+            info->ft_num = 49000 * info->frame_samples / info->frequency;
+            info->ft_den = 49;
+        }
+    }
 
-    /* Calculate time per frame */
-    info->frame_time = bs[info->layer] /
-        (freqtab[info->version][freqindex] << bittable);
-
-    info->channel_mode = (header & 0xc0) >> 6;
-    info->mode_extension = (header & 0x30) >> 4;
-    info->emphasis = header & 3;
+    info->channel_mode = (header & CHANNELMODE_MASK) >> 6;
+    info->mode_extension = (header & MODE_EXT_MASK) >> 4;
+    info->emphasis = header & EMPHASIS_MASK;
 
 #ifdef DEBUG_VERBOSE
-    DEBUGF( "Header: %08x, Ver %d, lay %d, bitr %d, freq %d, "
-            "chmode %d, mode_ext %d, emph %d, bytes: %d time: %d\n",
+    DEBUGF( "Header: %08x, Ver %d, lay %d, bitr %d, freq %ld, "
+            "chmode %d, mode_ext %d, emph %d, bytes: %d time: %d/%d\n",
             header, info->version, info->layer+1, info->bitrate,
             info->frequency, info->channel_mode, info->mode_extension,
-            info->emphasis, info->frame_size, info->frame_time);
+            info->emphasis, info->frame_size, info->ft_num, info->ft_den);
 #endif
     return true;
 }
@@ -252,7 +230,7 @@ static unsigned long __find_next_frame(int fd, long *offset, long max_offset,
     if(*offset)
         DEBUGF("Warning: skipping %d bytes of garbage\n", *offset);
 #endif
-    
+
     return header;
 }
 
@@ -380,9 +358,6 @@ int get_mp3file_info(int fd, struct mp3info *info)
 
     memset(info, 0, sizeof(struct mp3info));
     /* These two are needed for proper LAME gapless MP3 playback */
-    /* TODO: These can be found in a LAME Info header as well, but currently
-       they are only looked for in a Xing header. Xing and Info headers have
-       the exact same format, but Info headers are used for CBR files. */
     info->enc_delay = -1;
     info->enc_padding = -1;
     if(!mp3headerinfo(info, header))
@@ -435,7 +410,10 @@ int get_mp3file_info(int fd, struct mp3info *info)
         {
             info->frame_count = BYTES2INT(vbrheader[i], vbrheader[i+1],
                                           vbrheader[i+2], vbrheader[i+3]);
-            info->file_time = info->frame_count * info->frame_time;
+            if (info->frame_count <= ULONG_MAX / info->ft_num)
+                info->file_time = info->frame_count * info->ft_num / info->ft_den;
+            else
+                info->file_time = info->frame_count / info->ft_den * info->ft_num;
             i += 4;
         }
 
@@ -510,7 +488,10 @@ int get_mp3file_info(int fd, struct mp3info *info)
                                      vbrheader[12], vbrheader[13]);
         info->frame_count = BYTES2INT(vbrheader[14], vbrheader[15],
                                       vbrheader[16], vbrheader[17]);
-        info->file_time = info->frame_count * info->frame_time;
+        if (info->frame_count <= ULONG_MAX / info->ft_num)
+            info->file_time = info->frame_count * info->ft_num / info->ft_den;
+        else
+            info->file_time = info->frame_count / info->ft_den * info->ft_num;
         info->bitrate = info->byte_count * 8 / info->file_time;
 
         /* We don't parse the TOC, since we don't yet know how to (FIXME) */

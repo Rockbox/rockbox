@@ -348,7 +348,7 @@ static void set_elapsed(struct mp3entry* id3)
             /* find wich percent we're at */
             for (i=0; i<100; i++ )
             {
-                if ( id3->offset < (int)(id3->toc[i] * (id3->filesize / 256)) )
+                if ( id3->offset < id3->toc[i] * (id3->filesize / 256) )
                 {
                     break;
                 }
@@ -388,8 +388,8 @@ static void set_elapsed(struct mp3entry* id3)
         }
     }
     else
-        /* constant bitrate == simple frame calculation */
-        id3->elapsed = id3->offset / id3->bpf * id3->tpf;
+        /* constant bitrate, use exact calculation */
+        id3->elapsed = id3->offset / (id3->bitrate / 8);
 }
 
 int audio_get_file_pos(void)
@@ -405,7 +405,7 @@ int audio_get_file_pos(void)
             unsigned int percent, remainder;
             int curtoc, nexttoc, plen;
                         
-            percent = (id3->elapsed*100)/id3->length; 
+            percent = (id3->elapsed*100)/id3->length;
             if (percent > 99)
                 percent = 99;
                         
@@ -431,8 +431,8 @@ int audio_get_file_pos(void)
                 (id3->elapsed / 1000);
         }
     }
-    else if (id3->bpf && id3->tpf)
-        pos = (id3->elapsed/id3->tpf)*id3->bpf;
+    else if (id3->bitrate)
+        pos = id3->elapsed * (id3->bitrate / 8);
     else
     {
         return -1;

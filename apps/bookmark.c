@@ -389,7 +389,7 @@ static char* create_bookmark()
 
     /* create the bookmark */
     snprintf(global_bookmark, sizeof(global_bookmark),
-             "%d;%d;%d;%d;%d;%d;%d;%s;%s",
+             "%d;%ld;%d;%d;%ld;%d;%d;%s;%s",
              resume_index,
              id3->offset,
              playlist_get_seed(NULL),

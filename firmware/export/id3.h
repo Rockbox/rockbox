@@ -61,39 +61,37 @@ struct mp3entry {
     unsigned char genre;
     unsigned int codectype;
     unsigned int bitrate;
-    unsigned int frequency;
-    unsigned int id3v2len;
-    unsigned int id3v1len;
-    unsigned int first_frame_offset; /* Byte offset to first real MP3 frame.
-                                        Used for skipping leading garbage to
-                                        avoid gaps between tracks. */
-    unsigned int vbr_header_pos;
-    unsigned int filesize; /* in bytes */
-    unsigned int length;   /* song length */
-    unsigned int elapsed;  /* ms played */
+    unsigned long frequency;
+    unsigned long id3v2len;
+    unsigned long id3v1len;
+    unsigned long first_frame_offset; /* Byte offset to first real MP3 frame.
+                                         Used for skipping leading garbage to
+                                         avoid gaps between tracks. */
+    unsigned long vbr_header_pos;
+    unsigned long filesize; /* without headers; in bytes */
+    unsigned long length;   /* song length in ms */
+    unsigned long elapsed;  /* ms played */
 
-    int lead_trim;         /* Number of samples to skip at the beginning */
-    int tail_trim;         /* Number of samples to remove from the end */
+    int lead_trim;          /* Number of samples to skip at the beginning */
+    int tail_trim;          /* Number of samples to remove from the end */
 
     /* Added for Vorbis */
-    unsigned long samples; /* number of samples in track */
+    unsigned long samples;  /* number of samples in track */
 
     /* MP3 stream specific info */
-    long bpf;              /* bytes per frame */
-    long tpf;              /* time per frame */
-    long frame_count;      /* number of frames in the file (if VBR) */
+    unsigned long frame_count; /* number of frames in the file (if VBR) */
 
     /* Xing VBR fields */
     bool vbr;
-    bool has_toc;    /* True if there is a VBR header in the file */
-    unsigned char toc[100];/* table of contents */
+    bool has_toc;           /* True if there is a VBR header in the file */
+    unsigned char toc[100]; /* table of contents */
 
     /* these following two fields are used for local buffering */
     char id3v2buf[300];
     char id3v1buf[3][32];
 
     /* resume related */
-    int offset;            /* bytes played */
+    unsigned long offset;  /* bytes played */
     int index;             /* playlist index */
 
     /* FileEntry fields */
