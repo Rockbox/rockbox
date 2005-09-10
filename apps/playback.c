@@ -280,6 +280,15 @@ bool codec_pcmbuf_insert_split_callback(void *ch1, void *ch2,
     src[0] = ch1;
     src[1] = ch2;
 
+    while (paused)
+    {
+        if (pcm_is_playing())
+            pcm_play_pause(false);
+        sleep(1);
+        if (ci.stop_codec || ci.reload_codec || ci.seek_time)
+            return true;
+    }
+    
     if (dsp_stereo_mode() == STEREO_NONINTERLEAVED)
     {
         length *= 2;    /* Length is per channel */
@@ -738,7 +747,7 @@ void codec_track_changed(void)
 void yield_codecs(void)
 {
     yield();
-    if (!pcm_is_playing())
+    if (!pcm_is_playing() && !paused)
         sleep(5);
     while ((pcmbuf_is_crossfade_active() || pcmbuf_is_lowdata())
             && !ci.stop_codec && playing && queue_empty(&audio_queue)
@@ -1416,7 +1425,6 @@ void audio_update_trackinfo(void)
 
 static void audio_stop_playback(void)
 {
-    paused = false;
     playing = false;
     filling = false;
     ci.stop_codec = true;
@@ -1427,7 +1435,7 @@ static void audio_stop_playback(void)
     pcmbuf_play_stop();
     while (audio_codec_loaded)
         yield();
-    pcm_play_pause(true);
+    
     track_count = 0;
     /* Mark all entries null. */
     audio_clear_track_entries(false);
@@ -1643,8 +1651,6 @@ void audio_thread(void)
                 
                 logf("starting...");
                 playing = true;
-                paused = false;
-                pcm_play_pause(true);
                 ci.stop_codec = true;
                 ci.reload_codec = false;
                 ci.seek_time = 0;
@@ -1663,7 +1669,9 @@ void audio_thread(void)
                 
             case AUDIO_PAUSE:
                 logf("audio_pause");
-                pcm_play_pause(false);
+                /* We will pause the pcm playback in audiobuffer insert function
+                   to prevent a loop inside the pcm buffer. */
+                // pcm_play_pause(false);
                 paused = true;
                 break ;
                 
@@ -1921,6 +1929,8 @@ void audio_play(int offset)
 {
     logf("audio_play");
     last_index = -1;
+    paused = false;
+    pcm_play_pause(true);
     queue_post(&audio_queue, AUDIO_PLAY, (void *)offset);
 }
 
@@ -1963,7 +1973,6 @@ void audio_ff_rewind(int newpos)
     if (playing) {
         pcmbuf_play_stop();
         ci.seek_time = newpos+1;
-        paused = false;
     }
 }
 
