@@ -692,9 +692,9 @@ bool recording_screen(void)
             }
             lcd_puts(0, 1, buf);
 
-            /* We will do file splitting regardless, since the OFF
-               setting really means 24 hours. This is to make sure
-               that the recorded files don't get too big. */
+            /* We will do file splitting regardless, either at the end of
+               a split interval, or when the filesize approaches the 2GB
+               FAT file size (compatibility) limit. */
             if (audio_stat && 
                 ((global_settings.rec_timesplit && (seconds >= dseconds))
                  || (num_recorded_bytes >= MAX_FILE_SIZE)))
