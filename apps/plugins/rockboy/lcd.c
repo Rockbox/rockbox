@@ -41,7 +41,11 @@ struct scan scan IDATA_ATTR;
 #define WT (scan.wt)
 #define WV (scan.wv)
 
-byte patpix[4096][8][8];
+byte patpix[4096][8][8]
+#if CONFIG_CPU == MCF5249 && !defined(SIMULATOR)
+     __attribute__ ((aligned(16))) /* to profit from burst mode */
+#endif
+     ;
 byte patdirty[1024];
 byte anydirty;
 
@@ -96,7 +100,7 @@ static byte *vdest;
 void updatepatpix(void)
 {
 	int i, j;
-#if CONFIG_CPU != SH7034 || defined(SIMULATOR)
+#if ((CONFIG_CPU != SH7034) && (CONFIG_CPU != MCF5249)) || defined(SIMULATOR)
 	int k, a, c;
 #endif
 	byte *vram = lcd.vbank[0];
@@ -178,6 +182,70 @@ void updatepatpix(void)
                 /* %2 */ "r"(&vram[(i<<4)|(j<<1)])
                 : /* clobbers */
                 "r0", "r1", "r2"
+            );
+#elif CONFIG_CPU == MCF5249 && !defined(SIMULATOR)
+            asm volatile (
+                "move.b  (%2),%%d2      \n"
+                "move.b  (1,%2),%%d1    \n"
+
+                "addq.l  #8,%1          \n"
+                "clr.l   %%d0           \n"
+                "lsr.l   #1,%%d1        \n"
+                "addx.l  %%d0,%%d0      \n"
+                "lsr.l   #1,%%d2        \n"
+                "addx.l  %%d0,%%d0      \n"
+                "move.b  %%d0,-(%1)     \n"
+                "lsl.l   #6,%%d0        \n"
+                "lsr.l   #1,%%d1        \n"
+                "addx.l  %%d0,%%d0      \n"
+                "lsr.l   #1,%%d2        \n"
+                "addx.l  %%d0,%%d0      \n"
+                "move.b  %%d0,-(%1)     \n"
+                "lsl.l   #6,%%d0        \n"
+                "lsr.l   #1,%%d1        \n"
+                "addx.l  %%d0,%%d0      \n"
+                "lsr.l   #1,%%d2        \n"
+                "addx.l  %%d0,%%d0      \n"
+                "move.b  %%d0,-(%1)     \n"
+                "lsl.l   #6,%%d0        \n"
+                "lsr.l   #1,%%d1        \n"
+                "addx.l  %%d0,%%d0      \n"
+                "lsr.l   #1,%%d2        \n"
+                "addx.l  %%d0,%%d0      \n"
+                "move.l  %%d0,(%0)      \n"
+                "move.b  %%d0,-(%1)     \n"
+                "clr.l   %%d0           \n"
+                "lsr.l   #1,%%d1        \n"
+                "addx.l  %%d0,%%d0      \n"
+                "lsr.l   #1,%%d2        \n"
+                "addx.l  %%d0,%%d0      \n"
+                "move.b  %%d0,-(%1)     \n"
+                "lsl.l   #6,%%d0        \n"
+                "lsr.l   #1,%%d1        \n"
+                "addx.l  %%d0,%%d0      \n"
+                "lsr.l   #1,%%d2        \n"
+                "addx.l  %%d0,%%d0      \n"
+                "move.b  %%d0,-(%1)     \n"
+                "lsl.l   #6,%%d0        \n"
+                "lsr.l   #1,%%d1        \n"
+                "addx.l  %%d0,%%d0      \n"
+                "lsr.l   #1,%%d2        \n"
+                "addx.l  %%d0,%%d0      \n"
+                "move.b  %%d0,-(%1)     \n"
+                "lsl.l   #6,%%d0        \n"
+                "lsr.l   #1,%%d1        \n"
+                "addx.l  %%d0,%%d0      \n"
+                "lsr.l   #1,%%d2        \n"
+                "addx.l  %%d0,%%d0      \n"
+                "move.l  %%d0,(4,%0)    \n"
+                "move.b  %%d0,-(%1)     \n"
+                : /* outputs */
+                : /* inputs */
+                /* %0 */ "a"(patpix[i+1024][j]),
+                /* %1 */ "a"(patpix[i][j]),
+                /* %2 */ "a"(&vram[(i<<4)|(j<<1)])
+                : /* clobbers */
+                "d0", "d1", "d2"
             );
 #else
 			a = ((i<<4) | (j<<1));
@@ -269,6 +337,53 @@ void updatepatpix(void)
             /* %2 */ "r"(1024*64)
             : /* clobbers */
             "r0", "r1"
+        );
+#elif CONFIG_CPU == MCF5249 && !defined(SIMULATOR)
+        asm volatile (
+            "movem.l (%0),%%d0-%%d3     \n"
+            "move.l  %%d0,%%d4          \n"
+            "move.l  %%d1,%%d5          \n"
+            "movem.l %%d2-%%d5,(48,%1)  \n"
+            "movem.l (16,%0),%%d0-%%d3  \n"
+            "move.l  %%d0,%%d4          \n"
+            "move.l  %%d1,%%d5          \n"
+            "movem.l %%d2-%%d5,(32,%1)  \n"
+            "movem.l (32,%0),%%d0-%%d3  \n"
+            "move.l  %%d0,%%d4          \n"
+            "move.l  %%d1,%%d5          \n"
+            "movem.l %%d2-%%d5,(16,%1)  \n"
+            "movem.l (48,%0),%%d0-%%d3  \n"
+            "move.l  %%d0,%%d4          \n"
+            "move.l  %%d1,%%d5          \n"
+            "movem.l %%d2-%%d5,(%1)     \n"
+
+            "move.l  %2,%%d0            \n"
+            "add.l   %%d0,%0            \n"
+            "add.l   %%d0,%1            \n"
+
+            "movem.l (%0),%%d0-%%d3     \n"
+            "move.l  %%d0,%%d4          \n"
+            "move.l  %%d1,%%d5          \n"
+            "movem.l %%d2-%%d5,(48,%1)  \n"
+            "movem.l (16,%0),%%d0-%%d3  \n"
+            "move.l  %%d0,%%d4          \n"
+            "move.l  %%d1,%%d5          \n"
+            "movem.l %%d2-%%d5,(32,%1)  \n"
+            "movem.l (32,%0),%%d0-%%d3  \n"
+            "move.l  %%d0,%%d4          \n"
+            "move.l  %%d1,%%d5          \n"
+            "movem.l %%d2-%%d5,(16,%1)  \n"
+            "movem.l (48,%0),%%d0-%%d3  \n"
+            "move.l  %%d0,%%d4          \n"
+            "move.l  %%d1,%%d5          \n"
+            "movem.l %%d2-%%d5,(%1)     \n"
+            : /* outputs */
+            : /* inputs */
+            /* %0 */ "a"(patpix[i][0]),
+            /* %1 */ "a"(patpix[i+2048][0]),
+            /* %2 */ "i"(1024*64)
+            : /* clobbers */
+            "d0", "d1", "d2", "d3", "d4", "d5"
         );
 #else
 		for (j = 0; j < 8; j++)
