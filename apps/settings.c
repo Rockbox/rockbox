@@ -33,6 +33,7 @@
 #include "lcd.h"
 #include "audio.h"
 #include "mp3_playback.h"
+#include "mpeg.h"
 #include "talk.h"
 #include "string.h"
 #include "ata.h"
@@ -817,6 +818,7 @@ void settings_apply(void)
 #if CONFIG_CODEC == MAS3507D
     dac_line_in(global_settings.line_in);
 #endif
+    mpeg_id3_options(global_settings.id3_v1_first);
 #ifdef HAVE_ATA_POWER_OFF
     ata_poweroff(global_settings.disk_poweroff);
 #endif
