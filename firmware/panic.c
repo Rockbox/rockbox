@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 
+#include "config.h"
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
@@ -25,6 +26,8 @@
 #include "font.h"
 #include "debug.h"
 #include "led.h"
+#include "power.h"
+#include "system.h"
 
 static char panic_buf[128];
 
@@ -76,6 +79,13 @@ void panicf( const char *fmt, ...)
     /* no LCD */
 #endif
     DEBUGF(panic_buf);
+
+    set_cpu_frequency(0);
+    
+#ifdef HAVE_ATA_POWER_OFF
+    ide_power_enable(false);
+#endif
+
     while (1)
     {
 #if (CONFIG_LED == LED_REAL) && !defined(SIMULATOR)
@@ -83,7 +93,24 @@ void panicf( const char *fmt, ...)
         led (state);
         state = state?false:true;
         
-        for (i = 0; i < 400000; ++i);
+        for (i = 0; i < 240000; ++i);
+#endif
+#ifdef IRIVER_H100_SERIES
+        /* check for the ON button (and !hold) */
+        if ((GPIO1_READ & 0x22) == 0)
+            system_reboot();
+#elif CONFIG_CPU == SH7034
+        /* try to restart firmware if ON is pressed */
+#if CONFIG_KEYPAD == PLAYER_PAD
+        if (!(PADR & 0x0020))
+#elif CONFIG_KEYPAD == RECORDER_PAD
+#ifdef HAVE_FMADC
+        if (!(PCDR & 0x0008))
+#else
+        if (!(PBDR & 0x0100))
+#endif
+#endif
+            system_reboot();
 #endif
     }
 }
