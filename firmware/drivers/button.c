@@ -131,7 +131,14 @@ static void button_tick(void)
                                 !charger_inserted() &&
 #endif
                                 repeat_count > POWEROFF_COUNT)
+                            {
                                 queue_post(&button_queue, SYS_POWEROFF, NULL);
+
+                                /* Safety net for players without hardware
+                                   poweroff */
+                                if(repeat_count > POWEROFF_COUNT * 10)
+                                    power_off();
+                            }
 #endif
                         }
                     }
