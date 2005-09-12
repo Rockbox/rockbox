@@ -95,6 +95,7 @@ void panicf( const char *fmt, ...)
         
         for (i = 0; i < 240000; ++i);
 #endif
+#ifndef SIMULATOR
 #ifdef IRIVER_H100_SERIES
         /* check for the ON button (and !hold) */
         if ((GPIO1_READ & 0x22) == 0)
@@ -111,6 +112,7 @@ void panicf( const char *fmt, ...)
 #endif
 #endif
             system_reboot();
+#endif
 #endif
     }
 }
