@@ -1554,6 +1554,21 @@ void III_aliasreduce(mad_fixed_t xr[576], int lines)
 # if defined(ASO_ZEROCHECK)
       if (a | b) {
 # endif
+# if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+      (void)hi, (void)lo;
+      asm volatile ("mac.l %[a], %[csi], %%acc0\n\t"
+                    "msac.l %[b], %[cai], %%acc0\n\t"
+                    "mac.l %[b], %[csi], %%acc1\n\t"
+                    "mac.l %[a], %[cai], %%acc1\n\t"
+                    "movclr.l %%acc0, %[a]\n\t"
+                    "asl.l #3, %[a]\n\t"
+                    "movclr.l %%acc1, %[b]\n\t"
+                    "asl.l #3, %[b]\n\t"
+                    : [a] "+d" (a), [b] "+d" (b)
+                    : [csi] "r" (cs[i]), [cai] "r" (ca[i]));
+      xr[-1 - i] = a;
+      xr[     i] = b;
+# else
 	MAD_F_ML0(hi, lo,  a, cs[i]);
 	MAD_F_MLA(hi, lo, -b, ca[i]);
 
@@ -1563,6 +1578,7 @@ void III_aliasreduce(mad_fixed_t xr[576], int lines)
 	MAD_F_MLA(hi, lo,  a, ca[i]);
 
 	xr[     i] = MAD_F_MLZ(hi, lo);
+# endif
 # if defined(ASO_ZEROCHECK)
       }
 # endif
