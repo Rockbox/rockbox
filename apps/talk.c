@@ -472,6 +472,9 @@ static void reset_state(void)
 
 void talk_init(void)
 {
+#if CONFIG_CODEC == SWCODEC
+    audio_stop();
+#endif
     reset_state(); /* use this for most of our inits */
 
 #ifdef HAVE_MMC
