@@ -65,6 +65,8 @@ static int wrcount;
 #define DEBUG_STACK 0
 #endif
 
+static int shutdown_timeout = 0;
+
 #ifdef SIMULATOR /***********************************************************/
 
 int battery_level(void)
@@ -392,7 +394,7 @@ static void handle_auto_poweroff(void)
         if(TIME_AFTER(current_tick, last_event_tick    + timeout) &&
            TIME_AFTER(current_tick, last_disk_activity + timeout))
         {
-            sys_poweroff(true);
+            sys_poweroff();
         }
     }
     else
@@ -415,7 +417,7 @@ static void handle_auto_poweroff(void)
 #endif
                 {
                     DEBUGF("Sleep timer timeout. Shutting off...\n");
-                    sys_poweroff(true);
+                    sys_poweroff();
                 }
             }
         }
@@ -524,6 +526,14 @@ static void power_thread_sleep(int ticks)
         sleep(small_ticks);
         ticks -= small_ticks;
 
+        /* If the power off timeout expires, the main thread has failed
+           to shut down the system, and we need to force a power off */
+        if(shutdown_timeout) {
+            shutdown_timeout -= small_ticks;
+            if(shutdown_timeout <= 0)
+                power_off();
+        }
+
 #ifdef HAVE_ALARM_MOD
         power_thread_rtc_process();
 #endif
@@ -568,9 +578,6 @@ static void power_thread(void)
 {
     int i;
     short *phps, *phpd;         /* power history rotation pointers */
-#if CONFIG_BATTERY == BATT_LIION2200
-    int charging_current;
-#endif
 #ifdef HAVE_CHARGE_CTRL
     unsigned int target_voltage;    /* desired topoff/trickle voltage level */
     int charge_max_time_now = 0;    /* max. charging duration, calculated at
@@ -606,11 +613,10 @@ static void power_thread(void)
            tells us the charging current from the LTC1734. When DC is
            connected (either via the external adapter, or via USB), we try
            to determine if it is actively charging or only maintaining the
-           charge. My tests show that ADC readings is below about 0x80 means
+           charge. My tests show that ADC readings below about 0x80 means
            that the LTC1734 is only maintaining the charge. */
         if(charger_inserted()) {
-            charging_current = adc_read(ADC_EXT_POWER);
-            if(charging_current < 0x80) {
+            if(adc_read(ADC_EXT_POWER) < 0x80) {
                 charge_state = TRICKLE;
             } else {
                 charge_state = CHARGING;
@@ -878,12 +884,14 @@ void powermgmt_init(void)
 
 #endif /* SIMULATOR */
 
-void sys_poweroff(bool halt)
+void sys_poweroff(void)
 {
-    logf("sys_poweroff(%d)", halt);
+    logf("sys_poweroff()");
+    /* If the main thread fails to shut down the system, we will force a
+       power off after an 8 second timeout */
+    shutdown_timeout = HZ*8;
+    
     queue_post(&button_queue, SYS_POWEROFF, NULL);
-    while(halt)
-        yield();
 }
 
 /* Various hardware housekeeping tasks relating to shutting down the jukebox */

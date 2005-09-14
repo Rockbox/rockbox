@@ -132,7 +132,9 @@ static void button_tick(void)
 #endif
                                 repeat_count > POWEROFF_COUNT)
                             {
-                                queue_post(&button_queue, SYS_POWEROFF, NULL);
+                                /* Tell the main thread that it's time to
+                                   power off */
+                                sys_poweroff();
 
                                 /* Safety net for players without hardware
                                    poweroff */

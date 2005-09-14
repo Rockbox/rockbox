@@ -1259,7 +1259,7 @@ bool shutdown_screen(void)
         switch(button)
         {
             case BUTTON_OFF:
-                sys_poweroff(false);
+                sys_poweroff();
                 break;
 
             default:
