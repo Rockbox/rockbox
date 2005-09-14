@@ -22,6 +22,26 @@
 
 #include "iriver.h"
 
+enum
+{
+    ARCHOS_PLAYER,
+    ARCHOS_V1RECORDER,
+    ARCHOS_V2RECORDER,
+    ARCHOS_FMRECORDER,
+    ARCHOS_ONDIO_SP,
+    ARCHOS_ONDIO_FM
+};
+
+int size_limit[] =
+{
+    0x32000, /* ARCHOS_PLAYER */
+    0x32000, /* ARCHOS_V1RECORDER */
+    0x64000, /* ARCHOS_V2RECORDER */
+    0x64000, /* ARCHOS_FMRECORDER */
+    0x64000, /* ARCHOS_ONDIO_SP */
+    0x64000  /* ARCHOS_ONDIO_FM */
+};
+
 void int2le(unsigned int val, unsigned char* addr)
 {
     addr[0] = val & 0xFF;
@@ -71,8 +91,11 @@ int main (int argc, char** argv)
     int version;
     unsigned long irivernum;
     char irivermodel[5];
+    int model_id;
     enum { none, scramble, xor, add } method = scramble;
 
+    model_id = ARCHOS_PLAYER;
+    
     if (argc < 3) {
         usage();
     }
@@ -82,6 +105,7 @@ int main (int argc, char** argv)
         iname = argv[2];
         oname = argv[3];
         version = 4;
+        model_id = ARCHOS_FMRECORDER;
     }
     
     else if(!strcmp(argv[1], "-v2")) {
@@ -89,6 +113,7 @@ int main (int argc, char** argv)
         iname = argv[2];
         oname = argv[3];
         version = 2;
+        model_id = ARCHOS_V2RECORDER;
     }
 
     else if(!strcmp(argv[1], "-ofm")) {
@@ -96,6 +121,7 @@ int main (int argc, char** argv)
         iname = argv[2];
         oname = argv[3];
         version = 8;
+        model_id = ARCHOS_ONDIO_FM;
     }
 
     else if(!strcmp(argv[1], "-osp")) {
@@ -103,6 +129,7 @@ int main (int argc, char** argv)
         iname = argv[2];
         oname = argv[3];
         version = 16;
+        model_id = ARCHOS_ONDIO_SP;
     }
 
     else if(!strcmp(argv[1], "-neo")) {
@@ -164,12 +191,14 @@ int main (int argc, char** argv)
     length = ftell(file);
     length = (length + 3) & ~3; /* Round up to nearest 4 byte boundary */
     
-    if ((method == scramble) && ((length + headerlen) >= 0x32000)) {
-        printf("error: max firmware size is 200KB!\n");
+    if ((method == scramble) &&
+        ((length + headerlen) >= size_limit[model_id])) {
+        printf("error: max firmware size is %dKB!\n",
+               size_limit[model_id]/1024);
         fclose(file);
         return -1;
     }
-    
+
     fseek(file,0,SEEK_SET); 
     inbuf = malloc(length);
     if (method == xor)
