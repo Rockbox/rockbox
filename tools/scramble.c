@@ -24,8 +24,7 @@
 
 enum
 {
-    ARCHOS_PLAYER,
-    ARCHOS_V1RECORDER,
+    ARCHOS_PLAYER, /* and V1 recorder */
     ARCHOS_V2RECORDER,
     ARCHOS_FMRECORDER,
     ARCHOS_ONDIO_SP,
@@ -35,7 +34,6 @@ enum
 int size_limit[] =
 {
     0x32000, /* ARCHOS_PLAYER */
-    0x32000, /* ARCHOS_V1RECORDER */
     0x64000, /* ARCHOS_V2RECORDER */
     0x64000, /* ARCHOS_FMRECORDER */
     0x64000, /* ARCHOS_ONDIO_SP */
