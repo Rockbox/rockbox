@@ -158,9 +158,9 @@ bool pcm_rec_screen(void)
 
                 } else
                 {
-                                snprintf(filename, MAX_PATH, "/record-%0d.wav", rec_count++);
-                                pcm_record(filename);
-                            }
+                    create_numbered_filename(filename, "/", "rec_", ".wav", 4);
+                    pcm_record(filename);
+                }
                 break;
 
             case BUTTON_ON:
