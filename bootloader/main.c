@@ -359,3 +359,7 @@ void usb_acknowledge(void)
 void usb_wait_for_disconnect(void)
 {
 }
+
+void sys_poweroff(void)
+{
+}
