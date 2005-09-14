@@ -566,13 +566,6 @@ static bool check_changed_id3mode(bool currmode)
     return currmode;
 }
 
-static void tree_prepare_usb(void *parameter)
-{
-    (void) parameter;
-    rundb_shutdown();
-    tagdb_shutdown();
-}
-
 static bool dirbrowse(void)
 {
     int numentries=0;
@@ -764,13 +757,13 @@ static bool dirbrowse(void)
             case TREE_OFF:
                 if (*tc.dirfilter < NUM_FILTER_MODES)
                 {
-                    /* Stop the music if it is playing, else show the shutdown
-                       screen */
+                    /* Stop the music if it is playing, else power off */
                     if(audio_status())
                         audio_stop();
                     else {
                         if (!charger_inserted()) {
-                            shutdown_screen();
+                            if(shutdown_screen())
+                                reload_dir = true;
                         } else {
                             charging_splash();
                         }
@@ -1126,11 +1119,8 @@ static bool dirbrowse(void)
 #endif
 
             default:
-                if (default_event_handler_ex(button, tree_prepare_usb, NULL)
-                    == SYS_USB_CONNECTED)
+                if (default_event_handler(button) == SYS_USB_CONNECTED)
                 {
-                    tagdb_init(); /* re-init database */
-                    rundb_init();
                     if(*tc.dirfilter > NUM_FILTER_MODES)
                         /* leave sub-browsers after usb, doing otherwise
                            might be confusing to the user */
@@ -1638,3 +1628,15 @@ void ft_play_filename(char *dir, char *file)
     }
 }
 
+/* These two functions are called by the USB and shutdown handlers */
+void tree_flush(void)
+{
+    rundb_shutdown();
+    tagdb_shutdown();
+}
+
+void tree_restore(void)
+{
+    tagdb_init();
+    rundb_init();
+}

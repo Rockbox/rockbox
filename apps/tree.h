@@ -193,5 +193,7 @@ char *getcwd(char *buf, int size);
 void reload_directory(void);
 bool check_rockboxdir(void);
 struct tree_context* tree_get_context(void);
+void tree_flush(void);
+void tree_restore(void);
 
 #endif

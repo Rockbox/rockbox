@@ -46,6 +46,7 @@
 #ifdef HAVE_MMC
 #include "ata_mmc.h"
 #endif
+#include "tree.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "bmp.h"
@@ -381,6 +382,16 @@ bool settings_parseline(char* line, char** name, char** value)
     return true;
 }
 
+static void system_flush(void)
+{
+    tree_flush();
+}
+
+static void system_restore(void)
+{
+    tree_restore();
+}
+
 static bool clean_shutdown(void (*callback)(void *), void *parameter)
 {
 #ifdef SIMULATOR
@@ -396,6 +407,9 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
         splash(0, true, str(LANG_SHUTTINGDOWN));
         if (callback != NULL)
             callback(parameter);
+
+        system_flush();
+        
         shutdown_hw();
     }
 #endif
@@ -467,7 +481,11 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
 #ifdef HAVE_MMC
             if (!mmc_touched() || (mmc_remove_request() == SYS_MMC_EXTRACTED))
 #endif
+            {
+                system_flush();
                 usb_screen();
+                system_restore();
+            }
             return SYS_USB_CONNECTED;
         case SYS_POWEROFF:
             if (!clean_shutdown(callback, parameter))
