@@ -190,6 +190,7 @@ unsigned long record_start_time; /* Value of current_tick when recording
                                     was started */
 unsigned long pause_start_time;  /* Value of current_tick when pause was
                                     started */
+static unsigned long last_rec_time;
 static unsigned long num_rec_bytes;
 static unsigned long last_rec_bytes;
 static unsigned long frame_count_start;
@@ -1611,12 +1612,11 @@ static void mpeg_thread(void)
                 /* Don't read more than until the end of the buffer */
                 amount_to_read = MIN(audiobuflen - audiobuf_write,
                                      amount_to_read);
-#if MEM == 8
-                amount_to_read = MIN(0x100000, amount_to_read);
-#endif /* MEM == 8 */
 #ifdef HAVE_MMC /* MMC is slow, so don't read too large chunks */
                 amount_to_read = MIN(0x40000, amount_to_read);
-#endif /* HAVE_MMC */
+#elif MEM == 8
+                amount_to_read = MIN(0x100000, amount_to_read);
+#endif
 
                 /* Read as much mpeg data as we can fit in the buffer */
                 if(mpeg_file >= 0)
@@ -1810,7 +1810,7 @@ static void mpeg_thread(void)
                     DEBUGF("MPEG_STOP\n");
 
                     stop_recording();
-                    
+
                     /* Save the remaining data in the buffer */
                     save_endpos = audiobuf_write;
                     saving_status = STOP_RECORDING;
@@ -1848,7 +1848,7 @@ static void mpeg_thread(void)
 
                 case MPEG_NEW_FILE:
                     /* Bail out when a more important save is happening */
-                    if (saving_status > NEW_FILE) 
+                    if (saving_status > NEW_FILE)
                         break;
 
                     /* Make sure we have at least one complete frame
@@ -1865,6 +1865,11 @@ static void mpeg_thread(void)
                     mas_readmem(MAS_BANK_D0, MAS_D0_MPEG_FRAME_COUNT,
                                 &frame_count_end, 1);
  
+                    last_rec_time = current_tick - record_start_time;
+                    record_start_time = current_tick;
+                    if (paused)
+                        pause_start_time = record_start_time;
+
                     /* capture all values at one point */
                     level = set_irq_level(HIGHEST_IRQ_LEVEL);
                     save_endpos = audiobuf_write;
@@ -1916,11 +1921,10 @@ static void mpeg_thread(void)
 
                     amount_to_save = MIN(amount_to_save,
                                          audiobuflen - audiobuf_read);
-#if MEM == 8
-                    amount_to_save = MIN(0x100000, amount_to_save);
-#endif
 #ifdef HAVE_MMC /* MMC is slow, so don't save too large chunks at once */
                     amount_to_save = MIN(0x40000, amount_to_save);
+#elif MEM == 8
+                    amount_to_save = MIN(0x100000, amount_to_save);
 #endif
                     rc = write(mpeg_file, audiobuf + audiobuf_read,
                                amount_to_save);
@@ -2210,7 +2214,7 @@ void mpeg_record(const char *filename)
     
     strncpy(recording_filename, filename, MAX_PATH - 1);
     recording_filename[MAX_PATH - 1] = 0;
-    
+
     queue_post(&mpeg_queue, MPEG_RECORD, NULL);
 }
 
@@ -2274,7 +2278,8 @@ static void update_header(void)
 
         /* saved_header is saved right before stopping the MAS */
         framelen = create_xing_header(fd, 0, last_rec_bytes, xing_buffer,
-                                      frames, saved_header, NULL, false);
+                                      frames, last_rec_time * (1000/HZ),
+                                      saved_header, NULL, false);
 
         lseek(fd, MPEG_RESERVED_HEADER_SPACE - framelen, SEEK_SET);
         write(fd, xing_buffer, framelen);
@@ -2350,7 +2355,7 @@ static void start_recording(void)
         record_start_time = current_tick;
 
     pause_start_time = 0;
-    
+
     demand_irq_enable(true);
 }
 
@@ -2398,6 +2403,7 @@ static void stop_recording(void)
 
     last_rec_bytes = num_rec_bytes;
     mas_readmem(MAS_BANK_D0, MAS_D0_MPEG_FRAME_COUNT, &frame_count_end, 1);
+    last_rec_time = current_tick - record_start_time;
 
     /* Start monitoring */
     shadow_io_control_main |= (1 << 10);
@@ -2523,11 +2529,6 @@ void mpeg_new_file(const char *filename)
 
     strncpy(recording_filename, filename, MAX_PATH - 1);
     recording_filename[MAX_PATH - 1] = 0;
-
-    /* Store the current time */
-    record_start_time = current_tick;
-    if(paused)
-       pause_start_time = record_start_time;
 
     queue_post(&mpeg_queue, MPEG_NEW_FILE, NULL);
 }

@@ -41,7 +41,7 @@
 #define MPEG_MAX_PRERECORD_SECONDS 30
 
 /* For ID3 info and VBR header */
-#define MPEG_RESERVED_HEADER_SPACE (4096 + 288)
+#define MPEG_RESERVED_HEADER_SPACE (4096 + 576)
 
 #if (CONFIG_CODEC == MAS3587F) || defined(SIMULATOR)
 void mpeg_init_recording(void);

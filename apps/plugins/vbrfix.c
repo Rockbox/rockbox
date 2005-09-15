@@ -168,7 +168,7 @@ static bool vbr_fix(char *selected_file)
         /* Note: We don't need to pass a template header because it will be
            taken from the mpeg stream */
         framelen = rb->create_xing_header(fd, entry.first_frame_offset,
-                                          flen, xingbuf, num_frames,
+                                          flen, xingbuf, num_frames, 0,
                                           0, xingupdate, true);
         
         /* Try to fit the Xing header first in the stream. Replace the existing

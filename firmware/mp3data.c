@@ -406,7 +406,7 @@ int get_mp3file_info(int fd, struct mp3info *info)
         /* Is it a VBR file? */
         info->is_vbr = info->is_xing_vbr = !memcmp(vbrheader, "Xing", 4);
 
-        if(vbrheader[7] & VBR_FRAMES_FLAG) /* Is the frame count there? */
+        if (vbrheader[7] & VBR_FRAMES_FLAG) /* Is the frame count there? */
         {
             info->frame_count = BYTES2INT(vbrheader[i], vbrheader[i+1],
                                           vbrheader[i+2], vbrheader[i+3]);
@@ -417,19 +417,24 @@ int get_mp3file_info(int fd, struct mp3info *info)
             i += 4;
         }
 
-        if(vbrheader[7] & VBR_BYTES_FLAG) /* Is byte count there? */
+        if (vbrheader[7] & VBR_BYTES_FLAG) /* Is byte count there? */
         {
             info->byte_count = BYTES2INT(vbrheader[i], vbrheader[i+1],
                                          vbrheader[i+2], vbrheader[i+3]);
             i += 4;
         }
 
-        if(info->file_time && info->byte_count)
-            info->bitrate = info->byte_count * 8 / info->file_time;
+        if (info->file_time && info->byte_count)
+        {
+            if (info->byte_count <= (ULONG_MAX/8))
+                info->bitrate = info->byte_count * 8 / info->file_time;
+            else
+                info->bitrate = info->byte_count / (info->file_time >> 3);
+        }
         else
             info->bitrate = 0;
-        
-        if(vbrheader[7] & VBR_TOC_FLAG) /* Is table-of-contents there? */
+
+        if (vbrheader[7] & VBR_TOC_FLAG) /* Is table-of-contents there? */
         {
             memcpy( info->toc, vbrheader+i, 100 );
             i += 100;
@@ -492,7 +497,11 @@ int get_mp3file_info(int fd, struct mp3info *info)
             info->file_time = info->frame_count * info->ft_num / info->ft_den;
         else
             info->file_time = info->frame_count / info->ft_den * info->ft_num;
-        info->bitrate = info->byte_count * 8 / info->file_time;
+
+        if (info->byte_count <= (ULONG_MAX/8))
+            info->bitrate = info->byte_count * 8 / info->file_time;
+        else
+            info->bitrate = info->byte_count / (info->file_time >> 3);
 
         /* We don't parse the TOC, since we don't yet know how to (FIXME) */
         num_offsets = BYTES2INT(0, 0, vbrheader[18], vbrheader[19]);
@@ -587,37 +596,35 @@ int count_mp3_frames(int fd, int startpos, int filesize,
 
 static const char cooltext[] = "Rockbox - rocks your box";
 
-int create_xing_header(int fd, int startpos, int filesize,
-                       unsigned char *buf, /* must be at least 288 bytes */
-                       int num_frames, unsigned long header_template,
+/* buf needs to be the audio buffer with TOC generation enabled,
+   and at least MAX_XING_HEADER_SIZE bytes otherwise */
+int create_xing_header(int fd, long startpos, long filesize,
+                       unsigned char *buf, unsigned long num_frames,
+                       unsigned long rec_time, unsigned long header_template,
                        void (*progressfunc)(int), bool generate_toc)
-{
-    unsigned long header = 0;
+{   
     struct mp3info info;
-    int pos, last_pos;
-    int i, j;
-    long bytes;
-    unsigned long filepos;
-    int x;
-    int index;
     unsigned char toc[100];
-    unsigned long xing_header_template = 0;
+    unsigned long header = 0;
+    unsigned long xing_header_template = header_template;
+    unsigned long filepos;
+    long pos, last_pos;
+    long j;
+    long bytes;
+    int i;
+    int index;
 
     DEBUGF("create_xing_header()\n");
 
-    if(header_template)
-        xing_header_template = header_template;
-    
     if(generate_toc)
     {
         lseek(fd, startpos, SEEK_SET);
         buf_init();
-    
+
         /* Generate filepos table */
         last_pos = 0;
         filepos = 0;
         header = 0;
-        x = 0;
         for(i = 0;i < 100;i++) {
             /* Calculate the absolute frame number for this seek point */
             pos = i * num_frames / 100;
@@ -654,7 +661,7 @@ int create_xing_header(int fd, int startpos, int filesize,
              * the upper 8 bits of the file position are nonzero 
              * (i.e. files over 16mb in size).
              */
-            if (filepos > 0xFFFFFF)
+            if (filepos > (ULONG_MAX/256))
             {
                 /* instead of multiplying filepos by 256, we divide
                  * filesize by 256.
@@ -673,46 +680,49 @@ int create_xing_header(int fd, int startpos, int filesize,
         }
     }
     
-    /* Check the template header for validity and get some preliminary info. */
-    if (!mp3headerinfo(&info, xing_header_template))
+    /* Use the template header and create a new one.
+       We ignore the Protection bit even if the rest of the stream is
+       protected. */
+    header = xing_header_template & ~(BITRATE_MASK|PROTECTION_MASK|PADDING_MASK);
+    header |= 8 << 12; /* This gives us plenty of space, 192..576 bytes */
+
+    if (!mp3headerinfo(&info, header))
         return 0;  /* invalid header */
+
+    if (num_frames == 0 && rec_time) {
+        /* estimate the number of frames based on the recording time */
+        if (rec_time <= ULONG_MAX / info.ft_den)
+            num_frames = rec_time * info.ft_den / info.ft_num;
+        else
+            num_frames = rec_time / info.ft_num * info.ft_den;
+    }
 
     /* Clear the frame */
     memset(buf, 0, MAX_XING_HEADER_SIZE);
 
-    /* Use the template header and create a new one. */
-    header = xing_header_template & ~(BITRATE_MASK | PROTECTION_MASK);
+    /* Write the header to the buffer */
+    long2bytes(buf, header);
 
-    /* Calculate position of VBR header and required frame bitrate */
+    /* Calculate position of VBR header */
     if (info.version == MPEG_VERSION1) {
-        header |= 5 << 12;
         if (info.channel_mode == 3) /* mono */
             index = 21;
         else
             index = 36;
     }
     else {
-        if (info.version == MPEG_VERSION2)
-            header |= 8 << 12;
-        else  /* MPEG_VERSION2_5 */
-            header |= 4 << 12;
         if (info.channel_mode == 3) /* mono */
             index = 13;
         else
             index = 21;
     }
-    mp3headerinfo(&info, header);  /* Get final header info */
-    /* Size is now always one of 192, 208 or 288 bytes */
-
-    /* Write the header to the buffer */
-    long2bytes(buf, header);
 
     /* Create the Xing data */
     memcpy(&buf[index], "Xing", 4);
-    long2bytes(&buf[index+4], ((num_frames?VBR_FRAMES_FLAG:0) |
-                              (filesize?VBR_BYTES_FLAG:0) |
-                              (generate_toc?VBR_TOC_FLAG:0)));
-    index = index+8;
+    long2bytes(&buf[index+4], (num_frames ? VBR_FRAMES_FLAG : 0)
+                              | (filesize ? VBR_BYTES_FLAG : 0)
+                              | (generate_toc ? VBR_TOC_FLAG : 0));
+    index += 8;
     if(num_frames)
     {
         long2bytes(&buf[index], num_frames);
