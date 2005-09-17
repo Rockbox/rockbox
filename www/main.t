@@ -17,7 +17,7 @@ upgrade your ordinary Archos firmware.
 
 <h2>News</h2>
 
-<p><i>2005-09-17</i>: Some nice gentleman deleted our entire Wiki (and more) using a security hole in TWiki.
+<p><i>2005-09-17</i>: Some nice gentleman deleted our entire Wiki (and more) using a security hole in TWiki. The mailing list is also dead until we sort this out.
 
 <p><i>2005-08-24</i>: Linus ran his first <a href=/twiki/bin/view/Main/IriverBDM>BDM session</a> on his H320.
 
