@@ -29,15 +29,20 @@
  * be implemented elsewhere */
 #define malloc(x) codec_malloc(x)
 #define calloc(x,y) codec_calloc(x,y)
-#define alloca(x) codec_alloca(x)
 #define realloc(x,y) codec_realloc(x,y)
 #define free(x) codec_free(x)
 
 void* codec_malloc(size_t size);
 void* codec_calloc(size_t nmemb, size_t size);
-void* codec_alloca(size_t size);
 void* codec_realloc(void* ptr, size_t size);
 void codec_free(void* ptr);
+
+#if !defined(SIMULATOR)
+#define alloca __builtin_alloca
+#else
+#define alloca(x) codec_alloca(x)
+void* codec_alloca(size_t size);
+#endif
 
 #define abs(x) ((x)>0?(x):-(x))
 #define labs(x) abs(x)

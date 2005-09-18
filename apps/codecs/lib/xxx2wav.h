@@ -46,9 +46,13 @@ extern unsigned char* filebuf;    // The rest of the MP3 buffer
 
 void* codec_malloc(size_t size);
 void* codec_calloc(size_t nmemb, size_t size);
-void* codec_alloca(size_t size);
 void* codec_realloc(void* ptr, size_t size);
 void codec_free(void* ptr);
+
+#if defined(SIMULATOR)
+void* codec_alloca(size_t size);
+#endif
+
 size_t strlen(const char *s);
 char *strcpy(char *dest, const char *src);
 char *strcat(char *dest, const char *src);

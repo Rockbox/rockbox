@@ -56,12 +56,14 @@ void* codec_calloc(size_t nmemb, size_t size)
     return(x);
 }
 
+#if defined(SIMULATOR)
 void* codec_alloca(size_t size)
 {
     void* x;
     x = codec_malloc(size);
     return(x);
 }
+#endif
 
 void codec_free(void* ptr) {
     (void)ptr;
