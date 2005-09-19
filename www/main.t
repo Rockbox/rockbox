@@ -17,6 +17,8 @@ upgrade your ordinary Archos firmware.
 
 <h2>News</h2>
 
+<p><i>2005-09-19</i>: An oldish backup restored, work in progress on getting pages more up-to-date. Mailing lists are up again, but check that you are still subscribed!
+
 <p><i>2005-09-17</i>: Some nice gentleman deleted our entire Wiki (and more) using a security hole in TWiki. The mailing list is also dead until we sort this out.
 
 <p><i>2005-08-24</i>: Linus ran his first <a href=/twiki/bin/view/Main/IriverBDM>BDM session</a> on his H320.
@@ -27,15 +29,6 @@ upgrade your ordinary Archos firmware.
 href="http://www.rockbox.org/mail/archive/rockbox-archive-2005-08/0130.shtml">Feature
 Freeze</a> starting on August 22nd, aiming at releasing Rockbox 2.5 on
 September 5.
-
-<p><i>2005-06-06</i>: Rockbox plays MP3 and Ogg Vorbis music on the iRiver
- H1xx.
-
-<p><i>2005-02-08</i>: <a
-href="http://www.rockbox.org/twiki/bin/view/Main/RockboxShots">Evidence</a> of
-Rockbox <a
-href="http://www.rockbox.org/twiki/bin/view/Main/IriverBoot">booting</a> on <a
-href="http://www.rockbox.org/twiki/bin/view/Main/IriverPort">iRiver</a>.
 
 <p><i><small>(Old news items have moved to a 
 <a href="history.html">separate page</a>.)</small></i>

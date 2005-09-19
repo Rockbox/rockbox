@@ -2,6 +2,15 @@
 #define HISTORY_PAGE
 #include "head.t"
 
+<p><i>2005-06-06</i>: Rockbox plays MP3 and Ogg Vorbis music on the iRiver
+ H1xx.
+
+<p><i>2005-02-08</i>: <a
+href="http://www.rockbox.org/twiki/bin/view/Main/RockboxShots">Evidence</a> of
+Rockbox <a
+href="http://www.rockbox.org/twiki/bin/view/Main/IriverBoot">booting</a> on <a
+href="http://www.rockbox.org/twiki/bin/view/Main/IriverPort">iRiver</a>.
+
 <p><i>2004-12-23</i>: Rockbox v2.4 is <a href="download/">released</a>.
 
 <p><i>2004-12-17</i>: Rockbox started from <a href="/twiki/bin/view/Main/FlashingRockbox">flash ROM</a> finally available for players.
