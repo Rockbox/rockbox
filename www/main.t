@@ -17,6 +17,8 @@ upgrade your ordinary Archos firmware.
 
 <h2>News</h2>
 
+<p><i>2005-09-21</i>: The Wiki pages are now restored as much as possible with the exception of the <a href="http://www.rockbox.org/twiki/bin/view/Main/WpsGallery">WPS Gallery</a>. The Wiki has been upgraded and the hole is plugged. Backups are done manually currently - work is underway to fix the automatic system that failed us.
+
 <p><i>2005-09-19</i>: An oldish backup restored, work in progress on getting pages more up-to-date. Mailing lists are up again, but check that you are still subscribed!
 
 <p><i>2005-09-17</i>: Some nice gentleman deleted our entire Wiki (and more) using a security hole in TWiki. The mailing list is also dead until we sort this out.
@@ -24,11 +26,6 @@ upgrade your ordinary Archos firmware.
 <p><i>2005-08-24</i>: Linus ran his first <a href=/twiki/bin/view/Main/IriverBDM>BDM session</a> on his H320.
 
 <p><i>2005-08-18</i>: At 13:59 CET. First multimeter "beep" for the h300.
-
-<p><i>2005-08-08</i>: We will have a <a
-href="http://www.rockbox.org/mail/archive/rockbox-archive-2005-08/0130.shtml">Feature
-Freeze</a> starting on August 22nd, aiming at releasing Rockbox 2.5 on
-September 5.
 
 <p><i><small>(Old news items have moved to a 
 <a href="history.html">separate page</a>.)</small></i>
