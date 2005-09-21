@@ -1,5 +1,0 @@
-(c) 2003 by Jörg Hohensohn
-
-This tool extracts the firmware image out of an original Archos ROM dump,
-like created with the Rockbox debug->dump feature.
-The extracted image can then be used to compose a dual-boot firmware.
