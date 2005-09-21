@@ -18,7 +18,7 @@
  ****************************************************************************/
 
 #include "codec.h"
-#include "playback.h"
+#include "dsp.h"
 #include "lib/codeclib.h"
 #include <codecs/libmusepack/musepack.h>
 

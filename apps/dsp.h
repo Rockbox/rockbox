@@ -28,6 +28,25 @@
 #define STEREO_NONINTERLEAVED  1
 #define STEREO_MONO            2
 
+enum {
+    CODEC_SET_FILEBUF_WATERMARK = 1,
+    CODEC_SET_FILEBUF_CHUNKSIZE,
+    CODEC_SET_FILEBUF_LIMIT,
+    CODEC_DSP_ENABLE,
+    DSP_SET_FREQUENCY,
+    DSP_SWITCH_FREQUENCY,
+    DSP_SET_CLIP_MIN,
+    DSP_SET_CLIP_MAX,
+    DSP_SET_SAMPLE_DEPTH,
+    DSP_SET_STEREO_MODE,
+    DSP_RESET,
+    DSP_DITHER,
+    DSP_SET_TRACK_GAIN,
+    DSP_SET_ALBUM_GAIN,
+    DSP_SET_TRACK_PEAK,
+    DSP_SET_ALBUM_PEAK
+};
+
 long dsp_process(char *dest, char *src[], long size);
 long dsp_input_size(long size);
 long dsp_output_size(long size);

@@ -20,7 +20,7 @@
 /* "helper functions" common to all codecs  */
 
 #include "plugin.h"
-#include "playback.h"
+#include "dsp.h"
 #include "codeclib.h"
 #include "xxx2wav.h"
 #include "id3.h"
