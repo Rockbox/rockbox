@@ -38,6 +38,7 @@ enum {
     AFMT_MPC,          /* Musepack */
     AFMT_A52,          /* A/52 (aka AC3) audio */
     AFMT_WAVPACK,      /* WavPack */
+    AFMT_ALAC,         /* Apple Lossless Audio Codec */
 
     /* New formats must be added to the end of this list */
 

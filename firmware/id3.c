@@ -98,6 +98,7 @@ static const char* const codec_labels[] = {
   "MPC",  /* Musepack */
   "AC3",  /* A/52 (aka AC3) audio */
   "WV",   /* WavPack */
+  "ALAC", /* Apple Lossless Audio Codec */
 #endif
 };
 
