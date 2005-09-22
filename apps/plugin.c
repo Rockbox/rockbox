@@ -341,6 +341,20 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+
+    menu_init,
+    menu_exit,
+    menu_show,
+    menu_run,
+    menu_cursor,
+    menu_description,
+    menu_delete,
+    menu_count,
+    menu_moveup,
+    menu_movedown,
+    menu_draw,
+    menu_insert,
+    menu_set_cursor,
 };
 
 int plugin_load(const char* plugin, void* parameter)

@@ -56,6 +56,7 @@
 #include "widgets.h"
 #endif
 #include "sound.h"
+#include "menu.h"
 
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
@@ -426,7 +427,22 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */     
-       
+
+    int (*menu_init)(const struct menu_item* mitems, int count, 
+               int (*callback)(int, int),
+               const char *button1, const char *button2, const char *button3);
+    void (*menu_exit)(int menu);
+    int (*menu_show)(int m);
+    bool (*menu_run)(int menu);
+    int (*menu_cursor)(int menu);
+    char* (*menu_description)(int menu, int position);
+    void (*menu_delete)(int menu, int position);
+    int (*menu_count)(int menu);
+    bool (*menu_moveup)(int menu);
+    bool (*menu_movedown)(int menu);
+    void (*menu_draw)(int menu);
+    void (*menu_insert)(int menu, int position, char *desc, bool (*function) (void));
+    void (*menu_set_cursor)(int menu, int position);
 };
 
 int plugin_load(const char* plugin, void* parameter);
