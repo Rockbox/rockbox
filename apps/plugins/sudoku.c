@@ -611,7 +611,7 @@ static bool solve(Sudoku* sud, Stats* stats, const Options* options){
 
 
 /* A wrapper function between the Sudoku plugin and the above solver code */
-sudoku_solve(struct sudoku_state_t* state) {
+void sudoku_solve(struct sudoku_state_t* state) {
   bool ret;
   Stats stats;
   Options options;
@@ -652,7 +652,7 @@ sudoku_solve(struct sudoku_state_t* state) {
     rb->splash(HZ*2, true, "Solve failed");
   }
 
-  return ret;
+  return;
 }
 
 
