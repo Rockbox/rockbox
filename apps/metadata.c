@@ -192,7 +192,7 @@ int read_uint32be(int fd, unsigned int* buf) {
   char* p=(char*)buf;
   size_t n;
 
-  n=read(fd,tmp,4);
+  n=read(fd,p,4);
   if (n==4) {
     tmp=p[0];
     p[0]=p[3];
