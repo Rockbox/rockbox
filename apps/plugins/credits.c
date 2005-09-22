@@ -109,6 +109,14 @@ void roll_credits(void)
 }
 #else
 
+static int minisin[]={
+#if 1
+    1, 2, 2, 3, 3, 3, 2, 2, 1, 0, 0, 0, 0, 0, 0, 0
+#else
+    1, 2, 3, 4, 4, 4, 3, 2, 1, 0, 0, -1, -1, -1, 0, 0, 
+#endif
+};
+
 void roll_credits(void)
 {
     int i;
@@ -120,6 +128,7 @@ void roll_credits(void)
 
     int height;
     int width;
+    int sinstep=0;
 
     rb->lcd_setfont(FONT_UI);
 
@@ -140,7 +149,9 @@ void roll_credits(void)
         if (rb->button_get_w_tmo(HZ/20) & BUTTON_REL)
             return;
 
-        y--;
+        y-= minisin[sinstep];
+        sinstep++;
+        sinstep &= 0x0f; /* wrap */
 
         if(y<0) {
             line++;
