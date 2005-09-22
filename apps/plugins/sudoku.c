@@ -69,12 +69,15 @@ Example ".ss" file, and one with a saved state:
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define SUDOKU_BUTTON_QUIT BUTTON_OFF
 #define SUDOKU_BUTTON_TOGGLE BUTTON_PLAY
-#define SUDOKU_BUTTON_MENU BUTTON_F3
+#define SUDOKU_BUTTON_MENU BUTTON_F1
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define SUDOKU_BUTTON_QUIT BUTTON_OFF
-#define SUDOKU_BUTTON_TOGGLE BUTTON_MENU
-#define SUDOKU_BUTTON_MENU (BUTTON_MENU | BUTTON_OFF)
+#define SUDOKU_BUTTON_ALTTOGGLE (BUTTON_MENU | BUTTON_DOWN)
+#define SUDOKU_BUTTON_TOGGLE_PRE BUTTON_MENU
+#define SUDOKU_BUTTON_TOGGLE (BUTTON_MENU | BUTTON_REL)
+#define SUDOKU_BUTTON_MENU_PRE BUTTON_MENU
+#define SUDOKU_BUTTON_MENU (BUTTON_MENU | BUTTON_REPEAT)
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
@@ -1058,6 +1061,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
   bool exit;
   int button;
+  int lastbutton = BUTTON_NONE;
   long ticks;
   struct sudoku_state_t state;
 
@@ -1103,6 +1107,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
       case SUDOKU_BUTTON_ALTTOGGLE:
 #endif
       case SUDOKU_BUTTON_TOGGLE:
+#ifdef SUDOKU_BUTTON_TOGGLE_PRE
+        if ((button == SUDOKU_BUTTON_TOGGLE)
+            && (lastbutton != SUDOKU_BUTTON_TOGGLE_PRE))
+            break;
+#endif
         /* Increment digit */
         ticks=*rb->current_tick;
         if (state.startboard[state.y][state.x]=='0') {
@@ -1158,6 +1167,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         break;
 
       case SUDOKU_BUTTON_MENU:
+#ifdef SUDOKU_BUTTON_MENU_PRE
+        if (lastbutton != SUDOKU_BUTTON_MENU_PRE)
+            break;
+#endif
         /* Don't let the user leave a game in a bad state */
         if (check_status(&state)) {
           rb->splash(HZ*2, true, "Illegal move!");
@@ -1177,6 +1190,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         }
         break;
     }
+    if (button != BUTTON_NONE)
+        lastbutton = button;
 
     display_board(&state);
   }
