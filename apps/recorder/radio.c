@@ -71,6 +71,7 @@
 #define FM_PRESET_ACTION BUTTON_F3
 #elif CONFIG_KEYPAD == IRIVER_H100_PAD
 #define FM_MENU BUTTON_MODE
+#define FM_PRESET BUTTON_ON
 #define FM_STOP BUTTON_OFF
 #define FM_EXIT_PRE BUTTON_SELECT
 #define FM_EXIT (BUTTON_SELECT | BUTTON_REL)
@@ -969,8 +970,11 @@ bool radio_menu(void)
     bool result;
     
     static const struct menu_item items[] = {
-#if CONFIG_KEYPAD == ONDIO_PAD /* Ondio has no key for presets, put it in menu */
+/* Add functions not accessible via buttons */
+#ifndef FM_PRESET
         { ID2P(LANG_FM_BUTTONBAR_PRESETS), handle_radio_presets },
+#endif
+#ifndef FM_PRESET_ADD
         { ID2P(LANG_FM_BUTTONBAR_ADD)    , radio_add_preset     },
 #endif
         { monomode_menu_string           , toggle_mono_mode     },
