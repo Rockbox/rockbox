@@ -798,6 +798,95 @@ static bool get_flac_metadata(int fd, struct mp3entry* id3)
     return true;
 }
 
+static bool get_wave_metadata(int fd, struct mp3entry* id3)
+{
+    /* Use the trackname part of the id3 structure as a temporary buffer */
+    unsigned char* buf = id3->path;
+    unsigned long totalsamples = 0;
+    unsigned long channels = 0;
+    unsigned long bitspersample = 0;
+    unsigned long numbytes = 0;
+    int read_bytes;
+    int i;
+
+    if ((lseek(fd, 0, SEEK_SET) < 0) 
+        || ((read_bytes = read(fd, buf, sizeof(id3->path))) < 44))
+    {
+        return false;
+    }
+    
+    if ((memcmp(buf, "RIFF",4) != 0)
+        || (memcmp(&buf[8], "WAVE", 4) !=0 ))
+    {
+        return false;
+    }
+
+    buf += 12;
+    read_bytes -= 12;
+
+    while ((numbytes == 0) && (read_bytes >= 8)) 
+    {
+        /* chunkSize */
+        i = get_long(&buf[4]);
+        
+        if (memcmp(buf, "fmt ", 4) == 0)
+        {
+            /* skipping wFormatTag */
+            /* wChannels */
+            channels = buf[10] | (buf[11] << 8);
+            /* dwSamplesPerSec */
+            id3->frequency = get_long(&buf[12]);
+            /* dwAvgBytesPerSec */
+            id3->bitrate = (get_long(&buf[16]) * 8) / 1000;
+            /* skipping wBlockAlign */
+            /* wBitsPerSample */
+            bitspersample = buf[22] | (buf[23] << 8);
+        }
+        else if (memcmp(buf, "data", 4) == 0) 
+        {
+            numbytes = i;
+        }
+        else if (memcmp(buf, "fact", 4) == 0) 
+        {
+            /* dwSampleLength */
+            if (i >= 4) 
+            {
+                totalsamples = get_long(&buf[8]);
+            }
+        }
+     
+        /* go to next chunk (even chunk sizes must be padded) */
+        if (i & 0x01)
+        {
+            i++;
+        }
+     
+        buf += i + 8;
+        read_bytes -= i + 8;
+    }
+
+    if ((numbytes == 0) || (channels == 0)) 
+    {
+        return false;
+    }
+ 
+    if (totalsamples == 0) 
+    {
+        /* for PCM only */
+        totalsamples = numbytes 
+            / ((((bitspersample - 1) / 8) + 1) * channels);
+    }
+
+    id3->vbr = false;   /* All WAV files are CBR */
+    id3->filesize = filesize(fd);
+
+    /* Calculate track length (in ms) and estimate the bitrate (in kbit/s) */
+    id3->length = (totalsamples / id3->frequency) * 1000;
+
+    return true;
+}
+
+
 /* Simple file type probing by looking at the filename extension. */
 unsigned int probe_file_format(const char *filename)
 {
@@ -832,10 +921,6 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
 {
     unsigned char* buf;
     unsigned long totalsamples;
-    unsigned long bytespersample;
-    unsigned long channels;
-    unsigned long bitspersample;
-    unsigned long numbytes;
     int bytesperframe;
     int i;
       
@@ -870,46 +955,11 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         break;
 
     case AFMT_PCM_WAV:
-        /* Use the trackname part of the id3 structure as a temporary buffer */
-        buf = track->id3.path;
-        
-        if ((lseek(fd, 0, SEEK_SET) < 0) || (read(fd, buf, 44) < 44))
+        if (!get_wave_metadata(fd, &(track->id3)))
         {
             return false;
         }
 
-        if ((memcmp(buf,"RIFF",4) !=0 )
-            || (memcmp(&buf[8], "WAVEfmt", 7) !=0 )) 
-        {
-            logf("Not a WAV: %s\n", trackname);
-            return false;
-        }
-
-        /* FIX: Correctly parse WAV header - we assume canonical 
-         * 44-byte header 
-         */
-
-        bitspersample = buf[34];
-        channels = buf[22];
-
-        if ((bitspersample != 16) || (channels != 2)) 
-        {
-            logf("Unsupported WAV - %d bps, %d channels\n",
-                bitspersample, channels);
-            return false;
-        }
-
-        bytespersample = ((bitspersample / 8) * channels);
-        numbytes = get_long(&buf[40]);
-        totalsamples = numbytes / bytespersample;
-
-        track->id3.vbr = false;   /* All WAV files are CBR */
-        track->id3.filesize = filesize(fd);
-        track->id3.frequency = get_long(&buf[24]);
-
-        /* Calculate track length (in ms) and estimate the bitrate (in kbit/s) */
-        track->id3.length = (totalsamples / track->id3.frequency) * 1000;
-        track->id3.bitrate = (track->id3.frequency * bytespersample) / (1000 / 8);
         break;
 
     case AFMT_WAVPACK:
