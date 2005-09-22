@@ -2,6 +2,8 @@
 #define HISTORY_PAGE
 #include "head.t"
 
+<p><i>2005-08-18</i>: At 13:59 CET. First multimeter "beep" for the h300.
+
 <p><i>2005-08-08</i>: We will have a <a
 href="http://www.rockbox.org/mail/archive/rockbox-archive-2005-08/0130.shtml">Feature
 Freeze</a> starting on August 22nd, aiming at releasing Rockbox 2.5 on
