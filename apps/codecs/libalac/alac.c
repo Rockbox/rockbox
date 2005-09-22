@@ -33,8 +33,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
+#include <inttypes.h>
 
+#include "../codec.h"
 #include "decomp.h"
 
 #define _Swap32(v) do { \
@@ -47,53 +48,13 @@
                    v = (((v) & 0x00FF) << 0x08) | \
                        (((v) & 0xFF00) >> 0x08); } while (0)
 
-
-extern int host_bigendian;
-
-struct alac_file
-{
-    unsigned char *input_buffer;
-    int input_buffer_bitaccumulator; /* used so we can do arbitary
-                                        bit reads */
-
-    int samplesize;
-    int numchannels;
-    int bytespersample;
-
-
-    /* buffers */
-    int32_t *predicterror_buffer_a;
-    int32_t *predicterror_buffer_b;
-
-    int32_t *outputsamples_buffer_a;
-    int32_t *outputsamples_buffer_b;
-
-
-  /* stuff from setinfo */
-  uint32_t setinfo_max_samples_per_frame; /* 0x1000 = 4096 */    /* max samples per frame? */
-  uint8_t setinfo_7a; /* 0x00 */
-  uint8_t setinfo_sample_size; /* 0x10 */
-  uint8_t setinfo_rice_historymult; /* 0x28 */
-  uint8_t setinfo_rice_initialhistory; /* 0x0a */
-  uint8_t setinfo_rice_kmodifier; /* 0x0e */
-  uint8_t setinfo_7f; /* 0x02 */
-  uint16_t setinfo_80; /* 0x00ff */
-  uint32_t setinfo_82; /* 0x000020e7 */
-  uint32_t setinfo_86; /* 0x00069fe4 */
-  uint32_t setinfo_8a_rate; /* 0x0000ac44 */
-  /* end setinfo stuff */
-
-};
-
-
-static void allocate_buffers(alac_file *alac)
-{
-    alac->predicterror_buffer_a = malloc(alac->setinfo_max_samples_per_frame * 4);
-    alac->predicterror_buffer_b = malloc(alac->setinfo_max_samples_per_frame * 4);
-
-    alac->outputsamples_buffer_a = malloc(alac->setinfo_max_samples_per_frame * 4);
-    alac->outputsamples_buffer_b = malloc(alac->setinfo_max_samples_per_frame * 4);
-}
+int16_t predictor_coef_table[32] IDATA_ATTR;
+int16_t predictor_coef_table_a[32] IDATA_ATTR;
+int16_t predictor_coef_table_b[32] IDATA_ATTR;
+int32_t predicterror_buffer_a[4096];
+int32_t predicterror_buffer_b[4096];
+int32_t outputsamples_buffer_a[4096] IDATA_ATTR;
+int32_t outputsamples_buffer_b[4096] IDATA_ATTR;
 
 void alac_set_info(alac_file *alac, char *inputbuffer)
 {
@@ -107,8 +68,9 @@ void alac_set_info(alac_file *alac, char *inputbuffer)
   ptr += 4; /* 0 ? */
 
   alac->setinfo_max_samples_per_frame = *(uint32_t*)ptr; /* buffer size / 2 ? */
-  if (!host_bigendian)
-      _Swap32(alac->setinfo_max_samples_per_frame);
+#ifdef ROCKBOX_LITTLE_ENDIAN
+  _Swap32(alac->setinfo_max_samples_per_frame);
+#endif
   ptr += 4;
   alac->setinfo_7a = *(uint8_t*)ptr;
   ptr += 1;
@@ -123,24 +85,25 @@ void alac_set_info(alac_file *alac, char *inputbuffer)
   alac->setinfo_7f = *(uint8_t*)ptr;
   ptr += 1;
   alac->setinfo_80 = *(uint16_t*)ptr;
-  if (!host_bigendian)
-      _Swap16(alac->setinfo_80);
+#ifdef ROCKBOX_LITTLE_ENDIAN
+  _Swap16(alac->setinfo_80);
+#endif
   ptr += 2;
   alac->setinfo_82 = *(uint32_t*)ptr;
-  if (!host_bigendian)
-      _Swap32(alac->setinfo_82);
+#ifdef ROCKBOX_LITTLE_ENDIAN
+  _Swap32(alac->setinfo_82);
+#endif
   ptr += 4;
   alac->setinfo_86 = *(uint32_t*)ptr;
-  if (!host_bigendian)
-      _Swap32(alac->setinfo_86);
+#ifdef ROCKBOX_LITTLE_ENDIAN
+  _Swap32(alac->setinfo_86);
+#endif
   ptr += 4;
   alac->setinfo_8a_rate = *(uint32_t*)ptr;
-  if (!host_bigendian)
-      _Swap32(alac->setinfo_8a_rate);
+#ifdef ROCKBOX_LITTLE_ENDIAN
+  _Swap32(alac->setinfo_8a_rate);
+#endif
   ptr += 4;
-
-  allocate_buffers(alac);
-
 }
 
 /* stream reading */
@@ -432,23 +395,150 @@ static void predictor_decompress_fir_adapt(int32_t *error_buffer,
         }
     }
 
-#if 0
-    /* 4 and 8 are very common cases (the only ones i've seen). these
-     * should be unrolled and optimised
+    /* 4 and 8 are very common cases (the only ones i've seen).
+
+      The following code is an initial attempt to unroll and optimise
+      these two cases by the Rockbox project.  More work is needed. 
      */
+
+    /* optimised case: 4 */
     if (predictor_coef_num == 4)
     {
-        /* FIXME: optimised general case */
+        for (i = 4 + 1; i < output_size; i++)
+        {
+            int sum = 0;
+            int outval;
+            int error_val = error_buffer[i];
+
+            sum = (buffer_out[4] - buffer_out[0]) * predictor_coef_table[0]
+                + (buffer_out[3] - buffer_out[0]) * predictor_coef_table[1]
+                + (buffer_out[2] - buffer_out[0]) * predictor_coef_table[2]
+                + (buffer_out[1] - buffer_out[0]) * predictor_coef_table[3];
+
+            outval = (1 << (predictor_quantitization-1)) + sum;
+            outval = outval >> predictor_quantitization;
+            outval = outval + buffer_out[0] + error_val;
+            outval = SIGN_EXTENDED32(outval, readsamplesize);
+
+            buffer_out[4+1] = outval;
+
+            if (error_val > 0)
+            {
+                int predictor_num = 4 - 1;
+
+                while (predictor_num >= 0 && error_val > 0)
+                {
+                    int val = buffer_out[0] - buffer_out[4 - predictor_num];
+
+                    if (val!=0) {
+                       if (val < 0) {
+                         predictor_coef_table[predictor_num]++;
+                         val=-val;
+                       } else {
+                         predictor_coef_table[predictor_num]--;;
+                       }
+                       error_val -= ((val >> predictor_quantitization) * (4 - predictor_num));
+                    }                      
+                    predictor_num--;
+                }
+            }
+            else if (error_val < 0)
+            {
+                int predictor_num = 4 - 1;
+
+                while (predictor_num >= 0 && error_val < 0)
+                {
+                    int val = buffer_out[0] - buffer_out[4 - predictor_num];
+
+                    if (val != 0) {
+                      if (val > 0) {
+                        predictor_coef_table[predictor_num]++;
+                        val=-val; /* neg value */
+                      } else {
+                        predictor_coef_table[predictor_num]--;
+                      }
+                      error_val -= ((val >> predictor_quantitization) * (4 - predictor_num));
+                    }
+                    predictor_num--;
+                }
+            }
+
+            buffer_out++;
+        }
         return;
     }
 
-    if (predictor_coef_table == 8)
+    /* optimised case: 8 */
+    if (predictor_coef_num == 8)
     {
-        /* FIXME: optimised general case */
-        return;
-    }
-#endif
+        for (i = 8 + 1;
+             i < output_size;
+             i++)
+        {
+            int sum;
+            int outval;
+            int error_val = error_buffer[i];
 
+            sum = (buffer_out[8] - buffer_out[0]) * predictor_coef_table[0]
+                + (buffer_out[7] - buffer_out[0]) * predictor_coef_table[1]
+                + (buffer_out[6] - buffer_out[0]) * predictor_coef_table[2]
+                + (buffer_out[5] - buffer_out[0]) * predictor_coef_table[3]
+                + (buffer_out[4] - buffer_out[0]) * predictor_coef_table[4]
+                + (buffer_out[3] - buffer_out[0]) * predictor_coef_table[5]
+                + (buffer_out[2] - buffer_out[0]) * predictor_coef_table[6]
+                + (buffer_out[1] - buffer_out[0]) * predictor_coef_table[7];
+
+            outval = (1 << (predictor_quantitization-1)) + sum;
+            outval = outval >> predictor_quantitization;
+            outval = outval + buffer_out[0] + error_val;
+            outval = SIGN_EXTENDED32(outval, readsamplesize);
+
+            buffer_out[8+1] = outval;
+
+            if (error_val > 0)
+            {
+                int predictor_num = 8 - 1;
+
+                while (predictor_num >= 0 && error_val > 0)
+                {
+                    int val = buffer_out[0] - buffer_out[8 - predictor_num];
+
+                    if (val!=0) {
+                       if (val < 0) {
+                         predictor_coef_table[predictor_num]++;
+                         val=-val;
+                       } else {
+                         predictor_coef_table[predictor_num]--;;
+                       }
+                       error_val -= ((val >> predictor_quantitization) * (8 - predictor_num));
+                    }                      
+                    predictor_num--;
+                }
+            }
+            else if (error_val < 0)
+            {
+                int predictor_num = 8 - 1;
+
+                while (predictor_num >= 0 && error_val < 0)
+                {
+                    int val = buffer_out[0] - buffer_out[8 - predictor_num];
+                    if (val != 0) {
+                      if (val > 0) {
+                        predictor_coef_table[predictor_num]++;
+                        val=-val; /* neg value */
+                      } else {
+                        predictor_coef_table[predictor_num]--;
+                      }
+                      error_val -= ((val >> predictor_quantitization) * (8 - predictor_num));
+                    }
+                    predictor_num--;
+                }
+            }
+
+            buffer_out++;
+        }
+        return;
+    } 
 
     /* general case */
     if (predictor_coef_num > 0)
@@ -534,26 +624,12 @@ void deinterlace_16(int32_t *buffer_a, int32_t *buffer_b,
         for (i = 0; i < numsamples; i++)
         {
             int32_t difference, midright;
-            int16_t left;
-            int16_t right;
 
             midright = buffer_a[i];
             difference = buffer_b[i];
 
-
-            right = midright - ((difference * interlacing_leftweight) >> interlacing_shift);
-            left = (midright - ((difference * interlacing_leftweight) >> interlacing_shift))
-                 + difference;
-
-            /* output is always little endian */
-            if (host_bigendian)
-            {
-                _Swap16(left);
-                _Swap16(right);
-            }
-
-            buffer_out[i*numchannels] = left;
-            buffer_out[i*numchannels + 1] = right;
+            buffer_out[i*numchannels] = (midright - ((difference * interlacing_leftweight) >> interlacing_shift)) + difference;
+            buffer_out[i*numchannels + 1] = midright - ((difference * interlacing_leftweight) >> interlacing_shift);
         }
 
         return;
@@ -562,33 +638,26 @@ void deinterlace_16(int32_t *buffer_a, int32_t *buffer_b,
     /* otherwise basic interlacing took place */
     for (i = 0; i < numsamples; i++)
     {
-        int16_t left, right;
-
-        left = buffer_a[i];
-        right = buffer_b[i];
-
-        /* output is always little endian */
-        if (host_bigendian)
-        {
-            _Swap16(left);
-            _Swap16(right);
-        }
-
-        buffer_out[i*numchannels] = left;
-        buffer_out[i*numchannels + 1] = right;
+        buffer_out[i*numchannels] = buffer_a[i];
+        buffer_out[i*numchannels + 1] = buffer_b[i];
     }
 }
 
-void decode_frame(alac_file *alac,
+int16_t* decode_frame(alac_file *alac,
                   unsigned char *inbuffer,
-                  void *outbuffer, int *outputsize)
+                  int *outputsize)
 {
     int channels;
+    int16_t* outbuffer;
     int32_t outputsamples = alac->setinfo_max_samples_per_frame;
 
     /* setup the stream */
     alac->input_buffer = inbuffer;
     alac->input_buffer_bitaccumulator = 0;
+
+    /* We can share the same buffer for outputbuffer 
+       and outputsamples_buffer_b - and hence have them both in IRAM*/
+    outbuffer=(int16_t*)outputsamples_buffer_b;
 
     channels = readbits(alac, 3);
 
@@ -631,7 +700,6 @@ void decode_frame(alac_file *alac,
 
         if (!isnotcompressed)
         { /* so it is compressed */
-            int16_t predictor_coef_table[32];
             int predictor_coef_num;
             int prediction_type;
             int prediction_quantitization;
@@ -659,11 +727,11 @@ void decode_frame(alac_file *alac,
                 /* these bytes seem to have something to do with
                  * > 2 channel files.
                  */
-                fprintf(stderr, "FIXME: unimplemented, unhandling of wasted_bytes\n");
+                //fprintf(stderr, "FIXME: unimplemented, unhandling of wasted_bytes\n");
             }
 
             basterdised_rice_decompress(alac,
-                                        alac->predicterror_buffer_a,
+                                        predicterror_buffer_a,
                                         outputsamples,
                                         readsamplesize,
                                         alac->setinfo_rice_initialhistory,
@@ -673,8 +741,8 @@ void decode_frame(alac_file *alac,
 
             if (prediction_type == 0)
             { /* adaptive fir */
-                predictor_decompress_fir_adapt(alac->predicterror_buffer_a,
-                                               alac->outputsamples_buffer_a,
+                predictor_decompress_fir_adapt(predicterror_buffer_a,
+                                               outputsamples_buffer_a,
                                                outputsamples,
                                                readsamplesize,
                                                predictor_coef_table,
@@ -683,7 +751,7 @@ void decode_frame(alac_file *alac,
             }
             else
             {
-                fprintf(stderr, "FIXME: unhandled predicition type: %i\n", prediction_type);
+                //fprintf(stderr, "FIXME: unhandled predicition type: %i\n", prediction_type);
                 /* i think the only other prediction type (or perhaps this is just a
                  * boolean?) runs adaptive fir twice.. like:
                  * predictor_decompress_fir_adapt(predictor_error, tempout, ...)
@@ -704,7 +772,7 @@ void decode_frame(alac_file *alac,
 
                     audiobits = SIGN_EXTENDED32(audiobits, readsamplesize);
 
-                    alac->outputsamples_buffer_a[i] = audiobits;
+                    outputsamples_buffer_a[i] = audiobits;
                 }
             }
             else
@@ -722,7 +790,7 @@ void decode_frame(alac_file *alac,
 
                     audiobits |= readbits(alac, readsamplesize - 16);
 
-                    alac->outputsamples_buffer_a[i] = audiobits;
+                    outputsamples_buffer_a[i] = audiobits;
                 }
             }
             /* wasted_bytes = 0; // unused */
@@ -735,17 +803,16 @@ void decode_frame(alac_file *alac,
             int i;
             for (i = 0; i < outputsamples; i++)
             {
-                int16_t sample = alac->outputsamples_buffer_a[i];
-                if (host_bigendian)
-                    _Swap16(sample);
-                ((int16_t*)outbuffer)[i * alac->numchannels] = sample;
+                /* Output mono data as stereo */
+                outbuffer[i*2] = outputsamples_buffer_a[i];
+                outbuffer[i*2+1] = outputsamples_buffer_a[i];
             }
             break;
         }
         case 20:
         case 24:
         case 32:
-            fprintf(stderr, "FIXME: unimplemented sample size %i\n", alac->setinfo_sample_size);
+            //fprintf(stderr, "FIXME: unimplemented sample size %i\n", alac->setinfo_sample_size);
             break;
         default:
             break;
@@ -788,13 +855,11 @@ void decode_frame(alac_file *alac,
 
         if (!isnotcompressed)
         { /* compressed */
-            int16_t predictor_coef_table_a[32];
             int predictor_coef_num_a;
             int prediction_type_a;
             int prediction_quantitization_a;
             int ricemodifier_a;
 
-            int16_t predictor_coef_table_b[32];
             int predictor_coef_num_b;
             int prediction_type_b;
             int prediction_quantitization_b;
@@ -834,12 +899,12 @@ void decode_frame(alac_file *alac,
             /*********************/
             if (wasted_bytes)
             { /* see mono case */
-                fprintf(stderr, "FIXME: unimplemented, unhandling of wasted_bytes\n");
+                //fprintf(stderr, "FIXME: unimplemented, unhandling of wasted_bytes\n");
             }
 
             /* channel 1 */
             basterdised_rice_decompress(alac,
-                                        alac->predicterror_buffer_a,
+                                        predicterror_buffer_a,
                                         outputsamples,
                                         readsamplesize,
                                         alac->setinfo_rice_initialhistory,
@@ -849,8 +914,8 @@ void decode_frame(alac_file *alac,
 
             if (prediction_type_a == 0)
             { /* adaptive fir */
-                predictor_decompress_fir_adapt(alac->predicterror_buffer_a,
-                                               alac->outputsamples_buffer_a,
+                predictor_decompress_fir_adapt(predicterror_buffer_a,
+                                               outputsamples_buffer_a,
                                                outputsamples,
                                                readsamplesize,
                                                predictor_coef_table_a,
@@ -859,12 +924,12 @@ void decode_frame(alac_file *alac,
             }
             else
             { /* see mono case */
-                fprintf(stderr, "FIXME: unhandled predicition type: %i\n", prediction_type_a);
+                //fprintf(stderr, "FIXME: unhandled predicition type: %i\n", prediction_type_a);
             }
 
             /* channel 2 */
             basterdised_rice_decompress(alac,
-                                        alac->predicterror_buffer_b,
+                                        predicterror_buffer_b,
                                         outputsamples,
                                         readsamplesize,
                                         alac->setinfo_rice_initialhistory,
@@ -874,8 +939,8 @@ void decode_frame(alac_file *alac,
 
             if (prediction_type_b == 0)
             { /* adaptive fir */
-                predictor_decompress_fir_adapt(alac->predicterror_buffer_b,
-                                               alac->outputsamples_buffer_b,
+                predictor_decompress_fir_adapt(predicterror_buffer_b,
+                                               outputsamples_buffer_b,
                                                outputsamples,
                                                readsamplesize,
                                                predictor_coef_table_b,
@@ -884,7 +949,7 @@ void decode_frame(alac_file *alac,
             }
             else
             {
-                fprintf(stderr, "FIXME: unhandled predicition type: %i\n", prediction_type_b);
+                //fprintf(stderr, "FIXME: unhandled predicition type: %i\n", prediction_type_b);
             }
         }
         else
@@ -902,8 +967,8 @@ void decode_frame(alac_file *alac,
                     audiobits_a = SIGN_EXTENDED32(audiobits_a, alac->setinfo_sample_size);
                     audiobits_b = SIGN_EXTENDED32(audiobits_b, alac->setinfo_sample_size);
 
-                    alac->outputsamples_buffer_a[i] = audiobits_a;
-                    alac->outputsamples_buffer_b[i] = audiobits_b;
+                    outputsamples_buffer_a[i] = audiobits_a;
+                    outputsamples_buffer_b[i] = audiobits_b;
                 }
             }
             else
@@ -923,8 +988,8 @@ void decode_frame(alac_file *alac,
                     audiobits_b = audiobits_b >> (32 - alac->setinfo_sample_size);
                     audiobits_b |= readbits(alac, alac->setinfo_sample_size - 16);
 
-                    alac->outputsamples_buffer_a[i] = audiobits_a;
-                    alac->outputsamples_buffer_b[i] = audiobits_b;
+                    outputsamples_buffer_a[i] = audiobits_a;
+                    outputsamples_buffer_b[i] = audiobits_b;
                 }
             }
             /* wasted_bytes = 0; */
@@ -936,8 +1001,8 @@ void decode_frame(alac_file *alac,
         {
         case 16:
         {
-            deinterlace_16(alac->outputsamples_buffer_a,
-                           alac->outputsamples_buffer_b,
+            deinterlace_16(outputsamples_buffer_a,
+                           outputsamples_buffer_b,
                            (int16_t*)outbuffer,
                            alac->numchannels,
                            outputsamples,
@@ -948,7 +1013,7 @@ void decode_frame(alac_file *alac,
         case 20:
         case 24:
         case 32:
-            fprintf(stderr, "FIXME: unimplemented sample size %i\n", alac->setinfo_sample_size);
+            //fprintf(stderr, "FIXME: unimplemented sample size %i\n", alac->setinfo_sample_size);
             break;
         default:
             break;
@@ -957,16 +1022,12 @@ void decode_frame(alac_file *alac,
         break;
     }
     }
+    return outbuffer;
 }
 
-alac_file *create_alac(int samplesize, int numchannels)
+void create_alac(int samplesize, int numchannels, alac_file* alac)
 {
-    alac_file *newfile = malloc(sizeof(alac_file));
-
-    newfile->samplesize = samplesize;
-    newfile->numchannels = numchannels;
-    newfile->bytespersample = (samplesize / 8) * numchannels;
-
-    return newfile;
+    alac->samplesize = samplesize;
+    alac->numchannels = numchannels;
+    alac->bytespersample = (samplesize / 8) * numchannels;
 }
-

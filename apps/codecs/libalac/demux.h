@@ -1,7 +1,7 @@
 #ifndef DEMUX_H
 #define DEMUX_H
 
-#include <stdint.h>
+#include <inttypes.h>
 #include "stream.h"
 
 typedef uint32_t fourcc_t;

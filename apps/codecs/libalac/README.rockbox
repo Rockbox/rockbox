@@ -1,0 +1,80 @@
+Library: Reverse-engineered ALAC decoder v0.1.0
+Imported: 2005-08-14 by Dave Chapman
+
+
+This directory contains a local version of an ALAC (Apple Lossless Audio
+Codec) for use by Rockbox for software decoding of ALAC files.  It is 
+based on the reverse-engineered decoder by David Hamilton.
+
+LICENSING INFORMATION
+
+/*
+ * ALAC (Apple Lossless Audio Codec) decoder
+ * Copyright (c) 2005 David Hammerton
+ * All rights reserved.
+ *
+ * This is the actual decoder.
+ *
+ * http://crazney.net/programs/itunes/alac.html
+ * 
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+IMPORT DETAILS
+
+The base version first imported into Rockbox was the first release
+(v0.1.0) of the ALAC decoder by David Hammerton.
+
+Only the files alac.[ch], demux.[ch] and stream.h were used.
+
+stream.c (the original FILE* based I/O implementation) was replaced with
+functions in the ALAC codec - to interface with the Rockbox audio playback
+system.
+
+References to <stdint.h> were replaced with <inttypes.h> and debugging
+calls to fprintf were removed.
+
+The ALAC decoder itself was modified to return samples in host-endian
+order, instead of little-endian.
+
+The run-time detection of CPU endianness was replaced with
+compile-time tests of the ROCKBOX_LITTLE_ENDIAN define.
+
+All malloc calls were removed from alac.c, but some are still present
+in the metadata parser in demux.c - to store unbounded data such as
+the size in bytes of each compressed block in the file.
+
+The only changes to demux.c were to remove debugging calls to fprintf.
+
+The most-used buffers (the temporary 32-bit output buffer) were moved
+into IRAM (on the iRiver).  This was enough to make the decoder work
+in real-time.
+
+A point of interest - the -O3 gcc option (the setting used in the
+original Makefile provided with the alac decoder) gives a significant
+speedup compared to -O2.  With -O2, the Coldfire runs at a constant
+120MHz, but with -O3, it can power-down to 40MHz for a small amount of
+time.
+
+The file alac.c contained some hints from the original author for
+places where major optimisations can be made - specifically the
+unrolling and optimisation of certain cases of general loops.

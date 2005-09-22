@@ -3,9 +3,11 @@
 
 /* stream.h */
 
-#include <stdint.h>
+#include <inttypes.h>
 
-typedef struct stream_tTAG stream_t;
+typedef struct {
+  int eof;
+} stream_t;
 
 void stream_read(stream_t *stream, size_t len, void *buf);
 
@@ -22,9 +24,4 @@ void stream_skip(stream_t *stream, size_t skip);
 
 int stream_eof(stream_t *stream);
 
-stream_t *stream_create_file(FILE *file,
-                             int bigendian);
-void stream_destroy(stream_t *stream);
-
 #endif /* STREAM_H */
-
