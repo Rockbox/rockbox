@@ -75,6 +75,7 @@ static const struct format_list formats[] =
     { AFMT_A52,           "a52"  },
     { AFMT_A52,           "ac3"  },
     { AFMT_WAVPACK,       "wv"   },
+    { AFMT_ALAC,          "m4a"  },
 };
 
 static const unsigned short a52_bitrates[] =
@@ -180,6 +181,30 @@ static void convert_endian(void *data, const char *format)
     }
 }
 
+/* read_uint32be() - read an unsigned integer from a big-endian
+   (e.g. Quicktime) file.  This is used by the .m4a parser
+*/
+#ifdef ROCKBOX_BIG_ENDIAN
+#define read_uint32be(fd,buf) read((fd),(buf),4)
+#else
+int read_uint32be(int fd, unsigned int* buf) {
+  char tmp;
+  char* p=(char*)buf;
+  size_t n;
+
+  n=read(fd,tmp,4);
+  if (n==4) {
+    tmp=p[0];
+    p[0]=p[3];
+    p[1]=p[2];
+    p[2]=p[1];
+    p[3]=tmp;
+  }
+
+  return(n);
+}
+#endif
+
 /* Read an unaligned 32-bit little endian long from buffer. */
 static unsigned long get_long(void* buf)
 {
@@ -262,6 +287,37 @@ static void convert_utf8(char* utf8)
     }
 
     *dest = 0;
+}
+
+
+/* Read a string tag from an M4A file */
+void read_m4a_tag_string(int fd, int len,char** bufptr,size_t* bytes_remaining, char** dest)
+{
+  int data_length;
+
+  if (bytes_remaining==0) {
+    lseek(fd,len,SEEK_CUR); /* Skip everything */
+  } else {
+    /* Skip the data tag header - maybe we should parse it properly? */
+    lseek(fd,16,SEEK_CUR); 
+    len-=16;
+
+    *dest=*bufptr;
+    if ((size_t)len+1 > *bytes_remaining) {
+      read(fd,*bufptr,*bytes_remaining-1);
+      lseek(fd,len-(*bytes_remaining-1),SEEK_CUR);
+      *bufptr+=(*bytes_remaining-1);
+    } else {
+      read(fd,*bufptr,len);
+      *bufptr+=len;
+    }
+    **bufptr=(char)0;
+
+    convert_utf8(*dest);
+    data_length = strlen(*dest)+1;
+    *bufptr=(*dest)+data_length;
+    *bytes_remaining-=data_length;
+  }
 }
 
 /* Parse the tag (the name-value pair) and fill id3 and buffer accordingly.
@@ -887,6 +943,280 @@ static bool get_wave_metadata(int fd, struct mp3entry* id3)
 }
 
 
+
+static bool get_alac_metadata(int fd, struct mp3entry* id3)
+{
+  unsigned char* buf;
+  unsigned long totalsamples;
+  int i,j,k;
+  size_t n;
+  size_t bytes_remaining;
+  char* id3buf;
+  unsigned int compressedsize;
+  unsigned int sample_count;
+  unsigned int sample_duration;
+  int numentries;
+  int entry_size;
+  int size_remaining;
+  int chunk_len;
+  unsigned char chunk_id[4];
+  int sub_chunk_len;
+  unsigned char sub_chunk_id[4];
+
+  /* A simple parser to read vital metadata from an ALAC file.
+     This parser also works for AAC files - they are both stored in 
+     a Quicktime M4A container. */
+
+  /* Use the trackname part of the id3 structure as a temporary buffer */
+  buf=id3->path;
+
+  lseek(fd, 0, SEEK_SET);
+
+  totalsamples=0;
+  compressedsize=0;
+  /* read the chunks - we stop when we find the mdat chunk and set compressedsize */
+  while (compressedsize==0) {
+    n=read_uint32be(fd,&chunk_len);
+
+    // This means it was a 64-bit file, so we have problems.
+    if (chunk_len == 1) {
+      logf("need 64bit support\n");
+      return false;
+    }
+
+    n=read(fd,&chunk_id,4);
+    if (memcmp(&chunk_id,"ftyp",4)==0) {
+      /* Check for M4A type */
+      n=read(fd,&chunk_id,4);
+      if (memcmp(&chunk_id,"M4A ",4)!=0) {
+        logf("Not an M4A file, aborting\n");
+        return false;
+      }
+      /* Skip rest of chunk */
+      lseek(fd, chunk_len - 8 - 4, SEEK_CUR); /* FIXME not 8 */
+    } else if (memcmp(&chunk_id,"moov",4)==0) {
+      size_remaining=chunk_len - 8; /* FIXME not 8 */
+
+      while (size_remaining > 0) {
+        n=read_uint32be(fd,&sub_chunk_len);
+        if ((sub_chunk_len < 1) || (sub_chunk_len > size_remaining)) {
+          logf("Strange sub_chunk_len value inside moov: %d (remaining: %d)\n",sub_chunk_len,size_remaining);
+          return false;
+        }
+        n=read(fd,&sub_chunk_id,4);
+        size_remaining-=8;
+
+        if (memcmp(&sub_chunk_id,"mvhd",4)==0) {
+          /* We don't need anything from here - skip */
+          lseek(fd, sub_chunk_len - 8, SEEK_CUR); /* FIXME not 8 */
+          size_remaining-=(sub_chunk_len-8);
+        } else if (memcmp(&sub_chunk_id,"udta",4)==0) {
+          /* The udta chunk contains the metadata - track, artist, album etc.
+             The format appears to be:
+               udta
+                 meta
+                  hdlr
+                  ilst
+                    .nam
+                    [rest of tags]
+                  free
+
+              NOTE: This code was written by examination of some .m4a files
+                    produced by iTunes v4.9 - it may not therefore be 100%
+                    compliant with all streams.  But it should fail gracefully.
+           */
+          j=(sub_chunk_len-8);
+          size_remaining-=j;
+          n=read_uint32be(fd,&sub_chunk_len);
+          n=read(fd,&sub_chunk_id,4);
+          j-=8;
+          if (memcmp(&sub_chunk_id,"meta",4)==0) {
+            lseek(fd, 4, SEEK_CUR);
+            j-=4;
+            n=read_uint32be(fd,&sub_chunk_len);
+            n=read(fd,&sub_chunk_id,4);
+            j-=8;
+            if (memcmp(&sub_chunk_id,"hdlr",4)==0) {
+              lseek(fd, sub_chunk_len - 8, SEEK_CUR);
+              j-=(sub_chunk_len - 8);
+              n=read_uint32be(fd,&sub_chunk_len);
+              n=read(fd,&sub_chunk_id,4);
+              j-=8;
+              if (memcmp(&sub_chunk_id,"ilst",4)==0) {
+                /* Here are the actual tags.  We use the id3v2 300-byte buffer
+                   to store the string data */
+                bytes_remaining=sizeof(id3->id3v2buf);
+                id3->genre=255; /* Not every track is the Blues */
+                id3buf=id3->id3v2buf;
+                k=sub_chunk_len-8;
+                j-=k;
+                while (k > 0) {
+                  n=read_uint32be(fd,&sub_chunk_len);
+                  n=read(fd,&sub_chunk_id,4);
+                  k-=8;
+                  if (memcmp(sub_chunk_id,"\251nam",4)==0) {
+                    read_m4a_tag_string(fd,sub_chunk_len-8,&id3buf,&bytes_remaining,&id3->title);
+                  } else if (memcmp(sub_chunk_id,"\251ART",4)==0) {
+                    read_m4a_tag_string(fd,sub_chunk_len-8,&id3buf,&bytes_remaining,&id3->artist);
+                  } else if (memcmp(sub_chunk_id,"\251alb",4)==0) {
+                    read_m4a_tag_string(fd,sub_chunk_len-8,&id3buf,&bytes_remaining,&id3->album);
+                  } else if (memcmp(sub_chunk_id,"\251gen",4)==0) {
+                    read_m4a_tag_string(fd,sub_chunk_len-8,&id3buf,&bytes_remaining,&id3->genre_string);
+                  } else if (memcmp(sub_chunk_id,"\251day",4)==0) {
+                    read_m4a_tag_string(fd,sub_chunk_len-8,&id3buf,&bytes_remaining,&id3->year_string);
+                  } else if (memcmp(sub_chunk_id,"trkn",4)==0) {
+                    if (sub_chunk_len==0x20) {
+                      read(fd,buf,sub_chunk_len-8);
+                      id3->tracknum=buf[19];
+                    } else {
+                      lseek(fd, sub_chunk_len-8,SEEK_CUR);
+                    }
+                  } else {
+                    lseek(fd, sub_chunk_len-8,SEEK_CUR);
+                  }
+                  k-=(sub_chunk_len-8);
+                }
+              }
+            }
+          }
+          /* Skip any remaining data in udta chunk */
+          lseek(fd, j, SEEK_CUR);
+        } else if (memcmp(&sub_chunk_id,"trak",4)==0) {
+          /* Format of trak chunk:
+             tkhd
+             mdia
+               mdhd
+               hdlr
+               minf
+                 smhd
+                 dinf
+                 stbl
+                   stsd - Samplerate, Samplesize, Numchannels
+                   stts - time_to_sample array - RLE'd table containing duration of each block
+                   stsz - sample_byte_size array - ?Size in bytes of each compressed block
+                   stsc - Seek table related?
+                   stco - Seek table related?
+           */
+
+           /* Skip tkhd - not needed */
+           n=read_uint32be(fd,&sub_chunk_len);
+           n=read(fd,&sub_chunk_id,4);
+           if (memcmp(&sub_chunk_id,"tkhd",4)!=0) {
+             logf("Expecting tkhd\n");
+             return false;
+           }
+           lseek(fd, sub_chunk_len - 8, SEEK_CUR); /* FIXME not 8 */
+           size_remaining-=sub_chunk_len;
+
+           /* Process mdia */
+           n=read_uint32be(fd,&sub_chunk_len);
+           n=read(fd,&sub_chunk_id,4);
+           if (memcmp(&sub_chunk_id,"mdia",4)!=0) {
+             logf("Expecting mdia\n");
+             return false;
+           }
+           size_remaining-=sub_chunk_len;
+           j=sub_chunk_len-8;
+
+           while (j > 0) {
+             n=read_uint32be(fd,&sub_chunk_len);
+             n=read(fd,&sub_chunk_id,4);
+             j-=4;
+             if (memcmp(&sub_chunk_id,"minf",4)==0) {
+               j=sub_chunk_len-8;
+             } else if (memcmp(&sub_chunk_id,"stbl",4)==0) {
+               j=sub_chunk_len-8;
+             } else if (memcmp(&sub_chunk_id,"stsd",4)==0) {
+               n=read(fd,buf,sub_chunk_len-8);
+               j-=sub_chunk_len;
+               i=0;
+               /* Skip version and flags */
+               i+=4;
+
+               numentries=(buf[i]<<24)|(buf[i+1]<<16)|(buf[i+2]<<8)|buf[i+3];
+               i+=4;
+               if (numentries!=1) {
+                 logf("ERROR: Expecting only one entry in stsd\n");
+               }
+
+               entry_size=(buf[i]<<24)|(buf[i+1]<<16)|(buf[i+2]<<8)|buf[i+3];
+               i+=4;
+
+               /* Check the codec type - 'alac' for ALAC, 'mp4a' for AAC */
+               if (memcmp(&buf[i],"alac",4)!=0) {
+		     logf("Not an ALAC file\n");
+                 return false;
+               }
+
+               //numchannels=(buf[i+20]<<8)|buf[i+21];   /* Not used - assume Stereo */
+               //samplesize=(buf[i+22]<<8)|buf[i+23];    /* Not used - assume 16-bit */
+
+               /* Samplerate is 32-bit fixed point, but this works for < 65536 Hz */
+               id3->frequency=(buf[i+28]<<8)|buf[i+29];
+             } else if (memcmp(&sub_chunk_id,"stts",4)==0) {
+               j-=sub_chunk_len;
+               i=8;
+               n=read(fd,buf,8);
+               i+=8;
+               numentries=(buf[4]<<24)|(buf[5]<<16)|(buf[6]<<8)|buf[7];
+               for (k=0;k<numentries;k++) {
+                  n=read_uint32be(fd,&sample_count);
+                  n=read_uint32be(fd,&sample_duration);
+                  totalsamples+=sample_count*sample_duration;
+                  i+=8;
+               }
+               if (i > 0) lseek(fd, sub_chunk_len - i, SEEK_CUR);
+             } else if (memcmp(&sub_chunk_id,"stsz",4)==0) {
+               j-=sub_chunk_len;
+               i=8;
+               n=read(fd,buf,8);
+               i+=8;
+               numentries=(buf[4]<<24)|(buf[5]<<16)|(buf[6]<<8)|buf[7];
+               for (k=0;k<numentries;k++) {
+                  n=read_uint32be(fd,&sample_count);
+                  n=read_uint32be(fd,&sample_duration);
+                  totalsamples+=sample_count*sample_duration;
+                  i+=8;
+               }
+               if (i > 0) lseek(fd, sub_chunk_len - i, SEEK_CUR);
+             } else {
+               lseek(fd, sub_chunk_len - 8, SEEK_CUR); /* FIXME not 8 */
+               j-=sub_chunk_len;
+             }
+           }
+        } else {
+          logf("Unexpected sub_chunk_id inside moov: %c%c%c%c\n",
+             sub_chunk_id[0],sub_chunk_id[1],sub_chunk_id[2],sub_chunk_id[3]);
+          return false;
+        }
+      }
+    } else if (memcmp(&chunk_id,"mdat",4)==0) {
+       /* once we hit mdat we stop reading and return.
+        * this is on the assumption that there is no furhter interesting
+        * stuff in the stream. if there is stuff will fail (:()).
+        * But we need the read pointer to be at the mdat stuff
+        * for the decoder. And we don't want to rely on fseek/ftell,
+        * as they may not always be avilable */
+       lseek(fd, chunk_len - 8, SEEK_CUR); /* FIXME not 8 */
+       compressedsize=chunk_len-8;
+    } else if (memcmp(&chunk_id,"free",4)==0) {
+      /* these following atoms can be skipped !!!! */
+      lseek(fd, chunk_len - 8, SEEK_CUR); /* FIXME not 8 */
+    } else {
+      logf("(top) unknown chunk id: %c%c%c%c\n", chunk_id[0],chunk_id[1],chunk_id[2],chunk_id[3]);
+      return false;
+    }
+  }
+
+  id3->vbr=true; /* All ALAC files are VBR */
+  id3->filesize=filesize(fd);
+  id3->samples=totalsamples;
+  id3->length=(10*totalsamples)/(id3->frequency/100);
+  id3->bitrate=(compressedsize*8)/id3->length;;
+
+  return true;
+}    
+
 /* Simple file type probing by looking at the filename extension. */
 unsigned int probe_file_format(const char *filename)
 {
@@ -1062,6 +1392,14 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         /* One A52 frame contains 6 blocks, each containing 256 samples */
         totalsamples = (track->filesize / bytesperframe) * 6 * 256;
         track->id3.length = (totalsamples / track->id3.frequency) * 1000;
+        break;
+
+    case AFMT_ALAC:
+        if (!get_alac_metadata(fd, &(track->id3)))
+        {
+//            return false;
+        }
+
         break;
 
     /* If we don't know how to read the metadata, just store the filename */

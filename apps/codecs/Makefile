@@ -17,7 +17,7 @@ ifdef APPEXTRA
 endif
 
 ifdef SOFTWARECODECS
-   CODECLIBS = -lmad -la52 -lFLAC -lTremor -lwavpack -lmusepack
+   CODECLIBS = -lmad -la52 -lFLAC -lTremor -lwavpack -lmusepack -lalac
 endif
 
 # we "borrow" the plugin LDS file
@@ -39,7 +39,7 @@ DIRS = .
 
 CODECDEPS = $(LINKCODEC) $(BUILDDIR)/libcodec.a
 
-.PHONY: libmad liba52 libFLAC libTremor libwavpack dumb libmusepack
+.PHONY: libmad liba52 libFLAC libTremor libwavpack dumb libmusepack libalac
 
 OUTPUT = $(SOFTWARECODECS)
 
@@ -60,6 +60,7 @@ $(OBJDIR)/vorbis.elf: $(OBJDIR)/vorbis.o $(CODECDEPS) $(BUILDDIR)/libTremor.a
 $(OBJDIR)/mpc.elf: $(OBJDIR)/mpc.o $(CODECDEPS) $(BUILDDIR)/libmusepack.a
 $(OBJDIR)/wav.elf: $(OBJDIR)/wav.o $(CODECDEPS)
 $(OBJDIR)/wavpack.elf: $(OBJDIR)/wavpack.o $(CODECDEPS) $(BUILDDIR)/libwavpack.a
+$(OBJDIR)/alac.elf: $(OBJDIR)/alac.o $(CODECDEPS) $(BUILDDIR)/libalac.a
 
 $(OBJDIR)/%.elf: $(OBJDIR)/%.o $(CODECDEPS)
 	$(ELFIT)
@@ -152,14 +153,20 @@ libmusepack:
 	@mkdir -p $(OBJDIR)/libmusepack
 	@$(MAKE) -C libmusepack OBJDIR=$(OBJDIR)/libmusepack OUTPUT=$(BUILDDIR)/libmusepack.a
 
+libalac:
+	@echo "MAKE in libalac"
+	@mkdir -p $(OBJDIR)/libalac
+	@$(MAKE) -C libalac OBJDIR=$(OBJDIR)/libalac OUTPUT=$(BUILDDIR)/libalac.a
+
 clean:
 	@echo "cleaning codecs"
-	$(SILENT)rm -fr $(OBJDIR)/libmad $(BUILDDIR)/libmad.a $(OBJDIR)/liba52 $(OBJDIR)/libFLAC $(OBJDIR)/Tremor $(OBJDIR)/libwavpack $(OBJDIR)/dumb $(BUILDDIR)/libdumb.a $(BUILDDIR)/libdumbd.a $(OBJDIR)/libmusepack $(BUILDDIR)/libmusepack.a
+	$(SILENT)rm -fr $(OBJDIR)/libmad $(BUILDDIR)/libmad.a $(OBJDIR)/liba52 $(OBJDIR)/libFLAC $(OBJDIR)/Tremor $(OBJDIR)/libwavpack $(OBJDIR)/dumb $(BUILDDIR)/libdumb.a $(BUILDDIR)/libdumbd.a $(OBJDIR)/libmusepack $(BUILDDIR)/libmusepack.a $(OBJDIR)/libalac $(BUILDDIR)/libalac.a
 	@$(MAKE) -C libmad clean OBJDIR=$(OBJDIR)/libmad
 	@$(MAKE) -C liba52 clean OBJDIR=$(OBJDIR)/liba52
 	@$(MAKE) -C libFLAC clean OBJDIR=$(OBJDIR)/libFLAC
 	@$(MAKE) -C Tremor clean OBJDIR=$(OBJDIR)/Tremor
 	@$(MAKE) -C libwavpack clean OBJDIR=$(OBJDIR)/libwavpack
 	@$(MAKE) -C libmusepack clean OBJDIR=$(OBJDIR)/libmusepack
+	@$(MAKE) -C libalac clean OBJDIR=$(OBJDIR)/libalac
 	@$(MAKE) -C dumb clean OBJDIR=$(OBJDIR)/dumb
 	@$(MAKE) -C lib clean OBJDIR=$(OBJDIR)/lib

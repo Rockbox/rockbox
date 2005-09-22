@@ -54,6 +54,7 @@ codecs/dumb/src/core/*
 codecs/dumb/src/helpers/*
 codecs/dumb/src/it/*
 codecs/libmusepack/*
+codecs/libalac/*
 codecs/lib/*.[ch]
 codecs/lib/Makefile
 codecs/lib/SOURCES
