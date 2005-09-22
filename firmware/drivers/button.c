@@ -591,7 +591,12 @@ bool button_hold(void)
 
 bool remote_button_hold(void)
 {
-    return (GPIO1_READ & 0x00100000)?true:false;
+    /*
+    check also if the remote is plugged in
+    GPIO_READ = 0xDXXXXXXX => not plugged in (X don't care)
+    GPIO_READ = 0x9XXXXXXX => plugged in (X don't care)
+    */
+    return ( (GPIO1_READ & 0x00100000) && !(GPIO_READ & 0x40000000) )?true:false;
 }
 #endif
 
