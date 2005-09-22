@@ -79,6 +79,7 @@ Example ".ss" file, and one with a saved state:
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define SUDOKU_BUTTON_QUIT BUTTON_OFF
+#define SUDOKU_BUTTON_ALTTOGGLE BUTTON_ON
 #define SUDOKU_BUTTON_TOGGLE BUTTON_SELECT
 #define SUDOKU_BUTTON_MENU BUTTON_MODE
 
@@ -1089,12 +1090,18 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         break;
 
       /* Increment digit */
+#ifdef SUDOKU_BUTTON_ALTTOGGLE
+      case SUDOKU_BUTTON_ALTTOGGLE | BUTTON_REPEAT:
+#endif
       case SUDOKU_BUTTON_TOGGLE | BUTTON_REPEAT:
         /* Slow down the repeat speed to 1/3 second */
         if ((*rb->current_tick-ticks) < (HZ/3)) {
           break;
         }
 
+#ifdef SUDOKU_BUTTON_ALTTOGGLE
+      case SUDOKU_BUTTON_ALTTOGGLE:
+#endif
       case SUDOKU_BUTTON_TOGGLE:
         /* Increment digit */
         ticks=*rb->current_tick;
