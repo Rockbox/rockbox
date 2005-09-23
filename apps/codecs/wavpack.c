@@ -24,7 +24,6 @@
 #include "lib/codeclib.h"
 #include "dsp.h"
 
-static struct codec_api *rb;
 static struct codec_api *ci;
 
 #define BUFFER_SIZE 4096
@@ -38,7 +37,7 @@ static long read_callback (void *buffer, long bytes)
     return retval;
 }
 
-#ifndef SIMULATOR
+#ifdef USE_IRAM 
 extern char iramcopy[];
 extern char iramstart[];
 extern char iramend[];
@@ -54,11 +53,10 @@ enum codec_status codec_start(struct codec_api* api)
     /* Generic codec initialisation */
     TEST_CODEC_API(api);
 
-    rb = api;
     ci = api;
 
-#ifndef SIMULATOR
-    rb->memcpy(iramstart, iramcopy, iramend-iramstart);
+#ifdef USE_IRAM
+    ci->memcpy(iramstart, iramcopy, iramend-iramstart);
 #endif
 
     ci->configure(CODEC_SET_FILEBUF_LIMIT, (int *)(1024*1024*10));
@@ -74,14 +72,14 @@ enum codec_status codec_start(struct codec_api* api)
     if (codec_init(api))
         return CODEC_ERROR;
 
-    while (!*rb->taginfo_ready && !ci->stop_codec)
+    while (!*ci->taginfo_ready && !ci->stop_codec)
         ci->sleep(1);
         
     if (ci->id3->frequency != NATIVE_FREQUENCY ||
         ci->global_settings->replaygain) {
             ci->configure(CODEC_DSP_ENABLE, (bool *)true);
             ci->configure(DSP_SET_FREQUENCY, (long *)(ci->id3->frequency));
-            codec_set_replaygain(rb->id3);
+            codec_set_replaygain(ci->id3);
     }
     else
         ci->configure(CODEC_DSP_ENABLE, (bool *)false);
@@ -127,7 +125,7 @@ enum codec_status codec_start(struct codec_api* api)
                 break;
 
             ci->set_elapsed (WavpackGetSampleIndex (wpc) / sr_100 * 10);
-            rb->yield ();
+            ci->yield ();
         }
 
         nsamples = WavpackUnpackSamples (wpc, temp_buffer, BUFFER_SIZE / 2);  
@@ -146,7 +144,7 @@ enum codec_status codec_start(struct codec_api* api)
                 *--dst = *--src;
                 *--dst = *src;
                 if (!(count & 0x7f))
-                    rb->yield ();
+                    ci->yield ();
             }
         }
 
@@ -159,7 +157,7 @@ enum codec_status codec_start(struct codec_api* api)
                 *dst++ = *src++ << 8;
                 *dst++ = *src++ << 8;
                 if (!(count & 0x7f))
-                    rb->yield ();
+                    ci->yield ();
             }
         }
         else if (bps == 2) {
@@ -171,7 +169,7 @@ enum codec_status codec_start(struct codec_api* api)
                 *dst++ = *src++;
                 *dst++ = *src++;
                 if (!(count & 0x7f))
-                    rb->yield ();
+                    ci->yield ();
             }
         }
         else {
@@ -184,7 +182,7 @@ enum codec_status codec_start(struct codec_api* api)
                 *dst++ = *src++ >> shift;
                 *dst++ = *src++ >> shift;
                 if (!(count & 0x7f))
-                    rb->yield ();
+                    ci->yield ();
             }
         }
 
@@ -192,7 +190,7 @@ enum codec_status codec_start(struct codec_api* api)
             break;
 
         while (!ci->pcmbuf_insert ((char *) temp_buffer, nsamples * 4))
-            rb->sleep (1);
+            ci->sleep (1);
 
         ci->set_elapsed (WavpackGetSampleIndex (wpc) / sr_100 * 10);
     }
