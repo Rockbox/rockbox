@@ -565,7 +565,7 @@ appsdir='\$(ROOTDIR)/apps'
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libFLAC libTremor libwavpack dumb libmusepack"
+    codecs="libmad liba52 libFLAC libTremor libwavpack dumb libmusepack libalac"
     ;;
 
    *)
