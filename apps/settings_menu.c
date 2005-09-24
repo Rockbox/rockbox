@@ -1296,7 +1296,9 @@ static bool playback_settings_menu(void)
     if ((old_shuffle != global_settings.playlist_shuffle) 
         && (audio_status() & AUDIO_STATUS_PLAY))
     {
+#if CONFIG_CODEC == SWCODEC
         dsp_set_replaygain(true);
+#endif
 
         if (global_settings.playlist_shuffle)
         {

@@ -664,7 +664,9 @@ bool quick_screen(int context, int button)
 
                 if(audio_status() & AUDIO_STATUS_PLAY)
                 {
+#if CONFIG_CODEC == SWCODEC
                     dsp_set_replaygain(true);
+#endif
                     
                     if (global_settings.playlist_shuffle)
                         playlist_randomise(NULL, current_tick, true);
