@@ -133,7 +133,7 @@ static void read_chunk_hdlr(qtmovie_t *qtmovie, size_t chunk_len)
 
 }
 
-static void read_chunk_stsd(qtmovie_t *qtmovie, size_t chunk_len)
+static bool read_chunk_stsd(qtmovie_t *qtmovie, size_t chunk_len)
 {
     unsigned int i;
     uint32_t numentries;
@@ -154,7 +154,7 @@ static void read_chunk_stsd(qtmovie_t *qtmovie, size_t chunk_len)
     if (numentries != 1)
     {
         //fprintf(stderr, "only expecting one entry in sample description atom!\n");
-        return;
+        return false;
     }
 
     for (i = 0; i < numentries; i++)
@@ -249,9 +249,10 @@ static void read_chunk_stsd(qtmovie_t *qtmovie, size_t chunk_len)
         {
 //            fprintf(stderr, "expecting 'alac' data format, got %c%c%c%c\n",
 //                    SPLITFOURCC(qtmovie->res->format));
-            return;
+            return false;
         }
     }
+    return true;
 }
 
 static void read_chunk_stts(qtmovie_t *qtmovie, size_t chunk_len)
@@ -333,7 +334,7 @@ static void read_chunk_stsz(qtmovie_t *qtmovie, size_t chunk_len)
     }
 }
 
-static void read_chunk_stbl(qtmovie_t *qtmovie, size_t chunk_len)
+static bool read_chunk_stbl(qtmovie_t *qtmovie, size_t chunk_len)
 {
     size_t size_remaining = chunk_len - 8; /* FIXME WRONG */
 
@@ -346,7 +347,7 @@ static void read_chunk_stbl(qtmovie_t *qtmovie, size_t chunk_len)
         if (sub_chunk_len <= 1 || sub_chunk_len > size_remaining)
         {
             //fprintf(stderr, "strange size for chunk inside stbl\n");
-            return;
+            return false;
         }
 
         sub_chunk_id = stream_read_uint32(qtmovie->stream);
@@ -354,7 +355,9 @@ static void read_chunk_stbl(qtmovie_t *qtmovie, size_t chunk_len)
         switch (sub_chunk_id)
         {
         case MAKEFOURCC('s','t','s','d'):
-            read_chunk_stsd(qtmovie, sub_chunk_len);
+            if (!read_chunk_stsd(qtmovie, sub_chunk_len)) {
+               return false;
+            }
             break;
         case MAKEFOURCC('s','t','t','s'):
             read_chunk_stts(qtmovie, sub_chunk_len);
@@ -370,14 +373,15 @@ static void read_chunk_stbl(qtmovie_t *qtmovie, size_t chunk_len)
         default:
 //            fprintf(stderr, "(stbl) unknown chunk id: %c%c%c%c\n",
 //                    SPLITFOURCC(sub_chunk_id));
-            return;
+            return false;
         }
 
         size_remaining -= sub_chunk_len;
     }
+    return true;
 }
 
-static void read_chunk_minf(qtmovie_t *qtmovie, size_t chunk_len)
+static bool read_chunk_minf(qtmovie_t *qtmovie, size_t chunk_len)
 {
     size_t dinf_size, stbl_size;
     size_t size_remaining = chunk_len - 8; /* FIXME WRONG */
@@ -386,12 +390,12 @@ static void read_chunk_minf(qtmovie_t *qtmovie, size_t chunk_len)
     if (stream_read_uint32(qtmovie->stream) != 16)
     {
         //fprintf(stderr, "unexpected size in media info\n");
-        return;
+        return false;
     }
     if (stream_read_uint32(qtmovie->stream) != MAKEFOURCC('s','m','h','d'))
     {
         //fprintf(stderr, "not a sound header! can't handle this.\n");
-        return;
+        return false;
     }
     /* now skip the rest */
     stream_skip(qtmovie->stream, 16 - 8);
@@ -403,7 +407,7 @@ static void read_chunk_minf(qtmovie_t *qtmovie, size_t chunk_len)
     if (stream_read_uint32(qtmovie->stream) != MAKEFOURCC('d','i','n','f'))
     {
         //fprintf(stderr, "expected dinf, didn't get it.\n");
-        return;
+        return false;
     }
     /* skip it */
     stream_skip(qtmovie->stream, dinf_size - 8);
@@ -416,9 +420,12 @@ static void read_chunk_minf(qtmovie_t *qtmovie, size_t chunk_len)
     if (stream_read_uint32(qtmovie->stream) != MAKEFOURCC('s','t','b','l'))
     {
         //fprintf(stderr, "expected stbl, didn't get it.\n");
-        return;
+        return false;
     }
-    read_chunk_stbl(qtmovie, stbl_size);
+    if (!read_chunk_stbl(qtmovie, stbl_size)) {
+       return false;
+    }
+
     size_remaining -= stbl_size;
 
     if (size_remaining)
@@ -426,9 +433,10 @@ static void read_chunk_minf(qtmovie_t *qtmovie, size_t chunk_len)
         //fprintf(stderr, "oops\n");
         stream_skip(qtmovie->stream, size_remaining);
     }
+    return true;
 }
 
-static void read_chunk_mdia(qtmovie_t *qtmovie, size_t chunk_len)
+static bool read_chunk_mdia(qtmovie_t *qtmovie, size_t chunk_len)
 {
     size_t size_remaining = chunk_len - 8; /* FIXME WRONG */
 
@@ -441,7 +449,7 @@ static void read_chunk_mdia(qtmovie_t *qtmovie, size_t chunk_len)
         if (sub_chunk_len <= 1 || sub_chunk_len > size_remaining)
         {
             //fprintf(stderr, "strange size for chunk inside mdia\n");
-            return;
+            return false;
         }
 
         sub_chunk_id = stream_read_uint32(qtmovie->stream);
@@ -455,20 +463,23 @@ static void read_chunk_mdia(qtmovie_t *qtmovie, size_t chunk_len)
             read_chunk_hdlr(qtmovie, sub_chunk_len);
             break;
         case MAKEFOURCC('m','i','n','f'):
-            read_chunk_minf(qtmovie, sub_chunk_len);
+            if (!read_chunk_minf(qtmovie, sub_chunk_len)) {
+               return false;
+            }
             break;
         default:
 //            fprintf(stderr, "(mdia) unknown chunk id: %c%c%c%c\n",
 //                    SPLITFOURCC(sub_chunk_id));
-            return;
+            return false;
         }
 
         size_remaining -= sub_chunk_len;
     }
+    return true;
 }
 
 /* 'trak' - a movie track - contains other atoms */
-static void read_chunk_trak(qtmovie_t *qtmovie, size_t chunk_len)
+static bool read_chunk_trak(qtmovie_t *qtmovie, size_t chunk_len)
 {
     size_t size_remaining = chunk_len - 8; /* FIXME WRONG */
 
@@ -481,7 +492,7 @@ static void read_chunk_trak(qtmovie_t *qtmovie, size_t chunk_len)
         if (sub_chunk_len <= 1 || sub_chunk_len > size_remaining)
         {
             //fprintf(stderr, "strange size for chunk inside trak\n");
-            return;
+            return false;
         }
 
         sub_chunk_id = stream_read_uint32(qtmovie->stream);
@@ -492,7 +503,9 @@ static void read_chunk_trak(qtmovie_t *qtmovie, size_t chunk_len)
             read_chunk_tkhd(qtmovie, sub_chunk_len);
             break;
         case MAKEFOURCC('m','d','i','a'):
-            read_chunk_mdia(qtmovie, sub_chunk_len);
+            if (!read_chunk_mdia(qtmovie, sub_chunk_len)) {
+               return false;
+            }
             break;
         default:
 //            fprintf(stderr, "(trak) unknown chunk id: %c%c%c%c\n",
@@ -503,6 +516,7 @@ static void read_chunk_trak(qtmovie_t *qtmovie, size_t chunk_len)
 
         size_remaining -= sub_chunk_len;
     }
+    return true;
 }
 
 /* 'mvhd' movie header atom */
@@ -524,7 +538,7 @@ static void read_chunk_udta(qtmovie_t *qtmovie, size_t chunk_len)
 }
 
 /* 'moov' movie atom - contains other atoms */
-static void read_chunk_moov(qtmovie_t *qtmovie, size_t chunk_len)
+static bool read_chunk_moov(qtmovie_t *qtmovie, size_t chunk_len)
 {
     size_t size_remaining = chunk_len - 8; /* FIXME WRONG */
 
@@ -537,7 +551,7 @@ static void read_chunk_moov(qtmovie_t *qtmovie, size_t chunk_len)
         if (sub_chunk_len <= 1 || sub_chunk_len > size_remaining)
         {
             //fprintf(stderr, "strange size for chunk inside moov\n");
-            return;
+            return false;
         }
 
         sub_chunk_id = stream_read_uint32(qtmovie->stream);
@@ -548,7 +562,9 @@ static void read_chunk_moov(qtmovie_t *qtmovie, size_t chunk_len)
             read_chunk_mvhd(qtmovie, sub_chunk_len);
             break;
         case MAKEFOURCC('t','r','a','k'):
-            read_chunk_trak(qtmovie, sub_chunk_len);
+            if (!read_chunk_trak(qtmovie, sub_chunk_len)) {
+               return false;
+            }
             break;
         case MAKEFOURCC('u','d','t','a'):
             read_chunk_udta(qtmovie, sub_chunk_len);
@@ -556,11 +572,12 @@ static void read_chunk_moov(qtmovie_t *qtmovie, size_t chunk_len)
         default:
 //            fprintf(stderr, "(moov) unknown chunk id: %c%c%c%c\n",
 //                    SPLITFOURCC(sub_chunk_id));
-            return;
+            return false;
         }
 
         size_remaining -= sub_chunk_len;
     }
+    return true;
 }
 
 static void read_chunk_mdat(qtmovie_t *qtmovie, size_t chunk_len)
@@ -608,7 +625,9 @@ int qtmovie_read(stream_t *file, demux_res_t *demux_res)
             read_chunk_ftyp(&qtmovie, chunk_len);
             break;
         case MAKEFOURCC('m','o','o','v'):
-            read_chunk_moov(&qtmovie, chunk_len);
+            if (!read_chunk_moov(&qtmovie, chunk_len)) {
+               return 0;
+            }
             break;
             /* once we hit mdat we stop reading and return.
              * this is on the assumption that there is no furhter interesting
