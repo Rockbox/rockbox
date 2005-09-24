@@ -28,7 +28,8 @@ typedef struct
 void create_alac(int samplesize, int numchannels, alac_file* alac);
 int16_t* decode_frame(alac_file *alac,
                   unsigned char *inbuffer,
-                  int *outputsize);
+		  int *outputsize,
+                  void (*yield)(void));
 void alac_set_info(alac_file *alac, char *inputbuffer);
 
 #endif /* __ALAC__DECOMP_H */

@@ -356,7 +356,7 @@ enum codec_status codec_start(struct codec_api* api)
     /* Decode one block - returned samples will be host-endian */
     outputBytes = destBufferSize;
     rb->yield();
-    pDestBuffer=decode_frame(&alac, buffer, &outputBytes);
+    pDestBuffer=decode_frame(&alac, buffer, &outputBytes, rb->yield);
 
     /* Advance codec buffer - unless we did a read */
     if ((char*)buffer!=(char*)inputBuffer) {

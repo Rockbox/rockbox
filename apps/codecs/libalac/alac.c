@@ -645,7 +645,8 @@ void deinterlace_16(int32_t *buffer_a, int32_t *buffer_b,
 
 int16_t* decode_frame(alac_file *alac,
                   unsigned char *inbuffer,
-                  int *outputsize)
+                  int *outputsize,
+                  void (*yield)(void))
 {
     int channels;
     int16_t* outbuffer;
@@ -730,6 +731,8 @@ int16_t* decode_frame(alac_file *alac,
                 //fprintf(stderr, "FIXME: unimplemented, unhandling of wasted_bytes\n");
             }
 
+            yield();
+
             basterdised_rice_decompress(alac,
                                         predicterror_buffer_a,
                                         outputsamples,
@@ -738,6 +741,8 @@ int16_t* decode_frame(alac_file *alac,
                                         alac->setinfo_rice_kmodifier,
                                         ricemodifier * alac->setinfo_rice_historymult / 4,
                                         (1 << alac->setinfo_rice_kmodifier) - 1);
+
+            yield();
 
             if (prediction_type == 0)
             { /* adaptive fir */
@@ -796,6 +801,8 @@ int16_t* decode_frame(alac_file *alac,
             /* wasted_bytes = 0; // unused */
         }
 
+        yield();
+
         switch(alac->setinfo_sample_size)
         {
         case 16:
@@ -853,6 +860,7 @@ int16_t* decode_frame(alac_file *alac,
 
         readsamplesize = alac->setinfo_sample_size - (wasted_bytes * 8) + 1;
 
+        yield();
         if (!isnotcompressed)
         { /* compressed */
             int predictor_coef_num_a;
@@ -902,6 +910,7 @@ int16_t* decode_frame(alac_file *alac,
                 //fprintf(stderr, "FIXME: unimplemented, unhandling of wasted_bytes\n");
             }
 
+            yield();
             /* channel 1 */
             basterdised_rice_decompress(alac,
                                         predicterror_buffer_a,
@@ -912,6 +921,7 @@ int16_t* decode_frame(alac_file *alac,
                                         ricemodifier_a * alac->setinfo_rice_historymult / 4,
                                         (1 << alac->setinfo_rice_kmodifier) - 1);
 
+            yield();
             if (prediction_type_a == 0)
             { /* adaptive fir */
                 predictor_decompress_fir_adapt(predicterror_buffer_a,
@@ -927,6 +937,8 @@ int16_t* decode_frame(alac_file *alac,
                 //fprintf(stderr, "FIXME: unhandled predicition type: %i\n", prediction_type_a);
             }
 
+            yield();
+
             /* channel 2 */
             basterdised_rice_decompress(alac,
                                         predicterror_buffer_b,
@@ -937,6 +949,7 @@ int16_t* decode_frame(alac_file *alac,
                                         ricemodifier_b * alac->setinfo_rice_historymult / 4,
                                         (1 << alac->setinfo_rice_kmodifier) - 1);
 
+            yield();
             if (prediction_type_b == 0)
             { /* adaptive fir */
                 predictor_decompress_fir_adapt(predicterror_buffer_b,
@@ -996,6 +1009,8 @@ int16_t* decode_frame(alac_file *alac,
             interlacing_shift = 0;
             interlacing_leftweight = 0;
         }
+
+        yield();
 
         switch(alac->setinfo_sample_size)
         {
