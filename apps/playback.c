@@ -1401,7 +1401,7 @@ void audio_update_trackinfo(void)
     } else {
         buf_ridx -= ci.curpos + cur_ti->codecsize;
         filebufused += ci.curpos + cur_ti->codecsize;
-        cur_ti->available = cur_ti->filesize;
+        cur_ti->available = cur_ti->filesize - cur_ti->filerem;
         
         cur_ti = &tracks[track_ridx];
         buf_ridx -= cur_ti->filesize;
