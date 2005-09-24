@@ -1184,11 +1184,13 @@ static bool replaygain(void)
 
 static bool replaygain_mode(void)
 {
-    bool result = set_bool_options(str(LANG_REPLAYGAIN_MODE), 
-        &global_settings.replaygain_track, 
-        STR(LANG_TRACK_GAIN), 
-        STR(LANG_ALBUM_GAIN), 
-        NULL);
+    static const struct opt_items names[] = {
+        { STR(LANG_TRACK_GAIN) },
+        { STR(LANG_ALBUM_GAIN) },
+        { STR(LANG_SHUFFLE_GAIN) },
+    };
+    bool result = set_option(str(LANG_REPLAYGAIN_MODE),
+        &global_settings.replaygain_type, INT, names, 3, NULL);
 
     dsp_set_replaygain(true);
     return result;
@@ -1294,6 +1296,8 @@ static bool playback_settings_menu(void)
     if ((old_shuffle != global_settings.playlist_shuffle) 
         && (audio_status() & AUDIO_STATUS_PLAY))
     {
+        dsp_set_replaygain(true);
+
         if (global_settings.playlist_shuffle)
         {
             playlist_randomise(NULL, current_tick, true);

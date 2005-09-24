@@ -77,9 +77,10 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #if CONFIG_CODEC == SWCODEC
 #include "pcmbuf.h"
 #include "pcm_playback.h"
+#include "dsp.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 27
+#define CONFIG_BLOCK_VERSION 28
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -432,7 +433,8 @@ static const struct bit_entry hd_bits[] =
 #if CONFIG_CODEC == SWCODEC
     {2, S_O(crossfade), 0, "crossfade type", "off,crossfade,mix"},
     {1, S_O(replaygain), false, "replaygain", off_on },
-    {1, S_O(replaygain_track), false, "replaygain type", "track,album" },
+    {2, S_O(replaygain_type), REPLAYGAIN_ALBUM, "replaygain type", 
+        "track,album,track shuffle" },
     {1, S_O(replaygain_noclip), false, "replaygain noclip", off_on },
     {8 | SIGNED, S_O(replaygain_preamp), 0, "replaygain preamp", NULL },
     {2, S_O(beep), 0, "off,weak,moderate,strong", NULL },
@@ -879,6 +881,7 @@ void settings_apply(void)
 
 #if CONFIG_CODEC == SWCODEC
     audio_set_crossfade(global_settings.crossfade);
+    dsp_set_replaygain(true);
 #endif
 
 #ifdef HAVE_SPDIF_POWER

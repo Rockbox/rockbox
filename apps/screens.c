@@ -53,6 +53,9 @@
 #ifdef HAVE_MMC
 #include "ata_mmc.h"
 #endif
+#if CONFIG_CODEC == SWCODEC
+#include "dsp.h"
+#endif
 
 #ifdef HAVE_LCD_BITMAP
 #define SCROLLBAR_WIDTH  6
@@ -661,6 +664,8 @@ bool quick_screen(int context, int button)
 
                 if(audio_status() & AUDIO_STATUS_PLAY)
                 {
+                    dsp_set_replaygain(true);
+                    
                     if (global_settings.playlist_shuffle)
                         playlist_randomise(NULL, current_tick, true);
                     else

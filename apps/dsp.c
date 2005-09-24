@@ -708,11 +708,16 @@ void dsp_set_replaygain(bool always)
 
         if (global_settings.replaygain || global_settings.replaygain_noclip)
         {
-            long peak;
+            bool track_mode
+                = ((global_settings.replaygain_type == REPLAYGAIN_TRACK)
+                    || ((global_settings.replaygain_type == REPLAYGAIN_SHUFFLE)
+                        && global_settings.playlist_shuffle));
+            long peak = (track_mode || !dsp->album_peak)
+                ? dsp->track_peak : dsp->album_peak;
 
             if (global_settings.replaygain)
             {
-                gain = (global_settings.replaygain_track || !dsp->album_gain)
+                gain = (track_mode || !dsp->album_gain)
                     ? dsp->track_gain : dsp->album_gain;
 
                 if (global_settings.replaygain_preamp)
@@ -720,12 +725,9 @@ void dsp_set_replaygain(bool always)
                     long preamp = get_replaygain_int(
                         global_settings.replaygain_preamp * 10);
 
-                    gain = (long) ((((int64_t) gain * preamp)) >> 24);
+                    gain = (long) (((int64_t) gain * preamp) >> 24);
                 }
             }
-
-            peak = (global_settings.replaygain_track || !dsp->album_peak)
-                ? dsp->track_peak : dsp->album_peak;
 
             if (gain == 0)
             {

@@ -333,8 +333,9 @@ struct user_settings
 
 #if CONFIG_CODEC == SWCODEC
     bool replaygain;        /* enable replaygain */
-    bool replaygain_track;  /* true for track gain, false for album gain */
     bool replaygain_noclip; /* scale to prevent clips */
+    int  replaygain_type;   /* 0=track gain, 1=album gain, 2=track gain if
+                               shuffle is on, album gain otherwise */
     int  replaygain_preamp; /* scale replaygained tracks by this */
     int  beep;              /* system beep volume when changing tracks etc. */
 #endif
@@ -426,5 +427,8 @@ enum { SHOW_ALL, SHOW_SUPPORTED, SHOW_MUSIC, SHOW_PLAYLIST, SHOW_ID3DB,
 
 /* recursive dir insert options */
 enum { RECURSE_OFF, RECURSE_ON, RECURSE_ASK };
+
+/* replaygain types */
+enum { REPLAYGAIN_TRACK = 0, REPLAYGAIN_ALBUM, REPLAYGAIN_SHUFFLE };
 
 #endif /* __SETTINGS_H__ */

@@ -3292,3 +3292,9 @@ desc: repeat one song
 eng: "A-B"
 voice: "A-B"
 new:
+
+id: LANG_SHUFFLE_GAIN
+desc: use track gain if shuffle mode is on, album gain otherwise
+eng: "Track gain if shuffling"
+voice: "Track gain if shuffling"
+new:
