@@ -497,7 +497,8 @@ static void read_chunk_trak(qtmovie_t *qtmovie, size_t chunk_len)
         default:
 //            fprintf(stderr, "(trak) unknown chunk id: %c%c%c%c\n",
 //                    SPLITFOURCC(sub_chunk_id));
-            return;
+            stream_skip(qtmovie->stream, sub_chunk_len - 8);
+            break;
         }
 
         size_remaining -= sub_chunk_len;
