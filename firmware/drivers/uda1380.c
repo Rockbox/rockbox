@@ -266,17 +266,10 @@ void uda1380_set_recvol(int mic_gain, int linein_gain, int adc_volume)
  */
 void uda1380_set_monitor(int enable)
 {
-    if (enable)
-    {
-        /* enable channel 2 */
-        uda1380_write_reg(REG_MIX_VOL, (uda1380_regs[REG_MIX_VOL] & 0x00FF) | MIX_VOL_CH_2(0));
-        uda1380_write_reg(REG_MUTE, 0);
-    } else
-    {
-        /* mute channel 2 */
-        uda1380_write_reg(REG_MUTE, MUTE_CH2);
-        uda1380_write_reg(REG_MIX_VOL, (uda1380_regs[REG_MIX_VOL] & 0x00FF) | MIX_VOL_CH_2(0xff));
-    }
+    if (enable)    /* enable channel 2 */
+        uda1380_write_reg(REG_MUTE, uda1380_regs[REG_MUTE] & ~MUTE_CH2);
+    else           /* mute channel 2 */
+        uda1380_write_reg(REG_MUTE, uda1380_regs[REG_MUTE] | MUTE_CH2);
 }
 
 /* Change the order of the noise chaper, 5th order is recommended above 32kHz */
