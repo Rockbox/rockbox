@@ -1108,9 +1108,16 @@ static bool get_alac_metadata(int fd, struct mp3entry* id3)
            lseek(fd, sub_chunk_len - 8, SEEK_CUR); /* FIXME not 8 */
            size_remaining-=sub_chunk_len;
 
-           /* Process mdia */
+           /* Process mdia - skipping possible edts */
            n=read_uint32be(fd,&sub_chunk_len);
            n=read(fd,&sub_chunk_id,4);
+           if (memcmp(&sub_chunk_id,"edts",4)==0) {
+             lseek(fd, sub_chunk_len - 8, SEEK_CUR); /* FIXME not 8 */
+             size_remaining-=sub_chunk_len;
+             n=read_uint32be(fd,&sub_chunk_len);
+             n=read(fd,&sub_chunk_id,4);
+           }
+
            if (memcmp(&sub_chunk_id,"mdia",4)!=0) {
              logf("Expecting mdia\n");
              return false;
