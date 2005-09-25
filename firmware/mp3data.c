@@ -158,23 +158,18 @@ static bool mp3headerinfo(struct mp3info *info, unsigned long header)
                            / info->frequency + info->padding;
     }
     
-    /* Frametime fraction calculation.
-       This fraction is reduced as far as possible. */
-    if (freqindex != 0) { /* 48/32/24/16/12/8 kHz */
-        /* integer number of milliseconds, denominator == 1 */
-        info->ft_num = 1000 * info->frame_samples / info->frequency;
-        info->ft_den = 1;
+    /* Frametime fraction denominator */
+    if (freqindex != 0) {      /* 48/32/24/16/12/8 kHz */
+        info->ft_den = 1;      /* integer number of milliseconds */
     }
-    else {                /* 44.1/22.05/11.025 kHz */
-        if (info->layer == 0) {
-            info->ft_num = 147000 * 384 / info->frequency;
+    else {                     /* 44.1/22.05/11.025 kHz */
+        if (info->layer == 0)     /* layer 1 */
             info->ft_den = 147;
-        }
-        else {
-            info->ft_num = 49000 * info->frame_samples / info->frequency;
+        else                      /* layer 2+3 */
             info->ft_den = 49;
-        }
     }
+    /* Frametime fraction numerator */
+    info->ft_num = 1000 * info->ft_den * info->frame_samples / info->frequency;
 
     info->channel_mode = (header & CHANNELMODE_MASK) >> 6;
     info->mode_extension = (header & MODE_EXT_MASK) >> 4;
