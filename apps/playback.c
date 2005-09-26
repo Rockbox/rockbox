@@ -1430,6 +1430,7 @@ void audio_update_trackinfo(void)
 
 static void audio_stop_playback(void)
 {
+    paused = false;
     playing = false;
     filling = false;
     ci.stop_codec = true;
