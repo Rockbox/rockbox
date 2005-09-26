@@ -790,13 +790,8 @@ bool rectrigger(void)
                         // avoid compiler warnings
                         break;
                 }
-                
-                if (global_settings.rec_trigger_mode == TRIG_OFF) {
-                    peak_meter_trigger(true);
-                } else {
-                    /* restart trigger with new values */
-                    settings_apply_trigger();
-                }
+                peak_meter_trigger(global_settings.rec_trigger_mode!=TRIG_OFF);
+                settings_apply_trigger();
                 break;
 
 #ifdef TRIG_RESET_SIM
