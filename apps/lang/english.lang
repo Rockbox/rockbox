@@ -1390,13 +1390,13 @@ new:
 id: LANG_MAX_FILES_IN_DIR
 desc: in settings_menu
 eng: "Max files in dir browser"
-voice: "Max files in directory browser"
+voice: "Maximum files in directory browser"
 new:
 
 id: LANG_MAX_FILES_IN_PLAYLIST
 desc: in settings_menu
 eng: "Max playlist size"
-voice: "Max playlist size"
+voice: "Maximum playlist size"
 new:
 
 id: LANG_JUMP_SCROLL
@@ -1776,14 +1776,14 @@ new:
 #Auto bookmark prompts
 id: LANG_BOOKMARK_AUTOLOAD_QUERY
 desc: prompt for user to decide to create a bookmark
-voice: ""
 eng: "Load Last Bookmark?"
+voice: ""
 new:
 
 id: LANG_AUTO_BOOKMARK_QUERY
 desc: prompt for user to decide to create an bookmark
-voice: ""
 eng: "Create a Bookmark?"
+voice: ""
 new:
 
 # Bookmark Select Menu Text
@@ -3014,7 +3014,7 @@ new:
 id: LANG_RECORD_TRIGGER
 desc: in recording settings_menu
 eng: "Trigger"
-voice:
+voice: "Trigger"
 new:
 
 id: LANG_RECORD_START_THRESHOLD
@@ -3086,7 +3086,7 @@ new:
 id: LANG_LCD_REMOTE_MENU
 desc: in the display sub menu
 eng: "Remote-LCD Settings"
-voice:
+voice: "Remote LCD settings"
 new:
 
 id: LANG_DISK_NAME_INTERNAL
@@ -3164,7 +3164,7 @@ new:
 id: LANG_RATING
 desc: in set_rating
 eng: "Rating:"
-voice "Rating"
+voice: "Rating"
 new:
 
 id: LANG_CROSSFADE_DURATION
@@ -3182,109 +3182,109 @@ new:
 id: LANG_RESTARTING_PLAYBACK
 desc: splash screen displayed when pcm buffer size is changed
 eng: "Restarting playback..."
-voice: "Restarting playback..."
+voice: ""
 new:
 
 id: LANG_REPLAYGAIN
 desc: in replaygain
 eng: "Replaygain"
-voice "Replaygain"
+voice: "Replaygain"
 new:
 
 id: LANG_REPLAYGAIN_ENABLE
 desc: in replaygain
 eng: "Enable replaygain"
-voice "Enable replaygain"
+voice: "Enable replaygain"
 new:
 
 id: LANG_REPLAYGAIN_NOCLIP
 desc: in replaygain
 eng: "Prevent clipping"
-voice "Prevent clipping"
+voice: "Prevent clipping"
 new:
 
 id: LANG_REPLAYGAIN_MODE
 desc: in replaygain
 eng: "Replaygain type"
-voice "Replaygain type"
+voice: "Replaygain type"
 new:
 
 id: LANG_TRACK_GAIN
 desc: in replaygain
 eng: "Track gain"
-voice "Track gain"
+voice: "Track gain"
 new:
 
 id: LANG_ALBUM_GAIN
 desc: in replaygain
 eng: "Album gain"
-voice "Album gain"
+voice: "Album gain"
 new:
 
 id: LANG_ID3_TRACK_GAIN
 desc: in browse_id3
 eng: "[Track gain]"
-voice ""
+voice: ""
 new:
 
 id: LANG_ID3_ALBUM_GAIN
 desc: in browse_id3
 eng: "[Album gain]"
-voice ""
+voice: ""
 new:
 
 id: LANG_ID3_NO_GAIN
 desc: DEPRECATED
 eng: ""
-voice ""
+voice: ""
 new:
 
 id: LANG_BIDI_SUPPORT
 desc: in settings_menu, option to enable reversal of hebrew/arabic text
 eng: "BiDi Hebrew/Arabic"
-voice ""
+voice: "Bidirectional text"
 new:
 
 id: LANG_REPLAYGAIN_PREAMP
-desc: in browse_id3
+desc: in replaygain settings
 eng: "Pre-amp"
-voice "Preamp"
+voice: "Preamp"
 new:
 
 id: LANG_UNIT_DB
 desc: in browse_id3
 eng: "dB"
-voice ""
+voice: ""
 new:
 
 id: LANG_ID3_VBR
 desc: in browse_id3
 eng: " (VBR)"
-voice ""
+voice: ""
 new:
 
 id: LANG_BEEP
 desc: in playback settings
 eng: "Beep volume"
-voice "Beep volume"
+voice: "Beep volume"
 new:
 
 id: LANG_WEAK
 desc: in beep volume in playback settings
 eng: "Weak"
-voice "Weak"
+voice: "Weak"
 new:
 
 id: LANG_MODERATE
 desc: in beep volume in playback settings
 eng: "Moderate"
-voice "Moderate"
+voice: "Moderate"
 new:
 
 id: LANG_STRONG
 desc: in beep volume in playback settings
 eng: "Strong"
-voice "Strong"
+voice: "Strong"
 new:
 
 id: LANG_REPEAT_AB
