@@ -844,7 +844,7 @@ bool recording_menu(bool no_source)
     items[i].desc = ID2P(LANG_RECORD_STARTUP);
     items[i++].function = reconstartup;
 #if !defined(SIMULATOR) && CONFIG_CODEC == MAS3587F
-    items[i].desc = str(LANG_RECORD_TRIGGER);
+    items[i].desc = ID2P(LANG_RECORD_TRIGGER);
     items[i++].function = rectrigger;
 #endif
 
