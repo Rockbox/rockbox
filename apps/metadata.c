@@ -196,9 +196,10 @@ int read_uint32be(int fd, unsigned int* buf) {
   if (n==4) {
     tmp=p[0];
     p[0]=p[3];
-    p[1]=p[2];
-    p[2]=p[1];
     p[3]=tmp;
+    tmp=p[2];
+    p[2]=p[1];
+    p[1]=tmp;
   }
 
   return(n);
