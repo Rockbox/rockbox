@@ -1667,7 +1667,7 @@ new: "Keine Dateien"
 id: LANG_BUTTONBAR_MENU
 desc: in button bar
 eng: "Menu"
-voice: "Menü"
+voice: ""
 new: "Menü"
 
 id: LANG_FM_BUTTONBAR_PRESETS
@@ -3007,7 +3007,7 @@ new: "Alarm ausgeschaltet"
 id: LANG_RECORD_TRIGGER
 desc: in recording settings_menu
 eng: "Trigger"
-voice: 
+voice: "Trigger"
 new: "Trigger"
 
 id: LANG_RECORD_START_THRESHOLD
@@ -3079,7 +3079,7 @@ new: "Trigger aktiv"
 id: LANG_LCD_REMOTE_MENU
 desc: in the display sub menu
 eng: "Remote-LCD Settings"
-voice: 
+voice: "Fernbedienungs-LCD-Einstellungen"
 new: "Remote-LCD Einstellungen"
 
 id: LANG_DISK_NAME_INTERNAL
@@ -3157,7 +3157,7 @@ new: "Titel bewerten"
 id: LANG_RATING
 desc: in set_rating
 eng: "Rating:"
-voice: 
+voice: ""
 new: "Bewertung:"
 
 id: LANG_CROSSFADE_DURATION
@@ -3175,43 +3175,43 @@ new: "Mischen"
 id: LANG_RESTARTING_PLAYBACK
 desc: splash screen displayed when pcm buffer size is changed
 eng: "Restarting playback..."
-voice: "Neustart der Wiedergabe..."
+voice: ""
 new: "Neustart der Wiedergabe..."
 
 id: LANG_REPLAYGAIN
 desc: in replaygain
 eng: "Replaygain"
-voice: 
+voice: "Lautstärkeanpassung"
 new: "Lautstärkeanpassung"
 
 id: LANG_REPLAYGAIN_ENABLE
 desc: in replaygain
 eng: "Enable replaygain"
-voice: 
+voice: "Lautstärkeanpassung aktivieren"
 new: "Lautstärkeanpassung aktivieren"
 
 id: LANG_REPLAYGAIN_NOCLIP
 desc: in replaygain
 eng: "Prevent clipping"
-voice: 
+voice: "Übersteuerung verhindern"
 new: "Übersteuerung verhindern"
 
 id: LANG_REPLAYGAIN_MODE
 desc: in replaygain
 eng: "Replaygain type"
-voice: 
+voice: "Lautstärkeanpassungstyp"
 new: "Lautstärkeanpassungstyp"
 
 id: LANG_TRACK_GAIN
 desc: in replaygain
 eng: "Track gain"
-voice: 
+voice: "Titellautstärke"
 new: "Titellautstärke"
 
 id: LANG_ALBUM_GAIN
 desc: in replaygain
 eng: "Album gain"
-voice: 
+voice: "Albumlautstärke"
 new: "Albumlautstärke"
 
 id: LANG_ID3_TRACK_GAIN
@@ -3235,25 +3235,25 @@ new:
 id: LANG_BIDI_SUPPORT
 desc: in settings_menu, option to enable reversal of hebrew/arabic text
 eng: "BiDi Hebrew/Arabic"
-voice: 
+voice: "Bidirektionaler Text"
 new: "BiDi Hebräisch/Arabisch"
 
 id: LANG_REPLAYGAIN_PREAMP
-desc: in browse_id3
+desc: in replaygain settings
 eng: "Pre-amp"
-voice: 
+voice: "Vorverstärkung"
 new: "Vorverstärkung"
 
 id: LANG_UNIT_DB
 desc: in browse_id3
 eng: "dB"
-voice: 
+voice: ""
 new: "dB"
 
 id: LANG_ID3_VBR
 desc: in browse_id3
 eng: " (VBR)"
-voice: "variable Bitrate"
+voice: ""
 new: " (VBR)"
 
 id: LANG_BEEP
@@ -3285,3 +3285,9 @@ desc: repeat one song
 eng: "A-B"
 voice: "A-B"
 new: "A-B"
+
+id: LANG_SHUFFLE_GAIN
+desc: use track gain if shuffle mode is on, album gain otherwise
+eng: "Track gain if shuffling"
+voice: "Titellautstärke beim Mischen"
+new: "Titellautstärke beim Mischen"
