@@ -75,7 +75,6 @@ void savestate(int fd);
 #define read(a,b,c)     rb->read((a),(b),(c))
 #define write(a,b,c)    rb->write((a),(b),(c))
 #define memset(a,b,c)   rb->memset((a),(b),(c))
-#define memcpy(a,b,c)   rb->memcpy((a),(b),(c))
 #define strcpy(a,b)     rb->strcpy((a),(b))
 #define strncpy(a,b,c)  rb->strncpy((a),(b),(c))
 #define strlen(a)       rb->strlen((a))
@@ -91,3 +90,5 @@ void savestate(int fd);
 #define fdprintf(...)    rb->fdprintf(__VA_ARGS__)
 #define tolower(_A_)    (isupper(_A_) ? (_A_ - 'A' + 'a') : _A_)
 
+/* Using #define isn't enough with GCC 4.0.1 */
+void* memcpy(void* dst, const void* src, size_t size);

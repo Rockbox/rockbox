@@ -643,6 +643,40 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
 	++Dptr;
 
 	/* D[32 - sb][i] == -D[sb][31 - i] */
+#if __GNUC__ >= 4
+        /* GCC 4.0.1 can't find a suitable register here if all of d0-d7
+         * are clobbered, so use fewer registers. It does mean two extra 
+         * movem instructions, but should have no additional performance 
+         * impact (like not being able to use burst mode for the movem).
+         */
+        asm volatile (
+          "movem.l (%1), %%d0-%%d3\n\t"
+          "move.l (%2), %%a5\n\t"
+          "msac.l %%d0, %%a5, 56(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d1, %%a5, 48(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d2, %%a5, 40(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d3, %%a5, 32(%2), %%a5, %%acc0\n\t"
+          "movem.l 16(%1), %%d0-%%d3\n\t"
+          "msac.l %%d0, %%a5, 24(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d1, %%a5, 16(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d2, %%a5, 8(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d3, %%a5, 8(%4), %%a5, %%acc0\n\t"
+        
+          "movem.l 16(%3), %%d0-%%d3\n\t"
+          "mac.l %%d3, %%a5, 16(%4), %%a5, %%acc0\n\t"
+          "mac.l %%d2, %%a5, 24(%4), %%a5, %%acc0\n\t"
+          "mac.l %%d1, %%a5, 32(%4), %%a5, %%acc0\n\t"
+          "mac.l %%d0, %%a5, 40(%4), %%a5, %%acc0\n\t"
+          "movem.l (%3), %%d0-%%d3\n\t"
+          "mac.l %%d3, %%a5, 48(%4), %%a5, %%acc0\n\t"
+          "mac.l %%d2, %%a5, 56(%4), %%a5, %%acc0\n\t"
+          "mac.l %%d1, %%a5, (%4), %%a5, %%acc0\n\t"
+          "mac.l %%d0, %%a5, %%acc0\n\t"
+          "movclr.l %%acc0, %0\n\t"
+          : "=r" (hi) 
+          : "a" (*fo), "a" (*Dptr + po), "a" (*fe), "a" (*Dptr + pe) 
+          : "d0", "d1", "d2", "d3", "a5");
+#else
         asm volatile (
           "movem.l (%1), %%d0-%%d7\n\t"
           "move.l (%2), %%a5\n\t"
@@ -668,7 +702,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
           : "=r" (hi) 
           : "a" (*fo), "a" (*Dptr + po), "a" (*fe), "a" (*Dptr + pe) 
           : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
-
+#endif
 	*pcm1++ = hi << 3;
         
         asm volatile(
