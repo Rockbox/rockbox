@@ -274,6 +274,8 @@ bool radio_screen(void)
                   str(LANG_FM_BUTTONBAR_RECORD));
 #endif
 
+    cpu_idle_mode(true);
+    
     while(!done)
     {
         if(search_dir)
@@ -622,6 +624,9 @@ bool radio_screen(void)
     }
 
 #endif
+    
+    cpu_idle_mode(false);
+    
     return have_recorded;
 }
 
