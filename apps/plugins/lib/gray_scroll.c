@@ -294,7 +294,9 @@ void gray_ub_scroll_up(int count)
             "extu.b  r0,r1       \n"  /* store data for next round */
 
         ".su_shift6:             \n"  /* shift right by 0..7 bits */
-            "shlr2   r0          \n"
+            "shll2   r0          \n"
+            "bra     .su_shift0  \n"
+            "shlr8   r0          \n"
         ".su_shift4:             \n"
             "shlr2   r0          \n"
         ".su_shift2:             \n"
@@ -378,7 +380,7 @@ void gray_ub_scroll_up(int count)
             [wide]"r"(_gray_info.width),
             [rows]"r"(_gray_info.bheight - shift),
             [addr]"a"(_gray_info.plane_data + _gray_info.plane_size - blockshift),
-            [cnt] "d"(2 * count)
+            [cnt] "d"(count)
             : /* clobbers */
             "a0", "a1", "d0", "d1", "d2", "d3", "d4"
         );
@@ -474,7 +476,9 @@ void gray_ub_scroll_down(int count)
             "extu.b  r0,r0       \n"  /* extend unsigned */
 
         ".sd_shift6:             \n"  /* shift left by 0..7 bits */
-            "shll2   r0          \n"
+            "shll8   r0          \n"
+            "bra     .sd_shift0  \n"
+            "shlr2   r0          \n"
         ".sd_shift4:             \n"
             "shll2   r0          \n"
         ".sd_shift2:             \n"
@@ -557,7 +561,7 @@ void gray_ub_scroll_down(int count)
             [rows]"r"(_gray_info.bheight - shift),
             [psiz]"r"(_gray_info.plane_size),
             [addr]"a"(_gray_info.plane_data + blockshift),
-            [cnt] "d"(2 * count)
+            [cnt] "d"(count)
             : /* clobbers */
             "a0", "a1", "d0", "d1", "d2", "d3", "d4"
         );

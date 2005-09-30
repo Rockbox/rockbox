@@ -81,10 +81,8 @@ static void _timer_isr(void)
                memory. Unbuffered operation provides only a subset of
                drawing functions. (only gray_bitmap drawing and scrolling)
    width     = width in pixels  (1..LCD_WIDTH)
-   bheight   = height in LCD pixel-block units (8 pixels for b&w LCD,
-               4 pixels for 4-grey LCD) (1..LCD_HEIGHT/block_size)
-   depth     = number of bitplanes to use (1..32 for b&w LCD, 1..16 for
-               4-grey LCD).
+   bheight   = height in LCD pixel-block units (8 pixels) (1..LCD_HEIGHT/8)
+   depth     = number of bitplanes to use (1..32).
 
  result:
    = depth  if there was enough memory
@@ -99,8 +97,7 @@ static void _timer_isr(void)
    deliver an enhancement over the native display.
  
    The number of displayable shades is calculated as follows:
-   b&w LCD:    shades = depth + 1
-   4-grey LCD: shades = 3 * depth + 1
+   shades = depth + 1
 
    If you need info about the memory taken by the greyscale buffer, supply a
    long* as the last parameter. This long will then contain the number of bytes
@@ -109,7 +106,7 @@ static void _timer_isr(void)
      shades * sizeof(long)               (bitpatterns)
    + (width * bheight) * depth           (bitplane data)
    + buffered ?                          (chunky front- & backbuffer)
-       (width * bheight * 8(4) * 2) : 0
+       (width * bheight * 8 * 2) : 0
    + 0..3                                (longword alignment) */
 int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
               bool buffered, int width, int bheight, int depth, long *buf_taken)
@@ -292,42 +289,41 @@ void gray_update_rect(int x, int y, int width, int height)
 #if (CONFIG_CPU == SH7034) && (LCD_DEPTH == 1)
             unsigned long pat_stack[8];
             unsigned long *pat_ptr;
-            unsigned change, ofs;
+            unsigned char *cbuf, *bbuf;
+            unsigned change;
 
-            ofs = srcofs_row;
+            cbuf = _gray_info.cur_buffer + srcofs_row;
+            bbuf = _gray_info.back_buffer + srcofs_row;
+
             asm volatile (
-                "mov.l   @(%[ofs],%[cbuf]),r1\n"
-                "mov.l   @(%[ofs],%[bbuf]),r2\n"
+                "mov.l   @%[cbuf]+,r1    \n"
+                "mov.l   @%[bbuf]+,r2    \n"
                 "xor     r1,r2           \n"
-                "add     #4,%[ofs]       \n"
-                "mov.l   @(%[ofs],%[cbuf]),r1\n"
-                "mov.l   @(%[ofs],%[bbuf]),%[chg]\n"
+                "mov.l   @%[cbuf],r1     \n"
+                "mov.l   @%[bbuf],%[chg] \n"
                 "xor     r1,%[chg]       \n"
                 "or      r2,%[chg]       \n"
                 : /* outputs */
-                [ofs] "+z"(ofs),
+                [cbuf]"+r"(cbuf),
+                [bbuf]"+r"(bbuf),
                 [chg] "=r"(change)
                 : /* inputs */
-                [cbuf]"r"(_gray_info.cur_buffer),
-                [bbuf]"r"(_gray_info.back_buffer)
                 : /* clobbers */
                  "r1", "r2"
             );
 
             if (change != 0)
             {
-                unsigned char *cbuf, *bbuf, *addr, *end;
+                unsigned char *addr, *end;
                 unsigned mask;
 
                 pat_ptr = &pat_stack[8];
-                cbuf = _gray_info.cur_buffer;
-                bbuf = _gray_info.back_buffer;
+                cbuf = _gray_info.cur_buffer + srcofs_row;
+                bbuf = _gray_info.back_buffer + srcofs_row;
 
                 /* precalculate the bit patterns with random shifts
                  * for all 8 pixels and put them on an extra "stack" */
                 asm volatile (
-                    "add     %[ofs],%[cbuf]  \n"
-                    "add     %[ofs],%[bbuf]  \n"
                     "mov     #8,r3       \n"  /* loop count in r3: 8 pixels */
 
                 ".ur_pre_loop:           \n"
@@ -384,7 +380,6 @@ void gray_update_rect(int x, int y, int width, int height)
                     [patp]"+r"(pat_ptr),
                     [mask]"=&r"(mask)
                     : /* inputs */
-                    [ofs] "[mask]"(srcofs_row),
                     [dpth]"r"(_gray_info.depth),
                     [bpat]"r"(_gray_info.bitpattern),
                     [rmsk]"r"(_gray_info.randmask)
@@ -473,36 +468,44 @@ void gray_update_rect(int x, int y, int width, int height)
                 );
             }
 #elif defined(CPU_COLDFIRE) && (LCD_DEPTH == 2)
-            unsigned long pat_stack[4];
+            unsigned long pat_stack[8];
             unsigned long *pat_ptr;
+            unsigned char *cbuf, *bbuf;
             unsigned change;
 
+            cbuf = _gray_info.cur_buffer + srcofs_row;
+            bbuf = _gray_info.back_buffer + srcofs_row;
+
             asm volatile (
-                "move.l  (%[ofs]:l:1,%[cbuf]),%[chg] \n"
-                "sub.l   (%[ofs]:l:1,%[bbuf]),%[chg] \n"
+                "move.l  (%[cbuf])+,%%d0 \n"
+                "move.l  (%[bbuf])+,%%d1 \n"
+                "eor.l   %%d0,%%d1       \n"
+                "move.l  (%[cbuf]),%%d0  \n"
+                "move.l  (%[bbuf]),%[chg]\n"
+                "eor.l   %%d0,%[chg]     \n"
+                "or.l    %%d1,%[chg]     \n"
                 : /* outputs */
+                [cbuf]"+a"(cbuf),
+                [bbuf]"+a"(bbuf),
                 [chg] "=&d"(change)
                 : /* inputs */
-                [cbuf]"a"(_gray_info.cur_buffer),
-                [bbuf]"a"(_gray_info.back_buffer),
-                [ofs] "d"(srcofs_row)
+                : /* clobbers */
+                "d0", "d1"
             );
 
             if (change != 0)
             {
-                unsigned char *cbuf, *bbuf, *addr, *end;
+                unsigned char *addr, *end;
                 unsigned mask;
 
-                pat_ptr = &pat_stack[4];
-                cbuf = _gray_info.cur_buffer;
-                bbuf = _gray_info.back_buffer;
+                pat_ptr = &pat_stack[8];
+                cbuf = _gray_info.cur_buffer + srcofs_row;
+                bbuf = _gray_info.back_buffer + srcofs_row;
 
                 /* precalculate the bit patterns with random shifts
-                 * for all 4 pixels and put them on an extra "stack" */
+                 * for all 8 pixels and put them on an extra "stack" */
                 asm volatile (
-                    "add.l   %[ofs],%[cbuf]  \n"
-                    "add.l   %[ofs],%[bbuf]  \n"
-                    "moveq.l #4,%%d3     \n"  /* loop count in d3: 4 pixels */
+                    "moveq.l #8,%%d3     \n"  /* loop count in d3: 8 pixels */
                     "clr.l   %[mask]     \n"
 
                 ".ur_pre_loop:           \n"
@@ -536,10 +539,10 @@ void gray_update_rect(int x, int y, int width, int height)
                     "lsr.l   %%d1,%%d2   \n"
                     "or.l    %%d0,%%d2   \n"  /* rotated_pattern = d2 | d0 */
 
-                    "or.l    #0x0300,%[mask] \n"  /* set mask bit */
+                    "or.l    #0x0100,%[mask] \n"  /* set mask bit */
 
                 ".ur_skip:               \n"
-                    "lsr.l   #2,%[mask]  \n"  /* shift mask */
+                    "lsr.l   #1,%[mask]  \n"  /* shift mask */
                     "move.l  %%d2,-(%[patp]) \n"  /* push on pattern stack */
 
                     "subq.l  #1,%%d3     \n"  /* decrease loop count */
@@ -551,7 +554,6 @@ void gray_update_rect(int x, int y, int width, int height)
                     [rnd] "+d"(_gray_random_buffer),
                     [mask]"=&d"(mask)
                     : /* inputs */
-                    [ofs] "[mask]"(srcofs_row),
                     [bpat]"a"(_gray_info.bitpattern),
                     [dpth]"d"(_gray_info.depth),
                     [rmsk]"d"(_gray_info.randmask)
@@ -562,11 +564,11 @@ void gray_update_rect(int x, int y, int width, int height)
                 addr = dst_row;
                 end = addr + MULU16(_gray_info.depth, _gray_info.plane_size);
 
-                /* set the bits for all 4 pixels in all bytes according to the
+                /* set the bits for all 8 pixels in all bytes according to the
                  * precalculated patterns on the pattern stack */
                 asm volatile (
-                    "movem.l (%[patp]),%%d2-%%d5 \n" /* pop all 4 patterns */
-
+                    "movem.l (%[patp]),%%d2-%%d6/%%a0-%%a2   \n" 
+                                              /* pop all 8 patterns */
                     "not.l   %[mask]     \n"  /* set mask -> keep mask */
                     "and.l   #0xFF,%[mask]   \n"
                     "beq.b   .ur_sloop   \n"  /* yes: jump to short loop */
@@ -575,18 +577,26 @@ void gray_update_rect(int x, int y, int width, int height)
                     "clr.l   %%d0        \n"
                     "lsr.l   #1,%%d2     \n"  /* shift out mask bit */
                     "addx.l  %%d0,%%d0   \n"  /* puts bit into LSB, shifts left by 1 */
-                    "lsl.l   #1,%%d0     \n"  /* shift by another 1 for a total of 2 */
                     "lsr.l   #1,%%d3     \n"
                     "addx.l  %%d0,%%d0   \n"
-                    "lsl.l   #1,%%d0     \n"
                     "lsr.l   #1,%%d4     \n"
                     "addx.l  %%d0,%%d0   \n"
-                    "lsl.l   #1,%%d0     \n"
                     "lsr.l   #1,%%d5     \n"
                     "addx.l  %%d0,%%d0   \n"
-                    "move.l  %%d0,%%d1   \n"  /* duplicate bits 0, 2, 4, 6, ... */
-                    "lsl.l   #1,%%d1     \n"  /* to 1, 3, 5, 7, ... */
-                    "or.l    %%d1,%%d0   \n"
+                    "lsr.l   #1,%%d6     \n"
+                    "addx.l  %%d0,%%d0   \n"
+                    "move.l  %%a0,%%d1   \n"
+                    "lsr.l   #1,%%d1     \n"
+                    "addx.l  %%d0,%%d0   \n"
+                    "move.l  %%d1,%%a0   \n"
+                    "move.l  %%a1,%%d1   \n"
+                    "lsr.l   #1,%%d1     \n"
+                    "addx.l  %%d0,%%d0   \n"
+                    "move.l  %%d1,%%a1   \n"
+                    "move.l  %%a2,%%d1   \n"
+                    "lsr.l   #1,%%d1     \n"
+                    "addx.l  %%d0,%%d0   \n"
+                    "move.l  %%d1,%%a2   \n"
 
                     "move.b  (%[addr]),%%d1  \n"  /* read old value */
                     "and.l   %[mask],%%d1    \n"  /* mask out unneeded bits */
@@ -603,18 +613,26 @@ void gray_update_rect(int x, int y, int width, int height)
                     "clr.l   %%d0        \n"
                     "lsr.l   #1,%%d2     \n"  /* shift out mask bit */
                     "addx.l  %%d0,%%d0   \n"  /* puts bit into LSB, shifts left by 1 */
-                    "lsl.l   #1,%%d0     \n"  /* shift by another 1 for a total of 2 */
                     "lsr.l   #1,%%d3     \n"
                     "addx.l  %%d0,%%d0   \n"
-                    "lsl.l   #1,%%d0     \n"
                     "lsr.l   #1,%%d4     \n"
                     "addx.l  %%d0,%%d0   \n"
-                    "lsl.l   #1,%%d0     \n"
                     "lsr.l   #1,%%d5     \n"
                     "addx.l  %%d0,%%d0   \n"
-                    "move.l  %%d0,%%d1   \n"  /* duplicate bits 0, 2, 4, 6, ... */
-                    "lsl.l   #1,%%d1     \n"  /* to 1, 3, 5, 7, ... */
-                    "or.l    %%d1,%%d0   \n"
+                    "lsr.l   #1,%%d6     \n"
+                    "addx.l  %%d0,%%d0   \n"
+                    "move.l  %%a0,%%d1   \n"
+                    "lsr.l   #1,%%d1     \n"
+                    "addx.l  %%d0,%%d0   \n"
+                    "move.l  %%d1,%%a0   \n"
+                    "move.l  %%a1,%%d1   \n"
+                    "lsr.l   #1,%%d1     \n"
+                    "addx.l  %%d0,%%d0   \n"
+                    "move.l  %%d1,%%a1   \n"
+                    "move.l  %%a2,%%d1   \n"
+                    "lsr.l   #1,%%d1     \n"
+                    "addx.l  %%d0,%%d0   \n"
+                    "move.l  %%d1,%%a2   \n"
 
                     "move.b  %%d0,(%[addr])  \n"  /* store byte to bitplane */
                     "add.l   %[psiz],%[addr] \n"  /* advance to next bitplane */
@@ -626,11 +644,11 @@ void gray_update_rect(int x, int y, int width, int height)
                     [addr]"+a"(addr),
                     [mask]"+d"(mask)
                     : /* inputs */
-                    [psiz]"r"(_gray_info.plane_size),
+                    [psiz]"a"(_gray_info.plane_size),
                     [end] "a"(end),
                     [patp]"a"(pat_ptr)
                     : /* clobbers */
-                    "d0", "d1", "d2", "d3", "d4", "d5"
+                    "d0", "d1", "d2", "d3", "d4", "d5", "d6", "a0", "a1", "a2"
                 );
             }
 #endif

@@ -211,16 +211,41 @@ void lcd_init(void)
 void lcd_blit(const unsigned char* data, int x, int by, int width,
               int bheight, int stride)
 {
-    /* Copy display bitmap to hardware */
+    const unsigned char *src, *src_end;
+    unsigned char *dst_u, *dst_l;
+    unsigned char upper[LCD_WIDTH];
+    unsigned char lower[LCD_WIDTH];
+    unsigned int byte;
+
+    by *= 2;
+
     while (bheight--)
     {
+        src = data;
+        src_end = data + width;
+        dst_u = upper;
+        dst_l = lower;
+        do
+        {
+            byte = *src++;
+            *dst_u++ = dibits[byte & 0x0F];
+            byte >>= 4;
+            *dst_l++ = dibits[byte & 0x0F];
+        }
+        while (src < src_end);
+
         lcd_write_command_ex(LCD_CNTL_PAGE, by++, -1);
         lcd_write_command_ex(LCD_CNTL_COLUMN, x, -1);
-
         lcd_write_command(LCD_CNTL_DATA_WRITE);
-        lcd_write_data(data, width);
+        lcd_write_data(upper, width);
+
+        lcd_write_command_ex(LCD_CNTL_PAGE, by++, -1);
+        lcd_write_command_ex(LCD_CNTL_COLUMN, x, -1);
+        lcd_write_command(LCD_CNTL_DATA_WRITE);
+        lcd_write_data(lower, width);
+
         data += stride;
-    } 
+    }
 }
 
 

@@ -107,11 +107,7 @@ void gray_ub_scroll_down(int count);
 
 /*** Internal stuff ***/
 
-#if LCD_DEPTH == 1
 #define _PBLOCK_EXP 3
-#elif LCD_DEPTH == 2
-#define _PBLOCK_EXP 2
-#endif
 #define _PBLOCK (1 << _PBLOCK_EXP)
 
 /* flag definitions */

@@ -1822,8 +1822,8 @@ int main(char* filename)
 
 
     /* initialize the grayscale buffer: 32 bitplanes for 33 shades of gray. */
-    grayscales = gray_init(rb, buf, buf_size, false, LCD_WIDTH,
-                           (LCD_HEIGHT*LCD_DEPTH/8), 32, &graysize) + 1;
+    grayscales = gray_init(rb, buf, buf_size, false, LCD_WIDTH, LCD_HEIGHT/8,
+                           32, &graysize) + 1;
     buf += graysize;
     buf_size -= graysize;
     if (grayscales < 33 || buf_size <= 0)

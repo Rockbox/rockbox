@@ -754,13 +754,13 @@ static void _writearray(unsigned char *address, const unsigned char *src,
     _src = src;
 
     /* precalculate the bit patterns with random shifts 
-       for all 4 pixels and put them on an extra "stack" */
+       for all 8 pixels and put them on an extra "stack" */
     asm volatile (
-        "moveq.l #4,%%d3     \n"  /* loop count in d3: 4 pixels */
+        "moveq.l #8,%%d3     \n"  /* loop count in d3: 4 pixels */
 
     ".wa_loop:               \n"  /** load pattern for pixel **/
         "clr.l   %%d2        \n"  /* pattern for skipped pixel must be 0 */
-        "lsr.l   #2,%[mask]  \n"  /* shift out 2 lsbs of mask */
+        "lsr.l   #1,%[mask]  \n"  /* shift out 2 lsbs of mask */
         "bcc.b   .wa_skip    \n"  /* skip this pixel */
 
         "clr.l   %%d0        \n"
@@ -816,10 +816,10 @@ static void _writearray(unsigned char *address, const unsigned char *src,
     end = addr + MULU16(_gray_info.depth, _gray_info.plane_size);
     _mask = mask;
 
-    /* set the bits for all 4 pixels in all bytes according to the
+    /* set the bits for all 8 pixels in all bytes according to the
      * precalculated patterns on the pattern stack */
     asm volatile (
-        "movem.l (%[patp]),%%d2-%%d5 \n"  /* pop all 4 patterns */
+        "movem.l (%[patp]),%%d2-%%d6/%%a0-%%a2   \n"  /* pop all 8 patterns */
 
         "not.l   %[mask]     \n"  /* "set" mask -> "keep" mask */
         "and.l   #0xFF,%[mask]   \n"
@@ -829,18 +829,26 @@ static void _writearray(unsigned char *address, const unsigned char *src,
         "clr.l   %%d0        \n"
         "lsr.l   #1,%%d2     \n"  /* shift out mask bit */
         "addx.l  %%d0,%%d0   \n"  /* puts bit into LSB, shifts left by 1 */
-        "lsl.l   #1,%%d0     \n"  /* shift by another 1 for a total of 2 */
         "lsr.l   #1,%%d3     \n"
         "addx.l  %%d0,%%d0   \n"
-        "lsl.l   #1,%%d0     \n"
         "lsr.l   #1,%%d4     \n"
         "addx.l  %%d0,%%d0   \n"
-        "lsl.l   #1,%%d0     \n"
         "lsr.l   #1,%%d5     \n"
         "addx.l  %%d0,%%d0   \n"
-        "move.l  %%d0,%%d1   \n"  /* duplicate bits 0, 2, 4, 6, ... */
-        "lsl.l   #1,%%d1     \n"  /* to 1, 3, 5, 7, ... */
-        "or.l    %%d1,%%d0   \n"
+        "lsr.l   #1,%%d6     \n"
+        "addx.l  %%d0,%%d0   \n"
+        "move.l  %%a0,%%d1   \n"
+        "lsr.l   #1,%%d1     \n"
+        "addx.l  %%d0,%%d0   \n"
+        "move.l  %%d1,%%a0   \n"
+        "move.l  %%a1,%%d1   \n"
+        "lsr.l   #1,%%d1     \n"
+        "addx.l  %%d0,%%d0   \n"
+        "move.l  %%d1,%%a1   \n"
+        "move.l  %%a2,%%d1   \n"
+        "lsr.l   #1,%%d1     \n"
+        "addx.l  %%d0,%%d0   \n"
+        "move.l  %%d1,%%a2   \n"
 
         "move.b  (%[addr]),%%d1  \n"  /* read old value */
         "and.l   %[mask],%%d1    \n"  /* mask out unneeded bits */
@@ -857,18 +865,26 @@ static void _writearray(unsigned char *address, const unsigned char *src,
         "clr.l   %%d0        \n"
         "lsr.l   #1,%%d2     \n"  /* shift out mask bit */
         "addx.l  %%d0,%%d0   \n"  /* puts bit into LSB, shifts left by 1 */
-        "lsl.l   #1,%%d0     \n"  /* shift by another 1 for a total of 2 */
         "lsr.l   #1,%%d3     \n"
         "addx.l  %%d0,%%d0   \n"
-        "lsl.l   #1,%%d0     \n"
         "lsr.l   #1,%%d4     \n"
         "addx.l  %%d0,%%d0   \n"
-        "lsl.l   #1,%%d0     \n"
         "lsr.l   #1,%%d5     \n"
         "addx.l  %%d0,%%d0   \n"
-        "move.l  %%d0,%%d1   \n"  /* duplicate bits 0, 2, 4, 6, ... */
-        "lsl.l   #1,%%d1     \n"  /* to 1, 3, 5, 7, ... */
-        "or.l    %%d1,%%d0   \n"
+        "lsr.l   #1,%%d6     \n"
+        "addx.l  %%d0,%%d0   \n"
+        "move.l  %%a0,%%d1   \n"
+        "lsr.l   #1,%%d1     \n"
+        "addx.l  %%d0,%%d0   \n"
+        "move.l  %%d1,%%a0   \n"
+        "move.l  %%a1,%%d1   \n"
+        "lsr.l   #1,%%d1     \n"
+        "addx.l  %%d0,%%d0   \n"
+        "move.l  %%d1,%%a1   \n"
+        "move.l  %%a2,%%d1   \n"
+        "lsr.l   #1,%%d1     \n"
+        "addx.l  %%d0,%%d0   \n"
+        "move.l  %%d1,%%a2   \n"
 
         "move.b  %%d0,(%[addr])  \n"  /* store byte to bitplane */
         "add.l   %[psiz],%[addr] \n"  /* advance to next bitplane */
@@ -880,11 +896,11 @@ static void _writearray(unsigned char *address, const unsigned char *src,
         [addr]"+a"(addr),
         [mask]"+d"(_mask)
         : /* inputs */
-        [psiz]"r"(_gray_info.plane_size),
+        [psiz]"a"(_gray_info.plane_size),
         [end] "a"(end),
         [patp]"a"(pat_ptr)
         : /* clobbers */
-        "d0", "d1", "d2", "d3", "d4", "d5"
+        "d0", "d1", "d2", "d3", "d4", "d5", "d6", "a0", "a1", "a2"
     );
 #endif
 }
@@ -938,8 +954,8 @@ void gray_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
            + MULU16(_gray_info.width, y >> _PBLOCK_EXP);
     ny   = height - 1 + shift;
 
-    mask = 0xFFu << (LCD_DEPTH * shift);
-    mask_bottom = 0xFFu >> (LCD_DEPTH * (~ny & (_PBLOCK-1)));
+    mask = 0xFFu << shift;
+    mask_bottom = 0xFFu >> (~ny & (_PBLOCK-1));
 
     for (; ny >= _PBLOCK; ny -= _PBLOCK)
     {

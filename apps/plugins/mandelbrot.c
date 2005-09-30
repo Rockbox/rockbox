@@ -353,8 +353,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     /* initialize the grayscale buffer:
      * 8 bitplanes for 9 shades of gray.*/
-    grayscales = gray_init(rb, gbuf, gbuf_size, false, LCD_WIDTH,
-                           (LCD_HEIGHT*LCD_DEPTH/8), 8, NULL) + 1;
+    grayscales = gray_init(rb, gbuf, gbuf_size, false, LCD_WIDTH, LCD_HEIGHT/8,
+                           8, NULL) + 1;
     if (grayscales != 9) {
         rb->snprintf(buff, sizeof(buff), "%d", grayscales);
         rb->lcd_puts(0, 1, buff);
