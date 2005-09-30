@@ -207,7 +207,7 @@ void lcd_init(void)
 /*** update functions ***/
 
 /* Performance function that works with an external buffer
-   note that by and bheight are in 4-pixel units! */
+   note that by and bheight are in 8-pixel units! */
 void lcd_blit(const unsigned char* data, int x, int by, int width,
               int bheight, int stride)
 {
