@@ -26,6 +26,9 @@
 
 static struct codec_api *ci;
 
+#define FORCE_DSP_USE    /* fixes some WavPack bugs; adds about 12% to boost ratio
+                            (when DSP would not have been used) */
+
 #define BUFFER_SIZE 4096
 
 static long temp_buffer [BUFFER_SIZE] IDATA_ATTR;
@@ -75,6 +78,11 @@ enum codec_status codec_start(struct codec_api* api)
     while (!*ci->taginfo_ready && !ci->stop_codec)
         ci->sleep(1);
         
+#ifdef FORCE_DSP_USE
+    ci->configure(CODEC_DSP_ENABLE, (bool *)true);
+    ci->configure(DSP_SET_FREQUENCY, (long *)(ci->id3->frequency));
+    codec_set_replaygain(ci->id3);
+#else
     if (ci->id3->frequency != NATIVE_FREQUENCY ||
         ci->global_settings->replaygain) {
             ci->configure(CODEC_DSP_ENABLE, (bool *)true);
@@ -83,7 +91,8 @@ enum codec_status codec_start(struct codec_api* api)
     }
     else
         ci->configure(CODEC_DSP_ENABLE, (bool *)false);
-    
+#endif
+   
     /* Create a decoder instance */
     wpc = WavpackOpenFileInput (read_callback, error);
 
