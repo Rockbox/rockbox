@@ -355,6 +355,8 @@ static const struct plugin_api rockbox_api = {
     menu_draw,
     menu_insert,
     menu_set_cursor,
+    
+    screen_dump_set_hook,
 };
 
 int plugin_load(const char* plugin, void* parameter)

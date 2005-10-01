@@ -274,6 +274,8 @@ static const unsigned char bmpheader[] =
 #endif
 };
 
+static void (*screen_dump_hook)(int fh) = NULL;
+
 void screen_dump(void)
 {
     int fh;
@@ -298,56 +300,70 @@ void screen_dump(void)
     if (fh < 0)
         return;
 
-    write(fh, bmpheader, sizeof(bmpheader));
+    if (screen_dump_hook)
+    {
+        screen_dump_hook(fh);
+    }
+    else
+    {
+        write(fh, bmpheader, sizeof(bmpheader));
 
-    /* BMP image goes bottom up */
+        /* BMP image goes bottom up */
 #if LCD_DEPTH == 1
-    for (by = LCD_HEIGHT/8 - 1; by >= 0; by--)
-    {
-        memset(&line_block[0][0], 0, sizeof(line_block));
-
-        for (bx = 0; bx < LCD_WIDTH/8; bx++)
+        for (by = LCD_HEIGHT/8 - 1; by >= 0; by--)
         {
-            dst_mask = 0x01;
-            for (ix = 7; ix >= 0; ix--)
+            memset(&line_block[0][0], 0, sizeof(line_block));
+
+            for (bx = 0; bx < LCD_WIDTH/8; bx++)
             {
-                src_byte = lcd_framebuffer[by][8*bx+ix];
-                src_mask = 0x01;
-                for (iy = 7; iy >= 0; iy--)
+                dst_mask = 0x01;
+                for (ix = 7; ix >= 0; ix--)
                 {
-                    if (src_byte & src_mask)
-                        line_block[iy][bx] |= dst_mask;
-                    src_mask <<= 1;
+                    src_byte = lcd_framebuffer[by][8*bx+ix];
+                    src_mask = 0x01;
+                    for (iy = 7; iy >= 0; iy--)
+                    {
+                        if (src_byte & src_mask)
+                            line_block[iy][bx] |= dst_mask;
+                        src_mask <<= 1;
+                    }
+                    dst_mask <<= 1;
                 }
-                dst_mask <<= 1;
             }
+
+            write(fh, &line_block[0][0], sizeof(line_block));
         }
-        
-        write(fh, &line_block[0][0], sizeof(line_block));
-    }
 #elif LCD_DEPTH == 2
-    for (by = LCD_HEIGHT/4 - 1; by >= 0; by--)
-    {
-        memset(&line_block[0][0], 0, sizeof(line_block));
-
-        for (bx = 0; bx < LCD_WIDTH/2; bx++)
+        for (by = LCD_HEIGHT/4 - 1; by >= 0; by--)
         {
-            src_byte = lcd_framebuffer[by][2*bx];
-            src_byte2 = lcd_framebuffer[by][2*bx+1];
-            for (iy = 3; iy >= 0; iy--)
-            {
-                line_block[iy][bx] = ((src_byte & 3) << 4) | (src_byte2 & 3);
-                src_byte >>= 2;
-                src_byte2 >>= 2;
-            }
-        }
+            memset(&line_block[0][0], 0, sizeof(line_block));
 
-        write(fh, &line_block[0][0], sizeof(line_block));
+            for (bx = 0; bx < LCD_WIDTH/2; bx++)
+            {
+                src_byte = lcd_framebuffer[by][2*bx];
+                src_byte2 = lcd_framebuffer[by][2*bx+1];
+                for (iy = 3; iy >= 0; iy--)
+                {
+                    line_block[iy][bx] = ((src_byte & 3) << 4) | (src_byte2 & 3);
+                    src_byte >>= 2;
+                    src_byte2 >>= 2;
+                }
+            }
+
+            write(fh, &line_block[0][0], sizeof(line_block));
+        }
+#endif /* LCD_DEPTH */
     }
-#endif
+
     close(fh);
 }
-#endif
+
+void screen_dump_set_hook(void (*hook)(int fh))
+{
+    screen_dump_hook = hook;
+}
+
+#endif /* HAVE_LCD_BITMAP */
 
 /* parse a line from a configuration file. the line format is:
 

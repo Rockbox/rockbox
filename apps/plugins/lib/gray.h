@@ -42,7 +42,6 @@ void gray_release(void);
 /* Special functions */
 void gray_show(bool enable);
 void gray_deferred_lcd_update(void);
-void gray_screendump(void);
 
 /* Update functions */
 void gray_update(void);

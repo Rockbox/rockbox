@@ -90,7 +90,7 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 51
+#define PLUGIN_API_VERSION 52
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -443,6 +443,8 @@ struct plugin_api {
     void (*menu_draw)(int menu);
     void (*menu_insert)(int menu, int position, char *desc, bool (*function) (void));
     void (*menu_set_cursor)(int menu, int position);
+    
+    void (*screen_dump_set_hook)(void (*hook)(int fh));
 };
 
 int plugin_load(const char* plugin, void* parameter);

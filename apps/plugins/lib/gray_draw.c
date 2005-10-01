@@ -588,7 +588,7 @@ static void _writearray(unsigned char *address, const unsigned char *src,
     unsigned long *pat_ptr = &pat_stack[8];
     const unsigned char *_src;
     unsigned char *addr, *end;
-    unsigned _mask;
+    unsigned _mask, trash;
 
     _mask = mask;
     _src = src;
@@ -675,7 +675,7 @@ static void _writearray(unsigned char *address, const unsigned char *src,
         "mov.l   @%[patp]+,r7\n"
         "mov.l   @%[patp]+,r8\n"
         "mov.l   @%[patp]+,r9\n"
-        "mov.l   @%[patp]+,r10   \n"
+        "mov.l   @%[patp],%[rx]  \n"
 
         "not     %[mask],%[mask] \n"  /* "set" mask -> "keep" mask */
         "extu.b  %[mask],%[mask] \n"  /* mask out high bits */
@@ -697,7 +697,7 @@ static void _writearray(unsigned char *address, const unsigned char *src,
         "rotcl   r0          \n"
         "shlr    r9          \n"
         "rotcl   r0          \n"
-        "shlr    r10         \n"
+        "shlr    %[rx]       \n"
         "mov.b   @%[addr],%[patp]\n"  /* read old value */
         "rotcl   r0          \n"
         "and     %[mask],%[patp] \n"  /* mask out unneeded bits */
@@ -725,7 +725,7 @@ static void _writearray(unsigned char *address, const unsigned char *src,
         "rotcl   r0          \n"
         "shlr    r9          \n"
         "rotcl   r0          \n"
-        "shlr    r10         \n"
+        "shlr    %[rx]       \n"
         "rotcl   r0          \n"
         "mov.b   r0,@%[addr] \n"  /* store byte to bitplane */
         "add     %[psiz],%[addr] \n"  /* advance to next bitplane */
@@ -734,21 +734,22 @@ static void _writearray(unsigned char *address, const unsigned char *src,
 
     ".wa_end:                \n"
         : /* outputs */
-        [patp]"+r"(pat_ptr),
         [addr]"+r"(addr),
-        [mask]"+r"(_mask)
+        [mask]"+r"(_mask),
+        [rx]  "=&r"(trash)
         : /* inputs */
+        [psiz]"r"(_gray_info.plane_size),
         [end] "r"(end),
-        [psiz]"r"(_gray_info.plane_size)
+        [patp]"[rx]"(pat_ptr)
         : /* clobbers */
-        "r0", "r1", "r2", "r3", "r6", "r7", "r8", "r9", "r10"
+        "r0", "r1", "r2", "r3", "r6", "r7", "r8", "r9"
     );
 #elif defined(CPU_COLDFIRE) && (LCD_DEPTH == 2)
     unsigned long pat_stack[8];
     unsigned long *pat_ptr = &pat_stack[8];
     const unsigned char *_src;
     unsigned char *addr, *end;
-    unsigned _mask;
+    unsigned _mask, trash;
 
     _mask = mask;
     _src = src;
@@ -819,8 +820,8 @@ static void _writearray(unsigned char *address, const unsigned char *src,
     /* set the bits for all 8 pixels in all bytes according to the
      * precalculated patterns on the pattern stack */
     asm volatile (
-        "movem.l (%[patp]),%%d2-%%d6/%%a0-%%a2   \n"  /* pop all 8 patterns */
-
+        "movem.l (%[patp]),%%d2-%%d6/%%a0-%%a1/%[ax] \n"  
+                                  /* pop all 8 patterns */
         "not.l   %[mask]     \n"  /* "set" mask -> "keep" mask */
         "and.l   #0xFF,%[mask]   \n"
         "beq.b   .wa_sloop   \n"  /* yes: jump to short loop */
@@ -845,10 +846,10 @@ static void _writearray(unsigned char *address, const unsigned char *src,
         "lsr.l   #1,%%d1     \n"
         "addx.l  %%d0,%%d0   \n"
         "move.l  %%d1,%%a1   \n"
-        "move.l  %%a2,%%d1   \n"
+        "move.l  %[ax],%%d1  \n"
         "lsr.l   #1,%%d1     \n"
         "addx.l  %%d0,%%d0   \n"
-        "move.l  %%d1,%%a2   \n"
+        "move.l  %%d1,%[ax]  \n"
 
         "move.b  (%[addr]),%%d1  \n"  /* read old value */
         "and.l   %[mask],%%d1    \n"  /* mask out unneeded bits */
@@ -881,10 +882,10 @@ static void _writearray(unsigned char *address, const unsigned char *src,
         "lsr.l   #1,%%d1     \n"
         "addx.l  %%d0,%%d0   \n"
         "move.l  %%d1,%%a1   \n"
-        "move.l  %%a2,%%d1   \n"
+        "move.l  %[ax],%%d1  \n"
         "lsr.l   #1,%%d1     \n"
         "addx.l  %%d0,%%d0   \n"
-        "move.l  %%d1,%%a2   \n"
+        "move.l  %%d1,%[ax]  \n"
 
         "move.b  %%d0,(%[addr])  \n"  /* store byte to bitplane */
         "add.l   %[psiz],%[addr] \n"  /* advance to next bitplane */
@@ -894,13 +895,14 @@ static void _writearray(unsigned char *address, const unsigned char *src,
     ".wa_end:                \n"
         : /* outputs */
         [addr]"+a"(addr),
-        [mask]"+d"(_mask)
+        [mask]"+d"(_mask),
+        [ax]  "=&a"(trash)
         : /* inputs */
         [psiz]"a"(_gray_info.plane_size),
         [end] "a"(end),
-        [patp]"a"(pat_ptr)
+        [patp]"[ax]"(pat_ptr)
         : /* clobbers */
-        "d0", "d1", "d2", "d3", "d4", "d5", "d6", "a0", "a1", "a2"
+        "d0", "d1", "d2", "d3", "d4", "d5", "d6", "a0", "a1"
     );
 #endif
 }

@@ -36,6 +36,7 @@ short _gray_random_buffer;          /* buffer for random number generator */
 
 /* Prototypes */
 static void _timer_isr(void);
+static void gray_screendump_hook(int fd);
 
 /* Timer interrupt handler: display next bitplane */
 static void _timer_isr(void)
@@ -230,11 +231,13 @@ void gray_show(bool enable)
     {
         _gray_info.flags |= _GRAY_RUNNING;
         _gray_rb->timer_register(1, NULL, FREQ / 67, 1, _timer_isr);
+        _gray_rb->screen_dump_set_hook(gray_screendump_hook);
     }
     else
     {
         _gray_rb->timer_unregister();
         _gray_info.flags &= ~_GRAY_RUNNING;
+        _gray_rb->screen_dump_set_hook(NULL);
         _gray_rb->lcd_update(); /* restore whatever there was before */
     }
 #elif defined(CPU_COLDFIRE) && (CONFIG_LCD == LCD_S1D15E06)
@@ -244,12 +247,14 @@ void gray_show(bool enable)
         _gray_rb->cpu_boost(true);  /* run at 120 MHz to avoid freq changes */
         _gray_rb->timer_register(1, NULL, *_gray_rb->cpu_frequency / 70, 1,
                                  _timer_isr);
+        _gray_rb->screen_dump_set_hook(gray_screendump_hook);
     }
     else if (!enable && (_gray_info.flags & _GRAY_RUNNING))
     {
         _gray_rb->timer_unregister();
         _gray_rb->cpu_boost(false);
         _gray_info.flags &= ~_GRAY_RUNNING;
+        _gray_rb->screen_dump_set_hook(NULL);
         _gray_rb->lcd_update(); /* restore whatever there was before */
     }
 #endif
@@ -315,7 +320,7 @@ void gray_update_rect(int x, int y, int width, int height)
             if (change != 0)
             {
                 unsigned char *addr, *end;
-                unsigned mask;
+                unsigned mask, trash;
 
                 pat_ptr = &pat_stack[8];
                 cbuf = _gray_info.cur_buffer + srcofs_row;
@@ -400,7 +405,7 @@ void gray_update_rect(int x, int y, int width, int height)
                     "mov.l   @%[patp]+,r7\n"
                     "mov.l   @%[patp]+,r8\n"
                     "mov.l   @%[patp]+,r9\n"
-                    "mov.l   @%[patp]+,r10   \n"
+                    "mov.l   @%[patp],%[rx]  \n"
 
                     "tst     %[mask],%[mask] \n"  /* nothing to keep? */
                     "bt      .ur_sloop   \n"  /* yes: jump to short loop */
@@ -420,7 +425,7 @@ void gray_update_rect(int x, int y, int width, int height)
                     "rotcl   r0          \n"
                     "shlr    r9          \n"
                     "rotcl   r0          \n"
-                    "shlr    r10         \n"
+                    "shlr    %[rx]       \n"
                     "mov.b   @%[addr],%[patp]\n"  /* read old value */
                     "rotcl   r0          \n"
                     "and     %[mask],%[patp] \n"  /* mask out unneeded bits */
@@ -448,7 +453,7 @@ void gray_update_rect(int x, int y, int width, int height)
                     "rotcl   r0          \n"
                     "shlr    r9          \n"
                     "rotcl   r0          \n"
-                    "shlr    r10         \n"
+                    "shlr    %[rx]       \n"
                     "rotcl   r0          \n"
                     "mov.b   r0,@%[addr]     \n"  /* store byte to bitplane */
                     "add     %[psiz],%[addr] \n"  /* advance to next bitplane */
@@ -457,14 +462,15 @@ void gray_update_rect(int x, int y, int width, int height)
 
                 ".ur_end:                \n"
                     : /* outputs */
-                    [patp]"+r"(pat_ptr),
                     [addr]"+r"(addr),
-                    [mask]"+r"(mask)
+                    [mask]"+r"(mask),
+                    [rx]  "=&r"(trash)
                     : /* inputs */
+                    [psiz]"r"(_gray_info.plane_size),
                     [end] "r"(end),
-                    [psiz]"r"(_gray_info.plane_size)
+                    [patp]"[rx]"(pat_ptr)
                     : /* clobbers */
-                    "r0", "r1", "r2", "r3", "r6", "r7", "r8", "r9", "r10"
+                    "r0", "r1", "r2", "r3", "r6", "r7", "r8", "r9"
                 );
             }
 #elif defined(CPU_COLDFIRE) && (LCD_DEPTH == 2)
@@ -496,7 +502,7 @@ void gray_update_rect(int x, int y, int width, int height)
             if (change != 0)
             {
                 unsigned char *addr, *end;
-                unsigned mask;
+                unsigned mask, trash;
 
                 pat_ptr = &pat_stack[8];
                 cbuf = _gray_info.cur_buffer + srcofs_row;
@@ -567,7 +573,7 @@ void gray_update_rect(int x, int y, int width, int height)
                 /* set the bits for all 8 pixels in all bytes according to the
                  * precalculated patterns on the pattern stack */
                 asm volatile (
-                    "movem.l (%[patp]),%%d2-%%d6/%%a0-%%a2   \n" 
+                    "movem.l (%[patp]),%%d2-%%d6/%%a0-%%a1/%[ax] \n" 
                                               /* pop all 8 patterns */
                     "not.l   %[mask]     \n"  /* set mask -> keep mask */
                     "and.l   #0xFF,%[mask]   \n"
@@ -593,10 +599,10 @@ void gray_update_rect(int x, int y, int width, int height)
                     "lsr.l   #1,%%d1     \n"
                     "addx.l  %%d0,%%d0   \n"
                     "move.l  %%d1,%%a1   \n"
-                    "move.l  %%a2,%%d1   \n"
+                    "move.l  %[ax],%%d1  \n"
                     "lsr.l   #1,%%d1     \n"
                     "addx.l  %%d0,%%d0   \n"
-                    "move.l  %%d1,%%a2   \n"
+                    "move.l  %%d1,%[ax]  \n"
 
                     "move.b  (%[addr]),%%d1  \n"  /* read old value */
                     "and.l   %[mask],%%d1    \n"  /* mask out unneeded bits */
@@ -629,10 +635,10 @@ void gray_update_rect(int x, int y, int width, int height)
                     "lsr.l   #1,%%d1     \n"
                     "addx.l  %%d0,%%d0   \n"
                     "move.l  %%d1,%%a1   \n"
-                    "move.l  %%a2,%%d1   \n"
+                    "move.l  %[ax],%%d1  \n"
                     "lsr.l   #1,%%d1     \n"
                     "addx.l  %%d0,%%d0   \n"
-                    "move.l  %%d1,%%a2   \n"
+                    "move.l  %%d1,%[ax]  \n"
 
                     "move.b  %%d0,(%[addr])  \n"  /* store byte to bitplane */
                     "add.l   %[psiz],%[addr] \n"  /* advance to next bitplane */
@@ -642,13 +648,14 @@ void gray_update_rect(int x, int y, int width, int height)
                 ".ur_end:                \n"
                     : /* outputs */
                     [addr]"+a"(addr),
-                    [mask]"+d"(mask)
+                    [mask]"+d"(mask),
+                    [ax]  "=&a"(trash)
                     : /* inputs */
                     [psiz]"a"(_gray_info.plane_size),
                     [end] "a"(end),
-                    [patp]"a"(pat_ptr)
+                    [patp]"[ax]"(pat_ptr)
                     : /* clobbers */
-                    "d0", "d1", "d2", "d3", "d4", "d5", "d6", "a0", "a1", "a2"
+                    "d0", "d1", "d2", "d3", "d4", "d5", "d6", "a0", "a1"
                 );
             }
 #endif
@@ -692,12 +699,14 @@ void gray_deferred_lcd_update(void)
 
 /*** Screenshot ***/
 
-#define BMP_NUMCOLORS  33
-#define BMP_BPP        8
-#define BMP_LINESIZE   ((LCD_WIDTH + 3) & ~3)
-#define BMP_HEADERSIZE (54 + 4 * BMP_NUMCOLORS)
-#define BMP_DATASIZE   (BMP_LINESIZE * LCD_HEIGHT)
-#define BMP_TOTALSIZE  (BMP_HEADERSIZE + BMP_DATASIZE)
+#define BMP_FIXEDCOLORS (1 << LCD_DEPTH)
+#define BMP_VARCOLORS   33
+#define BMP_NUMCOLORS   (BMP_FIXEDCOLORS + BMP_VARCOLORS)
+#define BMP_BPP         8
+#define BMP_LINESIZE    ((LCD_WIDTH + 3) & ~3)
+#define BMP_HEADERSIZE  (54 + 4 * BMP_NUMCOLORS)
+#define BMP_DATASIZE    (BMP_LINESIZE * LCD_HEIGHT)
+#define BMP_TOTALSIZE   (BMP_HEADERSIZE + BMP_DATASIZE)
 
 #define LE16_CONST(x) (x)&0xff, ((x)>>8)&0xff
 #define LE32_CONST(x) (x)&0xff, ((x)>>8)&0xff, ((x)>>16)&0xff, ((x)>>24)&0xff
@@ -720,6 +729,17 @@ static const unsigned char bmpheader[] =
     0xc4, 0x0e, 0x00, 0x00,     /* Vertical resolution (pixels/meter) */
     LE32_CONST(BMP_NUMCOLORS),  /* Number of used colours */
     LE32_CONST(BMP_NUMCOLORS),  /* Number of important colours */
+
+    /* Fixed colours */
+#if LCD_DEPTH == 1
+    0x90, 0xee, 0x90, 0x00,     /* Colour #0 */
+    0x00, 0x00, 0x00, 0x00      /* Colour #1 */
+#elif LCD_DEPTH == 2
+    0xe6, 0xd8, 0xad, 0x00,     /* Colour #0 */
+    0x99, 0x90, 0x73, 0x00,     /* Colour #1 */
+    0x4c, 0x48, 0x39, 0x00,     /* Colour #2 */
+    0x00, 0x00, 0x00, 0x00      /* Colour #3 */
+#endif
 };
 
 #if LCD_DEPTH == 1
@@ -732,135 +752,131 @@ static const unsigned char bmpheader[] =
 #define BMP_BLUE  0xe6
 #endif
 
-static unsigned char linebuf[BMP_LINESIZE];
-
-/* Save the current display content (b&w and greyscale overlay) to an 8-bit
- * BMP file in the root directory. */
-void gray_screendump(void)
+/* Hook function for core screen_dump() to save the current display
+   content (b&w and greyscale overlay) to an 8-bit BMP file. */
+static void gray_screendump_hook(int fd)
 {
-    int fh, i, bright;
-    int y;
+    int i, idx;
+    int x, y, by;
+    int gx, mask;
 #if LCD_DEPTH == 1
-    int x, by, mask;
-    int gx, gby;
-    unsigned char *lcdptr, *grayptr, *grayptr2;
+    int gby;
+#elif LCD_DEPTH == 2
+    int shift, gy;
 #endif
-    char filename[MAX_PATH];
+    unsigned char *clut_entry;
+    unsigned char *lcdptr;
+    unsigned char *grayptr, *grayptr2;
+    unsigned char linebuf[MAX(4*BMP_VARCOLORS,BMP_LINESIZE)];
 
-#ifdef HAVE_RTC
-    struct tm *tm = _gray_rb->get_time();
-
-    _gray_rb->snprintf(filename, MAX_PATH,
-                       "/graydump %04d-%02d-%02d %02d-%02d-%02d.bmp",
-                       tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
-                       tm->tm_hour, tm->tm_min, tm->tm_sec);
-#else
-    {
-        DIR* dir;
-        int max_dump_file = 1; /* default to graydump_0001.bmp */
-        dir = _gray_rb->opendir("/");
-        if (dir) /* found */
-        {
-            /* Search for the highest screendump filename present,
-               increment behind that. So even with "holes"
-               (deleted files), the newest will always have the
-               highest number. */
-            while(true)
-            {   
-                struct dirent* entry;
-                int curr_dump_file;
-                /* walk through the directory content */
-                entry = _gray_rb->readdir(dir);
-                if (!entry)
-                {
-                    _gray_rb->closedir(dir);
-                    break; /* end of dir */
-                }
-                if (_gray_rb->strncasecmp(entry->d_name, "graydump_", 9))
-                    continue; /* no screendump file */
-                curr_dump_file = _gray_rb->atoi(&entry->d_name[9]);
-                if (curr_dump_file >= max_dump_file)
-                    max_dump_file = curr_dump_file + 1;
-            }
-        }
-        _gray_rb->snprintf(filename, MAX_PATH, "/graydump_%04d.bmp",
-                           max_dump_file);
-    }
-#endif
-
-    fh = _gray_rb->creat(filename, O_WRONLY);
-
-    if (fh < 0)
-        return;
-        
-    _gray_rb->write(fh, bmpheader, sizeof(bmpheader));  /* write header */
+    _gray_rb->write(fd, bmpheader, sizeof(bmpheader));  /* write header */
 
     /* build clut */
-    linebuf[3] = 0;
+    _gray_rb->memset(linebuf, 0, 4*BMP_VARCOLORS);
+    clut_entry = linebuf;
 
-    for (i = 0; i < BMP_NUMCOLORS; i++)
+    for (i = _gray_info.depth; i > 0; i--)
     {
-        bright = MIN(i, _gray_info.depth);
-        linebuf[0] = MULU16(BMP_BLUE,  bright) / _gray_info.depth;
-        linebuf[1] = MULU16(BMP_GREEN, bright) / _gray_info.depth;
-        linebuf[2] = MULU16(BMP_RED,   bright) / _gray_info.depth;
-        _gray_rb->write(fh, linebuf, 4);
+        *clut_entry++ = MULU16(BMP_BLUE,  i) / _gray_info.depth;
+        *clut_entry++ = MULU16(BMP_GREEN, i) / _gray_info.depth;
+        *clut_entry++ = MULU16(BMP_RED,   i) / _gray_info.depth;
+        clut_entry++;
     }
+    _gray_rb->write(fd, linebuf, 4*BMP_VARCOLORS);
 
-    /* 8-bit BMP image goes bottom -> top */
+    /* BMP image goes bottom -> top */
     for (y = LCD_HEIGHT - 1; y >= 0; y--)
     {
-        _gray_rb->memset(linebuf, BMP_NUMCOLORS-1, LCD_WIDTH);
+        _gray_rb->memset(linebuf, 0, BMP_LINESIZE);
 
 #if LCD_DEPTH == 1
-        mask = 1 << (y & 7);
-        by = y >> 3;
+        mask = 1 << (y & (_PBLOCK-1));
+        by = y >> _PBLOCK_EXP;
         lcdptr = _gray_rb->lcd_framebuffer + MULU16(LCD_WIDTH, by);
         gby = by - _gray_info.by;
 
-        if ((_gray_info.flags & _GRAY_RUNNING)
-            && (unsigned) gby < (unsigned) _gray_info.bheight)
-        {   
+        if ((unsigned) gby < (unsigned) _gray_info.bheight)
+        {
             /* line contains greyscale (and maybe b&w) graphics */
             grayptr = _gray_info.plane_data + MULU16(_gray_info.width, gby);
 
             for (x = 0; x < LCD_WIDTH; x++)
             {
-                if (*lcdptr++ & mask)
-                    linebuf[x] = 0;
-            
                 gx = x - _gray_info.x;
                 
                 if ((unsigned)gx < (unsigned)_gray_info.width)
                 {
-                    bright = 0;
+                    idx = BMP_FIXEDCOLORS;
                     grayptr2 = grayptr + gx;
 
-                    for (i = 0; i < _gray_info.depth; i++)
+                    for (i = _gray_info.depth; i > 0; i--)
                     {
-                        if (!(*grayptr2 & mask))
-                            bright++;
+                        if (*grayptr2 & mask)
+                            idx++;
                         grayptr2 += _gray_info.plane_size;
                     }
-                    linebuf[x] = bright;
+                    linebuf[x] = idx;
                 }
+                else
+                {
+                    linebuf[x] = (*lcdptr & mask) ? 1 : 0;
+                }
+                lcdptr++;
             }
         }
-        else  
-        {   
+        else
+        {
             /* line contains only b&w graphics */
             for (x = 0; x < LCD_WIDTH; x++)
-                if (*lcdptr++ & mask)
-                    linebuf[x] = 0;
+                linebuf[x] = (*lcdptr++ & mask) ? 1 : 0;
         }
 #elif LCD_DEPTH == 2
-        /* TODO */
+        shift = 2 * (y & 3);
+        by = y >> 2;
+        lcdptr = _gray_rb->lcd_framebuffer + MULU16(LCD_WIDTH, by);
+        gy = y - (_gray_info.by << _PBLOCK_EXP);
+        
+        if ((unsigned)gy < (unsigned)_gray_info.height)
+        {
+            /* line contains greyscale (and maybe b&w) graphics */
+            mask = 1 << (gy & (_PBLOCK-1));
+            grayptr = _gray_info.plane_data 
+                    + MULU16(_gray_info.width, gy >> _PBLOCK_EXP);
+
+            for (x = 0; x < LCD_WIDTH; x++)
+            {
+                gx = x - _gray_info.x;
+                
+                if ((unsigned)gx < (unsigned)_gray_info.width)
+                {
+                    idx = BMP_FIXEDCOLORS;
+                    grayptr2 = grayptr + gx;
+
+                    for (i = _gray_info.depth; i > 0; i--)
+                    {
+                        if (*grayptr2 & mask)
+                            idx++;
+                        grayptr2 += _gray_info.plane_size;
+                    }
+                    linebuf[x] = idx;
+                }
+                else
+                {
+                    linebuf[x] = (*lcdptr >> shift) & 3;
+                }
+                lcdptr++;
+            }
+        }
+        else
+        {
+            /* line contains only b&w graphics */
+            for (x = 0; x < LCD_WIDTH; x++)
+                linebuf[x] = (*lcdptr++ >> shift) & 3;
+        }
 #endif
 
-        _gray_rb->write(fh, linebuf, sizeof(linebuf));
+        _gray_rb->write(fd, linebuf, BMP_LINESIZE);
     }
-
-    _gray_rb->close(fh);
 }
 
 #endif /* HAVE_LCD_BITMAP */

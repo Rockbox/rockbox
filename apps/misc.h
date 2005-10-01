@@ -46,6 +46,7 @@ int read_line(int fd, char* buffer, int buffer_size);
 #ifdef HAVE_LCD_BITMAP
 /* Save a .BMP file containing the current screen contents. */
 void screen_dump(void);
+void screen_dump_set_hook(void (*hook)(int fh));
 #endif
 
 bool settings_parseline(char* line, char** name, char** value);
