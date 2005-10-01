@@ -443,8 +443,10 @@ struct plugin_api {
     void (*menu_draw)(int menu);
     void (*menu_insert)(int menu, int position, char *desc, bool (*function) (void));
     void (*menu_set_cursor)(int menu, int position);
-    
+
+#ifdef HAVE_LCD_BITMAP
     void (*screen_dump_set_hook)(void (*hook)(int fh));
+#endif
 };
 
 int plugin_load(const char* plugin, void* parameter);

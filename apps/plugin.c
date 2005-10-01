@@ -355,8 +355,10 @@ static const struct plugin_api rockbox_api = {
     menu_draw,
     menu_insert,
     menu_set_cursor,
-    
+
+#ifdef HAVE_LCD_BITMAP
     screen_dump_set_hook,
+#endif
 };
 
 int plugin_load(const char* plugin, void* parameter)
