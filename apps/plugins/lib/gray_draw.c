@@ -675,7 +675,7 @@ static void _writearray(unsigned char *address, const unsigned char *src,
         "mov.l   @%[patp]+,r7\n"
         "mov.l   @%[patp]+,r8\n"
         "mov.l   @%[patp]+,r9\n"
-        "mov.l   @%[patp],%[rx]  \n"
+        "mov.l   @%[patp],r10\n"
 
         "not     %[mask],%[mask] \n"  /* "set" mask -> "keep" mask */
         "extu.b  %[mask],%[mask] \n"  /* mask out high bits */
@@ -697,11 +697,11 @@ static void _writearray(unsigned char *address, const unsigned char *src,
         "rotcl   r0          \n"
         "shlr    r9          \n"
         "rotcl   r0          \n"
-        "shlr    %[rx]       \n"
-        "mov.b   @%[addr],%[patp]\n"  /* read old value */
+        "shlr    r10         \n"
+        "mov.b   @%[addr],%[rx]  \n"  /* read old value */
         "rotcl   r0          \n"
-        "and     %[mask],%[patp] \n"  /* mask out unneeded bits */
-        "or      %[patp],r0  \n"  /* set new bits */
+        "and     %[mask],%[rx]   \n"  /* mask out unneeded bits */
+        "or      %[rx],r0    \n"  /* set new bits */
         "mov.b   r0,@%[addr] \n"  /* store value to bitplane */
         "add     %[psiz],%[addr] \n"  /* advance to next bitplane */
         "cmp/hi  %[addr],%[end]  \n"  /* last bitplane done? */
@@ -725,7 +725,7 @@ static void _writearray(unsigned char *address, const unsigned char *src,
         "rotcl   r0          \n"
         "shlr    r9          \n"
         "rotcl   r0          \n"
-        "shlr    %[rx]       \n"
+        "shlr    r10         \n"
         "rotcl   r0          \n"
         "mov.b   r0,@%[addr] \n"  /* store byte to bitplane */
         "add     %[psiz],%[addr] \n"  /* advance to next bitplane */
@@ -742,7 +742,7 @@ static void _writearray(unsigned char *address, const unsigned char *src,
         [end] "r"(end),
         [patp]"[rx]"(pat_ptr)
         : /* clobbers */
-        "r0", "r1", "r2", "r3", "r6", "r7", "r8", "r9"
+        "r0", "r1", "r2", "r3", "r6", "r7", "r8", "r9", "r10"
     );
 #elif defined(CPU_COLDFIRE) && (LCD_DEPTH == 2)
     unsigned long pat_stack[8];
