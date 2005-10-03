@@ -28,6 +28,9 @@
 bool timer_register(int reg_prio, void (*unregister_callback)(void),
                     long cycles, int int_prio, void (*timer_callback)(void));
 bool timer_set_period(long cycles);
+#ifdef CPU_COLDFIRE
+void timers_adjust_prescale(int multiplier, bool enable_irq);
+#endif
 void timer_unregister(void);
 
 #endif /* !SIMULATOR */

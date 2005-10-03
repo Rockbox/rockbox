@@ -257,14 +257,17 @@ static inline unsigned long SWAB32(unsigned long value)
 static inline void invalidate_icache(void)
 {
    asm volatile ("move.l #0x01000000,%d0\n"
-		 "movec.l %d0,%cacr\n"
+                 "movec.l %d0,%cacr\n"
                  "move.l #0x80000000,%d0\n"
-		 "movec.l %d0,%cacr");
+                 "movec.l %d0,%cacr");
 }
-
-#define CPUFREQ_DEFAULT CPU_FREQ
-#define CPUFREQ_NORMAL 47980800
-#define CPUFREQ_MAX 119952000
+            
+#define CPUFREQ_DEFAULT_MULT 1
+#define CPUFREQ_DEFAULT      (CPUFREQ_DEFAULT_MULT * CPU_FREQ)
+#define CPUFREQ_NORMAL_MULT  4
+#define CPUFREQ_NORMAL       (CPUFREQ_NORMAL_MULT * CPU_FREQ)
+#define CPUFREQ_MAX_MULT     11
+#define CPUFREQ_MAX          (CPUFREQ_MAX_MULT * CPU_FREQ)
 
 #elif CONFIG_CPU == TCC730
 

@@ -28,7 +28,9 @@
 static int timer_prio = -1;
 static void (*pfn_timer)(void) = NULL;      /* timer callback */
 static void (*pfn_unregister)(void) = NULL; /* unregister callback */
-
+#ifdef CPU_COLDFIRE
+static int base_prescale;
+#endif
 
 /* interrupt handler */
 #if CONFIG_CPU == SH7034
@@ -93,16 +95,19 @@ static bool timer_set(long cycles, bool start)
     and_b(~0x01, &TSR4); /* clear an eventual interrupt */
 
 #elif defined CPU_COLDFIRE
-    if (prescale > 4096)
+    if (prescale > 4096/CPUFREQ_MAX_MULT)
         return false;
 
-    if (prescale > 256)
+    if (prescale > 256/CPUFREQ_MAX_MULT)
     {
         phi = 0x05;      /* prescale sysclk/16, timer enabled */
         prescale >>= 4;
     }
     else
         phi = 0x03;      /* prescale sysclk, timer enabled */
+        
+    base_prescale = prescale;
+    prescale *= (cpu_frequency / CPU_FREQ);
 
     if (start)
     {
@@ -125,7 +130,26 @@ static bool timer_set(long cycles, bool start)
     return true;
 }
 
-/* Register a user timer, called every <count> CPU cycles */
+#ifdef CPU_COLDFIRE
+void timers_adjust_prescale(int multiplier, bool enable_irq)
+{
+    /* tick timer */
+    TMR0 = (TMR0 & 0x00ef)
+         | ((unsigned short)(multiplier - 1) << 8)
+         | (enable_irq ? 0x10 : 0);
+
+    if (pfn_timer)
+    {
+        /* user timer */
+        int prescale = base_prescale * multiplier;
+        TMR1 = (TMR1 & 0x00ef)
+             | ((unsigned short)(prescale - 1) << 8)
+             | (enable_irq ? 0x10 : 0);
+    }
+}
+#endif
+
+/* Register a user timer, called every <cycles> CPU_FREQ cycles */
 bool timer_register(int reg_prio, void (*unregister_callback)(void),
                     long cycles, int int_prio, void (*timer_callback)(void))
 {

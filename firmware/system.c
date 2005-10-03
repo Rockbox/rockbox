@@ -23,6 +23,7 @@
 #include "font.h"
 #include "system.h"
 #include "kernel.h"
+#include "timer.h"
 
 #ifndef SIMULATOR
 long cpu_frequency = CPU_FREQ;
@@ -503,11 +504,13 @@ void system_init(void)
 }
 
 #ifdef IRIVER_H100
-#define MAX_REFRESH_TIMER 56
-#define NORMAL_REFRESH_TIMER 20
+#define MAX_REFRESH_TIMER     59
+#define NORMAL_REFRESH_TIMER  21
+#define DEFAULT_REFRESH_TIMER 4
 #else
-#define MAX_REFRESH_TIMER 28
-#define NORMAL_REFRESH_TIMER 10
+#define MAX_REFRESH_TIMER     29
+#define NORMAL_REFRESH_TIMER  10
+#define DEFAULT_REFRESH_TIMER 1
 #endif
 
 void set_cpu_frequency (long) __attribute__ ((section (".icode")));
@@ -516,44 +519,46 @@ void set_cpu_frequency(long frequency)
     switch(frequency)
     {
     case CPUFREQ_MAX:
-        DCR = (DCR & ~0x01ff) | 1;   /* Refresh timer for bypass
-                                            frequency */
+        DCR = (DCR & ~0x01ff) | DEFAULT_REFRESH_TIMER;  
+              /* Refresh timer for bypass frequency */
         PLLCR &= ~1;  /* Bypass mode */
-        PLLCR = 0x11853005;
+        timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, false);
+        PLLCR = 0x11856005;
         CSCR0 = 0x00000980; /* Flash: 2 wait state */
         CSCR1 = 0x00000980; /* LCD: 2 wait states */
         while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
                                             This may take up to 10ms! */
+        timers_adjust_prescale(CPUFREQ_MAX_MULT, true);
         DCR = (DCR & ~0x01ff) | MAX_REFRESH_TIMER;   /* Refresh timer */
         cpu_frequency = CPUFREQ_MAX;
-        tick_start(1000/HZ);
         IDECONFIG1 = 0x106000 | (5 << 10); /* BUFEN2 enable + CS2Pre/CS2Post */
         IDECONFIG2 = 0x40000 | (1 << 8); /* TA enable + CS2wait */
         break;
         
     case CPUFREQ_NORMAL:
-        DCR = (DCR & ~0x01ff) | 1;   /* Refresh timer for bypass
-                                            frequency */
+        DCR = (DCR & ~0x01ff) | DEFAULT_REFRESH_TIMER;
+              /* Refresh timer for bypass frequency */
         PLLCR &= ~1;  /* Bypass mode */
-        PLLCR = 0x10886001;
+        timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, false);
+        PLLCR = 0x1385e005;
         CSCR0 = 0x00000180; /* Flash: 0 wait states */
         CSCR1 = 0x00000180; /* LCD: 0 wait states */
         while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
                                             This may take up to 10ms! */
+        timers_adjust_prescale(CPUFREQ_NORMAL_MULT, true);
         DCR = (DCR & ~0x01ff) | NORMAL_REFRESH_TIMER;   /* Refresh timer */
         cpu_frequency = CPUFREQ_NORMAL;
-        tick_start(1000/HZ);
         IDECONFIG1 = 0x106000 | (5 << 10); /* BUFEN2 enable + CS2Pre/CS2Post */
         IDECONFIG2 = 0x40000 | (0 << 8); /* TA enable + CS2wait */
         break;
     default:
-        DCR = (DCR & ~0x01ff) | 1;   /* Refresh timer for bypass
-                                            frequency */
+        DCR = (DCR & ~0x01ff) | DEFAULT_REFRESH_TIMER;  
+              /* Refresh timer for bypass frequency */
         PLLCR = 0x00000000;  /* Bypass mode */
+        timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, true);
         CSCR0 = 0x00000180; /* Flash: 0 wait states */
         CSCR1 = 0x00000180; /* LCD: 0 wait states */
-        cpu_frequency = CPU_FREQ;
-        tick_start(1000/HZ);
+        cpu_frequency = CPUFREQ_DEFAULT;
         IDECONFIG1 = 0x106000 | (1 << 10); /* BUFEN2 enable + CS2Pre/CS2Post */
         IDECONFIG2 = 0x40000 | (0 << 8); /* TA enable + CS2wait */
         break;

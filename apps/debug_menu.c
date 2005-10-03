@@ -271,7 +271,8 @@ bool dbg_audio_thread(void)
         snprintf(buf, sizeof(buf), "track count: %d", track_count);
         lcd_puts(0, line++, buf);
 
-        snprintf(buf, sizeof(buf), "cpu freq: %dMHz", (int)FREQ/1000000+1);
+        snprintf(buf, sizeof(buf), "cpu freq: %dMHz",
+                 (int)((FREQ + 500000) / 1000000));
         lcd_puts(0, line++, buf);
 
         snprintf(buf, sizeof(buf), "boost ratio: %d%%",
@@ -682,7 +683,7 @@ bool dbg_spdif(void)
         valnogood = (interruptstat & 0x01000000)?true:false;
         symbolerr = (interruptstat & 0x00800000)?true:false;
         parityerr = (interruptstat & 0x00400000)?true:false;
-        
+
         snprintf(buf, sizeof(buf), "Val: %s Sym: %s Par: %s",
                  valnogood?"--":"OK",
                  symbolerr?"--":"OK",

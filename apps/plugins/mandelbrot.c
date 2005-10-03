@@ -370,6 +370,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* main loop */
     while (true) {
         if (redraw > REDRAW_NONE) {
+#if !defined(SIMULATOR) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
+            rb->cpu_boost(true);
+#endif
             if (redraw == REDRAW_FULL)
                 gray_ub_clear_display();
 
@@ -378,6 +381,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             else
                 calc_mandelbrot_32();
 
+#if !defined(SIMULATOR) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
+            rb->cpu_boost(false);
+#endif
             px_min = 0;
             px_max = LCD_WIDTH;
             py_min = 0;

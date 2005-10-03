@@ -164,6 +164,9 @@ int main(void)
     rb->lcd_puts(0, 0, pbuf);
     rb->lcd_update();
 
+#if !defined(SIMULATOR) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
+    rb->cpu_boost(true);
+#endif
     gray_show(true);          /* switch on greyscale overlay */
 
     time = *rb->current_tick; /* start time measurement */
@@ -223,6 +226,9 @@ int main(void)
                  time / 100, time % 100);
     rb->lcd_puts(0, 0, pbuf);
     gray_deferred_lcd_update();       /* schedule an lcd_update() */
+#if !defined(SIMULATOR) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
+    rb->cpu_boost(false);
+#endif
 
     /* drawing is now finished, play around with scrolling 
      * until you press OFF or connect USB

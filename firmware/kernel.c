@@ -156,11 +156,11 @@ int queue_broadcast(long id, void *data)
 #if CONFIG_CPU == SH7034
 void tick_start(unsigned int interval_in_ms)
 {
-    unsigned int count;
+    unsigned long count;
 
-    count = FREQ * interval_in_ms / 1000 / 8;
+    count = CPU_FREQ * interval_in_ms / 1000 / 8;
 
-    if(count > 0xffff)
+    if(count > 0x10000)
     {
         panicf("Error! The tick interval is too long (%d ms)\n",
                interval_in_ms);
@@ -174,7 +174,7 @@ void tick_start(unsigned int interval_in_ms)
     TMDR &= ~0x01; /* Operate normally */
 
     TCNT0 = 0;   /* Start counting at 0 */
-    GRA0 = count;
+    GRA0 = (unsigned short)(count - 1);
     TCR0 = 0x23; /* Clear at GRA match, sysclock/8 */
 
     /* Enable interrupt on level 1 */
@@ -186,7 +186,7 @@ void tick_start(unsigned int interval_in_ms)
     TSTR |= 0x01; /* Start timer 1 */
 }
 
-#pragma interrupt
+void IMIA0(void) __attribute__ ((interrupt_handler));
 void IMIA0(void)
 {
     int i;
@@ -208,22 +208,28 @@ void IMIA0(void)
 #elif defined(CPU_COLDFIRE)
 void tick_start(unsigned int interval_in_ms)
 {
-    unsigned int count;
+    unsigned long count;
+    int prescale;
 
-    count = FREQ/2 * interval_in_ms / 1000 / 16;
+    count = CPU_FREQ/2 * interval_in_ms / 1000 / 16;
 
-    if(count > 0xffff)
+    if(count > 0x10000)
     {
         panicf("Error! The tick interval is too long (%d ms)\n",
                interval_in_ms);
         return;
     }
+
+    prescale = cpu_frequency / CPU_FREQ;
+    /* Note: The prescaler is later adjusted on-the-fly on CPU frequency
+       changes within timer.c */
     
     /* We are using timer 0 */
 
-    TRR0 = count; /* The reference count */
+    TRR0 = (unsigned short)(count - 1); /* The reference count */
     TCN0 = 0; /* reset the timer */
-    TMR0 = 0x001d; /* no prescaler, restart, CLK/16, enabled */
+    TMR0 = 0x001d | ((unsigned short)(prescale - 1) << 8); 
+           /* restart, CLK/16, enabled, prescaler */
 
     TER0 = 0xff; /* Clear all events */
 

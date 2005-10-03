@@ -81,7 +81,7 @@ static void backlight_isr(void)
     int timer_period;
     bool idle = false;
     
-    timer_period = FREQ / 1000 * BL_PWM_INTERVAL / 1000;
+    timer_period = CPU_FREQ / 1000 * BL_PWM_INTERVAL / 1000;
     switch (bl_dim_state) 
     {
       /* New cycle */

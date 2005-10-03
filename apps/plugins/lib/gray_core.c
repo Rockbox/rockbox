@@ -226,38 +226,23 @@ void gray_release(void)
    lcd_set_invert_display(), lcd_set_flip(), lcd_roll() */
 void gray_show(bool enable)
 {
-#if (CONFIG_CPU == SH7034) && (CONFIG_LCD == LCD_SSD1815)
-    if (enable)
-    {
-        _gray_info.flags |= _GRAY_RUNNING;
-        _gray_rb->timer_register(1, NULL, FREQ / 67, 1, _timer_isr);
-        _gray_rb->screen_dump_set_hook(gray_screendump_hook);
-    }
-    else
-    {
-        _gray_rb->timer_unregister();
-        _gray_info.flags &= ~_GRAY_RUNNING;
-        _gray_rb->screen_dump_set_hook(NULL);
-        _gray_rb->lcd_update(); /* restore whatever there was before */
-    }
-#elif defined(CPU_COLDFIRE) && (CONFIG_LCD == LCD_S1D15E06)
     if (enable && !(_gray_info.flags & _GRAY_RUNNING))
     {
         _gray_info.flags |= _GRAY_RUNNING;
-        _gray_rb->cpu_boost(true);  /* run at 120 MHz to avoid freq changes */
-        _gray_rb->timer_register(1, NULL, *_gray_rb->cpu_frequency / 70, 1,
-                                 _timer_isr);
+#if CONFIG_LCD == LCD_SSD1815
+        _gray_rb->timer_register(1, NULL, CPU_FREQ / 67, 1, _timer_isr);
+#elif CONFIG_LCD == LCD_S1D15E06
+        _gray_rb->timer_register(1, NULL, CPU_FREQ / 70, 1, _timer_isr);
+#endif
         _gray_rb->screen_dump_set_hook(gray_screendump_hook);
     }
     else if (!enable && (_gray_info.flags & _GRAY_RUNNING))
     {
         _gray_rb->timer_unregister();
-        _gray_rb->cpu_boost(false);
         _gray_info.flags &= ~_GRAY_RUNNING;
         _gray_rb->screen_dump_set_hook(NULL);
         _gray_rb->lcd_update(); /* restore whatever there was before */
     }
-#endif
 }
 
 /* Update a rectangular area of the greyscale overlay */
