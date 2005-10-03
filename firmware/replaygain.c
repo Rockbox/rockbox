@@ -342,100 +342,50 @@ long get_replaypeak(const char* str)
     return peak;
 }
 
-/* Compare two strings, ignoring case, up to the end nil or another end of
- * string character. E.g., if eos is '=', "a=" would equal "a". Returns 
- * true for a match, false otherwise.
- * TODO: This should be placed somewhere else, as it could be useful in 
- *       other places too.
- */
-static bool str_equal(const char* s1, const char* s2, char eos)
-{
-    char c1 = 0;
-    char c2 = 0;
-
-    while (*s1 && *s2 && (*s1 != eos) && (*s2 != eos))
-    {
-        if ((c1 = toupper(*s1)) != (c2 = toupper(*s2)))
-        {
-            return false;
-        }
-        
-        s1++;
-        s2++;
-    }
-    
-    if (c1 == eos)
-    {
-        c1 = '\0';
-    }
-    
-    if (c2 == eos)
-    {
-        c2 = '\0';
-    }
-
-    return c1 == c2;
-}
-
 /* Check for a ReplayGain tag conforming to the "VorbisGain standard". If 
- * found, set the mp3entry accordingly. If value is NULL, key is expected 
- * to be on the "key=value" format, and the comparion/extraction is done 
- * accordingly. buffer is where to store the text contents of the gain tags;
- * up to length bytes (including end nil) can be written.
- * Returns number of bytes written to the tag text buffer, or zero if
- * no ReplayGain tag was found (or nothing was copied to the buffer for
+ * found, set the mp3entry accordingly. buffer is where to store the text
+ * contents of the gain tags; up to length bytes (including end nil) can be 
+ * written. Returns number of bytes written to the tag text buffer, or zero 
+ * if no ReplayGain tag was found (or nothing was copied to the buffer for
  * other reasons).
  */
 long parse_replaygain(const char* key, const char* value, 
     struct mp3entry* entry, char* buffer, int length)
 {
-    const char* val = value;
     char **p = NULL;
-    char eos = '\0';
-    
-    if (!val)
-    {
-        if (!(val = strchr(key, '=')))
-        {
-            return 0;
-        }
-        
-        val++;
-        eos = '=';
-    }
 
-    if (str_equal(key, "replaygain_track_gain", eos) 
-        || (str_equal(key, "rg_radio", eos) && !entry->track_gain))
+    if ((strcasecmp(key, "replaygain_track_gain") == 0)
+        || ((strcasecmp(key, "rg_radio") == 0) && !entry->track_gain))
     {
-        entry->track_gain = get_replaygain(val);
+        entry->track_gain = get_replaygain(value);
         p = &(entry->track_gain_string);
     } 
-    else if (str_equal(key, "replaygain_album_gain", eos)
-        || (str_equal(key, "rg_audiophile", eos) && !entry->album_gain))
+    else if ((strcasecmp(key, "replaygain_album_gain") == 0)
+        || ((strcasecmp(key, "rg_audiophile") == 0) && !entry->album_gain))
     {
-        entry->album_gain = get_replaygain(val);
+        entry->album_gain = get_replaygain(value);
         p = &(entry->album_gain_string);
     }
-    else if (str_equal(key, "replaygain_track_peak", eos) 
-        || (str_equal(key, "rg_peak", eos) && !entry->track_peak))
+    else if ((strcasecmp(key, "replaygain_track_peak") == 0)
+        || ((strcasecmp(key, "rg_peak") == 0) && !entry->track_peak))
     {
-        entry->track_peak = get_replaypeak(val);
+        entry->track_peak = get_replaypeak(value);
     } 
-    else if (str_equal(key, "replaygain_album_peak", eos))
+    else if (strcasecmp(key, "replaygain_album_peak") == 0)
     {
-        entry->album_peak = get_replaypeak(val);
+        entry->album_peak = get_replaypeak(value);
     }
 
     if (p)
     {
-        int len = strlen(val);
+        int len = strlen(value);
         
         len = MIN(len, length - 1);
 
         /* A few characters just isn't interesting... */
         if (len > 1)
         {
-            strncpy(buffer, val, len);
+            strncpy(buffer, value, len);
             buffer[len] = 0;
             *p = buffer;
             return len + 1;
