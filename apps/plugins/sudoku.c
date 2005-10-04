@@ -378,11 +378,12 @@ static unsigned char num_inverse[10][8]= {
 static struct plugin_api* rb;
 
 struct sudoku_state_t {
-  char* filename;           /* Filename */
+  char filename[MAX_PATH];  /* Filename */
   char startboard[9][9];    /* The initial state of the game */
   char currentboard[9][9];  /* The current state of the game */
   char savedboard[9][9];    /* Cached copy of saved state */
   int x,y;                  /* Cursor position */
+  int editmode;             /* We are editing the start board */
 };
 
 /****** Solver routine by Tom Shackell <shackell@cs.york.ac.uk>
@@ -664,6 +665,7 @@ void clear_state(struct sudoku_state_t* state)
 {
   int r,c;
 
+  state->filename[0]=0;
   for (r=0;r<9;r++) {
     for (c=0;c<9;c++) {
       state->startboard[r][c]='0';
@@ -673,6 +675,7 @@ void clear_state(struct sudoku_state_t* state)
 
   state->x=0;
   state->y=0;
+  state->editmode=0;
 }
 
 /* Load game - only ".ss" is officially supported, but any sensible
@@ -693,14 +696,12 @@ bool load_sudoku(struct sudoku_state_t* state, char* filename) {
     return(false);
   }
 
-  state->filename=filename;
+  rb->strncpy(state->filename,filename,MAX_PATH);
   n=rb->read(fd,buf,300);
   if (n <= 0) {
     return(false);
   }
   rb->close(fd);
-
-  clear_state(state);
 
   r=0;
   c=0;
@@ -765,7 +766,7 @@ bool save_sudoku(struct sudoku_state_t* state) {
   char line[]="...|...|...\r\n";
   char sep[]="-----------\r\n";  
 
-  if (state->filename==NULL) {
+  if (state->filename[0]==0) {
     return false;
   }
 
@@ -1003,6 +1004,7 @@ bool sudoku_menu(struct sudoku_state_t* state)
     { "Reload", NULL },
     { "Clear", NULL },
     { "Solve", NULL },
+    { "New", NULL },
   };
 
   m = rb->menu_init(items, sizeof(items) / sizeof(*items),
@@ -1025,6 +1027,11 @@ bool sudoku_menu(struct sudoku_state_t* state)
 
     case 3: /* Solve */
       sudoku_solve(state);
+      break;
+
+    case 4: /* Create a new game manually */
+      clear_state(state);
+      state->editmode=1;
       break;
 
     default:
@@ -1072,8 +1079,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
   rb = api;
   /* end of plugin init */
 
+  clear_state(&state);
+
   if (parameter==NULL) {
-    return(PLUGIN_ERROR);
+    state.editmode=1;
   } else {
     if (!load_sudoku(&state,(char*)parameter)) {
       rb->splash(HZ*2, true, "Load error");
@@ -1116,13 +1125,21 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
         /* Increment digit */
         ticks=*rb->current_tick;
-        if (state.startboard[state.y][state.x]=='0') {
-          if (state.currentboard[state.y][state.x]=='0') { 
-            state.currentboard[state.y][state.x]='1';
-          } else if (state.currentboard[state.y][state.x]=='9') { 
+        if (state.editmode) {
+          if (state.startboard[state.y][state.x]=='9') { 
+            state.startboard[state.y][state.x]='0';
             state.currentboard[state.y][state.x]='0';
           } else {
+            state.startboard[state.y][state.x]++;
             state.currentboard[state.y][state.x]++;
+          }
+        } else {
+          if (state.startboard[state.y][state.x]=='0') {
+            if (state.currentboard[state.y][state.x]=='9') { 
+              state.currentboard[state.y][state.x]='0';
+            } else {
+              state.currentboard[state.y][state.x]++;
+            }
           }
         }
         update_cell(&state,state.y,state.x);
@@ -1179,8 +1196,17 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
           /* Ignore any button presses during the splash */
           rb->button_clear_queue();
         } else {
-          if (sudoku_menu(&state)) {
-            return PLUGIN_USB_CONNECTED;
+          if (state.editmode) {
+            rb->kbd_input(state.filename,MAX_PATH);
+            if (save_sudoku(&state)) {
+              state.editmode=0;
+            } else {
+              rb->splash(HZ*2, true, "Save failed");
+            }
+          } else {
+            if (sudoku_menu(&state)) {
+              return PLUGIN_USB_CONNECTED;
+            }
           }
         }
         break;
