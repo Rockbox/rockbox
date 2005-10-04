@@ -708,9 +708,11 @@ bool load_sudoku(struct sudoku_state_t* state, char* filename) {
   while ((i < n) && (r < 9)) {
     switch (buf[i]){
     case ' ': case '\t':
-      valid=1;
+      if (c > 0)
+        valid=1;
       break;
     case '|':
+    case '*':
     case '-':
     case '\r':
       break;
