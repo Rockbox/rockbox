@@ -76,23 +76,39 @@ sub buildzip {
     open VIEWERS, ">.rockbox/viewers.config" or
         die "can't create .rockbox/viewers.config";
     mkdir ".rockbox/viewers", 0777;
-    for (@viewers) {
-        if (/,(.+).rock,/) {
-            my $r = "$1.rock";
-            my $o = "$1.ovl";
-            if(-e ".rockbox/rocks/$r") {
-                `mv .rockbox/rocks/$r .rockbox/viewers`;
-                print VIEWERS $_;
+    foreach my $line (@viewers) {
+        if ($line =~ /([^,]*),([^,]*),/) {
+            my ($ext, $plugin)=($1, $2);
+            my $r = "${plugin}.rock";
+            my $o = "${plugin}.ovl";
+
+            my $dir = $r;
+            my $name;
+
+            # strip off the last slash and file name part
+            $dir =~ s/(.*)\/(.*)/$1/;
+            # store the file name part
+            $name = $2;
+
+            # print STDERR "$ext $plugin $dir $name $r\n";
+
+            if(-e ".rockbox/rocks/$name") {
+                if($dir ne "rocks") {
+                    # target is not 'rocks' but the plugins are always in that
+                    # dir at first!
+                    `mv .rockbox/rocks/$name .rockbox/$r`;
+                }
+                print VIEWERS $line;
             }
-            elsif(-e ".rockbox/viewers/$r") {
+            elsif(-e ".rockbox/$r") {
                 # in case the same plugin works for multiple extensions, it
                 # was already moved to the viewers dir
-                print VIEWERS $_;
+                print VIEWERS $line;
             }
             if(-e ".rockbox/rocks/$o") {
                 # if there's an "overlay" file for the .rock, move that as
                 # well
-                `mv .rockbox/rocks/$o .rockbox/viewers`;              
+                `mv .rockbox/rocks/$o .rockbox/$o`;              
             }
         }
     }

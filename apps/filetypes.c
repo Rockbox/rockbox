@@ -188,7 +188,7 @@ char* filetype_get_plugin(const struct entry* file)
         return NULL;
 
     snprintf(plugin_name, sizeof(plugin_name),
-             VIEWERS_DIR "/%s.rock",filetypes[ix].plugin);
+             "%s/%s.rock", ROCKBOX_DIR, filetypes[ix].plugin);
 
     return plugin_name;
 }
@@ -453,9 +453,13 @@ static int add_plugin(char *plugin)
     if (!plugin)
         return 0;
 
+#if 0
+    /* starting now, Oct 2005, the plugins are given without extension in the
+       viewers.config file */
     cp=strrchr(plugin, '.');
     if (cp)
         *cp='\0';
+#endif
 
     for (i=first_soft_filetype; i < cnt_filetypes; i++)
     {
