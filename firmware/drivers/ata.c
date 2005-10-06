@@ -362,7 +362,7 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
         {   /* loop compiles to 7 assembler instructions */
             /* takes 12 clock cycles (2 pipeline stalls, 1 wait) */
 #ifdef SWAP_WORDS
-            *wbuf = SWAB16(ATA_DATA);
+            *wbuf = letoh16(ATA_DATA);
 #else
             *wbuf = ATA_DATA;
 #endif
@@ -677,7 +677,7 @@ static void copy_write_sectors(const unsigned char* buf, int wordcount)
 #ifdef SWAP_WORDS
             /* loop compiles to 6 assembler instructions */
             /* takes 10 clock cycles (2 pipeline stalls) */
-            SET_16BITREG(ATA_DATA, SWAB16(*wbuf));
+            SET_16BITREG(ATA_DATA, htole16(*wbuf));
 #else
             SET_16BITREG(ATA_DATA, *wbuf);
 #endif
@@ -1270,7 +1270,7 @@ static int identify(void)
 #ifdef SWAP_WORDS
         identify_info[i] = ATA_DATA;
 #else
-        identify_info[i] = SWAB16(ATA_DATA);
+        identify_info[i] = letoh16(ATA_DATA);
 #endif
     }
     

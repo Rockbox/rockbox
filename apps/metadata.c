@@ -152,7 +152,7 @@ static void convert_endian(void *data, const char *format)
             {
                 long* d = (long*) data;
                 
-                *d = SWAB32(*d);
+                *d = letoh32(*d);
                 data = d + 1;
             }
             
@@ -162,7 +162,7 @@ static void convert_endian(void *data, const char *format)
             {
                 short* d = (short*) data;
                 
-                *d = SWAB16(*d);
+                *d = letoh16(*d);
                 data = d + 1;
             }
             

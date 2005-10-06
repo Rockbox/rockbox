@@ -56,9 +56,25 @@ void cpu_idle_mode(bool on_off);
 #endif
 
 #ifdef ROCKBOX_LITTLE_ENDIAN
-#define SWAB16(x) (x)
-#define SWAB32(x) (x)
+#define letoh16(x) (x)
+#define letoh32(x) (x)
+#define htole16(x) (x)
+#define htole32(x) (x)
+#define betoh16(x) swap16(x)
+#define betoh32(x) swap32(x)
+#define htobe16(x) swap16(x)
+#define htobe32(x) swap32(x)
+#else 
+#define letoh16(x) swap16(x)
+#define letoh32(x) swap32(x)
+#define htole16(x) swap16(x)
+#define htole32(x) swap32(x)
+#define betoh16(x) (x)
+#define betoh32(x) (x)
+#define htobe16(x) (x)
+#define htobe32(x) (x)
 #endif
+
 
 #define nop \
   asm volatile ("nop")
@@ -162,7 +178,7 @@ static inline int set_irq_level(int level)
     return i;
 }
 
-static inline unsigned short SWAB16(unsigned short value)
+static inline unsigned short swap16(unsigned short value)
   /*
     result[15..8] = value[ 7..0];
     result[ 7..0] = value[15..8];
@@ -184,7 +200,7 @@ static inline unsigned long SWAW32(unsigned long value)
     return result;
 }
 
-static inline unsigned long SWAB32(unsigned long value)
+static inline unsigned long swap32(unsigned long value)
   /*
     result[31..24] = value[ 7.. 0];
     result[23..16] = value[15.. 8];
@@ -212,7 +228,7 @@ static inline int set_irq_level(int level)
     return oldlevel;
 }
 
-static inline unsigned short SWAB16(unsigned short value)
+static inline unsigned short swap16(unsigned short value)
   /*
     result[15..8] = value[ 7..0];
     result[ 7..0] = value[15..8];
@@ -231,7 +247,7 @@ static inline unsigned long SWAW32(unsigned long value)
     return value;
 }
 
-static inline unsigned long SWAB32(unsigned long value)
+static inline unsigned long swap32(unsigned long value)
   /*
     result[31..24] = value[ 7.. 0];
     result[23..16] = value[15.. 8];
@@ -299,7 +315,7 @@ static inline int set_irq_level(int level)
   return result;
 }
 
-static inline unsigned short SWAB16(unsigned short value)
+static inline unsigned short swap16(unsigned short value)
     /*
       result[15..8] = value[ 7..0];
       result[ 7..0] = value[15..8];
@@ -308,7 +324,7 @@ static inline unsigned short SWAB16(unsigned short value)
     return (value >> 8) | (value << 8);
 }
 
-static inline unsigned long SWAB32(unsigned long value)
+static inline unsigned long swap32(unsigned long value)
     /*
       result[31..24] = value[ 7.. 0];
       result[23..16] = value[15.. 8];
@@ -316,8 +332,8 @@ static inline unsigned long SWAB32(unsigned long value)
       result[ 7.. 0] = value[31..24];
     */
 {
-    unsigned long hi = SWAB16(value >> 16);
-    unsigned long lo = SWAB16(value & 0xffff);
+    unsigned long hi = swap16(value >> 16);
+    unsigned long lo = swap16(value & 0xffff);
     return (lo << 16) | hi;
 }
 
@@ -337,6 +353,29 @@ static inline unsigned long SWAB32(unsigned long value)
 
 #endif
 #else
+
+static inline unsigned short swap16(unsigned short value)
+    /*
+      result[15..8] = value[ 7..0];
+      result[ 7..0] = value[15..8];
+    */
+{
+    return (value >> 8) | (value << 8);
+}
+
+static inline unsigned long swap32(unsigned long value)
+    /*
+      result[31..24] = value[ 7.. 0];
+      result[23..16] = value[15.. 8];
+      result[15.. 8] = value[23..16];
+      result[ 7.. 0] = value[31..24];
+    */
+{
+    unsigned long hi = swap16(value >> 16);
+    unsigned long lo = swap16(value & 0xffff);
+    return (lo << 16) | hi;
+}
+
 
 #define invalidate_icache()
 

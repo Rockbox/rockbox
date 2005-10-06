@@ -482,7 +482,7 @@ enum codec_status codec_start(struct codec_api* api)
         else if (bitspersample > 8) {
             /* Byte-swap data. */
             for (i=0;i<n/2;i++) {
-                int16_samples[i]=(int16_t)SWAB16(wavbuf[i]);
+                int16_samples[i]=(int16_t)letoh16(wavbuf[i]);
             }
             wavbufsize = n;
         }

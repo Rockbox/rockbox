@@ -97,12 +97,11 @@ struct GWaveform * loadWaveform(int file)
     */
 
 
-    /* Iriver needs byteswapping.. big endian, go figure. Gus files are little endian */
-
-#if !defined(SIMULATOR)
+#ifdef ROCKBOX_BIG_ENDIAN
+    /* Byte-swap if necessary. Gus files are little endian */
     for(a=0; a<wav->numSamples; a++)
     {
-        ((unsigned short *) wav->data)[a] = SWAB16(((unsigned short *) wav->data)[a]);
+        ((unsigned short *) wav->data)[a] = letoh16(((unsigned short *) wav->data)[a]);
     }
 #endif
 

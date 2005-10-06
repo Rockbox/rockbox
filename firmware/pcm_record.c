@@ -354,7 +354,7 @@ void pcmrec_callback(bool flush)
 
             for (i=0; i<EACH_BUFFER_SIZE * num_ready / 4; i++)
             {
-                *ptr = SWAB32(*ptr);
+                *ptr = htole32(*ptr);
                 ptr++;
             }
 
@@ -476,11 +476,11 @@ static void close_wave(void)
 {
     long l;
 
-    l = SWAB32(num_rec_bytes + 36);
+    l = htole32(num_rec_bytes + 36);
     lseek(wav_file, 4, SEEK_SET);
     write(wav_file, &l, 4);
 
-    l = SWAB32(num_rec_bytes);
+    l = htole32(num_rec_bytes);
     lseek(wav_file, 40, SEEK_SET);
     write(wav_file, &l, 4);
 

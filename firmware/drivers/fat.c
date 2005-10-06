@@ -534,7 +534,7 @@ void fat_recalc_free(IF_MV_NONVOID(int volume))
                 if ( c > fat_bpb->dataclusters+1 ) /* nr 0 is unused */
                     break;
       
-                if (SWAB16(fat[j]) == 0x0000) {
+                if (letoh16(fat[j]) == 0x0000) {
                     free++;
                     if ( fat_bpb->fsinfo.nextfree == 0xffffffff )
                         fat_bpb->fsinfo.nextfree = c;
@@ -553,7 +553,7 @@ void fat_recalc_free(IF_MV_NONVOID(int volume))
                 if ( c > fat_bpb->dataclusters+1 ) /* nr 0 is unused */
                     break;
       
-                if (!(SWAB32(fat[j]) & 0x0fffffff)) {
+                if (!(letoh32(fat[j]) & 0x0fffffff)) {
                     free++;
                     if ( fat_bpb->fsinfo.nextfree == 0xffffffff )
                         fat_bpb->fsinfo.nextfree = c;
@@ -740,7 +740,7 @@ static unsigned long find_free_cluster(IF_MV2(struct bpb* fat_bpb,) unsigned lon
                 break;
             for (j = 0; j < CLUSTERS_PER_FAT16_SECTOR; j++) {
                 int k = (j + offset) % CLUSTERS_PER_FAT16_SECTOR;
-                if (SWAB16(fat[k]) == 0x0000) {
+                if (letoh16(fat[k]) == 0x0000) {
                     unsigned int c = nr * CLUSTERS_PER_FAT16_SECTOR + k;
                      /* Ignore the reserved clusters 0 & 1, and also
                         cluster numbers out of bounds */
@@ -768,7 +768,7 @@ static unsigned long find_free_cluster(IF_MV2(struct bpb* fat_bpb,) unsigned lon
                 break;
             for (j = 0; j < CLUSTERS_PER_FAT_SECTOR; j++) {
                 int k = (j + offset) % CLUSTERS_PER_FAT_SECTOR;
-                if (!(SWAB32(fat[k]) & 0x0fffffff)) {
+                if (!(letoh32(fat[k]) & 0x0fffffff)) {
                     unsigned long c = nr * CLUSTERS_PER_FAT_SECTOR + k;
                      /* Ignore the reserved clusters 0 & 1, and also
                         cluster numbers out of bounds */
@@ -819,17 +819,17 @@ static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,)
         }
 
         if ( val ) {
-            if (SWAB16(sec[offset]) == 0x0000 && fat_bpb->fsinfo.freecount > 0)
+            if (htole16(sec[offset]) == 0x0000 && fat_bpb->fsinfo.freecount > 0)
                 fat_bpb->fsinfo.freecount--;
         }
         else {
-            if (SWAB16(sec[offset]))
+            if (htole16(sec[offset]))
                 fat_bpb->fsinfo.freecount++;
         }
 
         LDEBUGF("update_fat_entry: %d free clusters\n", fat_bpb->fsinfo.freecount);
 
-        sec[offset] = SWAB16(val);
+        sec[offset] = htole16(val);
     }
     else
 #endif /* #ifdef HAVE_FAT16SUPPORT */
@@ -854,20 +854,20 @@ static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,)
         }
 
         if ( val ) {
-            if (!(SWAB32(sec[offset]) & 0x0fffffff) &&
+            if (!(htole32(sec[offset]) & 0x0fffffff) &&
                 fat_bpb->fsinfo.freecount > 0)
                 fat_bpb->fsinfo.freecount--;
         }
         else {
-            if (SWAB32(sec[offset]) & 0x0fffffff)
+            if (htole32(sec[offset]) & 0x0fffffff)
                 fat_bpb->fsinfo.freecount++;
         }
 
         LDEBUGF("update_fat_entry: %ld free clusters\n", fat_bpb->fsinfo.freecount);
 
         /* don't change top 4 bits */
-        sec[offset] &= SWAB32(0xf0000000);
-        sec[offset] |= SWAB32(val & 0x0fffffff);
+        sec[offset] &= htole32(0xf0000000);
+        sec[offset] |= htole32(val & 0x0fffffff);
     }
 
     return 0;
@@ -892,7 +892,7 @@ static long read_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned long entry)
             return -1;
         }
 
-        return SWAB16(sec[offset]);
+        return letoh16(sec[offset]);
     }
     else
 #endif /* #ifdef HAVE_FAT16SUPPORT */
@@ -908,7 +908,7 @@ static long read_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned long entry)
             return -1;
         }
 
-        return SWAB32(sec[offset]) & 0x0fffffff;
+        return letoh32(sec[offset]) & 0x0fffffff;
     }
 }
 
@@ -960,10 +960,10 @@ static int update_fsinfo(IF_MV_NONVOID(struct bpb* fat_bpb))
         return rc * 10 - 1;
     }
     intptr = (long*)&(fsinfo[FSINFO_FREECOUNT]);
-    *intptr = SWAB32(fat_bpb->fsinfo.freecount);
+    *intptr = htole32(fat_bpb->fsinfo.freecount);
 
     intptr = (long*)&(fsinfo[FSINFO_NEXTFREE]);
-    *intptr = SWAB32(fat_bpb->fsinfo.nextfree);
+    *intptr = htole32(fat_bpb->fsinfo.nextfree);
 
     rc = ata_write_sectors(IF_MV2(fat_bpb->drive,)
                            fat_bpb->startsector + fat_bpb->bpb_fsinfo,1,fsinfo);
@@ -1212,11 +1212,11 @@ static int write_long_name(struct fat_file* file,
 
             fat_time(&date, &time, &tenth);
             entry[FATDIR_CRTTIMETENTH] = tenth;
-            *(unsigned short*)(entry + FATDIR_CRTTIME) = SWAB16(time);
-            *(unsigned short*)(entry + FATDIR_WRTTIME) = SWAB16(time);
-            *(unsigned short*)(entry + FATDIR_CRTDATE) = SWAB16(date);
-            *(unsigned short*)(entry + FATDIR_WRTDATE) = SWAB16(date);
-            *(unsigned short*)(entry + FATDIR_LSTACCDATE) = SWAB16(date);
+            *(unsigned short*)(entry + FATDIR_CRTTIME) = htole16(time);
+            *(unsigned short*)(entry + FATDIR_WRTTIME) = htole16(time);
+            *(unsigned short*)(entry + FATDIR_CRTDATE) = htole16(date);
+            *(unsigned short*)(entry + FATDIR_WRTDATE) = htole16(date);
+            *(unsigned short*)(entry + FATDIR_LSTACCDATE) = htole16(date);
         }
         idx++;
         nameidx -= NAME_BYTES_PER_ENTRY;
@@ -1520,13 +1520,13 @@ static int update_short_entry( struct fat_file* file, long size, int attr )
     entry[FATDIR_ATTR] = attr & 0xFF;
 
     clusptr = (short*)(entry + FATDIR_FSTCLUSHI);
-    *clusptr = SWAB16(file->firstcluster >> 16);
+    *clusptr = htole16(file->firstcluster >> 16);
     
     clusptr = (short*)(entry + FATDIR_FSTCLUSLO);
-    *clusptr = SWAB16(file->firstcluster & 0xffff);
+    *clusptr = htole16(file->firstcluster & 0xffff);
 
     sizeptr = (long*)(entry + FATDIR_FILESIZE);
-    *sizeptr = SWAB32(size);
+    *sizeptr = htole32(size);
 
     {
 #ifdef HAVE_RTC
@@ -1534,13 +1534,13 @@ static int update_short_entry( struct fat_file* file, long size, int attr )
         unsigned short date = 0;
 #else
         /* get old time to increment from */
-        unsigned short time = SWAB16(*(unsigned short*)(entry + FATDIR_WRTTIME));
-        unsigned short date = SWAB16(*(unsigned short*)(entry + FATDIR_WRTDATE));
+        unsigned short time = htole16(*(unsigned short*)(entry + FATDIR_WRTTIME));
+        unsigned short date = htole16(*(unsigned short*)(entry + FATDIR_WRTDATE));
 #endif
         fat_time(&date, &time, NULL);
-        *(unsigned short*)(entry + FATDIR_WRTTIME) = SWAB16(time);
-        *(unsigned short*)(entry + FATDIR_WRTDATE) = SWAB16(date);
-        *(unsigned short*)(entry + FATDIR_LSTACCDATE) = SWAB16(date);
+        *(unsigned short*)(entry + FATDIR_WRTTIME) = htole16(time);
+        *(unsigned short*)(entry + FATDIR_WRTDATE) = htole16(date);
+        *(unsigned short*)(entry + FATDIR_LSTACCDATE) = htole16(date);
     }
 
     rc = fat_seek( &dir, sector );
