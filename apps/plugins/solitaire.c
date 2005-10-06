@@ -23,11 +23,10 @@ Solitaire by dionoea
 use arrows to move the cursor
 use ON to select cards, move cards, reveal hidden cards, ...
 use PLAY to move a card from the remains' stack to the top of the cursor
-use F1 to put card under cursor on one of the 4 final color stacks
+use F1 to put card under cursor on one of the 4 final stacks
 use F2 to un-select card if a card was selected, else draw 3 new cards
     out of the remains' stack
-use F3 to put card on top of the remains' stack on one of the 4 final color
-    stacks
+use F3 to put card on top of the remains' stack on one of the 4 final stacks
 
 *****************************************************************************/
 
@@ -115,27 +114,37 @@ static struct plugin_api* rb;
 #define HELP_SOL_MOVE "ON: Select cards, Move cards, reveal hidden cards ..."
 #define HELP_SOL_DRAW "F2: Un-select a card if it was selected. Else, draw 3 new cards out of the remains' stack."
 #define HELP_SOL_REM2CUR "PLAY: Put the card on top of the remains' stack on top of the cursor."
-#define HELP_SOL_CUR2STACK "F1: Put the card under the cursor on one of the 4 final color stacks."
-#define HELP_SOL_REM2STACK "F3: Put the card on top of the remains' stack on one of the 4 final color stacks."
+#define HELP_SOL_CUR2STACK "F1: Put the card under the cursor on one of the 4 final stacks."
+#define HELP_SOL_REM2STACK "F3: Put the card on top of the remains' stack on one of the 4 final stacks."
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define HELP_SOL_MOVE "MODE: Select cards, Move cards, reveal hidden cards ..."
 #define HELP_SOL_DRAW "MODE..: Un-select a card if it was selected. Else, draw 3 new cards out of the remains' stack."
 #define HELP_SOL_REM2CUR "LEFT..: Put the card on top of the remains' stack on top of the cursor."
-#define HELP_SOL_CUR2STACK "RIGHT..: Put the card under the cursor on one of the 4 final color stacks."
-#define HELP_SOL_REM2STACK "UP..: Put the card on top of the remains' stack on one of the 4 final color stacks."
+#define HELP_SOL_CUR2STACK "RIGHT..: Put the card under the cursor on one of the 4 final stacks."
+#define HELP_SOL_REM2STACK "UP..: Put the card on top of the remains' stack on one of the 4 final stacks."
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define HELP_SOL_MOVE "SELECT: Select cards, Move cards, reveal hidden cards ..."
 #define HELP_SOL_DRAW "REC: Un-select a card if it was selected. Else, draw 3 new cards out of the remains' stack."
 #define HELP_SOL_REM2CUR "PLAY+LEFT: Put the card on top of the remains' stack on top of the cursor."
-#define HELP_SOL_CUR2STACK "SELECT..: Put the card under the cursor on one of the 4 final color stacks."
-#define HELP_SOL_REM2STACK "PLAY+RIGHT: Put the card on top of the remains' stack on one of the 4 final color stacks."
+#define HELP_SOL_CUR2STACK "SELECT..: Put the card under the cursor on one of the 4 final stacks."
+#define HELP_SOL_REM2STACK "PLAY+RIGHT: Put the card on top of the remains' stack on one of the 4 final stacks."
 
 #endif
 
-static unsigned char colors[4][8] = {
+#if LCD_DEPTH>1
+#ifdef HAVE_LCD_COLOR
+static const unsigned struct rgb colors[4] = {
+    { 0, 0, 0 }, { LCD_MAX_RED, 0, 0 }, { 0, 0, 0 }, { LCD_MAX_RED, 0, 0 }
+};
+#else
+static const int colors[4] = { LCD_BLACK, LCD_MAX_LEVEL/2, LCD_BLACK, LCD_MAX_LEVEL/2 };
+#endif
+#endif
+
+static const unsigned char suits[4][8] = {
 /* Spades */
     {0x00, /* ........ */
      0x18, /* ...O.... */
@@ -296,20 +305,20 @@ static unsigned char numbers[13][8] = {
 
 #define NOT_A_CARD 255
 
-/* number of cards per color */
-#define CARDS_PER_COLOR 13
+/* number of cards per suit */
+#define CARDS_PER_SUIT 13
 
-/* number of colors */
-#define COLORS 4
+/* number of suits */
+#define SUITS 4
 
 /* number of columns */
 #define COL_NUM 7
 
 /* pseudo column numbers to be used for cursor coordinates */
-/* columns COL_NUM t COL_NUM + COLORS - 1 correspond to the color stacks */
+/* columns COL_NUM t COL_NUM + SUITS - 1 correspond to the final stacks */
 #define STACKS_COL COL_NUM
-/* column COL_NUM + COLORS corresponds to the remains' stack */
-#define REM_COL (STACKS_COL + COLORS)
+/* column COL_NUM + SUITS corresponds to the remains' stack */
+#define REM_COL (STACKS_COL + SUITS)
 
 #define NOT_A_COL 255
 
@@ -321,7 +330,7 @@ static unsigned char numbers[13][8] = {
 #define CARD_HEIGHT 10
 
 typedef struct card {
-    unsigned char color : 2;
+    unsigned char suit : 2;
     unsigned char num : 4;
     unsigned char known : 1;
     unsigned char used : 1;/* this is what is used when dealing cards */
@@ -331,11 +340,11 @@ typedef struct card {
 unsigned char next_random_card(card *deck){
     unsigned char i,r;
 
-    r = rb->rand()%(COLORS * CARDS_PER_COLOR)+1;
+    r = rb->rand()%(SUITS * CARDS_PER_SUIT)+1;
     i = 0;
 
     while(r>0){
-        i = (i + 1)%(COLORS * CARDS_PER_COLOR);
+        i = (i + 1)%(SUITS * CARDS_PER_SUIT);
         if(!deck[i].used) r--;
     }
 
@@ -587,7 +596,7 @@ unsigned char cur_col;
 unsigned char sel_card;
 
 /* the deck */
-card deck[COLORS * CARDS_PER_COLOR];
+card deck[SUITS * CARDS_PER_SUIT];
 
 /* the remaining cards */
 unsigned char rem;
@@ -596,8 +605,8 @@ unsigned char cur_rem;
 /* the 7 game columns */
 unsigned char cols[COL_NUM];
 
-/* the 4 final color stacks */
-unsigned char stacks[COLORS];
+/* the 4 final stacks */
+unsigned char stacks[SUITS];
 
 /* initialize the game */
 void solitaire_init(void){
@@ -605,13 +614,13 @@ void solitaire_init(void){
     int i,j;
 
     /* init deck */
-    for(i=0;i<COLORS;i++){
-        for(j=0;j<CARDS_PER_COLOR;j++){
-            deck[i*CARDS_PER_COLOR+j].color = i;
-            deck[i*CARDS_PER_COLOR+j].num = j;
-            deck[i*CARDS_PER_COLOR+j].known = 1;
-            deck[i*CARDS_PER_COLOR+j].used = 0;
-            deck[i*CARDS_PER_COLOR+j].next = NOT_A_CARD;
+    for(i=0;i<SUITS;i++){
+        for(j=0;j<CARDS_PER_SUIT;j++){
+            deck[i*CARDS_PER_SUIT+j].suit = i;
+            deck[i*CARDS_PER_SUIT+j].num = j;
+            deck[i*CARDS_PER_SUIT+j].known = 1;
+            deck[i*CARDS_PER_SUIT+j].used = 0;
+            deck[i*CARDS_PER_SUIT+j].next = NOT_A_CARD;
         }
     }
 
@@ -635,7 +644,7 @@ void solitaire_init(void){
     rem = next_random_card(deck);
     c = rem;
 
-    for(i=1; i<COLORS * CARDS_PER_COLOR - COL_NUM * (COL_NUM + 1)/2; i++){
+    for(i=1; i<SUITS * CARDS_PER_SUIT - COL_NUM * (COL_NUM + 1)/2; i++){
         deck[c].next = next_random_card(deck);
         c = deck[c].next;
     }
@@ -643,7 +652,7 @@ void solitaire_init(void){
     /* we now finished dealing the cards. The game can start ! (at last) */
 
     /* init the stack */
-    for(i = 0; i<COLORS; i++){
+    for(i = 0; i<SUITS; i++){
         stacks[i] = NOT_A_CARD;
     }
 
@@ -673,7 +682,7 @@ unsigned char find_card_col(unsigned char card){
         }
     }
 
-    for(i=0; i<COLORS; i++){
+    for(i=0; i<SUITS; i++){
         c = stacks[i];
         while(c!=NOT_A_CARD){
             if(c == card) return STACKS_COL + i;
@@ -689,7 +698,7 @@ unsigned char find_card_col(unsigned char card){
 unsigned char find_prev_card(unsigned char card){
     int i;
 
-    for(i=0; i<COLORS*CARDS_PER_COLOR; i++){
+    for(i=0; i<SUITS*CARDS_PER_SUIT; i++){
         if(deck[i].next == card) return i;
     }
 
@@ -739,7 +748,7 @@ unsigned char move_card(unsigned char dest_col, unsigned char src_card){
     dest_card = find_last_card(dest_col);
     src_card_prev = find_prev_card(src_card);
 
-    /* you can't move more than one card at a time from the colors stack */
+    /* you can't move more than one card at a time from the final stack */
     /* to the rest of the game */
     if(src_col >= COL_NUM && src_col < REM_COL
        && deck[src_card].next != NOT_A_CARD){
@@ -750,12 +759,12 @@ unsigned char move_card(unsigned char dest_col, unsigned char src_card){
     if(dest_col < COL_NUM){
         /* ... check is we are on an empty color and that the src is a king */
         if(dest_card == NOT_A_CARD
-           && deck[src_card].num == CARDS_PER_COLOR - 1){
+           && deck[src_card].num == CARDS_PER_SUIT - 1){
             /* this is a winning combination */
             cols[dest_col] = src_card;
         }
-        /* ... or check if the cards follow one another and have same color */
-        else if((deck[dest_card].color + deck[src_card].color)%2==1
+        /* ... or check if the cards follow one another and have same suit */
+        else if((deck[dest_card].suit + deck[src_card].suit)%2==1
            && deck[dest_card].num == deck[src_card].num + 1){
             /* this is a winning combination */
             deck[dest_card].next = src_card;
@@ -766,20 +775,20 @@ unsigned char move_card(unsigned char dest_col, unsigned char src_card){
             return MOVE_NOT_OK;
         }
     }
-    /* if we are on one of the 4 color stacks ... */
+    /* if we are on one of the 4 final stacks ... */
     else if(dest_col < REM_COL){
         /* ... check if we are on an empty stack, that the src is an
-         * ace and that this is the good color stack */
+         * ace and that this is the good final stack */
         if(dest_card == NOT_A_CARD
            && deck[src_card].num == 0
-           && deck[src_card].color == dest_col - STACKS_COL){
+           && deck[src_card].suit == dest_col - STACKS_COL){
             /* this is a winning combination */
             stacks[dest_col - STACKS_COL] = src_card;
         }
         /* ... or check if the cards follow one another, have the same
-         * color and {that src has no .next element or is from the remains'
+         * suit and {that src has no .next element or is from the remains'
          * stack} */
-        else if(deck[dest_card].color == deck[src_card].color
+        else if(deck[dest_card].suit == deck[src_card].suit
            && deck[dest_card].num + 1 == deck[src_card].num
            && (deck[src_card].next == NOT_A_CARD || src_col == REM_COL) ){
             /* this is a winning combination */
@@ -902,8 +911,14 @@ int solitaire(void){
                 rb->lcd_set_drawmode(DRMODE_SOLID);
                 /* known card */
                 if(deck[c].known){
+#if LCD_DEPTH>1
+                    rb->lcd_set_foreground(colors[deck[c].suit]);
+#endif
                     rb->lcd_mono_bitmap(numbers[deck[c].num], i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+1, j, 8, 8);
-                    rb->lcd_mono_bitmap(colors[deck[c].color], i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+7, j, 8, 8);
+                    rb->lcd_mono_bitmap(suits[deck[c].suit],  i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+7, j, 8, 8);
+#if LCD_DEPTH>1
+                    rb->lcd_set_foreground(LCD_BLACK);
+#endif
                 }
                 /* draw top line of the card */
                 rb->lcd_drawline(i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+1,j,i*(LCD_WIDTH - CARD_WIDTH)/COL_NUM+CARD_WIDTH-1,j);
@@ -938,17 +953,23 @@ int solitaire(void){
         }
 
         /* draw the stacks */
-        for(i=0; i<COLORS; i++){
+        for(i=0; i<SUITS; i++){
             c = stacks[i];
             if(c!=NOT_A_CARD){
                 while(deck[c].next != NOT_A_CARD){
                     c = deck[c].next;
                 }
             }
+#if LCD_DEPTH>1
+                    rb->lcd_set_foreground(colors[i]);
+#endif
             if(c != NOT_A_CARD) {
                 rb->lcd_mono_bitmap(numbers[deck[c].num], LCD_WIDTH2 - CARD_WIDTH+1, i*CARD_HEIGHT, 8, 8);
             }
-            rb->lcd_mono_bitmap(colors[i], LCD_WIDTH2 - CARD_WIDTH+7, i*CARD_HEIGHT, 8, 8);
+            rb->lcd_mono_bitmap(suits[i], LCD_WIDTH2 - CARD_WIDTH+7, i*CARD_HEIGHT, 8, 8);
+#if LCD_DEPTH>1
+                    rb->lcd_set_foreground(colors[deck[c].suit]);
+#endif
             /* draw a selected card */
             if(c != NOT_A_CARD) {
                 if(sel_card == c){
@@ -978,9 +999,15 @@ int solitaire(void){
              rb->lcd_drawline(LCD_WIDTH2,LCD_HEIGHT-CARD_HEIGHT,LCD_WIDTH2,LCD_HEIGHT-2);
 #endif
             if(cur_rem != NOT_A_CARD){
+#if LCD_DEPTH>1
+                rb->lcd_set_foreground(colors[deck[cur_rem].suit]);
+#endif
                 rb->lcd_mono_bitmap(numbers[deck[cur_rem].num], LCD_WIDTH2 - CARD_WIDTH+1, LCD_HEIGHT-CARD_HEIGHT, 8, 8);
-                rb->lcd_mono_bitmap(colors[deck[cur_rem].color], LCD_WIDTH2 - CARD_WIDTH+7, LCD_HEIGHT-CARD_HEIGHT, 8, 8);
+                rb->lcd_mono_bitmap(suits[deck[cur_rem].suit],  LCD_WIDTH2 - CARD_WIDTH+7, LCD_HEIGHT-CARD_HEIGHT, 8, 8);
                 /* draw a selected card */
+#if LCD_DEPTH>1
+                rb->lcd_set_foreground(LCD_BLACK);
+#endif
                 if(sel_card == cur_rem){
                     rb->lcd_drawrect(LCD_WIDTH2 - CARD_WIDTH+1, LCD_HEIGHT-CARD_HEIGHT,CARD_WIDTH-1, CARD_HEIGHT-1);
                 }
@@ -1001,7 +1028,7 @@ int solitaire(void){
         switch(button){
 
             /* move cursor to the last card of the previous column */
-            /* or to the previous color stack */
+            /* or to the previous final stack */
             /* or to the remains stack */
             case SOL_RIGHT:
 #ifdef SOL_RIGHT_PRE
@@ -1023,7 +1050,7 @@ int solitaire(void){
                 break;
 
             /* move cursor to the last card of the next column */
-            /* or to the next color stack */
+            /* or to the next final stack */
             /* or to the remains stack */
             case SOL_LEFT:
 #ifdef SOL_LEFT_PRE
@@ -1051,7 +1078,7 @@ int solitaire(void){
                     break;
 #endif
                 if(cur_col >= COL_NUM) {
-                    cur_col = (cur_col - COL_NUM + 1)%(COLORS + 1) + COL_NUM;
+                    cur_col = (cur_col - COL_NUM + 1)%(SUITS + 1) + COL_NUM;
                     if(cur_col == REM_COL){
                         cur_card = cur_rem;
                     } else {
@@ -1078,7 +1105,7 @@ int solitaire(void){
                     break;
 #endif
                 if(cur_col >= COL_NUM) {
-                    cur_col = (cur_col - COL_NUM + COLORS)%(COLORS + 1) + COL_NUM;
+                    cur_col = (cur_col - COL_NUM + SUITS)%(SUITS + 1) + COL_NUM;
                     if(cur_col == REM_COL){
                         cur_card = cur_rem;
                     } else {
@@ -1103,7 +1130,7 @@ int solitaire(void){
                     break;
 #endif
                 if(cur_card != NOT_A_CARD){
-                    move_card(deck[cur_card].color + STACKS_COL, cur_card);
+                    move_card(deck[cur_card].suit + STACKS_COL, cur_card);
                 }
                 break;
 
@@ -1125,7 +1152,7 @@ int solitaire(void){
                     }
                 /* unselect card or try putting card on one of the 4 stacks */
                 } else if(sel_card == cur_card) {
-                    move_card(deck[sel_card].color + COL_NUM, sel_card);
+                    move_card(deck[sel_card].suit + COL_NUM, sel_card);
                     sel_card = NOT_A_CARD;
                 /* try moving cards */
                 } else {
@@ -1153,7 +1180,7 @@ int solitaire(void){
                     break;
 #endif
                 if(cur_rem != NOT_A_CARD){
-                    move_card(deck[cur_rem].color + COL_NUM, cur_rem);
+                    move_card(deck[cur_rem].suit + COL_NUM, cur_rem);
                 }
                 break;
 
