@@ -819,11 +819,11 @@ static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,)
         }
 
         if ( val ) {
-            if (htole16(sec[offset]) == 0x0000 && fat_bpb->fsinfo.freecount > 0)
+            if (letoh16(sec[offset]) == 0x0000 && fat_bpb->fsinfo.freecount > 0)
                 fat_bpb->fsinfo.freecount--;
         }
         else {
-            if (htole16(sec[offset]))
+            if (letoh16(sec[offset]))
                 fat_bpb->fsinfo.freecount++;
         }
 
@@ -854,12 +854,12 @@ static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,)
         }
 
         if ( val ) {
-            if (!(htole32(sec[offset]) & 0x0fffffff) &&
+            if (!(letoh32(sec[offset]) & 0x0fffffff) &&
                 fat_bpb->fsinfo.freecount > 0)
                 fat_bpb->fsinfo.freecount--;
         }
         else {
-            if (htole32(sec[offset]) & 0x0fffffff)
+            if (letoh32(sec[offset]) & 0x0fffffff)
                 fat_bpb->fsinfo.freecount++;
         }
 
