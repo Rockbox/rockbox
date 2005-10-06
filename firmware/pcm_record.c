@@ -349,12 +349,12 @@ void pcmrec_callback(bool flush)
     {
         if (num_ready >= WRITE_THRESHOLD || flush)
         {
-            unsigned long *ptr = (unsigned long*)rec_buffers[read_index];
+            unsigned short *ptr = (unsigned short*)rec_buffers[read_index];
             int i;
 
-            for (i=0; i<EACH_BUFFER_SIZE * num_ready / 4; i++)
+            for (i=0; i<EACH_BUFFER_SIZE * num_ready / 2; i++)
             {
-                *ptr = htole32(*ptr);
+                *ptr = htole16(*ptr);
                 ptr++;
             }
 
