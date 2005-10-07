@@ -21,6 +21,7 @@ dict.c
 bounce.c
 calculator.c
 chip8.c
+demystify.c
 fire.c
 flipit.c
 grayscale.c
