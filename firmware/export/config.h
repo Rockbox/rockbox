@@ -117,6 +117,13 @@
 /* no known platform */
 #endif
 
+/* Enable the directory cache if we have plenty of RAM. */
+/* Cache is just temporarily disabled for simulator build.
+ * Do the small fix in dircache.c to enable this. */
+#if MEM > 8 && !defined(SIMULATOR)
+#define HAVE_DIRCACHE 1
+#endif
+
 /* define for all cpus from coldfire family */
 #if (CONFIG_CPU == MCF5249) || (CONFIG_CPU == MCF5250)
 #define CPU_COLDFIRE

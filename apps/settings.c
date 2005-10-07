@@ -67,6 +67,8 @@
 #include "version.h"
 #include "rtc.h"
 #include "sound.h"
+#include "dircache.h"
+
 #if CONFIG_CODEC == MAS3507D
 void dac_line_in(bool enable);
 #endif
@@ -438,6 +440,10 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(replaygain_noclip), false, "replaygain noclip", off_on },
     {8 | SIGNED, S_O(replaygain_preamp), 0, "replaygain preamp", NULL },
     {2, S_O(beep), 0, "off,weak,moderate,strong", NULL },
+#endif
+#ifdef HAVE_DIRCACHE
+    {1, S_O(dircache), false, "dircache", off_on },
+    {22, S_O(dircache_size), 0, NULL, NULL },
 #endif
     
     /* If values are just added to the end, no need to bump the version. */

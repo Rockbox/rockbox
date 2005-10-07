@@ -3329,3 +3329,21 @@ desc: repeat one song
 eng: "A-B"
 voice: "A-B"
 new: "A-B"
+
+id: LANG_DIRCACHE_ENABLE
+desc: in directory cache settings
+eng: "Enable directory cache"
+voice: "Hakemistopuun lataus muistiin"
+new: "Hakemistopuun lataus muistiin"
+
+id: LANG_DIRCACHE_REBOOT
+desc: when activating directory cache
+eng: "Please reboot to enable the cache"
+voice: "Käynnistä laite uudelleen"
+new: "Käynnistä laite uudelleen"
+
+id: LANG_DIRCACHE_BUILDING
+desc: when booting up and rebuilding the cache
+eng: "Scanning disk..."
+voice: ""
+new: "Ladataan hakemistopuu..."

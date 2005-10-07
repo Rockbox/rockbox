@@ -24,6 +24,7 @@
 #include "dir.h"
 #include "debug.h"
 #include "atoi.h"
+#include "dircache.h"
 
 #define MAX_OPEN_DIRS 8
 
@@ -85,7 +86,6 @@ int release_dirs(int volume)
     return closed; /* return how many we did */
 }
 #endif /* #ifdef HAVE_HOTSWAP */
-
 
 DIR* opendir(const char* name)
 {
@@ -275,7 +275,11 @@ int mkdir(const char *name, int mode)
     memset(&newdir, sizeof(struct fat_dir), 0);
     
     rc = fat_create_dir(basename, &newdir, &(dir->fatdir));
-    
+#ifdef HAVE_DIRCACHE
+    if (rc >= 0)
+        dircache_mkdir(name);
+#endif
+
     closedir(dir);
     
     return rc;
@@ -313,6 +317,12 @@ int rmdir(const char* name)
         errno = EIO;
         rc = rc * 10 - 3;
     }
+#ifdef HAVE_DIRCACHE
+    else
+    {
+        dircache_rmdir(name);
+    }
+#endif
 
     closedir(dir);
     

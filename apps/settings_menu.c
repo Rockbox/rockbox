@@ -49,6 +49,8 @@
 #include "abrepeat.h"
 #include "power.h"
 #include "database.h"
+#include "dir.h"
+#include "dircache.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
@@ -1259,6 +1261,23 @@ static bool beep(void)
 }
 #endif
 
+#ifdef HAVE_DIRCACHE
+static bool dircache(void)
+{
+    bool result = set_bool(str(LANG_DIRCACHE_ENABLE),
+        &global_settings.dircache);
+
+    if (!dircache_is_enabled() && global_settings.dircache)
+        splash(HZ*2, true, str(LANG_DIRCACHE_REBOOT));
+
+    if (!result)
+        dircache_disable();
+        
+    return result;
+}
+
+#endif /* HAVE_DIRCACHE */
+
 static bool playback_settings_menu(void)
 {
     int m;
@@ -1573,6 +1592,9 @@ static bool disk_settings_menu(void)
         { ID2P(LANG_SPINDOWN),    spindown        },
 #ifdef HAVE_ATA_POWER_OFF
         { ID2P(LANG_POWEROFF),    poweroff        },
+#endif
+#ifdef HAVE_DIRCACHE
+        { ID2P(LANG_DIRCACHE_ENABLE),  dircache },
 #endif
     };
 

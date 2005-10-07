@@ -23,6 +23,7 @@
 #include "fat.h"
 #include "dir.h"
 #include "debug.h"
+#include "dircache.h"
 
 /*
   These functions provide a roughly POSIX-compatible file IO API.
@@ -32,8 +33,6 @@
   having to re-read the sector each time. 
   The penalty is the RAM used for the cache and slightly more complex code.
 */
-
-#define MAX_OPEN_FILES 8
 
 struct filedesc {
     unsigned char cache[SECTOR_SIZE];
@@ -155,6 +154,9 @@ int open(const char* pathname, int flags)
                 closedir(dir);
                 return rc * 10 - 6;
             }
+#ifdef HAVE_DIRCACHE
+            dircache_add_file(pathname);
+#endif
             file->size = 0;
             file->attr = 0;
         }
@@ -183,6 +185,11 @@ int open(const char* pathname, int flags)
         if (rc < 0 )
             return rc * 10 - 9;
     }
+
+#ifdef HAVE_DIRCACHE
+    if (file->write)
+        dircache_bind(fd, pathname);
+#endif
 
     return fd;
 }
@@ -267,6 +274,9 @@ int remove(const char* name)
     }
 
     file->size = 0;
+#ifdef HAVE_DIRCACHE
+    dircache_remove(name);
+#endif
 
     rc = close(fd);
     if (rc<0)
@@ -335,6 +345,10 @@ int rename(const char* path, const char* newpath)
         return rc * 10 - 6;
     }
 
+#ifdef HAVE_DIRCACHE
+    dircache_rename(path, newpath);
+#endif
+    
     rc = close(fd);
     if (rc<0) {
         errno = EIO;
@@ -549,7 +563,12 @@ static int readwrite(int fd, void* buf, long count, bool write)
 
     /* adjust file size to length written */
     if ( write && file->fileoffset > file->size )
+    {
         file->size = file->fileoffset;
+#ifdef HAVE_DIRCACHE
+        dircache_update_filesize(fd, file->size);
+#endif
+    }
 
     return nread;
 }

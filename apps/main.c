@@ -59,6 +59,9 @@
 #include "plugin.h"
 #include "misc.h"
 #include "database.h"
+#include "dircache.h"
+#include "lang.h"
+#include "string.h"
 
 #if (CONFIG_CODEC == SWCODEC)
 #include "pcmbuf.h"
@@ -92,6 +95,33 @@ void app_main(void)
     browse_root();
 }
 
+#ifdef HAVE_DIRCACHE
+void init_dircache(void)
+{
+    int font_w, font_h;
+    
+    dircache_init();
+    if (global_settings.dircache)
+    {
+        /* Print "Scanning disk..." to the display. */
+        lcd_getstringsize("A", &font_w, &font_h);
+        lcd_putsxy((LCD_WIDTH/2) - ((strlen(str(LANG_DIRCACHE_BUILDING))*font_w)/2),
+                    LCD_HEIGHT-font_h*3, str(LANG_DIRCACHE_BUILDING));
+        lcd_update();
+
+        dircache_build(global_settings.dircache_size);
+
+        /* Clean the text when we are done. */
+        lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        lcd_fillrect(0, LCD_HEIGHT-font_h*3, LCD_WIDTH, font_h);
+        lcd_set_drawmode(DRMODE_SOLID);
+        lcd_update();
+    }
+}
+#else
+# define init_dircache(...)
+#endif
+
 #ifdef SIMULATOR
 
 void init(void)
@@ -110,6 +140,7 @@ void init(void)
     settings_calc_config_sector();
     settings_load(SETTINGS_ALL);
     settings_apply();
+    init_dircache();
     sleep(HZ/2);
     tree_init();
     playlist_init();
@@ -261,13 +292,15 @@ void init(void)
         }
     }
 
+    settings_calc_config_sector();
+    settings_load(SETTINGS_ALL);
+    init_dircache();
+    
     /* On software codec platforms we have to init audio before
        calling audio_set_buffer_margin(). */
 #if (CONFIG_CODEC == SWCODEC)
     audio_init();
 #endif
-    settings_calc_config_sector();
-    settings_load(SETTINGS_ALL);
     settings_apply();
 
     status_init();

@@ -3298,3 +3298,21 @@ desc: use track gain if shuffle mode is on, album gain otherwise
 eng: "Track gain if shuffling"
 voice: "Track gain if shuffling"
 new:
+
+id: LANG_DIRCACHE_ENABLE
+desc: in directory cache settings
+eng: "Enable directory cache"
+voice: "Enable directory cache"
+new:
+
+id: LANG_DIRCACHE_REBOOT
+desc: when activating directory cache
+eng: "Please reboot to enable the cache"
+voice: "Please reboot to enable the cache"
+new:
+
+id: LANG_DIRCACHE_BUILDING
+desc: when booting up and rebuilding the cache
+eng: "Scanning disk..."
+voice: ""
+new:

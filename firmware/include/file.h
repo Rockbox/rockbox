@@ -25,6 +25,8 @@
 #undef MAX_PATH /* this avoids problems when building simulator */
 #define MAX_PATH 260
 
+#define MAX_OPEN_FILES 8
+
 #ifndef SEEK_SET
 #define SEEK_SET 0
 #endif

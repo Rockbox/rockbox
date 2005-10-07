@@ -61,6 +61,7 @@
 #include "dbtree.h"
 #include "recorder/recording.h"
 #include "rtc.h"
+#include "dircache.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -1324,7 +1325,7 @@ static int plsize = 0;
 static bool add_dir(char* dirname, int len, int fd)
 {
     bool abort = false;
-    DIR* dir;
+    DIRCACHED* dir;
 
     /* check for user abort */
 #ifdef BUTTON_STOP
@@ -1334,14 +1335,14 @@ static bool add_dir(char* dirname, int len, int fd)
 #endif
         return true;
 
-    dir = opendir(dirname);
+    dir = opendir_cached(dirname);
     if(!dir)
         return true;
 
     while (true) {
-        struct dirent *entry;
+        struct dircache_entry *entry;
 
-        entry = readdir(dir);
+        entry = readdir_cached(dir);
         if (!entry)
             break;
         if (entry->attribute & ATTR_DIRECTORY) {
@@ -1409,7 +1410,7 @@ static bool add_dir(char* dirname, int len, int fd)
             }
         }
     }
-    closedir(dir);
+    closedir_cached(dir);
 
     return abort;
 }
@@ -1634,10 +1635,26 @@ void tree_flush(void)
 {
     rundb_shutdown();
     tagdb_shutdown();
+#ifdef HAVE_DIRCACHE
+    if (global_settings.dircache)
+    {
+        global_settings.dircache_size = dircache_get_cache_size();
+        dircache_disable();
+    }
+    else
+    {
+        global_settings.dircache_size = 0;
+    }
+    settings_save();
+#endif
 }
 
 void tree_restore(void)
 {
     tagdb_init();
     rundb_init();
+#ifdef HAVE_DIRCACHE
+    if (global_settings.dircache)
+        dircache_build(global_settings.dircache_size);
+#endif
 }

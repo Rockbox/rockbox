@@ -38,6 +38,7 @@
 #include "plugin.h"
 #include "rolo.h"
 #include "sprintf.h"
+#include "dircache.h"
 
 #ifndef SIMULATOR
 static int boot_size = 0;
@@ -75,11 +76,11 @@ int ft_build_playlist(struct tree_context* c, int start_index)
 static void check_file_thumbnails(struct tree_context* c)
 {
     int i;
-    struct dirent *entry;
+    struct dircache_entry *entry;
     struct entry* dircache = c->dircache;
-    DIR *dir;
+    DIRCACHED *dir;
     
-    dir = opendir(c->currdir);
+    dir = opendir_cached(c->currdir);
     if(!dir)
         return;
 
@@ -100,7 +101,7 @@ static void check_file_thumbnails(struct tree_context* c)
         }
     }
     
-    while((entry = readdir(dir)) != 0) /* walk directory */
+    while((entry = readdir_cached(dir)) != 0) /* walk directory */
     {
         int ext_pos;
 
@@ -126,7 +127,7 @@ static void check_file_thumbnails(struct tree_context* c)
             }
         }
     }
-    closedir(dir);
+    closedir_cached(dir);
 }
 
 /* support function for qsort() */
@@ -191,12 +192,12 @@ int ft_load(struct tree_context* c, const char* tempdir)
 {
     int i;
     int name_buffer_used = 0;
-    DIR *dir;
+    DIRCACHED *dir;
 
     if (tempdir)
-        dir = opendir(tempdir);
+        dir = opendir_cached(tempdir);
     else
-        dir = opendir(c->currdir);
+        dir = opendir_cached(c->currdir);
     if(!dir)
         return -1; /* not a directory */
 
@@ -205,7 +206,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
 
     for ( i=0; i < global_settings.max_files_in_dir; i++ ) {
         int len;
-        struct dirent *entry = readdir(dir);
+        struct dircache_entry *entry = readdir_cached(dir);
         struct entry* dptr =
             (struct entry*)(c->dircache + i * sizeof(struct entry));
         if (!entry)
@@ -292,7 +293,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
     }
     c->filesindir = i;
     c->dirlength = i;
-    closedir(dir);
+    closedir_cached(dir);
 
     qsort(c->dircache,i,sizeof(struct entry),compare);
 

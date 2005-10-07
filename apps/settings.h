@@ -23,6 +23,7 @@
 #include <stdbool.h>
 #include "config.h"
 #include "file.h"
+#include "dircache.h"
 #include "timefuncs.h"
 #include "abrepeat.h"
 
@@ -338,6 +339,10 @@ struct user_settings
                                shuffle is on, album gain otherwise */
     int  replaygain_preamp; /* scale replaygained tracks by this */
     int  beep;              /* system beep volume when changing tracks etc. */
+#endif
+#ifdef HAVE_DIRCACHE
+    bool dircache;          /* enable directory cache */
+    int dircache_size;      /* directory cache structure last size, 22 bits */
 #endif
 };
 
