@@ -4,7 +4,7 @@ require "/home/dast/perl/date.pm";
 
 opendir(DIR, ".") or
     die "Can't opendir()";
-@logs = sort grep { /^rockbox-/ } readdir(DIR);
+@logs = grep { /^rockbox-/ } readdir(DIR);
 closedir DIR;
 
 print "<table class=archive>\n";
@@ -13,7 +13,7 @@ $lasty = 0;
 $lastm = 0;
 $count = 0;
 
-for ( @logs ) {
+for ( sort @logs ) {
     $size = (stat("$_"))[7];
     $file = $_;
     $log = "";
@@ -26,7 +26,9 @@ for ( @logs ) {
 
             $mname = ucfirst MonthNameEng($m);
             if ($y != $lasty) {
-                print "</tr><tr>\n" if $lasty != 0;
+                if ($lasty != 0) {
+                    print "</tr><tr><th colspan=39><hr></th></tr><tr>\n";
+                }
                 print "<th>$y</th>\n";
                 $lasty = $y;
             } else {
