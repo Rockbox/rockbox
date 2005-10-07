@@ -497,17 +497,19 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             xa += xs;
             if (xa > 359)
                 xa -= 360;
-            if (xa < 0)
+            else if (xa < 0)
                 xa += 360;
+
             ya += ys;
             if (ya > 359)
                 ya -= 360;
-            if (ya < 0)
+            else if (ya < 0)
                 ya += 360;
+
             za += zs;
             if (za > 359)
                 za -= 360;
-            if (za < 0)
+            else if (za < 0)
                 za += 360;
             redraw = true;
         }
@@ -516,39 +518,105 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         switch (button)
         {
             case CUBE_X_INC:
-                if (xs < 10)
+            case (CUBE_X_INC|BUTTON_REPEAT):
+                if( !paused )
+                {
+                    if( xs < 10)
                     xs++;
+                }
+                else
+                {
+                    xa++;
+                    if( xa > 359 )
+                        xa -= 360;
+                }
                 t_disp = DISP_TIME;
+                redraw = true;
                 break;
 
             case CUBE_X_DEC:
+            case (CUBE_X_DEC|BUTTON_REPEAT):
+                if( !paused )
+                {
                 if (xs > -10)
                     xs--;
+                }
+                else
+                {
+                    xa--;
+                    if( xa < 0 )
+                        xa += 360;
+                }
                 t_disp = DISP_TIME;
+                redraw = true;
                 break;
 
             case CUBE_Y_INC:
+            case (CUBE_Y_INC|BUTTON_REPEAT):
+                if( !paused )
+                {
                 if (ys < 10)
                     ys++;
+                } 
+                else
+                {
+                    ya++;
+                    if( ya > 359 )
+                        ya -= 360;
+                }
                 t_disp = DISP_TIME;
+                redraw = true;
                 break;
 
             case CUBE_Y_DEC:
+            case (CUBE_Y_DEC|BUTTON_REPEAT):
+                if( !paused )
+                {
                 if (ys > -10)
                     ys--;
+                }
+                else
+                {
+                    ya--;
+                    if( ya < 0 )
+                        ya += 360;
+                }
                 t_disp = DISP_TIME;
+                redraw = true;
                 break;
 
             case CUBE_Z_INC:
+            case (CUBE_Z_INC|BUTTON_REPEAT):
+                if( !paused )
+                {
                 if (zs < 10)
                     zs++;
+                }
+                else
+                {
+                    za++;
+                    if( za > 359 )
+                        za -= 360;
+                }
                 t_disp = DISP_TIME;
+                redraw = true;
                 break;
 
             case CUBE_Z_DEC:
+            case (CUBE_Z_DEC|BUTTON_REPEAT):
+                if( !paused )
+                {
                 if (zs > -10)
                     zs--;
+                }
+                else
+                {
+                    za--;
+                    if( za < 0 )
+                        za += 360;
+                }
                 t_disp = DISP_TIME;
+                redraw = true;
                 break;
 
             case CUBE_MODE:
