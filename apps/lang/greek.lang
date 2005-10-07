@@ -183,7 +183,7 @@ id: LANG_DISCHARGE
 desc: DEPRECATED
 eng: ""
 voice: 
-new: ""
+new:
 
 id: LANG_TIME
 desc: in settings_menu
@@ -243,7 +243,7 @@ id: LANG_CASE_MENU
 desc: DEPRECATED
 eng: ""
 voice: 
-new: ""
+new:
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
@@ -315,7 +315,7 @@ id: LANG_BBOOST
 desc: DEPRECATED
 eng: ""
 voice: 
-new: ""
+new:
 
 id: LANG_DECAY
 desc: in sound_settings
@@ -381,7 +381,7 @@ id: LANG_RESUME_ASK
 desc: DEPRECATED
 eng: ""
 voice: 
-new: "Συνέχεια;"
+new:
 
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
@@ -417,37 +417,37 @@ id: LANG_MUTE_ON_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: 
-new: ""
+new:
 
 id: LANG_MUTE_OFF_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: 
-new: ""
+new:
 
 id: LANG_MUTE_ON_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: 
-new: ""
+new:
 
 id: LANG_MUTE_OFF_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: 
-new: ""
+new:
 
 id: LANG_ID3_INFO
 desc: DEPRECATED
 eng: ""
 voice: 
-new: ""
+new:
 
 id: LANG_ID3_SCREEN
 desc: DEPRECATED
 eng: ""
 voice: 
-new: ""
+new:
 
 id: LANG_ID3_TITLE
 desc: in wps
@@ -459,7 +459,7 @@ id: LANG_ID3_NO_TITLE
 desc: DEPRECATED
 eng: ""
 voice: 
-new: "<Χωρίς Τίτλο>"
+new:
 
 id: LANG_ID3_ARTIST
 desc: in wps
@@ -471,7 +471,7 @@ id: LANG_ID3_NO_ARTIST
 desc: DEPRECATED
 eng: ""
 voice: 
-new: "<’γνωστος>"
+new:
 
 id: LANG_ID3_ALBUM
 desc: in wps
@@ -483,7 +483,7 @@ id: LANG_ID3_NO_ALBUM
 desc: DEPRECATED
 eng: ""
 voice: 
-new: "<Χωρίς ’λμπουμ>"
+new:
 
 id: LANG_ID3_TRACKNUM
 desc: in wps
@@ -495,7 +495,7 @@ id: LANG_ID3_NO_TRACKNUM
 desc: DEPRECATED
 eng: ""
 voice: 
-new: "<Xωρίς Αριθμό Κομματιού>"
+new:
 
 id: LANG_ID3_LENGHT
 desc: in wps
@@ -837,7 +837,7 @@ id: LANG_RESUME_SETTING_ASK_ONCE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: "Με Ερώτηση"
+new:
 
 id: LANG_BATTERY_DISPLAY
 desc: Battery type title
@@ -867,19 +867,19 @@ id: LANG_PM_PERFORMANCE
 desc: DEPRECATED
 eng: ""
 voice: 
-new: "Επιδόση"
+new:
 
 id: LANG_PM_HIGH_PERFORMANCE
 desc: DEPRECATED
 eng: ""
-voice: ""
-new: "Υψηλή Επίδοση"
+voice:
+new:
 
 id: LANG_PM_ENERGY_SAVER
 desc: DEPRECATED
 eng: ""
-voice: ""
-new: "Εξοικονόμηση Ενέργειας"
+voice:
+new:
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
@@ -987,13 +987,13 @@ id: LANG_DISK_STAT
 desc: DEPRECATED
 eng: ""
 voice: 
-new: ""
+new:
 
 id: LANG_DISK_FREE_STAT
 desc: DEPRECATED
 eng: ""
 voice: 
-new: ""
+new:
 
 id: LANG_POWEROFF
 desc: disk poweroff flag
@@ -1077,7 +1077,7 @@ id: LANG_TRICKLE_CHARGE
 desc: DEPRECATED
 eng: ""
 voice: 
-new: ""
+new:
 
 id: LANG_STATUS_BAR
 desc: display menu, F3 substitute
