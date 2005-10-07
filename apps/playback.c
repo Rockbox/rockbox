@@ -1596,7 +1596,9 @@ bool codec_request_next_track_callback(void)
 void audio_invalidate_tracks(void)
 {
     if (track_count == 0) {
-        queue_post(&audio_queue, AUDIO_PLAY, 0);
+        /* This call doesn't seem necessary anymore. Uncomment it
+           if things break */
+        /* queue_post(&audio_queue, AUDIO_PLAY, 0); */
         return ;
     }
     
@@ -1664,7 +1666,15 @@ void audio_thread(void)
                 while (audio_codec_loaded)
                     yield();
                 audio_play_start((int)ev.data);
+
                 playlist_update_resume_info(audio_current_track());
+
+		/* If there are no tracks in the playlist, then the playlist
+                   was empty or none of the filenames were valid.  No point
+                   in playing an empty playlist. */
+                if (playlist_amount() == 0) {
+                    audio_stop_playback();
+                }
                 break ;
                 
             case AUDIO_STOP:
