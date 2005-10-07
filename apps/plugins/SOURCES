@@ -28,6 +28,7 @@ mandelbrot.c
 minesweeper.c
 oscillograph.c
 oscilloscope.c
+plasma.c
 pong.c
 rockblox.c
 #if (CONFIG_KEYPAD == RECORDER_PAD) && !defined(SIMULATOR)
