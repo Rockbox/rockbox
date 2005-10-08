@@ -3291,3 +3291,21 @@ desc: use track gain if shuffle mode is on, album gain otherwise
 eng: "Track gain if shuffling"
 voice: "Titellautstärke beim Mischen"
 new: "Titellautstärke beim Mischen"
+
+id: LANG_DIRCACHE_ENABLE
+desc: in directory cache settings
+eng: "Directory cache"
+voice: "Verzeichnispuffer"
+new: "Verzeichnispuffer"
+
+id: LANG_DIRCACHE_REBOOT
+desc: when activating directory cache
+eng: "Please reboot to enable the cache"
+voice: ""
+new: "Neustarten, um den Puffer zu aktivieren"
+
+id: LANG_DIRCACHE_BUILDING
+desc: when booting up and rebuilding the cache
+eng: "Scanning disk..."
+voice: ""
+new: "Lese Festplatte..."

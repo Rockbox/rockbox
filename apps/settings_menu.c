@@ -76,11 +76,8 @@ void dac_line_in(bool enable);
 #ifdef HAVE_CHARGING
 static bool car_adapter_mode(void)
 {
-    return set_bool_options( str(LANG_CAR_ADAPTER_MODE),
-                             &global_settings.car_adapter_mode,
-                             STR(LANG_SET_BOOL_YES),
-                             STR(LANG_SET_BOOL_NO),
-                             NULL);
+    return set_bool( str(LANG_CAR_ADAPTER_MODE),
+                     &global_settings.car_adapter_mode );
 }
 #endif
 
@@ -1161,11 +1158,8 @@ static bool runtimedb(void)
     bool rc;
     bool old = global_settings.runtimedb;
 
-    rc = set_bool_options( str(LANG_RUNTIMEDB_ACTIVE),
-                           &global_settings.runtimedb,
-                           STR(LANG_SET_BOOL_YES),
-                           STR(LANG_SET_BOOL_NO),
-                           NULL);
+    rc = set_bool( str(LANG_RUNTIMEDB_ACTIVE),
+                           &global_settings.runtimedb );
     if (old && !global_settings.runtimedb)
         rundb_shutdown();
     if (!old && global_settings.runtimedb)
@@ -1264,8 +1258,11 @@ static bool beep(void)
 #ifdef HAVE_DIRCACHE
 static bool dircache(void)
 {
-    bool result = set_bool(str(LANG_DIRCACHE_ENABLE),
-        &global_settings.dircache);
+    bool result = set_bool_options(str(LANG_DIRCACHE_ENABLE),
+                                   &global_settings.dircache,
+                                   STR(LANG_ON),
+                                   STR(LANG_OFF),
+                                   NULL);
 
     if (!dircache_is_enabled() && global_settings.dircache)
         splash(HZ*2, true, str(LANG_DIRCACHE_REBOOT));

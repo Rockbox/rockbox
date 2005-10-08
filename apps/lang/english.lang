@@ -3301,14 +3301,14 @@ new:
 
 id: LANG_DIRCACHE_ENABLE
 desc: in directory cache settings
-eng: "Enable directory cache"
-voice: "Enable directory cache"
+eng: "Directory cache"
+voice: "Directory cache"
 new:
 
 id: LANG_DIRCACHE_REBOOT
 desc: when activating directory cache
 eng: "Please reboot to enable the cache"
-voice: "Please reboot to enable the cache"
+voice: ""
 new:
 
 id: LANG_DIRCACHE_BUILDING
