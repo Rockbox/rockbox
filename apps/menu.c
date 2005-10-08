@@ -156,6 +156,7 @@ void menu_draw(int m)
 #endif
 
     menu_lines = height / fh;
+    height = menu_lines * fh;
     
 #else
     int menu_lines = MENU_LINES;
