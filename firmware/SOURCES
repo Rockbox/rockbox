@@ -11,7 +11,9 @@ common/ctype.c
 common/dir.c
 common/file.c
 #endif
+#ifdef HAVE_DIRCACHE
 common/dircache.c
+#endif
 common/disk.c
 common/errno.c
 common/memcmp.c

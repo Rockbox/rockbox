@@ -24,8 +24,6 @@
 
 #include "config.h"
 
-#ifdef HAVE_DIRCACHE
-
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
@@ -775,8 +773,18 @@ struct dircache_entry* readdir_cached(DIRCACHED* dir)
 
     dir->entry = ce->next;
 
+    strncpy(dir->secondary_entry.d_name, ce->d_name, MAX_PATH-1);
+    /* Can't do `dir->secondary_entry = *ce`
+       because that modifies the d_name pointer. */
+    dir->secondary_entry.size = ce->size;
+    dir->secondary_entry.startcluster = ce->startcluster;
+    dir->secondary_entry.attribute = ce->attribute;
+    dir->secondary_entry.wrttime = ce->wrttime;
+    dir->secondary_entry.wrtdate = ce->wrtdate;
+    dir->secondary_entry.next = NULL;
+
     //logf("-> %s", ce->name);
-    return ce;
+    return &dir->secondary_entry;
 }
 
 int closedir_cached(DIRCACHED* dir)
@@ -787,6 +795,4 @@ int closedir_cached(DIRCACHED* dir)
     
     return 0;
 }
-
-#endif /* HAVE_DIRCACHE */
 
