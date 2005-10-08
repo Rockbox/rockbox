@@ -302,8 +302,15 @@ void system_init(void)
     extra_init();
 }
 
+void system_reboot (void)
+{
+}
 
-
+int system_memory_guard(int newmode)
+{
+    (void)newmode;
+    return 0;
+}
 #elif defined(CPU_COLDFIRE)
 
 #define default_interrupt(name) \
@@ -501,6 +508,67 @@ void system_init(void)
                   "movclr.l %%acc2, %%d0\n\t"
                   "movclr.l %%acc3, %%d0\n\t"
                   : : : "d0");
+}
+
+void system_reboot (void)
+{
+    set_cpu_frequency(0);
+
+    asm(" move.w #0x2700,%sr");
+    /* Reset the cookie for the crt0 crash check */
+    asm(" move.l #0,%d0");
+    asm(" move.l %d0,0x10017ffc");
+    asm(" movec.l %d0,%vbr");
+    asm(" move.l 0,%sp");
+    asm(" move.l 4,%a0");
+    asm(" jmp (%a0)");
+}
+
+/* Utilise the breakpoint hardware to catch invalid memory accesses. */
+int system_memory_guard(int newmode)
+{
+    static const unsigned long modes[MAXMEMGUARD][8] = {
+        {   /* catch nothing */
+            0x2C870000, 0x00000000, /* TDR  = 0x00000000 */
+            0x2C8D0000, 0x00000000, /* ABLR = 0x00000000 */
+            0x2C8C0000, 0x00000000, /* ABHR = 0x00000000 */
+            0x2C860000, 0x00050000, /* AATR = 0x0005 */
+        },
+        {   /* catch flash ROM writes */
+            0x2C8D0000, 0x00000000, /* ABLR = 0x00000000 */
+            0x2C8C0FFF, 0xFFFF0000, /* ABHR = 0x0FFFFFFF */
+            0x2C860000, 0x6F050000, /* AATR = 0x6F05 */
+            0x2C878000, 0x20080000, /* TDR  = 0x80002008 */
+        },
+        {   /* catch all accesses to zero area */
+            0x2C8D0000, 0x00000000, /* ABLR = 0x00000000 */
+            0x2C8C0FFF, 0xFFFF0000, /* ABHR = 0x0FFFFFFF */
+            0x2C860000, 0xEF050000, /* AATR = 0xEF05 */
+            0x2C878000, 0x20080000, /* TDR  = 0x80002008 */
+        }
+        /* Note: CPU space accesses (movec instruction), interrupt acknowledges
+           and emulator mode accesses are never caught. */
+    };
+    static int oldmode = MEMGUARD_NONE;
+
+    const unsigned long *ptr;
+    int i;
+
+    if (newmode == MEMGUARD_KEEP)
+        newmode = oldmode;
+    else
+        oldmode = newmode;
+
+    /* Always set the new mode, we don't know the old settings
+       as we cannot read back */
+    ptr = modes[newmode];
+    for (i = 0; i < 4; i++)
+    {
+        asm ( "wdebug (%0) \n" : : "a"(ptr));
+        ptr += 2;
+    }
+
+    return oldmode;
 }
 
 #ifdef IRIVER_H100
@@ -708,158 +776,69 @@ default_interrupt (ADITI,  109);
 /* reset vectors are handled in crt0.S */
 void (*vbr[]) (void) __attribute__ ((section (".vectors"))) = 
 {
-    /*** 4 General Illegal Instruction ***/
-
-    GII,
-
-    /*** 5 Reserved ***/
-
-    UIE5,
-
-    /*** 6 Illegal Slot Instruction ***/
-
-    ISI,
-
-    /*** 7-8 Reserved ***/
-
-    UIE7,UIE8,
-
-    /*** 9 CPU Address Error ***/
-
-    CPUAE,
-
-    /*** 10 DMA Address Error ***/
-
-    DMAAE,
-
-    /*** 11 NMI ***/
-
-    NMI,
-
-    /*** 12 User Break ***/
-
-    UB,
+    GII,       /*** 4 General Illegal Instruction ***/
+    UIE5,      /*** 5 Reserved ***/
+    ISI,       /*** 6 Illegal Slot Instruction ***/
+    UIE7,      /*** 7-8 Reserved ***/
+    UIE8,
+    CPUAE,     /*** 9 CPU Address Error ***/
+    DMAAE,     /*** 10 DMA Address Error ***/
+    NMI,       /*** 11 NMI ***/
+    UB,        /*** 12 User Break ***/
 
     /*** 13-31 Reserved ***/
+    UIE13,UIE14,UIE15,UIE16,UIE17,UIE18,UIE19,UIE20,  
+    UIE21,UIE22,UIE23,UIE24,UIE25,UIE26,UIE27,UIE28,
+    UIE29,UIE30,UIE31,
 
-    UIE13,UIE14,UIE15,UIE16,UIE17,UIE18,UIE19,UIE20,UIE21,UIE22,UIE23,UIE24,UIE25,UIE26,UIE27,UIE28,UIE29,UIE30,UIE31,
-  
     /*** 32-63 TRAPA #20...#3F ***/
+    TRAPA32,TRAPA33,TRAPA34,TRAPA35,TRAPA36,TRAPA37,TRAPA38,TRAPA39,
+    TRAPA40,TRAPA41,TRAPA42,TRAPA43,TRAPA44,TRAPA45,TRAPA46,TRAPA47,
+    TRAPA48,TRAPA49,TRAPA50,TRAPA51,TRAPA52,TRAPA53,TRAPA54,TRAPA55,
+    TRAPA56,TRAPA57,TRAPA58,TRAPA59,TRAPA60,TRAPA61,TRAPA62,TRAPA63,
 
-    TRAPA32,TRAPA33,TRAPA34,TRAPA35,TRAPA36,TRAPA37,TRAPA38,TRAPA39,TRAPA40,TRAPA41,TRAPA42,TRAPA43,TRAPA44,TRAPA45,TRAPA46,TRAPA47,TRAPA48,TRAPA49,TRAPA50,TRAPA51,TRAPA52,TRAPA53,TRAPA54,TRAPA55,TRAPA56,TRAPA57,TRAPA58,TRAPA59,TRAPA60,TRAPA61,TRAPA62,TRAPA63,
-  
     /*** 64-71 IRQ0-7 ***/ 
-
     IRQ0,IRQ1,IRQ2,IRQ3,IRQ4,IRQ5,IRQ6,IRQ7,
-  
-    /*** 72 DMAC0 ***/ 
-  
-    DEI0,
-    
-    /*** 73 Reserved ***/
 
-    UIE73,
+    DEI0,      /*** 72 DMAC0 ***/
+    UIE73,     /*** 73 Reserved ***/
+    DEI1,      /*** 74 DMAC1 ***/
+    UIE75,     /*** 75 Reserved ***/
+    DEI2,      /*** 76 DMAC2 ***/
+    UIE77,     /*** 77 Reserved ***/
+    DEI3,      /*** 78 DMAC3 ***/
+    UIE79,     /*** 79 Reserved ***/
+    IMIA0,     /*** 80-82 ITU0 ***/
+    IMIB0,
+    OVI0,
+    UIE83,     /*** 83 Reserved ***/
+    IMIA1,     /*** 84-86 ITU1 ***/
+    IMIB1,
+    OVI1,
+    UIE87,     /*** 87 Reserved ***/
+    IMIA2,     /*** 88-90 ITU2 ***/
+    IMIB2,
+    OVI2,
+    UIE91,     /*** 91 Reserved ***/
+    IMIA3,     /*** 92-94 ITU3 ***/
+    IMIB3,
+    OVI3,
+    UIE95,     /*** 95 Reserved ***/
+    IMIA4,     /*** 96-98 ITU4 ***/
+    IMIB4,
+    OVI4,
+    UIE99,     /*** 99 Reserved ***/
 
-    /*** 74 DMAC1 ***/ 
-
-    DEI1,
-    
-    /*** 75 Reserved ***/
-
-    UIE75,
-
-    /*** 76 DMAC2 ***/ 
-
-    DEI2,
-    
-    /*** 77 Reserved ***/
-
-    UIE77,
-
-    /*** 78 DMAC3 ***/ 
-
-    DEI3,
-    
-    /*** 79 Reserved ***/
-
-    UIE79, 
-  
-    /*** 80-82 ITU0 ***/
-  
-    IMIA0,IMIB0,OVI0,
-    
-    /*** 83 Reserved ***/
-
-    UIE83, 
-
-    /*** 84-86 ITU1 ***/
-  
-    IMIA1,IMIB1,OVI1,
-    
-    /*** 87 Reserved ***/
-
-    UIE87, 
-  
-    /*** 88-90 ITU2 ***/
-  
-    IMIA2,IMIB2,OVI2,
-    
-    /*** 91 Reserved ***/
-
-    UIE91, 
-  
-    /*** 92-94 ITU3 ***/
-  
-    IMIA3,IMIB3,OVI3,
-    
-    /*** 95 Reserved ***/
-
-    UIE95, 
-  
-    /*** 96-98 ITU4 ***/
-  
-    IMIA4,IMIB4,OVI4,
-    
-    /*** 99 Reserved ***/
-
-    UIE99,
-    
     /*** 100-103 SCI0 ***/ 
-  
     REI0,RXI0,TXI0,TEI0,
-  
+
     /*** 104-107 SCI1 ***/ 
-  
     REI1,RXI1,TXI1,TEI1,
-  
-    /*** 108 Parity Control Unit ***/
-  
-    UIE108,       
-  
-    /*** 109 AD Converter ***/
-  
-    ADITI
-    
+
+    UIE108,    /*** 108 Parity Control Unit ***/
+    ADITI      /*** 109 AD Converter ***/
 };
 
-
-void system_reboot (void)
-{
-    set_irq_level(HIGHEST_IRQ_LEVEL);
-
-    asm volatile ("ldc\t%0,vbr" : : "r"(0));
-
-    PACR2 |= 0x4000; /* for coldstart detection */
-    IPRA = 0;
-    IPRB = 0;
-    IPRC = 0;
-    IPRD = 0;
-    IPRE = 0;
-    ICR = 0;
-
-    asm volatile ("jmp @%0; mov.l @%1,r15" : :
-                  "r"(*(int*)0),"r"(4));
-}
 
 void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
 {
@@ -1043,7 +1022,25 @@ void system_init(void)
     WCR3 = 0x8000; /* WAIT is pulled up, 1 state inserted for CS6 */
 }
 
-/* Utilize the user break controller to catch invalid memory accesses. */
+void system_reboot (void)
+{
+    set_irq_level(HIGHEST_IRQ_LEVEL);
+
+    asm volatile ("ldc\t%0,vbr" : : "r"(0));
+
+    PACR2 |= 0x4000; /* for coldstart detection */
+    IPRA = 0;
+    IPRB = 0;
+    IPRC = 0;
+    IPRD = 0;
+    IPRE = 0;
+    ICR = 0;
+
+    asm volatile ("jmp @%0; mov.l @%1,r15" : :
+                  "r"(*(int*)0),"r"(4));
+}
+
+/* Utilise the user break controller to catch invalid memory accesses. */
 int system_memory_guard(int newmode)
 {
     static const struct {
@@ -1087,29 +1084,5 @@ int system_memory_guard(int newmode)
     
     return oldmode;
 }
-#endif
+#endif /* CONFIG_CPU */
 
-#if CONFIG_CPU != SH7034
-/* this does nothing on non-SH systems */
-int system_memory_guard(int newmode)
-{
-    (void)newmode;
-    return 0;
-}
-
-void system_reboot (void)
-{
-#ifdef CPU_COLDFIRE
-    set_cpu_frequency(0);
-    
-    asm(" move.w #0x2700,%sr");
-    /* Reset the cookie for the crt0 crash check */
-    asm(" move.l #0,%d0");
-    asm(" move.l %d0,0x10017ffc");
-    asm(" movec.l %d0,%vbr");
-    asm(" move.l 0,%sp");
-    asm(" move.l 4,%a0");
-    asm(" jmp (%a0)");
-#endif
-}
-#endif

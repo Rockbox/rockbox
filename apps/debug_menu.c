@@ -1696,7 +1696,7 @@ bool dbg_screendump(void)
 }
 #endif
 
-#if CONFIG_CPU == SH7034
+#if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE)
 bool dbg_set_memory_guard(void)
 {
     static const struct opt_items names[MAXMEMGUARD] = {
@@ -1711,7 +1711,7 @@ bool dbg_set_memory_guard(void)
 
     return false;
 }
-#endif /* CONFIG_CPU == SH7034 */
+#endif /* CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) */
 
 bool debug_menu(void)
 {
@@ -1732,9 +1732,9 @@ bool debug_menu(void)
         { "PCM recording", pcm_rec_screen },
         { "S/PDIF analyzer", dbg_spdif },
 #endif
-#if CONFIG_CPU == SH7034
+#if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE)
         { "Catch mem accesses", dbg_set_memory_guard },
-#endif /* CONFIG_CPU == SH7034 */
+#endif
         { "View OS stacks", dbg_os },
 #ifdef HAVE_LCD_BITMAP
         { "View battery", view_battery },
