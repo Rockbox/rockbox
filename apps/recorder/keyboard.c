@@ -31,16 +31,25 @@
 #include "settings.h"
 #include "misc.h"
 
+#define KEYBOARD_MARGIN 3
+
+#if (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 96)
+#define KEYBOARD_LINES 8
+#define KEYBOARD_PAGES 1
+
+#else
 #define KEYBOARD_LINES 4
 #define KEYBOARD_PAGES 3
-#define KEYBOARD_MARGIN 3
+
+#endif
+
 
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
     (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define KBD_CURSOR_RIGHT (BUTTON_ON | BUTTON_RIGHT)
 #define KBD_CURSOR_LEFT (BUTTON_ON | BUTTON_LEFT)
 #define KBD_SELECT BUTTON_SELECT
-#define KBD_PAGE_FLIP BUTTON_MODE
+#define KBD_PAGE_FLIP BUTTON_MODE  /* unused */
 #define KBD_DONE_PRE BUTTON_ON
 #define KBD_DONE (BUTTON_ON | BUTTON_REL)
 #define KBD_ABORT BUTTON_OFF
@@ -74,10 +83,23 @@
 
 #endif
 
+#if KEYBOARD_PAGES == 1
+static const char * const kbdpages[KEYBOARD_PAGES][KEYBOARD_LINES] = {
+    {   "ABCDEFG abcdefg !?\" @#$%+'", 
+        "HIJKLMN hijklmn 789 &_()-`",
+        "OPQRSTU opqrstu 456 §|{}/<",  
+        "VWXYZ., vwxyz.,0123 ~=[]*>",
+        "ÀÁÂÃÄÅÆ ÌÍÎÏ ÈÉÊË ¢£¤¥¦§©®",   
+        "àáâãäåæ ìíîï èéêë «»°ºª¹²³",
+        "ÓÒÔÕÖØ ÇÐÞÝß ÙÚÛÜ ¯±×÷¡¿µ·",
+        "òóôõöø çðþýÿ ùúûü ¼½¾¬¶¨  "  },
+};
+
+#else
 static const char * const kbdpages[KEYBOARD_PAGES][KEYBOARD_LINES] = {
     {   "ABCDEFG !?\" @#$%+'", 
         "HIJKLMN 789 &_()-`",
-        "OPQRSTU 456 §|{}/<",  
+        "OPQRSTU 456 §|{}/<",
         "VWXYZ.,0123 ~=[]*>" },
 
     {   "abcdefg ¢£¤¥¦§©®¬",   
@@ -90,6 +112,8 @@ static const char * const kbdpages[KEYBOARD_PAGES][KEYBOARD_LINES] = {
         "ÓÒÔÕÖØ ÇÐÞÝß ÙÚÛÜ",
         "òóôõöø çðþýÿ ùúûü"  },
 };
+
+#endif
 
 /* helper function to spell a char if voice UI is enabled */
 static void kbd_spellchar(char c)
@@ -105,9 +129,10 @@ static void kbd_spellchar(char c)
 
 int kbd_input(char* text, int buflen)
 {
-    bool done = false;
+    bool done = false; 
+#if KEYBOARD_PAGES > 1
     int page = 0;
-
+#endif
     int font_w = 0, font_h = 0, i;
     int x = 0, y = 0;
     int main_x, main_y, max_chars;
@@ -134,7 +159,7 @@ int kbd_input(char* text, int buflen)
     status_y2 = LCD_HEIGHT;
 
     editpos = strlen(text);
-
+    
     max_chars = LCD_WIDTH / font_w - 2; /* leave room for < and > */
     line = kbdpages[0];
 
@@ -207,7 +232,7 @@ int kbd_input(char* text, int buflen)
                 return -1;
                 break;
 
-#ifdef KBD_PAGE_FLIP
+#if defined(KBD_PAGE_FLIP) && KEYBOARD_PAGES > 1
             case KBD_PAGE_FLIP:    
                 if (++page == KEYBOARD_PAGES)
                     page = 0;
@@ -235,7 +260,8 @@ int kbd_input(char* text, int buflen)
                     else
                     {
                         x = 0;
-#ifndef KBD_PAGE_FLIP   /* no dedicated flip key - flip page on wrap */
+#if !defined(KBD_PAGE_FLIP) && KEYBOARD_PAGES > 1   
+                        /* no dedicated flip key - flip page on wrap */
                         if (++page == KEYBOARD_PAGES)
                             page = 0;
                         line = kbdpages[page];
@@ -263,7 +289,8 @@ int kbd_input(char* text, int buflen)
                         x--;
                     else
                     {
-#ifndef KBD_PAGE_FLIP   /* no dedicated flip key - flip page on wrap */
+#if !defined(KBD_PAGE_FLIP) && KEYBOARD_PAGES > 1   
+                        /* no dedicated flip key - flip page on wrap */
                         if (--page < 0)
                             page = (KEYBOARD_PAGES-1);
                         line = kbdpages[page];
