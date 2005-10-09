@@ -743,10 +743,8 @@ struct dircache_entry* readdir_cached(DIRCACHED* dir)
     if (!dir->busy)
         return NULL;
 
-    if (!dircache_initialized)
+    if (dir->regulardir != NULL)
     {
-        if (dir->regulardir == NULL)
-            return NULL;
         regentry = readdir(dir->regulardir);
         if (regentry == NULL)
             return NULL;
@@ -789,8 +787,11 @@ struct dircache_entry* readdir_cached(DIRCACHED* dir)
 
 int closedir_cached(DIRCACHED* dir)
 {
+    if (!dir->busy)
+        return -1;
+        
     dir->busy=false;
-    if (!dircache_initialized && dir->regulardir != NULL)
+    if (dir->regulardir != NULL)
         return closedir(dir->regulardir);
     
     return 0;
