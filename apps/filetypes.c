@@ -238,13 +238,17 @@ int filetype_get_attr(const char* name)
 int filetype_load_menu(struct menu_item*  menu,int max_items)
 {
     int i;
+    char *cp;
     int cnt=0;
 
     for (i=0; i < cnt_filetypes; i++)
     {
         if (filetypes[i].plugin)
         {
-            menu[cnt].desc = filetypes[i].plugin;
+            cp=strrchr(filetypes[i].plugin,'/');
+            if (cp) cp++;
+            else    cp=filetypes[i].plugin;
+            menu[cnt].desc = cp;
             cnt++;
             if (cnt == max_items)
                 break;
