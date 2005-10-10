@@ -2978,7 +2978,7 @@ new: "Alarmet avaktiverat"
 id: LANG_RECORD_TRIGGER
 desc: in recording settings_menu
 eng: "Trigger"
-voice: 
+voice: "Trigger"
 new: "Startläge"
 
 id: LANG_RECORD_START_THRESHOLD
@@ -3050,7 +3050,7 @@ new: "Start aktiverad"
 id: LANG_LCD_REMOTE_MENU
 desc: in the display sub menu
 eng: "Remote-LCD Settings"
-voice: ""
+voice: "Remote LCD settings"
 new: "Fjärr-LCD"
 
 id: LANG_DISK_NAME_INTERNAL
@@ -3128,7 +3128,7 @@ new: "Värdera sången"
 id: LANG_RATING
 desc: in set_rating
 eng: "Rating:"
-voice: 
+voice: "Rating"
 new: "Värdering:"
 
 id: LANG_CROSSFADE_DURATION
@@ -3204,10 +3204,10 @@ voice: ""
 new: ""
 
 id: LANG_REPLAYGAIN_PREAMP
-desc: in browse_id3
+desc: in replaygain settings
 eng: "Pre-amp"
-voice: 
-new: "Volymljustering"
+voice: "Preamp"
+new: "Förförstärkning"
 
 id: LANG_UNIT_DB
 desc: in browse_id3
@@ -3218,7 +3218,7 @@ new: "dB"
 id: LANG_BIDI_SUPPORT
 desc: in settings_menu, option to enable reversal of hebrew/arabic text
 eng: "BiDi Hebrew/Arabic"
-voice: 
+voice: "Bidirectional text"
 new: "BiDi Hebrew/Arabic"
 
 id: LANG_ID3_VBR
@@ -3230,25 +3230,25 @@ new: " (VBR)"
 id: LANG_BEEP
 desc: in playback settings
 eng: "Beep volume"
-voice: 
+voice: "Beep volume"
 new: "Pipvolym"
 
 id: LANG_WEAK
 desc: in beep volume in playback settings
 eng: "Weak"
-voice: 
+voice: "Weak"
 new: "Svag"
 
 id: LANG_MODERATE
 desc: in beep volume in playback settings
 eng: "Moderate"
-voice: 
+voice: "Moderate"
 new: "Medel"
 
 id: LANG_STRONG
 desc: in beep volume in playback settings
 eng: "Strong"
-voice: 
+voice: "Strong"
 new: "Stark"
 
 id: LANG_REPEAT_AB
@@ -3256,3 +3256,27 @@ desc: repeat one song
 eng: "A-B"
 voice: "A-B"
 new: "A-B"
+
+id: LANG_SHUFFLE_GAIN
+desc: use track gain if shuffle mode is on, album gain otherwise
+eng: "Track gain if shuffling"
+voice: "Track gain if shuffling"
+new: "Spårvolymutjämning vid blandning"
+
+id: LANG_DIRCACHE_ENABLE
+desc: in directory cache settings
+eng: "Directory cache"
+voice: "Directory cache"
+new: "Katalogcache"
+
+id: LANG_DIRCACHE_REBOOT
+desc: when activating directory cache
+eng: "Please reboot to enable the cache"
+voice: ""
+new: "Starta om för att aktivera cachen"
+
+id: LANG_DIRCACHE_BUILDING
+desc: when booting up and rebuilding the cache
+eng: "Scanning disk..."
+voice: ""
+new: "Skannar disken..."
