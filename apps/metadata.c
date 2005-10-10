@@ -1284,6 +1284,12 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
 
         break;
 
+    case AFMT_MPC:
+        if (!read_ape_tags(fd, &(track->id3)))
+        {
+            return false;
+        }
+        break;
     case AFMT_OGG_VORBIS:
         if (!get_vorbis_metadata(fd, &(track->id3)))
         {
