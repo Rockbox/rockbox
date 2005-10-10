@@ -18,9 +18,7 @@
  ****************************************************************************/
 
 #include "codec.h"
-#include "playback.h"
 #include "lib/codeclib.h"
-#include "dsp.h"
 #include "inttypes.h"
 
 /* This codec support WAVE files with the following formats:
@@ -91,7 +89,7 @@ enum
 /* for 44.1kHz stereo 16bits, this represents 0.023s ~= 1/50s */
 #define WAV_CHUNK_SIZE (1024*2)
 
-#ifndef SIMULATOR
+#ifdef USE_IRAM
 extern char iramcopy[];
 extern char iramstart[];
 extern char iramend[];
@@ -224,14 +222,14 @@ enum codec_status codec_start(struct codec_api* api)
   uint16_t formattag = 0;
   uint16_t blockalign = 0;
   uint32_t avgbytespersec = 0;
-  off_t firstblockposn;		/* position of the first block in file */
-  int shortorlong = 1;		/* do we output shorts (1) or longs (2)? */
+  off_t firstblockposn;     /* position of the first block in file */
+  int shortorlong = 1;      /* do we output shorts (1) or longs (2)? */
   int32_t * const int32_samples = (int32_t*)int16_samples;
 
   /* Generic codec initialisation */
   TEST_CODEC_API(api);
 
-#ifndef SIMULATOR
+#ifdef USE_IRAM 
   rb->memcpy(iramstart, iramcopy, iramend-iramstart);
 #endif
 
@@ -244,7 +242,7 @@ enum codec_status codec_start(struct codec_api* api)
   next_track:
 
   if (codec_init(api)) {
-    return CODEC_ERROR;
+      return CODEC_ERROR;
   }
 
   while (!*rb->taginfo_ready)
@@ -253,10 +251,10 @@ enum codec_status codec_start(struct codec_api* api)
   /* assume the WAV header is less than 1024 bytes */
   buf=rb->request_buffer(&n,1024);
   if (n<44) {
-    return CODEC_ERROR;
+      return CODEC_ERROR;
   }
   if ((memcmp(buf,"RIFF",4)!=0) || (memcmp(&buf[8],"WAVE",4)!=0)) {
-    return CODEC_ERROR;
+      return CODEC_ERROR;
   }
 
   buf += 12;
@@ -287,33 +285,33 @@ enum codec_status codec_start(struct codec_api* api)
           if (formattag != WAVE_FORMAT_PCM) {
               uint16_t size;
               if (i<18) {
-		  /* this is not a fatal error with some formats,
-		   * we'll see later if we can't decode it */
+                  /* this is not a fatal error with some formats,
+                   * we'll see later if we can't decode it */
                   DEBUGF("CODEC_WARNING: non-PCM WAVE (formattag=0x%x) "
-			 "doesn't have ext. fmt descr (chunksize=%d<18).\n",
-			 formattag, i);
+                         "doesn't have ext. fmt descr (chunksize=%d<18).\n",
+                         formattag, i);
               }
               size = buf[24]|(buf[25]<<8);
               if (formattag == WAVE_FORMAT_DVI_ADPCM) {
                   if (size < 2) {
                       DEBUGF("CODEC_ERROR: dvi_adpcm is missing "
-			     "SamplesPerBlock value\n");
+                             "SamplesPerBlock value\n");
                       return CODEC_ERROR;
                   }
                   samplesperblock = buf[26]|(buf[27]<<8);
               }
-	      else if (formattag == WAVE_FORMAT_EXTENSIBLE) {
+              else if (formattag == WAVE_FORMAT_EXTENSIBLE) {
                   if (size < 22) {
                       DEBUGF("CODEC_ERROR: WAVE_FORMAT_EXTENSIBLE is "
-			     "missing extension\n");
+                             "missing extension\n");
                       return CODEC_ERROR;
                   }
-		  /* wValidBitsPerSample */
-		  bitspersample = buf[26]|(buf[27]<<8);
-		  /* skipping dwChannelMask (4bytes) */
-		  /* SubFormat (only get the first two bytes) */
-		  formattag = buf[32]|(buf[33]<<8);
-	      }
+                  /* wValidBitsPerSample */
+                  bitspersample = buf[26]|(buf[27]<<8);
+                  /* skipping dwChannelMask (4bytes) */
+                  /* SubFormat (only get the first two bytes) */
+                  formattag = buf[32]|(buf[33]<<8);
+              }
           }
       }
       else if (memcmp(buf,"data",4)==0) {
@@ -328,11 +326,11 @@ enum codec_status codec_start(struct codec_api* api)
       }
       else {
           DEBUGF("unknown WAVE chunk: '%c%c%c%c', size=%lu\n",
-		 buf[0], buf[1], buf[2], buf[3],i);
+                 buf[0], buf[1], buf[2], buf[3],i);
       }
       /* go to next chunk (even chunk sizes must be padded) */
       if (i & 0x01)
-	  i++;
+          i++;
       buf += i+8;
       if (n < (i+8)) {
           DEBUGF("CODEC_ERROR: WAVE header size > 1024\n");
@@ -368,7 +366,7 @@ enum codec_status codec_start(struct codec_api* api)
   }
   if (formattag == WAVE_FORMAT_PCM && bitspersample > 32) {
       DEBUGF("CODEC_ERROR: pcm with more than 32 bitspersample "
-	     "is unsupported\n");
+             "is unsupported\n");
       return CODEC_ERROR;
   }
 
@@ -396,15 +394,15 @@ enum codec_status codec_start(struct codec_api* api)
 
   if (totalsamples == 0) {
       if (formattag == WAVE_FORMAT_PCM ||
-	  formattag == WAVE_FORMAT_ALAW || formattag == WAVE_FORMAT_MULAW ||
-	  formattag == IBM_FORMAT_ALAW || formattag == IBM_FORMAT_MULAW) {
-	  /* for PCM and derived formats only */
-	  bytespersample=(((bitspersample-1)/8+1)*channels);
-	  totalsamples=numbytes/bytespersample;
+          formattag == WAVE_FORMAT_ALAW || formattag == WAVE_FORMAT_MULAW ||
+          formattag == IBM_FORMAT_ALAW || formattag == IBM_FORMAT_MULAW) {
+          /* for PCM and derived formats only */
+          bytespersample=(((bitspersample-1)/8+1)*channels);
+          totalsamples=numbytes/bytespersample;
       }
       else {
-	  DEBUGF("CODEC_ERROR: cannot compute totalsamples\n");
-	  return CODEC_ERROR;
+          DEBUGF("CODEC_ERROR: cannot compute totalsamples\n");
+          return CODEC_ERROR;
       }
   }
 
@@ -426,7 +424,7 @@ enum codec_status codec_start(struct codec_api* api)
       / (uint64_t)avgbytespersec >= WAV_CHUNK_SIZE) {
       chunksize = ((uint64_t)WAV_CHUNK_SIZE * avgbytespersec
                    / ((uint64_t)rb->id3->frequency * channels * shortorlong 
-		      * blockalign)) * blockalign;
+                      * blockalign)) * blockalign;
   }
 
   while (!endofstream) {
@@ -434,32 +432,32 @@ enum codec_status codec_start(struct codec_api* api)
 
       rb->yield();
     if (rb->stop_codec || rb->reload_codec) {
-      break;
+        break;
     }
 
     if (rb->seek_time) {
-	uint32_t newpos;
+        uint32_t newpos;
 
-	/* use avgbytespersec to round to the closest blockalign multiple,
-	   add firstblockposn. 64-bit casts to avoid overflows. */
-	newpos = (((uint64_t)avgbytespersec * rb->seek_time)
-		  / (1000LL*blockalign)) * blockalign;
-	if (newpos > numbytes)
-	    break;
-	if (rb->seek_buffer(firstblockposn + newpos)) {
-	    bytesdone = newpos;
-	}
-	rb->seek_time = 0;
+        /* use avgbytespersec to round to the closest blockalign multiple,
+           add firstblockposn. 64-bit casts to avoid overflows. */
+        newpos = (((uint64_t)avgbytespersec * rb->seek_time)
+                  / (1000LL*blockalign)) * blockalign;
+        if (newpos > numbytes)
+            break;
+        if (rb->seek_buffer(firstblockposn + newpos)) {
+            bytesdone = newpos;
+        }
+        rb->seek_time = 0;
     }
     wavbuf=rb->request_buffer(&n,chunksize);
     wavbuf8 = (uint8_t*)wavbuf;
 
     if (n==0)
-	break; /* End of stream */
+        break; /* End of stream */
 
     if (bytesdone + n > numbytes) {
-	n = numbytes - bytesdone;
-	endofstream = 1;
+        n = numbytes - bytesdone;
+        endofstream = 1;
     }
 
     wavbufsize = sizeof(int16_samples);
@@ -467,15 +465,15 @@ enum codec_status codec_start(struct codec_api* api)
     if (formattag == WAVE_FORMAT_PCM) {
         if (bitspersample > 24) {
             for (i=0;i<n;i+=4) {
-		int32_samples[i/4]=(int32_t)(wavbuf8[i]|(wavbuf8[i+1]<<8)|
-					     (wavbuf8[i+2]<<16)|(wavbuf8[i+3]<<24));
+                int32_samples[i/4]=(int32_t)(wavbuf8[i]|(wavbuf8[i+1]<<8)|
+                                             (wavbuf8[i+2]<<16)|(wavbuf8[i+3]<<24));
             }
             wavbufsize = n;
         }
         else if (bitspersample > 16) {
             for (i=0;i<n;i+=3) {
-		int32_samples[i/3]=(int32_t)((wavbuf8[i]<<8)|
-			   (wavbuf8[i+1]<<16)|(wavbuf8[i+2]<<24));
+                int32_samples[i/3]=(int32_t)((wavbuf8[i]<<8)|
+                           (wavbuf8[i+1]<<16)|(wavbuf8[i+2]<<24));
            }
             wavbufsize = n*4/3;
         }
@@ -527,7 +525,7 @@ enum codec_status codec_start(struct codec_api* api)
     }
 
     while (!rb->pcmbuf_insert((char*)int16_samples, wavbufsize)) {
-	rb->yield();
+        rb->yield();
     }
 
     rb->advance_buffer(n);
@@ -540,7 +538,7 @@ enum codec_status codec_start(struct codec_api* api)
   }
 
   if (rb->request_next_track())
-    goto next_track;
+      goto next_track;
 
   return CODEC_OK;
 }
