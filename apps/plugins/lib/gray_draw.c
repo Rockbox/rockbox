@@ -578,8 +578,7 @@ void gray_ub_clear_display(void)
 /* Write a pixel block, defined by their brightnesses in a greymap.
    Address is the byte in the first bitplane, src is the greymap start address,
    stride is the increment for the greymap to get to the next pixel, mask
-   determines which pixels of the destination block are changed. For "0" bits,
-   the src address is not incremented! */
+   determines which pixels of the destination block are changed. */
 static void _writearray(unsigned char *address, const unsigned char *src,
                         int stride, unsigned mask)
 {
@@ -757,11 +756,11 @@ static void _writearray(unsigned char *address, const unsigned char *src,
     /* precalculate the bit patterns with random shifts 
        for all 8 pixels and put them on an extra "stack" */
     asm volatile (
-        "moveq.l #8,%%d3     \n"  /* loop count in d3: 4 pixels */
+        "moveq.l #8,%%d3     \n"  /* loop count in d3: 8 pixels */
 
     ".wa_loop:               \n"  /** load pattern for pixel **/
         "clr.l   %%d2        \n"  /* pattern for skipped pixel must be 0 */
-        "lsr.l   #1,%[mask]  \n"  /* shift out 2 lsbs of mask */
+        "lsr.l   #1,%[mask]  \n"  /* shift out lsb of mask */
         "bcc.b   .wa_skip    \n"  /* skip this pixel */
 
         "clr.l   %%d0        \n"
