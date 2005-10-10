@@ -159,7 +159,6 @@ asm (
     "subx.l  %d4,%d4     \n"
     "neg.l   %d4         \n"  /* carry -> %d4 */
     "swap    %d4         \n"
-    "clr.w   %d4         \n"
     "swap    %d5         \n" 
     "move.w  %d5,%d4     \n"
     "clr.w   %d5         \n"  /* %d4%d5 <<= 16 */
