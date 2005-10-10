@@ -148,9 +148,9 @@ irq_handler:
     /* Chip select 0 - Flash ROM */
     moveq.l #0x00,%d0      /* CSAR0 - Base = 0x00000000 */
     move.l  %d0,(0x080,%a0)
-    move.l  #0x001f0101,%d0 /* CSMR0 - 2M, All access, write protect */
+    move.l  #0x001f0001,%d0 /* CSMR0 - 2M, All access */
     move.l  %d0,(0x084,%a0)
-    move.l  #0x00000d80,%d0 /* CSCR0 - 3 wait states, 16 bits, no bursts */
+    move.l  #0x00000180,%d0 /* CSCR0 - no wait states, 16 bits, no bursts */
     move.l  %d0,(0x088,%a0)
         
     /* Chip select 1 - LCD controller */
@@ -158,7 +158,7 @@ irq_handler:
     move.l  %d0,(0x08c,%a0)
     moveq.l #0x75,%d0      /* CSMR1 - 64K, Only data access */
     move.l  %d0,(0x090,%a0)
-    move.l  #0x00000180,%d0 /* CSCR1 - 0 wait states, 16 bits, no bursts */
+    move.l  #0x00000180,%d0 /* CSCR1 - no wait states, 16 bits, no bursts */
     move.l  %d0,(0x094,%a0)
         
     /* Chip select 2 - ATA controller */
