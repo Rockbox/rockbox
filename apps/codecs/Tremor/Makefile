@@ -37,7 +37,7 @@ $(OUTPUT): $(OBJS)
 
 $(OBJDIR)/%.o: $(APPSDIR)/codecs/Tremor/%.c
 	@echo "(Tremor) CC "`basename $<`
-	@$(CC) -c -O2 $(CFLAGS) -I$(APPSDIR)/codecs/Tremor/ $< -o $@
+	@$(CC) -c $(CFLAGS) -I$(APPSDIR)/codecs/Tremor/ $< -o $@
 
 include $(TOOLSDIR)/make.inc
 
