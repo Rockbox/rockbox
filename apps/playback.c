@@ -633,6 +633,8 @@ off_t codec_mp3_get_filepos_callback(int newtime)
 
 void codec_seek_complete_callback(void)
 {
+    /* assume we're called from non-voice codec, as they shouldn't seek */
+    ci.seek_time = 0;
     pcmbuf_flush_audio();
 }
 
