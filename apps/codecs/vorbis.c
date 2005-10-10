@@ -16,18 +16,12 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "kernel.h"
-#include "codecs.h"
-
+#include "codec.h"
+#include "lib/codeclib.h"
 #include "Tremor/ivorbisfile.h"
 #include "Tremor/ogg.h"
-#include "playback.h"
-#include "dsp.h"
-#include "lib/codeclib.h"
 
-#define TEST_RESUME
-
-static struct codec_api* rb;
+static struct codec_api *rb;
 
 /* Some standard functions and variables needed by Tremor */
 
@@ -39,7 +33,8 @@ size_t read_handler(void *ptr, size_t size, size_t nmemb, void *datasource)
     return rb->read_filebuf(ptr, nmemb*size);
 }
 
-int initial_seek_handler(void *datasource, ogg_int64_t offset, int whence) {
+int initial_seek_handler(void *datasource, ogg_int64_t offset, int whence)
+{
     (void)datasource;
     (void)offset;
     (void)whence;
@@ -50,14 +45,14 @@ int seek_handler(void *datasource, ogg_int64_t offset, int whence)
 {
     (void)datasource;
 
-    if ( whence == SEEK_CUR ) {
-      offset += rb->curpos;
-    } else if ( whence == SEEK_END ) {
-      offset += rb->filesize;
+    if (whence == SEEK_CUR) {
+        offset += rb->curpos;
+    } else if (whence == SEEK_END) {
+        offset += rb->filesize;
     }
 
     if (rb->seek_buffer(offset)) {
-      return 0;
+        return 0;
     }
 
     return -1;
@@ -81,11 +76,11 @@ long tell_handler(void *datasource)
  */
 bool vorbis_set_codec_parameters(OggVorbis_File *vf)
 {
-    vorbis_info* vi;
+    vorbis_info *vi;
 
-    vi=ov_info(vf,-1);
+    vi = ov_info(vf, -1);
 
-    if (vi==NULL) {
+    if (vi == NULL) {
         //rb->splash(HZ*2, true, "Vorbis Error");
         return false;
     }
@@ -108,13 +103,12 @@ extern char iramstart[];
 extern char iramend[];
 #endif
 
-
 /* this is the codec entry point */
-enum codec_status codec_start(struct codec_api* api)
+enum codec_status codec_start(struct codec_api *api)
 {
     ov_callbacks callbacks;
     OggVorbis_File vf;
-    ogg_int32_t** pcm;
+    ogg_int32_t **pcm;
 
     int error;
     long n;
@@ -127,33 +121,30 @@ enum codec_status codec_start(struct codec_api* api)
     ogg_int64_t vf_pcmlengths[2];
 
     TEST_CODEC_API(api);
-
-    /* if you are using a global api pointer, don't forget to copy it!
-         otherwise you will get lovely "I04: IllInstr" errors... :-) */
     rb = api;
 
     #ifdef USE_IRAM
-    rb->memcpy(iramstart, iramcopy, iramend-iramstart);
+    rb->memcpy(iramstart, iramcopy, iramend - iramstart);
     #endif
 
     rb->configure(CODEC_DSP_ENABLE, (bool *)true);
     rb->configure(DSP_DITHER, (bool *)false);
-    rb->configure(DSP_SET_SAMPLE_DEPTH, (long *) (24));
-    rb->configure(DSP_SET_CLIP_MAX, (long *)  ((1 << 24) - 1));
-    rb->configure(DSP_SET_CLIP_MIN, (long *) -((1 << 24) - 1));
+    rb->configure(DSP_SET_SAMPLE_DEPTH, (long *)24);
+    rb->configure(DSP_SET_CLIP_MAX, (long *)((1 << 24) - 1));
+    rb->configure(DSP_SET_CLIP_MIN, (long *)-((1 << 24) - 1));
     /* Note: These are sane defaults for these values.  Perhaps
      * they should be set differently based on quality setting
      */
-    rb->configure(CODEC_SET_FILEBUF_LIMIT, (int *)(1024*1024*2));
+    rb->configure(CODEC_SET_FILEBUF_LIMIT, (long *)(1024*1024*2));
 
     /* The chunk size below is magic.  If set any lower, resume
      * doesn't work properly (ov_raw_seek() does the wrong thing).
      */
-    rb->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*256));
+    rb->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (long *)(1024*256));
 
     
 /* We need to flush reserver memory every track load. */
-  next_track:
+next_track:
     if (codec_init(rb)) {
         return CODEC_ERROR;
     }
@@ -162,13 +153,13 @@ enum codec_status codec_start(struct codec_api* api)
         rb->sleep(1);
 
     /* Create a decoder instance */
-    callbacks.read_func=read_handler;
-    callbacks.seek_func=initial_seek_handler;
-    callbacks.tell_func=tell_handler;
-    callbacks.close_func=close_handler;
+    callbacks.read_func = read_handler;
+    callbacks.seek_func = initial_seek_handler;
+    callbacks.tell_func = tell_handler;
+    callbacks.close_func = close_handler;
 
     /* Open a non-seekable stream */
-    error=ov_open_callbacks(rb,&vf,NULL,0,callbacks);
+    error = ov_open_callbacks(rb, &vf, NULL, 0, callbacks);
     
     /* If the non-seekable open was successful, we need to supply the missing
      * data to make it seekable.  This is a hack, but it's reasonable since we
@@ -182,7 +173,7 @@ enum codec_status codec_start(struct codec_api* api)
      * physical Ogg bitstream.  This is verified in metadata.c, well before we
      * get here.
      */
-    if ( !error ) {
+    if (!error) {
          vf.offsets = vf_offsets;
          vf.dataoffsets = &vf_dataoffsets;
          vf.serialnos = &vf_serialnos;
@@ -194,7 +185,7 @@ enum codec_status codec_start(struct codec_api* api)
          vf.pcmlengths[0] = 0;
          vf.pcmlengths[1] = rb->id3->samples;
          vf.serialnos[0] = vf.current_serialno;
-         vf.callbacks.seek_func=seek_handler;
+         vf.callbacks.seek_func = seek_handler;
          vf.seekable = 1;
          vf.end = rb->id3->filesize;
          vf.ready_state = OPENED;
@@ -204,32 +195,31 @@ enum codec_status codec_start(struct codec_api* api)
          return CODEC_ERROR;
     }
 
-    if ( rb->id3->offset ) {
+    if (rb->id3->offset) {
         rb->advance_buffer(rb->id3->offset);
-        ov_raw_seek(&vf,rb->id3->offset);
+        ov_raw_seek(&vf, rb->id3->offset);
         rb->set_elapsed(ov_time_tell(&vf));
         rb->set_offset(ov_raw_tell(&vf));
     }
 
-    eof=0;
+    eof = 0;
     while (!eof) {
         rb->yield();
         if (rb->stop_codec || rb->reload_codec)
-            break ;
+            break;
 
         if (rb->seek_time) {
-        
             if (ov_time_seek(&vf, rb->seek_time)) {
                 //rb->logf("ov_time_seek failed");
             }
-            rb->seek_time = 0;
+            rb->seek_complete();
         }
 
         /* Read host-endian signed 24-bit PCM samples */
-        n=ov_read_fixed(&vf,&pcm,1024,&current_section);
+        n = ov_read_fixed(&vf, &pcm, 1024, &current_section);
 
         /* Change DSP and buffer settings for this bitstream */
-        if ( current_section != previous_section ) {
+        if (current_section != previous_section) {
             if (!vorbis_set_codec_parameters(&vf)) {
                 return CODEC_ERROR;
             } else {
@@ -237,30 +227,28 @@ enum codec_status codec_start(struct codec_api* api)
             }
         }
 
-        if (n==0) {
-            eof=1;
+        if (n == 0) {
+            eof = 1;
         } else if (n < 0) {
             DEBUGF("Error decoding frame\n");
         } else {
             while (!rb->pcmbuf_insert_split(pcm[0], pcm[1], 
-                n * sizeof(ogg_int32_t))) {
+                   n*sizeof(ogg_int32_t))) {
                 rb->sleep(1);
             }
-
-        rb->set_offset(ov_raw_tell(&vf));
-        rb->set_elapsed(ov_time_tell(&vf));
-
+            rb->set_offset(ov_raw_tell(&vf));
+            rb->set_elapsed(ov_time_tell(&vf));
         }
     }
     
     if (rb->request_next_track()) {
-    /* Clean things up for the next track */
+        /* Clean things up for the next track */
         vf.dataoffsets = NULL;
         vf.offsets = NULL;
         vf.serialnos = NULL;
         vf.pcmlengths = NULL;
         ov_clear(&vf);
-	previous_section = -1;
+        previous_section = -1;
         goto next_track;
     }
         
