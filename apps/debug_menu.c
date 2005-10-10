@@ -83,10 +83,8 @@ bool dbg_os(void)
     int i;
     int usage;
 
-#ifdef HAVE_LCD_BITMAP
     lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
-#endif
     lcd_clear_display();
 
     while(1)
@@ -111,7 +109,7 @@ bool dbg_os(void)
     }
     return false;
 }
-#else
+#else /* !HAVE_LCD_BITMAP */
 bool dbg_os(void)
 {
     char buf[32];
@@ -151,7 +149,7 @@ bool dbg_os(void)
     }
     return false;
 }
-#endif
+#endif /* !HAVE_LCD_BITMAP */
 
 #ifdef HAVE_LCD_BITMAP
 #if CONFIG_CODEC != SWCODEC
@@ -206,7 +204,7 @@ bool dbg_audio_thread(void)
     }
     return false;
 }
-#else
+#else /* CONFIG_CODEC == SWCODEC */
 extern size_t audiobuffer_free;
 extern int filebuflen;
 extern int filebufused;
@@ -286,8 +284,8 @@ bool dbg_audio_thread(void)
     
     return false;
 }
-#endif
-#endif
+#endif /* CONFIG_CODEC */
+#endif /* HAVE_LCD_BITMAP */
 
 /* Tool function to calculate a CRC16 across some buffer */
 unsigned short crc_16(const unsigned char* buf, unsigned len)
@@ -345,7 +343,6 @@ static unsigned flash_read_word(unsigned addr) {
 
 #endif
 
-
 /* Tool function to read the flash manufacturer and type, if available.
    Only chips which could be reprogrammed in system will return values.
    (The mode switch addresses vary between flash manufacturers, hence addr1/2) */
@@ -362,11 +359,15 @@ bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
 #if CONFIG_CPU == TCC730
 #define FLASH(addr) (flash_read_word(addr))
 #define SET_FLASH(addr, val) (flash_write_word((addr), (val)))
-#else
+
+#else /* memory mapped */
+#if CONFIG_CPU == SH7034
     volatile unsigned char* flash = (unsigned char*)0x2000000; /* flash mapping */
+#elif CONFIG_CPU == MCF5249
+    volatile unsigned short* flash = (unsigned short*)0; /* flash mapping */
+#endif
 #define FLASH(addr) (flash[addr])
 #define SET_FLASH(addr, val) (flash[addr] = val)
-    
 #endif
     int old_level; /* saved interrupt level */
 
@@ -390,7 +391,7 @@ bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
     /* sleep(HZ/50); no sleeping possible while interrupts are disabled */
 
     set_irq_level(old_level); /* enable interrupts again */
-
+    
     /* I assume success if the obtained values are different from
         the normal flash content. This is not perfectly bulletproof, they 
         could theoretically be the same by chance, causing us to fail. */
@@ -500,10 +501,46 @@ bool dbg_hw_info(void)
         if(button == SETTINGS_CANCEL)
             return false;
     }
-#endif /* CONFIG_CPU == SH7034 */
+#elif CONFIG_CPU == MCF5249
+    char buf[32];
+    int button;
+    unsigned manu, id; /* flash IDs */
+    bool got_id; /* flag if we managed to get the flash IDs */
+    int oldmode;  /* saved memory guard mode */
+
+    oldmode = system_memory_guard(MEMGUARD_NONE);  /* disable memory guard */
+
+    /* get flash ROM type */
+    got_id = dbg_flash_id(&manu, &id, 0x5555, 0x2AAA); /* try SST, Atmel, NexFlash */
+    if (!got_id)
+        got_id = dbg_flash_id(&manu, &id, 0x555, 0x2AA); /* try AMD, Macronix */
+    
+    system_memory_guard(oldmode);  /* re-enable memory guard */
+
+    lcd_setmargins(0, 0);
+    lcd_setfont(FONT_SYSFIXED);
+    lcd_clear_display();
+
+    lcd_puts(0, 0, "[Hardware info]");
+
+    if (got_id)
+        snprintf(buf, 32, "Flash: M=%04x D=%04x", manu, id);
+    else
+        snprintf(buf, 32, "Flash: M=???? D=????"); /* unknown, sorry */
+    lcd_puts(0, 1, buf);
+
+    lcd_update();
+
+    while(1)
+    {
+        button = button_get(true);
+        if(button == SETTINGS_CANCEL)
+            return false;
+    }
+#endif /* CONFIG_CPU */
     return false;
 }
-#else
+#else /* !HAVE_LCD_BITMAP */
 bool dbg_hw_info(void)
 {
     char buf[32];
@@ -600,7 +637,7 @@ bool dbg_hw_info(void)
     }
     return false;
 }
-#endif
+#endif /* !HAVE_LCD_BITMAP */
 
 bool dbg_partitions(void)
 {
@@ -813,7 +850,7 @@ bool dbg_spdif(void)
 
     return false;
 }
-#endif
+#endif /* CPU_COLDFIRE */
 
 #ifdef HAVE_LCD_BITMAP
 /* Test code!!! */
@@ -828,10 +865,8 @@ bool dbg_ports(void)
     int battery_voltage;
     int batt_int, batt_frac;
 
-#ifdef HAVE_LCD_BITMAP
     lcd_setfont(FONT_SYSFIXED);
     lcd_setmargins(0, 0);
-#endif
     lcd_clear_display();
 
     while(1)
@@ -954,10 +989,10 @@ bool dbg_ports(void)
         }
     }
 
-#endif /* CONFIG_CPU == SH7034 */
+#endif /* CPU */
     return false;
 }
-#else
+#else /* !HAVE_LCD_BITMAP */
 bool dbg_ports(void)
 {
     unsigned short porta;
@@ -1046,7 +1081,7 @@ bool dbg_ports(void)
     }
     return false;
 }
-#endif
+#endif /* !HAVE_LCD_BITMAP */
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 extern int boost_counter;
@@ -1103,7 +1138,7 @@ bool dbg_cpufreq(void)
 
     return false;
 }
-#endif
+#endif /* HAVE_ADJUSTABLE_CPU_FREQ */
                
 #ifdef HAVE_LCD_BITMAP
 /*
@@ -1122,10 +1157,9 @@ bool view_battery(void)
     unsigned short maxv, minv;
     char buf[32];
     
-#ifdef HAVE_LCD_BITMAP
     lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
-#endif
+
     while(1)
     {
         switch (view) {
@@ -1195,7 +1229,7 @@ bool view_battery(void)
                 snprintf(buf, 30, "long delta: %d", long_delta);
                 lcd_puts(0, 6, buf);
                 lcd_puts(0, 7, power_message);
-#endif
+#endif /* HAVE_CHARGE_CTRL */
                 break;
                 
             case 2: /* voltage deltas: */
@@ -1229,7 +1263,7 @@ bool view_battery(void)
 
                 snprintf(buf, 30, "Trickle sec: %d/60", trickle_sec);
                 lcd_puts(0, 4, buf);
-#endif
+#endif /* HAVE_CHARGE_CTRL */
 
                 snprintf(buf, 30, "Last PwrHist: %d.%02d V",
                     power_history[0] / 100,
@@ -1266,7 +1300,7 @@ bool view_battery(void)
     return false;
 }
 
-#endif
+#endif /* HAVE_LCD_BITMAP */
                               
 static bool view_runtime(void)
 {
@@ -1455,7 +1489,7 @@ bool dbg_mmc_info(void)
 
     return false;
 }
-#else /* Disk-based jukebox */
+#else /* !HAVE_MMC */
 static bool dbg_disk_info(void)
 {
     char buf[128];
@@ -1625,7 +1659,7 @@ static bool dbg_disk_info(void)
 
     return false;
 }
-#endif
+#endif /* !HAVE_MMC */
 
 #if CONFIG_CPU == SH7034
 bool dbg_save_roms(void)
@@ -1650,7 +1684,25 @@ bool dbg_save_roms(void)
     system_memory_guard(oldmode);
     return false;
 }
-#endif /*  CONFIG_CPU == SH7034 */
+#elif defined CPU_COLDFIRE
+bool dbg_save_roms(void)
+{
+    int fd;
+    int oldmode = system_memory_guard(MEMGUARD_NONE);
+
+#if defined(IRIVER_H100_SERIES)
+    fd = creat("/internal_rom_000000-1FFFFF.bin", O_WRONLY);
+    if(fd >= 0)
+    {
+        write(fd, (void *)0, 0x200000);
+        close(fd);
+    }
+#endif
+
+    system_memory_guard(oldmode);
+    return false;
+}
+#endif /* CPU */
 
 #ifdef CONFIG_TUNER
 bool dbg_fm_radio(void)
@@ -1682,7 +1734,7 @@ bool dbg_fm_radio(void)
     }
     return false;
 }
-#endif
+#endif /* CONFIG_TUNER */
 
 #ifdef HAVE_LCD_BITMAP
 extern bool do_screendump_instead_of_usb;
@@ -1694,7 +1746,7 @@ bool dbg_screendump(void)
                  do_screendump_instead_of_usb?"enabled":"disabled");
     return false;
 }
-#endif
+#endif /* HAVE_LCD_BITMAP */
 
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE)
 bool dbg_set_memory_guard(void)
@@ -1719,10 +1771,8 @@ bool debug_menu(void)
     bool result;
 
     static const struct menu_item items[] = {
-#if CONFIG_CPU == SH7034
-        { "Dump ROM contents", dbg_save_roms },
-#endif
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE)
+        { "Dump ROM contents", dbg_save_roms },
         { "View I/O ports", dbg_ports },
 #endif
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
