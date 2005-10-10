@@ -846,6 +846,7 @@ MAKEFLAGS += --no-print-directory
 
 all:
 #SIMUL#
+	@\$(MAKE) -C \$(TOOLSDIR)
 	@\$(MAKE) -C \$(FIRMDIR) OBJDIR=\$(BUILDDIR)/firmware
 	@\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@
 
