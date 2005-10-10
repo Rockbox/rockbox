@@ -43,8 +43,10 @@
 #include "mpeg.h"
 #include "audio.h"
 #include "mp3_playback.h"
-#if (HWCODEC == SWCODEC)
+#if (CONFIG_CODEC == SWCODEC)
+#include "dsp.h"
 #include "pcm_playback.h"
+#include "playback.h"
 #endif
 #include "settings.h"
 #include "thread.h"
