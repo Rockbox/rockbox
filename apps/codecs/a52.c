@@ -90,7 +90,7 @@ void a52_decode_data(uint8_t *start, uint8_t *end)
 
                 if (a52_frame(state, buf, &flags, &level, bias))
                     goto error;
-
+                a52_dynrng(state, NULL, NULL);
                 frequency = sample_rate;
 
                 /* An A52 frame consists of 6 blocks of 256 samples
