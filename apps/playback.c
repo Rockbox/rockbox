@@ -1345,8 +1345,9 @@ void initialize_buffer_fill(void)
 void audio_check_buffer(void)
 {
     /* Start buffer filling as necessary. */
-    if ((filebufused > conf_watermark || !queue_empty(&audio_queue)
-        || !playing || ci.stop_codec || ci.reload_codec) && !filling)
+    if ((!conf_watermark || filebufused > conf_watermark
+        || !queue_empty(&audio_queue) || !playing || ci.stop_codec
+        || ci.reload_codec) && !filling)
         return ;
     
     initialize_buffer_fill();
