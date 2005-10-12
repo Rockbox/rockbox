@@ -68,6 +68,66 @@ typedef mpc_int64_t MPC_SAMPLE_FORMAT_MULTIPLY;
 #define MAKE_MPC_SAMPLE(X) (MPC_SAMPLE_FORMAT)((double)(X) * (double)(((mpc_int64_t)1)<<MPC_FIXED_POINT_FRACTPART))
 #define MAKE_MPC_SAMPLE_EX(X,Y) (MPC_SAMPLE_FORMAT)((double)(X) * (double)(((mpc_int64_t)1)<<(Y)))
 
+#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+
+#define MPC_MULTIPLY(X,Y) mpc_multiply((X), (Y))
+#define MPC_MULTIPLY_EX(X,Y,Z) mpc_multiply_ex((X), (Y), (Z))
+
+static inline MPC_SAMPLE_FORMAT mpc_multiply(MPC_SAMPLE_FORMAT x,
+                                             MPC_SAMPLE_FORMAT y)
+{
+    MPC_SAMPLE_FORMAT t1, t2;
+    asm volatile (
+        "mac.l   %[x],%[y],%%acc0\n" /* multiply */
+        "mulu.l  %[y],%[x]   \n"     /* get lower half, avoid emac stall */
+        "movclr.l %%acc0,%[t1]   \n" /* get higher half */
+        "moveq.l #17,%[t2]   \n"
+        "asl.l   %[t2],%[t1] \n"     /* hi <<= 17, plus one free */
+        "moveq.l #14,%[t2]   \n"
+        "lsr.l   %[t2],%[x]  \n"     /* (unsigned)lo >>= 14 */
+        "or.l    %[x],%[t1]  \n"     /* combine result */
+        : /* outputs */
+        [t1]"=&d"(t1),
+        [t2]"=&d"(t2),
+        [x] "+d" (x)
+        : /* inputs */
+        [y] "d"  (y)
+    );
+    return t1;
+}
+
+static inline MPC_SAMPLE_FORMAT mpc_multiply_ex(MPC_SAMPLE_FORMAT x,
+                                                MPC_SAMPLE_FORMAT y,
+                                                unsigned shift)
+{
+    MPC_SAMPLE_FORMAT t1, t2;
+    asm volatile (
+        "mac.l   %[x],%[y],%%acc0\n" /* multiply */
+        "mulu.l  %[y],%[x]   \n"     /* get lower half, avoid emac stall */
+        "movclr.l %%acc0,%[t1]   \n" /* get higher half */
+        "moveq.l #31,%[t2]   \n"
+        "sub.l   %[sh],%[t2] \n"     /* t2 = 31 - shift */
+        "ble.s   1f          \n"
+        "asl.l   %[t2],%[t1] \n"     /* hi <<= 31 - shift */
+        "lsr.l   %[sh],%[x]  \n"     /* (unsigned)lo >>= shift */
+        "or.l    %[x],%[t1]  \n"     /* combine result */
+        "bra.s   2f          \n"
+    "1:                      \n"
+        "neg.l   %[t2]       \n"     /* t2 = shift - 31 */
+        "asr.l   %[t2],%[t1] \n"     /* hi >>= t2 */
+    "2:                      \n"
+        : /* outputs */
+        [t1]"=&d"(t1),
+        [t2]"=&d"(t2),
+        [x] "+d" (x)
+        : /* inputs */
+        [y] "d"  (y),
+        [sh]"d"  (shift)
+    );
+    return t1;
+}
+#else /* libmusepack standard */
+
 #define MPC_MULTIPLY_NOTRUNCATE(X,Y) \
 	(((MPC_SAMPLE_FORMAT_MULTIPLY)(X) * (MPC_SAMPLE_FORMAT_MULTIPLY)(Y)) >> MPC_FIXED_POINT_FRACTPART)
 
@@ -88,11 +148,10 @@ static inline MPC_SAMPLE_FORMAT MPC_MULTIPLY_EX(MPC_SAMPLE_FORMAT item1,MPC_SAMP
 	assert(temp == (MPC_SAMPLE_FORMAT_MULTIPLY)(MPC_SAMPLE_FORMAT)temp);
 	return (MPC_SAMPLE_FORMAT)temp;
 }
-
 #else
-
 #define MPC_MULTIPLY(X,Y) ((MPC_SAMPLE_FORMAT)MPC_MULTIPLY_NOTRUNCATE(X,Y))
 #define MPC_MULTIPLY_EX(X,Y,Z) ((MPC_SAMPLE_FORMAT)MPC_MULTIPLY_EX_NOTRUNCATE(X,Y,Z))
+#endif
 
 #endif
 

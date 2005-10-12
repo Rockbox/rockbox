@@ -1175,7 +1175,7 @@ void mpc_decoder_setup(mpc_decoder *d, mpc_reader *r)
   mpc_decoder_init_huffman_sv7(d);
 
   #if defined(CPU_COLDFIRE)&& !defined(SIMULATOR)
-  coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_ROUND | EMAC_SATURATE);
+  coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
   #endif
 }
 
