@@ -72,7 +72,7 @@ void recalc_samplecount(void)
 enum codec_status codec_start(struct codec_api *api)
 {
     int status = 0;
-    size_t size;
+    long size;
     int file_end;
     int frame_skip;
     char *inputbuffer;

@@ -122,7 +122,7 @@ extern char iramend[];
 /* this is the codec entry point */
 enum codec_status codec_start(struct codec_api *api)
 {
-    size_t n;
+    long n;
     unsigned char *filebuf;
 
     /* Generic codec initialisation */

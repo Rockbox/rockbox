@@ -213,7 +213,8 @@ enum codec_status codec_start(struct codec_api* api)
   int bytespersample=0;
   uint16_t bitspersample;
   uint32_t i;
-  size_t n, wavbufsize;
+  long n;
+  size_t wavbufsize;
   int endofstream;
   unsigned char* buf;
   uint16_t* wavbuf;
