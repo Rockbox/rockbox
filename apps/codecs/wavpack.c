@@ -17,12 +17,8 @@
  *
  ****************************************************************************/
 
-#include "codec.h"
-
-#include <codecs/libwavpack/wavpack.h>
-#include "playback.h"
-#include "lib/codeclib.h"
-#include "dsp.h"
+#include "codeclib.h"
+#include "libwavpack/wavpack.h"
 
 static struct codec_api *ci;
 

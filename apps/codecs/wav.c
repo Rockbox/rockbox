@@ -17,8 +17,7 @@
  *
  ****************************************************************************/
 
-#include "codec.h"
-#include "lib/codeclib.h"
+#include "codeclib.h"
 #include "inttypes.h"
 
 /* This codec support WAVE files with the following formats:

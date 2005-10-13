@@ -1,4 +1,3 @@
 #if CONFIG_CODEC == SWCODEC /* software codec platforms */
 codeclib.c
-xxx2wav.c
 #endif

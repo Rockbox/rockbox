@@ -19,13 +19,18 @@
 
 /* "helper functions" common to all codecs  */
 
-#include "plugin.h"
+#include "codecs.h"
 #include "dsp.h"
 #include "codeclib.h"
-#include "xxx2wav.h"
 #include "id3.h"
 
 struct codec_api *local_rb;
+
+int mem_ptr;
+int bufsize;
+unsigned char* mp3buf;     // The actual MP3 buffer from Rockbox
+unsigned char* mallocbuf;  // 512K from the start of MP3 buffer
+unsigned char* filebuf;    // The rest of the MP3 buffer
 
 int codec_init(struct codec_api* rb)
 {
@@ -42,4 +47,114 @@ void codec_set_replaygain(struct mp3entry* id3)
     local_rb->configure(DSP_SET_ALBUM_GAIN, (long *) id3->album_gain);
     local_rb->configure(DSP_SET_TRACK_PEAK, (long *) id3->track_peak);
     local_rb->configure(DSP_SET_ALBUM_PEAK, (long *) id3->album_peak);
+}
+
+/* Various "helper functions" common to all the xxx2wav decoder plugins  */
+
+
+void* codec_malloc(size_t size)
+{
+    void* x;
+
+    if (mem_ptr + (int)size > bufsize)
+        return NULL;
+    
+    x=&mallocbuf[mem_ptr];
+    mem_ptr+=(size+3)&~3; /* Keep memory 32-bit aligned */
+
+    return(x);
+}
+
+void* codec_calloc(size_t nmemb, size_t size)
+{
+    void* x;
+    x = codec_malloc(nmemb*size);
+    if (x == NULL)
+        return NULL;
+    local_rb->memset(x,0,nmemb*size);
+    return(x);
+}
+
+#if defined(SIMULATOR)
+void* codec_alloca(size_t size)
+{
+    void* x;
+    x = codec_malloc(size);
+    return(x);
+}
+#endif
+
+void codec_free(void* ptr) {
+    (void)ptr;
+}
+
+void* codec_realloc(void* ptr, size_t size)
+{
+    void* x;
+    (void)ptr;
+    x = codec_malloc(size);
+    return(x);
+}
+
+size_t strlen(const char *s)
+{
+    return(local_rb->strlen(s));
+}
+
+char *strcpy(char *dest, const char *src)
+{
+    return(local_rb->strcpy(dest,src));
+}
+
+char *strcat(char *dest, const char *src)
+{
+    return(local_rb->strcat(dest,src));
+}
+
+int strcmp(const char *s1, const char *s2)
+{
+    return(local_rb->strcmp(s1,s2));
+}
+
+int strncasecmp(const char *s1, const char *s2, size_t n)
+{
+    return(local_rb->strncasecmp(s1,s2,n));
+}
+
+void *memcpy(void *dest, const void *src, size_t n)
+{
+    return(local_rb->memcpy(dest,src,n));
+}
+
+void *memset(void *s, int c, size_t n)
+{
+    return(local_rb->memset(s,c,n));
+}
+
+int memcmp(const void *s1, const void *s2, size_t n)
+{
+    return(local_rb->memcmp(s1,s2,n));
+}
+
+void* memchr(const void *s, int c, size_t n)
+{
+    return(local_rb->memchr(s,c,n));
+}
+
+void* memmove(const void *s1, const void *s2, size_t n)
+{
+    char* dest=(char*)s1;
+    char* src=(char*)s2;
+    size_t i;
+    
+    for (i=0;i<n;i++)
+        dest[i]=src[i];
+
+    return(dest);
+}
+
+void qsort(void *base, size_t nmemb, size_t size,
+           int(*compar)(const void *, const void *))
+{
+    local_rb->qsort(base,nmemb,size,compar);
 }

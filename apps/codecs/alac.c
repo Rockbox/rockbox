@@ -17,15 +17,10 @@
  *
  ****************************************************************************/
 
-#include "codec.h"
-
+#include "codeclib.h"
 #include <codecs/libalac/demux.h>
 #include <codecs/libalac/decomp.h>
 #include <codecs/libalac/stream.h>
-
-#include "playback.h"
-#include "dsp.h"
-#include "lib/codeclib.h"
 
 #ifndef SIMULATOR
 extern char iramcopy[];

@@ -17,8 +17,7 @@
  *
  ****************************************************************************/
 
-#include "codec.h"
-#include "lib/codeclib.h"
+#include "codeclib.h"
 #include <codecs/libmad/mad.h>
 #include <inttypes.h>
 

@@ -17,14 +17,10 @@
  *
  ****************************************************************************/
 
-#include "codec.h"
-
+#include "codeclib.h"
 #include <codecs/libFLAC/include/FLAC/seekable_stream_decoder.h>
 #include <codecs/libFLAC/include/FLAC/format.h>
 #include <codecs/libFLAC/include/FLAC/metadata.h>
-#include "playback.h"
-#include "lib/codeclib.h"
-#include "dsp.h"
 
 #define FLAC_MAX_SUPPORTED_BLOCKSIZE 4608
 #define FLAC_MAX_SUPPORTED_CHANNELS  2

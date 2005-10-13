@@ -16,8 +16,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "codec.h"
-#include "lib/codeclib.h"
+
+#include "codeclib.h"
 #include "Tremor/ivorbisfile.h"
 #include "Tremor/ogg.h"
 
