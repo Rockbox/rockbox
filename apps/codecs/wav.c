@@ -213,8 +213,7 @@ enum codec_status codec_start(struct codec_api* api)
   int bytespersample=0;
   uint16_t bitspersample;
   uint32_t i;
-  long n;
-  size_t wavbufsize;
+  size_t n, wavbufsize;
   int endofstream;
   unsigned char* buf;
   uint16_t* wavbuf;
@@ -249,7 +248,7 @@ enum codec_status codec_start(struct codec_api* api)
       rb->yield();
     
   /* assume the WAV header is less than 1024 bytes */
-  buf=rb->request_buffer(&n,1024);
+  buf=rb->request_buffer((long *)&n,1024);
   if (n<44) {
       return CODEC_ERROR;
   }
@@ -449,7 +448,7 @@ enum codec_status codec_start(struct codec_api* api)
         }
         rb->seek_time = 0;
     }
-    wavbuf=rb->request_buffer(&n,chunksize);
+    wavbuf=rb->request_buffer((long *)&n,chunksize);
     wavbuf8 = (uint8_t*)wavbuf;
 
     if (n==0)
