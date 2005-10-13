@@ -225,12 +225,12 @@ void uda1380_enable_recording(bool source_mic)
     sleep(HZ/8);
 
     uda1380_write_reg(REG_I2S,     uda1380_regs[REG_I2S] | I2S_MODE_MASTER);
-    uda1380_write_reg(REG_MIX_CTL, MIX_MODE(3));   /* Not sure which mode is the best one.. */
+    uda1380_write_reg(REG_MIX_CTL, MIX_MODE(1)); 
 
 }
 
 /** 
- * Stop sending samples on the I2S bus 
+ * Stop sending samples on the I2S bus
  */
 void uda1380_disable_recording(void)
 {
