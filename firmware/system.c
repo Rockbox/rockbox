@@ -584,8 +584,6 @@ int system_memory_guard(int newmode)
 void set_cpu_frequency (long) __attribute__ ((section (".icode")));
 void set_cpu_frequency(long frequency)
 {
-    int i;
-
     switch(frequency)
     {
     case CPUFREQ_MAX:
