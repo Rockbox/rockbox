@@ -584,6 +584,8 @@ int system_memory_guard(int newmode)
 void set_cpu_frequency (long) __attribute__ ((section (".icode")));
 void set_cpu_frequency(long frequency)
 {
+    int i;
+
     switch(frequency)
     {
     case CPUFREQ_MAX:
@@ -622,8 +624,9 @@ void set_cpu_frequency(long frequency)
     default:
         DCR = (DCR & ~0x01ff) | DEFAULT_REFRESH_TIMER;  
               /* Refresh timer for bypass frequency */
-        PLLCR = 0x00000000;  /* Bypass mode */
+        PLLCR &= ~1;  /* Bypass mode */
         timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, true);
+        PLLCR = 0x10800200; /* Power down PLL, but keep CLSEL and CRSEL */
         CSCR0 = 0x00000180; /* Flash: 0 wait states */
         CSCR1 = 0x00000180; /* LCD: 0 wait states */
         cpu_frequency = CPUFREQ_DEFAULT;
