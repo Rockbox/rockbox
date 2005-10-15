@@ -179,7 +179,7 @@ static int get_sample_info(demux_res_t *demux_res, uint32_t samplenum,
 
 static unsigned int alac_seek (demux_res_t* demux_res, 
                                unsigned int sample_loc, 
-                               size_t* samplesdone, int* currentblock)
+                               uint32_t* samplesdone, int* currentblock)
 {
   int flag;
   unsigned int i,j;
@@ -327,7 +327,7 @@ enum codec_status codec_start(struct codec_api* api)
 
     /* Request the required number of bytes from the input buffer */
 
-    buffer=ci->request_buffer(&n,sample_byte_size);
+    buffer=ci->request_buffer((long*)&n,sample_byte_size);
     if (n!=sample_byte_size) {
       /* The decode_frame function requires the whole frame, so if we
          can't get it contiguously from the buffer, then we need to
