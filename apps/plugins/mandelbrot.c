@@ -55,15 +55,15 @@
 static struct plugin_api* rb;
 static char buff[32];
 
-/* Fixed point format: 6 bits integer part incl. sign, 58 bits fractional part */
-static long long x_min;
-static long long x_max;
-static long long x_step;
-static long long x_delta;
-static long long y_min;
-static long long y_max;
-static long long y_step;
-static long long y_delta;
+/* Fixed point format: 6 bits integer part incl. sign, 26 bits fractional part */
+static long x_min;
+static long x_max;
+static long x_step;
+static long x_delta;
+static long y_min;
+static long y_max;
+static long y_step;
+static long y_delta;
 
 static int px_min = 0;
 static int px_max = LCD_WIDTH;
@@ -78,117 +78,148 @@ static unsigned int gbuf_size = 0;
 static unsigned char graybuffer[LCD_HEIGHT];   
 
 #if CONFIG_CPU == SH7034
-long long mul64(long long f1, long long f2);
 
-asm (
-    /* 64bit * 64bit -> 64bit multiplication. Works for both signed and unsigned */
-    ".global _mul64      \n"  /* Notation: abcd * efgh, where each letter */
-    ".type   _mul64,@function\n" /* represents 16 bits. Called with: */
-"_mul64:                 \n"  /* r4 = ab, r5 = cd, r6 = ef, r7 = gh */
-    "swap.w  r4,r2       \n"  /* r2 = ba */
-    "mulu    r2,r7       \n"  /* a * h */
-    "swap.w  r6,r3       \n"  /* r3 = fe */
-    "sts     macl,r0     \n"  /* r0 = a * h */
-    "mulu    r5,r3       \n"  /* d * e */
-    "swap.w  r7,r3       \n"  /* r3 = hg */
-    "sts     macl,r1     \n"  /* r1 = d * e */
-    "mulu    r4,r3       \n"  /* b * g */
-    "add     r1,r0       \n"  /* r0 += r1 */
-    "swap.w  r5,r2       \n"  /* r2 = dc */
-    "sts     macl,r1     \n"  /* r1 = b * g */
-    "mulu    r2,r6       \n"  /* c * f */
-    "add     r1,r0       \n"  /* r0 += r1 */
-    "sts     macl,r1     \n"  /* r1 = c * f */
-    "mulu    r4,r7       \n"  /* b * h */
-    "add     r1,r0       \n"  /* r0 += r1 */
-    "shll16  r0          \n"  /* r0 <<= 16 */
-    "sts     macl,r1     \n"  /* r1 = b * h */
-    "mulu    r2,r3       \n"  /* c * g */
-    "add     r1,r0       \n"  /* r0 += r1 */
-    "sts     macl,r1     \n"  /* r1 = c * g */
-    "mulu    r5,r6       \n"  /* d * f */
-    "add     r1,r0       \n"  /* r0 += r1 */
-    "sts     macl,r1     \n"  /* r1 = d * f */
-    "mulu    r2,r7       \n"  /* c * h */
-    "add     r1,r0       \n"  /* r0 += r1 */
-    "sts     macl,r2     \n"  /* r2 = c * h */
-    "mulu    r5,r3       \n"  /* d * g */
-    "clrt                \n"
-    "sts     macl,r3     \n"  /* r3 = d * g */
-    "addc    r2,r3       \n"  /* r3 += r2, carry->r2 */
-    "movt    r2          \n"
-    "mulu    r5,r7       \n"  /* d * h */
-    "mov     r3,r1       \n"  /* r2r3 <<= 16 */
-    "xtrct   r2,r1       \n"
-    "mov     r1,r2       \n"
-    "shll16  r3          \n"
-    "sts     macl,r1     \n"  /* r1 = d * h */
-    "clrt                \n"  /* r0r1 += r2r3 */
-    "addc    r3,r1       \n"
-    "rts                 \n"
-    "addc    r2,r0       \n"
-);
-#define MUL64(a, b) mul64(a, b)
+#define MULS16_ASR10(a, b) muls16_asr10(a, b)
+static inline short muls16_asr10(short a, short b)
+{
+    short r;
+    asm (
+        "muls    %[a],%[b]   \n"
+        "sts     macl,%[r]   \n"
+        "shlr8   %[r]        \n"
+        "shlr2   %[r]        \n"
+        : /* outputs */
+        [r]"=r"(r)
+        : /* inputs */
+        [a]"r"(a),
+        [b]"r"(b)
+    );
+    return r;
+}
+
+#define MULS32_ASR26(a, b) muls32_asr26(a, b)
+static inline long muls32_asr26(long a, long b)
+{
+    long r, t1, t2, t3;
+    asm (
+        /* Signed 32bit * 32bit -> 64bit multiplication.
+           Notation: xxab * xxcd, where each letter represents 16 bits.
+           xx is the 64 bit sign extension.  */
+        "swap.w  %[a],%[t1]  \n" /* t1 = ba */
+        "mulu    %[t1],%[b]  \n" /* a * d */
+        "swap.w  %[b],%[t3]  \n" /* t3 = dc */
+        "sts     macl,%[t2]  \n" /* t2 = a * d */
+        "mulu    %[t1],%[t3] \n" /* a * c */
+        "sts     macl,%[r]   \n" /* hi = a * c */
+        "mulu    %[a],%[t3]  \n" /* b * c */
+        "clrt                \n"
+        "sts     macl,%[t3]  \n" /* t3 = b * c */
+        "addc    %[t2],%[t3] \n" /* t3 += t2, carry -> t2 */
+        "movt    %[t2]       \n"
+        "mulu    %[a],%[b]   \n" /* b * d */
+        "mov     %[t3],%[t1] \n" /* t2t3 <<= 16 */
+        "xtrct   %[t2],%[t1] \n"
+        "mov     %[t1],%[t2] \n"
+        "shll16  %[t3]       \n"
+        "sts     macl,%[t1]  \n" /* lo = b * d */
+        "clrt                \n" /* hi.lo += t2t3 */
+        "addc    %[t3],%[t1] \n"
+        "addc    %[t2],%[r]  \n"
+        "cmp/pz  %[a]        \n" /* ab >= 0 ? */
+        "bt      1f          \n"
+        "sub     %[b],%[r]   \n" /* no: hi -= cd (sign extension of ab is -1) */
+    "1:                      \n"
+        "cmp/pz  %[b]        \n" /* cd >= 0 ? */
+        "bt      2f          \n"
+        "sub     %[a],%[r]   \n" /* no: hi -= ab (sign extension of cd is -1) */
+    "2:                      \n"
+        /* Shift right by 26 and return low 32 bits */
+        "shll2   %[r]        \n" /* hi <<= 6 */
+        "shll2   %[r]        \n"
+        "shll2   %[r]        \n"
+        "shlr16  %[t1]       \n" /* (unsigned)lo >>= 26 */
+        "shlr8   %[t1]       \n"
+        "shlr2   %[t1]       \n"
+        "or      %[t1],%[r]  \n" /* combine result */
+        : /* outputs */
+        [r] "=&r"(r),
+        [t1]"=&r"(t1),
+        [t2]"=&r"(t2),
+        [t3]"=&r"(t3)
+        : /* inputs */
+        [a] "r"  (a),
+        [b] "r"  (b)
+    );
+    return r;
+}
 
 #elif defined CPU_COLDFIRE
-long long mul64(long long f1, long long f2);
 
-asm (
-    /* 64bit * 64bit -> 64bit multiplication. Works for both signed and unsigned */
-    ".section .text,\"ax\",@progbits\n"
-    ".global mul64       \n"    /* Notation: abcd * efgh, where each letter */
-    ".type   mul64,@function\n" /* represents 16 bits. */
-"mul64:                  \n"
-    "lea.l   (-16,%sp),%sp   \n"
-    "movem.l %d2-%d5,(%sp)   \n"
+#define MULS16_ASR10(a, b) muls16_asr10(a, b)
+static inline short muls16_asr10(short a, short b)
+{
+    asm (
+        "muls.w  %[a],%[b]   \n"
+        "asr.l   #8,%[b]     \n"
+        "asr.l   #2,%[b]     \n"
+        : /* outputs */
+        [b]"+d"(b)
+        : /* inputs */
+        [a]"d" (a)
+    );
+    return b;
+}
 
-    "movem.l (20,%sp),%d0-%d3\n" /* %d0%d1 = abcd, %d2%d3 = efgh */
-    "mulu.l  %d3,%d0     \n"  /* %d0 = ab * gh */
-    "mulu.l  %d1,%d2     \n"  /* %d2 = cd * ef */
-    "add.l   %d2,%d0     \n"  /* %d0 += %d2 */
-    "move.l  %d1,%d4     \n"  
-    "swap    %d4         \n"  /* %d4 = dc */
-    "move.l  %d3,%d5     \n"
-    "swap    %d5         \n"  /* %d5 = hg */
-    "move.l  %d4,%d2     \n"
-    "mulu.w  %d5,%d2     \n"  /* %d2 = c * g */
-    "add.l   %d2,%d0     \n"  /* %d0 += %d2 */
-    "mulu.w  %d3,%d4     \n"  /* %d4 = c * h */
-    "mulu.w  %d1,%d5     \n"  /* %d5 = d * h */
-    "add.l   %d4,%d5     \n"  /* %d5 += %d4 */
-    "subx.l  %d4,%d4     \n"
-    "neg.l   %d4         \n"  /* carry -> %d4 */
-    "swap    %d4         \n"
-    "swap    %d5         \n" 
-    "move.w  %d5,%d4     \n"
-    "clr.w   %d5         \n"  /* %d4%d5 <<= 16 */
-    "mulu.w  %d3,%d1     \n"  /* %d1 = d * h */
-    "add.l   %d5,%d1     \n"
-    "addx.l  %d4,%d0     \n"  /* %d0%d1 += %d4%d5 */
+/* Needs the EMAC initialised to fractional mode w/o rounding and saturation */
+#define MULS32_INIT() coldfire_set_macsr(EMAC_FRACTIONAL)
+#define MULS32_ASR26(a, b) muls32_asr26(a, b)
+static inline long muls32_asr26(long a, long b)
+{
+    long r, t1;
+    asm (
+        "mac.l   %[a],%[b],%%acc0\n" /* multiply */
+        "mulu.l  %[a],%[b]       \n" /* get lower half */
+        "movclr.l %%acc0,%[r]    \n" /* get higher half */
+        "asl.l   #5,%[r]         \n" /* hi <<= 5, plus one free */
+        "moveq.l #26,%[t1]       \n"
+        "lsr.l   %[t1],%[b]      \n" /* (unsigned)lo >>= 26 */
+        "or.l    %[b],%[r]       \n" /* combine result */
+        : /* outputs */
+        [r]"=&d"(r),
+        [t1]"=&d"(t1),
+        [b] "+d" (b)
+        : /* inputs */
+        [a] "d"  (a)
+    );
+    return r;
+}
 
-    "movem.l (%sp),%d2-%d5   \n"
-    "lea.l   (16,%sp),%sp\n"
-    "rts                 \n"
-);
-#define MUL64(a, b) mul64(a, b)
+#endif /* CPU */
 
-#else
-#define MUL64(a, b) ((a)*(b))
+/* default macros */
+#ifndef MULS16_ASR10 
+#define MULS16_ASR10(a, b) ((short)(((long)(a) * (long)(b)) >> 10))
+#endif
+#ifndef MULS32_ASR26
+#define MULS32_ASR26(a, b) ((long)(((long long)(a) * (long long)(b)) >> 26))
+#endif
+#ifndef MULS32_INIT
+#define MULS32_INIT()
 #endif
 
-int ilog2_fp(long long value) /* calculate integer log2(value_fp_6.58) */
+int ilog2_fp(long value) /* calculate integer log2(value_fp_6.26) */
 {
     int i = 0;
 
     if (value <= 0) {
         return -32767;
-    } else if (value > (1LL<<58)) {
-        while (value >= (2LL<<58)) {
+    } else if (value > (1L<<26)) {
+        while (value >= (2L<<26)) {
             value >>= 1;
             i++;
         }
     } else {
-        while (value < (1LL<<58)) {
+        while (value < (1L<<26)) {
             value <<= 1;
             i--;
         }
@@ -199,59 +230,57 @@ int ilog2_fp(long long value) /* calculate integer log2(value_fp_6.58) */
 void recalc_parameters(void)
 {
     x_step = (x_max - x_min) / LCD_WIDTH;
-    x_delta = MUL64(x_step, (LCD_WIDTH/8));
+    x_delta = x_step * (LCD_WIDTH/8);
     y_step = (y_max - y_min) / LCD_HEIGHT;
-    y_delta = MUL64(y_step, (LCD_HEIGHT/8));
-    step_log2 = MIN(ilog2_fp(x_step), ilog2_fp(y_step));
-    max_iter = MAX(10, -15 * step_log2 - 50);
+    y_delta = y_step * (LCD_HEIGHT/8);
+    step_log2 = ilog2_fp(MIN(x_step, y_step));
+    max_iter = MAX(15, -15 * step_log2 - 45);
 }
 
 void init_mandelbrot_set(void)
 {
 #if CONFIG_LCD == LCD_SSD1815 /* Recorder, Ondio. */
-    x_min = -38LL<<54;  // -2.375<<58
-    x_max =  15LL<<54;  //  0.9375<<58
+    x_min = -38L<<22;  // -2.375<<26
+    x_max =  15L<<22;  //  0.9375<<26
 #else  /* Iriver H1x0 */
-    x_min = -36LL<<54;  // -2.25<<58
-    x_max =  12LL<<54;  //  0.75<<58
+    x_min = -36L<<22;  // -2.25<<26
+    x_max =  12L<<22;  //  0.75<<26
 #endif
-    y_min = -19LL<<54;  // -1.1875<<58
-    y_max =  19LL<<54;  //  1.1875<<58
+    y_min = -19L<<22;  // -1.1875<<26
+    y_max =  19L<<22;  //  1.1875<<26
     recalc_parameters();
 }
 
-void calc_mandelbrot_32(void)
+void calc_mandelbrot_low_prec(void)
 {
     long start_tick, last_yield;
     unsigned n_iter;
-    long long a64, b64;
-    long x, x2, y, y2, a, b;
+    long a32, b32;
+    short x, x2, y, y2, a, b;
     int p_x, p_y;
     int brightness;
 
     start_tick = last_yield = *rb->current_tick;
     
-    for (p_x = 0, a64 = x_min; p_x <= px_max; p_x++, a64 += x_step) {
+    for (p_x = 0, a32 = x_min; p_x < px_max; p_x++, a32 += x_step) {
         if (p_x < px_min)
             continue;
-        a = a64 >> 32;
-        for (p_y = LCD_HEIGHT-1, b64 = y_min; p_y >= py_min; p_y--, b64 += y_step) {
+        a = a32 >> 16;
+        for (p_y = LCD_HEIGHT-1, b32 = y_min; p_y >= py_min; p_y--, b32 += y_step) {
             if (p_y >= py_max)
                 continue;
-            b = b64 >> 32;
-            x = 0;
-            y = 0;
+            b = b32 >> 16;
+            x = a;
+            y = b;
             n_iter = 0;
 
             while (++n_iter <= max_iter) {
-                x >>= 13;
-                y >>= 13;
-                x2 = x * x;
-                y2 = y * y;
-                
-                if (x2 + y2 > (4<<26)) break;
-                
-                y = 2 * x * y + b;
+                x2 = MULS16_ASR10(x, x);
+                y2 = MULS16_ASR10(y, y);
+
+                if (x2 + y2 > (4<<10)) break;
+
+                y = 2 * MULS16_ASR10(x, y) + b;
                 x = x2 - y2 + a;
             }
 
@@ -261,7 +290,7 @@ void calc_mandelbrot_32(void)
             } else {
                 brightness = 255 - (32 * (n_iter & 7));
             }
-            graybuffer[p_y]=brightness;
+            graybuffer[p_y] = brightness;
             /* be nice to other threads:
              * if at least one tick has passed, yield */
             if  (*rb->current_tick > last_yield) {
@@ -274,35 +303,34 @@ void calc_mandelbrot_32(void)
     }
 }
 
-void calc_mandelbrot_64(void)
+void calc_mandelbrot_high_prec(void)
 {
     long start_tick, last_yield;
     unsigned n_iter;
-    long long x, x2, y, y2, a, b;
+    long x, x2, y, y2, a, b;
     int p_x, p_y;
     int brightness;
-
-    start_tick = last_yield = *rb->current_tick;
     
+    MULS32_INIT();
+    start_tick = last_yield = *rb->current_tick;
+
     for (p_x = 0, a = x_min; p_x < px_max; p_x++, a += x_step) {
         if (p_x < px_min)
             continue;
         for (p_y = LCD_HEIGHT-1, b = y_min; p_y >= py_min; p_y--, b += y_step) {
             if (p_y >= py_max)
                 continue;
-            x = 0;
-            y = 0;
+            x = a;
+            y = b;
             n_iter = 0;
 
-            while (++n_iter<=max_iter) {
-                x >>= 29;
-                y >>= 29;
-                x2 = MUL64(x, x);
-                y2 = MUL64(y, y);
+            while (++n_iter <= max_iter) {
+                x2 = MULS32_ASR26(x, x);
+                y2 = MULS32_ASR26(y, y);
+
+                if (x2 + y2 > (4L<<26)) break;
                 
-                if (x2 + y2 > (4LL<<58)) break;
-                
-                y = 2 * MUL64(x, y) + b;
+                y = 2 * MULS32_ASR26(x, y) + b;
                 x = x2 - y2 + a;
             }
 
@@ -312,10 +340,10 @@ void calc_mandelbrot_64(void)
             } else {
                 brightness = 255 - (32 * (n_iter & 7));
             }
-            graybuffer[p_y]=brightness;
+            graybuffer[p_y] = brightness;
             /* be nice to other threads:
              * if at least one tick has passed, yield */
-            if  (*rb->current_tick > last_yield){
+            if  (*rb->current_tick > last_yield) {
                 rb->yield();
                 last_yield = *rb->current_tick;
             }
@@ -375,10 +403,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             if (redraw == REDRAW_FULL)
                 gray_ub_clear_display();
 
-            if (step_log2 <= -13) /* select precision */
-                calc_mandelbrot_64();
+            if (step_log2 <= -10) /* select precision */
+                calc_mandelbrot_high_prec();
             else
-                calc_mandelbrot_32();
+                calc_mandelbrot_low_prec();
 
 #if !defined(SIMULATOR) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
             rb->cpu_boost(false);
