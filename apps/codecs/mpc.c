@@ -87,7 +87,7 @@ enum codec_status codec_start(struct codec_api *api)
     
     ci->configure(CODEC_DSP_ENABLE, (bool *)true);
     ci->configure(DSP_DITHER, (bool *)false);
-    ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)(MPC_FIXED_POINT_SCALE_SHIFT - 1));
+    ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)(MPC_FIXED_POINT_SCALE_SHIFT));
     ci->configure(DSP_SET_CLIP_MAX, (long *)MPC_FIXED_POINT_SCALE);
     ci->configure(DSP_SET_CLIP_MIN, (long *)-MPC_FIXED_POINT_SCALE);
     ci->configure(CODEC_SET_FILEBUF_LIMIT, (long *)(1024*1024*2));
