@@ -1889,6 +1889,9 @@ void voice_codec_thread(void)
 
 void voice_init(void)
 {
+    if (!filebuf)
+        return;     /* Audio buffers not yet set up */
+
     while (voice_codec_loaded)
     {
         logf("Terminating voice codec");
@@ -2291,16 +2294,16 @@ void audio_init(void)
     queue_init(&codec_queue);
     queue_init(&voice_codec_queue);
     
-    /* Apply relevant settings */
-    audio_set_buffer_margin(global_settings.buffer_margin);
-    audio_set_crossfade(global_settings.crossfade);
-
     create_thread(codec_thread, codec_stack, sizeof(codec_stack),
                   codec_thread_name);
     create_thread(voice_codec_thread, voice_codec_stack,
                   sizeof(voice_codec_stack), voice_codec_thread_name);
     create_thread(audio_thread, audio_stack, sizeof(audio_stack),
                   audio_thread_name);
+
+    /* Apply relevant settings */
+    audio_set_buffer_margin(global_settings.buffer_margin);
+    audio_set_crossfade(global_settings.crossfade);
 }
 
 
