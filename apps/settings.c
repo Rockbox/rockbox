@@ -439,7 +439,7 @@ static const struct bit_entry hd_bits[] =
         "track,album,track shuffle" },
     {1, S_O(replaygain_noclip), false, "replaygain noclip", off_on },
     {8 | SIGNED, S_O(replaygain_preamp), 0, "replaygain preamp", NULL },
-    {2, S_O(beep), 0, "off,weak,moderate,strong", NULL },
+    {2, S_O(beep), 0, "beep", "off,weak,moderate,strong" },
 #endif
 #ifdef HAVE_DIRCACHE
     {1, S_O(dircache), false, "dircache", off_on },
@@ -1348,7 +1348,7 @@ void settings_reset(void) {
 
 bool set_bool(const char* string, bool* variable )
 {
-    return set_bool_options(string, variable, 
+    return set_bool_options(string, variable,
         STR(LANG_SET_BOOL_YES), 
         STR(LANG_SET_BOOL_NO), 
         NULL);
