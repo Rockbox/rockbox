@@ -686,6 +686,9 @@ static void set_filebuf_watermark(int seconds)
 
     if (current_codec == CODEC_IDX_VOICE)
         return ;
+
+    if (!filebuf)
+        return;     /* Audio buffers not yet set up */
         
     bytes = MAX((int)cur_ti->id3.bitrate * seconds * (1000/8), conf_watermark);
     bytes = MIN(bytes, filebuflen / 2);
@@ -2168,6 +2171,9 @@ void audio_set_crossfade(int type)
     static const int lookup[] = {1, 2, 4, 6, 8, 10, 12, 14};
     int seconds = lookup[global_settings.crossfade_duration];
 
+    if (!filebuf)
+        return;     /* Audio buffers not yet set up */
+
     /* Store the track resume position */
     if (playing)
         offset = cur_ti->id3.offset;
@@ -2285,6 +2291,10 @@ void audio_init(void)
     queue_init(&codec_queue);
     queue_init(&voice_codec_queue);
     
+    /* Apply relevant settings */
+    audio_set_buffer_margin(global_settings.buffer_margin);
+    audio_set_crossfade(global_settings.crossfade);
+
     create_thread(codec_thread, codec_stack, sizeof(codec_stack),
                   codec_thread_name);
     create_thread(voice_codec_thread, voice_codec_stack,

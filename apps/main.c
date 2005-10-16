@@ -135,7 +135,6 @@ void init(void)
     font_init();
     show_logo();
     lang_init();
-    audio_init();
     settings_reset();
     settings_calc_config_sector();
     settings_load(SETTINGS_ALL);
@@ -158,6 +157,7 @@ void init(void)
               global_settings.mdb_shape,
               global_settings.mdb_enable,
               global_settings.superbass);
+    audio_init();
     button_clear_queue(); /* Empty the keyboard buffer */
 #if CONFIG_CODEC == SWCODEC
     talk_init();
@@ -296,11 +296,6 @@ void init(void)
     settings_load(SETTINGS_ALL);
     init_dircache();
     
-    /* On software codec platforms we have to init audio before
-       calling audio_set_buffer_margin(). */
-#if (CONFIG_CODEC == SWCODEC)
-    audio_init();
-#endif
     settings_apply();
 
     status_init();
@@ -323,10 +318,9 @@ void init(void)
               global_settings.mdb_shape,
               global_settings.mdb_enable,
               global_settings.superbass);
+    audio_init();
 #if (CONFIG_CODEC == SWCODEC)
     sound_settings_apply();
-#else
-    audio_init();
 #endif
 #if defined(IRIVER_H100_SERIES) && !defined(SIMULATOR)
     pcm_init_recording();
