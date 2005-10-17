@@ -32,25 +32,10 @@ extern unsigned char* filebuf;    // The rest of the MP3 buffer
 
 /* Standard library functions that are used by the codecs follow here */
 
-/* Get these functions 'out of the way' of the standard functions. Not doing
- * so confuses the cygwin linker, and maybe others. These functions need to
- * be implemented elsewhere */
-#define malloc(x) codec_malloc(x)
-#define calloc(x,y) codec_calloc(x,y)
-#define realloc(x,y) codec_realloc(x,y)
-#define free(x) codec_free(x)
-
 void* codec_malloc(size_t size);
 void* codec_calloc(size_t nmemb, size_t size);
 void* codec_realloc(void* ptr, size_t size);
 void codec_free(void* ptr);
-
-#if !defined(SIMULATOR)
-#define alloca __builtin_alloca
-#else
-#define alloca(x) codec_alloca(x)
-void* codec_alloca(size_t size);
-#endif
 
 void *memcpy(void *dest, const void *src, size_t n);
 void *memset(void *s, int c, size_t n);
