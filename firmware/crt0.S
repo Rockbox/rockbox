@@ -191,7 +191,7 @@ irq_handler:
     /* Set up the DRAM controller. The refresh is based on the 11.2896MHz
        clock (5.6448MHz bus frequency). We haven't yet started the PLL */
 #if MEM < 32
-    move.w  #0x8202,%d0 /* DCR - Synchronous, 64 cycle refresh */
+    move.w  #0x8204,%d0 /* DCR - Synchronous, 80 cycle refresh */
 #else
     move.w  #0x8001,%d0 /* DCR - Synchronous, 32 cycle refresh */
 #endif
