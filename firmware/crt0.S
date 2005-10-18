@@ -267,48 +267,42 @@ irq_handler:
     lea     _iramstart,%a3
     lea     _iramend,%a4
 .iramloop:
+    move.l  (%a2)+,(%a3)+
     cmp.l   %a3,%a4
-    beq     .iramloopend
-    move.w  (%a2)+,(%a3)+
-    bra     .iramloop
-.iramloopend:
+    bhi.b   .iramloop
 #endif
 
     lea     _edata,%a2
     lea     _end,%a4
-    clr.l   %d0
 .edataloop:
+    clr.l   (%a2)+
     cmp.l   %a2,%a4
-    beq     .edataloopend
-    move.w  %d0,(%a2)+
-    bra    .edataloop
-.edataloopend:
+    bhi.b   .edataloop
 
     lea     _datacopy,%a2
     lea     _datastart,%a3
     lea     _dataend,%a4
+    cmp.l   %a2,%a3
+    beq.b   .nodatacopy
 .dataloop:
+    move.l  (%a2)+,(%a3)+
     cmp.l   %a3,%a4
-    beq     .dataloopend
-    move.w  (%a2)+,(%a3)+
-    bra     .dataloop
-.dataloopend:
+    bhi.b   .dataloop
+.nodatacopy:
 
     /* Munge the main stack */
+    move.l  #0xdeadbeef,%d0
     lea     stackbegin,%a2
     lea     stackend,%a4
-    move.l  #0xdeadbeef,%d0
+    move.l  %a4,%sp
 .mungeloop:
-    cmp.l   %a2,%a4
-    beq     .mungeloopend
     move.l  %d0,(%a2)+
-    bra     .mungeloop
-.mungeloopend:
+    cmp.l   %a2,%a4
+    bhi.b   .mungeloop
 
-    lea     stackend,%sp
     jsr     main
 .hoo:
-    bra     .hoo
+    bra.b   .hoo
 
     .section .resetvectors
 vectors:
