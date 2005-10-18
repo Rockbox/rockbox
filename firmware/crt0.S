@@ -19,7 +19,7 @@
 #include "config.h"
 #include "cpu.h"
 
-    .section .init.text
+    .section .init.text,"ax",@progbits
     .global    start
 start:
 #if CONFIG_CPU == TCC730
@@ -319,15 +319,13 @@ vectors:
 
     /* Fill in code here */
 #else
-    /* Platform:     Archos Jukebox
-     * We begin with some tricks. If we have built our code to be loaded
-     * via the standalone GDB stub, we will have out VBR at some other
-     * location than 0x9000000. We must copy the trap vectors for the
-     * GDB stub to our vector table.
-     * If, on the other hand, we are running standalone we will have
-     * the VBR at 0x9000000, and the copy will not do any harm.
-     */
+    /* Platform:     Archos Jukebox */
+
     mov.l   vbr_k,r1
+#ifdef DEBUG
+    /* If we have built our code to be loaded via the standalone GDB
+     * stub, we will have out VBR at some other location than 0x9000000.
+     * We must copy the trap vectors for the GDB stub to our vector table. */
     mov.l   orig_vbr_k,r2
 
     /* Move the invalid instruction vector (4) */
@@ -389,35 +387,31 @@ vectors:
     shll2   r0
     mov.l   @(r0,r2),r3
     mov.l   r3,@(r0,r1)
-
+#endif /* DEBUG */
     ldc     r1,vbr
 
     /* Now let's get on with the normal business */
-    mov.l   stack_k,r15
+    mov.l   stackend_k,r15
 
     /* zero out bss */
     mov.l   edata_k,r0
     mov.l   end_k,r1
     mov     #0,r2
-start_l:
-    mov.l   r2,@r0
-    add     #4,r0
-    cmp/ge  r1,r0
-    bf      start_l
-    nop
+edata_l:    /* backwards is faster and shorter */
+    mov.l   r2,@-r1
+    cmp/hi  r0,r1
+    bt      edata_l
 
     /* copy the .iram section */
     mov.l   iramcopy_k,r0
     mov.l   iram_k,r1
     mov.l   iramend_k,r2
-copy_l:
-    mov.l   @r0,r3
+iramcopy_l:
+    mov.l   @r0+,r3
     mov.l   r3,@r1
-    add     #4,r0
     add     #4,r1
-    cmp/ge  r2,r1
-    bf      copy_l
-    nop
+    cmp/hi  r1,r2
+    bt      iramcopy_l
 
     /* copy the .data section, for rombased execution */
     mov.l   datacopy_k,r0
@@ -426,25 +420,22 @@ copy_l:
     /* Don't copy if src and dest are equal */
     cmp/eq  r0,r1
     bt      nodatacopy
-copy_l2:
-    mov.l   @r0,r3
+data_l:
+    mov.l   @r0+,r3
     mov.l   r3,@r1
-    add     #4,r0
     add     #4,r1
-    cmp/ge  r2,r1
-    bf      copy_l2
-    nop
+    cmp/hi  r1,r2
+    bt      data_l
 nodatacopy:
+
     /* Munge the main thread stack */
-    mov.l   stack_k,r2
-    mov.l   deadbeef_k,r0
-    mov.l   stackbegin_k,r1
-munge_loop:
-    mov.l   r0,@r1
-    add     #4,r1
-    cmp/ge  r2,r1
-    bf      munge_loop
-    nop
+    mov.l   stackbegin_k,r0
+    mov.l   stackend_k,r1
+    mov.l   deadbeef_k,r2
+munge_l:    /* backwards is faster and shorter */
+    mov.l   r2,@-r1
+    cmp/hi  r0,r1
+    bt      munge_l
 
     mov     #0,r0
     ldc     r0,gbr
@@ -455,9 +446,10 @@ munge_loop:
     nop
 .hoo:
     bra     .hoo
+    nop
 
     .align  2
-stack_k:
+stackend_k:
     .long   _stackend
 stackbegin_k:
     .long   _stackbegin
@@ -483,8 +475,10 @@ main_k:
     .long   _main
 vbr_k:
     .long   vectors
+#ifdef DEBUG
 orig_vbr_k:
     .long   0x9000000
+#endif
 
     .section .resetvectors
 vectors:
