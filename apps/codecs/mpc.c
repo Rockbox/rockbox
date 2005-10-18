@@ -76,7 +76,7 @@ enum codec_status codec_start(struct codec_api *api)
     struct codec_api *ci = api;
     mpc_int64_t samplesdone;
     unsigned long frequency;
-    unsigned status = 1;
+    unsigned status;
     mpc_reader reader;
     mpc_streaminfo info;
     
@@ -132,7 +132,7 @@ next_track:
 
     /* This is the decoding loop. */
     samplesdone = 0;
-    while (status != 0) {
+    do {
         if (ci->seek_time) {
             mpc_int64_t new_sample_offset = ci->seek_time*info.sample_freq/1000;
             if (mpc_decoder_seek_sample(&decoder, new_sample_offset)) {
@@ -156,7 +156,8 @@ next_track:
             samplesdone += status;
             ci->set_elapsed(samplesdone/(frequency/1000));
         }
-    }
+    } while (status != 0) ;
+    
     if (ci->request_next_track())
         goto next_track;
     return CODEC_OK;
