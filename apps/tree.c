@@ -1638,8 +1638,11 @@ void tree_flush(void)
 #ifdef HAVE_DIRCACHE
     if (global_settings.dircache)
     {
-        global_settings.dircache_size = dircache_get_cache_size();
-        dircache_disable();
+        if (dircache_is_enabled())
+        {
+            global_settings.dircache_size = dircache_get_cache_size();
+            dircache_disable();
+        }
     }
     else
     {
@@ -1651,10 +1654,26 @@ void tree_flush(void)
 
 void tree_restore(void)
 {
+    int font_w, font_h;
+    
     tagdb_init();
     rundb_init();
 #ifdef HAVE_DIRCACHE
     if (global_settings.dircache)
+    {
+        /* Print "Scanning disk..." to the display. */
+        lcd_getstringsize("A", &font_w, &font_h);
+        lcd_putsxy((LCD_WIDTH/2) - ((strlen(str(LANG_DIRCACHE_BUILDING))*font_w)/2),
+                    LCD_HEIGHT-font_h*3, str(LANG_DIRCACHE_BUILDING));
+        lcd_update();
+
         dircache_build(global_settings.dircache_size);
+
+        /* Clean the text when we are done. */
+        lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        lcd_fillrect(0, LCD_HEIGHT-font_h*3, LCD_WIDTH, font_h);
+        lcd_set_drawmode(DRMODE_SOLID);
+        lcd_update();
+    }
 #endif
 }
