@@ -51,9 +51,10 @@ SECTIONS
         *(.resetvectors);
         *(.vectors);
         . = ALIGN(0x200);
-        *(.data)
         *(.icode)
+        *(.irodata)
         *(.idata)
+        *(.data)
         . = ALIGN(0x4);
         _dataend = .;         
         . = ALIGN(0x10);  /* Maintain proper alignment for .text section */
@@ -91,6 +92,7 @@ SECTIONS
     .bss :
     {
        _edata = .;
+        *(.ibss)
         *(.bss)
         *(COMMON)
        _end = .;

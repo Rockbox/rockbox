@@ -61,10 +61,9 @@
 
 /*** globals ***/
 
-unsigned char lcd_framebuffer[LCD_HEIGHT/4][LCD_WIDTH] IDATA_ATTR;
+unsigned char lcd_framebuffer[LCD_HEIGHT/4][LCD_WIDTH] IBSS_ATTR;
 
-/* should be 'const', but this causes a section type conflict */
-static unsigned char dibits[16] IDATA_ATTR = {
+static const unsigned char dibits[16] ICONST_ATTR = {
     0x00, 0x03, 0x0C, 0x0F, 0x30, 0x33, 0x3C, 0x3F,
     0xC0, 0xC3, 0xCC, 0xCF, 0xF0, 0xF3, 0xFC, 0xFF
 };

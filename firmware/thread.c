@@ -57,7 +57,7 @@ struct regs
 int num_threads;
 static volatile int num_sleepers;
 static int current_thread;
-static struct regs thread_contexts[MAXTHREADS] __attribute__ ((section(".idata")));
+static struct regs thread_contexts[MAXTHREADS] IBSS_ATTR;
 const char *thread_name[MAXTHREADS];
 void *thread_stack[MAXTHREADS];
 int thread_stack_size[MAXTHREADS];
@@ -66,7 +66,7 @@ static const char main_thread_name[] = "main";
 extern int stackbegin[];
 extern int stackend[];
 
-void switch_thread(void) __attribute__ ((section(".icode")));
+void switch_thread(void) ICODE_ATTR;
 static inline void store_context(void* addr) __attribute__ ((always_inline));
 static inline void load_context(const void* addr) __attribute__ ((always_inline));
 

@@ -246,7 +246,7 @@ irq_handler:
 
     move.l  #0xffffffbf,%d0
     and.l  %d0,(0x108,%a0)  /* Back to normal, the DRAM is now ready */
-#endif
+#endif /* BOOTLOADER */
 
     /* Invalicate cache */
     move.l  #0x01000000,%d0
@@ -263,38 +263,57 @@ irq_handler:
     movec.l %d0,%acr1
 
 #ifndef BOOTLOADER
+    /* zero out .ibss */
+    lea     _iedata,%a2
+    lea     _iend,%a4
+    bra.b   .iedatastart
+.iedataloop:
+    clr.l   (%a2)+
+.iedatastart:
+    cmp.l   %a2,%a4
+    bhi.b   .iedataloop
+
+    /* copy the .iram section */
     lea     _iramcopy,%a2
     lea     _iramstart,%a3
     lea     _iramend,%a4
+    bra.b   .iramstart
 .iramloop:
     move.l  (%a2)+,(%a3)+
+.iramstart:
     cmp.l   %a3,%a4
     bhi.b   .iramloop
-#endif
+#endif /* !BOOTLOADER */
 
+    /* zero out bss */
     lea     _edata,%a2
     lea     _end,%a4
+    bra.b   .edatastart
 .edataloop:
     clr.l   (%a2)+
+.edatastart:
     cmp.l   %a2,%a4
     bhi.b   .edataloop
 
+    /* copy the .data section */
     lea     _datacopy,%a2
     lea     _datastart,%a3
-    lea     _dataend,%a4
     cmp.l   %a2,%a3
-    beq.b   .nodatacopy
+    beq.b   .nodatacopy   /* Don't copy if src and dest are equal */
+    lea     _dataend,%a4
+    bra.b   .datastart
 .dataloop:
     move.l  (%a2)+,(%a3)+
+.datastart:
     cmp.l   %a3,%a4
     bhi.b   .dataloop
 .nodatacopy:
 
     /* Munge the main stack */
-    move.l  #0xdeadbeef,%d0
     lea     stackbegin,%a2
     lea     stackend,%a4
     move.l  %a4,%sp
+    move.l  #0xdeadbeef,%d0
 .mungeloop:
     move.l  %d0,(%a2)+
     cmp.l   %a2,%a4
@@ -315,12 +334,12 @@ vectors:
 #else
     /* Platform:     Archos Jukebox */
 
-    mov.l   vbr_k,r1
+    mov.l   .vbr_k,r1
 #ifdef DEBUG
     /* If we have built our code to be loaded via the standalone GDB
      * stub, we will have out VBR at some other location than 0x9000000.
      * We must copy the trap vectors for the GDB stub to our vector table. */
-    mov.l   orig_vbr_k,r2
+    mov.l   .orig_vbr_k,r2
 
     /* Move the invalid instruction vector (4) */
     mov     #4,r0
@@ -384,58 +403,77 @@ vectors:
 #endif /* DEBUG */
     ldc     r1,vbr
 
-    /* Now let's get on with the normal business */
-    mov.l   stackend_k,r15
-
-    /* zero out bss */
-    mov.l   edata_k,r0
-    mov.l   end_k,r1
-    mov     #0,r2
-edata_l:    /* backwards is faster and shorter */
-    mov.l   r2,@-r1
-    cmp/hi  r0,r1
-    bt      edata_l
-
-    /* copy the .iram section */
-    mov.l   iramcopy_k,r0
-    mov.l   iram_k,r1
-    mov.l   iramend_k,r2
-iramcopy_l:
-    mov.l   @r0+,r3
-    mov.l   r3,@r1
-    add     #4,r1
-    cmp/hi  r1,r2
-    bt      iramcopy_l
-
-    /* copy the .data section, for rombased execution */
-    mov.l   datacopy_k,r0
-    mov.l   data_k,r1
-    mov.l   dataend_k,r2
-    /* Don't copy if src and dest are equal */
-    cmp/eq  r0,r1
-    bt      nodatacopy
-data_l:
-    mov.l   @r0+,r3
-    mov.l   r3,@r1
-    add     #4,r1
-    cmp/hi  r1,r2
-    bt      data_l
-nodatacopy:
-
-    /* Munge the main thread stack */
-    mov.l   stackbegin_k,r0
-    mov.l   stackend_k,r1
-    mov.l   deadbeef_k,r2
-munge_l:    /* backwards is faster and shorter */
-    mov.l   r2,@-r1
-    cmp/hi  r0,r1
-    bt      munge_l
-
     mov     #0,r0
     ldc     r0,gbr
 
-    ! call the mainline
-    mov.l   main_k,r0
+    /* zero out .ibss */
+    mov.l   .iedata_k,r0
+    mov.l   .iend_k,r1
+    bra     .iedatastart
+    mov     #0,r2
+.iedataloop: /* backwards is faster and shorter */
+    mov.l   r2,@-r1
+.iedatastart:
+    cmp/hi  r0,r1
+    bt      .iedataloop
+
+    /* copy the .iram section */
+    mov.l   .iramcopy_k,r0
+    mov.l   .iram_k,r1
+    mov.l   .iramend_k,r2
+    /* Note: We cannot put a PC relative load into the delay slot of a 'bra'
+       instruction (the offset would be wrong), but there is nothing else to
+       do before the loop, so the delay slot would be 'nop'. The cmp / bf
+       sequence is the same length, but more efficient. */
+    cmp/hi  r1,r2
+    bf      .noiramcopy
+.iramloop:
+    mov.l   @r0+,r3
+    mov.l   r3,@r1
+    add     #4,r1
+    cmp/hi  r1,r2
+    bt      .iramloop
+.noiramcopy:
+
+    /* zero out bss */
+    mov.l   .edata_k,r0
+    mov.l   .end_k,r1
+    bra     .edatastart
+    mov     #0,r2
+.edataloop: /* backwards is faster and shorter */
+    mov.l   r2,@-r1
+.edatastart:
+    cmp/hi  r0,r1
+    bt      .edataloop
+
+    /* copy the .data section, for rombased execution */
+    mov.l   .datacopy_k,r0
+    mov.l   .data_k,r1
+    cmp/eq  r0,r1
+    bt      .nodatacopy   /* Don't copy if src and dest are equal */
+    mov.l   .dataend_k,r2
+    cmp/hi  r1,r2
+    bf      .nodatacopy
+.dataloop:
+    mov.l   @r0+,r3
+    mov.l   r3,@r1
+    add     #4,r1
+    cmp/hi  r1,r2
+    bt      .dataloop
+.nodatacopy:
+
+    /* Munge the main thread stack */
+    mov.l   .stackbegin_k,r0
+    mov.l   .stackend_k,r1
+    mov     r1,r15
+    mov.l   .deadbeef_k,r2
+.mungeloop: /* backwards is faster and shorter */
+    mov.l   r2,@-r1
+    cmp/hi  r0,r1
+    bt      .mungeloop
+
+    /* call the mainline */
+    mov.l   .main_k,r0
     jsr     @r0
     nop
 .hoo:
@@ -443,36 +481,40 @@ munge_l:    /* backwards is faster and shorter */
     nop
 
     .align  2
-stackend_k:
-    .long   _stackend
-stackbegin_k:
-    .long   _stackbegin
-deadbeef_k:
-    .long   0xdeadbeef
-edata_k:
-    .long   _edata
-end_k:
-    .long   _end
-iramcopy_k:
-    .long   _iramcopy
-iram_k:
-    .long   _iramstart
-iramend_k:
-    .long   _iramend
-datacopy_k:
-    .long   _datacopy
-data_k:
-    .long   _datastart
-dataend_k:
-    .long   _dataend
-main_k:
-    .long   _main
-vbr_k:
+.vbr_k:
     .long   vectors
 #ifdef DEBUG
-orig_vbr_k:
-    .long   0x9000000
+.orig_vbr_k:
+    .long   0x09000000
 #endif
+.iedata_k:
+    .long   _iedata
+.iend_k:
+    .long   _iend
+.iramcopy_k:
+    .long   _iramcopy
+.iram_k:
+    .long   _iramstart
+.iramend_k:
+    .long   _iramend
+.edata_k:
+    .long   _edata
+.end_k:
+    .long   _end
+.datacopy_k:
+    .long   _datacopy
+.data_k:
+    .long   _datastart
+.dataend_k:
+    .long   _dataend
+.stackbegin_k:
+    .long   _stackbegin
+.stackend_k:
+    .long   _stackend
+.deadbeef_k:
+    .long   0xdeadbeef
+.main_k:
+    .long   _main
 
     .section .resetvectors
 vectors:

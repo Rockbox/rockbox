@@ -188,8 +188,17 @@ SECTIONS
     {
         _iramstart = .;
         *(.icode)
+        *(.irodata)
         *(.idata)
         _iramend = .;
+    } > IRAM
+    
+    .ibss (NOLOAD) :
+    {
+        _iedata = .;
+        *(.ibss)
+        . = ALIGN(0x4);
+        _iend = .;
     } > IRAM
 
 #ifdef CPU_COLDFIRE

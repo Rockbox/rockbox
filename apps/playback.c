@@ -112,13 +112,13 @@ static const char audio_thread_name[] = "audio";
 
 /* Codec thread. */
 static struct event_queue codec_queue;
-static long codec_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)] IDATA_ATTR;
+static long codec_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)] IBSS_ATTR;
 static const char codec_thread_name[] = "codec";
 
 /* Voice codec thread. */
 static struct event_queue voice_codec_queue;
 /* Not enough IRAM for this. */
-static long voice_codec_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)] IDATA_ATTR;
+static long voice_codec_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)] IBSS_ATTR;
 static const char voice_codec_thread_name[] = "voice codec";
 
 static struct mutex mutex_bufferfill;

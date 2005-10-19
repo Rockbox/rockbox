@@ -139,11 +139,15 @@
     (CONFIG_CPU == MCF5249) || /* Coldfire: core, plugins, codecs */ \
     (CONFIG_CPU == TCC730))  /* CalmRISC16: core, (plugins, codecs) */
 #define ICODE_ATTR	__attribute__ ((section(".icode")))
+#define ICONST_ATTR __attribute__ ((section(".irodata")))
 #define IDATA_ATTR	__attribute__ ((section(".idata")))
+#define IBSS_ATTR	__attribute__ ((section(".ibss")))
 #define USE_IRAM
 #else
 #define ICODE_ATTR
+#define ICONST_ATTR
 #define IDATA_ATTR
+#define IBSS_ATTR
 #endif
 
 #endif

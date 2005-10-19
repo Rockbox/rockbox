@@ -80,7 +80,9 @@ SECTIONS
     {
         iramstart = .;
         *(.icode)
+        *(.irodata)
         *(.idata)
+        *(.ibss)
         iramend = .;
     } > PLUGIN_IRAM
 #endif

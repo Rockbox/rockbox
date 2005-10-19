@@ -130,9 +130,9 @@ struct dither_data
     long random;
 };
 
-static struct dsp_config dsp_conf[2] IDATA_ATTR;
-static struct dither_data dither_data[2] IDATA_ATTR;
-static struct resample_data resample_data[2][2] IDATA_ATTR;
+static struct dsp_config dsp_conf[2] IBSS_ATTR;
+static struct dither_data dither_data[2] IBSS_ATTR;
+static struct resample_data resample_data[2][2] IBSS_ATTR;
 
 extern int current_codec;
 struct dsp_config *dsp;
@@ -142,8 +142,8 @@ struct dsp_config *dsp;
  * of copying needed is minimized for that case.
  */
 
-static long sample_buf[SAMPLE_BUF_SIZE] IDATA_ATTR;
-static long resample_buf[RESAMPLE_BUF_SIZE] IDATA_ATTR;
+static long sample_buf[SAMPLE_BUF_SIZE] IBSS_ATTR;
+static long resample_buf[RESAMPLE_BUF_SIZE] IBSS_ATTR;
 
 
 /* Convert at most count samples to the internal format, if needed. Returns
