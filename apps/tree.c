@@ -1654,13 +1654,13 @@ void tree_flush(void)
 
 void tree_restore(void)
 {
-    int font_w, font_h;
-    
     tagdb_init();
     rundb_init();
 #ifdef HAVE_DIRCACHE
     if (global_settings.dircache)
     {
+        int font_w, font_h;
+        
         /* Print "Scanning disk..." to the display. */
         lcd_getstringsize("A", &font_w, &font_h);
         lcd_putsxy((LCD_WIDTH/2) - ((strlen(str(LANG_DIRCACHE_BUILDING))*font_w)/2),
