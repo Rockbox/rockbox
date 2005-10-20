@@ -823,7 +823,7 @@ static void _writearray(unsigned char *address, const unsigned char *src,
                                   /* pop all 8 patterns */
         "not.l   %[mask]     \n"  /* "set" mask -> "keep" mask */
         "and.l   #0xFF,%[mask]   \n"
-        "beq.b   .wa_sloop   \n"  /* yes: jump to short loop */
+        "beq.b   .wa_sstart  \n"  /* yes: jump to short loop */
 
     ".wa_floop:              \n"  /** full loop (there are bits to keep)**/
         "clr.l   %%d0        \n"
@@ -860,6 +860,9 @@ static void _writearray(unsigned char *address, const unsigned char *src,
         "bhi.b   .wa_floop   \n"  /* no: loop */
 
         "bra.b   .wa_end     \n"
+        
+    ".wa_sstart:             \n"
+        "move.l  %%a0,%[mask]\n"  /* mask isn't needed here, reuse reg */
 
     ".wa_sloop:              \n"  /** short loop (nothing to keep) **/
         "clr.l   %%d0        \n"
@@ -873,10 +876,8 @@ static void _writearray(unsigned char *address, const unsigned char *src,
         "addx.l  %%d0,%%d0   \n"
         "lsr.l   #1,%%d6     \n"
         "addx.l  %%d0,%%d0   \n"
-        "move.l  %%a0,%%d1   \n"
-        "lsr.l   #1,%%d1     \n"
+        "lsr.l   #1,%[mask]  \n"
         "addx.l  %%d0,%%d0   \n"
-        "move.l  %%d1,%%a0   \n"
         "move.l  %%a1,%%d1   \n"
         "lsr.l   #1,%%d1     \n"
         "addx.l  %%d0,%%d0   \n"
