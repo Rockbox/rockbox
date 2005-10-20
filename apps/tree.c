@@ -1641,8 +1641,8 @@ void tree_flush(void)
         if (dircache_is_enabled())
         {
             global_settings.dircache_size = dircache_get_cache_size();
-            dircache_disable();
         }
+        dircache_disable();
     }
     else
     {

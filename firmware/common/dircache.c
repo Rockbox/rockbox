@@ -41,6 +41,7 @@
 
 /* Queue commands. */
 #define DIRCACHE_BUILD 1
+#define DIRCACHE_STOP  2
 
 extern char *audiobuf;
 
@@ -406,6 +407,11 @@ static void dircache_thread(void)
                 thread_enabled = false;
                 break ;
                 
+            case DIRCACHE_STOP:
+                logf("Stopped the rebuilding.");
+                dircache_initialized = false;
+                break ;
+            
 #ifndef SIMULATOR
             case SYS_USB_CONNECTED:
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
@@ -487,13 +493,28 @@ int dircache_get_cache_size(void)
 void dircache_disable(void)
 {
     int i;
+    bool cache_in_use;
+    
+    if (thread_enabled)
+        queue_post(&dircache_queue, DIRCACHE_STOP, 0);
     
     while (thread_enabled)
         sleep(1);
     dircache_initialized = false;
 
-    for (i = 0; i < MAX_OPEN_DIRS; i++)
-        opendirs[i].busy = false;
+    logf("Waiting for cached dirs to release");
+    do {
+        cache_in_use = false;
+        for (i = 0; i < MAX_OPEN_DIRS; i++) {
+            if (!opendirs[i].regulardir && opendirs[i].busy)
+            {
+                cache_in_use = true;
+                sleep(1);
+                break ;
+            }
+        }
+    } while (cache_in_use) ;
+    logf("Cache released");
 }
 
 /* --- Directory cache live updating functions --- */
