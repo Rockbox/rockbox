@@ -116,7 +116,7 @@
         0 = Track entry is valid
         1 = Track does not exist on disk and should be skipped
  */
-#define PLAYLIST_SEEK_MASK              0x07FFFFFF
+#define PLAYLIST_SEEK_MASK              0x0FFFFFFF
 #define PLAYLIST_INSERT_TYPE_MASK       0xC0000000
 #define PLAYLIST_QUEUE_MASK             0x20000000
 
