@@ -193,7 +193,7 @@ void pcmbuf_watermark_callback(int bytes_left)
 {
     /* Fill audio buffer by boosting cpu */
     pcmbuf_boost(true);
-    if (bytes_left <= CHUNK_SIZE * 2)
+    if (bytes_left <= CHUNK_SIZE * 2 && crossfade_mode != CFM_FLUSH)
         crossfade_active = false;
 }
 
@@ -347,8 +347,9 @@ static void crossfade_start(void)
     }
 
     logf("crossfade_start");
-    audiobuffer_fillpos = 0;
     pcmbuf_boost(true);
+    while (audiobuffer_fillpos != 0)
+        pcmbuf_flush_fillpos();
     crossfade_active = true;
     crossfade_pos = audiobuffer_pos;
 
@@ -360,7 +361,7 @@ static void crossfade_start(void)
             break ;
 
         case CFM_FLUSH:
-            crossfade_amount = (bytesleft - (CHUNK_SIZE * 2))/2;
+            crossfade_amount = bytesleft /2;
             crossfade_rem = crossfade_amount;
             break ;
     }
@@ -439,13 +440,10 @@ void* pcmbuf_request_buffer(long length, long *realsize)
 {
     void *ptr = NULL;
 
-    if (crossfade_init)
-        crossfade_start();
-        
-    while (audiobuffer_free < length + audiobuffer_fillpos
-           + CHUNK_SIZE && !crossfade_active) {
-        pcmbuf_boost(false);
-        sleep(1);
+    if (!prepare_insert(length))
+    {
+        *realsize = 0;
+        return NULL;
     }
     
     if (crossfade_active) {
@@ -473,8 +471,6 @@ void pcmbuf_flush_buffer(long length)
     int copy_n;
     char *buf;
 
-    prepare_insert(length);
-    
     if (crossfade_active) {
         buf = &guardbuf[0];
         length = MIN(length, PCMBUF_GUARD);

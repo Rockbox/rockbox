@@ -99,10 +99,10 @@
 
 /*
     Each playlist index has a flag associated with it which identifies what
-    type of track it is.  These flags are stored in the 3 high order bits of
+    type of track it is.  These flags are stored in the 4 high order bits of
     the index.
     
-    NOTE: This limits the playlist file size to a max of 512M.
+    NOTE: This limits the playlist file size to a max of 256M.
 
     Bits 31-30:
         00 = Playlist track
@@ -112,8 +112,11 @@
     Bit 29:
         0 = Added track
         1 = Queued track
+    Bit 28:
+        0 = Track entry is valid
+        1 = Track does not exist on disk and should be skipped
  */
-#define PLAYLIST_SEEK_MASK              0x1FFFFFFF
+#define PLAYLIST_SEEK_MASK              0x07FFFFFF
 #define PLAYLIST_INSERT_TYPE_MASK       0xC0000000
 #define PLAYLIST_QUEUE_MASK             0x20000000
 
@@ -122,6 +125,7 @@
 #define PLAYLIST_INSERT_TYPE_APPEND     0xC0000000
 
 #define PLAYLIST_QUEUED                 0x20000000
+#define PLAYLIST_SKIPPED                0x10000000
 
 #define PLAYLIST_DISPLAY_COUNT          10
 
@@ -828,6 +832,72 @@ static int sort_playlist(struct playlist_info* playlist, bool start_current,
     return 0;
 }
 
+/* Marks the index of the track to be skipped that is "steps" away from
+ * current playing track.
+ */
+void playlist_skip_entry(struct playlist_info *playlist, int steps)
+{
+    int index;
+
+    if (playlist == NULL)
+        playlist = &current_playlist;
+    
+    index = rotate_index(playlist, playlist->index);
+    index += steps;
+    if (index < 0 || index >= playlist->amount)
+        return ;
+    
+    index = (index+playlist->first_index) % playlist->amount;
+    playlist->indices[index] |= PLAYLIST_SKIPPED;
+}
+
+/* Calculate how many steps we have to really step when skipping entries
+ * marked as bad.
+ */
+static int calculate_step_count(const struct playlist_info *playlist, int steps)
+{
+    int i, count, direction;
+    int index;
+    int stepped_count = 0;
+    
+    if (steps < 0)
+    {
+        direction = -1;
+        count = -steps;
+    }
+    else
+    {
+        direction = 1;
+        count = steps;
+    }
+
+    index = playlist->index;
+    i = 0;
+    while (i < count)
+    {
+        index += direction;
+        /* Boundary check */
+        if (index < 0)
+            index += playlist->amount;
+        if (index >= playlist->amount)
+            index -= playlist->amount;
+
+        /* Check if we found a bad entry. */
+        if (playlist->indices[index] & PLAYLIST_SKIPPED)
+        {
+            steps += direction;
+            /* Are all entries bad? */
+            if (stepped_count++ > playlist->amount)
+                break ;
+        }
+        else
+            i++;
+    }
+
+    return steps;
+}
+
+
 /*
  * returns the index of the track that is "steps" away from current playing
  * track.
@@ -848,6 +918,7 @@ static int get_next_index(const struct playlist_info* playlist, int steps,
         (!global_settings.playlist_shuffle || playlist->amount <= 1))
         repeat_mode = REPEAT_ALL;
 
+    steps = calculate_step_count(playlist, steps);
     switch (repeat_mode)
     {
         case REPEAT_SHUFFLE:
@@ -856,7 +927,6 @@ static int get_next_index(const struct playlist_info* playlist, int steps,
         case REPEAT_OFF:
         {
             current_index = rotate_index(playlist, current_index);
-            
             next_index = current_index+steps;
             if ((next_index < 0) || (next_index >= playlist->amount))
                 next_index = -1;
@@ -904,6 +974,10 @@ static int get_next_index(const struct playlist_info* playlist, int steps,
         }
     }
 
+    /* No luck if the whole playlist was bad. */
+    if (playlist->indices[next_index] & PLAYLIST_SKIPPED)
+        return -1;
+    
     return next_index;
 }
 
@@ -2652,8 +2726,12 @@ int playlist_get_track_info(struct playlist_info* playlist, int index,
             info->attr |= PLAYLIST_ATTR_QUEUED;
         else
             info->attr |= PLAYLIST_ATTR_INSERTED;
+        
     }
 
+    if (playlist->indices[index] & PLAYLIST_SKIPPED)
+        info->attr |= PLAYLIST_ATTR_SKIPPED;
+    
     info->index = index;
     info->display_index = rotate_index(playlist, index) + 1;
 

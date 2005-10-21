@@ -112,6 +112,7 @@ struct playlist_entry {
     int index;                  /* Playlist index                           */
     int display_index;          /* Display index                            */
     bool queued;                /* Is track queued?                         */
+    bool skipped;               /* Is track marked as bad?                  */
 };
 
 static struct playlist_viewer_info  viewer;
@@ -381,6 +382,7 @@ static int load_entry(int index, int pos, char* p, int size)
         tracks[pos].index = info.index;
         tracks[pos].display_index = info.display_index;
         tracks[pos].queued = info.attr & PLAYLIST_ATTR_QUEUED;
+        tracks[pos].skipped = info.attr & PLAYLIST_ATTR_SKIPPED;
         
         result = len;
     }
@@ -424,14 +426,18 @@ static void format_name(char* dest, const char* src)
 static void format_line(const struct playlist_entry* track, char* str, int len)
 {
     char name[MAX_PATH];
+    char *skipped = "";
 
     format_name(name, track->name);
 
+    if (track->skipped)
+        skipped = "(ERR) ";
+    
     if (global_settings.playlist_viewer_indices)
         /* Display playlist index */
-        snprintf(str, len, "%d. %s", track->display_index, name);
+        snprintf(str, len, "%d. %s%s", track->display_index, skipped, name);
     else
-        snprintf(str, len, "%s", name);
+        snprintf(str, len, "%s%s", skipped, name);
 
 }
 

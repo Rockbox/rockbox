@@ -296,9 +296,15 @@ bool codec_pcmbuf_insert_split_callback(void *ch1, void *ch2,
     }
 
     while (length > 0) {
+        /* This will prevent old audio from playing when skipping tracks. */
+        if (ci.reload_codec || ci.stop_codec)
+            return true;
+    
         while ((dest = pcmbuf_request_buffer(dsp_output_size(length), 
             &output_size)) == NULL) {
-            yield();
+            sleep(1);
+            if (ci.reload_codec || ci.stop_codec)
+                return true;
         }
 
         /* Get the real input_size for output_size bytes, guarding
@@ -1008,7 +1014,6 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     off_t size;
     int rc, i;
     int copy_n;
-    int playlist_index;
 
     /* Stop buffer filling if there is no free track entries.
        Don't fill up the last track entry (we wan't to store next track
@@ -1025,10 +1030,6 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         return false;
 
     last_index = playlist_get_display_index();
-    playlist_index = playlist_get_display_index() - 1
-                    + playlist_get_first_index(NULL) + peek_offset;
-    if (playlist_index >= playlist_amount())
-        playlist_index -= playlist_amount();
 
     peek_again:
     /* Get track name from current playlist read position. */
@@ -1038,8 +1039,8 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         fd = open(trackname, O_RDONLY);
         if (fd < 0) {
             logf("Open failed");
-            /* Delete invalid entry from playlist. */
-            playlist_delete(NULL, playlist_index);
+            /* Skip invalid entry from playlist. */
+            playlist_skip_entry(NULL, peek_offset);
             continue ;
         }
         break ;
@@ -1088,8 +1089,8 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
 
         /* Try skipping to next track. */
         if (fill_bytesleft > 0) {
-            /* Delete invalid entry from playlist. */
-            playlist_delete(NULL, playlist_index);
+            /* Skip invalid entry from playlist. */
+            playlist_skip_entry(NULL, peek_offset);
             goto peek_again;
         }
         return false;
@@ -1104,8 +1105,8 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
             tracks[track_widx].filesize = 0;
             tracks[track_widx].filerem = 0;
             close(fd);
-            /* Delete invalid entry from playlist. */
-            playlist_delete(NULL, playlist_index);
+            /* Skip invalid entry from playlist. */
+            playlist_skip_entry(NULL, peek_offset);
             goto peek_again;
         }
     }

@@ -58,6 +58,7 @@ struct playlist_info
 
 #define PLAYLIST_ATTR_QUEUED    0x01
 #define PLAYLIST_ATTR_INSERTED  0x02
+#define PLAYLIST_ATTR_SKIPPED   0x04
 
 #define DEFAULT_DYNAMIC_PLAYLIST_NAME "/dynamic.m3u"
 
@@ -99,6 +100,7 @@ int playlist_insert_directory(struct playlist_info* playlist,
                               bool recurse);
 int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
                              int position, bool queue);
+void playlist_skip_entry(struct playlist_info *playlist, int steps);
 int playlist_delete(struct playlist_info* playlist, int index);
 int playlist_move(struct playlist_info* playlist, int index, int new_index);
 int playlist_randomise(struct playlist_info* playlist, unsigned int seed,
