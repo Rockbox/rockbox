@@ -297,13 +297,13 @@ bool codec_pcmbuf_insert_split_callback(void *ch1, void *ch2,
 
     while (length > 0) {
         /* This will prevent old audio from playing when skipping tracks. */
-        if (ci.reload_codec || ci.stop_codec)
+        if ((ci.reload_codec || ci.stop_codec) && current_codec != CODEC_IDX_VOICE)
             return true;
     
         while ((dest = pcmbuf_request_buffer(dsp_output_size(length), 
             &output_size)) == NULL) {
             sleep(1);
-            if (ci.reload_codec || ci.stop_codec)
+            if ((ci.reload_codec || ci.stop_codec) && current_codec != CODEC_IDX_VOICE)
                 return true;
         }
 
@@ -1676,7 +1676,7 @@ void audio_thread(void)
 
                 playlist_update_resume_info(audio_current_track());
 
-		/* If there are no tracks in the playlist, then the playlist
+                /* If there are no tracks in the playlist, then the playlist
                    was empty or none of the filenames were valid.  No point
                    in playing an empty playlist. */
                 if (playlist_amount() == 0) {

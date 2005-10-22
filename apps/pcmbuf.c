@@ -652,7 +652,7 @@ void pcmbuf_mix(char *buf, long length)
     length /= 2;
 
     while (length-- > 0) {
-        obuf[mixpos] = MIN(MAX(obuf[mixpos] + *ibuf*4, -32768), 32767);
+        obuf[mixpos] = MIN(MAX(obuf[mixpos]/4 + *ibuf, -32768), 32767);
         
         ibuf++;
         mixpos++;
