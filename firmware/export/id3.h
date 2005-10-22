@@ -82,6 +82,9 @@ struct mp3entry {
     /* MP3 stream specific info */
     unsigned long frame_count; /* number of frames in the file (if VBR) */
 
+    /* Used for A52/AC3 */
+    unsigned long bytesperframe; /* number of bytes per frame (if CBR) */
+
     /* Xing VBR fields */
     bool vbr;
     bool has_toc;           /* True if there is a VBR header in the file */

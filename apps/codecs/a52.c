@@ -24,6 +24,8 @@
 
 #define BUFFER_SIZE 4096
 
+#define A52_SAMPLESPERFRAME (6*256)
+
 struct codec_api *ci;
 
 static a52_state_t *state;
@@ -124,6 +126,7 @@ enum codec_status codec_start(struct codec_api *api)
 {
     long n;
     unsigned char *filebuf;
+    int sample_loc;
 
     /* Generic codec initialisation */
     TEST_CODEC_API(api);
@@ -159,6 +162,16 @@ next_track:
     while (1) {
         if (ci->stop_codec || ci->reload_codec)
             break;
+
+        if (ci->seek_time) {
+            sample_loc = ci->seek_time/1000 * ci->id3->frequency;
+
+            if (ci->seek_buffer((sample_loc/A52_SAMPLESPERFRAME)*ci->id3->bytesperframe)) {
+                samplesdone = sample_loc;
+                ci->set_elapsed(samplesdone/(ci->id3->frequency/1000));
+            }
+            ci->seek_time = 0;
+        }
 
         filebuf = ci->request_buffer(&n, BUFFER_SIZE);
 

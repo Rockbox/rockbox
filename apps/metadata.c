@@ -1259,7 +1259,6 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
 {
     unsigned char* buf;
     unsigned long totalsamples;
-    int bytesperframe;
     int i;
       
     /* Load codec specific track tag information. */
@@ -1381,17 +1380,17 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         {
         case 0x00: 
             track->id3.frequency = 48000; 
-            bytesperframe=track->id3.bitrate * 2 * 2;
+            track->id3.bytesperframe=track->id3.bitrate * 2 * 2;
             break;
             
         case 0x40: 
             track->id3.frequency = 44100;
-            bytesperframe = a52_441framesizes[i];
+            track->id3.bytesperframe = a52_441framesizes[i];
             break;
         
         case 0x80: 
             track->id3.frequency = 32000; 
-            bytesperframe = track->id3.bitrate * 3 * 2;
+            track->id3.bytesperframe = track->id3.bitrate * 3 * 2;
             break;
         
         default: 
@@ -1401,7 +1400,7 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         }
 
         /* One A52 frame contains 6 blocks, each containing 256 samples */
-        totalsamples = (track->filesize / bytesperframe) * 6 * 256;
+        totalsamples = (track->filesize / track->id3.bytesperframe) * 6 * 256;
         track->id3.length = (totalsamples / track->id3.frequency) * 1000;
         break;
 
