@@ -35,10 +35,8 @@ unsigned long frequency;
 /* used outside liba52 */
 static uint8_t buf[3840] IDATA_ATTR;
 
-void output_audio(sample_t *samples, int flags)
+void output_audio(sample_t *samples)
 {
-    flags &= A52_CHANNEL_MASK | A52_LFE;
-
     do {
         ci->yield();
     } while (!ci->pcmbuf_insert_split(&samples[0], &samples[256], 
@@ -87,7 +85,7 @@ void a52_decode_data(uint8_t *start, uint8_t *end)
                 int i;
 
                 /* This is the configuration for the downmixing: */
-                flags = A52_STEREO | A52_ADJUST_LEVEL | A52_LFE;
+                flags = A52_STEREO | A52_ADJUST_LEVEL;
 
                 if (a52_frame(state, buf, &flags, &level, bias))
                     goto error;
@@ -99,7 +97,7 @@ void a52_decode_data(uint8_t *start, uint8_t *end)
                 for (i = 0; i < 6; i++) {
                     if (a52_block(state))
                         goto error;
-                    output_audio(a52_samples(state), flags);
+                    output_audio(a52_samples(state));
                     samplesdone += 256;
                 }
                 ci->set_elapsed(samplesdone/(frequency/1000));
