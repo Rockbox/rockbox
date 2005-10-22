@@ -128,7 +128,6 @@ _memset:
  *  %d3 - data (for burst transfer)
  *  %a0 - start address
  *  %a1 - current address (runs down from end to start)
- *  %a2 - end address (for burst transfer)
  *
  * For maximum speed this routine uses both long stores and burst mode,
  * storing whole lines with movem.l. The routine fills memory from end
@@ -186,37 +185,36 @@ memset:
 .end_l1:
     move.l  %d2,-(%sp)      /* free some registers */
     move.l  %d3,-(%sp)
-    move.l  %a2,-(%sp)
-    
+
     move.l  %d0,%d1         /* spread data to 4 data registers */
     move.l  %d0,%d2
     move.l  %d0,%d3
-    lea.l   (15,%a0),%a2    /* %a2 = start address + 15, acct. for trl. data */
+    lea.l   (15,%a0),%a0    /* start address += 15, acct. for trl. data */
     
     /* main loop: set whole lines utilising burst mode */
 .loop_line:
     lea.l   (-16,%a1),%a1   /* pre-decrement */
     movem.l %d0-%d3,(%a1)   /* store line */
-    cmp.l   %a2,%a1         /* runs %a1 down to first line bound */
+    cmp.l   %a0,%a1         /* runs %a1 down to first line bound */
     bhi.b   .loop_line
-    
-    move.l  (%sp)+,%a2      /* restore registers */
-    move.l  (%sp)+,%d3
+
+    lea.l   (-15,%a0),%a0   /* correct start address */
+    move.l  (%sp)+,%d3      /* restore registers */
     move.l  (%sp)+,%d2
 
     move.l  %a0,%d1         /* %d1 = start address ... */
     addq.l  #3,%d1          /* ... +3, account for possible trailing bytes */
-    bra.b   .start_l2       /* there might be no longwords left when coming
-                             * out of the main loop */
+    cmp.l   %d1,%a1         /* any longwords left */
+    bhi.b   .loop_l2        /* yes: jump to longword loop */
+    bra.b   .no_longs       /* no: skip loop */
 
 .no_lines:
     move.l  %a0,%d1         /* %d1 = start address ... */
     addq.l  #3,%d1          /* ... +3, account for possible trailing bytes */
-    
+
     /* trailing longword loop */
 .loop_l2:
     move.l  %d0,-(%a1)      /* store longword */
-.start_l2:
     cmp.l   %d1,%a1         /* runs %a1 down to first long bound */
     bhi.b   .loop_l2
 
