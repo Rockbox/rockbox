@@ -144,7 +144,6 @@ void screen_resized(int width, int height)
     XFillRectangle(dpy, window, draw_gc, 0, 0, width*display_zoom,
                    height*display_zoom);
     XtAppUnlock(app);
-    lcd_display_redraw=true;
     screen_redraw();
 }
 
@@ -259,6 +258,7 @@ void screen_redraw()
     drawline(1, X2, Y1, X2, Y2);
     drawline(1, X1, Y2, X2, Y2);
     drawline(1, X1, Y1, X1, Y2);
+    lcd_display_redraw = true;
     lcd_update();
 #ifdef LCD_REMOTE_HEIGHT
     /* draw a border around the remote LCD screen */
@@ -271,6 +271,7 @@ void screen_redraw()
     drawline(1, RX2, RY1, RX2, RY2);
     drawline(1, RX1, RY2, RX2, RY2);
     drawline(1, RX1, RY1, RX1, RY2);
+    lcd_display_redraw = true;
     lcd_remote_update();
 #endif
 }
