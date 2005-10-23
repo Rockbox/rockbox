@@ -252,8 +252,8 @@ void screen_redraw()
     /* draw a border around the screen */
 #define X1 0
 #define Y1 0
-#define X2 (LCD_WIDTH + MARGIN_X*2)
-#define Y2 (LCD_HEIGHT + MARGIN_Y)
+#define X2 (LCD_WIDTH + 2*MARGIN_X - 1)
+#define Y2 (LCD_HEIGHT + 2*MARGIN_Y - 1)
 
     drawline(1, X1, Y1, X2, Y1);
     drawline(1, X2, Y1, X2, Y2);
@@ -263,9 +263,9 @@ void screen_redraw()
 #ifdef LCD_REMOTE_HEIGHT
     /* draw a border around the remote LCD screen */
 #define RX1 0
-#define RY1 (Y2 +1)
-#define RX2 (LCD_REMOTE_WIDTH + MARGIN_X*2)
-#define RY2 (Y2 + 1 + LCD_REMOTE_HEIGHT)
+#define RY1 (Y2 + 1)
+#define RX2 (LCD_REMOTE_WIDTH + 2*MARGIN_X - 1)
+#define RY2 (RY1 + LCD_REMOTE_HEIGHT + 2*MARGIN_Y - 1)
 
     drawline(1, RX1, RY1, RX2, RY1);
     drawline(1, RX2, RY1, RX2, RY2);

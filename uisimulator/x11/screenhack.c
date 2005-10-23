@@ -53,6 +53,7 @@
 #else
 # include "xmu.h"
 #endif
+#include "lcd-x11.h"
 #include "screenhack.h"
 #include "version.h"
 #include "vroot.h"
@@ -147,13 +148,7 @@ static XrmOptionDescRec default_options [] = {
 static char *default_defaults[] = {
     ".root:            false",
 #define GEOMETRY_POSITION 1
-    "*geometry:        "
-#ifdef HAVE_LCD_BITMAP
-    "120x68"
-#else
-    "280x132" /* A bit larger that necessary */
-#endif
-    , /* this should be .geometry, but nooooo... */
+    "*geometry:        120x68", /* to be replaced anyway */
     "*mono:            false",
     "*installColormap: false",
     "*visualID:        default",
@@ -415,24 +410,15 @@ int main (int argc, char **argv)
             if (!strcmp("--old_lcd", argv[x])) {
                 having_new_lcd=FALSE;
                 printf("Using old LCD layout.\n");
-            } else if (!strcmp("--recorder_zoom", argv[x])) {
+            } else if (!strcmp("--zoom", argv[x])) {
                 x++;
-#ifdef HAVE_LCD_BITMAP
                 display_zoom=atoi(argv[x]);
                 printf("Window zoom is %d\n", display_zoom);
-#endif
-            } else if (!strcmp("--player_zoom", argv[x])) {
-                x++;
-#ifndef HAVE_LCD_BITMAP
-                display_zoom=atoi(argv[x]);
-                printf("Window zoom is %d\n", display_zoom);
-#endif
             } else {
                 printf("rockboxui\n");
                 printf("Arguments:\n");
                 printf("  --old_lcd \t [Player] simulate old playermodel (ROM version<4.51)\n");
-                printf("  --player_zoom \t [Player] window zoom\n");
-                printf("  --recorder_zoom \t [Recorder] window zoom\n");
+                printf("  --zoom \t window zoom\n");
                 printf(KEYBOARD_GENERIC KEYBOARD_SPECIFIC);
                 exit(0);
             }
@@ -440,18 +426,13 @@ int main (int argc, char **argv)
     }
     {
         static char geometry[40];
-#ifdef HAVE_LCD_BITMAP
-        unsigned int height = LCD_HEIGHT;
+        unsigned int height = (LCD_HEIGHT+2*MARGIN_Y);
 #ifdef LCD_REMOTE_HEIGHT
-        height += LCD_REMOTE_HEIGHT;
+        height += (LCD_REMOTE_HEIGHT+2*MARGIN_Y);
 #endif
         printf("height: %d\n", height);
         snprintf(geometry, 40, "*geometry: %dx%d",
-                 LCD_WIDTH*display_zoom+14, height*display_zoom+8);
-#else
-        snprintf(geometry, 40, "*geometry: %dx%d", 280*display_zoom,
-                 132*display_zoom);
-#endif
+                 (LCD_WIDTH+2*MARGIN_X) * display_zoom, height * display_zoom);
         default_defaults[GEOMETRY_POSITION]=geometry;
     }
     printf(KEYBOARD_GENERIC KEYBOARD_SPECIFIC);

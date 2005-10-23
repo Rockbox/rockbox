@@ -131,8 +131,7 @@ void lcd_update_rect(int x_start, int y_start,
 extern unsigned char lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH];
 unsigned char lcd_remote_framebuffer_copy[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH];
 
-#define REMOTE_MARGIN_X 2
-#define REMOTE_MARGIN_Y (LCD_HEIGHT + 2 + MARGIN_Y)
+#define REMOTE_START_Y (LCD_HEIGHT + 2*MARGIN_Y)
 
 void lcd_remote_update (void)
 {
@@ -181,15 +180,15 @@ void lcd_remote_update_rect(int x_start, int y_start,
                     if(lcd_remote_framebuffer[yline][x]&(1<<bit)) {
                         /* set a dot */
                         colors[p]=3;
-                        points[p].x = x + REMOTE_MARGIN_X;
-                        points[p].y = y+bit + REMOTE_MARGIN_Y;
+                        points[p].x = x + MARGIN_X;
+                        points[p].y = y+bit + (REMOTE_START_Y + MARGIN_Y);
                         p++; /* increase the point counter */
                     }
                     else if(diff &(1<<bit)) {
                         /* clear a dot */
                         colors[p]=0;
-                        points[p].x = x + REMOTE_MARGIN_X;
-                        points[p].y = y+bit + REMOTE_MARGIN_Y;
+                        points[p].x = x + MARGIN_X;
+                        points[p].y = y+bit + (REMOTE_START_Y + MARGIN_Y);
                         p++; /* increase the point counter */
                     }
                 }
