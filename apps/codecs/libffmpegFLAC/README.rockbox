@@ -1,0 +1,46 @@
+Library: libffmpegFLAC
+Imported: 2005-10-26 by Dave Chapman
+
+This directory contains a FLAC decoder based on the flac.c (and a small
+number of other files) from the ffmpeg project.
+
+LICENSING INFORMATION
+
+ffmpeg is licensed under the Lesser GNU General Public License and the
+file flac.c is Copyright 2003 Alex Beregszaszi.
+
+IMPORT DETAILS
+
+The decoder is based on ffmpeg-cvs from 26 October 2005.
+
+The file libavcodec/flac.c was renamed to decoder.c and all ffmpeg
+related code was removed.  It was also heavily modified to remove
+debugging information and unused experiemental code.
+
+It was also changed to provide output as 32-bit integers (with the
+data left-shifted to 28 bit accuracy).  The original flac.c provided
+16-bit output.
+
+In order to minimise memory usage, a small number of hard-coded limits
+are present in decoder.h - mainly limiting the supported blocksize
+(number of samples in a frame) to 4608.  This is the default value
+used by the reference FLAC encoder at all standard compression
+settings.
+
+
+TESTING
+
+A test program is contained in the file main.c and this should compile
+in any Unix-like environment using the command "make -f Makefile.test".
+
+Running "test file.flac" will decode the audio data to a WAV file
+called "test.wav" in the current directory.  This has been tested with
+16-bit and 24-bit mono and stereo FLAC files.
+
+This can be used to test the accuracy of the decoder by comparing the
+md5sum of the WAV file produced by this decoder with a WAV file
+produced by the official libFLAC decoder.  
+
+This test program could be extended to perform an internal md5sum
+calculation and comparing that against the md5sum stored in the FLAC
+file's header.

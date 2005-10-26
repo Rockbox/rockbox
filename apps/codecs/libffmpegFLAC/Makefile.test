@@ -1,0 +1,21 @@
+# Simple Makefile for standalone testing of decoder
+
+OBJS=main.o decoder.o bitstream.o
+CFLAGS=-O2 -Wall -DBUILD_STANDALONE
+CC=gcc
+
+# Uncomment the next line to build on a big-endian target:
+
+#CFLAGS += -DBUILD_BIGENDIAN
+
+all: test
+
+main.o: main.c decoder.h
+decoder.o: decoder.c bitstream.h golomb.h decoder.h
+bitstream.o: bitstream.c
+
+test: $(OBJS)
+	gcc -o test $(OBJS)
+
+clean:
+	rm -f test $(OBJS) *~

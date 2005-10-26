@@ -34,11 +34,7 @@ codecs/SOURCES
 codecs/*.[ch]
 codecs/Makefile
 codecs/liba52/*
-codecs/libFLAC/*
-codecs/libFLAC/include/private/*.h
-codecs/libFLAC/include/protected/*.h
-codecs/libFLAC/include/FLAC/*.h
-codecs/libFLAC/include/*.h
+codecs/libffmpegFLAC/*
 codecs/libmad/*
 codecs/libwavpack/*
 codecs/Tremor/*

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Björn Stenberg
+ * Copyright (C) 2005 Dave Chapman
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -18,156 +18,7 @@
  ****************************************************************************/
 
 #include "codeclib.h"
-#include <codecs/libFLAC/include/FLAC/seekable_stream_decoder.h>
-#include <codecs/libFLAC/include/FLAC/format.h>
-#include <codecs/libFLAC/include/FLAC/metadata.h>
-
-#define FLAC_MAX_SUPPORTED_BLOCKSIZE 4608
-#define FLAC_MAX_SUPPORTED_CHANNELS  2
-
-static uint32_t samplesdone;
-
-static FLAC__StreamMetadata *stream_info;
-static FLAC__StreamMetadata *seek_table;
-unsigned int metadata_length;
-
-/* Called when the FLAC decoder needs some FLAC data to decode */
-FLAC__SeekableStreamDecoderReadStatus flac_read_handler(const FLAC__SeekableStreamDecoder *dec, 
-                                                        FLAC__byte buffer[], unsigned *bytes, void *data)
-{   
-    struct codec_api* ci = (struct codec_api*)data;
-    (void)dec;
-
-    *bytes=(unsigned)(ci->read_filebuf(buffer,*bytes));
-
-    if (*bytes==0) {
-        return FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM;
-    } else {
-        return FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
-    }
-}
-
-static unsigned char pcmbuf[FLAC_MAX_SUPPORTED_BLOCKSIZE*FLAC_MAX_SUPPORTED_CHANNELS*2] IDATA_ATTR;
-
-/* Called when the FLAC decoder has some decoded PCM data to write */
-FLAC__StreamDecoderWriteStatus flac_write_handler(const FLAC__SeekableStreamDecoder *dec, 
-                              const FLAC__Frame *frame, 
-                              const FLAC__int32 * const buf[], 
-                              void *data)
-{
-    struct codec_api* ci = (struct codec_api*)data;
-    (void)dec;
-    unsigned int c_samp, c_chan, d_samp;
-    uint32_t data_size = frame->header.blocksize * frame->header.channels * 2; /* Assume 16-bit words */
-    uint32_t samples = frame->header.blocksize;
-    int yieldcounter = 0;
-
-
-    if (samples*frame->header.channels > (FLAC_MAX_SUPPORTED_BLOCKSIZE*FLAC_MAX_SUPPORTED_CHANNELS)) {
-        // ERROR!!!
-        // DEBUGF("ERROR: samples*frame->header.channels=%d\n",samples*frame->header.channels);
-        return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
-    }
-
-    (void)dec;
-    for (c_samp = d_samp = 0; c_samp < samples; c_samp++) {
-        for(c_chan = 0; c_chan < frame->header.channels; c_chan++, d_samp++) {
-            pcmbuf[d_samp*2] = (buf[c_chan][c_samp]&0xff00)>>8;
-            pcmbuf[(d_samp*2)+1] = buf[c_chan][c_samp]&0xff;
-            if (yieldcounter++ == 100) {
-                ci->yield();
-                yieldcounter = 0;
-            }
-        }
-    }
-
-    samplesdone+=samples;
-    ci->set_elapsed(samplesdone/(ci->id3->frequency/1000));
-   
-    ci->yield();
-    while (!ci->pcmbuf_insert(pcmbuf, data_size))
-        ci->yield();
-
-    return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
-}
-
-void flac_metadata_handler(const FLAC__SeekableStreamDecoder *dec, 
-                           const FLAC__StreamMetadata *meta, void *data)
-{
-    /* Ignore metadata for now... */
-    (void)dec;
-    (void)data;
-
-    metadata_length += meta->length;
-
-    if ( meta->type == FLAC__METADATA_TYPE_STREAMINFO ) {
-        stream_info = FLAC__metadata_object_clone( meta );
-        if ( stream_info == NULL ) {
-            //return CODEC_ERROR;
-        }
-    } else if ( meta->type == FLAC__METADATA_TYPE_SEEKTABLE ) {
-        seek_table = FLAC__metadata_object_clone( meta );
-        if ( seek_table == NULL ) {
-            //return CODEC_ERROR;
-        }
-    }
-}
-
-
-void flac_error_handler(const FLAC__SeekableStreamDecoder *dec, 
-                        FLAC__StreamDecoderErrorStatus status, void *data)
-{
-    (void)dec;
-    (void)status;
-    (void)data;
-}
-
-FLAC__SeekableStreamDecoderSeekStatus flac_seek_handler(const FLAC__SeekableStreamDecoder *decoder, 
-                                                        FLAC__uint64 absolute_byte_offset,
-                                                        void *client_data)
-{
-    (void)decoder;
-    struct codec_api* ci = (struct codec_api*)client_data;
-
-    if (ci->seek_buffer(absolute_byte_offset)) {
-        return FLAC__SEEKABLE_STREAM_DECODER_SEEK_STATUS_OK;
-    } else {
-        return FLAC__SEEKABLE_STREAM_DECODER_SEEK_STATUS_ERROR;
-    }
-}
-
-FLAC__SeekableStreamDecoderTellStatus flac_tell_handler(const FLAC__SeekableStreamDecoder *decoder, 
-                                                        FLAC__uint64 *absolute_byte_offset, void *client_data)
-{ 
-    struct codec_api* ci = (struct codec_api*)client_data;
-
-    (void)decoder;
-    *absolute_byte_offset = ci->curpos;
-    return FLAC__SEEKABLE_STREAM_DECODER_TELL_STATUS_OK;
-}
-
-FLAC__SeekableStreamDecoderLengthStatus flac_length_handler(const FLAC__SeekableStreamDecoder *decoder, 
-                                                            FLAC__uint64 *stream_length, void *client_data)
-{
-    struct codec_api* ci = (struct codec_api*)client_data;
-
-    (void)decoder;
-    *stream_length = ci->filesize;
-    return FLAC__SEEKABLE_STREAM_DECODER_LENGTH_STATUS_OK;
-}
-
-FLAC__bool flac_eof_handler(const FLAC__SeekableStreamDecoder *decoder, 
-                            void *client_data)
-{
-    struct codec_api* ci = (struct codec_api*)client_data;
-
-    (void)decoder;
-    if (ci->curpos >= ci->filesize) {
-        return true;
-    } else {
-        return false;
-    }
-}
+#include <codecs/libffmpegFLAC/decoder.h>
 
 #ifndef SIMULATOR
 extern char iramcopy[];
@@ -175,78 +26,101 @@ extern char iramstart[];
 extern char iramend[];
 #endif
 
-FLAC__uint64 find_sample_number(struct codec_api *ci, size_t offset)
+struct codec_api* rb;
+struct codec_api* ci;
+
+/* The output buffers containing the decoded samples (channels 0 and 1) */
+int32_t decoded0[MAX_BLOCKSIZE] IBSS_ATTR;
+int32_t decoded1[MAX_BLOCKSIZE] IBSS_ATTR;
+
+static bool flac_init(FLACContext* fc)
 {
-    FLAC__StreamMetadata_SeekPoint *points;
-    FLAC__uint64 prev_sample, next_sample;
-    size_t prev_offset, next_offset;
-    int percent;
+    unsigned char buf[255];
+    bool found_streaminfo=false;
+    int endofmetadata=0;
+    int blocklength;
 
-    if (offset >= (ci->id3->filesize - metadata_length)) {
-        return stream_info->data.stream_info.total_samples;
+    if (ci->read_filebuf(buf, 4) < 4)
+    {
+        return false;
     }
 
-    prev_offset = 0;
-    prev_sample = 0;
-    next_offset = ci->id3->filesize - metadata_length;
-    next_sample = stream_info->data.stream_info.total_samples;
+    if (ci->memcmp(buf,"fLaC",4) != 0) 
+    {
+        return false;
+    }
+    fc->metadatalength = 4;
 
-    if (seek_table) {
-        int left, right, middle;
+    while (!endofmetadata) {
+        if (ci->read_filebuf(buf, 4) < 4)
+        {
+            return false;
+        }
 
-	    middle = 0; /* Silence compiler warnings */
-        points = seek_table->data.seek_table.points;
-        left = 0;
-        right = seek_table->data.seek_table.num_points - 1;
+        endofmetadata=(buf[0]&0x80);
+        blocklength = (buf[1] << 16) | (buf[2] << 8) | buf[3];
+        fc->metadatalength+=blocklength+4;
 
-        /* Do a binary search to find the matching seek point */
-        while (left <= right) {
-            middle = (left + right) / 2;
-
-            if ((FLAC__uint64)offset < points[middle].stream_offset) {
-                right = middle - 1;
-            } else if ((FLAC__uint64)offset > points[middle].stream_offset) {
-                left = middle + 1;
-            } else {
-                return points[middle].sample_number;
+        if ((buf[0] & 0x7f) == 0)       /* 0 is the STREAMINFO block */
+        {
+            /* FIXME: Don't trust the value of blocklength */
+            if (ci->read_filebuf(buf, blocklength) < 0)
+            {
+                return false;
             }
-        }
+          
+            fc->filesize = ci->filesize;
+            fc->min_blocksize = (buf[0] << 8) | buf[1];
+            fc->max_blocksize = (buf[2] << 8) | buf[3];
+            fc->min_framesize = (buf[4] << 16) | (buf[5] << 8) | buf[6];
+            fc->max_framesize = (buf[7] << 16) | (buf[8] << 8) | buf[9];
+            fc->samplerate = (buf[10] << 12) | (buf[11] << 4) 
+                             | ((buf[12] & 0xf0) >> 4);
+            fc->channels = ((buf[12]&0x0e)>>1) + 1;
+            fc->bps = (((buf[12]&0x01) << 4) | ((buf[13]&0xf0)>>4) ) + 1;
 
-        /* Didn't find a matching seek point, so get the sample numbers of the
-         * seek points to the left and right of offset to make our guess more
-         * accurate.  Accuracy depends on how close these sample numbers are to
-         * each other.
-         */
-        if ((unsigned)left >= seek_table->data.seek_table.num_points) {
-            prev_offset = points[middle].stream_offset;
-            prev_sample = points[middle].sample_number;
-        } else if (right < 0) {
-            next_offset = points[middle].stream_offset;
-            next_sample = points[middle].sample_number;
+            /* totalsamples is a 36-bit field, but we assume <= 32 bits are 
+               used */
+            fc->totalsamples = (buf[14] << 24) | (buf[15] << 16) 
+                               | (buf[16] << 8) | buf[17];
+
+            /* Calculate track length (in ms) and estimate the bitrate 
+               (in kbit/s) */
+            fc->length = (fc->totalsamples / fc->samplerate) * 1000;
+
+            found_streaminfo=true;
+        } else if ((buf[0] & 0x7f) == 3) { /* 3 is the SEEKTABLE block */
+          ci->advance_buffer(blocklength);
         } else {
-            middle--;
-            prev_offset = points[middle].stream_offset;
-            prev_sample = points[middle].sample_number;
-            next_offset = points[middle+1].stream_offset;
-            next_sample = points[middle+1].sample_number;
+          /* Skip to next metadata block */
+          ci->advance_buffer(blocklength);
         }
     }
 
-    /* Either there's no seek table or we didn't find our seek point, so now we
-     * have to guess.
-     */
-    percent = ((offset - prev_offset) * 100) / (next_offset - prev_offset);
-    return (FLAC__uint64)(percent * (next_sample - prev_sample) / 100 + prev_sample);
+   if (found_streaminfo) {
+       fc->bitrate = ((fc->filesize-fc->metadatalength) * 8) / fc->length;
+       return true;
+   } else {
+       return false;
+   }
 }
 
 /* this is the codec entry point */
 enum codec_status codec_start(struct codec_api* api)
 {
-    struct codec_api* ci = api;
-    FLAC__SeekableStreamDecoder* flacDecoder;
-    FLAC__uint64 offset;
+    size_t n;
+    static int8_t buf[MAX_FRAMESIZE];
+    FLACContext fc;
+    uint32_t samplesdone;
+    uint32_t elapsedtime;
+    int bytesleft;
+    int consumed;
 
-    TEST_CODEC_API(ci);
+    /* Generic codec initialisation */
+    TEST_CODEC_API(api);
+
+    rb = api;
+    ci = (struct codec_api*)api;
 
 #ifndef SIMULATOR
     ci->memcpy(iramstart, iramcopy, iramend-iramstart);
@@ -254,19 +128,17 @@ enum codec_status codec_start(struct codec_api* api)
 
     ci->configure(CODEC_SET_FILEBUF_LIMIT, (int *)(1024*1024*10));
     ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
-    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*1024));
+    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*128));
 
     ci->configure(CODEC_DSP_ENABLE, (bool *)true);
     ci->configure(DSP_DITHER, (bool *)false);
-    ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_INTERLEAVED);
-    ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(16));
-  
-next_track:
-    metadata_length = 0;
-    seek_table = NULL;
-    stream_info = NULL;
+    ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_NONINTERLEAVED);
+    ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(28));
+    
+    next_track:
 
-    if (codec_init(api)) {
+    if (!flac_init(&fc)) {
+        LOGF("FLAC: Error initialising codec\n");
         return CODEC_ERROR;
     }
 
@@ -274,87 +146,58 @@ next_track:
         ci->yield();
     
     ci->configure(DSP_SET_FREQUENCY, (long *)(ci->id3->frequency));
-    codec_set_replaygain(ci->id3);
-  
-    /* Create a decoder instance */
-    flacDecoder = FLAC__seekable_stream_decoder_new();
 
-    /* Set up the decoder and the callback functions - this must be done before init */
-
-    /* The following are required for stream_decoder and higher */
-    FLAC__seekable_stream_decoder_set_client_data(flacDecoder,ci);
-    FLAC__seekable_stream_decoder_set_write_callback(flacDecoder, flac_write_handler);
-    FLAC__seekable_stream_decoder_set_read_callback(flacDecoder, flac_read_handler);
-    FLAC__seekable_stream_decoder_set_metadata_callback(flacDecoder, flac_metadata_handler);
-    FLAC__seekable_stream_decoder_set_error_callback(flacDecoder, flac_error_handler);
-    FLAC__seekable_stream_decoder_set_metadata_respond_all(flacDecoder);
-
-    /* The following are only for the seekable_stream_decoder */
-    FLAC__seekable_stream_decoder_set_seek_callback(flacDecoder, flac_seek_handler);
-    FLAC__seekable_stream_decoder_set_tell_callback(flacDecoder, flac_tell_handler);
-    FLAC__seekable_stream_decoder_set_length_callback(flacDecoder, flac_length_handler);
-    FLAC__seekable_stream_decoder_set_eof_callback(flacDecoder, flac_eof_handler);
-
-
-    /* QUESTION: What do we do when the init fails? */
-    if (FLAC__seekable_stream_decoder_init(flacDecoder)) {
-        return CODEC_ERROR;
-    }
-
-    /* The first thing to do is to parse the metadata */
-    FLAC__seekable_stream_decoder_process_until_end_of_metadata(flacDecoder);
-
-    if (ci->id3->offset && stream_info) {
-        FLAC__uint64 sample;
-
-        sample = find_sample_number(ci, ci->id3->offset - metadata_length);
-        ci->advance_buffer(ci->id3->offset);
-        FLAC__seekable_stream_decoder_seek_absolute(flacDecoder, sample);
-        FLAC__seekable_stream_decoder_get_decode_position(flacDecoder, &offset);
-        ci->set_offset(offset);
-        samplesdone = (uint32_t)sample;
-        ci->set_elapsed(sample/(ci->id3->frequency/1000));
-    } else {
-        samplesdone = 0;
-        ci->set_elapsed(0);
-    }
-
-    /* The main decoder loop */
-    while (FLAC__seekable_stream_decoder_get_state(flacDecoder) != FLAC__SEEKABLE_STREAM_DECODER_END_OF_STREAM) {
+    /* The main decoding loop */
+    bytesleft=ci->read_filebuf(buf,sizeof(buf));
+    while (bytesleft) {
         ci->yield();
         if (ci->stop_codec || ci->reload_codec) {
             break;
         }
 
+        /* Deal with any pending seek requests */
         if (ci->seek_time) {
-            int sample_loc;
-
-            sample_loc = ci->seek_time/1000 * ci->id3->frequency;
-            if (FLAC__seekable_stream_decoder_seek_absolute(flacDecoder, sample_loc)) {
-                samplesdone = sample_loc;
-                ci->set_elapsed(samplesdone/(ci->id3->frequency/1000));
-            }
-            ci->seek_time = 0;
+          /* We only support seeking to start of track at the moment */
+          if (ci->seek_time==1) {
+              if (ci->seek_buffer(fc.metadatalength)) {
+                  /* Refill the input buffer */
+                  bytesleft=ci->read_filebuf(buf,sizeof(buf));
+                  ci->set_elapsed(0);
+              }
+          }
+          ci->seek_time = 0;
         }
 
-        FLAC__seekable_stream_decoder_process_single(flacDecoder);
-        FLAC__seekable_stream_decoder_get_decode_position(flacDecoder, &offset);
-        ci->set_offset(offset);
+        if(flac_decode_frame(&fc,decoded0,decoded1,buf,
+                             bytesleft,ci->yield) < 0) {
+             LOGF("FLAC: Decode error, aborting\n");
+             return CODEC_ERROR;
+        }
+        consumed=fc.gb.index/8;
+
+        ci->yield();
+        while(!ci->pcmbuf_insert_split((char*)decoded0,(char*)decoded1,
+              fc.blocksize*4)) {
+            ci->yield();
+        }
+
+        /* Update the elapsed-time indicator */
+        samplesdone=fc.samplenumber+fc.blocksize;
+        elapsedtime=(samplesdone*10)/(ci->id3->frequency/100);
+        ci->set_elapsed(elapsedtime);
+
+        memmove(buf,&buf[consumed],bytesleft-consumed);
+        bytesleft-=consumed;
+
+        n=ci->read_filebuf(&buf[bytesleft],sizeof(buf)-bytesleft);
+        if (n > 0) {
+            bytesleft+=n;
+        }
     }
+    LOGF("FLAC: Decoded %d samples\n",samplesdone);
 
-    /* Flush the libFLAC buffers */
-    FLAC__seekable_stream_decoder_finish(flacDecoder);
-
-    if (ci->request_next_track()) {
-        if (stream_info) {
-            FLAC__metadata_object_delete(stream_info);
-        }
-        if (seek_table) {
-            FLAC__metadata_object_delete(seek_table);
-        }
-        metadata_length = 0;
+    if (ci->request_next_track())
         goto next_track;
-    }
 
     return CODEC_OK;
 }
