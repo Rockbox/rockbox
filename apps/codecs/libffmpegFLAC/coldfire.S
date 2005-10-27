@@ -48,21 +48,18 @@ lpc_decode_emac:
     moveq.l #8, %d3
     cmp.l %d3, %d2
     jgt .default              | order is over 8, jump to default case
-    lea.l .jumptable, %a4
-    move.l (%a4, %d2.l*4), %a4
-    jmp (%a4)
-    .align 4                  | avoid unaligned fetch
+    jmp.l (2, %pc, %d2.l*4)   | jump to loop corresponding to pred_order
 .jumptable:
-    .long .exit
-    .long .order1
-    .long .order2
-    .long .order3
-    .long .order4
-    .long .order5
-    .long .order6
-    .long .order7
-    .long .order8
+    bra.w .exit               | zero order filter isn't possible, exit function
+    bra.w .order1
+    bra.w .order2
+    bra.w .order3
+    bra.w .order4
+    bra.w .order5
+    bra.w .order6
+    bra.w .order7
 
+| last jump table entry coincides with target, so leave it out
 .order8:
     movem.l (%a1), %d3-%d7/%a2-%a4 | load lpc coefs
     move.l (%a0)+, %a5             | load first history sample
@@ -78,7 +75,7 @@ lpc_decode_emac:
     movclr.l %acc0, %d2    | get sum
     asr.l %d1, %d2         | shift sum by lp_quantization bits
     add.l %d2, (%a0)       | add residual and save
-    lea.l (-6*4, %a0), %a0 | history pointer points at second element
+    lea.l (-6*4, %a0), %a0 | point history back at second element
     subq.l #1, %d0         | decrement counter
     jne .loop8             | are we done?
     jra .exit
