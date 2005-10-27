@@ -22,8 +22,8 @@ SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARG
 DIRS = .
 
 ifdef APPEXTRA
-   DIRS += $(APPEXTRA)
-   INCLUDES += -I$(APPEXTRA)
+   DIRS += $(subst :, ,$(APPEXTRA))
+   INCLUDES += $(patsubst %,-I%,$(subst :, ,$(APPEXTRA)))
 endif
 
 ifndef VERSION

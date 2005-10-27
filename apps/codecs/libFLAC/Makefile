@@ -12,7 +12,7 @@ INCLUDES=-I$(APPSDIR) -I.. -I. -I$(FIRMDIR)/include -I$(FIRMDIR)/export	      \
  -I$(BUILDDIR)
 
 ifdef APPEXTRA
-INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
+   INCLUDES += $(patsubst %,-I$(APPSDIR)/%,$(subst :, ,$(APPEXTRA)))
 endif
 
 NEWGCC=$(shell expr $(GCCNUM) ">" 303)

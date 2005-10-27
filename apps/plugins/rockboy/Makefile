@@ -13,7 +13,7 @@ CFLAGS = $(GCCOPTS) -O3 $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
  -DMEM=${MEMORYSIZE} -DPLUGIN
 
 ifdef APPEXTRA
-    INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
+   INCLUDES += $(patsubst %,-I$(APPSDIR)/%,$(subst :, ,$(APPEXTRA)))
 endif
 
 LINKFILE := $(OBJDIR)/link.lds

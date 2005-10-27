@@ -30,8 +30,8 @@ DEFINES = $(DEBUG)
 DIRS = .
 
 ifdef APPEXTRA
-   DIRS += $(APPEXTRA)
-   INCLUDES += -I$(APPEXTRA)
+   DIRS += $(subst :, ,$(APPEXTRA))
+   INCLUDES += $(patsubst %,-I%,$(subst :, ,$(APPEXTRA)))
 endif
 
 CFLAGS = $(GCCOPTS) $(INCLUDES) $(TARGET) $(DEFINES)			\

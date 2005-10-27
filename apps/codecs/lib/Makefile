@@ -14,7 +14,7 @@ INCLUDES=-I$(APPSDIR) -I.. -I. -I$(FIRMDIR)/include -I$(FIRMDIR)/export	\
  -I$(FIRMDIR)/common -I$(BUILDDIR)
 
 ifdef APPEXTRA
-INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
+   INCLUDES += $(patsubst %,-I$(APPSDIR)/%,$(subst :, ,$(APPEXTRA)))
 endif
 
 CFLAGS = $(GCCOPTS) \
