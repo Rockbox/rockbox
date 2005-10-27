@@ -23,10 +23,10 @@ include $(TOOLSDIR)/makesrc.inc
 SOURCES = $(SRC)
 OBJS2 := $(SRC:%.c=$(OBJDIR)/%.o)
 OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))
-DEPFILE = $(OBJDIR)/dep-libalac
+DEPFILE = $(OBJDIR)/dep-libffmpegFLAC
 DIRS = 
 
-OUTPUT = $(BUILDDIR)/libalac.a
+OUTPUT = $(BUILDDIR)/libffmpegFLAC.a
 
 all: $(OUTPUT)
 
@@ -34,9 +34,9 @@ $(OUTPUT): $(OBJS)
 	@echo "AR $@"
 	@$(AR) ruv $@ $+ >/dev/null 2>&1
 
-$(OBJDIR)/libalac/%.o: $(APPSDIR)/codecs/libalac/%.c
-	@echo "(libalac) CC $<"
-	@$(CC) -c $(CFLAGS) -I$(APPSDIR)/codecs/libalac/ $< -o $@
+$(OBJDIR)/libffmpegFLAC/%.o: $(APPSDIR)/codecs/libffmpegFLAC/%.c
+	@echo "(libffmpegFLAC) CC $<"
+	@$(CC) -c $(CFLAGS) -I$(APPSDIR)/codecs/libffmpegFLAC/ $< -o $@
 
 include $(TOOLSDIR)/make.inc
 
