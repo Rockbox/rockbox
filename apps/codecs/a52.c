@@ -33,7 +33,7 @@ unsigned long samplesdone;
 unsigned long frequency;
 
 /* used outside liba52 */
-static uint8_t buf[3840] IDATA_ATTR;
+static uint8_t buf[3840] IBSS_ATTR;
 
 void output_audio(sample_t *samples)
 {

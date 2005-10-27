@@ -21,9 +21,9 @@
 #include <codecs/libmad/mad.h>
 #include <inttypes.h>
 
-struct mad_stream stream IDATA_ATTR;
-struct mad_frame frame IDATA_ATTR;
-struct mad_synth synth IDATA_ATTR;
+struct mad_stream stream IBSS_ATTR;
+struct mad_frame frame IBSS_ATTR;
+struct mad_synth synth IBSS_ATTR;
 
 /* The following function is used inside libmad - let's hope it's never
    called. 
@@ -34,8 +34,8 @@ void abort(void) {
 
 #define INPUT_CHUNK_SIZE   8192
 
-mad_fixed_t mad_frame_overlap[2][32][18] IDATA_ATTR;
-unsigned char mad_main_data[MAD_BUFFER_MDLEN] IDATA_ATTR;
+mad_fixed_t mad_frame_overlap[2][32][18] IBSS_ATTR;
+unsigned char mad_main_data[MAD_BUFFER_MDLEN] IBSS_ATTR;
 /* TODO: what latency does layer 1 have? */
 int mpeg_latency[3] = { 0, 481, 529 };
 

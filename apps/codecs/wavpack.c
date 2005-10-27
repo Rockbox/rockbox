@@ -27,7 +27,7 @@ static struct codec_api *ci;
 
 #define BUFFER_SIZE 4096
 
-static long temp_buffer [BUFFER_SIZE] IDATA_ATTR;
+static long temp_buffer [BUFFER_SIZE] IBSS_ATTR;
 
 static long read_callback (void *buffer, long bytes)
 {
