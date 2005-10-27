@@ -42,7 +42,7 @@
  * used in both Layer I and Layer II decoding
  */
 static
-mad_fixed_t const sf_table[64] IDATA_ATTR = {
+mad_fixed_t const sf_table[64] ICONST_ATTR = {
 # include "sf_table.dat"
 };
 
@@ -269,7 +269,7 @@ struct quantclass {
   unsigned char bits;
   mad_fixed_t C;
   mad_fixed_t D;
-} const qc_table[17] IDATA_ATTR = {
+} const qc_table[17] ICONST_ATTR = {
 # include "qc_table.dat"
 };
 

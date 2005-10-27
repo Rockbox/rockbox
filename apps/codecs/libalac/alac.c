@@ -48,13 +48,13 @@
                    v = (((v) & 0x00FF) << 0x08) | \
                        (((v) & 0xFF00) >> 0x08); } while (0)
 
-int16_t predictor_coef_table[32] IDATA_ATTR;
-int16_t predictor_coef_table_a[32] IDATA_ATTR;
-int16_t predictor_coef_table_b[32] IDATA_ATTR;
+int16_t predictor_coef_table[32] IBSS_ATTR;
+int16_t predictor_coef_table_a[32] IBSS_ATTR;
+int16_t predictor_coef_table_b[32] IBSS_ATTR;
 int32_t predicterror_buffer_a[4096];
 int32_t predicterror_buffer_b[4096];
-int32_t outputsamples_buffer_a[4096] IDATA_ATTR;
-int32_t outputsamples_buffer_b[4096] IDATA_ATTR;
+int32_t outputsamples_buffer_a[4096] IBSS_ATTR;
+int32_t outputsamples_buffer_b[4096] IBSS_ATTR;
 
 void alac_set_info(alac_file *alac, char *inputbuffer)
 {

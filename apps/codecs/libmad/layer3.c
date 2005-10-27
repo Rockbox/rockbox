@@ -384,7 +384,7 @@ mad_fixed_t const ca[8] = {
  * imdct_s[i/even][k] = cos((PI / 24) * (2 *       (i / 2) + 7) * (2 * k + 1))
  * imdct_s[i /odd][k] = cos((PI / 24) * (2 * (6 + (i-1)/2) + 7) * (2 * k + 1))
  */
-mad_fixed_t const imdct_s[6][6] IDATA_ATTR = {
+mad_fixed_t const imdct_s[6][6] ICONST_ATTR = {
 # include "imdct_s.dat"
 };
 
@@ -396,7 +396,7 @@ mad_fixed_t const imdct_s[6][6] IDATA_ATTR = {
  * window_l[i] = sin((PI / 36) * (i + 1/2))
  */
 static
-mad_fixed_t const window_l[36] IDATA_ATTR = {
+mad_fixed_t const window_l[36] ICONST_ATTR = {
   MAD_F(0x00b2aa3e) /* 0.043619387 */, MAD_F(0x0216a2a2) /* 0.130526192 */,
   MAD_F(0x03768962) /* 0.216439614 */, MAD_F(0x04cfb0e2) /* 0.300705800 */,
   MAD_F(0x061f78aa) /* 0.382683432 */, MAD_F(0x07635284) /* 0.461748613 */,
@@ -426,7 +426,7 @@ mad_fixed_t const window_l[36] IDATA_ATTR = {
  *
  * window_s[i] = sin((PI / 12) * (i + 1/2))
  */
-mad_fixed_t const window_s[12] IDATA_ATTR = {
+mad_fixed_t const window_s[12] ICONST_ATTR = {
   MAD_F(0x0216a2a2) /* 0.130526192 */, MAD_F(0x061f78aa) /* 0.382683432 */,
   MAD_F(0x09bd7ca0) /* 0.608761429 */, MAD_F(0x0cb19346) /* 0.793353340 */,
   MAD_F(0x0ec835e8) /* 0.923879533 */, MAD_F(0x0fdcf549) /* 0.991444861 */,

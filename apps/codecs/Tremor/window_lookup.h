@@ -51,7 +51,7 @@ static LOOKUP_T vwin128[64] = {
   X(0x7ffdcf39), X(0x7fff6dac), X(0x7fffed01), X(0x7fffffc4),
 };
 
-static LOOKUP_T vwin256[128] IDATA_ATTR = {
+static LOOKUP_T vwin256[128] ICONST_ATTR = {
   X(0x0001f018), X(0x00117066), X(0x00306e9e), X(0x005ee5f1),
   X(0x009ccf26), X(0x00ea208b), X(0x0146cdea), X(0x01b2c87f),
   X(0x022dfedf), X(0x02b85ced), X(0x0351cbbd), X(0x03fa317f),
@@ -284,7 +284,7 @@ static LOOKUP_T vwin1024[512]  = {
   X(0x7fffffdd), X(0x7ffffff7), X(0x7fffffff), X(0x7fffffff),
 };
 
-static LOOKUP_T vwin2048[1024] IDATA_ATTR = {
+static LOOKUP_T vwin2048[1024] ICONST_ATTR = {
   X(0x000007c0), X(0x000045c4), X(0x0000c1ca), X(0x00017bd3),
   X(0x000273de), X(0x0003a9eb), X(0x00051df9), X(0x0006d007),
   X(0x0008c014), X(0x000aee1e), X(0x000d5a25), X(0x00100428),
