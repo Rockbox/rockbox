@@ -40,6 +40,8 @@ static bool flac_init(FLACContext* fc)
     int endofmetadata=0;
     int blocklength;
 
+    ci->memset(fc,0,sizeof(FLACContext));
+
     if (ci->read_filebuf(buf, 4) < 4)
     {
         return false;
