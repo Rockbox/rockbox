@@ -347,7 +347,7 @@ static void Synthese_Filter_float_internal(MPC_SAMPLE_FORMAT * OutData,MPC_SAMPL
             
             
             for ( k = 0; k < 32; k++, D += 16, V++ ) {
-                #if defined(CPU_COLDFIRE) && !defined(SIMULATOR) && 1
+                #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
                 asm volatile (
                     "movem.l (%[D]), %%d0-%%d3\n\t"
                     "move.l (%[V]), %%a5\n\t"
