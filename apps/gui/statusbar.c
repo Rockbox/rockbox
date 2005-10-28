@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) Robert E. Hak (2002), Linus Nielsen Feltzing (2002), Kévin FERRARE (2005)
+ * Copyright (C) Robert E. Hak (2002), Linus Nielsen Feltzing (2002), Kevin FERRARE (2005)
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -111,9 +111,11 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 
     struct screen * display = bar->display;
 
-#ifdef HAVE_LCD_BITMAP
+#ifdef HAVE_RTC
     struct tm* tm; /* For Time */
-#else
+#endif
+
+#ifndef HAVE_LCD_BITMAP
     (void)force_redraw; /* players always "redraw" */
 #endif
 
@@ -123,9 +125,12 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
     bar->info.battery_safe = battery_level_safe();
 
 #ifdef HAVE_LCD_BITMAP
+#ifdef HAVE_RTC
     tm = get_time();
     bar->info.hour = tm->tm_hour;
     bar->info.minute = tm->tm_min;
+#endif
+
     bar->info.shuffle = global_settings.playlist_shuffle;
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
     bar->info.keylock = button_hold();
@@ -495,7 +500,7 @@ void gui_statusbar_time(struct screen * display, int hour, int minute)
 void gui_syncstatusbar_init(struct gui_syncstatusbar * bars)
 {
     int i;
-    for(i = 0;i < NB_SCREENS;++i) {
+    for(i = 0;i < NB_SCREENS;i++) {
         gui_statusbar_init( &(bars->statusbars[i]) );
         gui_statusbar_set_screen( &(bars->statusbars[i]), &(screens[i]) );
     }
@@ -505,7 +510,7 @@ void gui_syncstatusbar_draw(struct gui_syncstatusbar * bars,
                             bool force_redraw)
 {
     int i;
-    for(i = 0;i < NB_SCREENS;++i) {
+    for(i = 0;i < NB_SCREENS;i++) {
         gui_statusbar_draw( &(bars->statusbars[i]), force_redraw );
     }
 }

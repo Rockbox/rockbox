@@ -939,7 +939,7 @@ static bool dirbrowse(void)
             reload_dir = false;
         }
         if(need_update) {
-            tc.selected_item = gui_synclist_get_selected_item_position(&tree_lists);
+            tc.selected_item = gui_synclist_get_sel_pos(&tree_lists);
             need_update=false;
             if ( numentries > 0 ) {
                 /* Voice the file if changed */

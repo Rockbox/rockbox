@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) Daniel Stenberg (2002), Kévin FERRARE (2005)
+ * Copyright (C) Daniel Stenberg (2002), Kevin FERRARE (2005)
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -207,7 +207,7 @@ void gui_syncsplash(int ticks, bool center,  const char *fmt, ...)
     va_list ap;
     int i;
     va_start( ap, fmt );
-    for(i=0;i<NB_SCREENS;++i)
+    for(i=0;i<NB_SCREENS;i++)
         internal_splash(&(screens[i]), center, fmt, ap);
     va_end( ap );
 

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 by Kévin FERRARE
+ * Copyright (C) 2005 by Kevin FERRARE
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -75,6 +75,9 @@ struct gui_list
 
     struct screen * display;
     int line_scroll_limit;
+    /* defines wether the list should stop when reaching the top/bottom
+     * or should continue (by going to bottom/top) */
+    bool limit_scroll;
 };
 
 /*
@@ -91,12 +94,12 @@ extern void gui_list_init(struct gui_list * gui_list,
             );
 
 /*
- * Sets the numburs of items the list can currently display
+ * Sets the numbers of items the list can currently display
  * note that the list's context like the currently pointed item is resetted
  *  - gui_list : the list structure to initialize
  *  - nb_items : the numbers of items you want
  */
-extern void gui_list_set_nb_items(struct gui_list * gui_list, int nb_items);
+extern inline void gui_list_set_nb_items(struct gui_list * gui_list, int nb_items);
 
 /*
  * Puts the selection in the screen
@@ -118,19 +121,11 @@ extern void gui_list_set_display(struct gui_list * gui_list,
                                  struct screen * display);
 
 /*
- * Gives the name of the selected object
- *  - gui_list : the list structure
- *  - buffer : a buffer which is filled with the name
- */
-extern void gui_list_get_selected_item_name(struct gui_list * gui_list,
-                                            char *buffer);
-
-/*
  * Gives the position of the selected item
  *  - gui_list : the list structure
  * Returns the position
  */
-extern int gui_list_get_selected_item_position(struct gui_list * gui_list);
+extern inline int gui_list_get_sel_pos(struct gui_list * gui_list);
 
 /*
  * Selects an item in the list
@@ -187,6 +182,15 @@ extern void gui_list_add_item(struct gui_list * gui_list);
  */
 extern void gui_list_del_item(struct gui_list * gui_list);
 
+/*
+ * Tells the list wether it should stop when reaching the top/bottom
+ * or should continue (by going to bottom/top)
+ * - gui_list : the list structure
+ * - scroll :
+ *    - true : stops when reaching top/bottom
+ *    - false : continues to go to bottom/top when reaching top/bottom
+ */
+extern inline void gui_list_limit_scroll(struct gui_list * gui_list, bool scroll);
 
 /*
  * This part handles as many lists as there are connected screens
@@ -207,9 +211,8 @@ extern void gui_synclist_init(struct gui_synclist * lists,
              char * (*callback_get_item_name)(int selected_item, char *buffer)
              );
 extern void gui_synclist_set_nb_items(struct gui_synclist * lists, int nb_items);
-extern void gui_synclist_get_selected_item_name(struct gui_synclist * lists,
-                                                char *buffer);
-extern int  gui_synclist_get_selected_item_position(struct gui_synclist * lists);
+
+extern int  gui_synclist_get_sel_pos(struct gui_synclist * lists);
 extern void gui_synclist_draw(struct gui_synclist * lists);
 extern void gui_synclist_select_item(struct gui_synclist * lists,
                                      int item_number);
@@ -221,6 +224,8 @@ extern void gui_synclist_select_previous_page(struct gui_synclist * lists,
                                               enum screen_type screen);
 extern void gui_synclist_add_item(struct gui_synclist * lists);
 extern void gui_synclist_del_item(struct gui_synclist * lists);
+extern void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll);
+
 /*
  * Do the action implied by the given button,
  * returns true if something has been done, false otherwise

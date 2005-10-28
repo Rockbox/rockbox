@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) Linus Nielsen Feltzing (2002), Kévin FERRARE (2005)
+ * Copyright (C) Linus Nielsen Feltzing (2002), Kevin FERRARE (2005)
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -91,7 +91,7 @@ void gui_buttonbar_set(struct gui_buttonbar * buttonbar,
 void gui_buttonbar_unset(struct gui_buttonbar * buttonbar)
 {
     int i;
-    for(i = 0;i < BUTTONBAR_MAX_BUTTONS;++i)
+    for(i = 0;i < BUTTONBAR_MAX_BUTTONS;i++)
         buttonbar->caption[i][0] = 0;
 }
 
@@ -105,7 +105,7 @@ void gui_buttonbar_draw(struct gui_buttonbar * buttonbar)
                       display->width, BUTTONBAR_HEIGHT);
     display->set_drawmode(DRMODE_SOLID);
 
-    for(i = 0;i < BUTTONBAR_MAX_BUTTONS;++i)
+    for(i = 0;i < BUTTONBAR_MAX_BUTTONS;i++)
         gui_buttonbar_draw_button(buttonbar, i);
     display->update_rect(0, display->height - BUTTONBAR_HEIGHT,
                          display->width, BUTTONBAR_HEIGHT);
@@ -117,7 +117,7 @@ bool gui_buttonbar_isset(struct gui_buttonbar * buttonbar)
     if(!global_settings.buttonbar)
         return(false);
     int i;
-    for(i = 0;i < BUTTONBAR_MAX_BUTTONS;++i)
+    for(i = 0;i < BUTTONBAR_MAX_BUTTONS;i++)
         if(buttonbar->caption[i] != 0)
             return true;
     return false;
