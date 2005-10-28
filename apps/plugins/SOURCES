@@ -47,6 +47,7 @@ sudoku.c
 #if CONFIG_LCD == LCD_SSD1815
 video.c
 #endif
+starfield.c
 vu_meter.c
 
 #ifdef HAVE_RTC /* Recorder models only */
