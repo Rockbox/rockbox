@@ -1,6 +1,12 @@
 #ifndef __ALAC__DECOMP_H
 #define __ALAC__DECOMP_H
 
+/* Always output samples shifted to 28 bits */
+#define ALAC_OUTPUT_DEPTH 28
+#define SCALE16 (ALAC_OUTPUT_DEPTH - 16)
+#define ALAC_MAX_CHANNELS 2
+#define ALAC_BLOCKSIZE 4096  /* Number of samples per channel per block */
+
 typedef struct
 {
     unsigned char *input_buffer;
@@ -26,10 +32,10 @@ typedef struct
 } alac_file;
 
 void create_alac(int samplesize, int numchannels, alac_file* alac);
-int16_t* decode_frame(alac_file *alac,
-                  unsigned char *inbuffer,
-		  int *outputsize,
-                  void (*yield)(void));
+int alac_decode_frame(alac_file *alac,
+                      unsigned char *inbuffer,
+                      int32_t outputbuffer[ALAC_MAX_CHANNELS][ALAC_BLOCKSIZE],
+                      void (*yield)(void));
 void alac_set_info(alac_file *alac, char *inputbuffer);
 
 #endif /* __ALAC__DECOMP_H */

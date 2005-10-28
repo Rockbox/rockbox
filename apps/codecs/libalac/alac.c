@@ -51,10 +51,6 @@
 int16_t predictor_coef_table[32] IBSS_ATTR;
 int16_t predictor_coef_table_a[32] IBSS_ATTR;
 int16_t predictor_coef_table_b[32] IBSS_ATTR;
-int32_t predicterror_buffer_a[4096];
-int32_t predicterror_buffer_b[4096];
-int32_t outputsamples_buffer_a[4096] IBSS_ATTR;
-int32_t outputsamples_buffer_b[4096] IBSS_ATTR;
 
 void alac_set_info(alac_file *alac, char *inputbuffer)
 {
@@ -609,9 +605,9 @@ static void predictor_decompress_fir_adapt(int32_t *error_buffer,
     }
 }
 
-void deinterlace_16(int32_t *buffer_a, int32_t *buffer_b,
-                    int16_t *buffer_out,
-                    int numchannels, int numsamples,
+void deinterlace_16(int32_t* buffer0,
+                    int32_t* buffer1,
+                    int numsamples,
                     uint8_t interlacing_shift,
                     uint8_t interlacing_leftweight)
 {
@@ -625,11 +621,13 @@ void deinterlace_16(int32_t *buffer_a, int32_t *buffer_b,
         {
             int32_t difference, midright;
 
-            midright = buffer_a[i];
-            difference = buffer_b[i];
+            midright = buffer0[i];
+            difference = buffer1[i];
 
-            buffer_out[i*numchannels] = (midright - ((difference * interlacing_leftweight) >> interlacing_shift)) + difference;
-            buffer_out[i*numchannels + 1] = midright - ((difference * interlacing_leftweight) >> interlacing_shift);
+            buffer0[i] = ((midright - ((difference * interlacing_leftweight)
+                            >> interlacing_shift)) + difference) << SCALE16;
+            buffer1[i] = (midright - ((difference * interlacing_leftweight) 
+                            >> interlacing_shift)) << SCALE16;
         }
 
         return;
@@ -638,406 +636,414 @@ void deinterlace_16(int32_t *buffer_a, int32_t *buffer_b,
     /* otherwise basic interlacing took place */
     for (i = 0; i < numsamples; i++)
     {
-        buffer_out[i*numchannels] = buffer_a[i];
-        buffer_out[i*numchannels + 1] = buffer_b[i];
+        buffer0[i] = buffer0[i] << SCALE16;
+        buffer1[i] = buffer1[i] << SCALE16;
     }
 }
 
-int16_t* decode_frame(alac_file *alac,
-                  unsigned char *inbuffer,
-                  int *outputsize,
-                  void (*yield)(void))
+
+static inline int decode_frame_mono(
+                    alac_file *alac,
+                    int32_t outputbuffer[ALAC_MAX_CHANNELS][ALAC_BLOCKSIZE],
+                    void (*yield)(void))
+{
+    int hassize;
+    int isnotcompressed;
+    int readsamplesize;
+    int outputsamples = alac->setinfo_max_samples_per_frame;
+
+    int wasted_bytes;
+    int ricemodifier;
+
+
+    /* 2^result = something to do with output waiting.
+     * perhaps matters if we read > 1 frame in a pass?
+     */
+    readbits(alac, 4);
+
+    readbits(alac, 12); /* unknown, skip 12 bits */
+
+    hassize = readbits(alac, 1); /* the output sample size is stored soon */
+
+    wasted_bytes = readbits(alac, 2); /* unknown ? */
+
+    isnotcompressed = readbits(alac, 1); /* whether the frame is compressed */
+
+    if (hassize)
+    {
+        /* now read the number of samples,
+         * as a 32bit integer */
+        outputsamples = readbits(alac, 32);
+    }
+
+    readsamplesize = alac->setinfo_sample_size - (wasted_bytes * 8);
+
+    if (!isnotcompressed)
+    { /* so it is compressed */
+        int predictor_coef_num;
+        int prediction_type;
+        int prediction_quantitization;
+        int i;
+
+        /* skip 16 bits, not sure what they are. seem to be used in
+         * two channel case */
+        readbits(alac, 8);
+        readbits(alac, 8);
+
+        prediction_type = readbits(alac, 4);
+        prediction_quantitization = readbits(alac, 4);
+
+        ricemodifier = readbits(alac, 3);
+        predictor_coef_num = readbits(alac, 5);
+
+        /* read the predictor table */
+        for (i = 0; i < predictor_coef_num; i++)
+        {
+            predictor_coef_table[i] = (int16_t)readbits(alac, 16);
+        }
+
+        if (wasted_bytes)
+        {
+            /* these bytes seem to have something to do with
+             * > 2 channel files.
+             */
+            //fprintf(stderr, "FIXME: unimplemented, unhandling of wasted_bytes\n");
+        }
+
+        yield();
+
+        basterdised_rice_decompress(alac,
+                                    outputbuffer[0],
+                                    outputsamples,
+                                    readsamplesize,
+                                    alac->setinfo_rice_initialhistory,
+                                    alac->setinfo_rice_kmodifier,
+                                    ricemodifier * alac->setinfo_rice_historymult / 4,
+                                    (1 << alac->setinfo_rice_kmodifier) - 1);
+
+        yield();
+
+        if (prediction_type == 0)
+        { /* adaptive fir */
+            predictor_decompress_fir_adapt(outputbuffer[0],
+                                           outputbuffer[0],
+                                           outputsamples,
+                                           readsamplesize,
+                                           predictor_coef_table,
+                                           predictor_coef_num,
+                                           prediction_quantitization);
+        }
+        else
+        {
+            //fprintf(stderr, "FIXME: unhandled predicition type: %i\n", prediction_type);
+            /* i think the only other prediction type (or perhaps this is just a
+             * boolean?) runs adaptive fir twice.. like:
+             * predictor_decompress_fir_adapt(predictor_error, tempout, ...)
+             * predictor_decompress_fir_adapt(predictor_error, outputsamples ...)
+             * little strange..
+             */
+        }
+
+    }
+    else
+    { /* not compressed, easy case */
+        if (readsamplesize <= 16)
+        {
+            int i;
+            for (i = 0; i < outputsamples; i++)
+            {
+                int32_t audiobits = readbits(alac, readsamplesize);
+
+                audiobits = SIGN_EXTENDED32(audiobits, readsamplesize);
+
+                outputbuffer[0][i] = audiobits;
+            }
+        }
+        else
+        {
+            int i;
+            for (i = 0; i < outputsamples; i++)
+            {
+                int32_t audiobits;
+
+                audiobits = readbits(alac, 16);
+                /* special case of sign extension..
+                 * as we'll be ORing the low 16bits into this */
+                audiobits = audiobits << 16;
+                audiobits = audiobits >> (32 - readsamplesize);
+
+                audiobits |= readbits(alac, readsamplesize - 16);
+
+                outputbuffer[0][i] = audiobits;
+            }
+        }
+        /* wasted_bytes = 0; // unused */
+    }
+
+    yield();
+
+    switch(alac->setinfo_sample_size)
+    {
+    case 16:
+    {
+        int i;
+        for (i = 0; i < outputsamples; i++)
+        {
+            /* Output mono data as stereo */
+            outputbuffer[0][i] = outputbuffer[0][i] << SCALE16;
+            outputbuffer[1][i] = outputbuffer[0][i];
+        }
+        break;
+    }
+    case 20:
+    case 24:
+    case 32:
+        //fprintf(stderr, "FIXME: unimplemented sample size %i\n", alac->setinfo_sample_size);
+        break;
+    default:
+        break;
+    }
+
+    return outputsamples;
+}
+
+static inline int decode_frame_stereo(
+                    alac_file *alac,
+                    int32_t outputbuffer[ALAC_MAX_CHANNELS][ALAC_BLOCKSIZE],
+                    void (*yield)(void))
+{
+    int hassize;
+    int isnotcompressed;
+    int readsamplesize;
+    int outputsamples = alac->setinfo_max_samples_per_frame;
+    int wasted_bytes;
+
+    uint8_t interlacing_shift;
+    uint8_t interlacing_leftweight;
+
+    /* 2^result = something to do with output waiting.
+     * perhaps matters if we read > 1 frame in a pass?
+     */
+    readbits(alac, 4);
+
+    readbits(alac, 12); /* unknown, skip 12 bits */
+
+    hassize = readbits(alac, 1); /* the output sample size is stored soon */
+
+    wasted_bytes = readbits(alac, 2); /* unknown ? */
+
+    isnotcompressed = readbits(alac, 1); /* whether the frame is compressed */
+
+    if (hassize)
+    {
+        /* now read the number of samples,
+         * as a 32bit integer */
+        outputsamples = readbits(alac, 32);
+    }
+
+    readsamplesize = alac->setinfo_sample_size - (wasted_bytes * 8) + 1;
+
+    yield();
+    if (!isnotcompressed)
+    { /* compressed */
+        int predictor_coef_num_a;
+        int prediction_type_a;
+        int prediction_quantitization_a;
+        int ricemodifier_a;
+
+        int predictor_coef_num_b;
+        int prediction_type_b;
+        int prediction_quantitization_b;
+        int ricemodifier_b;
+
+        int i;
+
+        interlacing_shift = readbits(alac, 8);
+        interlacing_leftweight = readbits(alac, 8);
+
+        /******** channel 1 ***********/
+        prediction_type_a = readbits(alac, 4);
+        prediction_quantitization_a = readbits(alac, 4);
+
+        ricemodifier_a = readbits(alac, 3);
+        predictor_coef_num_a = readbits(alac, 5);
+
+        /* read the predictor table */
+        for (i = 0; i < predictor_coef_num_a; i++)
+        {
+            predictor_coef_table_a[i] = (int16_t)readbits(alac, 16);
+        }
+
+        /******** channel 2 *********/
+        prediction_type_b = readbits(alac, 4);
+        prediction_quantitization_b = readbits(alac, 4);
+
+        ricemodifier_b = readbits(alac, 3);
+        predictor_coef_num_b = readbits(alac, 5);
+
+        /* read the predictor table */
+        for (i = 0; i < predictor_coef_num_b; i++)
+        {
+            predictor_coef_table_b[i] = (int16_t)readbits(alac, 16);
+        }
+
+        /*********************/
+        if (wasted_bytes)
+        { /* see mono case */
+            //fprintf(stderr, "FIXME: unimplemented, unhandling of wasted_bytes\n");
+        }
+
+        yield();
+        /* channel 1 */
+        basterdised_rice_decompress(alac,
+                                    outputbuffer[0],
+                                    outputsamples,
+                                    readsamplesize,
+                                    alac->setinfo_rice_initialhistory,
+                                    alac->setinfo_rice_kmodifier,
+                                    ricemodifier_a * alac->setinfo_rice_historymult / 4,
+                                    (1 << alac->setinfo_rice_kmodifier) - 1);
+
+        yield();
+        if (prediction_type_a == 0)
+        { /* adaptive fir */
+            predictor_decompress_fir_adapt(outputbuffer[0],
+                                           outputbuffer[0],
+                                           outputsamples,
+                                           readsamplesize,
+                                           predictor_coef_table_a,
+                                           predictor_coef_num_a,
+                                           prediction_quantitization_a);
+        }
+        else
+        { /* see mono case */
+            //fprintf(stderr, "FIXME: unhandled predicition type: %i\n", prediction_type_a);
+        }
+
+        yield();
+
+        /* channel 2 */
+        basterdised_rice_decompress(alac,
+                                    outputbuffer[1],
+                                    outputsamples,
+                                    readsamplesize,
+                                    alac->setinfo_rice_initialhistory,
+                                    alac->setinfo_rice_kmodifier,
+                                    ricemodifier_b * alac->setinfo_rice_historymult / 4,
+                                    (1 << alac->setinfo_rice_kmodifier) - 1);
+
+        yield();
+        if (prediction_type_b == 0)
+        { /* adaptive fir */
+            predictor_decompress_fir_adapt(outputbuffer[1],
+                                           outputbuffer[1],
+                                           outputsamples,
+                                           readsamplesize,
+                                           predictor_coef_table_b,
+                                           predictor_coef_num_b,
+                                           prediction_quantitization_b);
+        }
+        else
+        {
+            //fprintf(stderr, "FIXME: unhandled predicition type: %i\n", prediction_type_b);
+        }
+    }
+    else
+    { /* not compressed, easy case */
+        if (alac->setinfo_sample_size <= 16)
+        {
+            int i;
+            for (i = 0; i < outputsamples; i++)
+            {
+                int32_t audiobits_a, audiobits_b;
+
+                audiobits_a = readbits(alac, alac->setinfo_sample_size);
+                audiobits_b = readbits(alac, alac->setinfo_sample_size);
+
+                audiobits_a = SIGN_EXTENDED32(audiobits_a, alac->setinfo_sample_size);
+                audiobits_b = SIGN_EXTENDED32(audiobits_b, alac->setinfo_sample_size);
+
+                outputbuffer[0][i] = audiobits_a;
+                outputbuffer[1][i] = audiobits_b;
+            }
+        }
+        else
+        {
+            int i;
+            for (i = 0; i < outputsamples; i++)
+            {
+                int32_t audiobits_a, audiobits_b;
+
+                audiobits_a = readbits(alac, 16);
+                audiobits_a = audiobits_a << 16;
+                audiobits_a = audiobits_a >> (32 - alac->setinfo_sample_size);
+                audiobits_a |= readbits(alac, alac->setinfo_sample_size - 16);
+
+                audiobits_b = readbits(alac, 16);
+                audiobits_b = audiobits_b << 16;
+                audiobits_b = audiobits_b >> (32 - alac->setinfo_sample_size);
+                audiobits_b |= readbits(alac, alac->setinfo_sample_size - 16);
+
+                outputbuffer[0][i] = audiobits_a;
+                outputbuffer[1][i] = audiobits_b;
+            }
+        }
+        /* wasted_bytes = 0; */
+        interlacing_shift = 0;
+        interlacing_leftweight = 0;
+    }
+
+    yield();
+
+    switch(alac->setinfo_sample_size)
+    {
+    case 16:
+    {
+        deinterlace_16(outputbuffer[0],
+                       outputbuffer[1],
+                       outputsamples,
+                       interlacing_shift,
+                       interlacing_leftweight);
+        break;
+    }
+    case 20:
+    case 24:
+    case 32:
+        //fprintf(stderr, "FIXME: unimplemented sample size %i\n", alac->setinfo_sample_size);
+        break;
+    default:
+        break;
+    }
+    return outputsamples;
+}
+
+int alac_decode_frame(alac_file *alac,
+                      unsigned char *inbuffer,
+                      int32_t outputbuffer[ALAC_MAX_CHANNELS][ALAC_BLOCKSIZE],
+                      void (*yield)(void))
 {
     int channels;
-    int16_t* outbuffer;
-    int32_t outputsamples = alac->setinfo_max_samples_per_frame;
+    int outputsamples;
 
     /* setup the stream */
     alac->input_buffer = inbuffer;
     alac->input_buffer_bitaccumulator = 0;
 
-    /* We can share the same buffer for outputbuffer 
-       and outputsamples_buffer_b - and hence have them both in IRAM*/
-    outbuffer=(int16_t*)outputsamples_buffer_b;
-
     channels = readbits(alac, 3);
 
-    *outputsize = outputsamples * alac->bytespersample;
-
+    /* TODO: The mono and stereo functions should be combined. */
     switch(channels)
     {
-    case 0: /* 1 channel */
-    {
-        int hassize;
-        int isnotcompressed;
-        int readsamplesize;
-
-        int wasted_bytes;
-        int ricemodifier;
-
-
-        /* 2^result = something to do with output waiting.
-         * perhaps matters if we read > 1 frame in a pass?
-         */
-        readbits(alac, 4);
-
-        readbits(alac, 12); /* unknown, skip 12 bits */
-
-        hassize = readbits(alac, 1); /* the output sample size is stored soon */
-
-        wasted_bytes = readbits(alac, 2); /* unknown ? */
-
-        isnotcompressed = readbits(alac, 1); /* whether the frame is compressed */
-
-        if (hassize)
-        {
-            /* now read the number of samples,
-             * as a 32bit integer */
-            outputsamples = readbits(alac, 32);
-            *outputsize = outputsamples * alac->bytespersample;
-        }
-
-        readsamplesize = alac->setinfo_sample_size - (wasted_bytes * 8);
-
-        if (!isnotcompressed)
-        { /* so it is compressed */
-            int predictor_coef_num;
-            int prediction_type;
-            int prediction_quantitization;
-            int i;
-
-            /* skip 16 bits, not sure what they are. seem to be used in
-             * two channel case */
-            readbits(alac, 8);
-            readbits(alac, 8);
-
-            prediction_type = readbits(alac, 4);
-            prediction_quantitization = readbits(alac, 4);
-
-            ricemodifier = readbits(alac, 3);
-            predictor_coef_num = readbits(alac, 5);
-
-            /* read the predictor table */
-            for (i = 0; i < predictor_coef_num; i++)
-            {
-                predictor_coef_table[i] = (int16_t)readbits(alac, 16);
-            }
-
-            if (wasted_bytes)
-            {
-                /* these bytes seem to have something to do with
-                 * > 2 channel files.
-                 */
-                //fprintf(stderr, "FIXME: unimplemented, unhandling of wasted_bytes\n");
-            }
-
-            yield();
-
-            basterdised_rice_decompress(alac,
-                                        predicterror_buffer_a,
-                                        outputsamples,
-                                        readsamplesize,
-                                        alac->setinfo_rice_initialhistory,
-                                        alac->setinfo_rice_kmodifier,
-                                        ricemodifier * alac->setinfo_rice_historymult / 4,
-                                        (1 << alac->setinfo_rice_kmodifier) - 1);
-
-            yield();
-
-            if (prediction_type == 0)
-            { /* adaptive fir */
-                predictor_decompress_fir_adapt(predicterror_buffer_a,
-                                               outputsamples_buffer_a,
-                                               outputsamples,
-                                               readsamplesize,
-                                               predictor_coef_table,
-                                               predictor_coef_num,
-                                               prediction_quantitization);
-            }
-            else
-            {
-                //fprintf(stderr, "FIXME: unhandled predicition type: %i\n", prediction_type);
-                /* i think the only other prediction type (or perhaps this is just a
-                 * boolean?) runs adaptive fir twice.. like:
-                 * predictor_decompress_fir_adapt(predictor_error, tempout, ...)
-                 * predictor_decompress_fir_adapt(predictor_error, outputsamples ...)
-                 * little strange..
-                 */
-            }
-
-        }
-        else
-        { /* not compressed, easy case */
-            if (readsamplesize <= 16)
-            {
-                int i;
-                for (i = 0; i < outputsamples; i++)
-                {
-                    int32_t audiobits = readbits(alac, readsamplesize);
-
-                    audiobits = SIGN_EXTENDED32(audiobits, readsamplesize);
-
-                    outputsamples_buffer_a[i] = audiobits;
-                }
-            }
-            else
-            {
-                int i;
-                for (i = 0; i < outputsamples; i++)
-                {
-                    int32_t audiobits;
-
-                    audiobits = readbits(alac, 16);
-                    /* special case of sign extension..
-                     * as we'll be ORing the low 16bits into this */
-                    audiobits = audiobits << 16;
-                    audiobits = audiobits >> (32 - readsamplesize);
-
-                    audiobits |= readbits(alac, readsamplesize - 16);
-
-                    outputsamples_buffer_a[i] = audiobits;
-                }
-            }
-            /* wasted_bytes = 0; // unused */
-        }
-
-        yield();
-
-        switch(alac->setinfo_sample_size)
-        {
-        case 16:
-        {
-            int i;
-            for (i = 0; i < outputsamples; i++)
-            {
-                /* Output mono data as stereo */
-                outbuffer[i*2] = outputsamples_buffer_a[i];
-                outbuffer[i*2+1] = outputsamples_buffer_a[i];
-            }
+        case 0: /* 1 channel */
+            outputsamples=decode_frame_mono(alac,outputbuffer,yield);
             break;
-        }
-        case 20:
-        case 24:
-        case 32:
-            //fprintf(stderr, "FIXME: unimplemented sample size %i\n", alac->setinfo_sample_size);
+        case 1: /* 2 channels */
+            outputsamples=decode_frame_stereo(alac,outputbuffer,yield);
             break;
-        default:
-            break;
-        }
-        break;
+        default: /* Unsupported */
+            return -1;
     }
-    case 1: /* 2 channels */
-    {
-        int hassize;
-        int isnotcompressed;
-        int readsamplesize;
-
-        int wasted_bytes;
-
-        uint8_t interlacing_shift;
-        uint8_t interlacing_leftweight;
-
-        /* 2^result = something to do with output waiting.
-         * perhaps matters if we read > 1 frame in a pass?
-         */
-        readbits(alac, 4);
-
-        readbits(alac, 12); /* unknown, skip 12 bits */
-
-        hassize = readbits(alac, 1); /* the output sample size is stored soon */
-
-        wasted_bytes = readbits(alac, 2); /* unknown ? */
-
-        isnotcompressed = readbits(alac, 1); /* whether the frame is compressed */
-
-        if (hassize)
-        {
-            /* now read the number of samples,
-             * as a 32bit integer */
-            outputsamples = readbits(alac, 32);
-            *outputsize = outputsamples * alac->bytespersample;
-        }
-
-        readsamplesize = alac->setinfo_sample_size - (wasted_bytes * 8) + 1;
-
-        yield();
-        if (!isnotcompressed)
-        { /* compressed */
-            int predictor_coef_num_a;
-            int prediction_type_a;
-            int prediction_quantitization_a;
-            int ricemodifier_a;
-
-            int predictor_coef_num_b;
-            int prediction_type_b;
-            int prediction_quantitization_b;
-            int ricemodifier_b;
-
-            int i;
-
-            interlacing_shift = readbits(alac, 8);
-            interlacing_leftweight = readbits(alac, 8);
-
-            /******** channel 1 ***********/
-            prediction_type_a = readbits(alac, 4);
-            prediction_quantitization_a = readbits(alac, 4);
-
-            ricemodifier_a = readbits(alac, 3);
-            predictor_coef_num_a = readbits(alac, 5);
-
-            /* read the predictor table */
-            for (i = 0; i < predictor_coef_num_a; i++)
-            {
-                predictor_coef_table_a[i] = (int16_t)readbits(alac, 16);
-            }
-
-            /******** channel 2 *********/
-            prediction_type_b = readbits(alac, 4);
-            prediction_quantitization_b = readbits(alac, 4);
-
-            ricemodifier_b = readbits(alac, 3);
-            predictor_coef_num_b = readbits(alac, 5);
-
-            /* read the predictor table */
-            for (i = 0; i < predictor_coef_num_b; i++)
-            {
-                predictor_coef_table_b[i] = (int16_t)readbits(alac, 16);
-            }
-
-            /*********************/
-            if (wasted_bytes)
-            { /* see mono case */
-                //fprintf(stderr, "FIXME: unimplemented, unhandling of wasted_bytes\n");
-            }
-
-            yield();
-            /* channel 1 */
-            basterdised_rice_decompress(alac,
-                                        predicterror_buffer_a,
-                                        outputsamples,
-                                        readsamplesize,
-                                        alac->setinfo_rice_initialhistory,
-                                        alac->setinfo_rice_kmodifier,
-                                        ricemodifier_a * alac->setinfo_rice_historymult / 4,
-                                        (1 << alac->setinfo_rice_kmodifier) - 1);
-
-            yield();
-            if (prediction_type_a == 0)
-            { /* adaptive fir */
-                predictor_decompress_fir_adapt(predicterror_buffer_a,
-                                               outputsamples_buffer_a,
-                                               outputsamples,
-                                               readsamplesize,
-                                               predictor_coef_table_a,
-                                               predictor_coef_num_a,
-                                               prediction_quantitization_a);
-            }
-            else
-            { /* see mono case */
-                //fprintf(stderr, "FIXME: unhandled predicition type: %i\n", prediction_type_a);
-            }
-
-            yield();
-
-            /* channel 2 */
-            basterdised_rice_decompress(alac,
-                                        predicterror_buffer_b,
-                                        outputsamples,
-                                        readsamplesize,
-                                        alac->setinfo_rice_initialhistory,
-                                        alac->setinfo_rice_kmodifier,
-                                        ricemodifier_b * alac->setinfo_rice_historymult / 4,
-                                        (1 << alac->setinfo_rice_kmodifier) - 1);
-
-            yield();
-            if (prediction_type_b == 0)
-            { /* adaptive fir */
-                predictor_decompress_fir_adapt(predicterror_buffer_b,
-                                               outputsamples_buffer_b,
-                                               outputsamples,
-                                               readsamplesize,
-                                               predictor_coef_table_b,
-                                               predictor_coef_num_b,
-                                               prediction_quantitization_b);
-            }
-            else
-            {
-                //fprintf(stderr, "FIXME: unhandled predicition type: %i\n", prediction_type_b);
-            }
-        }
-        else
-        { /* not compressed, easy case */
-            if (alac->setinfo_sample_size <= 16)
-            {
-                int i;
-                for (i = 0; i < outputsamples; i++)
-                {
-                    int32_t audiobits_a, audiobits_b;
-
-                    audiobits_a = readbits(alac, alac->setinfo_sample_size);
-                    audiobits_b = readbits(alac, alac->setinfo_sample_size);
-
-                    audiobits_a = SIGN_EXTENDED32(audiobits_a, alac->setinfo_sample_size);
-                    audiobits_b = SIGN_EXTENDED32(audiobits_b, alac->setinfo_sample_size);
-
-                    outputsamples_buffer_a[i] = audiobits_a;
-                    outputsamples_buffer_b[i] = audiobits_b;
-                }
-            }
-            else
-            {
-                int i;
-                for (i = 0; i < outputsamples; i++)
-                {
-                    int32_t audiobits_a, audiobits_b;
-
-                    audiobits_a = readbits(alac, 16);
-                    audiobits_a = audiobits_a << 16;
-                    audiobits_a = audiobits_a >> (32 - alac->setinfo_sample_size);
-                    audiobits_a |= readbits(alac, alac->setinfo_sample_size - 16);
-
-                    audiobits_b = readbits(alac, 16);
-                    audiobits_b = audiobits_b << 16;
-                    audiobits_b = audiobits_b >> (32 - alac->setinfo_sample_size);
-                    audiobits_b |= readbits(alac, alac->setinfo_sample_size - 16);
-
-                    outputsamples_buffer_a[i] = audiobits_a;
-                    outputsamples_buffer_b[i] = audiobits_b;
-                }
-            }
-            /* wasted_bytes = 0; */
-            interlacing_shift = 0;
-            interlacing_leftweight = 0;
-        }
-
-        yield();
-
-        switch(alac->setinfo_sample_size)
-        {
-        case 16:
-        {
-            deinterlace_16(outputsamples_buffer_a,
-                           outputsamples_buffer_b,
-                           (int16_t*)outbuffer,
-                           alac->numchannels,
-                           outputsamples,
-                           interlacing_shift,
-                           interlacing_leftweight);
-            break;
-        }
-        case 20:
-        case 24:
-        case 32:
-            //fprintf(stderr, "FIXME: unimplemented sample size %i\n", alac->setinfo_sample_size);
-            break;
-        default:
-            break;
-        }
-
-        break;
-    }
-    }
-    return outbuffer;
+    return outputsamples;
 }
 
 void create_alac(int samplesize, int numchannels, alac_file* alac)

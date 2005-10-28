@@ -31,6 +31,7 @@ extern char iramend[];
 #define destBufferSize (1024*16)
 
 char inputBuffer[1024*32];    /* Input buffer */
+int32_t outputbuffer[ALAC_MAX_CHANNELS][ALAC_BLOCKSIZE] IBSS_ATTR;
 size_t mdat_offset;
 struct codec_api* rb;
 struct codec_api* ci;
@@ -241,11 +242,10 @@ enum codec_status codec_start(struct codec_api* api)
   uint32_t elapsedtime;
   uint32_t sample_duration;
   uint32_t sample_byte_size;
-  int outputBytes;
+  int samplesdecoded;
   unsigned int i;
   unsigned char* buffer;
   alac_file alac;
-  int16_t* pDestBuffer;
 
   /* Generic codec initialisation */
   TEST_CODEC_API(api);
@@ -261,9 +261,10 @@ enum codec_status codec_start(struct codec_api* api)
   ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
   ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*128));
 
+  ci->configure(CODEC_DSP_ENABLE, (bool *)true);
   ci->configure(DSP_DITHER, (bool *)false);
-  ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_INTERLEAVED);
-  ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(16));
+  ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_NONINTERLEAVED);
+  ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(28));
   
   next_track:
 
@@ -275,12 +276,7 @@ enum codec_status codec_start(struct codec_api* api)
   while (!rb->taginfo_ready)
     rb->yield();
   
-  if (rb->id3->frequency != NATIVE_FREQUENCY) {
-    rb->configure(DSP_SET_FREQUENCY, (long *)(rb->id3->frequency));
-    rb->configure(CODEC_DSP_ENABLE, (bool *)true);
-  } else {
-    rb->configure(CODEC_DSP_ENABLE, (bool *)false);
-  }
+  ci->configure(DSP_SET_FREQUENCY, (long *)(rb->id3->frequency));
 
   stream_create(&input_stream);
 
@@ -349,9 +345,8 @@ enum codec_status codec_start(struct codec_api* api)
     }
 
     /* Decode one block - returned samples will be host-endian */
-    outputBytes = destBufferSize;
     rb->yield();
-    pDestBuffer=decode_frame(&alac, buffer, &outputBytes, rb->yield);
+    samplesdecoded=alac_decode_frame(&alac, buffer, outputbuffer, rb->yield);
 
     /* Advance codec buffer - unless we did a read */
     if ((char*)buffer!=(char*)inputBuffer) {
@@ -360,7 +355,9 @@ enum codec_status codec_start(struct codec_api* api)
 
     /* Output the audio */
     rb->yield();
-    while(!ci->pcmbuf_insert((char*)pDestBuffer,outputBytes))
+    while(!ci->pcmbuf_insert_split(outputbuffer[0],
+                                   outputbuffer[1],
+                                   samplesdecoded*sizeof(int32_t)))
       rb->yield();
 
     /* Update the elapsed-time indicator */
