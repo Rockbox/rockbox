@@ -117,6 +117,8 @@ enum codec_status codec_start(struct codec_api* api)
     uint32_t elapsedtime;
     int bytesleft;
     int consumed;
+    int res;
+    int frame;
 
     /* Generic codec initialisation */
     TEST_CODEC_API(api);
@@ -151,6 +153,7 @@ enum codec_status codec_start(struct codec_api* api)
 
     /* The main decoding loop */
     samplesdone=0;
+    frame=0;
     bytesleft=ci->read_filebuf(buf,sizeof(buf));
     while (bytesleft) {
         ci->yield();
@@ -171,12 +174,13 @@ enum codec_status codec_start(struct codec_api* api)
           ci->seek_time = 0;
         }
 
-        if(flac_decode_frame(&fc,decoded0,decoded1,buf,
-                             bytesleft,ci->yield) < 0) {
-             LOGF("FLAC: Decode error, aborting\n");
+        if((res=flac_decode_frame(&fc,decoded0,decoded1,buf,
+                             bytesleft,ci->yield)) < 0) {
+             LOGF("FLAC: Frame %d, error %d\n",frame,res);
              return CODEC_ERROR;
         }
         consumed=fc.gb.index/8;
+        frame++;
 
         ci->yield();
         while(!ci->pcmbuf_insert_split((char*)decoded0,(char*)decoded1,

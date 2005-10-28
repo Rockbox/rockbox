@@ -124,7 +124,7 @@ static int64_t get_utf8(GetBitContext *gb)
         const int tmp = get_bits(gb, 8);
         
         if((tmp>>6) != 2)
-            return -1;
+            return -2;
         val<<=6;
         val|= tmp&0x3F;
     }
@@ -150,7 +150,7 @@ static int decode_residuals(FLACContext *s, int32_t* decoded, int pred_order)
     method_type = get_bits(&s->gb, 2);
     if (method_type != 0){
         //fprintf(stderr,"illegal residual coding method %d\n", method_type);
-        return -1;
+        return -3;
     }
     
     rice_order = get_bits(&s->gb, 4);
@@ -192,7 +192,7 @@ static int decode_subframe_fixed(FLACContext *s, int32_t* decoded, int pred_orde
     }
     
     if (decode_residuals(s, decoded, pred_order) < 0)
-        return -1;
+        return -4;
 
     switch(pred_order)
     {
@@ -221,7 +221,7 @@ static int decode_subframe_fixed(FLACContext *s, int32_t* decoded, int pred_orde
                             -   decoded[i-4];
             break;
         default:
-            return -1;
+            return -5;
     }
 
     return 0;
@@ -244,13 +244,13 @@ static int decode_subframe_lpc(FLACContext *s, int32_t* decoded, int pred_order)
     if (coeff_prec == 16)
     {
         //fprintf(stderr,"invalid coeff precision\n");
-        return -1;
+        return -6;
     }
     qlevel = get_sbits(&s->gb, 5);
     if (qlevel < 0) 
     {
         //fprintf(stderr,"qlevel %d not supported, maybe buggy stream\n", qlevel);
-        return -1;
+        return -7;
     }
 
     for (i = 0; i < pred_order; i++)
@@ -259,7 +259,7 @@ static int decode_subframe_lpc(FLACContext *s, int32_t* decoded, int pred_order)
     }
     
     if (decode_residuals(s, decoded, pred_order) < 0)
-        return -1;
+        return -8;
 
     if ((s->bps + coeff_prec + av_log2(pred_order)) <= 32) {
         for (i = pred_order; i < s->blocksize; i++)
@@ -298,8 +298,8 @@ static inline int decode_subframe(FLACContext *s, int channel, int32_t* decoded)
 
     if (get_bits1(&s->gb))
     {
-        //av_log(s->avctx, AV_LOG_ERROR, "invalid subframe padding\n");
-        return -1;
+        //fprintf(stderr,"invalid subframe padding\n");
+        return -9;
     }
     type = get_bits(&s->gb, 6);
 //    wasted = get_bits1(&s->gb);
@@ -344,18 +344,18 @@ static inline int decode_subframe(FLACContext *s, int channel, int32_t* decoded)
     {
         //fprintf(stderr,"coding type: fixed\n");
         if (decode_subframe_fixed(s, decoded, type & ~0x8) < 0)
-            return -1;
+            return -10;
     }
     else if (type >= 32)
     {
         //fprintf(stderr,"coding type: lpc\n");
         if (decode_subframe_lpc(s, decoded, (type & ~0x20)+1) < 0)
-            return -1;
+            return -11;
     }
     else
     {
         //fprintf(stderr,"Unknown coding type: %d\n",type);
-        return -1;
+        return -12;
     }
         
     if (wasted)
@@ -375,6 +375,7 @@ static int decode_frame(FLACContext *s,
 {
     int blocksize_code, sample_rate_code, sample_size_code, assignment, crc8;
     int decorrelation, bps, blocksize, samplerate;
+    int res;
     
     blocksize_code = get_bits(&s->gb, 4);
 
@@ -387,7 +388,7 @@ static int decode_frame(FLACContext *s,
         decorrelation = LEFT_SIDE + assignment - 8;
     else
     {
-        return -1;
+        return -13;
     }
         
     sample_size_code = get_bits(&s->gb, 3);
@@ -397,12 +398,12 @@ static int decode_frame(FLACContext *s,
         bps = sample_size_table[sample_size_code];
     else 
     {
-        return -1;
+        return -14;
     }
 
     if (get_bits1(&s->gb))
     {
-        return -1;
+        return -15;
     }
 
     /* Get the samplenumber of the first sample in this block */
@@ -421,7 +422,7 @@ static int decode_frame(FLACContext *s,
     }else{
     }
 #endif
-    
+
     if (blocksize_code == 0)
         blocksize = s->min_blocksize;
     else if (blocksize_code == 6)
@@ -432,7 +433,7 @@ static int decode_frame(FLACContext *s,
         blocksize = blocksize_table[blocksize_code];
 
     if(blocksize > s->max_blocksize){
-        return -1;
+        return -16;
     }
 
     if (sample_rate_code == 0){
@@ -446,13 +447,13 @@ static int decode_frame(FLACContext *s,
     else if (sample_rate_code == 14)
         samplerate = get_bits(&s->gb, 16) * 10;
     else{
-        return -1;
+        return -17;
     }
 
     skip_bits(&s->gb, 8);
     crc8= get_crc8(s->gb.buffer, get_bits_count(&s->gb)/8);
     if(crc8){
-        return -1;
+        return -18;
     }
     
     s->blocksize    = blocksize;
@@ -462,14 +463,14 @@ static int decode_frame(FLACContext *s,
 
     yield();
     /* subframes */
-    if (decode_subframe(s, 0, decoded0) < 0)
-        return -1;
+    if ((res=decode_subframe(s, 0, decoded0)) < 0)
+        return res-100;
 
     yield();
 
     if (s->channels==2) {
-      if (decode_subframe(s, 1, decoded1) < 0)
-          return -1;
+      if ((res=decode_subframe(s, 1, decoded1)) < 0)
+          return res-200;
     }
     
     yield();
@@ -487,25 +488,22 @@ int flac_decode_frame(FLACContext *s,
                              uint8_t *buf, int buf_size,
                              void (*yield)(void))
 {
-    int tmp = 0, i, input_buf_size = 0;
+    int tmp;
+    int i;
     int framesize;
     int scale;
 
     init_get_bits(&s->gb, buf, buf_size*8);
 
-    tmp = show_bits(&s->gb, 16);
+    tmp = get_bits(&s->gb, 16);
     if(tmp != 0xFFF8){
-        //fprintf(stderr,"FRAME HEADER not here\n");
-        while(get_bits_count(&s->gb)/8+2 < buf_size && show_bits(&s->gb, 16) != 0xFFF8)
-           skip_bits(&s->gb, 8);
-        goto end; // we may not have enough bits left to decode a frame, so try next time
+        return -41;
     }
-    skip_bits(&s->gb, 16);
 
     if ((framesize=decode_frame(s,decoded0,decoded1,yield)) < 0){
        s->bitstream_size=0;
        s->bitstream_index=0;
-       return -1;
+       return framesize;
     }
 
     yield();
@@ -567,18 +565,5 @@ int flac_decode_frame(FLACContext *s,
             break;
     }
 
-end:
-    i= (get_bits_count(&s->gb)+7)/8;;
-    if(i > buf_size){
-        s->bitstream_size=0;
-        s->bitstream_index=0;
-        return -1;
-    }
-
-    if(s->bitstream_size){
-        s->bitstream_index += i;
-        s->bitstream_size  -= i;
-        return input_buf_size;
-    }else 
-        return i;
+    return 0;
 }
