@@ -136,8 +136,12 @@ typedef struct mpc_decoder_t {
     unsigned char SCF_shift[256];
 #endif
 
-    MPC_SAMPLE_FORMAT V_L[MPC_V_MEM + 960];
-    MPC_SAMPLE_FORMAT V_R[MPC_V_MEM + 960];
+    /* These two see very frequent use in synth_filter.c, so we'll put them
+       in IRAM for Rockbox use. Actual arrays are placed in mpc_decoder.c */
+    /* MPC_SAMPLE_FORMAT V_L[MPC_V_MEM + 960]; */
+    /* MPC_SAMPLE_FORMAT V_R[MPC_V_MEM + 960]; */
+    MPC_SAMPLE_FORMAT *V_L;
+    MPC_SAMPLE_FORMAT *V_R;
     MPC_SAMPLE_FORMAT Y_L[36][32];
     MPC_SAMPLE_FORMAT Y_R[36][32];
     MPC_SAMPLE_FORMAT SCF[256]; ///< holds adapted scalefactors (for clipping prevention)

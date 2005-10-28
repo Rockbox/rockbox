@@ -1106,6 +1106,9 @@ mpc_decoder_read_bitstream_sv7(mpc_decoder *d)
     }
 }
 
+MPC_SAMPLE_FORMAT V_L[MPC_V_MEM + 960] IBSS_ATTR;
+MPC_SAMPLE_FORMAT V_R[MPC_V_MEM + 960] IBSS_ATTR;
+
 void mpc_decoder_setup(mpc_decoder *d, mpc_reader *r)
 {
   d->r = r;
@@ -1174,6 +1177,9 @@ void mpc_decoder_setup(mpc_decoder *d, mpc_reader *r)
   mpc_decoder_init_huffman_sv6(d);
   mpc_decoder_init_huffman_sv7(d);
 
+  /* Link struct entries to actual tables which are placed in IRAM */
+  d->V_L = V_L;
+  d->V_R = V_R;
   #if defined(CPU_COLDFIRE)&& !defined(SIMULATOR)
   coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
   #endif
