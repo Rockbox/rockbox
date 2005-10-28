@@ -649,14 +649,14 @@ static bool dirbrowse(void)
                 break;
 
 #ifdef TREE_OFF
-#if (CONFIG_KEYPAD == RECORDER_PAD) && !defined(HAVE_SW_POWEROFF)
             case TREE_OFF:
                 if (*tc.dirfilter < NUM_FILTER_MODES)
                 {
-                    /* Stop the music if it is playing, else power off */
+                    /* Stop the music if it is playing */
                     if(audio_status())
                         audio_stop();
-                    else {
+#if (CONFIG_KEYPAD == RECORDER_PAD) && !defined(HAVE_SW_POWEROFF)
+                    else { 
                         if (!charger_inserted()) {
                             if(shutdown_screen())
                                 reload_dir = true;
@@ -665,9 +665,9 @@ static bool dirbrowse(void)
                         }
                         restore = true;
                     }
+#endif
                 }
                 break;
-#endif
 #if defined(HAVE_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
             case TREE_OFF | BUTTON_REPEAT:
                 if (charger_inserted()) {
@@ -676,7 +676,7 @@ static bool dirbrowse(void)
                 }
                 break;
 #endif
-#endif
+#endif /* TREE_OFF */
             case TREE_MENU:
 #ifdef TREE_RC_MENU
             case TREE_RC_MENU:
