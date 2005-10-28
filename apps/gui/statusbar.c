@@ -30,6 +30,8 @@
 #include "icons.h"
 #include "powermgmt.h"
 #include "button.h"
+#include "usb.h"
+#include "led.h"
 
 #include "status.h" /* needed for battery_state global var */
 #include "wps.h" /* for keys_locked */
@@ -88,7 +90,7 @@ void gui_statusbar_init(struct gui_statusbar * bar)
 {
     bar->last_volume = -1; /* -1 means "first update ever" */
     bar->battery_icon_switch_tick = 0;
-#ifdef HAVE_USB_POWER
+#ifdef HAVE_CHARGING
     bar->battery_charge_step = 0;
 #endif
 }
@@ -446,9 +448,10 @@ void gui_statusbar_icon_lock(struct screen * display)
  */
 void gui_statusbar_led(struct screen * display)
 {
-    display->mono_bitmap(bitmap_icon_disk, STATUSBAR_DISK_X_POS,
-                    STATUSBAR_Y_POS, STATUSBAR_DISK_WIDTH(screen->width),
-                    STATUSBAR_HEIGHT);
+    display->mono_bitmap(bitmap_icon_disk,
+                         STATUSBAR_DISK_X_POS(display->width),
+                         STATUSBAR_Y_POS, STATUSBAR_DISK_WIDTH,
+                         STATUSBAR_HEIGHT);
 }
 #endif
 

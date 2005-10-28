@@ -41,6 +41,9 @@ struct status_info {
 #ifdef HAVE_USB_POWER
     bool usb_power;
 #endif
+#ifdef HAVE_CHARGING
+    int battery_charge_step;
+#endif
 };
 
 struct gui_statusbar
