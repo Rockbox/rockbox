@@ -19,7 +19,7 @@
 #ifndef _WPS_H
 #define _WPS_H
 #include "id3.h"
-#include "playlist.h" 
+#include "playlist.h"
 
 /* button definitions */
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
@@ -33,7 +33,7 @@
 #define WPS_INCVOL     BUTTON_UP
 #define WPS_DECVOL     BUTTON_DOWN
 #define WPS_PAUSE      (BUTTON_ON | BUTTON_REL)
-#define WPS_PAUSE_PRE  BUTTON_ON 
+#define WPS_PAUSE_PRE  BUTTON_ON
 #define WPS_MENU       (BUTTON_MODE | BUTTON_REL)
 #define WPS_MENU_PRE   BUTTON_MODE
 #define WPS_BROWSE     (BUTTON_SELECT | BUTTON_REL)
@@ -53,10 +53,10 @@
 #define WPS_RC_INCVOL  BUTTON_RC_VOL_UP
 #define WPS_RC_DECVOL  BUTTON_RC_VOL_DOWN
 #define WPS_RC_EXIT    BUTTON_RC_STOP
-#define WPS_RC_MENU    (BUTTON_RC_MENU | BUTTON_REL)
-#define WPS_RC_MENU_PRE BUTTON_RC_MENU
-#define WPS_RC_BROWSE  (BUTTON_RC_MODE | BUTTON_REL)
-#define WPS_RC_BROWSE_PRE BUTTON_RC_MODE
+#define WPS_RC_MENU    (BUTTON_RC_MODE | BUTTON_REL)
+#define WPS_RC_MENU_PRE BUTTON_RC_MODE
+#define WPS_RC_BROWSE  (BUTTON_RC_MENU | BUTTON_REL)
+#define WPS_RC_BROWSE_PRE BUTTON_RC_MENU
 
 #elif CONFIG_KEYPAD == RECORDER_PAD
 #define WPS_NEXT       (BUTTON_RIGHT | BUTTON_REL)

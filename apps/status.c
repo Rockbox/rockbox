@@ -43,12 +43,12 @@
 #endif
 #include "usb.h"
 
-static enum playmode ff_mode;
+enum playmode ff_mode;
 
-static long switch_tick;
-static bool battery_state = true;
+long switch_tick;
+bool battery_state = true;
 #ifdef HAVE_CHARGING
-static int  battery_charge_step = 0;
+int battery_charge_step = 0;
 #endif
 
 struct status_info {
@@ -123,10 +123,10 @@ int current_playmode(void)
 }
 
 #if defined(HAVE_LCD_CHARCELLS)
-static bool record = false;
-static bool audio = false;
-static bool param = false;
-static bool usb = false;
+bool record = false;
+bool audio = false;
+bool param = false;
+bool usb = false;
 
 void status_set_record(bool b)
 {

@@ -63,6 +63,12 @@
 #include "rtc.h"
 #include "dircache.h"
 
+/* gui api */
+#include "list.h"
+#include "statusbar.h"
+#include "splash.h"
+#include "buttonbar.h"
+
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
 #endif
@@ -99,6 +105,14 @@ const struct filetype filetypes[] = {
 #endif /* #ifndef SIMULATOR */
 };
 
+struct gui_synclist tree_lists;
+
+/* I put it here because other files doesn't use it yet,
+ * but should be elsewhere since it will be used mostly everywhere */
+struct gui_syncstatusbar statusbars;
+#ifdef HAS_BUTTONBAR
+struct gui_buttonbar tree_buttonbar;
+#endif
 static struct tree_context tc;
 
 bool boot_changed = false;
@@ -112,17 +126,77 @@ static bool reload_dir = false;
 
 static bool start_wps = false;
 static bool dirbrowse(void);
-static int curr_context = false;
+static int curr_context = false;/* id3db or tree*/
+
+/*
+ * removes the extension of filename (if it doesn't start with a .)
+ * puts the result in buffer
+ */
+char * strip_extension(char * filename, char * buffer)
+{
+    int dotpos;
+    char * dot=strrchr(filename, '.');
+    if(dot!=0 && filename[0]!='.')
+    {
+        dotpos = dot-filename;
+        strncpy(buffer, filename, dotpos);
+        buffer[dotpos]='\0';
+        return(buffer);
+    }
+    else
+        return(filename);
+}
+char * tree_get_filename(int selected_item, char *buffer)
+{
+    char *name;
+    int attr=0;
+    bool id3db = *tc.dirfilter == SHOW_ID3DB;
+    if (id3db) {
+        name = ((char**)tc.dircache)[selected_item * tc.dentry_size];
+    }
+    else {
+        struct entry* dc = tc.dircache;
+        struct entry* e = &dc[selected_item];
+        name = e->name;
+        attr = e->attr;
+    }
+    /* if any file filter is on, and if it's not a directory,
+     * strip the extension */
+
+    if ( (*tc.dirfilter != SHOW_ID3DB) && !(attr & ATTR_DIRECTORY)
+        && (*tc.dirfilter != SHOW_ALL) )
+    {
+        return(strip_extension(name, buffer));
+    }
+    return(name);
+}
+
+
+void tree_get_fileicon(int selected_item, ICON * icon)
+{
+    bool id3db = *tc.dirfilter == SHOW_ID3DB;
+    if (id3db) {
+        *icon = db_get_icon(&tc);
+    }
+    else {
+        struct entry* dc = tc.dircache;
+        struct entry* e = &dc[selected_item];
+        *icon = filetype_get_icon(e->attr);
+    }
+}
 
 bool check_rockboxdir(void)
 {
     DIR *dir = opendir(ROCKBOX_DIR);
     if(!dir)
     {
-        lcd_clear_display();
-        splash(HZ*2, true, str(LANG_NO_ROCKBOX_DIR));
-        lcd_clear_display();
-        splash(HZ*2, true, str(LANG_INSTALLATION_INCOMPLETE));
+        int i;
+        for(i = 0;i < NB_SCREENS;++i)
+            screens[i].clear_display();
+        gui_syncsplash(HZ*2, true, str(LANG_NO_ROCKBOX_DIR));
+        for(i = 0;i < NB_SCREENS;++i)
+            screens[i].clear_display();
+        gui_syncsplash(HZ*2, true, str(LANG_INSTALLATION_INCOMPLETE));
         return false;
     }
     closedir(dir);
@@ -131,16 +205,28 @@ bool check_rockboxdir(void)
 
 void browse_root(void)
 {
+    /* essential to all programs that wants to display things */
+    screen_access_init();
+
     filetype_init();
     check_rockboxdir();
 
     strcpy(tc.currdir, "/");
+
 #ifdef HAVE_LCD_CHARCELLS
-    lcd_double_height(false);
+    int i;
+    for(i = 0;i < NB_SCREENS;++i)
+        screens[i].double_height(false);
 #endif
+#ifdef HAS_BUTTONBAR
+    gui_buttonbar_init(&tree_buttonbar);
+    /* since archos only have one screen, no need to create more than that */
+    gui_buttonbar_set_display(&tree_buttonbar, &(screens[SCREEN_MAIN]) );
+#endif
+    gui_syncstatusbar_init(&statusbars);
+    gui_synclist_init(&tree_lists, &tree_get_fileicon, &tree_get_filename);
 #ifndef SIMULATOR
     dirbrowse();
-
 #else
     if (!dirbrowse()) {
         DEBUGF("No filesystem found. Have you forgotten to create it?\n");
@@ -159,126 +245,35 @@ struct tree_context* tree_get_context(void)
     return &tc;
 }
 
-#ifdef HAVE_LCD_BITMAP
-
-/* pixel margins */
-#define MARGIN_X (global_settings.scrollbar && \
-                  tc.filesindir > tree_max_on_screen ? SCROLLBAR_WIDTH : 0) + \
-                  CURSOR_WIDTH + (global_settings.show_icons && ICON_WIDTH > 0 ? ICON_WIDTH :0)
-#define MARGIN_Y (global_settings.statusbar ? STATUSBAR_HEIGHT : 0)
-
-/* position the entry-list starts at */
-#define LINE_X   0
-#define LINE_Y   (global_settings.statusbar ? 1 : 0)
-
-#define CURSOR_X (global_settings.scrollbar && \
-                  tc.filesindir > tree_max_on_screen ? 1 : 0)
-#define CURSOR_Y 0 /* the cursor is not positioned in regard to
-                      the margins, so this is the amount of lines
-                      we add to the cursor Y position to position
-                      it on a line */
-#define CURSOR_WIDTH  (global_settings.invert_cursor ? 0 : 4)
-
-#define ICON_WIDTH    6
-
-#define SCROLLBAR_X      0
-#define SCROLLBAR_Y      lcd_getymargin()
-#define SCROLLBAR_WIDTH  6
-
-#else /* HAVE_LCD_BITMAP */
-
-#define TREE_MAX_ON_SCREEN   2
-#define TREE_MAX_LEN_DISPLAY 11 /* max length that fits on screen */
-#define LINE_X      2 /* X position the entry-list starts at */
-#define LINE_Y      0 /* Y position the entry-list starts at */
-
-#define CURSOR_X    0
-#define CURSOR_Y    0 /* not really used for players */
-
-#endif /* HAVE_LCD_BITMAP */
-
 /* talkbox hovering delay, to avoid immediate disk activity */
 #define HOVER_DELAY (HZ/2)
-
-static void showfileline(int line, char* name, int attr, bool scroll)
+/*
+ * Returns the position of a given file in the current directory
+ * returns -1 if not found
+ */
+int tree_get_file_position(char * filename)
 {
-    int xpos = LINE_X;
-    char* dotpos = NULL;
-
-#ifdef HAVE_LCD_CHARCELLS
-    if (!global_settings.show_icons)
-        xpos--;
-#endif
-
-    /* if any file filter is on, strip the extension */
-    if (*tc.dirfilter != SHOW_ID3DB &&
-        *tc.dirfilter != SHOW_ALL &&
-        !(attr & ATTR_DIRECTORY))
-    {
-        dotpos = strrchr(name, '.');
-        if (dotpos) {
-            *dotpos = 0;
-        }
-    }
-    
-    if(scroll) {
-#ifdef HAVE_LCD_BITMAP
-        lcd_setfont(FONT_UI);
-        if (global_settings.invert_cursor)
-            lcd_puts_scroll_style(xpos, line, name, STYLE_INVERT);
-        else
-#endif
-            lcd_puts_scroll(xpos, line, name);
-    } else
-        lcd_puts(xpos, line, name);
-
-    /* Restore the dot before the extension if it was removed */
-    if (dotpos)
-        *dotpos = '.';
-}
-
-#ifdef HAVE_LCD_BITMAP
-static int recalc_screen_height(void)
-{
-    int fw, fh;
-    int height = LCD_HEIGHT;
-
-    lcd_setfont(FONT_UI);
-    lcd_getstringsize("A", &fw, &fh);
-    if(global_settings.statusbar)
-        height -= STATUSBAR_HEIGHT;
-
-#if CONFIG_KEYPAD == RECORDER_PAD
-    if(global_settings.buttonbar)
-        height -= BUTTONBAR_HEIGHT;
-#endif        
-
-    return height / fh;
-}
-#endif
-
-static int showdir(void)
-{
-    struct entry *dircache = tc.dircache;
     int i;
-    int tree_max_on_screen;
-    int start = tc.dirstart;
-    bool id3db = *tc.dirfilter == SHOW_ID3DB;
-    bool newdir = false;
-#ifdef HAVE_LCD_BITMAP
-    const char* icon;
-    int line_height;
-    int fw, fh;
-    lcd_setfont(FONT_UI);
-    lcd_getstringsize("A", &fw, &fh);
-    tree_max_on_screen = recalc_screen_height();
-    line_height = fh;
-#else
-    int icon;
-    tree_max_on_screen = TREE_MAX_ON_SCREEN;
-#endif
+    /* use lastfile to determine the selected item (default=0) */
+    for (i=0; i < tc.filesindir; i++)
+    {
+        struct entry* dc = tc.dircache;
+        struct entry* e = &dc[i];
+        if (!strcasecmp(e->name, filename))
+            return(i);
+    }
+    return(-1);/* no file can match, returns undefined */
+}
 
-    /* new file dir? load it */
+/*
+ * Called when a new dir is loaded (for example when returning from other apps ...)
+ * also completely redraws the tree
+ */
+static int update_dir(void)
+{
+    bool id3db = *tc.dirfilter == SHOW_ID3DB;
+    bool changed = false;
+    /* Checks for changes */
     if (id3db) {
         if (tc.currtable != lasttable ||
             tc.currextra != lastextra ||
@@ -286,151 +281,73 @@ static int showdir(void)
         {
             if (db_load(&tc) < 0)
                 return -1;
+
             lasttable = tc.currtable;
             lastextra = tc.currextra;
             lastfirstpos = tc.firstpos;
-            newdir = true;
+            changed = true;
         }
     }
     else {
+        /* if the tc.currdir has been changed, reload it ...*/
         if (strncmp(tc.currdir, lastdir, sizeof(lastdir)) || reload_dir) {
-            if (ft_load(&tc, NULL) < 0)     
+
+            if (ft_load(&tc, NULL) < 0)
                 return -1;
             strcpy(lastdir, tc.currdir);
-            newdir = true;
+            changed = true;
         }
     }
-
-    if (newdir && !id3db &&
-        (tc.dirfull || tc.filesindir == global_settings.max_files_in_dir) )
+    /* if selected item is undefined */
+    if (tc.selected_item == -1)
     {
-#ifdef HAVE_LCD_CHARCELLS
-        lcd_double_height(false);
-#endif
-        lcd_clear_display();
-        lcd_puts(0,0,str(LANG_SHOWDIR_ERROR_BUFFER));
-        lcd_puts(0,1,str(LANG_SHOWDIR_ERROR_FULL));
-        lcd_update();
-        sleep(HZ*2);
-        lcd_clear_display();
+        /* use lastfile to determine the selected item */
+        tc.selected_item = tree_get_file_position(lastfile);
+
+        /* If the file doesn't exists, select the first one (default) */
+        if(tc.selected_item < 0)
+            tc.selected_item = 0;
+        changed = true;
     }
-
-    if (start == -1)
+    if (changed)
     {
-        int diff_files;
-
-        /* use lastfile to determine start (default=0) */
-        start = 0;
-
-        for (i=0; i < tc.filesindir; i++)
+        if(!id3db && (tc.dirfull ||
+                      tc.filesindir == global_settings.max_files_in_dir) )
         {
-            struct entry *dircache = tc.dircache;
-
-            if (!strcasecmp(dircache[i].name, lastfile))
+            /* dir full */
+            int i;
+            for(i = 0;i < NB_SCREENS;++i)
             {
-                start = i;
-                break;
-            }
-        }
-
-        diff_files = tc.filesindir - start;
-        if (diff_files < tree_max_on_screen)
-        {
-            int oldstart = start;
-
-            start -= (tree_max_on_screen - diff_files);
-            if (start < 0)
-                start = 0;
-
-            tc.dircursor = oldstart - start;
-        }
-
-        tc.dirstart = start;
-    }
-
-    /* The cursor might point to an invalid line, for example if someone
-       deleted the last file in the dir */
-    if (tc.filesindir)
-    {
-        while (start + tc.dircursor >= tc.filesindir)
-        {
-            if (start)
-                start--;
-            else
-                if (tc.dircursor)
-                    tc.dircursor--;
-        }
-        tc.dirstart = start;
-    }
-
 #ifdef HAVE_LCD_CHARCELLS
-    lcd_stop_scroll();
-    lcd_double_height(false);
+                screens[i].double_height(false);
 #endif
-    lcd_clear_display();
-#ifdef HAVE_LCD_BITMAP
-    lcd_setmargins(MARGIN_X,MARGIN_Y); /* leave room for cursor and icon */
-    lcd_setfont(FONT_UI);
+                screens[i].clear_display();
+                screens[i].puts(0,0,str(LANG_SHOWDIR_ERROR_BUFFER));
+                screens[i].puts(0,1,str(LANG_SHOWDIR_ERROR_FULL));
+#if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
+                screens[i].update();
 #endif
-
-
-    for ( i=start; i < start+tree_max_on_screen && i < tc.filesindir; i++ ) {
-        int line = i - start;
-        char* name;
-        int attr = 0;
-
-        if (id3db) {
-            name = ((char**)tc.dircache)[i * tc.dentry_size];
-            icon = db_get_icon(&tc);
+            }
+            sleep(HZ*2);
+            for(i = 0;i < NB_SCREENS;++i)
+                screens[i].clear_display();
         }
-        else { 
-            struct entry* dc = tc.dircache;
-            struct entry* e = &dc[i];
-            name = e->name;
-            attr = e->attr;
-            icon = filetype_get_icon(dircache[i].attr);
-        }
-            
-
-        if (icon && global_settings.show_icons) {
-#ifdef HAVE_LCD_BITMAP
-            int offset=0;
-            if ( line_height > 8 )
-                offset = (line_height - 8) / 2;
-            lcd_mono_bitmap(icon,
-                            CURSOR_X * 6 + CURSOR_WIDTH,
-                            MARGIN_Y+(i-start)*line_height + offset, 6, 8);
-#else
-            if (icon < 0 )
-                icon = Icon_Unknown;
-            lcd_putc(LINE_X-1, i-start, icon);
-#endif
-        }
-
-        showfileline(line, name, attr, false); /* no scroll */
     }
-
-#ifdef HAVE_LCD_BITMAP
-    if (global_settings.scrollbar && (tc.dirlength > tree_max_on_screen))
-        scrollbar(SCROLLBAR_X, SCROLLBAR_Y, SCROLLBAR_WIDTH - 1,
-                  tree_max_on_screen * line_height, tc.dirlength,
-                  start + tc.firstpos,
-                  start + tc.firstpos + tree_max_on_screen, VERTICAL);
-
-#if CONFIG_KEYPAD == RECORDER_PAD
+    gui_synclist_set_nb_items(&tree_lists, tc.filesindir);
+    gui_synclist_select_item(&tree_lists, tc.selected_item);
+    gui_synclist_draw(&tree_lists);
+    gui_syncstatusbar_draw(&statusbars, true);
+#ifdef HAS_BUTTONBAR
     if (global_settings.buttonbar) {
         if (*tc.dirfilter < NUM_FILTER_MODES)
-            buttonbar_set(str(LANG_DIRBROWSE_F1),
+            gui_buttonbar_set(&tree_buttonbar, str(LANG_DIRBROWSE_F1),
                           str(LANG_DIRBROWSE_F2),
                           str(LANG_DIRBROWSE_F3));
         else
-            buttonbar_set("<<<", "", "");
-        buttonbar_draw();
+            gui_buttonbar_set(&tree_buttonbar, "<<<", "", "");
+        gui_buttonbar_draw(&tree_buttonbar);
     }
 #endif
-#endif
-    status_draw(true);
-
     return tc.filesindir;
 }
 
@@ -468,7 +385,6 @@ void reload_directory(void)
 static void start_resume(bool just_powered_on)
 {
     bool do_resume = false;
-    
     if ( global_settings.resume_index != -1 ) {
         DEBUGF("Resume index %X offset %X\n",
                global_settings.resume_index,
@@ -486,7 +402,7 @@ static void start_resume(bool just_powered_on)
             do_resume = true;
 
         if (! do_resume) return;
-    
+
         if (playlist_resume() != -1)
         {
             playlist_start(global_settings.resume_index,
@@ -496,23 +412,23 @@ static void start_resume(bool just_powered_on)
         }
         else return;
     } else if (! just_powered_on) {
-        splash(HZ*2, true, str(LANG_NOTHING_TO_RESUME));
+        gui_syncsplash(HZ*2, true, str(LANG_NOTHING_TO_RESUME));
     }
 }
 
+/* Selects a file and update tree context properly */
 void set_current_file(char *path)
 {
     char *name;
-    unsigned int i;
+    int i;
 
     /* in ID3DB mode it is a bad idea to call this function */
     /* (only happens with `follow playlist') */
     if( *tc.dirfilter == SHOW_ID3DB )
-    {
         return;
-    }
 
     /* separate directory from filename */
+    /* gets the directory's name and put it into tc.currdir */
     name = strrchr(path+1,'/');
     if (name)
     {
@@ -528,24 +444,27 @@ void set_current_file(char *path)
     }
 
     strcpy(lastfile, name);
+    
+    /* undefined item selected */
+    tc.selected_item = -1;
 
-    tc.dircursor    =  0;
-    tc.dirstart     = -1;
-
+    /* If we changed dir we must recalculate the dirlevel
+       and adjust the selected history properly */
     if (strncmp(tc.currdir,lastdir,sizeof(lastdir)))
     {
-        tc.dirlevel            =  0;
-        tc.dirpos[tc.dirlevel]    = -1;
-        tc.cursorpos[tc.dirlevel] =  0;
+        tc.dirlevel =  0;
+        tc.selected_item_history[tc.dirlevel] = -1;
 
         /* use '/' to calculate dirlevel */
-        for (i=1; i<strlen(path)+1; i++)
+        /* FIXME : strlen(path) : crazy oO better to store it at
+           the beginning */
+        int path_len = strlen(path) + 1;
+        for (i = 1; i < path_len; i++)
         {
             if (path[i] == '/')
             {
                 tc.dirlevel++;
-                tc.dirpos[tc.dirlevel]    = -1;
-                tc.cursorpos[tc.dirlevel] =  0;
+                tc.selected_item_history[tc.dirlevel] = -1;
             }
         }
     }
@@ -567,24 +486,20 @@ static bool check_changed_id3mode(bool currmode)
     }
     return currmode;
 }
-
+/* main loop, handles key events */
 static bool dirbrowse(void)
 {
     int numentries=0;
     char buf[MAX_PATH];
-    int i;
-    int lasti=-1;
+    int lasti = -1;
     unsigned button;
-    int tree_max_on_screen;
     bool reload_root = false;
     int lastfilter = *tc.dirfilter;
     bool lastsortcase = global_settings.sort_case;
-    int lastdircursor=-1;
     bool need_update = true;
     bool exit_func = false;
     long thumbnail_time = -1; /* for delaying a thumbnail */
-    bool update_all = false; /* set this to true when the whole file list
-                                has been refreshed on screen */
+
     unsigned lastbutton = 0;
     char* currdir = tc.currdir; /* just a shortcut */
     bool id3db = *tc.dirfilter == SHOW_ID3DB;
@@ -593,15 +508,10 @@ static bool dirbrowse(void)
         curr_context=CONTEXT_ID3DB;
     else
         curr_context=CONTEXT_TREE;
-
 #ifdef HAVE_LCD_BITMAP
-    tree_max_on_screen = recalc_screen_height();
-#else
-    tree_max_on_screen = TREE_MAX_ON_SCREEN;
+    screen_access_update_nb_lines();
 #endif
-
-    tc.dircursor=0;
-    tc.dirstart=0;
+    tc.selected_item = 0;
     tc.dirlevel=0;
     tc.firstpos=0;
     lasttable = -1;
@@ -624,25 +534,21 @@ static bool dirbrowse(void)
         start_resume(true);
 
     }
-    
+    /* If we don't need to show the wps, draw the dir */
     if (!start_wps) {
-        numentries = showdir();
+        numentries = update_dir();
         if (numentries == -1)
             return false;  /* currdir is not a directory */
-    
+
         if (*tc.dirfilter > NUM_FILTER_MODES && numentries==0)
         {
-            splash(HZ*2, true, str(LANG_NO_FILES));
+            gui_syncsplash(HZ*2, true, str(LANG_NO_FILES));
             return false;  /* No files found for rockbox_browser() */
         }
-        update_all = true;
-
-        put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, true);
     }
 
     while(1) {
         struct entry *dircache = tc.dircache;
-
         bool restore = false;
 
         button = button_get_w_tmo(HZ/5);
@@ -651,15 +557,18 @@ static bool dirbrowse(void)
         if (boot_changed) {
             bool stop = false;
             unsigned int button;
-
-            lcd_clear_display();
-            lcd_puts(0,0,str(LANG_BOOT_CHANGED));
-            lcd_puts(0,1,str(LANG_REBOOT_NOW));
+            int i;
+            for(i = 0;i < NB_SCREENS;++i)
+            {
+                screens[i].clear_display();
+                screens[i].puts(0,0,str(LANG_BOOT_CHANGED));
+                screens[i].puts(0,1,str(LANG_REBOOT_NOW));
 #ifdef HAVE_LCD_BITMAP
-            lcd_puts(0,3,str(LANG_CONFIRM_WITH_PLAY_RECORDER));
-            lcd_puts(0,4,str(LANG_CANCEL_WITH_ANY_RECORDER));
-            lcd_update();
+                screens[i].puts(0,3,str(LANG_CONFIRM_WITH_PLAY_RECORDER));
+                screens[i].puts(0,4,str(LANG_CANCEL_WITH_ANY_RECORDER));
+                screens[i].update();
 #endif
+            }
             while (!stop) {
                 button = button_get(true);
                 switch (button) {
@@ -683,6 +592,7 @@ static bool dirbrowse(void)
             boot_changed = false;
         }
 #endif
+        need_update = gui_synclist_do_button(&tree_lists, button);
 
         switch ( button ) {
 #ifdef TREE_ENTER
@@ -702,33 +612,17 @@ static bool dirbrowse(void)
                     && (lastbutton != TREE_RUN_PRE)))
                     break;
 #endif
-                if ( !numentries )
+                /* nothing to do if no files to display */
+                if ( numentries == 0 )
                     break;
 
-                if (id3db)
-                    i = db_enter(&tc);
-                else
-                    i = ft_enter(&tc);
-                    
-                switch (i)
+                switch (id3db?db_enter(&tc):ft_enter(&tc))
                 {
                     case 1: reload_dir = true; break;
                     case 2: start_wps = true; break;
                     case 3: exit_func = true; break;
                     default: break;
                 }
-
-#ifdef HAVE_LCD_BITMAP
-                /* maybe we have a new font */
-                tree_max_on_screen = recalc_screen_height();
-#endif
-                /* make sure cursor is on screen */
-                while ( tc.dircursor > tree_max_on_screen )
-                {
-                    tc.dircursor--;
-                    tc.dirstart++;
-                }
-
                 restore = true;
                 break;
 
@@ -741,8 +635,8 @@ static bool dirbrowse(void)
                     exit_func = true;
                     break;
                 }
-
-                if (!tc.dirlevel)
+                /* if we are in /, nothing to do */
+                if (tc.dirlevel == 0)
                     break;
 
                 if (id3db)
@@ -783,169 +677,6 @@ static bool dirbrowse(void)
                 break;
 #endif
 #endif
-
-            case TREE_PREV:
-            case TREE_PREV | BUTTON_REPEAT:
-#ifdef TREE_RC_PREV
-            case TREE_RC_PREV:
-            case TREE_RC_PREV | BUTTON_REPEAT:
-#endif
-                if (!tc.filesindir)
-                    break;
-
-                /* start scrolling when at 1/3 of the screen */
-                if (tc.dircursor >=
-                        tree_max_on_screen - (2 * tree_max_on_screen) / 3
-                        || (tc.dirstart == 0 && tc.dircursor > 0)) {
-                    put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, false);
-                    tc.dircursor--;
-                    put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, true);
-                }
-                else {
-                    if (tc.dirstart || tc.firstpos) {
-                        if (tc.dirstart)
-                            tc.dirstart--;
-                        else {
-                            if (tc.firstpos > max_files/2) {
-                                tc.firstpos -= max_files/2;
-                                tc.dirstart += max_files/2;
-                                tc.dirstart--;
-                            }
-                            else {
-                                tc.dirstart = tc.firstpos - 1;
-                                tc.firstpos = 0;
-                            }
-                        }
-                        restore = true;
-                    }
-                    else {
-                        if (button & BUTTON_REPEAT)
-                            break;
-                        if (numentries < tree_max_on_screen) {
-                            put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor,
-                                         false);
-                            tc.dircursor = numentries - 1;
-                            put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor,
-                                         true);
-                        }
-                        else if (id3db && tc.dirfull) {
-                            /* load last dir segment */
-                            /* use max_files/2 in case names are longer than
-                                AVERAGE_FILE_LENGTH */
-                            tc.firstpos = tc.dirlength - max_files/2;
-                            tc.dirstart = tc.firstpos;
-                            tc.dircursor = tree_max_on_screen - 1;
-                            numentries = showdir();
-                            update_all = true;
-                            put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor,
-                                         true);
-                        }
-                        else {
-                            tc.dirstart = numentries - tree_max_on_screen;
-                            tc.dircursor = tree_max_on_screen - 1;
-                            restore = true;
-                        }
-                    }
-                }
-                need_update = true;
-                break;
-
-            case TREE_NEXT:
-            case TREE_NEXT | BUTTON_REPEAT:
-#ifdef TREE_RC_NEXT
-            case TREE_RC_NEXT:
-            case TREE_RC_NEXT | BUTTON_REPEAT:
-#endif
-                if (!tc.filesindir)
-                    break;
-
-                if (tc.dircursor + tc.dirstart + 1 < numentries ) {
-                    /* start scrolling when at 2/3 of the screen */
-                    if(tc.dircursor < (2 * tree_max_on_screen) / 3 ||
-                            numentries - tc.dirstart <= tree_max_on_screen) {
-                        put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, false);
-                        tc.dircursor++;
-                        put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, true);
-                    }
-                    else {
-                        tc.dirstart++;
-                        restore = true;
-                    }
-                }
-                else if (id3db && (tc.firstpos || tc.dirfull)) {
-                    if (tc.dircursor + tc.dirstart + tc.firstpos + 1 >= tc.dirlength) {
-                        /* wrap and load first dir segment */
-                        if (button & BUTTON_REPEAT)
-                            break;
-                        tc.firstpos = tc.dirstart = tc.dircursor = 0;
-                    }
-                    else {
-                        /* load next dir segment */
-                        tc.firstpos += tc.dirstart;
-                        tc.dirstart = 0;
-                    }
-                    restore = true;
-                }
-                else {
-                    if (button & BUTTON_REPEAT)
-                        break;
-                    if(numentries < tree_max_on_screen) {
-                        put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, false);
-                        tc.dirstart = tc.dircursor = 0;
-                        put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, true);
-                    }
-                    else {
-                        tc.dirstart = tc.dircursor = 0;
-                        numentries = showdir();
-                        update_all=true;
-                        put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, true);
-                    }
-                }
-                need_update = true;
-                break;
-
-#ifdef TREE_PGUP
-            case TREE_PGUP:
-            case TREE_PGUP | BUTTON_REPEAT:
-                if (tc.dirstart) {
-                    tc.dirstart -= tree_max_on_screen;
-                    if ( tc.dirstart < 0 )
-                        tc.dirstart = 0;
-                }
-                else if (tc.firstpos) {
-                    if (tc.firstpos > max_files/2) {
-                        tc.firstpos -= max_files/2;
-                        tc.dirstart += max_files/2;
-                        tc.dirstart -= tree_max_on_screen;
-                    }
-                    else {
-                        tc.dirstart = tc.firstpos - tree_max_on_screen;
-                        tc.firstpos = 0;
-                    }
-                }
-                else
-                    tc.dircursor = 0;
-                restore = true;
-                break;
-
-            case TREE_PGDN:
-            case TREE_PGDN | BUTTON_REPEAT:
-                if ( tc.dirstart < numentries - tree_max_on_screen ) {
-                    tc.dirstart += tree_max_on_screen;
-                    if ( tc.dirstart > numentries - tree_max_on_screen )
-                        tc.dirstart = numentries - tree_max_on_screen;
-                }
-                else if (id3db && tc.dirfull) {
-                    /* load next dir segment */
-                    tc.firstpos += tc.dirstart;
-                    tc.dirstart = 0;
-                }
-                else
-                    tc.dircursor = numentries - tc.dirstart - 1;
-                restore = true;
-                break;
-#endif
-
             case TREE_MENU:
 #ifdef TREE_RC_MENU
             case TREE_RC_MENU:
@@ -957,7 +688,9 @@ static bool dirbrowse(void)
                 /* don't enter menu from plugin browser */
                 if (*tc.dirfilter < NUM_FILTER_MODES)
                 {
-                    lcd_stop_scroll();
+                    int i;
+                    for(i = 0;i < NB_SCREENS;++i)
+                        screens[i].stop_scroll();
                     if (main_menu())
                         reload_dir = true;
                     restore = true;
@@ -1017,7 +750,7 @@ static bool dirbrowse(void)
                 {
                     if (quick_screen(curr_context, BUTTON_F3))
                         reload_dir = true;
-                    tree_max_on_screen = recalc_screen_height();
+                    screen_access_update_nb_lines();
                     restore = true;
                 }
                 break;
@@ -1052,20 +785,19 @@ static bool dirbrowse(void)
                     }
                     else
                     {
-                        attr = dircache[tc.dircursor+tc.dirstart].attr;
+                        attr = dircache[tc.selected_item].attr;
 
-                        if (currdir[1])
+                        if (currdir[1]) /* Not in / */
                             snprintf(buf, sizeof buf, "%s/%s",
                                      currdir,
-                                     dircache[tc.dircursor+tc.dirstart].name);
-                        else
+                                     dircache[tc.selected_item].name);
+                        else /* In / */
                             snprintf(buf, sizeof buf, "/%s",
-                                     dircache[tc.dircursor+tc.dirstart].name);
+                                     dircache[tc.selected_item].name);
                     }
-                    
                     onplay_result = onplay(buf, attr, curr_context);
                 }
-                
+
                 switch (onplay_result)
                 {
                     case ONPLAY_OK:
@@ -1099,22 +831,22 @@ static bool dirbrowse(void)
                         }
                     }
                     else
-                    { 
-                        DEBUGF("Playing file thumbnail: %s/%s%s\n", 
+                    {
+                        DEBUGF("Playing file thumbnail: %s/%s%s\n",
                                currdir, dircache[lasti].name, file_thumbnail_ext);
-                        /* no fallback necessary, we knew in advance 
+                        /* no fallback necessary, we knew in advance
                            that the file exists */
                         ft_play_filename(currdir, dircache[lasti].name);
                     }
                     thumbnail_time = -1; /* job done */
                 }
-                status_draw(false);
+                gui_syncstatusbar_draw(&statusbars, false);
                 break;
 
 #ifdef HAVE_HOTSWAP
             case SYS_FS_CHANGED:
                 if (!id3db)
-                    reload_dir = true; 
+                    reload_dir = true;
                 /* The 'dir no longer valid' situation will be caught later
                  * by checking the showdir() result. */
                 break;
@@ -1139,18 +871,20 @@ static bool dirbrowse(void)
             lastbutton = button;
         }
 
-        if (start_wps)
+        if (start_wps && audio_status() )
         {
-            lcd_stop_scroll();
+            int i;
+            for(i = 0;i < NB_SCREENS;++i)
+                screens[i].stop_scroll();
             if (wps_show() == SYS_USB_CONNECTED)
                 reload_dir = true;
 #ifdef HAVE_HOTSWAP
-            else 
+            else
                 if (!id3db) /* Try reload to catch 'no longer valid' case. */
                     reload_dir = true;
 #endif
 #ifdef HAVE_LCD_BITMAP
-            tree_max_on_screen = recalc_screen_height();
+            screen_access_update_nb_lines();
 #endif
             id3db = check_changed_id3mode(id3db);
             restore = true;
@@ -1174,8 +908,9 @@ static bool dirbrowse(void)
             }
             if (! reload_dir )
             {
-                tc.dircursor = 0;
-                tc.dirstart = 0;
+                gui_synclist_select_item(&tree_lists, 0);
+                gui_synclist_draw(&tree_lists);
+                tc.selected_item = 0;
                 lastdir[0] = 0;
             }
 
@@ -1190,131 +925,87 @@ static bool dirbrowse(void)
 
         if (restore || reload_dir) {
             /* restore display */
-
 #ifdef HAVE_LCD_BITMAP
-            tree_max_on_screen = recalc_screen_height();
+            screen_access_update_nb_lines();
 #endif
-
-            /* We need to adjust if the number of lines on screen have
-               changed because of a status bar change */
-            if(CURSOR_Y+LINE_Y+tc.dircursor>tree_max_on_screen) {
-                tc.dirstart++;
-                tc.dircursor--;
-            }
-#ifdef HAVE_LCD_BITMAP
-            /* the sub-screen might've ruined the margins */
-            lcd_setmargins(MARGIN_X,MARGIN_Y); /* leave room for cursor and
-                                                  icon */
-            lcd_setfont(FONT_UI);
-#endif
-            numentries = showdir();
+            numentries = update_dir();
             if (currdir[1] && (numentries < 0))
             {   /* not in root and reload failed */
                 reload_root = true; /* try root */
                 reload_dir = false;
                 goto check_rescan;
             }
-            update_all = true;
-            put_cursorxy(CURSOR_X, CURSOR_Y + tc.dircursor, true);
-
             need_update = true;
             reload_dir = false;
         }
+        if(need_update) {
+            tc.selected_item = gui_synclist_get_selected_item_position(&tree_lists);
+            need_update=false;
+            if ( numentries > 0 ) {
+                /* Voice the file if changed */
+                if(lasti != tc.selected_item || restore) {
+                    lasti = tc.selected_item;
+                    thumbnail_time = -1; /* Cancel whatever we were
+                                            about to say */
 
-        if ( (numentries > 0) && need_update) {
-            i = tc.dirstart+tc.dircursor;
+                    /* Directory? */
+                    if (dircache[tc.selected_item].attr & ATTR_DIRECTORY)
+                    {
+                        /* play directory thumbnail */
+                        switch (global_settings.talk_dir) {
+                            case 1: /* dirs as numbers */
+                                talk_id(VOICE_DIR, false);
+                                talk_number(tc.selected_item+1, true);
+                                break;
 
-            /* if MP3 filter is on, cut off the extension */
-            if(lasti!=i || restore) {
-                char* name;
-                int attr = 0;
+                            case 2: /* dirs spelled */
+                                talk_spell(dircache[tc.selected_item].name,
+                                           false);
+                                break;
 
-                if (id3db)
-                    name = ((char**)tc.dircache)[lasti * tc.dentry_size];
-                else {
-                    struct entry* dc = tc.dircache;
-                    struct entry* e = &dc[lasti];
-                    name = e->name;
-                    attr = e->attr;
-                }
-
-                lcd_stop_scroll();
-
-                /* So if lastdircursor and dircursor differ, and then full
-                   screen was not refreshed, restore the previous line */
-                if ((lastdircursor != tc.dircursor) && !update_all ) {
-                    showfileline(lastdircursor, name, attr, false); /* no scroll */
-                }
-                lasti=i;
-                lastdircursor=tc.dircursor;
-                thumbnail_time = -1; /* cancel whatever we were about to say */
-
-                if (id3db)
-                    name = ((char**)tc.dircache)[lasti * tc.dentry_size];
-                else {
-                    struct entry* dc = tc.dircache;
-                    struct entry* e = &dc[lasti];
-                    name = e->name;
-                    attr = e->attr;
-                }
-                showfileline(tc.dircursor, name, attr, true); /* scroll please */
-                need_update = true;
-
-                if (dircache[i].attr & ATTR_DIRECTORY) /* directory? */
-                {
-                    /* play directory thumbnail */
-                    switch (global_settings.talk_dir) {
-                        case 1: /* dirs as numbers */
-                            talk_id(VOICE_DIR, false);
-                            talk_number(i+1, true);
-                            break;
-
-                        case 2: /* dirs spelled */
-                            talk_spell(dircache[i].name, false);
-                            break;
-
-                        case 3: /* thumbnail clip */
-                            /* "schedule" a thumbnail, to have a little dalay */
-                            thumbnail_time = current_tick + HOVER_DELAY;
-                            break;
-
-                        default:
-                            break;
-                    }
-                }
-                else /* file */
-                {
-                    switch (global_settings.talk_file) {
-                        case 1: /* files as numbers */
-                            ft_play_filenumber(i-tc.dirsindir+1, 
-                                               dircache[i].attr & TREE_ATTR_MASK);
-                            break;
-
-                        case 2: /* files spelled */
-                            talk_spell(dircache[i].name, false);
-                            break;
-
-                        case 3: /* thumbnail clip */
-                            /* "schedule" a thumbnail, to have a little delay */
-                            if (dircache[i].attr & TREE_ATTR_THUMBNAIL)
+                            case 3: /* thumbnail clip */
+                                /* "schedule" a thumbnail, to have a little
+                                   delay */
                                 thumbnail_time = current_tick + HOVER_DELAY;
-                            else
-                                /* spell the number as fallback */
-                                talk_spell(dircache[i].name, false);
-                            break;
+                                break;
 
-                        default:
-                            break;
+                            default:
+                                break;
+                        }
+                    }
+                    else /* file */
+                    {
+                        switch (global_settings.talk_file) {
+                            case 1: /* files as numbers */
+                                ft_play_filenumber(
+                                    tc.selected_item-tc.dirsindir+1,
+                                    dircache[tc.selected_item].attr &
+                                    TREE_ATTR_MASK);
+                                break;
+
+                            case 2: /* files spelled */
+                                talk_spell(dircache[tc.selected_item].name,
+                                           false);
+                                break;
+
+                            case 3: /* thumbnail clip */
+                                /* "schedule" a thumbnail, to have a little
+                                   delay */
+                                if (dircache[tc.selected_item].attr &
+                                    TREE_ATTR_THUMBNAIL)
+                                    thumbnail_time = current_tick + HOVER_DELAY;
+                                else
+                                    /* spell the number as fallback */
+                                    talk_spell(dircache[tc.selected_item].name,
+                                               false);
+                                break;
+
+                            default:
+                                break;
+                        }
                     }
                 }
             }
-        }
-
-        if(need_update) {
-            lcd_update();
-
-            need_update = false;
-            update_all = false;
         }
     }
 
@@ -1369,7 +1060,7 @@ static bool add_dir(char* dirname, int len, int fd)
             int x = strlen(entry->d_name);
             unsigned int i;
             char *cp = strrchr(entry->d_name,'.');
-            
+
             if (cp) {
                 cp++;
 
@@ -1379,6 +1070,7 @@ static bool add_dir(char* dirname, int len, int fd)
                         if (!strcasecmp(cp, filetypes[i].extension))
                         {
                             char buf[8];
+                            int i;
                             write(fd, dirname, strlen(dirname));
                             write(fd, "/", 1);
                             write(fd, entry->d_name, x);
@@ -1387,8 +1079,11 @@ static bool add_dir(char* dirname, int len, int fd)
                             plsize++;
                             snprintf(buf, sizeof buf, "%d", plsize);
 #ifdef HAVE_LCD_BITMAP
-                            lcd_puts(0,4,buf);
-                            lcd_update();
+                            for(i = 0;i < NB_SCREENS;++i)
+                            {
+                                screens[i].puts(0,4,buf);
+                                screens[i].update();
+                            }
 #else
                             x = 10;
                             if (plsize > 999)
@@ -1401,7 +1096,8 @@ static bool add_dir(char* dirname, int len, int fd)
                                         x=9;
                                 }
                             }
-                            lcd_puts(x,0,buf);
+                            for(i = 0;i < NB_SCREENS;++i)
+                                screens[i].puts(x,0,buf);
 #endif
                             break;
                         }
@@ -1418,16 +1114,20 @@ static bool add_dir(char* dirname, int len, int fd)
 bool create_playlist(void)
 {
     int fd;
+    int i;
     char filename[MAX_PATH];
 
     snprintf(filename, sizeof filename, "%s.m3u",
              tc.currdir[1] ? tc.currdir : "/root");
-
-    lcd_clear_display();
-    lcd_puts(0,0,str(LANG_CREATING));
-    lcd_puts_scroll(0,1,filename);
-    lcd_update();
-
+    for(i = 0;i < NB_SCREENS;++i)
+    {
+        screens[i].clear_display();
+        screens[i].puts(0,0,str(LANG_CREATING));
+        screens[i].puts_scroll(0,1,filename);
+#if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
+        screens[i].update();
+#endif
+    }
     fd = creat(filename,0);
     if (fd < 0)
         return false;
@@ -1435,7 +1135,7 @@ bool create_playlist(void)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     cpu_boost(true);
 #endif
-    
+
     snprintf(filename, sizeof(filename), "%s",
              tc.currdir[1] ? tc.currdir : "/");
     plsize = 0;
@@ -1445,7 +1145,7 @@ bool create_playlist(void)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     cpu_boost(false);
 #endif
-    
+
     sleep(HZ);
 
     return true;
@@ -1460,12 +1160,10 @@ bool rockbox_browse(const char *root, int dirfilter)
     memcpy(tc.currdir, root, sizeof(tc.currdir));
     start_wps = false;
     tc.dirfilter = &dirfilter;
-    
+
     dirbrowse();
 
     tc = backup;
-    reload_dir = true;
-
     return false;
 }
 
@@ -1474,7 +1172,7 @@ void tree_init(void)
     /* We copy the settings value in case it is changed by the user. We can't
        use it until the next reboot. */
     max_files = global_settings.max_files_in_dir;
-    
+
     /* initialize tree context struct */
     memset(&tc, 0, sizeof(tc));
     tc.dirfilter = &global_settings.dirfilter;
@@ -1498,7 +1196,7 @@ void bookmark_play(char *resume_file, int index, int offset, int seed,
     {
         /* Playlist playback */
         char* slash;
-        // check that the file exists
+        /* check that the file exists */
         int fd = open(resume_file, O_RDONLY);
         if(fd<0)
             return;
@@ -1538,7 +1236,7 @@ void bookmark_play(char *resume_file, int index, int offset, int seed,
             if ((strcmp(strrchr(playlist_peek(index) + 1,'/') + 1,
                         filename)))
             {
-                for ( i=0; i < playlist_amount(); i++ ) 
+                for ( i=0; i < playlist_amount(); i++ )
                 {
                     if ((strcmp(strrchr(playlist_peek(i) + 1,'/') + 1,
                                 filename)) == 0)
@@ -1599,7 +1297,7 @@ int ft_play_dirname(int start_index)
     }
 
     close(fd);
-  
+
     DEBUGF("Found: %s\n", dirname_mp3_filename);
 
     talk_file(dirname_mp3_filename, false);
@@ -1639,9 +1337,7 @@ void tree_flush(void)
     if (global_settings.dircache)
     {
         if (dircache_is_enabled())
-        {
             global_settings.dircache_size = dircache_get_cache_size();
-        }
         dircache_disable();
     }
     else
@@ -1659,21 +1355,27 @@ void tree_restore(void)
 #ifdef HAVE_DIRCACHE
     if (global_settings.dircache)
     {
-        int font_w, font_h;
-        
         /* Print "Scanning disk..." to the display. */
-        lcd_getstringsize("A", &font_w, &font_h);
-        lcd_putsxy((LCD_WIDTH/2) - ((strlen(str(LANG_DIRCACHE_BUILDING))*font_w)/2),
-                    LCD_HEIGHT-font_h*3, str(LANG_DIRCACHE_BUILDING));
-        lcd_update();
-
+        int i;
+        for(i = 0;i < NB_SCREENS;++i)
+        {
+            screens[i].putsxy((LCD_WIDTH/2) -
+                              ((strlen(str(LANG_DIRCACHE_BUILDING)) *
+                                screens[i].char_width)/2),
+                              LCD_HEIGHT-screens[i].char_height*3,
+                              str(LANG_DIRCACHE_BUILDING));
+            screens[i].update();
+        }
         dircache_build(global_settings.dircache_size);
-
         /* Clean the text when we are done. */
-        lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-        lcd_fillrect(0, LCD_HEIGHT-font_h*3, LCD_WIDTH, font_h);
-        lcd_set_drawmode(DRMODE_SOLID);
-        lcd_update();
+        for(i=0;i<NB_SCREENS;++i)
+        {
+            screens[i].set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            screens[i].fillrect(0, LCD_HEIGHT-screens[i].char_height*3,
+                                LCD_WIDTH, screens[i].char_height);
+            screens[i].set_drawmode(DRMODE_SOLID);
+            screens[i].update();
+        }
     }
 #endif
 }

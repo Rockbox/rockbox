@@ -19,6 +19,21 @@
 #ifndef _STATUS_H
 #define _STATUS_H
 
+extern enum playmode ff_mode;
+
+extern long switch_tick;
+extern bool battery_state;
+#ifdef HAVE_CHARGING
+extern int battery_charge_step;
+#endif
+
+#if defined(HAVE_LCD_CHARCELLS)
+extern bool record;
+extern bool audio;
+extern bool param;
+extern bool usb;
+#endif
+
 enum playmode
 {
     STATUS_PLAY,
@@ -33,10 +48,12 @@ enum playmode
 void status_init(void);
 void status_set_ffmode(enum playmode mode);
 enum playmode status_get_ffmode(void);
+int current_playmode(void);
+
 #ifdef HAVE_LCD_BITMAP
 bool statusbar(bool state);
 #if CONFIG_KEYPAD == RECORDER_PAD
-void buttonbar_set(const char* caption1, const char* caption2, 
+void buttonbar_set(const char* caption1, const char* caption2,
                    const char* caption3);
 void buttonbar_unset(void);
 bool buttonbar_isset(void);

@@ -31,6 +31,15 @@ database.c
 filetree.c
 wps-display.c
 wps.c
+
+screen_access.c
+gui/buttonbar.c
+gui/icon.c
+gui/list.c
+gui/scrollbar.c
+gui/splash.c
+gui/statusbar.c
+
 #ifdef HAVE_LCD_CHARCELLS
 player/icons.c
 player/keyboard.c

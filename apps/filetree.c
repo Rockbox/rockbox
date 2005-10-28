@@ -79,12 +79,12 @@ static void check_file_thumbnails(struct tree_context* c)
     struct dircache_entry *entry;
     struct entry* dircache = c->dircache;
     DIRCACHED *dir;
-    
+
     dir = opendir_cached(c->currdir);
     if(!dir)
         return;
-
-    for (i=0; i < c->filesindir; i++) /* mark all files as non talking, except the .talk ones */
+    /* mark all files as non talking, except the .talk ones */
+    for (i=0; i < c->filesindir; i++)
     {
         if (dircache[i].attr & ATTR_DIRECTORY)
             continue; /* we're not touching directories */
@@ -100,7 +100,7 @@ static void check_file_thumbnails(struct tree_context* c)
             dircache[i].attr |= TREE_ATTR_THUMBNAIL; /* set */
         }
     }
-    
+
     while((entry = readdir_cached(dir)) != 0) /* walk directory */
     {
         int ext_pos;
@@ -110,13 +110,13 @@ static void check_file_thumbnails(struct tree_context* c)
             || (entry->attribute & ATTR_DIRECTORY) /* no file */
             || strcasecmp(&entry->d_name[ext_pos], file_thumbnail_ext))
         {   /* or doesn't end with ".talk", no candidate */
-            continue; 
+            continue;
         }
-        
+
         /* terminate the (disposable) name in dir buffer,
            this truncates off the ".talk" without needing an extra buffer */
         entry->d_name[ext_pos] = '\0';
-        
+
         /* search corresponding file in dir cache */
         for (i=0; i < c->filesindir; i++)
         {
@@ -187,7 +187,7 @@ static int compare(const void* p1, const void* p2)
     return 0; /* never reached */
 }
 
-/* load and sort directory into dircache.  returns NULL on failure. */
+/* load and sort directory into dircache. returns NULL on failure. */
 int ft_load(struct tree_context* c, const char* tempdir)
 {
     int i;
@@ -256,7 +256,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
             boot_cluster = entry->startcluster;
         }
 #endif
-        
+
         /* filter out non-visible files */
         if ((!(dptr->attr & ATTR_DIRECTORY) && (
             (*c->dirfilter == SHOW_PLAYLIST &&
@@ -289,7 +289,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
         name_buffer_used += len + 1;
 
         if (dptr->attr & ATTR_DIRECTORY) /* count the remaining dirs */
-            c->dirsindir++; 
+            c->dirsindir++;
     }
     c->filesindir = i;
     c->dirlength = i;
@@ -297,7 +297,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
 
     qsort(c->dircache,i,sizeof(struct entry),compare);
 
-    /* If thumbnail talking is enabled, make an extra run to mark files with 
+    /* If thumbnail talking is enabled, make an extra run to mark files with
        associated thumbnails, so we don't do unsuccessful spinups later. */
     if (global_settings.talk_file == 3)
         check_file_thumbnails(c); /* map .talk to ours */
@@ -310,7 +310,7 @@ int ft_enter(struct tree_context* c)
     int rc = 0;
     char buf[MAX_PATH];
     struct entry *dircache = c->dircache;
-    struct entry* file = &dircache[c->dircursor + c->dirstart];
+    struct entry* file = &dircache[c->selected_item];
     bool reload_dir = false;
     bool start_wps = false;
     bool exit_func = false;
@@ -322,13 +322,10 @@ int ft_enter(struct tree_context* c)
 
     if (file->attr & ATTR_DIRECTORY) {
         memcpy(c->currdir, buf, sizeof(c->currdir));
-        if ( c->dirlevel < MAX_DIR_LEVELS ) {
-            c->dirpos[c->dirlevel] = c->dirstart;
-            c->cursorpos[c->dirlevel] = c->dircursor;
-        }
+        if ( c->dirlevel < MAX_DIR_LEVELS )
+            c->selected_item_history[c->dirlevel] = c->selected_item;
         c->dirlevel++;
-        c->dircursor=0;
-        c->dirstart=0;
+        c->selected_item=0;
     }
     else {
         int seed = current_tick;
@@ -357,8 +354,7 @@ int ft_enter(struct tree_context* c)
 
                 if (playlist_create(c->currdir, NULL) != -1)
                 {
-                    start_index =
-                        ft_build_playlist(c, c->dircursor + c->dirstart);
+                    start_index = ft_build_playlist(c, c->selected_item);
                     if (global_settings.playlist_shuffle)
                     {
                         start_index = playlist_shuffle(seed, start_index);
@@ -497,14 +493,13 @@ int ft_exit(struct tree_context* c)
             exit_func = true;
 
         c->dirlevel--;
-        if ( c->dirlevel < MAX_DIR_LEVELS ) {
-            c->dirstart = c->dirpos[c->dirlevel];
-            c->dircursor = c->cursorpos[c->dirlevel];
-        }
+        if ( c->dirlevel < MAX_DIR_LEVELS )
+            c->selected_item=c->selected_item_history[c->dirlevel];
         else
-            c->dirstart = c->dircursor = 0;
+            c->selected_item=0;
 
-        if (c->dirstart == -1)
+        /* if undefined position */
+        if (c->selected_item == -1)
             strcpy(lastfile, buf);
     }
     else

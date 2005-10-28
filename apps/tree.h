@@ -23,6 +23,8 @@
 #include <applimits.h>
 #include <file.h>
 
+/*FIXME: don't forget to remove PGUP, PGDOW, NEXT, PREV
+ * when everything will be working with gui_list */
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
     (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define TREE_NEXT      BUTTON_DOWN
@@ -43,8 +45,11 @@
 #define TREE_POWER_BTN BUTTON_ON
 #define TREE_QUICK     (BUTTON_MODE | BUTTON_REPEAT)
 
+/* Remote keys */
 #define TREE_RC_NEXT   BUTTON_RC_FF
 #define TREE_RC_PREV   BUTTON_RC_REW
+#define TREE_RC_PGUP   BUTTON_RC_SOURCE
+#define TREE_RC_PGDN   BUTTON_RC_BITRATE
 #define TREE_RC_EXIT   BUTTON_RC_STOP
 #define TREE_RC_RUN    (BUTTON_RC_MENU | BUTTON_REL)
 #define TREE_RC_RUN_PRE   BUTTON_RC_MENU
@@ -137,27 +142,36 @@ struct filetype {
     int icon;
     int voiceclip;
 };
- 
+
 /* browser context for file or db */
 struct tree_context {
+    /* The directory we are browsing */
+    char currdir[MAX_PATH];
+    /* the number of directories we have crossed from / */
     int dirlevel;
-    int dircursor;
-    int dirstart;
+    /* The currently selected file/id3dbitem index (old dircursor+dirfile) */
+    int selected_item;
+    /* The selected item in each directory crossed
+     * (used when we want to return back to a previouws directory)*/
+    int selected_item_history[MAX_DIR_LEVELS];
+
     int firstpos; /* which dir entry is on first
                      position in dir buffer */
     int pos_history[MAX_DIR_LEVELS];
-    int dirpos[MAX_DIR_LEVELS];
-    int cursorpos[MAX_DIR_LEVELS];
-    char currdir[MAX_PATH]; /* file use */
+    int dirpos[MAX_DIR_LEVELS]; /* the dirstart history */
+    int cursorpos[MAX_DIR_LEVELS]; /* the dircursor history */
+
     int *dirfilter; /* file use */
-    int filesindir;
+    int filesindir; /* The number of files in the dircache */
     int dirsindir; /* file use */
     int dirlength; /* total number of entries in dir, incl. those not loaded */
     int table_history[MAX_DIR_LEVELS]; /* db use */
     int extra_history[MAX_DIR_LEVELS]; /* db use */
     int currtable; /* db use */
     int currextra; /* db use */
-
+    /* A big buffer with plenty of entry structs,
+     * contains all files and dirs in the current
+     * dir (with filters applied) */
     void* dircache;
     int dircache_size;
     char* name_buffer;
@@ -196,4 +210,7 @@ struct tree_context* tree_get_context(void);
 void tree_flush(void);
 void tree_restore(void);
 
+
+extern struct gui_synclist tree_lists;
+extern struct gui_syncstatusbar statusbars;
 #endif

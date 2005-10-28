@@ -43,6 +43,7 @@
 #include "lang.h"
 #include "keyboard.h"
 #include "autoconf.h"
+#include "list.h"
 
 static int db_play_folder(struct tree_context* c);
 static int db_search(struct tree_context* c, char* string);
@@ -69,17 +70,18 @@ int db_load(struct tree_context* c)
         c->filesindir = 0;
         return 0;
     }
-    
+
     c->dentry_size = 2;
     c->dirfull = false;
 
-    DEBUGF("db_load() table: %d extra: 0x%x  firstpos: %d\n", table, extra, c->firstpos);
+    DEBUGF("db_load() table: %d extra: 0x%x  firstpos: %d\n", table, extra,
+                                                              c->firstpos);
 
     if (!table) {
         table = root;
         c->currtable = table;
     }
-    
+
     switch (table) {
         case root: {
             static const int tables[] = {allartists, allalbums, allsongs,
@@ -138,28 +140,28 @@ int db_load(struct tree_context* c)
             return i;
 
         case allsongs:
-            DEBUGF("dbload table allsongs\n");                
+            DEBUGF("dbload table allsongs\n");
             offset = tagdbheader.songstart + c->firstpos * SONGENTRY_SIZE;
             itemcount = tagdbheader.songcount;
             stringlen = tagdbheader.songlen;
             break;
 
         case allalbums:
-            DEBUGF("dbload table allalbums\n");                
+            DEBUGF("dbload table allalbums\n");
             offset = tagdbheader.albumstart + c->firstpos * ALBUMENTRY_SIZE;
             itemcount = tagdbheader.albumcount;
             stringlen = tagdbheader.albumlen;
             break;
 
         case allartists:
-            DEBUGF("dbload table allartists\n");                
+            DEBUGF("dbload table allartists\n");
             offset = tagdbheader.artiststart + c->firstpos * ARTISTENTRY_SIZE;
             itemcount = tagdbheader.artistcount;
             stringlen = tagdbheader.artistlen;
             break;
 
         case albums4artist:
-            DEBUGF("dbload table albums4artist\n");                
+            DEBUGF("dbload table albums4artist\n");
             /* 'extra' is offset to the artist */
             safeplacelen = tagdbheader.albumarraylen * 4;
             safeplace = (void*)(end_of_nbuf - safeplacelen);
@@ -199,13 +201,13 @@ int db_load(struct tree_context* c)
             break;
 
         case songs4artist:
-            DEBUGF("dbload table songs4artist\n");                
+            DEBUGF("dbload table songs4artist\n");
             /* 'extra' is offset to the artist, used as filter */
             offset = tagdbheader.songstart + c->firstpos * SONGENTRY_SIZE;
             itemcount = tagdbheader.songcount;
             stringlen = tagdbheader.songlen;
             break;
-            
+
         default:
             DEBUGF("Unsupported table %d\n", table);
             return -1;
@@ -248,7 +250,8 @@ int db_load(struct tree_context* c)
             case songs4album:
             case songs4artist:
                 rc = read(tagdb_fd, intbuf, 12);
-                skip = SONGENTRY_SIZE-stringlen-12; /* skip the rest of the song info */
+                 /* skip the rest of the song info */
+                skip = SONGENTRY_SIZE-stringlen-12;
                 if (rc < 12) {
                     DEBUGF("%d read(%d) returned %d\n", i, 12, rc);
                     return -1;
@@ -287,7 +290,7 @@ int db_load(struct tree_context* c)
 
         if(table==songs4artist)
                 c->dirlength=hits;
-        
+
         /* next name is stored immediately after this */
         nptr = (void*)nptr + strlen((char*)nptr) + 1;
         if ((void*)nptr + stringlen > (void*)end_of_nbuf) {
@@ -314,7 +317,7 @@ int db_load(struct tree_context* c)
         dptr[1] = extra; /* offset to artist */
         hits++;
     }
-    
+
     c->filesindir = hits;
 
     return hits;
@@ -350,7 +353,7 @@ static int db_search(struct tree_context* c, char* string)
             count = tagdbheader.songcount;
             size = SONGENTRY_SIZE;
             break;
-            
+
         default:
             DEBUGF("Invalid table %d\n", c->currtable);
             return 0;
@@ -384,7 +387,7 @@ static int db_search(struct tree_context* c, char* string)
                 c->dirfull = true;
                 break;
             }
-    
+
             nptr += strlen(nptr) + 1;
             while ((unsigned long)nptr & 3)
                 nptr++;
@@ -403,25 +406,24 @@ static int db_search(struct tree_context* c, char* string)
 int db_enter(struct tree_context* c)
 {
     int rc = 0;
-    int offset = (c->dircursor + c->dirstart) * c->dentry_size + 1;
+    int offset = (c->selected_item) * c->dentry_size + 1;
     int newextra = ((int*)c->dircache)[offset];
 
     if (c->dirlevel >= MAX_DIR_LEVELS)
         return 0;
-    
-    c->dirpos[c->dirlevel] = c->dirstart;
-    c->cursorpos[c->dirlevel] = c->dircursor;
+
+    c->selected_item_history[c->dirlevel]=c->selected_item;
     c->table_history[c->dirlevel] = c->currtable;
     c->extra_history[c->dirlevel] = c->currextra;
     c->pos_history[c->dirlevel] = c->firstpos;
     c->dirlevel++;
-    
+
     switch (c->currtable) {
         case root:
             c->currtable = newextra;
             c->currextra = newextra;
             break;
-            
+
         case allartists:
         case searchartists:
             c->currtable = albums4artist;
@@ -457,13 +459,13 @@ int db_enter(struct tree_context* c)
             else
                 c->currtable = newextra;
             break;
-            
+
         default:
             c->dirlevel--;
             break;
     }
-
-    c->dirstart = c->dircursor = c->firstpos = 0;
+    c->selected_item=0;
+    gui_synclist_select_item(&tree_lists, c->selected_item);
 
     return rc;
 }
@@ -471,8 +473,8 @@ int db_enter(struct tree_context* c)
 void db_exit(struct tree_context* c)
 {
     c->dirlevel--;
-    c->dirstart = c->dirpos[c->dirlevel];
-    c->dircursor = c->cursorpos[c->dirlevel];
+    c->selected_item=c->selected_item_history[c->dirlevel];
+    gui_synclist_select_item(&tree_lists, c->selected_item);
     c->currtable = c->table_history[c->dirlevel];
     c->currextra = c->extra_history[c->dirlevel];
     c->firstpos  = c->pos_history[c->dirlevel];
@@ -481,9 +483,8 @@ void db_exit(struct tree_context* c)
 int db_get_filename(struct tree_context* c, char *buf, int buflen)
 {
     int rc;
-    int filenum = c->dircursor + c->dirstart;
-    int pathoffset = ((int*)c->dircache)[filenum * c->dentry_size + 1];
-    
+    int pathoffset = ((int*)c->dircache)[c->selected_item * c->dentry_size + 1];
+
     lseek(tagdb_fd, pathoffset, SEEK_SET);
     rc = read(tagdb_fd, buf, buflen);
 
@@ -498,7 +499,6 @@ static int db_play_folder(struct tree_context* c)
 {
     char buf[MAX_PATH];
     int rc, i;
-    int filenum = c->dircursor + c->dirstart;
 
     if (playlist_create(NULL, NULL) < 0) {
         DEBUGF("Failed creating playlist\n");
@@ -506,7 +506,7 @@ static int db_play_folder(struct tree_context* c)
     }
 
     /* TODO: add support for very long tables */
-    
+
     for (i=0; i < c->filesindir; i++) {
         int pathoffset = ((int*)c->dircache)[i * c->dentry_size + 1];
         lseek(tagdb_fd, pathoffset, SEEK_SET);
@@ -520,11 +520,12 @@ static int db_play_folder(struct tree_context* c)
     }
 
     if (global_settings.playlist_shuffle)
-        filenum = playlist_shuffle(current_tick, filenum);
+        c->selected_item = playlist_shuffle(current_tick, c->selected_item);
     if (!global_settings.play_selected)
-        filenum = 0;
+        c->selected_item = 0;
+    gui_synclist_select_item(&tree_lists, c->selected_item);
 
-    playlist_start(filenum,0);
+    playlist_start(c->selected_item,0);
 
     return 0;
 }

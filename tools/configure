@@ -412,7 +412,7 @@ appsdir='\$(ROOTDIR)/apps'
     shcc
     tool="$rootdir/tools/scramble"
     output="archos.mod"
-    appextra="player"
+    appextra="player:gui"
     archosrom="$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
@@ -425,7 +425,7 @@ appsdir='\$(ROOTDIR)/apps'
     shcc
     tool="$rootdir/tools/scramble"
     output="ajbrec.ajz"
-    appextra="recorder"
+    appextra="recorder:gui"
     archosrom="$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
@@ -438,7 +438,7 @@ appsdir='\$(ROOTDIR)/apps'
     shcc
     tool="$rootdir/tools/scramble -fm"
     output="ajbrec.ajz"
-    appextra="recorder"
+    appextra="recorder:gui"
     archosrom="$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
@@ -451,7 +451,7 @@ appsdir='\$(ROOTDIR)/apps'
     shcc
     tool="$rootdir/tools/scramble -v2"
     output="ajbrec.ajz"
-    appextra="recorder"
+    appextra="recorder:gui"
     archosrom="$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
@@ -465,7 +465,7 @@ appsdir='\$(ROOTDIR)/apps'
     calmrisccc
     tool="cp" # might work for now!
     output="rockbox.gmini"
-    appextra="recorder"
+    appextra="recorder:gui"
     archosrom=""
     flash=""
     plugins="" # disabled for now, enable later on
@@ -479,7 +479,7 @@ appsdir='\$(ROOTDIR)/apps'
     calmrisccc
     tool="cp" # might work for now!
     output="rockbox.gmini"
-    appextra="recorder"
+    appextra="recorder:gui"
     archosrom=""
     flash=""
     plugins="" # disabled for now, enable later on
@@ -492,7 +492,7 @@ appsdir='\$(ROOTDIR)/apps'
     shcc
     tool="$rootdir/tools/scramble -osp"
     output="ajbrec.ajz"
-    appextra="recorder"
+    appextra="recorder:gui"
     archosrom="$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
@@ -505,7 +505,7 @@ appsdir='\$(ROOTDIR)/apps'
     shcc
     tool="$rootdir/tools/scramble -ofm"
     output="ajbrec.ajz"
-    appextra="recorder"
+    appextra="recorder:gui"
     archosrom="$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
@@ -519,7 +519,7 @@ appsdir='\$(ROOTDIR)/apps'
     coldfirecc
     tool="$rootdir/tools/scramble -add=h120"
     output="rockbox.iriver"
-    appextra="recorder"
+    appextra="recorder:gui"
     archosrom=""
     flash=""
     plugins="yes"
@@ -533,7 +533,7 @@ appsdir='\$(ROOTDIR)/apps'
     coldfirecc
     tool="$rootdir/tools/scramble -add=h300"
     output="rockbox.iriver"
-    appextra="recorder"
+    appextra="recorder:gui"
     archosrom=""
     flash=""
     plugins="yes"
@@ -547,7 +547,7 @@ appsdir='\$(ROOTDIR)/apps'
     coldfirecc
     tool="$rootdir/tools/scramble -add=h100"
     output="rockbox.iriver"
-    appextra="recorder"
+    appextra="recorder:gui"
     archosrom=""
     flash=""
     plugins="yes"
@@ -561,7 +561,7 @@ appsdir='\$(ROOTDIR)/apps'
     coldfirecc
     tool="$rootdir/tools/scramble -add=x5" # wrong, must be fixed
     output="rockbox.iaudio"
-    appextra="recorder"
+    appextra="recorder:gui"
     archosrom=""
     flash=""
     plugins="yes"
