@@ -58,8 +58,10 @@ void screen_dump(void);   /* Nasty again. Defined in apps/ too */
 
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define USBPOWER_BUTTON BUTTON_F1
+#define USBPOWER_BTN_IGNORE BUTTON_ON
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define USBPOWER_BUTTON BUTTON_MENU
+#define USBPOWER_BTN_IGNORE BUTTON_OFF
 #endif
 #endif /* HAVE_USB_POWER */
 
@@ -225,7 +227,7 @@ static void usb_thread(void)
                 else
 #endif
 #ifdef HAVE_USB_POWER
-                if(button_status() == USBPOWER_BUTTON)
+                if((button_status() & ~USBPOWER_BTN_IGNORE) == USBPOWER_BUTTON)
                 {
                     usb_state = USB_POWERED;
                 }
