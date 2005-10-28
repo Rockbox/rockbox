@@ -42,6 +42,10 @@
 
 #include "decoder.h"
 
+#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#include "coldfire.h"
+#endif
+
 #define INT_MAX       2147483647
 
 #define FFMAX(a,b) ((a) > (b) ? (a) : (b))
@@ -262,6 +266,10 @@ static int decode_subframe_lpc(FLACContext *s, int32_t* decoded, int pred_order)
         return -8;
 
     if ((s->bps + coeff_prec + av_log2(pred_order)) <= 32) {
+        #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+        (void)sum;
+        lpc_decode_emac(s->blocksize - pred_order, qlevel, pred_order, decoded + pred_order, coeffs);
+        #else
         for (i = pred_order; i < s->blocksize; i++)
         {
             sum = 0;
@@ -269,6 +277,7 @@ static int decode_subframe_lpc(FLACContext *s, int32_t* decoded, int pred_order)
                 sum += coeffs[j] * decoded[i-j-1];
             decoded[i] += sum >> qlevel;
         }
+        #endif
     } else {
         for (i = pred_order; i < s->blocksize; i++)
         {

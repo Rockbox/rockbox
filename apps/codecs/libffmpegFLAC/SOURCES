@@ -1,2 +1,5 @@
 bitstream.c
 decoder.c
+#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+coldfire.S
+#endif
