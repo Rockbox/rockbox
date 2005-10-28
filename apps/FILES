@@ -1,6 +1,7 @@
 FILES
 Makefile
 *.[ch]
+gui/*.[ch]
 recorder/*.[ch]
 player/*.[ch]
 win32.mak
