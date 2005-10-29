@@ -33,14 +33,59 @@ struct codec_api* ci;
 int32_t decoded0[MAX_BLOCKSIZE] IBSS_ATTR;
 int32_t decoded1[MAX_BLOCKSIZE] IBSS_ATTR;
 
+#define MAX_SUPPORTED_SEEKTABLE_SIZE 5000
+
+/* Notes about seeking:
+
+   The full seek table consists of:
+      uint64_t sample (only 36 bits are used)
+      uint64_t offset
+      uint32_t blocksize
+
+   We don't store the blocksize (of the target frame) and we also
+   limit the sample and offset values to 32-bits - Rockbox doesn't support
+   files bigger than 2GB on FAT32 filesystems.
+
+   The reference FLAC encoder produces a seek table with points every
+   10 seconds, but this can be overridden by the user when encoding a file.
+
+   With the default settings, a typical 4 minute track will contain
+   24 seek points.
+
+   Taking the extreme case of a Rockbox supported file to be a 2GB (compressed)
+   16-bit/44.1KHz mono stream with a likely uncompressed size of 4GB:
+      Total duration is: 48694 seconds (about 810 minutes - 13.5 hours)
+      Total number of seek points: 4869
+
+   Therefore we limit the number of seek points to 5000.  This is a
+   very extreme case, and requires 5000*8=40000 bytes of storage.
+
+   If we come across a FLAC file with more than this number of seekpoints, we
+   just use the first 5000.
+
+*/
+
+struct FLACseekpoints {
+    uint32_t sample;
+    uint32_t offset;
+};
+
+struct FLACseekpoints seekpoints[MAX_SUPPORTED_SEEKTABLE_SIZE];
+int nseekpoints;
+
 static bool flac_init(FLACContext* fc)
 {
     unsigned char buf[255];
     bool found_streaminfo=false;
+    uint32_t seekpoint_hi,seekpoint_lo;
+    uint32_t offset_hi,offset_lo;
     int endofmetadata=0;
     int blocklength;
+    int n;
+    uint32_t* p;
 
     ci->memset(fc,0,sizeof(FLACContext));
+    nseekpoints=0;
 
     if (ci->read_filebuf(buf, 4) < 4)
     {
@@ -92,7 +137,28 @@ static bool flac_init(FLACContext* fc)
 
             found_streaminfo=true;
         } else if ((buf[0] & 0x7f) == 3) { /* 3 is the SEEKTABLE block */
-          ci->advance_buffer(blocklength);
+            while ((nseekpoints < MAX_SUPPORTED_SEEKTABLE_SIZE) && 
+                   (blocklength >= 18)) {
+                n=ci->read_filebuf(buf,18);
+                if (n < 18) return false;
+                blocklength-=n;
+
+                p=(uint32_t*)buf;
+                seekpoint_hi=betoh32(*(p++));
+                seekpoint_lo=betoh32(*(p++));
+                offset_hi=betoh32(*(p++));
+                offset_lo=betoh32(*(p++));
+            
+                if ((seekpoint_hi == 0) && (seekpoint_lo != 0xffffffff) &&
+                    (offset_hi == 0)) {
+                        seekpoints[nseekpoints].sample=seekpoint_lo;
+                        seekpoints[nseekpoints].offset=offset_lo;
+                        nseekpoints++;
+                }
+            }
+            /* Skip any unread seekpoints */
+            if (blocklength > 0)
+                ci->advance_buffer(blocklength);
         } else {
           /* Skip to next metadata block */
           ci->advance_buffer(blocklength);
@@ -105,6 +171,40 @@ static bool flac_init(FLACContext* fc)
    } else {
        return false;
    }
+}
+
+/* A very simple seek implementation - seek to the seekpoint before
+   the target sample.
+
+   This needs to be improved to seek with greater accuracy
+*/
+bool flac_seek(FLACContext* fc, uint32_t newsample) {
+  uint32_t offset;
+  int i;
+
+  if (nseekpoints==0) {
+      offset=0;
+  } else {
+      i=nseekpoints-1;
+      while ((i > 0) && (seekpoints[i].sample > newsample)) {
+          i--;
+      }
+
+      if ((i==0) && (seekpoints[i].sample > newsample)) {
+          offset=0;
+      } else {
+          offset=seekpoints[i].offset;
+      }
+  }
+
+  offset+=fc->metadatalength;
+
+  if ((off_t)offset < ci->filesize) {
+      ci->seek_buffer(offset);
+      return true;
+  } else {
+      return false;
+  }
 }
 
 /* this is the codec entry point */
@@ -163,15 +263,11 @@ enum codec_status codec_start(struct codec_api* api)
 
         /* Deal with any pending seek requests */
         if (ci->seek_time) {
-          /* We only support seeking to start of track at the moment */
-          if (ci->seek_time==1) {
-              if (ci->seek_buffer(fc.metadatalength)) {
-                  /* Refill the input buffer */
-                  bytesleft=ci->read_filebuf(buf,sizeof(buf));
-                  ci->set_elapsed(0);
-              }
-          }
-          ci->seek_time = 0;
+            if (flac_seek(&fc,(ci->seek_time/20) * (ci->id3->frequency/50))) {
+                /* Refill the input buffer */
+                bytesleft=ci->read_filebuf(buf,sizeof(buf));
+            }
+            ci->seek_time = 0;
         }
 
         if((res=flac_decode_frame(&fc,decoded0,decoded1,buf,
