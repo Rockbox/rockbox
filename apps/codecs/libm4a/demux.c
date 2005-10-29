@@ -29,16 +29,13 @@
  *
  */
 
-
 #include <string.h>
-#include <stdio.h>
 #include <inttypes.h>
 #include <stdlib.h>
 
 #include "../codec.h"
 
-#include "stream.h"
-#include "demux.h"
+#include "m4a.h"
 
 typedef struct
 {
@@ -637,6 +634,8 @@ int qtmovie_read(stream_t *file, demux_res_t *demux_res)
              * as they may not always be avilable */
         case MAKEFOURCC('m','d','a','t'):
             read_chunk_mdat(&qtmovie, chunk_len);
+            /* Keep track of start of stream in file - used for seeking */
+            qtmovie.res->mdat_offset=stream_tell(qtmovie.stream);
             return 1;
 
             /*  these following atoms can be skipped !!!! */

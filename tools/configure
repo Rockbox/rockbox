@@ -523,7 +523,7 @@ appsdir='\$(ROOTDIR)/apps'
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libm4a"
     ;;
 
    10)
@@ -537,7 +537,7 @@ appsdir='\$(ROOTDIR)/apps'
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libm4a"
     ;;
 
    11)
@@ -551,7 +551,7 @@ appsdir='\$(ROOTDIR)/apps'
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libm4a"
     ;;
 
    12)
@@ -565,7 +565,7 @@ appsdir='\$(ROOTDIR)/apps'
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libm4a"
     ;;
 
    *)
