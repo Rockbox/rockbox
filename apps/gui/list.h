@@ -63,21 +63,50 @@
 #define LIST_PGDN      (BUTTON_ON | BUTTON_DOWN)
 #endif
 
-
+/*
+ * The gui_list is based on callback functions, if you want the list
+ * to display something you have to provide it a function that
+ * tells it what to display.
+ * There are two callback function :
+ * one to get the text and one to get the icon
+ * Callback interface :
+ *
+ * Text callback
+ *  - selected_item : an integer that tells the number of the item to display
+ *  - data : a void pointer to the data you gave to the list when
+ *           you initialized it
+ *  - buffer : a buffer to put the resulting text on it
+ *             (The content of the buffer may not be used by the list, we use
+ *             the return value of the function in all cases to avoid filling
+ *             a buffer when it's not necessary)
+ * Returns a pointer to a string that contains the text to display
+ *
+ * Icon callback
+ *  - selected_item : an integer that tells the number of the item to display
+ *  - data : a void pointer to the data you gave to the list when
+ *           you initialized it
+ *  - icon : a pointer to the icon, the value inside it is used to display
+ *           the icon after the function returns.
+ * Note : we use the ICON type because the real type depends of the plateform
+ */
 struct gui_list
 {
     int nb_items;
     int selected_item;
     int start_item; /* the item that is displayed at the top of the screen */
 
-    void (*callback_get_item_icon)(int selected_item, ICON * icon);
-    char * (*callback_get_item_name)(int selected_item, char *buffer);
+    void (*callback_get_item_icon)
+        (int selected_item, void * data, ICON * icon);
+    char * (*callback_get_item_name)
+        (int selected_item, void * data, char *buffer);
 
     struct screen * display;
     int line_scroll_limit;
     /* defines wether the list should stop when reaching the top/bottom
      * or should continue (by going to bottom/top) */
     bool limit_scroll;
+    /* The data that will be passed to the callback function YOU implement */
+    void * data;
 };
 
 /*
@@ -89,9 +118,12 @@ struct gui_list
  *    to a given item number
  */
 extern void gui_list_init(struct gui_list * gui_list,
-            void (*callback_get_item_icon)(int selected_item, ICON * icon),
-            char * (*callback_get_item_name)(int selected_item, char *buffer)
-            );
+    void (*callback_get_item_icon)
+        (int selected_item, void * data, ICON * icon),
+    char * (*callback_get_item_name)
+        (int selected_item, void * data, char *buffer),
+    void * data
+    );
 
 /*
  * Sets the numbers of items the list can currently display
@@ -99,7 +131,8 @@ extern void gui_list_init(struct gui_list * gui_list,
  *  - gui_list : the list structure to initialize
  *  - nb_items : the numbers of items you want
  */
-extern inline void gui_list_set_nb_items(struct gui_list * gui_list, int nb_items);
+#define gui_list_set_nb_items(gui_list, nb) \
+    (gui_list)->nb_items = nb
 
 /*
  * Puts the selection in the screen
@@ -125,7 +158,8 @@ extern void gui_list_set_display(struct gui_list * gui_list,
  *  - gui_list : the list structure
  * Returns the position
  */
-extern inline int gui_list_get_sel_pos(struct gui_list * gui_list);
+#define gui_list_get_sel_pos(gui_list) \
+    (gui_list)->selected_item
 
 /*
  * Selects an item in the list
@@ -190,7 +224,8 @@ extern void gui_list_del_item(struct gui_list * gui_list);
  *    - true : stops when reaching top/bottom
  *    - false : continues to go to bottom/top when reaching top/bottom
  */
-extern inline void gui_list_limit_scroll(struct gui_list * gui_list, bool scroll);
+#define gui_list_limit_scroll(gui_list, scroll) \
+    (gui_list)->limit_scroll=scroll
 
 /*
  * This part handles as many lists as there are connected screens
@@ -206,13 +241,21 @@ struct gui_synclist
     struct gui_list gui_list[NB_SCREENS];
 };
 
-extern void gui_synclist_init(struct gui_synclist * lists,
-             void (*callback_get_item_icon)(int selected_item, ICON * icon),
-             char * (*callback_get_item_name)(int selected_item, char *buffer)
-             );
+extern void gui_synclist_init(
+    struct gui_synclist * lists,
+    void (*callback_get_item_icon)
+        (int selected_item, void * data, ICON * icon),
+    char * (*callback_get_item_name)
+        (int selected_item, void * data, char *buffer),
+    void * data
+    );
 extern void gui_synclist_set_nb_items(struct gui_synclist * lists, int nb_items);
 
 extern int  gui_synclist_get_sel_pos(struct gui_synclist * lists);
+
+#define gui_synclist_get_sel_pos(lists) \
+    gui_list_get_sel_pos(&((lists)->gui_list[0]))
+
 extern void gui_synclist_draw(struct gui_synclist * lists);
 extern void gui_synclist_select_item(struct gui_synclist * lists,
                                      int item_number);

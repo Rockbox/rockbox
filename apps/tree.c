@@ -146,16 +146,18 @@ char * strip_extension(char * filename, char * buffer)
     else
         return(filename);
 }
-char * tree_get_filename(int selected_item, char *buffer)
+char * tree_get_filename(int selected_item, void * data, char *buffer)
 {
+    struct tree_context * local_tc=(struct tree_context *)data;
     char *name;
     int attr=0;
-    bool id3db = *tc.dirfilter == SHOW_ID3DB;
+    bool id3db = *(local_tc->dirfilter) == SHOW_ID3DB;
+
     if (id3db) {
-        name = ((char**)tc.dircache)[selected_item * tc.dentry_size];
+        name = ((char**)local_tc->dircache)[selected_item * local_tc->dentry_size];
     }
     else {
-        struct entry* dc = tc.dircache;
+        struct entry* dc = local_tc->dircache;
         struct entry* e = &dc[selected_item];
         name = e->name;
         attr = e->attr;
@@ -163,8 +165,8 @@ char * tree_get_filename(int selected_item, char *buffer)
     /* if any file filter is on, and if it's not a directory,
      * strip the extension */
 
-    if ( (*tc.dirfilter != SHOW_ID3DB) && !(attr & ATTR_DIRECTORY)
-        && (*tc.dirfilter != SHOW_ALL) )
+    if ( (*(local_tc->dirfilter) != SHOW_ID3DB) && !(attr & ATTR_DIRECTORY)
+        && (*(local_tc->dirfilter) != SHOW_ALL) )
     {
         return(strip_extension(name, buffer));
     }
@@ -172,14 +174,15 @@ char * tree_get_filename(int selected_item, char *buffer)
 }
 
 
-void tree_get_fileicon(int selected_item, ICON * icon)
+void tree_get_fileicon(int selected_item, void * data, ICON * icon)
 {
-    bool id3db = *tc.dirfilter == SHOW_ID3DB;
+    struct tree_context * local_tc=(struct tree_context *)data;
+    bool id3db = *(local_tc->dirfilter) == SHOW_ID3DB;
     if (id3db) {
         *icon = db_get_icon(&tc);
     }
     else {
-        struct entry* dc = tc.dircache;
+        struct entry* dc = local_tc->dircache;
         struct entry* e = &dc[selected_item];
         *icon = filetype_get_icon(e->attr);
     }
@@ -224,7 +227,7 @@ void browse_root(void)
     gui_buttonbar_set_display(&tree_buttonbar, &(screens[SCREEN_MAIN]) );
 #endif
     gui_syncstatusbar_init(&statusbars);
-    gui_synclist_init(&tree_lists, &tree_get_fileicon, &tree_get_filename);
+    gui_synclist_init(&tree_lists, &tree_get_fileicon, &tree_get_filename, &tc);
 #ifndef SIMULATOR
     dirbrowse();
 #else

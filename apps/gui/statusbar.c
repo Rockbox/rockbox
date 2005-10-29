@@ -40,9 +40,7 @@
 
 /* FIXME: should be removed from icon.h to avoid redefinition,
    but still needed for compatibility with old system */
-#define STATUSBAR_X_POS                         0
-#define STATUSBAR_Y_POS                         0 /* MUST be a multiple of 8 */
-#define STATUSBAR_HEIGHT                        8
+
 #define STATUSBAR_BATTERY_X_POS                 0
 #define STATUSBAR_BATTERY_WIDTH                 18
 #define STATUSBAR_PLUG_X_POS                    STATUSBAR_X_POS + \
@@ -115,7 +113,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
     struct tm* tm; /* For Time */
 #endif
 
-#ifndef HAVE_LCD_BITMAP
+#ifdef HAVE_LCD_CHARCELLS
     (void)force_redraw; /* players always "redraw" */
 #endif
 
@@ -259,7 +257,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
     }
 
 
-#ifndef HAVE_LCD_BITMAP
+#ifdef HAVE_LCD_CHARCELLS
     if (bar->info.battlevel > -1)
         display->icon(ICON_BATTERY, battery_state);
     display->icon(ICON_BATTERY_1, bar->info.battlevel > 25);

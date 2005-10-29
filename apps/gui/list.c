@@ -39,8 +39,12 @@
 
 
 void gui_list_init(struct gui_list * gui_list,
-         void (*callback_get_item_icon)(int selected_item, ICON * icon),
-         char * (*callback_get_item_name)(int selected_item, char *buffer))
+    void (*callback_get_item_icon)
+        (int selected_item, void * data, ICON * icon),
+    char * (*callback_get_item_name)
+        (int selected_item, void * data, char *buffer),
+    void * data
+    )
 {
     gui_list->callback_get_item_icon = callback_get_item_icon;
     gui_list->callback_get_item_name = callback_get_item_name;
@@ -48,12 +52,8 @@ void gui_list_init(struct gui_list * gui_list,
     gui_list_set_nb_items(gui_list, 0);
     gui_list->selected_item = 0;
     gui_list->start_item = 0;
-    gui_list->limit_scroll=false;
-}
-
-inline void gui_list_set_nb_items(struct gui_list * gui_list, int nb_items)
-{
-    gui_list->nb_items = nb_items;
+    gui_list->limit_scroll = false;
+    gui_list->data=data;
 }
 
 void gui_list_set_display(struct gui_list * gui_list, struct screen * display)
@@ -70,28 +70,23 @@ void gui_list_set_display(struct gui_list * gui_list, struct screen * display)
 void gui_list_put_selection_in_screen(struct gui_list * gui_list,
                                       bool put_from_end)
 {
-    struct screen * display = gui_list->display;
+    int nb_lines=gui_list->display->nb_lines;
     if(put_from_end)
     {
         int list_end = gui_list->selected_item + SCROLL_LIMIT - 1;
         if(list_end > gui_list->nb_items)
-            list_end = gui_list->nb_items;
-        gui_list->start_item = list_end - display->nb_lines;
+            list_end = nb_lines;
+        gui_list->start_item = list_end - nb_lines;
     }
     else
     {
         int list_start = gui_list->selected_item - SCROLL_LIMIT + 1;
-        if(list_start + display->nb_lines > gui_list->nb_items)
-            list_start = gui_list->nb_items - display->nb_lines;
+        if(list_start + nb_lines > gui_list->nb_items)
+            list_start = gui_list->nb_items - nb_lines;
         gui_list->start_item = list_start;
     }
     if(gui_list->start_item < 0)
         gui_list->start_item = 0;
-}
-
-inline int gui_list_get_sel_pos(struct gui_list * gui_list)
-{
-    return gui_list->selected_item;
 }
 
 void gui_list_draw(struct gui_list * gui_list)
@@ -117,13 +112,13 @@ void gui_list_draw(struct gui_list * gui_list)
     text_pos = 0; /* here it's in pixels */
     if(draw_scrollbar)
     {
-        ++cursor_pos;
-        ++icon_pos;
+        cursor_pos++;
+        icon_pos++;
         text_pos += SCROLLBAR_WIDTH;
     }
     if(!draw_cursor)
     {
-        --icon_pos;
+        icon_pos--;
     }
     else
         text_pos += CURSOR_WIDTH;
@@ -165,6 +160,7 @@ void gui_list_draw(struct gui_list * gui_list)
         if(current_item >= gui_list->nb_items)
             break;
         entry_name = gui_list->callback_get_item_name(current_item,
+                                                      gui_list->data,
                                                       entry_buffer);
         if(current_item == gui_list->selected_item)
         {
@@ -193,7 +189,9 @@ void gui_list_draw(struct gui_list * gui_list)
         if(draw_icons)
         {
             ICON icon;
-            gui_list->callback_get_item_icon(current_item, &icon);
+            gui_list->callback_get_item_icon(current_item,
+                                             gui_list->data,
+                                             &icon);
             screen_put_iconxy(display, icon_pos, i, icon);
         }
     }
@@ -234,7 +232,7 @@ void gui_list_select_next(struct gui_list * gui_list)
     {
         if(gui_list->limit_scroll)
             return;
-        ++gui_list->selected_item;
+        gui_list->selected_item++;
         /* we have already reached the bottom of the list */
         gui_list->selected_item = 0;
         gui_list->start_item = 0;
@@ -242,14 +240,14 @@ void gui_list_select_next(struct gui_list * gui_list)
     else
     {
         int nb_lines = gui_list->display->nb_lines;
-        ++gui_list->selected_item;
+        gui_list->selected_item++;
         item_pos = gui_list->selected_item - gui_list->start_item;
         end_item = gui_list->start_item + nb_lines;
         /* we start scrolling vertically when reaching the line
          * (nb_lines-SCROLL_LIMIT)
          * and when we are not in the last part of the list*/
         if( item_pos > nb_lines-SCROLL_LIMIT && end_item < gui_list->nb_items )
-            ++gui_list->start_item;
+            gui_list->start_item++;
     }
 }
 
@@ -262,7 +260,7 @@ void gui_list_select_previous(struct gui_list * gui_list)
     {
         if(gui_list->limit_scroll)
             return;
-        --gui_list->selected_item;
+        gui_list->selected_item--;
         /* we have aleady reached the top of the list */
         int start;
         gui_list->selected_item = gui_list->nb_items-1;
@@ -274,10 +272,10 @@ void gui_list_select_previous(struct gui_list * gui_list)
     }
     else
     {
-         --gui_list->selected_item;
+        gui_list->selected_item--;
         item_pos = gui_list->selected_item - gui_list->start_item;
         if( item_pos < SCROLL_LIMIT-1 && gui_list->start_item > 0 )
-            --gui_list->start_item;
+            gui_list->start_item--;
     }
 }
 
@@ -317,7 +315,7 @@ void gui_list_select_previous_page(struct gui_list * gui_list, int nb_lines)
 
 void gui_list_add_item(struct gui_list * gui_list)
 {
-    ++gui_list->nb_items;
+    gui_list->nb_items++;
     /* if only one item in the list, select it */
     if(gui_list->nb_items == 1)
         gui_list->selected_item = 0;
@@ -337,34 +335,35 @@ void gui_list_del_item(struct gui_list * gui_list)
         {
             /* Oops we are removing the selected item,
                select the previous one */
-            --gui_list->selected_item;
+            gui_list->selected_item--;
         }
-        --gui_list->nb_items;
+        gui_list->nb_items--;
 
         /* scroll the list if needed */
         if( (dist_start_from_end < nb_lines) && (gui_list->start_item != 0) )
-            --gui_list->start_item;
+            gui_list->start_item--;
     }
 }
 
-inline void gui_list_limit_scroll(struct gui_list * gui_list, bool scroll)
-{
-    gui_list->limit_scroll=scroll;
-}
 /*
  * Synchronized lists stuffs
  */
 void gui_synclist_init(
     struct gui_synclist * lists,
-    void (*callback_get_item_icon)(int selected_item, ICON * icon),
-    char * (*callback_get_item_name)(int selected_item, char *buffer)
+    void (*callback_get_item_icon)
+        (int selected_item, void * data, ICON * icon),
+    char * (*callback_get_item_name)
+        (int selected_item, void * data, char *buffer),
+    void * data
     )
 {
     int i;
     for(i = 0;i < NB_SCREENS;i++)
     {
-        gui_list_init(&(lists->gui_list[i]), callback_get_item_icon,
-                      callback_get_item_name);
+        gui_list_init(&(lists->gui_list[i]),
+                      callback_get_item_icon,
+                      callback_get_item_name,
+                      data);
         gui_list_set_display(&(lists->gui_list[i]), &(screens[i]));
     }
 }
@@ -376,11 +375,6 @@ void gui_synclist_set_nb_items(struct gui_synclist * lists, int nb_items)
     {
         gui_list_set_nb_items(&(lists->gui_list[i]), nb_items);
     }
-}
-
-int gui_synclist_get_sel_pos(struct gui_synclist * lists)
-{
-    return gui_list_get_sel_pos(&(lists->gui_list[0]));
 }
 
 void gui_synclist_draw(struct gui_synclist * lists)

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 by Kévin FERRARE
+ * Copyright (C) 2005 by Kï¿½in FERRARE
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -34,7 +34,7 @@ enum screen_type {
 #define NB_SCREENS 1
 #endif
 
-#ifndef HAVE_LCD_BITMAP
+#ifdef HAVE_LCD_CHARCELLS
 #define MAX_LINES_ON_SCREEN 2
 #endif
 
@@ -113,15 +113,23 @@ extern void screen_update_nblines(struct screen * screen);
  * - screen : the screen structure
  * Returns the number of pixels
  */
-extern int screen_get_text_y_start(struct screen * screen);
+#define screen_get_text_y_start(screen) \
+    (global_settings.statusbar?STATUSBAR_HEIGHT:0)
 
 /*
  * Compute the number of pixels below which text can't be displayed
  * - screen : the screen structure
  * Returns the number of pixels
  */
-extern int screen_get_text_y_end(struct screen * screen);
-#endif
+#ifdef HAS_BUTTONBAR
+#define screen_get_text_y_end(screen) \
+    ( (screen)->height - (global_settings.buttonbar?BUTTONBAR_HEIGHT:0) )
+#else
+#define screen_get_text_y_end(screen) \
+    ( (screen)->height )
+#endif /* HAS_BUTTONBAR */
+
+#endif /* HAVE_LCD_BITMAP */
 
 /*
  * Initializes the whole screen_access api

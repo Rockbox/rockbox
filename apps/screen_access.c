@@ -171,24 +171,6 @@ void screen_update_nblines(struct screen * screen)
 
 }
 
-#ifdef HAVE_LCD_BITMAP
-int screen_get_text_y_start(struct screen * screen)
-{
-    screen=0;/* Avoid warning, this parameter is here for api integrity */
-    return(global_settings.statusbar?STATUSBAR_HEIGHT:0);
-}
-
-int screen_get_text_y_end(struct screen * screen)
-{
-#ifdef HAS_BUTTONBAR
-    return( screen->height - (global_settings.buttonbar?BUTTONBAR_HEIGHT:0) );
-#else
-    return( screen->height );
-#endif
-
-}
-#endif
-
 void screen_access_init(void)
 {
     screen_init(&screens[0], SCREEN_MAIN);
