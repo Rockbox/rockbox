@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) Linus Nielsen Feltzing (2002), Kevin FERRARE (2005)
+ * Copyright (C) Linus Nielsen Feltzing (2002)
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,7 +16,13 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
+/*
+2005 Kevin Ferrare :
+ - Multi screen support
+ - Rewrote a lot of code to avoid global vars and make it accept eventually
+   more that 3 buttons on the bar (just the prototype of gui_buttonbar_set
+   and the constant BUTTONBAR_MAX_BUTTONS to modify)
+*/
 #include "config.h"
 #include "buttonbar.h"
 
@@ -43,8 +49,7 @@ void gui_buttonbar_draw_button(struct gui_buttonbar * buttonbar, int num)
     int xpos, ypos, button_width, text_width;
     int fw, fh;
     struct screen * display = buttonbar->display;
-    
-    display->setfont(FONT_SYSFIXED);
+
     display->getstringsize("M", &fw, &fh);
 
     button_width = display->width/BUTTONBAR_MAX_BUTTONS;
@@ -62,7 +67,6 @@ void gui_buttonbar_draw_button(struct gui_buttonbar * buttonbar, int num)
     display->set_drawmode(DRMODE_COMPLEMENT);
     display->fillrect(xpos, ypos, button_width - 1, fh);
     display->set_drawmode(DRMODE_SOLID);
-    display->setfont(FONT_UI);
 }
 
 void gui_buttonbar_set(struct gui_buttonbar * buttonbar,
@@ -99,7 +103,8 @@ void gui_buttonbar_draw(struct gui_buttonbar * buttonbar)
 {
     struct screen * display = buttonbar->display;
     int i;
-    
+    display->setfont(FONT_SYSFIXED);
+
     display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
     display->fillrect(0, display->height - BUTTONBAR_HEIGHT,
                       display->width, BUTTONBAR_HEIGHT);
@@ -109,6 +114,7 @@ void gui_buttonbar_draw(struct gui_buttonbar * buttonbar)
         gui_buttonbar_draw_button(buttonbar, i);
     display->update_rect(0, display->height - BUTTONBAR_HEIGHT,
                          display->width, BUTTONBAR_HEIGHT);
+    display->setfont(FONT_UI);
 }
 
 bool gui_buttonbar_isset(struct gui_buttonbar * buttonbar)

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 by Kevin FERRARE
+ * Copyright (C) 2005 by Kevin Ferrare
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -27,7 +27,6 @@
 #include <icons.h>
 
 #include "screen_access.h"
-#include "buttonbar.h"
 
 struct screen screens[NB_SCREENS];
 
@@ -156,7 +155,7 @@ void screen_update_nblines(struct screen * screen)
     int height=screen->height;
     if(global_settings.statusbar)
         height -= STATUSBAR_HEIGHT;
-#if CONFIG_KEYPAD == RECORDER_PAD
+#ifdef HAS_BUTTONBAR
     if(global_settings.buttonbar)
         height -= BUTTONBAR_HEIGHT;
 #endif
