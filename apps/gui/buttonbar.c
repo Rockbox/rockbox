@@ -49,7 +49,6 @@ void gui_buttonbar_draw_button(struct gui_buttonbar * buttonbar, int num)
     int xpos, ypos, button_width, text_width;
     int fw, fh;
     struct screen * display = buttonbar->display;
-
     display->getstringsize("M", &fw, &fh);
 
     button_width = display->width/BUTTONBAR_MAX_BUTTONS;
@@ -102,6 +101,9 @@ void gui_buttonbar_unset(struct gui_buttonbar * buttonbar)
 void gui_buttonbar_draw(struct gui_buttonbar * buttonbar)
 {
     struct screen * display = buttonbar->display;
+    screen_has_buttonbar(display, gui_buttonbar_isset(buttonbar));
+    if(!global_settings.buttonbar || !display->has_buttonbar)
+        return;
     int i;
     display->setfont(FONT_SYSFIXED);
 
@@ -120,11 +122,9 @@ void gui_buttonbar_draw(struct gui_buttonbar * buttonbar)
 bool gui_buttonbar_isset(struct gui_buttonbar * buttonbar)
 {
     /* If all buttons are unset, the button bar is considered disabled */
-    if(!global_settings.buttonbar)
-        return(false);
     int i;
     for(i = 0;i < BUTTONBAR_MAX_BUTTONS;i++)
-        if(buttonbar->caption[i] != 0)
+        if(buttonbar->caption[i][0] != 0)
             return true;
     return false;
 }

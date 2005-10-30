@@ -362,7 +362,6 @@ bool main_menu(void)
     menu_exit(m);
 
     settings_save();
-
     return result;
 }
 

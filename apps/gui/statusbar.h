@@ -70,6 +70,9 @@ struct gui_statusbar
     struct screen * display;
 };
 
+
+extern struct gui_syncstatusbar statusbars;
+
 /*
  * Initializes a status bar
  *  - bar : the bar to initialize

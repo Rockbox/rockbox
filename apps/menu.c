@@ -16,6 +16,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+/*
+2005 Kevin Ferrare :
+ - Multi screen support
+ - Rewrote/removed a lot of code now useless with the new gui API
+*/
 #include <stdbool.h>
 #include <stdlib.h>
 
@@ -38,62 +43,285 @@
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
-#include "widgets.h"
+//#include "widgets.h"
 #endif
 
+/* gui api */
+#include "list.h"
+#include "statusbar.h"
+#include "buttonbar.h"
+
 struct menu {
-    int top;
-    int cursor;
     struct menu_item* items;
-    int itemcount;
     int (*callback)(int, int);
-#if defined(HAVE_LCD_BITMAP) && (CONFIG_KEYPAD == RECORDER_PAD)
-    bool use_buttonbar; /* true if a buttonbar is defined */
-    const char *buttonbar[3];
+#ifdef HAS_BUTTONBAR
+    struct gui_buttonbar buttonbar;
 #endif
+    struct gui_synclist synclist;
 };
 
 #define MAX_MENUS 5
 
-#ifdef HAVE_LCD_BITMAP
-
-/* pixel margins */
-#define MARGIN_X (global_settings.scrollbar && \
-                  menu_lines < menus[m].itemcount ? SCROLLBAR_WIDTH : 0) +\
-                  CURSOR_WIDTH
-#define MARGIN_Y (global_settings.statusbar ? STATUSBAR_HEIGHT : 0)
-
-/* position the entry-list starts at */
-#define LINE_X   0
-#define LINE_Y   (global_settings.statusbar ? 1 : 0)
-
-#define CURSOR_X (global_settings.scrollbar && \
-                  menu_lines < menus[m].itemcount ? 1 : 0)
-#define CURSOR_Y 0 /* the cursor is not positioned in regard to
-                      the margins, so this is the amount of lines
-                      we add to the cursor Y position to position
-                      it on a line */
-#define CURSOR_WIDTH (global_settings.invert_cursor ? 0 : 4)
-
-#define SCROLLBAR_X      0
-#define SCROLLBAR_Y      lcd_getymargin()
-#define SCROLLBAR_WIDTH  6
-
-#else /* HAVE_LCD_BITMAP */
-
-#define LINE_X      1 /* X position the entry-list starts at */
-
-#define MENU_LINES 2
-
-#define CURSOR_X    0
-#define CURSOR_Y    0 /* not really used for players */
-
-#endif /* HAVE_LCD_BITMAP */
-
-#define CURSOR_CHAR 0x92
-
 static struct menu menus[MAX_MENUS];
 static bool inuse[MAX_MENUS] = { false };
+
+char * menu_get_itemname(int selected_item, void * data, char *buffer)
+{
+    struct menu *local_menus=(struct menu *)data;
+    (void)buffer;
+    return(P2STR(local_menus->items[selected_item].desc));
+}
+
+int menu_find_free_menu()
+{
+    int i;
+    /* Tries to find an unused slot to put the new menu */
+    for ( i=0; i<MAX_MENUS; i++ ) {
+        if ( !inuse[i] ) {
+            inuse[i] = true;
+            break;
+        }
+    }
+    if ( i == MAX_MENUS ) {
+        DEBUGF("Out of menus!\n");
+        return -1;
+    }
+    return(i);
+}
+
+int menu_init(const struct menu_item* mitems, int count, int (*callback)(int, int),
+              const char *button1, const char *button2, const char *button3)
+{
+    int menu=menu_find_free_menu();
+    if(menu==-1)/* Out of menus */
+        return -1;
+    menus[menu].items = (struct menu_item*)mitems; /* de-const */
+    gui_synclist_init(&(menus[menu].synclist),
+                      NULL, &menu_get_itemname, &menus[menu]);
+    gui_synclist_set_nb_items(&(menus[menu].synclist), count);
+    menus[menu].callback = callback;
+#ifdef HAS_BUTTONBAR
+    gui_buttonbar_init(&(menus[menu].buttonbar));
+    gui_buttonbar_set_display(&(menus[menu].buttonbar), &(screens[SCREEN_MAIN]) );
+    gui_buttonbar_set(&(menus[menu].buttonbar), button1, button2, button3);
+#else
+    (void)button1;
+    (void)button2;
+    (void)button3;
+#endif
+    return menu;
+}
+
+void menu_exit(int m)
+{
+    inuse[m] = false;
+}
+
+int menu_show(int m)
+{
+#ifdef HAS_BUTTONBAR
+    gui_buttonbar_draw(&(menus[m].buttonbar));
+#endif
+    bool exit = false;
+    int key;
+
+    gui_synclist_draw(&(menus[m].synclist));
+    while (!exit) {
+        key = button_get_w_tmo(HZ/2);
+
+        /*
+         * "short-circuit" the default keypresses by running the
+         * callback function
+         * The callback may return a new key value, often this will be
+         * BUTTON_NONE or the same key value, but it's perfectly legal
+         * to "simulate" key presses by returning another value.
+         */
+        if( menus[m].callback != NULL )
+            key = menus[m].callback(key, m);
+        if(gui_synclist_do_button(&(menus[m].synclist), key))
+        {
+            /* If moved, "say" the entry under the cursor */
+            if(global_settings.talk_menu)
+            {
+                int selected=gui_synclist_get_sel_pos(&(menus[m].synclist));
+                int voice_id = P2ID(menus[m].items[selected].desc);
+                if (voice_id >= 0) /* valid ID given? */
+                    talk_id(voice_id, false); /* say it */
+            }
+        }
+        switch( key ) {
+            case MENU_ENTER:
+#ifdef MENU_ENTER2
+            case MENU_ENTER2:
+#endif
+#ifdef MENU_RC_ENTER
+            case MENU_RC_ENTER:
+#endif
+                /* Erase current display state */
+                /*lcd_clear_display();
+                return menus[m].cursor;
+                */
+                return gui_synclist_get_sel_pos(&(menus[m].synclist));
+            case MENU_EXIT:
+#ifdef MENU_EXIT2
+            case MENU_EXIT2:
+#endif
+#ifdef MENU_EXIT_MENU
+            case MENU_EXIT_MENU:
+#endif
+#ifdef MENU_RC_EXIT
+            case MENU_RC_EXIT:
+#endif
+                lcd_stop_scroll();
+                exit = true;
+                break;
+
+            default:
+                if(default_event_handler(key) == SYS_USB_CONNECTED)
+                    return MENU_ATTACHED_USB;
+                break;
+        }
+        gui_syncstatusbar_draw(&statusbars, false);
+    }
+    return MENU_SELECTED_EXIT;
+}
+
+
+bool menu_run(int m)
+{
+    while (1) {
+        switch (menu_show(m))
+        {
+            case MENU_SELECTED_EXIT:
+                return false;
+
+            case MENU_ATTACHED_USB:
+                return true;
+
+            default:
+            {
+                int selected=gui_synclist_get_sel_pos(&(menus[m].synclist));
+                if (menus[m].items[selected].function &&
+                    menus[m].items[selected].function())
+                    return  true;
+            }
+        }
+    }
+    return false;
+}
+
+/*
+ *  Property function - return the current cursor for "menu"
+ */
+
+int menu_cursor(int menu)
+{
+    return gui_synclist_get_sel_pos(&(menus[menu].synclist));
+}
+
+/*
+ *  Property function - return the "menu" description at "position"
+ */
+
+char* menu_description(int menu, int position)
+{
+    return P2STR(menus[menu].items[position].desc);
+}
+
+/*
+ *  Delete the element "position" from the menu items in "menu"
+ */
+
+void menu_delete(int menu, int position)
+{
+    int i;
+    int nb_items=gui_synclist_get_nb_items(&(menus[menu].synclist));
+    /* copy the menu item from the one below */
+    for( i = position; i < nb_items - 1; i++)
+        menus[menu].items[i] = menus[menu].items[i + 1];
+
+    gui_synclist_del_item(&(menus[menu].synclist));
+}
+
+void menu_insert(int menu, int position, char *desc, bool (*function) (void))
+{
+    int i;
+    int nb_items=gui_synclist_get_nb_items(&(menus[menu].synclist));
+    if(position < 0)
+       position = nb_items;
+
+    /* Move the items below one position forward */
+    for( i = nb_items; i > position; i--)
+       menus[menu].items[i] = menus[menu].items[i - 1];
+
+    /* Update the current item */
+    menus[menu].items[position].desc = desc;
+    menus[menu].items[position].function = function;
+    gui_synclist_add_item(&(menus[menu].synclist));
+}
+
+/*
+ *  Property function - return the "count" of menu items in "menu" 
+ */
+
+int menu_count(int menu)
+{
+    return gui_synclist_get_nb_items(&(menus[menu].synclist));
+}
+
+/*
+ *  Allows a menu item at the current cursor position in "menu"
+ * to be moved up the list
+ */
+
+bool menu_moveup(int menu)
+{
+    struct menu_item swap;
+    int selected=menu_cursor(menu);
+    /* can't be the first item ! */
+    if( selected == 0)
+        return false;
+
+    /* use a temporary variable to do the swap */
+    swap = menus[menu].items[selected - 1];
+    menus[menu].items[selected - 1] = menus[menu].items[selected];
+    menus[menu].items[selected] = swap;
+
+    gui_synclist_select_previous(&(menus[menu].synclist));
+    return true;
+}
+
+/*
+ *  Allows a menu item at the current cursor position in "menu" to be moved down the list
+ */
+
+bool menu_movedown(int menu)
+{
+    struct menu_item swap;
+    int selected=menu_cursor(menu);
+    int nb_items=gui_synclist_get_nb_items(&(menus[menu].synclist));
+
+    /* can't be the last item ! */
+    if( selected == nb_items - 1)
+        return false;
+
+    /* use a temporary variable to do the swap */    
+    swap = menus[menu].items[selected + 1];
+    menus[menu].items[selected + 1] = menus[menu].items[selected];
+    menus[menu].items[selected] = swap;
+
+    gui_synclist_select_next(&(menus[menu].synclist));
+    return true;
+}
+
+/*
+ * Allows to set the cursor position. Doesn't redraw by itself.
+ */
+
+void menu_set_cursor(int menu, int position)
+{
+    gui_synclist_select_item(&(menus[menu].synclist), position);
+}
 
 /* count in letter positions, NOT pixels */
 void put_cursorxy(int x, int y, bool on)
@@ -135,405 +363,5 @@ void put_cursorxy(int x, int y, bool on)
 
 void menu_draw(int m)
 {
-    int i = 0;
-#ifdef HAVE_LCD_BITMAP
-    int fw, fh;
-    int menu_lines;
-    int height = LCD_HEIGHT;
-    
-    lcd_setfont(FONT_UI);
-    lcd_getstringsize("A", &fw, &fh);
-    if (global_settings.statusbar)
-        height -= STATUSBAR_HEIGHT;
-
-#if CONFIG_KEYPAD == RECORDER_PAD
-    if(global_settings.buttonbar && menus[m].use_buttonbar) {
-        buttonbar_set(menus[m].buttonbar[0],
-                      menus[m].buttonbar[1],
-                      menus[m].buttonbar[2]);
-        height -= BUTTONBAR_HEIGHT;
-    }
-#endif
-
-    menu_lines = height / fh;
-    height = menu_lines * fh;
-    
-#else
-    int menu_lines = MENU_LINES;
-#endif
-
-    lcd_clear_display();
-#ifdef HAVE_LCD_BITMAP
-    lcd_setmargins(MARGIN_X,MARGIN_Y); /* leave room for cursor and icon */
-#endif
-    /* Adjust cursor pos if it's below the screen */
-    if (menus[m].cursor - menus[m].top >= menu_lines)
-        menus[m].top = menus[m].cursor - (menu_lines - 1);
-
-    /* Adjust cursor pos if it's above the screen */
-    if(menus[m].cursor < menus[m].top)
-        menus[m].top = menus[m].cursor;
-
-    for (i = menus[m].top; 
-         (i < menus[m].itemcount) && (i<menus[m].top+menu_lines);
-         i++) {
-
-        /* We want to scroll the line where the cursor is */
-        if((menus[m].cursor - menus[m].top)==(i-menus[m].top))
-#ifdef HAVE_LCD_BITMAP
-            if (global_settings.invert_cursor)
-                lcd_puts_scroll_style(LINE_X, i-menus[m].top,
-                                       P2STR(menus[m].items[i].desc), STYLE_INVERT);
-            else
-#endif
-                lcd_puts_scroll(LINE_X, i-menus[m].top, P2STR(menus[m].items[i].desc));
-        else
-            lcd_puts(LINE_X, i-menus[m].top, P2STR(menus[m].items[i].desc));
-    }
-
-    /* place the cursor */
-    put_cursorxy(CURSOR_X, menus[m].cursor - menus[m].top, true);
-    
-#ifdef HAVE_LCD_BITMAP
-    if (global_settings.scrollbar && menus[m].itemcount > menu_lines) 
-        scrollbar(SCROLLBAR_X, SCROLLBAR_Y, SCROLLBAR_WIDTH - 1,
-                  height, menus[m].itemcount, menus[m].top,
-                  menus[m].top + menu_lines, VERTICAL);
-
-#if CONFIG_KEYPAD == RECORDER_PAD
-    if(global_settings.buttonbar && menus[m].use_buttonbar)
-        buttonbar_draw();
-#endif /* CONFIG_KEYPAD == RECORDER_PAD */
-#endif /* HAVE_LCD_BITMAP */
-    status_draw(true);
-
-    lcd_update();
+    gui_synclist_draw(&(menus[m].synclist));
 }
-
-/* 
- * Move the cursor to a particular id, 
- *   target: where you want it to be 
- */
-static void put_cursor(int m, int target)
-{
-    int voice_id;
-    
-    menus[m].cursor = target;
-    menu_draw(m);
-
-    /* "say" the entry under the cursor */
-    if(global_settings.talk_menu)
-    {
-        voice_id = P2ID(menus[m].items[menus[m].cursor].desc);
-        if (voice_id >= 0) /* valid ID given? */
-            talk_id(voice_id, false); /* say it */
-    }
-}
-
-int menu_init(const struct menu_item* mitems, int count, int (*callback)(int, int),
-              const char *button1, const char *button2, const char *button3)
-{
-    int i;
-
-    for ( i=0; i<MAX_MENUS; i++ ) {
-        if ( !inuse[i] ) {
-            inuse[i] = true;
-            break;
-        }
-    }
-    if ( i == MAX_MENUS ) {
-        DEBUGF("Out of menus!\n");
-        return -1;
-    }
-    menus[i].items = (struct menu_item*)mitems; /* de-const */
-    menus[i].itemcount = count;
-    menus[i].top = 0;
-    menus[i].cursor = 0;
-    menus[i].callback = callback;
-#if defined(HAVE_LCD_BITMAP) && (CONFIG_KEYPAD == RECORDER_PAD)
-    menus[i].buttonbar[0] = button1;
-    menus[i].buttonbar[1] = button2;
-    menus[i].buttonbar[2] = button3;
-
-    if(button1 || button2 || button3)
-        menus[i].use_buttonbar = true;
-    else
-        menus[i].use_buttonbar = false;
-#else
-    (void)button1;
-    (void)button2;
-    (void)button3;
-#endif
-    return i;
-}
-
-void menu_exit(int m)
-{
-    inuse[m] = false;
-}
-
-int menu_show(int m)
-{
-    bool exit = false;
-    int key;
-#ifdef HAVE_LCD_BITMAP
-    int fw, fh;
-    int menu_lines;
-    int height = LCD_HEIGHT;
-    
-    lcd_setfont(FONT_UI);
-    lcd_getstringsize("A", &fw, &fh);
-    if (global_settings.statusbar)
-        height -= STATUSBAR_HEIGHT;
-
-#if CONFIG_KEYPAD == RECORDER_PAD
-    if(global_settings.buttonbar && menus[m].use_buttonbar) {
-        buttonbar_set(menus[m].buttonbar[0],
-                      menus[m].buttonbar[1],
-                      menus[m].buttonbar[2]);
-        height -= BUTTONBAR_HEIGHT;
-    }
-#endif
-
-    menu_lines = height / fh;
-#else
-    int menu_lines = MENU_LINES;
-#endif
-
-    /* Put the cursor on the first line and draw the menu */
-    put_cursor(m, menus[m].cursor);
-
-    while (!exit) {
-        key = button_get_w_tmo(HZ/2);
-
-        /*  
-         * "short-circuit" the default keypresses by running the
-         * callback function
-         * The callback may return a new key value, often this will be
-         * BUTTON_NONE or the same key value, but it's perfectly legal
-         * to "simulate" key presses by returning another value.
-         */
-
-        if( menus[m].callback != NULL )
-            key = menus[m].callback(key, m);
-        
-        switch( key ) {
-            case MENU_PREV:
-            case MENU_PREV | BUTTON_REPEAT:
-#ifdef MENU_RC_PREV
-            case MENU_RC_PREV:
-            case MENU_RC_PREV | BUTTON_REPEAT:
-#endif
-                if (menus[m].cursor) {
-                    /* keep the cursor at 1/3 of the screen */
-                    if (menus[m].top && menus[m].cursor - menus[m].top <
-                            menu_lines - (2 * menu_lines) / 3)
-                        menus[m].top--;
-                    /* move up */
-                    put_cursor(m, menus[m].cursor-1);
-                }
-                else {
-                    /* move to bottom */
-                    menus[m].top = menus[m].itemcount-(menu_lines+1);
-                    if (menus[m].top < 0)
-                        menus[m].top = 0;
-                    put_cursor(m, menus[m].itemcount-1);
-                }
-                break;
-
-            case MENU_NEXT:
-            case MENU_NEXT | BUTTON_REPEAT:
-#ifdef MENU_RC_NEXT
-            case MENU_RC_NEXT:
-            case MENU_RC_NEXT | BUTTON_REPEAT:
-#endif
-                if (menus[m].cursor < menus[m].itemcount-1) {
-                    /* keep the cursor at 2/3 of the screen */
-                    if (menus[m].itemcount - menus[m].top > menu_lines &&
-                        menus[m].cursor - menus[m].top >= (2 * menu_lines) / 3)
-                        menus[m].top++;
-                    /* move down */
-                    put_cursor(m, menus[m].cursor+1);
-                }
-                else {
-                    /* move to top */
-                    menus[m].top = 0;
-                    menus[m].cursor = 0;
-                    put_cursor(m, 0);
-                }
-                break;
-
-            case MENU_ENTER:
-#ifdef MENU_ENTER2
-            case MENU_ENTER2:
-#endif
-#ifdef MENU_RC_ENTER
-            case MENU_RC_ENTER:
-#endif
-                /* Erase current display state */
-                lcd_clear_display();
-                return menus[m].cursor;
-
-            case MENU_EXIT:
-#ifdef MENU_EXIT2
-            case MENU_EXIT2:
-#endif
-#ifdef MENU_EXIT_MENU
-            case MENU_EXIT_MENU:
-#endif
-#ifdef MENU_RC_EXIT
-            case MENU_RC_EXIT:
-#endif
-                lcd_stop_scroll();
-                exit = true;
-                break;
-
-            default:
-                if(default_event_handler(key) == SYS_USB_CONNECTED)
-                    return MENU_ATTACHED_USB;
-                break;
-        }
-        
-        status_draw(false);
-    }
-    return MENU_SELECTED_EXIT;
-}
-
-
-bool menu_run(int m)
-{
-    while (1) {
-        switch (menu_show(m))
-        {
-            case MENU_SELECTED_EXIT:
-                return false;
-
-            case MENU_ATTACHED_USB:
-                return true;
-
-            default:
-                if ((menus[m].items[menus[m].cursor].function) &&
-                    (menus[m].items[menus[m].cursor].function()))
-                    return true;
-        }
-    }
-    return false;
-}
-
-/*  
- *  Property function - return the current cursor for "menu"
- */
-
-int menu_cursor(int menu)
-{
-    return menus[menu].cursor;
-}
-
-/*  
- *  Property function - return the "menu" description at "position"
- */
-
-char* menu_description(int menu, int position)
-{
-    return P2STR(menus[menu].items[position].desc);
-}
-
-/*  
- *  Delete the element "position" from the menu items in "menu"
- */
-
-void menu_delete(int menu, int position)
-{
-    int i;
-    
-    /* copy the menu item from the one below */
-    for( i = position; i < (menus[menu].itemcount - 1); i++)
-        menus[menu].items[i] = menus[menu].items[i + 1];
- 
-    /* reduce the count */       
-    menus[menu].itemcount--;
-    
-    /* adjust if this was the last menu item and the cursor was on it */
-    if(menus[menu].itemcount && menus[menu].itemcount <= menus[menu].cursor)
-        menus[menu].cursor = menus[menu].itemcount - 1;
-}
-
-void menu_insert(int menu, int position, char *desc, bool (*function) (void))
-{
-    int i;
-
-    if(position < 0)
-       position = menus[menu].itemcount;
-
-    /* Move the items below one position forward */
-    for( i = menus[menu].itemcount; i > position; i--)
-       menus[menu].items[i] = menus[menu].items[i - 1];
-
-    /* Increase the count */
-    menus[menu].itemcount++;
-    
-    /* Update the current item */
-    menus[menu].items[position].desc = desc;
-    menus[menu].items[position].function = function;
-}
-
-/*  
- *  Property function - return the "count" of menu items in "menu" 
- */
-
-int menu_count(int menu)
-{
-    return menus[menu].itemcount;
-}
-
-/*  
- *  Allows a menu item at the current cursor position in "menu" to be moved up the list
- */
-
-bool menu_moveup(int menu)
-{
-    struct menu_item swap;
-    
-    /* can't be the first item ! */
-    if( menus[menu].cursor == 0)
-        return false;
-    
-    /* use a temporary variable to do the swap */    
-    swap = menus[menu].items[menus[menu].cursor - 1];
-    menus[menu].items[menus[menu].cursor - 1] = menus[menu].items[menus[menu].cursor];
-    menus[menu].items[menus[menu].cursor] = swap;
-    menus[menu].cursor--;
-    
-    return true;
-}
-
-/*  
- *  Allows a menu item at the current cursor position in "menu" to be moved down the list
- */
-
-bool menu_movedown(int menu)
-{
-    struct menu_item swap;
-    
-    /* can't be the last item ! */
-    if( menus[menu].cursor == menus[menu].itemcount - 1)
-        return false;
-    
-    /* use a temporary variable to do the swap */    
-    swap = menus[menu].items[menus[menu].cursor + 1];
-    menus[menu].items[menus[menu].cursor + 1] = menus[menu].items[menus[menu].cursor];
-    menus[menu].items[menus[menu].cursor] = swap;
-    menus[menu].cursor++;
-    
-    return true;
-}
-
-/*
- * Allows to set the cursor position. Doesn't redraw by itself.
- */
-
-void menu_set_cursor(int menu, int position)
-{
-    menus[menu].cursor = position;
-}
-

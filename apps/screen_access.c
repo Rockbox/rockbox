@@ -141,9 +141,11 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
     screen->setfont(FONT_UI);
 #endif
     screen->screen_type=screen_type;
+#ifdef HAS_BUTTONBAR
+    screen->has_buttonbar=false;
+#endif
     screen_update_nblines(screen);
 }
-
 
 /*
  * Returns the number of text lines that can be drawn on the given screen
@@ -156,7 +158,7 @@ void screen_update_nblines(struct screen * screen)
     if(global_settings.statusbar)
         height -= STATUSBAR_HEIGHT;
 #ifdef HAS_BUTTONBAR
-    if(global_settings.buttonbar)
+    if(global_settings.buttonbar && screen->has_buttonbar)
         height -= BUTTONBAR_HEIGHT;
 #endif
     screen->getstringsize("A", &screen->char_width, &screen->char_height);

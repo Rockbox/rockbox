@@ -102,9 +102,10 @@ void gui_list_draw(struct gui_list * gui_list)
 
     /* Adjust the position of icon, cursor, text */
 #ifdef HAVE_LCD_BITMAP
+    display->setfont(FONT_UI);
+    screen_update_nblines(display);
     bool draw_scrollbar = (global_settings.scrollbar &&
                            display->nb_lines < gui_list->nb_items);
-
     int list_y_start = screen_get_text_y_start(gui_list->display);
     int list_y_end = screen_get_text_y_end(gui_list->display);
 
@@ -139,9 +140,6 @@ void gui_list_draw(struct gui_list * gui_list)
     display->fillrect(0, list_y_start,
                       display->width, list_y_end - list_y_start);
     display->set_drawmode(DRMODE_SOLID);
-
-    display->setfont(FONT_UI);
-    screen_update_nblines(display);
 
     display->stop_scroll();
     display->setmargins(text_pos, list_y_start);

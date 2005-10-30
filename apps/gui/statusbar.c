@@ -84,6 +84,8 @@
                                                 STATUSBAR_DISK_WIDTH
 #define STATUSBAR_TIME_X_END(statusbar_width)   statusbar_width-1
 
+struct gui_syncstatusbar statusbars;
+
 void gui_statusbar_init(struct gui_statusbar * bar)
 {
     bar->last_volume = -1; /* -1 means "first update ever" */

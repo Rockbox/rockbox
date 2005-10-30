@@ -49,6 +49,10 @@ struct screen
     int depth;
     int char_width;
     int char_height;
+#ifdef HAS_BUTTONBAR
+    bool has_buttonbar;
+#endif
+
 #ifdef HAVE_LCD_BITMAP
 
     void (*setmargins)(int x, int y);
@@ -109,6 +113,16 @@ extern void screen_init(struct screen * screen, enum screen_type screen_type);
  */
 extern void screen_update_nblines(struct screen * screen);
 
+#ifdef HAS_BUTTONBAR
+/*
+ * Sets if the given screen has a buttonbar or not
+ * - screen : the screen structure
+ * - has : a boolean telling wether the current screen will have a buttonbar or not
+ */
+#define screen_has_buttonbar(screen, has_btnb) \
+    (screen)->has_buttonbar=has_btnb;
+#endif
+
 #ifdef HAVE_LCD_BITMAP
 /*
  * Compute the number of pixels from which text can be displayed
@@ -116,7 +130,7 @@ extern void screen_update_nblines(struct screen * screen);
  * Returns the number of pixels
  */
 #define screen_get_text_y_start(screen) \
-    (global_settings.statusbar?STATUSBAR_HEIGHT:0)
+    ( (global_settings.statusbar)? STATUSBAR_HEIGHT : 0)
 
 /*
  * Compute the number of pixels below which text can't be displayed
@@ -125,7 +139,9 @@ extern void screen_update_nblines(struct screen * screen);
  */
 #ifdef HAS_BUTTONBAR
 #define screen_get_text_y_end(screen) \
-    ( (screen)->height - (global_settings.buttonbar?BUTTONBAR_HEIGHT:0) )
+    ( (screen)->height - ( (global_settings.buttonbar && \
+                            (screen)->has_buttonbar)? \
+                            BUTTONBAR_HEIGHT : 0) )
 #else
 #define screen_get_text_y_end(screen) \
     ( (screen)->height )

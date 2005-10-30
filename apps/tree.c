@@ -109,7 +109,6 @@ struct gui_synclist tree_lists;
 
 /* I put it here because other files doesn't use it yet,
  * but should be elsewhere since it will be used mostly everywhere */
-struct gui_syncstatusbar statusbars;
 #ifdef HAS_BUTTONBAR
 struct gui_buttonbar tree_buttonbar;
 #endif
@@ -555,7 +554,6 @@ static bool dirbrowse(void)
         bool restore = false;
 
         button = button_get_w_tmo(HZ/5);
-
 #ifdef BOOTFILE
         if (boot_changed) {
             bool stop = false;

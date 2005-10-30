@@ -135,6 +135,13 @@ extern void gui_list_init(struct gui_list * gui_list,
     (gui_list)->nb_items = nb
 
 /*
+ * Returns the numbers of items currently in the list
+ *  - gui_list : the list structure to initialize
+ */
+#define gui_list_get_nb_items(gui_list) \
+    (gui_list)->nb_items
+
+/*
  * Puts the selection in the screen
  *  - gui_list : the list structure
  *  - put_from_end : if true, selection will be put as close from
@@ -160,6 +167,7 @@ extern void gui_list_set_display(struct gui_list * gui_list,
  */
 #define gui_list_get_sel_pos(gui_list) \
     (gui_list)->selected_item
+
 
 /*
  * Selects an item in the list
@@ -251,6 +259,8 @@ extern void gui_synclist_init(
     );
 extern void gui_synclist_set_nb_items(struct gui_synclist * lists, int nb_items);
 
+#define gui_synclist_get_nb_items(lists) \
+    gui_list_get_nb_items(&((lists)->gui_list[0]))
 extern int  gui_synclist_get_sel_pos(struct gui_synclist * lists);
 
 #define gui_synclist_get_sel_pos(lists) \
