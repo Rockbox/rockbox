@@ -97,7 +97,7 @@ static volatile bool paused;
 
 /* As defined in plugins/lib/xxx2wav.h */
 #define MALLOC_BUFSIZE (512*1024)
-#define GUARD_BUFSIZE  (8*1024)
+#define GUARD_BUFSIZE  (32*1024)
 
 /* As defined in plugin.lds */
 #define CODEC_IRAM_ORIGIN   0x1000c000
