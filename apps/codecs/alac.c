@@ -64,8 +64,8 @@ enum codec_status codec_start(struct codec_api* api)
   ci->configure(CODEC_DSP_ENABLE, (bool *)true);
   ci->configure(DSP_DITHER, (bool *)false);
   ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_NONINTERLEAVED);
-  ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(28));
-  
+  ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(ALAC_OUTPUT_DEPTH-1));
+
   next_track:
 
   if (codec_init(api)) {
