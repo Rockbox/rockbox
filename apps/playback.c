@@ -764,7 +764,7 @@ void yield_codecs(void)
     while ((pcmbuf_is_crossfade_active() || pcmbuf_is_lowdata())
             && !ci.stop_codec && playing && queue_empty(&audio_queue)
             && filebufused > (128*1024))
-        yield();
+        sleep(1);
 }
 
 /* FIXME: This code should be made more generic and move to metadata.c */
@@ -818,6 +818,7 @@ void audio_fill_file_buffer(void)
     if (tracks[track_widx].start_pos != 0)
         tracks[track_widx].codecsize = 0;
     
+    mutex_lock(&mutex_bufferfill);
     i = 0;
     size = MIN(tracks[track_widx].filerem, AUDIO_FILL_CYCLE);
     while (i < size) {
@@ -845,6 +846,7 @@ void audio_fill_file_buffer(void)
         filebufused += rc;
         fill_bytesleft -= rc;
     }
+    mutex_unlock(&mutex_bufferfill);
     
     /*logf("Filled:%d/%d", tracks[track_widx].available,
                        tracks[track_widx].filerem);*/
@@ -1651,9 +1653,7 @@ void audio_thread(void)
     while (1) {
         yield_codecs();
 
-        mutex_lock(&mutex_bufferfill);
         audio_check_buffer();
-        mutex_unlock(&mutex_bufferfill);
         
         queue_wait_w_tmo(&audio_queue, &ev, 0);
         switch (ev.id) {
