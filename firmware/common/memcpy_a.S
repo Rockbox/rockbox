@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2004 by Jens Arnold
+ * Copyright (C) 2004-2005 by Jens Arnold
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -37,10 +37,10 @@
  *  r0 - destination address (like ANSI version)
  *
  * register usage:
- *  r0 - data / temporary
- *  r1 - bit mask for rounding to long bounds / 2nd data
- *  r2 - first long bound (only if >= 12 bytes)
- *  r3 - last long bound (-4) (only if >= 12 bytes)
+ *  r0 - data / scratch
+ *  r1 - 2nd data / scratch
+ *  r2 - scratch
+ *  r3 - first long bound / adjusted end address (only if >= 11 bytes)
  *  r4 - current dest address
  *  r5 - current source address
  *  r6 - source end address
@@ -51,82 +51,81 @@
  */
 
 _memcpy:
+    mov     r4,r7       /* store dest for returning */
+    add     #-8,r4      /* offset for early increment (max. 2 longs) */
+    mov     #11,r0
+    cmp/hs  r0,r6       /* at least 11 bytes to copy? (ensures 2 aligned longs) */
     add     r5,r6       /* r6 = source_end */
-    mov     r4,r7       /* store for returning */
-    add     #-8,r4      /* adjust for early increments (max. 2 longs) */
-
-    mov     r6,r0
-    add     #-12,r0     /* r0 = r6 - 12; don't go below 12 here! */
-    cmp/hs  r5,r0       /* >= 12 bytes to copy? */
-    bf      .start_b2   /* no, jump into byte loop */
-
-    mov     #-4,r1      /* r1 = 0xFFFFFFFC */
-
-    mov     r5,r2
-    add     #3,r2
-    and     r1,r2       /* r2 = first source long bound */
-    mov     r6,r3
-    add     #-4,r3      /* end offset for copying 2 longs per pass */
-    bra     .start_b1   /* jump into leading byte loop */
-    and     r1,r3       /* r3 = last source long bound - 4 */
+    bf      .start_b2   /* no: jump directly to byte loop */
+    
+    mov     #3,r0
+    neg     r5,r3
+    and     r0,r3       /* r3 = (4 - align_offset) % 4 */
+    tst     r3,r3       /* already aligned? */
+    bt      .end_b1     /* yes: skip leading byte loop */
+    
+    add     r5,r3       /* r3 = first source long bound */
 
     /* leading byte loop: copies 0..3 bytes */
-    .align  2
 .loop_b1:
     mov.b   @r5+,r0     /* load byte & increment source addr */
     add     #1,r4       /* increment dest addr */
     mov.b   r0,@(7,r4)  /* store byte */
-.start_b1:
-    cmp/hi  r5,r2       /* runs r5 up to first long bound */
+    cmp/hi  r5,r3       /* runs r5 up to first long bound */
     bt      .loop_b1
     /* now r5 is always at a long boundary */
     /* -> memory reading is done in longs for all dest alignments */
 
     /* selector for main copy loop */
-    mov     r4,r0
-    tst     #3,r0       /* dest now also at long bound? */
-    bt      .loop2_l    /* yes, do long copy */
-    tst     #1,r0       /* dest now at least at word bound? */
-    bt      .start4_w   /* yes, do word copy */
+.end_b1:
+    mov     r6,r3       /* move end address to r3 */
+    mov     #3,r1
+    and     r4,r1       /* r1 = dest alignment offset */
+    sub     r1,r4       /* r4 now long aligned */
+    mova    .jmptab,r0
+    mov.b   @(r0,r1),r1 /* select appropriate main loop */
+    add     r0,r1
+    jmp     @r1         /* and jump to it */
+    add     #-7,r3      /* adjust end addr for main loops doing 2 longs/pass */
+    
+    /** main loops, copying 2 longs per pass to profit from fast page mode **/
 
-    /* main loop for byte aligned destination (fast) */
-    /* copies 1 long per pass */
-    add     #4,r3       /* reset end offset */
-    add     #-1,r4      /* adjust to word alignment for word write+ */
-
-.loop4_b:
-    mov.l   @r5+,r0     /* load a long & increment source addr */
+    /* long aligned destination (fastest) */
+    .align  2
+.loop_do0:
+    mov.l   @r5+,r1     /* load first long & increment source addr */
+    add     #8,r4       /* increment dest addr */
+    mov.l   @r5+,r0     /* load second long & increment source addr */
+    cmp/hi  r5,r3       /* runs r5 up to last or second last long bound */
+    mov.l   r1,@r4      /* store first long */
+    mov.l   r0,@(4,r4)  /* store second long; NOT ALIGNED - no speed loss here! */
+    bt      .loop_do0
+    
+    add     #4,r3       /* readjust end address */
+    cmp/hi  r5,r3       /* one long left? */
+    bf      .start_b2   /* no, jump to trailing byte loop */
+    
+    mov.l   @r5+,r0     /* load last long & increment source addr */
     add     #4,r4       /* increment dest addr */
-    mov.b   r0,@(8,r4)  /* store low byte */
-    shlr8   r0          /* get middle 2 bytes */
-    mov.w   r0,@(6,r4)  /* store as word+ */
-    shlr16  r0          /* get upper byte */
-    mov.b   r0,@(5,r4)  /* and store */
-    cmp/hi  r5,r3       /* runs r5 up to last long bound */
-    bt      .loop4_b
-
     bra     .start_b2   /* jump to trailing byte loop */
-    add     #1,r4       /* readjust */
-
-    /* main loop for word aligned destination (faster) */
-    /* copies 2 longs per pass, utilizing fast page mode */
-.start4_w:
-    add     #-2,r4      /* adjust to long alignment for long write+ */
-
-.loop4_w:
+    mov.l   r0,@(4,r4)  /* store last long */
+    
+    /* word aligned destination (long + 2) */
+    .align  2
+.loop_do2:
     mov.l   @r5+,r1     /* load first long & increment source addr */
     add     #8,r4       /* increment dest addr */
     mov.l   @r5+,r0     /* load second long & increment source addr */
     cmp/hi  r5,r3       /* runs r5 up to last or second last long bound */
     mov.w   r0,@(8,r4)  /* store low word of second long */
     xtrct   r1,r0       /* extract low word of first long & high word of second long */
-    mov.l   r0,@(4,r4)  /* and store as long+ */
+    mov.l   r0,@(4,r4)  /* and store as long */
     swap.w  r1,r0       /* get high word of first long */
     mov.w   r0,@(2,r4)  /* and store it */
-    bt      .loop4_w
+    bt      .loop_do2
 
     add     #2,r4       /* readjust destination */
-    add     #4,r3       /* reset end offset */
+    add     #4,r3       /* readjust end address */
     cmp/hi  r5,r3       /* one long left? */
     bf      .start_b2   /* no, jump to trailing byte loop */
 
@@ -137,27 +136,77 @@ _memcpy:
     bra     .start_b2   /* jump to trailing byte loop */
     mov.w   r0,@(4,r4)  /* and store it */
 
-    /* main loop for long aligned destination (fastest) */
-    /* copies 2 longs per pass, utilizing fast page mode */
-.loop2_l:
+    /* jumptable for loop selector */
+    .align  2
+.jmptab:
+    .byte   .loop_do0 - .jmptab  /* placed in the middle because the SH1 */
+    .byte   .loop_do1 - .jmptab  /* loads bytes sign-extended. Otherwise */
+    .byte   .loop_do2 - .jmptab  /* the last loop would be out of reach */
+    .byte   .loop_do3 - .jmptab  /* of the offset range. */
+
+    /* byte aligned destination (long + 1) */
+    .align  2
+.loop_do1:
     mov.l   @r5+,r1     /* load first long & increment source addr */
     add     #8,r4       /* increment dest addr */
     mov.l   @r5+,r0     /* load second long & increment source addr */
+    mov     r1,r2       /* copy first long */
+    mov.b   r0,@(8,r4)  /* store low byte of second long */
+    shlr8   r0          /* get upper 3 bytes */
+    shll16  r2          /* move low byte of first long all the way up, .. */
+    shll8   r2
+    or      r0,r2       /* ..combine with the 3 bytes of second long.. */
+    mov     r1,r0       /* copy first long to r0 */
+    mov.l   r2,@(4,r4)  /* ..and store as long */
+    shlr8   r0          /* get middle 2 bytes */
+    mov.w   r0,@(2,r4)  /* store as word */
+    shlr16  r0          /* get upper byte */
+    mov.b   r0,@(1,r4)  /* and store */
     cmp/hi  r5,r3       /* runs r5 up to last or second last long bound */
-    mov.l   r1,@r4      /* store first long */
-    mov.l   r0,@(4,r4)  /* store second long; NOT ALIGNED - no speed loss here! */
-    bt      .loop2_l
-
-    add     #4,r3       /* reset end offset */
+    bt      .loop_do1
+    
+.last_do13:
+    add     #4,r3       /* readjust end address */
     cmp/hi  r5,r3       /* one long left? */
-    bf      .start_b2   /* no, jump to trailing byte loop */
+    bf      .end_do13   /* no, get out of here */
 
     mov.l   @r5+,r0     /* load last long & increment source addr */
     add     #4,r4       /* increment dest addr */
-    bra     .start_b2   /* jump to trailing byte loop */
-    mov.l   r0,@(4,r4)  /* store last long */
+    mov.b   r0,@(8,r4)  /* store low byte */
+    shlr8   r0          /* get middle 2 bytes */
+    mov.w   r0,@(6,r4)  /* store as word */
+    shlr16  r0          /* get upper byte */
+    mov.b   r0,@(5,r4)  /* and store */
 
-    /* trailing byte loop: copies 0..3 bytes (or all for < 12 in total) */
+.end_do13:
+    bra     .start_b2   /* jump to trailing byte loop */
+    add     #1,r4       /* readjust destination */
+
+    /* byte aligned destination (long + 3) */
+    .align  2
+.loop_do3:
+    mov.l   @r5+,r1     /* load first long & increment source addr */
+    add     #8,r4       /* increment dest addr */
+    mov.l   @r5+,r0     /* load second long & increment source addr */
+    mov     r1,r2       /* copy first long */
+    mov.b   r0,@(10,r4) /* store low byte of second long */
+    shlr8   r0          /* get middle 2 bytes */
+    mov.w   r0,@(8,r4)  /* store as word */
+    shlr16  r0          /* get upper byte */
+    shll8   r2          /* move lower 3 bytes of first long one up.. */
+    or      r2,r0       /* ..combine with the 1 byte of second long.. */
+    mov.l   r0,@(4,r4)  /* ..and store as long */
+    swap.w  r1,r0       /* swap-copy first long */
+    shlr8   r0          /* get original upper byte.. */
+    cmp/hi  r5,r3       /* runs r5 up to last or second last long bound */
+    mov.b   r0,@(3,r4)  /* ..and store */
+    bt      .loop_do3
+
+    bra     .last_do13  /* handle last longword: reuse routine for (long + 1) */
+    add     #2,r4       /* correct the offset difference to do1 */
+
+    /* trailing byte loop: copies 0..3 bytes (or all for < 11 in total) */
+    .align  2
 .loop_b2:
     mov.b   @r5+,r0     /* load byte & increment source addr */
     add     #1,r4       /* increment dest addr */
