@@ -210,12 +210,11 @@ bool flac_seek(FLACContext* fc, uint32_t newsample) {
 /* this is the codec entry point */
 enum codec_status codec_start(struct codec_api* api)
 {
-    size_t n;
-    static int8_t buf[MAX_FRAMESIZE];
+    int8_t *buf;
     FLACContext fc;
     uint32_t samplesdone;
     uint32_t elapsedtime;
-    int bytesleft;
+    long bytesleft;
     int consumed;
     int res;
     int frame;
@@ -246,7 +245,7 @@ enum codec_status codec_start(struct codec_api* api)
         return CODEC_ERROR;
     }
 
-    while (!ci->taginfo_ready)
+    while (!*ci->taginfo_ready)
         ci->yield();
     
     ci->configure(DSP_SET_FREQUENCY, (long *)(ci->id3->frequency));
@@ -254,7 +253,7 @@ enum codec_status codec_start(struct codec_api* api)
     /* The main decoding loop */
     samplesdone=0;
     frame=0;
-    bytesleft=ci->read_filebuf(buf,sizeof(buf));
+    buf = ci->request_buffer(&bytesleft, MAX_FRAMESIZE);
     while (bytesleft) {
         ci->yield();
         if (ci->stop_codec || ci->reload_codec) {
@@ -265,7 +264,7 @@ enum codec_status codec_start(struct codec_api* api)
         if (ci->seek_time) {
             if (flac_seek(&fc,(ci->seek_time/20) * (ci->id3->frequency/50))) {
                 /* Refill the input buffer */
-                bytesleft=ci->read_filebuf(buf,sizeof(buf));
+                buf = ci->request_buffer(&bytesleft, MAX_FRAMESIZE);
             }
             ci->seek_time = 0;
         }
@@ -289,13 +288,9 @@ enum codec_status codec_start(struct codec_api* api)
         elapsedtime=(samplesdone*10)/(ci->id3->frequency/100);
         ci->set_elapsed(elapsedtime);
 
-        memmove(buf,&buf[consumed],bytesleft-consumed);
-        bytesleft-=consumed;
+        ci->advance_buffer(consumed);
 
-        n=ci->read_filebuf(&buf[bytesleft],sizeof(buf)-bytesleft);
-        if (n > 0) {
-            bytesleft+=n;
-        }
+        buf = ci->request_buffer(&bytesleft, MAX_FRAMESIZE);
     }
     LOGF("FLAC: Decoded %d samples\n",samplesdone);
 
