@@ -72,7 +72,7 @@ char * menu_get_itemname(int selected_item, void * data, char *buffer)
     return(P2STR(local_menus->items[selected_item].desc));
 }
 
-int menu_find_free_menu()
+int menu_find_free(void)
 {
     int i;
     /* Tries to find an unused slot to put the new menu */
@@ -92,7 +92,7 @@ int menu_find_free_menu()
 int menu_init(const struct menu_item* mitems, int count, int (*callback)(int, int),
               const char *button1, const char *button2, const char *button3)
 {
-    int menu=menu_find_free_menu();
+    int menu=menu_find_free();
     if(menu==-1)/* Out of menus */
         return -1;
     menus[menu].items = (struct menu_item*)mitems; /* de-const */
