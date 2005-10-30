@@ -157,10 +157,6 @@ int menu_show(int m)
 #ifdef MENU_RC_ENTER
             case MENU_RC_ENTER:
 #endif
-                /* Erase current display state */
-                /*lcd_clear_display();
-                return menus[m].cursor;
-                */
                 return gui_synclist_get_sel_pos(&(menus[m].synclist));
             case MENU_EXIT:
 #ifdef MENU_EXIT2
@@ -181,7 +177,6 @@ int menu_show(int m)
                     return MENU_ATTACHED_USB;
                 break;
         }
-        gui_syncstatusbar_draw(&statusbars, false);
     }
     return MENU_SELECTED_EXIT;
 }
@@ -189,8 +184,9 @@ int menu_show(int m)
 
 bool menu_run(int m)
 {
+    int selected;
     while (1) {
-        switch (menu_show(m))
+        switch (selected=menu_show(m))
         {
             case MENU_SELECTED_EXIT:
                 return false;
@@ -200,10 +196,10 @@ bool menu_run(int m)
 
             default:
             {
-                int selected=gui_synclist_get_sel_pos(&(menus[m].synclist));
                 if (menus[m].items[selected].function &&
                     menus[m].items[selected].function())
                     return  true;
+                gui_syncstatusbar_draw(&statusbars, true);
             }
         }
     }
