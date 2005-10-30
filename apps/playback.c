@@ -1149,6 +1149,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     }
 
     /* Do some initial file buffering. */
+    mutex_lock(&mutex_bufferfill);
     i = tracks[track_widx].start_pos;
     size = MIN(size, AUDIO_FILL_CYCLE);
     while (i < size) {
@@ -1167,6 +1168,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
             tracks[track_widx].filesize = 0;
             tracks[track_widx].filerem = 0;
             close(fd);
+            mutex_unlock(&mutex_bufferfill);
             return false;
         }
         buf_widx += rc;
@@ -1178,6 +1180,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
         filebufused += rc;
         fill_bytesleft -= rc;
     }
+    mutex_unlock(&mutex_bufferfill);
     
     if (!start_play)
         track_count++;
@@ -1228,6 +1231,7 @@ void audio_play_start(int offset)
     fill_bytesleft = filebuflen;
     filling = true;
     last_peek_offset = -1;
+    
     if (audio_load_track(offset, true, 0)) {
         if (track_buffer_callback) {
             cur_ti->event_sent = true;
