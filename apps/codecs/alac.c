@@ -27,9 +27,6 @@ extern char iramstart[];
 extern char iramend[];
 #endif
 
-#define destBufferSize (1024*16)
-
-char inputBuffer[1024*32];    /* Input buffer */
 int32_t outputbuffer[ALAC_MAX_CHANNELS][ALAC_BLOCKSIZE] IBSS_ATTR;
 
 struct codec_api* rb;
@@ -125,23 +122,7 @@ enum codec_status codec_start(struct codec_api* api)
 
     buffer=ci->request_buffer((long*)&n,sample_byte_size);
     if (n!=sample_byte_size) {
-      /* The decode_frame function requires the whole frame, so if we
-         can't get it contiguously from the buffer, then we need to
-         copy it via a read - i.e. we are at the buffer wraparound
-         point */
-
-      /* Check we estimated the maximum buffer size correctly */
-      if (sample_byte_size > sizeof(inputBuffer)) {
-        LOGF("ALAC: Input buffer < %d bytes\n",sample_byte_size);
         return CODEC_ERROR;
-      }
-
-      n=ci->read_filebuf(inputBuffer,sample_byte_size);
-      if (n!=sample_byte_size) {
-        LOGF("ALAC: Error reading data\n");
-        return CODEC_ERROR;
-      }
-      buffer=inputBuffer;
     }
 
     /* Decode one block - returned samples will be host-endian */
@@ -149,9 +130,7 @@ enum codec_status codec_start(struct codec_api* api)
     samplesdecoded=alac_decode_frame(&alac, buffer, outputbuffer, rb->yield);
 
     /* Advance codec buffer - unless we did a read */
-    if ((char*)buffer!=(char*)inputBuffer) {
-      ci->advance_buffer(n);
-    }
+    ci->advance_buffer(n);
 
     /* Output the audio */
     rb->yield();
