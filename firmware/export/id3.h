@@ -134,5 +134,6 @@ enum {
 bool mp3info(struct mp3entry *entry, const char *filename, bool v1first);
 char* id3_get_genre(const struct mp3entry* id3);
 char* id3_get_codec(const struct mp3entry* id3);
+int getid3v2len(int fd);
 
 #endif

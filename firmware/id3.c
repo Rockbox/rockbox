@@ -829,7 +829,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
  *
  * Returns: the size of the tag or 0 if none was found
  */
-static int getid3v2len(int fd) 
+int getid3v2len(int fd) 
 {
     char buf[6];
     int offset;

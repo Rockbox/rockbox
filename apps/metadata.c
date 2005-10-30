@@ -785,6 +785,26 @@ static bool get_flac_metadata(int fd, struct mp3entry* id3)
         return rc;
     }
 
+    if (memcmp(buf,"ID3",3) == 0)
+    {
+        /* We have found an ID3v2 tag at the start of the file - find its
+           length and then skip it. 
+         */
+
+        if ((id3->first_frame_offset=getid3v2len(fd)) == 0)
+        {
+            return rc;
+        }
+
+        if ((lseek(fd, id3->first_frame_offset, SEEK_SET) < 0) ||
+            (read(fd, buf, 4) < 4))
+        {
+            return rc;
+        }
+    } else {
+        id3->first_frame_offset=0;
+    }
+
     if (memcmp(buf,"fLaC",4) != 0) 
     {
         return rc;

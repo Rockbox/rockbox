@@ -73,7 +73,7 @@ struct FLACseekpoints {
 struct FLACseekpoints seekpoints[MAX_SUPPORTED_SEEKTABLE_SIZE];
 int nseekpoints;
 
-static bool flac_init(FLACContext* fc)
+static bool flac_init(FLACContext* fc, int first_frame_offset)
 {
     unsigned char buf[255];
     bool found_streaminfo=false;
@@ -87,6 +87,11 @@ static bool flac_init(FLACContext* fc)
     ci->memset(fc,0,sizeof(FLACContext));
     nseekpoints=0;
 
+    /* Skip any foreign tags at start of file */
+    ci->seek_buffer(first_frame_offset);
+
+    fc->metadatalength = first_frame_offset;
+
     if (ci->read_filebuf(buf, 4) < 4)
     {
         return false;
@@ -96,7 +101,7 @@ static bool flac_init(FLACContext* fc)
     {
         return false;
     }
-    fc->metadatalength = 4;
+    fc->metadatalength += 4;
 
     while (!endofmetadata) {
         if (ci->read_filebuf(buf, 4) < 4)
@@ -199,8 +204,7 @@ bool flac_seek(FLACContext* fc, uint32_t newsample) {
 
   offset+=fc->metadatalength;
 
-  if ((off_t)offset < ci->filesize) {
-      ci->seek_buffer(offset);
+  if (ci->seek_buffer(offset)) {
       return true;
   } else {
       return false;
@@ -240,7 +244,12 @@ enum codec_status codec_start(struct codec_api* api)
     
     next_track:
 
-    if (!flac_init(&fc)) {
+    if (codec_init(api)) {
+        LOGF("FLAC: Error initialising codec\n");
+        return CODEC_ERROR;
+    }
+
+    if (!flac_init(&fc,ci->id3->first_frame_offset)) {
         LOGF("FLAC: Error initialising codec\n");
         return CODEC_ERROR;
     }
