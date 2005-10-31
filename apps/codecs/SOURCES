@@ -7,4 +7,5 @@ a52.c
 mpc.c
 wavpack.c
 alac.c
+aac.c
 #endif

@@ -35,6 +35,8 @@ codecs/SOURCES
 codecs/*.[ch]
 codecs/Makefile
 codecs/liba52/*
+codecs/libfaad/*
+codecs/libfaad/codebook/*
 codecs/libffmpegFLAC/*
 codecs/libmad/*
 codecs/libwavpack/*

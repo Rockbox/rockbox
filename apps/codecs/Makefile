@@ -17,7 +17,7 @@ ifdef APPEXTRA
 endif
 
 ifdef SOFTWARECODECS
-   CODECLIBS = -lmad -la52 -lffmpegFLAC -lTremor -lwavpack -lmusepack -lalac -lm4a
+   CODECLIBS = -lmad -la52 -lffmpegFLAC -lTremor -lwavpack -lmusepack -lalac -lfaad -lm4a
 endif
 
 # we "borrow" the plugin LDS file
@@ -39,7 +39,7 @@ DIRS = .
 
 CODECDEPS = $(LINKCODEC) $(BUILDDIR)/libcodec.a
 
-.PHONY: libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libm4a
+.PHONY: libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a
 
 OUTPUT = $(SOFTWARECODECS)
 
@@ -61,6 +61,7 @@ $(OBJDIR)/mpc.elf: $(OBJDIR)/mpc.o $(CODECDEPS) $(BUILDDIR)/libmusepack.a
 $(OBJDIR)/wav.elf: $(OBJDIR)/wav.o $(CODECDEPS)
 $(OBJDIR)/wavpack.elf: $(OBJDIR)/wavpack.o $(CODECDEPS) $(BUILDDIR)/libwavpack.a
 $(OBJDIR)/alac.elf: $(OBJDIR)/alac.o $(CODECDEPS) $(BUILDDIR)/libalac.a $(BUILDDIR)/libm4a.a
+$(OBJDIR)/aac.elf: $(OBJDIR)/aac.o $(CODECDEPS) $(BUILDDIR)/libfaad.a $(BUILDDIR)/libm4a.a
 
 $(OBJDIR)/%.elf: $(OBJDIR)/%.o $(CODECDEPS)
 	$(ELFIT)
@@ -162,9 +163,14 @@ libm4a:
 	@mkdir -p $(OBJDIR)/libm4a
 	@$(MAKE) -C libm4a OBJDIR=$(OBJDIR)/libm4a OUTPUT=$(BUILDDIR)/libm4a.a
 
+libfaad:
+	@echo "MAKE in libfaad"
+	@mkdir -p $(OBJDIR)/libfaad
+	@$(MAKE) -C libfaad OBJDIR=$(OBJDIR)/libfaad OUTPUT=$(BUILDDIR)/libfaad.a
+
 clean:
 	@echo "cleaning codecs"
-	$(SILENT)rm -fr $(OBJDIR)/libmad $(BUILDDIR)/libmad.a $(OBJDIR)/liba52 $(OBJDIR)/libffmpegFLAC $(BUILDDIR)/libffmpegFLAC.a $(OBJDIR)/Tremor $(OBJDIR)/libwavpack $(OBJDIR)/dumb $(BUILDDIR)/libdumb.a $(BUILDDIR)/libdumbd.a $(OBJDIR)/libmusepack $(BUILDDIR)/libmusepack.a $(OBJDIR)/libalac $(BUILDDIR)/libalac.a $(OBJDIR)/libm4a $(BUILDDIR)/libm4a.a
+	$(SILENT)rm -fr $(OBJDIR)/libmad $(BUILDDIR)/libmad.a $(OBJDIR)/liba52 $(OBJDIR)/libffmpegFLAC $(OBJDIR)/Tremor $(OBJDIR)/libwavpack $(OBJDIR)/dumb $(BUILDDIR)/libdumb.a $(BUILDDIR)/libdumbd.a $(OBJDIR)/libmusepack $(BUILDDIR)/libmusepack.a $(OBJDIR)/libalac $(BUILDDIR)/libalac.a $(OBJDIR)/libfaad $(BUILDDIR)/libfaad.a $(OBJDIR)/libm4a $(BUILDDIR)/libm4a.a
 	@$(MAKE) -C libmad clean OBJDIR=$(OBJDIR)/libmad
 	@$(MAKE) -C liba52 clean OBJDIR=$(OBJDIR)/liba52
 	@$(MAKE) -C libffmpegFLAC clean OBJDIR=$(OBJDIR)/libffmpegFLAC
@@ -172,6 +178,7 @@ clean:
 	@$(MAKE) -C libwavpack clean OBJDIR=$(OBJDIR)/libwavpack
 	@$(MAKE) -C libmusepack clean OBJDIR=$(OBJDIR)/libmusepack
 	@$(MAKE) -C libalac clean OBJDIR=$(OBJDIR)/libalac
+	@$(MAKE) -C libfaad clean OBJDIR=$(OBJDIR)/libfaad
 	@$(MAKE) -C libm4a clean OBJDIR=$(OBJDIR)/libm4a
 	@$(MAKE) -C dumb clean OBJDIR=$(OBJDIR)/dumb
 	@$(MAKE) -C lib clean OBJDIR=$(OBJDIR)/lib

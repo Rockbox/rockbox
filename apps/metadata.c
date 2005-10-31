@@ -76,6 +76,7 @@ static const struct format_list formats[] =
     { AFMT_A52,           "ac3"  },
     { AFMT_WAVPACK,       "wv"   },
     { AFMT_ALAC,          "m4a"  },
+    { AFMT_AAC,           "mp4"  },
 };
 
 static const unsigned short a52_bitrates[] =
@@ -965,7 +966,7 @@ static bool get_wave_metadata(int fd, struct mp3entry* id3)
 
 
 
-static bool get_alac_metadata(int fd, struct mp3entry* id3)
+static bool get_m4a_metadata(int fd, struct mp3entry* id3)
 {
   unsigned char* buf;
   unsigned long totalsamples;
@@ -1171,8 +1172,15 @@ static bool get_alac_metadata(int fd, struct mp3entry* id3)
                i+=4;
 
                /* Check the codec type - 'alac' for ALAC, 'mp4a' for AAC */
-               if (memcmp(&buf[i],"alac",4)!=0) {
-		     logf("Not an ALAC file\n");
+               if ((id3->codectype==AFMT_ALAC) && 
+                   (memcmp(&buf[i],"alac",4)!=0)) {
+                 logf("Not an ALAC file\n");
+                 return false;
+               }
+
+               if ((id3->codectype==AFMT_AAC) && 
+                   (memcmp(&buf[i],"mp4a",4)!=0)) {
+                 logf("Not a MP4 AAC file\n");
                  return false;
                }
 
@@ -1425,7 +1433,8 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         break;
 
     case AFMT_ALAC:
-        if (!get_alac_metadata(fd, &(track->id3)))
+    case AFMT_AAC:
+        if (!get_m4a_metadata(fd, &(track->id3)))
         {
 //            return false;
         }

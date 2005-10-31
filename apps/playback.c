@@ -75,6 +75,7 @@ static volatile bool paused;
 #define CODEC_MPC      "/.rockbox/codecs/mpc.codec"
 #define CODEC_WAVPACK  "/.rockbox/codecs/wavpack.codec"
 #define CODEC_ALAC     "/.rockbox/codecs/alac.codec"
+#define CODEC_AAC      "/.rockbox/codecs/aac.codec"
 
 #define AUDIO_FILL_CYCLE             (1024*256)
 #define AUDIO_DEFAULT_WATERMARK      (1024*512)
@@ -898,6 +899,10 @@ bool loadcodec(const char *trackname, bool start_play)
     case AFMT_ALAC:
         logf("Codec: ALAC");
         codec_path = CODEC_ALAC;
+        break;
+    case AFMT_AAC:
+        logf("Codec: AAC");
+        codec_path = CODEC_AAC;
         break;
     default:
         logf("Codec: Unsupported");
