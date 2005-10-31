@@ -132,7 +132,7 @@ void* memchr(const void *s, int c, size_t n)
     return(local_rb->memchr(s,c,n));
 }
 
-void* memmove(const void *s1, const void *s2, size_t n)
+void* memmove(void *s1, const void *s2, size_t n)
 {
     char* dest=(char*)s1;
     char* src=(char*)s2;
