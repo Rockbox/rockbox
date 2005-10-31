@@ -161,6 +161,7 @@ static bool read_chunk_esds(qtmovie_t *qtmovie, size_t chunk_len)
     int32_t maxBitrate;
     int32_t avgBitrate;
 
+    (void)chunk_len;
     /* version and flags */
     temp=stream_read_uint32(qtmovie->stream);
 
