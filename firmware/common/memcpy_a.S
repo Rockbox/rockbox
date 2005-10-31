@@ -78,13 +78,12 @@ _memcpy:
 
     /* selector for main copy loop */
 .end_b1:
-    mov     r6,r3       /* move end address to r3 */
     mov     #3,r1
     and     r4,r1       /* r1 = dest alignment offset */
-    sub     r1,r4       /* r4 now long aligned */
     mova    .jmptab,r0
     mov.b   @(r0,r1),r1 /* select appropriate main loop */
     add     r0,r1
+    mov     r6,r3       /* move end address to r3 */
     jmp     @r1         /* and jump to it */
     add     #-7,r3      /* adjust end addr for main loops doing 2 longs/pass */
     
@@ -94,11 +93,11 @@ _memcpy:
     .align  2
 .loop_do0:
     mov.l   @r5+,r1     /* load first long & increment source addr */
-    add     #8,r4       /* increment dest addr */
+    add     #16,r4      /* increment dest addr & account for decrementing stores */
     mov.l   @r5+,r0     /* load second long & increment source addr */
     cmp/hi  r5,r3       /* runs r5 up to last or second last long bound */
-    mov.l   r1,@r4      /* store first long */
-    mov.l   r0,@(4,r4)  /* store second long; NOT ALIGNED - no speed loss here! */
+    mov.l   r0,@-r4     /* store second long */
+    mov.l   r1,@-r4     /* store first long; NOT ALIGNED - no speed loss here! */
     bt      .loop_do0
     
     add     #4,r3       /* readjust end address */
@@ -109,22 +108,21 @@ _memcpy:
     add     #4,r4       /* increment dest addr */
     bra     .start_b2   /* jump to trailing byte loop */
     mov.l   r0,@(4,r4)  /* store last long */
-    
+
     /* word aligned destination (long + 2) */
     .align  2
 .loop_do2:
     mov.l   @r5+,r1     /* load first long & increment source addr */
-    add     #8,r4       /* increment dest addr */
+    add     #16,r4      /* increment dest addr */
     mov.l   @r5+,r0     /* load second long & increment source addr */
     cmp/hi  r5,r3       /* runs r5 up to last or second last long bound */
-    mov.w   r0,@(8,r4)  /* store low word of second long */
+    mov.w   r0,@-r4     /* store low word of second long */
     xtrct   r1,r0       /* extract low word of first long & high word of second long */
-    mov.l   r0,@(4,r4)  /* and store as long */
+    mov.l   r0,@-r4     /* and store as long */
     swap.w  r1,r0       /* get high word of first long */
-    mov.w   r0,@(2,r4)  /* and store it */
+    mov.w   r0,@-r4     /* and store it */
     bt      .loop_do2
 
-    add     #2,r4       /* readjust destination */
     add     #4,r3       /* readjust end address */
     cmp/hi  r5,r3       /* one long left? */
     bf      .start_b2   /* no, jump to trailing byte loop */
@@ -148,62 +146,59 @@ _memcpy:
     .align  2
 .loop_do1:
     mov.l   @r5+,r1     /* load first long & increment source addr */
-    add     #8,r4       /* increment dest addr */
+    add     #16,r4      /* increment dest addr */
     mov.l   @r5+,r0     /* load second long & increment source addr */
     mov     r1,r2       /* copy first long */
-    mov.b   r0,@(8,r4)  /* store low byte of second long */
+    mov.b   r0,@-r4     /* store low byte of second long */
     shlr8   r0          /* get upper 3 bytes */
     shll16  r2          /* move low byte of first long all the way up, .. */
     shll8   r2
-    or      r0,r2       /* ..combine with the 3 bytes of second long.. */
-    mov     r1,r0       /* copy first long to r0 */
-    mov.l   r2,@(4,r4)  /* ..and store as long */
-    shlr8   r0          /* get middle 2 bytes */
-    mov.w   r0,@(2,r4)  /* store as word */
-    shlr16  r0          /* get upper byte */
-    mov.b   r0,@(1,r4)  /* and store */
+    or      r2,r0       /* ..combine with the 3 bytes of second long.. */
     cmp/hi  r5,r3       /* runs r5 up to last or second last long bound */
+    mov.l   r0,@-r4     /* ..and store as long */
+    shlr8   r1          /* get middle 2 bytes */
+    mov.w   r1,@-r4     /* store as word */
+    shlr16  r1          /* get upper byte */
+    mov.b   r1,@-r4     /* and store */
     bt      .loop_do1
     
-.last_do13:
     add     #4,r3       /* readjust end address */
+.last_do13:
     cmp/hi  r5,r3       /* one long left? */
-    bf      .end_do13   /* no, get out of here */
+    bf      .start_b2   /* no, jump to trailing byte loop */
 
     mov.l   @r5+,r0     /* load last long & increment source addr */
-    add     #4,r4       /* increment dest addr */
-    mov.b   r0,@(8,r4)  /* store low byte */
+    add     #12,r4      /* increment dest addr */
+    mov.b   r0,@-r4     /* store low byte */
     shlr8   r0          /* get middle 2 bytes */
-    mov.w   r0,@(6,r4)  /* store as word */
+    mov.w   r0,@-r4     /* store as word */
     shlr16  r0          /* get upper byte */
-    mov.b   r0,@(5,r4)  /* and store */
-
-.end_do13:
+    mov.b   r0,@-r4     /* and store */
     bra     .start_b2   /* jump to trailing byte loop */
-    add     #1,r4       /* readjust destination */
+    add     #-4,r4      /* readjust destination */
 
     /* byte aligned destination (long + 3) */
     .align  2
 .loop_do3:
     mov.l   @r5+,r1     /* load first long & increment source addr */
-    add     #8,r4       /* increment dest addr */
+    add     #16,r4      /* increment dest addr */
     mov.l   @r5+,r0     /* load second long & increment source addr */
     mov     r1,r2       /* copy first long */
-    mov.b   r0,@(10,r4) /* store low byte of second long */
+    mov.b   r0,@-r4     /* store low byte of second long */
     shlr8   r0          /* get middle 2 bytes */
-    mov.w   r0,@(8,r4)  /* store as word */
+    mov.w   r0,@-r4     /* store as word */
     shlr16  r0          /* get upper byte */
     shll8   r2          /* move lower 3 bytes of first long one up.. */
     or      r2,r0       /* ..combine with the 1 byte of second long.. */
-    mov.l   r0,@(4,r4)  /* ..and store as long */
-    swap.w  r1,r0       /* swap-copy first long */
-    shlr8   r0          /* get original upper byte.. */
+    mov.l   r0,@-r4     /* ..and store as long */
+    shlr16  r1          /* get upper byte of first long.. */
+    shlr8   r1
     cmp/hi  r5,r3       /* runs r5 up to last or second last long bound */
-    mov.b   r0,@(3,r4)  /* ..and store */
+    mov.b   r1,@-r4     /* ..and store */
     bt      .loop_do3
 
     bra     .last_do13  /* handle last longword: reuse routine for (long + 1) */
-    add     #2,r4       /* correct the offset difference to do1 */
+    add     #4,r3       /* readjust end address */
 
     /* trailing byte loop: copies 0..3 bytes (or all for < 11 in total) */
     .align  2
