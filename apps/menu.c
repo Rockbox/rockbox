@@ -43,7 +43,6 @@
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
-//#include "widgets.h"
 #endif
 
 /* gui api */
@@ -157,7 +156,12 @@ int menu_show(int m)
 #ifdef MENU_RC_ENTER
             case MENU_RC_ENTER:
 #endif
+#ifdef MENU_RC_ENTER2
+            case MENU_RC_ENTER2:
+#endif
                 return gui_synclist_get_sel_pos(&(menus[m].synclist));
+
+
             case MENU_EXIT:
 #ifdef MENU_EXIT2
             case MENU_EXIT2:
@@ -168,7 +172,10 @@ int menu_show(int m)
 #ifdef MENU_RC_EXIT
             case MENU_RC_EXIT:
 #endif
-                lcd_stop_scroll();
+#ifdef MENU_RC_EXIT_MENU
+            case MENU_RC_EXIT_MENU:
+#endif
+                //lcd_stop_scroll();
                 exit = true;
                 break;
 
@@ -177,6 +184,7 @@ int menu_show(int m)
                     return MENU_ATTACHED_USB;
                 break;
         }
+        gui_syncstatusbar_draw(&statusbars, false);
     }
     return MENU_SELECTED_EXIT;
 }

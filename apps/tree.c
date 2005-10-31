@@ -683,7 +683,11 @@ static bool dirbrowse(void)
             case TREE_RC_MENU:
 #endif
 #ifdef TREE_MENU_PRE
-                if (lastbutton != TREE_MENU_PRE)
+                if (lastbutton != TREE_MENU_PRE
+#ifdef TREE_RC_MENU_PRE
+                    && lastbutton != TREE_RC_MENU_PRE
+#endif
+                    )
                     break;
 #endif
                 /* don't enter menu from plugin browser */

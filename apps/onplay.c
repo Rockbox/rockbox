@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Björn Stenberg
+ * Copyright (C) 2002 Bjï¿½n Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -510,7 +510,11 @@ static int onplay_callback(int key, int menu)
 {
     (void)menu;
 
-    if (key == MENU_EXIT_MENU)
+    if (key == MENU_EXIT_MENU
+#ifdef MENU_RC_EXIT_MENU
+        || key == MENU_RC_EXIT_MENU
+#endif
+       )
         exit_to_main = true;
 
     return key;
