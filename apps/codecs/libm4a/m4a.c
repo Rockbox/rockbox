@@ -102,7 +102,14 @@ uint8_t stream_read_uint8(stream_t *stream)
 void stream_skip(stream_t *stream, size_t skip)
 {
   (void)stream;
-  stream->ci->advance_buffer(skip);
+#if 1
+  char buf;
+  while (skip > 0) {
+    stream->ci->read_filebuf(&buf,1);
+    skip--;
+  }
+#endif
+  //stream->ci->advance_buffer(skip);
 }
 
 int stream_eof(stream_t *stream)
