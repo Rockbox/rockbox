@@ -39,6 +39,7 @@ enum {
     AFMT_A52,          /* A/52 (aka AC3) audio */
     AFMT_WAVPACK,      /* WavPack */
     AFMT_ALAC,         /* Apple Lossless Audio Codec */
+    AFMT_AAC,          /* Advanced Audio Coding (AAC) in M4A container */
 
     /* New formats must be added to the end of this list */
 

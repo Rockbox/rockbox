@@ -99,6 +99,7 @@ static const char* const codec_labels[] = {
   "AC3",  /* A/52 (aka AC3) audio */
   "WV",   /* WavPack */
   "ALAC", /* Apple Lossless Audio Codec */
+  "AAC",  /* Advanced Audio Coding in M4A container */
 #endif
 };
 
