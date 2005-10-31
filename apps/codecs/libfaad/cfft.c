@@ -870,6 +870,7 @@ static void cffti1(uint16_t n, complex_t *wa, uint16_t *ifac)
     uint16_t ib;
     uint16_t nf, nl, nq, nr;
 
+    (void)wa;
     nl = n;
     nf = 0;
     j = 0;

@@ -55,8 +55,9 @@ void hf_adjustment(sbr_info *sbr, qmf_t Xsbr[MAX_NTSRHFG][64]
 #endif
                    ,uint8_t ch)
 {
-    ALIGN sbr_hfadj_info adj = {{{0}}};
+    ALIGN sbr_hfadj_info adj;
 
+    memset(&adj,0,sizeof(adj));
     if (sbr->bs_frame_class[ch] == FIXFIX)
     {
         sbr->l_A[ch] = -1;
@@ -131,6 +132,7 @@ static void estimate_current_envelope(sbr_info *sbr, sbr_hfadj_info *adj,
     uint8_t m, l, j, k, k_l, k_h, p;
     real_t nrg, div;
 
+    (void)adj;
     if (sbr->bs_interpol_freq == 1)
     {
         for (l = 0; l < sbr->L_E[ch]; l++)

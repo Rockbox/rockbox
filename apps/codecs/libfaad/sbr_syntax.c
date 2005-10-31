@@ -821,6 +821,7 @@ static uint16_t sbr_extension(bitfile *ld, sbr_info *sbr,
     uint16_t ret;
 #endif
 
+    (void)num_bits_left;
     switch (bs_extension_id)
     {
 #ifdef PS_DEC

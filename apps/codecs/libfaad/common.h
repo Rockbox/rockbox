@@ -32,8 +32,24 @@
 extern "C" {
 #endif
 
-#ifdef HAVE_CONFIG_H
-#  include "../config.h"
+#include "faad_config.h"
+#include "../codec.h"
+#include "../lib/codeclib.h"
+
+extern struct codec_api* ci;
+
+#if defined(DEBUG) || defined(SIMULATOR)
+#undef DEBUGF
+#define DEBUGF ci->debugf
+#else
+#define DEBUGF(...)
+#endif
+
+#ifdef ROCKBOX_HAS_LOGF
+#undef LOGF
+#define LOGF ci->logf
+#else
+#define LOGF(...)
 #endif
 
 #define INLINE __inline
@@ -55,7 +71,7 @@ extern "C" {
 /* use double precision */
 /* #define USE_DOUBLE_PRECISION */
 /* use fixed point reals */
-//#define FIXED_POINT
+#define FIXED_POINT
 //#define BIG_IQ_TABLE
 
 /* Use if target platform has address generators with autoincrement */
@@ -72,7 +88,7 @@ extern "C" {
 /* Allow decoding of MAIN profile AAC */
 #define MAIN_DEC
 /* Allow decoding of SSR profile AAC */
-//#define SSR_DEC
+#define SSR_DEC
 /* Allow decoding of LTP profile AAC */
 #define LTP_DEC
 /* Allow decoding of LD profile AAC */
@@ -183,10 +199,10 @@ typedef float float32_t;
 # if !STDC_HEADERS && HAVE_MEMORY_H
 #  include <memory.h>
 # endif
-# include <string.h>
+//# include <string.h>
 #endif
 #if HAVE_STRINGS_H
-# include <strings.h>
+//# include <strings.h>
 #endif
 #if HAVE_INTTYPES_H
 # include <inttypes.h>
@@ -214,7 +230,7 @@ typedef float float32_t;
 #endif
 
 #if STDC_HEADERS
-# include <string.h>
+//# include <string.h>
 #else
 # if !HAVE_STRCHR
 #  define strchr index

@@ -32,6 +32,8 @@
 #include <string.h>
 #include "bits.h"
 
+uint8_t static_buffer[1024] IBSS_ATTR;
+
 /* initialize buffer, call once before first getbits or showbits */
 void faad_initbits(bitfile *ld, const void *_buffer, const uint32_t buffer_size)
 {
@@ -49,7 +51,7 @@ void faad_initbits(bitfile *ld, const void *_buffer, const uint32_t buffer_size)
         return;
     }
 
-    ld->buffer = faad_malloc((buffer_size+12)*sizeof(uint8_t));
+    ld->buffer = &static_buffer; 
     memset(ld->buffer, 0, (buffer_size+12)*sizeof(uint8_t));
     memcpy(ld->buffer, _buffer, buffer_size*sizeof(uint8_t));
 

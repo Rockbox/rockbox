@@ -558,14 +558,16 @@ void raw_data_block(NeAACDecHandle hDecoder, NeAACDecFrameInfo *hInfo,
 
 /* Table 4.4.4 and */
 /* Table 4.4.9 */
+ALIGN int16_t spec_data[1024] = {0};
+element sce IBSS_ATTR;
 static uint8_t single_lfe_channel_element(NeAACDecHandle hDecoder, bitfile *ld,
                                           uint8_t channel, uint8_t *tag)
 {
     uint8_t retval = 0;
-    element sce = {0};
     ic_stream *ics = &(sce.ics1);
-    ALIGN int16_t spec_data[1024] = {0};
 
+    memset(spec_data,0,sizeof(spec_data));
+    memset(&sce,0,sizeof(sce));
     sce.element_instance_tag = (uint8_t)faad_getbits(ld, LEN_TAG
         DEBUGVAR(1,38,"single_lfe_channel_element(): element_instance_tag"));
 
@@ -601,16 +603,19 @@ static uint8_t single_lfe_channel_element(NeAACDecHandle hDecoder, bitfile *ld,
 }
 
 /* Table 4.4.5 */
+ALIGN int16_t spec_data1[1024];
+ALIGN int16_t spec_data2[1024];
+element cpe IBSS_ATTR;
 static uint8_t channel_pair_element(NeAACDecHandle hDecoder, bitfile *ld,
                                     uint8_t channels, uint8_t *tag)
 {
-    ALIGN int16_t spec_data1[1024] = {0};
-    ALIGN int16_t spec_data2[1024] = {0};
-    element cpe = {0};
     ic_stream *ics1 = &(cpe.ics1);
     ic_stream *ics2 = &(cpe.ics2);
     uint8_t result;
 
+    memset(spec_data1,0,sizeof(spec_data1));
+    memset(spec_data2,0,sizeof(spec_data2));
+    memset(&cpe,0,sizeof(cpe));
     cpe.channel        = channels;
     cpe.paired_channel = channels+1;
 
@@ -876,7 +881,7 @@ static uint8_t coupling_channel_element(NeAACDecHandle hDecoder, bitfile *ld)
 
     element el_empty = {0};
     ic_stream ics_empty = {0};
-    int16_t sh_data[1024];
+    static int16_t sh_data[1024];
 
     c = faad_getbits(ld, LEN_TAG
         DEBUGVAR(1,900,"coupling_channel_element(): element_instance_tag"));
@@ -960,6 +965,8 @@ static uint16_t data_stream_element(NeAACDecHandle hDecoder, bitfile *ld)
 {
     uint8_t byte_aligned;
     uint16_t i, count;
+
+    (void)hDecoder;
 
     /* element_instance_tag = */ faad_getbits(ld, LEN_TAG
         DEBUGVAR(1,60,"data_stream_element(): element_instance_tag"));
@@ -1158,6 +1165,8 @@ static void gain_control_data(bitfile *ld, ic_stream *ics)
 #endif
 
 #ifdef SCALABLE_DEC
+ALIGN int16_t spec_data1[1024] IBSS_ATTR;
+ALIGN int16_t spec_data2[1024] IBSS_ATTR;
 /* Table 4.4.13 ASME */
 void aac_scalable_main_element(NeAACDecHandle hDecoder, NeAACDecFrameInfo *hInfo,
                                bitfile *ld, program_config *pce, drc_info *drc)
@@ -1170,9 +1179,9 @@ void aac_scalable_main_element(NeAACDecHandle hDecoder, NeAACDecFrameInfo *hInfo
     ic_stream *ics1 = &(cpe.ics1);
     ic_stream *ics2 = &(cpe.ics2);
     int16_t *spec_data;
-    ALIGN int16_t spec_data1[1024] = {0};
-    ALIGN int16_t spec_data2[1024] = {0};
 
+    memset(spec_data1,0,sizeof(spec_data1));
+    memset(spec_data2,0,sizeof(spec_data2));
     hDecoder->fr_ch_ele = 0;
 
     hInfo->error = aac_scalable_main_header(hDecoder, ics1, ics2, ld, this_layer_stereo);
@@ -1810,7 +1819,8 @@ static uint8_t scale_factor_data(NeAACDecHandle hDecoder, ic_stream *ics, bitfil
 /* Table 4.4.27 */
 static void tns_data(ic_stream *ics, tns_info *tns, bitfile *ld)
 {
-    uint8_t w, filt, i, start_coef_bits, coef_bits;
+    uint8_t w, filt, i, start_coef_bits = 0;
+    int8_t coef_bits;
     uint8_t n_filt_bits = 2;
     uint8_t length_bits = 6;
     uint8_t order_bits = 5;
@@ -2048,11 +2058,11 @@ static uint16_t extension_payload(bitfile *ld, drc_info *drc, uint16_t count)
         return n;
     case EXT_FILL_DATA:
         /* fill_nibble = */ faad_getbits(ld, 4
-            DEBUGVAR(1,136,"extension_payload(): fill_nibble")); /* must be ‘0000’ */
+            DEBUGVAR(1,136,"extension_payload(): fill_nibble")); /* must be æ0000Æ */
         for (i = 0; i < count-1; i++)
         {
             /* fill_byte[i] = */ faad_getbits(ld, 8
-                DEBUGVAR(1,88,"extension_payload(): fill_byte")); /* must be ‘10100101’ */
+                DEBUGVAR(1,88,"extension_payload(): fill_byte")); /* must be æ10100101Æ */
         }
         return count;
     case EXT_DATA_ELEMENT:

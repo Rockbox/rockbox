@@ -159,13 +159,14 @@ static INLINE void mdct(fb_info *fb, real_t *in_data, real_t *out_data, uint16_t
 }
 #endif
 
+ALIGN real_t transf_buf[2*1024] = {0};
+
 void ifilter_bank(fb_info *fb, uint8_t window_sequence, uint8_t window_shape,
                   uint8_t window_shape_prev, real_t *freq_in,
                   real_t *time_out, real_t *overlap,
                   uint8_t object_type, uint16_t frame_len)
 {
     int16_t i;
-    ALIGN real_t transf_buf[2*1024] = {0};
 
     const real_t *window_long = NULL;
     const real_t *window_long_prev = NULL;
@@ -182,6 +183,7 @@ void ifilter_bank(fb_info *fb, uint8_t window_sequence, uint8_t window_shape,
     int64_t count = faad_get_ts();
 #endif
 
+    memset(transf_buf,0,sizeof(transf_buf));
     /* select windows of current frame and previous frame (Sine or KBD) */
 #ifdef LD_DEC
     if (object_type == LD)
@@ -331,13 +333,13 @@ void ifilter_bank(fb_info *fb, uint8_t window_sequence, uint8_t window_shape,
 
 
 #ifdef LTP_DEC
+ALIGN real_t windowed_buf[2*1024] = {0};
 /* only works for LTP -> no overlapping, no short blocks */
 void filter_bank_ltp(fb_info *fb, uint8_t window_sequence, uint8_t window_shape,
                      uint8_t window_shape_prev, real_t *in_data, real_t *out_mdct,
                      uint8_t object_type, uint16_t frame_len)
 {
     int16_t i;
-    ALIGN real_t windowed_buf[2*1024] = {0};
 
     const real_t *window_long = NULL;
     const real_t *window_long_prev = NULL;
@@ -348,8 +350,9 @@ void filter_bank_ltp(fb_info *fb, uint8_t window_sequence, uint8_t window_shape,
     uint16_t nshort = frame_len/8;
     uint16_t nflat_ls = (nlong-nshort)/2;
 
-    assert(window_sequence != EIGHT_SHORT_SEQUENCE);
+    //assert(window_sequence != EIGHT_SHORT_SEQUENCE);
 
+    memset(windowed_buf,0,sizeof(windowed_buf));
 #ifdef LD_DEC
     if (object_type == LD)
     {

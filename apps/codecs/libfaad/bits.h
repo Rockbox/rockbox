@@ -144,7 +144,7 @@ static INLINE void faad_flushbits(bitfile *ld, uint32_t bits)
 }
 
 /* return next n bits (right adjusted) */
-static INLINE uint32_t faad_getbits(bitfile *ld, uint32_t n DEBUGDEC)
+static uint32_t faad_getbits(bitfile *ld, uint32_t n DEBUGDEC)
 {
     uint32_t ret;
 

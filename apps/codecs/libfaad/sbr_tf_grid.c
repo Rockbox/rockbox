@@ -50,7 +50,8 @@ static uint8_t middleBorder(sbr_info *sbr, uint8_t ch);
 /* first build into temp vector to be able to use previous vector on error */
 uint8_t envelope_time_border_vector(sbr_info *sbr, uint8_t ch)
 {
-    uint8_t l, border, temp;
+    uint8_t l, temp;
+    int8_t border;
     uint8_t t_E_temp[6] = {0};
 
     t_E_temp[0] = sbr->rate * sbr->abs_bord_lead[ch];

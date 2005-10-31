@@ -217,8 +217,8 @@ uint8_t reordered_spectral_data(NeAACDecHandle hDecoder, ic_stream *ics,
     uint16_t PCWs_done;
     uint16_t numberOfSegments, numberOfSets, numberOfCodewords;  
 
-    codeword_t codeword[512];
-    bits_t segment[512];
+    static codeword_t codeword[512];
+    static bits_t segment[512];
 
     uint16_t sp_offset[8];
     uint16_t g, i, sortloop, set, bitsread;

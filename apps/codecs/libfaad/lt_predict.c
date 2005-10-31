@@ -77,6 +77,8 @@ ALIGN static const real_t codebook[8] =
     REAL_CONST(1.369533)
 };
 
+ALIGN real_t x_est[2048];
+ALIGN real_t X_est[2048];
 void lt_prediction(ic_stream *ics, ltp_info *ltp, real_t *spec,
                    int16_t *lt_pred_stat, fb_info *fb, uint8_t win_shape,
                    uint8_t win_shape_prev, uint8_t sr_index,
@@ -84,8 +86,6 @@ void lt_prediction(ic_stream *ics, ltp_info *ltp, real_t *spec,
 {
     uint8_t sfb;
     uint16_t bin, i, num_samples;
-    ALIGN real_t x_est[2048];
-    ALIGN real_t X_est[2048];
 
     if (ics->window_sequence != EIGHT_SHORT_SEQUENCE)
     {

@@ -409,7 +409,7 @@ uint8_t window_grouping_info(NeAACDecHandle hDecoder, ic_stream *ics)
     }
 }
 
-/* iquant() *
+/* iquant() */
 /* output = sign(input)*abs(input)^(4/3) */
 /**/
 static INLINE real_t iquant(int16_t q, const real_t *tab, uint8_t *error)
@@ -543,6 +543,7 @@ static uint8_t quant_to_spec(NeAACDecHandle hDecoder,
     };
     const real_t *tab = iq_table;
 
+    (void)frame_len;
     uint8_t g, sfb, win;
     uint16_t width, bin, k, gindex, wa, wb;
     uint8_t error = 0; /* Init error flag */
@@ -856,7 +857,7 @@ uint8_t reconstruct_single_channel(NeAACDecHandle hDecoder, ic_stream *ics,
                                    element *sce, int16_t *spec_data)
 {
     uint8_t retval, output_channels;
-    ALIGN real_t spec_coef[1024];
+    ALIGN static real_t spec_coef[1024];
 
 #ifdef PROFILE
     int64_t count = faad_get_ts();
@@ -1048,8 +1049,8 @@ uint8_t reconstruct_channel_pair(NeAACDecHandle hDecoder, ic_stream *ics1, ic_st
                                  element *cpe, int16_t *spec_data1, int16_t *spec_data2)
 {
     uint8_t retval;
-    ALIGN real_t spec_coef1[1024];
-    ALIGN real_t spec_coef2[1024];
+    ALIGN static real_t spec_coef1[1024];
+    ALIGN static real_t spec_coef2[1024];
 
 #ifdef PROFILE
     int64_t count = faad_get_ts();

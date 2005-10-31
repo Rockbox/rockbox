@@ -628,14 +628,14 @@ static void patch_construction(sbr_info *sbr)
 
     do
     {
-        uint8_t j = k + 1;
+        int8_t j = k + 1;
 
         do
         {
             j--;
-
             sb = sbr->f_master[j];
             odd = (sb - 2 + sbr->k0) % 2;
+
         } while (sb > (sbr->k0 - 1 + msb - odd));
 
         sbr->patchNoSubbands[sbr->noPatches] = max(sb - usb, 0);

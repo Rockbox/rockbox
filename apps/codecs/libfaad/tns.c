@@ -36,9 +36,9 @@
 static void tns_decode_coef(uint8_t order, uint8_t coef_res_bits, uint8_t coef_compress,
                             uint8_t *coef, real_t *a);
 static void tns_ar_filter(real_t *spectrum, uint16_t size, int8_t inc, real_t *lpc,
-                          uint8_t order);
+                          int8_t order);
 static void tns_ma_filter(real_t *spectrum, uint16_t size, int8_t inc, real_t *lpc,
-                          uint8_t order);
+                          int8_t order);
 
 
 #ifdef _MSC_VER
@@ -226,7 +226,7 @@ static void tns_decode_coef(uint8_t order, uint8_t coef_res_bits, uint8_t coef_c
 }
 
 static void tns_ar_filter(real_t *spectrum, uint16_t size, int8_t inc, real_t *lpc,
-                          uint8_t order)
+                          int8_t order)
 {
     /*
      - Simple all-pole filter of order "order" defined by
@@ -269,7 +269,7 @@ static void tns_ar_filter(real_t *spectrum, uint16_t size, int8_t inc, real_t *l
 }
 
 static void tns_ma_filter(real_t *spectrum, uint16_t size, int8_t inc, real_t *lpc,
-                          uint8_t order)
+                          int8_t order)
 {
     /*
      - Simple all-zero filter of order "order" defined by

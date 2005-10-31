@@ -60,7 +60,7 @@ mdct_info *faad_mdct_init(uint16_t N)
 {
     mdct_info *mdct = (mdct_info*)faad_malloc(sizeof(mdct_info));
 
-    assert(N % 8 == 0);
+    //assert(N % 8 == 0);
 
     mdct->N = N;
 
@@ -123,10 +123,10 @@ void faad_imdct(mdct_info *mdct, real_t *X_in, real_t *X_out)
     complex_t x;
 #ifdef ALLOW_SMALL_FRAMELENGTH
 #ifdef FIXED_POINT
-    real_t scale, b_scale = 0;
+    real_t scale = 0, b_scale = 0;
 #endif
 #endif
-    ALIGN complex_t Z1[512];
+    ALIGN static complex_t Z1[512];
     complex_t *sincos = mdct->sincos;
 
     uint16_t N  = mdct->N;
@@ -230,7 +230,7 @@ void faad_mdct(mdct_info *mdct, real_t *X_in, real_t *X_out)
     uint16_t k;
 
     complex_t x;
-    ALIGN complex_t Z1[512];
+    ALIGN static complex_t Z1[512];
     complex_t *sincos = mdct->sincos;
 
     uint16_t N  = mdct->N;

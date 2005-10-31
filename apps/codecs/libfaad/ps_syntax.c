@@ -469,6 +469,7 @@ static uint16_t ps_extension(ps_info *ps, bitfile *ld,
     uint8_t n;
     uint16_t bits = (uint16_t)faad_get_processed_bits(ld);
 
+    (void)num_bits_left;
     if (ps_extension_id == 0)
     {
         ps->enable_ipdopd = (uint8_t)faad_get1bit(ld

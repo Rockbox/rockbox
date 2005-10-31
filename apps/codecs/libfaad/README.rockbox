@@ -1,0 +1,19 @@
+Library: libfaad (FAAD2)
+Imported: 2005-10-31 by Dave Chapman
+
+This directory contains the libfaad library from the FAAD2 project.
+
+LICENSING INFORMATION
+
+FAAD2 is licensed under the GNU General Public License and is
+Copyright (C) 2003 M. Bakker (mbakker(at)nero.com), Ahead Software AG
+
+IMPORT DETAILS
+
+The decoder is based on the CVS version of libfaad from 2 February 2005.
+
+A non GPL compatible clause was added to the license as part of the
+CVS commit on 2 February 2005 - so we are not able to use later
+versions of that project in Rockbox.
+
+

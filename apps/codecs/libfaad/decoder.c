@@ -53,7 +53,7 @@ uint16_t dbg_count;
 /* static function declarations */
 static void* aac_frame_decode(NeAACDecHandle hDecoder, NeAACDecFrameInfo *hInfo,
                               uint8_t *buffer, uint32_t buffer_size,
-                              void **sample_buffer, uint32_t sample_buffer_size);
+                              void **sample_buffer, int32_t sample_buffer_size);
 static void create_channel_config(NeAACDecHandle hDecoder, NeAACDecFrameInfo *hInfo);
 
 
@@ -724,7 +724,7 @@ void* NEAACDECAPI NeAACDecDecode2(NeAACDecHandle hDecoder,
 
 static void* aac_frame_decode(NeAACDecHandle hDecoder, NeAACDecFrameInfo *hInfo,
                               uint8_t *buffer, uint32_t buffer_size,
-                              void **sample_buffer2, uint32_t sample_buffer_size)
+                              void **sample_buffer2, int32_t sample_buffer_size)
 {
     uint8_t channels = 0;
     uint8_t output_channels = 0;
