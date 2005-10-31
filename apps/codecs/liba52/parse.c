@@ -48,8 +48,8 @@ typedef struct {
     int q4_ptr;
 } quantizer_set_t;
 
-static a52_state_t istate IDATA_ATTR;
-static sample_t isamples[256*12]  IDATA_ATTR;
+static a52_state_t istate IBSS_ATTR;
+static sample_t isamples[256*12] IBSS_ATTR;
 
 static uint8_t halfrate[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3};
 
