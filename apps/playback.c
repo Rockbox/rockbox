@@ -576,7 +576,7 @@ static bool rebuffer_and_seek(int newpos)
     ci.curpos = newpos;
     cur_ti->available = 0;
     lseek(current_fd, newpos, SEEK_SET);
-        
+
     mutex_unlock(&mutex_bufferfill);
 
     while (cur_ti->available == 0 && cur_ti->filerem > 0) {
@@ -584,7 +584,7 @@ static bool rebuffer_and_seek(int newpos)
         if (ci.stop_codec || ci.reload_codec)
             return false;
     }
-
+    
     return true;
 }
 
@@ -1365,7 +1365,9 @@ void audio_check_buffer(void)
         || ci.reload_codec) && !filling)
         return ;
     
+    mutex_lock(&mutex_bufferfill);
     initialize_buffer_fill();
+    mutex_unlock(&mutex_bufferfill);
     
     /* Limit buffering size at first run. */
     if (conf_bufferlimit && fill_bytesleft > conf_bufferlimit
@@ -1673,6 +1675,12 @@ void audio_thread(void)
                     break ;
                 }
                 
+                /* Do not start crossfading if audio is paused. */
+                if (paused) {
+                    audio_stop_playback();
+                    paused = false;
+                }
+            
                 logf("starting...");
                 playing = true;
                 ci.stop_codec = true;
@@ -1964,8 +1972,6 @@ void audio_play(int offset)
 {
     logf("audio_play");
     last_index = -1;
-    paused = false;
-    pcm_play_pause(true);
     queue_post(&audio_queue, AUDIO_PLAY, (void *)offset);
 }
 
