@@ -34,6 +34,7 @@ plugins/midi/*.[ch]
 codecs/SOURCES
 codecs/*.[ch]
 codecs/Makefile
+codecs/libm4a/*
 codecs/liba52/*
 codecs/libfaad/*
 codecs/libfaad/codebook/*
