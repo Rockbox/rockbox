@@ -318,6 +318,10 @@ int8_t NEAACDECAPI NeAACDecInit2(NeAACDecHandle hDecoder, uint8_t *pBuffer,
     hDecoder->adif_header_present = 0;
     hDecoder->adts_header_present = 0;
 
+    #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+    coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
+    #endif
+
     /* decode the audio specific config */
     rc = AudioSpecificConfig2(pBuffer, SizeOfDecoderSpecificInfo, &mp4ASC,
         &(hDecoder->pce));
