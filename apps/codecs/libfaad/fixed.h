@@ -59,7 +59,84 @@ typedef int32_t real_t;
 #define Q2_PRECISION (1 << Q2_BITS)
 #define Q2_CONST(A) (((A) >= 0) ? ((real_t)((A)*(Q2_PRECISION)+0.5)) : ((real_t)((A)*(Q2_PRECISION)-0.5)))
 
-#if defined(__GNUC__) && defined (__arm__)
+#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+
+static INLINE real_t MUL_F(real_t A, real_t B)
+{
+    asm volatile (
+        "mac.l %[A], %[B], %%acc0\n\t"
+        "movclr.l %%acc0, %[A]"
+        : [A] "+&r" (A) : [B] "r" (B)
+    );
+    return A;
+}
+
+#if 0
+/* this currently provokes an ICE in gcc 3.4.x */
+static INLINE real_t MUL_C(real_t A, real_t B)
+{
+    asm volatile (
+        "mac.l %[A], %[B], %%acc0\n\t"
+        "movclr.l %%acc0, %[A]\n\t"
+        "asl.l #3, %[A]"
+        : [A] "+&d" (A) : [B] "r" (B)
+    );
+    return A;
+}
+#else
+/* keep this one around until the ICE is solved */
+#define MUL_C(A,B) (real_t)(((int64_t)(A)*(int64_t)(B)+(1 << (COEF_BITS-1))) >> COEF_BITS)
+#endif
+
+/* MUL_R needs too many shifts for us to just operate on the top 32 bits the
+   emac unit gives as usual, so we do a full 64 bit mul here. */
+static INLINE real_t MUL_R(real_t x, real_t y)
+{
+    real_t t1, t2;
+    asm volatile (
+        "mac.l   %[x],%[y],%%acc0\n" /* multiply */
+        "mulu.l  %[y],%[x]   \n"     /* get lower half, avoid emac stall */
+        "movclr.l %%acc0,%[t1]   \n" /* get higher half */
+        "moveq.l #17,%[t2]   \n"
+        "asl.l   %[t2],%[t1] \n"     /* hi <<= 17, plus one free */
+        "moveq.l #14,%[t2]   \n"
+        "lsr.l   %[t2],%[x]  \n"     /* (unsigned)lo >>= 14 */
+        "or.l    %[x],%[t1]  \n"     /* combine result */
+        : /* outputs */
+        [t1]"=&d"(t1),
+        [t2]"=&d"(t2),
+        [x] "+d" (x)
+        : /* inputs */
+        [y] "d"  (y)
+    );
+    return t1;
+}
+
+static INLINE void ComplexMult(real_t *y1, real_t *y2,
+    real_t x1, real_t x2, real_t c1, real_t c2)
+{
+    asm volatile(
+        "mac.l %[x1], %[c1], %%acc0\n\t"
+        "mac.l %[x2], %[c2], %%acc0\n\t"
+        "mac.l %[x2], %[c1], %%acc1\n\t"
+        "msac.l %[x1], %[c2], %%acc1\n\t"
+        "movclr.l %%acc0, %[x1]\n\t"
+        "move.l %[x1], (%[y1])\n\t"
+        "movclr.l %%acc1, %[x1]\n\t"
+        "move.l %[x1], (%[y2])"
+        : [x1] "+&r" (x1)
+        : [x2] "r" (x2), [y1] "a" (y1), [y2] "a" (y2),
+          [c1] "r" (c1), [c2] "r" (c2)
+        : "memory"
+    );
+}
+
+  /* the following see little or no use, so just ignore them for now */
+  #define MUL_Q2(A,B) (real_t)(((int64_t)(A)*(int64_t)(B)+(1 << (Q2_BITS-1))) >> Q2_BITS)
+  #define MUL_SHIFT6(A,B) (real_t)(((int64_t)(A)*(int64_t)(B)+(1 << (6-1))) >> 6)
+  #define MUL_SHIFT23(A,B) (real_t)(((int64_t)(A)*(int64_t)(B)+(1 << (23-1))) >> 23)
+
+#elif defined(__GNUC__) && defined (__arm__)
 
 /* taken from MAD */
 #define arm_mul(x, y, SCALEBITS) \
