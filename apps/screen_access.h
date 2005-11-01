@@ -106,13 +106,6 @@ struct screen
  */
 extern void screen_init(struct screen * screen, enum screen_type screen_type);
 
-/*
- * Compute the number of text lines the display can draw with the current font
- * - screen : the screen structure
- * Returns the number of text lines
- */
-extern void screen_update_nblines(struct screen * screen);
-
 #ifdef HAS_BUTTONBAR
 /*
  * Sets if the given screen has a buttonbar or not
@@ -123,42 +116,26 @@ extern void screen_update_nblines(struct screen * screen);
     (screen)->has_buttonbar=has_btnb;
 #endif
 
-#ifdef HAVE_LCD_BITMAP
 /*
- * Compute the number of pixels from which text can be displayed
+ * Sets the x margin in pixels for the given screen
  * - screen : the screen structure
- * Returns the number of pixels
+ * - xmargin : the number of pixels to the left of the screen
  */
-#define screen_get_text_y_start(screen) \
-    ( (global_settings.statusbar)? STATUSBAR_HEIGHT : 0)
+#define screen_set_xmargin(screen, xmargin) \
+    (screen)->setmargins(xmargin, (screen)->getymargin());
 
 /*
- * Compute the number of pixels below which text can't be displayed
+ * Sets the y margin in pixels for the given screen
  * - screen : the screen structure
- * Returns the number of pixels
+ * - xmargin : the number of pixels to the top of the screen
  */
-#ifdef HAS_BUTTONBAR
-#define screen_get_text_y_end(screen) \
-    ( (screen)->height - ( (global_settings.buttonbar && \
-                            (screen)->has_buttonbar)? \
-                            BUTTONBAR_HEIGHT : 0) )
-#else
-#define screen_get_text_y_end(screen) \
-    ( (screen)->height )
-#endif /* HAS_BUTTONBAR */
-
-#endif /* HAVE_LCD_BITMAP */
+#define screen_set_ymargin(screen, ymargin) \
+    (screen)->setmargins((screen)->getxmargin(), ymargin);
 
 /*
  * Initializes the whole screen_access api
  */
 extern void screen_access_init(void);
-
-/*
- * Just recalculate the number of text lines that can be displayed
- * on each screens in case of poilice change for example
- */
-extern void screen_access_update_nb_lines(void);
 
 /*
  * exported screens array that should be used

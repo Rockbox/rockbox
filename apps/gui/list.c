@@ -29,6 +29,7 @@
 #include "list.h"
 #include "scrollbar.h"
 #include "statusbar.h"
+#include "textarea.h"
 
 #ifdef HAVE_LCD_CHARCELLS
 #define SCROLL_LIMIT 1
@@ -70,6 +71,7 @@ void gui_list_set_display(struct gui_list * gui_list, struct screen * display)
 void gui_list_put_selection_in_screen(struct gui_list * gui_list,
                                       bool put_from_end)
 {
+    gui_textarea_update_nblines(gui_list->display);
     int nb_lines=gui_list->display->nb_lines;
     if(put_from_end)
     {
@@ -103,12 +105,9 @@ void gui_list_draw(struct gui_list * gui_list)
     /* Adjust the position of icon, cursor, text */
 #ifdef HAVE_LCD_BITMAP
     display->setfont(FONT_UI);
-    screen_update_nblines(display);
+    gui_textarea_update_nblines(display);
     bool draw_scrollbar = (global_settings.scrollbar &&
                            display->nb_lines < gui_list->nb_items);
-    int list_y_start = screen_get_text_y_start(gui_list->display);
-    int list_y_end = screen_get_text_y_end(gui_list->display);
-
     draw_cursor = !global_settings.invert_cursor;
     text_pos = 0; /* here it's in pixels */
     if(draw_scrollbar)
@@ -133,18 +132,10 @@ void gui_list_draw(struct gui_list * gui_list)
     else
         text_pos = 1;
 #endif
-    /* The drawing part */
-#ifdef HAVE_LCD_BITMAP
-    /* clear the drawing area */
-    display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    display->fillrect(0, list_y_start,
-                      display->width, list_y_end - list_y_start);
-    display->set_drawmode(DRMODE_SOLID);
 
-    display->stop_scroll();
-    display->setmargins(text_pos, list_y_start);
-#else
-    display->clear_display();
+    gui_textarea_clear(display);
+#ifdef HAVE_LCD_BITMAP
+    screen_set_xmargin(display, text_pos);
 #endif
 
     for(i = 0;i < display->nb_lines;i++)
@@ -197,20 +188,16 @@ void gui_list_draw(struct gui_list * gui_list)
     /* Draw the scrollbar if needed*/
     if(draw_scrollbar)
     {
+        int y_start = gui_textarea_get_ystart(display);
         int scrollbar_y_end = display->char_height *
-                              display->nb_lines + list_y_start;
-        gui_scrollbar_draw(display, 0, list_y_start, SCROLLBAR_WIDTH-1,
-                           scrollbar_y_end - list_y_start, gui_list->nb_items,
+                              display->nb_lines + y_start;
+        gui_scrollbar_draw(display, 0, y_start, SCROLLBAR_WIDTH-1,
+                           scrollbar_y_end - y_start, gui_list->nb_items,
                            gui_list->start_item,
                            gui_list->start_item + display->nb_lines, VERTICAL);
     }
-    display->update_rect(0, list_y_start, display->width,
-                         list_y_end - list_y_start);
-#else
-#ifdef SIMULATOR
-    display->update();
 #endif
-#endif
+    gui_textarea_update(display);
 }
 
 void gui_list_select_item(struct gui_list * gui_list, int item_number)
@@ -251,11 +238,9 @@ void gui_list_select_next(struct gui_list * gui_list)
 
 void gui_list_select_previous(struct gui_list * gui_list)
 {
-    int item_pos;
-    int nb_lines = gui_list->display->nb_lines;
-
     if( gui_list->selected_item == 0 )
     {
+        int nb_lines = gui_list->display->nb_lines;
         if(gui_list->limit_scroll)
             return;
         gui_list->selected_item--;
@@ -270,6 +255,7 @@ void gui_list_select_previous(struct gui_list * gui_list)
     }
     else
     {
+        int item_pos;
         gui_list->selected_item--;
         item_pos = gui_list->selected_item - gui_list->start_item;
         if( item_pos < SCROLL_LIMIT-1 && gui_list->start_item > 0 )
@@ -321,10 +307,11 @@ void gui_list_add_item(struct gui_list * gui_list)
 
 void gui_list_del_item(struct gui_list * gui_list)
 {
-    int nb_lines = gui_list->display->nb_lines;
-
     if(gui_list->nb_items > 0)
     {
+        gui_textarea_update_nblines(gui_list->display);
+        int nb_lines = gui_list->display->nb_lines;
+
         int dist_selected_from_end = gui_list->nb_items
             - gui_list->selected_item - 1;
         int dist_start_from_end = gui_list->nb_items

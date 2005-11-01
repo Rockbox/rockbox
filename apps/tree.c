@@ -511,9 +511,6 @@ static bool dirbrowse(void)
         curr_context=CONTEXT_ID3DB;
     else
         curr_context=CONTEXT_TREE;
-#ifdef HAVE_LCD_BITMAP
-    screen_access_update_nb_lines();
-#endif
     tc.selected_item = 0;
     tc.dirlevel=0;
     tc.firstpos=0;
@@ -756,7 +753,6 @@ static bool dirbrowse(void)
                 {
                     if (quick_screen(curr_context, BUTTON_F3))
                         reload_dir = true;
-                    screen_access_update_nb_lines();
                     restore = true;
                 }
                 break;
@@ -889,9 +885,6 @@ static bool dirbrowse(void)
                 if (!id3db) /* Try reload to catch 'no longer valid' case. */
                     reload_dir = true;
 #endif
-#ifdef HAVE_LCD_BITMAP
-            screen_access_update_nb_lines();
-#endif
             id3db = check_changed_id3mode(id3db);
             restore = true;
             start_wps=false;
@@ -931,9 +924,6 @@ static bool dirbrowse(void)
 
         if (restore || reload_dir) {
             /* restore display */
-#ifdef HAVE_LCD_BITMAP
-            screen_access_update_nb_lines();
-#endif
             numentries = update_dir();
             if (currdir[1] && (numentries < 0))
             {   /* not in root and reload failed */

@@ -144,32 +144,7 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
 #ifdef HAS_BUTTONBAR
     screen->has_buttonbar=false;
 #endif
-    screen_update_nblines(screen);
-}
-
-/*
- * Returns the number of text lines that can be drawn on the given screen
- * with it's current font
- */
-void screen_update_nblines(struct screen * screen)
-{
-#ifdef HAVE_LCD_BITMAP
-    int height=screen->height;
-    if(global_settings.statusbar)
-        height -= STATUSBAR_HEIGHT;
-#ifdef HAS_BUTTONBAR
-    if(global_settings.buttonbar && screen->has_buttonbar)
-        height -= BUTTONBAR_HEIGHT;
-#endif
-    screen->getstringsize("A", &screen->char_width, &screen->char_height);
-    screen->nb_lines = height / screen->char_height;
-#else
-    screen->char_width=1;
-    screen->char_height=1;
-    /* default on char based player supported by rb */
-    screen->nb_lines = MAX_LINES_ON_SCREEN;
-#endif
-
+    gui_textarea_update_nblines(screen);
 }
 
 void screen_access_init(void)
@@ -178,11 +153,4 @@ void screen_access_init(void)
 #ifdef HAVE_REMOTE_LCD
     screen_init(&screens[1], SCREEN_REMOTE);
 #endif
-}
-
-void screen_access_update_nb_lines(void)
-{
-    int i;
-    for(i=0;i<NB_SCREENS;++i)
-        screen_update_nblines(&screens[i]);
 }

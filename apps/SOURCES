@@ -39,6 +39,7 @@ gui/list.c
 gui/scrollbar.c
 gui/splash.c
 gui/statusbar.c
+gui/textarea.c
 
 #ifdef HAVE_LCD_CHARCELLS
 player/icons.c
