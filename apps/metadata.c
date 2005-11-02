@@ -1010,7 +1010,8 @@ static bool get_m4a_metadata(int fd, struct mp3entry* id3)
     if (memcmp(&chunk_id,"ftyp",4)==0) {
       /* Check for M4A type */
       n=read(fd,&chunk_id,4);
-      if (memcmp(&chunk_id,"M4A ",4)!=0) {
+      if ((memcmp(&chunk_id,"M4A ",4)!=0) &&
+          (memcmp(&chunk_id,"mp42",4)!=0)) {
         logf("Not an M4A file, aborting\n");
         return false;
       }

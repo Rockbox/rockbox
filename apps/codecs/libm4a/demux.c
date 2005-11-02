@@ -59,7 +59,8 @@ static void read_chunk_ftyp(qtmovie_t *qtmovie, size_t chunk_len)
 
     type = stream_read_uint32(qtmovie->stream);
     size_remaining-=4;
-    if (type != MAKEFOURCC('M','4','A',' '))
+    if ((type != MAKEFOURCC('M','4','A',' ')) &&
+        (type != MAKEFOURCC('m','p','4','2')))
     {
         DEBUGF("not M4A file\n");
         return;
@@ -485,7 +486,7 @@ static bool read_chunk_stbl(qtmovie_t *qtmovie, size_t chunk_len)
         default:
             DEBUGF("(stbl) unknown chunk id: %c%c%c%c\n",
                    SPLITFOURCC(sub_chunk_id));
-            return false;
+            stream_skip(qtmovie->stream, sub_chunk_len - 8); /* FIXME not 8 */
         }
 
         size_remaining -= sub_chunk_len;
@@ -497,12 +498,14 @@ static bool read_chunk_minf(qtmovie_t *qtmovie, size_t chunk_len)
 {
     size_t dinf_size, stbl_size;
     size_t size_remaining = chunk_len - 8; /* FIXME WRONG */
+    uint32_t i;
 
   /**** SOUND HEADER CHUNK ****/
-    if (stream_read_uint32(qtmovie->stream) != 16)
+    if ((i=stream_read_uint32(qtmovie->stream)) != 16)
     {
-        DEBUGF("unexpected size in media info\n");
-        return false;
+        DEBUGF("unexpected size in media info: %d\n",i);
+        stream_skip(qtmovie->stream, size_remaining-4);
+        return true;
     }
     if (stream_read_uint32(qtmovie->stream) != MAKEFOURCC('s','m','h','d'))
     {
@@ -582,6 +585,7 @@ static bool read_chunk_mdia(qtmovie_t *qtmovie, size_t chunk_len)
         default:
             DEBUGF("(mdia) unknown chunk id: %c%c%c%c\n",
                    SPLITFOURCC(sub_chunk_id));
+            stream_skip(qtmovie->stream, sub_chunk_len - 8);
             return false;
         }
 
@@ -684,7 +688,7 @@ static bool read_chunk_moov(qtmovie_t *qtmovie, size_t chunk_len)
         default:
             DEBUGF("(moov) unknown chunk id: %c%c%c%c\n",
                     SPLITFOURCC(sub_chunk_id));
-            return false;
+            stream_skip(qtmovie->stream, sub_chunk_len - 8); /* FIXME not 8 */
         }
 
         size_remaining -= sub_chunk_len;
