@@ -66,8 +66,8 @@ enum codec_status codec_start(struct codec_api* api)
 
     ci->configure(CODEC_DSP_ENABLE, (bool *)true);
     ci->configure(DSP_DITHER, (bool *)false);
-    ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_INTERLEAVED);
-    ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(16));
+    ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_NONINTERLEAVED);
+    ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(29));
 
     next_track:
 
@@ -100,7 +100,7 @@ enum codec_status codec_start(struct codec_api* api)
     }
 
     NeAACDecConfigurationPtr conf = NeAACDecGetCurrentConfiguration(hDecoder);
-    conf->outputFormat = 1; // 16-bit integers
+    conf->outputFormat = FAAD_FMT_24BIT; /* irrelevant, we don't convert */
     NeAACDecSetConfiguration(hDecoder, conf);
 
     unsigned long s=0;
@@ -147,7 +147,8 @@ enum codec_status codec_start(struct codec_api* api)
         /* Decode one block - returned samples will be host-endian */
         rb->yield();
         decodedbuffer = NeAACDecDecode(hDecoder, &frameInfo, buffer, n);
-
+        /* ignore decodedbuffer return value, we access samples in the
+           decoder struct directly */
         if (frameInfo.error > 0) {
              LOGF("FAAD: decoding error \"%s\"\n", NeAACDecGetErrorMessage(frameInfo.error));
              return CODEC_ERROR;
@@ -161,7 +162,9 @@ enum codec_status codec_start(struct codec_api* api)
 
         /* Output the audio */
         rb->yield();
-        while (!rb->pcmbuf_insert((char*)decodedbuffer, frameInfo.samples << 1))
+        while (!rb->pcmbuf_insert_split(hDecoder->time_out[0],
+                                        hDecoder->time_out[1],
+                                        frameInfo.samples*2))
             rb->yield();
 
         /* Update the elapsed-time indicator */

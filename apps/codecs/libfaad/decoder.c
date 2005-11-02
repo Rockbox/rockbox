@@ -982,9 +982,10 @@ static void* aac_frame_decode(NeAACDecHandle hDecoder, NeAACDecFrameInfo *hInfo,
     }
 #endif
 
+    /* we don't need sample conversion in rockbox.
     sample_buffer = output_to_PCM(hDecoder, hDecoder->time_out, sample_buffer,
         output_channels, frame_len, hDecoder->config.outputFormat);
-
+    */
 
     hDecoder->postSeekResetFlag = 0;
 
