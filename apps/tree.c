@@ -1364,9 +1364,14 @@ void tree_restore(void)
                               str(LANG_DIRCACHE_BUILDING));
             gui_textarea_update(&screens[i]);
         }
+
         dircache_build(global_settings.dircache_size);
+
         /* Clean the text when we are done. */
-        gui_textarea_clear(&screens[i]);
+        for(i = 0;i < NB_SCREENS;++i)
+        {
+            gui_textarea_clear(&screens[i]);
+        }
     }
 #endif
 }
