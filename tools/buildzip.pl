@@ -80,7 +80,7 @@ sub buildzip {
         if ($line =~ /([^,]*),([^,]*),/) {
             my ($ext, $plugin)=($1, $2);
             my $r = "${plugin}.rock";
-            my $o = "${plugin}.ovl";
+            my $oname;
 
             my $dir = $r;
             my $name;
@@ -89,6 +89,10 @@ sub buildzip {
             $dir =~ s/(.*)\/(.*)/$1/;
             # store the file name part
             $name = $2;
+
+            # get .ovl name (file part only)
+            $oname = $name;
+            $oname =~ s/\.rock$/.ovl/;
 
             # print STDERR "$ext $plugin $dir $name $r\n";
 
@@ -105,10 +109,11 @@ sub buildzip {
                 # was already moved to the viewers dir
                 print VIEWERS $line;
             }
-            if(-e ".rockbox/rocks/$o") {
+
+            if(-e ".rockbox/rocks/$oname") {
                 # if there's an "overlay" file for the .rock, move that as
                 # well
-                `mv .rockbox/rocks/$o .rockbox/$o`;              
+                `mv .rockbox/rocks/$oname .rockbox/$dir`;
             }
         }
     }
