@@ -27,6 +27,7 @@
 #include <icons.h>
 
 #include "screen_access.h"
+#include "textarea.h"
 
 struct screen screens[NB_SCREENS];
 
