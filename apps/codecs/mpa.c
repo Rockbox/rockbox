@@ -74,7 +74,8 @@ enum codec_status codec_start(struct codec_api *api)
     int status = 0;
     long size;
     int file_end;
-    int frame_skip;
+    int frame_skip;      /* samples to skip current frame */
+    int samples_to_skip; /* samples to skip in total for this file (at start) */
     char *inputbuffer;
 
     ci = api;
@@ -106,7 +107,7 @@ enum codec_status codec_start(struct codec_api *api)
     mad_synth_init(&synth);
 
     /* We do this so libmad doesn't try to call codec_calloc() */
-    memset(mad_frame_overlap, 0, sizeof(mad_frame_overlap));
+    ci->memset(mad_frame_overlap, 0, sizeof(mad_frame_overlap));
     frame.overlap = &mad_frame_overlap;
     stream.main_data = &mad_main_data;
 
@@ -136,7 +137,7 @@ next_track:
     }
 
     samplesdone = ((int64_t)ci->id3->elapsed) * current_frequency / 1000;
-    frame_skip = start_skip;
+    samples_to_skip = start_skip;
     recalc_samplecount();
     
     /* This is the decoding loop. */
@@ -158,7 +159,7 @@ next_track:
             if (!ci->seek_buffer(newpos))
                 goto next_track;
             if (newpos == 0)
-                frame_skip = start_skip;
+                samples_to_skip = start_skip;
             ci->seek_complete();
         }
 
@@ -170,10 +171,9 @@ next_track:
             mad_stream_buffer(&stream, inputbuffer, size);
         }
     
-        if (mad_frame_decode(&frame,&stream)) {
+        if (mad_frame_decode(&frame, &stream)) {
             if (stream.error == MAD_FLAG_INCOMPLETE 
                 || stream.error == MAD_ERROR_BUFLEN) {
-                // ci->splash(HZ*1, true, "Incomplete");
                 /* This makes the codec support partially corrupted files */
                 if (file_end == 30)
                     break;
@@ -188,57 +188,66 @@ next_track:
                 }
                 continue;
             } else if (stream.error == MAD_ERROR_BUFLEN) {
-                //rb->splash(HZ*1, true, "Buflen error");
                 break;
             } else {
-                //rb->splash(HZ*1, true, "Unrecoverable error");
+                /* Some other unrecoverable error */
                 status = 1;
                 break;
             }
             break;
         }
         
-        file_end = false;
+        file_end = 0;
 
         mad_synth_frame(&synth, &frame);
-        framelength = synth.pcm.length - frame_skip;
-    
-        /* We skip frame_skip number of samples here, this should only happen for
-           very first frame in the stream. */
-        /* TODO: possible for frame_skip to exceed one frames worth of samples? */
-
-        if (frame.header.samplerate != current_frequency) {
-            current_frequency = frame.header.samplerate;
-            ci->configure(DSP_SWITCH_FREQUENCY, (int *)current_frequency);
-            recalc_samplecount();
+        
+        /* We need to skip samples_to_skip samples from the start of every file
+           to properly support LAME style gapless MP3 files. samples_to_skip
+           might be larger than one frame. */
+        if (samples_to_skip < synth.pcm.length) {
+            /* skip just part of the frame */
+            frame_skip = samples_to_skip;
+            samples_to_skip = 0;
+        } else {
+            /* we need to skip an entire frame */
+            frame_skip = synth.pcm.length;
+            samples_to_skip -= synth.pcm.length;
         }
+       
+        framelength = synth.pcm.length - frame_skip;
         
         if (stop_skip > 0) {
             int64_t max = samplecount - samplesdone;
             
             if (max < 0) max = 0;
             if (max < framelength) framelength = (int)max;
-            if (framelength == 0) break;
         }
-
+        
+        /* Check if sample rate and stereo settings changed in this frame. */
+        if (frame.header.samplerate != current_frequency) {
+            current_frequency = frame.header.samplerate;
+            ci->configure(DSP_SWITCH_FREQUENCY, (int *)current_frequency);
+            recalc_samplecount();
+        }
         if (MAD_NCHANNELS(&frame.header) == 2) {
             if (current_stereo_mode != STEREO_NONINTERLEAVED) {
                 ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_NONINTERLEAVED);
                 current_stereo_mode = STEREO_NONINTERLEAVED;
             }
-            ci->pcmbuf_insert_split(&synth.pcm.samples[0][frame_skip],
-                                    &synth.pcm.samples[1][frame_skip],
-                                    framelength * 4);
         } else {
             if (current_stereo_mode != STEREO_MONO) {
                 ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_MONO);
                 current_stereo_mode = STEREO_MONO;
             }
-            ci->pcmbuf_insert((char *)&synth.pcm.samples[0][frame_skip],
-                              framelength * 4);
         }
-        
-        frame_skip = 0;
+      
+        /* Check if we can just skip the entire frame. */
+        if (frame_skip < synth.pcm.length) {
+            /* In case of a mono file, the second array will be ignored. */
+            ci->pcmbuf_insert_split(&synth.pcm.samples[0][frame_skip],
+                                    &synth.pcm.samples[1][frame_skip],
+                                    framelength * 4);
+        }
         
         if (stream.next_frame)
             ci->advance_buffer_loc((void *)stream.next_frame);
