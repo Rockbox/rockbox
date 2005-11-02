@@ -30,7 +30,7 @@ enum screen_type {
 #endif
 };
 
-#ifdef HAVE_REMOTE_LCD
+#if defined(HAVE_REMOTE_LCD) && !defined (ROCKBOX_HAS_LOGF)
 #define NB_SCREENS 2
 #else
 #define NB_SCREENS 1
