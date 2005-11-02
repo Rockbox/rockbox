@@ -20,6 +20,8 @@
 #include "codeclib.h"
 #include "inttypes.h"
 
+struct codec_api* rb;
+
 /* This codec support WAVE files with the following formats:
  * - PCM, up to 32 bits, supporting 32 bits playback when useful.
  * - ALAW and MULAW (16 bits compressed on 8 bits).
@@ -205,7 +207,7 @@ decode_dvi_adpcm(struct codec_api* ci,
 /* this is the codec entry point */
 enum codec_status codec_start(struct codec_api* api)
 {
-  struct codec_api* ci = api;
+  struct codec_api* ci;
   uint32_t numbytes, bytesdone;
   uint32_t totalsamples = 0;
   uint16_t channels=0;
@@ -227,6 +229,9 @@ enum codec_status codec_start(struct codec_api* api)
 
   /* Generic codec initialisation */
   TEST_CODEC_API(api);
+
+  rb = api;
+  ci = api;
 
 #ifdef USE_IRAM 
   ci->memcpy(iramstart, iramcopy, iramend-iramstart);
