@@ -96,7 +96,7 @@ extern char iramend[];
 
 /* Those are lookup tables, so they should be in the idata section
  * (fast but small RAM on the coldfire processor) */
-static int16_t alaw2linear16[256] ICONST_ATTR = {
+static const int16_t alaw2linear16[256] ICONST_ATTR = {
      -5504,   -5248,   -6016,   -5760,   -4480,   -4224,   -4992,
      -4736,   -7552,   -7296,   -8064,   -7808,   -6528,   -6272,
      -7040,   -6784,   -2752,   -2624,   -3008,   -2880,   -2240,
@@ -136,7 +136,7 @@ static int16_t alaw2linear16[256] ICONST_ATTR = {
        816,     784,     880,     848
 };
 
-static int16_t ulaw2linear16[256] ICONST_ATTR = {
+static const int16_t ulaw2linear16[256] ICONST_ATTR = {
     -32124,  -31100,  -30076,  -29052,  -28028,  -27004,  -25980,
     -24956,  -23932,  -22908,  -21884,  -20860,  -19836,  -18812,
     -17788,  -16764,  -15996,  -15484,  -14972,  -14460,  -13948,
@@ -176,7 +176,7 @@ static int16_t ulaw2linear16[256] ICONST_ATTR = {
         24,      16,       8,       0
 };
 
-static uint16_t dvi_adpcm_steptab[ 89 ] ICONST_ATTR = {
+static const uint16_t dvi_adpcm_steptab[ 89 ] ICONST_ATTR = {
     7, 8, 9, 10, 11, 12, 13, 14,
     16, 17, 19, 21, 23, 25, 28, 31,
     34, 37, 41, 45, 50, 55, 60, 66,
@@ -189,8 +189,8 @@ static uint16_t dvi_adpcm_steptab[ 89 ] ICONST_ATTR = {
     7132, 7845, 8630, 9493, 10442, 11487, 12635, 13899,
     15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794,
     32767 };
-static int dvi_adpcm_indextab4[ 8 ] ICONST_ATTR = { -1, -1, -1, -1, 2, 4, 6, 8 };
-static int dvi_adpcm_indextab3[ 4 ] ICONST_ATTR = { -1, -1, 1, 2 };
+static const int dvi_adpcm_indextab4[ 8 ] ICONST_ATTR = { -1, -1, -1, -1, 2, 4, 6, 8 };
+static const int dvi_adpcm_indextab3[ 4 ] ICONST_ATTR = { -1, -1, 1, 2 };
 
 static int16_t int16_samples[WAV_CHUNK_SIZE] IBSS_ATTR;
 
