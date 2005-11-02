@@ -442,7 +442,9 @@ int get_mp3file_info(int fd, struct mp3info *info)
         i += 21;
         info->enc_delay = (vbrheader[i] << 4) | (vbrheader[i + 1] >> 4);
         info->enc_padding = ((vbrheader[i + 1] & 0x0f) << 8) | vbrheader[i + 2];
-        if (!(info->enc_delay >= 0 && info->enc_delay <= 1152 && 
+        /* TODO: This sanity checking is rather silly, seeing as how the LAME
+           header contains a CRC field that can be used to verify integrity. */
+        if (!(info->enc_delay >= 0 && info->enc_delay <= 2880 && 
             info->enc_padding >= 0 && info->enc_padding <= 2*1152))
         {
            /* Invalid data */
