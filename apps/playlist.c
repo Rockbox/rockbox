@@ -162,6 +162,8 @@ static int compare(const void* p1, const void* p2);
 static int get_filename(struct playlist_info* playlist, int seek,
                         bool control_file, char *buf, int buf_length);
 static int get_next_directory(char *dir);
+static int get_next_dir(char *dir, bool is_forward, bool recursion);
+static int get_previous_directory(char *dir);
 static int check_subdir_for_music(char *dir, char *subdir);
 static int format_track_path(char *dest, char *src, int buf_length, int max,
                              char *dir);
@@ -1098,25 +1100,52 @@ static int get_filename(struct playlist_info* playlist, int seek,
     return (format_track_path(buf, tmp_buf, buf_length, max, dir_buf));
 }
 
+static int get_next_directory(char *dir){
+  return get_next_dir(dir,true,false);
+}
+
+static int get_previous_directory(char *dir){
+  return get_next_dir(dir,false,false);
+}
+
 /*
  * search through all the directories (starting with the current) to find
  * one that has tracks to play
  */
-static int get_next_directory(char *dir)
+static int get_next_dir(char *dir, bool is_forward, bool recursion)
 {
     struct playlist_info* playlist = &current_playlist;
     int result = -1;
     int dirfilter = global_settings.dirfilter;
+    int sort_dir = global_settings.sort_dir;
     char *start_dir = NULL;
     bool exit = false;
     struct tree_context* tc = tree_get_context();
 
-    /* start with current directory */
-    strncpy(dir, playlist->filename, playlist->dirlen-1);
-    dir[playlist->dirlen-1] = '\0';
+    if (recursion){
+       /* start with root */
+       dir[0] = '\0';
+    }
+    else{
+        /* start with current directory */
+        strncpy(dir, playlist->filename, playlist->dirlen-1);
+        dir[playlist->dirlen-1] = '\0';
+    }
 
     /* use the tree browser dircache to load files */
     global_settings.dirfilter = SHOW_ALL;
+
+    /* sort in another direction if previous dir is requested */
+    if(!is_forward){
+       if ((global_settings.sort_dir == 0) || (global_settings.sort_dir == 3))
+           global_settings.sort_dir = 4;
+       else if (global_settings.sort_dir == 1)
+           global_settings.sort_dir = 2;
+       else if (global_settings.sort_dir == 2)
+           global_settings.sort_dir = 1;
+       else if (global_settings.sort_dir == 4)
+           global_settings.sort_dir = 0;
+    }
 
     while (!exit)
     {
@@ -1180,8 +1209,14 @@ static int get_next_directory(char *dir)
        reloaded */
     reload_directory();
 
-    /* restore dirfilter */
+    /* restore dirfilter & sort_dir */
     global_settings.dirfilter = dirfilter;
+    global_settings.sort_dir = sort_dir;
+
+    /* special case if nothing found: try start searching again from root */
+    if (result == -1 && !recursion){
+        result = get_next_dir(dir,is_forward, true);
+    }
 
     return result;
 }
@@ -1922,13 +1957,14 @@ int playlist_start(int start_index, int offset)
 bool playlist_check(int steps)
 {
     struct playlist_info* playlist = &current_playlist;
+
+    /* always allow folder navigation */
+    if (global_settings.next_folder && playlist->in_ram)
+        return true;
+
     int index = get_next_index(playlist, steps, -1);
 
-    if (index < 0 && steps >= 0 &&
-        (global_settings.repeat_mode == REPEAT_SHUFFLE ||
-         (global_settings.next_folder && playlist->in_ram)))
-        /* shuffle repeat and move to next folder are the same as repeat all
-           for check purposes */
+    if (index < 0 && steps >= 0 && global_settings.repeat_mode == REPEAT_SHUFFLE)
         index = get_next_index(playlist, steps, REPEAT_ALL);
 
     return (index >= 0);
@@ -2031,23 +2067,40 @@ int playlist_next(int steps)
             playlist_start(0, 0);
             index = 0;
         }
-        else if (global_settings.next_folder && playlist->in_ram)
+        else if (playlist->in_ram && global_settings.next_folder)
         {
             char dir[MAX_PATH+1];
 
-            if (!get_next_directory(dir))
+            if (steps > 0)
             {
-                /* start playing new directory */
+                if (!get_next_directory(dir))
+                {
+                    /* start playing next directory */
+                    if (playlist_create(dir, NULL) != -1)
+                    {
+                        ft_build_playlist(tree_get_context(), 0);
+                        if (global_settings.playlist_shuffle)
+                            playlist_shuffle(current_tick, -1);                    
+                        playlist_start(0, 0);
+                        index = 0;
+                    }
+                }
+            }
+            else
+            {
+              if (!get_previous_directory(dir))
+              {
+                /* start playing previous directory */
                 if (playlist_create(dir, NULL) != -1)
                 {
                     ft_build_playlist(tree_get_context(), 0);
                     if (global_settings.playlist_shuffle)
                         playlist_shuffle(current_tick, -1);
-                    
-                    playlist_start(0, 0);
-                    index = 0;
+                    playlist_start(current_playlist.amount-1,0);
+                    index = current_playlist.amount-1;
                 }
-            }
+              }
+           }
         }
 
         return index;
@@ -2094,6 +2147,29 @@ int playlist_next(int steps)
     }
 
     return index;
+}
+
+/* try playing next or previous folder */
+bool playlist_next_dir(int direction)
+{
+    char dir[MAX_PATH+1];
+
+    if (((direction > 0) && !get_next_directory(dir)) ||
+       ((direction < 0) && !get_previous_directory(dir)))
+    {
+        if (playlist_create(dir, NULL) != -1)
+        {
+            ft_build_playlist(tree_get_context(), 0);
+            if (global_settings.playlist_shuffle)
+                 playlist_shuffle(current_tick, -1);
+            playlist_start(0,0);
+            return true;
+        }
+        else
+            return false;
+    }
+    else
+        return false;
 }
 
 /* Get resume info for current playing song.  If return value is -1 then

@@ -429,7 +429,7 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(spdif_enable), false, "spdif enable", off_on},
 #endif
 
-    {1, S_O(next_folder), false, "move to next folder", off_on },
+    {1, S_O(next_folder), true, "folder navigation", off_on },
     {1, S_O(runtimedb), false, "gather runtime data", off_on },
 
 #if CONFIG_CODEC == SWCODEC

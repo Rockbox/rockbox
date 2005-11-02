@@ -172,11 +172,17 @@ static int compare(const void* p1, const void* p2)
                 return t1 - t2;
             /* else fall through to alphabetical sorting */
         }
-        case 0: /* sort alphabetically */
+        case 0: /* sort alphabetically asc */
             if (global_settings.sort_case)
                 return strncmp(e1->name, e2->name, MAX_PATH);
             else
                 return strncasecmp(e1->name, e2->name, MAX_PATH);
+
+        case 4: /* sort alphabetically desc */
+            if (global_settings.sort_case)
+                return strncmp(e2->name, e1->name, MAX_PATH);
+            else
+                return strncasecmp(e2->name, e1->name, MAX_PATH);
 
         case 1: /* sort date */
             return e1->time_write - e2->time_write;

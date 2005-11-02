@@ -64,6 +64,9 @@ static struct mp3entry* id3 = NULL;
 static struct mp3entry* nid3 = NULL;
 static char current_track_path[MAX_PATH+1];
 
+void audio_next_dir(void);
+void audio_prev_dir(void);
+
 /* set volume
    return true if screen restore is needed
    return false otherwise
@@ -600,6 +603,17 @@ long wps_show(void)
                         audio_resume();
                 }
                 break;
+
+#ifdef WPS_RC_NEXT_DIR
+            case WPS_RC_NEXT_DIR:
+                audio_next_dir();
+                break;
+#endif
+#ifdef WPS_RC_PREV_DIR
+            case WPS_RC_PREV_DIR:
+                audio_prev_dir();
+                break;
+#endif
 
                 /* next */
             case WPS_NEXT:

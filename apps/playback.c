@@ -92,6 +92,8 @@ static volatile bool paused;
 #define AUDIO_CODEC_DONE   9
 #define AUDIO_FLUSH        10
 #define AUDIO_TRACK_CHANGED 11
+#define AUDIO_DIR_NEXT      12
+#define AUDIO_DIR_PREV      13
 
 #define CODEC_LOAD       1
 #define CODEC_LOAD_DISK  2
@@ -1653,6 +1655,24 @@ static void initiate_track_change(int peek_index)
     codec_track_changed();
 }
 
+static void initiate_dir_change(int direction)
+{
+    if(!playlist_next_dir(direction))
+        return;
+
+    /* Detect if disk is spinning.. */
+    if (filling) {
+        queue_post(&audio_queue, AUDIO_PLAY, 0);
+    } else {
+        new_track = 0;
+        ci.reload_codec = true;
+        if (!pcmbuf_is_crossfade_enabled())
+            pcmbuf_flush_audio();
+    }
+
+    codec_track_changed();
+}
+
 void audio_thread(void)
 {
     struct event ev;
@@ -1735,6 +1755,21 @@ void audio_thread(void)
                 initiate_track_change(-1);
                 break;
                 
+
+            case AUDIO_DIR_NEXT:
+                logf("audio_dir_next");
+                if (global_settings.beep)
+                    pcmbuf_beep(5000, 100, 2500*global_settings.beep);
+                initiate_dir_change(1);
+                break;
+            
+            case AUDIO_DIR_PREV:
+                logf("audio_dir_prev");
+                if (global_settings.beep)
+                    pcmbuf_beep(5000, 100, 2500*global_settings.beep);
+                initiate_dir_change(-1);
+                break;
+
             case AUDIO_FLUSH:
                 audio_invalidate_tracks();
                 break ;
@@ -2006,6 +2041,16 @@ void audio_next(void)
 void audio_prev(void)
 {
     queue_post(&audio_queue, AUDIO_PREV, 0);
+}
+
+void audio_next_dir(void)
+{
+    queue_post(&audio_queue, AUDIO_DIR_NEXT, 0);
+}
+
+void audio_prev_dir(void)
+{
+    queue_post(&audio_queue, AUDIO_DIR_PREV, 0);
 }
 
 void audio_ff_rewind(int newpos)

@@ -3144,9 +3144,9 @@ voice: "Optical output"
 new:
 
 id: LANG_NEXT_FOLDER
-desc: in settings_menu.  Should we move to next folder when current one ends
-eng: "Move to Next Folder"
-voice: "Move to Next Folder"
+desc: in settings_menu. Should we allow skip directories and move to next folder when current one ends
+eng: "Directory navigation"
+voice: "Directory navigation"
 new:
 
 id: LANG_RUNTIMEDB_ACTIVE
