@@ -96,7 +96,7 @@ extern char iramend[];
 
 /* Those are lookup tables, so they should be in the idata section
  * (fast but small RAM on the coldfire processor) */
-static int16_t alaw2linear16[256] IDATA_ATTR = {
+static int16_t alaw2linear16[256] ICONST_ATTR = {
      -5504,   -5248,   -6016,   -5760,   -4480,   -4224,   -4992,
      -4736,   -7552,   -7296,   -8064,   -7808,   -6528,   -6272,
      -7040,   -6784,   -2752,   -2624,   -3008,   -2880,   -2240,
@@ -136,7 +136,7 @@ static int16_t alaw2linear16[256] IDATA_ATTR = {
        816,     784,     880,     848
 };
 
-static int16_t ulaw2linear16[256] IDATA_ATTR = {
+static int16_t ulaw2linear16[256] ICONST_ATTR = {
     -32124,  -31100,  -30076,  -29052,  -28028,  -27004,  -25980,
     -24956,  -23932,  -22908,  -21884,  -20860,  -19836,  -18812,
     -17788,  -16764,  -15996,  -15484,  -14972,  -14460,  -13948,
@@ -176,7 +176,7 @@ static int16_t ulaw2linear16[256] IDATA_ATTR = {
         24,      16,       8,       0
 };
 
-static uint16_t dvi_adpcm_steptab[ 89 ] IDATA_ATTR = {
+static uint16_t dvi_adpcm_steptab[ 89 ] ICONST_ATTR = {
     7, 8, 9, 10, 11, 12, 13, 14,
     16, 17, 19, 21, 23, 25, 28, 31,
     34, 37, 41, 45, 50, 55, 60, 66,
@@ -189,13 +189,13 @@ static uint16_t dvi_adpcm_steptab[ 89 ] IDATA_ATTR = {
     7132, 7845, 8630, 9493, 10442, 11487, 12635, 13899,
     15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794,
     32767 };
-static int dvi_adpcm_indextab4[ 8 ] IDATA_ATTR = { -1, -1, -1, -1, 2, 4, 6, 8 };
-static int dvi_adpcm_indextab3[ 4 ] IDATA_ATTR = { -1, -1, 1, 2 };
+static int dvi_adpcm_indextab4[ 8 ] ICONST_ATTR = { -1, -1, -1, -1, 2, 4, 6, 8 };
+static int dvi_adpcm_indextab3[ 4 ] ICONST_ATTR = { -1, -1, 1, 2 };
 
-static int16_t int16_samples[WAV_CHUNK_SIZE] IDATA_ATTR;
+static int16_t int16_samples[WAV_CHUNK_SIZE] IBSS_ATTR;
 
 static enum codec_status
-decode_dvi_adpcm(struct codec_api* rb,
+decode_dvi_adpcm(struct codec_api* ci,
                  const uint8_t *buf,
                  int n,
                  uint16_t channels, uint16_t bitspersample,
@@ -205,7 +205,7 @@ decode_dvi_adpcm(struct codec_api* rb,
 /* this is the codec entry point */
 enum codec_status codec_start(struct codec_api* api)
 {
-  struct codec_api* rb = api;
+  struct codec_api* ci = api;
   uint32_t numbytes, bytesdone;
   uint32_t totalsamples = 0;
   uint16_t channels=0;
@@ -229,14 +229,14 @@ enum codec_status codec_start(struct codec_api* api)
   TEST_CODEC_API(api);
 
 #ifdef USE_IRAM 
-  rb->memcpy(iramstart, iramcopy, iramend-iramstart);
+  ci->memcpy(iramstart, iramcopy, iramend-iramstart);
 #endif
 
-  rb->configure(CODEC_SET_FILEBUF_LIMIT, (int *)(1024*1024*10));
-  rb->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
-  rb->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*256));
+  ci->configure(CODEC_SET_FILEBUF_LIMIT, (int *)(1024*1024*10));
+  ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
+  ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*256));
 
-  rb->configure(DSP_DITHER, (bool *)false);
+  ci->configure(DSP_DITHER, (bool *)false);
   
   next_track:
 
@@ -244,11 +244,11 @@ enum codec_status codec_start(struct codec_api* api)
       return CODEC_ERROR;
   }
 
-  while (!*rb->taginfo_ready)
-      rb->yield();
+  while (!*ci->taginfo_ready)
+      ci->yield();
     
   /* assume the WAV header is less than 1024 bytes */
-  buf=rb->request_buffer((long *)&n,1024);
+  buf=ci->request_buffer((long *)&n,1024);
   if (n<44) {
       return CODEC_ERROR;
   }
@@ -369,23 +369,23 @@ enum codec_status codec_start(struct codec_api* api)
       return CODEC_ERROR;
   }
 
-  rb->configure(CODEC_DSP_ENABLE, (bool *)true);
-  rb->configure(DSP_SET_FREQUENCY, (long *)(rb->id3->frequency));
+  ci->configure(CODEC_DSP_ENABLE, (bool *)true);
+  ci->configure(DSP_SET_FREQUENCY, (long *)(ci->id3->frequency));
 
   if (bitspersample <= 16) {
-      rb->configure(DSP_SET_SAMPLE_DEPTH, (int *)(16));
+      ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(16));
   } else {
       shortorlong = 2;
-      rb->configure(DSP_DITHER, (bool *)false);
-      rb->configure(DSP_SET_SAMPLE_DEPTH, (long *) (32));
-      rb->configure(DSP_SET_CLIP_MAX, (long *) (2147483647));
-      rb->configure(DSP_SET_CLIP_MIN, (long *) (-2147483647-1));
+      ci->configure(DSP_DITHER, (bool *)false);
+      ci->configure(DSP_SET_SAMPLE_DEPTH, (long *) (32));
+      ci->configure(DSP_SET_CLIP_MAX, (long *) (2147483647));
+      ci->configure(DSP_SET_CLIP_MIN, (long *) (-2147483647-1));
   }
 
   if (channels == 2) {
-      rb->configure(DSP_SET_STEREO_MODE, (int *)STEREO_INTERLEAVED);
+      ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_INTERLEAVED);
   } else if (channels == 1) {
-      rb->configure(DSP_SET_STEREO_MODE, (int *)STEREO_MONO);
+      ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_MONO);
   } else {
       DEBUGF("CODEC_ERROR: more than 2 channels\n");
       return CODEC_ERROR;
@@ -406,12 +406,12 @@ enum codec_status codec_start(struct codec_api* api)
   }
 
   firstblockposn = (1024-n);
-  rb->advance_buffer(firstblockposn);
+  ci->advance_buffer(firstblockposn);
 
   /* The main decoder loop */
 
   bytesdone=0;
-  rb->set_elapsed(0);
+  ci->set_elapsed(0);
   endofstream=0;
   /* chunksize is computed so that one chunk is about 1/50s.
    * this make 4096 for 44.1kHz 16bits stereo.
@@ -419,36 +419,36 @@ enum codec_status codec_start(struct codec_api* api)
   chunksize = (1 + avgbytespersec / (50*blockalign)) * blockalign;
   /* check that the output buffer is big enough (convert to samplespersec,
      then round to the blockalign multiple below) */
-  if (((uint64_t)chunksize*rb->id3->frequency*channels*shortorlong)
+  if (((uint64_t)chunksize*ci->id3->frequency*channels*shortorlong)
       / (uint64_t)avgbytespersec >= WAV_CHUNK_SIZE) {
       chunksize = ((uint64_t)WAV_CHUNK_SIZE * avgbytespersec
-                   / ((uint64_t)rb->id3->frequency * channels * shortorlong 
+                   / ((uint64_t)ci->id3->frequency * channels * shortorlong 
                       * blockalign)) * blockalign;
   }
 
   while (!endofstream) {
       uint8_t *wavbuf8;
 
-      rb->yield();
-    if (rb->stop_codec || rb->reload_codec) {
+      ci->yield();
+    if (ci->stop_codec || ci->reload_codec) {
         break;
     }
 
-    if (rb->seek_time) {
+    if (ci->seek_time) {
         uint32_t newpos;
 
         /* use avgbytespersec to round to the closest blockalign multiple,
            add firstblockposn. 64-bit casts to avoid overflows. */
-        newpos = (((uint64_t)avgbytespersec * rb->seek_time)
+        newpos = (((uint64_t)avgbytespersec * ci->seek_time)
                   / (1000LL*blockalign)) * blockalign;
         if (newpos > numbytes)
             break;
-        if (rb->seek_buffer(firstblockposn + newpos)) {
+        if (ci->seek_buffer(firstblockposn + newpos)) {
             bytesdone = newpos;
         }
-        rb->seek_complete();
+        ci->seek_complete();
     }
-    wavbuf=rb->request_buffer((long *)&n,chunksize);
+    wavbuf=ci->request_buffer((long *)&n,chunksize);
     wavbuf8 = (uint8_t*)wavbuf;
 
     if (n==0)
@@ -507,7 +507,7 @@ enum codec_status codec_start(struct codec_api* api)
 
         for (i=0; i<nblocks; i++) {
             size_t decodedsize = samplesperblock*channels;
-            if (decode_dvi_adpcm(rb, ((uint8_t*)wavbuf)+i*blockalign,
+            if (decode_dvi_adpcm(ci, ((uint8_t*)wavbuf)+i*blockalign,
                                  blockalign, channels, bitspersample,
                                  int16_samples+i*samplesperblock*channels,
                                  &decodedsize)
@@ -523,27 +523,27 @@ enum codec_status codec_start(struct codec_api* api)
         return CODEC_ERROR;
     }
 
-    while (!rb->pcmbuf_insert((char*)int16_samples, wavbufsize)) {
-        rb->yield();
+    while (!ci->pcmbuf_insert((char*)int16_samples, wavbufsize)) {
+        ci->yield();
     }
 
-    rb->advance_buffer(n);
+    ci->advance_buffer(n);
     bytesdone += n;
     if (bytesdone >= numbytes) {
         endofstream=1;
     }
 
-    rb->set_elapsed(bytesdone*1000LL/avgbytespersec);
+    ci->set_elapsed(bytesdone*1000LL/avgbytespersec);
   }
 
-  if (rb->request_next_track())
+  if (ci->request_next_track())
       goto next_track;
 
   return CODEC_OK;
 }
 
 static enum codec_status
-decode_dvi_adpcm(struct codec_api* rb,
+decode_dvi_adpcm(struct codec_api* ci,
                  const uint8_t *buf,
                  int n,
                  uint16_t channels, uint16_t bitspersample,
@@ -561,7 +561,7 @@ decode_dvi_adpcm(struct codec_api* rb,
     int codem;
     int code;
 
-    (void)rb;
+    (void)ci;
     if (bitspersample != 4 && bitspersample != 3) {
         DEBUGF("decode_dvi_adpcm: wrong bitspersample\n");
         return CODEC_ERROR;
