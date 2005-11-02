@@ -641,6 +641,8 @@ bool dsp_configure(int setting, void *value)
         {
             dsp->frac_bits = (long) value;
             dsp->sample_bytes = sizeof(long);
+            dsp->clip_max = (1 << (long)value) - 1;
+            dsp->clip_min = -(1 << (long)value);
         }
 
         break;
