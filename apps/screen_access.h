@@ -22,6 +22,7 @@
 
 #include "lcd.h"
 #include "buttonbar.h"
+#include "textarea.h"
 
 enum screen_type {
     SCREEN_MAIN
