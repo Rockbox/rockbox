@@ -68,6 +68,7 @@
 #include "statusbar.h"
 #include "splash.h"
 #include "buttonbar.h"
+#include "textarea.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -321,19 +322,18 @@ static int update_dir(void)
             int i;
             for(i = 0;i < NB_SCREENS;++i)
             {
+                gui_textarea_clear(&screens[i]);
 #ifdef HAVE_LCD_CHARCELLS
                 screens[i].double_height(false);
 #endif
                 screens[i].clear_display();
                 screens[i].puts(0,0,str(LANG_SHOWDIR_ERROR_BUFFER));
                 screens[i].puts(0,1,str(LANG_SHOWDIR_ERROR_FULL));
-#if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
-                screens[i].update();
-#endif
+                gui_textarea_update(&screens[i]);
             }
             sleep(HZ*2);
             for(i = 0;i < NB_SCREENS;++i)
-                screens[i].clear_display();
+                gui_textarea_clear(&screens[i]);
         }
     }
     gui_synclist_set_nb_items(&tree_lists, tc.filesindir);
@@ -559,13 +559,13 @@ static bool dirbrowse(void)
             int i;
             for(i = 0;i < NB_SCREENS;++i)
             {
-                screens[i].clear_display();
+                gui_textarea_clear(&screens[i]);
                 screens[i].puts(0,0,str(LANG_BOOT_CHANGED));
                 screens[i].puts(0,1,str(LANG_REBOOT_NOW));
 #ifdef HAVE_LCD_BITMAP
                 screens[i].puts(0,3,str(LANG_CONFIRM_WITH_PLAY_RECORDER));
                 screens[i].puts(0,4,str(LANG_CANCEL_WITH_ANY_RECORDER));
-                screens[i].update();
+                gui_textarea_update(&screens[i]);
 #endif
             }
             while (!stop) {
@@ -1077,8 +1077,8 @@ static bool add_dir(char* dirname, int len, int fd)
 #ifdef HAVE_LCD_BITMAP
                             for(i = 0;i < NB_SCREENS;++i)
                             {
+                                gui_textarea_clear(&screens[i]);
                                 screens[i].puts(0,4,buf);
-                                screens[i].update();
                             }
 #else
                             x = 10;
@@ -1092,8 +1092,10 @@ static bool add_dir(char* dirname, int len, int fd)
                                         x=9;
                                 }
                             }
-                            for(i = 0;i < NB_SCREENS;++i)
+                            for(i = 0;i < NB_SCREENS;++i) {
                                 screens[i].puts(x,0,buf);
+                                gui_textarea_update(&screens[i]);
+                            }
 #endif
                             break;
                         }
@@ -1117,11 +1119,11 @@ bool create_playlist(void)
              tc.currdir[1] ? tc.currdir : "/root");
     for(i = 0;i < NB_SCREENS;++i)
     {
-        screens[i].clear_display();
+        gui_textarea_clear(&screens[i]);
         screens[i].puts(0,0,str(LANG_CREATING));
         screens[i].puts_scroll(0,1,filename);
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
-        screens[i].update();
+        gui_textarea_update(&screens[i]);
 #endif
     }
     fd = creat(filename,0);
@@ -1360,18 +1362,11 @@ void tree_restore(void)
                                 screens[i].char_width)/2),
                               LCD_HEIGHT-screens[i].char_height*3,
                               str(LANG_DIRCACHE_BUILDING));
-            screens[i].update();
+            gui_textarea_update(&screens[i]);
         }
         dircache_build(global_settings.dircache_size);
         /* Clean the text when we are done. */
-        for(i=0;i<NB_SCREENS;++i)
-        {
-            screens[i].set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-            screens[i].fillrect(0, LCD_HEIGHT-screens[i].char_height*3,
-                                LCD_WIDTH, screens[i].char_height);
-            screens[i].set_drawmode(DRMODE_SOLID);
-            screens[i].update();
-        }
+        gui_textarea_clear(&screens[i]);
     }
 #endif
 }

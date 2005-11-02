@@ -22,6 +22,7 @@
 
 #include "config.h"
 #include "status.h"
+#include "screen_access.h"
 
 #define STATUSBAR_X_POS                         0
 #define STATUSBAR_Y_POS                         0 /* MUST be a multiple of 8 */
