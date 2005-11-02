@@ -168,7 +168,7 @@ next_track:
                 samplesdone = sample_loc;
                 ci->set_elapsed(samplesdone/(ci->id3->frequency/1000));
             }
-            ci->seek_time = 0;
+            ci->seek_complete();
         }
 
         filebuf = ci->request_buffer(&n, BUFFER_SIZE);

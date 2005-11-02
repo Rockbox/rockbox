@@ -446,7 +446,7 @@ enum codec_status codec_start(struct codec_api* api)
         if (rb->seek_buffer(firstblockposn + newpos)) {
             bytesdone = newpos;
         }
-        rb->seek_time = 0;
+        rb->seek_complete();
     }
     wavbuf=rb->request_buffer((long *)&n,chunksize);
     wavbuf8 = (uint8_t*)wavbuf;

@@ -275,7 +275,7 @@ enum codec_status codec_start(struct codec_api* api)
                 /* Refill the input buffer */
                 buf = ci->request_buffer(&bytesleft, MAX_FRAMESIZE);
             }
-            ci->seek_time = 0;
+            ci->seek_complete();
         }
 
         if((res=flac_decode_frame(&fc,decoded0,decoded1,buf,

@@ -124,7 +124,7 @@ enum codec_status codec_start(struct codec_api* api)
             }
 
             wpc = WavpackOpenFileInput (read_callback, error);
-            ci->seek_time = 0;
+            ci->seek_complete();
 
             if (!wpc)
                 break;

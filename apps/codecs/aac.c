@@ -131,7 +131,7 @@ enum codec_status codec_start(struct codec_api* api)
                 elapsedtime=(samplesdone*10)/(ci->id3->frequency/100);
                 ci->set_elapsed(elapsedtime);
             }
-            ci->seek_time = 0;
+            ci->seek_complete();
         }
 
         /* Lookup the length (in samples and bytes) of block i */
