@@ -31,12 +31,12 @@ typedef struct
     /* end setinfo stuff */
 } alac_file;
 
-void create_alac(int samplesize, int numchannels, alac_file* alac);
+void create_alac(int samplesize, int numchannels, alac_file* alac) ICODE_ATTR;
 int alac_decode_frame(alac_file *alac,
                       unsigned char *inbuffer,
                       int32_t outputbuffer[ALAC_MAX_CHANNELS][ALAC_BLOCKSIZE],
-                      void (*yield)(void));
-void alac_set_info(alac_file *alac, char *inputbuffer);
+                      void (*yield)(void)) ICODE_ATTR;
+void alac_set_info(alac_file *alac, char *inputbuffer) ICODE_ATTR;
 
 #endif /* __ALAC__DECOMP_H */
 

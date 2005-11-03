@@ -105,7 +105,7 @@ void alac_set_info(alac_file *alac, char *inputbuffer)
 /* stream reading */
 
 /* supports reading 1 to 16 bits, in big endian format */
-static uint32_t readbits_16(alac_file *alac, int bits)
+static inline uint32_t readbits_16(alac_file *alac, int bits)
 {
     uint32_t result;
     int new_accumulator;
@@ -137,7 +137,7 @@ static uint32_t readbits_16(alac_file *alac, int bits)
 }
 
 /* supports reading 1 to 32 bits, in big endian format */
-static uint32_t readbits(alac_file *alac, int bits)
+static inline uint32_t readbits(alac_file *alac, int bits)
 {
     int32_t result = 0;
 
@@ -153,7 +153,7 @@ static uint32_t readbits(alac_file *alac, int bits)
 }
 
 /* reads a single bit */
-static int readbit(alac_file *alac)
+static inline int readbit(alac_file *alac)
 {
     int result;
     int new_accumulator;
@@ -173,7 +173,7 @@ static int readbit(alac_file *alac)
     return result;
 }
 
-static void unreadbits(alac_file *alac, int bits)
+static inline void unreadbits(alac_file *alac, int bits)
 {
     int new_accumulator = (alac->input_buffer_bitaccumulator - bits);
 
@@ -187,7 +187,7 @@ static void unreadbits(alac_file *alac, int bits)
 /* hideously inefficient. could use a bitmask search,
  * alternatively bsr on x86,
  */
-static int count_leading_zeros(int32_t input)
+static inline int count_leading_zeros(int32_t input)
 {
     int i = 0;
     while (!(0x80000000 & input) && i < 32)
@@ -206,7 +206,16 @@ void basterdised_rice_decompress(alac_file *alac,
                                  int rice_kmodifier, /* arg424->d */
                                  int rice_historymult, /* arg424->c */
                                  int rice_kmodifier_mask /* arg424->e */
-        )
+                                ) ICODE_ATTR;
+void basterdised_rice_decompress(alac_file *alac,
+                                 int32_t *output_buffer,
+                                 int output_size,
+                                 int readsamplesize, /* arg_10 */
+                                 int rice_initialhistory, /* arg424->b */
+                                 int rice_kmodifier, /* arg424->d */
+                                 int rice_historymult, /* arg424->c */
+                                 int rice_kmodifier_mask /* arg424->e */
+                                )
 {
     int output_count;
     unsigned int history = rice_initialhistory;
@@ -338,6 +347,13 @@ void basterdised_rice_decompress(alac_file *alac,
                                 ((v > 0) ? (1) : \
                                            (0)))
 
+static void predictor_decompress_fir_adapt(int32_t *error_buffer,
+                                           int32_t *buffer_out,
+                                           int output_size,
+                                           int readsamplesize,
+                                           int16_t *predictor_coef_table,
+                                           int predictor_coef_num,
+                                           int predictor_quantitization) ICODE_ATTR;
 static void predictor_decompress_fir_adapt(int32_t *error_buffer,
                                            int32_t *buffer_out,
                                            int output_size,
@@ -605,6 +621,11 @@ static void predictor_decompress_fir_adapt(int32_t *error_buffer,
     }
 }
 
+void deinterlace_16(int32_t* buffer0,
+                    int32_t* buffer1,
+                    int numsamples,
+                    uint8_t interlacing_shift,
+                    uint8_t interlacing_leftweight) ICODE_ATTR;
 void deinterlace_16(int32_t* buffer0,
                     int32_t* buffer1,
                     int numsamples,
