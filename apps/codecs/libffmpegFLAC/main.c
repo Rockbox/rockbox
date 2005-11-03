@@ -138,6 +138,10 @@ static bool flac_init(int fd, FLACContext* fc)
     bool found_streaminfo=false;
     int endofmetadata=0;
     int blocklength;
+    uint32_t* p;
+    uint32_t seekpoint_lo,seekpoint_hi;
+    uint32_t offset_lo,offset_hi;
+    int n;
 
     if (lseek(fd, 0, SEEK_SET) < 0) 
     {
@@ -196,9 +200,22 @@ static bool flac_init(int fd, FLACContext* fc)
             found_streaminfo=true;
         } else if ((buf[0] & 0x7f) == 3) { /* 3 is the SEEKTABLE block */
             fprintf(stderr,"Seektable length = %d bytes\n",blocklength);
-            if (lseek(fd, blocklength, SEEK_CUR) < 0) {
-                return false;
-          }
+            while (blocklength >= 18) {
+                n=read(fd,buf,18);
+                if (n < 18) return false;
+                blocklength-=n;
+
+                p=(uint32_t*)buf;
+                seekpoint_hi=betoh32(*(p++));
+                seekpoint_lo=betoh32(*(p++));
+                offset_hi=betoh32(*(p++));
+                offset_lo=betoh32(*(p++));
+            
+                if ((seekpoint_hi != 0xffffffff) && (seekpoint_lo != 0xffffffff)) {
+		  fprintf(stderr,"Seekpoint: %u, Offset=%u\n",seekpoint_lo,offset_lo);
+                }
+            }
+            lseek(fd, blocklength, SEEK_CUR);
         } else {
             /* Skip to next metadata block */
             if (lseek(fd, blocklength, SEEK_CUR) < 0)
@@ -227,7 +244,7 @@ int main(int argc, char* argv[]) {
     int i;
     int bytesleft;
     int consumed;
-    char buf[MAX_FRAMESIZE]; /* The input buffer */
+    unsigned char buf[MAX_FRAMESIZE]; /* The input buffer */
     /* The output buffers containing the decoded samples (channels 0 and 1) */
     int32_t decoded0[MAX_BLOCKSIZE];
     int32_t decoded1[MAX_BLOCKSIZE];

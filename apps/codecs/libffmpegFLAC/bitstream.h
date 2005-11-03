@@ -15,7 +15,7 @@
   #include <stdio.h>
   #define IBSS_ATTR
   #define ICONST_ATTR
-
+  #define ICODE_ATTR
 #endif
 
 /* Endian conversion routines for standalone compilation */
