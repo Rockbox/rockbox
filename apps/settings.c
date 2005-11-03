@@ -333,7 +333,7 @@ static const struct bit_entry hd_bits[] =
     {3, S_O(dirfilter), SHOW_SUPPORTED, 
         "show files", "all,supported,music,playlists,id3 database" },
     {1, S_O(sort_case), false, "sort case", off_on },
-    {1, S_O(browse_current), false, "follow playlist", off_on },
+    {1, S_O(browse_current), true, "follow playlist", off_on },
     /* playlist */
     {1, S_O(playlist_viewer_icons), true, "playlist viewer icons", off_on },
     {1, S_O(playlist_viewer_indices), true,
