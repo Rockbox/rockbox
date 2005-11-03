@@ -96,5 +96,6 @@ bool menu_movedown(int menu);
 void menu_draw(int menu);
 void menu_insert(int menu, int position, char *desc, bool (*function) (void));
 void menu_set_cursor(int menu, int position);
+void menu_talk_selected(int m);
 
 #endif /* End __MENU_H__ */

@@ -125,9 +125,9 @@ int menu_show(int m)
     int key;
 
     gui_synclist_draw(&(menus[m].synclist));
+    menu_talk_selected(m);
     while (!exit) {
         key = button_get_w_tmo(HZ/2);
-
         /*
          * "short-circuit" the default keypresses by running the
          * callback function
@@ -137,17 +137,9 @@ int menu_show(int m)
          */
         if( menus[m].callback != NULL )
             key = menus[m].callback(key, m);
+        /* If moved, "say" the entry under the cursor */
         if(gui_synclist_do_button(&(menus[m].synclist), key))
-        {
-            /* If moved, "say" the entry under the cursor */
-            if(global_settings.talk_menu)
-            {
-                int selected=gui_synclist_get_sel_pos(&(menus[m].synclist));
-                int voice_id = P2ID(menus[m].items[selected].desc);
-                if (voice_id >= 0) /* valid ID given? */
-                    talk_id(voice_id, false); /* say it */
-            }
-        }
+            menu_talk_selected(m);
         switch( key ) {
             case MENU_ENTER:
 #ifdef MENU_ENTER2
@@ -265,7 +257,7 @@ void menu_insert(int menu, int position, char *desc, bool (*function) (void))
 }
 
 /*
- *  Property function - return the "count" of menu items in "menu" 
+ *  Property function - return the "count" of menu items in "menu"
  */
 
 int menu_count(int menu)
@@ -309,7 +301,7 @@ bool menu_movedown(int menu)
     if( selected == nb_items - 1)
         return false;
 
-    /* use a temporary variable to do the swap */    
+    /* use a temporary variable to do the swap */
     swap = menus[menu].items[selected + 1];
     menus[menu].items[selected + 1] = menus[menu].items[selected];
     menus[menu].items[selected] = swap;
@@ -325,6 +317,22 @@ bool menu_movedown(int menu)
 void menu_set_cursor(int menu, int position)
 {
     gui_synclist_select_item(&(menus[menu].synclist), position);
+}
+
+void menu_talk_selected(int m)
+{
+    if(global_settings.talk_menu)
+    {
+        int selected=gui_synclist_get_sel_pos(&(menus[m].synclist));
+        int voice_id = P2ID(menus[m].items[selected].desc);
+        if (voice_id >= 0) /* valid ID given? */
+            talk_id(voice_id, false); /* say it */
+    }
+}
+
+void menu_draw(int m)
+{
+    gui_synclist_draw(&(menus[m].synclist));
 }
 
 /* count in letter positions, NOT pixels */
@@ -363,9 +371,4 @@ void put_cursorxy(int x, int y, bool on)
         lcd_putc(x, y, ' ');
 #endif
     }
-}
-
-void menu_draw(int m)
-{
-    gui_synclist_draw(&(menus[m].synclist));
 }
