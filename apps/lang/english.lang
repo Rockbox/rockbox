@@ -3164,7 +3164,7 @@ new:
 id: LANG_RATING
 desc: in set_rating
 eng: "Rating:"
-voice: "Rating"
+voice: ""
 new:
 
 id: LANG_CROSSFADE_DURATION
