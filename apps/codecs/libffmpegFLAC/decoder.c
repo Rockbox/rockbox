@@ -111,6 +111,7 @@ static const uint8_t table_crc8[256] ICONST_ATTR = {
     0xe6, 0xe1, 0xe8, 0xef, 0xfa, 0xfd, 0xf4, 0xf3
 };
 
+static int64_t get_utf8(GetBitContext *gb) ICODE_ATTR;
 static int64_t get_utf8(GetBitContext *gb)
 {
     uint64_t val;
@@ -135,7 +136,9 @@ static int64_t get_utf8(GetBitContext *gb)
     return val;
 }
 
-static int get_crc8(const uint8_t *buf, int count){
+static int get_crc8(const uint8_t *buf, int count) ICODE_ATTR;
+static int get_crc8(const uint8_t *buf, int count)
+{
     int crc=0;
     int i;
     
@@ -146,6 +149,7 @@ static int get_crc8(const uint8_t *buf, int count){
     return crc;
 }
 
+static int decode_residuals(FLACContext *s, int32_t* decoded, int pred_order) ICODE_ATTR;
 static int decode_residuals(FLACContext *s, int32_t* decoded, int pred_order)
 {
     int i, tmp, partition, method_type, rice_order;
@@ -185,6 +189,7 @@ static int decode_residuals(FLACContext *s, int32_t* decoded, int pred_order)
     return 0;
 }    
 
+static int decode_subframe_fixed(FLACContext *s, int32_t* decoded, int pred_order) ICODE_ATTR;
 static int decode_subframe_fixed(FLACContext *s, int32_t* decoded, int pred_order)
 {
     int i;
@@ -231,6 +236,7 @@ static int decode_subframe_fixed(FLACContext *s, int32_t* decoded, int pred_orde
     return 0;
 }
 
+static int decode_subframe_lpc(FLACContext *s, int32_t* decoded, int pred_order) ICODE_ATTR;
 static int decode_subframe_lpc(FLACContext *s, int32_t* decoded, int pred_order)
 {
     int sum, i, j;
@@ -377,6 +383,10 @@ static inline int decode_subframe(FLACContext *s, int channel, int32_t* decoded)
     return 0;
 }
 
+static int decode_frame(FLACContext *s,
+                        int32_t* decoded0,
+                        int32_t* decoded1,
+                        void (*yield)(void)) ICODE_ATTR;
 static int decode_frame(FLACContext *s,
                         int32_t* decoded0,
                         int32_t* decoded1,

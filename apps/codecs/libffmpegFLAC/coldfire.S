@@ -23,7 +23,7 @@
    All LPC filtering up to order 8 is done in specially optimised unrolled
    loops, while every order above this is handled by a slower default routine.
  */
-    .text
+    .section .icode,"ax",@progbits
     .global lpc_decode_emac
     .align 2
 lpc_decode_emac:

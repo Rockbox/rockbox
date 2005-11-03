@@ -252,7 +252,7 @@ static inline unsigned int get_bits(GetBitContext *s, int n){
     return tmp;
 }
 
-unsigned int get_bits_long(GetBitContext *s, int n);
+unsigned int get_bits_long(GetBitContext *s, int n) ICODE_ATTR;
 
 /**
  * shows 0-17 bits.
@@ -267,7 +267,7 @@ static inline unsigned int show_bits(GetBitContext *s, int n){
     return tmp;
 }
 
-unsigned int show_bits_long(GetBitContext *s, int n);
+unsigned int show_bits_long(GetBitContext *s, int n) ICODE_ATTR;
 
 static inline void skip_bits(GetBitContext *s, int n){
  //Note gcc seems to optimize this to s->index+=n for the ALT_READER :))
@@ -328,6 +328,6 @@ static inline void init_get_bits(GetBitContext *s,
     }
 }
 
-void align_get_bits(GetBitContext *s);
+void align_get_bits(GetBitContext *s) ICODE_ATTR;
 
 #endif /* BITSTREAM_H */

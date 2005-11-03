@@ -41,6 +41,6 @@ int flac_decode_frame(FLACContext *s,
                       int32_t* decoded0,
                       int32_t* decoded1,
                       uint8_t *buf, int buf_size,
-                      void (*yield)(void));
+                      void (*yield)(void)) ICODE_ATTR;
 
 #endif
