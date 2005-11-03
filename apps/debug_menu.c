@@ -1205,7 +1205,7 @@ bool view_battery(void)
             case 1: /* status: */
                 lcd_clear_display();
                 lcd_puts(0, 0, "Power status:");
-                
+
                 y = (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) / 10000;
                 snprintf(buf, 30, "Battery: %d.%02d V", y / 100, y % 100);
                 lcd_puts(0, 1, buf);
@@ -1215,10 +1215,6 @@ bool view_battery(void)
                 lcd_puts(0, 2, buf);
 #endif
 #ifdef HAVE_CHARGING
-                snprintf(buf, 30, "Charger: %s", 
-                         charger_inserted() ? "present" : "absent");
-                lcd_puts(0, 3, buf);
-#endif
 #ifdef HAVE_CHARGE_CTRL
                 snprintf(buf, 30, "Chgr: %s %s", 
                          charger_inserted() ? "present" : "absent",
@@ -1229,7 +1225,12 @@ bool view_battery(void)
                 snprintf(buf, 30, "long delta: %d", long_delta);
                 lcd_puts(0, 6, buf);
                 lcd_puts(0, 7, power_message);
-#endif /* HAVE_CHARGE_CTRL */
+#else /* !HAVE_CHARGE_CTRL */
+                snprintf(buf, 30, "Charger: %s",
+                         charger_inserted() ? "present" : "absent");
+                lcd_puts(0, 3, buf);
+#endif /* !HAVE_CHARGE_CTRL */
+#endif /* HAVE_CHARGING */
                 break;
                 
             case 2: /* voltage deltas: */
