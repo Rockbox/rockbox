@@ -868,19 +868,19 @@ id: LANG_PM_PERFORMANCE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_PM_HIGH_PERFORMANCE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_PM_ENERGY_SAVER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
@@ -3137,10 +3137,10 @@ voice: "Optischer Ausgang"
 new: "Optischer Ausgang"
 
 id: LANG_NEXT_FOLDER
-desc: in settings_menu.  Should we move to next folder when current one ends
-eng: "Move to Next Folder"
-voice: "In nächstes Verzeichnis wechseln"
-new: "In nächstes Verzeichnis wechseln"
+desc: in settings_menu. Should we allow skip directories and move to next folder when current one ends
+eng: "Directory navigation"
+voice: "Verzeichnisnavigation"
+new: "Verzeichnisnavigation"
 
 id: LANG_RUNTIMEDB_ACTIVE
 desc: in settings_menu.
