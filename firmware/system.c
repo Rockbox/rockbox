@@ -549,15 +549,14 @@ int system_memory_guard(int newmode)
         /* Note: CPU space accesses (movec instruction), interrupt acknowledges
            and emulator mode accesses are never caught. */
     };
-    static int oldmode = MEMGUARD_NONE;
+    static int cur_mode = MEMGUARD_NONE;
 
+    int oldmode = cur_mode;
     const unsigned long *ptr;
     int i;
 
     if (newmode == MEMGUARD_KEEP)
         newmode = oldmode;
-    else
-        oldmode = newmode;
 
     /* Always set the new mode, we don't know the old settings
        as we cannot read back */
@@ -567,6 +566,7 @@ int system_memory_guard(int newmode)
         asm ( "wdebug (%0) \n" : : "a"(ptr));
         ptr += 2;
     }
+    cur_mode = newmode;
 
     return oldmode;
 }
