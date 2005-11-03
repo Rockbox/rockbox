@@ -587,7 +587,7 @@ void set_cpu_frequency(long frequency)
     switch(frequency)
     {
     case CPUFREQ_MAX:
-        DCR = (DCR & ~0x01ff) | DEFAULT_REFRESH_TIMER;  
+        DCR = (0x8200 | DEFAULT_REFRESH_TIMER);
               /* Refresh timer for bypass frequency */
         PLLCR &= ~1;  /* Bypass mode */
         timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, false);
@@ -597,7 +597,7 @@ void set_cpu_frequency(long frequency)
         while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
                                             This may take up to 10ms! */
         timers_adjust_prescale(CPUFREQ_MAX_MULT, true);
-        DCR = (DCR & ~0x01ff) | MAX_REFRESH_TIMER;   /* Refresh timer */
+        DCR = (0x8200 | MAX_REFRESH_TIMER);          /* Refresh timer */
         cpu_frequency = CPUFREQ_MAX;
         IDECONFIG1 = 0x106000 | (5 << 10); /* BUFEN2 enable + CS2Pre/CS2Post */
         IDECONFIG2 = 0x40000 | (1 << 8); /* TA enable + CS2wait */
@@ -614,19 +614,20 @@ void set_cpu_frequency(long frequency)
         while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
                                             This may take up to 10ms! */
         timers_adjust_prescale(CPUFREQ_NORMAL_MULT, true);
-        DCR = (DCR & ~0x01ff) | NORMAL_REFRESH_TIMER;   /* Refresh timer */
+        DCR = (0x8000 | NORMAL_REFRESH_TIMER);       /* Refresh timer */
         cpu_frequency = CPUFREQ_NORMAL;
         IDECONFIG1 = 0x106000 | (5 << 10); /* BUFEN2 enable + CS2Pre/CS2Post */
         IDECONFIG2 = 0x40000 | (0 << 8); /* TA enable + CS2wait */
         break;
     default:
-        DCR = (DCR & ~0x01ff) | DEFAULT_REFRESH_TIMER;  
+        DCR = (DCR & ~0x01ff) | DEFAULT_REFRESH_TIMER;
               /* Refresh timer for bypass frequency */
         PLLCR &= ~1;  /* Bypass mode */
         timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, true);
         PLLCR = 0x10800200; /* Power down PLL, but keep CLSEL and CRSEL */
         CSCR0 = 0x00000180; /* Flash: 0 wait states */
         CSCR1 = 0x00000180; /* LCD: 0 wait states */
+        DCR = (0x8000 | DEFAULT_REFRESH_TIMER);       /* Refresh timer */
         cpu_frequency = CPUFREQ_DEFAULT;
         IDECONFIG1 = 0x106000 | (1 << 10); /* BUFEN2 enable + CS2Pre/CS2Post */
         IDECONFIG2 = 0x40000 | (0 << 8); /* TA enable + CS2wait */
