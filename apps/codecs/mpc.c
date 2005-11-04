@@ -87,9 +87,15 @@ enum codec_status codec_start(struct codec_api *api)
     
     ci->configure(CODEC_DSP_ENABLE, (bool *)true);
     ci->configure(DSP_DITHER, (bool *)false);
-    ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)(MPC_FIXED_POINT_SCALE_SHIFT));
+    
+    /* NOTE: this _should_ be set to MPC_FIXED_POINT_SCALE_SHIFT, not with
+       a 1 subtracted. However, doing so yields an output with only half the
+       amplitude it should have, so currently we use what's here, as it gives
+       correct level output. */
+    ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)(MPC_FIXED_POINT_SCALE_SHIFT - 1));
+    /* disable these until we can figure out what's going on.
     ci->configure(DSP_SET_CLIP_MAX, (long *)MPC_FIXED_POINT_SCALE);
-    ci->configure(DSP_SET_CLIP_MIN, (long *)-MPC_FIXED_POINT_SCALE);
+    ci->configure(DSP_SET_CLIP_MIN, (long *)-MPC_FIXED_POINT_SCALE);*/
     ci->configure(CODEC_SET_FILEBUF_LIMIT, (long *)(1024*1024*2));
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (long *)(1024*16));
     
@@ -112,9 +118,6 @@ next_track:
     frequency = info.sample_freq;
     ci->configure(DSP_SET_FREQUENCY, (long *)info.sample_freq);
         
-    /* TODO: this should no doubt be handled in metadata.c */
-    ci->id3->length = info.pcm_samples/info.sample_freq*1000;
-        
     /* set playback engine up for correct number of channels */
     /* NOTE: current musepack format only allows for stereo files
        but code is here to handle other configurations anyway */
@@ -125,6 +128,7 @@ next_track:
     else
        return CODEC_ERROR;
     
+    codec_set_replaygain(ci->id3);
     /* instantiate a decoder with our file reader */
     mpc_decoder_setup(&decoder, &reader);
     if (!mpc_decoder_initialize(&decoder, &info))
