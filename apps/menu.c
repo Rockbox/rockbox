@@ -125,6 +125,7 @@ int menu_show(int m)
     int key;
 
     gui_synclist_draw(&(menus[m].synclist));
+    gui_syncstatusbar_draw(&statusbars, true);
     menu_talk_selected(m);
     while (!exit) {
         key = button_get_w_tmo(HZ/2);

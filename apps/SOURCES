@@ -37,6 +37,7 @@ gui/buttonbar.c
 gui/icon.c
 gui/list.c
 gui/scrollbar.c
+gui/select.c
 gui/splash.c
 gui/statusbar.c
 gui/textarea.c

@@ -68,6 +68,8 @@
 #include "rtc.h"
 #include "sound.h"
 #include "dircache.h"
+#include "select.h"
+#include "statusbar.h"
 
 #if CONFIG_CODEC == MAS3507D
 void dac_line_in(bool enable);
@@ -112,7 +114,7 @@ struct bit_entry
     /* store position in global_settings struct */
     short settings_offset; /* min 9 bit, better 10 */
     /* default value */
-    int default_val; /* min 15 bit */ 
+    int default_val; /* min 15 bit */
     /* variable name in a .cfg file, NULL if not to be saved */
     const char* cfg_name;
     /* set of values, or NULL for a numerical value */
@@ -135,7 +137,7 @@ offset  abs
 Config memory is reset to 0xff and initialized with 'factory defaults' if
 a valid header & checksum is not found. Config version number is only
 increased when information is _relocated_ or space is _reused_ so that old
-versions can read and modify configuration changed by new versions. 
+versions can read and modify configuration changed by new versions.
 Memory locations not used by a given version should not be
 modified unless the header & checksum test fails.
 
@@ -150,8 +152,8 @@ Rest of config block, only saved to disk:
 *************************************/
 
 /* The persistence of the global_settings members is now controlled by
-   the two tables below, rtc_bits and hd_bits. 
-   New values can just be added to the end, it will be backwards 
+   the two tables below, rtc_bits and hd_bits.
+   New values can just be added to the end, it will be backwards
    compatible. If you however change order, bitsize, etc. of existing
    entries, you need to bump CONFIG_BLOCK_VERSION to break compatibility.
 */
@@ -176,7 +178,7 @@ static const char trig_durations_conf [] =
                   "0s,1s,2s,5s,10s,15s,20s,25s,30s,1min,2min,5min,10min";
 #endif
 
-/* the part of the settings which ends up in the RTC RAM, where available 
+/* the part of the settings which ends up in the RTC RAM, where available
    (those we either need early, save frequently, or without spinup) */
 static const struct bit_entry rtc_bits[] =
 {
@@ -214,7 +216,7 @@ static const struct bit_entry rtc_bits[] =
     {6, S_O(contrast), 40, "contrast", NULL },
 #ifdef CONFIG_BACKLIGHT
 #ifdef HAVE_CHARGING
-    {1, S_O(backlight_on_when_charging), false, 
+    {1, S_O(backlight_on_when_charging), false,
         "backlight when plugged", off_on },
 #endif
     {5, S_O(backlight_timeout), 5, "backlight timeout",
@@ -240,9 +242,9 @@ static const struct bit_entry rtc_bits[] =
         "idle poweroff", "off,1,2,3,4,5,6,7,8,9,10,15,30,45,60" },
     {18, S_O(runtime), 0, NULL, NULL },
     {18, S_O(topruntime), 0, NULL, NULL },
-    {15, S_O(max_files_in_playlist), 10000, 
+    {15, S_O(max_files_in_playlist), 10000,
         "max files in playlist", NULL }, /* 1000...20000 */
-    {14, S_O(max_files_in_dir), 400, 
+    {14, S_O(max_files_in_dir), 400,
         "max files in dir", NULL }, /* 50...10000 */
     /* battery */
     {12, S_O(battery_capacity), BATTERY_CAPACITY_MIN, "battery capacity",
@@ -313,7 +315,7 @@ static const struct bit_entry hd_bits[] =
     /* more playback */
     {1, S_O(play_selected), true, "play selected", off_on },
     {1, S_O(fade_on_stop), true, "volume fade", off_on },
-    {4, S_O(ff_rewind_min_step), FF_REWIND_1000, 
+    {4, S_O(ff_rewind_min_step), FF_REWIND_1000,
         "scan min step", "1,2,3,4,5,6,8,10,15,20,25,30,45,60" },
     {4, S_O(ff_rewind_accel), 3, "scan accel", NULL },
 #if CONFIG_CODEC == SWCODEC
@@ -330,7 +332,7 @@ static const struct bit_entry hd_bits[] =
     {8, S_O(disk_spindown), 5, "disk spindown", NULL },
 #endif /* HAVE_MMC */
     /* browser */
-    {3, S_O(dirfilter), SHOW_SUPPORTED, 
+    {3, S_O(dirfilter), SHOW_SUPPORTED,
         "show files", "all,supported,music,playlists,id3 database" },
     {1, S_O(sort_case), false, "sort case", off_on },
     {1, S_O(browse_current), true, "follow playlist", off_on },
@@ -338,16 +340,16 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(playlist_viewer_icons), true, "playlist viewer icons", off_on },
     {1, S_O(playlist_viewer_indices), true,
         "playlist viewer indices", off_on },
-    {1, S_O(playlist_viewer_track_display), 0, 
+    {1, S_O(playlist_viewer_track_display), 0,
         "playlist viewer track display", "track name,full path" },
-    {2, S_O(recursive_dir_insert), RECURSE_OFF, 
+    {2, S_O(recursive_dir_insert), RECURSE_OFF,
         "recursive directory insert", off_on_ask },
     /* bookmarks */
-    {3, S_O(autocreatebookmark), BOOKMARK_NO, "autocreate bookmarks", 
+    {3, S_O(autocreatebookmark), BOOKMARK_NO, "autocreate bookmarks",
         "off,on,ask,recent only - on,recent only - ask" },
     {2, S_O(autoloadbookmark), BOOKMARK_NO,
         "autoload bookmarks", off_on_ask },
-    {2, S_O(usemrb), BOOKMARK_NO, 
+    {2, S_O(usemrb), BOOKMARK_NO,
         "use most-recent-bookmarks", "off,on,unique only" },
 #ifdef HAVE_LCD_BITMAP
     /* peak meter */
@@ -424,7 +426,7 @@ static const struct bit_entry hd_bits[] =
     {3, S_O(backlight_fade_out), 3, "backlight fade out",
         "off,500ms,1s,2s,3s,4s,5s,10s"},
 #endif
-    
+
 #ifdef HAVE_SPDIF_POWER
     {1, S_O(spdif_enable), false, "spdif enable", off_on},
 #endif
@@ -435,7 +437,7 @@ static const struct bit_entry hd_bits[] =
 #if CONFIG_CODEC == SWCODEC
     {2, S_O(crossfade), 0, "crossfade type", "off,crossfade,mix"},
     {1, S_O(replaygain), false, "replaygain", off_on },
-    {2, S_O(replaygain_type), REPLAYGAIN_ALBUM, "replaygain type", 
+    {2, S_O(replaygain_type), REPLAYGAIN_ALBUM, "replaygain type",
         "track,album,track shuffle" },
     {1, S_O(replaygain_noclip), false, "replaygain noclip", off_on },
     {8 | SIGNED, S_O(replaygain_preamp), 0, "replaygain preamp", NULL },
@@ -445,7 +447,7 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(dircache), false, "dircache", off_on },
     {22, S_O(dircache_size), 0, NULL, NULL },
 #endif
-    
+
     /* If values are just added to the end, no need to bump the version. */
     /* new stuff to be added at the end */
 
@@ -490,7 +492,7 @@ static void set_bits(
     mask <<= bit_index;
 
     if (bit_index + size > 32)
-        p[long_index+1] = 
+        p[long_index+1] =
             (p[long_index+1] & (0xFFFFFFFF << (bit_index + size - 32)))
             | (value >> (32 - bit_index));
 
@@ -506,7 +508,7 @@ static unsigned short calculate_config_checksum(const unsigned char* buf)
     unsigned int i;
     unsigned char cksum[2];
     cksum[0] = cksum[1] = 0;
-    
+
     for (i=0; i < RTC_BLOCK_SIZE - 2; i+=2 ) {
         cksum[0] ^= buf[i];
         cksum[1] ^= buf[i+1];
@@ -521,7 +523,7 @@ static unsigned short calculate_config_checksum(const unsigned char* buf)
 static void init_config_buffer( void )
 {
     DEBUGF( "init_config_buffer()\n" );
-    
+
     /* reset to 0 - all unused */
     memset(config_block, 0, CONFIG_BLOCK_SIZE);
     /* insert header */
@@ -546,7 +548,7 @@ static int save_config_buffer( void )
     config_block[ RTC_BLOCK_SIZE - 2 ] = chksum >> 8;
     config_block[ RTC_BLOCK_SIZE - 1 ] = chksum & 0xff;
 
-#ifdef HAVE_RTC    
+#ifdef HAVE_RTC
     /* FIXME: okay, it _would_ be cleaner and faster to implement rtc_write so
        that it would write a number of bytes at a time since the RTC chip
        supports that, but this will have to do for now 8-) */
@@ -577,7 +579,7 @@ static int load_config_buffer(int which)
     unsigned short chksum;
     bool correct = false;
 
-   
+
     DEBUGF( "load_config_buffer()\n" );
 
     if (which & SETTINGS_HD)
@@ -586,7 +588,7 @@ static int load_config_buffer(int which)
             ata_read_sectors(IF_MV2(0,) config_sector, 1,  config_block);
             /* calculate the checksum, check it and the header */
             chksum = calculate_config_checksum(config_block);
-        
+
             if (config_block[0] == 'R' &&
                 config_block[1] == 'o' &&
                 config_block[2] == 'c' &&
@@ -600,7 +602,7 @@ static int load_config_buffer(int which)
         }
     }
 
-#ifdef HAVE_RTC    
+#ifdef HAVE_RTC
     if(!correct)
     {
         /* If the disk sector was incorrect, reinit the buffer */
@@ -617,7 +619,7 @@ static int load_config_buffer(int which)
             rtc_block[i] = rtc_read(0x14+i);
 
         chksum = calculate_config_checksum(rtc_block);
-    
+
         /* if rtc block is ok, use that */
         if (rtc_block[0] == 'R' &&
             rtc_block[1] == 'o' &&
@@ -631,7 +633,7 @@ static int load_config_buffer(int which)
         }
     }
 #endif
-    
+
     if ( !correct ) {
         /* if checksum is not valid, clear the config buffer */
         DEBUGF( "load_config_buffer: header & checksum test failed\n" );
@@ -644,7 +646,7 @@ static int load_config_buffer(int which)
 
 
 /* helper to save content of global_settings into a bitfield,
-   as described per table */ 
+   as described per table */
 static void save_bit_table(const struct bit_entry* p_table, int count, int bitstart)
 {
     unsigned long* p_bitfield = (unsigned long*)config_block; /* 32 bit addr. */
@@ -682,7 +684,7 @@ static void save_bit_table(const struct bit_entry* p_table, int count, int bitst
 
 /*
  * figure out the config sector from the partition table and the
- * mounted file system 
+ * mounted file system
  */
 void settings_calc_config_sector(void)
 {
@@ -705,7 +707,7 @@ void settings_calc_config_sector(void)
         if (sector < 0)
             sector = 0;
     }
-    
+
     config_sector = sector;
 #endif
 }
@@ -753,8 +755,8 @@ int settings_save( void )
 
 #ifdef HAVE_LCD_BITMAP
 /**
- * Applies the range infos stored in global_settings to 
- * the peak meter. 
+ * Applies the range infos stored in global_settings to
+ * the peak meter.
  */
 void settings_apply_pm_range(void)
 {
@@ -762,13 +764,13 @@ void settings_apply_pm_range(void)
 
     /* depending on the scale mode (dBfs or percent) the values
        of global_settings.peak_meter_dbfs have different meanings */
-    if (global_settings.peak_meter_dbfs) 
+    if (global_settings.peak_meter_dbfs)
     {
         /* convert to dBfs * 100          */
         pm_min = -(((int)global_settings.peak_meter_min) * 100);
         pm_max = -(((int)global_settings.peak_meter_max) * 100);
     }
-    else 
+    else
     {
         /* percent is stored directly -> no conversion */
         pm_min = global_settings.peak_meter_min;
@@ -807,7 +809,7 @@ void settings_apply(void)
     sound_settings_apply();
 
     audio_set_buffer_margin(global_settings.buffer_margin);
-    
+
     lcd_set_contrast(global_settings.contrast);
     lcd_scroll_speed(global_settings.scroll_speed);
 #ifdef HAVE_REMOTE_LCD
@@ -846,11 +848,11 @@ void settings_apply(void)
     lcd_update(); /* refresh after flipping the screen */
     settings_apply_pm_range();
     peak_meter_init_times(
-        global_settings.peak_meter_release, global_settings.peak_meter_hold, 
+        global_settings.peak_meter_release, global_settings.peak_meter_hold,
         global_settings.peak_meter_clip_hold);
 #endif
 
-    if ( global_settings.wps_file[0] && 
+    if ( global_settings.wps_file[0] &&
          global_settings.wps_file[0] != 0xff ) {
         snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.wps",
                  global_settings.wps_file);
@@ -930,15 +932,15 @@ static void load_bit_table(const struct bit_entry* p_table, int count, int bitst
         switch(p_run->byte_size)
         {
         case 1:
-            ((unsigned char*)&global_settings)[p_run->settings_offset] = 
+            ((unsigned char*)&global_settings)[p_run->settings_offset] =
                 (unsigned char)value;
             break;
         case 2:
-            ((unsigned short*)&global_settings)[p_run->settings_offset/2] = 
+            ((unsigned short*)&global_settings)[p_run->settings_offset/2] =
                 (unsigned short)value;
             break;
         case 4:
-            ((unsigned int*)&global_settings)[p_run->settings_offset/4] = 
+            ((unsigned int*)&global_settings)[p_run->settings_offset/4] =
                 (unsigned int)value;
             break;
         default:
@@ -958,7 +960,7 @@ void settings_load(int which)
 
     /* load the buffer from the RTC (resets it to all-unused if the block
        is invalid) and decode the settings which are set in the block */
-    if (!load_config_buffer(which)) 
+    if (!load_config_buffer(which))
     {
         /* load scalar values from RTC and HD sector, specified via table */
         if (which & SETTINGS_RTC)
@@ -970,7 +972,7 @@ void settings_load(int which)
             load_bit_table(hd_bits, sizeof(hd_bits)/sizeof(hd_bits[0]),
                 RTC_BLOCK_SIZE*8);
         }
-        
+
         if ( global_settings.contrast < MIN_CONTRAST_SETTING )
             global_settings.contrast = lcd_default_contrast();
 
@@ -999,11 +1001,11 @@ void set_file(char* filename, char* setting, int maxlen)
         extlen++;
         ptr--;
     }
-        
+
     if (strncasecmp(ROCKBOX_DIR, filename ,strlen(ROCKBOX_DIR)) ||
         (len-extlen > maxlen))
         return;
-        
+
     strncpy(setting, fptr, len-extlen);
     setting[len-extlen]=0;
 
@@ -1011,7 +1013,7 @@ void set_file(char* filename, char* setting, int maxlen)
 }
 
 /* helper to sort a .cfg file entry into a global_settings member,
-   as described per table. Returns the position if found, else 0. */ 
+   as described per table. Returns the position if found, else 0. */
 static int load_cfg_table(
     const struct bit_entry* p_table, /* the table which describes the entries */
     int count, /* number of entries in the table, including the first */
@@ -1035,9 +1037,9 @@ static int load_cfg_table(
                 const char* item;
                 const char* run;
                 int len = strlen(value);
-                
+
                 item = run = p_table[i].cfg_val;
-                
+
                 while(1)
                 {
                     /* count the length of the field */
@@ -1046,7 +1048,7 @@ static int load_cfg_table(
 
                     if (!strncasecmp(value, item, MAX(run-item, len)))
                         break; /* match, exit the search */
-                    
+
                     if (*run == '\0') /* reached the end of the choices */
                         return i; /* return the position, but don't update */
 
@@ -1055,20 +1057,20 @@ static int load_cfg_table(
                     item = run;
                 }
             }
-        
+
             /* could do a memcpy, but that would be endian-dependent */
             switch(p_table[i].byte_size)
             {
             case 1:
-                ((unsigned char*)&global_settings)[p_table[i].settings_offset] = 
+                ((unsigned char*)&global_settings)[p_table[i].settings_offset] =
                     (unsigned char)val;
                 break;
             case 2:
-                ((unsigned short*)&global_settings)[p_table[i].settings_offset/2] = 
+                ((unsigned short*)&global_settings)[p_table[i].settings_offset/2] =
                     (unsigned short)val;
                 break;
             case 4:
-                ((unsigned int*)&global_settings)[p_table[i].settings_offset/4] = 
+                ((unsigned int*)&global_settings)[p_table[i].settings_offset/4] =
                     (unsigned int)val;
                 break;
             default:
@@ -1083,7 +1085,7 @@ static int load_cfg_table(
         if (i==count)
             i=1; /* wraparound */
     } while (i != hint); /* back where we started, all searched */
-    
+
     return 0; /* indicate not found */
 }
 
@@ -1102,8 +1104,8 @@ bool settings_load_config(const char* file)
         char* name;
         char* value;
         const struct bit_entry* table[2] = { rtc_bits, hd_bits };
-        const int ta_size[2] = { 
-            sizeof(rtc_bits)/sizeof(rtc_bits[0]), 
+        const int ta_size[2] = {
+            sizeof(rtc_bits)/sizeof(rtc_bits[0]),
             sizeof(hd_bits)/sizeof(hd_bits[0])
         };
         int last_table = 0; /* which table was used last round */
@@ -1133,7 +1135,7 @@ bool settings_load_config(const char* file)
 #endif
 
         /* check for scalar values, using the two tables */
-        pos = load_cfg_table(table[last_table], ta_size[last_table], 
+        pos = load_cfg_table(table[last_table], ta_size[last_table],
             name, value, last_pos);
         if (pos) /* success */
         {
@@ -1160,7 +1162,7 @@ bool settings_load_config(const char* file)
 
 
 /* helper to save content of global_settings into a file,
-   as described per table */ 
+   as described per table */
 static void save_cfg_table(const struct bit_entry* p_table, int count, int fd)
 {
     long value; /* 32 bit content */
@@ -1197,7 +1199,7 @@ static void save_cfg_table(const struct bit_entry* p_table, int count, int fd)
             DEBUGF( "illegal size!" );
             continue;
         }
-        
+
         if (p_run->cfg_val == NULL) /* write as number */
         {
             fdprintf(fd, "%s: %ld\r\n", p_run->cfg_name, value);
@@ -1207,7 +1209,7 @@ static void save_cfg_table(const struct bit_entry* p_table, int count, int fd)
             const char* p = p_run->cfg_val;
 
             fdprintf(fd, "%s: ", p_run->cfg_name);
-            
+
             while(value >= 0)
             {
                 char c = *p++; /* currently processed char */
@@ -1231,7 +1233,7 @@ bool settings_save_config(void)
 {
     int fd;
     char filename[MAX_PATH];
-    
+
     create_numbered_filename(filename, ROCKBOX_DIR, "config", ".cfg", 2);
 
     /* allow user to modify filename */
@@ -1294,15 +1296,15 @@ static void default_table(const struct bit_entry* p_table, int count)
         switch(p_table[i].byte_size)
         {
         case 1:
-            ((unsigned char*)&global_settings)[p_table[i].settings_offset] = 
+            ((unsigned char*)&global_settings)[p_table[i].settings_offset] =
                 (unsigned char)p_table[i].default_val;
             break;
         case 2:
-            ((unsigned short*)&global_settings)[p_table[i].settings_offset/2] = 
+            ((unsigned short*)&global_settings)[p_table[i].settings_offset/2] =
                 (unsigned short)p_table[i].default_val;
             break;
         case 4:
-            ((unsigned int*)&global_settings)[p_table[i].settings_offset/4] = 
+            ((unsigned int*)&global_settings)[p_table[i].settings_offset/4] =
                 (unsigned int)p_table[i].default_val;
             break;
         default:
@@ -1314,10 +1316,10 @@ static void default_table(const struct bit_entry* p_table, int count)
 
 
 /*
- * reset all settings to their default value 
+ * reset all settings to their default value
  */
 void settings_reset(void) {
-        
+
     DEBUGF( "settings_reset()\n" );
 
     /* read defaults from table(s) into global_settings */
@@ -1349,8 +1351,8 @@ void settings_reset(void) {
 bool set_bool(const char* string, bool* variable )
 {
     return set_bool_options(string, variable,
-        STR(LANG_SET_BOOL_YES), 
-        STR(LANG_SET_BOOL_NO), 
+        STR(LANG_SET_BOOL_YES),
+        STR(LANG_SET_BOOL_NO),
         NULL);
 }
 
@@ -1373,7 +1375,7 @@ bool set_bool_options(const char* string, bool* variable,
     bool result;
 
     boolfunction = function;
-    result = set_option(string, variable, BOOL, names, 2, 
+    result = set_option(string, variable, BOOL, names, 2,
                         function ? bool_funcwrapper : NULL);
     return result;
 }
@@ -1388,102 +1390,42 @@ bool set_int(const char* string,
              int max,
              void (*formatter)(char*, int, int, const char*) )
 {
-    bool done = false;
     int button;
-    int org_value=*variable;
-    int last_value = INT_MAX; /* out of range init */
-
-#ifdef HAVE_LCD_BITMAP
-    if(global_settings.statusbar)
-        lcd_setmargins(0, STATUSBAR_HEIGHT);
-    else
-        lcd_setmargins(0, 0);
-#endif
-
-    lcd_clear_display();
-    lcd_puts_scroll(0, 0, string);
-
-    while (!done) {
-        char str[32];
-        
-        if (formatter) 
-        {
-            formatter(str, sizeof str, *variable, unit);
-        }
-        else
-        {
-            snprintf(str,sizeof str,"%d %s  ", *variable, unit);
-        }
-
-        lcd_puts(0, 1, str);
-#ifdef HAVE_LCD_BITMAP
-        status_draw(true);
-#endif
-        lcd_update();
-
-        if (global_settings.talk_menu && *variable != last_value)
-        {
-            if (voice_unit < UNIT_LAST)
-            {   /* use the available unit definition */
-                talk_value(*variable, voice_unit, false);
-            }
-            else
-            {   /* say the number, followed by an arbitrary voice ID */
-                talk_number(*variable, false);
-                talk_id(voice_unit, true);
-            }
-            last_value = *variable;
-        }
-
+    int oldvalue=*variable;
+    struct gui_select select;
+    gui_select_init_numeric(&select, string, *variable, min, max, step, unit, formatter);
+    gui_syncselect_draw(&select);
+    while (!gui_select_is_validated(&select))
+    {
         button = button_get_w_tmo(HZ/2);
-        switch(button) {
-            case SETTINGS_INC:
-            case SETTINGS_INC | BUTTON_REPEAT:
-                *variable += step;
-                break;
-
-            case SETTINGS_DEC:
-            case SETTINGS_DEC | BUTTON_REPEAT:
-                *variable -= step;
-                break;
-
-            case SETTINGS_OK:
-#ifdef SETTINGS_OK2
-            case SETTINGS_OK2:
-#endif
-                done = true;
-                break;
-
-            case SETTINGS_CANCEL:
-#ifdef SETTINGS_CANCEL2
-            case SETTINGS_CANCEL2:
-#endif
-                if (*variable != org_value) {
-                    *variable=org_value;
-                    lcd_stop_scroll();
-                    lcd_puts(0, 0, str(LANG_MENU_SETTING_CANCEL));
-                    lcd_update();
-                    sleep(HZ/2);
+        if(gui_syncselect_do_button(&select, button))
+        {
+            *variable=gui_select_get_selected(&select);
+            if (global_settings.talk_menu)
+            {
+                gui_syncselect_draw(&select);
+                if (voice_unit < UNIT_LAST)
+                {   /* use the available unit definition */
+                    talk_value(*variable, voice_unit, false);
                 }
-                done = true;
-                break;
-
-            default:
-                if(default_event_handler(button) == SYS_USB_CONNECTED)
-                    return true;
-                break;
+                else
+                {   /* say the number, followed by an arbitrary voice ID */
+                    talk_number(*variable, false);
+                    talk_id(voice_unit, true);
+                }
+            }
+            if ( function )
+                function(gui_select_get_selected(&select));
         }
-        if(*variable > max )
-            *variable = max;
-
-        if(*variable < min )
-            *variable = min;
-
-        if ( function && button != BUTTON_NONE)
-            function(*variable);
+        gui_syncstatusbar_draw(&statusbars, false);
+        if(gui_select_is_canceled(&select))
+        {
+            *variable=oldvalue;
+            return false;
+        }
+        if(default_event_handler(button) == SYS_USB_CONNECTED)
+            return true;
     }
-    lcd_stop_scroll();
-
     return false;
 }
 
@@ -1495,109 +1437,52 @@ bool set_int(const char* string,
    different and bit-incompatible types and can not share the same access
    code. */
 
+#define set_type_fromint(type, dest, value) \
+    if (type == INT) \
+        *(int *)dest=value; \
+    else \
+        *(bool *)dest=value?true:false
+
+#define set_int_fromtype(type, dest, var) \
+    if (type == INT) \
+        dest=*(int *)var; \
+    else \
+        dest=*(bool *)var?1:0
+
 bool set_option(const char* string, void* variable, enum optiontype type,
                 const struct opt_items* options, int numoptions, void (*function)(int))
 {
-    bool done = false;
     int button;
-    int* intvar = (int*)variable;
-    bool* boolvar = (bool*)variable;
-    int oldval = 0;
-    int index, oldindex = -1; /* remember what we said */
-
-    if (type==INT)
-        oldval=*intvar;
-    else
-        oldval=*boolvar;
-
-#ifdef HAVE_LCD_BITMAP
-    if(global_settings.statusbar)
-        lcd_setmargins(0, STATUSBAR_HEIGHT);
-    else
-        lcd_setmargins(0, 0);
-#endif
-
-    lcd_clear_display();
-    lcd_puts_scroll(0, 0, string);
-
-    while ( !done ) {
-        index = type==INT ? *intvar : (int)*boolvar;
-        lcd_puts(0, 1, P2STR(options[index].string));
-        if (global_settings.talk_menu && index != oldindex)
-        {
-            talk_id(options[index].voice_id, false);
-            oldindex = index;
-        }
-#ifdef HAVE_LCD_BITMAP
-        status_draw(true);
-#endif
-        lcd_update();
-
+    int oldvalue;
+    /* oldvalue=*variable; */
+    set_int_fromtype(type, oldvalue, variable);
+    struct gui_select select;
+    gui_select_init_items(&select, string, oldvalue, options, numoptions);
+    gui_syncselect_draw(&select);
+    while ( !gui_select_is_validated(&select) )
+    {
+        gui_syncstatusbar_draw(&statusbars, true);
         button = button_get_w_tmo(HZ/2);
-        switch (button) {
-            case SETTINGS_INC:
-            case SETTINGS_INC | BUTTON_REPEAT:
-                if (type == INT) {
-                    if ( *intvar < (numoptions-1) )
-                        (*intvar)++;
-                    else
-                        (*intvar) -= (numoptions-1);
-                }
-                else
-                    *boolvar = !*boolvar;
-                break;
-
-            case SETTINGS_DEC:
-            case SETTINGS_DEC | BUTTON_REPEAT:
-                if (type == INT) {
-                    if ( *intvar > 0 )
-                        (*intvar)--;
-                    else
-                        (*intvar) += (numoptions-1);
-                }
-                else
-                    *boolvar = !*boolvar;
-                break;
-
-            case SETTINGS_OK:
-#ifdef SETTINGS_OK2
-            case SETTINGS_OK2:
-#endif
-                done = true;
-                break;
-
-            case SETTINGS_CANCEL:
-#ifdef SETTINGS_CANCEL2
-            case SETTINGS_CANCEL2:
-#endif
-                if (((type==INT) && (*intvar != oldval)) ||
-                    ((type==BOOL) && (*boolvar != (bool)oldval))) {
-                    if (type==INT)
-                        *intvar=oldval;
-                    else
-                        *boolvar=oldval;
-                    lcd_stop_scroll();
-                    lcd_puts(0, 0, str(LANG_MENU_SETTING_CANCEL));
-                    lcd_update();
-                    sleep(HZ/2);
-                }
-                done = true;
-                break;
-
-            default:
-                if(default_event_handler(button) == SYS_USB_CONNECTED)
-                    return true;
-                break;
+        if(gui_syncselect_do_button(&select, button))
+        {
+            /* *variable = gui_select_get_selected(&select) */
+            set_type_fromint(type, variable, gui_select_get_selected(&select));
+            gui_syncselect_draw(&select);
+            if (global_settings.talk_menu)
+                talk_id(options[gui_select_get_selected(&select)].voice_id, false);
+            if ( function )
+                function(*(int *)variable);
         }
-
-        if ( function && button != BUTTON_NONE) {
-            if (type == INT)
-                function(*intvar);
-            else
-                function(*boolvar);
+        gui_syncstatusbar_draw(&statusbars, false);
+        if(gui_select_is_canceled(&select))
+        {
+            /* *variable=oldvalue; */
+            set_type_fromint(type, variable, oldvalue);
+            return false;
         }
+        if(default_event_handler(button) == SYS_USB_CONNECTED)
+            return true;
     }
-    lcd_stop_scroll();
     return false;
 }
 
