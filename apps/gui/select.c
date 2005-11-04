@@ -83,7 +83,9 @@ void gui_select_prev(struct gui_select * select)
 
 void gui_select_draw(struct gui_select * select, struct screen * display)
 {
+#ifdef HAVE_LCD_BITMAP
     screen_set_xmargin(display, 0);
+#endif
     gui_textarea_clear(display);
     display->puts_scroll(0, 0, select->title);
 
