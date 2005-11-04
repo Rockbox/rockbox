@@ -70,6 +70,7 @@
 #include "dircache.h"
 #include "select.h"
 #include "statusbar.h"
+#include "splash.h"
 
 #if CONFIG_CODEC == MAS3507D
 void dac_line_in(bool enable);
@@ -1240,16 +1241,13 @@ bool settings_save_config(void)
     while (true) {
         if (!kbd_input(filename, sizeof filename)) {
             fd = creat(filename,0);
-            if (fd < 0) {
-                lcd_clear_display();
-                splash(HZ, true, str(LANG_FAILED));
-            }
+            if (fd < 0)
+                gui_syncsplash(HZ, true, str(LANG_FAILED));
             else
                 break;
         }
         else {
-            lcd_clear_display();
-            splash(HZ, true, str(LANG_RESET_DONE_CANCEL));
+            gui_syncsplash(HZ, true, str(LANG_RESET_DONE_CANCEL));
             return false;
         }
     }
@@ -1278,8 +1276,7 @@ bool settings_save_config(void)
 
     close(fd);
 
-    lcd_clear_display();
-    splash(HZ, true, "%s %s", str(LANG_SETTINGS_SAVED1),
+    gui_syncsplash(HZ, true, "%s %s", str(LANG_SETTINGS_SAVED1),
            str(LANG_SETTINGS_SAVED2));
     return true;
 }

@@ -17,7 +17,6 @@
  *
  ****************************************************************************/
 
-
 #ifndef _GUI_SELECT_H_
 #define _GUI_SELECT_H_
 #include "screen_access.h"
@@ -90,6 +89,17 @@ struct gui_select
     const struct opt_items * items;
 };
 
+/*
+ * Initializes a select that let's you choose between several numeric values
+ *  - title : the title of the select
+ *  - init_value : the initial value the number will be
+ *  - min_value, max_value : bounds to the value
+ *  - step : the ammount you want to add / withdraw to the initial number
+ *           each time a key is pressed
+ *  - unit : the unit in which the value is  (ex "s", "bytes", ...)
+ *  - formatter : a callback function that generates a string
+ *                from the number it gets
+ */
 extern void gui_select_init_numeric(struct gui_select * select,
         const char * title,
         int init_value,
@@ -102,6 +112,14 @@ extern void gui_select_init_numeric(struct gui_select * select,
                           int variable,
                           const char* unit));
 
+
+/*
+ * Initializes a select that let's you choose between options in a list
+ *  - title : the title of the select
+ *  - selected : the initially selected item
+ *  - items : the list of items, defined in settings.h
+ *  - nb_items : the number of items in the 'items' list
+ */
 extern void gui_select_init_items(struct gui_select * select,
         const char * title,
         int selected,
@@ -109,29 +127,70 @@ extern void gui_select_init_items(struct gui_select * select,
         int nb_items
         );
 
+/*
+ * Selects the next value
+ *  - select : the select struct
+ */
 extern void gui_select_next(struct gui_select * select);
 
+/*
+ * Selects the previous value
+ *  - select : the select struct
+ */
 extern void gui_select_prev(struct gui_select * select);
 
+/*
+ * Draws the select on the given screen
+ *  - select : the select struct
+ *  - display : the display on which you want to output
+ */
 extern void gui_select_draw(struct gui_select * select, struct screen * display);
 
+/*
+ * Returns the selected value
+ *  - select : the select struct
+ */
 #define gui_select_get_selected(select) \
     (select)->option
 
+/*
+ * Cancels the select
+ *  - select : the select struct
+ */
 #define gui_select_cancel(select) \
     (select)->canceled=true
 
+/*
+ * Tells wether the select has been canceled or not
+ *  - select : the select struct
+ */
 #define gui_select_is_canceled(select) \
     (select)->canceled
 
+/*
+ * Validate the select
+ *  - select : the select struct
+ */
 #define gui_select_validate(select) \
     (select)->validated=true
 
+/*
+ * Tells wether the select is validated or not
+ *  - select : the select struct
+ */
 #define gui_select_is_validated(select) \
     (select)->validated
 
+/*
+ * Draws the select on all the screens
+ *  - select : the select struct
+ */
 extern void gui_syncselect_draw(struct gui_select * select);
 
+/*
+ * Handles key events for a synced (drawn on all screens) select
+ *  - select : the select struct
+ */
 extern bool gui_syncselect_do_button(struct gui_select * select, int button);
 
 #endif /* _GUI_SELECT_H_ */
