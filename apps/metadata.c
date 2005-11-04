@@ -1254,6 +1254,69 @@ static bool get_m4a_metadata(int fd, struct mp3entry* id3)
   return true;
 }    
 
+static bool get_musepack_metadata(int fd, struct mp3entry *id3)
+{
+    const int32_t sfreqs_sv7[4] = { 44100, 48000, 37800, 32000 };
+    uint32_t header[8];
+    uint64_t samples = 0;
+    unsigned i;
+    
+    /* TODO: libmpcdec skips id3v2 header, perhaps we should as well */
+    if (read(fd, header, 4*8) != 4*8) return false;
+    /* Musepack files are little endian, might need swapping */
+    for (i = 1; i < 8; i++) 
+       header[i] = letoh32(header[i]); 
+    if (!memcmp(header, "MP+", 3)) { /* Compare to sig "MP+" */
+        unsigned int streamversion;
+        
+        header[0] = letoh32(header[0]);
+        streamversion = (header[0] >> 24) & 15;
+        if (streamversion >= 8) {
+            return false; /* SV8 or higher don't exist yet, so no support */
+        } else if (streamversion == 7) {
+            unsigned int gapless = (header[5] >> 31) & 0x0001;
+            unsigned int last_frame_samples = (header[5] >> 20) & 0x07ff;
+            int track_gain, album_gain;
+            unsigned int bufused;
+            
+            id3->frequency = sfreqs_sv7[(header[2] >> 16) & 0x0003];
+            samples = (uint64_t)header[1]*1152; /* 1152 is mpc frame size */
+            if (gapless)
+                samples -= 1152 - last_frame_samples;
+            else
+                samples -= 481; /* Musepack subband synth filter delay */
+           
+            /* Extract ReplayGain data from header */
+            track_gain = (int16_t)((header[3] >> 16) & 0xffff);
+            id3->track_gain = get_replaygain_int(track_gain);
+            id3->track_peak = ((uint16_t)(header[3] & 0xffff)) << 9;
+            
+            album_gain = (int16_t)((header[4] >> 16) & 0xffff);
+            id3->album_gain = get_replaygain_int(album_gain);
+            id3->album_peak = ((uint16_t)(header[4] & 0xffff)) << 9;
+            
+            /* Write replaygain values to strings for use in id3 screen */
+            id3->track_gain_string = id3->id3v2buf;
+            bufused = snprintf(id3->track_gain_string, sizeof(id3->id3v2buf),
+                               "%d.%d dB", track_gain/100, abs(track_gain)%100);
+            id3->album_gain_string = id3->id3v2buf + bufused + 1;
+            bufused = snprintf(id3->album_gain_string, 100,
+                               "%d.%d dB", album_gain/100, abs(album_gain)%100);
+        }
+    } else {
+        /* There's no certain way to detect these pre-sv7 streams, apparently */
+        /* TODO: add sv6 parsing here */
+        return false;
+    }
+
+    /* Estimate bitrate, we should probably subtract the various header sizes
+       here for super-accurate results */
+    id3->length = samples/id3->frequency*1000;
+    id3->filesize = filesize(fd);
+    id3->bitrate = id3->filesize*8/id3->length;
+    return true;
+}
+
 /* Simple file type probing by looking at the filename extension. */
 unsigned int probe_file_format(const char *filename)
 {
@@ -1313,8 +1376,11 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         break;
 
     case AFMT_MPC:
+        if (!get_musepack_metadata(fd, &(track->id3)))
+            return false;
         read_ape_tags(fd, &(track->id3));
         break;
+    
     case AFMT_OGG_VORBIS:
         if (!get_vorbis_metadata(fd, &(track->id3)))
         {
