@@ -1401,9 +1401,9 @@ bool set_int(const char* string,
         if(gui_syncselect_do_button(&select, button))
         {
             *variable=gui_select_get_selected(&select);
+            gui_syncselect_draw(&select);
             if (global_settings.talk_menu)
             {
-                gui_syncselect_draw(&select);
                 if (voice_unit < UNIT_LAST)
                 {   /* use the available unit definition */
                     talk_value(*variable, voice_unit, false);

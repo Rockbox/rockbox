@@ -42,7 +42,7 @@ void gui_select_init_numeric(struct gui_select * select,
     select->validated=false;
     select->title=title;
     select->min_value=min_value;
-    select->max_value=max_value;
+    select->max_value=max_value+1;
     select->option=init_value;
     select->step=step;
     select->extra_string=unit;
@@ -66,19 +66,27 @@ void gui_select_init_items(struct gui_select * select,
     select->formatter=NULL;
     select->items=items;
 }
-//FIXME: si step>1, mettre d'abord au plus grand, ensuite passerau plus petit
+
 void gui_select_next(struct gui_select * select)
 {
-    select->option+=select->step;
-    if(select->option >= select->max_value)
-        select->option=select->min_value;
+    if(select->option + select->step >= select->max_value)
+        if(select->option==select->max_value-1)
+            select->option=select->min_value;
+        else
+            select->option=select->max_value-1;
+    else
+        select->option+=select->step;
 }
 
 void gui_select_prev(struct gui_select * select)
 {
-    select->option-=select->step;
-    if(select->option < select->min_value)
-        select->option=select->max_value-1;
+    if(select->option - select->step < select->min_value)
+        if(select->option==select->min_value)
+            select->option=select->max_value-1;
+        else
+            select->option=select->min_value;
+    else
+        select->option-=select->step;
 }
 
 void gui_select_draw(struct gui_select * select, struct screen * display)
@@ -119,22 +127,44 @@ bool gui_syncselect_do_button(struct gui_select * select, int button)
     {
         case SELECT_INC :
         case SELECT_INC | BUTTON_REPEAT :
+#ifdef SELECT_RC_INC
+        case SELECT_RC_INC :
+        case SELECT_RC_INC | BUTTON_REPEAT :
+#endif
             gui_select_next(select);
             moved=true;
             break;
         case SELECT_DEC :
         case SELECT_DEC | BUTTON_REPEAT :
+#ifdef SELECT_RC_DEC
+        case SELECT_RC_DEC :
+        case SELECT_RC_DEC | BUTTON_REPEAT :
+#endif
             gui_select_prev(select);
             moved=true;
             break;
         case SELECT_OK :
+#ifdef SELECT_RC_OK
+        case SELECT_RC_OK :
+#endif
+#ifdef SELECT_RC_OK2
+        case SELECT_RC_OK2 :
+#endif
 #ifdef SELECT_OK2
         case SELECT_OK2 :
 #endif
             gui_select_validate(select);
             break;
         case SELECT_CANCEL :
+#ifdef SELECT_CANCEL2
         case SELECT_CANCEL2 :
+#endif 
+#ifdef SELECT_RC_CANCEL
+        case SELECT_RC_CANCEL :
+#endif
+#ifdef SELECT_RC_CANCEL2
+        case SELECT_RC_CANCEL2 :
+#endif
             gui_select_cancel(select);
             gui_syncselect_draw(select);
             sleep(HZ/2);
