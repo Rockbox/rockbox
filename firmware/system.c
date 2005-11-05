@@ -451,13 +451,21 @@ void UIE (void) /* Unexpected Interrupt or Exception */
     
     /* set cpu frequency to 11mhz (to prevent overheating) */
     DCR = (DCR & ~0x01ff) | 1;
-    PLLCR = 0x00000000;
+    PLLCR = 0x10800000;
 
     while (1)
     {
         /* check for the ON button (and !hold) */
         if ((GPIO1_READ & 0x22) == 0)
-            system_reboot();
+            SYPCR = 0xc0;
+           /* Start watchdog timer with 512 cycles timeout. Don't service it. */
+
+    /* We need a reset method that works in all cases. Calling system_reboot()
+       doesn't work when we're called from the debug interrupt, because then
+       the CPU is in emulator mode and the only ways leaving it are exexcuting
+       an rte instruction or performing a reset. Even disabling the breakpoint
+       logic and performing special rte magic doesn't make system_reboot()
+       reliable. The system restarts, but boot often fails with ata error -42. */
     }
 }
 
