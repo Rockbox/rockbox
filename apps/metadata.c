@@ -581,6 +581,34 @@ static bool read_vorbis_tags(int fd, struct mp3entry *id3,
     return true;
 }
 
+/* Skip an ID3v2 tag if it can be found. We assume the tag is located at the
+ * start of the file, which should be true in all cases where we need to skip it.
+ * Returns true if successfully skipped or not skipped, and false if
+ * something went wrong while skipping.
+ */
+static bool skip_id3v2(int fd, struct mp3entry *id3)
+{
+    char buf[4];
+
+    read(fd, buf, 4);
+    if (memcmp(buf, "ID3", 3) == 0)
+    {
+        /* We have found an ID3v2 tag at the start of the file - find its
+           length and then skip it. */
+        if ((id3->first_frame_offset = getid3v2len(fd)) == 0)
+            return false;
+
+        if ((lseek(fd, id3->first_frame_offset, SEEK_SET) < 0)) 
+            return false;
+        
+        return true;
+    } else {
+        lseek(fd, 0, SEEK_SET);
+        id3->first_frame_offset = 0;
+        return true;
+    }
+}
+
 /* A simple parser to read vital metadata from an Ogg Vorbis file. Returns
  * false if metadata needed by the Vorbis codec couldn't be read.
  */
@@ -781,32 +809,12 @@ static bool get_flac_metadata(int fd, struct mp3entry* id3)
     unsigned char* buf = id3->path;
     bool rc = false;
 
-    if ((lseek(fd, 0, SEEK_SET) < 0) || (read(fd, buf, 4) < 4))
+    if (!skip_id3v2(fd, id3) || (read(fd, buf, 4) < 4))
     {
         return rc;
     }
-
-    if (memcmp(buf,"ID3",3) == 0)
-    {
-        /* We have found an ID3v2 tag at the start of the file - find its
-           length and then skip it. 
-         */
-
-        if ((id3->first_frame_offset=getid3v2len(fd)) == 0)
-        {
-            return rc;
-        }
-
-        if ((lseek(fd, id3->first_frame_offset, SEEK_SET) < 0) ||
-            (read(fd, buf, 4) < 4))
-        {
-            return rc;
-        }
-    } else {
-        id3->first_frame_offset=0;
-    }
-
-    if (memcmp(buf,"fLaC",4) != 0) 
+    
+    if (memcmp(buf, "fLaC", 4) != 0) 
     {
         return rc;
     }
@@ -1259,9 +1267,10 @@ static bool get_musepack_metadata(int fd, struct mp3entry *id3)
     const int32_t sfreqs_sv7[4] = { 44100, 48000, 37800, 32000 };
     uint32_t header[8];
     uint64_t samples = 0;
-    unsigned i;
+    int i;
     
-    /* TODO: libmpcdec skips id3v2 header, perhaps we should as well */
+    if (!skip_id3v2(fd, id3))
+        return false;
     if (read(fd, header, 4*8) != 4*8) return false;
     /* Musepack files are little endian, might need swapping */
     for (i = 1; i < 8; i++) 
@@ -1295,12 +1304,14 @@ static bool get_musepack_metadata(int fd, struct mp3entry *id3)
             id3->album_gain = get_replaygain_int(album_gain);
             id3->album_peak = ((uint16_t)(header[4] & 0xffff)) << 9;
             
-            /* Write replaygain values to strings for use in id3 screen */
-            id3->track_gain_string = id3->id3v2buf;
-            bufused = snprintf(id3->track_gain_string, sizeof(id3->id3v2buf),
+            /* Write replaygain values to strings for use in id3 screen. We use
+               the XING header as buffer space since Musepack files shouldn't
+               need to use it in any other way */
+            id3->track_gain_string = id3->toc;
+            bufused = snprintf(id3->track_gain_string, 45,
                                "%d.%d dB", track_gain/100, abs(track_gain)%100);
-            id3->album_gain_string = id3->id3v2buf + bufused + 1;
-            bufused = snprintf(id3->album_gain_string, 100,
+            id3->album_gain_string = id3->toc + bufused + 1;
+            bufused = snprintf(id3->album_gain_string, 45,
                                "%d.%d dB", album_gain/100, abs(album_gain)%100);
         }
     } else {
