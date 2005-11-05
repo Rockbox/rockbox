@@ -570,7 +570,7 @@ static void pcmrec_open(void)
     DIVR1 = 55;                     /* DMA1 is mapped into vector 55 in system.c      */
     DMACONFIG = 1;                  /* DMA0Req = PDOR3, DMA1Req = PDIR2               */
     DMAROUTE = (DMAROUTE & 0xffff00ff) | DMA1_REQ_AUDIO_2;
-    ICR4 = (ICR4 & 0xffffff00) | 0x0000001c;  /* Enable interrupt at level 7, priority 0 */
+    ICR7 = 0x1c;                    /* Enable interrupt at level 7, priority 0 */
     IMR &= ~(1<<15);                /* bit 15 is DMA1 */
 
     init_done = 1;
@@ -585,8 +585,8 @@ static void pcmrec_close(void)
 #endif
 
     DMAROUTE = (DMAROUTE & 0xffff00ff);
-    ICR4 = (ICR4 & 0xffffff00);     /* Disable interrupt */
-    IMR |= (1<<15);                 /* bit 15 is DMA1 */
+    ICR7 = 0x00;     /* Disable interrupt */
+    IMR |= (1<<15);  /* bit 15 is DMA1 */
 
 }
 

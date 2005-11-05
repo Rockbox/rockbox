@@ -174,8 +174,7 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
     IPRD = (IPRD & 0xFF0F) | int_prio << 4;  /* interrupt priority */
     or_b(0x10, &TSTR); /* start timer 4 */
 #elif defined CPU_COLDFIRE
-    /* ICR2 (Timer1) */
-    ICR0 = (ICR0 & 0xffff00ff) | 0x00009000; /* interrupt on level 4.0 */
+    ICR2 = 0x90;       /* interrupt on level 4.0 */
     and_l(~(1<<10), &IMR);
     TMR1 |= 1;         /* start timer */
 #endif

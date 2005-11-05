@@ -22,14 +22,27 @@
 #define MBAR  0x40000000
 #define MBAR2 0x80000000
 
-#define SYSTEM_CTRL     (*(volatile unsigned char *)(MBAR + 0x000))
-#define BUSMASTER_CTRL  (*(volatile unsigned char *)(MBAR + 0x00c))
+#define RSR   (*(volatile unsigned char *)(MBAR + 0x000))
+#define SYPCR (*(volatile unsigned char *)(MBAR + 0x001))
+#define SWIVR (*(volatile unsigned char *)(MBAR + 0x002))
+#define SWSR  (*(volatile unsigned char *)(MBAR + 0x003))
 
-#define IPR    (*(volatile unsigned long *)(MBAR + 0x040))
-#define IMR    (*(volatile unsigned long *)(MBAR + 0x044))
-#define ICR0   (*(volatile unsigned long *)(MBAR + 0x04c))
-#define ICR4   (*(volatile unsigned long *)(MBAR + 0x050))
-#define ICR8   (*(volatile unsigned long *)(MBAR + 0x054))
+#define MPARK (*(volatile unsigned char *)(MBAR + 0x00c))
+
+#define IPR   (*(volatile unsigned long *)(MBAR + 0x040))
+#define IMR   (*(volatile unsigned long *)(MBAR + 0x044))
+#define ICR0  (*(volatile unsigned char *)(MBAR + 0x04c))
+#define ICR1  (*(volatile unsigned char *)(MBAR + 0x04d))
+#define ICR2  (*(volatile unsigned char *)(MBAR + 0x04e))
+#define ICR3  (*(volatile unsigned char *)(MBAR + 0x04f))
+#define ICR4  (*(volatile unsigned char *)(MBAR + 0x050))
+#define ICR5  (*(volatile unsigned char *)(MBAR + 0x051))
+#define ICR6  (*(volatile unsigned char *)(MBAR + 0x052))
+#define ICR7  (*(volatile unsigned char *)(MBAR + 0x053))
+#define ICR8  (*(volatile unsigned char *)(MBAR + 0x054))
+#define ICR9  (*(volatile unsigned char *)(MBAR + 0x055))
+#define ICR10 (*(volatile unsigned char *)(MBAR + 0x056))
+#define ICR11 (*(volatile unsigned char *)(MBAR + 0x057))
 
 #define CSAR0 (*(volatile unsigned long *)(MBAR + 0x080))
 #define CSMR0 (*(volatile unsigned long *)(MBAR + 0x084))
@@ -53,12 +66,12 @@
 #define TRR0  (*(volatile unsigned short *)(MBAR + 0x144))
 #define TCR0  (*(volatile unsigned short *)(MBAR + 0x148))
 #define TCN0  (*(volatile unsigned short *)(MBAR + 0x14c))
-#define TER0  (*(volatile unsigned short *)(MBAR + 0x150))
+#define TER0  (*(volatile unsigned char *)(MBAR + 0x151))
 #define TMR1  (*(volatile unsigned short *)(MBAR + 0x180))
 #define TRR1  (*(volatile unsigned short *)(MBAR + 0x184))
 #define TCR1  (*(volatile unsigned short *)(MBAR + 0x188))
 #define TCN1  (*(volatile unsigned short *)(MBAR + 0x18c))
-#define TER1  (*(volatile unsigned short *)(MBAR + 0x190))
+#define TER1  (*(volatile unsigned char *)(MBAR + 0x191))
 
 #define UMR0   (*(volatile unsigned char *)(MBAR + 0x1c0))
 #define USR0   (*(volatile unsigned char *)(MBAR + 0x1c4))
@@ -133,11 +146,11 @@
 #define QSPIQWR   (*(volatile unsigned short *)(MBAR + 0x408))
 #define QSPIQIR   (*(volatile unsigned short *)(MBAR + 0x40c))
 #define QSPIQAR   (*(volatile unsigned short *)(MBAR + 0x410))
-#define QIR       (*(volatile unsigned short *)(MBAR + 0x414))
+#define QSPIQDR   (*(volatile unsigned short *)(MBAR + 0x414))
 
-#define GPIO_READ   (*(volatile unsigned long *)(MBAR2 + 0x000))
-#define GPIO_OUT    (*(volatile unsigned long *)(MBAR2 + 0x004))
-#define GPIO_ENABLE (*(volatile unsigned long *)(MBAR2 + 0x008))
+#define GPIO_READ     (*(volatile unsigned long *)(MBAR2 + 0x000))
+#define GPIO_OUT      (*(volatile unsigned long *)(MBAR2 + 0x004))
+#define GPIO_ENABLE   (*(volatile unsigned long *)(MBAR2 + 0x008))
 #define GPIO_FUNCTION (*(volatile unsigned long *)(MBAR2 + 0x00c))
 
 #define IIS1CONFIG (*(volatile unsigned long *)(MBAR2 + 0x010))
@@ -177,9 +190,11 @@
 #define U2CHANNELRECEIVE  (*(volatile unsigned long *)(MBAR2 + 0x0d8))
 #define Q2CHANNELRECEIVE  (*(volatile unsigned long *)(MBAR2 + 0x0dc))
 
-#define GPIO1_READ   (*(volatile unsigned long *)(MBAR2 + 0x0b0))
-#define GPIO1_OUT    (*(volatile unsigned long *)(MBAR2 + 0x0b4))
-#define GPIO1_ENABLE (*(volatile unsigned long *)(MBAR2 + 0x0b8))
+#define DEVICE_ID (*(volatile unsigned long *)(MBAR2 + 0x0ac))
+
+#define GPIO1_READ     (*(volatile unsigned long *)(MBAR2 + 0x0b0))
+#define GPIO1_OUT      (*(volatile unsigned long *)(MBAR2 + 0x0b4))
+#define GPIO1_ENABLE   (*(volatile unsigned long *)(MBAR2 + 0x0b8))
 #define GPIO1_FUNCTION (*(volatile unsigned long *)(MBAR2 + 0x0bc))
 #define GPIO_INT_STAT  (*(volatile unsigned long *)(MBAR2 + 0x0c0))
 #define GPIO_INT_CLEAR (*(volatile unsigned long *)(MBAR2 + 0x0c0))
@@ -221,8 +236,6 @@
 #define FLASHMEDIAINTEN    (*(volatile unsigned long *)(MBAR2 + 0x478))
 #define FLASHMEDIAINTSTAT  (*(volatile unsigned long *)(MBAR2 + 0x47c))
 #define FLASHMEDIAINTCLEAR (*(volatile unsigned long *)(MBAR2 + 0x47c))
-
-#define DEVICE_ID (*(volatile unsigned long *)(MBAR2 + 0x0ac))
 
 /* DMA Registers ... */
 

@@ -233,7 +233,7 @@ void tick_start(unsigned int interval_in_ms)
 
     TER0 = 0xff; /* Clear all events */
 
-    ICR0 = (ICR0 & 0xff00ffff) | 0x008c0000; /* Interrupt on level 3.0 */
+    ICR1 = 0x8c; /* Interrupt on level 3.0 */
     IMR &= ~0x200;
 }
 

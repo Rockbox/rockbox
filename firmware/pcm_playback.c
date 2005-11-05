@@ -286,8 +286,8 @@ void pcm_init(void)
     pcm_playing = false;
     pcm_paused = false;
 
-    BUSMASTER_CTRL = 0x81; /* PARK[1,0]=10 + BCR24BIT */
-    DIVR0 = 54;            /* DMA0 is mapped into vector 54 in system.c */
+    MPARK = 0x81;    /* PARK[1,0]=10 + BCR24BIT */
+    DIVR0 = 54;      /* DMA0 is mapped into vector 54 in system.c */
     DMAROUTE = (DMAROUTE & 0xffffff00) | DMA0_REQ_AUDIO_1;
     DMACONFIG = 1;   /* DMA0Req = PDOR3 */
 
@@ -295,7 +295,7 @@ void pcm_init(void)
     IIS2CONFIG = IIS_RESET;
 
     /* Enable interrupt at level 7, priority 0 */
-    ICR4 = (ICR4 & 0xffff00ff) | 0x00001c00;
+    ICR6 = 0x1c;
     IMR &= ~(1<<14);      /* bit 14 is DMA0 */
 
     pcm_set_frequency(44100);
