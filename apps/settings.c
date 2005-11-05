@@ -1377,6 +1377,22 @@ bool set_bool_options(const char* string, bool* variable,
     return result;
 }
 
+void talk_unit(int unit, int value)
+{
+    if (global_settings.talk_menu)
+    {
+        if (unit < UNIT_LAST)
+        {   /* use the available unit definition */
+            talk_value(value, unit, false);
+        }
+        else
+        {   /* say the number, followed by an arbitrary voice ID */
+            talk_number(value, false);
+            talk_id(unit, true);
+        }
+    }
+}
+
 bool set_int(const char* string,
              const char* unit,
              int voice_unit,
@@ -1392,6 +1408,7 @@ bool set_int(const char* string,
     struct gui_select select;
     gui_select_init_numeric(&select, string, *variable, min, max, step, unit, formatter);
     gui_syncselect_draw(&select);
+    talk_unit(voice_unit, *variable);
     while (!gui_select_is_validated(&select))
     {
         button = button_get_w_tmo(HZ/2);
@@ -1399,18 +1416,7 @@ bool set_int(const char* string,
         {
             *variable=gui_select_get_selected(&select);
             gui_syncselect_draw(&select);
-            if (global_settings.talk_menu)
-            {
-                if (voice_unit < UNIT_LAST)
-                {   /* use the available unit definition */
-                    talk_value(*variable, voice_unit, false);
-                }
-                else
-                {   /* say the number, followed by an arbitrary voice ID */
-                    talk_number(*variable, false);
-                    talk_id(voice_unit, true);
-                }
-            }
+            talk_unit(voice_unit, *variable);
             if ( function )
                 function(gui_select_get_selected(&select));
         }
@@ -1456,6 +1462,8 @@ bool set_option(const char* string, void* variable, enum optiontype type,
     struct gui_select select;
     gui_select_init_items(&select, string, oldvalue, options, numoptions);
     gui_syncselect_draw(&select);
+    if (global_settings.talk_menu)
+        talk_id(options[gui_select_get_selected(&select)].voice_id, false);
     while ( !gui_select_is_validated(&select) )
     {
         gui_syncstatusbar_draw(&statusbars, true);
