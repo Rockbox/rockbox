@@ -444,7 +444,7 @@ enum codec_status codec_start(struct codec_api* api)
 
         /* use avgbytespersec to round to the closest blockalign multiple,
            add firstblockposn. 64-bit casts to avoid overflows. */
-        newpos = (((uint64_t)avgbytespersec * ci->seek_time)
+        newpos = (((uint64_t)avgbytespersec * (ci->seek_time - 1))
                   / (1000LL*blockalign)) * blockalign;
         if (newpos > numbytes)
             break;

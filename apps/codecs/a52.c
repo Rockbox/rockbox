@@ -162,7 +162,7 @@ next_track:
             break;
 
         if (ci->seek_time) {
-            sample_loc = ci->seek_time/1000 * ci->id3->frequency;
+            sample_loc = (ci->seek_time - 1)/1000 * ci->id3->frequency;
 
             if (ci->seek_buffer((sample_loc/A52_SAMPLESPERFRAME)*ci->id3->bytesperframe)) {
                 samplesdone = sample_loc;

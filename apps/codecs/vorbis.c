@@ -209,7 +209,7 @@ next_track:
             break;
 
         if (rb->seek_time) {
-            if (ov_time_seek(&vf, rb->seek_time)) {
+            if (ov_time_seek(&vf, rb->seek_time - 1)) {
                 //rb->logf("ov_time_seek failed");
             }
             rb->seek_complete();

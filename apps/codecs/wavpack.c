@@ -107,6 +107,7 @@ enum codec_status codec_start(struct codec_api* api)
         long nsamples;  
 
         if (ci->seek_time && ci->taginfo_ready && ci->id3->length) {
+            ci->seek_time--;
             int curpos_ms = WavpackGetSampleIndex (wpc) / sr_100 * 10;
             int n, d, skip;
 

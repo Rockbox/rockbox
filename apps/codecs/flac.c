@@ -272,7 +272,7 @@ enum codec_status codec_start(struct codec_api* api)
 
         /* Deal with any pending seek requests */
         if (ci->seek_time) {
-            if (flac_seek(&fc,(ci->seek_time/20) * (ci->id3->frequency/50))) {
+            if (flac_seek(&fc,((ci->seek_time-1)/20)*(ci->id3->frequency/50))) {
                 /* Refill the input buffer */
                 buf = ci->request_buffer(&bytesleft, MAX_FRAMESIZE);
             }
