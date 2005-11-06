@@ -151,7 +151,7 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
 void screen_access_init(void)
 {
     screen_init(&screens[0], SCREEN_MAIN);
-#ifdef HAVE_REMOTE_LCD
+#if defined(HAVE_REMOTE_LCD) && !defined(ROCKBOX_HAS_LOGF)
     screen_init(&screens[1], SCREEN_REMOTE);
 #endif
 }
