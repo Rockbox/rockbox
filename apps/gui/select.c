@@ -44,6 +44,7 @@ void gui_select_init_numeric(struct gui_select * select,
     select->min_value=min_value;
     select->max_value=max_value+1;
     select->option=init_value;
+    select->nb_decimals=0;
     select->step=step;
     select->extra_string=unit;
     select->formatter=formatter;
@@ -62,6 +63,7 @@ void gui_select_init_items(struct gui_select * select,
     select->min_value=0;
     select->max_value=nb_items;
     select->option=selected;
+    select->nb_decimals=0;
     select->step=1;
     select->formatter=NULL;
     select->items=items;

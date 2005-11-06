@@ -50,104 +50,41 @@ static const char* const fmt[] =
     "%d.%02d %s  "      /* 2 decimals */
 };
 
+int selected_setting; /* Used by the callback */
+void dec_sound_formatter(char *buffer, int buffer_size, int val, const char * unit)
+{
+    val = sound_val2phys(selected_setting, val);
+    int integer = val / 10;
+    int dec = val % 10;
+    snprintf(buffer, buffer_size, "%d.%d %s", integer, dec, unit);
+}
+
 bool set_sound(const char* string,
                int* variable,
                int setting)
 {
-    bool done = false;
-    bool changed = true;
-    int min, max;
-    int val;
-    int numdec;
-    int integer;
-    int dec;
-    const char* unit;
-    char str[32];
     int talkunit = UNIT_INT;
-    int steps;
-    int button;
-
-    unit = sound_unit(setting);
-    numdec = sound_numdecimals(setting);
-    steps = sound_steps(setting);
-    min = sound_min(setting);
-    max = sound_max(setting);
+    const char* unit = sound_unit(setting);
+    int numdec = sound_numdecimals(setting);
+    int steps = sound_steps(setting);
+    int min = sound_min(setting);
+    int max = sound_max(setting);
+    void(*sound_callback)(int)=sound_get_fn(setting);
     if (*unit == 'd') /* crude reconstruction */
         talkunit = UNIT_DB;
     else if (*unit == '%')
         talkunit = UNIT_PERCENT;
     else if (*unit == 'H')
          talkunit = UNIT_HERTZ;
-    
-#ifdef HAVE_LCD_BITMAP
-    if(global_settings.statusbar)
-        lcd_setmargins(0, STATUSBAR_HEIGHT);
+    if(!numdec)
+        return set_int(string, unit, talkunit,  variable, sound_callback,
+                       steps, min, max, NULL );
     else
-        lcd_setmargins(0, 0);
-#endif
-    lcd_clear_display();
-    lcd_puts_scroll(0,0,string);
-
-    while (!done) {
-        if (changed) {
-            val = sound_val2phys(setting, *variable);
-            if(numdec)
-            {
-                integer = val / (10 * numdec);
-                dec = val % (10 * numdec);
-                snprintf(str,sizeof str, fmt[numdec], integer, dec, unit);
-            }
-            else
-            {
-                snprintf(str,sizeof str,"%d %s  ", val, unit);
-            }
-            if (global_settings.talk_menu)
-                talk_value(val, talkunit, false); /* speak it */
-        }
-        lcd_puts(0,1,str);
-        status_draw(true);
-        lcd_update();
-
-        changed = false;
-        button = button_get_w_tmo(HZ/2);
-        switch( button ) {
-            case SETTINGS_INC:
-            case SETTINGS_INC | BUTTON_REPEAT:
-                (*variable)+=steps;
-                if(*variable > max )
-                    *variable = max;
-                changed = true;
-                break;
-
-            case SETTINGS_DEC:
-            case SETTINGS_DEC | BUTTON_REPEAT:
-                (*variable)-=steps;
-                if(*variable < min )
-                    *variable = min;
-                changed = true;
-                break;
-
-            case SETTINGS_OK:
-            case SETTINGS_CANCEL:
-#ifdef SETTINGS_OK2
-            case SETTINGS_OK2:
-#endif
-#ifdef SETTINGS_CANCEL2
-            case SETTINGS_CANCEL2:
-#endif
-                done = true;
-                break;
-
-            default:
-                if(default_event_handler(button) == SYS_USB_CONNECTED)
-                    return true;
-                break;
-        }
-        if (changed)
-            sound_set(setting, *variable);
+    {/* Decimal number */
+        selected_setting=setting;
+        return set_int(string, unit, talkunit,  variable, sound_callback,
+                       steps, min, max, &dec_sound_formatter );
     }
-    lcd_stop_scroll();
-    return false;
 }
 
 static bool volume(void)

@@ -45,6 +45,26 @@
 #define SOUND_CHAN_MONO_RIGHT 4
 #define SOUND_CHAN_KARAOKE 5
 
+#ifndef SIMULATOR
+void sound_set_volume(int value);
+void sound_set_balance(int value);
+void sound_set_bass(int value);
+void sound_set_treble(int value);
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+void sound_set_loudness(int value);
+void sound_set_avc(int value);
+void sound_set_mdb_strength(int value);
+void sound_set_mdb_harmonics(int value);
+void sound_set_mdb_center(int value);
+void sound_set_mdb_shape(int value);
+void sound_set_mdb_enable(int value);
+void sound_set_superbass(int value);
+#endif /* (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
+void sound_set_channels(int value);
+void sound_set_stereo_width(int value);
+#endif
+
+void (*sound_get_fn(int setting))(int value);
 void sound_set(int setting, int value);
 int sound_min(int setting);
 int sound_max(int setting);

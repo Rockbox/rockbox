@@ -1418,12 +1418,14 @@ bool set_int(const char* string,
             gui_syncselect_draw(&select);
             talk_unit(voice_unit, *variable);
             if ( function )
-                function(gui_select_get_selected(&select));
+                function(*variable);
         }
         gui_syncstatusbar_draw(&statusbars, false);
         if(gui_select_is_canceled(&select))
         {
             *variable=oldvalue;
+            if ( function )
+                function(*variable);
             return false;
         }
         if(default_event_handler(button) == SYS_USB_CONNECTED)
@@ -1446,11 +1448,14 @@ bool set_int(const char* string,
     else \
         *(bool *)dest=value?true:false
 
-#define set_int_fromtype(type, dest, var) \
-    if (type == INT) \
-        dest=*(int *)var; \
-    else \
-        dest=*(bool *)var?1:0
+#define type_fromvoidptr(type, value) \
+    (type == INT)? \
+        (int)(*(int*)(value)) \
+    : \
+        (bool)(*(bool*)(value))
+
+#define get_int_fromtype(type, var) \
+    (type == INT)?*(int *)var:(*(bool *)var?1:0)
 
 bool set_option(const char* string, void* variable, enum optiontype type,
                 const struct opt_items* options, int numoptions, void (*function)(int))
@@ -1458,12 +1463,12 @@ bool set_option(const char* string, void* variable, enum optiontype type,
     int button;
     int oldvalue;
     /* oldvalue=*variable; */
-    set_int_fromtype(type, oldvalue, variable);
+    oldvalue=get_int_fromtype(type, variable);
     struct gui_select select;
     gui_select_init_items(&select, string, oldvalue, options, numoptions);
     gui_syncselect_draw(&select);
     if (global_settings.talk_menu)
-        talk_id(options[gui_select_get_selected(&select)].voice_id, false);
+        talk_id(options[gui_select_get_selected(&select)].voice_id, true);
     while ( !gui_select_is_validated(&select) )
     {
         gui_syncstatusbar_draw(&statusbars, true);
@@ -1476,13 +1481,15 @@ bool set_option(const char* string, void* variable, enum optiontype type,
             if (global_settings.talk_menu)
                 talk_id(options[gui_select_get_selected(&select)].voice_id, false);
             if ( function )
-                function(*(int *)variable);
+                function(type_fromvoidptr(type, variable));
         }
         gui_syncstatusbar_draw(&statusbars, false);
         if(gui_select_is_canceled(&select))
         {
             /* *variable=oldvalue; */
             set_type_fromint(type, variable, oldvalue);
+            if ( function )
+                function(type_fromvoidptr(type, variable));
             return false;
         }
         if(default_event_handler(button) == SYS_USB_CONNECTED)

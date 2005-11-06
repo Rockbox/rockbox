@@ -494,143 +494,226 @@ unsigned long mdb_shape_shadow = 0;
 unsigned long loudness_shadow = 0;
 #endif
 
-void sound_set(int setting, int value)
-{
-#ifdef SIMULATOR
-    setting = value;
-#else
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    int tmp;
-#endif
+#ifndef SIMULATOR
 
+void sound_set_volume(int value)
+{
     if(!audio_is_initialized)
         return;
-    
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+    int tmp = 0x7f00 * value / 100;
+    mas_codec_writereg(0x10, tmp & 0xff00);
+#elif (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380
+    current_volume = VOLUME_MIN + (value * VOLUME_RANGE / 100);
+    set_prescaled_volume();                   /* tenth of dB */
+#endif
+}
+
+void sound_set_balance(int value)
+{
+    if(!audio_is_initialized)
+        return;
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+    int tmp = ((value * 127 / 100) & 0xff) << 8;
+    mas_codec_writereg(0x11, tmp & 0xff00);
+#elif CONFIG_CODEC == MAS3507D || defined HAVE_UDA1380
+    current_balance = value * VOLUME_RANGE / 100; /* tenth of dB */
+    set_prescaled_volume();
+#endif
+}
+
+void sound_set_bass(int value)
+{
+    if(!audio_is_initialized)
+        return;
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+    int tmp = ((value * 8) & 0xff) << 8;
+    mas_codec_writereg(0x14, tmp & 0xff00);
+#elif CONFIG_CODEC == MAS3507D
+    mas_writereg(MAS_REG_KBASS, bass_table[value+15]);
+    current_bass = value * 10;
+    set_prescaled_volume();
+#elif defined(HAVE_UDA1380)
+    uda1380_set_bass(value >> 1);
+    current_bass = value * 10;
+    set_prescaled_volume();
+#endif
+}
+
+void sound_set_treble(int value)
+{
+    if(!audio_is_initialized)
+        return;
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+    int tmp = ((value * 8) & 0xff) << 8;
+    mas_codec_writereg(0x15, tmp & 0xff00);
+#elif CONFIG_CODEC == MAS3507D
+    mas_writereg(MAS_REG_KTREBLE, treble_table[value+15]);
+    current_treble = value * 10;
+    set_prescaled_volume();
+#elif defined(HAVE_UDA1380)
+    uda1380_set_treble(value >> 1);
+    current_treble = value * 10;
+    set_prescaled_volume();
+#endif
+}
+
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+void sound_set_loudness(int value)
+{
+    if(!audio_is_initialized)
+        return;
+    loudness_shadow = (loudness_shadow & 0x04) |
+                       (MAX(MIN(value * 4, 0x44), 0) << 8);
+    mas_codec_writereg(MAS_REG_KLOUDNESS, loudness_shadow);
+}
+
+void sound_set_avc(int value)
+{
+    if(!audio_is_initialized)
+        return;
+    int tmp;
+    switch (value) {
+        case 1: /* 20ms */
+            tmp = (0x1 << 8) | (0x8 << 12);
+            break;
+        case 2: /* 2s */
+            tmp = (0x2 << 8) | (0x8 << 12);
+            break;
+        case 3: /* 4s */
+            tmp = (0x4 << 8) | (0x8 << 12);
+            break;
+        case 4: /* 8s */
+            tmp = (0x8 << 8) | (0x8 << 12);
+            break;
+        case -1: /* turn off and then turn on again to decay quickly */
+            tmp = mas_codec_readreg(MAS_REG_KAVC);
+            mas_codec_writereg(MAS_REG_KAVC, 0);
+            break;
+        default: /* off */
+            tmp = 0;
+            break;
+    }
+    mas_codec_writereg(MAS_REG_KAVC, tmp);
+}
+
+void sound_set_mdb_strength(int value)
+{
+    if(!audio_is_initialized)
+        return;
+    mas_codec_writereg(MAS_REG_KMDB_STR, (value & 0x7f) << 8);
+}
+
+void sound_set_mdb_harmonics(int value)
+{
+    if(!audio_is_initialized)
+        return;
+    int tmp = value * 127 / 100;
+    mas_codec_writereg(MAS_REG_KMDB_HAR, (tmp & 0x7f) << 8);
+}
+
+void sound_set_mdb_center(int value)
+{
+    if(!audio_is_initialized)
+        return;
+    mas_codec_writereg(MAS_REG_KMDB_FC, (value/10) << 8);
+}
+
+void sound_set_mdb_shape(int value)
+{
+    if(!audio_is_initialized)
+        return;
+    mdb_shape_shadow = (mdb_shape_shadow & 0x02) | ((value/10) << 8);
+    mas_codec_writereg(MAS_REG_KMDB_SWITCH, mdb_shape_shadow);
+}
+
+void sound_set_mdb_enable(int value)
+{
+    if(!audio_is_initialized)
+        return;
+    mdb_shape_shadow = (mdb_shape_shadow & ~0x02) | (value?2:0);
+    mas_codec_writereg(MAS_REG_KMDB_SWITCH, mdb_shape_shadow);
+}
+
+void sound_set_superbass(int value)
+{
+    if(!audio_is_initialized)
+        return;
+    loudness_shadow = (loudness_shadow & ~0x04) | (value?4:0);
+    mas_codec_writereg(MAS_REG_KLOUDNESS, loudness_shadow);
+}
+#endif /* (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
+
+void sound_set_channels(int value)
+{
+    if(!audio_is_initialized)
+        return;
+    channel_configuration = value;
+    set_channel_config();
+}
+
+void sound_set_stereo_width(int value)
+{
+    if(!audio_is_initialized)
+        return;
+    stereo_width = value;
+    if (channel_configuration == SOUND_CHAN_CUSTOM)
+        set_channel_config();
+}
+#endif /* SIMULATOR */
+
+void (*sound_get_fn(int setting))(int value)
+{
+#ifdef SIMULATOR
+    (void)setting;
+    return NULL;
+#else
+    if(!audio_is_initialized)
+        return NULL;
     switch(setting)
     {
         case SOUND_VOLUME:
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-            tmp = 0x7f00 * value / 100;
-            mas_codec_writereg(0x10, tmp & 0xff00);
-#elif (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380
-            current_volume = VOLUME_MIN + (value * VOLUME_RANGE / 100);
-            set_prescaled_volume();                   /* tenth of dB */
-#endif
-            break;
-
+            return &sound_set_volume;
         case SOUND_BALANCE:
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-            tmp = ((value * 127 / 100) & 0xff) << 8;
-            mas_codec_writereg(0x11, tmp & 0xff00);
-#elif CONFIG_CODEC == MAS3507D || defined HAVE_UDA1380
-            current_balance = value * VOLUME_RANGE / 100; /* tenth of dB */
-            set_prescaled_volume();
-#endif
-            break;
-
+            return &sound_set_balance;
         case SOUND_BASS:
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-            tmp = ((value * 8) & 0xff) << 8;
-            mas_codec_writereg(0x14, tmp & 0xff00);
-#elif CONFIG_CODEC == MAS3507D
-            mas_writereg(MAS_REG_KBASS, bass_table[value+15]);
-            current_bass = value * 10;
-            set_prescaled_volume();
-#elif defined(HAVE_UDA1380)
-            uda1380_set_bass(value >> 1);
-            current_bass = value * 10;
-            set_prescaled_volume();
-#endif
-            break;
-
+            return &sound_set_bass;
         case SOUND_TREBLE:
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-            tmp = ((value * 8) & 0xff) << 8;
-            mas_codec_writereg(0x15, tmp & 0xff00);
-#elif CONFIG_CODEC == MAS3507D
-            mas_writereg(MAS_REG_KTREBLE, treble_table[value+15]);
-            current_treble = value * 10;
-            set_prescaled_volume();
-#elif defined(HAVE_UDA1380)
-            uda1380_set_treble(value >> 1);
-            current_treble = value * 10;
-            set_prescaled_volume();
-#endif
-            break;
-            
+            return &sound_set_treble;
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
         case SOUND_LOUDNESS:
-            loudness_shadow = (loudness_shadow & 0x04) |
-                (MAX(MIN(value * 4, 0x44), 0) << 8);
-            mas_codec_writereg(MAS_REG_KLOUDNESS, loudness_shadow);
-            break;
-            
+            return &sound_set_loudness;
         case SOUND_AVC:
-            switch (value) {
-                case 1: /* 20ms */
-                    tmp = (0x1 << 8) | (0x8 << 12);
-                    break;
-                case 2: /* 2s */
-                    tmp = (0x2 << 8) | (0x8 << 12);
-                    break;
-                case 3: /* 4s */
-                    tmp = (0x4 << 8) | (0x8 << 12);
-                    break;
-                case 4: /* 8s */
-                    tmp = (0x8 << 8) | (0x8 << 12);
-                    break;
-                case -1: /* turn off and then turn on again to decay quickly */
-                    tmp = mas_codec_readreg(MAS_REG_KAVC);
-                    mas_codec_writereg(MAS_REG_KAVC, 0);
-                    break;
-                default: /* off */
-                    tmp = 0;
-                    break;  
-            }
-            mas_codec_writereg(MAS_REG_KAVC, tmp);
-            break;
-
+            return &sound_set_avc;
         case SOUND_MDB_STRENGTH:
-            mas_codec_writereg(MAS_REG_KMDB_STR, (value & 0x7f) << 8);
-            break;
-          
+            return &sound_set_mdb_strength;
         case SOUND_MDB_HARMONICS:
-            tmp = value * 127 / 100;
-            mas_codec_writereg(MAS_REG_KMDB_HAR, (tmp & 0x7f) << 8);
-            break;
-          
+            return &sound_set_mdb_harmonics;
         case SOUND_MDB_CENTER:
-            mas_codec_writereg(MAS_REG_KMDB_FC, (value/10) << 8);
-            break;
-          
+            return &sound_set_mdb_center;
         case SOUND_MDB_SHAPE:
-            mdb_shape_shadow = (mdb_shape_shadow & 0x02) | ((value/10) << 8);
-            mas_codec_writereg(MAS_REG_KMDB_SWITCH, mdb_shape_shadow);
-            break;
-          
+            return &sound_set_mdb_shape;
         case SOUND_MDB_ENABLE:
-            mdb_shape_shadow = (mdb_shape_shadow & ~0x02) | (value?2:0);
-            mas_codec_writereg(MAS_REG_KMDB_SWITCH, mdb_shape_shadow);
-            break;
-          
+            return &sound_set_mdb_enable;
         case SOUND_SUPERBASS:
-            loudness_shadow = (loudness_shadow & ~0x04) |
-                (value?4:0);
-            mas_codec_writereg(MAS_REG_KLOUDNESS, loudness_shadow);
-            break;
-#endif            
+            return &sound_set_superbass;
+#endif
         case SOUND_CHANNELS:
-            channel_configuration = value;
-            set_channel_config();
-            break;
-        
+            return &sound_set_channels;
         case SOUND_STEREO_WIDTH:
-            stereo_width = value;
-            if (channel_configuration == SOUND_CHAN_CUSTOM)
-                set_channel_config();
-            break;
+            return &sound_set_stereo_width;
+        default :
+            return NULL;
     }
 #endif /* SIMULATOR */
+}
+
+void sound_set(int setting, int value)
+{
+
+    void (*sound_set_val)(int)=sound_get_fn(setting);
+    if(sound_set_val)
+        sound_set_val(value);
 }
 
 int sound_val2phys(int setting, int value)
@@ -677,13 +760,13 @@ void sound_set_pitch(int pitch)
     {
         /* Calculate the new (bogus) frequency */
         val = 18432 * 1000 / pitch;
-    
+
         mas_writemem(MAS_BANK_D0, MAS_D0_OFREQ_CONTROL, &val, 1);
 
         /* We must tell the MAS that the frequency has changed.
          * This will unfortunately cause a short silence. */
         mas_writemem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &shadow_io_control_main, 1);
-        
+
         last_pitch = pitch;
     }
 }

@@ -80,6 +80,7 @@ struct gui_select
     int max_value;
     int step;
     int option;
+    int nb_decimals;
     const char * extra_string;
     /* In the case the option is a number */
     void (*formatter)(char* dest,
