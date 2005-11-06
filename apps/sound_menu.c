@@ -43,13 +43,6 @@
 #include "mas.h"
 #endif
 
-static const char* const fmt[] =
-{
-    "",                 /* no decimals */
-    "%d.%d %s  ",       /* 1 decimal */
-    "%d.%02d %s  "      /* 2 decimals */
-};
-
 int selected_setting; /* Used by the callback */
 void dec_sound_formatter(char *buffer, int buffer_size, int val, const char * unit)
 {

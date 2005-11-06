@@ -80,7 +80,6 @@ struct gui_select
     int max_value;
     int step;
     int option;
-    int nb_decimals;
     const char * extra_string;
     /* In the case the option is a number */
     void (*formatter)(char* dest,
@@ -88,6 +87,7 @@ struct gui_select
                       int variable,
                       const char* unit);
     const struct opt_items * items;
+    bool limit_loop;
 };
 
 /*
@@ -181,6 +181,17 @@ extern void gui_select_draw(struct gui_select * select, struct screen * display)
  */
 #define gui_select_is_validated(select) \
     (select)->validated
+
+/*
+ * Tells the select wether it should stop when reaching the min/max value
+ * or should continue (by going to max/min)
+ *  - select : the select struct
+ *  - scroll :
+ *    - true : stops when reaching min/max
+ *    - false : continues to go to max/min when reaching min/max
+ */
+#define gui_select_limit_loop(select, loop) \
+    (select)->limit_loop=loop
 
 /*
  * Draws the select on all the screens

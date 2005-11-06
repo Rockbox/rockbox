@@ -44,11 +44,11 @@ void gui_select_init_numeric(struct gui_select * select,
     select->min_value=min_value;
     select->max_value=max_value+1;
     select->option=init_value;
-    select->nb_decimals=0;
     select->step=step;
     select->extra_string=unit;
     select->formatter=formatter;
     select->items=NULL;
+    select->limit_loop=false;
 }
 
 void gui_select_init_items(struct gui_select * select,
@@ -63,19 +63,24 @@ void gui_select_init_items(struct gui_select * select,
     select->min_value=0;
     select->max_value=nb_items;
     select->option=selected;
-    select->nb_decimals=0;
     select->step=1;
     select->formatter=NULL;
     select->items=items;
+    select->limit_loop=false;
 }
 
 void gui_select_next(struct gui_select * select)
 {
     if(select->option + select->step >= select->max_value)
-        if(select->option==select->max_value-1)
-            select->option=select->min_value;
-        else
-            select->option=select->max_value-1;
+    {
+        if(!select->limit_loop)
+        {
+            if(select->option==select->max_value-1)
+                select->option=select->min_value;
+            else
+                select->option=select->max_value-1;
+        }
+    }
     else
         select->option+=select->step;
 }
@@ -83,10 +88,15 @@ void gui_select_next(struct gui_select * select)
 void gui_select_prev(struct gui_select * select)
 {
     if(select->option - select->step < select->min_value)
-        if(select->option==select->min_value)
-            select->option=select->max_value-1;
-        else
-            select->option=select->min_value;
+    {
+        if(!select->limit_loop)
+        {
+            if(select->option==select->min_value)
+                select->option=select->max_value-1;
+            else
+                select->option=select->min_value;
+        }
+    }
     else
         select->option-=select->step;
 }
@@ -124,27 +134,33 @@ void gui_syncselect_draw(struct gui_select * select)
 
 bool gui_syncselect_do_button(struct gui_select * select, int button)
 {
-    bool moved=false;
+    gui_select_limit_loop(select, false);
     switch(button)
     {
-        case SELECT_INC :
         case SELECT_INC | BUTTON_REPEAT :
 #ifdef SELECT_RC_INC
-        case SELECT_RC_INC :
         case SELECT_RC_INC | BUTTON_REPEAT :
 #endif
+            gui_select_limit_loop(select, true);
+        case SELECT_INC :
+#ifdef SELECT_RC_INC
+        case SELECT_RC_INC :
+#endif
             gui_select_next(select);
-            moved=true;
-            break;
-        case SELECT_DEC :
+            return(true);
+
         case SELECT_DEC | BUTTON_REPEAT :
 #ifdef SELECT_RC_DEC
-        case SELECT_RC_DEC :
         case SELECT_RC_DEC | BUTTON_REPEAT :
 #endif
+            gui_select_limit_loop(select, true);
+        case SELECT_DEC :
+#ifdef SELECT_RC_DEC
+        case SELECT_RC_DEC :
+#endif
             gui_select_prev(select);
-            moved=true;
-            break;
+            return(true);
+
         case SELECT_OK :
 #ifdef SELECT_RC_OK
         case SELECT_RC_OK :
@@ -156,7 +172,8 @@ bool gui_syncselect_do_button(struct gui_select * select, int button)
         case SELECT_OK2 :
 #endif
             gui_select_validate(select);
-            break;
+            return(false);
+
         case SELECT_CANCEL :
 #ifdef SELECT_CANCEL2
         case SELECT_CANCEL2 :
@@ -170,8 +187,8 @@ bool gui_syncselect_do_button(struct gui_select * select, int button)
             gui_select_cancel(select);
             gui_syncselect_draw(select);
             sleep(HZ/2);
-            break;
+            return(false);
     }
-    return(moved);
+    return(false);
 }
 
