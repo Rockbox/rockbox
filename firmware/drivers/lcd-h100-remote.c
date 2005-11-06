@@ -240,7 +240,7 @@ void lcd_remote_set_invert_display(bool yesno)
 {
     cached_invert = yesno;
     if (remote_initialized)
-        lcd_remote_write_command(LCD_REMOTE_CNTL_REVERSE_ON_OFF | yesno);
+        lcd_remote_write_command(LCD_REMOTE_CNTL_REVERSE_ON_OFF | (yesno?1:0));
 }
 
 /* turn the display upside down (call lcd_remote_update() afterwards) */
