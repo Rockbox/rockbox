@@ -137,15 +137,29 @@ next_track:
     /* This is the decoding loop. */
     samplesdone = 0;
     do {
+        #if 0
+        /* Complete seek handler. This will be extremely slow and unresponsive 
+           on target, so has been disabledt. */
         if (ci->seek_time) {
-            mpc_int64_t new_sample_offset = ci->seek_time*info.sample_freq/1000;
-            if (mpc_decoder_seek_sample(&decoder, new_sample_offset)) {
-                samplesdone = new_sample_offset;
+            mpc_int64_t new_offset = (ci->seek_time - 1)*info.sample_freq/1000;
+            if (mpc_decoder_seek_sample(&decoder, new_offset)) {
+                samplesdone = new_offset;
                 ci->set_elapsed(ci->seek_time);
             }
             ci->seek_complete();
         }
-  
+        #else
+        /* Seek to start of track handler. This is the only case that isn't slow
+           as hell, and needs to be supported for the back button to function as
+           wanted. */
+        if (ci->seek_time == 1) {
+            if (mpc_decoder_seek_sample(&decoder, 0)) {
+                samplesdone = 0;
+                ci->set_elapsed(0);
+            }
+            ci->seek_complete();
+        }
+        #endif
         if (ci->stop_codec || ci->reload_codec)
             break;
 
@@ -160,7 +174,7 @@ next_track:
             samplesdone += status;
             ci->set_elapsed(samplesdone/(frequency/1000));
         }
-    } while (status != 0) ;
+    } while (status != 0);
     
     if (ci->request_next_track())
         goto next_track;
