@@ -62,7 +62,7 @@ bool canseek_impl(void *data)
 }
 
 /* temporary, we probably have better use for iram than this */
-MPC_SAMPLE_FORMAT sample_buffer[MPC_DECODER_BUFFER_LENGTH] IBSS_ATTR;
+MPC_SAMPLE_FORMAT sample_buffer[MPC_FRAME_LENGTH*2] IBSS_ATTR;
 
 #ifdef USE_IRAM
 extern char iramcopy[];
@@ -122,7 +122,7 @@ next_track:
     /* NOTE: current musepack format only allows for stereo files
        but code is here to handle other configurations anyway */
     if (info.channels == 2)
-        ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_INTERLEAVED);
+        ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_NONINTERLEAVED);
     else if (info.channels == 1)
         ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_MONO);
     else
@@ -163,13 +163,14 @@ next_track:
         if (ci->stop_codec || ci->reload_codec)
             break;
 
-        status = mpc_decoder_decode(&decoder, sample_buffer, 0, 0);
+        status = mpc_decoder_decode(&decoder, sample_buffer, NULL, NULL);
         ci->yield();
         if (status == (unsigned)(-1)) { /* decode error */
             return CODEC_ERROR;
         } else {
-            while (!ci->pcmbuf_insert((char *)sample_buffer,
-                                      status*sizeof(MPC_SAMPLE_FORMAT)*2))
+            while (!ci->pcmbuf_insert_split(sample_buffer,
+                                            sample_buffer + MPC_FRAME_LENGTH,
+                                            status*sizeof(MPC_SAMPLE_FORMAT)))
                 ci->yield();
             samplesdone += status;
             ci->set_elapsed(samplesdone/(frequency/1000));

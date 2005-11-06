@@ -372,8 +372,7 @@ static void Synthese_Filter_float_internal(MPC_SAMPLE_FORMAT * OutData,MPC_SAMPL
                     "mac.l %%d3, %%a5, %%acc0\n\t"
                     "movclr.l %%acc0, %%d0\n\t"
                     "asl.l #1, %%d0\n\t"
-                    "move.l %%d0, (%[Data])\n\t"
-                    "addq.l #8, %[Data]"
+                    "move.l %%d0, (%[Data])+\n"
                     : [Data] "+a" (Data)
                     : [V] "a" (V), [D] "a" (D)
                     : "d0", "d1", "d2", "d3", "a5");
@@ -389,7 +388,7 @@ static void Synthese_Filter_float_internal(MPC_SAMPLE_FORMAT * OutData,MPC_SAMPL
                 #endif
             }
             V -= 32;//bleh
-            OutData+=64;
+            OutData+=32;
         }
     }
 }
@@ -409,7 +408,7 @@ mpc_decoder_synthese_filter_float(mpc_decoder *d, MPC_SAMPLE_FORMAT* OutData)
     memmove(d->V_R + MPC_V_MEM, d->V_R, 960 * sizeof(MPC_SAMPLE_FORMAT) );
 
     Synthese_Filter_float_internal(
-        OutData + 1,
+        OutData + MPC_FRAME_LENGTH,
         (MPC_SAMPLE_FORMAT *)(d->V_R + MPC_V_MEM),
         (MPC_SAMPLE_FORMAT *)(d->Y_R [0]));
 }
