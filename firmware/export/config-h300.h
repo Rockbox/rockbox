@@ -39,6 +39,8 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0xC0000
 
+#define HAVE_UDA1380
+
 #ifndef SIMULATOR
 
 /* Define this if you have a Motorola SCF5249 */
@@ -46,8 +48,6 @@
 
 /* Define this if you want to use coldfire's i2c interface */
 #define CONFIG_I2C I2C_COLDFIRE
-
-#define HAVE_UDA1380
 
 /* Type of mobile power */
 #define CONFIG_BATTERY BATT_LIPOL1300

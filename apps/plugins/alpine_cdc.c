@@ -1045,9 +1045,11 @@ void sound_neutral(void)
     rb->sound_set(SOUND_TREBLE, 0);
     rb->sound_set(SOUND_BALANCE, 0);
     rb->sound_set(SOUND_VOLUME, 92); /* 0 dB */
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     rb->sound_set(SOUND_LOUDNESS, 0);
     rb->sound_set(SOUND_SUPERBASS, 0);
     rb->sound_set(SOUND_AVC, 0);
+#endif
 }
 
 /* return to user settings */
@@ -1057,9 +1059,11 @@ void sound_normal(void)
     rb->sound_set(SOUND_TREBLE, rb->global_settings->treble);
     rb->sound_set(SOUND_BALANCE, rb->global_settings->balance);
     rb->sound_set(SOUND_VOLUME, rb->global_settings->volume);
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     rb->sound_set(SOUND_LOUDNESS, rb->global_settings->loudness);
     rb->sound_set(SOUND_SUPERBASS, rb->global_settings->superbass);
     rb->sound_set(SOUND_AVC, rb->global_settings->avc);
+#endif
 }
 
 /* the thread running it all */

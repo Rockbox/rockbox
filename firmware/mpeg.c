@@ -221,7 +221,7 @@ static int get_playable_space(void);
 static int get_unswapped_space(void);
 #endif /* !SIMULATOR */
 
-#if CONFIG_CODEC == MAS3587F
+#if (CONFIG_CODEC == MAS3587F) && !defined(SIMULATOR)
 static void init_recording(void);
 static void prepend_header(void);
 static void update_header(void);
@@ -231,7 +231,7 @@ static void stop_recording(void);
 static int get_unsaved_space(void);
 static void pause_recording(void);
 static void resume_recording(void);
-#endif /* CONFIG_CODEC == MAS3587F */
+#endif /* (CONFIG_CODEC == MAS3587F) && !defined(SIMULATOR) */
 
 
 #ifndef SIMULATOR
@@ -2085,6 +2085,7 @@ bool audio_has_changed_track(void)
 }
 
 #if CONFIG_CODEC == MAS3587F
+#ifndef SIMULATOR
 void audio_init_playback(void)
 {
     init_playback_done = false;
@@ -2575,20 +2576,9 @@ unsigned long mpeg_num_recorded_bytes(void)
         return 0;
 }
 
-#elif defined(SIMULATOR)
+#else /* SIMULATOR */
 
-/* dummies coming up
-
-NOTE: when we implment these functions for real for software coded targets,
-these dummies shall remain for the simulator */
-
-void bitswap(unsigned char *data, int length)
-{
-    /* a dummy */
-    /* this ought to be useless */
-    (void)data;
-    (void)length;
-}
+/* dummies coming up */
 
 void audio_init_playback(void)
 {
@@ -2651,7 +2641,8 @@ void mpeg_set_recording_options(int frequency, int quality,
     (void)editable;
     (void)prerecord_time;
 }
-#endif /* CONFIG_CODEC == MAS3587F; SIMULATOR */
+#endif /* SIMULATOR */
+#endif /* CONFIG_CODEC == MAS3587F */
 
 void audio_play(int offset)
 {
@@ -2807,7 +2798,7 @@ int audio_status(void)
     if(paused)
         ret |= AUDIO_STATUS_PAUSE;
     
-#if CONFIG_CODEC == MAS3587F
+#if (CONFIG_CODEC == MAS3587F) && !defined(SIMULATOR)
     if(is_recording && !is_prerecording)
         ret |= AUDIO_STATUS_RECORD;
 
@@ -2867,7 +2858,7 @@ void audio_init(void)
 
     memset(trackdata, sizeof(trackdata), 0);
 
-#if CONFIG_CODEC == MAS3587F
+#if (CONFIG_CODEC == MAS3587F) && !defined(SIMULATOR)
     if(read_hw_mask() & PR_ACTIVE_HIGH)
         and_b(~0x08, &PADRH);
     else

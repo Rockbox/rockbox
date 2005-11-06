@@ -827,7 +827,7 @@ void settings_apply(void)
     backlight_set_fade_out(global_settings.backlight_fade_out);
 #endif
     ata_spindown(global_settings.disk_spindown);
-#if CONFIG_CODEC == MAS3507D
+#if (CONFIG_CODEC == MAS3507D) && !defined(SIMULATOR)
     dac_line_in(global_settings.line_in);
 #endif
     mpeg_id3_options(global_settings.id3_v1_first);
@@ -1329,16 +1329,18 @@ void settings_reset(void) {
     global_settings.balance     = sound_default(SOUND_BALANCE);
     global_settings.bass        = sound_default(SOUND_BASS);
     global_settings.treble      = sound_default(SOUND_TREBLE);
-    global_settings.loudness    = sound_default(SOUND_LOUDNESS);
-    global_settings.avc         = sound_default(SOUND_AVC);
     global_settings.channel_config = sound_default(SOUND_CHANNELS);
     global_settings.stereo_width = sound_default(SOUND_STEREO_WIDTH);
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+    global_settings.loudness    = sound_default(SOUND_LOUDNESS);
+    global_settings.avc         = sound_default(SOUND_AVC);
     global_settings.mdb_strength = sound_default(SOUND_MDB_STRENGTH);
     global_settings.mdb_harmonics = sound_default(SOUND_MDB_HARMONICS);
     global_settings.mdb_center = sound_default(SOUND_MDB_CENTER);
     global_settings.mdb_shape = sound_default(SOUND_MDB_SHAPE);
     global_settings.mdb_enable = sound_default(SOUND_MDB_ENABLE);
     global_settings.superbass = sound_default(SOUND_SUPERBASS);
+#endif
     global_settings.contrast    = lcd_default_contrast();
     global_settings.wps_file[0] = '\0';
     global_settings.font_file[0] = '\0';

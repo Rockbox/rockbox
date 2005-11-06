@@ -22,13 +22,13 @@
 #define CONFIG_TUNER (S1A0903X01 | TEA5767) /* to be decided at runtime */
 #define CONFIG_TUNER_XTAL 13000000
 
+/* Define this if you have a MAS3587F */
+#define CONFIG_CODEC MAS3587F
+
 #ifndef SIMULATOR
 
 /* Define this if you have a SH7034 */
 #define CONFIG_CPU SH7034
-
-/* Define this if you have a MAS3587F */
-#define CONFIG_CODEC MAS3587F
 
 /* Define this to the CPU frequency */
 #define CPU_FREQ      12000000

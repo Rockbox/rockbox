@@ -38,196 +38,92 @@
 
 #ifndef SIMULATOR
 extern bool audio_is_initialized;
-#endif
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 extern unsigned long shadow_io_control_main;
 extern unsigned shadow_codec_reg0;
 #endif
+#endif /* SIMULATOR */
 
-static const char* const units[] =
-{
-    "%",    /* Volume */
-    "dB",   /* Bass */
-    "dB",   /* Treble */
-    "%",    /* Balance */
-    "dB",   /* Loudness */
-    "",     /* AVC */
-    "",     /* Channels */
-    "%",    /* Stereo width */
-    "dB",   /* Left gain */
-    "dB",   /* Right gain */
-    "dB",   /* Mic gain */
-    "dB",   /* MDB Strength */
-    "%",    /* MDB Harmonics */
-    "Hz",   /* MDB Center */
-    "Hz",   /* MDB Shape */
-    "",     /* MDB Enable */
-    "",     /* Super bass */
+struct sound_settings_info {
+    const char *unit;
+    int numdecimals;
+    int steps;
+    int minval;
+    int maxval;
+    int defaultval;
+    sound_set_type *setfn;
 };
 
-static const int numdecimals[] =
-{
-    0,    /* Volume */
-    0,    /* Bass */
-    0,    /* Treble */
-    0,    /* Balance */
-    0,    /* Loudness */
-    0,    /* AVC */
-    0,    /* Channels */
-    0,    /* Stereo width */
-    1,    /* Left gain */
-    1,    /* Right gain */
-    1,    /* Mic gain */
-    0,    /* MDB Strength */
-    0,    /* MDB Harmonics */
-    0,    /* MDB Center */
-    0,    /* MDB Shape */
-    0,    /* MDB Enable */
-    0,    /* Super bass */
-};
-
-static const int steps[] =
-{
-    1,    /* Volume */
-#ifdef HAVE_UDA1380
-    2,    /* Bass */
-    2,    /* Treble */
-#else
-    1,    /* Bass */
-    1,    /* Treble */
-#endif
-    1,    /* Balance */
-    1,    /* Loudness */
-    1,    /* AVC */
-    1,    /* Channels */
-    1,    /* Stereo width */
-    1,    /* Left gain */
-    1,    /* Right gain */
-    1,    /* Mic gain */
-    1,    /* MDB Strength */
-    1,    /* MDB Harmonics */
-    10,   /* MDB Center */
-    10,   /* MDB Shape */
-    1,    /* MDB Enable */
-    1,    /* Super bass */
-};
-
-static const int minval[] =
-{
-    0,    /* Volume */
+static const struct sound_settings_info sound_settings_table[] = {
+    [SOUND_VOLUME]        = {"%",  0,  1,   0, 100,  70, sound_set_volume},
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    -12,  /* Bass */
-    -12,  /* Treble */
+    [SOUND_BASS]          = {"dB", 0,  1, -12,  12,   6, sound_set_bass},
+    [SOUND_TREBLE]        = {"dB", 0,  1, -12,  12,   6, sound_set_treble},
 #elif defined(HAVE_UDA1380)
-    0,    /* Bass */
-    0,    /* Treble */
-#else
-    -15,  /* Bass */
-    -15,  /* Treble */
+    [SOUND_BASS]          = {"dB", 0,  2,   0,  24,   0, sound_set_bass},
+    [SOUND_TREBLE]        = {"dB", 0,  2,   0,   6,   0, sound_set_treble},
+#else /* MAS3507D */
+    [SOUND_BASS]          = {"dB", 0,  1, -15,  15,   7, sound_set_bass},
+    [SOUND_TREBLE]        = {"dB", 0,  1, -15,  15,   7, sound_set_treble},
 #endif
-    -100,  /* Balance */
-    0,    /* Loudness */
-    -1,   /* AVC */
-    0,    /* Channels */
-    0,    /* Stereo width */
-    0,    /* Left gain */
-    0,    /* Right gain */
-    0,    /* Mic gain */
-    0,    /* MDB Strength */
-    0,    /* MDB Harmonics */
-    20,   /* MDB Center */
-    50,   /* MDB Shape */
-    0,    /* MDB Enable */
-    0,    /* Super bass */
-};
-
-static const int maxval[] =
-{
-    100,  /* Volume */
+    [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0, sound_set_balance},
+    [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0, sound_set_channels},
+    [SOUND_STEREO_WIDTH]  = {"%",  0,  1,   0, 255, 100, sound_set_stereo_width},
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    12,   /* Bass */
-    12,   /* Treble */
-#elif defined(HAVE_UDA1380)
-    24,   /* Bass */
-    6,    /* Treble */
-#else
-    15,   /* Bass */
-    15,   /* Treble */
+    [SOUND_LOUDNESS]      = {"dB", 0,  1,   0,  17,   0, sound_set_loudness},
+    [SOUND_AVC]           = {"",   0,  1,  -1,   4,   0, sound_set_avc},
+    [SOUND_MDB_STRENGTH]  = {"dB", 0,  1,   0, 127,  48, sound_set_mdb_strength},
+    [SOUND_MDB_HARMONICS] = {"%",  0,  1,   0, 100,  50, sound_set_mdb_harmonics},
+    [SOUND_MDB_CENTER]    = {"Hz", 0, 10,  20, 300,  60, sound_set_mdb_center},
+    [SOUND_MDB_SHAPE]     = {"Hz", 0, 10,  50, 300,  90, sound_set_mdb_shape},
+    [SOUND_MDB_ENABLE]    = {"",   0,  1,   0,   1,   0, sound_set_mdb_enable},
+    [SOUND_SUPERBASS]     = {"",   0,  1,   0,   1,   0, sound_set_superbass},
 #endif
-    100,   /* Balance */
-    17,   /* Loudness */
-    4,    /* AVC */
-    5,    /* Channels */
-    255,  /* Stereo width */
-    15,   /* Left gain */
-    15,   /* Right gain */
-    15,   /* Mic gain */
-    127,  /* MDB Strength */
-    100,  /* MDB Harmonics */
-    300,  /* MDB Center */
-    300,  /* MDB Shape */
-    1,    /* MDB Enable */
-    1,    /* Super bass */
-};
-
-static const int defaultval[] =
-{
-    70,   /* Volume */
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    6,    /* Bass */
-    6,    /* Treble */
-#elif defined(HAVE_UDA1380)
-    0,    /* Bass */
-    0,    /* Treble */
-#else
-    7,    /* Bass */
-    7,    /* Treble */
+#if CONFIG_CODEC == MAS3587F
+    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,   0,  15,   8, NULL},
+    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,   0,  15,   8, NULL},
+    [SOUND_MIC_GAIN]      = {"dB", 1,  1,   0,  15,   2, NULL},
 #endif
-    0,    /* Balance */
-    0,    /* Loudness */
-    0,    /* AVC */
-    0,    /* Channels */
-    100,  /* Stereo width */
-    8,    /* Left gain */
-    8,    /* Right gain */
-    2,    /* Mic gain */
-    50,   /* MDB Strength */
-    48,   /* MDB Harmonics */
-    60,   /* MDB Center */
-    90,   /* MDB Shape */
-    0,    /* MDB Enable */
-    0,    /* Super bass */
 };
 
 const char *sound_unit(int setting)
 {
-    return units[setting];
+    return sound_settings_table[setting].unit;
 }
 
 int sound_numdecimals(int setting)
 {
-    return numdecimals[setting];
+    return sound_settings_table[setting].numdecimals;
 }
 
 int sound_steps(int setting)
 {
-    return steps[setting];
+    return sound_settings_table[setting].steps;
 }
 
 int sound_min(int setting)
 {
-    return minval[setting];
+    return sound_settings_table[setting].minval;
 }
 
 int sound_max(int setting)
 {
-    return maxval[setting];
+    return sound_settings_table[setting].maxval;
 }
 
 int sound_default(int setting)
 {
-    return defaultval[setting];
+    return sound_settings_table[setting].defaultval;
+}
+
+sound_set_type* sound_get_fn(int setting)
+{
+    if ((unsigned)setting < (sizeof(sound_settings_table)
+                             / sizeof(struct sound_settings_info)))
+        return sound_settings_table[setting].setfn;
+    else
+        return NULL;
 }
 
 #ifndef SIMULATOR
@@ -487,14 +383,11 @@ static void set_channel_config(void)
     mas_writemem(MAS_BANK_D1, 0x7fb, &val_rr, 1); /* RR */
 #endif
 }
-#endif /* !SIMULATOR */
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 unsigned long mdb_shape_shadow = 0;
 unsigned long loudness_shadow = 0;
 #endif
-
-#ifndef SIMULATOR
 
 void sound_set_volume(int value)
 {
@@ -506,7 +399,7 @@ void sound_set_volume(int value)
 #elif (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380
     current_volume = VOLUME_MIN + (value * VOLUME_RANGE / 100);
     set_prescaled_volume();                   /* tenth of dB */
-#endif
+#endif    
 }
 
 void sound_set_balance(int value)
@@ -519,7 +412,7 @@ void sound_set_balance(int value)
 #elif CONFIG_CODEC == MAS3507D || defined HAVE_UDA1380
     current_balance = value * VOLUME_RANGE / 100; /* tenth of dB */
     set_prescaled_volume();
-#endif
+#endif       
 }
 
 void sound_set_bass(int value)
@@ -537,7 +430,7 @@ void sound_set_bass(int value)
     uda1380_set_bass(value >> 1);
     current_bass = value * 10;
     set_prescaled_volume();
-#endif
+#endif               
 }
 
 void sound_set_treble(int value)
@@ -555,7 +448,24 @@ void sound_set_treble(int value)
     uda1380_set_treble(value >> 1);
     current_treble = value * 10;
     set_prescaled_volume();
-#endif
+#endif    
+}
+
+void sound_set_channels(int value)
+{
+    if(!audio_is_initialized)
+        return;
+    channel_configuration = value;
+    set_channel_config();  
+}
+
+void sound_set_stereo_width(int value)
+{
+    if(!audio_is_initialized)
+        return;
+    stereo_width = value;
+    if (channel_configuration == SOUND_CHAN_CUSTOM)
+        set_channel_config();
 }
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
@@ -594,14 +504,14 @@ void sound_set_avc(int value)
             tmp = 0;
             break;
     }
-    mas_codec_writereg(MAS_REG_KAVC, tmp);
+    mas_codec_writereg(MAS_REG_KAVC, tmp);     
 }
 
 void sound_set_mdb_strength(int value)
 {
     if(!audio_is_initialized)
         return;
-    mas_codec_writereg(MAS_REG_KMDB_STR, (value & 0x7f) << 8);
+    mas_codec_writereg(MAS_REG_KMDB_STR, (value & 0x7f) << 8); 
 }
 
 void sound_set_mdb_harmonics(int value)
@@ -644,83 +554,92 @@ void sound_set_superbass(int value)
 }
 #endif /* (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
 
+#else /* SIMULATOR */
+void sound_set_volume(int value)
+{
+    (void)value;
+}
+
+void sound_set_balance(int value)
+{
+    (void)value;
+}
+
+void sound_set_bass(int value)
+{
+    (void)value;
+}
+
+void sound_set_treble(int value)
+{
+    (void)value;
+}
+
 void sound_set_channels(int value)
 {
-    if(!audio_is_initialized)
-        return;
-    channel_configuration = value;
-    set_channel_config();
+    (void)value;
 }
 
 void sound_set_stereo_width(int value)
 {
-    if(!audio_is_initialized)
-        return;
-    stereo_width = value;
-    if (channel_configuration == SOUND_CHAN_CUSTOM)
-        set_channel_config();
+    (void)value;
 }
-#endif /* SIMULATOR */
 
-void (*sound_get_fn(int setting))(int value)
-{
-#ifdef SIMULATOR
-    (void)setting;
-    return NULL;
-#else
-    if(!audio_is_initialized)
-        return NULL;
-    switch(setting)
-    {
-        case SOUND_VOLUME:
-            return &sound_set_volume;
-        case SOUND_BALANCE:
-            return &sound_set_balance;
-        case SOUND_BASS:
-            return &sound_set_bass;
-        case SOUND_TREBLE:
-            return &sound_set_treble;
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-        case SOUND_LOUDNESS:
-            return &sound_set_loudness;
-        case SOUND_AVC:
-            return &sound_set_avc;
-        case SOUND_MDB_STRENGTH:
-            return &sound_set_mdb_strength;
-        case SOUND_MDB_HARMONICS:
-            return &sound_set_mdb_harmonics;
-        case SOUND_MDB_CENTER:
-            return &sound_set_mdb_center;
-        case SOUND_MDB_SHAPE:
-            return &sound_set_mdb_shape;
-        case SOUND_MDB_ENABLE:
-            return &sound_set_mdb_enable;
-        case SOUND_SUPERBASS:
-            return &sound_set_superbass;
-#endif
-        case SOUND_CHANNELS:
-            return &sound_set_channels;
-        case SOUND_STEREO_WIDTH:
-            return &sound_set_stereo_width;
-        default :
-            return NULL;
-    }
-#endif /* SIMULATOR */
+void sound_set_loudness(int value)
+{
+    (void)value;
 }
+
+void sound_set_avc(int value)
+{
+    (void)value;
+}
+
+void sound_set_mdb_strength(int value)
+{
+    (void)value;
+}
+
+void sound_set_mdb_harmonics(int value)
+{
+    (void)value;
+}
+
+void sound_set_mdb_center(int value)
+{
+    (void)value;
+}
+
+void sound_set_mdb_shape(int value)
+{
+    (void)value;
+}
+
+void sound_set_mdb_enable(int value)
+{
+    (void)value;
+}
+
+void sound_set_superbass(int value)
+{
+    (void)value;
+}
+#endif /* (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
+#endif /* SIMULATOR */
 
 void sound_set(int setting, int value)
 {
-
-    void (*sound_set_val)(int)=sound_get_fn(setting);
-    if(sound_set_val)
+    sound_set_type* sound_set_val = sound_get_fn(setting);
+    if (sound_set_val)
         sound_set_val(value);
 }
 
 int sound_val2phys(int setting, int value)
 {
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+#if CONFIG_CODEC == MAS3587F
     int result = 0;
-    
+
     switch(setting)
     {
         case SOUND_LEFT_GAIN:
@@ -744,6 +663,7 @@ int sound_val2phys(int setting, int value)
 }
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+#ifndef SIMULATOR
 /* This function works by telling the decoder that we have another
    crystal frequency than we actually have. It will adjust its internal
    parameters and the result is that the audio is played at another pitch.
@@ -775,7 +695,7 @@ int sound_get_pitch(void)
 {
     return last_pitch;
 }
-#elif defined SIMULATOR
+#else /* SIMULATOR */
 void sound_set_pitch(int pitch)
 {
     (void)pitch;
@@ -785,5 +705,5 @@ int sound_get_pitch(void)
 {
     return 1000;
 }
-#endif
-
+#endif /* SIMULATOR */
+#endif /* (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */

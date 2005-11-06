@@ -50,6 +50,8 @@
 #define CONFIG_TUNER TEA5767
 #define CONFIG_TUNER_XTAL 32768
 
+#define HAVE_UDA1380
+
 #ifndef SIMULATOR
 
 /* Define this if you have a Motorola SCF5249 */
@@ -57,8 +59,6 @@
 
 /* Define this if you want to use coldfire's i2c interface */
 #define CONFIG_I2C I2C_COLDFIRE
-
-#define HAVE_UDA1380
 
 /* Type of mobile power */
 #define CONFIG_BATTERY BATT_LIPOL1300

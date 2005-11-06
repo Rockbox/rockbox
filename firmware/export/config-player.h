@@ -14,16 +14,16 @@
 
 #define AB_REPEAT_ENABLE 1
 
-#ifndef SIMULATOR
-
-/* Define this if you have a SH7034 */
-#define CONFIG_CPU SH7034
-
 /* Define this if you have a MAS3507D */
 #define CONFIG_CODEC MAS3507D
 
 /* Define this if you have a DAC3550A */
 #define HAVE_DAC3550A
+
+#ifndef SIMULATOR
+
+/* Define this if you have a SH7034 */
+#define CONFIG_CPU SH7034
 
 /* Define this if you need to power on ATA */
 #define NEEDS_ATA_POWER_ON

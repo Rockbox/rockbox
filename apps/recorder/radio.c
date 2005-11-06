@@ -410,7 +410,7 @@ bool radio_screen(void)
                 global_settings.volume++;
                 if(global_settings.volume > sound_max(SOUND_VOLUME))
                     global_settings.volume = sound_max(SOUND_VOLUME);
-                sound_set(SOUND_VOLUME, global_settings.volume);
+                sound_set_volume(global_settings.volume);
                 update_screen = true;
                 settings_save();
                 break;
@@ -420,7 +420,7 @@ bool radio_screen(void)
                 global_settings.volume--;
                 if(global_settings.volume < sound_min(SOUND_VOLUME))
                     global_settings.volume = sound_min(SOUND_VOLUME);
-                sound_set(SOUND_VOLUME, global_settings.volume);
+                sound_set_volume(global_settings.volume);
                 update_screen = true;
                 settings_save();
                 break;

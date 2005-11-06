@@ -44,7 +44,7 @@ enum
 } mpeg_mode;
 #endif /* #ifdef MAS3587F */
 
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+#if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)) && !defined(SIMULATOR)
 extern unsigned long shadow_io_control_main;
 extern unsigned shadow_codec_reg0;
 #endif
@@ -258,7 +258,6 @@ static void setup_sci0(void)
     /* Enable Tx (only!) */
     SCR0 |= 0x20;
 }
-#endif /* SIMULATOR */
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 static void init_playback(void)
@@ -323,6 +322,7 @@ static void init_playback(void)
     DEBUGF("MAS Decoding application started\n");
 }
 #endif /* #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
+#endif /* SIMULATOR */
 
 void mp3_init(int volume, int bass, int treble, int balance, int loudness,
               int avc, int channel_config, int stereo_width,

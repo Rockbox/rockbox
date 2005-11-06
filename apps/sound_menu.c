@@ -62,13 +62,13 @@ bool set_sound(const char* string,
     int steps = sound_steps(setting);
     int min = sound_min(setting);
     int max = sound_max(setting);
-    void(*sound_callback)(int)=sound_get_fn(setting);
+    sound_set_type* sound_callback = sound_get_fn(setting);
     if (*unit == 'd') /* crude reconstruction */
         talkunit = UNIT_DB;
     else if (*unit == '%')
         talkunit = UNIT_PERCENT;
     else if (*unit == 'H')
-         talkunit = UNIT_HERTZ;
+        talkunit = UNIT_HERTZ;
     if(!numdec)
         return set_int(string, unit, talkunit,  variable, sound_callback,
                        steps, min, max, NULL );
@@ -134,7 +134,7 @@ static bool mdb_shape(void)
 
 static void set_mdb_enable(bool value)
 {
-    sound_set(SOUND_MDB_ENABLE, (int)value);
+    sound_set_mdb_enable((int)value);
 }
 
 static bool mdb_enable(void)
@@ -148,7 +148,7 @@ static bool mdb_enable(void)
 
 static void set_superbass(bool value)
 {
-    sound_set(SOUND_SUPERBASS, (int)value);
+    sound_set_superbass((int)value);
 }
 
 static bool superbass(void)
@@ -158,11 +158,6 @@ static bool superbass(void)
                             STR(LANG_SET_BOOL_YES), 
                             STR(LANG_SET_BOOL_NO), 
                             set_superbass);
-}
-
-static void set_avc(int val)
-{
-    sound_set(SOUND_AVC, val);
 }
 
 static bool avc(void)
@@ -175,7 +170,7 @@ static bool avc(void)
         { "8s", TALK_ID(8, UNIT_SEC) }
     };
     return set_option(str(LANG_DECAY), &global_settings.avc, INT,
-                      names, 5, set_avc);
+                      names, 5, sound_set_avc);
 }
 #endif
 
@@ -317,11 +312,6 @@ static bool reconstartup(void)
 
 #endif /* MAS3587F */
 
-static void set_chanconf(int val)
-{
-    sound_set(SOUND_CHANNELS, val);
-}
-
 static bool chanconf(void)
 {
     static const struct opt_items names[] = {
@@ -333,7 +323,7 @@ static bool chanconf(void)
         { STR(LANG_CHANNEL_KARAOKE) }
     };
     return set_option(str(LANG_CHANNEL), &global_settings.channel_config, INT,
-                      names, 6, set_chanconf );
+                      names, 6, sound_set_channels);
 }
 
 static bool stereo_width(void)

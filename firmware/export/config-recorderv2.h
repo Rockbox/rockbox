@@ -25,11 +25,11 @@
 
 #ifndef SIMULATOR
 
-/* Define this if you have a SH7034 */
-#define CONFIG_CPU SH7034
-
 /* Define this if you have a MAS3587F */
 #define CONFIG_CODEC MAS3587F
+
+/* Define this if you have a SH7034 */
+#define CONFIG_CPU SH7034
 
 /* Define this if you have a FM Recorder key system */
 #define HAVE_FMADC 1

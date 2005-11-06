@@ -15,13 +15,13 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x8000
 
+/* Define this if you have a MAS3539F */
+#define CONFIG_CODEC MAS3539F
+
 #ifndef SIMULATOR
 
 /* Define this if you have a SH7034 */
 #define CONFIG_CPU SH7034
-
-/* Define this if you have a MAS3539F */
-#define CONFIG_CODEC MAS3539F
 
 /* Define this to the CPU frequency */
 #define CPU_FREQ      12000000

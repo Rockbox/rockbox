@@ -291,7 +291,7 @@ bool recording_screen(void)
 #endif
     mpeg_init_recording();
 
-    sound_set(SOUND_VOLUME, global_settings.volume);
+    sound_set_volume(global_settings.volume);
     
     /* Yes, we use the D/A for monitoring */
     peak_meter_playback(true);

@@ -1228,7 +1228,7 @@ void audio_play_start(int offset)
     }
 
     memset(&tracks, 0, sizeof(struct track_info) * MAX_TRACK);
-    sound_set(SOUND_VOLUME, global_settings.volume);
+    sound_set_volume(global_settings.volume);
     track_count = 0;
     track_widx = 0;
     track_ridx = 0;

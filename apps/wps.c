@@ -77,7 +77,7 @@ static bool setvol(void)
         global_settings.volume = sound_min(SOUND_VOLUME);
     if (global_settings.volume > sound_max(SOUND_VOLUME))
         global_settings.volume = sound_max(SOUND_VOLUME);
-    sound_set(SOUND_VOLUME, global_settings.volume);
+    sound_set_volume(global_settings.volume);
     status_draw(false);
     wps_refresh(id3, nid3, 0, WPS_REFRESH_NON_STATIC);
     settings_save();
@@ -267,7 +267,7 @@ static void fade(bool fade_in)
         unsigned fp_volume = 0;
 
         /* zero out the sound */
-        sound_set(SOUND_VOLUME, 0);
+        sound_set_volume(0);
 
         sleep(HZ/10); /* let audio thread run */
         audio_resume();
@@ -275,9 +275,9 @@ static void fade(bool fade_in)
         while (fp_volume < fp_global_vol) {
             fp_volume += fp_step;
             sleep(1);
-            sound_set(SOUND_VOLUME, fp_volume >> 8);
+            sound_set_volume(fp_volume >> 8);
         }
-        sound_set(SOUND_VOLUME, global_settings.volume);
+        sound_set_volume(global_settings.volume);
     }
     else {
         /* fade out */
@@ -286,7 +286,7 @@ static void fade(bool fade_in)
         while (fp_volume > fp_step) {
             fp_volume -= fp_step;
             sleep(1);
-            sound_set(SOUND_VOLUME, fp_volume >> 8);
+            sound_set_volume(fp_volume >> 8);
         }
         audio_pause();
 #ifndef SIMULATOR
@@ -296,7 +296,7 @@ static void fade(bool fade_in)
             sleep(HZ/10);
 
         /* reset volume to what it was before the fade */
-        sound_set(SOUND_VOLUME, global_settings.volume);
+        sound_set_volume(global_settings.volume);
     }
 }
 

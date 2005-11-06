@@ -882,7 +882,9 @@ static bool poweroff(void)
 static bool line_in(void)
 {
     bool rc = set_bool(str(LANG_LINE_IN), &global_settings.line_in);
+#ifndef SIMULATOR
     dac_line_in(global_settings.line_in);
+#endif
     return rc;
 }
 #endif
