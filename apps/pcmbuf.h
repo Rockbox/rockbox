@@ -43,7 +43,7 @@ void pcmbuf_set_boost_mode(bool state);
 bool pcmbuf_is_lowdata(void);
 void pcmbuf_flush_audio(void);
 void pcmbuf_play_start(void);
-bool pcmbuf_crossfade_init(int type);
+bool pcmbuf_crossfade_init(void);
 void pcmbuf_add_event(void (*event_handler)(void));
 unsigned int pcmbuf_get_latency(void);
 bool pcmbuf_insert_buffer(char *buf, long length);

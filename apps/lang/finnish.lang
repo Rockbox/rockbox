@@ -3144,10 +3144,10 @@ voice: "Crossfade"
 new: "Ristivaihto"
 
 id: LANG_CROSSFADE_DURATION
-desc: in playback settings
-eng: "Crossfade duration"
-voice: "Ristivaihdon kesto"
-new: "Ristivaihdon kesto"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_SHUFFLE_PLAYLIST
 desc: in playlist menu, reshuffles the order in which songs are played
@@ -3347,3 +3347,39 @@ desc: when booting up and rebuilding the cache
 eng: "Scanning disk..."
 voice: ""
 new: "Ladataan hakemistopuu..."
+
+id: LANG_CROSSFADE_ENABLE
+desc: in crossfade settings menu
+eng: "Enable crossfade"
+voice: "Aktivoi ristivaihto"
+new: "Aktivoi ristivaihto"
+
+id: LANG_CROSSFADE_FADE_IN_DELAY
+desc: in crossfade settings menu
+eng: "Fade in delay"
+voice: "Sis‰‰nh‰ivytyksen viive"
+new: "Sis‰‰nh‰ivytyksen viive"
+
+id: LANG_CROSSFADE_FADE_OUT_DELAY
+desc: in crossfade settings menu
+eng: "Fade out delay"
+voice: "Poish‰ivytyksen viive"
+new: "Poish‰ivytyksen viive"
+
+id: LANG_CROSSFADE_FADE_IN_DURATION
+desc: in crossfade settings menu
+eng: "Fade in duration"
+voice: "Sis‰‰nh‰ivytyksen kesto"
+new: "Sis‰‰nh‰ivytyksen kesto"
+
+id: LANG_CROSSFADE_FADE_OUT_DURATION
+desc: in crossfade settings menu
+eng: "Fade out duration"
+voice: "Poish‰ivytyksen kesto"
+new: "Poish‰ivytyksen kesto"
+
+id: LANG_CROSSFADE_FADE_OUT_MODE
+desc: in crossfade settings menu
+eng: "Fade out mode"
+voice: "Poish‰ivytyksen tyyli"
+new: "Poish‰ivytyksen tyyli"

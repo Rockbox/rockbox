@@ -3168,9 +3168,9 @@ voice: ""
 new:
 
 id: LANG_CROSSFADE_DURATION
-desc: in playback settings
-eng: "Crossfade duration"
-voice: "Crossfade duration"
+desc: DEPRECATED
+eng: ""
+voice: ""
 new:
 
 id: LANG_MIX
@@ -3315,4 +3315,40 @@ id: LANG_DIRCACHE_BUILDING
 desc: when booting up and rebuilding the cache
 eng: "Scanning disk..."
 voice: ""
+new:
+
+id: LANG_CROSSFADE_ENABLE
+desc: in crossfade settings menu
+eng: "Enable crossfade"
+voice: "Enable crossfade"
+new:
+
+id: LANG_CROSSFADE_FADE_IN_DELAY
+desc: in crossfade settings menu
+eng: "Fade in delay"
+voice: "Fade in delay"
+new:
+
+id: LANG_CROSSFADE_FADE_OUT_DELAY
+desc: in crossfade settings menu
+eng: "Fade out delay"
+voice: "Fade out delay"
+new:
+
+id: LANG_CROSSFADE_FADE_IN_DURATION
+desc: in crossfade settings menu
+eng: "Fade in duration"
+voice: "Fade in duration"
+new:
+
+id: LANG_CROSSFADE_FADE_OUT_DURATION
+desc: in crossfade settings menu
+eng: "Fade out duration"
+voice: "Fade out duration"
+new:
+
+id: LANG_CROSSFADE_FADE_OUT_MODE
+desc: in crossfade settings menu
+eng: "Fade out mode"
+voice: "Fade out mode"
 new:

@@ -109,9 +109,8 @@
 #define TRIG_DURATION_COUNT 13
 extern const char * const trig_durations[TRIG_DURATION_COUNT];
 
-#define CROSSFADE_MODE_OFF       0
-#define CROSSFADE_MODE_CROSSFADE 1
-#define CROSSFADE_MODE_MIX       2
+#define CROSSFADE_ENABLE_SHUFFLE  1
+#define CROSSFADE_ENABLE_ALWAYS   2
 
 /* These define "virtual pointers", which could either be a literal string,
    or a mean a string ID if the pointer is in a certain range.
@@ -157,8 +156,12 @@ struct user_settings
     bool superbass; /* true/false */
 
 #if CONFIG_CODEC == SWCODEC
-    int crossfade;
-    int crossfade_duration;
+    int crossfade;     /* Enable crossfade (0=off,1=shuffle,2=always)      */
+    int crossfade_fade_in_delay;      /* Fade in delay (0-15s)             */
+    int crossfade_fade_out_delay;     /* Fade out delay (0-15s)            */
+    int crossfade_fade_in_duration;   /* Fade in duration (0-15s)          */
+    int crossfade_fade_out_duration;  /* Fade out duration (0-15s)         */
+    int crossfade_fade_out_mixmode;   /* Fade out mode (0=crossfade,1=mix) */
 #endif
 
     int rec_quality;   /* 0-7 */

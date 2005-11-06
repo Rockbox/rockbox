@@ -38,7 +38,7 @@
 
 #define CHUNK_SIZE           PCMBUF_GUARD
 /* Must be a power of 2 */
-#define NUM_PCM_BUFFERS      64
+#define NUM_PCM_BUFFERS      128
 #define NUM_PCM_BUFFERS_MASK (NUM_PCM_BUFFERS - 1)
 #define PCMBUF_WATERMARK     (CHUNK_SIZE * 6)
 
@@ -58,7 +58,6 @@ static bool crossfade_enabled;
 static bool crossfade_active;
 static bool crossfade_init;
 static int crossfade_pos;
-static int crossfade_amount;
 static int crossfade_rem;
 
 /* Crossfade modes. If CFM_CROSSFADE is selected, normal
@@ -70,6 +69,9 @@ enum {
     CFM_MIX,
     CFM_FLUSH
 };
+
+static int crossfade_fade_in_amount;
+static int crossfade_fade_in_rem;
 
 /* Structure we can use to queue pcm chunks in memory to be played
  * by the driver code. */
@@ -225,7 +227,7 @@ bool pcmbuf_is_lowdata(void)
     return false;
 }
 
-bool pcmbuf_crossfade_init(int type)
+bool pcmbuf_crossfade_init(void)
 {
     if (pcmbuf_size - audiobuffer_free < CHUNK_SIZE * 8 || !crossfade_enabled
         || crossfade_active || crossfade_init) {
@@ -235,17 +237,8 @@ bool pcmbuf_crossfade_init(int type)
     logf("pcmbuf_crossfade_init");
     pcmbuf_boost(true);
 
-    switch (type) {
-    case CROSSFADE_MODE_CROSSFADE:
-        crossfade_mode = CFM_CROSSFADE;
-        break;
-    case CROSSFADE_MODE_MIX:
-        crossfade_mode = CFM_MIX;
-        break;
-    default:
-        return false;
-    }
-        
+    crossfade_mode = global_settings.crossfade_fade_out_mixmode
+            ? CFM_MIX : CFM_CROSSFADE;
     crossfade_init = true;
     
     return true;
@@ -308,6 +301,9 @@ void pcmbuf_play_start(void)
         pcm_play_data(pcmbuf_callback);
 }
 
+/**
+ * Commit samples waiting to the pcm buffer.
+ */
 void pcmbuf_flush_fillpos(void)
 {
     int copy_n;
@@ -335,9 +331,59 @@ void pcmbuf_flush_fillpos(void)
     }
 }
 
+/**
+ * Completely process the crossfade fade out effect with current pcm buffer.
+ */
+static void crossfade_process_buffer(
+        int fade_in_delay, int fade_out_delay, int fade_out_rem)
+{
+    int amount;
+    int pos;
+    short *buf;
+
+    /* Fade out the entire current buffer according to settings. */
+    amount = fade_out_rem;
+    pos = crossfade_pos + fade_out_delay*2;
+    
+    while (fade_out_rem > 0 && crossfade_mode == CFM_CROSSFADE)
+    {
+        int blocksize = MIN(8192, fade_out_rem);
+        int factor = (fade_out_rem<<8)/amount;
+
+        /* Prevent pcmbuffer from wrapping. */
+        if (pos >= pcmbuf_size)
+            pos -= pcmbuf_size;
+        blocksize = MIN(pcmbuf_size - pos, blocksize);
+        buf = (short *)&audiobuffer[pos];
+        
+        fade_out_rem -= blocksize;
+        pos += blocksize * 2;
+        while (blocksize > 0)
+        {
+            *buf = (*buf * factor) >> 8;
+            *buf++;
+            blocksize--;
+        }
+        //yield();
+    }
+
+    /* And finally set the mixing position where we should start fading in. */
+    crossfade_rem -= fade_in_delay;
+    crossfade_pos += fade_in_delay*2;
+    if (crossfade_pos >= pcmbuf_size)
+        crossfade_pos -= pcmbuf_size;
+    logf("process done!");
+}
+
+/**
+ * Initializes crossfader, calculates all necessary parameters and
+ * performs fade-out with the pcm buffer.
+ */
 static void crossfade_start(void)
 {
     int bytesleft = pcmbuf_unplayed_bytes;
+    int fade_out_rem = 0, fade_out_delay = 0;
+    int fade_in_delay = 0;
     
     crossfade_init = 0;
     if (bytesleft < CHUNK_SIZE * 4) {
@@ -356,44 +402,125 @@ static void crossfade_start(void)
     switch (crossfade_mode) {
         case CFM_MIX:
         case CFM_CROSSFADE:
-            crossfade_amount = (bytesleft - (CHUNK_SIZE * 2))/2;
-            crossfade_rem = crossfade_amount;
+            /* Initialize the crossfade buffer size. */
+            crossfade_rem = (bytesleft - (CHUNK_SIZE * 2))/2;
+
+            /* Get fade out delay from settings. */
+            fade_out_delay = NATIVE_FREQUENCY
+                    * global_settings.crossfade_fade_out_delay * 2;
+
+            /* Get fade out duration from settings. */
+            fade_out_rem = NATIVE_FREQUENCY
+                    * global_settings.crossfade_fade_out_duration * 2;
+
+            /* Truncate fade out duration if necessary. */
+            if (fade_out_rem > crossfade_rem)
+                fade_out_rem = crossfade_rem;
+
+            /* We want only to modify the last part of the buffer. */
+            if (crossfade_rem > fade_out_rem + fade_out_delay)
+                crossfade_rem = fade_out_rem + fade_out_delay;
+
+            /* Get also fade in duration and delays from settings. */
+            crossfade_fade_in_rem = NATIVE_FREQUENCY
+                    * global_settings.crossfade_fade_in_duration * 2;
+            crossfade_fade_in_amount = crossfade_fade_in_rem;
+
+            /* We should avoid to divide by zero. */
+            if (crossfade_fade_in_amount == 0)
+                crossfade_fade_in_amount = 1;
+
+            fade_in_delay = NATIVE_FREQUENCY
+                    * global_settings.crossfade_fade_in_delay * 2;
+        
+            /* Decrease the fade out delay if necessary. */
+            fade_out_delay += MIN(crossfade_rem -
+                                  fade_out_rem -
+                                  fade_out_delay, 0);
+            if (fade_out_delay < 0)
+                fade_out_delay = 0;
             break ;
 
         case CFM_FLUSH:
-            crossfade_amount = bytesleft /2;
-            crossfade_rem = crossfade_amount;
+            crossfade_rem = bytesleft /2;
             break ;
     }
     
-    crossfade_pos -= crossfade_amount*2;
+    crossfade_pos -= crossfade_rem*2;
     if (crossfade_pos < 0)
         crossfade_pos += pcmbuf_size;
+    
+    if (crossfade_mode != CFM_FLUSH) {
+        /* Process the fade out part of the crossfade. */
+        crossfade_process_buffer(fade_in_delay, fade_out_delay, fade_out_rem);
+    }
+    
 }
 
+/**
+ * Fades in samples passed to the function and inserts them
+ * to the pcm buffer.
+ */
+static void fade_insert(const short *inbuf, int length)
+{
+    int copy_n;
+    int factor;
+    int i, samples;
+    short *buf;
+    
+    factor = ((crossfade_fade_in_amount-crossfade_fade_in_rem)
+            <<8)/crossfade_fade_in_amount;
+
+    while (audiobuffer_free < length + audiobuffer_fillpos
+        + CHUNK_SIZE)
+    {
+        pcmbuf_boost(false);
+        sleep(1);
+    }
+    
+    while (length > 0) {
+        copy_n = MIN(length, pcmbuf_size - audiobuffer_pos -
+                audiobuffer_fillpos);
+        copy_n = MIN(CHUNK_SIZE - audiobuffer_fillpos, copy_n);
+
+        buf = (short *)&audiobuffer[audiobuffer_pos+audiobuffer_fillpos];
+        samples = copy_n / 2;
+        for (i = 0; i < samples; i++)
+            buf[i] = (inbuf[i] * factor) >> 8;
+        
+        inbuf += samples;
+        audiobuffer_fillpos += copy_n;
+        length -= copy_n;
+        
+        /* Pre-buffer to meet CHUNK_SIZE requirement */
+        if (audiobuffer_fillpos < CHUNK_SIZE && length == 0) {
+            break ;
+        }
+
+        pcmbuf_flush_fillpos();
+    }
+}
+
+/**
+ * Fades in buf2 and mixes it with buf.
+ */
 static __inline
 int crossfade(short *buf, const short *buf2, int length)
 {
     int size, i;
-    int val1, val2;
+    int size_insert = 0;
+    int factor;
     
-    size = MIN(length, crossfade_rem);
+    size = MAX(0, MIN(length, crossfade_rem));
     switch (crossfade_mode) {
-        /* Mix two streams. */
+        /* Fade in the current stream and mix it. */
         case CFM_MIX:
-            /* Bias & add & clip. */
-            for (i = 0; i < size; i++) {
-                buf[i] = MIN(MAX(buf[i] + buf2[i], -32768), 32767);
-            }
-            break ;
-
-        /* Fade two streams. */
         case CFM_CROSSFADE:
-            val1 = (crossfade_rem<<10)/crossfade_amount;
-            val2 = ((crossfade_amount-crossfade_rem)<<10)/crossfade_amount;
+            factor = ((crossfade_fade_in_amount-crossfade_fade_in_rem)
+                    <<8)/crossfade_fade_in_amount;
             
             for (i = 0; i < size; i++) {
-                buf[i] = ((buf[i] * val1) + (buf2[i] * val2)) >> 10;
+                buf[i] = MIN(MAX(buf[i] + ((buf2[i] * factor) >> 8), -32768), 32767);
             }
             break ;
 
@@ -405,12 +532,20 @@ int crossfade(short *buf, const short *buf2, int length)
             //memcpy((char *)buf, (char *)buf2, size*2);
             break ;
     }
-    
+
+    crossfade_fade_in_rem = MAX(0, crossfade_fade_in_rem - size);
     crossfade_rem -= size;
     if (crossfade_rem <= 0)
-        crossfade_active = false;
-    
-    return size;
+    {
+        size_insert = MAX(0, MIN(crossfade_fade_in_rem, length - size));
+        fade_insert(&buf2[size], size_insert*2);
+        crossfade_fade_in_rem -= size_insert;
+        
+        if (crossfade_fade_in_rem <= 0)
+            crossfade_active = false;
+    }
+
+    return size + size_insert;
 }
 
 static bool prepare_insert(long length)
@@ -486,13 +621,12 @@ void pcmbuf_flush_buffer(long length)
         }
         
         while (length > 0) {
+            pcmbuf_flush_fillpos();
             copy_n = MIN(length, pcmbuf_size - audiobuffer_pos);
             memcpy(&audiobuffer[audiobuffer_pos], buf, copy_n);
             audiobuffer_fillpos = copy_n;
             buf += copy_n;
             length -= copy_n;
-            if (length > 0)
-                pcmbuf_flush_fillpos();
         }
     }
 
@@ -537,13 +671,12 @@ bool pcmbuf_insert_buffer(char *buf, long length)
         }
         
         while (length > 0) {
+            pcmbuf_flush_fillpos();
             copy_n = MIN(length, pcmbuf_size - audiobuffer_pos);
             memcpy(&audiobuffer[audiobuffer_pos], buf, copy_n);
             audiobuffer_fillpos = copy_n;
             buf += copy_n;
             length -= copy_n;
-            if (length > 0)
-                pcmbuf_flush_fillpos();
         }
     }
         
@@ -674,6 +807,9 @@ void pcmbuf_crossfade_enable(bool on_off)
 
 bool pcmbuf_is_crossfade_enabled(void)
 {
+    if (global_settings.crossfade == CROSSFADE_ENABLE_SHUFFLE)
+        return global_settings.playlist_shuffle;
+
     return crossfade_enabled;
 }
 

@@ -85,7 +85,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "dsp.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 28
+#define CONFIG_BLOCK_VERSION 29
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -417,10 +417,6 @@ static const struct bit_entry hd_bits[] =
     {4, S_O(rec_trigger_mode ), 0, "trigger mode", "off,once,repeat"},
 #endif
 
-#if CONFIG_CODEC == SWCODEC
-    {3, S_O(crossfade_duration), 0, "crossfade duration", "1s,2s,4s,6s,8s,10s,12s,14s"},
-#endif
-
 #if CONFIG_BACKLIGHT == BL_IRIVER
     /* backlight fading */
     {2, S_O(backlight_fade_in), 1, "backlight fade in", "off,500ms,1s,2s"},
@@ -436,13 +432,18 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(runtimedb), false, "gather runtime data", off_on },
 
 #if CONFIG_CODEC == SWCODEC
-    {2, S_O(crossfade), 0, "crossfade type", "off,crossfade,mix"},
     {1, S_O(replaygain), false, "replaygain", off_on },
     {2, S_O(replaygain_type), REPLAYGAIN_ALBUM, "replaygain type",
         "track,album,track shuffle" },
     {1, S_O(replaygain_noclip), false, "replaygain noclip", off_on },
     {8 | SIGNED, S_O(replaygain_preamp), 0, "replaygain preamp", NULL },
     {2, S_O(beep), 0, "beep", "off,weak,moderate,strong" },
+    {2, S_O(crossfade), 0, "crossfade", "off,shuffle,always"},
+    {3, S_O(crossfade_fade_in_delay), 0, "crossfade fade in delay", NULL},
+    {3, S_O(crossfade_fade_out_delay), 0, "crossfade fade out delay", NULL},
+    {4, S_O(crossfade_fade_in_duration), 0, "crossfade fade in duration", NULL},
+    {4, S_O(crossfade_fade_out_duration), 0, "crossfade fade out duration", NULL},
+    {1, S_O(crossfade_fade_out_mixmode), 0, "crossfade fade out mode", "crossfade,mix"},
 #endif
 #ifdef HAVE_DIRCACHE
     {1, S_O(dircache), false, "dircache", off_on },

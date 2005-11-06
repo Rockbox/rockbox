@@ -1110,44 +1110,6 @@ static bool id3_order(void)
                              mpeg_id3_options);
 }
 
-#if CONFIG_CODEC == SWCODEC
-static bool crossfade(void)
-{
-    static const struct opt_items names[] = {
-        { STR(LANG_OFF) },
-        { STR(LANG_CROSSFADE) },
-        { STR(LANG_MIX) },
-    };
-    bool ret;
-
-    ret = set_option( str(LANG_CROSSFADE),
-                     &global_settings.crossfade, INT, names, 3, NULL);
-    audio_set_crossfade(global_settings.crossfade);
-
-    return ret;
-}
-
-static bool crossfade_duration(void)
-{
-    static const struct opt_items names[] = {
-        { "1s", TALK_ID(1, UNIT_SEC) },
-        { "2s", TALK_ID(2, UNIT_SEC) },
-        { "4s", TALK_ID(4, UNIT_SEC) },
-        { "6s", TALK_ID(6, UNIT_SEC) },
-        { "8s", TALK_ID(8, UNIT_SEC) },
-        { "10s", TALK_ID(10, UNIT_SEC) },
-        { "12s", TALK_ID(12, UNIT_SEC) },
-        { "14s", TALK_ID(14, UNIT_SEC) },
-    };
-    bool ret;
-    ret=set_option( str(LANG_CROSSFADE_DURATION),
-                    &global_settings.crossfade_duration, INT, names, 8, NULL);
-    audio_set_crossfade(global_settings.crossfade);
-                   
-    return ret;
-}
-#endif
-
 static bool next_folder(void)
 {
     return set_bool( str(LANG_NEXT_FOLDER), &global_settings.next_folder );
@@ -1239,6 +1201,120 @@ static bool replaygain_settings_menu(void)
     return result;
 }
 
+static bool crossfade(void)
+{
+    static const struct opt_items names[] = {
+        { STR(LANG_OFF) },
+        { STR(LANG_SHUFFLE) },
+        { STR(LANG_ALWAYS) },
+    };
+
+    bool ret;
+    
+    ret=set_option( str(LANG_CROSSFADE_ENABLE),
+                    &global_settings.crossfade, INT, names, 3, NULL);
+    
+    audio_set_crossfade(global_settings.crossfade);
+
+    return ret;
+}
+
+static const struct opt_items crossfade_time[] = {
+    { "0s", TALK_ID(0, UNIT_SEC) },
+    { "1s", TALK_ID(1, UNIT_SEC) },
+    { "2s", TALK_ID(2, UNIT_SEC) },
+    { "3s", TALK_ID(3, UNIT_SEC) },
+    { "4s", TALK_ID(4, UNIT_SEC) },
+    { "5s", TALK_ID(5, UNIT_SEC) },
+    { "6s", TALK_ID(6, UNIT_SEC) },
+    { "7s", TALK_ID(7, UNIT_SEC) },
+    { "8s", TALK_ID(8, UNIT_SEC) },
+    { "9s", TALK_ID(9, UNIT_SEC) },
+    { "10s", TALK_ID(10, UNIT_SEC) },
+    { "11s", TALK_ID(11, UNIT_SEC) },
+    { "12s", TALK_ID(12, UNIT_SEC) },
+    { "13s", TALK_ID(13, UNIT_SEC) },
+    { "14s", TALK_ID(14, UNIT_SEC) },
+    { "15s", TALK_ID(15, UNIT_SEC) },
+};
+
+static bool crossfade_fade_in_delay(void)
+{
+    bool ret;
+    ret=set_option( str(LANG_CROSSFADE_FADE_IN_DELAY),
+                    &global_settings.crossfade_fade_in_delay, INT, crossfade_time, 8, NULL);
+    audio_set_crossfade(global_settings.crossfade);
+                   
+    return ret;
+}
+
+static bool crossfade_fade_out_delay(void)
+{
+    bool ret;
+    ret=set_option( str(LANG_CROSSFADE_FADE_OUT_DELAY),
+                    &global_settings.crossfade_fade_out_delay, INT, crossfade_time, 8, NULL);
+    audio_set_crossfade(global_settings.crossfade);
+                   
+    return ret;
+}
+
+static bool crossfade_fade_in_duration(void)
+{
+    bool ret;
+    ret=set_option( str(LANG_CROSSFADE_FADE_IN_DURATION),
+                    &global_settings.crossfade_fade_in_duration, INT, crossfade_time, 16, NULL);
+    audio_set_crossfade(global_settings.crossfade);
+                   
+    return ret;
+}
+
+static bool crossfade_fade_out_duration(void)
+{
+    bool ret;
+    ret=set_option( str(LANG_CROSSFADE_FADE_OUT_DURATION),
+                    &global_settings.crossfade_fade_out_duration, INT, crossfade_time, 16, NULL);
+    audio_set_crossfade(global_settings.crossfade);
+                   
+    return ret;
+}
+
+static bool crossfade_fade_out_mixmode(void)
+{
+    static const struct opt_items names[] = {
+        { STR(LANG_CROSSFADE) },
+        { STR(LANG_MIX) },
+    };
+    bool ret;
+    ret=set_option( str(LANG_CROSSFADE_FADE_OUT_MODE),
+                    &global_settings.crossfade_fade_out_mixmode, INT, names, 2, NULL);
+                   
+    return ret;
+}
+
+/**
+ * Menu to configure the crossfade settings.
+ */
+static bool crossfade_settings_menu(void)
+{
+    int m;
+    bool result;
+
+    static const struct menu_item items[] = {
+        { ID2P(LANG_CROSSFADE_ENABLE), crossfade },
+        { ID2P(LANG_CROSSFADE_FADE_IN_DELAY), crossfade_fade_in_delay },
+        { ID2P(LANG_CROSSFADE_FADE_IN_DURATION), crossfade_fade_in_duration },
+        { ID2P(LANG_CROSSFADE_FADE_OUT_DELAY), crossfade_fade_out_delay },
+        { ID2P(LANG_CROSSFADE_FADE_OUT_DURATION), crossfade_fade_out_duration },
+        { ID2P(LANG_CROSSFADE_FADE_OUT_MODE), crossfade_fade_out_mixmode },
+    };
+
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
+    result = menu_run(m);
+    menu_exit(m);
+    return result;
+}
+
 static bool beep(void)
 {
     static const struct opt_items names[] = {
@@ -1289,8 +1365,7 @@ static bool playback_settings_menu(void)
         { ID2P(LANG_MP3BUFFER_MARGIN), buffer_margin },
         { ID2P(LANG_FADE_ON_STOP), set_fade_on_stop },
 #if CONFIG_CODEC == SWCODEC
-        { ID2P(LANG_CROSSFADE), crossfade },
-        { ID2P(LANG_CROSSFADE_DURATION), crossfade_duration },
+        { ID2P(LANG_CROSSFADE), crossfade_settings_menu },
         { ID2P(LANG_REPLAYGAIN), replaygain_settings_menu },
         { ID2P(LANG_BEEP), beep },
 #endif

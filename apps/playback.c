@@ -1441,8 +1441,7 @@ void audio_update_trackinfo(void)
     cur_ti->start_pos = 0;
     ci.taginfo_ready = (bool *)&cur_ti->taginfo_ready;
     if (pcmbuf_is_crossfade_enabled() && !pcmbuf_is_crossfade_active()) {
-        pcmbuf_crossfade_init(new_track ? CROSSFADE_MODE_CROSSFADE
-                                : global_settings.crossfade);
+        pcmbuf_crossfade_init();
         codec_track_changed();
     } else {
         pcmbuf_add_event(codec_track_changed);
@@ -1706,7 +1705,7 @@ void audio_thread(void)
                 ci.stop_codec = true;
                 ci.reload_codec = false;
                 ci.seek_time = 0;
-                pcmbuf_crossfade_init(CROSSFADE_MODE_CROSSFADE);
+                pcmbuf_crossfade_init();
                 while (audio_codec_loaded)
                     yield();
                 audio_play_start((int)ev.data);
@@ -2227,13 +2226,12 @@ void audio_set_buffer_margin(int setting)
 }
 
 /* Set crossfade & PCM buffer length. */
-void audio_set_crossfade(int type)
+void audio_set_crossfade(int enable)
 {
     long size;
     bool was_playing = playing;
     int offset = 0;
-    static const int lookup[] = {1, 2, 4, 6, 8, 10, 12, 14};
-    int seconds = lookup[global_settings.crossfade_duration];
+    int seconds = 1;
 
     if (!filebuf)
         return;     /* Audio buffers not yet set up */
@@ -2242,8 +2240,11 @@ void audio_set_crossfade(int type)
     if (playing)
         offset = cur_ti->id3.offset;
 
-    if (type == CROSSFADE_MODE_OFF)
-        seconds = 1;
+    if (enable)
+    {
+        seconds = global_settings.crossfade_fade_out_delay
+                + global_settings.crossfade_fade_out_duration;
+    }
         
     /* Buffer has to be at least 2s long. */
     seconds += 2;
@@ -2259,7 +2260,7 @@ void audio_set_crossfade(int type)
     if (was_playing)
         splash(0, true, str(LANG_RESTARTING_PLAYBACK));
     pcmbuf_init(size);
-    pcmbuf_crossfade_enable(type != CROSSFADE_MODE_OFF);
+    pcmbuf_crossfade_enable(enable);
     reset_buffer();
     logf("abuf:%dB", pcmbuf_get_bufsize());
     logf("fbuf:%dB", filebuflen);
