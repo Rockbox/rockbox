@@ -500,7 +500,7 @@ static void nopixel(int x, int y)
     (void)y;
 }
 
-lcd_pixelfunc_type* lcd_remote_pixelfuncs[8] = {
+lcd_pixelfunc_type* const lcd_remote_pixelfuncs[8] = {
     flippixel, nopixel, setpixel, setpixel,
     nopixel, clearpixel, nopixel, clearpixel
 };
@@ -561,7 +561,7 @@ static void solidinvblock(unsigned char *address, unsigned mask, unsigned bits)
     *address = (*address & ~mask) | (~bits & mask);
 }
 
-lcd_blockfunc_type* lcd_remote_blockfuncs[8] = {
+lcd_blockfunc_type* const lcd_remote_blockfuncs[8] = {
     flipblock, bgblock, fgblock, solidblock,
     flipinvblock, bginvblock, fginvblock, solidinvblock
 };

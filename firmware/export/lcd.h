@@ -163,8 +163,8 @@ extern void lcd_setfont(int font);
 extern int  lcd_getstringsize(const unsigned char *str, int *w, int *h);
 
 /* low level drawing function pointer arrays */
-extern lcd_pixelfunc_type* lcd_pixelfuncs[8];
-extern lcd_blockfunc_type* lcd_blockfuncs[8];
+extern lcd_pixelfunc_type* const lcd_pixelfuncs[8];
+extern lcd_blockfunc_type* const lcd_blockfuncs[8];
 
 extern void lcd_drawpixel(int x, int y);
 extern void lcd_drawline(int x1, int y1, int x2, int y2);
