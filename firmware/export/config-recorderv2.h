@@ -23,10 +23,10 @@
 
 #define AB_REPEAT_ENABLE 1
 
-#ifndef SIMULATOR
-
 /* Define this if you have a MAS3587F */
 #define CONFIG_CODEC MAS3587F
+
+#ifndef SIMULATOR
 
 /* Define this if you have a SH7034 */
 #define CONFIG_CPU SH7034
