@@ -750,10 +750,20 @@ long wps_show(void)
                 /* stop and exit wps */
 #ifdef WPS_EXIT
             case WPS_EXIT:
-#ifdef WPS_RC_EXIT
-            case WPS_RC_EXIT:
-#endif
+# ifdef WPS_EXIT_PRE
+                if (lastbutton != WPS_EXIT_PRE)
+                    break;
+# endif
                 exit = true;
+
+# ifdef WPS_RC_EXIT
+            case WPS_RC_EXIT:
+#  ifdef WPS_RC_EXIT_PRE
+                if (lastbutton != WPS_RC_EXIT_PRE)
+                    break;
+#  endif
+                exit = true;
+# endif
                 break;
 #endif
 
