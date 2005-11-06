@@ -19,7 +19,6 @@
 
 #ifndef _GUI_ICON_H_
 #define _GUI_ICON_H_
-#include "lcd.h"
 #include "screen_access.h"
 /* Defines a type for the icons since it's not the same thing on
  * char-based displays and bitmap displays */
