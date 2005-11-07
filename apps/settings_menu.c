@@ -1221,62 +1221,47 @@ static bool crossfade(void)
     return ret;
 }
 
-static const struct opt_items crossfade_time[] = {
-    { "0s", TALK_ID(0, UNIT_SEC) },
-    { "1s", TALK_ID(1, UNIT_SEC) },
-    { "2s", TALK_ID(2, UNIT_SEC) },
-    { "3s", TALK_ID(3, UNIT_SEC) },
-    { "4s", TALK_ID(4, UNIT_SEC) },
-    { "5s", TALK_ID(5, UNIT_SEC) },
-    { "6s", TALK_ID(6, UNIT_SEC) },
-    { "7s", TALK_ID(7, UNIT_SEC) },
-    { "8s", TALK_ID(8, UNIT_SEC) },
-    { "9s", TALK_ID(9, UNIT_SEC) },
-    { "10s", TALK_ID(10, UNIT_SEC) },
-    { "11s", TALK_ID(11, UNIT_SEC) },
-    { "12s", TALK_ID(12, UNIT_SEC) },
-    { "13s", TALK_ID(13, UNIT_SEC) },
-    { "14s", TALK_ID(14, UNIT_SEC) },
-    { "15s", TALK_ID(15, UNIT_SEC) },
-};
-
 static bool crossfade_fade_in_delay(void)
 {
     bool ret;
-    ret=set_option( str(LANG_CROSSFADE_FADE_IN_DELAY),
-                    &global_settings.crossfade_fade_in_delay, INT, crossfade_time, 8, NULL);
+
+    ret = set_int(str(LANG_CROSSFADE_FADE_IN_DELAY), "s", UNIT_SEC,
+                   &global_settings.crossfade_fade_in_delay,
+                   NULL, 1, 0, 7, NULL );
     audio_set_crossfade(global_settings.crossfade);
-                   
     return ret;
 }
 
 static bool crossfade_fade_out_delay(void)
 {
     bool ret;
-    ret=set_option( str(LANG_CROSSFADE_FADE_OUT_DELAY),
-                    &global_settings.crossfade_fade_out_delay, INT, crossfade_time, 8, NULL);
+
+    ret = set_int(str(LANG_CROSSFADE_FADE_OUT_DELAY), "s", UNIT_SEC,
+                   &global_settings.crossfade_fade_out_delay,
+                   NULL, 1, 0, 7, NULL );
     audio_set_crossfade(global_settings.crossfade);
-                   
     return ret;
 }
 
 static bool crossfade_fade_in_duration(void)
 {
     bool ret;
-    ret=set_option( str(LANG_CROSSFADE_FADE_IN_DURATION),
-                    &global_settings.crossfade_fade_in_duration, INT, crossfade_time, 16, NULL);
+
+    ret = set_int(str(LANG_CROSSFADE_FADE_IN_DURATION), "s", UNIT_SEC,
+                   &global_settings.crossfade_fade_in_duration,
+                   NULL, 1, 0, 15, NULL );
     audio_set_crossfade(global_settings.crossfade);
-                   
     return ret;
 }
 
 static bool crossfade_fade_out_duration(void)
 {
     bool ret;
-    ret=set_option( str(LANG_CROSSFADE_FADE_OUT_DURATION),
-                    &global_settings.crossfade_fade_out_duration, INT, crossfade_time, 16, NULL);
+
+    ret = set_int(str(LANG_CROSSFADE_FADE_OUT_DURATION), "s", UNIT_SEC,
+                   &global_settings.crossfade_fade_out_duration,
+                   NULL, 1, 0, 15, NULL );
     audio_set_crossfade(global_settings.crossfade);
-                   
     return ret;
 }
 
