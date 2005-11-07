@@ -58,7 +58,7 @@
 #include "bmp.h"
 #include "atoi.h"
 #define MAX_IMAGES (26*2) /* a-z and A-Z */
-#define IMG_BUFSIZE (LCD_HEIGHT * LCD_WIDTH * MAX_IMAGES/25) / 8
+#define IMG_BUFSIZE (LCD_HEIGHT * LCD_WIDTH * MAX_IMAGES / 25 ) / 8
 static unsigned char img_buf[IMG_BUFSIZE]; /* image buffer */
 static unsigned char* img_buf_ptr = img_buf; /* where are in image buffer? */
 
@@ -82,7 +82,7 @@ struct {
 
 #ifdef HAVE_LCD_BITMAP
 #define MAX_LINES (LCD_HEIGHT/5+1)
-#define FORMAT_BUFFER_SIZE 1600
+#define FORMAT_BUFFER_SIZE 3072
 #else
 #define MAX_LINES 2
 #define FORMAT_BUFFER_SIZE 400
