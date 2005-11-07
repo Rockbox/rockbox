@@ -271,7 +271,7 @@ struct plugin_api {
     int (*read_line)(int fd, char* buffer, int buffer_size);
     bool (*settings_parseline)(char* line, char** name, char** value);
 #ifndef SIMULATOR
-    int (*ata_sleep)(void);
+    void (*ata_sleep)(void);
 #endif
     
     /* dir */

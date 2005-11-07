@@ -36,22 +36,10 @@
 #define NUM_VOLUMES 1
 #endif
 
-/*
-  ata_spindown() time values:
-   -1     Immediate spindown
-   0      Timeout disabled
-   1-240  (time * 5) seconds
-   241-251((time - 240) * 30) minutes
-   252    21 minutes
-   253    Period between 8 and 12 hrs
-   254    Reserved
-   255    21 min 15 s
-*/
 extern void ata_enable(bool on);
 extern void ata_spindown(int seconds);
 extern void ata_poweroff(bool enable);
-extern int ata_sleep(void);
-extern int ata_standby(int time);
+extern void ata_sleep(void);
 extern bool ata_disk_is_active(void);
 extern int ata_hard_reset(void);
 extern int ata_soft_reset(void);

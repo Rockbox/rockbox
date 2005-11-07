@@ -998,16 +998,8 @@ bool ata_disk_is_active(void)
     return mmc_mutex.locked;
 }
 
-int ata_standby(int time)
+void ata_sleep(void)
 {
-    (void)time;
-
-    return 0;
-}
-
-int ata_sleep(void)
-{
-    return 0;
 }
 
 void ata_spin(void)
