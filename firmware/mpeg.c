@@ -1039,7 +1039,7 @@ static void track_change(void)
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     /* Reset the AVC */
-    sound_set(SOUND_AVC, -1);
+    sound_set_avc(-1);
 #endif /* (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
 
     if (num_tracks_in_memory() > 0)
