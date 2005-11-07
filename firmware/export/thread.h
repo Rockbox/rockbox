@@ -21,7 +21,12 @@
 
 #include <stdbool.h>
 
+#if CONFIG_CODEC == SWCODEC
 #define MAXTHREADS	14
+#else
+#define MAXTHREADS  9
+#endif
+
 #define DEFAULT_STACK_SIZE 0x400 /* Bytes */
 
 int create_thread(void (*function)(void), void* stack, int stack_size,
