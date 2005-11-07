@@ -3,12 +3,17 @@
 ENTRY(start)
 #ifdef CPU_COLDFIRE
 OUTPUT_FORMAT(elf32-m68k)
+INPUT(crt0.o)
 #elif CONFIG_CPU == TCC730
 OUTPUT_FORMAT(elf32-calmrisc16)
+INPUT(crt0.o)
+#elif CONFIG_CPU == PP5020
+OUTPUT_FORMAT(elf32-littlearm)
+OUTPUT_ARCH(arm)
 #else
 OUTPUT_FORMAT(elf32-sh)
-#endif
 INPUT(crt0.o)
+#endif
 
 #if CONFIG_CPU == TCC730
 MEMORY
@@ -98,7 +103,44 @@ _audiobufend = 0;
 _pluginbuf = 0;
 
 }
+#elif CONFIG_CPU==PP5020
+SECTIONS
+{
+  . = 0x10000000;
 
+  .text : { 
+    *(.init.text)
+    *(.text)
+  }
+
+    __data_start__ = . ;
+  .data : { *(.data) }
+    __data_end__ = . ;
+
+  __stack_start__ = .;
+  .stack :
+  {
+     *(.stack)
+     _stackbegin = .;
+     stackbegin = .;
+     . += 0x2000;
+     _stackend = .;
+     stackend = .;
+  }
+
+  /* The bss section is too large for IRAM - we just move it at the
+     end of the regular RAM. */
+
+  . = 0x11c00000;
+  __bss_start__ = .;
+  .bss : {
+     *(.bss);
+     __bss_end__ = . ;
+   }
+
+
+
+}
 #else
 
 #define PLUGINSIZE PLUGIN_BUFFER_SIZE

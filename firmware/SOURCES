@@ -57,6 +57,8 @@ bidi.c
 drivers/lcd-h100.c
 #elif LCD_DEPTH == 1
 drivers/lcd-recorder.c
+#elif LCD_DEPTH == 16
+drivers/lcd-16bit.c
 #endif
 #endif
 drivers/power.c
@@ -85,6 +87,8 @@ tuner_philips.c
 #endif
 #if CONFIG_I2C == I2C_COLDFIRE
 drivers/i2c-coldfire.c
+#elif CONFIG_I2C == I2C_PP5020
+drivers/i2c-pp5020.c
 #else
 drivers/i2c.c
 #endif

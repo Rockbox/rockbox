@@ -122,14 +122,24 @@ extern void lcd_jump_scroll_delay(int ms);
 
 /* Low-level drawing function types */
 typedef void lcd_pixelfunc_type(int x, int y);
+#if LCD_DEPTH==16
 typedef void lcd_blockfunc_type(unsigned char *address, unsigned mask, unsigned bits);
+#else
+typedef void lcd_blockfunc_type(unsigned char *address, unsigned mask, unsigned bits);
+#endif
 
 #ifdef HAVE_LCD_BITMAP
 
 #ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH == 16
+#define LCD_MAX_RED   ((1 << 5) - 1)
+#define LCD_MAX_GREEN ((1 << 6) - 1)
+#define LCD_MAX_BLUE  ((1 << 5) - 1)
+#else
 #define LCD_MAX_RED   ((1 << (LCD_DEPTH/3)) - 1)
 #define LCD_MAX_GREEN ((1 << (LCD_DEPTH/3)) - 1)
 #define LCD_MAX_BLUE  ((1 << (LCD_DEPTH/3)) - 1)
+#endif
 struct rgb {
     unsigned char red;
     unsigned char green;
@@ -148,6 +158,8 @@ struct rgb {
 extern unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
 #elif LCD_DEPTH == 2
 extern unsigned char lcd_framebuffer[LCD_HEIGHT/4][LCD_WIDTH];
+#elif LCD_DEPTH == 16
+extern unsigned char lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH*2];
 #endif
 
 extern void lcd_set_invert_display(bool yesno);

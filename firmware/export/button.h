@@ -144,6 +144,17 @@ bool remote_button_hold(void);
 #define  BUTTON_DOWN          0x0020
 #define  BUTTON_MENU          0x0100
 
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+
+#warning Correct the IPOD definitions
+
+#define  BUTTON_ON            0x0001
+#define  BUTTON_OFF           0x0002
+#define  BUTTON_PLAY          0x0004
+#define  BUTTON_UP            0x0010
+#define  BUTTON_DOWN          0x0020
+#define  BUTTON_MENU          0x0100
+
 #endif /* RECORDER/PLAYER/ONDIO/GMINI KEYPAD */
 
 #endif /* _BUTTON_H_ */

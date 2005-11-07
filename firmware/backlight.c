@@ -212,6 +212,10 @@ static void __backlight_off(void)
     and_b(~0x40, &PADRH); /* drive it low */
 #elif CONFIG_BACKLIGHT == BL_GMINI
     P1 &= ~0x10;
+#elif CONFIG_BACKLIGHT == BL_IPOD4G
+   /* fades backlight off on 4g */
+   outl(inl(0x70000084) & ~0x2000000, 0x70000084);
+   outl(0x80000000, 0x7000a010);
 #endif
 }
 
@@ -235,6 +239,12 @@ static void __backlight_on(void)
     or_b(0x40, &PADRH); /* drive it high */
 #elif CONFIG_BACKLIGHT == BL_GMINI
     P1 |= 0x10;
+#elif CONFIG_BACKLIGHT == BL_IPOD4G
+    /* brightness full */
+    outl(0x80000000 | (0xff << 16), 0x7000a010);
+
+    /* set port b bit 3 on */
+    outl(((0x100 | 1) << 3), 0x6000d824);
 #endif
 }
 

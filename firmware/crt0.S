@@ -19,10 +19,136 @@
 #include "config.h"
 #include "cpu.h"
 
+#if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
+    .section .init.text
+#else
     .section .init.text,"ax",@progbits
+#endif
     .global    start
 start:
-#if CONFIG_CPU == TCC730
+#if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
+
+/* Based on startup.s from the iPodLinux loader
+ *
+ * Copyright (c) 2003, Daniel Palffy (dpalffy (at) rainstorm.org)
+ * Copyright (c) 2005, Bernard Leach <leachbj@bouncycastle.org>
+ *
+ */
+	.equ	PP5002_PROC_ID,	0xc4000000
+	.equ	PP5002COP_CTRL, 0xcf004058
+	.equ	PP5020_PROC_ID,	0x60000000
+	.equ	PP5020_COP_CTRL, 0x60007004
+
+start:
+	/* get the high part of our execute address */
+	ldr	r0, =0xff000000
+	and	r8, pc, r0     		@ r8 is used later
+
+#if CONFIG_CPU==PP5002
+	mov	r0, #PP5002_PROC_ID
+#else
+	mov	r0, #PP5020_PROC_ID
+#endif
+	ldr	r0, [r0]
+	and	r0, r0, #0xff
+	cmp	r0, #0x55
+	beq	1f
+
+	/* put us (co-processor) to sleep */
+#if CONFIG_CPU==PP5002
+	ldr	r4, =PP5002_COP_CTRL
+	mov	r3, #0xca
+#else
+	ldr	r4, =PP5020_COP_CTRL
+	mov	r3, #0x80000000
+#endif
+	str	r3, [r4]
+
+	ldr	pc, =cop_wake_start
+
+cop_wake_start:
+	/* jump the COP to startup */
+	ldr	r0, =startup_loc
+	ldr	pc, [r0]
+
+1:
+	/* setup some stack */
+	ldr	sp, = _stackbegin
+
+	/* get the high part of our execute address */
+	ldr	r2, =0xffffff00
+	and	r4, pc, r2
+
+	/* Copy bootloader to safe area - 0x40000000 */
+	mov	r5, #0x40000000
+	ldr	r6, = _dataend
+	sub	r0, r6, r5       /* length of loader */
+	add	r0, r4, r0	 /* r0 points to start of loader */
+1:
+	cmp	r5, r6
+	ldrcc	r2, [r4], #4
+	strcc	r2, [r5], #4
+	bcc	1b
+
+	ldr	pc, =start_loc	/* jump to the relocated start_loc:  */
+
+start_loc:
+        /* Initialise bss section to zero */
+        ldr     r3, =_bssstart
+	ldr	r1, =_bssend
+	mov	r2, #0x0
+
+1:
+	cmp	r3, r1
+	strcc	r2, [r3], #4
+	bcc	1b
+
+	/* execute the loader - this will load an image to 0x10000000 */
+	bl	main
+
+	/* save the startup address for the COP */
+	ldr	r1, =startup_loc
+	str	r0, [r1]
+
+#if CONFIG_CPU==PP5002
+	/* make sure COP is sleeping */
+	ldr	r4, =0xcf004050
+1:
+	ldr	r3, [r4]
+	ands	r3, r3, #0x4000
+	beq	1b
+
+	/* wake up COP */
+	ldr	r4, =PP5002_COP_CTRL
+	mov	r3, #0xce
+	strh	r3, [r4]
+#else
+	/* make sure COP is sleeping */
+	ldr	r4, =PP5020_COP_CTRL
+1:
+	ldr	r3, [r4]
+	ands	r3, r3, #0x80000000
+	beq	1b
+
+	/* wake up COP */
+	@ ldr	r4, =PP5020_COP_CTRL
+	mov	r3, #0x0
+	str	r3, [r4]
+#endif
+
+	/* jump to start location */
+	mov	pc, r0
+
+startup_loc:
+	.word	0x0
+
+.align 8	/* starts at 0x100 */
+.global boot_table
+boot_table:
+	/* here comes the boot table, don't move its offset */
+	.space 400
+
+#elif CONFIG_CPU == TCC730
     /* Platform:     Gmini 120/SP */
     ;; disable all interrupts
      clrsr fe
@@ -331,6 +457,13 @@ vectors:
     /* Platform:     iRiver H320/H340 */
 
     /* Fill in code here */
+#elif CONFIG_CPU == PP5020
+    /* Platform:     iPod */
+
+#warning TODO: Implement crt0.S
+
+    /* Fill in code here */
+
 #else
     /* Platform:     Archos Jukebox */
 

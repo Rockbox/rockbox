@@ -3,10 +3,14 @@
 ENTRY(start)
 #ifdef CPU_COLDFIRE
 OUTPUT_FORMAT(elf32-m68k)
+INPUT(crt0.o)
+#elif CONFIG_CPU == PP5020
+OUTPUT_FORMAT(elf32-littlearm)
+OUTPUT_ARCH(arm)
 #else
 OUTPUT_FORMAT(elf32-sh)
-#endif
 INPUT(crt0.o)
+#endif
 
 #if MEMORYSIZE >= 32
 #define PLUGINSIZE 0xC0000
@@ -22,6 +26,12 @@ INPUT(crt0.o)
 #define IRAMSIZE 0x18000
 #define FLASHORIG 0x001f0000
 #define FLASHSIZE 2M
+#elif CONFIG_CPU == PP5020
+#define DRAMORIG 0x10000000
+#define IRAMORIG 0x40000000
+#define IRAMSIZE 0x18000
+#define FLASHORIG 0x001f0000
+#define FLASHSIZE 2M
 #else
 #define DRAMORIG 0x09000000
 #define IRAMORIG 0x0f000000
@@ -32,13 +42,55 @@ INPUT(crt0.o)
 
 #define ENDADDR  (IRAMORIG + IRAMSIZE)
 
+#if CONFIG_CPU!=PP5020
 MEMORY
 {
    DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
    IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
    FLASH : ORIGIN = FLASHORIG, LENGTH = FLASHSIZE
 }
+#endif
+
 SECTIONS
+#if CONFIG_CPU==PP5020
+{
+  . = IRAMORIG;
+
+  .text : { 
+    *(.init.text)
+    *(.text)
+  }
+
+  .data : { 
+    *(.icode)
+    *(.irodata)
+    *(.idata)
+    *(.data)
+    _dataend = . ;
+   }
+
+  .stack :
+  {
+     *(.stack)
+     _stackbegin = .;
+     stackbegin = .;
+     . += 0x2000;
+     _stackend = .;
+     stackend = .;
+  }
+
+  /* The bss section is too large for IRAM - we just move it near the
+     end of the regular RAM. */
+
+  . = 0x11c00000;
+  .bss : {
+     _bssstart = .;
+     *(.bss);
+     *(.ibss);
+     _bssend = . ;
+   }
+}
+#else
 {
     .vectors :
     {
@@ -114,3 +166,4 @@ SECTIONS
         _pluginbuf = .;
     }
 }
+#endif

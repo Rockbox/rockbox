@@ -39,6 +39,8 @@
 #define MCF5249 5249
 #define MCF5250 5250
 #define TCC730   730   /* lacking a proper abbrivation */
+#define PP5002  5002
+#define PP5020  5020
 
 /* CONFIG_KEYPAD */
 #define PLAYER_PAD      0
@@ -48,6 +50,8 @@
 #define GMINI100_PAD    4
 #define IRIVER_H300_PAD 5
 #define IAUDIO_X5_PAD   6
+#define IPOD_4G_PAD     7
+#define IPOD_NANO_PAD   8
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -61,14 +65,16 @@
 #define BATT_LIPOL1300  1300 /* the type used in iRiver h1x0 models */
 
 /* CONFIG_LCD */
-#define LCD_GMINI100 0
-#define LCD_SSD1815  1 /* as used by Archos Recorders and Ondios */
-#define LCD_SSD1801  2 /* as used by Archos Player/Studio */
-#define LCD_S1D15E06 3 /* as used by iRiver H100 series */
-#define LCD_H300     4 /* as used by iRiver H300 series, exact model name is
+#define LCD_GMINI100  0
+#define LCD_SSD1815   1 /* as used by Archos Recorders and Ondios */
+#define LCD_SSD1801   2 /* as used by Archos Player/Studio */
+#define LCD_S1D15E06  3 /* as used by iRiver H100 series */
+#define LCD_H300      4 /* as used by iRiver H300 series, exact model name is
+                           unknown at the time of this writing */
+#define LCD_X5        5 /* as used by iAudio X5 series, exact model name is
                           unknown at the time of this writing */
-#define LCD_X5       5 /* as used by iAudio X5 series, exact model name is
-                          unknown at the time of this writing */
+#define LCD_IPODCOLOR 6 /* as used by iPod Color/Photo */
+#define LCD_IPODNANO  7 /* as used by iPod Nano */
 
 /* CONFIG_BACKLIGHT */
 #define BL_PA14_LO  0 /* Player, PA14 low active */
@@ -76,12 +82,15 @@
 #define BL_PA14_HI  2 /* Ondio, PA14 high active */
 #define BL_IRIVER   3 /* IRiver GPIO */
 #define BL_GMINI    4 /* Archos GMini */
+#define BL_IPOD4G   5 /* Apple iPod 4G */
+#define BL_IPODNANO 6 /* Apple iPod Nano */
 
 /* CONFIG_I2C */
 #define I2C_PLAYREC  0 /* Archos Player/Recorder style */
 #define I2C_ONDIO    1 /* Ondio style */
 #define I2C_GMINI    2 /* Gmini style */
 #define I2C_COLDFIRE 3 /* Coldfire style */
+#define I2C_PP5020   4 /* PP5020 style */
 
 /* CONFIG_LED */
 #define LED_REAL     1 /* SW controlled LED (Archos recorders, player, Gmini) */
@@ -113,6 +122,10 @@
 #include "config-gminisp.h"
 #elif defined(IAUDIO_X5)
 #include "config-iaudiox5.h"
+#elif defined(IPOD_COLOR)
+#include "config-ipodcolor.h"
+#elif defined(IPOD_NANO)
+#include "config-ipodnano.h"
 #else
 /* no known platform */
 #endif
@@ -129,6 +142,11 @@
 #define CPU_COLDFIRE
 #endif
 
+/* define for all cpus from ARM family */
+#if (CONFIG_CPU == PP5020) 
+#define CPU_ARM
+#endif
+
 #ifndef CODEC_SIZE
 #define CODEC_SIZE 0
 #endif
@@ -137,7 +155,8 @@
 #if !defined(SIMULATOR) &&   /* Not for simulators */ \
     (((CONFIG_CPU == SH7034) && !defined(PLUGIN)) || /* SH1 archos: core only */ \
     (CONFIG_CPU == MCF5249) || /* Coldfire: core, plugins, codecs */ \
-    (CONFIG_CPU == TCC730))  /* CalmRISC16: core, (plugins, codecs) */
+    (CONFIG_CPU == PP5020) ||  /* iPod: core, plugins, codecs */ \
+    (CONFIG_CPU == TCC730))    /* CalmRISC16: core, (plugins, codecs) */
 #define ICODE_ATTR	__attribute__ ((section(".icode")))
 #define ICONST_ATTR __attribute__ ((section(".irodata")))
 #define IDATA_ATTR	__attribute__ ((section(".idata")))

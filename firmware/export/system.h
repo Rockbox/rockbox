@@ -29,6 +29,13 @@ extern void system_init(void);
 
 extern long cpu_frequency;
 
+#if CONFIG_CPU==PP5020
+#define inl(a) (*(volatile unsigned long *) (a))
+#define outl(a,b) (*(volatile unsigned long *) (b) = (a))
+#define inb(a) (*(volatile unsigned char *) (a))
+#define outb(a,b) (*(volatile unsigned char *) (b) = (a))
+#endif
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 #define FREQ cpu_frequency
 void set_cpu_frequency(long frequency);
@@ -284,6 +291,43 @@ static inline void invalidate_icache(void)
 #define CPUFREQ_NORMAL       (CPUFREQ_NORMAL_MULT * CPU_FREQ)
 #define CPUFREQ_MAX_MULT     11
 #define CPUFREQ_MAX          (CPUFREQ_MAX_MULT * CPU_FREQ)
+
+#elif CONFIG_CPU == PP5020
+
+#warning Implement set_irq_level and check CPU frequencies
+
+#define CPUFREQ_DEFAULT CPU_FREQ
+#define CPUFREQ_NORMAL 37500000
+#define CPUFREQ_MAX 75000000
+
+static inline unsigned short swap16(unsigned short value)
+    /*
+      result[15..8] = value[ 7..0];
+      result[ 7..0] = value[15..8];
+    */
+{
+    return (value >> 8) | (value << 8);
+}
+
+static inline unsigned long swap32(unsigned long value)
+    /*
+      result[31..24] = value[ 7.. 0];
+      result[23..16] = value[15.. 8];
+      result[15.. 8] = value[23..16];
+      result[ 7.. 0] = value[31..24];
+    */
+{
+    unsigned long hi = swap16(value >> 16);
+    unsigned long lo = swap16(value & 0xffff);
+    return (lo << 16) | hi;
+}
+
+#define HIGHEST_IRQ_LEVEL (1)
+static inline int set_irq_level(int level)
+{
+  int result=level;
+  return result;
+}
 
 #elif CONFIG_CPU == TCC730
 

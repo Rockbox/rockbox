@@ -27,8 +27,8 @@
 #include "lcd.h"
 #include "serial.h"
 
-#if (CONFIG_CPU != MCF5249) && (CONFIG_CPU != TCC730)
-/* FIX: this doesn't work on iRiver or Gmini yet */
+#if (CONFIG_CPU != MCF5249) && (CONFIG_CPU != TCC730) && (CONFIG_CPU != PP5020)
+/* FIX: this doesn't work on iRiver or Gmini or iPod yet */
 
 #ifndef HAVE_MMC /* MMC takes serial port 1, so don't mess with it */
 

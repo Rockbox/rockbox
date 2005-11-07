@@ -20,6 +20,7 @@
 #define _KERNEL_H_
 
 #include <stdbool.h>
+#include "config.h"
 
 /* wrap-safe macros for tick comparison */
 #define TIME_AFTER(a,b)         ((long)(b) - (long)(a) < 0)
@@ -65,7 +66,12 @@ struct mutex
 };
 
 /* global tick variable */
+#if (CONFIG_CPU==PP5020)
+/* A temporary hack until timer interrupt is enabled - use the RTC */
+#define current_tick ((*((volatile unsigned long*)0x60005010))/10000)
+#else
 extern long current_tick;
+#endif
 
 #ifdef SIMULATOR
 #define sleep(x) sim_sleep(x)

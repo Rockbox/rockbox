@@ -143,7 +143,7 @@ int rolo_load(const char* filename)
     lcd_update();
 
     set_irq_level(HIGHEST_IRQ_LEVEL);
-#else
+#elif CONFIG_CPU == SH7034
     /* Read file length from header and compare to real file length */
     lseek(fd, FIRMWARE_OFFSET_FILE_LENGTH, SEEK_SET);
     if(read(fd, &file_length, 4) != 4) {

@@ -41,6 +41,14 @@ struct regs
     void         *pr;    /* Procedure register */
     void         *start; /* Thread start address, or NULL when started */
 };
+#elif CONFIG_CPU == PP5020
+#warning TODO: define struct regs
+struct regs
+{
+    void *sp;    /* Stack pointer (a15) */
+    void *start; /* Thread start address */
+    int started; /* 0 when not started */
+};
 #elif CONFIG_CPU == TCC730
 struct regs
 {
@@ -70,7 +78,21 @@ void switch_thread(void) ICODE_ATTR;
 static inline void store_context(void* addr) __attribute__ ((always_inline));
 static inline void load_context(const void* addr) __attribute__ ((always_inline));
 
-#ifdef CPU_COLDFIRE
+#if CONFIG_CPU == PP5020
+
+#warning TODO: Implement store_context and load_context
+
+static inline void store_context(void* addr)
+{
+}
+
+static inline void load_context(const void* addr)
+{
+
+}
+
+
+#elif defined(CPU_COLDFIRE)
 /*--------------------------------------------------------------------------- 
  * Store non-volatile context.
  *---------------------------------------------------------------------------
@@ -341,6 +363,8 @@ void init_threads(void)
     thread_contexts[0].start = 0; /* thread 0 already running */
 #elif CONFIG_CPU == TCC730
     thread_contexts[0].started = 1;
+#elif CONFIG_CPU == PP5020
+    thread_contexts[0].start = 0; /* thread 0 already running */
 #endif
     num_sleepers = 0;
 }

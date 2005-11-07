@@ -254,4 +254,18 @@ void adc_init(void)
     sleep(2);    /* Ensure valid readings when adc_init returns */
 }
 
+#elif CONFIG_CPU == PP5020
+
+#warning Implement adc.c
+
+unsigned short adc_read(int channel)
+{
+    return 0;
+}
+
+void adc_init(void)
+{
+
+}
+
 #endif

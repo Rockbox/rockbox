@@ -1094,5 +1094,18 @@ int system_memory_guard(int newmode)
     
     return oldmode;
 }
+#elif CONFIG_CPU==PP5020
+
+#warning TODO: Implement system.c
+
+void system_init(void) {
+
+}
+
+void system_reboot(void) {
+
+}
+
+
 #endif /* CONFIG_CPU */
 

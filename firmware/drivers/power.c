@@ -73,6 +73,8 @@ void power_init(void)
 #ifdef HAVE_SPDIF_POWER
     spdif_power_enable(false);
 #endif
+#elif CONFIG_CPU == PP5020
+#warning Implement power_init()
 #else
 #ifdef HAVE_POWEROFF_ON_PB5
     PBCR2 &= ~0x0c00;    /* GPIO for PB5 */
@@ -163,6 +165,8 @@ void ide_power_enable(bool on)
         and_l(~0x80000000, &GPIO_OUT);
     else
         or_l(0x80000000, &GPIO_OUT);
+#elif CONFIG_CPU == PP5020
+#warning Implement ide_power_enable()
 #elif defined(GMINI_ARCH)
     if(on)
         P1 |= 0x08;
@@ -213,6 +217,9 @@ bool ide_powered(void)
 {
 #if CONFIG_CPU == MCF5249
     return (GPIO_OUT & 0x80000000)?false:true;
+#elif CONFIG_CPU == PP5020
+#warning Implement ide_powered()
+    return true;
 #elif defined(GMINI_ARCH)
     return (P1 & 0x08?true:false);
 #else /* SH1 based archos */
@@ -244,6 +251,8 @@ void power_off(void)
     set_irq_level(HIGHEST_IRQ_LEVEL);
 #if CONFIG_CPU == MCF5249
     and_l(~0x00080000, &GPIO1_OUT);
+#elif CONFIG_CPU == PP5020
+#warning Implement power_off()
 #elif defined(GMINI_ARCH)
     P1 &= ~1;
     P1CON &= ~1;

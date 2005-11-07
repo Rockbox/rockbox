@@ -145,6 +145,10 @@ static void usb_enable(bool on)
         and_l(~0x01000000, &GPIO_OUT);
     }
     
+#elif defined(USB_IPODSTYLE)
+
+#warning Implement USB_IPODSTYLE
+
 #else
 #ifdef HAVE_LCD_BITMAP
     if(read_hw_mask() & USB_ACTIVE_HIGH)

@@ -71,6 +71,43 @@
 #define SET_REG(reg,val) reg = ((val) << 8)
 #define SET_16BITREG(reg,val) reg = (val)
 
+#elif CONFIG_CPU == PP5020
+
+/* don't use sh7034 assembler routines */
+#define PREFER_C_READING
+#define PREFER_C_WRITING
+
+#define ATA_IOBASE      0xc30001e0
+#define ATA_DATA        (*((volatile unsigned short*)(ATA_IOBASE)))
+#define ATA_ERROR       (*((volatile unsigned char*)(ATA_IOBASE + 0x04)))
+#define ATA_NSECTOR     (*((volatile unsigned char*)(ATA_IOBASE + 0x08)))
+#define ATA_SECTOR      (*((volatile unsigned char*)(ATA_IOBASE + 0x0c)))
+#define ATA_LCYL        (*((volatile unsigned char*)(ATA_IOBASE + 0x10)))
+#define ATA_HCYL        (*((volatile unsigned char*)(ATA_IOBASE + 0x14)))
+#define ATA_SELECT      (*((volatile unsigned char*)(ATA_IOBASE + 0x18)))
+#define ATA_COMMAND     (*((volatile unsigned char*)(ATA_IOBASE + 0x1c)))
+#define ATA_CONTROL     (*((volatile unsigned char*)(0xc30003f8)))
+
+#define STATUS_BSY      0x80
+#define STATUS_RDY      0x40
+#define STATUS_DF       0x20
+#define STATUS_DRQ      0x08
+#define STATUS_ERR      0x01
+#define ERROR_ABRT      0x04
+
+#define WRITE_PATTERN1 0xa5
+#define WRITE_PATTERN2 0x5a
+#define WRITE_PATTERN3 0xaa
+#define WRITE_PATTERN4 0x55
+
+#define READ_PATTERN1 0xa5
+#define READ_PATTERN2 0x5a
+#define READ_PATTERN3 0xaa
+#define READ_PATTERN4 0x55
+
+#define SET_REG(reg,val) reg = (val)
+#define SET_16BITREG(reg,val) reg = (val)
+
 #elif CONFIG_CPU == SH7034
 
 #define SWAP_WORDS
@@ -362,7 +399,7 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
         {   /* loop compiles to 7 assembler instructions */
             /* takes 12 clock cycles (2 pipeline stalls, 1 wait) */
 #ifdef SWAP_WORDS
-            *wbuf = letoh16(ATA_DATA);
+            *wbuf = swap16(ATA_DATA);
 #else
             *wbuf = ATA_DATA;
 #endif
@@ -677,7 +714,7 @@ static void copy_write_sectors(const unsigned char* buf, int wordcount)
 #ifdef SWAP_WORDS
             /* loop compiles to 6 assembler instructions */
             /* takes 10 clock cycles (2 pipeline stalls) */
-            SET_16BITREG(ATA_DATA, htole16(*wbuf));
+            SET_16BITREG(ATA_DATA, swap16(*wbuf));
 #else
             SET_16BITREG(ATA_DATA, *wbuf);
 #endif
@@ -1242,6 +1279,8 @@ void ata_enable(bool on)
     or_l(0x00040000, &GPIO_FUNCTION);
 #elif CONFIG_CPU == TCC730
 
+#elif CONFIG_CPU == PP5020
+     #warning Implement ata_enable()
 #endif
 }
 
@@ -1255,7 +1294,6 @@ static int identify(void)
         DEBUGF("identify() - not RDY\n");
         return -1;
     }
-
     SET_REG(ATA_COMMAND, CMD_IDENTIFY);
 
     if (!wait_for_start_of_transfer())
@@ -1267,10 +1305,11 @@ static int identify(void)
     for (i=0; i<SECTOR_SIZE/2; i++) {
         /* the IDENTIFY words are already swapped, so we need to treat
            this info differently that normal sector data */
-#ifdef SWAP_WORDS
-        identify_info[i] = ATA_DATA;
+#if defined(ROCKBOX_IS_BIGENDIAN) && !defined(SWAP_WORDS)
+#warning Swapping ATA identify data
+        identify_info[i] = swap16(ATA_DATA);
 #else
-        identify_info[i] = letoh16(ATA_DATA);
+        identify_info[i] = ATA_DATA;
 #endif
     }
     
@@ -1393,6 +1432,9 @@ int ata_init(void)
     bool coldstart = (P1 & 0x80) == 0;
 #elif CONFIG_CPU == MCF5249
     bool coldstart = (GPIO_FUNCTION & 0x00080000) == 0;
+#elif CONFIG_CPU == PP5020
+    bool coldstart = false;
+    #warning Implement coldstart variable
 #else
     bool coldstart = (PACR2 & 0x4000) != 0;
 #endif
@@ -1418,6 +1460,13 @@ int ata_init(void)
     or_l(0x00080000, &GPIO_FUNCTION);
 
     /* FYI: The IDECONFIGx registers are set by set_cpu_frequency() */
+#elif CONFIG_CPU == PP5020
+    /* From ipod-ide.c:ipod_ide_register() */
+    outl(inl(0xc3000028) | (1 << 5), 0xc3000028);
+    outl(inl(0xc3000028) & ~0x10000000, 0xc3000028);
+
+    outl(0x10, 0xc3000000);
+    outl(0x80002150, 0xc3000004);
 #endif
 
     sleeping = false;

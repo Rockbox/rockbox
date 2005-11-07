@@ -25,7 +25,9 @@
 #include "system.h"
 #include "panic.h"
 
+#if (CONFIG_CPU != PP5020)
 long current_tick = 0;
+#endif
 
 static void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
 
@@ -65,6 +67,11 @@ void sleep(int ticks)
 
 void yield(void)
 {
+#if CONFIG_CPU == PP5020
+    /* Threading not yet implemented */
+    #warning Enable yield()
+    return;
+#endif
     switch_thread();
     wake_up_thread();
 }
@@ -313,6 +320,12 @@ void tick_start(unsigned int interval_in_ms)
     /* enable the interrupt */
     interrupt_vector[2] = TIMER0;
     IMR0 |= (1<<2);
+}
+
+#elif CONFIG_CPU == PP5020
+
+void tick_start(unsigned int interval_in_ms) {
+#warning Implement tick_start
 }
 
 #endif
