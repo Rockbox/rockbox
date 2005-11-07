@@ -67,8 +67,8 @@ void usage(void)
            "\t-neo    SSI Neo format\n"
            "\t-mm=X   Archos Multimedia format (X values: A=JBMM, B=AV1xx, C=AV3xx)\n"
            "\t-iriver iRiver format\n"
-           "\t-add=X  Rockbox iRiver \"add-up\" checksum format\n"
-           "\t        (X values: h100, h120, h140, h300)\n"
+           "\t-add=X  Rockbox generic \"add-up\" checksum format\n"
+           "\t        (X values: h100, h120, h140, h300, ipco, nano)\n"
            "\nNo option results in Archos standard player/recorder format.\n");
 
     exit(1);
@@ -87,8 +87,8 @@ int main (int argc, char** argv)
     int headerlen = 6;
     FILE* file;
     int version;
-    unsigned long irivernum;
-    char irivermodel[5];
+    unsigned long modelnum;
+    char modelname[5];
     int model_id;
     enum { none, scramble, xor, add } method = scramble;
 
@@ -155,20 +155,24 @@ int main (int argc, char** argv)
         method = add;
 
         if(!strcmp(&argv[1][5], "h120"))
-            irivernum = 0;
+            modelnum = 0;
         else if(!strcmp(&argv[1][5], "h140"))
-            irivernum = 0; /* the same as the h120 */
+            modelnum = 0; /* the same as the h120 */
         else if(!strcmp(&argv[1][5], "h100"))
-            irivernum = 1;
+            modelnum = 1;
         else if(!strcmp(&argv[1][5], "h300"))
-            irivernum = 2;
+            modelnum = 2;
+        else if(!strcmp(&argv[1][5], "ipco"))
+            modelnum = 3;
+        else if(!strcmp(&argv[1][5], "nano"))
+            modelnum = 4;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;
         }
         /* we store a 4-letter model name too, for humans */
-        strcpy(irivermodel, &argv[1][5]);
-        chksum = irivernum; /* start checksum calcs with this */
+        strcpy(modelname, &argv[1][5]);
+        chksum = modelnum; /* start checksum calcs with this */
     }
 
     else if(!strcmp(argv[1], "-iriver")) {
@@ -264,7 +268,7 @@ int main (int argc, char** argv)
         case add:
         {
             int2be(chksum, header); /* checksum, big-endian */
-            memcpy(&header[4], irivermodel, 4); /* 4 bytes model name */
+            memcpy(&header[4], modelname, 4); /* 4 bytes model name */
             memcpy(outbuf, inbuf, length); /* the input buffer to output*/
             headerlen = 8;
         }
