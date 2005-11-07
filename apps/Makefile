@@ -53,7 +53,13 @@ all: $(BUILDDIR)/$(BINARY) $(CODECS) $(ROCKS)
 
 else
 # regular target build
-all: $(BUILDDIR)/$(BINARY) $(FLASHFILE) $(CODECS) $(ROCKS) $(ARCHOSROM)
+
+ifndef DEBUG
+# this is not needed to get built when doing debug builds
+REALBIN = $(BUILDDIR)/$(BINARY)
+endif
+
+all:  $(REALBIN) $(FLASHFILE) $(CODECS) $(ROCKS) $(ARCHOSROM)
 endif
 
 dep: $(DEPFILE)
@@ -103,7 +109,7 @@ $(OBJDIR)/rockbox.asm: $(OBJDIR)/rockbox.bin
 
 $(BUILDDIR)/$(BINARY) : $(OBJDIR)/rockbox.bin
 	@echo "Build firmware file"
-	@$(MKFIRMWARE) $< $@
+	$(SILENT)$(MKFIRMWARE) $< $@
 
 else
 # this is a simulator build
