@@ -1016,6 +1016,19 @@ static void stop_playing(void)
     reset_mp3_buffer();
 }
 
+/* Is this a really the end of playback or is a new playlist starting */
+static void check_playlist_end(int direction)
+{
+	/* Use the largest possible step size to account for skipped tracks */
+	int steps = playlist_amount();
+
+	if (direction < 0)
+		steps = -steps;
+
+	if (playlist_next(steps) < 0)
+		is_playing = false;
+}
+
 static void update_playlist(void)
 {
     if (num_tracks_in_memory() > 0)
@@ -1026,8 +1039,7 @@ static void update_playlist(void)
     else
     {
         /* End of playlist? */
-        if (playlist_next(playlist_amount()) < 0)
-            is_playing = false;
+		check_playlist_end(1);
     }
 
     playlist_update_resume_info(audio_current_track());
@@ -1363,7 +1375,7 @@ static void mpeg_thread(void)
                         DEBUGF("No more files to play\n");
                         filling = false;
 
-                        update_playlist();
+                        check_playlist_end(1);
                         current_track_counter++;
                     } else {
                         /* Make it read more data */
@@ -1402,6 +1414,9 @@ static void mpeg_thread(void)
                 if (new_file(-1) < 0) {
                     DEBUGF("No more files to play\n");
                     filling = false;
+
+					check_playlist_end(-1);
+					current_track_counter++;
                 } else {
                     /* Make it read more data */
                     filling = true;
