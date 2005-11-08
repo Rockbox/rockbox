@@ -122,11 +122,7 @@ extern void lcd_jump_scroll_delay(int ms);
 
 /* Low-level drawing function types */
 typedef void lcd_pixelfunc_type(int x, int y);
-#if LCD_DEPTH==16
 typedef void lcd_blockfunc_type(unsigned char *address, unsigned mask, unsigned bits);
-#else
-typedef void lcd_blockfunc_type(unsigned char *address, unsigned mask, unsigned bits);
-#endif
 
 #ifdef HAVE_LCD_BITMAP
 
