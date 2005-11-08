@@ -1273,7 +1273,6 @@ static int identify(void)
         /* the IDENTIFY words are already swapped, so we need to treat
            this info differently that normal sector data */
 #if defined(ROCKBOX_BIG_ENDIAN) && !defined(SWAP_WORDS)
-#warning Swapping ATA identify data
         identify_info[i] = swap16(ATA_DATA);
 #else
         identify_info[i] = ATA_DATA;
