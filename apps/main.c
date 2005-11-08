@@ -190,7 +190,7 @@ void init(void)
     lcd_remote_init();
 #endif
     font_init();
-//    show_logo();
+    show_logo();
     lang_init();
 
     set_irq_level(0);
@@ -203,7 +203,7 @@ void init(void)
 #endif
 #endif
 
-//    i2c_init();
+    i2c_init();
 
 #ifdef HAVE_RTC
     rtc_init();
@@ -212,16 +212,16 @@ void init(void)
 
     adc_init();
     
-//    usb_init();
+    usb_init();
     
     backlight_init();
 
     button_init();
 
-//    powermgmt_init();
+    powermgmt_init();
 
 #ifdef CONFIG_TUNER
-//    radio_init();
+    radio_init();
 #endif
 
 #if defined(HAVE_CHARGING) && (CONFIG_CPU == SH7034)
