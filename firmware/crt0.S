@@ -242,7 +242,7 @@ irq_handler:
     pop r1, r0
     ret_irq
 
-#elif defined(IRIVER_H100_SERIES)
+#elif defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
     /* Platform:     iRiver H120/H140 */
     move.w  #0x2700,%sr
 
@@ -274,7 +274,7 @@ irq_handler:
     /* Chip select 0 - Flash ROM */
     moveq.l #0x00,%d0      /* CSAR0 - Base = 0x00000000 */
     move.l  %d0,(0x080,%a0)
-    move.l  #0x001f0001,%d0 /* CSMR0 - 2M, All access */
+    move.l  #FLASH_SIZE-0x10000+1,%d0 /* CSMR0 - All access */
     move.l  %d0,(0x084,%a0)
     move.l  #0x00000180,%d0 /* CSCR0 - no wait states, 16 bits, no bursts */
     move.l  %d0,(0x088,%a0)
