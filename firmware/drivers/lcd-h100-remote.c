@@ -126,7 +126,7 @@ void lcd_remote_write_command(int cmd)
     RS_LO;
     CS_LO;
     
-    for (i = 0; i < 8; i++)
+    for (i = 8; i > 0; i--)
     {
         if (cmd & 0x80)
             DATA_HI;
@@ -150,37 +150,151 @@ void lcd_remote_write_data(const unsigned char* p_bytes, int count)
     
     RS_HI;
     CS_LO;
-    
-    for (i = 0; i < count; i++)
+
+    /* This is safe as long as lcd_remote_write_data() isn't called from within
+     * an ISR. */
+    if (cpu_frequency > 20000000)
     {
-        data = p_bytes[i];
-        
-        for (j = 0; j < 8; j++)
+        for (i = count; i > 0; i--)
         {
-            if (data & 0x80)
-                DATA_HI;
-            else
-                DATA_LO;
+            data = *p_bytes++;
+        
+            for (j = 8; j > 0; j--)
+            {
+                if (data & 0x80)
+                    DATA_HI;
+                else
+                    DATA_LO;
             
-            CLK_HI;
-            data <<= 1;
-            DELAY;
+                CLK_HI;
+                data <<= 1;
+                DELAY;
             
-            CLK_LO;
+                CLK_LO;
+            }
         }
     }
-    
+    else
+    {
+        for (i = count; i > 0; i--)
+        {
+            asm (
+                "move.w  %%sr,%%d4       \n" /* get current interrupt level */
+                "move.w  #0x2700,%%sr    \n" /* disable interrupts */
+
+                "move.l  #0x00040000,%%d1\n" /* precalculate port values */
+                "move.l  %%d1,%%d0       \n" /* for setting and resetting */
+                "or.l    (%[gpi1]),%%d1  \n" /* the data bit */
+                "eor.l   %%d1,%%d0       \n"
+
+                "move.l  #0x10000000,%%d3\n" /* precalculate port values */
+                "move.l  %%d3,%%d2       \n" /* for setting and resetting */
+                "or.l    (%[gpio]),%%d3  \n" /* the clock bit */
+                "eor.l   %%d3,%%d2       \n"
+
+                "tst.b   %[data]         \n" /* MSB of data set? */
+                "bmi.s   1f              \n"
+                "move.l  %%d0,(%[gpi1])  \n" /* reset data bit */
+                ".word   0x51fa          \n" /* trapf.w - shadow next insn */
+            "1:                          \n"
+                "move.l  %%d1,(%[gpi1])  \n" /* set data bit */
+                "move.l  %%d3,(%[gpio])  \n" /* set clock bit */
+                "lsl.l   #1,%[data]      \n" /* data <<= 1 */
+                "move.l  %%d2,(%[gpio])  \n" /* reset clock bit */
+
+                "tst.b   %[data]         \n"
+                "bmi.s   1f              \n"
+                "move.l  %%d0,(%[gpi1])  \n"
+                ".word   0x51fa          \n"
+            "1:                          \n"
+                "move.l  %%d1,(%[gpi1])  \n"
+                "move.l  %%d3,(%[gpio])  \n"
+                "lsl.l   #1,%[data]      \n"
+                "move.l  %%d2,(%[gpio])  \n"
+
+                "tst.b   %[data]         \n"
+                "bmi.s   1f              \n"
+                "move.l  %%d0,(%[gpi1])  \n"
+                ".word   0x51fa          \n"
+            "1:                          \n"
+                "move.l  %%d1,(%[gpi1])  \n"
+                "move.l  %%d3,(%[gpio])  \n"
+                "lsl.l   #1,%[data]      \n"
+                "move.l  %%d2,(%[gpio])  \n"
+
+                "tst.b   %[data]         \n"
+                "bmi.s   1f              \n"
+                "move.l  %%d0,(%[gpi1])  \n"
+                ".word   0x51fa          \n"
+            "1:                          \n"
+                "move.l  %%d1,(%[gpi1])  \n"
+                "move.l  %%d3,(%[gpio])  \n"
+                "lsl.l   #1,%[data]      \n"
+                "move.l  %%d2,(%[gpio])  \n"
+
+                "tst.b   %[data]         \n"
+                "bmi.s   1f              \n"
+                "move.l  %%d0,(%[gpi1])  \n"
+                ".word   0x51fa          \n"
+            "1:                          \n"
+                "move.l  %%d1,(%[gpi1])  \n"
+                "move.l  %%d3,(%[gpio])  \n"
+                "lsl.l   #1,%[data]      \n"
+                "move.l  %%d2,(%[gpio])  \n"
+
+                "tst.b   %[data]         \n"
+                "bmi.s   1f              \n"
+                "move.l  %%d0,(%[gpi1])  \n"
+                ".word   0x51fa          \n"
+            "1:                          \n"
+                "move.l  %%d1,(%[gpi1])  \n"
+                "move.l  %%d3,(%[gpio])  \n"
+                "lsl.l   #1,%[data]      \n"
+                "move.l  %%d2,(%[gpio])  \n"
+
+                "tst.b   %[data]         \n"
+                "bmi.s   1f              \n"
+                "move.l  %%d0,(%[gpi1])  \n"
+                ".word   0x51fa          \n"
+            "1:                          \n"
+                "move.l  %%d1,(%[gpi1])  \n"
+                "move.l  %%d3,(%[gpio])  \n"
+                "lsl.l   #1,%[data]      \n"
+                "move.l  %%d2,(%[gpio])  \n"
+
+                "tst.b   %[data]         \n"
+                "bmi.s   1f              \n"
+                "move.l  %%d0,(%[gpi1])  \n"
+                ".word   0x51fa          \n"
+            "1:                          \n"
+                "move.l  %%d1,(%[gpi1])  \n"
+                "move.l  %%d3,(%[gpio])  \n"
+                "lsl.l   #1,%[data]      \n"
+                "move.l  %%d2,(%[gpio])  \n"
+
+                "move.w  %%d4,%%sr       \n" /* reenable interrupts */
+                : /* outputs */
+                : /* inputs */
+                [data]"d"(*p_bytes++),
+                [gpio]"a"(&GPIO_OUT),
+                [gpi1]"a"(&GPIO1_OUT)
+                : /* clobbers */
+                "d0", "d1", "d2", "d3", "d4"
+            );
+        }
+    }
+
     CS_HI;
 }
 
 void lcd_remote_write_command_ex(int cmd, int data)
 {
     int i;
-    
-    CS_LO;
+
     RS_LO;
+    CS_LO;
     
-    for (i = 0; i < 8; i++)
+    for (i = 8; i > 0; i--)
     {
         if (cmd & 0x80)
             DATA_HI;
@@ -194,7 +308,7 @@ void lcd_remote_write_command_ex(int cmd, int data)
         CLK_LO;
     }
     
-    for (i = 0; i < 8; i++)
+    for (i = 8; i > 0; i--)
     {
         if (data & 0x80)
             DATA_HI;
