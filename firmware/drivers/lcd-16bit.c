@@ -95,6 +95,23 @@ static const char scroll_tick_table[16] = {
     100, 80, 64, 50, 40, 32, 25, 20, 16, 12, 10, 8, 6, 5, 4, 3
 };
 
+#ifdef IRIVER_H300_SERIES
+static void lcd_cmd_data(int cmd, int data)
+{
+}
+
+static void lcd_send_lo(int v)
+{
+}
+
+static void lcd_send_hi(int v)
+{
+}
+
+#define outl(a, v)
+#define inl(x) 0
+
+#else
 #define IPOD_PP5020_RTC         0x60005010
 
 #define LCD_DATA 0x10
@@ -156,6 +173,7 @@ static void lcd_cmd_data(int cmd, int data)
         lcd_send_hi(data & 0xff);
     }
 }
+#endif
 
 /*** hardware configuration ***/
 

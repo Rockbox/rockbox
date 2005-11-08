@@ -18,12 +18,17 @@ viewer.c
 dict.c
 
 #ifdef HAVE_LCD_BITMAP /* Recorder/Ondio models only */
+#ifndef HAVE_LCD_COLOR
 bejeweled.c
+fire.c
+plasma.c
+solitaire.c
+sudoku.c
+#endif
 bounce.c
 calculator.c
 chip8.c
 demystify.c
-fire.c
 flipit.c
 grayscale.c
 jpeg.c
@@ -31,7 +36,6 @@ mandelbrot.c
 minesweeper.c
 oscillograph.c
 oscilloscope.c
-plasma.c
 pong.c
 rockblox.c
 #if (CONFIG_KEYPAD == RECORDER_PAD) && !defined(SIMULATOR)
@@ -42,9 +46,7 @@ sliding_puzzle.c
 snake.c
 snake2.c
 sokoban.c
-solitaire.c
 star.c
-sudoku.c
 #if CONFIG_LCD == LCD_SSD1815
 video.c
 #endif
