@@ -200,7 +200,7 @@ void* main(void)
     /* brightness full */
     outl(0x80000000 | (0xff << 16), 0x7000a010);
 
-    /* set port B03 on
+    /* set port B03 on */
     outl(((0x100 | 1) << 3), 0x6000d824);
 
 #elif CONFIG_BACKLIGHT==BL_IPODNANO
