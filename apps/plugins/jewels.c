@@ -156,7 +156,7 @@ static unsigned char jewel[8][8] = {
     {0x0e, 0x1f, 0x3e, 0x7c, 0x3e, 0x1f, 0x0e, 0x00}
 };
 
-#elif
+#else
   #error BEJEWELED: Unsupported LCD size
 #endif
 
