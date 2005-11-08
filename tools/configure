@@ -168,6 +168,13 @@ coldfirecc () {
  endian="big"
 }
 
+arm7tdmicc () {
+ prefixtools arm-elf-
+ GCCOPTS="$CCOPTS -mcpu=arm7tdmi"
+ GCCOPTIMIZE="-fomit-frame-pointer"
+ endian="little"
+}
+
 whichaddr () {
     case $archos in
     gmini120|gminisp)
@@ -401,6 +408,8 @@ appsdir='\$(ROOTDIR)/apps'
   echo "10 - iriver H320/H340"
   echo "11 - iriver iHP-100/iHP-110/iHP-115"
   echo "12 - iAudio X5"
+  echo "13 - iPod Color/Photo"
+  echo "14 - iPod Nano"
 
   getit=`input`;
 
@@ -568,6 +577,34 @@ appsdir='\$(ROOTDIR)/apps'
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
     ;;
 
+   13)
+    archos="ipodcolor"
+    target="-DIPOD_COLOR"
+    memory=32 # always
+    arm7tdmicc
+    tool="$rootdir/tools/scramble -add=ipco"
+    output="rockbox.ipod"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins="yes"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    ;;
+
+   14)
+    archos="ipodnano"
+    target="-DIPOD_NANO"
+    memory=32 # always
+    arm7tdmicc
+    tool="$rootdir/tools/scramble -add=nano"
+    output="rockbox.ipod"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins="yes"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    ;;
+
    *)
     echo "Please select an actual target platform!"
     exit
@@ -612,7 +649,7 @@ fi
   case $option in
     [Bb])
       case $archos in
-          h100|h120)
+          h100|h120|ipodcolor|ipodnano)
               extradefines="-DBOOTLOADER" # for target makefile symbol EXTRA_DEFINES
               appsdir='\$(ROOTDIR)/bootloader'
               apps="bootloader"
