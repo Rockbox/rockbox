@@ -243,7 +243,6 @@ irq_handler:
     ret_irq
 
 #elif defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-    /* Platform:     iRiver H120/H140 */
     move.w  #0x2700,%sr
 
     move.l  #vectors,%d0
