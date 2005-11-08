@@ -70,7 +70,11 @@ struct screen
                         int x, int y, int width, int height);
     void (*set_drawmode)(int mode);
 #if LCD_DEPTH > 1
+#if HAVE_LCD_COLOR
+    void (*set_background)(struct rgb color);
+#else
     void (*set_background)(int brightness);
+#endif
 #endif /* LCD_DEPTH > 1 */
     void (*update_rect)(int x, int y, int width, int height);
     void (*fillrect)(int x, int y, int width, int height);
