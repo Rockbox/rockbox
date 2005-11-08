@@ -18,7 +18,7 @@
 /* LCD dimensions */
 #define LCD_WIDTH  220
 #define LCD_HEIGHT 176
-#define LCD_DEPTH  18   /* 262.144 colours */
+#define LCD_DEPTH  16   /* 65k colours */
 
 /* remote LCD */
 #define LCD_REMOTE_WIDTH  128
