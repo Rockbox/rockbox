@@ -337,6 +337,9 @@ static int update_dir(void)
         }
     }
     gui_synclist_set_nb_items(&tree_lists, tc.filesindir);
+    if( tc.selected_item >= tc.filesindir)
+        tc.selected_item=tc.filesindir-1;
+
     gui_synclist_select_item(&tree_lists, tc.selected_item);
     gui_synclist_draw(&tree_lists);
     gui_syncstatusbar_draw(&statusbars, true);
@@ -799,7 +802,6 @@ static bool dirbrowse(void)
                     }
                     onplay_result = onplay(buf, attr, curr_context);
                 }
-
                 switch (onplay_result)
                 {
                     case ONPLAY_OK:

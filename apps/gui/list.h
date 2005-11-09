@@ -93,6 +93,7 @@ struct gui_list
 {
     int nb_items;
     int selected_item;
+    bool cursor_flash_state;
     int start_item; /* the item that is displayed at the top of the screen */
 
     void (*callback_get_item_icon)
@@ -236,6 +237,14 @@ extern void gui_list_del_item(struct gui_list * gui_list);
     (gui_list)->limit_scroll=scroll
 
 /*
+ * One call on 2, the selected lune will either blink the cursor or
+ * invert/display normal the selected line
+ * - gui_list : the list structure
+ */
+extern void gui_list_flash(struct gui_list * gui_list);
+
+
+/*
  * This part handles as many lists as there are connected screens
  * (the api is similar to the ones above)
  * The lists on the screens are synchronized ;
@@ -278,6 +287,7 @@ extern void gui_synclist_select_previous_page(struct gui_synclist * lists,
 extern void gui_synclist_add_item(struct gui_synclist * lists);
 extern void gui_synclist_del_item(struct gui_synclist * lists);
 extern void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll);
+extern void gui_synclist_flash(struct gui_synclist * lists);
 
 /*
  * Do the action implied by the given button,

@@ -24,10 +24,7 @@ void gui_textarea_clear(struct screen * display)
 #ifdef HAVE_LCD_BITMAP
     int y_start = gui_textarea_get_ystart(display);
     int y_end = gui_textarea_get_yend(display);
-
-    display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    display->fillrect(0, y_start, display->width, y_end - y_start);
-    display->set_drawmode(DRMODE_SOLID);
+    screen_clear_area(display, 0, y_start, display->width, y_end - y_start);
     display->stop_scroll();
     screen_set_ymargin(display, y_start);
 #else

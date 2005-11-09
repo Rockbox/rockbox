@@ -55,6 +55,7 @@ void gui_list_init(struct gui_list * gui_list,
     gui_list->start_item = 0;
     gui_list->limit_scroll = false;
     gui_list->data=data;
+    gui_list->cursor_flash_state=false;
 }
 
 void gui_list_set_display(struct gui_list * gui_list, struct screen * display)
@@ -66,6 +67,42 @@ void gui_list_set_display(struct gui_list * gui_list, struct screen * display)
     display->double_height(false);
 #endif
     gui_list_put_selection_in_screen(gui_list, false);
+}
+
+void gui_list_flash(struct gui_list * gui_list)
+{
+    struct screen * display=gui_list->display;
+    gui_list->cursor_flash_state=!gui_list->cursor_flash_state;
+    int selected_line=gui_list->selected_item-gui_list->start_item;
+#ifdef HAVE_LCD_BITMAP
+    int cursor_xpos=global_settings.scrollbar?1:0;
+    int line_xpos=display->getxmargin();
+    int line_ypos=display->getymargin()+display->char_height*selected_line;
+    if (global_settings.invert_cursor)
+    {
+        display->set_drawmode(DRMODE_COMPLEMENT);
+        display->fillrect(line_xpos, line_ypos, display->width,
+                          display->char_height);
+        display->set_drawmode(DRMODE_SOLID);
+        display->invertscroll(0, selected_line);
+    }
+    else
+    {
+        if(gui_list->cursor_flash_state)
+            screen_clear_area(display, cursor_xpos*SCROLLBAR_WIDTH, line_ypos,
+                              CURSOR_WIDTH, CURSOR_HEIGHT);
+        else
+            screen_put_cursorxy(display, cursor_xpos, selected_line);
+    }
+    display->update_rect(0, line_ypos,display->width,
+                         display->char_height);
+#else
+    if(gui_list->cursor_flash_state)
+        display->putc(0, selected_line, ' ');
+    else
+        screen_put_cursorxy(display, 0, selected_line);
+    gui_textarea_update(display);
+#endif
 }
 
 void gui_list_put_selection_in_screen(struct gui_list * gui_list,
@@ -117,9 +154,7 @@ void gui_list_draw(struct gui_list * gui_list)
         text_pos += SCROLLBAR_WIDTH;
     }
     if(!draw_cursor)
-    {
         icon_pos--;
-    }
     else
         text_pos += CURSOR_WIDTH;
 
@@ -181,7 +216,8 @@ void gui_list_draw(struct gui_list * gui_list)
             gui_list->callback_get_item_icon(current_item,
                                              gui_list->data,
                                              &icon);
-            screen_put_iconxy(display, icon_pos, i, icon);
+            if(icon)
+                screen_put_iconxy(display, icon_pos, i, icon);
         }
     }
 #ifdef HAVE_LCD_BITMAP
@@ -427,6 +463,13 @@ void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll)
     int i;
     for(i = 0;i < NB_SCREENS;i++)
         gui_list_limit_scroll(&(lists->gui_list[i]), scroll);
+}
+
+void gui_synclist_flash(struct gui_synclist * lists)
+{
+    int i;
+    for(i = 0;i < NB_SCREENS;i++)
+        gui_list_flash(&(lists->gui_list[i]));
 }
 
 bool gui_synclist_do_button(struct gui_synclist * lists, unsigned button)

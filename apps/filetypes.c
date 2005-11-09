@@ -162,7 +162,7 @@ int   filetype_get_icon(int attr)
 #ifdef HAVE_LCD_BITMAP
         return NULL;
 #else
-        return -1;
+        return Icon_Unknown;
 #endif
     }
     else

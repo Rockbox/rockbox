@@ -168,7 +168,6 @@ int menu_show(int m)
 #ifdef MENU_RC_EXIT_MENU
             case MENU_RC_EXIT_MENU:
 #endif
-                //lcd_stop_scroll();
                 exit = true;
                 break;
 

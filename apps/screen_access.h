@@ -83,6 +83,7 @@ struct screen
     void (*drawline)(int x1, int y1, int x2, int y2);
     void (*vline)(int x, int y1, int y2);
     void (*hline)(int x1, int x2, int y);
+    void (*invertscroll) (int x, int y);
 #endif /* HAVE_LCD_BITMAP */
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -135,6 +136,17 @@ extern void screen_init(struct screen * screen, enum screen_type screen_type);
  */
 #define screen_set_ymargin(screen, ymargin) \
     (screen)->setmargins((screen)->getxmargin(), ymargin);
+
+#ifdef HAVE_LCD_BITMAP
+/*
+ * Clear only a given area of the screen
+ * - screen : the screen structure
+ * - xstart, ystart : where the area starts
+ * - width, height : size of the area
+ */
+void screen_clear_area(struct screen * display, int xstart, int ystart,
+                       int width, int height);
+#endif
 
 /*
  * Initializes the whole screen_access api

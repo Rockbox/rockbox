@@ -65,6 +65,7 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->scroll_delay=&lcd_remote_scroll_delay;
             screen->scroll_step=&lcd_remote_scroll_step;
             screen->puts_scroll_style=&lcd_remote_puts_scroll_style;
+            screen->invertscroll=&lcd_remote_invertscroll;
 #endif /* HAVE_LCD_BITMAP */
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -114,6 +115,7 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->scroll_delay=&lcd_scroll_delay;
             screen->scroll_step=&lcd_scroll_step;
             screen->puts_scroll_style=&lcd_puts_scroll_style;
+            screen->invertscroll=&lcd_invertscroll;
 #endif /* HAVE_LCD_BITMAP */
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -150,8 +152,17 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
 
 void screen_access_init(void)
 {
-    screen_init(&screens[0], SCREEN_MAIN);
-#if defined(HAVE_REMOTE_LCD) && !defined(ROCKBOX_HAS_LOGF)
-    screen_init(&screens[1], SCREEN_REMOTE);
-#endif
+    int i;
+    for(i=0;i<NB_SCREENS;i++)
+        screen_init(&screens[i], i);
 }
+
+#ifdef HAVE_LCD_BITMAP
+void screen_clear_area(struct screen * display, int xstart, int ystart,
+                       int width, int height)
+{
+    display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    display->fillrect(xstart, ystart, width, height);
+    display->set_drawmode(DRMODE_SOLID);
+}
+#endif
