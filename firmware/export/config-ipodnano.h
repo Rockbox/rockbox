@@ -64,7 +64,7 @@
 /* Define this if you have ATA power-off control */
 #define HAVE_ATA_POWER_OFF
 
-#define CONFIG_LCD LCD_IPODCOLOR
+#define CONFIG_LCD LCD_IPODNANO
 
 /* Offset ( in the firmware file's header ) to the file length */
 #define FIRMWARE_OFFSET_FILE_LENGTH 0
