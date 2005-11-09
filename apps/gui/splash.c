@@ -207,7 +207,7 @@ void gui_syncsplash(int ticks, bool center,  const char *fmt, ...)
     va_list ap;
     int i;
     va_start( ap, fmt );
-    for(i=0;i<NB_SCREENS;i++)
+    FOR_NB_SCREENS(i)
         internal_splash(&(screens[i]), center, fmt, ap);
     va_end( ap );
 

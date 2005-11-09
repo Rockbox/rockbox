@@ -195,10 +195,10 @@ bool check_rockboxdir(void)
     if(!dir)
     {
         int i;
-        for(i = 0;i < NB_SCREENS;++i)
+        FOR_NB_SCREENS(i)
             screens[i].clear_display();
         gui_syncsplash(HZ*2, true, str(LANG_NO_ROCKBOX_DIR));
-        for(i = 0;i < NB_SCREENS;++i)
+        FOR_NB_SCREENS(i)
             screens[i].clear_display();
         gui_syncsplash(HZ*2, true, str(LANG_INSTALLATION_INCOMPLETE));
         return false;
@@ -219,7 +219,7 @@ void browse_root(void)
 
 #ifdef HAVE_LCD_CHARCELLS
     int i;
-    for(i = 0;i < NB_SCREENS;++i)
+    FOR_NB_SCREENS(i)
         screens[i].double_height(false);
 #endif
 #ifdef HAS_BUTTONBAR
@@ -320,7 +320,7 @@ static int update_dir(void)
         {
             /* dir full */
             int i;
-            for(i = 0;i < NB_SCREENS;++i)
+            FOR_NB_SCREENS(i)
             {
                 gui_textarea_clear(&screens[i]);
 #ifdef HAVE_LCD_CHARCELLS
@@ -332,7 +332,7 @@ static int update_dir(void)
                 gui_textarea_update(&screens[i]);
             }
             sleep(HZ*2);
-            for(i = 0;i < NB_SCREENS;++i)
+            FOR_NB_SCREENS(i)
                 gui_textarea_clear(&screens[i]);
         }
     }
@@ -560,7 +560,7 @@ static bool dirbrowse(void)
             bool stop = false;
             unsigned int button;
             int i;
-            for(i = 0;i < NB_SCREENS;++i)
+            FOR_NB_SCREENS(i)
             {
                 gui_textarea_clear(&screens[i]);
                 screens[i].puts(0,0,str(LANG_BOOT_CHANGED));
@@ -695,7 +695,7 @@ static bool dirbrowse(void)
                 if (*tc.dirfilter < NUM_FILTER_MODES)
                 {
                     int i;
-                    for(i = 0;i < NB_SCREENS;++i)
+                    FOR_NB_SCREENS(i)
                         screens[i].stop_scroll();
                     if (main_menu())
                         reload_dir = true;
@@ -878,7 +878,7 @@ static bool dirbrowse(void)
         if (start_wps && audio_status() )
         {
             int i;
-            for(i = 0;i < NB_SCREENS;++i)
+            FOR_NB_SCREENS(i)
                 screens[i].stop_scroll();
             if (wps_show() == SYS_USB_CONNECTED)
                 reload_dir = true;
@@ -1077,7 +1077,7 @@ static bool add_dir(char* dirname, int len, int fd)
                             plsize++;
                             snprintf(buf, sizeof buf, "%d", plsize);
 #ifdef HAVE_LCD_BITMAP
-                            for(i = 0;i < NB_SCREENS;++i)
+                            FOR_NB_SCREENS(i)
                             {
                                 gui_textarea_clear(&screens[i]);
                                 screens[i].puts(0,4,buf);
@@ -1094,7 +1094,7 @@ static bool add_dir(char* dirname, int len, int fd)
                                         x=9;
                                 }
                             }
-                            for(i = 0;i < NB_SCREENS;++i) {
+                            FOR_NB_SCREENS(i) {
                                 screens[i].puts(x,0,buf);
                                 gui_textarea_update(&screens[i]);
                             }
@@ -1119,7 +1119,7 @@ bool create_playlist(void)
 
     snprintf(filename, sizeof filename, "%s.m3u",
              tc.currdir[1] ? tc.currdir : "/root");
-    for(i = 0;i < NB_SCREENS;++i)
+    FOR_NB_SCREENS(i)
     {
         gui_textarea_clear(&screens[i]);
         screens[i].puts(0,0,str(LANG_CREATING));
@@ -1357,7 +1357,7 @@ void tree_restore(void)
     {
         /* Print "Scanning disk..." to the display. */
         int i;
-        for(i = 0;i < NB_SCREENS;++i)
+        FOR_NB_SCREENS(i)
         {
             screens[i].putsxy((LCD_WIDTH/2) -
                               ((strlen(str(LANG_DIRCACHE_BUILDING)) *
@@ -1370,7 +1370,7 @@ void tree_restore(void)
         dircache_build(global_settings.dircache_size);
 
         /* Clean the text when we are done. */
-        for(i = 0;i < NB_SCREENS;++i)
+        FOR_NB_SCREENS(i)
         {
             gui_textarea_clear(&screens[i]);
         }

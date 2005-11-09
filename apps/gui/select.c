@@ -128,7 +128,7 @@ void gui_select_draw(struct gui_select * select, struct screen * display)
 void gui_syncselect_draw(struct gui_select * select)
 {
     int i;
-    for(i=0;i<NB_SCREENS;i++)
+    FOR_NB_SCREENS(i)
         gui_select_draw(select, &(screens[i]));
 }
 

@@ -500,7 +500,7 @@ void gui_statusbar_time(struct screen * display, int hour, int minute)
 void gui_syncstatusbar_init(struct gui_syncstatusbar * bars)
 {
     int i;
-    for(i = 0;i < NB_SCREENS;i++) {
+    FOR_NB_SCREENS(i) {
         gui_statusbar_init( &(bars->statusbars[i]) );
         gui_statusbar_set_screen( &(bars->statusbars[i]), &(screens[i]) );
     }
@@ -510,7 +510,7 @@ void gui_syncstatusbar_draw(struct gui_syncstatusbar * bars,
                             bool force_redraw)
 {
     int i;
-    for(i = 0;i < NB_SCREENS;i++) {
+    FOR_NB_SCREENS(i) {
         gui_statusbar_draw( &(bars->statusbars[i]), force_redraw );
     }
 }

@@ -153,7 +153,7 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
 void screen_access_init(void)
 {
     int i;
-    for(i=0;i<NB_SCREENS;i++)
+    FOR_NB_SCREENS(i)
         screen_init(&screens[i], i);
 }
 

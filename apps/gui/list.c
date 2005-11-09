@@ -379,7 +379,7 @@ void gui_synclist_init(
     )
 {
     int i;
-    for(i = 0;i < NB_SCREENS;i++)
+    FOR_NB_SCREENS(i)
     {
         gui_list_init(&(lists->gui_list[i]),
                       callback_get_item_icon,
@@ -392,7 +392,7 @@ void gui_synclist_init(
 void gui_synclist_set_nb_items(struct gui_synclist * lists, int nb_items)
 {
     int i;
-    for(i = 0;i < NB_SCREENS;i++)
+    FOR_NB_SCREENS(i)
     {
         gui_list_set_nb_items(&(lists->gui_list[i]), nb_items);
     }
@@ -401,28 +401,28 @@ void gui_synclist_set_nb_items(struct gui_synclist * lists, int nb_items)
 void gui_synclist_draw(struct gui_synclist * lists)
 {
     int i;
-    for(i = 0;i < NB_SCREENS;i++)
+    FOR_NB_SCREENS(i)
         gui_list_draw(&(lists->gui_list[i]));
 }
 
 void gui_synclist_select_item(struct gui_synclist * lists, int item_number)
 {
     int i;
-    for(i = 0;i < NB_SCREENS;i++)
+    FOR_NB_SCREENS(i)
         gui_list_select_item(&(lists->gui_list[i]), item_number);
 }
 
 void gui_synclist_select_next(struct gui_synclist * lists)
 {
     int i;
-    for(i = 0;i < NB_SCREENS;i++)
+    FOR_NB_SCREENS(i)
         gui_list_select_next(&(lists->gui_list[i]));
 }
 
 void gui_synclist_select_previous(struct gui_synclist * lists)
 {
     int i;
-    for(i = 0;i < NB_SCREENS;i++)
+    FOR_NB_SCREENS(i)
         gui_list_select_previous(&(lists->gui_list[i]));
 }
 
@@ -430,7 +430,7 @@ void gui_synclist_select_next_page(struct gui_synclist * lists,
                                    enum screen_type screen)
 {
     int i;
-    for(i = 0;i < NB_SCREENS;i++)
+    FOR_NB_SCREENS(i)
         gui_list_select_next_page(&(lists->gui_list[i]),
                                   screens[screen].nb_lines);
 }
@@ -439,7 +439,7 @@ void gui_synclist_select_previous_page(struct gui_synclist * lists,
                                        enum screen_type screen)
 {
     int i;
-    for(i = 0;i < NB_SCREENS;i++)
+    FOR_NB_SCREENS(i)
         gui_list_select_previous_page(&(lists->gui_list[i]),
                                       screens[screen].nb_lines);
 }
@@ -447,28 +447,28 @@ void gui_synclist_select_previous_page(struct gui_synclist * lists,
 void gui_synclist_add_item(struct gui_synclist * lists)
 {
     int i;
-    for(i = 0;i < NB_SCREENS;i++)
+    FOR_NB_SCREENS(i)
         gui_list_add_item(&(lists->gui_list[i]));
 }
 
 void gui_synclist_del_item(struct gui_synclist * lists)
 {
     int i;
-    for(i = 0;i < NB_SCREENS;i++)
+    FOR_NB_SCREENS(i)
         gui_list_del_item(&(lists->gui_list[i]));
 }
 
 void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll)
 {
     int i;
-    for(i = 0;i < NB_SCREENS;i++)
+    FOR_NB_SCREENS(i)
         gui_list_limit_scroll(&(lists->gui_list[i]), scroll);
 }
 
 void gui_synclist_flash(struct gui_synclist * lists)
 {
     int i;
-    for(i = 0;i < NB_SCREENS;i++)
+    FOR_NB_SCREENS(i)
         gui_list_flash(&(lists->gui_list[i]));
 }
 

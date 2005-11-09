@@ -36,6 +36,12 @@ enum screen_type {
 #define NB_SCREENS 1
 #endif
 
+#if NB_SCREENS == 1
+#define FOR_NB_SCREENS(i) i = 0;
+#else
+#define FOR_NB_SCREENS(i) for(i = 0; i < NB_SCREENS; i++)
+#endif
+
 #ifdef HAVE_LCD_CHARCELLS
 #define MAX_LINES_ON_SCREEN 2
 #endif
