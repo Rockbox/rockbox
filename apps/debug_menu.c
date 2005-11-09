@@ -1693,13 +1693,14 @@ bool dbg_save_roms(void)
 
 #if defined(IRIVER_H100_SERIES)
     fd = creat("/internal_rom_000000-1FFFFF.bin", O_WRONLY);
+#elif defined(IRIVER_H300_SERIES)
+    fd = creat("/internal_rom_000000-3FFFFF.bin", O_WRONLY);
+#endif
     if(fd >= 0)
     {
-        write(fd, (void *)0, 0x200000);
+        write(fd, (void *)0, FLASH_SIZE);
         close(fd);
     }
-#endif
-
     system_memory_guard(oldmode);
     return false;
 }
