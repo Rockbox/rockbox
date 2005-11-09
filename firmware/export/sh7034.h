@@ -294,9 +294,12 @@
 #define RTCNT      (*((volatile unsigned short*)RTCNT_ADDR)) 
 #define RTCOR      (*((volatile unsigned short*)RTCOR_ADDR)) 
 
-#define TCSR       (*((volatile unsigned char*)TCSR_ADDR))   
-#define TCNT       (*((volatile unsigned char*)TCNT_ADDR))   
-#define RSTCSR     (*((volatile unsigned char*)RSTCSR_ADDR)) 
+#define TCSR_R     (*((volatile unsigned char*)TCSR_ADDR))
+#define TCSR_W     (*((volatile unsigned short*)(TCSR_ADDR & ~1)))
+#define TCNT_R     (*((volatile unsigned char*)TCNT_ADDR))
+#define TCNT_W     (*((volatile unsigned short*)(TCNT_ADDR & ~1)))
+#define RSTCSR_R   (*((volatile unsigned char*)RSTCSR_ADDR))
+#define RSTCSR_W   (*((volatile unsigned short*)(RSTCSR_ADDR & ~1)))
 
 #define SBYCR      (*((volatile unsigned char*)SBYCR_ADDR))  
 

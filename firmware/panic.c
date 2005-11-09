@@ -40,7 +40,7 @@ void panicf( const char *fmt, ...)
 
 #ifndef SIMULATOR
 #if CONFIG_LED == LED_REAL
-    bool state = false;
+    bool state = true;
 #endif
 
     /* Disable interrupts */
@@ -88,31 +88,32 @@ void panicf( const char *fmt, ...)
 
     while (1)
     {
-#if (CONFIG_LED == LED_REAL) && !defined(SIMULATOR)
+#ifndef SIMULATOR
+#if CONFIG_LED == LED_REAL
         volatile long i;
         led (state);
-        state = state?false:true;
+        state = !state;
         
         for (i = 0; i < 240000; ++i);
 #endif
-#ifndef SIMULATOR
-#ifdef IRIVER_H100_SERIES
-        /* check for the ON button (and !hold) */
-        if ((GPIO1_READ & 0x22) == 0)
-            system_reboot();
-#elif CONFIG_CPU == SH7034
+
         /* try to restart firmware if ON is pressed */
+#ifdef IRIVER_H100_SERIES
+        if ((GPIO1_READ & 0x22) == 0) /* check for ON button and !hold */
+#elif CONFIG_CPU == SH7034
 #if CONFIG_KEYPAD == PLAYER_PAD
-        if (!(PADR & 0x0020))
+        if (!(PADRL & 0x20))
 #elif CONFIG_KEYPAD == RECORDER_PAD
 #ifdef HAVE_FMADC
         if (!(PCDR & 0x0008))
 #else
-        if (!(PBDR & 0x0100))
+        if (!(PBDRH & 0x01))
 #endif
-#endif
+#elif CONFIG_KEYPAD == ONDIO_PAD
+        if (!(PCDR & 0x0008))
+#endif /* CONFIG_KEYPAD */
+#endif /* CPU */
             system_reboot();
-#endif
-#endif
+#endif /* !SIMULATOR */
     }
 }

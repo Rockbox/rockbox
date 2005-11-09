@@ -852,7 +852,9 @@ void (*vbr[]) (void) __attribute__ ((section (".vectors"))) =
 
 void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
 {
+#if CONFIG_LED == LED_REAL
     bool state = true;
+#endif
     unsigned int n;
     char str[32];
 
@@ -876,23 +878,31 @@ void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
 
     while (1)
     {
+#if CONFIG_LED == LED_REAL
         volatile int i;
         led (state);
-        state = state?false:true;
+        state = !state;
         
         for (i = 0; i < 240000; ++i);
+#endif
 
         /* try to restart firmware if ON is pressed */
 #if CONFIG_KEYPAD == PLAYER_PAD
-        if (!(PADR & 0x0020))
+        if (!(PADRL & 0x20))
 #elif CONFIG_KEYPAD == RECORDER_PAD
 #ifdef HAVE_FMADC
         if (!(PCDR & 0x0008))
 #else
-        if (!(PBDR & 0x0100))
+        if (!(PBDRH & 0x01))
 #endif
+#elif CONFIG_KEYPAD == ONDIO_PAD
+        if (!(PCDR & 0x0008))
 #endif
-            system_reboot();
+        {   
+            /* enable the watchguard timer, but don't service it */
+            RSTCSR_W = 0x5a40; /* Reset enabled, power-on reset */
+            TCSR_W = 0xa560; /* Watchdog timer mode, timer enabled, sysclk/2 */
+        }
     }
 }
 
