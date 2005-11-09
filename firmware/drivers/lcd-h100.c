@@ -212,8 +212,8 @@ void lcd_blit(const unsigned char* data, int x, int by, int width,
 {
     const unsigned char *src, *src_end;
     unsigned char *dst_u, *dst_l;
-    unsigned char upper[LCD_WIDTH];
-    unsigned char lower[LCD_WIDTH];
+    static unsigned char upper[LCD_WIDTH] IBSS_ATTR;
+    static unsigned char lower[LCD_WIDTH] IBSS_ATTR;
     unsigned int byte;
 
     by *= 2;
