@@ -286,11 +286,17 @@ void lcd_update_rect(int x, int y, int width, int height)
     unsigned short *addr = (unsigned short *)lcd_framebuffer;
 
     /* calculate the drawing region */
+    #if CONFIG_LCD == IPOD_COLOR
     rect1 = x;                          /* start vert */
     rect2 = (LCD_WIDTH - 1) - y;        /* start horiz */
     rect3 = (x + height) - 1;           /* end vert */
     rect4 = (rect2 - width) + 1;        /* end horiz */
-
+    #else
+    rect1 = y;                         /* start horiz */
+    rect2 = x;                         /* start vert */
+    rect3 = (y + width) - 1;           /* max horiz */
+    rect4 = (x + height) - 1;          /* max vert */
+    #endif
     /* setup the drawing region */
     if (lcd_type == 0) {
         lcd_cmd_data(0x12, rect1);      /* start vert */
@@ -320,7 +326,9 @@ void lcd_update_rect(int x, int y, int width, int height)
         lcd_cmd_data(0x45, (rect4 << 8) | rect2);
 
         /* start vert = max vert */
+        #if CONFIG_LCD == IPOD_COLOR
         rect2 = rect4;
+        #endif
 
         /* position cursor (set AD0-AD15) */
         /* start vert << 8 | start horiz */
