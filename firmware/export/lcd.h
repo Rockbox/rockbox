@@ -39,6 +39,12 @@ extern void lcd_write_command(int byte);
 extern void lcd_write_command_ex(int cmd, int data1, int data2);
 extern void lcd_write_data(const unsigned char* p_bytes, int count);
 extern void lcd_init(void);
+#ifdef SIMULATOR
+/* Define a dummy device specific init for the sims */
+#define lcd_init_device()
+#else
+extern void lcd_init_device(void);
+#endif
 extern void lcd_backlight(bool on);
 extern int  lcd_default_contrast(void);
 extern void lcd_set_contrast(int val);

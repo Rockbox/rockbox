@@ -61,6 +61,9 @@ drivers/lcd-recorder.c
 drivers/lcd-16bit.c
 #endif
 #endif
+#if CONFIG_LCD==LCD_IPODNANO || CONFIG_LCD==LCD_IPODCOLOR
+drivers/lcd-ipod.c
+#endif
 drivers/power.c
 #ifdef CONFIG_LED
 drivers/led.c
