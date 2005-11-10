@@ -901,7 +901,7 @@ void lcd_puts_scroll_style(int x, int y, const unsigned char *string, int style)
         scrolling_lines &= ~(1<<y);
 }
 
-void scroll_thread(void)
+static void scroll_thread(void)
 {
     struct font* pf;
     struct scrollinfo* s;
