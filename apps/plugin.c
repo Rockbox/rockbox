@@ -378,6 +378,7 @@ int plugin_load(const char* plugin, void* parameter)
     {
         pfn_tsr_exit(); /* force it to exit now */
         pfn_tsr_exit = NULL;
+        plugin_loaded = false;
     }
 
 #ifdef HAVE_LCD_BITMAP
@@ -436,7 +437,8 @@ int plugin_load(const char* plugin, void* parameter)
 #endif /* LCD_DEPTH */
 #endif /* HAVE_LCD_BITMAP */
     
-    plugin_loaded = false;
+    if (pfn_tsr_exit == NULL)
+        plugin_loaded = false;
 
     switch (rc) {
         case PLUGIN_OK:
