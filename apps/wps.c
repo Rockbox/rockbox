@@ -52,6 +52,7 @@
 #include "sound.h"
 #include "onplay.h"
 #include "abrepeat.h"
+#include "playback.h"
 
 #define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
                                 /* 3% of 30min file == 54s step size */
@@ -63,9 +64,6 @@ static bool paused = false;
 static struct mp3entry* id3 = NULL;
 static struct mp3entry* nid3 = NULL;
 static char current_track_path[MAX_PATH+1];
-
-void audio_next_dir(void);
-void audio_prev_dir(void);
 
 /* set volume
    return true if screen restore is needed
@@ -337,6 +335,8 @@ long wps_show(void)
     long restoretimer = 0; /* timer to delay screen redraw temporarily */
     bool exit = false;
     bool update_track = false;
+    unsigned long right_lastclick = 0;
+    unsigned long left_lastclick = 0;
 
     id3 = nid3 = NULL;
     current_track_path[0] = '\0';
@@ -555,11 +555,29 @@ long wps_show(void)
                 break;
 
                 /* fast forward / rewind */
-            case WPS_FFWD:
-            case WPS_REW:
 #ifdef WPS_RC_FFWD
             case WPS_RC_FFWD:
+#endif
+            case WPS_FFWD:
+#ifdef WPS_NEXT_DIR
+                if (current_tick - right_lastclick < HZ)
+                {
+                    audio_next_dir();
+                    right_lastclick = 0;
+                    break;   
+                }
+#endif
+#ifdef WPS_RC_REW
             case WPS_RC_REW:
+#endif
+            case WPS_REW:
+#ifdef WPS_PREV_DIR
+                if (current_tick - left_lastclick < HZ)
+                {
+                    audio_prev_dir();
+                    left_lastclick = 0;
+                    break;   
+                }
 #endif
                 ffwd_rew(button);
                 break;
@@ -577,6 +595,7 @@ long wps_show(void)
                     break;
 #endif
 #endif
+                left_lastclick = current_tick;
 
 #ifdef AB_REPEAT_ENABLE
                 /* if we're in A/B repeat mode and the current position
@@ -604,13 +623,19 @@ long wps_show(void)
                 }
                 break;
 
+#ifdef WPS_NEXT_DIR
 #ifdef WPS_RC_NEXT_DIR
             case WPS_RC_NEXT_DIR:
+#endif
+            case WPS_NEXT_DIR:
                 audio_next_dir();
                 break;
 #endif
+#ifdef WPS_PREV_DIR
 #ifdef WPS_RC_PREV_DIR
             case WPS_RC_PREV_DIR:
+#endif
+            case WPS_PREV_DIR:
                 audio_prev_dir();
                 break;
 #endif
@@ -628,6 +653,7 @@ long wps_show(void)
                     break;
 #endif
 #endif
+                right_lastclick = current_tick;
 
 #ifdef AB_REPEAT_ENABLE
                 /* if we're in A/B repeat mode and the current position is

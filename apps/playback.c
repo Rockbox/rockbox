@@ -1659,15 +1659,7 @@ static void initiate_dir_change(int direction)
     if(!playlist_next_dir(direction))
         return;
 
-    /* Detect if disk is spinning.. */
-    if (filling) {
-        queue_post(&audio_queue, AUDIO_PLAY, 0);
-    } else {
-        new_track = 0;
-        ci.reload_codec = true;
-        if (!pcmbuf_is_crossfade_enabled())
-            pcmbuf_flush_audio();
-    }
+    queue_post(&audio_queue, AUDIO_PLAY, 0);
 
     codec_track_changed();
 }

@@ -130,6 +130,8 @@
 
 #define PLAYLIST_DISPLAY_COUNT          10
 
+static bool changing_dir = false;
+
 static struct playlist_info current_playlist;
 static char now_playing[MAX_PATH+1];
 
@@ -2072,6 +2074,7 @@ int playlist_next(int steps)
         {
             char dir[MAX_PATH+1];
 
+            changing_dir = true;
             if (steps > 0)
             {
                 if (!get_next_directory(dir))
@@ -2089,19 +2092,20 @@ int playlist_next(int steps)
             }
             else
             {
-              if (!get_previous_directory(dir))
-              {
-                /* start playing previous directory */
-                if (playlist_create(dir, NULL) != -1)
+                if (!get_previous_directory(dir))
                 {
-                    ft_build_playlist(tree_get_context(), 0);
-                    if (global_settings.playlist_shuffle)
-                        playlist_shuffle(current_tick, -1);
-                    playlist_start(current_playlist.amount-1,0);
-                    index = current_playlist.amount-1;
+                    /* start playing previous directory */
+                    if (playlist_create(dir, NULL) != -1)
+                    {
+                        ft_build_playlist(tree_get_context(), 0);
+                        if (global_settings.playlist_shuffle)
+                            playlist_shuffle(current_tick, -1);
+                        playlist_start(current_playlist.amount-1,0);
+                        index = current_playlist.amount-1;
+                    }
                 }
-              }
-           }
+            }
+            changing_dir = true;
         }
 
         return index;
@@ -2154,9 +2158,22 @@ int playlist_next(int steps)
 bool playlist_next_dir(int direction)
 {
     char dir[MAX_PATH+1];
+    bool result;
+    int res;
 
-    if (((direction > 0) && !get_next_directory(dir)) ||
-       ((direction < 0) && !get_previous_directory(dir)))
+    /* not to mess up real playlists */
+    if(!current_playlist.in_ram)
+       return false;
+
+    if(changing_dir)
+       return false;
+
+    changing_dir = true;
+    if(direction > 0)
+      res = get_next_directory(dir);
+    else
+      res = get_previous_directory(dir);
+    if (!res)
     {
         if (playlist_create(dir, NULL) != -1)
         {
@@ -2164,13 +2181,17 @@ bool playlist_next_dir(int direction)
             if (global_settings.playlist_shuffle)
                  playlist_shuffle(current_tick, -1);
             playlist_start(0,0);
-            return true;
+            result = true;
         }
         else
-            return false;
+            result = false;
     }
     else
-        return false;
+        result = false;
+
+    changing_dir = false;
+
+    return result;    
 }
 
 /* Get resume info for current playing song.  If return value is -1 then

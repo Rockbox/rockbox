@@ -55,6 +55,9 @@ void audio_set_track_unbuffer_event(void (*handler)(struct mp3entry *id3,
 void audio_invalidate_tracks(void);
 void voice_init(void);
 
+extern void audio_next_dir(void);
+extern void audio_prev_dir(void);
+
 #endif
 
 
