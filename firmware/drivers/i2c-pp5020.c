@@ -28,10 +28,12 @@
 
 /* Local functions definitions */
 
+#if 0
 static int i2c_write_byte(int device, unsigned char data);
 static int i2c_gen_start(int device);
 static void i2c_gen_stop(int device);
 static volatile unsigned char *i2c_get_addr(int device);
+#endif
 
 #define IPOD_I2C_BASE   0x7000c000
 #define IPOD_I2C_CTRL   (IPOD_I2C_BASE+0x00)
@@ -53,8 +55,8 @@ static volatile unsigned char *i2c_get_addr(int device);
 static int
 ipod_i2c_wait_not_busy(void)
 {
-    unsigned long timeout;
 #if 0
+    unsigned long timeout;
     timeout = jiffies + POLL_TIMEOUT;
     while (time_before(jiffies, timeout)) {
          if (!(inb(IPOD_I2C_STATUS) & IPOD_I2C_BUSY)) {
@@ -65,6 +67,7 @@ ipod_i2c_wait_not_busy(void)
 
     return -ETIMEDOUT;
 #endif
+    return 0;
 }
 
 
@@ -81,8 +84,7 @@ void i2c_init(void)
    outl(0x0, 0x600060a4);
    outl(0x80 | (0 << 8), 0x600060a4);
 
-   i2c_readbyte(0x8, 0);
-
+   //i2c_readbyte(0x8, 0);
 }
 
 void i2c_close(void)
@@ -130,8 +132,9 @@ int i2c_write(int device, unsigned char *buf, int count)
     return count;
 }
 
+#if 0
 /* Write a byte to the interface, returns 0 on success, -1 otherwise. */
-int i2c_write_byte(int device, unsigned char data)
+static int i2c_write_byte(int device, unsigned char data)
 {
     if (ipod_i2c_wait_not_busy() < 0) {
         return -2;
@@ -179,6 +182,7 @@ void i2c_gen_stop(int device)
     regs[O_MBCR] &= ~MSTA;          /* Clear MSTA to generate STOP */
 }
 
+#endif
 
 volatile unsigned char *i2c_get_addr(int device)
 {

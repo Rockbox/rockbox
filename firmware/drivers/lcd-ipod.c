@@ -71,7 +71,7 @@ static int timer_get_current(void)
 }
 
 /* check if number of useconds has past */
-static int timer_check(int clock_start, int usecs)
+static int timer_check(unsigned long clock_start, unsigned long usecs)
 {
     unsigned long clock;
     clock = inl(IPOD_PP5020_RTC);
@@ -127,18 +127,21 @@ int lcd_default_contrast(void)
 
 void lcd_set_contrast(int val)
 {
-  #warning: Implement lcd_set_contrast()
+  /* TODO: Implement lcd_set_contrast() */
+  (void)val;
 }
 
 void lcd_set_invert_display(bool yesno)
 {
-  #warning: Implement lcd_set_invert_display()
+  /* TODO: Implement lcd_set_invert_display() */
+  (void)yesno;
 }
 
 /* turn the display upside down (call lcd_update() afterwards) */
 void lcd_set_flip(bool yesno)
 {
-#warning: Implement lcd_set_flip()
+  /* TODO: Implement lcd_set_flip() */
+  (void)yesno;
 }
 
 /* Rolls up the lcd display by the specified amount of lines.
@@ -150,8 +153,8 @@ void lcd_set_flip(bool yesno)
  *  The value must be 0 <= pixels < LCD_HEIGHT. */
 void lcd_roll(int lines)
 {
+    /* TODO: Implement lcd_roll() */
     lines &= LCD_HEIGHT-1;
-#warning: To do: Implement lcd_roll()
 }
 
 /* LCD init */
@@ -204,7 +207,13 @@ void lcd_init_device(void)
 void lcd_blit(const unsigned char* data, int x, int by, int width,
               int bheight, int stride)
 {
-    #warning Implement lcd_blit()
+    /* TODO: Implement lcd_blit() */
+    (void)data;
+    (void)x;
+    (void)by;
+    (void)width;
+    (void)bheight;
+    (void)stride;
 }
 
 /* Update a fraction of the display. */

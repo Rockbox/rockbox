@@ -563,7 +563,10 @@ static int button_read(void)
     data = P7;
     if (data & 0x01)
         btn |= BUTTON_ON;
-    
+
+#elif CONFIG_KEYPAD == IPOD_4G_PAD || CONFIG_KEYPAD == IPOD_NANO_PAD
+    /* TODO: Implement for iPod */
+    (void)data;
 #endif /* CONFIG_KEYPAD */
 
 

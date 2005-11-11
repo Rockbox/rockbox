@@ -1247,7 +1247,8 @@ void ata_enable(bool on)
 #elif CONFIG_CPU == TCC730
 
 #elif CONFIG_CPU == PP5020
-     #warning Implement ata_enable()
+    /* TODO: Implement ata_enable() */
+    (void)on;
 #endif
 }
 
@@ -1400,7 +1401,7 @@ int ata_init(void)
     bool coldstart = (GPIO_FUNCTION & 0x00080000) == 0;
 #elif CONFIG_CPU == PP5020
     bool coldstart = false;
-    #warning Implement coldstart variable
+    /* TODO: Implement coldstart variable */
 #else
     bool coldstart = (PACR2 & 0x4000) != 0;
 #endif

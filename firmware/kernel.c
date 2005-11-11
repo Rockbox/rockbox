@@ -68,8 +68,7 @@ void sleep(int ticks)
 void yield(void)
 {
 #if CONFIG_CPU == PP5020
-    /* Threading not yet implemented */
-    #warning Enable yield()
+    /* TODO: Threading not yet implemented */
     return;
 #endif
     switch_thread();
@@ -325,7 +324,8 @@ void tick_start(unsigned int interval_in_ms)
 #elif CONFIG_CPU == PP5020
 
 void tick_start(unsigned int interval_in_ms) {
-#warning Implement tick_start
+  /* TODO:  Implement tick_start */
+  (void)interval_in_ms;
 }
 
 #endif

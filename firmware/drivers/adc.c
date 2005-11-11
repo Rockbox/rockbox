@@ -256,10 +256,11 @@ void adc_init(void)
 
 #elif CONFIG_CPU == PP5020
 
-#warning Implement adc.c
+/* TODO: Implement adc.c */
 
 unsigned short adc_read(int channel)
 {
+    (void)channel;
     return 0;
 }
 

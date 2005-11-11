@@ -146,7 +146,7 @@ bool remote_button_hold(void);
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
 
-#warning Correct the IPOD definitions
+/* TODO: Correct the IPOD definitions */
 
 #define  BUTTON_ON            0x0001
 #define  BUTTON_OFF           0x0002

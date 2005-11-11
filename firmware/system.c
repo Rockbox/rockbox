@@ -1106,7 +1106,7 @@ int system_memory_guard(int newmode)
 }
 #elif CONFIG_CPU==PP5020
 
-#warning TODO: Implement system.c
+/* TODO: Implement system.c */
 
 void system_init(void) {
 

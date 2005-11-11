@@ -42,7 +42,7 @@ struct regs
     void         *start; /* Thread start address, or NULL when started */
 };
 #elif CONFIG_CPU == PP5020
-#warning TODO: define struct regs
+/* TODO: define struct regs */
 struct regs
 {
     void *sp;    /* Stack pointer (a15) */
@@ -80,15 +80,16 @@ static inline void load_context(const void* addr) __attribute__ ((always_inline)
 
 #if CONFIG_CPU == PP5020
 
-#warning TODO: Implement store_context and load_context
+/* TODO: Implement store_context and load_context */
 
 static inline void store_context(void* addr)
 {
+  (void)addr;
 }
 
 static inline void load_context(const void* addr)
 {
-
+  (void)addr;
 }
 
 

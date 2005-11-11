@@ -399,6 +399,9 @@ void sound_set_volume(int value)
 #elif (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380
     current_volume = VOLUME_MIN + (value * VOLUME_RANGE / 100);
     set_prescaled_volume();                   /* tenth of dB */
+#elif (CONFIG_CPU == PP5020)
+    /* TODO: Implement sound_set_volume() */
+    (void)value;
 #endif    
 }
 
@@ -412,6 +415,9 @@ void sound_set_balance(int value)
 #elif CONFIG_CODEC == MAS3507D || defined HAVE_UDA1380
     current_balance = value * VOLUME_RANGE / 100; /* tenth of dB */
     set_prescaled_volume();
+#elif (CONFIG_CPU == PP5020)
+    /* TODO: Implement sound_set_balance() */
+    (void)value;
 #endif       
 }
 
@@ -430,6 +436,9 @@ void sound_set_bass(int value)
     uda1380_set_bass(value >> 1);
     current_bass = value * 10;
     set_prescaled_volume();
+#elif (CONFIG_CPU == PP5020)
+    /* TODO: Implement sound_set_bass() */
+    (void)value;
 #endif               
 }
 
@@ -448,6 +457,9 @@ void sound_set_treble(int value)
     uda1380_set_treble(value >> 1);
     current_treble = value * 10;
     set_prescaled_volume();
+#elif (CONFIG_CPU == PP5020)
+    /* TODO: Implement sound_set_treble() */
+    (void)value;
 #endif    
 }
 

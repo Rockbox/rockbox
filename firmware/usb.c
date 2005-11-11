@@ -146,9 +146,8 @@ static void usb_enable(bool on)
     }
     
 #elif defined(USB_IPODSTYLE)
-
-#warning Implement USB_IPODSTYLE
-
+    /* TODO: Implement USB_IPODSTYLE */
+    (void) on;
 #else
 #ifdef HAVE_LCD_BITMAP
     if(read_hw_mask() & USB_ACTIVE_HIGH)
@@ -364,7 +363,10 @@ bool usb_detect(void)
     /* TODO: add proper code code for H300 USB style */
     current_status = false;
 #endif
-    
+#ifdef USB_IPODSTYLE
+    /* TODO: Implement USB_IPODSTYLE */
+    current_status = false;
+#endif
     return current_status;
 }
 

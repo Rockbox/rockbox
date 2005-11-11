@@ -294,7 +294,7 @@ static inline void invalidate_icache(void)
 
 #elif CONFIG_CPU == PP5020
 
-#warning Implement set_irq_level and check CPU frequencies
+/* TODO: Implement set_irq_level and check CPU frequencies */
 
 #define CPUFREQ_DEFAULT CPU_FREQ
 #define CPUFREQ_NORMAL 37500000

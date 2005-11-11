@@ -155,23 +155,26 @@ int lcd_getstringsize(const unsigned char *str, int *w, int *h)
 
 static void setpixel(int x, int y)
 {
-    unsigned short *data = &lcd_framebuffer[y][x*2];
+    unsigned short *data = (unsigned short*)&lcd_framebuffer[y][x*2];
     *data = fg_pattern;
 }
 
 static void clearpixel(int x, int y)
 {
-    unsigned short *data = &lcd_framebuffer[y][x*2];
+    unsigned short *data = (unsigned short*)&lcd_framebuffer[y][x*2];
     *data = bg_pattern;
 }
 
 static void flippixel(int x, int y)
 {
   /* What should this do on a color display? */
+  (void)x;
+  (void)y;
 }
 
 static void nopixel(int x, int y)
 {
+  /* What should this do on a color display? */
     (void)x;
     (void)y;
 }
@@ -182,17 +185,18 @@ lcd_pixelfunc_type* const lcd_pixelfuncs[8] = {
 };
 
 /* 'mask' and 'bits' contain 2 bits per pixel */
-static void flipblock(unsigned short *address, unsigned mask, unsigned bits)
+static void flipblock(unsigned char *address, unsigned mask, unsigned bits)
                       ICODE_ATTR;
-static void flipblock(unsigned short *address, unsigned mask, unsigned bits)
+static void flipblock(unsigned char *address, unsigned mask, unsigned bits)
 {
     *address ^= bits & mask;
 }
 
-static void bgblock(unsigned short *address, unsigned mask, unsigned bits)
+static void bgblock(unsigned char *address, unsigned mask, unsigned bits)
                     ICODE_ATTR;
-static void bgblock(unsigned short *address, unsigned mask, unsigned bits)
+static void bgblock(unsigned char *address, unsigned mask, unsigned bits)
 {
+    (void)bits;
     if (mask > 0) {
       *address = bg_pattern;
     } else {
@@ -200,10 +204,11 @@ static void bgblock(unsigned short *address, unsigned mask, unsigned bits)
     }
 }
 
-static void fgblock(unsigned short *address, unsigned mask, unsigned bits)
+static void fgblock(unsigned char *address, unsigned mask, unsigned bits)
                     ICODE_ATTR;
-static void fgblock(unsigned short *address, unsigned mask, unsigned bits)
+static void fgblock(unsigned char *address, unsigned mask, unsigned bits)
 {
+    (void)bits;
     if (mask > 0) {
       *address = fg_pattern;
     } else {
@@ -211,40 +216,40 @@ static void fgblock(unsigned short *address, unsigned mask, unsigned bits)
     }
 }
 
-static void solidblock(unsigned short *address, unsigned mask, unsigned bits)
+static void solidblock(unsigned char *address, unsigned mask, unsigned bits)
                        ICODE_ATTR;
-static void solidblock(unsigned short *address, unsigned mask, unsigned bits)
+static void solidblock(unsigned char *address, unsigned mask, unsigned bits)
 {
     *address = (*address & ~mask) | (bits & mask & fg_pattern)
                                   | (~bits & mask & bg_pattern);
 }
 
-static void flipinvblock(unsigned short *address, unsigned mask, unsigned bits)
+static void flipinvblock(unsigned char *address, unsigned mask, unsigned bits)
                          ICODE_ATTR;
-static void flipinvblock(unsigned short *address, unsigned mask, unsigned bits)
+static void flipinvblock(unsigned char *address, unsigned mask, unsigned bits)
 {
     *address ^= ~bits & mask;
 }
 
-static void bginvblock(unsigned short *address, unsigned mask, unsigned bits)
+static void bginvblock(unsigned char *address, unsigned mask, unsigned bits)
                        ICODE_ATTR;
-static void bginvblock(unsigned short *address, unsigned mask, unsigned bits)
+static void bginvblock(unsigned char *address, unsigned mask, unsigned bits)
 {
     mask &= bits;
     *address = (*address & ~mask) | (bg_pattern & mask);
 }
 
-static void fginvblock(unsigned short *address, unsigned mask, unsigned bits)
+static void fginvblock(unsigned char *address, unsigned mask, unsigned bits)
                        ICODE_ATTR;
-static void fginvblock(unsigned short *address, unsigned mask, unsigned bits)
+static void fginvblock(unsigned char *address, unsigned mask, unsigned bits)
 {
     mask &= ~bits;
     *address = (*address & ~mask) | (fg_pattern & mask);
 }
 
-static void solidinvblock(unsigned short *address, unsigned mask, unsigned bits)
+static void solidinvblock(unsigned char *address, unsigned mask, unsigned bits)
                           ICODE_ATTR;
-static void solidinvblock(unsigned short *address, unsigned mask, unsigned bits)
+static void solidinvblock(unsigned char *address, unsigned mask, unsigned bits)
 {
     *address = (*address & ~mask) | (~bits & mask & fg_pattern)
                                   | (bits & mask & bg_pattern);
@@ -536,9 +541,9 @@ void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
     int out_x;
     int out_y;
     unsigned char pixel;
-    int src_width=src_x+width+stride;
     unsigned short* addr;
 
+    (void)stride;
     /* nothing to draw? */
     if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
         || (x + width <= 0) || (y + height <= 0))
@@ -705,7 +710,7 @@ void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
 /* Draw a full native bitmap */
 void lcd_bitmap(const unsigned char *src, int x, int y, int width, int height)
 {
-    unsigned short* s=src;
+    unsigned short* s=(unsigned short*)src;
     unsigned short* d=(unsigned short*)&lcd_framebuffer[y][x*2];
     int k=LCD_WIDTH-width;
     int i,j;
@@ -782,16 +787,18 @@ void lcd_puts_style(int x, int y, const unsigned char *str, int style)
     xpos = xmargin + x*w / strlen(str);
     ypos = ymargin + y*h;
     lcd_putsxy(xpos, ypos, str);
-#if 0
     drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
+    (void)style;
+#if 0
+    /* TODO: Implement lcd_fillrect */
     lcd_fillrect(xpos + w, ypos, LCD_WIDTH - (xpos + w), h);
     if (style & STYLE_INVERT)
     {
         drawmode = DRMODE_COMPLEMENT;
         lcd_fillrect(xpos, ypos, LCD_WIDTH - xpos, h);
     }
-    drawmode = lastmode;
 #endif
+    drawmode = lastmode;
 }
 
 /* put a string at a given char position */

@@ -26,12 +26,11 @@
 #ifndef _I2C_ARM_H
 #define _I2C_ARM_H
 
-#warning Implement: i2c-pp5020.h
+/* TODO: Implement: i2c-pp5020.h */
 
 void i2c_init(void);
 int i2c_write(int device, unsigned char *buf, int count);
 void i2c_close(void);
-
 
 #define MAX_LOOP    0x100     /* TODO: select a better value */
 
