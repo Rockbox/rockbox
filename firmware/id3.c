@@ -801,6 +801,10 @@ static void setid3v2title(int fd, struct mp3entry *entry)
 
                 if( tr->ppFunc )
                     bufferpos = tr->ppFunc(entry, tag, bufferpos);
+
+                /* Seek to the next frame */
+                if(framelen < totframelen)
+                    lseek(fd, totframelen - framelen, SEEK_CUR);
                 break;
             }
         }
