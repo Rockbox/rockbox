@@ -77,6 +77,7 @@ static const struct format_list formats[] =
     { AFMT_WAVPACK,       "wv"   },
     { AFMT_ALAC,          "m4a"  },
     { AFMT_AAC,           "mp4"  },
+    { AFMT_SHN,           "shn"  },
 };
 
 static const unsigned short a52_bitrates[] =

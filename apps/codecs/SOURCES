@@ -8,4 +8,5 @@ mpc.c
 wavpack.c
 alac.c
 aac.c
+shorten.c
 #endif

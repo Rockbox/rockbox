@@ -19,9 +19,20 @@
  *
  */
 
+#include <limits.h>
 
 /* From libavutil/common.h */
-extern const uint8_t ff_log2_tab[256];
+const uint8_t ff_log2_tab[256] ICONST_ATTR = {
+        0,0,1,1,2,2,2,2,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+        5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
+        6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+        6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7
+};
+
 static inline int av_log2(unsigned int v)
 {
     int n;
@@ -103,4 +114,26 @@ static inline int get_ur_golomb_jpegls(GetBitContext *gb, int k, int limit, int 
 static inline int get_sr_golomb_flac(GetBitContext *gb, int k, int limit, int esc_len){
     int v= get_ur_golomb_jpegls(gb, k, limit, esc_len);
     return (v>>1) ^ -(v&1);
+}
+
+/**
+ * read unsigned golomb rice code (shorten).
+ */
+#define get_ur_golomb_shorten(gb, k) get_ur_golomb_jpegls(gb, k, INT_MAX, 0)
+/*
+static inline unsigned int get_ur_golomb_shorten(GetBitContext *gb, int k){
+	return get_ur_golomb_jpegls(gb, k, INT_MAX, 0);
+}
+*/
+
+/**
+ * read signed golomb rice code (shorten).
+ */
+static inline int get_sr_golomb_shorten(GetBitContext* gb, int k)
+{
+    int uvar = get_ur_golomb_jpegls(gb, k + 1, INT_MAX, 0);
+    if (uvar & 1)
+        return ~(uvar >> 1);
+    else
+        return uvar >> 1;
 }

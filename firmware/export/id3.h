@@ -40,6 +40,7 @@ enum {
     AFMT_WAVPACK,      /* WavPack */
     AFMT_ALAC,         /* Apple Lossless Audio Codec */
     AFMT_AAC,          /* Advanced Audio Coding (AAC) in M4A container */
+    AFMT_SHN,          /* Shorten */
 
     /* New formats must be added to the end of this list */
 
