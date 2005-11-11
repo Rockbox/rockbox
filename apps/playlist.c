@@ -2105,7 +2105,7 @@ int playlist_next(int steps)
                     }
                 }
             }
-            changing_dir = true;
+            changing_dir = false;
         }
 
         return index;
