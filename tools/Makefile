@@ -9,7 +9,7 @@
 CFLAGS := -O -ansi -g
 LDFLAGS := -g
 
-TARGETS := scramble descramble iaudio sh2d bmp2rb rdf2binary convbdf generate_rocklatin mkboot
+TARGETS := scramble descramble iaudio sh2d bmp2rb rdf2binary convbdf generate_rocklatin mkboot ipod_fw
 
 all: $(TARGETS)
 	@echo "tools done"
@@ -32,6 +32,9 @@ rdf2binary:	rdf2binary.c
 	$(CC) -g $+ -o $@
 
 mkboot:	mkboot.c
+	$(CC) -g $+ -o $@
+
+ipod_fw:	ipod_fw.c
 	$(CC) -g $+ -o $@
 
 convbdf: convbdf.c
