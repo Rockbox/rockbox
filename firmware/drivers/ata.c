@@ -308,7 +308,7 @@ static int perform_soft_reset(void);
 static int set_multiple_mode(int sectors);
 static int set_features(void);
 
-static int wait_for_bsy(void) __attribute__ ((section (".icode")));
+static int wait_for_bsy(void) ICODE_ATTR;
 static int wait_for_bsy(void)
 {
     long timeout = current_tick + HZ*30;
@@ -323,7 +323,7 @@ static int wait_for_bsy(void)
         return 0; /* timeout */
 }
 
-static int wait_for_rdy(void) __attribute__ ((section (".icode")));
+static int wait_for_rdy(void) ICODE_ATTR;
 static int wait_for_rdy(void)
 {
     long timeout;
@@ -345,7 +345,7 @@ static int wait_for_rdy(void)
         return 0; /* timeout */
 }
 
-static int wait_for_start_of_transfer(void) __attribute__ ((section (".icode")));
+static int wait_for_start_of_transfer(void) ICODE_ATTR;
 static int wait_for_start_of_transfer(void)
 {
     if (!wait_for_bsy())
@@ -353,7 +353,7 @@ static int wait_for_start_of_transfer(void)
     return (ATA_ALT_STATUS & (STATUS_BSY|STATUS_DRQ)) == STATUS_DRQ;
 }
 
-static int wait_for_end_of_transfer(void) __attribute__ ((section (".icode")));
+static int wait_for_end_of_transfer(void) ICODE_ATTR;
 static int wait_for_end_of_transfer(void)
 {
     if (!wait_for_bsy())
@@ -367,9 +367,7 @@ static int wait_for_end_of_transfer(void)
  * controller & cpu internal memory.
  */
 /* the tight loop of ata_read_sectors(), to avoid the whole in IRAM */
-static void copy_read_sectors(unsigned char* buf,
-                         int wordcount)
-                         __attribute__ ((section (".icode")));
+static void copy_read_sectors(unsigned char* buf, int wordcount) ICODE_ATTR;
 static void copy_read_sectors(unsigned char* buf, int wordcount)
 {
 #ifdef PREFER_C_READING
@@ -679,8 +677,7 @@ int ata_read_sectors(IF_MV2(int drive,)
 
 /* the tight loop of ata_write_sectors(), to avoid the whole in IRAM */
 static void copy_write_sectors(const unsigned char* buf,
-                               int wordcount)
-                               __attribute__ ((section (".icode")));
+                               int wordcount) ICODE_ATTR;
 
 static void copy_write_sectors(const unsigned char* buf, int wordcount)
 {

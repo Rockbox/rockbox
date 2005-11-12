@@ -35,8 +35,8 @@ static void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
 static struct event_queue *all_queues[32];
 static int num_queues;
 
-void sleep(int ticks) __attribute__ ((section(".icode")));
-void queue_wait(struct event_queue *q, struct event *ev) __attribute__ ((section(".icode")));
+void sleep(int ticks) ICODE_ATTR;
+void queue_wait(struct event_queue *q, struct event *ev) ICODE_ATTR;
 
 /****************************************************************************
  * Standard kernel stuff
