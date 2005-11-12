@@ -351,6 +351,13 @@ bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
                   unsigned addr1, unsigned addr2)
           
 {
+#if CONFIG_CPU == PP5020
+    /* TODO: Implement for iPod */
+    (void)p_manufacturer;
+    (void)p_device;
+    (void)addr1;
+    (void)addr2;
+#else
     unsigned not_manu, not_id; /* read values before switching to ID mode */
     unsigned manu, id; /* read values when in ID mode */
 #if CONFIG_CPU == TCC730
@@ -398,9 +405,9 @@ bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
         *p_device = id;
         return true; /* success */
     }
+#endif
     return false; /* fail */
 }
-
 
 #ifdef HAVE_LCD_BITMAP
 bool dbg_hw_info(void)
