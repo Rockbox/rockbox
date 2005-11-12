@@ -10,6 +10,7 @@ INPUT(crt0.o)
 #elif CONFIG_CPU == PP5020
 OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
+INPUT(crt0.o)
 #else
 OUTPUT_FORMAT(elf32-sh)
 INPUT(crt0.o)
@@ -103,44 +104,6 @@ _audiobufend = 0;
 _pluginbuf = 0;
 
 }
-#elif CONFIG_CPU==PP5020
-SECTIONS
-{
-  . = 0x10000000;
-
-  .text : { 
-    *(.init.text)
-    *(.text)
-  }
-
-    __data_start__ = . ;
-  .data : { *(.data) }
-    __data_end__ = . ;
-
-  __stack_start__ = .;
-  .stack :
-  {
-     *(.stack)
-     _stackbegin = .;
-     stackbegin = .;
-     . += 0x2000;
-     _stackend = .;
-     stackend = .;
-  }
-
-  /* The bss section is too large for IRAM - we just move it at the
-     end of the regular RAM. */
-
-  . = 0x11c00000;
-  __bss_start__ = .;
-  .bss : {
-     *(.bss);
-     __bss_end__ = . ;
-   }
-
-
-
-}
 #else
 
 #define PLUGINSIZE PLUGIN_BUFFER_SIZE
@@ -158,6 +121,10 @@ SECTIONS
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300)
 #define DRAMORIG 0x31000000 + STUBOFFSET
 #define IRAMORIG 0x10000000
+#define IRAMSIZE 0xc000
+#elif CONFIG_CPU==PP5020
+#define DRAMORIG 0x10000000 + STUBOFFSET
+#define IRAMORIG 0x40000000
 #define IRAMSIZE 0xc000
 #else
 #define DRAMORIG 0x09000000 + STUBOFFSET
@@ -194,6 +161,10 @@ SECTIONS
         . = ALIGN(0x200);
         *(.init.text)
         *(.text*)
+#if CONFIG_CPU==PP5020
+        *(.glue_7)
+        *(.glue_7t)
+#endif
         . = ALIGN(0x4);
     } > DRAM
 
@@ -243,7 +214,7 @@ SECTIONS
         _iend = .;
     } > IRAM
 
-#ifdef CPU_COLDFIRE
+#if defined(CPU_COLDFIRE) || CONFIG_CPU==PP5020
     .stack :
     {
        *(.stack)
@@ -263,7 +234,7 @@ SECTIONS
     } > DRAM
 #endif
 
-#ifdef CPU_COLDFIRE
+#if defined(CPU_COLDFIRE) || CONFIG_CPU==PP5020
     .bss ADDR(.data) + SIZEOF(.data) + SIZEOF(.iram):
 #else
     .bss :

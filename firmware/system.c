@@ -1116,6 +1116,11 @@ void system_reboot(void) {
 
 }
 
+int system_memory_guard(int newmode)
+{
+    (void)newmode;
+    return 0;
+}
 
 #endif /* CONFIG_CPU */
 
