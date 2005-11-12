@@ -207,7 +207,9 @@ static const struct plugin_api rockbox_api = {
     /* kernel/ system */
     PREFIX(sleep),
     yield,
+#if CONFIG_CPU != PP5020
     &current_tick,
+#endif
     default_event_handler,
     default_event_handler_ex,
     create_thread,

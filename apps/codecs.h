@@ -197,7 +197,9 @@ struct codec_api {
     /* kernel/ system */
     void (*PREFIX(sleep))(int ticks);
     void (*yield)(void);
+#if CONFIG_CPU != PP5020
     long* current_tick;
+#endif
     long (*default_event_handler)(long event);
     long (*default_event_handler_ex)(long event, void (*callback)(void *), void *parameter);
     int (*create_thread)(void (*function)(void), void* stack, int stack_size, const char *name);
