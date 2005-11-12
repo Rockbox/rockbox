@@ -27,9 +27,9 @@
 // 17 & 18 are special functions using the previous 2 samples, and negative
 // values indicate cross channel decorrelation (in stereo only).
 
-static const char default_terms [] = { 18,18,2,3,-2,0 };
-static const char high_terms [] = { 18,18,2,3,-2,18,2,4,7,5,3,6,0 };
-static const char fast_terms [] = { 17,17,0 };
+static const signed char default_terms [] = { 18,18,2,3,-2,0 };
+static const signed char high_terms [] = { 18,18,2,3,-2,18,2,4,7,5,3,6,0 };
+static const signed char fast_terms [] = { 17,17,0 };
 
 ///////////////////////////// executable code ////////////////////////////////
 
@@ -41,7 +41,7 @@ void pack_init (WavpackContext *wpc)
     WavpackStream *wps = &wpc->stream;
     ulong flags = wps->wphdr.flags;
     struct decorr_pass *dpp;
-    const char *term_string;
+    const signed char *term_string;
     int ti;
 
     wps->sample_index = 0;

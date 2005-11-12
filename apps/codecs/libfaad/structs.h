@@ -325,7 +325,7 @@ typedef struct mp4AudioSpecificConfig
     /*uint8_t*/ unsigned char aacSpectralDataResilienceFlag;
     /*uint8_t*/ unsigned char epConfig;
 
-    /*uint8_t*/ char sbr_present_flag;
+    /*uint8_t*/ signed char sbr_present_flag;
     /*uint8_t*/ char forceUpSampling;
     /*uint8_t*/ char downSampledSBR;
 } mp4AudioSpecificConfig;
