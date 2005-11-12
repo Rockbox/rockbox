@@ -1,4 +1,4 @@
-#ifdef IRIVER_H100_SERIES
+#if CONFIG_CODEC == SWCODEC
 vorbis.c
 mpa.c
 flac.c
