@@ -7,7 +7,9 @@
 #define MODEL_NUMBER 0
 
 /* define this if you have recording possibility */
+#ifndef SIMULATOR
 #define HAVE_RECORDING 1
+#endif
 
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP 1

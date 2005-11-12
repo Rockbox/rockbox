@@ -2647,7 +2647,8 @@ void audio_init_recording(void)
 }
 void audio_set_recording_options(int frequency, int quality,
                                 int source, int channel_mode,
-                                bool editable, int prerecord_time)
+                                bool editable, int prerecord_time,
+                                int monitor)
 {
     /* a dummy */
     (void)frequency;
@@ -2656,6 +2657,7 @@ void audio_set_recording_options(int frequency, int quality,
     (void)channel_mode;
     (void)editable;
     (void)prerecord_time;
+    (void)monitor;
 }
 #endif /* SIMULATOR */
 #endif /* CONFIG_CODEC == MAS3587F */
