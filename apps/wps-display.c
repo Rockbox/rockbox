@@ -147,6 +147,11 @@ static void wps_format(const char* fmt, char *bmpdir, size_t bmpdirlen)
     char* start_of_line = format_buffer;
     int line = 0;
     int subline;
+#ifndef HAVE_LCD_BITMAP
+    /* no bitmap lcd == no bitmap loading */
+    (void)bmpdir;
+    (void)bmpdirlen;
+#endif
 
     strncpy(format_buffer, fmt, sizeof(format_buffer));
     format_buffer[sizeof(format_buffer) - 1] = 0;
