@@ -208,8 +208,7 @@ unsigned long audio_num_recorded_bytes(void)
  */
 void audio_set_recording_options(int frequency, int quality,
                                 int source, int channel_mode,
-                                bool editable, int prerecord_time,
-                                bool monitor)
+                                bool editable, int prerecord_time)
 {
     /* TODO: */
     (void)frequency;
@@ -233,7 +232,7 @@ void audio_set_recording_options(int frequency, int quality,
         break;
     }    
     
-    uda1380_set_monitor(monitor);
+    uda1380_set_monitor(true);
 }
 
 

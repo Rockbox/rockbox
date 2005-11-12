@@ -228,12 +228,6 @@ static bool receditable(void)
                     &global_settings.rec_editable);
 }
 
-static bool recmonitor(void)
-{
-    return set_bool(str(LANG_RECORDING_MONITOR),
-                    &global_settings.rec_monitor);
-}
-
 #ifdef HAVE_UDA1380
 static bool recadcleft(void)
 {
@@ -783,8 +777,6 @@ bool recording_menu(bool no_source)
     items[i++].function = recadcright;
 #endif
 
-    items[i].desc = ID2P(LANG_RECORDING_MONITOR);
-    items[i++].function = recmonitor;
     items[i].desc = ID2P(LANG_RECORDING_EDITABLE);
     items[i++].function = receditable;
     items[i].desc = ID2P(LANG_RECORD_TIMESPLIT);

@@ -407,7 +407,6 @@ static const struct bit_entry hd_bits[] =
 
 #ifdef HAVE_RECORDING
     {1, S_O(rec_startup), false, "rec screen on startup", off_on },
-    {1, S_O(rec_monitor), true, "monitor recording", off_on },
 
     /* values for the trigger */
     {8 | SIGNED, S_O(rec_start_thres), -35, "trigger start threshold", NULL},

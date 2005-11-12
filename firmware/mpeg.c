@@ -2437,8 +2437,7 @@ static void stop_recording(void)
 
 void audio_set_recording_options(int frequency, int quality,
                                 int source, int channel_mode,
-                                bool editable, int prerecord_time,
-                                bool monitor)
+                                bool editable, int prerecord_time)
 {
     bool is_mpeg1;
 
@@ -2462,7 +2461,7 @@ void audio_set_recording_options(int frequency, int quality,
 
     DEBUGF("mas_writemem(MAS_BANK_D0, SOFT_MUTE, %x)\n", shadow_soft_mute);
 
-    shadow_io_control_main = ((monitor?(1 << 10):0) | /* Monitoring ON */
+    shadow_io_control_main = ((1 << 10) | /* Monitoring ON */
         ((source < 2)?1:2) << 8) | /* Input select */
         (1 << 5) | /* SDO strobe invert */
         ((is_mpeg1?0:1) << 3) |
@@ -2647,8 +2646,7 @@ void audio_init_recording(void)
 }
 void audio_set_recording_options(int frequency, int quality,
                                 int source, int channel_mode,
-                                bool editable, int prerecord_time,
-                                int monitor)
+                                bool editable, int prerecord_time)
 {
     /* a dummy */
     (void)frequency;
@@ -2657,7 +2655,6 @@ void audio_set_recording_options(int frequency, int quality,
     (void)channel_mode;
     (void)editable;
     (void)prerecord_time;
-    (void)monitor;
 }
 #endif /* SIMULATOR */
 #endif /* CONFIG_CODEC == MAS3587F */

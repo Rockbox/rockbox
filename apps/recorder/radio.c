@@ -243,8 +243,7 @@ bool radio_screen(void)
                                1, /* Line In */
                                global_settings.rec_channels,
                                global_settings.rec_editable,
-                               global_settings.rec_prerecord_time,
-                               global_settings.rec_monitor);
+                               global_settings.rec_prerecord_time);
 
     
     audio_set_recording_gain(sound_default(SOUND_LEFT_GAIN),
@@ -919,8 +918,7 @@ static bool fm_recording_settings(void)
                                    1, /* Line In */
                                    global_settings.rec_channels,
                                    global_settings.rec_editable,
-                                   global_settings.rec_prerecord_time,
-                                   global_settings.rec_monitor);
+                                   global_settings.rec_prerecord_time);
     }
     return ret;
 }

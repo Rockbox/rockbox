@@ -94,8 +94,7 @@ void audio_resume_recording(void);
 void audio_new_file(const char *filename);
 void audio_set_recording_options(int frequency, int quality,
                                 int source, int channel_mode,
-                                bool editable, int prerecord_time,
-                                bool monitor);
+                                bool editable, int prerecord_time);
 void audio_set_recording_gain(int left, int right, int type);
 unsigned long audio_recorded_time(void);
 unsigned long audio_num_recorded_bytes(void);

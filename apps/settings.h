@@ -181,7 +181,6 @@ struct user_settings
     int rec_adc_right_gain; /* -128 .. 48 */
 #endif    
     bool rec_editable; /* true means that the bit reservoir is off */
-    bool rec_monitor; /* true means that one can listen to what is being recorded */
 
     /* note: timesplit setting is not saved */
     int rec_timesplit; /* 0 = off,

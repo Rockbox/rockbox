@@ -332,8 +332,7 @@ bool recording_screen(void)
                                global_settings.rec_source,
                                global_settings.rec_channels,
                                global_settings.rec_editable,
-                               global_settings.rec_prerecord_time,
-                               global_settings.rec_monitor);
+                               global_settings.rec_prerecord_time);
 
     set_gain();
 
@@ -594,8 +593,7 @@ bool recording_screen(void)
                                                global_settings.rec_source,
                                                global_settings.rec_channels,
                                                global_settings.rec_editable,
-                                               global_settings.rec_prerecord_time,
-                                               global_settings.rec_monitor);
+                                               global_settings.rec_prerecord_time);
                 
                     set_gain();
                     update_countdown = 1; /* Update immediately */
@@ -973,8 +971,7 @@ bool f2_rec_screen(void)
                                global_settings.rec_source,
                                global_settings.rec_channels,
                                global_settings.rec_editable,
-                               global_settings.rec_prerecord_time,
-                               global_settings.rec_monitor);
+                               global_settings.rec_prerecord_time);
 
     set_gain();
     
@@ -1068,8 +1065,7 @@ bool f3_rec_screen(void)
                                global_settings.rec_source,
                                global_settings.rec_channels,
                                global_settings.rec_editable,
-                               global_settings.rec_prerecord_time,
-                               global_settings.rec_monitor);
+                               global_settings.rec_prerecord_time);
                                                               
 
     set_gain();
