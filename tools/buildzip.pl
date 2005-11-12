@@ -54,6 +54,7 @@ sub buildzip {
     mkdir ".rockbox/langs", 0777;
     mkdir ".rockbox/rocks", 0777;
     mkdir ".rockbox/codecs", 0777;
+    mkdir ".rockbox/wps", 0777;
 
     my $c = 'find apps -name "*.codec" ! -empty -exec cp {} .rockbox/codecs/ \;';
     print `$c`;
