@@ -166,6 +166,27 @@
 #define WPS_KEYLOCK    (BUTTON_MENU | BUTTON_DOWN)
 #define WPS_ID3        (BUTTON_MENU | BUTTON_ON)
 
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+
+/* TODO: Check WPS button assignments */
+
+#define WPS_NEXT       (BUTTON_RIGHT | BUTTON_REL)
+#define WPS_NEXT_PRE   BUTTON_RIGHT
+#define WPS_PREV       (BUTTON_LEFT | BUTTON_REL)
+#define WPS_PREV_PRE   BUTTON_LEFT
+#define WPS_FFWD       (BUTTON_RIGHT | BUTTON_REPEAT)
+#define WPS_REW        (BUTTON_LEFT | BUTTON_REPEAT)
+#define WPS_INCVOL     BUTTON_UP
+#define WPS_DECVOL     BUTTON_DOWN
+#define WPS_PAUSE      BUTTON_OFF
+/* #define WPS_MENU    iPod can't have both main menu and context menu in wps */
+#define WPS_BROWSE     (BUTTON_MENU | BUTTON_REL)
+#define WPS_BROWSE_PRE BUTTON_MENU
+#define WPS_KEYLOCK    (BUTTON_MENU | BUTTON_DOWN)
+#define WPS_EXIT       (BUTTON_OFF | BUTTON_REPEAT)
+#define WPS_CONTEXT    (BUTTON_MENU | BUTTON_REPEAT)
+
+
 #endif
 
 extern bool keys_locked;

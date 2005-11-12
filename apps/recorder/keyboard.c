@@ -81,6 +81,17 @@
 #define KBD_ABORT BUTTON_OFF
 #define KBD_BACKSPACE (BUTTON_MENU | BUTTON_PLAY)
 
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+
+/* TODO: Check keyboard.c button mappings - this is a copy of Ondio */
+
+#define KBD_MODES /* Ondio uses 2 modes, picker and line edit */
+#define KBD_SELECT (BUTTON_MENU | BUTTON_REL) /* backspace in line edit */
+#define KBD_SELECT_PRE BUTTON_MENU
+#define KBD_DONE (BUTTON_MENU | BUTTON_REPEAT)
+#define KBD_ABORT BUTTON_OFF
+
+
 #endif
 
 #if KEYBOARD_PAGES == 1

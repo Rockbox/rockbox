@@ -68,6 +68,16 @@
 #define MENU_ENTER      BUTTON_RIGHT
 #define MENU_ENTER2     BUTTON_PLAY
 
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+
+/* TODO: Check menu button assignments */
+
+#define MENU_NEXT       BUTTON_DOWN
+#define MENU_PREV       BUTTON_UP
+#define MENU_EXIT       BUTTON_LEFT
+#define MENU_EXIT_MENU  BUTTON_MENU
+#define MENU_ENTER      BUTTON_RIGHT
+
 #endif
 
 struct menu_item {
