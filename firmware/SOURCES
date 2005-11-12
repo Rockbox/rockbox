@@ -37,11 +37,8 @@ common/strncpy.c
 common/strrchr.c
 common/strtok.c
 common/timefuncs.c
-#if CONFIG_CPU == SH7034
+#if (CONFIG_CPU == SH7034) || defined(CPU_COLDFIRE)
 common/memcpy_a.S
-common/memset_a.S
-#elif defined(CPU_COLDFIRE)
-common/memcpy.c
 common/memset_a.S
 #else
 common/memcpy.c
