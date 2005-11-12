@@ -930,8 +930,12 @@ void splash(int ticks,       /* how long the splash is displayed */
         x += w+SPACE; /*  pixels space! */
         next = strtok_r(NULL, " ", &store);
     }
-#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH > 1)
-    lcd_set_background(LCD_WHITE);
+#if LCD_DEPTH > 1
+#ifdef HAVE_LCD_COLOR
+        lcd_set_background((struct rgb){LCD_MAX_RED-1, LCD_MAX_GREEN-1, LCD_MAX_BLUE-1});
+#else
+        lcd_set_background(LCD_MAX_LEVEL-1);
+#endif
 #endif
     lcd_update();
 
