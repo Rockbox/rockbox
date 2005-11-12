@@ -20,7 +20,7 @@
 #ifndef __INTTYPES_H__ 
 #define __INTTYPES_H__ 
 
-#define int8_t char
+#define int8_t signed char
 #define int16_t short
 #define int32_t long
 #define int64_t long long
