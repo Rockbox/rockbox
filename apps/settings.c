@@ -876,7 +876,7 @@ void settings_apply(void)
 
     if ( global_settings.wps_file[0] &&
          global_settings.wps_file[0] != 0xff ) {
-        snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.wps",
+        snprintf(buf, sizeof buf, WPS_DIR "/%s.wps",
                  global_settings.wps_file);
         wps_load(buf, false);
     }
@@ -1278,7 +1278,7 @@ bool settings_save_config(void)
                  "#\r\n# wps / language / font \r\n#\r\n", appsversion);
 
     if (global_settings.wps_file[0] != 0)
-        fdprintf(fd, "wps: %s/%s.wps\r\n", ROCKBOX_DIR,
+        fdprintf(fd, "wps: %s/%s.wps\r\n", WPS_DIR,
                  global_settings.wps_file);
 
     if (global_settings.lang_file[0] != 0)

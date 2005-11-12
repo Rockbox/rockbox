@@ -31,6 +31,7 @@
 #define ROCKBOX_DIR_LEN 9
 #define FONT_DIR "/fonts"
 #define LANG_DIR "/langs"
+#define WPS_DIR ROCKBOX_DIR "/wps"
 #define PLUGIN_DIR ROCKBOX_DIR"/rocks"
 #define REC_BASE_DIR "/recordings"
 

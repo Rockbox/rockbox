@@ -992,7 +992,7 @@ static bool browse_current(void)
 
 static bool custom_wps_browse(void)
 {
-    return rockbox_browse(ROCKBOX_DIR, SHOW_WPS);
+    return rockbox_browse(WPS_DIR, SHOW_WPS);
 }
 
 static bool custom_cfg_browse(void)

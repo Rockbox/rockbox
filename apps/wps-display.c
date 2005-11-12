@@ -141,7 +141,7 @@ static void wps_display_images(void) {
 #endif
 
 /* Set format string to use for WPS, splitting it into lines */
-static void wps_format(const char* fmt)
+static void wps_format(const char* fmt, char *bmpdir, size_t bmpdirlen)
 {
     char* buf = format_buffer;
     char* start_of_line = format_buffer;
@@ -263,11 +263,11 @@ static void wps_format(const char* fmt)
                             if ((pos - ptr) <
                                 (int)sizeof(imgname)-ROCKBOX_DIR_LEN-2)
                             {
-                                memcpy(imgname, ROCKBOX_DIR, ROCKBOX_DIR_LEN);
-                                imgname[ROCKBOX_DIR_LEN] = '/';
-                                memcpy(&imgname[ROCKBOX_DIR_LEN+1],
+                                memcpy(imgname, bmpdir, bmpdirlen);
+                                imgname[bmpdirlen] = '/';
+                                memcpy(&imgname[bmpdirlen+1],
                                        ptr, pos - ptr);
-                                imgname[ROCKBOX_DIR_LEN+1+pos-ptr] = 0;
+                                imgname[bmpdirlen+1+pos-ptr] = 0;
                             }
                             else
                                 /* filename too long */
@@ -342,7 +342,11 @@ bool wps_load(const char* file, bool display)
     int i, s;
     char buffer[FORMAT_BUFFER_SIZE];
     int fd;
+    size_t bmpdirlen;
 
+    char *bmpdir = strrchr(file, '.');
+    bmpdirlen = bmpdir - file;
+    
     fd = open(file, O_RDONLY);
 
     if (fd >= 0)
@@ -364,7 +368,7 @@ bool wps_load(const char* file, bool display)
             }
 #endif
             buffer[numread] = 0;
-            wps_format(buffer);
+            wps_format(buffer, (char *)file, bmpdirlen);
         }
 
         close(fd);
@@ -1614,10 +1618,10 @@ bool wps_display(struct mp3entry* id3,
                            "%al%pc/%pt%ar[%pp:%pe]\n"
                            "%fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>\n"
                            "%pb\n"
-                           "%pm\n");
+                           "%pm\n", NULL, 0);
 #else
                 wps_format("%s%pp/%pe: %?it<%it|%fn> - %?ia<%ia|%d2> - %?id<%id|%d1>\n"
-                           "%pc%?ps<*|/>%pt\n");
+                           "%pc%?ps<*|/>%pt\n", NULL, 0);
 #endif
             }
         }
