@@ -28,6 +28,7 @@
 #include "string.h"
 #include "file.h"
 #include "buffer.h"
+#include "audio.h"
 
 #include "i2c-coldfire.h"
 #include "uda1380.h"
@@ -204,7 +205,7 @@ void uda1380_close(void)
  * sound samples over the I2S bus, which is connected
  * to the processor's IIS1 interface. 
  *
- * source_mic: true=record from microphone, false=record from line-in
+ * source_mic: true=record from microphone, false=record from line-in (or radio)
  */
 void uda1380_enable_recording(bool source_mic)
 {
@@ -246,17 +247,29 @@ void uda1380_disable_recording(void)
 /**
  * Set recording gain and volume
  * 
- * mic_gain    : range    0 .. 15 ->   0 .. 30 dB gain
- * linein_gain : range    0 .. 15 ->   0 .. 24 dB gain
- * 
- * adc_volume  : range -127 .. 48 -> -63 .. 24 dB gain
- *   note that 0 -> 0 dB gain..
+ * type:             params:        ranges:
+ * AUDIO_GAIN_MIC    left              0 .. 15 ->   0 .. 30 dB gain
+ * AUDIO_GAIN_LINEIN left & right      0 ..  8 ->   0 .. 24 dB gain
+ * AUDIO_GAIN_ADC    left & right   -128 .. 48 -> -64 .. 24 dB gain
+ *
+ * Note: For all types the value 0 gives 0 dB gain.
  */
-void uda1380_set_recvol(int mic_gain, int linein_gain, int adc_volume)
+void uda1380_set_recvol(int left, int right, int type)
 {
-    uda1380_write_reg(REG_DEC_VOL, DEC_VOLL(adc_volume) | DEC_VOLR(adc_volume));
-    uda1380_write_reg(REG_PGA, (uda1380_regs[REG_PGA] & ~PGA_GAIN_MASK) | PGA_GAINL(linein_gain) | PGA_GAINR(linein_gain));
-    uda1380_write_reg(REG_ADC, (uda1380_regs[REG_ADC] & ~VGA_GAIN_MASK) | VGA_GAIN(mic_gain));
+    switch (type)
+    {
+        case AUDIO_GAIN_MIC: 
+            uda1380_write_reg(REG_ADC, (uda1380_regs[REG_ADC] & ~VGA_GAIN_MASK) | VGA_GAIN(left));
+        break;
+        
+        case AUDIO_GAIN_LINEIN:
+            uda1380_write_reg(REG_PGA, (uda1380_regs[REG_PGA] & ~PGA_GAIN_MASK) | PGA_GAINL(left) | PGA_GAINR(right));
+        break;
+        
+        case AUDIO_GAIN_ADC:
+            uda1380_write_reg(REG_DEC_VOL, DEC_VOLL(left) | DEC_VOLR(right));
+        break;
+    }
 }
 
 

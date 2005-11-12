@@ -939,13 +939,13 @@ new:
 
 id: LANG_RECORDING_LEFT
 desc: in the recording screen
-eng: "Left"
+eng: "Gain Left"
 voice: ""
 new:
 
 id: LANG_RECORDING_RIGHT
 desc: in the recording screen
-eng: "Right"
+eng: "Gain Right"
 voice: ""
 new:
 
@@ -3351,4 +3351,22 @@ id: LANG_CROSSFADE_FADE_OUT_MODE
 desc: in crossfade settings menu
 eng: "Fade out mode"
 voice: "Fade out mode"
+new:
+
+id: LANG_RECORDING_ADC_RIGHT
+desc: in the recording settings
+eng: "ADC Gain Right"
+voice: "ADC Gain Right"
+new:
+
+id: LANG_RECORDING_ADC_LEFT
+desc: in the recording settings
+eng: "ADC Gain Left"
+voice: "ADC Gain Left"
+new:
+
+id: LANG_RECORDING_MONITOR
+desc: in the recording settings
+eng: "Monitor Mode"
+voice: "Monitor Mode"
 new:

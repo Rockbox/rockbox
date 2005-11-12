@@ -85,7 +85,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "dsp.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 29
+#define CONFIG_BLOCK_VERSION 30
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -407,6 +407,7 @@ static const struct bit_entry hd_bits[] =
 
 #ifdef HAVE_RECORDING
     {1, S_O(rec_startup), false, "rec screen on startup", off_on },
+    {1, S_O(rec_monitor), true, "monitor recording", off_on },
 
     /* values for the trigger */
     {8 | SIGNED, S_O(rec_start_thres), -35, "trigger start threshold", NULL},
@@ -448,6 +449,26 @@ static const struct bit_entry hd_bits[] =
 #ifdef HAVE_DIRCACHE
     {1, S_O(dircache), false, "dircache", off_on },
     {22, S_O(dircache_size), 0, NULL, NULL },
+#endif
+
+#if defined(HAVE_UDA1380)
+    /* recording settings for iriver */
+    {4, S_O(rec_timesplit), 0, "rec timesplit", /* 0...15 */
+        "off,00:05,00:10,00:15,00:30,01:00,01:14,01:20,02:00,04:00,06:00,08:00,10:00,12:00,18:00,24:00" },
+    {1, S_O(rec_channels), 0, "rec channels", "stereo,mono" },
+    {4, S_O(rec_mic_gain), 4, "rec mic gain", NULL },
+    {1, S_O(rec_source), 0 /* 0=mic */, "rec source", "mic,line" },
+    {3, S_O(rec_frequency), 0, /* 0=44.1kHz */
+        "rec frequency", "44,48,32,22,24,16" },
+    {4, S_O(rec_left_gain), 2, /* 0dB */
+        "rec left gain", NULL }, /* 0...15 */
+    {4, S_O(rec_right_gain), 2, /* 0dB */
+        "rec right gain", NULL }, /* 0...15 */
+    {5, S_O(rec_prerecord_time), 0, "prerecording time", NULL }, /* 0...30 */
+    {1, S_O(rec_directory), 0, /* rec_base_directory */
+        "rec directory", REC_BASE_DIR ",current" },
+    {8|SIGNED, S_O(rec_adc_left_gain),  0, /* 0dB */   "adc left gain", NULL }, /* -128...48 */
+    {8|SIGNED, S_O(rec_adc_right_gain), 0, /* 0dB */   "adc right gain", NULL }, /* -128...48 */
 #endif
 
     /* If values are just added to the end, no need to bump the version. */

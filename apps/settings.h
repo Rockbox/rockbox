@@ -176,7 +176,12 @@ struct user_settings
     int rec_mic_gain; /* 0-15 */
     int rec_left_gain; /* 0-15 */
     int rec_right_gain; /* 0-15 */
+#ifdef HAVE_UDA1380
+    int rec_adc_left_gain; /* -128 .. 48 */
+    int rec_adc_right_gain; /* -128 .. 48 */
+#endif    
     bool rec_editable; /* true means that the bit reservoir is off */
+    bool rec_monitor; /* true means that one can listen to what is being recorded */
 
     /* note: timesplit setting is not saved */
     int rec_timesplit; /* 0 = off,

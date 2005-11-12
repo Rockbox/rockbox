@@ -323,7 +323,7 @@ void init(void)
     sound_settings_apply();
 #endif
 #if defined(IRIVER_H100_SERIES) && !defined(SIMULATOR)
-    pcm_init_recording();
+    pcm_rec_init();
 #endif
     talk_init();
     /* runtime database has to be initialized after audio_init() */

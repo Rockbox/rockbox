@@ -33,6 +33,11 @@
 
 #define AUDIOERR_DISK_FULL 1
 
+#define AUDIO_GAIN_LINEIN   0
+#define AUDIO_GAIN_MIC      1
+#define AUDIO_GAIN_ADC      2   /* for UDA1380 */
+
+
 struct audio_debug
 {
         int audiobuflen;
@@ -78,6 +83,24 @@ void audio_error_clear(void);
 int audio_get_file_pos(void);
 void audio_beep(int duration);
 void audio_init_playback(void);
+
+/* audio recording functions */
+void audio_init_recording(void);
+void audio_close_recording(void);
+void audio_record(const char *filename);
+void audio_stop_recording(void);
+void audio_pause_recording(void);
+void audio_resume_recording(void);
+void audio_new_file(const char *filename);
+void audio_set_recording_options(int frequency, int quality,
+                                int source, int channel_mode,
+                                bool editable, int prerecord_time,
+                                bool monitor);
+void audio_set_recording_gain(int left, int right, int type);
+unsigned long audio_recorded_time(void);
+unsigned long audio_num_recorded_bytes(void);
+
+
 
 /***********************************************************************/
 /* audio event handling */

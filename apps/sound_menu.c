@@ -228,6 +228,28 @@ static bool receditable(void)
                     &global_settings.rec_editable);
 }
 
+static bool recmonitor(void)
+{
+    return set_bool(str(LANG_RECORDING_MONITOR),
+                    &global_settings.rec_monitor);
+}
+
+#ifdef HAVE_UDA1380
+static bool recadcleft(void)
+{
+    return set_sound(str(LANG_RECORDING_ADC_LEFT),
+                    &global_settings.rec_adc_left_gain,
+                    SOUND_ADC_LEFT_GAIN);
+}
+
+static bool recadcright(void)
+{
+    return set_sound(str(LANG_RECORDING_ADC_RIGHT),
+                    &global_settings.rec_adc_right_gain,
+                    SOUND_ADC_RIGHT_GAIN);
+}
+#endif
+
 static bool rectimesplit(void)
 {
     static const struct opt_items names[] = {
@@ -740,7 +762,7 @@ bool recording_menu(bool no_source)
 {
     int m;
     int i = 0;
-    struct menu_item items[10];
+    struct menu_item items[13];
     bool result;
 
     items[i].desc = ID2P(LANG_RECORDING_QUALITY);
@@ -753,6 +775,16 @@ bool recording_menu(bool no_source)
     }
     items[i].desc = ID2P(LANG_RECORDING_CHANNELS);
     items[i++].function = recchannels;
+    
+#ifdef HAVE_UDA1380
+    items[i].desc = ID2P(LANG_RECORDING_ADC_LEFT);
+    items[i++].function = recadcleft;
+    items[i].desc = ID2P(LANG_RECORDING_ADC_RIGHT);
+    items[i++].function = recadcright;
+#endif
+
+    items[i].desc = ID2P(LANG_RECORDING_MONITOR);
+    items[i++].function = recmonitor;
     items[i].desc = ID2P(LANG_RECORDING_EDITABLE);
     items[i++].function = receditable;
     items[i].desc = ID2P(LANG_RECORD_TIMESPLIT);

@@ -44,20 +44,11 @@
 #define MPEG_RESERVED_HEADER_SPACE (4096 + 576)
 
 #if (CONFIG_CODEC == MAS3587F) || defined(SIMULATOR)
-void mpeg_init_recording(void);
-void mpeg_record(const char *filename);
-void mpeg_new_file(const char *filename);
-void mpeg_set_recording_options(int frequency, int quality,
-                                int source, int channel_mode,
-                                bool editable, int prerecord_time);
-void mpeg_set_recording_gain(int left, int right, bool use_mic);
+
 #if CONFIG_TUNER & S1A0903X01
 int mpeg_get_mas_pllfreq(void);
 #endif
-unsigned long mpeg_recorded_time(void);
-unsigned long mpeg_num_recorded_bytes(void);
-void mpeg_pause_recording(void);
-void mpeg_resume_recording(void);
+
 #endif
 unsigned long mpeg_get_last_header(void);
 

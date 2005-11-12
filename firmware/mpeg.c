@@ -2115,7 +2115,7 @@ void audio_init_playback(void)
 /****************************************************************************
  * Recording functions
  ***************************************************************************/
-void mpeg_init_recording(void)
+void audio_init_recording(void)
 {
     init_recording_done = false;
     queue_post(&mpeg_queue, MPEG_INIT_RECORDING, NULL);
@@ -2224,7 +2224,7 @@ static void init_recording(void)
        call mpeg_set_recording_options(). */
 }
 
-void mpeg_record(const char *filename)
+void audio_record(const char *filename)
 {
     mpeg_errno = 0;
     
@@ -2234,12 +2234,12 @@ void mpeg_record(const char *filename)
     queue_post(&mpeg_queue, MPEG_RECORD, NULL);
 }
 
-void mpeg_pause_recording(void)
+void audio_pause_recording(void)
 {
     queue_post(&mpeg_queue, MPEG_PAUSE_RECORDING, NULL);
 }
 
-void mpeg_resume_recording(void)
+void audio_resume_recording(void)
 {
     queue_post(&mpeg_queue, MPEG_RESUME_RECORDING, NULL);
 }
@@ -2435,9 +2435,10 @@ static void stop_recording(void)
     resume_recording();
 }
 
-void mpeg_set_recording_options(int frequency, int quality,
+void audio_set_recording_options(int frequency, int quality,
                                 int source, int channel_mode,
-                                bool editable, int prerecord_time)
+                                bool editable, int prerecord_time,
+                                bool monitor)
 {
     bool is_mpeg1;
 
@@ -2461,7 +2462,7 @@ void mpeg_set_recording_options(int frequency, int quality,
 
     DEBUGF("mas_writemem(MAS_BANK_D0, SOFT_MUTE, %x)\n", shadow_soft_mute);
 
-    shadow_io_control_main = ((1 << 10) | /* Monitoring ON */
+    shadow_io_control_main = ((monitor?(1 << 10):0) | /* Monitoring ON */
         ((source < 2)?1:2) << 8) | /* Input select */
         (1 << 5) | /* SDO strobe invert */
         ((is_mpeg1?0:1) << 3) |
@@ -2497,13 +2498,13 @@ void mpeg_set_recording_options(int frequency, int quality,
 }
 
 /* If use_mic is true, the left gain is used */
-void mpeg_set_recording_gain(int left, int right, bool use_mic)
+void audio_set_recording_gain(int left, int right, int type)
 {
     /* Enable both left and right A/D */
     shadow_codec_reg0 = (left << 12) |
                         (right << 8) |
                         (left << 4) |
-                        (use_mic?0x0008:0) | /* Connect left A/D to mic */
+                        (type==AUDIO_GAIN_MIC?0x0008:0) | /* Connect left A/D to mic */
                         0x0007;
     mas_codec_writereg(0x0, shadow_codec_reg0);
 }
@@ -2539,7 +2540,7 @@ void audio_beep(int duration)
     while (current_tick - starttick < duration);
 }
 
-void mpeg_new_file(const char *filename)
+void audio_new_file(const char *filename)
 {
     mpeg_errno = 0;
 
@@ -2549,7 +2550,7 @@ void mpeg_new_file(const char *filename)
     queue_post(&mpeg_queue, MPEG_NEW_FILE, NULL);
 }
 
-unsigned long mpeg_recorded_time(void)
+unsigned long audio_recorded_time(void)
 {
     if(is_prerecording)
         return prerecord_count * HZ;
@@ -2565,7 +2566,7 @@ unsigned long mpeg_recorded_time(void)
     return 0;
 }
 
-unsigned long mpeg_num_recorded_bytes(void)
+unsigned long audio_num_recorded_bytes(void)
 {
     int num_bytes;
     int index;
@@ -2599,7 +2600,7 @@ void audio_init_playback(void)
 {
     /* a dummy */
 }
-unsigned long mpeg_recorded_time(void)
+unsigned long audio_recorded_time(void)
 {
     /* a dummy */
     return 0;
@@ -2609,42 +2610,42 @@ void audio_beep(int duration)
     /* a dummy */
     (void)duration;
 }
-void mpeg_pause_recording(void)
+void audio_pause_recording(void)
 {
     /* a dummy */
 }
-void mpeg_resume_recording(void)
+void audio_resume_recording(void)
 {
     /* a dummy */
 }
-unsigned long mpeg_num_recorded_bytes(void)
+unsigned long audio_num_recorded_bytes(void)
 {
     /* a dummy */
     return 0;
 }
-void mpeg_record(const char *filename)
+void audio_record(const char *filename)
 {
     /* a dummy */
     (void)filename;
 }
-void mpeg_new_file(const char *filename)
+void audio_new_file(const char *filename)
 {
     /* a dummy */
     (void)filename;
 }
 
-void mpeg_set_recording_gain(int left, int right, bool use_mic)
+void audio_set_recording_gain(int left, int right, int type)
 {
     /* a dummy */
     (void)left;
     (void)right;
-    (void)use_mic;
+    (void)type;
 }
-void mpeg_init_recording(void)
+void audio_init_recording(void)
 {
     /* a dummy */
 }
-void mpeg_set_recording_options(int frequency, int quality,
+void audio_set_recording_options(int frequency, int quality,
                                 int source, int channel_mode,
                                 bool editable, int prerecord_time)
 {
@@ -2708,6 +2709,12 @@ void audio_stop(void)
     is_playing = false;
     playing = false;
 #endif /* SIMULATOR */
+}
+
+/* dummy */
+void audio_stop_recording(void)
+{
+    audio_stop(); 
 }
 
 void audio_pause(void)

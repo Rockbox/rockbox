@@ -58,9 +58,6 @@
 #include "ata_mmc.h"
 #endif
 #include "logfdisp.h"
-#if defined(IRIVER_H100_SERIES) && !defined(SIMULATOR)
-extern bool pcm_rec_screen(void);
-#endif
 #if CONFIG_CODEC == SWCODEC
 #include "pcmbuf.h"
 #include "pcm_playback.h"
@@ -1781,7 +1778,6 @@ bool debug_menu(void)
         { "CPU frequency", dbg_cpufreq },
 #endif
 #if defined(IRIVER_H100_SERIES) && !defined(SIMULATOR)
-        { "PCM recording", pcm_rec_screen },
         { "S/PDIF analyzer", dbg_spdif },
 #endif
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE)

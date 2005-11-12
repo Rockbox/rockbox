@@ -17,37 +17,13 @@
  *
  ****************************************************************************/
 
-/*
- * Function names are taken from apps/recorder/recording.c to
- * make the integration later easier..
- * 
- */
-
 #ifndef PCM_RECORD_H
 #define PCM_RECORD_H
 
-unsigned long pcm_status(void);
+unsigned long pcm_rec_status(void);
+void pcm_rec_init(void);
+void pcm_rec_mux(int source);
 
-void pcm_init_recording(void);
-
-void pcm_open_recording(void);
-void pcm_close_recording(void);
-
-
-void pcm_set_recording_options(int source, bool enable_waveform);
-void pcm_set_recording_gain(int gain, int volume);
-                                
-void pcm_record(const char *filename);
-void pcm_stop_recording(void);
-
-//void pcm_new_file(const char *filename);
-
-
-unsigned long pcm_recorded_time(void);
-unsigned long pcm_num_recorded_bytes(void);
-void pcm_pause_recording(void);
-void pcm_resume_recording(void);
-
-void pcmrec_set_mux(int source);
+/* audio.h contains audio recording functions */
 
 #endif

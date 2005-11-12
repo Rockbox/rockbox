@@ -226,7 +226,7 @@ bool radio_screen(void)
     audio_stop();
 
 #if CONFIG_CODEC != SWCODEC
-    mpeg_init_recording();
+    audio_init_recording();
 
     sound_settings_apply();
 
@@ -238,23 +238,24 @@ bool radio_screen(void)
     if (global_settings.rec_prerecord_time)
         talk_buffer_steal(); /* will use the mp3 buffer */
 
-    mpeg_set_recording_options(global_settings.rec_frequency,
+    audio_set_recording_options(global_settings.rec_frequency,
                                global_settings.rec_quality,
                                1, /* Line In */
                                global_settings.rec_channels,
                                global_settings.rec_editable,
-                               global_settings.rec_prerecord_time);
+                               global_settings.rec_prerecord_time,
+                               global_settings.rec_monitor);
 
     
-    mpeg_set_recording_gain(sound_default(SOUND_LEFT_GAIN),
-                            sound_default(SOUND_RIGHT_GAIN), false);
+    audio_set_recording_gain(sound_default(SOUND_LEFT_GAIN),
+                            sound_default(SOUND_RIGHT_GAIN), AUDIO_GAIN_LINEIN);
 #else
     uda1380_enable_recording(false);
-    uda1380_set_recvol(0, 0, 10);
+    uda1380_set_recvol(10, 10, AUDIO_GAIN_LINEIN);
     uda1380_set_monitor(true);
 
     /* Set the input multiplexer to FM */
-    pcmrec_set_mux(1);
+    pcm_rec_mux(1);
 #endif
 #endif
 
@@ -345,14 +346,14 @@ bool radio_screen(void)
 #ifndef SIMULATOR
                 if(audio_status() == AUDIO_STATUS_RECORD)
                 {
-                    mpeg_new_file(rec_create_filename(buf));
+                    audio_new_file(rec_create_filename(buf));
                     update_screen = true;
                 }
                 else
                 {
                     have_recorded = true;
                     talk_buffer_steal(); /* we use the mp3 buffer */
-                    mpeg_record(rec_create_filename(buf));
+                    audio_record(rec_create_filename(buf));
                     update_screen = true;
                 }
 #endif
@@ -517,7 +518,7 @@ bool radio_screen(void)
             
 #ifndef SIMULATOR
 #if CONFIG_CODEC != SWCODEC
-            seconds = mpeg_recorded_time() / HZ;
+            seconds = audio_recorded_time() / HZ;
 #endif
 #endif
             if(update_screen || seconds > last_seconds)
@@ -609,8 +610,8 @@ bool radio_screen(void)
     {
 #if CONFIG_CODEC != SWCODEC
         /* Enable the Left and right A/D Converter */
-        mpeg_set_recording_gain(sound_default(SOUND_LEFT_GAIN),
-                                sound_default(SOUND_RIGHT_GAIN), false);
+        audio_set_recording_gain(sound_default(SOUND_LEFT_GAIN),
+                                sound_default(SOUND_RIGHT_GAIN), AUDIO_GAIN_LINEIN);
         mas_codec_writereg(6, 0x4000);
 #endif
         radio_set_status(FMRADIO_POWERED); /* leave it powered */
@@ -619,7 +620,7 @@ bool radio_screen(void)
     {
         radio_stop();
 #if CONFIG_CODEC == SWCODEC
-        pcmrec_set_mux(0); /* Line In */
+        pcm_rec_mux(0); /* Line In */
 #endif
     }
 
@@ -913,12 +914,13 @@ static bool fm_recording_settings(void)
         if (global_settings.rec_prerecord_time)
             talk_buffer_steal(); /* will use the mp3 buffer */
 
-        mpeg_set_recording_options(global_settings.rec_frequency,
+        audio_set_recording_options(global_settings.rec_frequency,
                                    global_settings.rec_quality,
                                    1, /* Line In */
                                    global_settings.rec_channels,
                                    global_settings.rec_editable,
-                                   global_settings.rec_prerecord_time);
+                                   global_settings.rec_prerecord_time,
+                                   global_settings.rec_monitor);
     }
     return ret;
 }

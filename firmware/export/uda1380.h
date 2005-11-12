@@ -32,7 +32,7 @@ extern void uda1380_set_nsorder(int order);
 
 extern void uda1380_enable_recording(bool source_mic);
 extern void uda1380_disable_recording(void);
-extern void uda1380_set_recvol(int mic_gain, int linein_gain, int adc_volume);
+extern void uda1380_set_recvol(int left, int right, int type);
 extern void uda1380_set_monitor(int enable);
 
 #define UDA1380_ADDR        0x30

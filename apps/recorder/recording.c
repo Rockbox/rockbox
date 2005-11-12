@@ -28,6 +28,13 @@
 #include "led.h"
 #include "mpeg.h"
 #include "audio.h"
+#if CONFIG_CODEC == SWCODEC
+#include "pcm_record.h"
+#endif
+#ifdef HAVE_UDA1380
+#include "uda1380.h"
+#endif
+
 #include "mp3_playback.h"
 #include "mas.h"
 #include "button.h"
@@ -79,9 +86,12 @@
 
 #elif CONFIG_KEYPAD == IRIVER_H100_PAD
 #define REC_STOPEXIT BUTTON_OFF
-#define REC_RECPAUSE BUTTON_ON
+#define REC_RECPAUSE BUTTON_REC
 #define REC_INC BUTTON_RIGHT
 #define REC_DEC BUTTON_LEFT
+#define REC_NEXT BUTTON_DOWN
+#define REC_PREV BUTTON_UP
+#define REC_SETTINGS BUTTON_MODE
 
 #elif CONFIG_KEYPAD == GMINI100_PAD
 #define REC_STOPEXIT BUTTON_OFF
@@ -102,6 +112,12 @@ bool f3_rec_screen(void);
 #define MAX_SOURCE   SOURCE_LINE
 #endif
 
+#if CONFIG_CODEC == SWCODEC
+#define REC_FILE_ENDING ".wav"
+#else
+#define REC_FILE_ENDING ".mp3"
+#endif
+
 #define MAX_FILE_SIZE 0x7FF00000 /* 2 GB - 1 MB */
 
 const char* const freq_str[6] =
@@ -118,13 +134,18 @@ static void set_gain(void)
 {
     if(global_settings.rec_source == SOURCE_MIC)
     {
-        mpeg_set_recording_gain(global_settings.rec_mic_gain, 0, true);
+        audio_set_recording_gain(global_settings.rec_mic_gain, 0, AUDIO_GAIN_MIC);
     }
     else
     {
-        mpeg_set_recording_gain(global_settings.rec_left_gain,
-                                global_settings.rec_right_gain, false);
+        audio_set_recording_gain(global_settings.rec_left_gain,
+                                global_settings.rec_right_gain, AUDIO_GAIN_LINEIN);
     }
+#ifdef HAVE_UDA1380
+    audio_set_recording_gain(global_settings.rec_adc_left_gain, 
+                             global_settings.rec_adc_right_gain, 
+                             AUDIO_GAIN_ADC);
+#endif    
 }
 
 static const char* const fmtstr[] =
@@ -176,9 +197,9 @@ char *rec_create_filename(char *buffer)
         strncpy(buffer, rec_base_directory, MAX_PATH);
 
 #ifdef HAVE_RTC 
-    create_datetime_filename(buffer, buffer, "R", ".mp3");
+    create_datetime_filename(buffer, buffer, "R", REC_FILE_ENDING);
 #else
-    create_numbered_filename(buffer, buffer, "rec_", ".mp3", 4);
+    create_numbered_filename(buffer, buffer, "rec_", REC_FILE_ENDING, 4);
 #endif
     return buffer;
 }
@@ -227,7 +248,7 @@ static void trigger_listener(int trigger_status)
             if((audio_status() & AUDIO_STATUS_RECORD) != AUDIO_STATUS_RECORD)
             {
               talk_buffer_steal(); /* we use the mp3 buffer */
-              mpeg_record(rec_create_filename(path_buffer));
+              audio_record(rec_create_filename(path_buffer));
 
               /* give control to mpeg thread so that it can start recording */
               yield(); yield(); yield();
@@ -236,7 +257,7 @@ static void trigger_listener(int trigger_status)
             /* if we're already recording this is a retrigger */
             else
             {
-                mpeg_new_file(rec_create_filename(path_buffer));
+                audio_new_file(rec_create_filename(path_buffer));
                 /* tell recording_screen to reset the time */
                 last_seconds = 0;
             }
@@ -273,6 +294,7 @@ bool recording_screen(void)
     char path_buffer[MAX_PATH];
     bool been_in_usb_mode = false;
     int last_audio_stat = -1;
+    int audio_stat;
 #if CONFIG_LED == LED_REAL
     bool led_state = false;
     int led_countdown = 2;
@@ -289,7 +311,7 @@ bool recording_screen(void)
 #if (CONFIG_LED == LED_REAL) && !defined(SIMULATOR)
     ata_set_led_enabled(false);
 #endif
-    mpeg_init_recording();
+    audio_init_recording();
 
     sound_set_volume(global_settings.volume);
     
@@ -298,15 +320,20 @@ bool recording_screen(void)
     
     peak_meter_enabled = true;
 
+#if CONFIG_CODEC == SWCODEC
+    audio_stop();
+#endif
+
     if (global_settings.rec_prerecord_time)
         talk_buffer_steal(); /* will use the mp3 buffer */
 
-    mpeg_set_recording_options(global_settings.rec_frequency,
+    audio_set_recording_options(global_settings.rec_frequency,
                                global_settings.rec_quality,
                                global_settings.rec_source,
                                global_settings.rec_channels,
                                global_settings.rec_editable,
-                               global_settings.rec_prerecord_time);
+                               global_settings.rec_prerecord_time,
+                               global_settings.rec_monitor);
 
     set_gain();
 
@@ -321,7 +348,12 @@ bool recording_screen(void)
 
     while(!done)
     {
-        int audio_stat = audio_status();
+#if CONFIG_CODEC == SWCODEC        
+        audio_stat = pcm_rec_status();
+#else
+        audio_stat = audio_status();
+#endif
+        
 #if CONFIG_LED == LED_REAL
 
         /*
@@ -390,7 +422,7 @@ bool recording_screen(void)
 
                 if(audio_stat & AUDIO_STATUS_RECORD)
                 {
-                    audio_stop();
+                    audio_stop_recording();
                 }
                 else
                 {
@@ -416,7 +448,7 @@ bool recording_screen(void)
                         /* manual recording */
                         have_recorded = true;
                         talk_buffer_steal(); /* we use the mp3 buffer */
-                        mpeg_record(rec_create_filename(path_buffer));
+                        audio_record(rec_create_filename(path_buffer));
                         last_seconds = 0;
                         if (global_settings.talk_menu)
                         {   /* no voice possible here, but a beep */
@@ -438,7 +470,7 @@ bool recording_screen(void)
                 {
                     if(audio_stat & AUDIO_STATUS_PAUSE)
                     {
-                        mpeg_resume_recording();
+                        audio_resume_recording();
                         if (global_settings.talk_menu)
                         {   /* no voice possible here, but a beep */
                             audio_beep(HZ/4); /* short beep on resume */
@@ -446,7 +478,7 @@ bool recording_screen(void)
                     }
                     else
                     {
-                        mpeg_pause_recording();
+                        audio_pause_recording();
                     }
                 }
                 update_countdown = 1; /* Update immediately */
@@ -535,7 +567,7 @@ bool recording_screen(void)
                            sound_min(SOUND_RIGHT_GAIN))
                             global_settings.rec_right_gain--;
                         break;
-                }
+                } 
                 set_gain();
                 update_countdown = 1; /* Update immediately */
                 break;
@@ -557,12 +589,13 @@ bool recording_screen(void)
                     if (global_settings.rec_prerecord_time)
                         talk_buffer_steal(); /* will use the mp3 buffer */
 
-                    mpeg_set_recording_options(global_settings.rec_frequency,
+                    audio_set_recording_options(global_settings.rec_frequency,
                                                global_settings.rec_quality,
                                                global_settings.rec_source,
                                                global_settings.rec_channels,
                                                global_settings.rec_editable,
-                                               global_settings.rec_prerecord_time);
+                                               global_settings.rec_prerecord_time,
+                                               global_settings.rec_monitor);
                 
                     set_gain();
                     update_countdown = 1; /* Update immediately */
@@ -596,7 +629,7 @@ bool recording_screen(void)
             case REC_F3:
                 if(audio_stat & AUDIO_STATUS_RECORD)
                 {
-                    mpeg_new_file(rec_create_filename(path_buffer));
+                    audio_new_file(rec_create_filename(path_buffer));
                     last_seconds = 0;
                 }
                 else
@@ -638,8 +671,8 @@ bool recording_screen(void)
 
         lcd_setfont(FONT_SYSFIXED);
 
-        seconds = mpeg_recorded_time() / HZ;
- 
+        seconds = audio_recorded_time() / HZ;
+        
         update_countdown--;
         if(update_countdown == 0 || seconds > last_seconds)
         {
@@ -660,7 +693,7 @@ bool recording_screen(void)
             lcd_puts(0, 0, buf);
 
             dseconds = rec_timesplit_seconds();
-            num_recorded_bytes = mpeg_num_recorded_bytes();
+            num_recorded_bytes = audio_num_recorded_bytes();
 
             if(audio_stat & AUDIO_STATUS_PRERECORD)
             {
@@ -699,7 +732,7 @@ bool recording_screen(void)
                 ((global_settings.rec_timesplit && (seconds >= dseconds))
                  || (num_recorded_bytes >= MAX_FILE_SIZE)))
             {
-                mpeg_new_file(rec_create_filename(path_buffer));
+                audio_new_file(rec_create_filename(path_buffer));
                 update_countdown = 1;
                 last_seconds = 0;
             }
@@ -784,7 +817,13 @@ bool recording_screen(void)
         }
     }
 
-    if(audio_status() & AUDIO_STATUS_ERROR)
+    
+#if CONFIG_CODEC == SWCODEC        
+    audio_stat = pcm_rec_status();
+#else
+    audio_stat = audio_status();
+#endif
+    if (audio_stat & AUDIO_STATUS_ERROR)
     {
         splash(0, true, str(LANG_DISK_FULL));
         status_draw(true);
@@ -799,7 +838,12 @@ bool recording_screen(void)
         }
     }
     
+#if CONFIG_CODEC == SWCODEC        
+    audio_stop_recording(); 
+    audio_close_recording();
+#else
     audio_init_playback();
+#endif
 
     /* make sure the trigger is really turned off */
     peak_meter_trigger(false);
@@ -924,12 +968,13 @@ bool f2_rec_screen(void)
     if (global_settings.rec_prerecord_time)
         talk_buffer_steal(); /* will use the mp3 buffer */
 
-    mpeg_set_recording_options(global_settings.rec_frequency,
+    audio_set_recording_options(global_settings.rec_frequency,
                                global_settings.rec_quality,
                                global_settings.rec_source,
                                global_settings.rec_channels,
                                global_settings.rec_editable,
-                               global_settings.rec_prerecord_time);
+                               global_settings.rec_prerecord_time,
+                               global_settings.rec_monitor);
 
     set_gain();
     
@@ -1018,12 +1063,14 @@ bool f3_rec_screen(void)
     if (global_settings.rec_prerecord_time)
         talk_buffer_steal(); /* will use the mp3 buffer */
 
-    mpeg_set_recording_options(global_settings.rec_frequency,
+    audio_set_recording_options(global_settings.rec_frequency,
                                global_settings.rec_quality,
                                global_settings.rec_source,
                                global_settings.rec_channels,
                                global_settings.rec_editable,
-                               global_settings.rec_prerecord_time);
+                               global_settings.rec_prerecord_time,
+                               global_settings.rec_monitor);
+                                                              
 
     set_gain();
 
@@ -1033,5 +1080,14 @@ bool f3_rec_screen(void)
     return false;
 }
 #endif /* #ifdef REC_F3 */
+
+#if CONFIG_CODEC == SWCODEC
+void audio_beep(int duration)
+{
+    /* dummy */
+    (void)duration;
+}
+#endif
+
 
 #endif /* HAVE_RECORDING */
