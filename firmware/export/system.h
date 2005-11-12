@@ -329,6 +329,8 @@ static inline int set_irq_level(int level)
   return result;
 }
 
+#define invalidate_icache()
+
 #elif CONFIG_CPU == TCC730
 
 extern int smsc_version(void);

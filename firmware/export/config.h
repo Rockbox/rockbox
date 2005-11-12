@@ -157,7 +157,13 @@
     (CONFIG_CPU == MCF5249) || /* Coldfire: core, plugins, codecs */ \
     (CONFIG_CPU == PP5020) ||  /* iPod: core, plugins, codecs */ \
     (CONFIG_CPU == TCC730))    /* CalmRISC16: core, (plugins, codecs) */
+#if CONFIG_CPU != PP5020
 #define ICODE_ATTR	__attribute__ ((section(".icode")))
+#else
+/* TODO: We get linker errors for the arm when putting code in IRAM so it
+         is temporarily disabled. */
+#define ICODE_ATTR
+#endif
 #define ICONST_ATTR __attribute__ ((section(".irodata")))
 #define IDATA_ATTR	__attribute__ ((section(".idata")))
 #define IBSS_ATTR	__attribute__ ((section(".ibss")))
