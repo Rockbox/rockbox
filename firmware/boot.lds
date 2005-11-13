@@ -79,10 +79,10 @@ SECTIONS
      stackend = .;
   }
 
-  /* The bss section is too large for IRAM - we just move it near the
-     end of the regular RAM. */
+  /* The bss section is too large for IRAM - we just move it 16MB into the
+     DRAM */
 
-  . = 0x11c00000;
+  . = (DRAMORIG+16*1024*1024);
   .bss : {
      _bssstart = .;
      *(.bss);

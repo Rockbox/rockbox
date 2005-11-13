@@ -23,6 +23,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "cpu.h"
 #include "system.h"
 #include "lcd.h"
@@ -34,7 +35,6 @@
 #include "font.h"
 #include "adc.h"
 #include "backlight.h"
-#include "button.h"
 #include "panic.h"
 #include "power.h"
 #include "file.h"
@@ -43,6 +43,14 @@
 #define IPOD_PP5020_RTC        0x60005010
 
 #define IPOD_HW_REVISION (*((volatile unsigned long*)(0x00002084)))
+
+#define BUTTON_LEFT  1
+#define BUTTON_MENU  2
+#define BUTTON_RIGHT 3
+#define BUTTON_PLAY  4
+
+/* Size of the buffer to store the loaded Rockbox/Linux image */
+#define MAX_LOADSIZE (4*1024*1024)
 
 char version[] = APPSVERSION;
 
@@ -115,7 +123,93 @@ int usleep(unsigned int usecs)
     return 0;
 }
 
-int load_firmware(void)
+
+static void ser_opto_keypad_cfg(int val)
+{
+    int start_time;
+
+    outl(inl(0x6000d004) & ~0x80, 0x6000d004);
+
+    outl(inl(0x7000c104) | 0xc000000, 0x7000c104);
+    outl(val, 0x7000c120);
+    outl(inl(0x7000c100) | 0x80000000, 0x7000c100);
+
+    outl(inl(0x6000d024) & ~0x10, 0x6000d024);
+    outl(inl(0x6000d014) | 0x10, 0x6000d014);
+
+    start_time = timer_get_current();
+    do {
+        if ((inl(0x7000c104) & 0x80000000) == 0) {
+            break;
+        }
+    } while (timer_check(start_time, 1500) != 0);
+
+    outl(inl(0x7000c100) & ~0x80000000, 0x7000c100);
+
+    outl(inl(0x6000d004) | 0x80, 0x6000d004);
+    outl(inl(0x6000d024) | 0x10, 0x6000d024);
+    outl(inl(0x6000d014) & ~0x10, 0x6000d014);
+
+    outl(inl(0x7000c104) | 0xc000000, 0x7000c104);
+    outl(inl(0x7000c100) | 0x60000000, 0x7000c100);
+}
+
+int opto_keypad_read(void)
+{
+    int loop_cnt, had_io = 0;
+
+    for (loop_cnt = 5; loop_cnt != 0;)
+    {
+        int key_pressed = 0;
+        int start_time;
+        unsigned int key_pad_val;
+
+        ser_opto_keypad_cfg(0x8000023a);
+
+        start_time = timer_get_current();
+        do {
+            if (inl(0x7000c104) & 0x4000000) {
+                had_io = 1;
+                break;
+            }
+
+            if (had_io != 0) {
+                break;
+            }
+        } while (timer_check(start_time, 1500) != 0);
+
+        key_pad_val = inl(0x7000c140);
+        if ((key_pad_val & ~0x7fff0000) != 0x8000023a) {
+            loop_cnt--;
+        } else {
+            key_pad_val = (key_pad_val << 11) >> 27;
+            key_pressed = 1;
+        }
+
+        outl(inl(0x7000c100) | 0x60000000, 0x7000c100);
+        outl(inl(0x7000c104) | 0xc000000, 0x7000c104);
+
+        if (key_pressed != 0) {
+            return key_pad_val ^ 0x1f;
+        }
+    }
+
+    return 0;
+}
+
+static int key_pressed(void)
+{
+    unsigned char state;
+
+    state = opto_keypad_read();
+    if ((state & 0x4) == 0) return BUTTON_LEFT;
+    if ((state & 0x10) == 0) return BUTTON_MENU;
+    if ((state & 0x8) == 0) return BUTTON_PLAY;
+    if ((state & 0x2) == 0) return BUTTON_RIGHT;
+    return 0;
+}
+
+int load_rockbox(unsigned char* buf)
 {
     int fd;
     int rc;
@@ -124,36 +218,31 @@ int load_firmware(void)
     char model[5];
     unsigned long sum;
     int i;
-    unsigned char *buf = (unsigned char *)DRAM_START;
     char str[80];
     
     fd = open("/rockbox.ipod", O_RDONLY);
     if(fd < 0)
-    return -1;
+        return -1;
 
     len = filesize(fd) - 8;
 
-    snprintf(str, 80, "Length: %x", len);
-    lcd_puts(0, line++, str);
-    lcd_update();
+    if (len > MAX_LOADSIZE)
+        return -6;
 
     lseek(fd, FIRMWARE_OFFSET_FILE_CRC, SEEK_SET);
     
     rc = read(fd, &chksum, 4);
+    chksum=betoh32(chksum); /* Rockbox checksums are big-endian */
     if(rc < 4)
-    return -2;
-
-    snprintf(str, 80, "Checksum: %x", chksum);
-    lcd_puts(0, line++, str);
-    lcd_update();
+        return -2;
 
     rc = read(fd, model, 4);
     if(rc < 4)
-    return -3;
+        return -3;
 
     model[4] = 0;
     
-    snprintf(str, 80, "Model name: %s", model);
+    snprintf(str, 80, "Model: %s, Checksum: %x", model, chksum);
     lcd_puts(0, line++, str);
     lcd_update();
 
@@ -161,14 +250,14 @@ int load_firmware(void)
 
     rc = read(fd, buf, len);
     if(rc < len)
-    return -4;
+        return -4;
 
     close(fd);
 
     sum = MODEL_NUMBER;
     
     for(i = 0;i < len;i++) {
-    sum += buf[i];
+        sum += buf[i];
     }
 
     snprintf(str, 80, "Sum: %x", sum);
@@ -178,8 +267,39 @@ int load_firmware(void)
     if(sum != chksum)
     return -5;
 
-    return 0;
+    return len;
 }
+
+
+int load_linux(unsigned char* buf) {
+    int fd;
+    int rc;
+    int len;
+    char str[80];
+
+    fd=open("/linux.bin",O_RDONLY);
+    if (fd < 0)
+        return -1;
+
+    len=filesize(fd);
+    if (len > MAX_LOADSIZE)
+        return -6;
+
+    rc=read(fd,buf,len);
+
+    if (rc < len)
+        return -4;
+
+    snprintf(str, 80, "Loaded Linux: %d bytes", len);
+    lcd_puts(0, line++, str);
+    lcd_update();
+
+    return len;
+}
+
+
+/* A buffer to load the Linux kernel or Rockbox into */
+unsigned char loadbuffer[MAX_LOADSIZE];
 
 void* main(void)
 {
@@ -196,7 +316,6 @@ void* main(void)
     /* Turn on the backlight */
 
 #if CONFIG_BACKLIGHT==BL_IPOD4G
-
     /* brightness full */
     outl(0x80000000 | (0xff << 16), 0x7000a010);
 
@@ -277,31 +396,49 @@ void* main(void)
     lcd_puts(0, line++, buf);
     lcd_update();
 
-#if 0
-    /* The following code will load and run an ipodlinux kernel - we will
-       enable it once the button driver is written and we can detect key
-       presses */
-    int fd=open("/linux.bin",O_RDONLY);
-    if (fd >= 0) {
-      i=filesize(fd);
-      int n=read(fd,(void*)DRAM_START,i);
-      if (n==i) {
-          /* We return the entry point for the loaded kernel */
-          return DRAM_START;
-      } else {
-          /* What do we do now?  We may have overwritten the copy of the 
-             original firmware with our incomplete copy of the Linux 
-             kernel... */
-      }
-    }
-#endif
+    /* Check for a keypress */
+    i=key_pressed();
 
-    /* Pause for 5 seconds so we can see what's happened*/
-    usleep(5000000);
+    if (i==BUTTON_MENU) {
+        lcd_puts(0, line, "Loading Rockbox...");
+        lcd_update();
+        rc=load_rockbox(loadbuffer);
+        if (rc < 0) {
+            snprintf(buf, sizeof(buf), "Rockbox error: %d",rc);
+            lcd_puts(0, line++, buf);
+            lcd_update();
+        } else {
+            lcd_puts(0, line++, "Rockbox loaded.");
+            lcd_update();
+#if 0
+            /* Rockbox is not yet runable, so we disable this */
+            memcpy((void*)DRAM_START,loadbuffer,rc);
+            return (void*)DRAM_START;
+#endif
+        }
+    }
+
+    if (i==BUTTON_PLAY) {
+        lcd_puts(0, line, "Loading Linux...");
+        lcd_update();
+        rc=load_linux(loadbuffer);
+        if (rc < 0) {
+            snprintf(buf, sizeof(buf), "Linux error: %d",rc);
+            lcd_puts(0, line++, buf);
+            lcd_update();
+        } else {
+            memcpy((void*)DRAM_START,loadbuffer,rc);
+            return (void*)DRAM_START;
+        }
+    }
 
     /* If everything else failed, try the original firmware */
+
     lcd_puts(0, line, "Loading original firmware...");
     lcd_update();
+
+    /* Pause for 5 seconds so we can see what's happened */
+    usleep(5000000);
 
     entry = tblp->addr + tblp->entryOffset;
     if (imageno || ((int)tblp->addr & 0xffffff) != 0) {
@@ -317,10 +454,6 @@ void* main(void)
    them here because the originals do a lot more than we want */
 
 void reset_poweroff_timer(void)
-{
-}
-
-void screen_dump(void)
 {
 }
 
