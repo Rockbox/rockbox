@@ -140,7 +140,11 @@ long oggpack_look(oggpack_buffer *b,int bits){
 }
 
 /* limited to 32 at a time */
+#if CONFIG_CPU!=PP5020
+/* TODO: This function (and this function only) causes a "relocation
+   truncated to fit: R_ARM_PC24" error when in IRAM on ARM targets */
 void oggpack_adv(oggpack_buffer *b,int bits) ICODE_ATTR;
+#endif
 void oggpack_adv(oggpack_buffer *b,int bits){
   bits+=b->headbit;
   b->headbit=bits&7;
