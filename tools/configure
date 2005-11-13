@@ -170,7 +170,7 @@ coldfirecc () {
 
 arm7tdmicc () {
  prefixtools arm-elf-
- GCCOPTS="$CCOPTS -mcpu=arm7tdmi"
+ GCCOPTS="$CCOPTS -mcpu=arm7tdmi -ffunction-sections -mlong-calls"
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
 }
