@@ -150,7 +150,7 @@ static void set_gain(void)
 
 static const char* const fmtstr[] =
 {
-    "",                 /* no decimals */
+    "%d %s",            /* no decimals */
     "%d.%d %s  ",       /* 1 decimal */
     "%d.%02d %s  "      /* 2 decimals */
 };
@@ -164,10 +164,15 @@ char *fmt_gain(int snd, int val, char *str, int len)
     numdec = sound_numdecimals(snd);
     unit = sound_unit(snd);
     
-    i = tmp / (10*numdec);
-    d = abs(tmp % (10*numdec));
+    if(numdec)
+    {
+        i = tmp / (10*numdec);
+        d = abs(tmp % (10*numdec));
+        snprintf(str, len, fmtstr[numdec], i, d, unit);
+    }
+    else
+        snprintf(str, len, fmtstr[numdec], tmp, unit);
     
-    snprintf(str, len, fmtstr[numdec], i, d, unit);
     return str;
 }
 
@@ -175,18 +180,27 @@ static int cursor;
 
 void adjust_cursor(void)
 {
-    if(global_settings.rec_source == SOURCE_LINE)
-    {
-        if(cursor < 0)
-            cursor = 0;
+    int max_cursor;
     
-        if(cursor > 2)
-            cursor = 2;
-    }
-    else
-    {
+    if(cursor < 0)
         cursor = 0;
+
+    switch(global_settings.rec_source)
+    {
+    case SOURCE_MIC:
+        max_cursor = 1;
+        break;
+        
+    case SOURCE_LINE:
+        max_cursor = 3;
+        break;
+    default:
+        max_cursor = 0;
+        break;
     }
+    
+    if(cursor > max_cursor)
+        cursor = max_cursor;
 }
 
 char *rec_create_filename(char *buffer)
@@ -504,6 +518,13 @@ bool recording_screen(void)
                 switch(cursor)
                 {
                     case 0:
+                        if(global_settings.volume <
+                           sound_max(SOUND_VOLUME))
+                            global_settings.volume++;
+                        sound_set_volume(global_settings.volume);
+                        break;
+                        
+                    case 1:
                         if(global_settings.rec_source == SOURCE_MIC)
                         {
                             if(global_settings.rec_mic_gain <
@@ -520,12 +541,12 @@ bool recording_screen(void)
                             global_settings.rec_right_gain = gain;
                         }
                         break;
-                    case 1:
+                    case 2:
                         if(global_settings.rec_left_gain <
                            sound_max(SOUND_LEFT_GAIN))
                             global_settings.rec_left_gain++;
                         break;
-                    case 2:
+                    case 3:
                         if(global_settings.rec_right_gain <
                            sound_max(SOUND_RIGHT_GAIN))
                             global_settings.rec_right_gain++;
@@ -540,6 +561,13 @@ bool recording_screen(void)
                 switch(cursor)
                 {
                     case 0:
+                        if(global_settings.volume >
+                           sound_min(SOUND_VOLUME))
+                            global_settings.volume--;
+                        sound_set_volume(global_settings.volume);
+                        break;
+                        
+                    case 1:
                         if(global_settings.rec_source == SOURCE_MIC)
                         {
                             if(global_settings.rec_mic_gain >
@@ -556,17 +584,17 @@ bool recording_screen(void)
                             global_settings.rec_right_gain = gain;
                         }
                         break;
-                    case 1:
+                    case 2:
                         if(global_settings.rec_left_gain >
                            sound_min(SOUND_LEFT_GAIN))
                             global_settings.rec_left_gain--;
                         break;
-                    case 2:
+                    case 3:
                         if(global_settings.rec_right_gain >
                            sound_min(SOUND_RIGHT_GAIN))
                             global_settings.rec_right_gain--;
                         break;
-                } 
+                }
                 set_gain();
                 update_countdown = 1; /* Update immediately */
                 break;
@@ -594,7 +622,8 @@ bool recording_screen(void)
                                                global_settings.rec_channels,
                                                global_settings.rec_editable,
                                                global_settings.rec_prerecord_time);
-                
+
+                    adjust_cursor();
                     set_gain();
                     update_countdown = 1; /* Update immediately */
 
@@ -735,6 +764,16 @@ bool recording_screen(void)
                 last_seconds = 0;
             }
 
+            snprintf(buf, 32, "%s: %s", str(LANG_VOLUME),
+                     fmt_gain(SOUND_VOLUME,
+                              global_settings.volume,
+                              buf2, sizeof(buf2)));
+            
+            if (global_settings.invert_cursor && (pos++ == cursor))
+                lcd_puts_style(0, 3, buf, STYLE_INVERT);
+            else
+                lcd_puts(0, 3, buf);
+
             if(global_settings.rec_source == SOURCE_MIC)
             {
                 snprintf(buf, 32, "%s: %s", str(LANG_RECORDING_GAIN),
@@ -774,18 +813,15 @@ bool recording_screen(void)
                              fmt_gain(SOUND_RIGHT_GAIN,
                                       global_settings.rec_right_gain,
                                       buf2, sizeof(buf2)));
-                    if (global_settings.invert_cursor && (pos++ == cursor))
+                    if (global_settings.invert_cursor && (pos == cursor))
                         lcd_puts_style(0, 6, buf, STYLE_INVERT);
                     else
                         lcd_puts(0, 6, buf);
                 }
             }
 
-#ifdef SOURCE_SPDIF
-            if(global_settings.rec_source != SOURCE_SPDIF)
-#endif
-                put_cursorxy(0, 4 + cursor, true);
-
+            put_cursorxy(0, 3 + cursor, true);
+            
             if (global_settings.rec_source != SOURCE_LINE) {
                 snprintf(buf, 32, "%s %s [%d]",
                          freq_str[global_settings.rec_frequency],
