@@ -61,6 +61,10 @@
 #include "sound.h"
 #include "metadata.h"
 #include "talk.h"
+#ifdef CONFIG_TUNER
+#include "radio.h"
+#include "power.h"
+#endif
 
 static volatile bool audio_codec_loaded;
 static volatile bool voice_codec_loaded;
@@ -1696,6 +1700,13 @@ void audio_thread(void)
                     audio_stop_playback();
                     paused = false;
                 }
+
+#ifdef CONFIG_TUNER
+                /* check if radio is playing */
+                if(radio_get_status() != FMRADIO_OFF){
+		    radio_stop();
+                }
+#endif
             
                 logf("starting...");
                 playing = true;
@@ -2079,6 +2090,19 @@ int audio_status(void)
         ret |= AUDIO_STATUS_PAUSE;
     
     return ret;
+}
+
+void set_audio_status(int status)
+{
+    if (status & AUDIO_STATUS_PLAY)
+        playing = true;
+    else
+        playing = false;
+
+    if (status & AUDIO_STATUS_PAUSE)
+        paused = true;
+    else
+        paused = false;
 }
 
 int audio_get_file_pos(void)
