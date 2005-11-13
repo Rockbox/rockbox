@@ -1,3 +1,4 @@
+#if CONFIG_CPU!=PP5020  /* Temporarily disable plugin building for iPod */
 /* plugins common to all models */
 battery_test.c
 chessclock.c
@@ -83,3 +84,4 @@ midi2wav.c
 splitedit.c
 metronome.c
 #endif
+#endif /* PP5020 */
