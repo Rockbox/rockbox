@@ -2833,6 +2833,22 @@ int audio_status(void)
     return ret;
 }
 
+void set_audio_status(int status)
+{
+
+    
+    if (status & AUDIO_STATUS_PLAY)
+        is_playing = true;
+    else
+        is_playing = false;
+
+    if (status & AUDIO_STATUS_PAUSE)
+        paused = true;
+    else
+        paused = false;
+
+}
+
 unsigned int audio_error(void)
 {
     return mpeg_errno;
