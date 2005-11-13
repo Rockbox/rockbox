@@ -75,9 +75,16 @@ cop_wake_start:
     ldr    pc, [r0]
 
 1:
-    /* setup some stack */
-    ldr    sp, = _stackbegin
-
+    /* setup some stack and munge it with 0xdeadbeef */
+    ldr    sp, =_stackend
+    mov    r3, sp
+    ldr    r2, =_stackbegin
+    ldr    r4, =0xdeadbeef
+.mungeloop:
+    str    r4, [r2], #4
+    cmp    r2, r3
+    bne    .mungeloop
+    
     /* get the high part of our execute address */
     ldr    r2, =0xffffff00
     and    r4, pc, r2
