@@ -2092,19 +2092,6 @@ int audio_status(void)
     return ret;
 }
 
-void set_audio_status(int status)
-{
-    if (status & AUDIO_STATUS_PLAY)
-        playing = true;
-    else
-        playing = false;
-
-    if (status & AUDIO_STATUS_PAUSE)
-        paused = true;
-    else
-        paused = false;
-}
-
 int audio_get_file_pos(void)
 {
     return 0;
