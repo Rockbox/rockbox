@@ -879,7 +879,7 @@ void splash(int ticks,       /* how long the splash is displayed */
         int xx = (LCD_WIDTH-maxw)/2 - 2;
         /* The new graphics routines handle clipping, so no need to check */
 #if LCD_DEPTH > 1
-        lcd_set_background(LCD_WHITE);
+        lcd_set_background(LCD_LIGHTGRAY);
 #endif
         lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
         lcd_fillrect(xx, y-2, maxw+4, LCD_HEIGHT-y*2+4);

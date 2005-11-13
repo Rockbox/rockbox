@@ -148,10 +148,14 @@ struct rgb {
     unsigned char blue;
 };
 #define LCD_BLACK ((struct rgb){0, 0, 0})
+#define LCD_DARKGRAY ((struct rgb){LCD_MAX_RED/3, LCD_MAX_GREEN/3, LCD_MAX_BLUE/3})
+#define LCD_LIGHTGRAY ((struct rgb){2*LCD_MAX_RED/3, 2*LCD_MAX_GREEN/3, 2*LCD_MAX_BLUE/3})
 #define LCD_WHITE ((struct rgb){LCD_MAX_RED, LCD_MAX_GREEN, LCD_MAX_BLUE})
 #else /* monochrome */
 #define LCD_MAX_LEVEL ((1 << LCD_DEPTH) - 1)
 #define LCD_BLACK 0
+#define LCD_DARKGRAY (LCD_MAX_LEVEL/3)
+#define LCD_LIGHTGRAY (2*LCD_MAX_LEVEL/3)
 #define LCD_WHITE LCD_MAX_LEVEL
 #endif
 
