@@ -42,12 +42,12 @@ struct regs
     void         *start; /* Thread start address, or NULL when started */
 };
 #elif CONFIG_CPU == PP5020
-/* TODO: define struct regs */
 struct regs
 {
-    void *sp;    /* Stack pointer (a15) */
-    void *start; /* Thread start address */
-    int started; /* 0 when not started */
+    unsigned int r[9];   /* Registers r4-r12 */
+    void         *sp;    /* Stack pointer (r13) */
+    unsigned int lr;     /* r14 (lr) */
+    void         *start; /* Thread start address, or NULL when started */
 };
 #elif CONFIG_CPU == TCC730
 struct regs
@@ -79,17 +79,35 @@ static inline void store_context(void* addr) __attribute__ ((always_inline));
 static inline void load_context(const void* addr) __attribute__ ((always_inline));
 
 #if CONFIG_CPU == PP5020
-
-/* TODO: Implement store_context and load_context */
-
+/*--------------------------------------------------------------------------- 
+ * Store non-volatile context.
+ *---------------------------------------------------------------------------
+ */
 static inline void store_context(void* addr)
 {
-  (void)addr;
+    asm volatile(
+        "stmia %0, { r4-r14 }\n"
+        : : "r" (addr)
+    );
 }
 
+/*---------------------------------------------------------------------------
+ * Load non-volatile context.
+ *---------------------------------------------------------------------------
+ */
 static inline void load_context(const void* addr)
 {
-  (void)addr;
+    asm volatile(
+        "ldmia %0, { r4-r14 }   \n" /* load regs r4 to r14 from context */
+        "ldr r0, [%0, #44]      \n" /* load start pointer */
+        "mov r1, #0             \n"
+        "cmp r0, r1             \n" /* check for NULL */
+        "beq .running           \n" /* if it's NULL, we're already running */
+        "str r1, [%0, #44]      \n"
+        "mov pc, r0             \n" /* not already running, so jump to start */
+    ".running:                  \n"
+        : : "r" (addr) : "r0", "r1"
+    );
 }
 
 
@@ -312,7 +330,7 @@ int create_thread(void (*function)(void), void* stack, int stack_size,
     thread_stack[num_threads] = stack;
     thread_stack_size[num_threads] = stack_size;
     regs = &thread_contexts[num_threads];
-#if defined(CPU_COLDFIRE) || (CONFIG_CPU == SH7034)
+#if defined(CPU_COLDFIRE) || (CONFIG_CPU == SH7034) || (CONFIG_CPU == PP5020)
     /* Align stack to an even 32 bit boundary */
     regs->sp = (void*)(((unsigned int)stack + stack_size) & ~3);
 #elif CONFIG_CPU == TCC730
@@ -360,12 +378,10 @@ void init_threads(void)
     thread_name[0] = main_thread_name;
     thread_stack[0] = stackbegin;
     thread_stack_size[0] = (int)stackend - (int)stackbegin;
-#if defined(CPU_COLDFIRE) || (CONFIG_CPU == SH7034)
+#if defined(CPU_COLDFIRE) || (CONFIG_CPU == SH7034) || (CONFIG_CPU == PP5020)
     thread_contexts[0].start = 0; /* thread 0 already running */
 #elif CONFIG_CPU == TCC730
     thread_contexts[0].started = 1;
-#elif CONFIG_CPU == PP5020
-    thread_contexts[0].start = 0; /* thread 0 already running */
 #endif
     num_sleepers = 0;
 }

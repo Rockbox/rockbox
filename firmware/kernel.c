@@ -67,10 +67,6 @@ void sleep(int ticks)
 
 void yield(void)
 {
-#if CONFIG_CPU == PP5020
-    /* TODO: Threading not yet implemented */
-    return;
-#endif
     switch_thread();
     wake_up_thread();
 }
