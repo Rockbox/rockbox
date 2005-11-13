@@ -3370,3 +3370,21 @@ desc: in the recording settings
 eng: "Monitor Mode"
 voice: "Monitor Mode"
 new:
+
+id: LANG_RADIO_SCAN_MODE
+desc: in radio screen
+eng: "Scan Mode"
+voice: ""
+new:
+
+id: LANG_RADIO_PRESET_MODE
+desc: in radio screen
+eng: "Preset Mode"
+voice: ""
+new:
+
+id: LANG_FM_FREEZE
+desc: error message when preset list is empty
+eng: "Screen frozen!"
+voice: ""
+new:
