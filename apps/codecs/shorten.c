@@ -78,6 +78,12 @@ next_track:
     /* Shorten decoder initialization */
     ci->memset(&sc, 0, sizeof(ShortenContext));
 
+    /* Skip id3v2 tags */
+    if (ci->id3->first_frame_offset) {
+        buf = ci->request_buffer(&bytesleft, ci->id3->first_frame_offset);
+        ci->advance_buffer(ci->id3->first_frame_offset);
+    }
+
     /* Read the shorten & wave headers */
     buf = ci->request_buffer(&bytesleft, MAX_FRAMESIZE);
     res = shorten_init(&sc, buf, bytesleft);
@@ -86,9 +92,18 @@ next_track:
         return CODEC_ERROR;
     }
 
-    ci->configure(DSP_SET_FREQUENCY, (long *)(sc.sample_rate));
     ci->id3->frequency = sc.sample_rate;
-    ci->id3->length = (sc.totalsamples / sc.sample_rate) * 1000;
+    ci->configure(DSP_SET_FREQUENCY, (long *)(sc.sample_rate));
+
+    if (sc.sample_rate) {
+        ci->id3->length = (sc.totalsamples / sc.sample_rate) * 1000;
+    } else {
+        ci->id3->length = 0;
+    }
+
+    if (ci->id3->length) {
+        ci->id3->bitrate = (ci->id3->filesize * 8) / ci->id3->length;
+    }
 
     consumed = sc.gb.index/8;
     ci->advance_buffer(consumed);
@@ -112,7 +127,7 @@ seek_start:
 
         /* Seek to start of track */
         if (ci->seek_time == 1) {
-            if (ci->seek_buffer(sc.header_bits/8)) {
+            if (ci->seek_buffer(sc.header_bits/8 + ci->id3->first_frame_offset)) {
                 sc.bitindex = sc.header_bits - 8*(sc.header_bits/8);
                 ci->set_elapsed(0);
                 ci->seek_complete();

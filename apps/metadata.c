@@ -1520,6 +1520,16 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
 
         break;
 
+    case AFMT_SHN:
+        track->id3.vbr = true;
+        track->id3.filesize = filesize(fd);
+        if (!skip_id3v2(fd, &(track->id3)))
+        {
+            return false;
+        }
+        /* TODO: read the id3v2 header if it exists */
+        break;
+
     /* If we don't know how to read the metadata, just store the filename */
     default:
         break;

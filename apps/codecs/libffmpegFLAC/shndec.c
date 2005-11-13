@@ -24,11 +24,6 @@
  *
  */
  
-#include "../codec.h"
-#include "../lib/codeclib.h"
-extern struct codec_api* ci;
-#define DEBUGF ci->debugf
-
 #include "bitstream.h"
 #include "golomb.h"
 #include "shndec.h"
