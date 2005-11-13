@@ -463,13 +463,6 @@ vectors:
     /* Platform:     iRiver H320/H340 */
 
     /* Fill in code here */
-#elif CONFIG_CPU == PP5020
-    /* Platform:     iPod */
-
-#warning TODO: Implement crt0.S
-
-    /* Fill in code here */
-
 #else
     /* Platform:     Archos Jukebox */
 
