@@ -3144,9 +3144,9 @@ voice: "Optical output"
 new:
 
 id: LANG_NEXT_FOLDER
-desc: in settings_menu. Should we allow skip directories and move to next folder when current one ends
-eng: "Directory navigation"
-voice: "Directory navigation"
+desc: in settings_menu. Should we allow move to next/prev folder from last/first track of current one
+eng: "Auto change directory"
+voice: "Auto change directory"
 new:
 
 id: LANG_RUNTIMEDB_ACTIVE
