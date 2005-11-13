@@ -229,9 +229,6 @@ int read_line(int fd, char* buffer, int buffer_size)
 #elif LCD_DEPTH <= 8
 #define BMP_BPP 8
 #define BMP_LINESIZE ((LCD_WIDTH + 3) & ~3)
-#elif LCD_DEPTH <= 16
-#define BMP_BPP 16
-#define BMP_LINESIZE ((LCD_WIDTH*2 + 3) & ~3)
 #else
 #define BMP_BPP 24
 #define BMP_LINESIZE ((LCD_WIDTH*3 + 3) & ~3)
@@ -279,15 +276,23 @@ static void (*screen_dump_hook)(int fh) = NULL;
 void screen_dump(void)
 {
     int fh;
-    int bx, by, iy;
-    int src_byte;
     char filename[MAX_PATH];
+    int bx, by;
+#if LCD_DEPTH < 16
+    int iy;
+    int src_byte;
+#endif
 #if LCD_DEPTH == 1
     int ix, src_mask, dst_mask;
     static unsigned char line_block[8][BMP_LINESIZE];
 #elif LCD_DEPTH == 2
     int src_byte2;
     static unsigned char line_block[4][BMP_LINESIZE];
+#elif LCD_DEPTH == 16
+    static unsigned char line_block[BMP_LINESIZE];
+    unsigned char* dst;
+    unsigned short* src;
+    unsigned short pixel;
 #endif
 
 #ifdef HAVE_RTC
@@ -351,6 +356,23 @@ void screen_dump(void)
             }
 
             write(fh, &line_block[0][0], sizeof(line_block));
+        }
+#elif LCD_DEPTH==16
+        for (by = LCD_HEIGHT - 1; by >= 0; by--)
+        {
+            memset(line_block, 0, sizeof(line_block));
+            src=(unsigned short*)&lcd_framebuffer[by][0];
+            dst=line_block;
+
+            for (bx = 0; bx < LCD_WIDTH; bx++)
+            {
+               pixel=swap16(*(src++));
+               *(dst++)=(pixel&0x1f)<<3;         /* Blue */
+               *(dst++)=((pixel&0x07e0)>>5)<<2;  /* Green */
+               *(dst++)=((pixel&0xf800)>>11)<<3; /* Red */
+            }
+
+            write(fh, line_block, sizeof(line_block));
         }
 #endif /* LCD_DEPTH */
     }
