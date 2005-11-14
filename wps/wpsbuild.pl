@@ -142,17 +142,22 @@ while(<WPS>) {
                 exit;
             }
 
-            # print "LCD: $wps wants $rheight x $rwidth\n";
+            #print "LCD: $wps wants $height x $width\n";
+            #print "LCD: is $rheight x $rwidth\n";
 
-            if(($height >= $rheight) ||
-               ($width >= $width)) {
+            if(($height <= $rheight) && ($width <= $width)) {
                 #
                 # The target model has an LCD that is suitable for this
                 # WPS
                 #
+                #print "Size requirement is fine!\n";
+
                 mkdirs();
                 buildcfg();
                 copywps();
+            }
+            else {
+                #print "Skip $wps due to size restraints\n";
             }
             $within = 0;
 
