@@ -3388,3 +3388,15 @@ desc: error message when preset list is empty
 eng: "Screen frozen!"
 voice: ""
 new:
+
+id: LANG_CROSSFEED_ENABLE
+desc: In the crossfeed menu
+eng: "Enable crossfeed"
+voice:
+new:
+
+id: LANG_CROSSFEED
+desc: in the sound settings menu
+eng: "Crossfeed"
+voice:
+new:

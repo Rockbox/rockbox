@@ -41,6 +41,15 @@
 #define RESAMPLE_BUF_SIZE   (256 * 4)   /* Enough for 11,025 Hz -> 44,100 Hz*/
 #define DEFAULT_REPLAYGAIN  0x01000000
 
+/* These are the constants for the filters in the crossfeed */
+
+#define ATT 0x0CCCCCCDL /* 0.1 */
+#define ATT_COMP 0x73333333L /* 0.9 */
+#define LOW  0x4CCCCCCDL /* 0.6 */
+#define LOW_COMP 0x33333333L /* 0.4 */
+#define HIGH_NEG 0x9999999AL /* -0.2 */
+#define HIGH_COMP 0x66666666L /* 0.8 */
+
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
 
 /* Multiply two S.31 fractional integers and return the sign bit and the
@@ -86,6 +95,20 @@
     (t << 8) | (u & 0xff); \
 })
 
+
+#define ACC(acc, x, y) \
+    (void)acc; \
+    asm volatile ("mac.l %[a], %[b], %%acc0" \
+                  : : [a] "i,r" (x), [b] "i,r" (y));
+#define GET_ACC(acc) \
+({ \
+    long t; \
+    (void)acc; \
+    asm volatile ("movclr.l %%acc0, %[t]" \
+                  : [t] "=r" (t)); \
+    t; \
+})
+
 #else
 
 #define FRACMUL(x, y) (long) (((((long long) (x)) * ((long long) (y))) >> 31))
@@ -115,6 +138,7 @@ struct dsp_config
     int frac_bits;
     bool dither_enabled;
     bool new_gain;
+    bool crossfeed_enabled;
 };
 
 struct resample_data
@@ -130,9 +154,18 @@ struct dither_data
     long random;
 };
 
+struct crossfeed_data
+{
+    long lowpass[2];
+    long highpass[2];
+    long delay[2][13];
+    int index;
+};
+
 static struct dsp_config dsp_conf[2] IBSS_ATTR;
 static struct dither_data dither_data[2] IBSS_ATTR;
 static struct resample_data resample_data[2][2] IBSS_ATTR;
+static struct crossfeed_data crossfeed_data IBSS_ATTR;
 
 extern int current_codec;
 struct dsp_config *dsp;
@@ -144,7 +177,6 @@ struct dsp_config *dsp;
 
 static long sample_buf[SAMPLE_BUF_SIZE] IBSS_ATTR;
 static long resample_buf[RESAMPLE_BUF_SIZE] IBSS_ATTR;
-
 
 /* Convert at most count samples to the internal format, if needed. Returns
  * number of samples ready for further processing. Updates src to point
@@ -410,6 +442,76 @@ static long dither_sample(long sample, long bias, long mask,
  * the src array if gain was applied.
  * Note that this must be called before the resampler.
  */
+static void apply_crossfeed(long* src[], int count)
+{
+
+    if (dsp->crossfeed_enabled && src[0] != src[1])
+    {
+        long long a;
+
+        long low_left = crossfeed_data.lowpass[0];
+        long low_right = crossfeed_data.lowpass[1];
+        long high_left = crossfeed_data.highpass[0];
+        long high_right = crossfeed_data.highpass[1];
+        unsigned int index = crossfeed_data.index;
+
+        long left, right;
+
+        long * delay_l = crossfeed_data.delay[0];
+        long * delay_r = crossfeed_data.delay[1];
+
+        int i;
+
+        for (i = 0; i < count; i++)
+        {
+            /* use a low-pass filter on the signal */
+            left = src[0][i];
+            right = src[1][i];
+
+            ACC(a, LOW, low_left); ACC(a, LOW_COMP, left);
+            low_left = GET_ACC(a);
+
+            ACC(a, LOW, low_right); ACC(a, LOW_COMP, right);
+            low_right = GET_ACC(a);
+
+            /* use a high-pass filter on the signal */
+
+            ACC(a, HIGH_NEG, high_left); ACC(a, HIGH_COMP, left);
+            high_left = GET_ACC(a);
+
+            ACC(a, HIGH_NEG, high_right); ACC(a, HIGH_COMP, right);
+            high_right = GET_ACC(a);
+
+            /* New data is the high-passed signal + delayed and attenuated 
+             * low-passed signal from the other channel */
+
+            ACC(a, ATT, delay_r[index]); ACC(a, ATT_COMP, high_left);
+            src[0][i] = GET_ACC(a);
+
+            ACC(a, ATT, delay_l[index]); ACC(a, ATT_COMP, high_right);
+            src[1][i] = GET_ACC(a);
+
+            /* Store the low-passed signal in the ringbuffer */
+
+            delay_l[index] = low_left;
+            delay_r[index] = low_right;
+
+            index = (index + 1) % 13;
+        }
+
+        crossfeed_data.index = index;
+        crossfeed_data.lowpass[0] = low_left;
+        crossfeed_data.lowpass[1] = low_right;
+        crossfeed_data.highpass[0] = high_left;
+        crossfeed_data.highpass[1] = high_right;
+
+    }
+}
+
+/* Apply a constant gain to the samples (e.g., for ReplayGain). May update
+ * the src array if gain was applied.
+ * Note that this must be called before the resampler.
+ */
 static void apply_gain(long* src[], int count)
 {
     if (dsp->replaygain)
@@ -509,6 +611,7 @@ long dsp_process(char* dst, char* src[], long size)
         size -= samples;
         apply_gain(tmp, samples);
         samples = resample(tmp, samples);
+        apply_crossfeed(tmp, samples);
         write_samples((short*) dst, tmp, samples);
         written += samples;
         dst += samples * sizeof(short) * 2;
@@ -696,6 +799,13 @@ bool dsp_configure(int setting, void *value)
     }
 
     return 1;
+}
+
+void dsp_set_crossfeed(bool enable)
+{
+    if (enable)
+        memset(&crossfeed_data, 0, sizeof(crossfeed_data));
+    dsp->crossfeed_enabled = enable;
 }
 
 void dsp_set_replaygain(bool always)

@@ -85,7 +85,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "dsp.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 30
+#define CONFIG_BLOCK_VERSION 31
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -444,6 +444,7 @@ static const struct bit_entry hd_bits[] =
     {4, S_O(crossfade_fade_in_duration), 0, "crossfade fade in duration", NULL},
     {4, S_O(crossfade_fade_out_duration), 0, "crossfade fade out duration", NULL},
     {1, S_O(crossfade_fade_out_mixmode), 0, "crossfade fade out mode", "crossfade,mix"},
+    {1, S_O(crossfeed), false, "crossfeed", off_on },
 #endif
 #ifdef HAVE_DIRCACHE
     {1, S_O(dircache), false, "dircache", off_on },
@@ -912,6 +913,7 @@ void settings_apply(void)
 #if CONFIG_CODEC == SWCODEC
     audio_set_crossfade(global_settings.crossfade);
     dsp_set_replaygain(true);
+    dsp_set_crossfeed(global_settings.crossfeed);
 #endif
 
 #ifdef HAVE_SPDIF_POWER

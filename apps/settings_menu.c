@@ -1203,6 +1203,15 @@ static bool replaygain_settings_menu(void)
     return result;
 }
 
+static bool crossfeed(void)
+{
+    bool result = set_bool(str(LANG_CROSSFEED_ENABLE), 
+        &global_settings.crossfeed);
+
+    dsp_set_crossfeed(global_settings.crossfeed);
+    return result;
+}
+
 static bool crossfade(void)
 {
     static const struct opt_items names[] = {
@@ -1354,6 +1363,7 @@ static bool playback_settings_menu(void)
 #if CONFIG_CODEC == SWCODEC
         { ID2P(LANG_CROSSFADE), crossfade_settings_menu },
         { ID2P(LANG_REPLAYGAIN), replaygain_settings_menu },
+        { ID2P(LANG_CROSSFEED), crossfeed },
         { ID2P(LANG_BEEP), beep },
 #endif
 #ifdef HAVE_SPDIF_POWER

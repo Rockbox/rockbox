@@ -44,7 +44,8 @@ enum {
     DSP_SET_TRACK_GAIN,
     DSP_SET_ALBUM_GAIN,
     DSP_SET_TRACK_PEAK,
-    DSP_SET_ALBUM_PEAK
+    DSP_SET_ALBUM_PEAK,
+    DSP_CROSSFEED
 };
 
 long dsp_process(char *dest, char *src[], long size);
@@ -53,5 +54,6 @@ long dsp_output_size(long size);
 int dsp_stereo_mode(void);
 bool dsp_configure(int setting, void *value);
 void dsp_set_replaygain(bool always);
+void dsp_set_crossfeed(bool enable);
 
 #endif
