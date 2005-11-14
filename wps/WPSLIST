@@ -1,4 +1,4 @@
-<wps>
+<wps>ZZ
 # Name of the WPS _including_ extension
 Name: ipodVOL.wps
 # Name of the creator of the WPS
@@ -10,5 +10,14 @@ Statusbar: off
 # The minimum required pixel height for the WPS
 Height: 128
 # The minimum required pixel width for the WPS
+Width: 160
+</wps>
+
+<wps>
+Name: boxes.wps
+Author: Christi Scarborough (after the_engineer)
+Font: rockbox_default.fnt
+Statusbar: off
+Height: 128
 Width: 160
 </wps>
