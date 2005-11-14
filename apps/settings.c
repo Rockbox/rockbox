@@ -417,7 +417,7 @@ static const struct bit_entry hd_bits[] =
     {4, S_O(rec_trigger_mode ), 0, "trigger mode", "off,once,repeat"},
 #endif
 
-#if CONFIG_BACKLIGHT == BL_IRIVER
+#if CONFIG_BACKLIGHT == BL_IRIVER_H100
     /* backlight fading */
     {2, S_O(backlight_fade_in), 1, "backlight fade in", "off,500ms,1s,2s"},
     {3, S_O(backlight_fade_out), 3, "backlight fade out",
@@ -843,7 +843,7 @@ void settings_apply(void)
 #endif
     backlight_set_timeout(global_settings.backlight_timeout);
     backlight_set_on_when_charging(global_settings.backlight_on_when_charging);
-#if !defined(SIMULATOR) && (CONFIG_BACKLIGHT == BL_IRIVER)
+#if CONFIG_BACKLIGHT == BL_IRIVER_H100
     backlight_set_fade_in(global_settings.backlight_fade_in);
     backlight_set_fade_out(global_settings.backlight_fade_out);
 #endif

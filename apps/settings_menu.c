@@ -166,7 +166,7 @@ static bool backlight_timer(void)
                       INT, names, 19, backlight_set_timeout );
 }
 
-#if CONFIG_BACKLIGHT == BL_IRIVER
+#if CONFIG_BACKLIGHT == BL_IRIVER_H100
 static bool backlight_fade_in(void)
 {
     static const struct opt_items names[] = {
@@ -1525,7 +1525,7 @@ static bool lcd_settings_menu(void)
         { ID2P(LANG_BACKLIGHT_ON_WHEN_CHARGING), backlight_on_when_charging },
 #endif
         { ID2P(LANG_CAPTION_BACKLIGHT), caption_backlight },
-#if CONFIG_BACKLIGHT == BL_IRIVER
+#if CONFIG_BACKLIGHT == BL_IRIVER_H100
         { ID2P(LANG_BACKLIGHT_FADE_IN), backlight_fade_in },
         { ID2P(LANG_BACKLIGHT_FADE_OUT), backlight_fade_out },
 #endif

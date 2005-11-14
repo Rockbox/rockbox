@@ -27,7 +27,7 @@ void backlight_off(void);
 void backlight_tick(void);
 int  backlight_get_timeout(void);
 void backlight_set_timeout(int index);
-#if CONFIG_BACKLIGHT == BL_IRIVER
+#if CONFIG_BACKLIGHT == BL_IRIVER_H100
 void backlight_set_fade_in(int index);
 void backlight_set_fade_out(int index);
 #endif
