@@ -39,8 +39,8 @@
 /*** globals ***/
 fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH] __attribute__ ((aligned (2)));
 
-static unsigned fg_pattern = 0x0000; /* Black */
-static unsigned bg_pattern = RGB_PACK(0xb6, 0xc6, 0xe5); /* "Rockbox blue" */
+static unsigned fg_pattern;
+static unsigned bg_pattern;
 static int drawmode = DRMODE_SOLID;
 static int xmargin = 0;
 static int ymargin = 0;
@@ -66,6 +66,9 @@ static const char scroll_tick_table[16] = {
 /* LCD init */
 void lcd_init(void)
 {
+    fg_pattern = 0x0000; /* Black */
+    bg_pattern = RGB_PACK(0xb6, 0xc6, 0xe5); /* "Rockbox blue" */
+
     lcd_clear_display();
     /* Call device specific init */
     lcd_init_device();
