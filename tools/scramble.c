@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <string.h>
 #include "iriver.h"
 
 enum
@@ -81,9 +81,9 @@ int main (int argc, char** argv)
     unsigned short crc=0;
     unsigned long chksum=0; /* 32 bit checksum */
     unsigned char header[24];
-    unsigned char *iname = argv[1];
-    unsigned char *oname = argv[2];
-    unsigned char *xorstring;
+    char *iname = argv[1];
+    char *oname = argv[2];
+    char *xorstring;
     int headerlen = 6;
     FILE* file;
     int version;
@@ -320,7 +320,7 @@ int main (int argc, char** argv)
 #define MY_FIRMWARE_TYPE "Rockbox"
 #define MY_HEADER_VERSION 1
         default:
-            strncpy(header,MY_FIRMWARE_TYPE,9);
+            strncpy((char *)header, MY_FIRMWARE_TYPE,9);
             header[9]='\0'; /*shouldn't have to, but to be SURE */
             header[10]=MY_HEADER_VERSION&0xFF;
             header[11]=(crc>>8)&0xFF;
