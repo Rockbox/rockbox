@@ -528,11 +528,6 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
                 maxwidth = width;
             pf->width[encoding-pf->firstchar] = width;
 
-            if(maxwidth > 16) {
-                fprintf(stderr, "Error: Too wide characters (>16 pixels)\n");
-                return 0;
-            }
-            
             /* clear bitmap*/
             memset(ch_bitmap, 0, BITMAP_BYTES(width) * pf->height);
 
@@ -607,7 +602,7 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
             encodetable = 1;
             break;
         }
-        l += pf->maxwidth * (pf->height + 7) / 8;
+        l += pf->maxwidth * ((pf->height + 7) / 8);
     }
 #else
     l = 0;
@@ -741,15 +736,17 @@ int rotleft(unsigned char *dst, bitmap_t *src, unsigned int width,
         /* for each input column...*/
         for(j=0; j < width; j++) {
 
+            if (src_mask == 0) /* input word done? */
+            {
+                src_mask = 1 << (sizeof (bitmap_t) * 8 - 1);
+                i++;    /* next input word */
+            }
+
             /* if set in input, set in rotated output */
             if (src[i] & src_mask)
                 dst[j] |= dst_mask;
 
             src_mask >>= 1;    /* next input bit */
-            if (src_mask == 0) /* input word done? */
-            {
-                continue;
-            }
         }
 
         dst_mask <<= 1;          /* next output bit (row) */
