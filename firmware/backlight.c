@@ -216,6 +216,12 @@ static void __backlight_off(void)
    /* fades backlight off on 4g */
    outl(inl(0x70000084) & ~0x2000000, 0x70000084);
    outl(0x80000000, 0x7000a010);
+#elif CONFIG_BACKLIGHT==BL_IPODNANO
+    /* set port B03 off */
+    outl(((0x100 | 0) << 3), 0x6000d824);
+
+    /* set port L07 off */
+    outl(((0x100 | 0) << 7), 0x6000d12c);
 #endif
 }
 
@@ -245,6 +251,12 @@ static void __backlight_on(void)
 
     /* set port b bit 3 on */
     outl(((0x100 | 1) << 3), 0x6000d824);
+#elif CONFIG_BACKLIGHT==BL_IPODNANO
+    /* set port B03 on */
+    outl(((0x100 | 1) << 3), 0x6000d824);
+
+    /* set port L07 on */
+    outl(((0x100 | 1) << 7), 0x6000d12c);
 #endif
 }
 
