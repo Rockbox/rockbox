@@ -34,10 +34,16 @@
 #include "file.h"  /* for MAX_PATH; FIXME: Why does this not work for sims? */
 #endif
 
+#if LCD_DEPTH <=8
+typedef unsigned char fb_data;
+#elif LCD_DEPTH <= 16
+typedef unsigned short fb_data;
+#endif
+
 /* common functions */
 extern void lcd_write_command(int byte);
 extern void lcd_write_command_ex(int cmd, int data1, int data2);
-extern void lcd_write_data(const unsigned char* p_bytes, int count);
+extern void lcd_write_data(const fb_data* p_bytes, int count);
 extern void lcd_init(void);
 #ifdef SIMULATOR
 /* Define a dummy device specific init for the sims */
@@ -63,7 +69,7 @@ extern void lcd_icon(int icon, bool enable);
 
 #if defined(SIMULATOR) || defined(HAVE_LCD_BITMAP)
 /* performance function */
-extern void lcd_blit(const unsigned char* data, int x, int by, int width,
+extern void lcd_blit(const fb_data* data, int x, int by, int width,
                      int bheight, int stride);
 
 extern void lcd_update(void);
@@ -161,11 +167,11 @@ struct rgb {
 
 /* Memory copy of display bitmap */
 #if LCD_DEPTH == 1
-extern unsigned char lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
+extern fb_data lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
 #elif LCD_DEPTH == 2
-extern unsigned char lcd_framebuffer[LCD_HEIGHT/4][LCD_WIDTH];
+extern fb_data lcd_framebuffer[LCD_HEIGHT/4][LCD_WIDTH];
 #elif LCD_DEPTH == 16
-extern unsigned char lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH*2];
+extern fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH];
 #endif
 
 extern void lcd_set_invert_display(bool yesno);
@@ -190,9 +196,9 @@ extern void lcd_hline(int x1, int x2, int y);
 extern void lcd_vline(int x, int y1, int y2);
 extern void lcd_drawrect(int x, int y, int width, int height);
 extern void lcd_fillrect(int x, int y, int width, int height);
-extern void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
+extern void lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
                             int stride, int x, int y, int width, int height);
-extern void lcd_bitmap(const unsigned char *src, int x, int y, int width,
+extern void lcd_bitmap(const fb_data *src, int x, int y, int width,
                        int height);
 extern void lcd_putsxy(int x, int y, const unsigned char *string);
 

@@ -184,17 +184,17 @@ struct plugin_api {
     void (*lcd_set_background)(int brightness);
     int  (*lcd_get_background)(void);
 #endif
-    void (*lcd_bitmap_part)(const unsigned char *src, int src_x, int src_y,
+    void (*lcd_bitmap_part)(const fb_data *src, int src_x, int src_y,
                             int stride, int x, int y, int width, int height);
-    void (*lcd_bitmap)(const unsigned char *src, int x, int y, int width,
+    void (*lcd_bitmap)(const fb_data *src, int x, int y, int width,
                        int height);
 #endif
     void (*lcd_putsxy)(int x, int y, const unsigned char *string);
     void (*lcd_puts_style)(int x, int y, const unsigned char *str, int style);
     void (*lcd_puts_scroll_style)(int x, int y, const unsigned char* string,
                                   int style);
-    unsigned char* lcd_framebuffer;
-    void (*lcd_blit) (const unsigned char* data, int x, int by, int width,
+    fb_data* lcd_framebuffer;
+    void (*lcd_blit) (const fb_data* data, int x, int by, int width,
                       int bheight, int stride);
     void (*lcd_update)(void);
     void (*lcd_update_rect)(int x, int y, int width, int height);
