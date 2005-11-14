@@ -77,13 +77,14 @@
 #define LCD_IPODNANO  7 /* as used by iPod Nano */
 
 /* CONFIG_BACKLIGHT */
-#define BL_PA14_LO  0 /* Player, PA14 low active */
-#define BL_RTC      1 /* Recorder, RTC square wave output */
-#define BL_PA14_HI  2 /* Ondio, PA14 high active */
-#define BL_IRIVER   3 /* IRiver GPIO */
-#define BL_GMINI    4 /* Archos GMini */
-#define BL_IPOD4G   5 /* Apple iPod 4G */
-#define BL_IPODNANO 6 /* Apple iPod Nano */
+#define BL_PA14_LO       0 /* Player, PA14 low active */
+#define BL_RTC           1 /* Recorder, RTC square wave output */
+#define BL_PA14_HI       2 /* Ondio, PA14 high active */
+#define BL_IRIVER_H100   3 /* IRiver GPIO */
+#define BL_GMINI         4 /* Archos GMini */
+#define BL_IPOD4G        5 /* Apple iPod 4G */
+#define BL_IPODNANO      6 /* Apple iPod Nano */
+#define BL_IRIVER_H300   7 /* IRiver PWM */
 
 /* CONFIG_I2C */
 #define I2C_PLAYREC  0 /* Archos Player/Recorder style */

@@ -72,7 +72,7 @@
 #define FLASH_SIZE 0x200000
 
 /* Define this for LCD backlight available */
-#define CONFIG_BACKLIGHT BL_IRIVER /* port controlled */
+#define CONFIG_BACKLIGHT BL_IRIVER_H100 /* port controlled */
 
 /* Define this to the CPU frequency */
 #define CPU_FREQ      11289600

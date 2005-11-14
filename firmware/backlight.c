@@ -61,7 +61,7 @@ static int remote_backlight_timer;
 static unsigned int remote_backlight_timeout = 5;
 #endif
 
-#if CONFIG_BACKLIGHT == BL_IRIVER
+#if CONFIG_BACKLIGHT == BL_IRIVER_H100
 /* backlight fading */
 #define BL_PWM_INTERVAL 5000  /* Cycle interval in µs */
 #define BL_PWM_COUNT    100
@@ -195,7 +195,7 @@ void backlight_set_fade_out(int index)
 
 static void __backlight_off(void)
 {
-#if CONFIG_BACKLIGHT == BL_IRIVER
+#if CONFIG_BACKLIGHT == BL_IRIVER_H100
     if (fade_out_count > 0)
         backlight_dim(0);
     else
@@ -203,6 +203,8 @@ static void __backlight_off(void)
         bl_dim_target = bl_dim_current = 0;
         or_l(0x00020000, &GPIO1_OUT);
     }
+#elif CONFIG_BACKLIGHT == BL_IRIVER_H300
+    and_l(~0x00020000, &GPIO1_OUT);
 #elif CONFIG_BACKLIGHT == BL_RTC
     /* Disable square wave */
     rtc_write(0x0a, rtc_read(0x0a) & ~0x40);
@@ -227,7 +229,7 @@ static void __backlight_off(void)
 
 static void __backlight_on(void)
 {
-#if CONFIG_BACKLIGHT == BL_IRIVER
+#if CONFIG_BACKLIGHT == BL_IRIVER_H100
     if (fade_in_count > 0)
         backlight_dim(BL_PWM_COUNT);
     else
@@ -235,6 +237,8 @@ static void __backlight_on(void)
         bl_dim_target = bl_dim_current = BL_PWM_COUNT;
         and_l(~0x00020000, &GPIO1_OUT);
     }
+#elif CONFIG_BACKLIGHT == BL_IRIVER_H300
+    or_l(0x00020000, &GPIO1_OUT);    
 #elif CONFIG_BACKLIGHT == BL_RTC
     /* Enable square wave */
     rtc_write(0x0a, rtc_read(0x0a) | 0x40);
@@ -317,7 +321,7 @@ void backlight_thread(void)
                 __backlight_off();
                 break;
 
-#if CONFIG_BACKLIGHT == BL_IRIVER
+#if CONFIG_BACKLIGHT == BL_IRIVER_H100
             case BACKLIGHT_UNBOOST_CPU:
                 cpu_boost(false);
                 break;
@@ -430,10 +434,14 @@ void backlight_init(void)
     create_thread(backlight_thread, backlight_stack,
                   sizeof(backlight_stack), backlight_thread_name);
                   
-#if CONFIG_BACKLIGHT == BL_IRIVER
+#if CONFIG_BACKLIGHT == BL_IRIVER_H100
     or_l(0x00020000, &GPIO1_ENABLE);
     or_l(0x00020000, &GPIO1_FUNCTION);
     and_l(~0x00020000, &GPIO1_OUT);  /* Start with the backlight ON */
+#elif CONFIG_BACKLIGHT == BL_IRIVER_H300
+    or_l(0x00020000, &GPIO1_ENABLE);
+    or_l(0x00020000, &GPIO1_FUNCTION);
+    or_l(0x00020000, &GPIO1_OUT);  /* Start with the backlight ON */
 #elif CONFIG_BACKLIGHT == BL_PA14_LO || CONFIG_BACKLIGHT == BL_PA14_HI
     PACR1 &= ~0x3000;    /* Set PA14 (backlight control) to GPIO */
     or_b(0x40, &PAIORH); /* ..and output */
