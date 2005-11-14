@@ -52,6 +52,9 @@ recorder/icons.c
 recorder/keyboard.c
 recorder/peakmeter.c
 recorder/widgets.c
+#ifdef IRIVER_H300_SERIES
+recorder/logo-h300.c
+#endif
 #endif
 #ifdef CONFIG_TUNER
 recorder/radio.c
