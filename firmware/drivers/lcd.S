@@ -305,7 +305,7 @@ _lcd_write_data:
 
 .end:
     .size   _lcd_write_command,.end-_lcd_write_command
-#elif CONFIG_CPU == MCF5249
+#elif defined(IRIVER_H100_SERIES)
     .section    .icode,"ax",@progbits
 
     .align      2
