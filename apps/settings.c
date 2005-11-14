@@ -843,7 +843,7 @@ void settings_apply(void)
 #endif
     backlight_set_timeout(global_settings.backlight_timeout);
     backlight_set_on_when_charging(global_settings.backlight_on_when_charging);
-#if CONFIG_BACKLIGHT == BL_IRIVER
+#if !defined(SIMULATOR) && (CONFIG_BACKLIGHT == BL_IRIVER)
     backlight_set_fade_in(global_settings.backlight_fade_in);
     backlight_set_fade_out(global_settings.backlight_fade_out);
 #endif
