@@ -346,10 +346,10 @@ void* main(void)
     /* Notes: iPod Color/Photo LCD is 220x176, Nano is 176x138 */
 
     /* Display the 42x47 pixel iPodLinux logo */
-    lcd_bitmap((unsigned char*)ipllogo, 20,6, 42,47);
+    lcd_bitmap(ipllogo, 20,6, 42,47);
 
     /* Display the 100x31 pixel Rockbox logo */
-    lcd_bitmap((unsigned char*)rockboxlogo, 74,16, 100,31);
+    lcd_bitmap(rockboxlogo, 74,16, 100,31);
 
     line=7;
 
