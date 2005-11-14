@@ -145,7 +145,7 @@ while(<WPS>) {
             #print "LCD: $wps wants $height x $width\n";
             #print "LCD: is $rheight x $rwidth\n";
 
-            if(($height <= $rheight) && ($width <= $width)) {
+            if(($height <= $rheight) && ($width <= $rwidth)) {
                 #
                 # The target model has an LCD that is suitable for this
                 # WPS
