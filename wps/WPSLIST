@@ -1,0 +1,14 @@
+<wps>
+# Name of the WPS _including_ extension
+Name: ipodVOL.wps
+# Name of the creator of the WPS
+Author: xameius
+# prefered font:
+Font: chicago12.fnt
+# Weather the WPS is designed to have the statusbar present or not
+Statusbar: off
+# The minimum required pixel height for the WPS
+Height: 128
+# The minimum required pixel width for the WPS
+Width: 160
+</wps>
