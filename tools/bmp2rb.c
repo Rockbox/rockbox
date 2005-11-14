@@ -277,7 +277,7 @@ int read_bmp_file(char* filename,
  ****************************************************************************/
 
 int transform_bitmap(const struct RGBQUAD *src, long width, long height,
-                     int format, unsigned char **dest, long *dst_width,
+                     int format, unsigned short **dest, long *dst_width,
                      long *dst_height)
 {
     long row, col;
@@ -305,12 +305,17 @@ int transform_bitmap(const struct RGBQUAD *src, long width, long height,
         dst_h = height;
         break;
 
+      case 4: /* 16-bit packed RGB (5-6-5) */
+        dst_w = width;
+        dst_h = height;
+        break;
+
       default: /* unknown */
         debugf("error - Undefined destination format\n");
         return 1;
     }
     
-    *dest = (unsigned char *)malloc(dst_w * dst_h);
+    *dest = (unsigned short *)malloc(dst_w * dst_h);
     if (*dest == NULL)
     {
         debugf("error - Out of memory.\n");
@@ -356,6 +361,19 @@ int transform_bitmap(const struct RGBQUAD *src, long width, long height,
                 (*dest)[row * dst_w + col] = brightness(src[row * width + col]);
             }
         break;
+
+      case 4: /* 16-bit packed RGB (5-6-5) */
+        for (row = 0; row < height; row++)
+            for (col = 0; col < width; col++)
+            {
+                unsigned short rgb =
+                    (((src[row * width + col].rgbRed >> 3) << 11) |
+                     ((src[row * width + col].rgbGreen >> 2) << 5) |
+                     ((src[row * width + col].rgbBlue >> 3)));
+
+                (*dest)[row * dst_w + col] = rgb;
+            }
+        break;
     }
     
     return 0;
@@ -369,8 +387,8 @@ int transform_bitmap(const struct RGBQUAD *src, long width, long height,
  ****************************************************************************/
 
 void generate_c_source(char *id, long width, long height,
-                       const unsigned char *t_bitmap, long t_width,
-                       long t_height)
+                       const unsigned short *t_bitmap, long t_width,
+                       long t_height, int format)
 {
     FILE *f;
     long i, a;
@@ -382,15 +400,24 @@ void generate_c_source(char *id, long width, long height,
 
     fprintf(f,
             "#define BMPHEIGHT_%s %ld\n"
-            "#define BMPWIDTH_%s %ld\n"
-            "const unsigned char %s[] = {\n",
-            id, height, id, width, id);
+            "#define BMPWIDTH_%s %ld\n",
+            id, height, id, width);
+    if(format < 4)
+        fprintf(f, "const unsigned char %s[] = {\n", id);
+    else
+        fprintf(f, "const unsigned short %s[] = {\n", id);
 
     for (i = 0; i < t_height; i++)
     {
         for (a = 0; a < t_width; a++)
-            fprintf(f, "0x%02x,%c", t_bitmap[i * t_width + a],
-                    (a + 1) % 13 ? ' ' : '\n');
+        {
+            if(format < 4)
+                fprintf(f, "0x%02x,%c", t_bitmap[i * t_width + a],
+                        (a + 1) % 13 ? ' ' : '\n');
+            else
+                fprintf(f, "0x%04x,%c", t_bitmap[i * t_width + a],
+                        (a + 1) % 10 ? ' ' : '\n');
+        }
         fprintf(f, "\n");
     }
 
@@ -431,6 +458,7 @@ void print_usage(void)
            "\t         1  Archos player graphics library\n"
            "\t         2  Iriver H1x0 4-grey\n"
            "\t         3  Canonical 8-bit grayscale\n"
+           "\t         4  16-bit packed 5-6-5 RGB (iriver H300)\n"
            , APPLICATION_NAME);
     printf("build date: " __DATE__ "\n\n");
 }
@@ -443,7 +471,7 @@ int main(int argc, char **argv)
     int ascii = false;
     int format = 0;
     struct RGBQUAD *bitmap = NULL;
-    unsigned char *t_bitmap = NULL;
+    unsigned short *t_bitmap = NULL;
     long width, height;
     long t_width, t_height;
 
@@ -544,7 +572,7 @@ int main(int argc, char **argv)
         if (transform_bitmap(bitmap, width, height, format, &t_bitmap,
                              &t_width, &t_height))
             exit(1);
-        generate_c_source(id, width, height, t_bitmap, t_width, t_height);
+        generate_c_source(id, width, height, t_bitmap, t_width, t_height, format);
     }
 
     return 0;
