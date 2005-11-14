@@ -111,6 +111,7 @@ rolo.c
 thread.c
 timer.c
 crt0.S
+drivers/lcd.S
 #endif  
 mp3_playback.c
 mp3data.c
@@ -124,11 +125,10 @@ debug.c
 powermgmt.c
 system.c
 usb.c
-#if CONFIG_CPU == SH7034
+#if (CONFIG_CPU == SH7034) && !defined(SIMULATOR)
 bitswap.S
 descramble.S
 #endif
-drivers/lcd.S
 #ifdef HAVE_REMOTE_LCD
 drivers/lcd-h100-remote.c
 #endif
