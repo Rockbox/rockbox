@@ -202,7 +202,7 @@ STOP
 
     # Now do the WPS dance
     if(-d "$ROOT/wps") {
-        system("perl $ROOT/wps/wpsbuild.pl $ROOT/wps/WPSLIST $target");
+        system("perl $ROOT/wps/wpsbuild.pl -r $ROOT/wps/WPSLIST $target");
     }
     else {
         print STDERR "No wps module present, can't do the WPS magic!\n";
