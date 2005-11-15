@@ -37,7 +37,7 @@
 #define RGB_PACK(r,g,b) (htobe16(((r>>3)<<11)|((g>>2)<<5)|(b>>3)))
 
 /*** globals ***/
-fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH] __attribute__ ((aligned (2)));
+fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH] __attribute__ ((aligned (4)));
 
 static unsigned fg_pattern;
 static unsigned bg_pattern;
