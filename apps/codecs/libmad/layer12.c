@@ -50,7 +50,7 @@ mad_fixed_t const sf_table[64] ICONST_ATTR = {
 
 /* linear scaling table */
 static
-mad_fixed_t const linear_table[14] = {
+mad_fixed_t const linear_table[14] IDATA_ATTR = {
   MAD_F(0x15555555),  /* 2^2  / (2^2  - 1) == 1.33333333333333 */
   MAD_F(0x12492492),  /* 2^3  / (2^3  - 1) == 1.14285714285714 */
   MAD_F(0x11111111),  /* 2^4  / (2^4  - 1) == 1.06666666666667 */
@@ -71,7 +71,7 @@ mad_fixed_t const linear_table[14] = {
  * NAME:	I_sample()
  * DESCRIPTION:	decode one requantized Layer I sample from a bitstream
  */
-static
+static inline
 mad_fixed_t I_sample(struct mad_bitptr *ptr, unsigned int nb)
 {
   mad_fixed_t sample;
