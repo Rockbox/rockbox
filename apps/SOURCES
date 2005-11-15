@@ -54,6 +54,10 @@ recorder/peakmeter.c
 recorder/widgets.c
 #ifdef IRIVER_H300_SERIES
 recorder/logo-h300.c
+#elif CONFIG_LCD == LCD_IPODCOLOR
+recorder/logo-ipod.c
+#elif CONFIG_LCD == LCD_IPODNANO
+recorder/logo-nano.c
 #endif
 #endif
 #ifdef CONFIG_TUNER

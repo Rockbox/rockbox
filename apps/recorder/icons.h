@@ -77,9 +77,13 @@ extern const unsigned char bitmap_icon_disk[];
 #if  LCD_WIDTH == 112 || LCD_WIDTH == 128 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_WIDTH == 128)
 extern const unsigned char rockbox112x37[];
 #endif
-#ifdef IRIVER_H300_SERIES
+#if defined(IRIVER_H300_SERIES) || (CONFIG_LCD == LCD_IPODCOLOR)
 #define ROCKBOXLOGO_WIDTH 220
 #define ROCKBOXLOGO_HEIGHT 68
+extern const unsigned short rockboxlogo[];
+#elif CONFIG_LCD == LCD_IPODNANO
+#define ROCKBOXLOGO_WIDTH 176
+#define ROCKBOXLOGO_HEIGHT 54
 extern const unsigned short rockboxlogo[];
 #elif LCD_WIDTH >= 160
 extern const unsigned char rockbox160x53x2[];

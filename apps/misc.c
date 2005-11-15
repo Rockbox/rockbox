@@ -557,7 +557,7 @@ int show_logo( void )
 #if LCD_WIDTH == 112 || LCD_WIDTH == 128
     lcd_bitmap(rockbox112x37, 0, 10, 112, 37);
 #endif
-#if (LCD_WIDTH >= 220) && defined(HAVE_LCD_COLOR)
+#if (LCD_WIDTH >= 176) && defined(HAVE_LCD_COLOR)
     lcd_bitmap(rockboxlogo, 0, 10, ROCKBOXLOGO_WIDTH, ROCKBOXLOGO_HEIGHT);
 #elif LCD_WIDTH >= 160
     lcd_bitmap(rockbox160x53x2, 0, 10, 160, 53);
