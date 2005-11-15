@@ -169,7 +169,7 @@ struct crossfeed_data
 static struct dsp_config dsp_conf[2] IBSS_ATTR;
 static struct dither_data dither_data[2] IBSS_ATTR;
 static struct resample_data resample_data[2][2] IBSS_ATTR;
-static struct crossfeed_data crossfeed_data IBSS_ATTR;
+struct crossfeed_data crossfeed_data IBSS_ATTR;
 
 extern int current_codec;
 struct dsp_config *dsp;
@@ -446,71 +446,147 @@ static long dither_sample(long sample, long bias, long mask,
  * the src array if gain was applied.
  * Note that this must be called before the resampler.
  */
+#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+static const long crossfeed_coefs[6] ICONST_ATTR = { 
+    LOW, LOW_COMP, HIGH_NEG, HIGH_COMP, ATT, ATT_COMP
+};
+
 static void apply_crossfeed(long* src[], int count)
 {
-
-    if (dsp->crossfeed_enabled && src[0] != src[1])
-    {
-        long a; /* accumulator */
-
-        long low_left = crossfeed_data.lowpass[0];
-        long low_right = crossfeed_data.lowpass[1];
-        long high_left = crossfeed_data.highpass[0];
-        long high_right = crossfeed_data.highpass[1];
-        unsigned int index = crossfeed_data.index;
-
-        long left, right;
-
-        long * delay_l = crossfeed_data.delay[0];
-        long * delay_r = crossfeed_data.delay[1];
-
-        int i;
-
-        for (i = 0; i < count; i++)
-        {
-            /* use a low-pass filter on the signal */
-            left = src[0][i];
-            right = src[1][i];
-
-            ACC_INIT(a, LOW, low_left); ACC(a, LOW_COMP, left);
-            low_left = GET_ACC(a);
-
-            ACC_INIT(a, LOW, low_right); ACC(a, LOW_COMP, right);
-            low_right = GET_ACC(a);
-
-            /* use a high-pass filter on the signal */
-
-            ACC_INIT(a, HIGH_NEG, high_left); ACC(a, HIGH_COMP, left);
-            high_left = GET_ACC(a);
-
-            ACC_INIT(a, HIGH_NEG, high_right); ACC(a, HIGH_COMP, right);
-            high_right = GET_ACC(a);
-
-            /* New data is the high-passed signal + delayed and attenuated 
-             * low-passed signal from the other channel */
-
-            ACC_INIT(a, ATT, delay_r[index]); ACC(a, ATT_COMP, high_left);
-            src[0][i] = GET_ACC(a);
-
-            ACC_INIT(a, ATT, delay_l[index]); ACC(a, ATT_COMP, high_right);
-            src[1][i] = GET_ACC(a);
-
-            /* Store the low-passed signal in the ringbuffer */
-
-            delay_l[index] = low_left;
-            delay_r[index] = low_right;
-
-            index = (index + 1) % 13;
-        }
-
-        crossfeed_data.index = index;
-        crossfeed_data.lowpass[0] = low_left;
-        crossfeed_data.lowpass[1] = low_right;
-        crossfeed_data.highpass[0] = high_left;
-        crossfeed_data.highpass[1] = high_right;
-
-    }
+    asm volatile (
+        "lea.l crossfeed_data, %%a1 \n"
+        "lea.l (16, %%a1), %%a0     \n"  
+        "movem.l (%%a1), %%d0-%%d3  \n"
+        "move.l (120, %%a1), %%d4   \n"
+        /* fetch left, right, LOW and LOW_COMP for first iteration */
+        "move.l (%[src0]), %%d5     \n"
+        "move.l (%[src1]), %%d6     \n"
+        "move.l (%[coef])+, %%a1    \n"
+        "move.l (%[coef])+, %%a2    \n"
+        /* Register usage in loop:
+         * a0 = &delay[0][0], a1 & a2 = coefs
+         * d0 = low_left, d1 = low_right,
+         * d2 = high_left, d3 = high_right,
+         * d4 = delay line index,
+         * d5 = src[0][i], d6 = src[1][i].
+         * The rest are described in asm constraint list.
+         */
+     ".cfloop:"
+        /* LOW*low_left + LOW_COMP*left */
+        "mac.l %%a1, %%d0, %%acc0                    \n" 
+        "mac.l %%a2, %%d5, %%acc0                    \n" 
+        /* LOW*low_right + LOW_COMP*right */
+        "mac.l %%a1, %%d1, (%[coef])+, %%a1, %%acc1  \n" /* a1 = HIGH_NEG */
+        "mac.l %%a2, %%d6, (%[coef])+, %%a2, %%acc1  \n" /* a2 = HIGH_COMP */
+        "movclr.l %%acc0, %%d0                       \n" /* get low_left */
+        "movclr.l %%acc1, %%d1                       \n" /* get low_right */
+        /* HIGH_NEG*high_left + HIGH_COMP*left */ 
+        "mac.l %%a1, %%d2, %%acc0                    \n"
+        "mac.l %%a2, %%d5, %%acc0                    \n"
+        /* HIGH_NEG*hifh_right + HIGH_COMP+*right */
+        "mac.l %%a1, %%d3, (%[coef])+, %%a1, %%acc1  \n" /* a1 = ATT */
+        "mac.l %%a2, %%d6, (%[coef])+, %%a2, %%acc1  \n" /* a2 = ATT_COMP */
+        "lea.l (-6*4, %[coef]), %[coef]              \n" /* coef = &coefs[0] */
+        "move.l (%%a0, %%d4*4), %%a3                 \n" /* a3=delay[0][idx] */
+        "move.l (52, %%a0, %%d4*4), %%d5             \n" /* d5=delay[1][idx] */
+        "movclr.l %%acc0, %%d2                       \n" /* get high_left */
+        "movclr.l %%acc1, %%d3                       \n" /* get high_right */
+        /* ATT*delay_r + ATT_COMP*high_left */
+        "mac.l %%a1, %%d5, (4, %[src0]), %%d5, %%acc0\n" /* d5 = src[0][i+1] */
+        "mac.l %%a2, %%d2, (4, %[src1]), %%d6, %%acc0\n" /* d6 = src[1][i+1] */
+        /* ATT*delay_l + ATT_COMP*high_right */
+        "mac.l %%a1, %%a3, (%[coef])+, %%a1, %%acc1  \n" /* a1 = LOW */
+        "mac.l %%a2, %%d3, (%[coef])+, %%a2, %%acc1  \n" /* a2 = LOW_COMP */
+        
+        /* save crossfed samples to output */
+        "movclr.l %%acc0, %%a3          \n"
+        "move.l %%a3, (%[src0])+        \n" /* src[0][i++] = out_l */
+        "movclr.l %%acc1, %%a3          \n"
+        "move.l %%a3, (%[src1])+        \n" /* src[1][i++] = out_r */
+        "move.l %%d0, (%%a0, %%d4*4)    \n" /* delay[0][index] = low_left */
+        "move.l %%d1, (52, %%a0, %%d4*4)\n" /* delay[1][index] = low_right */
+        "addq.l #1, %%d4                \n" /* index++ */
+        "cmp.l #13, %%d4                \n" /* if (index >= 13) { */
+        "jlt .nowrap                    \n"
+        "clr.l %%d4                     \n" /*     index = 0 */
+    ".nowrap:                           \n" /* } */
+        "subq.l #1, %[count]            \n"
+        "jne .cfloop                    \n"
+        /* save data back to struct */
+        "lea.l crossfeed_data, %%a1     \n"
+        "movem.l %%d0-%%d3, (%%a1)      \n"
+        "move.l %%d4, (120, %%a1)       \n"
+        /* NOTE: We _just_ have enough registers for our use here, clobber just
+           one more and GCC will fail. */
+        : 
+        : [count] "d" (count),
+          [src0] "a" (src[0]), [src1] "a" (src[1]), [coef] "a" (crossfeed_coefs)
+        : "d0", "d1", "d2", "d3", "d4", "d5", "d6",
+          "a0", "a1", "a2", "a3"
+    );
 }
+#else
+static void apply_crossfeed(long* src[], int count)
+{
+    long a; /* accumulator */
+
+    long low_left = crossfeed_data.lowpass[0];
+    long low_right = crossfeed_data.lowpass[1];
+    long high_left = crossfeed_data.highpass[0];
+    long high_right = crossfeed_data.highpass[1];
+    unsigned int index = crossfeed_data.index;
+
+    long left, right;
+
+    long * delay_l = crossfeed_data.delay[0];
+    long * delay_r = crossfeed_data.delay[1];
+
+    int i;
+
+    for (i = 0; i < count; i++)
+    {
+        /* use a low-pass filter on the signal */
+        left = src[0][i];
+        right = src[1][i];
+
+        ACC_INIT(a, LOW, low_left); ACC(a, LOW_COMP, left);
+        low_left = GET_ACC(a);
+
+        ACC_INIT(a, LOW, low_right); ACC(a, LOW_COMP, right);
+        low_right = GET_ACC(a);
+
+        /* use a high-pass filter on the signal */
+
+        ACC_INIT(a, HIGH_NEG, high_left); ACC(a, HIGH_COMP, left);
+        high_left = GET_ACC(a);
+
+        ACC_INIT(a, HIGH_NEG, high_right); ACC(a, HIGH_COMP, right);
+        high_right = GET_ACC(a);
+
+        /* New data is the high-passed signal + delayed and attenuated 
+         * low-passed signal from the other channel */
+
+        ACC_INIT(a, ATT, delay_r[index]); ACC(a, ATT_COMP, high_left);
+        src[0][i] = GET_ACC(a);
+
+        ACC_INIT(a, ATT, delay_l[index]); ACC(a, ATT_COMP, high_right);
+        src[1][i] = GET_ACC(a);
+
+        /* Store the low-passed signal in the ringbuffer */
+
+        delay_l[index] = low_left;
+        delay_r[index] = low_right;
+
+        index = (index + 1) % 13;
+    }
+
+    crossfeed_data.index = index;
+    crossfeed_data.lowpass[0] = low_left;
+    crossfeed_data.lowpass[1] = low_right;
+    crossfeed_data.highpass[0] = high_left;
+    crossfeed_data.highpass[1] = high_right;
+}
+#endif
 
 /* Apply a constant gain to the samples (e.g., for ReplayGain). May update
  * the src array if gain was applied.
@@ -615,7 +691,8 @@ long dsp_process(char* dst, char* src[], long size)
         size -= samples;
         apply_gain(tmp, samples);
         samples = resample(tmp, samples);
-        apply_crossfeed(tmp, samples);
+        if (dsp->crossfeed_enabled && dsp->stereo_mode != STEREO_MONO)
+            apply_crossfeed(tmp, samples);
         write_samples((short*) dst, tmp, samples);
         written += samples;
         dst += samples * sizeof(short) * 2;
