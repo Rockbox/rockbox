@@ -95,7 +95,6 @@
     (t << 8) | (u & 0xff); \
 })
 
-
 #define ACC(acc, x, y) \
     (void)acc; \
     asm volatile ("mac.l %[a], %[b], %%acc0" \
@@ -109,8 +108,13 @@
     t; \
 })
 
+#define ACC_INIT(acc, x, y) ACC(acc, x, y)
+
 #else
 
+#define ACC_INIT(acc, x, y) acc = FRACMUL(x, y)
+#define ACC(acc, x, y) acc += FRACMUL(x, y)
+#define GET_ACC(acc) acc
 #define FRACMUL(x, y) (long) (((((long long) (x)) * ((long long) (y))) >> 31))
 #define FRACMUL_8(x, y) (long) (((((long long) (x)) * ((long long) (y))) >> 23))
 #define FRACMUL_8_LOOP(x, y, s) \
@@ -447,7 +451,7 @@ static void apply_crossfeed(long* src[], int count)
 
     if (dsp->crossfeed_enabled && src[0] != src[1])
     {
-        long long a;
+        long a; /* accumulator */
 
         long low_left = crossfeed_data.lowpass[0];
         long low_right = crossfeed_data.lowpass[1];
@@ -468,27 +472,27 @@ static void apply_crossfeed(long* src[], int count)
             left = src[0][i];
             right = src[1][i];
 
-            ACC(a, LOW, low_left); ACC(a, LOW_COMP, left);
+            ACC_INIT(a, LOW, low_left); ACC(a, LOW_COMP, left);
             low_left = GET_ACC(a);
 
-            ACC(a, LOW, low_right); ACC(a, LOW_COMP, right);
+            ACC_INIT(a, LOW, low_right); ACC(a, LOW_COMP, right);
             low_right = GET_ACC(a);
 
             /* use a high-pass filter on the signal */
 
-            ACC(a, HIGH_NEG, high_left); ACC(a, HIGH_COMP, left);
+            ACC_INIT(a, HIGH_NEG, high_left); ACC(a, HIGH_COMP, left);
             high_left = GET_ACC(a);
 
-            ACC(a, HIGH_NEG, high_right); ACC(a, HIGH_COMP, right);
+            ACC_INIT(a, HIGH_NEG, high_right); ACC(a, HIGH_COMP, right);
             high_right = GET_ACC(a);
 
             /* New data is the high-passed signal + delayed and attenuated 
              * low-passed signal from the other channel */
 
-            ACC(a, ATT, delay_r[index]); ACC(a, ATT_COMP, high_left);
+            ACC_INIT(a, ATT, delay_r[index]); ACC(a, ATT_COMP, high_left);
             src[0][i] = GET_ACC(a);
 
-            ACC(a, ATT, delay_l[index]); ACC(a, ATT_COMP, high_right);
+            ACC_INIT(a, ATT, delay_l[index]); ACC(a, ATT_COMP, high_right);
             src[1][i] = GET_ACC(a);
 
             /* Store the low-passed signal in the ringbuffer */
