@@ -310,6 +310,11 @@ int transform_bitmap(const struct RGBQUAD *src, long width, long height,
         dst_h = height;
         break;
 
+      case 5: /* 16-bit packed and byte-swapped RGB (5-6-5) */
+        dst_w = width;
+        dst_h = height;
+        break;
+
       default: /* unknown */
         debugf("error - Undefined destination format\n");
         return 1;
@@ -363,6 +368,7 @@ int transform_bitmap(const struct RGBQUAD *src, long width, long height,
         break;
 
       case 4: /* 16-bit packed RGB (5-6-5) */
+      case 5: /* 16-bit packed and byte-swapped RGB (5-6-5) */
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
@@ -371,7 +377,10 @@ int transform_bitmap(const struct RGBQUAD *src, long width, long height,
                      ((src[row * width + col].rgbGreen >> 2) << 5) |
                      ((src[row * width + col].rgbBlue >> 3)));
 
-                (*dest)[row * dst_w + col] = rgb;
+                if (format == 4)
+                    (*dest)[row * dst_w + col] = rgb;
+                else
+                    (*dest)[row * dst_w + col] = ((rgb&0xff00)>>8)|((rgb&0x00ff)<<8);
             }
         break;
     }
@@ -459,6 +468,7 @@ void print_usage(void)
            "\t         2  Iriver H1x0 4-grey\n"
            "\t         3  Canonical 8-bit grayscale\n"
            "\t         4  16-bit packed 5-6-5 RGB (iriver H300)\n"
+           "\t         5  16-bit packed and byte-swapped 5-6-5 RGB (iPod)\n"
            , APPLICATION_NAME);
     printf("build date: " __DATE__ "\n\n");
 }
