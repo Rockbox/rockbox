@@ -221,8 +221,11 @@ void lcd_update_rect(int x, int y, int width, int height)
 {
     int rect1, rect2, rect3, rect4;
 
-    unsigned short *addr = (unsigned short *)lcd_framebuffer;
+    unsigned long *addr = (unsigned long *)lcd_framebuffer;
 
+    /* TODO: Ensure x is even - so we read 32-bit aligned data from 
+             lcd_framebuffer */
+    
     /* calculate the drawing region */
 #if CONFIG_LCD == LCD_IPODCOLOR
     rect1 = x;                          /* start vert */
@@ -277,7 +280,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         lcd_send_lo(0x22);
     }
 
-    addr += x * LCD_WIDTH + y;
+    addr += x * LCD_WIDTH + y/2;
 
     while (height > 0) {
         int c, r;
@@ -300,18 +303,13 @@ void lcd_update_rect(int x, int y, int width, int height)
         for (r = 0; r < h; r++) {
             /* for each column */
             for (c = 0; c < width; c += 2) {
-                unsigned two_pixels;
-
-                two_pixels = addr[0] | (addr[1] << 16);
-                addr += 2;
-
                 while ((inl(0x70008a20) & 0x1000000) == 0);
 
                 /* output 2 pixels */
-                outl(two_pixels, 0x70008b00);
+                outl(*(addr++), 0x70008b00);
             }
 
-            addr += LCD_WIDTH - width;
+            addr += (LCD_WIDTH - width)/2;
         }
 
         while ((inl(0x70008a20) & 0x4000000) == 0);
