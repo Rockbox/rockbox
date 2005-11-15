@@ -63,6 +63,12 @@ static const char scroll_tick_table[16] = {
     100, 80, 64, 50, 40, 32, 25, 20, 16, 12, 10, 8, 6, 5, 4, 3
 };
 
+/* probably just a dummy */
+int lcd_default_contrast(void)
+{
+    return 28;
+}
+
 /* LCD init */
 void lcd_init(void)
 {

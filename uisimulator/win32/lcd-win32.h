@@ -30,11 +30,15 @@ typedef struct
 	RGBQUAD bmiColors[256];
 } BITMAPINFO256;
 
-extern char            bitmap[LCD_HEIGHT][LCD_WIDTH]; // the ui display
+#if LCD_DEPTH >= 16
+extern unsigned long   bitmap[LCD_HEIGHT][LCD_WIDTH]; // the ui display
+#else
+extern unsigned char   bitmap[LCD_HEIGHT][LCD_WIDTH]; // the ui display
+#endif
 extern BITMAPINFO256   bmi; // bitmap information
 
 #ifdef HAVE_REMOTE_LCD
-extern char            remote_bitmap[LCD_REMOTE_HEIGHT][LCD_REMOTE_WIDTH];
+extern unsigned char   remote_bitmap[LCD_REMOTE_HEIGHT][LCD_REMOTE_WIDTH];
 extern BITMAPINFO256   remote_bmi; // bitmap information
 #endif
 

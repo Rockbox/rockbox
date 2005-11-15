@@ -120,10 +120,6 @@ static void lcd_cmd_data(int cmd, int data)
 }
 
 /*** hardware configuration ***/
-int lcd_default_contrast(void)
-{
-    return 28;
-}
 
 void lcd_set_contrast(int val)
 {

@@ -30,7 +30,7 @@
 #include "lcd-x11.h"
 #endif
 
-void lcd_blit(const unsigned char* p_data, int x, int y, int width, int height,
+void lcd_blit(const fb_data* p_data, int x, int y, int width, int height,
               int stride)
 {
     (void)p_data;

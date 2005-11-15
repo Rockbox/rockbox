@@ -98,6 +98,9 @@ drivers/i2c.c
 #if CONFIG_CODEC != SWCODEC
 drivers/mas.c
 #endif
+#ifdef IRIVER_H300_SERIES
+drivers/pcf50606.c
+#endif
 #ifdef HAVE_RTC
 drivers/rtc.c
 #endif
@@ -150,6 +153,3 @@ replaygain.c
 pcm_record.c
 #endif
 sound.c
-#ifdef IRIVER_H300_SERIES
-drivers/pcf50606.c
-#endif

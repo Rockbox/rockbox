@@ -93,6 +93,22 @@ typedef unsigned short wchar_t;
 #define UI_REMOTE_WIDTH             128
 #define UI_REMOTE_HEIGHT            64
 
+#elif defined(IRIVER_H300_SERIES)
+#define UI_TITLE                    "iriver H300"
+#define UI_WIDTH                    288 // width of GUI window
+#define UI_HEIGHT                   581 // height of GUI window
+/* high-colour */
+#define UI_LCD_POSX                 26 // x position of lcd
+#define UI_LCD_POSY                 36 // y position of lcd
+#define UI_LCD_WIDTH                220
+#define UI_LCD_HEIGHT               176
+#define UI_REMOTE_BGCOLOR           90, 145, 90 // bkgnd of remote lcd (no bklight)
+#define UI_REMOTE_BGCOLORLIGHT      250, 180, 130 // bkgnd of remote lcd (bklight)
+#define UI_REMOTE_POSX              12  // x position of remote lcd
+#define UI_REMOTE_POSY              478 // y position of remote lcd
+#define UI_REMOTE_WIDTH             128
+#define UI_REMOTE_HEIGHT            64
+
 #elif defined(ARCHOS_GMINI120)
 #define UI_TITLE                    "Gmini 120"
 #define UI_WIDTH                    370 // width of GUI window

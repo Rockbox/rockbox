@@ -49,13 +49,6 @@ void lcd_write_data(const unsigned short* p_bytes, int count)
 
 /*** hardware configuration ***/
 
-int lcd_default_contrast(void)
-{
-    return 28;
-}
-
-#ifndef SIMULATOR
-
 void lcd_set_contrast(int val)
 {
     (void)val;
@@ -84,10 +77,8 @@ void lcd_roll(int lines)
     (void)lines;
 }
 
-#endif /* !SIMULATOR */
 
 /* LCD init */
-#ifndef SIMULATOR
 void lcd_init_device(void)
 {
     /* GPO46 is LCD RESET */
@@ -216,4 +207,3 @@ void lcd_update_rect(int x, int y, int width, int height)
         lcd_write_data ((unsigned short *)&lcd_framebuffer[y][x], width);
     }
 }
-#endif /* !SIMULATOR */
