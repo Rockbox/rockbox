@@ -50,7 +50,7 @@ mad_fixed_t const sf_table[64] ICONST_ATTR = {
 
 /* linear scaling table */
 static
-mad_fixed_t const linear_table[14] IDATA_ATTR = {
+mad_fixed_t const linear_table[14] ICONST_ATTR = {
   MAD_F(0x15555555),  /* 2^2  / (2^2  - 1) == 1.33333333333333 */
   MAD_F(0x12492492),  /* 2^3  / (2^3  - 1) == 1.14285714285714 */
   MAD_F(0x11111111),  /* 2^4  / (2^4  - 1) == 1.06666666666667 */
