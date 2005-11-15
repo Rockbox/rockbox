@@ -21,3 +21,12 @@ Statusbar: off
 Height: 128
 Width: 160
 </wps>
+
+<wps>
+Name: default.wps
+Author: Rockbox team
+Font: rockbox_default.fnt
+Statusbar: on
+Height: 64
+Width: 112
+</wps>
