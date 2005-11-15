@@ -102,10 +102,8 @@ static inline void load_context(const void* addr)
         "ldr r0, [%0, #44]      \n" /* load start pointer */
         "mov r1, #0             \n"
         "cmp r0, r1             \n" /* check for NULL */
-        "beq .running           \n" /* if it's NULL, we're already running */
-        "str r1, [%0, #44]      \n"
-        "mov pc, r0             \n" /* not already running, so jump to start */
-    ".running:                  \n"
+        "strne r1, [%0, #44]    \n" /* if it's NULL, we're already running */
+        "movne  pc, r0          \n" /* not already running, so jump to start */
         : : "r" (addr) : "r0", "r1"
     );
 }
