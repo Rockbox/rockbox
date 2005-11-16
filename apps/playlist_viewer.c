@@ -47,7 +47,7 @@
 #include "splash.h"
 
 /* Maximum number of tracks we can have loaded at one time */
-#define MAX_PLAYLIST_ENTRIES 40
+#define MAX_PLAYLIST_ENTRIES 200
 
 /* The number of items between the selected one and the end/start of
  * the buffer under which the buffer must reload */
@@ -598,7 +598,11 @@ void playlist_callback_icons(int selected_item, void * data, ICON * icon)
 #endif
     }
     else
+#ifdef HAVE_LCD_BITMAP
         *icon=0;
+#else
+        *icon=-1;
+#endif
 }
 
 

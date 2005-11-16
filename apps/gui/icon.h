@@ -25,7 +25,7 @@
 #ifdef HAVE_LCD_BITMAP
     typedef const unsigned char * ICON;
 #else
-    typedef unsigned short ICON;
+    typedef short ICON;
 #endif
 
 #define CURSOR_CHAR 0x92
