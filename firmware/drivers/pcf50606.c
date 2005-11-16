@@ -201,7 +201,7 @@ int pcf50606_i2c_write(int address, const unsigned char* buf, int count)
     return x;
 }
 
-int pcf50606_read(int address, unsigned char* buf, int count)
+int pcf50606_read_multiple(int address, unsigned char* buf, int count)
 {
     int i=0;
     int ret = 0;
@@ -232,7 +232,19 @@ int pcf50606_read(int address, unsigned char* buf, int count)
     return ret;
 }
 
-int pcf50606_write(int address, const unsigned char* buf, int count)
+int pcf50606_read(int address)
+{
+    int ret;
+    unsigned char c;
+
+    ret = pcf50606_read_multiple(address, &c, 1);
+    if(ret >= 0)
+        return c;
+    else
+        return ret;
+}
+
+int pcf50606_write_multiple(int address, const unsigned char* buf, int count)
 {
     unsigned char obuf[1];
     int i;
@@ -262,6 +274,12 @@ int pcf50606_write(int address, const unsigned char* buf, int count)
     return ret;
 }
 
+int pcf50606_write(int address, unsigned char val)
+{
+    return pcf50606_write_multiple(address, &val, 1);
+}
+
+
 /* These voltages were determined by measuring the output of the PCF50606
    on a running H300, and verified by disassembling the original firmware */
 static void set_voltages(void)
@@ -275,13 +293,11 @@ static void set_voltages(void)
             0xef,   /* LPREGC1 = 2.4V, ON in all states */
         };
     
-    pcf50606_write(0x23, buf, 5);
+    pcf50606_write_multiple(0x23, buf, 5);
 }
 
 void pcf50606_init(void)
 {
-    unsigned char c;
-    
     /* Bit banged I2C */
     or_l(0x00002000, &GPIO1_OUT);
     or_l(0x00001000, &GPIO_OUT);
@@ -293,6 +309,5 @@ void pcf50606_init(void)
     set_voltages();
 
     /* Backlight PWM = 512Hz 50/50 */
-    c = 0x13;
-    pcf50606_write(0x35, &c, 1);
+    pcf50606_write(0x35, 0x13);
 }
