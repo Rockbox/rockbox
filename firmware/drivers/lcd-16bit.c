@@ -34,7 +34,7 @@
 
 #define SCROLLABLE_LINES 26
 
-#define RGB_PACK(r,g,b) (htobe16(((r>>3)<<11)|((g>>2)<<5)|(b>>3)))
+#define RGB_PACK(r,g,b) (htobe16(((r)<<11)|((g)<<5)|(b)))
 
 /*** globals ***/
 fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH] __attribute__ ((aligned (4)));
@@ -73,7 +73,7 @@ int lcd_default_contrast(void)
 void lcd_init(void)
 {
     fg_pattern = 0x0000; /* Black */
-    bg_pattern = RGB_PACK(0xb6, 0xc6, 0xe5); /* "Rockbox blue" */
+    bg_pattern = RGB_PACK(0x17, 0x31, 0x1d); /* "Rockbox blue" */
 
     lcd_clear_display();
     /* Call device specific init */
@@ -96,23 +96,22 @@ int lcd_get_drawmode(void)
 
 void lcd_set_foreground(struct rgb color)
 {
-    fg_pattern=RGB_PACK(color.red,color.green,color.blue);
+    fg_pattern = RGB_PACK(color.red, color.green, color.blue);
 }
 
 struct rgb lcd_get_foreground(void)
 {
     struct rgb colour;
 
-    colour.red=((fg_pattern&0xf800)>>11)<<3;
-    colour.green=((fg_pattern&0x03e0)>>5)<<2;
-    colour.blue=(fg_pattern&0x1f)<<3;
-
+    colour.red   = (fg_pattern >> 11) & 0x1f;
+    colour.green = (fg_pattern >> 5) & 0x3f;
+    colour.blue  =  fg_pattern & 0x1f;
     return colour;
 }
 
 void lcd_set_background(struct rgb color)
 {
-    bg_pattern=RGB_PACK(color.red,color.green,color.blue);
+    bg_pattern = RGB_PACK(color.red, color.green, color. blue);
 }
 
 
@@ -120,9 +119,9 @@ struct rgb lcd_get_background(void)
 {
     struct rgb colour;
 
-    colour.red=((bg_pattern&0xf800)>>11)<<3;
-    colour.green=((bg_pattern&0x03e0)>>5)<<2;
-    colour.blue=(bg_pattern&0x1f)<<3;
+    colour.red   = (bg_pattern >> 11) & 0x1f;
+    colour.green = (bg_pattern >> 5) & 0x3f;
+    colour.blue  =  bg_pattern & 0x1f;
     return colour;
 }
 
@@ -174,14 +173,11 @@ static void clearpixel(int x, int y)
 
 static void flippixel(int x, int y)
 {
-  /* What should this do on a color display? */
-  (void)x;
-  (void)y;
+    lcd_framebuffer[y][x] = ~lcd_framebuffer[y][x];
 }
 
 static void nopixel(int x, int y)
 {
-  /* What should this do on a color display? */
     (void)x;
     (void)y;
 }
@@ -196,13 +192,13 @@ lcd_pixelfunc_type* const lcd_pixelfuncs[8] = {
 /* Clear the whole display */
 void lcd_clear_display(void)
 {
-    int i;
-    unsigned short bits = (drawmode & DRMODE_INVERSEVID) ? fg_pattern : bg_pattern;
-    unsigned short* addr = (unsigned short *)lcd_framebuffer;
-
-    for (i=0;i<LCD_HEIGHT*LCD_WIDTH;i++) {
-        *(addr++)=bits;
-    }
+    fb_data bits = (drawmode & DRMODE_INVERSEVID) ? fg_pattern : bg_pattern;
+    fb_data *dst = &lcd_framebuffer[0][0];
+    fb_data *dst_end = dst + LCD_HEIGHT*LCD_WIDTH;
+    
+    do
+        *dst++ = bits;
+    while (dst < dst_end);
     scrolling_lines = 0;
 }
 
@@ -361,7 +357,7 @@ void lcd_drawrect(int x, int y, int width, int height)
 /* Fill a rectangular area */
 void lcd_fillrect(int x, int y, int width, int height)
 {
-    int nx, ny;
+    int xe, ye, xc;
     lcd_pixelfunc_type *pfunc = lcd_pixelfuncs[drawmode];
 
     /* nothing to draw? */
@@ -385,13 +381,12 @@ void lcd_fillrect(int x, int y, int width, int height)
     if (y + height > LCD_HEIGHT)
         height = LCD_HEIGHT - y;
 
-    ny = y + height;
-    for(;y < ny;y++)
+    ye = y + height;
+    xe = x + width;
+    for(; y < ye; y++)
     {
-        int xc;
-        nx = x + width;
-        for(xc = x;xc < nx;xc++)
-            pfunc(x, y);
+        for(xc = x; xc < xe; xc++)
+            pfunc(xc, y);
     }
 }
 
@@ -404,9 +399,8 @@ void lcd_fillrect(int x, int y, int width, int height)
  * byte 1 2nd from left etc. The first row of bytes defines pixel rows
  * 0..7, the second row defines pixel row 8..15 etc.
  *
- * This is similar to the internal lcd hw format. */
-
-static unsigned char masks[8]={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
+ * This is the mono bitmap format used on all other targets so far; the
+ * pixel packing doesn't really matter on a 8bit+ target. */
 
 /* Draw a partial monochrome bitmap */
 void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
@@ -415,13 +409,10 @@ void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
 void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
                           int stride, int x, int y, int width, int height)
 {
-    int in_x,in_y;
-    int out_x;
-    int out_y;
-    unsigned char pixel;
-    fb_data * addr;
+    int xe, ye, yc;
+    lcd_pixelfunc_type *fgfunc;
+    lcd_pixelfunc_type *bgfunc;
 
-    (void)stride;
     /* nothing to draw? */
     if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
         || (x + width <= 0) || (y + height <= 0))
@@ -445,24 +436,35 @@ void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
     if (y + height > LCD_HEIGHT)
         height = LCD_HEIGHT - y;
 
-//    src += stride * (src_y >> 3) + src_x; /* move starting point */
+    src += stride * (src_y >> 3) + src_x; /* move starting point */
+    src_y  &= 7;
 
-    /* Copying from src_x,src_y to (x,y).  Size is width,height */
-    in_x=src_x;
-    for (out_x=x;out_x<(x+width);out_x++) {
-      in_y=src_y;
-      for (out_y=y;out_y<(y+height);out_y++) {
-         pixel=(*src)&masks[in_y];
-         addr=&lcd_framebuffer[out_y][out_x];
-         if (pixel > 0) {
-            *addr=fg_pattern;
-         } else {
-            *addr=bg_pattern;
-         }
-         in_y++;
-      }
-      in_x++;
-      src++;
+    xe = x + width;
+    ye = y + height;
+    fgfunc = lcd_pixelfuncs[drawmode];
+    bgfunc = lcd_pixelfuncs[drawmode ^ DRMODE_INVERSEVID];
+
+    for (; x < xe; x++)
+    {
+        const unsigned char *src_col = src++;
+        unsigned char data = *src_col >> src_y;
+        int numbits = 8 - src_y;
+        
+        for (yc = y; yc < ye; yc++)
+        {
+            if (data & 0x01)
+                fgfunc(x, yc);
+            else
+                bgfunc(x, yc);
+
+            data >>= 1;
+            if (--numbits == 0)
+            {
+                src_col += stride;
+                data = *src_col;
+                numbits = 8;
+            }
+        }
     }
 }
 
@@ -479,33 +481,52 @@ void lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
 void lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
                      int stride, int x, int y, int width, int height)
 {
-    (void)src;
-    (void)src_x;
-    (void)src_y;
-    (void)stride;
-    (void)x;
-    (void)y;
-    (void)width;
-    (void)height;
+    int ye;
+
+    /* nothing to draw? */
+    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
+        || (x + width <= 0) || (y + height <= 0))
+        return;
+        
+    /* clipping */
+    if (x < 0)
+    {
+        width += x;
+        src_x -= x;
+        x = 0;
+    }
+    if (y < 0)
+    {
+        height += y;
+        src_y -= y;
+        y = 0;
+    }
+    if (x + width > LCD_WIDTH)
+        width = LCD_WIDTH - x;
+    if (y + height > LCD_HEIGHT)
+        height = LCD_HEIGHT - y;
+
+    src += stride * src_y + src_x; /* move starting point */
+    ye = y + height;
+
+    for (; y < ye; y++)
+    {
+        const fb_data *src_row = src;
+        fb_data *dst = &lcd_framebuffer[y][x];
+        fb_data *dst_end = dst + width;
+
+        do
+            *dst++ = *src_row++;
+        while (dst < dst_end);
+
+        src += stride;
+    }
 }
 
 /* Draw a full native bitmap */
 void lcd_bitmap(const fb_data *src, int x, int y, int width, int height)
 {
-    fb_data* s=(fb_data *)src;
-    fb_data* d=&lcd_framebuffer[y][x];
-    int k=LCD_WIDTH-width;
-    int i,j;
-
-    for (i=0;i<height;i++) {
-        for (j=0;j<width;j++) {
-            *(d++)=*(s++);
-        }
-        d+=k;
-    }
-
-//OLD Implementation: lcd_bitmap_part(src, 0, 0, width, x, y, width, height);
-
+    lcd_bitmap_part(src, 0, 0, width, x, y, width, height);
 }
 
 /* put a string at a given pixel position, skipping first ofs pixel columns */
@@ -571,15 +592,12 @@ void lcd_puts_style(int x, int y, const unsigned char *str, int style)
     lcd_putsxy(xpos, ypos, str);
     drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
     (void)style;
-#if 0
-    /* TODO: Implement lcd_fillrect */
     lcd_fillrect(xpos + w, ypos, LCD_WIDTH - (xpos + w), h);
     if (style & STYLE_INVERT)
     {
         drawmode = DRMODE_COMPLEMENT;
         lcd_fillrect(xpos, ypos, LCD_WIDTH - xpos, h);
     }
-#endif
     drawmode = lastmode;
 }
 
