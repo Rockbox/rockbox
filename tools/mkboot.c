@@ -18,15 +18,16 @@
  ****************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 void usage(void)
 {
-    printf("usage: mkboot <firmware file> <boot file> <output file>\n");
+    printf("usage: mkboot [-h300] <firmware file> <boot file> <output file>\n");
 
     exit(1);
 }
 
-unsigned char image[0x200000 + 0x220 + 0x200000/0x200];
+unsigned char image[0x400000 + 0x220 + 0x400000/0x200];
 
 int main(int argc, char *argv[])
 {
@@ -37,14 +38,25 @@ int main(int argc, char *argv[])
     int file_length;
     int len;
     int actual_length, total_length, binary_length, num_chksums;
+    int origin = 0x1f0000;   /* H1x0 bootloader address */
     
     if(argc < 3) {
         usage();
     }
 
-    infile = argv[1];
-    bootfile = argv[2];
-    outfile = argv[3];
+    if(!strcmp(argv[1], "-h300")) {
+        infile = argv[2];
+        bootfile = argv[3];
+        outfile = argv[4];
+
+        origin = 0x3f0000;   /* H3x0 bootloader address */
+    }
+    else
+    {
+        infile = argv[1];
+        bootfile = argv[2];
+        outfile = argv[3];
+    }
 
     memset(image, 0xff, sizeof(image));
 
@@ -88,7 +100,7 @@ int main(int argc, char *argv[])
 
     fseek(f, 0, SEEK_SET);
 
-    i = fread(image+0x220 + 0x1f0000, 1, len, f);
+    i = fread(image+0x220 + 0x3f0000, 1, len, f);
     if(i < len) {
         perror(bootfile);
         exit(1);
@@ -103,13 +115,13 @@ int main(int argc, char *argv[])
     }
 
     /* Patch the reset vector to start the boot loader */
-    image[0x220 + 4] = image[0x1f0000 + 0x220 + 4];
-    image[0x220 + 5] = image[0x1f0000 + 0x220 + 5];
-    image[0x220 + 6] = image[0x1f0000 + 0x220 + 6];
-    image[0x220 + 7] = image[0x1f0000 + 0x220 + 7];
+    image[0x220 + 4] = image[origin + 0x220 + 4];
+    image[0x220 + 5] = image[origin + 0x220 + 5];
+    image[0x220 + 6] = image[origin + 0x220 + 6];
+    image[0x220 + 7] = image[origin + 0x220 + 7];
 
     /* This is the actual length of the binary, excluding all headers */
-    actual_length = 0x1f0000 + len;
+    actual_length = origin + len;
 
     /* Patch the ESTFBINR header */
     image[0x20c] = (actual_length >> 24) & 0xff;
