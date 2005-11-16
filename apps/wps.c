@@ -53,6 +53,7 @@
 #include "onplay.h"
 #include "abrepeat.h"
 #include "playback.h"
+#include "splash.h"
 
 #define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
                                 /* 3% of 30min file == 54s step size */
