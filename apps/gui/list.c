@@ -40,12 +40,11 @@
 
 
 void gui_list_init(struct gui_list * gui_list,
-    list_get_icon callback_get_item_icon,
     list_get_name callback_get_item_name,
     void * data
     )
 {
-    gui_list->callback_get_item_icon = callback_get_item_icon;
+    gui_list->callback_get_item_icon = NULL;
     gui_list->callback_get_item_name = callback_get_item_name;
     gui_list->display = NULL;
     gui_list_set_nb_items(gui_list, 0);
@@ -126,8 +125,7 @@ void gui_list_draw(struct gui_list * gui_list)
     int cursor_pos = 0;
     int icon_pos = 1;
     int text_pos;
-    bool draw_icons = (gui_list->callback_get_item_icon != NULL &&
-                       global_settings.show_icons) ;
+    bool draw_icons = (gui_list->callback_get_item_icon != NULL ) ;
     bool draw_cursor;
     int i;
 
@@ -363,7 +361,6 @@ void gui_list_del_item(struct gui_list * gui_list)
  */
 void gui_synclist_init(
     struct gui_synclist * lists,
-    list_get_icon callback_get_item_icon,
     list_get_name callback_get_item_name,
     void * data
     )
@@ -372,7 +369,6 @@ void gui_synclist_init(
     FOR_NB_SCREENS(i)
     {
         gui_list_init(&(lists->gui_list[i]),
-                      callback_get_item_icon,
                       callback_get_item_name,
                       data);
         gui_list_set_display(&(lists->gui_list[i]), &(screens[i]));
@@ -385,6 +381,14 @@ void gui_synclist_set_nb_items(struct gui_synclist * lists, int nb_items)
     FOR_NB_SCREENS(i)
     {
         gui_list_set_nb_items(&(lists->gui_list[i]), nb_items);
+    }
+}
+void gui_synclist_set_icon_callback(struct gui_synclist * lists, list_get_icon icon_callback)
+{
+    int i;
+    FOR_NB_SCREENS(i)
+    {
+        gui_list_set_icon_callback(&(lists->gui_list[i]), icon_callback);
     }
 }
 

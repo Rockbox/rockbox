@@ -96,7 +96,8 @@ int menu_init(const struct menu_item* mitems, int count, int (*callback)(int, in
         return -1;
     menus[menu].items = (struct menu_item*)mitems; /* de-const */
     gui_synclist_init(&(menus[menu].synclist),
-                      NULL, &menu_get_itemname, &menus[menu]);
+                      &menu_get_itemname, &menus[menu]);
+    gui_synclist_set_icon_callback(&(menus[menu].synclist), NULL);
     gui_synclist_set_nb_items(&(menus[menu].synclist), count);
     menus[menu].callback = callback;
 #ifdef HAS_BUTTONBAR

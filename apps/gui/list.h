@@ -136,9 +136,9 @@ struct gui_list
  *    to a given item number
  *  - callback_get_item_name : pointer to a function that associates a label
  *    to a given item number
+ *  - data : extra data passed to the list callback
  */
 extern void gui_list_init(struct gui_list * gui_list,
-    list_get_icon callback_get_item_icon,
     list_get_name callback_get_item_name,
     void * data
     );
@@ -146,7 +146,7 @@ extern void gui_list_init(struct gui_list * gui_list,
 /*
  * Sets the numbers of items the list can currently display
  * note that the list's context like the currently pointed item is resetted
- *  - gui_list : the list structure to initialize
+ *  - gui_list : the list structure
  *  - nb_items : the numbers of items you want
  */
 #define gui_list_set_nb_items(gui_list, nb) \
@@ -154,7 +154,7 @@ extern void gui_list_init(struct gui_list * gui_list,
 
 /*
  * Returns the numbers of items currently in the list
- *  - gui_list : the list structure to initialize
+ *  - gui_list : the list structure
  */
 #define gui_list_get_nb_items(gui_list) \
     (gui_list)->nb_items
@@ -168,6 +168,14 @@ extern void gui_list_init(struct gui_list * gui_list,
  */
 extern void gui_list_put_selection_in_screen(struct gui_list * gui_list,
                                              bool put_from_end);
+
+/*
+ * Sets the icon callback function
+ *  - gui_list : the list structure
+ *  - _callback : the callback function
+ */
+#define gui_list_set_icon_callback(gui_list, _callback) \
+    (gui_list)->callback_get_item_icon=_callback
 
 /*
  * Attach the scrolling list to a screen
@@ -277,14 +285,14 @@ struct gui_synclist
 
 extern void gui_synclist_init(
     struct gui_synclist * lists,
-    list_get_icon callback_get_item_icon,
     list_get_name callback_get_item_name,
     void * data
     );
 extern void gui_synclist_set_nb_items(struct gui_synclist * lists, int nb_items);
-
+extern void gui_synclist_set_icon_callback(struct gui_synclist * lists, list_get_icon icon_callback);
 #define gui_synclist_get_nb_items(lists) \
     gui_list_get_nb_items(&((lists)->gui_list[0]))
+
 extern int  gui_synclist_get_sel_pos(struct gui_synclist * lists);
 
 #define gui_synclist_get_sel_pos(lists) \

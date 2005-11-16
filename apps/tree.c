@@ -229,7 +229,9 @@ void browse_root(void)
     gui_buttonbar_set_display(&tree_buttonbar, &(screens[SCREEN_MAIN]) );
 #endif
     gui_syncstatusbar_init(&statusbars);
-    gui_synclist_init(&tree_lists, &tree_get_fileicon, &tree_get_filename, &tc);
+    gui_synclist_init(&tree_lists, &tree_get_filename, &tc);
+    gui_synclist_set_icon_callback(&tree_lists,
+                  global_settings.show_icons?&tree_get_fileicon:NULL);
 #ifndef SIMULATOR
     dirbrowse();
 #else
@@ -338,6 +340,8 @@ static int update_dir(void)
         }
     }
     gui_synclist_set_nb_items(&tree_lists, tc.filesindir);
+    gui_synclist_set_icon_callback(&tree_lists,
+                  global_settings.show_icons?&tree_get_fileicon:NULL);
     if( tc.selected_item >= tc.filesindir)
         tc.selected_item=tc.filesindir-1;
 

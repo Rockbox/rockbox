@@ -618,8 +618,9 @@ bool playlist_viewer_ex(char* filename)
     if (!playlist_viewer_init(&viewer, filename, false))
         goto exit;
 
-    gui_synclist_init(&playlist_lists, playlist_callback_icons,
-                      playlist_callback_name, &viewer);
+    gui_synclist_init(&playlist_lists, playlist_callback_name, &viewer);
+    gui_synclist_set_icon_callback(&playlist_lists,
+                  global_settings.playlist_viewer_icons?&playlist_callback_icons:NULL);
     gui_synclist_set_nb_items(&playlist_lists, viewer.num_tracks);
     gui_synclist_select_item(&playlist_lists, viewer.selected_track);
     gui_synclist_draw(&playlist_lists);
@@ -773,6 +774,11 @@ bool playlist_viewer_ex(char* filename)
                     ret = true;
                     goto exit;
                 }
+                gui_synclist_set_icon_callback(
+                    &playlist_lists,
+                    global_settings.playlist_viewer_icons?
+                        &playlist_callback_icons:NULL
+                    );
                 gui_synclist_draw(&playlist_lists);
                 break;
 
