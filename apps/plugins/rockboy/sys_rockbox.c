@@ -36,11 +36,8 @@ rcvar_t vid_exports[] =
 };
 
 struct fb fb;
-byte *video_base_buf;
 
 extern int debug_trace;
-
-static byte frameb[145][160];
 
 void vid_settitle(char *title)
 {
@@ -124,7 +121,7 @@ void ev_poll(void)
             ev_postevent(&ev);
         }
         if(pressed & ROCKBOY_MENU) {
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
           if (do_user_menu() == USER_MENU_QUIT) 
 #endif
           {
@@ -156,38 +153,32 @@ void vid_init(void)
     fb.pitch=160;
     fb.enabled=1;
     fb.dirty=0;
-    video_base_buf=fb.ptr=(byte *)frameb;
     fb.mode=3;
 }
+
+#ifdef HAVE_LCD_COLOR
+static const fb_data my_pal[4] = {
+    LCD_WHITE, LCD_LIGHTGRAY, LCD_DARKGRAY, LCD_BLACK
+};
+#endif
 
 void vid_update(int scanline) 
 {
     int cnt=0,scanline_remapped;
-    byte *frameb;
-#if LCD_HEIGHT == 64 /* Archos */
+    fb_data *frameb;
+#if (LCD_HEIGHT == 64) && (LCD_DEPTH == 1) /* Archos */
     int balance = 0;
     if (fb.mode==1)
-      scanline-=16;
+        scanline-=16;
     else if (fb.mode==2)
-      scanline-=8;
+        scanline-=8;
     scanline_remapped = scanline / 16;
     frameb = rb->lcd_framebuffer + scanline_remapped * LCD_WIDTH;
     while (cnt < 160) {
         balance += LCD_WIDTH;
         if (balance > 0)
         {
-#ifdef SIMULATOR /* simulator uses C */
-             register unsigned scrbyte = 0;
-             if (scan.buf[0][cnt] & 0x02)  scrbyte |= 0x01;
-             if (scan.buf[1][cnt] & 0x02)  scrbyte |= 0x02;
-             if (scan.buf[2][cnt] & 0x02)  scrbyte |= 0x04;
-             if (scan.buf[3][cnt] & 0x02)  scrbyte |= 0x08;
-             if (scan.buf[4][cnt] & 0x02)  scrbyte |= 0x10;
-             if (scan.buf[5][cnt] & 0x02)  scrbyte |= 0x20;
-             if (scan.buf[6][cnt] & 0x02)  scrbyte |= 0x40;
-             if (scan.buf[7][cnt] & 0x02)  scrbyte |= 0x80;
-             *(frameb++) = scrbyte;
-#else
+#if (CONFIG_CPU == SH7034) && !defined(SIMULATOR)
              asm volatile (
                  "mov.b   @%0,r0         \n"
                  "add     %1,%0          \n"
@@ -234,25 +225,31 @@ void vid_update(int scanline)
                  : /* clobbers */
                  "r0", "r1"
              );
+#else
+             register unsigned scrbyte = 0;
+             if (scan.buf[0][cnt] & 0x02)  scrbyte |= 0x01;
+             if (scan.buf[1][cnt] & 0x02)  scrbyte |= 0x02;
+             if (scan.buf[2][cnt] & 0x02)  scrbyte |= 0x04;
+             if (scan.buf[3][cnt] & 0x02)  scrbyte |= 0x08;
+             if (scan.buf[4][cnt] & 0x02)  scrbyte |= 0x10;
+             if (scan.buf[5][cnt] & 0x02)  scrbyte |= 0x20;
+             if (scan.buf[6][cnt] & 0x02)  scrbyte |= 0x40;
+             if (scan.buf[7][cnt] & 0x02)  scrbyte |= 0x80;
+             *(frameb++) = scrbyte;
 #endif
              balance -= 160;
         }
         cnt ++;
     }
     rb->lcd_update_rect(0, (scanline/2) & ~7, LCD_WIDTH, 8);
-#else /* LCD_HEIGHT != 64, iRiver */
+#elif (LCD_HEIGHT == 128) && (LCD_DEPTH == 2) /* iriver H1x0 */
     if (fb.mode==1)
-      scanline-=16;
+        scanline-=16;
     else if (fb.mode==2)
-      scanline-=8;
-#if LCD_DEPTH == 2
+        scanline-=8;
     scanline_remapped = scanline / 4;
-#else
-    scanline_remapped = scanline / 8;
-#endif	    
     frameb = rb->lcd_framebuffer + scanline_remapped * LCD_WIDTH;
     while (cnt < 160) {
-#if LCD_DEPTH == 2
         *(frameb++) = (scan.buf[0][cnt]&0x3) |
                       ((scan.buf[1][cnt]&0x3)<<2) |
                       ((scan.buf[2][cnt]&0x3)<<4) |
@@ -260,21 +257,12 @@ void vid_update(int scanline)
         cnt++;
     }
     rb->lcd_update_rect(0, scanline & ~3, LCD_WIDTH, 4);
-#else	    
-        register unsigned scrbyte = 0;
-        if (scan.buf[0][cnt] & 0x02)  scrbyte |= 0x01;
-        if (scan.buf[1][cnt] & 0x02)  scrbyte |= 0x02;
-        if (scan.buf[2][cnt] & 0x02)  scrbyte |= 0x04;
-        if (scan.buf[3][cnt] & 0x02)  scrbyte |= 0x08;
-        if (scan.buf[4][cnt] & 0x02)  scrbyte |= 0x10;
-        if (scan.buf[5][cnt] & 0x02)  scrbyte |= 0x20;
-        if (scan.buf[6][cnt] & 0x02)  scrbyte |= 0x40;
-        if (scan.buf[7][cnt] & 0x02)  scrbyte |= 0x80;
-        *(frameb++) = scrbyte;
-        cnt++;
-    }
-    rb->lcd_update_rect(0, scanline & ~7, LCD_WIDTH, 8);
-#endif /* LCD_DEPTH */
+#elif (LCD_HEIGHT >= 144) && defined(HAVE_LCD_COLOR) /* iriver H3x0, colour iPod */
+    scanline_remapped = scanline + (LCD_HEIGHT-144)/2;
+    frameb = rb->lcd_framebuffer + scanline_remapped * LCD_WIDTH + (LCD_WIDTH-160)/2;
+    while (cnt < 160)
+        *frameb++ = my_pal[scan.buf[0][cnt++]&0x3];
+    rb->lcd_update_rect((LCD_WIDTH-160)/2, scanline_remapped, 160, 1);
 #endif /* LCD_HEIGHT */
 }
 

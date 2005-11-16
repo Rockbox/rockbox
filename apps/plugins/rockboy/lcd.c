@@ -99,21 +99,21 @@ static byte *vdest;
 #ifndef ASM_UPDATEPATPIX
 void updatepatpix(void)
 {
-	int i, j;
+    int i, j;
 #if ((CONFIG_CPU != SH7034) && (CONFIG_CPU != MCF5249)) || defined(SIMULATOR)
-	int k, a, c;
+    int k, a, c;
 #endif
-	byte *vram = lcd.vbank[0];
+    byte *vram = lcd.vbank[0];
 
-	if (!anydirty) return;
-	for (i = 0; i < 1024; i++)
-	{
-		if (i == 384) i = 512;
-		if (i == 896) break;
-		if (!patdirty[i]) continue;
-		patdirty[i] = 0;
-		for (j = 0; j < 8; j++)
-		{
+    if (!anydirty) return;
+    for (i = 0; i < 1024; i++)
+    {
+        if (i == 384) i = 512;
+        if (i == 896) break;
+        if (!patdirty[i]) continue;
+        patdirty[i] = 0;
+        for (j = 0; j < 8; j++)
+        {
 #if CONFIG_CPU == SH7034 && !defined(SIMULATOR)
             asm volatile (
                 "mov.w   @%2,r1         \n"
@@ -248,18 +248,18 @@ void updatepatpix(void)
                 "d0", "d1", "d2"
             );
 #else
-			a = ((i<<4) | (j<<1));
-			for (k = 0; k < 8; k++)
-			{
-				c = vram[a] & (1<<k) ? 1 : 0;
-				c |= vram[a+1] & (1<<k) ? 2 : 0;
-				patpix[i+1024][j][k] = c;
-			}
-			for (k = 0; k < 8; k++)
-				patpix[i][j][k] =
-					patpix[i+1024][j][7-k];
+            a = ((i<<4) | (j<<1));
+            for (k = 0; k < 8; k++)
+            {
+                c = vram[a] & (1<<k) ? 1 : 0;
+                c |= vram[a+1] & (1<<k) ? 2 : 0;
+                patpix[i+1024][j][k] = c;
+            }
+            for (k = 0; k < 8; k++)
+                patpix[i][j][k] =
+                    patpix[i+1024][j][7-k];
 #endif
-		}
+        }
 #if CONFIG_CPU == SH7034 && !defined(SIMULATOR)
         asm volatile (
             "mov.l   @%0,r0         \n"
@@ -386,19 +386,19 @@ void updatepatpix(void)
             "d0", "d1", "d2", "d3", "d4", "d5"
         );
 #else
-		for (j = 0; j < 8; j++)
-		{
-			for (k = 0; k < 8; k++)
-			{
-				patpix[i+2048][j][k] =
-					patpix[i][7-j][k];
-				patpix[i+3072][j][k] =
-					patpix[i+1024][7-j][k];
-			}
-		}
+        for (j = 0; j < 8; j++)
+        {
+            for (k = 0; k < 8; k++)
+            {
+                patpix[i+2048][j][k] =
+                    patpix[i][7-j][k];
+                patpix[i+3072][j][k] =
+                    patpix[i+1024][7-j][k];
+            }
+        }
 #endif
-	}
-	anydirty = 0;
+    }
+    anydirty = 0;
 }
 #endif /* ASM_UPDATEPATPIX */
 
@@ -406,99 +406,99 @@ void updatepatpix(void)
 
 void tilebuf(void)
 {
-	int i, cnt;
-	int base;
-	byte *tilemap, *attrmap;
-	int *tilebuf;
-	int *wrap;
-	static int wraptable[64] =
-	{
-		0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
-		0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,-32
-	};
+    int i, cnt;
+    int base;
+    byte *tilemap, *attrmap;
+    int *tilebuf;
+    int *wrap;
+    static int wraptable[64] =
+    {
+        0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,-32
+    };
 
-	base = ((R_LCDC&0x08)?0x1C00:0x1800) + (T<<5) + S;
-	tilemap = lcd.vbank[0] + base;
-	attrmap = lcd.vbank[1] + base;
-	tilebuf = BG;
-	wrap = wraptable + S;
-	cnt = ((WX + 7) >> 3) + 1;
+    base = ((R_LCDC&0x08)?0x1C00:0x1800) + (T<<5) + S;
+    tilemap = lcd.vbank[0] + base;
+    attrmap = lcd.vbank[1] + base;
+    tilebuf = BG;
+    wrap = wraptable + S;
+    cnt = ((WX + 7) >> 3) + 1;
 
-	if (hw.cgb) {
-		if (R_LCDC & 0x10)
-			for (i = cnt; i > 0; i--)
-			{
-				*(tilebuf++) = *tilemap
-					| (((int)*attrmap & 0x08) << 6)
-					| (((int)*attrmap & 0x60) << 5);
-				*(tilebuf++) = (((int)*attrmap & 0x07) << 2);
-				attrmap += *wrap + 1;
-				tilemap += *(wrap++) + 1;
-			}
-		else
-			for (i = cnt; i > 0; i--)
-			{
-				*(tilebuf++) = (256 + ((n8)*tilemap))
-					| (((int)*attrmap & 0x08) << 6)
-					| (((int)*attrmap & 0x60) << 5);
-				*(tilebuf++) = (((int)*attrmap & 0x07) << 2);
-				attrmap += *wrap + 1;
-				tilemap += *(wrap++) + 1;
-			}
-	}
-	else
-	{
-		if (R_LCDC & 0x10)
-			for (i = cnt; i > 0; i--)
-			{
-				*(tilebuf++) = *(tilemap++);
-				tilemap += *(wrap++);
-			}
-		else
-			for (i = cnt; i > 0; i--)
-			{
-				*(tilebuf++) = (256 + ((n8)*(tilemap++)));
-				tilemap += *(wrap++);
-			}
-	}
+    if (hw.cgb) {
+        if (R_LCDC & 0x10)
+            for (i = cnt; i > 0; i--)
+            {
+                *(tilebuf++) = *tilemap
+                    | (((int)*attrmap & 0x08) << 6)
+                    | (((int)*attrmap & 0x60) << 5);
+                *(tilebuf++) = (((int)*attrmap & 0x07) << 2);
+                attrmap += *wrap + 1;
+                tilemap += *(wrap++) + 1;
+            }
+        else
+            for (i = cnt; i > 0; i--)
+            {
+                *(tilebuf++) = (256 + ((n8)*tilemap))
+                    | (((int)*attrmap & 0x08) << 6)
+                    | (((int)*attrmap & 0x60) << 5);
+                *(tilebuf++) = (((int)*attrmap & 0x07) << 2);
+                attrmap += *wrap + 1;
+                tilemap += *(wrap++) + 1;
+            }
+    }
+    else
+    {
+        if (R_LCDC & 0x10)
+            for (i = cnt; i > 0; i--)
+            {
+                *(tilebuf++) = *(tilemap++);
+                tilemap += *(wrap++);
+            }
+        else
+            for (i = cnt; i > 0; i--)
+            {
+                *(tilebuf++) = (256 + ((n8)*(tilemap++)));
+                tilemap += *(wrap++);
+            }
+    }
 
-	if (WX >= 160) return;
+    if (WX >= 160) return;
 
-	base = ((R_LCDC&0x40)?0x1C00:0x1800) + (WT<<5);
-	tilemap = lcd.vbank[0] + base;
-	attrmap = lcd.vbank[1] + base;
-	tilebuf = WND;
-	cnt = ((160 - WX) >> 3) + 1;
+    base = ((R_LCDC&0x40)?0x1C00:0x1800) + (WT<<5);
+    tilemap = lcd.vbank[0] + base;
+    attrmap = lcd.vbank[1] + base;
+    tilebuf = WND;
+    cnt = ((160 - WX) >> 3) + 1;
 
-	if (hw.cgb)
-	{
-		if (R_LCDC & 0x10)
-			for (i = cnt; i > 0; i--)
-			{
-				*(tilebuf++) = *(tilemap++)
-					| (((int)*attrmap & 0x08) << 6)
-					| (((int)*attrmap & 0x60) << 5);
-				*(tilebuf++) = (((int)*(attrmap++)&7) << 2);
-			}
-		else
-			for (i = cnt; i > 0; i--)
-			{
-				*(tilebuf++) = (256 + ((n8)*(tilemap++)))
-					| (((int)*attrmap & 0x08) << 6)
-					| (((int)*attrmap & 0x60) << 5);
-				*(tilebuf++) = (((int)*(attrmap++)&7) << 2);
-			}
-	}
-	else
+    if (hw.cgb)
+    {
+        if (R_LCDC & 0x10)
+            for (i = cnt; i > 0; i--)
+            {
+                *(tilebuf++) = *(tilemap++)
+                    | (((int)*attrmap & 0x08) << 6)
+                    | (((int)*attrmap & 0x60) << 5);
+                *(tilebuf++) = (((int)*(attrmap++)&7) << 2);
+            }
+        else
+            for (i = cnt; i > 0; i--)
+            {
+                *(tilebuf++) = (256 + ((n8)*(tilemap++)))
+                    | (((int)*attrmap & 0x08) << 6)
+                    | (((int)*attrmap & 0x60) << 5);
+                *(tilebuf++) = (((int)*(attrmap++)&7) << 2);
+            }
+    }
+    else
 
-	{
-		if (R_LCDC & 0x10)
-			for (i = cnt; i > 0; i--)
-				*(tilebuf++) = *(tilemap++);
-		else
-			for (i = cnt; i > 0; i--)
-				*(tilebuf++) = (256 + ((n8)*(tilemap++)));
-	}
+    {
+        if (R_LCDC & 0x10)
+            for (i = cnt; i > 0; i--)
+                *(tilebuf++) = *(tilemap++);
+        else
+            for (i = cnt; i > 0; i--)
+                *(tilebuf++) = (256 + ((n8)*(tilemap++)));
+    }
 }
 
 
@@ -507,318 +507,318 @@ void tilebuf(void)
 // U = start...something...thingy... 7 at most
 void bg_scan(void)
 {
-	int cnt;
-	byte *src, *dest;
-	int *tile;
+    int cnt;
+    byte *src, *dest;
+    int *tile;
 
-	if (WX <= 0) return;
-	cnt = WX;
-	tile = BG;
-	dest = BUF;
+    if (WX <= 0) return;
+    cnt = WX;
+    tile = BG;
+    dest = BUF;
 
-	src = patpix[*(tile++)][V] + U;
-	memcpy(dest, src, 8-U);
-	dest += 8-U;
-	cnt -= 8-U;
-	if (cnt <= 0) return;
-	while (cnt >= 8)
-	{
-		src = patpix[*(tile++)][V];
-		MEMCPY8(dest, src);
-		dest += 8;
-		cnt -= 8;
-	}
-	src = patpix[*tile][V];
-	while (cnt--)
-		*(dest++) = *(src++);
+    src = patpix[*(tile++)][V] + U;
+    memcpy(dest, src, 8-U);
+    dest += 8-U;
+    cnt -= 8-U;
+    if (cnt <= 0) return;
+    while (cnt >= 8)
+    {
+        src = patpix[*(tile++)][V];
+        MEMCPY8(dest, src);
+        dest += 8;
+        cnt -= 8;
+    }
+    src = patpix[*tile][V];
+    while (cnt--)
+        *(dest++) = *(src++);
 }
 
 void wnd_scan(void)
 {
-	int cnt;
-	byte *src, *dest;
-	int *tile;
+    int cnt;
+    byte *src, *dest;
+    int *tile;
 
-	if (WX >= 160) return;
-	cnt = 160 - WX;
-	tile = WND;
-	dest = BUF + WX;
+    if (WX >= 160) return;
+    cnt = 160 - WX;
+    tile = WND;
+    dest = BUF + WX;
 
-	while (cnt >= 8)
-	{
-		src = patpix[*(tile++)][WV];
-		MEMCPY8(dest, src);
-		dest += 8;
-		cnt -= 8;
-	}
-	src = patpix[*tile][WV];
-	while (cnt--)
-		*(dest++) = *(src++);
+    while (cnt >= 8)
+    {
+        src = patpix[*(tile++)][WV];
+        MEMCPY8(dest, src);
+        dest += 8;
+        cnt -= 8;
+    }
+    src = patpix[*tile][WV];
+    while (cnt--)
+        *(dest++) = *(src++);
 }
 
 static void blendcpy(byte *dest, byte *src, byte b, int cnt)
 {
-	while (cnt--) *(dest++) = *(src++) | b;
+    while (cnt--) *(dest++) = *(src++) | b;
 }
 
 static int priused(void *attr)
 {
-	un32 *a = attr;
-	return (int)((a[0]|a[1]|a[2]|a[3]|a[4]|a[5]|a[6]|a[7])&0x80808080);
+    un32 *a = attr;
+    return (int)((a[0]|a[1]|a[2]|a[3]|a[4]|a[5]|a[6]|a[7])&0x80808080);
 }
 
 void bg_scan_pri(void)
 {
-	int cnt, i;
-	byte *src, *dest;
+    int cnt, i;
+    byte *src, *dest;
 
-	if (WX <= 0) return;
-	i = S;
-	cnt = WX;
-	dest = PRI;
-	src = lcd.vbank[1] + ((R_LCDC&0x08)?0x1C00:0x1800) + (T<<5);
+    if (WX <= 0) return;
+    i = S;
+    cnt = WX;
+    dest = PRI;
+    src = lcd.vbank[1] + ((R_LCDC&0x08)?0x1C00:0x1800) + (T<<5);
 
-	if (!priused(src))
-	{
-		memset(dest, 0, cnt);
-		return;
-	}
+    if (!priused(src))
+    {
+        memset(dest, 0, cnt);
+        return;
+    }
 
-	memset(dest, src[i++&31]&128, 8-U);
-	dest += 8-U;
-	cnt -= 8-U;
-	if (cnt <= 0) return;
-	while (cnt >= 8)
-	{
-		memset(dest, src[i++&31]&128, 8);
-		dest += 8;
-		cnt -= 8;
-	}
-	memset(dest, src[i&31]&128, cnt);
+    memset(dest, src[i++&31]&128, 8-U);
+    dest += 8-U;
+    cnt -= 8-U;
+    if (cnt <= 0) return;
+    while (cnt >= 8)
+    {
+        memset(dest, src[i++&31]&128, 8);
+        dest += 8;
+        cnt -= 8;
+    }
+    memset(dest, src[i&31]&128, cnt);
 }
 
 void wnd_scan_pri(void)
 {
-	int cnt, i;
-	byte *src, *dest;
+    int cnt, i;
+    byte *src, *dest;
 
-	if (WX >= 160) return;
-	i = 0;
-	cnt = 160 - WX;
-	dest = PRI + WX;
-	src = lcd.vbank[1] + ((R_LCDC&0x40)?0x1C00:0x1800) + (WT<<5);
+    if (WX >= 160) return;
+    i = 0;
+    cnt = 160 - WX;
+    dest = PRI + WX;
+    src = lcd.vbank[1] + ((R_LCDC&0x40)?0x1C00:0x1800) + (WT<<5);
 
-	if (!priused(src))
-	{
-		memset(dest, 0, cnt);
-		return;
-	}
+    if (!priused(src))
+    {
+        memset(dest, 0, cnt);
+        return;
+    }
 
-	while (cnt >= 8)
-	{
-		memset(dest, src[i++]&128, 8);
-		dest += 8;
-		cnt -= 8;
-	}
-	memset(dest, src[i]&128, cnt);
+    while (cnt >= 8)
+    {
+        memset(dest, src[i++]&128, 8);
+        dest += 8;
+        cnt -= 8;
+    }
+    memset(dest, src[i]&128, cnt);
 }
 
 void bg_scan_color(void)
 {
-	int cnt;
-	byte *src, *dest;
-	int *tile;
+    int cnt;
+    byte *src, *dest;
+    int *tile;
 
-	if (WX <= 0) return;
-	cnt = WX;
-	tile = BG;
-	dest = BUF;
+    if (WX <= 0) return;
+    cnt = WX;
+    tile = BG;
+    dest = BUF;
 
-	src = patpix[*(tile++)][V] + U;
-	blendcpy(dest, src, *(tile++), 8-U);
-	dest += 8-U;
-	cnt -= 8-U;
-	if (cnt <= 0) return;
-	while (cnt >= 8)
-	{
-		src = patpix[*(tile++)][V];
-		blendcpy(dest, src, *(tile++), 8);
-		dest += 8;
-		cnt -= 8;
-	}
-	src = patpix[*(tile++)][V];
-	blendcpy(dest, src, *(tile++), cnt);
+    src = patpix[*(tile++)][V] + U;
+    blendcpy(dest, src, *(tile++), 8-U);
+    dest += 8-U;
+    cnt -= 8-U;
+    if (cnt <= 0) return;
+    while (cnt >= 8)
+    {
+        src = patpix[*(tile++)][V];
+        blendcpy(dest, src, *(tile++), 8);
+        dest += 8;
+        cnt -= 8;
+    }
+    src = patpix[*(tile++)][V];
+    blendcpy(dest, src, *(tile++), cnt);
 }
 
 void wnd_scan_color(void)
 {
-	int cnt;
-	byte *src, *dest;
-	int *tile;
+    int cnt;
+    byte *src, *dest;
+    int *tile;
 
-	if (WX >= 160) return;
-	cnt = 160 - WX;
-	tile = WND;
-	dest = BUF + WX;
+    if (WX >= 160) return;
+    cnt = 160 - WX;
+    tile = WND;
+    dest = BUF + WX;
 
-	while (cnt >= 8)
-	{
-		src = patpix[*(tile++)][WV];
-		blendcpy(dest, src, *(tile++), 8);
-		dest += 8;
-		cnt -= 8;
-	}
-	src = patpix[*(tile++)][WV];
-	blendcpy(dest, src, *(tile++), cnt);
+    while (cnt >= 8)
+    {
+        src = patpix[*(tile++)][WV];
+        blendcpy(dest, src, *(tile++), 8);
+        dest += 8;
+        cnt -= 8;
+    }
+    src = patpix[*(tile++)][WV];
+    blendcpy(dest, src, *(tile++), cnt);
 }
 
 static void recolor(byte *buf, byte fill, int cnt)
 {
-	while (cnt--) *(buf++) |= fill;
+    while (cnt--) *(buf++) |= fill;
 }
 
 void spr_count(void)
 {
-	int i;
-	struct obj *o;
+    int i;
+    struct obj *o;
 
-	NS = 0;
-	if (!(R_LCDC & 0x02)) return;
+    NS = 0;
+    if (!(R_LCDC & 0x02)) return;
 
-	o = lcd.oam.obj;
+    o = lcd.oam.obj;
 
-	for (i = 40; i; i--, o++)
-	{
-		if (L >= o->y || L + 16 < o->y)
-			continue;
-		if (L + 8 >= o->y && !(R_LCDC & 0x04))
-			continue;
-		if (++NS == 10) break;
-	}
+    for (i = 40; i; i--, o++)
+    {
+        if (L >= o->y || L + 16 < o->y)
+            continue;
+        if (L + 8 >= o->y && !(R_LCDC & 0x04))
+            continue;
+        if (++NS == 10) break;
+    }
 }
 
 void spr_enum(void)
 {
-	int i, j;
-	struct obj *o;
-	struct vissprite ts[10];
-	int v, pat;
-	int l, x;
+    int i, j;
+    struct obj *o;
+    struct vissprite ts[10];
+    int v, pat;
+    int l, x;
 
-	NS = 0;
-	if (!(R_LCDC & 0x02)) return;
+    NS = 0;
+    if (!(R_LCDC & 0x02)) return;
 
-	o = lcd.oam.obj;
+    o = lcd.oam.obj;
 
-	for (i = 40; i; i--, o++)
-	{
-		if (L >= o->y || L + 16 < o->y)
-			continue;
-		if (L + 8 >= o->y && !(R_LCDC & 0x04))
-			continue;
-		VS[NS].x = (int)o->x - 8;
-		v = L - (int)o->y + 16;
-		if (hw.cgb)
-		{
-			pat = o->pat | (((int)o->flags & 0x60) << 5)
-				| (((int)o->flags & 0x08) << 6);
-			VS[NS].pal = 32 + ((o->flags & 0x07) << 2);
-		}
-		else
-		{
-			pat = o->pat | (((int)o->flags & 0x60) << 5);
-			VS[NS].pal = 32 + ((o->flags & 0x10) >> 2);
-		}
-		VS[NS].pri = (o->flags & 0x80) >> 7;
-		if ((R_LCDC & 0x04))
-		{
-			pat &= ~1;
-			if (v >= 8)
-			{
-				v -= 8;
-				pat++;
-			}
-			if (o->flags & 0x40) pat ^= 1;
-		}
-		VS[NS].buf = patpix[pat][v];
-		if (++NS == 10) break;
-	}
-	if (!sprsort||hw.cgb) return;
-	/* not quite optimal but it finally works! */
-	for (i = 0; i < NS; i++)
-	{
-		l = 0;
-		x = VS[0].x;
-		for (j = 1; j < NS; j++)
-		{
-			if (VS[j].x < x)
-			{
-				l = j;
-				x = VS[j].x;
-			}
-		}
-		ts[i] = VS[l];
-		VS[l].x = 160;
-	}
-	memcpy(VS, ts, sizeof VS);
+    for (i = 40; i; i--, o++)
+    {
+        if (L >= o->y || L + 16 < o->y)
+            continue;
+        if (L + 8 >= o->y && !(R_LCDC & 0x04))
+            continue;
+        VS[NS].x = (int)o->x - 8;
+        v = L - (int)o->y + 16;
+        if (hw.cgb)
+        {
+            pat = o->pat | (((int)o->flags & 0x60) << 5)
+                | (((int)o->flags & 0x08) << 6);
+            VS[NS].pal = 32 + ((o->flags & 0x07) << 2);
+        }
+        else
+        {
+            pat = o->pat | (((int)o->flags & 0x60) << 5);
+            VS[NS].pal = 32 + ((o->flags & 0x10) >> 2);
+        }
+        VS[NS].pri = (o->flags & 0x80) >> 7;
+        if ((R_LCDC & 0x04))
+        {
+            pat &= ~1;
+            if (v >= 8)
+            {
+                v -= 8;
+                pat++;
+            }
+            if (o->flags & 0x40) pat ^= 1;
+        }
+        VS[NS].buf = patpix[pat][v];
+        if (++NS == 10) break;
+    }
+    if (!sprsort||hw.cgb) return;
+    /* not quite optimal but it finally works! */
+    for (i = 0; i < NS; i++)
+    {
+        l = 0;
+        x = VS[0].x;
+        for (j = 1; j < NS; j++)
+        {
+            if (VS[j].x < x)
+            {
+                l = j;
+                x = VS[j].x;
+            }
+        }
+        ts[i] = VS[l];
+        VS[l].x = 160;
+    }
+    memcpy(VS, ts, sizeof VS);
 }
 
 void spr_scan(void)
 {
-	int i, x;
-	byte pal, b, ns = NS;
-	byte *src, *dest, *bg, *pri;
-	struct vissprite *vs;
-	static byte bgdup[256];
+    int i, x;
+    byte pal, b, ns = NS;
+    byte *src, *dest, *bg, *pri;
+    struct vissprite *vs;
+    static byte bgdup[256];
 
-	if (!ns) return;
+    if (!ns) return;
 
-	memcpy(bgdup, BUF, 256);
-	vs = &VS[ns-1];
+    memcpy(bgdup, BUF, 256);
+    vs = &VS[ns-1];
 
-	for (; ns; ns--, vs--)
-	{
-		x = vs->x;
-		if (x >= 160) continue;
-		if (x <= -8) continue;
-		if (x < 0)
-		{
-			src = vs->buf - x;
-			dest = BUF;
-			i = 8 + x;
-		}
-		else
-		{
-			src = vs->buf;
-			dest = BUF + x;
-			if (x > 152) i = 160 - x;
-			else i = 8;
-		}
-		pal = vs->pal;
-		if (vs->pri)
-		{
-			bg = bgdup + (dest - BUF);
-			while (i--)
-			{
-				b = src[i];
-				if (b && !(bg[i]&3)) dest[i] = pal|b;
-			}
-		}
-		else if (hw.cgb)
-		{
-			bg = bgdup + (dest - BUF);
-			pri = PRI + (dest - BUF);
-			while (i--)
-			{
-				b = src[i];
-				if (b && (!pri[i] || !(bg[i]&3)))
-					dest[i] = pal|b;
-			}
-		}
-		else while (i--) if (src[i]) dest[i] = pal|src[i];
-		/* else while (i--) if (src[i]) dest[i] = 31 + ns; */
-	}
-//	if (sprdebug) for (i = 0; i < NS; i++) BUF[i<<1] = 36;
+    for (; ns; ns--, vs--)
+    {
+        x = vs->x;
+        if (x >= 160) continue;
+        if (x <= -8) continue;
+        if (x < 0)
+        {
+            src = vs->buf - x;
+            dest = BUF;
+            i = 8 + x;
+        }
+        else
+        {
+            src = vs->buf;
+            dest = BUF + x;
+            if (x > 152) i = 160 - x;
+            else i = 8;
+        }
+        pal = vs->pal;
+        if (vs->pri)
+        {
+            bg = bgdup + (dest - BUF);
+            while (i--)
+            {
+                b = src[i];
+                if (b && !(bg[i]&3)) dest[i] = pal|b;
+            }
+        }
+        else if (hw.cgb)
+        {
+            bg = bgdup + (dest - BUF);
+            pri = PRI + (dest - BUF);
+            while (i--)
+            {
+                b = src[i];
+                if (b && (!pri[i] || !(bg[i]&3)))
+                    dest[i] = pal|b;
+            }
+        }
+        else while (i--) if (src[i]) dest[i] = pal|src[i];
+        /* else while (i--) if (src[i]) dest[i] = 31 + ns; */
+    }
+//    if (sprdebug) for (i = 0; i < NS; i++) BUF[i<<1] = 36;
 }
 
 
@@ -828,43 +828,45 @@ void spr_scan(void)
 
 void lcd_begin(void)
 {
-/*	if (fb.indexed)
-	{
-		if (rgb332) pal_set332();
-		else pal_expire();
-	}
-	while (scale * 160 > fb.w || scale * 144 > fb.h) scale--; */
-	vdest = fb.ptr + ((fb.w*fb.pelsize)>>1)
-		- (80*fb.pelsize)
-		+ ((fb.h>>1) - 72) * fb.pitch;
-	WY = R_WY;
+/*    if (fb.indexed)
+    {
+        if (rgb332) pal_set332();
+        else pal_expire();
+    }
+    while (scale * 160 > fb.w || scale * 144 > fb.h) scale--; */
+    vdest = fb.ptr + ((fb.w*fb.pelsize)>>1)
+        - (80*fb.pelsize)
+        + ((fb.h>>1) - 72) * fb.pitch;
+    WY = R_WY;
 }
 
 void lcd_refreshline(void)
 {
-	if (!fb.enabled) return;
-	if(!insync) {
-		if(R_LY!=0)
-			return;
-		else
-		   insync=1;
-	}
+    if (!fb.enabled) return;
+    if(!insync) {
+        if(R_LY!=0)
+            return;
+        else
+           insync=1;
+    }
 
-	if (!(R_LCDC & 0x80))
-		return; /* should not happen... */
+    if (!(R_LCDC & 0x80))
+        return; /* should not happen... */
 
-        if ( (fb.mode==0&&(R_LY >= 128)) ||
-             (fb.mode==1&&(R_LY < 16)) ||
-             (fb.mode==2&&(R_LY<8||R_LY>=136)) ||
-	     (fb.mode==3&&((R_LY%9)==8))
-							
+#if LCD_HEIGHT < 144
+    if ( (fb.mode==0&&(R_LY >= 128)) ||
+         (fb.mode==1&&(R_LY < 16)) ||
+         (fb.mode==2&&(R_LY<8||R_LY>=136)) ||
+         (fb.mode==3&&((R_LY%9)==8))
+
 #if LCD_HEIGHT == 64
-	     || (R_LY & 1) /* calculate only even lines */
+        || (R_LY & 1) /* calculate only even lines */
 #endif
-	   )
-	    return;
+        )
+        return;
+#endif
 
-	updatepatpix();
+    updatepatpix();
 
     L = R_LY;
     X = R_SCX;
@@ -901,25 +903,25 @@ void lcd_refreshline(void)
         recolor(BUF+WX, 0x04, 160-WX);
     }
     spr_scan();
-#if LCD_DEPTH == 2
-    if (scanline_ind == 3)
-#else
+#if LCD_DEPTH == 1
     if (scanline_ind == 7)
+#elif LCD_DEPTH == 2
+    if (scanline_ind == 3)
 #endif
     {
+#if LCD_HEIGHT < 144
         if(fb.mode!=3)
             vid_update(L);
-	else
-	    vid_update(L-((int)(L/9)));
-    }
-#if LCD_HEIGHT == 64
-    scanline_ind = (scanline_ind+1) % 8;
+        else
+            vid_update(L-((int)(L/9)));
 #else
-#if LCD_DEPTH == 2
-    scanline_ind = (scanline_ind+1) % 4;
-#else
-    scanline_ind = (scanline_ind+1) % 8;
+        vid_update(L);
 #endif
+    }
+#if LCD_DEPTH == 1
+    scanline_ind = (scanline_ind+1) % 8;
+#elif LCD_DEPTH == 2
+    scanline_ind = (scanline_ind+1) % 4;
 #endif
 }
 
