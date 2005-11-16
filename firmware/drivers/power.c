@@ -62,24 +62,22 @@ int radio_get_status(void)
 void power_init(void)
 {
 #if CONFIG_CPU == MCF5249
-#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-//    or_l(0x00080000, &GPIO1_OUT);
-//    or_l(0x00080000, &GPIO1_ENABLE);
-//    or_l(0x00080000, &GPIO1_FUNCTION);
+#if IRIVER_H100_SERIES
+    or_l(0x00080000, &GPIO1_OUT);
+    or_l(0x00080000, &GPIO1_ENABLE);
+    or_l(0x00080000, &GPIO1_FUNCTION);
 
 #ifndef BOOTLOADER
     /* The boot loader controls the power */
-//    ide_power_enable(true);
+    ide_power_enable(true);
 #endif
-    or_l(0x80000000, &GPIO_OUT);
     or_l(0x80000000, &GPIO_ENABLE);
     or_l(0x80000000, &GPIO_FUNCTION);
 #ifdef HAVE_SPDIF_POWER
     spdif_power_enable(false);
 #endif
-#ifdef IRIVER_H300_SERIES
+#elif defined(IRIVER_H300_SERIES)
     pcf50606_init();
-#endif
 #endif
 #elif CONFIG_CPU == PP5020
     /* TODO: Implement power_init() */

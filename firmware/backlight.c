@@ -456,14 +456,7 @@ void backlight_init(void)
 
 #else /* no backlight, empty dummy functions */
 
-void backlight_init(void)
-{
-#if defined(IRIVER_H300_SERIES) && defined(BOOTLOADER)
-    or_l(0x00020000, &GPIO1_OUT);
-    or_l(0x00020000, &GPIO1_ENABLE);
-    or_l(0x00020000, &GPIO1_FUNCTION);
-#endif
-}
+void backlight_init(void) {}
 void backlight_on(void) {}
 void backlight_off(void) {}
 void backlight_tick(void) {}

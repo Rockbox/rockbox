@@ -77,10 +77,8 @@ static void dma_start(const void *addr, long size)
 
     /* Enable the FIFO and force one write to it */
     IIS2CONFIG = IIS_DEFPARM(pcm_freq);
-#ifdef HAVE_SPDIF_OUT
     /* Also send the audio to S/PDIF */
     EBU1CONFIG = EBU_DEFPARM;
-#endif
     DCR0 = DMA_INT | DMA_EEXT | DMA_CS | DMA_SINC | DMA_START;
 }
 
@@ -92,9 +90,7 @@ static void dma_stop(void)
     DCR0 = 0;
     /* Reset the FIFO */
     IIS2CONFIG = IIS_RESET | IIS_DEFPARM(pcm_freq);
-#ifdef HAVE_SPDIF_OUT
     EBU1CONFIG = IIS_RESET;
-#endif
 
     next_start = NULL;
     next_size = 0;
@@ -224,9 +220,7 @@ void pcm_play_pause(bool play)
         //BCR0 = next_size;
         /* Enable the FIFO and force one write to it */
         IIS2CONFIG = IIS_DEFPARM(pcm_freq);
-#ifdef HAVE_SPDIF_OUT
         EBU1CONFIG = EBU_DEFPARM;
-#endif
         DCR0 |= DMA_EEXT | DMA_START;
     }
     else if(!pcm_paused && !play)
@@ -236,9 +230,7 @@ void pcm_play_pause(bool play)
         /* Disable DMA peripheral request. */
         DCR0 &= ~DMA_EEXT;
         IIS2CONFIG = IIS_RESET | IIS_DEFPARM(pcm_freq);
-#ifdef HAVE_SPDIF_OUT
         EBU1CONFIG = IIS_RESET;
-#endif
     }
     pcm_paused = !play;
 }
