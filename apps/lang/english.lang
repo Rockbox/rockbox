@@ -1714,9 +1714,9 @@ voice: ""
 new:
 
 id: LANG_FM_NO_PRESETS
-desc:  DEPRECATED
-eng: ""
-voice: ""
+desc: error when preset list is empty
+eng: "No presets"
+voice: "No presets"
 new:
 
 id: LANG_FM_NO_FREE_PRESETS
@@ -3384,7 +3384,7 @@ voice: ""
 new:
 
 id: LANG_FM_FREEZE
-desc: error message when preset list is empty
+desc: splash screen during freeze in radio mode
 eng: "Screen frozen!"
 voice: ""
 new:
@@ -3400,3 +3400,34 @@ desc: in the sound settings menu
 eng: "Crossfeed"
 voice:
 new:
+
+id: LANG_FM_SCAN_PRESETS
+desc: in radio menu
+eng: "Auto scan presets"
+voice: "Auto scan presets"
+new:
+
+id: LANG_FM_SCANNING
+desc: during auto scan
+eng: "Scanning %d.%dMHz"
+voice: ""
+new:
+
+id: LANG_FM_DEFAULT_PRESET_NAME
+desc: default preset name for auto scan mode
+eng: "%d.%dMHz"
+voice:
+new:
+
+id: LANG_FM_ADD_PRESET
+desc: in radio menu
+eng: "Add preset"
+voice: "Add preset"
+new:
+
+id: LANG_FM_CLEAR_PRESETS
+desc: confirmation if presets can be cleared
+eng: "Clear current presets?"
+voice: "Clear current presets?"
+new:
+
