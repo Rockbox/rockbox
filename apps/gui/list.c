@@ -40,10 +40,8 @@
 
 
 void gui_list_init(struct gui_list * gui_list,
-    void (*callback_get_item_icon)
-        (int selected_item, void * data, ICON * icon),
-    char * (*callback_get_item_name)
-        (int selected_item, void * data, char *buffer),
+    list_get_icon callback_get_item_icon,
+    list_get_name callback_get_item_name,
     void * data
     )
 {
@@ -75,11 +73,10 @@ void gui_list_flash(struct gui_list * gui_list)
     gui_list->cursor_flash_state=!gui_list->cursor_flash_state;
     int selected_line=gui_list->selected_item-gui_list->start_item;
 #ifdef HAVE_LCD_BITMAP
-    int cursor_xpos=global_settings.scrollbar?1:0;
-    int line_xpos=display->getxmargin();
     int line_ypos=display->getymargin()+display->char_height*selected_line;
     if (global_settings.invert_cursor)
     {
+        int line_xpos=display->getxmargin();
         display->set_drawmode(DRMODE_COMPLEMENT);
         display->fillrect(line_xpos, line_ypos, display->width,
                           display->char_height);
@@ -88,19 +85,14 @@ void gui_list_flash(struct gui_list * gui_list)
     }
     else
     {
-        if(gui_list->cursor_flash_state)
-            screen_clear_area(display, cursor_xpos*SCROLLBAR_WIDTH, line_ypos,
-                              CURSOR_WIDTH, CURSOR_HEIGHT);
-        else
-            screen_put_cursorxy(display, cursor_xpos, selected_line);
+        int cursor_xpos=(global_settings.scrollbar &&
+                         display->nb_lines < gui_list->nb_items)?1:0;
+        screen_put_cursorxy(display, cursor_xpos, selected_line, gui_list->cursor_flash_state);
     }
     display->update_rect(0, line_ypos,display->width,
                          display->char_height);
 #else
-    if(gui_list->cursor_flash_state)
-        display->putc(0, selected_line, ' ');
-    else
-        screen_put_cursorxy(display, 0, selected_line);
+    screen_put_cursorxy(display, 0, selected_line, gui_list->cursor_flash_state);
     gui_textarea_update(display);
 #endif
 }
@@ -199,7 +191,7 @@ void gui_list_draw(struct gui_list * gui_list)
 #endif
 
             if(draw_cursor)
-                screen_put_cursorxy(display, cursor_pos, i);
+                screen_put_cursorxy(display, cursor_pos, i, true);
         }
         else
         {/* normal item */
@@ -371,10 +363,8 @@ void gui_list_del_item(struct gui_list * gui_list)
  */
 void gui_synclist_init(
     struct gui_synclist * lists,
-    void (*callback_get_item_icon)
-        (int selected_item, void * data, ICON * icon),
-    char * (*callback_get_item_name)
-        (int selected_item, void * data, char *buffer),
+    list_get_icon callback_get_item_icon,
+    list_get_name callback_get_item_name,
     void * data
     )
 {
@@ -472,7 +462,7 @@ void gui_synclist_flash(struct gui_synclist * lists)
         gui_list_flash(&(lists->gui_list[i]));
 }
 
-bool gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
+unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
 {
     gui_synclist_limit_scroll(lists, true);
     switch(button)
@@ -489,7 +479,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
 #endif
             gui_synclist_select_previous(lists);
             gui_synclist_draw(lists);
-            return true;
+            return LIST_PREV;
 
         case LIST_NEXT:
 #ifdef LIST_RC_NEXT
@@ -504,7 +494,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
 #endif
             gui_synclist_select_next(lists);
             gui_synclist_draw(lists);
-            return true;
+            return LIST_NEXT;
 /* for pgup / pgdown, we are obliged to have a different behaviour depending on the screen
  * for which the user pressed the key since for example, remote and main screen doesn't
  * have the same number of lines*/
@@ -514,7 +504,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
         case LIST_PGUP | BUTTON_REPEAT:
             gui_synclist_select_previous_page(lists, SCREEN_MAIN);
             gui_synclist_draw(lists);
-            return true;
+            return LIST_NEXT;
 #endif
 
 #ifdef LIST_RC_PGUP
@@ -523,7 +513,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
         case LIST_RC_PGUP | BUTTON_REPEAT:
             gui_synclist_select_previous_page(lists, SCREEN_REMOTE);
             gui_synclist_draw(lists);
-            return true;
+            return LIST_NEXT;
 #endif
 
 #ifdef LIST_PGDN
@@ -532,7 +522,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
         case LIST_PGDN | BUTTON_REPEAT:
             gui_synclist_select_next_page(lists, SCREEN_MAIN);
             gui_synclist_draw(lists);
-            return true;
+            return LIST_PREV;
 #endif
 
 #ifdef LIST_RC_PGDN
@@ -541,8 +531,8 @@ bool gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
         case LIST_RC_PGDN | BUTTON_REPEAT:
             gui_synclist_select_next_page(lists, SCREEN_REMOTE);
             gui_synclist_draw(lists);
-            return true;
+            return LIST_PREV;
 #endif
     }
-    return false;
+    return 0;
 }

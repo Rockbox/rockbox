@@ -44,6 +44,8 @@ enum icons_6x8 {
     Icon_Config,
     Icon_Plugin,
     Icon_Bookmark,
+    Icon_Queued,
+    Icon_Moving,
     LastIcon
 };
 

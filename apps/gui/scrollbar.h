@@ -19,10 +19,9 @@
 
 #ifndef _GUI_SCROLLBAR_H_
 #define _GUI_SCROLLBAR_H_
-#include <lcd.h>
-#ifdef HAVE_LCD_BITMAP
+#include "screen_access.h"
 
-struct screen;
+#ifdef HAVE_LCD_BITMAP
 
 enum orientation {
     VERTICAL,

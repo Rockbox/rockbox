@@ -17,12 +17,10 @@
  *
  ****************************************************************************/
 
-#include "config.h"
-#include "lcd.h"
-#ifdef HAVE_LCD_BITMAP
-#include "limits.h"
 #include "scrollbar.h"
-#include "screen_access.h"
+#ifdef HAVE_LCD_BITMAP
+#include "config.h"
+#include "limits.h"
 
 void gui_scrollbar_draw(struct screen * screen, int x, int y,
                         int width, int height, int items,

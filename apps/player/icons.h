@@ -28,6 +28,8 @@
 #ifdef HAVE_LCD_CHARCELLS
 
 enum {
+    Icon_Queued = 'Q',
+    Icon_Moving = 'M',
     Icon_Unknown = 0x90,
     Icon_Bookmark = 0x16,
     Icon_Plugin,

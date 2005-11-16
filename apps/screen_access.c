@@ -150,13 +150,6 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
     gui_textarea_update_nblines(screen);
 }
 
-void screen_access_init(void)
-{
-    int i;
-    FOR_NB_SCREENS(i)
-        screen_init(&screens[i], i);
-}
-
 #ifdef HAVE_LCD_BITMAP
 void screen_clear_area(struct screen * display, int xstart, int ystart,
                        int width, int height)
@@ -166,3 +159,10 @@ void screen_clear_area(struct screen * display, int xstart, int ystart,
     display->set_drawmode(DRMODE_SOLID);
 }
 #endif
+
+void screen_access_init(void)
+{
+    int i;
+    FOR_NB_SCREENS(i)
+        screen_init(&screens[i], i);
+}

@@ -33,24 +33,33 @@
 #define LIST_PREV      BUTTON_UP
 #define LIST_PGUP      (BUTTON_ON | BUTTON_UP)
 #define LIST_PGDN      (BUTTON_ON | BUTTON_DOWN)
+
+#ifdef CONFIG_REMOTE_KEYPAD
 #define LIST_RC_NEXT   BUTTON_RC_FF
 #define LIST_RC_PREV   BUTTON_RC_REW
 #define LIST_RC_PGUP   BUTTON_RC_SOURCE
 #define LIST_RC_PGDN   BUTTON_RC_BITRATE
+#endif /* CONFIG_REMOTE_KEYPAD */
 
 #elif CONFIG_KEYPAD == RECORDER_PAD
 #define LIST_NEXT      BUTTON_DOWN
 #define LIST_PREV      BUTTON_UP
 #define LIST_PGUP      (BUTTON_ON | BUTTON_UP)
 #define LIST_PGDN      (BUTTON_ON | BUTTON_DOWN)
+
+#ifdef CONFIG_REMOTE_KEYPAD
 #define LIST_RC_NEXT   BUTTON_RC_RIGHT
 #define LIST_RC_PREV   BUTTON_RC_LEFT
+#endif /* CONFIG_REMOTE_KEYPAD */
 
 #elif CONFIG_KEYPAD == PLAYER_PAD
 #define LIST_NEXT      BUTTON_RIGHT
 #define LIST_PREV      BUTTON_LEFT
+
+#ifdef CONFIG_REMOTE_KEYPAD
 #define LIST_RC_NEXT   BUTTON_RC_RIGHT
 #define LIST_RC_PREV   BUTTON_RC_LEFT
+#endif /* CONFIG_REMOTE_KEYPAD */
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define LIST_NEXT      BUTTON_DOWN
@@ -73,8 +82,21 @@
  * tells it what to display.
  * There are two callback function :
  * one to get the text and one to get the icon
- * Callback interface :
- *
+ */
+
+/*
+ * Icon callback
+ *  - selected_item : an integer that tells the number of the item to display
+ *  - data : a void pointer to the data you gave to the list when
+ *           you initialized it
+ *  - icon : a pointer to the icon, the value inside it is used to display
+ *           the icon after the function returns.
+ * Note : we use the ICON type because the real type depends of the plateform
+ */
+typedef void list_get_icon(int selected_item,
+                           void * data,
+                           ICON * icon);
+/*
  * Text callback
  *  - selected_item : an integer that tells the number of the item to display
  *  - data : a void pointer to the data you gave to the list when
@@ -84,15 +106,11 @@
  *             the return value of the function in all cases to avoid filling
  *             a buffer when it's not necessary)
  * Returns a pointer to a string that contains the text to display
- *
- * Icon callback
- *  - selected_item : an integer that tells the number of the item to display
- *  - data : a void pointer to the data you gave to the list when
- *           you initialized it
- *  - icon : a pointer to the icon, the value inside it is used to display
- *           the icon after the function returns.
- * Note : we use the ICON type because the real type depends of the plateform
  */
+typedef char * list_get_name(int selected_item,
+                             void * data,
+                             char *buffer);
+
 struct gui_list
 {
     int nb_items;
@@ -100,13 +118,10 @@ struct gui_list
     bool cursor_flash_state;
     int start_item; /* the item that is displayed at the top of the screen */
 
-    void (*callback_get_item_icon)
-        (int selected_item, void * data, ICON * icon);
-    char * (*callback_get_item_name)
-        (int selected_item, void * data, char *buffer);
+    list_get_icon *callback_get_item_icon;
+    list_get_name *callback_get_item_name;
 
     struct screen * display;
-    int line_scroll_limit;
     /* defines wether the list should stop when reaching the top/bottom
      * or should continue (by going to bottom/top) */
     bool limit_scroll;
@@ -123,10 +138,8 @@ struct gui_list
  *    to a given item number
  */
 extern void gui_list_init(struct gui_list * gui_list,
-    void (*callback_get_item_icon)
-        (int selected_item, void * data, ICON * icon),
-    char * (*callback_get_item_name)
-        (int selected_item, void * data, char *buffer),
+    list_get_icon callback_get_item_icon,
+    list_get_name callback_get_item_name,
     void * data
     );
 
@@ -264,10 +277,8 @@ struct gui_synclist
 
 extern void gui_synclist_init(
     struct gui_synclist * lists,
-    void (*callback_get_item_icon)
-        (int selected_item, void * data, ICON * icon),
-    char * (*callback_get_item_name)
-        (int selected_item, void * data, char *buffer),
+    list_get_icon callback_get_item_icon,
+    list_get_name callback_get_item_name,
     void * data
     );
 extern void gui_synclist_set_nb_items(struct gui_synclist * lists, int nb_items);
@@ -295,10 +306,13 @@ extern void gui_synclist_flash(struct gui_synclist * lists);
 
 /*
  * Do the action implied by the given button,
- * returns true if something has been done, false otherwise
+ * returns the action taken if any, 0 else
  *  - lists : the synchronized lists
  *  - button : the keycode of a pressed button
+ * returned value :
+ *  - LIST_NEXT when moving forward (next item or pgup)
+ *  - LIST_PREV when moving backward (previous item or pgdown)
  */
-extern bool gui_synclist_do_button(struct gui_synclist * lists, unsigned button);
+extern unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button);
 
 #endif /* _GUI_LIST_H_ */

@@ -26,24 +26,30 @@
 void screen_put_iconxy(struct screen * display, int x, int y, ICON icon)
 {
 #ifdef HAVE_LCD_BITMAP
-    if(icon==0)/* Don't display invalid icons */
-        return;
     int xpos, ypos;
     xpos = x*CURSOR_WIDTH;
     ypos = y*display->char_height + display->getymargin();
+
     if ( display->char_height > CURSOR_HEIGHT )/* center the cursor */
         ypos += (display->char_height - CURSOR_HEIGHT) / 2;
-    display->mono_bitmap(icon, xpos, ypos, CURSOR_WIDTH, CURSOR_HEIGHT);
+    if(icon==0)/* Don't display invalid icons */
+        screen_clear_area(display, xpos, ypos, CURSOR_WIDTH, CURSOR_HEIGHT);
+    else
+        display->mono_bitmap(icon, xpos, ypos, CURSOR_WIDTH, CURSOR_HEIGHT);
 #else
-    display->putc(x, y, icon);
+    if(icon==-1)
+        display->putc(x, y, ' ');
+    else
+        display->putc(x, y, icon);
 #endif
 }
 
-void screen_put_cursorxy(struct screen * display, int x, int y)
+void screen_put_cursorxy(struct screen * display, int x, int y, bool on)
 {
 #ifdef HAVE_LCD_BITMAP
-    screen_put_iconxy(display, x, y, bitmap_icons_6x8[Icon_Cursor]);
+    screen_put_iconxy(display, x, y, on?bitmap_icons_6x8[Icon_Cursor]:0);
 #else
-    screen_put_iconxy(display, x, y, CURSOR_CHAR);
+    screen_put_iconxy(display, x, y, on?CURSOR_CHAR:-1);
 #endif
+
 }

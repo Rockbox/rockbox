@@ -31,16 +31,20 @@
 #define CURSOR_CHAR 0x92
 #define CURSOR_WIDTH 6
 #define CURSOR_HEIGHT 8
+
 /*
- * Draws a cursor at a given position
+ * Draws a cursor at a given position, if th
  * - screen : the screen where we put the cursor
  * - x, y : the position, in character, not in pixel !!
+ * - on : true if the cursor must be shown, false if it must be erased
  */
-extern void screen_put_cursorxy(struct screen * screen, int x, int y);
+extern void screen_put_cursorxy(struct screen * screen, int x, int y, bool on);
 
 /*
  * Put an icon on a screen at a given position
  * (the position is given in characters)
+ * If the given icon is null (HAVE_LCD_BITMAP) or -1 otherwise, the icon
+ * at the given position will be erased
  * - screen : the screen where we put our icon
  * - x, y : the position, in character, not in pixel !!
  * - icon : the icon to put
