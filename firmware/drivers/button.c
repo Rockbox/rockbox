@@ -211,6 +211,13 @@ void button_init(void)
     /* Set GPIO33, GPIO37, GPIO38  and GPIO52 as general purpose inputs */
     GPIO1_FUNCTION |= 0x00100062;
     GPIO1_ENABLE &= ~0x00100062;
+#elif CONFIG_KEYPAD == IRIVER_H300_PAD
+    /* Set GPIO9 and GPIO15 as general purpose inputs */
+    GPIO_ENABLE &= ~0x00008200;
+    GPIO_FUNCTION |= 0x00008200;
+    /* Set GPIO33, GPIO37, GPIO38  and GPIO52 as general purpose inputs */
+    GPIO1_ENABLE &= ~0x00100062;
+    GPIO1_FUNCTION |= 0x00100062;
 #elif CONFIG_KEYPAD == RECORDER_PAD
     /* Set PB4 and PB8 as input pins */
     PBCR1 &= 0xfffc;  /* PB8MD = 00 */
@@ -367,7 +374,7 @@ static int button_read(void)
 
     int data;
 
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
 
     static bool hold_button = false;
     static bool remote_hold_button = false;
@@ -449,7 +456,7 @@ static int button_read(void)
                     if (data < 0xf0)
                         btn = BUTTON_RC_REW;
     }
-                    
+    
     /* special buttons */
     data = GPIO1_READ;
     if (!button_hold() && ((data & 0x20) == 0))
@@ -457,6 +464,95 @@ static int button_read(void)
     if (!remote_button_hold() && ((data & 0x40) == 0))
         btn |= BUTTON_RC_ON;
     
+#elif CONFIG_KEYPAD == IRIVER_H300_PAD
+
+    static bool hold_button = false;
+    static bool remote_hold_button = false;
+
+    /* light handling */
+    if (hold_button && !button_hold())
+    {
+        backlight_on();
+    }
+    if (remote_hold_button && !remote_button_hold())
+    {
+        remote_backlight_on();
+    }
+    hold_button = button_hold();
+    remote_hold_button = remote_button_hold();
+
+    /* normal buttons */
+    if (!button_hold())
+    {
+        data = adc_scan(ADC_BUTTONS);
+        
+        if (data < 0x50)
+            if (data < 0x30)
+                if (data < 0x10)
+                    btn = BUTTON_SELECT;
+                else
+                    btn = BUTTON_UP;
+            else
+                btn = BUTTON_LEFT;
+        else
+            if (data < 0x90)
+                if (data < 0x70)
+                    btn = BUTTON_DOWN;
+                else
+                    btn = BUTTON_RIGHT;
+            else
+                if(data < 0xc0)
+                    btn = BUTTON_OFF;
+    }
+        
+    /* remote buttons */
+    if (!remote_button_hold())
+    {
+        data = adc_scan(ADC_REMOTE);
+
+        if (data < 0x74)
+            if (data < 0x40)
+                if (data < 0x20)
+                    if(data < 0x10)
+                        btn = BUTTON_RC_STOP;
+                    else
+                        btn = BUTTON_RC_VOL_DOWN;
+                else
+                    btn = BUTTON_RC_MODE;
+            else
+                if (data < 0x58)
+                    btn = BUTTON_RC_VOL_UP;
+                else
+                    btn = BUTTON_RC_BITRATE;
+        else
+            if (data < 0xb0)
+                if (data < 0x88)
+                    btn = BUTTON_RC_REC;
+                else
+                    btn = BUTTON_RC_SOURCE;
+            else
+                if (data < 0xd8)
+                    if(data < 0xc0)
+                        btn = BUTTON_RC_FF;
+                    else
+                        btn = BUTTON_RC_MENU;
+                else
+                    if (data < 0xf0)
+                        btn = BUTTON_RC_REW;
+    }
+    
+    /* special buttons */
+    data = GPIO_READ;
+    if (!button_hold() && ((data & 0x200) == 0))
+        btn |= BUTTON_MODE;
+    if (!button_hold() && ((data & 0x8000) == 0))
+        btn |= BUTTON_REC;
+    
+    data = GPIO1_READ;
+    if (!button_hold() && ((data & 0x20) == 0))
+        btn |= BUTTON_ON;
+    if (!remote_button_hold() && ((data & 0x40) == 0))
+        btn |= BUTTON_RC_ON;
     
 #elif CONFIG_KEYPAD == RECORDER_PAD
 
