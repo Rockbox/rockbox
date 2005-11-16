@@ -93,7 +93,4 @@
 #define BOOTFILE_EXT "iriver"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 
-/* Define this if you can control the S/PDIF power */
-#define HAVE_SPDIF_POWER
-
 #endif
