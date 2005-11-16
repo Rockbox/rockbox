@@ -21,7 +21,7 @@
 
 #include "config.h"
 
-#ifdef IRIVER_H100_SERIES
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
 #define NUM_ADC_CHANNELS 4
 
 #define ADC_BUTTONS 0
@@ -30,14 +30,6 @@
 #define ADC_UNREG_POWER ADC_BATTERY /* For compatibility */
 
 #else
-#ifdef IRIVER_H300
-/* TODO: we don't have enough info about the ADC for the H3x0 for now, so this
-   stuff is only added here for now to make things compile. */
-#define ADC_BUTTONS -2
-#define ADC_REMOTE  -3
-unsigned char adc_scan(int channel);
-
-#endif
 
 #define NUM_ADC_CHANNELS 8
 

@@ -22,6 +22,7 @@
 #include "kernel.h"
 #include "thread.h"
 #include "adc.h"
+#include "pcf50606.h"
 
 #if CONFIG_CPU == SH7034
 /**************************************************************************
@@ -107,8 +108,28 @@ void adc_init(void)
     sleep(2);    /* Ensure valid readings when adc_init returns */
 }
 #elif CONFIG_CPU == MCF5249
-
 static unsigned char adcdata[NUM_ADC_CHANNELS];
+
+#ifdef IRIVER_H300_SERIES
+static int channelnum[] =
+{
+    5,   /* ADC_BUTTONS */
+    6,   /* ADC_REMOTE */
+    0,   /* ADC_BATTERY */
+};
+
+unsigned char adc_scan(int channel)
+{
+    unsigned char data;
+    
+    pcf50606_write(0x2f, 0x80 | (channelnum[channel] << 1) | 1);
+    data = pcf50606_read(0x30);
+
+    adcdata[channel] = data;
+
+    return data;
+}
+#else
 
 #define CS_LO  and_l(~0x80, &GPIO_OUT)
 #define CS_HI  or_l(0x80, &GPIO_OUT)
@@ -176,6 +197,7 @@ unsigned char adc_scan(int channel)
 
     return data;
 }
+#endif
 
 unsigned short adc_read(int channel)
 {
@@ -195,6 +217,8 @@ static void adc_tick(void)
 
 void adc_init(void)
 {
+#ifdef IRIVER_H300_SERIES
+#else
     or_l(0x80600080, &GPIO_FUNCTION); /* GPIO7:  CS
                                          GPIO21: Data In (to the ADC)
                                          GPIO22: CLK
@@ -202,6 +226,7 @@ void adc_init(void)
     or_l(0x00600080, &GPIO_ENABLE);
     or_l(0x80, &GPIO_OUT);          /* CS high */
     and_l(~0x00400000, &GPIO_OUT);  /* CLK low */
+#endif
 
     adc_scan(ADC_BATTERY);
     
