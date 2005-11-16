@@ -814,7 +814,7 @@ bool radio_screen(void)
 #ifndef SIMULATOR
     if(audio_status() & AUDIO_STATUS_ERROR)
     {
-        splash(0, true, str(LANG_DISK_FULL));
+        gui_syncsplash(0, true, str(LANG_DISK_FULL));
         gui_syncstatusbar_draw(&statusbars,true);
         FOR_NB_SCREENS(i)
             gui_textarea_update(&screens[i]);
@@ -878,7 +878,7 @@ void radio_save_presets(void)
     }
     else
     {
-        splash(HZ*2, true, str(LANG_FM_PRESET_SAVE_FAILED));
+        gui_syncsplash(HZ*2, true, str(LANG_FM_PRESET_SAVE_FAILED));
     }
 }
 
@@ -959,7 +959,7 @@ bool radio_add_preset(void)
     }
     else
     {
-        splash(HZ*2, true, str(LANG_FM_NO_FREE_PRESETS));
+        gui_syncsplash(HZ*2, true, str(LANG_FM_NO_FREE_PRESETS));
     }
     return true;
 }

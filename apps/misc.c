@@ -43,6 +43,7 @@
 #include "atoi.h"
 #include "version.h"
 #include "font.h"
+#include "splash.h"
 #ifdef HAVE_MMC
 #include "ata_mmc.h"
 #endif
@@ -442,7 +443,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 #endif
     {
         lcd_clear_display();
-        splash(0, true, str(LANG_SHUTTINGDOWN));
+        gui_syncsplash(0, true, str(LANG_SHUTTINGDOWN));
         if (callback != NULL)
             callback(parameter);
 

@@ -43,6 +43,7 @@
 #include "alarm_menu.h"
 #include "backlight.h"
 
+#include "splash.h"
 #define MARGIN_Y (global_settings.statusbar ? STATUSBAR_HEIGHT : 0)
 
 bool alarm_screen(void)
@@ -92,11 +93,11 @@ bool alarm_screen(void)
                 rtc_init();
                 rtc_set_alarm(h,m);
                 rtc_enable_alarm(true);
-                splash(HZ*2, true, str(LANG_ALARM_MOD_TIME_TO_GO),
+                gui_syncsplash(HZ*2, true, str(LANG_ALARM_MOD_TIME_TO_GO),
                        togo / 60, togo % 60);
 		done = true;
             } else {
-                splash(HZ, true, str(LANG_ALARM_MOD_ERROR));
+                gui_syncsplash(HZ, true, str(LANG_ALARM_MOD_ERROR));
                 update = true;
             }
             break;
@@ -146,7 +147,7 @@ bool alarm_screen(void)
         case BUTTON_MENU:
 #endif
             rtc_enable_alarm(false);
-            splash(HZ*2, true, str(LANG_ALARM_MOD_DISABLE));
+            gui_syncsplash(HZ*2, true, str(LANG_ALARM_MOD_DISABLE));
             done = true;
             break;
 

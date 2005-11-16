@@ -43,6 +43,7 @@
 #include "keyboard.h"
 #include "database.h"
 #include "autoconf.h"
+#include "splash.h"
 
 #if CONFIG_CODEC == SWCODEC
 #include "playback.h"
@@ -94,7 +95,7 @@ int tagdb_init(void)
         ptr[1] != 'D' ||
         ptr[2] != 'B')
     {
-        splash(HZ,true,"Not a rockbox ID3 database!");
+        gui_syncsplash(HZ,true,"Not a rockbox ID3 database!");
         return -1;
     }
 #ifdef ROCKBOX_LITTLE_ENDIAN
@@ -106,7 +107,7 @@ int tagdb_init(void)
 #endif
     if ( (tagdbheader.version&0xFF) != TAGDB_VERSION)
     {
-        splash(HZ,true,"Unsupported database version %d!",
+        gui_syncsplash(HZ,true,"Unsupported database version %d!",
                tagdbheader.version&0xFF);
         return -1;
     }
@@ -115,7 +116,7 @@ int tagdb_init(void)
         tagdbheader.albumstart > tagdbheader.songstart ||
         tagdbheader.artiststart > tagdbheader.albumstart)
     {
-        splash(HZ,true,"Corrupt ID3 database!");
+        gui_syncsplash(HZ,true,"Corrupt ID3 database!");
         return -1;
     }
 
@@ -232,7 +233,7 @@ void update_fentryoffsets(int start, int end)
              }
          }
          if(fe.rundbentry!=-1) {
-              splash(HZ*2,true, "o.o.. found a rundbentry? o.o; didn't update "
+              gui_syncsplash(HZ*2,true, "o.o.. found a rundbentry? o.o; didn't update "
                      "it, update the code o.o;");
          }
     }
@@ -242,7 +243,7 @@ int tagdb_shiftdown(int targetoffset, int startingoffset, int bytes)
 {
     int amount;
     if(targetoffset>=startingoffset) {
-        splash(HZ*2,true,"Woah. no beeping way. (tagdb_shiftdown)");
+        gui_syncsplash(HZ*2,true,"Woah. no beeping way. (tagdb_shiftdown)");
         return 0;
     }
     lseek(tagdb_fd,startingoffset,SEEK_SET);
@@ -253,7 +254,7 @@ int tagdb_shiftdown(int targetoffset, int startingoffset, int bytes)
         written=write(tagdb_fd,sbuf,amount);
         targetoffset+=written;
         if(amount!=written) {
-            splash(HZ*2,true,"Something went very wrong. expect database "
+            gui_syncsplash(HZ*2,true,"Something went very wrong. expect database "
                    "corruption. (tagdb_shiftdown)");
             return 0;
         }
@@ -268,7 +269,7 @@ int tagdb_shiftup(int targetoffset, int startingoffset, int bytes)
     int amount,amount2;
     int readpos,writepos,filelen;
     if(targetoffset<=startingoffset) {
-        splash(HZ*2,true,"Um. no. (tagdb_shiftup)");
+        gui_syncsplash(HZ*2,true,"Um. no. (tagdb_shiftup)");
         return 0;
     }
     filelen=lseek(tagdb_fd,0,SEEK_END);
@@ -280,14 +281,14 @@ int tagdb_shiftup(int targetoffset, int startingoffset, int bytes)
         lseek(tagdb_fd,readpos,SEEK_SET);
         amount2=read(tagdb_fd,sbuf,amount);
         if(amount2!=amount) {
-             splash(HZ*2,true,"Something went very wrong. expect database "
+             gui_syncsplash(HZ*2,true,"Something went very wrong. expect database "
                     "corruption. (tagdb_shiftup)");
              return 0;
         }
         lseek(tagdb_fd,writepos,SEEK_SET);
         amount=write(tagdb_fd,sbuf,amount2);
         if(amount2!=amount) {
-            splash(HZ*2,true,"Something went very wrong. expect database "
+            gui_syncsplash(HZ*2,true,"Something went very wrong. expect database "
                    "corruption. (tagdb_shiftup)");
             return 0;
         }
@@ -296,7 +297,7 @@ int tagdb_shiftup(int targetoffset, int startingoffset, int bytes)
     if(bytes==0)
         return 1;
     else {
-        splash(HZ*2,true,"Something went wrong, >.>;; (tagdb_shiftup)");
+        gui_syncsplash(HZ*2,true,"Something went wrong, >.>;; (tagdb_shiftup)");
         return 0;
     }
 }
@@ -361,7 +362,7 @@ int rundb_init(void)
         ptr[1] != 'R' ||
         ptr[2] != 'D')
     {
-        splash(HZ,true,"Not a rockbox runtime database!");
+        gui_syncsplash(HZ,true,"Not a rockbox runtime database!");
         return -1;
     }
 #ifdef ROCKBOX_LITTLE_ENDIAN
@@ -373,7 +374,7 @@ int rundb_init(void)
 #endif
     if ( (rundbheader.version&0xFF) != RUNDB_VERSION)
     {
-        splash(HZ,true,"Unsupported runtime database version %d!",
+        gui_syncsplash(HZ,true,"Unsupported runtime database version %d!",
                rundbheader.version&0xFF);
         return -1;
     }

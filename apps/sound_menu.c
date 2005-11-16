@@ -42,6 +42,7 @@
 #include "peakmeter.h"
 #include "mas.h"
 #endif
+#include "splash.h"
 
 int selected_setting; /* Used by the callback */
 void dec_sound_formatter(char *buffer, int buffer_size, int val, const char * unit)
@@ -610,7 +611,7 @@ bool rectrigger(void)
 
         switch (button) {
             case TRIG_CANCEL:
-                splash(50, true, str(LANG_RESET_DONE_CANCEL));
+                gui_syncsplash(50, true, str(LANG_RESET_DONE_CANCEL));
                 global_settings.rec_start_thres = old_start_thres;
                 global_settings.rec_start_duration = old_start_duration;
                 global_settings.rec_prerecord_time = old_prerecord_time;

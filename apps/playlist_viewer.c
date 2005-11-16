@@ -673,15 +673,30 @@ bool playlist_viewer_ex(char* filename)
         switch (button)
         {
             case TREE_EXIT:
+#ifdef TREE_RC_EXIT
+            case TREE_RC_EXIT:
+#endif
 #ifdef TREE_OFF
-           case TREE_OFF:
+            case TREE_OFF:
 #endif
                 exit = true;
                 break;
 
+#ifdef TREE_ENTER
+            case TREE_ENTER:
+            case TREE_ENTER | BUTTON_REPEAT:
+#endif
+#ifdef TREE_RC_RUN
+            case TREE_RC_RUN:
+#endif
             case TREE_RUN:
 #ifdef TREE_RUN_PRE
-                if (lastbutton != TREE_RUN_PRE)
+                if (((button == TREE_RUN)
+#ifdef TREE_RC_RUN_PRE
+                    || (button == TREE_RC_RUN))
+                        && ((lastbutton != TREE_RC_RUN_PRE)
+#endif
+                    && (lastbutton != TREE_RUN_PRE)))
                     break;
 #endif
                 struct playlist_entry * current_track=playlist_buffer_get_track(&viewer.buffer, viewer.selected_track);
@@ -723,6 +738,9 @@ bool playlist_viewer_ex(char* filename)
 #ifdef TREE_CONTEXT2
             case TREE_CONTEXT2:
 #endif
+#ifdef TREE_RC_CONTEXT
+            case TREE_RC_CONTEXT:
+#endif
             {
                 /* ON+PLAY menu */
                 int ret;
@@ -747,6 +765,9 @@ bool playlist_viewer_ex(char* filename)
             }
 
             case TREE_MENU:
+#ifdef TREE_RC_MENU
+            case TREE_RC_MENU:
+#endif
                 if (viewer_menu())
                 {
                     ret = true;

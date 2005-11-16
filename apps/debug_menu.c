@@ -47,6 +47,8 @@
 #include "panic.h"
 #include "screens.h"
 #include "misc.h"
+#include "splash.h"
+
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
 #include "peakmeter.h"
@@ -1748,7 +1750,7 @@ extern bool do_screendump_instead_of_usb;
 bool dbg_screendump(void)
 {
     do_screendump_instead_of_usb = !do_screendump_instead_of_usb;
-    splash(HZ, true, "Screendump %s",
+    gui_syncsplash(HZ, true, "Screendump %s",
                  do_screendump_instead_of_usb?"enabled":"disabled");
     return false;
 }

@@ -48,7 +48,7 @@
 #include "talk.h"
 #include "misc.h"
 #include "abrepeat.h"
-
+#include "splash.h"
 #define MAX_BOOKMARKS 10
 #define MAX_BOOKMARK_SIZE  350
 #define RECENT_BOOKMARK_FILE ROCKBOX_DIR "/most-recent.bmark"
@@ -283,9 +283,9 @@ static bool write_bookmark(bool create_bookmark_file)
     }
 
     if (success)
-        splash(HZ, true, str(LANG_BOOKMARK_CREATE_SUCCESS));
+        gui_syncsplash(HZ, true, str(LANG_BOOKMARK_CREATE_SUCCESS));
     else
-        splash(HZ, true, str(LANG_BOOKMARK_CREATE_FAILURE));
+        gui_syncsplash(HZ, true, str(LANG_BOOKMARK_CREATE_FAILURE));
 
     return true;
 }
@@ -621,7 +621,7 @@ static char* select_bookmark(const char* bookmark_file_name)
             /* if there were no bookmarks in the file, delete the file and exit. */
             if(bookmark_id <= 0)
             {
-                splash(HZ, true, str(LANG_BOOKMARK_LOAD_EMPTY));
+                gui_syncsplash(HZ, true, str(LANG_BOOKMARK_LOAD_EMPTY));
                 remove(bookmark_file_name);
                 return NULL;
             }

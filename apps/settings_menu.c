@@ -51,6 +51,7 @@
 #include "database.h"
 #include "dir.h"
 #include "dircache.h"
+#include "splash.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
@@ -1337,7 +1338,7 @@ static bool dircache(void)
                                    NULL);
 
     if (!dircache_is_enabled() && global_settings.dircache)
-        splash(HZ*2, true, str(LANG_DIRCACHE_REBOOT));
+        gui_syncsplash(HZ*2, true, str(LANG_DIRCACHE_REBOOT));
 
     if (!result)
         dircache_disable();

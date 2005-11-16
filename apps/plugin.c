@@ -48,6 +48,7 @@
 #include "timer.h"
 #include "sound.h"
 #include "database.h"
+#include "splash.h"
 #if (CONFIG_CODEC == SWCODEC)
 #include "pcm_playback.h"
 #endif
@@ -138,7 +139,7 @@ static const struct plugin_api rockbox_api = {
     backlight_on,
     backlight_off,
     backlight_set_timeout,
-    splash,
+    gui_syncsplash,
 #ifdef HAVE_REMOTE_LCD
     /* remote lcd */
     lcd_remote_set_contrast,
@@ -400,7 +401,7 @@ int plugin_load(const char* plugin, void* parameter)
     fd = open(plugin, O_RDONLY);
     if (fd < 0) {
         snprintf(buf, sizeof buf, str(LANG_PLUGIN_CANT_OPEN), plugin);
-        splash(HZ*2, true, buf);
+        gui_syncsplash(HZ*2, true, buf);
         return fd;
     }
     
@@ -413,12 +414,12 @@ int plugin_load(const char* plugin, void* parameter)
     if (plugin_size < 0) {
         /* read error */
         snprintf(buf, sizeof buf, str(LANG_READ_FAILED), plugin);
-        splash(HZ*2, true, buf);
+        gui_syncsplash(HZ*2, true, buf);
         return -1;
     }
     if (plugin_size == 0) {
         /* loaded a 0-byte plugin, implying it's not for this model */
-        splash(HZ*2, true, str(LANG_PLUGIN_WRONG_MODEL));
+        gui_syncsplash(HZ*2, true, str(LANG_PLUGIN_WRONG_MODEL));
         return -1;
     }
 #endif
@@ -450,15 +451,15 @@ int plugin_load(const char* plugin, void* parameter)
             return PLUGIN_USB_CONNECTED;
 
         case PLUGIN_WRONG_API_VERSION:
-            splash(HZ*2, true, str(LANG_PLUGIN_WRONG_VERSION));
+            gui_syncsplash(HZ*2, true, str(LANG_PLUGIN_WRONG_VERSION));
             break;
 
         case PLUGIN_WRONG_MODEL:
-            splash(HZ*2, true, str(LANG_PLUGIN_WRONG_MODEL));
+            gui_syncsplash(HZ*2, true, str(LANG_PLUGIN_WRONG_MODEL));
             break;
 
         default:
-            splash(HZ*2, true, str(LANG_PLUGIN_ERROR));
+            gui_syncsplash(HZ*2, true, str(LANG_PLUGIN_ERROR));
             break;
     }
 

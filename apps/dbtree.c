@@ -44,6 +44,7 @@
 #include "keyboard.h"
 #include "autoconf.h"
 #include "list.h"
+#include "splash.h"
 
 static int db_play_folder(struct tree_context* c);
 static int db_search(struct tree_context* c, char* string);
@@ -130,13 +131,13 @@ int db_load(struct tree_context* c)
             i = db_search(c, searchstring);
             c->dirlength = c->filesindir = i;
             if (c->dirfull) {
-                splash(HZ, true, "%s %s",
+                gui_syncsplash(HZ, true, "%s %s",
                        str(LANG_SHOWDIR_ERROR_BUFFER),
                        str(LANG_SHOWDIR_ERROR_FULL));
                 c->dirfull = false;
             }
             else
-                splash(HZ, true, str(LANG_ID3DB_MATCHES), i);
+                gui_syncsplash(HZ, true, str(LANG_ID3DB_MATCHES), i);
             return i;
 
         case allsongs:

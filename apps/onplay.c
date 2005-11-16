@@ -48,6 +48,7 @@
 #include "bookmark.h"
 #include "wps.h"
 #include "action.h"
+#include "splash.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #endif
@@ -125,7 +126,7 @@ static bool list_viewers(void)
     }
     else
     {
-        splash(HZ*2, true, "No viewers found");
+        gui_syncsplash(HZ*2, true, "No viewers found");
     }
 
     if (ret == PLUGIN_USB_CONNECTED)
@@ -495,7 +496,7 @@ bool create_dir(void)
 
     rc = mkdir(dirname, 0);
     if (rc < 0) {
-        splash(HZ, true, "%s %s", str(LANG_CREATE_DIR), str(LANG_FAILED));
+        gui_syncsplash(HZ, true, "%s %s", str(LANG_CREATE_DIR), str(LANG_FAILED));
     } else {
         onplay_result = ONPLAY_RELOAD_DIR;
     }

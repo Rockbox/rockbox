@@ -80,7 +80,7 @@ static bool setvol(void)
     wps_refresh(id3, nid3, 0, WPS_REFRESH_NON_STATIC);
     settings_save();
 #ifdef HAVE_LCD_CHARCELLS
-    splash(0, false, "Vol: %d %%   ",
+    gui_syncsplash(0, false, "Vol: %d %%   ",
            sound_val2phys(SOUND_VOLUME, global_settings.volume));
     return true;
 #endif
@@ -315,7 +315,7 @@ static void display_keylock_text(bool locked)
     else
         s = str(LANG_KEYLOCK_OFF_RECORDER);
 #endif
-    splash(HZ, true, s);
+    gui_syncsplash(HZ, true, s);
 }
 
 static void waitfor_nokey(void)

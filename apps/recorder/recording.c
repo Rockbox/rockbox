@@ -59,7 +59,7 @@
 #include "atoi.h"
 #include "sound.h"
 #include "ata.h"
-
+#include "splash.h"
 #ifdef HAVE_RECORDING
 
 
@@ -228,7 +228,7 @@ int rec_create_directory(void)
         rc = mkdir(rec_base_directory, 0);
         if(rc < 0 && errno != EEXIST)
         {
-            splash(HZ * 2, true,
+            gui_syncsplash(HZ * 2, true,
                    "Can't create the %s directory. Error code %d.",
                    rec_base_directory, rc);
             return -1;
@@ -859,7 +859,7 @@ bool recording_screen(void)
 #endif
     if (audio_stat & AUDIO_STATUS_ERROR)
     {
-        splash(0, true, str(LANG_DISK_FULL));
+        gui_syncsplash(0, true, str(LANG_DISK_FULL));
         status_draw(true);
         lcd_update();
         audio_error_clear();

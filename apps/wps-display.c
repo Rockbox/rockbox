@@ -47,7 +47,7 @@
 #include "button.h"
 #include "abrepeat.h"
 #include "screens.h"
-
+#include "splash.h"
 #ifdef HAVE_LCD_BITMAP
 #include <ctype.h>
 #include "icons.h"
@@ -1622,10 +1622,10 @@ bool wps_display(struct mp3entry* id3,
     {
         global_settings.resume_index = -1;
 #ifdef HAVE_LCD_CHARCELLS
-        splash(HZ, true, str(LANG_END_PLAYLIST_PLAYER));
+        gui_syncsplash(HZ, true, str(LANG_END_PLAYLIST_PLAYER));
 #else
         status_draw(true);
-        splash(HZ, true, str(LANG_END_PLAYLIST_RECORDER));
+        gui_syncsplash(HZ, true, str(LANG_END_PLAYLIST_RECORDER));
 #endif
         return true;
     }

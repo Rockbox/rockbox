@@ -65,6 +65,7 @@
 #include "radio.h"
 #include "power.h"
 #endif
+#include "splash.h"
 
 static volatile bool audio_codec_loaded;
 static volatile bool voice_codec_loaded;
@@ -918,7 +919,7 @@ bool loadcodec(const char *trackname, bool start_play)
     default:
         logf("Codec: Unsupported");
         snprintf(msgbuf, sizeof(msgbuf)-1, "No codec for: %s", trackname);
-        splash(HZ*2, true, msgbuf);
+        gui_syncsplash(HZ*2, true, msgbuf);
         codec_path = NULL;
     }
     
@@ -952,7 +953,7 @@ bool loadcodec(const char *trackname, bool start_play)
     if (fd < 0) {
         logf("Codec doesn't exist!");
         snprintf(msgbuf, sizeof(msgbuf)-1, "Couldn't load codec: %s", codec_path);
-        splash(HZ*2, true, msgbuf);
+        gui_syncsplash(HZ*2, true, msgbuf);
         return false;
     }
     
@@ -1872,7 +1873,7 @@ void codec_thread(void)
             if (status != CODEC_OK) {
                 logf("Codec failure");
                 audio_stop_playback();
-                splash(HZ*2, true, "Codec failure");
+                gui_syncsplash(HZ*2, true, "Codec failure");
             } else {
                 logf("Codec finished");
             }
@@ -2266,7 +2267,7 @@ void audio_set_crossfade(int enable)
 
     /* Re-initialize audio system. */
     if (was_playing)
-        splash(0, true, str(LANG_RESTARTING_PLAYBACK));
+        gui_syncsplash(0, true, str(LANG_RESTARTING_PLAYBACK));
     pcmbuf_init(size);
     pcmbuf_crossfade_enable(enable);
     reset_buffer();

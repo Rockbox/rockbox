@@ -39,6 +39,7 @@
 #include "rolo.h"
 #include "sprintf.h"
 #include "dircache.h"
+#include "splash.h"
 
 #ifndef SIMULATOR
 static int boot_size = 0;
@@ -406,7 +407,7 @@ int ft_enter(struct tree_context* c)
                     set_file(buf, global_settings.lang_file,
                              MAX_FILENAME);
                     talk_init(); /* use voice of same language */
-                    splash(HZ, true, str(LANG_LANGUAGE_LOADED));
+                    gui_syncsplash(HZ, true, str(LANG_LANGUAGE_LOADED));
                 }
                 break;
 

@@ -43,12 +43,6 @@ bool quick_screen(const int, const int);
    /* Long press already detected so not needed here */
 #endif
 
-void splash(int ticks,       /* how long */
-            bool center,     /* FALSE means left-justified, TRUE means
-                                horizontal and vertical center */
-            const char *fmt, /* what to say *printf style */
-            ...);
-
 #ifdef HAVE_RTC
 bool set_time_screen(const char* string, struct tm *tm);
 #endif

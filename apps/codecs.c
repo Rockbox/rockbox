@@ -48,6 +48,8 @@
 #include "system.h"
 #include "sound.h"
 #include "database.h"
+#include "splash.h"
+
 #if (CONFIG_CODEC == SWCODEC)
 #include "pcm_playback.h"
 #endif
@@ -94,7 +96,7 @@ struct codec_api ci = {
     NULL,
     NULL,
     
-    splash,
+    gui_syncsplash,
 
     /* file */
     (open_func)PREFIX(open),
@@ -304,7 +306,7 @@ int codec_load_file(const char *plugin, struct codec_api *api)
     if (fd < 0) {
         snprintf(msgbuf, sizeof(msgbuf)-1, "Couldn't load codec: %s", plugin);
         logf("Codec load error:%d", fd);
-        splash(HZ*2, true, msgbuf);
+        gui_syncsplash(HZ*2, true, msgbuf);
         return fd;
     }
     
