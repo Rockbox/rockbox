@@ -1,4 +1,4 @@
-<wps>ZZ
+<wps>
 # Name of the WPS _including_ extension
 Name: ipodVOL.wps
 # Name of the creator of the WPS
@@ -14,19 +14,19 @@ Width: 160
 </wps>
 
 <wps>
+Name: rockbox_default.wps
+Author: Rockbox team
+Font: rockbox_default.fnt
+Statusbar: on
+Height: 2
+Width: 8
+</wps>
+
+<wps>
 Name: boxes.wps
 Author: Christi Scarborough (after the_engineer)
 Font: rockbox_default.fnt
 Statusbar: off
 Height: 128
 Width: 160
-</wps>
-
-<wps>
-Name: default.wps
-Author: Rockbox team
-Font: rockbox_default.fnt
-Statusbar: on
-Height: 64
-Width: 112
 </wps>

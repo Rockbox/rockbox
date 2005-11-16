@@ -78,7 +78,7 @@ struct {
 
 #endif
 
-#define WPS_CONFIG ROCKBOX_DIR "/default.wps"
+#define WPS_DEFAULTCFG WPS_DIR "/rockbox_default.wps"
 
 #ifdef HAVE_LCD_BITMAP
 #define MAX_LINES (LCD_HEIGHT/5+1)
@@ -336,15 +336,36 @@ static void wps_format(const char* fmt, char *bmpdir, size_t bmpdirlen)
     }
 }
 
+/* Clear the WPS image cache */
+static void wps_clear(void)
+{
+#ifdef HAVE_LCD_BITMAP
+   int i;
+
+   /* reset image buffer */
+   img_buf_ptr = img_buf;
+   img_buf_free = IMG_BUFSIZE;
+
+   /* set images to unloaded and not displayed */
+   for (i = 0; i < MAX_IMAGES; i++) {
+      img[i].loaded = false;
+      img[i].display = false;
+      img[i].always_display = false;
+   }
+#endif
+
+}
+
 void wps_reset(void)
 {
     wps_loaded = false;
     memset(&format_buffer, 0, sizeof format_buffer);
+    wps_clear();
 }
 
 bool wps_load(const char* file, bool display)
 {
-    int i, s;
+    int i,s;
     char buffer[FORMAT_BUFFER_SIZE];
     int fd;
     size_t bmpdirlen;
@@ -352,6 +373,16 @@ bool wps_load(const char* file, bool display)
     char *bmpdir = strrchr(file, '.');
     bmpdirlen = bmpdir - file;
     
+    /* 
+     * Hardcode loading WPS_DEFAULTCFG to cause a reset ideally this 
+     * wants to be a virtual file.  Feel free to modify dirbrowse()
+     * if you're feeling brave.
+     */
+    if (! strcmp(file, WPS_DEFAULTCFG) ) {
+       wps_reset();
+       return(false);
+    }
+
     fd = open(file, O_RDONLY);
 
     if (fd >= 0)
@@ -360,18 +391,7 @@ bool wps_load(const char* file, bool display)
 
         if (numread > 0)
         {
-#ifdef HAVE_LCD_BITMAP
-            /* reset image buffer */
-            img_buf_ptr = img_buf;
-            img_buf_free = IMG_BUFSIZE;
-
-            /* set images to unloaded and not displayed */
-            for (i = 0; i < MAX_IMAGES; i++) {
-                img[i].loaded = false;
-                img[i].display = false;
-                img[i].always_display = false;
-            }
-#endif
+            wps_clear();
             buffer[numread] = 0;
             wps_format(buffer, (char *)file, bmpdirlen);
         }

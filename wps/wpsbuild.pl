@@ -88,7 +88,9 @@ sub copywps {
         my $wpsdir = $wps;
         $wpsdir =~ s/\.wps//;
         system("cp $dir/$wps .rockbox/wps/");
-        system("cp $dir/$wpsdir/*.bmp .rockbox/wps/$wpsdir/");
+        if (-e "$dir/$wpsdir") {
+           system("cp $dir/$wpsdir/*.bmp .rockbox/wps/$wpsdir/");
+        }
     }
     else {
         print STDERR "beep, no dir to copy WPS from!\n";
