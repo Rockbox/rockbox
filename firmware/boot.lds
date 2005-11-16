@@ -12,13 +12,7 @@ OUTPUT_FORMAT(elf32-sh)
 INPUT(crt0.o)
 #endif
 
-#if MEMORYSIZE >= 32
-#define PLUGINSIZE 0xC0000
-#else
-#define PLUGINSIZE 0x8000
-#endif
-
-#define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGINSIZE
+#define DRAMSIZE (MEMORYSIZE * 0x100000)
 
 #ifdef IRIVER_H100_SERIES
 #define DRAMORIG 0x31000000
@@ -26,6 +20,12 @@ INPUT(crt0.o)
 #define IRAMSIZE 0x18000
 #define FLASHORIG 0x001f0000
 #define FLASHSIZE 2M
+#elif defined(IRIVER_H300_SERIES)
+#define DRAMORIG 0x31000000
+#define IRAMORIG 0x10000000
+#define IRAMSIZE 0x18000
+#define FLASHORIG 0x003f0000
+#define FLASHSIZE 4M
 #elif CONFIG_CPU == PP5020
 #define DRAMORIG 0x10000000
 #define IRAMORIG 0x40000000
@@ -39,8 +39,6 @@ INPUT(crt0.o)
 #define FLASHORIG 0x02000000 + ROM_START
 #define FLASHSIZE 256K - ROM_START
 #endif
-
-#define ENDADDR  (IRAMORIG + IRAMSIZE)
 
 #if CONFIG_CPU!=PP5020
 MEMORY
@@ -141,29 +139,22 @@ SECTIONS
        stackend = .;
     } > IRAM
 
+#ifdef IRIVER_H300_SERIES
+    .bss DRAMORIG+0x1000000:
+#else
     .bss :
+#endif
     {
        _edata = .;
         *(.ibss)
         *(.bss)
         *(COMMON)
        _end = .;
+#ifdef IRIVER_H300_SERIES
+    } > DRAM
+#else
     } > IRAM
+#endif
 
-    .mp3buf :
-    {
-        . = ALIGN(0x4);
-        _mp3buffer = .;
-    } > IRAM
-
-    .mp3end ENDADDR:
-    {
-        _mp3end = .;
-    } > IRAM
-
-    .plugin ENDADDR:
-    {
-        _pluginbuf = .;
-    }
 }
 #endif
