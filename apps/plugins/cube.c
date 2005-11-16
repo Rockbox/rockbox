@@ -152,18 +152,16 @@ static const struct face faces[6] =
 };
 
 #if LCD_DEPTH > 1
+static const unsigned face_colors[6] =
+{
 #ifdef HAVE_LCD_COLOR
-static const struct rgb face_colors[6] =
-{
-    {LCD_MAX_RED, 0, 0},   {LCD_MAX_RED, 0, 0},  {0, LCD_MAX_GREEN, 0},
-    {0, LCD_MAX_GREEN, 0}, {0, 0, LCD_MAX_BLUE}, {0, 0, LCD_MAX_BLUE}
-};
+    LCD_RGBPACK(255, 0, 0), LCD_RGBPACK(255, 0, 0), LCD_RGBPACK(0, 255, 0),
+    LCD_RGBPACK(0, 255, 0), LCD_RGBPACK(0, 0, 255), LCD_RGBPACK(0, 0, 255)
 #else
-static const int face_colors[6] =
-{
-    2*LCD_MAX_LEVEL/3, 2*LCD_MAX_LEVEL/3, LCD_MAX_LEVEL/3, LCD_MAX_LEVEL/3, 0, 0
-};
+    LCD_LIGHTGRAY, LCD_LIGHTGRAY, LCD_DARKGRAY,
+    LCD_DARKGRAY, LCD_BLACK, LCD_BLACK
 #endif
+};
 #endif
 
 enum {

@@ -67,16 +67,6 @@ use F3 to see how many mines are left (supposing all your flags are correct)
 
 #endif
 
-#if LCD_DEPTH > 1
-#if HAVE_LCD_COLOR
-#define LIGHT_GRAY ((struct rgb){2*LCD_MAX_RED/3, 2*LCD_MAX_GREEN/3, 2*LCD_MAX_BLUE/3})
-#define DARK_GRAY  ((struct rgb){LCD_MAX_RED/3, LCD_MAX_GREEN/3, LCD_MAX_BLUE/3})
-#else
-#define LIGHT_GRAY (2*LCD_MAX_LEVEL/3)
-#define DARK_GRAY  (LCD_MAX_LEVEL/3)
-#endif
-#endif
-
 /* here is a global api struct pointer. while not strictly necessary,
    it's nice not to have to pass the api pointer in all function calls
    in the plugin */
@@ -385,7 +375,7 @@ int minesweeper(void)
         for(i=0;i<height;i++){
             for(j=0;j<width;j++){
 #if LCD_DEPTH > 1
-                rb->lcd_set_foreground(DARK_GRAY);
+                rb->lcd_set_foreground(LCD_DARKGRAY);
                 rb->lcd_drawrect(j*8,i*8,8,8);
                 rb->lcd_set_foreground(LCD_BLACK);
 #else
@@ -404,7 +394,7 @@ int minesweeper(void)
                     rb->lcd_drawline(j*8+2,i*8+5,j*8+5,i*8+2);
                 } else {
 #if LCD_DEPTH > 1
-                    rb->lcd_set_foreground(LIGHT_GRAY);
+                    rb->lcd_set_foreground(LCD_LIGHTGRAY);
                     rb->lcd_fillrect(j*8+1,i*8+1,6,6);
                     rb->lcd_set_foreground(LCD_BLACK);
 #else

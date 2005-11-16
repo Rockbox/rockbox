@@ -140,29 +140,39 @@ typedef void lcd_blockfunc_type(unsigned char *address, unsigned mask, unsigned 
 
 #ifdef HAVE_LCD_COLOR
 #if LCD_DEPTH == 16
-#define LCD_MAX_RED   ((1 << 5) - 1)
-#define LCD_MAX_GREEN ((1 << 6) - 1)
-#define LCD_MAX_BLUE  ((1 << 5) - 1)
+#define LCD_MAX_RED    31
+#define LCD_MAX_GREEN  63
+#define LCD_MAX_BLUE   31
+#define _RGBPACK(r, g, b) ( ((((r) * 31 + 127) / 255) << 11) \
+                           |((((g) * 63 + 127) / 255) << 5) \
+                           | (((b) * 31 + 127) / 255))
+#if (CONFIG_LCD == LCD_IPODCOLOR) || (CONFIG_LCD == LCD_IPODNANO)
+#define LCD_RGBPACK(r, g, b) ( ((_RGBPACK((r), (g), (b)) & 0xff00) >> 8) \
+                              |((_RGBPACK((r), (g), (b)) & 0x00ff) << 8))
 #else
-#define LCD_MAX_RED   ((1 << (LCD_DEPTH/3)) - 1)
-#define LCD_MAX_GREEN ((1 << (LCD_DEPTH/3)) - 1)
-#define LCD_MAX_BLUE  ((1 << (LCD_DEPTH/3)) - 1)
+#define LCD_RGBPACK(r, g, b) _RGBPACK((r), (g), (b))
 #endif
-struct rgb {
-    unsigned char red;
-    unsigned char green;
-    unsigned char blue;
-};
-#define LCD_BLACK ((struct rgb){0, 0, 0})
-#define LCD_DARKGRAY ((struct rgb){LCD_MAX_RED/3, LCD_MAX_GREEN/3, LCD_MAX_BLUE/3})
-#define LCD_LIGHTGRAY ((struct rgb){2*LCD_MAX_RED/3, 2*LCD_MAX_GREEN/3, 2*LCD_MAX_BLUE/3})
-#define LCD_WHITE ((struct rgb){LCD_MAX_RED, LCD_MAX_GREEN, LCD_MAX_BLUE})
-#else /* monochrome */
+#else
+/* other colour depths */
+#endif 
+
+#define LCD_BLACK      LCD_RGBPACK(0, 0, 0)
+#define LCD_DARKGRAY   LCD_RGBPACK(85, 85, 85)
+#define LCD_LIGHTGRAY  LCD_RGBPACK(170, 170, 170)
+#define LCD_WHITE      LCD_RGBPACK(255, 255, 255)
+#define LCD_DEFAULT_FG LCD_BLACK
+#define LCD_DEFAULT_BG LCD_RGBPACK(182, 198, 229) /* rockbox blue */
+
+#elif LCD_DEPTH > 1 /* greyscale */
 #define LCD_MAX_LEVEL ((1 << LCD_DEPTH) - 1)
-#define LCD_BLACK 0
-#define LCD_DARKGRAY (LCD_MAX_LEVEL/3)
-#define LCD_LIGHTGRAY (2*LCD_MAX_LEVEL/3)
-#define LCD_WHITE LCD_MAX_LEVEL
+#define LCD_BRIGHTNESS(y) (((y) * LCD_MAX_LEVEL + 127) / 255)
+
+#define LCD_BLACK      LCD_BRIGHTNESS(0)
+#define LCD_DARKGRAY   LCD_BRIGHTNESS(85)
+#define LCD_LIGHTGRAY  LCD_BRIGHTNESS(170)
+#define LCD_WHITE      LCD_BRIGHTNESS(255)
+#define LCD_DEFAULT_FG LCD_BLACK
+#define LCD_DEFAULT_BG LCD_WHITE
 #endif
 
 /* Memory copy of display bitmap */
@@ -207,20 +217,13 @@ extern void lcd_bidir_scroll(int threshold);
 extern void lcd_scroll_step(int pixels);
 
 #if LCD_DEPTH > 1
-#ifdef HAVE_LCD_COLOR
-extern void       lcd_set_foreground(struct rgb color);
-extern struct rgb lcd_get_foreground(void);
-extern void       lcd_set_background(struct rgb color);
-extern struct rgb lcd_get_background(void);
-extern void       lcd_set_drawinfo(int mode, struct rgb fg_color,
-                                   struct rgb bg_color);
-#else /* monochrome */
-extern void lcd_set_foreground(int brightness);
-extern int  lcd_get_foreground(void);
-extern void lcd_set_background(int brightness);
-extern int  lcd_get_background(void);
-extern void lcd_set_drawinfo(int mode, int fg_brightness, int bg_brightness);
-#endif
+extern void     lcd_set_foreground(unsigned foreground);
+extern unsigned lcd_get_foreground(void);
+extern void     lcd_set_background(unsigned background);
+extern unsigned lcd_get_background(void);
+extern void     lcd_set_drawinfo(int mode, unsigned foreground,
+                                 unsigned background);
+
 extern void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
                             int stride, int x, int y, int width, int height);
 extern void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width,

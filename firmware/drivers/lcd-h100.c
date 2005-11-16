@@ -307,27 +307,27 @@ int lcd_get_drawmode(void)
     return drawmode;
 }
 
-void lcd_set_foreground(int brightness)
+void lcd_set_foreground(unsigned brightness)
 {
     fg_pattern = 0x55 * (~brightness & 3);
 }
 
-int lcd_get_foreground(void)
+unsigned lcd_get_foreground(void)
 {
     return ~fg_pattern & 3;
 }
 
-void lcd_set_background(int brightness)
+void lcd_set_background(unsigned brightness)
 {
     bg_pattern = 0x55 * (~brightness & 3);
 }
 
-int lcd_get_background(void)
+unsigned lcd_get_background(void)
 {
     return ~bg_pattern & 3;
 }
 
-void lcd_set_drawinfo(int mode, int fg_brightness, int bg_brightness)
+void lcd_set_drawinfo(int mode, unsigned fg_brightness, unsigned bg_brightness)
 {
     lcd_set_drawmode(mode);
     lcd_set_foreground(fg_brightness);

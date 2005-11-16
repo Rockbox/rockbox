@@ -34,13 +34,11 @@
 
 #define SCROLLABLE_LINES 26
 
-#define RGB_PACK(r,g,b) (htobe16(((r)<<11)|((g)<<5)|(b)))
-
 /*** globals ***/
 fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH] __attribute__ ((aligned (4)));
 
-static unsigned fg_pattern;
-static unsigned bg_pattern;
+static unsigned fg_pattern = LCD_DEFAULT_FG;
+static unsigned bg_pattern = LCD_DEFAULT_BG;
 static int drawmode = DRMODE_SOLID;
 static int xmargin = 0;
 static int ymargin = 0;
@@ -72,9 +70,6 @@ int lcd_default_contrast(void)
 /* LCD init */
 void lcd_init(void)
 {
-    fg_pattern = 0x0000; /* Black */
-    bg_pattern = RGB_PACK(0x17, 0x31, 0x1d); /* "Rockbox blue" */
-
     lcd_clear_display();
     /* Call device specific init */
     lcd_init_device();
@@ -94,43 +89,32 @@ int lcd_get_drawmode(void)
     return drawmode;
 }
 
-void lcd_set_foreground(struct rgb color)
+void lcd_set_foreground(unsigned color)
 {
-    fg_pattern = RGB_PACK(color.red, color.green, color.blue);
+    fg_pattern = color;
 }
 
-struct rgb lcd_get_foreground(void)
+unsigned lcd_get_foreground(void)
 {
-    struct rgb colour;
-
-    colour.red   = (fg_pattern >> 11) & 0x1f;
-    colour.green = (fg_pattern >> 5) & 0x3f;
-    colour.blue  =  fg_pattern & 0x1f;
-    return colour;
+    return fg_pattern;
 }
 
-void lcd_set_background(struct rgb color)
+void lcd_set_background(unsigned color)
 {
-    bg_pattern = RGB_PACK(color.red, color.green, color. blue);
+    bg_pattern = color;
 }
 
 
-struct rgb lcd_get_background(void)
+unsigned lcd_get_background(void)
 {
-    struct rgb colour;
-
-    colour.red   = (bg_pattern >> 11) & 0x1f;
-    colour.green = (bg_pattern >> 5) & 0x3f;
-    colour.blue  =  bg_pattern & 0x1f;
-    return colour;
+    return bg_pattern;
 }
 
-void lcd_set_drawinfo(int mode, struct rgb fg_color,
-                                struct rgb bg_color)
+void lcd_set_drawinfo(int mode, unsigned fg_color, unsigned bg_color)
 {
     lcd_set_drawmode(mode);
-    lcd_set_foreground(fg_color);
-    lcd_set_background(bg_color);
+    fg_pattern = fg_color;
+    bg_pattern = bg_color;
 }
 
 void lcd_setmargins(int x, int y)

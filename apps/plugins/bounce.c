@@ -282,17 +282,14 @@ static void addclock(void)
 #define DRAW_WIDTH (LCD_WIDTH + LETTER_WIDTH*2)
 
 #if LCD_DEPTH > 1
+static const unsigned face_colors[] =
+{
 #ifdef HAVE_LCD_COLOR
-static const struct rgb face_colors[] =
-{
-    LCD_BLACK, {0, 0, LCD_MAX_BLUE}, {LCD_MAX_RED, 0, 0}
-};
+    LCD_BLACK, LCD_RGBPACK(0, 0, 255), LCD_RGBPACK(255, 0, 0)
 #else
-static const int face_colors[] =
-{
-    0, 2*LCD_MAX_LEVEL/3, LCD_MAX_LEVEL/3
-};
+    LCD_BLACK, LCD_LIGHTGRAY, LCD_DARKGRAY
 #endif
+};
 #endif
 
 static int scrollit(void)

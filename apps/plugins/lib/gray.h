@@ -51,11 +51,11 @@ void gray_update_rect(int x, int y, int width, int height);
 void gray_set_position(int x, int by);
 void gray_set_drawmode(int mode);
 int  gray_get_drawmode(void);
-void gray_set_foreground(int brightness);
-int  gray_get_foreground(void);
-void gray_set_background(int brightness);
-int  gray_get_background(void);
-void gray_set_drawinfo(int mode, int fg_brightness, int bg_brightness);
+void gray_set_foreground(unsigned brightness);
+unsigned gray_get_foreground(void);
+void gray_set_background(unsigned brightness);
+unsigned gray_get_background(void);
+void gray_set_drawinfo(int mode, unsigned fg_brightness, unsigned bg_brightness);
 void gray_setfont(int newfont);
 int  gray_getstringsize(const unsigned char *str, int *w, int *h);
 

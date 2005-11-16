@@ -127,13 +127,8 @@ void internal_splash(struct screen * screen,
         int xx = (screen->width-maxw)/2 - 2;
         /* The new graphics routines handle clipping, so no need to check */
 #if LCD_DEPTH > 1
-#ifdef HAVE_LCD_COLOR
-        screen->set_background((struct rgb){LCD_MAX_RED-1, LCD_MAX_GREEN-1,
-                                            LCD_MAX_BLUE-1});
-#else
         if(screen->depth>1)
-            screen->set_background(LCD_MAX_LEVEL-1);
-#endif
+            screen->set_background(LCD_LIGHTGRAY);
 #endif
         screen->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
         screen->fillrect(xx, y-2, maxw+4, screen->height-y*2+4);
@@ -183,7 +178,7 @@ void internal_splash(struct screen * screen,
 
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH > 1)
     if(screen->depth > 1)
-        screen->set_background(LCD_WHITE);
+        screen->set_background(LCD_DEFAULT_BG);
 #endif
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
     screen->update();

@@ -135,13 +135,13 @@ static struct plugin_api* rb;
 #endif
 
 #if LCD_DEPTH>1
+static const unsigned colors[4] = {
 #ifdef HAVE_LCD_COLOR
-static const unsigned struct rgb colors[4] = {
-    { 0, 0, 0 }, { LCD_MAX_RED, 0, 0 }, { 0, 0, 0 }, { LCD_MAX_RED, 0, 0 }
-};
+    LCD_BLACK, LCD_RGBPACK(255, 0, 0), LCD_BLACK, LCD_RGBPACK(255, 0, 0)
 #else
-static const int colors[4] = { LCD_BLACK, LCD_MAX_LEVEL/2, LCD_BLACK, LCD_MAX_LEVEL/2 };
+    LCD_BLACK, LCD_BRIGHTNESS(127), LCD_BLACK, LCD_BRIGHTNESS(127)
 #endif
+};
 #endif
 
 static const unsigned char suits[4][8] = {

@@ -59,10 +59,10 @@
 #endif
 
 #if LCD_DEPTH > 1
-#if HAVE_LCD_COLOR
-#define MEDIUM_GRAY ((struct rgb){LCD_MAX_RED/2, LCD_MAX_GREEN/2, LCD_MAX_BLUE/2})
+#ifdef HAVE_LCD_COLOR
+#define MEDIUM_GRAY LCD_RGBPACK(127, 127, 127)
 #else
-#define MEDIUM_GRAY (LCD_MAX_LEVEL/2)
+#define MEDIUM_GRAY LCD_BRIGHTNESS(127)
 #endif
 #endif
 

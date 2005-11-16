@@ -53,7 +53,7 @@ int  gray_get_drawmode(void)
 }
 
 /* Set the foreground shade for subsequent drawing operations */
-void gray_set_foreground(int brightness)
+void gray_set_foreground(unsigned brightness)
 {
     unsigned data = MULU16(_gray_info.depth, brightness & 0xFF) + 127;
 
@@ -61,14 +61,14 @@ void gray_set_foreground(int brightness)
 }
 
 /* Return the current foreground shade */
-int  gray_get_foreground(void)
+unsigned gray_get_foreground(void)
 {
     return (_gray_info.fg_brightness * 255 + (_gray_info.depth >> 1))
            / _gray_info.depth;
 }
 
 /* Set the background shade for subsequent drawing operations */
-void gray_set_background(int brightness)
+void gray_set_background(unsigned brightness)
 {
     unsigned data = MULU16(_gray_info.depth, brightness & 0xFF) + 127;
 
@@ -76,14 +76,14 @@ void gray_set_background(int brightness)
 }
 
 /* Return the current background shade */
-int  gray_get_background(void)
+unsigned gray_get_background(void)
 {
     return (_gray_info.bg_brightness * 255 + (_gray_info.depth >> 1))
            / _gray_info.depth;
 }
 
 /* Set draw mode, foreground and background shades at once */
-void gray_set_drawinfo(int mode, int fg_brightness, int bg_brightness)
+void gray_set_drawinfo(int mode, unsigned fg_brightness, unsigned bg_brightness)
 {
     gray_set_drawmode(mode);
     gray_set_foreground(fg_brightness);
