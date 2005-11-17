@@ -41,6 +41,7 @@ void lcd_begin_write_gram(void)
     *(volatile unsigned short *)0xf0000000 = 0x22;
 }
 
+void lcd_write_data(const unsigned short* p_bytes, int count) ICODE_ATTR;
 void lcd_write_data(const unsigned short* p_bytes, int count)
 {
     while(count--)

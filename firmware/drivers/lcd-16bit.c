@@ -37,8 +37,8 @@
 /*** globals ***/
 fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH] __attribute__ ((aligned (4)));
 
-static unsigned fg_pattern = LCD_DEFAULT_FG;
-static unsigned bg_pattern = LCD_DEFAULT_BG;
+static unsigned fg_pattern IDATA_ATTR = LCD_DEFAULT_FG;
+static unsigned bg_pattern IDATA_ATTR = LCD_DEFAULT_BG;
 static int drawmode = DRMODE_SOLID;
 static int xmargin = 0;
 static int ymargin = 0;
@@ -145,21 +145,25 @@ int lcd_getstringsize(const unsigned char *str, int *w, int *h)
 
 /*** low-level drawing functions ***/
 
+static void setpixel(int x, int y) ICODE_ATTR;
 static void setpixel(int x, int y)
 {
     lcd_framebuffer[y][x] = fg_pattern;
 }
 
+static void clearpixel(int x, int y) ICODE_ATTR;
 static void clearpixel(int x, int y)
 {
     lcd_framebuffer[y][x] = bg_pattern;
 }
 
+static void flippixel(int x, int y) ICODE_ATTR;
 static void flippixel(int x, int y)
 {
     lcd_framebuffer[y][x] = ~lcd_framebuffer[y][x];
 }
 
+static void nopixel(int x, int y) ICODE_ATTR;
 static void nopixel(int x, int y)
 {
     (void)x;
