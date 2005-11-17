@@ -18,15 +18,32 @@ Name: rockbox_default.wps
 Author: Rockbox team
 Font: rockbox_default.fnt
 Statusbar: on
-Height: 2
-Width: 8
+Height: 14
+Width: 55
 </wps>
 
 <wps>
 Name: boxes.wps
-Author: Christi Scarborough (after the_engineer)
+Author: Christi Scarborough (after Magnus Westerlund)
 Font: rockbox_default.fnt
 Statusbar: off
 Height: 128
+Width: 160
+</wps>
+
+<wps>
+# Name of the WPS (_including_ .wps extension)
+Name: engineeer2.wps
+# Real name of the creator of the WPS
+Author: Magnus Westerlund
+# Preferred font (including .fnt extension - leave blank for player):
+Font: Nedore-8.fnt
+# Whether the WPS is designed to have the statusbar on or off
+Statusbar: Off
+# The minimum required pixel height for the WPS
+#  176 for H3xx, 128 for H1xx, 64 for Recorder/Ondio, 14 for player
+Height: 128
+# The minimum required pixel width for the WPS 
+#  220 for H3xx, 160 for H1xx, 112 for Recorder/Ondio, 55 for player
 Width: 160
 </wps>
