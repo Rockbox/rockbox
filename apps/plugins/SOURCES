@@ -1,4 +1,6 @@
-#if CONFIG_CPU!=PP5020  /* Temporarily disable plugin building for iPod */
+/* Temporarily disable the plugins for the iPod until we fix the
+   button assignments and other problems */
+#if (CONFIG_KEYPAD!=IPOD_4G_PAD) && (CONFIG_KEYPAD!=IPOD_NANO_PAD)
 /* plugins common to all models */
 battery_test.c
 chessclock.c
