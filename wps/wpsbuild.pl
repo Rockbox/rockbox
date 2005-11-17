@@ -92,7 +92,7 @@ sub mkdirs {
     mkdir ".rockbox/wps", 0777;
 
     if( -d ".rockbox/wps/$wpsdir") {
-        print STDERR "wpsbuild warning: directory wps/$wpsdir already exists!\n";
+        #print STDERR "wpsbuild warning: directory wps/$wpsdir already exists!\n";
     }
     else {
         mkdir ".rockbox/wps/$wpsdir", 0777;
@@ -109,9 +109,7 @@ sub copywps {
         my $wpsdir = $wps;
         $wpsdir =~ s/\.(r|)wps//;
         system("cp $dir/$wps .rockbox/wps/");
-        if ($rwps) {
-          system("cp $dir/$rwps .rockbox/wps/");
-        }
+
         if (-e "$dir/$wpsdir") {
            system("cp $dir/$wpsdir/*.bmp .rockbox/wps/$wpsdir/");
         }
@@ -199,7 +197,10 @@ while(<WPS>) {
                 #print "Size requirement is fine!\n";
 
                 mkdirs();
-                buildcfg();
+                if(!$isrwps) {
+                    # We only make .cfg files for <wps> sections:
+                    buildcfg();
+                }
                 copywps();
             }
             else {
@@ -210,6 +211,8 @@ while(<WPS>) {
             undef $wps, $rwps, $width, $height, $font, $statusbar, $author;
         }
         elsif($l =~ /^Name: (.*)/i) {
+            # Note that in the case this is within <rwps>, $wps will contain the
+            # name of the rwps. Use $isrwps to figure out what type it is.
             $wps = $1;
         }
         elsif($l =~ /^RWPS: (.*)/i) {
