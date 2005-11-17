@@ -499,14 +499,7 @@ void lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
 
     for (; y < ye; y++)
     {
-        const fb_data *src_row = src;
-        fb_data *dst = &lcd_framebuffer[y][x];
-        fb_data *dst_end = dst + width;
-
-        do
-            *dst++ = *src_row++;
-        while (dst < dst_end);
-
+        memcpy(&lcd_framebuffer[y][x], src, width * sizeof(fb_data));
         src += stride;
     }
 }
