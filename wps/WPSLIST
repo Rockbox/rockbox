@@ -48,3 +48,20 @@ Statusbar: Off
 Height: 128
 Width: 160
 </wps>
+
+<wps>
+# Name of the WPS (_including_ .wps extension)
+Name: zezayer.wps
+# Real name of the creator of the WPS
+Author: Jake Owen
+# Preferred font (including .fnt extension - leave blank for player):
+Font: nedore-8.fnt
+# Whether the WPS is designed to have the statusbar on or off
+Statusbar: off
+# The minimum required pixel height for the WPS
+# 176 for H3xx, 128 for H1xx, 64 for Recorder/Ondio, 14 for player
+Height: 128
+# The minimum required pixel width for the WPS 
+# 220 for H3xx, 160 for H1xx, 112 for Recorder/Ondio, 55 for player
+Width: 160
+</wps>
