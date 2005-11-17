@@ -26,6 +26,6 @@
 # spread out over the entire source repository.
 
 rockbox        &apps &firmware &docs &tools &fonts
-rockbox-devel  &apps &flash &firmware &fonts &bootloader &docs &tools &uisimulator &gdb
-rockbox-all    &apps &flash &firmware &fonts &bootloader &docs &tools &uisimulator &gdb &www
+rockbox-devel  &apps &flash &firmware &fonts &bootloader &docs &tools &uisimulator &gdb &wps
+rockbox-all    &apps &flash &firmware &fonts &bootloader &docs &tools &uisimulator &gdb &www &wps
 website        &www &docs
