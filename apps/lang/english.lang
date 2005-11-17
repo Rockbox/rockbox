@@ -3434,6 +3434,6 @@ new:
 id: LANG_WAIT
 desc: general please wait splash
 eng: "=== Please Wait ==="
-voice: "Please wait"
+voice: 
 new:
 
