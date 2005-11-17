@@ -53,11 +53,9 @@ extern bool lcd_display_redraw;
 
 #ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH==16
-extern unsigned char lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH*2];
-unsigned char lcd_framebuffer_copy[LCD_HEIGHT][LCD_WIDTH*2];
+fb_data lcd_framebuffer_copy[LCD_HEIGHT][LCD_WIDTH*2];
 #else
-extern unsigned char lcd_framebuffer[LCD_HEIGHT/YBLOCK][LCD_WIDTH];
-unsigned char lcd_framebuffer_copy[LCD_HEIGHT/YBLOCK][LCD_WIDTH];
+fb_data lcd_framebuffer_copy[LCD_HEIGHT/YBLOCK][LCD_WIDTH];
 #endif
 
 void lcd_update (void)
