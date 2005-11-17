@@ -27,56 +27,26 @@
 #include "system.h"
 
 /*** definitions ***/
-#define IPOD_HW_REVISION (*((volatile unsigned long*)(0x00002084)))
+#define IPOD_HW_REVISION        (*((volatile unsigned long*)0x00002084))
+#define IPOD_PP5020_RTC         (*((volatile unsigned long*)0x60005010))
 
-/* LCD command codes */
-#define LCD_CNTL_POWER_CONTROL          0x25
-#define LCD_CNTL_VOLTAGE_SELECT         0x2b
-#define LCD_CNTL_LINE_INVERT_DRIVE      0x36
-#define LCD_CNTL_GRAY_SCALE_PATTERN     0x39
-#define LCD_CNTL_TEMP_GRADIENT_SELECT   0x4e
-#define LCD_CNTL_OSC_FREQUENCY          0x5f
-#define LCD_CNTL_ON_OFF                 0xae
-#define LCD_CNTL_OSC_ON_OFF             0xaa
-#define LCD_CNTL_OFF_MODE               0xbe
-#define LCD_CNTL_REVERSE                0xa6
-#define LCD_CNTL_ALL_LIGHTING           0xa4
-#define LCD_CNTL_COMMON_OUTPUT_STATUS   0xc4
-#define LCD_CNTL_COLUMN_ADDRESS_DIR     0xa0
-#define LCD_CNTL_NLINE_ON_OFF           0xe4
-#define LCD_CNTL_DISPLAY_MODE           0x66
-#define LCD_CNTL_DUTY_SET               0x6d
-#define LCD_CNTL_ELECTRONIC_VOLUME      0x81
-#define LCD_CNTL_DATA_INPUT_DIR         0x84
-#define LCD_CNTL_DISPLAY_START_LINE     0x8a
+#define IPOD_LCD_BASE           0x70008a0c
+#define IPOD_LCD_BUSY_MASK      0x80000000
 
-#define LCD_CNTL_PAGE                   0xb1
-#define LCD_CNTL_COLUMN                 0x13
-#define LCD_CNTL_DATA_WRITE             0x1d
+/* LCD command codes for HD66789R */
+#define LCD_CNTL_RAM_ADDR_SET           0x21
+#define LCD_CNTL_WRITE_TO_GRAM          0x22
+#define LCD_CNTL_HORIZ_RAM_ADDR_POS     0x44
+#define LCD_CNTL_VERT_RAM_ADDR_POS      0x45
 
 /*** globals ***/
 static int lcd_type = 1; /* 0 = "old" Color/Photo, 1 = "new" Color & Nano */
 
-#define IPOD_PP5020_RTC         0x60005010
-
-#define LCD_DATA 0x10
-#define LCD_CMD  0x08
-
-#define IPOD_LCD_BASE      0x70008a0c
-#define IPOD_LCD_BUSY_MASK 0x80000000
-
-static int timer_get_current(void)
-{
-    return inl(IPOD_PP5020_RTC);
-}
 
 /* check if number of useconds has past */
-static int timer_check(unsigned long clock_start, unsigned long usecs)
+static inline int timer_check(unsigned long clock_start, unsigned long usecs)
 {
-    unsigned long clock;
-    clock = inl(IPOD_PP5020_RTC);
-
-    if ( (clock - clock_start) >= usecs ) {
+    if ( (IPOD_PP5020_RTC - clock_start) >= usecs ) {
         return 1;
     } else {
         return 0;
@@ -86,7 +56,7 @@ static int timer_check(unsigned long clock_start, unsigned long usecs)
 static void lcd_wait_write(void)
 {
     if ((inl(IPOD_LCD_BASE) & IPOD_LCD_BUSY_MASK) != 0) {
-        int start = timer_get_current();
+        int start = IPOD_PP5020_RTC;
 
         do {
             if ((inl(IPOD_LCD_BASE) & IPOD_LCD_BUSY_MASK) == 0) break;
@@ -97,13 +67,13 @@ static void lcd_wait_write(void)
 static void lcd_send_lo(int v)
 {
     lcd_wait_write();
-    outl(v | 0x80000000, 0x70008A0C);
+    outl(v | 0x80000000, IPOD_LCD_BASE);
 }
 
 static void lcd_send_hi(int v)
 {
     lcd_wait_write();
-    outl(v | 0x81000000, 0x70008A0C);
+    outl(v | 0x81000000, IPOD_LCD_BASE);
 }
 
 static void lcd_cmd_data(int cmd, int data)
@@ -258,9 +228,9 @@ void lcd_update_rect(int x, int y, int width, int height)
         }
 
         /* max horiz << 8 | start horiz */
-        lcd_cmd_data(0x44, (rect3 << 8) | rect1);
+        lcd_cmd_data(LCD_CNTL_HORIZ_RAM_ADDR_POS, (rect3 << 8) | rect1);
         /* max vert << 8 | start vert */
-        lcd_cmd_data(0x45, (rect4 << 8) | rect2);
+        lcd_cmd_data(LCD_CNTL_VERT_RAM_ADDR_POS, (rect4 << 8) | rect2);
 
         /* start vert = max vert */
 #if CONFIG_LCD == LCD_IPODCOLOR
@@ -269,11 +239,11 @@ void lcd_update_rect(int x, int y, int width, int height)
 
         /* position cursor (set AD0-AD15) */
         /* start vert << 8 | start horiz */
-        lcd_cmd_data(0x21, (rect2 << 8) | rect1);
+        lcd_cmd_data(LCD_CNTL_RAM_ADDR_SET, (rect2 << 8) | rect1);
 
         /* start drawing */
         lcd_send_lo(0x0);
-        lcd_send_lo(0x22);
+        lcd_send_lo(LCD_CNTL_WRITE_TO_GRAM);
     }
 
     addr += x * LCD_WIDTH + y/2;
@@ -283,9 +253,9 @@ void lcd_update_rect(int x, int y, int width, int height)
         int h, pixels_to_write;
 
         pixels_to_write = (width * height) * 2;
+        h = height;
 
         /* calculate how much we can do in one go */
-        h = height;
         if (pixels_to_write > 64000) {
             h = (64000/2) / width;
             pixels_to_write = (width * h) * 2;
