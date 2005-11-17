@@ -31,6 +31,7 @@ upgrade your ordinary Archos firmware.
 <a href="history.html">separate page</a>.)</small></i>
 
 <h2>Recent CVS activity</h2>
+<i><small><a href="since25.html">all commits since 2.5</a>.</small></i>
 <p>
 <!--#include file="lastcvs.link" -->
 
