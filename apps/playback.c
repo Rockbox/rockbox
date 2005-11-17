@@ -165,9 +165,6 @@ static volatile int buf_widx;
 /* Step count to the next unbuffered track. */
 static int last_peek_offset;
 
-/* Index of the last buffered track. */
-static int last_index;
-
 /* Track information (count in file buffer, read/write indexes for
    track ring structure. */
 int track_count;
@@ -589,7 +586,7 @@ static bool rebuffer_and_seek(int newpos)
 
     while (cur_ti->available == 0 && cur_ti->filerem > 0) {
         yield();
-        if (ci.stop_codec || ci.reload_codec)
+        if (ci.stop_codec || ci.reload_codec || !queue_empty(&audio_queue))
             return false;
     }
     
@@ -1048,8 +1045,6 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     if (tracks[track_widx].filesize != 0)
         return false;
 
-    last_index = playlist_get_display_index();
-
     peek_again:
     /* Get track name from current playlist read position. */
     logf("Buffering track:%d/%d", track_widx, track_ridx);
@@ -1456,7 +1451,6 @@ void audio_update_trackinfo(void)
     } else {
         pcmbuf_add_event(codec_track_changed);
     }
-    last_index = playlist_get_display_index();
 }
 
 static void audio_stop_playback(void)
@@ -1519,8 +1513,8 @@ bool codec_request_next_track_callback(void)
 {
     if (current_codec == CODEC_IDX_VOICE) {
         voice_remaining = 0;
-        /* Terminate the codec if they are messages waiting on the queue or
-           core has been requested the codec to be terminated. */
+        /* Terminate the codec if there are messages waiting on the queue or
+           the core has been requested the codec to be terminated. */
         return !ci_voice.stop_codec && queue_empty(&voice_codec_queue);
     }
         
@@ -1531,12 +1525,7 @@ bool codec_request_next_track_callback(void)
 
     /* Advance to next track. */
     if (ci.reload_codec && new_track > 0) {
-        if (!playlist_check(new_track)) {
-            ci.reload_codec = false;
-            return false;
-        }
         last_peek_offset--;
-        playlist_next(new_track);
         if (++track_ridx == MAX_TRACK)
             track_ridx = 0;
         
@@ -1549,7 +1538,6 @@ bool codec_request_next_track_callback(void)
         if (tracks[track_ridx].filesize == 0) {
             logf("Loading from disk...");
             new_track = 0;
-            last_index = -1;
             queue_post(&audio_queue, AUDIO_PLAY, 0);
             return false;
         }
@@ -1557,12 +1545,7 @@ bool codec_request_next_track_callback(void)
     
     /* Advance to previous track. */
     else if (ci.reload_codec && new_track < 0) {
-        if (!playlist_check(new_track)) {
-            ci.reload_codec = false;
-            return false;
-        }
         last_peek_offset++;
-        playlist_next(new_track);
         if (--track_ridx < 0)
             track_ridx = MAX_TRACK-1;
         if (tracks[track_ridx].filesize == 0 || 
@@ -1570,7 +1553,6 @@ bool codec_request_next_track_callback(void)
             /*+ (off_t)tracks[track_ridx].codecsize*/ > filebuflen) {
             logf("Loading from disk...");
             new_track = 0;
-            last_index = -1;
             queue_post(&audio_queue, AUDIO_PLAY, 0);
             return false;
         }
@@ -1597,7 +1579,6 @@ bool codec_request_next_track_callback(void)
             logf("No more tracks [2]");
             ci.stop_codec = true;
             new_track = 0;
-            last_index = -1;
             queue_post(&audio_queue, AUDIO_PLAY, 0);
             return false;
         }
@@ -1652,7 +1633,6 @@ static void initiate_track_change(int peek_index)
 
     /* Detect if disk is spinning.. */
     if (filling) {
-        playlist_next(peek_index);
         queue_post(&audio_queue, AUDIO_PLAY, 0);
     } else {
         new_track = peek_index;
@@ -1677,35 +1657,49 @@ static void initiate_dir_change(int direction)
 void audio_thread(void)
 {
     struct event ev;
+    int last_tick = 0;
+    bool play_pending = false;
     
     while (1) {
-        yield_codecs();
-
-        audio_check_buffer();
+        if (!play_pending)
+        {
+            yield_codecs();
+            audio_check_buffer();
+        }
+        else
+        {
+            // ata_spin();
+            sleep(1);
+        }
         
         queue_wait_w_tmo(&audio_queue, &ev, 0);
+        if (ev.id == SYS_TIMEOUT && play_pending)
+        {
+            ev.id = AUDIO_PLAY;
+            ev.data = 0;
+        }
+        
         switch (ev.id) {
             case AUDIO_PLAY:
-                 /* Refuse to start playback if we are already playing
-                    the requested track. This is needed because when skipping
-                    tracks fast, AUDIO_PLAY commands will get queued with the
-                    the same track and playback will stutter. */
-                if (last_index == playlist_get_display_index() && playing
-                    && pcm_is_playing()) {
-                    logf("already playing req. track");
+                /* Don't start playing immediately if user is skipping tracks
+                 * fast to prevent UI lag. */
+                track_count = 0;
+                last_peek_offset = 0;
+                if (current_tick - last_tick < HZ/2)
+                {
+                    play_pending = true;
                     break ;
                 }
-                
+                play_pending = false;
+            
                 /* Do not start crossfading if audio is paused. */
-                if (paused) {
-                    audio_stop_playback();
-                    paused = false;
-                }
+                if (paused)
+                    pcmbuf_play_stop();
 
 #ifdef CONFIG_TUNER
                 /* check if radio is playing */
-                if(radio_get_status() != FMRADIO_OFF){
-		    radio_stop();
+                if (radio_get_status() != FMRADIO_OFF) {
+                    radio_stop();
                 }
 #endif
             
@@ -1751,15 +1745,13 @@ void audio_thread(void)
             
             case AUDIO_NEXT:
                 logf("audio_next");
-                if (global_settings.beep)
-                    pcmbuf_beep(5000, 100, 2500*global_settings.beep);
+                last_tick = current_tick;
                 initiate_track_change(1);
                 break ;
                 
             case AUDIO_PREV:
                 logf("audio_prev");
-                if (global_settings.beep)
-                    pcmbuf_beep(5000, 100, 2500*global_settings.beep);
+                last_tick = current_tick;
                 initiate_track_change(-1);
                 break;
                 
@@ -1793,7 +1785,7 @@ void audio_thread(void)
                 //    audio_change_track();
                 break ;
 
-#ifndef SIMULATOR                
+#ifndef SIMULATOR
             case SYS_USB_CONNECTED:
                 logf("USB: Audio core");
                 audio_stop_playback();
@@ -1973,12 +1965,28 @@ void voice_init(void)
 
 struct mp3entry* audio_current_track(void)
 {
-    // logf("audio_current_track");
+    const char *filename;
+    const char *p;
+    static struct mp3entry temp_id3;
     
     if (track_count > 0 && cur_ti->taginfo_ready)
         return (struct mp3entry *)&cur_ti->id3;
-    else
-        return NULL;
+    else {
+        filename = playlist_peek(0);
+        if (!filename)
+            filename = "No file!";
+        p = strrchr(filename, '/');
+        if (!p)
+            p = filename;
+        else
+            p++;
+        
+        memset(&temp_id3, 0, sizeof(struct mp3entry));
+        strncpy(temp_id3.path, p, sizeof(temp_id3.path)-1);
+        temp_id3.title = &temp_id3.path[0];
+
+        return &temp_id3;
+    }
 }
 
 struct mp3entry* audio_next_track(void)
@@ -1994,16 +2002,12 @@ struct mp3entry* audio_next_track(void)
     if (!tracks[next_idx].taginfo_ready)
         return NULL;
         
-    //logf("audio_next_track");
-    
     return &tracks[next_idx].id3;
 }
 
 bool audio_has_changed_track(void)
 {
-    if (track_changed && track_count > 0 && playing) {
-        if (!cur_ti->taginfo_ready)
-            return false;
+    if (track_changed) {
         track_changed = false;
         return true;
     }
@@ -2014,7 +2018,6 @@ bool audio_has_changed_track(void)
 void audio_play(int offset)
 {
     logf("audio_play");
-    last_index = -1;
     queue_post(&audio_queue, AUDIO_PLAY, (void *)offset);
 }
 
@@ -2043,11 +2046,37 @@ void audio_resume(void)
 
 void audio_next(void)
 {
+    /* Prevent UI lag and update the WPS immediately. */
+    if (global_settings.beep)
+        pcmbuf_beep(5000, 100, 2500*global_settings.beep);
+
+    if (!playlist_check(1))
+        return ;
+    playlist_next(1);
+    track_changed = true;
+    
+    /* Force WPS to update even if audio thread is blocked spinning. */
+    if (mutex_bufferfill.locked)
+        cur_ti->taginfo_ready = false;
+    
     queue_post(&audio_queue, AUDIO_NEXT, 0);
 }
 
 void audio_prev(void)
 {
+    /* Prevent UI lag and update the WPS immediately. */
+    if (global_settings.beep)
+        pcmbuf_beep(5000, 100, 2500*global_settings.beep);
+
+    if (!playlist_check(-1))
+        return ;
+    playlist_next(-1);
+    track_changed = true;
+    
+    /* Force WPS to update even if audio thread is blocked spinning. */
+    if (mutex_bufferfill.locked)
+        cur_ti->taginfo_ready = false;
+    
     queue_post(&audio_queue, AUDIO_PREV, 0);
 }
 

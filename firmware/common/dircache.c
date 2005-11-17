@@ -77,6 +77,7 @@ static struct dircache_entry* allocate_entry(void)
     dircache_size += sizeof(struct dircache_entry);
     next_entry->name_len = 0;
     next_entry->d_name = NULL;
+    next_entry->up = NULL;
     next_entry->down = NULL;
     next_entry->next = NULL;
 
@@ -88,6 +89,7 @@ static struct dircache_entry* dircache_gen_next(struct dircache_entry *ce)
     struct dircache_entry *next_entry;
 
     next_entry = allocate_entry();
+    next_entry->up = ce->up;
     ce->next = next_entry;
     
     return next_entry;
@@ -98,6 +100,7 @@ static struct dircache_entry* dircache_gen_down(struct dircache_entry *ce)
     struct dircache_entry *next_entry;
 
     next_entry = allocate_entry();
+    next_entry->up = ce;
     ce->down = next_entry;
     
     return next_entry;
@@ -176,6 +179,7 @@ static int dircache_travel(struct fat_dir *dir, struct dircache_entry *ce)
     int depth = 0;
     int result;
 
+    memset(ce, 0, sizeof(struct dircache_entry));
     dir_recursion[0].dir = dir;
     dir_recursion[0].ce = ce;
     
@@ -515,6 +519,43 @@ void dircache_disable(void)
         }
     } while (cache_in_use) ;
     logf("Cache released");
+}
+
+const struct dircache_entry *dircache_get_entry_ptr(const char *filename)
+{
+    if (!dircache_initialized || filename == NULL)
+        return NULL;
+    
+    return dircache_get_entry(filename, false, false);
+}
+
+void dircache_copy_path(const struct dircache_entry *entry, char *buf, int size)
+{
+    const struct dircache_entry *down[MAX_SCAN_DEPTH];
+    int depth = 0;
+    
+    if (size <= 0)
+        return ;
+    
+    buf[0] = '\0';
+    
+    if (entry == NULL)
+        return ;
+    
+    do {
+        down[depth] = entry;
+        entry = entry->up;
+        depth++;
+    } while (entry != NULL && depth < MAX_SCAN_DEPTH);
+    
+    while (--depth >= 0)
+    {
+        snprintf(buf, size, "/%s", down[depth]->d_name);
+        buf += down[depth]->name_len; /* '/' + d_name */
+        size -= down[depth]->name_len;
+        if (size <= 0)
+            break ;
+    }
 }
 
 /* --- Directory cache live updating functions --- */

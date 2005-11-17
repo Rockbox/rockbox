@@ -3431,3 +3431,9 @@ eng: "Clear current presets?"
 voice: "Clear current presets?"
 new:
 
+id: LANG_WAIT
+desc: general please wait splash
+eng: "=== Please Wait ==="
+voice: "Please wait"
+new:
+

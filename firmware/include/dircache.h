@@ -47,6 +47,7 @@ struct dircache_maindata {
 /* Exported structures. */
 struct dircache_entry {
     struct dircache_entry *next;
+    struct dircache_entry *up;
     struct dircache_entry *down;
     int attribute;
     long size;
@@ -71,6 +72,8 @@ int dircache_build(int last_size);
 bool dircache_is_enabled(void);
 int dircache_get_cache_size(void);
 void dircache_disable(void);
+const struct dircache_entry *dircache_get_entry_ptr(const char *filename);
+void dircache_copy_path(const struct dircache_entry *entry, char *buf, int size);
 
 void dircache_bind(int fd, const char *path);
 void dircache_update_filesize(int fd, long newsize);

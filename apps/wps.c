@@ -597,6 +597,7 @@ long wps_show(void)
 #endif
 #endif
                 left_lastclick = current_tick;
+                update_track = true;
 
 #ifdef AB_REPEAT_ENABLE
                 /* if we're in A/B repeat mode and the current position
@@ -604,7 +605,6 @@ long wps_show(void)
                 if ( ab_repeat_mode_enabled() && ab_after_A_marker(id3->elapsed) )
                 {
                     ab_jump_to_A_marker();
-                    update_track = true;
                     break;
                 }
                 /* ...otherwise, do it normally */
@@ -655,6 +655,7 @@ long wps_show(void)
 #endif
 #endif
                 right_lastclick = current_tick;
+                update_track = true;
 
 #ifdef AB_REPEAT_ENABLE
                 /* if we're in A/B repeat mode and the current position is
@@ -662,7 +663,6 @@ long wps_show(void)
                 if ( ab_repeat_mode_enabled() && ab_before_A_marker(id3->elapsed) )
                 {
                     ab_jump_to_A_marker();
-                    update_track = true;
                     break;
                 }
                 /* ...otherwise, do it normally */

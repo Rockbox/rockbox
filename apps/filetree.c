@@ -340,6 +340,7 @@ int ft_enter(struct tree_context* c)
         int start_index=0;
 
         lcd_stop_scroll();
+        gui_syncsplash(0, true, str(LANG_WAIT));
         switch ( file->attr & TREE_ATTR_MASK ) {
             case TREE_ATTR_M3U:
                 if (bookmark_autoload(buf))
