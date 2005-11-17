@@ -344,7 +344,7 @@ static char* get_tag(struct wps_data* wps_data,
 
                 case 'v': /* volume */
                     *flags |= WPS_REFRESH_DYNAMIC;
-                    snprintf(buf, buf_size, "%d%%", global_settings.volume);
+                    snprintf(buf, buf_size, "%d", global_settings.volume);
                     *intval = global_settings.volume / 10 + 1;
                     return buf;
 
@@ -403,7 +403,7 @@ static char* get_tag(struct wps_data* wps_data,
                     int l = battery_level();
                     if (l > -1)
                     {
-                        snprintf(buf, buf_size, "%d%%", l);
+                        snprintf(buf, buf_size, "%d", l);
                         *intval = l / 20 + 1;
                     }
                     else
