@@ -215,10 +215,16 @@ int read_line(int fd, char* buffer, int buffer_size)
 
 #ifdef HAVE_LCD_BITMAP
 
+#if LCD_DEPTH == 16 
+#define BMP_COMPRESSION 3 /* BI_BITFIELDS */
+#define BMP_NUMCOLORS 3
+#else
+#define BMP_COMPRESSION 0 /* BI_RGB */
 #if LCD_DEPTH <= 8
 #define BMP_NUMCOLORS (1 << LCD_DEPTH)
 #else
 #define BMP_NUMCOLORS 0
+#endif
 #endif
 
 #if LCD_DEPTH == 1
@@ -230,6 +236,9 @@ int read_line(int fd, char* buffer, int buffer_size)
 #elif LCD_DEPTH <= 8
 #define BMP_BPP 8
 #define BMP_LINESIZE ((LCD_WIDTH + 3) & ~3)
+#elif LCD_DEPTH <= 16
+#define BMP_BPP 16
+#define BMP_LINESIZE ((LCD_WIDTH*2 + 3) & ~3)
 #else
 #define BMP_BPP 24
 #define BMP_LINESIZE ((LCD_WIDTH*3 + 3) & ~3)
@@ -254,7 +263,7 @@ static const unsigned char bmpheader[] =
     LE32_CONST(LCD_HEIGHT),     /* Height in pixels */
     0x01, 0x00,                 /* Number of planes (always 1) */
     LE16_CONST(BMP_BPP),        /* Bits per pixel 1/4/8/16/24 */
-    0x00, 0x00, 0x00, 0x00,     /* Compression mode, 0 = none */
+    LE32_CONST(BMP_COMPRESSION),/* Compression mode */
     LE32_CONST(BMP_DATASIZE),   /* Size of bitmap data */
     0xc4, 0x0e, 0x00, 0x00,     /* Horizontal resolution (pixels/meter) */
     0xc4, 0x0e, 0x00, 0x00,     /* Vertical resolution (pixels/meter) */
@@ -269,6 +278,10 @@ static const unsigned char bmpheader[] =
     0x99, 0x90, 0x73, 0x00,     /* Colour #1 */
     0x4c, 0x48, 0x39, 0x00,     /* Colour #2 */
     0x00, 0x00, 0x00, 0x00      /* Colour #3 */
+#elif LCD_DEPTH == 16
+    0x00, 0xf8, 0x00, 0x00,     /* red bitfield mask */
+    0xe0, 0x07, 0x00, 0x00,     /* green bitfield mask */
+    0x1f, 0x00, 0x00, 0x00      /* blue bitfield mask */
 #endif
 };
 
@@ -290,10 +303,9 @@ void screen_dump(void)
     int src_byte2;
     static unsigned char line_block[4][BMP_LINESIZE];
 #elif LCD_DEPTH == 16
-    static unsigned char line_block[BMP_LINESIZE];
-    unsigned char* dst;
+    static unsigned short line_block[BMP_LINESIZE/2];
+    unsigned short* dst;
     unsigned short* src;
-    unsigned short pixel;
 #endif
 
 #ifdef HAVE_RTC
@@ -358,19 +370,21 @@ void screen_dump(void)
 
             write(fh, &line_block[0][0], sizeof(line_block));
         }
-#elif LCD_DEPTH==16
+#elif LCD_DEPTH == 16
         for (by = LCD_HEIGHT - 1; by >= 0; by--)
         {
             memset(line_block, 0, sizeof(line_block));
-            src=(unsigned short*)&lcd_framebuffer[by][0];
-            dst=line_block;
+            src = &lcd_framebuffer[by][0];
+            dst = line_block;
 
             for (bx = 0; bx < LCD_WIDTH; bx++)
             {
-               pixel=swap16(*(src++));
-               *(dst++)=(pixel&0x1f)<<3;         /* Blue */
-               *(dst++)=((pixel&0x07e0)>>5)<<2;  /* Green */
-               *(dst++)=((pixel&0xf800)>>11)<<3; /* Red */
+#if (CONFIG_LCD == LCD_IPODCOLOR) || (CONFIG_LCD == LCD_IPODNANO)
+                /* iPod LCD data is big endian although the CPU is not */
+                *dst++ = swap16(*src++);
+#else
+                *dst++ = htole16(*src++);
+#endif
             }
 
             write(fh, line_block, sizeof(line_block));
