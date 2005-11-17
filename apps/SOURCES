@@ -29,8 +29,6 @@ tree.c
 dbtree.c
 database.c
 filetree.c
-wps-display.c
-wps.c
 
 screen_access.c
 gui/buttonbar.c
@@ -40,6 +38,8 @@ gui/scrollbar.c
 gui/select.c
 gui/splash.c
 gui/statusbar.c
+gui/gwps.c
+gui/gwps-common.c
 gui/textarea.c
 
 #ifdef HAVE_LCD_CHARCELLS

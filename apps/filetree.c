@@ -31,7 +31,7 @@
 #include "filetypes.h"
 #include "talk.h"
 #include "playlist.h"
-#include "wps-display.h"
+#include "gwps.h"
 #include "lang.h"
 #include "language.h"
 #include "screens.h"
@@ -273,6 +273,9 @@ int ft_load(struct tree_context* c, const char* tempdir)
              (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_M3U) ||
             (*c->dirfilter == SHOW_SUPPORTED && !filetype_supported(dptr->attr)))) ||
             (*c->dirfilter == SHOW_WPS && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_WPS) ||
+#ifdef HAVE_REMOTE_LCD
+            (*c->dirfilter == SHOW_RWPS && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_RWPS) ||
+#endif
             (*c->dirfilter == SHOW_CFG && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_CFG) ||
             (*c->dirfilter == SHOW_LNG && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_LNG) ||
             (*c->dirfilter == SHOW_MOD && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_MOD) ||
@@ -381,10 +384,19 @@ int ft_enter(struct tree_context* c)
 
                 /* wps config file */
             case TREE_ATTR_WPS:
-                wps_load(buf,true);
+                wps_data_load(gui_syncwps.gui_wps[0].data, buf, true, true);
                 set_file(buf, global_settings.wps_file,
                          MAX_FILENAME);
                 break;
+
+#ifdef HAVE_REMOTE_LCD
+                /* remote-wps config file */
+            case TREE_ATTR_RWPS:
+                wps_data_load(gui_syncwps.gui_wps[1].data, buf, true, true);
+                set_file(buf, global_settings.rwps_file,
+                         MAX_FILENAME);
+                break;
+#endif
 
             case TREE_ATTR_CFG:
                 if (!settings_load_config(buf))

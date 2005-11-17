@@ -46,7 +46,7 @@
 #include "led.h"
 #include "sound.h"
 #include "abrepeat.h"
-#include "wps-display.h"
+#include "gwps-common.h"
 #include "splash.h"
 #if defined(HAVE_LCD_BITMAP)
 #include "widgets.h"
@@ -1226,7 +1226,7 @@ bool browse_id3(void)
 
         line = draw_id3_item(line, top, LANG_ID3_YEAR, body);
 
-        wps_format_time(buf, sizeof(buf), id3->length);
+        gui_wps_format_time(buf, sizeof(buf), id3->length);
         line = draw_id3_item(line, top, LANG_ID3_LENGHT, buf);
 
         snprintf(buf, sizeof(buf), "%d/%d", playlist_get_display_index(),

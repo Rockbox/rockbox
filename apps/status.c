@@ -26,7 +26,7 @@
 #include "status.h"
 #include "mp3_playback.h"
 #include "audio.h"
-#include "wps.h"
+#include "gwps.h"
 #include "abrepeat.h"
 #ifdef HAVE_RTC
 #include "timefuncs.h"

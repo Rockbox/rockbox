@@ -35,7 +35,6 @@
 #include "mpeg.h"
 #include "misc.h"
 #include "ata.h"
-#include "wps.h"
 #include "filetypes.h"
 #include "applimits.h"
 #include "icons.h"

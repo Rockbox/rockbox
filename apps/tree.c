@@ -36,8 +36,7 @@
 #include "audio.h"
 #include "playlist.h"
 #include "menu.h"
-#include "wps.h"
-#include "wps-display.h"
+#include "gwps.h"
 #include "settings.h"
 #include "status.h"
 #include "debug.h"
@@ -97,6 +96,9 @@ const struct filetype filetypes[] = {
     { "m3u", TREE_ATTR_M3U, Icon_Playlist, LANG_PLAYLIST },
     { "cfg", TREE_ATTR_CFG, Icon_Config, VOICE_EXT_CFG },
     { "wps", TREE_ATTR_WPS, Icon_Wps, VOICE_EXT_WPS },
+#ifdef HAVE_REMOTE_LCD
+    { "rwps", TREE_ATTR_RWPS, Icon_Wps, VOICE_EXT_RWPS },
+#endif
     { "lng", TREE_ATTR_LNG, Icon_Language, LANG_LANGUAGE },
     { "rock",TREE_ATTR_ROCK,Icon_Plugin, VOICE_EXT_ROCK },
 #ifdef HAVE_LCD_BITMAP
@@ -212,6 +214,7 @@ void browse_root(void)
 {
     /* essential to all programs that wants to display things */
     screen_access_init();
+    gui_sync_wps_screen_init();
 
     filetype_init();
     check_rockboxdir();
@@ -885,7 +888,7 @@ static bool dirbrowse(void)
             int i;
             FOR_NB_SCREENS(i)
                 screens[i].stop_scroll();
-            if (wps_show() == SYS_USB_CONNECTED)
+            if (gui_wps_show() == SYS_USB_CONNECTED)
                 reload_dir = true;
 #ifdef HAVE_HOTSWAP
             else

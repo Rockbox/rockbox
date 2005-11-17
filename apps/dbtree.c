@@ -35,7 +35,7 @@
 #include "mpeg.h"
 #include "misc.h"
 #include "ata.h"
-#include "wps.h"
+#include "playlist.h"
 #include "filetypes.h"
 #include "applimits.h"
 #include "dbtree.h"

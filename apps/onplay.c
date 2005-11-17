@@ -46,7 +46,6 @@
 #include "filetypes.h"
 #include "plugin.h"
 #include "bookmark.h"
-#include "wps.h"
 #include "action.h"
 #include "splash.h"
 #ifdef HAVE_LCD_BITMAP

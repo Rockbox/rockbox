@@ -996,6 +996,13 @@ static bool custom_wps_browse(void)
     return rockbox_browse(WPS_DIR, SHOW_WPS);
 }
 
+#ifdef HAVE_REMOTE_LCD
+static bool custom_remote_wps_browse(void)
+{
+    return rockbox_browse(WPS_DIR, SHOW_RWPS);
+}
+#endif
+
 static bool custom_cfg_browse(void)
 {
     return rockbox_browse(ROCKBOX_DIR, SHOW_CFG);
@@ -1602,6 +1609,9 @@ static bool display_settings_menu(void)
         { ID2P(LANG_CUSTOM_FONT),     font_browse },
 #endif
         { ID2P(LANG_WHILE_PLAYING),   custom_wps_browse },
+#ifdef HAVE_REMOTE_LCD
+        { ID2P(LANG_REMOTE_WHILE_PLAYING),   custom_remote_wps_browse },
+#endif
         { ID2P(LANG_LCD_MENU),        lcd_settings_menu },
 #ifdef HAVE_REMOTE_LCD
         { ID2P(LANG_LCD_REMOTE_MENU), lcd_remote_settings_menu },

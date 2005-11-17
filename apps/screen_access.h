@@ -99,6 +99,8 @@ struct screen
     void (*scroll_delay)(int ms);
     void (*stop_scroll)(void);
     void (*clear_display)(void);
+    unsigned char (*get_locked_pattern)(void);
+    void (*define_pattern)(int pat, const char *pattern);
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
     void (*update)(void);
 #endif

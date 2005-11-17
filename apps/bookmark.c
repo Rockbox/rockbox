@@ -27,7 +27,7 @@
 #include "button.h"
 #include "usb.h"
 #include "audio.h"
-#include "wps.h"
+#include "playlist.h"
 #include "settings.h"
 #include "tree.h"
 #include "bookmark.h"

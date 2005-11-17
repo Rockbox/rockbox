@@ -123,6 +123,8 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->height=2;
             screen->double_height=&lcd_double_height;
             screen->putc=&lcd_putc;
+            screen->get_locked_pattern=&lcd_get_locked_pattern;
+            screen->define_pattern=&lcd_define_pattern;
 #ifdef SIMULATOR
             screen->icon=&sim_lcd_icon;
 #else

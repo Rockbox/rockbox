@@ -34,7 +34,7 @@
 #include "led.h"
 
 #include "status.h" /* needed for battery_state global var */
-#include "wps.h" /* for keys_locked */
+#include "gwps.h" /* for keys_locked */
 #include "statusbar.h"
 
 

@@ -34,8 +34,6 @@
 #include "sprintf.h"
 #include "settings.h"
 #include "codecs.h"
-#include "wps.h"
-#include "wps-display.h"
 #include "audio.h"
 #include "logf.h"
 #include "mp3_playback.h"

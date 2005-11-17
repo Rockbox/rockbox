@@ -359,6 +359,9 @@ struct user_settings
     bool dircache;          /* enable directory cache */
     int dircache_size;      /* directory cache structure last size, 22 bits */
 #endif
+#ifdef HAVE_REMOTE_LCD
+    unsigned char rwps_file[MAX_FILENAME+1];  /* last remote-wps */
+#endif
 };
 
 enum optiontype { INT, BOOL };
@@ -443,7 +446,7 @@ enum
  *       must be added after NUM_FILTER_MODES. */
 enum { SHOW_ALL, SHOW_SUPPORTED, SHOW_MUSIC, SHOW_PLAYLIST, SHOW_ID3DB,
        NUM_FILTER_MODES,
-       SHOW_WPS, SHOW_CFG, SHOW_LNG, SHOW_MOD, SHOW_FONT, SHOW_PLUGINS};
+       SHOW_WPS, SHOW_RWPS, SHOW_CFG, SHOW_LNG, SHOW_MOD, SHOW_FONT, SHOW_PLUGINS};
 
 /* recursive dir insert options */
 enum { RECURSE_OFF, RECURSE_ON, RECURSE_ASK };

@@ -59,7 +59,7 @@
 #endif
 #include "lang.h"
 #include "language.h"
-#include "wps-display.h"
+#include "gwps.h"
 #include "powermgmt.h"
 #include "bookmark.h"
 #include "sprintf.h"
@@ -85,7 +85,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "dsp.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 31
+#define CONFIG_BLOCK_VERSION 32
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -758,10 +758,16 @@ int settings_save( void )
     strncpy(&config_block[0xb8], global_settings.wps_file, MAX_FILENAME);
     strncpy(&config_block[0xcc], global_settings.lang_file, MAX_FILENAME);
     strncpy(&config_block[0xe0], global_settings.font_file, MAX_FILENAME);
+#ifdef HAVE_REMOTE_LCD
+    strncpy(&config_block[0xf4], global_settings.rwps_file, MAX_FILENAME);
+#endif
 
     if(save_config_buffer())
     {
         lcd_clear_display();
+#ifdef HAVE_REMOTE_LCD
+        lcd_remote_clear_display();
+#endif
 #ifdef HAVE_LCD_CHARCELLS
         lcd_puts(0, 0, str(LANG_SETTINGS_SAVE_PLAYER));
         lcd_puts(0, 1, str(LANG_SETTINGS_BATTERY_PLAYER));
@@ -769,6 +775,11 @@ int settings_save( void )
         lcd_puts(4, 2, str(LANG_SETTINGS_SAVE_RECORDER));
         lcd_puts(2, 4, str(LANG_SETTINGS_BATTERY_RECORDER));
         lcd_update();
+#ifdef HAVE_REMOTE_LCD
+        lcd_remote_puts(4, 2, str(LANG_SETTINGS_SAVE_RECORDER));
+        lcd_remote_puts(2, 4, str(LANG_SETTINGS_BATTERY_RECORDER));
+        lcd_remote_update();
+#endif
 #endif
         sleep(HZ*2);
         return -1;
@@ -879,10 +890,21 @@ void settings_apply(void)
          global_settings.wps_file[0] != 0xff ) {
         snprintf(buf, sizeof buf, WPS_DIR "/%s.wps",
                  global_settings.wps_file);
-        wps_load(buf, false);
+        wps_data_load(gui_syncwps.gui_wps[0].data, buf, true, false);
     }
     else
-        wps_reset();
+        wps_data_init(gui_syncwps.gui_wps[0].data);
+
+#ifdef HAVE_REMOTE_LCD
+    if ( global_settings.rwps_file[0] &&
+         global_settings.rwps_file[0] != 0xff ) {
+        snprintf(buf, sizeof buf, WPS_DIR "/%s.rwps",
+                 global_settings.rwps_file);
+        wps_data_load(gui_syncwps.gui_wps[1].data, buf, true, false);
+    }
+    else
+        wps_data_init(gui_syncwps.gui_wps[1].data);
+#endif
 
 #ifdef HAVE_LCD_BITMAP
     if ( global_settings.font_file[0] &&
@@ -1003,6 +1025,9 @@ void settings_load(int which)
         strncpy(global_settings.wps_file, &config_block[0xb8], MAX_FILENAME);
         strncpy(global_settings.lang_file, &config_block[0xcc], MAX_FILENAME);
         strncpy(global_settings.font_file, &config_block[0xe0], MAX_FILENAME);
+#ifdef HAVE_REMOTE_LCD
+        strncpy(global_settings.rwps_file, &config_block[0xf4], MAX_FILENAME);
+#endif
     }
 }
 
@@ -1141,9 +1166,15 @@ bool settings_load_config(const char* file)
 
         /* check for the string values */
         if (!strcasecmp(name, "wps")) {
-            if (wps_load(value,false))
+            if (wps_data_load(gui_syncwps.gui_wps[0].data,value,true, false))
                 set_file(value, global_settings.wps_file, MAX_FILENAME);
         }
+#ifdef HAVE_REMOTE_LCD
+        else if (!strcasecmp(name, "rwps")) {
+            if (wps_data_load(gui_syncwps.gui_wps[1].data,value,true, false))
+                set_file(value, global_settings.rwps_file, MAX_FILENAME);
+        }
+#endif
         else if (!strcasecmp(name, "lang")) {
             if (!lang_load(value))
             {
@@ -1283,6 +1314,12 @@ bool settings_save_config(void)
         fdprintf(fd, "wps: %s/%s.wps\r\n", WPS_DIR,
                  global_settings.wps_file);
 
+#ifdef HAVE_REMOTE_LCD
+    if (global_settings.rwps_file[0] != 0)
+        fdprintf(fd, "rwps: %s/%s.rwps\r\n", WPS_DIR,
+                 global_settings.rwps_file);
+#endif
+
     if (global_settings.lang_file[0] != 0)
         fdprintf(fd, "lang: %s/%s.lng\r\n", ROCKBOX_DIR LANG_DIR,
                  global_settings.lang_file);
@@ -1365,6 +1402,9 @@ void settings_reset(void) {
 #endif
     global_settings.contrast    = lcd_default_contrast();
     global_settings.wps_file[0] = '\0';
+#ifdef HAVE_REMOTE_LCD
+    global_settings.rwps_file[0] = '\0';
+#endif
     global_settings.font_file[0] = '\0';
     global_settings.lang_file[0] = '\0';
 

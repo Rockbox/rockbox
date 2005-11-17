@@ -24,7 +24,7 @@
 #include "ata.h"
 #include "lcd.h"
 #include "widgets.h"
-#include "wps-display.h"
+#include "gwps.h"
 #include "sprintf.h"
 #include "button.h"
 #include "system.h"

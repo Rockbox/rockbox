@@ -49,7 +49,7 @@
 #include "sprintf.h"
 #include "font.h"
 #include "language.h"
-#include "wps-display.h"
+#include "gwps.h"
 #include "playlist.h"
 #include "buffer.h"
 #include "rolo.h"
@@ -138,6 +138,8 @@ void init(void)
     settings_reset();
     settings_calc_config_sector();
     settings_load(SETTINGS_ALL);
+    gui_sync_data_wps_init();
+    gui_sync_wps_init();
     settings_apply();
     init_dircache();
     sleep(HZ/2);
@@ -295,7 +297,8 @@ void init(void)
     settings_calc_config_sector();
     settings_load(SETTINGS_ALL);
     init_dircache();
-    
+    gui_sync_data_wps_init();
+    gui_sync_wps_init();
     settings_apply();
 
     status_init();

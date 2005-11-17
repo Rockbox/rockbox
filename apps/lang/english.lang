@@ -3437,3 +3437,15 @@ eng: "=== Please Wait ==="
 voice: 
 new:
 
+id: VOICE_EXT_RWPS
+desc: spoken only, for file extension
+eng: ""
+voice: "remote while-playing-screen"
+new:
+
+id: LANG_REMOTE_WHILE_PLAYING
+desc: in settings_menu()
+eng: "Browse .rwps files"
+voice: "Browse remote while-playing-screen files"
+new:
+
