@@ -2060,6 +2060,9 @@ int playlist_add(const char *filename)
     }
 
     playlist->indices[playlist->amount] = playlist->buffer_end_pos;
+#ifdef HAVE_DIRCACHE
+    playlist->filenames[playlist->amount] = NULL;
+#endif
     playlist->amount++;
     
     strcpy(&playlist->buffer[playlist->buffer_end_pos], filename);
