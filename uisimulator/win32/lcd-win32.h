@@ -30,10 +30,10 @@ typedef struct
 	RGBQUAD bmiColors[256];
 } BITMAPINFO256;
 
-#if LCD_DEPTH >= 16
-extern unsigned long   bitmap[LCD_HEIGHT][LCD_WIDTH]; // the ui display
-#else
+#if LCD_DEPTH <= 8
 extern unsigned char   bitmap[LCD_HEIGHT][LCD_WIDTH]; // the ui display
+#elif LCD_DEPTH <= 16
+extern unsigned short  bitmap[LCD_HEIGHT][LCD_WIDTH]; // the ui display
 #endif
 extern BITMAPINFO256   bmi; // bitmap information
 
