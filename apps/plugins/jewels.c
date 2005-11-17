@@ -78,7 +78,8 @@
 /* Use 16x16 tiles */
 
 /* size of a tile */
-#define TILE_SZ 16
+#define TILE_WIDTH  16
+#define TILE_HEIGHT 16
 
 /* number of high scores to save */
 #define NUM_SCORES 15
@@ -131,29 +132,30 @@ static unsigned char jewel[8][32] = {
 /* Use 8x8 tiles */
 
 /* size of a tile */
-#define TILE_SZ 8
+#define TILE_WIDTH 10
+#define TILE_HEIGHT 8
 
 /* number of high scores to save */
 #define NUM_SCORES 8
 
 /* bitmaps for the jewels */
-static unsigned char jewel[8][8] = {
+static unsigned char jewel[8][10] = {
     /* empty */
-    {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+    {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
     /* square */
-    {0x00, 0x7e, 0x7e, 0x7e, 0x7e, 0x7e, 0x7e, 0x00},
+    {0x00, 0x7e, 0x7e, 0x7e, 0x7e, 0x7e, 0x7e, 0x7e, 0x00, 0x00},
     /* plus */
-    {0x1c, 0x14, 0x77, 0x41, 0x77, 0x14, 0x1c, 0x00},
+    {0x00, 0x1c, 0x14, 0x77, 0x41, 0x41, 0x77, 0x14, 0x1c, 0x00},
     /* triangle */
-    {0x60, 0x78, 0x4e, 0x43, 0x4e, 0x78, 0x60, 0x00},
+    {0x60, 0x70, 0x5c, 0x46, 0x43, 0x46, 0x5c, 0x70, 0x60, 0x00},
     /* diamond */
-    {0x08, 0x1c, 0x3e, 0x7f, 0x3e, 0x1c, 0x08, 0x00},
+    {0x00, 0x08, 0x1c, 0x3e, 0x7f, 0x7f, 0x3e, 0x1c, 0x08, 0x00},
     /* star */
-    {0x08, 0x68, 0x3c, 0x1f, 0x3c, 0x68, 0x08, 0x00},
+    {0x00, 0x04, 0x6c, 0x3c, 0x1c, 0x1f, 0x3c, 0x6c, 0x04, 0x00},
     /* circle */
-    {0x1c, 0x3e, 0x63, 0x63, 0x63, 0x3e, 0x1c, 0x00},
+    {0x00, 0x1c, 0x3e, 0x63, 0x63, 0x63, 0x63, 0x3e, 0x1c, 0x00},
     /* heart */
-    {0x0e, 0x1f, 0x3e, 0x7c, 0x3e, 0x1f, 0x0e, 0x00}
+    {0x06, 0x0f, 0x1f, 0x3e, 0x7c, 0x3e, 0x1f, 0x0f, 0x06, 0x00}
 };
 
 #else
@@ -231,36 +233,37 @@ void bejeweled_drawboard(struct game_context* bj) {
     rb->lcd_clear_display();
 
     /* draw separator lines */
-    rb->lcd_vline(BJ_WIDTH*TILE_SZ, 0, LCD_HEIGHT);
-    rb->lcd_hline(BJ_WIDTH*TILE_SZ, LCD_WIDTH, 18);
-    rb->lcd_hline(BJ_WIDTH*TILE_SZ, LCD_WIDTH, LCD_HEIGHT-10);
+    rb->lcd_vline(BJ_WIDTH*TILE_WIDTH, 0, LCD_HEIGHT);
+    rb->lcd_hline(BJ_WIDTH*TILE_WIDTH, LCD_WIDTH, 18);
+    rb->lcd_hline(BJ_WIDTH*TILE_WIDTH, LCD_WIDTH, LCD_HEIGHT-10);
 
     /* draw progress bar */
-    rb->lcd_fillrect(BJ_WIDTH*TILE_SZ+(LCD_WIDTH-BJ_WIDTH*TILE_SZ)/4,
+    rb->lcd_fillrect(BJ_WIDTH*TILE_WIDTH+(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/4,
                      (LCD_HEIGHT-10)-(((LCD_HEIGHT-10)-18)*
                          tempscore/LEVEL_PTS),
-                     (LCD_WIDTH-BJ_WIDTH*TILE_SZ)/2,
+                     (LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2,
                      ((LCD_HEIGHT-10)-18)*tempscore/LEVEL_PTS);
 
     /* dispay playing board */
     for(i=0; i<BJ_HEIGHT-1; i++){
         for(j=0; j<BJ_WIDTH; j++){
             rb->lcd_mono_bitmap(jewel[bj->playboard[j][i+1].type],
-                                j*TILE_SZ, i*TILE_SZ, TILE_SZ, TILE_SZ);
+                                j*TILE_WIDTH, i*TILE_HEIGHT,
+                                TILE_WIDTH, TILE_HEIGHT);
         }
     }
 
     /* print text */
     rb->lcd_getstringsize(title, &w, &h);
-    rb->lcd_putsxy(LCD_WIDTH-(LCD_WIDTH-BJ_WIDTH*TILE_SZ)/2-w/2, 1, title);
+    rb->lcd_putsxy(LCD_WIDTH-(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2-w/2, 1, title);
 
     rb->snprintf(str, 4, "%d", bj->level);
     rb->lcd_getstringsize(str, &w, &h);
-    rb->lcd_putsxy(LCD_WIDTH-(LCD_WIDTH-BJ_WIDTH*TILE_SZ)/2-w/2, 10, str);
+    rb->lcd_putsxy(LCD_WIDTH-(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2-w/2, 10, str);
 
     rb->snprintf(str, 6, "%d", (bj->level-1)*LEVEL_PTS+bj->score);
     rb->lcd_getstringsize(str, &w, &h);
-    rb->lcd_putsxy(LCD_WIDTH-(LCD_WIDTH-BJ_WIDTH*TILE_SZ)/2-w/2,
+    rb->lcd_putsxy(LCD_WIDTH-(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2-w/2,
                    LCD_HEIGHT-8,
                    str);
 
@@ -302,7 +305,7 @@ void bejeweled_putjewels(struct game_context* bj){
         if(done) break;
 
         /* animate falling jewels */
-        for(k=TILE_SZ/8; k<=TILE_SZ; k+=TILE_SZ/8) {
+        for(k=TILE_HEIGHT/8; k<=TILE_HEIGHT; k+=TILE_HEIGHT/8) {
             rb->sleep(HZ/FALL_TIMER);
             for(i=0; i<BJ_HEIGHT-1; i++) {
                 for(j=0; j<BJ_WIDTH; j++) {
@@ -310,14 +313,14 @@ void bejeweled_putjewels(struct game_context* bj){
                        bj->playboard[j][i].type != 0) {
                         /* clear old position */
                         rb->lcd_mono_bitmap(jewel[0],
-                                            j*TILE_SZ,
-                                            (i-1)*TILE_SZ+k-2,
-                                            TILE_SZ, TILE_SZ);
+                                            j*TILE_WIDTH,
+                                            (i-1)*TILE_HEIGHT+k-2,
+                                            TILE_WIDTH, TILE_HEIGHT);
                         /* draw new position */
                         rb->lcd_mono_bitmap(jewel[bj->playboard[j][i].type],
-                                            j*TILE_SZ,
-                                            (i-1)*TILE_SZ+k,
-                                            TILE_SZ, TILE_SZ);
+                                            j*TILE_WIDTH,
+                                            (i-1)*TILE_HEIGHT+k,
+                                            TILE_WIDTH, TILE_HEIGHT);
                     }
                 }
             }
@@ -448,6 +451,7 @@ unsigned int bejeweled_swapjewels(struct game_context* bj,
                                   int x, int y, int direc) {
     int k;
     int horzmod, vertmod;
+    int movelen = 0;
     bool undo = false;
     unsigned int points = 0;
 
@@ -468,39 +472,47 @@ unsigned int bejeweled_swapjewels(struct game_context* bj,
     vertmod = 0;
     switch(direc) {
         case SWAP_UP:
-            vertmod = -1; break;
+            vertmod = -1;
+            movelen = TILE_HEIGHT;
+            break;
         case SWAP_RIGHT:
-            horzmod = 1;  break;
+            horzmod = 1;
+            movelen = TILE_WIDTH;
+            break;
         case SWAP_DOWN:
-            vertmod = 1;  break;
+            vertmod = 1;
+            movelen = TILE_HEIGHT;
+            break;
         case SWAP_LEFT:
-            horzmod = -1; break;
+            horzmod = -1;
+            movelen = TILE_WIDTH;
+            break;
     }
 
     while(true) {
         /* animate swapping jewels */
-        for(k=TILE_SZ/8; k<=TILE_SZ; k+=TILE_SZ/8) {
+        for(k=TILE_HEIGHT/8; k<=movelen;k+=TILE_HEIGHT/8) {
             rb->sleep(HZ/SWAP_TIMER);
             /* clear old position */
             rb->lcd_mono_bitmap(jewel[0],
-                                x*TILE_SZ+horzmod*(k-TILE_SZ/8),
-                                y*TILE_SZ+vertmod*(k-TILE_SZ/8),
-                                TILE_SZ, TILE_SZ);
+                                x*TILE_WIDTH+horzmod*(k-TILE_WIDTH/8),
+                                y*TILE_HEIGHT+vertmod*(k-TILE_HEIGHT/8),
+                                TILE_WIDTH, TILE_HEIGHT);
             rb->lcd_mono_bitmap(jewel[0],
-                                (x+horzmod)*TILE_SZ+horzmod*(k-TILE_SZ/8)*-1,
-                                (y+vertmod)*TILE_SZ+vertmod*(k-TILE_SZ/8)*-1,
-                                TILE_SZ, TILE_SZ);
+                                (x+horzmod)*TILE_WIDTH-horzmod*(k-TILE_WIDTH/8),
+                                (y+vertmod)*TILE_HEIGHT-vertmod*(k-TILE_HEIGHT/8),
+                                TILE_WIDTH, TILE_HEIGHT);
             /* draw new position */
             rb->lcd_mono_bitmap(jewel[bj->playboard[x][y+1].type],
-                                x*TILE_SZ+horzmod*k,
-                                y*TILE_SZ+vertmod*k,
-                                TILE_SZ, TILE_SZ);
+                                x*TILE_WIDTH+horzmod*k,
+                                y*TILE_HEIGHT+vertmod*k,
+                                TILE_WIDTH, TILE_HEIGHT);
             rb->lcd_set_drawmode(DRMODE_FG);
             rb->lcd_mono_bitmap(jewel[bj->playboard
                                 [x+horzmod][y+1+vertmod].type],
-                                (x+horzmod)*TILE_SZ+horzmod*k*-1,
-                                (y+vertmod)*TILE_SZ+vertmod*k*-1,
-                                TILE_SZ, TILE_SZ);
+                                (x+horzmod)*TILE_WIDTH-horzmod*k,
+                                (y+vertmod)*TILE_HEIGHT-vertmod*k,
+                                TILE_WIDTH, TILE_HEIGHT);
             rb->lcd_set_drawmode(DRMODE_SOLID);
 
             rb->lcd_update();
@@ -915,12 +927,12 @@ int bejeweled(struct game_context* bj) {
         /* display the cursor */
         if(selected) {
             rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-            rb->lcd_fillrect(x*TILE_SZ, y*TILE_SZ, TILE_SZ, TILE_SZ);
+            rb->lcd_fillrect(x*TILE_WIDTH, y*TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
             rb->lcd_set_drawmode(DRMODE_SOLID);
         } else {
-            rb->lcd_drawrect(x*TILE_SZ, y*TILE_SZ, TILE_SZ, TILE_SZ);
+            rb->lcd_drawrect(x*TILE_WIDTH, y*TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
         }
-        rb->lcd_update_rect(x*TILE_SZ, y*TILE_SZ, TILE_SZ, TILE_SZ);
+        rb->lcd_update_rect(x*TILE_WIDTH, y*TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
 
         /* handle game button presses */
         button = rb->button_get(true);
