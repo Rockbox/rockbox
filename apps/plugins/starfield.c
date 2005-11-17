@@ -174,7 +174,7 @@ static inline void starfield_move_and_draw(struct starfield * starfield)
 
 static struct starfield starfield;
 
-int main(void)
+int plugin_main(void)
 {
     char str_buffer[40];
     int button, t_disp=0;
@@ -251,7 +251,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     if (rb->global_settings->backlight_timeout > 0)
         rb->backlight_set_timeout(1);/* keep the light on */
 
-    ret = main();
+    ret = plugin_main();
 
     return ret;
 }
