@@ -109,6 +109,9 @@ sub copywps {
         my $wpsdir = $wps;
         $wpsdir =~ s/\.(r|)wps//;
         system("cp $dir/$wps .rockbox/wps/");
+        if ($rwps) {
+          system("cp $dir/$rwps .rockbox/wps/");
+        }
         if (-e "$dir/$wpsdir") {
            system("cp $dir/$wpsdir/*.bmp .rockbox/wps/$wpsdir/");
         }
