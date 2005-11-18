@@ -567,6 +567,11 @@ long gui_wps_show(void)
                 update_track = true;
                 break;
 
+            case SYS_POWEROFF:
+                bookmark_autobookmark();
+                default_event_handler(SYS_POWEROFF);
+                break;
+                
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
                     return SYS_USB_CONNECTED;
