@@ -708,6 +708,7 @@ void dircache_remove(const char *name)
 void dircache_rename(const char *oldpath, const char *newpath)
 { /* Test ok. */
     struct dircache_entry *entry, *newentry;
+    struct dircache_entry oldentry;
     
     if (!dircache_initialized)
         return ;
@@ -724,6 +725,10 @@ void dircache_rename(const char *oldpath, const char *newpath)
     /* Delete the old entry. */
     entry->name_len = 0;
 
+    /** If we rename the same filename twice in a row, we need to
+     * save the data, because the entry will be re-used. */
+    oldentry = *entry;
+
     newentry = dircache_new_entry(newpath, entry->attribute);
     if (newentry == NULL)
     {
@@ -731,13 +736,12 @@ void dircache_rename(const char *oldpath, const char *newpath)
         return ;
     }
 
-    //newentry->down = entry->down;
-    //entry->down = 0;
-    
-    newentry->size = entry->size;
-    newentry->startcluster = entry->startcluster;
-    newentry->wrttime = entry->wrttime;
-    newentry->wrtdate = entry->wrtdate;
+    newentry->down = oldentry.down;
+    newentry->up = oldentry.up;
+    newentry->size = oldentry.size;
+    newentry->startcluster = oldentry.startcluster;
+    newentry->wrttime = oldentry.wrttime;
+    newentry->wrtdate = oldentry.wrtdate;
 }
 
 void dircache_add_file(const char *path)
