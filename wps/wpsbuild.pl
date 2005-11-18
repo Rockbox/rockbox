@@ -90,7 +90,7 @@ sub mkdirs {
     my $wpsdir = $wps;
     $wpsdir =~ s/\.(r|)wps//;
     mkdir ".rockbox/wps", 0777;
-    mkdir ".rockbox/theme", 0777;
+    mkdir ".rockbox/themes", 0777;
 
     if( -d ".rockbox/wps/$wpsdir") {
         #print STDERR "wpsbuild warning: directory wps/$wpsdir already exists!\n";
@@ -140,7 +140,7 @@ MOO
     if($statusbar) {
         push @out, "statusbar: $statusbar\n";
     }
-    if($rwps && !$isrwps) {
+    if($rwps && $has_remote ) {
         push @out, "rwps: /.rockbox/wps/$rwps\n";
     }
 
@@ -148,7 +148,7 @@ MOO
         print STDERR "wpsbuild warning: wps/$cfg already exists!\n";
     }
     else {
-        open(CFG, ">.rockbox/theme/$cfg");
+        open(CFG, ">.rockbox/themes/$cfg");
         print CFG @out;
         close(CFG);
     }
@@ -157,6 +157,8 @@ MOO
 # Get the LCD sizes first
 my ($main_height, $main_width) = getlcdsizes();
 my ($remote_height, $remote_width) = getlcdsizes(1);
+
+$has_remote = true if ($remote_height && $remote_width);
 
 open(WPS, "<$wpslist");
 while(<WPS>) {
@@ -168,6 +170,14 @@ while(<WPS>) {
     if($l =~ /^ *<(r|)wps>/i) {
         $isrwps = $1;
         $within = 1;
+        # undef is a unary operator (!)
+        undef $wps;
+        undef $rwps;
+        undef $width; 
+        undef $height;
+        undef $font;
+        undef $statusbar;
+        undef $author;
         next;
     }
     if($within) {
@@ -184,6 +194,7 @@ while(<WPS>) {
             if(!$rheight || !$rwidth) {
                 printf STDERR "wpsbuild notice: No %sLCD size, skipping $wps\n",
                 $isrwps?"remote ":"";
+                $within = 0;
                 next;
             }
 
@@ -196,7 +207,6 @@ while(<WPS>) {
                 # WPS
                 #
                 #print "Size requirement is fine!\n";
-
                 mkdirs();
                 if(!$isrwps) {
                     # We only make .cfg files for <wps> sections:
@@ -208,8 +218,6 @@ while(<WPS>) {
                 #print "Skip $wps due to size restraints\n";
             }
             $within = 0;
-
-            undef $wps, $rwps, $width, $height, $font, $statusbar, $author;
         }
         elsif($l =~ /^Name: (.*)/i) {
             # Note that in the case this is within <rwps>, $wps will contain the

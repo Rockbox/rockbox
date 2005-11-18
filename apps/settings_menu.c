@@ -1003,11 +1003,6 @@ static bool custom_remote_wps_browse(void)
     return rockbox_browse(WPS_DIR, SHOW_RWPS);
 }
 #endif
-
-static bool custom_theme_browse(void)
-{
-    return rockbox_browse(THEME_DIR, SHOW_CFG);
-}
 	
 static bool custom_cfg_browse(void)
 {
@@ -1589,7 +1584,6 @@ static bool display_settings_menu(void)
 #ifdef HAVE_LCD_BITMAP
         { ID2P(LANG_CUSTOM_FONT),     font_browse },
 #endif
-	{ ID2P(LANG_CUSTOM_THEME),    custom_theme_browse },
         { ID2P(LANG_WHILE_PLAYING),   custom_wps_browse },
 #ifdef HAVE_REMOTE_LCD
         { ID2P(LANG_REMOTE_WHILE_PLAYING),   custom_remote_wps_browse },

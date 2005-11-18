@@ -58,7 +58,7 @@ Width: 160
 <wps>
 Name: engineeer2.wps
 Author: Magnus Westerlund
-Font: Nedore-8.fnt
+Font: nedore-8.fnt
 Statusbar: Off
 Height: 128
 Width: 160
@@ -68,7 +68,7 @@ Width: 160
 Name: iAmp.wps
 RWPS: iAmp.rwps
 Author: Raymond Hoh
-Font: Nimbus-12.fnt
+Font: nimbus-12.fnt
 Statusbar: Off
 Height: 128
 Width: 160
@@ -95,7 +95,7 @@ Width: 128
 <rwps>
 Name: iAmp.rwps
 Author: Raymond Hoh
-Font: Nimbus-12.fnt
+Font: nimbus-12.fnt
 Statusbar: Off
 Height: 64
 Width: 128

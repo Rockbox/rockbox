@@ -731,11 +731,22 @@ bool wps_data_load(struct wps_data *wps_data,
          * wants to be a virtual file.  Feel free to modify dirbrowse()
          * if you're feeling brave.
          */
-        if (! strcmp(buf, WPS_DEFAULTCFG) || !strcmp(buf, RWPS_DEFAULTCFG) )
+        if (! strcmp(buf, WPS_DEFAULTCFG) )
         {
             wps_reset(wps_data);
+	    global_settings.wps_file[0] = 0;
             return false;
-        }
+        } 
+
+#ifdef HAVE_REMOTE_LCD
+	if (! strcmp(buf, RWPS_DEFAULTCFG) )
+       	{
+            wps_reset(wps_data);
+	    global_settings.rwps_file[0] = 0;
+	    return false;
+	}
+#endif
+	
         size_t bmpdirlen;
         char *bmpdir = strrchr(buf, '.');
         bmpdirlen = bmpdir - buf;

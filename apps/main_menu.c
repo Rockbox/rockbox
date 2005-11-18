@@ -241,6 +241,11 @@ static bool plugin_browse(void)
     return rockbox_browse(PLUGIN_DIR, SHOW_PLUGINS);
 }
 
+static bool custom_theme_browse(void)
+{
+    return rockbox_browse(THEME_DIR, SHOW_CFG);
+}
+
 #ifdef HAVE_RECORDING
 
 static bool recording_settings(void)
@@ -311,7 +316,7 @@ bool main_menu(void)
     int i = 0;
 
     /* main menu */
-    struct menu_item items[10];
+    struct menu_item items[11];
 
     items[i].desc = ID2P(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS);
     items[i++].function = bookmark_mrb_load;
@@ -324,6 +329,9 @@ bool main_menu(void)
 
     items[i].desc = ID2P(LANG_MANAGE_MENU);
     items[i++].function = manage_settings_menu;
+
+    items[i].desc = ID2P(LANG_CUSTOM_THEME);
+    items[i++].function = custom_theme_browse;
 
 #ifdef CONFIG_TUNER
     if(radio_hardware_present()) {

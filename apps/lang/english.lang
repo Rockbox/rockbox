@@ -3451,6 +3451,6 @@ new:
 
 id: LANG_CUSTOM_THEME
 desc: Custom themes menu
-eng: "Browse themes"
-voice: "Browse themes"
+eng: "Browse Themes"
+voice: "Browse Themes"
 new:
