@@ -916,7 +916,7 @@ void gui_wps_format(struct wps_data *data, const char *bmpdir,
     char* start_of_line = data->format_buffer;
     int line = 0;
     int subline;
-    char c, lastc;
+    char c, lastc = 0;
 #ifndef HAVE_LCD_BITMAP
     /* no bitmap lcd == no bitmap loading */
     (void)bmpdir;
