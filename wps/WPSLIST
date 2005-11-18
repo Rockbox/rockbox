@@ -91,3 +91,12 @@ Statusbar: on
 Height: 64
 Width: 128
 </rwps>
+
+<rwps>
+Name: iAmp.rwps
+Author: Raymond Hoh
+Font: Nimbus-12.fnt
+Statusbar: Off
+Height: 128
+Width: 160
+</rwps>
