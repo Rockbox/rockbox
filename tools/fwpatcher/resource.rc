@@ -3,3 +3,4 @@
 IDI_RBICON ICON "rockbox.ico"
 IDI_BOOTLOADERH100 BIN "bootloader-h100.bin"
 IDI_BOOTLOADERH120 BIN "bootloader-h120.bin"
+IDI_BOOTLOADERH300 BIN "bootloader-h300.bin"

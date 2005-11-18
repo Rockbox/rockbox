@@ -44,7 +44,7 @@ $(TARGET): $(OBJS)
 $(TARGETU): $(OBJSU)
 	$(CC) $(LDFLAGS) $(OBJSU) -o $@
 
-resource.o: resource.rc bootloader-h100.bin bootloader-h120.bin rockbox.ico
+resource.o: resource.rc bootloader-h100.bin bootloader-h120.bin bootloader-h300.bin rockbox.ico
 	$(WINDRES) -v $< $@
 
 iriveru.o: iriver.c iriver.h

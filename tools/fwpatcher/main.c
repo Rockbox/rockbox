@@ -56,15 +56,21 @@ static struct sumpairs h120pairs[] = {
 #include "h120sums.h"
 };
 
+/* precalculated checksums for H320/H340 */
+static struct sumpairs h300pairs[] = {
+#include "h300sums.h"
+};
+
 HICON rbicon;
 HFONT deffont;
 HWND controls[CTL_NUM];
 
 /* begin mkboot.c excerpt */
 
-unsigned char image[0x200000 + 0x220 + 0x200000/0x200];
+unsigned char image[0x400000 + 0x220 + 0x400000/0x200];
 
-int mkboot(TCHAR *infile, TCHAR *outfile, unsigned char *bldata, int bllen)
+int mkboot(TCHAR *infile, TCHAR *outfile, unsigned char *bldata, int bllen,
+           int origin)
 {
     FILE *f;
     int i;
@@ -101,7 +107,7 @@ int mkboot(TCHAR *infile, TCHAR *outfile, unsigned char *bldata, int bllen)
     
     fclose(f);
 
-    memcpy(image + 0x220 + 0x1f0000, bldata, bllen);
+    memcpy(image + 0x220 + origin, bldata, bllen);
     
     f = _tfopen(outfile, TEXT("wb"));
     if(!f) {
@@ -110,13 +116,13 @@ int mkboot(TCHAR *infile, TCHAR *outfile, unsigned char *bldata, int bllen)
     }
 
     /* Patch the reset vector to start the boot loader */
-    image[0x220 + 4] = image[0x1f0000 + 0x220 + 4];
-    image[0x220 + 5] = image[0x1f0000 + 0x220 + 5];
-    image[0x220 + 6] = image[0x1f0000 + 0x220 + 6];
-    image[0x220 + 7] = image[0x1f0000 + 0x220 + 7];
+    image[0x220 + 4] = image[origin + 0x220 + 4];
+    image[0x220 + 5] = image[origin + 0x220 + 5];
+    image[0x220 + 6] = image[origin + 0x220 + 6];
+    image[0x220 + 7] = image[origin + 0x220 + 7];
 
     /* This is the actual length of the binary, excluding all headers */
-    actual_length = 0x1f0000 + bllen;
+    actual_length = origin + bllen;
 
     /* Patch the ESTFBINR header */
     image[0x20c] = (actual_length >> 24) & 0xff;
@@ -216,16 +222,24 @@ int PatchFirmware(int series, int table_entry)
     DWORD blsize;
     int i;
     struct sumpairs *sums;
+    int origin;
     
     /* get pointer to the correct bootloader.bin */
     switch(series) {
         case 100:
             res = FindResource(NULL, MAKEINTRESOURCE(IDI_BOOTLOADERH100), TEXT("BIN"));
             sums = &h100pairs[0];
+            origin = 0x1f0000;
             break;
         case 120:
             res = FindResource(NULL, MAKEINTRESOURCE(IDI_BOOTLOADERH120), TEXT("BIN"));
             sums = &h120pairs[0];
+            origin = 0x1f0000;
+            break;
+        case 300:
+            res = FindResource(NULL, MAKEINTRESOURCE(IDI_BOOTLOADERH300), TEXT("BIN"));
+            sums = &h300pairs[0];
+            origin = 0x3f0000;
             break;
     }
     resload = LoadResource(NULL, res);
@@ -246,7 +260,7 @@ int PatchFirmware(int series, int table_entry)
                    TEXT("Error"), MB_ICONERROR);
         goto error;
     }
-    if (!mkboot(name1, name2, bootloader, blsize)) {
+    if (!mkboot(name1, name2, bootloader, blsize, origin)) {
         MessageBox(NULL, TEXT("Error in patching"),
                    TEXT("Error"), MB_ICONERROR);
         goto error;
@@ -380,8 +394,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 else {
                     table_entry = intable(md5sum_str, &h100pairs[0],
                                           sizeof(h100pairs)/sizeof(struct sumpairs));
-                    if (table_entry >= 0)
+                    if (table_entry >= 0) {
                         series = 100;
+                    }
+                    else {
+                        table_entry =
+                            intable(md5sum_str, &h300pairs[0],
+                                    sizeof(h300pairs)/sizeof(struct sumpairs));
+                        if (table_entry >= 0)
+                            series = 300;
+                    }
                 }
                 if (series == 0) {
                     MessageBox(NULL, TEXT("Unrecognised firmware"), TEXT("Fail"), MB_OK);
