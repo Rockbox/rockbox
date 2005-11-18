@@ -1413,10 +1413,12 @@ int ata_init(void)
     or_b(0x02, &PADRH); /* release ATA reset */
     PACR2 &= 0xBFFF; /* GPIO function for PA7 (IDE enable) */
 #elif CONFIG_CPU == MCF5249
+#ifdef HAVE_ATA_LED_CTRL
     /* Enable disk LED & ISD chip power control */
     and_l(~0x0000240, &GPIO_OUT);
     or_l(0x00000240, &GPIO_ENABLE);
     or_l(0x00000200, &GPIO_FUNCTION);
+#endif
     
     /* ATA reset */
     or_l(0x00080000, &GPIO_OUT);

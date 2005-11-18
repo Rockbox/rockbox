@@ -91,6 +91,8 @@
 
 #define USB_IRIVERSTYLE
 
+#define HAVE_ATA_LED_CTRL
+
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ
 
