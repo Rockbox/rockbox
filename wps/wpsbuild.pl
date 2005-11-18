@@ -140,7 +140,7 @@ MOO
     if($statusbar) {
         push @out, "statusbar: $statusbar\n";
     }
-    if($rwps && $isrwps) {
+    if($rwps && !$isrwps) {
         push @out, "rwps: /.rockbox/wps/$rwps\n";
     }
 
