@@ -95,7 +95,6 @@ enum codec_status codec_start(struct codec_api *api)
     ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(MAD_F_FRACBITS));
     ci->configure(DSP_SET_CLIP_MIN, (int *)-MAD_F_ONE);
     ci->configure(DSP_SET_CLIP_MAX, (int *)(MAD_F_ONE - 1));
-    ci->configure(CODEC_SET_FILEBUF_LIMIT, (int *)(1024*1024*2));
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*16));
     
     ci->memset(&stream, 0, sizeof(struct mad_stream));

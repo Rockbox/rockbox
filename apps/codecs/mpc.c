@@ -96,7 +96,6 @@ enum codec_status codec_start(struct codec_api *api)
     /* disable these until we can figure out what's going on.
     ci->configure(DSP_SET_CLIP_MAX, (long *)MPC_FIXED_POINT_SCALE);
     ci->configure(DSP_SET_CLIP_MIN, (long *)-MPC_FIXED_POINT_SCALE);*/
-    ci->configure(CODEC_SET_FILEBUF_LIMIT, (long *)(1024*1024*2));
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (long *)(1024*16));
     
     /* Create a decoder instance */

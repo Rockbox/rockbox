@@ -135,7 +135,6 @@ enum codec_status codec_start(struct codec_api *api)
     /* Note: These are sane defaults for these values.  Perhaps
      * they should be set differently based on quality setting
      */
-    rb->configure(CODEC_SET_FILEBUF_LIMIT, (long *)(1024*1024*2));
 
     /* The chunk size below is magic.  If set any lower, resume
      * doesn't work properly (ov_raw_seek() does the wrong thing).

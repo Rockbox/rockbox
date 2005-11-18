@@ -81,6 +81,7 @@ static volatile bool paused;
 #define CODEC_AAC      "/.rockbox/codecs/aac.codec"
 #define CODEC_SHN      "/.rockbox/codecs/shorten.codec"
 
+#define AUDIO_DEFAULT_FIRST_LIMIT    (1024*1024*10)
 #define AUDIO_FILL_CYCLE             (1024*256)
 #define AUDIO_DEFAULT_WATERMARK      (1024*512)
 #define AUDIO_DEFAULT_FILECHUNK      (1024*32)
@@ -717,10 +718,6 @@ void codec_configure_callback(int setting, void *value)
         conf_filechunk = (unsigned int)value;
         break;
         
-    case CODEC_SET_FILEBUF_LIMIT:
-        conf_bufferlimit = (unsigned int)value;
-        break;
-        
     case CODEC_DSP_ENABLE:
         if ((bool)value)
             ci.pcmbuf_insert = codec_pcmbuf_insert_callback;
@@ -1009,9 +1006,11 @@ bool read_next_metadata(void)
     fd = open(trackname, O_RDONLY);
     if (fd < 0)
         return false;
-        
-    /* Start buffer refilling also because we need to spin-up the disk. */
-    filling = true;
+    
+    /** Start buffer refilling also because we need to spin-up the disk.
+     * In fact, it might be better not to start filling here, because if user
+     * is manipulating the playlist a lot, we will just lose battery. */
+    // filling = true;
     tracks[next_track].id3.codectype = probe_file_format(trackname);
     status = get_metadata(&tracks[next_track],fd,trackname,v1first);
     tracks[next_track].id3.codectype = 0;
@@ -1081,7 +1080,7 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     if (start_play) {
         int last_codec = current_codec;
         current_codec = CODEC_IDX_AUDIO;
-        conf_bufferlimit = 0;
+        conf_bufferlimit = AUDIO_DEFAULT_FIRST_LIMIT;
         conf_watermark = AUDIO_DEFAULT_WATERMARK;
         conf_filechunk = AUDIO_DEFAULT_FILECHUNK;
         dsp_configure(DSP_RESET, 0);
@@ -1329,12 +1328,12 @@ void initialize_buffer_fill(void)
 {
     int cur_idx, i;
     
-    
-    fill_bytesleft = filebuflen - filebufused;
-    cur_ti->start_pos = ci.curpos;
-
+    /* Initialize only once; do not truncate the tracks. */
     if (filling)
         return ;
+
+    fill_bytesleft = filebuflen - filebufused;
+    cur_ti->start_pos = ci.curpos;
 
     pcmbuf_set_boost_mode(true);
     
@@ -1392,8 +1391,14 @@ void audio_check_buffer(void)
     
     /* Load new files to fill the entire buffer. */
     if (audio_load_track(0, false, last_peek_offset + 1)) {
-    
-    } else if (tracks[track_widx].filerem == 0 || fill_bytesleft == 0) {
+        if (conf_bufferlimit)
+            fill_bytesleft = 0;
+    }
+    else if (tracks[track_widx].filerem == 0)
+        fill_bytesleft = 0;
+
+    if (fill_bytesleft <= 0)
+    {
         /* Read next unbuffered track's metadata as necessary. */
         read_next_metadata();
         
@@ -1659,7 +1664,7 @@ void audio_thread(void)
     bool play_pending = false;
     
     while (1) {
-        if (!play_pending)
+        if (!play_pending && queue_empty(&audio_queue))
         {
             yield_codecs();
             audio_check_buffer();
@@ -1683,12 +1688,14 @@ void audio_thread(void)
                  * fast to prevent UI lag. */
                 track_count = 0;
                 last_peek_offset = 0;
+                track_changed = true;
                 if (current_tick - last_tick < HZ/2)
                 {
                     play_pending = true;
                     break ;
                 }
                 play_pending = false;
+                last_tick = current_tick;
             
                 /* Do not start crossfading if audio is paused. */
                 if (paused)
