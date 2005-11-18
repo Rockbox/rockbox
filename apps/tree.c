@@ -61,6 +61,7 @@
 #include "recorder/recording.h"
 #include "rtc.h"
 #include "dircache.h"
+#include "yesno.h"
 
 /* gui api */
 #include "list.h"
@@ -561,47 +562,17 @@ static bool dirbrowse(void)
     while(1) {
         struct entry *dircache = tc.dircache;
         bool restore = false;
-
-        button = button_get_w_tmo(HZ/5);
 #ifdef BOOTFILE
         if (boot_changed) {
-            bool stop = false;
-            unsigned int button;
-            int i;
-            FOR_NB_SCREENS(i)
-            {
-                gui_textarea_clear(&screens[i]);
-                screens[i].puts(0,0,str(LANG_BOOT_CHANGED));
-                screens[i].puts(0,1,str(LANG_REBOOT_NOW));
-#ifdef HAVE_LCD_BITMAP
-                screens[i].puts(0,3,str(LANG_CONFIRM_WITH_PLAY_RECORDER));
-                screens[i].puts(0,4,str(LANG_CANCEL_WITH_ANY_RECORDER));
-                gui_textarea_update(&screens[i]);
-#endif
-            }
-            while (!stop) {
-                button = button_get(true);
-                switch (button) {
-                    case TREE_RUN:
-#ifdef TREE_RC_RUN
-                    case TREE_RC_RUN:
-#endif
-                        rolo_load("/" BOOTFILE);
-                        stop = true;
-                        break;
-
-                    default:
-                        if(default_event_handler(button) ||
-                           (button & BUTTON_REL))
-                            stop = true;
-                        break;
-                }
-            }
-
+            char *lines[]={str(LANG_BOOT_CHANGED), str(LANG_REBOOT_NOW)};
+            struct text_message message={lines, 2};
+            if(gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
+                rolo_load("/" BOOTFILE);
             restore = true;
             boot_changed = false;
         }
 #endif
+        button = button_get_w_tmo(HZ/5);
         need_update = gui_synclist_do_button(&tree_lists, button);
 
         switch ( button ) {

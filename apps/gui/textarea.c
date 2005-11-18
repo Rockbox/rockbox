@@ -41,6 +41,18 @@ void gui_textarea_update(struct screen * display)
 }
 #endif
 
+int gui_textarea_put_message(struct screen * display,
+                             struct text_message * message,
+                             int ystart)
+{
+    int i;
+    gui_textarea_clear(display);
+    for(i=0;i<message->nb_lines && i+ystart<display->nb_lines;i++)
+        display->puts(0, i+ystart, message->message_lines[i]);
+    gui_textarea_update(display);
+    return(i);
+}
+
 void gui_textarea_update_nblines(struct screen * display)
 {
 #ifdef HAVE_LCD_BITMAP

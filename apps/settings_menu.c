@@ -52,6 +52,7 @@
 #include "dir.h"
 #include "dircache.h"
 #include "splash.h"
+#include "yesno.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
@@ -1428,49 +1429,24 @@ static bool bookmark_settings_menu(void)
 }
 static bool reset_settings(void)
 {
-    bool done=false;
-    int line;
-    int button;
- 
-    lcd_clear_display();
+    char *lines[]={str(LANG_RESET_ASK_RECORDER)};
+    char *yes_lines[]={str(LANG_RESET_DONE_SETTING), str(LANG_RESET_DONE_CLEAR)};
+    char *no_lines[]={yes_lines[0], str(LANG_RESET_DONE_CANCEL)};
+    struct text_message message={lines, 1};
+    struct text_message yes_message={yes_lines, 2};
+    struct text_message no_message={no_lines, 2};
 
-#ifdef HAVE_LCD_CHARCELLS
-    line = 0;
-#else
-    line = 1;
-    lcd_puts(0,0,str(LANG_RESET_ASK_RECORDER));
-#endif
-    lcd_puts(0,line,str(LANG_RESET_CONFIRM));
-    lcd_puts(0,line+1,str(LANG_RESET_CANCEL));
-
-    lcd_update();
-     
-    while(!done) {
-        button = button_get(true);
-        switch(button) {
-            case SETTINGS_OK:
-                settings_reset();
-                settings_apply();
-                lcd_clear_display();
-                lcd_puts(0,1,str(LANG_RESET_DONE_CLEAR));
-                done = true;
-                break;
-
-            case SETTINGS_CANCEL:
-                lcd_clear_display();
-                lcd_puts(0,1,str(LANG_RESET_DONE_CANCEL));
-                done = true;
-                break;
-
-            default:
-                if(default_event_handler(button) == SYS_USB_CONNECTED)
-                    return true;
-        }
+    switch(gui_syncyesno_run(&message, &yes_message, &no_message))
+    {
+        case YESNO_YES:
+            settings_reset();
+            settings_apply();
+            break;
+        case YESNO_NO:
+            break;
+        case YESNO_USB:
+            return true;
     }
-
-    lcd_puts(0,0,str(LANG_RESET_DONE_SETTING));
-    lcd_update();
-    sleep(HZ);
     return false;
 }
 

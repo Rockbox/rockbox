@@ -41,6 +41,7 @@ gui/statusbar.c
 gui/gwps.c
 gui/gwps-common.c
 gui/textarea.c
+gui/yesno.c
 
 #ifdef HAVE_LCD_CHARCELLS
 player/icons.c

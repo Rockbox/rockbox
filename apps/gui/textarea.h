@@ -23,6 +23,12 @@
 #include "settings.h"
 #include "statusbar.h"
 
+struct text_message
+{
+    char **message_lines;
+    int nb_lines;
+};
+
 /*
  * Clears the area in the screen in which text can be displayed
  * and sets the y margin properly
@@ -45,6 +51,16 @@ extern void gui_textarea_update(struct screen * display);
 #endif
 #endif
 
+/*
+ * Displays message lines on the given screen
+ *  - display : the screen structure
+ *  - message : the lines to display
+ *  - ystart : the lineon which we start displaying
+ * returns : the number of lines effectively displayed
+ */
+extern int gui_textarea_put_message(struct screen * display,
+                                    struct text_message * message,
+                                    int ystart);
 /*
  * Compute the number of text lines the display can draw with the current font
  * Also updates the char height and width
