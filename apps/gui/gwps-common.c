@@ -1098,7 +1098,6 @@ void gui_wps_format(struct wps_data *data, const char *bmpdir,
                                     data->img[n].always_display = true;
                             }
                         }
-                        buf++;
                     }
                 }
               }
