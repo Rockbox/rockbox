@@ -62,7 +62,7 @@ int radio_get_status(void)
 void power_init(void)
 {
 #if CONFIG_CPU == MCF5249
-#if IRIVER_H100_SERIES
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
     or_l(0x00080000, &GPIO1_OUT);
     or_l(0x00080000, &GPIO1_ENABLE);
     or_l(0x00080000, &GPIO1_FUNCTION);
@@ -76,8 +76,9 @@ void power_init(void)
 #ifdef HAVE_SPDIF_POWER
     spdif_power_enable(false);
 #endif
-#elif defined(IRIVER_H300_SERIES)
+#ifdef IRIVER_H300_SERIES
     pcf50606_init();
+#endif
 #endif
 #elif CONFIG_CPU == PP5020
     /* TODO: Implement power_init() */
