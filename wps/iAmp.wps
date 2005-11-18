@@ -13,7 +13,7 @@
 %xl|w|h.bmp|114|1|
 %?mh<%?mr<%xdw|%xda>>
 %?mr<%?mh<%xdw|%xdz>>
-%x|H|pb.bmp|128|100|
+%x|L|pb.bmp|128|100|
 %xl|x|w.bmp|68|95|
 %xl|y|wv.bmp|68|95|
 %xl|f|f.bmp|68|95|
@@ -51,4 +51,4 @@
 %x|F|l.bmp|0|14|
 %xl|G|bp.bmp|1|1|
 %?bp<%xdG|%?bl<%xdA|%xdB|%xdC|%xdD|%xdE>>
-# letters to use: b, q, L-Z
+# letters to use: b, q, M-Z
