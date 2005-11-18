@@ -37,9 +37,8 @@
 
 #endif
 
-
-void internal_splash(struct screen * screen,
-                    bool center,  const char *fmt, va_list ap)
+static void splash(struct screen * screen,
+                   bool center,  const char *fmt, va_list ap)
 {
     char *next;
     char *store=NULL;
@@ -190,7 +189,7 @@ void gui_splash(struct screen * screen, int ticks,
 {
     va_list ap;
     va_start( ap, fmt );
-    internal_splash(screen, center, fmt, ap);
+    splash(screen, center, fmt, ap);
     va_end( ap );
 
     if(ticks)
@@ -203,7 +202,7 @@ void gui_syncsplash(int ticks, bool center,  const char *fmt, ...)
     int i;
     va_start( ap, fmt );
     FOR_NB_SCREENS(i)
-        internal_splash(&(screens[i]), center, fmt, ap);
+        splash(&(screens[i]), center, fmt, ap);
     va_end( ap );
 
     if(ticks)
