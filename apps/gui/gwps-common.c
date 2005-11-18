@@ -916,6 +916,7 @@ void gui_wps_format(struct wps_data *data, const char *bmpdir,
     char* start_of_line = data->format_buffer;
     int line = 0;
     int subline;
+    char c, lastc;
 #ifndef HAVE_LCD_BITMAP
     /* no bitmap lcd == no bitmap loading */
     (void)bmpdir;
@@ -945,7 +946,9 @@ void gui_wps_format(struct wps_data *data, const char *bmpdir,
 
     while ((*buf) && (line < WPS_MAX_LINES))
     {
-        switch (*buf)
+        c = *buf;
+        
+        switch (c)
         {
             /*
              * skip % sequences so "%;" doesn't start a new subline
@@ -1006,6 +1009,10 @@ void gui_wps_format(struct wps_data *data, const char *bmpdir,
                 char *pos = NULL;
                 char imgname[MAX_PATH];
                 char qual = *ptr;
+
+                if(lastc != '%')
+                    break;
+                
                 if (qual == 'l' || qual == '|')  /* format:
                                                     %x|n|filename.bmp|x|y|
                                                     or
@@ -1033,7 +1040,14 @@ void gui_wps_format(struct wps_data *data, const char *bmpdir,
                         ptr = pos+1;
 
                         /* check the image number and load state */
-                        if (!data->img[n].loaded)
+                        if (data->img[n].loaded)
+                        {
+                            /* Skip the rest of the line */
+                            while(*buf != '\n')
+                                buf++;
+                            break;
+                        }
+                        else
                         {
                             /* get filename */
                             pos = strchr(ptr, '|');
@@ -1100,10 +1114,11 @@ void gui_wps_format(struct wps_data *data, const char *bmpdir,
                         }
                     }
                 }
-              }
+            }
 #endif
-              break;
+            break;
         }
+        lastc = c;
         buf++;
     }
 }
