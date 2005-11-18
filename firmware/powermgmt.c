@@ -873,8 +873,6 @@ static void power_thread(void)
 
 void powermgmt_init(void)
 {
-    power_init();
-    
     /* init history to 0 */
     memset(power_history, 0x00, sizeof(power_history));
     
