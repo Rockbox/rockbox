@@ -49,6 +49,10 @@ A {
  text-decoration: underline;
 }
 
+pre {
+ overflow: auto;
+}
+
 .bgbox {
  left-border-width: 1px;
  border-color: #000000;
@@ -62,6 +66,11 @@ A {
 .menutext {
  color: #f0f0f0;
  font-size: 7pt;
+}
+
+td.building {
+ text-align: center;
+ background-color: #d6d6f5
 }
 
 .buildok {
@@ -161,3 +170,42 @@ td.toolscat {
  background-color: #90afe3;
 }
 
+.twikiDiffLineNumberHeader {
+ background-color: #d6e6f5;
+}
+
+.twikiDiffChangedHeader {
+ background-color: #d0ffd0;
+}
+
+.twikiDiffDeletedMarker {
+ background-color: #e81412;
+}
+
+.twikiDiffAddedMarker {
+ background-color: #25e914;
+}
+
+.twikiDiffUnchangedText {
+ background-color: #b6c6e5;
+}
+
+.twikibar {
+ border: 2px outset white;
+}
+
+.bstamp {
+ text-decoration: none;
+}
+
+.bstamp:hover {
+ text-decoration: underline;
+}
+
+.blink {
+ text-decoration: none;
+}
+
+.blink:hover {
+ text-decoration: underline;
+}
