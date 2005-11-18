@@ -63,7 +63,7 @@ struct wps_state wps_state;
 struct gui_wps gui_wps[NB_SCREENS];
 static struct wps_data wps_datas[NB_SCREENS];
 
-static bool keys_locked = false;
+bool keys_locked = false;
 
 /* change the path to the current played track */
 static void wps_state_update_ctp(const char *path);
