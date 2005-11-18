@@ -90,6 +90,7 @@ sub mkdirs {
     my $wpsdir = $wps;
     $wpsdir =~ s/\.(r|)wps//;
     mkdir ".rockbox/wps", 0777;
+    mkdir ".rockbox/theme", 0777;
 
     if( -d ".rockbox/wps/$wpsdir") {
         #print STDERR "wpsbuild warning: directory wps/$wpsdir already exists!\n";
@@ -139,7 +140,7 @@ MOO
     if($statusbar) {
         push @out, "statusbar: $statusbar\n";
     }
-    if($rwps) {
+    if($rwps && $isrwps) {
         push @out, "rwps: /.rockbox/wps/$rwps\n";
     }
 
@@ -147,7 +148,7 @@ MOO
         print STDERR "wpsbuild warning: wps/$cfg already exists!\n";
     }
     else {
-        open(CFG, ">.rockbox/wps/$cfg");
+        open(CFG, ">.rockbox/theme/$cfg");
         print CFG @out;
         close(CFG);
     }

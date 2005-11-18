@@ -3449,3 +3449,8 @@ eng: "Browse .rwps files"
 voice: "Browse remote while-playing-screen files"
 new:
 
+id: LANG_CUSTOM_THEME
+desc: Custom themes menu
+eng: "Browse themes"
+voice: "Browse themes"
+new:
