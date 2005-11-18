@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 
     fseek(f, 0, SEEK_SET);
 
-    i = fread(image+0x220 + 0x3f0000, 1, len, f);
+    i = fread(image+0x220 + origin, 1, len, f);
     if(i < len) {
         perror(bootfile);
         exit(1);
