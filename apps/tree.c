@@ -816,7 +816,8 @@ static bool dirbrowse(void)
                     else
                     {
                         DEBUGF("Playing file thumbnail: %s/%s%s\n",
-                               currdir, dircache[lasti].name, file_thumbnail_ext);
+                               currdir, dircache[lasti].name,
+                               file_thumbnail_ext);
                         /* no fallback necessary, we knew in advance
                            that the file exists */
                         ft_play_filename(currdir, dircache[lasti].name);

@@ -384,7 +384,7 @@ int ft_enter(struct tree_context* c)
 
                 /* wps config file */
             case TREE_ATTR_WPS:
-                wps_data_load(gui_syncwps.gui_wps[0].data, buf, true, true);
+                wps_data_load(gui_wps[0].data, buf, true, true);
                 set_file(buf, global_settings.wps_file,
                          MAX_FILENAME);
                 break;
@@ -392,7 +392,7 @@ int ft_enter(struct tree_context* c)
 #ifdef HAVE_REMOTE_LCD
                 /* remote-wps config file */
             case TREE_ATTR_RWPS:
-                wps_data_load(gui_syncwps.gui_wps[1].data, buf, true, true);
+                wps_data_load(gui_wps[1].data, buf, true, true);
                 set_file(buf, global_settings.rwps_file,
                          MAX_FILENAME);
                 break;

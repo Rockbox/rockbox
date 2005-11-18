@@ -145,7 +145,7 @@
 #define WPS_INCVOL     BUTTON_UP
 #define WPS_DECVOL     BUTTON_DOWN
 #define WPS_PAUSE      BUTTON_OFF
-/* #define WPS_MENU    Ondio can't have both main menu and context menu in wps */
+/* #define WPS_MENU Ondio can't have both main menu and context menu in wps */
 #define WPS_BROWSE     (BUTTON_MENU | BUTTON_REL)
 #define WPS_BROWSE_PRE BUTTON_MENU
 #define WPS_KEYLOCK    (BUTTON_MENU | BUTTON_DOWN)
@@ -183,7 +183,7 @@
 #define WPS_INCVOL     BUTTON_UP
 #define WPS_DECVOL     BUTTON_DOWN
 #define WPS_PAUSE      BUTTON_OFF
-/* #define WPS_MENU    iPod can't have both main menu and context menu in wps */
+/* #define WPS_MENU iPod can't have both main menu and context menu in wps */
 #define WPS_BROWSE     (BUTTON_MENU | BUTTON_REL)
 #define WPS_BROWSE_PRE BUTTON_MENU
 #define WPS_KEYLOCK    (BUTTON_MENU | BUTTON_DOWN)
@@ -253,6 +253,8 @@ struct wps_data
 #ifdef HAVE_LCD_BITMAP
     struct gui_img img[MAX_IMAGES];
     unsigned char img_buf[IMG_BUFSIZE];
+    bool wps_sb_tag;
+    bool show_sb_on_wps;
 #endif
 #ifdef HAVE_LCD_CHARCELLS
     unsigned char wps_progress_pat[8];
@@ -274,7 +276,10 @@ void wps_data_init(struct wps_data *wps_data);
 
 /* to setup up the wps-data from a format-buffer (isfile = false)
    from a (wps-)file (isfile = true)*/
-bool wps_data_load(struct wps_data *wps_data, const char *buf, bool isfile, bool display);
+bool wps_data_load(struct wps_data *wps_data,
+                   const char *buf,
+                   bool isfile,
+                   bool display);
 
 /* wps_data end */
 
@@ -301,13 +306,6 @@ void wps_state_init(void);
    else we are in normal mode */
 void wps_state_update_ff_rew(bool ff_rew);
 
-/* change the paused-status
-   to indicate if playback is currently paused or not */
-void wps_state_update_paused(bool paused);
-
-/* change the path to the current played track */
-void wps_state_update_ctp(const char *path);
-
 /* change the tag-information of the current played track
    and the following track */
 void wps_state_update_id3_nid3(struct mp3entry *id3, struct mp3entry *nid3);
@@ -318,7 +316,7 @@ void wps_state_update_id3_nid3(struct mp3entry *id3, struct mp3entry *nid3);
    and the screen on which the wps-content should be drawn */
 struct gui_wps
 {
-	struct screen * display;
+    struct screen * display;
     struct wps_data *data;
     struct wps_state *state;
 };
@@ -333,16 +331,11 @@ void gui_wps_set_data(struct gui_wps *gui_wps, struct wps_data *data);
 void gui_wps_set_disp(struct gui_wps *gui_wps, struct screen *display);
 /* gui_wps end */
 
-struct gui_syncwps
-{
-        struct gui_wps gui_wps[NB_SCREENS];
-};
 long gui_wps_show(void);
 
 /* currently only on wps_state is needed */
 extern struct wps_state wps_state;
-extern struct gui_syncwps gui_syncwps;
-extern struct wps_data wps_datas[NB_SCREENS];
+extern struct gui_wps gui_wps[NB_SCREENS];
 
 void gui_sync_wps_init(void);
 void gui_sync_data_wps_init(void);

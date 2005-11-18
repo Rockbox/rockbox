@@ -890,20 +890,20 @@ void settings_apply(void)
          global_settings.wps_file[0] != 0xff ) {
         snprintf(buf, sizeof buf, WPS_DIR "/%s.wps",
                  global_settings.wps_file);
-        wps_data_load(gui_syncwps.gui_wps[0].data, buf, true, false);
+        wps_data_load(gui_wps[0].data, buf, true, false);
     }
     else
-        wps_data_init(gui_syncwps.gui_wps[0].data);
+        wps_data_init(gui_wps[0].data);
 
 #ifdef HAVE_REMOTE_LCD
     if ( global_settings.rwps_file[0] &&
          global_settings.rwps_file[0] != 0xff ) {
         snprintf(buf, sizeof buf, WPS_DIR "/%s.rwps",
                  global_settings.rwps_file);
-        wps_data_load(gui_syncwps.gui_wps[1].data, buf, true, false);
+        wps_data_load(gui_wps[1].data, buf, true, false);
     }
     else
-        wps_data_init(gui_syncwps.gui_wps[1].data);
+        wps_data_init(gui_wps[1].data);
 #endif
 
 #ifdef HAVE_LCD_BITMAP
@@ -1166,12 +1166,12 @@ bool settings_load_config(const char* file)
 
         /* check for the string values */
         if (!strcasecmp(name, "wps")) {
-            if (wps_data_load(gui_syncwps.gui_wps[0].data,value,true, false))
+            if (wps_data_load(gui_wps[0].data,value,true, false))
                 set_file(value, global_settings.wps_file, MAX_FILENAME);
         }
 #ifdef HAVE_REMOTE_LCD
         else if (!strcasecmp(name, "rwps")) {
-            if (wps_data_load(gui_syncwps.gui_wps[1].data,value,true, false))
+            if (wps_data_load(gui_wps[1].data,value,true, false))
                 set_file(value, global_settings.rwps_file, MAX_FILENAME);
         }
 #endif

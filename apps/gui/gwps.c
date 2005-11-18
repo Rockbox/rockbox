@@ -1,3 +1,21 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
+ *
+ * Copyright (C) 2002 Jerome Kuptz
+ *
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -42,12 +60,15 @@
 #define RWPS_DEFAULTCFG WPS_DIR "/rockbox_default.rwps"
 /* currently only on wps_state is needed */
 struct wps_state wps_state;
-struct gui_syncwps gui_syncwps;
-struct wps_data wps_datas[NB_SCREENS];
+struct gui_wps gui_wps[NB_SCREENS];
+static struct wps_data wps_datas[NB_SCREENS];
 
-bool keys_locked = false;
+static bool keys_locked = false;
 
-long gui_wps_show()
+/* change the path to the current played track */
+static void wps_state_update_ctp(const char *path);
+
+long gui_wps_show(void)
 {
     long button = 0, lastbutton = 0;
     bool ignore_keyup = true;
@@ -67,10 +88,8 @@ long gui_wps_show()
 #else
     FOR_NB_SCREENS(i)
     {
-        if(global_settings.statusbar)
-            gui_syncwps.gui_wps[i].display->setmargins(0, STATUSBAR_HEIGHT);
-        else
-            gui_syncwps.gui_wps[i].display->setmargins(0, 0);
+        gui_wps[i].display->setmargins(0, global_settings.statusbar?
+                                       STATUSBAR_HEIGHT:0);
     }
 #endif
 
@@ -87,7 +106,7 @@ long gui_wps_show()
             if (gui_wps_display())
                 return 0;
             FOR_NB_SCREENS(i)
-                gui_wps_refresh(&gui_syncwps.gui_wps[i], 0, WPS_REFRESH_ALL);
+                gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_ALL);
             wps_state_update_ctp(wps_state.id3->path);
         }
 
@@ -119,7 +138,7 @@ long gui_wps_show()
         bool pm=false;
         FOR_NB_SCREENS(i)
         {
-           if(gui_syncwps.gui_wps[i].data->peak_meter_enabled)
+           if(gui_wps[i].data->peak_meter_enabled)
                pm = true;
         }
         
@@ -137,8 +156,12 @@ long gui_wps_show()
 
                 if (TIME_AFTER(current_tick, next_refresh)) {
                     FOR_NB_SCREENS(i)
-                       gui_wps_refresh(&gui_syncwps.gui_wps[i], 0, WPS_REFRESH_PEAK_METER);
-                    next_refresh += HZ / PEAK_METER_FPS;
+                        {
+                            if(gui_wps[i].data->peak_meter_enabled)
+                                gui_wps_refresh(&gui_wps[i], 0,
+                                                WPS_REFRESH_PEAK_METER);
+                            next_refresh += HZ / PEAK_METER_FPS;
+                        }
                 }
             }
 
@@ -213,7 +236,7 @@ long gui_wps_show()
                 status_set_audio(false);
 #endif
                 FOR_NB_SCREENS(i)
-                    gui_syncwps.gui_wps[i].display->stop_scroll();
+                    gui_wps[i].display->stop_scroll();
 
                 /* set dir browser to current playing song */
                 if (global_settings.browse_current &&
@@ -232,7 +255,8 @@ long gui_wps_show()
 #ifdef WPS_RC_PAUSE
             case WPS_RC_PAUSE:
 #ifdef WPS_RC_PAUSE_PRE
-                if ((button == WPS_RC_PAUSE) && (lastbutton != WPS_RC_PAUSE_PRE))
+                if ((button == WPS_RC_PAUSE) &&
+                    (lastbutton != WPS_RC_PAUSE_PRE))
                     break;
 #endif
 #endif
@@ -333,7 +357,8 @@ long gui_wps_show()
 #ifdef AB_REPEAT_ENABLE
                 /* if we're in A/B repeat mode and the current position
                    is past the A marker, jump back to the A marker... */
-                if ( ab_repeat_mode_enabled() && ab_after_A_marker(wps_state.id3->elapsed) )
+                if ( ab_repeat_mode_enabled() 
+                     && ab_after_A_marker(wps_state.id3->elapsed) )
                 {
                     ab_jump_to_A_marker();
                     break;
@@ -391,7 +416,8 @@ long gui_wps_show()
 #ifdef AB_REPEAT_ENABLE
                 /* if we're in A/B repeat mode and the current position is
                    before the A marker, jump to the A marker... */
-                if ( ab_repeat_mode_enabled() && ab_before_A_marker(wps_state.id3->elapsed) )
+                if ( ab_repeat_mode_enabled() 
+                     && ab_before_A_marker(wps_state.id3->elapsed) )
                 {
                     ab_jump_to_A_marker();
                     break;
@@ -417,17 +443,16 @@ long gui_wps_show()
 #endif
 #endif
                 FOR_NB_SCREENS(i)
-                    gui_syncwps.gui_wps[i].display->stop_scroll();
+                    gui_wps[i].display->stop_scroll();
 
                 if (main_menu())
                     return true;
 #ifdef HAVE_LCD_BITMAP
                 FOR_NB_SCREENS(i)
                 {
-                    if(global_settings.statusbar)
-                        gui_syncwps.gui_wps[i].display->setmargins(0, STATUSBAR_HEIGHT);
-                    else
-                        gui_syncwps.gui_wps[i].display->setmargins(0, 0);
+                    gui_wps[i].display->setmargins(0,
+                                                   global_settings.statusbar?
+                                                   STATUSBAR_HEIGHT:0);
                 }
 #endif
                 restore = true;
@@ -552,8 +577,9 @@ long gui_wps_show()
         if (update_track)
         {
             bool upt = false;
-            FOR_NB_SCREENS(i){
-                if(update(&gui_syncwps.gui_wps[i]))
+            FOR_NB_SCREENS(i)
+            {
+                if(update(&gui_wps[i]))
                     upt = true;
             }
             if (upt)
@@ -577,7 +603,7 @@ long gui_wps_show()
                 fade(0);
                 
             FOR_NB_SCREENS(i)
-                gui_syncwps.gui_wps[i].display->stop_scroll();
+                gui_wps[i].display->stop_scroll();
             bookmark_autobookmark();
             audio_stop();
 #ifdef AB_REPEAT_ENABLE
@@ -617,7 +643,7 @@ long gui_wps_show()
 
             if (wps_state.id3){
                 FOR_NB_SCREENS(i)
-                    gui_wps_refresh(&gui_syncwps.gui_wps[i], 0, WPS_REFRESH_NON_STATIC);
+                    gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_NON_STATIC);
             }
         }
         if (button != BUTTON_NONE)
@@ -674,11 +700,17 @@ static void wps_reset(struct wps_data *data)
 
 /* to setup up the wps-data from a format-buffer (isfile = false)
    from a (wps-)file (isfile = true)*/
-bool wps_data_load(struct wps_data *wps_data, const char *buf, bool isfile, bool display)
+bool wps_data_load(struct wps_data *wps_data,
+                   const char *buf,
+                   bool isfile,
+                   bool display)
 {
     int i, s;
     int fd;
-    if(!wps_data || !buf) return false;
+
+    if(!wps_data || !buf)
+        return false;
+
     if(!isfile)
     {
         wps_clear(wps_data);
@@ -694,9 +726,10 @@ bool wps_data_load(struct wps_data *wps_data, const char *buf, bool isfile, bool
          * wants to be a virtual file.  Feel free to modify dirbrowse()
          * if you're feeling brave.
          */
-        if (! strcmp(buf, WPS_DEFAULTCFG) || !strcmp(buf, RWPS_DEFAULTCFG) ) {
-           wps_reset(wps_data);
-           return false;
+        if (! strcmp(buf, WPS_DEFAULTCFG) || !strcmp(buf, RWPS_DEFAULTCFG) )
+        {
+            wps_reset(wps_data);
+            return false;
         }
         size_t bmpdirlen;
         char *bmpdir = strrchr(buf, '.');
@@ -706,7 +739,8 @@ bool wps_data_load(struct wps_data *wps_data, const char *buf, bool isfile, bool
 
         if (fd >= 0)
         {
-            int numread = read(fd, wps_data->format_buffer, sizeof(wps_data->format_buffer) - 1);
+            int numread = read(fd, wps_data->format_buffer,
+                               sizeof(wps_data->format_buffer) - 1);
     
             if (numread > 0)
             {
@@ -733,24 +767,19 @@ bool wps_data_load(struct wps_data *wps_data, const char *buf, bool isfile, bool
                     any_defined_line = false;
                     for (i=0; i<WPS_MAX_LINES; i++)
                     {
-                        if (wps_data->format_lines[i][s])
+                        if (wps_data->format_lines[i][s] &&
+                            wps_data->format_lines[i][s][0])
                         {
-                            if (*(wps_data->format_lines[i][s]) == 0)
-                            {
-                                FOR_NB_SCREENS(z)
-                                    screens[z].puts(0,i," ");
-                            }
-                            else
-                            {
-                                FOR_NB_SCREENS(z)
-                                    screens[z].puts(0,i,wps_data->format_lines[i][s]);
-                            }
+                            FOR_NB_SCREENS(z)
+                                screens[z].puts(0, i,
+                                                wps_data->
+                                                format_lines[i][s]);
                             any_defined_line = true;
                         }
                         else
                         {
                             FOR_NB_SCREENS(z)
-                                screens[z].puts(0,i," ");
+                                screens[z].puts(0, i, " ");
                         }
                     }
                     if (any_defined_line)
@@ -759,7 +788,7 @@ bool wps_data_load(struct wps_data *wps_data, const char *buf, bool isfile, bool
                         FOR_NB_SCREENS(z)
                             screens[z].update();
 #endif
-                            sleep(HZ/2);
+                        sleep(HZ/2);
                     }
                 }
             }
@@ -775,7 +804,6 @@ bool wps_data_load(struct wps_data *wps_data, const char *buf, bool isfile, bool
 /* wps_data end */
 
 /* wps_state */
-struct wps_state wps_state;
 
 void wps_state_init(void)
 {
@@ -785,22 +813,30 @@ void wps_state_init(void)
     wps_state.nid3 = NULL;
     wps_state.current_track_path[0] = '\0';
 }
+
+#if 0
+/* these are obviously not used? */
+
 void wps_state_update_ff_rew(bool ff_rew)
 {
     wps_state.ff_rewind = ff_rew;
 }
+
 void wps_state_update_paused(bool paused)
 {
     wps_state.paused = paused;
-}
-void wps_state_update_ctp(const char *path)
-{
-    memcpy(wps_state.current_track_path, path, sizeof(wps_state.current_track_path));
 }
 void wps_state_update_id3_nid3(struct mp3entry *id3, struct mp3entry *nid3)
 {
     wps_state.id3 = id3;
     wps_state.nid3 = nid3;
+}
+#endif
+
+static void wps_state_update_ctp(const char *path)
+{
+    memcpy(wps_state.current_track_path, path,
+           sizeof(wps_state.current_track_path));
 }
 /* wps_state end*/
 
@@ -838,7 +874,7 @@ void gui_sync_wps_screen_init(void)
 {
     int i;
     FOR_NB_SCREENS(i)
-        gui_wps_set_disp(&gui_syncwps.gui_wps[i], &screens[i]);
+        gui_wps_set_disp(&gui_wps[i], &screens[i]);
 }
 
 void gui_sync_wps_init(void)
@@ -846,8 +882,7 @@ void gui_sync_wps_init(void)
     int i;
     FOR_NB_SCREENS(i)
     {
-        gui_wps_init(&gui_syncwps.gui_wps[i]);
-        gui_wps_set_data(&gui_syncwps.gui_wps[i], &wps_datas[i]);
+        gui_wps_init(&gui_wps[i]);
+        gui_wps_set_data(&gui_wps[i], &wps_datas[i]);
     }
 }
-
