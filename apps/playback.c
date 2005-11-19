@@ -264,7 +264,10 @@ static void swap_codec(void)
 static void voice_boost_cpu(bool state)
 {
     static bool voice_cpu_boosted = false;
-    
+
+    if (!voice_codec_loaded)
+        state = false;
+   
     if (state != voice_cpu_boosted)
     {
         cpu_boost(state);
@@ -1631,9 +1634,6 @@ void audio_invalidate_tracks(void)
 
 static void initiate_track_change(int peek_index)
 {
-    if (!playlist_check(peek_index))
-        return ;
-
     /* Detect if disk is spinning.. */
     if (filling) {
         queue_post(&audio_queue, AUDIO_PLAY, 0);
