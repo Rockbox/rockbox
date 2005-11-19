@@ -379,7 +379,7 @@ void screen_dump(void)
 
             for (bx = 0; bx < LCD_WIDTH; bx++)
             {
-#if (CONFIG_LCD == LCD_IPODCOLOR) || (CONFIG_LCD == LCD_IPODNANO)
+#if (LCD_PIXELFORMAT == RGB565SWAPPED)
                 /* iPod LCD data is big endian although the CPU is not */
                 *dst++ = swap16(*src++);
 #else
