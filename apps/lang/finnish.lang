@@ -3383,3 +3383,112 @@ desc: in crossfade settings menu
 eng: "Fade out mode"
 voice: "Poishäivytyksen tyyli"
 new: "Poishäivytyksen tyyli"
+
+id: LANG_RECORDING_ADC_RIGHT
+desc: in the recording settings
+eng: "ADC Gain Right"
+voice: "ADC Oikea Vahvistus"
+new: "ADC Oikea Vahvistus"
+
+id: LANG_RECORDING_ADC_LEFT
+desc: in the recording settings
+eng: "ADC Gain Left"
+voice: "ADC Vasen Vahvistus"
+new: "ADC Vasen Vahvistus"
+
+id: LANG_RECORDING_MONITOR
+desc: in the recording settings
+eng: "Monitor Mode"
+voice: "Monitorointitila"
+new: "Monitorointitila"
+
+id: LANG_RADIO_SCAN_MODE
+desc: in radio screen
+eng: "Scan Mode"
+voice: ""
+new: "Vapaa taajuusvalinta"
+
+id: LANG_RADIO_PRESET_MODE
+desc: in radio screen
+eng: "Preset Mode"
+voice: ""
+new: "Esivalinta"
+
+id: LANG_FM_FREEZE
+desc: splash screen during freeze in radio mode
+eng: "Screen frozen!"
+voice: ""
+new: "Näytön päivitys keskeytynyt!"
+
+id: LANG_CROSSFEED_ENABLE
+desc: In the crossfeed menu
+eng: "Enable crossfeed"
+voice:
+new: "Aktivoi ristisyöttö"
+
+id: LANG_CROSSFEED
+desc: in the sound settings menu
+eng: "Crossfeed"
+voice: "Ristisyöttö"
+new: "Ristisyöttö"
+
+id: LANG_FM_SCAN_PRESETS
+desc: in radio menu
+eng: "Auto scan presets"
+voice: "Auto scan presets"
+new: "Kanavien automaattihaku"
+
+id: LANG_FM_SCANNING
+desc: during auto scan
+eng: "Scanning %d.%dMHz"
+voice: ""
+new: "Skannataan %d.%dMHz"
+
+id: LANG_FM_DEFAULT_PRESET_NAME
+desc: default preset name for auto scan mode
+eng: "%d.%dMHz"
+voice:
+new: "%d.%dMHz"
+
+id: LANG_FM_ADD_PRESET
+desc: in radio menu
+eng: "Add preset"
+voice: 
+new: "Lisää esivalinta"
+
+id: LANG_FM_CLEAR_PRESETS
+desc: confirmation if presets can be cleared
+eng: "Clear current presets?"
+voice: "Poistetaanko esivalinta?"
+new: "Poistetaanko esivalinta?"
+
+id: LANG_WAIT
+desc: general please wait splash
+eng: "Loading..."
+voice: 
+new: "Ladataan..."
+
+id: VOICE_EXT_RWPS
+desc: spoken only, for file extension
+eng: ""
+voice: "Etäohjaimen soittoikkuna"
+new:
+
+id: LANG_REMOTE_WHILE_PLAYING
+desc: in settings_menu()
+eng: "Browse .rwps files"
+voice: "Selaa etäohjaimen soittoikkunatiedostoja"
+new: "Selaa .rwps tiedostoja"
+
+id: LANG_CUSTOM_THEME
+desc: Custom themes menu
+eng: "Browse Themes"
+voice: "Selaa teemoja"
+new: "Selaa teemoja"
+
+id: LANG_REDUCE_TICKING
+desc: in remote lcd settings menu
+eng: "Reduce ticking"
+voice: "Vähennä etäohjaimen audiosignaalin häiriöitä"
+new: "Vähennä etäohjaimen audiosignaalin häiriöitä"
+
