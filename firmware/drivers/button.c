@@ -246,7 +246,7 @@ void button_init(void)
 }
 
 #ifdef HAVE_LCD_BITMAP /* only bitmap displays can be flipped */
-#if (CONFIG_KEYPAD != IPOD_4G_PAD) && (CONFIG_KEYPAD != IPOD_4G_PAD)
+#if (CONFIG_KEYPAD != IPOD_4G_PAD) && (CONFIG_KEYPAD != IPOD_NANO_PAD)
 /*
  * helper function to swap UP/DOWN, LEFT/RIGHT (and F1/F3 for Recorder)
  */
