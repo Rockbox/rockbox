@@ -854,6 +854,7 @@ void settings_apply(void)
     lcd_remote_set_contrast(global_settings.remote_contrast);
     lcd_remote_set_invert_display(global_settings.remote_invert);
     lcd_remote_set_flip(global_settings.remote_flip_display);
+    lcd_remote_emireduce(global_settings.remote_reduce_ticking);
     remote_backlight_set_timeout(global_settings.remote_backlight_timeout);
 #endif
     backlight_set_timeout(global_settings.backlight_timeout);
