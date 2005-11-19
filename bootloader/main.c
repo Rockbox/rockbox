@@ -97,9 +97,13 @@ int load_firmware(void)
     unsigned char *buf = (unsigned char *)DRAM_START;
     char str[80];
     
-    fd = open("/rockbox.iriver", O_RDONLY);
+    fd = open("/.rockbox/" BOOTFILE, O_RDONLY);
     if(fd < 0)
-        return -1;
+    {
+        fd = open("/" BOOTFILE, O_RDONLY);
+        if(fd < 0)
+            return -1;
+    }
 
     len = filesize(fd) - 8;
 
@@ -190,14 +194,31 @@ void main(void)
     if ((data & 0x40) == 0)
         rc_on_button = true;
 
-    /* Backlight ON */
-    or_l(0x00020000, &GPIO1_ENABLE);
-    or_l(0x00020000, &GPIO1_FUNCTION);
-
     /* Set the default state of the hard drive power to OFF */
     ide_power_enable(false);
     
     power_init();
+
+    /* Turn off if neither ON button is pressed */
+    if(!(on_button || rc_on_button))
+        power_off();
+    
+    /* Backlight ON */
+    or_l(0x00020000, &GPIO1_ENABLE);
+    or_l(0x00020000, &GPIO1_FUNCTION);
+    and_l(~0x00020000, &GPIO1_OUT);
+
+    /* Remote backlight ON */
+#ifdef HAVE_REMOTE_LCD
+#ifdef IRIVER_H300_SERIES
+    or_l(0x00000002, &GPIO1_ENABLE);
+    and_l(~0x00000002, &GPIO1_OUT);
+#else
+    or_l(0x00000800, &GPIO_ENABLE);
+    or_l(0x00000800, &GPIO_FUNCTION);
+    and_l(~0x00000800, &GPIO_OUT);
+#endif
+#endif
 
     /* Power on the hard drive early, to speed up the loading */
     if(!((on_button && button_hold()) ||
@@ -246,6 +267,15 @@ void main(void)
         lcd_puts(0, 8, "HOLD switch on, power off...");
         lcd_update();
         sleep(HZ*2);
+
+        /* Backlight OFF */
+#ifdef HAVE_REMOTE_LCD
+#ifdef IRIVER_H300_SERIES
+        or_l(0x00000002, &GPIO1_OUT);
+#else
+        or_l(0x00000800, &GPIO_OUT);
+#endif
+#endif
         /* Reset the cookie for the crt0 crash check */
         asm(" move.l #0,%d0");
         asm(" move.l %d0,0x10017ffc");
