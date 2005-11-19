@@ -37,23 +37,22 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
     {
 #ifdef HAVE_REMOTE_LCD
         case SCREEN_REMOTE:
+            screen->depth=LCD_REMOTE_DEPTH;
+#if 1 /* all remote LCDs are bitmapped so far */
             screen->width=LCD_REMOTE_WIDTH;
             screen->height=LCD_REMOTE_HEIGHT;
-            screen->is_color=false;
-            screen->depth=1;
-#ifdef HAVE_LCD_BITMAP
             screen->setmargins=&lcd_remote_setmargins;
             screen->getymargin=&lcd_remote_getymargin;
             screen->getxmargin=&lcd_remote_getxmargin;
             screen->setfont=&lcd_remote_setfont;
+            screen->setfont(FONT_UI);
             screen->getstringsize=&lcd_remote_getstringsize;
             screen->putsxy=&lcd_remote_putsxy;
             screen->mono_bitmap=&lcd_remote_mono_bitmap;
             screen->set_drawmode=&lcd_remote_set_drawmode;
-#if LCD_DEPTH > 1
-            /* since lcd_remote_set_background doesn't exist yet ... */
-            screen->set_background=NULL;
-#endif /* LCD_DEPTH > 1 */
+#if LCD_REMOTE_DEPTH > 1
+            screen->set_background=&lcd_remote_set_background;
+#endif /* LCD_REMOTE_DEPTH > 1 */
             screen->update_rect=&lcd_remote_update_rect;
             screen->fillrect=&lcd_remote_fillrect;
             screen->drawrect=&lcd_remote_drawrect;
@@ -66,12 +65,22 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->scroll_step=&lcd_remote_scroll_step;
             screen->puts_scroll_style=&lcd_remote_puts_scroll_style;
             screen->invertscroll=&lcd_remote_invertscroll;
-#endif /* HAVE_LCD_BITMAP */
+#endif /* 1 */
 
-#ifdef HAVE_LCD_CHARCELLS
-            screen->double_height=&lcd_double_height;
+#if 0 /* no charcell remote LCDs so far */
+            screen->width=11;
+            screen->height=2;
+            screen->double_height=&lcd_remote_double_height;
             screen->putc=&lcd_remote_putc;
-#endif /* HAVE_LCD_CHARCELLS */
+            screen->get_locked_pattern=&lcd_remote_get_locked_pattern;
+            screen->define_pattern=&lcd_remote_define_pattern;
+#ifdef SIMULATOR
+            screen->icon=&sim_lcd_remote_icon;
+#else
+            screen->icon=&lcd_remote_icon;
+#endif
+#endif /* 0 */
+
             screen->init=&lcd_remote_init;
             screen->puts_scroll=&lcd_remote_puts_scroll;
             screen->stop_scroll=&lcd_remote_stop_scroll;
@@ -84,11 +93,6 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
 
         case SCREEN_MAIN:
         default:
-#ifdef HAVE_LCD_COLOR
-            screen->is_color=true;
-#else
-            screen->is_color=false;
-#endif
             screen->depth=LCD_DEPTH;
 #ifdef HAVE_LCD_BITMAP
             screen->width=LCD_WIDTH;
@@ -97,11 +101,12 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->getymargin=&lcd_getymargin;
             screen->getxmargin=&lcd_getxmargin;
             screen->setfont=&lcd_setfont;
+            screen->setfont(FONT_UI);
             screen->getstringsize=&lcd_getstringsize;
             screen->putsxy=&lcd_putsxy;
             screen->mono_bitmap=&lcd_mono_bitmap;
             screen->set_drawmode=&lcd_set_drawmode;
-#if LCD_DEPTH > 1
+#if LCD_DEPTH > 1   
             screen->set_background=&lcd_set_background;
 #endif
             screen->update_rect=&lcd_update_rect;
@@ -130,8 +135,8 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
 #else
             screen->icon=&lcd_icon;
 #endif
-
 #endif /* HAVE_LCD_CHARCELLS */
+
             screen->init=&lcd_init;
             screen->puts_scroll=&lcd_puts_scroll;
             screen->stop_scroll=&lcd_stop_scroll;
@@ -142,9 +147,6 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->puts=&lcd_puts;
             break;
     }
-#ifdef HAVE_LCD_BITMAP
-    screen->setfont(FONT_UI);
-#endif
     screen->screen_type=screen_type;
 #ifdef HAS_BUTTONBAR
     screen->has_buttonbar=false;

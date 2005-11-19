@@ -51,7 +51,6 @@ struct screen
     int width, height;
     int nb_lines;
     enum screen_type screen_type;
-    bool is_color;
     int depth;
     int char_width;
     int char_height;
@@ -59,8 +58,7 @@ struct screen
     bool has_buttonbar;
 #endif
 
-#ifdef HAVE_LCD_BITMAP
-
+#if defined(HAVE_LCD_BITMAP) || defined(HAVE_REMOTE_LCD) /* always bitmap */
     void (*setmargins)(int x, int y);
     int (*getxmargin)(void);
     int (*getymargin)(void);
@@ -75,9 +73,9 @@ struct screen
     void (*mono_bitmap)(const unsigned char *src,
                         int x, int y, int width, int height);
     void (*set_drawmode)(int mode);
-#if LCD_DEPTH > 1
+#if (LCD_DEPTH > 1) || (LCD_REMOTE_DEPTH > 1)
     void (*set_background)(unsigned background);
-#endif /* LCD_DEPTH > 1 */
+#endif /* (LCD_DEPTH > 1) || (LCD_REMOTE_DEPTH > 1) */
     void (*update_rect)(int x, int y, int width, int height);
     void (*fillrect)(int x, int y, int width, int height);
     void (*drawrect)(int x, int y, int width, int height);
@@ -86,9 +84,9 @@ struct screen
     void (*vline)(int x, int y1, int y2);
     void (*hline)(int x1, int x2, int y);
     void (*invertscroll) (int x, int y);
-#endif /* HAVE_LCD_BITMAP */
+#endif /* HAVE_LCD_BITMAP || HAVE_REMOTE_LCD */
 
-#ifdef HAVE_LCD_CHARCELLS
+#ifdef HAVE_LCD_CHARCELLS  /* no charcell remote LCDs so far */
     void (*double_height)(bool on);
     void (*putc)(int x, int y, unsigned short ch);
     void (*icon)(int icon, bool enable);
@@ -101,7 +99,7 @@ struct screen
     void (*clear_display)(void);
     unsigned char (*get_locked_pattern)(void);
     void (*define_pattern)(int pat, const char *pattern);
-#if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
+#if defined(HAVE_LCD_BITMAP) || defined(HAVE_REMOTE_LCD) || defined(SIMULATOR)
     void (*update)(void);
 #endif
 
@@ -141,7 +139,7 @@ extern void screen_init(struct screen * screen, enum screen_type screen_type);
 #define screen_set_ymargin(screen, ymargin) \
     (screen)->setmargins((screen)->getxmargin(), ymargin);
 
-#ifdef HAVE_LCD_BITMAP
+#if defined(HAVE_LCD_BITMAP) || defined(HAVE_REMOTE_LCD)
 /*
  * Clear only a given area of the screen
  * - screen : the screen structure
