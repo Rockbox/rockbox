@@ -318,19 +318,19 @@ irq_handler:
     move.l  (%a2),%d0
     move.l  #0xc0015a17,%d1
     cmp.l   %d0,%d1
-    bne     .nocookie
+    bne.b   .nocookie
     /* Clear the cookie again */
     clr.l   (%a2)
     jmp     8
-        
+
 .nocookie:
     /* Set the cookie */
     move.l  %d1,(%a2)
-        
+
     /* Set up the DRAM controller. The refresh is based on the 11.2896MHz
        clock (5.6448MHz bus frequency). We haven't yet started the PLL */
 #if MEM < 32
-    move.w  #0x8204,%d0 /* DCR - Synchronous, 80 cycle refresh */
+    move.w  #0x8004,%d0 /* DCR - Synchronous, 80 cycle refresh */
 #else
     move.w  #0x8001,%d0 /* DCR - Synchronous, 32 cycle refresh */
 #endif
@@ -345,46 +345,44 @@ irq_handler:
        use a 64M mask.
     */
 #if MEM < 32
-    move.l  #0x31002320,%d0 /* DACR0 - Base 0x31000000, Banks on 21 and up,
-                               CAS latency 1, No refresh yet */
+    move.l  #0x31002324,%d0 /* DACR0 - Base 0x31000000, Banks on 21 and up,
+                               CAS latency 1, Page mode, No refresh yet */
     move.l  %d0,(0x108,%a0)
     move.l  #0x00fc0001,%d0 /* Size: 16M */
     move.l  %d0,(0x10c,%a0) /* DMR0 - 32Mb */
 #else
-    move.l  #0x31002520,%d0 /* DACR0 - Base 0x31000000, Banks on 23 and up,
-                               CAS latency 1, No refresh yet */
+    move.l  #0x31002524,%d0 /* DACR0 - Base 0x31000000, Banks on 23 and up,
+                               CAS latency 1, Page mode, No refresh yet */
     move.l  %d0,(0x108,%a0)
     move.l  #0x03fc0001,%d0 /* Size: 64M because of workaround above */
     move.l  %d0,(0x10c,%a0) /* DMR0 - 32Mb */
 #endif
 
     /* Precharge */
-    move.l  #8,%d0
-    or.l  %d0,(0x108,%a0)   /* DACR0[IP] = 1, next access will issue a
+    moveq.l #8,%d0
+    or.l    %d0,(0x108,%a0) /* DACR0[IP] = 1, next access will issue a
                                Precharge command */
     move.l  #0xabcd1234,%d0
     move.l  %d0,0x31000000  /* Issue precharge command */
 
+    move.l  #0x8000,%d0
+    or.l    %d0,(0x108,%a0) /* Enable refresh */
+
     /* Let it refresh */
-    move.l  #1000,%d0
+    move.l  #500,%d0
 .delayloop:
     subq.l  #1,%d0
-    bne     .delayloop
-        
-    /* Refresh */
-    move.l #0x8000,%d0
-    or.l   %d0,(0x108,%a0) /* Enable refresh */
+    bne.b   .delayloop
 
     /* Mode Register init */
-    move.l #0x40,%d0       /* DACR0[IMRS] = 1, next access will set the
-                              Mode Register */
-    or.l  %d0,(0x108,%a0)
+    moveq.l #0x40,%d0       /* DACR0[IMRS] = 1, next access will set the
+                               Mode Register */
+    or.l    %d0,(0x108,%a0)
 
     move.l  #0xabcd1234,%d0
     move.l  %d0,0x31000800  /* A12=1 means CASL=1 (a0 is not connected) */
 
-    move.l  #0xffffffbf,%d0
-    and.l  %d0,(0x108,%a0)  /* Back to normal, the DRAM is now ready */
+    /* DACR0[IMRS] gets deactivated by the SDRAM controller */
 #endif /* BOOTLOADER */
 
     /* Invalicate cache */
