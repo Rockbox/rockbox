@@ -1457,6 +1457,10 @@ void audio_update_trackinfo(void)
     } else {
         pcmbuf_add_event(codec_track_changed);
     }
+
+    /* Manual track change. */
+    if (new_track)
+        codec_track_changed();
 }
 
 static void audio_stop_playback(void)
