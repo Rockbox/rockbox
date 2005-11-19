@@ -1092,8 +1092,7 @@ void gui_wps_format(struct wps_data *data, const char *bmpdir,
                             pos++;
                             
                             /* reposition buf pointer to next WPS element */
-                            while (*pos && *pos != ';' &&
-                                   *pos != '\r' && *pos != '\n')
+                            while (*pos && *pos != ';' && *pos != '\n')
                                 pos++;
 
                             buf = pos;
