@@ -42,6 +42,9 @@
 #include "button.h"
 #endif
 #include "usb.h"
+#ifdef CONFIG_TUNER
+#include "radio.h"
+#endif
 
 enum playmode ff_mode;
 
@@ -117,6 +120,16 @@ int current_playmode(void)
                 return STATUS_RECORD;
         }
     }
+#endif
+
+#ifdef CONFIG_TUNER
+    audio_stat = get_radio_status();
+
+    if(audio_stat == FMRADIO_PLAYING)
+       return STATUS_PLAY;
+
+    if(audio_stat == FMRADIO_PAUSED)
+       return STATUS_PAUSE;
 #endif
     
     return STATUS_STOP;
