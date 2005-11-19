@@ -55,6 +55,7 @@
 #include "statusbar.h"
 #include "textarea.h"
 #include "splash.h"
+#include "yesno.h"
 
 #ifdef CONFIG_TUNER
 
@@ -1185,76 +1186,57 @@ static bool toggle_mono_mode(void)
 
 static bool scan_presets(void)
 {
-    bool exit = false;
     bool tuned = false;
     char buf[32];
     int freq, i;
+    char *lines[]={str(LANG_FM_CLEAR_PRESETS)};
+    struct text_message message={lines, 1};
 
-    FOR_NB_SCREENS(i){
-        gui_textarea_clear(&screens[i]);
-        screens[i].puts_scroll(0,0,str(LANG_FM_CLEAR_PRESETS));
-        screens[i].puts_scroll(0,2,str(LANG_CONFIRM_WITH_PLAY_RECORDER));
-        screens[i].puts_scroll(0,3,str(LANG_CANCEL_WITH_ANY_RECORDER)); 
-        gui_textarea_update(&screens[i]);
-    }
+    if(gui_syncyesno_run(&message,NULL,NULL)==YESNO_YES){
+        FOR_NB_SCREENS(i)
+            gui_textarea_clear(&screens[i]);
+        curr_freq = MIN_FREQ;
+        num_presets = 0;
+        while(curr_freq <= MAX_FREQ){
+            if (num_presets >= MAX_PRESETS)
+                break;
 
-    while (!exit) {
-        int btn = button_get(true);
-        switch (btn) {
-            case SETTINGS_OK:
-                FOR_NB_SCREENS(i)
-                    gui_textarea_clear(&screens[i]);
-                curr_freq = MIN_FREQ;
-                num_presets = 0;
-                while(curr_freq <= MAX_FREQ){
-                    if (num_presets >= MAX_PRESETS)
-                        break;
+            freq = curr_freq /100000;
+            snprintf(buf, 32, str(LANG_FM_SCANNING), freq/10, freq % 10);
+            gui_syncsplash(0, true, buf);
 
-                    freq = curr_freq /100000;
-                    snprintf(buf, 32, str(LANG_FM_SCANNING), freq/10, freq % 10);
-                    gui_syncsplash(0, true, buf);
-
-                    /* Tune in and delay */
-                    radio_set(RADIO_FREQUENCY, curr_freq);
-                    sleep(1);
+            /* Tune in and delay */
+            radio_set(RADIO_FREQUENCY, curr_freq);
+            sleep(1);
             
-                    /* Start IF measurement */
-                    radio_set(RADIO_IF_MEASUREMENT, 1);
-                    sleep(1);
+            /* Start IF measurement */
+            radio_set(RADIO_IF_MEASUREMENT, 1);
+            sleep(1);
 
-                    /* Now check how close to the IF frequency we are */
-                    tuned = radio_get(RADIO_TUNED);
+            /* Now check how close to the IF frequency we are */
+            tuned = radio_get(RADIO_TUNED);
 
-                    /* add preset */
-                    if(tuned){
-                        snprintf(buf, 32, str(LANG_FM_DEFAULT_PRESET_NAME),freq/10, freq % 10);
-                        strcpy(presets[num_presets].name, buf);
-                        presets[num_presets].frequency = curr_freq;
-                        menu_insert(preset_menu, -1,
-                                    presets[num_presets].name, 0);
-                        num_presets++;
-                    }
+            /* add preset */
+            if(tuned){
+                 snprintf(buf, 32, str(LANG_FM_DEFAULT_PRESET_NAME),freq/10, freq % 10);
+                 strcpy(presets[num_presets].name, buf);
+                 presets[num_presets].frequency = curr_freq;
+                 menu_insert(preset_menu, -1,
+                             presets[num_presets].name, 0);
+                 num_presets++;
+            }
 
-                    curr_freq += FREQ_STEP;
+            curr_freq += FREQ_STEP;
                    
-                }
+        }
 
-                rebuild_preset_menu();
-                radio_save_presets();
+        rebuild_preset_menu();
+        radio_save_presets();
 
-                if(num_presets > 0 ){
-                    curr_freq = presets[0].frequency;
-                    radio_set(RADIO_FREQUENCY, curr_freq);
-                    remember_frequency();
-                }
-                exit = true;
-                break;
-
-            default:
-                /* ignore button releases */
-                if (!(btn & BUTTON_REL))
-                    exit = true;
-                break;
+        if(num_presets > 0 ){
+            curr_freq = presets[0].frequency;
+            radio_set(RADIO_FREQUENCY, curr_freq);
+            remember_frequency();
         }
     }
     return true;
