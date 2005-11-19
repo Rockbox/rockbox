@@ -47,6 +47,7 @@
 #include "tlv320.h"
 #endif
 #include "logf.h"
+#include "lcd-remote.h"
 
 /*
  * Define DEBUG_FILE to create a csv (spreadsheet) with battery information
@@ -918,6 +919,9 @@ void shutdown_hw(void)
     backlight_off();
     sleep(1);
     lcd_set_contrast(0);
+#endif
+#ifdef HAVE_REMOTE_LCD
+    lcd_remote_backlight_off();
 #endif
     power_off();
 #endif /* #ifndef SIMULATOR */
