@@ -42,7 +42,9 @@ enum playmode
     STATUS_FASTFORWARD,
     STATUS_FASTBACKWARD,
     STATUS_RECORD,
-    STATUS_RECORD_PAUSE
+    STATUS_RECORD_PAUSE,
+    STATUS_RADIO,
+    STATUS_RADIO_PAUSE
 };
 
 void status_init(void);

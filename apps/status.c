@@ -126,10 +126,10 @@ int current_playmode(void)
     audio_stat = get_radio_status();
 
     if(audio_stat == FMRADIO_PLAYING)
-       return STATUS_PLAY;
+       return STATUS_RADIO;
 
     if(audio_stat == FMRADIO_PAUSED)
-       return STATUS_PAUSE;
+       return STATUS_RADIO_PAUSE;
 #endif
     
     return STATUS_STOP;

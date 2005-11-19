@@ -226,6 +226,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
                                                 bar->info.volume);
         gui_statusbar_icon_play_state(display, current_playmode() +
                                                 Icon_Play);
+
         switch (bar->info.repeat) {
 #ifdef AB_REPEAT_ENABLE
             case REPEAT_AB:

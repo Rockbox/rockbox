@@ -60,6 +60,8 @@ enum icons_7x8 {
     Icon_FastBackward,
     Icon_Record,
     Icon_RecPause,
+    Icon_Radio,
+    Icon_Radio_Mute,
     Icon_Repeat,
     Icon_RepeatOne,
     Icon_Shuffle,
