@@ -997,11 +997,7 @@ static bool add_dir(char* dirname, int len, int fd)
     DIRCACHED* dir;
 
     /* check for user abort */
-#ifdef BUTTON_STOP
-    if (button_get(false) == BUTTON_STOP)
-#else
-    if (button_get(false) == BUTTON_OFF)
-#endif
+    if (button_get(false) == TREE_ABORT)
         return true;
 
     dir = opendir_cached(dirname);

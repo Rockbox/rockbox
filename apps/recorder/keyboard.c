@@ -54,6 +54,10 @@
 #define KBD_DONE (BUTTON_ON | BUTTON_REL)
 #define KBD_ABORT BUTTON_OFF
 #define KBD_BACKSPACE BUTTON_REC
+#define KBD_LEFT BUTTON_LEFT
+#define KBD_RIGHT BUTTON_RIGHT
+#define KBD_UP BUTTON_UP
+#define KBD_DOWN BUTTON_DOWN
 
 #elif CONFIG_KEYPAD == RECORDER_PAD
 #define KBD_CURSOR_RIGHT (BUTTON_ON | BUTTON_RIGHT)
@@ -63,6 +67,10 @@
 #define KBD_DONE BUTTON_F2
 #define KBD_ABORT BUTTON_OFF
 #define KBD_BACKSPACE BUTTON_F3
+#define KBD_LEFT BUTTON_LEFT
+#define KBD_RIGHT BUTTON_RIGHT
+#define KBD_UP BUTTON_UP
+#define KBD_DOWN BUTTON_DOWN
 
 #elif CONFIG_KEYPAD == ONDIO_PAD /* restricted Ondio keypad */
 #define KBD_MODES /* Ondio uses 2 modes, picker and line edit */
@@ -70,6 +78,10 @@
 #define KBD_SELECT_PRE BUTTON_MENU
 #define KBD_DONE (BUTTON_MENU | BUTTON_REPEAT)
 #define KBD_ABORT BUTTON_OFF
+#define KBD_LEFT BUTTON_LEFT
+#define KBD_RIGHT BUTTON_RIGHT
+#define KBD_UP BUTTON_UP
+#define KBD_DOWN BUTTON_DOWN
 
 #elif CONFIG_KEYPAD == GMINI100_PAD
 #define KBD_CURSOR_RIGHT (BUTTON_MENU | BUTTON_RIGHT)
@@ -80,17 +92,23 @@
 #define KBD_DONE (BUTTON_PLAY | BUTTON_REPEAT)
 #define KBD_ABORT BUTTON_OFF
 #define KBD_BACKSPACE (BUTTON_MENU | BUTTON_PLAY)
+#define KBD_LEFT BUTTON_LEFT
+#define KBD_RIGHT BUTTON_RIGHT
+#define KBD_UP BUTTON_UP
+#define KBD_DOWN BUTTON_DOWN
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
 
-/* TODO: Check keyboard.c button mappings - this is a copy of Ondio */
+#define KBD_MODES /* iPod uses 2 modes, picker and line edit */
+#define KBD_SELECT (BUTTON_SELECT | BUTTON_REL) /* backspace in line edit */
+#define KBD_SELECT_PRE BUTTON_SELECT
+#define KBD_DONE (BUTTON_SELECT | BUTTON_REPEAT)
+#define KBD_ABORT BUTTON_MENU
 
-#define KBD_MODES /* Ondio uses 2 modes, picker and line edit */
-#define KBD_SELECT (BUTTON_MENU | BUTTON_REL) /* backspace in line edit */
-#define KBD_SELECT_PRE BUTTON_MENU
-#define KBD_DONE (BUTTON_MENU | BUTTON_REPEAT)
-#define KBD_ABORT BUTTON_OFF
-
+#define KBD_LEFT BUTTON_PREV
+#define KBD_RIGHT BUTTON_NEXT
+#define KBD_UP BUTTON_SCROLL_BACK
+#define KBD_DOWN BUTTON_SCROLL_FWD
 
 #endif
 
@@ -252,8 +270,8 @@ int kbd_input(char* text, int buflen)
                 break;
 #endif
 
-            case BUTTON_RIGHT:
-            case BUTTON_RIGHT | BUTTON_REPEAT:
+            case KBD_RIGHT:
+            case KBD_RIGHT | BUTTON_REPEAT:
 #ifdef KBD_MODES
                 if (line_edit) /* right doubles as cursor_right in line_edit */
                 {
@@ -282,8 +300,8 @@ int kbd_input(char* text, int buflen)
                 }
                 break;
 
-            case BUTTON_LEFT:
-            case BUTTON_LEFT | BUTTON_REPEAT:
+            case KBD_LEFT:
+            case KBD_LEFT | BUTTON_REPEAT:
 #ifdef KBD_MODES
                 if (line_edit) /* left doubles as cursor_left in line_edit */
                 {
@@ -312,8 +330,8 @@ int kbd_input(char* text, int buflen)
                 }
                 break;
 
-            case BUTTON_DOWN:
-            case BUTTON_DOWN | BUTTON_REPEAT:
+            case KBD_DOWN:
+            case KBD_DOWN | BUTTON_REPEAT:
 #ifdef KBD_MODES
                 if (line_edit)
                 {
@@ -336,8 +354,8 @@ int kbd_input(char* text, int buflen)
                     kbd_spellchar(line[y][x]);
                 break;
 
-            case BUTTON_UP:
-            case BUTTON_UP | BUTTON_REPEAT:
+            case KBD_UP:
+            case KBD_UP | BUTTON_REPEAT:
 #ifdef KBD_MODES
                 if (line_edit)
                 {

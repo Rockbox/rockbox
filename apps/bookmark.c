@@ -473,7 +473,7 @@ bool bookmark_autoload(const char* file)
             switch(key)
             {
 #ifdef HAVE_LCD_BITMAP
-                case BUTTON_DOWN:
+                case BOOKMARK_DOWN:
                     return bookmark_load(global_bookmark_file_name, false);
 #endif
                 case SETTINGS_OK:
@@ -566,21 +566,6 @@ static int get_bookmark_count(const char* bookmark_file_name)
  
     
 }
-
-#if CONFIG_KEYPAD == ONDIO_PAD
-#define BOOKMARK_SELECT_PRE BUTTON_RIGHT
-#define BOOKMARK_SELECT (BUTTON_RIGHT | BUTTON_REL)
-#define BOOKMARK_DELETE (BUTTON_RIGHT | BUTTON_REPEAT)
-
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
- (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define BOOKMARK_SELECT BUTTON_SELECT
-#define BOOKMARK_DELETE (BUTTON_ON | BUTTON_SELECT)
-
-#else /* player, recorder, gmini */
-#define BOOKMARK_SELECT BUTTON_PLAY
-#define BOOKMARK_DELETE (BUTTON_ON | BUTTON_PLAY)
-#endif
 
 /* ----------------------------------------------------------------------- */
 /* This displays a the bookmarks in a file and allows the user to          */
