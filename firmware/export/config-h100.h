@@ -35,9 +35,6 @@
 
 /* Define this if you have an remote lcd */
 #define HAVE_REMOTE_LCD
-#ifndef SIMULATOR
-#define HAVE_REMOTE_LCD_TICKING
-#endif
 
 #define CONFIG_LCD LCD_S1D15E06
 
@@ -62,6 +59,9 @@
 
 /* Define this if you want to use coldfire's i2c interface */
 #define CONFIG_I2C I2C_COLDFIRE
+
+/* Define if we have a hardware defect that causes ticking on the audio line */
+#define HAVE_REMOTE_LCD_TICKING
 
 /* Type of mobile power */
 #define CONFIG_BATTERY BATT_LIPOL1300

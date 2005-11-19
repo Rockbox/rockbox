@@ -6,11 +6,6 @@
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 0
 
-/* define this if you have recording possibility */
-#ifndef SIMULATOR
-#define HAVE_RECORDING 1
-#endif
-
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP 1
 
@@ -33,9 +28,6 @@
 
 /* Define this if you have an remote lcd */
 #define HAVE_REMOTE_LCD
-#ifndef SIMULATOR
-#define HAVE_REMOTE_LCD_TICKING
-#endif
 
 #define CONFIG_LCD LCD_S1D15E06
 
@@ -64,6 +56,12 @@
 #define CONFIG_BATTERY BATT_LIPOL1300
 
 #define BATTERY_SCALE_FACTOR 16665 /* FIX: this value is picked at random */
+
+/* define this if you have recording possibility */
+#define HAVE_RECORDING 1
+
+/* Define if we have a hardware defect that causes ticking on the audio line */
+#define HAVE_REMOTE_LCD_TICKING
 
 /* Define this if the platform can charge batteries */
 #define HAVE_CHARGING 1
