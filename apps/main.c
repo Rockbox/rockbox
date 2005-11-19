@@ -99,6 +99,8 @@ void app_main(void)
 void init_dircache(void)
 {
     int font_w, font_h;
+    int result;
+    char buf[32];
     
     dircache_init();
     if (global_settings.dircache)
@@ -109,13 +111,24 @@ void init_dircache(void)
                     LCD_HEIGHT-font_h*3, str(LANG_DIRCACHE_BUILDING));
         lcd_update();
 
-        dircache_build(global_settings.dircache_size);
-
-        /* Clean the text when we are done. */
-        lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-        lcd_fillrect(0, LCD_HEIGHT-font_h*3, LCD_WIDTH, font_h);
-        lcd_set_drawmode(DRMODE_SOLID);
-        lcd_update();
+        result = dircache_build(global_settings.dircache_size);
+        if (result < 0)
+        {
+            snprintf(buf, sizeof(buf),
+                     "Failed! Result: %d",
+                     result);
+            lcd_getstringsize("A", &font_w, &font_h);
+            lcd_putsxy((LCD_WIDTH/2) - ((strlen(buf)*font_w)/2),
+                        LCD_HEIGHT-font_h*2, buf);
+        }
+        else
+        {
+            /* Clean the text when we are done. */
+            lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            lcd_fillrect(0, LCD_HEIGHT-font_h*3, LCD_WIDTH, font_h);
+            lcd_set_drawmode(DRMODE_SOLID);
+            lcd_update();
+        }
     }
 }
 #else

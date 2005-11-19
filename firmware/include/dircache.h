@@ -24,7 +24,7 @@
 #ifdef HAVE_DIRCACHE
 
 #define DIRCACHE_RESERVE  (1024*64)
-#define DIRCACHE_LIMIT    (1024*1024*2)
+#define DIRCACHE_LIMIT    (1024*1024*3)
 #define DIRCACHE_FILE     ROCKBOX_DIR "/dircache.dat"
 
 /* Internal structures. */
