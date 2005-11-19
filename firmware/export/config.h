@@ -76,6 +76,10 @@
 #define LCD_IPODCOLOR 6 /* as used by iPod Color/Photo */
 #define LCD_IPODNANO  7 /* as used by iPod Nano */
 
+/* LCD_PIXELFORMAT */
+#define RGB565 565
+#define RGB565SWAPPED 3553
+
 /* CONFIG_BACKLIGHT */
 #define BL_PA14_LO       0 /* Player, PA14 low active */
 #define BL_RTC           1 /* Recorder, RTC square wave output */

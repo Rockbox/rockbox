@@ -1,3 +1,8 @@
+/*
+ * This config file is for the Apple iPod Color/Photo
+ */
+#define APPLE_IPODCOLOR 1
+
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 3
 
@@ -14,6 +19,7 @@
 #define LCD_WIDTH  220
 #define LCD_HEIGHT 176
 #define LCD_DEPTH  16   /* 65536 colours */
+#define LCD_PIXELFORMAT RGB565SWAPPED /* rgb565 byte-swapped */
 
 #define CONFIG_KEYPAD IPOD_4G_PAD
 

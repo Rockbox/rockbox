@@ -146,7 +146,7 @@ typedef void lcd_blockfunc_type(unsigned char *address, unsigned mask, unsigned 
 #define _RGBPACK(r, g, b) ( ((((r) * 31 + 127) / 255) << 11) \
                            |((((g) * 63 + 127) / 255) << 5) \
                            | (((b) * 31 + 127) / 255))
-#if (CONFIG_LCD == LCD_IPODCOLOR) || (CONFIG_LCD == LCD_IPODNANO)
+#if (LCD_PIXELFORMAT == RGB565SWAPPED)
 #define LCD_RGBPACK(r, g, b) ( ((_RGBPACK((r), (g), (b)) & 0xff00) >> 8) \
                               |((_RGBPACK((r), (g), (b)) & 0x00ff) << 8))
 #else

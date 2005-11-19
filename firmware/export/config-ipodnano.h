@@ -1,3 +1,8 @@
+/*
+ * This config file is for the Apple iPod Nano
+ */
+#define APPLE_IPODNANO 1
+
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 4
 
@@ -14,6 +19,7 @@
 #define LCD_WIDTH  176
 #define LCD_HEIGHT 132
 #define LCD_DEPTH  16   /* 65536 colours */
+#define LCD_PIXELFORMAT RGB565SWAPPED /* rgb565 byte-swapped */
 
 #define CONFIG_KEYPAD IPOD_NANO_PAD
 
