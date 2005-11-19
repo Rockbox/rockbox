@@ -27,7 +27,7 @@
 #define CONFIG_CODEC SWCODEC
 
 /* Define this if you have a software controlled poweroff */
-#define HAVE_SW_POWEROFF
+//#define HAVE_SW_POWEROFF
 
 /* The number of bytes reserved for loadable codecs */
 #define CODEC_SIZE 0x80000

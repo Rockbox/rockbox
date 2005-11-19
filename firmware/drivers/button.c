@@ -246,6 +246,7 @@ void button_init(void)
 }
 
 #ifdef HAVE_LCD_BITMAP /* only bitmap displays can be flipped */
+#if (CONFIG_KEYPAD != IPOD_4G_PAD) && (CONFIG_KEYPAD != IPOD_4G_PAD)
 /*
  * helper function to swap UP/DOWN, LEFT/RIGHT (and F1/F3 for Recorder)
  */
@@ -278,6 +279,10 @@ static int button_flip(int button)
 
     return newbutton;
 }
+#else
+/* We don't flip the iPod's keypad yet*/
+#define button_flip(x) (x)
+#endif
 
 /*
  * set the flip attribute
