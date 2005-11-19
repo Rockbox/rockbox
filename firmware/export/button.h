@@ -146,14 +146,15 @@ bool remote_button_hold(void);
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
 
-/* TODO: Correct the IPOD definitions */
+/* TODO: These codes should relate to the hardware */
 
-#define  BUTTON_ON            0x0001
-#define  BUTTON_OFF           0x0002
-#define  BUTTON_PLAY          0x0004
-#define  BUTTON_UP            0x0010
-#define  BUTTON_DOWN          0x0020
-#define  BUTTON_MENU          0x0100
+#define  BUTTON_MENU          0x0001
+#define  BUTTON_PLAY          0x0002
+#define  BUTTON_NEXT          0x0004
+#define  BUTTON_PREV          0x0008
+#define  BUTTON_SELECT        0x0010
+#define  BUTTON_SCROLL_FWD    0x0020
+#define  BUTTON_SCROLL_BACK   0x0040
 
 #endif /* RECORDER/PLAYER/ONDIO/GMINI KEYPAD */
 
