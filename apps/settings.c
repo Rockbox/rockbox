@@ -277,7 +277,7 @@ static const struct bit_entry rtc_bits[] =
     {1, S_O(bidi_support), false, "bidi hebrew/arabic", off_on },
 #endif
 
-#ifdef HAVE_REMOTE_LCD /* move to REMOTE_LCD next time we bump version */
+#ifdef HAVE_REMOTE_LCD_TICKING /* move to REMOTE_LCD next time we bump version */
     {1, S_O(remote_reduce_ticking), false, "remote reduce ticking", off_on },
 #endif
 
@@ -854,7 +854,9 @@ void settings_apply(void)
     lcd_remote_set_contrast(global_settings.remote_contrast);
     lcd_remote_set_invert_display(global_settings.remote_invert);
     lcd_remote_set_flip(global_settings.remote_flip_display);
+#ifdef HAVE_REMOTE_LCD_TICKING
     lcd_remote_emireduce(global_settings.remote_reduce_ticking);
+#endif
     remote_backlight_set_timeout(global_settings.remote_backlight_timeout);
 #endif
     backlight_set_timeout(global_settings.backlight_timeout);

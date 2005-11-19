@@ -343,8 +343,10 @@ struct user_settings
     int remote_backlight_timeout;  /* backlight off timeout:  0-18 0=never,
                                1=always,
                                then according to timeout_values[] */
+#ifdef HAVE_REMOTE_LCD_TICKING    
     bool remote_reduce_ticking; /* 0=normal operation,
                                    1=EMI reduce on with cost more CPU. */
+#endif
 #endif
     
     bool next_folder; /* move to next folder */

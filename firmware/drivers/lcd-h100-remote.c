@@ -61,11 +61,15 @@
 #define RS_HI      or_l(0x00010000, &GPIO_OUT)
 
 /* delay loop */
+#ifdef HAVE_REMOTE_LCD_TICKING
 #define DELAY_DEFAULT   do { int _x = 0; for (_x = 0;_x < 2;_x++); } while (0)
 #define DELAY_EMIREDUCE do { int _x = cpu_frequency >> 21; while (_x--); } \
                             while (0)
 #define DELAY   do { if (emireduce) DELAY_EMIREDUCE; \
                     else DELAY_DEFAULT; } while (0)
+#else
+#define DELAY   do { int _x = 0; for (_x = 0;_x < 3;_x++); } while (0)
+#endif
 
 #define SCROLLABLE_LINES 13
 
@@ -81,8 +85,10 @@ static int curfont = FONT_SYSFIXED;
 #ifndef SIMULATOR
 static int xoffset; /* needed for flip */
 
+#ifdef HAVE_REMOTE_LCD_TICKING
 /* If set to true, will prevent "ticking" to headphones. */
 static bool emireduce = false;
+#endif
 
 /* remote hotplug */
 static int countdown;  /* for remote plugging debounce */
@@ -350,10 +356,12 @@ int lcd_remote_default_contrast(void)
 
 #ifndef SIMULATOR
 
+#ifdef HAVE_REMOTE_LCD_TICKING
 void lcd_remote_emireduce(bool state)
 {
     emireduce = state;
 }
+#endif
 
 void lcd_remote_powersave(bool on)
 {

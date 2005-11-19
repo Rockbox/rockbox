@@ -35,6 +35,9 @@
 
 /* Define this if you have an remote lcd */
 #define HAVE_REMOTE_LCD
+#ifndef SIMULATOR
+#define HAVE_REMOTE_LCD_TICKING
+#endif
 
 #define CONFIG_LCD LCD_S1D15E06
 

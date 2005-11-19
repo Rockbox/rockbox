@@ -121,6 +121,7 @@ static bool remote_flip_display(void)
     return rc;
 }
 
+#ifdef HAVE_REMOTE_LCD_TICKING
 static bool remote_reduce_ticking(void)
 {
     bool rc = set_bool( str(LANG_REDUCE_TICKING),
@@ -130,6 +131,7 @@ static bool remote_reduce_ticking(void)
 
     return rc;
 }
+#endif
 #endif
 
 #ifdef CONFIG_BACKLIGHT
@@ -1550,7 +1552,9 @@ static bool lcd_remote_settings_menu(void)
         { ID2P(LANG_CONTRAST),        remote_contrast },
         { ID2P(LANG_INVERT),          remote_invert },
         { ID2P(LANG_FLIP_DISPLAY),    remote_flip_display },
+#ifdef HAVE_REMOTE_LCD_TICKING
         { ID2P(LANG_REDUCE_TICKING),  remote_reduce_ticking },
+#endif
 };
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
