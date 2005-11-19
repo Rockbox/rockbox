@@ -210,13 +210,13 @@ void button_init(void)
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
     /* Set GPIO33, GPIO37, GPIO38  and GPIO52 as general purpose inputs */
     GPIO1_FUNCTION |= 0x00100062;
-    GPIO1_ENABLE &= ~0x00100062;
+    GPIO1_ENABLE &= ~0x00100060;
 #elif CONFIG_KEYPAD == IRIVER_H300_PAD
     /* Set GPIO9 and GPIO15 as general purpose inputs */
     GPIO_ENABLE &= ~0x00008200;
     GPIO_FUNCTION |= 0x00008200;
     /* Set GPIO33, GPIO37, GPIO38  and GPIO52 as general purpose inputs */
-    GPIO1_ENABLE &= ~0x00100062;
+    GPIO1_ENABLE &= ~0x00100060;
     GPIO1_FUNCTION |= 0x00100062;
 #elif CONFIG_KEYPAD == RECORDER_PAD
     /* Set PB4 and PB8 as input pins */

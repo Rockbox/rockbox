@@ -111,12 +111,20 @@ static const char scroll_tick_table[16] = {
 #ifndef SIMULATOR
 void lcd_remote_backlight_on(void)
 {
+#ifdef IRIVER_H300_SERIES
+    and_l(~0x00000002, &GPIO1_OUT);
+#else
     and_l(~0x00000800, &GPIO_OUT);
+#endif
 }
 
 void lcd_remote_backlight_off(void)
 {
+#ifdef IRIVER_H300_SERIES
+    or_l(0x00000002, &GPIO1_OUT);
+#else
     or_l(0x00000800, &GPIO_OUT);
+#endif
 }
 
 void lcd_remote_write_command(int cmd)
@@ -484,6 +492,16 @@ void lcd_remote_init(void)
 /* Initialise ports and kick off monitor */
 void lcd_remote_init(void)
 {
+#ifdef IRIVER_H300_SERIES
+    or_l(0x10010000, &GPIO_FUNCTION); /* GPIO16: RS
+                                         GPIO28: CLK */
+    
+    or_l(0x00040006, &GPIO1_FUNCTION); /* GPO33:  Backlight
+                                          GPIO34: CS
+                                          GPIO50: Data */
+    or_l(0x10010000, &GPIO_ENABLE);
+    or_l(0x00040006, &GPIO1_ENABLE);
+#else
     or_l(0x10010800, &GPIO_FUNCTION); /* GPIO11: Backlight
                                          GPIO16: RS
                                          GPIO28: CLK */
@@ -492,7 +510,7 @@ void lcd_remote_init(void)
                                           GPIO50: Data */
     or_l(0x10010800, &GPIO_ENABLE);
     or_l(0x00040004, &GPIO1_ENABLE);
-    
+#endif
     lcd_remote_clear_display();
 
     tick_add_task(remote_tick);
