@@ -87,7 +87,7 @@
 #define SPELLING_LENGTH 100
 
 struct token {
-    char kind;
+    signed char kind;
     char spelling[SPELLING_LENGTH + 3];
     long intvalue;
 };
