@@ -102,7 +102,7 @@ struct playlist_viewer {
 static struct playlist_viewer  viewer;
 
 /* Used when viewing playlists on disk */
-static struct playlist_info         temp_playlist;
+static struct playlist_info temp_playlist;
 
 void playlist_buffer_init(struct playlist_buffer * pb, char * names_buffer,
                           int names_buffer_size);
@@ -118,7 +118,8 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
                                  char* filename, bool reload);
 
 static void format_name(char* dest, const char* src);
-static void format_line(const struct playlist_entry* track, char* str, int len);
+static void format_line(const struct playlist_entry* track, char* str,
+                        int len);
 
 static bool update_playlist(bool force);
 static int  onplay_menu(int index);
@@ -136,6 +137,7 @@ void playlist_buffer_init(struct playlist_buffer * pb, char * names_buffer,
     pb->first_index=0;
     pb->num_loaded=0;
 }
+
 /*
  * Loads the entries following 'index' in the playlist buffer
  */
@@ -245,7 +247,7 @@ int playlist_buffer_get_index(struct playlist_buffer * pb, int index )
 
 #define distance(a, b) \
     a>b? (a) - (b) : (b) - (a)
-bool playlist_buffer_needs_reload(struct playlist_buffer * pb, int track_index)
+bool playlist_buffer_needs_reload(struct playlist_buffer* pb, int track_index)
 {
     if(pb->num_loaded==viewer.num_tracks)
         return(false);
@@ -331,7 +333,12 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
     viewer->move_track = -1;
 
     if (!reload)
-        viewer->selected_track = 0;
+    {
+        if (global_settings.browse_current && !viewer->playlist)
+            viewer->selected_track = playlist_get_display_index() - 1;
+        else
+            viewer->selected_track = 0;
+    }
 
     if (!update_playlist(true))
         return false;
@@ -369,7 +376,8 @@ static void format_name(char* dest, const char* src)
 }
 
 /* Format display line */
-static void format_line(const struct playlist_entry* track, char* str, int len)
+static void format_line(const struct playlist_entry* track, char* str,
+                        int len)
 {
     char name[MAX_PATH];
     char *skipped = "";
@@ -552,9 +560,6 @@ bool playlist_viewer(void)
     return playlist_viewer_ex(NULL);
 }
 
-
-
-
 char * playlist_callback_name(int selected_item, void * data, char *buffer)
 {
     struct playlist_viewer * local_viewer = (struct playlist_viewer *)data;
@@ -605,8 +610,6 @@ void playlist_callback_icons(int selected_item, void * data, ICON * icon)
 #endif
 }
 
-
-
 /* Main viewer function.  Filename identifies playlist to be viewed.  If NULL,
    view current playlist. */
 bool playlist_viewer_ex(char* filename)
@@ -620,7 +623,8 @@ bool playlist_viewer_ex(char* filename)
 
     gui_synclist_init(&playlist_lists, playlist_callback_name, &viewer);
     gui_synclist_set_icon_callback(&playlist_lists,
-                  global_settings.playlist_viewer_icons?&playlist_callback_icons:NULL);
+                  global_settings.playlist_viewer_icons?
+                  &playlist_callback_icons:NULL);
     gui_synclist_set_nb_items(&playlist_lists, viewer.num_tracks);
     gui_synclist_select_item(&playlist_lists, viewer.selected_track);
     gui_synclist_draw(&playlist_lists);
@@ -663,7 +667,8 @@ bool playlist_viewer_ex(char* filename)
         if( (list_action=gui_synclist_do_button(&playlist_lists, button))!=0 )
         {
             viewer.selected_track=gui_synclist_get_sel_pos(&playlist_lists);
-            if(playlist_buffer_needs_reload(&viewer.buffer, viewer.selected_track))
+            if(playlist_buffer_needs_reload(&viewer.buffer,
+                viewer.selected_track))
                 playlist_buffer_load_entries_screen(&viewer.buffer,
                     list_action==LIST_NEXT?
                         FORWARD
@@ -700,13 +705,16 @@ bool playlist_viewer_ex(char* filename)
                     && (lastbutton != TREE_RUN_PRE)))
                     break;
 #endif
-                struct playlist_entry * current_track=playlist_buffer_get_track(&viewer.buffer, viewer.selected_track);
+                struct playlist_entry * current_track =
+                    playlist_buffer_get_track(&viewer.buffer,
+                    viewer.selected_track);
                 if (viewer.move_track >= 0)
                 {
                     /* Move track */
                     int ret;
 
-                    ret = playlist_move(viewer.playlist, viewer.move_track, current_track->index);
+                    ret = playlist_move(viewer.playlist, viewer.move_track,
+                        current_track->index);
                     if (ret < 0)
                         gui_syncsplash(HZ, true, str(LANG_MOVE_FAILED));
 
