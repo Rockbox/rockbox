@@ -3454,3 +3454,10 @@ desc: Custom themes menu
 eng: "Browse Themes"
 voice: "Browse Themes"
 new:
+
+id: LANG_REDUCE_TICKING
+desc: in remote lcd settings menu
+eng: "Reduce ticking"
+voice: "Reduce ticking"
+new:
+

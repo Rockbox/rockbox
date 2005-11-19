@@ -277,6 +277,10 @@ static const struct bit_entry rtc_bits[] =
     {1, S_O(bidi_support), false, "bidi hebrew/arabic", off_on },
 #endif
 
+#ifdef HAVE_REMOTE_LCD /* move to REMOTE_LCD next time we bump version */
+    {1, S_O(remote_reduce_ticking), false, "remote reduce ticking", off_on },
+#endif
+
     /* new stuff to be added here */
     /* If values are just added to the end, no need to bump the version. */
 
