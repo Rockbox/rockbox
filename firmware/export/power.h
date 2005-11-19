@@ -35,12 +35,8 @@ void spdif_power_enable(bool on);
 #endif
 
 #ifdef CONFIG_TUNER
-/* status values */
-#define FMRADIO_OFF     0 /* switched off */
-#define FMRADIO_POWERED 1 /* left powered, but idle */
-#define FMRADIO_PLAYING 2 /* actively in use */
-extern void radio_set_status(int status);
-extern int radio_get_status(void);
+extern bool radio_power(bool status);
+extern bool radio_powered(void);
 #endif
 
 #endif

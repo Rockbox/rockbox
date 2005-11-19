@@ -19,11 +19,16 @@
 #ifndef RADIO_H
 #define RADIO_H
 
+#define FMRADIO_OFF     0
+#define FMRADIO_PLAYING 1
+#define FMRADIO_PAUSED  2
+
 #ifdef CONFIG_TUNER
 void radio_init(void);
 bool radio_screen(void);
 void radio_stop(void);
 bool radio_hardware_present(void);
+int  get_radio_status(void);
 
 struct fmstation
 {

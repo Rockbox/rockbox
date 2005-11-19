@@ -56,6 +56,7 @@
 #include "textarea.h"
 #include "splash.h"
 #include "yesno.h"
+#include "power.h"
 
 #ifdef CONFIG_TUNER
 
@@ -122,6 +123,8 @@ static int curr_preset = -1;
 static int curr_freq;
 static int radio_mode = RADIO_SCAN_MODE;
 
+static int radio_status = FMRADIO_OFF;
+
 #define MAX_PRESETS 64
 static bool presets_loaded = false;
 static struct fmstation presets[MAX_PRESETS];
@@ -172,21 +175,26 @@ void radio_init(void)
     radio_stop();
 }
 
+int get_radio_status(void)
+{
+    return radio_status;
+}
+
 void radio_stop(void)
 {
     radio_set(RADIO_MUTE, 1);
     radio_set(RADIO_SLEEP, 1); /* low power mode, if available */
-    radio_set_status(FMRADIO_OFF); /* status update, power off if avail. */
+    radio_status = FMRADIO_OFF;
+    radio_power(false); /* status update, power off if avail. */
 }
 
 bool radio_hardware_present(void)
 {
 #ifdef HAVE_TUNER_PWR_CTRL
     bool ret;
-    int fmstatus = radio_get_status(); /* get current state */
-    radio_set_status(FMRADIO_POWERED); /* power it up */
+    bool fmstatus = radio_power(true); /* power it up */
     ret = radio_get(RADIO_PRESENT);
-    radio_set_status(fmstatus); /* restore previous state */
+    radio_power(fmstatus); /* restore previous state */
     return ret;
 #else
     return radio_get(RADIO_PRESENT);
@@ -352,15 +360,16 @@ bool radio_screen(void)
 
     curr_freq = global_settings.last_frequency * FREQ_STEP + MIN_FREQ;
     
-    if(radio_get_status() == FMRADIO_OFF){
+    if(radio_status != FMRADIO_PLAYING){
+        radio_power(true);
         radio_set(RADIO_SLEEP, 0); /* wake up the tuner */
         radio_set(RADIO_FREQUENCY, curr_freq);
         radio_set(RADIO_IF_MEASUREMENT, 0);
         radio_set(RADIO_SENSITIVITY, 0);
         radio_set(RADIO_FORCE_MONO, global_settings.fm_force_mono);
         radio_set(RADIO_MUTE, 0);
+        radio_status = FMRADIO_PLAYING;
     }
-    radio_set_status(FMRADIO_PLAYING);
     
     curr_preset = find_preset(curr_freq);
 #ifdef FM_MODE
@@ -577,18 +586,18 @@ bool radio_screen(void)
                   )
                      break;
 #endif
-                if(radio_get_status() != FMRADIO_PLAYING)
+                if(radio_status != FMRADIO_PLAYING)
                 {
                      radio_set(RADIO_SLEEP, 0);
                      radio_set(RADIO_FREQUENCY, curr_freq);
                      radio_set(RADIO_MUTE, 0);
-                     radio_set_status(FMRADIO_PLAYING);
+                     radio_status = FMRADIO_PLAYING;
                 }
                 else
                 {
                      radio_set(RADIO_MUTE, 1);
                      radio_set(RADIO_SLEEP, 1);
-                     radio_set_status(FMRADIO_POWERED);
+                     radio_status = FMRADIO_PAUSED;
                 }
                 update_screen = true;
                 break;
@@ -848,7 +857,6 @@ bool radio_screen(void)
                                 sound_default(SOUND_RIGHT_GAIN), AUDIO_GAIN_LINEIN);
         mas_codec_writereg(6, 0x4000);
 #endif
-        radio_set_status(FMRADIO_POWERED); /* leave it powered */
     }
     else
     {
@@ -954,11 +962,13 @@ bool radio_add_preset(void)
             buf[27] = 0;
             strcpy(presets[num_presets].name, buf);
             presets[num_presets].frequency = curr_freq;
+#ifdef FM_PRESET_ADD  /* only for archos */         
             menu_insert(preset_menu, -1,
                         presets[num_presets].name, 0);
             /* We must still rebuild the menu table, since the
                item name pointers must be updated */
             rebuild_preset_menu();
+#endif 
             num_presets++;
             radio_save_presets();
         }
@@ -1183,11 +1193,10 @@ static bool toggle_mono_mode(void)
     return false;
 }
 
-
 static bool scan_presets(void)
 {
     bool tuned = false;
-    char buf[32];
+    char buf[27];
     int freq, i;
     char *lines[]={str(LANG_FM_CLEAR_PRESETS)};
     struct text_message message={lines, 1};
@@ -1202,7 +1211,7 @@ static bool scan_presets(void)
                 break;
 
             freq = curr_freq /100000;
-            snprintf(buf, 32, str(LANG_FM_SCANNING), freq/10, freq % 10);
+            snprintf(buf, 27, str(LANG_FM_SCANNING), freq/10, freq % 10);
             gui_syncsplash(0, true, buf);
 
             /* Tune in and delay */
@@ -1218,11 +1227,9 @@ static bool scan_presets(void)
 
             /* add preset */
             if(tuned){
-                 snprintf(buf, 32, str(LANG_FM_DEFAULT_PRESET_NAME),freq/10, freq % 10);
-                 strcpy(presets[num_presets].name, buf);
+                 snprintf(buf, 27, str(LANG_FM_DEFAULT_PRESET_NAME),freq/10, freq % 10);
+                 strcpy(presets[num_presets].name,buf);
                  presets[num_presets].frequency = curr_freq;
-                 menu_insert(preset_menu, -1,
-                             presets[num_presets].name, 0);
                  num_presets++;
             }
 
@@ -1230,13 +1237,15 @@ static bool scan_presets(void)
                    
         }
 
-        rebuild_preset_menu();
         radio_save_presets();
 
         if(num_presets > 0 ){
             curr_freq = presets[0].frequency;
             radio_set(RADIO_FREQUENCY, curr_freq);
             remember_frequency();
+#ifdef FM_MODE
+            radio_mode = RADIO_PRESET_MODE;
+#endif
         }
     }
     return true;

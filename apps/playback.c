@@ -61,7 +61,6 @@
 #include "talk.h"
 #ifdef CONFIG_TUNER
 #include "radio.h"
-#include "power.h"
 #endif
 #include "splash.h"
 
@@ -1707,7 +1706,7 @@ void audio_thread(void)
 
 #ifdef CONFIG_TUNER
                 /* check if radio is playing */
-                if (radio_get_status() != FMRADIO_OFF) {
+                if (get_radio_status() != FMRADIO_OFF) {
                     radio_stop();
                 }
 #endif

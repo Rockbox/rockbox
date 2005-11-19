@@ -34,11 +34,17 @@ bool charger_enabled;
 
 #ifdef CONFIG_TUNER
 
-static int fmstatus = 0;
+static bool powered = false;
 
-void radio_set_status(int status)
+bool radio_powered()
 {
-    fmstatus = status;
+    return powered;
+}
+
+bool radio_power(bool status)
+{
+    bool old_status = powered;
+    powered = status;
 #ifdef HAVE_TUNER_PWR_CTRL
     if (status)
     {
@@ -48,11 +54,7 @@ void radio_set_status(int status)
     else
         or_b(0x04, &PADRL); /* drive PA2 high for tuner disable */
 #endif
-}
-
-int radio_get_status(void)
-{
-    return fmstatus;
+    return old_status;
 }
 
 #endif /* #ifdef CONFIG_TUNER */
