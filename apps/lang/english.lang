@@ -3433,7 +3433,7 @@ new:
 
 id: LANG_WAIT
 desc: general please wait splash
-eng: "=== Please Wait ==="
+eng: "Loading..."
 voice: 
 new:
 
