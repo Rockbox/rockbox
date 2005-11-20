@@ -82,10 +82,10 @@ SECTIONS
 
   . = (DRAMORIG+16*1024*1024);
   .bss : {
-     _bssstart = .;
+     _edata = .;
      *(.bss);
      *(.ibss);
-     _bssend = . ;
+     _end = .;
    }
 }
 #else

@@ -34,17 +34,61 @@ start:
  * Copyright (c) 2005, Bernard Leach <leachbj@bouncycastle.org>
  *
  */
-    .equ    PP5002_PROC_ID,    0xc4000000
-    .equ    PP5002COP_CTRL, 0xcf004058
-    .equ    PP5020_PROC_ID,    0x60000000
+    .equ    PP5002_PROC_ID,  0xc4000000
+    .equ    PP5002_COP_CTRL, 0xcf004058
+    .equ    PP5020_PROC_ID,  0x60000000
     .equ    PP5020_COP_CTRL, 0x60007004
 
 start:
+#ifndef BOOTLOADER
+/* Zero out IBSS */
+    ldr    r2, =_iedata
+    ldr    r3, =_iend
+    mov    r4, #0
+1:
+    cmp    r3, r2
+    strhi  r4, [r2], #4
+    bhi    1b
+
+/* Copy the IRAM */
+    ldr    r2, =_iramcopy
+    ldr    r3, =_iramstart
+    ldr    r4, =_iramend
+1:
+    cmp    r4, r3
+    ldrhi  r5, [r2], #4
+    strhi  r5, [r3], #4
+    bhi    1b
+#endif
+
+    /* Initialise bss section to zero */
+    ldr    r2, =_edata
+    ldr    r3, =_end
+    mov    r4, #0
+1:
+    cmp    r3, r2
+    strhi  r4, [r2], #4
+    bhi    1b
+    
+    /* Set up some stack and munge it with 0xdeadbeef */
+    ldr    sp, =stackend
+    mov    r3, sp
+    ldr    r2, =stackbegin
+    ldr    r4, =0xdeadbeef
+1:
+    cmp    r3, r2
+    strhi  r4, [r2], #4
+    bhi    1b
+
+#ifdef BOOTLOADER
+    /* TODO: the high part of the address is probably dependent on CONFIG_CPU.
+       Since we tend to use ifdefs for each chipset target
+       anyway, we might as well just hardcode it here.
+     */
+       
     /* get the high part of our execute address */
     ldr    r0, =0xff000000
     and    r8, pc, r0             @ r8 is used later
-
-#ifdef BOOTLOADER
 
 #if CONFIG_CPU==PP5002
     mov    r0, #PP5002_PROC_ID
@@ -75,15 +119,6 @@ cop_wake_start:
     ldr    pc, [r0]
 
 1:
-    /* setup some stack and munge it with 0xdeadbeef */
-    ldr    sp, =_stackend
-    mov    r3, sp
-    ldr    r2, =_stackbegin
-    ldr    r4, =0xdeadbeef
-.mungeloop:
-    str    r4, [r2], #4
-    cmp    r2, r3
-    bne    .mungeloop
     
     /* get the high part of our execute address */
     ldr    r2, =0xffffff00
@@ -103,15 +138,6 @@ cop_wake_start:
     ldr    pc, =start_loc    /* jump to the relocated start_loc:  */
     
 start_loc:
-    /* Initialise bss section to zero */
-    ldr    r3, =_bssstart
-    ldr    r1, =_bssend
-    mov    r2, #0x0
-
-1:
-    cmp    r3, r1
-    strcc  r2, [r3], #4
-    bcc    1b
 
     /* execute the loader - this will load an image to 0x10000000 */
     bl     main
@@ -158,8 +184,9 @@ boot_table:
     /* here comes the boot table, don't move its offset */
     .space 400
 #else
-    /* TODO: Implement startup code */
-
+    /* Non-bootloader startup code */
+    ldr    r0, =main
+    mov    pc, r0 
 #endif /* BOOTLOADER (iPod) */
 
 #elif CONFIG_CPU == TCC730
