@@ -220,9 +220,13 @@ int load_rockbox(unsigned char* buf)
     int i;
     char str[80];
     
-    fd = open("/rockbox.ipod", O_RDONLY);
+    fd = open("/.rockbox/" BOOTFILE, O_RDONLY);
     if(fd < 0)
-        return -1;
+    {
+        fd = open("/" BOOTFILE, O_RDONLY);
+        if(fd < 0)
+            return -1;
+    }
 
     len = filesize(fd) - 8;
 
@@ -399,7 +403,7 @@ void* main(void)
     /* Check for a keypress */
     i=key_pressed();
 
-    if (i==BUTTON_MENU) {
+    if ((i!=BUTTON_MENU) && (i!=BUTTON_PLAY)) {
         lcd_puts(0, line, "Loading Rockbox...");
         lcd_update();
         rc=load_rockbox(loadbuffer);
@@ -410,11 +414,8 @@ void* main(void)
         } else {
             lcd_puts(0, line++, "Rockbox loaded.");
             lcd_update();
-#if 0
-            /* Rockbox is not yet runable, so we disable this */
             memcpy((void*)DRAM_START,loadbuffer,rc);
             return (void*)DRAM_START;
-#endif
         }
     }
 
@@ -438,7 +439,7 @@ void* main(void)
     lcd_update();
 
     /* Pause for 5 seconds so we can see what's happened */
-    usleep(5000000);
+//    usleep(5000000);
 
     entry = tblp->addr + tblp->entryOffset;
     if (imageno || ((int)tblp->addr & 0xffffff) != 0) {
