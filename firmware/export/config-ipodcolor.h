@@ -88,7 +88,7 @@
 /* Define this if you have adjustable CPU frequency */
 //#define HAVE_ADJUSTABLE_CPU_FREQ
 
-#define BOOTFILE_EXT "ipodcolor"
+#define BOOTFILE_EXT "ipod"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 
 #endif
