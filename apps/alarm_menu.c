@@ -25,14 +25,12 @@
 #include "options.h"
 
 #include "lcd.h"
-#include "font.h"
 #include "button.h"
 #include "kernel.h"
 #include "sprintf.h"
 #include <string.h>
 #include "settings.h"
 #include "power.h"
-#include "status.h"
 #include "icons.h"
 #include "rtc.h"
 #include "misc.h"
@@ -44,6 +42,8 @@
 #include "backlight.h"
 
 #include "splash.h"
+#include "statusbar.h"
+#include "textarea.h"
 #define MARGIN_Y (global_settings.statusbar ? STATUSBAR_HEIGHT : 0)
 
 bool alarm_screen(void)
@@ -54,6 +54,7 @@ bool alarm_screen(void)
     struct tm *tm;
     int togo;
     int button;
+    int i;
     bool update = true;
 
     rtc_get_alarm(&h, &m);
@@ -69,20 +70,22 @@ bool alarm_screen(void)
     while(!done) {
         if(update)
         {
-            lcd_clear_display();
-            status_draw(true);
-            lcd_setfont(FONT_SYSFIXED);
-            lcd_setmargins(0, MARGIN_Y);
-            lcd_puts(0, 3, str(LANG_ALARM_MOD_KEYS));
+            FOR_NB_SCREENS(i)
+            {
+                gui_textarea_clear(&screens[i]);
+                screens[i].puts(0, 3, str(LANG_ALARM_MOD_KEYS));
+            }
             update = false;
         }
-        
-        snprintf(buf, 32, str(LANG_ALARM_MOD_TIME), h, m);
-        lcd_puts(0, 1, buf);
-        lcd_update();
 
+        snprintf(buf, 32, str(LANG_ALARM_MOD_TIME), h, m);
+        FOR_NB_SCREENS(i)
+        {
+            screens[i].puts(0, 1, buf);
+            gui_textarea_update(&screens[i]);
+        }
         button = button_get_w_tmo(HZ);
-        
+
         switch(button) {
         case BUTTON_PLAY:
             /* prevent that an alarm occurs in the shutdown procedure */
@@ -95,7 +98,7 @@ bool alarm_screen(void)
                 rtc_enable_alarm(true);
                 gui_syncsplash(HZ*2, true, str(LANG_ALARM_MOD_TIME_TO_GO),
                        togo / 60, togo % 60);
-		done = true;
+                done = true;
             } else {
                 gui_syncsplash(HZ, true, str(LANG_ALARM_MOD_ERROR));
                 update = true;
@@ -125,9 +128,9 @@ bool alarm_screen(void)
              if (h == -1)
                  h = 23;
              break;
-            
+
 #if CONFIG_KEYPAD == RECORDER_PAD
-         /* inc(h) */            
+         /* inc(h) */
          case BUTTON_UP:
          case BUTTON_UP | BUTTON_REPEAT:
              h = (h+1) % 24;
@@ -152,7 +155,7 @@ bool alarm_screen(void)
             break;
 
         case BUTTON_NONE:
-            status_draw(false);
+            gui_syncstatusbar_draw(&statusbars, false);
             break;
 
         default:

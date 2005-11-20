@@ -56,6 +56,7 @@ static void splash(struct screen * screen,
 #ifdef HAVE_LCD_CHARCELLS
     screen->double_height (false);
 #endif
+    screen->stop_scroll();
     vsnprintf( splash_buf, sizeof(splash_buf), fmt, ap );
 
     if(center) {

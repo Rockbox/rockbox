@@ -74,9 +74,7 @@ enum icons_7x8 {
 extern const unsigned char bitmap_icons_5x8[1][5];
 extern const unsigned char bitmap_icons_6x8[LastIcon][6];
 extern const unsigned char bitmap_icons_7x8[Icon_Last][7];
-#if CONFIG_LED == LED_VIRTUAL
 extern const unsigned char bitmap_icon_disk[];
-#endif
 
 #if  LCD_WIDTH == 112 || LCD_WIDTH == 128 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_WIDTH == 128)
 extern const unsigned char rockbox112x37[];

@@ -45,7 +45,7 @@
 #include "icons.h"
 #include "screens.h"
 #include "peakmeter.h"
-#include "status.h"
+#include "statusbar.h"
 #include "menu.h"
 #include "sound_menu.h"
 #include "timefuncs.h"
@@ -831,7 +831,7 @@ bool recording_screen(void)
                 lcd_puts(0, 6, buf);
             }
 
-            status_draw(true);
+            gui_syncstatusbar_draw(&statusbars, true);
             peak_meter_draw(0, 8 + h*2, LCD_WIDTH, h);
 
             lcd_update();
@@ -860,7 +860,7 @@ bool recording_screen(void)
     if (audio_stat & AUDIO_STATUS_ERROR)
     {
         gui_syncsplash(0, true, str(LANG_DISK_FULL));
-        status_draw(true);
+        gui_syncstatusbar_draw(&statusbars, true);
         lcd_update();
         audio_error_clear();
 

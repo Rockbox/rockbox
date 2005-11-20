@@ -52,27 +52,14 @@ void status_set_ffmode(enum playmode mode);
 enum playmode status_get_ffmode(void);
 int current_playmode(void);
 
-#ifdef HAVE_LCD_BITMAP
-bool statusbar(bool state);
-#if CONFIG_KEYPAD == RECORDER_PAD
-void buttonbar_set(const char* caption1, const char* caption2,
-                   const char* caption3);
-void buttonbar_unset(void);
-bool buttonbar_isset(void);
-void buttonbar_draw(void);
-#define BUTTONBAR_HEIGHT 8
-#endif /* CONFIG_KEYPAD == RECORDER_PAD */
-#endif /* HAVE_LCD_BITMAP */
-void status_draw(bool force_redraw);
-
-#if defined(HAVE_LCD_CHARCELLS)
+#ifdef SIMULATOR
+#include <time.h>
+#endif
+#ifdef HAVE_LCD_CHARCELLS
 void status_set_record(bool b);
 void status_set_audio(bool b);
 void status_set_param(bool b);
 void status_set_usb(bool b);
-#endif
+#endif /* HAVE_LCD_CHARCELLS */
 
-#ifdef SIMULATOR
-#include <time.h>
-#endif
-#endif
+#endif /* _STATUS_H */

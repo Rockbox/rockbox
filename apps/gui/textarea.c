@@ -18,6 +18,7 @@
  ****************************************************************************/
 
 #include "textarea.h"
+#include "font.h"
 
 void gui_textarea_clear(struct screen * display)
 {
@@ -27,6 +28,7 @@ void gui_textarea_clear(struct screen * display)
     screen_clear_area(display, 0, y_start, display->width, y_end - y_start);
     display->stop_scroll();
     screen_set_ymargin(display, y_start);
+    display->setfont(FONT_SYSFIXED);
 #else
     display->clear_display();
 #endif
@@ -48,7 +50,7 @@ int gui_textarea_put_message(struct screen * display,
     int i;
     gui_textarea_clear(display);
     for(i=0;i<message->nb_lines && i+ystart<display->nb_lines;i++)
-        display->puts(0, i+ystart, message->message_lines[i]);
+        display->puts_scroll(0, i+ystart, message->message_lines[i]);
     gui_textarea_update(display);
     return(i);
 }

@@ -26,7 +26,7 @@
 #include "button.h"
 #include "mp3_playback.h"
 #include "settings.h"
-#include "status.h"
+#include "statusbar.h"
 #include "screens.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
@@ -575,7 +575,7 @@ bool rectrigger(void)
         lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
         lcd_fillrect(0, stat_height, LCD_WIDTH, LCD_HEIGHT - stat_height);
         lcd_set_drawmode(DRMODE_SOLID);
-        status_draw(true);
+        gui_syncstatusbar_draw(&statusbars, true);
 
         /* reselect FONT_SYSFONT as status_draw has changed the font */
         /*lcd_setfont(FONT_SYSFIXED);*/

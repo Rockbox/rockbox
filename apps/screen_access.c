@@ -38,6 +38,8 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
 #ifdef HAVE_REMOTE_LCD
         case SCREEN_REMOTE:
             screen->depth=LCD_REMOTE_DEPTH;
+            screen->has_disk_led=false;
+
 #if 1 /* all remote LCDs are bitmapped so far */
             screen->width=LCD_REMOTE_WIDTH;
             screen->height=LCD_REMOTE_HEIGHT;
@@ -87,13 +89,17 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->clear_display=&lcd_remote_clear_display;
             screen->update=&lcd_remote_update;
             screen->puts=&lcd_remote_puts;
-
             break;
 #endif /* HAVE_REMOTE_LCD */
 
         case SCREEN_MAIN:
         default:
             screen->depth=LCD_DEPTH;
+#if CONFIG_LED == LED_VIRTUAL
+            screen->has_disk_led=false;
+#else
+            screen->has_disk_led=true;
+#endif
 #ifdef HAVE_LCD_BITMAP
             screen->width=LCD_WIDTH;
             screen->height=LCD_HEIGHT;

@@ -42,9 +42,8 @@ struct status_info {
     bool keylock;
     bool battery_safe;
     bool redraw_volume; /* true if the volume gauge needs updating */
-#if CONFIG_LED == LED_VIRTUAL
     bool led; /* disk LED simulation in the status bar */
-#endif
+
 #ifdef HAVE_USB_POWER
     bool usb_power;
 #endif
@@ -100,9 +99,8 @@ void gui_statusbar_icon_play_state(struct screen * display, int state);
 void gui_statusbar_icon_play_mode(struct screen * display, int mode);
 void gui_statusbar_icon_shuffle(struct screen * display);
 void gui_statusbar_icon_lock(struct screen * display);
-#if CONFIG_LED == LED_VIRTUAL
 void gui_statusbar_led(struct screen * display);
-#endif
+
 
 #ifdef HAVE_RTC
 void gui_statusbar_time(struct screen * display, int hour, int minute);

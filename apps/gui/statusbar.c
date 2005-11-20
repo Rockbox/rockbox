@@ -107,17 +107,17 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 #ifdef HAVE_LCD_BITMAP
     if(!global_settings.statusbar)
        return;
-#endif
+#endif /* HAVE_LCD_BITMAP */
 
     struct screen * display = bar->display;
 
 #ifdef HAVE_RTC
     struct tm* tm; /* For Time */
-#endif
+#endif /* HAVE_RTC */
 
 #ifdef HAVE_LCD_CHARCELLS
     (void)force_redraw; /* players always "redraw" */
-#endif
+#endif /* HAVE_LCD_CHARCELLS */
 
     bar->info.volume = sound_val2phys(SOUND_VOLUME, global_settings.volume);
     bar->info.inserted = charger_inserted();
@@ -129,22 +129,22 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
     tm = get_time();
     bar->info.hour = tm->tm_hour;
     bar->info.minute = tm->tm_min;
-#endif
+#endif /* HAVE_RTC */
 
     bar->info.shuffle = global_settings.playlist_shuffle;
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
     bar->info.keylock = button_hold();
 #else
     bar->info.keylock = keys_locked;
-#endif
+#endif /* CONFIG_KEYPAD == IRIVER_H100_PAD */
     bar->info.repeat = global_settings.repeat_mode;
     bar->info.playmode = current_playmode();
-#if CONFIG_LED == LED_VIRTUAL
-    bar->info.led = led_read(HZ/2); /* delay should match polling interval */
-#endif
+    if(!display->has_disk_led)
+        bar->info.led = led_read(HZ/2); /* delay should match polling interval */
+
 #ifdef HAVE_USB_POWER
     bar->info.usb_power = usb_powered();
-#endif
+#endif /* HAVE_USB_POWER */
 
     /* only redraw if forced to, or info has changed */
     if (force_redraw ||
@@ -161,7 +161,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 
     /* players always "redraw" */
     {
-#endif
+#endif /* HAVE_LCD_BITMAP */
 
 #ifdef HAVE_CHARGING
         if (bar->info.inserted) {
@@ -220,7 +220,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
                                  STATUSBAR_PLUG_X_POS,
                                  STATUSBAR_Y_POS, STATUSBAR_PLUG_WIDTH,
                                  STATUSBAR_HEIGHT);
-#endif
+#endif /* HAVE_USB_POWER */
 
         bar->info.redraw_volume = gui_statusbar_icon_volume(bar,
                                                 bar->info.volume);
@@ -232,7 +232,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
             case REPEAT_AB:
                 gui_statusbar_icon_play_mode(display, Icon_RepeatAB);
                 break;
-#endif
+#endif /* AB_REPEAT_ENABLE */
 
             case REPEAT_ONE:
                 gui_statusbar_icon_play_mode(display, Icon_RepeatOne);
@@ -249,14 +249,12 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
             gui_statusbar_icon_lock(display);
 #ifdef HAVE_RTC
         gui_statusbar_time(display, bar->info.hour, bar->info.minute);
-#endif
-#if CONFIG_LED == LED_VIRTUAL
-        if (bar->info.led)
-            statusbar_led();
-#endif
+#endif /* HAVE_RTC */
+        if(!display->has_disk_led && bar->info.led)
+            gui_statusbar_led(display);
         display->update_rect(0, 0, display->width, STATUSBAR_HEIGHT);
         bar->lastinfo = bar->info;
-#endif
+#endif /* HAVE_LCD_BITMAP */
     }
 
 
@@ -284,7 +282,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
     display->icon(ICON_AUDIO, audio);
     display->icon(ICON_PARAM, param);
     display->icon(ICON_USB, usb);
-#endif
+#endif /* HAVE_LCD_CHARCELLS */
 }
 
 #ifdef HAVE_LCD_BITMAP
@@ -448,7 +446,6 @@ void gui_statusbar_icon_lock(struct screen * display)
                     STATUSBAR_Y_POS, 5, 8);
 }
 
-#if CONFIG_LED == LED_VIRTUAL
 /*
  * no real LED: disk activity in status bar
  */
@@ -459,8 +456,6 @@ void gui_statusbar_led(struct screen * display)
                          STATUSBAR_Y_POS, STATUSBAR_DISK_WIDTH,
                          STATUSBAR_HEIGHT);
 }
-#endif
-
 
 #ifdef HAVE_RTC
 /*

@@ -49,6 +49,8 @@
 #include "misc.h"
 #include "abrepeat.h"
 #include "splash.h"
+#include "yesno.h"
+
 #define MAX_BOOKMARKS 10
 #define MAX_BOOKMARK_SIZE  350
 #define RECENT_BOOKMARK_FILE ROCKBOX_DIR "/most-recent.bmark"
@@ -189,10 +191,6 @@ bool bookmark_mrb_load()
 /* ----------------------------------------------------------------------- */
 bool bookmark_autobookmark(void)
 {
-    /* prompts the user as to create a bookmark */
-    bool done = false;
-    int  key = 0;
-
     if (!system_check())
         return false;
 
@@ -208,42 +206,23 @@ bool bookmark_autobookmark(void)
         case BOOKMARK_RECENT_ONLY_YES:
             return write_bookmark(false);
     }
-
-    /* Prompting user to confirm bookmark creation */
-    lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
-    lcd_setmargins(0, STATUSBAR_HEIGHT);
-    lcd_puts(0,0, str(LANG_AUTO_BOOKMARK_QUERY));
-    lcd_puts(0,1, str(LANG_CONFIRM_WITH_PLAY_RECORDER));
-    lcd_puts(0,2, str(LANG_CANCEL_WITH_ANY_RECORDER));
+    char *lines[]={str(LANG_AUTO_BOOKMARK_QUERY),
+                   str(LANG_CONFIRM_WITH_PLAY_RECORDER),
+                   str(LANG_CANCEL_WITH_ANY_RECORDER)};
+    struct text_message message={lines, 3};
 #else
-    status_draw(false);
-    lcd_puts(0,0, str(LANG_AUTO_BOOKMARK_QUERY));
-    lcd_puts(0,1,str(LANG_RESUME_CONFIRM_PLAYER));
+    char *lines[]={str(LANG_AUTO_BOOKMARK_QUERY),
+                   str(LANG_RESUME_CONFIRM_PLAYER)};
+    struct text_message message={lines, 2};
 #endif
-    lcd_update();
-
-    while (!done)
+    gui_syncstatusbar_draw(&statusbars, false);
+    if(gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
     {
-        /* Wait for a key to be pushed */
-        key = button_get(true);
-        switch (key)
-        {
-            case SETTINGS_OK:
-                if (global_settings.autocreatebookmark ==
-                    BOOKMARK_RECENT_ONLY_ASK)
-                    return write_bookmark(false);
-                else
-                    return write_bookmark(true);
-                break;
-
-            default:
-                /* Handle sys events, ignore button releases & repeats */
-                if(default_event_handler(key) || 
-                   !(key & (BUTTON_REL|BUTTON_REPEAT)))
-                    done = true;
-                break;
-        }
+        if (global_settings.autocreatebookmark == BOOKMARK_RECENT_ONLY_ASK)
+            return write_bookmark(false);
+        else
+            return write_bookmark(true);
     }
     return false;
 }
@@ -434,7 +413,6 @@ bool bookmark_autoload(const char* file)
     {
         return false;
     }
-
     fd = open(global_bookmark_file_name, O_RDONLY);
     if(fd<0)
         return false;
@@ -444,7 +422,6 @@ bool bookmark_autoload(const char* file)
         return false;
     }
     close(fd);
-
     if(global_settings.autoloadbookmark == BOOKMARK_YES)
     {
         return bookmark_load(global_bookmark_file_name, true);
@@ -453,6 +430,7 @@ bool bookmark_autoload(const char* file)
     {
         /* Prompting user to confirm bookmark load */
         lcd_clear_display();
+        gui_syncstatusbar_draw(&statusbars, false);
 #ifdef HAVE_LCD_BITMAP
         lcd_setmargins(0, STATUSBAR_HEIGHT);
         lcd_puts_scroll(0,0, str(LANG_BOOKMARK_AUTOLOAD_QUERY));
@@ -460,7 +438,6 @@ bool bookmark_autoload(const char* file)
         lcd_puts(0,2, str(LANG_BOOKMARK_SELECT_LIST_BOOKMARKS));
         lcd_puts(0,3, str(LANG_CANCEL_WITH_ANY_RECORDER));
 #else
-        status_draw(false);
         lcd_puts_scroll(0,0, str(LANG_BOOKMARK_AUTOLOAD_QUERY));
         lcd_puts(0,1,str(LANG_RESUME_CONFIRM_PLAYER));
 #endif
@@ -857,7 +834,7 @@ static void display_bookmark(const char* bookmark,
              global_filename);
     }
 
-    status_draw(false);
+    gui_syncstatusbar_draw(&statusbars, false);
     lcd_puts_scroll(0,0,global_temp_buffer);
     lcd_puts(0,1,str(LANG_RESUME_CONFIRM_PLAYER));
     if (dot)

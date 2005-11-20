@@ -54,6 +54,7 @@ struct screen
     int depth;
     int char_width;
     int char_height;
+    bool has_disk_led;
 #ifdef HAS_BUTTONBAR
     bool has_buttonbar;
 #endif

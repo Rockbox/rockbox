@@ -39,7 +39,7 @@
 #include "tree.h"
 #include "buffer.h"
 #include "settings.h"
-#include "status.h"
+#include "statusbar.h"
 #include "playlist_viewer.h"
 #include "talk.h"
 #include "onplay.h"
@@ -220,7 +220,7 @@ static bool add_to_playlist(int position, bool queue)
         if (global_settings.playlist_shuffle)
             playlist_shuffle(current_tick, -1);
         playlist_start(0,0);
-        status_draw(false);
+        gui_syncstatusbar_draw(&statusbars, false);
         onplay_result = ONPLAY_START_PLAY;
     }
 

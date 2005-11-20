@@ -26,7 +26,7 @@
 #include <string.h>
 #include "lcd-player-charset.h"
 #include "settings.h"
-#include "status.h"
+#include "statusbar.h"
 #include "talk.h"
 #include "misc.h"
 
@@ -153,7 +153,7 @@ int kbd_input(char* text, int buflen)
             lcd_puts(1, 1, temptext);
             lcd_put_cursor(curpos + 1, 1, KEYBOARD_CURSOR);
             
-            status_draw(true);
+            gui_syncstatusbar_draw(&statusbars, true);
         }
 
         /* The default action is to redraw */
@@ -251,7 +251,7 @@ int kbd_input(char* text, int buflen)
                 break;
 
             case BUTTON_NONE:
-                status_draw(false);
+                gui_syncstatusbar_draw(&statusbars, false);
                 redraw = false;
                 break;
 

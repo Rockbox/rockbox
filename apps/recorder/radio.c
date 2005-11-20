@@ -56,6 +56,7 @@
 #include "textarea.h"
 #include "splash.h"
 #include "yesno.h"
+#include "buttonbar.h"
 #include "power.h"
 
 #ifdef CONFIG_TUNER
@@ -298,9 +299,13 @@ bool radio_screen(void)
     int hours, minutes;
     bool keep_playing = false;
     bool statusbar = global_settings.statusbar;
+#ifdef HAS_BUTTONBAR
+    struct gui_buttonbar buttonbar;
+    gui_buttonbar_init(&buttonbar);
+    gui_buttonbar_set_display(&buttonbar, &(screens[SCREEN_MAIN]) );
+#endif
     /* always display status bar in radio screen for now */
     global_settings.statusbar = true;
-
     FOR_NB_SCREENS(i){
         gui_textarea_clear(&screens[i]);
         screen_set_xmargin(&screens[i],0);
@@ -377,8 +382,8 @@ bool radio_screen(void)
          radio_mode = RADIO_PRESET_MODE;
 #endif
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-    buttonbar_set(str(LANG_BUTTONBAR_MENU), str(LANG_FM_BUTTONBAR_PRESETS),
+#ifdef HAS_BUTTONBAR
+    gui_buttonbar_set(&buttonbar, str(LANG_BUTTONBAR_MENU), str(LANG_FM_BUTTONBAR_PRESETS),
                   str(LANG_FM_BUTTONBAR_RECORD));
 #endif
 
@@ -613,10 +618,10 @@ bool radio_screen(void)
                     gui_textarea_clear(&screens[i]);
                     screen_set_xmargin(&screens[i],0);
                 }
-#if CONFIG_KEYPAD == RECORDER_PAD
-                buttonbar_set(str(LANG_BUTTONBAR_MENU),
-                              str(LANG_FM_BUTTONBAR_PRESETS),
-                              str(LANG_FM_BUTTONBAR_RECORD));
+#ifdef HAS_BUTTONBAR
+                gui_buttonbar_set(&buttonbar, str(LANG_BUTTONBAR_MENU),
+                                  str(LANG_FM_BUTTONBAR_PRESETS),
+                                  str(LANG_FM_BUTTONBAR_RECORD));
 #endif
                 update_screen = true;
                 break;
@@ -646,10 +651,11 @@ bool radio_screen(void)
                     gui_textarea_clear(&screens[i]);
                     screen_set_xmargin(&screens[i],0);
                 }
-#if CONFIG_KEYPAD == RECORDER_PAD
-                buttonbar_set(str(LANG_BUTTONBAR_MENU),
-                              str(LANG_FM_BUTTONBAR_PRESETS),
-                              str(LANG_FM_BUTTONBAR_RECORD));
+#ifdef HAS_BUTTONBAR
+                gui_buttonbar_set(&buttonbar,
+                                  str(LANG_BUTTONBAR_MENU),
+                                  str(LANG_FM_BUTTONBAR_PRESETS),
+                                  str(LANG_FM_BUTTONBAR_RECORD));
 #endif
                 update_screen = true;
                 break;
@@ -807,16 +813,16 @@ bool radio_screen(void)
                             screens[i].puts_scroll(0, top_of_screen + 4, buf);
                     }
                 }
-                
-#if CONFIG_KEYPAD == RECORDER_PAD
-                buttonbar_draw();
-#endif                
+
+#if HAS_BUTTONBAR
+                gui_buttonbar_draw(&buttonbar);
+#endif
                 FOR_NB_SCREENS(i)
                     gui_textarea_update(&screens[i]);
             }
             /* Only force the redraw if update_screen is true */
             gui_syncstatusbar_draw(&statusbars,true);
-                
+
             update_screen = false;
         }
 

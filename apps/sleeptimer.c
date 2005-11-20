@@ -28,7 +28,7 @@
 #include "settings.h"
 #include "power.h"
 #include "powermgmt.h"
-#include "status.h"
+#include "statusbar.h"
 #include "debug.h"
 #include "talk.h"
 #include "icons.h"
@@ -155,7 +155,7 @@ bool sleeptimer_screen(void)
             }
         }
 
-        status_draw(true);
+        gui_syncstatusbar_draw(&statusbars, true);
 
         lcd_update();
     }

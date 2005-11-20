@@ -23,8 +23,6 @@
 #include <stdbool.h>
 
 extern void led( bool on );
-#if CONFIG_LED == LED_VIRTUAL
-extern bool led_read(int delayticks); /* read for status bar */
-#endif
+extern bool led_read(int delayticks);
 
 #endif

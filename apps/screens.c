@@ -48,6 +48,8 @@
 #include "abrepeat.h"
 #include "gwps-common.h"
 #include "splash.h"
+#include "statusbar.h"
+
 #if defined(HAVE_LCD_BITMAP)
 #include "widgets.h"
 #endif
@@ -108,7 +110,7 @@ void usb_display_info(void)
     lcd_mono_bitmap(usb_logo, LCD_WIDTH/2-BMPWIDTH_usb_logo/2,
                     LCD_HEIGHT/2-BMPHEIGHT_usb_logo/2, BMPWIDTH_usb_logo,
                     BMPHEIGHT_usb_logo);
-    status_draw(true);
+    gui_syncstatusbar_draw(&statusbars, true);
     lcd_update();
 #else
     lcd_double_height(false);
@@ -116,7 +118,7 @@ void usb_display_info(void)
     status_set_param(false);
     status_set_audio(false);
     status_set_usb(true);
-    status_draw(false);
+    gui_syncstatusbar_draw(&statusbars, false);
 #endif
 }
 
@@ -138,7 +140,7 @@ void usb_screen(void)
 
 #endif
 
-            status_draw(false);
+            gui_syncstatusbar_draw(&statusbars, false);
         }
     }
 #ifdef HAVE_LCD_CHARCELLS
@@ -358,7 +360,7 @@ int charging_screen(void)
     remote_backlight_set_timeout(global_settings.remote_backlight_timeout);
 #endif
     backlight_set_on_when_charging(global_settings.backlight_on_when_charging);
-    status_draw(true);
+    gui_syncstatusbar_draw(&statusbars, true);
 
 #ifdef HAVE_LCD_CHARCELLS
     logo_lock_patterns(true);
@@ -367,7 +369,7 @@ int charging_screen(void)
 
     do
     {
-        status_draw(false);
+        gui_syncstatusbar_draw(&statusbars, false);
         charging_display_info(true);
         button = button_get_w_tmo(HZ/3);
         if (button == BUTTON_ON)
@@ -990,7 +992,7 @@ bool set_time_screen(const char* string, struct tm *tm)
         lcd_puts(0, 4, str(LANG_TIME_SET));
         lcd_puts(0, 5, str(LANG_TIME_REVERT));
 #ifdef HAVE_LCD_BITMAP
-        status_draw(true);
+        gui_syncstatusbar_draw(&statusbars, true);
 #endif
         lcd_update();
 
@@ -1186,7 +1188,7 @@ bool browse_id3(void)
         char* body;
 
         lcd_clear_display();
-        status_draw(true);
+        gui_syncstatusbar_draw(&statusbars, true);
         line = draw_id3_item(line, top, LANG_ID3_TITLE,  id3->title);
         line = draw_id3_item(line, top, LANG_ID3_ARTIST, id3->artist);
         line = draw_id3_item(line, top, LANG_ID3_ALBUM,  id3->album);
@@ -1260,7 +1262,7 @@ bool browse_id3(void)
 
         while (!exit && (top == old_top))
         {
-            status_draw(false);
+            gui_syncstatusbar_draw(&statusbars, false);
             lcd_update();
             button = button_get_w_tmo(HZ / 2);
 

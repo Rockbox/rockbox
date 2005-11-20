@@ -73,11 +73,9 @@ const unsigned char bitmap_icons_7x8[][7] =
     {0x7f,0x04,0x4e,0x5f,0x44,0x38,0x7f}  /* Repeat-AB playmode */
 };
 
-#if CONFIG_LED == LED_VIRTUAL
 /* Disk/MMC activity */
 const unsigned char bitmap_icon_disk[12] = 
     {0x15,0x3f,0x7d,0x7B,0x77,0x67,0x79,0x7b,0x57,0x4f,0x47,0x7f};
-#endif
 
 #if  LCD_WIDTH == 112 || LCD_WIDTH == 128 \
      || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_WIDTH == 128)
@@ -341,130 +339,6 @@ const unsigned char rockbox160x53x2[] = {
 #endif
 
 /*
- * Print battery icon to status bar
- */
-void statusbar_icon_battery(int percent)
-{
-    int fill;
-    char buffer[5];
-    unsigned int width, height;
-
-    /* fill battery */
-    fill = percent;
-    if (fill < 0)
-        fill = 0;
-    if (fill > 100)
-        fill = 100;
-
-#if defined(HAVE_CHARGE_CTRL) && !defined(SIMULATOR) /* Rec v1 target only */
-    /* show graphical animation when charging instead of numbers */
-    if ((global_settings.battery_display) &&
-        (charge_state != 1) &&
-        (percent > -1)) {
-#else /* all others */
-    if (global_settings.battery_display && (percent > -1)) {
-#endif
-        /* Numeric display */
-        snprintf(buffer, sizeof(buffer), "%3d", fill);
-        lcd_setfont(FONT_SYSFIXED);
-        lcd_getstringsize(buffer, &width, &height);
-        if (height <= STATUSBAR_HEIGHT)
-            lcd_putsxy(ICON_BATTERY_X_POS + ICON_BATTERY_WIDTH / 2 -
-                       width/2, STATUSBAR_Y_POS, buffer);
-        lcd_setfont(FONT_UI);
-
-    }
-    else {
-        /* draw battery */
-        lcd_drawrect(ICON_BATTERY_X_POS, STATUSBAR_Y_POS, 17, 7);
-        lcd_vline(ICON_BATTERY_X_POS + 17, STATUSBAR_Y_POS + 2,
-                  STATUSBAR_Y_POS + 4);
-
-        fill = fill * 15 / 100;
-        lcd_fillrect(ICON_BATTERY_X_POS + 1, STATUSBAR_Y_POS + 1, fill, 5);
-    }
-
-    if (percent == -1) {
-        lcd_setfont(FONT_SYSFIXED);
-        lcd_putsxy(ICON_BATTERY_X_POS + ICON_BATTERY_WIDTH / 2 - 4,
-                   STATUSBAR_Y_POS, "?");
-        lcd_setfont(FONT_UI);
-    }
-}
-
-/*
- * Print volume gauge to status bar
- */
-bool statusbar_icon_volume(int percent)
-{
-    int i;
-    int volume;
-    int vol;
-    char buffer[4];
-    unsigned int width, height;
-    bool needs_redraw = false;
-    int type = global_settings.volume_type;
-    static long switch_tick;
-    static int last_volume = -1; /* -1 means "first update ever" */
-
-    volume = percent;
-    if (volume < 0)
-        volume = 0;
-    if (volume > 100)
-        volume = 100;
-
-    if (volume == 0) {
-        lcd_mono_bitmap(bitmap_icons_7x8[Icon_Mute], 
-                        ICON_VOLUME_X_POS + ICON_VOLUME_WIDTH / 2 - 4,
-                        STATUSBAR_Y_POS, 7, STATUSBAR_HEIGHT);
-    }
-    else {
-        /* We want to redraw the icon later on */
-        if (last_volume != volume && last_volume >= 0) {
-            switch_tick = current_tick + HZ;
-        }
-
-        /* If the timeout hasn't yet been reached, we show it numerically
-           and tell the caller that we want to be called again */
-        if (TIME_BEFORE(current_tick,switch_tick)) {
-            type = 1;
-            needs_redraw = true;
-        }
-        
-        /* display volume level numerical? */
-        if (type)
-        {
-            snprintf(buffer, sizeof(buffer), "%2d", percent);
-            lcd_setfont(FONT_SYSFIXED);
-            lcd_getstringsize(buffer, &width, &height);
-            if (height <= STATUSBAR_HEIGHT)
-                lcd_putsxy(ICON_VOLUME_X_POS + ICON_VOLUME_WIDTH / 2 -
-                           width/2, STATUSBAR_Y_POS, buffer);
-            lcd_setfont(FONT_UI);
-        } else { 
-            /* display volume bar */
-            vol = volume * 14 / 100;
-            for(i=0; i < vol; i++) {
-                lcd_vline(ICON_VOLUME_X_POS + i, STATUSBAR_Y_POS + 6 - i / 2,
-                          STATUSBAR_Y_POS + 6);
-            }
-        }
-    }
-    last_volume = volume;
-
-    return needs_redraw;
-}
-
-/*
- * Print play state to status bar
- */
-void statusbar_icon_play_state(int state)
-{
-    lcd_mono_bitmap(bitmap_icons_7x8[state], ICON_PLAY_STATE_X_POS,
-                    STATUSBAR_Y_POS, ICON_PLAY_STATE_WIDTH, STATUSBAR_HEIGHT);
-}
-
-/*
  * Print play mode to status bar
  */
 void statusbar_icon_play_mode(int mode)
@@ -478,59 +352,6 @@ void statusbar_icon_play_mode(int mode)
  */
 void statusbar_icon_shuffle(void)
 {
-    lcd_mono_bitmap(bitmap_icons_7x8[Icon_Shuffle], ICON_SHUFFLE_X_POS, 
+    lcd_mono_bitmap(bitmap_icons_7x8[Icon_Shuffle], ICON_SHUFFLE_X_POS,
                     STATUSBAR_Y_POS, ICON_SHUFFLE_WIDTH, STATUSBAR_HEIGHT);
 }
-
-/*
- * Print lock when keys are locked
- */
-void statusbar_icon_lock(void)
-{
-    lcd_mono_bitmap(bitmap_icons_5x8[Icon_Lock], LOCK_X_POS, 
-                    STATUSBAR_Y_POS, 5, 8);
-}
-
-#if CONFIG_LED == LED_VIRTUAL
-/*
- * no real LED: disk activity in status bar
- */
-void statusbar_led(void)
-{
-    lcd_mono_bitmap(bitmap_icon_disk, ICON_DISK_X_POS,
-                    STATUSBAR_Y_POS, ICON_DISK_WIDTH, STATUSBAR_HEIGHT);
-}
-#endif
-
-#ifdef HAVE_RTC
-/*
- * Print time to status bar
- */
-void statusbar_time(int hour, int minute)
-{
-    unsigned char buffer[6];
-    unsigned int width, height;
-
-    if ( hour >= 0 && 
-         hour <= 23 &&
-         minute >= 0 && 
-         minute <= 59 ) {
-        if ( global_settings.timeformat ) { /* 12 hour clock */
-            hour %= 12;
-            if ( hour == 0 ) {
-                hour += 12;
-            }
-        }
-        snprintf(buffer, sizeof(buffer), "%02d:%02d", hour, minute);
-    }
-    else {
-        strncpy(buffer, "--:--", sizeof buffer);
-    }
-
-    lcd_setfont(FONT_SYSFIXED);
-    lcd_getstringsize(buffer, &width, &height);
-    if (height <= STATUSBAR_HEIGHT)
-        lcd_putsxy(TIME_X_END - width, STATUSBAR_Y_POS, buffer);
-    lcd_setfont(FONT_UI);
-}
-#endif

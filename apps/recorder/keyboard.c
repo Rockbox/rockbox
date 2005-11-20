@@ -26,10 +26,11 @@
 #include <string.h>
 #include "font.h"
 #include "screens.h"
-#include "status.h"
+#include "statusbar.h"
 #include "talk.h"
 #include "settings.h"
 #include "misc.h"
+#include "buttonbar.h"
 
 #define KEYBOARD_MARGIN 3
 
@@ -177,7 +178,11 @@ int kbd_input(char* text, int buflen)
     char outline[256];
     struct font* font = font_get(FONT_SYSFIXED);
     int button, lastbutton = 0;
-
+#ifdef HAS_BUTTONBAR
+    struct gui_buttonbar buttonbar;
+    gui_buttonbar_init(&buttonbar);
+    gui_buttonbar_set_display(&buttonbar, &(screens[SCREEN_MAIN]) );
+#endif
     lcd_setfont(FONT_SYSFIXED);
     font_w = font->maxwidth;
     font_h = font->height;
@@ -229,10 +234,10 @@ int kbd_input(char* text, int buflen)
             i = (curpos + 1) * font_w;
             lcd_vline(i, main_y, main_y + font_h);
 
-#if CONFIG_KEYPAD == RECORDER_PAD
+#ifdef HAS_BUTTONBAR
             /* draw the status bar */
-            buttonbar_set("Shift", "OK", "Del");
-            buttonbar_draw();
+            gui_buttonbar_set(&buttonbar, "Shift", "OK", "Del");
+            gui_buttonbar_draw(&buttonbar);
 #endif
             
 #ifdef KBD_MODES
@@ -245,8 +250,7 @@ int kbd_input(char* text, int buflen)
                 lcd_set_drawmode(DRMODE_SOLID);
             }
 
-            status_draw(true);
-        
+            gui_syncstatusbar_draw(&statusbars, true);
             lcd_update();
         }
 
@@ -454,7 +458,7 @@ int kbd_input(char* text, int buflen)
 #endif /* !KBD_MODES */
 
             case BUTTON_NONE:
-                status_draw(false);
+                gui_syncstatusbar_draw(&statusbars, false);
                 redraw = false;
                 break;
 

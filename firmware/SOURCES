@@ -65,9 +65,7 @@ drivers/lcd-ipod.c
 drivers/lcd-h300.c
 #endif
 drivers/power.c
-#ifdef CONFIG_LED
 drivers/led.c
-#endif
 #ifndef SIMULATOR
 drivers/adc.c
 #ifdef HAVE_MMC
