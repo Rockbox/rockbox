@@ -53,7 +53,6 @@
 #include "abrepeat.h"
 #include "playback.h"
 
-#include "statusbar.h"
 #include "splash.h"
 
 #define WPS_DEFAULTCFG WPS_DIR "/rockbox_default.wps"
@@ -67,6 +66,19 @@ bool keys_locked = false;
 
 /* change the path to the current played track */
 static void wps_state_update_ctp(const char *path);
+
+#ifdef HAVE_LCD_BITMAP
+static void gui_wps_set_margine(struct gui_wps *gwps)
+{
+    int offset = 0;
+    struct wps_data *data = gwps->data;
+    if(data->wps_sb_tag && data->show_sb_on_wps)
+        offset = STATUSBAR_HEIGHT;
+    else if ( global_settings.statusbar && !data->wps_sb_tag)
+        offset = STATUSBAR_HEIGHT;
+    gwps->display->setmargins(0, offset);
+}
+#endif
 
 long gui_wps_show(void)
 {
@@ -88,8 +100,7 @@ long gui_wps_show(void)
 #else
     FOR_NB_SCREENS(i)
     {
-        gui_wps[i].display->setmargins(0, global_settings.statusbar?
-                                       STATUSBAR_HEIGHT:0);
+        gui_wps_set_margine(&gui_wps[i]);
     }
 #endif
 
@@ -156,12 +167,12 @@ long gui_wps_show(void)
 
                 if (TIME_AFTER(current_tick, next_refresh)) {
                     FOR_NB_SCREENS(i)
-                        {
-                            if(gui_wps[i].data->peak_meter_enabled)
-                                gui_wps_refresh(&gui_wps[i], 0,
-                                                WPS_REFRESH_PEAK_METER);
-                            next_refresh += HZ / PEAK_METER_FPS;
-                        }
+                    {
+                        if(gui_wps[i].data->peak_meter_enabled)
+                            gui_wps_refresh(&gui_wps[i], 0,
+                                            WPS_REFRESH_PEAK_METER);
+                        next_refresh += HZ / PEAK_METER_FPS;
+                    }
                 }
             }
 
@@ -215,6 +226,12 @@ long gui_wps_show(void)
             case WPS_RC_CONTEXT:
 #endif
                 onplay(wps_state.id3->path, TREE_ATTR_MPA, CONTEXT_WPS);
+#ifdef HAVE_LCD_BITMAP
+                FOR_NB_SCREENS(i)
+                {
+                    gui_wps_set_margine(&gui_wps[i]);
+                }
+#endif
                 restore = true;
                 break;
 #endif
@@ -289,11 +306,20 @@ long gui_wps_show(void)
             case WPS_RC_INCVOL:
             case WPS_RC_INCVOL | BUTTON_REPEAT:
 #endif
+            {
                 global_settings.volume++;
-                if (setvol()) {
+                bool res = false;
+                setvol();
+                FOR_NB_SCREENS(i)
+                {
+                    if(update_onvol_change(&gui_wps[i]))
+                        res = true;
+                }
+                if (res) {
                     restore = true;
                     restoretimer = current_tick + HZ;
                 }
+            }
                 break;
 
                 /* volume down */
@@ -303,11 +329,20 @@ long gui_wps_show(void)
             case WPS_RC_DECVOL:
             case WPS_RC_DECVOL | BUTTON_REPEAT:
 #endif
+            {
                 global_settings.volume--;
-                if (setvol()) {
+                setvol();
+                bool res = false;
+                FOR_NB_SCREENS(i)
+                {
+                    if(update_onvol_change(&gui_wps[i]))
+                        res = true;
+                }
+                if (res) {
                     restore = true;
                     restoretimer = current_tick + HZ;
                 }
+            }
                 break;
 
                 /* fast forward / rewind */
@@ -450,9 +485,7 @@ long gui_wps_show(void)
 #ifdef HAVE_LCD_BITMAP
                 FOR_NB_SCREENS(i)
                 {
-                    gui_wps[i].display->setmargins(0,
-                                                   global_settings.statusbar?
-                                                   STATUSBAR_HEIGHT:0);
+                    gui_wps_set_margine(&gui_wps[i]);
                 }
 #endif
                 restore = true;
@@ -581,13 +614,13 @@ long gui_wps_show(void)
 
         if (update_track)
         {
-            bool upt = false;
+            bool update_failed = false;
             FOR_NB_SCREENS(i)
             {
                 if(update(&gui_wps[i]))
-                    upt = true;
+                    update_failed = true;
             }
-            if (upt)
+            if (update_failed)
             {
                 /* set dir browser to current playing song */
                 if (global_settings.browse_current &&
@@ -670,6 +703,8 @@ void wps_data_init(struct wps_data *wps_data)
         wps_data->img[i].display = false;
         wps_data->img[i].always_display = false;
     }
+    wps_data->wps_sb_tag = false;
+    wps_data->show_sb_on_wps = false;
 #else /* HAVE_LCD_CHARCELLS */
     for(i = 0; i < 8; i++)
         wps_data->wps_progress_pat[i] = 0;
@@ -861,6 +896,7 @@ void gui_wps_init(struct gui_wps *gui_wps)
 {
     gui_wps->data = NULL;
     gui_wps->display = NULL;
+    gui_wps->statusbar = NULL;
     /* Currently no seperate wps_state needed/possible
        so use the only aviable ( "global" ) one */
     gui_wps->state = &wps_state;
@@ -877,14 +913,12 @@ void gui_wps_set_disp(struct gui_wps *gui_wps, struct screen *display)
 {
     gui_wps->display = display;
 }
-/* gui_wps end */
 
-void gui_sync_data_wps_init(void)
+void gui_wps_set_statusbar(struct gui_wps *gui_wps, struct gui_statusbar *statusbar)
 {
-    int i;
-    FOR_NB_SCREENS(i)
-        wps_data_init(&wps_datas[i]);
+    gui_wps->statusbar = statusbar;
 }
+/* gui_wps end */
 
 void gui_sync_wps_screen_init(void)
 {
@@ -898,7 +932,9 @@ void gui_sync_wps_init(void)
     int i;
     FOR_NB_SCREENS(i)
     {
+        wps_data_init(&wps_datas[i]);
         gui_wps_init(&gui_wps[i]);
         gui_wps_set_data(&gui_wps[i], &wps_datas[i]);
+        gui_wps_set_statusbar(&gui_wps[i], &statusbars.statusbars[i]);
     }
 }

@@ -20,6 +20,7 @@
 #define _WPS_H
 
 #include "screen_access.h"
+#include "statusbar.h"
 #include "id3.h"
 #include "playlist.h"
 
@@ -319,6 +320,7 @@ struct gui_wps
     struct screen * display;
     struct wps_data *data;
     struct wps_state *state;
+    struct gui_statusbar *statusbar;
 };
 
 /* initial setup of a wps */
@@ -329,6 +331,9 @@ void gui_wps_set_data(struct gui_wps *gui_wps, struct wps_data *data);
 
 /* connects a wps with a screen */
 void gui_wps_set_disp(struct gui_wps *gui_wps, struct screen *display);
+
+/* connects a wps with a statusbar*/
+void gui_wps_set_statusbar(struct gui_wps *gui_wps, struct gui_statusbar *statusbar);
 /* gui_wps end */
 
 long gui_wps_show(void);
@@ -338,7 +343,6 @@ extern struct wps_state wps_state;
 extern struct gui_wps gui_wps[NB_SCREENS];
 
 void gui_sync_wps_init(void);
-void gui_sync_data_wps_init(void);
 void gui_sync_wps_screen_init(void);
 
 #endif

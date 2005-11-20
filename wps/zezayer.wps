@@ -1,5 +1,5 @@
 %x|a|RockBoxWPSd.bmp|0|0|
-%ar  %?mp<Stop|Play|Pause|%>%>|%<%<>     
+%wd%ar  %?mp<Stop|Play|Pause|%>%>|%<%<>     
 
 * %?ia<%ia|%d2>
 * %?id<%id|%d1>

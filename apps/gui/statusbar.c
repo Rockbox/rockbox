@@ -104,11 +104,6 @@ void gui_statusbar_set_screen(struct gui_statusbar * bar,
 
 void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 {
-#ifdef HAVE_LCD_BITMAP
-    if(!global_settings.statusbar)
-       return;
-#endif /* HAVE_LCD_BITMAP */
-
     struct screen * display = bar->display;
 
 #ifdef HAVE_RTC
@@ -505,6 +500,10 @@ void gui_syncstatusbar_init(struct gui_syncstatusbar * bars)
 void gui_syncstatusbar_draw(struct gui_syncstatusbar * bars,
                             bool force_redraw)
 {
+#ifdef HAVE_LCD_BITMAP
+    if(!global_settings.statusbar)
+       return;
+#endif /* HAVE_LCD_BITMAP */
     int i;
     FOR_NB_SCREENS(i) {
         gui_statusbar_draw( &(bars->statusbars[i]), force_redraw );

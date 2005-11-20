@@ -151,7 +151,6 @@ void init(void)
     settings_reset();
     settings_calc_config_sector();
     settings_load(SETTINGS_ALL);
-    gui_sync_data_wps_init();
     gui_sync_wps_init();
     settings_apply();
     init_dircache();
@@ -318,7 +317,6 @@ void init(void)
     settings_calc_config_sector();
     settings_load(SETTINGS_ALL);
     init_dircache();
-    gui_sync_data_wps_init();
     gui_sync_wps_init();
     settings_apply();
 

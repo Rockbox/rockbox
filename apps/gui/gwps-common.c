@@ -17,7 +17,6 @@
  *
  ****************************************************************************/
 #include "gwps-common.h"
-#include "gwps.h"
 #include "font.h"
 #include <stdio.h>
 #include <string.h>
@@ -37,7 +36,6 @@
 #include "lang.h"
 #include "misc.h"
 
-#include "statusbar.h"
 #include "splash.h"
 #include "scrollbar.h"
 #ifdef HAVE_LCD_BITMAP
@@ -56,6 +54,24 @@ static void draw_player_fullbar(struct gui_wps *gwps,
 #define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
                                 /* 3% of 30min file == 54s step size */
 #define MIN_FF_REWIND_STEP 500
+
+/* draws the statusbar on the given wps-screen */
+#ifdef HAVE_LCD_BITMAP
+static void gui_wps_statusbar_draw(struct gui_wps *wps, bool force)
+{
+    bool draw = global_settings.statusbar;
+    if(wps->data->wps_sb_tag 
+        && gui_wps->data->show_sb_on_wps)
+        draw = true;
+    else if(wps->data->wps_sb_tag)
+        draw = false;
+    if(draw)
+        gui_statusbar_draw(wps->statusbar, force);
+}
+#else
+#define gui_wps_statusbar_draw(wps, force) \
+    gui_statusbar_draw((wps)->statusbar, (force))
+#endif
 
 /* Format time into buf.
  *
@@ -944,6 +960,11 @@ void gui_wps_format(struct wps_data *data, const char *bmpdir,
     subline = 0;
     data->format_lines[line][subline] = buf;
 
+#ifdef HAVE_LCD_BITMAP
+    bool wps_tag_found = false;
+    data->wps_sb_tag = false;
+    data->show_sb_on_wps = false;
+#endif
     while ((*buf) && (line < WPS_MAX_LINES))
     {
         c = *buf;
@@ -955,10 +976,19 @@ void gui_wps_format(struct wps_data *data, const char *bmpdir,
              * don't skip %x lines (pre-load bitmaps)
              */
             case '%':
+#ifdef HAVE_LCD_BITMAP
+                if(*(buf+1) == 'w' && (*(buf+2) == 'd' || *(buf+2) == 'e')
+                    && !wps_tag_found)
+                {
+                    data->wps_sb_tag = true;
+                    if( *(buf+1) == 'w' && *(buf+2) == 'e' )
+                        data->show_sb_on_wps = true;
+                    wps_tag_found = true;
+                }
                 if (*(buf+1) != 'x')
                     buf++;
                 break;
-
+#endif
             case '\r': /* CR */
                 *buf = 0;
                 break;
@@ -1177,7 +1207,13 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
     }
 #ifdef HAVE_LCD_BITMAP
     int h = font_get(FONT_UI)->height;
-    int offset = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
+    int offset = 0;
+    gui_wps_statusbar_draw(gwps, true);
+    if(data->wps_sb_tag && data->show_sb_on_wps)
+        offset = STATUSBAR_HEIGHT;
+    else if ( global_settings.statusbar && !data->wps_sb_tag)
+        offset = STATUSBAR_HEIGHT;
+    
     /* to find out wether the peak meter is enabled we
        assume it wasn't until we find a line that contains
        the peak meter. We can't use peak_meter_enabled itself
@@ -1774,24 +1810,26 @@ static void draw_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size)
 }
 #endif
 
-/* set volume
-   return true if screen restore is needed
-   return false otherwise
-*/
-bool setvol(void)
+/* set volume */
+void setvol(void)
 {
     if (global_settings.volume < sound_min(SOUND_VOLUME))
         global_settings.volume = sound_min(SOUND_VOLUME);
     if (global_settings.volume > sound_max(SOUND_VOLUME))
         global_settings.volume = sound_max(SOUND_VOLUME);
     sound_set_volume(global_settings.volume);
-    gui_syncstatusbar_draw(&statusbars, false);
-    int i;
-    FOR_NB_SCREENS(i)
-        gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_NON_STATIC);
     settings_save();
+}
+/* return true if screen restore is needed
+   return false otherwise
+*/
+bool update_onvol_change(struct gui_wps * gwps)
+{
+    gui_wps_statusbar_draw(gwps, false);
+    gui_wps_refresh(gwps, 0, WPS_REFRESH_NON_STATIC);
+
 #ifdef HAVE_LCD_CHARCELLS
-    gui_syncsplash(0, false, "Vol: %d %%   ",
+    gui_splash(gwps->display,0, false, "Vol: %d %%   ",
                    sound_val2phys(SOUND_VOLUME, global_settings.volume));
     return true;
 #endif
@@ -1837,13 +1875,13 @@ bool ffwd_rew(int button)
                         max_step = (wps_state.id3->length - 
                                     (wps_state.id3->elapsed +
                                      ff_rewind_count)) *
-                            FF_REWIND_MAX_PERCENT / 100;
+                                     FF_REWIND_MAX_PERCENT / 100;
                     }
                     else
                     {
                         /* rewinding, calc max step relative to start */
                         max_step = (wps_state.id3->elapsed + ff_rewind_count) *
-                            FF_REWIND_MAX_PERCENT / 100;
+                                    FF_REWIND_MAX_PERCENT / 100;
                     }
 
                     max_step = MAX(max_step, MIN_FF_REWIND_STEP);
@@ -2003,10 +2041,9 @@ bool gui_wps_display(void)
     }
     yield();
     FOR_NB_SCREENS(i)
-        gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_ALL);
-    gui_syncstatusbar_draw(&statusbars, true);
-    FOR_NB_SCREENS(i)
     {
+        gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_ALL);
+
 #ifdef HAVE_LCD_BITMAP
         wps_display_images(&gui_wps[i]);
         gui_wps[i].display->update();
@@ -2039,9 +2076,9 @@ bool update(struct gui_wps *gwps)
     if (gwps->state->id3)
         gui_wps_refresh(gwps, 0, WPS_REFRESH_NON_STATIC);
 
-    gui_syncstatusbar_draw(&statusbars, false);
-
-    return retcode;
+    gui_wps_statusbar_draw(gwps, false);
+    
+    return retcode;           
 }
 
 #ifdef WPS_KEYLOCK

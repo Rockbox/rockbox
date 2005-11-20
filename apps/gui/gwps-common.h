@@ -30,7 +30,8 @@ void gui_wps_format(struct wps_data *data, const char *bmpdir,
 bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
                      unsigned char refresh_mode);
 bool gui_wps_display(void);
-bool setvol(void);
+void setvol(void);
+bool update_onvol_change(struct gui_wps * gwps);
 bool update(struct gui_wps *gwps);
 bool ffwd_rew(int button);
 #ifdef WPS_KEYLOCK

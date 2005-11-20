@@ -63,7 +63,6 @@ void status_init(void)
 void status_set_ffmode(enum playmode mode)
 {
     ff_mode = mode; /* Either STATUS_FASTFORWARD or STATUS_FASTBACKWARD */
-    gui_syncstatusbar_draw(&statusbars, false);
 }
 
 enum playmode status_get_ffmode(void)
