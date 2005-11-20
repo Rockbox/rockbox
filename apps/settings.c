@@ -854,6 +854,9 @@ void settings_apply(void)
     lcd_remote_set_contrast(global_settings.remote_contrast);
     lcd_remote_set_invert_display(global_settings.remote_invert);
     lcd_remote_set_flip(global_settings.remote_flip_display);
+    lcd_remote_scroll_speed(global_settings.scroll_speed);
+    lcd_remote_scroll_step(global_settings.scroll_step);
+    lcd_remote_scroll_delay(global_settings.scroll_delay);
 #ifdef HAVE_REMOTE_LCD_TICKING
     lcd_remote_emireduce(global_settings.remote_reduce_ticking);
 #endif
