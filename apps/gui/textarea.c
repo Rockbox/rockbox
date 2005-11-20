@@ -28,7 +28,6 @@ void gui_textarea_clear(struct screen * display)
     screen_clear_area(display, 0, y_start, display->width, y_end - y_start);
     display->stop_scroll();
     screen_set_ymargin(display, y_start);
-    display->setfont(FONT_SYSFIXED);
 #else
     display->clear_display();
 #endif
