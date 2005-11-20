@@ -814,7 +814,7 @@ bool radio_screen(void)
                     }
                 }
 
-#if HAS_BUTTONBAR
+#ifdef HAS_BUTTONBAR
                 gui_buttonbar_draw(&buttonbar);
 #endif
                 FOR_NB_SCREENS(i)
