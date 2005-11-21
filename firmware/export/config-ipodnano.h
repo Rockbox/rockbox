@@ -68,9 +68,6 @@
 /* Define this to the CPU frequency */
 #define CPU_FREQ      11289600
 
-/* Define this if you have ATA power-off control */
-#define HAVE_ATA_POWER_OFF
-
 #define CONFIG_LCD LCD_IPODNANO
 
 /* Offset ( in the firmware file's header ) to the file length */

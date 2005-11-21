@@ -175,7 +175,7 @@ void ide_power_enable(bool on)
     else
         or_l(0x80000000, &GPIO_OUT);
 #elif CONFIG_CPU == PP5020
-    /* TODO: Implement ide_power_enable() */
+    /* We do nothing on the iPod */
 #elif defined(GMINI_ARCH)
     if(on)
         P1 |= 0x08;
@@ -227,7 +227,7 @@ bool ide_powered(void)
 #if CONFIG_CPU == MCF5249
     return (GPIO_OUT & 0x80000000)?false:true;
 #elif CONFIG_CPU == PP5020
-    /* TODO: Implement ide_powered() */
+    /* pretend we are always powered - we don't turn it off on the ipod */
     return true;
 #elif defined(GMINI_ARCH)
     return (P1 & 0x08?true:false);
