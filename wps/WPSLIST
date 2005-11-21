@@ -24,6 +24,8 @@
 <wps>
 # Name of the WPS _including_ extension
 Name: ipodVOL.wps
+# default RWPS for the theme (to be loaded with the same theme file)
+RWPS: rockbox_default.rwps
 # Name of the creator of the WPS
 Author: xameius
 # prefered font:
@@ -58,9 +60,10 @@ Width: 160
 
 <wps>
 Name: engineeer2.wps
+RWPS: rockbox_default.rwps
 Author: Magnus Westerlund
 Font: nedore-8.fnt
-Statusbar: Off
+Statusbar: on
 Height: 128
 Width: 160
 </wps>
@@ -70,16 +73,17 @@ Name: iAmp.wps
 RWPS: iAmp.rwps
 Author: Raymond Hoh
 Font: nimbus-12.fnt
-Statusbar: Off
+Statusbar: on
 Height: 128
 Width: 160
 </wps>
 
 <wps>
 Name: zezayer.wps
+RWPS: rockbox_default.rwps
 Author: Jake Owen
 Font: nedore-8.fnt
-Statusbar: off
+Statusbar: on
 Height: 128
 Width: 160
 </wps>
@@ -97,7 +101,7 @@ Width: 128
 Name: iAmp.rwps
 Author: Raymond Hoh
 Font: nimbus-12.fnt
-Statusbar: Off
+Statusbar: on
 Height: 64
 Width: 128
 </rwps>
@@ -106,7 +110,7 @@ Width: 128
 Name: boxes.rwps
 Author: Christi Scarborough
 Font: rockbox_default.fnt
-Statusbar: off
+Statusbar: on
 Height: 64
 Width: 128
 </rwps>
