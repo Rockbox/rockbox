@@ -87,7 +87,7 @@ id: LANG_PLAYINDICES_PLAYLIST
 desc: in playlist.indices() when playlist is full *WARNING* this and next ID are only used in this function.
 eng: "Playlist"
 voice: ""
-new: "Liste d'écoute"
+new: "Liste de lecture"
 
 id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
@@ -158,8 +158,8 @@ new: "Tri sur MAJ/min"
 id: LANG_RESUME
 desc: in settings_menu
 eng: "Resume on startup"
-voice: "Reprendre au démarrage"
-new: "Reprendre au démarrage"
+voice: "Reprise au démarrage"
+new: "Reprise au démarrage"
 
 id: LANG_OFF
 desc: Used in a lot of places
@@ -182,8 +182,8 @@ new: "Oui"
 id: LANG_BACKLIGHT
 desc: in settings_menu
 eng: "Backlight"
-voice: "Rétro-éclairage"
-new: "Rétro-éclairage"
+voice: "Durée d'éclairage"
+new: "Durée d'éclairage"
 
 id: LANG_SCROLL
 desc: in settings_menu
@@ -224,8 +224,8 @@ new: "AR/RR accéleration"
 id: LANG_FOLLOW
 desc: in settings_menu
 eng: "Follow Playlist"
-voice: "Suivre la liste d'écoute"
-new: "Suivre la liste d'écoute"
+voice: "Suivre la liste de lecture"
+new: "Suivre la liste de lecture"
 
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
@@ -279,7 +279,7 @@ id: LANG_FILE
 desc: in settings_menu()
 eng: "File View"
 voice: "Vue de fichiers"
-new: "Vue des fichiers"
+new: "Parcours des fichiers"
 
 id: LANG_DISPLAY
 desc: in settings_menu()
@@ -393,13 +393,13 @@ id: LANG_RESUME_ASK
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: ""
+new: "Reprendre?"
 
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
 eng: "(PLAY/STOP)"
 voice: ""
-new: "(PLAY/STOP)"
+new: "(LECTURE/ARRET)"
 
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
@@ -483,7 +483,7 @@ id: LANG_ID3_NO_ARTIST
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: ""
+new: "Pas d'artiste"
 
 id: LANG_ID3_ALBUM
 desc: in wps
@@ -495,7 +495,7 @@ id: LANG_ID3_NO_ALBUM
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: ""
+new: "Pas d'album"
 
 id: LANG_ID3_TRACKNUM
 desc: in wps
@@ -519,7 +519,7 @@ id: LANG_ID3_PLAYLIST
 desc: in wps
 eng: "[Playlist]"
 voice: ""
-new: "[Liste]"
+new: "[Liste de lecture]"
 
 id: LANG_ID3_BITRATE
 desc: in wps
@@ -585,13 +585,13 @@ id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
 eng: "End Of List"
 voice: ""
-new: "Fin de la liste"
+new: "Fin de la liste de lecture"
 
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
 eng: "End Of Song List"
 voice: ""
-new: "Fin de la liste"
+new: "Fin de la liste de lecture"
 
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
@@ -848,7 +848,7 @@ new: "Déc"
 id: LANG_RESUME_SETTING_ASK_ONCE
 desc: DEPRECATED
 eng: ""
-voice: ""
+voice: "Demander une fois"
 new: ""
 
 id: LANG_BATTERY_DISPLAY
@@ -873,7 +873,7 @@ id: LANG_DISPLAY_NUMERIC
 desc: Label for type of icon display
 eng: "Numeric"
 voice: "Numerique"
-new: "Numérique"
+new: "Numérique (%)"
 
 id: LANG_PM_PERFORMANCE
 desc: DEPRECATED
@@ -885,7 +885,7 @@ id: LANG_PM_HIGH_PERFORMANCE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: ""
+new: "Haute performance"
 
 id: LANG_PM_ENERGY_SAVER
 desc: DEPRECATED
@@ -915,13 +915,13 @@ id: LANG_PM_MIN
 desc: in the peak meter menu
 eng: "Minimum Of Range"
 voice: "Minimum de la rangée"
-new: "Minimum"
+new: "Borne Minimum"
 
 id: LANG_PM_MAX
 desc: in the peak meter menu
 eng: "Maximum Of Range"
 voice: "Maximum de la rangée"
-new: "Maximum"
+new: "Borne Maximum"
 
 id: LANG_RECORDING
 desc: in the main menu
@@ -939,13 +939,13 @@ id: LANG_RECORDING_LEFT
 desc: in the recording screen
 eng: "Left"
 voice: ""
-new: "Gauche"
+new: "Gain à Gauche"
 
 id: LANG_RECORDING_RIGHT
 desc: in the recording screen
 eng: "Right"
 voice: ""
-new: "Droite"
+new: "Gain à Droite"
 
 id: LANG_RECORDING_QUALITY
 desc: in the recording settings
@@ -975,19 +975,19 @@ id: LANG_RECORDING_SRC_MIC
 desc: in the recording settings
 eng: "Mic"
 voice: "Microphone incorporé"
-new: "Micro incorporé"
+new: "Micro intégré"
 
 id: LANG_RECORDING_SRC_LINE
 desc: in the recording settings
 eng: "Line In"
 voice: "Line In"
-new: "Line In"
+new: "Entrée ligne"
 
 id: LANG_RECORDING_SRC_DIGITAL
 desc: in the recording settings
 eng: "Digital"
-voice: "Digital"
-new: "Digital In/Out"
+voice: "Entrée Sortie numérique"
+new: "Entrée/Sortie numérique"
 
 id: LANG_RECORDING_SETTINGS
 desc: in the main menu
@@ -1016,8 +1016,8 @@ new: "Arrêt du disque"
 id: LANG_FILTER_PLAYLIST
 desc: show only playlist
 eng: "Playlists"
-voice: "Listes d'écoute"
-new: "Listes"
+voice: "Listes de lecture"
+new: "Listes de lectures"
 
 id: LANG_BATTERY_TIME
 desc: battery level in % and estimated time remaining
@@ -1040,7 +1040,7 @@ new: "Mémoire anti-choc"
 id: LANG_BIDIR_SCROLL
 desc: Bidirectional scroll limit
 eng: "Bidirectional Scroll Limit"
-voice: "Limite défilement bidirectionnel"
+voice: "Limite du défilement bidirectionnel"
 new: "Limite défilement bidirectionnel"
 
 id: LANG_SCROLL_DELAY
@@ -1100,8 +1100,8 @@ new: "Annulé"
 id: LANG_QUEUE
 desc: The verb/action Queue
 eng: "Queue"
-voice: "File d'attente"
-new: "File d'attente"
+voice: "Insérér pour une lecture unique"
+new: "Insérér (lecture unique)"
 
 id: LANG_DELETE
 desc: The verb/action Delete
@@ -1172,8 +1172,8 @@ new: "PLAY=Régler OFF=Annuler"
 id: LANG_CREATE_PLAYLIST
 desc: Menu option for creating a playlist
 eng: "Create Playlist"
-voice: "Créer une liste d'écoute"
-new: "Créer une liste d'écoute"
+voice: "Créer une nouvelle liste de lecture"
+new: "Créer une nouvelle liste"
 
 id: LANG_CREATING
 desc: Screen feedback during playlist creation
@@ -1209,7 +1209,7 @@ id: LANG_MENU_SHOW_ID3_INFO
 desc: Menu option to start id3 viewer
 eng: "Show ID3 Info"
 voice: "Montrer Infos ID3"
-new: "Montrer Infos ID3"
+new: "Montrer Infos Tag"
 
 id: LANG_ID3_GENRE
 desc: ID3 frame 'genre'
@@ -1347,7 +1347,7 @@ id: LANG_STATUS_BAR
 desc: display menu, F3 substitute
 eng: "Status Bar"
 voice: "Ligne d'état"
-new: "Ligne d'état"
+new: "Barre d'état"
 
 id: LANG_SCROLL_BAR
 desc: display menu, F3 substitute
@@ -1358,8 +1358,8 @@ new: "Barre de défilement"
 id: LANG_CAPTION_BACKLIGHT
 desc: in settings_menu
 eng: "Caption backlight"
-voice: "Enchaînement rétro-éclairé"
-new: "Enchaînement rétro-éclairé"
+voice: "Eclairage lors du changement de chanson"
+new: "Eclairage lors du changement de chanson"
 
 id: LANG_INVERT_CURSOR_POINTER
 desc: in settings_menu
@@ -1370,8 +1370,8 @@ new: "Pointeur"
 id: LANG_INVERT_CURSOR_BAR
 desc: in settings_menu
 eng: "Bar(Inverse)"
-voice: "Ligne inversée"
-new: "Ligne inversée"
+voice: "Ligne surlignée"
+new: "Ligne Surlignée"
 
 id: LANG_INVERT_LCD_NORMAL
 desc: in settings_menu
@@ -1394,8 +1394,8 @@ new: "Max fichiers par répertoire"
 id: LANG_MAX_FILES_IN_PLAYLIST
 desc: in settings_menu
 eng: "Max playlist size"
-voice: "Maximum de fichiers par liste d'écoute"
-new: "Max fichiers par liste d'écoute"
+voice: "Maximum de fichiers par liste de lecture"
+new: "Max fichiers par liste de lecture"
 
 id: LANG_JUMP_SCROLL
 desc: (player) menu altarnative for jump scroll
@@ -1510,8 +1510,8 @@ new: "Redémarrer?"
 id: LANG_QUEUE_LAST
 desc: in onplay menu.  queue a track/playlist at end of playlist.
 eng: "Queue last"
-voice: "En fin de file"
-new: "En fin de file"
+voice: "Insérer en dernier pour une lecture unique"
+new: "Insérer en dernier (lecture unique)"
 
 id: LANG_INSERT
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
@@ -1528,8 +1528,8 @@ new: "Insérer en dernier"
 id: LANG_QUEUE_FIRST
 desc: in onplay menu.  queue a track/playlist into dynamic playlist.
 eng: "Queue next"
-voice: "Suivant en file"
-new: "Suivant en file"
+voice: "Inserer suivant pour une lecture unique"
+new: "Inserer suivant (lecture unique)"
 
 id: LANG_INSERT_FIRST
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
@@ -1540,14 +1540,14 @@ new: "Insérer suivant"
 id: LANG_SAVE_DYNAMIC_PLAYLIST
 desc: in playlist menu.
 eng: "Save Current Playlist"
-voice: "Enreg. liste d'écoute courante"
-new: "Enreg. liste d'écoute courante"
+voice: "Enreg. liste de lecture courante"
+new: "Enreg. liste courante"
 
 id: LANG_PLAYLIST_MENU
 desc: in main menu.
 eng: "Playlist Options"
-voice: "Options de listes d'écoute"
-new: "Options de listes d'écoute"
+voice: "Options de listes de lecture"
+new: "Listes de lecture"
 
 id: LANG_PLAYLIST_INSERT_COUNT
 desc: splash number of tracks inserted
@@ -1607,7 +1607,7 @@ id: LANG_PLAYLIST_CONTROL_INVALID
 desc: Playlist resume error
 eng: "Playlist control file is invalid"
 voice: ""
-new: "Liste d'écoute invalide"
+new: "Liste de lecture invalide"
 
 id: LANG_RECURSE_DIRECTORY
 desc: In playlist menu
@@ -1624,8 +1624,8 @@ new: "Récursivement?"
 id: LANG_CUSTOM_FONT
 desc: in setting_menu()
 eng: "Browse Fonts"
-voice: "Liste des Polices"
-new: "Liste des Polices"
+voice: "Polices d'affichage"
+new: "Polices d'affichage"
 
 id: LANG_FIRMWARE
 desc: in the main menu
@@ -1642,14 +1642,14 @@ new: "Langue"
 id: LANG_WHILE_PLAYING
 desc: in settings_menu()
 eng: "Browse .wps files"
-voice: "Liste des fichiers d'affichage"
-new: "Liste des fichiers d'affichage"
+voice: "Charger une configuration d'affichage"
+new: "Charger config d'affichage"
 
 id: LANG_CUSTOM_CFG
 desc: in setting_menu()
 eng: "Browse .cfg files"
-voice: "Liste des fichiers de configuration"
-new: "Liste des fichiers .cfg"
+voice: "Choix d'un fichier de configuration"
+new: "Charger fichier .cfg"
 
 id: LANG_PLUGINS
 desc: in main_menu()
@@ -1739,7 +1739,7 @@ id: LANG_VIEW_DYNAMIC_PLAYLIST
 desc: in playlist menu.
 eng: "View Current Playlist"
 voice: "Voir la liste d'écoute courante"
-new: "Voir la liste d'écoute"
+new: "Voir la liste courante"
 
 id: LANG_MOVE
 desc: The verb/action Move
@@ -1757,7 +1757,7 @@ id: LANG_FLIP_DISPLAY
 desc: in settings_menu, option to turn display+buttos by 180 degreed
 eng: "Upside Down"
 voice: "Rotation écran"
-new: "Rotation LCD"
+new: "Rotation LCD à 180°"
 
 id: LANG_RECORD_PRERECORD
 desc: in recording and radio screen
@@ -1769,7 +1769,7 @@ id: LANG_RECORD_PRERECORD_TIME
 desc: in recording settings_menu
 eng: "Prerecord time"
 voice: "Temps de préenregistrement"
-new: "Tps préenr."
+new: "Tps préenreg."
 
 # Auto bookmark prompts
 
@@ -1937,7 +1937,7 @@ id: LANG_WIND_MENU
 desc: in the playback sub menu
 eng: "FFwd/Rewind"
 voice: "avance et recul rapide"
-new: "AR/RR"
+new: "Avance/Retour Rapide"
 
 id: LANG_LCD_MENU
 desc: in the display sub menu
@@ -2809,7 +2809,7 @@ id: LANG_SHUTTINGDOWN
 desc: in main menu
 eng: "Shutting down..."
 voice: "Arrêt en cours"
-new: "Arrêt en cours"
+new: "Arrêt en cours..."
 
 id: LANG_CONFIRM_SHUTDOWN
 desc: in shutdown screen
@@ -3001,7 +3001,7 @@ id: LANG_PLAYLIST
 desc: Used when you need to say playlist, also voiced
 eng: "Playlist"
 voice: "Liste d'écoute"
-new: "Liste d'écoute"
+new: "Liste de lecture"
 
 id: LANG_RECORD_STARTUP
 desc: Start Rockbox in Recording screen
@@ -3109,31 +3109,31 @@ id: LANG_CROSSFADE
 desc: in playback settings
 eng: "Crossfade"
 voice: "Fondu enchaîné"
-new: "Fondu enchaîné"
+new: "Crossfade"
 
 id: LANG_BACKLIGHT_FADE_IN
 desc: in settings_menu
 eng: "Backlight fade in"
-voice: "Marche rétro-éclairage doux"
-new: "Marche rétro-éclairage doux"
+voice: "Allumage progressif de l'éclairage"
+new: "Allumage progressif de l'éclairage"
 
 id: LANG_BACKLIGHT_FADE_OUT
 desc: in settings_menu
 eng: "Backlight fade out"
-voice: "Arrêt rétro-éclairage doux"
-new: "Arrêt rétro-éclairage doux"
+voice: "Extinction progressive de l'éclairage"
+new: "Extinction progressive de l'éclairage"
 
 id: LANG_SHUFFLE_PLAYLIST
 desc: in playlist menu, reshuffles the order in which songs are played
 eng: "Reshuffle"
 voice: "Remélanger"
-new: "Remélanger"
+new: "Re-mélanger"
 
 id: LANG_NOTHING_TO_RESUME
 desc: Error message displayed when resume button pressed but no playlist
 eng: "Nothing to resume"
 voice: "Il n'y à rien a reprendre"
-new: "Rien à reprendre"
+new: "Aucun fichier à reprendre"
 
 id: LANG_INSERT_SHUFFLED
 desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
@@ -3150,56 +3150,56 @@ new: "Sortie digitale"
 id: LANG_NEXT_FOLDER
 desc: in settings_menu.  Should we move to next folder when current one ends
 eng: "Move to Next Folder"
-voice: "Procéder au prochain répertoire"
-new: "Procéder au prochain rép."
+voice: "Passer au répertoire suivant"
+new: "Passer au rep. suivant"
 
 id: LANG_RUNTIMEDB_ACTIVE
 desc: in settings_menu.
 eng: "Gather runtime data (experimental)"
 voice: "Collectioner temps courant"
-new: "Collectioner temps courant"
+new: "Collecter les données de lecture"
 
 id: LANG_MENU_SET_RATING
 desc: in wps context menu
 eng: "Set song rating"
-voice: "Set song rating"
-new: "Ajouter classement"
+voice: "Noter la chanson"
+new: "Noter la chanson"
 
 id: LANG_RATING
 desc: in set_rating
 eng: "Rating:"
-voice: "Classement"
-new: "Classement:"
+voice: "Note"
+new: "Note:"
 
 id: LANG_CROSSFADE_DURATION
 desc: in playback settings
 eng: "Crossfade duration"
-voice: "Durée fondu enchaîné"
-new: "Durée fondu enchaîné"
+voice: "Durée du Crossfade"
+new: "Durée du Crossfade"
 
 id: LANG_MIX
 desc: in playback settings, crossfade option
 eng: "Mix"
-voice: "Mélange"
-new: "Mélange"
+voice: "Mixé"
+new: "Mixé"
 
 id: LANG_RESTARTING_PLAYBACK
 desc: splash screen displayed when pcm buffer size is changed
 eng: "Restarting playback..."
 voice: "Restarting playback..."
-new: "Redémarrage lecture"
+new: "Reprise de la lecture"
 
 id: LANG_REPLAYGAIN
 desc: in replaygain
 eng: "Replaygain"
-voice: "Adaption de volume" 
-new: "Adaption de volume"
+voice: "ReplayGain" 
+new: "ReplayGain"
 
 id: LANG_REPLAYGAIN_ENABLE
 desc: in replaygain
 eng: "Enable replaygain"
-voice: "Activer l'adaption de volume"
-new: "Activer l'adaption de volume"
+voice: "Activer ReplayGain"
+new: "Activer ReplayGain"
 
 id: LANG_REPLAYGAIN_NOCLIP
 desc: in replaygain
@@ -3210,8 +3210,8 @@ new: "Eviter surmodulation"
 id: LANG_REPLAYGAIN_MODE
 desc: in replaygain
 eng: "Replaygain type"
-voice: "Type d'adaption de volume"
-new: "Type d'adaption de volume"
+voice: "Type de ReplayGain"
+new: "Type de ReplayGain"
 
 id: LANG_TRACK_GAIN
 desc: in replaygain
@@ -3246,8 +3246,8 @@ new:
 id: LANG_BIDI_SUPPORT
 desc: in settings_menu, option to enable reversal of hebrew/arabic text
 eng: "BiDi Hebrew/Arabic"
-voice: "hébreu/arabe bidirectionell"
-new: "BiDi hébreu/arabe"
+voice: "Textes bidirectionel"
+new: "Arabe/Hébreux (BiDi)"
 
 id: LANG_REPLAYGAIN_PREAMP
 desc: in browse_id3
@@ -3272,8 +3272,8 @@ new: " (VBR)"
 id: LANG_BEEP
 desc: in playback settings
 eng: "Beep volume"
-voice: "Volume bip"
-new: "Voulume bip"
+voice: "Volume beep"
+new: "Voulume beep"
 
 id: LANG_WEAK
 desc: in beep volume in playback settings
