@@ -25,7 +25,7 @@
 # can be useful for creating a module that consists of many directories
 # spread out over the entire source repository.
 
-rockbox        &apps &firmware &docs &tools &fonts
+rockbox        &apps &firmware &docs &tools &fonts &wps
 rockbox-devel  &apps &flash &firmware &fonts &bootloader &docs &tools &uisimulator &gdb &wps
 rockbox-all    &apps &flash &firmware &fonts &bootloader &docs &tools &uisimulator &gdb &www &wps
 website        &www &docs
