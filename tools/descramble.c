@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "iriver.h"
 
@@ -38,8 +39,8 @@ int main (int argc, char** argv)
 {
     unsigned long length,i,slen;
     unsigned char *inbuf,*outbuf;
-    unsigned char *iname = argv[1];
-    unsigned char *oname = argv[2];
+    char *iname = argv[1];
+    char *oname = argv[2];
     unsigned char header[32];
     int headerlen = 6;
     int descramble = 1;
