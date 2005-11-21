@@ -10,6 +10,7 @@
 #     Eric LASSAUGE <lassauge AT users.sourceforge.net> - Juin 2004
 #     Modifié par Mourad Jaber <newbeewan AT users.sourceforge.net> - Octobre 2004
 #     Modifié par Manuel Dejonghe (lImbus) <lImbus AT users.soureforge.net> - February 2005
+#     Modifié par Mustapha Senhaji (Moos) <moos012 AT hotmail.com> - Novembre 2005
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -105,7 +106,7 @@ id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
 eng: "Partition?"
 voice: ""
-new: "config."
+new: "Partition?"
 
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
@@ -243,7 +244,7 @@ id: LANG_RESET_DONE_CLEAR
 desc: visual confirmation after settings reset
 eng: "Cleared"
 voice: "ré-initialisée"
-new: "ré-initialisée"
+new: "Ré-initialisée"
 
 id: LANG_RESET_DONE_CANCEL
 desc: Visual confirmation of cancelation
@@ -387,13 +388,13 @@ id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Is Full!"
 voice: ""
-new: "plein !"
+new: "Plein !"
 
 id: LANG_RESUME_ASK
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: "Reprendre?"
+new: ""
 
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
@@ -405,25 +406,25 @@ id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
 eng: "Key Lock ON"
 voice: ""
-new: "Verrouillage"
+new: "Verrouillage des touches ON"
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
 eng: "Key Lock OFF"
 voice: ""
-new: "Dé-verrouillage"
+new: "Dé-verrouillage des touches OFF"
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
 eng: "Key Lock Is ON"
-voice: ""
-new: "Touches désactivées"
+voice: "Touches vérouillées "
+new: "Touches vérouillées"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key Lock Is OFF"
 voice: ""
-new: "Touches activées"
+new: "Touches dévérouillées"
 
 id: LANG_MUTE_ON_PLAYER
 desc: DEPRECATED
@@ -483,7 +484,7 @@ id: LANG_ID3_NO_ARTIST
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: "Pas d'artiste"
+new: ""
 
 id: LANG_ID3_ALBUM
 desc: in wps
@@ -495,7 +496,7 @@ id: LANG_ID3_NO_ALBUM
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: "Pas d'album"
+new: ""
 
 id: LANG_ID3_TRACKNUM
 desc: in wps
@@ -848,7 +849,7 @@ new: "Déc"
 id: LANG_RESUME_SETTING_ASK_ONCE
 desc: DEPRECATED
 eng: ""
-voice: "Demander une fois"
+voice: ""
 new: ""
 
 id: LANG_BATTERY_DISPLAY
@@ -885,7 +886,7 @@ id: LANG_PM_HIGH_PERFORMANCE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: "Haute performance"
+new: ""
 
 id: LANG_PM_ENERGY_SAVER
 desc: DEPRECATED
@@ -974,7 +975,7 @@ new: "Canaux"
 id: LANG_RECORDING_SRC_MIC
 desc: in the recording settings
 eng: "Mic"
-voice: "Microphone incorporé"
+voice: "Microphone intégré"
 new: "Micro intégré"
 
 id: LANG_RECORDING_SRC_LINE
@@ -999,13 +1000,13 @@ id: LANG_DISK_STAT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: ""
 
 id: LANG_DISK_FREE_STAT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: ""
 
 id: LANG_POWEROFF
 desc: disk poweroff flag
@@ -1017,7 +1018,7 @@ id: LANG_FILTER_PLAYLIST
 desc: show only playlist
 eng: "Playlists"
 voice: "Listes de lecture"
-new: "Listes de lectures"
+new: "Listes de lecture"
 
 id: LANG_BATTERY_TIME
 desc: battery level in % and estimated time remaining
@@ -1100,7 +1101,7 @@ new: "Annulé"
 id: LANG_QUEUE
 desc: The verb/action Queue
 eng: "Queue"
-voice: "Insérér pour une lecture unique"
+voice: "Insérér pour lecture unique"
 new: "Insérér (lecture unique)"
 
 id: LANG_DELETE
@@ -1179,13 +1180,13 @@ id: LANG_CREATING
 desc: Screen feedback during playlist creation
 eng: "Creating"
 voice: ""
-new: "Création de"
+new: "Création..."
 
 id: LANG_PLAYER_KEYBOARD_BACKSPACE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new:  
 
 id: LANG_PLAYER_KEYBOARD_DELETE
 desc: DEPRECATED
@@ -1208,7 +1209,7 @@ new:
 id: LANG_MENU_SHOW_ID3_INFO
 desc: Menu option to start id3 viewer
 eng: "Show ID3 Info"
-voice: "Montrer Infos ID3"
+voice: "Montrer Infos Tag"
 new: "Montrer Infos Tag"
 
 id: LANG_ID3_GENRE
@@ -1227,7 +1228,7 @@ id: LANG_ID3_NO_INFO
 desc: ID3 info is missing
 eng: "<No Info>"
 voice: ""
-new: "<pas d'info>"
+new: "<Pas d'info>"
 
 id: LANG_RECORDING_TIME
 desc: Display of recorded time
@@ -1299,7 +1300,7 @@ id: LANG_SAVE_SETTINGS
 desc: in system_settings_menu()
 eng: "Write .cfg file"
 voice: "Ecrire un fichier de configuration"
-new: "Ecrire un fichier .cfg"
+new: "Sauvegardé .cfg actuelle"
 
 id: LANG_SETTINGS_SAVED1
 desc: Feedback shown when a .cfg file is saved
@@ -1359,7 +1360,7 @@ id: LANG_CAPTION_BACKLIGHT
 desc: in settings_menu
 eng: "Caption backlight"
 voice: "Eclairage lors du changement de chanson"
-new: "Eclairage lors du changement de chanson"
+new: "Eclairage quand changement de chanson"
 
 id: LANG_INVERT_CURSOR_POINTER
 desc: in settings_menu
@@ -1419,7 +1420,7 @@ id: LANG_JUMP_SCROLL_DELAY
 desc: (player) Delay before making a jump scroll
 eng: "Jump Scroll Delay"
 voice: "Délai avant défiliement par sauts"
-new: "Délai avant défil."
+new: "Délai avant défil. par sauts."
 
 id: LANG_RECORD_TIMESPLIT
 desc: Prompt for record timer interval setting, in the record settings menu
@@ -1624,8 +1625,8 @@ new: "Récursivement?"
 id: LANG_CUSTOM_FONT
 desc: in setting_menu()
 eng: "Browse Fonts"
-voice: "Polices d'affichage"
-new: "Polices d'affichage"
+voice: "Listes des polices d'affichage"
+new: "Liste Polices d'affichage"
 
 id: LANG_FIRMWARE
 desc: in the main menu
@@ -1643,7 +1644,7 @@ id: LANG_WHILE_PLAYING
 desc: in settings_menu()
 eng: "Browse .wps files"
 voice: "Charger une configuration d'affichage"
-new: "Charger config d'affichage"
+new: "Charger config. d'affichage"
 
 id: LANG_CUSTOM_CFG
 desc: in setting_menu()
@@ -1667,7 +1668,7 @@ id: LANG_LINE_IN
 desc: in settings_menu
 eng: "Line In"
 voice: "Entrée analogique"
-new: "Entrée analo."
+new: "Entrée analogique"
 
 id: LANG_NO_FILES
 desc: in settings_menu
@@ -1738,7 +1739,7 @@ new: "Enreg."
 id: LANG_VIEW_DYNAMIC_PLAYLIST
 desc: in playlist menu.
 eng: "View Current Playlist"
-voice: "Voir la liste d'écoute courante"
+voice: "Voir la liste de lecture courante"
 new: "Voir la liste courante"
 
 id: LANG_MOVE
@@ -1756,20 +1757,20 @@ new: "Echec du déplacement"
 id: LANG_FLIP_DISPLAY
 desc: in settings_menu, option to turn display+buttos by 180 degreed
 eng: "Upside Down"
-voice: "Rotation écran"
+voice: "Rotation écran à 180°"
 new: "Rotation LCD à 180°"
 
 id: LANG_RECORD_PRERECORD
 desc: in recording and radio screen
 eng: "Prerecording"
 voice: ""
-new: "Préenregistrement"
+new: "Pré-enregistrement"
 
 id: LANG_RECORD_PRERECORD_TIME
 desc: in recording settings_menu
 eng: "Prerecord time"
 voice: "Temps de préenregistrement"
-new: "Tps préenreg."
+new: "Tps pré-enreg."
 
 # Auto bookmark prompts
 
@@ -1936,14 +1937,14 @@ new: "Enregistrer..."
 id: LANG_WIND_MENU
 desc: in the playback sub menu
 eng: "FFwd/Rewind"
-voice: "avance et recul rapide"
+voice: "avance et retour rapide"
 new: "Avance/Retour Rapide"
 
 id: LANG_LCD_MENU
 desc: in the display sub menu
 eng: "LCD Settings"
-voice: "Configuration écran"
-new: "Config. LCD"
+voice: "Configuration écran du lecteur"
+new: "Config. LCD principal"
 
 id: LANG_BARS_MENU
 desc: in the display sub menu
@@ -1999,7 +2000,7 @@ id: LANG_CREATE_DIR
 desc: in main menu
 eng: "Create directory"
 voice: "Créer un répertoire"
-new: "Créer un Rép."
+new: "Créer un Répertoire"
 
 id: LANG_VIEW
 desc: in on+play menu
@@ -2386,20 +2387,20 @@ new: "Interface vocale"
 id: LANG_VOICE_MENU
 desc: item of voice menu, enable/disable the voice UI
 eng: "Voice Menus"
-voice: "Menus"
-new: "Menus"
+voice: "Menus vocalisés"
+new: "Menus vocalisés"
 
 id: LANG_VOICE_DIR
 desc: item of voice menu, set the "talkbox" mode for directories
 eng: "Voice Directories"
-voice: "Répertoires lus"
-new: "Répertoires"
+voice: "Répertoires vocalisés"
+new: "Répertoires vocalisés"
 
 id: LANG_VOICE_FILE
 desc: item of voice menu, set the voive mode for files
 eng: "Voice Filenames"
-voice: "Nom des fichiers"
-new: "Nom des fichiers"
+voice: "Nom des fichiers vocalisés"
+new: "Nom des fichiers vocalisés"
 
 id: LANG_VOICE_NUMBER
 desc: "talkbox" mode for files+directories
@@ -2689,7 +2690,7 @@ id: LANG_ONPLAY_OPEN_WITH
 desc: Onplay open with
 eng: "Open with"
 voice: "Ouvrir avec"
-new: "Ouvrir avec"
+new: "Ouvrir avec..."
 
 id: LANG_SORT_DIR
 desc: browser sorting setting
@@ -2719,13 +2720,13 @@ id: LANG_SORT_DATE_REVERSE
 desc: browser sorting setting
 eng: "by newest date"
 voice: "plus récent"
-new: "plus récent"
+new: "Plus récent"
 
 id: LANG_SORT_TYPE
 desc: browser sorting setting
 eng: "by type"
 voice: "par type"
-new: "par type"
+new: "Par type"
 
 id: LANG_FM_EDIT_PRESET
 desc: in radio screen
@@ -2755,7 +2756,7 @@ id: LANG_FM_BUTTONBAR_ADD
 desc: in radio screen
 eng: "Add"
 voice: "Ajouter"
-new: "Ajout."
+new: "Ajouter"
 
 id: LANG_FM_BUTTONBAR_ACTION
 desc: in radio screen
@@ -2803,7 +2804,7 @@ id: LANG_SHUTDOWN
 desc: in main menu
 eng: "Shut down"
 voice: "Arrêter"
-new: "Arrêter..."
+new: "Arrêter"
 
 id: LANG_SHUTTINGDOWN
 desc: in main menu
@@ -2862,7 +2863,7 @@ new:
 id: VOICE_PAUSE
 desc: spoken only, for spelling, a split second of silence (difficult to author)
 eng: ""
-voice: " "
+voice: ""
 new: 
 
 id: LANG_STEREO_WIDTH
@@ -2875,7 +2876,7 @@ id: LANG_CHANNEL_CUSTOM
 desc: in sound_settings
 eng: "Custom"
 voice: "au choix"
-new: "au choix"
+new: "Au choix"
 
 id: LANG_FILTER_ID3DB
 desc: show ID3 database
@@ -2905,7 +2906,7 @@ id: LANG_ID3DB_SEARCH
 desc: ID3 virtual folder name
 eng: "Search"
 voice: "rechercher"
-new: "rechercher"
+new: "Rechercher"
 
 id: LANG_ID3DB_SEARCH_ARTISTS
 desc: ID3 virtual folder name
@@ -3000,14 +3001,14 @@ new: "<toutes chansons>"
 id: LANG_PLAYLIST
 desc: Used when you need to say playlist, also voiced
 eng: "Playlist"
-voice: "Liste d'écoute"
+voice: "Liste de lecture"
 new: "Liste de lecture"
 
 id: LANG_RECORD_STARTUP
 desc: Start Rockbox in Recording screen
 eng: "Show recording screen on startup"
 voice: "Afficher le menu d'enregistrement au démarrage"
-new: "Afficher le menu d'enregistrement au démarrage"
+new: "Afficher menu d'enregistrement au démarrage"
 
 id: LANG_ALARM_MOD_DISABLE
 desc: Announce that the RTC alarm has been turned off
@@ -3091,7 +3092,7 @@ id: LANG_LCD_REMOTE_MENU
 desc: in the display sub menu
 eng: "Remote-LCD Settings"
 voice: "Propriétés écran télécommande"
-new: "Prop. écran télécommande"
+new: "Config. LCD télécommande"
 
 id: LANG_DISK_NAME_INTERNAL
 desc: in info menu; name for internal disk with multivolume (keep short!)
@@ -3108,7 +3109,7 @@ new: "MMC:"
 id: LANG_CROSSFADE
 desc: in playback settings
 eng: "Crossfade"
-voice: "Fondu enchaîné"
+voice: "Crossfade"
 new: "Crossfade"
 
 id: LANG_BACKLIGHT_FADE_IN
@@ -3156,7 +3157,7 @@ new: "Passer au rep. suivant"
 id: LANG_RUNTIMEDB_ACTIVE
 desc: in settings_menu.
 eng: "Gather runtime data (experimental)"
-voice: "Collectioner temps courant"
+voice: "Collectioner les données de lecture"
 new: "Collecter les données de lecture"
 
 id: LANG_MENU_SET_RATING
@@ -3186,19 +3187,19 @@ new: "Mixé"
 id: LANG_RESTARTING_PLAYBACK
 desc: splash screen displayed when pcm buffer size is changed
 eng: "Restarting playback..."
-voice: "Restarting playback..."
-new: "Reprise de la lecture"
+voice: "Restarting playback"
+new: "Reprise de la lecture..."
 
 id: LANG_REPLAYGAIN
 desc: in replaygain
 eng: "Replaygain"
-voice: "ReplayGain" 
+voice: "Replaygain" 
 new: "ReplayGain"
 
 id: LANG_REPLAYGAIN_ENABLE
 desc: in replaygain
 eng: "Enable replaygain"
-voice: "Activer ReplayGain"
+voice: "Activer Replaygain"
 new: "Activer ReplayGain"
 
 id: LANG_REPLAYGAIN_NOCLIP
@@ -3216,26 +3217,26 @@ new: "Type de ReplayGain"
 id: LANG_TRACK_GAIN
 desc: in replaygain
 eng: "Track gain"
-voice: "Volume de piste"
-new: "Volume de piste"
+voice: "Par volume de piste"
+new: "Par volume de piste"
 
 id: LANG_ALBUM_GAIN
 desc: in replaygain
 eng: "Album gain"
-voice: "Volume d'album"
-new: "Volume d'album"
+voice: "Par volume d'album"
+new: "Par Volume d'album"
 
 id: LANG_ID3_TRACK_GAIN
 desc: in browse_id3
 eng: "[Track gain]"
-voice: "Adaption de volume"
-new: "[Adaption de volume]"
+voice: "Gain par piste"
+new: "[Gain par piste]"
 
 id: LANG_ID3_ALBUM_GAIN
 desc: in browse_id3
 eng: "[Album gain]"
-voice: "Volume d'album"
-new: "[Volume d'album]"
+voice: "Gain par album"
+new: "[Gain par album]"
 
 id: LANG_ID3_NO_GAIN
 desc: DEPRECATED
@@ -3253,7 +3254,7 @@ id: LANG_REPLAYGAIN_PREAMP
 desc: in browse_id3
 eng: "Pre-amp"
 voice: "Préamplificateur"
-new: "Préamplificateur"
+new: "Pré-amplificateur"
 
 id: LANG_UNIT_DB
 desc: in browse_id3
@@ -3272,8 +3273,8 @@ new: " (VBR)"
 id: LANG_BEEP
 desc: in playback settings
 eng: "Beep volume"
-voice: "Volume beep"
-new: "Voulume beep"
+voice: "Volume bip"
+new: "Voulume bip"
 
 id: LANG_WEAK
 desc: in beep volume in playback settings
@@ -3298,3 +3299,171 @@ desc: repeat one song
 eng: "A-B"
 voice: "A-B"
 new: "A-B"
+
+id: LANG_SHUFFLE_GAIN
+desc: use track gain if shuffle mode is on, album gain otherwise
+eng: "Track gain if shuffling"
+voice: "Gain par piste quand lécture aléatoire "
+new: "Gain par piste quand lecture aléatoire"
+
+id: LANG_DIRCACHE_ENABLE
+desc: in directory cache settings
+eng: "Directory cache"
+voice: "Cache de la structure des dossiers"
+new: "Cache de la structure des dossiers"
+
+id: LANG_DIRCACHE_REBOOT
+desc: when activating directory cache
+eng: "Please reboot to enable the cache"
+voice: "Redémarrer pour activer le cache"
+new: "Redemarrer pour activer cache"
+
+id: LANG_DIRCACHE_BUILDING
+desc: when booting up and rebuilding the cache
+eng: "Scanning disk..."
+voice: "Recherche en cours"
+new: "Recherche en cours..."
+
+id: LANG_CROSSFADE_ENABLE
+desc: in crossfade settings menu
+eng: "Enable crossfade"
+voice: "Activer crossfade"
+new: "Activer crossfade"
+
+id: LANG_CROSSFADE_FADE_IN_DELAY
+desc: in crossfade settings menu
+eng: "Fade in delay"
+voice: "Délais du fade in"
+new: "Délais du fade in"
+
+id: LANG_CROSSFADE_FADE_OUT_DELAY
+desc: in crossfade settings menu
+eng: "Fade out delay"
+voice: "Délais du fade out"
+new: "Délais du fade out"
+
+id: LANG_CROSSFADE_FADE_IN_DURATION
+desc: in crossfade settings menu
+eng: "Fade in duration"
+voice: "Durée du fade in"
+new: "Durée du fade in"
+
+id: LANG_CROSSFADE_FADE_OUT_DURATION
+desc: in crossfade settings menu
+eng: "Fade out duration"
+voice: "Durée du fade out"
+new: "Durée du fade out"
+
+id: LANG_CROSSFADE_FADE_OUT_MODE
+desc: in crossfade settings menu
+eng: "Fade out mode"
+voice: "Mode du fade out"
+new: "Mode du fade out" 
+
+id: LANG_RECORDING_ADC_RIGHT
+desc: in the recording settings
+eng: "ADC Gain Right"
+voice: "gain ADC droit"
+new: "Gain ADC droit"
+
+id: LANG_RECORDING_ADC_LEFT
+desc: in the recording settings
+eng: "ADC Gain Left"
+voice: "ADC Gain Left"
+new: "Gain ADC gauche"
+
+id: LANG_RECORDING_MONITOR
+desc: in the recording settings
+eng: "Monitor Mode"
+voice: "Monitor Mode"
+new: "Mode Moniteur"
+
+id: LANG_RADIO_SCAN_MODE
+desc: in radio screen
+eng: "Scan Mode"
+voice: "Mode recherche automatique"
+new: "Mode recherche automatique"
+
+id: LANG_RADIO_PRESET_MODE
+desc: in radio screen
+eng: "Preset Mode"
+voice: "Mode stations"
+new: "Mode stations"
+
+id: LANG_FM_FREEZE
+desc: splash screen during freeze in radio mode
+eng: "Screen frozen!"
+voice: "Ecran gelé"
+new: "Ecran gelé!"
+
+id: LANG_CROSSFEED_ENABLE
+desc: In the crossfeed menu
+eng: "Enable crossfeed"
+voice: "Activer crossfeed"
+new: "Activer Crossfeed"
+
+id: LANG_CROSSFEED
+desc: in the sound settings menu
+eng: "Crossfeed"
+voice: "Crossfeed"
+new: "Crossfeed"
+
+id: LANG_FM_SCAN_PRESETS
+desc: in radio menu
+eng: "Auto scan presets"
+voice: "Recherche automatique des stations"
+new: "Recherche auto. des stations"
+
+id: LANG_FM_SCANNING
+desc: during auto scan
+eng: "Scanning %d.%dMHz"
+voice: ""
+new: "Recherche %d.%dMHz"
+
+id: LANG_FM_DEFAULT_PRESET_NAME
+desc: default preset name for auto scan mode
+eng: "%d.%dMHz"
+voice:
+new: "%d.%dMHz"
+
+id: LANG_FM_ADD_PRESET
+desc: in radio menu
+eng: "Add preset"
+voice: "Ajouter une station"
+new: "Ajouter station"
+
+id: LANG_FM_CLEAR_PRESETS
+desc: confirmation if presets can be cleared
+eng: "Clear current presets?"
+voice: "Effacer les stations actuelles"
+new: "Effacer stations actuelles?"
+
+id: LANG_WAIT
+desc: general please wait splash
+eng: "Loading..."
+voice: 
+new: "Chargement..."
+
+id: VOICE_EXT_RWPS
+desc: spoken only, for file extension
+eng: ""
+voice: "Configuration WPS de la télécommande"
+new:
+
+id: LANG_REMOTE_WHILE_PLAYING
+desc: in settings_menu()
+eng: "Browse .rwps files"
+voice: "Charger configuration d'écran télécommande"
+new: "Charger configuration écran télécommande"
+
+id: LANG_CUSTOM_THEME
+desc: Custom themes menu
+eng: "Browse Themes"
+voice: "Liste des Thèmes"
+new: "Listes des Thèmes"
+
+id: LANG_REDUCE_TICKING
+desc: in remote lcd settings menu
+eng: "Reduce ticking"
+voice: "Reduire le bruit parazite"
+new: "Reduire le bruit parazite"
