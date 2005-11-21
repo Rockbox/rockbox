@@ -17,8 +17,12 @@
  *
  ****************************************************************************/
 
+#include <stddef.h>
 #include "kernel.h"
 #include "thread.h"
+#include "debug.h"
+
+static void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
 
 int set_irq_level (int level)
 {
@@ -89,6 +93,54 @@ void queue_clear(struct event_queue* q)
 void switch_thread (void)
 {
     yield ();
+}
+
+void sim_tick_tasks(void)
+{
+    int i;
+
+    /* Run through the list of tick tasks */
+    for(i = 0;i < MAX_NUM_TICK_TASKS;i++)
+    {
+        if(tick_funcs[i])
+        {
+            tick_funcs[i]();
+        }
+    }
+}
+
+int tick_add_task(void (*f)(void))
+{
+    int i;
+
+    /* Add a task if there is room */
+    for(i = 0;i < MAX_NUM_TICK_TASKS;i++)
+    {
+        if(tick_funcs[i] == NULL)
+        {
+            tick_funcs[i] = f;
+            return 0;
+        }
+    }
+    DEBUGF("Error! tick_add_task(): out of tasks");
+    return -1;
+}
+
+int tick_remove_task(void (*f)(void))
+{
+    int i;
+
+    /* Remove a task if it is there */
+    for(i = 0;i < MAX_NUM_TICK_TASKS;i++)
+    {
+        if(tick_funcs[i] == f)
+        {
+            tick_funcs[i] = NULL;
+            return 0;
+        }
+    }
+    
+    return -1;
 }
 
 void mutex_init(struct mutex *m)

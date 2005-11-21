@@ -169,8 +169,8 @@ static const struct plugin_api rockbox_api = {
     lcd_remote_update,
     lcd_remote_update_rect,
 
-    lcd_remote_backlight_on,
-    lcd_remote_backlight_off,
+    remote_backlight_on,
+    remote_backlight_off,
 #endif
     /* button */
     button_get,

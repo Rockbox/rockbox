@@ -21,6 +21,7 @@
 #include "button.h"
 #include "kernel.h"
 #include "debug.h"
+#include "backlight.h"
 #include "misc.h"
 
 #include "X11/keysym.h"
@@ -47,7 +48,7 @@ static long lastbtn;   /* Last valid button status */
 /* mostly copied from real button.c */
 void button_read (void);
 
-void button_tick(void)
+static void button_tick(void)
 {
     static int tick = 0;
     static int count = 0;
@@ -117,6 +118,13 @@ void button_tick(void)
                         queue_post(&button_queue, BUTTON_REPEAT | btn, NULL);
                     else
                         queue_post(&button_queue, btn, NULL);
+#ifdef HAVE_REMOTE_LCD
+                    if(btn & BUTTON_REMOTE)
+                        remote_backlight_on();
+                    else
+#endif
+                        backlight_on();
+
                 }
             }
             else
@@ -276,6 +284,7 @@ long button_get_w_tmo(int ticks)
 
 void button_init(void)
 {
+    tick_add_task(button_tick);
 }
 
 int button_status(void)

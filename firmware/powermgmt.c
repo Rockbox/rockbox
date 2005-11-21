@@ -448,7 +448,7 @@ static int runcurrent(void)
         current = CURRENT_USB;
     }
 
-#ifndef BOOTLOADER
+#if defined(CONFIG_BACKLIGHT) && !defined(BOOTLOADER)
     if ((backlight_get_timeout() == 1) /* LED always on */
 #ifdef HAVE_CHARGE_CTRL
         || (charger_inserted() && backlight_get_on_when_charging())
@@ -915,13 +915,11 @@ void shutdown_hw(void)
 #elif HAVE_TLV320
     tlv320_close();
 #endif
-#if CONFIG_KEYPAD == ONDIO_PAD
     backlight_off();
-    sleep(1);
     lcd_set_contrast(0);
-#endif
 #ifdef HAVE_REMOTE_LCD
-    lcd_remote_backlight_off();
+    remote_backlight_off();
+    lcd_remote_set_contrast(0);
 #endif
     power_off();
 #endif /* #ifndef SIMULATOR */

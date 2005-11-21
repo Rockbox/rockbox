@@ -277,8 +277,14 @@ static const struct bit_entry rtc_bits[] =
     {1, S_O(bidi_support), false, "bidi hebrew/arabic", off_on },
 #endif
 
-#ifdef HAVE_REMOTE_LCD_TICKING /* move to REMOTE_LCD next time we bump version */
+#ifdef HAVE_REMOTE_LCD   /* move to REMOTE_LCD next time we bump version */
+#ifdef HAVE_REMOTE_LCD_TICKING
     {1, S_O(remote_reduce_ticking), false, "remote reduce ticking", off_on },
+#endif
+#ifdef HAVE_CHARGING
+    {1, S_O(remote_backlight_on_when_charging), false,
+        "remote backlight when plugged", off_on },
+#endif
 #endif
 
     /* new stuff to be added here */
@@ -475,6 +481,10 @@ static const struct bit_entry hd_bits[] =
     {8|SIGNED, S_O(rec_adc_right_gain), 0, /* 0dB */   "adc right gain", NULL }, /* -128...48 */
 #endif
 
+#ifdef HAVE_REMOTE_LCD
+    {1, S_O(remote_caption_backlight), false, 
+        "remote caption backlight", off_on },
+#endif
     /* If values are just added to the end, no need to bump the version. */
     /* new stuff to be added at the end */
 
@@ -862,11 +872,15 @@ void settings_apply(void)
 #endif
     remote_backlight_set_timeout(global_settings.remote_backlight_timeout);
 #endif
+#ifdef CONFIG_BACKLIGHT
     backlight_set_timeout(global_settings.backlight_timeout);
+#ifdef HAVE_CHARGING
     backlight_set_on_when_charging(global_settings.backlight_on_when_charging);
-#if CONFIG_BACKLIGHT == BL_IRIVER_H100
+#endif
+#if (CONFIG_BACKLIGHT == BL_IRIVER_H100) && !defined(SIMULATOR)
     backlight_set_fade_in(global_settings.backlight_fade_in);
     backlight_set_fade_out(global_settings.backlight_fade_out);
+#endif
 #endif
     ata_spindown(global_settings.disk_spindown);
 #if (CONFIG_CODEC == MAS3507D) && !defined(SIMULATOR)

@@ -181,8 +181,6 @@ static void button_tick(void)
         lastbtn = btn & ~(BUTTON_REL | BUTTON_REPEAT);
         tick = 0;
     }
-
-    backlight_tick();
 }
 
 long button_get(bool block)

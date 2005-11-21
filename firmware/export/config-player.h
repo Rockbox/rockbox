@@ -20,6 +20,9 @@
 /* Define this if you have a DAC3550A */
 #define HAVE_DAC3550A
 
+/* Define this for LCD backlight available */
+#define CONFIG_BACKLIGHT BL_PA14_LO /* port PA14, low active */
+
 #ifndef SIMULATOR
 
 /* Define this if you have a SH7034 */
@@ -69,9 +72,6 @@
 
 /* Software controlled LED */
 #define CONFIG_LED LED_REAL
-
-/* Define this for LCD backlight available */
-#define CONFIG_BACKLIGHT BL_PA14_LO /* port PA14, low active */
 
 #define CONFIG_LCD LCD_SSD1801
 

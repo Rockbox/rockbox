@@ -28,6 +28,7 @@
 #include "power.h"
 #include "system.h"
 #include "timer.h"
+#include "backlight.h"
 
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
@@ -51,17 +52,17 @@ static long backlight_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 static const char backlight_thread_name[] = "backlight";
 static struct event_queue backlight_queue;
 
-static bool charger_was_inserted = 0;
-static bool backlight_on_when_charging = 0;
-
+static bool backlight_on_when_charging = false;
 static int backlight_timer;
 static unsigned int backlight_timeout = 5;
+
 #ifdef HAVE_REMOTE_LCD
+static bool remote_backlight_on_when_charging = false;
 static int remote_backlight_timer;
 static unsigned int remote_backlight_timeout = 5;
 #endif
 
-#if CONFIG_BACKLIGHT == BL_IRIVER_H100
+#if (CONFIG_BACKLIGHT == BL_IRIVER_H100) && !defined(SIMULATOR)
 /* backlight fading */
 #define BL_PWM_INTERVAL 5000  /* Cycle interval in µs */
 #define BL_PWM_COUNT    100
@@ -191,45 +192,13 @@ void backlight_set_fade_out(int index)
 {
     fade_out_count = backlight_fade_value[index];
 }
-#endif
-
-static void __backlight_off(void)
-{
-#if CONFIG_BACKLIGHT == BL_IRIVER_H100
-    if (fade_out_count > 0)
-        backlight_dim(0);
-    else
-    {
-        bl_dim_target = bl_dim_current = 0;
-        or_l(0x00020000, &GPIO1_OUT);
-    }
-#elif CONFIG_BACKLIGHT == BL_IRIVER_H300
-    and_l(~0x00020000, &GPIO1_OUT);
-#elif CONFIG_BACKLIGHT == BL_RTC
-    /* Disable square wave */
-    rtc_write(0x0a, rtc_read(0x0a) & ~0x40);
-#elif CONFIG_BACKLIGHT == BL_PA14_LO /* Player */
-    and_b(~0x40, &PAIORH); /* let it float (up) */
-#elif CONFIG_BACKLIGHT == BL_PA14_HI /* Ondio */
-    and_b(~0x40, &PADRH); /* drive it low */
-#elif CONFIG_BACKLIGHT == BL_GMINI
-    P1 &= ~0x10;
-#elif CONFIG_BACKLIGHT == BL_IPOD4G
-   /* fades backlight off on 4g */
-   outl(inl(0x70000084) & ~0x2000000, 0x70000084);
-   outl(0x80000000, 0x7000a010);
-#elif CONFIG_BACKLIGHT==BL_IPODNANO
-    /* set port B03 off */
-    outl(((0x100 | 0) << 3), 0x6000d824);
-
-    /* set port L07 off */
-    outl(((0x100 | 0) << 7), 0x6000d12c);
-#endif
-}
+#endif /* (CONFIG_BACKLIGHT == BL_IRIVER_H100) && !defined(SIMULATOR) */
 
 static void __backlight_on(void)
 {
-#if CONFIG_BACKLIGHT == BL_IRIVER_H100
+#ifdef SIMULATOR
+    sim_backlight(100);
+#elif CONFIG_BACKLIGHT == BL_IRIVER_H100
     if (fade_in_count > 0)
         backlight_dim(BL_PWM_COUNT);
     else
@@ -264,6 +233,66 @@ static void __backlight_on(void)
 #endif
 }
 
+static void __backlight_off(void)
+{
+#ifdef SIMULATOR
+    sim_backlight(0);
+#elif CONFIG_BACKLIGHT == BL_IRIVER_H100
+    if (fade_out_count > 0)
+        backlight_dim(0);
+    else
+    {
+        bl_dim_target = bl_dim_current = 0;
+        or_l(0x00020000, &GPIO1_OUT);
+    }
+#elif CONFIG_BACKLIGHT == BL_IRIVER_H300
+    and_l(~0x00020000, &GPIO1_OUT);
+#elif CONFIG_BACKLIGHT == BL_RTC
+    /* Disable square wave */
+    rtc_write(0x0a, rtc_read(0x0a) & ~0x40);
+#elif CONFIG_BACKLIGHT == BL_PA14_LO /* Player */
+    and_b(~0x40, &PAIORH); /* let it float (up) */
+#elif CONFIG_BACKLIGHT == BL_PA14_HI /* Ondio */
+    and_b(~0x40, &PADRH); /* drive it low */
+#elif CONFIG_BACKLIGHT == BL_GMINI
+    P1 &= ~0x10;
+#elif CONFIG_BACKLIGHT == BL_IPOD4G
+   /* fades backlight off on 4g */
+   outl(inl(0x70000084) & ~0x2000000, 0x70000084);
+   outl(0x80000000, 0x7000a010);
+#elif CONFIG_BACKLIGHT==BL_IPODNANO
+    /* set port B03 off */
+    outl(((0x100 | 0) << 3), 0x6000d824);
+
+    /* set port L07 off */
+    outl(((0x100 | 0) << 7), 0x6000d12c);
+#endif
+}
+
+#ifdef HAVE_REMOTE_LCD
+static void __remote_backlight_on(void)
+{
+#ifdef SIMULATOR
+    sim_remote_backlight(100);
+#elif defined(IRIVER_H300_SERIES)
+    and_l(~0x00000002, &GPIO1_OUT);
+#else
+    and_l(~0x00000800, &GPIO_OUT);
+#endif
+}
+
+static void __remote_backlight_off(void)
+{
+#ifdef SIMULATOR
+    sim_remote_backlight(0);
+#elif defined(IRIVER_H300_SERIES)
+    or_l(0x00000002, &GPIO1_OUT);
+#else
+    or_l(0x00000800, &GPIO_OUT);
+#endif
+}
+#endif /* HAVE_REMOTE_LCD */
+
 void backlight_thread(void)
 {
     struct event ev;
@@ -275,26 +304,34 @@ void backlight_thread(void)
         {
 #ifdef HAVE_REMOTE_LCD
             case REMOTE_BACKLIGHT_ON:
-                remote_backlight_timer =
-                    HZ*backlight_timeout_value[remote_backlight_timeout];
+                if( remote_backlight_on_when_charging && charger_inserted() )
+                {
+                    /* Forcing to zero keeps the lights on */
+                    remote_backlight_timer = 0;
+                }
+                else
+                {
+                    remote_backlight_timer =
+                        HZ*backlight_timeout_value[remote_backlight_timeout];
+                }
 
                 /* Backlight == OFF in the setting? */
                 if(remote_backlight_timer < 0)
                 {
                     remote_backlight_timer = 0; /* Disable the timeout */
-                    lcd_remote_backlight_off();
+                    __remote_backlight_off();
                 }
                 else 
                 {
-                    lcd_remote_backlight_on();
+                    __remote_backlight_on();
                 }
                 break;
 
             case REMOTE_BACKLIGHT_OFF:
-                lcd_remote_backlight_off();
+                __remote_backlight_off();
                 break;
                 
-#endif
+#endif /* HAVE_REMOTE_LCD */
             case BACKLIGHT_ON:
                 if( backlight_on_when_charging && charger_inserted() )
                 {
@@ -321,7 +358,7 @@ void backlight_thread(void)
                 __backlight_off();
                 break;
 
-#if CONFIG_BACKLIGHT == BL_IRIVER_H100
+#if (CONFIG_BACKLIGHT == BL_IRIVER_H100) && !defined(SIMULATOR)
             case BACKLIGHT_UNBOOST_CPU:
                 cpu_boost(false);
                 break;
@@ -340,74 +377,24 @@ void backlight_thread(void)
     }
 }
 
-void backlight_on(void)
+static void backlight_tick(void)
 {
-    queue_post(&backlight_queue, BACKLIGHT_ON, NULL);
-}
-
-void backlight_off(void)
-{
-    queue_post(&backlight_queue, BACKLIGHT_OFF, NULL);
-}
-
-#ifdef HAVE_REMOTE_LCD
-void remote_backlight_on(void)
-{
-    queue_post(&backlight_queue, REMOTE_BACKLIGHT_ON, NULL);
-}
-
-void remote_backlight_off(void)
-{
-    queue_post(&backlight_queue, REMOTE_BACKLIGHT_OFF, NULL);
-}
-
-void remote_backlight_set_timeout(int index)
-{
-    if((unsigned)index >= sizeof(backlight_timeout_value))
-        /* if given a weird value, use 0 */
-        index=0;
-    remote_backlight_timeout = index; /* index in the backlight_timeout_value table */
-    remote_backlight_on();
-}
-#endif
-
-int backlight_get_timeout(void)
-{
-    return backlight_timeout;
-}
-
-void backlight_set_timeout(int index)
-{
-    if((unsigned)index >= sizeof(backlight_timeout_value))
-        /* if given a weird value, use 0 */
-        index=0;
-    backlight_timeout = index; /* index in the backlight_timeout_value table */
-    backlight_on();
-}
-
-#ifdef HAVE_CHARGE_CTRL
-bool backlight_get_on_when_charging(void)
-{
-    return backlight_on_when_charging;
-}
-#endif
-
-void backlight_set_on_when_charging(bool yesno)
-{
-    backlight_on_when_charging = yesno;
-    backlight_on();
-}
-
-void backlight_tick(void)
-{
+#ifdef HAVE_CHARGING
+    static bool charger_was_inserted = false;
     bool charger_is_inserted = charger_inserted();
-    if( backlight_on_when_charging &&
-        (charger_was_inserted != charger_is_inserted) )
+
+    if( charger_was_inserted != charger_is_inserted )
     {
-        backlight_on();
+        if( backlight_on_when_charging  )
+            backlight_on();
+#ifdef HAVE_REMOTE_LCD
+        if( remote_backlight_on_when_charging  )
+            remote_backlight_on();
+#endif
     }
     charger_was_inserted = charger_is_inserted;
-    
+#endif /* HAVE_CHARGING */
+
     if(backlight_timer)
     {
         backlight_timer--;
@@ -433,8 +420,10 @@ void backlight_init(void)
     queue_init(&backlight_queue);
     create_thread(backlight_thread, backlight_stack,
                   sizeof(backlight_stack), backlight_thread_name);
-                  
-#if CONFIG_BACKLIGHT == BL_IRIVER_H100
+    tick_add_task(backlight_tick);
+#ifdef SIMULATOR
+    /* do nothing */
+#elif CONFIG_BACKLIGHT == BL_IRIVER_H100
     or_l(0x00020000, &GPIO1_ENABLE);
     or_l(0x00020000, &GPIO1_FUNCTION);
     and_l(~0x00020000, &GPIO1_OUT);  /* Start with the backlight ON */
@@ -454,22 +443,77 @@ void backlight_init(void)
 #endif
 }
 
+void backlight_on(void)
+{
+    queue_post(&backlight_queue, BACKLIGHT_ON, NULL);
+}
+
+void backlight_off(void)
+{
+    queue_post(&backlight_queue, BACKLIGHT_OFF, NULL);
+}
+
+int backlight_get_timeout(void)
+{
+    return backlight_timeout;
+}
+
+void backlight_set_timeout(int index)
+{
+    if((unsigned)index >= sizeof(backlight_timeout_value))
+        /* if given a weird value, use 0 */
+        index=0;
+    backlight_timeout = index; /* index in the backlight_timeout_value table */
+    backlight_on();
+}
+
+#ifdef HAVE_CHARGING
+bool backlight_get_on_when_charging(void)
+{
+    return backlight_on_when_charging;
+}
+
+void backlight_set_on_when_charging(bool yesno)
+{
+    backlight_on_when_charging = yesno;
+    backlight_on();
+}
+#endif
+
+#ifdef HAVE_REMOTE_LCD
+void remote_backlight_on(void)
+{
+    queue_post(&backlight_queue, REMOTE_BACKLIGHT_ON, NULL);
+}
+
+void remote_backlight_off(void)
+{
+    queue_post(&backlight_queue, REMOTE_BACKLIGHT_OFF, NULL);
+}
+
+void remote_backlight_set_timeout(int index)
+{
+    if((unsigned)index >= sizeof(backlight_timeout_value))
+        /* if given a weird value, use 0 */
+        index=0;
+    remote_backlight_timeout = index; /* index in the backlight_timeout_value table */
+    remote_backlight_on();
+}
+
+#ifdef HAVE_CHARGING
+void remote_backlight_set_on_when_charging(bool yesno)
+{
+    remote_backlight_on_when_charging = yesno;
+    remote_backlight_on();
+}
+#endif
+#endif /* HAVE_REMOTE_LCD */
+
 #else /* no backlight, empty dummy functions */
 
-void backlight_init(void)
-{
-#if defined(IRIVER_H300_SERIES) && defined(BOOTLOADER)
-    or_l(0x00020000, &GPIO1_OUT);
-    or_l(0x00020000, &GPIO1_ENABLE);
-    or_l(0x00020000, &GPIO1_FUNCTION);
-#endif
-}
 void backlight_on(void) {}
 void backlight_off(void) {}
-void backlight_tick(void) {}
-int  backlight_get_timeout(void) {return 0;}
 void backlight_set_timeout(int index) {(void)index;}
-void backlight_set_on_when_charging(bool yesno) {(void)yesno;}
 #ifdef HAVE_REMOTE_LCD
 void remote_backlight_on(void) {}
 void remote_backlight_off(void) {}

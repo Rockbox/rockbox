@@ -137,10 +137,8 @@ static bool remote_reduce_ticking(void)
 #ifdef CONFIG_BACKLIGHT
 static bool caption_backlight(void)
 {
-    bool rc = set_bool( str(LANG_CAPTION_BACKLIGHT),
-                        &global_settings.caption_backlight);
-
-    return rc;
+    return set_bool( str(LANG_CAPTION_BACKLIGHT),
+                     &global_settings.caption_backlight);
 }
 
 #ifdef HAVE_CHARGING
@@ -180,7 +178,7 @@ static bool backlight_timer(void)
                       INT, names, 19, backlight_set_timeout );
 }
 
-#if CONFIG_BACKLIGHT == BL_IRIVER_H100
+#if (CONFIG_BACKLIGHT == BL_IRIVER_H100) && !defined(SIMULATOR)
 static bool backlight_fade_in(void)
 {
     static const struct opt_items names[] = {
@@ -242,6 +240,22 @@ static bool remote_backlight_timer(void)
                       INT, names, 19, remote_backlight_set_timeout );
 }
 
+#ifdef HAVE_CHARGING
+static bool remote_backlight_on_when_charging(void)
+{
+    bool result = set_bool(str(LANG_BACKLIGHT_ON_WHEN_CHARGING),
+                           &global_settings.remote_backlight_on_when_charging);
+    remote_backlight_set_on_when_charging(
+                     global_settings.remote_backlight_on_when_charging);
+    return result;
+}
+#endif
+
+static bool remote_caption_backlight(void)
+{
+    return set_bool( str(LANG_CAPTION_BACKLIGHT),
+                     &global_settings.remote_caption_backlight);
+}
 #endif /* HAVE_REMOTE_LCD */
 
 static bool contrast(void)
@@ -1521,7 +1535,7 @@ static bool lcd_settings_menu(void)
         { ID2P(LANG_BACKLIGHT_ON_WHEN_CHARGING), backlight_on_when_charging },
 #endif
         { ID2P(LANG_CAPTION_BACKLIGHT), caption_backlight },
-#if CONFIG_BACKLIGHT == BL_IRIVER_H100
+#if (CONFIG_BACKLIGHT == BL_IRIVER_H100) && !defined(SIMULATOR)
         { ID2P(LANG_BACKLIGHT_FADE_IN), backlight_fade_in },
         { ID2P(LANG_BACKLIGHT_FADE_OUT), backlight_fade_out },
 #endif
@@ -1549,6 +1563,11 @@ static bool lcd_remote_settings_menu(void)
 
     static const struct menu_item items[] = {
         { ID2P(LANG_BACKLIGHT),       remote_backlight_timer },
+#ifdef HAVE_CHARGING
+        { ID2P(LANG_BACKLIGHT_ON_WHEN_CHARGING),
+                               remote_backlight_on_when_charging },
+#endif
+        { ID2P(LANG_CAPTION_BACKLIGHT), remote_caption_backlight },
         { ID2P(LANG_CONTRAST),        remote_contrast },
         { ID2P(LANG_INVERT),          remote_invert },
         { ID2P(LANG_FLIP_DISPLAY),    remote_flip_display },

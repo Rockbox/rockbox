@@ -147,6 +147,8 @@ void init(void)
 #endif
     font_init();
     show_logo();
+    button_init();
+    backlight_init();
     lang_init();
     /* Must be done before any code uses the multi-screen APi */
     screen_access_init();

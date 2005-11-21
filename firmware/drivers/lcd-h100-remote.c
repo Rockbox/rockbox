@@ -122,24 +122,6 @@ static const char scroll_tick_table[16] = {
 /*** driver routines ***/
 
 #ifndef SIMULATOR
-void lcd_remote_backlight_on(void)
-{
-#ifdef IRIVER_H300_SERIES
-    and_l(~0x00000002, &GPIO1_OUT);
-#else
-    and_l(~0x00000800, &GPIO_OUT);
-#endif
-}
-
-void lcd_remote_backlight_off(void)
-{
-#ifdef IRIVER_H300_SERIES
-    or_l(0x00000002, &GPIO1_OUT);
-#else
-    or_l(0x00000800, &GPIO_OUT);
-#endif
-}
-
 void lcd_remote_write_command(int cmd)
 {
     int i;

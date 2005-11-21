@@ -31,6 +31,9 @@
 
 #define CONFIG_LCD LCD_S1D15E06
 
+/* Define this for LCD backlight available */
+#define CONFIG_BACKLIGHT BL_IRIVER_H100 /* port controlled */
+
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 
@@ -71,9 +74,6 @@
 
 /* The size of the flash ROM */
 #define FLASH_SIZE 0x200000
-
-/* Define this for LCD backlight available */
-#define CONFIG_BACKLIGHT BL_IRIVER_H100 /* port controlled */
 
 /* Define this to the CPU frequency */
 #define CPU_FREQ      11289600

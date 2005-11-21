@@ -78,21 +78,19 @@ void audio_set_buffer_margin(int seconds)
 }
 #endif
 
-/* Generic firmware stubs. */
-void backlight_on(void)
+#ifdef CONFIG_BACKLIGHT
+void sim_backlight(int value)
 {
-  /* we could do something better here! */
+    DEBUGF("backlight: %s\n", (value > 0) ? "on" : "off");
 }
+#endif
 
-void backlight_off(void)
+#ifdef HAVE_REMOTE_LCD
+void sim_remote_backlight(int value)
 {
-  /* we could do something better here! */
+    DEBUGF("remote backlight: %s\n", (value > 0) ? "on" : "off");
 }
-
-void backlight_time(int dummy)
-{
-    (void)dummy;
-}
+#endif
 
 int fat_startsector(void)
 {
@@ -165,21 +163,6 @@ bool simulate_usb(void)
     usb_display_info();
     while (button_get(true) & BUTTON_REL);
     return false;
-}
-
-void backlight_set_timeout(int index)
-{
-  (void)index;
-}
-
-void backlight_set_on_when_charging(bool beep)
-{
-  (void)beep;
-}
-
-void remote_backlight_set_timeout(int index)
-{
-  (void)index;
 }
 
 int rtc_read(int address)

@@ -202,7 +202,13 @@ void button_event(int key, bool pressed)
                 else
                     queue_post(&button_queue, btn, NULL);
 
-                backlight_on();
+#ifdef HAVE_REMOTE_LCD
+                if(btn & BUTTON_REMOTE)
+                    remote_backlight_on();
+                else
+#endif
+                    backlight_on();
+
             }
         }
         else

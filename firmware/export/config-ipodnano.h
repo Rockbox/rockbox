@@ -38,6 +38,9 @@
 /* Define this if you have the WM8975 audio codec */
 #define HAVE_WM8975
 
+/* Define this for LCD backlight available */
+#define CONFIG_BACKLIGHT BL_IPODNANO /* port controlled */
+
 #ifndef SIMULATOR
 
 /* The Nano actually has a PP5021 - but it's register compatible with 
@@ -61,9 +64,6 @@
 
 /* The start address index for ROM builds */
 #define ROM_START 0x00000000
-
-/* Define this for LCD backlight available */
-#define CONFIG_BACKLIGHT BL_IPODNANO /* port controlled */
 
 /* Define this to the CPU frequency */
 #define CPU_FREQ      11289600

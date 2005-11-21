@@ -30,7 +30,7 @@
 #endif
 
 long current_tick = 0;
-extern void button_tick(void);
+extern void sim_tick_tasks(void);
 
 static void msleep(int msec)
 {
@@ -59,10 +59,8 @@ static void update_tick_thread()
                    + (now.tv_usec - start.tv_usec) / (1000000/HZ);
         if (new_tick > current_tick)
         {
+            sim_tick_tasks();
             current_tick = new_tick;
-            button_tick();  /* Dirty call to button.c. This should probably
-                             * be implemented as a tick task the same way 
-                             * as on the target. */
         }
     }
 }

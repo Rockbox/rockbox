@@ -32,6 +32,9 @@
 /* Define this for S/PDIF input available */
 #define HAVE_SPDIF_IN
 
+/* Define this for LCD backlight available */
+#define CONFIG_BACKLIGHT BL_RTC /* on I2C controlled RTC port */
+
 #ifndef SIMULATOR
 
 /* Define this if you have a SH7034 */
@@ -82,9 +85,6 @@
 
 /* Software controlled LED */
 #define CONFIG_LED LED_REAL
-
-/* Define this for LCD backlight available */
-#define CONFIG_BACKLIGHT BL_RTC /* on I2C controlled RTC port */
 
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER

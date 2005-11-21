@@ -30,8 +30,6 @@
 #define STYLE_INVERT  1
 
 extern void lcd_remote_init(void);
-extern void lcd_remote_backlight_on(void);
-extern void lcd_remote_backlight_off(void);
 extern int  lcd_remote_default_contrast(void);
 extern void lcd_remote_set_contrast(int val);
 extern void lcd_remote_emireduce(bool state);

@@ -36,7 +36,8 @@
 
 // extern functions
 extern void                 app_main (void *); // mod entry point
-extern void					new_key(int key);
+extern void                 new_key(int key);
+extern void                 sim_tick_tasks(void);
 
 void button_event(int key, bool pressed);
 
@@ -67,12 +68,18 @@ LRESULT CALLBACK GUIWndProc (
     static HDC hMemDc;
 
     static LARGE_INTEGER    persec, tick1, ticknow;
+    long new_tick;
 
     switch (uMsg)
     {
     case WM_TIMER:
         QueryPerformanceCounter(&ticknow);
-        current_tick = ((ticknow.QuadPart-tick1.QuadPart)*HZ)/persec.QuadPart;
+        new_tick = ((ticknow.QuadPart-tick1.QuadPart)*HZ)/persec.QuadPart;
+        if (new_tick != current_tick)
+        {
+            sim_tick_tasks();
+            current_tick = new_tick;
+        }
         return TRUE;
     case WM_ACTIVATE:
         if (LOWORD(wParam) == WA_ACTIVE || LOWORD(wParam) == WA_CLICKACTIVE)

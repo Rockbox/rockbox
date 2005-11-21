@@ -21,24 +21,32 @@
 
 #include "config.h"
 
-void backlight_init(void);
 void backlight_on(void);
 void backlight_off(void);
-void backlight_tick(void);
-int  backlight_get_timeout(void);
 void backlight_set_timeout(int index);
+#ifdef CONFIG_BACKLIGHT
+void backlight_init(void);
+int  backlight_get_timeout(void);
 #if CONFIG_BACKLIGHT == BL_IRIVER_H100
 void backlight_set_fade_in(int index);
 void backlight_set_fade_out(int index);
 #endif
 bool backlight_get_on_when_charging(void);
 void backlight_set_on_when_charging(bool yesno);
-void remote_backlight_on(void);
-void remote_backlight_off(void);
 extern const char backlight_timeout_value[];
-
-#ifdef HAVE_REMOTE_LCD
-void remote_backlight_set_timeout(int index);
+#else
+#define backlight_init()
 #endif
 
+#ifdef HAVE_REMOTE_LCD
+void remote_backlight_on(void);
+void remote_backlight_off(void);
+void remote_backlight_set_timeout(int index);
+void remote_backlight_set_on_when_charging(bool yesno);
+#endif
+
+#ifdef SIMULATOR
+void sim_backlight(int value);
+void sim_remote_backlight(int value);
+#endif
 #endif

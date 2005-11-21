@@ -1612,12 +1612,12 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
     data->peak_meter_enabled = enable_pm;
 #endif
 
-#if defined(CONFIG_BACKLIGHT) && !defined(SIMULATOR)
+#ifdef CONFIG_BACKLIGHT
     if (global_settings.caption_backlight && state->id3) {
         /* turn on backlight n seconds before track ends, and turn it off n
            seconds into the new track. n == backlight_timeout, or 5s */
-        int n =
-            backlight_timeout_value[global_settings.backlight_timeout] * 1000;
+        int n = backlight_timeout_value[global_settings.backlight_timeout] 
+              * 1000;
 
         if ( n < 1000 )
             n = 5000; /* use 5s if backlight is always on or off */
@@ -1625,6 +1625,22 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
         if ((state->id3->elapsed < 1000) ||
             ((state->id3->length - state->id3->elapsed) < (unsigned)n))
             backlight_on();
+    }
+#endif
+#ifdef HAVE_REMOTE_LCD
+    if (global_settings.remote_caption_backlight && state->id3) {
+        /* turn on remote backlight n seconds before track ends, and turn it
+           off n seconds into the new track. n == remote_backlight_timeout,
+           or 5s */
+        int n = backlight_timeout_value[global_settings.remote_backlight_timeout]
+              * 1000;
+
+        if ( n < 1000 )
+            n = 5000; /* use 5s if backlight is always on or off */
+
+        if ((state->id3->elapsed < 1000) ||
+            ((state->id3->length - state->id3->elapsed) < (unsigned)n))
+            remote_backlight_on();
     }
 #endif
     return true;
