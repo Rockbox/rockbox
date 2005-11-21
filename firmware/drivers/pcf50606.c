@@ -38,7 +38,7 @@
 #define SCL_INPUT  and_l(~0x00001000, &GPIO_ENABLE)
 #define SCL_OUTPUT  or_l( 0x00001000, &GPIO_ENABLE)
 #define SCL_LO     and_l(~0x00001000, &GPIO_OUT)
-#define SCL_HI      or_l( 0x00001000, &GPIO_OUT)
+#define SCL_HI      SCL_INPUT;while(!SCL){};or_l(0x1000, &GPIO_OUT);SCL_OUTPUT
 #define SCL             ( 0x00001000 & GPIO_READ)
 
 /* delay loop to achieve 400kHz at 120MHz CPU frequency */
@@ -68,28 +68,13 @@ static void pcf50606_i2c_stop(void)
 
 static void pcf50606_i2c_ack(bool ack)
 {
-    /* Here's the deal. The slave is slow, and sometimes needs to wait
-       before it can receive the acknowledge. Therefore it forces the clock
-       low until it is ready. We need to poll the clock line until it goes
-       high before we release the ack.
-
-       In their infinite wisdom, iriver didn't pull up the SCL line, so
-       we have to drive the SCL high repeatedly to simulate a pullup. */
-    
     SCL_LO;      /* Set the clock low */
     if(ack)
         SDA_LO;
     else
         SDA_HI;
-    
-    SCL_INPUT;   /* Set the clock to input */
-    while(!SCL)  /* and wait for the slave to release it */
-    {
-        SCL_OUTPUT;  /* Set the clock to output */
-        SCL_HI;
-        SCL_INPUT;   /* Set the clock to input */
-        DELAY;
-    }
+
+    SCL_HI;
 
     DELAY;
     SCL_OUTPUT;
@@ -100,23 +85,8 @@ static int pcf50606_i2c_getack(void)
 {
     int ret = 1;
 
-    /* Here's the deal. The slave is slow, and sometimes needs to wait
-       before it can send the acknowledge. Therefore it forces the clock
-       low until it is ready. We need to poll the clock line until it goes
-       high before we read the ack.
-
-       In their infinite wisdom, iriver didn't pull up the SCL line, so
-       we have to drive the SCL high repeatedly to simulate a pullup. */
-
     SDA_INPUT;   /* And set to input */
-    SCL_INPUT;   /* Set the clock to input */
-    while(!SCL)  /* and wait for the slave to release it */
-    {
-        SCL_OUTPUT;  /* Set the clock to output */
-        SCL_HI;
-        SCL_INPUT;   /* Set the clock to input */
-        DELAY;
-    }
+    SCL_HI;
 
     if (SDA)
         /* ack failed */
