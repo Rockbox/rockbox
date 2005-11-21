@@ -916,11 +916,16 @@ static int calculate_step_count(const struct playlist_info *playlist, int steps)
     int index;
     int stepped_count = 0;
     
-    count = steps;
     if (steps < 0)
+    {
         direction = -1;
+        count = -steps;
+    }
     else
+    {
         direction = 1;
+        count = steps;
+    }
 
     index = playlist->index;
     i = 0;
