@@ -48,9 +48,10 @@ Width: 55
 
 <wps>
 Name: boxes.wps
+rwps: boxes.rwps
 Author: Christi Scarborough (after Magnus Westerlund)
 Font: rockbox_default.fnt
-Statusbar: off
+Statusbar: on
 Height: 128
 Width: 160
 </wps>
@@ -97,6 +98,15 @@ Name: iAmp.rwps
 Author: Raymond Hoh
 Font: nimbus-12.fnt
 Statusbar: Off
+Height: 64
+Width: 128
+</rwps>
+
+<rwps>
+Name: boxes.rwps
+Author: Christi Scarborough
+Font: rockbox_default.fnt
+Statusbar: off
 Height: 64
 Width: 128
 </rwps>

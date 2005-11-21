@@ -233,7 +233,7 @@ struct align_pos {
 
 #ifdef HAVE_LCD_BITMAP
 #define MAX_IMAGES (26*2) /* a-z and A-Z */
-#define IMG_BUFSIZE (LCD_HEIGHT * LCD_WIDTH * MAX_IMAGES/25) / 8
+#define IMG_BUFSIZE (LCD_HEIGHT * LCD_WIDTH * MAX_IMAGES/10) / 8
 #define WPS_MAX_LINES (LCD_HEIGHT/5+1)
 #define FORMAT_BUFFER_SIZE 3072
 #else
