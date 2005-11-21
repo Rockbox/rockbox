@@ -792,9 +792,11 @@ if test "$simulator" = "yes"; then
 
   # add simul make stuff on the #SIMUL# line
   simmagic='/#SIMUL#/c\	@$(MAKE) -C $(SIMDIR) OBJDIR=$(BUILDDIR)/sim\n	@$(MAKE) -C $(ROOTDIR)/uisimulator/common OBJDIR=$(BUILDDIR)/comsim'
+  simtools='s/#TOOLSDEP#//'
 else
   # delete the line that matches
   simmagic='/#SIMUL#/D'
+  simtools='s/#TOOLSDEP#/tools/'
 fi
 
 sed > Makefile \
@@ -833,6 +835,7 @@ sed > Makefile \
  -e "s,@UNAME@,${uname},g" \
  -e "s,@ENDIAN@,${defendian},g" \
  -e "${simmagic}" \
+ -e "${simtools}" \
 <<EOF
 ## Automaticly generated. http://www.rockbox.org/
 
@@ -882,7 +885,7 @@ MAKEFLAGS += --no-print-directory
 
 .PHONY: all clean tags zip
 
-all:
+all: #TOOLSDEP#
 #SIMUL#
 	@\$(MAKE) -C \$(FIRMDIR) OBJDIR=\$(BUILDDIR)/firmware
 	@\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@
