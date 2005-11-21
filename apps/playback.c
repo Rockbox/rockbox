@@ -867,6 +867,7 @@ bool loadcodec(const char *trackname, bool start_play)
     int prev_track;
     
     filetype = probe_file_format(trackname);
+    
     switch (filetype) {
     case AFMT_OGG_VORBIS:
         logf("Codec: Vorbis");
@@ -915,12 +916,11 @@ bool loadcodec(const char *trackname, bool start_play)
         snprintf(msgbuf, sizeof(msgbuf)-1, "No codec for: %s", trackname);
         gui_syncsplash(HZ*2, true, msgbuf);
         codec_path = NULL;
+        return false;
     }
     
     tracks[track_widx].id3.codectype = filetype;
     tracks[track_widx].codecsize = 0;
-    if (codec_path == NULL)
-        return false;
     
     if (!start_play) {
         prev_track = track_widx - 1;
@@ -1094,11 +1094,10 @@ bool audio_load_track(int offset, bool start_play, int peek_offset)
     tracks[track_widx].codecbuf = &filebuf[buf_widx];
     if (!loadcodec(trackname, start_play)) {
         close(fd);
-        /* Stop buffer filling if codec load failed. */
-        fill_bytesleft = 0;
         /* Set filesize to zero to indicate no file was loaded. */
         tracks[track_widx].filesize = 0;
         tracks[track_widx].filerem = 0;
+        tracks[track_widx].taginfo_ready = false;
 
         /* Try skipping to next track. */
         if (fill_bytesleft > 0) {

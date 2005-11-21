@@ -582,7 +582,6 @@ static int add_track_to_playlist(struct playlist_info* playlist,
 #ifdef HAVE_DIRCACHE
     if (playlist->filenames)
         playlist->filenames[insert_position] = NULL;
-    queue_post(&playlist_queue, PLAYLIST_LOAD_POINTERS, 0);
 #endif
 
     playlist->amount++;
@@ -917,22 +916,15 @@ static int calculate_step_count(const struct playlist_info *playlist, int steps)
     int index;
     int stepped_count = 0;
     
+    count = steps;
     if (steps < 0)
-    {
         direction = -1;
-        count = -steps;
-    }
     else
-    {
         direction = 1;
-        count = steps;
-    }
 
     index = playlist->index;
     i = 0;
-    while (i < count)
-    {
-        index += direction;
+    do {
         /* Boundary check */
         if (index < 0)
             index += playlist->amount;
@@ -949,7 +941,9 @@ static int calculate_step_count(const struct playlist_info *playlist, int steps)
         }
         else
             i++;
-    }
+
+        index += direction;
+    } while (i < count);
 
     return steps;
 }
@@ -1693,6 +1687,7 @@ int playlist_resume(void)
 
     empty_playlist(playlist, true);
 
+    gui_syncsplash(0, true, str(LANG_WAIT));
     playlist->control_fd = open(playlist->control_filename, O_RDWR);
     if (playlist->control_fd < 0)
     {
@@ -1810,7 +1805,7 @@ int playlist_resume(void)
                            buffer */
                         if (add_track_to_playlist(playlist, str3, position,
                                 queue, total_read+(str3-buffer)) < 0)
-                            return -1;
+                        return -1;
                         
                         playlist->last_insert_pos = last_position;
 
@@ -2040,6 +2035,10 @@ int playlist_resume(void)
             break;
         }
     }
+
+#ifdef HAVE_DIRCACHE
+    queue_post(&playlist_queue, PLAYLIST_LOAD_POINTERS, 0);
+#endif
 
     return 0;
 }
@@ -2582,6 +2581,10 @@ int playlist_insert_track(struct playlist_info* playlist,
             audio_flush_and_reload_tracks();
     }
 
+#ifdef HAVE_DIRCACHE
+    queue_post(&playlist_queue, PLAYLIST_LOAD_POINTERS, 0);
+#endif
+
     return result;
 }
 
@@ -2623,6 +2626,10 @@ int playlist_insert_directory(struct playlist_info* playlist,
 
     if (audio_status() & AUDIO_STATUS_PLAY)
         audio_flush_and_reload_tracks();
+
+#ifdef HAVE_DIRCACHE
+    queue_post(&playlist_queue, PLAYLIST_LOAD_POINTERS, 0);
+#endif
 
     return result;
 }
@@ -2737,6 +2744,10 @@ int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
 
     if (audio_status() & AUDIO_STATUS_PLAY)
         audio_flush_and_reload_tracks();
+
+#ifdef HAVE_DIRCACHE
+    queue_post(&playlist_queue, PLAYLIST_LOAD_POINTERS, 0);
+#endif
 
     return result;
 }
@@ -2859,6 +2870,10 @@ int playlist_move(struct playlist_info* playlist, int index, int new_index)
                 audio_flush_and_reload_tracks();
         }
     }
+
+#ifdef HAVE_DIRCACHE
+    queue_post(&playlist_queue, PLAYLIST_LOAD_POINTERS, 0);
+#endif
 
     return result;
 }
