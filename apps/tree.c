@@ -213,8 +213,6 @@ bool check_rockboxdir(void)
 
 void browse_root(void)
 {
-    /* essential to all programs that wants to display things */
-    screen_access_init();
     gui_sync_wps_screen_init();
 
     filetype_init();
@@ -232,7 +230,6 @@ void browse_root(void)
     /* since archos only have one screen, no need to create more than that */
     gui_buttonbar_set_display(&tree_buttonbar, &(screens[SCREEN_MAIN]) );
 #endif
-    gui_syncstatusbar_init(&statusbars);
     gui_synclist_init(&tree_lists, &tree_get_filename, &tc);
     gui_synclist_set_icon_callback(&tree_lists,
                   global_settings.show_icons?&tree_get_fileicon:NULL);

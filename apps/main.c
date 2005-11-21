@@ -148,6 +148,9 @@ void init(void)
     font_init();
     show_logo();
     lang_init();
+    /* Must be done before any code uses the multi-screen APi */
+    screen_access_init();
+    gui_syncstatusbar_init(&statusbars);
     settings_reset();
     settings_calc_config_sector();
     settings_load(SETTINGS_ALL);
@@ -244,6 +247,10 @@ void init(void)
 #ifdef CONFIG_TUNER
     radio_init();
 #endif
+
+    /* Must be done before any code uses the multi-screen APi */
+    screen_access_init();
+    gui_syncstatusbar_init(&statusbars);
 
 #if defined(HAVE_CHARGING) && (CONFIG_CPU == SH7034)
     if (coldstart && charger_inserted()

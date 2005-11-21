@@ -95,13 +95,6 @@ void gui_statusbar_init(struct gui_statusbar * bar)
 #endif
 }
 
-void gui_statusbar_set_screen(struct gui_statusbar * bar,
-                              struct screen * display)
-{
-    bar->display = display;
-    gui_statusbar_draw(bar, false);
-}
-
 void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 {
     struct screen * display = bar->display;
