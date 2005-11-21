@@ -943,7 +943,7 @@ static int calculate_step_count(const struct playlist_info *playlist, int steps)
             i++;
 
         index += direction;
-    } while (i < count);
+    } while (i <= count);
 
     return steps;
 }
