@@ -30,7 +30,7 @@
 typedef struct
 {
         int             format;
-        unsigned char   *mnem;
+        const char   *mnem;
         unsigned short  mask;   /* mask used to obtain opcode bits */
         unsigned short  bits;   /* opcode bits */
         int             dat;    /* specific data for situation */
@@ -541,7 +541,7 @@ int main(int argc, char **argv)
         fseek(fp, 0, SEEK_END);
         fsize = ftell(fp);
         rewind(fp);
-        if ((buffer = (unsigned char *) calloc(fsize * 2, sizeof(unsigned short)))
+        if ((buffer = (char *) calloc(fsize * 2, sizeof(unsigned short)))
             == NULL)
         {                      
                 fprintf(stderr, "sh2d: Not enough memory to load input "
@@ -560,11 +560,11 @@ int main(int argc, char **argv)
         {
                 if (do_org)
                 {
-                        SH2Disasm(org, &buffer[i], mode, &mark[i]);
+                        SH2Disasm(org, (unsigned char*)&buffer[i], mode, &mark[i]);
                         org += 2;
                 }
                 else
-                        SH2Disasm(i, &buffer[i], mode, &mark[i]);
+                        SH2Disasm(i, (unsigned char *)&buffer[i], mode, &mark[i]);
                 j += 2;
         }
 
