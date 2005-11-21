@@ -41,8 +41,8 @@ int main (int argc, char* argv[]) {
     char checksum = '\0';
     unsigned long length, i;
     unsigned char* inbuf;
-    unsigned char* iname = argv[1];
-    unsigned char* oname = argv[2];
+    char* iname = argv[1];
+    char* oname = argv[2];
     FILE* pFile;
 
     if (argc < 2) {
@@ -50,7 +50,7 @@ int main (int argc, char* argv[]) {
     }
 
     /* open file */
-    pFile = fopen(iname,"rb");
+    pFile = fopen(iname, "rb");
     if (!pFile) {
        perror(oname);
        return -1;

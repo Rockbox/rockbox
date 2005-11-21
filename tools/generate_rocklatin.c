@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define CHAR_WIDTH 8
 #define CHAR_HEIGHT 8
