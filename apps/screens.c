@@ -552,14 +552,14 @@ bool quick_screen_quick(void)
         [0]={ STR(LANG_OFF) },
         [1]={ STR(LANG_ON) }
     };
-    struct opt_items bottom_items[] = {
+    static const struct opt_items bottom_items[] = {
         [SHOW_ALL]={ STR(LANG_FILTER_ALL) },
         [SHOW_SUPPORTED]={ STR(LANG_FILTER_SUPPORTED) },
         [SHOW_MUSIC]={ STR(LANG_FILTER_MUSIC) },
         [SHOW_PLAYLIST]={ STR(LANG_FILTER_PLAYLIST) },
         [SHOW_ID3DB]={ STR(LANG_FILTER_ID3DB) }
     };
-    struct opt_items right_items[] = {
+    static const struct opt_items right_items[] = {
         [REPEAT_OFF]={ STR(LANG_OFF) },
         [REPEAT_ALL]={ STR(LANG_REPEAT_ALL) },
         [REPEAT_ONE]={ STR(LANG_REPEAT_ONE) },
@@ -611,6 +611,7 @@ bool quick_screen_quick(void)
     return(res);
 }
 
+#ifdef BUTTON_F3
 void quick_screen_f3_apply(struct gui_quickscreen *qs)
 {
     global_settings.scrollbar=int_to_bool(option_select_get_selected(qs->left_option));
@@ -629,11 +630,11 @@ bool quick_screen_f3(void)
     struct option_select left_option;
     struct option_select bottom_option;
     struct option_select right_option;
-    struct opt_items onoff_items[] = {
+    static const struct opt_items onoff_items[] = {
         [0]={ STR(LANG_OFF) },
         [1]={ STR(LANG_ON) }
     };
-    struct opt_items yesno_items[] = {
+    static const struct opt_items yesno_items[] = {
         [0]={ STR(LANG_SET_BOOL_NO) },
         [1]={ STR(LANG_SET_BOOL_YES) }
     };
@@ -662,7 +663,8 @@ bool quick_screen_f3(void)
         settings_save();
     return(res);
 }
-#endif
+#endif /* BUTTON_F3 */
+#endif /* CONFIG_KEYPAD in (RECORDER_PAD |IRIVER_H100_PAD | IRIVER_H300_PAD) */
 
 #if defined(HAVE_CHARGING) || defined(SIMULATOR)
 void charging_splash(void)
