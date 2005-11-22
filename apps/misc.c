@@ -381,7 +381,7 @@ void screen_dump(void)
             {
 #if (LCD_PIXELFORMAT == RGB565SWAPPED)
                 /* iPod LCD data is big endian although the CPU is not */
-                *dst++ = swap16(*src++);
+                *dst++ = htobe16(*src++); 
 #else
                 *dst++ = htole16(*src++);
 #endif

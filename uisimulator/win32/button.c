@@ -64,6 +64,8 @@ void button_event(int key, bool pressed)
     case VK_UP:
 #ifdef BUTTON_UP
         new_btn = BUTTON_UP;
+#elif defined BUTTON_SCROLL_FWD
+        new_btn = BUTTON_SCROLL_FWD;
 #elif defined BUTTON_PLAY
         new_btn = BUTTON_PLAY;
 #endif
@@ -73,16 +75,20 @@ void button_event(int key, bool pressed)
     case VK_DOWN:
 #ifdef BUTTON_DOWN
         new_btn = BUTTON_DOWN;
+#elif defined BUTTON_SCROLL_BACK
+        new_btn = BUTTON_SCROLL_BACK;
 #elif defined BUTTON_STOP
         new_btn = BUTTON_STOP;
 #endif
         break;
 
-#ifdef BUTTON_ON
     case VK_ADD:
+#ifdef BUTTON_ON
         new_btn = BUTTON_ON;
-        break;
+#elif defined(BUTTON_SELECT) && defined(BUTTON_PLAY)
+        new_btn = BUTTON_PLAY;
 #endif
+        break;
 
 #ifdef BUTTON_OFF
     case VK_RETURN:
@@ -112,7 +118,7 @@ void button_event(int key, bool pressed)
 
     case VK_NUMPAD5:
     case VK_SPACE:
-#ifdef BUTTON_PLAY
+#if defined(BUTTON_PLAY) && !defined(BUTTON_SELECT)
         new_btn = BUTTON_PLAY;
 #elif defined(BUTTON_SELECT)
         new_btn = BUTTON_SELECT;
