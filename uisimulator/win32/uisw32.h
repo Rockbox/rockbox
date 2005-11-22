@@ -119,6 +119,16 @@ typedef unsigned short wchar_t;
 #define UI_LCD_WIDTH                220
 #define UI_LCD_HEIGHT               176
 
+#elif defined(IPOD_NANO)
+#define UI_TITLE                    "iPod Nano"
+#define UI_WIDTH                    199 // width of GUI window
+#define UI_HEIGHT                   421 // height of GUI window
+/* high-colour */
+#define UI_LCD_POSX                 13 // x position of lcd
+#define UI_LCD_POSY                 14 // y position of lcd
+#define UI_LCD_WIDTH                176
+#define UI_LCD_HEIGHT               132
+
 #elif defined(ARCHOS_GMINI120)
 #define UI_TITLE                    "Gmini 120"
 #define UI_WIDTH                    370 // width of GUI window
