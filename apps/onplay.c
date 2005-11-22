@@ -48,6 +48,8 @@
 #include "bookmark.h"
 #include "action.h"
 #include "splash.h"
+#include "yesno.h"
+
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #endif
@@ -392,52 +394,31 @@ static int remove_dir(char* dirname, int len)
 /* share code for file and directory deletion, saves space */
 static bool delete_handler(bool is_dir)
 {
-    bool exit = false;
+    char *lines[]={
+        str(LANG_REALLY_DELETE),
+        selected_file
+    };
+    char *yes_lines[]={
+        str(LANG_DELETED),
+        selected_file
+    };
+
+    struct text_message message={lines, 2};
+    struct text_message yes_message={yes_lines, 2};
+    if(gui_syncyesno_run(&message, &yes_message, NULL)!=YESNO_YES)
+        return false;
     int res;
+    if (is_dir)
+    {
+        char pathname[MAX_PATH]; /* space to go deep */
+        strncpy(pathname, selected_file, sizeof pathname);
+        res = remove_dir(pathname, sizeof(pathname));
+    }
+    else
+        res = remove(selected_file);
 
-    lcd_clear_display();
-    lcd_puts(0,0,str(LANG_REALLY_DELETE));
-    lcd_puts_scroll(0,1,selected_file);
-
-#ifdef HAVE_LCD_BITMAP
-    lcd_puts(0,3,str(LANG_CONFIRM_WITH_PLAY_RECORDER));
-    lcd_puts(0,4,str(LANG_CANCEL_WITH_ANY_RECORDER)); 
-#endif
-
-    lcd_update();
-
-    while (!exit) {
-        int btn = button_get(true);
-        switch (btn) {
-            case SETTINGS_OK:
-                if (is_dir)
-                {
-                    char pathname[MAX_PATH]; /* space to go deep */
-                    strncpy(pathname, selected_file, sizeof pathname);
-                    res = remove_dir(pathname, sizeof(pathname));
-                }
-                else
-                {
-                    res = remove(selected_file);
-                }
-
-                if (!res) {
-                    onplay_result = ONPLAY_RELOAD_DIR;
-                    lcd_clear_display();
-                    lcd_puts(0,0,str(LANG_DELETED));
-                    lcd_puts_scroll(0,1,selected_file);
-                    lcd_update();
-                    sleep(HZ);
-                    exit = true;
-                }
-                break;
-
-            default:
-                /* ignore button releases */
-                if (!(btn & BUTTON_REL))
-                    exit = true;
-                break;
-        }
+    if (!res) {
+        onplay_result = ONPLAY_RELOAD_DIR;
     }
     return false;
 }

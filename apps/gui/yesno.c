@@ -75,7 +75,7 @@ enum yesno_res gui_syncyesno_run(struct text_message * main_message,
         switch (button)
         {
             case YESNO_OK:
-#ifdef TREE_RC_RUN
+#ifdef YESNO_RC_OK
             case YESNO_RC_OK:
 #endif
                 result=YESNO_YES;
