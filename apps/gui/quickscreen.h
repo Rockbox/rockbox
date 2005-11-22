@@ -34,10 +34,8 @@
 #define QUICKSCREEN_BOTTOM_INV  BUTTON_UP
 #define QUICKSCREEN_RIGHT       BUTTON_RIGHT
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-#define QUICKSCREEN_QUIT        BUTTON_F2
-#define QUICKSCREEN_QUIT2       BUTTON_F3
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define QUICKSCREEN_QUIT        BUTTON_MODE
 #define QUICKSCREEN_QUIT2       BUTTON_OFF
 #define QUICKSCREEN_RC_QUIT     BUTTON_RC_MODE
@@ -104,11 +102,12 @@ bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button);
 void gui_syncquickscreen_draw(struct gui_quickscreen * qs);
 
 /*
- * Runs the quickscreen on all available screens
+ * Runs the quickscreen on all available screens, if button_enter is released, quits
  *  - qs : the quickscreen
+ *  - button_enter : button pressed at the same time the quickscreen is displayed
  * returns : true if usb was connected, false otherwise
  */
-bool gui_syncquickscreen_run(struct gui_quickscreen * qs);
+bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter);
 
 #endif /*_GUI_QUICK_SCREEN_H_*/
 #endif /* CONFIG_KEYPAD */

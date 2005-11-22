@@ -509,7 +509,7 @@ long gui_wps_show(void)
 #ifdef WPS_RC_QUICK
             case WPS_RC_QUICK:
 #endif
-                if (quick_screen_quick())
+                if (quick_screen_quick(button))
                     return SYS_USB_CONNECTED;
                 restore = true;
                 lastbutton = 0;
@@ -518,7 +518,7 @@ long gui_wps_show(void)
                 /* screen settings */
 #ifdef BUTTON_F3
             case BUTTON_F3:
-                if (quick_screen_f3())
+                if (quick_screen_f3(button))
                     return SYS_USB_CONNECTED;
                 restore = true;
                 break;

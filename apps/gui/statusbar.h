@@ -23,6 +23,7 @@
 #include "config.h"
 #include "status.h"
 #include "screen_access.h"
+#include "button.h"
 
 #define STATUSBAR_X_POS                         0
 #define STATUSBAR_Y_POS                         0 /* MUST be a multiple of 8 */
@@ -40,6 +41,9 @@ struct status_info {
     bool inserted;
     bool shuffle;
     bool keylock;
+#ifdef HAS_REMOTE_BUTTON_HOLD
+    bool keylockremote;
+#endif
     bool battery_safe;
     bool redraw_volume; /* true if the volume gauge needs updating */
     bool led; /* disk LED simulation in the status bar */
@@ -101,6 +105,7 @@ void gui_statusbar_icon_play_state(struct screen * display, int state);
 void gui_statusbar_icon_play_mode(struct screen * display, int mode);
 void gui_statusbar_icon_shuffle(struct screen * display);
 void gui_statusbar_icon_lock(struct screen * display);
+void gui_statusbar_icon_lock_remote(struct screen * display);
 void gui_statusbar_led(struct screen * display);
 
 

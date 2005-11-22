@@ -51,6 +51,7 @@ void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * display)
     display->has_buttonbar=false;
 #endif
     gui_textarea_clear(display);
+    display->setfont(FONT_SYSFIXED);
     display->getstringsize("M",&w,&h);
     /* Displays the icons */
     display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],
@@ -62,7 +63,6 @@ void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * display)
     display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
                          display->width/2 + 8,
                          display->height/2 - 4, 7, 8);
-    display->setfont(FONT_SYSFIXED);
 
     /* Displays the left's text */
     title=option_select_get_title(qs->left_option);
@@ -90,7 +90,7 @@ void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * display)
     display->putsxy(display->width - w, display->height/2, option);
 
     gui_textarea_update(display);
-    lcd_setfont(FONT_UI);
+    display->setfont(FONT_UI);
 }
 
 void gui_syncquickscreen_draw(struct gui_quickscreen * qs)
@@ -102,6 +102,7 @@ void gui_syncquickscreen_draw(struct gui_quickscreen * qs)
 
 bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button)
 {
+    
     switch(button)
     {
         case QUICKSCREEN_LEFT :
@@ -143,24 +144,32 @@ bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button)
     return(false);
 }
 
-bool gui_syncquickscreen_run(struct gui_quickscreen * qs)
+bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
 {
     int key;
+    /* To quit we need either :
+     *  - a second press on the button that made us enter
+     *  - an action taken while pressing the enter button,
+     *    then release the enter button*/
+    bool can_quit=false;
     gui_syncquickscreen_draw(qs);
     while (true) {
         key = button_get(true);
-        if(default_event_handler(key) == SYS_USB_CONNECTED)
+        if(default_event_handler(key & ~button_enter) == SYS_USB_CONNECTED)
             return(true);
-        if(gui_quickscreen_do_button(qs, key))
+        if(gui_quickscreen_do_button(qs, key & ~button_enter))
         {
+            can_quit=true;
             if(qs->callback)
                 qs->callback(qs);
             gui_syncquickscreen_draw(qs);
         }
-        else if(key==QUICKSCREEN_QUIT
+        else if(key==button_enter)
+            can_quit=true;
+        if(key==(button_enter | BUTTON_REL) && can_quit)
+            return(false);
 #ifdef QUICKSCREEN_QUIT
-                || key==QUICKSCREEN_QUIT
-#endif
+        if(key==QUICKSCREEN_QUIT
 #ifdef QUICKSCREEN_QUIT2
                 || key==QUICKSCREEN_QUIT2
 #endif
@@ -168,9 +177,8 @@ bool gui_syncquickscreen_run(struct gui_quickscreen * qs)
                 || key==QUICKSCREEN_RC_QUIT
 #endif
         )
-        {
             return(false);
-        }
+#endif /* QUICKSCREEN_QUIT */
         gui_syncstatusbar_draw(&statusbars, false);
     }
 }

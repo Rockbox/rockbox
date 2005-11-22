@@ -22,7 +22,11 @@
 
 #include <stdbool.h>
 #include "config.h"
-
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+    (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define HAS_BUTTON_HOLD
+#define HAS_REMOTE_BUTTON_HOLD
+#endif
 extern struct event_queue button_queue;
 
 void button_init (void);
@@ -34,9 +38,10 @@ void button_clear_queue(void);
 void button_set_flip(bool flip); /* turn 180 degrees */
 #endif
 
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
-    (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#ifdef HAS_BUTTON_HOLD
 bool button_hold(void);
+#endif
+#ifdef HAS_REMOTE_BUTTON_HOLD
 bool remote_button_hold(void);
 #endif
 

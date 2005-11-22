@@ -40,27 +40,30 @@
 
 /* FIXME: should be removed from icon.h to avoid redefinition,
    but still needed for compatibility with old system */
-
-#define STATUSBAR_BATTERY_X_POS                 0
+#define ICONS_SPACING                           2
+#define STATUSBAR_BATTERY_X_POS                 0*ICONS_SPACING
 #define STATUSBAR_BATTERY_WIDTH                 18
 #define STATUSBAR_PLUG_X_POS                    STATUSBAR_X_POS + \
-                                                STATUSBAR_BATTERY_WIDTH +2
+                                                STATUSBAR_BATTERY_WIDTH + \
+                                                ICONS_SPACING
 #define STATUSBAR_PLUG_WIDTH                    7
 #define STATUSBAR_VOLUME_X_POS                  STATUSBAR_X_POS + \
                                                 STATUSBAR_BATTERY_WIDTH + \
-                                                STATUSBAR_PLUG_WIDTH +2+2
+                                                STATUSBAR_PLUG_WIDTH + \
+                                                2*ICONS_SPACING
 #define STATUSBAR_VOLUME_WIDTH                  16
 #define STATUSBAR_PLAY_STATE_X_POS              STATUSBAR_X_POS + \
                                                 STATUSBAR_BATTERY_WIDTH + \
                                                 STATUSBAR_PLUG_WIDTH + \
-                                                STATUSBAR_VOLUME_WIDTH+2+2+2
+                                                STATUSBAR_VOLUME_WIDTH + \
+                                                3*ICONS_SPACING
 #define STATUSBAR_PLAY_STATE_WIDTH              7
 #define STATUSBAR_PLAY_MODE_X_POS               STATUSBAR_X_POS + \
                                                 STATUSBAR_BATTERY_WIDTH + \
                                                 STATUSBAR_PLUG_WIDTH + \
                                                 STATUSBAR_VOLUME_WIDTH + \
                                                 STATUSBAR_PLAY_STATE_WIDTH + \
-                                                2+2+2+2
+                                                4*ICONS_SPACING
 #define STATUSBAR_PLAY_MODE_WIDTH               7
 #define STATUSBAR_SHUFFLE_X_POS                 STATUSBAR_X_POS + \
                                                 STATUSBAR_BATTERY_WIDTH + \
@@ -68,17 +71,28 @@
                                                 STATUSBAR_VOLUME_WIDTH + \
                                                 STATUSBAR_PLAY_STATE_WIDTH + \
                                                 STATUSBAR_PLAY_MODE_WIDTH + \
-                                                2+2+2+2+2
+                                                5*ICONS_SPACING
 #define STATUSBAR_SHUFFLE_WIDTH                 7
-#define STATUSBAR_LOCK_X_POS                    STATUSBAR_X_POS + \
+#define STATUSBAR_LOCKM_X_POS                   STATUSBAR_X_POS + \
                                                 STATUSBAR_BATTERY_WIDTH + \
                                                 STATUSBAR_PLUG_WIDTH + \
                                                 STATUSBAR_VOLUME_WIDTH + \
                                                 STATUSBAR_PLAY_STATE_WIDTH + \
                                                 STATUSBAR_PLAY_MODE_WIDTH + \
                                                 STATUSBAR_SHUFFLE_WIDTH + \
-                                                2+2+2+2+2+2
-#define STATUSBAR_LOCK_WIDTH                    5
+                                                6*ICONS_SPACING
+#define STATUSBAR_LOCKM_WIDTH                   5
+#define STATUSBAR_LOCKR_X_POS                   STATUSBAR_X_POS + \
+                                                STATUSBAR_BATTERY_WIDTH + \
+                                                STATUSBAR_PLUG_WIDTH + \
+                                                STATUSBAR_VOLUME_WIDTH + \
+                                                STATUSBAR_PLAY_STATE_WIDTH + \
+                                                STATUSBAR_PLAY_MODE_WIDTH + \
+                                                STATUSBAR_SHUFFLE_WIDTH + \
+                                                STATUSBAR_LOCKM_WIDTH + \
+                                                7*ICONS_SPACING
+#define STATUSBAR_LOCKR_WIDTH                   5
+
 #define STATUSBAR_DISK_WIDTH                    12
 #define STATUSBAR_DISK_X_POS(statusbar_width)   statusbar_width - \
                                                 STATUSBAR_DISK_WIDTH
@@ -98,7 +112,6 @@ void gui_statusbar_init(struct gui_statusbar * bar)
 void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 {
     struct screen * display = bar->display;
-
 #ifdef HAVE_RTC
     struct tm* tm; /* For Time */
 #endif /* HAVE_RTC */
@@ -120,11 +133,14 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 #endif /* HAVE_RTC */
 
     bar->info.shuffle = global_settings.playlist_shuffle;
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
+#ifdef HAS_BUTTON_HOLD
     bar->info.keylock = button_hold();
 #else
     bar->info.keylock = keys_locked;
-#endif /* CONFIG_KEYPAD == IRIVER_H100_PAD */
+#endif /* HAS_BUTTON_HOLD */
+#ifdef HAS_REMOTE_BUTTON_HOLD
+    bar->info.keylockremote = remote_button_hold();
+#endif
     bar->info.repeat = global_settings.repeat_mode;
     bar->info.playmode = current_playmode();
     if(!display->has_disk_led)
@@ -235,6 +251,10 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
             gui_statusbar_icon_shuffle(display);
         if (bar->info.keylock)
             gui_statusbar_icon_lock(display);
+#ifdef HAS_REMOTE_BUTTON_HOLD
+        if (bar->info.keylockremote)
+            gui_statusbar_icon_lock_remote(display);
+#endif
 #ifdef HAVE_RTC
         gui_statusbar_time(display, bar->info.hour, bar->info.minute);
 #endif /* HAVE_RTC */
@@ -430,8 +450,19 @@ void gui_statusbar_icon_shuffle(struct screen * display)
  */
 void gui_statusbar_icon_lock(struct screen * display)
 {
-    display->mono_bitmap(bitmap_icons_5x8[Icon_Lock], STATUSBAR_LOCK_X_POS,
-                    STATUSBAR_Y_POS, 5, 8);
+    display->mono_bitmap(bitmap_icons_5x8[Icon_Lock_Main],
+                         STATUSBAR_LOCKM_X_POS, STATUSBAR_Y_POS,
+                         STATUSBAR_LOCKM_WIDTH, STATUSBAR_HEIGHT);
+}
+
+/*
+ * Print remote lock when remote hold is enabled
+ */
+void gui_statusbar_icon_lock_remote(struct screen * display)
+{
+    display->mono_bitmap(bitmap_icons_5x8[Icon_Lock_Remote],
+                         STATUSBAR_LOCKR_X_POS, STATUSBAR_Y_POS,
+                         STATUSBAR_LOCKR_WIDTH, STATUSBAR_HEIGHT);
 }
 
 /*

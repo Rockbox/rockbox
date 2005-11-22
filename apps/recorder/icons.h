@@ -29,7 +29,9 @@
 
 /* Symbolic names for icons */
 enum icons_5x8 {
-    Icon_Lock
+    Icon_Lock_Main,
+    Icon_Lock_Remote,
+    Icon5x8Last
 };
 
 enum icons_6x8 {
@@ -46,7 +48,7 @@ enum icons_6x8 {
     Icon_Bookmark,
     Icon_Queued,
     Icon_Moving,
-    LastIcon
+    Icon6x8Last
 };
 
 enum icons_7x8 {
@@ -68,12 +70,12 @@ enum icons_7x8 {
     Icon_DownArrow,
     Icon_UpArrow,
     Icon_RepeatAB,
-    Icon_Last
+    Icon7x8Last
 };
 
-extern const unsigned char bitmap_icons_5x8[1][5];
-extern const unsigned char bitmap_icons_6x8[LastIcon][6];
-extern const unsigned char bitmap_icons_7x8[Icon_Last][7];
+extern const unsigned char bitmap_icons_5x8[Icon5x8Last][5];
+extern const unsigned char bitmap_icons_6x8[Icon6x8Last][6];
+extern const unsigned char bitmap_icons_7x8[Icon7x8Last][7];
 extern const unsigned char bitmap_icon_disk[];
 
 #if  LCD_WIDTH == 112 || LCD_WIDTH == 128 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_WIDTH == 128)

@@ -36,6 +36,7 @@ gui/gwps.c
 gui/gwps-common.c
 gui/icon.c
 gui/list.c
+gui/logo.c
 gui/option_select.c
 gui/quickscreen.c
 gui/scrollbar.c

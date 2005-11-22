@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Björn Stenberg
+ * Copyright (C) 2005 by Kevin Ferrare
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,36 +16,28 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _SCREENS_H_
-#define _SCREENS_H_
 
-#include "config.h"
-#include "timefuncs.h"
+#ifndef _GUI_LOGO_H_
+#define _GUI_LOGO_H_
+#include "screen_access.h"
 
-struct screen;
-
-void usb_display_info(struct screen * display);
-void usb_screen(void);
-int charging_screen(void);
-void charging_splash(void);
-
-#ifdef HAVE_MMC
-int mmc_remove_request(void);
+struct logo{
+#ifdef HAVE_LCD_BITMAP
+    const unsigned char * bitmap;
+    int width;
+    int height;
+#else
+    const char * text;
 #endif
+};
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-int pitch_screen(void);
-extern bool quick_screen_f3(int button_enter);
-#endif
-extern bool quick_screen_quick(int button_enter);
+extern struct logo usb_logos[];
 
-#ifdef HAVE_RTC
-bool set_time_screen(const char* string, struct tm *tm);
-#endif
+/*
+ * Draws the given logo at the center of the given screen
+ *  - logo : the logo
+ *  - display : the screen to draw on
+ */
+void gui_logo_draw(struct logo * logo, struct screen * display);
 
-bool shutdown_screen(void);
-bool browse_id3(void);
-bool set_rating(void);
-
-#endif
-
+#endif /* _GUI_LOGO_H_ */
