@@ -19,6 +19,7 @@
 
 #include <lcd.h>
 #include <lcd-remote.h>
+#include "backlight.h"
 #include <font.h>
 #include <button.h>
 #include <sprintf.h>
@@ -67,7 +68,7 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->scroll_step=&lcd_remote_scroll_step;
             screen->puts_scroll_style=&lcd_remote_puts_scroll_style;
             screen->invertscroll=&lcd_remote_invertscroll;
-#endif /* 1 */
+#endif /* LCD_REMOTE_DEPTH > 1 */
 
 #if 0 /* no charcell remote LCDs so far */
             screen->width=11;
@@ -89,6 +90,8 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->clear_display=&lcd_remote_clear_display;
             screen->update=&lcd_remote_update;
             screen->puts=&lcd_remote_puts;
+            screen->backlight_on=&remote_backlight_on;
+            screen->backlight_off=&remote_backlight_off;
             break;
 #endif /* HAVE_REMOTE_LCD */
 
@@ -151,6 +154,8 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->update=&lcd_update;
 #endif
             screen->puts=&lcd_puts;
+            screen->backlight_on=&backlight_on;
+            screen->backlight_off=&backlight_off;
             break;
     }
     screen->screen_type=screen_type;

@@ -21,6 +21,7 @@
 #define _GUI_SELECT_H_
 #include "screen_access.h"
 #include "settings.h"
+#include "option_select.h"
 
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
   (CONFIG_KEYPAD == IRIVER_H300_PAD)
@@ -83,19 +84,7 @@ struct gui_select
 {
     bool canceled;
     bool validated;
-    const char * title;
-    int min_value;
-    int max_value;
-    int step;
-    int option;
-    const char * extra_string;
-    /* In the case the option is a number */
-    void (*formatter)(char* dest,
-                      int dest_length,
-                      int variable,
-                      const char* unit);
-    const struct opt_items * items;
-    bool limit_loop;
+    struct option_select options;
 };
 
 /*
@@ -116,10 +105,7 @@ extern void gui_select_init_numeric(struct gui_select * select,
         int max_value,
         int step,
         const char * unit,
-        void (*formatter)(char* dest,
-                          int dest_length,
-                          int variable,
-                          const char* unit));
+        option_formatter *formatter);
 
 
 /*
@@ -140,13 +126,15 @@ extern void gui_select_init_items(struct gui_select * select,
  * Selects the next value
  *  - select : the select struct
  */
-extern void gui_select_next(struct gui_select * select);
+#define gui_select_next(select) \
+    option_select_next(&(select->options))
 
 /*
  * Selects the previous value
  *  - select : the select struct
  */
-extern void gui_select_prev(struct gui_select * select);
+#define gui_select_prev(select) \
+    option_select_prev(&(select->options))
 
 /*
  * Draws the select on the given screen
@@ -159,9 +147,8 @@ extern void gui_select_draw(struct gui_select * select, struct screen * display)
  * Returns the selected value
  *  - select : the select struct
  */
-#define gui_select_get_selected(select) \
-    (select)->option
-
+#define gui_select_get_selected(_sel_) \
+    option_select_get_selected(&((_sel_)->options))
 /*
  * Cancels the select
  *  - select : the select struct
@@ -199,7 +186,7 @@ extern void gui_select_draw(struct gui_select * select, struct screen * display)
  *    - false : continues to go to max/min when reaching min/max
  */
 #define gui_select_limit_loop(select, loop) \
-    (select)->limit_loop=loop
+    option_select_limit_loop(&((select)->options), loop)
 
 /*
  * Draws the select on all the screens

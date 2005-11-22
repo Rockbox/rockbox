@@ -712,10 +712,13 @@ static bool dirbrowse(void)
 
 #ifdef TREE_QUICK
             case TREE_QUICK:
+#ifdef TREE_RC_QUICK
+            case TREE_RC_QUICK:
+#endif
                 /* don't enter f2 from plugin browser */
                 if (*tc.dirfilter < NUM_FILTER_MODES)
                 {
-                    if (quick_screen(curr_context, TREE_QUICK))
+                    if (quick_screen_quick())
                         reload_dir = true;
                     restore = true;
 
@@ -730,7 +733,7 @@ static bool dirbrowse(void)
                 /* don't enter f3 from plugin browser */
                 if (*tc.dirfilter < NUM_FILTER_MODES)
                 {
-                    if (quick_screen(curr_context, BUTTON_F3))
+                    if (quick_screen_f3())
                         reload_dir = true;
                     restore = true;
                 }

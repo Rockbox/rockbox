@@ -85,8 +85,9 @@ extern void gui_statusbar_init(struct gui_statusbar * bar);
  *  - bar : the statusbar structure
  *  - display : the screen to attach
  */
-#define gui_statusbar_set_screen(gui_statusbar, screen) \
-    (gui_statusbar)->display = screen
+#define gui_statusbar_set_screen(gui_statusbar, _display) \
+    (gui_statusbar)->display = (_display);
+
 
 /*
  * Draws the status bar on the attached screen

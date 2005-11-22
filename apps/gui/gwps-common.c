@@ -61,7 +61,7 @@ static void gui_wps_statusbar_draw(struct gui_wps *wps, bool force)
 {
     bool draw = global_settings.statusbar;
     if(wps->data->wps_sb_tag 
-        && gui_wps->data->show_sb_on_wps)
+        && wps->data->show_sb_on_wps)
         draw = true;
     else if(wps->data->wps_sb_tag)
         draw = false;

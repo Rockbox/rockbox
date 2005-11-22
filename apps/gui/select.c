@@ -21,9 +21,9 @@
 
 #include "lang.h"
 #include "textarea.h"
-#include "sprintf.h"
-#include "kernel.h"
 #include "screen_access.h"
+#include "kernel.h"
+
 
 void gui_select_init_numeric(struct gui_select * select,
         const char * title,
@@ -32,23 +32,12 @@ void gui_select_init_numeric(struct gui_select * select,
         int max_value,
         int step,
         const char * unit,
-        void (*formatter)(char* dest,
-                          int dest_length,
-                          int variable,
-                          const char* unit)
-                          )
+        option_formatter *formatter)
 {
     select->canceled=false;
     select->validated=false;
-    select->title=title;
-    select->min_value=min_value;
-    select->max_value=max_value+1;
-    select->option=init_value;
-    select->step=step;
-    select->extra_string=unit;
-    select->formatter=formatter;
-    select->items=NULL;
-    select->limit_loop=false;
+    option_select_init_numeric(&select->options, title, init_value,
+                               min_value, max_value, step, unit, formatter);
 }
 
 void gui_select_init_items(struct gui_select * select,
@@ -59,69 +48,22 @@ void gui_select_init_items(struct gui_select * select,
 {
     select->canceled=false;
     select->validated=false;
-    select->title=title;
-    select->min_value=0;
-    select->max_value=nb_items;
-    select->option=selected;
-    select->step=1;
-    select->formatter=NULL;
-    select->items=items;
-    select->limit_loop=false;
-}
-
-void gui_select_next(struct gui_select * select)
-{
-    if(select->option + select->step >= select->max_value)
-    {
-        if(!select->limit_loop)
-        {
-            if(select->option==select->max_value-1)
-                select->option=select->min_value;
-            else
-                select->option=select->max_value-1;
-        }
-    }
-    else
-        select->option+=select->step;
-}
-
-void gui_select_prev(struct gui_select * select)
-{
-    if(select->option - select->step < select->min_value)
-    {
-        if(!select->limit_loop)
-        {
-            if(select->option==select->min_value)
-                select->option=select->max_value-1;
-            else
-                select->option=select->min_value;
-        }
-    }
-    else
-        select->option-=select->step;
+    option_select_init_items(&select->options, title, selected, items, nb_items);
 }
 
 void gui_select_draw(struct gui_select * select, struct screen * display)
 {
+    char buffer[30];
+    const char * selected=option_select_get_text(&(select->options), buffer);
 #ifdef HAVE_LCD_BITMAP
     screen_set_xmargin(display, 0);
 #endif
     gui_textarea_clear(display);
-    display->puts_scroll(0, 0, select->title);
+    display->puts_scroll(0, 0, option_select_get_title(&(select->options)));
 
     if(gui_select_is_canceled(select))
         display->puts_scroll(0, 0, str(LANG_MENU_SETTING_CANCEL));
-    if(select->items)
-        display->puts_scroll(0, 1, P2STR(select->items[select->option].string));
-    else
-    {
-        char buffer[30];
-        if(!select->formatter)
-            snprintf(buffer, sizeof buffer,"%d %s", select->option, select->extra_string);
-        else
-            select->formatter(buffer, sizeof buffer, select->option, select->extra_string);
-        display->puts_scroll(0, 1, buffer);
-    }
+    display->puts_scroll(0, 1, selected);
     gui_textarea_update(display);
 }
 

@@ -22,7 +22,9 @@
 #include "config.h"
 #include "timefuncs.h"
 
-void usb_display_info(void);
+struct screen;
+
+void usb_display_info(struct screen * display);
 void usb_screen(void);
 int charging_screen(void);
 void charging_splash(void);
@@ -33,15 +35,9 @@ int mmc_remove_request(void);
 
 #if CONFIG_KEYPAD == RECORDER_PAD
 int pitch_screen(void);
-bool quick_screen(const int, const int);
-#define SCREENS_QUICK   BUTTON_F2
+extern bool quick_screen_f3(void);
 #endif
- 
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-bool quick_screen(const int, const int);
-#define SCREENS_QUICK   BUTTON_MODE
-   /* Long press already detected so not needed here */
-#endif
+extern bool quick_screen_quick(void);
 
 #ifdef HAVE_RTC
 bool set_time_screen(const char* string, struct tm *tm);

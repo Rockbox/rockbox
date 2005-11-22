@@ -160,8 +160,7 @@ void ata_spindown(int s)
 
 bool simulate_usb(void)
 {
-    usb_display_info();
-    while (button_get(true) & BUTTON_REL);
+    usb_screen();
     return false;
 }
 

@@ -49,6 +49,8 @@
 #include "gwps-common.h"
 #include "splash.h"
 #include "statusbar.h"
+#include "screen_access.h"
+#include "quickscreen.h"
 
 #if defined(HAVE_LCD_BITMAP)
 #include "widgets.h"
@@ -101,25 +103,25 @@ static const unsigned char usb_logo[] = {
 };
 #endif
 
-void usb_display_info(void)
+void usb_display_info(struct screen * display)
 {
-    lcd_clear_display();
+    display->clear_display();
 
 #ifdef HAVE_LCD_BITMAP
     /* Center bitmap on screen */
-    lcd_mono_bitmap(usb_logo, LCD_WIDTH/2-BMPWIDTH_usb_logo/2,
-                    LCD_HEIGHT/2-BMPHEIGHT_usb_logo/2, BMPWIDTH_usb_logo,
-                    BMPHEIGHT_usb_logo);
-    gui_syncstatusbar_draw(&statusbars, true);
-    lcd_update();
+    display->mono_bitmap(usb_logo,
+                display->width/2-BMPWIDTH_usb_logo/2,
+                display->height/2-BMPHEIGHT_usb_logo/2,
+                BMPWIDTH_usb_logo,
+                BMPHEIGHT_usb_logo);
+    display->update();
 #else
-    lcd_double_height(false);
-    lcd_puts(0, 0, "[USB Mode]");
-    status_set_param(false);
-    status_set_audio(false);
-    status_set_usb(true);
-    gui_syncstatusbar_draw(&statusbars, false);
-#endif
+    display->double_height(false);
+    display->puts(0, 0, "[USB Mode]");
+#ifdef SIMULATOR
+    display->update();
+#endif /* SIMULATOR */
+#endif /* HAVE_LCD_BITMAP */
 }
 
 void usb_screen(void)
@@ -127,28 +129,35 @@ void usb_screen(void)
 #ifdef USB_NONE
     /* nothing here! */
 #else
-#ifndef SIMULATOR
-    backlight_on();
+    int i;
+    FOR_NB_SCREENS(i) {
+        screens[i].backlight_on();
+        usb_display_info(&screens[i]);
+    }
+#ifdef HAVE_LCD_CHARCELLS
+    status_set_param(false);
+    status_set_audio(false);
+    status_set_usb(true);
+#endif /* HAVE_LCD_BITMAP */
+    gui_syncstatusbar_draw(&statusbars, true);
+#ifdef SIMULATOR
+    while (button_get(true) & BUTTON_REL);
+#else
     usb_acknowledge(SYS_USB_CONNECTED_ACK);
-    usb_display_info();
     while(usb_wait_for_disconnect_w_tmo(&button_queue, HZ)) {
         if(usb_inserted()) {
-
 #ifdef HAVE_MMC /* USB-MMC bridge can report activity */
-
             led(mmc_usb_active(HZ));
-
-#endif
-
+#endif /* HAVE_MMC */
             gui_syncstatusbar_draw(&statusbars, false);
         }
     }
+#endif /* SIMULATOR */
 #ifdef HAVE_LCD_CHARCELLS
     status_set_usb(false);
-#endif
-
-    backlight_on();
-#endif
+#endif /* HAVE_LCD_CHARCELLS */
+    FOR_NB_SCREENS(i)
+        screens[i].backlight_on();
 #endif /* USB_NONE */
 }
 
@@ -157,7 +166,8 @@ int mmc_remove_request(void)
 {
     struct event ev;
 
-    lcd_clear_display();
+    FOR_NB_SCREENS(i)
+        screens[i].clear_display();
     gui_syncsplash(1, true, str(LANG_REMOVE_MMC));
     if (global_settings.talk_menu)
         talk_id(LANG_REMOVE_MMC, false);
@@ -520,257 +530,137 @@ int pitch_screen(void)
 
 #if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H100_PAD) ||\
     (CONFIG_KEYPAD == IRIVER_H300_PAD)
-bool quick_screen(int context, int button)
+#define bool_to_int(b)\
+    b?1:0
+#define int_to_bool(i)\
+    i==0?false:true
+
+void quick_screen_quick_apply(struct gui_quickscreen *qs)
 {
-    bool exit = false;
-    bool used = false;
-    int w, h, key;
-    char buf[32];
-    int oldrepeat = global_settings.repeat_mode;
+    global_settings.playlist_shuffle=int_to_bool(option_select_get_selected(qs->left_option));
+    global_settings.dirfilter=option_select_get_selected(qs->bottom_option);
+    global_settings.repeat_mode=option_select_get_selected(qs->right_option);
+}
 
-    /* just to stop compiler warning */
-    context = context;
-    lcd_setfont(FONT_SYSFIXED);
-
-    lcd_getstringsize("A",&w,&h);
-
-    while (!exit) {
-        char* ptr=NULL;
-
-        lcd_clear_display();
-
-        switch(button)
-        {
-#if CONFIG_KEYPAD == RECORDER_PAD
-            case SCREENS_QUICK:
-#endif
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-            case SCREENS_QUICK | BUTTON_REPEAT:
-#endif
-                /* Shuffle mode */
-                lcd_putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_SHUFFLE));
-                lcd_putsxy(0, LCD_HEIGHT/2 - h, str(LANG_F2_MODE));
-                lcd_putsxy(0, LCD_HEIGHT/2,
-                           global_settings.playlist_shuffle ?
-                           str(LANG_ON) : str(LANG_OFF));
-
-                /* Directory Filter */
-                switch ( global_settings.dirfilter ) {
-                    case SHOW_ALL:
-                        ptr = str(LANG_FILTER_ALL);
-                        break;
-
-                    case SHOW_SUPPORTED:
-                        ptr = str(LANG_FILTER_SUPPORTED);
-                        break;
-
-                    case SHOW_MUSIC:
-                        ptr = str(LANG_FILTER_MUSIC);
-                        break;
-
-                    case SHOW_PLAYLIST:
-                        ptr = str(LANG_FILTER_PLAYLIST);
-                        break;
-
-                    case SHOW_ID3DB:
-                        ptr = str(LANG_FILTER_ID3DB);
-                        break;
-                }
-
-                snprintf(buf, sizeof buf, "%s:", str(LANG_FILTER));
-                lcd_getstringsize(buf,&w,&h);
-                lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h*2, buf);
-                lcd_getstringsize(ptr,&w,&h);
-                lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
-
-                /* Repeat Mode */
-                switch ( global_settings.repeat_mode ) {
-                    case REPEAT_OFF:
-                        ptr = str(LANG_OFF);
-                        break;
-
-                    case REPEAT_ALL:
-                        ptr = str(LANG_REPEAT_ALL);
-                        break;
-
-                    case REPEAT_ONE:
-                        ptr = str(LANG_REPEAT_ONE);
-                        break;
-
-                    case REPEAT_SHUFFLE:
-                        ptr = str(LANG_SHUFFLE);
-                        break;
-
+bool quick_screen_quick(void)
+{
+    bool res, oldrepeat;
+    struct option_select left_option;
+    struct option_select bottom_option;
+    struct option_select right_option;
+    struct opt_items left_items[] = {
+        [0]={ STR(LANG_OFF) },
+        [1]={ STR(LANG_ON) }
+    };
+    struct opt_items bottom_items[] = {
+        [SHOW_ALL]={ STR(LANG_FILTER_ALL) },
+        [SHOW_SUPPORTED]={ STR(LANG_FILTER_SUPPORTED) },
+        [SHOW_MUSIC]={ STR(LANG_FILTER_MUSIC) },
+        [SHOW_PLAYLIST]={ STR(LANG_FILTER_PLAYLIST) },
+        [SHOW_ID3DB]={ STR(LANG_FILTER_ID3DB) }
+    };
+    struct opt_items right_items[] = {
+        [REPEAT_OFF]={ STR(LANG_OFF) },
+        [REPEAT_ALL]={ STR(LANG_REPEAT_ALL) },
+        [REPEAT_ONE]={ STR(LANG_REPEAT_ONE) },
+        [REPEAT_SHUFFLE]={ STR(LANG_SHUFFLE) },
 #ifdef AB_REPEAT_ENABLE
-                    case REPEAT_AB:
-                        ptr = str(LANG_REPEAT_AB);
-                        break;
+        [REPEAT_AB]={ STR(LANG_REPEAT_AB) }
 #endif
-                }
+    };
+    struct gui_quickscreen qs;
 
-                lcd_getstringsize(str(LANG_REPEAT),&w,&h);
-                lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2, str(LANG_REPEAT));
-                lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h, str(LANG_F2_MODE));
-                lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2, ptr);
-                break;
-#ifdef BUTTON_F3
-            case BUTTON_F3:
-                /* Scrollbar */
-                lcd_putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_F3_SCROLL));
-                lcd_putsxy(0, LCD_HEIGHT/2 - h, str(LANG_F3_BAR));
-                lcd_putsxy(0, LCD_HEIGHT/2,
-                           global_settings.scrollbar ? str(LANG_ON) : str(LANG_OFF));
+    option_select_init_items(&left_option,
+                             str(LANG_SHUFFLE),
+                             bool_to_int(global_settings.playlist_shuffle),
+                             left_items,
+                             2);
+    option_select_init_items(&bottom_option,
+                             str(LANG_FILTER),
+                             global_settings.dirfilter,
+                             bottom_items,
+                             sizeof(bottom_items)/sizeof(struct opt_items));
+    option_select_init_items(&right_option,
+                             str(LANG_REPEAT),
+                             global_settings.repeat_mode,
+                             right_items,
+                             sizeof(right_items)/sizeof(struct opt_items));
 
-                /* Status bar */
-                ptr = str(LANG_F3_STATUS);
-                lcd_getstringsize(ptr,&w,&h);
-                lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2, ptr);
-                lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h, str(LANG_F3_BAR));
-                lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2,
-                           global_settings.statusbar ? str(LANG_ON) : str(LANG_OFF));
-
-                /* Flip */
-                ptr = str(LANG_FLIP_DISPLAY);
-                lcd_getstringsize(ptr,&w,&h);
-                lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h*2, str(LANG_FLIP_DISPLAY));
-                ptr = global_settings.flip_display ?
-                           str(LANG_SET_BOOL_YES) : str(LANG_SET_BOOL_NO);
-                lcd_getstringsize(ptr,&w,&h);
-                lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
-                break;
-#endif
-        }
-
-        lcd_mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],
-                        LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8);
-        lcd_mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
-                        LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8);
-        lcd_mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
-                        LCD_WIDTH/2 + 8, LCD_HEIGHT/2 - 4, 7, 8);
-
-        lcd_update();
-        key = button_get(true);
-
-        /*
-         *  This is a temporary kludge so that the F2 & F3 menus operate in exactly
-         *  the same manner up until the full F2/F3 configurable menus are complete
-         */
-
-        if( key == BUTTON_LEFT || key == BUTTON_RIGHT || key == BUTTON_DOWN || key == ( BUTTON_LEFT | BUTTON_REPEAT ) || key == ( BUTTON_RIGHT  | BUTTON_REPEAT ) || key == ( BUTTON_DOWN  | BUTTON_REPEAT ) )
-            key = button | key;
-
-        switch (key) {
-            case SCREENS_QUICK | BUTTON_LEFT:
-            case SCREENS_QUICK | BUTTON_LEFT | BUTTON_REPEAT:
-                global_settings.playlist_shuffle =
-                    !global_settings.playlist_shuffle;
-
-                if(audio_status() & AUDIO_STATUS_PLAY)
-                {
-#if CONFIG_CODEC == SWCODEC
-                    dsp_set_replaygain(true);
-#endif
-                    
-                    if (global_settings.playlist_shuffle)
-                        playlist_randomise(NULL, current_tick, true);
-                    else
-                        playlist_sort(NULL, true);
-                }
-                used = true;
-                break;
-
-            case SCREENS_QUICK | BUTTON_DOWN:
-            case SCREENS_QUICK | BUTTON_DOWN | BUTTON_REPEAT:
-                global_settings.dirfilter++;
-                if ( global_settings.dirfilter >= NUM_FILTER_MODES )
-                    global_settings.dirfilter = 0;
-                used = true;
-                break;
-
-            case SCREENS_QUICK | BUTTON_RIGHT:
-            case SCREENS_QUICK | BUTTON_RIGHT | BUTTON_REPEAT:
-                global_settings.repeat_mode++;
-                if ( global_settings.repeat_mode >= NUM_REPEAT_MODES )
-                    global_settings.repeat_mode = 0;
-                used = true;
-                break;
-
-#ifdef BUTTON_F3
-            case BUTTON_F3 | BUTTON_LEFT:
-            case BUTTON_F3 | BUTTON_LEFT | BUTTON_REPEAT:
-                global_settings.scrollbar = !global_settings.scrollbar;
-                used = true;
-                break;
-
-            case BUTTON_F3 | BUTTON_RIGHT:
-            case BUTTON_F3 | BUTTON_RIGHT | BUTTON_REPEAT:
-                global_settings.statusbar = !global_settings.statusbar;
-                used = true;
-                break;
-
-            case BUTTON_F3 | BUTTON_DOWN:
-            case BUTTON_F3 | BUTTON_DOWN | BUTTON_REPEAT:
-            case BUTTON_F3 | BUTTON_UP:
-            case BUTTON_F3 | BUTTON_UP | BUTTON_REPEAT:
-                global_settings.flip_display = !global_settings.flip_display;
-                button_set_flip(global_settings.flip_display);
-                lcd_set_flip(global_settings.flip_display);
-                used = true;
-                break;
-
-            case BUTTON_F3 | BUTTON_REL:
-#endif
-            case SCREENS_QUICK | BUTTON_REL:
-
-                if( used )
-                    exit = true;
-
-                used = true;
-
-                break;
-
-            case BUTTON_OFF | BUTTON_REL:
-                lcd_setfont(FONT_UI);
-                return false;
-
-            default:
-                if(default_event_handler(key) == SYS_USB_CONNECTED)
-                    return true;
-                break;
-        }
-    }
-
-    settings_save();
-
-    switch( button )
+    gui_quickscreen_init(&qs, &left_option, &bottom_option, &right_option,
+                         str(LANG_F2_MODE), &quick_screen_quick_apply);
+    oldrepeat=global_settings.repeat_mode;
+    res=gui_syncquickscreen_run(&qs);
+    if(!res)
     {
-#if CONFIG_KEYPAD == RECORDER_PAD
-          case SCREENS_QUICK:
+        if ( oldrepeat != global_settings.repeat_mode &&
+            (audio_status() & AUDIO_STATUS_PLAY) )
+            audio_flush_and_reload_tracks();
+        if(global_settings.playlist_shuffle
+           && audio_status() & AUDIO_STATUS_PLAY)
+        {
+#if CONFIG_CODEC == SWCODEC
+            dsp_set_replaygain(true);
 #endif
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-          case SCREENS_QUICK | BUTTON_REPEAT:
-#endif
-
-            if ( oldrepeat != global_settings.repeat_mode &&
-                (audio_status() & AUDIO_STATUS_PLAY) )
-                audio_flush_and_reload_tracks();
-
-            break;
-#ifdef BUTTON_F3
-        case BUTTON_F3:
-
-            if (global_settings.statusbar)
-                lcd_setmargins(0, STATUSBAR_HEIGHT);
+            if (global_settings.playlist_shuffle)
+                playlist_randomise(NULL, current_tick, true);
             else
-                lcd_setmargins(0, 0);
-
-            break;
-#endif
+                playlist_sort(NULL, true);
+        }
+        settings_save();
     }
+    return(res);
+}
 
-    lcd_setfont(FONT_UI);
+void quick_screen_f3_apply(struct gui_quickscreen *qs)
+{
+    global_settings.scrollbar=int_to_bool(option_select_get_selected(qs->left_option));
 
-    return false;
+    global_settings.flip_display=int_to_bool(option_select_get_selected(qs->bottom_option));
+    button_set_flip(global_settings.flip_display);
+    lcd_set_flip(global_settings.flip_display);
+
+    global_settings.statusbar=int_to_bool(option_select_get_selected(qs->right_option));
+    gui_syncstatusbar_draw(&statusbars, true);
+}
+
+bool quick_screen_f3(void)
+{
+    bool res;
+    struct option_select left_option;
+    struct option_select bottom_option;
+    struct option_select right_option;
+    struct opt_items onoff_items[] = {
+        [0]={ STR(LANG_OFF) },
+        [1]={ STR(LANG_ON) }
+    };
+    struct opt_items yesno_items[] = {
+        [0]={ STR(LANG_SET_BOOL_NO) },
+        [1]={ STR(LANG_SET_BOOL_YES) }
+    };
+
+    struct gui_quickscreen qs;
+
+    option_select_init_items(&left_option,
+                             str(LANG_F3_SCROLL),
+                             bool_to_int(global_settings.scrollbar),
+                             onoff_items,
+                             2);
+    option_select_init_items(&bottom_option,
+                             str(LANG_FLIP_DISPLAY),
+                             bool_to_int(global_settings.flip_display),
+                             yesno_items,
+                             2);
+    option_select_init_items(&right_option,
+                             str(LANG_F3_STATUS),
+                             bool_to_int(global_settings.statusbar),
+                             onoff_items,
+                             2);
+    gui_quickscreen_init(&qs, &left_option, &bottom_option, &right_option,
+                         str(LANG_F3_BAR), &quick_screen_f3_apply);
+    res=gui_syncquickscreen_run(&qs);
+    if(!res)
+        settings_save();
+    return(res);
 }
 #endif
 

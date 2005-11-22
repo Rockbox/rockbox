@@ -103,7 +103,8 @@ struct screen
 #if defined(HAVE_LCD_BITMAP) || defined(HAVE_REMOTE_LCD) || defined(SIMULATOR)
     void (*update)(void);
 #endif
-
+    void (*backlight_on)(void);
+    void (*backlight_off)(void);
     void (*puts)(int x, int y, const unsigned char *str);
 };
 
