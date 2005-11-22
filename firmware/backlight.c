@@ -511,6 +511,17 @@ void remote_backlight_set_on_when_charging(bool yesno)
 
 #else /* no backlight, empty dummy functions */
 
+#ifdef BOOTLOADER
+void backlight_init(void)
+{
+#ifdef IRIVER_H300_SERIES
+    or_l(0x00020000, &GPIO1_OUT);
+    or_l(0x00020000, &GPIO1_ENABLE);
+    or_l(0x00020000, &GPIO1_FUNCTION);
+#endif
+}
+#endif
+
 void backlight_on(void) {}
 void backlight_off(void) {}
 void backlight_set_timeout(int index) {(void)index;}
