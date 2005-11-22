@@ -165,7 +165,7 @@ void usb_screen(void)
 int mmc_remove_request(void)
 {
     struct event ev;
-
+    int i;
     FOR_NB_SCREENS(i)
         screens[i].clear_display();
     gui_syncsplash(1, true, str(LANG_REMOVE_MMC));
