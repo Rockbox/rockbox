@@ -548,7 +548,7 @@ bool quick_screen_quick(void)
     struct option_select left_option;
     struct option_select bottom_option;
     struct option_select right_option;
-    struct opt_items left_items[] = {
+    static const struct opt_items left_items[] = {
         [0]={ STR(LANG_OFF) },
         [1]={ STR(LANG_ON) }
     };
