@@ -66,14 +66,14 @@ void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * display)
 
     /* Displays the left's text */
     title=option_select_get_title(qs->left_option);
-    option=option_select_get_text(qs->left_option, buffer);
+    option=option_select_get_text(qs->left_option, buffer, sizeof buffer);
     display->putsxy(0, display->height/2 - h*2, title);
     display->putsxy(0, display->height/2 - h, qs->left_right_title);
     display->putsxy(0, display->height/2, option);
 
     /* Displays the bottom's text */
     title=option_select_get_title(qs->bottom_option);
-    option=option_select_get_text(qs->bottom_option, buffer);
+    option=option_select_get_text(qs->bottom_option, buffer, sizeof buffer);
     display->getstringsize(title, &w, &h);
     display->putsxy((display->width-w)/2, display->height - h*2, title);
     display->getstringsize(option, &w, &h);
@@ -81,7 +81,7 @@ void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * display)
 
     /* Displays the right's text */
     title=option_select_get_title(qs->right_option);
-    option=option_select_get_text(qs->right_option, buffer);
+    option=option_select_get_text(qs->right_option, buffer, sizeof buffer);
     display->getstringsize(title,&w,&h);
     display->putsxy(display->width - w, display->height/2 - h*2, title);
     display->getstringsize(qs->left_right_title,&w,&h);

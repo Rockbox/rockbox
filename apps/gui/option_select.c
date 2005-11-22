@@ -90,13 +90,14 @@ void option_select_prev(struct option_select * opt)
         opt->option-=opt->step;
 }
 
-const char * option_select_get_text(struct option_select * opt, char * buffer)
+const char * option_select_get_text(struct option_select * opt, char * buffer,
+                                    int buffersize)
 {
     if(opt->items)
         return(P2STR(opt->items[opt->option].string));
     if(!opt->formatter)
-        snprintf(buffer, sizeof buffer,"%d %s", opt->option, opt->extra_string);
+        snprintf(buffer, buffersize,"%d %s", opt->option, opt->extra_string);
     else
-        opt->formatter(buffer, sizeof buffer, opt->option, opt->extra_string);
+        opt->formatter(buffer, buffersize, opt->option, opt->extra_string);
     return(buffer);
 }

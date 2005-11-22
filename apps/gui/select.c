@@ -54,7 +54,8 @@ void gui_select_init_items(struct gui_select * select,
 void gui_select_draw(struct gui_select * select, struct screen * display)
 {
     char buffer[30];
-    const char * selected=option_select_get_text(&(select->options), buffer);
+    const char * selected=option_select_get_text(&(select->options), buffer,
+                                                 sizeof buffer);
 #ifdef HAVE_LCD_BITMAP
     screen_set_xmargin(display, 0);
 #endif

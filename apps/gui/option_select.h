@@ -77,7 +77,9 @@ extern void option_select_init_items(struct option_select * opt,
  *  - buffer : a buffer to eventually format the option
  * Returns the selected option
  */
-extern const char * option_select_get_text(struct option_select * opt, char * buffer);
+extern const char * option_select_get_text(struct option_select * opt,
+                                           char * buffer,
+                                           int buffersize);
 
 /*
  * Selects the next value
