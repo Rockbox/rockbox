@@ -28,7 +28,7 @@ id: LANG_INFO
 desc: in the main menu
 eng: "Info"
 voice: "Infos"
-new: "Infos"
+new: "Informations"
 
 id: LANG_VERSION
 desc: in the main menu
@@ -268,7 +268,7 @@ id: LANG_RESET
 desc: in system_settings_menu()
 eng: "Reset Settings"
 voice: "Réinitialiser les réglages"
-new: "Réinit. réglages"
+new: "Ré-initialiser réglages"
 
 id: LANG_PLAYBACK
 desc: in settings_menu()
@@ -406,25 +406,25 @@ id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
 eng: "Key Lock ON"
 voice: ""
-new: "Verrouillage des touches ON"
+new: "Verrouillage touches"
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
 eng: "Key Lock OFF"
 voice: ""
-new: "Dé-verrouillage des touches OFF"
+new: "Déverrouillage touches"
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
 eng: "Key Lock Is ON"
-voice: "Touches vérouillées "
-new: "Touches vérouillées"
+voice: "Touches verrouillées. "
+new: "Touches verrouillées."
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key Lock Is OFF"
-voice: ""
-new: "Touches dévérouillées"
+voice: "Touches déverrouillées"
+new: "Touches déverrouillées"
 
 id: LANG_MUTE_ON_PLAYER
 desc: DEPRECATED
@@ -1095,14 +1095,14 @@ new: "Capacité"
 id: LANG_MENU_SETTING_CANCEL
 desc: Visual confirmation of canceling a changed setting
 eng: "Canceled"
-voice: ""
+voice: "Annulé"
 new: "Annulé"
 
 id: LANG_QUEUE
 desc: The verb/action Queue
 eng: "Queue"
-voice: "Insérér pour lecture unique"
-new: "Insérér (lecture unique)"
+voice: "Insérer pour lecture unique"
+new: "Insérer (lecture unique)"
 
 id: LANG_DELETE
 desc: The verb/action Delete
@@ -1341,8 +1341,8 @@ new: "Sélecteur de ligne"
 id: LANG_RECORDING_EDITABLE
 desc: Editable recordings setting
 eng: "Independent frames"
-voice: "Frame MP3 independantes"
-new: "Frame MP3 independantes"
+voice: "Frames MP3 independantes"
+new: "Frames MP3 independantes"
 
 id: LANG_STATUS_BAR
 desc: display menu, F3 substitute
@@ -1426,13 +1426,13 @@ id: LANG_RECORD_TIMESPLIT
 desc: Prompt for record timer interval setting, in the record settings menu
 eng: "Time Split"
 voice: "Temps de coupure"
-new: "Tps coupure"
+new: "Temps coupure"
 
 id: LANG_RECORD_TIMESPLIT_REC
 desc: Display of record timer interval setting, on the record screen
 eng: "Split time:"
-voice: ""
-new: "Tps coupe:"
+voice: "Temps de coupe"
+new: "Temps coupe:"
 
 id: LANG_SHOW_ICONS
 desc: in settings_menu
@@ -1541,8 +1541,8 @@ new: "Insérer suivant"
 id: LANG_SAVE_DYNAMIC_PLAYLIST
 desc: in playlist menu.
 eng: "Save Current Playlist"
-voice: "Enreg. liste de lecture courante"
-new: "Enreg. liste courante"
+voice: "Enregistrer liste de lecture courante"
+new: "Enregistrer liste courante"
 
 id: LANG_PLAYLIST_MENU
 desc: in main menu.
@@ -1583,7 +1583,7 @@ new: "STOP pour annuler"
 id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
 desc: Playlist error
 eng: "Error updating playlist control file"
-voice: ""
+voice: "Erreur de mise à jour de la liste"
 new: "Erreur de mise à jour de la liste"
 
 id: LANG_PLAYLIST_ACCESS_ERROR
@@ -1644,7 +1644,7 @@ id: LANG_WHILE_PLAYING
 desc: in settings_menu()
 eng: "Browse .wps files"
 voice: "Charger une configuration d'affichage"
-new: "Charger config. d'affichage"
+new: "Charger configuration d'affichage"
 
 id: LANG_CUSTOM_CFG
 desc: in setting_menu()
@@ -1673,7 +1673,7 @@ new: "Entrée analogique"
 id: LANG_NO_FILES
 desc: in settings_menu
 eng: "No files"
-voice: ""
+voice: "Pas de fichiers"
 new: "Pas de fichiers"
 
 id: LANG_BUTTONBAR_MENU
@@ -1721,8 +1721,8 @@ new:
 id: LANG_FM_NO_FREE_PRESETS
 desc: in radio screen
 eng: "The preset list is full"
-voice: ""
-new: "liste de pré-selections pleine"
+voice: "Liste de pré-selections pleine"
+new: "Liste de pré-selections pleine"
 
 id: LANG_FM_RADIO
 desc: in main menu
@@ -1734,7 +1734,7 @@ id: LANG_FM_BUTTONBAR_RECORD
 desc: in main menu
 eng: "Record"
 voice: "Enregistrement"
-new: "Enreg."
+new: "Enregistrement"
 
 id: LANG_VIEW_DYNAMIC_PLAYLIST
 desc: in playlist menu.
@@ -1770,7 +1770,7 @@ id: LANG_RECORD_PRERECORD_TIME
 desc: in recording settings_menu
 eng: "Prerecord time"
 voice: "Temps de préenregistrement"
-new: "Tps pré-enreg."
+new: "Temps pré-enreg."
 
 # Auto bookmark prompts
 
@@ -1943,8 +1943,8 @@ new: "Avance/Retour Rapide"
 id: LANG_LCD_MENU
 desc: in the display sub menu
 eng: "LCD Settings"
-voice: "Configuration écran du lecteur"
-new: "Config. LCD principal"
+voice: "Réglages écran principal"
+new: "Réglages LCD principal"
 
 id: LANG_BARS_MENU
 desc: in the display sub menu
@@ -1982,7 +1982,7 @@ id: LANG_MANAGE_MENU
 desc: in the system sub menu
 eng: "Manage Settings"
 voice: "Gestion des configurations"
-new: "Gestion des config."
+new: "Gestion des configurations"
 
 id: LANG_RECORD_DIRECTORY
 desc: in recording settings_menu
@@ -2277,7 +2277,7 @@ new:
 id: VOICE_POINT
 desc: DEPRECATED
 eng: ""
-voice: ""
+voice: "."
 new: 
 
 id: VOICE_MILLISECONDS
@@ -2665,25 +2665,25 @@ new:
 id: LANG_FILETYPES_EXTENSION_FULL
 desc: Extension array full
 eng: "Extension array full"
-voice: ""
+voice: "Table des suffixes pleine"
 new: "Table des suffixes pleine"
 
 id: LANG_FILETYPES_FULL
 desc: Filetype array full
 eng: "Filetype array full"
-voice: ""
+voice: "Table des types de fichier pleine"
 new: "Table des types de fichier pleine"
 
 id: LANG_FILETYPES_PLUGIN_NAME_LONG
 desc: Viewer plugin name too long
 eng: "Plugin name too long"
-voice: ""
+voice: "Nom de l'extension trop long"
 new: "Nom de l'extension trop long"
 
 id: LANG_FILETYPES_STRING_BUFFER_EMPTY
 desc: Filetype string buffer empty
 eng: "Filetype string buffer empty"
-voice: ""
+voice: "Nom du type de fichier vide"
 new: "Nom du type de fichier vide"
 
 id: LANG_ONPLAY_OPEN_WITH
@@ -3025,7 +3025,7 @@ new: "Déclencheur"
 id: LANG_RECORD_START_THRESHOLD
 desc: in recording settings_menu
 eng: "Start above"
-voice: "Démarrer au dessus de"
+voice: "Démarrer à"
 new: "Démarrer à"
 
 id: LANG_RECORD_MIN_DURATION
@@ -3050,7 +3050,7 @@ id: LANG_RECORD_STOP_GAP
 desc: in recording settings_menu
 eng: "Presplit gap"
 voice: "Temps de coupe"
-new: "Tps coupe"
+new: "Temps coupe"
 
 id: LANG_RECORD_TRIGGER_MODE
 desc: in recording settings_menu
@@ -3274,7 +3274,7 @@ id: LANG_BEEP
 desc: in playback settings
 eng: "Beep volume"
 voice: "Volume bip"
-new: "Voulume bip"
+new: "Volume bip"
 
 id: LANG_WEAK
 desc: in beep volume in playback settings
@@ -3369,7 +3369,7 @@ new: "Gain ADC droit"
 id: LANG_RECORDING_ADC_LEFT
 desc: in the recording settings
 eng: "ADC Gain Left"
-voice: "ADC Gain Left"
+voice: "gain ADC gauche"
 new: "Gain ADC gauche"
 
 id: LANG_RECORDING_MONITOR
@@ -3454,16 +3454,16 @@ id: LANG_REMOTE_WHILE_PLAYING
 desc: in settings_menu()
 eng: "Browse .rwps files"
 voice: "Charger configuration d'écran télécommande"
-new: "Charger configuration écran télécommande"
+new: "Charger config. d'affichage écran télécommande"
 
 id: LANG_CUSTOM_THEME
 desc: Custom themes menu
 eng: "Browse Themes"
-voice: "Liste des Thèmes"
-new: "Listes des Thèmes"
+voice: "Liste des thèmes"
+new: "Listes des thèmes"
 
 id: LANG_REDUCE_TICKING
 desc: in remote lcd settings menu
 eng: "Reduce ticking"
-voice: "Reduire le bruit parazite"
-new: "Reduire le bruit parazite"
+voice: "Reduire le bruit parasite"
+new: "Reduire le bruit parasite"
