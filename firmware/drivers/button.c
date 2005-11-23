@@ -58,6 +58,7 @@ static bool flipped;  /* buttons can be flipped to match the LCD flip */
 #define POWEROFF_COUNT 10
 
 static int button_read(void);
+static bool remote_button_hold_only(void);
 
 static void button_tick(void)
 {
@@ -387,13 +388,13 @@ static int button_read(void)
     {
         backlight_on();
     }
-    if (remote_hold_button && !remote_button_hold())
+    if (remote_hold_button && !remote_button_hold_only())
     {
         remote_backlight_on();
     }
 
     hold_button = button_hold();
-    remote_hold_button = remote_button_hold();
+    remote_hold_button = remote_button_hold_only();
 
     /* normal buttons */
     if (!hold_button)
@@ -478,13 +479,13 @@ static int button_read(void)
     {
         backlight_on();
     }
-    if (remote_hold_button && !remote_button_hold())
+    if (remote_hold_button && !remote_button_hold_only())
     {
         remote_backlight_on();
     }
 
     hold_button = button_hold();
-    remote_hold_button = remote_button_hold();
+    remote_hold_button = remote_button_hold_only();
 
     /* normal buttons */
     if (!hold_button)
@@ -696,9 +697,14 @@ bool button_hold(void)
     return (GPIO1_READ & 0x00000002)?true:false;
 }
 
-bool remote_button_hold(void)
+static bool remote_button_hold_only(void)
 {
     return (GPIO1_READ & 0x00100000)?true:false;
+}
+
+bool remote_button_hold(void)
+{
+    return ((GPIO_READ & 0x40000000) == 0)?remote_button_hold_only():false;
 }
 #endif
 
