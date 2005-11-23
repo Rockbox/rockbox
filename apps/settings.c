@@ -85,7 +85,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "dsp.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 32
+#define CONFIG_BLOCK_VERSION 33
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -179,6 +179,11 @@ static const char trig_durations_conf [] =
                   "0s,1s,2s,5s,10s,15s,20s,25s,30s,1min,2min,5min,10min";
 #endif
 
+#if defined(CONFIG_BACKLIGHT)
+static const char backlight_times_conf [] =
+                  "off,on,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90";
+#endif
+
 /* the part of the settings which ends up in the RTC RAM, where available
    (those we either need early, save frequently, or without spinup) */
 static const struct bit_entry rtc_bits[] =
@@ -216,12 +221,11 @@ static const struct bit_entry rtc_bits[] =
     /* LCD */
     {6, S_O(contrast), 40, "contrast", NULL },
 #ifdef CONFIG_BACKLIGHT
+    {5, S_O(backlight_timeout), 5, "backlight timeout", backlight_times_conf },
 #ifdef HAVE_CHARGING
-    {1, S_O(backlight_on_when_charging), false,
-        "backlight when plugged", off_on },
+    {5, S_O(backlight_timeout_plugged), 11, "backlight timeout plugged",
+        backlight_times_conf },
 #endif
-    {5, S_O(backlight_timeout), 5, "backlight timeout",
-        "off,on,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90" },
 #endif /* CONFIG_BACKLIGHT */
 #ifdef HAVE_LCD_BITMAP
     {1, S_O(invert), false, "invert", off_on },
@@ -236,6 +240,7 @@ static const struct bit_entry rtc_bits[] =
     {1, S_O(volume_type), 0, "volume display", graphic_numeric },
     {1, S_O(battery_display), 0, "battery display", graphic_numeric },
     {1, S_O(timeformat), 0, "time format", "24hour,12hour" },
+    {1, S_O(bidi_support), false, "bidi hebrew/arabic", off_on },
 #endif /* HAVE_LCD_BITMAP */
     {1, S_O(show_icons), true, "show icons", off_on },
     /* system */
@@ -268,22 +273,15 @@ static const struct bit_entry rtc_bits[] =
     /* remote lcd */
     {6, S_O(remote_contrast), 42, "remote contrast", NULL },
     {1, S_O(remote_invert), false, "remote invert", off_on },
-    {5, S_O(remote_backlight_timeout), 5, "remote backlight timeout",
-        "off,on,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90" },
     {1, S_O(remote_flip_display), false, "remote flip display", off_on },
+    {5, S_O(remote_backlight_timeout), 5, "remote backlight timeout",
+        backlight_times_conf },
+#ifdef HAVE_CHARGING
+    {5, S_O(remote_backlight_timeout_plugged), 11,
+        "remote backlight timeout plugged", backlight_times_conf },
 #endif
-
-#ifdef HAVE_LCD_BITMAP /* move to LCD next time we bump version */
-    {1, S_O(bidi_support), false, "bidi hebrew/arabic", off_on },
-#endif
-
-#ifdef HAVE_REMOTE_LCD   /* move to REMOTE_LCD next time we bump version */
 #ifdef HAVE_REMOTE_LCD_TICKING
     {1, S_O(remote_reduce_ticking), false, "remote reduce ticking", off_on },
-#endif
-#ifdef HAVE_CHARGING
-    {1, S_O(remote_backlight_on_when_charging), false,
-        "remote backlight when plugged", off_on },
 #endif
 #endif
 
@@ -871,11 +869,14 @@ void settings_apply(void)
     lcd_remote_emireduce(global_settings.remote_reduce_ticking);
 #endif
     remote_backlight_set_timeout(global_settings.remote_backlight_timeout);
+#ifdef HAVE_CHARGING
+    remote_backlight_set_timeout_plugged(global_settings.remote_backlight_timeout_plugged);
+#endif
 #endif
 #ifdef CONFIG_BACKLIGHT
     backlight_set_timeout(global_settings.backlight_timeout);
 #ifdef HAVE_CHARGING
-    backlight_set_on_when_charging(global_settings.backlight_on_when_charging);
+    backlight_set_timeout_plugged(global_settings.backlight_timeout_plugged);
 #endif
 #if (CONFIG_BACKLIGHT == BL_IRIVER_H100) && !defined(SIMULATOR)
     backlight_set_fade_in(global_settings.backlight_fade_in);

@@ -449,13 +449,8 @@ static int runcurrent(void)
     }
 
 #if defined(CONFIG_BACKLIGHT) && !defined(BOOTLOADER)
-    if ((backlight_get_timeout() == 1) /* LED always on */
-#ifdef HAVE_CHARGE_CTRL
-        || (charger_inserted() && backlight_get_on_when_charging())
-#endif
-       ) {
+    if (backlight_get_current_timeout() == 0) /* LED always on */
         current += CURRENT_BACKLIGHT;
-    }
 #endif
 
     return(current);

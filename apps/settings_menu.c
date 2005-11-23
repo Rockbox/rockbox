@@ -135,6 +135,28 @@ static bool remote_reduce_ticking(void)
 #endif
 
 #ifdef CONFIG_BACKLIGHT
+static const struct opt_items backlight_timeouts[] = {
+    { STR(LANG_OFF) },
+    { STR(LANG_ON) },
+    { "1s ", TALK_ID(1, UNIT_SEC) },
+    { "2s ", TALK_ID(2, UNIT_SEC) },
+    { "3s ", TALK_ID(3, UNIT_SEC) },
+    { "4s ", TALK_ID(4, UNIT_SEC) },
+    { "5s ", TALK_ID(5, UNIT_SEC) },
+    { "6s ", TALK_ID(6, UNIT_SEC) },
+    { "7s ", TALK_ID(7, UNIT_SEC) },
+    { "8s ", TALK_ID(8, UNIT_SEC) },
+    { "9s ", TALK_ID(9, UNIT_SEC) },
+    { "10s", TALK_ID(10, UNIT_SEC) },
+    { "15s", TALK_ID(15, UNIT_SEC) },
+    { "20s", TALK_ID(20, UNIT_SEC) },
+    { "25s", TALK_ID(25, UNIT_SEC) },
+    { "30s", TALK_ID(30, UNIT_SEC) },
+    { "45s", TALK_ID(45, UNIT_SEC) },
+    { "60s", TALK_ID(60, UNIT_SEC) },
+    { "90s", TALK_ID(90, UNIT_SEC) }
+};
+
 static bool caption_backlight(void)
 {
     return set_bool( str(LANG_CAPTION_BACKLIGHT),
@@ -142,40 +164,21 @@ static bool caption_backlight(void)
 }
 
 #ifdef HAVE_CHARGING
-static bool backlight_on_when_charging(void)
+static bool backlight_timer_plugged(void)
 {
-    bool result = set_bool(str(LANG_BACKLIGHT_ON_WHEN_CHARGING),
-                           &global_settings.backlight_on_when_charging);
-    backlight_set_on_when_charging(global_settings.backlight_on_when_charging);
-    return result;
+    return set_option(str(LANG_BACKLIGHT_ON_WHEN_CHARGING),
+                      &global_settings.backlight_timeout_plugged,
+                      INT, backlight_timeouts, 19,
+                      backlight_set_timeout_plugged );
 }
 #endif
 
 static bool backlight_timer(void)
 {
-    static const struct opt_items names[] = {
-        { STR(LANG_OFF) },
-        { STR(LANG_ON) },
-        { "1s ", TALK_ID(1, UNIT_SEC) },
-        { "2s ", TALK_ID(2, UNIT_SEC) },
-        { "3s ", TALK_ID(3, UNIT_SEC) },
-        { "4s ", TALK_ID(4, UNIT_SEC) },
-        { "5s ", TALK_ID(5, UNIT_SEC) },
-        { "6s ", TALK_ID(6, UNIT_SEC) },
-        { "7s ", TALK_ID(7, UNIT_SEC) },
-        { "8s ", TALK_ID(8, UNIT_SEC) },
-        { "9s ", TALK_ID(9, UNIT_SEC) },
-        { "10s", TALK_ID(10, UNIT_SEC) },
-        { "15s", TALK_ID(15, UNIT_SEC) },
-        { "20s", TALK_ID(20, UNIT_SEC) },
-        { "25s", TALK_ID(25, UNIT_SEC) },
-        { "30s", TALK_ID(30, UNIT_SEC) },
-        { "45s", TALK_ID(45, UNIT_SEC) },
-        { "60s", TALK_ID(60, UNIT_SEC) },
-        { "90s", TALK_ID(90, UNIT_SEC) }
-    };
-    return set_option(str(LANG_BACKLIGHT), &global_settings.backlight_timeout,
-                      INT, names, 19, backlight_set_timeout );
+    return set_option(str(LANG_BACKLIGHT),
+                      &global_settings.backlight_timeout,
+                      INT, backlight_timeouts, 19,
+                      backlight_set_timeout );
 }
 
 #if (CONFIG_BACKLIGHT == BL_IRIVER_H100) && !defined(SIMULATOR)
@@ -215,39 +218,19 @@ static bool backlight_fade_out(void)
 
 static bool remote_backlight_timer(void)
 {
-    static const struct opt_items names[] = {
-        { STR(LANG_OFF) },
-        { STR(LANG_ON) },
-        { "1s ", TALK_ID(1, UNIT_SEC) },
-        { "2s ", TALK_ID(2, UNIT_SEC) },
-        { "3s ", TALK_ID(3, UNIT_SEC) },
-        { "4s ", TALK_ID(4, UNIT_SEC) },
-        { "5s ", TALK_ID(5, UNIT_SEC) },
-        { "6s ", TALK_ID(6, UNIT_SEC) },
-        { "7s ", TALK_ID(7, UNIT_SEC) },
-        { "8s ", TALK_ID(8, UNIT_SEC) },
-        { "9s ", TALK_ID(9, UNIT_SEC) },
-        { "10s", TALK_ID(10, UNIT_SEC) },
-        { "15s", TALK_ID(15, UNIT_SEC) },
-        { "20s", TALK_ID(20, UNIT_SEC) },
-        { "25s", TALK_ID(25, UNIT_SEC) },
-        { "30s", TALK_ID(30, UNIT_SEC) },
-        { "45s", TALK_ID(45, UNIT_SEC) },
-        { "60s", TALK_ID(60, UNIT_SEC) },
-        { "90s", TALK_ID(90, UNIT_SEC) }
-    };
-    return set_option(str(LANG_BACKLIGHT), &global_settings.remote_backlight_timeout,
-                      INT, names, 19, remote_backlight_set_timeout );
+    return set_option(str(LANG_BACKLIGHT),
+                      &global_settings.remote_backlight_timeout,
+                      INT, backlight_timeouts, 19,
+                      remote_backlight_set_timeout );
 }
 
 #ifdef HAVE_CHARGING
-static bool remote_backlight_on_when_charging(void)
+static bool remote_backlight_timer_plugged(void)
 {
-    bool result = set_bool(str(LANG_BACKLIGHT_ON_WHEN_CHARGING),
-                           &global_settings.remote_backlight_on_when_charging);
-    remote_backlight_set_on_when_charging(
-                     global_settings.remote_backlight_on_when_charging);
-    return result;
+    return set_option(str(LANG_BACKLIGHT_ON_WHEN_CHARGING),
+                      &global_settings.remote_backlight_timeout_plugged,
+                      INT, backlight_timeouts, 19,
+                      remote_backlight_set_timeout_plugged );
 }
 #endif
 
@@ -1532,7 +1515,7 @@ static bool lcd_settings_menu(void)
 #ifdef CONFIG_BACKLIGHT
         { ID2P(LANG_BACKLIGHT),       backlight_timer },
 #ifdef HAVE_CHARGING
-        { ID2P(LANG_BACKLIGHT_ON_WHEN_CHARGING), backlight_on_when_charging },
+        { ID2P(LANG_BACKLIGHT_ON_WHEN_CHARGING), backlight_timer_plugged },
 #endif
         { ID2P(LANG_CAPTION_BACKLIGHT), caption_backlight },
 #if (CONFIG_BACKLIGHT == BL_IRIVER_H100) && !defined(SIMULATOR)
@@ -1565,7 +1548,7 @@ static bool lcd_remote_settings_menu(void)
         { ID2P(LANG_BACKLIGHT),       remote_backlight_timer },
 #ifdef HAVE_CHARGING
         { ID2P(LANG_BACKLIGHT_ON_WHEN_CHARGING),
-                               remote_backlight_on_when_charging },
+                                      remote_backlight_timer_plugged },
 #endif
         { ID2P(LANG_CAPTION_BACKLIGHT), remote_caption_backlight },
         { ID2P(LANG_CONTRAST),        remote_contrast },

@@ -52,14 +52,18 @@ static long backlight_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 static const char backlight_thread_name[] = "backlight";
 static struct event_queue backlight_queue;
 
-static bool backlight_on_when_charging = false;
 static int backlight_timer;
-static unsigned int backlight_timeout = 5;
+static int backlight_timeout = 5*HZ;
+#ifdef HAVE_CHARGING
+static int backlight_timeout_plugged = 5*HZ;
+#endif
 
 #ifdef HAVE_REMOTE_LCD
-static bool remote_backlight_on_when_charging = false;
 static int remote_backlight_timer;
-static unsigned int remote_backlight_timeout = 5;
+static int remote_backlight_timeout = 5*HZ;
+#ifdef HAVE_CHARGING
+static int remote_backlight_timeout_plugged = 5*HZ;
+#endif
 #endif
 
 #if (CONFIG_BACKLIGHT == BL_IRIVER_H100) && !defined(SIMULATOR)
@@ -304,19 +308,15 @@ void backlight_thread(void)
         {
 #ifdef HAVE_REMOTE_LCD
             case REMOTE_BACKLIGHT_ON:
-                if( remote_backlight_on_when_charging && charger_inserted() )
-                {
-                    /* Forcing to zero keeps the lights on */
-                    remote_backlight_timer = 0;
-                }
+#ifdef HAVE_CHARGING
+                if (charger_inserted())
+                    remote_backlight_timer = remote_backlight_timeout_plugged;
                 else
-                {
-                    remote_backlight_timer =
-                        HZ*backlight_timeout_value[remote_backlight_timeout];
-                }
+#endif
+                    remote_backlight_timer = remote_backlight_timeout;
 
                 /* Backlight == OFF in the setting? */
-                if(remote_backlight_timer < 0)
+                if (remote_backlight_timer < 0)
                 {
                     remote_backlight_timer = 0; /* Disable the timeout */
                     __remote_backlight_off();
@@ -333,17 +333,14 @@ void backlight_thread(void)
                 
 #endif /* HAVE_REMOTE_LCD */
             case BACKLIGHT_ON:
-                if( backlight_on_when_charging && charger_inserted() )
-                {
-                    /* Forcing to zero keeps the lights on */
-                    backlight_timer = 0;
-                }
+#ifdef HAVE_CHARGING
+                if (charger_inserted())
+                    backlight_timer = backlight_timeout_plugged;
                 else
-                {
-                    backlight_timer = HZ*backlight_timeout_value[backlight_timeout];
-                }
+#endif
+                    backlight_timer = backlight_timeout;
 
-                if(backlight_timer < 0) /* Backlight == OFF in the setting? */
+                if (backlight_timer < 0) /* Backlight == OFF in the setting? */
                 {
                     backlight_timer = 0; /* Disable the timeout */
                     __backlight_off();
@@ -385,11 +382,9 @@ static void backlight_tick(void)
 
     if( charger_was_inserted != charger_is_inserted )
     {
-        if( backlight_on_when_charging  )
-            backlight_on();
+        backlight_on();
 #ifdef HAVE_REMOTE_LCD
-        if( remote_backlight_on_when_charging  )
-            remote_backlight_on();
+        remote_backlight_on();
 #endif
     }
     charger_was_inserted = charger_is_inserted;
@@ -453,9 +448,14 @@ void backlight_off(void)
     queue_post(&backlight_queue, BACKLIGHT_OFF, NULL);
 }
 
-int backlight_get_timeout(void)
+/* return value in ticks; 0 means always on, <0 means always off */
+int backlight_get_current_timeout(void)
 {
+#ifdef HAVE_CHARGING
+    return charger_inserted() ? backlight_timeout_plugged : backlight_timeout;
+#else
     return backlight_timeout;
+#endif
 }
 
 void backlight_set_timeout(int index)
@@ -463,19 +463,17 @@ void backlight_set_timeout(int index)
     if((unsigned)index >= sizeof(backlight_timeout_value))
         /* if given a weird value, use 0 */
         index=0;
-    backlight_timeout = index; /* index in the backlight_timeout_value table */
+    backlight_timeout = HZ * backlight_timeout_value[index];
     backlight_on();
 }
 
 #ifdef HAVE_CHARGING
-bool backlight_get_on_when_charging(void)
+void backlight_set_timeout_plugged(int index)
 {
-    return backlight_on_when_charging;
-}
-
-void backlight_set_on_when_charging(bool yesno)
-{
-    backlight_on_when_charging = yesno;
+    if((unsigned)index >= sizeof(backlight_timeout_value))
+        /* if given a weird value, use 0 */
+        index=0;
+    backlight_timeout_plugged = HZ * backlight_timeout_value[index];
     backlight_on();
 }
 #endif
@@ -496,14 +494,17 @@ void remote_backlight_set_timeout(int index)
     if((unsigned)index >= sizeof(backlight_timeout_value))
         /* if given a weird value, use 0 */
         index=0;
-    remote_backlight_timeout = index; /* index in the backlight_timeout_value table */
+    remote_backlight_timeout = HZ * backlight_timeout_value[index];
     remote_backlight_on();
 }
 
 #ifdef HAVE_CHARGING
-void remote_backlight_set_on_when_charging(bool yesno)
+void remote_backlight_set_timeout_plugged(int index)
 {
-    remote_backlight_on_when_charging = yesno;
+    if((unsigned)index >= sizeof(backlight_timeout_value))
+        /* if given a weird value, use 0 */
+        index=0;
+    remote_backlight_timeout_plugged = HZ * backlight_timeout_value[index];
     remote_backlight_on();
 }
 #endif

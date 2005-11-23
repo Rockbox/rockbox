@@ -26,13 +26,12 @@ void backlight_off(void);
 void backlight_set_timeout(int index);
 #ifdef CONFIG_BACKLIGHT
 void backlight_init(void);
-int  backlight_get_timeout(void);
+int  backlight_get_current_timeout(void);
 #if CONFIG_BACKLIGHT == BL_IRIVER_H100
 void backlight_set_fade_in(int index);
 void backlight_set_fade_out(int index);
 #endif
-bool backlight_get_on_when_charging(void);
-void backlight_set_on_when_charging(bool yesno);
+void backlight_set_timeout_plugged(int index);
 extern const char backlight_timeout_value[];
 #else
 #define backlight_init()
@@ -42,7 +41,7 @@ extern const char backlight_timeout_value[];
 void remote_backlight_on(void);
 void remote_backlight_off(void);
 void remote_backlight_set_timeout(int index);
-void remote_backlight_set_on_when_charging(bool yesno);
+void remote_backlight_set_timeout_plugged(int index);
 #endif
 
 #ifdef SIMULATOR

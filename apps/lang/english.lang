@@ -680,9 +680,9 @@ voice: "Units Per Read"
 new:
 
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
-desc: in display_settings_menu
-eng: "Backlight On When Plugged"
-voice: "Backlight On When Plugged"
+desc: in display_settings_menu, backlight timeout with charger connected
+eng: "Backlight When Plugged"
+voice: "Backlight When Plugged"
 new:
 
 id: LANG_REPEAT

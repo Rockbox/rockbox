@@ -313,7 +313,7 @@ int charging_screen(void)
 #ifdef HAVE_REMOTE_LCD
     remote_backlight_set_timeout(global_settings.remote_backlight_timeout);
 #endif
-    backlight_set_on_when_charging(global_settings.backlight_on_when_charging);
+    backlight_set_timeout_plugged(global_settings.backlight_timeout_plugged);
     gui_syncstatusbar_draw(&statusbars, true);
 
 #ifdef HAVE_LCD_CHARCELLS

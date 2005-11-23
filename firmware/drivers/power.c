@@ -280,7 +280,8 @@ void power_off(void)
     or_b(0x08, &PAIORH);
 #endif
 #endif
-    while(1);
+    while(1)
+        yield();
 }
 
 #else
