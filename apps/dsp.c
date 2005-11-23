@@ -471,7 +471,7 @@ static void apply_crossfeed(long* src[], int count)
          * d5 = src[0][i], d6 = src[1][i].
          * The rest are described in asm constraint list.
          */
-     ".cfloop:"
+    ".cfloop:"
         /* LOW*low_left + LOW_COMP*left */
         "mac.l %%a1, %%d0, %%acc0                    \n" 
         "mac.l %%a2, %%d5, %%acc0                    \n" 
@@ -483,7 +483,7 @@ static void apply_crossfeed(long* src[], int count)
         /* HIGH_NEG*high_left + HIGH_COMP*left */ 
         "mac.l %%a1, %%d2, %%acc0                    \n"
         "mac.l %%a2, %%d5, %%acc0                    \n"
-        /* HIGH_NEG*hifh_right + HIGH_COMP+*right */
+        /* HIGH_NEG*high_right + HIGH_COMP+*right */
         "mac.l %%a1, %%d3, (%[coef])+, %%a1, %%acc1  \n" /* a1 = ATT */
         "mac.l %%a2, %%d6, (%[coef])+, %%a2, %%acc1  \n" /* a2 = ATT_COMP */
         "lea.l (-6*4, %[coef]), %[coef]              \n" /* coef = &coefs[0] */
@@ -676,7 +676,7 @@ long dsp_process(char* dst, char* src[], long size)
     /* set emac unit for dsp processing, and save old macsr, we're running in
        codec thread context at this point, so can't clobber it */
     unsigned long old_macsr = coldfire_get_macsr();
-    coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_ROUND | EMAC_SATURATE);
+    coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
     #endif
     
     dsp = &dsp_conf[current_codec];
