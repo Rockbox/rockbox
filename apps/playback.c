@@ -1461,9 +1461,11 @@ void audio_update_trackinfo(void)
         codec_track_changed();
 }
 
-static void audio_stop_playback(void)
+static void audio_stop_playback(bool resume)
 {
     paused = false;
+    if (playing)
+        playlist_update_resume_info(resume ? audio_current_track() : NULL);
     playing = false;
     filling = false;
     ci.stop_codec = true;
@@ -1480,26 +1482,36 @@ static void audio_stop_playback(void)
     audio_clear_track_entries(false);
 }
 
-/* Request the next track with new codec. */
-void audio_change_track(void)
+static bool advance_next_track(void)
 {
-    logf("change track");
-    
-    /* Wait for new track data. */
-    while (track_count <= 1 && filling)
-        yield();
-
-    /* If we are not filling, then it must be end-of-playlist. */
-    if (track_count <= 1) {
-        logf("No more tracks");
-        while (pcm_is_playing())
-            yield();
-        audio_stop_playback();
-        return ;
-    }
-    
     if (++track_ridx >= MAX_TRACK)
         track_ridx = 0;
+        
+        /* Wait for new track data (codectype 0 is invalid). When a correct
+    codectype is set, we can assume that the filesize is correct. */
+    while (tracks[track_ridx].id3.codectype == 0 && filling
+           && !ci.stop_codec)
+        yield();
+
+    if (tracks[track_ridx].filesize > 0)
+        return true;
+
+    return false;
+}
+
+/* Request the next track with new codec. */
+static void audio_change_track(void)
+{
+    logf("change track");
+
+    if (!advance_next_track())
+    {
+        logf("No more tracks");
+        while (pcm_is_playing())
+            sleep(1);
+        audio_stop_playback(false);
+        return ;
+    }
     
     audio_update_trackinfo();
     queue_post(&codec_queue, CODEC_LOAD, 0);
@@ -1534,16 +1546,8 @@ bool codec_request_next_track_callback(void)
     /* Advance to next track. */
     if (ci.reload_codec && new_track > 0) {
         last_peek_offset--;
-        if (++track_ridx == MAX_TRACK)
-            track_ridx = 0;
         
-        /* Wait for new track data (codectype 0 is invalid). When a correct
-           codectype is set, we can assume that the filesize is correct. */
-        while (tracks[track_ridx].id3.codectype == 0 && filling
-               && !ci.stop_codec)
-            yield();
-        
-        if (tracks[track_ridx].filesize == 0) {
+        if (!advance_next_track()) {
             logf("Loading from disk...");
             new_track = 0;
             queue_post(&audio_queue, AUDIO_PLAY, 0);
@@ -1574,16 +1578,8 @@ bool codec_request_next_track_callback(void)
         }
         last_peek_offset--;
         playlist_next(1);
-        if (++track_ridx >= MAX_TRACK)
-            track_ridx = 0;
-        
-        /* Wait for new track data (codectype 0 is invalid). When a correct
-           codectype is set, we can assume that the filesize is correct. */
-        while (tracks[track_ridx].id3.codectype == 0 && filling
-               && !ci.stop_codec)
-            yield();
             
-        if (tracks[track_ridx].filesize == 0) {
+        if (!advance_next_track()) {
             logf("No more tracks [2]");
             ci.stop_codec = true;
             new_track = 0;
@@ -1726,14 +1722,12 @@ void audio_thread(void)
                    was empty or none of the filenames were valid.  No point
                    in playing an empty playlist. */
                 if (playlist_amount() == 0) {
-                    audio_stop_playback();
+                    audio_stop_playback(false);
                 }
                 break ;
                 
             case AUDIO_STOP:
-                if (playing)
-                    playlist_update_resume_info(audio_current_track());
-                audio_stop_playback();
+                audio_stop_playback(true);
                 break ;
                 
             case AUDIO_PAUSE:
@@ -1788,14 +1782,12 @@ void audio_thread(void)
                 break ;
                 
             case AUDIO_CODEC_DONE:
-                //if (playing)
-                //    audio_change_track();
                 break ;
 
 #ifndef SIMULATOR
             case SYS_USB_CONNECTED:
                 logf("USB: Audio core");
-                audio_stop_playback();
+                audio_stop_playback(true);
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 usb_wait_for_disconnect(&audio_queue);
                 break ;
@@ -1836,7 +1828,7 @@ void codec_thread(void)
                     /* Wait for the pcm buffer to go empty */
                     while (pcm_is_playing())
                         yield();
-                    audio_stop_playback();
+                    audio_stop_playback(true);
                     break ;
                 }
                 
@@ -1871,19 +1863,16 @@ void codec_thread(void)
         case CODEC_LOAD:
             if (status != CODEC_OK) {
                 logf("Codec failure");
-                audio_stop_playback();
+                // audio_stop_playback();
                 gui_syncsplash(HZ*2, true, "Codec failure");
             } else {
                 logf("Codec finished");
             }
                 
-            if (playing && !ci.stop_codec && !ci.reload_codec) {
+            if (playing && !ci.stop_codec && !ci.reload_codec)
                 audio_change_track();
-                continue ;
-            } else if (ci.stop_codec) {
-                //playing = false;
-            }
-            //queue_post(&audio_queue, AUDIO_CODEC_DONE, (void *)status);
+            
+            // queue_post(&audio_queue, AUDIO_CODEC_DONE, (void *)status);
         }
     }
 }
@@ -1915,7 +1904,7 @@ void voice_codec_thread(void)
         switch (ev.id) {
             case CODEC_LOAD_DISK:
                 logf("Loading voice codec");
-                audio_stop_playback();
+                audio_stop_playback(true);
                 mutex_lock(&mutex_codecthread);
                 current_codec = CODEC_IDX_VOICE;
                 dsp_configure(DSP_RESET, 0);
@@ -1929,7 +1918,7 @@ void voice_codec_thread(void)
                 status = codec_load_file((char *)ev.data, &ci_voice);
                 
                 logf("Voice codec finished");
-                audio_stop_playback();
+                audio_stop_playback(true);
                 mutex_unlock(&mutex_codecthread);
                 current_codec = CODEC_IDX_AUDIO;
                 voice_codec_loaded = false;
@@ -2299,7 +2288,7 @@ void audio_set_crossfade(int enable)
         return ;
 
     /* Playback has to be stopped before changing the buffer size. */
-    audio_stop_playback();
+    audio_stop_playback(true);
 
     /* Re-initialize audio system. */
     if (was_playing)
