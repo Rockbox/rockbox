@@ -667,10 +667,10 @@ voice: "Einheiten pro gelesenem Wert"
 new: "Einheiten pro gelesenem Wert"
 
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
-desc: in display_settings_menu
-eng: "Backlight On When Plugged"
-voice: "Beleuchtung an bei Netzbetrieb"
-new: "Beleuchtung an bei Netzbetrieb"
+desc: in display_settings_menu, backlight timeout with charger connected
+eng: "Backlight When Plugged"
+voice: "Beleuchtung bei Netzbetrieb"
+new: "Beleuchtung bei Netzbetrieb"
 
 id: LANG_REPEAT
 desc: in settings_menu
@@ -926,15 +926,15 @@ new: "Verst"
 
 id: LANG_RECORDING_LEFT
 desc: in the recording screen
-eng: "Left"
+eng: "Gain Left"
 voice: ""
-new: "Links"
+new: "V. Links"
 
 id: LANG_RECORDING_RIGHT
 desc: in the recording screen
-eng: "Right"
+eng: "Gain Right"
 voice: ""
-new: "Rechts"
+new: "V. Rechts"
 
 id: LANG_RECORDING_QUALITY
 desc: in the recording settings
@@ -1701,10 +1701,10 @@ voice: ""
 new: "Sender speichern fehlgeschlagen"
 
 id: LANG_FM_NO_PRESETS
-desc: DEPRECATED
-eng: ""
+desc: error when preset list is empty
+eng: "No presets"
 voice: ""
-new: ""
+new: "Keine Sender"
 
 id: LANG_FM_NO_FREE_PRESETS
 desc: in radio screen
@@ -3137,10 +3137,10 @@ voice: "Optischer Ausgang"
 new: "Optischer Ausgang"
 
 id: LANG_NEXT_FOLDER
-desc: in settings_menu. Should we allow skip directories and move to next folder when current one ends
-eng: "Directory navigation"
-voice: "Verzeichnisnavigation"
-new: "Verzeichnisnavigation"
+desc: in settings_menu. Should we allow move to next/prev folder from last/first track of current one
+eng: "Auto change directory"
+voice: "Automatischer Verzeichniswechsel"
+new: "Autom. Verzeichniswechsel"
 
 id: LANG_RUNTIMEDB_ACTIVE
 desc: in settings_menu.
@@ -3161,10 +3161,10 @@ voice: ""
 new: "Bewertung:"
 
 id: LANG_CROSSFADE_DURATION
-desc: in playback settings
-eng: "Crossfade duration"
-voice: "Überblenddauer"
-new: "Überblenddauer"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new:
 
 id: LANG_MIX
 desc: in playback settings, crossfade option
@@ -3309,3 +3309,147 @@ desc: when booting up and rebuilding the cache
 eng: "Scanning disk..."
 voice: ""
 new: "Lese Festplatte..."
+
+id: LANG_CROSSFADE_ENABLE
+desc: in crossfade settings menu
+eng: "Enable crossfade"
+voice: "Überblenden aktivieren"
+new: "Überblenden aktivieren"
+
+id: LANG_CROSSFADE_FADE_IN_DELAY
+desc: in crossfade settings menu
+eng: "Fade in delay"
+voice: "Einblendverzögerung"
+new: "Einblendverzögerung"
+
+id: LANG_CROSSFADE_FADE_OUT_DELAY
+desc: in crossfade settings menu
+eng: "Fade out delay"
+voice: "Ausblendverzögerung"
+new: "Ausblendverzögerung"
+
+id: LANG_CROSSFADE_FADE_IN_DURATION
+desc: in crossfade settings menu
+eng: "Fade in duration"
+voice: "Einblenddauer"
+new: "Einblenddauer"
+
+id: LANG_CROSSFADE_FADE_OUT_DURATION
+desc: in crossfade settings menu
+eng: "Fade out duration"
+voice: "Ausblenddauer"
+new: "Ausblenddauer"
+
+id: LANG_CROSSFADE_FADE_OUT_MODE
+desc: in crossfade settings menu
+eng: "Fade out mode"
+voice: "Ausblendmodus"
+new: "Ausblendmodus"
+
+id: LANG_RECORDING_ADC_RIGHT
+desc: in the recording settings
+eng: "ADC Gain Right"
+voice: "Verstärkung rechts"
+new: "Verstärkung rechts"
+
+id: LANG_RECORDING_ADC_LEFT
+desc: in the recording settings
+eng: "ADC Gain Left"
+voice: "Verstärkung links"
+new: "Verstärkung links"
+
+id: LANG_RECORDING_MONITOR
+desc: DEPRECATED
+eng: ""
+voice: ""
+new:
+
+id: LANG_RADIO_SCAN_MODE
+desc: in radio screen
+eng: "Scan Mode"
+voice: ""
+new: "Abstimmmodus"
+
+id: LANG_RADIO_PRESET_MODE
+desc: in radio screen
+eng: "Preset Mode"
+voice: ""
+new: "Sendermodus"
+
+id: LANG_FM_FREEZE
+desc: splash screen during freeze in radio mode
+eng: "Screen frozen!"
+voice: ""
+new: "Anzeige eingefroren!"
+
+id: LANG_CROSSFEED_ENABLE
+desc: DEPRECATED
+eng: ""
+voice:
+new:
+
+id: LANG_CROSSFEED
+desc: in the sound settings menu
+eng: "Crossfeed"
+voice: "Crossfeed"
+new: "Crossfeed"
+
+id: LANG_FM_SCAN_PRESETS
+desc: in radio menu
+eng: "Auto scan presets"
+voice: "Auto scan presets"
+new: "Automatische Sendersuche"
+
+id: LANG_FM_SCANNING
+desc: during auto scan
+eng: "Scanning %d.%dMHz"
+voice: ""
+new: "Suche %d,%01dMHz"
+
+id: LANG_FM_DEFAULT_PRESET_NAME
+desc: default preset name for auto scan mode
+eng: "%d.%01dMHz"
+voice: 
+new: "%d,%01dMHz"
+
+id: LANG_FM_ADD_PRESET
+desc: in radio menu
+eng: "Add preset"
+voice: "Sender hinzufügen"
+new: "Sender hinzufügen"
+
+id: LANG_FM_CLEAR_PRESETS
+desc: confirmation if presets can be cleared
+eng: "Clear current presets?"
+voice: ""
+new: "Alle Sender löschen?"
+
+id: LANG_WAIT
+desc: general please wait splash
+eng: "Loading..."
+voice: 
+new: "Lade..."
+
+id: VOICE_EXT_RWPS
+desc: spoken only, for file extension
+eng: ""
+voice: "RWPS"
+new:
+
+id: LANG_REMOTE_WHILE_PLAYING
+desc: in settings_menu()
+eng: "Browse .rwps files"
+voice: "Zeige RWPS-Dateien"
+new: "Zeige .rwps-Dateien"
+
+id: LANG_CUSTOM_THEME
+desc: Custom themes menu
+eng: "Browse Themes"
+voice: "Zeige Themen"
+new: "Zeige Themen"
+
+id: LANG_REDUCE_TICKING
+desc: in remote lcd settings menu
+eng: "Reduce ticking"
+voice: "Ticken verringern"
+new: "Ticken verringern"
