@@ -3397,7 +3397,7 @@ new: "Crossfeed"
 id: LANG_FM_SCAN_PRESETS
 desc: in radio menu
 eng: "Auto scan presets"
-voice: "Auto scan presets"
+voice: "Automatische Sendersuche"
 new: "Automatische Sendersuche"
 
 id: LANG_FM_SCANNING
