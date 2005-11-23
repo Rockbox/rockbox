@@ -58,7 +58,10 @@ static bool flipped;  /* buttons can be flipped to match the LCD flip */
 #define POWEROFF_COUNT 10
 
 static int button_read(void);
+
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 static bool remote_button_hold_only(void);
+#endif
 
 static void button_tick(void)
 {
