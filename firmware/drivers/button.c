@@ -391,11 +391,12 @@ static int button_read(void)
     {
         remote_backlight_on();
     }
+
     hold_button = button_hold();
     remote_hold_button = remote_button_hold();
 
     /* normal buttons */
-    if (!button_hold())
+    if (!hold_button)
     {
         data = adc_scan(ADC_BUTTONS);
         
@@ -425,7 +426,7 @@ static int button_read(void)
     }
     
     /* remote buttons */
-    if (!remote_button_hold())
+    if (!remote_hold_button)
     {
         data = adc_scan(ADC_REMOTE);
 
@@ -462,9 +463,9 @@ static int button_read(void)
     
     /* special buttons */
     data = GPIO1_READ;
-    if (!button_hold() && ((data & 0x20) == 0))
+    if (!hold_button && ((data & 0x20) == 0))
         btn |= BUTTON_ON;
-    if (!remote_button_hold() && ((data & 0x40) == 0))
+    if (!remote_hold_button && ((data & 0x40) == 0))
         btn |= BUTTON_RC_ON;
     
 #elif CONFIG_KEYPAD == IRIVER_H300_PAD
@@ -481,11 +482,12 @@ static int button_read(void)
     {
         remote_backlight_on();
     }
+
     hold_button = button_hold();
     remote_hold_button = remote_button_hold();
 
     /* normal buttons */
-    if (!button_hold())
+    if (!hold_button)
     {
         data = adc_scan(ADC_BUTTONS);
         
@@ -509,7 +511,7 @@ static int button_read(void)
     }
         
     /* remote buttons */
-    if (!remote_button_hold())
+    if (!remote_hold_button)
     {
         data = adc_scan(ADC_REMOTE);
 
@@ -543,18 +545,21 @@ static int button_read(void)
                     if (data < 0xf0)
                         btn = BUTTON_RC_REW;
     }
-    
+
     /* special buttons */
-    data = GPIO_READ;
-    if (!button_hold() && ((data & 0x200) == 0))
-        btn |= BUTTON_MODE;
-    if (!button_hold() && ((data & 0x8000) == 0))
-        btn |= BUTTON_REC;
+    if (!hold_button)
+    {
+        data = GPIO_READ;
+        if ((data & 0x0200) == 0)
+            btn |= BUTTON_MODE;
+        if ((data & 0x8000) == 0)
+            btn |= BUTTON_REC;
+    }
     
     data = GPIO1_READ;
-    if (!button_hold() && ((data & 0x20) == 0))
+    if (!hold_button && ((data & 0x20) == 0))
         btn |= BUTTON_ON;
-    if (!remote_button_hold() && ((data & 0x40) == 0))
+    if (!remote_hold_button && ((data & 0x40) == 0))
         btn |= BUTTON_RC_ON;
     
 #elif CONFIG_KEYPAD == RECORDER_PAD
