@@ -1223,8 +1223,11 @@ static bool replaygain_settings_menu(void)
 
 static bool crossfeed(void)
 {
-    bool result = set_bool(str(LANG_CROSSFEED_ENABLE), 
-        &global_settings.crossfeed);
+    bool result = set_bool_options(str(LANG_CROSSFEED),
+                                   &global_settings.crossfeed,
+                                   STR(LANG_ON),
+                                   STR(LANG_OFF),
+                                   NULL);
 
     dsp_set_crossfeed(global_settings.crossfeed);
     return result;
