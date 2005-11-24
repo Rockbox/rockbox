@@ -143,10 +143,17 @@ bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button)
     }
     return(false);
 }
+#ifdef BUTTON_REMOTE
+#define uncombine_button(key_read, combined_button) \
+    key_read & ~(combined_button & ~BUTTON_REMOTE)
+#else
+#define uncombine_button(key_read, combined_button) \
+    key_read & ~combined_button
+#endif
 
 bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
 {
-    int key;
+    int raw_key, button;
     /* To quit we need either :
      *  - a second press on the button that made us enter
      *  - an action taken while pressing the enter button,
@@ -154,27 +161,28 @@ bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
     bool can_quit=false;
     gui_syncquickscreen_draw(qs);
     while (true) {
-        key = button_get(true);
-        if(default_event_handler(key & ~button_enter) == SYS_USB_CONNECTED)
+        raw_key = button_get(true);
+        button=uncombine_button(raw_key, button_enter);
+        if(default_event_handler(button) == SYS_USB_CONNECTED)
             return(true);
-        if(gui_quickscreen_do_button(qs, key & ~button_enter))
+        if(gui_quickscreen_do_button(qs, button))
         {
             can_quit=true;
             if(qs->callback)
                 qs->callback(qs);
             gui_syncquickscreen_draw(qs);
         }
-        else if(key==button_enter)
+        else if(raw_key==button_enter)
             can_quit=true;
-        if(key==(button_enter | BUTTON_REL) && can_quit)
+        if(raw_key==(button_enter | BUTTON_REL) && can_quit)
             return(false);
 #ifdef QUICKSCREEN_QUIT
-        if(key==QUICKSCREEN_QUIT
+        if(raw_key==QUICKSCREEN_QUIT
 #ifdef QUICKSCREEN_QUIT2
-                || key==QUICKSCREEN_QUIT2
+           || raw_key==QUICKSCREEN_QUIT2
 #endif
 #if QUICKSCREEN_RC_QUIT
-                || key==QUICKSCREEN_RC_QUIT
+           || raw_key==QUICKSCREEN_RC_QUIT
 #endif
         )
             return(false);
