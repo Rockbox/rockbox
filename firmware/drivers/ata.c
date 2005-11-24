@@ -278,7 +278,7 @@ static volatile unsigned char* ata_control;
 
 bool old_recorder = false;
 int ata_spinup_time = 0;
-#ifdef CONFIG_LED
+#if CONFIG_LED == LED_REAL
 static bool ata_led_enabled = true;
 static bool ata_led_on = false;
 #endif
