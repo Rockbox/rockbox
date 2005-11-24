@@ -54,7 +54,9 @@ struct screen
     int depth;
     int char_width;
     int char_height;
+#if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
     bool has_disk_led;
+#endif
 #ifdef HAS_BUTTONBAR
     bool has_buttonbar;
 #endif

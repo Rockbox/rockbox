@@ -46,7 +46,9 @@ struct status_info {
 #endif
     bool battery_safe;
     bool redraw_volume; /* true if the volume gauge needs updating */
+#if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
     bool led; /* disk LED simulation in the status bar */
+#endif
 
 #ifdef HAVE_USB_POWER
     bool usb_power;

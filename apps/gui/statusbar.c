@@ -143,8 +143,10 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 #endif
     bar->info.repeat = global_settings.repeat_mode;
     bar->info.playmode = current_playmode();
+#if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
     if(!display->has_disk_led)
         bar->info.led = led_read(HZ/2); /* delay should match polling interval */
+#endif
 
 #ifdef HAVE_USB_POWER
     bar->info.usb_power = usb_powered();
@@ -258,8 +260,10 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 #ifdef HAVE_RTC
         gui_statusbar_time(display, bar->info.hour, bar->info.minute);
 #endif /* HAVE_RTC */
+#if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
         if(!display->has_disk_led && bar->info.led)
             gui_statusbar_led(display);
+#endif
         display->update_rect(0, 0, display->width, STATUSBAR_HEIGHT);
         bar->lastinfo = bar->info;
 #endif /* HAVE_LCD_BITMAP */
@@ -465,6 +469,7 @@ void gui_statusbar_icon_lock_remote(struct screen * display)
                          STATUSBAR_LOCKR_WIDTH, STATUSBAR_HEIGHT);
 }
 
+#if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
 /*
  * no real LED: disk activity in status bar
  */
@@ -475,6 +480,7 @@ void gui_statusbar_led(struct screen * display)
                          STATUSBAR_Y_POS, STATUSBAR_DISK_WIDTH,
                          STATUSBAR_HEIGHT);
 }
+#endif
 
 #ifdef HAVE_RTC
 /*

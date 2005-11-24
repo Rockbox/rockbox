@@ -23,50 +23,50 @@
 #include "system.h"
 #include "kernel.h"
 
-static bool disk_led_status;
-static long last_on; /* timestamp of switching off */
-
-
-
-void disk_led_on(void)
-{
-    disk_led_status=true;
 #if CONFIG_LED == LED_REAL
-#ifdef GMINI_ARCH
-    P2 |= 1;
-#else
-    or_b(0x40, &PBDRL);
-#endif
-#endif
-}
-
-void disk_led_off(void)
-{
-    if(disk_led_status)
-    {
-        last_on = current_tick;/* remember for off delay */
-        disk_led_status=false;
-#if CONFIG_LED == LED_REAL
-#ifdef GMINI_ARCH
-        P2 &= ~1;
-#else
-        and_b(~0x40, &PBDRL);
-#endif
-#endif
-    }
-}
 
 void led(bool on)
 {
     if ( on )
-        disk_led_on();
+#ifdef GMINI_ARCH
+        P2 |= 1;
     else
-        disk_led_off();
+        P2 &= ~1;
+#else
+    {
+        or_b(0x40, &PBDRL);
+    }
+    else
+    {
+        and_b(~0x40, &PBDRL);
+    }
+#endif
 }
 
-bool led_read(int delayticks)
+#elif (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
+
+static bool current;
+static long last_on; /* timestamp of switching off */
+
+void led(bool on)
+{
+    if (current && !on) /* switching off */
+    {
+        last_on = current_tick; /* remember for off delay */
+    }
+    current = on;
+}
+
+bool led_read(int delayticks) /* read by status bar update */
 {
     /* reading "off" is delayed by user-supplied monoflop value */
-    return (disk_led_status ||
-        TIME_BEFORE(current_tick, last_on+delayticks));
+    return (current || TIME_BEFORE(current_tick, last_on+delayticks));
 }
+
+#else
+
+void led(bool on)
+{
+    (void)on;
+}
+#endif /* CONFIG_LED, HAVE_REMOTE_LCD */

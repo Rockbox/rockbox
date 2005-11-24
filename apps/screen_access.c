@@ -100,7 +100,7 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->depth=LCD_DEPTH;
 #if CONFIG_LED == LED_VIRTUAL
             screen->has_disk_led=false;
-#else
+#elif defined(HAVE_REMOTE_LCD)
             screen->has_disk_led=true;
 #endif
 #ifdef HAVE_LCD_BITMAP

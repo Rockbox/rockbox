@@ -512,7 +512,9 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
 #endif
 }
 
-#ifdef CONFIG_LED
+#if CONFIG_LED == LED_REAL
+/* Conditionally block LED access for the ATA driver, so the LED can be
+ * (mis)used for other purposes */
 static void ata_led(bool on) {
     ata_led_on = on;
     if (ata_led_enabled) {
@@ -520,7 +522,7 @@ static void ata_led(bool on) {
     }
 }
 #else
-#define ata_led(on)
+#define ata_led(on) led(on)
 #endif
 
 int ata_read_sectors(IF_MV2(int drive,)
