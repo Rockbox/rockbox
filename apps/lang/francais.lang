@@ -910,7 +910,7 @@ id: LANG_PM_LINEAR
 desc: in the peak meter menu
 eng: "Linear(%)"
 voice: "linéaire pour cent"
-new: "linéaire(%)"
+new: "Linéaire(%)"
 
 id: LANG_PM_MIN
 desc: in the peak meter menu
@@ -1300,7 +1300,7 @@ id: LANG_SAVE_SETTINGS
 desc: in system_settings_menu()
 eng: "Write .cfg file"
 voice: "Ecrire un fichier de configuration"
-new: "Sauvegardé .cfg actuelle"
+new: "Sauvegarder .cfg actuelle"
 
 id: LANG_SETTINGS_SAVED1
 desc: Feedback shown when a .cfg file is saved
@@ -1529,8 +1529,8 @@ new: "Insérer en dernier"
 id: LANG_QUEUE_FIRST
 desc: in onplay menu.  queue a track/playlist into dynamic playlist.
 eng: "Queue next"
-voice: "Inserer suivant pour une lecture unique"
-new: "Inserer suivant (lecture unique)"
+voice: "Insérer suivant pour une lecture unique"
+new: "Insérer suivant (lecture unique)"
 
 id: LANG_INSERT_FIRST
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
@@ -1686,7 +1686,7 @@ id: LANG_FM_BUTTONBAR_PRESETS
 desc: in button bar
 eng: "Preset"
 voice: ""
-new: "Pré-selections"
+new: "Stations"
 
 id: LANG_FM_SAVE_PRESET
 desc: DEPRECATED
@@ -1698,7 +1698,7 @@ id: LANG_FM_DELETE_PRESET
 desc: in radio screen
 eng: "Remove preset"
 voice: ""
-new: "Suppr. pré-selection"
+new: "Suppr. station"
 
 id: LANG_FM_STATION
 desc: in radio screen
@@ -3217,14 +3217,14 @@ new: "Type de ReplayGain"
 id: LANG_TRACK_GAIN
 desc: in replaygain
 eng: "Track gain"
-voice: "Par volume de piste"
-new: "Par volume de piste"
+voice: "Par piste"
+new: "Par piste"
 
 id: LANG_ALBUM_GAIN
 desc: in replaygain
 eng: "Album gain"
-voice: "Par volume d'album"
-new: "Par Volume d'album"
+voice: "Par album"
+new: "Par album"
 
 id: LANG_ID3_TRACK_GAIN
 desc: in browse_id3
