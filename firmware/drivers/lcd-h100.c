@@ -1069,7 +1069,7 @@ void lcd_puts_style(int x, int y, const unsigned char *str, int style)
         return;
 
     lcd_getstringsize(str, &w, &h);
-    xpos = xmargin + x*w / strlen(str);
+    xpos = xmargin + x*w / strlen((char *)str);
     ypos = ymargin + y*h;
     lcd_putsxy(xpos, ypos, str);
     drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
@@ -1155,10 +1155,10 @@ void lcd_puts_scroll_style(int x, int y, const unsigned char *string, int style)
         char *end;
 
         memset(s->line, 0, sizeof s->line);
-        strcpy(s->line, string);
+        strcpy(s->line, (char *)string);
 
         /* get width */
-        s->width = lcd_getstringsize(s->line, &w, &h);
+        s->width = lcd_getstringsize((unsigned char *)s->line, &w, &h);
 
         /* scroll bidirectional or forward only depending on the string
            width */
@@ -1172,13 +1172,13 @@ void lcd_puts_scroll_style(int x, int y, const unsigned char *string, int style)
         if (!s->bidir) { /* add spaces if scrolling in the round */
             strcat(s->line, "   ");
             /* get new width incl. spaces */
-            s->width = lcd_getstringsize(s->line, &w, &h);
+            s->width = lcd_getstringsize((unsigned char *)s->line, &w, &h);
         }
 
         end = strchr(s->line, '\0');
-        strncpy(end, string, LCD_WIDTH/2);
+        strncpy(end, (char *)string, LCD_WIDTH/2);
 
-        s->len = strlen(string);
+        s->len = strlen((char *)string);
         s->offset = 0;
         s->startx = x;
         s->backward = false;
@@ -1245,7 +1245,7 @@ static void scroll_thread(void)
             drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
             lcd_fillrect(xpos, ypos, LCD_WIDTH - xpos, pf->height);
             drawmode = DRMODE_SOLID;
-            lcd_putsxyofs(xpos, ypos, s->offset, s->line);
+            lcd_putsxyofs(xpos, ypos, s->offset, (unsigned char *)s->line);
             if (s->invert)
             {
                 drawmode = DRMODE_COMPLEMENT;

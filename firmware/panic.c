@@ -57,19 +57,19 @@ void panicf( const char *fmt, ...)
 
 #ifdef HAVE_LCD_CHARCELLS
     lcd_double_height(false);
-    lcd_puts(0,0,"*PANIC*");
-    lcd_puts(0,1,panic_buf);
+    lcd_puts(0, 0, "*PANIC*");
+    lcd_puts(0, 1, panic_buf);
 #elif defined(HAVE_LCD_BITMAP)
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
-    lcd_puts(0,0,"*PANIC*");
+    lcd_puts(0, 0, (unsigned char *)"*PANIC*");
     {
         /* wrap panic line */
         int i, y=1, len = strlen(panic_buf);
         for (i=0; i<len; i+=18) {
             unsigned char c = panic_buf[i+18];
             panic_buf[i+18] = 0;
-            lcd_puts(0,y++,panic_buf+i);
+            lcd_puts(0, y++, (unsigned char *)panic_buf+i);
             panic_buf[i+18] = c;
         }
     }

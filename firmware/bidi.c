@@ -38,7 +38,7 @@
 
 bool bidi_support_enabled = false;
 
-unsigned char *bidi_l2v(const unsigned char *str, int orientation)
+unsigned char *bidi_l2v(const char *str, int orientation)
 {
     static unsigned char buf_heb_str[_HEB_BUFFER_LENGTH];
     static unsigned char  buf_broken_str[_HEB_BUFFER_LENGTH];
@@ -50,9 +50,9 @@ unsigned char *bidi_l2v(const unsigned char *str, int orientation)
     int begin, end, char_count, orig_begin;
 
     if (!str || !*str)
-        return "";
+        return (unsigned char *)"";
 
-    tmp = str;
+    tmp = (unsigned char *)str;
     block_start=block_end=0;
     block_ended=0;
 

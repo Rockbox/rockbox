@@ -181,7 +181,7 @@ int snprintf(char *buf, size_t size, const char *fmt, ...)
     va_list ap;
     struct for_snprintf pr;
 
-    pr.ptr = buf;
+    pr.ptr = (unsigned char *)buf;
     pr.bytes = 0;
     pr.max = size;
 
@@ -200,7 +200,7 @@ int vsnprintf(char *buf, int size, const char *fmt, va_list ap)
     bool ok;
     struct for_snprintf pr;
 
-    pr.ptr = buf;
+    pr.ptr = (unsigned char *)buf;
     pr.bytes = 0;
     pr.max = size;
 

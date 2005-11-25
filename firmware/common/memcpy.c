@@ -95,7 +95,7 @@ _DEFUN (memcpy, (dst0, src0, len0),
           *aligned_dst++ = *aligned_src++;
           *aligned_dst++ = *aligned_src++;
           *aligned_dst++ = *aligned_src++;
-          len -= BIGBLOCKSIZE;
+          len -= (unsigned int)BIGBLOCKSIZE;
         }
 
       /* Copy one long word at a time if possible.  */

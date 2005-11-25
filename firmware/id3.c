@@ -192,7 +192,7 @@ static int unsynchronize(char* tag, int len, bool *ff_found)
     unsigned char c;
     unsigned char *rp, *wp;
 
-    wp = rp = tag;
+    wp = rp = (unsigned char *)tag;
     
     rp = (unsigned char *)tag;
     for(i = 0;i < len;i++) {
@@ -475,14 +475,14 @@ static bool setid3v1title(int fd, struct mp3entry *entry)
     if (read(fd, buffer, sizeof buffer) != sizeof buffer)
         return false;
 
-    if (strncmp(buffer, "TAG", 3))
+    if (strncmp((char *)buffer, "TAG", 3))
         return false;
 
     entry->id3v1len = 128;
     entry->id3version = ID3_VER_1_0;
 
     for (i=0; i < (int)sizeof offsets; i++) {
-        char* ptr = buffer + offsets[i];
+        char* ptr = (char *)buffer + offsets[i];
         
         if (i<3) {
             /* kill trailing space in strings */
