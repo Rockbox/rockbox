@@ -68,7 +68,7 @@ bool keys_locked = false;
 static void wps_state_update_ctp(const char *path);
 
 #ifdef HAVE_LCD_BITMAP
-static void gui_wps_set_margine(struct gui_wps *gwps)
+static void gui_wps_set_margin(struct gui_wps *gwps)
 {
     int offset = 0;
     struct wps_data *data = gwps->data;
@@ -100,7 +100,7 @@ long gui_wps_show(void)
 #else
     FOR_NB_SCREENS(i)
     {
-        gui_wps_set_margine(&gui_wps[i]);
+        gui_wps_set_margin(&gui_wps[i]);
     }
 #endif
 
@@ -229,7 +229,7 @@ long gui_wps_show(void)
 #ifdef HAVE_LCD_BITMAP
                 FOR_NB_SCREENS(i)
                 {
-                    gui_wps_set_margine(&gui_wps[i]);
+                    gui_wps_set_margin(&gui_wps[i]);
                 }
 #endif
                 restore = true;
@@ -485,7 +485,7 @@ long gui_wps_show(void)
 #ifdef HAVE_LCD_BITMAP
                 FOR_NB_SCREENS(i)
                 {
-                    gui_wps_set_margine(&gui_wps[i]);
+                    gui_wps_set_margin(&gui_wps[i]);
                 }
 #endif
                 restore = true;
@@ -511,6 +511,12 @@ long gui_wps_show(void)
 #endif
                 if (quick_screen_quick(button))
                     return SYS_USB_CONNECTED;
+#ifdef HAVE_LCD_BITMAP
+                FOR_NB_SCREENS(i)
+                {
+                    gui_wps_set_margin(&gui_wps[i]);
+                }
+#endif
                 restore = true;
                 lastbutton = 0;
                 break;

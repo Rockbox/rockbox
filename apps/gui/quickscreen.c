@@ -160,6 +160,7 @@ bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
      *    then release the enter button*/
     bool can_quit=false;
     gui_syncquickscreen_draw(qs);
+    gui_syncstatusbar_draw(&statusbars, true);
     while (true) {
         raw_key = button_get(true);
         button=uncombine_button(raw_key, button_enter);
