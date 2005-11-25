@@ -185,68 +185,73 @@ void lcd_blit(const fb_data* data, int x, int by, int width,
 /* Update a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    int rect1, rect2, rect3, rect4;
+    int y0, x0, y1, x1;
+    int newx,newwidth;
 
     unsigned long *addr = (unsigned long *)lcd_framebuffer;
 
-    /* TODO: Ensure x is even - so we read 32-bit aligned data from 
-             lcd_framebuffer */
-    
+    /* Ensure x and width are both even - so we can read 32-bit aligned 
+       data from lcd_framebuffer */
+    newx=x&~1;
+    newwidth=width&~1;
+    if (newx+newwidth < x+width) { newwidth+=2; }
+    x=newx; width=newwidth;
+
     /* calculate the drawing region */
-#if CONFIG_LCD == LCD_IPODCOLOR
-    rect1 = x;                          /* start vert */
-    rect2 = (LCD_WIDTH - 1) - y;        /* start horiz */
-    rect3 = (x + height) - 1;           /* end vert */
-    rect4 = (rect2 - width) + 1;        /* end horiz */
-#else
-    rect1 = y;                         /* start horiz */
-    rect2 = x;                         /* start vert */
-    rect3 = (y + width) - 1;           /* max horiz */
-    rect4 = (x + height) - 1;          /* max vert */
+#if CONFIG_LCD == LCD_IPODNANO
+    y0 = x;                         /* start horiz */
+    x0 = y;                         /* start vert */
+    y1 = (x + width) - 1;           /* max horiz */
+    x1 = (y + height) - 1;          /* max vert */
+#elif CONFIG_LCD == LCD_IPODCOLOR
+    y0 = y;                         /* start vert */
+    x0 = (LCD_WIDTH - 1) - x;       /* start horiz */
+    y1 = (y + height) - 1;          /* end vert */
+    x1 = (x0 - width) + 1;          /* end horiz */
 #endif
     /* setup the drawing region */
     if (lcd_type == 0) {
-        lcd_cmd_data(0x12, rect1);      /* start vert */
-        lcd_cmd_data(0x13, rect2);      /* start horiz */
-        lcd_cmd_data(0x15, rect3);      /* end vert */
-        lcd_cmd_data(0x16, rect4);      /* end horiz */
+        lcd_cmd_data(0x12, y0);      /* start vert */
+        lcd_cmd_data(0x13, x0);      /* start horiz */
+        lcd_cmd_data(0x15, y1);      /* end vert */
+        lcd_cmd_data(0x16, x1);      /* end horiz */
     } else {
         /* swap max horiz < start horiz */
-        if (rect3 < rect1) {
+        if (y1 < y0) {
             int t;
-            t = rect1;
-            rect1 = rect3;
-            rect3 = t;
+            t = y0;
+            y0 = y1;
+            y1 = t;
         }
 
         /* swap max vert < start vert */
-        if (rect4 < rect2) {
+        if (x1 < x0) {
             int t;
-            t = rect2;
-            rect2 = rect4;
-            rect4 = t;
+            t = x0;
+            x0 = x1;
+            x1 = t;
         }
 
         /* max horiz << 8 | start horiz */
-        lcd_cmd_data(LCD_CNTL_HORIZ_RAM_ADDR_POS, (rect3 << 8) | rect1);
+        lcd_cmd_data(LCD_CNTL_HORIZ_RAM_ADDR_POS, (y1 << 8) | y0);
         /* max vert << 8 | start vert */
-        lcd_cmd_data(LCD_CNTL_VERT_RAM_ADDR_POS, (rect4 << 8) | rect2);
+        lcd_cmd_data(LCD_CNTL_VERT_RAM_ADDR_POS, (x1 << 8) | x0);
 
         /* start vert = max vert */
 #if CONFIG_LCD == LCD_IPODCOLOR
-        rect2 = rect4;
+	x0 = x1;
 #endif
 
         /* position cursor (set AD0-AD15) */
         /* start vert << 8 | start horiz */
-        lcd_cmd_data(LCD_CNTL_RAM_ADDR_SET, (rect2 << 8) | rect1);
+        lcd_cmd_data(LCD_CNTL_RAM_ADDR_SET, ((x0 << 8) | y0));
 
         /* start drawing */
         lcd_send_lo(0x0);
         lcd_send_lo(LCD_CNTL_WRITE_TO_GRAM);
     }
 
-    addr += x * LCD_WIDTH + y/2;
+    addr = (unsigned long*)&lcd_framebuffer[y][x];
 
     while (height > 0) {
         int c, r;
