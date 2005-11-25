@@ -433,7 +433,7 @@ void gray_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
     {
         const unsigned char *src_col = src++;
         unsigned char *dst_col = dst;
-        unsigned char data = *src_col >> src_y;
+        unsigned data = *src_col >> src_y;
         int numbits = 8 - src_y;
         
         dst_end = dst_col + height;
