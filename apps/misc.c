@@ -292,20 +292,12 @@ void screen_dump(void)
     int fh;
     char filename[MAX_PATH];
     int bx, by;
-#if LCD_DEPTH < 16
-    int iy;
-    int src_byte;
-#endif
 #if LCD_DEPTH == 1
-    int ix, src_mask, dst_mask;
     static unsigned char line_block[8][BMP_LINESIZE];
 #elif LCD_DEPTH == 2
-    int src_byte2;
     static unsigned char line_block[4][BMP_LINESIZE];
 #elif LCD_DEPTH == 16
     static unsigned short line_block[BMP_LINESIZE/2];
-    unsigned short* dst;
-    unsigned short* src;
 #endif
 
 #ifdef HAVE_RTC
@@ -330,58 +322,72 @@ void screen_dump(void)
 #if LCD_DEPTH == 1
         for (by = LCD_HEIGHT/8 - 1; by >= 0; by--)
         {
-            memset(&line_block[0][0], 0, sizeof(line_block));
+            unsigned char *src = &lcd_framebuffer[by][0];
+            unsigned char *dst = &line_block[0][0];
 
-            for (bx = 0; bx < LCD_WIDTH/8; bx++)
+            memset(line_block, 0, sizeof(line_block));
+            for (bx = LCD_WIDTH/8; bx > 0; bx--)
             {
-                dst_mask = 0x01;
-                for (ix = 7; ix >= 0; ix--)
+                unsigned dst_mask = 0x80;
+                int ix;
+
+                for (ix = 8; ix > 0; ix--)
                 {
-                    src_byte = lcd_framebuffer[by][8*bx+ix];
-                    src_mask = 0x01;
-                    for (iy = 7; iy >= 0; iy--)
+                    unsigned char *dst_blk = dst;
+                    unsigned src_byte = *src++;
+                    int iy;
+
+                    for (iy = 8; iy > 0; iy--)
                     {
-                        if (src_byte & src_mask)
-                            line_block[iy][bx] |= dst_mask;
-                        src_mask <<= 1;
+                        if (src_byte & 0x80)
+                            *dst_blk |= dst_mask;
+                        src_byte <<= 1;
+                        dst_blk += BMP_LINESIZE;
                     }
-                    dst_mask <<= 1;
+                    dst_mask >>= 1;
                 }
+                dst++;
             }
 
-            write(fh, &line_block[0][0], sizeof(line_block));
+            write(fh, line_block, sizeof(line_block));
         }
 #elif LCD_DEPTH == 2
         for (by = LCD_HEIGHT/4 - 1; by >= 0; by--)
         {
-            memset(&line_block[0][0], 0, sizeof(line_block));
+            unsigned char *src = &lcd_framebuffer[by][0];
+            unsigned char *dst = &line_block[3][0];
 
-            for (bx = 0; bx < LCD_WIDTH/2; bx++)
+            memset(line_block, 0, sizeof(line_block));
+            for (bx = LCD_WIDTH/2; bx > 0; bx--)
             {
-                src_byte = lcd_framebuffer[by][2*bx];
-                src_byte2 = lcd_framebuffer[by][2*bx+1];
-                for (iy = 3; iy >= 0; iy--)
+                unsigned char *dst_blk = dst++;
+                unsigned src_byte0 = *src++;
+                unsigned src_byte1 = *src++;
+                int iy;
+
+                for (iy = 4; iy > 0; iy--)
                 {
-                    line_block[iy][bx] = ((src_byte & 3) << 4) | (src_byte2 & 3);
-                    src_byte >>= 2;
-                    src_byte2 >>= 2;
+                    *dst_blk = ((src_byte0 & 3) << 4) | (src_byte1 & 3);
+                    src_byte0 >>= 2;
+                    src_byte1 >>= 2;
+                    dst_blk -= BMP_LINESIZE;
                 }
             }
 
-            write(fh, &line_block[0][0], sizeof(line_block));
+            write(fh, line_block, sizeof(line_block));
         }
 #elif LCD_DEPTH == 16
         for (by = LCD_HEIGHT - 1; by >= 0; by--)
         {
-            memset(line_block, 0, sizeof(line_block));
-            src = &lcd_framebuffer[by][0];
-            dst = line_block;
+            unsigned short *src = &lcd_framebuffer[by][0];
+            unsigned short *dst = line_block;
 
-            for (bx = 0; bx < LCD_WIDTH; bx++)
+            memset(line_block, 0, sizeof(line_block));
+            for (bx = LCD_WIDTH; bx > 0; bx--)
             {
 #if (LCD_PIXELFORMAT == RGB565SWAPPED)
                 /* iPod LCD data is big endian although the CPU is not */
-                *dst++ = htobe16(*src++); 
+                *dst++ = htobe16(*src++);
 #else
                 *dst++ = htole16(*src++);
 #endif
