@@ -56,6 +56,7 @@ static bool thread_enabled = false;
 static unsigned long allocated_size = DIRCACHE_LIMIT;
 static unsigned long dircache_size = 0;
 static unsigned long reserve_used = 0;
+static unsigned int  cache_build_ticks = 0;
 static char dircache_cur_path[MAX_PATH];
 
 static struct event_queue dircache_queue;
@@ -63,6 +64,10 @@ static long dircache_stack[(DEFAULT_STACK_SIZE + 0x800)/sizeof(long)];
 static const char dircache_thread_name[] = "dircache";
 
 /* --- Internal cache structure control functions --- */
+
+/** 
+ * Internal function to allocate a new dircache_entry from memory.
+ */
 static struct dircache_entry* allocate_entry(void)
 {
     struct dircache_entry *next_entry;
@@ -84,6 +89,10 @@ static struct dircache_entry* allocate_entry(void)
     return next_entry;
 }
 
+/**
+ * Internal function to allocate a dircache_entry and set 
+ * ->next entry pointers.
+ */
 static struct dircache_entry* dircache_gen_next(struct dircache_entry *ce)
 {
     struct dircache_entry *next_entry;
@@ -95,6 +104,10 @@ static struct dircache_entry* dircache_gen_next(struct dircache_entry *ce)
     return next_entry;
 }
 
+/*
+ * Internal function to allocate a dircache_entry and set
+ * ->down entry pointers.
+ */
 static struct dircache_entry* dircache_gen_down(struct dircache_entry *ce)
 {
     struct dircache_entry *next_entry;
@@ -111,6 +124,9 @@ static struct dircache_entry* dircache_gen_down(struct dircache_entry *ce)
 #define MAX_SCAN_DEPTH 16
 static struct travel_data dir_recursion[MAX_SCAN_DEPTH];
 
+/**
+ * Internal function to iterate a path.
+ */
 static int dircache_scan(struct travel_data *td)
 {
     while ( (fat_getnext(td->dir, &td->entry) >= 0) && (td->entry.name[0]))
@@ -173,7 +189,9 @@ static int dircache_scan(struct travel_data *td)
     return 0;
 }
 
-/* Recursively scan the hard disk and build the cache. */
+/** 
+ * Recursively scan the hard disk and build the cache.
+ */
 static int dircache_travel(struct fat_dir *dir, struct dircache_entry *ce)
 {
     int depth = 0;
@@ -215,6 +233,12 @@ static int dircache_travel(struct fat_dir *dir, struct dircache_entry *ce)
     return 0;
 }
 
+/**
+ * Internal function to get a pointer to dircache_entry for a given filename.
+ *   path: Absolute path to a file or directory.
+ *   get_before: Returns the cache pointer before the last valid entry found.
+ *   only_directories: Match only filenames which are a directory type.
+ */
 static struct dircache_entry* dircache_get_entry(const char *path,
         bool get_before, bool only_directories)
 {
@@ -262,6 +286,10 @@ static struct dircache_entry* dircache_get_entry(const char *path,
 }
 
 #if 0
+/**
+ * Function to load the internal cache structure from disk to initialize
+ * the dircache really fast and little disk access.
+ */
 int dircache_load(const char *path)
 {
     struct dircache_maindata maindata;
@@ -307,6 +335,10 @@ int dircache_load(const char *path)
     return 0;
 }
 
+/**
+ * Function to save the internal cache stucture to disk for fast loading
+ * on boot.
+ */
 int dircache_save(const char *path)
 {
     struct dircache_maindata maindata;
@@ -346,9 +378,16 @@ int dircache_save(const char *path)
 }
 #endif /* #if 0 */
 
+/**
+ * Internal function which scans the disk and creates the dircache structure.
+ */
 static int dircache_do_rebuild(void)
 {
     struct fat_dir dir;
+    unsigned int start_tick;
+    
+    /* Measure how long it takes build the cache. */
+    start_tick = current_tick;
     
     if ( fat_opendir(IF_MV2(volume,) &dir, 0, NULL) < 0 ) {
         logf("Failed opening root dir");
@@ -378,6 +417,7 @@ static int dircache_do_rebuild(void)
 
     logf("Done, %d KiB used", dircache_size / 1024);
     dircache_initialized = true;
+    cache_build_ticks = current_tick - start_tick;
     
     if (thread_enabled)
     {
@@ -395,6 +435,9 @@ static int dircache_do_rebuild(void)
     return 1;
 }
 
+/**
+ * Internal thread that controls transparent cache building.
+ */
 static void dircache_thread(void)
 {
     struct event ev;
@@ -426,6 +469,10 @@ static void dircache_thread(void)
     }
 }
 
+/**
+ * Start scanning the disk to build the dircache.
+ * Either transparent or non-transparent build method is used.
+ */
 int dircache_build(int last_size)
 {
     if (dircache_initialized)
@@ -465,6 +512,10 @@ int dircache_build(int last_size)
     return dircache_do_rebuild();
 }
 
+/**
+ * Main initialization function that must be called before any other
+ * operations within the dircache.
+ */
 void dircache_init(void)
 {
     int i;
@@ -481,27 +532,43 @@ void dircache_init(void)
                 sizeof(dircache_stack), dircache_thread_name);
 }
 
+/**
+ * Returns true if dircache has been initialized and is ready to be used.
+ */
 bool dircache_is_enabled(void)
 {
     return dircache_initialized;
 }
 
+/**
+ * Returns the allocated space for dircache (without reserve space).
+ */
 int dircache_get_cache_size(void)
 {
-    if (!dircache_is_enabled())
-        return 0;
-    
-    return dircache_size;
+    return dircache_is_enabled() ? dircache_size : 0;
 }
 
+/**
+ * Returns how many bytes of the reserve allocation for live cache
+ * updates have been used.
+ */
 int dircache_get_reserve_used(void)
 {
-    if (!dircache_is_enabled())
-        return 0;
-    
-    return reserve_used;
+    return dircache_is_enabled() ? reserve_used : 0;
 }
 
+/**
+ * Returns the time in kernel ticks that took to build the cache.
+ */
+int dircache_get_build_ticks(void)
+{
+    return dircache_is_enabled() ? cache_build_ticks : 0;
+}
+
+/**
+ * Disables the dircache. Usually called on shutdown or when
+ * accepting a usb connection.
+ */
 void dircache_disable(void)
 {
     int i;
@@ -529,6 +596,9 @@ void dircache_disable(void)
     logf("Cache released");
 }
 
+/**
+ * Usermode function to return dircache_entry pointer to the given path.
+ */
 const struct dircache_entry *dircache_get_entry_ptr(const char *filename)
 {
     if (!dircache_initialized || filename == NULL)
@@ -537,6 +607,10 @@ const struct dircache_entry *dircache_get_entry_ptr(const char *filename)
     return dircache_get_entry(filename, false, false);
 }
 
+/**
+ * Function to copy the full absolute path from dircache to the given buffer
+ * using the given dircache_entry pointer.
+ */
 void dircache_copy_path(const struct dircache_entry *entry, char *buf, int size)
 {
     const struct dircache_entry *down[MAX_SCAN_DEPTH];

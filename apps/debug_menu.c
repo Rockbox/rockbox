@@ -1702,6 +1702,10 @@ static bool dbg_dircache_info(void)
                  dircache_get_reserve_used(), DIRCACHE_RESERVE);
         lcd_puts(0, line++, buf);
 
+        snprintf(buf, sizeof(buf), "Scanning took: %d s",
+                 dircache_get_build_ticks() / HZ);
+        lcd_puts(0, line++, buf);
+
         lcd_update();
 
         switch (button_get_w_tmo(HZ/2))
