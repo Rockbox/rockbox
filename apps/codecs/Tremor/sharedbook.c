@@ -24,6 +24,12 @@
 #include "ivorbiscodec.h"
 #include "codebook.h"
 
+/* Size (in number of entries) for static buffers in book_init_decode, so
+ * that large alloca() calls can be avoided, which is needed in Rockbox.
+ * This is enough for one certain test file...
+ */
+#define BOOK_INIT_MAXSIZE   3072
+
 /**** pack/unpack helpers ******************************************/
 int _ilog(unsigned int v){
   int ret=0;
@@ -349,10 +355,18 @@ int vorbis_book_init_decode(codebook *c,const static_codebook *s){
      by sorted bitreversed codeword to allow treeless decode. */
 
   {
+    /* Static buffers to avoid heavy stack usage */
+    static int sortindex_buffer[BOOK_INIT_MAXSIZE];
+    static ogg_uint32_t* codep_buffer[BOOK_INIT_MAXSIZE];
+
     /* perform sort */
     ogg_uint32_t *codes=_make_words(s->lengthlist,s->entries,c->used_entries);
-    ogg_uint32_t **codep=(ogg_uint32_t **)alloca(sizeof(*codep)*n);
-    
+    /* ogg_uint32_t **codep=(ogg_uint32_t **)alloca(sizeof(*codep)*n); */
+    ogg_uint32_t **codep=codep_buffer;
+
+    if (n > BOOK_INIT_MAXSIZE)
+      goto err_out;
+
     if(codes==NULL)goto err_out;
 
     for(i=0;i<n;i++){
@@ -362,7 +376,8 @@ int vorbis_book_init_decode(codebook *c,const static_codebook *s){
 
     qsort(codep,n,sizeof(*codep),sort32a);
 
-    sortindex=(int *)alloca(n*sizeof(*sortindex));
+    /*sortindex=(int *)alloca(n*sizeof(*sortindex));*/
+    sortindex=sortindex_buffer;
     c->codelist=(ogg_uint32_t *)_ogg_malloc(n*sizeof(*c->codelist));
     /* the index is a reverse index */
     for(i=0;i<n;i++){
