@@ -30,7 +30,7 @@
 #include "gray.h"
 
 /* Set position of the top left corner of the greyscale overlay
-   Note that by is in pixel-block units (8 on Archos/SH1, 4 on H1x0) */
+   Note that by is in pixel-block units (8 pixels) */
 void gray_set_position(int x, int by)
 {
     _gray_info.x = x;
