@@ -77,7 +77,9 @@ LRESULT CALLBACK GUIWndProc (
         new_tick = ((ticknow.QuadPart-tick1.QuadPart)*HZ)/persec.QuadPart;
         if (new_tick != current_tick)
         {
-            sim_tick_tasks();
+            long i;
+            for (i = new_tick - current_tick; i > 0; i--)
+                sim_tick_tasks();
             current_tick = new_tick;
         }
         return TRUE;
