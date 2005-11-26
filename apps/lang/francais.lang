@@ -27,7 +27,7 @@ new: "Réglages généraux"
 id: LANG_INFO
 desc: in the main menu
 eng: "Info"
-voice: "Infos"
+voice: "Informations"
 new: "Informations"
 
 id: LANG_VERSION
@@ -268,7 +268,7 @@ id: LANG_RESET
 desc: in system_settings_menu()
 eng: "Reset Settings"
 voice: "Réinitialiser les réglages"
-new: "Ré-initialiser réglages"
+new: "Réinitialiser réglages"
 
 id: LANG_PLAYBACK
 desc: in settings_menu()
@@ -394,7 +394,7 @@ id: LANG_RESUME_ASK
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: ""
+new:
 
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
@@ -418,7 +418,7 @@ id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
 eng: "Key Lock Is ON"
 voice: "Touches verrouillées. "
-new: "Touches verrouillées."
+new: "Touches verrouillées"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
@@ -855,14 +855,14 @@ new: ""
 id: LANG_BATTERY_DISPLAY
 desc: Battery type title
 eng: "Battery Display"
-voice: "Affichage batterie"
+voice: "Affichage de la batterie"
 new: "Affichage batterie"
 
 id: LANG_VOLUME_DISPLAY
 desc: Volume type title
 eng: "Volume Display"
 voice: "Affichage du volume"
-new: "Affichage du volume"
+new: "Affichage volume"
 
 id: LANG_DISPLAY_GRAPHIC
 desc: Label for type of icon display
@@ -981,7 +981,7 @@ new: "Micro intégré"
 id: LANG_RECORDING_SRC_LINE
 desc: in the recording settings
 eng: "Line In"
-voice: "Line In"
+voice: "Entrée ligne"
 new: "Entrée ligne"
 
 id: LANG_RECORDING_SRC_DIGITAL
@@ -1072,7 +1072,7 @@ id: LANG_TRICKLE_CHARGE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: ""
+new:
 
 id: LANG_BATTERY_TOPOFF_CHARGE
 desc: in info display, shows that top off charge is running
@@ -1347,7 +1347,7 @@ new: "Frames MP3 independantes"
 id: LANG_STATUS_BAR
 desc: display menu, F3 substitute
 eng: "Status Bar"
-voice: "Ligne d'état"
+voice: "Barre d'état"
 new: "Barre d'état"
 
 id: LANG_SCROLL_BAR
@@ -1584,7 +1584,7 @@ id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
 desc: Playlist error
 eng: "Error updating playlist control file"
 voice: "Erreur de mise à jour de la liste"
-new: "Erreur de mise à jour de la liste"
+new: "Erreur mise à jour liste"
 
 id: LANG_PLAYLIST_ACCESS_ERROR
 desc: Playlist error
@@ -1626,7 +1626,7 @@ id: LANG_CUSTOM_FONT
 desc: in setting_menu()
 eng: "Browse Fonts"
 voice: "Listes des polices d'affichage"
-new: "Liste Polices d'affichage"
+new: "Liste des Polices d'affichage"
 
 id: LANG_FIRMWARE
 desc: in the main menu
@@ -1643,8 +1643,8 @@ new: "Langue"
 id: LANG_WHILE_PLAYING
 desc: in settings_menu()
 eng: "Browse .wps files"
-voice: "Charger une configuration d'affichage"
-new: "Charger configuration d'affichage"
+voice: "Charger configuration d'affichage écran principal"
+new: "Charger config. d'affichage écran principal"
 
 id: LANG_CUSTOM_CFG
 desc: in setting_menu()
@@ -1710,7 +1710,7 @@ id: LANG_FM_PRESET_SAVE_FAILED
 desc: in radio screen
 eng: "Preset save failed"
 voice: ""
-new: "Echec d'enreg. pré-selection"
+new: "Echec d'enreg. station"
 
 id: LANG_FM_NO_PRESETS
 desc: DEPRECATED
@@ -1722,7 +1722,7 @@ id: LANG_FM_NO_FREE_PRESETS
 desc: in radio screen
 eng: "The preset list is full"
 voice: "Liste de pré-selections pleine"
-new: "Liste de pré-selections pleine"
+new: "Liste de stations pleine"
 
 id: LANG_FM_RADIO
 desc: in main menu
@@ -1876,7 +1876,7 @@ id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
 desc: Configuration option to maintain a list of recent bookmarks
 eng: "Maintain a List of Recent Bookmarks?"
 voice: "Maintenir une liste des derniers signets?"
-new: "Maintenir une liste des derniers signets?"
+new: "Maintenir liste des derniers signets?"
 
 id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
 desc: Save in recent bookmarks only
@@ -2652,7 +2652,7 @@ id: LANG_DELETE_DIR
 desc: in on+play menu
 eng: "Delete directory"
 voice: "Effacer le répertoire"
-new: "Effacer le répertoire"
+new: "Effacer le Répertoire"
 
 id: VOICE_CURRENT_TIME
 desc: spoken only, for wall clock announce
@@ -2732,7 +2732,7 @@ id: LANG_FM_EDIT_PRESET
 desc: in radio screen
 eng: "Edit preset"
 voice: ""
-new: "Editer pré-select."
+new: "Editer station"
 
 id: LANG_FM_MONO_MODE
 desc: in radio screen
@@ -3032,7 +3032,7 @@ id: LANG_RECORD_MIN_DURATION
 desc: in recording settings_menu
 eng: "for at least"
 voice: "pour au moins"
-new: "pour au moins"
+new: "Pour au moins"
 
 id: LANG_RECORD_STOP_THRESHOLD
 desc: in recording settings_menu
@@ -3044,7 +3044,7 @@ id: LANG_RECORD_STOP_POSTREC
 desc: in recording settings_menu
 eng: "for at least"
 voice: "pour au moins"
-new: "pour au moins"
+new: "Pour au moins"
 
 id: LANG_RECORD_STOP_GAP
 desc: in recording settings_menu
@@ -3056,13 +3056,13 @@ id: LANG_RECORD_TRIGGER_MODE
 desc: in recording settings_menu
 eng: "Trigger"
 voice: "Déclencheur"
-new: "Déclench."
+new: "Déclencheur"
 
 id: LANG_RECORD_TRIG_NOREARM
 desc: in recording settings_menu
 eng: "Once"
 voice: "unique"
-new: "unique"
+new: "Unique"
 
 id: LANG_RECORD_TRIG_REARM
 desc: in recording settings_menu
@@ -3091,8 +3091,8 @@ new: "Déclencheur activé"
 id: LANG_LCD_REMOTE_MENU
 desc: in the display sub menu
 eng: "Remote-LCD Settings"
-voice: "Propriétés écran télécommande"
-new: "Config. LCD télécommande"
+voice: "Réglages écran télécommande"
+new: "Réglages LCD télécommande"
 
 id: LANG_DISK_NAME_INTERNAL
 desc: in info menu; name for internal disk with multivolume (keep short!)
@@ -3157,7 +3157,7 @@ new: "Passer au rep. suivant"
 id: LANG_RUNTIMEDB_ACTIVE
 desc: in settings_menu.
 eng: "Gather runtime data (experimental)"
-voice: "Collectioner les données de lecture"
+voice: "Collecter les données de lecture"
 new: "Collecter les données de lecture"
 
 id: LANG_MENU_SET_RATING
@@ -3187,7 +3187,7 @@ new: "Mixé"
 id: LANG_RESTARTING_PLAYBACK
 desc: splash screen displayed when pcm buffer size is changed
 eng: "Restarting playback..."
-voice: "Restarting playback"
+voice: "Reprise de la lecture"
 new: "Reprise de la lecture..."
 
 id: LANG_REPLAYGAIN
@@ -3217,14 +3217,14 @@ new: "Type de ReplayGain"
 id: LANG_TRACK_GAIN
 desc: in replaygain
 eng: "Track gain"
-voice: "Par piste"
-new: "Par piste"
+voice: "gain par piste"
+new: "Gain par piste"
 
 id: LANG_ALBUM_GAIN
 desc: in replaygain
 eng: "Album gain"
-voice: "Par album"
-new: "Par album"
+voice: "gain par album"
+new: "Gain par album"
 
 id: LANG_ID3_TRACK_GAIN
 desc: in browse_id3
@@ -3247,7 +3247,7 @@ new:
 id: LANG_BIDI_SUPPORT
 desc: in settings_menu, option to enable reversal of hebrew/arabic text
 eng: "BiDi Hebrew/Arabic"
-voice: "Textes bidirectionel"
+voice: "Textes bidirectionels"
 new: "Arabe/Hébreux (BiDi)"
 
 id: LANG_REPLAYGAIN_PREAMP
@@ -3393,8 +3393,8 @@ new: "Mode stations"
 id: LANG_FM_FREEZE
 desc: splash screen during freeze in radio mode
 eng: "Screen frozen!"
-voice: "Ecran gelé"
-new: "Ecran gelé!"
+voice: "Ecran figé"
+new: "Ecran figé!"
 
 id: LANG_CROSSFEED_ENABLE
 desc: In the crossfeed menu
