@@ -1668,6 +1668,56 @@ static bool dbg_disk_info(void)
 }
 #endif /* !HAVE_MMC */
 
+#ifdef HAVE_DIRCACHE
+static bool dbg_dircache_info(void)
+{
+    bool done = false;
+    int line;
+    char buf[32];
+
+    lcd_setmargins(0, 0);
+    lcd_setfont(FONT_SYSFIXED);
+
+    while (!done)
+    {
+        line = 0;
+        
+        lcd_clear_display();
+        snprintf(buf, sizeof(buf), "Cache initialized: %s", 
+                 dircache_is_enabled() ? "Yes" : "No");
+        lcd_puts(0, line++, buf);
+
+        snprintf(buf, sizeof(buf), "Cache size: %d B",
+                 dircache_get_cache_size());
+        lcd_puts(0, line++, buf);
+
+        snprintf(buf, sizeof(buf), "Last size: %d B",
+                 global_settings.dircache_size);
+        lcd_puts(0, line++, buf);
+
+        snprintf(buf, sizeof(buf), "Limit: %d B", DIRCACHE_LIMIT);
+        lcd_puts(0, line++, buf);
+
+        snprintf(buf, sizeof(buf), "Reserve: %d/%d B",
+                 dircache_get_reserve_used(), DIRCACHE_RESERVE);
+        lcd_puts(0, line++, buf);
+
+        lcd_update();
+
+        switch (button_get_w_tmo(HZ/2))
+        {
+            case SETTINGS_OK:
+            case SETTINGS_CANCEL:
+                done = true;
+                break;
+        }
+    }
+
+    return false;
+}
+
+#endif /* HAVE_DIRCACHE */
+
 #if CONFIG_CPU == SH7034
 bool dbg_save_roms(void)
 {
@@ -1803,6 +1853,9 @@ bool debug_menu(void)
         { "View MMC info", dbg_mmc_info },
 #else
         { "View disk info", dbg_disk_info },
+#endif
+#ifdef HAVE_DIRCACHE
+        { "View dircache info", dbg_dircache_info },
 #endif
 #ifdef HAVE_LCD_BITMAP
         { "View audio thread", dbg_audio_thread },

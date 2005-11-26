@@ -71,6 +71,7 @@ int dircache_save(const char *path);
 int dircache_build(int last_size);
 bool dircache_is_enabled(void);
 int dircache_get_cache_size(void);
+int dircache_get_reserve_used(void);
 void dircache_disable(void);
 const struct dircache_entry *dircache_get_entry_ptr(const char *filename);
 void dircache_copy_path(const struct dircache_entry *entry, char *buf, int size);

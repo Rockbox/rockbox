@@ -494,6 +494,14 @@ int dircache_get_cache_size(void)
     return dircache_size;
 }
 
+int dircache_get_reserve_used(void)
+{
+    if (!dircache_is_enabled())
+        return 0;
+    
+    return reserve_used;
+}
+
 void dircache_disable(void)
 {
     int i;
