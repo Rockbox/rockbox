@@ -224,10 +224,7 @@ void init(void)
 #endif
 #endif
 
-#ifndef IRIVER_H300_SERIES
-    /* Not yet done on H300 */
     i2c_init();
-#endif
 
 #ifdef HAVE_RTC
     rtc_init();
