@@ -1333,6 +1333,9 @@ void initialize_buffer_fill(void)
     if (filling)
         return ;
 
+    /* Save the current resume position once. */
+    playlist_update_resume_info(audio_current_track());
+    
     fill_bytesleft = filebuflen - filebufused;
     cur_ti->start_pos = ci.curpos;
 
@@ -1793,8 +1796,6 @@ void audio_thread(void)
                 break ;
 #endif
             case SYS_TIMEOUT:
-                if (playing)
-                    playlist_update_resume_info(audio_current_track());
                 break;
         }
     }
