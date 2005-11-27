@@ -104,6 +104,9 @@
 
 #endif
 
+/* Define this for S/PDIF output available */
+#define HAVE_SPDIF_OUT
+
 /* Define this if you can control the S/PDIF power */
 #define HAVE_SPDIF_POWER
 #define SPDIF_POWER_INVERTED
