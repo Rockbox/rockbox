@@ -32,6 +32,7 @@
 
 #include "i2c-coldfire.h"
 #include "uda1380.h"
+#include "pcf50606.h"
 
 /* ------------------------------------------------- */
 /* Local functions and variables */
@@ -167,12 +168,19 @@ void uda1380_enable_output(bool enable)
 
 void uda1380_reset(void)
 {
+#ifdef IRIVER_H300_SERIES
+    int mask = set_irq_level(HIGHEST_IRQ_LEVEL);
+    pcf50606_write(0x3b, 0x00);
+    pcf50606_write(0x3b, 0x07);
+    set_irq_level(mask);
+#else
     /* RESET signal */
     or_l(1<<29, &GPIO_OUT);
     or_l(1<<29, &GPIO_ENABLE);
     or_l(1<<29, &GPIO_FUNCTION);
     sleep(HZ/100);
     and_l(~(1<<29), &GPIO_OUT);
+#endif
 }
 
 /* Initialize UDA1380 codec with default register values (uda1380_defaults) */
