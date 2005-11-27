@@ -149,9 +149,11 @@ static char method_name[64];
 static ucl_bool set_method_name(int method, int level)
 {
     method_name[0] = 0;
-    if (level < 1 || level > 10)
+    if (level < 0 || level > 10)
         return 0;
-    if (method == 0x2b)
+    if (level == 0)
+        sprintf(method_name,"uncompressed/%d", level);
+    else if (method == 0x2b)
         sprintf(method_name,"NRV2B-99/%d", level);
     else if (method == 0x2d)
         sprintf(method_name,"NRV2D-99/%d", level);
@@ -219,7 +221,12 @@ int do_compress(FILE *fi, FILE *fo, int method, int level, ucl_uint block_size)
 
         /* compress block */
         r = UCL_E_ERROR;
-        if (method == 0x2b)
+        if (level == 0)
+        {
+            out_len = in_len; /* uncompressed */
+            r = UCL_E_OK;
+        }
+        else if (method == 0x2b)
             r = ucl_nrv2b_99_compress(in,in_len,out,&out_len,0,level,NULL,NULL);
         else if (method == 0x2d)
             r = ucl_nrv2d_99_compress(in,in_len,out,&out_len,0,level,NULL,NULL);
@@ -439,7 +446,7 @@ err:
 
 static void usage(void)
 {
-    printf("usage: %s [-123456789] input-file output-file   (compress)\n", progname);
+    printf("usage: %s [-0123456789] input-file output-file  (compress)\n", progname);
     printf("usage: %s -d input-file output-file             (decompress)\n", progname);
     printf("usage: %s -t input-file...                      (test)\n", progname);
     exit(1);
@@ -575,12 +582,14 @@ int main(int argc, char *argv[])
             opt_method = 0x2e;
         else if (strcmp(argv[i],"--nrv2e") == 0)
             opt_method = 0x2e;
-        else if ((argv[i][1] >= '1' && argv[i][1] <= '9') && !argv[i][2])
+        else if ((argv[i][1] >= '0' && argv[i][1] <= '9') && !argv[i][2])
             opt_level = argv[i][1] - '0';
         else if (strcmp(argv[i],"--10") == 0)
             opt_level = 10;
         else if (strcmp(argv[i],"--best") == 0)
             opt_level = 10;
+        else if (strcmp(argv[i],"--none") == 0)
+            opt_level = 0;
         else if (argv[i][1] == 'b' && argv[i][2])
         {
 #if (UCL_UINT_MAX > UINT_MAX) && defined(HAVE_ATOL)
