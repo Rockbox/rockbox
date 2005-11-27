@@ -25,7 +25,6 @@ dict.c
 fire.c
 plasma.c
 solitaire.c
-sudoku.c
 #endif
 bejeweled.c
 bounce.c
@@ -54,6 +53,7 @@ star.c
 video.c
 #endif
 starfield.c
+sudoku.c
 vu_meter.c
 
 #ifdef HAVE_RTC /* Recorder models only */
