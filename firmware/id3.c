@@ -93,7 +93,7 @@ static const char* const codec_labels[] = {
 
 #if CONFIG_CODEC == SWCODEC
   "WAV",  /* Uncompressed PCM in a WAV file */
-  "OGG",  /* Ogg Vorbis */
+  "Ogg",  /* Ogg Vorbis */
   "FLAC", /* FLAC */
   "MPC",  /* Musepack */
   "AC3",  /* A/52 (aka AC3) audio */
