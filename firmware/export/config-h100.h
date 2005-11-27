@@ -10,9 +10,6 @@
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 1
 
-/* define this if you have recording possibility */
-#define HAVE_RECORDING 1
-
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP 1
 
@@ -70,6 +67,9 @@
 #define CONFIG_BATTERY BATT_LIPOL1300
 
 #define BATTERY_SCALE_FACTOR 16665 /* FIX: this value is picked at random */
+
+/* define this if you have recording possibility */
+#define HAVE_RECORDING 1
 
 /* Define this if the platform can charge batteries */
 #define HAVE_CHARGING 1
