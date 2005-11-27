@@ -22,12 +22,12 @@ dict.c
 
 #ifdef HAVE_LCD_BITMAP /* Recorder/Ondio models only */
 #ifndef HAVE_LCD_COLOR
-bejeweled.c
 fire.c
 plasma.c
 solitaire.c
 sudoku.c
 #endif
+bejeweled.c
 bounce.c
 calculator.c
 chip8.c
