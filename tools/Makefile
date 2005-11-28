@@ -9,7 +9,8 @@
 CFLAGS := -O -ansi -g
 LDFLAGS := -g
 
-TARGETS := scramble descramble iaudio sh2d bmp2rb rdf2binary convbdf generate_rocklatin mkboot ipod_fw
+TARGETS := scramble descramble iaudio sh2d bmp2rb rdf2binary convbdf	\
+ generate_rocklatin mkboot ipod_fw uclpack
 
 all: $(TARGETS)
 	@echo "tools done"
@@ -43,6 +44,10 @@ convbdf: convbdf.c
 generate_rocklatin: generate_rocklatin.c ../firmware/drivers/lcd-player-charset.c 
 	$(CC) -DHAVE_LCD_CHARCELLS -D__CONFIG_H__ -I../firmware/export $+ -o $@
 
+uclpack:
+	$(MAKE) -C ucl
+
 clean:
 	rm -f $(TARGETS) $(shell for f in $(TARGETS) ; do echo $$f.exe $$f.o $$f.obj ; done) *.ajf *~
+	$(MAKE) -C ucl clean
 
