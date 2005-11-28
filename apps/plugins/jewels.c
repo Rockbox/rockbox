@@ -26,7 +26,6 @@
 /* colors */
 #ifdef HAVE_LCD_COLOR
 #define COLOR_BLACK  LCD_RGBPACK(0,0,0)
-#define COLOR_WHITE  LCD_RGBPACK(255,255,255)
 #define COLOR_RED    LCD_RGBPACK(255,0,0)
 #define COLOR_YELLOW LCD_RGBPACK(128,128,0)
 #define COLOR_GREEN  LCD_RGBPACK(0,255,0)
@@ -414,11 +413,11 @@ static void bejeweled_putjewels(struct game_context* bj){
                                             j*TILE_WIDTH,
                                             (i-1)*TILE_HEIGHT+k-TILE_HEIGHT/8,
                                             TILE_WIDTH, TILE_HEIGHT);
+                        /* draw new position */
 #ifdef HAVE_LCD_COLOR
                         rb->lcd_set_foreground(jewel_color
                                                [bj->playboard[j][i].type]);
 #endif
-                        /* draw new position */
                         rb->lcd_mono_bitmap(jewel[bj->playboard[j][i].type],
                                             j*TILE_WIDTH,
                                             (i-1)*TILE_HEIGHT+k,
@@ -428,6 +427,9 @@ static void bejeweled_putjewels(struct game_context* bj){
             }
             rb->lcd_update();
         }
+#ifdef HAVE_LCD_COLOR
+        rb->lcd_set_foreground(COLOR_BLACK);
+#endif
 
         /* shift jewels down */
         for(j=0; j<BJ_WIDTH; j++) {
@@ -638,6 +640,9 @@ static unsigned int bejeweled_swapjewels(struct game_context* bj,
         points = bejeweled_runboard(bj);
         if(points == 0) {undo = true;} else {break;}
     }
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_foreground(COLOR_BLACK);
+#endif
 
     return points;
 }
