@@ -135,6 +135,9 @@ extern void lcd_jump_scroll_delay(int ms);
 /* Low-level drawing function types */
 typedef void lcd_pixelfunc_type(int x, int y);
 typedef void lcd_blockfunc_type(unsigned char *address, unsigned mask, unsigned bits);
+#if LCD_DEPTH >= 8
+typedef void lcd_fastpixelfunc_type(fb_data *address);
+#endif
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -199,6 +202,9 @@ extern int  lcd_getstringsize(const unsigned char *str, int *w, int *h);
 /* low level drawing function pointer arrays */
 extern lcd_pixelfunc_type* const lcd_pixelfuncs[8];
 extern lcd_blockfunc_type* const lcd_blockfuncs[8];
+#if LCD_DEPTH >= 8
+extern lcd_fastpixelfunc_type* const lcd_fastpixelfuncs[8];
+#endif
 
 extern void lcd_drawpixel(int x, int y);
 extern void lcd_drawline(int x1, int y1, int x2, int y2);

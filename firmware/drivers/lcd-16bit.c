@@ -145,32 +145,33 @@ int lcd_getstringsize(const unsigned char *str, int *w, int *h)
 
 /*** low-level drawing functions ***/
 
-static void setpixel(int x, int y) ICODE_ATTR;
-static void setpixel(int x, int y)
+#define LCDADDR(x, y) (&lcd_framebuffer[(y)][(x)])
+
+static void setpixel(fb_data *address) ICODE_ATTR;
+static void setpixel(fb_data *address)
 {
-    lcd_framebuffer[y][x] = fg_pattern;
+    *address = fg_pattern;
 }
 
-static void clearpixel(int x, int y) ICODE_ATTR;
-static void clearpixel(int x, int y)
+static void clearpixel(fb_data *address) ICODE_ATTR;
+static void clearpixel(fb_data *address)
 {
-    lcd_framebuffer[y][x] = bg_pattern;
+    *address = bg_pattern;
 }
 
-static void flippixel(int x, int y) ICODE_ATTR;
-static void flippixel(int x, int y)
+static void flippixel(fb_data *address) ICODE_ATTR;
+static void flippixel(fb_data *address)
 {
-    lcd_framebuffer[y][x] = ~lcd_framebuffer[y][x];
+    *address = ~(*address);
 }
 
-static void nopixel(int x, int y) ICODE_ATTR;
-static void nopixel(int x, int y)
+static void nopixel(fb_data *address) ICODE_ATTR;
+static void nopixel(fb_data *address)
 {
-    (void)x;
-    (void)y;
+    (void)address;
 }
 
-lcd_pixelfunc_type* const lcd_pixelfuncs[8] = {
+lcd_fastpixelfunc_type* const lcd_fastpixelfuncs[8] = {
     flippixel, nopixel, setpixel, setpixel,
     nopixel, clearpixel, nopixel, clearpixel
 };
@@ -181,7 +182,7 @@ lcd_pixelfunc_type* const lcd_pixelfuncs[8] = {
 void lcd_clear_display(void)
 {
     fb_data bits = (drawmode & DRMODE_INVERSEVID) ? fg_pattern : bg_pattern;
-    fb_data *dst = &lcd_framebuffer[0][0];
+    fb_data *dst = LCDADDR(0, 0);
     fb_data *dst_end = dst + LCD_HEIGHT*LCD_WIDTH;
     
     do
@@ -194,7 +195,7 @@ void lcd_clear_display(void)
 void lcd_drawpixel(int x, int y)
 {
     if (((unsigned)x < LCD_WIDTH) && ((unsigned)y < LCD_HEIGHT))
-        lcd_pixelfuncs[drawmode](x, y);
+        lcd_fastpixelfuncs[drawmode](LCDADDR(x, y));
 }
 
 /* Draw a line */
@@ -206,7 +207,7 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
     int d, dinc1, dinc2;
     int x, xinc1, xinc2;
     int y, yinc1, yinc2;
-    lcd_pixelfunc_type *pfunc = lcd_pixelfuncs[drawmode];
+    lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[drawmode];
 
     deltax = abs(x2 - x1);
     deltay = abs(y2 - y1);
@@ -251,7 +252,7 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
     for (i = 0; i < numpixels; i++)
     {
         if (((unsigned)x < LCD_WIDTH) && ((unsigned)y < LCD_HEIGHT))
-            pfunc(x, y);
+            pfunc(LCDADDR(x, y));
 
         if (d < 0)
         {
@@ -272,7 +273,8 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
 void lcd_hline(int x1, int x2, int y)
 {
     int x;
-    lcd_pixelfunc_type *pfunc = lcd_pixelfuncs[drawmode];
+    fb_data *dst, *dst_end;
+    lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[drawmode];
 
     /* direction flip */
     if (x2 < x1)
@@ -292,16 +294,20 @@ void lcd_hline(int x1, int x2, int y)
     if (x2 >= LCD_WIDTH)
         x2 = LCD_WIDTH-1;
         
+    dst = LCDADDR(x1, y);
+    dst_end = dst + x2 - x1;
+        
     do
-        pfunc(x1++, y);
-    while (x1 <= x2);
+        pfunc(dst++);
+    while (dst <= dst_end);
 }
 
 /* Draw a vertical line (optimised) */
 void lcd_vline(int x, int y1, int y2)
 {
     int y;
-    lcd_pixelfunc_type *pfunc = lcd_pixelfuncs[drawmode];
+    fb_data *dst, *dst_end;
+    lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[drawmode];
 
     /* direction flip */
     if (y2 < y1)
@@ -321,10 +327,15 @@ void lcd_vline(int x, int y1, int y2)
     if (y2 >= LCD_HEIGHT)
         y2 = LCD_HEIGHT-1;
         
+    dst = LCDADDR(x, y1);
+    dst_end = dst + (y2 - y1) * LCD_WIDTH;
 
     do
-        pfunc(x, y1++);
-    while (y1 <= y2);
+    {
+        pfunc(dst);
+        dst += LCD_WIDTH;
+    }
+    while (dst <= dst_end);
 }
 
 /* Draw a rectangular box */
@@ -345,8 +356,8 @@ void lcd_drawrect(int x, int y, int width, int height)
 /* Fill a rectangular area */
 void lcd_fillrect(int x, int y, int width, int height)
 {
-    int xe, ye, xc;
-    lcd_pixelfunc_type *pfunc = lcd_pixelfuncs[drawmode];
+    fb_data *dst, *dst_end;
+    lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[drawmode];
 
     /* nothing to draw? */
     if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
@@ -368,14 +379,22 @@ void lcd_fillrect(int x, int y, int width, int height)
         width = LCD_WIDTH - x;
     if (y + height > LCD_HEIGHT)
         height = LCD_HEIGHT - y;
+        
+    dst = LCDADDR(x, y);
+    dst_end = dst + height * LCD_WIDTH;
 
-    ye = y + height;
-    xe = x + width;
-    for(; y < ye; y++)
+    do
     {
-        for(xc = x; xc < xe; xc++)
-            pfunc(xc, y);
+        fb_data *dst_row = dst;
+        fb_data *row_end = dst_row + width;
+
+        do
+            pfunc(dst_row++);
+        while (dst_row < row_end);
+
+        dst += LCD_WIDTH;
     }
+    while (dst < dst_end);
 }
 
 /* About Rockbox' internal monochrome bitmap format:
@@ -397,9 +416,10 @@ void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
 void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
                           int stride, int x, int y, int width, int height)
 {
-    int xe, ye, yc;
-    lcd_pixelfunc_type *fgfunc;
-    lcd_pixelfunc_type *bgfunc;
+    const unsigned char *src_end;
+    fb_data *dst, *dst_end;
+    lcd_fastpixelfunc_type *fgfunc;
+    lcd_fastpixelfunc_type *bgfunc;
 
     /* nothing to draw? */
     if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
@@ -426,24 +446,28 @@ void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
 
     src += stride * (src_y >> 3) + src_x; /* move starting point */
     src_y  &= 7;
+    src_end = src + width;
 
-    xe = x + width;
-    ye = y + height;
-    fgfunc = lcd_pixelfuncs[drawmode];
-    bgfunc = lcd_pixelfuncs[drawmode ^ DRMODE_INVERSEVID];
+    dst = LCDADDR(x, y);
+    fgfunc = lcd_fastpixelfuncs[drawmode];
+    bgfunc = lcd_fastpixelfuncs[drawmode ^ DRMODE_INVERSEVID];
 
-    for (; x < xe; x++)
+    do
     {
         const unsigned char *src_col = src++;
-        unsigned char data = *src_col >> src_y;
+        unsigned data = *src_col >> src_y;
+        fb_data *dst_col = dst++;
         int numbits = 8 - src_y;
         
-        for (yc = y; yc < ye; yc++)
+        dst_end = dst_col + height * LCD_WIDTH;
+        do
         {
             if (data & 0x01)
-                fgfunc(x, yc);
+                fgfunc(dst_col);
             else
-                bgfunc(x, yc);
+                bgfunc(dst_col);
+
+            dst_col += LCD_WIDTH;
 
             data >>= 1;
             if (--numbits == 0)
@@ -453,7 +477,9 @@ void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
                 numbits = 8;
             }
         }
+        while (dst_col < dst_end);
     }
+    while (src < src_end);
 }
 
 /* Draw a full monochrome bitmap */
@@ -469,7 +495,7 @@ void lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
 void lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
                      int stride, int x, int y, int width, int height)
 {
-    int ye;
+    fb_data *dst, *dst_end;
 
     /* nothing to draw? */
     if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
@@ -495,13 +521,16 @@ void lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
         height = LCD_HEIGHT - y;
 
     src += stride * src_y + src_x; /* move starting point */
-    ye = y + height;
+    dst = LCDADDR(x, y);
+    dst_end = dst + height * LCD_WIDTH;
 
-    for (; y < ye; y++)
+    do
     {
-        memcpy(&lcd_framebuffer[y][x], src, width * sizeof(fb_data));
+        memcpy(dst, src, width * sizeof(fb_data));
         src += stride;
+        dst += LCD_WIDTH;
     }
+    while (dst < dst_end);
 }
 
 /* Draw a full native bitmap */
