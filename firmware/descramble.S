@@ -104,8 +104,6 @@ _rolo_restart:
     sub     r4,r0           /* r0 = dest - source */
     add     #-4,r0          /* adjust for early increment */
     add     r4,r6           /* r6 = source + len */
-    mov.w   .offset,r1
-    add     r1,r5           /* start_func() */
 
 .copy:                      /* loop takes 6 cycles per longword */
     mov.l   @r4+,r1
@@ -113,11 +111,9 @@ _rolo_restart:
     mov.l   r1,@(r0,r4)
     bt      .copy
 
-    jmp     @r5
-    nop
-
-.offset:
-    .word   0x200
+    mov.l   @r5+,r0         /* start address from image */
+    jmp     @r0
+    mov.l   @r5+,r15        /* stack pointer from image */
 
 .end:
     .size   _descramble,.end-_descramble
