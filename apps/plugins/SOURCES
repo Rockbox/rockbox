@@ -24,7 +24,6 @@ dict.c
 #ifndef HAVE_LCD_COLOR
 fire.c
 plasma.c
-solitaire.c
 #endif
 bejeweled.c
 bounce.c
@@ -48,12 +47,13 @@ sliding_puzzle.c
 snake.c
 snake2.c
 sokoban.c
+solitaire.c
 star.c
+starfield.c
+sudoku.c
 #if CONFIG_LCD == LCD_SSD1815
 video.c
 #endif
-starfield.c
-sudoku.c
 vu_meter.c
 
 #ifdef HAVE_RTC /* Recorder models only */
