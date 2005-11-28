@@ -133,9 +133,6 @@ static struct mutex mutex_codecthread;
 
 static struct mp3entry id3_voice;
 
-#define CODEC_IDX_AUDIO  0
-#define CODEC_IDX_VOICE  1
-
 static char *voicebuf;
 static int voice_remaining;
 static bool voice_is_playing;

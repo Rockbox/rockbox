@@ -27,6 +27,9 @@
 #include "id3.h"
 #include "mp3data.h"
 
+#define CODEC_IDX_AUDIO  0
+#define CODEC_IDX_VOICE  1
+
 /* Not yet implemented. */
 #define CODEC_SET_AUDIOBUF_WATERMARK    4
 

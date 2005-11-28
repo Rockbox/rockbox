@@ -54,5 +54,6 @@ int dsp_stereo_mode(void);
 bool dsp_configure(int setting, void *value);
 void dsp_set_replaygain(bool always);
 void dsp_set_crossfeed(bool enable);
-
+void sound_set_pitch(int r);
+int sound_get_pitch(void);
 #endif

@@ -342,11 +342,16 @@ int charging_screen(void)
 #endif /* HAVE_CHARGING && !HAVE_POWEROFF_WHILE_CHARGING */
 
 
-#if CONFIG_KEYPAD == RECORDER_PAD
+#if CONFIG_KEYPAD == RECORDER_PAD || CONFIG_KEYPAD == IRIVER_H100_PAD
 /* returns:
    0 if no key was pressed
    1 if a key was pressed (or if ON was held down long enough to repeat)
    2 if USB was connected */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define PITCH_PAUSE BUTTON_PLAY
+#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+#define PITCH_PAUSE BUTTON_SELECT
+#endif
 int pitch_screen(void)
 {
     int button;
@@ -411,17 +416,17 @@ int pitch_screen(void)
                 sound_set_pitch(pitch);
                 break;
 
-            case BUTTON_ON | BUTTON_PLAY:
+            case BUTTON_ON | PITCH_PAUSE:
                 audio_pause();
                 used = true;
                 break;
 
-            case BUTTON_PLAY | BUTTON_REL:
+            case PITCH_PAUSE | BUTTON_REL:
                 audio_resume();
                 used = true;
                 break;
 
-            case BUTTON_ON | BUTTON_PLAY | BUTTON_REL:
+            case BUTTON_ON | PITCH_PAUSE | BUTTON_REL:
                 audio_resume();
                 exit = true;
                 break;

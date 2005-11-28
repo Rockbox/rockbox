@@ -128,7 +128,8 @@
 
 struct dsp_config
 {
-    long frequency;
+    long codec_frequency; /* Sample rate of data coming from the codec */
+    long frequency;       /* Effective sample rate after pitch shift (if any) */
     long clip_min;
     long clip_max;
     long track_gain;
@@ -147,9 +148,8 @@ struct dsp_config
 
 struct resample_data
 {
-    long last_sample;
-    long phase;
-    long delta;
+    long phase, delta;
+    long last_sample[2];
 };
 
 struct dither_data
@@ -168,8 +168,10 @@ struct crossfeed_data
 
 static struct dsp_config dsp_conf[2] IBSS_ATTR;
 static struct dither_data dither_data[2] IBSS_ATTR;
-static struct resample_data resample_data[2][2] IBSS_ATTR;
+static struct resample_data resample_data[2] IBSS_ATTR;
 struct crossfeed_data crossfeed_data IBSS_ATTR;
+
+static int pitch_ratio = 1000;
 
 extern int current_codec;
 struct dsp_config *dsp;
@@ -181,6 +183,18 @@ struct dsp_config *dsp;
 
 static long sample_buf[SAMPLE_BUF_SIZE] IBSS_ATTR;
 static long resample_buf[RESAMPLE_BUF_SIZE] IBSS_ATTR;
+
+int sound_get_pitch(void)
+{
+    return pitch_ratio;
+}
+
+void sound_set_pitch(int permille)
+{
+    pitch_ratio = permille;
+    
+    dsp_configure(DSP_SWITCH_FREQUENCY, (int *)dsp->codec_frequency);
+}
 
 /* Convert at most count samples to the internal format, if needed. Returns
  * number of samples ready for further processing. Updates src to point
@@ -270,64 +284,81 @@ static int convert_to_internal(char* src[], int count, long* dst[])
     return count;
 }
 
+static void resampler_set_delta(int frequency)
+{
+    resample_data[current_codec].delta = (unsigned long) 
+        frequency * 65536LL / NATIVE_FREQUENCY;
+}
+
 /* Linear resampling that introduces a one sample delay, because of our
  * inability to look into the future at the end of a frame.
  */
 
-static long downsample(long *dst, long *src, int count,
+/* TODO: we really should have a separate set of resample functions for both
+   mono and stereo to avoid all this internal branching and looping. */
+static long downsample(long **dst, long **src, int count,
     struct resample_data *r)
 {
     long phase = r->phase;
     long delta = r->delta;
-    long last_sample = r->last_sample;
+    long last_sample;
+    long *d[2] = { dst[0], dst[1] };
     int pos = phase >> 16;
-    int i = 1;
-
-    /* Do we need last sample of previous frame for interpolation? */
-    if (pos > 0)
-    {
-        last_sample = src[pos - 1];
+    int i = 1, j;
+    int num_channels = src[0] == src[1] ? 1 : 2;
+    
+    for (j = 0; j < num_channels; j++) {
+        last_sample = r->last_sample[j];
+        /* Do we need last sample of previous frame for interpolation? */
+        if (pos > 0)
+        {
+            last_sample = src[j][pos - 1];
+        }
+        *d[j]++ = last_sample + FRACMUL((phase & 0xffff) << 15,
+            src[j][pos] - last_sample);
     }
-
-    *dst++ = last_sample + FRACMUL((phase & 0xffff) << 15,
-        src[pos] - last_sample);
     phase += delta;
-
+ 
     while ((pos = phase >> 16) < count)
     {
-        *dst++ = src[pos - 1] + FRACMUL((phase & 0xffff) << 15,
-            src[pos] - src[pos - 1]);
-        phase += delta;
-        i++;
+        for (j = 0; j < num_channels; j++)
+            *d[j]++ = src[j][pos - 1] + FRACMUL((phase & 0xffff) << 15,
+                src[j][pos] - src[j][pos - 1]);
+         phase += delta;
+         i++;
     }
 
     /* Wrap phase accumulator back to start of next frame. */
     r->phase = phase - (count << 16);
     r->delta = delta;
-    r->last_sample = src[count - 1];
+    r->last_sample[0] = src[0][count - 1];
+    r->last_sample[1] = src[1][count - 1];
     return i;
 }
 
-static long upsample(long *dst, long *src, int count, struct resample_data *r)
+static long upsample(long **dst, long **src, int count, struct resample_data *r)
 {
     long phase = r->phase;
     long delta = r->delta;
-    long last_sample = r->last_sample;
-    int i = 0;
+    long *d[2] = { dst[0], dst[1] };
+    int i = 0, j;
     int pos;
-
+    int num_channels = src[0] == src[1] ? 1 : 2;
+    
     while ((pos = phase >> 16) == 0)
     {
-        *dst++ = last_sample + FRACMUL((phase & 0xffff) << 15,
-            src[pos] - last_sample);
+       for (j = 0; j < num_channels; j++)
+           *d[j]++ = r->last_sample[j] + FRACMUL((phase & 0xffff) << 15,
+                src[j][pos] - r->last_sample[j]);
         phase += delta;
         i++;
     }
 
     while ((pos = phase >> 16) < count)
     {
-        *dst++ = src[pos - 1] + FRACMUL((phase & 0xffff) << 15,
-            src[pos] - src[pos - 1]);
+        for (j = 0; j < num_channels; j++)
+            *d[j]++ = src[j][pos - 1] + FRACMUL((phase & 0xffff) << 15,
+                src[j][pos] - src[j][pos - 1]);
         phase += delta;
         i++;
     }
@@ -335,7 +366,8 @@ static long upsample(long *dst, long *src, int count, struct resample_data *r)
     /* Wrap phase accumulator back to start of next frame. */
     r->phase = phase - (count << 16);
     r->delta = delta;
-    r->last_sample = src[count - 1];
+    r->last_sample[0] = src[0][count - 1];
+    r->last_sample[1] = src[1][count - 1];
     return i;
 }
 
@@ -349,36 +381,21 @@ static inline int resample(long* src[], int count)
 
     if (dsp->frequency != NATIVE_FREQUENCY)
     {
-        long* d0 = &resample_buf[0];
-        /* Only process the second channel if needed. */
-        long* d1 = (src[0] == src[1]) ? d0
-            : &resample_buf[RESAMPLE_BUF_SIZE / 2];
+        long* dst[2] = {&resample_buf[0], &resample_buf[RESAMPLE_BUF_SIZE / 2]};
 
         if (dsp->frequency < NATIVE_FREQUENCY)
         {
-            new_count = upsample(d0, src[0], count,
-                            &resample_data[current_codec][0]);
-
-            if (d0 != d1)
-            {
-                upsample(d1, src[1], count,
-                    &resample_data[current_codec][1]);
-            }
+            new_count = upsample(dst, src, count, 
+                            &resample_data[current_codec]);
         }
         else
         {
-            new_count = downsample(d0, src[0], count,
-                            &resample_data[current_codec][0]);
-
-            if (d0 != d1)
-            {
-                downsample(d1, src[1], count,
-                    &resample_data[current_codec][1]);
-            }
+            new_count = downsample(dst, src, count,
+                            &resample_data[current_codec]);
         }
 
-        src[0] = d0;
-        src[1] = d1;
+        src[0] = dst[0];
+        src[1] = dst[1];
     }
     else
     {
@@ -767,7 +784,7 @@ long dsp_input_size(long size)
          *  (unsigned long) dsp->frequency * 65536 / NATIVE_FREQUENCY, and
          * round towards zero to avoid buffer overflows. */
         size = ((unsigned long)size *
-            resample_data[current_codec][0].delta) >> 16;
+            resample_data[current_codec].delta) >> 16;
     }
 
     /* Convert back to bytes. */
@@ -793,14 +810,20 @@ bool dsp_configure(int setting, void *value)
     switch (setting)
     {
     case DSP_SET_FREQUENCY:
-        memset(&resample_data[current_codec][0], 0,
-            sizeof(struct resample_data) * 2);
+        memset(&resample_data[current_codec], 0,
+            sizeof(struct resample_data));
         /* Fall through!!! */
     case DSP_SWITCH_FREQUENCY:
-        dsp->frequency = ((int) value == 0) ? NATIVE_FREQUENCY : (int) value;
-        resample_data[current_codec][0].delta =
-            resample_data[current_codec][1].delta =
-            (unsigned long) dsp->frequency * 65536 / NATIVE_FREQUENCY;
+        dsp->codec_frequency = ((int) value == 0) ? NATIVE_FREQUENCY : (int) value;
+        /* Account for playback speed adjustment when settingg dsp->frequency
+           if we're called from the main audio thread. Voice UI thread should
+           not need this feature.
+         */
+        if (current_codec == CODEC_IDX_AUDIO)
+            dsp->frequency = pitch_ratio * dsp->codec_frequency / 1000;
+        else
+            dsp->frequency = dsp->codec_frequency;
+        resampler_set_delta(dsp->frequency); 
         break;
 
     case DSP_SET_CLIP_MIN:
@@ -844,7 +867,7 @@ bool dsp_configure(int setting, void *value)
         dsp->album_gain = 0;
         dsp->track_peak = 0;
         dsp->album_peak = 0;
-        dsp->frequency = NATIVE_FREQUENCY;
+        dsp->codec_frequency = dsp->frequency = NATIVE_FREQUENCY;
         dsp->sample_depth = NATIVE_DEPTH;
         dsp->frac_bits = WORD_FRACBITS;
         dsp->new_gain = true;
