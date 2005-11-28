@@ -21,7 +21,7 @@ MEMORYSIZE = 2
 
 LDS := link.lds
 LINKFILE = $(OBJDIR)/linkage.lds
-OBJS := $(OBJDIR)/decompressor.o $(OBJDIR)/rockboxucl.o
+OBJS := $(OBJDIR)/decompressor.o $(OBJDIR)/rockboxucl.o $(OBJDIR)/startup.o
 
 CFLAGS = -O -W -Wall -m1 -nostdlib -ffreestanding -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns
 

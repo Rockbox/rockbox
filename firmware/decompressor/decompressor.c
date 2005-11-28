@@ -31,7 +31,8 @@ extern char imgstart[], imgend[];
 extern char loadaddress[], dramend[];
 
 /* Prototypes */
-void start(void)  __attribute__ ((section (".start")));
+extern void start(void);
+
 void main(void) ICODE_ATTR;
 int ucl_nrv2e_decompress_8(const unsigned char *src, unsigned char *dst,
                            unsigned long *dst_len) ICODE_ATTR;
@@ -44,22 +45,6 @@ void (*vbr[]) (void) __attribute__ ((section (".vectors"))) =
             0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 };
-
-/* Inline copy function */
-static inline void longcopy(long *dst, long *dst_end, const long *src)
-                            __attribute__ ((always_inline));
-static inline void longcopy(long *dst, long *dst_end, const long *src)
-{
-    while (dst < dst_end)
-        *dst++ = *src++;
-}
-
-/* Entry point */
-void start(void)
-{
-    longcopy((long *)iramstart, (long *)iramend, (long *)iramcopy);
-    main();
-}
 
 /** All subsequent functions are executed from IRAM **/
 
@@ -133,18 +118,20 @@ void main(void)
 {
     unsigned long dst_len; /* dummy */
     unsigned long img_len = (unsigned long)(imgend - imgstart);
-
-    longcopy((long *)(dramend - img_len), (long *) dramend,
-             (long *) imgstart);
-
+    unsigned long *src = (unsigned long *)imgstart;
+    unsigned long *dst = (unsigned long *)(dramend - img_len);
+    
+    do
+        *dst++ = *src++;
+    while (dst < (unsigned long *)dramend);
+    
     ucl_nrv2e_decompress_8(dramend - img_len + UCL_HEADER,
                            loadaddress, &dst_len);
 
     asm(
         "mov.l   @%0+,r0     \n"
-        "mov.l   @%0+,r15    \n"
         "jmp     @r0         \n"
-        "nop                 \n"
+        "mov.l   @%0+,r15    \n"
         : : "r"(loadaddress) : "r0"
     );
 }
