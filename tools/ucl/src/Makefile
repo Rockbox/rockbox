@@ -19,7 +19,7 @@ OBJS = alloc.o io.o n2b_99.o n2b_d.o n2b_ds.o n2b_to.o n2d_99.o	\
 	ucl_dll.o ucl_init.o ucl_ptr.o ucl_str.o ucl_util.o
 
 $(TARGET): $(OBJS)
-	$(AR) ruv $(TARGET) $(OBJS)
+	ar ruv $(TARGET) $(OBJS)
 
 
 clean:
