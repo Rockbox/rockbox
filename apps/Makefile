@@ -129,34 +129,17 @@ $(BUILDDIR)/$(BINARY) : $(OBJS) $(DEPFILE) $(BUILDDIR)/libsim.a \
 endif
 
 $(BUILDDIR)/rockbox.ucl: $(OBJDIR)/rockbox.bin
-	@a=`uclpack -h 2>/dev/null`; \
-	if test -n "$$a"; then \
-	  echo "UCLPACK rockbox" ; \
-	  uclpack --best --2e $< $@ >/dev/null 2>&1; \
-	else \
-	  echo "no uclpack command found, makes a fake rockbox.ucl"; \
-	  echo "fake" > $@; \
-	fi
+	$(SILENT)(echo "UCLPACK rockbox" ; \
+	$(TOOLSDIR)/uclpack --best --2e $< $@ >/dev/null 2>&1;)
 
 $(BUILDDIR)/rombox.ucl: $(OBJDIR)/rombox.bin $(MAXOUTFILE)
-	@a=`uclpack -h 2>/dev/null`; \
-	if test -n "$$a"; then \
-	  echo "UCLPACK rombox" ; \
-	  uclpack --none $< $@ >/dev/null 2>&1; \
-	  if test -s $@; then \
-	    perl $(TOOLSDIR)/romsizetest.pl `cat $(MAXOUTFILE)` $<; \
-	    if test $$? -ne 0; then \
-	      echo "removing UCL file again, making it a fake one"; \
-	      echo "fake" > $@; \
-	    fi \
-	  else \
-	    echo "Your uclpack seems to not support --none, making a fake ucl"; \
-	    echo "fake" > $@; \
-	  fi \
-	else \
-	  echo "no uclpack command found, makes a fake rombox.ucl"; \
+	$(SILENT)(echo "UCLPACK rombox" ; \
+	$(TOOLSDIR)/uclpack --none $< $@ >/dev/null 2>&1; \
+	perl $(TOOLSDIR)/romsizetest.pl `cat $(MAXOUTFILE)` $<; \
+	if test $$? -ne 0; then \
+	  echo "removing UCL file again, making it a fake one"; \
 	  echo "fake" > $@; \
-	fi
+	fi)
 
 include $(TOOLSDIR)/make.inc
 
