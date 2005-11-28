@@ -84,7 +84,7 @@ void sound_playback_thread(void)
                 sound_get_pcm = NULL;
                 break;
             }
-            sim_sound_play(soundfd, buf, size);
+            sim_sound_play(soundfd, (char *)buf, size);
             usleep(10000);
         } while(size);
 

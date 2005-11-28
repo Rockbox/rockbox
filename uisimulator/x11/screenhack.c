@@ -272,7 +272,7 @@ int screenhack_handle_event(XEvent *event, bool *release)
             {
                 KeySym keysym;
                 unsigned char c = 0;
-                XLookupString (&event->xkey, &c, 1, &keysym, 0);
+                XLookupString (&event->xkey, (char *)&c, 1, &keysym, 0);
                 key = keysym;
 #if 0
                 DEBUGF("Got keypress: %c (%02x) %x, tick %ld\n", c, c,
@@ -284,7 +284,7 @@ int screenhack_handle_event(XEvent *event, bool *release)
             {
                 KeySym keysym;
                 unsigned char c = 0;
-                XLookupString (&event->xkey, &c, 1, &keysym, 0);
+                XLookupString (&event->xkey, (char *)&c, 1, &keysym, 0);
                 key = keysym;
 #if 0
                 DEBUGF("Got keyrelease: %c (%02x) %x, tick %ld\n", c, c,

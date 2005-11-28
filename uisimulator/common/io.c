@@ -120,7 +120,7 @@ struct sim_dirent *sim_readdir(MYDIR *dir)
     if(!x11)
         return (struct sim_dirent *)0;
 
-    strcpy(secret.d_name, x11->d_name);
+    strcpy((char *)secret.d_name, x11->d_name);
 
     /* build file name */
     sprintf(buffer, SIMULATOR_ARCHOS_ROOT "%s/%s",
