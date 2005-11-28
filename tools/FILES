@@ -18,4 +18,8 @@ fwpatcher/*.[ch]
 fwpatcher/Makefile
 fwpatcher/favicon.ico
 fwpatcher/resource.rc
-
+ucl/Makefile
+ucl/*.[ch]
+ucl/src/*.[ch]
+ucl/src/Makefile
+ucl/include/ucl/*.h
