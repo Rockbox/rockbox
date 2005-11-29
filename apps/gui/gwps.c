@@ -531,7 +531,7 @@ long gui_wps_show(void)
 #endif
 
                 /* pitch screen */
-#if CONFIG_KEYPAD == RECORDER_PAD
+#if CONFIG_KEYPAD == RECORDER_PAD || defined(IRIVER_H100_SERIES)
             case BUTTON_ON | BUTTON_UP:
             case BUTTON_ON | BUTTON_DOWN:
                 if (2 == pitch_screen())
