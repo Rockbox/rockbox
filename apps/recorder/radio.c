@@ -77,6 +77,7 @@
 #define FM_EXIT (BUTTON_ON | BUTTON_REL)
 #define FM_PRESET_ADD BUTTON_F1
 #define FM_PRESET_ACTION BUTTON_F3
+
 #elif CONFIG_KEYPAD == IRIVER_H100_PAD
 /* pause/play - short PLAY */
 #define FM_PLAY_PRE BUTTON_ON
@@ -105,10 +106,12 @@
 /* stop and exit radio - STOP */
 #define FM_STOP BUTTON_OFF
 #define FM_RC_STOP BUTTON_RC_STOP
+
 #elif CONFIG_KEYPAD == ONDIO_PAD /* restricted keypad */
 #define FM_MENU (BUTTON_MENU | BUTTON_REPEAT)
 #define FM_RECORD_DBLPRE BUTTON_MENU
 #define FM_RECORD (BUTTON_MENU | BUTTON_REL)
+#define FM_STOP_PRE BUTTON_OFF
 #define FM_STOP (BUTTON_OFF | BUTTON_REL)
 #define FM_EXIT (BUTTON_OFF | BUTTON_REPEAT)
 #endif
@@ -377,10 +380,8 @@ bool radio_screen(void)
     }
     
     curr_preset = find_preset(curr_freq);
-#ifdef FM_MODE
     if(curr_preset != -1)
          radio_mode = RADIO_PRESET_MODE;
-#endif
 
 #ifdef HAS_BUTTONBAR
     gui_buttonbar_set(&buttonbar, str(LANG_BUTTONBAR_MENU), str(LANG_FM_BUTTONBAR_PRESETS),
@@ -431,6 +432,10 @@ bool radio_screen(void)
             case FM_RC_STOP:
 #endif
             case FM_STOP:
+#ifdef FM_STOP_PRE
+                if (lastbutton != FM_STOP_PRE)
+                    break;
+#endif
 #ifndef SIMULATOR
                 if(audio_status() == AUDIO_STATUS_RECORD)
                 {
@@ -761,7 +766,7 @@ bool radio_screen(void)
             if(update_screen || seconds > last_seconds)
             {
                 last_seconds = seconds;
-                
+
                 FOR_NB_SCREENS(i)
                     screens[i].setfont(FONT_UI);
                 
@@ -786,12 +791,11 @@ bool radio_screen(void)
                 FOR_NB_SCREENS(i)
                     screens[i].puts_scroll(0, top_of_screen + 2, buf);
 
-#ifdef FM_MODE
-                snprintf(buf, 128, radio_mode?str(LANG_RADIO_PRESET_MODE):
-                                             str(LANG_RADIO_SCAN_MODE));
+                snprintf(buf, 128, "%s %s", str(LANG_FM_TUNE_MODE),
+                         radio_mode ? str(LANG_RADIO_PRESET_MODE) :
+                                      str(LANG_RADIO_SCAN_MODE));
                 FOR_NB_SCREENS(i)
                     screens[i].puts_scroll(0, top_of_screen + 3, buf);
-#endif
 
                 if(audio_status() == AUDIO_STATUS_RECORD)
                 {
@@ -1185,7 +1189,8 @@ char monomode_menu_string[32];
 
 static void create_monomode_menu(void)
 {
-    snprintf(monomode_menu_string, 32, "%s: %s", str(LANG_FM_MONO_MODE),
+    snprintf(monomode_menu_string, sizeof monomode_menu_string,
+             "%s: %s", str(LANG_FM_MONO_MODE),
              global_settings.fm_force_mono?
              str(LANG_SET_BOOL_YES):str(LANG_SET_BOOL_NO));
 }
@@ -1198,6 +1203,25 @@ static bool toggle_mono_mode(void)
     create_monomode_menu();
     return false;
 }
+
+#ifndef FM_MODE
+char radiomode_menu_string[32];
+
+static void create_radiomode_menu(void)
+{
+    snprintf(radiomode_menu_string, 32, "%s %s", str(LANG_FM_TUNE_MODE),
+             radio_mode ? str(LANG_RADIO_PRESET_MODE) :
+                          str(LANG_RADIO_SCAN_MODE));
+}
+
+static bool toggle_radio_mode(void)
+{
+    radio_mode = (radio_mode == RADIO_SCAN_MODE) ?
+                 RADIO_PRESET_MODE : RADIO_SCAN_MODE;
+    create_radiomode_menu();
+    return false;
+}
+#endif
 
 static bool scan_presets(void)
 {
@@ -1249,9 +1273,7 @@ static bool scan_presets(void)
             curr_freq = presets[0].frequency;
             radio_set(RADIO_FREQUENCY, curr_freq);
             remember_frequency();
-#ifdef FM_MODE
             radio_mode = RADIO_PRESET_MODE;
-#endif
         }
     }
     return true;
@@ -1300,15 +1322,20 @@ bool radio_menu(void)
         { ID2P(LANG_FM_ADD_PRESET)       , radio_add_preset     },
 #endif
         { monomode_menu_string           , toggle_mono_mode     },
+#ifndef FM_MODE
+        { radiomode_menu_string          , toggle_radio_mode    },
+#endif
         { ID2P(LANG_SOUND_SETTINGS)      , sound_menu           },
 #if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
         { ID2P(LANG_RECORDING_SETTINGS)  , fm_recording_settings},
 #endif
-        { ID2P(LANG_FM_SCAN_PRESETS)  , scan_presets},
+        { ID2P(LANG_FM_SCAN_PRESETS)     , scan_presets         },
     };
 
     create_monomode_menu();
-
+#ifndef FM_MODE
+    create_radiomode_menu();
+#endif
     m = menu_init(items, sizeof(items) / sizeof(*items),
                   radio_menu_cb, NULL, NULL, NULL);
     result = menu_run(m);

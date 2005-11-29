@@ -3164,7 +3164,7 @@ id: LANG_CROSSFADE_DURATION
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_MIX
 desc: in playback settings, crossfade option
@@ -3362,19 +3362,19 @@ id: LANG_RECORDING_MONITOR
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_RADIO_SCAN_MODE
-desc: in radio screen
-eng: "Scan Mode"
+desc: in radio screen / menu
+eng: "Scan"
 voice: ""
-new: "Abstimmmodus"
+new: "Abstimmen"
 
 id: LANG_RADIO_PRESET_MODE
-desc: in radio screen
-eng: "Preset Mode"
+desc: in radio screen / menu
+eng: "Preset"
 voice: ""
-new: "Sendermodus"
+new: "Sender"
 
 id: LANG_FM_FREEZE
 desc: splash screen during freeze in radio mode
@@ -3385,8 +3385,8 @@ new: "Anzeige eingefroren!"
 id: LANG_CROSSFEED_ENABLE
 desc: DEPRECATED
 eng: ""
-voice:
-new:
+voice: 
+new: 
 
 id: LANG_CROSSFEED
 desc: in the sound settings menu
@@ -3402,7 +3402,7 @@ new: "Automatische Sendersuche"
 
 id: LANG_FM_SCANNING
 desc: during auto scan
-eng: "Scanning %d.%dMHz"
+eng: "Scanning %d.%01dMHz"
 voice: ""
 new: "Suche %d,%01dMHz"
 
@@ -3434,7 +3434,7 @@ id: VOICE_EXT_RWPS
 desc: spoken only, for file extension
 eng: ""
 voice: "RWPS"
-new:
+new: 
 
 id: LANG_REMOTE_WHILE_PLAYING
 desc: in settings_menu()
@@ -3453,3 +3453,9 @@ desc: in remote lcd settings menu
 eng: "Reduce ticking"
 voice: "Ticken verringern"
 new: "Ticken verringern"
+
+id: LANG_FM_TUNE_MODE
+desc: in radio screen / menu
+eng: "Mode:"
+voice: ""
+new: "Modus:"

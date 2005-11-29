@@ -3372,14 +3372,14 @@ voice: ""
 new:
 
 id: LANG_RADIO_SCAN_MODE
-desc: in radio screen
-eng: "Scan Mode"
+desc: in radio screen / menu
+eng: "Scan"
 voice: ""
 new:
 
 id: LANG_RADIO_PRESET_MODE
-desc: in radio screen
-eng: "Preset Mode"
+desc: in radio screen / menu
+eng: "Preset"
 voice: ""
 new:
 
@@ -3461,3 +3461,8 @@ eng: "Reduce ticking"
 voice: "Reduce ticking"
 new:
 
+id: LANG_FM_TUNE_MODE
+desc: in radio screen / menu
+eng: "Mode:"
+voice: ""
+new:
