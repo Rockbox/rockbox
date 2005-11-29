@@ -3336,16 +3336,16 @@ voice: ""
 new: ""
 
 id: LANG_RADIO_SCAN_MODE
-desc: in radio screen
-eng: "Scan Mode"
+desc: in radio screen / menu
+eng: "Scan"
 voice: ""
-new: "Manuell sökning"
+new: "Sökning"
 
 id: LANG_RADIO_PRESET_MODE
-desc: in radio screen
-eng: "Preset Mode"
+desc: in radio screen / menu
+eng: "Preset"
 voice: ""
-new: "Förinställningar"
+new: "Förinställning"
 
 id: LANG_FM_FREEZE
 desc: splash screen during freeze in radio mode
@@ -3424,3 +3424,9 @@ desc: in remote lcd settings menu
 eng: "Reduce ticking"
 voice: "Reduce ticking"
 new: "Reducera tickande"
+
+id: LANG_FM_TUNE_MODE
+desc: in radio screen / menu
+eng: "Mode:"
+voice: ""
+new: "Läge:"
