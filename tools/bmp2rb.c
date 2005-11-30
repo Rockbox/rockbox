@@ -320,7 +320,7 @@ int transform_bitmap(const struct RGBQUAD *src, long width, long height,
         return 1;
     }
     
-    *dest = (unsigned short *)malloc(dst_w * dst_h);
+    *dest = (unsigned short *)malloc(dst_w * dst_h * sizeof(short));
     if (*dest == NULL)
     {
         debugf("error - Out of memory.\n");
