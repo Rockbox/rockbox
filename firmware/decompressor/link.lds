@@ -40,15 +40,11 @@ SECTIONS
 	{
 		*(.data)
 		. = ALIGN(0x4);
-		_imgstart = .;
-		*(.image)
-		. = ALIGN(0x4);
-		_imgend = .;
 		_iramcopy = .;
 	} > DRAM
 
 	.iram IRAMORIG : AT ( _iramcopy )
-	{	 
+	{
 		_iramstart = .;
 		*(.icode)
 		*(.idata)

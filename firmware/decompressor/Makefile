@@ -18,12 +18,13 @@ OBJDIR := .
 # FIXME: get proper value from build system
 MEMORYSIZE = 2
 
-
 LDS := link.lds
 LINKFILE = $(OBJDIR)/linkage.lds
-OBJS := $(OBJDIR)/decompressor.o $(OBJDIR)/rockboxucl.o $(OBJDIR)/startup.o
+OBJS := $(OBJDIR)/decompressor.o $(OBJDIR)/uclimage.o $(OBJDIR)/startup.o
 
 CFLAGS = -O -W -Wall -m1 -nostdlib -ffreestanding -Wstrict-prototypes -fomit-frame-pointer -fschedule-insns
+
+all: $(OBJDIR)/compressed.bin
 
 $(OBJDIR)/compressed.bin : $(OBJDIR)/compressed.elf
 	@echo "OBJCOPY "`basename $@`
@@ -37,6 +38,12 @@ $(LINKFILE): $(LDS)
 	@echo "Build LDS file"
 	@cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
 
-$(OBJDIR)/rockboxucl.o: $(OBJDIR)/rockbox.ucl
-	@echo "OBJCOPY rockbox.ucl"
-	@$(OC) -I binary -O elf32-sh -B sh --rename-section .data=.image,alloc,load,data,contents $< $@
+$(OBJDIR)/decompressor.o : $(OBJDIR)/uclimage.h
+
+$(OBJDIR)/uclimage.c : $(OBJDIR)/rockbox.ucl  $(TOOLSDIR)/ucl2src.pl
+	@echo "UCL2SRC"
+	@perl -s $(TOOLSDIR)/ucl2src.pl -p=uclimage $< $@
+
+$(OBJDIR)/uclimage.h : $(OBJDIR)/rockbox.ucl  $(TOOLSDIR)/ucl2src.pl
+	@echo "UCL2SRC"
+	@perl -s $(TOOLSDIR)/ucl2src.pl -p=uclimage $< $@
