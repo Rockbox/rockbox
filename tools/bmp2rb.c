@@ -326,7 +326,7 @@ int transform_bitmap(const struct RGBQUAD *src, long width, long height,
         debugf("error - Out of memory.\n");
         return 2;
     }
-    memset(*dest, 0, dst_w * dst_h);
+    memset(*dest, 0, dst_w * dst_h * sizeof(short));
     *dst_width = dst_w;
     *dst_height = dst_h;
 
