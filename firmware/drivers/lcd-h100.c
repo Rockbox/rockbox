@@ -1236,9 +1236,11 @@ static void scroll_thread(void)
                 }
             }
             else {
-                /* scroll forward the whole time */
-                if (s->offset >= s->width)
-                    s->offset %= s->width;
+                /* pause at beginning of line */
+                if (s->offset >= s->width) {
+                    s->offset = 0;
+                    s->start_tick = current_tick + scroll_delay * 2;
+                }
             }
 
             lastmode = drawmode;
