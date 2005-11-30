@@ -305,7 +305,7 @@ static long downsample(long **dst, long **src, int count,
     long *d[2] = { dst[0], dst[1] };
     int pos = phase >> 16;
     int i = 1, j;
-    int num_channels = src[0] == src[1] ? 1 : 2;
+    int num_channels = dsp->stereo_mode == STEREO_MONO ? 1 : 2;
     
     for (j = 0; j < num_channels; j++) {
         last_sample = r->last_sample[j];
@@ -343,7 +343,7 @@ static long upsample(long **dst, long **src, int count, struct resample_data *r)
     long *d[2] = { dst[0], dst[1] };
     int i = 0, j;
     int pos;
-    int num_channels = src[0] == src[1] ? 1 : 2;
+    int num_channels = dsp->stereo_mode == STEREO_MONO ? 1 : 2;
     
     while ((pos = phase >> 16) == 0)
     {
@@ -395,7 +395,10 @@ static inline int resample(long* src[], int count)
         }
 
         src[0] = dst[0];
-        src[1] = dst[1];
+        if (dsp->stereo_mode != STEREO_MONO)
+            src[1] = dst[1];
+        else
+            src[1] = dst[0];
     }
     else
     {
