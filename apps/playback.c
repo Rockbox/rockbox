@@ -583,7 +583,7 @@ static bool rebuffer_and_seek(int newpos)
     mutex_unlock(&mutex_bufferfill);
 
     while (cur_ti->available == 0 && cur_ti->filerem > 0) {
-        yield();
+        sleep(1);
         if (ci.stop_codec || ci.reload_codec || !queue_empty(&audio_queue))
             return false;
     }
@@ -604,6 +604,9 @@ void codec_advance_buffer_callback(long amount)
     
     if (amount > cur_ti->available + cur_ti->filerem)
         amount = cur_ti->available + cur_ti->filerem;
+
+    while (amount > cur_ti->available && filling)
+        sleep(1);
     
     if (amount > cur_ti->available) {
         if (!rebuffer_and_seek(ci.curpos + amount))
@@ -1779,6 +1782,12 @@ void audio_thread(void)
                 initiate_track_change(-1);
                 break;
                 
+            case AUDIO_FF_REWIND:
+                if (!playing)
+                    break ;
+                pcmbuf_play_stop();
+                ci.seek_time = (int)ev.data+1;
+                break ;
 
             case AUDIO_DIR_NEXT:
                 logf("audio_dir_next");
@@ -2113,10 +2122,7 @@ void audio_prev_dir(void)
 void audio_ff_rewind(int newpos)
 {
     logf("rewind: %d", newpos);
-    if (playing) {
-        pcmbuf_play_stop();
-        ci.seek_time = newpos+1;
-    }
+    queue_post(&audio_queue, AUDIO_FF_REWIND, (int *)newpos);
 }
 
 void audio_flush_and_reload_tracks(void)
