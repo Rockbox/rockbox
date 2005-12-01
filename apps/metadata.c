@@ -1181,16 +1181,12 @@ static bool get_m4a_metadata(int fd, struct mp3entry* id3)
                entry_size=(buf[i]<<24)|(buf[i+1]<<16)|(buf[i+2]<<8)|buf[i+3];
                i+=4;
 
-               /* Check the codec type - 'alac' for ALAC, 'mp4a' for AAC */
-               if ((id3->codectype==AFMT_ALAC) && 
-                   (memcmp(&buf[i],"alac",4)!=0)) {
-                 logf("Not an ALAC file\n");
-                 return false;
-               }
-
-               if ((id3->codectype==AFMT_AAC) && 
-                   (memcmp(&buf[i],"mp4a",4)!=0)) {
-                 logf("Not a MP4 AAC file\n");
+               if (memcmp(&buf[i],"alac",4)==0) {
+                  id3->codectype=AFMT_ALAC;
+               } else if (memcmp(&buf[i],"mp4a",4)==0) {
+                  id3->codectype=AFMT_AAC;
+               } else {
+                 logf("Not an ALAC or AAC file\n");
                  return false;
                }
 
@@ -1330,7 +1326,7 @@ static bool get_musepack_metadata(int fd, struct mp3entry *id3)
 }
 
 /* Simple file type probing by looking at the filename extension. */
-unsigned int probe_file_format(const char *filename)
+static unsigned int probe_file_format(const char *filename)
 {
     char *suffix;
     unsigned int i;
@@ -1364,12 +1360,11 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
     unsigned char* buf;
     unsigned long totalsamples;
     int i;
-      
-    /* We should detect the codec type here. */
+
+    /* Take our best guess at the codec type based on file extension */
     track->id3.codectype = probe_file_format(trackname);
-    
-    /* Load codec specific track tag information. */
-    
+
+    /* Load codec specific track tag information and confirm the codec type. */
     switch (track->id3.codectype) 
     {
     case AFMT_MPA_L1:
@@ -1518,7 +1513,7 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
     case AFMT_AAC:
         if (!get_m4a_metadata(fd, &(track->id3)))
         {
-//            return false;
+            return false;
         }
 
         break;
@@ -1533,10 +1528,14 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         /* TODO: read the id3v2 header if it exists */
         break;
 
-    /* If we don't know how to read the metadata, just store the filename */
     default:
+        /* If we don't know how to read the metadata, assume we can't play 
+           the file */
+        return false;
         break;
     }
+
+    /* We have successfully read the metadata from the file */
 
     lseek(fd, 0, SEEK_SET);
     strncpy(track->id3.path, trackname, sizeof(track->id3.path));
