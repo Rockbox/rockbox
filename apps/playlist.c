@@ -888,25 +888,6 @@ static int sort_playlist(struct playlist_info* playlist, bool start_current,
     return 0;
 }
 
-/* Marks the index of the track to be skipped that is "steps" away from
- * current playing track.
- */
-void playlist_skip_entry(struct playlist_info *playlist, int steps)
-{
-    int index;
-
-    if (playlist == NULL)
-        playlist = &current_playlist;
-    
-    index = rotate_index(playlist, playlist->index);
-    index += steps;
-    if (index < 0 || index >= playlist->amount)
-        return ;
-    
-    index = (index+playlist->first_index) % playlist->amount;
-    playlist->indices[index] |= PLAYLIST_SKIPPED;
-}
-
 /* Calculate how many steps we have to really step when skipping entries
  * marked as bad.
  */
@@ -953,6 +934,25 @@ static int calculate_step_count(const struct playlist_info *playlist, int steps)
     return steps;
 }
 
+/* Marks the index of the track to be skipped that is "steps" away from
+ * current playing track.
+ */
+void playlist_skip_entry(struct playlist_info *playlist, int steps)
+{
+    int index;
+
+    if (playlist == NULL)
+        playlist = &current_playlist;
+    
+    index = rotate_index(playlist, playlist->index);
+    /* We should also skip already skipped entries before the entry to be skipepd. */
+    index += calculate_step_count(playlist, steps);
+    if (index < 0 || index >= playlist->amount)
+        return ;
+    
+    index = (index+playlist->first_index) % playlist->amount;
+    playlist->indices[index] |= PLAYLIST_SKIPPED;
+}
 
 /*
  * returns the index of the track that is "steps" away from current playing

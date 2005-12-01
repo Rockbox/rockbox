@@ -1365,6 +1365,9 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
     unsigned long totalsamples;
     int i;
       
+    /* We should detect the codec type here. */
+    track->id3.codectype = probe_file_format(trackname);
+    
     /* Load codec specific track tag information. */
     
     switch (track->id3.codectype) 
