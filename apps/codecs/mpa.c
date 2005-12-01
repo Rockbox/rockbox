@@ -220,6 +220,7 @@ next_track:
             
             if (max < 0) max = 0;
             if (max < framelength) framelength = (int)max;
+            if (framelength == 0 && frame_skip == 0) break;
         }
         
         /* Check if sample rate and stereo settings changed in this frame. */
