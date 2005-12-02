@@ -301,8 +301,8 @@ void showscore(struct pong *p)
     int w;
 
     rb->snprintf(buffer, sizeof(buffer), "%d - %d", p->score[0], p->score[1]);
-    w = rb->lcd_getstringsize(buffer, NULL, NULL);
-    rb->lcd_putsxy( (LCD_WIDTH / 2) - (w / 2), 0, buffer);
+    w = rb->lcd_getstringsize((unsigned char *)buffer, NULL, NULL);
+    rb->lcd_putsxy( (LCD_WIDTH / 2) - (w / 2), 0, (unsigned char *)buffer);
 }
 
 /* this is the plugin entry point */

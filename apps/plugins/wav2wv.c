@@ -76,16 +76,16 @@ static void wvupdate (long start_tick,
             (bytes_read/2)) / bytes_read);
 
     rb->snprintf(buf, 32, "elapsed time: %d secs", (elapsed_ticks + (HZ/2)) / HZ);
-    rb->lcd_puts(0, 2, buf);
+    rb->lcd_puts(0, 2, (unsigned char *)buf);
 
     rb->snprintf(buf, 32, "progress: %d%%", progress);
-    rb->lcd_puts(0, 4, buf);
+    rb->lcd_puts(0, 4, (unsigned char *)buf);
 
     rb->snprintf(buf, 32, "realtime: %d%%  ", realtime);
-    rb->lcd_puts(0, 6, buf);
+    rb->lcd_puts(0, 6, (unsigned char *)buf);
 
     rb->snprintf(buf, 32, "compression: %d%%  ", compression);
-    rb->lcd_puts(0, 8, buf);
+    rb->lcd_puts(0, 8, (unsigned char *)buf);
 
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_update();
@@ -102,14 +102,14 @@ static int wav2wv (char *filename)
     unsigned long total_bytes_read = 0, total_bytes_written = 0;
     unsigned long total_samples, samples_remaining;
     long *input_buffer = (long *) audiobuf;
-    unsigned char *output_buffer = audiobuf + 0x100000;
+    unsigned char *output_buffer = (unsigned char *)(audiobuf + 0x100000);
     char *extension, save_a;
     WavpackConfig config;
     WavpackContext *wpc;
     long start_tick;
 
     rb->lcd_clear_display();
-    rb->lcd_puts_scroll(0, 0, filename);
+    rb->lcd_puts_scroll(0, 0, (unsigned char *)filename);
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_update();
 #endif

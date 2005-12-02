@@ -103,7 +103,7 @@ static int chessclock_set_int(char* string,
 #define FLAGS_SET_INT_SECONDS 1
 
 static char * show_time(int secs);
-static int simple_menu(int nr, char **strarr);
+static int simple_menu(int nr, unsigned char **strarr);
 
 static bool pause;
 
@@ -215,7 +215,7 @@ static void show_pause_mode(bool enabled)
     static const char pause_icon[] = {0x00,0x7f,0x7f,0x00,0x7f,0x7f,0x00};
     
     if (enabled)
-        rb->lcd_mono_bitmap(pause_icon, 52, 0, 7, 8);
+        rb->lcd_mono_bitmap((unsigned char *)pause_icon, 52, 0, 7, 8);
     else
     {
         rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
@@ -253,7 +253,7 @@ static int run_timer(int nr)
         round_time=true;
     }
     rb->snprintf(player_info, sizeof(player_info), "Player %d", nr+1);
-    rb->lcd_puts(0, FIRST_LINE, player_info);
+    rb->lcd_puts(0, FIRST_LINE, (unsigned char *)player_info);
     last_tick=*rb->current_tick;
 
     while (!done) {
@@ -261,9 +261,9 @@ static int run_timer(int nr)
         long now;
         if (ticks>max_ticks) {
             if (round_time) 
-                rb->lcd_puts(0, FIRST_LINE+1, "ROUND UP!");
+                rb->lcd_puts(0, FIRST_LINE+1, (unsigned char *)"ROUND UP!");
             else
-                rb->lcd_puts(0, FIRST_LINE+1, "TIME OUT!");
+                rb->lcd_puts(0, FIRST_LINE+1, (unsigned char *)"TIME OUT!");
             rb->backlight_on();
         } else {
             /*
@@ -273,7 +273,7 @@ static int run_timer(int nr)
                 rb->lcd_puts(0, FIRST_LINE, player_info);
             }
             */
-            rb->lcd_puts(0, FIRST_LINE, player_info);
+            rb->lcd_puts(0, FIRST_LINE, (unsigned char *)player_info);
             now=*rb->current_tick;
             if (!pause) {
                 ticks+=now-last_tick;
@@ -291,9 +291,10 @@ static int run_timer(int nr)
                            show_time((timer_holder[nr].total_time*HZ-
                                       timer_holder[nr].used_time-
                                       ticks+HZ-1)/HZ));
-                rb->lcd_puts(0, FIRST_LINE+1, buf);
+                rb->lcd_puts(0, FIRST_LINE+1, (unsigned char *)buf);
             } else {
-                rb->lcd_puts(0, FIRST_LINE+1, show_time((max_ticks-ticks+HZ-1)/HZ));
+                rb->lcd_puts(0, FIRST_LINE+1,
+                             (unsigned char *)show_time((max_ticks-ticks+HZ-1)/HZ));
             }
         }
 #ifdef HAVE_LCD_BITMAP
@@ -326,7 +327,7 @@ static int run_timer(int nr)
                 int ret;
                 char *menu[]={"Delete player", "Restart round",
                               "Set round time", "Set total time"};
-                ret=simple_menu(4, menu);
+                ret=simple_menu(4, (unsigned char **)menu);
                 if (ret==-1) {
                     retval = 3;
                     done=true;
@@ -401,17 +402,17 @@ static int run_timer(int nr)
 }
 
 static int chessclock_set_int(char* string, 
-             int* variable,
-             int step,
-             int min,
-             int max,
-             int flags)
+                              int* variable,
+                              int step,
+                              int min,
+                              int max,
+                              int flags)
 {
     bool done = false;
     int button;
 
     rb->lcd_clear_display();
-    rb->lcd_puts_scroll(0, FIRST_LINE, string);
+    rb->lcd_puts_scroll(0, FIRST_LINE, (unsigned char *)string);
 
     while (!done) {
         char str[32];
@@ -419,7 +420,7 @@ static int chessclock_set_int(char* string,
             rb->snprintf(str, sizeof str,"%s (m:s)", show_time(*variable));
         else
             rb->snprintf(str, sizeof str,"%d", *variable);
-        rb->lcd_puts(0, FIRST_LINE+1, str);
+        rb->lcd_puts(0, FIRST_LINE+1, (unsigned char *)str);
 #ifdef HAVE_LCD_BITMAP
         rb->lcd_update();
 #endif
@@ -477,7 +478,7 @@ static char * show_time(int seconds)
 /* -1 = USB
    -2 = cancel
 */
-static int simple_menu(int nr, char **strarr)
+static int simple_menu(int nr, unsigned char **strarr)
 {
     int show=0;
     int button;

@@ -47,8 +47,8 @@ void doevents()
 
 /* convenience macro for printing loading state */
 #define PUTS(str) do { \
-  rb->lcd_putsxy(1, y, str); \
-  rb->lcd_getstringsize(str, &w, &h); \
+  rb->lcd_putsxy(1, y, (unsigned char *)str); \
+  rb->lcd_getstringsize((unsigned char *)str, &w, &h); \
   y += h + 1; \
 } while (0)
 

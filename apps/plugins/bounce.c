@@ -325,7 +325,7 @@ static int scrollit(void)
 #if LCD_DEPTH > 1
             rb->lcd_set_foreground(face_colors[ letter % 3] );
 #endif
-            rb->lcd_mono_bitmap((char *)char_gen_12x16[letter-0x20],
+            rb->lcd_mono_bitmap(char_gen_12x16[letter-0x20],
                                 xx, table[yy&(TABLE_SIZE-1)], 11, 16);
             yy += YADD;
             xx+= DRAW_WIDTH/LETTERS_ON_SCREEN;
@@ -407,13 +407,13 @@ static int loopit(void)
             }
             rb->snprintf(buffer, 30, "%s: %d",
                          values[show].what, values[show].num);
-            rb->lcd_putsxy(0, LCD_HEIGHT -  8, buffer);
+            rb->lcd_putsxy(0, LCD_HEIGHT -  8, (unsigned char *)buffer);
             timeout--;
         }
         for(i=0, yy=y, xx=x;
             i<rocklen;
             i++, yy+=values[NUM_YDIST].num, xx+=values[NUM_XDIST].num)
-            rb->lcd_mono_bitmap((char *)char_gen_12x16[rock[i]-0x20],
+            rb->lcd_mono_bitmap(char_gen_12x16[rock[i]-0x20],
                                 xtable[xx&(TABLE_SIZE-1)],
                                 table[yy&(TABLE_SIZE-1)], 11, 16);
         rb->lcd_update();
@@ -436,7 +436,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     len = rb->strlen(SS_TITLE);
     rb->lcd_setfont(FONT_SYSFIXED);
-    rb->lcd_getstringsize(SS_TITLE,&w, &h);
+    rb->lcd_getstringsize((unsigned char *)SS_TITLE, &w, &h);
 
     /* Get horizontel centering for text */
     len *= w;
@@ -451,10 +451,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         h /= 2;
     
     rb->lcd_clear_display();
-    rb->lcd_putsxy(LCD_WIDTH/2-len, (LCD_HEIGHT/2)-h, SS_TITLE);
+    rb->lcd_putsxy(LCD_WIDTH/2-len, (LCD_HEIGHT/2)-h, (unsigned char *)SS_TITLE);
     
     len = 1;
-    rb->lcd_getstringsize(off, &w, &h);
+    rb->lcd_getstringsize((unsigned char *)off, &w, &h);
 
     /* Get horizontel centering for text */
     len *= w;
@@ -468,7 +468,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     else
         h /= 2;
     
-    rb->lcd_putsxy(LCD_WIDTH/2-len, LCD_HEIGHT-(2*h), off);
+    rb->lcd_putsxy(LCD_WIDTH/2-len, LCD_HEIGHT-(2*h), (unsigned char *)off);
     rb->lcd_update();
     rb->sleep(HZ);
     rb->lcd_set_drawmode(DRMODE_FG);

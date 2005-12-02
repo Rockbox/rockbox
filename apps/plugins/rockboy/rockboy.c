@@ -106,7 +106,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }
     
     audio_bufferbase = audio_bufferpointer
-        = rb->plugin_get_audio_buffer(&audio_buffer_free);
+        = rb->plugin_get_audio_buffer((int *)&audio_buffer_free);
 #if MEM <= 8 && !defined(SIMULATOR)
     /* loaded as an overlay, protect from overwriting ourselves */
     if ((unsigned)(ovl_start_addr - (unsigned char *)audio_bufferbase)

@@ -156,7 +156,7 @@ static void draw_spot(int p, int x, int y)
         rb->lcd_fillrect(x+1, y+1, 14, 14);
         rb->lcd_set_drawmode(DRMODE_SOLID);
         rb->snprintf(s, sizeof(s), "%d", p);
-        rb->lcd_putsxy(x+2, y+4, s);
+        rb->lcd_putsxy(x+2, y+4, (unsigned char *)s);
     }
 }
     
@@ -178,7 +178,7 @@ static void move_spot(int x, int y)
     hole -= (x+5*y);
     moves++;
     rb->snprintf(s, sizeof(s), "%d", moves);
-    rb->lcd_putsxy(85, 20, s);
+    rb->lcd_putsxy(85, 20, (unsigned char *)s);
 
     for (i=4; i<=16; i+=4) {
         draw_spot(20, (hole%5)*16, (hole/5)*16);
@@ -195,9 +195,9 @@ static void puzzle_init(void)
     moves = 0;
     rb->lcd_clear_display();
     rb->lcd_drawrect(80, 0, 32, 64);
-    rb->lcd_putsxy(81, 10, "Moves");
+    rb->lcd_putsxy(81, 10, (unsigned char *)"Moves");
     rb->snprintf(s, sizeof(s), "%d", moves);
-    rb->lcd_putsxy(85, 20, s);
+    rb->lcd_putsxy(85, 20, (unsigned char *)s);
     
     /* shuffle spots */
     for (i=19; i>=0; i--) {
@@ -324,11 +324,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb = api;
     
     /* print title */
-    rb->lcd_getstringsize("Sliding Puzzle", &w, &h);
+    rb->lcd_getstringsize((unsigned char *)"Sliding Puzzle", &w, &h);
     w = (w+1)/2;
     h = (h+1)/2;
     rb->lcd_clear_display();
-    rb->lcd_putsxy(LCD_WIDTH/2-w, (LCD_HEIGHT/2)-h, "Sliding Puzzle");
+    rb->lcd_putsxy(LCD_WIDTH/2-w, (LCD_HEIGHT/2)-h, (unsigned char *)"Sliding Puzzle");
     rb->lcd_update();
     rb->sleep(HZ);
 
@@ -349,7 +349,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     
     rb->lcd_clear_display();
     rb->lcd_drawrect(80, 0, 32, 64);
-    rb->lcd_putsxy(81, 10, "Moves");
+    rb->lcd_putsxy(81, 10, (unsigned char *)"Moves");
     for (i=0; i<20; i++) {
         spots[i]=(i+1);
         draw_spot(spots[i], (i%5)*16, (i/5)*16);

@@ -132,18 +132,19 @@ void roll_credits(void)
 
     rb->lcd_setfont(FONT_UI);
 
-    rb->lcd_getstringsize("A", &width, &height);
+    rb->lcd_getstringsize((unsigned char *)"A", &width, &height);
 
     while(1) {
         rb->lcd_clear_display();
         for ( i=0; i <= (LCD_HEIGHT-y)/height; i++ )
-            rb->lcd_putsxy(0, i*height+y, line+i<numnames?credits[line+i]:"");
+            rb->lcd_putsxy(0, i*height+y,
+                           (unsigned char *)(line+i<numnames?credits[line+i]:""));
         rb->snprintf(buffer, sizeof(buffer), " [Credits] %2d/%2d  ",
                  line+1, numnames);
         rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
         rb->lcd_fillrect(0, 0, LCD_WIDTH, height);
         rb->lcd_set_drawmode(DRMODE_SOLID);
-        rb->lcd_putsxy(0, 0, buffer);
+        rb->lcd_putsxy(0, 0, (unsigned char *)buffer);
         rb->lcd_update();
 
         if (rb->button_get_w_tmo(HZ/20) & BUTTON_REL)
