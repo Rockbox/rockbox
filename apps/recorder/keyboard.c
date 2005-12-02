@@ -31,6 +31,7 @@
 #include "settings.h"
 #include "misc.h"
 #include "buttonbar.h"
+#include "logf.h"
 
 #define KEYBOARD_MARGIN 3
 
@@ -59,6 +60,7 @@
 #define KBD_RIGHT BUTTON_RIGHT
 #define KBD_UP BUTTON_UP
 #define KBD_DOWN BUTTON_DOWN
+#define HAVE_MORSE_INPUT
 
 #elif CONFIG_KEYPAD == RECORDER_PAD
 #define KBD_CURSOR_RIGHT (BUTTON_ON | BUTTON_RIGHT)
@@ -145,6 +147,19 @@ static const char * const kbdpages[KEYBOARD_PAGES][KEYBOARD_LINES] = {
 
 #endif
 
+#ifdef HAVE_MORSE_INPUT
+/* FIXME: We should put this to a configuration file. */
+static const char *morse_alphabets = 
+    "abcdefghijklmnopqrstuwvxyzåäö1234567890,";
+static const unsigned char morse_codes[] = {
+    0x05,0x18,0x1a,0x0c,0x02,0x12,0x0e,0x10,0x04,0x17,0x0d,0x14,0x07,
+    0x06,0x0f,0x16,0x1d,0x0a,0x08,0x03,0x09,0x11,0x0b,0x19,0x1b,0x1c,
+    0x2d,0x15,0x1e,0x2f,0x27,0x23,0x21,0x20,0x30,0x38,0x3c,0x3f,0x3f,
+    0x73 };
+
+static bool morse_mode = false;
+#endif
+
 /* helper function to spell a char if voice UI is enabled */
 static void kbd_spellchar(char c)
 {
@@ -160,9 +175,7 @@ static void kbd_spellchar(char c)
 int kbd_input(char* text, int buflen)
 {
     bool done = false; 
-#if KEYBOARD_PAGES > 1
     int page = 0;
-#endif
     int font_w = 0, font_h = 0, i;
     int x = 0, y = 0;
     int main_x, main_y, max_chars;
@@ -171,6 +184,12 @@ int kbd_input(char* text, int buflen)
     int editpos, curpos, leftpos;
     bool redraw = true;
     const char * const *line;
+#ifdef HAVE_MORSE_INPUT
+    bool morse_reading = false;
+    unsigned char morse_code = 0;
+    int morse_tick = 0, morse_len, j;
+    char buf[2];
+#endif
 #ifdef KBD_MODES
     bool line_edit = false;
 #endif
@@ -198,22 +217,59 @@ int kbd_input(char* text, int buflen)
     line = kbdpages[0];
 
     if (global_settings.talk_menu) /* voice UI? */
-        talk_spell(text, true); /* spell initial text */ 
+        talk_spell(text, true); /* spell initial text */
 
     while(!done)
     {
         len = strlen(text);
-            
-        if(redraw)
+
+        if (redraw)
         {
             lcd_clear_display();
             
             lcd_setfont(FONT_SYSFIXED);
 
-            /* draw page */
-            for (i=0; i < KEYBOARD_LINES; i++)
-                lcd_putsxy(0, 8+i * font_h, line[i]);
-            
+#ifdef HAVE_MORSE_INPUT
+            if (morse_mode)
+            {
+                x = 0;
+                y = font_h;
+                buf[1] = '\0';
+                /* Draw morse code table with code descriptions. */
+                for (i = 0; morse_alphabets[i] != '\0'; i++)
+                {
+                    buf[0] = morse_alphabets[i];
+                    lcd_putsxy(x, y, buf);
+
+                    for (j = 0; (morse_codes[i] >> j) > 0x01; j++) ;
+                    morse_len = j;
+
+                    x += font_w + 3;
+                    for (j = 0; j < morse_len; j++)
+                    {
+                        if ((morse_codes[i] >> (morse_len-j-1)) & 0x01)
+                            lcd_fillrect(x + j*4, y + 2, 3, 4);
+                        else
+                            lcd_fillrect(x + j*4, y + 3, 1, 2);
+                    }
+                    
+                    x += font_w * 5 - 3;
+                    if (x >= LCD_WIDTH - (font_w*6))
+                    {
+                        x = 0;
+                        y += font_h;
+                    }
+                }
+            }
+            else
+#endif
+            {
+                /* draw page */
+                for (i=0; i < KEYBOARD_LINES; i++)
+                    lcd_putsxy(0, 8+i * font_h, line[i]);
+                
+            }
+
             /* separator */
             lcd_hline(0, LCD_WIDTH - 1, main_y - KEYBOARD_MARGIN);
             
@@ -229,11 +285,11 @@ int kbd_input(char* text, int buflen)
                 lcd_putsxy(0, main_y, "<");
             if (len - leftpos > max_chars)
                 lcd_putsxy(LCD_WIDTH - font_w, main_y, ">");
-
+            
             /* cursor */
             i = (curpos + 1) * font_w;
             lcd_vline(i, main_y, main_y + font_h);
-
+            
 #ifdef HAS_BUTTONBAR
             /* draw the status bar */
             gui_buttonbar_set(&buttonbar, "Shift", "OK", "Del");
@@ -258,6 +314,7 @@ int kbd_input(char* text, int buflen)
         redraw = true;
 
         button = button_get_w_tmo(HZ/2);
+        
         switch ( button ) {
 
             case KBD_ABORT:
@@ -265,10 +322,26 @@ int kbd_input(char* text, int buflen)
                 return -1;
                 break;
 
-#if defined(KBD_PAGE_FLIP) && KEYBOARD_PAGES > 1
-            case KBD_PAGE_FLIP:    
+#if defined(KBD_PAGE_FLIP)
+            case KBD_PAGE_FLIP:
+#ifdef HAVE_MORSE_INPUT
+                if (morse_mode)
+                {
+                    main_y = (KEYBOARD_LINES + 1) * font_h + (2*KEYBOARD_MARGIN);
+                    morse_mode = false;
+                }
+                else
+#endif
                 if (++page == KEYBOARD_PAGES)
+                {
                     page = 0;
+#ifdef HAVE_MORSE_INPUT
+                    main_y = LCD_HEIGHT - font_h;
+                    morse_mode = true;
+                    /* FIXME: We should talk something like Morse mode.. */
+                    break ;
+#endif
+                }
                 line = kbdpages[page];
                 kbd_spellchar(line[y][x]);
                 break;
@@ -276,6 +349,10 @@ int kbd_input(char* text, int buflen)
 
             case KBD_RIGHT:
             case KBD_RIGHT | BUTTON_REPEAT:
+#ifdef HAVE_MORSE_INPUT
+                if (morse_mode)
+                    break;
+#endif
 #ifdef KBD_MODES
                 if (line_edit) /* right doubles as cursor_right in line_edit */
                 {
@@ -306,6 +383,10 @@ int kbd_input(char* text, int buflen)
 
             case KBD_LEFT:
             case KBD_LEFT | BUTTON_REPEAT:
+#ifdef HAVE_MORSE_INPUT
+                if (morse_mode)
+                    break;
+#endif
 #ifdef KBD_MODES
                 if (line_edit) /* left doubles as cursor_left in line_edit */
                 {
@@ -336,6 +417,10 @@ int kbd_input(char* text, int buflen)
 
             case KBD_DOWN:
             case KBD_DOWN | BUTTON_REPEAT:
+#ifdef HAVE_MORSE_INPUT
+                if (morse_mode)
+                    break;
+#endif
 #ifdef KBD_MODES
                 if (line_edit)
                 {
@@ -360,6 +445,10 @@ int kbd_input(char* text, int buflen)
 
             case KBD_UP:
             case KBD_UP | BUTTON_REPEAT:
+#ifdef HAVE_MORSE_INPUT
+                if (morse_mode)
+                    break;
+#endif
 #ifdef KBD_MODES
                 if (line_edit)
                 {
@@ -391,7 +480,32 @@ int kbd_input(char* text, int buflen)
                 done = true;
                 break;
 
+#ifdef HAVE_MORSE_INPUT
+            case KBD_SELECT | BUTTON_REL:
+                if (morse_mode && morse_reading)
+                {
+                    morse_code <<= 1;
+                    if ((current_tick - morse_tick) > HZ/5)
+                        morse_code |= 0x01;
+                }
+                
+                break;
+#endif
+                
             case KBD_SELECT:
+#ifdef HAVE_MORSE_INPUT
+                if (morse_mode)
+                {
+                    morse_tick = current_tick;
+                    if (!morse_reading)
+                    {
+                        morse_reading = true;
+                        morse_code = 1;
+                    }
+                    break;
+                }
+#endif
+                
                 /* inserts the selected char */
 #ifdef KBD_SELECT_PRE
                 if (lastbutton != KBD_SELECT_PRE)
@@ -460,6 +574,38 @@ int kbd_input(char* text, int buflen)
             case BUTTON_NONE:
                 gui_syncstatusbar_draw(&statusbars, false);
                 redraw = false;
+#ifdef HAVE_MORSE_INPUT
+                if (morse_reading)
+                {
+                    logf("Morse: 0x%02x", morse_code);
+                    morse_reading = false;
+
+                    for (j = 0; morse_alphabets[j] != '\0'; j++)
+                    {
+                        if (morse_codes[j] == morse_code)
+                            break ;
+                    }
+
+                    if (morse_alphabets[j] == '\0')
+                    {
+                        logf("Morse code not found");
+                        break ;
+                    }
+                    
+                    if (len + 1 < buflen)
+                    {
+                        for (i = len ; i > editpos; i--)
+                            text[i] = text[i-1];
+                        text[len+1] = 0;
+                        text[editpos] = morse_alphabets[j];
+                        editpos++;
+                    }
+                    if (global_settings.talk_menu) /* voice UI? */
+                        talk_spell(text, false);   /* speak revised text */
+                    redraw = true;
+                }
+#endif
+
                 break;
 
             default:
