@@ -473,6 +473,7 @@ static void pcmrec_callback(bool flush)
             read_index++;
             if (read_index >= num_chunks)
                 read_index = 0;
+            yield();
         }
         
         logf("done");
