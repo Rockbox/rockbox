@@ -9,11 +9,11 @@
 CFLAGS := -O -ansi -g
 LDFLAGS := -g
 
-TARGETS := scramble descramble iaudio sh2d bmp2rb rdf2binary convbdf	\
+CLEANALL := scramble descramble iaudio sh2d bmp2rb rdf2binary convbdf	\
  generate_rocklatin mkboot ipod_fw uclpack
 
-all: $(TARGETS)
-	@echo "tools done"
+all:
+	@echo "Run make in your build directory!"
 
 scramble: scramble.o iriver.o
 descramble: descramble.o iriver.o
@@ -48,6 +48,6 @@ uclpack:
 	$(MAKE) -C ucl
 
 clean:
-	rm -f $(TARGETS) $(shell for f in $(TARGETS) ; do echo $$f.exe $$f.o $$f.obj ; done) *.ajf *~
+	rm -f $(CLEANALL) $(shell for f in $(CLEANALL) ; do echo $$f.exe $$f.o $$f.obj ; done) *.ajf *~
 	$(MAKE) -C ucl clean
 

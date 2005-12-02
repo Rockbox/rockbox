@@ -413,6 +413,14 @@ appsdir='\$(ROOTDIR)/apps'
 
   getit=`input`;
 
+  # Set of tools built for all target platforms:
+  toolset="rdf2binary"
+
+  # Toolsets for some target families:
+  archosbitmaptools="$toolset scramble descramble sh2d uclpack bmp2rb convbdf"
+  iriverbitmaptools="$toolset scramble descramble mkboot bmp2rb convbdf"
+  ipodbitmaptools="$toolset ipod_fw bmp2rb convbdf"
+
   case $getit in
 
    1)
@@ -426,6 +434,10 @@ appsdir='\$(ROOTDIR)/apps'
     flash="$pwd/rockbox.ucl"
     plugins="yes"
     codecs=""
+
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$toolset scramble descramble sh2d generate_rocklatin uclpack"
     ;;
 
    2)
@@ -439,6 +451,9 @@ appsdir='\$(ROOTDIR)/apps'
     flash="$pwd/rockbox.ucl"
     plugins="yes"
     codecs=""
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$archosbitmaptools
     ;;
 
    3)
@@ -452,6 +467,9 @@ appsdir='\$(ROOTDIR)/apps'
     flash="$pwd/rockbox.ucl"
     plugins="yes"
     codecs=""
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$archosbitmaptools
     ;;
 
    4)
@@ -465,6 +483,9 @@ appsdir='\$(ROOTDIR)/apps'
     flash="$pwd/rockbox.ucl"
     plugins="yes"
     codecs=""
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$archosbitmaptools
     ;;
 
    5)
@@ -479,6 +500,9 @@ appsdir='\$(ROOTDIR)/apps'
     flash=""
     plugins="" # disabled for now, enable later on
     codecs="libmad"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$toolset bmp2rb convbdf"
     ;;
 
    6)
@@ -493,6 +517,9 @@ appsdir='\$(ROOTDIR)/apps'
     flash=""
     plugins="" # disabled for now, enable later on
     codecs="libmad"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$toolset bmp2rb convbdf"
     ;;
 
    7)
@@ -506,6 +533,9 @@ appsdir='\$(ROOTDIR)/apps'
     flash="$pwd/rockbox.ucl"
     plugins="yes"
     codecs=""
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$archosbitmaptools
     ;;
 
    8)
@@ -519,6 +549,7 @@ appsdir='\$(ROOTDIR)/apps'
     flash="$pwd/rockbox.ucl"
     plugins="yes"
     codecs=""
+    toolset=$archosbitmaptools
     ;;
 
    9)
@@ -533,6 +564,9 @@ appsdir='\$(ROOTDIR)/apps'
     flash=""
     plugins="yes"
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$iriverbitmaptools
     ;;
 
    10)
@@ -547,6 +581,9 @@ appsdir='\$(ROOTDIR)/apps'
     flash=""
     plugins="yes"
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$iriverbitmaptools
     ;;
 
    11)
@@ -561,6 +598,9 @@ appsdir='\$(ROOTDIR)/apps'
     flash=""
     plugins="yes"
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$iriverbitmaptools
     ;;
 
    12)
@@ -575,6 +615,9 @@ appsdir='\$(ROOTDIR)/apps'
     flash=""
     plugins="yes"
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$toolset iaudio bmp2rb convbdf"
     ;;
 
    13)
@@ -589,6 +632,9 @@ appsdir='\$(ROOTDIR)/apps'
     flash=""
     plugins="yes"
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$ipodbitmaptools
     ;;
 
    14)
@@ -603,6 +649,9 @@ appsdir='\$(ROOTDIR)/apps'
     flash=""
     plugins="yes"
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$ipodbitmaptools
     ;;
 
    *)
@@ -834,6 +883,7 @@ sed > Makefile \
  -e "s,@GCCNUM@,${gccnum},g" \
  -e "s,@UNAME@,${uname},g" \
  -e "s,@ENDIAN@,${defendian},g" \
+ -e "s,@TOOLSET@,${toolset},g" \
  -e "${simmagic}" \
  -e "${simtools}" \
 <<EOF
@@ -883,7 +933,7 @@ export UNAME=@UNAME@
 # Do not print "Entering directory ..."
 MAKEFLAGS += --no-print-directory
 
-.PHONY: all clean tags zip
+.PHONY: all clean tags zip tools
 
 all: #TOOLSDEP#
 #SIMUL#
@@ -893,10 +943,11 @@ all: #TOOLSDEP#
 clean:
 	@\$(MAKE) -C \$(FIRMDIR) clean OBJDIR=\$(BUILDDIR)/firmware
 	@\$(MAKE) -C \$(APPSDIR) clean OBJDIR=\$(BUILDDIR)/@APPS@
+	@\$(MAKE) -C \$(TOOLSDIR) clean
 	@rm -rf rockbox.zip TAGS @APPS@ firmware comsim sim lang.h
 
 tools:
-	\$(MAKE) -C \$(TOOLSDIR) CC=\$(HOSTCC)
+	\$(MAKE) -C \$(TOOLSDIR) CC=\$(HOSTCC) @TOOLSET@
 
 tags:
 	@rm -f TAGS
