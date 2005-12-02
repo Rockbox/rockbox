@@ -342,12 +342,6 @@ void audio_resume_recording(void)
 
 void pcm_rec_get_peaks(int *left, int *right)
 {
-    if (!is_recording)
-    {
-        peak_left = 0;
-        peak_right = 0;
-    }
-    
     if (left)
         *left = peak_left;
     if (right)
@@ -412,9 +406,6 @@ static void pcmrec_callback(bool flush)
     unsigned short *ptr;    
     int i, j, w;
     
-    if ((!is_recording || is_paused) && !flush)
-        return;
-
     w = write_index;
     
     num_new = w - read2_index;
@@ -428,6 +419,12 @@ static void pcmrec_callback(bool flush)
         if (j < 0)
             j += num_chunks;
         pcmrec_find_peaks(j);
+    }
+
+    if ((!is_recording || is_paused) && !flush)
+    {
+        read_index = write_index;
+        return;
     }
 
     for (i=0; i<num_new; i++)
@@ -531,7 +528,7 @@ void DMA1(void)
         if (write_index >= num_chunks)
             write_index = 0;
 
-        if (is_stopping || !is_recording)
+        if (is_stopping)
         {
             DCR1 = 0;   /* Stop DMA transfer */
             is_stopping = false;
@@ -644,8 +641,6 @@ static void pcmrec_start(void)
     is_paused = false;
     is_recording = true;
     
-    pcmrec_dma_start();
-
     record_done = true;
 }
 
@@ -679,6 +674,9 @@ static void pcmrec_stop(void)
     close_wave();
 
     stop_done = true;
+    
+    /* Finally start dma again for peakmeters and pre-recoding to work. */
+    pcmrec_dma_start();
     
     logf("pcmrec_stop done");
 }
@@ -828,6 +826,8 @@ static void pcmrec_init(void)
     DMAROUTE = (DMAROUTE & 0xffff00ff) | DMA1_REQ_AUDIO_2;
     ICR7 = 0x1c;                    /* Enable interrupt at level 7, priority 0 */
     IMR &= ~(1<<15);                /* bit 15 is DMA1 */
+
+    pcmrec_dma_start();
 
     init_done = 1;
 }
