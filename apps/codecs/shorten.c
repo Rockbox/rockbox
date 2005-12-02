@@ -85,7 +85,7 @@ next_track:
 
     /* Read the shorten & wave headers */
     buf = ci->request_buffer(&bytesleft, MAX_FRAMESIZE);
-    res = shorten_init(&sc, buf, bytesleft);
+    res = shorten_init(&sc, (unsigned char *)buf, bytesleft);
     if (res < 0) {
         LOGF("shorten_init error: %d\n", res);
         return CODEC_ERROR;
@@ -139,10 +139,10 @@ seek_start:
         ci->yield();
         if (cur_chan == 0) {
             res = shorten_decode_frame(&sc, decoded0 + sc.nwrap, offset0,
-                                       buf, bytesleft);
+                                       (unsigned char *)buf, bytesleft);
         } else {
             res = shorten_decode_frame(&sc, decoded1 + sc.nwrap, offset1,
-                                       buf, bytesleft);
+                                       (unsigned char *)buf, bytesleft);
         }
         cur_chan++;
 

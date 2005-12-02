@@ -63,7 +63,7 @@
 static long _get_data(OggVorbis_File *vf){
   errno=0;
   if(vf->datasource){
-    char *buffer=ogg_sync_bufferin(vf->oy,CHUNKSIZE);
+    char *buffer=(char *)ogg_sync_bufferin(vf->oy,CHUNKSIZE);
     long bytes=(vf->callbacks.read_func)(buffer,1,CHUNKSIZE,vf->datasource);
     if(bytes>0)ogg_sync_wrote(vf->oy,bytes);
     if(bytes==0 && errno)return(-1);
@@ -682,7 +682,7 @@ static int _ov_open1(void *f,OggVorbis_File *vf,char *initial,
      previously read data (as we may be reading from a non-seekable
      stream) */
   if(initial){
-    char *buffer=ogg_sync_bufferin(vf->oy,ibytes);
+    char *buffer=(char *)ogg_sync_bufferin(vf->oy,ibytes);
     memcpy(buffer,initial,ibytes);
     ogg_sync_wrote(vf->oy,ibytes);
   }

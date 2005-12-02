@@ -79,7 +79,7 @@ int init_wv_bitstream (WavpackContext *wpc, WavpackMetadata *wpmd)
     WavpackStream *wps = &wpc->stream;
 
     if (wpmd->data)
-        bs_open_read (&wps->wvbits, wpmd->data, (char *) wpmd->data + wpmd->byte_length, NULL, 0);
+        bs_open_read (&wps->wvbits, wpmd->data, (unsigned char *) wpmd->data + wpmd->byte_length, NULL, 0);
     else if (wpmd->byte_length)
         bs_open_read (&wps->wvbits, wpc->read_buffer, wpc->read_buffer + sizeof (wpc->read_buffer),
             wpc->infile, wpmd->byte_length + (wpmd->byte_length & 1));

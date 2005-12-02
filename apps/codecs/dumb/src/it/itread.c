@@ -669,7 +669,7 @@ static int it_read_pattern(IT_PATTERN *pattern, DUMBFILE *f, unsigned char *buff
 		return -1;
 
 	/* Read in the pattern data. */
-	dumbfile_getnc(buffer, buflen, f);
+	dumbfile_getnc((char *)buffer, buflen, f);
 
 	if (dumbfile_error(f))
 		return -1;
@@ -875,8 +875,8 @@ static sigdata_t *it_load_sigdata(DUMBFILE *f)
 	/* Skip Pitch Wheel Depth, Message Length, Message Offset and Reserved. */
 	dumbfile_skip(f, 11);
 
-	dumbfile_getnc(sigdata->channel_pan, DUMB_IT_N_CHANNELS, f);
-	dumbfile_getnc(sigdata->channel_volume, DUMB_IT_N_CHANNELS, f);
+	dumbfile_getnc((char *)sigdata->channel_pan, DUMB_IT_N_CHANNELS, f);
+	dumbfile_getnc((char *)sigdata->channel_volume, DUMB_IT_N_CHANNELS, f);
 
 	if (dumbfile_error(f) || sigdata->n_orders <= 0 || sigdata->n_instruments > 256 || sigdata->n_samples > 256 || sigdata->n_patterns > 256) {
 		_dumb_it_unload_sigdata(sigdata);
@@ -917,7 +917,7 @@ static sigdata_t *it_load_sigdata(DUMBFILE *f)
 			sigdata->pattern[n].entry = NULL;
 	}
 
-	dumbfile_getnc(sigdata->order, sigdata->n_orders, f);
+	dumbfile_getnc((char *)sigdata->order, sigdata->n_orders, f);
 	sigdata->restart_position = 0;
 
 	component = malloc(768 * sizeof(*component));
@@ -1000,7 +1000,7 @@ static sigdata_t *it_load_sigdata(DUMBFILE *f)
 		for (i = 0; i < 16; i++) {
 			unsigned char len = 0;
 			int j, leftdigit = -1;
-			if (dumbfile_getnc(mididata, 32, f) < 32) {
+			if (dumbfile_getnc((char *)mididata, 32, f) < 32) {
 				free(component);
 				_dumb_it_unload_sigdata(sigdata);
 				return NULL;
@@ -1032,7 +1032,7 @@ static sigdata_t *it_load_sigdata(DUMBFILE *f)
 		for (i = 0; i < 128; i++) {
 			unsigned char len = 0;
 			int j, leftdigit = -1;
-			dumbfile_getnc(mididata, 32, f);
+			dumbfile_getnc((char *)mididata, 32, f);
 			for (j = 0; j < 32; j++) {
 				if (leftdigit >= 0) {
 					if (mididata[j] == 0) {

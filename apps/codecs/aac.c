@@ -124,9 +124,9 @@ enum codec_status codec_start(struct codec_api* api)
 
         /* Deal with any pending seek requests */
         if (ci->seek_time) {
-            if (alac_seek(&demux_res,&input_stream,
+            if (alac_seek(&demux_res, &input_stream,
                           ((ci->seek_time-1)/10) * (ci->id3->frequency/100),
-                          &samplesdone, &i)) {
+                          &samplesdone, (int *)&i)) {
                 elapsedtime=(samplesdone*10)/(ci->id3->frequency/100);
                 ci->set_elapsed(elapsedtime);
             }

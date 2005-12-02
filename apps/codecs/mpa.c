@@ -167,7 +167,7 @@ next_track:
             inputbuffer = ci->request_buffer(&size, INPUT_CHUNK_SIZE);
             if (size == 0 || inputbuffer == NULL)
                 break;
-            mad_stream_buffer(&stream, inputbuffer, size);
+            mad_stream_buffer(&stream, (unsigned char *)inputbuffer, size);
         }
     
         if (mad_frame_decode(&frame, &stream)) {

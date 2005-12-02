@@ -231,8 +231,8 @@ static int it_s3m_read_pattern(IT_PATTERN *pattern, DUMBFILE *f, unsigned char *
 		b >>= 5;
 		pattern->n_entries++;
 		if (b) {
-			if (buflen + used[b] >= 65536) return -1;
-			dumbfile_getnc(buffer + buflen, used[b], f);
+			if (buflen + (signed char)used[b] >= 65536) return -1;
+			dumbfile_getnc((char *)buffer + buflen, used[b], f);
 			buflen += used[b];
 		} else {
 			/* End of row */
@@ -494,7 +494,7 @@ static DUMB_IT_SIGDATA *it_s3m_load_sigdata(DUMBFILE *f)
 	}
 
 	/* Orders, byte each, length = sigdata->n_orders (should be even) */
-	dumbfile_getnc(sigdata->order, sigdata->n_orders, f);
+	dumbfile_getnc((char *)sigdata->order, sigdata->n_orders, f);
 	sigdata->restart_position = 0;
 
 	component = malloc(768*sizeof(*component));
