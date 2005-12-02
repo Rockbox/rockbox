@@ -35,6 +35,11 @@
 
 #if CONFIG_CODEC == SWCODEC
 #include "pcm_playback.h"
+
+#ifdef HAVE_RECORDING        
+#include "pcm_record.h"
+#endif
+static bool pm_playback = true; /* selects between playback and recording peaks */
 #endif
 
 #if !defined(SIMULATOR) && CONFIG_CODEC != SWCODEC
@@ -491,8 +496,7 @@ void peak_meter_playback(bool playback)
 #ifdef SIMULATOR
     (void)playback;
 #elif CONFIG_CODEC == SWCODEC
-/* FIX: not for the sw-based ones yes */
-    (void)playback;
+    pm_playback = playback;
 #else
     if (playback) {
         pm_src_left = MAS_REG_DQPEAK_L;
@@ -531,7 +535,15 @@ void peak_meter_peek(void)
     pm_cur_left  = left  = 8000;
     pm_cur_right = right = 9000;
 #elif CONFIG_CODEC == SWCODEC
-    pcm_calculate_peaks(&pm_cur_left, &pm_cur_right);
+
+    if (pm_playback)
+        pcm_calculate_peaks(&pm_cur_left, &pm_cur_right);
+#ifdef HAVE_RECORDING        
+    if (!pm_playback)
+    {
+        pcm_rec_get_peaks(&pm_cur_left, &pm_cur_right);
+    }
+#endif        
     left  = pm_cur_left;
     right = pm_cur_right;
 #else

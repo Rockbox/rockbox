@@ -24,6 +24,8 @@ unsigned long pcm_rec_status(void);
 void pcm_rec_init(void);
 void pcm_rec_mux(int source);
 
+void pcm_rec_get_peaks(int *left, int *right);
+
 /* audio.h contains audio recording functions */
 
 #endif

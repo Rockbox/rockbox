@@ -56,18 +56,17 @@ static volatile bool is_error;                  /* An error has occured */
 
 static volatile unsigned long num_rec_bytes;    /* Num bytes recorded */
 static volatile unsigned long num_file_bytes;   /* Num bytes written to current file */
-static volatile int int_count;                  /* Number of DMA completed interrupts */
 static volatile int error_count;                /* Number of DMA errors */
 
 static unsigned long record_start_time;         /* Value of current_tick when recording was started */
 static unsigned long pause_start_time;          /* Value of current_tick when pause was started */
 
-static bool show_waveform;
-
 static int wav_file;
 static char recording_filename[MAX_PATH];
 
-static bool init_done, close_done, record_done, stop_done, pause_done, resume_done, new_file_done;
+static volatile bool init_done, close_done, record_done, stop_done, pause_done, resume_done, new_file_done;
+
+static int peak_left, peak_right;
 
 /***************************************************************************/
 
@@ -75,17 +74,10 @@ static bool init_done, close_done, record_done, stop_done, pause_done, resume_do
   Some estimates:
     Normal recording rate: 44100 HZ * 4     = 176 KB/s
     Total buffer size:     32 MB / 176 KB/s = 181s before writing to disk
-    CHUNK_SIZE:            65536            
-    Chunks/s:              176 KB / 65536   =  ~3 chunks / s
-    
-    WRITE_THRESHOLD:       30
-    - Should gives us < 10s to start writing to disk before we run out 
-      of buffer space..   
-
 */
 
-#define CHUNK_SIZE                 65536  /* Multiple of 4 */
-#define WRITE_THRESHOLD            30     /* Write when this many chunks (or less) until buffer full */
+#define CHUNK_SIZE                 8192  /* Multiple of 4 */
+#define WRITE_THRESHOLD            250   /* (2 MB) Write when this many chunks (or less) until buffer full */
 
 #define GET_CHUNK(x)               (short*)(&rec_buffer[CHUNK_SIZE*(x)])
 
@@ -123,8 +115,6 @@ static void pcmrec_dma_stop(void);
 #define PCMREC_RESUME       11
 #define PCMREC_NEW_FILE     12
 #define PCMREC_SET_GAIN     13
-#define PCMREC_GOT_DATA     20    /* DMA1 notifies when data has arrived */
-
 
 /*******************************************************************/
 /* Functions that are not executing in the pcmrec_thread first     */
@@ -350,21 +340,68 @@ void audio_resume_recording(void)
     wake_up_thread();    
 }
 
-
+void pcm_rec_get_peaks(int *left, int *right)
+{
+    if (!is_recording)
+    {
+        peak_left = 0;
+        peak_right = 0;
+    }
+    
+    if (left)
+        *left = peak_left;
+    if (right)
+        *right = peak_right;
+}
 
 /***************************************************************************/
 /* Functions that executes in the context of pcmrec_thread                 */
 /***************************************************************************/
 
+/* Skip PEAK_STRIDE sample-pairs for each compare */
+#define PEAK_STRIDE  3
+
+static void pcmrec_find_peaks(int chunk)
+{
+    short *ptr, value;        
+    int peak_l, peak_r;
+    int j;
+    
+    ptr = GET_CHUNK(chunk);
+    
+    peak_l = 0;
+    peak_r = 0;
+    
+    for (j=0; j<CHUNK_SIZE/4; j+=PEAK_STRIDE+1)
+    {
+        if ((value = ptr[0]) > peak_l)
+            peak_l = value;
+        else if (-value > peak_l)
+            peak_l = -value;
+        ptr++;
+    
+        if ((value = ptr[0]) > peak_r)
+            peak_r = value;
+        else if (-value > peak_r)
+            peak_r = -value;
+        ptr++;
+        
+        ptr += PEAK_STRIDE * 2;
+    }
+    
+    peak_left = peak_l;
+    peak_right = peak_r;
+   
+}
+
 
 /**
  * Process the chunks using read_index and write_index.
  *
- * DMA1 handler posts to pcmrec_queue and pcmrec_thread calls this 
- * function. 
+ * This function is called when queue_get_w_tmo times out.
  *
- * Other function can also call this function with flush = true when 
- * they want to save everything recorded sofar to disk.
+ * Other functions can also call this function with flush = true when 
+ * they want to save everything in the buffers to disk.
  *
  */
 
@@ -375,12 +412,24 @@ static void pcmrec_callback(bool flush)
     unsigned short *ptr;    
     int i, j, w;
     
+    if ((!is_recording || is_paused) && !flush)
+        return;
+
     w = write_index;
     
     num_new = w - read2_index;
     if (num_new < 0)
         num_new += num_chunks;
-        
+
+    if (num_new > 0)
+    {
+        /* Collect peak values for the last buffer only */
+        j = w - 1;
+        if (j < 0)
+            j += num_chunks;
+        pcmrec_find_peaks(j);
+    }
+
     for (i=0; i<num_new; i++)
     {
         /* Convert the samples to little-endian so we only have to write later
@@ -389,12 +438,10 @@ static void pcmrec_callback(bool flush)
         ptr = GET_CHUNK(read2_index);
         for (j=0; j<CHUNK_SIZE/2; j++)
         {
-            /* TODO: might be a good place to add the peak-meter.. */
-            
             *ptr = htole16(*ptr);
             ptr++;
         }
-        
+
         num_rec_bytes += CHUNK_SIZE;
         
         read2_index++;
@@ -406,26 +453,8 @@ static void pcmrec_callback(bool flush)
     if (num_ready < 0)
         num_ready += num_chunks;
 
-    if (num_ready >= num_chunks)
-    {
-        logf("num_ready overflow?");
-        num_ready = num_chunks-1;
-    }
-
     num_free = num_chunks - num_ready;
-
-    if (wav_file == -1 || (!is_recording && !flush))
-    {
-        /* In this case we should consume the buffers to avoid */
-        /* getting 'dma1 overrun' */
-
-        read_index+=num_ready;
-        if (read_index >= num_chunks)
-            read_index -= num_chunks;
-
-        return;
-    }
-
+    
     if (num_free <= WRITE_THRESHOLD || flush)
     {
         logf("writing: %d (%d)", num_ready, flush);
@@ -484,15 +513,13 @@ void DMA1(void)
 
     DSR1 = 1;    /* Clear interrupt */
 
-    int_count++;
-
     if (res & 0x70)
     {
         DCR1 = 0;   /* Stop DMA transfer */
         error_count++;
         is_recording = false;
 
-        logf("dma1 err 0x%x", res);
+        logf("dma1 err: 0x%x", res);
         
         /* Flush recorded data to disk and stop recording */
         queue_post(&pcmrec_queue, PCMREC_STOP, NULL);
@@ -521,9 +548,6 @@ void DMA1(void)
         {
             DAR1 = (unsigned long)GET_CHUNK(write_index);  /* Destination address */
             BCR1 = CHUNK_SIZE;
-
-            queue_post(&pcmrec_queue, PCMREC_GOT_DATA, NULL);
-
         }
     }
 
@@ -602,6 +626,9 @@ static void pcmrec_start(void)
         record_done = true;
         return;
     }
+ 
+    peak_left = 0;
+    peak_right = 0;
  
     num_rec_bytes = 0;
     num_file_bytes = 0;
@@ -761,11 +788,13 @@ static void pcmrec_init(void)
 {
     unsigned long buffer_size;
 
-    show_waveform = 0;
     wav_file = -1;  
     read_index = 0;
     read2_index = 0;
     write_index = 0;
+    
+    peak_left = 0;
+    peak_right = 0;
     
     num_rec_bytes = 0;
     num_file_bytes = 0;
@@ -819,12 +848,11 @@ static void pcmrec_thread(void)
 
     logf("thread pcmrec start");
 
-    int_count = 0;
     error_count = 0;
     
     while (1)
     {
-        queue_wait(&pcmrec_queue, &ev);
+        queue_wait_w_tmo(&pcmrec_queue, &ev, HZ / 40);
 
         switch (ev.id)
         {
@@ -856,8 +884,7 @@ static void pcmrec_thread(void)
                 pcmrec_new_file();
                 break;
 
-            /* Notification by DMA interrupt */
-            case PCMREC_GOT_DATA:
+            case SYS_TIMEOUT:
                 pcmrec_callback(false);
                 break;
 

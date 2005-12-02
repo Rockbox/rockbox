@@ -328,15 +328,17 @@ bool recording_screen(void)
     audio_init_recording();
 
     sound_set_volume(global_settings.volume);
-    
-    /* Yes, we use the D/A for monitoring */
-    peak_meter_playback(true);
-    
-    peak_meter_enabled = true;
 
 #if CONFIG_CODEC == SWCODEC
     audio_stop();
+    /* Set peak meter to recording mode */
+    peak_meter_playback(false);
+    cpu_boost(true);
+#else
+    /* Yes, we use the D/A for monitoring */
+    peak_meter_playback(true);
 #endif
+    peak_meter_enabled = true;
 
     if (global_settings.rec_prerecord_time)
         talk_buffer_steal(); /* will use the mp3 buffer */
@@ -440,7 +442,9 @@ bool recording_screen(void)
                 else
                 {
                     peak_meter_playback(true);
+#if CONFIG_CODEC != SWCODEC
                     peak_meter_enabled = false;
+#endif                    
                     done = true;
                 }
                 update_countdown = 1; /* Update immediately */
@@ -875,6 +879,7 @@ bool recording_screen(void)
 #if CONFIG_CODEC == SWCODEC        
     audio_stop_recording(); 
     audio_close_recording();
+    cpu_boost(false);
 #else
     audio_init_playback();
 #endif
