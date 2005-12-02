@@ -39,7 +39,11 @@
 #ifdef HAVE_RECORDING        
 #include "pcm_record.h"
 #endif
+
+#ifndef SIMULATOR /* this is not used in the sim */
 static bool pm_playback = true; /* selects between playback and recording peaks */
+#endif
+
 #endif
 
 #if !defined(SIMULATOR) && CONFIG_CODEC != SWCODEC
