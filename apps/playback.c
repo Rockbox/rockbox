@@ -179,6 +179,9 @@ static struct track_info tracks[MAX_TRACK];
 /* Pointer to track info structure about current song playing. */
 static struct track_info *cur_ti;
 
+/* Have we reached end of the current playlist. */
+static bool playlist_end = false;
+
 /* Codec API including function callbacks. */
 extern struct codec_api ci;
 extern struct codec_api ci_voice;
@@ -572,6 +575,7 @@ static bool rebuffer_and_seek(int newpos)
     /* Clear codec buffer. */
     audio_invalidate_tracks();
     filebufused = 0;
+    playlist_end = false;
     buf_ridx = buf_widx = 0;
     cur_ti->filerem = cur_ti->filesize - newpos;
     cur_ti->filepos = newpos;
@@ -1066,7 +1070,7 @@ static bool audio_load_track(int offset, bool start_play, int peek_offset)
     
     if (!trackname) {
         logf("End-of-playlist");
-        conf_watermark = 0;
+        playlist_end = true;
         return false;
     }
     
@@ -1402,7 +1406,7 @@ static void audio_check_buffer(void)
     /* Start buffer filling as necessary. */
     if ((!conf_watermark || filebufused > conf_watermark
         || !queue_empty(&audio_queue) || !playing || ci.stop_codec
-        || ci.reload_codec) && !filling)
+        || ci.reload_codec || playlist_end) && !filling)
         return ;
     
     mutex_lock(&mutex_bufferfill);
@@ -1507,6 +1511,7 @@ static int skip_next_track(void)
     if (tracks[track_ridx].filesize <= 0)
     {
         logf("Loading from disk...");
+        ci.reload_codec = true;
         queue_post(&audio_queue, AUDIO_PLAY, 0);
         return SKIP_OK_DISK;
     }
@@ -1538,6 +1543,7 @@ static int skip_previous_track(void)
         filebufused+ci.curpos+tracks[track_ridx].filesize
         /*+ (off_t)tracks[track_ridx].codecsize*/ > filebuflen) {
         logf("Loading from disk...");
+        ci.reload_codec = true;
         queue_post(&audio_queue, AUDIO_PLAY, 0);
         return SKIP_OK_DISK;
     }
@@ -1644,6 +1650,7 @@ void audio_invalidate_tracks(void)
         return ;
     }
     
+    playlist_end = false;
     track_count = 1;
     last_peek_offset = 0;
     track_widx = track_ridx;
@@ -1713,6 +1720,7 @@ void audio_thread(void)
                 track_count = 0;
                 last_peek_offset = 0;
                 track_changed = true;
+                playlist_end = false;
                 if (current_tick - last_tick < HZ/2)
                 {
                     play_pending = true;
@@ -1773,12 +1781,14 @@ void audio_thread(void)
             case AUDIO_NEXT:
                 logf("audio_next");
                 last_tick = current_tick;
+                playlist_end = false;
                 initiate_track_change(1);
                 break ;
                 
             case AUDIO_PREV:
                 logf("audio_prev");
                 last_tick = current_tick;
+                playlist_end = false;
                 initiate_track_change(-1);
                 break;
                 
@@ -1791,6 +1801,7 @@ void audio_thread(void)
 
             case AUDIO_DIR_NEXT:
                 logf("audio_dir_next");
+                playlist_end = false;
                 if (global_settings.beep)
                     pcmbuf_beep(5000, 100, 2500*global_settings.beep);
                 initiate_dir_change(1);
@@ -1798,6 +1809,7 @@ void audio_thread(void)
             
             case AUDIO_DIR_PREV:
                 logf("audio_dir_prev");
+                playlist_end = false;
                 if (global_settings.beep)
                     pcmbuf_beep(5000, 100, 2500*global_settings.beep);
                 initiate_dir_change(-1);
