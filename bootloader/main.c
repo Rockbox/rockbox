@@ -220,11 +220,14 @@ void main(void)
 #endif
 #endif
 
-    /* Power on the hard drive early, to speed up the loading */
+    /* Power on the hard drive early, to speed up the loading.
+       Some H300 don't like this, so we only do it for the H100 */
+#ifndef IRIVER_H300_SERIES
     if(!((on_button && button_hold()) ||
          (rc_on_button && remote_button_hold()))) {
         ide_power_enable(true);
     }
+#endif
     
     system_init();
     kernel_init();
