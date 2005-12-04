@@ -63,7 +63,7 @@ static const struct sound_settings_info sound_settings_table[] = {
 #elif defined(HAVE_UDA1380)
     [SOUND_BASS]          = {"dB", 0,  2,   0,  24,   0, sound_set_bass},
     [SOUND_TREBLE]        = {"dB", 0,  2,   0,   6,   0, sound_set_treble},
-    [SOUND_SCALING]       = {"",   0,  1,   0,   1,   0, sound_set_scaling},
+    [SOUND_SCALING]       = {"",   0,  1,   0,   1,   SOUND_SCALE_VOLUME, sound_set_scaling},
 #else /* MAS3507D */
     [SOUND_BASS]          = {"dB", 0,  1, -15,  15,   7, sound_set_bass},
     [SOUND_TREBLE]        = {"dB", 0,  1, -15,  15,   7, sound_set_treble},
