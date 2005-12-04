@@ -33,22 +33,8 @@ CRITICAL_SECTION    CriticalSection;
 
 void yield(void)
 {
-    static clock_t last = 0;
-    clock_t now;
-
     LeaveCriticalSection(&CriticalSection);
-    /* Don't call Sleep() too often (as the smallest sleep really is a bit
-     * longer). This keeps CPU usage low, yet allows sound playback to work
-     * well (at least on one particular computer).
-     */
-    now = clock();
-
-    if (now - last > CLOCKS_PER_SEC / 200)
-    {
-        last = now;
-        Sleep(1);
-    }
-
+    Sleep(1);
     EnterCriticalSection(&CriticalSection);
 }
 
