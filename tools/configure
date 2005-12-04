@@ -419,7 +419,7 @@ appsdir='\$(ROOTDIR)/apps'
   # Toolsets for some target families:
   archosbitmaptools="$toolset scramble descramble sh2d uclpack bmp2rb convbdf"
   iriverbitmaptools="$toolset scramble descramble mkboot bmp2rb convbdf"
-  ipodbitmaptools="$toolset ipod_fw bmp2rb convbdf"
+  ipodbitmaptools="$toolset scramble ipod_fw bmp2rb convbdf"
 
   case $getit in
 
