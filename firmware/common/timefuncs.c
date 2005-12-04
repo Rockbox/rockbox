@@ -46,7 +46,7 @@ bool valid_time(const struct tm *tm)
 struct tm *get_time(void)
 {
 #ifndef SIMULATOR
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
     char rtcbuf[8];
 
     /* We don't need the first byte, but we want the indexes in the
@@ -84,7 +84,7 @@ struct tm *get_time(void)
 
 int set_time(const struct tm *tm)
 {
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
     int rc;
     int tmp;
     

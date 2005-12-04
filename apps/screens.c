@@ -624,7 +624,7 @@ void charging_splash(void)
 #endif
 
 
-#if defined(HAVE_LCD_BITMAP) && defined (HAVE_RTC)
+#if defined(HAVE_LCD_BITMAP) && defined (CONFIG_RTC)
 
 /* little helper function for voice output */
 static void say_time(int cursorpos, const struct tm *tm)
@@ -923,7 +923,7 @@ bool set_time_screen(const char* string, struct tm *tm)
     lcd_set_drawmode(lastmode);
     return false;
 }
-#endif /* defined(HAVE_LCD_BITMAP) && defined (HAVE_RTC) */
+#endif /* defined(HAVE_LCD_BITMAP) && defined (CONFIG_RTC) */
 
 #if (CONFIG_KEYPAD == RECORDER_PAD) && !defined(HAVE_SW_POWEROFF)
 bool shutdown_screen(void)

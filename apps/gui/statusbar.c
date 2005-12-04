@@ -112,9 +112,9 @@ void gui_statusbar_init(struct gui_statusbar * bar)
 void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 {
     struct screen * display = bar->display;
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
     struct tm* tm; /* For Time */
-#endif /* HAVE_RTC */
+#endif /* CONFIG_RTC */
 
 #ifdef HAVE_LCD_CHARCELLS
     (void)force_redraw; /* players always "redraw" */
@@ -126,11 +126,11 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
     bar->info.battery_safe = battery_level_safe();
 
 #ifdef HAVE_LCD_BITMAP
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
     tm = get_time();
     bar->info.hour = tm->tm_hour;
     bar->info.minute = tm->tm_min;
-#endif /* HAVE_RTC */
+#endif /* CONFIG_RTC */
 
     bar->info.shuffle = global_settings.playlist_shuffle;
 #ifdef HAS_BUTTON_HOLD
@@ -257,9 +257,9 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
         if (bar->info.keylockremote)
             gui_statusbar_icon_lock_remote(display);
 #endif
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
         gui_statusbar_time(display, bar->info.hour, bar->info.minute);
-#endif /* HAVE_RTC */
+#endif /* CONFIG_RTC */
 #if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
         if(!display->has_disk_led && bar->info.led)
             gui_statusbar_led(display);
@@ -482,7 +482,7 @@ void gui_statusbar_led(struct screen * display)
 }
 #endif
 
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
 /*
  * Print time to status bar
  */

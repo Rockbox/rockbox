@@ -41,7 +41,7 @@ extern bool quick_screen_f3(int button_enter);
 #endif
 extern bool quick_screen_quick(int button_enter);
 
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
 bool set_time_screen(const char* string, struct tm *tm);
 #endif
 

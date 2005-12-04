@@ -87,7 +87,7 @@ enum plugin_status loop(void)
             rb->splash(HZ, true, "Failed creating /battery.log");
             break;
         }
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
         t = rb->get_time();
 #else
         {

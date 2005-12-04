@@ -32,7 +32,7 @@
 struct status_info {
     int battlevel;
     int volume;
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
     int hour;
     int minute;
 #endif
@@ -111,7 +111,7 @@ void gui_statusbar_icon_lock_remote(struct screen * display);
 void gui_statusbar_led(struct screen * display);
 
 
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
 void gui_statusbar_time(struct screen * display, int hour, int minute);
 #endif
 

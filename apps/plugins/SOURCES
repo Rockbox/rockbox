@@ -56,10 +56,10 @@ video.c
 #endif
 vu_meter.c
 
-#ifdef HAVE_RTC /* Recorder models only */
+#ifdef CONFIG_RTC /* Recorder models only */
 calendar.c
 clock.c
-#endif /* #ifdef HAVE_RTC */
+#endif /* #ifdef CONFIG_RTC */
 
 #if CONFIG_KEYPAD != ONDIO_PAD
 /* gradually bring in the ones not working yet */

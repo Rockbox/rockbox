@@ -154,7 +154,7 @@ char *create_numbered_filename(char *buffer, const char *path,
     return buffer;
 }
 
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
 /* Create a filename with a date+time part.
    It is allowed that buffer and path point to the same memory location,
    saving a strcpy(). Path must always be given without trailing slash. */
@@ -175,7 +175,7 @@ char *create_datetime_filename(char *buffer, const char *path,
 
     return buffer;
 }
-#endif /* HAVE_RTC */
+#endif /* CONFIG_RTC */
 
 /* Read (up to) a line of text from fd into buffer and return number of bytes
  * read (which may be larger than the number of bytes stored in buffer). If
@@ -300,7 +300,7 @@ void screen_dump(void)
     static unsigned short line_block[BMP_LINESIZE/2];
 #endif
 
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
     create_datetime_filename(filename, "", "dump ", ".bmp");
 #else
     create_numbered_filename(filename, "", "dump_", ".bmp", 4);

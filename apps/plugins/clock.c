@@ -78,7 +78,7 @@ Original release, featuring analog / digital modes and a few options.
 #include "plugin.h"
 #include "time.h"
 
-#if defined(HAVE_LCD_BITMAP) && defined(HAVE_RTC)
+#if defined(HAVE_LCD_BITMAP) && defined(CONFIG_RTC)
 
 #define CLOCK_VERSION "2.60"
 

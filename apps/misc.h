@@ -30,7 +30,7 @@ void output_dyn_value(char *buf, int buf_size, int value,
 char *create_numbered_filename(char *buffer, const char *path, 
                                const char *prefix, const char *suffix,
                                int numberlen);
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
 char *create_datetime_filename(char *buffer, const char *path,
                                const char *prefix, const char *suffix);
 #endif

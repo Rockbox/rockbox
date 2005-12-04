@@ -210,7 +210,7 @@ char *rec_create_filename(char *buffer)
     else
         strncpy(buffer, rec_base_directory, MAX_PATH);
 
-#ifdef HAVE_RTC 
+#ifdef CONFIG_RTC 
     create_datetime_filename(buffer, buffer, "R", REC_FILE_ENDING);
 #else
     create_numbered_filename(buffer, buffer, "rec_", REC_FILE_ENDING, 4);

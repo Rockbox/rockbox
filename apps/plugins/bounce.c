@@ -230,7 +230,7 @@ struct counter values[]={
   {"ydist", -6},
 };
 
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
 static unsigned char yminute[]={
 53,53,52,52,51,50,49,47,46,44,42,40,38,36,34,32,29,27,25,23,21,19,17,16,14,13,12,11,11,10,10,10,11,11,12,13,14,16,17,19,21,23,25,27,29,31,34,36,38,40,42,44,46,47,49,50,51,52,52,53,
 };
@@ -277,7 +277,7 @@ static void addclock(void)
                           yminute[(i+1)%60]);
     }
 }
-#endif /* HAVE_RTC */
+#endif /* CONFIG_RTC */
 
 #define DRAW_WIDTH (LCD_WIDTH + LETTER_WIDTH*2)
 
@@ -330,7 +330,7 @@ static int scrollit(void)
             yy += YADD;
             xx+= DRAW_WIDTH/LETTERS_ON_SCREEN;
         }
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
         addclock();
 #endif
         rb->lcd_update();
@@ -385,7 +385,7 @@ static int loopit(void)
         x+= speed[xsanke&15] + values[NUM_XADD].num;
 
         rb->lcd_clear_display();
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
         addclock();
 #endif
         if(timeout) {

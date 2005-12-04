@@ -23,7 +23,7 @@ bool debug_menu(void);
 
 #ifndef SIMULATOR
 extern bool dbg_ports(void);
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
 extern bool dbg_rtc(void);
 #endif
 #endif

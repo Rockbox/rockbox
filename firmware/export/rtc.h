@@ -21,7 +21,7 @@
 
 #include <stdbool.h> 
 
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
 void rtc_init(void);
 int rtc_read(unsigned char address);
 int rtc_read_multiple(unsigned char address, unsigned char *buf, int numbytes);
@@ -35,6 +35,6 @@ bool rtc_check_alarm_started(bool release_alarm);
 bool rtc_check_alarm_flag(void);
 #endif /* HAVE_ALARM_MOD */
 
-#endif /* HAVE_RTC */
+#endif /* CONFIG_RTC */
 
 #endif

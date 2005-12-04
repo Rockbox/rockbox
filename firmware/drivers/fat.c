@@ -1010,7 +1010,7 @@ static void fat_time(unsigned short* date,
                      unsigned short* time,
                      unsigned short* tenth )
 {
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
     struct tm* tm = get_time();
 
     if (date)
@@ -1092,7 +1092,7 @@ static void fat_time(unsigned short* date,
     }
     if (tenth)
         *tenth = 0;
-#endif /* HAVE_RTC */
+#endif /* CONFIG_RTC */
 }
 
 static int write_long_name(struct fat_file* file,
@@ -1529,7 +1529,7 @@ static int update_short_entry( struct fat_file* file, long size, int attr )
     *sizeptr = htole32(size);
 
     {
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
         unsigned short time = 0;
         unsigned short date = 0;
 #else

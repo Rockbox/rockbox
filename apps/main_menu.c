@@ -125,7 +125,7 @@ bool show_info(void)
         output_dyn_value(NULL, 0, free, kbyte_units, true); /* NULL == talk */
 #endif
 
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
         {
             struct tm* tm = get_time();
             talk_id(VOICE_CURRENT_TIME, true);

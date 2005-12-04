@@ -829,7 +829,7 @@ static bool battery_type(void)
 #endif
 #endif
 
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
 static bool timedate_set(void)
 {
     struct tm tm;
@@ -1682,7 +1682,7 @@ static bool disk_settings_menu(void)
 }
 #endif /* !HAVE_MMC */
 
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
 static bool time_settings_menu(void)
 {
     int m;
@@ -1748,7 +1748,7 @@ static bool system_settings_menu(void)
 #ifndef HAVE_MMC
         { ID2P(LANG_DISK_MENU),        disk_settings_menu     },
 #endif
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
         { ID2P(LANG_TIME_MENU),        time_settings_menu     },
 #endif
         { ID2P(LANG_POWEROFF_IDLE),    poweroff_idle_timer    },

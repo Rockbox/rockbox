@@ -29,7 +29,7 @@
 #include "gwps.h"
 #include "abrepeat.h"
 #include "statusbar.h"
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
 #include "timefuncs.h"
 #endif
 #ifdef HAVE_LCD_BITMAP

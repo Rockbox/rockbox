@@ -122,7 +122,7 @@ extern void statusbar_icon_play_state(int state);
 extern void statusbar_icon_play_mode(int mode);
 extern void statusbar_icon_shuffle(void);
 extern void statusbar_icon_lock(void);
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
 extern void statusbar_time(int hour, int minute);
 #endif
 #if CONFIG_LED == LED_VIRTUAL

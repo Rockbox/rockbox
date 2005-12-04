@@ -17,7 +17,7 @@
  *
  ****************************************************************************/
 #include "config.h"
-#ifdef HAVE_RTC
+#ifdef CONFIG_RTC
 #include "i2c.h"
 #include "rtc.h"
 #include "kernel.h"
