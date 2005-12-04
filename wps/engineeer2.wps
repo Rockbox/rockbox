@@ -37,13 +37,13 @@
 %xl|K|batt_2.bmp|144|0|
 %xl|L|batt_3.bmp|144|0|
 %xl|M|batt_4.bmp|144|0|
-%xl|N|charge.bmp|143|0|
+%xl|N|charge.bmp|144|0|
 %wd
 
 
 
-%ac%?it<%it|%fn>
-%ac%?ia<%ia|%d2>
+%s%ac%?it<%it|%fn>
+%s%ac%?ia<%ia|%d2>
 
 %ac%pc / %pt
 
@@ -54,7 +54,7 @@
 
 %ac%t3%?It<%It|%Fn>;%ac%t3%?Ia<%Ia|%D2>
 %?pv<%xdy|%xdz|%xdA|%xdB|%xdC|%xdD|%xdE|%xdF|%xdG|%xdH>
-%?bp<%xdN|%?bl<%xdI|%xdJ|%xdK|%xdL|%xdM>>
+%?bp<%xdN|%ac%t0.25%?bl<%xdI|%xdJ|%xdK|%xdL|%xdM>;%ac%t0.25%?bl<|%xdJ|%xdK|%xdL|%xdM>;%ac%t0.25%?bl<%xdI||%xdK|%xdL|%xdM>;%ac%t0.25%?bl<||%xdK|%xdL|%xdM>>
 %?fc<%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi|%xdj|%xdk>
 %?fv<%xdl|%xdm>
 %?mm<|%xdn|%xdo|%xdp>
