@@ -85,7 +85,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "dsp.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 33
+#define CONFIG_BLOCK_VERSION 34
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -210,6 +210,9 @@ static const struct bit_entry rtc_bits[] =
     {3, S_O(channel_config), 0, "channels",
         "stereo,mono,custom,mono left,mono right,karaoke" },
     {8, S_O(stereo_width), 100, "stereo width", NULL},
+#ifdef HAVE_UDA1380
+    {2, S_O(sound_scaling), SOUND_SCALE_VOLUME, "prevent clipping", "adjust volume,adjust bass,adjust current,off"},
+#endif
     /* playback */
     {1, S_O(resume), false, "resume", off_on },
     {1, S_O(playlist_shuffle), false, "shuffle", off_on },
@@ -836,6 +839,9 @@ void sound_settings_apply(void)
     sound_set(SOUND_VOLUME, global_settings.volume);
     sound_set(SOUND_CHANNELS, global_settings.channel_config);
     sound_set(SOUND_STEREO_WIDTH, global_settings.stereo_width);
+#ifdef HAVE_UDA1380
+    sound_set(SOUND_SCALING, global_settings.sound_scaling);
+#endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     sound_set(SOUND_LOUDNESS, global_settings.loudness);
     sound_set(SOUND_AVC, global_settings.avc);
@@ -1415,6 +1421,9 @@ void settings_reset(void) {
     global_settings.treble      = sound_default(SOUND_TREBLE);
     global_settings.channel_config = sound_default(SOUND_CHANNELS);
     global_settings.stereo_width = sound_default(SOUND_STEREO_WIDTH);
+#ifdef HAVE_UDA1380
+    global_settings.sound_scaling = sound_default(SOUND_SCALING);
+#endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     global_settings.loudness    = sound_default(SOUND_LOUDNESS);
     global_settings.avc         = sound_default(SOUND_AVC);

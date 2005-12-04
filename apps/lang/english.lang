@@ -3466,3 +3466,33 @@ desc: in radio screen / menu
 eng: "Mode:"
 voice: ""
 new:
+
+id: LANG_SCALING_MODE
+desc: in sound_settings. How to scale volume/bass to prevent clipping
+eng: "Prevent clipping"
+voice: "Prevent clipping"
+new:
+
+id: LANG_SCALE_OFF
+desc: in sound_settings. Do not reduce volume/bass
+eng: "Off"
+voice: "Off"
+new:
+
+id: LANG_SCALE_VOLUME
+desc: in sound_settings. Reduce volume
+eng: "Adjust volume"
+voice: "Adjust volume"
+new:
+
+id: LANG_SCALE_BASS
+desc: in sound_settings. Reduce bass
+eng: "Adjust bass"
+voice: "Adjust bass"
+new:
+
+id: LANG_SCALE_CURRENT
+desc: in sound_settings. Reduce other metric than currently modified
+eng: "Adjust current"
+voice: "Adjust current"
+new:

@@ -157,6 +157,9 @@ struct user_settings
     int avc;        /* auto volume correct:  0=off, 1=20ms, 2=2s 3=4s 4=8s   */
     int channel_config; /* Stereo, Mono, Custom, Mono left, Mono right, Karaoke */
     int stereo_width; /* 0-255% */
+#ifdef HAVE_UDA1380
+    int sound_scaling; /* Off, Volume, Bass, Current metric */
+#endif
     int mdb_strength; /* 0-127dB */
     int mdb_harmonics; /* 0-100% */
     int mdb_center; /* 20-300Hz */
