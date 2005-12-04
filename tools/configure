@@ -437,7 +437,12 @@ appsdir='\$(ROOTDIR)/apps'
 
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset="$toolset scramble descramble sh2d generate_rocklatin uclpack"
+    toolset="$toolset scramble descramble sh2d generate_rocklatin uclpack convbdf"
+
+    # Note: the convbdf is present in the toolset just because: 1) the
+    # firmware/Makefile assumes it is present always, and 2) we will need it when we
+    # build the player simulator
+
     ;;
 
    2)
@@ -841,11 +846,9 @@ if test "$simulator" = "yes"; then
 
   # add simul make stuff on the #SIMUL# line
   simmagic='/#SIMUL#/c\	@$(MAKE) -C $(SIMDIR) OBJDIR=$(BUILDDIR)/sim\n	@$(MAKE) -C $(ROOTDIR)/uisimulator/common OBJDIR=$(BUILDDIR)/comsim'
-  simtools='s/#TOOLSDEP#//'
 else
   # delete the line that matches
   simmagic='/#SIMUL#/D'
-  simtools='s/#TOOLSDEP#/tools/'
 fi
 
 sed > Makefile \
@@ -935,7 +938,7 @@ MAKEFLAGS += --no-print-directory
 
 .PHONY: all clean tags zip tools
 
-all: #TOOLSDEP#
+all: tools
 #SIMUL#
 	@\$(MAKE) -C \$(FIRMDIR) OBJDIR=\$(BUILDDIR)/firmware
 	@\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@
