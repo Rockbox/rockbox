@@ -150,12 +150,12 @@ static const char * const kbdpages[KEYBOARD_PAGES][KEYBOARD_LINES] = {
 #ifdef HAVE_MORSE_INPUT
 /* FIXME: We should put this to a configuration file. */
 static const char *morse_alphabets = 
-    "abcdefghijklmnopqrstuwvxyzåäö1234567890,";
+    "abcdefghijklmnopqrstuwvxyzåäö1234567890,.?-@ ";
 static const unsigned char morse_codes[] = {
     0x05,0x18,0x1a,0x0c,0x02,0x12,0x0e,0x10,0x04,0x17,0x0d,0x14,0x07,
     0x06,0x0f,0x16,0x1d,0x0a,0x08,0x03,0x09,0x11,0x0b,0x19,0x1b,0x1c,
-    0x2d,0x15,0x1e,0x2f,0x27,0x23,0x21,0x20,0x30,0x38,0x3c,0x3f,0x3f,
-    0x73 };
+    0x2d,0x15,0x1e,0x2f,0x27,0x23,0x21,0x20,0x30,0x38,0x3c,0x3e,0x3f,
+    0x73,0x55,0x4c,0x61,0x5a,0x80 };
 
 static bool morse_mode = false;
 #endif
@@ -208,7 +208,12 @@ int kbd_input(char* text, int buflen)
     font_w = font->maxwidth;
     font_h = font->height;
 
-    main_y = (KEYBOARD_LINES + 1) * font_h + (2*KEYBOARD_MARGIN);
+#ifdef HAVE_MORSE_INPUT
+    if (morse_mode)
+        main_y = LCD_HEIGHT - font_h;
+    else
+#endif
+        main_y = (KEYBOARD_LINES + 1) * font_h + (2*KEYBOARD_MARGIN);
     main_x = 0;
     status_y1 = LCD_HEIGHT - font_h;
     status_y2 = LCD_HEIGHT;
@@ -316,6 +321,16 @@ int kbd_input(char* text, int buflen)
         redraw = true;
 
         button = button_get_w_tmo(HZ/2);
+#ifdef HAVE_MORSE_INPUT
+        if (morse_mode)
+        {
+            /* Remap some buttons for morse mode. */
+            if (button == KBD_LEFT || button == (KBD_LEFT | BUTTON_REPEAT))
+                button = KBD_CURSOR_LEFT;
+            if (button == KBD_RIGHT || button == (KBD_RIGHT | BUTTON_REPEAT))
+                button = KBD_CURSOR_RIGHT;
+        }
+#endif
         
         switch ( button ) {
 
@@ -331,6 +346,7 @@ int kbd_input(char* text, int buflen)
                 {
                     main_y = (KEYBOARD_LINES + 1) * font_h + (2*KEYBOARD_MARGIN);
                     morse_mode = false;
+                    x = y = 0;
                 }
                 else
 #endif
