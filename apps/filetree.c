@@ -388,7 +388,7 @@ int ft_enter(struct tree_context* c)
                          MAX_FILENAME);
                 break;
 
-#ifdef HAVE_REMOTE_LCD
+#if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
                 /* remote-wps config file */
             case TREE_ATTR_RWPS:
                 wps_data_load(gui_wps[1].data, buf, true, true);

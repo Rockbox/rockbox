@@ -920,7 +920,7 @@ void settings_apply(void)
     else
         wps_data_init(gui_wps[0].data);
 
-#ifdef HAVE_REMOTE_LCD
+#if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
     if ( global_settings.rwps_file[0] &&
          global_settings.rwps_file[0] != 0xff ) {
         snprintf(buf, sizeof buf, WPS_DIR "/%s.rwps",
@@ -1194,7 +1194,7 @@ bool settings_load_config(const char* file)
             if (wps_data_load(gui_wps[0].data,value,true, false))
                 set_file(value, global_settings.wps_file, MAX_FILENAME);
         }
-#ifdef HAVE_REMOTE_LCD
+#if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
         else if (!strcasecmp(name, "rwps")) {
             if (wps_data_load(gui_wps[1].data,value,true, false))
                 set_file(value, global_settings.rwps_file, MAX_FILENAME);
