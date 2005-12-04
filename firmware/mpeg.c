@@ -2023,6 +2023,7 @@ static void mpeg_thread(void)
                 case MPEG_INIT_PLAYBACK:
                     /* Stop the prerecording */ 
                     stop_recording();
+                    reset_mp3_buffer();
                     mp3_play_init();
                     init_playback_done = true;
                     break;
