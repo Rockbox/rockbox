@@ -135,7 +135,7 @@ long gui_wps_show(void)
                about to shut down. lets save the settings. */
             if (wps_state.paused) {
                 settings_save();
-#if !defined(HAVE_RTC) && !defined(HAVE_SW_POWEROFF)
+#if !defined(HAVE_RTC_RAM) && !defined(HAVE_SW_POWEROFF)
                 ata_flush();
 #endif
             }
@@ -293,7 +293,7 @@ long gui_wps_show(void)
                     else
                         audio_pause();
                     settings_save();
-#if !defined(HAVE_RTC) && !defined(HAVE_SW_POWEROFF)
+#if !defined(HAVE_RTC_RAM) && !defined(HAVE_SW_POWEROFF)
                     ata_flush();   /* make sure resume info is saved */
 #endif
                 }

@@ -15,6 +15,12 @@
 /* define this if you have a real-time clock */
 #define HAVE_RTC 1
 
+/* define this if you have RTC RAM available for settings */
+#define HAVE_RTC_RAM 1
+
+/* define this to the type of RTC hardware */
+#define CONFIG_RTC RTC_M41ST84W
+
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 

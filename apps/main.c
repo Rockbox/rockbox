@@ -228,6 +228,8 @@ void init(void)
 
 #ifdef HAVE_RTC
     rtc_init();
+#endif
+#ifdef HAVE_RTC_RAM
     settings_load(SETTINGS_RTC); /* early load parts of global_settings */
 #endif
 

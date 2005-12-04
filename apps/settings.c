@@ -574,7 +574,7 @@ static void init_config_buffer( void )
 static int save_config_buffer( void )
 {
     unsigned short chksum;
-#ifdef HAVE_RTC
+#ifdef HAVE_RTC_RAM
     unsigned int i;
 #endif
 
@@ -583,7 +583,7 @@ static int save_config_buffer( void )
     config_block[ RTC_BLOCK_SIZE - 2 ] = chksum >> 8;
     config_block[ RTC_BLOCK_SIZE - 1 ] = chksum & 0xff;
 
-#ifdef HAVE_RTC
+#ifdef HAVE_RTC_RAM
     /* FIXME: okay, it _would_ be cleaner and faster to implement rtc_write so
        that it would write a number of bytes at a time since the RTC chip
        supports that, but this will have to do for now 8-) */
@@ -637,7 +637,7 @@ static int load_config_buffer(int which)
         }
     }
 
-#ifdef HAVE_RTC
+#ifdef HAVE_RTC_RAM
     if(!correct)
     {
         /* If the disk sector was incorrect, reinit the buffer */

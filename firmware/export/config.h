@@ -100,6 +100,11 @@
 /* CONFIG_LED */
 #define LED_REAL     1 /* SW controlled LED (Archos recorders, player, Gmini) */
 #define LED_VIRTUAL  2 /* Virtual LED (icon) (Archos Ondio) */
+
+/* CONFIG_RTC */
+#define RTC_M41ST84W 1
+#define RTC_PCF50606 2
+
 /* else                   HW controlled LED (iRiver H1x0) */
 
 /* now go and pick yours */

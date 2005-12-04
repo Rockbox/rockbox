@@ -98,7 +98,9 @@ drivers/mas.c
 drivers/pcf50606.c
 #endif
 #ifdef HAVE_RTC
+#if CONFIG_RTC == RTC_M41ST84W
 drivers/rtc.c
+#endif
 #endif
 drivers/serial.c
 #endif /* !SIMULATOR */
