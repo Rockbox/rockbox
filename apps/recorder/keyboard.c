@@ -175,7 +175,7 @@ static void kbd_spellchar(char c)
 int kbd_input(char* text, int buflen)
 {
     bool done = false;
-#ifdef KBD_PAGE_FLIP
+#if defined(KBD_PAGE_FLIP) || (KEYBOARD_PAGES > 1)
     int page = 0;
 #endif
     int font_w = 0, font_h = 0, i;
