@@ -174,8 +174,10 @@ static void kbd_spellchar(char c)
 
 int kbd_input(char* text, int buflen)
 {
-    bool done = false; 
+    bool done = false;
+#ifdef KBD_PAGE_FLIP
     int page = 0;
+#endif
     int font_w = 0, font_h = 0, i;
     int x = 0, y = 0;
     int main_x, main_y, max_chars;
