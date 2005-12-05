@@ -88,13 +88,13 @@ int db_load(struct tree_context* c)
             static const int tables[] = {allartists, allalbums, allsongs,
                                          search };
             char* nbuf = (char*)nptr;
-            char* labels[] = { str(LANG_ID3DB_ARTISTS),
-                               str(LANG_ID3DB_ALBUMS),
-                               str(LANG_ID3DB_SONGS),
-                               str(LANG_ID3DB_SEARCH)};
+            unsigned char* labels[] = { str(LANG_ID3DB_ARTISTS),
+                                        str(LANG_ID3DB_ALBUMS),
+                                        str(LANG_ID3DB_SONGS),
+                                        str(LANG_ID3DB_SEARCH)};
             DEBUGF("dbload table root\n");
             for (i=0; i < 4; i++) {
-                strcpy(nbuf, labels[i]);
+                strcpy(nbuf, (char *)labels[i]);
                 dptr[0] = (unsigned long)nbuf;
                 dptr[1] = tables[i];
                 nbuf += strlen(nbuf) + 1;
@@ -109,12 +109,12 @@ int db_load(struct tree_context* c)
                                          searchalbums,
                                          searchsongs};
             char* nbuf = (char*)nptr;
-            char* labels[] = { str(LANG_ID3DB_SEARCH_ARTISTS),
-                               str(LANG_ID3DB_SEARCH_ALBUMS),
-                               str(LANG_ID3DB_SEARCH_SONGS)};
+            unsigned char* labels[] = { str(LANG_ID3DB_SEARCH_ARTISTS),
+                                        str(LANG_ID3DB_SEARCH_ALBUMS),
+                                        str(LANG_ID3DB_SEARCH_SONGS)};
             DEBUGF("dbload table search\n");
             for (i=0; i < 3; i++) {
-                strcpy(nbuf, labels[i]);
+                strcpy(nbuf, (char *)labels[i]);
                 dptr[0] = (unsigned long)nbuf;
                 dptr[1] = tables[i];
                 nbuf += strlen(nbuf) + 1;
@@ -131,9 +131,9 @@ int db_load(struct tree_context* c)
             i = db_search(c, searchstring);
             c->dirlength = c->filesindir = i;
             if (c->dirfull) {
-                gui_syncsplash(HZ, true, "%s %s",
-                       str(LANG_SHOWDIR_ERROR_BUFFER),
-                       str(LANG_SHOWDIR_ERROR_FULL));
+                gui_syncsplash(HZ, true, (unsigned char *)"%s %s",
+                               str(LANG_SHOWDIR_ERROR_BUFFER),
+                               str(LANG_SHOWDIR_ERROR_FULL));
                 c->dirfull = false;
             }
             else
@@ -313,7 +313,7 @@ int db_load(struct tree_context* c)
     }
 
     if (c->currtable == albums4artist && !c->dirfull) {
-        strcpy((char*)nptr, str(LANG_ID3DB_ALL_SONGS));
+        strcpy((char*)nptr, (char *)str(LANG_ID3DB_ALL_SONGS));
         dptr[0] = (unsigned long)nptr;
         dptr[1] = extra; /* offset to artist */
         hits++;
@@ -554,7 +554,7 @@ int   db_get_icon(struct tree_context* c)
     }
 
 #ifdef HAVE_LCD_BITMAP
-    return bitmap_icons_6x8[icon];
+    return (char *)bitmap_icons_6x8[icon];
 #else
     return icon;
 #endif

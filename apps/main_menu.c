@@ -153,29 +153,29 @@ bool show_info(void)
             integer = buflen / 1000;
             decimal = buflen % 1000;
 #ifdef HAVE_LCD_CHARCELLS
-            snprintf(s, sizeof(s), str(LANG_BUFFER_STAT_PLAYER),
+            snprintf(s, sizeof(s), (char *)str(LANG_BUFFER_STAT_PLAYER),
                      integer, decimal);
 #else
-            snprintf(s, sizeof(s), str(LANG_BUFFER_STAT_RECORDER),
+            snprintf(s, sizeof(s), (char *)str(LANG_BUFFER_STAT_RECORDER),
                      integer, decimal);
 #endif
-            lcd_puts(0, y++, s);
+            lcd_puts(0, y++, (unsigned char *)s);
 
 #ifdef HAVE_CHARGE_CTRL
             if (charge_state == 1)
-                snprintf(s, sizeof(s), str(LANG_BATTERY_CHARGE));
+                snprintf(s, sizeof(s), (char *)str(LANG_BATTERY_CHARGE));
             else if (charge_state == 2)
-                snprintf(s, sizeof(s), str(LANG_BATTERY_TOPOFF_CHARGE));
+                snprintf(s, sizeof(s), (char *)str(LANG_BATTERY_TOPOFF_CHARGE));
             else if (charge_state == 3)
-                snprintf(s, sizeof(s), str(LANG_BATTERY_TRICKLE_CHARGE));
+                snprintf(s, sizeof(s), (char *)str(LANG_BATTERY_TRICKLE_CHARGE));
             else
 #endif
             if (battery_level() >= 0)
-                snprintf(s, sizeof(s), str(LANG_BATTERY_TIME), battery_level(),
+                snprintf(s, sizeof(s), (char *)str(LANG_BATTERY_TIME), battery_level(),
                          battery_time() / 60, battery_time() % 60);
             else
                 strncpy(s, "(n/a)", sizeof(s));
-            lcd_puts(0, y++, s);
+            lcd_puts(0, y++, (unsigned char *)s);
         }
 
         if (state & 2) {
@@ -188,7 +188,7 @@ bool show_info(void)
             output_dyn_value(s1, sizeof s1, size, kbyte_units, true);
             snprintf(s, sizeof s, SIZE_FMT, str(LANG_DISK_SIZE_INFO), s1);
 #endif
-            lcd_puts(0, y++, s);
+            lcd_puts(0, y++, (unsigned char *)s);
 
 #ifdef HAVE_MULTIVOLUME
             if (size2) {
@@ -196,12 +196,12 @@ bool show_info(void)
                 output_dyn_value(s2, sizeof s2, size2, kbyte_units, true);
                 snprintf(s, sizeof s, "%s %s/%s", str(LANG_DISK_NAME_MMC),
                          s1, s2);
-                lcd_puts(0, y++, s);
+                lcd_puts(0, y++, (unsigned char *)s);
             }
 #else
             output_dyn_value(s1, sizeof s1, free, kbyte_units, true);
             snprintf(s, sizeof s, SIZE_FMT, str(LANG_DISK_FREE_INFO), s1);
-            lcd_puts(0, y++, s);
+            lcd_puts(0, y++, (unsigned char *)s);
 #endif
         }
         lcd_update();

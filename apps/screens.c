@@ -521,23 +521,23 @@ bool quick_screen_quick(int button_enter)
     struct gui_quickscreen qs;
 
     option_select_init_items(&left_option,
-                             str(LANG_SHUFFLE),
+                             (char *)str(LANG_SHUFFLE),
                              bool_to_int(global_settings.playlist_shuffle),
                              left_items,
                              2);
     option_select_init_items(&bottom_option,
-                             str(LANG_FILTER),
+                             (char *)str(LANG_FILTER),
                              global_settings.dirfilter,
                              bottom_items,
                              sizeof(bottom_items)/sizeof(struct opt_items));
     option_select_init_items(&right_option,
-                             str(LANG_REPEAT),
+                             (char *)str(LANG_REPEAT),
                              global_settings.repeat_mode,
                              right_items,
                              sizeof(right_items)/sizeof(struct opt_items));
 
     gui_quickscreen_init(&qs, &left_option, &bottom_option, &right_option,
-                         str(LANG_F2_MODE), &quick_screen_quick_apply);
+                         (char *)str(LANG_F2_MODE), &quick_screen_quick_apply);
     oldrepeat=global_settings.repeat_mode;
     res=gui_syncquickscreen_run(&qs, button_enter);
     if(!res)
@@ -619,7 +619,7 @@ bool quick_screen_f3(int button_enter)
 #if defined(HAVE_CHARGING) || defined(SIMULATOR)
 void charging_splash(void)
 {
-    gui_syncsplash(2*HZ, true, str(LANG_BATTERY_CHARGE));
+    gui_syncsplash(2*HZ, true, (char *)str(LANG_BATTERY_CHARGE));
     button_clear_queue();
 }
 #endif
@@ -1184,8 +1184,8 @@ bool set_rating(void)
     {
         lcd_clear_display();
         lcd_puts(0, 0, str(LANG_RATING));
-        snprintf(rating_text,sizeof(rating_text),"%d",id3->rating);
-        lcd_puts(0,1,rating_text);
+        snprintf(rating_text, sizeof(rating_text), "%d", id3->rating);
+        lcd_puts(0, 1, (unsigned char *)rating_text);
         lcd_update();
         button = button_get(true);
 

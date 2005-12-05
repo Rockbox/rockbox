@@ -55,8 +55,8 @@ bool gui_yesno_draw_result(struct gui_yesno * yn, enum yesno_res result)
 }
 
 enum yesno_res gui_syncyesno_run(struct text_message * main_message,
-                             struct text_message * yes_message,
-                             struct text_message * no_message)
+                                 struct text_message * yes_message,
+                                 struct text_message * no_message)
 {
     int i;
     unsigned button;

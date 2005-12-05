@@ -252,7 +252,7 @@ void menu_insert(int menu, int position, char *desc, bool (*function) (void))
        menus[menu].items[i] = menus[menu].items[i - 1];
 
     /* Update the current item */
-    menus[menu].items[position].desc = desc;
+    menus[menu].items[position].desc = (unsigned char *)desc;
     menus[menu].items[position].function = function;
     gui_synclist_add_item(&(menus[menu].synclist));
 }
@@ -347,7 +347,7 @@ void put_cursorxy(int x, int y, bool on)
     if (global_settings.invert_cursor)
         return;
 
-    lcd_getstringsize("A", &fw, &fh);
+    lcd_getstringsize((unsigned char *)"A", &fw, &fh);
     xpos = x*6;
     ypos = y*fh + lcd_getymargin();
     if ( fh > 8 )

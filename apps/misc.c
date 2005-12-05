@@ -137,11 +137,11 @@ char *create_numbered_filename(char *buffer, const char *path,
     {
         int curr_num;
 
-        if (strncasecmp(entry->d_name, prefix, prefixlen)
-            || strcasecmp(entry->d_name + prefixlen + numberlen, suffix))
+        if (strncasecmp((char *)entry->d_name, prefix, prefixlen)
+            || strcasecmp((char *)entry->d_name + prefixlen + numberlen, suffix))
             continue;
 
-        curr_num = atoi(entry->d_name + prefixlen);
+        curr_num = atoi((char *)entry->d_name + prefixlen);
         if (curr_num > max_num)
             max_num = curr_num;
     }
@@ -591,16 +591,16 @@ int show_logo( void )
 
     snprintf(version, sizeof(version), "Ver. %s", appsversion);
     lcd_setfont(FONT_SYSFIXED);
-    lcd_getstringsize("A", &font_w, &font_h);
+    lcd_getstringsize((unsigned char *)"A", &font_w, &font_h);
     lcd_putsxy((LCD_WIDTH/2) - ((strlen(version)*font_w)/2),
-               LCD_HEIGHT-font_h, version);
+               LCD_HEIGHT-font_h, (unsigned char *)version);
     lcd_update();
 
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_setfont(FONT_SYSFIXED);
-    lcd_remote_getstringsize("A", &font_w, &font_h);
+    lcd_remote_getstringsize((unsigned char *)"A", &font_w, &font_h);
     lcd_remote_putsxy((LCD_REMOTE_WIDTH/2) - ((strlen(version)*font_w)/2),
-               LCD_REMOTE_HEIGHT-font_h, version);
+               LCD_REMOTE_HEIGHT-font_h, (unsigned char *)version);
     lcd_remote_update();
 #endif
 

@@ -56,7 +56,7 @@ void dec_sound_formatter(char *buffer, int buffer_size, int val, const char * un
     snprintf(buffer, buffer_size, "%d.%d %s", integer, dec, unit);
 }
 
-bool set_sound(const char* string,
+bool set_sound(const unsigned char * string,
                int* variable,
                int setting)
 {

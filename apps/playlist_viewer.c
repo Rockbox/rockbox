@@ -514,15 +514,15 @@ static bool viewer_menu(void)
 /* Show icons in viewer? */
 static bool show_icons(void)
 {
-    return set_bool(str(LANG_SHOW_ICONS),
-        &global_settings.playlist_viewer_icons);
+    return set_bool((char *)str(LANG_SHOW_ICONS),
+                    &global_settings.playlist_viewer_icons);
 }
 
 /* Show indices of tracks? */
 static bool show_indices(void)
 {
-    return set_bool(str(LANG_SHOW_INDICES),
-        &global_settings.playlist_viewer_indices);
+    return set_bool((char *)str(LANG_SHOW_INDICES),
+                    &global_settings.playlist_viewer_indices);
 }
 
 /* How to display a track */
@@ -533,8 +533,9 @@ static bool track_display(void)
         { STR(LANG_DISPLAY_FULL_PATH) }
     };
 
-    return set_option(str(LANG_TRACK_DISPLAY), 
-        &global_settings.playlist_viewer_track_display, INT, names, 2, NULL);
+    return set_option((char *)str(LANG_TRACK_DISPLAY), 
+                      &global_settings.playlist_viewer_track_display, INT, names, 2,
+                      NULL);
 }
 
 /* Save playlist to disk */

@@ -770,11 +770,15 @@ int settings_save( void )
     save_bit_table(rtc_bits, sizeof(rtc_bits)/sizeof(rtc_bits[0]), 4*8);
     save_bit_table(hd_bits, sizeof(hd_bits)/sizeof(hd_bits[0]), RTC_BLOCK_SIZE*8);
 
-    strncpy(&config_block[0xb8], global_settings.wps_file, MAX_FILENAME);
-    strncpy(&config_block[0xcc], global_settings.lang_file, MAX_FILENAME);
-    strncpy(&config_block[0xe0], global_settings.font_file, MAX_FILENAME);
+    strncpy((char *)&config_block[0xb8], (char *)global_settings.wps_file,
+            MAX_FILENAME);
+    strncpy((char *)&config_block[0xcc], (char *)global_settings.lang_file,
+            MAX_FILENAME);
+    strncpy((char *)&config_block[0xe0], (char *)global_settings.font_file,
+            MAX_FILENAME);
 #ifdef HAVE_REMOTE_LCD
-    strncpy(&config_block[0xf4], global_settings.rwps_file, MAX_FILENAME);
+    strncpy((char *)&config_block[0xf4], (char *)global_settings.rwps_file,
+            MAX_FILENAME);
 #endif
 
     if(save_config_buffer())
@@ -1053,11 +1057,15 @@ void settings_load(int which)
         if ( global_settings.contrast < MIN_CONTRAST_SETTING )
             global_settings.contrast = lcd_default_contrast();
 
-        strncpy(global_settings.wps_file, &config_block[0xb8], MAX_FILENAME);
-        strncpy(global_settings.lang_file, &config_block[0xcc], MAX_FILENAME);
-        strncpy(global_settings.font_file, &config_block[0xe0], MAX_FILENAME);
+        strncpy((char *)global_settings.wps_file, (char *)&config_block[0xb8],
+                MAX_FILENAME);
+        strncpy((char *)global_settings.lang_file, (char *)&config_block[0xcc],
+                MAX_FILENAME);
+        strncpy((char *)global_settings.font_file, (char *)&config_block[0xe0],
+                MAX_FILENAME);
 #ifdef HAVE_REMOTE_LCD
-        strncpy(global_settings.rwps_file, &config_block[0xf4], MAX_FILENAME);
+        strncpy((char *)global_settings.rwps_file, (char *)&config_block[0xf4],
+                MAX_FILENAME);
 #endif
     }
 }
@@ -1198,25 +1206,25 @@ bool settings_load_config(const char* file)
         /* check for the string values */
         if (!strcasecmp(name, "wps")) {
             if (wps_data_load(gui_wps[0].data,value,true, false))
-                set_file(value, global_settings.wps_file, MAX_FILENAME);
+                set_file(value, (char *)global_settings.wps_file, MAX_FILENAME);
         }
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
         else if (!strcasecmp(name, "rwps")) {
             if (wps_data_load(gui_wps[1].data,value,true, false))
-                set_file(value, global_settings.rwps_file, MAX_FILENAME);
+                set_file(value, (char *)global_settings.rwps_file, MAX_FILENAME);
         }
 #endif
         else if (!strcasecmp(name, "lang")) {
             if (!lang_load(value))
             {
-                set_file(value, global_settings.lang_file, MAX_FILENAME);
+                set_file(value, (char *)global_settings.lang_file, MAX_FILENAME);
                 talk_init(); /* use voice of same language */
             }
         }
 #ifdef HAVE_LCD_BITMAP
         else if (!strcasecmp(name, "font")) {
             if (font_load(value))
-                set_file(value, global_settings.font_file, MAX_FILENAME);
+                set_file(value, (char *)global_settings.font_file, MAX_FILENAME);
         }
 #endif
 
@@ -1367,7 +1375,7 @@ bool settings_save_config(void)
 
     close(fd);
 
-    gui_syncsplash(HZ, true, "%s %s", str(LANG_SETTINGS_SAVED1),
+    gui_syncsplash(HZ, true, (unsigned char *)"%s %s", str(LANG_SETTINGS_SAVED1),
            str(LANG_SETTINGS_SAVED2));
     return true;
 }
@@ -1447,9 +1455,9 @@ void settings_reset(void) {
 bool set_bool(const char* string, bool* variable )
 {
     return set_bool_options(string, variable,
-        STR(LANG_SET_BOOL_YES),
-        STR(LANG_SET_BOOL_NO),
-        NULL);
+                            (char *)STR(LANG_SET_BOOL_YES),
+                            (char *)STR(LANG_SET_BOOL_NO),
+                            NULL);
 }
 
 /* wrapper to convert from int param to bool param in set_option */
@@ -1467,7 +1475,10 @@ bool set_bool_options(const char* string, bool* variable,
                       const char* no_str, int no_voice,
                       void (*function)(bool))
 {
-    struct opt_items names[] = { {no_str, no_voice}, {yes_str, yes_voice} };
+    struct opt_items names[] = {
+        {(unsigned char *)no_str, no_voice},
+        {(unsigned char *)yes_str, yes_voice}
+    };
     bool result;
 
     boolfunction = function;
@@ -1492,7 +1503,7 @@ void talk_unit(int unit, int value)
     }
 }
 
-bool set_int(const char* string,
+bool set_int(const unsigned char* string,
              const char* unit,
              int voice_unit,
              int* variable,
@@ -1505,7 +1516,8 @@ bool set_int(const char* string,
     int button;
     int oldvalue=*variable;
     struct gui_select select;
-    gui_select_init_numeric(&select, string, *variable, min, max, step, unit, formatter);
+    gui_select_init_numeric(&select, (char *)string, *variable, min, max, step, unit,
+                            formatter);
     gui_syncselect_draw(&select);
     talk_unit(voice_unit, *variable);
     while (!gui_select_is_validated(&select))

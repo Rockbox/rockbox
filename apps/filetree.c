@@ -106,10 +106,10 @@ static void check_file_thumbnails(struct tree_context* c)
     {
         int ext_pos;
 
-        ext_pos = strlen(entry->d_name) - strlen(file_thumbnail_ext);
+        ext_pos = strlen((char *)entry->d_name) - strlen(file_thumbnail_ext);
         if (ext_pos <= 0 /* too short to carry ".talk" */
             || (entry->attribute & ATTR_DIRECTORY) /* no file */
-            || strcasecmp(&entry->d_name[ext_pos], file_thumbnail_ext))
+            || strcasecmp((char *)&entry->d_name[ext_pos], file_thumbnail_ext))
         {   /* or doesn't end with ".talk", no candidate */
             continue;
         }
@@ -121,7 +121,7 @@ static void check_file_thumbnails(struct tree_context* c)
         /* search corresponding file in dir cache */
         for (i=0; i < c->filesindir; i++)
         {
-            if (!strcasecmp(dircache[i].name, entry->d_name))
+            if (!strcasecmp(dircache[i].name, (char *)entry->d_name))
             {   /* match */
                 dircache[i].attr |= TREE_ATTR_THUMBNAIL; /* set the flag */
                 break; /* exit search loop, because we found it */
@@ -219,14 +219,12 @@ int ft_load(struct tree_context* c, const char* tempdir)
         if (!entry)
             break;
 
-        len = strlen(entry->d_name);
+        len = strlen((char *)entry->d_name);
 
         /* skip directories . and .. */
         if ((entry->attribute & ATTR_DIRECTORY) &&
-            (((len == 1) &&
-            (!strncmp(entry->d_name, ".", 1))) ||
-            ((len == 2) &&
-            (!strncmp(entry->d_name, "..", 2))))) {
+            (((len == 1) && (!strncmp((char *)entry->d_name, ".", 1))) ||
+             ((len == 2) && (!strncmp((char *)entry->d_name, "..", 2))))) {
             i--;
             continue;
         }
@@ -249,7 +247,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
 
         /* check for known file types */
         if ( !(dptr->attr & ATTR_DIRECTORY) )
-           dptr->attr |= filetype_get_attr(entry->d_name);
+            dptr->attr |= filetype_get_attr((char *)entry->d_name);
 
 #ifdef BOOTFILE
         /* memorize/compare details about the boot file */
@@ -295,7 +293,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
         dptr->time_write =
             (long)entry->wrtdate<<16 |
             (long)entry->wrttime; /* in one # */
-        strcpy(dptr->name,entry->d_name);
+        strcpy(dptr->name, (char *)entry->d_name);
         name_buffer_used += len + 1;
 
         if (dptr->attr & ATTR_DIRECTORY) /* count the remaining dirs */
@@ -384,7 +382,7 @@ int ft_enter(struct tree_context* c)
                 /* wps config file */
             case TREE_ATTR_WPS:
                 wps_data_load(gui_wps[0].data, buf, true, true);
-                set_file(buf, global_settings.wps_file,
+                set_file(buf, (char *)global_settings.wps_file,
                          MAX_FILENAME);
                 break;
 
@@ -392,7 +390,7 @@ int ft_enter(struct tree_context* c)
                 /* remote-wps config file */
             case TREE_ATTR_RWPS:
                 wps_data_load(gui_wps[1].data, buf, true, true);
-                set_file(buf, global_settings.rwps_file,
+                set_file(buf, (char *)global_settings.rwps_file,
                          MAX_FILENAME);
                 break;
 #endif
@@ -416,7 +414,7 @@ int ft_enter(struct tree_context* c)
 
             case TREE_ATTR_LNG:
                 if(!lang_load(buf)) {
-                    set_file(buf, global_settings.lang_file,
+                    set_file(buf, (char *)global_settings.lang_file,
                              MAX_FILENAME);
                     talk_init(); /* use voice of same language */
                     gui_syncsplash(HZ, true, str(LANG_LANGUAGE_LOADED));
@@ -426,7 +424,7 @@ int ft_enter(struct tree_context* c)
 #ifdef HAVE_LCD_BITMAP
             case TREE_ATTR_FONT:
                 font_load(buf);
-                set_file(buf, global_settings.font_file, MAX_FILENAME);
+                set_file(buf, (char *)global_settings.font_file, MAX_FILENAME);
                 break;
 #endif
 

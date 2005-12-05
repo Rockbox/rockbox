@@ -184,12 +184,12 @@ void tree_get_fileicon(int selected_item, void * data, ICON * icon)
     struct tree_context * local_tc=(struct tree_context *)data;
     bool id3db = *(local_tc->dirfilter) == SHOW_ID3DB;
     if (id3db) {
-        *icon = db_get_icon(&tc);
+        *icon = (ICON)db_get_icon(&tc);
     }
     else {
         struct entry* dc = local_tc->dircache;
         struct entry* e = &dc[selected_item];
-        *icon = filetype_get_icon(e->attr);
+        *icon = (ICON)filetype_get_icon(e->attr);
     }
 }
 
@@ -423,7 +423,8 @@ static void start_resume(bool just_powered_on)
             start_wps = true;
         }
         else return;
-    } else if (! just_powered_on) {
+    }
+    else if (! just_powered_on) {
         gui_syncsplash(HZ*2, true, str(LANG_NOTHING_TO_RESUME));
     }
 }
@@ -1014,8 +1015,8 @@ static bool add_dir(char* dirname, int len, int fd)
             int dirlen = strlen(dirname);
             bool result;
 
-            if (!strcmp(entry->d_name, ".") ||
-                !strcmp(entry->d_name, ".."))
+            if (!strcmp((char *)entry->d_name, ".") ||
+                !strcmp((char *)entry->d_name, ".."))
                 continue;
 
             if (dirname[1])
@@ -1031,9 +1032,9 @@ static bool add_dir(char* dirname, int len, int fd)
             }
         }
         else {
-            int x = strlen(entry->d_name);
+            int x = strlen((char *)entry->d_name);
             unsigned int i;
-            char *cp = strrchr(entry->d_name,'.');
+            char *cp = strrchr((char *)entry->d_name,'.');
 
             if (cp) {
                 cp++;
@@ -1056,7 +1057,7 @@ static bool add_dir(char* dirname, int len, int fd)
                             FOR_NB_SCREENS(i)
                             {
                                 gui_textarea_clear(&screens[i]);
-                                screens[i].puts(0,4,buf);
+                                screens[i].puts(0, 4, (unsigned char *)buf);
                             }
 #else
                             x = 10;
@@ -1098,8 +1099,8 @@ bool create_playlist(void)
     FOR_NB_SCREENS(i)
     {
         gui_textarea_clear(&screens[i]);
-        screens[i].puts(0,0,str(LANG_CREATING));
-        screens[i].puts_scroll(0,1,filename);
+        screens[i].puts(0, 0, str(LANG_CREATING));
+        screens[i].puts_scroll(0, 1, (unsigned char *)filename);
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
         gui_textarea_update(&screens[i]);
 #endif

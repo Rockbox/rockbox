@@ -267,8 +267,8 @@ void pcmbuf_play_stop(void)
 void pcmbuf_init(long bufsize)
 {
     pcmbuf_size = bufsize;
-    audiobuffer = &audiobuf[(audiobufend - audiobuf) - 
-                            pcmbuf_size - PCMBUF_GUARD];
+    audiobuffer = (char *)&audiobuf[(audiobufend - audiobuf) - 
+                                    pcmbuf_size - PCMBUF_GUARD];
     guardbuf = &audiobuffer[pcmbuf_size];
     pcmbuf_event_handler = NULL;
     pcmbuf_play_stop();

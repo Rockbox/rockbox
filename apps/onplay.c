@@ -123,11 +123,12 @@ static bool list_viewers(void)
         result = menu_show(m);
         menu_exit(m);
         if (result >= 0)
-            ret = filetype_load_plugin(menu[result].desc,selected_file);
+            ret = filetype_load_plugin((char *)menu[result].desc,selected_file);
     }
     else
     {
-        gui_syncsplash(HZ*2, true, "No viewers found");
+        /* FIX: translation! */
+        gui_syncsplash(HZ*2, true, (unsigned char *)"No viewers found");
     }
 
     if (ret == PLUGIN_USB_CONNECTED)
@@ -182,12 +183,12 @@ static bool add_to_playlist(int position, bool queue)
             bool exit = false;
             
             lcd_clear_display();
-            lcd_puts_scroll(0,0,str(LANG_RECURSE_DIRECTORY_QUESTION));
-            lcd_puts_scroll(0,1,selected_file);
+            lcd_puts_scroll(0, 0, str(LANG_RECURSE_DIRECTORY_QUESTION));
+            lcd_puts_scroll(0, 1, (unsigned char *)selected_file);
             
 #ifdef HAVE_LCD_BITMAP
-            lcd_puts(0,3,str(LANG_CONFIRM_WITH_PLAY_RECORDER));
-            lcd_puts(0,4,str(LANG_CANCEL_WITH_ANY_RECORDER)); 
+            lcd_puts(0, 3, str(LANG_CONFIRM_WITH_PLAY_RECORDER));
+            lcd_puts(0, 4, str(LANG_CANCEL_WITH_ANY_RECORDER)); 
 #endif
             
             lcd_update();
@@ -365,8 +366,8 @@ static int remove_dir(char* dirname, int len)
 
         if (entry->attribute & ATTR_DIRECTORY) 
         {   /* remove a subdirectory */
-            if (!strcmp(entry->d_name, ".") ||
-                !strcmp(entry->d_name, ".."))
+            if (!strcmp((char *)entry->d_name, ".") ||
+                !strcmp((char *)entry->d_name, ".."))
                 continue; /* skip these */
 
             result = remove_dir(dirname, len); /* recursion */
@@ -395,11 +396,11 @@ static int remove_dir(char* dirname, int len)
 static bool delete_handler(bool is_dir)
 {
     char *lines[]={
-        str(LANG_REALLY_DELETE),
+        (char *)str(LANG_REALLY_DELETE),
         selected_file
     };
     char *yes_lines[]={
-        str(LANG_DELETED),
+        (char *)str(LANG_DELETED),
         selected_file
     };
 
@@ -476,7 +477,8 @@ bool create_dir(void)
 
     rc = mkdir(dirname, 0);
     if (rc < 0) {
-        gui_syncsplash(HZ, true, "%s %s", str(LANG_CREATE_DIR), str(LANG_FAILED));
+        gui_syncsplash(HZ, true, (unsigned char *)"%s %s",
+                       str(LANG_CREATE_DIR), str(LANG_FAILED));
     } else {
         onplay_result = ONPLAY_RELOAD_DIR;
     }

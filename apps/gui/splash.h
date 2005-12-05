@@ -39,6 +39,6 @@ extern void gui_splash(struct screen * screen, int ticks,
  *  - fmt : what to say *printf style
  */
 extern void gui_syncsplash(int ticks, bool center,
-                           const char *fmt, ...);
+                           const unsigned char *fmt, ...);
 
 #endif /* _GUI_ICON_H_ */

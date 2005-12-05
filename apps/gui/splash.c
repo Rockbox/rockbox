@@ -186,7 +186,7 @@ static void splash(struct screen * screen,
 }
 
 void gui_splash(struct screen * screen, int ticks,
-                    bool center,  const char *fmt, ...)
+                    bool center,  const unsigned char *fmt, ...)
 {
     va_list ap;
     va_start( ap, fmt );
@@ -197,7 +197,7 @@ void gui_splash(struct screen * screen, int ticks,
         sleep(ticks);
 }
 
-void gui_syncsplash(int ticks, bool center,  const char *fmt, ...)
+void gui_syncsplash(int ticks, bool center,  const unsigned char *fmt, ...)
 {
     va_list ap;
     int i;

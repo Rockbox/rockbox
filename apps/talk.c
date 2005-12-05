@@ -115,7 +115,7 @@ static int open_voicefile(void)
     if ( global_settings.lang_file[0] &&
          global_settings.lang_file[0] != 0xff ) 
     {   /* try to open the voice file of the selected language */
-        p_lang = global_settings.lang_file;
+        p_lang = (char *)global_settings.lang_file;
     }
 
     snprintf(buf, sizeof(buf), ROCKBOX_DIR LANG_DIR "/%s.voice", p_lang);

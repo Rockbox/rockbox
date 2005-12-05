@@ -88,7 +88,7 @@ static bool car_adapter_mode(void)
  */
 static bool show_icons(void)
 {
-    return set_bool( str(LANG_SHOW_ICONS), &global_settings.show_icons );
+    return set_bool( (char *)str(LANG_SHOW_ICONS), &global_settings.show_icons );
 }
 
 #ifdef HAVE_REMOTE_LCD
@@ -102,9 +102,9 @@ static bool remote_contrast(void)
 
 static bool remote_invert(void)
 {
-     bool rc = set_bool_options(str(LANG_INVERT),
+     bool rc = set_bool_options((char *)str(LANG_INVERT),
                                 &global_settings.remote_invert,
-                                STR(LANG_INVERT_LCD_INVERSE),
+                                (char *)STR(LANG_INVERT_LCD_INVERSE),
                                 STR(LANG_INVERT_LCD_NORMAL),
                                 lcd_remote_set_invert_display);
      return rc;
@@ -112,7 +112,7 @@ static bool remote_invert(void)
 
 static bool remote_flip_display(void)
 {
-    bool rc = set_bool( str(LANG_FLIP_DISPLAY),
+    bool rc = set_bool( (char *)str(LANG_FLIP_DISPLAY),
                         &global_settings.remote_flip_display);
     
     lcd_remote_set_flip(global_settings.remote_flip_display);
@@ -138,35 +138,35 @@ static bool remote_reduce_ticking(void)
 static const struct opt_items backlight_timeouts[] = {
     { STR(LANG_OFF) },
     { STR(LANG_ON) },
-    { "1s ", TALK_ID(1, UNIT_SEC) },
-    { "2s ", TALK_ID(2, UNIT_SEC) },
-    { "3s ", TALK_ID(3, UNIT_SEC) },
-    { "4s ", TALK_ID(4, UNIT_SEC) },
-    { "5s ", TALK_ID(5, UNIT_SEC) },
-    { "6s ", TALK_ID(6, UNIT_SEC) },
-    { "7s ", TALK_ID(7, UNIT_SEC) },
-    { "8s ", TALK_ID(8, UNIT_SEC) },
-    { "9s ", TALK_ID(9, UNIT_SEC) },
-    { "10s", TALK_ID(10, UNIT_SEC) },
-    { "15s", TALK_ID(15, UNIT_SEC) },
-    { "20s", TALK_ID(20, UNIT_SEC) },
-    { "25s", TALK_ID(25, UNIT_SEC) },
-    { "30s", TALK_ID(30, UNIT_SEC) },
-    { "45s", TALK_ID(45, UNIT_SEC) },
-    { "60s", TALK_ID(60, UNIT_SEC) },
-    { "90s", TALK_ID(90, UNIT_SEC) }
+    { (unsigned char *)"1s ", TALK_ID(1, UNIT_SEC) },
+    { (unsigned char *)"2s ", TALK_ID(2, UNIT_SEC) },
+    { (unsigned char *)"3s ", TALK_ID(3, UNIT_SEC) },
+    { (unsigned char *)"4s ", TALK_ID(4, UNIT_SEC) },
+    { (unsigned char *)"5s ", TALK_ID(5, UNIT_SEC) },
+    { (unsigned char *)"6s ", TALK_ID(6, UNIT_SEC) },
+    { (unsigned char *)"7s ", TALK_ID(7, UNIT_SEC) },
+    { (unsigned char *)"8s ", TALK_ID(8, UNIT_SEC) },
+    { (unsigned char *)"9s ", TALK_ID(9, UNIT_SEC) },
+    { (unsigned char *)"10s", TALK_ID(10, UNIT_SEC) },
+    { (unsigned char *)"15s", TALK_ID(15, UNIT_SEC) },
+    { (unsigned char *)"20s", TALK_ID(20, UNIT_SEC) },
+    { (unsigned char *)"25s", TALK_ID(25, UNIT_SEC) },
+    { (unsigned char *)"30s", TALK_ID(30, UNIT_SEC) },
+    { (unsigned char *)"45s", TALK_ID(45, UNIT_SEC) },
+    { (unsigned char *)"60s", TALK_ID(60, UNIT_SEC) },
+    { (unsigned char *)"90s", TALK_ID(90, UNIT_SEC) }
 };
 
 static bool caption_backlight(void)
 {
-    return set_bool( str(LANG_CAPTION_BACKLIGHT),
+    return set_bool( (char *)str(LANG_CAPTION_BACKLIGHT),
                      &global_settings.caption_backlight);
 }
 
 #ifdef HAVE_CHARGING
 static bool backlight_timer_plugged(void)
 {
-    return set_option(str(LANG_BACKLIGHT_ON_WHEN_CHARGING),
+    return set_option((char *)str(LANG_BACKLIGHT_ON_WHEN_CHARGING),
                       &global_settings.backlight_timeout_plugged,
                       INT, backlight_timeouts, 19,
                       backlight_set_timeout_plugged );
@@ -175,7 +175,7 @@ static bool backlight_timer_plugged(void)
 
 static bool backlight_timer(void)
 {
-    return set_option(str(LANG_BACKLIGHT),
+    return set_option((char *)str(LANG_BACKLIGHT),
                       &global_settings.backlight_timeout,
                       INT, backlight_timeouts, 19,
                       backlight_set_timeout );
@@ -186,9 +186,9 @@ static bool backlight_fade_in(void)
 {
     static const struct opt_items names[] = {
         { STR(LANG_OFF) },
-        { "500ms", TALK_ID(500, UNIT_MS) },
-        { "1s", TALK_ID(1, UNIT_SEC) },
-        { "2s", TALK_ID(2, UNIT_SEC) },
+        { (unsigned char *)"500ms", TALK_ID(500, UNIT_MS) },
+        { (unsigned char *)"1s", TALK_ID(1, UNIT_SEC) },
+        { (unsigned char *)"2s", TALK_ID(2, UNIT_SEC) },
     };
     return set_option(str(LANG_BACKLIGHT_FADE_IN),
                       &global_settings.backlight_fade_in,
@@ -199,13 +199,13 @@ static bool backlight_fade_out(void)
 {
     static const struct opt_items names[] = {
         { STR(LANG_OFF) },
-        { "500ms", TALK_ID(500, UNIT_MS) },
-        { "1s", TALK_ID(1, UNIT_SEC) },
-        { "2s", TALK_ID(2, UNIT_SEC) },
-        { "3s", TALK_ID(3, UNIT_SEC) },
-        { "4s", TALK_ID(4, UNIT_SEC) },
-        { "5s", TALK_ID(5, UNIT_SEC) },
-        { "10s", TALK_ID(10, UNIT_SEC) },
+        { (unsigned char *)"500ms", TALK_ID(500, UNIT_MS) },
+        { (unsigned char *)"1s", TALK_ID(1, UNIT_SEC) },
+        { (unsigned char *)"2s", TALK_ID(2, UNIT_SEC) },
+        { (unsigned char *)"3s", TALK_ID(3, UNIT_SEC) },
+        { (unsigned char *)"4s", TALK_ID(4, UNIT_SEC) },
+        { (unsigned char *)"5s", TALK_ID(5, UNIT_SEC) },
+        { (unsigned char *)"10s", TALK_ID(10, UNIT_SEC) },
     };
     return set_option(str(LANG_BACKLIGHT_FADE_OUT),
                       &global_settings.backlight_fade_out,
@@ -218,7 +218,7 @@ static bool backlight_fade_out(void)
 
 static bool remote_backlight_timer(void)
 {
-    return set_option(str(LANG_BACKLIGHT),
+    return set_option((char *)str(LANG_BACKLIGHT),
                       &global_settings.remote_backlight_timeout,
                       INT, backlight_timeouts, 19,
                       remote_backlight_set_timeout );
@@ -227,7 +227,7 @@ static bool remote_backlight_timer(void)
 #ifdef HAVE_CHARGING
 static bool remote_backlight_timer_plugged(void)
 {
-    return set_option(str(LANG_BACKLIGHT_ON_WHEN_CHARGING),
+    return set_option((char *)str(LANG_BACKLIGHT_ON_WHEN_CHARGING),
                       &global_settings.remote_backlight_timeout_plugged,
                       INT, backlight_timeouts, 19,
                       remote_backlight_set_timeout_plugged );
@@ -236,8 +236,8 @@ static bool remote_backlight_timer_plugged(void)
 
 static bool remote_caption_backlight(void)
 {
-    return set_bool( str(LANG_CAPTION_BACKLIGHT),
-                     &global_settings.remote_caption_backlight);
+    return set_bool((char *)str(LANG_CAPTION_BACKLIGHT),
+                    &global_settings.remote_caption_backlight);
 }
 #endif /* HAVE_REMOTE_LCD */
 
@@ -256,12 +256,12 @@ static bool contrast(void)
  */
 static bool invert(void)
 {
-     bool rc = set_bool_options(str(LANG_INVERT),
-                                &global_settings.invert,
-                                STR(LANG_INVERT_LCD_INVERSE),
-                                STR(LANG_INVERT_LCD_NORMAL),
-                                lcd_set_invert_display);
-     return rc;
+    bool rc = set_bool_options(str(LANG_INVERT),
+                               &global_settings.invert,
+                               (char *)STR(LANG_INVERT_LCD_INVERSE),
+                               STR(LANG_INVERT_LCD_NORMAL),
+                               lcd_set_invert_display);
+    return rc;
 }
 
 /**
@@ -1428,12 +1428,15 @@ static bool bookmark_settings_menu(void)
 }
 static bool reset_settings(void)
 {
-    char *lines[]={str(LANG_RESET_ASK_RECORDER)};
-    char *yes_lines[]={str(LANG_RESET_DONE_SETTING), str(LANG_RESET_DONE_CLEAR)};
-    char *no_lines[]={yes_lines[0], str(LANG_RESET_DONE_CANCEL)};
-    struct text_message message={lines, 1};
-    struct text_message yes_message={yes_lines, 2};
-    struct text_message no_message={no_lines, 2};
+    unsigned char *lines[]={str(LANG_RESET_ASK_RECORDER)};
+    unsigned char *yes_lines[]={
+        str(LANG_RESET_DONE_SETTING),
+        str(LANG_RESET_DONE_CLEAR)
+    };
+    unsigned char *no_lines[]={yes_lines[0], str(LANG_RESET_DONE_CANCEL)};
+    struct text_message message={(char **)lines, 1};
+    struct text_message yes_message={(char **)yes_lines, 2};
+    struct text_message no_message={(char **)no_lines, 2};
 
     switch(gui_syncyesno_run(&message, &yes_message, &no_message))
     {

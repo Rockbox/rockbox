@@ -139,7 +139,7 @@ extern unsigned char vp_dummy[VIRT_SIZE];
 #define ID2P(id) (VIRT_PTR + id)
 
 /* resolve a pointer which could be a virtualized ID or a literal */
-#define P2STR(p) ((p>=VIRT_PTR && p<=VIRT_PTR+VIRT_SIZE) ? str(p-VIRT_PTR) : p)
+#define P2STR(p) (char *)((p>=VIRT_PTR && p<=VIRT_PTR+VIRT_SIZE) ? str(p-VIRT_PTR) : p)
 
 /* get the string ID from a virtual pointer, -1 if not virtual */
 #define P2ID(p) ((p>=VIRT_PTR && p<=VIRT_PTR+VIRT_SIZE) ? p-VIRT_PTR : -1)
@@ -403,7 +403,8 @@ bool set_bool_options(const char* string, bool* variable,
 bool set_bool(const char* string, bool* variable );
 bool set_option(const char* string, void* variable, enum optiontype type,
                 const struct opt_items* options, int numoptions, void (*function)(int));
-bool set_int(const char* string, const char* unit, int voice_unit, int* variable,
+bool set_int(const unsigned char* string, const char* unit, int voice_unit,
+             int* variable,
              void (*function)(int), int step, int min, int max, 
              void (*formatter)(char*, int, int, const char*) );
 bool set_time_screen(const char* string, struct tm *tm);

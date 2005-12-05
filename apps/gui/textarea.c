@@ -49,7 +49,7 @@ int gui_textarea_put_message(struct screen * display,
     int i;
     gui_textarea_clear(display);
     for(i=0;i<message->nb_lines && i+ystart<display->nb_lines;i++)
-        display->puts_scroll(0, i+ystart, message->message_lines[i]);
+        display->puts_scroll(0, i+ystart, (unsigned char *)message->message_lines[i]);
     gui_textarea_update(display);
     return(i);
 }
@@ -64,7 +64,8 @@ void gui_textarea_update_nblines(struct screen * display)
     if(global_settings.buttonbar && display->has_buttonbar)
         height -= BUTTONBAR_HEIGHT;
 #endif
-    display->getstringsize("A", &display->char_width, &display->char_height);
+    display->getstringsize((unsigned char *)"A", &display->char_width,
+                           &display->char_height);
     display->nb_lines = height / display->char_height;
 #else
     display->char_width  = 1;

@@ -207,14 +207,14 @@ bool bookmark_autobookmark(void)
             return write_bookmark(false);
     }
 #ifdef HAVE_LCD_BITMAP
-    char *lines[]={str(LANG_AUTO_BOOKMARK_QUERY),
-                   str(LANG_CONFIRM_WITH_PLAY_RECORDER),
-                   str(LANG_CANCEL_WITH_ANY_RECORDER)};
-    struct text_message message={lines, 3};
+    unsigned char *lines[]={str(LANG_AUTO_BOOKMARK_QUERY),
+                            str(LANG_CONFIRM_WITH_PLAY_RECORDER),
+                            str(LANG_CANCEL_WITH_ANY_RECORDER)};
+    struct text_message message={(char **)lines, 3};
 #else
-    char *lines[]={str(LANG_AUTO_BOOKMARK_QUERY),
-                   str(LANG_RESUME_CONFIRM_PLAYER)};
-    struct text_message message={lines, 2};
+    unsigned char *lines[]={str(LANG_AUTO_BOOKMARK_QUERY),
+                            str(LANG_RESUME_CONFIRM_PLAYER)};
+    struct text_message message={(char **)lines, 2};
 #endif
     gui_syncstatusbar_draw(&statusbars, false);
     if(gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
@@ -766,7 +766,7 @@ static void display_bookmark(const char* bookmark,
       dot=NULL;
     if (dot)
         *dot='\0';
-    lcd_puts_scroll(0, 0, global_filename);
+    lcd_puts_scroll(0, 0, (unsigned char *)global_filename);
     if (dot)
         *dot='.';
 
@@ -774,12 +774,12 @@ static void display_bookmark(const char* bookmark,
     snprintf(global_temp_buffer, sizeof(global_temp_buffer), "%s: %2d/%2d",
              str(LANG_BOOKMARK_SELECT_BOOKMARK_TEXT),
              bookmark_id + 1, bookmark_count);
-    lcd_puts_scroll(0, 1, global_temp_buffer);
+    lcd_puts_scroll(0, 1, (unsigned char *)global_temp_buffer);
 
     /* bookmark resume index */
     snprintf(global_temp_buffer, sizeof(global_temp_buffer), "%s: %2d",
              str(LANG_BOOKMARK_SELECT_INDEX_TEXT), resume_index+1);
-    lcd_puts_scroll(0, 2, global_temp_buffer);
+    lcd_puts_scroll(0, 2, (unsigned char *)global_temp_buffer);
 
     /* elapsed time*/
     if ( ms < 3600000 )
@@ -799,7 +799,7 @@ static void display_bookmark(const char* bookmark,
                  ms % 3600000 / 60000,
                  (unsigned int)(ms % 60000) / 1000);
     }
-    lcd_puts_scroll(0, 3, global_temp_buffer);
+    lcd_puts_scroll(0, 3, (unsigned char *)global_temp_buffer);
 
     /* commands */
     lcd_puts_scroll(0, 4, str(LANG_BOOKMARK_SELECT_PLAY));

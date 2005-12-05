@@ -1130,7 +1130,7 @@ void gui_wps_format(struct wps_data *data, const char *bmpdir,
 
                             /* load the image */
                             ret = read_bmp_file(imgname, &data->img[n].w,
-                                                &data->img[n].h, img_buf_ptr,
+                                                &data->img[n].h, (char *)img_buf_ptr,
                                                 img_buf_free);
                             if (ret > 0)
                             {
@@ -1389,10 +1389,11 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
 #endif
 #ifdef HAVE_LCD_BITMAP
             /* calculate different string sizes and positions */
-            display->getstringsize(" ", &space_width, &string_height);
+            display->getstringsize((unsigned char *)" ", &space_width, &string_height);
             if (data->format_align[i][data->curr_subline[i]].left != 0) {
-                display->getstringsize(data->format_align[i][data->curr_subline[i]].left,
-                                  &left_width, &string_height);
+                display->getstringsize((unsigned char *)data->format_align[i]
+                                       [data->curr_subline[i]].left,
+                                       &left_width, &string_height);
             }
             else {
                 left_width = 0;
@@ -1400,8 +1401,9 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
             left_xpos = 0;
 
             if (data->format_align[i][data->curr_subline[i]].center != 0) {
-                display->getstringsize(data->format_align[i][data->curr_subline[i]].center,
-                                  &center_width, &string_height);
+                display->getstringsize((unsigned char *)data->format_align[i]
+                                       [data->curr_subline[i]].center,
+                                       &center_width, &string_height);
             }
             else {
                 center_width = 0;
@@ -1409,8 +1411,9 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
             center_xpos=(display->width - center_width) / 2;
 
             if (data->format_align[i][data->curr_subline[i]].right != 0) {
-                display->getstringsize(data->format_align[i][data->curr_subline[i]].right,
-                                  &right_width, &string_height);
+                display->getstringsize((unsigned char *)data->format_align[i]
+                                       [data->curr_subline[i]].right,
+                                       &right_width, &string_height);
             }
             else {
                 right_width = 0;
@@ -1517,7 +1520,8 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
 
                     if (left_width>display->width) {
                         display->puts_scroll(0, i,
-                                             data->format_align[i][data->curr_subline[i]].left);
+                                             (unsigned char *)data->format_align[i]
+                                             [data->curr_subline[i]].left);
                     } else {
                         /* clear the line first */
                         display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
@@ -1526,23 +1530,26 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
 
                         /* Nasty hack: we output an empty scrolling string,
                            which will reset the scroller for that line */
-                        display->puts_scroll(0, i, "");
+                        display->puts_scroll(0, i, (unsigned char *)"");
                         
                         /* print aligned strings */
                         if (left_width != 0)
                         {
                             display->putsxy(left_xpos, ypos,
-                                            data->format_align[i][data->curr_subline[i]].left);
+                                            (unsigned char *)data->format_align[i]
+                                            [data->curr_subline[i]].left);
                         }
                         if (center_width != 0)
                         {
                             display->putsxy(center_xpos, ypos, 
-                                            data->format_align[i][data->curr_subline[i]].center);
+                                            (unsigned char *)data->format_align[i]
+                                            [data->curr_subline[i]].center);
                         }
                         if (right_width != 0)
                         {
                             display->putsxy(right_xpos, ypos,
-                                            data->format_align[i][data->curr_subline[i]].right);
+                                            (unsigned char *)data->format_align[i]
+                                            [data->curr_subline[i]].right);
                         }
                     }
 #else
@@ -1568,23 +1575,26 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
 
                     /* Nasty hack: we output an empty scrolling string,
                        which will reset the scroller for that line */
-                    display->puts_scroll(0, i, "");
+                    display->puts_scroll(0, i, (unsigned char *)"");
                         
                     /* print aligned strings */
                     if (left_width != 0)
                     {
                         display->putsxy(left_xpos, ypos,
-                                        data->format_align[i][data->curr_subline[i]].left);
+                                        (unsigned char *)data->format_align[i]
+                                        [data->curr_subline[i]].left);
                     }
                     if (center_width != 0)
                     {
                         display->putsxy(center_xpos, ypos,
-                                        data->format_align[i][data->curr_subline[i]].center);
+                                        (unsigned char *)data->format_align[i]
+                                        [data->curr_subline[i]].center);
                     }
                     if (right_width != 0)
                     {
                         display->putsxy(right_xpos, ypos,
-                                        data->format_align[i][data->curr_subline[i]].right);
+                                        (unsigned char *)data->format_align[i]
+                                        [data->curr_subline[i]].right);
                     }
 #else
                     update_line = true;

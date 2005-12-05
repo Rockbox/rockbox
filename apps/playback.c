@@ -222,8 +222,8 @@ static void do_swap(int idx_old, int idx_new)
     memcpy(iram_p, iram_buf[idx_new], CODEC_IRAM_SIZE);
 #endif
 
-    dram_buf[0] = &filebuf[filebuflen+CODEC_IRAM_SIZE*2];
-    dram_buf[1] = &filebuf[filebuflen+CODEC_IRAM_SIZE*2+CODEC_SIZE];
+    dram_buf[0] = (unsigned char *)&filebuf[filebuflen+CODEC_IRAM_SIZE*2];
+    dram_buf[1] = (unsigned char *)&filebuf[filebuflen+CODEC_IRAM_SIZE*2+CODEC_SIZE];
     memcpy(dram_buf[idx_old], codecbuf, CODEC_SIZE);
     memcpy(codecbuf, dram_buf[idx_new], CODEC_SIZE);
 }
@@ -1924,7 +1924,7 @@ void codec_thread(void)
 
 static void reset_buffer(void)
 {
-    filebuf = &audiobuf[MALLOC_BUFSIZE];
+    filebuf = (char *)&audiobuf[MALLOC_BUFSIZE];
     filebuflen = audiobufend - audiobuf - pcmbuf_get_bufsize()
                   - PCMBUF_GUARD - MALLOC_BUFSIZE - GUARD_BUFSIZE;
                   
@@ -2287,7 +2287,7 @@ void mp3_play_data(const unsigned char* start, int size,
                    void (*get_more)(unsigned char** start, int* size))
 {
     voice_getmore = get_more;
-    voicebuf = (unsigned char *)start;
+    voicebuf = (char *)start;
     voice_remaining = size;
     voice_is_playing = true;
     pcmbuf_reset_mixpos();
@@ -2334,7 +2334,7 @@ void audio_set_crossfade(int enable)
 
     /* Re-initialize audio system. */
     if (was_playing)
-        gui_syncsplash(0, true, str(LANG_RESTARTING_PLAYBACK));
+        gui_syncsplash(0, true, (char *)str(LANG_RESTARTING_PLAYBACK));
     pcmbuf_init(size);
     pcmbuf_crossfade_enable(enable);
     reset_buffer();
@@ -2385,7 +2385,7 @@ void audio_init(void)
     filebufused = 0;
     filling = false;
     current_codec = CODEC_IDX_AUDIO;
-    filebuf = &audiobuf[MALLOC_BUFSIZE];
+    filebuf = (char *)&audiobuf[MALLOC_BUFSIZE];
     playing = false;
     audio_codec_loaded = false;
     voice_is_playing = false;

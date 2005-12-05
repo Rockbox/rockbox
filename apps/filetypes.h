@@ -25,7 +25,7 @@
 
 int filetype_get_attr(const char*);
 #ifdef HAVE_LCD_BITMAP
-const char* filetype_get_icon(int);
+const unsigned char* filetype_get_icon(int);
 #else
 int   filetype_get_icon(int);
 #endif

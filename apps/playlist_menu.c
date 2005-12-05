@@ -55,7 +55,7 @@ static bool recurse_directory(void)
         { STR(LANG_RESUME_SETTING_ASK)},
     };
 
-    return set_option( str(LANG_RECURSE_DIRECTORY),
+    return set_option( (char *)str(LANG_RECURSE_DIRECTORY),
                        &global_settings.recursive_dir_insert, INT, names, 3,
                        NULL );
 }

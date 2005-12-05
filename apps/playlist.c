@@ -173,7 +173,7 @@ static int get_previous_directory(char *dir);
 static int check_subdir_for_music(char *dir, char *subdir);
 static int format_track_path(char *dest, char *src, int buf_length, int max,
                              char *dir);
-static void display_playlist_count(int count, const char *fmt);
+static void display_playlist_count(int count, const unsigned char *fmt);
 static void display_buffer_full(void);
 static int flush_pending_control(struct playlist_info* playlist);
 static int rotate_index(const struct playlist_info* playlist, int index);
@@ -274,9 +274,9 @@ static void create_control(struct playlist_info* playlist)
     {
         if (check_rockboxdir())
         {
-            gui_syncsplash(HZ*2, true, "%s (%d)",
-                str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR),
-                playlist->control_fd);
+            gui_syncsplash(HZ*2, true, (unsigned char *)"%s (%d)",
+                           str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR),
+                           playlist->control_fd);
         }
         playlist->control_created = false;
     }
@@ -375,7 +375,7 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
         audio_stop();
         talk_buffer_steal(); /* we use the mp3 buffer, need to tell */
 
-        buffer = audiobuf;
+        buffer = (char *)audiobuf;
         buflen = (audiobufend - audiobuf);
     }
     
@@ -388,7 +388,7 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
         if(nread <= 0)
             break;
         
-        p = buffer;
+        p = (unsigned char *)buffer;
 
         for(count=0; count < nread; count++,p++) {
 
@@ -598,7 +598,7 @@ static int add_directory_to_playlist(struct playlist_info* playlist,
                                      bool queue, int *count, bool recurse)
 {
     char buf[MAX_PATH+1];
-    char *count_str;
+    unsigned char *count_str;
     int result = 0;
     int num_files = 0;
     int i;
@@ -1512,7 +1512,7 @@ static int format_track_path(char *dest, char *src, int buf_length, int max,
  * Display splash message showing progress of playlist/directory insertion or
  * save.
  */
-static void display_playlist_count(int count, const char *fmt)
+static void display_playlist_count(int count, const unsigned char *fmt)
 {
     lcd_clear_display();
 
@@ -1525,9 +1525,9 @@ static void display_playlist_count(int count, const char *fmt)
 
     gui_syncsplash(0, true, fmt, count,
 #if CONFIG_KEYPAD == PLAYER_PAD
-           str(LANG_STOP_ABORT)
+                   str(LANG_STOP_ABORT)
 #else
-           str(LANG_OFF_ABORT)
+                   str(LANG_OFF_ABORT)
 #endif
         );
 }
@@ -1537,9 +1537,9 @@ static void display_playlist_count(int count, const char *fmt)
  */
 static void display_buffer_full(void)
 {
-    gui_syncsplash(HZ*2, true, "%s %s",
-           str(LANG_PLAYINDICES_PLAYLIST),
-           str(LANG_PLAYINDICES_BUFFER));
+    gui_syncsplash(HZ*2, true, (unsigned char *)"%s %s",
+                   str(LANG_PLAYINDICES_PLAYLIST),
+                   str(LANG_PLAYINDICES_BUFFER));
 }
 
 /*
@@ -1684,10 +1684,10 @@ int playlist_resume(void)
 #if CONFIG_CODEC != SWCODEC
     talk_buffer_steal(); /* we use the mp3 buffer, need to tell */
     buflen = (audiobufend - audiobuf);
-    buffer = audiobuf;
+    buffer = (char *)audiobuf;
 #else
     buflen = (audiobufend - audiobuf - talk_get_bufsize());
-    buffer = &audiobuf[talk_get_bufsize()];
+    buffer = (char *)&audiobuf[talk_get_bufsize()];
 #endif
 
     empty_playlist(playlist, true);
@@ -2602,7 +2602,7 @@ int playlist_insert_directory(struct playlist_info* playlist,
 {
     int count = 0;
     int result;
-    char *count_str;
+    unsigned char *count_str;
 
     if (!playlist)
         playlist = &current_playlist;
@@ -2649,7 +2649,7 @@ int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
     int max;
     char *temp_ptr;
     char *dir;
-    char *count_str;
+    unsigned char *count_str;
     char temp_buf[MAX_PATH+1];
     char trackname[MAX_PATH+1];
     int count = 0;

@@ -126,7 +126,7 @@ bool sleeptimer_screen(void)
             minutes = (seconds - (hours * 3600)) / 60;
             snprintf(buf, 32, "%d:%02d",
                      hours, minutes);
-            lcd_puts(0, 1, buf);
+            lcd_puts(0, 1, (unsigned char *)buf);
 
             if (sayit && global_settings.talk_menu)
             {

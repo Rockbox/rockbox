@@ -168,7 +168,7 @@ struct codec_api {
     /* Configure different codec buffer parameters. */
     void (*configure)(int setting, void *value);
 
-    void (*splash)(int ticks, bool center, const char *fmt, ...);
+    void (*splash)(int ticks, bool center, const unsigned char *fmt, ...);
 
     /* file */
     int (*PREFIX(open))(const char* pathname, int flags);

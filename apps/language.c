@@ -36,7 +36,7 @@ void lang_init(void)
     
     for (i = 0; i < LANG_LAST_INDEX_IN_ARRAY; i++) {
         language_strings[i] = ptr;
-        ptr += strlen(ptr) + 1; /* advance pointer to next string */
+        ptr += strlen((char *)ptr) + 1; /* advance pointer to next string */
     }
 }
 

@@ -149,7 +149,7 @@ void filetype_init(void)
 
 /* get icon */
 #ifdef HAVE_LCD_BITMAP
-const char* filetype_get_icon(int attr)
+const unsigned char* filetype_get_icon(int attr)
 #else
 int   filetype_get_icon(int attr)
 #endif
@@ -249,7 +249,7 @@ int filetype_load_menu(struct menu_item*  menu,int max_items)
             cp=strrchr(filetypes[i].plugin,'/');
             if (cp) cp++;
             else    cp=filetypes[i].plugin;
-            menu[cnt].desc = cp;
+            menu[cnt].desc = (unsigned char *)cp;
             cnt++;
             if (cnt == max_items)
                 break;
@@ -317,14 +317,14 @@ static void scan_plugins(void)
         /* exttypes[] full, bail out */
         if (cnt_exttypes >= MAX_EXTTYPES)
         {
-            gui_syncsplash(HZ,true,str(LANG_FILETYPES_EXTENSION_FULL));
+            gui_syncsplash(HZ, true, str(LANG_FILETYPES_EXTENSION_FULL));
             break;
         }
 
         /* filetypes[] full, bail out */
         if (cnt_filetypes >= MAX_FILETYPES)
         {
-            gui_syncsplash(HZ,true,str(LANG_FILETYPES_FULL));
+            gui_syncsplash(HZ, true, str(LANG_FILETYPES_FULL));
             break;
         }
 
@@ -348,31 +348,31 @@ static void scan_plugins(void)
         }
 
         /* filter out non rock files */
-        if (strcasecmp(
-             &entry->d_name[strlen(entry->d_name) - sizeof(ROCK_EXTENSION) + 1],
-             ROCK_EXTENSION)) {
+        if (strcasecmp((char *)&entry->d_name[strlen((char *)entry->d_name) -
+                                              sizeof(ROCK_EXTENSION) + 1],
+                       ROCK_EXTENSION)) {
             continue;
         }
 
         /* filter out to long filenames */
-        if (strlen(entry->d_name) > MAX_PLUGIN_LENGTH + 5)
+        if (strlen((char *)entry->d_name) > MAX_PLUGIN_LENGTH + 5)
         {
-            gui_syncsplash(HZ,true,str(LANG_FILETYPES_PLUGIN_NAME_LONG));
+            gui_syncsplash(HZ, true, str(LANG_FILETYPES_PLUGIN_NAME_LONG));
             continue;
         }
 
-        dot=strrchr(entry->d_name,'.');
+        dot=strrchr((char *)entry->d_name,'.');
         *dot='\0';
-        dash=strchr(entry->d_name,'-');
+        dash=strchr((char *)entry->d_name,'-');
 
         /* add plugin and extension */
         if (dash)
         {
             *dash='\0';
-            ix=(filetype_get_attr(entry->d_name) >> 8);
+            ix=(filetype_get_attr((char *)entry->d_name) >> 8);
             if (!ix)
             {
-                cp=get_string(entry->d_name);
+                cp=get_string((char *)entry->d_name);
                 if (cp)
                 {
                     exttypes[cnt_exttypes].extension=cp;
@@ -385,7 +385,7 @@ static void scan_plugins(void)
                     cnt_exttypes++;
 
                     *dash='-';
-                    cp=get_string(entry->d_name);
+                    cp=get_string((char *)entry->d_name);
                     if (cp)
                     {
                         filetypes[cnt_filetypes].plugin=cp;
@@ -402,7 +402,7 @@ static void scan_plugins(void)
                 *dash='-';
                 if (!filetypes[ix].plugin)
                 {
-                    cp=get_string(entry->d_name);
+                    cp=get_string((char *)entry->d_name);
                     if (cp)
                     {
                         filetypes[cnt_filetypes].plugin=cp;
@@ -421,7 +421,7 @@ static void scan_plugins(void)
             for (i = first_soft_filetype; i < cnt_filetypes; i++)
             {
                 if (filetypes[i].plugin)
-                    if (!strcasecmp(filetypes[i].plugin,entry->d_name))
+                    if (!strcasecmp(filetypes[i].plugin, (char *)entry->d_name))
                     {
                         found=true;
                         break;
@@ -430,7 +430,7 @@ static void scan_plugins(void)
 
             if (!found)
             {
-                cp=get_string(entry->d_name);
+                cp=get_string((char *)entry->d_name);
                 if (cp)
                 {
                     filetypes[cnt_filetypes].plugin=cp;
@@ -477,7 +477,7 @@ static int add_plugin(char *plugin)
                 {
                     cp = string2icon(icon);
                     if (cp)
-                        filetypes[cnt_filetypes].icon = cp;
+                        filetypes[cnt_filetypes].icon = (unsigned char *)cp;
                     else
                         return 0;
                 }
@@ -498,7 +498,7 @@ static int add_plugin(char *plugin)
         {
             cp = string2icon(icon);
             if (cp)
-                filetypes[cnt_filetypes].icon = cp;
+                filetypes[cnt_filetypes].icon = (unsigned char *)cp;
             else
                 return 0;
         }
@@ -538,13 +538,13 @@ bool read_config(const char* file)
     {
         if (cnt_exttypes >= MAX_EXTTYPES)
         {
-            gui_syncsplash(HZ,true,str(LANG_FILETYPES_EXTENSION_FULL));
+            gui_syncsplash(HZ, true, str(LANG_FILETYPES_EXTENSION_FULL));
             break;
         }
 
         if (cnt_filetypes >= MAX_FILETYPES)
         {
-            gui_syncsplash(HZ,true,str(LANG_FILETYPES_FULL));
+            gui_syncsplash(HZ, true, str(LANG_FILETYPES_FULL));
             break;
         }
 
@@ -635,7 +635,7 @@ bool read_config(const char* file)
                         {
                             cp = string2icon(str[icon]);
                             if (cp)
-                                exttypes[i].type->icon = cp;
+                                exttypes[i].type->icon = (unsigned char *)cp;
                         }
                     }
                 }
@@ -713,7 +713,7 @@ static char* string2icon(const char* str)
          (unsigned long) string_buffer -
          (unsigned long) next_free_string) < ICON_LENGTH)
     {
-        gui_syncsplash(HZ,true,str(LANG_FILETYPES_STRING_BUFFER_EMPTY));
+        gui_syncsplash(HZ, true, str(LANG_FILETYPES_STRING_BUFFER_EMPTY));
         return NULL;
     }
 
@@ -762,14 +762,14 @@ static char* get_string(const char* str)
              (unsigned long) string_buffer -
              (unsigned long) next_free_string))
     {
-        strcpy(next_free_string,str);
+        strcpy(next_free_string, str);
         cp=next_free_string;
         next_free_string=&next_free_string[l];
         return cp;
     }
     else
     {
-        gui_syncsplash(HZ,true,str(LANG_FILETYPES_STRING_BUFFER_EMPTY));
+        gui_syncsplash(HZ, true, str(LANG_FILETYPES_STRING_BUFFER_EMPTY));
         return NULL;
     }
 }
