@@ -60,7 +60,7 @@ Width: 160
 
 <wps>
 Name: engineeer2.wps
-RWPS: rockbox_default.rwps
+RWPS: engineeer2.rwps
 Author: Magnus Westerlund
 Font: nedore-8.fnt
 Statusbar: on
@@ -110,6 +110,15 @@ Width: 128
 Name: boxes.rwps
 Author: Christi Scarborough
 Font: rockbox_default.fnt
+Statusbar: on
+Height: 64
+Width: 128
+</rwps>
+
+<rwps>
+Name: engineeer2.rwps
+Author: Magnus Westerlund
+Font: nedore-8.fnt
 Statusbar: on
 Height: 64
 Width: 128
