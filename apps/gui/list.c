@@ -166,7 +166,7 @@ void gui_list_draw(struct gui_list * gui_list)
     for(i = 0;i < display->nb_lines;i++)
     {
         char entry_buffer[MAX_PATH];
-        char * entry_name;
+        unsigned char *entry_name;
         int current_item = gui_list->start_item + i;
 
         /* When there are less items to display than the

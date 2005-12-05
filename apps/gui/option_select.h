@@ -93,29 +93,4 @@ extern void option_select_next(struct option_select * opt);
  */
 extern void option_select_prev(struct option_select * opt);
 
-/*
- * Returns the selected number
- *  - opt : the option struct
- */
-#define option_select_get_selected(_opt) \
-    (_opt)->option
-
-/*
- * Returns the title
- *  - opt : the option struct
- */
-#define option_select_get_title(_opt) \
-    (_opt)->title
-
-/*
- * Tells the option selector wether it should stop when reaching the min/max value
- * or should continue (by going to max/min)
- *  - opt : the option struct
- *  - scroll :
- *    - true : stops when reaching min/max
- *    - false : continues to go to max/min when reaching min/max
- */
-#define option_select_limit_loop(_opt, loop) \
-    (_opt)->limit_loop=loop
-
 #endif /* _GUI_OPTION_SELECT_H_ */

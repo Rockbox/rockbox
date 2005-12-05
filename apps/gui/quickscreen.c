@@ -45,14 +45,14 @@ void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * display)
 {
     int w,h;
     char buffer[30];
-    const char * option;
-    const char * title;
+    const unsigned char *option;
+    const unsigned char *title;
 #ifdef HAS_BUTTONBAR
     display->has_buttonbar=false;
 #endif
     gui_textarea_clear(display);
     display->setfont(FONT_SYSFIXED);
-    display->getstringsize("M",&w,&h);
+    display->getstringsize((unsigned char *)"M",&w,&h);
     /* Displays the icons */
     display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],
                          display->width/2 - 16,
@@ -65,27 +65,32 @@ void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * display)
                          display->height/2 - 4, 7, 8);
 
     /* Displays the left's text */
-    title=option_select_get_title(qs->left_option);
-    option=option_select_get_text(qs->left_option, buffer, sizeof buffer);
+    title=(unsigned char *)qs->left_option->title;
+    option=(unsigned char *)option_select_get_text(qs->left_option, buffer,
+                                                   sizeof buffer);
     display->putsxy(0, display->height/2 - h*2, title);
-    display->putsxy(0, display->height/2 - h, qs->left_right_title);
+    display->putsxy(0, display->height/2 - h,
+                    (unsigned char *)qs->left_right_title);
     display->putsxy(0, display->height/2, option);
 
     /* Displays the bottom's text */
-    title=option_select_get_title(qs->bottom_option);
-    option=option_select_get_text(qs->bottom_option, buffer, sizeof buffer);
+    title=(unsigned char *)qs->bottom_option->title;
+    option=(unsigned char *)option_select_get_text(qs->bottom_option, buffer,
+                                                   sizeof buffer);
     display->getstringsize(title, &w, &h);
     display->putsxy((display->width-w)/2, display->height - h*2, title);
     display->getstringsize(option, &w, &h);
     display->putsxy((display->width-w)/2, display->height - h, option);
 
     /* Displays the right's text */
-    title=option_select_get_title(qs->right_option);
-    option=option_select_get_text(qs->right_option, buffer, sizeof buffer);
+    title=(unsigned char *)qs->right_option->title;
+    option=(unsigned char *)option_select_get_text(qs->right_option, buffer,
+                                                   sizeof buffer);
     display->getstringsize(title,&w,&h);
     display->putsxy(display->width - w, display->height/2 - h*2, title);
-    display->getstringsize(qs->left_right_title,&w,&h);
-    display->putsxy(display->width - w, display->height/2 - h, qs->left_right_title);
+    display->getstringsize((unsigned char *)qs->left_right_title, &w, &h);
+    display->putsxy(display->width - w, display->height/2 - h,
+                    (unsigned char *)qs->left_right_title);
     display->getstringsize(option,&w,&h);
     display->putsxy(display->width - w, display->height/2, option);
 

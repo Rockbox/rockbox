@@ -1520,19 +1520,19 @@ bool set_int(const unsigned char* string,
                             formatter);
     gui_syncselect_draw(&select);
     talk_unit(voice_unit, *variable);
-    while (!gui_select_is_validated(&select))
+    while (!select.validated)
     {
         button = button_get_w_tmo(HZ/2);
         if(gui_syncselect_do_button(&select, button))
         {
-            *variable=gui_select_get_selected(&select);
+            *variable=select.options.option;
             gui_syncselect_draw(&select);
             talk_unit(voice_unit, *variable);
             if ( function )
                 function(*variable);
         }
         gui_syncstatusbar_draw(&statusbars, false);
-        if(gui_select_is_canceled(&select))
+        if(select.canceled)
         {
             *variable=oldvalue;
             if ( function )
@@ -1579,23 +1579,24 @@ bool set_option(const char* string, void* variable, enum optiontype type,
     gui_select_init_items(&select, string, oldvalue, options, numoptions);
     gui_syncselect_draw(&select);
     if (global_settings.talk_menu)
-        talk_id(options[gui_select_get_selected(&select)].voice_id, true);
-    while ( !gui_select_is_validated(&select) )
+        talk_id(options[select.options.option].voice_id, true);
+
+    while ( !select.validated )
     {
         gui_syncstatusbar_draw(&statusbars, true);
         button = button_get_w_tmo(HZ/2);
         if(gui_syncselect_do_button(&select, button))
         {
             /* *variable = gui_select_get_selected(&select) */
-            set_type_fromint(type, variable, gui_select_get_selected(&select));
+            set_type_fromint(type, variable, select.options.option);
             gui_syncselect_draw(&select);
             if (global_settings.talk_menu)
-                talk_id(options[gui_select_get_selected(&select)].voice_id, false);
+                talk_id(options[select.options.option].voice_id, false);
             if ( function )
                 function(type_fromvoidptr(type, variable));
         }
         gui_syncstatusbar_draw(&statusbars, false);
-        if(gui_select_is_canceled(&select))
+        if(select.canceled)
         {
             /* *variable=oldvalue; */
             set_type_fromint(type, variable, oldvalue);

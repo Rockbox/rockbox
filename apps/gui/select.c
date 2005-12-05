@@ -60,11 +60,11 @@ void gui_select_draw(struct gui_select * select, struct screen * display)
     screen_set_xmargin(display, 0);
 #endif
     gui_textarea_clear(display);
-    display->puts_scroll(0, 0, option_select_get_title(&(select->options)));
+    display->puts_scroll(0, 0, (unsigned char *)select->options.title);
 
-    if(gui_select_is_canceled(select))
+    if(select->canceled)
         display->puts_scroll(0, 0, str(LANG_MENU_SETTING_CANCEL));
-    display->puts_scroll(0, 1, selected);
+    display->puts_scroll(0, 1, (unsigned char *)selected);
     gui_textarea_update(display);
 }
 
@@ -77,31 +77,31 @@ void gui_syncselect_draw(struct gui_select * select)
 
 bool gui_syncselect_do_button(struct gui_select * select, int button)
 {
-    gui_select_limit_loop(select, false);
+    select->options.limit_loop = false;
     switch(button)
     {
         case SELECT_INC | BUTTON_REPEAT :
 #ifdef SELECT_RC_INC
         case SELECT_RC_INC | BUTTON_REPEAT :
 #endif
-            gui_select_limit_loop(select, true);
+            select->options.limit_loop = true;
         case SELECT_INC :
 #ifdef SELECT_RC_INC
         case SELECT_RC_INC :
 #endif
-            gui_select_next(select);
+            option_select_next(&select->options);
             return(true);
 
         case SELECT_DEC | BUTTON_REPEAT :
 #ifdef SELECT_RC_DEC
         case SELECT_RC_DEC | BUTTON_REPEAT :
 #endif
-            gui_select_limit_loop(select, true);
+            select->options.limit_loop = true;
         case SELECT_DEC :
 #ifdef SELECT_RC_DEC
         case SELECT_RC_DEC :
 #endif
-            gui_select_prev(select);
+            option_select_prev(&select->options);
             return(true);
 
         case SELECT_OK :
@@ -114,7 +114,7 @@ bool gui_syncselect_do_button(struct gui_select * select, int button)
 #ifdef SELECT_OK2
         case SELECT_OK2 :
 #endif
-            gui_select_validate(select);
+            select->validated=true;
             return(false);
 
         case SELECT_CANCEL :
@@ -127,7 +127,7 @@ bool gui_syncselect_do_button(struct gui_select * select, int button)
 #ifdef SELECT_RC_CANCEL2
         case SELECT_RC_CANCEL2 :
 #endif
-            gui_select_cancel(select);
+            select->canceled = true;
             gui_syncselect_draw(select);
             sleep(HZ/2);
             return(false);

@@ -123,70 +123,11 @@ extern void gui_select_init_items(struct gui_select * select,
         );
 
 /*
- * Selects the next value
- *  - select : the select struct
- */
-#define gui_select_next(select) \
-    option_select_next(&(select->options))
-
-/*
- * Selects the previous value
- *  - select : the select struct
- */
-#define gui_select_prev(select) \
-    option_select_prev(&(select->options))
-
-/*
  * Draws the select on the given screen
  *  - select : the select struct
  *  - display : the display on which you want to output
  */
 extern void gui_select_draw(struct gui_select * select, struct screen * display);
-
-/*
- * Returns the selected value
- *  - select : the select struct
- */
-#define gui_select_get_selected(_sel_) \
-    option_select_get_selected(&((_sel_)->options))
-/*
- * Cancels the select
- *  - select : the select struct
- */
-#define gui_select_cancel(select) \
-    (select)->canceled=true
-
-/*
- * Tells wether the select has been canceled or not
- *  - select : the select struct
- */
-#define gui_select_is_canceled(select) \
-    (select)->canceled
-
-/*
- * Validate the select
- *  - select : the select struct
- */
-#define gui_select_validate(select) \
-    (select)->validated=true
-
-/*
- * Tells wether the select is validated or not
- *  - select : the select struct
- */
-#define gui_select_is_validated(select) \
-    (select)->validated
-
-/*
- * Tells the select wether it should stop when reaching the min/max value
- * or should continue (by going to max/min)
- *  - select : the select struct
- *  - scroll :
- *    - true : stops when reaching min/max
- *    - false : continues to go to max/min when reaching min/max
- */
-#define gui_select_limit_loop(select, loop) \
-    option_select_limit_loop(&((select)->options), loop)
 
 /*
  * Draws the select on all the screens

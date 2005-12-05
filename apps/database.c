@@ -78,7 +78,7 @@ struct tagdb_header tagdbheader;
 
 int tagdb_init(void)
 {
-    unsigned char* ptr = (char*)&tagdbheader.version;
+    unsigned char* ptr = (unsigned char*)&tagdbheader.version;
 #ifdef ROCKBOX_LITTLE_ENDIAN
     int i, *p;
 #endif
@@ -94,7 +94,8 @@ int tagdb_init(void)
         ptr[1] != 'D' ||
         ptr[2] != 'B')
     {
-        gui_syncsplash(HZ,true,"Not a rockbox ID3 database!");
+        gui_syncsplash(HZ, true,
+                       (unsigned char *)"Not a rockbox ID3 database!");
         return -1;
     }
 #ifdef ROCKBOX_LITTLE_ENDIAN
@@ -106,8 +107,9 @@ int tagdb_init(void)
 #endif
     if ( (tagdbheader.version&0xFF) != TAGDB_VERSION)
     {
-        gui_syncsplash(HZ,true,"Unsupported database version %d!",
-               tagdbheader.version&0xFF);
+        gui_syncsplash(HZ, true,
+                       (unsigned char *)"Unsupported database version %d!",
+                       tagdbheader.version&0xFF);
         return -1;
     }
 
@@ -115,7 +117,7 @@ int tagdb_init(void)
         tagdbheader.albumstart > tagdbheader.songstart ||
         tagdbheader.artiststart > tagdbheader.albumstart)
     {
-        gui_syncsplash(HZ,true,"Corrupt ID3 database!");
+        gui_syncsplash(HZ, true, (unsigned char *)"Corrupt ID3 database!");
         return -1;
     }
 
@@ -334,7 +336,7 @@ void rundb_buffer_track(struct mp3entry *id, bool last_track) {
 
 int rundb_init(void)
 {
-    unsigned char* ptr = (char*)&rundbheader.version;
+    unsigned char* ptr = (unsigned char*)&rundbheader.version;
 #ifdef ROCKBOX_LITTLE_ENDIAN
     int i, *p;
 #endif
@@ -361,7 +363,8 @@ int rundb_init(void)
         ptr[1] != 'R' ||
         ptr[2] != 'D')
     {
-        gui_syncsplash(HZ,true,"Not a rockbox runtime database!");
+        gui_syncsplash(HZ, true,
+                       (unsigned char *)"Not a rockbox runtime database!");
         return -1;
     }
 #ifdef ROCKBOX_LITTLE_ENDIAN
@@ -373,8 +376,9 @@ int rundb_init(void)
 #endif
     if ( (rundbheader.version&0xFF) != RUNDB_VERSION)
     {
-        gui_syncsplash(HZ,true,"Unsupported runtime database version %d!",
-               rundbheader.version&0xFF);
+        gui_syncsplash(HZ, true, (unsigned char *)
+                       "Unsupported runtime database version %d!",
+                       rundbheader.version&0xFF);
         return -1;
     }
 

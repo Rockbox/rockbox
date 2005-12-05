@@ -363,8 +363,8 @@ int pitch_screen(void)
     while (!exit) {
 
         if ( used ) {
-            char* ptr;
-            char buf[32];
+            unsigned char* ptr;
+            unsigned char buf[32];
             int w, h;
 
             lcd_clear_display();
@@ -376,7 +376,8 @@ int pitch_screen(void)
             lcd_mono_bitmap(bitmap_icons_7x8[Icon_UpArrow],
                             LCD_WIDTH/2 - 3, h*2, 7, 8);
 
-            snprintf(buf, sizeof buf, "%d.%d%%", pitch / 10, pitch % 10 );
+            snprintf((char *)buf, sizeof buf, "%d.%d%%",
+                     pitch / 10, pitch % 10 );
             lcd_getstringsize(buf,&w,&h);
             lcd_putsxy((LCD_WIDTH-w)/2, h, buf);
 
@@ -487,9 +488,9 @@ int pitch_screen(void)
 
 void quick_screen_quick_apply(struct gui_quickscreen *qs)
 {
-    global_settings.playlist_shuffle=int_to_bool(option_select_get_selected(qs->left_option));
-    global_settings.dirfilter=option_select_get_selected(qs->bottom_option);
-    global_settings.repeat_mode=option_select_get_selected(qs->right_option);
+    global_settings.playlist_shuffle=int_to_bool(qs->left_option->option);
+    global_settings.dirfilter=qs->bottom_option->option;
+    global_settings.repeat_mode=qs->right_option->option;
 }
 
 bool quick_screen_quick(int button_enter)
@@ -619,7 +620,7 @@ bool quick_screen_f3(int button_enter)
 #if defined(HAVE_CHARGING) || defined(SIMULATOR)
 void charging_splash(void)
 {
-    gui_syncsplash(2*HZ, true, (char *)str(LANG_BATTERY_CHARGE));
+    gui_syncsplash(2*HZ, true, (unsigned char *)str(LANG_BATTERY_CHARGE));
     button_clear_queue();
 }
 #endif
