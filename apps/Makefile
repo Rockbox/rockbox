@@ -107,9 +107,23 @@ $(OBJDIR)/rombox.bin : $(OBJDIR)/rombox.elf
 $(OBJDIR)/rockbox.asm: $(OBJDIR)/rockbox.bin
 	$(TOOLSDIR)/sh2d -sh1 $< > $@
 
-$(BUILDDIR)/$(BINARY) : $(OBJDIR)/rockbox.bin
+#
+# If there's a flashfile defined for this target (rockbox.ucl for Archos
+# models) Then check if the mkfirmware script fails, as then it is (likely)
+# because the image is too big and we need to create a compressed image
+# instead.
+#
+$(BUILDDIR)/$(BINARY) : $(OBJDIR)/rockbox.bin $(FLASHFILE) 
 	@echo "Build firmware file"
-	$(SILENT)$(MKFIRMWARE) $< $@
+	$(SILENT)($(MKFIRMWARE) $< $@; \
+	stat=$$?; \
+	if test -n "$(FLASHFILE)"; then \
+	  if test "$$stat" -ne 0; then \
+	    echo "Image too big, making a compressed version!"; \
+	    $(MAKE) -C $(FIRMDIR)/decompressor OBJDIR=$(BUILDDIR)/firmware/decompressor; \
+	    $(MKFIRMWARE) $(BUILDDIR)/firmware/decompressor/compressed.bin $@; \
+	  fi \
+	fi )
 
 else
 # this is a simulator build
