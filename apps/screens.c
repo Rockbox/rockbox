@@ -342,14 +342,15 @@ int charging_screen(void)
 #endif /* HAVE_CHARGING && !HAVE_POWEROFF_WHILE_CHARGING */
 
 
-#if CONFIG_KEYPAD == RECORDER_PAD || CONFIG_KEYPAD == IRIVER_H100_PAD
+#if CONFIG_KEYPAD == RECORDER_PAD || CONFIG_KEYPAD == IRIVER_H100_PAD \
+    || CONFIG_KEYPAD == IRIVER_H300_PAD
 /* returns:
    0 if no key was pressed
    1 if a key was pressed (or if ON was held down long enough to repeat)
    2 if USB was connected */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define PITCH_PAUSE BUTTON_PLAY
-#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+#elif CONFIG_KEYPAD == IRIVER_H100_PAD || CONFIG_KEYPAD == IRIVER_H300_PAD
 #define PITCH_PAUSE BUTTON_SELECT
 #endif
 int pitch_screen(void)

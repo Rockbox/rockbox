@@ -33,7 +33,8 @@ void charging_splash(void);
 int mmc_remove_request(void);
 #endif
 
-#if CONFIG_KEYPAD == RECORDER_PAD || defined(IRIVER_H100_SERIES)
+#if CONFIG_KEYPAD == RECORDER_PAD || CONFIG_KEYPAD == IRIVER_H100_PAD \
+    || CONFIG_KEYPAD == IRIVER_H300_PAD
 int pitch_screen(void);
 #endif
 #if CONFIG_KEYPAD == RECORDER_PAD 
