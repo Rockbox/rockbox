@@ -142,3 +142,22 @@ Statusbar: on
 Height: 64
 Width: 128
 </rwps>
+
+<wps>
+Name: DancePuffDuo.wps
+RWPS: DancePuffDuo.rwps
+Author: Chris Oxtoby
+Font: chicago12.fnt
+Statusbar: on
+Height: 128
+Width: 160
+</wps>
+
+<rwps>
+Name: DancePuffDuo.rwps
+Author: Chris Oxtoby
+Font: chicago12.fnt
+Statusbar: on
+Height: 64
+Width: 128
+</rwps>
