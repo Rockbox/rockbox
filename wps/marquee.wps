@@ -1,0 +1,14 @@
+# Marquee full information WPS, with Rockbox status bar
+# for use with Chicago12 font
+#
+%x|a|iRiver Rockbox.bmp|0|0|
+
+
+%ac %?pn<%t10%s%pn|%?ia<%s%ia|%s%d2>> ;%ac %?pn<%?ia<%t10%s%ia|%t10%s%d2>|%t0> 
+%ac %s%?id<%id|%d1>%?iy< (%iy)|> 
+%ac %s%?it<%it|%fn> 
+%pb
+%x|b|pb.bmp|128|77|
+%al %pc%ac%pp/%pe%ar%pt 
+%t5%ac%fb %fc %?fv<vbr|>;%t5%ac%s genre: %?ig<%ig|unknown> ;%t10%ac%s %?It<up: %It/|%?Fn<up: %Fn/|%fb%fc%?fv<vbr|>>>%?Id<%Id|%D1> 
+%pm

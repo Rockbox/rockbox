@@ -1,0 +1,8 @@
+# Marquee full information remote WPS, with Rockbox status bar
+# for use with Chicago12 font
+#
+%ac%?pn<%t10%s%pn|%s%?id<%id|%d1>%?iy< (%iy)|>>;%ac%?pn<%s%?id<%id|%d1>%?iy< (%iy)|>|%t0>
+%ac%s%?it<%it|%fn>
+%pb
+%x|b|pb.bmp|96|38|
+%t5%al%pc%ac%pp/%pe%ar%pt;%t2.5%al%pc%ac%fb %?fv<vbr|k>%ar%pt;%t2.5%al%pc%ac%fc%ar%pt;%t10%ac%s%?It<up: %It/|%?Fn<up: %Fn/|genre: %?ig<%ig|unknown>>>%?Id<%Id|%D1>

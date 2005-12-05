@@ -123,3 +123,22 @@ Statusbar: on
 Height: 64
 Width: 128
 </rwps>
+
+<wps>
+Name: marquee.wps
+RWPS: marquee.rwps
+Author: Mike Sobel
+Font: chicago12.fnt
+Statusbar: on
+Height: 128
+Width: 160
+</wps>
+
+<rwps>
+Name: marquee.rwps
+Author: Mike Sobel
+Font: chicago12.fnt
+Statusbar: on
+Height: 64
+Width: 128
+</rwps>
