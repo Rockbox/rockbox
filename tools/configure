@@ -833,10 +833,12 @@ EOF
 
 if test "$simulator" = "yes"; then
   # add simul make stuff on the #SIMUL# line
-  simmagic="s,#SIMUL#,\	@\$(MAKE) -C \$(SIMDIR) OBJDIR=\$(BUILDDIR)/sim\n	@\$(MAKE) -C \$(ROOTDIR)/uisimulator/common OBJDIR=\$(BUILDDIR)/comsim,"
+  simmagic1="s,@SIMUL1@,@\$(MAKE) -C \$(SIMDIR) OBJDIR=\$(BUILDDIR)/sim,"
+  simmagic2="s,@SIMUL2@,@\$(MAKE) -C \$(ROOTDIR)/uisimulator/common OBJDIR=\$(BUILDDIR)/comsim,"
 else
-  # delete the line that matches
-  simmagic='/#SIMUL#/D'
+  # delete the lines that match
+  simmagic1='/@SIMUL1@/D'
+  simmagic2='/@SIMUL2@/D'
 fi
 
 sed > Makefile \
@@ -875,7 +877,8 @@ sed > Makefile \
  -e "s,@UNAME@,${uname},g" \
  -e "s,@ENDIAN@,${defendian},g" \
  -e "s,@TOOLSET@,${toolset},g" \
- -e "${simmagic}" \
+ -e "${simmagic1}" \
+ -e "${simmagic2}" \
 <<EOF
 ## Automaticly generated. http://www.rockbox.org/
 
@@ -926,7 +929,8 @@ MAKEFLAGS += --no-print-directory
 .PHONY: all clean tags zip tools
 
 all: tools
-#SIMUL#
+	@SIMUL1@
+	@SIMUL2@
 	@\$(MAKE) -C \$(FIRMDIR) OBJDIR=\$(BUILDDIR)/firmware
 	@\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@
 
