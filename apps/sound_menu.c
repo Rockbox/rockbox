@@ -43,6 +43,9 @@
 #include "mas.h"
 #endif
 #include "splash.h"
+#if CONFIG_CODEC == SWCODEC
+#include "dsp.h"
+#endif
 
 int selected_setting; /* Used by the callback */
 void dec_sound_formatter(char *buffer, int buffer_size, int val, const char * unit)
@@ -101,6 +104,20 @@ static bool treble(void)
 {
     return set_sound(str(LANG_TREBLE), &global_settings.treble, SOUND_TREBLE);
 }
+
+#if CONFIG_CODEC == SWCODEC
+static bool crossfeed(void)
+{
+    bool result = set_bool_options(str(LANG_CROSSFEED),
+                                   &global_settings.crossfeed,
+                                   STR(LANG_ON),
+                                   STR(LANG_OFF),
+                                   NULL);
+
+    dsp_set_crossfeed(global_settings.crossfeed);
+    return result;
+}
+#endif
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 static bool loudness(void)
@@ -375,6 +392,9 @@ bool sound_menu(void)
         { ID2P(LANG_BALANCE), balance },
         { ID2P(LANG_CHANNEL_MENU), chanconf },
         { ID2P(LANG_STEREO_WIDTH), stereo_width },
+#if CONFIG_CODEC == SWCODEC
+        { ID2P(LANG_CROSSFEED), crossfeed },
+#endif
 #ifdef HAVE_UDA1380
         { ID2P(LANG_SCALING_MODE), sound_scaling },
 #endif
