@@ -14,8 +14,9 @@ ifdef APPEXTRA
    INCLUDES += $(patsubst %,-I$(APPSDIR)/%,$(subst :, ,$(APPEXTRA)))
 endif
 
-A52OPTS =  
-CFLAGS = $(GCCOPTS) $(A52OPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
+A52OPTS = -O2
+CFLAGS = $(GCCOPTS) $(A52OPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
+ -DMEM=${MEMORYSIZE}
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc
@@ -26,17 +27,11 @@ OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))
 DEPFILE = $(OBJDIR)/dep-liba52
 DIRS = 
 
-OUTPUT = $(BUILDDIR)/liba52.a
-
 all: $(OUTPUT)
 
 $(OUTPUT): $(OBJS)
 	@echo "AR $@"
 	@$(AR) ruv $@ $+ >/dev/null 2>&1
-
-$(OBJDIR)/liba52/%.o: $(APPSDIR)/codecs/liba52/%.c
-	@echo "(liba52) CC $<"
-	@$(CC) -c -O2 $(CFLAGS) -I$(APPSDIR)/codecs/liba52/ $< -o $@
 
 include $(TOOLSDIR)/make.inc
 
@@ -44,4 +39,6 @@ clean:
 	@echo "cleaning liba52"
 	@rm -f $(OBJS) $(OUTPUT) $(DEPFILE)
 
+ifneq ($(MAKECMDGOALS),clean)
 -include $(DEPFILE)
+endif

@@ -16,8 +16,8 @@ endif
 
 # NOTE: FPM_ define has been moved to global.h
 MADOPTS = -DNDEBUG -O2
-CFLAGS = $(GCCOPTS) $(MADOPTS)\
-$(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
+CFLAGS = $(GCCOPTS) $(MADOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
+ -DMEM=${MEMORYSIZE}
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc
@@ -32,11 +32,7 @@ all: $(OUTPUT)
 
 $(OUTPUT): $(OBJS)
 	@echo "AR $@"
-	$(AR) ruv $@ $+ >/dev/null 2>&1
-
-$(OBJDIR)/%.o: $(APPSDIR)/codecs/libmad/%.c
-	@echo "(libmad) CC "`basename $<`
-	@$(CC) -c -O2 $(CFLAGS) -I$(APPSDIR)/codecs/libmad/ $< -o $@
+	@$(AR) ruv $@ $+ >/dev/null 2>&1
 
 include $(TOOLSDIR)/make.inc
 
@@ -44,4 +40,6 @@ clean:
 	@echo "cleaning libmad"
 	@rm -f $(OBJS) $(OUTPUT) $(DEPFILE)
 
+ifneq ($(MAKECMDGOALS),clean)
 -include $(DEPFILE)
+endif

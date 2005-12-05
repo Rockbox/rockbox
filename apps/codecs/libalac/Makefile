@@ -15,7 +15,8 @@ ifdef APPEXTRA
 endif
 
 ALACOPTS = -O3
-CFLAGS = $(GCCOPTS) $(ALACOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
+CFLAGS = $(GCCOPTS) $(ALACOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
+ -DMEM=${MEMORYSIZE}
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc
@@ -26,17 +27,11 @@ OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))
 DEPFILE = $(OBJDIR)/dep-libalac
 DIRS = 
 
-OUTPUT = $(BUILDDIR)/libalac.a
-
 all: $(OUTPUT)
 
 $(OUTPUT): $(OBJS)
 	@echo "AR $@"
 	@$(AR) ruv $@ $+ >/dev/null 2>&1
-
-$(OBJDIR)/libalac/%.o: $(APPSDIR)/codecs/libalac/%.c
-	@echo "(libalac) CC $<"
-	@$(CC) -c $(CFLAGS) -I$(APPSDIR)/codecs/libalac/ $< -o $@
 
 include $(TOOLSDIR)/make.inc
 
@@ -44,4 +39,6 @@ clean:
 	@echo "cleaning libalac"
 	@rm -f $(OBJS) $(OUTPUT) $(DEPFILE)
 
+ifneq ($(MAKECMDGOALS),clean)
 -include $(DEPFILE)
+endif

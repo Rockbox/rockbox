@@ -14,8 +14,9 @@ ifdef APPEXTRA
    INCLUDES += $(patsubst %,-I$(APPSDIR)/%,$(subst :, ,$(APPEXTRA)))
 endif
 
-CFLAGS = $(GCCOPTS) \
-$(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE} -O2 \
+WAVPACKOPTS = -O2
+CFLAGS = $(GCCOPTS) $(WAVPACKOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
+ -DMEM=${MEMORYSIZE}
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc
@@ -26,17 +27,11 @@ OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))
 DEPFILE = $(OBJDIR)/dep-libwavpack
 DIRS = 
 
-OUTPUT = $(BUILDDIR)/libwavpack.a
-
 all: $(OUTPUT)
 
 $(OUTPUT): $(OBJS)
 	@echo "AR $@"
 	@$(AR) ruv $@ $+ >/dev/null 2>&1
-
-$(OBJDIR)/libwavpack/%.o: $(APPSDIR)/codecs/libwavpack/%.c
-	@echo "(libwavpack) CC $<"
-	@$(CC) -c -O2 $(CFLAGS) -I$(APPSDIR)/codecs/libwavpack/ $< -o $@
 
 include $(TOOLSDIR)/make.inc
 
@@ -44,4 +39,6 @@ clean:
 	@echo "cleaning libwavpack"
 	@rm -f $(OBJS) $(OUTPUT) $(DEPFILE)
 
+ifneq ($(MAKECMDGOALS),clean)
 -include $(DEPFILE)
+endif

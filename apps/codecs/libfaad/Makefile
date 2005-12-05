@@ -11,11 +11,12 @@ INCLUDES=-I$(APPSDIR) -I.. -I. -I$(FIRMDIR)/include -I$(FIRMDIR)/export	\
  -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers -I$(BUILDDIR)
 
 ifdef APPEXTRA
-INCLUDES += -I$(APPSDIR)/$(APPEXTRA)
+   INCLUDES += $(patsubst %,-I$(APPSDIR)/%,$(subst :, ,$(APPEXTRA)))
 endif
 
 FAADOPTS = -O2 -Wno-char-subscripts
-CFLAGS = $(GCCOPTS) $(FAADOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
+CFLAGS = $(GCCOPTS) $(FAADOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
+ -DMEM=${MEMORYSIZE}
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc
@@ -26,17 +27,11 @@ OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))
 DEPFILE = $(OBJDIR)/dep-libfaad
 DIRS = 
 
-OUTPUT = $(BUILDDIR)/libfaad.a
-
 all: $(OUTPUT)
 
 $(OUTPUT): $(OBJS)
 	@echo "AR $@"
 	@$(AR) ruv $@ $+ >/dev/null 2>&1
-
-$(OBJDIR)/libfaad/%.o: $(APPSDIR)/codecs/libfaad/%.c
-	@echo "(libfaad) CC $<"
-	@$(CC) -c $(CFLAGS) -I$(APPSDIR)/codecs/libfaad/ $< -o $@
 
 include $(TOOLSDIR)/make.inc
 
@@ -44,4 +39,6 @@ clean:
 	@echo "cleaning libfaad"
 	@rm -f $(OBJS) $(OUTPUT) $(DEPFILE)
 
+ifneq ($(MAKECMDGOALS),clean)
 -include $(DEPFILE)
+endif

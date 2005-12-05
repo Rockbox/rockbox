@@ -15,7 +15,8 @@ ifdef APPEXTRA
 endif
 
 FLACOPTS = -O2
-CFLAGS = $(GCCOPTS) $(FLACOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
+CFLAGS = $(GCCOPTS) $(FLACOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
+ -DMEM=${MEMORYSIZE}
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc
@@ -26,17 +27,11 @@ OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))
 DEPFILE = $(OBJDIR)/dep-libffmpegFLAC
 DIRS = 
 
-OUTPUT = $(BUILDDIR)/libffmpegFLAC.a
-
 all: $(OUTPUT)
 
 $(OUTPUT): $(OBJS)
 	@echo "AR $@"
 	@$(AR) ruv $@ $+ >/dev/null 2>&1
-
-$(OBJDIR)/libffmpegFLAC/%.o: $(APPSDIR)/codecs/libffmpegFLAC/%.c
-	@echo "(libffmpegFLAC) CC $<"
-	@$(CC) -c $(CFLAGS) -I$(APPSDIR)/codecs/libffmpegFLAC/ $< -o $@
 
 include $(TOOLSDIR)/make.inc
 
@@ -44,4 +39,6 @@ clean:
 	@echo "cleaning libffmpegFLAC"
 	@rm -f $(OBJS) $(OUTPUT) $(DEPFILE)
 
+ifneq ($(MAKECMDGOALS),clean)
 -include $(DEPFILE)
+endif

@@ -16,7 +16,7 @@ endif
 
 TREMOROPTS = -O2
 CFLAGS = $(GCCOPTS) $(TREMOROPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
--DMEM=${MEMORYSIZE}
+ -DMEM=${MEMORYSIZE}
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc
@@ -27,17 +27,11 @@ OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))
 DEPFILE = $(OBJDIR)/dep-Tremor
 DIRS = 
 
-OUTPUT = $(BUILDDIR)/libTremor.a
-
 all: $(OUTPUT)
 
 $(OUTPUT): $(OBJS)
 	@echo "AR $@"
 	@$(AR) ruv $@ $+ >/dev/null 2>&1
-
-$(OBJDIR)/%.o: $(APPSDIR)/codecs/Tremor/%.c
-	@echo "(Tremor) CC "`basename $<`
-	@$(CC) -c $(CFLAGS) -I$(APPSDIR)/codecs/Tremor/ $< -o $@
 
 include $(TOOLSDIR)/make.inc
 
@@ -45,4 +39,6 @@ clean:
 	@echo "cleaning Tremor"
 	@rm -f $(OBJS) $(OUTPUT) $(DEPFILE)
 
+ifneq ($(MAKECMDGOALS),clean)
 -include $(DEPFILE)
+endif
