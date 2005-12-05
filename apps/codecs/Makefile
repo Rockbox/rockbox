@@ -43,7 +43,7 @@ CODECDEPS = $(LINKCODEC) $(BUILDDIR)/libcodec.a
 
 OUTPUT = $(SOFTWARECODECS)
 
-all: $(OUTPUT) $(ROCKS) $(DEPFILE)
+all: $(OUTPUT) $(ROCKS)
 
 ifndef SIMVER
 ELFIT =	$(SILENT)(file=`basename $@`; \
@@ -183,3 +183,7 @@ clean:
 	@$(MAKE) -C libm4a clean OBJDIR=$(OBJDIR)/libm4a
 	@$(MAKE) -C dumb clean OBJDIR=$(OBJDIR)/dumb
 	@$(MAKE) -C lib clean OBJDIR=$(OBJDIR)/lib
+
+ifneq ($(MAKECMDGOALS),clean)
+-include $(DEPFILE)
+endif
