@@ -986,9 +986,10 @@ void gui_wps_format(struct wps_data *data, const char *bmpdir,
                     wps_tag_found = true;
                 }
                 if (*(buf+1) != 'x')
+#endif
                     buf++;
                 break;
-#endif
+
             case '\r': /* CR */
                 *buf = 0;
                 break;
