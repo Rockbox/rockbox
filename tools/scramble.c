@@ -195,8 +195,9 @@ int main (int argc, char** argv)
     
     if ((method == scramble) &&
         ((length + headerlen) >= size_limit[model_id])) {
-        printf("error: max firmware size is %dKB!\n",
-               size_limit[model_id]/1024);
+        printf("error: firmware image is %d bytes while max size is %d!\n",
+               length + headerlen,
+               size_limit[model_id]);
         fclose(file);
         return -1;
     }
