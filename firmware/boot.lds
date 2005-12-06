@@ -140,7 +140,7 @@ SECTIONS
     } > IRAM
 
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-    .bss DRAMORIG+0x1000000:
+    .bss DRAMORIG+0x800000:
 #else
     .bss :
 #endif
