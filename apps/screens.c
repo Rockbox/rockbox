@@ -565,13 +565,13 @@ bool quick_screen_quick(int button_enter)
 #ifdef BUTTON_F3
 void quick_screen_f3_apply(struct gui_quickscreen *qs)
 {
-    global_settings.scrollbar=int_to_bool(option_select_get_selected(qs->left_option));
+    global_settings.scrollbar=int_to_bool(qs->left_option->option);
 
-    global_settings.flip_display=int_to_bool(option_select_get_selected(qs->bottom_option));
+    global_settings.flip_display=int_to_bool(qs->bottom_option->option);
     button_set_flip(global_settings.flip_display);
     lcd_set_flip(global_settings.flip_display);
 
-    global_settings.statusbar=int_to_bool(option_select_get_selected(qs->right_option));
+    global_settings.statusbar=int_to_bool(qs->right_option->option);
     gui_syncstatusbar_draw(&statusbars, true);
 }
 
