@@ -26,6 +26,7 @@
 #include "kernel.h"
 #include "thread.h"
 #include "ata.h"
+#include "usb.h"
 #include "disk.h"
 #include "font.h"
 #include "adc.h"
@@ -46,32 +47,6 @@ int usb_screen(void)
 }
 
 char version[] = APPSVERSION;
-
-static void usb_enable(bool on)
-{
-    and_l(~0x01000000, &GPIO_OUT);      /* GPIO24 is the Cypress chip power */
-    or_l(0x01000000, &GPIO_ENABLE);
-    or_l(0x01000000, &GPIO_FUNCTION);
-    
-    or_l(0x00000080, &GPIO1_FUNCTION); /* GPIO39 is the USB detect input */
-
-    if(on)
-    {
-        /* Power on the Cypress chip */
-        or_l(0x01000000, &GPIO_OUT);
-        sleep(2);
-    }
-    else
-    {
-        /* Power off the Cypress chip */
-        and_l(~0x01000000, &GPIO_OUT);
-    }
-}
-
-bool usb_detect(void)
-{
-    return (GPIO1_READ & 0x80)?true:false;
-}
 
 void start_iriver_fw(void)
 {
@@ -285,6 +260,8 @@ void main(void)
         power_off();
     }
 
+    usb_init();
+    
     adc_battery = adc_read(ADC_BATTERY);
 
     battery_voltage = (adc_battery * BATTERY_SCALE_FACTOR) / 10000;
@@ -318,13 +295,17 @@ void main(void)
     /* A hack to enter USB mode without using the USB thread */
     if(usb_detect())
     {
+        const char msg[] = "Bootloader USB mode";
+        int w, h;
+        font_getstringsize(msg, &w, &h, FONT_SYSFIXED);
         lcd_clear_display();
-        lcd_puts(0, 7, "    Bootloader USB mode");
+        lcd_putsxy((LCD_WIDTH-w)/2, (LCD_HEIGHT-h)/2, msg);
         lcd_update();
 
         ata_spin();
         ata_enable(false);
         usb_enable(true);
+        cpu_idle_mode(true);
         while(usb_detect())
         {
             ata_spin(); /* Prevent the drive from spinning down */
@@ -334,6 +315,7 @@ void main(void)
             or_l(0x00020000, &GPIO1_OUT);
         }
 
+        cpu_idle_mode(false);
         usb_enable(false);
         ata_init(); /* Reinitialize ATA and continue booting */
         
@@ -382,14 +364,6 @@ int dbg_ports(void)
 }
 
 void mpeg_stop(void)
-{
-}
-
-void usb_acknowledge(void)
-{
-}
-
-void usb_wait_for_disconnect(void)
 {
 }
 

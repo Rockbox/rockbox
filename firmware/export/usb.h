@@ -22,6 +22,7 @@
 #include "kernel.h"
 
 void usb_init(void);
+void usb_enable(bool on);
 void usb_start_monitoring(void);
 void usb_acknowledge(long id);
 void usb_wait_for_disconnect(struct event_queue *q);

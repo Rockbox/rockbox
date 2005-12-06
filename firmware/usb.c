@@ -79,14 +79,15 @@ static int usb_mmc_countdown = 0;
 
 /* FIXME: The extra 0x800 is consumed by fat_mount() when the fsinfo
    needs updating */
+#ifndef BOOTLOADER
 static long usb_stack[(DEFAULT_STACK_SIZE + 0x800)/sizeof(long)];
 static const char usb_thread_name[] = "usb";
+#endif
 static struct event_queue usb_queue;
 static bool last_usb_status;
 static bool usb_monitor_enabled;
 
-
-static void usb_enable(bool on)
+void usb_enable(bool on)
 {
 #ifdef USB_ENABLE_ONDIOSTYLE
     PACR2 &= ~0x04C0; /* use PA3, PA5 as GPIO */
@@ -173,6 +174,7 @@ static void usb_enable(bool on)
 #endif
 }
 
+#ifndef BOOTLOADER
 static void usb_slave_mode(bool on)
 {
     int rc;
@@ -347,6 +349,7 @@ static void usb_thread(void)
         }
     }
 }
+#endif
 
 bool usb_detect(void)
 {
@@ -378,7 +381,7 @@ bool usb_detect(void)
     return current_status;
 }
 
-
+#ifndef BOOTLOADER
 static void usb_tick(void)
 {
     bool current_status;
@@ -431,6 +434,7 @@ static void usb_tick(void)
     }
 #endif
 }
+#endif
 
 void usb_acknowledge(long id)
 {
@@ -468,10 +472,12 @@ void usb_init(void)
     /* We assume that the USB cable is extracted */
     last_usb_status = false;
 
+#ifndef BOOTLOADER
     queue_init(&usb_queue);
     create_thread(usb_thread, usb_stack, sizeof(usb_stack), usb_thread_name);
 
     tick_add_task(usb_tick);
+#endif
 }
 
 void usb_wait_for_disconnect(struct event_queue *q)
