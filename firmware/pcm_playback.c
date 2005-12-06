@@ -93,6 +93,7 @@ static void dma_stop(void)
     pcm_playing = false;
 
     DCR0 = 0;
+    DSR0 = 1;
     /* Reset the FIFO */
     IIS2CONFIG = IIS_RESET | IIS_DEFPARM(pcm_freq);
 #ifdef HAVE_SPDIF_OUT
