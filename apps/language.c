@@ -42,21 +42,23 @@ void lang_init(void)
 
 int lang_load(const char *filename)
 {
-    int filesize;
+    int fsize;
     int fd = open(filename, O_RDONLY);
     int retcode=0;
+    unsigned char lang_header[2];
     if(fd == -1)
         return 1;
-    filesize = read(fd, language_buffer, MAX_LANGUAGE_SIZE);
-    if(filesize != MAX_LANGUAGE_SIZE) {
-        if((language_buffer[0] == LANGUAGE_COOKIE) &&
-           (language_buffer[1] == LANGUAGE_VERSION)) {
-            unsigned char *ptr=&language_buffer[2];
+    fsize = filesize(fd) - 2;
+    if(fsize <= MAX_LANGUAGE_SIZE) {
+        read(fd, lang_header, 2);
+        if((lang_header[0] == LANGUAGE_COOKIE) &&
+           (lang_header[1] == LANGUAGE_VERSION)) {
+            read(fd, language_buffer, MAX_LANGUAGE_SIZE);
+            unsigned char *ptr = language_buffer;
             int id;
             lang_init();                    /* initialize with builtin */
-            filesize-=2;
 
-            while(filesize>3) {
+            while(fsize>3) {
                 id = (ptr[0]<<8) | ptr[1];  /* get two-byte id */
                 ptr+=2;                     /* pass the id */
                 if(id < LANG_LAST_INDEX_IN_ARRAY) {
@@ -67,10 +69,10 @@ int lang_load(const char *filename)
                     language_strings[id] = ptr; /* point to this string */
                 }
                 while(*ptr) {               /* pass the string */
-                    filesize--;
+                    fsize--;
                     ptr++;
                 }
-                filesize-=3; /* the id and the terminating zero */
+                fsize-=3; /* the id and the terminating zero */
                 ptr++;       /* pass the terminating zero-byte */
             }
         }
@@ -80,7 +82,7 @@ int lang_load(const char *filename)
         }
     }
     else {
-        DEBUGF("Language %s too large: %d\n", filename, filesize);
+        DEBUGF("Language %s too large: %d\n", filename, fsize);
         retcode = 3;
     }
     close(fd);
