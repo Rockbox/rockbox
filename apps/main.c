@@ -235,9 +235,7 @@ void init(void)
 
     adc_init();
     
-#ifndef IRIVER_H300_SERIES
     usb_init();
-#endif
 
     backlight_init();
 
@@ -285,7 +283,6 @@ void init(void)
         panicf("ata: %d", rc);
     }
 
-#ifndef IRIVER_H300_SERIES
     usb_start_monitoring();
     while (usb_detect())
     {   /* enter USB mode early, before trying to mount */
@@ -302,7 +299,7 @@ void init(void)
             break;
 #endif
     }
-#endif
+
     if (!mounted)
     {
         rc = disk_mount_all();

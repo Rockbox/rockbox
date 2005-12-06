@@ -136,13 +136,21 @@ static void usb_enable(bool on)
     if(on)
     {
         /* Power on the Cypress chip */
-        or_l(0x01000000, &GPIO_OUT);
+#ifdef IRIVER_H100_SERIES
+        or_l(0x01000040, &GPIO_OUT);
+#else
+        and_l(~0x00000008,&GPIO1_OUT);
+#endif
         sleep(2);
     }
     else
     {
         /* Power off the Cypress chip */
-        and_l(~0x01000000, &GPIO_OUT);
+#ifdef IRIVER_H100_SERIES
+        and_l(~0x01000040, &GPIO_OUT);
+#else
+        or_l(0x00000008,&GPIO1_OUT);
+#endif
     }
     
 #elif defined(USB_IPODSTYLE)
@@ -361,7 +369,7 @@ bool usb_detect(void)
 #endif
 #ifdef IRIVER_H300
     /* TODO: add proper code code for H300 USB style */
-    current_status = false;
+    current_status = (GPIO1_READ & 0x80)?true:false;
 #endif
 #ifdef USB_IPODSTYLE
     /* TODO: Implement USB_IPODSTYLE */
@@ -436,11 +444,23 @@ void usb_init(void)
     countdown = -1;
 
 #ifdef USB_IRIVERSTYLE
-    and_l(~0x01000000, &GPIO_OUT);     /* GPIO24 is the Cypress chip power */
-    or_l(0x01000000, &GPIO_ENABLE);
-    or_l(0x01000000, &GPIO_FUNCTION);
-    
     or_l(0x00000080, &GPIO1_FUNCTION); /* GPIO39 is the USB detect input */
+
+#ifdef IRIVER_H300_SERIES
+    /* ISD300 3.3V ON */
+    or_l(8,&GPIO1_FUNCTION);
+    or_l(8,&GPIO1_OUT);
+    or_l(8,&GPIO1_ENABLE);
+
+    /* Tristate the SCK/SDA to the ISD300 config EEPROM */
+    and_l(~0x03000000, &GPIO_ENABLE);
+    or_l(0x03000000, &GPIO_FUNCTION);
+#else
+    and_l(~0x01000040, &GPIO_OUT);     /* GPIO24 is the Cypress chip power */
+    or_l(0x01000040, &GPIO_ENABLE);
+    or_l(0x01000040, &GPIO_FUNCTION);
+#endif
+
 #endif
 
     usb_enable(false);
