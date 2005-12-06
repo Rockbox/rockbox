@@ -216,83 +216,6 @@ static unsigned long get_long(void* buf)
     return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
 }
 
-/* Convert an UTF-8 string to Latin-1, overwriting the old string (the new
- * string is never longer than the original, so this is safe). Non-latin-1
- * chars are replaced with '?'.
- */
-static void convert_utf8(char* utf8)
-{
-    char* dest = utf8;
-    long code = 0;
-    unsigned char c;
-    int tail = 0;
-    int size = 0;
-
-    while ((c = *utf8++) != 0)
-    {
-        if ((tail <= 0) && ((c <= 0x7f) || (c >= 0xc2)))
-        {
-            /* Start of new character. */
-            if (c < 0x80)
-            {
-                size = 1;
-            }
-            else if (c < 0xe0)
-            {
-                size = 2;
-                c &= 0x1f;
-            }
-            else if (c < 0xf0)
-            {
-                size = 3;
-                c &= 0x0f;
-            }
-            else if (c < 0xf5)
-            {
-                size = 4;
-                c &= 0x07;
-            }
-            else
-            {
-                /* Invalid size. */
-                size = 0;
-            }
-
-            code = c;
-            tail = size - 1;
-        }
-        else if ((tail > 0) && ((c & 0xc0) == 0x80))
-        {
-            /* Valid continuation character. */
-            code = (code << 6) | (c & 0x3f);
-            tail--;
-
-            if (tail == 0)
-            {
-                if (((size == 2) && (code < 0x80))
-                    || ((size == 3) && (code < 0x800))
-                    || ((size == 4) && (code < 0x10000)))
-                {
-                    /* Invalid encoding. */
-                    code = 0;
-                }
-            }
-        }
-        else
-        {
-            tail = -1;
-        }
-
-        if ((tail == 0) && (code > 0))
-        {
-            *dest++ = (code <= 0xff) ? (char) (code & 0xff) : '?';
-        }
-    }
-
-    *dest = 0;
-}
-
-
 /* Read a string tag from an M4A file */
 void read_m4a_tag_string(int fd, int len,char** bufptr,size_t* bytes_remaining, char** dest)
 {
@@ -316,7 +239,6 @@ void read_m4a_tag_string(int fd, int len,char** bufptr,size_t* bytes_remaining, 
     }
     **bufptr=(char)0;
 
-    convert_utf8(*dest);
     data_length = strlen(*dest)+1;
     *bufptr=(*dest)+data_length;
     *bytes_remaining-=data_length;
@@ -468,7 +390,6 @@ static bool read_ape_tags(int fd, struct mp3entry* id3)
                     return false;
                 }
 
-                convert_utf8(value);
                 len = parse_tag(name, value, id3, buf, buf_remaining, 
                     TAGTYPE_APE);
                 buf += len;
@@ -563,7 +484,6 @@ static bool read_vorbis_tags(int fd, struct mp3entry *id3,
             return false;
         }
 
-        convert_utf8(value);
         len = parse_tag(name, value, id3, buf, buf_remaining, 
             TAGTYPE_VORBIS);
         buf += len;

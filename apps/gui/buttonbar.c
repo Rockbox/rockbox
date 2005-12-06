@@ -47,9 +47,9 @@ void gui_buttonbar_set_display(struct gui_buttonbar * buttonbar,
 void gui_buttonbar_draw_button(struct gui_buttonbar * buttonbar, int num)
 {
     int xpos, ypos, button_width, text_width;
-    int fw, fh;
+    int fh;
     struct screen * display = buttonbar->display;
-    display->getstringsize("M", &fw, &fh);
+    display->getstringsize("M", NULL, &fh);
 
     button_width = display->width/BUTTONBAR_MAX_BUTTONS;
     xpos = num * button_width;
@@ -58,7 +58,7 @@ void gui_buttonbar_draw_button(struct gui_buttonbar * buttonbar, int num)
     if(buttonbar->caption[num][0] != 0)
     {
         /* center the text */
-        text_width = fw * strlen(buttonbar->caption[num]);
+        text_width = display->getstringsize(buttonbar->caption[num], NULL, NULL);
         display->putsxy(xpos + (button_width - text_width)/2,
                         ypos, buttonbar->caption[num]);
     }

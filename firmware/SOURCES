@@ -1,3 +1,4 @@
+common/unicode.c
 #ifdef ROCKBOX_HAS_LOGF
 logf.c
 #endif
@@ -103,6 +104,8 @@ drivers/rtc.c
 drivers/serial.c
 #endif /* !SIMULATOR */
 #ifdef HAVE_LCD_BITMAP
+lru.c
+font_cache.c
 font.c
 #endif
 id3.c

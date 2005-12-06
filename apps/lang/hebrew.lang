@@ -18,181 +18,181 @@ id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
 voice: "Sound Settings"
-new: "δβγψεϊ φμιμ"
+new: "Χ”Χ’Χ“Χ¨Χ•Χª Χ¦ΧΧ™Χ"
 
 id: LANG_GENERAL_SETTINGS
 desc: in the main menu
 eng: "General Settings"
 voice: "General Settings"
-new: "δβγψεϊ λμμιεϊ"
+new: "Χ”Χ’Χ“Χ¨Χ•Χª Χ›ΧΧΧ™Χ•Χª"
 
 id: LANG_INFO
 desc: in the main menu
 eng: "Info"
 voice: "Info"
-new: "ξιγς"
+new: "ΧΧ™Χ“ΧΆ"
 
 id: LANG_VERSION
 desc: in the main menu
 eng: "Version"
 voice: "Version"
-new: "βψρδ"
+new: "Χ’Χ¨Χ΅Χ”"
 
 id: LANG_DEBUG
 desc: in the main menu
 eng: "Debug (Keep Out!)"
 voice: "Debug, keep out!"
-new: "(!ΰιϊεψ ωβιΰεϊ (μΰ μδλπρ"
+new: "(!ΧΧ™ΧªΧ•Χ¨ Χ©Χ’Χ™ΧΧ•Χª (ΧΧ ΧΧ”Χ›Χ Χ΅"
 
 id: LANG_USB
 desc: in the main menu
 eng: "USB (Sim)"
 voice: ""
-new: "USB (δγβξδ)"
+new: "USB (Χ”Χ“Χ’ΧΧ”)"
 
 id: LANG_ROCKBOX_INFO
 desc: displayed topmost on the info screen
 eng: "Rockbox Info:"
 voice: ""
-new: ":ξιγς ςμ ψεχαεχρ"
+new: ":ΧΧ™Χ“ΧΆ ΧΆΧ Χ¨Χ•Χ§Χ‘Χ•Χ§Χ΅"
 
 id: LANG_BUFFER_STAT_PLAYER
 desc: the buffer size player-screen width, %d MB %d fraction of MB
 eng: "Buf: %d.%03dMB"
 voice: ""
-new: "ζλψ: %d.%03dMB"
+new: "Χ–Χ›Χ¨: %d.%03dMB"
 
 id: LANG_BUFFER_STAT_RECORDER
 desc: the buffer size recorder-screen width, %d MB %d fraction of MB
 eng: "Buffer: %d.%03dMB"
 voice: ""
-new: "ζιλψεο: %d.%03dMB"
+new: "Χ–Χ™Χ›Χ¨Χ•Χ: %d.%03dMB"
 
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
 eng: "Battery: Charging"
 voice: ""
-new: "ρεμμδ: αθςιπδ"
+new: "Χ΅Χ•ΧΧΧ”: Χ‘ΧΧΆΧ™Χ Χ”"
 
 id: LANG_PLAYLIST_LOAD
 desc: displayed on screen while loading a playlist
 eng: "Loading..."
 voice: ""
-new: "...θεςο"
+new: "...ΧΧ•ΧΆΧ"
 
 id: LANG_PLAYLIST_SHUFFLE
 desc: displayed on screen while shuffling a playlist
 eng: "Shuffling..."
 voice: ""
-new: "...ξςψαα"
+new: "...ΧΧΆΧ¨Χ‘Χ‘"
 
 id: LANG_PLAYINDICES_PLAYLIST
 desc: in playlist.indices() when playlist is full *WARNING* this and next ID are only used in this function.
 eng: "Playlist"
 voice: ""
-new: "ψωιξϊ ωιψιν"
+new: "Χ¨Χ©Χ™ΧΧª Χ©Χ™Χ¨Χ™Χ"
 
 id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
 eng: "Buffer Full"
 voice: ""
-new: "δζιλψεο ξμΰ"
+new: "Χ”Χ–Χ™Χ›Χ¨Χ•Χ ΧΧΧ"
 
 id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
 eng: "Save Failed"
 voice: ""
-new: "δωξιψδ πλωμδ"
+new: "Χ”Χ©ΧΧ™Χ¨Χ” Χ Χ›Χ©ΧΧ”"
 
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
 eng: "Partition?"
 voice: ""
-new: "?μημχ"
+new: "?ΧΧ—ΧΧ§"
 
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
 eng: "Save Failed"
 voice: ""
-new: "δωξιψδ πλωμδ"
+new: "Χ”Χ©ΧΧ™Χ¨Χ” Χ Χ›Χ©ΧΧ”"
 
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
 eng: "No partition?"
 voice: ""
-new: "?μΰ μημχ"
+new: "?ΧΧ ΧΧ—ΧΧ§"
 
 id: LANG_TIME_SET
 desc: used in set_time()
 eng: "ON To Set"
 voice: ""
-new: "δτςμ λγι μλεεο"
+new: "Χ”Χ¤ΧΆΧ Χ›Χ“Χ™ ΧΧ›Χ•Χ•Χ"
 
 id: LANG_TIME_REVERT
 desc: used in set_time()
 eng: "OFF To Revert"
 voice: ""
-new: "αθμ λγι μηζεψ"
+new: "Χ‘ΧΧ Χ›Χ“Χ™ ΧΧ—Χ–Χ•Χ¨"
 
 id: LANG_CONTRAST
 desc: in settings_menu
 eng: "Contrast"
 voice: "Contrast"
-new: "πιβεγιεϊ"
+new: "Χ Χ™Χ’Χ•Χ“Χ™Χ•Χª"
 
 id: LANG_SHUFFLE
 desc: in settings_menu
 eng: "Shuffle"
 voice: "Shuffle"
-new: "ςψαεα"
+new: "ΧΆΧ¨Χ‘Χ•Χ‘"
 
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play Selected First"
 voice: "Play Selected File First"
-new: "πβο ΰϊ δχεαυ δπαηψ ψΰωεο"
+new: "Χ Χ’Χ ΧΧª Χ”Χ§Χ•Χ‘Χ¥ Χ”Χ Χ‘Χ—Χ¨ Χ¨ΧΧ©Χ•Χ"
 
 id: LANG_SORT_CASE
 desc: in settings_menu
 eng: "Sort Case Sensitive"
 voice: "Sort Case Sensitive"
-new: "ργψ μτι ΰεϊιεϊ βγεμεϊ"
+new: "Χ΅Χ“Χ¨ ΧΧ¤Χ™ ΧΧ•ΧªΧ™Χ•Χª Χ’Χ“Χ•ΧΧ•Χª"
 
 id: LANG_RESUME
 desc: in settings_menu
 eng: "Resume on startup"
 voice: "Resume on startup"
-new: "δξωκ ξΰεϊε ξχεν αδτςμδ ξηγω"
+new: "Χ”ΧΧ©Χ ΧΧΧ•ΧªΧ• ΧΧ§Χ•Χ Χ‘Χ”Χ¤ΧΆΧΧ” ΧΧ—Χ“Χ©"
 
 id: LANG_OFF
 desc: Used in a lot of places
 eng: "Off"
 voice: "Off"
-new: "λαει"
+new: "Χ›Χ‘Χ•Χ™"
 
 id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
 eng: "Ask"
 voice: "Ask"
-new: "ωΰμ"
+new: "Χ©ΧΧ"
 
 id: LANG_ON
 desc: Used in a lot of places
 eng: "On"
 voice: "On"
-new: "τεςμ"
+new: "Χ¤Χ•ΧΆΧ"
 
 id: LANG_BACKLIGHT
 desc: in settings_menu
 eng: "Backlight"
 voice: "Backlight"
-new: "ϊΰεψδ"
+new: "ΧªΧΧ•Χ¨Χ”"
 
 id: LANG_SCROLL
 desc: in settings_menu
 eng: "Scroll Speed Setting Example"
 voice: ""
-new: "γεβξδ ΰψελδ αξιεηγ μδβγψϊ χφα δβμιμδ"
+new: "Χ“Χ•Χ’ΧΧ” ΧΧ¨Χ•Χ›Χ” Χ‘ΧΧ™Χ•Χ—Χ“ ΧΧ”Χ’Χ“Χ¨Χª Χ§Χ¦Χ‘ Χ”Χ’ΧΧ™ΧΧ”"
 
 id: LANG_DISCHARGE
 desc: DEPRECATED
@@ -204,55 +204,55 @@ id: LANG_TIME
 desc: in settings_menu
 eng: "Set Time/Date"
 voice: "Set Time and Date"
-new: "δβγψ ϊΰψικ εζξο"
+new: "Χ”Χ’Χ“Χ¨ ΧªΧΧ¨Χ™Χ Χ•Χ–ΧΧ"
 
 id: LANG_SPINDOWN
 desc: in settings_menu
 eng: "Disk Spindown"
 voice: "Disk Spindown"
-new: "δτρχϊ ριαεα γιρχ"
+new: "Χ”Χ¤Χ΅Χ§Χª Χ΅Χ™Χ‘Χ•Χ‘ Χ“Χ™Χ΅Χ§"
 
 id: LANG_FFRW_STEP
 desc: in settings_menu
 eng: "FF/RW Min Step"
 voice: "Minimum Step"
-new: "φςγ ξιπιξμι αδςαψδ ξδιψδ"
+new: "Χ¦ΧΆΧ“ ΧΧ™Χ Χ™ΧΧΧ™ Χ‘Χ”ΧΆΧ‘Χ¨Χ” ΧΧ”Χ™Χ¨Χ”"
 
 id: LANG_FFRW_ACCEL
 desc: in settings_menu
 eng: "FF/RW Accel"
 voice: "Acceleration"
-new: "ϊΰεφδ χγιξδ/ΰηεψδ"
+new: "ΧªΧΧ•Χ¦Χ” Χ§Χ“Χ™ΧΧ”/ΧΧ—Χ•Χ¨Χ”"
 
 id: LANG_FOLLOW
 desc: in settings_menu
 eng: "Follow Playlist"
 voice: "Follow Playlist"
-new: "ςχεα ΰηψ ψωιξϊ δωιψιν"
+new: "ΧΆΧ§Χ•Χ‘ ΧΧ—Χ¨ Χ¨Χ©Χ™ΧΧª Χ”Χ©Χ™Χ¨Χ™Χ"
 
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
 eng: "Are You Sure?"
 voice: ""
-new: "ΰϊδ αθεη?"
+new: "ΧΧªΧ” Χ‘ΧΧ•Χ—?"
 
 id: LANG_RESET_DONE_SETTING
 desc: visual confirmation after settings reset
 eng: "Settings"
 voice: ""
-new: "δβγψεϊ"
+new: "Χ”Χ’Χ“Χ¨Χ•Χª"
 
 id: LANG_RESET_DONE_CLEAR
 desc: visual confirmation after settings reset
 eng: "Cleared"
 voice: ""
-new: "ξΰετρ"
+new: "ΧΧΧ•Χ¤Χ΅"
 
 id: LANG_RESET_DONE_CANCEL
 desc: Visual confirmation of cancelation
 eng: "Canceled"
 voice: ""
-new: "ξαεθμ"
+new: "ΧΧ‘Χ•ΧΧ"
 
 id: LANG_CASE_MENU
 desc: DEPRECATED
@@ -264,67 +264,67 @@ id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
 eng: "Scrolling"
 voice: "Scrolling"
-new: "βμιμϊ ξιμιν"
+new: "Χ’ΧΧ™ΧΧª ΧΧ™ΧΧ™Χ"
 
 id: LANG_RESET
 desc: in system_settings_menu()
 eng: "Reset Settings"
 voice: "Reset Settings"
-new: "ΰτρ δβγψεϊ"
+new: "ΧΧ¤Χ΅ Χ”Χ’Χ“Χ¨Χ•Χª"
 
 id: LANG_PLAYBACK
 desc: in settings_menu()
 eng: "Playback"
 voice: "Playback"
-new: "δωξςδ"
+new: "Χ”Χ©ΧΧΆΧ”"
 
 id: LANG_FILE
 desc: in settings_menu()
 eng: "File View"
 voice: "File View"
-new: "ϊφεβϊ χαφιν"
+new: "ΧªΧ¦Χ•Χ’Χª Χ§Χ‘Χ¦Χ™Χ"
 
 id: LANG_DISPLAY
 desc: in settings_menu()
 eng: "Display"
 voice: "Display"
-new: "ϊφεβδ"
+new: "ΧªΧ¦Χ•Χ’Χ”"
 
 id: LANG_SYSTEM
 desc: in settings_menu()
 eng: "System"
 voice: "System"
-new: "ξςψλϊ"
+new: "ΧΧΆΧ¨Χ›Χª"
 
 id: LANG_VOLUME
 desc: in sound_settings
 eng: "Volume"
 voice: "Volume"
-new: "ςεφξϊ χεμ"
+new: "ΧΆΧ•Χ¦ΧΧª Χ§Χ•Χ"
 
 id: LANG_BALANCE
 desc: in sound_settings
 eng: "Balance"
 voice: "Balance"
-new: "ΰιζεο μφγγιν"
+new: "ΧΧ™Χ–Χ•Χ ΧΧ¦Χ“Χ“Χ™Χ"
 
 id: LANG_BASS
 desc: in sound_settings
 eng: "Bass"
 voice: "Bass"
-new: "αρ"
+new: "Χ‘Χ΅"
 
 id: LANG_TREBLE
 desc: in sound_settings
 eng: "Treble"
 voice: "Treble"
-new: "θψιαμ"
+new: "ΧΧ¨Χ™Χ‘Χ"
 
 id: LANG_LOUDNESS
 desc: in sound_settings
 eng: "Loudness"
 voice: "Loudness"
-new: "φςχπεϊ"
+new: "Χ¦ΧΆΧ§Χ Χ•Χª"
 
 id: LANG_BBOOST
 desc: DEPRECATED
@@ -336,67 +336,67 @@ id: LANG_DECAY
 desc: in sound_settings
 eng: "AV Decay Time"
 voice: ""
-new: "AV ζξο γςιλϊ"
+new: "AV Χ–ΧΧ Χ“ΧΆΧ™Χ›Χª"
 
 id: LANG_CHANNEL_MENU
 desc: in sound_settings
 eng: "Channels"
 voice: "Channels"
-new: "ςψεφιν"
+new: "ΧΆΧ¨Χ•Χ¦Χ™Χ"
 
 id: LANG_CHANNEL
 desc: in sound_settings
 eng: "Channel Configuration"
 voice: ""
-new: "δβγψεϊ ςψευ"
+new: "Χ”Χ’Χ“Χ¨Χ•Χª ΧΆΧ¨Χ•Χ¥"
 
 id: LANG_CHANNEL_STEREO
 desc: in sound_settings
 eng: "Stereo"
 voice: "Stereo"
-new: "ρθψιΰε"
+new: "Χ΅ΧΧ¨Χ™ΧΧ•"
 
 id: LANG_CHANNEL_MONO
 desc: in sound_settings
 eng: "Mono"
 voice: "Mono"
-new: "ξεπε"
+new: "ΧΧ•Χ Χ•"
 
 id: LANG_CHANNEL_LEFT
 desc: in sound_settings
 eng: "Mono Left"
 voice: "Mono Left"
-new: "ξεπε ωξΰμι"
+new: "ΧΧ•Χ Χ• Χ©ΧΧΧΧ™"
 
 id: LANG_CHANNEL_RIGHT
 desc: in sound_settings
 eng: "Mono Right"
 voice: "Mono Right"
-new: "ξεπε ιξπι"
+new: "ΧΧ•Χ Χ• Χ™ΧΧ Χ™"
 
 id: LANG_AUTOVOL
 desc: in sound_settings
 eng: "Auto Volume"
 voice: "Auto Volume"
-new: "ςεφξϊ χεμ ΰεθεξθιϊ"
+new: "ΧΆΧ•Χ¦ΧΧª Χ§Χ•Χ ΧΧ•ΧΧ•ΧΧΧ™Χª"
 
 id: LANG_SHOWDIR_ERROR_BUFFER
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Dir Buffer"
 voice: ""
-new: "ζιλψεο ϊιχιεϊ"
+new: "Χ–Χ™Χ›Χ¨Χ•Χ ΧªΧ™Χ§Χ™Χ•Χª"
 
 id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Is Full!"
 voice: ""
-new: "!ξμΰ"
+new: "!ΧΧΧ"
 
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
 eng: "(PLAY/STOP)"
 voice: ""
-new: "(πβο/δτρχ)"
+new: "(Χ Χ’Χ/Χ”Χ¤Χ΅Χ§)"
 
 id: LANG_RESUME_ASK
 desc: DEPRECATED
@@ -408,25 +408,25 @@ id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
 eng: "Key Lock ON"
 voice: ""
-new: "πςιμϊ ξχωιν τςιμδ"
+new: "Χ ΧΆΧ™ΧΧª ΧΧ§Χ©Χ™Χ Χ¤ΧΆΧ™ΧΧ”"
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
 eng: "Key Lock OFF"
 voice: ""
-new: "πςιμϊ ξχωιν ξαεθμϊ"
+new: "Χ ΧΆΧ™ΧΧª ΧΧ§Χ©Χ™Χ ΧΧ‘Χ•ΧΧΧª"
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
 eng: "Key Lock Is ON"
 voice: ""
-new: "πςιμϊ ξχωιν τςιμδ"
+new: "Χ ΧΆΧ™ΧΧª ΧΧ§Χ©Χ™Χ Χ¤ΧΆΧ™ΧΧ”"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key Lock Is OFF"
 voice: ""
-new: "πςιμϊ ξχωιν ξαεθμϊ"
+new: "Χ ΧΆΧ™ΧΧª ΧΧ§Χ©Χ™Χ ΧΧ‘Χ•ΧΧΧª"
 
 id: LANG_MUTE_ON_PLAYER
 desc: DEPRECATED
@@ -468,7 +468,7 @@ id: LANG_ID3_TITLE
 desc: in wps
 eng: "[Title]"
 voice: ""
-new: "[ων δωιψ]"
+new: "[Χ©Χ Χ”Χ©Χ™Χ¨]"
 
 id: LANG_ID3_NO_TITLE
 desc: DEPRECATED
@@ -480,7 +480,7 @@ id: LANG_ID3_ARTIST
 desc: in wps
 eng: "[Artist]"
 voice: ""
-new: "[ΰξο]"
+new: "[ΧΧΧ]"
 
 id: LANG_ID3_NO_ARTIST
 desc: DEPRECATED
@@ -492,7 +492,7 @@ id: LANG_ID3_ALBUM
 desc: in wps
 eng: "[Album]"
 voice: ""
-new: "[ΰμαεν]"
+new: "[ΧΧΧ‘Χ•Χ]"
 
 id: LANG_ID3_NO_ALBUM
 desc: DEPRECATED
@@ -504,7 +504,7 @@ id: LANG_ID3_TRACKNUM
 desc: in wps
 eng: "[Tracknum]"
 voice: ""
-new: "[ξρτψ ωιψ]"
+new: "[ΧΧ΅Χ¤Χ¨ Χ©Χ™Χ¨]"
 
 id: LANG_ID3_NO_TRACKNUM
 desc: DEPRECATED
@@ -516,337 +516,337 @@ id: LANG_ID3_LENGHT
 desc: in wps
 eng: "[Length]"
 voice: ""
-new: "[ΰεψκ]"
+new: "[ΧΧ•Χ¨Χ]"
 
 id: LANG_ID3_PLAYLIST
 desc: in wps
 eng: "[Playlist]"
 voice: ""
-new: "[ψωιξϊ ωιψιν]"
+new: "[Χ¨Χ©Χ™ΧΧª Χ©Χ™Χ¨Χ™Χ]"
 
 id: LANG_ID3_BITRATE
 desc: in wps
 eng: "[Bitrate]"
 voice: ""
-new: "[ΰιλεϊ]"
+new: "[ΧΧ™Χ›Χ•Χª]"
 
 id: LANG_ID3_FRECUENCY
 desc: in wps
 eng: "[Frequency]"
 voice: ""
-new: "[ϊγιψεϊ]"
+new: "[ΧªΧ“Χ™Χ¨Χ•Χª]"
 
 id: LANG_ID3_PATH
 desc: in wps
 eng: "[Path]"
 voice: ""
-new: "[λϊεαϊ]"
+new: "[Χ›ΧªΧ•Χ‘Χª]"
 
 id: LANG_PITCH_UP
 desc: in wps
 eng: "Pitch Up"
 voice: ""
-new: "δβαδ βεαδ φμιμ"
+new: "Χ”Χ’Χ‘Χ” Χ’Χ•Χ‘Χ” Χ¦ΧΧ™Χ"
 
 id: LANG_PITCH_DOWN
 desc: in wps
 eng: "Pitch Down"
 voice: ""
-new: "δπξκ βεαδ φμιμ"
+new: "Χ”Χ ΧΧ Χ’Χ•Χ‘Χ” Χ¦ΧΧ™Χ"
 
 id: LANG_PAUSE
 desc: in wps
 eng: "Pause"
 voice: ""
-new: "ςφιψδ"
+new: "ΧΆΧ¦Χ™Χ¨Χ”"
 
 id: LANG_F2_MODE
 desc: in wps F2 pressed
 eng: "Mode:"
 voice: ""
-new: "ξφα:"
+new: "ΧΧ¦Χ‘:"
 
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
 eng: "Status"
 voice: ""
-new: "ξφα"
+new: "ΧΧ¦Χ‘"
 
 id: LANG_F3_SCROLL
 desc: in wps F3 pressed
 eng: "Scroll"
 voice: ""
-new: "βμιμδ"
+new: "Χ’ΧΧ™ΧΧ”"
 
 id: LANG_F3_BAR
 desc: in wps F3 pressed
 eng: "Bar"
 voice: ""
-new: "χε"
+new: "Χ§Χ•"
 
 id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
 eng: "End Of List"
 voice: ""
-new: "ρεσ δψωιξδ"
+new: "Χ΅Χ•Χ£ Χ”Χ¨Χ©Χ™ΧΧ”"
 
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
 eng: "End Of Song List"
 voice: ""
-new: "ρεσ ψωιξϊ δωιψιν"
+new: "Χ΅Χ•Χ£ Χ¨Χ©Χ™ΧΧª Χ”Χ©Χ™Χ¨Χ™Χ"
 
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
 eng: "Idle Poweroff"
 voice: "Idle Poweroff"
-new: "λιαει αξφα δξϊπδ"
+new: "Χ›Χ™Χ‘Χ•Χ™ Χ‘ΧΧ¦Χ‘ Χ”ΧΧªΧ Χ”"
 
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
 eng: "New Language"
 voice: ""
-new: "ηγωδ ωτδ"
+new: "Χ—Χ“Χ©Χ” Χ©Χ¤Χ”"
 
 id: LANG_FILTER
 desc: setting name for dir filter
 eng: "Show Files"
 voice: "Show Files"
-new: "δφβ χαφιν"
+new: "Χ”Χ¦Χ’ Χ§Χ‘Χ¦Χ™Χ"
 
 id: LANG_FILTER_MUSIC
 desc: show only music-related files
 eng: "Music"
 voice: "Music"
-new: "ξεριχδ"
+new: "ΧΧ•Χ΅Χ™Χ§Χ”"
 
 id: LANG_FILTER_SUPPORTED
 desc: show all file types supported by Rockbox
 eng: "Supported"
 voice: "Supported"
-new: "πϊξλιν"
+new: "Χ ΧªΧΧ›Χ™Χ"
 
 id: LANG_FILTER_ALL
 desc: show all files
 eng: "All"
 voice: "All"
-new: "δλμ"
+new: "Χ”Χ›Χ"
 
 id: LANG_SET_BOOL_YES
 desc: bool true representation
 eng: "Yes"
 voice: "Yes"
-new: "λο"
+new: "Χ›Χ"
 
 id: LANG_SET_BOOL_NO
 desc: bool false representation
 eng: "No"
 voice: "No"
-new: "μΰ"
+new: "ΧΧ"
 
 id: LANG_PM_MENU
 desc: in the display menu
 eng: "Peak Meter"
 voice: "Peak Meter"
-new: "ξγ ςεφξδ"
+new: "ΧΧ“ ΧΆΧ•Χ¦ΧΧ”"
 
 id: LANG_PM_RELEASE
 desc: in the peak meter menu
 eng: "Peak Release"
 voice: "Peak Release"
-new: "ωηψεψ ξωιΰ δςεφξδ"
+new: "Χ©Χ—Χ¨Χ•Χ¨ ΧΧ©Χ™Χ Χ”ΧΆΧ•Χ¦ΧΧ”"
 
 id: LANG_PM_PEAK_HOLD
 desc: in the peak meter menu
 eng: "Peak Hold Time"
 voice: "Peak Hold Time"
-new: "ζξο δηζχδ ςμ ωιΰ δςεφξδ"
+new: "Χ–ΧΧ Χ”Χ—Χ–Χ§Χ” ΧΆΧ Χ©Χ™Χ Χ”ΧΆΧ•Χ¦ΧΧ”"
 
 id: LANG_PM_CLIP_HOLD
 desc: in the peak meter menu
 eng: "Clip Hold Time"
 voice: "Clip Hold Time"
-new: "ζξο δηζχδ μΰηψ ςιεεϊ"
+new: "Χ–ΧΧ Χ”Χ—Χ–Χ§Χ” ΧΧΧ—Χ¨ ΧΆΧ™Χ•Χ•Χª"
 
 id: LANG_PM_ETERNAL
 desc: in the peak meter menu
 eng: "Eternal"
 voice: "Eternal"
-new: "ΰιο ρετι"
+new: "ΧΧ™Χ Χ΅Χ•Χ¤Χ™"
 
 id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
 eng: "Units Per Read"
 voice: "Units Per Read"
-new: "ιηιγεϊ μχψιΰδ"
+new: "Χ™Χ—Χ™Χ“Χ•Χª ΧΧ§Χ¨Χ™ΧΧ”"
 
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
 eng: "Backlight On When Plugged"
 voice: "Backlight On When Plugged"
-new: "ϊΰεψδ γεμχϊ λωξηεαψ μξθςο"
+new: "ΧªΧΧ•Χ¨Χ” Χ“Χ•ΧΧ§Χª Χ›Χ©ΧΧ—Χ•Χ‘Χ¨ ΧΧΧΧΆΧ"
 
 id: LANG_REPEAT
 desc: in settings_menu
 eng: "Repeat"
 voice: "Repeat"
-new: "ηζψδ"
+new: "Χ—Χ–Χ¨Χ”"
 
 id: LANG_REPEAT_ALL
 desc: repeat playlist once all songs have completed
 eng: "All"
 voice: "All"
-new: "δλμ"
+new: "Χ”Χ›Χ"
 
 id: LANG_REPEAT_ONE
 desc: repeat one song
 eng: "One"
 voice: "One"
-new: "ΰηγ"
+new: "ΧΧ—Χ“"
 
 id: LANG_RESET_CONFIRM
 desc: confirm to reset settings
 eng: "PLAY=Reset"
 voice: ""
-new: "πβο=ΰιτερ"
+new: "Χ Χ’Χ=ΧΧ™Χ¤Χ•Χ΅"
 
 id: LANG_RESET_CANCEL
 desc: confirm to reset settings
 eng: "OFF=Cancel"
 voice: ""
-new: "λαδ=αιθεμ"
+new: "Χ›Χ‘Χ”=Χ‘Χ™ΧΧ•Χ"
 
 id: LANG_TIMEFORMAT
 desc: select the time format of time in status bar
 eng: "Time Format"
 voice: "Time Format"
-new: "ξαπδ ϊφεβϊ ζξο"
+new: "ΧΧ‘Χ Χ” ΧªΧ¦Χ•Χ’Χª Χ–ΧΧ"
 
 id: LANG_12_HOUR_CLOCK
 desc: option for 12 hour clock
 eng: "12 Hour Clock"
 voice: "12 Hour Clock"
-new: "ωςεϊ 12 ωςεο ωμ"
+new: "Χ©ΧΆΧ•Χª 12 Χ©ΧΆΧ•Χ Χ©Χ"
 
 id: LANG_24_HOUR_CLOCK
 desc: option for 24 hour clock
 eng: "24 Hour Clock"
 voice: "24 Hour Clock"
-new: "ωςεϊ 24 ωςεο ωμ"
+new: "Χ©ΧΆΧ•Χª 24 Χ©ΧΆΧ•Χ Χ©Χ"
 
 id: LANG_WEEKDAY_SUNDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Sun"
 voice: ""
-new: "ψΰω"
+new: "Χ¨ΧΧ©"
 
 id: LANG_WEEKDAY_MONDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Mon"
 voice: ""
-new: "ωπι"
+new: "Χ©Χ Χ™"
 
 id: LANG_WEEKDAY_TUESDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Tue"
 voice: ""
-new: "ωμι"
+new: "Χ©ΧΧ™"
 
 id: LANG_WEEKDAY_WEDNESDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Wed"
 voice: ""
-new: "ψαι"
+new: "Χ¨Χ‘Χ™"
 
 id: LANG_WEEKDAY_THURSDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Thu"
 voice: ""
-new: "ηξι"
+new: "Χ—ΧΧ™"
 
 id: LANG_WEEKDAY_FRIDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Fri"
 voice: ""
-new: "ωιω"
+new: "Χ©Χ™Χ©"
 
 id: LANG_WEEKDAY_SATURDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Sat"
 voice: ""
-new: "ωαϊ"
+new: "Χ©Χ‘Χª"
 
 id: LANG_MONTH_JANUARY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Jan"
 voice: "January"
-new: "ιπε"
+new: "Χ™Χ Χ•"
 
 id: LANG_MONTH_FEBRUARY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Feb"
 voice: "February"
-new: "ταψ"
+new: "Χ¤Χ‘Χ¨"
 
 id: LANG_MONTH_MARCH
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Mar"
 voice: "March"
-new: "ξψυ"
+new: "ΧΧ¨Χ¥"
 
 id: LANG_MONTH_APRIL
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Apr"
 voice: "April"
-new: "ΰτψ"
+new: "ΧΧ¤Χ¨"
 
 id: LANG_MONTH_MAY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "May"
 voice: "May"
-new: "ξΰι"
+new: "ΧΧΧ™"
 
 id: LANG_MONTH_JUNE
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Jun"
 voice: "June"
-new: "ιεπ"
+new: "Χ™Χ•Χ "
 
 id: LANG_MONTH_JULY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Jul"
 voice: "July"
-new: "ιεμ"
+new: "Χ™Χ•Χ"
 
 id: LANG_MONTH_AUGUST
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Aug"
 voice: "August"
-new: "ΰεβ"
+new: "ΧΧ•Χ’"
 
 id: LANG_MONTH_SEPTEMBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Sep"
 voice: "September"
-new: "ρτθ"
+new: "Χ΅Χ¤Χ"
 
 id: LANG_MONTH_OCTOBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Oct"
 voice: "October"
-new: "ΰεχ"
+new: "ΧΧ•Χ§"
 
 id: LANG_MONTH_NOVEMBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Nov"
 voice: "November"
-new: "πεα"
+new: "Χ Χ•Χ‘"
 
 id: LANG_MONTH_DECEMBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Dec"
 voice: "December"
-new: "γφξ"
+new: "Χ“Χ¦Χ"
 
 id: LANG_RESUME_SETTING_ASK_ONCE
 desc: DEPRECATED
@@ -858,25 +858,25 @@ id: LANG_BATTERY_DISPLAY
 desc: Battery type title
 eng: "Battery Display"
 voice: "Battery Display"
-new: "ϊφεβϊ ρεμμδ"
+new: "ΧªΧ¦Χ•Χ’Χª Χ΅Χ•ΧΧΧ”"
 
 id: LANG_VOLUME_DISPLAY
 desc: Volume type title
 eng: "Volume Display"
 voice: "Volume Display"
-new: "ϊφεβϊ ςεφξϊ χεμ"
+new: "ΧªΧ¦Χ•Χ’Χª ΧΆΧ•Χ¦ΧΧª Χ§Χ•Χ"
 
 id: LANG_DISPLAY_GRAPHIC
 desc: Label for type of icon display
 eng: "Graphic"
 voice: "Graphic"
-new: "βψτιϊ"
+new: "Χ’Χ¨Χ¤Χ™Χª"
 
 id: LANG_DISPLAY_NUMERIC
 desc: Label for type of icon display
 eng: "Numeric"
 voice: "Numeric"
-new: "ξρτψιϊ"
+new: "ΧΧ΅Χ¤Χ¨Χ™Χª"
 
 id: LANG_PM_PERFORMANCE
 desc: DEPRECATED
@@ -900,103 +900,103 @@ id: LANG_PM_SCALE
 desc: in the peak meter menu
 eng: "Scale"
 voice: "Scale"
-new: "χπδ ξιγδ"
+new: "Χ§Χ Χ” ΧΧ™Χ“Χ”"
 
 id: LANG_PM_DBFS
 desc: in the peak meter menu
 eng: "Logarithmic(dB)"
 voice: "Logarithmic decibel"
-new: "(db) μεβψιϊξι"
+new: "(db) ΧΧ•Χ’Χ¨Χ™ΧªΧΧ™"
 
 id: LANG_PM_LINEAR
 desc: in the peak meter menu
 eng: "Linear(%)"
 voice: "Linear percent"
-new: "(%) μιπιΰψι"
+new: "(%) ΧΧ™Χ Χ™ΧΧ¨Χ™"
 
 id: LANG_PM_MIN
 desc: in the peak meter menu
 eng: "Minimum Of Range"
 voice: "Minimum Of Range"
-new: "θεεη ξιπιξμι"
+new: "ΧΧ•Χ•Χ— ΧΧ™Χ Χ™ΧΧΧ™"
 
 id: LANG_PM_MAX
 desc: in the peak meter menu
 eng: "Maximum Of Range"
 voice: "Maximum Of Range"
-new: "θεεη ξχριξμι"
+new: "ΧΧ•Χ•Χ— ΧΧ§Χ΅Χ™ΧΧΧ™"
 
 id: LANG_RECORDING
 desc: in the main menu
 eng: "Recording"
 voice: "Recording"
-new: "δχμθδ"
+new: "Χ”Χ§ΧΧΧ”"
 
 id: LANG_RECORDING_GAIN
 desc: in the recording screen
 eng: "Gain"
 voice: ""
-new: "ωςψ ςεφξδ"
+new: "Χ©ΧΆΧ¨ ΧΆΧ•Χ¦ΧΧ”"
 
 id: LANG_RECORDING_LEFT
 desc: in the recording screen
 eng: "Left"
 voice: ""
-new: "ωξΰμ"
+new: "Χ©ΧΧΧ"
 
 id: LANG_RECORDING_RIGHT
 desc: in the recording screen
 eng: "Right"
 voice: ""
-new: "ιξιο"
+new: "Χ™ΧΧ™Χ"
 
 id: LANG_RECORDING_QUALITY
 desc: in the recording settings
 eng: "Quality"
 voice: "Quality"
-new: "ΰιλεϊ"
+new: "ΧΧ™Χ›Χ•Χª"
 
 id: LANG_RECORDING_FREQUENCY
 desc: in the recording settings
 eng: "Frequency"
 voice: "Frequency"
-new: "ϊγιψεϊ"
+new: "ΧªΧ“Χ™Χ¨Χ•Χª"
 
 id: LANG_RECORDING_SOURCE
 desc: in the recording settings
 eng: "Source"
 voice: "Source"
-new: "ξχεψ"
+new: "ΧΧ§Χ•Χ¨"
 
 id: LANG_RECORDING_CHANNELS
 desc: in the recording settings
 eng: "Channels"
 voice: "Channels"
-new: "ςψεφιν"
+new: "ΧΆΧ¨Χ•Χ¦Χ™Χ"
 
 id: LANG_RECORDING_SRC_MIC
 desc: in the recording settings
 eng: "Mic"
 voice: "Microphone"
-new: "ξιχψετεο"
+new: "ΧΧ™Χ§Χ¨Χ•Χ¤Χ•Χ"
 
 id: LANG_RECORDING_SRC_LINE
 desc: in the recording settings
 eng: "Line In"
 voice: "Line In"
-new: "λπιρϊ ωξς"
+new: "Χ›Χ Χ™Χ΅Χª Χ©ΧΧΆ"
 
 id: LANG_RECORDING_SRC_DIGITAL
 desc: in the recording settings
 eng: "Digital"
 voice: "Digital"
-new: "λπιρϊ ωξς γιβιθμιϊ"
+new: "Χ›Χ Χ™Χ΅Χª Χ©ΧΧΆ Χ“Χ™Χ’Χ™ΧΧΧ™Χª"
 
 id: LANG_RECORDING_SETTINGS
 desc: in the main menu
 eng: "Recording Settings"
 voice: "Recording Settings"
-new: "δβγψεϊ δχμθδ"
+new: "Χ”Χ’Χ“Χ¨Χ•Χª Χ”Χ§ΧΧΧ”"
 
 id: LANG_DISK_STAT
 desc: DEPRECATED
@@ -1014,13 +1014,13 @@ id: LANG_POWEROFF
 desc: disk poweroff flag
 eng: "Disk Poweroff"
 voice: "Disk Poweroff"
-new: "λιαει γιρχ"
+new: "Χ›Χ™Χ‘Χ•Χ™ Χ“Χ™Χ΅Χ§"
 
 id: LANG_FILTER_PLAYLIST
 desc: show only playlist
 eng: "Playlists"
 voice: "Playlists"
-new: "ψωιξεϊ δωξςδ"
+new: "Χ¨Χ©Χ™ΧΧ•Χª Χ”Χ©ΧΧΆΧ”"
 
 id: LANG_BATTERY_TIME
 desc: battery level in % and estimated time remaining
@@ -1032,43 +1032,43 @@ id: LANG_SLEEP_TIMER
 desc: sleep timer setting
 eng: "Sleep Timer"
 voice: "Sleep Timer"
-new: "ωςεο ωιπδ"
+new: "Χ©ΧΆΧ•Χ Χ©Χ™Χ Χ”"
 
 id: LANG_MP3BUFFER_MARGIN
 desc: MP3 buffer margin time
 eng: "Anti-Skip Buffer"
 voice: "Anti-Skip Buffer"
-new: "ζιλψεο πβγ χτιφεϊ"
+new: "Χ–Χ™Χ›Χ¨Χ•Χ Χ Χ’Χ“ Χ§Χ¤Χ™Χ¦Χ•Χª"
 
 id: LANG_BIDIR_SCROLL
 desc: Bidirectional scroll limit
 eng: "Bidirectional Scroll Limit"
 voice: "Bidirectional Scroll Limit"
-new: "βαεμ βμιμδ γε-λιεεπι"
+new: "Χ’Χ‘Χ•Χ Χ’ΧΧ™ΧΧ” Χ“Χ•-Χ›Χ™Χ•Χ•Χ Χ™"
 
 id: LANG_SCROLL_DELAY
 desc: Delay before scrolling
 eng: "Scroll Start Delay"
 voice: "Scroll Start Delay"
-new: "δωδιδ μτπι δβμιμδ"
+new: "Χ”Χ©Χ”Χ™Χ” ΧΧ¤Χ Χ™ Χ”Χ’ΧΧ™ΧΧ”"
 
 id: LANG_SCROLL_STEP
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size"
 voice: "Scroll Step Size"
-new: "βεγμ δωμα αβμιμδ"
+new: "Χ’Χ•Χ“Χ Χ”Χ©ΧΧ‘ Χ‘Χ’ΧΧ™ΧΧ”"
 
 id: LANG_SCROLL_STEP_EXAMPLE
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size Setting Example Text"
 voice: ""
-new: "γεβξδ ΰψελδ αξιεηγ μβεγμ δωμα αβμιμδ αθχρθ"
+new: "Χ“Χ•Χ’ΧΧ” ΧΧ¨Χ•Χ›Χ” Χ‘ΧΧ™Χ•Χ—Χ“ ΧΧ’Χ•Χ“Χ Χ”Χ©ΧΧ‘ Χ‘Χ’ΧΧ™ΧΧ” Χ‘ΧΧ§Χ΅Χ"
 
 id: LANG_SCROLL_SPEED
 desc: in display_settings_menu()
 eng: "Scroll Speed"
 voice: "Scroll Speed"
-new: "ξδιψεϊ βμιμδ"
+new: "ΧΧ”Χ™Χ¨Χ•Χª Χ’ΧΧ™ΧΧ”"
 
 id: LANG_TRICKLE_CHARGE
 desc: DEPRECATED
@@ -1080,109 +1080,109 @@ id: LANG_BATTERY_TOPOFF_CHARGE
 desc: in info display, shows that top off charge is running
 eng: "Battery: Top-Off Chg"
 voice: ""
-new: "θςιπϊ: λιαει αξχριξεν"
+new: "ΧΧΆΧ™Χ Χª: Χ›Χ™Χ‘Χ•Χ™ Χ‘ΧΧ§Χ΅Χ™ΧΧ•Χ"
 
 id: LANG_BATTERY_TRICKLE_CHARGE
 desc: in info display, shows that trickle charge is running
 eng: "Battery: Trickle Chg"
 voice: ""
-new: "θςιπϊ: θτθεσ θςιπδ"
+new: "ΧΧΆΧ™Χ Χª: ΧΧ¤ΧΧ•Χ£ ΧΧΆΧ™Χ Χ”"
 
 id: LANG_BATTERY_CAPACITY
 desc: in settings_menu
 eng: "Battery Capacity"
 voice: "Battery Capacity"
-new: "χιαεμϊ ρεμμδ"
+new: "Χ§Χ™Χ‘Χ•ΧΧª Χ΅Χ•ΧΧΧ”"
 
 id: LANG_MENU_SETTING_CANCEL
 desc: Visual confirmation of canceling a changed setting
 eng: "Canceled"
 voice: ""
-new: "ξαεθμ"
+new: "ΧΧ‘Χ•ΧΧ"
 
 id: LANG_QUEUE
 desc: The verb/action Queue
 eng: "Queue"
 voice: "Queue"
-new: "μςξεγ αϊεψ"
+new: "ΧΧΆΧΧ•Χ“ Χ‘ΧªΧ•Χ¨"
 
 id: LANG_DELETE
 desc: The verb/action Delete
 eng: "Delete"
 voice: "Delete"
-new: "μξηεχ"
+new: "ΧΧΧ—Χ•Χ§"
 
 id: LANG_REALLY_DELETE
 desc: Really Delete?
 eng: "Delete?"
 voice: ""
-new: "μξηεχ?"
+new: "ΧΧΧ—Χ•Χ§?"
 
 id: LANG_DELETED
 desc: A file has beed deleted
 eng: "Deleted"
 voice: ""
-new: "πξηχ"
+new: "Χ ΧΧ—Χ§"
 
 id: LANG_RENAME
 desc: The verb/action Rename
 eng: "Rename"
 voice: "Rename"
-new: "ωπδ ων"
+new: "Χ©Χ Χ” Χ©Χ"
 
 id: LANG_FAILED
 desc: Something failed. To be appended after above actions
 eng: "Failed"
 voice: ""
-new: "πλωμ"
+new: "Χ Χ›Χ©Χ"
 
 id: LANG_ALARM_MOD_ALARM_MENU
 desc: The name of the additional entry in the main menu for the RTC alarm mod.
 eng: "Wake-Up Alarm"
 voice: "Wake-Up Alarm"
-new: "ωςεο ξςεψψ"
+new: "Χ©ΧΆΧ•Χ ΧΧΆΧ•Χ¨Χ¨"
 
 id: LANG_ALARM_MOD_TIME
 desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
 eng: "Alarm Time: %02d:%02d"
 voice: ""
-new: "ωςεο ξςεψψ: %02d:%02d"
+new: "Χ©ΧΆΧ•Χ ΧΧΆΧ•Χ¨Χ¨: %02d:%02d"
 
 id: LANG_ALARM_MOD_TIME_TO_GO
 desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
 eng: "Waking Up In %d:%02d"
 voice: ""
-new: "ξϊςεψψ α: %d:%02d"
+new: "ΧΧªΧΆΧ•Χ¨Χ¨ Χ‘: %d:%02d"
 
 id: LANG_ALARM_MOD_SHUTDOWN
 desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
 eng: "Alarm Set"
 voice: ""
-new: "ωςεο ξςεψψ ξεβγψ"
+new: "Χ©ΧΆΧ•Χ ΧΧΆΧ•Χ¨Χ¨ ΧΧ•Χ’Χ“Χ¨"
 
 id: LANG_ALARM_MOD_ERROR
 desc: The text that tells that the time is incorrect (for the RTC alarm mod).
 eng: "Alarm Time Is Too Soon!"
 voice: ""
-new: "!δωςδ αωςεο δξςεψψ ξεχγξϊ ξγιι"
+new: "!Χ”Χ©ΧΆΧ” Χ‘Χ©ΧΆΧ•Χ Χ”ΧΧΆΧ•Χ¨Χ¨ ΧΧ•Χ§Χ“ΧΧª ΧΧ“Χ™Χ™"
 
 id: LANG_ALARM_MOD_KEYS
 desc: Shown key functions in alarm menu (for the RTC alarm mod).
 eng: "PLAY=Set OFF=Cancel"
 voice: ""
-new: "πβο=ΰωψ λαδ=αιθεμ"
+new: "Χ Χ’Χ=ΧΧ©Χ¨ Χ›Χ‘Χ”=Χ‘Χ™ΧΧ•Χ"
 
 id: LANG_CREATE_PLAYLIST
 desc: Menu option for creating a playlist
 eng: "Create Playlist"
 voice: "Create Playlist"
-new: "ιφιψϊ ψωιξϊ ωιψιν"
+new: "Χ™Χ¦Χ™Χ¨Χª Χ¨Χ©Χ™ΧΧª Χ©Χ™Χ¨Χ™Χ"
 
 id: LANG_CREATING
 desc: Screen feedback during playlist creation
 eng: "Creating"
 voice: ""
-new: "ιεφψ"
+new: "Χ™Χ•Χ¦Χ¨"
 
 id: LANG_PLAYER_KEYBOARD_BACKSPACE
 desc: DEPRECATED
@@ -1212,55 +1212,55 @@ id: LANG_MENU_SHOW_ID3_INFO
 desc: Menu option to start id3 viewer
 eng: "Show ID3 Info"
 voice: "Show ID3 Info"
-new: "δφβ ξιγς ID3"
+new: "Χ”Χ¦Χ’ ΧΧ™Χ“ΧΆ ID3"
 
 id: LANG_ID3_GENRE
 desc: ID3 frame 'genre'
 eng: "[Genre]"
 voice: ""
-new: "[ρβπεο]"
+new: "[Χ΅Χ’Χ Χ•Χ]"
 
 id: LANG_ID3_YEAR
 desc: ID3 info 'year'
 eng: "[Year]"
 voice: ""
-new: "[ωπδ]"
+new: "[Χ©Χ Χ”]"
 
 id: LANG_ID3_NO_INFO
 desc: ID3 info is missing
 eng: "<No Info>"
 voice: ""
-new: "<ΰιο ξιγς>"
+new: "<ΧΧ™Χ ΧΧ™Χ“ΧΆ>"
 
 id: LANG_RECORDING_TIME
 desc: Display of recorded time
 eng: "Time:"
 voice: ""
-new: "ζξο:"
+new: "Χ–ΧΧ:"
 
 id: LANG_RECORDING_SIZE
 desc: Display of recorded file size
 eng: "Size:"
 voice: ""
-new: "βεγμ:"
+new: "Χ’Χ•Χ“Χ:"
 
 id: LANG_SETTINGS_LOADED1
 desc: Feedback shown when a .cfg file is loaded
 eng: "Settings"
 voice: ""
-new: "δβγψεϊ"
+new: "Χ”Χ’Χ“Χ¨Χ•Χª"
 
 id: LANG_SETTINGS_LOADED2
 desc: Feedback shown when a .cfg file is loaded
 eng: "Loaded"
 voice: ""
-new: "πθςο"
+new: "Χ ΧΧΆΧ"
 
 id: LANG_FADE_ON_STOP
 desc: options menu to set fade on stop or pause
 eng: "Fade On Stop/Pause"
 voice: "Fade On Stop and Pause"
-new: "ςξςεν φμιμ αςφιψδ"
+new: "ΧΆΧΧΆΧ•Χ Χ¦ΧΧ™Χ Χ‘ΧΆΧ¦Χ™Χ¨Χ”"
 
 id: LANG_SOKOBAN_ON
 desc: DEPRECATED
@@ -1272,7 +1272,7 @@ id: LANG_INVERT
 desc: in settings_menu
 eng: "LCD Mode"
 voice: "LCD Mode"
-new: "ξφα δξρκ"
+new: "ΧΧ¦Χ‘ Χ”ΧΧ΅Χ"
 
 id: LANG_CHANNEL_STEREO_NARROW_PLAYER
 desc: DEPRECATED
@@ -1296,25 +1296,25 @@ id: LANG_CHANNEL_KARAOKE
 desc: in sound_settings
 eng: "Karaoke"
 voice: "Karaoke"
-new: "χψιεχι"
+new: "Χ§Χ¨Χ™Χ•Χ§Χ™"
 
 id: LANG_SAVE_SETTINGS
 desc: in system_settings_menu()
 eng: "Write .cfg file"
 voice: "Write configuration file"
-new: "ιφιψϊ χεαυ δβγψεϊ"
+new: "Χ™Χ¦Χ™Χ¨Χª Χ§Χ•Χ‘Χ¥ Χ”Χ’Χ“Χ¨Χ•Χª"
 
 id: LANG_SETTINGS_SAVED1
 desc: Feedback shown when a .cfg file is saved
 eng: "Settings"
 voice: ""
-new: "δβγψεϊ"
+new: "Χ”Χ’Χ“Χ¨Χ•Χª"
 
 id: LANG_SETTINGS_SAVED2
 desc: Feedback shown when a .cfg file is saved
 eng: "Saved"
 voice: ""
-new: "πωξψ"
+new: "Χ Χ©ΧΧ¨"
 
 id: LANG_VBRFIX_STOP_PLAY
 desc: DEPRECATED
@@ -1338,127 +1338,127 @@ id: LANG_INVERT_CURSOR
 desc: in settings_menu
 eng: "Line Selector"
 voice: "Line Selector"
-new: "αεψψ δωεψδ"
+new: "Χ‘Χ•Χ¨Χ¨ Χ”Χ©Χ•Χ¨Χ”"
 
 id: LANG_RECORDING_EDITABLE
 desc: Editable recordings setting
 eng: "Independent frames"
 voice: "Independent frames"
-new: "ξρβψϊ ςφξΰιϊ"
+new: "ΧΧ΅Χ’Χ¨Χª ΧΆΧ¦ΧΧΧ™Χª"
 
 id: LANG_STATUS_BAR
 desc: display menu, F3 substitute
 eng: "Status Bar"
 voice: "Status Bar"
-new: "ωεψϊ ξφα"
+new: "Χ©Χ•Χ¨Χª ΧΧ¦Χ‘"
 
 id: LANG_SCROLL_BAR
 desc: display menu, F3 substitute
 eng: "Scroll Bar"
 voice: "Scroll Bar"
-new: "ωεψϊ βμιμδ"
+new: "Χ©Χ•Χ¨Χª Χ’ΧΧ™ΧΧ”"
 
 id: LANG_CAPTION_BACKLIGHT
 desc: in settings_menu
 eng: "Caption backlight"
 voice: "Caption backlight"
-new: "λεϊψϊ ϊΰεψδ"
+new: "Χ›Χ•ΧªΧ¨Χª ΧªΧΧ•Χ¨Χ”"
 
 id: LANG_INVERT_CURSOR_POINTER
 desc: in settings_menu
 eng: "Pointer"
 voice: "Pointer"
-new: "ξφαις"
+new: "ΧΧ¦Χ‘Χ™ΧΆ"
 
 id: LANG_INVERT_CURSOR_BAR
 desc: in settings_menu
 eng: "Bar(Inverse)"
 voice: "Inverse Bar"
-new: "ωεψδ δτελδ"
+new: "Χ©Χ•Χ¨Χ” Χ”Χ¤Χ•Χ›Χ”"
 
 id: LANG_INVERT_LCD_NORMAL
 desc: in settings_menu
 eng: "Normal"
 voice: "Normal"
-new: "ψβιμ"
+new: "Χ¨Χ’Χ™Χ"
 
 id: LANG_INVERT_LCD_INVERSE
 desc: in settings_menu
 eng: "Inverse"
 voice: "Inverse"
-new: "δτεκ"
+new: "Χ”Χ¤Χ•Χ"
 
 id: LANG_MAX_FILES_IN_DIR
 desc: in settings_menu
 eng: "Max files in dir browser"
 voice: "Max files in directory browser"
-new: "ξρτψ χαφιν ξχριξμι αρτψιδ"
+new: "ΧΧ΅Χ¤Χ¨ Χ§Χ‘Χ¦Χ™Χ ΧΧ§Χ΅Χ™ΧΧΧ™ Χ‘Χ΅Χ¤Χ¨Χ™Χ”"
 
 id: LANG_MAX_FILES_IN_PLAYLIST
 desc: in settings_menu
 eng: "Max playlist size"
 voice: "Max playlist size"
-new: "ξρτψ χαφιν ξχριξμι αψωιξϊ ωιψιν"
+new: "ΧΧ΅Χ¤Χ¨ Χ§Χ‘Χ¦Χ™Χ ΧΧ§Χ΅Χ™ΧΧΧ™ Χ‘Χ¨Χ©Χ™ΧΧª Χ©Χ™Χ¨Χ™Χ"
 
 id: LANG_JUMP_SCROLL
 desc: (player) menu altarnative for jump scroll
 eng: "Jump scroll"
 voice: "Jump scroll"
-new: "χτιφϊ βμιμδ"
+new: "Χ§Χ¤Χ™Χ¦Χª Χ’ΧΧ™ΧΧ”"
 
 id: LANG_ONE_TIME
 desc: (player) the jump scroll shall be done "one time"
 eng: "One time"
 voice: "One time"
-new: "τςν ΰηϊ"
+new: "Χ¤ΧΆΧ ΧΧ—Χª"
 
 id: LANG_ALWAYS
 desc: (player) the jump scroll shall be done "always"
 eng: "Always"
 voice: "Always"
-new: "ϊξιγ"
+new: "ΧªΧΧ™Χ“"
 
 id: LANG_JUMP_SCROLL_DELAY
 desc: (player) Delay before making a jump scroll
 eng: "Jump Scroll Delay"
 voice: "Jump Scroll Delay"
-new: "δωδιδ αϊηιμϊ χτιφϊ δβμιμδ"
+new: "Χ”Χ©Χ”Χ™Χ” Χ‘ΧªΧ—Χ™ΧΧª Χ§Χ¤Χ™Χ¦Χª Χ”Χ’ΧΧ™ΧΧ”"
 
 id: LANG_RECORD_TIMESPLIT
 desc: Prompt for record timer interval setting, in the record settings menu
 eng: "Time Split"
 voice: "Time Split"
-new: "τιφεμ μτι ζξο"
+new: "Χ¤Χ™Χ¦Χ•Χ ΧΧ¤Χ™ Χ–ΧΧ"
 
 id: LANG_RECORD_TIMESPLIT_REC
 desc: Display of record timer interval setting, on the record screen
 eng: "Split time:"
 voice: ""
-new: "ζξο τιφεμ:"
+new: "Χ–ΧΧ Χ¤Χ™Χ¦Χ•Χ:"
 
 id: LANG_SHOW_ICONS
 desc: in settings_menu
 eng: "Show Icons"
 voice: "Show Icons"
-new: "δφβ ρξμιν"
+new: "Χ”Χ¦Χ’ Χ΅ΧΧΧ™Χ"
 
 id: LANG_DISK_FULL
 desc: in recording screen
 eng: "The disk is full. Press OFF to continue."
 voice: ""
-new: "μδξωικ λγι λαδ ςμ μηυ ξμΰ. δγιρχ."
+new: "ΧΧ”ΧΧ©Χ™Χ Χ›Χ“Χ™ Χ›Χ‘Χ” ΧΆΧ ΧΧ—Χ¥ ΧΧΧ. Χ”Χ“Χ™Χ΅Χ§."
 
 id: LANG_CONFIRM_WITH_PLAY_RECORDER
 desc: Generic recorder string to use to confirm
 eng: "PLAY = Yes"
 voice: ""
-new: "πβο = λο"
+new: "Χ Χ’Χ = Χ›Χ"
 
 id: LANG_CANCEL_WITH_ANY_RECORDER
 desc: Generic recorder string to use to cancel
 eng: "Any Other = No"
 voice: ""
-new: "λμ μηφο ΰηψ = μΰ"
+new: "Χ›Χ ΧΧ—Χ¦Χ ΧΧ—Χ¨ = ΧΧ"
 
 ##
 ## Strings used in the plugin loader:
@@ -1468,31 +1468,31 @@ id: LANG_PLUGIN_CANT_OPEN
 desc: Plugin open error message
 eng: "Can't open %s"
 voice: ""
-new: "ΰιπε πτϊη %s"
+new: "ΧΧ™Χ Χ• Χ Χ¤ΧªΧ— %s"
 
 id: LANG_READ_FAILED
 desc: There was an error reading a file
 eng: "Failed reading %s"
 voice: ""
-new: "πλωμδ δχψιΰδ %s"
+new: "Χ Χ›Χ©ΧΧ” Χ”Χ§Χ¨Χ™ΧΧ” %s"
 
 id: LANG_PLUGIN_WRONG_MODEL
 desc: The plugin is not compatible with the archos model trying to run it
 eng: "Incompatible model"
 voice: ""
-new: "γβν μΰ ξϊΰιν"
+new: "Χ“Χ’Χ ΧΧ ΧΧªΧΧ™Χ"
 
 id: LANG_PLUGIN_WRONG_VERSION
 desc: The plugin is not compatible with the rockbox version trying to run it
 eng: "Incompatible version"
 voice: ""
-new: "βψρδ μΰ ξϊΰιξδ"
+new: "Χ’Χ¨Χ΅Χ” ΧΧ ΧΧªΧΧ™ΧΧ”"
 
 id: LANG_PLUGIN_ERROR
 desc: The plugin return an error code
 eng: "Plugin returned error"
 voice: ""
-new: "δδϊχο δηζιψ ωβιΰδ"
+new: "Χ”Χ”ΧªΧ§Χ Χ”Χ—Χ–Χ™Χ¨ Χ©Χ’Χ™ΧΧ”"
 
 ##
 ## boot change detection
@@ -1502,193 +1502,193 @@ id: LANG_BOOT_CHANGED
 desc: File browser discovered the boot file was changed
 eng: "Boot changed"
 voice: ""
-new: "δΰϊηεμ ωεπδ"
+new: "Χ”ΧΧªΧ—Χ•Χ Χ©Χ•Χ Χ”"
 
 id: LANG_REBOOT_NOW
 desc: Do you want to reboot?
 eng: "Reboot now?"
 voice: ""
-new: "μΰϊημ ςλωιε?"
+new: "ΧΧΧªΧ—Χ ΧΆΧ›Χ©Χ™Χ•?"
 
 id: LANG_QUEUE_LAST
 desc: in onplay menu.  queue a track/playlist at end of playlist.
 eng: "Queue last"
 voice: "Queue last"
-new: "δςξγ ΰηψεο αϊεψ"
+new: "Χ”ΧΆΧΧ“ ΧΧ—Χ¨Χ•Χ Χ‘ΧªΧ•Χ¨"
 
 id: LANG_INSERT
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
 eng: "Insert"
 voice: "Insert"
-new: "δλπρ"
+new: "Χ”Χ›Χ Χ΅"
 
 id: LANG_INSERT_LAST
 desc: in onplay menu.  append a track/playlist into dynamic playlist.
 eng: "Insert last"
 voice: "Insert last"
-new: "δλπρ ΰηψεο"
+new: "Χ”Χ›Χ Χ΅ ΧΧ—Χ¨Χ•Χ"
 
 id: LANG_QUEUE_FIRST
 desc: in onplay menu.  queue a track/playlist into dynamic playlist.
 eng: "Queue next"
 voice: "Queue next"
-new: "δςξγ δαΰ αϊεψ"
+new: "Χ”ΧΆΧΧ“ Χ”Χ‘Χ Χ‘ΧªΧ•Χ¨"
 
 id: LANG_INSERT_FIRST
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
 eng: "Insert next"
 voice: "Insert next"
-new: "δλπρ δαΰ αϊεψ"
+new: "Χ”Χ›Χ Χ΅ Χ”Χ‘Χ Χ‘ΧªΧ•Χ¨"
 
 id: LANG_SAVE_DYNAMIC_PLAYLIST
 desc: in playlist menu.
 eng: "Save Current Playlist"
 voice: "Save Current Playlist"
-new: "ωξεψ ψωιξϊ ωιψιν πεληιϊ"
+new: "Χ©ΧΧ•Χ¨ Χ¨Χ©Χ™ΧΧª Χ©Χ™Χ¨Χ™Χ Χ Χ•Χ›Χ—Χ™Χª"
 
 id: LANG_PLAYLIST_MENU
 desc: in main menu.
 eng: "Playlist Options"
 voice: "Playlist Options"
-new: "ψωιξϊ ωιψιν - ΰτωψειεϊ"
+new: "Χ¨Χ©Χ™ΧΧª Χ©Χ™Χ¨Χ™Χ - ΧΧ¤Χ©Χ¨Χ•Χ™Χ•Χª"
 
 id: LANG_PLAYLIST_INSERT_COUNT
 desc: splash number of tracks inserted
 eng: "Inserted %d tracks (%s)"
 voice: ""
-new: "ωιψιν %d δελπρε (%s)"
+new: "Χ©Χ™Χ¨Χ™Χ %d Χ”Χ•Χ›Χ Χ΅Χ• (%s)"
 
 id: LANG_PLAYLIST_QUEUE_COUNT
 desc: splash number of tracks queued
 eng: "Queued %d tracks (%s)"
 voice: ""
-new: "ωιψιν δεςξγε αϊεψ %d (%s)"
+new: "Χ©Χ™Χ¨Χ™Χ Χ”Χ•ΧΆΧΧ“Χ• Χ‘ΧªΧ•Χ¨ %d (%s)"
 
 id: LANG_PLAYLIST_SAVE_COUNT
 desc: splash number of tracks saved
 eng: "Saved %d tracks (%s)"
 voice: ""
-new: "ωιψιν %d πωξψε (%s)"
+new: "Χ©Χ™Χ¨Χ™Χ %d Χ Χ©ΧΧ¨Χ• (%s)"
 
 id: LANG_OFF_ABORT
 desc: Used on recorder models
 eng: "OFF to abort"
 voice: ""
-new: "μαθμ λγι λαδ"
+new: "ΧΧ‘ΧΧ Χ›Χ“Χ™ Χ›Χ‘Χ”"
 
 id: LANG_STOP_ABORT
 desc: Used on player models
 eng: "STOP to abort"
 voice: ""
-new: "ςφεψ λγι μαθμ"
+new: "ΧΆΧ¦Χ•Χ¨ Χ›Χ“Χ™ ΧΧ‘ΧΧ"
 
 id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
 desc: Playlist error
 eng: "Error updating playlist control file"
 voice: ""
-new: "ωβιΰδ αςγλεο χεαυ ωμιθδ αψωιξϊ δωιψιν"
+new: "Χ©Χ’Χ™ΧΧ” Χ‘ΧΆΧ“Χ›Χ•Χ Χ§Χ•Χ‘Χ¥ Χ©ΧΧ™ΧΧ” Χ‘Χ¨Χ©Χ™ΧΧª Χ”Χ©Χ™Χ¨Χ™Χ"
 
 id: LANG_PLAYLIST_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing playlist file"
 voice: ""
-new: "ωβιΰδ αβιωδ μχεαυ ψωιξϊ δωιψιν"
+new: "Χ©Χ’Χ™ΧΧ” Χ‘Χ’Χ™Χ©Χ” ΧΧ§Χ•Χ‘Χ¥ Χ¨Χ©Χ™ΧΧª Χ”Χ©Χ™Χ¨Χ™Χ"
 
 id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing playlist control file"
 voice: ""
-new: "ωβιΰδ αβιωδ μχεαυ δωμιθδ αψωιξϊ δωιψιν"
+new: "Χ©Χ’Χ™ΧΧ” Χ‘Χ’Χ™Χ©Χ” ΧΧ§Χ•Χ‘Χ¥ Χ”Χ©ΧΧ™ΧΧ” Χ‘Χ¨Χ©Χ™ΧΧª Χ”Χ©Χ™Χ¨Χ™Χ"
 
 id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing directory"
 voice: ""
-new: "ωβιΰδ αβιωδ μρτψιδ"
+new: "Χ©Χ’Χ™ΧΧ” Χ‘Χ’Χ™Χ©Χ” ΧΧ΅Χ¤Χ¨Χ™Χ”"
 
 id: LANG_PLAYLIST_CONTROL_INVALID
 desc: Playlist resume error
 eng: "Playlist control file is invalid"
 voice: ""
-new: "χεαυ δωμιθδ αψωιξϊ δωιψιν μΰ ηεχι"
+new: "Χ§Χ•Χ‘Χ¥ Χ”Χ©ΧΧ™ΧΧ” Χ‘Χ¨Χ©Χ™ΧΧª Χ”Χ©Χ™Χ¨Χ™Χ ΧΧ Χ—Χ•Χ§Χ™"
 
 id: LANG_RECURSE_DIRECTORY
 desc: In playlist menu
 eng: "Recursively Insert Directories"
 voice: "Recursively Insert Directories"
-new: "δλπρ ρτψιεϊ αφεψδ δηεζψϊ ςμ ςφξδ"
+new: "Χ”Χ›Χ Χ΅ Χ΅Χ¤Χ¨Χ™Χ•Χª Χ‘Χ¦Χ•Χ¨Χ” Χ”Χ—Χ•Χ–Χ¨Χª ΧΆΧ ΧΆΧ¦ΧΧ”"
 
 id: LANG_RECURSE_DIRECTORY_QUESTION
 desc: Asked from onplay screen
 eng: "Recursively?"
 voice: ""
-new: "αφεψδ δηεζψϊ ςμ ςφξδ?"
+new: "Χ‘Χ¦Χ•Χ¨Χ” Χ”Χ—Χ•Χ–Χ¨Χª ΧΆΧ ΧΆΧ¦ΧΧ”?"
 
 id: LANG_CUSTOM_FONT
 desc: in setting_menu()
 eng: "Browse Fonts"
 voice: "Browse Fonts"
-new: "δφβ βτπιν"
+new: "Χ”Χ¦Χ’ Χ’Χ¤Χ Χ™Χ"
 
 id: LANG_FIRMWARE
 desc: in the main menu
 eng: "Browse Firmwares"
 voice: "Browse Firmwares"
-new: "δφβ χεωηεϊ"
+new: "Χ”Χ¦Χ’ Χ§Χ•Χ©Χ—Χ•Χª"
 
 id: LANG_LANGUAGE
 desc: in settings_menu
 eng: "Language"
 voice: "Language"
-new: "ωτδ"
+new: "Χ©Χ¤Χ”"
 
 id: LANG_WHILE_PLAYING
 desc: in settings_menu()
 eng: "Browse .wps files"
 voice: "Browse while-playing-screen files"
-new: ".wps δφβ χαφι"
+new: ".wps Χ”Χ¦Χ’ Χ§Χ‘Χ¦Χ™"
 
 id: LANG_CUSTOM_CFG
 desc: in setting_menu()
 eng: "Browse .cfg files"
 voice: "Browse configuration files"
-new: ".cfg δφβ χαφι"
+new: ".cfg Χ”Χ¦Χ’ Χ§Χ‘Χ¦Χ™"
 
 id: LANG_PLUGINS
 desc: in main_menu()
 eng: "Browse Plugins"
 voice: "Browse Plugins"
-new: "δφβ δϊχπιν"
+new: "Χ”Χ¦Χ’ Χ”ΧªΧ§Χ Χ™Χ"
 
 id: LANG_CAR_ADAPTER_MODE
 desc: Displayed for setting car adapter mode to on/off
 eng: "Car Adapter Mode"
 voice: "Car Adapter Mode"
-new: "ξφα ξλεπιϊ"
+new: "ΧΧ¦Χ‘ ΧΧ›Χ•Χ Χ™Χª"
 
 id: LANG_LINE_IN
 desc: in settings_menu
 eng: "Line In"
 voice: "Line In"
-new: "λπιρϊ ωξς"
+new: "Χ›Χ Χ™Χ΅Χª Χ©ΧΧΆ"
 
 id: LANG_NO_FILES
 desc: in settings_menu
 eng: "No files"
 voice: ""
-new: "χαφιν ΰιο"
+new: "Χ§Χ‘Χ¦Χ™Χ ΧΧ™Χ"
 
 id: LANG_BUTTONBAR_MENU
 desc: in button bar
 eng: "Menu"
 voice: ""
-new: "ϊτψιθ"
+new: "ΧªΧ¤Χ¨Χ™Χ"
 
 id: LANG_FM_BUTTONBAR_PRESETS
 desc: in button bar
 eng: "Preset"
 voice: ""
-new: "ϊηπδ χαεςδ"
+new: "ΧªΧ—Χ Χ” Χ§Χ‘Χ•ΧΆΧ”"
 
 id: LANG_FM_SAVE_PRESET
 desc: DEPRECATED
@@ -1700,19 +1700,19 @@ id: LANG_FM_DELETE_PRESET
 desc: in radio screen
 eng: "Remove preset"
 voice: ""
-new: "δρψ ϊηπδ χαεςδ"
+new: "Χ”Χ΅Χ¨ ΧªΧ—Χ Χ” Χ§Χ‘Χ•ΧΆΧ”"
 
 id: LANG_FM_STATION
 desc: in radio screen
 eng: "Station: %d.%dMHz"
 voice: ""
-new: "ϊηπδ: %d.%dMHz"
+new: "ΧªΧ—Χ Χ”: %d.%dMHz"
 
 id: LANG_FM_PRESET_SAVE_FAILED
 desc: in radio screen
 eng: "Preset save failed"
 voice: ""
-new: "ωξιψϊ δϊηπδ δχαεςδ πλωμδ"
+new: "Χ©ΧΧ™Χ¨Χª Χ”ΧªΧ—Χ Χ” Χ”Χ§Χ‘Χ•ΧΆΧ” Χ Χ›Χ©ΧΧ”"
 
 id: LANG_FM_NO_PRESETS
 desc: DEPRECATED
@@ -1724,55 +1724,55 @@ id: LANG_FM_NO_FREE_PRESETS
 desc: in radio screen
 eng: "The preset list is full"
 voice: ""
-new: "ψωιξϊ δϊηπεϊ δχαεςεϊ ξψΰω πλωμδ"
+new: "Χ¨Χ©Χ™ΧΧª Χ”ΧªΧ—Χ Χ•Χª Χ”Χ§Χ‘Χ•ΧΆΧ•Χª ΧΧ¨ΧΧ© Χ Χ›Χ©ΧΧ”"
 
 id: LANG_FM_RADIO
 desc: in main menu
 eng: "FM Radio"
 voice: "FM Radio"
-new: "FM ψγιε"
+new: "FM Χ¨Χ“Χ™Χ•"
 
 id: LANG_FM_BUTTONBAR_RECORD
 desc: in main menu
 eng: "Record"
 voice: ""
-new: "δχμθδ"
+new: "Χ”Χ§ΧΧΧ”"
 
 id: LANG_VIEW_DYNAMIC_PLAYLIST
 desc: in playlist menu.
 eng: "View Current Playlist"
 voice: "View Current Playlist"
-new: "δφβ ψωιξϊ ωιψιν πεληιϊ"
+new: "Χ”Χ¦Χ’ Χ¨Χ©Χ™ΧΧª Χ©Χ™Χ¨Χ™Χ Χ Χ•Χ›Χ—Χ™Χª"
 
 id: LANG_MOVE
 desc: The verb/action Move
 eng: "Move"
 voice: "Move"
-new: "δςαψ"
+new: "Χ”ΧΆΧ‘Χ¨"
 
 id: LANG_MOVE_FAILED
 desc: Error message displayed in playlist viewer
 eng: "Move failed"
 voice: ""
-new: "δςαψδ πλωμδ"
+new: "Χ”ΧΆΧ‘Χ¨Χ” Χ Χ›Χ©ΧΧ”"
 
 id: LANG_FLIP_DISPLAY
 desc: in settings_menu, option to turn display+buttos by 180 degreed
 eng: "Upside Down"
 voice: "Upside Down"
-new: "δτεκ"
+new: "Χ”Χ¤Χ•Χ"
 
 id: LANG_RECORD_PRERECORD
 desc: in recording and radio screen
 eng: "Prerecording"
 voice: ""
-new: "δχμθδ ξψΰω"
+new: "Χ”Χ§ΧΧΧ” ΧΧ¨ΧΧ©"
 
 id: LANG_RECORD_PRERECORD_TIME
 desc: in recording settings_menu
 eng: "Prerecord time"
 voice: "Pre-Record time"
-new: "ωςεο δχμθδ ξψΰω"
+new: "Χ©ΧΆΧ•Χ Χ”Χ§ΧΧΧ” ΧΧ¨ΧΧ©"
 
 #Auto bookmark prompts
 
@@ -1780,13 +1780,13 @@ id: LANG_BOOKMARK_AUTOLOAD_QUERY
 desc: prompt for user to decide to create a bookmark
 eng: "Load Last Bookmark?"
 voice: ""
-new: "?μθςεο ριξπιδ ΰηψεπδ"
+new: "?ΧΧΧΆΧ•Χ Χ΅Χ™ΧΧ Χ™Χ” ΧΧ—Χ¨Χ•Χ Χ”"
 
 id: LANG_AUTO_BOOKMARK_QUERY
 desc: prompt for user to decide to create an bookmark
 eng: "Create a Bookmark?"
 voice: ""
-new: "?μιφεψ ριξπιδ"
+new: "?ΧΧ™Χ¦Χ•Χ¨ Χ΅Χ™ΧΧ Χ™Χ”"
 
 # Bookmark Select Menu Text
 
@@ -1794,43 +1794,43 @@ id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
 desc: From the auto-load screen, allows user to list all bookmarks
 eng: "Down = List"
 voice: ""
-new: "μξθδ = ψωιξδ"
+new: "ΧΧΧΧ” = Χ¨Χ©Χ™ΧΧ”"
 
 id: LANG_BOOKMARK_SELECT_EXIT
 desc: From the bookmark list screen, allows user to exit
 eng: "OFF = Exit"
 voice: ""
-new: "λαδ = ιφιΰδ"
+new: "Χ›Χ‘Χ” = Χ™Χ¦Χ™ΧΧ”"
 
 id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
 desc: Used on the bookmark select window to label bookmark number
 eng: "Bookmark"
 voice: ""
-new: "ριξπιδ"
+new: "Χ΅Χ™ΧΧ Χ™Χ”"
 
 id: LANG_BOOKMARK_SELECT_INDEX_TEXT
 desc: Used on the bookmark select window to label index number
 eng: "Index"
 voice: "Index"
-new: "ξτϊη"
+new: "ΧΧ¤ΧªΧ—"
 
 id: LANG_BOOKMARK_SELECT_TIME_TEXT
 desc: Used on the bookmark select window to label elapsed time
 eng: "Time"
 voice: "Time"
-new: "ζξο"
+new: "Χ–ΧΧ"
 
 id: LANG_BOOKMARK_SELECT_PLAY
 desc: Used on the bookmark select window to indicated the play option
 eng: "PLAY = Select"
 voice: ""
-new: "πβο = αηιψδ"
+new: "Χ Χ’Χ = Χ‘Χ—Χ™Χ¨Χ”"
 
 id: LANG_BOOKMARK_SELECT_DELETE
 desc: Used on the bookmark select window to indicated the bookmark delete option
 eng: "ON+Play = Delete"
 voice: ""
-new: "δτςμ+πβο = ξηιχδ"
+new: "Χ”Χ¤ΧΆΧ+Χ Χ’Χ = ΧΧ—Χ™Χ§Χ”"
 
 # Bookmark creation/failure text
 
@@ -1838,13 +1838,13 @@ id: LANG_BOOKMARK_CREATE_SUCCESS
 desc: Indicates bookmark was successfully created
 eng: "Bookmark Created"
 voice: ""
-new: "πεφψδ ριξπιδ"
+new: "Χ Χ•Χ¦Χ¨Χ” Χ΅Χ™ΧΧ Χ™Χ”"
 
 id: LANG_BOOKMARK_CREATE_FAILURE
 desc: Indicates bookmark was not created
 eng: "Bookmark Failed!"
 voice: ""
-new: "!ιφιψϊ ριξπιδ πλωμδ"
+new: "!Χ™Χ¦Χ™Χ¨Χª Χ΅Χ™ΧΧ Χ™Χ” Χ Χ›Χ©ΧΧ”"
 
 # Bookmark creation/failure text
 
@@ -1852,7 +1852,7 @@ id: LANG_BOOKMARK_LOAD_EMPTY
 desc: Indicates bookmark was empty
 eng: "Bookmark Empty"
 voice: ""
-new: "ριξπιεϊ ΰιο"
+new: "Χ΅Χ™ΧΧ Χ™Χ•Χª ΧΧ™Χ"
 
 # Bookmark Settings Text
 
@@ -1860,43 +1860,43 @@ id: LANG_BOOKMARK_SETTINGS
 desc: in general settings
 eng: "Bookmarking"
 voice: "Bookmarking"
-new: "ριξπιεϊ"
+new: "Χ΅Χ™ΧΧ Χ™Χ•Χª"
 
 id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
 desc: prompt for user to decide to create a bookmark
 eng: "Load Last Bookmark"
 voice: "Load Last Bookmark"
-new: "θςιπϊ ριξπιδ ΰηψεπδ"
+new: "ΧΧΆΧ™Χ Χª Χ΅Χ™ΧΧ Χ™Χ” ΧΧ—Χ¨Χ•Χ Χ”"
 
 id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
 desc: prompt for user to decide to create an bookmark
 eng: "Bookmark on Stop"
 voice: "Bookmark on Stop"
-new: "ιφιψϊ ριξπιδ αςφιψδ"
+new: "Χ™Χ¦Χ™Χ¨Χª Χ΅Χ™ΧΧ Χ™Χ” Χ‘ΧΆΧ¦Χ™Χ¨Χ”"
 
 id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
 desc: Configuration option to maintain a list of recent bookmarks
 eng: "Maintain a List of Recent Bookmarks?"
 voice: "Maintain a List of Recent Bookmarks?"
-new: "?ιφιψϊ ψωιξϊ ριξπιεϊ ΰηψεπεϊ"
+new: "?Χ™Χ¦Χ™Χ¨Χª Χ¨Χ©Χ™ΧΧª Χ΅Χ™ΧΧ Χ™Χ•Χª ΧΧ—Χ¨Χ•Χ Χ•Χª"
 
 id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
 desc: Save in recent bookmarks only
 eng: "Yes - Recent only"
 voice: "Yes - Recent only"
-new: "λο - ΰηψεπεϊ αμαγ"
+new: "Χ›Χ - ΧΧ—Χ¨Χ•Χ Χ•Χª Χ‘ΧΧ‘Χ“"
 
 id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
 desc: Save in recent bookmarks only
 eng: "Ask - Recent only"
 voice: "Ask - Recent only"
-new: "ωΰμ - ΰηψεπεϊ αμαγ"
+new: "Χ©ΧΧ - ΧΧ—Χ¨Χ•Χ Χ•Χª Χ‘ΧΧ‘Χ“"
 
 id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
 desc: Save only on bookmark for each playlist in recent bookmarks
 eng: "Unique only"
 voice: "Unique only"
-new: "ξιεηγιν αμαγ"
+new: "ΧΧ™Χ•Χ—Χ“Χ™Χ Χ‘ΧΧ‘Χ“"
 
 # Main Bookmarks Menu
 
@@ -1904,73 +1904,73 @@ id: LANG_BOOKMARK_MENU
 desc: Text on main menu to get to bookmark commands
 eng: "Bookmarks"
 voice: "Bookmarks"
-new: "ριξπιεϊ"
+new: "Χ΅Χ™ΧΧ Χ™Χ•Χª"
 
 id: LANG_BOOKMARK_MENU_CREATE
 desc: Used off of the bookmark menu to create a bookmark
 eng: "Create Bookmark"
 voice: "Create Bookmark"
-new: "φεψ ριξπιδ"
+new: "Χ¦Χ•Χ¨ Χ΅Χ™ΧΧ Χ™Χ”"
 
 id: LANG_BOOKMARK_MENU_LIST
 desc: Used off of the bookmark menu to list available bookmarks for the currently playing directory or M3U
 eng: "List Bookmarks"
 voice: "List Bookmarks"
-new: "ψωιξϊ ριξπιεϊ"
+new: "Χ¨Χ©Χ™ΧΧª Χ΅Χ™ΧΧ Χ™Χ•Χª"
 
 id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
 desc: Text for the menu text to access the most recent bookmarks list
 eng: "Recent Bookmarks"
 voice: "Recent Bookmarks"
-new: "ριξπιεϊ ΰηψεπεϊ"
+new: "Χ΅Χ™ΧΧ Χ™Χ•Χª ΧΧ—Χ¨Χ•Χ Χ•Χª"
 
 id: LANG_INFO_MENU
 desc: in the info sub menu
 eng: "Rockbox Info"
 voice: "Rockbox Info"
-new: "ξιγς ςμ ψεχαεχρ"
+new: "ΧΧ™Χ“ΧΆ ΧΆΧ Χ¨Χ•Χ§Χ‘Χ•Χ§Χ΅"
 
 id: LANG_RECORDING_MENU
 desc: in the recording sub menu
 eng: "Recording screen"
 voice: "Recording screen"
-new: "ξρκ δχμθδ"
+new: "ΧΧ΅Χ Χ”Χ§ΧΧΧ”"
 
 id: LANG_WIND_MENU
 desc: in the playback sub menu
 eng: "FFwd/Rewind"
 voice: "Fast forward and Rewind"
-new: "διμεκ ξδιψ χγιξδ εΰηεψδ"
+new: "Χ”Χ™ΧΧ•Χ ΧΧ”Χ™Χ¨ Χ§Χ“Χ™ΧΧ” Χ•ΧΧ—Χ•Χ¨Χ”"
 
 id: LANG_LCD_MENU
 desc: in the display sub menu
 eng: "LCD Settings"
 voice: "LCD Settings"
-new: "δβγψεϊ ξρκ"
+new: "Χ”Χ’Χ“Χ¨Χ•Χª ΧΧ΅Χ"
 
 id: LANG_BARS_MENU
 desc: in the display sub menu
 eng: "Status-/Scrollbar"
 voice: "Status- and Scrollbar"
-new: "ωεψϊ ξφα εωεψϊ εβμιμδ"
+new: "Χ©Χ•Χ¨Χª ΧΧ¦Χ‘ Χ•Χ©Χ•Χ¨Χª Χ•Χ’ΧΧ™ΧΧ”"
 
 id: LANG_BATTERY_MENU
 desc: in the system sub menu
 eng: "Battery"
 voice: "Battery"
-new: "ρεμμδ"
+new: "Χ΅Χ•ΧΧΧ”"
 
 id: LANG_DISK_MENU
 desc: in the system sub menu
 eng: "Disk"
 voice: "Disk"
-new: "γιρχ"
+new: "Χ“Χ™Χ΅Χ§"
 
 id: LANG_TIME_MENU
 desc: in the system sub menu
 eng: "Time & Date"
 voice: "Time and Date"
-new: "ϊΰψικ εζξο"
+new: "ΧªΧΧ¨Χ™Χ Χ•Χ–ΧΧ"
 
 # Limits
 
@@ -1978,97 +1978,97 @@ id: LANG_LIMITS_MENU
 desc: in the system sub menu
 eng: "Limits"
 voice: "Limits"
-new: "βαεμεϊ"
+new: "Χ’Χ‘Χ•ΧΧ•Χª"
 
 id: LANG_MANAGE_MENU
 desc: in the system sub menu
 eng: "Manage Settings"
 voice: "Manage Settings"
-new: "πιδεμ δβγψεϊ"
+new: "Χ Χ™Χ”Χ•Χ Χ”Χ’Χ“Χ¨Χ•Χª"
 
 id: LANG_RECORD_DIRECTORY
 desc: in recording settings_menu
 eng: "Directory"
 voice: "Directory"
-new: "ρτψιδ"
+new: "Χ΅Χ¤Χ¨Χ™Χ”"
 
 id: LANG_RECORD_CURRENT_DIR
 desc: in recording directory options
 eng: "Current dir"
 voice: "Current directory"
-new: "ρτψιδ πεληιϊ"
+new: "Χ΅Χ¤Χ¨Χ™Χ” Χ Χ•Χ›Χ—Χ™Χª"
 
 id: LANG_CREATE_DIR
 desc: in main menu
 eng: "Create directory"
 voice: "Create directory"
-new: "ιφιψϊ ρτψιδ"
+new: "Χ™Χ¦Χ™Χ¨Χª Χ΅Χ¤Χ¨Χ™Χ”"
 
 id: LANG_VIEW
 desc: in on+play menu
 eng: "View"
 voice: "View"
-new: "δφβδ"
+new: "Χ”Χ¦Χ’Χ”"
 
 id: LANG_SHOW_INDICES
 desc: in playlist viewer menu
 eng: "Show Indices"
 voice: "Show Indices"
-new: "δφβ ριξπι ξτϊη"
+new: "Χ”Χ¦Χ’ Χ΅Χ™ΧΧ Χ™ ΧΧ¤ΧªΧ—"
 
 id: LANG_TRACK_DISPLAY
 desc: in playlist viewer on+play menu
 eng: "Track Display"
 voice: "Track Display"
-new: "δφβϊ ωιψ"
+new: "Χ”Χ¦Χ’Χª Χ©Χ™Χ¨"
 
 id: LANG_DISPLAY_TRACK_NAME_ONLY
 desc: track display options
 eng: "Track name only"
 voice: "Track name only"
-new: "ων δωιψ αμαγ"
+new: "Χ©Χ Χ”Χ©Χ™Χ¨ Χ‘ΧΧ‘Χ“"
 
 id: LANG_DISPLAY_FULL_PATH
 desc: track display options
 eng: "Full path"
 voice: "Full path"
-new: "λμ δλϊεαϊ"
+new: "Χ›Χ Χ”Χ›ΧªΧ•Χ‘Χª"
 
 id: LANG_REMOVE
 desc: in playlist viewer on+play menu
 eng: "Remove"
 voice: "Remove"
-new: "δρψ"
+new: "Χ”Χ΅Χ¨"
 
 id: LANG_FILE_OPTIONS
 desc: in playlist viewer on+play menu
 eng: "File Options"
 voice: "File Options"
-new: "ΰτωψειεϊ χεαυ"
+new: "ΧΧ¤Χ©Χ¨Χ•Χ™Χ•Χª Χ§Χ•Χ‘Χ¥"
 
 id: LANG_BUTTON_BAR
 desc: in settings menu
 eng: "Button bar"
 voice: "Button bar"
-new: "ωεψϊ λτϊεψιν"
+new: "Χ©Χ•Χ¨Χª Χ›Χ¤ΧªΧ•Χ¨Χ™Χ"
 
 id: LANG_DIRBROWSE_F1
 desc: in dir browser, F1 button bar text
 eng: "Menu"
 voice: ""
-new: "ϊτψιθ"
+new: "ΧªΧ¤Χ¨Χ™Χ"
 
 id: LANG_DIRBROWSE_F2
 desc: in dir browser, F2 button bar text
 eng: "Option"
 voice: ""
-new: "ΰτωψειεϊ"
+new: "ΧΧ¤Χ©Χ¨Χ•Χ™Χ•Χª"
 
 id: LANG_DIRBROWSE_F3
 desc: in dir browser, F3 button bar text
 eng: "LCD"
 voice: ""
-new: "ξρκ"
+new: "ΧΧ΅Χ"
 
 #digits and units for voice, the order is important
 
@@ -2384,31 +2384,31 @@ id: LANG_VOICE
 desc: root of voice menu
 eng: "Voice"
 voice: "Voice"
-new: "χεμ"
+new: "Χ§Χ•Χ"
 
 id: LANG_VOICE_MENU
 desc: item of voice menu, enable/disable the voice UI
 eng: "Voice Menus"
 voice: "Voice Menus"
-new: "ϊτψιθι χεμ"
+new: "ΧªΧ¤Χ¨Χ™ΧΧ™ Χ§Χ•Χ"
 
 id: LANG_VOICE_DIR
 desc: item of voice menu, set the "talkbox" mode for directories
 eng: "Voice Directories"
 voice: "Voice Directories"
-new: "ρτψιεϊ χεμιεϊ"
+new: "Χ΅Χ¤Χ¨Χ™Χ•Χª Χ§Χ•ΧΧ™Χ•Χª"
 
 id: LANG_VOICE_FILE
 desc: item of voice menu, set the voive mode for files
 eng: "Voice Filenames"
 voice: "Voice Filenames"
-new: "χαφιν χεμιιν"
+new: "Χ§Χ‘Χ¦Χ™Χ Χ§Χ•ΧΧ™Χ™Χ"
 
 id: LANG_VOICE_NUMBER
 desc: "talkbox" mode for files+directories
 eng: "Numbers"
 voice: "Numbers"
-new: "ξρτψιν"
+new: "ΧΧ΅Χ¤Χ¨Χ™Χ"
 
 id: LANG_VOICE_DIR_ENTER
 desc: DEPRECATED
@@ -2420,7 +2420,7 @@ id: LANG_VOICE_DIR_HOVER
 desc: "talkbox" mode for directories + files
 eng: ".talk mp3 clip"
 voice: "talk mp3 clip"
-new: ".ΰξεψ ημχι mp3:"
+new: ".ΧΧΧ•Χ¨ Χ—ΧΧ§Χ™ mp3:"
 
 id: VOICE_FILE
 desc: spoken only, prefix for file number
@@ -2438,7 +2438,7 @@ id: LANG_VOICE_SPELL
 desc: "talkbox" mode for files+directories
 eng: "Spell"
 voice: "Spell"
-new: "ΰιιϊ"
+new: "ΧΧ™Χ™Χª"
 
 id: VOICE_CHAR_A
 desc: spoken only, for spelling
@@ -2654,7 +2654,7 @@ id: LANG_DELETE_DIR
 desc: in on+play menu
 eng: "Delete directory"
 voice: "delete directory"
-new: "ξηχ ρτψιδ"
+new: "ΧΧ—Χ§ Χ΅Χ¤Χ¨Χ™Χ”"
 
 id: VOICE_CURRENT_TIME
 desc: spoken only, for wall clock announce
@@ -2668,85 +2668,85 @@ id: LANG_FILETYPES_EXTENSION_FULL
 desc: Extension array full
 eng: "Extension array full"
 voice: ""
-new: "ξςψκ δριεξεϊ ξμΰ"
+new: "ΧΧΆΧ¨Χ Χ”Χ΅Χ™Χ•ΧΧ•Χª ΧΧΧ"
 
 id: LANG_FILETYPES_FULL
 desc: Filetype array full
 eng: "Filetype array full"
 voice: ""
-new: "ξςψκ ρεβι δχαφιν ξμΰ"
+new: "ΧΧΆΧ¨Χ Χ΅Χ•Χ’Χ™ Χ”Χ§Χ‘Χ¦Χ™Χ ΧΧΧ"
 
 id: LANG_FILETYPES_PLUGIN_NAME_LONG
 desc: Viewer plugin name too long
 eng: "Plugin name too long"
 voice: ""
-new: "ων δδϊχο ΰψεκ ξιγιι"
+new: "Χ©Χ Χ”Χ”ΧªΧ§Χ ΧΧ¨Χ•Χ ΧΧ™Χ“Χ™Χ™"
 
 id: LANG_FILETYPES_STRING_BUFFER_EMPTY
 desc: Filetype string buffer empty
 eng: "Filetype string buffer empty"
 voice: ""
-new: "ζιλψεο ρεβι δχαφιν ψιχ"
+new: "Χ–Χ™Χ›Χ¨Χ•Χ Χ΅Χ•Χ’Χ™ Χ”Χ§Χ‘Χ¦Χ™Χ Χ¨Χ™Χ§"
 
 id: LANG_ONPLAY_OPEN_WITH
 desc: Onplay open with
 eng: "Open with"
 voice: "open with"
-new: "τϊη αΰξφςεϊ"
+new: "Χ¤ΧªΧ— Χ‘ΧΧΧ¦ΧΆΧ•Χª"
 
 id: LANG_SORT_DIR
 desc: browser sorting setting
 eng: "Sort Directories"
 voice: "sort directories"
-new: "ριγεψ ρτψιεϊ"
+new: "Χ΅Χ™Χ“Χ•Χ¨ Χ΅Χ¤Χ¨Χ™Χ•Χª"
 
 id: LANG_SORT_FILE
 desc: browser sorting setting
 eng: "Sort Files"
 voice: "sort files"
-new: "ριγεψ χαφιν"
+new: "Χ΅Χ™Χ“Χ•Χ¨ Χ§Χ‘Χ¦Χ™Χ"
 
 id: LANG_SORT_ALPHA
 desc: browser sorting setting
 eng: "Alphabetical"
 voice: "Alphabetical"
-new: "ΰμταϊιϊ"
+new: "ΧΧΧ¤Χ‘ΧªΧ™Χª"
 
 id: LANG_SORT_DATE
 desc: browser sorting setting
 eng: "by date"
 voice: "by date"
-new: "μτι ϊΰψικ"
+new: "ΧΧ¤Χ™ ΧªΧΧ¨Χ™Χ"
 
 id: LANG_SORT_DATE_REVERSE
 desc: browser sorting setting
 eng: "by newest date"
 voice: "by newest date"
-new: "μτι δϊΰψικ δηγω αιεϊψ"
+new: "ΧΧ¤Χ™ Χ”ΧªΧΧ¨Χ™Χ Χ”Χ—Χ“Χ© Χ‘Χ™Χ•ΧªΧ¨"
 
 id: LANG_SORT_TYPE
 desc: browser sorting setting
 eng: "by type"
 voice: "by type"
-new: "μτι ρεβ"
+new: "ΧΧ¤Χ™ Χ΅Χ•Χ’"
 
 id: LANG_FM_EDIT_PRESET
 desc: in radio screen
 eng: "Edit preset"
 voice: ""
-new: "ςψεκ ϊηπδ χαεςδ"
+new: "ΧΆΧ¨Χ•Χ ΧªΧ—Χ Χ” Χ§Χ‘Χ•ΧΆΧ”"
 
 id: LANG_FM_MONO_MODE
 desc: in radio screen
 eng: "Force mono"
 voice: ""
-new: "λτδ ξεπε"
+new: "Χ›Χ¤Χ” ΧΧ•Χ Χ•"
 
 id: LANG_FM_BUTTONBAR_EXIT
 desc: in radio screen
 eng: "Exit"
 voice: ""
-new: "ιφιΰδ"
+new: "Χ™Χ¦Χ™ΧΧ”"
 
 id: LANG_FM_BUTTONBAR_EDIT
 desc: DEPRECATED
@@ -2758,103 +2758,103 @@ id: LANG_FM_BUTTONBAR_ADD
 desc: in radio screen
 eng: "Add"
 voice: ""
-new: "δερσ"
+new: "Χ”Χ•Χ΅Χ£"
 
 id: LANG_FM_BUTTONBAR_ACTION
 desc: in radio screen
 eng: "Action"
 voice: ""
-new: "τςεμδ"
+new: "Χ¤ΧΆΧ•ΧΧ”"
 
 id: LANG_MDB_STRENGTH
 desc: in sound settings
 eng: "MDB Strength"
 voice: "MDB Strength"
-new: "MDB ηεζχ"
+new: "MDB Χ—Χ•Χ–Χ§"
 
 id: LANG_MDB_HARMONICS
 desc: in sound settings
 eng: "MDB Harmonics"
 voice: "MDB Harmonics"
-new: "MDB δψξεπιιϊ"
+new: "MDB Χ”Χ¨ΧΧ•Χ Χ™Χ™Χª"
 
 id: LANG_MDB_CENTER
 desc: in sound settings
 eng: "MDB Center frequency"
 voice: "MDB Center frequency"
-new: "MDB ξψλζ ϊγιψεϊ"
+new: "MDB ΧΧ¨Χ›Χ– ΧªΧ“Χ™Χ¨Χ•Χª"
 
 id: LANG_MDB_SHAPE
 desc: in sound settings
 eng: "MDB Shape"
 voice: "MDB Shape"
-new: "MDB φεψϊ"
+new: "MDB Χ¦Χ•Χ¨Χª"
 
 id: LANG_MDB_ENABLE
 desc: in sound settings
 eng: "MDB Enable"
 voice: "MDB Enable"
-new: "τςιμ MDB"
+new: "Χ¤ΧΆΧ™Χ MDB"
 
 id: LANG_SUPERBASS
 desc: in sound settings
 eng: "Super bass"
 voice: "Super bass"
-new: "ρετψ αρ"
+new: "Χ΅Χ•Χ¤Χ¨ Χ‘Χ΅"
 
 id: LANG_SHUTDOWN
 desc: in main menu
 eng: "Shut down"
 voice: "Shut down"
-new: "λιαει"
+new: "Χ›Χ™Χ‘Χ•Χ™"
 
 id: LANG_SHUTTINGDOWN
 desc: in main menu
 eng: "Shutting down..."
 voice: ""
-new: "...ξλαδ"
+new: "...ΧΧ›Χ‘Χ”"
 
 id: LANG_CONFIRM_SHUTDOWN
 desc: in shutdown screen
 eng: "Press OFF to shut down"
 voice: ""
-new: "μηυ ςμ λαδ λγι μλαεϊ"
+new: "ΧΧ—Χ¥ ΧΆΧ Χ›Χ‘Χ” Χ›Χ“Χ™ ΧΧ›Χ‘Χ•Χª"
 
 id: LANG_ID3_ORDER
 desc: in playback settings screen
 eng: "ID3 tag priority"
 voice: "ID3 tag priority"
-new: "ID3 ςγιτεϊ ϊεειϊ"
+new: "ID3 ΧΆΧ“Χ™Χ¤Χ•Χª ΧªΧ•Χ•Χ™Χª"
 
 id: LANG_ID3_V1_FIRST
 desc: in playback settings screen
 eng: "V1 then V2"
 voice: "Version 1 then version 2"
-new: "2 ξΰωψ βψρδ 1 βψρδ"
+new: "2 ΧΧΧ©Χ¨ Χ’Χ¨Χ΅Χ” 1 Χ’Χ¨Χ΅Χ”"
 
 id: LANG_ID3_V2_FIRST
 desc: in playback settings screen
 eng: "V2 then V1"
 voice: "Version 2 then version 1"
-new: "1 ξΰωψ βψρδ 2 βψρδ"
+new: "1 ΧΧΧ©Χ¨ Χ’Χ¨Χ΅Χ” 2 Χ’Χ¨Χ΅Χ”"
 
 id: LANG_NO_ROCKBOX_DIR
 desc: in browse root
 eng: "No .rockbox directory"
 voice: ""
-new: ".RockBox μΰ χιιξϊ ρτψιιϊ"
+new: ".RockBox ΧΧ Χ§Χ™Χ™ΧΧª Χ΅Χ¤Χ¨Χ™Χ™Χª"
 
 id: LANG_INSTALLATION_INCOMPLETE
 desc: in browse root
 eng: "Installation incomplete"
 voice: ""
-new: "δδϊχπδ πλωμδ"
+new: "Χ”Χ”ΧªΧ§Χ Χ” Χ Χ›Χ©ΧΧ”"
 
 id: LANG_REMOVE_MMC
 desc: before acknowledging usb in case an MMC is inserted (Ondio)
 eng: "Please remove inserted MMC"
 voice: "Please remove multimedia card"
-new: "ΰπΰ δρψ λψθιρ ξεμθιξγιδ"
+new: "ΧΧ Χ Χ”Χ΅Χ¨ Χ›Χ¨ΧΧ™Χ΅ ΧΧ•ΧΧΧ™ΧΧ“Χ™Χ”"
 
 id: VOICE_DOT
 desc: spoken only, for spelling
@@ -2872,85 +2872,85 @@ id: LANG_STEREO_WIDTH
 desc: in sound_settings
 eng: "Stereo width"
 voice: "Stereo width"
-new: "ψεηα ρθψιΰε"
+new: "Χ¨Χ•Χ—Χ‘ Χ΅ΧΧ¨Χ™ΧΧ•"
 
 id: LANG_CHANNEL_CUSTOM
 desc: in sound_settings
 eng: "Custom"
 voice: "Custom"
-new: "δϊΰξδ ΰιωιϊ"
+new: "Χ”ΧªΧΧΧ” ΧΧ™Χ©Χ™Χª"
 
 id: LANG_FILTER_ID3DB
 desc: show ID3 database
 eng: "ID3 database"
 voice: "ID3 database"
-new: "ID3 ξργ πϊεπι"
+new: "ID3 ΧΧ΅Χ“ Χ ΧªΧ•Χ Χ™"
 
 id: LANG_ID3DB_ARTISTS
 desc: ID3 virtual folder name
 eng: "Artists"
 voice: ""
-new: "ΰξπιν"
+new: "ΧΧΧ Χ™Χ"
 
 id: LANG_ID3DB_ALBUMS
 desc: ID3 virtual folder name
 eng: "Albums"
 voice: ""
-new: "ΰμαεξιν"
+new: "ΧΧΧ‘Χ•ΧΧ™Χ"
 
 id: LANG_ID3DB_SONGS
 desc: ID3 virtual folder name
 eng: "Songs"
 voice: ""
-new: "ωιψιν"
+new: "Χ©Χ™Χ¨Χ™Χ"
 
 id: LANG_ID3DB_SEARCH
 desc: ID3 virtual folder name
 eng: "Search"
 voice: ""
-new: "ηιτεω"
+new: "Χ—Χ™Χ¤Χ•Χ©"
 
 id: LANG_ID3DB_SEARCH_ARTISTS
 desc: ID3 virtual folder name
 eng: "Search Artists"
 voice: ""
-new: "ηιτεω ΰξπιν"
+new: "Χ—Χ™Χ¤Χ•Χ© ΧΧΧ Χ™Χ"
 
 id: LANG_ID3DB_SEARCH_ALBUMS
 desc: ID3 virtual folder name
 eng: "Search Albums"
 voice: ""
-new: "ηιτεω ΰμαεξιν"
+new: "Χ—Χ™Χ¤Χ•Χ© ΧΧΧ‘Χ•ΧΧ™Χ"
 
 id: LANG_ID3DB_SEARCH_SONGS
 desc: ID3 virtual folder name
 eng: "Search Songs"
 voice: ""
-new: "ηιτεω ωιψιν"
+new: "Χ—Χ™Χ¤Χ•Χ© Χ©Χ™Χ¨Χ™Χ"
 
 id: LANG_ID3DB_MATCHES
 desc: ID3 virtual folder name
 eng: "Found %d matches"
 voice: ""
-new: "δϊΰξεϊ %d πξφΰε"
+new: "Χ”ΧªΧΧΧ•Χª %d Χ ΧΧ¦ΧΧ•"
 
 id: LANG_BATTERY_TYPE
 desc: in battery settings
 eng: "Battery Type"
 voice: "Battery type"
-new: "ρεβ ρεμμδ"
+new: "Χ΅Χ•Χ’ Χ΅Χ•ΧΧΧ”"
 
 id: LANG_BATTERY_TYPE_ALKALINE
 desc: in battery settings
 eng: "Alkaline"
 voice: "Alkaline"
-new: "ΰμχμιιο"
+new: "ΧΧΧ§ΧΧ™Χ™Χ"
 
 id: LANG_BATTERY_TYPE_NIMH
 desc: in battery settings
 eng: "NiMH"
 voice: "Nickel metal hydride"
-new: "πιχμ ξθΰμ διιγψιγ"
+new: "Χ Χ™Χ§Χ ΧΧΧΧ Χ”Χ™Χ™Χ“Χ¨Χ™Χ“"
 
 id: LANG_POINT
 desc: decimal separator for composing numbers
@@ -2986,91 +2986,91 @@ id: LANG_DISK_SIZE_INFO
 desc: disk size info
 eng: "Disk:"
 voice: ""
-new: "γιρχ:"
+new: "Χ“Χ™Χ΅Χ§:"
 
 id: LANG_DISK_FREE_INFO
 desc: disk size info
 eng: "Free:"
 voice: "Free diskspace:"
-new: "ξχεν ηετωι αγιρχ:"
+new: "ΧΧ§Χ•Χ Χ—Χ•Χ¤Χ©Χ™ Χ‘Χ“Χ™Χ΅Χ§:"
 
 id: LANG_ID3DB_ALL_SONGS
 desc: ID3 virtual folder name
 eng: "<All songs>"
 voice: ""
-new: "<λμ δωιψιν>"
+new: "<Χ›Χ Χ”Χ©Χ™Χ¨Χ™Χ>"
 
 id: LANG_PLAYLIST
 desc: Used when you need to say playlist, also voiced
 eng: "Playlist"
 voice: "Playlist"
-new: "ψωιξϊ ωιψιν"
+new: "Χ¨Χ©Χ™ΧΧª Χ©Χ™Χ¨Χ™Χ"
 
 id: LANG_RECORD_STARTUP
 desc: Start Rockbox in Recording screen
 eng: "Show recording screen on startup"
 voice: "Show recording screen on startup"
-new: "δφβ ξρκ δχμθδ αδτςμδ ξηγω"
+new: "Χ”Χ¦Χ’ ΧΧ΅Χ Χ”Χ§ΧΧΧ” Χ‘Χ”Χ¤ΧΆΧΧ” ΧΧ—Χ“Χ©"
 
 id: LANG_ALARM_MOD_DISABLE
 desc: Announce that the RTC alarm has been turned off
 eng: "Alarm Disabled"
 voice: "Alarm Disabled"
-new: "ωςεο ξςεψψ ξαεθμ"
+new: "Χ©ΧΆΧ•Χ ΧΧΆΧ•Χ¨Χ¨ ΧΧ‘Χ•ΧΧ"
 
 id: LANG_RECORD_TRIGGER
 desc: in recording settings_menu
 eng: "Trigger"
 voice: 
-new: "βεψν δτςμδ"
+new: "Χ’Χ•Χ¨Χ Χ”Χ¤ΧΆΧΧ”"
 
 id: LANG_RECORD_START_THRESHOLD
 desc: in recording settings_menu
 eng: "Start above"
 voice: 
-new: "δϊημ μτπι"
+new: "Χ”ΧªΧ—Χ ΧΧ¤Χ Χ™"
 
 id: LANG_RECORD_MIN_DURATION
 desc: in recording settings_menu
 eng: "for at least"
 voice: 
-new: "μξωκ μτηεϊ"
+new: "ΧΧΧ©Χ ΧΧ¤Χ—Χ•Χª"
 
 id: LANG_RECORD_STOP_THRESHOLD
 desc: in recording settings_menu
 eng: "Stop below"
 voice: 
-new: "ςφεψ ΰηψι"
+new: "ΧΆΧ¦Χ•Χ¨ ΧΧ—Χ¨Χ™"
 
 id: LANG_RECORD_STOP_POSTREC
 desc: in recording settings_menu
 eng: "for at least"
 voice: 
-new: "μξωκ μτηεϊ"
+new: "ΧΧΧ©Χ ΧΧ¤Χ—Χ•Χª"
 
 id: LANG_RECORD_STOP_GAP
 desc: in recording settings_menu
 eng: "Presplit gap"
 voice: 
-new: "ημχ ξψΰω ΰϊ δψεεη"
+new: "Χ—ΧΧ§ ΧΧ¨ΧΧ© ΧΧª Χ”Χ¨Χ•Χ•Χ—"
 
 id: LANG_RECORD_TRIGGER_MODE
 desc: in recording settings_menu
 eng: "Trigger"
 voice: 
-new: "βεψν δτςμδ"
+new: "Χ’Χ•Χ¨Χ Χ”Χ¤ΧΆΧΧ”"
 
 id: LANG_RECORD_TRIG_NOREARM
 desc: in recording settings_menu
 eng: "Once"
 voice: 
-new: "τςν ΰηϊ"
+new: "Χ¤ΧΆΧ ΧΧ—Χª"
 
 id: LANG_RECORD_TRIG_REARM
 desc: in recording settings_menu
 eng: "Repeat"
 voice: 
-new: "ηζψδ"
+new: "Χ—Χ–Χ¨Χ”"
 
 id: LANG_DB_INF
 desc: -inf db for values below measurement
@@ -3082,25 +3082,25 @@ id: LANG_RECORD_TRIG_IDLE
 desc: waiting for threshold
 eng: "Trigger idle"
 voice: 
-new: "βεψν δδτςμδ ξξϊιο"
+new: "Χ’Χ•Χ¨Χ Χ”Χ”Χ¤ΧΆΧΧ” ΧΧΧªΧ™Χ"
 
 id: LANG_RECORD_TRIGGER_ACTIVE
 desc: 
 eng: "Trigger active"
 voice: 
-new: "βεψν δδτςμδ ξετςμ"
+new: "Χ’Χ•Χ¨Χ Χ”Χ”Χ¤ΧΆΧΧ” ΧΧ•Χ¤ΧΆΧ"
 
 id: LANG_LCD_REMOTE_MENU
 desc: in the display sub menu
 eng: "Remote-LCD Settings"
 voice: 
-new: "δβγψεϊ ξρκ δωμθ"
+new: "Χ”Χ’Χ“Χ¨Χ•Χª ΧΧ΅Χ Χ”Χ©ΧΧ"
 
 id: LANG_DISK_NAME_INTERNAL
 desc: in info menu; name for internal disk with multivolume (keep short!)
 eng: "Int:"
 voice: "Internal"
-new: "τπιξι:"
+new: "Χ¤Χ Χ™ΧΧ™:"
 
 id: LANG_DISK_NAME_MMC
 desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
@@ -3112,133 +3112,133 @@ id: LANG_CROSSFADE
 desc: in playback settings
 eng: "Crossfade"
 voice: "Crossfade"
-new: "ξςαψ αιπιιν"
+new: "ΧΧΆΧ‘Χ¨ Χ‘Χ™Χ Χ™Χ™Χ"
 
 id: LANG_BACKLIGHT_FADE_IN
 desc: in settings_menu
 eng: "Backlight fade in"
 voice: "Backlight fade in"
-new: "δβαψδ δγψβϊιϊ ωμ ϊΰεψϊ δξρκ"
+new: "Χ”Χ’Χ‘Χ¨Χ” Χ”Χ“Χ¨Χ’ΧªΧ™Χª Χ©Χ ΧªΧΧ•Χ¨Χª Χ”ΧΧ΅Χ"
 
 id: LANG_BACKLIGHT_FADE_OUT
 desc: in settings_menu
 eng: "Backlight fade out"
 voice: "Backlight fade out"
-new: "ςξςεν ϊΰεψϊ δξρκ"
+new: "ΧΆΧΧΆΧ•Χ ΧªΧΧ•Χ¨Χª Χ”ΧΧ΅Χ"
 
 id: LANG_SHUFFLE_PLAYLIST
 desc: in playlist menu, reshuffles the order in which songs are played
 eng: "Reshuffle"
 voice: "Reshuffle"
-new: "ςψαεα ξηγω"
+new: "ΧΆΧ¨Χ‘Χ•Χ‘ ΧΧ—Χ“Χ©"
 
 id: LANG_NOTHING_TO_RESUME
 desc: Error message displayed when resume button pressed but no playlist
 eng: "Nothing to resume"
 voice: ""
-new: "ΰμιδ μηζεψ ωιψιν ψωιξϊ ΰιο"
+new: "ΧΧΧ™Χ” ΧΧ—Χ–Χ•Χ¨ Χ©Χ™Χ¨Χ™Χ Χ¨Χ©Χ™ΧΧª ΧΧ™Χ"
 
 id: LANG_INSERT_SHUFFLED
 desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
 eng: "Insert shuffled"
 voice: "Insert shuffled"
-new: "δλπρ ξςεψααιν"
+new: "Χ”Χ›Χ Χ΅ ΧΧΆΧ•Χ¨Χ‘Χ‘Χ™Χ"
 
 id: LANG_SPDIF_ENABLE
 desc: in playback settings menu. enable/disable the optical out
 eng: "Optical output"
 voice: "Optical output"
-new: "ιφιΰδ ΰετθιϊ"
+new: "Χ™Χ¦Χ™ΧΧ” ΧΧ•Χ¤ΧΧ™Χª"
 
 id: LANG_NEXT_FOLDER
 desc: in settings_menu.  Should we move to next folder when current one ends
 eng: "Move to Next Folder"
 voice: "Move to Next Folder"
-new: "ξςαψ μρτψιδ δαΰδ"
+new: "ΧΧΆΧ‘Χ¨ ΧΧ΅Χ¤Χ¨Χ™Χ” Χ”Χ‘ΧΧ”"
 
 id: LANG_RUNTIMEDB_ACTIVE
 desc: in settings_menu.
 eng: "Gather runtime data (experimental)"
 voice: "Gather runtime data"
-new: "ΰρεσ πϊεπι ψιφδ"
+new: "ΧΧ΅Χ•Χ£ Χ ΧªΧ•Χ Χ™ Χ¨Χ™Χ¦Χ”"
 
 id: LANG_MENU_SET_RATING
 desc: in wps context menu
 eng: "Set song rating"
 voice: "Set song rating"
-new: "χας γιψεβ ωιψ"
+new: "Χ§Χ‘ΧΆ Χ“Χ™Χ¨Χ•Χ’ Χ©Χ™Χ¨"
 
 id: LANG_RATING
 desc: in set_rating
 eng: "Rating:"
 voice: 
-new: "γιψεβ:"
+new: "Χ“Χ™Χ¨Χ•Χ’:"
 
 id: LANG_CROSSFADE_DURATION
 desc: in playback settings
 eng: "Crossfade duration"
 voice: "Crossfade duration"
-new: "ξωκ ξςαψ αιπιιν"
+new: "ΧΧ©Χ ΧΧΆΧ‘Χ¨ Χ‘Χ™Χ Χ™Χ™Χ"
 
 id: LANG_MIX
 desc: in playback settings, crossfade option
 eng: "Mix"
 voice: "Mix"
-new: "ςψαεα"
+new: "ΧΆΧ¨Χ‘Χ•Χ‘"
 
 id: LANG_RESTARTING_PLAYBACK
 desc: splash screen displayed when pcm buffer size is changed
 eng: "Restarting playback..."
 voice: "Restarting playback..."
-new: "...ξΰϊημ ΰϊ δδωξςδ"
+new: "...ΧΧΧªΧ—Χ ΧΧª Χ”Χ”Χ©ΧΧΆΧ”"
 
 id: LANG_REPLAYGAIN
 desc: in replaygain
 eng: "Replaygain"
 voice: 
-new: "ςεφξδ ηεζψϊ"
+new: "ΧΆΧ•Χ¦ΧΧ” Χ—Χ•Χ–Χ¨Χª"
 
 id: LANG_REPLAYGAIN_ENABLE
 desc: in replaygain
 eng: "Enable replaygain"
 voice: 
-new: "ςεφξδ ηεζψϊ τςιμδ"
+new: "ΧΆΧ•Χ¦ΧΧ” Χ—Χ•Χ–Χ¨Χª Χ¤ΧΆΧ™ΧΧ”"
 
 id: LANG_REPLAYGAIN_NOCLIP
 desc: in replaygain
 eng: "Prevent clipping"
 voice: 
-new: "ξπς ςιεεϊιν"
+new: "ΧΧ ΧΆ ΧΆΧ™Χ•Χ•ΧªΧ™Χ"
 
 id: LANG_REPLAYGAIN_MODE
 desc: in replaygain
 eng: "Replaygain type"
 voice: 
-new: "ρεβ ςεφξδ ηεζψϊ"
+new: "Χ΅Χ•Χ’ ΧΆΧ•Χ¦ΧΧ” Χ—Χ•Χ–Χ¨Χª"
 
 id: LANG_TRACK_GAIN
 desc: in replaygain
 eng: "Track gain"
 voice: 
-new: "ςεφξδ ηεζψϊ μτι ωιψ"
+new: "ΧΆΧ•Χ¦ΧΧ” Χ—Χ•Χ–Χ¨Χª ΧΧ¤Χ™ Χ©Χ™Χ¨"
 
 id: LANG_ALBUM_GAIN
 desc: in replaygain
 eng: "Album gain"
 voice: 
-new: "ςεφξδ ηεζψϊ μτι ΰμαεν"
+new: "ΧΆΧ•Χ¦ΧΧ” Χ—Χ•Χ–Χ¨Χª ΧΧ¤Χ™ ΧΧΧ‘Χ•Χ"
 
 id: LANG_ID3_TRACK_GAIN
 desc: in browse_id3
 eng: "[Track gain]"
 voice: 
-new: "[ςεφξδ ηεζψϊ ωιψ]"
+new: "[ΧΆΧ•Χ¦ΧΧ” Χ—Χ•Χ–Χ¨Χª Χ©Χ™Χ¨]"
 
 id: LANG_ID3_ALBUM_GAIN
 desc: in browse_id3
 eng: "[Album gain]"
 voice: 
-new: "[ςεφξδ ηεζψϊ ΰμαεν]"
+new: "[ΧΆΧ•Χ¦ΧΧ” Χ—Χ•Χ–Χ¨Χª ΧΧΧ‘Χ•Χ]"
 
 id: LANG_ID3_NO_GAIN
 desc: DEPRECATED
@@ -3250,13 +3250,13 @@ id: LANG_BIDI_SUPPORT
 desc: in settings_menu, option to enable reversal of hebrew/arabic text
 eng: "BiDi Hebrew/Arabic"
 voice: 
-new: "ςαψιϊ/ςψαιϊ γε-λιεεπιϊ"
+new: "ΧΆΧ‘Χ¨Χ™Χª/ΧΆΧ¨Χ‘Χ™Χª Χ“Χ•-Χ›Χ™Χ•Χ•Χ Χ™Χª"
 
 id: LANG_REPLAYGAIN_PREAMP
 desc: in browse_id3
 eng: "Pre-amp"
 voice: 
-new: "χγν-ξβαψ"
+new: "Χ§Χ“Χ-ΧΧ’Χ‘Χ¨"
 
 id: LANG_UNIT_DB
 desc: in browse_id3
@@ -3274,25 +3274,25 @@ id: LANG_BEEP
 desc: in playback settings
 eng: "Beep volume"
 voice: 
-new: "ςεφξϊ δφτφεσ"
+new: "ΧΆΧ•Χ¦ΧΧª Χ”Χ¦Χ¤Χ¦Χ•Χ£"
 
 id: LANG_WEAK
 desc: in beep volume in playback settings
 eng: "Weak"
 voice: 
-new: "ημω"
+new: "Χ—ΧΧ©"
 
 id: LANG_MODERATE
 desc: in beep volume in playback settings
 eng: "Moderate"
 voice: 
-new: "αιπεπι"
+new: "Χ‘Χ™Χ Χ•Χ Χ™"
 
 id: LANG_STRONG
 desc: in beep volume in playback settings
 eng: "Strong"
 voice: 
-new: "ηζχ"
+new: "Χ—Χ–Χ§"
 
 id: LANG_REPEAT_AB
 desc: repeat one song

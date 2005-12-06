@@ -48,7 +48,7 @@ new: "Puffer: %d.%03dMB"
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
 eng: "Battery: Charging"
-new: "Akku: Üfladu"
+new: "Akku: Ãœfladu"
 
 id: LANG_PLAYLIST_LOAD
 desc: displayed on screen while loading a playlist
@@ -73,22 +73,22 @@ new: "Puffer voll"
 id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
 eng: "Save Failed"
-new: "Spiicherfähler"
+new: "SpiicherfÃ¤hler"
 
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
 eng: "Partition?"
-new: "Akku läär?"
+new: "Akku lÃ¤Ã¤r?"
 
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
 eng: "Save Failed"
-new: "Spiicherfähler"
+new: "SpiicherfÃ¤hler"
 
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
 eng: "No partition?"
-new: "Akku läär?"
+new: "Akku lÃ¤Ã¤r?"
 
 id: LANG_TIME_SET
 desc: used in set_time()
@@ -98,7 +98,7 @@ new: "ON = spiichru"
 id: LANG_TIME_REVERT
 desc: used in set_time()
 eng: "OFF To Revert"
-new: "OFF = abbrächu"
+new: "OFF = abbrÃ¤chu"
 
 id: LANG_CONTRAST
 desc: in settings_menu
@@ -108,12 +108,12 @@ new: "Kontrascht"
 id: LANG_SHUFFLE
 desc: in settings_menu
 eng: "Shuffle"
-new: "Züefall"
+new: "ZÃ¼efall"
 
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play Selected First"
-new: "Gwählts zersch abschpilu"
+new: "GwÃ¤hlts zersch abschpilu"
 
 id: LANG_SORT_CASE
 desc: in settings_menu
@@ -128,12 +128,12 @@ new: "Fortsetzu"
 id: LANG_OFF
 desc: Used in a lot of places
 eng: "Off"
-new: "Üs"
+new: "Ãœs"
 
 id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
 eng: "Ask"
-new: "Naafrägu"
+new: "NaafrÃ¤gu"
 
 id: LANG_ON
 desc: Used in a lot of places
@@ -143,7 +143,7 @@ new: "A"
 id: LANG_BACKLIGHT
 desc: in settings_menu
 eng: "Backlight"
-new: "Bilüüchtig"
+new: "BilÃ¼Ã¼chtig"
 
 id: LANG_SCROLL
 desc: in settings_menu
@@ -163,7 +163,7 @@ new: "Zit/Datum setzu"
 id: LANG_SPINDOWN
 desc: in settings_menu
 eng: "Disk Spindown"
-new: "HDD Motor-Üsschaltzit"
+new: "HDD Motor-Ãœsschaltzit"
 
 id: LANG_FFRW_STEP
 desc: in settings_menu
@@ -238,7 +238,7 @@ new: "Syschtem"
 id: LANG_VOLUME
 desc: in sound_settings
 eng: "Volume"
-new: "Lütschterchi"
+new: "LÃ¼tschterchi"
 
 id: LANG_BALANCE
 desc: in sound_settings
@@ -268,12 +268,12 @@ new: "Bass-Verschtercher"
 id: LANG_DECAY
 desc: in sound_settings
 eng: "AV Decay Time"
-new: "AV Trägheit"
+new: "AV TrÃ¤gheit"
 
 id: LANG_CHANNEL_MENU
 desc: in sound_settings
 eng: "Channels"
-new: "Kanäl"
+new: "KanÃ¤l"
 
 id: LANG_CHANNEL
 desc: in sound_settings
@@ -298,12 +298,12 @@ new: "Mono Lings"
 id: LANG_CHANNEL_RIGHT
 desc: in sound_settings
 eng: "Mono Right"
-new: "Mono Rächts"
+new: "Mono RÃ¤chts"
 
 id: LANG_AUTOVOL
 desc: in sound_settings
 eng: "Auto Volume"
-new: "Autom. Lütschterchi"
+new: "Autom. LÃ¼tschterchi"
 
 id: LANG_SHOWDIR_ERROR_BUFFER
 desc: in showdir(), displayed on screen when you reach buffer limit
@@ -333,7 +333,7 @@ new: "Schperri A"
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
 eng: "Key Lock OFF"
-new: "Schperri Üs"
+new: "Schperri Ãœs"
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
@@ -343,7 +343,7 @@ new: "Schperri isch A"
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key Lock Is OFF"
-new: "Schperri isch Üs"
+new: "Schperri isch Ãœs"
 
 id: LANG_MUTE_ON_PLAYER
 desc: displayed when mute is on
@@ -353,7 +353,7 @@ new: "Schtumm A"
 id: LANG_MUTE_OFF_PLAYER
 desc: displayed when mute is off
 eng: "Mute OFF"
-new: "Schtumm Üs"
+new: "Schtumm Ãœs"
 
 id: LANG_MUTE_ON_RECORDER
 desc: displayed when mute is on
@@ -363,12 +363,12 @@ new: "Schtumm isch A"
 id: LANG_MUTE_OFF_RECORDER
 desc: displayed when mute is off
 eng: "Mute Is OFF"
-new: "Schtumm isch Üs"
+new: "Schtumm isch Ãœs"
 
 id: LANG_ID3_INFO
 desc: in the browse_id3() function
 eng: "-ID3 Info- "
-new: "|¯ ID3 Info"
+new: "|Â¯ ID3 Info"
 
 id: LANG_ID3_SCREEN
 desc: in the browse_id3() function
@@ -388,12 +388,12 @@ new: "<kei Titel>"
 id: LANG_ID3_ARTIST
 desc: in wps 
 eng: "[Artist]"
-new: "[Künschtler]"
+new: "[KÃ¼nschtler]"
 
 id: LANG_ID3_NO_ARTIST
 desc: in wps when no artist is avaible
 eng: "<No Artist>"
-new: "<kei Künschtler>"
+new: "<kei KÃ¼nschtler>"
 
 id: LANG_ID3_ALBUM
 desc: in wps
@@ -433,7 +433,7 @@ new: "[Bitrata]"
 id: LANG_ID3_FRECUENCY
 desc: in wps
 eng: "[Frequency]"
-new: "[Frequänz]"
+new: "[FrequÃ¤nz]"
 
 id: LANG_ID3_PATH
 desc: in wps
@@ -443,7 +443,7 @@ new: "[Pfad]"
 id: LANG_PITCH_UP
 desc: in wps
 eng: "Pitch Up"
-new: "schnäller"
+new: "schnÃ¤ller"
 
 id: LANG_PITCH_DOWN
 desc: in wps
@@ -488,12 +488,12 @@ new: "Lischtuendi"
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
 eng: "Idle Poweroff"
-new: "automatischus Üsschaltu"
+new: "automatischus Ãœsschaltu"
 
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
 eng: "New Language"
-new: "Nöiji Spraach"
+new: "NÃ¶iji Spraach"
 
 id: LANG_FILTER
 desc: setting name for dir filter
@@ -503,12 +503,12 @@ new: "Datiifilter"
 id: LANG_FILTER_MUSIC
 desc: show only music-related files
 eng: "Music"
-new: "Müsig"
+new: "MÃ¼sig"
 
 id: LANG_FILTER_SUPPORTED
 desc: show all file types supported by Rockbox
 eng: "Supported"
-new: "Unnerschtützti"
+new: "UnnerschtÃ¼tzti"
 
 id: LANG_FILTER_ALL
 desc: show all files
@@ -528,7 +528,7 @@ new: "Nei"
 id: LANG_PM_MENU
 desc: in the display menu
 eng: "Peak Meter"
-new: "Üsstiirigsazeig"
+new: "Ãœsstiirigsazeig"
 
 id:   LANG_PM_RELEASE
 desc: in the peak meter menu
@@ -538,7 +538,7 @@ new: "Gschw. bim Abfallu"
 id: LANG_PM_PEAK_HOLD
 desc: in the peak meter menu
 eng: "Peak Hold Time"
-new: "Üsstiirig Haltezit"
+new: "Ãœsstiirig Haltezit"
 
 id: LANG_PM_CLIP_HOLD
 desc: in the peak meter menu
@@ -553,12 +553,12 @@ new: "Ewig"
 id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
 eng: "Units Per Read"
-new: "Einheite pro Mässig"
+new: "Einheite pro MÃ¤ssig"
 
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
 eng: "Backlight On When Plugged"
-new: "Bilüüchtig a bim Netzbitrieb"
+new: "BilÃ¼Ã¼chtig a bim Netzbitrieb"
 
 id: LANG_REPEAT
 desc: in settings_menu
@@ -583,7 +583,7 @@ new: "PLAY=Zruggsetzu"
 id: LANG_RESET_CANCEL
 desc: confirm to reset settings
 eng: "OFF=Cancel"
-new: "OFF=Abbrächu"
+new: "OFF=AbbrÃ¤chu"
 
 id: LANG_TIMEFORMAT
 desc: select the time format of time in status bar
@@ -593,12 +593,12 @@ new: "Zitformat"
 id: LANG_12_HOUR_CLOCK
 desc: option for 12 hour clock
 eng: "12 Hour Clock"
-new: "12 Std. Ühr"
+new: "12 Std. Ãœhr"
 
 id: LANG_24_HOUR_CLOCK
 desc: option for 24 hour clock
 eng: "24 Hour Clock"
-new: "24 Std. Ühr"
+new: "24 Std. Ãœhr"
 
 id: LANG_WEEKDAY_SUNDAY
 desc: Maximum 3-letter abbreviation for weekday
@@ -608,7 +608,7 @@ new: "Sun"
 id: LANG_WEEKDAY_MONDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Mon"
-new: "Män"
+new: "MÃ¤n"
 
 id: LANG_WEEKDAY_TUESDAY
 desc: Maximum 3-letter abbreviation for weekday
@@ -648,7 +648,7 @@ new: "Feb"
 id: LANG_MONTH_MARCH
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Mar"
-new: "Mär"
+new: "MÃ¤r"
 
 id: LANG_MONTH_APRIL
 desc: Maximum 3-letter abbreviation for monthname
@@ -673,7 +673,7 @@ new: "Jul"
 id: LANG_MONTH_AUGUST
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Aug"
-new: "Öüg"
+new: "Ã–Ã¼g"
 
 id: LANG_MONTH_SEPTEMBER
 desc: Maximum 3-letter abbreviation for monthname
@@ -698,7 +698,7 @@ new: "Dez"
 id: LANG_RESUME_SETTING_ASK_ONCE
 desc: in settings_menu
 eng: "Ask Once"
-new: "eismal frägu"
+new: "eismal frÃ¤gu"
 
 id: LANG_BATTERY_DISPLAY
 desc: Battery type title
@@ -708,7 +708,7 @@ new: "Akku Azeig"
 id: LANG_VOLUME_DISPLAY
 desc: Volume type title
 eng: "Volume Display"
-new: "Lütschterchiazeig"
+new: "LÃ¼tschterchiazeig"
 
 id: LANG_DISPLAY_GRAPHIC
 desc: Label for type of icon display
@@ -753,17 +753,17 @@ new: "linear (%)"
 id: LANG_PM_MIN
 desc: in the peak meter menu
 eng: "Minimum Of Range"
-new: "chlinschte Wärt"
+new: "chlinschte WÃ¤rt"
 
 id: LANG_PM_MAX
 desc: in the peak meter menu
 eng: "Maximum Of Range"
-new: "greeschte Wärt"
+new: "greeschte WÃ¤rt"
 
 id: LANG_RECORDING
 desc: in the main menu
 eng: "Recording"
-new: "Üfnahm"
+new: "Ãœfnahm"
 
 id: LANG_RECORDING_GAIN
 desc: in the recording screen
@@ -778,17 +778,17 @@ new: "Lings"
 id: LANG_RECORDING_RIGHT
 desc: in the recording screen
 eng: "Right"
-new: "Rächts"
+new: "RÃ¤chts"
 
 id: LANG_RECORDING_QUALITY
 desc: in the recording settings
 eng: "Quality"
-new: "Qualität"
+new: "QualitÃ¤t"
 
 id: LANG_RECORDING_FREQUENCY
 desc: in the recording settings
 eng: "Frequency"
-new: "Frequänz"
+new: "FrequÃ¤nz"
 
 id: LANG_RECORDING_SOURCE
 desc: in the recording settings
@@ -818,7 +818,7 @@ new: "Digital"
 id: LANG_RECORDING_SETTINGS
 desc: in the main menu
 eng: "Recording Settings"
-new: "Üfnahmeischtellige"
+new: "Ãœfnahmeischtellige"
 
 id: LANG_DISK_STAT
 desc: disk size info
@@ -833,7 +833,7 @@ new: "Frii: %d.%dGB"
 id: LANG_POWEROFF
 desc: disk poweroff flag
 eng: "Disk Poweroff"
-new: "HDD Üsschaltbifähl brüüchu"
+new: "HDD ÃœsschaltbifÃ¤hl brÃ¼Ã¼chu"
 
 id: LANG_FILTER_PLAYLIST
 desc: show only playlist
@@ -853,7 +853,7 @@ new: "Ischlaaftimer"
 id: LANG_MP3BUFFER_MARGIN
 desc: MP3 buffer margin time
 eng: "Anti-Skip Buffer"
-new: "Puffer zum vorüs fillu"
+new: "Puffer zum vorÃ¼s fillu"
 
 id: LANG_BIDIR_SCROLL
 desc: Bidirectional scroll limit
@@ -863,7 +863,7 @@ new: "Beidsitigs Scroll-Limit"
 id: LANG_SCROLL_DELAY
 desc: Delay before scrolling
 eng: "Scroll Start Delay"
-new: "Scroll-Startverzögrig"
+new: "Scroll-StartverzÃ¶grig"
 
 id: LANG_SCROLL_STEP
 desc: Pixels to advance per scroll
@@ -898,7 +898,7 @@ new: "Akku: Erhaltladu"
 id: LANG_BATTERY_CAPACITY
 desc: in settings_menu
 eng: "Battery Capacity"
-new: "Akku: Kapazität"
+new: "Akku: KapazitÃ¤t"
 
 id: LANG_MENU_SETTING_CANCEL
 desc: Visual confirmation of canceling a changed setting
@@ -948,22 +948,22 @@ new: "Weckzit: %02d:%02d"
 id: LANG_ALARM_MOD_TIME_TO_GO
 desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
 eng: "Waking Up In %d:%02d"
-new: "Üfwachu in %d:%02d"
+new: "Ãœfwachu in %d:%02d"
 
 id: LANG_ALARM_MOD_SHUTDOWN
 desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
 eng: "Shutting Down..."
-new: "Schaltu üs..."
+new: "Schaltu Ã¼s..."
 
 id: LANG_ALARM_MOD_ERROR
 desc: The text that tells that the time is incorrect (for the RTC alarm mod).
 eng: "Alarm Time Is Too Soon!"
-new: "Weckzit isch zfrüeh"
+new: "Weckzit isch zfrÃ¼eh"
 
 id: LANG_ALARM_MOD_KEYS
 desc: Shown key functions in alarm menu (for the RTC alarm mod).
 eng: "PLAY=Set OFF=Cancel"
-new: "PLAY=Ok OFF=Abbrächu"
+new: "PLAY=Ok OFF=AbbrÃ¤chu"
 
 id: LANG_CREATE_PLAYLIST
 desc: Menu option for creating a playlist
@@ -973,7 +973,7 @@ new: "Abschpillischta Erschtellu"
 id: LANG_CREATING
 desc: Screen feedback during playlist creation
 eng: "Creating"
-new: "Am Zämuschtellu"
+new: "Am ZÃ¤muschtellu"
 
 id: LANG_PLAYER_KEYBOARD_BACKSPACE
 desc: Backspace alternative in player keyboard interaction
@@ -988,7 +988,7 @@ new: "Leschu"
 id: LANG_PLAYER_KEYBOARD_ACCEPT
 desc: Accept alternative in player keyboard interaction
 eng: "Accept"
-new: "Anäh"
+new: "AnÃ¤h"
 
 id: LANG_PLAYER_KEYBOARD_ABORT
 desc: Abort alternative in player keyboard interaction
@@ -1103,12 +1103,12 @@ new: "VBR-Datii aktualisieru"
 id: LANG_INVERT_CURSOR
 desc: in settings_menu
 eng: "Line Selector"
-new: "Ziiluüswahl"
+new: "ZiiluÃ¼swahl"
 
 id: LANG_RECORDING_EDITABLE
 desc: Editable recordings setting
 eng: "Independent frames"
-new: "unabhängigi Frames"
+new: "unabhÃ¤ngigi Frames"
 
 id: LANG_STATUS_BAR
 desc: display menu, F3 substitute
@@ -1123,7 +1123,7 @@ new: "Scrolliischta"
 id: LANG_CAPTION_BACKLIGHT
 desc: in settings_menu
 eng: "Caption backlight"
-new: "Bilüüchtig a bim Titelwägsel"
+new: "BilÃ¼Ã¼chtig a bim TitelwÃ¤gsel"
 
 id: LANG_INVERT_CURSOR_POINTER
 desc: in settings_menu
@@ -1173,17 +1173,17 @@ new: "immer"
 id: LANG_JUMP_SCROLL_DELAY
 desc: (player) Delay before making a jump scroll
 eng: "Jump Scroll Delay"
-new: "Gumpverzögrig"
+new: "GumpverzÃ¶grig"
 
 id: LANG_RECORD_TIMESPLIT
 desc: Prompt for record timer interval setting, in the record settings menu
 eng: "Time Split"
-new: "Üfnahm teilu"
+new: "Ãœfnahm teilu"
 
 id: LANG_RECORD_TIMESPLIT_REC
 decs: Display of record timer interval setting, on the record screen
 eng: "Split time:"
-new: "Üfnahm teilu:"
+new: "Ãœfnahm teilu:"
 
 id: LANG_SHOW_ICONS
 desc: in settings_menu
@@ -1212,12 +1212,12 @@ new: "Andri = Nei"
 id: LANG_PLUGIN_CANT_OPEN
 desc: Plugin open error message
 eng: "Can't open %s"
-new: "Cha %s nit üftüe"
+new: "Cha %s nit Ã¼ftÃ¼e"
 
 id: LANG_READ_FAILED
 desc: There was an error reading a file
 eng: "Failed reading %s"
-new: "Fähler bim läsu fa %s"
+new: "FÃ¤hler bim lÃ¤su fa %s"
 
 id: LANG_PLUGIN_WRONG_MODEL
 desc: The plugin is not compatible with the archos model trying to run it
@@ -1232,7 +1232,7 @@ new: "nit kompatibli Version"
 id: LANG_PLUGIN_ERROR
 desc: The plugin return an error code
 eng: "Plugin returned error"
-new: "Plugin mäldut Fähler"
+new: "Plugin mÃ¤ldut FÃ¤hler"
 
 ##
 ## boot change detection
@@ -1241,12 +1241,12 @@ new: "Plugin mäldut Fähler"
 id: LANG_BOOT_CHANGED
 desc: File browser discovered the boot file was changed
 eng: "Boot changed"
-new: "Boot gändrut"
+new: "Boot gÃ¤ndrut"
 
 id: LANG_REBOOT_NOW
 desc: Do you want to reboot?
 eng: "Reboot now?"
-new: "jetz nöü bootu?"
+new: "jetz nÃ¶Ã¼ bootu?"
 
 id: LANG_QUEUE_LAST
 desc: in onplay menu.  queue a track/playlist at end of playlist.
@@ -1301,37 +1301,37 @@ new: "%d Lieder abgspiichrut (%s)"
 id: LANG_OFF_ABORT
 desc: Used on recorder models
 eng: "OFF to abort"
-new: "Off fer abzbrächu"
+new: "Off fer abzbrÃ¤chu"
 
 id: LANG_STOP_ABORT
 desc: Used on player models
 eng: "STOP to abort"
-new: "STOP fer abzbrächu"
+new: "STOP fer abzbrÃ¤chu"
 
 id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
 desc: Playlist error
 eng: "Error updating playlist control file"
-new: "Fähler: Aktualisierig Abschpillischta-Kontrolldatii"
+new: "FÃ¤hler: Aktualisierig Abschpillischta-Kontrolldatii"
 
 id: LANG_PLAYLIST_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing playlist file"
-new: "Fähler: Züegriff Abschpillischta"
+new: "FÃ¤hler: ZÃ¼egriff Abschpillischta"
 
 id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing playlist control file"
-new: "Fähler: Züegriff Abschpillischta-Kontrolldatii"
+new: "FÃ¤hler: ZÃ¼egriff Abschpillischta-Kontrolldatii"
 
 id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing directory"
-new: "Fähler: Verzeichniszüegriff"
+new: "FÃ¤hler: VerzeichniszÃ¼egriff"
 
 id: LANG_PLAYLIST_CONTROL_INVALID
 desc: Playlist resume error
 eng: "Playlist control file is invalid"
-new: "Abschpillischta-Kontrolldatii isch ungültig"
+new: "Abschpillischta-Kontrolldatii isch ungÃ¼ltig"
 
 id: LANG_RECURSE_DIRECTORY
 desc: In playlist menu
@@ -1391,7 +1391,7 @@ new: "kei Datije"
 id: LANG_BUTTONBAR_MENU
 desc:  in button bar
 eng: "Menu"
-new: "Mönü"
+new: "MÃ¶nÃ¼"
 
 id: LANG_FM_BUTTONBAR_PRESETS
 desc:  in button bar
@@ -1416,12 +1416,12 @@ new: "Sender: %d.%dMHz"
 id: LANG_FM_PRESET_SAVE_FAILED
 desc:  in radio screen
 eng: "Preset save failed"
-new: "Fähler bim spiichru"
+new: "FÃ¤hler bim spiichru"
 
 id: LANG_FM_NO_PRESETS
 desc:  in radio screen
 eng: "The preset list is empty"
-new: "Senderlischta läär"
+new: "Senderlischta lÃ¤Ã¤r"
 
 id: LANG_FM_NO_FREE_PRESETS
 desc:  in radio screen
@@ -1436,7 +1436,7 @@ new: "FM Radio"
 id: LANG_FM_BUTTONBAR_RECORD
 desc:  in main menu
 eng: "Record"
-new: "Üfnäh"
+new: "ÃœfnÃ¤h"
 
 id: LANG_VIEW_DYNAMIC_PLAYLIST
 desc: in playlist menu.
@@ -1451,33 +1451,33 @@ new: "verschiebu"
 id: LANG_MOVE_FAILED
 desc: Error message displayed in playlist viewer
 eng: "Move failed"
-new: "Fähler bim verschiebu"
+new: "FÃ¤hler bim verschiebu"
 
 id: LANG_FLIP_DISPLAY
 desc: in settings_menu, option to turn display+buttos by 180 degreed
 eng: "Upside Down"
-new: "umgidräht"
+new: "umgidrÃ¤ht"
 
 id: LANG_RECORD_PRERECORD
 desc: in recording and radio screen
 eng: "Prerecording"
-new: "Vorüsüfnahm"
+new: "VorÃ¼sÃ¼fnahm"
 
 id: LANG_RECORD_PRERECORD_TIME
 desc: in recording settings_menu
 eng: "Prerecord time"
-new: "Vorüsüfnahmezit"
+new: "VorÃ¼sÃ¼fnahmezit"
 
 #Auto bookmark prompts
 id: LANG_BOOKMARK_AUTOLOAD_QUERY
 desc: prompt for user to decide to create a bookmark
 eng: "Load Last Bookmark?"
-new: "zletscht Läsezeichu ladu?"
+new: "zletscht LÃ¤sezeichu ladu?"
 
 id: LANG_AUTO_BOOKMARK_QUERY
 desc: prompt for user to decide to create an bookmark
 eng: "Create a Bookmark?"
-new: "Läsezeichu erschtellu?"
+new: "LÃ¤sezeichu erschtellu?"
 
 # Bookmark Select Menu Text
 id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
@@ -1493,7 +1493,7 @@ new: "OFF = Biendu"
 id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
 desc: Used on the bookmark select window to label bookmark number
 eng: "Bookmark"
-new: "Läsezeichu"
+new: "LÃ¤sezeichu"
 
 id: LANG_BOOKMARK_SELECT_INDEX_TEXT
 desc: Used on the bookmark select window to label index number
@@ -1508,7 +1508,7 @@ new: "Zit"
 id: LANG_BOOKMARK_SELECT_PLAY
 desc: Used on the bookmark select window to indicated the play option
 eng: "PLAY = Select"
-new: "PLAY = üswählu"
+new: "PLAY = Ã¼swÃ¤hlu"
 
 id: LANG_BOOKMARK_SELECT_DELETE
 desc: Used on the bookmark select window to indicated the bookmark delete option
@@ -1519,49 +1519,49 @@ new: "ON+PLAY = leschu"
 id: LANG_BOOKMARK_CREATE_SUCCESS
 desc: Indicates bookmark was successfully created
 eng: "Bookmark Created"
-new: "Läsezeichu erschtellt"
+new: "LÃ¤sezeichu erschtellt"
 
 id: LANG_BOOKMARK_CREATE_FAILURE
 desc: Indicates bookmark was not created
 eng: "Bookmark Failed!"
-new: "Fähler bim Erschtellu fam Läsezeichu"
+new: "FÃ¤hler bim Erschtellu fam LÃ¤sezeichu"
 
 # Bookmark creation/failure text
 id: LANG_BOOKMARK_LOAD_EMPTY
 desc: Indicates bookmark was empty
 eng: "Bookmark Empty"
-new: "kei Läsezeichu"
+new: "kei LÃ¤sezeichu"
 
 # Bookmark Settings Text
 id: LANG_BOOKMARK_SETTINGS
 desc: in general settings
 eng: "Bookmarking"
-new: "Läsezeichu"
+new: "LÃ¤sezeichu"
 
 id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
 desc: prompt for user to decide to create a bookmark
 eng: "Load Last Bookmark"
-new: "letschts Läsezeichu ladu"
+new: "letschts LÃ¤sezeichu ladu"
 
 id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
 desc: prompt for user to decide to create an bookmark
 eng: "Bookmark on Stop"
-new: "Bim Stoppu Läsezeichu erschtellu"
+new: "Bim Stoppu LÃ¤sezeichu erschtellu"
 
 id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
 desc: Configuration option to maintain a list of recent bookmarks
 eng: "Maintain a List of Recent Bookmarks?"
-new: "Lischta mit zletscht gibrüchte Läsezeichu verwaltu?"
+new: "Lischta mit zletscht gibrÃ¼chte LÃ¤sezeichu verwaltu?"
 
 id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
 desc: Save in recent bookmarks only
 eng: "Yes - Recent only"
-new: "Ja - nur znöüschta"
+new: "Ja - nur znÃ¶Ã¼schta"
 
 id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
 desc: Save in recent bookmarks only
 eng: "Ask - Recent only"
-new: "Frägu - Nur znöüschta"
+new: "FrÃ¤gu - Nur znÃ¶Ã¼schta"
 
 
 id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
@@ -1573,22 +1573,22 @@ new: "nur verschidni"
 id: LANG_BOOKMARK_MENU
 desc: Text on main menu to get to bookmark commands
 eng: "Bookmarks"
-new: "Läsezeichu"
+new: "LÃ¤sezeichu"
 
 id: LANG_BOOKMARK_MENU_CREATE
 desc: Used off of the bookmark menu to create a bookmark
 eng: "Create Bookmark"
-new: "Läsezeichu erschtellu"
+new: "LÃ¤sezeichu erschtellu"
 
 id: LANG_BOOKMARK_MENU_LIST
 desc: Used off of the bookmark menu to list available bookmarks for the currently playing directory or M3U
 eng: "List Bookmarks"
-new: "Läsezeichu üflischtu"
+new: "LÃ¤sezeichu Ã¼flischtu"
 
 id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
 desc: Text for the menu text to access the most recent bookmarks list
 eng: "Recent Bookmarks"
-new: "nöüschti Läsezeichu"
+new: "nÃ¶Ã¼schti LÃ¤sezeichu"
 
 id: LANG_INFO_MENU
 desc: in the info sub menu
@@ -1598,7 +1598,7 @@ new: "Rockbox Info"
 id: LANG_RECORDING_MENU
 desc: in the recording sub menu
 eng: "Start Recording"
-new: "Üfnahm startu"
+new: "Ãœfnahm startu"
 
 id: LANG_WIND_MENU
 desc: in the playback sub menu
@@ -1634,7 +1634,7 @@ new: "Zit & Datum"
 id: LANG_LIMITS_MENU
 desc: in the system sub menu
 eng: "Limits"
-new: "Grenzwärta"
+new: "GrenzwÃ¤rta"
 
 id: LANG_MANAGE_MENU
 desc: in the system sub menu
@@ -1699,7 +1699,7 @@ new: "Taschtuliischta"
 id: LANG_DIRBROWSE_F1
 desc: in dir browser, F1 button bar text
 eng: "Menu"
-new: "Mönü"
+new: "MÃ¶nÃ¼"
 
 id: LANG_DIRBROWSE_F2
 desc: in dir browser, F2 button bar text
@@ -2025,13 +2025,13 @@ id: LANG_VOICE
 desc: root of voice menu
 eng: "Voice"
 voice: ""
-new: "Spraachüsgab"
+new: "SpraachÃ¼sgab"
 
 id: LANG_VOICE_MENU
 desc: item of voice menu, enable/disable the voice UI
 eng: "Voice Menus"
 voice: ""
-new: "Mönüs"
+new: "MÃ¶nÃ¼s"
 
 id: LANG_VOICE_DIR
 desc: item of voice menu, set the "talkbox" mode for directories
@@ -2079,7 +2079,7 @@ id: LANG_VOICE_SPELL
 desc: "talkbox" mode for files+directories
 eng: "Spell"
 voice: ""
-new: "büechschtabieru"
+new: "bÃ¼echschtabieru"
 
 id: VOICE_CHAR_A
 desc: spoken only, for spelling
@@ -2326,13 +2326,13 @@ id: LANG_FILETYPES_STRING_BUFFER_EMPTY
 desc: Filetype string buffer empty
 eng: "Filetype string buffer empty"
 voice: ""
-new: "Datiitypu-Zeichubuffer läär"
+new: "Datiitypu-Zeichubuffer lÃ¤Ã¤r"
 
 id: LANG_ONPLAY_OPEN_WITH
 desc: Onplay open with
 eng: "Open with"
 voice: ""
-new: "Öffnu mit"
+new: "Ã–ffnu mit"
 
 id: LANG_SORT_DIR
 desc: browser sorting setting
@@ -2362,7 +2362,7 @@ id: LANG_SORT_DATE_REVERSE
 desc: browser sorting setting
 eng: "by newest date"
 voice: ""
-new: "nach nöüschtum Datum"
+new: "nach nÃ¶Ã¼schtum Datum"
 
 id: LANG_SORT_TYPE
 desc: browser sorting setting
@@ -2398,7 +2398,7 @@ id: LANG_FM_BUTTONBAR_ADD
 desc:  in radio screen
 eng: "Add"
 voice: ""
-new: "Derzüe"
+new: "DerzÃ¼e"
 
 id: LANG_FM_BUTTONBAR_ACTION
 desc:  in radio screen
@@ -2422,7 +2422,7 @@ id: LANG_MDB_CENTER
 desc:  in sound settings
 eng: "MDB Center frequency"
 voice: ""
-new: "MDB Mittufrequänz"
+new: "MDB MittufrequÃ¤nz"
 
 id: LANG_MDB_SHAPE
 desc:  in sound settings
@@ -2446,19 +2446,19 @@ id: LANG_SHUTDOWN
 desc:  in main menu
 eng: "Shut down"
 voice: ""
-new: "Üsschaltu"
+new: "Ãœsschaltu"
 
 id: LANG_SHUTTINGDOWN
 desc:  in main menu
 eng: "Shutting down..."
 voice: ""
-new: "am Üsschaltu..."
+new: "am Ãœsschaltu..."
 
 id: LANG_CONFIRM_SHUTDOWN
 desc:  in shutdown screen
 eng: "Press OFF to shut down"
 voice: ""
-new: "OFF fer Üszschaltu"
+new: "OFF fer Ãœszschaltu"
 
 id: LANG_ID3_ORDER
 desc:  in playback settings screen
@@ -2482,19 +2482,19 @@ id: LANG_NO_ROCKBOX_DIR
 desc: in browse root
 eng: "No .rockbox directory"
 voice: ""
-new: "Verzeichnis .rockbox fählt"
+new: "Verzeichnis .rockbox fÃ¤hlt"
 
 id: LANG_INSTALLATION_INCOMPLETE
 desc: in browse root
 eng: "Installation incomplete"
 voice: ""
-new: "Inschtallation unvollschtändig"
+new: "Inschtallation unvollschtÃ¤ndig"
 
 id: LANG_REMOVE_MMC
 desc: before acknowledging usb in case an MMC is inserted (Ondio)
 eng: "Please remove inserted MMC"
 voice: ""
-new: "Bitte MMC üsanäh"
+new: "Bitte MMC Ã¼sanÃ¤h"
 
 id: VOICE_DOT
 desc: spoken only, for spelling

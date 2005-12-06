@@ -52,7 +52,7 @@ void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * display)
 #endif
     gui_textarea_clear(display);
     display->setfont(FONT_SYSFIXED);
-    display->getstringsize((unsigned char *)"M",&w,&h);
+    display->getstringsize((unsigned char *)"M", NULL, &h);
     /* Displays the icons */
     display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],
                          display->width/2 - 16,

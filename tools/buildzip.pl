@@ -62,16 +62,26 @@ sub buildzip {
     mkdir ".rockbox/langs", 0777;
     mkdir ".rockbox/rocks", 0777;
     mkdir ".rockbox/codecs", 0777;
+    mkdir ".rockbox/codepages", 0777;
     mkdir ".rockbox/wps", 0777;
     mkdir ".rockbox/themes", 0777;
 
     my $c = 'find apps -name "*.codec" ! -empty -exec cp {} .rockbox/codecs/ \;';
     print `$c`;
 
+    system("$ROOT/tools/codepages");
+    my $c = 'find . -name "*.cp" ! -empty -exec mv {} .rockbox/codepages/ \; >/dev/null 2>&1';
+    print `$c`;
+
     my @call = `find .rockbox/codecs -type f`;
     if(!$call[0]) {
         # no codec was copied, remove directory again
         rmdir(".rockbox/codecs");
+
+    system("$ROOT/tools/codepages");
+    my $c = 'find . -name "*.cp" ! -empty -exec mv {} .rockbox/codepages/ \; >/dev/null 2>&1';
+    print `$c`;
+
     }
 
 
@@ -139,44 +149,16 @@ sub buildzip {
         my @fonts = grep { /\.bdf$/ && -f "$ROOT/fonts/$_" } readdir(DIR);
         closedir DIR;
 
-        my $maxfont;
-
-        open(SIZE, ">ziptemp");
-        print SIZE <<STOP
-\#include "font.h"
-Font Size We Want: MAX_FONT_SIZE
-STOP
-;
-        close(SIZE);
-        my $c="cat ziptemp | gcc $cppdef -I. -I$firmdir/export -E -P -";
-        # print STDERR "C: $c\n";
-        open(GETSIZE, "$c|");
-
-        while(<GETSIZE>) {
-            if($_ =~ /^Font Size We Want: (\d*)/) {
-                $maxfont = $1;
-                last;
-            }
-        }
-        close(GETSIZE);
-        unlink("ziptemp");
-        die "no decent max font size" if ($maxfont < 2000);
-        
         for(@fonts) {
             my $f = $_;
 
             print "FONT: $f\n" if($verbose);
             my $o = $f;
             $o =~ s/\.bdf/\.fnt/;
-            my $cmd ="$ROOT/tools/convbdf -s 32 -l 255 -f -o \".rockbox/fonts/$o\" \"$ROOT/fonts/$f\" >/dev/null 2>&1";
+            my $cmd ="$ROOT/tools/convbdf -f -o \".rockbox/fonts/$o\" \"$ROOT/fonts/$f\" >/dev/null 2>&1";
             print "CMD: $cmd\n" if($verbose);
             `$cmd`;
             
-            # no need to add fonts we cannot load anyway
-            my $fontsize = filesize(".rockbox/fonts/$o");
-            if($fontsize > $maxfont) {
-                unlink(".rockbox/fonts/$o");
-            }
         }
 
     }

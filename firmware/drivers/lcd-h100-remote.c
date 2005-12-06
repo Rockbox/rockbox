@@ -29,6 +29,7 @@
 #include "debug.h"
 #include "system.h"
 #include "font.h"
+#include "rbunicode.h"
 #include "bidi.h"
 
 /*** definitions ***/
@@ -1091,13 +1092,13 @@ void lcd_remote_bitmap(const unsigned char *src, int x, int y, int width,
 /* put a string at a given pixel position, skipping first ofs pixel columns */
 static void lcd_remote_putsxyofs(int x, int y, int ofs, const unsigned char *str)
 {
-    int ch;
+    unsigned short ch;
+    unsigned short *ucs;
     struct font* pf = font_get(curfont);
 
-    if (bidi_support_enabled)
-        str = bidi_l2v(str, 1);
+    ucs = bidi_l2v(str, 1);
 
-    while ((ch = *str++) != '\0' && x < LCD_REMOTE_WIDTH)
+    while ((ch = *ucs++) != 0 && x < LCD_REMOTE_WIDTH)
     {
         int width;
         const unsigned char *bits;
@@ -1108,7 +1109,7 @@ static void lcd_remote_putsxyofs(int x, int y, int ofs, const unsigned char *str
         ch -= pf->firstchar;
 
         /* get proportional width and glyph bits */
-        width = pf->width ? pf->width[ch] : pf->maxwidth;
+        width = font_get_width(pf, ch);
 
         if (ofs > width)
         {
@@ -1116,8 +1117,7 @@ static void lcd_remote_putsxyofs(int x, int y, int ofs, const unsigned char *str
             continue;
         }
 
-        bits = pf->bits + (pf->offset ?
-               pf->offset[ch] : ((pf->height + 7) / 8 * pf->maxwidth * ch));
+        bits = font_get_bits(pf, ch);
 
         lcd_remote_bitmap_part(bits, ofs, 0, width, x, y, width - ofs,
                                pf->height);
@@ -1153,7 +1153,7 @@ void lcd_remote_puts_style(int x, int y, const unsigned char *str, int style)
         return;
 
     lcd_remote_getstringsize(str, &w, &h);
-    xpos = xmargin + x*w / strlen((char *)str);
+    xpos = xmargin + x*w / utf8length((char *)str);
     ypos = ymargin + y*h;
     lcd_remote_putsxy(xpos, ypos, str);
     drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
@@ -1256,7 +1256,7 @@ void lcd_remote_puts_scroll_style(int x, int y, const unsigned char *string, int
         end = strchr(s->line, '\0');
         strncpy(end, (char *)string, LCD_REMOTE_WIDTH/2);
 
-        s->len = strlen((char *)string);
+        s->len = utf8length((char *)string);
         s->offset = 0;
         s->startx = x;
         s->backward = false;
@@ -1323,9 +1323,11 @@ static void scroll_thread(void)
                 }
             }
             else {
-                /* scroll forward the whole time */
-                if (s->offset >= s->width)
-                    s->offset %= s->width;
+                /* pause at beginning of line */
+                if (s->offset >= s->width) {
+                    s->offset = 0;
+                    s->start_tick = current_tick + scroll_delay * 2;
+                }
             }
 
             lastmode = drawmode;

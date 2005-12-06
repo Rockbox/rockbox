@@ -66,12 +66,12 @@ new: "Baterie: %d%%%s"
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
 eng: "Battery: Charging"
-new: "Bateria se Óncarca"
+new: "Bateria se √Æncarca"
 
 id: LANG_BOUNCE
 desc: in the demos menu
 eng: "Bounce"
-new: "Text Ón salturi"
+new: "Text √Æn salturi"
 
 id: LANG_SNOW
 desc: in the demos menu
@@ -101,7 +101,7 @@ new: "Sarpe"
 id: LANG_PLAYLIST_LOAD
 desc: displayed on screen while loading a playlist
 eng: "Loading..."
-new: "Œncarcare..."
+new: "√éncarcare..."
 
 id: LANG_PLAYLIST_SHUFFLE
 desc: displayed on screen while shuffling a playlist
@@ -201,7 +201,7 @@ new: "Continuare"
 id: LANG_OFF
 desc: Used in a lot of places
 eng: "Off"
-new: "Œnchis"
+new: "√énchis"
 
 id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
@@ -346,7 +346,7 @@ new: "Grave"
 id: LANG_TREBLE
 desc: in sound_settings
 eng: "Treble"
-new: "Œnalte"
+new: "√énalte"
 
 id: LANG_LOUDNESS
 desc: in sound_settings
@@ -386,7 +386,7 @@ new: "Mono"
 id: LANG_CHANNEL_LEFT
 desc: in sound_settings
 eng: "Mono Left"
-new: "Mono St‚nga"
+new: "Mono St√¢nga"
 
 id: LANG_CHANNEL_RIGHT
 desc: in sound_settings
@@ -586,7 +586,7 @@ new: "Bara"
 id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
 eng: "End Of List"
-new: "Sf‚rsit de lista"
+new: "Sf√¢rsit de lista"
 
 id: LANG_END_CONFIRM_PLAYER
 desc: when playlist has finished
@@ -596,7 +596,7 @@ new: ""
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
 eng: "End Of Song List"
-new: "Sf‚rsitul listei"
+new: "Sf√¢rsitul listei"
 
 id: LANG_END_CONFIRM_RECORDER
 desc: when playlist has finished
@@ -631,7 +631,7 @@ new: "[PLAY] pentru continuare"
 id: LANG_SNAKE_QUIT
 desc: how to quit game
 eng: "[OFF] To Quit"
-new: "[OFF] pentru Óncetare"
+new: "[OFF] pentru √Æncetare"
 
 id: LANG_SNAKE_LEVEL
 desc: level of difficulty
@@ -646,7 +646,7 @@ new: "(1 - lent, 9 - rapid)"
 id: LANG_SNAKE_START
 desc: how to start or pause the game
 eng: "[PLAY] To Start/Pause"
-new: "[PLAY] pentru Ónceput/pauza"
+new: "[PLAY] pentru √Ænceput/pauza"
 
 id: LANG_SOKOBAN_LEVEL
 desc: must be smaller than 6 characters
@@ -661,7 +661,7 @@ new: "Deplasari"
 id: LANG_SOKOBAN_WIN
 desc: displayed when you win 
 eng: "YOU WIN!!"
-new: "AI C¬STIGAT!!"
+new: "AI C√ÇSTIGAT!!"
 
 id: LANG_SOKOBAN_QUIT
 desc: how to quit game
@@ -696,7 +696,7 @@ new: "Creste"
 id: LANG_WORMLET_HUNGRY
 desc: wormlet game
 eng: "Hungry"
-new: "Flam‚nd"
+new: "Flam√¢nd"
 
 id: LANG_WORMLET_WORMED
 desc: wormlet game
@@ -1236,7 +1236,7 @@ new: "Alarma: %02d:%02d"
 id: LANG_ALARM_MOD_TIME_TO_GO
 desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
 eng: "Waking Up In %d:%02d"
-new: "Alarma Ón %d:%02d"
+new: "Alarma √Æn %d:%02d"
 
 id: LANG_CREATE_PLAYLIST
 desc: Menu option for creating a playlist

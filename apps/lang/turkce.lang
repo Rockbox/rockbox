@@ -268,7 +268,7 @@ new: "Gercekten?"
 id: LANG_RESET_CONFIRM_PLAYER
 desc: confirm to reset settings
 eng: "Play/Stop"
-new: "Çal/Dur"
+new: "Ã‡al/Dur"
  
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
@@ -279,7 +279,7 @@ new: "Emin misiniz?"
 id: LANG_RESET_CONFIRM_RECORDER
 desc: confirm to reset settings
 eng: "Play = Yes"
-new: "Çal = Evet"
+new: "Ã‡al = Evet"
  
 # depreciated
 id: LANG_RESET_CANCEL_RECORDER
@@ -320,7 +320,7 @@ new: "Ayarlari basa dondur"
 id: LANG_PLAYBACK
 desc: in settings_menu()
 eng: "Playback"
-new: "Çalma"
+new: "Ã‡alma"
  
 id: LANG_FILE
 desc: in settings_menu()
@@ -370,7 +370,7 @@ new: "Bass Boost"
 id: LANG_DECAY
 desc: in sound_settings
 eng: "AV decay time"
-new: "AV sönüm zamani"
+new: "AV sÃ¶nÃ¼m zamani"
  
 id: LANG_CHANNEL_MENU
 desc: in sound_settings
@@ -425,12 +425,12 @@ new: "Kaldigi yerden?"
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: posible answers to resume question
 eng: "(PLAY/STOP)"
-new: "(ÇAL/DUR)"
+new: "(Ã‡AL/DUR)"
  
 id: LANG_RESUME_CONFIRM_RECORDER
 desc: posible answer to resume question
 eng: "Play = Yes"
-new: "Çal = Evet"
+new: "Ã‡al = Evet"
  
 id: LANG_RESUME_CANCEL_RECORDER
 desc: posible answer to resume question
@@ -876,7 +876,7 @@ new: "Calani"
 id: LANG_RESET_CONFIRM
 desc: confirm to reset settings
 eng: "PLAY=Reset"
-new: "PLAY=Basa Dön"
+new: "PLAY=Basa DÃ¶n"
  
 id: LANG_RESET_CANCEL
 desc: confirm to reset settings
@@ -916,7 +916,7 @@ new: "Sal"
 id: LANG_WEEKDAY_WEDNESDAY
 desc: abbreviation for weekday
 eng: "Wed"
-new: "Çar"
+new: "Ã‡ar"
  
 id: LANG_WEEKDAY_THURSDAY
 desc: abbreviation for weekday

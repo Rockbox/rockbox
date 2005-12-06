@@ -41,7 +41,6 @@
 #include "power.h"
 #include "backlight.h"
 #include "powermgmt.h"
-#include "bidi.h"
 #include "status.h"
 #include "atoi.h"
 #include "screens.h"
@@ -67,6 +66,7 @@
 #include "version.h"
 #include "rtc.h"
 #include "sound.h"
+#include "rbunicode.h"
 #include "dircache.h"
 #include "select.h"
 #include "statusbar.h"
@@ -85,7 +85,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "dsp.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 34
+#define CONFIG_BLOCK_VERSION 35
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -243,7 +243,6 @@ static const struct bit_entry rtc_bits[] =
     {1, S_O(volume_type), 0, "volume display", graphic_numeric },
     {1, S_O(battery_display), 0, "battery display", graphic_numeric },
     {1, S_O(timeformat), 0, "time format", "24hour,12hour" },
-    {1, S_O(bidi_support), false, "bidi hebrew/arabic", off_on },
 #endif /* HAVE_LCD_BITMAP */
     {1, S_O(show_icons), true, "show icons", off_on },
     /* system */
@@ -910,7 +909,6 @@ void settings_apply(void)
 #endif
 
 #ifdef HAVE_LCD_BITMAP
-    set_bidi_support(global_settings.bidi_support);
     lcd_set_invert_display(global_settings.invert);
     lcd_set_flip(global_settings.flip_display);
     button_set_flip(global_settings.flip_display);
@@ -966,6 +964,8 @@ void settings_apply(void)
         lang_load(buf);
         talk_init(); /* use voice of same language */
     }
+
+    set_codepage(global_settings.default_codepage);
 
 #if CONFIG_CODEC == SWCODEC
     audio_set_crossfade(global_settings.crossfade);

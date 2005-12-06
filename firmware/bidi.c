@@ -24,75 +24,168 @@
 #include <ctype.h>
 #include "file.h"
 #include "lcd.h"
+#include "rbunicode.h"
+#include "arabjoin.h"
 
-#define _HEB_BUFFER_LENGTH MAX_PATH + LCD_WIDTH/2 + 3 + 2 + 2
+//#define _HEB_BUFFER_LENGTH (MAX_PATH + LCD_WIDTH/2 + 3 + 2 + 2) * 2
 #define _HEB_BLOCK_TYPE_ENG 1
 #define _HEB_BLOCK_TYPE_HEB 0
 #define _HEB_ORIENTATION_LTR 1
 #define _HEB_ORIENTATION_RTL 0
 
-#define ischar(c) (((((unsigned char) c)>=193) && (((unsigned char) c)<=250)) ? 1 : 0)
-#define _isblank(c) (((((unsigned char) c)==' ' || ((unsigned char) c)=='\t')) ? 1 : 0)
-#define _isnewline(c) (((((unsigned char) c)=='\n' || ((unsigned char) c)=='\r')) ? 1 : 0)
+#define ischar(c) ((c > 0x0589 && c < 0x0700) || (c >= 0xfb50 && c <= 0xfefc) ? 1 : 0)
+#define _isblank(c) ((c==' ' || c=='\t') ? 1 : 0)
+#define _isnewline(c) ((c=='\n' || c=='\r') ? 1 : 0)
 #define XOR(a,b) ((a||b) && !(a&&b))
 
-bool bidi_support_enabled = false;
-
-unsigned char *bidi_l2v(const char *str, int orientation)
+arab_t * arab_lookup(unsigned short uchar)
 {
-    static unsigned char buf_heb_str[_HEB_BUFFER_LENGTH];
-    static unsigned char  buf_broken_str[_HEB_BUFFER_LENGTH];
-    const unsigned char *tmp;
-    unsigned char *heb_str, *target, *opposite_target, *broken_str;
+    if (uchar >= 0x621 && uchar <= 0x63a)
+        return &(jointable[uchar - 0x621]);
+    if (uchar >= 0x640 && uchar <= 0x64a)
+        return &(jointable[uchar - 0x621 - 5]);
+    if (uchar >= 0x671 && uchar <= 0x6d5)
+        return &(jointable[uchar - 0x621 - 5 - 38]);
+    if (uchar == 0x200D) /* Support for the zero-width joiner */
+        return &zwj;
+    return 0;
+}
+
+void arabjoin(unsigned short * stringprt, int length){
+
+    bool connected = false;
+    unsigned short * writeprt = stringprt;
+
+    arab_t * prev = 0;
+    arab_t * cur;
+    arab_t * ligature = 0;
+    short uchar;
+
+    int i;
+    for (i = 0; i <= length; i++) {
+        cur = arab_lookup(uchar = *stringprt++);
+
+        /* Skip non-arabic chars */
+        if (cur == 0) {
+            if (prev) {
+                /* Finish the last char */
+                if (connected) {
+                    *writeprt++ = prev->final;
+                    connected = false;
+                } else
+                    *writeprt++ = prev->isolated;
+                prev = 0;
+                *writeprt++ = uchar;
+            } else {
+                *writeprt++ = uchar;
+            }
+            continue;
+        }
+
+        /* nothing to do for arabic char if the previous was non-arabic */
+        if (prev == 0) {
+            prev = cur;
+            continue;
+        }
+
+        /* if it's LAM, check for LAM+ALEPH ligatures */
+        if (prev->isolated == 0xfedd) {
+            switch (cur->isolated) {
+                case 0xfe8d:
+                    ligature = &(lamaleph[0]);
+                    break;
+                case 0xfe87:
+                    ligature = &(lamaleph[1]);
+                    break;
+                case 0xfe83:
+                    ligature = &(lamaleph[2]);
+                    break;
+                case 0xfe81:
+                    ligature = &(lamaleph[3]);
+            }
+        }
+
+        if (ligature) { /* replace the 2 glyphs by their ligature */
+            prev = ligature;
+            ligature = 0;
+        } else {
+            if (connected) { /* previous char has something connected to it */
+                if (prev->medial && cur->final) /* Can we connect to it? */
+                    *writeprt++ = prev->medial;
+                else {
+                    *writeprt++ = prev->final;
+                    connected = false;
+                }
+            } else {
+                if (prev->initial && cur->final) { /* Can we connect to it? */
+                    *writeprt++ = prev->initial;
+                    connected = true;
+                } else
+                    *writeprt++ = prev->isolated;
+            }
+            prev = cur;
+        }
+    }
+}
+
+unsigned short *bidi_l2v(const unsigned char *str, int orientation)
+{
+    int length = utf8length(str);
+    static unsigned short  utf16_buf[MAX_PATH+1];
+    static unsigned short  bidi_buf[MAX_PATH+1];
+    unsigned short *heb_str, *target, *tmp; // *broken_str
     int block_start, block_end, block_type, block_length, i;
-    int block_ended;
-    long max_chars=0;
-    int begin, end, char_count, orig_begin;
+    //long max_chars=0;
+    //int begin, end, char_count, orig_begin;
 
     if (!str || !*str)
-        return (unsigned char *)"";
+        return &(unsigned short){0};
 
-    tmp = (unsigned char *)str;
-    block_start=block_end=0;
-    block_ended=0;
+    //tmp = str;
+    target = tmp = utf16_buf;
+    while (*str)
+        str = utf8decode(str, target++);
+    *target = 0;
 
-    heb_str = buf_heb_str;
+    /* properly join any arabic chars */
+    arabjoin(utf16_buf, length);
+
+    block_start=block_end=block_length=0;
+
+    heb_str = bidi_buf;
     if (orientation) {
         target = heb_str;
-        opposite_target = heb_str + strlen(str);
     } else {
-        target = heb_str + strlen(str);
-        opposite_target = heb_str;
+        target = heb_str + length;
         *target = 0;
         target--;
     }
-    
-    block_length=0;
+
     if (ischar(*tmp))
         block_type = _HEB_BLOCK_TYPE_HEB;
     else
         block_type = _HEB_BLOCK_TYPE_ENG;
-    
+
     do {
-        while((XOR(ischar((int)*(tmp+1)),block_type)
-               || _isblank((int)*(tmp+1)) || ispunct((int)*(tmp+1))
-               || (int)*(tmp+1)=='\n')
-              && block_end<(int)strlen(str)-1) {
-            tmp++;
-            block_end++;
-            block_length++;
+        while((XOR(ischar(*(tmp+1)),block_type)
+               || _isblank(*(tmp+1)) || ispunct((int)*(tmp+1))
+               || *(tmp+1)=='\n')
+              && block_end < length-1) {
+                tmp++;
+                block_end++;
+                block_length++;
         }
-        
+
         if (block_type != orientation) {
-            while ((_isblank((int)*tmp) || ispunct((int)*tmp))
+            while ((_isblank(*tmp) || ispunct((int)*tmp))
                    && *tmp!='/' && *tmp!='-' && block_end>block_start) {
                 tmp--;
                 block_end--;
             }
         }
-        
+
         for (i=block_start; i<=block_end; i++) {
-            *target = (block_type == orientation) ? *(str+i) : *(str+block_end-i+block_start);
+            *target = (block_type == orientation) ? *(utf16_buf+i) : *(utf16_buf+block_end-i+block_start);
             if (block_type!=orientation) {
                 switch (*target) {
                 case '(':
@@ -109,12 +202,15 @@ unsigned char *bidi_l2v(const char *str, int orientation)
         }
         block_type = !block_type;
         block_start=block_end+1;
-    } while(block_end<(int)strlen(str)-1);
-    
-    broken_str = buf_broken_str;
-    begin=end=strlen(str)-1;
+    } while(block_end<length-1);
+
+    *target = 0;
+
+#if 0 /* Is this code really necessary? */
+    broken_str = utf16_buf;
+    begin=end=length-1;
     target = broken_str;
-    
+
     while (1) {
         char_count=0;
         while ((!max_chars || char_count<max_chars) && begin>0) {
@@ -147,9 +243,9 @@ unsigned char *bidi_l2v(const char *str, int orientation)
         }
         orig_begin=begin;
         
-        if (_isblank(heb_str[begin])) {
+        /* if (_isblank(heb_str[begin])) {
             heb_str[begin]='\n';
-        }
+        } */
         
         /* skip leading newlines */
         while (begin<=end && _isnewline(heb_str[begin])) {
@@ -176,9 +272,7 @@ unsigned char *bidi_l2v(const char *str, int orientation)
         end=begin;
     }
     return broken_str;
+#endif
+    return heb_str;
 }
 
-void set_bidi_support(bool setting)
-{
-    bidi_support_enabled = setting;
-}

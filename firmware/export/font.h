@@ -31,9 +31,15 @@
 #if LCD_HEIGHT > 64
 #define MAX_FONT_SIZE   10000
 #else
-#define MAX_FONT_SIZE	4000
+#define MAX_FONT_SIZE   4000
 #endif
 #endif
+
+#ifndef FONT_HEADER_SIZE
+#define FONT_HEADER_SIZE 36
+#endif
+
+#define GLYPH_CACHE_FILE "/.rockbox/.glyphcache"
 
 /*
  * Fonts are specified by number, and used for display
@@ -88,6 +94,7 @@ struct font {
     const unsigned short *offset;	/* offsets into bitmap data*/
     const unsigned char *width;	/* character widths or NULL if fixed*/
     int		defaultchar;	/* default char (not glyph index)*/
+    long       bits_size;       /* # bytes of glyph bits*/
 };
 
 /* font routines*/
@@ -96,6 +103,10 @@ struct font* font_load(const char *path);
 struct font* font_get(int font);
 void font_reset(void);
 int font_getstringsize(const unsigned char *str, int *w, int *h, int fontnumber);
+int font_get_width(struct font* ft, unsigned short ch);
+const unsigned char * font_get_bits(struct font* ft, unsigned short ch);
+void glyph_cache_save(void);
+void glyph_cache_load(void);
 
 #else /* HAVE_LCD_BITMAP */
 

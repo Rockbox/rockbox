@@ -5,9 +5,8 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
- * Copyright (C) 2005 by Gadi Cohen
+ * Copyright (C) 2003 Tat Tang
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,6 +15,32 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef BIDI_H
-extern unsigned short *bidi_l2v(const unsigned char *str, int orientation);
-#endif
+
+#ifndef LRU_H
+#define LRU_H
+
+/*******************************************************************************
+ * LRU manager
+ ******************************************************************************/
+struct lru
+{
+    short _head;
+    short _tail;
+    short _size;
+    short _slot_size;
+    void *_base;
+};
+
+#define LRU_SLOT_OVERHEAD (2 * sizeof(short))
+
+/* Create LRU list with specified size from buf. */
+void lru_create(struct lru* pl, void *buf, short size, short data_size);
+/* Touch an entry. Moves handle to back of LRU list */
+void lru_touch(struct lru* pl, short handle);
+/* Data */
+void *lru_data(struct lru* pl, short handle);
+/* Traverse lru-wise */
+void lru_traverse(struct lru* pl, void (*callback)(void* data));
+
+#endif /* LRU_H */
+

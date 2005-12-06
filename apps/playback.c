@@ -1024,6 +1024,12 @@ static bool read_next_metadata(void)
      * is manipulating the playlist a lot, we will just lose battery. */
     // filling = true;
     status = get_metadata(&tracks[next_track],fd,trackname,v1first);
+    /* Preload the glyphs in the tags */
+    if (status) {
+        lcd_getstringsize(tracks[next_track].id3.title, NULL, NULL);
+        lcd_getstringsize(tracks[next_track].id3.artist, NULL, NULL);
+        lcd_getstringsize(tracks[next_track].id3.album, NULL, NULL);
+    }
     track_changed = true;
     close(fd);
 

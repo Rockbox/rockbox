@@ -28,7 +28,7 @@ id: LANG_DEBUG
 desc: in the main menu
 eng: "Debug (Keep Out!)"
 voice: "Debug, keep out!"
-new: "Debug (ikke rør!)"
+new: "Debug (ikke rÃ¸r!)"
 
 id: LANG_USB
 desc: in the main menu
@@ -112,13 +112,13 @@ id: LANG_TIME_SET
 desc: used in set_time()
 eng: "ON To Set"
 voice: ""
-new: "PÅ for å stille"
+new: "PÃ… for Ã¥ stille"
 
 id: LANG_TIME_REVERT
 desc: used in set_time()
 eng: "OFF To Revert"
 voice: ""
-new: "AV for å tilbakestille"
+new: "AV for Ã¥ tilbakestille"
 
 id: LANG_CONTRAST
 desc: in settings_menu
@@ -130,19 +130,19 @@ id: LANG_SHUFFLE
 desc: in settings_menu
 eng: "Shuffle"
 voice: "Shuffle"
-new: "Stokk om rekkefølge"
+new: "Stokk om rekkefÃ¸lge"
 
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play Selected First"
 voice: "Play Selected File First"
-new: "Spill valgte først"
+new: "Spill valgte fÃ¸rst"
 
 id: LANG_SORT_CASE
 desc: in settings_menu
 eng: "Sort Case Sensitive"
 voice: "Sort Case Sensitive"
-new: "Sortere små/store bokstaver"
+new: "Sortere smÃ¥/store bokstaver"
 
 id: LANG_RESUME
 desc: in settings_menu
@@ -160,13 +160,13 @@ id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
 eng: "Ask"
 voice: "Ask"
-new: "Spør"
+new: "SpÃ¸r"
 
 id: LANG_ON
 desc: Used in a lot of places
 eng: "On"
 voice: "On"
-new: "På"
+new: "PÃ¥"
 
 id: LANG_BACKLIGHT
 desc: in settings_menu
@@ -196,25 +196,25 @@ id: LANG_SPINDOWN
 desc: in settings_menu
 eng: "Disk Spindown"
 voice: "Disk Spindown"
-new: "Slå av harddiskmotor"
+new: "SlÃ¥ av harddiskmotor"
 
 id: LANG_FFRW_STEP
 desc: in settings_menu
 eng: "FF/RW Min Step"
 voice: "Minimum Step"
-new: "Minimum søkesteg"
+new: "Minimum sÃ¸kesteg"
 
 id: LANG_FFRW_ACCEL
 desc: in settings_menu
 eng: "FF/RW Accel"
 voice: "Acceleration"
-new: "Søkeaksellerasjon"
+new: "SÃ¸keaksellerasjon"
 
 id: LANG_FOLLOW
 desc: in settings_menu
 eng: "Follow Playlist"
 voice: "Follow Playlist"
-new: "Følg spillelisten"
+new: "FÃ¸lg spillelisten"
 
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
@@ -358,7 +358,7 @@ id: LANG_CHANNEL_RIGHT
 desc: in sound_settings
 eng: "Mono Right"
 voice: "Mono Right"
-new: "Mono høyre"
+new: "Mono hÃ¸yre"
 
 id: LANG_AUTOVOL
 desc: in sound_settings
@@ -394,25 +394,25 @@ id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
 eng: "Key Lock ON"
 voice: ""
-new: "Tastelås PÅ"
+new: "TastelÃ¥s PÃ…"
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
 eng: "Key Lock OFF"
 voice: ""
-new: "Tastelås AV"
+new: "TastelÃ¥s AV"
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
 eng: "Key Lock Is ON"
 voice: ""
-new: "Tastelås er PÅ"
+new: "TastelÃ¥s er PÃ…"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key Lock Is OFF"
 voice: ""
-new: "Tastelås er AV"
+new: "TastelÃ¥s er AV"
 
 id: LANG_MUTE_ON_PLAYER
 desc: DEPRECATED
@@ -586,13 +586,13 @@ id: LANG_POWEROFF_IDLE
 desc: in settings_menu
 eng: "Idle Poweroff"
 voice: "Idle Poweroff"
-new: "Slå av når ikke i bruk"
+new: "SlÃ¥ av nÃ¥r ikke i bruk"
 
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
 eng: "New Language"
 voice: ""
-new: "Nytt språk"
+new: "Nytt sprÃ¥k"
 
 id: LANG_FILTER
 desc: setting name for dir filter
@@ -610,7 +610,7 @@ id: LANG_FILTER_SUPPORTED
 desc: show all file types supported by Rockbox
 eng: "Supported"
 voice: "Supported"
-new: "Støttede"
+new: "StÃ¸ttede"
 
 id: LANG_FILTER_ALL
 desc: show all files
@@ -634,7 +634,7 @@ id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
 eng: "Backlight On When Plugged"
 voice: "Backlight On When Plugged"
-new: "Skjermlys på ved tilkoblet strøm"
+new: "Skjermlys pÃ¥ ved tilkoblet strÃ¸m"
 
 id: LANG_PM_CLIP_HOLD
 desc: in the peak meter menu
@@ -652,7 +652,7 @@ id: LANG_PM_MENU
 desc: in the display menu
 eng: "Peak Meter"
 voice: "Peak Meter"
-new: "Toppmåler"
+new: "ToppmÃ¥ler"
 
 id: LANG_PM_PEAK_HOLD
 desc: in the peak meter menu
@@ -820,13 +820,13 @@ id: LANG_WEEKDAY_SATURDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Sat"
 voice: ""
-new: "Lør"
+new: "LÃ¸r"
 
 id: LANG_WEEKDAY_SUNDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Sun"
 voice: ""
-new: "Søn"
+new: "SÃ¸n"
 
 id: LANG_WEEKDAY_TUESDAY
 desc: Maximum 3-letter abbreviation for weekday
@@ -892,13 +892,13 @@ id: LANG_PM_LINEAR
 desc: in the peak meter menu
 eng: "Linear(%)"
 voice: "Linear percent"
-new: "Lineær(%)"
+new: "LineÃ¦r(%)"
 
 id: LANG_PM_MAX
 desc: in the peak meter menu
 eng: "Maximum Of Range"
 voice: "Maximum Of Range"
-new: "Største verdi"
+new: "StÃ¸rste verdi"
 
 id: LANG_PM_MIN
 desc: in the peak meter menu
@@ -958,7 +958,7 @@ id: LANG_RECORDING_RIGHT
 desc: in the recording screen
 eng: "Right"
 voice: ""
-new: "Høyre"
+new: "HÃ¸yre"
 
 id: LANG_RECORDING_SETTINGS
 desc: in the main menu
@@ -1006,7 +1006,7 @@ id: LANG_POWEROFF
 desc: disk poweroff flag
 eng: "Disk Poweroff"
 voice: "Disk Poweroff"
-new: "Disken slås av"
+new: "Disken slÃ¥s av"
 
 id: LANG_BATTERY_TIME
 desc: battery level in % and estimated time remaining
@@ -1054,7 +1054,7 @@ id: LANG_SCROLL_DELAY
 desc: Delay before scrolling
 eng: "Scroll Start Delay"
 voice: "Scroll Start Delay"
-new: "Pause før rullestart"
+new: "Pause fÃ¸r rullestart"
 
 id: LANG_SCROLL_SPEED
 desc: in display_settings_menu()
@@ -1072,7 +1072,7 @@ id: LANG_SCROLL_STEP_EXAMPLE
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size Setting Example Text"
 voice: ""
-new: "Eksempel for å sette rullesteglengde"
+new: "Eksempel for Ã¥ sette rullesteglengde"
 
 id: LANG_TRICKLE_CHARGE
 desc: DEPRECATED
@@ -1120,7 +1120,7 @@ id: LANG_ALARM_MOD_TIME_TO_GO
 desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
 eng: "Waking Up In %d:%02d"
 voice: ""
-new: "Våkner om %d:%02d"
+new: "VÃ¥kner om %d:%02d"
 
 id: LANG_CREATE_PLAYLIST
 desc: Menu option for creating a playlist
@@ -1156,7 +1156,7 @@ id: LANG_QUEUE
 desc: The verb/action Queue
 eng: "Queue"
 voice: "Queue"
-new: "Legg til i kø"
+new: "Legg til i kÃ¸"
 
 id: LANG_REALLY_DELETE
 desc: Really Delete?
@@ -1210,7 +1210,7 @@ id: LANG_ID3_YEAR
 desc: ID3 info 'year'
 eng: "[Year]"
 voice: ""
-new: "[År]"
+new: "[Ã…r]"
 
 id: LANG_MENU_SHOW_ID3_INFO
 desc: Menu option to start id3 viewer
@@ -1228,7 +1228,7 @@ id: LANG_RECORDING_SIZE
 desc: Display of recorded file size
 eng: "Size:"
 voice: ""
-new: "Størrelse:"
+new: "StÃ¸rrelse:"
 
 id: LANG_RECORDING_TIME
 desc: Display of recorded time
@@ -1384,7 +1384,7 @@ id: LANG_MAX_FILES_IN_PLAYLIST
 desc: in settings_menu
 eng: "Max playlist size"
 voice: "Max playlist size"
-new: "Maks. spillelistestørrelse"
+new: "Maks. spillelistestÃ¸rrelse"
 
 id: LANG_JUMP_SCROLL
 desc: (player) menu altarnative for jump scroll
@@ -1396,7 +1396,7 @@ id: LANG_ONE_TIME
 desc: (player) the jump scroll shall be done "one time"
 eng: "One time"
 voice: "One time"
-new: "Én gang"
+new: "Ã‰n gang"
 
 id: LANG_ALWAYS
 desc: (player) the jump scroll shall be done "always"
@@ -1432,7 +1432,7 @@ id: LANG_DISK_FULL
 desc: in recording screen
 eng: "The disk is full. Press OFF to continue."
 voice: ""
-new: "Disken er full. Trykk AV for å fortsette."
+new: "Disken er full. Trykk AV for Ã¥ fortsette."
 
 id: LANG_CONFIRM_WITH_PLAY_RECORDER
 desc: Generic recorder string to use to confirm
@@ -1450,7 +1450,7 @@ id: LANG_PLUGIN_CANT_OPEN
 desc: Plugin open error message
 eng: "Can't open %s"
 voice: ""
-new: "Kan ikke åpne %s"
+new: "Kan ikke Ã¥pne %s"
 
 id: LANG_READ_FAILED
 desc: There was an error reading a file
@@ -1486,13 +1486,13 @@ id: LANG_REBOOT_NOW
 desc: Do you want to reboot?
 eng: "Reboot now?"
 voice: ""
-new: "Omstart nå?"
+new: "Omstart nÃ¥?"
 
 id: LANG_QUEUE_LAST
 desc: in onplay menu.  queue a track/playlist at end of playlist.
 eng: "Queue last"
 voice: "Queue last"
-new: "Legg til sist i kø"
+new: "Legg til sist i kÃ¸"
 
 id: LANG_INSERT
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
@@ -1510,7 +1510,7 @@ id: LANG_QUEUE_FIRST
 desc: in onplay menu.  queue a track/playlist into dynamic playlist.
 eng: "Queue next"
 voice: "Queue next"
-new: "Legg til som neste i kø"
+new: "Legg til som neste i kÃ¸"
 
 id: LANG_INSERT_FIRST
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
@@ -1522,7 +1522,7 @@ id: LANG_SAVE_DYNAMIC_PLAYLIST
 desc: in playlist menu.
 eng: "Save Current Playlist"
 voice: "Save Current Playlist"
-new: "Lagre nåværende spilleliste"
+new: "Lagre nÃ¥vÃ¦rende spilleliste"
 
 id: LANG_PLAYLIST_MENU
 desc: in main menu.
@@ -1540,7 +1540,7 @@ id: LANG_PLAYLIST_QUEUE_COUNT
 desc: splash number of tracks queued
 eng: "Queued %d tracks (%s)"
 voice: ""
-new: "La til %d spor i køen (%s)"
+new: "La til %d spor i kÃ¸en (%s)"
 
 id: LANG_PLAYLIST_SAVE_COUNT
 desc: splash number of tracks saved
@@ -1552,13 +1552,13 @@ id: LANG_OFF_ABORT
 desc: Used on recorder models
 eng: "OFF to abort"
 voice: ""
-new: "AV for å avbryte"
+new: "AV for Ã¥ avbryte"
 
 id: LANG_STOP_ABORT
 desc: Used on player models
 eng: "STOP to abort"
 voice: ""
-new: "STOP for å avbryte"
+new: "STOP for Ã¥ avbryte"
 
 id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
 desc: Playlist error
@@ -1618,7 +1618,7 @@ id: LANG_LANGUAGE
 desc: in settings_menu
 eng: "Language"
 voice: "Language"
-new: "Språk"
+new: "SprÃ¥k"
 
 id: LANG_WHILE_PLAYING
 desc: in settings_menu()
@@ -1666,7 +1666,7 @@ id: LANG_FM_BUTTONBAR_PRESETS
 desc: in button bar
 eng: "Preset"
 voice: ""
-new: "Forhåndsinnstilling"
+new: "ForhÃ¥ndsinnstilling"
 
 id: LANG_FM_SAVE_PRESET
 desc: DEPRECATED
@@ -1678,7 +1678,7 @@ id: LANG_FM_DELETE_PRESET
 desc: in radio screen
 eng: "Remove preset"
 voice: ""
-new: "Fjern forhåndsinnstilling"
+new: "Fjern forhÃ¥ndsinnstilling"
 
 id: LANG_FM_STATION
 desc: in radio screen
@@ -1690,7 +1690,7 @@ id: LANG_FM_PRESET_SAVE_FAILED
 desc: in radio screen
 eng: "Preset save failed"
 voice: ""
-new: "Lagring av forhåndsinnstilling feilet"
+new: "Lagring av forhÃ¥ndsinnstilling feilet"
 
 id: LANG_FM_NO_PRESETS
 desc: DEPRECATED
@@ -1702,7 +1702,7 @@ id: LANG_FM_NO_FREE_PRESETS
 desc: in radio screen
 eng: "The preset list is full"
 voice: ""
-new: "Forhåndsinnstillingslisten er full"
+new: "ForhÃ¥ndsinnstillingslisten er full"
 
 id: LANG_FM_RADIO
 desc: in main menu
@@ -1720,7 +1720,7 @@ id: LANG_VIEW_DYNAMIC_PLAYLIST
 desc: in playlist menu.
 eng: "View Current Playlist"
 voice: "View Current Playlist"
-new: "Vis nåværende spilleliste" 
+new: "Vis nÃ¥vÃ¦rende spilleliste" 
 
 id: LANG_MOVE
 desc: The verb/action Move
@@ -1804,7 +1804,7 @@ id: LANG_BOOKMARK_SELECT_DELETE
 desc: Used on the bookmark select window to indicated the bookmark delete option
 eng: "ON+Play = Delete"
 voice: ""
-new: "PÅ+Play = Slett"
+new: "PÃ…+Play = Slett"
 
 id: LANG_BOOKMARK_CREATE_SUCCESS
 desc: Indicates bookmark was successfully created
@@ -1858,7 +1858,7 @@ id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
 desc: Save in recent bookmarks only
 eng: "Ask - Recent only"
 voice: "Ask - Recent only"
-new: "Spør - Kun nylige"
+new: "SpÃ¸r - Kun nylige"
 
 id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
 desc: Save only on bookmark for each playlist in recent bookmarks
@@ -1960,7 +1960,7 @@ id: LANG_RECORD_CURRENT_DIR
 desc: in recording directory options
 eng: "Current dir"
 voice: "Current directory"
-new: "Nåværende katalog"
+new: "NÃ¥vÃ¦rende katalog"
 
 id: LANG_CREATE_DIR
 desc: in main menu
@@ -2650,7 +2650,7 @@ id: LANG_ONPLAY_OPEN_WITH
 desc: Onplay open with
 eng: "Open with"
 voice: "open with"
-new: "Åpne med"
+new: "Ã…pne med"
 
 id: LANG_SORT_DIR
 desc: browser sorting setting
@@ -2692,7 +2692,7 @@ id: LANG_FM_EDIT_PRESET
 desc: in radio screen
 eng: "Edit preset"
 voice: ""
-new: "Editer forhåndsinnstilling"
+new: "Editer forhÃ¥ndsinnstilling"
 
 id: LANG_FM_MONO_MODE
 desc: in radio screen
@@ -2752,7 +2752,7 @@ id: LANG_MDB_ENABLE
 desc: in sound settings
 eng: "MDB Enable"
 voice: "MDB Enable"
-new: "MDB på"
+new: "MDB pÃ¥"
 
 id: LANG_SUPERBASS
 desc: in sound settings
@@ -2776,7 +2776,7 @@ id: LANG_CONFIRM_SHUTDOWN
 desc: in shutdown screen
 eng: "Press OFF to shut down"
 voice: ""
-new: "Trykk AV for å avslutte"
+new: "Trykk AV for Ã¥ avslutte"
 
 id: LANG_ID3_ORDER
 desc: in playback settings screen
@@ -2788,13 +2788,13 @@ id: LANG_ID3_V1_FIRST
 desc: in playback settings screen
 eng: "V1 then V2"
 voice: "Version 1 then version 2"
-new: "V1 så V2"
+new: "V1 sÃ¥ V2"
 
 id: LANG_ID3_V2_FIRST
 desc: in playback settings screen
 eng: "V2 then V1"
 voice: "Version 2 then version 1"
-new: "V2 så V1"
+new: "V2 sÃ¥ V1"
 
 id: LANG_NO_ROCKBOX_DIR
 desc: in browse root
@@ -2866,25 +2866,25 @@ id: LANG_ID3DB_SEARCH
 desc: ID3 virtual folder name
 eng: "Search"
 voice: ""
-new: "Søk"
+new: "SÃ¸k"
 
 id: LANG_ID3DB_SEARCH_ARTISTS
 desc: ID3 virtual folder name
 eng: "Search Artists"
 voice: ""
-new: "Søk i artister"
+new: "SÃ¸k i artister"
 
 id: LANG_ID3DB_SEARCH_ALBUMS
 desc: ID3 virtual folder name
 eng: "Search Albums"
 voice: ""
-new: "Søk i album"
+new: "SÃ¸k i album"
 
 id: LANG_ID3DB_SEARCH_SONGS
 desc: ID3 virtual folder name
 eng: "Search Songs"
 voice: ""
-new: "Søk i sanger"
+new: "SÃ¸k i sanger"
 
 id: LANG_ID3DB_MATCHES
 desc: ID3 virtual folder name
@@ -2974,13 +2974,13 @@ id: LANG_ALARM_MOD_DISABLE
 desc: Announce that the RTC alarm has been turned off
 eng: "Alarm Disabled"
 voice: "Alarm Disabled"
-new: "Alarm avslått"
+new: "Alarm avslÃ¥tt"
 
 id: LANG_RECORD_TRIGGER
 desc: in recording settings_menu
 eng: "Trigger"
 voice: 
-new: "Utløser"
+new: "UtlÃ¸ser"
 
 id: LANG_RECORD_START_THRESHOLD
 desc: in recording settings_menu
@@ -3010,19 +3010,19 @@ id: LANG_RECORD_STOP_GAP
 desc: in recording settings_menu
 eng: "Presplit gap"
 voice: 
-new: "Førsplitt-mellomrom"
+new: "FÃ¸rsplitt-mellomrom"
 
 id: LANG_RECORD_TRIGGER_MODE
 desc: in recording settings_menu
 eng: "Trigger"
 voice: 
-new: "Utløser"
+new: "UtlÃ¸ser"
 
 id: LANG_RECORD_TRIG_NOREARM
 desc: in recording settings_menu
 eng: "Once"
 voice: 
-new: "Én gang"
+new: "Ã‰n gang"
 
 id: LANG_RECORD_TRIG_REARM
 desc: in recording settings_menu
@@ -3040,13 +3040,13 @@ id: LANG_RECORD_TRIG_IDLE
 desc: waiting for threshold
 eng: "Trigger idle"
 voice: 
-new: "Utløser venter"
+new: "UtlÃ¸ser venter"
 
 id: LANG_RECORD_TRIGGER_ACTIVE
 desc: 
 eng: "Trigger active"
 voice: 
-new: "Utløser aktiv"
+new: "UtlÃ¸ser aktiv"
 
 id: LANG_LCD_REMOTE_MENU
 desc: in the display sub menu
@@ -3100,7 +3100,7 @@ id: LANG_NOTHING_TO_RESUME
 desc: Error message displayed when resume button pressed but no playlist
 eng: "Nothing to resume"
 voice: ""
-new: "Ingenting å fortsette"
+new: "Ingenting Ã¥ fortsette"
 
 id: LANG_SPDIF_ENABLE
 desc: in playback settings menu. enable/disable the optical out
@@ -3124,13 +3124,13 @@ id: LANG_MENU_SET_RATING
 desc: in wps context menu
 eng: "Set song rating"
 voice: "Set song rating"
-new: "Sett sangbedømmelse" 
+new: "Sett sangbedÃ¸mmelse" 
 
 id: LANG_RATING
 desc: in set_rating
 eng: "Rating:"
 voice: 
-new: "Bedømmelse:"
+new: "BedÃ¸mmelse:"
 
 id: LANG_CROSSFADE_DURATION
 desc: in playback settings
@@ -3160,7 +3160,7 @@ id: LANG_REPLAYGAIN_ENABLE
 desc: in replaygain
 eng: "Enable replaygain"
 voice: 
-new: "Slå på replaygain"
+new: "SlÃ¥ pÃ¥ replaygain"
 
 id: LANG_REPLAYGAIN_NOCLIP
 desc: in replaygain
@@ -3178,25 +3178,25 @@ id: LANG_TRACK_GAIN
 desc: in replaygain
 eng: "Track gain"
 voice: 
-new: "Spornivå"
+new: "SpornivÃ¥"
 
 id: LANG_ALBUM_GAIN
 desc: in replaygain
 eng: "Album gain"
 voice: 
-new: "Albumnivå" 
+new: "AlbumnivÃ¥" 
 
 id: LANG_ID3_TRACK_GAIN
 desc: in browse_id3
 eng: "[Track gain]"
 voice: 
-new: "[Spornivå]"
+new: "[SpornivÃ¥]"
 
 id: LANG_ID3_ALBUM_GAIN
 desc: in browse_id3
 eng: "[Album gain]"
 voice: 
-new: "[Albumnivå]"
+new: "[AlbumnivÃ¥]"
 
 id: LANG_ID3_NO_GAIN
 desc: DEPRECATED

@@ -3,12 +3,12 @@
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
-new: "Opções de Som"
+new: "OpÃ§Ãµes de Som"
 
 id: LANG_GENERAL_SETTINGS
 desc: in the main menu
 eng: "General Settings"
-new: "Opções Gerais"
+new: "OpÃ§Ãµes Gerais"
 
 id: LANG_GAMES
 desc: in the main menu
@@ -28,12 +28,12 @@ new: "Info"
 id: LANG_VERSION
 desc: in the main menu
 eng: "Version"
-new: "Versão"
+new: "VersÃ£o"
 
 id: LANG_DEBUG
 desc: in the main menu
 eng: "Debug (keep out!)"
-new: "Debug (não entre!)"
+new: "Debug (nÃ£o entre!)"
 
 id: LANG_USB
 desc: in the main menu
@@ -118,7 +118,7 @@ new: "A reproduzir..."
 id: LANG_PLAYINDICES_PLAYLIST
 desc: in playlist.indices() when playlist is full
 eng: "Playlist"
-new: "Lista de reprodução"
+new: "Lista de reproduÃ§Ã£o"
 
 id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
@@ -148,7 +148,7 @@ new: "Falhou a Salvaguarda"
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
 eng: "Is battery low?"
-new: "Está a bat. baixa?"
+new: "EstÃ¡ a bat. baixa?"
 
 id: LANG_TIME_SET
 desc: used in set_time()
@@ -183,7 +183,7 @@ new: "Contraste"
 id: LANG_SHUFFLE
 desc: in settings_menu
 eng: "Shuffle"
-new: "Aleatório"
+new: "AleatÃ³rio"
 
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
@@ -198,7 +198,7 @@ new: ""
 id: LANG_SORT_CASE
 desc: in settings_menu
 eng: "Sort Case Sensitive"
-new: "Ordenação sensível a maisc./min."
+new: "OrdenaÃ§Ã£o sensÃ­vel a maisc./min."
 
 id: LANG_RESUME
 desc: in settings_menu
@@ -223,7 +223,7 @@ new: "Ligar"
 id: LANG_BACKLIGHT
 desc: in settings_menu
 eng: "Backlight"
-new: "Retro-iluminação"
+new: "Retro-iluminaÃ§Ã£o"
 
 id: LANG_BACKLIGHT_ON
 desc: in settings_menu
@@ -253,7 +253,7 @@ new: "Paragem do disco"
 id: LANG_FFRW_STEP
 desc: in settings_menu
 eng: "FF/RW Min Step"
-new: "Passo mínimo de FF/RW"
+new: "Passo mÃ­nimo de FF/RW"
 
 id: LANG_FFRW_ACCEL
 desc: in settings_menu
@@ -263,7 +263,7 @@ new: "Acelar. FF/RW"
 id: LANG_FOLLOW
 desc: in settings_menu
 eng: "Follow Playlist"
-new: "Seguir a lista de reprodução"
+new: "Seguir a lista de reproduÃ§Ã£o"
 
 # depreciated
 id: LANG_RESET_ASK_PLAYER
@@ -297,7 +297,7 @@ new: "OFF=Cancelar"
 id: LANG_RESET_DONE_SETTING
 desc: visual confirmation after settings reset
 eng: "Settings"
-new: "Opções"
+new: "OpÃ§Ãµes"
 
 id: LANG_RESET_DONE_CLEAR
 desc: visual confirmation after settings reset
@@ -312,7 +312,7 @@ new: "Cancelado"
 id: LANG_CASE_MENU
 desc: in fileview_settings_menu()
 eng: "Sort Mode"
-new: "Modo de ordenação"
+new: "Modo de ordenaÃ§Ã£o"
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
@@ -322,7 +322,7 @@ new: "Vel. de desloc. do ecran"
 id: LANG_RESET
 desc: in system_settings_menu()
 eng: "Reset settings"
-new: "Opções de reinicialização"
+new: "OpÃ§Ãµes de reinicializaÃ§Ã£o"
 
 id: LANG_PLAYBACK
 desc: in settings_menu()
@@ -352,7 +352,7 @@ new: "Volume"
 id: LANG_BALANCE
 desc: in sound_settings
 eng: "Balance"
-new: "Balanço"
+new: "BalanÃ§o"
 
 id: LANG_BASS
 desc: in sound_settings
@@ -377,7 +377,7 @@ new: "Realce dos graves"
 id: LANG_DECAY
 desc: in sound_settings
 eng: "AV Decay Time"
-new: "Tempo de caída de AV"
+new: "Tempo de caÃ­da de AV"
 
 id: LANG_CHANNEL_MENU
 desc: in sound_settings
@@ -387,7 +387,7 @@ new: "Canais"
 id: LANG_CHANNEL
 desc: in sound_settings
 eng: "Channel Configuration"
-new: "Configuração de canal"
+new: "ConfiguraÃ§Ã£o de canal"
 
 id: LANG_CHANNEL_STEREO
 desc: in sound_settings
@@ -422,7 +422,7 @@ new: "Buffer de direct."
 id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "is full!"
-new: "está cheio!"
+new: "estÃ¡ cheio!"
 
 id: LANG_RESUME_ASK
 desc: question asked at the begining when resume is on
@@ -442,7 +442,7 @@ new: "PLAY = Sim"
 id: LANG_RESUME_CANCEL_RECORDER
 desc: possible answer to resume question
 eng: "Any Other = No"
-new: "Qualquer outra = Não"
+new: "Qualquer outra = NÃ£o"
 
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
@@ -457,32 +457,32 @@ new: "Teclado desbloq."
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
 eng: "Key lock is ON"
-new: "Teclado está bloq."
+new: "Teclado estÃ¡ bloq."
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key lock is OFF"
-new: "Teclado está desbloq."
+new: "Teclado estÃ¡ desbloq."
 
 id: LANG_MUTE_ON_PLAYER
 desc: displayed when mute is on
 eng: "Mute ON"
-new: "Silêncio activo"
+new: "SilÃªncio activo"
 
 id: LANG_MUTE_OFF_PLAYER
 desc: displayed when mute is off
 eng: "Mute OFF"
-new: "Silêncio desactivo"
+new: "SilÃªncio desactivo"
 
 id: LANG_MUTE_ON_RECORDER
 desc: displayed when mute is on
 eng: "Mute is ON"
-new: "Silêncio está activo"
+new: "SilÃªncio estÃ¡ activo"
 
 id: LANG_MUTE_OFF_RECORDER
 desc: displayed when mute is off
 eng: "Mute is OFF"
-new: "Silêncio está desactivo"
+new: "SilÃªncio estÃ¡ desactivo"
 
 id: LANG_ID3_INFO
 desc: in the browse_id3() function
@@ -497,12 +497,12 @@ new: "--Ecran-- "
 id: LANG_ID3_TITLE
 desc: in wps
 eng: "[Title]"
-new: "[Título]"
+new: "[TÃ­tulo]"
 
 id: LANG_ID3_NO_TITLE
 desc: in wps when no title is avaible
 eng: "<no title>"
-new: "<sem título>"
+new: "<sem tÃ­tulo>"
 
 id: LANG_ID3_ARTIST
 desc: in wps 
@@ -527,12 +527,12 @@ new: "<sem album>"
 id: LANG_ID3_TRACKNUM
 desc: in wps
 eng: "[Tracknum]"
-new: "[Número pista]"
+new: "[NÃºmero pista]"
 
 id: LANG_ID3_NO_TRACKNUM
 desc: in wps if no track number is avaible
 eng: "<no tracknum>"
-new: "<sem número pista>"
+new: "<sem nÃºmero pista>"
 
 id: LANG_ID3_LENGHT
 desc: in wps
@@ -552,7 +552,7 @@ new: "[Bitrate]"
 id: LANG_ID3_FRECUENCY
 desc: in wps
 eng: "[Frequency]"
-new: "[Frequência]"
+new: "[FrequÃªncia]"
 
 id: LANG_ID3_PATH
 desc: in wps
@@ -612,7 +612,7 @@ new: ""
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
 eng: "End of song list"
-new: "Fim da lista de canções"
+new: "Fim da lista de canÃ§Ãµes"
 
 id: LANG_END_CONFIRM_RECORDER
 desc: when playlist has finished
@@ -622,17 +622,17 @@ new: ""
 id: LANG_SNAKE_SCORE
 desc: when you die in snake game
 eng: "Your score:"
-new: "A sua pontuação:"
+new: "A sua pontuaÃ§Ã£o:"
 
 id: LANG_SNAKE_HISCORE
 desc: high score in snake game
 eng: "High Score: %d"
-new: "Maior Pontuação: %d"
+new: "Maior PontuaÃ§Ã£o: %d"
 
 id: LANG_SNAKE_HISCORE_NEW
 desc: new high score in snake game
 eng: "New High Score!"
-new: "Nova maior pontuação!"
+new: "Nova maior pontuaÃ§Ã£o!"
 
 id: LANG_SNAKE_PAUSE
 desc: displayed when game is paused
@@ -652,7 +652,7 @@ new: "[OFF] para sair"
 id: LANG_SNAKE_LEVEL
 desc: level of difficulty
 eng: "Level - %d"
-new: "Nível - %d"
+new: "NÃ­vel - %d"
 
 id: LANG_SNAKE_RANGE
 desc: range of levels
@@ -662,12 +662,12 @@ new: "(1 - devagar, 9 - depressa)"
 id: LANG_SNAKE_START
 desc: how to start or pause the game
 eng: "[PLAY] to start/pause"
-new: "[PLAY] para começar/pausa"
+new: "[PLAY] para comeÃ§ar/pausa"
 
 id: LANG_SOKOBAN_LEVEL
 desc: must be smaller than 6 characters
 eng: "Level"
-new: "Nível"
+new: "NÃ­vel"
 
 id: LANG_SOKOBAN_MOVE
 desc: must be smaller than 6 characters
@@ -687,17 +687,17 @@ new: "[OFF] para parar"
 id: LANG_SOKOBAN_F1
 desc: what does F1 do
 eng: "[F1] - level"
-new: "[F1] - nível"
+new: "[F1] - nÃ­vel"
 
 id: LANG_SOKOBAN_F2
 desc: what does F2 do
 eng: "[F2] same level"
-new: "[F2] mesmo nível"
+new: "[F2] mesmo nÃ­vel"
 
 id: LANG_SOKOBAN_F3
 desc: what does F3 do
 eng: "[F3] + level"
-new: "[F3] + nível"
+new: "[F3] + nÃ­vel"
 
 # Next ids are for Worlmet Game.
 # Lenght restrictions for score board strings (LANG_SB_XXX):
@@ -788,7 +788,7 @@ new: "Perdeu!"
 id: LANG_TETRIS_LEVEL
 desc: tetris game
 eng: "Rows - Level"
-new: "Linhas - Nível"
+new: "Linhas - NÃ­vel"
 
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
@@ -798,7 +798,7 @@ new: "Auto Desligar"
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
 eng: "new language"
-new: "nova língua"
+new: "nova lÃ­ngua"
 
 id: LANG_FILTER
 desc: setting name for dir filter
@@ -808,7 +808,7 @@ new: "Mostrar ficheiros"
 id: LANG_FILTER_MUSIC
 desc: show only music-related files
 eng: "Music"
-new: "Música"
+new: "MÃºsica"
 
 id: LANG_FILTER_SUPPORTED
 desc: show all file types supported by Rockbox
@@ -828,7 +828,7 @@ new: "Sim"
 id: LANG_SET_BOOL_NO
 desc: bool false representation
 eng: "No"
-new: "Não"
+new: "NÃ£o"
 
 id: LANG_PM_MENU
 desc: in the display menu
@@ -863,7 +863,7 @@ new: "Unidades por leitura"
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
 eng: "Backlight On When Plugged"
-new: "Com Retro-iluminação quando ligado"
+new: "Com Retro-iluminaÃ§Ã£o quando ligado"
 
 id: LANG_REPEAT
 desc: in settings_menu
@@ -898,12 +898,12 @@ new: "Formato Horas"
 id: LANG_12_HOUR_CLOCK
 desc: option for 12 hour clock
 eng: "12 hour clock"
-new: "Relógio 12 horas"
+new: "RelÃ³gio 12 horas"
 
 id: LANG_24_HOUR_CLOCK
 desc: option for 24 hour clock
 eng: "24 hour clock"
-new: "Relógio 24 horas"
+new: "RelÃ³gio 24 horas"
 
 id: LANG_WEEKDAY_SUNDAY
 desc: Maximum 3-letter abbreviation for weekday
@@ -913,32 +913,32 @@ new: "Dom"
 id: LANG_WEEKDAY_MONDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Mon"
-new: "2ªf"
+new: "2Âªf"
 
 id: LANG_WEEKDAY_TUESDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Tue"
-new: "3ªf"
+new: "3Âªf"
 
 id: LANG_WEEKDAY_WEDNESDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Wed"
-new: "4ªf"
+new: "4Âªf"
 
 id: LANG_WEEKDAY_THURSDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Thu"
-new: "5ªf"
+new: "5Âªf"
 
 id: LANG_WEEKDAY_FRIDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Fri"
-new: "6ªf"
+new: "6Âªf"
 
 id: LANG_WEEKDAY_SATURDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Sat"
-new: "Sáb"
+new: "SÃ¡b"
 
 id: LANG_MONTH_JANUARY
 desc: Maximum 3-letter abbreviation for monthname
@@ -1008,7 +1008,7 @@ new: "Cubo"
 id: LANG_OSCILLOGRAPH
 desc: the name of the oscillograph demo in the demo menu
 eng: "Oscillograph"
-new: "Oscilosgráfico"
+new: "OscilosgrÃ¡fico"
 
 id: LANG_RESUME_SETTING_ASK_ONCE
 desc: in settings_menu

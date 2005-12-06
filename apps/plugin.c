@@ -361,7 +361,14 @@ static const struct plugin_api rockbox_api = {
 
 #ifdef HAVE_LCD_BITMAP
     screen_dump_set_hook,
+    font_get_width,
 #endif
+    utf8decode,
+    iso_decode,
+    utf16LEdecode,
+    utf16BEdecode,
+    utf8encode,
+    utf8length,
 };
 
 int plugin_load(const char* plugin, void* parameter)

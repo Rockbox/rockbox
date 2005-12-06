@@ -9,7 +9,7 @@ id: LANG_GENERAL_SETTINGS
 desc: in the main menu
 eng: "General Settings"
 voice: "General Settings"
-new: "Inställningar"
+new: "InstÃ¤llningar"
 
 id: LANG_INFO
 desc: in the main menu
@@ -27,7 +27,7 @@ id: LANG_DEBUG
 desc: in the main menu
 eng: "Debug (Keep Out!)"
 voice: "Debug, keep out!"
-new: "Felsök (Rör ej!)"
+new: "FelsÃ¶k (RÃ¶r ej!)"
 
 id: LANG_USB
 desc: in the main menu
@@ -63,7 +63,7 @@ id: LANG_PLAYLIST_LOAD
 desc: displayed on screen while loading a playlist
 eng: "Loading..."
 voice: ""
-new: "Läser..."
+new: "LÃ¤ser..."
 
 id: LANG_PLAYLIST_SHUFFLE
 desc: displayed on screen while shuffling a playlist
@@ -111,13 +111,13 @@ id: LANG_TIME_SET
 desc: used in set_time()
 eng: "ON To Set"
 voice: ""
-new: "PÅ för att ställa"
+new: "PÃ… fÃ¶r att stÃ¤lla"
 
 id: LANG_TIME_REVERT
 desc: used in set_time()
 eng: "OFF To Revert"
 voice: ""
-new: "AV för att återgå"
+new: "AV fÃ¶r att Ã¥tergÃ¥"
 
 id: LANG_CONTRAST
 desc: in settings_menu
@@ -135,19 +135,19 @@ id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play Selected First"
 voice: "Play Selected File First"
-new: "Spela vald fil först"
+new: "Spela vald fil fÃ¶rst"
 
 id: LANG_SORT_CASE
 desc: in settings_menu
 eng: "Sort Case Sensitive"
 voice: "Sort Case Sensitive"
-new: "Sortera skiftlägeskänsligt"
+new: "Sortera skiftlÃ¤geskÃ¤nsligt"
 
 id: LANG_RESUME
 desc: in settings_menu
 eng: "Resume on startup"
 voice: "Resume on startup"
-new: "Återuppta vid start"
+new: "Ã…teruppta vid start"
 
 id: LANG_OFF
 desc: Used in a lot of places
@@ -159,13 +159,13 @@ id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
 eng: "Ask"
 voice: "Ask"
-new: "Fråga"
+new: "FrÃ¥ga"
 
 id: LANG_ON
 desc: Used in a lot of places
 eng: "On"
 voice: "On"
-new: "På"
+new: "PÃ¥"
 
 id: LANG_BACKLIGHT
 desc: in settings_menu
@@ -177,7 +177,7 @@ id: LANG_SCROLL
 desc: in settings_menu
 eng: "Scroll Speed Setting Example"
 voice: ""
-new: "Exempel på rullningshastighet"
+new: "Exempel pÃ¥ rullningshastighet"
 
 id: LANG_DISCHARGE
 desc: DEPRECATED
@@ -189,7 +189,7 @@ id: LANG_TIME
 desc: in settings_menu
 eng: "Set Time/Date"
 voice: "Set Time and Date"
-new: "Ställ tid och datum"
+new: "StÃ¤ll tid och datum"
 
 id: LANG_SPINDOWN
 desc: in settings_menu
@@ -213,25 +213,25 @@ id: LANG_FOLLOW
 desc: in settings_menu
 eng: "Follow Playlist"
 voice: "Follow Playlist"
-new: "Följ spellistan"
+new: "FÃ¶lj spellistan"
 
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
 eng: "Are You Sure?"
 voice: ""
-new: "Är du säker?"
+new: "Ã„r du sÃ¤ker?"
 
 id: LANG_RESET_DONE_SETTING
 desc: visual confirmation after settings reset
 eng: "Settings"
 voice: ""
-new: "Inställningar"
+new: "InstÃ¤llningar"
 
 id: LANG_RESET_DONE_CLEAR
 desc: visual confirmation after settings reset
 eng: "Cleared"
 voice: ""
-new: "återställda"
+new: "Ã¥terstÃ¤llda"
 
 id: LANG_RESET_DONE_CANCEL
 desc: Visual confirmation of cancelation
@@ -255,7 +255,7 @@ id: LANG_RESET
 desc: in system_settings_menu()
 eng: "Reset Settings"
 voice: "Reset Settings"
-new: "Återställ inställningar"
+new: "Ã…terstÃ¤ll instÃ¤llningar"
 
 id: LANG_PLAYBACK
 desc: in settings_menu()
@@ -273,7 +273,7 @@ id: LANG_DISPLAY
 desc: in settings_menu()
 eng: "Display"
 voice: "Display"
-new: "Skärm"
+new: "SkÃ¤rm"
 
 id: LANG_SYSTEM
 desc: in settings_menu()
@@ -321,7 +321,7 @@ id: LANG_DECAY
 desc: in sound_settings
 eng: "AV Decay Time"
 voice: ""
-new: "Falltid för autovolym"
+new: "Falltid fÃ¶r autovolym"
 
 id: LANG_CHANNEL_MENU
 desc: in sound_settings
@@ -351,13 +351,13 @@ id: LANG_CHANNEL_LEFT
 desc: in sound_settings
 eng: "Mono Left"
 voice: "Mono Left"
-new: "Mono vänster"
+new: "Mono vÃ¤nster"
 
 id: LANG_CHANNEL_RIGHT
 desc: in sound_settings
 eng: "Mono Right"
 voice: "Mono Right"
-new: "Mono höger"
+new: "Mono hÃ¶ger"
 
 id: LANG_AUTOVOL
 desc: in sound_settings
@@ -375,7 +375,7 @@ id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Is Full!"
 voice: ""
-new: "är full!"
+new: "Ã¤r full!"
 
 id: LANG_RESUME_ASK
 desc: DEPRECATED
@@ -393,25 +393,25 @@ id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
 eng: "Key Lock ON"
 voice: ""
-new: "Knapplås på"
+new: "KnapplÃ¥s pÃ¥"
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
 eng: "Key Lock OFF"
 voice: ""
-new: "Knapplås av"
+new: "KnapplÃ¥s av"
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
 eng: "Key Lock Is ON"
 voice: ""
-new: "Knapplåset är på"
+new: "KnapplÃ¥set Ã¤r pÃ¥"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key Lock Is OFF"
 voice: ""
-new: "Knapplåset är av"
+new: "KnapplÃ¥set Ã¤r av"
 
 id: LANG_MUTE_ON_PLAYER
 desc: DEPRECATED
@@ -489,7 +489,7 @@ id: LANG_ID3_TRACKNUM
 desc: in wps
 eng: "[Tracknum]"
 voice: ""
-new: "[Spårnummer]"
+new: "[SpÃ¥rnummer]"
 
 id: LANG_ID3_NO_TRACKNUM
 desc: DEPRECATED
@@ -501,7 +501,7 @@ id: LANG_ID3_LENGHT
 desc: in wps
 eng: "[Length]"
 voice: ""
-new: "[Längd]"
+new: "[LÃ¤ngd]"
 
 id: LANG_ID3_PLAYLIST
 desc: in wps
@@ -525,19 +525,19 @@ id: LANG_ID3_PATH
 desc: in wps
 eng: "[Path]"
 voice: ""
-new: "[Sökväg]"
+new: "[SÃ¶kvÃ¤g]"
 
 id: LANG_PITCH_UP
 desc: in wps
 eng: "Pitch Up"
 voice: ""
-new: "Höj tonläge"
+new: "HÃ¶j tonlÃ¤ge"
 
 id: LANG_PITCH_DOWN
 desc: in wps
 eng: "Pitch Down"
 voice: ""
-new: "Sänk tonläge"
+new: "SÃ¤nk tonlÃ¤ge"
 
 id: LANG_PAUSE
 desc: in wps
@@ -549,7 +549,7 @@ id: LANG_F2_MODE
 desc: in wps F2 pressed
 eng: "Mode:"
 voice: ""
-new: "läge:"
+new: "lÃ¤ge:"
 
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
@@ -579,19 +579,19 @@ id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
 eng: "End Of Song List"
 voice: ""
-new: "Slut på spellistan"
+new: "Slut pÃ¥ spellistan"
 
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
 eng: "Idle Poweroff"
 voice: "Idle Poweroff"
-new: "Autoavstängning"
+new: "AutoavstÃ¤ngning"
 
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
 eng: "New Language"
 voice: ""
-new: "Nytt språk"
+new: "Nytt sprÃ¥k"
 
 id: LANG_FILTER
 desc: setting name for dir filter
@@ -609,7 +609,7 @@ id: LANG_FILTER_SUPPORTED
 desc: show all file types supported by Rockbox
 eng: "Supported"
 voice: "Supported"
-new: "Alla filer som stödjs"
+new: "Alla filer som stÃ¶djs"
 
 id: LANG_FILTER_ALL
 desc: show all files
@@ -639,37 +639,37 @@ id: LANG_PM_CLIP_HOLD
 desc: in the peak meter menu
 eng: "Clip Hold Time"
 voice: "Clip Hold Time"
-new: "Klipphålltid"
+new: "KlipphÃ¥lltid"
 
 id: LANG_PM_ETERNAL
 desc: in the peak meter menu
 eng: "Eternal"
 voice: "Eternal"
-new: "Oändlig"
+new: "OÃ¤ndlig"
 
 id: LANG_PM_MENU
 desc: in the display menu
 eng: "Peak Meter"
 voice: "Peak Meter"
-new: "Toppmätare"
+new: "ToppmÃ¤tare"
 
 id: LANG_PM_PEAK_HOLD
 desc: in the peak meter menu
 eng: "Peak Hold Time"
 voice: "Peak Hold Time"
-new: "Topphålltid"
+new: "TopphÃ¥lltid"
 
 id: LANG_PM_RELEASE
 desc: in the peak meter menu
 eng: "Peak Release"
 voice: "Peak Release"
-new: "Toppsläppning"
+new: "ToppslÃ¤ppning"
 
 id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
 eng: "Units Per Read"
 voice: "Units Per Read"
-new: "Toppåtergång"
+new: "ToppÃ¥tergÃ¥ng"
 
 id: LANG_REPEAT
 desc: in settings_menu
@@ -711,7 +711,7 @@ id: LANG_RESET_CONFIRM
 desc: confirm to reset settings
 eng: "PLAY=Reset"
 voice: ""
-new: "SPELA=Återställ"
+new: "SPELA=Ã…terstÃ¤ll"
 
 id: LANG_TIMEFORMAT
 desc: select the time format of time in status bar
@@ -813,19 +813,19 @@ id: LANG_WEEKDAY_MONDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Mon"
 voice: ""
-new: "Mån"
+new: "MÃ¥n"
 
 id: LANG_WEEKDAY_SATURDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Sat"
 voice: ""
-new: "Lör"
+new: "LÃ¶r"
 
 id: LANG_WEEKDAY_SUNDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Sun"
 voice: ""
-new: "Sön"
+new: "SÃ¶n"
 
 id: LANG_WEEKDAY_TUESDAY
 desc: Maximum 3-letter abbreviation for weekday
@@ -891,19 +891,19 @@ id: LANG_PM_LINEAR
 desc: in the peak meter menu
 eng: "Linear(%)"
 voice: "Linear percent"
-new: "Linjär (%)"
+new: "LinjÃ¤r (%)"
 
 id: LANG_PM_MAX
 desc: in the peak meter menu
 eng: "Maximum Of Range"
 voice: "Maximum Of Range"
-new: "Maximalt värde"
+new: "Maximalt vÃ¤rde"
 
 id: LANG_PM_MIN
 desc: in the peak meter menu
 eng: "Minimum Of Range"
 voice: "Minimum Of Range"
-new: "Minimalt värde"
+new: "Minimalt vÃ¤rde"
 
 id: LANG_PM_PERFORMANCE
 desc: DEPRECATED
@@ -939,13 +939,13 @@ id: LANG_RECORDING_GAIN
 desc: in the recording screen
 eng: "Gain"
 voice: ""
-new: "Förstärkning"
+new: "FÃ¶rstÃ¤rkning"
 
 id: LANG_RECORDING_LEFT
 desc: in the recording screen
 eng: "Gain Left"
 voice: ""
-new: "Vänster"
+new: "VÃ¤nster"
 
 id: LANG_RECORDING_QUALITY
 desc: in the recording settings
@@ -957,19 +957,19 @@ id: LANG_RECORDING_RIGHT
 desc: in the recording screen
 eng: "Gain Right"
 voice: ""
-new: "Höger"
+new: "HÃ¶ger"
 
 id: LANG_RECORDING_SETTINGS
 desc: in the main menu
 eng: "Recording Settings"
 voice: "Recording Settings"
-new: "Inspelningsinställningar"
+new: "InspelningsinstÃ¤llningar"
 
 id: LANG_RECORDING_SOURCE
 desc: in the recording settings
 eng: "Source"
 voice: "Source"
-new: "Källa"
+new: "KÃ¤lla"
 
 id: LANG_RECORDING_SRC_DIGITAL
 desc: in the recording settings
@@ -981,7 +981,7 @@ id: LANG_RECORDING_SRC_LINE
 desc: in the recording settings
 eng: "Line In"
 voice: "Line In"
-new: "Linjeingång"
+new: "LinjeingÃ¥ng"
 
 id: LANG_RECORDING_SRC_MIC
 desc: in the recording settings
@@ -1005,7 +1005,7 @@ id: LANG_POWEROFF
 desc: disk poweroff flag
 eng: "Disk Poweroff"
 voice: "Disk Poweroff"
-new: "Stäng av disk"
+new: "StÃ¤ng av disk"
 
 id: LANG_BATTERY_TIME
 desc: battery level in % and estimated time remaining
@@ -1035,7 +1035,7 @@ id: LANG_BATTERY_TRICKLE_CHARGE
 desc: in info display, shows that trickle charge is running
 eng: "Battery: Trickle Chg"
 voice: ""
-new: "Batteri: Underhållsladdning"
+new: "Batteri: UnderhÃ¥llsladdning"
 
 id: LANG_BIDIR_SCROLL
 desc: Bidirectional scroll limit
@@ -1071,7 +1071,7 @@ id: LANG_SCROLL_STEP_EXAMPLE
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size Setting Example Text"
 voice: ""
-new: "Exempel för att sätta rullningssteg"
+new: "Exempel fÃ¶r att sÃ¤tta rullningssteg"
 
 id: LANG_TRICKLE_CHARGE
 desc: DEPRECATED
@@ -1089,19 +1089,19 @@ id: LANG_ALARM_MOD_ALARM_MENU
 desc: The name of the additional entry in the main menu for the RTC alarm mod.
 eng: "Wake-Up Alarm"
 voice: "Wake-Up Alarm"
-new: "Väckarklocka"
+new: "VÃ¤ckarklocka"
 
 id: LANG_ALARM_MOD_ERROR
 desc: The text that tells that the time is incorrect (for the RTC alarm mod).
 eng: "Alarm Time Is Too Soon!"
 voice: ""
-new: "Väckning om för kort tid!"
+new: "VÃ¤ckning om fÃ¶r kort tid!"
 
 id: LANG_ALARM_MOD_KEYS
 desc: Shown key functions in alarm menu (for the RTC alarm mod).
 eng: "PLAY=Set OFF=Cancel"
 voice: ""
-new: "PLAY=Sätt OFF=Avbryt"
+new: "PLAY=SÃ¤tt OFF=Avbryt"
 
 id: LANG_ALARM_MOD_SHUTDOWN
 desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
@@ -1155,7 +1155,7 @@ id: LANG_QUEUE
 desc: The verb/action Queue
 eng: "Queue"
 voice: "Queue"
-new: "Köa"
+new: "KÃ¶a"
 
 id: LANG_REALLY_DELETE
 desc: Really Delete?
@@ -1167,7 +1167,7 @@ id: LANG_RENAME
 desc: The verb/action Rename
 eng: "Rename"
 voice: "Rename"
-new: "Ändra namn"
+new: "Ã„ndra namn"
 
 id: LANG_PLAYER_KEYBOARD_ABORT
 desc: DEPRECATED
@@ -1209,13 +1209,13 @@ id: LANG_ID3_YEAR
 desc: ID3 info 'year'
 eng: "[Year]"
 voice: ""
-new: "[År]"
+new: "[Ã…r]"
 
 id: LANG_MENU_SHOW_ID3_INFO
 desc: Menu option to start id3 viewer
 eng: "Show ID3 Info"
 voice: "Show ID3 Info"
-new: "Visa spårinfo"
+new: "Visa spÃ¥rinfo"
 
 id: LANG_FADE_ON_STOP
 desc: options menu to set fade on stop or pause
@@ -1239,13 +1239,13 @@ id: LANG_SETTINGS_LOADED1
 desc: Feedback shown when a .cfg file is loaded
 eng: "Settings"
 voice: ""
-new: "Inställningar"
+new: "InstÃ¤llningar"
 
 id: LANG_SETTINGS_LOADED2
 desc: Feedback shown when a .cfg file is loaded
 eng: "Loaded"
 voice: ""
-new: "inlästa"
+new: "inlÃ¤sta"
 
 id: LANG_CHANNEL_KARAOKE
 desc: in sound_settings
@@ -1275,7 +1275,7 @@ id: LANG_INVERT
 desc: in settings_menu
 eng: "LCD Mode"
 voice: "LCD Mode"
-new: "LCD-läge"
+new: "LCD-lÃ¤ge"
 
 id: LANG_SOKOBAN_ON
 desc: DEPRECATED
@@ -1293,7 +1293,7 @@ id: LANG_SETTINGS_SAVED1
 desc: Feedback shown when a .cfg file is saved
 eng: "Settings"
 voice: ""
-new: "Inställningar"
+new: "InstÃ¤llningar"
 
 id: LANG_SETTINGS_SAVED2
 desc: Feedback shown when a .cfg file is saved
@@ -1335,7 +1335,7 @@ id: LANG_INVERT_CURSOR
 desc: in settings_menu
 eng: "Line Selector"
 voice: "Line Selector"
-new: "Radväljare"
+new: "RadvÃ¤ljare"
 
 id: LANG_RECORDING_EDITABLE
 desc: Editable recordings setting
@@ -1347,7 +1347,7 @@ id: LANG_CAPTION_BACKLIGHT
 desc: in settings_menu
 eng: "Caption backlight"
 voice: "Caption backlight"
-new: "Spårbytesbelysning"
+new: "SpÃ¥rbytesbelysning"
 
 id: LANG_INVERT_CURSOR_BAR
 desc: in settings_menu
@@ -1395,7 +1395,7 @@ id: LANG_ONE_TIME
 desc: (player) the jump scroll shall be done "one time"
 eng: "One time"
 voice: "One time"
-new: "En gång"
+new: "En gÃ¥ng"
 
 id: LANG_ALWAYS
 desc: (player) the jump scroll shall be done "always"
@@ -1419,7 +1419,7 @@ id: LANG_CAR_ADAPTER_MODE
 desc: Displayed for setting car adapter mode to on/off
 eng: "Car Adapter Mode"
 voice: "Car Adapter Mode"
-new: "Biltillsatsläge"
+new: "BiltillsatslÃ¤ge"
 
 id: LANG_CONFIRM_WITH_PLAY_RECORDER
 desc: Generic recorder string to use to confirm
@@ -1443,7 +1443,7 @@ id: LANG_DISK_FULL
 desc: in recording screen
 eng: "The disk is full. Press OFF to continue."
 voice: ""
-new: "Disken är full. Tryck AV för att fortsätta."
+new: "Disken Ã¤r full. Tryck AV fÃ¶r att fortsÃ¤tta."
 
 id: LANG_FIRMWARE
 desc: in the main menu
@@ -1461,7 +1461,7 @@ id: LANG_INSERT_FIRST
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
 eng: "Insert next"
 voice: "Insert next"
-new: "Infoga som nästa"
+new: "Infoga som nÃ¤sta"
 
 id: LANG_INSERT_LAST
 desc: in onplay menu.  append a track/playlist into dynamic playlist.
@@ -1473,55 +1473,55 @@ id: LANG_JUMP_SCROLL_DELAY
 desc: (player) Delay before making a jump scroll
 eng: "Jump Scroll Delay"
 voice: "Jump Scroll Delay"
-new: "Hopprullningsfördröjning"
+new: "HopprullningsfÃ¶rdrÃ¶jning"
 
 id: LANG_LANGUAGE
 desc: in settings_menu
 eng: "Language"
 voice: "Language"
-new: "Språk"
+new: "SprÃ¥k"
 
 id: LANG_OFF_ABORT
 desc: Used on recorder models
 eng: "OFF to abort"
 voice: ""
-new: "AV för avbryt"
+new: "AV fÃ¶r avbryt"
 
 id: LANG_PLAYLIST_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing playlist file"
 voice: ""
-new: "Kan ej nå filen med spellistan"
+new: "Kan ej nÃ¥ filen med spellistan"
 
 id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing playlist control file"
 voice: ""
-new: "Kan ej nå filen för spellistekontroll"
+new: "Kan ej nÃ¥ filen fÃ¶r spellistekontroll"
 
 id: LANG_PLAYLIST_CONTROL_INVALID
 desc: Playlist resume error
 eng: "Playlist control file is invalid"
 voice: ""
-new: "Filen för spellistekontroll är inte korrekt"
+new: "Filen fÃ¶r spellistekontroll Ã¤r inte korrekt"
 
 id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
 desc: Playlist error
 eng: "Error updating playlist control file"
 voice: ""
-new: "Fel vid uppdatering av filen för spellistekontroll"
+new: "Fel vid uppdatering av filen fÃ¶r spellistekontroll"
 
 id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing directory"
 voice: ""
-new: "Kan inte läsa katalogen"
+new: "Kan inte lÃ¤sa katalogen"
 
 id: LANG_PLAYLIST_INSERT_COUNT
 desc: splash number of tracks inserted
 eng: "Inserted %d tracks (%s)"
 voice: ""
-new: "Infogade %d spår (%s)"
+new: "Infogade %d spÃ¥r (%s)"
 
 id: LANG_PLAYLIST_MENU
 desc: in main menu.
@@ -1533,13 +1533,13 @@ id: LANG_PLAYLIST_QUEUE_COUNT
 desc: splash number of tracks queued
 eng: "Queued %d tracks (%s)"
 voice: ""
-new: "Köade %d spår (%s)"
+new: "KÃ¶ade %d spÃ¥r (%s)"
 
 id: LANG_PLAYLIST_SAVE_COUNT
 desc: splash number of tracks saved
 eng: "Saved %d tracks (%s)"
 voice: ""
-new: "Sparade %d spår (%s)"
+new: "Sparade %d spÃ¥r (%s)"
 
 id: LANG_PLUGINS
 desc: in main_menu()
@@ -1551,7 +1551,7 @@ id: LANG_PLUGIN_CANT_OPEN
 desc: Plugin open error message
 eng: "Can't open %s"
 voice: ""
-new: "Kan inte öppna %s"
+new: "Kan inte Ã¶ppna %s"
 
 id: LANG_PLUGIN_ERROR
 desc: The plugin return an error code
@@ -1575,19 +1575,19 @@ id: LANG_QUEUE_FIRST
 desc: in onplay menu.  queue a track/playlist into dynamic playlist.
 eng: "Queue next"
 voice: "Queue next"
-new: "Köa som nästa"
+new: "KÃ¶a som nÃ¤sta"
 
 id: LANG_QUEUE_LAST
 desc: in onplay menu.  queue a track/playlist at end of playlist.
 eng: "Queue last"
 voice: "Queue last"
-new: "Köa sist"
+new: "KÃ¶a sist"
 
 id: LANG_READ_FAILED
 desc: There was an error reading a file
 eng: "Failed reading %s"
 voice: ""
-new: "Kan inte läsa %s"
+new: "Kan inte lÃ¤sa %s"
 
 id: LANG_REBOOT_NOW
 desc: Do you want to reboot?
@@ -1635,7 +1635,7 @@ id: LANG_STOP_ABORT
 desc: Used on player models
 eng: "STOP to abort"
 voice: ""
-new: "STANNA för avbryt"
+new: "STANNA fÃ¶r avbryt"
 
 id: LANG_WHILE_PLAYING
 desc: in settings_menu()
@@ -1653,31 +1653,31 @@ id: LANG_FM_BUTTONBAR_PRESETS
 desc: in button bar
 eng: "Preset"
 voice: ""
-new: "Förinställning"
+new: "FÃ¶rinstÃ¤llning"
 
 id: LANG_FM_DELETE_PRESET
 desc: in radio screen
 eng: "Remove preset"
 voice: ""
-new: "Ta bort förinställning"
+new: "Ta bort fÃ¶rinstÃ¤llning"
 
 id: LANG_FM_NO_FREE_PRESETS
 desc: in radio screen
 eng: "The preset list is full"
 voice: ""
-new: "Listan med förinställningar är full"
+new: "Listan med fÃ¶rinstÃ¤llningar Ã¤r full"
 
 id: LANG_FM_NO_PRESETS
 desc: error when preset list is empty
 eng: "No presets"
 voice: ""
-new: "Inga förinställningar"
+new: "Inga fÃ¶rinstÃ¤llningar"
 
 id: LANG_FM_PRESET_SAVE_FAILED
 desc: in radio screen
 eng: "Preset save failed"
 voice: ""
-new: "Kan inte spara förinställningar"
+new: "Kan inte spara fÃ¶rinstÃ¤llningar"
 
 id: LANG_FM_SAVE_PRESET
 desc: DEPRECATED
@@ -1695,7 +1695,7 @@ id: LANG_LINE_IN
 desc: in settings_menu
 eng: "Line In"
 voice: "Line In"
-new: "Linjeingång"
+new: "LinjeingÃ¥ng"
 
 id: LANG_NO_FILES
 desc: in settings_menu
@@ -1743,19 +1743,19 @@ id: LANG_RECORD_PRERECORD
 desc: in recording and radio screen
 eng: "Prerecording"
 voice: ""
-new: "Förinspelning"
+new: "FÃ¶rinspelning"
 
 id: LANG_RECORD_PRERECORD_TIME
 desc: in recording settings_menu
 eng: "Prerecord time"
 voice: "Pre-Record time"
-new: "Förinspelningstid"
+new: "FÃ¶rinspelningstid"
 
 id: LANG_AUTO_BOOKMARK_QUERY
 desc: prompt for user to decide to create an bookmark
 eng: "Create a Bookmark?"
 voice: ""
-new: "Skapa bokmärke?"
+new: "Skapa bokmÃ¤rke?"
 
 id: LANG_BARS_MENU
 desc: in the display sub menu
@@ -1773,61 +1773,61 @@ id: LANG_BOOKMARK_AUTOLOAD_QUERY
 desc: prompt for user to decide to create a bookmark
 eng: "Load Last Bookmark?"
 voice: ""
-new: "Starta vid bokmärket?"
+new: "Starta vid bokmÃ¤rket?"
 
 id: LANG_BOOKMARK_CREATE_FAILURE
 desc: Indicates bookmark was not created
 eng: "Bookmark Failed!"
 voice: ""
-new: "Kan inte skapa bokmärke!"
+new: "Kan inte skapa bokmÃ¤rke!"
 
 id: LANG_BOOKMARK_CREATE_SUCCESS
 desc: Indicates bookmark was successfully created
 eng: "Bookmark Created"
 voice: ""
-new: "Bokmärke skapat"
+new: "BokmÃ¤rke skapat"
 
 id: LANG_BOOKMARK_LOAD_EMPTY
 desc: Indicates bookmark was empty
 eng: "Bookmark Empty"
 voice: ""
-new: "Inga bokmärken"
+new: "Inga bokmÃ¤rken"
 
 id: LANG_BOOKMARK_MENU
 desc: Text on main menu to get to bookmark commands
 eng: "Bookmarks"
 voice: "Bookmarks"
-new: "Bokmärken"
+new: "BokmÃ¤rken"
 
 id: LANG_BOOKMARK_MENU_CREATE
 desc: Used off of the bookmark menu to create a bookmark
 eng: "Create Bookmark"
 voice: "Create Bookmark"
-new: "Skapa bokmärke"
+new: "Skapa bokmÃ¤rke"
 
 id: LANG_BOOKMARK_MENU_LIST
 desc: Used off of the bookmark menu to list available bookmarks for the currently playing directory or M3U
 eng: "List Bookmarks"
 voice: "List Bookmarks"
-new: "Lista bokmärken"
+new: "Lista bokmÃ¤rken"
 
 id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
 desc: Text for the menu text to access the most recent bookmarks list
 eng: "Recent Bookmarks"
 voice: "Recent Bookmarks"
-new: "Nya bokmärken"
+new: "Nya bokmÃ¤rken"
 
 id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
 desc: Used on the bookmark select window to label bookmark number
 eng: "Bookmark"
 voice: ""
-new: "Bokmärke"
+new: "BokmÃ¤rke"
 
 id: LANG_BOOKMARK_SELECT_DELETE
 desc: Used on the bookmark select window to indicated the bookmark delete option
 eng: "ON+Play = Delete"
 voice: ""
-new: "PÅ+SPELA = Ta bort"
+new: "PÃ…+SPELA = Ta bort"
 
 id: LANG_BOOKMARK_SELECT_EXIT
 desc: From the bookmark list screen, allows user to exit
@@ -1851,7 +1851,7 @@ id: LANG_BOOKMARK_SELECT_PLAY
 desc: Used on the bookmark select window to indicated the play option
 eng: "PLAY = Select"
 voice: ""
-new: "SPELA = Välj"
+new: "SPELA = VÃ¤lj"
 
 id: LANG_BOOKMARK_SELECT_TIME_TEXT
 desc: Used on the bookmark select window to label elapsed time
@@ -1863,31 +1863,31 @@ id: LANG_BOOKMARK_SETTINGS
 desc: in general settings
 eng: "Bookmarking"
 voice: "Bookmarking"
-new: "Bokmärken"
+new: "BokmÃ¤rken"
 
 id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
 desc: prompt for user to decide to create an bookmark
 eng: "Bookmark on Stop"
 voice: "Bookmark on Stop"
-new: "Bokmärke vid stopp"
+new: "BokmÃ¤rke vid stopp"
 
 id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
 desc: prompt for user to decide to create a bookmark
 eng: "Load Last Bookmark"
 voice: "Load Last Bookmark"
-new: "Starta vid bokmärke"
+new: "Starta vid bokmÃ¤rke"
 
 id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
 desc: Configuration option to maintain a list of recent bookmarks
 eng: "Maintain a List of Recent Bookmarks?"
 voice: "Maintain a List of Recent Bookmarks?"
-new: "Spara en lista av nya bokmärken"
+new: "Spara en lista av nya bokmÃ¤rken"
 
 id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
 desc: Save in recent bookmarks only
 eng: "Ask - Recent only"
 voice: "Ask - Recent only"
-new: "Fråga - Bara nya"
+new: "FrÃ¥ga - Bara nya"
 
 id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
 desc: Save in recent bookmarks only
@@ -1923,19 +1923,19 @@ id: LANG_LIMITS_MENU
 desc: in the system sub menu
 eng: "Limits"
 voice: "Limits"
-new: "Gränser"
+new: "GrÃ¤nser"
 
 id: LANG_MANAGE_MENU
 desc: in the system sub menu
 eng: "Manage Settings"
 voice: "Manage Settings"
-new: "Hantera inställningar"
+new: "Hantera instÃ¤llningar"
 
 id: LANG_RECORDING_MENU
 desc: in the recording sub menu
 eng: "Recording screen"
 voice: "Recording screen"
-new: "Inspelningsskärm"
+new: "InspelningsskÃ¤rm"
 
 id: LANG_TIME_MENU
 desc: in the system sub menu
@@ -1971,13 +1971,13 @@ id: LANG_DISPLAY_FULL_PATH
 desc: track display options
 eng: "Full path"
 voice: "Full path"
-new: "Hela sökvägen"
+new: "Hela sÃ¶kvÃ¤gen"
 
 id: LANG_DISPLAY_TRACK_NAME_ONLY
 desc: track display options
 eng: "Track name only"
 voice: "Track name only"
-new: "Endast spårnamnet"
+new: "Endast spÃ¥rnamnet"
 
 id: LANG_FILE_OPTIONS
 desc: in playlist viewer on+play menu
@@ -2001,7 +2001,7 @@ id: LANG_TRACK_DISPLAY
 desc: in playlist viewer on+play menu
 eng: "Track Display"
 voice: "Track Display"
-new: "Visa spår"
+new: "Visa spÃ¥r"
 
 id: LANG_VIEW
 desc: in on+play menu
@@ -2325,13 +2325,13 @@ id: LANG_VOICE
 desc: root of voice menu
 eng: "Voice"
 voice: "Voice"
-new: "Röst"
+new: "RÃ¶st"
 
 id: LANG_VOICE_DIR
 desc: item of voice menu, set the "talkbox" mode for directories
 eng: "Voice Directories"
 voice: "Voice Directories"
-new: "Röstkataloger"
+new: "RÃ¶stkataloger"
 
 id: LANG_VOICE_DIR_ENTER
 desc: DEPRECATED
@@ -2349,13 +2349,13 @@ id: LANG_VOICE_FILE
 desc: item of voice menu, set the voive mode for files
 eng: "Voice Filenames"
 voice: "Voice Filenames"
-new: "Röstfilnamn"
+new: "RÃ¶stfilnamn"
 
 id: LANG_VOICE_MENU
 desc: item of voice menu, enable/disable the voice UI
 eng: "Voice Menus"
 voice: "Voice Menus"
-new: "Röstmeny"
+new: "RÃ¶stmeny"
 
 id: LANG_VOICE_NUMBER
 desc: "talkbox" mode for files+directories
@@ -2625,31 +2625,31 @@ id: LANG_FILETYPES_EXTENSION_FULL
 desc: Extension array full
 eng: "Extension array full"
 voice: ""
-new: "Tillägssamlingen är full"
+new: "TillÃ¤gssamlingen Ã¤r full"
 
 id: LANG_FILETYPES_FULL
 desc: Filetype array full
 eng: "Filetype array full"
 voice: ""
-new: "Filtypssamlingen är full"
+new: "Filtypssamlingen Ã¤r full"
 
 id: LANG_FILETYPES_PLUGIN_NAME_LONG
 desc: Viewer plugin name too long
 eng: "Plugin name too long"
 voice: ""
-new: "Insticksnamnet är för långt"
+new: "Insticksnamnet Ã¤r fÃ¶r lÃ¥ngt"
 
 id: LANG_FILETYPES_STRING_BUFFER_EMPTY
 desc: Filetype string buffer empty
 eng: "Filetype string buffer empty"
 voice: ""
-new: "Strängbufferten för filtyper är tom"
+new: "StrÃ¤ngbufferten fÃ¶r filtyper Ã¤r tom"
 
 id: LANG_ONPLAY_OPEN_WITH
 desc: Onplay open with
 eng: "Open with"
 voice: "open with"
-new: "Öppna med"
+new: "Ã–ppna med"
 
 id: LANG_SORT_ALPHA
 desc: browser sorting setting
@@ -2661,13 +2661,13 @@ id: LANG_SORT_DATE
 desc: browser sorting setting
 eng: "by date"
 voice: "by date"
-new: "på datum"
+new: "pÃ¥ datum"
 
 id: LANG_SORT_DATE_REVERSE
 desc: browser sorting setting
 eng: "by newest date"
 voice: "by newest date"
-new: "på senaste datum"
+new: "pÃ¥ senaste datum"
 
 id: LANG_SORT_DIR
 desc: browser sorting setting
@@ -2685,13 +2685,13 @@ id: LANG_SORT_TYPE
 desc: browser sorting setting
 eng: "by type"
 voice: "by type"
-new: "på typ"
+new: "pÃ¥ typ"
 
 id: LANG_FM_BUTTONBAR_ACTION
 desc: in radio screen
 eng: "Action"
 voice: ""
-new: "Sätt igång"
+new: "SÃ¤tt igÃ¥ng"
 
 id: LANG_FM_BUTTONBAR_ADD
 desc: in radio screen
@@ -2709,13 +2709,13 @@ id: LANG_FM_BUTTONBAR_EXIT
 desc: in radio screen
 eng: "Exit"
 voice: ""
-new: "Gå ur"
+new: "GÃ¥ ur"
 
 id: LANG_FM_EDIT_PRESET
 desc: in radio screen
 eng: "Edit preset"
 voice: ""
-new: "Redigera förinställningar"
+new: "Redigera fÃ¶rinstÃ¤llningar"
 
 id: LANG_FM_MONO_MODE
 desc: in radio screen
@@ -2739,7 +2739,7 @@ id: LANG_MDB_HARMONICS
 desc: in sound settings
 eng: "MDB Harmonics"
 voice: "MDB Harmonics"
-new: "MDB Övertoner"
+new: "MDB Ã–vertoner"
 
 id: LANG_MDB_SHAPE
 desc: in sound settings
@@ -2763,7 +2763,7 @@ id: LANG_CONFIRM_SHUTDOWN
 desc: in shutdown screen
 eng: "Press OFF to shut down"
 voice: ""
-new: "Tryck på AV för att avsluta"
+new: "Tryck pÃ¥ AV fÃ¶r att avsluta"
 
 id: LANG_ID3_ORDER
 desc: in playback settings screen
@@ -2793,13 +2793,13 @@ id: LANG_SHUTTINGDOWN
 desc: in main menu
 eng: "Shutting down..."
 voice: ""
-new: "Stänger av..."
+new: "StÃ¤nger av..."
 
 id: LANG_INSTALLATION_INCOMPLETE
 desc: in browse root
 eng: "Installation incomplete"
 voice: ""
-new: "Installationen ofullständig"
+new: "Installationen ofullstÃ¤ndig"
 
 id: LANG_NO_ROCKBOX_DIR
 desc: in browse root
@@ -2811,7 +2811,7 @@ id: LANG_REMOVE_MMC
 desc: before acknowledging usb in case an MMC is inserted (Ondio)
 eng: "Please remove inserted MMC"
 voice: "Please remove multimedia card"
-new: "Var vänlig ta bort instucken MMC"
+new: "Var vÃ¤nlig ta bort instucken MMC"
 
 id: VOICE_DOT
 desc: spoken only, for spelling
@@ -2859,7 +2859,7 @@ id: LANG_ID3DB_SONGS
 desc: ID3 virtual folder name
 eng: "Songs"
 voice: ""
-new: "Sånger"
+new: "SÃ¥nger"
 
 id: LANG_BATTERY_TYPE
 desc: in battery settings
@@ -2907,31 +2907,31 @@ id: LANG_ID3DB_MATCHES
 desc: ID3 virtual folder name
 eng: "Found %d matches"
 voice: ""
-new: "Fann %d träffar"
+new: "Fann %d trÃ¤ffar"
 
 id: LANG_ID3DB_SEARCH
 desc: ID3 virtual folder name
 eng: "Search"
 voice: ""
-new: "Sök"
+new: "SÃ¶k"
 
 id: LANG_ID3DB_SEARCH_ALBUMS
 desc: ID3 virtual folder name
 eng: "Search Albums"
 voice: ""
-new: "Sök album"
+new: "SÃ¶k album"
 
 id: LANG_ID3DB_SEARCH_ARTISTS
 desc: ID3 virtual folder name
 eng: "Search Artists"
 voice: ""
-new: "Sök artist"
+new: "SÃ¶k artist"
 
 id: LANG_ID3DB_SEARCH_SONGS
 desc: ID3 virtual folder name
 eng: "Search Songs"
 voice: ""
-new: "Sök sång"
+new: "SÃ¶k sÃ¥ng"
 
 id: LANG_KILOBYTE
 desc: a unit postfix, also voiced
@@ -2955,7 +2955,7 @@ id: LANG_ID3DB_ALL_SONGS
 desc: ID3 virtual folder name
 eng: "<All songs>"
 voice: ""
-new: "<Alla sånger>"
+new: "<Alla sÃ¥nger>"
 
 id: LANG_PLAYLIST
 desc: Used when you need to say playlist, also voiced
@@ -2967,7 +2967,7 @@ id: LANG_RECORD_STARTUP
 desc: Start Rockbox in Recording screen
 eng: "Show recording screen on startup"
 voice: "Show recording screen on startup"
-new: "Visa inspelningsskärm vid start"
+new: "Visa inspelningsskÃ¤rm vid start"
 
 id: LANG_ALARM_MOD_DISABLE
 desc: Announce that the RTC alarm has been turned off
@@ -2979,13 +2979,13 @@ id: LANG_RECORD_TRIGGER
 desc: in recording settings_menu
 eng: "Trigger"
 voice: "Trigger"
-new: "Startläge"
+new: "StartlÃ¤ge"
 
 id: LANG_RECORD_START_THRESHOLD
 desc: in recording settings_menu
 eng: "Start above"
 voice: 
-new: "Börja över"
+new: "BÃ¶rja Ã¶ver"
 
 id: LANG_RECORD_MIN_DURATION
 desc: in recording settings_menu
@@ -3015,13 +3015,13 @@ id: LANG_RECORD_TRIGGER_MODE
 desc: in recording settings_menu
 eng: "Trigger"
 voice: 
-new: "Startläge"
+new: "StartlÃ¤ge"
 
 id: LANG_RECORD_TRIG_NOREARM
 desc: in recording settings_menu
 eng: "Once"
 voice: 
-new: "En gång"
+new: "En gÃ¥ng"
 
 id: LANG_RECORD_TRIG_REARM
 desc: in recording settings_menu
@@ -3051,7 +3051,7 @@ id: LANG_LCD_REMOTE_MENU
 desc: in the display sub menu
 eng: "Remote-LCD Settings"
 voice: "Remote LCD settings"
-new: "Fjärr-LCD"
+new: "FjÃ¤rr-LCD"
 
 id: LANG_DISK_NAME_INTERNAL
 desc: in info menu; name for internal disk with multivolume (keep short!)
@@ -3093,7 +3093,7 @@ id: LANG_NOTHING_TO_RESUME
 desc: Error message displayed when resume button pressed but no playlist
 eng: "Nothing to resume"
 voice: ""
-new: "Inget att fortsätta"
+new: "Inget att fortsÃ¤tta"
 
 id: LANG_INSERT_SHUFFLED
 desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
@@ -3105,7 +3105,7 @@ id: LANG_SPDIF_ENABLE
 desc: in playback settings menu. enable/disable the optical out
 eng: "Optical output"
 voice: "Optical output"
-new: "Optisk utgång"
+new: "Optisk utgÃ¥ng"
 
 id: LANG_NEXT_FOLDER
 desc: in settings_menu. Should we allow move to next/prev folder from last/first track of current one
@@ -3117,19 +3117,19 @@ id: LANG_RUNTIMEDB_ACTIVE
 desc: in settings_menu.
 eng: "Gather runtime data (experimental)"
 voice: "Gather runtime data"
-new: "Samla kördata (experimentell)"
+new: "Samla kÃ¶rdata (experimentell)"
 
 id: LANG_MENU_SET_RATING
 desc: in wps context menu
 eng: "Set song rating"
 voice: "Set song rating"
-new: "Värdera sången"
+new: "VÃ¤rdera sÃ¥ngen"
 
 id: LANG_RATING
 desc: in set_rating
 eng: "Rating:"
 voice: "Rating"
-new: "Värdering:"
+new: "VÃ¤rdering:"
 
 id: LANG_CROSSFADE_DURATION
 desc: DEPRECATED
@@ -3153,31 +3153,31 @@ id: LANG_REPLAYGAIN
 desc: in replaygain
 eng: "Replaygain"
 voice: "Replaygain"
-new: "Volymutjämning"
+new: "VolymutjÃ¤mning"
 
 id: LANG_REPLAYGAIN_ENABLE
 desc: in replaygain
 eng: "Enable replaygain"
 voice: "Enable replaygain"
-new: "Aktivera volymutjämning"
+new: "Aktivera volymutjÃ¤mning"
 
 id: LANG_REPLAYGAIN_NOCLIP
 desc: in replaygain
 eng: "Prevent clipping"
 voice: "Prevent clipping"
-new: "Förhindra klippning"
+new: "FÃ¶rhindra klippning"
 
 id: LANG_REPLAYGAIN_MODE
 desc: in replaygain
 eng: "Replaygain type"
 voice: "Replaygain type"
-new: "Volymutjämningstyp"
+new: "VolymutjÃ¤mningstyp"
 
 id: LANG_TRACK_GAIN
 desc: in replaygain
 eng: "Track gain"
 voice: "Track gain"
-new: "Per spår"
+new: "Per spÃ¥r"
 
 id: LANG_ALBUM_GAIN
 desc: in replaygain
@@ -3189,13 +3189,13 @@ id: LANG_ID3_TRACK_GAIN
 desc: in browse_id3
 eng: "[Track gain]"
 voice: ""
-new: "[Spårvolymutjämning]"
+new: "[SpÃ¥rvolymutjÃ¤mning]"
 
 id: LANG_ID3_ALBUM_GAIN
 desc: in browse_id3
 eng: "[Album gain]"
 voice: ""
-new: "[Albumvolymutjämning]"
+new: "[AlbumvolymutjÃ¤mning]"
 
 id: LANG_ID3_NO_GAIN
 desc: DEPRECATED
@@ -3207,7 +3207,7 @@ id: LANG_REPLAYGAIN_PREAMP
 desc: in replaygain settings
 eng: "Pre-amp"
 voice: "Preamp"
-new: "Förförstärkning"
+new: "FÃ¶rfÃ¶rstÃ¤rkning"
 
 id: LANG_UNIT_DB
 desc: in browse_id3
@@ -3261,7 +3261,7 @@ id: LANG_SHUFFLE_GAIN
 desc: use track gain if shuffle mode is on, album gain otherwise
 eng: "Track gain if shuffling"
 voice: "Track gain if shuffling"
-new: "Spårvolymutjämning vid blandning"
+new: "SpÃ¥rvolymutjÃ¤mning vid blandning"
 
 id: LANG_DIRCACHE_ENABLE
 desc: in directory cache settings
@@ -3273,7 +3273,7 @@ id: LANG_DIRCACHE_REBOOT
 desc: when activating directory cache
 eng: "Please reboot to enable the cache"
 voice: ""
-new: "Starta om för att aktivera cachen"
+new: "Starta om fÃ¶r att aktivera cachen"
 
 id: LANG_DIRCACHE_BUILDING
 desc: when booting up and rebuilding the cache
@@ -3291,43 +3291,43 @@ id: LANG_CROSSFADE_FADE_IN_DELAY
 desc: in crossfade settings menu
 eng: "Fade in delay"
 voice: "Fade in delay"
-new: "Intoningsfördröjning"
+new: "IntoningsfÃ¶rdrÃ¶jning"
 
 id: LANG_CROSSFADE_FADE_OUT_DELAY
 desc: in crossfade settings menu
 eng: "Fade out delay"
 voice: "Fade out delay"
-new: "Uttoningsfördröjning"
+new: "UttoningsfÃ¶rdrÃ¶jning"
 
 id: LANG_CROSSFADE_FADE_IN_DURATION
 desc: in crossfade settings menu
 eng: "Fade in duration"
 voice: "Fade in duration"
-new: "Intoningslängd"
+new: "IntoningslÃ¤ngd"
 
 id: LANG_CROSSFADE_FADE_OUT_DURATION
 desc: in crossfade settings menu
 eng: "Fade out duration"
 voice: "Fade out duration"
-new: "Uttoningslängd"
+new: "UttoningslÃ¤ngd"
 
 id: LANG_CROSSFADE_FADE_OUT_MODE
 desc: in crossfade settings menu
 eng: "Fade out mode"
 voice: "Fade out mode"
-new: "Uttoningsläge"
+new: "UttoningslÃ¤ge"
 
 id: LANG_RECORDING_ADC_RIGHT
 desc: in the recording settings
 eng: "ADC Gain Right"
 voice: "ADC Gain Right"
-new: "Förstärkning höger ADC"
+new: "FÃ¶rstÃ¤rkning hÃ¶ger ADC"
 
 id: LANG_RECORDING_ADC_LEFT
 desc: in the recording settings
 eng: "ADC Gain Left"
 voice: "ADC Gain Left"
-new: "Förstärkning vänster ADC"
+new: "FÃ¶rstÃ¤rkning vÃ¤nster ADC"
 
 id: LANG_RECORDING_MONITOR
 desc: DEPRECATED
@@ -3339,19 +3339,19 @@ id: LANG_RADIO_SCAN_MODE
 desc: in radio screen / menu
 eng: "Scan"
 voice: ""
-new: "Sökning"
+new: "SÃ¶kning"
 
 id: LANG_RADIO_PRESET_MODE
 desc: in radio screen / menu
 eng: "Preset"
 voice: ""
-new: "Förinställning"
+new: "FÃ¶rinstÃ¤llning"
 
 id: LANG_FM_FREEZE
 desc: splash screen during freeze in radio mode
 eng: "Screen frozen!"
 voice: ""
-new: "Skärmen fryst!"
+new: "SkÃ¤rmen fryst!"
 
 id: LANG_CROSSFEED_ENABLE
 desc: DEPRECATED
@@ -3369,13 +3369,13 @@ id: LANG_FM_SCAN_PRESETS
 desc: in radio menu
 eng: "Auto scan presets"
 voice: "Auto scan presets"
-new: "Sök förinställnignar"
+new: "SÃ¶k fÃ¶rinstÃ¤llnignar"
 
 id: LANG_FM_SCANNING
 desc: during auto scan
 eng: "Scanning %d.%01dMHz"
 voice: ""
-new: "Söker vid %d.1d MHz"
+new: "SÃ¶ker vid %d.1d MHz"
 
 id: LANG_FM_DEFAULT_PRESET_NAME
 desc: default preset name for auto scan mode
@@ -3387,19 +3387,19 @@ id: LANG_FM_ADD_PRESET
 desc: in radio menu
 eng: "Add preset"
 voice: "Add preset"
-new: "Addera förinställning"
+new: "Addera fÃ¶rinstÃ¤llning"
 
 id: LANG_FM_CLEAR_PRESETS
 desc: confirmation if presets can be cleared
 eng: "Clear current presets?"
 voice: ""
-new: "Ta bort förinställningar?"
+new: "Ta bort fÃ¶rinstÃ¤llningar?"
 
 id: LANG_WAIT
 desc: general please wait splash
 eng: "Loading..."
 voice: ""
-new: "Läser..."
+new: "LÃ¤ser..."
 
 id: VOICE_EXT_RWPS
 desc: spoken only, for file extension
@@ -3429,4 +3429,4 @@ id: LANG_FM_TUNE_MODE
 desc: in radio screen / menu
 eng: "Mode:"
 voice: ""
-new: "Läge:"
+new: "LÃ¤ge:"

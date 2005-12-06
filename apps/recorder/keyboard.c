@@ -30,6 +30,7 @@
 #include "talk.h"
 #include "settings.h"
 #include "misc.h"
+#include "rbunicode.h"
 #include "buttonbar.h"
 #include "logf.h"
 
@@ -117,32 +118,32 @@
 
 #if KEYBOARD_PAGES == 1
 static const char * const kbdpages[KEYBOARD_PAGES][KEYBOARD_LINES] = {
-    {   "ABCDEFG abcdefg !?\" @#$%+'", 
+    {   "ABCDEFG abcdefg !?\" @#$%+'",
         "HIJKLMN hijklmn 789 &_()-`",
-        "OPQRSTU opqrstu 456 §|{}/<",  
+        "OPQRSTU opqrstu 456 Â§|{}/<",
         "VWXYZ., vwxyz.,0123 ~=[]*>",
-        "ÀÁÂÃÄÅÆ ÌÍÎÏ ÈÉÊË ¢£¤¥¦§©®",   
-        "àáâãäåæ ìíîï èéêë «»°ºª¹²³",
-        "ÓÒÔÕÖØ ÇĞŞİß ÙÚÛÜ ¯±×÷¡¿µ·",
-        "òóôõöø çğşıÿ ùúûü ¼½¾¬¶¨  "  },
+        "Ã€ÃÃ‚ÃƒÃ„Ã…Ã† ÃŒÃÃÃ ÃˆÃ‰ÃŠÃ‹ Â¢Â£Â¤Â¥Â¦Â§Â©Â®",
+        "Ã Ã¡Ã¢Ã£Ã¤Ã¥Ã¦ Ã¬Ã­Ã®Ã¯ Ã¨Ã©ÃªÃ« Â«Â»Â°ÂºÂªÂ¹Â²Â³",
+        "Ã“Ã’Ã”Ã•Ã–Ã˜ Ã‡ÃÃÃÃŸ Ã™ÃšÃ›Ãœ Â¯Â±Ã—Ã·Â¡Â¿ÂµÂ·",
+        "Ã²Ã³Ã´ÃµÃ¶Ã¸ Ã§Ã°Ã¾Ã½Ã¿ Ã¹ÃºÃ»Ã¼ Â¼Â½Â¾Â¬Â¶Â¨  "  },
 };
 
 #else
 static const char * const kbdpages[KEYBOARD_PAGES][KEYBOARD_LINES] = {
-    {   "ABCDEFG !?\" @#$%+'", 
+    {   "ABCDEFG !?\" @#$%+'",
         "HIJKLMN 789 &_()-`",
-        "OPQRSTU 456 §|{}/<",
+        "OPQRSTU 456 Â§|{}/<",
         "VWXYZ.,0123 ~=[]*>" },
 
-    {   "abcdefg ¢£¤¥¦§©®¬",   
-        "hijklmn «»°ºª¹²³¶",
-        "opqrstu ¯±×÷¡¿µ·¨",   
-        "vwxyz., ¼½¾      "  },
+    {   "abcdefg Â¢Â£Â¤Â¥Â¦Â§Â©Â®Â¬",
+        "hijklmn Â«Â»Â°ÂºÂªÂ¹Â²Â³Â¶",
+        "opqrstu Â¯Â±Ã—Ã·Â¡Â¿ÂµÂ·Â¨",
+        "vwxyz., Â¼Â½Â¾      "  },
 
-    {   "ÀÁÂÃÄÅÆ ÌÍÎÏ ÈÉÊË",   
-        "àáâãäåæ ìíîï èéêë",
-        "ÓÒÔÕÖØ ÇĞŞİß ÙÚÛÜ",
-        "òóôõöø çğşıÿ ùúûü"  },
+    {   "Ã€ÃÃ‚ÃƒÃ„Ã…Ã† ÃŒÃÃÃ ÃˆÃ‰ÃŠÃ‹",
+        "Ã Ã¡Ã¢Ã£Ã¤Ã¥Ã¦ Ã¬Ã­Ã®Ã¯ Ã¨Ã©ÃªÃ«",
+        "Ã“Ã’Ã”Ã•Ã–Ã˜ Ã‡ÃÃÃÃŸ Ã™ÃšÃ›Ãœ",
+        "Ã²Ã³Ã´ÃµÃ¶Ã¸ Ã§Ã°Ã¾Ã½Ã¿ Ã¹ÃºÃ»Ã¼"  },
 };
 
 #endif
@@ -178,18 +179,19 @@ int kbd_input(char* text, int buflen)
 #if defined(KBD_PAGE_FLIP) || (KEYBOARD_PAGES > 1)
     int page = 0;
 #endif
-    int font_w = 0, font_h = 0, i;
+    int font_w = 0, font_h = 0, i, j;
     int x = 0, y = 0;
     int main_x, main_y, max_chars;
     int status_y1, status_y2;
-    int len;
+    int len, len_utf8, c = 0;
     int editpos, curpos, leftpos;
     bool redraw = true;
+    unsigned char *utf8;
     const char * const *line;
 #ifdef HAVE_MORSE_INPUT
     bool morse_reading = false;
     unsigned char morse_code = 0;
-    int morse_tick = 0, morse_len, j;
+    int morse_tick = 0, morse_len;
     char buf[2];
 #endif
 #ifdef KBD_MODES
@@ -218,7 +220,7 @@ int kbd_input(char* text, int buflen)
     status_y1 = LCD_HEIGHT - font_h;
     status_y2 = LCD_HEIGHT;
 
-    editpos = strlen(text);
+    editpos = utf8length(text);
     
     max_chars = LCD_WIDTH / font_w - 2; /* leave room for < and > */
     line = kbdpages[0];
@@ -229,11 +231,12 @@ int kbd_input(char* text, int buflen)
     while(!done)
     {
         len = strlen(text);
+        len_utf8 = utf8length(text);
 
-        if (redraw)
+        if(redraw)
         {
             lcd_clear_display();
-            
+
             lcd_setfont(FONT_SYSFIXED);
 
 #ifdef HAVE_MORSE_INPUT
@@ -279,18 +282,24 @@ int kbd_input(char* text, int buflen)
 
             /* separator */
             lcd_hline(0, LCD_WIDTH - 1, main_y - KEYBOARD_MARGIN);
-            
+
             /* write out the text */
-            curpos = MIN(editpos, max_chars - MIN(len - editpos, 2));
+            curpos = MIN(editpos, max_chars - MIN(len_utf8 - editpos, 2));
             leftpos = editpos - curpos;
-            strncpy(outline, text + leftpos, max_chars);
-            outline[max_chars] = 0;
+            utf8 = text + utf8seek(text, leftpos);
+            i=j=0;
+            while (*utf8 && i < max_chars) {
+                outline[j++] = *utf8++;
+                if ((*utf8 & MASK) != COMP)
+                    i++;
+            }
+            outline[j] = 0;
             
             lcd_putsxy(font_w, main_y, outline);
 
             if (leftpos)
                 lcd_putsxy(0, main_y, "<");
-            if (len - leftpos > max_chars)
+            if (len_utf8 - leftpos > max_chars)
                 lcd_putsxy(LCD_WIDTH - font_w, main_y, ">");
             
             /* cursor */
@@ -361,7 +370,8 @@ int kbd_input(char* text, int buflen)
 #endif
                 }
                 line = kbdpages[page];
-                kbd_spellchar(line[y][x]);
+                c = utf8seek(line[y], x);
+                kbd_spellchar(line[y][c]);
                 break;
 #endif
 
@@ -374,16 +384,17 @@ int kbd_input(char* text, int buflen)
 #ifdef KBD_MODES
                 if (line_edit) /* right doubles as cursor_right in line_edit */
                 {
-                    if (editpos < len)
+                    if (editpos < len_utf8)
                     {
                         editpos++;
-                        kbd_spellchar(text[editpos]);
+                        c = utf8seek(text, editpos);
+                        kbd_spellchar(text[c]);
                     }
                 }
                 else
 #endif
                 {   
-                    if (x < (int)strlen(line[y]) - 1)
+                    if (x < (int)utf8length(line[y]) - 1)
                         x++;
                     else
                     {
@@ -395,7 +406,8 @@ int kbd_input(char* text, int buflen)
                         line = kbdpages[page];
 #endif
                     }
-                    kbd_spellchar(line[y][x]);
+                    c = utf8seek(line[y], x);
+                    kbd_spellchar(line[y][c]);
                 }
                 break;
 
@@ -411,7 +423,8 @@ int kbd_input(char* text, int buflen)
                     if (editpos)
                     {
                         editpos--;
-                        kbd_spellchar(text[editpos]);
+                        c = utf8seek(text, editpos);
+                        kbd_spellchar(text[c]);
                     }
                 }
                 else
@@ -427,9 +440,10 @@ int kbd_input(char* text, int buflen)
                             page = (KEYBOARD_PAGES-1);
                         line = kbdpages[page];
 #endif
-                        x = strlen(line[y]) - 1;
+                        x = utf8length(line[y]) - 1;
                     }
-                    kbd_spellchar(line[y][x]);
+                    c = utf8seek(line[y], x);
+                    kbd_spellchar(line[y][c]);
                 }
                 break;
 
@@ -458,7 +472,8 @@ int kbd_input(char* text, int buflen)
                 }
                 if (!line_edit)
 #endif
-                    kbd_spellchar(line[y][x]);
+                    c = utf8seek(line[y], x);
+                    kbd_spellchar(line[y][c]);
                 break;
 
             case KBD_UP:
@@ -486,7 +501,8 @@ int kbd_input(char* text, int buflen)
                 }
                 if (!line_edit)
 #endif
-                    kbd_spellchar(line[y][x]);
+                    c = utf8seek(line[y], x);
+                    kbd_spellchar(line[y][c]);
                 break;
 
             case KBD_DONE:
@@ -534,21 +550,38 @@ int kbd_input(char* text, int buflen)
                 {
                     if (editpos > 0)
                     {
-                        for (i = editpos; i < len; i++)
-                            text[i-1] = text[i];
-                        text[i-1] = '\0';
+                        utf8 = text + utf8seek(text, editpos);
+                        i = 0;
+                        do {
+                            i++;
+                            utf8--;
+                        } while ((*utf8 & MASK) == COMP);
+                        while (utf8[i]) {
+                            *utf8 = utf8[i];
+                            utf8++;
+                        }
+                        *utf8 = 0;
                         editpos--;
                     }
                 }
                 else
 #endif
                 {
-                    if (len + 1 < buflen)
+                    const unsigned char *inschar = line[y] + utf8seek(line[y], x);
+                    j = 0;
+                    do {
+                        j++;
+                    } while ((inschar[j] & MASK) == COMP);
+                    if (len + j < buflen)
                     {
-                        for (i = len ; i > editpos; i--)
-                            text[i] = text[i-1];
-                        text[len+1] = 0;
-                        text[editpos] = line[y][x];
+                        int k = len_utf8;
+                        for (i = len+j; k >= editpos; i--) {
+                            text[i] = text[i-j];
+                            if ((text[i] & MASK) != COMP)
+                                k--;
+                        }
+                        while (j--)
+                            text[i--] = inschar[j];
                         editpos++;
                     }
                 }
@@ -561,9 +594,17 @@ int kbd_input(char* text, int buflen)
             case KBD_BACKSPACE | BUTTON_REPEAT:
                 if (editpos > 0)
                 {
-                    for (i = editpos; i < len; i++)
-                        text[i-1] = text[i];
-                    text[i-1] = '\0';
+                    utf8 = text + utf8seek(text, editpos);
+                    i = 0;
+                    do {
+                        i++;
+                        utf8--;
+                    } while ((*utf8 & MASK) == COMP);
+                    while (utf8[i]) {
+                        *utf8 = utf8[i];
+                        utf8++;
+                    }
+                    *utf8 = 0;
                     editpos--;
                 }
                 if (global_settings.talk_menu) /* voice UI? */
@@ -572,10 +613,11 @@ int kbd_input(char* text, int buflen)
 
             case KBD_CURSOR_RIGHT:
             case KBD_CURSOR_RIGHT | BUTTON_REPEAT:
-                if (editpos < len)
+                if (editpos < len_utf8)
                 {
                     editpos++;
-                    kbd_spellchar(text[editpos]);
+                    c = utf8seek(text, editpos);
+                    kbd_spellchar(text[c]);
                 }
                 break;
 
@@ -584,7 +626,8 @@ int kbd_input(char* text, int buflen)
                 if (editpos)
                 {
                     editpos--;
-                    kbd_spellchar(text[editpos]);
+                    c = utf8seek(text, editpos);
+                    kbd_spellchar(text[c]);
                 }
                 break;
 #endif /* !KBD_MODES */

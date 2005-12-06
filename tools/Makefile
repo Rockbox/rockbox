@@ -10,7 +10,7 @@ CFLAGS := -O -ansi -g
 LDFLAGS := -g
 
 CLEANALL := scramble descramble iaudio sh2d bmp2rb rdf2binary convbdf	\
- generate_rocklatin mkboot ipod_fw uclpack
+ generate_rocklatin mkboot ipod_fw codepages uclpack
 
 all:
 	@echo "Run make in your build directory!"
@@ -39,6 +39,9 @@ ipod_fw:	ipod_fw.c
 	$(CC) -g $+ -o $@
 
 convbdf: convbdf.c
+	$(CC) -g $+ -o $@
+
+codepages: codepages.c
 	$(CC) -g $+ -o $@
 
 generate_rocklatin: generate_rocklatin.c ../firmware/drivers/lcd-player-charset.c 

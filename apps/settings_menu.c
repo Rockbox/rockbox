@@ -38,7 +38,6 @@
 #include "fat.h"                /* For dotfile settings */
 #include "sleeptimer.h"
 #include "powermgmt.h"
-#include "bidi.h"
 #include "rtc.h"
 #include "ata.h"
 #include "tree.h"
@@ -51,6 +50,7 @@
 #include "database.h"
 #include "dir.h"
 #include "dircache.h"
+#include "rbunicode.h"
 #include "splash.h"
 #include "yesno.h"
 
@@ -290,18 +290,6 @@ static bool invert_cursor(void)
                             NULL);
 }
  
- /**
- * Menu to reverse Hebrew and Arabic text according to BiDi algorythm
- */
-static bool bidi_support(void)
-{
-    return set_bool_options( str(LANG_BIDI_SUPPORT),
-                             &global_settings.bidi_support,
-                             STR(LANG_SET_BOOL_YES),
-                             STR(LANG_SET_BOOL_NO),
-                             set_bidi_support);
-}
-
 /**
  * Menu to configure the battery display on status bar
  */
@@ -1150,6 +1138,28 @@ static bool runtimedb(void)
     return rc;
 }
 
+static bool codepage_setting(void)
+{
+    static const struct opt_items names[] = {
+        { STR(LANG_CODEPAGE_LATIN1)          },
+        { STR(LANG_CODEPAGE_GREEK)           },
+        { STR(LANG_CODEPAGE_HEBREW)          },
+        { STR(LANG_CODEPAGE_RUSSIAN)         },
+        { STR(LANG_CODEPAGE_THAI)            },
+        { STR(LANG_CODEPAGE_ARABIC)          },
+        { STR(LANG_CODEPAGE_TURKISH)         },
+        { STR(LANG_CODEPAGE_LATIN_EXTENDED)  },
+        { STR(LANG_CODEPAGE_JAPANESE)        },
+        { STR(LANG_CODEPAGE_SIMPLIFIED)      },
+        { STR(LANG_CODEPAGE_KOREAN)          },
+        { STR(LANG_CODEPAGE_TRADITIONAL)     },
+        { STR(LANG_CODEPAGE_UTF8)            },
+    };
+    return set_option(str(LANG_DEFAULT_CODEPAGE),
+                      &global_settings.default_codepage,
+                      INT, names, 13, set_codepage );
+}
+
 #if CONFIG_CODEC == SWCODEC
 static bool replaygain(void)
 {
@@ -1606,8 +1616,8 @@ static bool display_settings_menu(void)
 #ifdef HAVE_LCD_BITMAP
         { ID2P(LANG_BARS_MENU),       bars_settings_menu },
         { ID2P(LANG_PM_MENU),         peak_meter_menu },
-        { ID2P(LANG_BIDI_SUPPORT),    bidi_support },
 #endif
+        { ID2P(LANG_DEFAULT_CODEPAGE),    codepage_setting },
     };
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL,

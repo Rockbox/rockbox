@@ -94,7 +94,7 @@ struct mp3entry {
 
     /* these following two fields are used for local buffering */
     char id3v2buf[300];
-    char id3v1buf[3][32];
+    char id3v1buf[3][92];
 
     /* resume related */
     unsigned long offset;  /* bytes played */

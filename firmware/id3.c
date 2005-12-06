@@ -42,6 +42,7 @@
 #include "mp3data.h"
 #include "system.h"
 #include "replaygain.h"
+#include "rbunicode.h"
 
 #define UNSYNC(b0,b1,b2,b3) (((long)(b0 & 0x7F) << (3*7)) | \
                              ((long)(b1 & 0x7F) << (2*7)) | \
@@ -359,100 +360,83 @@ static const struct tag_resolver taglist[] = {
 #define TAGLIST_SIZE ((int)(sizeof(taglist) / sizeof(taglist[0])))
 
 /* Checks to see if the passed in string is a 16-bit wide Unicode v2
-   string.  If it is, we attempt to convert it to a 8-bit ASCII string
-   (for valid 8-bit ASCII characters).  If it's not unicode, we leave
-   it alone.  At some point we should fully support unicode strings */
-static int unicode_munge(char* string, int *len) {
-   long tmp;
-   bool le = false;
-   int i;
-   char *str = string;
-   char *outstr = string;
-   bool bom = false;
-   int outlen;
+   string.  If it is, we convert it to a UTF-8 string.  If it's not unicode,
+   we convert from the default codepage */
+static int unicode_munge(char* string, char* utf8buf, int *len) {
+    long tmp;
+    bool le = false;
+    int i = 0;
+    char *str = string;
+    int templen = 0;
+    char* utf8 = utf8buf;
 
-   if(str[0] > 0x03) {
-      /* Plain old string */
-      return 0;
-   }
-   
-   /* Type 0x00 is ordinary ISO 8859-1 */
-   if(str[0] == 0x00) {
-      int i = --(*len);
+    switch (str[0]) {
+        case 0x00: /* Type 0x00 is ordinary ISO 8859-1 */
+            str++;
+            (*len)--;
+            utf8 = iso_decode(str, utf8, -1, *len);
+            *utf8 = 0;
+            *len = strlen(utf8buf);
+            break;
 
-      /* We must move the string to the left */
-      while (i--) {
-         string[0] = string[1];
-         string++;
-      }
+        case 0x01: /* Unicode with or without BOM */
+        case 0x02:
+            (*len)--;
+            str++;
 
-      return 0;
-   }
+            /* Handle frames with more than one string
+               (needed for TXXX frames).*/
+            do {
+                tmp = BYTES2INT(0, 0, str[0], str[1]);
 
-   /* Unicode with or without BOM */
-   if(str[0] == 0x01 || str[0] == 0x02) {
-      (*len)--;
-      str++;
-      i = 0;
-   
-      /* Handle frames with more than one string (needed for TXXX frames).
-       */
-      do {
-         tmp = BYTES2INT(0, 0, str[0], str[1]);
-    
-         /* Now check if there is a BOM (zero-width non-breaking space, 0xfeff)
-            and if it is in little or big endian format */
-         if(tmp == 0xfffe) { /* Little endian? */
-            bom = true;
-            le = true;
-            str += 2;
-            (*len)-=2;
-         }
-    
-         if(tmp == 0xfeff) { /* Big endian? */
-            bom = true;
-            str += 2;
-            (*len)-=2;
-         }
-    
-         /* If there is no BOM (which is a specification violation),
-    	    let's try to guess it. If one of the bytes is 0x00, it is
-    	    probably the most significant one. */
-         if(!bom) {
-            if(str[1] == 0)
-               le = true;
-         }
-      
-         outlen = *len / 2;
+                /* Now check if there is a BOM
+                   (zero-width non-breaking space, 0xfeff)
+                   and if it is in little or big endian format */
+                if(tmp == 0xfffe) { /* Little endian? */
+                    le = true;
+                    str += 2;
+                    (*len)-=2;
+                } else if(tmp == 0xfeff) { /* Big endian? */
+                    str += 2;
+                    (*len)-=2;
+                } else
+                /* If there is no BOM (which is a specification violation),
+                   let's try to guess it. If one of the bytes is 0x00, it is
+                   probably the most significant one. */
+                    if(str[1] == 0)
+                        le = true;
 
-         do {
-            if(le) {
-               if(str[1])
-                  outstr[i++] = '.';
-               else
-                  outstr[i++] = str[0];
-            } else {
-               if(str[0])
-                  outstr[i++] = '.';
-               else
-                  outstr[i++] = str[1];
-            }
-            str += 2;
-         } while((str[0] || str[1]) && (i < outlen));
+                do {
+                    if(le)
+                        utf8 = utf16LEdecode(str, utf8, 1);
+                    else
+                        utf8 = utf16BEdecode(str, utf8, 1);
 
-         str += 2;
-         outstr[i++] = 0; /* Terminate the string */
-      } while(i < outlen);
+                    str+=2;
+                    i += 2;
+                } while((str[0] || str[1]) && (i < *len));
 
-      *len = i - 1;
+                *utf8++ = 0; /* Terminate the string */
+                templen += (strlen(&utf8buf[templen]) + 1);
+                str += 2;
+                i+=2;
+            } while(i < *len);
+            *len = templen - 1;
+            break;
 
-      return 0;
-   }
+        case 0x03: /* UTF-8 encoded string */
+            for(i=0; i < *len; i++)
+                utf8[i] = str[i+1];
+            *len = strlen(utf8buf);
+            break;
 
-   /* If we come here, the string was of an unsupported type */
-   *len = 1;
-   outstr[0] = 0;
-   return -1;
+        default: /* Plain old string */
+            utf8 = iso_decode(str, utf8, -1, *len);
+            *utf8 = 0;
+            *len = strlen(utf8buf);
+            break;
+    }
+    return 0;
 }
 
 /*
@@ -468,6 +452,7 @@ static bool setid3v1title(int fd, struct mp3entry *entry)
     unsigned char buffer[128];
     static const char offsets[] = {3, 33, 63, 93, 125, 127};
     int i, j;
+    unsigned char* utf8;
 
     if (-1 == lseek(fd, -128, SEEK_END))
         return false;
@@ -482,8 +467,8 @@ static bool setid3v1title(int fd, struct mp3entry *entry)
     entry->id3version = ID3_VER_1_0;
 
     for (i=0; i < (int)sizeof offsets; i++) {
-        char* ptr = (char *)buffer + offsets[i];
-        
+        unsigned char* ptr = (unsigned char *)buffer + offsets[i];
+
         if (i<3) {
             /* kill trailing space in strings */
             for (j=29; j && ptr[j]==' '; j--)
@@ -492,18 +477,13 @@ static bool setid3v1title(int fd, struct mp3entry *entry)
 
         switch(i) {
             case 0:
-                strncpy(entry->id3v1buf[2], ptr, 30);
-                entry->title = entry->id3v1buf[2];
-                break;
-
             case 1:
-                strncpy(entry->id3v1buf[0], ptr, 30);
-                entry->artist = entry->id3v1buf[0];
-                break;
-
             case 2:
-                strncpy(entry->id3v1buf[1], ptr, 30);
-                entry->album = entry->id3v1buf[1];
+                /* convert string to utf8 */
+                utf8 = entry->id3v1buf[i];
+                utf8 = iso_decode(ptr, utf8, -1, 30);
+                /* make sure string is terminated */
+                *utf8 = 0;
                 break;
 
             case 3:
@@ -526,6 +506,10 @@ static bool setid3v1title(int fd, struct mp3entry *entry)
                 break;
         }
     }
+
+    entry->title = entry->id3v1buf[0];
+    entry->artist = entry->id3v1buf[1];
+    entry->album = entry->id3v1buf[2];
 
     return true;
 }
@@ -556,7 +540,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
     bool global_unsynch = false;
     bool unsynch = false;
     int data_length_ind;
-    int i;
+    int i, j;
     int rc;
 
     global_ff_found = false;
@@ -789,7 +773,18 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                 if(unsynch || (global_unsynch && version >= ID3_VER_2_4))
                     bytesread = unsynchronize_frame(tag, bytesread);
                 
-                unicode_munge( tag, &bytesread );
+
+                /* UTF-8 could potentially be 3 times larger */
+                /* so we need to create a new buffer         */
+                char utf8buf[(3 * bytesread) + 1];
+
+                unicode_munge( tag, utf8buf, &bytesread );
+
+                if(bytesread >= buffersize - bufferpos)
+                    bytesread = buffersize - bufferpos - 1;
+
+                for (j = 0; j < bytesread; j++)
+                    tag[j] = utf8buf[j];
 
                 if (ptag)
                     *ptag = tag;
@@ -809,7 +804,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                 break;
             }
         }
-        
+
         if( i == TAGLIST_SIZE ) {
             /* no tag in tagList was found, or it was a repeat.
                skip it using the total size */
@@ -839,7 +834,7 @@ int getid3v2len(int fd)
 {
     char buf[6];
     int offset;
-	
+
     /* Make sure file has a ID3 tag */
     if((-1 == lseek(fd, 0, SEEK_SET)) ||
        (read(fd, buf, 6) != 6) ||
@@ -955,7 +950,7 @@ bool mp3info(struct mp3entry *entry, const char *filename, bool v1first)
 #if CONFIG_CODEC != SWCODEC
     memset(entry, 0, sizeof(struct mp3entry));
 #endif
-	
+
     strncpy(entry->path, filename, sizeof(entry->path));
  
     entry->title = NULL;

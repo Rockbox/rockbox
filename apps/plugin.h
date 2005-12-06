@@ -57,6 +57,7 @@
 #endif
 #include "sound.h"
 #include "menu.h"
+#include "rbunicode.h"
 
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
@@ -90,7 +91,7 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 52
+#define PLUGIN_API_VERSION 53
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -441,7 +442,14 @@ struct plugin_api {
 
 #ifdef HAVE_LCD_BITMAP
     void (*screen_dump_set_hook)(void (*hook)(int fh));
+    int (*font_get_width)(struct font* pf, unsigned short char_code);
 #endif
+    const unsigned char* (*utf8decode)(const unsigned char *utf8, unsigned short *ucs);
+    unsigned char* (*iso_decode)(const unsigned char *iso, unsigned char *utf8, int cp, int count);
+    unsigned char* (*utf16LEdecode)(const unsigned char *utf16, unsigned char *utf8, unsigned int count);
+    unsigned char* (*utf16BEdecode)(const unsigned char *utf16, unsigned char *utf8, unsigned int count);
+    unsigned char* (*utf8encode)(unsigned long ucs, unsigned char *utf8);
+    unsigned long (*utf8length)(const unsigned char *utf8);
 };
 
 int plugin_load(const char* plugin, void* parameter);

@@ -1168,7 +1168,7 @@ id: LANG_CREATING
 desc: Screen feedback during playlist creation
 eng: "Creating"
 voice: "" 
-new: "Creeëren..."
+new: "CreeÃ«ren..."
 
 id: LANG_FADE_ON_STOP
 desc: options menu to set fade on stop or pause
@@ -1365,8 +1365,8 @@ new: ""
 id: LANG_INVERT_LCD_INVERSE
 desc: in settings_menu
 eng: "Inverse"
-voice: "Geïnverteerd"
-new: "Geïnverteerd"
+voice: "GeÃ¯nverteerd"
+new: "GeÃ¯nverteerd"
 
 id: LANG_INVERT_LCD_NORMAL
 desc: in settings_menu

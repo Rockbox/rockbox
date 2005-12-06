@@ -177,7 +177,7 @@ id: LANG_SCROLL
 desc: in settings_menu
 eng: "Scroll Speed Setting Example"
 voice: 
-new: "Esempio velocit‡ scorrimento impostata"
+new: "Esempio velocit√† scorrimento impostata"
 
 id: LANG_DISCHARGE
 desc: DEPRECATED
@@ -375,7 +375,7 @@ id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Is Full!"
 voice: 
-new: "Ë pieno!"
+new: "√® pieno!"
 
 id: LANG_RESUME_ASK
 desc: DEPRECATED
@@ -537,7 +537,7 @@ id: LANG_PITCH_DOWN
 desc: in wps
 eng: "Pitch Down"
 voice: 
-new: "Tono gi˘"
+new: "Tono gi√π"
 
 id: LANG_PAUSE
 desc: in wps
@@ -584,8 +584,8 @@ new: "Fine della playlist"
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
 eng: "Idle Poweroff"
-voice: "Spegnimento per Inattivit‡"
-new: "Spegnimento per inattivit‡"
+voice: "Spegnimento per Inattivit√†"
+new: "Spegnimento per inattivit√†"
 
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
@@ -662,8 +662,8 @@ new: "Eterno"
 id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
 eng: "Units Per Read"
-voice: "Unit‡ per lettura"
-new: "Unit‡ per lettura"
+voice: "Unit√† per lettura"
+new: "Unit√† per lettura"
 
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
@@ -938,8 +938,8 @@ new: "Destro"
 id: LANG_RECORDING_QUALITY
 desc: in the recording settings
 eng: "Quality"
-voice: "Qualit‡"
-new: "Qualit‡"
+voice: "Qualit√†"
+new: "Qualit√†"
 
 id: LANG_RECORDING_FREQUENCY
 desc: in the recording settings
@@ -1052,8 +1052,8 @@ new: "Testo d'esempio per il passo di scorrimento corrente"
 id: LANG_SCROLL_SPEED
 desc: in display_settings_menu()
 eng: "Scroll Speed"
-voice: "Velocit‡ Scorrimento"
-new: "Velocit‡ scorrimento"
+voice: "Velocit√† Scorrimento"
+new: "Velocit√† scorrimento"
 
 id: LANG_TRICKLE_CHARGE
 desc: DEPRECATED
@@ -1076,8 +1076,8 @@ new: "Batteria: Mantenimento carica"
 id: LANG_BATTERY_CAPACITY
 desc: in settings_menu
 eng: "Battery Capacity"
-voice: "Capacit‡ Batteria"
-new: "Capacit‡ batteria"
+voice: "Capacit√† Batteria"
+new: "Capacit√† batteria"
 
 id: LANG_MENU_SETTING_CANCEL
 desc: Visual confirmation of canceling a changed setting
@@ -1149,7 +1149,7 @@ id: LANG_ALARM_MOD_ERROR
 desc: The text that tells that the time is incorrect (for the RTC alarm mod).
 eng: "Alarm Time Is Too Soon!"
 voice: 
-new: "L'orario impostato Ë troppo vicino!"
+new: "L'orario impostato √® troppo vicino!"
 
 id: LANG_ALARM_MOD_KEYS
 desc: Shown key functions in alarm menu (for the RTC alarm mod).
@@ -1648,8 +1648,8 @@ new: "Avvia plugins"
 id: LANG_CAR_ADAPTER_MODE
 desc: Displayed for setting car adapter mode to on/off
 eng: "Car Adapter Mode"
-voice: "Modalit‡ Adattatore Auto"
-new: "Modalit‡ adattatore auto"
+voice: "Modalit√† Adattatore Auto"
+new: "Modalit√† adattatore auto"
 
 id: LANG_LINE_IN
 desc: in settings_menu
@@ -1667,7 +1667,7 @@ id: LANG_BUTTONBAR_MENU
 desc: in button bar
 eng: "Menu"
 voice: ""
-new: "Men˘"
+new: "Men√π"
 
 id: LANG_FM_BUTTONBAR_PRESETS
 desc: in button bar
@@ -1709,7 +1709,7 @@ id: LANG_FM_NO_FREE_PRESETS
 desc: in radio screen
 eng: "The preset list is full"
 voice: ""
-new: "La lista delle stazioni Ë piena"
+new: "La lista delle stazioni √® piena"
 
 id: LANG_FM_RADIO
 desc: in main menu
@@ -2027,7 +2027,7 @@ id: LANG_DIRBROWSE_F1
 desc: in dir browser, F1 button bar text
 eng: "Menu"
 voice: ""
-new: "Men˘"
+new: "Men√π"
 
 id: LANG_DIRBROWSE_F2
 desc: in dir browser, F2 button bar text
@@ -2242,7 +2242,7 @@ new:
 id: VOICE_PLUS
 desc: spoken only, for composing numbers
 eng: ""
-voice: "pi˘"
+voice: "pi√π"
 new: 
 
 id: VOICE_POINT
@@ -2356,8 +2356,8 @@ new: "Voce"
 id: LANG_VOICE_MENU
 desc: item of voice menu, enable/disable the voice UI
 eng: "Voice Menus"
-voice: "Pronuncia Men˘"
-new: "Pronuncia men˘"
+voice: "Pronuncia Men√π"
+new: "Pronuncia men√π"
 
 id: LANG_VOICE_DIR
 desc: item of voice menu, set the "talkbox" mode for directories
@@ -2686,8 +2686,8 @@ new: "Per data"
 id: LANG_SORT_DATE_REVERSE
 desc: browser sorting setting
 eng: "by newest date"
-voice: "dal pi˘ recente"
-new: "Dal pi˘ recente"
+voice: "dal pi√π recente"
+new: "Dal pi√π recente"
 
 id: LANG_SORT_TYPE
 desc: browser sorting setting
@@ -2734,8 +2734,8 @@ new: "Azione"
 id: LANG_MDB_STRENGTH
 desc: in sound settings
 eng: "MDB Strength"
-voice: "Intensit‡ MDB"
-new: "Intensit‡ MDB"
+voice: "Intensit√† MDB"
+new: "Intensit√† MDB"
 
 id: LANG_MDB_HARMONICS
 desc: in sound settings
@@ -2788,8 +2788,8 @@ new: "Premere OFF per spegnere"
 id: LANG_ID3_ORDER
 desc: in playback settings screen
 eng: "ID3 tag priority"
-voice: "Priorit‡ ID3 tag"
-new: "Priorit‡ info ID3"
+voice: "Priorit√† ID3 tag"
+new: "Priorit√† info ID3"
 
 id: LANG_ID3_V1_FIRST
 desc: in playback settings screen

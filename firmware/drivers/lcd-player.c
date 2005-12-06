@@ -31,6 +31,7 @@
 #include "system.h"
 #include "font.h"
 #include "lcd-player-charset.h"
+#include "rbunicode.h"
 
 /*** definitions ***/
 
@@ -323,9 +324,24 @@ static void lcd_puts_cont_scroll(int x, int y, const unsigned char *string)
 }
 void lcd_puts(int x, int y, const unsigned char *string)
 {
+    int i=0;
+    unsigned short ucs;
+    const unsigned char *utf8 = string;
+    unsigned char tmp[12];
+
+    while (*utf8 && i<11) {
+        utf8 = utf8decode(utf8, &ucs);
+        if (ucs < 256)
+            tmp[i++] = ucs;
+        else
+            tmp[i++] = '?';
+    }
+
+    tmp[i] = 0;
+
     DEBUGF("lcd_puts(%d, %d) -> ", x, y);
     scroll[y].mode=SCROLL_MODE_OFF;
-    return lcd_puts_cont_scroll(x, y, string);
+    return lcd_puts_cont_scroll(x, y, tmp);
 }
 
 void lcd_put_cursor(int x, int y, char cursor_char)
@@ -627,14 +643,28 @@ void lcd_bidir_scroll(int percent)
 void lcd_puts_scroll(int x, int y, const unsigned char* string )
 {
     struct scrollinfo* s;
-    int i;
+    int i=0;
+    unsigned short ucs;
+    const unsigned char *utf8 = string;
+    unsigned char tmp[utf8length(string)+1];
+
+    while (*utf8) {
+        utf8 = utf8decode(utf8, &ucs);
+        if (ucs < 256)
+            tmp[i++] = ucs;
+        else
+            tmp[i++] = '?';
+    }
+
+    tmp[i] = 0;
+
 
     DEBUGF("lcd_puts_scroll(%d, %d, %s)\n", x, y, string);
 
     s = &scroll[y];
 
-    lcd_puts_cont_scroll(x,y,string);
-    s->textlen = strlen(string);
+    lcd_puts_cont_scroll(x,y,tmp);
+    s->textlen = strlen(tmp);
 
     if ( s->textlen > 11-x ) {
         s->mode = SCROLL_MODE_RUN;
@@ -649,7 +679,7 @@ void lcd_puts_scroll(int x, int y, const unsigned char* string )
             s->jump_scroll_steps=11-x;
             s->jump_scroll=jump_scroll;
         }
-        strncpy(s->text,string,sizeof s->text);
+        strncpy(s->text,tmp,sizeof s->text);
         s->turn_offset=-1;
         if (bidir_limit && (s->textlen < ((11-x)*(100+bidir_limit))/100)) {
             s->turn_offset=s->textlen+x-11;

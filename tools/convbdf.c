@@ -443,6 +443,7 @@ int bdf_read_header(FILE *fp, struct font* pf)
         return 0;
     }
 
+    fprintf(stderr, "Header parsed\n");
     return 1;
 }
 
@@ -955,6 +956,7 @@ int gen_c_source(struct font* pf, char *path)
             "  %s  /* offset */\n"
             "  %s\n"
             "  %d,  /* defaultchar */\n"
+            "  %d   /* bits_size */\n"
             "};\n"
             "#endif /* HAVE_LCD_BITMAP */\n",
             pf->maxwidth, pf->height,
@@ -963,7 +965,8 @@ int gen_c_source(struct font* pf, char *path)
             pf->size,
             obuf,
             buf,
-            pf->defaultchar);
+            pf->defaultchar,
+            pf->bits_size);
 
     return 0;
 }
@@ -1071,12 +1074,29 @@ int gen_fnt_file(struct font* pf, char *path)
         ofr += size;
     }
 
-    if (ftell(ofp) & 1)
-        writebyte(ofp, 0);		/* pad to 16-bit boundary*/
+    if ( pf->bits_size < 0xFFDB )
+    {
+        /* bitmap offset is small enough, use unsigned short for offset */
+        if (ftell(ofp) & 1)
+            writebyte(ofp, 0);          /* pad to 16-bit boundary*/
+    }
+    else
+    {
+        /* bitmap offset is large then 64K, use unsigned long for offset */
+        while (ftell(ofp) & 3)
+            writebyte(ofp, 0);          /* pad to 32-bit boundary*/
+    }
 
     if (pf->offset)
+    {
         for (i=0; i<pf->size; ++i)
-            writeshort(ofp, pf->offrot[i]);
+        {
+            if ( pf->bits_size < 0xFFDB )
+                writeshort(ofp, pf->offrot[i]);
+            else
+                writelong(ofp, pf->offrot[i]);
+        }
+    }
 
     if (pf->width)
         for (i=0; i<pf->size; ++i)

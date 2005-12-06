@@ -58,7 +58,7 @@ id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
 eng: "Battery: Charging"
 voice: ""
-new: "Akku: lädt"
+new: "Akku: lÃ¤dt"
 
 id: LANG_PLAYLIST_LOAD
 desc: displayed on screen while loading a playlist
@@ -135,14 +135,14 @@ new: "Zufallswiedergabe"
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play Selected First"
-voice: "Gewählte zuerst wiedergeben"
-new: "Gewählte zuerst wiedergeben"
+voice: "GewÃ¤hlte zuerst wiedergeben"
+new: "GewÃ¤hlte zuerst wiedergeben"
 
 id: LANG_SORT_CASE
 desc: in settings_menu
 eng: "Sort Case Sensitive"
-voice: "Sortiere Groß- und Kleinschreibung"
-new: "Sortiere Groß-/Kleinschreibung"
+voice: "Sortiere GroÃŸ- und Kleinschreibung"
+new: "Sortiere GroÃŸ-/Kleinschreibung"
 
 id: LANG_RESUME
 desc: in settings_menu
@@ -178,7 +178,7 @@ id: LANG_SCROLL
 desc: in settings_menu
 eng: "Scroll Speed Setting Example"
 voice: ""
-new: "Beispieltext für die Scrollgeschwindigkeit"
+new: "Beispieltext fÃ¼r die Scrollgeschwindigkeit"
 
 id: LANG_DISCHARGE
 desc: DEPRECATED
@@ -232,7 +232,7 @@ id: LANG_RESET_DONE_CLEAR
 desc: visual confirmation after settings reset
 eng: "Cleared"
 voice: ""
-new: "Gelöscht"
+new: "GelÃ¶scht"
 
 id: LANG_RESET_DONE_CANCEL
 desc: Visual confirmation of cancelation
@@ -255,8 +255,8 @@ new: "Scroll-Einstellungen"
 id: LANG_RESET
 desc: in system_settings_menu()
 eng: "Reset Settings"
-voice: "Einstellungen zurücksetzen"
-new: "Einstellungen zurücksetzen"
+voice: "Einstellungen zurÃ¼cksetzen"
+new: "Einstellungen zurÃ¼cksetzen"
 
 id: LANG_PLAYBACK
 desc: in settings_menu()
@@ -285,8 +285,8 @@ new: "System"
 id: LANG_VOLUME
 desc: in sound_settings
 eng: "Volume"
-voice: "Lautstärke"
-new: "Lautstärke"
+voice: "LautstÃ¤rke"
+new: "LautstÃ¤rke"
 
 id: LANG_BALANCE
 desc: in sound_settings
@@ -303,8 +303,8 @@ new: "Bass"
 id: LANG_TREBLE
 desc: in sound_settings
 eng: "Treble"
-voice: "Höhen"
-new: "Höhen"
+voice: "HÃ¶hen"
+new: "HÃ¶hen"
 
 id: LANG_LOUDNESS
 desc: in sound_settings
@@ -322,13 +322,13 @@ id: LANG_DECAY
 desc: in sound_settings
 eng: "AV Decay Time"
 voice: ""
-new: "AV-Trägheit"
+new: "AV-TrÃ¤gheit"
 
 id: LANG_CHANNEL_MENU
 desc: in sound_settings
 eng: "Channels"
-voice: "Kanäle"
-new: "Kanäle"
+voice: "KanÃ¤le"
+new: "KanÃ¤le"
 
 id: LANG_CHANNEL
 desc: in sound_settings
@@ -363,8 +363,8 @@ new: "Mono rechts"
 id: LANG_AUTOVOL
 desc: in sound_settings
 eng: "Auto Volume"
-voice: "Automatische Lautstärke"
-new: "Autom. Lautstärke"
+voice: "Automatische LautstÃ¤rke"
+new: "Autom. LautstÃ¤rke"
 
 id: LANG_SHOWDIR_ERROR_BUFFER
 desc: in showdir(), displayed on screen when you reach buffer limit
@@ -466,7 +466,7 @@ id: LANG_ID3_ARTIST
 desc: in wps
 eng: "[Artist]"
 voice: ""
-new: "[Künstler]"
+new: "[KÃ¼nstler]"
 
 id: LANG_ID3_NO_ARTIST
 desc: DEPRECATED
@@ -502,7 +502,7 @@ id: LANG_ID3_LENGHT
 desc: in wps
 eng: "[Length]"
 voice: ""
-new: "[Länge]"
+new: "[LÃ¤nge]"
 
 id: LANG_ID3_PLAYLIST
 desc: in wps
@@ -609,8 +609,8 @@ new: "Musik"
 id: LANG_FILTER_SUPPORTED
 desc: show all file types supported by Rockbox
 eng: "Supported"
-voice: "Unterstützte"
-new: "Unterstützte"
+voice: "UnterstÃ¼tzte"
+new: "UnterstÃ¼tzte"
 
 id: LANG_FILTER_ALL
 desc: show all files
@@ -651,8 +651,8 @@ new: "Aussteuerung Haltezeit"
 id: LANG_PM_CLIP_HOLD
 desc: in the peak meter menu
 eng: "Clip Hold Time"
-voice: "Übersteuerung Haltezeit"
-new: "Übersteuerung Haltezeit"
+voice: "Ãœbersteuerung Haltezeit"
+new: "Ãœbersteuerung Haltezeit"
 
 id: LANG_PM_ETERNAL
 desc: in the peak meter menu
@@ -777,8 +777,8 @@ new: "Feb"
 id: LANG_MONTH_MARCH
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Mar"
-voice: "März"
-new: "Mär"
+voice: "MÃ¤rz"
+new: "MÃ¤r"
 
 id: LANG_MONTH_APRIL
 desc: Maximum 3-letter abbreviation for monthname
@@ -849,8 +849,8 @@ new: "Batterieanzeige"
 id: LANG_VOLUME_DISPLAY
 desc: Volume type title
 eng: "Volume Display"
-voice: "Lautstärkeanzeige"
-new: "Lautstärkeanzeige"
+voice: "LautstÃ¤rkeanzeige"
+new: "LautstÃ¤rkeanzeige"
 
 id: LANG_DISPLAY_GRAPHIC
 desc: Label for type of icon display
@@ -909,8 +909,8 @@ new: "Kleinster Wert"
 id: LANG_PM_MAX
 desc: in the peak meter menu
 eng: "Maximum Of Range"
-voice: "Größter Wert"
-new: "Größter Wert"
+voice: "GrÃ¶ÃŸter Wert"
+new: "GrÃ¶ÃŸter Wert"
 
 id: LANG_RECORDING
 desc: in the main menu
@@ -939,8 +939,8 @@ new: "V. Rechts"
 id: LANG_RECORDING_QUALITY
 desc: in the recording settings
 eng: "Quality"
-voice: "Qualität"
-new: "Qualität"
+voice: "QualitÃ¤t"
+new: "QualitÃ¤t"
 
 id: LANG_RECORDING_FREQUENCY
 desc: in the recording settings
@@ -957,8 +957,8 @@ new: "Quelle"
 id: LANG_RECORDING_CHANNELS
 desc: in the recording settings
 eng: "Channels"
-voice: "Kanäle"
-new: "Kanäle"
+voice: "KanÃ¤le"
+new: "KanÃ¤le"
 
 id: LANG_RECORDING_SRC_MIC
 desc: in the recording settings
@@ -1023,8 +1023,8 @@ new: "Einschlaftimer"
 id: LANG_MP3BUFFER_MARGIN
 desc: MP3 buffer margin time
 eng: "Anti-Skip Buffer"
-voice: "Puffer vorzeitig füllen"
-new: "Puffer vorzeitig füllen"
+voice: "Puffer vorzeitig fÃ¼llen"
+new: "Puffer vorzeitig fÃ¼llen"
 
 id: LANG_BIDIR_SCROLL
 desc: Bidirectional scroll limit
@@ -1035,8 +1035,8 @@ new: "Bidirektionales Scroll-Limit"
 id: LANG_SCROLL_DELAY
 desc: Delay before scrolling
 eng: "Scroll Start Delay"
-voice: "Start-Verzögerung"
-new: "Start-Verzögerung"
+voice: "Start-VerzÃ¶gerung"
+new: "Start-VerzÃ¶gerung"
 
 id: LANG_SCROLL_STEP
 desc: Pixels to advance per scroll
@@ -1048,7 +1048,7 @@ id: LANG_SCROLL_STEP_EXAMPLE
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size Setting Example Text"
 voice: ""
-new: "Beispieltext für die Schrittweite"
+new: "Beispieltext fÃ¼r die Schrittweite"
 
 id: LANG_SCROLL_SPEED
 desc: in display_settings_menu()
@@ -1066,7 +1066,7 @@ id: LANG_BATTERY_TOPOFF_CHARGE
 desc: in info display, shows that top off charge is running
 eng: "Battery: Top-Off Chg"
 voice: ""
-new: "Akku: Übergangsladen"
+new: "Akku: Ãœbergangsladen"
 
 id: LANG_BATTERY_TRICKLE_CHARGE
 desc: in info display, shows that trickle charge is running
@@ -1077,8 +1077,8 @@ new: "Akku: Erhaltladen"
 id: LANG_BATTERY_CAPACITY
 desc: in settings_menu
 eng: "Battery Capacity"
-voice: "Batteriekapazität"
-new: "Batteriekapazität"
+voice: "BatteriekapazitÃ¤t"
+new: "BatteriekapazitÃ¤t"
 
 id: LANG_MENU_SETTING_CANCEL
 desc: Visual confirmation of canceling a changed setting
@@ -1095,20 +1095,20 @@ new: "In Warteschlange stellen"
 id: LANG_DELETE
 desc: The verb/action Delete
 eng: "Delete"
-voice: "Löschen"
-new: "Löschen"
+voice: "LÃ¶schen"
+new: "LÃ¶schen"
 
 id: LANG_REALLY_DELETE
 desc: Really Delete?
 eng: "Delete?"
 voice: ""
-new: "Löschen?"
+new: "LÃ¶schen?"
 
 id: LANG_DELETED
 desc: A file has beed deleted
 eng: "Deleted"
 voice: ""
-new: "Gelöscht"
+new: "GelÃ¶scht"
 
 id: LANG_RENAME
 desc: The verb/action Rename
@@ -1150,7 +1150,7 @@ id: LANG_ALARM_MOD_ERROR
 desc: The text that tells that the time is incorrect (for the RTC alarm mod).
 eng: "Alarm Time Is Too Soon!"
 voice: ""
-new: "Weckzeit ist zu früh!"
+new: "Weckzeit ist zu frÃ¼h!"
 
 id: LANG_ALARM_MOD_KEYS
 desc: Shown key functions in alarm menu (for the RTC alarm mod).
@@ -1228,7 +1228,7 @@ id: LANG_RECORDING_SIZE
 desc: Display of recorded file size
 eng: "Size:"
 voice: ""
-new: "Größe:"
+new: "GrÃ¶ÃŸe:"
 
 id: LANG_SETTINGS_LOADED1
 desc: Feedback shown when a .cfg file is loaded
@@ -1329,8 +1329,8 @@ new: "Zeilenauswahl"
 id: LANG_RECORDING_EDITABLE
 desc: Editable recordings setting
 eng: "Independent frames"
-voice: "Unabhängige mp3-Rahmen"
-new: "Unabhängige mp3-Frames"
+voice: "UnabhÃ¤ngige mp3-Rahmen"
+new: "UnabhÃ¤ngige mp3-Frames"
 
 id: LANG_STATUS_BAR
 desc: display menu, F3 substitute
@@ -1383,8 +1383,8 @@ new: "Max Anzahl Dateien in Verzeichnisanzeige"
 id: LANG_MAX_FILES_IN_PLAYLIST
 desc: in settings_menu
 eng: "Max playlist size"
-voice: "Maximale Länge Abspielliste"
-new: "Max Playlist-Länge"
+voice: "Maximale LÃ¤nge Abspielliste"
+new: "Max Playlist-LÃ¤nge"
 
 id: LANG_JUMP_SCROLL
 desc: (player) menu altarnative for jump scroll
@@ -1407,14 +1407,14 @@ new: "Immer"
 id: LANG_JUMP_SCROLL_DELAY
 desc: (player) Delay before making a jump scroll
 eng: "Jump Scroll Delay"
-voice: "Sprung-Scroll Verzögerung"
-new: "Sprung-Scroll Verzögerung"
+voice: "Sprung-Scroll VerzÃ¶gerung"
+new: "Sprung-Scroll VerzÃ¶gerung"
 
 id: LANG_RECORD_TIMESPLIT
 desc: Prompt for record timer interval setting, in the record settings menu
 eng: "Time Split"
-voice: "Zeitabhängiges Aufteilen"
-new: "Zeitabhängiges Aufteilen"
+voice: "ZeitabhÃ¤ngiges Aufteilen"
+new: "ZeitabhÃ¤ngiges Aufteilen"
 
 id: LANG_RECORD_TIMESPLIT_REC
 desc: Display of record timer interval setting, on the record screen
@@ -1432,7 +1432,7 @@ id: LANG_DISK_FULL
 desc: in recording screen
 eng: "The disk is full. Press OFF to continue."
 voice: ""
-new: "Festplatte voll. Drücke OFF zum fortfahren."
+new: "Festplatte voll. DrÃ¼cke OFF zum fortfahren."
 
 id: LANG_CONFIRM_WITH_PLAY_RECORDER
 desc: Generic recorder string to use to confirm
@@ -1454,7 +1454,7 @@ id: LANG_PLUGIN_CANT_OPEN
 desc: Plugin open error message
 eng: "Can't open %s"
 voice: ""
-new: "Kann %s nicht öffnen"
+new: "Kann %s nicht Ã¶ffnen"
 
 id: LANG_READ_FAILED
 desc: There was an error reading a file
@@ -1488,7 +1488,7 @@ id: LANG_BOOT_CHANGED
 desc: File browser discovered the boot file was changed
 eng: "Boot changed"
 voice: ""
-new: "Boot geändert"
+new: "Boot geÃ¤ndert"
 
 id: LANG_REBOOT_NOW
 desc: Do you want to reboot?
@@ -1505,26 +1505,26 @@ new: "Warteschlange als Letzten"
 id: LANG_INSERT
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
 eng: "Insert"
-voice: "Einfügen"
-new: "Einfügen"
+voice: "EinfÃ¼gen"
+new: "EinfÃ¼gen"
 
 id: LANG_INSERT_LAST
 desc: in onplay menu.  append a track/playlist into dynamic playlist.
 eng: "Insert last"
-voice: "Einfügen als Letzten"
-new: "Einfügen als Letzten"
+voice: "EinfÃ¼gen als Letzten"
+new: "EinfÃ¼gen als Letzten"
 
 id: LANG_QUEUE_FIRST
 desc: in onplay menu.  queue a track/playlist into dynamic playlist.
 eng: "Queue next"
-voice: "Warteschlange als Nächsten"
-new: "Warteschlange als Nächsten"
+voice: "Warteschlange als NÃ¤chsten"
+new: "Warteschlange als NÃ¤chsten"
 
 id: LANG_INSERT_FIRST
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
 eng: "Insert next"
-voice: "Einfügen als Nächsten"
-new: "Einfügen als Nächsten"
+voice: "EinfÃ¼gen als NÃ¤chsten"
+new: "EinfÃ¼gen als NÃ¤chsten"
 
 id: LANG_SAVE_DYNAMIC_PLAYLIST
 desc: in playlist menu.
@@ -1542,7 +1542,7 @@ id: LANG_PLAYLIST_INSERT_COUNT
 desc: splash number of tracks inserted
 eng: "Inserted %d tracks (%s)"
 voice: ""
-new: "%d Tracks eingefügt (%s)"
+new: "%d Tracks eingefÃ¼gt (%s)"
 
 id: LANG_PLAYLIST_QUEUE_COUNT
 desc: splash number of tracks queued
@@ -1596,13 +1596,13 @@ id: LANG_PLAYLIST_CONTROL_INVALID
 desc: Playlist resume error
 eng: "Playlist control file is invalid"
 voice: ""
-new: "Playlist-Steuerdatei ist ungültig"
+new: "Playlist-Steuerdatei ist ungÃ¼ltig"
 
 id: LANG_RECURSE_DIRECTORY
 desc: In playlist menu
 eng: "Recursively Insert Directories"
-voice: "Verzeichnisse rekursiv hinzufügen"
-new: "Verzeichnisse rekursiv hinzufügen"
+voice: "Verzeichnisse rekursiv hinzufÃ¼gen"
+new: "Verzeichnisse rekursiv hinzufÃ¼gen"
 
 id: LANG_RECURSE_DIRECTORY_QUESTION
 desc: Asked from onplay screen
@@ -1613,8 +1613,8 @@ new: "Rekursiv?"
 id: LANG_CUSTOM_FONT
 desc: in setting_menu()
 eng: "Browse Fonts"
-voice: "Zeige Zeichensätze"
-new: "Zeige Zeichensätze"
+voice: "Zeige ZeichensÃ¤tze"
+new: "Zeige ZeichensÃ¤tze"
 
 id: LANG_FIRMWARE
 desc: in the main menu
@@ -1668,7 +1668,7 @@ id: LANG_BUTTONBAR_MENU
 desc: in button bar
 eng: "Menu"
 voice: ""
-new: "Menü"
+new: "MenÃ¼"
 
 id: LANG_FM_BUTTONBAR_PRESETS
 desc: in button bar
@@ -1757,8 +1757,8 @@ new: "Vorab-Aufnahme"
 id: LANG_RECORD_PRERECORD_TIME
 desc: in recording settings_menu
 eng: "Prerecord time"
-voice: "Vorab-Aufnahme-Länge"
-new: "Vorab-Aufnahme-Länge"
+voice: "Vorab-Aufnahme-LÃ¤nge"
+new: "Vorab-Aufnahme-LÃ¤nge"
 
 #Auto bookmark prompts
 
@@ -1810,13 +1810,13 @@ id: LANG_BOOKMARK_SELECT_PLAY
 desc: Used on the bookmark select window to indicated the play option
 eng: "PLAY = Select"
 voice: ""
-new: "PLAY = Auswählen"
+new: "PLAY = AuswÃ¤hlen"
 
 id: LANG_BOOKMARK_SELECT_DELETE
 desc: Used on the bookmark select window to indicated the bookmark delete option
 eng: "ON+Play = Delete"
 voice: ""
-new: "ON+Play = Löschen"
+new: "ON+Play = LÃ¶schen"
 
 # Bookmark creation/failure text
 
@@ -1925,7 +1925,7 @@ new: "Aufnahmemodus"
 id: LANG_WIND_MENU
 desc: in the playback sub menu
 eng: "FFwd/Rewind"
-voice: "Vor- und Rücklauf"
+voice: "Vor- und RÃ¼cklauf"
 new: "FF/RW"
 
 id: LANG_LCD_MENU
@@ -2042,7 +2042,7 @@ id: LANG_DIRBROWSE_F1
 desc: in dir browser, F1 button bar text
 eng: "Menu"
 voice: ""
-new: "Menü"
+new: "MenÃ¼"
 
 id: LANG_DIRBROWSE_F2
 desc: in dir browser, F2 button bar text
@@ -2375,8 +2375,8 @@ new: "Sprachausgabe"
 id: LANG_VOICE_MENU
 desc: item of voice menu, enable/disable the voice UI
 eng: "Voice Menus"
-voice: "Menüs"
-new: "Menüs"
+voice: "MenÃ¼s"
+new: "MenÃ¼s"
 
 id: LANG_VOICE_DIR
 desc: item of voice menu, set the "talkbox" mode for directories
@@ -2639,8 +2639,8 @@ new:
 id: LANG_DELETE_DIR
 desc: in on+play menu
 eng: "Delete directory"
-voice: "Verzeichnis löschen"
-new: "Verzeichnis löschen"
+voice: "Verzeichnis lÃ¶schen"
+new: "Verzeichnis lÃ¶schen"
 
 id: VOICE_CURRENT_TIME
 desc: spoken only, for wall clock announce
@@ -2677,8 +2677,8 @@ new: "Dateitypen-Zeichenpuffer leer"
 id: LANG_ONPLAY_OPEN_WITH
 desc: Onplay open with
 eng: "Open with"
-voice: "öffnen mit"
-new: "Öffnen mit"
+voice: "Ã¶ffnen mit"
+new: "Ã–ffnen mit"
 
 id: LANG_SORT_DIR
 desc: browser sorting setting
@@ -2755,14 +2755,14 @@ new: "Aktion"
 id: LANG_MDB_STRENGTH
 desc: in sound settings
 eng: "MDB Strength"
-voice: "MDB Stärke"
-new: "MDB Stärke"
+voice: "MDB StÃ¤rke"
+new: "MDB StÃ¤rke"
 
 id: LANG_MDB_HARMONICS
 desc: in sound settings
 eng: "MDB Harmonics"
-voice: "MDB Obertöne"
-new: "MDB Obertöne"
+voice: "MDB ObertÃ¶ne"
+new: "MDB ObertÃ¶ne"
 
 id: LANG_MDB_CENTER
 desc: in sound settings
@@ -2834,7 +2834,7 @@ id: LANG_INSTALLATION_INCOMPLETE
 desc: in browse root
 eng: "Installation incomplete"
 voice: ""
-new: "Installation unvollständig"
+new: "Installation unvollstÃ¤ndig"
 
 id: LANG_REMOVE_MMC
 desc: before acknowledging usb in case an MMC is inserted (Ondio)
@@ -2876,7 +2876,7 @@ id: LANG_ID3DB_ARTISTS
 desc: ID3 virtual folder name
 eng: "Artists"
 voice: ""
-new: "Künstler"
+new: "KÃ¼nstler"
 
 id: LANG_ID3DB_ALBUMS
 desc: ID3 virtual folder name
@@ -2900,7 +2900,7 @@ id: LANG_ID3DB_SEARCH_ARTISTS
 desc: ID3 virtual folder name
 eng: "Search Artists"
 voice: ""
-new: "Suche Künstler"
+new: "Suche KÃ¼nstler"
 
 id: LANG_ID3DB_SEARCH_ALBUMS
 desc: ID3 virtual folder name
@@ -3020,7 +3020,7 @@ id: LANG_RECORD_MIN_DURATION
 desc: in recording settings_menu
 eng: "for at least"
 voice: 
-new: "für mindestens"
+new: "fÃ¼r mindestens"
 
 id: LANG_RECORD_STOP_THRESHOLD
 desc: in recording settings_menu
@@ -3032,7 +3032,7 @@ id: LANG_RECORD_STOP_POSTREC
 desc: in recording settings_menu
 eng: "for at least"
 voice: 
-new: "für mindestens"
+new: "fÃ¼r mindestens"
 
 id: LANG_RECORD_STOP_GAP
 desc: in recording settings_menu
@@ -3097,8 +3097,8 @@ new: "MMC:"
 id: LANG_CROSSFADE
 desc: in playback settings
 eng: "Crossfade"
-voice: "Überblenden"
-new: "Überblenden"
+voice: "Ãœberblenden"
+new: "Ãœberblenden"
 
 id: LANG_BACKLIGHT_FADE_IN
 desc: in settings_menu
@@ -3127,8 +3127,8 @@ new: "Nichts fortzusetzen"
 id: LANG_INSERT_SHUFFLED
 desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
 eng: "Insert shuffled"
-voice: "Zufällig einfügen"
-new: "Zufällig einfügen"
+voice: "ZufÃ¤llig einfÃ¼gen"
+new: "ZufÃ¤llig einfÃ¼gen"
 
 id: LANG_SPDIF_ENABLE
 desc: in playback settings menu. enable/disable the optical out
@@ -3181,50 +3181,50 @@ new: "Neustart der Wiedergabe..."
 id: LANG_REPLAYGAIN
 desc: in replaygain
 eng: "Replaygain"
-voice: "Lautstärkeanpassung"
-new: "Lautstärkeanpassung"
+voice: "LautstÃ¤rkeanpassung"
+new: "LautstÃ¤rkeanpassung"
 
 id: LANG_REPLAYGAIN_ENABLE
 desc: in replaygain
 eng: "Enable replaygain"
-voice: "Lautstärkeanpassung aktivieren"
-new: "Lautstärkeanpassung aktivieren"
+voice: "LautstÃ¤rkeanpassung aktivieren"
+new: "LautstÃ¤rkeanpassung aktivieren"
 
 id: LANG_REPLAYGAIN_NOCLIP
 desc: in replaygain
 eng: "Prevent clipping"
-voice: "Übersteuerung verhindern"
-new: "Übersteuerung verhindern"
+voice: "Ãœbersteuerung verhindern"
+new: "Ãœbersteuerung verhindern"
 
 id: LANG_REPLAYGAIN_MODE
 desc: in replaygain
 eng: "Replaygain type"
-voice: "Lautstärkeanpassungstyp"
-new: "Lautstärkeanpassungstyp"
+voice: "LautstÃ¤rkeanpassungstyp"
+new: "LautstÃ¤rkeanpassungstyp"
 
 id: LANG_TRACK_GAIN
 desc: in replaygain
 eng: "Track gain"
-voice: "Titellautstärke"
-new: "Titellautstärke"
+voice: "TitellautstÃ¤rke"
+new: "TitellautstÃ¤rke"
 
 id: LANG_ALBUM_GAIN
 desc: in replaygain
 eng: "Album gain"
-voice: "Albumlautstärke"
-new: "Albumlautstärke"
+voice: "AlbumlautstÃ¤rke"
+new: "AlbumlautstÃ¤rke"
 
 id: LANG_ID3_TRACK_GAIN
 desc: in browse_id3
 eng: "[Track gain]"
 voice: 
-new: "[Titellautstärke]"
+new: "[TitellautstÃ¤rke]"
 
 id: LANG_ID3_ALBUM_GAIN
 desc: in browse_id3
 eng: "[Album gain]"
 voice: 
-new: "[Albumlautstärke]"
+new: "[AlbumlautstÃ¤rke]"
 
 id: LANG_ID3_NO_GAIN
 desc: DEPRECATED
@@ -3236,13 +3236,13 @@ id: LANG_BIDI_SUPPORT
 desc: in settings_menu, option to enable reversal of hebrew/arabic text
 eng: "BiDi Hebrew/Arabic"
 voice: "Bidirektionaler Text"
-new: "BiDi Hebräisch/Arabisch"
+new: "BiDi HebrÃ¤isch/Arabisch"
 
 id: LANG_REPLAYGAIN_PREAMP
 desc: in replaygain settings
 eng: "Pre-amp"
-voice: "Vorverstärkung"
-new: "Vorverstärkung"
+voice: "VorverstÃ¤rkung"
+new: "VorverstÃ¤rkung"
 
 id: LANG_UNIT_DB
 desc: in browse_id3
@@ -3259,8 +3259,8 @@ new: " (VBR)"
 id: LANG_BEEP
 desc: in playback settings
 eng: "Beep volume"
-voice: "Piep-Lautstärke"
-new: "Piep-Lautstärke"
+voice: "Piep-LautstÃ¤rke"
+new: "Piep-LautstÃ¤rke"
 
 id: LANG_WEAK
 desc: in beep volume in playback settings
@@ -3289,8 +3289,8 @@ new: "A-B"
 id: LANG_SHUFFLE_GAIN
 desc: use track gain if shuffle mode is on, album gain otherwise
 eng: "Track gain if shuffling"
-voice: "Titellautstärke beim Mischen"
-new: "Titellautstärke beim Mischen"
+voice: "TitellautstÃ¤rke beim Mischen"
+new: "TitellautstÃ¤rke beim Mischen"
 
 id: LANG_DIRCACHE_ENABLE
 desc: in directory cache settings
@@ -3313,20 +3313,20 @@ new: "Lese Festplatte..."
 id: LANG_CROSSFADE_ENABLE
 desc: in crossfade settings menu
 eng: "Enable crossfade"
-voice: "Überblenden aktivieren"
-new: "Überblenden aktivieren"
+voice: "Ãœberblenden aktivieren"
+new: "Ãœberblenden aktivieren"
 
 id: LANG_CROSSFADE_FADE_IN_DELAY
 desc: in crossfade settings menu
 eng: "Fade in delay"
-voice: "Einblendverzögerung"
-new: "Einblendverzögerung"
+voice: "EinblendverzÃ¶gerung"
+new: "EinblendverzÃ¶gerung"
 
 id: LANG_CROSSFADE_FADE_OUT_DELAY
 desc: in crossfade settings menu
 eng: "Fade out delay"
-voice: "Ausblendverzögerung"
-new: "Ausblendverzögerung"
+voice: "AusblendverzÃ¶gerung"
+new: "AusblendverzÃ¶gerung"
 
 id: LANG_CROSSFADE_FADE_IN_DURATION
 desc: in crossfade settings menu
@@ -3349,14 +3349,14 @@ new: "Ausblendmodus"
 id: LANG_RECORDING_ADC_RIGHT
 desc: in the recording settings
 eng: "ADC Gain Right"
-voice: "Verstärkung rechts"
-new: "Verstärkung rechts"
+voice: "VerstÃ¤rkung rechts"
+new: "VerstÃ¤rkung rechts"
 
 id: LANG_RECORDING_ADC_LEFT
 desc: in the recording settings
 eng: "ADC Gain Left"
-voice: "Verstärkung links"
-new: "Verstärkung links"
+voice: "VerstÃ¤rkung links"
+new: "VerstÃ¤rkung links"
 
 id: LANG_RECORDING_MONITOR
 desc: DEPRECATED
@@ -3415,14 +3415,14 @@ new: "%d,%01dMHz"
 id: LANG_FM_ADD_PRESET
 desc: in radio menu
 eng: "Add preset"
-voice: "Sender hinzufügen"
-new: "Sender hinzufügen"
+voice: "Sender hinzufÃ¼gen"
+new: "Sender hinzufÃ¼gen"
 
 id: LANG_FM_CLEAR_PRESETS
 desc: confirmation if presets can be cleared
 eng: "Clear current presets?"
 voice: ""
-new: "Alle Sender löschen?"
+new: "Alle Sender lÃ¶schen?"
 
 id: LANG_WAIT
 desc: general please wait splash

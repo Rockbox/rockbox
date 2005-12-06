@@ -219,7 +219,6 @@ struct user_settings
     bool invert_cursor; /* invert the current file in dir browser and menu
                            instead of using the default cursor */
     bool flip_display; /* turn display (and button layout) by 180 degrees */
-    bool bidi_support; /* reverse hebrew/arabic chars: 0=off, 1=on */
     int poweroff;   /* power off timer */
     int backlight_timeout;  /* backlight off timeout:  0-18 0=never,
                                1=always,
@@ -370,6 +369,7 @@ struct user_settings
     bool dircache;          /* enable directory cache */
     int dircache_size;      /* directory cache structure last size, 22 bits */
 #endif
+    int default_codepage;   /* set default codepage for tag conversion */
 #ifdef HAVE_REMOTE_LCD
     unsigned char rwps_file[MAX_FILENAME+1];  /* last remote-wps */
 #endif

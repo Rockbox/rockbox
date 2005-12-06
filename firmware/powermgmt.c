@@ -46,6 +46,9 @@
 #elif HAVE_TLV320
 #include "tlv320.h"
 #endif
+#ifdef HAVE_LCD_BITMAP
+#include "font.h"
+#endif
 #include "logf.h"
 #include "lcd-remote.h"
 
@@ -378,7 +381,7 @@ static void handle_auto_poweroff(void)
      * Inhibit shutdown as long as the charger is plugged in.  If it is
      * unplugged, wait for a timeout period and then shut down.
      */
-    if(charger_input_state == CHARGER) {
+    if(charger_input_state == CHARGER || audio_stat == AUDIO_STATUS_PLAY) {
         last_event_tick = current_tick;
     }
 #endif
@@ -899,6 +902,9 @@ void shutdown_hw(void)
     }
 #endif
     audio_stop();
+#ifdef HAVE_LCD_BITMAP
+    glyph_cache_save();
+#endif
     ata_flush();
     ata_spindown(1);
     while(ata_disk_is_active())

@@ -3,7 +3,7 @@ id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
 voice: "Sound Settings"
-new: "ƒ‰niasetukset"
+new: "√Ñ√§niasetukset"
 
 id: LANG_GENERAL_SETTINGS
 desc: in the main menu
@@ -27,7 +27,7 @@ id: LANG_DEBUG
 desc: in the main menu
 eng: "Debug (Keep Out!)"
 voice: "Debug, keep out!"
-new: "Debug (ƒl‰ koske!)"
+new: "Debug (√Ñl√§ koske!)"
 
 id: LANG_USB
 desc: in the main menu
@@ -81,13 +81,13 @@ id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
 eng: "Buffer Full"
 voice: ""
-new: "Puskuri t‰ynn‰"
+new: "Puskuri t√§ynn√§"
 
 id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
 eng: "Save Failed"
 voice: ""
-new: "Tallennus ep‰onnistui"
+new: "Tallennus ep√§onnistui"
 
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
@@ -99,7 +99,7 @@ id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
 eng: "Save Failed"
 voice: ""
-new: "Tallennus ep‰onnistui"
+new: "Tallennus ep√§onnistui"
 
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
@@ -111,7 +111,7 @@ id: LANG_TIME_SET
 desc: used in set_time()
 eng: "ON To Set"
 voice: ""
-new: "PƒƒLLE asettaa" 
+new: "P√Ñ√ÑLLE asettaa" 
 
 id: LANG_TIME_REVERT
 desc: used in set_time()
@@ -146,14 +146,14 @@ new: "Case Sensitive lajittelu"
 id: LANG_RESUME
 desc: in settings_menu
 eng: "Resume on startup"
-voice: "Jatka toistoa k‰ynnistett‰ess‰"
-new: "Jatka toistoa k‰ynnistett‰ess‰"
+voice: "Jatka toistoa k√§ynnistett√§ess√§"
+new: "Jatka toistoa k√§ynnistett√§ess√§"
 
 id: LANG_OFF
 desc: Used in a lot of places
 eng: "Off"
 voice: "Off"
-new: "Pois p‰‰lt‰"
+new: "Pois p√§√§lt√§"
 
 id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
@@ -165,7 +165,7 @@ id: LANG_ON
 desc: Used in a lot of places
 eng: "On"
 voice: "On"
-new: "P‰‰ll‰"
+new: "P√§√§ll√§"
 
 id: LANG_BACKLIGHT
 desc: in settings_menu
@@ -273,19 +273,19 @@ id: LANG_DISPLAY
 desc: in settings_menu()
 eng: "Display"
 voice: "Display"
-new: "N‰yttˆ"
+new: "N√§ytt√∂"
 
 id: LANG_SYSTEM
 desc: in settings_menu()
 eng: "System"
 voice: "System"
-new: "J‰rjestelm‰"
+new: "J√§rjestelm√§"
 
 id: LANG_VOLUME
 desc: in sound_settings
 eng: "Volume"
 voice: "Volume"
-new: "ƒ‰nenvoimakkuus"
+new: "√Ñ√§nenvoimakkuus"
 
 id: LANG_BALANCE
 desc: in sound_settings
@@ -309,7 +309,7 @@ id: LANG_LOUDNESS
 desc: in sound_settings
 eng: "Loudness"
 voice: "Loudness"
-new: "ƒ‰nekkyys"
+new: "√Ñ√§nekkyys"
 
 id: LANG_BBOOST
 desc: DEPRECATED
@@ -363,7 +363,7 @@ id: LANG_AUTOVOL
 desc: in sound_settings
 eng: "Auto Volume"
 voice: "Auto Volume"
-new: "Autom. ‰‰nenvoimakkuus"
+new: "Autom. √§√§nenvoimakkuus"
 
 id: LANG_SHOWDIR_ERROR_BUFFER
 desc: in showdir(), displayed on screen when you reach buffer limit
@@ -375,7 +375,7 @@ id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Is Full!"
 voice: ""
-new: "on t‰ynn‰!"
+new: "on t√§ynn√§!"
 
 id: LANG_RESUME_ASK
 ### Description changed! Previous description was:
@@ -397,25 +397,25 @@ id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
 eng: "Key Lock ON"
 voice: ""
-new: "N‰pp‰inlukko PƒƒLLƒ"
+new: "N√§pp√§inlukko P√Ñ√ÑLL√Ñ"
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
 eng: "Key Lock OFF"
 voice: ""
-new: "N‰pp‰inlukko POIS"
+new: "N√§pp√§inlukko POIS"
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
 eng: "Key Lock Is ON"
 voice: ""
-new: "N‰pp‰inlukko PƒƒLLƒ"
+new: "N√§pp√§inlukko P√Ñ√ÑLL√Ñ"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key Lock Is OFF"
 voice: ""
-new: "N‰pp‰inlukko POIS"
+new: "N√§pp√§inlukko POIS"
 
 id: LANG_MUTE_ON_PLAYER
 desc: DEPRECATED
@@ -467,13 +467,13 @@ desc: DEPRECATED
 ### "<No Title>"
 eng: ""
 voice: ""
-new: "<Ei nime‰>"
+new: "<Ei nime√§>"
 
 id: LANG_ID3_ARTIST
 desc: in wps
 eng: "[Artist]"
 voice: ""
-new: "[Esitt‰j‰]"
+new: "[Esitt√§j√§]"
 
 id: LANG_ID3_NO_ARTIST
 ### Description changed! Previous description was:
@@ -483,7 +483,7 @@ desc: DEPRECATED
 ### "<No Artist>"
 eng: ""
 voice: ""
-new: "<Ei esitt‰j‰‰>"
+new: "<Ei esitt√§j√§√§>"
 
 id: LANG_ID3_ALBUM
 desc: in wps
@@ -539,7 +539,7 @@ id: LANG_ID3_FRECUENCY
 desc: in wps
 eng: "[Frequency]"
 voice: ""
-new: "[N‰ytetaajuus]"
+new: "[N√§ytetaajuus]"
 
 id: LANG_ID3_PATH
 desc: in wps
@@ -551,13 +551,13 @@ id: LANG_PITCH_UP
 desc: in wps
 eng: "Pitch Up"
 voice: ""
-new: "ƒ‰nenkorkeus ylˆs"
+new: "√Ñ√§nenkorkeus yl√∂s"
 
 id: LANG_PITCH_DOWN
 desc: in wps
 eng: "Pitch Down"
 voice: ""
-new: "ƒ‰nenkorkeus alas"
+new: "√Ñ√§nenkorkeus alas"
 
 id: LANG_PAUSE
 desc: in wps
@@ -605,7 +605,7 @@ id: LANG_POWEROFF_IDLE
 desc: in settings_menu
 eng: "Idle Poweroff"
 voice: "Idle Poweroff"
-new: "Sammutus k‰ytt‰m‰ttˆm‰n‰"
+new: "Sammutus k√§ytt√§m√§tt√∂m√§n√§"
 
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
@@ -617,7 +617,7 @@ id: LANG_FILTER
 desc: setting name for dir filter
 eng: "Show Files"
 voice: "Show Files"
-new: "N‰yt‰ tiedostot"
+new: "N√§yt√§ tiedostot"
 
 id: LANG_FILTER_MUSIC
 desc: show only music-related files
@@ -641,7 +641,7 @@ id: LANG_SET_BOOL_YES
 desc: bool true representation
 eng: "Yes"
 voice: "Yes"
-new: "Kyll‰"
+new: "Kyll√§"
 
 id: LANG_SET_BOOL_NO
 desc: bool false representation
@@ -683,13 +683,13 @@ id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
 eng: "Units Per Read"
 voice: "Units Per Read"
-new: "Yksikkˆ‰ lukua kohden"
+new: "Yksikk√∂√§ lukua kohden"
 
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
 eng: "Backlight On When Plugged"
 voice: "Backlight On When Plugged"
-new: "Taustavalo p‰‰ll‰ verkkovirralla"
+new: "Taustavalo p√§√§ll√§ verkkovirralla"
 
 id: LANG_REPEAT
 desc: in settings_menu
@@ -869,13 +869,13 @@ id: LANG_BATTERY_DISPLAY
 desc: Battery type title
 eng: "Battery Display"
 voice: "Battery Display"
-new: "Akkun‰yttˆ"
+new: "Akkun√§ytt√∂"
 
 id: LANG_VOLUME_DISPLAY
 desc: Volume type title
 eng: "Volume Display"
 voice: "Volume Display"
-new: "ƒ‰nenvoimakkuusn‰yttˆ"
+new: "√Ñ√§nenvoimakkuusn√§ytt√∂"
 
 id: LANG_DISPLAY_GRAPHIC
 desc: Label for type of icon display
@@ -923,7 +923,7 @@ eng: ""
 ### English phrase was changed! Voice set to english. Previous voice was:
 ### "Save Energy"
 voice: ""
-new: "Virrans‰‰stˆ"
+new: "Virrans√§√§st√∂"
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
@@ -947,13 +947,13 @@ id: LANG_PM_MIN
 desc: in the peak meter menu
 eng: "Minimum Of Range"
 voice: "Minimum Of Range"
-new: "V‰lin minimi"
+new: "V√§lin minimi"
 
 id: LANG_PM_MAX
 desc: in the peak meter menu
 eng: "Maximum Of Range"
 voice: "Maximum Of Range"
-new: "V‰lin maksimi"
+new: "V√§lin maksimi"
 
 id: LANG_RECORDING
 desc: in the main menu
@@ -989,13 +989,13 @@ id: LANG_RECORDING_FREQUENCY
 desc: in the recording settings
 eng: "Frequency"
 voice: "Frequency"
-new: "N‰ytetaajuus"
+new: "N√§ytetaajuus"
 
 id: LANG_RECORDING_SOURCE
 desc: in the recording settings
 eng: "Source"
 voice: "Source"
-new: "L‰hde"
+new: "L√§hde"
 
 id: LANG_RECORDING_CHANNELS
 desc: in the recording settings
@@ -1115,7 +1115,7 @@ id: LANG_BATTERY_TRICKLE_CHARGE
 desc: in info display, shows that trickle charge is running
 eng: "Battery: Trickle Chg"
 voice: ""
-new: "Akku: yll‰pitolataus"
+new: "Akku: yll√§pitolataus"
 
 id: LANG_BATTERY_CAPACITY
 desc: in settings_menu
@@ -1133,7 +1133,7 @@ id: LANG_QUEUE
 desc: The verb/action Queue
 eng: "Queue"
 voice: "Queue"
-new: "Lis‰‰ jonoon"
+new: "Lis√§√§ jonoon"
 
 id: LANG_DELETE
 desc: The verb/action Delete
@@ -1157,43 +1157,43 @@ id: LANG_RENAME
 desc: The verb/action Rename
 eng: "Rename"
 voice: "Rename"
-new: "Uudelleennime‰"
+new: "Uudelleennime√§"
 
 id: LANG_FAILED
 desc: Something failed. To be appended after above actions
 eng: "Failed"
 voice: ""
-new: "ep‰onnistui"
+new: "ep√§onnistui"
 
 id: LANG_ALARM_MOD_ALARM_MENU
 desc: The name of the additional entry in the main menu for the RTC alarm mod.
 eng: "Wake-Up Alarm"
 voice: "Wake-Up Alarm"
-new: "Her‰tys"
+new: "Her√§tys"
 
 id: LANG_ALARM_MOD_TIME
 desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
 eng: "Alarm Time: %02d:%02d"
 voice: ""
-new: "Her‰tysaika: %02d:%02d"
+new: "Her√§tysaika: %02d:%02d"
 
 id: LANG_ALARM_MOD_TIME_TO_GO
 desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
 eng: "Waking Up In %d:%02d"
 voice: ""
-new: "Her‰tys %d:%02d kuluttua"
+new: "Her√§tys %d:%02d kuluttua"
 
 id: LANG_ALARM_MOD_SHUTDOWN
 desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
 eng: "Alarm Set"
 voice: ""
-new: "Her‰tys asetettu"
+new: "Her√§tys asetettu"
 
 id: LANG_ALARM_MOD_ERROR
 desc: The text that tells that the time is incorrect (for the RTC alarm mod).
 eng: "Alarm Time Is Too Soon!"
 voice: ""
-new: "Her‰tysaika liian pian!"
+new: "Her√§tysaika liian pian!"
 
 id: LANG_ALARM_MOD_KEYS
 desc: Shown key functions in alarm menu (for the RTC alarm mod).
@@ -1241,7 +1241,7 @@ id: LANG_MENU_SHOW_ID3_INFO
 desc: Menu option to start id3 viewer
 eng: "Show ID3 Info"
 voice: "Show ID3 Info"
-new: "N‰yt‰ ID3-tiedot"
+new: "N√§yt√§ ID3-tiedot"
 
 id: LANG_ID3_GENRE
 desc: ID3 frame 'genre'
@@ -1289,7 +1289,7 @@ id: LANG_FADE_ON_STOP
 desc: options menu to set fade on stop or pause
 eng: "Fade On Stop/Pause"
 voice: "Fade On Stop and Pause"
-new: "H‰ivyt‰ ‰‰ni pys‰ytett‰ess‰"
+new: "H√§ivyt√§ √§√§ni pys√§ytett√§ess√§"
 
 id: LANG_SOKOBAN_ON
 desc: DEPRECATED
@@ -1403,7 +1403,7 @@ id: LANG_INVERT_CURSOR_BAR
 desc: in settings_menu
 eng: "Bar(Inverse)"
 voice: "Inverse Bar"
-new: "Palkki(K‰‰nteinen)"
+new: "Palkki(K√§√§nteinen)"
 
 id: LANG_INVERT_LCD_NORMAL
 desc: in settings_menu
@@ -1415,13 +1415,13 @@ id: LANG_INVERT_LCD_INVERSE
 desc: in settings_menu
 eng: "Inverse"
 voice: "Inverse"
-new: "K‰‰nteinen"
+new: "K√§√§nteinen"
 
 id: LANG_MAX_FILES_IN_DIR
 desc: in settings_menu
 eng: "Max files in dir browser"
 voice: "Max files in directory browser"
-new: "Hakemistoselaimessa tiedostoja enint‰‰n"
+new: "Hakemistoselaimessa tiedostoja enint√§√§n"
 
 id: LANG_MAX_FILES_IN_PLAYLIST
 desc: in settings_menu
@@ -1433,7 +1433,7 @@ id: LANG_JUMP_SCROLL
 desc: (player) menu altarnative for jump scroll
 eng: "Jump scroll"
 voice: "Jump scroll"
-new: "Hyppiv‰ vieritys"
+new: "Hyppiv√§ vieritys"
 
 id: LANG_ONE_TIME
 desc: (player) the jump scroll shall be done "one time"
@@ -1451,7 +1451,7 @@ id: LANG_JUMP_SCROLL_DELAY
 desc: (player) Delay before making a jump scroll
 eng: "Jump Scroll Delay"
 voice: "Jump Scroll Delay"
-new: "Hyppiv‰n vierityksen viive"
+new: "Hyppiv√§n vierityksen viive"
 
 id: LANG_RECORD_TIMESPLIT
 desc: Prompt for record timer interval setting, in the record settings menu
@@ -1469,19 +1469,19 @@ id: LANG_SHOW_ICONS
 desc: in settings_menu
 eng: "Show Icons"
 voice: "Show Icons"
-new: "N‰yt‰ kuvakkeet"
+new: "N√§yt√§ kuvakkeet"
 
 id: LANG_DISK_FULL
 desc: in recording screen
 eng: "The disk is full. Press OFF to continue."
 voice: ""
-new: "Levy on t‰ynn‰. Paina OFF jatkaaksesi."
+new: "Levy on t√§ynn√§. Paina OFF jatkaaksesi."
 
 id: LANG_CONFIRM_WITH_PLAY_RECORDER
 desc: Generic recorder string to use to confirm
 eng: "PLAY = Yes"
 voice: ""
-new: "PLAY = Kyll‰"
+new: "PLAY = Kyll√§"
 
 id: LANG_CANCEL_WITH_ANY_RECORDER
 desc: Generic recorder string to use to cancel
@@ -1503,7 +1503,7 @@ id: LANG_READ_FAILED
 desc: There was an error reading a file
 eng: "Failed reading %s"
 voice: ""
-new: "%s:n lukeminen ep‰onnistui"
+new: "%s:n lukeminen ep√§onnistui"
 
 id: LANG_PLUGIN_WRONG_MODEL
 desc: The plugin is not compatible with the archos model trying to run it
@@ -1521,7 +1521,7 @@ id: LANG_PLUGIN_ERROR
 desc: The plugin return an error code
 eng: "Plugin returned error"
 voice: ""
-new: "Lis‰osa palautti virheen"
+new: "Lis√§osa palautti virheen"
 
 ##
 ## boot change detection
@@ -1531,43 +1531,43 @@ id: LANG_BOOT_CHANGED
 desc: File browser discovered the boot file was changed
 eng: "Boot changed"
 voice: ""
-new: "K‰ynnistystiedosto muuttunut"
+new: "K√§ynnistystiedosto muuttunut"
 
 id: LANG_REBOOT_NOW
 desc: Do you want to reboot?
 eng: "Reboot now?"
 voice: ""
-new: "K‰ynnist‰ uudelleen?"
+new: "K√§ynnist√§ uudelleen?"
 
 id: LANG_QUEUE_LAST
 desc: in onplay menu.  queue a track/playlist at end of playlist.
 eng: "Queue last"
 voice: "Queue last"
-new: "Lis‰‰ jonon loppuun"
+new: "Lis√§√§ jonon loppuun"
 
 id: LANG_INSERT
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
 eng: "Insert"
 voice: "Insert"
-new: "Lis‰‰"
+new: "Lis√§√§"
 
 id: LANG_INSERT_LAST
 desc: in onplay menu.  append a track/playlist into dynamic playlist.
 eng: "Insert last"
 voice: "Insert last"
-new: "Lis‰‰ loppuun"
+new: "Lis√§√§ loppuun"
 
 id: LANG_QUEUE_FIRST
 desc: in onplay menu.  queue a track/playlist into dynamic playlist.
 eng: "Queue next"
 voice: "Queue next"
-new: "Lis‰‰ jonoon seuraavaksi"
+new: "Lis√§√§ jonoon seuraavaksi"
 
 id: LANG_INSERT_FIRST
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
 eng: "Insert next"
 voice: "Insert next"
-new: "Lis‰‰ seuraavaksi"
+new: "Lis√§√§ seuraavaksi"
 
 id: LANG_SAVE_DYNAMIC_PLAYLIST
 desc: in playlist menu.
@@ -1585,13 +1585,13 @@ id: LANG_PLAYLIST_INSERT_COUNT
 desc: splash number of tracks inserted
 eng: "Inserted %d tracks (%s)"
 voice: ""
-new: "Lis‰ttiin %d kappaletta (%s)"
+new: "Lis√§ttiin %d kappaletta (%s)"
 
 id: LANG_PLAYLIST_QUEUE_COUNT
 desc: splash number of tracks queued
 eng: "Queued %d tracks (%s)"
 voice: ""
-new: "Lis‰ttiin jonoon %d kappaletta (%s)"
+new: "Lis√§ttiin jonoon %d kappaletta (%s)"
 
 id: LANG_PLAYLIST_SAVE_COUNT
 desc: splash number of tracks saved
@@ -1603,19 +1603,19 @@ id: LANG_OFF_ABORT
 desc: Used on recorder models
 eng: "OFF to abort"
 voice: ""
-new: "OFF keskeytt‰‰"
+new: "OFF keskeytt√§√§"
 
 id: LANG_STOP_ABORT
 desc: Used on player models
 eng: "STOP to abort"
 voice: ""
-new: "STOP keskeytt‰‰"
+new: "STOP keskeytt√§√§"
 
 id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
 desc: Playlist error
 eng: "Error updating playlist control file"
 voice: ""
-new: "Virhe p‰ivitett‰ess‰ soittolista-kontrollia"
+new: "Virhe p√§ivitett√§ess√§ soittolista-kontrollia"
 
 id: LANG_PLAYLIST_ACCESS_ERROR
 desc: Playlist error
@@ -1645,13 +1645,13 @@ id: LANG_RECURSE_DIRECTORY
 desc: In playlist menu
 eng: "Recursively Insert Directories"
 voice: "Recursively Insert Directories"
-new: "Lis‰‰ alihakemistoineen"
+new: "Lis√§√§ alihakemistoineen"
 
 id: LANG_RECURSE_DIRECTORY_QUESTION
 desc: Asked from onplay screen
 eng: "Recursively?"
 voice: ""
-new: "Myˆs alihakemistot?"
+new: "My√∂s alihakemistot?"
 
 id: LANG_CUSTOM_FONT
 desc: in setting_menu()
@@ -1687,7 +1687,7 @@ id: LANG_PLUGINS
 desc: in main_menu()
 eng: "Browse Plugins"
 voice: "Browse Plugins"
-new: "Selaa lis‰osia"
+new: "Selaa lis√§osia"
 
 id: LANG_CAR_ADAPTER_MODE
 desc: Displayed for setting car adapter mode to on/off
@@ -1741,7 +1741,7 @@ id: LANG_FM_PRESET_SAVE_FAILED
 desc: in radio screen
 eng: "Preset save failed"
 voice: ""
-new: "Esivalinnan tallennus ep‰onnistui"
+new: "Esivalinnan tallennus ep√§onnistui"
 
 id: LANG_FM_NO_PRESETS
 desc: DEPRECATED
@@ -1753,7 +1753,7 @@ id: LANG_FM_NO_FREE_PRESETS
 desc: in radio screen
 eng: "The preset list is full"
 voice: ""
-new: "Esivalinta-lista t‰ynn‰"
+new: "Esivalinta-lista t√§ynn√§"
 
 id: LANG_FM_RADIO
 desc: in main menu
@@ -1771,25 +1771,25 @@ id: LANG_VIEW_DYNAMIC_PLAYLIST
 desc: in playlist menu.
 eng: "View Current Playlist"
 voice: "View Current Playlist"
-new: "N‰yt‰ soittolista"
+new: "N√§yt√§ soittolista"
 
 id: LANG_MOVE
 desc: The verb/action Move
 eng: "Move"
 voice: "Move"
-new: "Siirr‰"
+new: "Siirr√§"
 
 id: LANG_MOVE_FAILED
 desc: Error message displayed in playlist viewer
 eng: "Move failed"
 voice: ""
-new: "Siirto ep‰onnistui"
+new: "Siirto ep√§onnistui"
 
 id: LANG_FLIP_DISPLAY
 desc: in settings_menu, option to turn display+buttos by 180 degreed
 eng: "Upside Down"
 voice: "Upside Down"
-new: "Ylˆsalaisin"
+new: "Yl√∂salaisin"
 
 id: LANG_RECORD_PRERECORD
 desc: in recording and radio screen
@@ -1873,7 +1873,7 @@ id: LANG_BOOKMARK_CREATE_FAILURE
 desc: Indicates bookmark was not created
 eng: "Bookmark Failed!"
 voice: ""
-new: "Kirjanmerkki ep‰onnistui!"
+new: "Kirjanmerkki ep√§onnistui!"
 
 # Bookmark creation/failure text
 
@@ -1881,7 +1881,7 @@ id: LANG_BOOKMARK_LOAD_EMPTY
 desc: Indicates bookmark was empty
 eng: "Bookmark Empty"
 voice: ""
-new: "Tyhj‰ kirjanmerkki"
+new: "Tyhj√§ kirjanmerkki"
 
 # Bookmark Settings Text
 
@@ -1901,19 +1901,19 @@ id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
 desc: prompt for user to decide to create an bookmark
 eng: "Bookmark on Stop"
 voice: "Bookmark on Stop"
-new: "Kirjanmerkki pys‰ytett‰ess‰"
+new: "Kirjanmerkki pys√§ytett√§ess√§"
 
 id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
 desc: Configuration option to maintain a list of recent bookmarks
 eng: "Maintain a List of Recent Bookmarks?"
 voice: "Maintain a List of Recent Bookmarks?"
-new: "Pid‰ kirjaa edellisist‰ kirjanmerkeist‰?"
+new: "Pid√§ kirjaa edellisist√§ kirjanmerkeist√§?"
 
 id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
 desc: Save in recent bookmarks only
 eng: "Yes - Recent only"
 voice: "Yes - Recent only"
-new: "Kyll‰ - Vain viimeaikaiset"
+new: "Kyll√§ - Vain viimeaikaiset"
 
 id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
 desc: Save in recent bookmarks only
@@ -1951,7 +1951,7 @@ id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
 desc: Text for the menu text to access the most recent bookmarks list
 eng: "Recent Bookmarks"
 voice: "Recent Bookmarks"
-new: "Viimeisimm‰t kirjanmerkit"
+new: "Viimeisimm√§t kirjanmerkit"
 
 id: LANG_INFO_MENU
 desc: in the info sub menu
@@ -1963,7 +1963,7 @@ id: LANG_RECORDING_MENU
 desc: in the recording sub menu
 eng: "Recording screen"
 voice: "Recording screen"
-new: "Nauhoitusn‰yttˆ"
+new: "Nauhoitusn√§ytt√∂"
 
 id: LANG_WIND_MENU
 desc: in the playback sub menu
@@ -2037,19 +2037,19 @@ id: LANG_VIEW
 desc: in on+play menu
 eng: "View"
 voice: "View"
-new: "N‰yt‰"
+new: "N√§yt√§"
 
 id: LANG_SHOW_INDICES
 desc: in playlist viewer menu
 eng: "Show Indices"
 voice: "Show Indices"
-new: "N‰yt‰ luettelot"
+new: "N√§yt√§ luettelot"
 
 id: LANG_TRACK_DISPLAY
 desc: in playlist viewer on+play menu
 eng: "Track Display"
 voice: "Track Display"
-new: "Kappalen‰yttˆ"
+new: "Kappalen√§ytt√∂"
 
 id: LANG_DISPLAY_TRACK_NAME_ONLY
 desc: track display options
@@ -2697,25 +2697,25 @@ id: LANG_FILETYPES_EXTENSION_FULL
 desc: Extension array full
 eng: "Extension array full"
 voice: ""
-new: "Tiedostotarkenne-taulukko t‰ynn‰"
+new: "Tiedostotarkenne-taulukko t√§ynn√§"
 
 id: LANG_FILETYPES_FULL
 desc: Filetype array full
 eng: "Filetype array full"
 voice: ""
-new: "Tiedostotyyppi-taulukko t‰ynn‰"
+new: "Tiedostotyyppi-taulukko t√§ynn√§"
 
 id: LANG_FILETYPES_PLUGIN_NAME_LONG
 desc: Viewer plugin name too long
 eng: "Plugin name too long"
 voice: ""
-new: "Lis‰osan nimi on liian pitk‰"
+new: "Lis√§osan nimi on liian pitk√§"
 
 id: LANG_FILETYPES_STRING_BUFFER_EMPTY
 desc: Filetype string buffer empty
 eng: "Filetype string buffer empty"
 voice: ""
-new: "Tiedostotyypin merkkijonopuskuri tyhj‰"
+new: "Tiedostotyypin merkkijonopuskuri tyhj√§"
 
 id: LANG_ONPLAY_OPEN_WITH
 desc: Onplay open with
@@ -2727,13 +2727,13 @@ id: LANG_SORT_DIR
 desc: browser sorting setting
 eng: "Sort Directories"
 voice: "sort directories"
-new: "J‰rjest‰ hakemistot"
+new: "J√§rjest√§ hakemistot"
 
 id: LANG_SORT_FILE
 desc: browser sorting setting
 eng: "Sort Files"
 voice: "sort files"
-new: "J‰rjest‰ tiedostot"
+new: "J√§rjest√§ tiedostot"
 
 id: LANG_SORT_ALPHA
 desc: browser sorting setting
@@ -2787,7 +2787,7 @@ id: LANG_FM_BUTTONBAR_ADD
 desc: in radio screen
 eng: "Add"
 voice: ""
-new: "Lis‰‰"
+new: "Lis√§√§"
 
 id: LANG_FM_BUTTONBAR_ACTION
 desc: in radio screen
@@ -2805,7 +2805,7 @@ id: LANG_MDB_HARMONICS
 desc: in sound settings
 eng: "MDB Harmonics"
 voice: "MDB Harmonics"
-new: "MDB yl‰s‰velet"
+new: "MDB yl√§s√§velet"
 
 id: LANG_MDB_CENTER
 desc: in sound settings
@@ -2823,7 +2823,7 @@ id: LANG_MDB_ENABLE
 desc: in sound settings
 eng: "MDB Enable"
 voice: "MDB Enable"
-new: "MDB k‰ytˆss‰"
+new: "MDB k√§yt√∂ss√§"
 
 id: LANG_SUPERBASS
 desc: in sound settings
@@ -2871,13 +2871,13 @@ id: LANG_NO_ROCKBOX_DIR
 desc: in browse root
 eng: "No .rockbox directory"
 voice: ""
-new: "Ei lˆytynyt .rockbox-hakemistoa"
+new: "Ei l√∂ytynyt .rockbox-hakemistoa"
 
 id: LANG_INSTALLATION_INCOMPLETE
 desc: in browse root
 eng: "Installation incomplete"
 voice: ""
-new: "Asennus keskener‰inen"
+new: "Asennus keskener√§inen"
 
 id: LANG_REMOVE_MMC
 desc: before acknowledging usb in case an MMC is inserted (Ondio)
@@ -2901,7 +2901,7 @@ id: LANG_STEREO_WIDTH
 desc: in sound_settings
 eng: "Stereo width"
 voice: "Stereo width"
-new: "Stereo‰‰nen leveys"
+new: "Stereo√§√§nen leveys"
 
 id: LANG_CHANNEL_CUSTOM
 desc: in sound_settings
@@ -2919,7 +2919,7 @@ id: LANG_ID3DB_ARTISTS
 desc: ID3 virtual folder name
 eng: "Artists"
 voice: ""
-new: "Esitt‰j‰t"
+new: "Esitt√§j√§t"
 
 id: LANG_ID3DB_ALBUMS
 desc: ID3 virtual folder name
@@ -2961,7 +2961,7 @@ id: LANG_ID3DB_MATCHES
 desc: ID3 virtual folder name
 eng: "Found %d matches"
 voice: ""
-new: "Lˆytyi %d kpl"
+new: "L√∂ytyi %d kpl"
 
 id: LANG_BATTERY_TYPE
 desc: in battery settings
@@ -3039,19 +3039,19 @@ id: LANG_RECORD_STARTUP
 desc: Start Rockbox in Recording screen
 eng: "Show recording screen on startup"
 voice: "Show recording screen on startup"
-new: "N‰yt‰ nauhoitusruutu k‰ynnistyksess‰"
+new: "N√§yt√§ nauhoitusruutu k√§ynnistyksess√§"
 
 id: LANG_ALARM_MOD_DISABLE
 desc: Announce that the RTC alarm has been turned off
 eng: "Alarm Disabled"
 voice: "Alarm Disabled"
-new: "Her‰tys pois"
+new: "Her√§tys pois"
 
 id: LANG_RECORD_TRIGGER
 desc: in recording settings_menu
 eng: "Trigger"
 voice: 
-new: "K‰ynnistin"
+new: "K√§ynnistin"
 
 id: LANG_RECORD_START_THRESHOLD
 desc: in recording settings_menu
@@ -3069,7 +3069,7 @@ id: LANG_RECORD_STOP_THRESHOLD
 desc: in recording settings_menu
 eng: "Stop below"
 voice: 
-new: "Lopeta j‰lkeen"
+new: "Lopeta j√§lkeen"
 
 id: LANG_RECORD_STOP_POSTREC
 desc: in recording settings_menu
@@ -3081,13 +3081,13 @@ id: LANG_RECORD_STOP_GAP
 desc: in recording settings_menu
 eng: "Presplit gap"
 voice: 
-new: "Katkoa edelt‰v‰ v‰li"
+new: "Katkoa edelt√§v√§ v√§li"
 
 id: LANG_RECORD_TRIGGER_MODE
 desc: in recording settings_menu
 eng: "Trigger"
 voice: 
-new: "K‰ynnistin"
+new: "K√§ynnistin"
 
 id: LANG_RECORD_TRIG_NOREARM
 desc: in recording settings_menu
@@ -3111,13 +3111,13 @@ id: LANG_RECORD_TRIG_IDLE
 desc: waiting for threshold
 eng: "Trigger idle"
 voice: 
-new: "Tyhj‰k‰ynnistin"
+new: "Tyhj√§k√§ynnistin"
 
 id: LANG_RECORD_TRIGGER_ACTIVE
 desc: 
 eng: "Trigger active"
 voice: 
-new: "K‰ynnistin aktiivinen"
+new: "K√§ynnistin aktiivinen"
 
 id: LANG_LCD_REMOTE_MENU
 desc: in the display sub menu
@@ -3158,14 +3158,14 @@ new: "Sekoita uudelleen"
 id: LANG_INSERT_SHUFFLED
 desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
 eng: "Insert shuffled"
-voice: "Lis‰‰ ja sekoita"
-new: "Lis‰‰ ja sekoita"
+voice: "Lis√§√§ ja sekoita"
+new: "Lis√§√§ ja sekoita"
 
 id: LANG_SPDIF_ENABLE
 desc: in playback settings menu. enable/disable the optical out
 eng: "Optical output"
 voice: "Optical output"
-new: "Optinen l‰htˆ"
+new: "Optinen l√§ht√∂"
 
 id: LANG_NEXT_FOLDER
 desc: in settings_menu.  Should we move to next folder when current one ends
@@ -3177,13 +3177,13 @@ id: LANG_RUNTIMEDB_ACTIVE
 desc: in settings_menu.
 eng: "Gather runtime data (experimental)"
 voice: "Gather runtime data"
-new: "Ker‰‰ soittotilastoja (koek‰ytˆss‰)"
+new: "Ker√§√§ soittotilastoja (koek√§yt√∂ss√§)"
 
 id: LANG_MENU_SET_RATING
 desc: in wps context menu
 eng: "Set song rating"
-voice: "Pisteyt‰ kappale"
-new: "Pisteyt‰ kappale"
+voice: "Pisteyt√§ kappale"
+new: "Pisteyt√§ kappale"
 
 id: LANG_RATING
 desc: in set_rating
@@ -3206,20 +3206,20 @@ new: "Jatketaan toistoa..."
 id: LANG_BACKLIGHT_FADE_IN
 desc: in settings_menu
 eng: "Backlight fade in"
-voice: "Taustavalon sis‰‰nh‰ivytys"
-new: "Taustavalon sis‰‰nh‰ivytys"
+voice: "Taustavalon sis√§√§nh√§ivytys"
+new: "Taustavalon sis√§√§nh√§ivytys"
 
 id: LANG_BACKLIGHT_FADE_OUT
 desc: in settings_menu
 eng: "Backlight fade out"
-voice: "Taustavalon poish‰ivytys"
-new: "Taustavalon poish‰ivytys"
+voice: "Taustavalon poish√§ivytys"
+new: "Taustavalon poish√§ivytys"
 
 id: LANG_NOTHING_TO_RESUME
 desc: Error message displayed when resume button pressed but no playlist
 eng: "Nothing to resume"
-voice: "Tyhj‰ soittolista"
-new: "Tyhj‰ soittolista"
+voice: "Tyhj√§ soittolista"
+new: "Tyhj√§ soittolista"
 
 id: LANG_REPLAYGAIN
 desc: in replaygain
@@ -3230,14 +3230,14 @@ new: "Replaygain"
 id: LANG_REPLAYGAIN_ENABLE
 desc: in replaygain
 eng: "Enable replaygain"
-voice: "Ota k‰yttˆˆn Replaygain"
-new: "Ota k‰yttˆˆn Replaygain"
+voice: "Ota k√§ytt√∂√∂n Replaygain"
+new: "Ota k√§ytt√∂√∂n Replaygain"
 
 id: LANG_REPLAYGAIN_NOCLIP
 desc: in replaygain
 eng: "Prevent clipping"
-voice: "Est‰ leikkautuminen"
-new: "Est‰ leikkautuminen"
+voice: "Est√§ leikkautuminen"
+new: "Est√§ leikkautuminen"
 
 id: LANG_REPLAYGAIN_MODE
 desc: in replaygain
@@ -3339,8 +3339,8 @@ new: "Hakemistopuun lataus muistiin"
 id: LANG_DIRCACHE_REBOOT
 desc: when activating directory cache
 eng: "Please reboot to enable the cache"
-voice: "K‰ynnist‰ laite uudelleen"
-new: "K‰ynnist‰ laite uudelleen"
+voice: "K√§ynnist√§ laite uudelleen"
+new: "K√§ynnist√§ laite uudelleen"
 
 id: LANG_DIRCACHE_BUILDING
 desc: when booting up and rebuilding the cache
@@ -3357,32 +3357,32 @@ new: "Aktivoi ristivaihto"
 id: LANG_CROSSFADE_FADE_IN_DELAY
 desc: in crossfade settings menu
 eng: "Fade in delay"
-voice: "Sis‰‰nh‰ivytyksen viive"
-new: "Sis‰‰nh‰ivytyksen viive"
+voice: "Sis√§√§nh√§ivytyksen viive"
+new: "Sis√§√§nh√§ivytyksen viive"
 
 id: LANG_CROSSFADE_FADE_OUT_DELAY
 desc: in crossfade settings menu
 eng: "Fade out delay"
-voice: "Poish‰ivytyksen viive"
-new: "Poish‰ivytyksen viive"
+voice: "Poish√§ivytyksen viive"
+new: "Poish√§ivytyksen viive"
 
 id: LANG_CROSSFADE_FADE_IN_DURATION
 desc: in crossfade settings menu
 eng: "Fade in duration"
-voice: "Sis‰‰nh‰ivytyksen kesto"
-new: "Sis‰‰nh‰ivytyksen kesto"
+voice: "Sis√§√§nh√§ivytyksen kesto"
+new: "Sis√§√§nh√§ivytyksen kesto"
 
 id: LANG_CROSSFADE_FADE_OUT_DURATION
 desc: in crossfade settings menu
 eng: "Fade out duration"
-voice: "Poish‰ivytyksen kesto"
-new: "Poish‰ivytyksen kesto"
+voice: "Poish√§ivytyksen kesto"
+new: "Poish√§ivytyksen kesto"
 
 id: LANG_CROSSFADE_FADE_OUT_MODE
 desc: in crossfade settings menu
 eng: "Fade out mode"
-voice: "Poish‰ivytyksen tyyli"
-new: "Poish‰ivytyksen tyyli"
+voice: "Poish√§ivytyksen tyyli"
+new: "Poish√§ivytyksen tyyli"
 
 id: LANG_RECORDING_ADC_RIGHT
 desc: in the recording settings
@@ -3418,19 +3418,19 @@ id: LANG_FM_FREEZE
 desc: splash screen during freeze in radio mode
 eng: "Screen frozen!"
 voice: ""
-new: "N‰ytˆn p‰ivitys keskeytynyt!"
+new: "N√§yt√∂n p√§ivitys keskeytynyt!"
 
 id: LANG_CROSSFEED_ENABLE
 desc: In the crossfeed menu
 eng: "Enable crossfeed"
 voice:
-new: "Aktivoi ristisyˆttˆ"
+new: "Aktivoi ristisy√∂tt√∂"
 
 id: LANG_CROSSFEED
 desc: in the sound settings menu
 eng: "Crossfeed"
-voice: "Ristisyˆttˆ"
-new: "Ristisyˆttˆ"
+voice: "Ristisy√∂tt√∂"
+new: "Ristisy√∂tt√∂"
 
 id: LANG_FM_SCAN_PRESETS
 desc: in radio menu
@@ -3454,7 +3454,7 @@ id: LANG_FM_ADD_PRESET
 desc: in radio menu
 eng: "Add preset"
 voice: 
-new: "Lis‰‰ esivalinta"
+new: "Lis√§√§ esivalinta"
 
 id: LANG_FM_CLEAR_PRESETS
 desc: confirmation if presets can be cleared
@@ -3471,13 +3471,13 @@ new: "Ladataan..."
 id: VOICE_EXT_RWPS
 desc: spoken only, for file extension
 eng: ""
-voice: "Et‰ohjaimen soittoikkuna"
+voice: "Et√§ohjaimen soittoikkuna"
 new:
 
 id: LANG_REMOTE_WHILE_PLAYING
 desc: in settings_menu()
 eng: "Browse .rwps files"
-voice: "Selaa et‰ohjaimen soittoikkunatiedostoja"
+voice: "Selaa et√§ohjaimen soittoikkunatiedostoja"
 new: "Selaa .rwps tiedostoja"
 
 id: LANG_CUSTOM_THEME
@@ -3489,6 +3489,6 @@ new: "Selaa teemoja"
 id: LANG_REDUCE_TICKING
 desc: in remote lcd settings menu
 eng: "Reduce ticking"
-voice: "V‰henn‰ et‰ohjaimen audiosignaalin h‰iriˆit‰"
-new: "V‰henn‰ et‰ohjaimen audiosignaalin h‰iriˆit‰"
+voice: "V√§henn√§ et√§ohjaimen audiosignaalin h√§iri√∂it√§"
+new: "V√§henn√§ et√§ohjaimen audiosignaalin h√§iri√∂it√§"
 

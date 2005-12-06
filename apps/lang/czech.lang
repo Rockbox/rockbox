@@ -4,14 +4,14 @@
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
-voice: "NastavenÌ zvuku"
-new: "NastavenÌ zvuku"
+voice: "Nastaven√≠ zvuku"
+new: "Nastaven√≠ zvuku"
 
 id: LANG_GENERAL_SETTINGS
 desc: in the main menu
 eng: "General Settings"
-voice: "ObecnÈ nastavenÌ"
-new: "ObecnÈ nastavenÌ"
+voice: "Obecn√© nastaven√≠"
+new: "Obecn√© nastaven√≠"
 
 id: LANG_INFO
 desc: in the main menu
@@ -28,8 +28,8 @@ new: "Verze"
 id: LANG_DEBUG
 desc: in the main menu
 eng: "Debug (Keep Out!)"
-voice: "Debug info ruce pryË"
-new: "Debug info (Ruce pryË)"
+voice: "Debug info ruce pryƒç"
+new: "Debug info (Ruce pryƒç)"
 
 id: LANG_USB
 desc: in the main menu
@@ -59,19 +59,19 @@ id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
 eng: "Battery: Charging"
 voice: ""
-new: "Baterie: NabÌjenÌ"
+new: "Baterie: Nab√≠jen√≠"
 
 id: LANG_PLAYLIST_LOAD
 desc: displayed on screen while loading a playlist
 eng: "Loading..."
 voice: ""
-new: "Nahr·v·m..."
+new: "Nahr√°v√°m..."
 
 id: LANG_PLAYLIST_SHUFFLE
 desc: displayed on screen while shuffling a playlist
 eng: "Shuffling..."
 voice: ""
-new: "PromÌch·v·nÌ..."
+new: "Prom√≠ch√°v√°n√≠..."
 
 id: LANG_PLAYINDICES_PLAYLIST
 desc: in playlist.indices() when playlist is full *WARNING* this and next ID are only used in this function.
@@ -83,13 +83,13 @@ id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
 eng: "Buffer Full"
 voice: ""
-new: "ZaplnÏn˝ buffer"
+new: "Zaplnƒõn√Ω buffer"
 
 id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
 eng: "Save Failed"
 voice: ""
-new: "Neuloæeno"
+new: "Neulo≈æeno"
 
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
@@ -101,7 +101,7 @@ id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
 eng: "Save Failed"
 voice: ""
-new: "Ukl·d·nÌ selhalo"
+new: "Ukl√°d√°n√≠ selhalo"
 
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
@@ -130,26 +130,26 @@ new: "Kontrast"
 id: LANG_SHUFFLE
 desc: in settings_menu
 eng: "Shuffle"
-voice: "N·hodnÏ"
-new: "N·hodnÏ"
+voice: "N√°hodnƒõ"
+new: "N√°hodnƒõ"
 
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play Selected First"
-voice: "P¯ehr·t nejprve vybranÈ"
-new: "P¯ehr·t nejprve vybranÈ"
+voice: "P≈ôehr√°t nejprve vybran√©"
+new: "P≈ôehr√°t nejprve vybran√©"
 
 id: LANG_SORT_CASE
 desc: in settings_menu
 eng: "Sort Case Sensitive"
-voice: "ÿadit podle velikosti pÌsmen"
-new: "ÿadit podle velikosti pÌsmen"
+voice: "≈òadit podle velikosti p√≠smen"
+new: "≈òadit podle velikosti p√≠smen"
 
 id: LANG_RESUME
 desc: in settings_menu
 eng: "Resume on startup"
-voice: "PokraËovat po zapnutÌ"
-new: "PokraËovat po zapnutÌ"
+voice: "Pokraƒçovat po zapnut√≠"
+new: "Pokraƒçovat po zapnut√≠"
 
 id: LANG_OFF
 desc: Used in a lot of places
@@ -160,8 +160,8 @@ new: "vyp."
 id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
 eng: "Ask"
-voice: "Zeptat se pokaædÈ"
-new: "Zeptat se pokaædÈ"
+voice: "Zeptat se poka≈æd√©"
+new: "Zeptat se poka≈æd√©"
 
 id: LANG_ON
 desc: Used in a lot of places
@@ -172,14 +172,14 @@ new: "zap."
 id: LANG_BACKLIGHT
 desc: in settings_menu
 eng: "Backlight"
-voice: "PodsvÌcenÌ"
-new: "PodsvÌcenÌ"
+voice: "Podsv√≠cen√≠"
+new: "Podsv√≠cen√≠"
 
 id: LANG_SCROLL
 desc: in settings_menu
 eng: "Scroll Speed Setting Example"
 voice: ""
-new: "Uk·zka rychlosti rolov·nÌ"
+new: "Uk√°zka rychlosti rolov√°n√≠"
 
 id: LANG_DISCHARGE
 desc: DEPRECATED
@@ -190,56 +190,56 @@ new: ""
 id: LANG_TIME
 desc: in settings_menu
 eng: "Set Time/Date"
-voice: "NastavenÌ Ëasu a data"
-new: "NastavenÌ Ëasu/data"
+voice: "Nastaven√≠ ƒçasu a data"
+new: "Nastaven√≠ ƒçasu/data"
 
 id: LANG_SPINDOWN
 desc: in settings_menu
 eng: "Disk Spindown"
-voice: "Zastavov·nÌ disku"
-new: "Zastavov·nÌ disku"
+voice: "Zastavov√°n√≠ disku"
+new: "Zastavov√°n√≠ disku"
 
 id: LANG_FFRW_STEP
 desc: in settings_menu
 eng: "FF/RW Min Step"
-voice: "Mal˝ skok p¯evÌjenÌ"
-new: "Skok p¯evÌjenÌ (mal˝)"
+voice: "Mal√Ω skok p≈ôev√≠jen√≠"
+new: "Skok p≈ôev√≠jen√≠ (mal√Ω)"
 
 id: LANG_FFRW_ACCEL
 desc: in settings_menu
 eng: "FF/RW Accel"
-voice: "UrychlenÈ p¯evÌjenÌ"
-new: "UrychlenÈ p¯evÌjenÌ"
+voice: "Urychlen√© p≈ôev√≠jen√≠"
+new: "Urychlen√© p≈ôev√≠jen√≠"
 
 id: LANG_FOLLOW
 desc: in settings_menu
 eng: "Follow Playlist"
-voice: "N·sledov·nÌ seznamu skladeb"
-new: "N·sledov·nÌ seznamu skladeb"
+voice: "N√°sledov√°n√≠ seznamu skladeb"
+new: "N√°sledov√°n√≠ seznamu skladeb"
 
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
 eng: "Are You Sure?"
 voice: ""
-new: "Jste si jist˝?"
+new: "Jste si jist√Ω?"
 
 id: LANG_RESET_DONE_SETTING
 desc: visual confirmation after settings reset
 eng: "Settings"
 voice: ""
-new: "NastavenÌ"
+new: "Nastaven√≠"
 
 id: LANG_RESET_DONE_CLEAR
 desc: visual confirmation after settings reset
 eng: "Cleared"
 voice: ""
-new: "Vynulov·no"
+new: "Vynulov√°no"
 
 id: LANG_RESET_DONE_CANCEL
 desc: Visual confirmation of cancelation
 eng: "Canceled"
 voice: ""
-new: "Zachov·no"
+new: "Zachov√°no"
 
 id: LANG_CASE_MENU
 desc: DEPRECATED
@@ -250,26 +250,26 @@ new: ""
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
 eng: "Scrolling"
-voice: "Rolov·nÌ"
-new: "Rolov·nÌ"
+voice: "Rolov√°n√≠"
+new: "Rolov√°n√≠"
 
 id: LANG_RESET
 desc: in system_settings_menu()
 eng: "Reset Settings"
-voice: "Vynulovat nastavenÌ"
-new: "Vynulovat nastavenÌ"
+voice: "Vynulovat nastaven√≠"
+new: "Vynulovat nastaven√≠"
 
 id: LANG_PLAYBACK
 desc: in settings_menu()
 eng: "Playback"
-voice: "P¯ehr·v·nÌ"
-new: "P¯ehr·v·nÌ"
+voice: "P≈ôehr√°v√°n√≠"
+new: "P≈ôehr√°v√°n√≠"
 
 id: LANG_FILE
 desc: in settings_menu()
 eng: "File View"
-voice: "ZobrazenÌ soubor˘"
-new: "ZobrazenÌ soubor˘"
+voice: "Zobrazen√≠ soubor≈Ø"
+new: "Zobrazen√≠ soubor≈Ø"
 
 id: LANG_DISPLAY
 desc: in settings_menu()
@@ -280,8 +280,8 @@ new: "Displej"
 id: LANG_SYSTEM
 desc: in settings_menu()
 eng: "System"
-voice: "SystÈm"
-new: "SystÈm"
+voice: "Syst√©m"
+new: "Syst√©m"
 
 id: LANG_VOLUME
 desc: in sound_settings
@@ -292,8 +292,8 @@ new: "Hlasitost"
 id: LANG_BALANCE
 desc: in sound_settings
 eng: "Balance"
-voice: "Vyv·æenÌ"
-new: "Vyv·æenÌ"
+voice: "Vyv√°≈æen√≠"
+new: "Vyv√°≈æen√≠"
 
 id: LANG_BASS
 desc: in sound_settings
@@ -304,14 +304,14 @@ new: "Basy"
 id: LANG_TREBLE
 desc: in sound_settings
 eng: "Treble"
-voice: "V˝πky"
-new: "V˝πky"
+voice: "V√Ω≈°ky"
+new: "V√Ω≈°ky"
 
 id: LANG_LOUDNESS
 desc: in sound_settings
 eng: "Loudness"
-voice: "St¯edy"
-new: "St¯edy"
+voice: "St≈ôedy"
+new: "St≈ôedy"
 
 id: LANG_BBOOST
 desc: DEPRECATED
@@ -323,19 +323,19 @@ id: LANG_DECAY
 desc: in sound_settings
 eng: "AV Decay Time"
 voice: ""
-new: "Doba doznÌv·nÌ"
+new: "Doba dozn√≠v√°n√≠"
 
 id: LANG_CHANNEL_MENU
 desc: in sound_settings
 eng: "Channels"
-voice: "Kan·ly"
-new: "Kan·ly"
+voice: "Kan√°ly"
+new: "Kan√°ly"
 
 id: LANG_CHANNEL
 desc: in sound_settings
 eng: "Channel Configuration"
 voice: ""
-new: "NastavenÌ kan·l˘"
+new: "Nastaven√≠ kan√°l≈Ø"
 
 id: LANG_CHANNEL_STEREO
 desc: in sound_settings
@@ -352,32 +352,32 @@ new: "Mono"
 id: LANG_CHANNEL_LEFT
 desc: in sound_settings
 eng: "Mono Left"
-voice: "Mono lev˝"
-new: "Mono-Lev˝"
+voice: "Mono lev√Ω"
+new: "Mono-Lev√Ω"
 
 id: LANG_CHANNEL_RIGHT
 desc: in sound_settings
 eng: "Mono Right"
-voice: "Mono prav˝"
-new: "Mono-Prav˝"
+voice: "Mono prav√Ω"
+new: "Mono-Prav√Ω"
 
 id: LANG_AUTOVOL
 desc: in sound_settings
 eng: "Auto Volume"
-voice: "Automatick· hlasitost"
+voice: "Automatick√° hlasitost"
 new: "Auto. hlasitost"
 
 id: LANG_SHOWDIR_ERROR_BUFFER
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Dir Buffer"
 voice: ""
-new: "Adres·¯ov˝ buf."
+new: "Adres√°≈ôov√Ω buf."
 
 id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Is Full!"
 voice: ""
-new: "Je zaplÚen!"
+new: "Je zapl≈àen!"
 
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
@@ -395,25 +395,25 @@ id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
 eng: "Key Lock ON"
 voice: ""
-new: "Kl·vesy Zap"
+new: "Kl√°vesy Zap"
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
 eng: "Key Lock OFF"
 voice: ""
-new: "Kl·vesy vyp."
+new: "Kl√°vesy vyp."
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
 eng: "Key Lock Is ON"
 voice: ""
-new: "Kl·vesy zamknuty"
+new: "Kl√°vesy zamknuty"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key Lock Is OFF"
 voice: ""
-new: "Kl·vesy aktivov·ny"
+new: "Kl√°vesy aktivov√°ny"
 
 id: LANG_MUTE_ON_PLAYER
 desc: DEPRECATED
@@ -455,7 +455,7 @@ id: LANG_ID3_TITLE
 desc: in wps
 eng: "[Title]"
 voice: ""
-new: "[N·zev]"
+new: "[N√°zev]"
 
 id: LANG_ID3_NO_TITLE
 desc: DEPRECATED
@@ -491,7 +491,7 @@ id: LANG_ID3_TRACKNUM
 desc: in wps
 eng: "[Tracknum]"
 voice: ""
-new: "[».skladby]"
+new: "[ƒå.skladby]"
 
 id: LANG_ID3_NO_TRACKNUM
 desc: DEPRECATED
@@ -503,7 +503,7 @@ id: LANG_ID3_LENGHT
 desc: in wps
 eng: "[Length]"
 voice: ""
-new: "[DÈlka]"
+new: "[D√©lka]"
 
 id: LANG_ID3_PLAYLIST
 desc: in wps
@@ -551,7 +551,7 @@ id: LANG_F2_MODE
 desc: in wps F2 pressed
 eng: "Mode:"
 voice: ""
-new: "mÛd:"
+new: "m√≥d:"
 
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
@@ -563,7 +563,7 @@ id: LANG_F3_SCROLL
 desc: in wps F3 pressed
 eng: "Scroll"
 voice: ""
-new: "RolovacÌ"
+new: "Rolovac√≠"
 
 id: LANG_F3_BAR
 desc: in wps F3 pressed
@@ -586,14 +586,14 @@ new: "Konec playlistu"
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
 eng: "Idle Poweroff"
-voice: "AutomatickÈ vypÌn·nÌ"
-new: "Aut. vypÌn·nÌ"
+voice: "Automatick√© vyp√≠n√°n√≠"
+new: "Aut. vyp√≠n√°n√≠"
 
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
 eng: "New Language"
 voice: ""
-new: "Nov˝ jazyk"
+new: "Nov√Ω jazyk"
 
 id: LANG_FILTER
 desc: setting name for dir filter
@@ -610,14 +610,14 @@ new: "Hudba"
 id: LANG_FILTER_SUPPORTED
 desc: show all file types supported by Rockbox
 eng: "Supported"
-voice: "PodporovanÈ"
-new: "PodporovanÈ"
+voice: "Podporovan√©"
+new: "Podporovan√©"
 
 id: LANG_FILTER_ALL
 desc: show all files
 eng: "All"
-voice: "Vπe"
-new: "Vπe"
+voice: "V≈°e"
+new: "V≈°e"
 
 id: LANG_SET_BOOL_YES
 desc: bool true representation
@@ -634,44 +634,44 @@ new: "Ne"
 id: LANG_PM_MENU
 desc: in the display menu
 eng: "Peak Meter"
-voice: "Grafick˝ ekvalizÈr"
-new: "Graf. ekvalizÈr"
+voice: "Grafick√Ω ekvaliz√©r"
+new: "Graf. ekvaliz√©r"
 
 id: LANG_PM_RELEASE
 desc: in the peak meter menu
 eng: "Peak Release"
-voice: "UvolnÏnÌ maxima"
-new: "UvolnÏnÌ maxima"
+voice: "Uvolnƒõn√≠ maxima"
+new: "Uvolnƒõn√≠ maxima"
 
 id: LANG_PM_PEAK_HOLD
 desc: in the peak meter menu
 eng: "Peak Hold Time"
-voice: "UdræenÌ maxima"
-new: "UdræenÌ maxima"
+voice: "Udr≈æen√≠ maxima"
+new: "Udr≈æen√≠ maxima"
 
 id: LANG_PM_CLIP_HOLD
 desc: in the peak meter menu
 eng: "Clip Hold Time"
-voice: "Prodleva p¯i p¯ebuzenÌ"
-new: "Prodleva p¯i p¯ebuzenÌ"
+voice: "Prodleva p≈ôi p≈ôebuzen√≠"
+new: "Prodleva p≈ôi p≈ôebuzen√≠"
 
 id: LANG_PM_ETERNAL
 desc: in the peak meter menu
 eng: "Eternal"
-voice: "NekoneËn·"
-new: "NekoneËn·"
+voice: "Nekoneƒçn√°"
+new: "Nekoneƒçn√°"
 
 id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
 eng: "Units Per Read"
-voice: "Jednotek na naËtenÌ"
-new: "Jedn. na naËtenÌ"
+voice: "Jednotek na naƒçten√≠"
+new: "Jedn. na naƒçten√≠"
 
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
 eng: "Backlight On When Plugged"
-voice: "PodsvÌtit p¯i nabÌjenÌ"
-new: "PodsvÌtit p¯i nabÌjenÌ"
+voice: "Podsv√≠tit p≈ôi nab√≠jen√≠"
+new: "Podsv√≠tit p≈ôi nab√≠jen√≠"
 
 id: LANG_REPEAT
 desc: in settings_menu
@@ -682,8 +682,8 @@ new: "Opak."
 id: LANG_REPEAT_ALL
 desc: repeat playlist once all songs have completed
 eng: "All"
-voice: "Vπe"
-new: "Vπe"
+voice: "V≈°e"
+new: "V≈°e"
 
 id: LANG_REPEAT_ONE
 desc: repeat one song
@@ -706,20 +706,20 @@ new: "OFF =Zachovat"
 id: LANG_TIMEFORMAT
 desc: select the time format of time in status bar
 eng: "Time Format"
-voice: "Form·t Ëasu"
-new: "Form·t Ëasu"
+voice: "Form√°t ƒçasu"
+new: "Form√°t ƒçasu"
 
 id: LANG_12_HOUR_CLOCK
 desc: option for 12 hour clock
 eng: "12 Hour Clock"
-voice: "dvan·cti hodinov˝ cyklus"
-new: "12 hodinov˝ cyklus"
+voice: "dvan√°cti hodinov√Ω cyklus"
+new: "12 hodinov√Ω cyklus"
 
 id: LANG_24_HOUR_CLOCK
 desc: option for 24 hour clock
 eng: "24 Hour Clock"
-voice: "dvaceti Ëty¯ hodinov˝ cyklus"
-new: "24 hodinov˝ cyklus"
+voice: "dvaceti ƒçty≈ô hodinov√Ω cyklus"
+new: "24 hodinov√Ω cyklus"
 
 id: LANG_WEEKDAY_SUNDAY
 desc: Maximum 3-letter abbreviation for weekday
@@ -737,25 +737,25 @@ id: LANG_WEEKDAY_TUESDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Tue"
 voice: ""
-new: "⁄te"
+new: "√öte"
 
 id: LANG_WEEKDAY_WEDNESDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Wed"
 voice: ""
-new: "St¯"
+new: "St≈ô"
 
 id: LANG_WEEKDAY_THURSDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Thu"
 voice: ""
-new: "»tv"
+new: "ƒåtv"
 
 id: LANG_WEEKDAY_FRIDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Fri"
 voice: ""
-new: "P·t"
+new: "P√°t"
 
 id: LANG_WEEKDAY_SATURDAY
 desc: Maximum 3-letter abbreviation for weekday
@@ -772,14 +772,14 @@ new: "Led"
 id: LANG_MONTH_FEBRUARY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Feb"
-voice: "⁄nor"
-new: "⁄nr"
+voice: "√önor"
+new: "√önr"
 
 id: LANG_MONTH_MARCH
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Mar"
-voice: "B¯ezen"
-new: "B¯e"
+voice: "B≈ôezen"
+new: "B≈ôe"
 
 id: LANG_MONTH_APRIL
 desc: Maximum 3-letter abbreviation for monthname
@@ -790,20 +790,20 @@ new: "Dub"
 id: LANG_MONTH_MAY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "May"
-voice: "KvÏten"
-new: "KvÏ"
+voice: "Kvƒõten"
+new: "Kvƒõ"
 
 id: LANG_MONTH_JUNE
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Jun"
-voice: "»erven"
-new: "»en"
+voice: "ƒåerven"
+new: "ƒåen"
 
 id: LANG_MONTH_JULY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Jul"
-voice: "»ervenec"
-new: "»ec"
+voice: "ƒåervenec"
+new: "ƒåec"
 
 id: LANG_MONTH_AUGUST
 desc: Maximum 3-letter abbreviation for monthname
@@ -814,14 +814,14 @@ new: "Srp"
 id: LANG_MONTH_SEPTEMBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Sep"
-voice: "Z·¯Ì"
-new: "Z·¯"
+voice: "Z√°≈ô√≠"
+new: "Z√°≈ô"
 
 id: LANG_MONTH_OCTOBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Oct"
-voice: "ÿÌjen"
-new: "ÿÌj"
+voice: "≈ò√≠jen"
+new: "≈ò√≠j"
 
 id: LANG_MONTH_NOVEMBER
 desc: Maximum 3-letter abbreviation for monthname
@@ -856,14 +856,14 @@ new: "Ukazatel hlasitosti"
 id: LANG_DISPLAY_GRAPHIC
 desc: Label for type of icon display
 eng: "Graphic"
-voice: "Grafick˝"
-new: "Grafick˝"
+voice: "Grafick√Ω"
+new: "Grafick√Ω"
 
 id: LANG_DISPLAY_NUMERIC
 desc: Label for type of icon display
 eng: "Numeric"
-voice: "Numerick˝"
-new: "Numerick˝"
+voice: "Numerick√Ω"
+new: "Numerick√Ω"
 
 id: LANG_PM_PERFORMANCE
 desc: DEPRECATED
@@ -892,14 +892,14 @@ new: "Rozsah"
 id: LANG_PM_DBFS
 desc: in the peak meter menu
 eng: "Logarithmic(dB)"
-voice: "Neline·rnÌ"
-new: "Neline·rnÌ(dB)"
+voice: "Neline√°rn√≠"
+new: "Neline√°rn√≠(dB)"
 
 id: LANG_PM_LINEAR
 desc: in the peak meter menu
 eng: "Linear(%)"
-voice: "Line·rnÌ"
-new: "Line·rnÌ(%)"
+voice: "Line√°rn√≠"
+new: "Line√°rn√≠(%)"
 
 id: LANG_PM_MIN
 desc: in the peak meter menu
@@ -916,26 +916,26 @@ new: "Maximum rozsahu"
 id: LANG_RECORDING
 desc: in the main menu
 eng: "Recording"
-voice: "Z·znam"
-new: "Z·znam"
+voice: "Z√°znam"
+new: "Z√°znam"
 
 id: LANG_RECORDING_GAIN
 desc: in the recording screen
 eng: "Gain"
 voice: ""
-new: "ZesÌlenÌ"
+new: "Zes√≠len√≠"
 
 id: LANG_RECORDING_LEFT
 desc: in the recording screen
 eng: "Left"
 voice: ""
-new: "Lev˝"
+new: "Lev√Ω"
 
 id: LANG_RECORDING_RIGHT
 desc: in the recording screen
 eng: "Right"
 voice: ""
-new: "Prav˝"
+new: "Prav√Ω"
 
 id: LANG_RECORDING_QUALITY
 desc: in the recording settings
@@ -958,8 +958,8 @@ new: "Zdroj"
 id: LANG_RECORDING_CHANNELS
 desc: in the recording settings
 eng: "Channels"
-voice: "Kan·ly"
-new: "Kan·ly"
+voice: "Kan√°ly"
+new: "Kan√°ly"
 
 id: LANG_RECORDING_SRC_MIC
 desc: in the recording settings
@@ -970,20 +970,20 @@ new: "Mik"
 id: LANG_RECORDING_SRC_LINE
 desc: in the recording settings
 eng: "Line In"
-voice: "Analogov˝"
+voice: "Analogov√Ω"
 new: "Analog"
 
 id: LANG_RECORDING_SRC_DIGITAL
 desc: in the recording settings
 eng: "Digital"
-voice: "Digit·lnÌ"
+voice: "Digit√°ln√≠"
 new: "Digit."
 
 id: LANG_RECORDING_SETTINGS
 desc: in the main menu
 eng: "Recording Settings"
-voice: "NastavenÌ z·znamu"
-new: "NastavenÌ z·znamu"
+voice: "Nastaven√≠ z√°znamu"
+new: "Nastaven√≠ z√°znamu"
 
 id: LANG_DISK_STAT
 desc: DEPRECATED
@@ -1000,8 +1000,8 @@ new: ""
 id: LANG_POWEROFF
 desc: disk poweroff flag
 eng: "Disk Poweroff"
-voice: "VypÌn·nÌ disku"
-new: "VypÌn·nÌ disku"
+voice: "Vyp√≠n√°n√≠ disku"
+new: "Vyp√≠n√°n√≠ disku"
 
 id: LANG_FILTER_PLAYLIST
 desc: show only playlist
@@ -1012,50 +1012,50 @@ new: "Seznamy skladeb"
 id: LANG_BATTERY_TIME
 desc: battery level in % and estimated time remaining
 eng: "%d%% %dh %dm"
-voice: "Energie bateriÌ"
+voice: "Energie bateri√≠"
 new: "%d%% %dh %dm"
 
 id: LANG_SLEEP_TIMER
 desc: sleep timer setting
 eng: "Sleep Timer"
-voice: "Usp·v·nÌ"
-new: "Usp·v·nÌ"
+voice: "Usp√°v√°n√≠"
+new: "Usp√°v√°n√≠"
 
 id: LANG_MP3BUFFER_MARGIN
 desc: MP3 buffer margin time
 eng: "Anti-Skip Buffer"
-voice: "Protiot¯esov· pamÏª"
-new: "Protiot¯esov· pamÏª"
+voice: "Protiot≈ôesov√° pamƒõ≈•"
+new: "Protiot≈ôesov√° pamƒõ≈•"
 
 id: LANG_BIDIR_SCROLL
 desc: Bidirectional scroll limit
 eng: "Bidirectional Scroll Limit"
-voice: "Limit obousmÏrnÈho rolov·nÌ"
-new: "Limit obousmÏrnÈho rolov·nÌ"
+voice: "Limit obousmƒõrn√©ho rolov√°n√≠"
+new: "Limit obousmƒõrn√©ho rolov√°n√≠"
 
 id: LANG_SCROLL_DELAY
 desc: Delay before scrolling
 eng: "Scroll Start Delay"
-voice: "⁄vodnÌ prodleva rolov·nÌ"
-new: "⁄vodnÌ prodleva rolov·nÌ"
+voice: "√övodn√≠ prodleva rolov√°n√≠"
+new: "√övodn√≠ prodleva rolov√°n√≠"
 
 id: LANG_SCROLL_STEP
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size"
-voice: "Krok rolov·nÌ"
-new: "Krok rolov·nÌ"
+voice: "Krok rolov√°n√≠"
+new: "Krok rolov√°n√≠"
 
 id: LANG_SCROLL_STEP_EXAMPLE
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size Setting Example Text"
 voice: ""
-new: "Uk·zkov˝ text pro nastavenÌ kroku rolov·nÌ"
+new: "Uk√°zkov√Ω text pro nastaven√≠ kroku rolov√°n√≠"
 
 id: LANG_SCROLL_SPEED
 desc: in display_settings_menu()
 eng: "Scroll Speed"
-voice: "Rychlost rolov·nÌ"
-new: "Rychlost rolov·nÌ"
+voice: "Rychlost rolov√°n√≠"
+new: "Rychlost rolov√°n√≠"
 
 id: LANG_TRICKLE_CHARGE
 desc: DEPRECATED
@@ -1067,13 +1067,13 @@ id: LANG_BATTERY_TOPOFF_CHARGE
 desc: in info display, shows that top off charge is running
 eng: "Battery: Top-Off Chg"
 voice: ""
-new: "Baterie: DonabÌjenÌ"
+new: "Baterie: Donab√≠jen√≠"
 
 id: LANG_BATTERY_TRICKLE_CHARGE
 desc: in info display, shows that trickle charge is running
 eng: "Battery: Trickle Chg"
 voice: ""
-new: "Baterie: P¯eruπov.nab."
+new: "Baterie: P≈ôeru≈°ov.nab."
 
 id: LANG_BATTERY_CAPACITY
 desc: in settings_menu
@@ -1085,7 +1085,7 @@ id: LANG_MENU_SETTING_CANCEL
 desc: Visual confirmation of canceling a changed setting
 eng: "Canceled"
 voice: ""
-new: "Stornov·no"
+new: "Stornov√°no"
 
 id: LANG_QUEUE
 desc: The verb/action Queue
@@ -1109,13 +1109,13 @@ id: LANG_DELETED
 desc: A file has beed deleted
 eng: "Deleted"
 voice: ""
-new: "Smaz·no"
+new: "Smaz√°no"
 
 id: LANG_RENAME
 desc: The verb/action Rename
 eng: "Rename"
-voice: "P¯ejmenovat"
-new: "P¯ejmenovat"
+voice: "P≈ôejmenovat"
+new: "P≈ôejmenovat"
 
 id: LANG_FAILED
 desc: Something failed. To be appended after above actions
@@ -1126,32 +1126,32 @@ new: "Neprovedeno"
 id: LANG_ALARM_MOD_ALARM_MENU
 desc: The name of the additional entry in the main menu for the RTC alarm mod.
 eng: "Wake-Up Alarm"
-voice: "BudÌk"
-new: "BudÌk"
+voice: "Bud√≠k"
+new: "Bud√≠k"
 
 id: LANG_ALARM_MOD_TIME
 desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
 eng: "Alarm Time: %02d:%02d"
 voice: ""
-new: "»as buzenÌ: %02d:%02d"
+new: "ƒåas buzen√≠: %02d:%02d"
 
 id: LANG_ALARM_MOD_TIME_TO_GO
 desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
 eng: "Waking Up In %d:%02d"
 voice: ""
-new: "BuzenÌ za %d:%02d"
+new: "Buzen√≠ za %d:%02d"
 
 id: LANG_ALARM_MOD_SHUTDOWN
 desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
 eng: "Alarm Set"
 voice: ""
-new: "BudÌk nastaven"
+new: "Bud√≠k nastaven"
 
 id: LANG_ALARM_MOD_ERROR
 desc: The text that tells that the time is incorrect (for the RTC alarm mod).
 eng: "Alarm Time Is Too Soon!"
 voice: ""
-new: "»as buzenÌ je p¯Ìliπ brzy!"
+new: "ƒåas buzen√≠ je p≈ô√≠li≈° brzy!"
 
 id: LANG_ALARM_MOD_KEYS
 desc: Shown key functions in alarm menu (for the RTC alarm mod).
@@ -1162,14 +1162,14 @@ new: "PLAY=nastav OFF=Odchod"
 id: LANG_CREATE_PLAYLIST
 desc: Menu option for creating a playlist
 eng: "Create Playlist"
-voice: "Vytvo¯it playlist"
-new: "Vytvo¯it playlist"
+voice: "Vytvo≈ôit playlist"
+new: "Vytvo≈ôit playlist"
 
 id: LANG_CREATING
 desc: Screen feedback during playlist creation
 eng: "Creating"
 voice: ""
-new: "Vytv·¯Ìm"
+new: "Vytv√°≈ô√≠m"
 
 id: LANG_PLAYER_KEYBOARD_BACKSPACE
 desc: DEPRECATED
@@ -1205,7 +1205,7 @@ id: LANG_ID3_GENRE
 desc: ID3 frame 'genre'
 eng: "[Genre]"
 voice: ""
-new: "[Æ·nr]"
+new: "[≈Ω√°nr]"
 
 id: LANG_ID3_YEAR
 desc: ID3 info 'year'
@@ -1223,7 +1223,7 @@ id: LANG_RECORDING_TIME
 desc: Display of recorded time
 eng: "Time:"
 voice: ""
-new: "»as"
+new: "ƒåas"
 
 id: LANG_RECORDING_SIZE
 desc: Display of recorded file size
@@ -1235,19 +1235,19 @@ id: LANG_SETTINGS_LOADED1
 desc: Feedback shown when a .cfg file is loaded
 eng: "Settings"
 voice: ""
-new: "NastavenÌ"
+new: "Nastaven√≠"
 
 id: LANG_SETTINGS_LOADED2
 desc: Feedback shown when a .cfg file is loaded
 eng: "Loaded"
 voice: ""
-new: "Nahr·no"
+new: "Nahr√°no"
 
 id: LANG_FADE_ON_STOP
 desc: options menu to set fade on stop or pause
 eng: "Fade On Stop/Pause"
-voice: "Ztlumovat p¯i zastevenÌ pauze"
-new: "Ztlumovat p¯i zastevenÌ/pauze"
+voice: "Ztlumovat p≈ôi zasteven√≠ pauze"
+new: "Ztlumovat p≈ôi zasteven√≠/pauze"
 
 id: LANG_SOKOBAN_ON
 desc: DEPRECATED
@@ -1258,8 +1258,8 @@ new: ""
 id: LANG_INVERT
 desc: in settings_menu
 eng: "LCD Mode"
-voice: "MÛd displeje"
-new: "MÛd displeje"
+voice: "M√≥d displeje"
+new: "M√≥d displeje"
 
 id: LANG_CHANNEL_STEREO_NARROW_PLAYER
 desc: DEPRECATED
@@ -1288,20 +1288,20 @@ new: "Karaoke"
 id: LANG_SAVE_SETTINGS
 desc: in system_settings_menu()
 eng: "Write .cfg file"
-voice: "Uloæit nastavenÌ do konfiguraËnÌho souboru"
-new: "Uloæit nastavenÌ do .cfg souboru"
+voice: "Ulo≈æit nastaven√≠ do konfiguraƒçn√≠ho souboru"
+new: "Ulo≈æit nastaven√≠ do .cfg souboru"
 
 id: LANG_SETTINGS_SAVED1
 desc: Feedback shown when a .cfg file is saved
 eng: "Settings"
 voice: ""
-new: "NastavenÌ"
+new: "Nastaven√≠"
 
 id: LANG_SETTINGS_SAVED2
 desc: Feedback shown when a .cfg file is saved
 eng: "Saved"
 voice: ""
-new: "Uloæeno"
+new: "Ulo≈æeno"
 
 id: LANG_VBRFIX_STOP_PLAY
 desc: DEPRECATED
@@ -1330,68 +1330,68 @@ new: "Kurzor"
 id: LANG_RECORDING_EDITABLE
 desc: Editable recordings setting
 eng: "Independent frames"
-voice: "Nez·vislÈ snÌmky"
-new: "Nez·vislÈ snÌmky"
+voice: "Nez√°visl√© sn√≠mky"
+new: "Nez√°visl√© sn√≠mky"
 
 id: LANG_STATUS_BAR
 desc: display menu, F3 substitute
 eng: "Status Bar"
-voice: "Stavov˝ panel"
-new: "Stavov˝ panel"
+voice: "Stavov√Ω panel"
+new: "Stavov√Ω panel"
 
 id: LANG_SCROLL_BAR
 desc: display menu, F3 substitute
 eng: "Scroll Bar"
-voice: "RolovacÌ panel"
-new: "RolovacÌ panel"
+voice: "Rolovac√≠ panel"
+new: "Rolovac√≠ panel"
 
 id: LANG_CAPTION_BACKLIGHT
 desc: in settings_menu
 eng: "Caption backlight"
-voice: "PodsvÌcenÌ zaË·tku skladeb"
-new: "PodsvÌcenÌ zaË·tku skladeb"
+voice: "Podsv√≠cen√≠ zaƒç√°tku skladeb"
+new: "Podsv√≠cen√≠ zaƒç√°tku skladeb"
 
 id: LANG_INVERT_CURSOR_POINTER
 desc: in settings_menu
 eng: "Pointer"
-voice: "©ipka"
-new: "©ipka"
+voice: "≈†ipka"
+new: "≈†ipka"
 
 id: LANG_INVERT_CURSOR_BAR
 desc: in settings_menu
 eng: "Bar(Inverse)"
-voice: "InverznÌ kurzor"
-new: "InverznÌ kurzor"
+voice: "Inverzn√≠ kurzor"
+new: "Inverzn√≠ kurzor"
 
 id: LANG_INVERT_LCD_NORMAL
 desc: in settings_menu
 eng: "Normal"
-voice: "Norm·lnÌ"
-new: "Norm·lnÌ"
+voice: "Norm√°ln√≠"
+new: "Norm√°ln√≠"
 
 id: LANG_INVERT_LCD_INVERSE
 desc: in settings_menu
 eng: "Inverse"
-voice: "InverznÌ"
-new: "InverznÌ"
+voice: "Inverzn√≠"
+new: "Inverzn√≠"
 
 id: LANG_MAX_FILES_IN_DIR
 desc: in settings_menu
 eng: "Max files in dir browser"
-voice: "Maxim·lnÌ poËet soubor˘ v adres·¯i"
-new: "Max.poË. soubor˘ v adres·¯i"
+voice: "Maxim√°ln√≠ poƒçet soubor≈Ø v adres√°≈ôi"
+new: "Max.poƒç. soubor≈Ø v adres√°≈ôi"
 
 id: LANG_MAX_FILES_IN_PLAYLIST
 desc: in settings_menu
 eng: "Max playlist size"
-voice: "Maxim·lnÌ velikost seznamu skadeb"
+voice: "Maxim√°ln√≠ velikost seznamu skadeb"
 new: "Max.velikost sezn.skadeb"
 
 id: LANG_JUMP_SCROLL
 desc: (player) menu altarnative for jump scroll
 eng: "Jump scroll"
-voice: "SkokovÈ rolov·nÌ"
-new: "SkokovÈ rolov·nÌ"
+voice: "Skokov√© rolov√°n√≠"
+new: "Skokov√© rolov√°n√≠"
 
 id: LANG_ONE_TIME
 desc: (player) the jump scroll shall be done "one time"
@@ -1402,26 +1402,26 @@ new: "Pouze jednou"
 id: LANG_ALWAYS
 desc: (player) the jump scroll shall be done "always"
 eng: "Always"
-voice: "OpakovanÏ"
-new: "OpakovanÏ"
+voice: "Opakovanƒõ"
+new: "Opakovanƒõ"
 
 id: LANG_JUMP_SCROLL_DELAY
 desc: (player) Delay before making a jump scroll
 eng: "Jump Scroll Delay"
-voice: "UvodnÌ prodleva"
-new: "UvodnÌ prodleva"
+voice: "Uvodn√≠ prodleva"
+new: "Uvodn√≠ prodleva"
 
 id: LANG_RECORD_TIMESPLIT
 desc: Prompt for record timer interval setting, in the record settings menu
 eng: "Time Split"
-voice: "Interval rozdÏlenÌ"
-new: "Interval rozdÏlenÌ"
+voice: "Interval rozdƒõlen√≠"
+new: "Interval rozdƒõlen√≠"
 
 id: LANG_RECORD_TIMESPLIT_REC
 desc: Display of record timer interval setting, on the record screen
 eng: "Split time:"
 voice: ""
-new: "Interval rozdÏlenÌ:"
+new: "Interval rozdƒõlen√≠:"
 
 id: LANG_SHOW_ICONS
 desc: in settings_menu
@@ -1433,7 +1433,7 @@ id: LANG_CANCEL_WITH_ANY_RECORDER
 desc: Generic recorder string to use to cancel
 eng: "Any Other = No"
 voice: ""
-new: "OstatnÌ = Ne"
+new: "Ostatn√≠ = Ne"
 
 id: LANG_CONFIRM_WITH_PLAY_RECORDER
 desc: Generic recorder string to use to confirm
@@ -1445,49 +1445,49 @@ id: LANG_DISK_FULL
 desc: in recording screen
 eng: "The disk is full. Press OFF to continue."
 voice: ""
-new: "Disk je pln˝. Pro pokraËov·nÌ stisknÏte OFF."
+new: "Disk je pln√Ω. Pro pokraƒçov√°n√≠ stisknƒõte OFF."
 
 id: LANG_INSERT
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
 eng: "Insert"
-voice: "Vloæit"
-new: "Vloæit"
+voice: "Vlo≈æit"
+new: "Vlo≈æit"
 
 id: LANG_INSERT_FIRST
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
 eng: "Insert next"
-voice: "Vloæit za"
-new: "Vloæit za"
+voice: "Vlo≈æit za"
+new: "Vlo≈æit za"
 
 id: LANG_INSERT_LAST
 desc: in onplay menu.  append a track/playlist into dynamic playlist.
 eng: "Insert last"
-voice: "Vloæit na konec"
-new: "Vloæit na konec"
+voice: "Vlo≈æit na konec"
+new: "Vlo≈æit na konec"
 
 id: LANG_OFF_ABORT
 desc: Used on recorder models
 eng: "OFF to abort"
 voice: ""
-new: "OFF zruπit"
+new: "OFF zru≈°it"
 
 id: LANG_PLAYLIST_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing playlist file"
 voice: ""
-new: "Chyba p¯i p¯Ìstupu k playlistu"
+new: "Chyba p≈ôi p≈ô√≠stupu k playlistu"
 
 id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing playlist control file"
 voice: ""
-new: "Chyba p¯Ìstupu k konf. souboru playlistu"
+new: "Chyba p≈ô√≠stupu k konf. souboru playlistu"
 
 id: LANG_PLAYLIST_CONTROL_INVALID
 desc: Playlist resume error
 eng: "Playlist control file is invalid"
 voice: ""
-new: "Konf. soubor playlistu je neplatn˝"
+new: "Konf. soubor playlistu je neplatn√Ω"
 
 ##
 ## boot change detection
@@ -1497,25 +1497,25 @@ id: LANG_BOOT_CHANGED
 desc: File browser discovered the boot file was changed
 eng: "Boot changed"
 voice: ""
-new: "ZmÏnÏn firmware"
+new: "Zmƒõnƒõn firmware"
 
 id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
 desc: Playlist error
 eng: "Error updating playlist control file"
 voice: ""
-new: "Chyba p¯Ìstupu k konf. souboru playlistu"
+new: "Chyba p≈ô√≠stupu k konf. souboru playlistu"
 
 id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing directory"
 voice: ""
-new: "Chyba p¯Ìstupu k adres·¯i"
+new: "Chyba p≈ô√≠stupu k adres√°≈ôi"
 
 id: LANG_PLAYLIST_INSERT_COUNT
 desc: splash number of tracks inserted
 eng: "Inserted %d tracks (%s)"
 voice: ""
-new: "Vloæeno %d skladeb (%s)"
+new: "Vlo≈æeno %d skladeb (%s)"
 
 id: LANG_PLAYLIST_MENU
 desc: in main menu.
@@ -1527,85 +1527,85 @@ id: LANG_PLAYLIST_QUEUE_COUNT
 desc: splash number of tracks queued
 eng: "Queued %d tracks (%s)"
 voice: ""
-new: "Za¯azeno %d skladeb (%s)"
+new: "Za≈ôazeno %d skladeb (%s)"
 
 id: LANG_PLAYLIST_SAVE_COUNT
 desc: splash number of tracks saved
 eng: "Saved %d tracks (%s)"
 voice: ""
-new: "Uloæeno %d skladeb (%s)"
+new: "Ulo≈æeno %d skladeb (%s)"
 
 id: LANG_PLUGIN_CANT_OPEN
 desc: Plugin open error message
 eng: "Can't open %s"
 voice: ""
-new: "Chyba p¯i otvÌr·nÌ %s"
+new: "Chyba p≈ôi otv√≠r√°n√≠ %s"
 
 id: LANG_PLUGIN_ERROR
 desc: The plugin return an error code
 eng: "Plugin returned error"
 voice: ""
-new: "Plugin vr·til chybu"
+new: "Plugin vr√°til chybu"
 
 id: LANG_PLUGIN_WRONG_MODEL
 desc: The plugin is not compatible with the archos model trying to run it
 eng: "Incompatible model"
 voice: ""
-new: "NekompatibilnÌ model"
+new: "Nekompatibiln√≠ model"
 
 id: LANG_PLUGIN_WRONG_VERSION
 desc: The plugin is not compatible with the rockbox version trying to run it
 eng: "Incompatible version"
 voice: ""
-new: "NekompatibilnÌ verze"
+new: "Nekompatibiln√≠ verze"
 
 id: LANG_QUEUE_FIRST
 desc: in onplay menu.  queue a track/playlist into dynamic playlist.
 eng: "Queue next"
-voice: "Za¯adit za"
-new: "Za¯adit za"
+voice: "Za≈ôadit za"
+new: "Za≈ôadit za"
 
 id: LANG_QUEUE_LAST
 desc: in onplay menu.  queue a track/playlist at end of playlist.
 eng: "Queue last"
-voice: "Za¯adit na konec"
-new: "Za¯adit na konec"
+voice: "Za≈ôadit na konec"
+new: "Za≈ôadit na konec"
 
 id: LANG_READ_FAILED
 desc: There was an error reading a file
 eng: "Failed reading %s"
 voice: ""
-new: "Chyba ËtenÌ %s"
+new: "Chyba ƒçten√≠ %s"
 
 id: LANG_REBOOT_NOW
 desc: Do you want to reboot?
 eng: "Reboot now?"
 voice: ""
-new: "Restartovat nynÌ?"
+new: "Restartovat nyn√≠?"
 
 id: LANG_RECURSE_DIRECTORY
 desc: In playlist menu
 eng: "Recursively Insert Directories"
-voice: "Vkl·dat adres·¯e rekurzivnÏ"
-new: "Vkl·dat adres·¯e rekurzivnÏ"
+voice: "Vkl√°dat adres√°≈ôe rekurzivnƒõ"
+new: "Vkl√°dat adres√°≈ôe rekurzivnƒõ"
 
 id: LANG_SAVE_DYNAMIC_PLAYLIST
 desc: in playlist menu.
 eng: "Save Current Playlist"
-voice: "Uloæit aktu·lnÌ playlist"
-new: "Uloæit aktu·lnÌ playlist"
+voice: "Ulo≈æit aktu√°ln√≠ playlist"
+new: "Ulo≈æit aktu√°ln√≠ playlist"
 
 id: LANG_STOP_ABORT
 desc: Used on player models
 eng: "STOP to abort"
 voice: ""
-new: "STOP zruπit"
+new: "STOP zru≈°it"
 
 id: LANG_RECURSE_DIRECTORY_QUESTION
 desc: Asked from onplay screen
 eng: "Recursively?"
 voice: ""
-new: "RekurzivnÏ?"
+new: "Rekurzivnƒõ?"
 
 id: LANG_BUTTONBAR_MENU
 desc: in button bar
@@ -1616,44 +1616,44 @@ new: "Menu"
 id: LANG_CAR_ADAPTER_MODE
 desc: Displayed for setting car adapter mode to on/off
 eng: "Car Adapter Mode"
-voice: "MÛd auto adaptÈru"
-new: "MÛd auto adaptÈru"
+voice: "M√≥d auto adapt√©ru"
+new: "M√≥d auto adapt√©ru"
 
 id: LANG_CUSTOM_CFG
 desc: in setting_menu()
 eng: "Browse .cfg files"
-voice: "Proch·zet konfiguraËnÌ soubory"
-new: "Proch·zet .cfg soubory"
+voice: "Proch√°zet konfiguraƒçn√≠ soubory"
+new: "Proch√°zet .cfg soubory"
 
 id: LANG_CUSTOM_FONT
 desc: in setting_menu()
 eng: "Browse Fonts"
-voice: "Proch·zet fonty"
-new: "Proch·zet fonty"
+voice: "Proch√°zet fonty"
+new: "Proch√°zet fonty"
 
 id: LANG_FIRMWARE
 desc: in the main menu
 eng: "Browse Firmwares"
-voice: "Proch·zet firmware soubory"
-new: "Proch·zet firmware soubory"
+voice: "Proch√°zet firmware soubory"
+new: "Proch√°zet firmware soubory"
 
 id: LANG_FM_BUTTONBAR_PRESETS
 desc: in button bar
 eng: "Preset"
 voice: ""
-new: "P¯edvolba"
+new: "P≈ôedvolba"
 
 id: LANG_FM_DELETE_PRESET
 desc: in radio screen
 eng: "Remove preset"
 voice: ""
-new: "Vymaæ p¯edvolbu"
+new: "Vyma≈æ p≈ôedvolbu"
 
 id: LANG_FM_NO_FREE_PRESETS
 desc: in radio screen
 eng: "The preset list is full"
 voice: ""
-new: "Seznam p¯edvoleb je pln˝"
+new: "Seznam p≈ôedvoleb je pln√Ω"
 
 id: LANG_FM_NO_PRESETS
 desc: DEPRECATED
@@ -1665,7 +1665,7 @@ id: LANG_FM_PRESET_SAVE_FAILED
 desc: in radio screen
 eng: "Preset save failed"
 voice: ""
-new: "Chyba p¯i ukl·d·nÌ p¯edvolby"
+new: "Chyba p≈ôi ukl√°d√°n√≠ p≈ôedvolby"
 
 id: LANG_FM_SAVE_PRESET
 desc: DEPRECATED
@@ -1688,38 +1688,38 @@ new: "Jazyk"
 id: LANG_LINE_IN
 desc: in settings_menu
 eng: "Line In"
-voice: "Linkov˝ vstup"
-new: "Linkov˝ vstup"
+voice: "Linkov√Ω vstup"
+new: "Linkov√Ω vstup"
 
 id: LANG_NO_FILES
 desc: in settings_menu
 eng: "No files"
 voice: ""
-new: "Æ·dnÈ soubory"
+new: "≈Ω√°dn√© soubory"
 
 id: LANG_PLUGINS
 desc: in main_menu()
 eng: "Browse Plugins"
-voice: "Proch·zet pluginy"
-new: "Proch·zet pluginy"
+voice: "Proch√°zet pluginy"
+new: "Proch√°zet pluginy"
 
 id: LANG_WHILE_PLAYING
 desc: in settings_menu()
 eng: "Browse .wps files"
-voice: "Proch·zet definice p¯ehr·vacÌch obrazovek"
-new: "Proch·zet .wps soubory"
+voice: "Proch√°zet definice p≈ôehr√°vac√≠ch obrazovek"
+new: "Proch√°zet .wps soubory"
 
 id: LANG_AUTO_BOOKMARK_QUERY
 desc: prompt for user to decide to create an bookmark
 eng: "Create a Bookmark?"
 voice: ""
-new: "Vytvo¯it z·loæku?"
+new: "Vytvo≈ôit z√°lo≈æku?"
 
 id: LANG_BARS_MENU
 desc: in the display sub menu
 eng: "Status-/Scrollbar"
-voice: "Infopanel PosuvnÌk"
-new: "Infopanel/PosuvnÌk"
+voice: "Infopanel Posuvn√≠k"
+new: "Infopanel/Posuvn√≠k"
 
 id: LANG_BATTERY_MENU
 desc: in the system sub menu
@@ -1731,67 +1731,67 @@ id: LANG_BOOKMARK_AUTOLOAD_QUERY
 desc: prompt for user to decide to create a bookmark
 eng: "Load Last Bookmark?"
 voice: ""
-new: "Nahr·t poslednÌ z·loæku?"
+new: "Nahr√°t posledn√≠ z√°lo≈æku?"
 
 id: LANG_BOOKMARK_CREATE_FAILURE
 desc: Indicates bookmark was not created
 eng: "Bookmark Failed!"
 voice: ""
-new: "Chyba p¯i vytv·¯enÌ z·loæky!"
+new: "Chyba p≈ôi vytv√°≈ôen√≠ z√°lo≈æky!"
 
 id: LANG_BOOKMARK_CREATE_SUCCESS
 desc: Indicates bookmark was successfully created
 eng: "Bookmark Created"
 voice: ""
-new: "Z·loæka vytvo¯ena"
+new: "Z√°lo≈æka vytvo≈ôena"
 
 id: LANG_BOOKMARK_LOAD_EMPTY
 desc: Indicates bookmark was empty
 eng: "Bookmark Empty"
 voice: ""
-new: "Z·loæka je pr·zdn·"
+new: "Z√°lo≈æka je pr√°zdn√°"
 
 id: LANG_BOOKMARK_MENU
 desc: Text on main menu to get to bookmark commands
 eng: "Bookmarks"
-voice: "Z·loæky"
-new: "Z·loæky"
+voice: "Z√°lo≈æky"
+new: "Z√°lo≈æky"
 
 id: LANG_BOOKMARK_MENU_CREATE
 desc: Used off of the bookmark menu to create a bookmark
 eng: "Create Bookmark"
-voice: "Vytvo¯it z·loæku"
-new: "Vytvo¯it z·loæku"
+voice: "Vytvo≈ôit z√°lo≈æku"
+new: "Vytvo≈ôit z√°lo≈æku"
 
 id: LANG_BOOKMARK_MENU_LIST
 desc: Used off of the bookmark menu to list available bookmarks for the currently playing directory or M3U
 eng: "List Bookmarks"
-voice: "Proch·zet z·loæky"
-new: "Proch·zet z·loæky"
+voice: "Proch√°zet z√°lo≈æky"
+new: "Proch√°zet z√°lo≈æky"
 
 id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
 desc: Text for the menu text to access the most recent bookmarks list
 eng: "Recent Bookmarks"
-voice: "PoslednÌ z·loæky"
-new: "PoslednÌ z·loæky"
+voice: "Posledn√≠ z√°lo≈æky"
+new: "Posledn√≠ z√°lo≈æky"
 
 id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
 desc: Used on the bookmark select window to label bookmark number
 eng: "Bookmark"
 voice: ""
-new: "Z·loæka"
+new: "Z√°lo≈æka"
 
 id: LANG_BOOKMARK_SELECT_DELETE
 desc: Used on the bookmark select window to indicated the bookmark delete option
 eng: "ON+Play = Delete"
 voice: ""
-new: "ON+Play = Vymaæ"
+new: "ON+Play = Vyma≈æ"
 
 id: LANG_BOOKMARK_SELECT_EXIT
 desc: From the bookmark list screen, allows user to exit
 eng: "OFF = Exit"
 voice: ""
-new: "OFF = ZpÏt"
+new: "OFF = Zpƒõt"
 
 id: LANG_BOOKMARK_SELECT_INDEX_TEXT
 desc: Used on the bookmark select window to label index number
@@ -1803,7 +1803,7 @@ id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
 desc: From the auto-load screen, allows user to list all bookmarks
 eng: "Down = List"
 voice: ""
-new: "Dol˘ = Proch·zet"
+new: "Dol≈Ø = Proch√°zet"
 
 id: LANG_BOOKMARK_SELECT_PLAY
 desc: Used on the bookmark select window to indicated the play option
@@ -1814,56 +1814,56 @@ new: "PLAY = Vybrat"
 id: LANG_BOOKMARK_SELECT_TIME_TEXT
 desc: Used on the bookmark select window to label elapsed time
 eng: "Time"
-voice: "»as"
-new: "»as"
+voice: "ƒåas"
+new: "ƒåas"
 
 id: LANG_BOOKMARK_SETTINGS
 desc: in general settings
 eng: "Bookmarking"
-voice: "Vytv·¯enÌ z·loæek"
-new: "Vytv·¯enÌ z·loæek"
+voice: "Vytv√°≈ôen√≠ z√°lo≈æek"
+new: "Vytv√°≈ôen√≠ z√°lo≈æek"
 
 id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
 desc: prompt for user to decide to create an bookmark
 eng: "Bookmark on Stop"
-voice: "Vytvo¯it p¯i zastavenÌ"
-new: "Vytvo¯it p¯i zastavenÌ"
+voice: "Vytvo≈ôit p≈ôi zastaven√≠"
+new: "Vytvo≈ôit p≈ôi zastaven√≠"
 
 id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
 desc: prompt for user to decide to create a bookmark
 eng: "Load Last Bookmark"
-voice: "Nahr·t poslednÌ z·loæku"
-new: "Nahr·t poslednÌ z·loæku"
+voice: "Nahr√°t posledn√≠ z√°lo≈æku"
+new: "Nahr√°t posledn√≠ z√°lo≈æku"
 
 id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
 desc: Configuration option to maintain a list of recent bookmarks
 eng: "Maintain a List of Recent Bookmarks?"
-voice: "Uchov·vat seznam pouæÌvan˝ch z·loæek?"
-new: "Uchov·vat seznam pouæÌvan˝ch z·loæek?"
+voice: "Uchov√°vat seznam pou≈æ√≠van√Ωch z√°lo≈æek?"
+new: "Uchov√°vat seznam pou≈æ√≠van√Ωch z√°lo≈æek?"
 
 id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
 desc: Save in recent bookmarks only
 eng: "Ask - Recent only"
-voice: "Zeptat se - Jen u naposledy pouæit˝ch"
-new: "Zeptat se - Jen u naposledy pouæit˝ch"
+voice: "Zeptat se - Jen u naposledy pou≈æit√Ωch"
+new: "Zeptat se - Jen u naposledy pou≈æit√Ωch"
 
 id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
 desc: Save in recent bookmarks only
 eng: "Yes - Recent only"
-voice: "Ano U naposledy pouæit˝ch"
-new: "Ano - U naposledy pouæit˝ch"
+voice: "Ano U naposledy pou≈æit√Ωch"
+new: "Ano - U naposledy pou≈æit√Ωch"
 
 id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
 desc: Save only on bookmark for each playlist in recent bookmarks
 eng: "Unique only"
-voice: "Jen unik·tnÌ"
-new: "Jen unik·tnÌ"
+voice: "Jen unik√°tn√≠"
+new: "Jen unik√°tn√≠"
 
 id: LANG_CREATE_DIR
 desc: in main menu
 eng: "Create directory"
-voice: "Vytvo¯it adres·¯"
-new: "Vytvo¯it adres·¯"
+voice: "Vytvo≈ôit adres√°≈ô"
+new: "Vytvo≈ôit adres√°≈ô"
 
 id: LANG_DISK_MENU
 desc: in the system sub menu
@@ -1880,32 +1880,32 @@ new: "Plnou cestu"
 id: LANG_DISPLAY_TRACK_NAME_ONLY
 desc: track display options
 eng: "Track name only"
-voice: "Jen n·zev skladby"
-new: "Jen n·zev skladby"
+voice: "Jen n√°zev skladby"
+new: "Jen n√°zev skladby"
 
 id: LANG_FILE_OPTIONS
 desc: in playlist viewer on+play menu
 eng: "File Options"
-voice: "Vlastnosti soubor˘"
-new: "Vlastnosti soubor˘"
+voice: "Vlastnosti soubor≈Ø"
+new: "Vlastnosti soubor≈Ø"
 
 id: LANG_FLIP_DISPLAY
 desc: in settings_menu, option to turn display+buttos by 180 degreed
 eng: "Upside Down"
-voice: "Vzh˘ru nohama"
-new: "Vzh˘ru nohama"
+voice: "Vzh≈Øru nohama"
+new: "Vzh≈Øru nohama"
 
 id: LANG_FM_BUTTONBAR_RECORD
 desc: in main menu
 eng: "Record"
 voice: ""
-new: "Nahr·v·nÌ"
+new: "Nahr√°v√°n√≠"
 
 id: LANG_FM_RADIO
 desc: in main menu
 eng: "FM Radio"
-voice: "FM R·dio"
-new: "FM R·dio"
+voice: "FM R√°dio"
+new: "FM R√°dio"
 
 id: LANG_INFO_MENU
 desc: in the info sub menu
@@ -1916,8 +1916,8 @@ new: "Rockbox info"
 id: LANG_LCD_MENU
 desc: in the display sub menu
 eng: "LCD Settings"
-voice: "NastavenÌ displeje"
-new: "NastavenÌ displeje"
+voice: "Nastaven√≠ displeje"
+new: "Nastaven√≠ displeje"
 
 id: LANG_LIMITS_MENU
 desc: in the system sub menu
@@ -1928,50 +1928,50 @@ new: "Limity"
 id: LANG_MANAGE_MENU
 desc: in the system sub menu
 eng: "Manage Settings"
-voice: "ZmÏnit nastavenÌ"
-new: "ZmÏnit nastavenÌ"
+voice: "Zmƒõnit nastaven√≠"
+new: "Zmƒõnit nastaven√≠"
 
 id: LANG_MOVE
 desc: The verb/action Move
 eng: "Move"
-voice: "P¯esunout"
-new: "P¯esunout"
+voice: "P≈ôesunout"
+new: "P≈ôesunout"
 
 id: LANG_MOVE_FAILED
 desc: Error message displayed in playlist viewer
 eng: "Move failed"
 voice: ""
-new: "Chyba p¯i p¯esouv·nÌ"
+new: "Chyba p≈ôi p≈ôesouv√°n√≠"
 
 id: LANG_RECORDING_MENU
 desc: in the recording sub menu
 eng: "Recording screen"
-voice: "Z·znam"
-new: "Z·znam"
+voice: "Z√°znam"
+new: "Z√°znam"
 
 id: LANG_RECORD_CURRENT_DIR
 desc: in recording directory options
 eng: "Current dir"
-voice: "V aktu·lnÌm adres·¯i"
-new: "V aktu·lnÌm adres·¯i"
+voice: "V aktu√°ln√≠m adres√°≈ôi"
+new: "V aktu√°ln√≠m adres√°≈ôi"
 
 id: LANG_RECORD_DIRECTORY
 desc: in recording settings_menu
 eng: "Directory"
-voice: "Adres·¯"
-new: "Adres·¯"
+voice: "Adres√°≈ô"
+new: "Adres√°≈ô"
 
 id: LANG_RECORD_PRERECORD
 desc: in recording and radio screen
 eng: "Prerecording"
 voice: ""
-new: "P¯ednahr·v·nÌ"
+new: "P≈ôednahr√°v√°n√≠"
 
 id: LANG_RECORD_PRERECORD_TIME
 desc: in recording settings_menu
 eng: "Prerecord time"
-voice: "DÈlka p¯edn·hr·tÌ"
-new: "DÈlka p¯edn·hr·tÌ"
+voice: "D√©lka p≈ôedn√°hr√°t√≠"
+new: "D√©lka p≈ôedn√°hr√°t√≠"
 
 id: LANG_REMOVE
 desc: in playlist viewer on+play menu
@@ -1988,14 +1988,14 @@ new: "Ukazovat indexy"
 id: LANG_TIME_MENU
 desc: in the system sub menu
 eng: "Time & Date"
-voice: "Datum a Ëas"
-new: "Datum a Ëas"
+voice: "Datum a ƒças"
+new: "Datum a ƒças"
 
 id: LANG_TRACK_DISPLAY
 desc: in playlist viewer on+play menu
 eng: "Track Display"
-voice: "Informace o skladbÏ"
-new: "Info o skladbÏ"
+voice: "Informace o skladbƒõ"
+new: "Info o skladbƒõ"
 
 id: LANG_VIEW
 desc: in on+play menu
@@ -2006,32 +2006,32 @@ new: "Zobrazit"
 id: LANG_VIEW_DYNAMIC_PLAYLIST
 desc: in playlist menu.
 eng: "View Current Playlist"
-voice: "Zobrazit aktu·lnÌ playlist"
-new: "Zobrazit aktu·lnÌ playlist"
+voice: "Zobrazit aktu√°ln√≠ playlist"
+new: "Zobrazit aktu√°ln√≠ playlist"
 
 id: LANG_WIND_MENU
 desc: in the playback sub menu
 eng: "FFwd/Rewind"
-voice: "P¯et·ËenÌ dop¯edu dozadu"
-new: "P¯et·ËenÌ dop¯edu/dozadu"
+voice: "P≈ôet√°ƒçen√≠ dop≈ôedu dozadu"
+new: "P≈ôet√°ƒçen√≠ dop≈ôedu/dozadu"
 
 id: LANG_BUTTON_BAR
 desc: in settings menu
 eng: "Button bar"
-voice: "TlaËÌtkov· liπta"
-new: "TlaËÌtkov· liπta"
+voice: "Tlaƒç√≠tkov√° li≈°ta"
+new: "Tlaƒç√≠tkov√° li≈°ta"
 
 id: LANG_CONFIRM_SHUTDOWN
 desc: in shutdown screen
 eng: "Press OFF to shut down"
 voice: ""
-new: "VypnÏte stisknutÌm OFF"
+new: "Vypnƒõte stisknut√≠m OFF"
 
 id: LANG_DELETE_DIR
 desc: in on+play menu
 eng: "Delete directory"
-voice: "Smazat adres·¯"
-new: "Smazat adres·¯"
+voice: "Smazat adres√°≈ô"
+new: "Smazat adres√°≈ô"
 
 id: LANG_DIRBROWSE_F1
 desc: in dir browser, F1 button bar text
@@ -2055,25 +2055,25 @@ id: LANG_FILETYPES_EXTENSION_FULL
 desc: Extension array full
 eng: "Extension array full"
 voice: ""
-new: "Seznam p¯Ìpon je pln˝"
+new: "Seznam p≈ô√≠pon je pln√Ω"
 
 id: LANG_FILETYPES_FULL
 desc: Filetype array full
 eng: "Filetype array full"
 voice: ""
-new: "Seznam typ˘ soubor˘ je pln˝"
+new: "Seznam typ≈Ø soubor≈Ø je pln√Ω"
 
 id: LANG_FILETYPES_PLUGIN_NAME_LONG
 desc: Viewer plugin name too long
 eng: "Plugin name too long"
 voice: ""
-new: "P¯iliπ dlouhÈ jmÈno pluginu"
+new: "P≈ôili≈° dlouh√© jm√©no pluginu"
 
 id: LANG_FILETYPES_STRING_BUFFER_EMPTY
 desc: Filetype string buffer empty
 eng: "Filetype string buffer empty"
 voice: ""
-new: "Seznam typ˘ soubor˘ je pr·zdn˝"
+new: "Seznam typ≈Ø soubor≈Ø je pr√°zdn√Ω"
 
 id: LANG_FM_BUTTONBAR_ACTION
 desc: in radio screen
@@ -2085,7 +2085,7 @@ id: LANG_FM_BUTTONBAR_ADD
 desc: in radio screen
 eng: "Add"
 voice: ""
-new: "P¯idat"
+new: "P≈ôidat"
 
 id: LANG_FM_BUTTONBAR_EDIT
 desc: DEPRECATED
@@ -2097,7 +2097,7 @@ id: LANG_FM_BUTTONBAR_EXIT
 desc: in radio screen
 eng: "Exit"
 voice: ""
-new: "ZpÏt"
+new: "Zpƒõt"
 
 id: LANG_FM_EDIT_PRESET
 desc: in radio screen
@@ -2114,8 +2114,8 @@ new: "Vynutit mono"
 id: LANG_ID3_ORDER
 desc: in playback settings screen
 eng: "ID3 tag priority"
-voice: "Priorita ID3 tag˘"
-new: "Priorita ID3 tag˘"
+voice: "Priorita ID3 tag≈Ø"
+new: "Priorita ID3 tag≈Ø"
 
 id: LANG_ID3_V1_FIRST
 desc: in playback settings screen
@@ -2133,13 +2133,13 @@ id: LANG_INSTALLATION_INCOMPLETE
 desc: in browse root
 eng: "Installation incomplete"
 voice: ""
-new: "NekompletnÌ instalace"
+new: "Nekompletn√≠ instalace"
 
 id: LANG_MDB_CENTER
 desc: in sound settings
 eng: "MDB Center frequency"
-voice: "MDB aktivaËnÌ frekvence"
-new: "MDB-aktivaËnÌ frekvence"
+voice: "MDB aktivaƒçn√≠ frekvence"
+new: "MDB-aktivaƒçn√≠ frekvence"
 
 id: LANG_MDB_ENABLE
 desc: in sound settings
@@ -2150,14 +2150,14 @@ new: "MDB-aktivovat"
 id: LANG_MDB_HARMONICS
 desc: in sound settings
 eng: "MDB Harmonics"
-voice: "MDB hlasitost harmonick˝ch frekvencÌ"
-new: "MDB-hlasitost harmonick˝ch frekvencÌ"
+voice: "MDB hlasitost harmonick√Ωch frekvenc√≠"
+new: "MDB-hlasitost harmonick√Ωch frekvenc√≠"
 
 id: LANG_MDB_SHAPE
 desc: in sound settings
 eng: "MDB Shape"
-voice: "MDB πÌ¯ka p·sma"
-new: "MDB-πÌ¯ka p·sma"
+voice: "MDB ≈°√≠≈ôka p√°sma"
+new: "MDB-≈°√≠≈ôka p√°sma"
 
 id: LANG_MDB_STRENGTH
 desc: in sound settings
@@ -2169,13 +2169,13 @@ id: LANG_NO_ROCKBOX_DIR
 desc: in browse root
 eng: "No .rockbox directory"
 voice: ""
-new: "ChybÌ .rockbox adres·¯"
+new: "Chyb√≠ .rockbox adres√°≈ô"
 
 id: LANG_ONPLAY_OPEN_WITH
 desc: Onplay open with
 eng: "Open with"
-voice: "Otev¯Ìt pluginem"
-new: "Otev¯Ìt pluginem"
+voice: "Otev≈ô√≠t pluginem"
+new: "Otev≈ô√≠t pluginem"
 
 id: LANG_SHUTDOWN
 desc: in main menu
@@ -2187,13 +2187,13 @@ id: LANG_SHUTTINGDOWN
 desc: in main menu
 eng: "Shutting down..."
 voice: ""
-new: "VypÌn·m..."
+new: "Vyp√≠n√°m..."
 
 id: LANG_SORT_ALPHA
 desc: browser sorting setting
 eng: "Alphabetical"
-voice: "AbecednÏ"
-new: "AbecednÏ"
+voice: "Abecednƒõ"
+new: "Abecednƒõ"
 
 id: LANG_SORT_DATE
 desc: browser sorting setting
@@ -2204,20 +2204,20 @@ new: "podle data"
 id: LANG_SORT_DATE_REVERSE
 desc: browser sorting setting
 eng: "by newest date"
-voice: "sestupnÏ podle data"
-new: "sestupnÏ podle data"
+voice: "sestupnƒõ podle data"
+new: "sestupnƒõ podle data"
 
 id: LANG_SORT_DIR
 desc: browser sorting setting
 eng: "Sort Directories"
-voice: "ÿadit adres·¯e"
-new: "ÿadit adres·¯e"
+voice: "≈òadit adres√°≈ôe"
+new: "≈òadit adres√°≈ôe"
 
 id: LANG_SORT_FILE
 desc: browser sorting setting
 eng: "Sort Files"
-voice: "ÿadit soubory"
-new: "ÿadit soubory"
+voice: "≈òadit soubory"
+new: "≈òadit soubory"
 
 id: LANG_SORT_TYPE
 desc: browser sorting setting
@@ -2228,20 +2228,20 @@ new: "podle typu"
 id: LANG_SUPERBASS
 desc: in sound settings
 eng: "Super bass"
-voice: "Zv˝raznÏnÌ bas˘"
-new: "Zv˝raznÏnÌ bas˘"
+voice: "Zv√Ωraznƒõn√≠ bas≈Ø"
+new: "Zv√Ωraznƒõn√≠ bas≈Ø"
 
 id: LANG_VOICE
 desc: root of voice menu
 eng: "Voice"
-voice: "OzvuËenÌ"
-new: "OzvuËenÌ"
+voice: "Ozvuƒçen√≠"
+new: "Ozvuƒçen√≠"
 
 id: LANG_VOICE_DIR
 desc: item of voice menu, set the "talkbox" mode for directories
 eng: "Voice Directories"
-voice: "OzvuËit adres·¯e"
-new: "OzvuËit adres·¯e"
+voice: "Ozvuƒçit adres√°≈ôe"
+new: "Ozvuƒçit adres√°≈ôe"
 
 id: LANG_VOICE_DIR_ENTER
 desc: DEPRECATED
@@ -2252,32 +2252,32 @@ new: ""
 id: LANG_VOICE_DIR_HOVER
 desc: "talkbox" mode for directories + files
 eng: ".talk mp3 clip"
-voice: "p¯ehr·t tolk soubory"
-new: "p¯ehr·vat .talk soubory"
+voice: "p≈ôehr√°t tolk soubory"
+new: "p≈ôehr√°vat .talk soubory"
 
 id: LANG_VOICE_FILE
 desc: item of voice menu, set the voive mode for files
 eng: "Voice Filenames"
-voice: "OzvuËit soubory"
-new: "OzvuËit soubory"
+voice: "Ozvuƒçit soubory"
+new: "Ozvuƒçit soubory"
 
 id: LANG_VOICE_MENU
 desc: item of voice menu, enable/disable the voice UI
 eng: "Voice Menus"
-voice: "OzvuËit menu"
-new: "OzvuËit menu"
+voice: "Ozvuƒçit menu"
+new: "Ozvuƒçit menu"
 
 id: LANG_VOICE_NUMBER
 desc: "talkbox" mode for files+directories
 eng: "Numbers"
-voice: "»Ìsla"
-new: "»Ìsla"
+voice: "ƒå√≠sla"
+new: "ƒå√≠sla"
 
 id: LANG_VOICE_SPELL
 desc: "talkbox" mode for files+directories
 eng: "Spell"
-voice: "hl·skovat"
-new: "Hl·skovat"
+voice: "hl√°skovat"
+new: "Hl√°skovat"
 
 id: VOICE_BILLION
 desc: spoken only, for composing numbers
@@ -2444,7 +2444,7 @@ new: ""
 id: VOICE_CURRENT_TIME
 desc: spoken only, for wall clock announce
 eng: ""
-voice: "Je pr·vÏ:"
+voice: "Je pr√°vƒõ:"
 new: ""
 
 id: VOICE_DB
@@ -2456,7 +2456,7 @@ new: ""
 id: VOICE_DIR
 desc: spoken only, prefix for directory number
 eng: ""
-voice: "sloæka"
+voice: "slo≈æka"
 new: ""
 
 id: VOICE_EIGHT
@@ -2486,13 +2486,13 @@ new: ""
 id: VOICE_EXT_AJZ
 desc: spoken only, for file extension
 eng: ""
-voice: "firmvÈr"
+voice: "firmv√©r"
 new: ""
 
 id: VOICE_EXT_BMARK
 desc: spoken only, for file extension and the word in general
 eng: ""
-voice: "z·loæka"
+voice: "z√°lo≈æka"
 new: ""
 
 id: VOICE_EXT_CFG
@@ -2504,7 +2504,7 @@ new: ""
 id: VOICE_EXT_FONT
 desc: spoken only, for file extension
 eng: ""
-voice: "pÌsmo"
+voice: "p√≠smo"
 new: ""
 
 id: VOICE_EXT_MPA
@@ -2528,13 +2528,13 @@ new: ""
 id: VOICE_EXT_UCL
 desc: spoken only, for file extension
 eng: ""
-voice: "fleπ"
+voice: "fle≈°"
 new: ""
 
 id: VOICE_EXT_WPS
 desc: spoken only, for file extension
 eng: ""
-voice: "definice p¯ehr·vacÌ obrazovky"
+voice: "definice p≈ôehr√°vac√≠ obrazovky"
 new: ""
 
 id: VOICE_FIFE
@@ -2624,13 +2624,13 @@ new: ""
 id: VOICE_MILLIAMPHOURS
 desc: spoken only, a unit postfix
 eng: ""
-voice: "mili ampÈr hodin"
+voice: "mili amp√©r hodin"
 new: ""
 
 id: VOICE_MILLION
 desc: spoken only, for composing numbers
 eng: ""
-voice: "miliÛn"
+voice: "mili√≥n"
 new: ""
 
 id: VOICE_MILLISECONDS
@@ -2642,7 +2642,7 @@ new: ""
 id: VOICE_MINUS
 desc: spoken only, for composing numbers
 eng: ""
-voice: "mÌnus"
+voice: "m√≠nus"
 new: ""
 
 id: VOICE_MINUTE
@@ -2816,13 +2816,13 @@ new: ""
 id: LANG_REMOVE_MMC
 desc: before acknowledging usb in case an MMC is inserted (Ondio)
 eng: "Please remove inserted MMC"
-voice: "VyjmÏte prosÌm pamÏªovou kartu"
-new: "VyjmÏte prosÌm pamÏªovou kartu"
+voice: "Vyjmƒõte pros√≠m pamƒõ≈•ovou kartu"
+new: "Vyjmƒõte pros√≠m pamƒõ≈•ovou kartu"
 
 id: VOICE_DOT
 desc: spoken only, for spelling
 eng: ""
-voice: "teËka"
+voice: "teƒçka"
 new: ""
 
 id: VOICE_PAUSE
@@ -2834,20 +2834,20 @@ new: ""
 id: LANG_STEREO_WIDTH
 desc: in sound_settings
 eng: "Stereo width"
-voice: "©Ì¯ka sterea"
-new: "©Ì¯ka sterea"
+voice: "≈†√≠≈ôka sterea"
+new: "≈†√≠≈ôka sterea"
 
 id: LANG_CHANNEL_CUSTOM
 desc: in sound_settings
 eng: "Custom"
-voice: "VlastnÌ"
-new: "VlastnÌ"
+voice: "Vlastn√≠"
+new: "Vlastn√≠"
 
 id: LANG_FILTER_ID3DB
 desc: show ID3 database
 eng: "ID3 database"
-voice: "ID3 datab·ze"
-new: "ID3 datab·ze"
+voice: "ID3 datab√°ze"
+new: "ID3 datab√°ze"
 
 id: LANG_ID3DB_ARTISTS
 desc: ID3 virtual folder name
@@ -2895,7 +2895,7 @@ id: LANG_ID3DB_MATCHES
 desc: ID3 virtual folder name
 eng: "Found %d matches"
 voice: ""
-new: "Nalezeno %d v˝skyt(˘)"
+new: "Nalezeno %d v√Ωskyt(≈Ø)"
 
 id: LANG_BATTERY_TYPE
 desc: in battery settings
@@ -2906,8 +2906,8 @@ new: "Typ baterie"
 id: LANG_BATTERY_TYPE_ALKALINE
 desc: in battery settings
 eng: "Alkaline"
-voice: "AlkalickÈ"
-new: "AlkalickÈ"
+voice: "Alkalick√©"
+new: "Alkalick√©"
 
 id: LANG_BATTERY_TYPE_NIMH
 desc: in battery settings
@@ -2918,7 +2918,7 @@ new: "NiMH"
 id: LANG_POINT
 desc: decimal separator for composing numbers
 eng: "."
-voice: "cel˝ch"
+voice: "cel√Ωch"
 new: ","
 
 id: LANG_BYTE
@@ -2930,19 +2930,19 @@ new: "B"
 id: LANG_KILOBYTE
 desc: a unit postfix, also voiced
 eng: "KB"
-voice: "kilobajt˘"
+voice: "kilobajt≈Ø"
 new: "kB"
 
 id: LANG_MEGABYTE
 desc: a unit postfix, also voiced
 eng: "MB"
-voice: "megabajt˘"
+voice: "megabajt≈Ø"
 new: "MB"
 
 id: LANG_GIGABYTE
 desc: a unit postfix, also voiced
 eng: "GB"
-voice: "gigabajt˘"
+voice: "gigabajt≈Ø"
 new: "GB"
 
 id: LANG_DISK_SIZE_INFO
@@ -2954,44 +2954,44 @@ new: "Disk:"
 id: LANG_DISK_FREE_INFO
 desc: disk size info
 eng: "Free:"
-voice: "VolnÈ mÌsto"
-new: "VolnÈ mÌsto:"
+voice: "Voln√© m√≠sto"
+new: "Voln√© m√≠sto:"
 
 id: LANG_ID3DB_ALL_SONGS
 desc: ID3 virtual folder name
 eng: "<All songs>"
 voice: ""
-new: "<Vπechny skadby>"
+new: "<V≈°echny skadby>"
 
 id: LANG_PLAYLIST
 desc: Used when you need to say playlist, also voiced
 eng: "Playlist"
-voice: "seznam soubor˘"
-new: "Seznam soubor˘"
+voice: "seznam soubor≈Ø"
+new: "Seznam soubor≈Ø"
 
 id: LANG_RECORD_STARTUP
 desc: Start Rockbox in Recording screen
 eng: "Show recording screen on startup"
-voice: "Nahr·vat po startu"
-new: "Nahr·vat po startu"
+voice: "Nahr√°vat po startu"
+new: "Nahr√°vat po startu"
 
 id: LANG_ALARM_MOD_DISABLE
 desc: Announce that the RTC alarm has been turned off
 eng: "Alarm Disabled"
-voice: "BudÌk vypnut˝"
-new: "BudÌk vypnut˝"
+voice: "Bud√≠k vypnut√Ω"
+new: "Bud√≠k vypnut√Ω"
 
 id: LANG_RECORD_TRIGGER
 desc: in recording settings_menu
 eng: "Trigger"
 voice: 
-new: "Automatick· spouπª"
+new: "Automatick√° spou≈°≈•"
 
 id: LANG_RECORD_START_THRESHOLD
 desc: in recording settings_menu
 eng: "Start above"
 voice: 
-new: "Start p¯i"
+new: "Start p≈ôi"
 
 id: LANG_RECORD_MIN_DURATION
 desc: in recording settings_menu
@@ -3021,7 +3021,7 @@ id: LANG_RECORD_TRIGGER_MODE
 desc: in recording settings_menu
 eng: "Trigger"
 voice: 
-new: "Nahr·v·nÌ"
+new: "Nahr√°v√°n√≠"
 
 id: LANG_RECORD_TRIG_NOREARM
 desc: in recording settings_menu
@@ -3033,7 +3033,7 @@ id: LANG_RECORD_TRIG_REARM
 desc: in recording settings_menu
 eng: "Repeat"
 voice: 
-new: "OpakovanÈ"
+new: "Opakovan√©"
 
 id: LANG_DB_INF
 desc: -inf db for values below measurement
@@ -3045,85 +3045,85 @@ id: LANG_RECORD_TRIG_IDLE
 desc: waiting for threshold
 eng: "Trigger idle"
 voice: 
-new: "NeaktivnÌ spouπª"
+new: "Neaktivn√≠ spou≈°≈•"
 
 id: LANG_RECORD_TRIGGER_ACTIVE
 desc: 
 eng: "Trigger active"
 voice: 
-new: "AktivnÌ spouπª"
+new: "Aktivn√≠ spou≈°≈•"
 
 id: LANG_LCD_REMOTE_MENU
 desc: in the display sub menu
 eng: "Remote-LCD Settings"
 voice: 
-new: "Displej na d·lk. ovladaËi"
+new: "Displej na d√°lk. ovladaƒçi"
 
 id: LANG_DISK_NAME_INTERNAL
 desc: in info menu; name for internal disk with multivolume (keep short!)
 eng: "Int:"
-voice: "InternÌ"
+voice: "Intern√≠"
 new: "Int:"
 
 id: LANG_DISK_NAME_MMC
 desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
 eng: "MMC:"
-voice: "Multimedi·lnÌ karta"
+voice: "Multimedi√°ln√≠ karta"
 new: "MMC"
 
 id: LANG_CROSSFADE
 desc: in playback settings
 eng: "Crossfade"
-voice: "ProlÌn·nÌ skladeb"
-new: "ProlÌn·nÌ skladeb"
+voice: "Prol√≠n√°n√≠ skladeb"
+new: "Prol√≠n√°n√≠ skladeb"
 
 id: LANG_BACKLIGHT_FADE_IN
 desc: in settings_menu
 eng: "Backlight fade in"
-voice: "Plynule zapÌnat podsvÌcenÌ"
-new: "Plynule zapÌnat podsvÌcenÌ"
+voice: "Plynule zap√≠nat podsv√≠cen√≠"
+new: "Plynule zap√≠nat podsv√≠cen√≠"
 
 id: LANG_BACKLIGHT_FADE_OUT
 desc: in settings_menu
 eng: "Backlight fade out"
-voice: "Plynule vypÌnat podsvÌcenÌ"
-new: "Plynule vypÌnat podsvÌcenÌ"
+voice: "Plynule vyp√≠nat podsv√≠cen√≠"
+new: "Plynule vyp√≠nat podsv√≠cen√≠"
 
 id: LANG_SHUFFLE_PLAYLIST
 desc: in playlist menu, reshuffles the order in which songs are played
 eng: "Reshuffle"
-voice: "Znova promÌchat"
-new: "Znova promÌchat"
+voice: "Znova prom√≠chat"
+new: "Znova prom√≠chat"
 
 id: LANG_NOTHING_TO_RESUME
 desc: Error message displayed when resume button pressed but no playlist
 eng: "Nothing to resume"
 voice: ""
-new: "NenÌ v Ëem poraËovat"
+new: "Nen√≠ v ƒçem poraƒçovat"
 
 id: LANG_INSERT_SHUFFLED
 desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
 eng: "Insert shuffled"
-voice: "Vloæit n·hodnÏ"
-new: "Vloæit n·hodnÏ"
+voice: "Vlo≈æit n√°hodnƒõ"
+new: "Vlo≈æit n√°hodnƒõ"
 
 id: LANG_SPDIF_ENABLE
 desc: in playback settings menu. enable/disable the optical out
 eng: "Optical output"
-voice: "Optick˝ v˝stup"
-new: "Optick˝ v˝stup"
+voice: "Optick√Ω v√Ωstup"
+new: "Optick√Ω v√Ωstup"
 
 id: LANG_NEXT_FOLDER
 desc: in settings_menu.  Should we move to next folder when current one ends
 eng: "Move to Next Folder"
-voice: "P¯esouvat se do n·sledujÌcÌ sloæky"
-new: "P¯esouvat se do n·sl. sloæky"
+voice: "P≈ôesouvat se do n√°sleduj√≠c√≠ slo≈æky"
+new: "P≈ôesouvat se do n√°sl. slo≈æky"
 
 id: LANG_RUNTIMEDB_ACTIVE
 desc: in settings_menu.
 eng: "Gather runtime data (experimental)"
-voice: "SbÌrat provoznÌ informace"
-new: "SbÌrat provoznÌ informace (experiment·lnÌ)"
+voice: "Sb√≠rat provozn√≠ informace"
+new: "Sb√≠rat provozn√≠ informace (experiment√°ln√≠)"
 
 id: LANG_MENU_SET_RATING
 desc: in wps context menu
@@ -3134,14 +3134,14 @@ new: "Ohodnotit skladbu"
 id: LANG_RATING
 desc: in set_rating
 eng: "Rating:"
-voice: "HodnocenÌ"
-new: "HodnocenÌ:"
+voice: "Hodnocen√≠"
+new: "Hodnocen√≠:"
 
 id: LANG_CROSSFADE_DURATION
 desc: in playback settings
 eng: "Crossfade duration"
-voice: "DÈlka prolÌn·nÌ"
-new: "DÈlka prolÌn·nÌ"
+voice: "D√©lka prol√≠n√°n√≠"
+new: "D√©lka prol√≠n√°n√≠"
 
 id: LANG_MIX
 desc: in playback settings, crossfade option
@@ -3152,8 +3152,8 @@ new: "Mix"
 id: LANG_RESTARTING_PLAYBACK
 desc: splash screen displayed when pcm buffer size is changed
 eng: "Restarting playback..."
-voice: "Restartuji p¯ehr·v·nÌ..."
-new: "Restartuji p¯ehr·v·nÌ..."
+voice: "Restartuji p≈ôehr√°v√°n√≠..."
+new: "Restartuji p≈ôehr√°v√°n√≠..."
 
 id: LANG_REPLAYGAIN
 desc: in replaygain
@@ -3170,8 +3170,8 @@ new: "Zapnout normalizaci hlasitosti"
 id: LANG_REPLAYGAIN_NOCLIP
 desc: in replaygain
 eng: "Prevent clipping"
-voice: "Odstranit lup·nÌ"
-new: "Odstranit lup·nÌ"
+voice: "Odstranit lup√°n√≠"
+new: "Odstranit lup√°n√≠"
 
 id: LANG_REPLAYGAIN_MODE
 desc: in replaygain
@@ -3182,14 +3182,14 @@ new: "Typ normalizace hlasitosti"
 id: LANG_TRACK_GAIN
 desc: in replaygain
 eng: "Track gain"
-voice: "Pro kaædou skladbu"
-new: "Pro kaædou skladbu"
+voice: "Pro ka≈ædou skladbu"
+new: "Pro ka≈ædou skladbu"
 
 id: LANG_ALBUM_GAIN
 desc: in replaygain
 eng: "Album gain"
-voice: "Pro celÈ album"
-new: "Pro celÈ album"
+voice: "Pro cel√© album"
+new: "Pro cel√© album"
 
 id: LANG_ID3_TRACK_GAIN
 desc: in browse_id3
@@ -3213,13 +3213,13 @@ id: LANG_BIDI_SUPPORT
 desc: in settings_menu, option to enable reversal of hebrew/arabic text
 eng: "BiDi Hebrew/Arabic"
 voice: 
-new: "Podpora oboustran˝ch text˘ (Hebrejπtina,Arabπtina)"
+new: "Podpora oboustran√Ωch text≈Ø (Hebrej≈°tina,Arab≈°tina)"
 
 id: LANG_REPLAYGAIN_PREAMP
 desc: in browse_id3
 eng: "Pre-amp"
-voice: "P¯edzesÌlenÌ"
-new: "P¯edzesÌlenÌ"
+voice: "P≈ôedzes√≠len√≠"
+new: "P≈ôedzes√≠len√≠"
 
 id: LANG_UNIT_DB
 desc: in browse_id3
@@ -3236,26 +3236,26 @@ new: " (VBR)"
 id: LANG_BEEP
 desc: in playback settings
 eng: "Beep volume"
-voice: "Hlasitost pÌpnutÌ"
-new: "Hlasitost pÌpnutÌ"
+voice: "Hlasitost p√≠pnut√≠"
+new: "Hlasitost p√≠pnut√≠"
 
 id: LANG_WEAK
 desc: in beep volume in playback settings
 eng: "Weak"
-voice: "NÌzk·"
-new: "NÌzk·"
+voice: "N√≠zk√°"
+new: "N√≠zk√°"
 
 id: LANG_MODERATE
 desc: in beep volume in playback settings
 eng: "Moderate"
-voice: "St¯ednÌ"
-new: "St¯ednÌ"
+voice: "St≈ôedn√≠"
+new: "St≈ôedn√≠"
 
 id: LANG_STRONG
 desc: in beep volume in playback settings
 eng: "Strong"
-voice: "Vysok·"
-new: "Vysok·"
+voice: "Vysok√°"
+new: "Vysok√°"
 
 id: LANG_REPEAT_AB
 desc: repeat one song

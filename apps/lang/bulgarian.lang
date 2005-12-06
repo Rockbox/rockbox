@@ -1,72 +1,72 @@
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
-new: "Звукови Настройки"
+new: "Р—РІСѓРєРѕРІРё РќР°СЃС‚СЂРѕР№РєРё"
 
 id: LANG_GENERAL_SETTINGS
 desc: in the main menu
 eng: "General Settings"
-new: "Общи Настройки"
+new: "РћР±С‰Рё РќР°СЃС‚СЂРѕР№РєРё"
 
 id: LANG_GAMES
 desc: in the main menu
 eng: "Games"
-new: "Игри"
+new: "РРіСЂРё"
 
 id: LANG_DEMOS
 desc: in the main menu
 eng: "Demos"
-new: "Демота"
+new: "Р”РµРјРѕС‚Р°"
 
 id: LANG_INFO
 desc: in the main menu
 eng: "Info"
-new: "Инфо"
+new: "РРЅС„Рѕ"
 
 id: LANG_VERSION
 desc: in the main menu
 eng: "Version"
-new: "Версия"
+new: "Р’РµСЂСЃРёСЏ"
 
 id: LANG_DEBUG
 desc: in the main menu
 eng: "Debug (keep out!)"
-new: "Дебъг (Не пипай!)"
+new: "Р”РµР±СЉРі (РќРµ РїРёРїР°Р№!)"
 
 id: LANG_USB
 desc: in the main menu
 eng: "USB (sim)"
-new: "USB (сим)"
+new: "USB (СЃРёРј)"
 
 id: LANG_ROCKBOX_INFO
 desc: displayed topmost on the info screen
 eng: "Rockbox Info:"
-new: "Инфо за Rockbox:"
+new: "РРЅС„Рѕ Р·Р° Rockbox:"
 
 id: LANG_BUFFER_STAT_PLAYER
 desc: the buffer size player-screen width, %d MB %d fraction of MB
 eng: "Buf: %d.%03dMB"
-new: "Разс: %d.%03dMB"
+new: "Р Р°Р·СЃ: %d.%03dMB"
 
 id: LANG_BUFFER_STAT_RECORDER
 desc: the buffer size recorder-screen width, %d MB %d fraction of MB
 eng: "Buffer: %d.%03dMB"
-new: "Разс?: %d.%03dMB"
+new: "Р Р°Р·СЃ?: %d.%03dMB"
 
 id: LANG_BATTERY_LEVEL_PLAYER
 desc: the battery level in percentage
 eng: "Batt: %d%%%s"
-new: "Батерия: %d%%%s"
+new: "Р‘Р°С‚РµСЂРёСЏ: %d%%%s"
 
 id: LANG_BATTERY_LEVEL_RECORDER
 desc: the battery level in percentage
 eng: "Battery: %d%%%s"
-new: "Батерия: %d%%%s"
+new: "Р‘Р°С‚РµСЂРёСЏ: %d%%%s"
 
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
 eng: "Battery: charging"
-new: "Батерия: зарежда се"
+new: "Р‘Р°С‚РµСЂРёСЏ: Р·Р°СЂРµР¶РґР° СЃРµ"
 
 id: LANG_BOUNCE
 desc: in the demos menu
@@ -101,61 +101,61 @@ new: "Snake"
 id: LANG_PLAYLIST_LOAD
 desc: displayed on screen while loading a playlist
 eng: "Loading..."
-new: "Зарежда се..."
+new: "Р—Р°СЂРµР¶РґР° СЃРµ..."
 
 id: LANG_PLAYLIST_SHUFFLE
 desc: displayed on screen while shuffling a playlist
 eng: "Shuffling..."
-new: "Разбърква се..."
+new: "Р Р°Р·Р±СЉСЂРєРІР° СЃРµ..."
 
 id: LANG_PLAYLIST_PLAY
 desc: displayed on screen when start playing a playlist
 eng: "Playing..."
-new: "Слушате..."
+new: "РЎР»СѓС€Р°С‚Рµ..."
 
 id: LANG_PLAYINDICES_PLAYLIST
 desc: in playlist.indices() when playlist is full
 eng: "Playlist"
-new: "Опис"
+new: "РћРїРёСЃ"
 
 id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
 eng: "buffer full"
-new: "Пълна Директорията "
+new: "РџСЉР»РЅР° Р”РёСЂРµРєС‚РѕСЂРёСЏС‚Р° "
 
 id: LANG_PLAYINDICES_AMOUNT
 desc: number of files in playlist
 eng: "%d files"
-new: "%d файлове"
+new: "%d С„Р°Р№Р»РѕРІРµ"
 
 id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
 eng: "Save failed"
-new: "Запаметяването неуспешно" 
+new: "Р—Р°РїР°РјРµС‚СЏРІР°РЅРµС‚Рѕ РЅРµСѓСЃРїРµС€РЅРѕ" 
 
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
 eng: "Batt. low?"
-new: "Батерията е почти празна"
+new: "Р‘Р°С‚РµСЂРёСЏС‚Р° Рµ РїРѕС‡С‚Рё РїСЂР°Р·РЅР°"
 
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
 eng: "Save failed"
-new: "Запаметяването неуспешно"
+new: "Р—Р°РїР°РјРµС‚СЏРІР°РЅРµС‚Рѕ РЅРµСѓСЃРїРµС€РЅРѕ"
 
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
 eng: "Is battery low?"
-new: "Батерията почти празна ли е?"
+new: "Р‘Р°С‚РµСЂРёСЏС‚Р° РїРѕС‡С‚Рё РїСЂР°Р·РЅР° Р»Рё Рµ?"
 
 id: LANG_TIME_SET 
 eng: "ON to set"
-new: "ON за да нагласите."
+new: "ON Р·Р° РґР° РЅР°РіР»Р°СЃРёС‚Рµ."
 
 id: LANG_TIME_REVERT
 desc: used in set_time()
 eng: "OFF to revert"
-new: "OFF за да обърнете"
+new: "OFF Р·Р° РґР° РѕР±СЉСЂРЅРµС‚Рµ"
 
 id: LANG_HIDDEN
 desc: in settings_menu
@@ -175,17 +175,17 @@ new: ""
 id: LANG_CONTRAST
 desc: in settings_menu
 eng: "Contrast"
-new: "Контраст"
+new: "РљРѕРЅС‚СЂР°СЃС‚"
 
 id: LANG_SHUFFLE
 desc: in settings_menu
 eng: "Shuffle"
-new: "Разбъркване"
+new: "Р Р°Р·Р±СЉСЂРєРІР°РЅРµ"
 
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play Selected First"
-new: "Слушайте първо избраната"
+new: "РЎР»СѓС€Р°Р№С‚Рµ РїСЉСЂРІРѕ РёР·Р±СЂР°РЅР°С‚Р°"
 
 id: LANG_MP3FILTER
 desc: in settings_menu
@@ -195,17 +195,17 @@ new: ""
 id: LANG_SORT_CASE
 desc: in settings_menu
 eng: "Sort Case Sensitive"
-new: "Сортирана по главни букви"
+new: "РЎРѕСЂС‚РёСЂР°РЅР° РїРѕ РіР»Р°РІРЅРё Р±СѓРєРІРё"
 
 id: LANG_RESUME
 desc: in settings_menu
 eng: "Resume"
-new: "Продължаване"
+new: "РџСЂРѕРґСЉР»Р¶Р°РІР°РЅРµ"
 
 id: LANG_OFF
 desc: Used in a lot of places
 eng: "Off"
-new: "Изключване"
+new: "РР·РєР»СЋС‡РІР°РЅРµ"
 
 id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
@@ -220,12 +220,12 @@ new: "Aee."
 id: LANG_BACKLIGHT
 desc: in settings_menu
 eng: "Backlight"
-new: "Екранна Светлина"
+new: "Р•РєСЂР°РЅРЅР° РЎРІРµС‚Р»РёРЅР°"
 
 id: LANG_SCROLL
 desc: in settings_menu
 eng: "Scroll Speed Setting Example"
-new: "Скролиране Скорост Настройки Пример"
+new: "РЎРєСЂРѕР»РёСЂР°РЅРµ РЎРєРѕСЂРѕСЃС‚ РќР°СЃС‚СЂРѕР№РєРё РџСЂРёРјРµСЂ"
 
 id: LANG_DISCHARGE
 desc: DEPRECATED
@@ -235,27 +235,27 @@ new: ""
 id: LANG_TIME
 desc: in settings_menu
 eng: "Set Time/Date"
-new: "Нагласете Време/Дата"
+new: "РќР°РіР»Р°СЃРµС‚Рµ Р’СЂРµРјРµ/Р”Р°С‚Р°"
 
 id: LANG_SPINDOWN
 desc: in settings_menu
 eng: "Disk Spindown"
-new: "Въртене на диска"
+new: "Р’СЉСЂС‚РµРЅРµ РЅР° РґРёСЃРєР°"
 
 id: LANG_FFRW_STEP
 desc: in settings_menu
 eng: "FF/RW Min Step"
-new: "Напр./Наз. Минимум"
+new: "РќР°РїСЂ./РќР°Р·. РњРёРЅРёРјСѓРј"
 
 id: LANG_FFRW_ACCEL
 desc: in settings_menu
 eng: "FF/RW Accel"
-new: "Напр./Наз. ускоряване"
+new: "РќР°РїСЂ./РќР°Р·. СѓСЃРєРѕСЂСЏРІР°РЅРµ"
 
 id: LANG_FOLLOW
 desc: in settings_menu
 eng: "Follow Playlist"
-new: "придържай се към описа"
+new: "РїСЂРёРґСЉСЂР¶Р°Р№ СЃРµ РєСЉРј РѕРїРёСЃР°"
 
 id: LANG_RESET_ASK_PLAYER
 desc: confirm to reset settings
@@ -270,7 +270,7 @@ new: ""
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
 eng: "Are you sure?"
-new: "Сигурен ли си?"
+new: "РЎРёРіСѓСЂРµРЅ Р»Рё СЃРё?"
 
 id: LANG_RESET_CONFIRM_RECORDER
 desc: confirm to reset settings
@@ -280,57 +280,57 @@ new: ""
 id: LANG_RESET_CANCEL_RECORDER
 desc: confirm to reset settings
 eng: "OFF=Cancel"
-new: "OFF=Анулирай"
+new: "OFF=РђРЅСѓР»РёСЂР°Р№"
 
 id: LANG_RESET_DONE_SETTING
 desc: visual confirmation after settings reset
 eng: "Settings"
-new: "Настройки"
+new: "РќР°СЃС‚СЂРѕР№РєРё"
 
 id: LANG_RESET_DONE_CLEAR
 desc: visual confirmation after settings reset
 eng: "Cleared"
-new: "Изчистено"
+new: "РР·С‡РёСЃС‚РµРЅРѕ"
 
 id: LANG_RESET_DONE_CANCEL
 desc: Visual confirmation of cancelation
 eng: "Canceled"
-new: "Анулирано"
+new: "РђРЅСѓР»РёСЂР°РЅРѕ"
 
 id: LANG_CASE_MENU
 desc: in fileview_settings_menu()
 eng: "Sort Mode"
-new: "Сортиране"
+new: "РЎРѕСЂС‚РёСЂР°РЅРµ"
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
 eng: "Scroll"
-new: "Скролиране"
+new: "РЎРєСЂРѕР»РёСЂР°РЅРµ"
 
 id: LANG_RESET
 desc: in system_settings_menu()
 eng: "Reset settings"
-new: "Връщане на настройките"
+new: "Р’СЂСЉС‰Р°РЅРµ РЅР° РЅР°СЃС‚СЂРѕР№РєРёС‚Рµ"
 
 id: LANG_PLAYBACK
 desc: in settings_menu()
 eng: "Playback"
-new: "Плейбек"
+new: "РџР»РµР№Р±РµРє"
 
 id: LANG_FILE
 desc: in settings_menu()
 eng: "File View"
-new: "Файлове"
+new: "Р¤Р°Р№Р»РѕРІРµ"
 
 id: LANG_DISPLAY
 desc: in settings_menu()
 eng: "Display"
-new: "Показване на"
+new: "РџРѕРєР°Р·РІР°РЅРµ РЅР°"
 
 id: LANG_SYSTEM
 desc: in settings_menu()
 eng: "System"
-new: "Система"
+new: "РЎРёСЃС‚РµРјР°"
 
 id: LANG_VOLUME
 desc: in sound_settings
@@ -340,27 +340,27 @@ new: "Volume"
 id: LANG_BALANCE
 desc: in sound_settings
 eng: "Balance"
-new: "Баланс"
+new: "Р‘Р°Р»Р°РЅСЃ"
 
 id: LANG_BASS
 desc: in sound_settings
 eng: "Bass"
-new: "Бас"
+new: "Р‘Р°СЃ"
 
 id: LANG_TREBLE
 desc: in sound_settings
 eng: "Treble"
-new: "Требъл"
+new: "РўСЂРµР±СЉР»"
 
 id: LANG_LOUDNESS
 desc: in sound_settings
 eng: "Loudness"
-new: "Сила"
+new: "РЎРёР»Р°"
 
 id: LANG_BBOOST
 desc: in sound settings
 eng: "Bass Boost"
-new: "Бас увеличение"
+new: "Р‘Р°СЃ СѓРІРµР»РёС‡РµРЅРёРµ"
 
 id: LANG_DECAY
 desc: in sound_settings
@@ -370,37 +370,37 @@ new: "AV Decay Time"
 id: LANG_CHANNEL_MENU
 desc: in sound_settings
 eng: "Channels"
-new: "Канали"
+new: "РљР°РЅР°Р»Рё"
 
 id: LANG_CHANNEL
 desc: in sound_settings
 eng: "Channel Configuration"
-new: "Настройка на каналите"
+new: "РќР°СЃС‚СЂРѕР№РєР° РЅР° РєР°РЅР°Р»РёС‚Рµ"
 
 id: LANG_CHANNEL_STEREO
 desc: in sound_settings
 eng: "Stereo"
-new: "Стерео"
+new: "РЎС‚РµСЂРµРѕ"
 
 id: LANG_CHANNEL_MONO
 desc: in sound_settings
 eng: "Mono"
-new: "Моно"
+new: "РњРѕРЅРѕ"
 
 id: LANG_CHANNEL_LEFT
 desc: in sound_settings
 eng: "Mono Left"
-new: "Ляво Моно"
+new: "Р›СЏРІРѕ РњРѕРЅРѕ"
 
 id: LANG_CHANNEL_RIGHT
 desc: in sound_settings
 eng: "Mono Right"
-new: "Дясно Моно"
+new: "Р”СЏСЃРЅРѕ РњРѕРЅРѕ"
 
 id: LANG_AUTOVOL
 desc: in sound_settings
 eng: "Auto Volume"
-new: "Автоматично Volume"
+new: "РђРІС‚РѕРјР°С‚РёС‡РЅРѕ Volume"
 
 id: LANG_SHOWDIR_ERROR_BUFFER
 desc: in showdir(), displayed on screen when you reach buffer limit
@@ -410,82 +410,82 @@ new: "Dir Buffer"
 id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "is full!"
-new: "е пълен!"
+new: "Рµ РїСЉР»РµРЅ!"
 
 id: LANG_RESUME_ASK
 desc: question asked at the begining when resume is on
 eng: "Resume?"
-new: "Продължи?"
+new: "РџСЂРѕРґСЉР»Р¶Рё?"
 
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
 eng: "(PLAY/STOP)"
-new: "(Пуск./Спиране)"
+new: "(РџСѓСЃРє./РЎРїРёСЂР°РЅРµ)"
 
 id: LANG_RESUME_CONFIRM_RECORDER
 desc: possible answer to resume question
 eng: "PLAY = Yes"
-new: "PLAY = Да"
+new: "PLAY = Р”Р°"
 
 id: LANG_RESUME_CANCEL_RECORDER
 desc: possible answer to resume question
 eng: "Any Other = No"
-new: "E?aie a?oaie = Не"
+new: "E?aie a?oaie = РќРµ"
 
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
 eng: "Keylock ON"
-new: "Бутони Заключени"
+new: "Р‘СѓС‚РѕРЅРё Р—Р°РєР»СЋС‡РµРЅРё"
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
 eng: "Keylock OFF"
-new: "Бутони Отключени"
+new: "Р‘СѓС‚РѕРЅРё РћС‚РєР»СЋС‡РµРЅРё"
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
 eng: "Key lock is ON"
-new: "Бутони Заключени"
+new: "Р‘СѓС‚РѕРЅРё Р—Р°РєР»СЋС‡РµРЅРё"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key lock is OFF"
-new: "Бутони Отключени"
+new: "Р‘СѓС‚РѕРЅРё РћС‚РєР»СЋС‡РµРЅРё"
 
 id: LANG_MUTE_ON_PLAYER
 desc: displayed when mute is on
 eng: "Mute ON"
-new: "Няма Звук"
+new: "РќСЏРјР° Р—РІСѓРє"
 
 id: LANG_MUTE_OFF_PLAYER
 desc: displayed when mute is off
 eng: "Mute OFF"
-new: "Има Звук"
+new: "РРјР° Р—РІСѓРє"
 
 id: LANG_MUTE_ON_RECORDER
 desc: displayed when mute is on
 eng: "Mute is ON"
-new: "Няма Звук"
+new: "РќСЏРјР° Р—РІСѓРє"
 
 id: LANG_MUTE_OFF_RECORDER
 desc: displayed when mute is off
 eng: "Mute is OFF"
-new: "Има Звук"
+new: "РРјР° Р—РІСѓРє"
 
 id: LANG_ID3_INFO
 desc: in the browse_id3() function
 eng: "-ID3 Info- "
-new: "-ID3 Инфо-"
+new: "-ID3 РРЅС„Рѕ-"
 
 id: LANG_ID3_SCREEN
 desc: in the browse_id3() function
 eng: "--Screen-- "
-new: "--Екран--"
+new: "--Р•РєСЂР°РЅ--"
 
 id: LANG_ID3_TITLE
 desc: in wps
 eng: "[Title]"
-new: "[Заглавие]"
+new: "[Р—Р°РіР»Р°РІРёРµ]"
 
 id: LANG_ID3_NO_TITLE
 desc: in wps when no title is avaible
@@ -495,7 +495,7 @@ new: ""
 id: LANG_ID3_ARTIST
 desc: in wps 
 eng: "[Artist]"
-new: "[Изпълнител]"
+new: "[РР·РїСЉР»РЅРёС‚РµР»]"
 
 id: LANG_ID3_NO_ARTIST
 desc: in wps when no artist is avaible
@@ -505,7 +505,7 @@ new: ""
 id: LANG_ID3_ALBUM
 desc: in wps
 eng: "[Album]"
-new: "[Албум]"
+new: "[РђР»Р±СѓРј]"
 
 id: LANG_ID3_NO_ALBUM
 desc: in wps when no album is avaible
@@ -515,7 +515,7 @@ new: ""
 id: LANG_ID3_TRACKNUM
 desc: in wps
 eng: "[Tracknum]"
-new: "[Песен№]"
+new: "[РџРµСЃРµРЅв„–]"
 
 id: LANG_ID3_NO_TRACKNUM
 desc: in wps if no track number is avaible
@@ -525,12 +525,12 @@ new: ""
 id: LANG_ID3_LENGHT
 desc: in wps
 eng: "[Length]"
-new: "[Прдължителност]"
+new: "[РџСЂРґСЉР»Р¶РёС‚РµР»РЅРѕСЃС‚]"
 
 id: LANG_ID3_PLAYLIST
 desc: in wps
 eng: "[Playlist]"
-new: "[Опис]"
+new: "[РћРїРёСЃ]"
 
 id: LANG_ID3_BITRATE
 desc: in wps
@@ -540,32 +540,32 @@ new: "[Bitrate]"
 id: LANG_ID3_FRECUENCY
 desc: in wps
 eng: "[Frequency]"
-new: "[Честота]"
+new: "[Р§РµСЃС‚РѕС‚Р°]"
 
 id: LANG_ID3_PATH
 desc: in wps
 eng: "[Path]"
-new: "[Пътека]"
+new: "[РџСЉС‚РµРєР°]"
 
 id: LANG_PITCH_UP
 desc: in wps
 eng: "Pitch up"
-new: "Усили Височина на звука"
+new: "РЈСЃРёР»Рё Р’РёСЃРѕС‡РёРЅР° РЅР° Р·РІСѓРєР°"
 
 id: LANG_PITCH_DOWN
 desc: in wps
 eng: "Pitch down"
-new: "Намали Височина на звука"
+new: "РќР°РјР°Р»Рё Р’РёСЃРѕС‡РёРЅР° РЅР° Р·РІСѓРєР°"
 
 id: LANG_PAUSE
 desc: in wps
 eng: "Pause"
-new: "Пауза"
+new: "РџР°СѓР·Р°"
 
 id: LANG_F2_MODE
 desc: in wps F2 pressed
 eng: "mode:"
-new: "Начин:"
+new: "РќР°С‡РёРЅ:"
 
 id: LANG_DIR_FILTER
 desc: in wps F2 pressed
@@ -575,22 +575,22 @@ new: ""
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
 eng: "Status"
-new: "Статус"
+new: "РЎС‚Р°С‚СѓСЃ"
 
 id: LANG_F3_SCROLL
 desc: in wps F3 pressed
 eng: "Scroll"
-new: "Скролиране"
+new: "РЎРєСЂРѕР»РёСЂР°РЅРµ"
 
 id: LANG_F3_BAR
 desc: in wps F3 pressed
 eng: "bar"
-new: "черта"
+new: "С‡РµСЂС‚Р°"
 
 id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
 eng: "End of list"
-new: "Край на списъка"
+new: "РљСЂР°Р№ РЅР° СЃРїРёСЃСЉРєР°"
 
 id: LANG_END_CONFIRM_PLAYER
 desc: when playlist has finished
@@ -600,7 +600,7 @@ new: ""
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
 eng: "End of song list"
-new: "Край на описа"
+new: "РљСЂР°Р№ РЅР° РѕРїРёСЃР°"
 
 id: LANG_END_CONFIRM_RECORDER
 desc: when playlist has finished
@@ -610,337 +610,337 @@ new: ""
 id: LANG_SNAKE_SCORE
 desc: when you die in snake game
 eng: "Your score:"
-new: "Твоят резултат:"
+new: "РўРІРѕСЏС‚ СЂРµР·СѓР»С‚Р°С‚:"
 
 id: LANG_SNAKE_HISCORE
 desc: high score in snake game
 eng: "High Score: %d"
-new: "Висок резултат: %d"
+new: "Р’РёСЃРѕРє СЂРµР·СѓР»С‚Р°С‚: %d"
 
 id: LANG_SNAKE_HISCORE_NEW
 desc: new high score in snake game
 eng: "New High Score!"
-new: "Нов висок резултат!"
+new: "РќРѕРІ РІРёСЃРѕРє СЂРµР·СѓР»С‚Р°С‚!"
 
 id: LANG_SNAKE_PAUSE
 desc: displayed when game is paused
 eng: "Game Paused"
-new: "Паузирана игра"
+new: "РџР°СѓР·РёСЂР°РЅР° РёРіСЂР°"
 
 id: LANG_SNAKE_RESUME
 desc: what to do to resume game
 eng: "[PLAY] to resume"
-new: "[PLAY] за продължаване"
+new: "[PLAY] Р·Р° РїСЂРѕРґСЉР»Р¶Р°РІР°РЅРµ"
 
 id: LANG_SNAKE_QUIT
 desc: how to quit game
 eng: "[OFF] to quit"
-new: "[OFF] за излизане"
+new: "[OFF] Р·Р° РёР·Р»РёР·Р°РЅРµ"
 
 id: LANG_SNAKE_LEVEL
 desc: level of difficulty
 eng: "Level - %d"
-new: "Ниво - %d"
+new: "РќРёРІРѕ - %d"
 
 id: LANG_SNAKE_RANGE
 desc: range of levels
 eng: "(1 - slow, 9 - fast)"
-new: "(1- бавно, 9- бързо)"
+new: "(1- Р±Р°РІРЅРѕ, 9- Р±СЉСЂР·Рѕ)"
 
 id: LANG_SNAKE_START
 desc: how to start or pause the game
 eng: "[PLAY] to start/pause"
-new: "[PLAY] за Старт/Пауза"
+new: "[PLAY] Р·Р° РЎС‚Р°СЂС‚/РџР°СѓР·Р°"
 
 id: LANG_SOKOBAN_LEVEL
 desc: must be smaller than 6 characters
 eng: "Level"
-new: "Ниво"
+new: "РќРёРІРѕ"
 
 id: LANG_SOKOBAN_MOVE
 desc: must be smaller than 6 characters
 eng: "Moves"
-new: "Движе."
+new: "Р”РІРёР¶Рµ."
 
 id: LANG_SOKOBAN_WIN
 desc: displayed when you win 
 eng: "YOU WIN!!"
-new: "Победа!!"
+new: "РџРѕР±РµРґР°!!"
 
 id: LANG_SOKOBAN_QUIT
 desc: how to quit game
 eng: "[OFF] to stop"
-new: "[OFF] за спиране"
+new: "[OFF] Р·Р° СЃРїРёСЂР°РЅРµ"
 
 id: LANG_SOKOBAN_F1
 desc: what does F1 do
 eng: "[F1] - level"
-new: "[F1] - ниво"
+new: "[F1] - РЅРёРІРѕ"
 
 id: LANG_SOKOBAN_F2
 desc: what does F2 do
 eng: "[F2] same level"
-new: "[F2] същото ниво"
+new: "[F2] СЃСЉС‰РѕС‚Рѕ РЅРёРІРѕ"
 
 id: LANG_SOKOBAN_F3
 desc: what does F3 do
 eng: "[F3] + level"
-new: "[F3] + ниво"
+new: "[F3] + РЅРёРІРѕ"
 
 id: LANG_WORMLET_LENGTH
 desc: wormlet game
 eng: "Len:%d"
-new: "Продължителност:%d"
+new: "РџСЂРѕРґСЉР»Р¶РёС‚РµР»РЅРѕСЃС‚:%d"
 
 id: LANG_WORMLET_GROWING
 desc: wormlet game 
 eng: "Growing"
-new: "Расте"
+new: "Р Р°СЃС‚Рµ"
 
 id: LANG_WORMLET_HUNGRY
 desc: wormlet game
 eng: "Hungry"
-new: "Гладно е"
+new: "Р“Р»Р°РґРЅРѕ Рµ"
 
 id: LANG_WORMLET_WORMED
 desc: wormlet game
 eng: "Wormed"
-new: "Червей е"
+new: "Р§РµСЂРІРµР№ Рµ"
 
 id: LANG_WORMLET_ARGH
 desc: wormlet game
 eng: "Argh"
-new: "Ох"
+new: "РћС…"
 
 id: LANG_WORMLET_CRASHED
 desc: wormlet game
 eng: "Crashed"
-new: "Блъсна се"
+new: "Р‘Р»СЉСЃРЅР° СЃРµ"
 
 id: LANG_WORMLET_HIGHSCORE
 desc: wormlet game
 eng: "Hs: %d"
-new: "Вр: %d"
+new: "Р’СЂ: %d"
 
 id: LANG_WORMLET_PLAYERS
 desc: wormlet game
 eng: "%d Players    UP/DN"
-new: "%d Играчи      ^/V"
+new: "%d РРіСЂР°С‡Рё      ^/V"
 
 id: LANG_WORMLET_WORMS
 desc: wormlet game
 eng: "%d Worms        L/R"
-new: "%d Червеи   Ляво/Дясно."
+new: "%d Р§РµСЂРІРµРё   Р›СЏРІРѕ/Р”СЏСЃРЅРѕ."
 
 id: LANG_WORMLET_REMOTE_CTRL
 desc: wormlet game
 eng: "Remote control F1"
-new: "Дистанционно F1"
+new: "Р”РёСЃС‚Р°РЅС†РёРѕРЅРЅРѕ F1"
 
 id: LANG_WORMLET_NO_REM_CTRL
 desc: wormlet game
 eng: "No rem. control F1"
-new: "Без Дистанционно F1"
+new: "Р‘РµР· Р”РёСЃС‚Р°РЅС†РёРѕРЅРЅРѕ F1"
 
 id: LANG_WORMLET_2_KEY_CTRL
 desc: wormlet game
 eng: "2 key control   F1"
-new: "Контрол с два бутона  F1"
+new: "РљРѕРЅС‚СЂРѕР» СЃ РґРІР° Р±СѓС‚РѕРЅР°  F1"
 
 id: LANG_WORMLET_4_KEY_CTRL
 desc: wormlet game
 eng: "4 key control   F1"
-new: "Контрол с 4 бутона  F1"
+new: "РљРѕРЅС‚СЂРѕР» СЃ 4 Р±СѓС‚РѕРЅР°  F1"
 
 id: LANG_WORMLET_NO_CONTROL
 desc: wormlet game
 eng: "Out of control"
-new: "Загубен контрол"
+new: "Р—Р°РіСѓР±РµРЅ РєРѕРЅС‚СЂРѕР»"
 
 id: LANG_TETRIS_LOSE
 desc: tetris game
 eng: "You lose!"
-new: "Загуби!"
+new: "Р—Р°РіСѓР±Рё!"
 
 id: LANG_TETRIS_LEVEL
 desc: tetris game
 eng: "Rows - Level"
-new: "Редици - Ниво"
+new: "Р РµРґРёС†Рё - РќРёРІРѕ"
 
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
 eng: "Idle Poweroff"
-new: "Изключване при неизползване"
+new: "РР·РєР»СЋС‡РІР°РЅРµ РїСЂРё РЅРµРёР·РїРѕР»Р·РІР°РЅРµ"
 
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
 eng: "new language"
-new: "нов език"
+new: "РЅРѕРІ РµР·РёРє"
 
 id: LANG_FILTER
 desc: setting name for dir filter
 eng: "Show Files"
-new: "Показване на Файлове"
+new: "РџРѕРєР°Р·РІР°РЅРµ РЅР° Р¤Р°Р№Р»РѕРІРµ"
 
 id: LANG_FILTER_MUSIC
 desc: show only music-related files
 eng: "Music"
-new: "Музика"
+new: "РњСѓР·РёРєР°"
 
 id: LANG_FILTER_SUPPORTED
 desc: show all file types supported by Rockbox
 eng: "Supported"
-new: "Поддържани"
+new: "РџРѕРґРґСЉСЂР¶Р°РЅРё"
 
 id: LANG_FILTER_ALL
 desc: show all files
 eng: "All"
-new: "Всички"
+new: "Р’СЃРёС‡РєРё"
 
 id: LANG_SET_BOOL_YES
 desc: bool true representation
 eng: "Yes"
-new: "Да"
+new: "Р”Р°"
 
 id: LANG_SET_BOOL_NO
 desc: bool false representation
 eng: "No"
-new: "Не"
+new: "РќРµ"
 
 id: LANG_PM_MENU
 desc: in the display menu
 eng: "Peak Meter"
-new: "Peak Измервач"
+new: "Peak РР·РјРµСЂРІР°С‡"
 
 id: LANG_PM_RELEASE
 desc: in the peak meter menu
 eng: "Peak Release"
-new: "Peaki Пускане"
+new: "Peaki РџСѓСЃРєР°РЅРµ"
 
 id: LANG_PM_PEAK_HOLD
 desc: in the peak meter menu
 eng: "Peak Hold Time"
-new: "Задържане на Peak"
+new: "Р—Р°РґСЉСЂР¶Р°РЅРµ РЅР° Peak"
 
 id: LANG_PM_CLIP_HOLD
 desc: in the peak meter menu
 eng: "Clip Hold Time"
-new: "Задържане на Clip"
+new: "Р—Р°РґСЉСЂР¶Р°РЅРµ РЅР° Clip"
 
 id: LANG_PM_ETERNAL
 desc: in the peak meter menu
 eng: "Eternal"
-new: "Вечно"
+new: "Р’РµС‡РЅРѕ"
 
 id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
 eng: "Units Per Read"
-new: "Бройка при прочитане" 
+new: "Р‘СЂРѕР№РєР° РїСЂРё РїСЂРѕС‡РёС‚Р°РЅРµ" 
 
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
 eng: "Backlight On When Plugged"
-new: "Свети при включване в контакт"
+new: "РЎРІРµС‚Рё РїСЂРё РІРєР»СЋС‡РІР°РЅРµ РІ РєРѕРЅС‚Р°РєС‚"
 
 id: LANG_REPEAT
 desc: in settings_menu
 eng: "Repeat"
-new: "повтаряне"
+new: "РїРѕРІС‚Р°СЂСЏРЅРµ"
 
 id: LANG_REPEAT_ALL
 desc: repeat playlist once all songs have completed
 eng: "All"
-new: "Всички"
+new: "Р’СЃРёС‡РєРё"
 
 id: LANG_REPEAT_ONE
 desc: repeat one song
 eng: "One"
-new: "Една"
+new: "Р•РґРЅР°"
 
 id: LANG_RESET_CONFIRM
 desc: confirm to reset settings
 eng: "PLAY=Reset"
-new: "PLAY=Рестартиране"
+new: "PLAY=Р РµСЃС‚Р°СЂС‚РёСЂР°РЅРµ"
 
 id: LANG_RESET_CANCEL
 desc: confirm to reset settings
 eng: "OFF=Cancel"
-new: "OFF=Анулирай"
+new: "OFF=РђРЅСѓР»РёСЂР°Р№"
 
 id: LANG_TIMEFORMAT
 desc: select the time format of time in status bar
 eng: "Time Format"
-new: "Формат на времето"
+new: "Р¤РѕСЂРјР°С‚ РЅР° РІСЂРµРјРµС‚Рѕ"
 
 id: LANG_12_HOUR_CLOCK
 desc: option for 12 hour clock
 eng: "12 hour clock"
-new: "12ч часовник"
+new: "12С‡ С‡Р°СЃРѕРІРЅРёРє"
 
 id: LANG_24_HOUR_CLOCK
 desc: option for 24 hour clock
 eng: "24 hour clock"
-new: "24ч часовник"
+new: "24С‡ С‡Р°СЃРѕРІРЅРёРє"
 
 id: LANG_WEEKDAY_SUNDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Sun"
-new: "Нед"
+new: "РќРµРґ"
 
 id: LANG_WEEKDAY_MONDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Mon"
-new: "Пон"
+new: "РџРѕРЅ"
 
 id: LANG_WEEKDAY_TUESDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Tue"
-new: "Вт"
+new: "Р’С‚"
 
 id: LANG_WEEKDAY_WEDNESDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Wed"
-new: "Ср"
+new: "РЎСЂ"
 
 id: LANG_WEEKDAY_THURSDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Thu"
-new: "Чет"
+new: "Р§РµС‚"
 
 id: LANG_WEEKDAY_FRIDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Fri"
-new: "Пет"
+new: "РџРµС‚"
 
 id: LANG_WEEKDAY_SATURDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Sat"
-new: "Съб"
+new: "РЎСЉР±"
 
 id: LANG_MONTH_JANUARY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Jan"
-new: "Ян"
+new: "РЇРЅ"
 
 id: LANG_MONTH_FEBRUARY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Feb"
-new: "Фев"
+new: "Р¤РµРІ"
 
 id: LANG_MONTH_MARCH
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Mar"
-new: "Мар"
+new: "РњР°СЂ"
 
 id: LANG_MONTH_APRIL
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Apr"
-new: "Апр"
+new: "РђРїСЂ"
 
 id: LANG_MONTH_MAY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "May"
-new: "Май"
+new: "РњР°Р№"
 
 id: LANG_MONTH_JUNE
 desc: Maximum 3-letter abbreviation for monthname
@@ -950,32 +950,32 @@ new: "E?i"
 id: LANG_MONTH_JULY
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Jul"
-new: "Юли"
+new: "Р®Р»Рё"
 
 id: LANG_MONTH_AUGUST
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Aug"
-new: "Авг"
+new: "РђРІРі"
 
 id: LANG_MONTH_SEPTEMBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Sep"
-new: "Сеп"
+new: "РЎРµРї"
 
 id: LANG_MONTH_OCTOBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Oct"
-new: "Окт"
+new: "РћРєС‚"
 
 id: LANG_MONTH_NOVEMBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Nov"
-new: "Ное"
+new: "РќРѕРµ"
 
 id: LANG_MONTH_DECEMBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Dec"
-new: "Дек"
+new: "Р”РµРє"
 
 id: LANG_CUBE
 desc: the name of the cube demo in the demo menu
@@ -990,47 +990,47 @@ new: "Oscillograph"
 id: LANG_RESUME_SETTING_ASK_ONCE
 desc: in settings_menu
 eng: "Ask Once"
-new: "Еднократно питане"
+new: "Р•РґРЅРѕРєСЂР°С‚РЅРѕ РїРёС‚Р°РЅРµ"
 
 id: LANG_BATTERY_DISPLAY
 desc: Battery type title
 eng: "Battery Display"
-new: "Виждане на Батерия"
+new: "Р’РёР¶РґР°РЅРµ РЅР° Р‘Р°С‚РµСЂРёСЏ"
 
 id: LANG_VOLUME_DISPLAY
 desc: Volume type title
 eng: "Volume Display"
-new: "Виждане на Volume"
+new: "Р’РёР¶РґР°РЅРµ РЅР° Volume"
 
 id: LANG_DISPLAY_GRAPHIC
 desc: Label for type of icon display
 eng: "Graphic"
-new: "Графика"
+new: "Р“СЂР°С„РёРєР°"
 
 id: LANG_DISPLAY_NUMERIC
 desc: Label for type of icon display
 eng: "Numeric"
-new: "Цифрово"
+new: "Р¦РёС„СЂРѕРІРѕ"
 
 id: LANG_PM_PERFORMANCE
 desc: in the peak meter menu
 eng: "Performance"
-new: "Изпълнение"
+new: "РР·РїСЉР»РЅРµРЅРёРµ"
 
 id: LANG_PM_HIGH_PERFORMANCE
 desc: in the peak meter menu
 eng: "High performance"
-new: "Добро Изпълнение"
+new: "Р”РѕР±СЂРѕ РР·РїСЉР»РЅРµРЅРёРµ"
 
 id: LANG_PM_ENERGY_SAVER
 desc: in the peak meter menu
 eng: "Save energy"
-new: "Запазване на енергия"
+new: "Р—Р°РїР°Р·РІР°РЅРµ РЅР° РµРЅРµСЂРіРёСЏ"
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
 eng: "dBfs  linear"
-new: "dBfs  линеално"
+new: "dBfs  Р»РёРЅРµР°Р»РЅРѕ"
 
 id: LANG_PM_DBFS
 desc: in the peak meter menu
@@ -1040,62 +1040,62 @@ new: "dBfs"
 id: LANG_PM_LINEAR
 desc: in the peak meter menu
 eng: "linear"
-new: "линеално"
+new: "Р»РёРЅРµР°Р»РЅРѕ"
 
 id: LANG_PM_MIN
 desc: in the peak meter menu
 eng: "Minimum of range"
-new: "Минимум обхват"
+new: "РњРёРЅРёРјСѓРј РѕР±С…РІР°С‚"
 
 id: LANG_PM_MAX
 desc: in the peak meter menu
 eng: "Maximum of range"
-new: "максимум обхват"
+new: "РјР°РєСЃРёРјСѓРј РѕР±С…РІР°С‚"
 
 id: LANG_RECORDING
 desc: in the main menu
 eng: "Recording"
-new: "Запис"
+new: "Р—Р°РїРёСЃ"
 
 id: LANG_RECORDING_GAIN
 desc: in the recording screen
 eng: "Gain"
-new: "Записване на"
+new: "Р—Р°РїРёСЃРІР°РЅРµ РЅР°"
 
 id: LANG_RECORDING_LEFT
 desc: in the recording screen
 eng: "Left"
-new: "Ляво"
+new: "Р›СЏРІРѕ"
 
 id: LANG_RECORDING_RIGHT
 desc: in the recording screen
 eng: "Right"
-new: "Дясно"
+new: "Р”СЏСЃРЅРѕ"
 
 id: LANG_RECORDING_QUALITY
 desc: in the recording settings
 eng: "Quality"
-new: "Качество"
+new: "РљР°С‡РµСЃС‚РІРѕ"
 
 id: LANG_RECORDING_FREQUENCY
 desc: in the recording settings
 eng: "Frequency"
-new: "?Честота"
+new: "?Р§РµСЃС‚РѕС‚Р°"
 
 id: LANG_RECORDING_SOURCE
 desc: in the recording settings
 eng: "Source"
-new: "Произход"
+new: "РџСЂРѕРёР·С…РѕРґ"
 
 id: LANG_RECORDING_CHANNELS
 desc: in the recording settings
 eng: "Channels"
-new: "Канали"
+new: "РљР°РЅР°Р»Рё"
 
 id: LANG_RECORDING_SRC_MIC
 desc: in the recording settings
 eng: "Mic"
-new: "Микр"
+new: "РњРёРєСЂ"
 
 id: LANG_RECORDING_SRC_LINE
 desc: in the recording settings
@@ -1105,87 +1105,87 @@ new: "Line in"
 id: LANG_RECORDING_SRC_DIGITAL
 desc: in the recording settings
 eng: "Digital"
-new: "Дигитален / Digital"
+new: "Р”РёРіРёС‚Р°Р»РµРЅ / Digital"
 
 id: LANG_RECORDING_SETTINGS
 desc: in the main menu
 eng: "Recording settings"
-new: "Записващи настройки"
+new: "Р—Р°РїРёСЃРІР°С‰Рё РЅР°СЃС‚СЂРѕР№РєРё"
 
 id: LANG_DISK_STAT
 desc: disk size info
 eng: "Disk: %d.%dGB"
-new: "Диск: %d.%Aa"
+new: "Р”РёСЃРє: %d.%Aa"
 
 id: LANG_DISK_FREE_STAT
 desc: disk size info
 eng: "Free: %d.%dGB"
-new: "Свободен: %d.%dAa"
+new: "РЎРІРѕР±РѕРґРµРЅ: %d.%dAa"
 
 id: LANG_POWEROFF
 desc: disk poweroff flag
 eng: "Disk Poweroff"
-new: "Диск изключване"
+new: "Р”РёСЃРє РёР·РєР»СЋС‡РІР°РЅРµ"
 
 id: LANG_FILTER_PLAYLIST
 desc: show only playlist
 eng: "Playlists"
-new: "Описи"
+new: "РћРїРёСЃРё"
 
 id: LANG_BATTERY_TIME
 desc: battery level in % and estimated time remaining
 eng: "%d%% %dh %dm"
-new: "%d%% %dчас %dмин"
+new: "%d%% %dС‡Р°СЃ %dРјРёРЅ"
 
 id: LANG_SLEEP_TIMER
 desc: sleep timer setting
 eng: "Sleep timer"
-new: "Часовник за изключване"
+new: "Р§Р°СЃРѕРІРЅРёРє Р·Р° РёР·РєР»СЋС‡РІР°РЅРµ"
 
 id: LANG_MP3BUFFER_MARGIN
 desc: MP3 buffer margin time
 eng: "Anti-skip buffer"
-new: "Анти-прескачач"
+new: "РђРЅС‚Рё-РїСЂРµСЃРєР°С‡Р°С‡"
 
 id: LANG_BATTERY_CAPACITY
 desc: in settings_menu
 eng: "Battery Capacity"
-new: "капазитет на батерията"
+new: "РєР°РїР°Р·РёС‚РµС‚ РЅР° Р±Р°С‚РµСЂРёСЏС‚Р°"
 
 id: LANG_BATTERY_TOPOFF_CHARGE
 desc: in info display, shows that top off charge is running
 eng: "Battery: Top-Off Chg"
-new: "Батерия: Нерегулирано зареждане"
+new: "Р‘Р°С‚РµСЂРёСЏ: РќРµСЂРµРіСѓР»РёСЂР°РЅРѕ Р·Р°СЂРµР¶РґР°РЅРµ"
 
 id: LANG_BATTERY_TRICKLE_CHARGE
 desc: in info display, shows that trickle charge is running
 eng: "Battery: Trickle Chg"
-new: "Ieoaiea: Регулирано зареждане"
+new: "Ieoaiea: Р РµРіСѓР»РёСЂР°РЅРѕ Р·Р°СЂРµР¶РґР°РЅРµ"
 
 id: LANG_BIDIR_SCROLL
 desc: Bidirectional scroll limit
 eng: "Bidirectional Scroll Limit"
-new: "Ограничено двупосочно скролиране"
+new: "РћРіСЂР°РЅРёС‡РµРЅРѕ РґРІСѓРїРѕСЃРѕС‡РЅРѕ СЃРєСЂРѕР»РёСЂР°РЅРµ"
 
 id: LANG_SCROLL_DELAY
 desc: Delay before scrolling
 eng: "Scroll Start Delay"
-new: "Забавяне на скролиране"
+new: "Р—Р°Р±Р°РІСЏРЅРµ РЅР° СЃРєСЂРѕР»РёСЂР°РЅРµ"
 
 id: LANG_SCROLL_SPEED
 desc: in display_settings_menu()
 eng: "Scroll Speed"
-new: "Скорост на скролиране"
+new: "РЎРєРѕСЂРѕСЃС‚ РЅР° СЃРєСЂРѕР»РёСЂР°РЅРµ"
 
 id: LANG_SCROLL_STEP
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size"
-new: "Сменящ се текст при скролиране"
+new: "РЎРјРµРЅСЏС‰ СЃРµ С‚РµРєСЃС‚ РїСЂРё СЃРєСЂРѕР»РёСЂР°РЅРµ"
 
 id: LANG_SCROLL_STEP_EXAMPLE
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size Setting Example Text"
-new:  "Пример"
+new:  "РџСЂРёРјРµСЂ"
 
 id: LANG_TRICKLE_CHARGE
 desc: LANG_TRICKLE_CHARGE
@@ -1195,9 +1195,9 @@ new: ""
 id: LANG_STATUS_BAR
 desc: display menu, F3 substitute
 eng: "Status Bar"
-new: "Статус черта"
+new: "РЎС‚Р°С‚СѓСЃ С‡РµСЂС‚Р°"
 
 id: LANG_SCROLL_BAR
 desc: display menu, F3 substitute
 eng: "Scroll Bar"
-new:  "Скролираща черта"
+new:  "РЎРєСЂРѕР»РёСЂР°С‰Р° С‡РµСЂС‚Р°"

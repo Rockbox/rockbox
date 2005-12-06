@@ -5,12 +5,12 @@
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
-new: "Ustawienia dºwiÍku"
+new: "Ustawienia d≈∫wiƒôku"
 
 id: LANG_GENERAL_SETTINGS
 desc: in the main menu
 eng: "General Settings"
-new: "Ustawienia g≥Ûwne"
+new: "Ustawienia g≈Ç√≥wne"
 
 id: LANG_GAMES
 desc: in the main menu
@@ -35,7 +35,7 @@ new: "Wersja"
 id: LANG_DEBUG
 desc: in the main menu
 eng: "Debug (Keep Out!)"
-new: "Podgl±d procesÛw"
+new: "PodglƒÖd proces√≥w"
 
 id: LANG_USB
 desc: in the main menu
@@ -70,17 +70,17 @@ new: "Bateria: %d%%%s"
 id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
 eng: "Battery: Charging"
-new: "Bateria: £adowanie"
+new: "Bateria: ≈Åadowanie"
 
 id: LANG_BOUNCE
 desc: in the demos menu
 eng: "Bounce"
-new: "Skacz±cy napis"
+new: "SkaczƒÖcy napis"
 
 id: LANG_SNOW
 desc: in the demos menu
 eng: "Snow"
-new: "¶nieg"
+new: "≈önieg"
 
 id: LANG_TETRIS
 desc: in the games menu
@@ -100,18 +100,18 @@ new: "Robal"
 id: LANG_SNAKE
 desc: in the games menu
 eng: "Snake"
-new: "W±ø"
+new: "WƒÖ≈º"
 
 id: LANG_PLAYLIST_LOAD
 desc: displayed on screen while loading a playlist
 eng: "Loading..."
-new: "£adujÍ..."
+new: "≈Åadujƒô..."
 
 # NO LONGER USED
 id: LANG_PLAYLIST_SHUFFLE
 desc: displayed on screen while shuffling a playlist
 eng: "Shuffling..."
-new: "LosujÍ..."
+new: "Losujƒô..."
 
 # NO LONGER USED
 id: LANG_PLAYLIST_PLAY
@@ -127,18 +127,18 @@ new: "Playlista"
 id: LANG_PLAYINDICES_BUFFER
 desc: in playlist.indices() when playlist is full
 eng: "Buffer Full"
-new: "Pe≥ny bufor"
+new: "Pe≈Çny bufor"
 
 # NO LONGER USED
 id: LANG_PLAYINDICES_AMOUNT
 desc: number of files in playlist
 eng: "%d Files"
-new: "%d plikÛw"
+new: "%d plik√≥w"
 
 id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
 eng: "Save Failed"
-new: "B≥±d zapisu"
+new: "B≈ÇƒÖd zapisu"
 
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
@@ -148,7 +148,7 @@ new: "Partycja?"
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
 eng: "Save Failed"
-new: "B≥±d zapisu"
+new: "B≈ÇƒÖd zapisu"
 
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
@@ -163,7 +163,7 @@ new: "ON - ustaw"
 id: LANG_TIME_REVERT
 desc: used in set_time()
 eng: "OFF To Revert"
-new: "OFF - przywrÛÊ"
+new: "OFF - przywr√≥ƒá"
 
 id: LANG_HIDDEN
 desc: in settings_menu
@@ -203,17 +203,17 @@ new:
 id: LANG_SORT_CASE
 desc: in settings_menu
 eng: "Sort Case Sensitive"
-new: "Sortuj uwzgl. wielko∂Ê liter"
+new: "Sortuj uwzgl. wielko≈õƒá liter"
 
 id: LANG_RESUME
 desc: in settings_menu
 eng: "Resume"
-new: "DokoÒcz"
+new: "Doko≈Ñcz"
 
 id: LANG_OFF
 desc: Used in a lot of places
 eng: "Off"
-new: "wy≥."
+new: "wy≈Ç."
 
 id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
@@ -223,17 +223,17 @@ new: "Pytaj"
 id: LANG_ON
 desc: Used in a lot of places
 eng: "On"
-new: "w≥±cz"
+new: "w≈ÇƒÖcz"
 
 id: LANG_BACKLIGHT
 desc: in settings_menu
 eng: "Backlight"
-new: "Pod∂wietlenie"
+new: "Pod≈õwietlenie"
 
 id: LANG_SCROLL
 desc: in settings_menu
 eng: "Scroll Speed Setting Example"
-new: "Przyk≥adowa prÍdko∂Ê przesuwu"
+new: "Przyk≈Çadowa prƒôdko≈õƒá przesuwu"
 
 id: LANG_DISCHARGE
 desc: DEPRECATED
@@ -243,7 +243,7 @@ new: ""
 id: LANG_TIME
 desc: in settings_menu
 eng: "Set Time/Date"
-new: "Ustaw datÍ/czas"
+new: "Ustaw datƒô/czas"
 
 id: LANG_SPINDOWN
 desc: in settings_menu
@@ -258,12 +258,12 @@ new: "Minim. skok przewijania"
 id: LANG_FFRW_ACCEL
 desc: in settings_menu
 eng: "FF/RW Accel"
-new: "Przy∂pieszenie przewijania"
+new: "Przy≈õpieszenie przewijania"
 
 id: LANG_FOLLOW
 desc: in settings_menu
 eng: "Follow Playlist"
-new: "Idº do playlisty"
+new: "Id≈∫ do playlisty"
 
 # depreciated
 id: LANG_RESET_ASK_PLAYER
@@ -280,7 +280,7 @@ new:
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
 eng: "Are You Sure?"
-new: "Jeste∂ pewny?"
+new: "Jeste≈õ pewny?"
 
 # depreciated
 id: LANG_RESET_CONFIRM_RECORDER
@@ -317,12 +317,12 @@ new: "Tryb sortowania"
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
 eng: "Scroll"
-new: "Przesuwanie napisÛw"
+new: "Przesuwanie napis√≥w"
 
 id: LANG_RESET
 desc: in system_settings_menu()
 eng: "Reset Settings"
-new: "Ustawienia domy∂lne"
+new: "Ustawienia domy≈õlne"
 
 id: LANG_PLAYBACK
 desc: in settings_menu()
@@ -332,12 +332,12 @@ new: "Odtwarzanie"
 id: LANG_FILE
 desc: in settings_menu()
 eng: "File View"
-new: "Widok plikÛw"
+new: "Widok plik√≥w"
 
 id: LANG_DISPLAY
 desc: in settings_menu()
 eng: "Display"
-new: "Wy∂wietlanie"
+new: "Wy≈õwietlanie"
 
 id: LANG_SYSTEM
 desc: in settings_menu()
@@ -367,7 +367,7 @@ new: "Wysokie"
 id: LANG_LOUDNESS
 desc: in sound_settings
 eng: "Loudness"
-new: "G≥o∂no∂Ê"
+new: "G≈Ço≈õno≈õƒá"
 
 id: LANG_BBOOST
 desc: in sound settings
@@ -382,12 +382,12 @@ new: "Czas wyciszenia"
 id: LANG_CHANNEL_MENU
 desc: in sound_settings
 eng: "Channels"
-new: "Kana≥y"
+new: "Kana≈Çy"
 
 id: LANG_CHANNEL
 desc: in sound_settings
 eng: "Channel Configuration"
-new: "Konfiguracja kana≥Ûw"
+new: "Konfiguracja kana≈Ç√≥w"
 
 id: LANG_CHANNEL_STEREO
 desc: in sound_settings
@@ -417,17 +417,17 @@ new: "Aut. wzmocnienie"
 id: LANG_SHOWDIR_ERROR_BUFFER
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Dir Buffer"
-new: "Bufor katalogÛw"
+new: "Bufor katalog√≥w"
 
 id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Is Full!"
-new: "jest pe≥ny!"
+new: "jest pe≈Çny!"
 
 id: LANG_RESUME_ASK
 desc: question asked at the begining when resume is on
 eng: "Resume?"
-new: "DokoÒczyÊ?"
+new: "Doko≈Ñczyƒá?"
 
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
@@ -459,12 +459,12 @@ new: "Klawisze odblokowane"
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
 eng: "Key Lock Is ON"
-new: "Klawisze s± zablokowane"
+new: "Klawisze sƒÖ zablokowane"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key Lock Is OFF"
-new: "Klawisze s± odblokowane"
+new: "Klawisze sƒÖ odblokowane"
 
 id: LANG_MUTE_ON_PLAYER
 desc: displayed when mute is on
@@ -499,12 +499,12 @@ new: "--Ekran-- "
 id: LANG_ID3_TITLE
 desc: in wps
 eng: "[Title]"
-new: "[Tytu≥]"
+new: "[Tytu≈Ç]"
 
 id: LANG_ID3_NO_TITLE
 desc: in wps when no title is avaible
 eng: "<No Title>"
-new: "<bez tytu≥u>"
+new: "<bez tytu≈Çu>"
 
 id: LANG_ID3_ARTIST
 desc: in wps 
@@ -529,17 +529,17 @@ new: "<brak albumu>"
 id: LANG_ID3_TRACKNUM
 desc: in wps
 eng: "[Tracknum]"
-new: "[¶cieøka nr]"
+new: "[≈öcie≈ºka nr]"
 
 id: LANG_ID3_NO_TRACKNUM
 desc: in wps if no track number is avaible
 eng: "<No Tracknum>"
-new: "<brak nru ∂cieøki>"
+new: "<brak nru ≈õcie≈ºki>"
 
 id: LANG_ID3_LENGHT
 desc: in wps
 eng: "[Length]"
-new: "[D≥ugo∂Ê]"
+new: "[D≈Çugo≈õƒá]"
 
 id: LANG_ID3_PLAYLIST
 desc: in wps
@@ -554,22 +554,22 @@ new: "[Bitrate]"
 id: LANG_ID3_FRECUENCY
 desc: in wps
 eng: "[Frequency]"
-new: "[CzÍstotl.]"
+new: "[Czƒôstotl.]"
 
 id: LANG_ID3_PATH
 desc: in wps
 eng: "[Path]"
-new: "[¶cieøka]"
+new: "[≈öcie≈ºka]"
 
 id: LANG_PITCH_UP
 desc: in wps
 eng: "Pitch Up"
-new: "Podnie∂"
+new: "Podnie≈õ"
 
 id: LANG_PITCH_DOWN
 desc: in wps
 eng: "Pitch Down"
-new: "Obniø"
+new: "Obni≈º"
 
 id: LANG_PAUSE
 desc: in wps
@@ -589,7 +589,7 @@ new:
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
 eng: "Status"
-new: "GÛrny"
+new: "G√≥rny"
 
 id: LANG_F3_SCROLL
 desc: in wps F3 pressed
@@ -624,7 +624,7 @@ new:
 id: LANG_SNAKE_SCORE
 desc: when you die in snake game
 eng: "Your score:"
-new: "TwÛj wynik:"
+new: "Tw√≥j wynik:"
 
 id: LANG_SNAKE_HISCORE
 desc: high score in snake game
@@ -649,7 +649,7 @@ new: "[GRAJ] dalej"
 id: LANG_SNAKE_QUIT
 desc: how to quit game
 eng: "[OFF] To Quit"
-new: "[OFF] zakoÒcz"
+new: "[OFF] zako≈Ñcz"
 
 id: LANG_SNAKE_LEVEL
 desc: level of difficulty
@@ -795,17 +795,17 @@ new:
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
 eng: "Idle Poweroff"
-new: "Aut. wyl±czanie"
+new: "Aut. wylƒÖczanie"
 
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
 eng: "New Language"
-new: "Nowy jÍzyk"
+new: "Nowy jƒôzyk"
 
 id: LANG_FILTER
 desc: setting name for dir filter
 eng: "Show Files"
-new: "Pokaø pliki"
+new: "Poka≈º pliki"
 
 id: LANG_FILTER_MUSIC
 desc: show only music-related files
@@ -835,7 +835,7 @@ new: "Nie"
 id: LANG_PM_MENU
 desc: in the display menu
 eng: "Peak Meter"
-new: "Wskaºnik szczyt."
+new: "Wska≈∫nik szczyt."
 
 id:   LANG_PM_RELEASE
 desc: in the peak meter menu
@@ -865,12 +865,12 @@ new: "fragm. na odczyt"
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
 eng: "Backlight On When Plugged"
-new: "Pod∂wietl kiedy pod≥±czony"
+new: "Pod≈õwietl kiedy pod≈ÇƒÖczony"
 
 id: LANG_REPEAT
 desc: in settings_menu
 eng: "Repeat"
-new: "PowtÛrz"
+new: "Powt√≥rz"
 
 id: LANG_REPEAT_ALL
 desc: repeat playlist once all songs have completed
@@ -929,7 +929,7 @@ new: "Wto"
 id: LANG_WEEKDAY_WEDNESDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Wed"
-new: "¶ro"
+new: "≈öro"
 
 id: LANG_WEEKDAY_THURSDAY
 desc: Maximum 3-letter abbreviation for weekday
@@ -939,7 +939,7 @@ new: "Czw"
 id: LANG_WEEKDAY_FRIDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Fri"
-new: "Pi±"
+new: "PiƒÖ"
 
 id: LANG_WEEKDAY_SATURDAY
 desc: Maximum 3-letter abbreviation for weekday
@@ -994,7 +994,7 @@ new: "Wrz"
 id: LANG_MONTH_OCTOBER
 desc: Maximum 3-letter abbreviation for monthname
 eng: "Oct"
-new: "Paº"
+new: "Pa≈∫"
 
 id: LANG_MONTH_NOVEMBER
 desc: Maximum 3-letter abbreviation for monthname
@@ -1009,7 +1009,7 @@ new: "Gru"
 id: LANG_CUBE
 desc: the name of the cube demo in the demo menu
 eng: "Cube"
-new: "Bry≥a"
+new: "Bry≈Ça"
 
 id: LANG_OSCILLOGRAPH
 desc: the name of the oscillograph demo in the demo menu
@@ -1024,12 +1024,12 @@ new: "Zapytaj raz"
 id: LANG_BATTERY_DISPLAY
 desc: Battery type title
 eng: "Battery Display"
-new: "Wy∂wietlanie baterii"
+new: "Wy≈õwietlanie baterii"
 
 id: LANG_VOLUME_DISPLAY
 desc: Volume type title
 eng: "Volume Display"
-new: "Wy∂wietlanie wzmocnienia"
+new: "Wy≈õwietlanie wzmocnienia"
 
 id: LANG_DISPLAY_GRAPHIC
 desc: Label for type of icon display
@@ -1044,22 +1044,22 @@ new: "numerycznie"
 id: LANG_PM_PERFORMANCE
 desc: in the peak meter menu
 eng: "Performance"
-new: "Wydajno∂Ê"
+new: "Wydajno≈õƒá"
 
 id: LANG_PM_HIGH_PERFORMANCE
 desc: in the peak meter menu
 eng: "High performance"
-new: "Wysoka wydajno∂Ê"
+new: "Wysoka wydajno≈õƒá"
 
 id: LANG_PM_ENERGY_SAVER
 desc: in the peak meter menu
 eng: "Save Energy"
-new: "OszczÍdz. energii"
+new: "Oszczƒôdz. energii"
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
 eng: "Scale"
-new: "Wskaºnik"
+new: "Wska≈∫nik"
 
 id: LANG_PM_DBFS
 desc: in the peak meter menu
@@ -1104,22 +1104,22 @@ new: "prawy"
 id: LANG_RECORDING_QUALITY
 desc: in the recording settings
 eng: "Quality"
-new: "Jako∂Ê"
+new: "Jako≈õƒá"
 
 id: LANG_RECORDING_FREQUENCY
 desc: in the recording settings
 eng: "Frequency"
-new: "CzÍstotliwo∂Ê"
+new: "Czƒôstotliwo≈õƒá"
 
 id: LANG_RECORDING_SOURCE
 desc: in the recording settings
 eng: "Source"
-new: "¨rÛd≥o"
+new: "≈πr√≥d≈Ço"
 
 id: LANG_RECORDING_CHANNELS
 desc: in the recording settings
 eng: "Channels"
-new: "Kana≥y"
+new: "Kana≈Çy"
 
 id: LANG_RECORDING_SRC_MIC
 desc: in the recording settings
@@ -1154,7 +1154,7 @@ new: "Wolne: %d.%GB"
 id: LANG_POWEROFF
 desc: disk poweroff flag
 eng: "Disk Poweroff"
-new: "Wy≥±czanie dysku"
+new: "Wy≈ÇƒÖczanie dysku"
 
 id: LANG_FILTER_PLAYLIST
 desc: show only playlist
@@ -1174,7 +1174,7 @@ new: "Usypiacz"
 id: LANG_MP3BUFFER_MARGIN
 desc: MP3 buffer margin time
 eng: "Anti-Skip Buffer"
-new: "Bufor antywstrz±sowy"
+new: "Bufor antywstrzƒÖsowy"
 
 id: LANG_BIDIR_SCROLL
 desc: Bidirectional scroll limit
@@ -1184,7 +1184,7 @@ new: "Limit przesuwania dwukierunkowego"
 id: LANG_SCROLL_DELAY
 desc: Delay before scrolling
 eng: "Scroll Start Delay"
-new: "OpÛºnienie rozpoczÍcia przesuwania"
+new: "Op√≥≈∫nienie rozpoczƒôcia przesuwania"
 
 id: LANG_SCROLL_STEP
 desc: Pixels to advance per scroll
@@ -1194,12 +1194,12 @@ new: "Rozmiar skoku przesuwania"
 id: LANG_SCROLL_STEP_EXAMPLE
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size Setting Example Text"
-new: "Przyk≥adowy rozmiar skoku przesuwania"
+new: "Przyk≈Çadowy rozmiar skoku przesuwania"
 
 id: LANG_SCROLL_SPEED
 desc: in display_settings_menu()
 eng: "Scroll Speed"
-new: "PrÍdko∂Ê przesuwania"
+new: "Prƒôdko≈õƒá przesuwania"
 
 id: LANG_TRICKLE_CHARGE
 desc: DEPRECATED
@@ -1209,17 +1209,17 @@ new: ""
 id: LANG_BATTERY_TOPOFF_CHARGE
 desc: in info display, shows that top off charge is running
 eng: "Battery: Top-Off Chg"
-new: "Bateria: Do≥adowanie"
+new: "Bateria: Do≈Çadowanie"
 
 id: LANG_BATTERY_TRICKLE_CHARGE
 desc: in info display, shows that trickle charge is running
 eng: "Battery: Trickle Chg"
-new: "Bateria: Wolne ≥adowanie"
+new: "Bateria: Wolne ≈Çadowanie"
 
 id: LANG_BATTERY_CAPACITY
 desc: in settings_menu
 eng: "Battery Capacity"
-new: "Pojemno∂Ê baterii"
+new: "Pojemno≈õƒá baterii"
 
 id: LANG_QUEUE_QUEUED
 desc: queued track name %s
@@ -1269,7 +1269,7 @@ new: "Skasuj"
 id: LANG_REALLY_DELETE
 desc: Really Delete?
 eng: "Delete?"
-new: "SkasowaÊ?"
+new: "Skasowaƒá?"
 
 id: LANG_DELETED
 desc: A file has beed deleted
@@ -1284,7 +1284,7 @@ new: "Zm.Naz"
 id: LANG_FAILED
 desc: Something failed. To be appended after above actions
 eng: "Failed"
-new: "nie uda≥o siÍ"
+new: "nie uda≈Ço siƒô"
 
 id: LANG_ALARM_MOD_ALARM_MENU
 desc: The name of the additional entry in the main menu for the RTC alarm mod.
@@ -1304,7 +1304,7 @@ new: "Budzenie za %d:%02d"
 id: LANG_ALARM_MOD_SHUTDOWN
 desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
 eng: "Shutting Down..."
-new: "Wy≥±czanie..."
+new: "Wy≈ÇƒÖczanie..."
 
 id: LANG_ALARM_MOD_ERROR
 desc: The text that tells that the time is incorrect (for the RTC alarm mod).
@@ -1319,12 +1319,12 @@ new: "GRAJ=Ustaw OFF=Anuluj"
 id: LANG_CREATE_PLAYLIST
 desc: Menu option for creating a playlist
 eng: "Create Playlist"
-new: "StwÛrz playlistÍ"
+new: "Stw√≥rz playlistƒô"
 
 id: LANG_CREATING
 desc: Screen feedback during playlist creation
 eng: "Creating"
-new: "TworzÍ"
+new: "Tworzƒô"
 
 id: LANG_PLAYER_KEYBOARD_BACKSPACE
 desc: Backspace alternative in player keyboard interaction
@@ -1344,12 +1344,12 @@ new: "Akceptuj"
 id: LANG_PLAYER_KEYBOARD_ABORT
 desc: Abort alternative in player keyboard interaction
 eng: "Abort"
-new: "Opu∂Ê"
+new: "Opu≈õƒá"
 
 id: LANG_MENU_SHOW_ID3_INFO
 desc: Menu option to start id3 viewer
 eng: "Show ID3 Info"
-new: "Pokaø info ID3"
+new: "Poka≈º info ID3"
 
 id: LANG_ID3_GENRE
 desc: ID3 frame 'genre'
@@ -1389,7 +1389,7 @@ new: "Ustawienia"
 id: LANG_SETTINGS_LOADED2
 desc: Feedback shown when a .cfg file is loaded
 eng: "Loaded"
-new: "za≥adowane"
+new: "za≈Çadowane"
 
 id: LANG_FADE_ON_STOP
 desc: options menu to set fade on stop or pause
@@ -1399,7 +1399,7 @@ new: "Wycisz przy zatrzymaniu"
 id: LANG_SOKOBAN_ON
 desc: how to undo move 
 eng: "[ON] To Undo"
-new: "[ON] przywrÛÊ"
+new: "[ON] przywr√≥ƒá"
 
 id: LANG_INVERT
 desc: in settings_menu
@@ -1409,12 +1409,12 @@ new: "Tryb LCD"
 id: LANG_CHANNEL_STEREO_NARROW_PLAYER
 desc: in sound_settings
 eng: "St. Narrow"
-new: "w±skie st."
+new: "wƒÖskie st."
 
 id: LANG_CHANNEL_STEREO_NARROW_RECORDER
 desc: in sound_settings
 eng: "Stereo Narrow"
-new: "w±skie stereo"
+new: "wƒÖskie stereo"
 
 id: LANG_CHANNEL_STEREO_WIDE
 desc: in sound_settings
@@ -1464,7 +1464,7 @@ new: "Zaznaczanie linii"
 id: LANG_RECORDING_EDITABLE
 desc: Editable recordings setting
 eng: "Independent frames"
-new: "Niezaleøne ramki"
+new: "Niezale≈ºne ramki"
 
 id: LANG_STATUS_BAR
 desc: display menu, F3 substitute
@@ -1479,12 +1479,12 @@ new: "Pasek przewijania"
 id: LANG_CAPTION_BACKLIGHT
 desc: in settings_menu
 eng: "Caption backlight"
-new: "Pod∂wietlanie napisÛw"
+new: "Pod≈õwietlanie napis√≥w"
 
 id: LANG_INVERT_CURSOR_POINTER
 desc: in settings_menu
 eng: "Pointer"
-new: "wskaºnik"
+new: "wska≈∫nik"
 
 id: LANG_INVERT_CURSOR_BAR
 desc: in settings_menu
@@ -1504,7 +1504,7 @@ new: "w negatywie"
 id: LANG_MAX_FILES_IN_DIR
 desc: in settings_menu
 eng: "Max files in dir browser"
-new: "Maksym. plikÛw w przegl±darce katalogÛw"
+new: "Maksym. plik√≥w w przeglƒÖdarce katalog√≥w"
 
 id: LANG_MAX_FILES_IN_PLAYLIST
 desc: in settings_menu
@@ -1529,7 +1529,7 @@ new: "zawsze"
 id: LANG_JUMP_SCROLL_DELAY
 desc: (player) Delay before making a jump scroll
 eng: "Jump Scroll Delay"
-new: "opÛºnienie skoku przewijania"
+new: "op√≥≈∫nienie skoku przewijania"
 
 id: LANG_RECORD_TIMESPLIT
 desc: Prompt for record timer interval setting, in the record settings menu
@@ -1544,12 +1544,12 @@ new: "Dziel co:"
 id: LANG_SHOW_ICONS
 desc: in settings_menu
 eng: "Show Icons"
-new: "Pokaø ikony"
+new: "Poka≈º ikony"
 
 id: LANG_DISK_FULL
 desc: in recording screen
 eng: "The disk is full. Press OFF to continue."
-new: "Dysk jest pe≥ny. Wci∂nij OFF øeby kontynuowaÊ."
+new: "Dysk jest pe≈Çny. Wci≈õnij OFF ≈ºeby kontynuowaƒá."
 
 id: LANG_CONFIRM_WITH_PLAY_RECORDER
 desc: Generic recorder string to use to confirm
@@ -1559,7 +1559,7 @@ new: "GRAJ = Tak"
 id: LANG_CANCEL_WITH_ANY_RECORDER
 desc: Generic recorder string to use to cancel
 eng: "Any Other = No"
-new: "Kaødy inny = Nie"
+new: "Ka≈ºdy inny = Nie"
 
 ##
 ## Strings used in the plugin loader:
@@ -1568,12 +1568,12 @@ new: "Kaødy inny = Nie"
 id: LANG_PLUGIN_CANT_OPEN
 desc: Plugin open error message
 eng: "Can't open %s"
-new: "Nie mogÍ otworzyÊ %s"
+new: "Nie mogƒô otworzyƒá %s"
 
 id: LANG_READ_FAILED
 desc: There was an error reading a file
 eng: "Failed reading %s"
-new: "B≥±d odczytu %s"
+new: "B≈ÇƒÖd odczytu %s"
 
 id: LANG_PLUGIN_WRONG_MODEL
 desc: The plugin is not compatible with the archos model trying to run it
@@ -1588,7 +1588,7 @@ new: "Wersja niekompatybilna"
 id: LANG_PLUGIN_ERROR
 desc: The plugin return an error code
 eng: "Plugin returned error"
-new: "Wtyczka zwrÛci≥a b≥±d"
+new: "Wtyczka zwr√≥ci≈Ça b≈ÇƒÖd"
 
 ##
 ## boot change detection
@@ -1597,17 +1597,17 @@ new: "Wtyczka zwrÛci≥a b≥±d"
 id: LANG_BOOT_CHANGED
 desc: File browser discovered the boot file was changed
 eng: "Boot changed"
-new: "Zmieni≥ siÍ plik startowy"
+new: "Zmieni≈Ç siƒô plik startowy"
 
 id: LANG_REBOOT_NOW
 desc: Do you want to reboot?
 eng: "Reboot now?"
-new: "ZresetowaÊ teraz?"
+new: "Zresetowaƒá teraz?"
 
 id: LANG_FLIPIT
 desc: in the games menu
 eng: "Flipit"
-new: "OdwrÛÊ"
+new: "Odwr√≥ƒá"
 
 id: LANG_OTHELO
 desc: in the games menu
@@ -1627,7 +1627,7 @@ new: "Gwiazda"
 id: LANG_QUEUE_LAST
 desc: in onplay menu.  queue a track/playlist at end of playlist.
 eng: "Queue last"
-new: "Kolejkuj ostatni/±"
+new: "Kolejkuj ostatni/ƒÖ"
 
 id: LANG_INSERT
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
@@ -1637,22 +1637,22 @@ new: "Wstaw"
 id: LANG_INSERT_LAST
 desc: in onplay menu.  append a track/playlist into dynamic playlist.
 eng: "Insert last"
-new: "Wstaw ostatni/±"
+new: "Wstaw ostatni/ƒÖ"
 
 id: LANG_QUEUE_FIRST
 desc: in onplay menu.  queue a track/playlist into dynamic playlist.
 eng: "Queue next"
-new: "Kolejkuj nastÍpny/±"
+new: "Kolejkuj nastƒôpny/ƒÖ"
 
 id: LANG_INSERT_FIRST
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
 eng: "Insert next"
-new: "Wstaw nastÍpny/±"
+new: "Wstaw nastƒôpny/ƒÖ"
 
 id: LANG_SAVE_DYNAMIC_PLAYLIST
 desc: in playlist menu.
 eng: "Save Dynamic Playlist"
-new: "Zachowaj dynamiczn± playlistÍ"
+new: "Zachowaj dynamicznƒÖ playlistƒô"
 
 id: LANG_PLAYLIST_MENU
 desc: in main menu.
@@ -1662,17 +1662,17 @@ new: "Opcje playlisty"
 id: LANG_PLAYLIST_INSERT_COUNT
 desc: splash number of tracks inserted
 eng: "Inserted %d tracks (%s)"
-new: "Wstawione %d plikÛw (%s)"
+new: "Wstawione %d plik√≥w (%s)"
 
 id: LANG_PLAYLIST_QUEUE_COUNT
 desc: splash number of tracks queued
 eng: "Queued %d tracks (%s)"
-new: "W kolejce %d plikÛw (%s)"
+new: "W kolejce %d plik√≥w (%s)"
 
 id: LANG_PLAYLIST_SAVE_COUNT
 desc: splash number of tracks saved
 eng: "Saved %d tracks (%s)"
-new: "Zachowane %d plikÛw (%s)"
+new: "Zachowane %d plik√≥w (%s)"
 
 id: LANG_OFF_ABORT
 desc: Used on recorder models
@@ -1687,22 +1687,22 @@ new: "STOP - anuluj"
 id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
 desc: Playlist error
 eng: "Error updating playlist control file"
-new: "B≥±d przy od∂wieøaniu pliku kontroli playlisty"
+new: "B≈ÇƒÖd przy od≈õwie≈ºaniu pliku kontroli playlisty"
 
 id: LANG_PLAYLIST_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing playlist file"
-new: "Brak dostÍpu do pliku playlisty"
+new: "Brak dostƒôpu do pliku playlisty"
 
 id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing playlist control file"
-new: "Brak dostÍpu do pliku kontroli playlisty"
+new: "Brak dostƒôpu do pliku kontroli playlisty"
 
 id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing directory"
-new: "Brak dostÍpu do katalogu"
+new: "Brak dostƒôpu do katalogu"
 
 id: LANG_PLAYLIST_CONTROL_INVALID
 desc: Playlist resume error
@@ -1732,7 +1732,7 @@ new: "Firmware"
 id: LANG_LANGUAGE
 desc: in settings_menu
 eng: "Language"
-new: "JÍzyk"
+new: "Jƒôzyk"
 
 id: LANG_WHILE_PLAYING
 desc: in settings_menu()

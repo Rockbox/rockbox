@@ -29,6 +29,7 @@
 #include "statusbar.h"
 #include "talk.h"
 #include "misc.h"
+#include "rbunicode.h"
 
 #define KEYBOARD_PAGES 3
 
@@ -98,14 +99,16 @@ int kbd_input(char* text, int buflen)
     int page = 0, x = 0;
     int linelen;
 
-    int len, i;
+    int len, len_utf8, i, j;
     int editpos, curpos, leftpos;
     unsigned short* line = kbd_setupkeys(page, &linelen);
-    unsigned char temptext[12];
+    unsigned char temptext[36];
+    unsigned short tmp;
+    unsigned char *utf8;
 
     int button, lastbutton = 0;
 
-    editpos = strlen(text);
+    editpos = utf8length(text);
 
     if (global_settings.talk_menu) /* voice UI? */
         talk_spell(text, true); /* spell initial text */ 
@@ -113,7 +116,8 @@ int kbd_input(char* text, int buflen)
     while (!done)
     {
         len = strlen(text);
-        
+        len_utf8 = utf8length(text);
+
         if (redraw)
         {
             if (line_edit) 
@@ -128,26 +132,47 @@ int kbd_input(char* text, int buflen)
             }
 
             /* Draw insert chars */
-            temptext[0] = KEYBOARD_INSERT_LEFT;
-            temptext[1] = line[x];
-            temptext[2] = KEYBOARD_INSERT_RIGHT;
+            utf8 = temptext;
+            tmp = KEYBOARD_INSERT_LEFT;
+            utf8 = iso_decode((unsigned char*)&tmp, utf8, 0, 1);
+            tmp = line[x];
+            utf8 = iso_decode((unsigned char*)&tmp, utf8, 0, 1);
+            tmp = KEYBOARD_INSERT_RIGHT;
+            utf8 = iso_decode((unsigned char*)&tmp, utf8, 0, 1);
             for (i = 1; i < 8; i++)
             {
-                temptext[i+2] = line[(x+i)%linelen];
+                utf8 = iso_decode((unsigned char*)&line[(x+i)%linelen], utf8, 0, 1);
+                /* temptext[i+2] = line[(x+i)%linelen]; */
             }
-            temptext[i+2] = 0;
+            *utf8 = 0;
             lcd_puts(1, 0, temptext);
 
             /* write out the text */
-            curpos = MIN(MIN(editpos, 10 - MIN(len - editpos, 3)), 9);
+            curpos = MIN(MIN(editpos, 10 - MIN(len_utf8 - editpos, 3)), 9);
             leftpos = editpos - curpos;
-            strncpy(temptext, text + leftpos, 10);
-            temptext[10] = 0;
-            
-            if (leftpos)
+            if (!leftpos) {
+                utf8 = text + utf8seek(text, leftpos);
+                i = 0;
+                j = 0;
+            } else {
                 temptext[0] = '<';
-            if (len - leftpos > 10)
-                temptext[9] = '>';
+                i = 1;
+                j = 1;
+                utf8 = text + utf8seek(text, leftpos+1);
+            }
+            while (*utf8 && i < 10) {
+                temptext[j++] = *utf8++;
+                if ((*utf8 & MASK) != COMP)
+                    i++;
+            }
+            temptext[j] = 0;
+
+
+            if (len_utf8 - leftpos > 10) {
+                utf8 = temptext + utf8seek(temptext, 9);
+                *utf8++ = '>';
+                *utf8 = 0;
+            }
 
             lcd_remove_cursor();
             lcd_puts(1, 1, temptext);
@@ -185,10 +210,11 @@ int kbd_input(char* text, int buflen)
             case BUTTON_RIGHT | BUTTON_REPEAT:
                 if (line_edit)
                 {
-                    if (editpos < len)
+                    if (editpos < len_utf8)
                     {
                         editpos++;
-                        kbd_spellchar(text[editpos]);
+                        int c = utf8seek(text, editpos);
+                        kbd_spellchar(text[c]);
                     }
                 }
                 else
@@ -206,7 +232,8 @@ int kbd_input(char* text, int buflen)
                     if (editpos)
                     {
                         editpos--;
-                        kbd_spellchar(text[editpos]);
+                        int c = utf8seek(text, editpos);
+                        kbd_spellchar(text[c]);
                     }
                 }
                 else
@@ -229,20 +256,35 @@ int kbd_input(char* text, int buflen)
                 {
                     if (editpos > 0)
                     {
-                        for (i = editpos; i < len; i++)
-                            text[i-1] = text[i];
-                        text[i-1] = '\0';
+                        utf8 = text + utf8seek(text, editpos);
+                        i = 0;
+                        do {
+                            i++;
+                            utf8--;
+                        } while ((*utf8 & MASK) == COMP);
+                        while (utf8[i]) {
+                            *utf8 = utf8[i];
+                            utf8++;
+                        }
+                        *utf8 = 0;
                         editpos--;
                     }
                 }
                 else  /* inserts the selected char */
                 {
-                    if (len + 1 < buflen)
+                    utf8 = iso_decode((unsigned char*)&line[x], temptext, 0, 1);
+                    *utf8 = 0;
+                    j = strlen(temptext);
+                    if (len + j < buflen)
                     {
-                        for (i = len ; i > editpos; i--)
-                            text[i] = text[i-1];
-                        text[len+1] = 0;
-                        text[editpos] = line[x];
+                        int k = len_utf8;
+                        for (i = len+j; k >= editpos; i--) {
+                            text[i] = text[i-j];
+                            if ((text[i] & MASK) != COMP)
+                                k--;
+                        }
+                        while (j--)
+                            text[i--] = temptext[j];
                         editpos++;
                     }
                 }

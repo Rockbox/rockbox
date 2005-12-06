@@ -4,7 +4,7 @@
 # Translated by:
 # - Rune Wiinberg
 # - Jakob Givoni
-# - Jonas Häggqvist
+# - Jonas HÃ¤ggqvist
 # 
 # Try to follow the guidelines from http://www.sslug.dk/locale/ Specifically
 # try to avoid english words at (almost) all costs.
@@ -41,7 +41,7 @@ id: LANG_DEBUG
 desc: in the main menu
 eng: "Debug (Keep Out!)"
 voice: "Debug, keep out!"
-new: "Fejlfinding, bliv væk!"
+new: "Fejlfinding, bliv vÃ¦k!"
 
 id: LANG_USB
 desc: in the main menu
@@ -77,7 +77,7 @@ id: LANG_PLAYLIST_LOAD
 desc: displayed on screen while loading a playlist
 eng: "Loading..."
 voice: ""
-new: "Indlæser..."
+new: "IndlÃ¦ser..."
 
 id: LANG_PLAYLIST_SHUFFLE
 desc: displayed on screen while shuffling a playlist
@@ -125,7 +125,7 @@ id: LANG_TIME_SET
 desc: used in set_time()
 eng: "ON To Set"
 voice: ""
-new: "TÆND: Indstil"
+new: "TÃ†ND: Indstil"
 
 id: LANG_TIME_REVERT
 desc: used in set_time()
@@ -149,7 +149,7 @@ id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play Selected First"
 voice: "Play Selected File First"
-new: "Spil valgte først"
+new: "Spil valgte fÃ¸rst"
 
 id: LANG_SORT_CASE
 desc: in settings_menu
@@ -161,7 +161,7 @@ id: LANG_RESUME
 desc: in settings_menu
 eng: "Resume on startup"
 voice: "Resume on startup"
-new: "Forsæt ved tænd"
+new: "ForsÃ¦t ved tÃ¦nd"
 
 id: LANG_OFF
 desc: Used in a lot of places
@@ -173,7 +173,7 @@ id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
 eng: "Ask"
 voice: "Ask"
-new: "Spørg"
+new: "SpÃ¸rg"
 
 id: LANG_ON
 desc: Used in a lot of places
@@ -191,7 +191,7 @@ id: LANG_SCROLL
 desc: in settings_menu
 eng: "Scroll Speed Setting Example"
 voice: ""
-new: "Eksempel på rulle-hastighed"
+new: "Eksempel pÃ¥ rulle-hastighed"
 
 id: LANG_DISCHARGE
 desc: DEPRECATED
@@ -227,7 +227,7 @@ id: LANG_FOLLOW
 desc: in settings_menu
 eng: "Follow Playlist"
 voice: "Follow Playlist"
-new: "Følg spilleliste"
+new: "FÃ¸lg spilleliste"
 
 id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
@@ -269,7 +269,7 @@ id: LANG_RESET
 desc: in system_settings_menu()
 eng: "Reset Settings"
 voice: "Reset Settings"
-new: "Nulstil opsætning"
+new: "Nulstil opsÃ¦tning"
 
 id: LANG_PLAYBACK
 desc: in settings_menu()
@@ -287,7 +287,7 @@ id: LANG_DISPLAY
 desc: in settings_menu()
 eng: "Display"
 voice: "Display"
-new: "Skærm"
+new: "SkÃ¦rm"
 
 id: LANG_SYSTEM
 desc: in settings_menu()
@@ -371,7 +371,7 @@ id: LANG_CHANNEL_RIGHT
 desc: in sound_settings
 eng: "Mono Right"
 voice: "Mono Right"
-new: "Mono højre"
+new: "Mono hÃ¸jre"
 
 id: LANG_AUTOVOL
 desc: in sound_settings
@@ -395,7 +395,7 @@ id: LANG_RESUME_ASK
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: "Forsæt?"
+new: "ForsÃ¦t?"
 
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
@@ -407,25 +407,25 @@ id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
 eng: "Key Lock ON"
 voice: ""
-new: "Lås TIL"
+new: "LÃ¥s TIL"
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
 eng: "Key Lock OFF"
 voice: ""
-new: "Lås FRA"
+new: "LÃ¥s FRA"
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
 eng: "Key Lock Is ON"
 voice: ""
-new: "Tast. lås er TIL"
+new: "Tast. lÃ¥s er TIL"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key Lock Is OFF"
 voice: ""
-new: "Tast. lås er FRA"
+new: "Tast. lÃ¥s er FRA"
 
 id: LANG_MUTE_ON_PLAYER
 desc: DEPRECATED
@@ -515,7 +515,7 @@ id: LANG_ID3_LENGHT
 desc: in wps
 eng: "[Length]"
 voice: ""
-new: "[Længde]"
+new: "[LÃ¦ngde]"
 
 id: LANG_ID3_PLAYLIST
 desc: in wps
@@ -581,19 +581,19 @@ id: LANG_F3_BAR
 desc: in wps F3 pressed
 eng: "Bar"
 voice: ""
-new: "Bjælke"
+new: "BjÃ¦lke"
 
 id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
 eng: "End Of List"
 voice: ""
-new: "Slut på liste"
+new: "Slut pÃ¥ liste"
 
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
 eng: "End Of Song List"
 voice: ""
-new: "Slut på liste"
+new: "Slut pÃ¥ liste"
 
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
@@ -623,7 +623,7 @@ id: LANG_FILTER_SUPPORTED
 desc: show all file types supported by Rockbox
 eng: "Supported"
 voice: "Supported"
-new: "Understøttede"
+new: "UnderstÃ¸ttede"
 
 id: LANG_FILTER_ALL
 desc: show all files
@@ -647,7 +647,7 @@ id: LANG_PM_MENU
 desc: in the display menu
 eng: "Peak Meter"
 voice: "Peak Meter"
-new: "Spids markør"
+new: "Spids markÃ¸r"
 
 id: LANG_PM_RELEASE
 desc: in the peak meter menu
@@ -677,7 +677,7 @@ id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
 eng: "Units Per Read"
 voice: "Units Per Read"
-new: "Enheder per læsning"
+new: "Enheder per lÃ¦sning"
 
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu
@@ -737,7 +737,7 @@ id: LANG_WEEKDAY_SUNDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Sun"
 voice: ""
-new: "Søn"
+new: "SÃ¸n"
 
 id: LANG_WEEKDAY_MONDAY
 desc: Maximum 3-letter abbreviation for weekday
@@ -767,7 +767,7 @@ id: LANG_WEEKDAY_SATURDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Sat"
 voice: ""
-new: "Lør"
+new: "LÃ¸r"
 
 id: LANG_MONTH_JANUARY
 desc: Maximum 3-letter abbreviation for monthname
@@ -845,7 +845,7 @@ id: LANG_RESUME_SETTING_ASK_ONCE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: "Spørg én gang"
+new: "SpÃ¸rg Ã©n gang"
 
 id: LANG_BATTERY_DISPLAY
 desc: Battery type title
@@ -905,19 +905,19 @@ id: LANG_PM_LINEAR
 desc: in the peak meter menu
 eng: "Linear(%)"
 voice: "Linear percent"
-new: "lineær(%)"
+new: "lineÃ¦r(%)"
 
 id: LANG_PM_MIN
 desc: in the peak meter menu
 eng: "Minimum Of Range"
 voice: "Minimum Of Range"
-new: "Mindste værdi"
+new: "Mindste vÃ¦rdi"
 
 id: LANG_PM_MAX
 desc: in the peak meter menu
 eng: "Maximum Of Range"
 voice: "Maximum Of Range"
-new: "Største værdi"
+new: "StÃ¸rste vÃ¦rdi"
 
 id: LANG_RECORDING
 desc: in the main menu
@@ -929,7 +929,7 @@ id: LANG_RECORDING_GAIN
 desc: in the recording screen
 eng: "Gain"
 voice: ""
-new: "Forstærkning"
+new: "ForstÃ¦rkning"
 
 id: LANG_RECORDING_LEFT
 desc: in the recording screen
@@ -941,7 +941,7 @@ id: LANG_RECORDING_RIGHT
 desc: in the recording screen
 eng: "Right"
 voice: ""
-new: "Højre"
+new: "HÃ¸jre"
 
 id: LANG_RECORDING_QUALITY
 desc: in the recording settings
@@ -1025,19 +1025,19 @@ id: LANG_SLEEP_TIMER
 desc: sleep timer setting
 eng: "Sleep Timer"
 voice: "Sleep Timer"
-new: "Søvntimer"
+new: "SÃ¸vntimer"
 
 id: LANG_STATUS_BAR
 desc: display menu, F3 substitute
 eng: "Status Bar"
 voice: "Status Bar"
-new: "Status bjælke"
+new: "Status bjÃ¦lke"
 
 id: LANG_SCROLL_BAR
 desc: display menu, F3 substitute
 eng: "Scroll Bar"
 voice: "Scroll Bar"
-new: "Rullebjælke"
+new: "RullebjÃ¦lke"
 
 id: LANG_WEEKDAY_THURSDAY
 desc: Maximum 3-letter abbreviation for weekday
@@ -1055,7 +1055,7 @@ id: LANG_BIDIR_SCROLL
 desc: Bidirectional scroll limit
 eng: "Bidirectional Scroll Limit"
 voice: "Bidirectional Scroll Limit"
-new: "Tovejs-rul grænse"
+new: "Tovejs-rul grÃ¦nse"
 
 id: LANG_SCROLL_DELAY
 desc: Delay before scrolling
@@ -1067,7 +1067,7 @@ id: LANG_SCROLL_STEP
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size"
 voice: "Scroll Step Size"
-new: "Rul trin størrelse"
+new: "Rul trin stÃ¸rrelse"
 
 id: LANG_SCROLL_STEP_EXAMPLE
 desc: Pixels to advance per scroll
@@ -1115,7 +1115,7 @@ id: LANG_QUEUE
 desc: The verb/action Queue
 eng: "Queue"
 voice: "Queue"
-new: "Sæt i kø"
+new: "SÃ¦t i kÃ¸"
 
 id: LANG_DELETE
 desc: The verb/action Delete
@@ -1139,7 +1139,7 @@ id: LANG_RENAME
 desc: The verb/action Rename
 eng: "Rename"
 voice: "Rename"
-new: "Omdøb"
+new: "OmdÃ¸b"
 
 id: LANG_FAILED
 desc: Something failed. To be appended after above actions
@@ -1151,7 +1151,7 @@ id: LANG_ALARM_MOD_ALARM_MENU
 desc: The name of the additional entry in the main menu for the RTC alarm mod.
 eng: "Wake-Up Alarm"
 voice: "Wake-Up Alarm"
-new: "Vækkeur"
+new: "VÃ¦kkeur"
 
 id: LANG_ALARM_MOD_TIME
 desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
@@ -1163,7 +1163,7 @@ id: LANG_ALARM_MOD_TIME_TO_GO
 desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
 eng: "Waking Up In %d:%02d"
 voice: ""
-new: "Vågner om om %d:%02d"
+new: "VÃ¥gner om om %d:%02d"
 
 id: LANG_ALARM_MOD_SHUTDOWN
 desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
@@ -1181,7 +1181,7 @@ id: LANG_ALARM_MOD_KEYS
 desc: Shown key functions in alarm menu (for the RTC alarm mod).
 eng: "PLAY=Set OFF=Cancel"
 voice: ""
-new: "SPIL=Sæt SLUK=Anuller"
+new: "SPIL=SÃ¦t SLUK=Anuller"
 
 id: LANG_CREATE_PLAYLIST
 desc: Menu option for creating a playlist
@@ -1235,7 +1235,7 @@ id: LANG_ID3_YEAR
 desc: ID3 info 'year'
 eng: "[Year]"
 voice: ""
-new: "[År]"
+new: "[Ã…r]"
 
 id: LANG_ID3_NO_INFO
 desc: ID3 info is missing
@@ -1253,7 +1253,7 @@ id: LANG_RECORDING_SIZE
 desc: Display of recorded file size
 eng: "Size:"
 voice: ""
-new: "Størrelse:"
+new: "StÃ¸rrelse:"
 
 id: LANG_SETTINGS_LOADED1
 desc: Feedback shown when a .cfg file is loaded
@@ -1283,7 +1283,7 @@ id: LANG_INVERT
 desc: in settings_menu
 eng: "LCD Mode"
 voice: "LCD Mode"
-new: "Skærm tilstand"
+new: "SkÃ¦rm tilstand"
 
 id: LANG_CHANNEL_STEREO_NARROW_PLAYER
 desc: DEPRECATED
@@ -1349,13 +1349,13 @@ id: LANG_INVERT_CURSOR
 desc: in settings_menu
 eng: "Line Selector"
 voice: "Line Selector"
-new: "Linje vælger"
+new: "Linje vÃ¦lger"
 
 id: LANG_RECORDING_EDITABLE
 desc: Editable recordings setting
 eng: "Independent frames"
 voice: "Independent frames"
-new: "Uafhængige rammer"
+new: "UafhÃ¦ngige rammer"
 
 id: LANG_CAPTION_BACKLIGHT
 desc: in settings_menu
@@ -1367,13 +1367,13 @@ id: LANG_INVERT_CURSOR_POINTER
 desc: in settings_menu
 eng: "Pointer"
 voice: "Pointer"
-new: "Markør"
+new: "MarkÃ¸r"
 
 id: LANG_INVERT_CURSOR_BAR
 desc: in settings_menu
 eng: "Bar(Inverse)"
 voice: "Inverse Bar"
-new: "Bjælke (omvendt)"
+new: "BjÃ¦lke (omvendt)"
 
 id: LANG_INVERT_LCD_NORMAL
 desc: in settings_menu
@@ -1391,13 +1391,13 @@ id: LANG_MAX_FILES_IN_DIR
 desc: in settings_menu
 eng: "Max files in dir browser"
 voice: "Max files in directory browser"
-new: "Maks filer i dir vælger"
+new: "Maks filer i dir vÃ¦lger"
 
 id: LANG_MAX_FILES_IN_PLAYLIST
 desc: in settings_menu
 eng: "Max playlist size"
 voice: "Max playlist size"
-new: "Maks spilleliste størrelse" 
+new: "Maks spilleliste stÃ¸rrelse" 
 
 id: LANG_JUMP_SCROLL
 desc: (player) menu altarnative for jump scroll
@@ -1445,7 +1445,7 @@ id: LANG_DISK_FULL
 desc: in recording screen
 eng: "The disk is full. Press OFF to continue."
 voice: ""
-new: "Disken er fuld. Tryk SLUK for at fortsætte."
+new: "Disken er fuld. Tryk SLUK for at fortsÃ¦tte."
 
 id: LANG_CONFIRM_WITH_PLAY_RECORDER
 desc: Generic recorder string to use to confirm
@@ -1463,13 +1463,13 @@ id: LANG_PLUGIN_CANT_OPEN
 desc: Plugin open error message
 eng: "Can't open %s"
 voice: ""
-new: "Kan ikke åbne %s"
+new: "Kan ikke Ã¥bne %s"
 
 id: LANG_READ_FAILED
 desc: There was an error reading a file
 eng: "Failed reading %s"
 voice: ""
-new: "Læsning af %s fejlede"
+new: "LÃ¦sning af %s fejlede"
 
 id: LANG_PLUGIN_WRONG_MODEL
 desc: The plugin is not compatible with the archos model trying to run it
@@ -1493,7 +1493,7 @@ id: LANG_BOOT_CHANGED
 desc: File browser discovered the boot file was changed
 eng: "Boot changed"
 voice: ""
-new: "Boot ændret"
+new: "Boot Ã¦ndret"
 
 id: LANG_REBOOT_NOW
 desc: Do you want to reboot?
@@ -1505,31 +1505,31 @@ id: LANG_QUEUE_LAST
 desc: in onplay menu.  queue a track/playlist at end of playlist.
 eng: "Queue last"
 voice: "Queue last"
-new: "Sæt sidst i køen"
+new: "SÃ¦t sidst i kÃ¸en"
 
 id: LANG_INSERT
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
 eng: "Insert"
 voice: "Insert"
-new: "Indsæt"
+new: "IndsÃ¦t"
 
 id: LANG_INSERT_LAST
 desc: in onplay menu.  append a track/playlist into dynamic playlist.
 eng: "Insert last"
 voice: "Insert last"
-new: "Indsæt tilsidst"
+new: "IndsÃ¦t tilsidst"
 
 id: LANG_QUEUE_FIRST
 desc: in onplay menu.  queue a track/playlist into dynamic playlist.
 eng: "Queue next"
 voice: "Queue next"
-new: "Set i kø som næste"
+new: "Set i kÃ¸ som nÃ¦ste"
 
 id: LANG_INSERT_FIRST
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
 eng: "Insert next"
 voice: "Insert next"
-new: "Indsæt som næste"
+new: "IndsÃ¦t som nÃ¦ste"
 
 id: LANG_SAVE_DYNAMIC_PLAYLIST
 desc: in playlist menu.
@@ -1553,7 +1553,7 @@ id: LANG_PLAYLIST_QUEUE_COUNT
 desc: splash number of tracks queued
 eng: "Queued %d tracks (%s)"
 voice: ""
-new: "Har sat %d numre i kø (%s)"
+new: "Har sat %d numre i kÃ¸ (%s)"
 
 id: LANG_PLAYLIST_SAVE_COUNT
 desc: splash number of tracks saved
@@ -1607,13 +1607,13 @@ id: LANG_RECURSE_DIRECTORY
 desc: In playlist menu
 eng: "Recursively Insert Directories"
 voice: "Recursively Insert Directories"
-new: "Indsæt mapper og undermapper"
+new: "IndsÃ¦t mapper og undermapper"
 
 id: LANG_RECURSE_DIRECTORY_QUESTION
 desc: Asked from onplay screen
 eng: "Recursively?"
 voice: ""
-new: "Indsæt undermapper?"
+new: "IndsÃ¦t undermapper?"
 
 id: LANG_CUSTOM_FONT
 desc: in setting_menu()
@@ -1637,7 +1637,7 @@ id: LANG_WHILE_PLAYING
 desc: in settings_menu()
 eng: "Browse .wps files"
 voice: "Browse while-playing-screen files"
-new: "Vis afspilnings-skærm filer"
+new: "Vis afspilnings-skÃ¦rm filer"
 
 id: LANG_CUSTOM_CFG
 desc: in setting_menu()
@@ -1733,7 +1733,7 @@ id: LANG_VIEW_DYNAMIC_PLAYLIST
 desc: in playlist menu.
 eng: "View Current Playlist"
 voice: "View Current Playlist"
-new: "Vis nuværende spilleliste"
+new: "Vis nuvÃ¦rende spilleliste"
 
 id: LANG_MOVE
 desc: The verb/action Move
@@ -1751,7 +1751,7 @@ id: LANG_FLIP_DISPLAY
 desc: in settings_menu, option to turn display+buttos by 180 degreed
 eng: "Upside Down"
 voice: "Upside Down"
-new: "På hovedet"
+new: "PÃ¥ hovedet"
 
 id: LANG_RECORD_PRERECORD
 desc: in recording and radio screen
@@ -1769,13 +1769,13 @@ id: LANG_BOOKMARK_AUTOLOAD_QUERY
 desc: prompt for user to decide to create a bookmark
 eng: "Load Last Bookmark?"
 voice: ""
-new: "Hent seneste bogmærke?"
+new: "Hent seneste bogmÃ¦rke?"
 
 id: LANG_AUTO_BOOKMARK_QUERY
 desc: prompt for user to decide to create an bookmark
 eng: "Create a Bookmark?"
 voice: ""
-new: "Opret bogmærke?"
+new: "Opret bogmÃ¦rke?"
 
 id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
 desc: From the auto-load screen, allows user to list all bookmarks
@@ -1793,7 +1793,7 @@ id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
 desc: Used on the bookmark select window to label bookmark number
 eng: "Bookmark"
 voice: ""
-new: "Bogmærke"
+new: "BogmÃ¦rke"
 
 id: LANG_BOOKMARK_SELECT_INDEX_TEXT
 desc: Used on the bookmark select window to label index number
@@ -1811,55 +1811,55 @@ id: LANG_BOOKMARK_SELECT_PLAY
 desc: Used on the bookmark select window to indicated the play option
 eng: "PLAY = Select"
 voice: ""
-new: "SPIL = Vælg"
+new: "SPIL = VÃ¦lg"
 
 id: LANG_BOOKMARK_SELECT_DELETE
 desc: Used on the bookmark select window to indicated the bookmark delete option
 eng: "ON+Play = Delete"
 voice: ""
-new: "TÆND+Spil = Slet"
+new: "TÃ†ND+Spil = Slet"
 
 id: LANG_BOOKMARK_CREATE_SUCCESS
 desc: Indicates bookmark was successfully created
 eng: "Bookmark Created"
 voice: ""
-new: "Bogmærke oprettet"
+new: "BogmÃ¦rke oprettet"
 
 id: LANG_BOOKMARK_CREATE_FAILURE
 desc: Indicates bookmark was not created
 eng: "Bookmark Failed!"
 voice: ""
-new: "Bogmærke fejlede!"
+new: "BogmÃ¦rke fejlede!"
 
 id: LANG_BOOKMARK_LOAD_EMPTY
 desc: Indicates bookmark was empty
 eng: "Bookmark Empty"
 voice: ""
-new: "Bogmærke tomt"
+new: "BogmÃ¦rke tomt"
 
 id: LANG_BOOKMARK_SETTINGS
 desc: in general settings
 eng: "Bookmarking"
 voice: "Bookmarking"
-new: "Bogmærker"
+new: "BogmÃ¦rker"
 
 id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
 desc: prompt for user to decide to create a bookmark
 eng: "Load Last Bookmark"
 voice: "Load Last Bookmark"
-new: "Hent seneste bogmærke"
+new: "Hent seneste bogmÃ¦rke"
 
 id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
 desc: prompt for user to decide to create an bookmark
 eng: "Bookmark on Stop"
 voice: "Bookmark on Stop"
-new: "Opret bogmærke ved stop"
+new: "Opret bogmÃ¦rke ved stop"
 
 id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
 desc: Configuration option to maintain a list of recent bookmarks
 eng: "Maintain a List of Recent Bookmarks?"
 voice: "Maintain a List of Recent Bookmarks?"
-new: "Vedligehold liste af seneste bogmærker?"
+new: "Vedligehold liste af seneste bogmÃ¦rker?"
 
 id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
 desc: Save in recent bookmarks only
@@ -1871,7 +1871,7 @@ id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
 desc: Save in recent bookmarks only
 eng: "Ask - Recent only"
 voice: "Ask - Recent only"
-new: "Spørg - kun seneste"
+new: "SpÃ¸rg - kun seneste"
 
 id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
 desc: Save only on bookmark for each playlist in recent bookmarks
@@ -1883,25 +1883,25 @@ id: LANG_BOOKMARK_MENU
 desc: Text on main menu to get to bookmark commands
 eng: "Bookmarks"
 voice: "Bookmarks"
-new: "Bogmærker"
+new: "BogmÃ¦rker"
 
 id: LANG_BOOKMARK_MENU_CREATE
 desc: Used off of the bookmark menu to create a bookmark
 eng: "Create Bookmark"
 voice: "Create Bookmark"
-new: "Opret bogmærke"
+new: "Opret bogmÃ¦rke"
 
 id: LANG_BOOKMARK_MENU_LIST
 desc: Used off of the bookmark menu to list available bookmarks for the currently playing directory or M3U
 eng: "List Bookmarks"
 voice: "List Bookmarks"
-new: "Vis bogmærker"
+new: "Vis bogmÃ¦rker"
 
 id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
 desc: Text for the menu text to access the most recent bookmarks list
 eng: "Recent Bookmarks"
 voice: "Recent Bookmarks"
-new: "Seneste bogmærker"
+new: "Seneste bogmÃ¦rker"
 
 id: LANG_INFO_MENU
 desc: in the info sub menu
@@ -1913,7 +1913,7 @@ id: LANG_RECORDING_MENU
 desc: in the recording sub menu
 eng: "Recording screen"
 voice: "Recording screen"
-new: "Optage skærm"
+new: "Optage skÃ¦rm"
 
 id: LANG_WIND_MENU
 desc: in the playback sub menu
@@ -1925,13 +1925,13 @@ id: LANG_LCD_MENU
 desc: in the display sub menu
 eng: "LCD Settings"
 voice: "LCD Settings"
-new: "Skærm indstillinger"
+new: "SkÃ¦rm indstillinger"
 
 id: LANG_BARS_MENU
 desc: in the display sub menu
 eng: "Status-/Scrollbar"
 voice: "Status- and Scrollbar"
-new: "Status- og rulle-bjælke"
+new: "Status- og rulle-bjÃ¦lke"
 
 id: LANG_BATTERY_MENU
 desc: in the system sub menu
@@ -1955,13 +1955,13 @@ id: LANG_LIMITS_MENU
 desc: in the system sub menu
 eng: "Limits"
 voice: "Limits"
-new: "Begrænsninger"
+new: "BegrÃ¦nsninger"
 
 id: LANG_MANAGE_MENU
 desc: in the system sub menu
 eng: "Manage Settings"
 voice: "Manage Settings"
-new: "Håndter opsætning"
+new: "HÃ¥ndter opsÃ¦tning"
 
 id: LANG_RECORD_DIRECTORY
 desc: in recording settings_menu
@@ -1973,7 +1973,7 @@ id: LANG_RECORD_CURRENT_DIR
 desc: in recording directory options
 eng: "Current dir"
 voice: "Current directory"
-new: "Nuværende mappe"
+new: "NuvÃ¦rende mappe"
 
 id: LANG_CREATE_DIR
 desc: in main menu
@@ -1997,7 +1997,7 @@ id: LANG_TRACK_DISPLAY
 desc: in playlist viewer on+play menu
 eng: "Track Display"
 voice: "Track Display"
-new: "Nummer skærm"
+new: "Nummer skÃ¦rm"
 
 id: LANG_DISPLAY_TRACK_NAME_ONLY
 desc: track display options
@@ -2027,7 +2027,7 @@ id: LANG_BUTTON_BAR
 desc: in settings menu
 eng: "Button bar"
 voice: "Button bar"
-new: "Knap bjælke"
+new: "Knap bjÃ¦lke"
 
 id: LANG_DIRBROWSE_F1
 desc: in dir browser, F1 button bar text
@@ -2045,7 +2045,7 @@ id: LANG_DIRBROWSE_F3
 desc: in dir browser, F3 button bar text
 eng: "LCD"
 voice: ""
-new: "Skærm"
+new: "SkÃ¦rm"
 
 id: VOICE_ZERO
 desc: spoken only, for composing numbers
@@ -2663,7 +2663,7 @@ id: LANG_ONPLAY_OPEN_WITH
 desc: Onplay open with
 eng: "Open with"
 voice: "open with"
-new: "Åben med"
+new: "Ã…ben med"
 
 id: LANG_SORT_DIR
 desc: browser sorting setting
@@ -2729,7 +2729,7 @@ id: LANG_FM_BUTTONBAR_ADD
 desc: in radio screen
 eng: "Add"
 voice: ""
-new: "Tilføj"
+new: "TilfÃ¸j"
 
 id: LANG_FM_BUTTONBAR_ACTION
 desc: in radio screen
@@ -2795,19 +2795,19 @@ id: LANG_ID3_ORDER
 desc: in playback settings screen
 eng: "ID3 tag priority"
 voice: "ID3 tag priority"
-new: "ID3 mærke prioritet"
+new: "ID3 mÃ¦rke prioritet"
 
 id: LANG_ID3_V1_FIRST
 desc: in playback settings screen
 eng: "V1 then V2"
 voice: "Version 1 then version 2"
-new: "V1 før V2"
+new: "V1 fÃ¸r V2"
 
 id: LANG_ID3_V2_FIRST
 desc: in playback settings screen
 eng: "V2 then V1"
 voice: "Version 2 then version 1"
-new: "V2 før V1"
+new: "V2 fÃ¸r V1"
 
 id: LANG_NO_ROCKBOX_DIR
 desc: in browse root
@@ -2819,7 +2819,7 @@ id: LANG_INSTALLATION_INCOMPLETE
 desc: in browse root
 eng: "Installation incomplete"
 voice: ""
-new: "Installation fuldført"
+new: "Installation fuldfÃ¸rt"
 
 id: LANG_REMOVE_MMC
 desc: before acknowledging usb in case an MMC is inserted (Ondio)
@@ -2879,25 +2879,25 @@ id: LANG_ID3DB_SEARCH
 desc: ID3 virtual folder name
 eng: "Search"
 voice: ""
-new: "Søg"
+new: "SÃ¸g"
 
 id: LANG_ID3DB_SEARCH_ARTISTS
 desc: ID3 virtual folder name
 eng: "Search Artists"
 voice: ""
-new: "Søg på kunstnere"
+new: "SÃ¸g pÃ¥ kunstnere"
 
 id: LANG_ID3DB_SEARCH_ALBUMS
 desc: ID3 virtual folder name
 eng: "Search Albums"
 voice: ""
-new: "Søg på albums"
+new: "SÃ¸g pÃ¥ albums"
 
 id: LANG_ID3DB_SEARCH_SONGS
 desc: ID3 virtual folder name
 eng: "Search Songs"
 voice: ""
-new: "Søg på sange"
+new: "SÃ¸g pÃ¥ sange"
 
 id: LANG_ID3DB_MATCHES
 desc: ID3 virtual folder name
@@ -2981,19 +2981,19 @@ id: LANG_RECORD_STARTUP
 desc: Start Rockbox in Recording screen
 eng: "Show recording screen on startup"
 voice: "Show recording screen on startup"
-new: "Vis optage skærm ved start"
+new: "Vis optage skÃ¦rm ved start"
 
 id: LANG_ALARM_MOD_DISABLE
 desc: Announce that the RTC alarm has been turned off
 eng: "Alarm Disabled"
 voice: "Alarm Disabled"
-new: "Alarm slået fra"
+new: "Alarm slÃ¥et fra"
 
 id: LANG_RECORD_TRIGGER
 desc: in recording settings_menu
 eng: "Trigger"
 voice: 
-new: "Udløser"
+new: "UdlÃ¸ser"
 
 id: LANG_RECORD_START_THRESHOLD
 desc: in recording settings_menu
@@ -3023,13 +3023,13 @@ id: LANG_RECORD_STOP_GAP
 desc: in recording settings_menu
 eng: "Presplit gap"
 voice: 
-new: "Pause før deling"
+new: "Pause fÃ¸r deling"
 
 id: LANG_RECORD_TRIGGER_MODE
 desc: in recording settings_menu
 eng: "Trigger"
 voice: 
-new: "Udløser"
+new: "UdlÃ¸ser"
 
 id: LANG_RECORD_TRIG_NOREARM
 desc: in recording settings_menu
@@ -3053,19 +3053,19 @@ id: LANG_RECORD_TRIG_IDLE
 desc: waiting for threshold
 eng: "Trigger idle"
 voice: 
-new: "Udløser venter"
+new: "UdlÃ¸ser venter"
 
 id: LANG_RECORD_TRIGGER_ACTIVE
 desc: 
 eng: "Trigger active"
 voice: 
-new: "Udløser klar"
+new: "UdlÃ¸ser klar"
 
 id: LANG_LCD_REMOTE_MENU
 desc: in the display sub menu
 eng: "Remote-LCD Settings"
 voice: 
-new: "Fjernbetjenings-skærm indstillinger"
+new: "Fjernbetjenings-skÃ¦rm indstillinger"
 
 id: LANG_DISK_NAME_INTERNAL
 desc: in info menu; name for internal disk with multivolume (keep short!)
@@ -3089,13 +3089,13 @@ id: LANG_BACKLIGHT_FADE_IN
 desc: in settings_menu
 eng: "Backlight fade in"
 voice: "Backlight fade in"
-new: "Tænd lys langsomt"
+new: "TÃ¦nd lys langsomt"
 
 id: LANG_BACKLIGHT_FADE_OUT
 desc: in settings_menu
 eng: "Backlight fade out"
 voice: "Backlight fade out"
-new: "Dæmp lys"
+new: "DÃ¦mp lys"
 
 id: LANG_SHUFFLE_PLAYLIST
 desc: in playlist menu, reshuffles the order in which songs are played
@@ -3107,13 +3107,13 @@ id: LANG_INSERT_SHUFFLED
 desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
 eng: "Insert shuffled"
 voice: "Insert shuffled"
-new: "Indsæt blandet"
+new: "IndsÃ¦t blandet"
 
 id: LANG_NOTHING_TO_RESUME
 desc: Error message displayed when resume button pressed but no playlist
 eng: "Nothing to resume"
 voice: ""
-new: "Intet at fortsætte"
+new: "Intet at fortsÃ¦tte"
 
 id: LANG_SPDIF_ENABLE
 desc: in playback settings menu. enable/disable the optical out
@@ -3125,7 +3125,7 @@ id: LANG_NEXT_FOLDER
 desc: in settings_menu.  Should we move to next folder when current one ends
 eng: "Move to Next Folder"
 voice: "Move to Next Folder"
-new: "Fortsæt med næste mappe"
+new: "FortsÃ¦t med nÃ¦ste mappe"
 
 id: LANG_RUNTIMEDB_ACTIVE
 desc: in settings_menu.
@@ -3137,19 +3137,19 @@ id: LANG_MENU_SET_RATING
 desc: in wps context menu
 eng: "Set song rating"
 voice: "Set song rating"
-new: "Sæt bedømmelse"
+new: "SÃ¦t bedÃ¸mmelse"
 
 id: LANG_RATING
 desc: in set_rating
 eng: "Rating:"
 voice: "Rating" 
-new: "Bedømmelse:"
+new: "BedÃ¸mmelse:"
 
 id: LANG_CROSSFADE_DURATION
 desc: in playback settings
 eng: "Crossfade duration"
 voice: "Crossfade duration"
-new: "Længde af glidende overgang"
+new: "LÃ¦ngde af glidende overgang"
 
 id: LANG_MIX
 desc: in playback settings, crossfade option
@@ -3179,7 +3179,7 @@ id: LANG_REPLAYGAIN_NOCLIP
 desc: in replaygain
 eng: "Prevent clipping"
 voice: 
-new: "Undgå klipning"
+new: "UndgÃ¥ klipning"
 
 id: LANG_REPLAYGAIN_MODE
 desc: in replaygain
@@ -3221,13 +3221,13 @@ id: LANG_BIDI_SUPPORT
 desc: in settings_menu, option to enable reversal of hebrew/arabic text
 eng: "BiDi Hebrew/Arabic"
 voice: 
-new: "Højre mod venstre sprog"
+new: "HÃ¸jre mod venstre sprog"
 
 id: LANG_REPLAYGAIN_PREAMP
 desc: in browse_id3
 eng: "Pre-amp"
 voice: 
-new: "Forforstærkning"
+new: "ForforstÃ¦rkning"
 
 id: LANG_UNIT_DB
 desc: in browse_id3
