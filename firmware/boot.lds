@@ -139,7 +139,7 @@ SECTIONS
        stackend = .;
     } > IRAM
 
-#ifdef IRIVER_H300_SERIES
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
     .bss DRAMORIG+0x1000000:
 #else
     .bss :
@@ -150,7 +150,7 @@ SECTIONS
         *(.bss)
         *(COMMON)
        _end = .;
-#ifdef IRIVER_H300_SERIES
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
     } > DRAM
 #else
     } > IRAM
