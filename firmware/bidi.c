@@ -38,7 +38,7 @@
 #define _isnewline(c) ((c=='\n' || c=='\r') ? 1 : 0)
 #define XOR(a,b) ((a||b) && !(a&&b))
 
-arab_t * arab_lookup(unsigned short uchar)
+const arab_t * arab_lookup(unsigned short uchar)
 {
     if (uchar >= 0x621 && uchar <= 0x63a)
         return &(jointable[uchar - 0x621]);
@@ -56,9 +56,9 @@ void arabjoin(unsigned short * stringprt, int length){
     bool connected = false;
     unsigned short * writeprt = stringprt;
 
-    arab_t * prev = 0;
-    arab_t * cur;
-    arab_t * ligature = 0;
+    const arab_t * prev = 0;
+    const arab_t * cur;
+    const arab_t * ligature = 0;
     short uchar;
 
     int i;

@@ -73,7 +73,8 @@ int load_cp_table(int cp)
 
     while (i < tablesize) {
         if (!read(file, tmp, 2)) {
-            DEBUGF("Can't read from codepage file: %s.cp\n", filename[table-1]);
+            DEBUGF("Can't read from codepage file: %s.cp\n", 
+                    filename[table-1]);
             loaded_cp_table = 0;
             return 0;
         }
@@ -170,13 +171,16 @@ unsigned char* iso_decode(const unsigned char *iso, unsigned char *utf8,
 }
 
 /* Recode a UTF-16 string with little-endian byte ordering to UTF-8 */
-unsigned char* utf16LEdecode(const unsigned char *utf16, unsigned char *utf8, unsigned int count)
+unsigned char* utf16LEdecode(const unsigned char *utf16, unsigned char *utf8,
+        unsigned int count)
 {
     unsigned long ucs;
 
     while (count != 0) {
-        if (utf16[1] >= 0xD8 && utf16[1] < 0xE0) { /* Check for a surrogate pair */
-            ucs = 0x10000 + ((utf16[0] << 10) | ((utf16[1] - 0xD8) << 18) | utf16[2] | ((utf16[3] - 0xDC) << 8));
+        /* Check for a surrogate pair */
+        if (utf16[1] >= 0xD8 && utf16[1] < 0xE0) {
+            ucs = 0x10000 + ((utf16[0] << 10) | ((utf16[1] - 0xD8) << 18)
+                    | utf16[2] | ((utf16[3] - 0xDC) << 8));
             utf16 += 4;
             count -= 2;
         } else {
@@ -190,13 +194,15 @@ unsigned char* utf16LEdecode(const unsigned char *utf16, unsigned char *utf8, un
 }
 
 /* Recode a UTF-16 string with big-endian byte ordering to UTF-8 */
-unsigned char* utf16BEdecode(const unsigned char *utf16, unsigned char *utf8, unsigned int count)
+unsigned char* utf16BEdecode(const unsigned char *utf16, unsigned char *utf8,
+        unsigned int count)
 {
     unsigned long ucs;
 
     while (count != 0) {
         if (*utf16 >= 0xD8 && *utf16 < 0xE0) { /* Check for a surrogate pair */
-            ucs = 0x10000 + (((utf16[0] - 0xD8) << 18) | (utf16[1] << 10) | ((utf16[2] - 0xDC) << 8) | utf16[3]);
+            ucs = 0x10000 + (((utf16[0] - 0xD8) << 18) | (utf16[1] << 10)
+                    | ((utf16[2] - 0xDC) << 8) | utf16[3]);
             utf16 += 4;
             count -= 2;
         } else {
@@ -210,8 +216,8 @@ unsigned char* utf16BEdecode(const unsigned char *utf16, unsigned char *utf8, un
 }
 
 /* Recode any UTF-16 string to UTF-8 */
-//unsigned char* utf16decode(unsigned const char *utf16, unsigned char *utf8, unsigned int count)
-unsigned char* utf16decode(const unsigned char *utf16, unsigned char *utf8, unsigned int count)
+unsigned char* utf16decode(const unsigned char *utf16, unsigned char *utf8,
+        unsigned int count)
 {
     unsigned long ucs;
 

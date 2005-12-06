@@ -41,7 +41,7 @@ ipod_fw:	ipod_fw.c
 convbdf: convbdf.c
 	$(CC) -g $+ -o $@
 
-codepages: codepages.c
+codepages: codepages.c codepage_tables.c
 	$(CC) -g $+ -o $@
 
 generate_rocklatin: generate_rocklatin.c ../firmware/drivers/lcd-player-charset.c 
