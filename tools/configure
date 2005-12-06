@@ -414,12 +414,12 @@ appsdir='\$(ROOTDIR)/apps'
   getit=`input`;
 
   # Set of tools built for all target platforms:
-  toolset="rdf2binary"
+  toolset="rdf2binary convbdf"
 
   # Toolsets for some target families:
-  archosbitmaptools="$toolset scramble descramble sh2d uclpack bmp2rb convbdf"
-  iriverbitmaptools="$toolset scramble descramble mkboot bmp2rb convbdf"
-  ipodbitmaptools="$toolset scramble ipod_fw bmp2rb convbdf"
+  archosbitmaptools="$toolset scramble descramble sh2d uclpack bmp2rb codepages"
+  iriverbitmaptools="$toolset scramble descramble mkboot bmp2rb codepages"
+  ipodbitmaptools="$toolset scramble ipod_fw bmp2rb codepages"
 
   case $getit in
 
@@ -437,7 +437,7 @@ appsdir='\$(ROOTDIR)/apps'
 
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset="$toolset scramble descramble sh2d generate_rocklatin uclpack convbdf"
+    toolset="$toolset scramble descramble sh2d generate_rocklatin uclpack"
 
     # Note: the convbdf is present in the toolset just because: 1) the
     # firmware/Makefile assumes it is present always, and 2) we will need it when we
@@ -507,7 +507,7 @@ appsdir='\$(ROOTDIR)/apps'
     codecs="libmad"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset="$toolset bmp2rb convbdf"
+    toolset="$toolset bmp2rb codepages"
     ;;
 
    6)
@@ -524,7 +524,7 @@ appsdir='\$(ROOTDIR)/apps'
     codecs="libmad"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset="$toolset bmp2rb convbdf"
+    toolset="$toolset bmp2rb codepages"
     ;;
 
    7)
@@ -622,7 +622,7 @@ appsdir='\$(ROOTDIR)/apps'
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset="$toolset iaudio bmp2rb convbdf"
+    toolset="$toolset iaudio bmp2rb codepages"
     ;;
 
    13)
