@@ -15,7 +15,13 @@ href="/twiki/pub/Main/RockboxManual/rockbox-manual-2.4.pdf">easy to use</a>.
 <p> Installing Rockbox does not harm your Archos, it works the same way you
 upgrade your ordinary Archos firmware.
 
+<p> Development in progress might take Rockbox to <a
+href="http://www.rockbox.org/twiki/bin/view/Main/TargetStatus">other music
+players</a>.
+
 <h2>News</h2>
+
+<p><i>2005-12-06</i>: Unicode support!
 
 <p><i>2005-09-22</i>: Rockbox v2.5 is <a href="download/">released</a>.
 
