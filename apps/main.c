@@ -60,7 +60,6 @@
 #include "misc.h"
 #include "database.h"
 #include "dircache.h"
-#include "tagcache.h"
 #include "lang.h"
 #include "string.h"
 #include "splash.h"
@@ -132,8 +131,6 @@ void init_dircache(void)
             lcd_update();
         }
     }
-    
-    tagcache_init();
 }
 #else
 # define init_dircache(...)
