@@ -85,7 +85,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "dsp.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 35
+#define CONFIG_BLOCK_VERSION 36
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -193,7 +193,11 @@ static const struct bit_entry rtc_bits[] =
 
     /* # of bits, offset+size, default, .cfg name, .cfg values */
     /* sound */
-    {7, S_O(volume), 70, "volume", NULL }, /* 0...100 */
+#if CONFIG_CODEC == MAS3507D
+    {8 | SIGNED, S_O(volume), -18, "volume", NULL }, /* -78...+18 */
+#else 
+    {8 | SIGNED, S_O(volume), -25, "volume", NULL }, /* -100...+12 / -84...0 */
+#endif
     {8 | SIGNED, S_O(balance), 0, "balance", NULL }, /* -100...100 */
 #if CONFIG_CODEC != SWCODEC /* any MAS */
     {5 | SIGNED, S_O(bass), 0, "bass", NULL }, /* -15..+15 / -12..+12 */
@@ -210,9 +214,6 @@ static const struct bit_entry rtc_bits[] =
     {3, S_O(channel_config), 0, "channels",
         "stereo,mono,custom,mono left,mono right,karaoke" },
     {8, S_O(stereo_width), 100, "stereo width", NULL},
-#ifdef HAVE_UDA1380
-    {2, S_O(sound_scaling), SOUND_SCALE_VOLUME, "prevent clipping", "adjust volume,adjust bass,adjust current,off"},
-#endif
     /* playback */
     {1, S_O(resume), false, "resume", off_on },
     {1, S_O(playlist_shuffle), false, "shuffle", off_on },
@@ -842,9 +843,6 @@ void sound_settings_apply(void)
     sound_set(SOUND_VOLUME, global_settings.volume);
     sound_set(SOUND_CHANNELS, global_settings.channel_config);
     sound_set(SOUND_STEREO_WIDTH, global_settings.stereo_width);
-#ifdef HAVE_UDA1380
-    sound_set(SOUND_SCALING, global_settings.sound_scaling);
-#endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     sound_set(SOUND_LOUDNESS, global_settings.loudness);
     sound_set(SOUND_AVC, global_settings.avc);
@@ -1429,9 +1427,6 @@ void settings_reset(void) {
     global_settings.treble      = sound_default(SOUND_TREBLE);
     global_settings.channel_config = sound_default(SOUND_CHANNELS);
     global_settings.stereo_width = sound_default(SOUND_STEREO_WIDTH);
-#ifdef HAVE_UDA1380
-    global_settings.sound_scaling = sound_default(SOUND_SCALING);
-#endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     global_settings.loudness    = sound_default(SOUND_LOUDNESS);
     global_settings.avc         = sound_default(SOUND_AVC);

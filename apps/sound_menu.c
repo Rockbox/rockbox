@@ -366,21 +366,6 @@ static bool stereo_width(void)
                      SOUND_STEREO_WIDTH);
 }
 
-#ifdef HAVE_UDA1380
-static bool sound_scaling(void)
-{
-    static const struct opt_items names[] = { 
-        { STR(LANG_SCALE_VOLUME) },
-        { STR(LANG_SCALE_BASS)   },
-        { STR(LANG_SCALE_CURRENT)},
-        { STR(LANG_SCALE_OFF) }
-    };
-
-    return set_option(str(LANG_SCALING_MODE), &global_settings.sound_scaling, INT,
-                      names, 4, sound_set_scaling);
-}
-#endif
-
 bool sound_menu(void)
 {
     int m;
@@ -394,9 +379,6 @@ bool sound_menu(void)
         { ID2P(LANG_STEREO_WIDTH), stereo_width },
 #if CONFIG_CODEC == SWCODEC
         { ID2P(LANG_CROSSFEED), crossfeed },
-#endif
-#ifdef HAVE_UDA1380
-        { ID2P(LANG_SCALING_MODE), sound_scaling },
 #endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
         { ID2P(LANG_LOUDNESS), loudness },

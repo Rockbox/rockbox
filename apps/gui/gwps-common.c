@@ -569,7 +569,10 @@ static char* get_tag(struct wps_data* wps_data,
                 case 'v': /* volume */
                     *flags |= WPS_REFRESH_DYNAMIC;
                     snprintf(buf, buf_size, "%d", global_settings.volume);
-                    *intval = global_settings.volume / 10 + 1;
+                    *intval = 10 * (global_settings.volume 
+                                    - sound_min(SOUND_VOLUME))
+                                 / (sound_max(SOUND_VOLUME)
+                                    - sound_min(SOUND_VOLUME)) + 1;
                     return buf;
 
             }
@@ -1892,7 +1895,7 @@ bool update_onvol_change(struct gui_wps * gwps)
     gui_wps_refresh(gwps, 0, WPS_REFRESH_NON_STATIC);
 
 #ifdef HAVE_LCD_CHARCELLS
-    gui_splash(gwps->display,0, false, "Vol: %d %%   ",
+    gui_splash(gwps->display,0, false, "Vol: %d dB   ",
                    sound_val2phys(SOUND_VOLUME, global_settings.volume));
     return true;
 #endif

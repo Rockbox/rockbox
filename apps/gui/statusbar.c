@@ -102,7 +102,7 @@ struct gui_syncstatusbar statusbars;
 
 void gui_statusbar_init(struct gui_statusbar * bar)
 {
-    bar->last_volume = -1; /* -1 means "first update ever" */
+    bar->last_volume = -1000; /* -1000 means "first update ever" */
     bar->battery_icon_switch_tick = 0;
 #ifdef HAVE_CHARGING
     bar->battery_charge_step = 0;
@@ -117,6 +117,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 #endif /* CONFIG_RTC */
 
 #ifdef HAVE_LCD_CHARCELLS
+    int vol;
     (void)force_redraw; /* players always "redraw" */
 #endif /* HAVE_LCD_CHARCELLS */
 
@@ -277,12 +278,14 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
     display->icon(ICON_BATTERY_2, bar->info.battlevel > 50);
     display->icon(ICON_BATTERY_3, bar->info.battlevel > 75);
 
+    vol = 100 * (bar->info.volume - sound_min(SOUND_VOLUME))
+           / (sound_max(SOUND_VOLUME) - sound_min(SOUND_VOLUME));
     display->icon(ICON_VOLUME, true);
-    display->icon(ICON_VOLUME_1, bar->info.volume > 10);
-    display->icon(ICON_VOLUME_2, bar->info.volume > 30);
-    display->icon(ICON_VOLUME_3, bar->info.volume > 50);
-    display->icon(ICON_VOLUME_4, bar->info.volume > 70);
-    display->icon(ICON_VOLUME_5, bar->info.volume > 90);
+    display->icon(ICON_VOLUME_1, vol > 10);
+    display->icon(ICON_VOLUME_2, vol > 30);
+    display->icon(ICON_VOLUME_3, vol > 50);
+    display->icon(ICON_VOLUME_4, vol > 70);
+    display->icon(ICON_VOLUME_5, vol > 90);
 
     display->icon(ICON_PLAY, current_playmode() == STATUS_PLAY);
     display->icon(ICON_PAUSE, current_playmode() == STATUS_PAUSE);
@@ -356,31 +359,31 @@ void gui_statusbar_icon_battery(struct screen * display, int percent)
 /*
  * Print volume gauge to status bar
  */
-bool gui_statusbar_icon_volume(struct gui_statusbar * bar, int percent)
+bool gui_statusbar_icon_volume(struct gui_statusbar * bar, int volume)
 {
     int i;
-    int volume;
     int vol;
     char buffer[4];
     unsigned int width, height;
     bool needs_redraw = false;
     int type = global_settings.volume_type;
-    struct screen * display=bar->display;
+    struct screen * display=bar->display; 
+    int minvol = sound_min(SOUND_VOLUME);
+    int maxvol = sound_max(SOUND_VOLUME);
 
-    volume = percent;
-    if (volume < 0)
-        volume = 0;
-    if (volume > 100)
-        volume = 100;
+    if (volume < minvol)
+        volume = minvol;
+    if (volume > maxvol)
+        volume = maxvol;
 
-    if (volume == 0) {
+    if (volume == minvol) {
         display->mono_bitmap(bitmap_icons_7x8[Icon_Mute],
                     STATUSBAR_VOLUME_X_POS + STATUSBAR_VOLUME_WIDTH / 2 - 4,
                     STATUSBAR_Y_POS, 7, STATUSBAR_HEIGHT);
     }
     else {
         /* We want to redraw the icon later on */
-        if (bar->last_volume != volume && bar->last_volume >= 0) {
+        if (bar->last_volume != volume && bar->last_volume >= minvol) {
             bar->volume_icon_switch_tick = current_tick + HZ;
         }
 
@@ -395,7 +398,7 @@ bool gui_statusbar_icon_volume(struct gui_statusbar * bar, int percent)
         if (type)
         {
             display->setfont(FONT_SYSFIXED);
-            snprintf(buffer, sizeof(buffer), "%2d", percent);
+            snprintf(buffer, sizeof(buffer), "%2d", volume);
             display->getstringsize(buffer, &width, &height);
             if (height <= STATUSBAR_HEIGHT)
             {
@@ -406,7 +409,7 @@ bool gui_statusbar_icon_volume(struct gui_statusbar * bar, int percent)
             display->setfont(FONT_UI);
         } else {
             /* display volume bar */
-            vol = volume * 14 / 100;
+            vol = (volume - minvol) * 14 / (maxvol - minvol);
             for(i=0; i < vol; i++) {
                 display->vline(STATUSBAR_VOLUME_X_POS + i,
                                STATUSBAR_Y_POS + 6 - i / 2,

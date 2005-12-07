@@ -102,7 +102,7 @@ extern void gui_statusbar_init(struct gui_statusbar * bar);
 extern void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw);
 
 void gui_statusbar_icon_battery(struct screen * display, int percent);
-bool gui_statusbar_icon_volume(struct gui_statusbar * bar, int percent);
+bool gui_statusbar_icon_volume(struct gui_statusbar * bar, int volume);
 void gui_statusbar_icon_play_state(struct screen * display, int state);
 void gui_statusbar_icon_play_mode(struct screen * display, int mode);
 void gui_statusbar_icon_shuffle(struct screen * display);
