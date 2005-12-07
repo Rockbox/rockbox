@@ -71,6 +71,7 @@
 #endif
 #if defined(IRIVER_H100_SERIES) && !defined(SIMULATOR)
 #include "pcm_record.h"
+#define SETTINGS_RESET BUTTON_REC
 #endif
 
 #ifdef CONFIG_TUNER
@@ -322,16 +323,17 @@ void init(void)
 
     settings_calc_config_sector();
     
+#ifdef SETTINGS_RESET
     /* Reset settings if holding the rec button. */
-    if ((button_status() & BUTTON_REC) == BUTTON_REC)
+    if ((button_status() & SETTINGS_RESET) == SETTINGS_RESET)
     {
         gui_syncsplash(HZ*2, true, str(LANG_RESET_DONE_CLEAR));
         settings_reset();
     }
     else
-    {
+#endif
         settings_load(SETTINGS_ALL);
-    }
+
     
     init_dircache();
     gui_sync_wps_init();
