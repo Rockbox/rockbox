@@ -77,7 +77,6 @@ void gui_syncselect_draw(struct gui_select * select)
 
 bool gui_syncselect_do_button(struct gui_select * select, int button)
 {
-    select->options.limit_loop = false;
     switch(button)
     {
         case SELECT_INC | BUTTON_REPEAT :

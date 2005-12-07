@@ -39,7 +39,7 @@ void option_select_init_numeric(struct option_select * opt,
     opt->extra_string=unit;
     opt->formatter=formatter;
     opt->items=NULL;
-    opt->limit_loop=false;
+    opt->limit_loop=true;
 }
 
 void option_select_init_items(struct option_select * opt,

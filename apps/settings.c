@@ -1585,6 +1585,7 @@ bool set_option(const char* string, void* variable, enum optiontype type,
     {
         gui_syncstatusbar_draw(&statusbars, true);
         button = button_get_w_tmo(HZ/2);
+        select.options.limit_loop = false;
         if(gui_syncselect_do_button(&select, button))
         {
             /* *variable = gui_select_get_selected(&select) */
