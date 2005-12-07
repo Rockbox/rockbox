@@ -255,6 +255,8 @@ struct wps_data
 #ifdef HAVE_LCD_BITMAP
     struct gui_img img[MAX_IMAGES];
     unsigned char img_buf[IMG_BUFSIZE];
+    unsigned char* img_buf_ptr;
+    int img_buf_free;
     bool wps_sb_tag;
     bool show_sb_on_wps;
 #endif

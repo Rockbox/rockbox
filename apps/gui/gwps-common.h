@@ -25,8 +25,7 @@
 
 void gui_wps_format_time(char* buf, int buf_size, long time);
 void fade(bool fade_in);
-void gui_wps_format(struct wps_data *data, const char *bmpdir,
-                    size_t bmpdirlen);
+void gui_wps_format(struct wps_data *data);
 bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
                      unsigned char refresh_mode);
 bool gui_wps_display(void);
@@ -34,6 +33,8 @@ void setvol(void);
 bool update_onvol_change(struct gui_wps * gwps);
 bool update(struct gui_wps *gwps);
 bool ffwd_rew(int button);
+bool wps_data_preload_tags(struct wps_data *data, unsigned char *buf,
+                            const char *bmpdir, size_t bmpdirlen);
 #ifdef WPS_KEYLOCK
 void display_keylock_text(bool locked);
 void waitfor_nokey(void);

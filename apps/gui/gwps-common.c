@@ -55,11 +55,191 @@ static void draw_player_fullbar(struct gui_wps *gwps,
                                 /* 3% of 30min file == 54s step size */
 #define MIN_FF_REWIND_STEP 500
 
+/*
+ * returns the image_id between
+ * a..z and A..Z
+ */
+#ifdef HAVE_LCD_BITMAP
+static int get_image_id(int c)
+{
+    if(c >= 'a' && c <= 'z')
+        c -= 'a';
+    if(c >= 'A' && c <= 'Z')
+        c = c - 'A' + 26;
+    return c;
+}
+#endif
+/*
+ * parse the given buffer for following static tags:
+ * %x    -   load image for always display
+ * %xl   -   preload image
+ * %we   -   enable statusbar on wps regardless of the global setting
+ * %wd   -   disable statusbar on wps regardless of the global setting
+ * and also for:
+ * #     -   a comment line
+ *
+ * it returns true if one of these tags is found and handled
+ * false otherwise
+ */
+bool wps_data_preload_tags(struct wps_data *data, unsigned char *buf,
+                            const char *bmpdir, size_t bmpdirlen)
+{
+    if(!data || !buf) return false;
+    
+    char c;
+#ifndef HAVE_LCD_BITMAP
+    /* no bitmap-lcd == no bitmap loading */
+    (void)bmpdir;
+    (void)bmpdirlen;
+#endif
+    /* jump over the UTF-8 BOM(Byte Order Mark) if exist
+     * the BOM for UTF-8 is 3 bytes long and looks like so:
+     * 1. Byte:  0xEF
+     * 2. Byte:  0xBB
+     * 3. Byte:  0xBF
+     */
+    if(buf[0] == 0xef && buf[1] == 0xbb && buf[2] == 0xbf)
+        buf+=3;
+    
+    if(*buf == '#')
+        return true;
+    if('%' != *buf)
+        return false;
+    buf++;
+    
+    c  = *buf;
+    switch (c)
+    {
+#ifdef HAVE_LCD_BITMAP
+        case 'w':
+            /* 
+             * if tag found then return because these two tags must be on 
+             * must be on their own line
+             */
+            if(*(buf+1) == 'd' || *(buf+1) == 'e')
+            {
+                data->wps_sb_tag = true;
+                if( *(buf+1) == 'e' )
+                    data->show_sb_on_wps = true;
+                return true;
+            }
+        break;
+        
+        case 'x':
+            /* Preload images so the %xd# tag can display it */
+        {
+            int ret = 0;
+            int n;
+            char *ptr = buf+1;
+            char *pos = NULL;
+            char imgname[MAX_PATH];
+            char qual = *ptr;
+
+            if (qual == 'l' || qual == '|')  /* format:
+                                                %x|n|filename.bmp|x|y|
+                                                or
+                                                %xl|n|filename.bmp|x|y|
+                                             */
+            {
+                ptr = strchr(ptr, '|') + 1;
+                pos = strchr(ptr, '|');
+                if (pos)
+                {
+                    /* get the image ID */
+                    n = get_image_id(*ptr);
+                    
+                    if(n < 0 || n >= MAX_IMAGES)
+                    {
+                        /* Skip the rest of the line */
+                        while(*buf != '\n')
+                            buf++;
+                        return false;
+                    }
+                    ptr = pos+1;
+
+                    /* check the image number and load state */
+                    if (data->img[n].loaded)
+                    {
+                        /* Skip the rest of the line */
+                        while(*buf != '\n')
+                            buf++;
+                        return false;
+                    }
+                    else
+                    {
+                        /* get filename */
+                        pos = strchr(ptr, '|');
+                        if ((pos - ptr) <
+                            (int)sizeof(imgname)-ROCKBOX_DIR_LEN-2)
+                        {
+                            memcpy(imgname, bmpdir, bmpdirlen);
+                            imgname[bmpdirlen] = '/';
+                            memcpy(&imgname[bmpdirlen+1],
+                                   ptr, pos - ptr);
+                            imgname[bmpdirlen+1+pos-ptr] = 0;
+                        }
+                        else
+                            /* filename too long */
+                            imgname[0] = 0;
+
+                        ptr = pos+1;
+
+                        /* get x-position */
+                        pos = strchr(ptr, '|');
+                        if (pos)
+                            data->img[n].x = atoi(ptr);
+                        else
+                        {
+                            /* weird syntax, bail out */
+                            buf++;
+                            return false;
+                        }
+
+                        /* get y-position */
+                        ptr = pos+1;
+                        pos = strchr(ptr, '|');
+                        if (pos)
+                            data->img[n].y = atoi(ptr);
+                        else
+                        {
+                            /* weird syntax, bail out */
+                            buf++;
+                            return false;
+                        }
+
+                        /* load the image */
+                        ret = read_bmp_file(imgname, &data->img[n].w,
+                                            &data->img[n].h, data->img_buf_ptr,
+                                            data->img_buf_free);
+                        if (ret > 0)
+                        {
+                            data->img[n].ptr = data->img_buf_ptr;
+                            data->img_buf_ptr += ret;
+                            data->img_buf_free -= ret;
+                            data->img[n].loaded = true;
+                            if(qual == '|')
+                                data->img[n].always_display = true;
+                        }
+                        return true;
+                    }
+                }
+            }
+        }
+
+        break;
+#endif
+    }
+    /* no of these tags found */
+    return false;
+}
+
+
 /* draws the statusbar on the given wps-screen */
 #ifdef HAVE_LCD_BITMAP
 static void gui_wps_statusbar_draw(struct gui_wps *wps, bool force)
 {
     bool draw = global_settings.statusbar;
+    
     if(wps->data->wps_sb_tag 
         && wps->data->show_sb_on_wps)
         draw = true;
@@ -781,13 +961,7 @@ static void format_display(struct gui_wps *gwps, char* buf,
 
             case 'x': /* image support */
 #ifdef HAVE_LCD_BITMAP
-                /* skip preload or regular image tag */
-                if ('l' == *(fmt+1) || '|' == *(fmt+1))
-                {
-                    while (*fmt && *fmt != '\n')
-                        fmt++;
-                }
-                else if ('d' == *(fmt+1) )
+                if ('d' == *(fmt+1) )
                 {
                     fmt+=2;
 
@@ -925,23 +1099,13 @@ void fade(bool fade_in)
 }
 
 /* Set format string to use for WPS, splitting it into lines */
-void gui_wps_format(struct wps_data *data, const char *bmpdir,
-                    size_t bmpdirlen)
+void gui_wps_format(struct wps_data *data)
 {
     char* buf = data->format_buffer;
     char* start_of_line = data->format_buffer;
     int line = 0;
     int subline;
-    char c, lastc = 0;
-#ifndef HAVE_LCD_BITMAP
-    /* no bitmap lcd == no bitmap loading */
-    (void)bmpdir;
-    (void)bmpdirlen;
-#else
-    unsigned char* img_buf_ptr = data->img_buf; /* where in image buffer */
-
-    int img_buf_free = IMG_BUFSIZE; /* free space in image buffer */
-#endif    
+    char c;
     if(!data)
         return;
 
@@ -955,16 +1119,11 @@ void gui_wps_format(struct wps_data *data, const char *bmpdir,
         data->subline_expire_time[line] = 0;
         data->curr_subline[line] = SUBLINE_RESET;
     }
-
+    
     line = 0;
     subline = 0;
     data->format_lines[line][subline] = buf;
 
-#ifdef HAVE_LCD_BITMAP
-    bool wps_tag_found = false;
-    data->wps_sb_tag = false;
-    data->show_sb_on_wps = false;
-#endif
     while ((*buf) && (line < WPS_MAX_LINES))
     {
         c = *buf;
@@ -976,18 +1135,7 @@ void gui_wps_format(struct wps_data *data, const char *bmpdir,
              * don't skip %x lines (pre-load bitmaps)
              */
             case '%':
-#ifdef HAVE_LCD_BITMAP
-                if(*(buf+1) == 'w' && (*(buf+2) == 'd' || *(buf+2) == 'e')
-                    && !wps_tag_found)
-                {
-                    data->wps_sb_tag = true;
-                    if( *(buf+1) == 'w' && *(buf+2) == 'e' )
-                        data->show_sb_on_wps = true;
-                    wps_tag_found = true;
-                }
-                if (*(buf+1) != 'x')
-#endif
-                    buf++;
+                buf++;
                 break;
 
             case '\r': /* CR */
@@ -1029,126 +1177,7 @@ void gui_wps_format(struct wps_data *data, const char *bmpdir,
                     subline = 0;
                 }
                 break;
-
-            case 'x':
-#ifdef HAVE_LCD_BITMAP
-                /* Preload images so the %xd# tag can display it */
-            {
-                int ret = 0;
-                int n;
-                char *ptr = buf+1;
-                char *pos = NULL;
-                char imgname[MAX_PATH];
-                char qual = *ptr;
-
-                if(lastc != '%')
-                    break;
-                
-                if (qual == 'l' || qual == '|')  /* format:
-                                                    %x|n|filename.bmp|x|y|
-                                                    or
-                                                    %xl|n|filename.bmp|x|y|
-                                                 */
-                {
-                    ptr = strchr(ptr, '|') + 1;
-                    pos = strchr(ptr, '|');
-                    if (pos)
-                    {
-                        /* get the image ID */
-                        n = *ptr;
-                        if(n >= 'a' && n <= 'z')
-                            n -= 'a';
-                        if(n >= 'A' && n <= 'Z')
-                            n = n - 'A' + 26;
-
-                        if(n < 0 || n >= MAX_IMAGES)
-                        {
-                            /* Skip the rest of the line */
-                            while(*buf != '\n')
-                                buf++;
-                            break;
-                        }
-                        ptr = pos+1;
-
-                        /* check the image number and load state */
-                        if (data->img[n].loaded)
-                        {
-                            /* Skip the rest of the line */
-                            while(*buf != '\n')
-                                buf++;
-                            break;
-                        }
-                        else
-                        {
-                            /* get filename */
-                            pos = strchr(ptr, '|');
-                            if ((pos - ptr) <
-                                (int)sizeof(imgname)-ROCKBOX_DIR_LEN-2)
-                            {
-                                memcpy(imgname, bmpdir, bmpdirlen);
-                                imgname[bmpdirlen] = '/';
-                                memcpy(&imgname[bmpdirlen+1],
-                                       ptr, pos - ptr);
-                                imgname[bmpdirlen+1+pos-ptr] = 0;
-                            }
-                            else
-                                /* filename too long */
-                                imgname[0] = 0;
-
-                            ptr = pos+1;
-
-                            /* get x-position */
-                            pos = strchr(ptr, '|');
-                            if (pos)
-                                data->img[n].x = atoi(ptr);
-                            else
-                            {
-                                /* weird syntax, bail out */
-                                buf++;
-                                break;
-                            }
-
-                            /* get y-position */
-                            ptr = pos+1;
-                            pos = strchr(ptr, '|');
-                            if (pos)
-                                data->img[n].y = atoi(ptr);
-                            else
-                            {
-                                /* weird syntax, bail out */
-                                buf++;
-                                break;
-                            }
-
-                            pos++;
-                            
-                            /* reposition buf pointer to next WPS element */
-                            while (*pos && *pos != ';' && *pos != '\n')
-                                pos++;
-
-                            buf = pos;
-
-                            /* load the image */
-                            ret = read_bmp_file(imgname, &data->img[n].w,
-                                                &data->img[n].h, (char *)img_buf_ptr,
-                                                img_buf_free);
-                            if (ret > 0)
-                            {
-                                data->img[n].ptr = img_buf_ptr;
-                                img_buf_ptr += ret;
-                                img_buf_free -= ret;
-                                data->img[n].loaded = true;
-                                if(qual == '|')
-                                    data->img[n].always_display = true;
-                            }
-                        }
-                    }
-                }
-            }
-#endif
-            break;
         }
-        lastc = c;
         buf++;
     }
 }

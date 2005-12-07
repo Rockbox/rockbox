@@ -734,6 +734,8 @@ static void wps_clear(struct wps_data *data )
        data->img[i].display = false;
        data->img[i].always_display = false;
     }
+    data->wps_sb_tag = false;
+    data->show_sb_on_wps = false;
 }
 #else
 #define wps_clear(a)
@@ -764,7 +766,7 @@ bool wps_data_load(struct wps_data *wps_data,
         wps_clear(wps_data);
         strncpy(wps_data->format_buffer, buf, sizeof(wps_data->format_buffer));
         wps_data->format_buffer[sizeof(wps_data->format_buffer) - 1] = 0;
-        gui_wps_format(wps_data, NULL, 0);
+        gui_wps_format(wps_data);
         return true;
     }
     else
@@ -798,16 +800,34 @@ bool wps_data_load(struct wps_data *wps_data,
 
         if (fd >= 0)
         {
-            int numread = read(fd, wps_data->format_buffer,
-                               sizeof(wps_data->format_buffer) - 1);
-    
-            if (numread > 0)
-            {
+            unsigned int start = 0;
+            
+            wps_reset(wps_data);
 #ifdef HAVE_LCD_BITMAP
-                wps_clear(wps_data);
+            wps_data->img_buf_ptr = wps_data->img_buf; /* where in image buffer */
+
+            wps_data->img_buf_free = IMG_BUFSIZE; /* free space in image buffer */
 #endif
-                wps_data->format_buffer[numread] = 0;
-                gui_wps_format(wps_data, buf, bmpdirlen);
+            while( ( read_line(fd, &wps_data->format_buffer[start],
+                    sizeof(wps_data->format_buffer)-start) ) > 0 )
+            {
+                if(!wps_data_preload_tags(wps_data,
+                                          &wps_data->format_buffer[start],
+                                          buf, bmpdirlen))
+                {
+                    start += strlen(&wps_data->format_buffer[start]);
+                    
+                    if (start < sizeof(wps_data->format_buffer) - 1)
+                    {
+                        wps_data->format_buffer[start++] = '\n';
+                        wps_data->format_buffer[start] = 0;
+                    }
+                }
+            }
+
+            if (start > 0)
+            {
+                gui_wps_format(wps_data);
             }
     
             close(fd);
@@ -853,7 +873,7 @@ bool wps_data_load(struct wps_data *wps_data,
             }
             wps_data->wps_loaded = true;
     
-            return numread > 0;
+            return start > 0;
         }
     }
 
