@@ -207,9 +207,7 @@ bool bookmark_autobookmark(void)
             return write_bookmark(false);
     }
 #ifdef HAVE_LCD_BITMAP
-    unsigned char *lines[]={str(LANG_AUTO_BOOKMARK_QUERY),
-                            str(LANG_CONFIRM_WITH_PLAY_RECORDER),
-                            str(LANG_CANCEL_WITH_ANY_RECORDER)};
+    unsigned char *lines[]={str(LANG_AUTO_BOOKMARK_QUERY);
     struct text_message message={(char **)lines, 3};
 #else
     unsigned char *lines[]={str(LANG_AUTO_BOOKMARK_QUERY),

@@ -78,10 +78,6 @@ sub buildzip {
         # no codec was copied, remove directory again
         rmdir(".rockbox/codecs");
 
-    system("$ROOT/tools/codepages");
-    my $c = 'find . -name "*.cp" ! -empty -exec mv {} .rockbox/codepages/ \; >/dev/null 2>&1';
-    print `$c`;
-
     }
 
 

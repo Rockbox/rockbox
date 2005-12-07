@@ -92,7 +92,7 @@ unsigned char* utf8encode(unsigned long ucs, unsigned char *utf8)
     int tail = 0;
 
     if (ucs > 0x7F)
-        while (ucs >> (6*tail + 2))
+        while (ucs >> (5*tail + 6))
             tail++;
 
     *utf8++ = (ucs >> (6*tail)) | utf8comp[tail];

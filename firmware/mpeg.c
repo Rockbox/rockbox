@@ -920,10 +920,9 @@ static struct trackdata *add_track_to_tag_list(const char *filename)
     track->mempos = audiobuf_write;
     track->id3.elapsed = 0;
 #ifdef HAVE_LCD_BITMAP
-    int w, h;
-    lcd_getstringsize(track->id3.title, &w, &h);
-    lcd_getstringsize(track->id3.artist, &w, &h);
-    lcd_getstringsize(track->id3.album, &w, &h);
+    lcd_getstringsize(track->id3.title, NULL, NULL);
+    lcd_getstringsize(track->id3.artist, NULL, NULL);
+    lcd_getstringsize(track->id3.album, NULL, NULL);
 #endif
 
     track_write_idx = (track_write_idx+1) & MAX_TRACK_ENTRIES_MASK;
