@@ -134,15 +134,13 @@ int kbd_input(char* text, int buflen)
             /* Draw insert chars */
             utf8 = temptext;
             tmp = KEYBOARD_INSERT_LEFT;
-            utf8 = iso_decode((unsigned char*)&tmp, utf8, 0, 1);
-            tmp = line[x];
-            utf8 = iso_decode((unsigned char*)&tmp, utf8, 0, 1);
+            utf8 = iso_decode(&tmp, utf8, 0, 1);
+            utf8 = iso_decode(&line[x], utf8, 0, 1);
             tmp = KEYBOARD_INSERT_RIGHT;
-            utf8 = iso_decode((unsigned char*)&tmp, utf8, 0, 1);
+            utf8 = iso_decode(&tmp, utf8, 0, 1);
             for (i = 1; i < 8; i++)
             {
-                utf8 = iso_decode((unsigned char*)&line[(x+i)%linelen], utf8, 0, 1);
-                /* temptext[i+2] = line[(x+i)%linelen]; */
+                utf8 = iso_decode(&line[(x+i)%linelen], utf8, 0, 1);
             }
             *utf8 = 0;
             lcd_puts(1, 0, temptext);
