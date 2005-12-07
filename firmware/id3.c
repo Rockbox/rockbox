@@ -322,7 +322,6 @@ static int parseuser( struct mp3entry* entry, char* tag, int bufferpos )
         /* At least part of the value was read, so we can safely try to 
          * parse it 
          */
-        
         value = tag + desc_len + 1;
         value_len = parse_replaygain(tag, value, entry, tag, 
             bufferpos - (tag - entry->id3v2buf));
@@ -376,7 +375,7 @@ static int unicode_munge(char* string, char* utf8buf, int *len) {
             (*len)--;
             utf8 = iso_decode(str, utf8, -1, *len);
             *utf8 = 0;
-            *len = strlen(utf8buf);
+            *len = utf8 - utf8buf;
             break;
 
         case 0x01: /* Unicode with or without BOM */
@@ -427,13 +426,13 @@ static int unicode_munge(char* string, char* utf8buf, int *len) {
         case 0x03: /* UTF-8 encoded string */
             for(i=0; i < *len; i++)
                 utf8[i] = str[i+1];
-            *len = strlen(utf8buf);
+            (*len)--;
             break;
 
         default: /* Plain old string */
             utf8 = iso_decode(str, utf8, -1, *len);
             *utf8 = 0;
-            *len = strlen(utf8buf);
+            *len = utf8 - utf8buf;
             break;
     }
     return 0;
