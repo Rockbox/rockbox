@@ -35,11 +35,11 @@
 
 extern unsigned short *lcd_ascii;
 
-static unsigned short* kbd_setupkeys(int page, int* len)
+static unsigned char* kbd_setupkeys(int page, int* len)
 {
-    static unsigned short lines[128];
+    static unsigned char lines[128];
 
-    unsigned short ch;
+    unsigned ch;
     int i = 0;
 
     switch (page) 
@@ -101,9 +101,9 @@ int kbd_input(char* text, int buflen)
 
     int len, len_utf8, i, j;
     int editpos, curpos, leftpos;
-    unsigned short* line = kbd_setupkeys(page, &linelen);
+    unsigned char *line = kbd_setupkeys(page, &linelen);
     unsigned char temptext[36];
-    unsigned short tmp;
+    unsigned char tmp;
     unsigned char *utf8;
 
     int button, lastbutton = 0;
