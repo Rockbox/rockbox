@@ -55,6 +55,19 @@ static void draw_player_fullbar(struct gui_wps *gwps,
                                 /* 3% of 30min file == 54s step size */
 #define MIN_FF_REWIND_STEP 500
 
+/* Skip leading UTF-8 BOM, if present. */
+static char* skip_utf8_bom(char* buf)
+{
+    unsigned char* s = (unsigned char*) buf;
+    
+    if(s[0] == 0xef && s[1] == 0xbb && s[2] == 0xbf)
+    {
+        buf += 3;
+    }
+    
+    return buf;
+}
+
 /*
  * returns the image_id between
  * a..z and A..Z
@@ -81,7 +94,7 @@ static int get_image_id(int c)
  * it returns true if one of these tags is found and handled
  * false otherwise
  */
-bool wps_data_preload_tags(struct wps_data *data, unsigned char *buf,
+bool wps_data_preload_tags(struct wps_data *data, char *buf,
                             const char *bmpdir, size_t bmpdirlen)
 {
     if(!data || !buf) return false;
@@ -92,14 +105,7 @@ bool wps_data_preload_tags(struct wps_data *data, unsigned char *buf,
     (void)bmpdir;
     (void)bmpdirlen;
 #endif
-    /* jump over the UTF-8 BOM(Byte Order Mark) if exist
-     * the BOM for UTF-8 is 3 bytes long and looks like so:
-     * 1. Byte:  0xEF
-     * 2. Byte:  0xBB
-     * 3. Byte:  0xBF
-     */
-    if(buf[0] == 0xef && buf[1] == 0xbb && buf[2] == 0xbf)
-        buf+=3;
+    buf = skip_utf8_bom(buf);
     
     if(*buf == '#')
         return true;
@@ -1122,6 +1128,7 @@ void gui_wps_format(struct wps_data *data)
     
     line = 0;
     subline = 0;
+    buf = skip_utf8_bom(buf);
     data->format_lines[line][subline] = buf;
 
     while ((*buf) && (line < WPS_MAX_LINES))

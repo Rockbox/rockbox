@@ -33,7 +33,7 @@ void setvol(void);
 bool update_onvol_change(struct gui_wps * gwps);
 bool update(struct gui_wps *gwps);
 bool ffwd_rew(int button);
-bool wps_data_preload_tags(struct wps_data *data, unsigned char *buf,
+bool wps_data_preload_tags(struct wps_data *data, char *buf,
                             const char *bmpdir, size_t bmpdirlen);
 #ifdef WPS_KEYLOCK
 void display_keylock_text(bool locked);
