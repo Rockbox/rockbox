@@ -60,8 +60,10 @@
 #include "misc.h"
 #include "database.h"
 #include "dircache.h"
+#include "tagcache.h"
 #include "lang.h"
 #include "string.h"
+#include "splash.h"
 
 #if (CONFIG_CODEC == SWCODEC)
 #include "pcmbuf.h"
@@ -130,6 +132,8 @@ void init_dircache(void)
             lcd_update();
         }
     }
+    
+    tagcache_init();
 }
 #else
 # define init_dircache(...)
@@ -320,7 +324,18 @@ void init(void)
     }
 
     settings_calc_config_sector();
-    settings_load(SETTINGS_ALL);
+    
+    /* Reset settings if holding the rec button. */
+    if ((button_status() & BUTTON_REC) == BUTTON_REC)
+    {
+        gui_syncsplash(HZ*2, true, str(LANG_RESET_DONE_CLEAR));
+        settings_reset();
+    }
+    else
+    {
+        settings_load(SETTINGS_ALL);
+    }
+    
     init_dircache();
     gui_sync_wps_init();
     settings_apply();
