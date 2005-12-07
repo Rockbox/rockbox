@@ -16,7 +16,8 @@
 %xl|F|bfp.bmp|136|2|
 %x|V|vol.bmp|60|117|
 %x|g|bg.bmp|0|0|
-%wd%ac%?mp<Now Stopped|Now Playing %?ps<(S)|>|Now Paused %?ps<(S)|>|Now Playing %?ps<(S)|>|Now Playing %?ps<(S)|>>
+%wd
+%ac%?mp<Now Stopped|Now Playing %?ps<(S)|>|Now Paused %?ps<(S)|>|Now Playing %?ps<(S)|>|Now Playing %?ps<(S)|>>
 
 %al%pp of %pe 
 
