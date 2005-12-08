@@ -418,7 +418,8 @@ int bdf_read_header(FILE *fp, struct font* pf)
     /* calc default char*/
     if (pf->defaultchar < 0 || 
         pf->defaultchar < firstchar || 
-        pf->defaultchar > limit_char )
+        pf->defaultchar > limit_char ||
+        pf->defaultchar > lastchar)
         pf->defaultchar = firstchar;
 
     /* calc font size (offset/width entries)*/
