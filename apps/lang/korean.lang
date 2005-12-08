@@ -28,13 +28,13 @@ id: LANG_DEBUG
 desc: in the main menu
 eng: "Debug (Keep Out!)"
 voice: "Debug, keep out!"
-new: "디버그 (고급)"
+new: "디버그 (들어가지 마세요!)"
 
 id: LANG_USB
 desc: in the main menu
 eng: "USB (Sim)"
 voice: ""
-new: ""
+new: "USB (Sim)"
 
 id: LANG_ROCKBOX_INFO
 desc: displayed topmost on the info screen
@@ -502,7 +502,7 @@ id: LANG_ID3_LENGHT
 desc: in wps
 eng: "[Length]"
 voice: ""
-new: "[재생 시간]"
+new: "[재생시간]"
 
 id: LANG_ID3_PLAYLIST
 desc: in wps
@@ -580,7 +580,7 @@ id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
 eng: "End Of Song List"
 voice: ""
-new: "노래 목록의 끝입니다."
+new: "음악 목록의 끝입니다."
 
 id: LANG_POWEROFF_IDLE
 desc: in settings_menu
@@ -753,8 +753,8 @@ new: "목"
 id: LANG_WEEKDAY_FRIDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Fri"
-voice: "금"
-new: ""
+voice: ""
+new: "금"
 
 id: LANG_WEEKDAY_SATURDAY
 desc: Maximum 3-letter abbreviation for weekday
@@ -1378,7 +1378,7 @@ id: LANG_MAX_FILES_IN_DIR
 desc: in settings_menu
 eng: "Max files in dir browser"
 voice: "Maximum files in directory browser"
-new: " 한 폴더의 최대 파일수"
+new: "한 폴더의 최대 파일수"
 
 id: LANG_MAX_FILES_IN_PLAYLIST
 desc: in settings_menu
@@ -1746,7 +1746,7 @@ id: LANG_FLIP_DISPLAY
 desc: in settings_menu, option to turn display+buttos by 180 degreed
 eng: "Upside Down"
 voice: "Upside Down"
-new: "위아래로"
+new: "버튼이동 반전"
 
 id: LANG_RECORD_PRERECORD
 desc: in recording and radio screen
@@ -1951,7 +1951,7 @@ id: LANG_TIME_MENU
 desc: in the system sub menu
 eng: "Time & Date"
 voice: "Time and Date"
-new: ""시간 & 날짜"
+new: "시간 & 날짜"
 
 # Limits
 id: LANG_LIMITS_MENU
@@ -2418,7 +2418,7 @@ id: LANG_VOICE_SPELL
 desc: "talkbox" mode for files+directories
 eng: "Spell"
 voice: "Spell"
-new: ""
+new: "철자"
 
 id: VOICE_CHAR_A
 desc: spoken only, for spelling
@@ -2977,7 +2977,7 @@ id: LANG_ID3DB_ALL_SONGS
 desc: ID3 virtual folder name
 eng: "<All songs>"
 voice: ""
-new: "<모든 노래>"
+new: "<모든 음악>"
 
 id: LANG_PLAYLIST
 desc: Used when you need to say playlist, also voiced
@@ -3146,7 +3146,7 @@ id: LANG_MENU_SET_RATING
 desc: in wps context menu
 eng: "Set song rating"
 voice: "Set song rating"
-new: "노래 평점 주기"
+new: "음악 평점 주기"
 
 id: LANG_RATING
 desc: in set_rating
@@ -3422,7 +3422,7 @@ id: LANG_CODEPAGE_TURKISH
 desc: in codepage setting menu
 eng: "Turkish (ISO-8859-9)"
 voice:
-new: "터키어 (ISO-8859-9)
+new: "터키어 (ISO-8859-9)"
 
 id: LANG_CODEPAGE_LATIN_EXTENDED
 desc: in codepage setting menu
@@ -3537,33 +3537,3 @@ desc: in radio screen / menu
 eng: "Mode:"
 voice: ""
 new: "모드: "
-
-id: LANG_SCALING_MODE
-desc: in sound_settings. How to scale volume/bass to prevent clipping
-eng: "Prevent clipping"
-voice: "Prevent clipping"
-new: "소리 자동조정 막기"
-
-id: LANG_SCALE_OFF
-desc: in sound_settings. Do not reduce volume/bass
-eng: "Off"
-voice: "Off"
-new: "끄기"
-
-id: LANG_SCALE_VOLUME
-desc: in sound_settings. Reduce volume
-eng: "Adjust volume"
-voice: "Adjust volume"
-new: "볼륨 조절"
-
-id: LANG_SCALE_BASS
-desc: in sound_settings. Reduce bass
-eng: "Adjust bass"
-voice: "Adjust bass"
-new: "저음 조절"
-
-id: LANG_SCALE_CURRENT
-desc: in sound_settings. Reduce other metric than currently modified
-eng: "Adjust current"
-voice: "Adjust current"
-new: "흐름 조절"
