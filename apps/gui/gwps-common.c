@@ -1066,34 +1066,35 @@ static void format_display(struct gui_wps *gwps, char* buf,
 /* fades the volume */
 void fade(bool fade_in)
 {
-    unsigned fp_global_vol = global_settings.volume << 8;
-    unsigned fp_step = fp_global_vol / 30;
+    int fp_global_vol = global_settings.volume << 8;
+    int fp_min_vol = sound_min(SOUND_VOLUME) << 8;
+    int fp_step = (fp_global_vol - fp_min_vol) / 30;
 
     if (fade_in) {
         /* fade in */
-        unsigned fp_volume = 0;
+        int fp_volume = fp_min_vol;
 
         /* zero out the sound */
-        sound_set_volume(0);
+        sound_set_volume(fp_min_vol >> 8);
 
         sleep(HZ/10); /* let audio thread run */
         audio_resume();
         
-        while (fp_volume < fp_global_vol) {
+        while (fp_volume < fp_global_vol - fp_step) {
             fp_volume += fp_step;
-            sleep(1);
             sound_set_volume(fp_volume >> 8);
+            sleep(1);
         }
         sound_set_volume(global_settings.volume);
     }
     else {
         /* fade out */
-        unsigned fp_volume = fp_global_vol;
+        int fp_volume = fp_global_vol;
 
-        while (fp_volume > fp_step) {
+        while (fp_volume > fp_min_vol + fp_step) {
             fp_volume -= fp_step;
-            sleep(1);
             sound_set_volume(fp_volume >> 8);
+            sleep(1);
         }
         audio_pause();
 #ifndef SIMULATOR
