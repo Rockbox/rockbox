@@ -923,7 +923,7 @@ void settings_apply(void)
          global_settings.wps_file[0] != 0xff ) {
         snprintf(buf, sizeof buf, WPS_DIR "/%s.wps",
                  global_settings.wps_file);
-        wps_data_load(gui_wps[0].data, buf, true, false);
+        wps_data_load(gui_wps[0].data, buf, true);
     }
     else
         wps_data_init(gui_wps[0].data);
@@ -933,7 +933,7 @@ void settings_apply(void)
          global_settings.rwps_file[0] != 0xff ) {
         snprintf(buf, sizeof buf, WPS_DIR "/%s.rwps",
                  global_settings.rwps_file);
-        wps_data_load(gui_wps[1].data, buf, true, false);
+        wps_data_load(gui_wps[1].data, buf, true);
     }
     else
         wps_data_init(gui_wps[1].data);
@@ -1205,12 +1205,12 @@ bool settings_load_config(const char* file)
 
         /* check for the string values */
         if (!strcasecmp(name, "wps")) {
-            if (wps_data_load(gui_wps[0].data,value,true, false))
+            if (wps_data_load(gui_wps[0].data, value, true))
                 set_file(value, (char *)global_settings.wps_file, MAX_FILENAME);
         }
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
         else if (!strcasecmp(name, "rwps")) {
-            if (wps_data_load(gui_wps[1].data,value,true, false))
+            if (wps_data_load(gui_wps[1].data, value, true))
                 set_file(value, (char *)global_settings.rwps_file, MAX_FILENAME);
         }
 #endif

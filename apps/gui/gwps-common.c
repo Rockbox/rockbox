@@ -2083,11 +2083,11 @@ bool gui_wps_display(void)
                                       "%al%pc/%pt%ar[%pp:%pe]\n"
                                       "%fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>\n"
                                       "%pb\n"
-                                      "%pm\n", false, false);
+                                      "%pm\n", false);
 #else
                         wps_data_load(gui_wps[i].data,
                                       "%s%pp/%pe: %?it<%it|%fn> - %?ia<%ia|%d2> - %?id<%id|%d1>\n"
-                                      "%pc%?ps<*|/>%pt\n", false, false);
+                                      "%pc%?ps<*|/>%pt\n", false);
 #endif
                     }
 #if NB_SCREENS == 2
@@ -2099,7 +2099,7 @@ bool gui_wps_display(void)
                                        "%s%?it<%?in<%in. |>%it|%fn>\n"
                                        "%al%pc/%pt%ar[%pp:%pe]\n"
                                        "%fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>\n"
-                                       "%pb", false, false);
+                                       "%pb", false);
                      }
 #endif
                 }

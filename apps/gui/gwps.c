@@ -752,10 +752,8 @@ static void wps_reset(struct wps_data *data)
    from a (wps-)file (isfile = true)*/
 bool wps_data_load(struct wps_data *wps_data,
                    const char *buf,
-                   bool isfile,
-                   bool display)
+                   bool isfile)
 {
-    int i, s;
     int fd;
 
     if(!wps_data || !buf)
@@ -832,45 +830,6 @@ bool wps_data_load(struct wps_data *wps_data,
     
             close(fd);
     
-            if ( display ) {
-                bool any_defined_line;
-                int z;
-                FOR_NB_SCREENS(z)
-                    screens[z].clear_display();
-#ifdef HAVE_LCD_BITMAP
-                FOR_NB_SCREENS(z)
-                    screens[z].setmargins(0,0);
-#endif
-                for (s=0; s<WPS_MAX_SUBLINES; s++)
-                {
-                    any_defined_line = false;
-                    for (i=0; i<WPS_MAX_LINES; i++)
-                    {
-                        if (wps_data->format_lines[i][s] &&
-                            wps_data->format_lines[i][s][0])
-                        {
-                            FOR_NB_SCREENS(z)
-                                screens[z].puts(0, i,
-                                                wps_data->
-                                                format_lines[i][s]);
-                            any_defined_line = true;
-                        }
-                        else
-                        {
-                            FOR_NB_SCREENS(z)
-                                screens[z].puts(0, i, " ");
-                        }
-                    }
-                    if (any_defined_line)
-                    {
-#ifdef HAVE_LCD_BITMAP
-                        FOR_NB_SCREENS(z)
-                            screens[z].update();
-#endif
-                        sleep(HZ/2);
-                    }
-                }
-            }
             wps_data->wps_loaded = true;
     
             return start > 0;

@@ -282,8 +282,7 @@ void wps_data_init(struct wps_data *wps_data);
    from a (wps-)file (isfile = true)*/
 bool wps_data_load(struct wps_data *wps_data,
                    const char *buf,
-                   bool isfile,
-                   bool display);
+                   bool isfile);
 
 /* wps_data end */
 
