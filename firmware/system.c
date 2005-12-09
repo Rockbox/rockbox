@@ -599,11 +599,7 @@ void set_cpu_frequency(long frequency)
               /* Refresh timer for bypass frequency */
         PLLCR &= ~1;  /* Bypass mode */
         timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, false);
-#ifdef IRIVER_H300_SERIES
-        PLLCR = 0x1183e005;
-#else
         PLLCR = 0x11856005;
-#endif
         CSCR0 = 0x00001180; /* Flash: 4 wait states */
         CSCR1 = 0x00000980; /* LCD: 2 wait states */
         while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.

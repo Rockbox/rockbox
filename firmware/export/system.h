@@ -289,11 +289,7 @@ static inline void invalidate_icache(void)
 #define CPUFREQ_DEFAULT      (CPUFREQ_DEFAULT_MULT * CPU_FREQ)
 #define CPUFREQ_NORMAL_MULT  4
 #define CPUFREQ_NORMAL       (CPUFREQ_NORMAL_MULT * CPU_FREQ)
-#ifdef IRIVER_H300_SERIES
-#define CPUFREQ_MAX_MULT     8
-#else
 #define CPUFREQ_MAX_MULT     11
-#endif
 #define CPUFREQ_MAX          (CPUFREQ_MAX_MULT * CPU_FREQ)
 
 #elif CONFIG_CPU == PP5020
