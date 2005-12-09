@@ -86,6 +86,7 @@ static int pcf50606_i2c_getack(void)
     int ret = 1;
 
     SDA_INPUT;   /* And set to input */
+    DELAY;
     SCL_HI;
 
     if (SDA)
@@ -96,6 +97,7 @@ static int pcf50606_i2c_getack(void)
     SCL_LO;
     SDA_HI;
     SDA_OUTPUT;
+    DELAY;
 
     return ret;
 }
