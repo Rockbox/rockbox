@@ -3166,31 +3166,31 @@ new: "ReplayGain"
 id: LANG_REPLAYGAIN_ENABLE
 desc: in replaygain
 eng: "Enable replaygain"
-voice: 
+voice: "Abilita ReplayGain"
 new: "Abilita ReplayGain"
 
 id: LANG_REPLAYGAIN_NOCLIP
 desc: in replaygain
 eng: "Prevent clipping"
-voice: 
+voice: "Non consentire distorsione"
 new: "Non consentire distorsione"
 
 id: LANG_REPLAYGAIN_MODE
 desc: in replaygain
 eng: "Replaygain type"
-voice: 
+voice: "Tipo ReplayGain"
 new: "Tipo ReplayGain"
 
 id: LANG_TRACK_GAIN
 desc: in replaygain
 eng: "Track gain"
-voice: 
+voice: "Guadagno singola traccia"
 new: "Guadagno singola traccia"
 
 id: LANG_ALBUM_GAIN
 desc: in replaygain
 eng: "Album gain"
-voice: 
+voice: "Guadagno album"
 new: "Guadagno album"
 
 id: LANG_ID3_TRACK_GAIN
@@ -3218,9 +3218,9 @@ voice: "Modo bidirezionale (ebreo/arabico)"
 new: "Modo bidirezionale (ebreo/arabico)"
 
 id: LANG_REPLAYGAIN_PREAMP
-desc: in browse_id3
+desc: in replaygain settings
 eng: "Pre-amp"
-voice: 
+voice: "Pre-amplificazione"
 new: "Pre-amplificazione"
 
 id: LANG_UNIT_DB
@@ -3264,3 +3264,9 @@ desc: repeat one song
 eng: "A-B"
 voice: "parte di una traccia"
 new: "A-B"
+
+id: LANG_SHUFFLE_GAIN
+desc: use track gain if shuffle mode is on, album gain otherwise
+eng: "Track gain if shuffling"
+voice: "Guadagno traccia se casuale"
+new: "Guadagno traccia se casuale"
