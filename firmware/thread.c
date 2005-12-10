@@ -41,7 +41,7 @@ struct regs
     void         *pr;    /* Procedure register */
     void         *start; /* Thread start address, or NULL when started */
 };
-#elif CONFIG_CPU == PP5020
+#elif defined(CPU_ARM) 
 struct regs
 {
     unsigned int r[9];   /* Registers r4-r12 */
@@ -78,7 +78,7 @@ void switch_thread(void) ICODE_ATTR;
 static inline void store_context(void* addr) __attribute__ ((always_inline));
 static inline void load_context(const void* addr) __attribute__ ((always_inline));
 
-#if CONFIG_CPU == PP5020
+#if defined(CPU_ARM)
 /*--------------------------------------------------------------------------- 
  * Store non-volatile context.
  *---------------------------------------------------------------------------
@@ -86,7 +86,7 @@ static inline void load_context(const void* addr) __attribute__ ((always_inline)
 static inline void store_context(void* addr)
 {
     asm volatile(
-        "stmia %0, { r4-r14 }\n"
+        "stmia  %0, { r4-r14 }   \n"
         : : "r" (addr)
     );
 }
@@ -98,12 +98,12 @@ static inline void store_context(void* addr)
 static inline void load_context(const void* addr)
 {
     asm volatile(
-        "ldmia %0, { r4-r14 }   \n" /* load regs r4 to r14 from context */
-        "ldr r0, [%0, #44]      \n" /* load start pointer */
-        "mov r1, #0             \n"
-        "cmp r0, r1             \n" /* check for NULL */
-        "strne r1, [%0, #44]    \n" /* if it's NULL, we're already running */
-        "movne  pc, r0          \n" /* not already running, so jump to start */
+        "ldmia  %0, { r4-r14 }   \n" /* load regs r4 to r14 from context */
+        "ldr    r0, [%0, #44]    \n" /* load start pointer */
+        "mov    r1, #0           \n"
+        "cmp    r0, r1           \n" /* check for NULL */
+        "strne  r1, [%0, #44]    \n" /* if it's NULL, we're already running */
+        "movne  pc, r0           \n" /* not already running, so jump to start */
         : : "r" (addr) : "r0", "r1"
     );
 }
@@ -251,7 +251,8 @@ void switch_thread(void)
 #ifdef SIMULATOR
     /* Do nothing */
 #else
-
+/* We currently have no interrupts on iPod targets, so remove this temp. */
+#if CONFIG_CPU != PP5020
     while (num_sleepers == num_threads)
     {
         /* Enter sleep mode, woken up on interrupt */
@@ -269,7 +270,7 @@ void switch_thread(void)
          */
 #endif
     }
-    
+#endif
 #endif
     current = current_thread;
     store_context(&thread_contexts[current]);
@@ -376,10 +377,10 @@ void init_threads(void)
     thread_name[0] = main_thread_name;
     thread_stack[0] = stackbegin;
     thread_stack_size[0] = (int)stackend - (int)stackbegin;
-#if defined(CPU_COLDFIRE) || (CONFIG_CPU == SH7034) || (CONFIG_CPU == PP5020)
-    thread_contexts[0].start = 0; /* thread 0 already running */
-#elif CONFIG_CPU == TCC730
+#if CONFIG_CPU == TCC730
     thread_contexts[0].started = 1;
+#else
+    thread_contexts[0].start = 0; /* thread 0 already running */
 #endif
     num_sleepers = 0;
 }
