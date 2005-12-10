@@ -879,22 +879,22 @@ bool set_time_screen(const char* string, struct tm *tm)
 
         button = button_get_w_tmo(HZ/2);
         switch ( button ) {
-            case BUTTON_LEFT:
+            case SETTINGS_PREV:
                 cursorpos = (cursorpos + 6 - 1) % 6;
                 break;
-            case BUTTON_RIGHT:
+            case SETTINGS_NEXT:
                 cursorpos = (cursorpos + 6 + 1) % 6;
                 break;
-            case BUTTON_UP:
-            case BUTTON_UP | BUTTON_REPEAT:
+            case SETTINGS_INC:
+            case SETTINGS_INC | BUTTON_REPEAT:
                 *valptr = (*valptr + steps - min + 1) %
                     steps + min;
                 if(*valptr == 0)
                     *valptr = min;
                 say_time(cursorpos, tm);
                 break;
-            case BUTTON_DOWN:
-            case BUTTON_DOWN | BUTTON_REPEAT:
+            case SETTINGS_DEC:
+            case SETTINGS_DEC | BUTTON_REPEAT:
                 *valptr = (*valptr + steps - min - 1) %
                     steps + min;
                 if(*valptr == 0)
@@ -902,15 +902,11 @@ bool set_time_screen(const char* string, struct tm *tm)
                 say_time(cursorpos, tm);
                 break;
 
-#ifdef BUTTON_ON
-            case BUTTON_ON:
-#elif defined BUTTON_MENU
-            case BUTTON_MENU:
-#endif
+            case SETTINGS_ACCEPT:
                 done = true;
                 break;
 
-            case BUTTON_OFF:
+            case SETTINGS_CANCEL:
                 done = true;
                 tm->tm_year = -1;
                 break;
