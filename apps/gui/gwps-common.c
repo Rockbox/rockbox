@@ -1195,24 +1195,32 @@ void gui_wps_format(struct wps_data *data)
 
 #ifdef HAVE_LCD_BITMAP
 /* Display images */
-static void wps_display_images(struct gui_wps *gwps)
+static void wps_draw_image(struct gui_wps *gwps, int n)
+{
+    struct screen *display = gwps->display;
+    struct wps_data *data = gwps->data;
+    if(data->img[n].always_display)
+        display->set_drawmode(DRMODE_FG);
+    else
+        display->set_drawmode(DRMODE_SOLID);
+
+    display->mono_bitmap(data->img[n].ptr, data->img[n].x,
+                         data->img[n].y, data->img[n].w,
+                         data->img[n].h);
+    display->update_rect(data->img[n].x, data->img[n].y,
+                         data->img[n].w, data->img[n].h);
+}
+static void wps_display_images(struct gui_wps *gwps, bool always)
 {
     if(!gwps || !gwps->data || !gwps->display) return;
     int n;
     struct wps_data *data = gwps->data;
     struct screen *display = gwps->display;
     for (n = 0; n < MAX_IMAGES; n++) {
-        if (data->img[n].loaded && data->img[n].display) {
-            if(data->img[n].always_display)
-                display->set_drawmode(DRMODE_FG);
-            else
-                display->set_drawmode(DRMODE_SOLID);
-
-            display->mono_bitmap(data->img[n].ptr, data->img[n].x,
-                                 data->img[n].y, data->img[n].w,
-                                 data->img[n].h);
-            display->update_rect(data->img[n].x, data->img[n].y,
-                                 data->img[n].w, data->img[n].h);
+        if (data->img[n].loaded) {
+            if( (!always && data->img[n].display)
+                || (always && data->img[n].always_display) )
+                wps_draw_image(gwps, n);
         }
     }
     display->set_drawmode(DRMODE_SOLID);
@@ -1645,6 +1653,7 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
         }
 #ifdef HAVE_LCD_BITMAP
         if (update_line) {
+            wps_display_images(gwps,false);
             display->update_rect(0, i*h + offset, display->width, h);
         }
 #endif
@@ -1652,11 +1661,7 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
 
 #ifdef HAVE_LCD_BITMAP
     /* Display all images */
-    for (i = 0; i < MAX_IMAGES; i++) {
-        if(data->img[i].always_display)
-           data->img[i].display = data->img[i].always_display;
-    }
-    wps_display_images(gwps);
+    wps_display_images(gwps,true);
     
     /* Now we know wether the peak meter is used.
        So we can enable / disable the peak meter thread */
@@ -2112,7 +2117,6 @@ bool gui_wps_display(void)
         gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_ALL);
 
 #ifdef HAVE_LCD_BITMAP
-        wps_display_images(&gui_wps[i]);
         gui_wps[i].display->update();
 #endif
     }
