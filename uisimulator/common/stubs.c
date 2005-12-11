@@ -166,37 +166,36 @@ bool simulate_usb(void)
 
 int rtc_read(int address)
 {
-  time_t now = time(NULL);
-  struct tm *teem = localtime(&now);
-
-  switch(address) {
-  case 3: /* hour */
-    return (teem->tm_hour%10) | ((teem->tm_hour/10) << 4);
-
-  case 2: /* minute */
-    return (teem->tm_min%10) | ((teem->tm_min/10) << 4);
-
-  case 1: /* seconds */
-    return (teem->tm_sec%10) | ((teem->tm_sec/10) << 4);
-
-  case 7: /* year */
-    return ((teem->tm_year-100)%10) | (((teem->tm_year-100)/10) << 4);
-
-  case 6: /* month */
-    return ((teem->tm_mon+1)%10) | (((teem->tm_mon+1)/10) << 4);
-
-  case 5: /* day */
-    return (teem->tm_mday%10) | ((teem->tm_mday/10) << 4);
-  }
-
-  return address ^ 0x55;
+    return address ^ 0x55;
 }
 
 int rtc_write(int address, int value)
 {
     (void)address;
     (void)value;
-     return 0;
+    return 0;
+}
+
+int rtc_read_datetime(unsigned char* buf)
+{
+    time_t now = time(NULL);
+    struct tm *teem = localtime(&now);
+
+    buf[0] = (teem->tm_sec%10) | ((teem->tm_sec/10) << 4);
+    buf[1] = (teem->tm_min%10) | ((teem->tm_min/10) << 4);
+    buf[2] = (teem->tm_hour%10) | ((teem->tm_hour/10) << 4);
+    buf[3] = (teem->tm_wday);
+    buf[4] = (teem->tm_mday%10) | ((teem->tm_mday/10) << 4);
+    buf[5] = ((teem->tm_year-100)%10) | (((teem->tm_year-100)/10) << 4);
+    buf[6] = ((teem->tm_mon+1)%10) | (((teem->tm_mon+1)/10) << 4);
+
+    return 0;
+}
+
+int rtc_write_datetime(unsigned char* buf)
+{
+    (void)buf;
+    return 0;
 }
 
 bool is_new_player(void)
