@@ -102,8 +102,9 @@
 #define LED_VIRTUAL  2 /* Virtual LED (icon) (Archos Ondio) */
 
 /* CONFIG_RTC */
-#define RTC_M41ST84W 1
-#define RTC_PCF50606 2
+#define RTC_M41ST84W 1 /* Archos Recorder */
+#define RTC_PCF50605 2 /* iPod 4G */
+#define RTC_PCF50606 3 /* iriver H300 */
 
 /* else                   HW controlled LED (iRiver H1x0) */
 

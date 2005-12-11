@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Linus Nielsen Feltzing
+ * Copyright (C) 2005 by Dave Chapman
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -17,18 +17,15 @@
  *
  ****************************************************************************/
 
-/*
- * PP5020 i2c driver
- *
- */
- 
-#ifndef _I2C_PP5020_H
-#define _I2C_PP5020_H
+#ifndef PCF50605_H
+#define PCF50605_H
 
-/* TODO: Fully implement i2c driver */
-
-void i2c_init(void);
-int i2c_readbyte(unsigned int dev_addr, int addr);
-int ipod_i2c_send(unsigned int addr, int data0, int data1);
+#if defined(APPLE_IPODCOLOR) || defined(APPLE_IPODNANO)
+int pcf50605_read(int address);
+void pcf50605_read_multiple(int address, unsigned char* buf, int count);
+int pcf50605_write(int address, unsigned char val);
+int pcf50605_write_multiple(int address, const unsigned char* buf, int count);
+int pcf50605_battery_read(void);
+#endif
 
 #endif
