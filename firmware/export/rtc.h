@@ -22,7 +22,16 @@
 #include <stdbool.h> 
 
 #ifdef CONFIG_RTC
+
+/* Common functions for all targets */
 void rtc_init(void);
+int rtc_read_datetime(unsigned char* buf);
+int rtc_write_datetime(unsigned char* buf);
+
+#if CONFIG_RTC == RTC_M41ST84W
+
+/* The RTC in the Archos devices is used for much more than just the clock 
+   data */
 int rtc_read(unsigned char address);
 int rtc_read_multiple(unsigned char address, unsigned char *buf, int numbytes);
 int rtc_write(unsigned char address, unsigned char value);
@@ -34,6 +43,8 @@ bool rtc_enable_alarm(bool enable);
 bool rtc_check_alarm_started(bool release_alarm);
 bool rtc_check_alarm_flag(void);
 #endif /* HAVE_ALARM_MOD */
+
+#endif /* RTC_M41ST84W */
 
 #endif /* CONFIG_RTC */
 

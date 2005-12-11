@@ -249,4 +249,34 @@ int rtc_read_multiple(unsigned char address, unsigned char *buf, int numbytes)
     i2c_end();
     return ret;
 }
-#endif
+
+int rtc_read_datetime(unsigned char* buf) {
+    int rc;
+
+    rc = rtc_read_multiple(1, buf, 7);
+
+    /* Adjust weekday */
+    if(buf[3] == 7)
+        buf[3]=0;
+
+    return rc;
+}
+
+int rtc_write_datetime(unsigned char* buf) {
+    int i;
+    int rc = 0;
+    
+    /* Adjust weekday */
+    if(buf[3] == 0)
+        buf[3] = 7;
+
+    for (i = 0; i < 7 ; i++)
+    {
+        rc |= rtc_write(i+1, buf[i]);
+    }
+    rc |= rtc_write(8, 0x80); /* Out=1, calibration = 0 */
+
+    return rc;
+}
+
+#endif /* CONFIG_RTC */
