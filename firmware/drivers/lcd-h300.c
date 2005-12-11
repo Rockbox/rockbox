@@ -200,11 +200,19 @@ void lcd_update_rect(int x, int y, int width, int height)
     if(ymax >= LCD_HEIGHT)
         ymax = LCD_HEIGHT-1;
 
-    /* Copy specified rectangle bitmap to hardware */
-    for (; y <= ymax; y++)
-    {
-        lcd_write_reg(0x21, (x << 8) + y);
-        lcd_begin_write_gram();
-        lcd_write_data ((unsigned short *)&lcd_framebuffer[y][x], width);
-    }
+    /* set update window */ 
+    lcd_write_reg(0x44, (ymax<<8) | y); /* horiz ram addr */ 
+    lcd_write_reg(0x45, ((x+width-1)<<8) | x); /* vert ram addr */ 
+    lcd_write_reg(0x21, (x<<8) | y); 
+    lcd_begin_write_gram(); 
+
+    /* Copy specified rectangle bitmap to hardware */ 
+    for (; y <= ymax; y++) 
+    { 
+        lcd_write_data ((unsigned short *)&lcd_framebuffer[y][x], width); 
+    } 
+
+    /* reset update window */ 
+    lcd_write_reg(0x44, 0xaf00); /* horiz ram addr: 0 - 175 */ 
+    lcd_write_reg(0x45, 0xdb00); /* vert ram addr: 0 - 219 */ 
 }
