@@ -1829,6 +1829,7 @@ int main(char* filename)
     if (grayscales < 33 || buf_size <= 0)
     {
         rb->splash(HZ*2, true, "gray buf error");
+        rb->close(fd);
         return PLUGIN_ERROR;
     }
 
