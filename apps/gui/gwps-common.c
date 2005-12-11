@@ -605,7 +605,7 @@ static char* get_tag(struct wps_data* wps_data,
                     snprintf(buf, buf_size, "%d", *intval);
                     return buf;
 
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
                 case 'h': /* hold */
                     *flags |= WPS_REFRESH_DYNAMIC;
                     if (button_hold())
