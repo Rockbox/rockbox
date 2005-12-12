@@ -124,9 +124,7 @@ struct codec_api ci = {
     /* kernel/ system */
     PREFIX(sleep),
     yield,
-#if CONFIG_CPU != PP5020
     &current_tick,
-#endif
     default_event_handler,
     default_event_handler_ex,
     create_thread,
