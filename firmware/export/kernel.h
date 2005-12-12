@@ -66,12 +66,7 @@ struct mutex
 };
 
 /* global tick variable */
-#if (CONFIG_CPU==PP5020)
-/* A temporary hack until timer interrupt is enabled - use the RTC */
-#define current_tick ((*((volatile long*)0x60005010))/10000)
-#else
 extern long current_tick;
-#endif
 
 #ifdef SIMULATOR
 #define sleep(x) sim_sleep(x)

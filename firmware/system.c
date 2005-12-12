@@ -1106,14 +1106,28 @@ int system_memory_guard(int newmode)
 }
 #elif CONFIG_CPU==PP5020
 
-/* TODO: Implement system.c */
+extern void TIMER1(void);
 
-void system_init(void) {
-
+void irq(void)
+{
+    if (PP5020_CPU_INT_STAT & PP5020_TIMER1_MASK) 
+        TIMER1();
 }
 
-void system_reboot(void) {
+void system_init(void)
+{
+    /* disable all irqs */
+    outl(-1, 0x60001138);
+    outl(-1, 0x60001128);
+    outl(-1, 0x6000111c);
 
+    outl(-1, 0x60001038);
+    outl(-1, 0x60001028);
+    outl(-1, 0x6000101c);
+}
+
+void system_reboot(void)
+{
 }
 
 int system_memory_guard(int newmode)

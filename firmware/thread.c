@@ -251,8 +251,6 @@ void switch_thread(void)
 #ifdef SIMULATOR
     /* Do nothing */
 #else
-/* We currently have no interrupts on iPod targets, so remove this temp. */
-#if CONFIG_CPU != PP5020
     while (num_sleepers == num_threads)
     {
         /* Enter sleep mode, woken up on interrupt */
@@ -270,7 +268,6 @@ void switch_thread(void)
          */
 #endif
     }
-#endif
 #endif
     current = current_thread;
     store_context(&thread_contexts[current]);

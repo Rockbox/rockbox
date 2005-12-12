@@ -25,9 +25,7 @@
 #include "system.h"
 #include "panic.h"
 
-#if (CONFIG_CPU != PP5020)
 long current_tick = 0;
-#endif
 
 static void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
 
@@ -319,9 +317,36 @@ void tick_start(unsigned int interval_in_ms)
 
 #elif CONFIG_CPU == PP5020
 
-void tick_start(unsigned int interval_in_ms) {
-  /* TODO:  Implement tick_start */
-  (void)interval_in_ms;
+#define USECS_PER_INT 0x2710
+
+void TIMER1(void)
+{
+    int i;
+
+    PP5020_TIMER1_ACK;
+    /* Run through the list of tick tasks */
+    for (i = 0;i < MAX_NUM_TICK_TASKS;i++)
+    {
+        if (tick_funcs[i])
+        {
+            tick_funcs[i]();
+        }
+    }
+
+    current_tick++;
+    wake_up_thread();
+}
+
+void tick_start(unsigned int interval_in_ms)
+{
+    /* TODO: use interval_in_ms to set timer periode */
+    (void)interval_in_ms;
+    PP5020_TIMER1 = 0x0;
+    PP5020_TIMER1_ACK;
+    /* enable timer, period, trigger value 0x2710 -> 100Hz */
+    PP5020_TIMER1 = 0xc0000000 | USECS_PER_INT;
+    /* unmask interrupt source */
+    PP5020_CPU_INT_EN = PP5020_TIMER1_MASK;
 }
 
 #endif

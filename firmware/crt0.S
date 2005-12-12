@@ -275,6 +275,8 @@ ecode:
     .word  fiq_handler
 ecodeend:
 
+    .global irq
+
 undef_instr_handler:
 software_int_handler:
 reserved_handler:
@@ -288,6 +290,9 @@ data_abort_handler:
     subs   pc, lr, #8
 
 irq_handler:
+    stmfd  sp!, {r0-r3, r12, lr}
+    bl     irq
+    ldmfd  sp!, {r0-r3, r12, lr}
     subs   pc, lr, #4
     
 /* 256 words of IRQ stack */
