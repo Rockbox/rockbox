@@ -19,29 +19,79 @@
 #include "config.h"
 #include "cpu.h"
 
-#if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
+#if defined(CPU_ARM)
     .section .init.text,"ax",%progbits
 #else
     .section .init.text,"ax",@progbits
 #endif
+
     .global    start
 start:
-#if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
 
-/* Based on startup.s from the iPodLinux loader
+#if defined(CPU_ARM)
+
+/* iPod bootloader and startup code based on startup.s from the iPodLinux loader
  *
  * Copyright (c) 2003, Daniel Palffy (dpalffy (at) rainstorm.org)
  * Copyright (c) 2005, Bernard Leach <leachbj@bouncycastle.org>
  *
  */
-    .equ    PP5002_PROC_ID,  0xc4000000
-    .equ    PP5002_COP_CTRL, 0xcf004058
-    .equ    PP5020_PROC_ID,  0x60000000
-    .equ    PP5020_COP_CTRL, 0x60007004
 
-start:
 #ifndef BOOTLOADER
-/* Zero out IBSS */
+#if CONFIG_CPU == PP5002 || CONFIG_CPU == PP5020
+    b      pad_skip
+.space 50*4 /* (more than enough) space for exception vectors */
+pad_skip:
+    /* We need to remap memory from wherever SDRAM is mapped natively, to
+       base address 0, so we can put our exception vectors there. We don't
+       want to do this remapping while executing from SDRAM, so we copy the
+       remapping code to IRAM, then execute from there. Hence, the following
+       code is compiled for address 0, but is currently executing at either
+       0x28000000 or 0x10000000, depending on chipset version. Do not use any
+       absolute addresses until remapping has been done. */
+    ldr    r1, =0x40000000
+    ldr    r2, =remap_start
+    ldr    r3, =remap_end
+
+    and    r5, pc, #0xff000000 /* adjust for execute address */
+    orr    r2, r2, r5
+    orr    r3, r3, r5
+
+    /* copy the code to 0x40000000 */
+1:
+    ldr    r4, [r2], #4
+    str    r4, [r1], #4
+    cmp    r2, r3
+    ble    1b
+
+    ldr    r3, =0x3f84     /* r3 and r1 values here are magic, don't touch */
+    orr    r3, r3, r5      /* adjust for execute address */
+    ldr    r2, =0xf000f014
+    mov    r1, #0x3a00
+    ldr    r0, =0xf000f010
+    ldr    r4, =0x40000000
+    mov    pc, r4
+
+remap_start:
+    str    r1, [r0]
+    str    r3, [r2]
+    ldr    r0, L_post_remap
+    mov    pc, r0
+L_post_remap: .word remap_end
+remap_end:
+#endif /* PP specific */
+
+    /* Copy exception handler code to address 0 */
+    ldr    r2, =ecode
+    ldr    r3, =ecodeend
+    mov    r4, #0 
+1:
+    cmp    r3, r2
+    ldrhi  r5, [r2], #4
+    strhi  r5, [r4], #4
+    bhi    1b
+    
+    /* Zero out IBSS */
     ldr    r2, =_iedata
     ldr    r3, =_iend
     mov    r4, #0
@@ -50,7 +100,7 @@ start:
     strhi  r4, [r2], #4
     bhi    1b
 
-/* Copy the IRAM */
+    /* Copy the IRAM */
     ldr    r2, =_iramcopy
     ldr    r3, =_iramstart
     ldr    r4, =_iramend
@@ -59,7 +109,7 @@ start:
     ldrhi  r5, [r2], #4
     strhi  r5, [r3], #4
     bhi    1b
-#endif
+#endif /* !BOOTLOADER */
 
     /* Initialise bss section to zero */
     ldr    r2, =_edata
@@ -81,6 +131,11 @@ start:
     bhi    1b
 
 #ifdef BOOTLOADER
+#if CONFIG_CPU == PP5002 || CONFIG_CPU == PP5020
+    .equ    PP5002_PROC_ID,  0xc4000000
+    .equ    PP5002_COP_CTRL, 0xcf004058
+    .equ    PP5020_PROC_ID,  0x60000000
+    .equ    PP5020_COP_CTRL, 0x60007004
     /* TODO: the high part of the address is probably dependent on CONFIG_CPU.
        Since we tend to use ifdefs for each chipset target
        anyway, we might as well just hardcode it here.
@@ -146,6 +201,8 @@ start_loc:
     ldr    r1, =startup_loc
     str    r0, [r1]
 
+#if 0
+/* TODO: fix something for the COP to wake up to, until then let it sleep. */
 #if CONFIG_CPU==PP5002
     /* make sure COP is sleeping */
     ldr    r4, =0xcf004050
@@ -167,11 +224,11 @@ start_loc:
     beq    1b
 
     /* wake up COP */
-    @ ldr    r4, =PP5020_COP_CTRL
+    @ldr    r4, =PP5020_COP_CTRL
     mov    r3, #0x0
     str    r3, [r4]
-#endif
-
+#endif 
+#endif 
     /* jump to start location */
     mov    pc, r0
 
@@ -183,11 +240,61 @@ startup_loc:
 boot_table:
     /* here comes the boot table, don't move its offset */
     .space 400
-#else
-    /* Non-bootloader startup code */
-    ldr    r0, =main
-    mov    pc, r0 
-#endif /* BOOTLOADER (iPod) */
+#endif /* PP specific */
+/* Code for ARM bootloader targets other than iPod go here */
+#else /* BOOTLOADER */
+    
+    /* Set up stack for IRQ mode */ 
+    msr    cpsr_c, #0xd2
+    ldr    sp, =irq_stack
+    /* Switch to supervisor mode, enable IRQ and FIQ processing */
+    msr    cpsr_c, #0x13
+    ldr    sp, =stackend
+    bl     main
+    /* main() should never return */
+
+/* Exception handlers. Will be copied to address 0 after memory remapping */
+ecode:
+    ldr    pc, [pc, #24]
+    ldr    pc, [pc, #24]
+    ldr    pc, [pc, #24]
+    ldr    pc, [pc, #24]
+    ldr    pc, [pc, #24]
+    ldr    pc, [pc, #24]
+    ldr    pc, [pc, #24]
+    ldr    pc, [pc, #24]
+
+    /* Exception vectors */
+    .word  start 
+    .word  undef_instr_handler
+    .word  software_int_handler
+    .word  prefetch_abort_handler
+    .word  data_abort_handler
+    .word  reserved_handler
+    .word  irq_handler
+    .word  fiq_handler
+ecodeend:
+
+undef_instr_handler:
+software_int_handler:
+reserved_handler:
+    movs   pc, lr
+
+prefetch_abort_handler:
+fiq_handler:
+    subs   pc, lr, #4
+
+data_abort_handler:
+    subs   pc, lr, #8
+
+irq_handler:
+    subs   pc, lr, #4
+    
+/* 256 words of IRQ stack */
+    .space 256*4
+irq_stack:
+
+#endif /* BOOTLOADER */ 
 
 #elif CONFIG_CPU == TCC730
     /* Platform:     Gmini 120/SP */
