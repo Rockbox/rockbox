@@ -111,8 +111,8 @@ include $(TOOLSDIR)/make.inc
 
 $(BUILDDIR)/libplugin.a:
 	@echo "MAKE in plugin/lib"
-	@mkdir -p $(OBJDIR)/lib
-	@$(MAKE) -C lib OBJDIR=$(OBJDIR)/lib
+	$(SILENT)mkdir -p $(OBJDIR)/lib
+	$(SILENT)$(MAKE) -C lib OBJDIR=$(OBJDIR)/lib
 
 $(LINKFILE): $(LDS)
 	@echo "build $@"
@@ -120,8 +120,8 @@ $(LINKFILE): $(LDS)
 
 $(SUBDIRS):
 	@echo "MAKE in $@"
-	@mkdir -p $(OBJDIR)/$@
-	@$(MAKE) -C $@ OUTDIR=$(OBJDIR) OBJDIR=$(OBJDIR)/$@
+	$(SILENT)mkdir -p $(OBJDIR)/$@
+	$(SILENT)$(MAKE) -C $@ OUTDIR=$(OBJDIR) OBJDIR=$(OBJDIR)/$@
 
 clean:
 	@echo "cleaning plugins"
