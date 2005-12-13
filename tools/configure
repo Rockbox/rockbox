@@ -951,7 +951,10 @@ tags:
 	\$(MAKE) -C \$(APPSDIR)/plugins/lib tags
 
 zip:
-	\$(TOOLSDIR)/buildzip.pl -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
+	@\$(TOOLSDIR)/buildzip.pl -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
+
+7zip:
+	@\$(TOOLSDIR)/buildzip.pl -o "rockbox.7z" -z "7za a" -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
 EOF
 
 if [ "yes" = "$simulator" ]; then
