@@ -10,24 +10,49 @@
 
 $ROOT="..";
 
-if($ARGV[0] eq "-r") {
-    $ROOT=$ARGV[1];
-    shift @ARGV;
-    shift @ARGV;    
+
+
+my $ziptool="zip";
+my $output="rockbox.zip";
+my $verbose;
+my $exe;
+my $target;
+
+while(1) {
+    if($ARGV[0] eq "-r") {
+        $ROOT=$ARGV[1];
+        shift @ARGV;
+        shift @ARGV;    
+    }
+
+    elsif($ARGV[0] eq "-z") {
+        $ziptool=$ARGV[1];
+        shift @ARGV;
+        shift @ARGV;    
+    }
+
+    elsif($ARGV[0] eq "-o") {
+        $output=$ARGV[1];
+        shift @ARGV;
+        shift @ARGV;    
+    }
+
+    elsif($ARGV[0] eq "-v") {
+        $verbose =1;
+        shift @ARGV;
+    }
+    else {
+        $target = $ARGV[0];
+        $exe = $ARGV[1];
+        last;
+    }
 }
 
-my $verbose;
-if($ARGV[0] eq "-v") {
-    $verbose =1;
-    shift @ARGV;
-}
 
 my $firmdir="$ROOT/firmware";
 
-my $target = $ARGV[0];
 my $cppdef = $target;
 
-my $exe = $ARGV[1];
 
 sub filesize {
     my ($filename)=@_;
@@ -198,10 +223,10 @@ sub buildzip {
     buildlangs(".rockbox/langs");
 
     `rm -f $zip`;
-    `find .rockbox | zip $zip -@ >/dev/null`;
+    `find .rockbox | xargs $ziptool $zip >/dev/null`;
 
     if($image) {
-        `zip $zip $image`;
+        `$ziptool $zip $image`;
     }
 
     # remove the .rockbox afterwards
@@ -222,7 +247,7 @@ sub runone {
     my ($type, $target)=@_;
 
     # build a full install zip file 
-    buildzip("rockbox.zip", $target,
+    buildzip($output, $target,
              ($type eq "player")?0:1);
 };
 
