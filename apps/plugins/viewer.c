@@ -128,6 +128,8 @@
 #define VIEWER_MODE_WRAP (BUTTON_SELECT | BUTTON_LEFT)
 #define VIEWER_MODE_LINE (BUTTON_SELECT | BUTTON_PLAY)
 #define VIEWER_MODE_WIDTH (BUTTON_SELECT | BUTTON_RIGHT)
+#define VIEWER_MODE_PAGE (BUTTON_SELECT | BUTTON_LEFT | BUTTON_MENU)
+#define VIEWER_MODE_SCROLLBAR (BUTTON_SELECT | BUTTON_LEFT | BUTTON_RIGHT)
 
 #endif
 
@@ -1169,7 +1171,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 break;
 
 #if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == ONDIO_PAD) \
-    || (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+    || (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
             case VIEWER_MODE_PAGE:
                 /* Page-overlap mode */
                 if (++page_mode == PAGE_MODES)
