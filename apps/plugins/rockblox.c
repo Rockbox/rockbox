@@ -22,6 +22,20 @@
 
 #ifdef HAVE_LCD_BITMAP
 
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+#define ROCKBLOX_OFF   BUTTON_MENU
+#define ROCKBLOX_UP    BUTTON_SCROLL_BACK
+#define ROCKBLOX_DOWN  BUTTON_SCROLL_FWD
+#define ROCKBLOX_LEFT  BUTTON_LEFT
+#define ROCKBLOX_RIGHT BUTTON_RIGHT
+#else
+#define ROCKBLOX_OFF   BUTTON_OFF
+#define ROCKBLOX_UP    BUTTON_UP
+#define ROCKBLOX_DOWN  BUTTON_DOWN
+#define ROCKBLOX_LEFT  BUTTON_LEFT
+#define ROCKBLOX_RIGHT BUTTON_RIGHT
+#endif
+
 static const int start_x = 5;
 static const int start_y = 5;
 static const int max_x = 4 * 17;
@@ -338,26 +352,26 @@ static int game_loop(void)
             button = rb->button_get_w_tmo(HZ/10);
             switch(button)
             {
-                case BUTTON_OFF:
+                case ROCKBLOX_OFF:
                     return PLUGIN_OK;
                 
-                case BUTTON_UP:
-                case BUTTON_UP | BUTTON_REPEAT:
+                case ROCKBLOX_UP:
+                case ROCKBLOX_UP | BUTTON_REPEAT:
                     move_block(0,-3,0);
                     break;
                 
-                case BUTTON_DOWN:
-                case BUTTON_DOWN | BUTTON_REPEAT:
+                case ROCKBLOX_DOWN:
+                case ROCKBLOX_DOWN | BUTTON_REPEAT:
                     move_block(0,3,0);
                     break;
                 
-                case BUTTON_RIGHT:
-                case BUTTON_RIGHT | BUTTON_REPEAT:
+                case ROCKBLOX_RIGHT:
+                case ROCKBLOX_RIGHT | BUTTON_REPEAT:
                     move_block(0,0,1);
                     break;
                 
-                case BUTTON_LEFT:
-                case BUTTON_LEFT | BUTTON_REPEAT:
+                case ROCKBLOX_LEFT:
+                case ROCKBLOX_LEFT | BUTTON_REPEAT:
                     move_down();
                     break;
 

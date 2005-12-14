@@ -50,6 +50,11 @@
 #define MOSAIQUE_QUIT BUTTON_OFF
 #define MOSAIQUE_SPEED BUTTON_MODE
 #define MOSAIQUE_RESTART BUTTON_ON
+
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+#define MOSAIQUE_QUIT BUTTON_MENU
+#define MOSAIQUE_SPEED BUTTON_SELECT
+#define MOSAIQUE_RESTART BUTTON_PLAY
 #endif
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)

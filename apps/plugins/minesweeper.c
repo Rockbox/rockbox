@@ -41,6 +41,8 @@ use F3 to see how many mines are left (supposing all your flags are correct)
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
+#define MINESWP_UP BUTTON_UP
+#define MINESWP_DOWN BUTTON_DOWN
 #define MINESWP_QUIT BUTTON_OFF
 #define MINESWP_START BUTTON_ON
 #define MINESWP_TOGGLE BUTTON_PLAY
@@ -50,6 +52,8 @@ use F3 to see how many mines are left (supposing all your flags are correct)
 #define MINESWP_INFO BUTTON_F3
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
+#define MINESWP_UP BUTTON_UP
+#define MINESWP_DOWN BUTTON_DOWN
 #define MINESWP_QUIT BUTTON_OFF
 #define MINESWP_START BUTTON_MENU
 #define MINESWP_TOGGLE_PRE BUTTON_MENU
@@ -59,11 +63,22 @@ use F3 to see how many mines are left (supposing all your flags are correct)
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define MINESWP_UP BUTTON_UP
+#define MINESWP_DOWN BUTTON_DOWN
 #define MINESWP_QUIT BUTTON_OFF
 #define MINESWP_START BUTTON_SELECT
 #define MINESWP_TOGGLE BUTTON_SELECT
 #define MINESWP_DISCOVER BUTTON_ON
 #define MINESWP_INFO BUTTON_MODE
+
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+#define MINESWP_UP BUTTON_SCROLL_BACK
+#define MINESWP_DOWN BUTTON_SCROLL_FWD
+#define MINESWP_QUIT BUTTON_MENU
+#define MINESWP_START BUTTON_SELECT
+#define MINESWP_TOGGLE BUTTON_PLAY
+#define MINESWP_DISCOVER (BUTTON_SELECT | BUTTON_PLAY)
+#define MINESWP_INFO (BUTTON_SELECT | BUTTON_MENU)
 
 #endif
 
@@ -323,11 +338,11 @@ int minesweeper(void)
 
         button = rb->button_get(true);
         switch(button){
-            case BUTTON_DOWN:
+            case MINESWP_DOWN:
                 p = (p + 98)%100;
                 break;
 
-            case BUTTON_UP:
+            case MINESWP_UP:
                 p = (p + 2)%100;
                 break;
 
@@ -431,14 +446,14 @@ int minesweeper(void)
                 break;
 
                 /* move cursor down */
-            case BUTTON_DOWN:
-            case (BUTTON_DOWN | BUTTON_REPEAT):
+            case MINESWP_DOWN:
+            case (MINESWP_DOWN | BUTTON_REPEAT):
                 y = (y + 1)%height;
                 break;
 
                 /* move cursor up */
-            case BUTTON_UP:
-            case (BUTTON_UP | BUTTON_REPEAT):
+            case MINESWP_UP:
+            case (MINESWP_UP | BUTTON_REPEAT):
                 y = (y + height - 1)%height;
                 break;
 

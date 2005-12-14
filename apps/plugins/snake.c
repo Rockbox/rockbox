@@ -36,16 +36,29 @@ dir is the current direction of the snake - 0=up, 1=right, 2=down, 3=left;
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define SNAKE_QUIT BUTTON_OFF
+#define SNAKE_UP   BUTTON_UP
+#define SNAKE_DOWN BUTTON_DOWN
 #define SNAKE_PLAYPAUSE BUTTON_PLAY
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define SNAKE_QUIT BUTTON_OFF
+#define SNAKE_UP   BUTTON_UP
+#define SNAKE_DOWN BUTTON_DOWN
 #define SNAKE_PLAYPAUSE BUTTON_MENU
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define SNAKE_QUIT BUTTON_OFF
+#define SNAKE_UP   BUTTON_UP
+#define SNAKE_DOWN BUTTON_DOWN
 #define SNAKE_PLAYPAUSE BUTTON_ON
+
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+
+#define SNAKE_QUIT (BUTTON_SELECT|BUTTON_MENU)
+#define SNAKE_UP   BUTTON_MENU
+#define SNAKE_DOWN BUTTON_PLAY
+#define SNAKE_PLAYPAUSE BUTTON_SELECT
 
 #else
 #error "lacks keymapping"
@@ -236,13 +249,13 @@ void game (void) {
 
         button=rb->button_get(false);
         switch (button) {
-             case BUTTON_UP:
+             case SNAKE_UP:
                  if (dir!=2) dir=0;
                  break;
              case BUTTON_RIGHT:
                  if (dir!=3) dir=1;
                  break;
-             case BUTTON_DOWN:
+             case SNAKE_DOWN:
                  if (dir!=0) dir=2;
                  break;
              case BUTTON_LEFT:
@@ -300,12 +313,12 @@ void game_init(void) {
         button=rb->button_get(true);
         switch (button) {
             case BUTTON_RIGHT:
-            case BUTTON_UP:
+            case SNAKE_UP:
                 if (level<9) 
                     level++;
                 break;
             case BUTTON_LEFT:
-            case BUTTON_DOWN:
+            case SNAKE_DOWN:
                 if (level>1)
                     level--;
                 break;

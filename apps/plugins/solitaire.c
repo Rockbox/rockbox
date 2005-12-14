@@ -101,6 +101,22 @@ static struct plugin_api* rb;
 #define SOL_MENU_RUN2 BUTTON_RIGHT
 #define SOL_MENU_INFO BUTTON_MODE
 #define SOL_MENU_INFO2 BUTTON_REC
+
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+
+#define SOL_QUIT (BUTTON_SELECT | BUTTON_MENU)
+#define SOL_UP BUTTON_MENU
+#define SOL_DOWN BUTTON_PLAY
+#define SOL_LEFT BUTTON_LEFT
+#define SOL_RIGHT BUTTON_RIGHT
+#define SOL_MOVE BUTTON_SELECT
+#define SOL_DRAW (BUTTON_SELECT | BUTTON_PLAY)
+#define SOL_REM2CUR (BUTTON_SELECT | BUTTON_LEFT)
+#define SOL_CUR2STACK (BUTTON_SELECT | BUTTON_RIGHT)
+#define SOL_REM2STACK (BUTTON_LEFT | BUTTON_RIGHT)
+#define SOL_MENU_RUN BUTTON_SELECT
+#define SOL_MENU_INFO (BUTTON_PLAY | BUTTON_MENU)
+
 #endif
 
 /* common help definitions */
@@ -131,6 +147,13 @@ static struct plugin_api* rb;
 #define HELP_SOL_REM2CUR "PLAY+LEFT: Put the card on top of the remains' stack on top of the cursor."
 #define HELP_SOL_CUR2STACK "SELECT..: Put the card under the cursor on one of the 4 final stacks."
 #define HELP_SOL_REM2STACK "PLAY+RIGHT: Put the card on top of the remains' stack on one of the 4 final stacks."
+
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+#define HELP_SOL_MOVE "SELECT: Select cards, Move cards, reveal hidden cards ..."
+#define HELP_SOL_DRAW "SELECT+PLAY: Un-select a card if it was selected. Else, draw 3 new cards out of the remains' stack."
+#define HELP_SOL_REM2CUR "SELECT+LEFT: Put the card on top of the remains' stack on top of the cursor."
+#define HELP_SOL_CUR2STACK "SELECT+RIGHT..: Put the card under the cursor on one of the 4 final stacks."
+#define HELP_SOL_REM2STACK "LEFT+RIGHT: Put the card on top of the remains' stack on one of the 4 final stacks."
 
 #endif
 
@@ -540,11 +563,11 @@ int solitaire_menu(unsigned char when)
 
         button = rb->button_get(true);
         switch(button){
-            case BUTTON_UP:
+            case SOL_UP:
                 cursor = (cursor + MENU_LENGTH - 1)%MENU_LENGTH;
                 break;
 
-            case BUTTON_DOWN:
+            case SOL_DOWN:
                 cursor = (cursor + 1)%MENU_LENGTH;
                 break;
 
@@ -576,7 +599,7 @@ int solitaire_menu(unsigned char when)
                 rb->splash(HZ, true, "Solitaire for Rockbox by dionoea");
                 break;
 
-            case BUTTON_OFF:
+            case SOL_QUIT:
                 return MENU_QUIT;
 
             default:

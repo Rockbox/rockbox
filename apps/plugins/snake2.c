@@ -57,6 +57,8 @@ Head and Tail are stored
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
+#define SNAKE2_UP   BUTTON_UP
+#define SNAKE2_DOWN BUTTON_DOWN
 #define SNAKE2_QUIT BUTTON_OFF
 #define SNAKE2_LEVEL_UP BUTTON_UP
 #define SNAKE2_LEVEL_UP2 BUTTON_RIGHT
@@ -67,6 +69,8 @@ Head and Tail are stored
 #define SNAKE2_PLAYPAUSE BUTTON_PLAY
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
+#define SNAKE2_UP   BUTTON_UP
+#define SNAKE2_DOWN BUTTON_DOWN
 #define SNAKE2_QUIT BUTTON_OFF
 #define SNAKE2_LEVEL_UP BUTTON_UP
 #define SNAKE2_LEVEL_DOWN BUTTON_DOWN
@@ -76,6 +80,8 @@ Head and Tail are stored
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define SNAKE2_UP   BUTTON_UP
+#define SNAKE2_DOWN BUTTON_DOWN
 #define SNAKE2_QUIT BUTTON_OFF
 #define SNAKE2_LEVEL_UP BUTTON_UP
 #define SNAKE2_LEVEL_UP2 BUTTON_RIGHT
@@ -84,6 +90,18 @@ Head and Tail are stored
 #define SNAKE2_SELECT_MAZE BUTTON_REC
 #define SNAKE2_SELECT_TYPE BUTTON_MODE
 #define SNAKE2_PLAYPAUSE BUTTON_ON
+
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+
+#define SNAKE2_UP   BUTTON_MENU
+#define SNAKE2_DOWN BUTTON_PLAY
+#define SNAKE2_QUIT (BUTTON_SELECT | BUTTON_MENU)
+#define SNAKE2_LEVEL_UP BUTTON_SCROLL_FWD
+#define SNAKE2_LEVEL_DOWN BUTTON_SCROLL_BACK
+#define SNAKE2_SELECT_MAZE BUTTON_LEFT
+#define SNAKE2_SELECT_TYPE BUTTON_RIGHT
+#define SNAKE2_PLAYPAUSE BUTTON_SELECT
+
 #else
 #error "lacks keymapping"
 #endif
@@ -1247,8 +1265,8 @@ void game (void)
         button = rb->button_get(false);
         switch (button)
         {
-             case BUTTON_UP:
-             case BUTTON_UP | BUTTON_REPEAT:             
+             case SNAKE2_UP:
+             case SNAKE2_UP | BUTTON_REPEAT:             
                  if (dir != SOUTH) set_direction(NORTH);
                  break;
 
@@ -1257,8 +1275,8 @@ void game (void)
                  if (dir != WEST) set_direction(EAST); 
                  break;
 
-             case BUTTON_DOWN:
-             case BUTTON_DOWN | BUTTON_REPEAT:
+             case SNAKE2_DOWN:
+             case SNAKE2_DOWN | BUTTON_REPEAT:
                  if (dir != NORTH) set_direction(SOUTH);
                  break;
 

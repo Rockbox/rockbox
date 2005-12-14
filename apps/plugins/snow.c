@@ -34,6 +34,8 @@
 /* variable button definitions */
 #if CONFIG_KEYPAD == PLAYER_PAD
 #define SNOW_QUIT BUTTON_STOP
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+#define SNOW_QUIT BUTTON_MENU
 #else
 #define SNOW_QUIT BUTTON_OFF
 #endif

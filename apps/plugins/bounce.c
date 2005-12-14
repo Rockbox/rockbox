@@ -32,17 +32,30 @@
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
+#define BOUNCE_UP   BUTTON_UP
+#define BOUNCE_DOWN BUTTON_DOWN
 #define BOUNCE_QUIT (BUTTON_OFF | BUTTON_REL)
 #define BOUNCE_MODE (BUTTON_ON | BUTTON_REL)
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
+#define BOUNCE_UP   BUTTON_UP
+#define BOUNCE_DOWN BUTTON_DOWN
 #define BOUNCE_QUIT (BUTTON_OFF | BUTTON_REL)
 #define BOUNCE_MODE (BUTTON_MENU | BUTTON_REL)
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define BOUNCE_UP   BUTTON_UP
+#define BOUNCE_DOWN BUTTON_DOWN
 #define BOUNCE_QUIT (BUTTON_OFF | BUTTON_REL)
 #define BOUNCE_MODE (BUTTON_SELECT | BUTTON_REL)
+
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+#define BOUNCE_UP   BUTTON_SCROLL_BACK
+#define BOUNCE_DOWN BUTTON_SCROLL_FWD
+#define BOUNCE_QUIT (BUTTON_MENU | BUTTON_REL)
+#define BOUNCE_MODE (BUTTON_SELECT | BUTTON_REL)
+
 #endif
 
 static struct plugin_api* rb;
@@ -396,11 +409,11 @@ static int loopit(void)
                 case BUTTON_RIGHT:
                   values[show].num++;
                   break;
-                case BUTTON_UP:
+                case BOUNCE_UP:
                   if(++show == NUM_LAST)
                       show=0;
                   break;
-                case BUTTON_DOWN:
+                case BOUNCE_DOWN:
                   if(--show < 0)
                       show=NUM_LAST-1;
                   break;

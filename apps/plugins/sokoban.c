@@ -35,6 +35,8 @@
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
+#define SOKOBAN_UP BUTTON_UP
+#define SOKOBAN_DOWN BUTTON_DOWN
 #define SOKOBAN_QUIT BUTTON_OFF
 #define SOKOBAN_UNDO BUTTON_ON
 #define SOKOBAN_LEVEL_UP BUTTON_F3
@@ -42,6 +44,8 @@
 #define SOKOBAN_LEVEL_REPEAT BUTTON_F2
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
+#define SOKOBAN_UP BUTTON_UP
+#define SOKOBAN_DOWN BUTTON_DOWN
 #define SOKOBAN_QUIT BUTTON_OFF
 #define SOKOBAN_UNDO_PRE BUTTON_MENU
 #define SOKOBAN_UNDO (BUTTON_MENU | BUTTON_REL)
@@ -51,11 +55,24 @@
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define SOKOBAN_UP BUTTON_UP
+#define SOKOBAN_DOWN BUTTON_DOWN
 #define SOKOBAN_QUIT BUTTON_OFF
 #define SOKOBAN_UNDO BUTTON_ON
 #define SOKOBAN_LEVEL_UP BUTTON_MODE
 #define SOKOBAN_LEVEL_DOWN BUTTON_REC
 #define SOKOBAN_LEVEL_REPEAT BUTTON_SELECT
+
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+#define SOKOBAN_UP BUTTON_MENU
+#define SOKOBAN_DOWN BUTTON_PLAY
+#define SOKOBAN_QUIT (BUTTON_SELECT | BUTTON_MENU)
+#define SOKOBAN_UNDO_PRE BUTTON_SELECT
+#define SOKOBAN_UNDO (BUTTON_SELECT | BUTTON_REL)
+#define SOKOBAN_LEVEL_UP (BUTTON_SELECT | BUTTON_RIGHT)
+#define SOKOBAN_LEVEL_DOWN (BUTTON_SELECT | BUTTON_LEFT)
+#define SOKOBAN_LEVEL_REPEAT (BUTTON_SELECT | BUTTON_PLAY)
+
 #endif
 
 #if LCD_DEPTH > 1
@@ -180,7 +197,7 @@ static void add_undo(int button)
     bool storable;
 
     if ((button != BUTTON_LEFT) && (button != BUTTON_RIGHT) &&
-        (button != BUTTON_UP) && (button != BUTTON_DOWN))
+        (button != SOKOBAN_UP) && (button != SOKOBAN_DOWN))
         return;
 
     if (undo_info.count != 0) {
@@ -223,13 +240,13 @@ static void add_undo(int button)
                 storable = false;
             break;
 
-        case BUTTON_UP:
+        case SOKOBAN_UP:
             row--;
             if (row < 0)
                 storable = false;
             break;
             
-        case BUTTON_DOWN:
+        case SOKOBAN_DOWN:
             row++;
             if (row >= ROWS)
                 storable = false;
@@ -514,7 +531,7 @@ static bool sokoban_loop(void)
 
         switch(button) 
         {
-            case BUTTON_OFF:
+            case SOKOBAN_QUIT:
                 /* get out of here */
                 return PLUGIN_OK;
 
@@ -691,7 +708,7 @@ static bool sokoban_loop(void)
                     current_info.player.col++;
                 break;
 
-            case BUTTON_UP:
+            case SOKOBAN_UP:
                 switch(current_info.board[r-1][c]) {
                     case ' ': /* if it is a blank spot */
                     case '.': /* if it is a home spot */
@@ -756,7 +773,7 @@ static bool sokoban_loop(void)
                     current_info.player.row--;
                 break;
 
-            case BUTTON_DOWN:
+            case SOKOBAN_DOWN:
                 switch(current_info.board[r+1][c]) {
                     case ' ': /* if it is a blank spot */
                     case '.': /* if it is a home spot */

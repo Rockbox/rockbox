@@ -946,6 +946,7 @@ STATIC void chip8 (void)
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD /* only 9 out of 16 chip8 buttons */
+#define CHIP8_OFF  BUTTON_OFF
 #define CHIP8_KEY1 BUTTON_F1
 #define CHIP8_KEY2 BUTTON_UP
 #define CHIP8_KEY3 BUTTON_F3
@@ -957,6 +958,7 @@ STATIC void chip8 (void)
 #define CHIP8_KEY9 BUTTON_ON
 
 #elif CONFIG_KEYPAD == ONDIO_PAD /* even more limited */
+#define CHIP8_OFF  BUTTON_OFF
 #define CHIP8_KEY2 BUTTON_UP
 #define CHIP8_KEY4 BUTTON_LEFT
 #define CHIP8_KEY5 BUTTON_MENU
@@ -965,11 +967,20 @@ STATIC void chip8 (void)
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define CHIP8_OFF  BUTTON_OFF
 #define CHIP8_KEY2 BUTTON_UP
 #define CHIP8_KEY4 BUTTON_LEFT
 #define CHIP8_KEY5 BUTTON_SELECT
 #define CHIP8_KEY6 BUTTON_RIGHT
 #define CHIP8_KEY8 BUTTON_DOWN
+
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+#define CHIP8_OFF  BUTTON_MENU
+#define CHIP8_KEY2 BUTTON_SCROLL_BACK
+#define CHIP8_KEY4 BUTTON_LEFT
+#define CHIP8_KEY5 BUTTON_PLAY
+#define CHIP8_KEY6 BUTTON_RIGHT
+#define CHIP8_KEY8 BUTTON_SCROLL_FWD
 
 #endif
 
@@ -1076,7 +1087,7 @@ static void chip8_keyboard(void)
     int button = rb->button_get(false);
     switch (button)
     {
-    case BUTTON_OFF:                                      /* Abort Emulator */
+    case CHIP8_OFF:                                      /* Abort Emulator */
         chip8_running = 0;
         break;
 

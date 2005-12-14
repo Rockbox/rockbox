@@ -106,6 +106,8 @@ F3: equal to "="
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
+#define CALCULATOR_UP   BUTTON_UP
+#define CALCULATOR_DOWN BUTTON_DOWN
 #define CALCULATOR_QUIT BUTTON_OFF
 #define CALCULATOR_INPUT BUTTON_PLAY
 #define CALCULATOR_CALC BUTTON_F3
@@ -113,6 +115,8 @@ F3: equal to "="
 #define CALCULATOR_CLEAR BUTTON_F1
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
+#define CALCULATOR_UP   BUTTON_UP
+#define CALCULATOR_DOWN BUTTON_DOWN
 #define CALCULATOR_QUIT BUTTON_OFF
 #define CALCULATOR_INPUT_CALC_PRE BUTTON_MENU
 #define CALCULATOR_INPUT (BUTTON_MENU | BUTTON_REL)
@@ -120,11 +124,22 @@ F3: equal to "="
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define CALCULATOR_UP   BUTTON_UP
+#define CALCULATOR_DOWN BUTTON_DOWN
 #define CALCULATOR_QUIT BUTTON_OFF
 #define CALCULATOR_INPUT BUTTON_SELECT
 #define CALCULATOR_CALC BUTTON_ON
 #define CALCULATOR_OPERATORS BUTTON_MODE
 #define CALCULATOR_CLEAR BUTTON_REC
+
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+
+#define CALCULATOR_UP   BUTTON_SCROLL_BACK
+#define CALCULATOR_DOWN BUTTON_SCROLL_FWD
+#define CALCULATOR_QUIT BUTTON_MENU
+#define CALCULATOR_INPUT_CALC_PRE BUTTON_SELECT
+#define CALCULATOR_INPUT (BUTTON_SELECT | BUTTON_REL)
+#define CALCULATOR_CALC (BUTTON_PLAY | BUTTON_REPEAT)
 
 #endif
 
@@ -675,16 +690,16 @@ void moveButton(void){
                 n++;
             break;
 
-        case BUTTON_UP:
-        case BUTTON_UP | BUTTON_REPEAT:
+        case CALCULATOR_UP:
+        case CALCULATOR_UP | BUTTON_REPEAT:
             if (m == 0)
                 m = 4;
             else
                 m--;
             break;
 
-        case BUTTON_DOWN:
-        case BUTTON_DOWN | BUTTON_REPEAT:
+        case CALCULATOR_DOWN:
+        case CALCULATOR_DOWN | BUTTON_REPEAT:
             if (m == 4)
                 m = 0;
             else
@@ -1359,10 +1374,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             case BUTTON_LEFT | BUTTON_REPEAT:
             case BUTTON_RIGHT:
             case BUTTON_RIGHT | BUTTON_REPEAT:
-            case BUTTON_UP:
-            case BUTTON_UP | BUTTON_REPEAT:
-            case BUTTON_DOWN:
-            case BUTTON_DOWN | BUTTON_REPEAT:
+            case CALCULATOR_UP:
+            case CALCULATOR_UP | BUTTON_REPEAT:
+            case CALCULATOR_DOWN:
+            case CALCULATOR_DOWN | BUTTON_REPEAT:
                 moveButton();
                 break;
             case CALCULATOR_QUIT:

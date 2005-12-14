@@ -68,12 +68,16 @@ Example ".ss" file, and one with a saved state:
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define SUDOKU_BUTTON_QUIT BUTTON_OFF
+#define SUDOKU_BUTTON_UP BUTTON_UP
+#define SUDOKU_BUTTON_DOWN BUTTON_DOWN
 #define SUDOKU_BUTTON_TOGGLE BUTTON_PLAY
 #define SUDOKU_BUTTON_MENU BUTTON_F1
 #define SUDOKU_BUTTON_POSSIBLE BUTTON_F2
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define SUDOKU_BUTTON_QUIT BUTTON_OFF
+#define SUDOKU_BUTTON_UP BUTTON_UP
+#define SUDOKU_BUTTON_DOWN BUTTON_DOWN
 #define SUDOKU_BUTTON_ALTTOGGLE (BUTTON_MENU | BUTTON_DOWN)
 #define SUDOKU_BUTTON_TOGGLE_PRE BUTTON_MENU
 #define SUDOKU_BUTTON_TOGGLE (BUTTON_MENU | BUTTON_REL)
@@ -84,10 +88,22 @@ Example ".ss" file, and one with a saved state:
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define SUDOKU_BUTTON_QUIT BUTTON_OFF
+#define SUDOKU_BUTTON_UP BUTTON_UP
+#define SUDOKU_BUTTON_DOWN BUTTON_DOWN
 #define SUDOKU_BUTTON_ALTTOGGLE BUTTON_ON
 #define SUDOKU_BUTTON_TOGGLE BUTTON_SELECT
 #define SUDOKU_BUTTON_MENU BUTTON_MODE
 #define SUDOKU_BUTTON_POSSIBLE BUTTON_REC
+
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+
+#define SUDOKU_BUTTON_QUIT (BUTTON_SELECT | BUTTON_MENU)
+#define SUDOKU_BUTTON_UP BUTTON_SCROLL_BACK
+#define SUDOKU_BUTTON_DOWN BUTTON_SCROLL_FWD
+#define SUDOKU_BUTTON_TOGGLE BUTTON_SELECT
+#define SUDOKU_BUTTON_MENU BUTTON_MENU
+#define SUDOKU_BUTTON_POSSIBLE (BUTTON_SELECT | BUTTON_LEFT)
+
 
 #elif
   #error SUDOKU: Unsupported keypad
@@ -2195,8 +2211,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         break;
 
       /* move cursor up */
-      case BUTTON_UP:
-      case (BUTTON_UP | BUTTON_REPEAT):
+      case SUDOKU_BUTTON_UP:
+      case (SUDOKU_BUTTON_UP | BUTTON_REPEAT):
         if (state.y==0) {
           move_cursor(&state,state.x,8);
         } else { 
@@ -2205,8 +2221,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         break;
 
       /* move cursor down */
-      case BUTTON_DOWN:
-      case (BUTTON_DOWN | BUTTON_REPEAT):
+      case SUDOKU_BUTTON_DOWN:
+      case (SUDOKU_BUTTON_DOWN | BUTTON_REPEAT):
         if (state.y==8) {
           move_cursor(&state,state.x,0);
         } else { 

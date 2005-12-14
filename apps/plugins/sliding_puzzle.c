@@ -22,11 +22,15 @@
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define PUZZLE_QUIT BUTTON_OFF
+#define PUZZLE_UP BUTTON_UP
+#define PUZZLE_DOWN BUTTON_DOWN
 #define PUZZLE_SHUFFLE BUTTON_F1
 #define PUZZLE_PICTURE BUTTON_F2
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define PUZZLE_QUIT BUTTON_OFF
+#define PUZZLE_UP BUTTON_UP
+#define PUZZLE_DOWN BUTTON_DOWN
 #define PUZZLE_SHUFFLE_PICTURE_PRE BUTTON_MENU
 #define PUZZLE_SHUFFLE (BUTTON_MENU | BUTTON_REPEAT)
 #define PUZZLE_PICTURE (BUTTON_MENU | BUTTON_REL)
@@ -34,8 +38,18 @@
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define PUZZLE_QUIT BUTTON_OFF
+#define PUZZLE_UP BUTTON_UP
+#define PUZZLE_DOWN BUTTON_DOWN
 #define PUZZLE_SHUFFLE BUTTON_SELECT
 #define PUZZLE_PICTURE BUTTON_ON
+
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+#define PUZZLE_QUIT BUTTON_MENU
+#define PUZZLE_UP BUTTON_SCROLL_BACK
+#define PUZZLE_DOWN BUTTON_SCROLL_FWD
+#define PUZZLE_SHUFFLE BUTTON_SELECT
+#define PUZZLE_PICTURE BUTTON_PLAY
+
 #endif
 
 static struct plugin_api* rb;
@@ -295,12 +309,12 @@ static int puzzle_loop(void)
                     move_spot(1, 0);
                 break;
     
-            case BUTTON_UP:
+            case PUZZLE_UP:
                 if ((hole/5)<3 && !puzzle_finished())
                     move_spot(0, -1);
                 break;
     
-            case BUTTON_DOWN:
+            case PUZZLE_DOWN:
                 if ((hole/5)>0 && !puzzle_finished())
                     move_spot(0, 1);
                 break;

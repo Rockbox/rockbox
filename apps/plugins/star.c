@@ -62,6 +62,8 @@
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define STAR_QUIT BUTTON_OFF
+#define STAR_UP   BUTTON_UP
+#define STAR_DOWN BUTTON_DOWN
 #define STAR_TOGGLE_CONTROL BUTTON_ON
 #define STAR_TOGGLE_CONTROL2 BUTTON_PLAY
 #define STAR_LEVEL_UP BUTTON_F3
@@ -73,6 +75,8 @@
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define STAR_QUIT BUTTON_OFF
+#define STAR_UP   BUTTON_UP
+#define STAR_DOWN BUTTON_DOWN
 #define STAR_TOGGLE_CONTROL_PRE BUTTON_MENU
 #define STAR_TOGGLE_CONTROL (BUTTON_MENU | BUTTON_REL)
 #define STAR_LEVEL_UP (BUTTON_MENU | BUTTON_RIGHT)
@@ -83,12 +87,27 @@
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define STAR_QUIT BUTTON_OFF
+#define STAR_UP   BUTTON_UP
+#define STAR_DOWN BUTTON_DOWN
 #define STAR_TOGGLE_CONTROL_PRE BUTTON_MODE
 #define STAR_TOGGLE_CONTROL (BUTTON_MODE | BUTTON_REL)
 #define STAR_LEVEL_UP (BUTTON_MODE | BUTTON_RIGHT)
 #define STAR_LEVEL_DOWN (BUTTON_MODE | BUTTON_LEFT)
 #define STAR_LEVEL_REPEAT (BUTTON_MODE | BUTTON_UP)
 #define STAR_MENU_RUN BUTTON_RIGHT
+
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+
+#define STAR_QUIT (BUTTON_SELECT | BUTTON_MENU)
+#define STAR_UP   BUTTON_SCROLL_BACK
+#define STAR_DOWN BUTTON_SCROLL_FWD
+#define STAR_TOGGLE_CONTROL_PRE BUTTON_MENU
+#define STAR_TOGGLE_CONTROL (BUTTON_MENU | BUTTON_REL)
+#define STAR_LEVEL_UP (BUTTON_SELECT | BUTTON_RIGHT)
+#define STAR_LEVEL_DOWN (BUTTON_SELECT | BUTTON_LEFT)
+#define STAR_LEVEL_REPEAT (BUTTON_SELECT | BUTTON_PLAY)
+#define STAR_MENU_RUN BUTTON_RIGHT
+
 #endif
 
 /* function returns because of USB? */
@@ -427,7 +446,7 @@ static void star_display_text(char *str, bool waitkey)
                 switch (key)
                 {
                     case STAR_MENU_RUN:
-                    case BUTTON_DOWN:
+                    case STAR_DOWN:
                         go_on = true;
                         break;
                         
@@ -601,11 +620,11 @@ static int star_run_game(void)
                     move_x = 1;
                     break;
 
-                case BUTTON_UP:
+                case STAR_UP:
                     move_y = -1;
                     break;
 
-                case BUTTON_DOWN:
+                case STAR_DOWN:
                     move_y = 1;
                     break;
 
@@ -777,11 +796,11 @@ static int star_menu(void)
         {
             case STAR_QUIT:
                 return PLUGIN_OK;
-            case BUTTON_UP:
+            case STAR_UP:
                 if (menu_y > 0)
                     move_y = -1;
                 break; 
-            case BUTTON_DOWN:
+            case STAR_DOWN:
                 if (menu_y < 3)
                     move_y = 1;
                 break; 

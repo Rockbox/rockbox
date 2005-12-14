@@ -39,6 +39,8 @@
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define BATTERY_TEST_QUIT BUTTON_OFF
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+#define BATTERY_TEST_QUIT BUTTON_MENU
 #endif
 
 static struct plugin_api* rb;

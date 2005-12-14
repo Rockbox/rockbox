@@ -21,6 +21,8 @@
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
+#define FLIPIT_UP   BUTTON_UP
+#define FLIPIT_DOWN BUTTON_DOWN
 #define FLIPIT_QUIT BUTTON_OFF
 #define FLIPIT_SHUFFLE BUTTON_F1
 #define FLIPIT_SOLVE BUTTON_F2
@@ -28,6 +30,8 @@
 #define FLIPIT_TOGGLE BUTTON_PLAY
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
+#define FLIPIT_UP   BUTTON_UP
+#define FLIPIT_DOWN BUTTON_DOWN
 #define FLIPIT_QUIT BUTTON_OFF
 #define FLIPIT_SHUFFLE (BUTTON_MENU | BUTTON_LEFT)
 #define FLIPIT_SOLVE (BUTTON_MENU | BUTTON_UP)
@@ -37,10 +41,23 @@
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define FLIPIT_UP   BUTTON_UP
+#define FLIPIT_DOWN BUTTON_DOWN
 #define FLIPIT_QUIT BUTTON_OFF
 #define FLIPIT_SHUFFLE BUTTON_MODE
 #define FLIPIT_SOLVE BUTTON_ON
 #define FLIPIT_STEP_BY_STEP BUTTON_REC
+#define FLIPIT_TOGGLE_PRE BUTTON_SELECT
+#define FLIPIT_TOGGLE (BUTTON_SELECT | BUTTON_REL)
+
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+
+#define FLIPIT_UP   BUTTON_SCROLL_FWD
+#define FLIPIT_DOWN BUTTON_SCROLL_BACK
+#define FLIPIT_QUIT BUTTON_MENU
+#define FLIPIT_SHUFFLE (BUTTON_SELECT | BUTTON_LEFT)
+#define FLIPIT_SOLVE (BUTTON_SELECT | BUTTON_PLAY)
+#define FLIPIT_STEP_BY_STEP (BUTTON_SELECT | BUTTON_MENU)
 #define FLIPIT_TOGGLE_PRE BUTTON_SELECT
 #define FLIPIT_TOGGLE (BUTTON_SELECT | BUTTON_REL)
 
@@ -252,12 +269,12 @@ static bool flipit_loop(void) {
                     move_cursor(1, 0);
                 break;
 
-            case BUTTON_UP:
+            case FLIPIT_UP:
                 if ((cursor_pos/5)>0)
                     move_cursor(0, -1);
                 break;
 
-            case BUTTON_DOWN:
+            case FLIPIT_DOWN:
                 if ((cursor_pos/5)<3)
                     move_cursor(0, 1);
                 break;

@@ -50,12 +50,16 @@ static unsigned jewel_color[8]={COLOR_BLACK, COLOR_RED, COLOR_ORANGE,
 
 /* button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
+#define BEJEWELED_UP     BUTTON_UP
+#define BEJEWELED_DOWN   BUTTON_DOWN
 #define BEJEWELED_QUIT   BUTTON_OFF
 #define BEJEWELED_START  BUTTON_ON
 #define BEJEWELED_SELECT BUTTON_PLAY
 #define BEJEWELED_RESUME BUTTON_F1
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
+#define BEJEWELED_UP     BUTTON_UP
+#define BEJEWELED_DOWN   BUTTON_DOWN
 #define BEJEWELED_QUIT       BUTTON_OFF
 #define BEJEWELED_START      BUTTON_RIGHT
 #define BEJEWELED_SELECT     (BUTTON_MENU|BUTTON_REL)
@@ -63,10 +67,20 @@ static unsigned jewel_color[8]={COLOR_BLACK, COLOR_RED, COLOR_ORANGE,
 #define BEJEWELED_RESUME     (BUTTON_MENU|BUTTON_OFF)
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define BEJEWELED_UP     BUTTON_UP
+#define BEJEWELED_DOWN   BUTTON_DOWN
 #define BEJEWELED_QUIT   BUTTON_OFF
 #define BEJEWELED_START  BUTTON_ON
 #define BEJEWELED_SELECT BUTTON_SELECT
 #define BEJEWELED_RESUME BUTTON_MODE
+
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+#define BEJEWELED_UP     BUTTON_SCROLL_BACK
+#define BEJEWELED_DOWN   BUTTON_SCROLL_FWD
+#define BEJEWELED_QUIT   BUTTON_MENU
+#define BEJEWELED_START  BUTTON_PLAY
+#define BEJEWELED_SELECT BUTTON_SELECT
+#define BEJEWELED_RESUME (BUTTON_SELECT | BUTTON_PLAY)
 
 #else
     #error BEJEWELED: Unsupported keypad
@@ -1081,8 +1095,8 @@ static int bejeweled(struct game_context* bj) {
                 }
                 break;
 
-            case BUTTON_DOWN:                /* move cursor down */
-            case (BUTTON_DOWN|BUTTON_REPEAT):
+            case BEJEWELED_DOWN:                /* move cursor down */
+            case (BEJEWELED_DOWN|BUTTON_REPEAT):
                 if(selected) {
                     bj->score += bejeweled_swapjewels(bj, x, y, SWAP_DOWN);
                     selected = false;
@@ -1092,8 +1106,8 @@ static int bejeweled(struct game_context* bj) {
                 }
                 break;
 
-            case BUTTON_UP:                  /* move cursor up */
-            case (BUTTON_UP|BUTTON_REPEAT):
+            case BEJEWELED_UP:                  /* move cursor up */
+            case (BEJEWELED_UP|BUTTON_REPEAT):
                 if(selected) {
                     bj->score += bejeweled_swapjewels(bj, x, y, SWAP_UP);
                     selected = false;
