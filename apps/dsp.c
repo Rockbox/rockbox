@@ -466,7 +466,7 @@ static long dither_sample(long sample, long bias, long mask,
  * the src array if gain was applied.
  * Note that this must be called before the resampler.
  */
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#if defined(CPU_COLDFIRE) && !defined(SIMULATOR) && !defined(DEBUG)
 static const long crossfeed_coefs[6] ICONST_ATTR = { 
     LOW, LOW_COMP, HIGH_NEG, HIGH_COMP, ATT, ATT_COMP
 };
@@ -503,7 +503,7 @@ static void apply_crossfeed(long* src[], int count)
         /* HIGH_NEG*high_left + HIGH_COMP*left */ 
         "mac.l %%a1, %%d2, %%acc0                    \n"
         "mac.l %%a2, %%d5, %%acc0                    \n"
-        /* HIGH_NEG*high_right + HIGH_COMP+*right */
+        /* HIGH_NEG*high_right + HIGH_COMP*right */
         "mac.l %%a1, %%d3, (%[coef])+, %%a1, %%acc1  \n" /* a1 = ATT */
         "mac.l %%a2, %%d6, (%[coef])+, %%a2, %%acc1  \n" /* a2 = ATT_COMP */
         "lea.l (-6*4, %[coef]), %[coef]              \n" /* coef = &coefs[0] */
