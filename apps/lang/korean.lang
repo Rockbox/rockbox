@@ -112,7 +112,7 @@ id: LANG_TIME_SET
 desc: used in set_time()
 eng: "ON To Set"
 voice: ""
-new: "[재생]: 설정 저장"
+new: "[NAVI]: 설정 저장"
 
 id: LANG_TIME_REVERT
 desc: used in set_time()
@@ -694,7 +694,7 @@ id: LANG_RESET_CONFIRM
 desc: confirm to reset settings
 eng: "PLAY=Reset"
 voice: ""
-new: "[재생]: 초기화"
+new: "[NAVI]: 초기화"
 
 id: LANG_RESET_CANCEL
 desc: confirm to reset settings
