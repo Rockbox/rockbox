@@ -466,7 +466,7 @@ static long dither_sample(long sample, long bias, long mask,
  * the src array if gain was applied.
  * Note that this must be called before the resampler.
  */
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR) && !defined(DEBUG)
+#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
 static const long crossfeed_coefs[6] ICONST_ATTR = { 
     LOW, LOW_COMP, HIGH_NEG, HIGH_COMP, ATT, ATT_COMP
 };
