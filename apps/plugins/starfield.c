@@ -191,6 +191,11 @@ int plugin_main(void)
     starfield_init(&starfield);
     starfield_add_stars(&starfield, INIT_STARS);
 
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_background(LCD_BLACK);
+    rb->lcd_set_foreground(LCD_WHITE);
+#endif
+
     while (true)
     {
         rb->sleep(1);
