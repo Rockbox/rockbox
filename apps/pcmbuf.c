@@ -442,7 +442,9 @@ static void crossfade_start(void)
             break ;
 
         case CFM_FLUSH:
-            crossfade_rem = bytesleft /2;
+            crossfade_rem = (bytesleft - CHUNK_SIZE) /2;
+            crossfade_fade_in_rem = 0;
+            crossfade_fade_in_amount = 0;
             break ;
     }
     
@@ -537,9 +539,12 @@ int crossfade(short *buf, const short *buf2, int length)
     crossfade_rem -= size;
     if (crossfade_rem <= 0)
     {
-        size_insert = MAX(0, MIN(crossfade_fade_in_rem, length - size));
-        fade_insert(&buf2[size], size_insert*2);
-        crossfade_fade_in_rem -= size_insert;
+        if (crossfade_fade_in_rem > 0 && crossfade_fade_in_amount > 0)
+        {
+            size_insert = MAX(0, MIN(crossfade_fade_in_rem, length - size));
+            fade_insert(&buf2[size], size_insert*2);
+            crossfade_fade_in_rem -= size_insert;
+        }
         
         if (crossfade_fade_in_rem <= 0)
             crossfade_active = false;
