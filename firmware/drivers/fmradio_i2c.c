@@ -30,18 +30,38 @@
 /* cute little functions, atomic read-modify-write */
 /* SDA is GPIO1,23 */
 
-#define SDA_LO     and_l(~0x00800000, &GPIO1_OUT)    // and_b(~0x10, &PBDRL)
-#define SDA_HI      or_l( 0x00800000, &GPIO1_OUT)    //  or_b( 0x10, &PBDRL)
-#define SDA_INPUT  and_l(~0x00800000, &GPIO1_ENABLE) // and_b(~0x10, &PBIORL)
-#define SDA_OUTPUT  or_l( 0x00800000, &GPIO1_ENABLE) //  or_b( 0x10, &PBIORL)
-#define SDA             ( 0x00800000 & GPIO1_READ)   //      (PBDR & 0x0010)
+#ifdef IRIVER_H300_SERIES
 
-/* SCL is GPIO, 3 */
-#define SCL_INPUT  and_l(~0x00000008, &GPIO_ENABLE)  // and_b(~0x02, &PBIORL)
-#define SCL_OUTPUT  or_l( 0x00000008, &GPIO_ENABLE)  //  or_b( 0x02, &PBIORL) 
-#define SCL_LO     and_l(~0x00000008, &GPIO_OUT)     // and_b(~0x02, &PBDRL)
-#define SCL_HI      or_l( 0x00000008, &GPIO_OUT)     //  or_b( 0x02, &PBDRL)
-#define SCL             ( 0x00000008 & GPIO_READ)    // (PBDR & 0x0002)
+/* SDA is GPIO57 */
+#define SDA_LO     and_l(~0x02000000, &GPIO1_OUT)
+#define SDA_HI      or_l( 0x02000000, &GPIO1_OUT)
+#define SDA_INPUT  and_l(~0x02000000, &GPIO1_ENABLE)
+#define SDA_OUTPUT  or_l( 0x02000000, &GPIO1_ENABLE)
+#define SDA             ( 0x02000000 & GPIO1_READ)
+
+/* SCL is GPIO56 */
+#define SCL_INPUT  and_l(~0x01000000, &GPIO1_ENABLE)
+#define SCL_OUTPUT  or_l( 0x01000000, &GPIO1_ENABLE)
+#define SCL_LO     and_l(~0x01000000, &GPIO1_OUT)
+#define SCL_HI      or_l( 0x01000000, &GPIO1_OUT)
+#define SCL             ( 0x01000000 & GPIO1_READ)
+
+#else
+
+/* SDA is GPIO55 */
+#define SDA_LO     and_l(~0x00800000, &GPIO1_OUT)
+#define SDA_HI      or_l( 0x00800000, &GPIO1_OUT)
+#define SDA_INPUT  and_l(~0x00800000, &GPIO1_ENABLE)
+#define SDA_OUTPUT  or_l( 0x00800000, &GPIO1_ENABLE)
+#define SDA             ( 0x00800000 & GPIO1_READ)
+
+/* SCL is GPIO3 */
+#define SCL_INPUT  and_l(~0x00000008, &GPIO_ENABLE)
+#define SCL_OUTPUT  or_l( 0x00000008, &GPIO_ENABLE)
+#define SCL_LO     and_l(~0x00000008, &GPIO_OUT)
+#define SCL_HI      or_l( 0x00000008, &GPIO_OUT)
+#define SCL             ( 0x00000008 & GPIO_READ)
+#endif
 
 /* delay loop to achieve 400kHz at 120MHz CPU frequency */
 #define DELAY    do { int _x; for(_x=0;_x<22;_x++);} while(0)
@@ -84,8 +104,8 @@ static void fmradio_i2c_ack(void)
     SCL_INPUT;   /* Set the clock to input */
     while(!SCL)  /* and wait for the slave to release it */
     {
-        SCL_OUTPUT;  /* Set the clock to output */
         SCL_HI;
+        SCL_OUTPUT;  /* Set the clock to output */
         SCL_INPUT;   /* Set the clock to input */
         DELAY;
     }
@@ -111,8 +131,8 @@ static int fmradio_i2c_getack(void)
     SCL_INPUT;   /* Set the clock to input */
     while(!SCL)  /* and wait for the slave to release it */
     {
-        SCL_OUTPUT;  /* Set the clock to output */
         SCL_HI;
+        SCL_OUTPUT;  /* Set the clock to output */
         SCL_INPUT;   /* Set the clock to input */
         DELAY;
     }
@@ -160,10 +180,12 @@ static unsigned char fmradio_i2c_inb(void)
    /* clock in each bit, MSB first */
    for ( i=0x80; i; i>>=1 ) {
        SDA_INPUT;   /* And set to input */
-       SCL_HI;
+       DELAY;
        DELAY;
        if ( SDA )
            byte |= i;
+       SCL_HI;
+       DELAY;
        SCL_LO;
        DELAY;
        SDA_OUTPUT;

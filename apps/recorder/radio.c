@@ -78,7 +78,7 @@
 #define FM_PRESET_ADD BUTTON_F1
 #define FM_PRESET_ACTION BUTTON_F3
 
-#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 /* pause/play - short PLAY */
 #define FM_PLAY_PRE BUTTON_ON
 #define FM_RC_PLAY_PRE BUTTON_RC_ON
@@ -1075,7 +1075,7 @@ int handle_radio_presets_cb(int key, int m)
             key = BUTTON_NONE;
             break;
 #endif
-#if CONFIG_KEYPAD != IRIVER_H100_PAD
+#if (CONFIG_KEYPAD != IRIVER_H100_PAD) && (CONFIG_KEYPAD != IRIVER_H300_PAD)
 #ifdef FM_PRESET
         case FM_PRESET:
             menu_draw(m);
@@ -1285,7 +1285,7 @@ int radio_menu_cb(int key, int m)
     (void)m;
     switch(key)
     {
-#if CONFIG_KEYPAD != IRIVER_H100_PAD
+#if (CONFIG_KEYPAD != IRIVER_H100_PAD) && (CONFIG_KEYPAD != IRIVER_H300_PAD)
 #ifdef MENU_ENTER2
     case MENU_ENTER2:
 #endif
@@ -1294,7 +1294,7 @@ int radio_menu_cb(int key, int m)
         key = BUTTON_NONE; /* eat the downpress, next menu reacts on release */
         break;
 
-#if CONFIG_KEYPAD != IRIVER_H100_PAD
+#if (CONFIG_KEYPAD != IRIVER_H100_PAD) && (CONFIG_KEYPAD != IRIVER_H300_PAD)
 #ifdef MENU_ENTER2
     case MENU_ENTER2 | BUTTON_REL:
 #endif

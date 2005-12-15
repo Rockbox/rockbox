@@ -905,6 +905,15 @@ static void pcmrec_thread(void)
 /* Select VINL & VINR source: 0=Line-in, 1=FM Radio */
 void pcm_rec_mux(int source)
 {
+#ifdef IRIVER_H300_SERIES
+    if(source == 0)
+        and_l(~0x40000000, &GPIO_OUT);  /* Line In */
+    else
+        or_l(0x40000000, &GPIO_OUT);    /* FM radio */
+        
+    or_l(0x40000000, &GPIO_ENABLE);
+    or_l(0x40000000, &GPIO_FUNCTION);
+#else
     if(source == 0)
         and_l(~0x00800000, &GPIO_OUT);  /* Line In */
     else
@@ -912,4 +921,5 @@ void pcm_rec_mux(int source)
         
     or_l(0x00800000, &GPIO_ENABLE);
     or_l(0x00800000, &GPIO_FUNCTION);
+#endif
 }

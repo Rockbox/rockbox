@@ -46,7 +46,14 @@ void i2c_init(void)
     or_l(0x00000008, &GPIO_ENABLE);
     or_l(0x00800000, &GPIO1_FUNCTION);
     or_l(0x00000008, &GPIO_FUNCTION);
+#elif defined(IRIVER_H300_SERIES)
+    /* The FM chip has no pullup for SCL, so we have to bit-bang the
+       I2C for that one. */
+    or_l(0x03000000, &GPIO1_OUT);
+    or_l(0x03000000, &GPIO1_ENABLE);
+    or_l(0x03000000, &GPIO1_FUNCTION);
 #endif
+    
     /* I2C Clock divisor = 576 => 119.952 MHz / 2 / 576 = 104.125 kHz */
     MFDR = 0x14;
 
