@@ -1525,7 +1525,7 @@ static bool dbg_disk_info(void)
         switch (page) {
             case 0:
                 for (i=0; i < 20; i++)
-                    ((unsigned short*)buf)[i]=identify_info[i+27];
+                    ((unsigned short*)buf)[i]=htobe16(identify_info[i+27]);
                 buf[40]=0;
                 /* kill trailing space */
                 for (i=39; i && buf[i]==' '; i--)
@@ -1536,7 +1536,7 @@ static bool dbg_disk_info(void)
 
             case 1:
                 for (i=0; i < 4; i++)
-                    ((unsigned short*)buf)[i]=identify_info[i+23];
+                    ((unsigned short*)buf)[i]=htobe16(identify_info[i+23]);
                 buf[8]=0;
                 lcd_puts(0, y++, "Firmware");
                 lcd_puts(0, y++, buf);
