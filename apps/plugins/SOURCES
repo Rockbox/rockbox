@@ -22,6 +22,7 @@ dict.c
 fire.c
 plasma.c
 #endif
+bejeweled.c
 bounce.c
 calculator.c
 chip8.c
@@ -48,7 +49,6 @@ star.c
 starfield.c
 #if (LCD_WIDTH != 176)
 /* These need adjusting for the Nano's screen */
-bejeweled.c
 sudoku.c
 #endif
 #if CONFIG_LCD == LCD_SSD1815
