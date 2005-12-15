@@ -12,6 +12,8 @@ for later reference.
 <p>
 <a href="/twiki/bin/view/Main/IrcNicks">Nick reference</a>
 <p>
+<a href="/twiki/bin/view/Main/IrcTalk">IRC lingo explained</a>
+<p>
 <a href="http://rasher.dk/rockbox/ircstats/">Cool statistics</a>
 
 <h2>Logs</h2>
