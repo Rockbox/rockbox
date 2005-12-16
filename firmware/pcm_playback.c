@@ -364,6 +364,8 @@ static void dma_start(const void *addr, long size)
     addr = (void *)((unsigned long)addr & ~3); /* Align data */
     size &= ~3; /* Size must be multiple of 4 */
 
+    /* Disable playback for now */
+    pcm_playing = false;
     return;
 
 /* This is the uda1380 code */
