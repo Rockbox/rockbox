@@ -143,6 +143,8 @@ drivers/lcd-h100-remote.c
 #endif
 #if defined(HAVE_UDA1380) && !defined(SIMULATOR)
 drivers/uda1380.c
+#elif defined(HAVE_WM8975) && !defined(SIMULATOR)
+drivers/wm8975.c
 #elif defined(HAVE_TLV320) && !defined(SIMULATOR)
 drivers/tlv320.c
 #endif
