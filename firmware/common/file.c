@@ -445,10 +445,29 @@ static int readwrite(int fd, void* buf, long count, bool write)
             headbytes = count;
             file->cacheoffset += count;
             if ( file->cacheoffset >= SECTOR_SIZE )
+            {
+                /* Flush the cache first if it's dirty. */
+                if (file->dirty)
+                {
+                    rc = flush_cache(fd);
+                    if ( rc < 0 ) {
+                        errno = EIO;
+                        return rc * 10 - 9;
+                    }
+                }
                 file->cacheoffset = -1;
+            }
         }
         else {
             headbytes = SECTOR_SIZE - file->cacheoffset;
+            if (file->dirty)
+            {
+                rc = flush_cache(fd);
+                if ( rc < 0 ) {
+                    errno = EIO;
+                    return rc * 10 - 9;
+                }
+            }
             file->cacheoffset = -1;
         }
 
@@ -543,17 +562,6 @@ static int readwrite(int fd, void* buf, long count, bool write)
             file->dirty = true;
         }
         else {
-            /* Flush the cache first if it's dirty. */
-            if (file->dirty)
-            {
-                rc = flush_cache(fd);
-                if ( rc < 0 ) {
-                    errno = EIO;
-                    return rc * 10 - 8;
-                }
-                file->cacheoffset = -1;
-            }
-        
             rc = fat_readwrite(&(file->fatfile), 1, &(file->cache),false);
             if (rc < 1 ) {
                 DEBUGF("Failed caching sector\n");
