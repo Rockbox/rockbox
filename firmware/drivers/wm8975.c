@@ -105,6 +105,8 @@ int wm8975_init(void) {
 
     /* external dev clock to 24MHz */
     outl(inl(0x70000018) & ~0xc, 0x70000018);
+
+    return 0;
 }
 
 /* Silently enable / disable audio output */
@@ -177,21 +179,26 @@ int wm8975_set_master_vol(int vol_l, int vol_r)
     /* OUT2 */
     ipod_i2c_send(0x1a, LOUT2VOL, vol_l);
     ipod_i2c_send(0x1a, ROUT2VOL | 0x1, vol_r);
+
+    return 0;
 }
 
 int wm8975_set_mixer_vol(int channel1, int channel2)
 {
+    (void)channel1;
+    (void)channel2;
 
+    return 0;
 }
 
 void wm8975_set_bass(int value)
 {
-
+    (void)value;
 }
 
 void wm8975_set_treble(int value)
 {
-
+    (void)value;
 }
 
 int wm8975_mute(int mute)
@@ -204,6 +211,8 @@ int wm8975_mute(int mute)
         /* Set DACMU = 0 to soft-un-mute the audio DACs. */
         ipod_i2c_send(0x1a, 0xa, 0x0);
     }
+
+    return 0;
 }
 
 /* Nice shutdown of WM8975 codec */
@@ -222,7 +231,7 @@ void wm8975_close(void)
 /* Change the order of the noise shaper, 5th order is recommended above 32kHz */
 void wm8975_set_nsorder(int order)
 {
-
+    (void)order;
 }
 
 /* Note: Disable output before calling this function */
@@ -234,6 +243,7 @@ void wm8975_set_sample_rate(int sampling_control) {
 
 void wm8975_enable_recording(bool source_mic) {
 
+    (void)source_mic;
 }
 
 void wm8975_disable_recording(void) {
@@ -242,8 +252,12 @@ void wm8975_disable_recording(void) {
 
 void wm8975_set_recvol(int left, int right, int type) {
 
+    (void)left;
+    (void)right;
+    (void)type;
 }
 
 void wm8975_set_monitor(int enable) {
 
+    (void)enable;
 }
