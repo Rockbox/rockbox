@@ -26,6 +26,9 @@
 
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
 #define FPM_COLDFIRE_EMAC
+#elif defined(CPU_ARM) && !defined(SIMULATOR)
+#define FPM_ARM
+#define ASO_IMDCT
 #else
 #define FPM_DEFAULT
 #endif

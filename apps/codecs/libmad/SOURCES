@@ -12,3 +12,6 @@ version.c
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
 imdct_mcf5249.S
 #endif
+#if defined(CPU_ARM) && !defined(SIMULATOR)
+imdct_l_arm.S
+#endif
