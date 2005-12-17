@@ -63,6 +63,143 @@ static int button_read(void);
 static bool remote_button_hold_only(void);
 #endif
 
+#if CONFIG_KEYPAD == IPOD_4G_PAD || CONFIG_KEYPAD == IPOD_NANO_PAD
+/* Variable to use for setting button status in interrupt handler */
+int int_btn = BUTTON_NONE;
+
+static void opto_i2c_init(void)
+{
+    int i, curr_value;
+
+    /* wait for value to settle */
+    i = 1000;
+    curr_value = (inl(0x7000c104) << 16) >> 24;
+    while (i > 0)
+    {
+        int new_value = (inl(0x7000c104) << 16) >> 24;
+
+        if (new_value != curr_value) {
+            i = 10000;
+            curr_value = new_value;
+        }
+        else {
+            i--;
+        }
+    }
+
+    GPIOB_OUTPUT_VAL |= 0x10;
+    DEV_EN |= 0x10000;
+    DEV_RS |= 0x10000;
+    udelay(5);
+    DEV_RS &= ~0x10000; /* finish reset */
+
+    outl(0xffffffff, 0x7000c120);
+    outl(0xffffffff, 0x7000c124);
+    outl(0xc00a1f00, 0x7000c100);
+    outl(0x1000000, 0x7000c104);
+}
+
+static int ipod_4g_button_read(void)
+{
+    unsigned reg, status;
+    static int clickwheel_down = 0;
+    static int old_wheel_value = -1;
+    int wheel_keycode = BUTTON_NONE;
+    int wheel_delta, wheel_delta_abs;
+    int new_wheel_value;
+    int btn = BUTTON_NONE;
+    
+    udelay(250);
+    reg = 0x7000c104;
+    if ((inl(0x7000c104) & 0x4000000) != 0) {
+        reg = reg + 0x3C;   /* 0x7000c140 */
+
+        status = inl(0x7000c140);
+        outl(0x0, 0x7000c140);  /* clear interrupt status? */
+
+        if ((status & 0x800000ff) == 0x8000001a) {
+            /* NB: highest wheel = 0x5F, clockwise increases */
+            new_wheel_value = ((status << 9) >> 25) & 0xff;
+
+            if (status & 0x100)
+                btn |= BUTTON_SELECT;
+            if (status & 0x200)
+                btn |= BUTTON_RIGHT;
+            if (status & 0x400)
+                btn |= BUTTON_LEFT;
+            if (status & 0x800)
+                btn |= BUTTON_PLAY;
+            if (status & 0x1000)
+                btn |= BUTTON_MENU;
+            if (status & 0x40000000) {
+                /* scroll wheel down */
+                clickwheel_down = 1;
+                backlight_on();
+                if (old_wheel_value != -1) {
+                    wheel_delta = new_wheel_value - old_wheel_value;
+                    wheel_delta_abs = wheel_delta < 0 ? -wheel_delta : wheel_delta;
+
+                    wheel_delta = new_wheel_value - old_wheel_value;
+
+                    /* TODO: these thresholds should most definitely be
+                       settings, and we're probably going to want a more
+                       advanced scheme than this anyway. */
+                    if (wheel_delta > 4) {
+                        wheel_keycode = BUTTON_SCROLL_FWD;
+                        old_wheel_value = new_wheel_value;
+                    } else if (wheel_delta < -4) {
+                        wheel_keycode = BUTTON_SCROLL_BACK;
+                        old_wheel_value = new_wheel_value;
+                    }
+
+                    if (wheel_keycode != BUTTON_NONE)
+                        queue_post(&button_queue, wheel_keycode, NULL);
+                }
+                else {
+                    old_wheel_value = new_wheel_value;
+                }
+            }
+            else if (clickwheel_down) {
+                /* scroll wheel up */
+                old_wheel_value = -1;
+                clickwheel_down = 0;
+            }
+        }
+        /* 
+       Don't know why this should be needed, let me know if you do. 
+       else if ((status & 0x800000FF) == 0x8000003A) {
+            wheel_value = status & 0x800000FF;
+        }
+        */
+        else if (status == 0xffffffff) {
+            opto_i2c_init();
+        }
+    }
+
+    if ((inl(reg) & 0x8000000) != 0) {
+        outl(0xffffffff, 0x7000c120);
+        outl(0xffffffff, 0x7000c124);
+    }
+    return btn;
+}
+
+
+
+void ipod_4g_button_int(void)
+{
+    PP5020_CPU_HI_INT_CLR = PP5020_I2C_MASK;
+    udelay(250);
+    outl(0x0, 0x7000c140); 
+    int_btn = ipod_4g_button_read();
+    outl(inl(0x7000c104) | 0xC000000, 0x7000c104);
+    outl(0x400a1f00, 0x7000c100);
+
+    GPIOB_OUTPUT_VAL |= 0x10;
+    PP5020_CPU_INT_EN = 0x40000000;
+    PP5020_CPU_HI_INT_EN = PP5020_I2C_MASK;
+}
+#endif 
+
 static void button_tick(void)
 {
     static int tick = 0;
@@ -234,6 +371,18 @@ void button_init(void)
     /* nothing to initialize here */
 #elif CONFIG_KEYPAD == GMINI100_PAD
     /* nothing to initialize here */
+#elif CONFIG_KEYPAD == IPOD_4G_PAD || CONFIG_KEYPAD == IPOD_NANO_PAD
+    opto_i2c_init();
+    /* hold button - enable as input */
+    GPIOA_ENABLE |= 0x20;
+    GPIOA_OUTPUT_EN &= ~0x20; 
+    /* hold button - set interrupt levels */
+    GPIOA_INT_LEV = ~(GPIOA_INPUT_VAL & 0x20);
+    GPIOA_INT_CLR = GPIOA_INT_STAT & 0x20;
+    /* enable interrupts */
+    GPIOA_INT_EN = 0x20;
+    PP5020_CPU_INT_EN = 0x40000000;
+    PP5020_CPU_HI_INT_EN = PP5020_I2C_MASK;
 #endif /* CONFIG_KEYPAD */
 
     queue_init(&button_queue);
@@ -673,8 +822,9 @@ static int button_read(void)
         btn |= BUTTON_ON;
 
 #elif CONFIG_KEYPAD == IPOD_4G_PAD || CONFIG_KEYPAD == IPOD_NANO_PAD
-    /* TODO: Implement for iPod */
     (void)data;
+    /* The int_btn variable is set in the button interrupt handler */
+    btn = int_btn;
 #endif /* CONFIG_KEYPAD */
 
 

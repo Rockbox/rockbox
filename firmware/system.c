@@ -1107,11 +1107,14 @@ int system_memory_guard(int newmode)
 #elif CONFIG_CPU==PP5020
 
 extern void TIMER1(void);
+extern void ipod_4g_button_int(void);
 
 void irq(void)
 {
     if (PP5020_CPU_INT_STAT & PP5020_TIMER1_MASK) 
         TIMER1();
+    else if (PP5020_CPU_HI_INT_STAT & PP5020_I2C_MASK)
+        ipod_4g_button_int();
 }
 
 void system_init(void)
