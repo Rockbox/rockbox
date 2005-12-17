@@ -24,6 +24,7 @@
 #include "dir.h"
 #include "debug.h"
 #include "dircache.h"
+#include "system.h"
 
 /*
   These functions provide a roughly POSIX-compatible file IO API.
@@ -439,53 +440,29 @@ static int readwrite(int fd, void* buf, long count, bool write)
 
     /* any head bytes? */
     if ( file->cacheoffset != -1 ) {
-        int headbytes;
         int offs = file->cacheoffset;
-        if ( count <= SECTOR_SIZE - file->cacheoffset ) {
-            headbytes = count;
-            file->cacheoffset += count;
-            if ( file->cacheoffset >= SECTOR_SIZE )
-            {
-                /* Flush the cache first if it's dirty. */
-                if (file->dirty)
-                {
-                    rc = flush_cache(fd);
-                    if ( rc < 0 ) {
-                        errno = EIO;
-                        return rc * 10 - 9;
-                    }
-                }
-                file->cacheoffset = -1;
-            }
-        }
-        else {
-            headbytes = SECTOR_SIZE - file->cacheoffset;
-            if (file->dirty)
-            {
-                rc = flush_cache(fd);
-                if ( rc < 0 ) {
-                    errno = EIO;
-                    return rc * 10 - 9;
-                }
-            }
-            file->cacheoffset = -1;
-        }
+        int headbytes = MIN(count, SECTOR_SIZE - offs);
 
         if (write) {
             memcpy( file->cache + offs, buf, headbytes );
-            if (offs+headbytes == SECTOR_SIZE) {
+            file->dirty = true;
+        }
+        else {
+            memcpy( buf, file->cache + offs, headbytes );
+        }
+
+        if (offs + headbytes == SECTOR_SIZE) {
+            if (file->dirty) {
                 int rc = flush_cache(fd);
                 if ( rc < 0 ) {
                     errno = EIO;
                     return rc * 10 - 2;
                 }
-                file->cacheoffset = -1;
             }
-            else
-                file->dirty = true;
+            file->cacheoffset = -1;
         }
         else {
-            memcpy( buf, file->cache + offs, headbytes );
+            file->cacheoffset += headbytes;
         }
 
         nread = headbytes;
