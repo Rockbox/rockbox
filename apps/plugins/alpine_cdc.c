@@ -1044,7 +1044,7 @@ void sound_neutral(void)
     rb->sound_set(SOUND_BASS, 0);
     rb->sound_set(SOUND_TREBLE, 0);
     rb->sound_set(SOUND_BALANCE, 0);
-    rb->sound_set(SOUND_VOLUME, 92); /* 0 dB */
+    rb->sound_set(SOUND_VOLUME, 0);
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     rb->sound_set(SOUND_LOUDNESS, 0);
     rb->sound_set(SOUND_SUPERBASS, 0);

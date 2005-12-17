@@ -272,15 +272,17 @@ void DrawPosition(int pos, int total)
 // helper function to change the volume by a certain amount, +/-
 void ChangeVolume(int delta)
 {
+    int minvol = rb->sound_min(SOUND_VOLUME);
+    int maxvol = rb->sound_max(SOUND_VOLUME);
     int vol = rb->global_settings->volume + delta;
 
-    if (vol > 100) vol = 100;
-    else if (vol < 0) vol = 0;
+    if (vol > maxvol) vol = maxvol;
+    else if (vol < minvol) vol = minvol;
     if (vol != rb->global_settings->volume)
     {
         rb->sound_set(SOUND_VOLUME, vol);
         rb->global_settings->volume = vol;
-        rb->snprintf(gPrint, sizeof(gPrint), "Vol: %d", vol);
+        rb->snprintf(gPrint, sizeof(gPrint), "Vol: %d dB", vol);
         rb->lcd_puts(0, 7, gPrint);
         if (gPlay.state == paused) // we have to draw ourselves
             rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);

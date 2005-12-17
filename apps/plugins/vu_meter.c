@@ -133,11 +133,13 @@ void save_settings(void) {
 }
 
 void change_volume(int delta) {
-    char curr_vol[4];
+    char curr_vol[5];
+    int minvol = rb->sound_min(SOUND_VOLUME);
+    int maxvol = rb->sound_max(SOUND_VOLUME);
     int vol = rb->global_settings->volume + delta;
 
-    if (vol>100) vol = 100;
-    else if (vol < 0) vol = 0;
+    if (vol > maxvol) vol = maxvol;
+    else if (vol < minvol) vol = minvol;
     if (vol != rb->global_settings->volume) {
         rb->sound_set(SOUND_VOLUME, vol);
         rb->global_settings->volume = vol;

@@ -196,10 +196,13 @@ void draw_display(void){
 /* helper function to change the volume by a certain amount, +/-
    ripped from video.c */
 void change_volume(int delta){
+    int minvol = rb->sound_min(SOUND_VOLUME);
+    int maxvol = rb->sound_max(SOUND_VOLUME);
     int vol = rb->global_settings->volume + delta;
     char buffer[30];
-    if (vol > 100) vol = 100;
-    else if (vol < 0) vol = 0;
+
+    if (vol > maxvol) vol = maxvol;
+    else if (vol < minvol) vol = minvol;
     if (vol != rb->global_settings->volume) {
         rb->sound_set(SOUND_VOLUME, vol);
         rb->global_settings->volume = vol;

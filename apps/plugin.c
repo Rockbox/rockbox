@@ -367,6 +367,9 @@ static const struct plugin_api rockbox_api = {
     utf16BEdecode,
     utf8encode,
     utf8length,
+    
+    sound_min,
+    sound_max,
 };
 
 int plugin_load(const char* plugin, void* parameter)

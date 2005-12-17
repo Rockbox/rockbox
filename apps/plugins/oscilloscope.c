@@ -241,7 +241,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             case OSCILLOSCOPE_VOL_UP:
             case OSCILLOSCOPE_VOL_UP | BUTTON_REPEAT:
                 vol = rb->global_settings->volume;
-                if (vol < 100)
+                if (vol < rb->sound_max(SOUND_VOLUME))
                 {
                     vol++;
                     rb->sound_set(SOUND_VOLUME, vol);
@@ -252,7 +252,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             case OSCILLOSCOPE_VOL_DOWN:
             case OSCILLOSCOPE_VOL_DOWN | BUTTON_REPEAT:
                 vol = rb->global_settings->volume;
-                if (vol > 0)
+                if (vol > rb->sound_min(SOUND_VOLUME))
                 {
                     vol--;
                     rb->sound_set(SOUND_VOLUME, vol);

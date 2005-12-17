@@ -91,7 +91,7 @@
 #endif
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 53
+#define PLUGIN_API_VERSION 54
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -448,6 +448,9 @@ struct plugin_api {
     unsigned char* (*utf16BEdecode)(const unsigned char *utf16, unsigned char *utf8, unsigned int count);
     unsigned char* (*utf8encode)(unsigned long ucs, unsigned char *utf8);
     unsigned long (*utf8length)(const unsigned char *utf8);
+    
+    int (*sound_min)(int setting);
+    int (*sound_max)(int setting);
 };
 
 int plugin_load(const char* plugin, void* parameter);
