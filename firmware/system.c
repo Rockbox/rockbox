@@ -1117,6 +1117,49 @@ void irq(void)
         ipod_4g_button_int();
 }
 
+/* TODO: The following two function have been lifted straight from IPL, and
+   hence have a lot of numeric addresses used straight. I'd like to use
+   #defines for these, but don't know what most of them are for or even what
+   they should be named. Because of this I also have no way of knowing how
+   to extend the funtions to do alternate cache configurations and/or 
+   some other CPU frequency scaling. */
+
+static void ipod_init_cache(void)
+{
+    unsigned i;
+
+    /* cache init mode? */
+    outl(0x4, 0x6000C000);
+
+    /* PP5002 has 8KB cache */
+    for (i = 0xf0004000; i < 0xf0006000; i += 16) {
+        outl(0x0, i);
+    }
+
+    outl(0x0, 0xf000f040);
+    outl(0x3fc0, 0xf000f044);
+
+    /* enable cache */
+    outl(0x1, 0x6000C000);
+
+    for (i = 0x10000000; i < 0x10002000; i += 16)
+        inb(i);
+}
+    
+static void ipod_set_cpu_speed(void)
+{
+    outl(inl(0x70000020) | (1<<30), 0x70000020);
+
+    /* Set run state to 24MHz */
+    outl((inl(0x60006020) & 0x0fffff0f) | 0x20000020, 0x60006020);
+
+    /* 75 MHz (24/8)*25 */
+    outl(0xaa021908, 0x60006034);
+    udelay(2000);
+
+    outl((inl(0x60006020) & 0x0fffff0f) | 0x20000070, 0x60006020);
+}
+
 void system_init(void)
 {
     /* disable all irqs */
@@ -1127,6 +1170,8 @@ void system_init(void)
     outl(-1, 0x60001038);
     outl(-1, 0x60001028);
     outl(-1, 0x6000101c);
+    ipod_set_cpu_speed();
+    ipod_init_cache();
 }
 
 void system_reboot(void)

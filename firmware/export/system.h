@@ -34,6 +34,11 @@ extern long cpu_frequency;
 #define outl(a,b) (*(volatile unsigned long *) (b) = (a))
 #define inb(a) (*(volatile unsigned char *) (a))
 #define outb(a,b) (*(volatile unsigned char *) (b) = (a))
+static inline void udelay(unsigned usecs)
+{
+    unsigned start = inl(0x60005010);
+    while ((inl(0x60005010) - start) < usecs);
+}
 #endif
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
