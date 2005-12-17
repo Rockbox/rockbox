@@ -39,7 +39,6 @@ extern void uda1380_set_monitor(int enable);
 
 /* REG_0: Misc settings */
 #define REG_0               0x00
-
 #define EN_ADC              (1 << 11)    /* Enable ADC                     */
 #define EN_DEC              (1 << 10)    /* Enable Decimator               */
 #define EN_DAC              (1 << 9)     /* Enable DAC                     */
@@ -114,7 +113,7 @@ extern void uda1380_set_monitor(int enable);
 
 /* REG_EQ: Bass boost and tremble */
 #define REG_EQ              0x12
-#define EQ_MODE_FLAG        (0 << 14)
+#define EQ_MODE_FLAT        (0 << 14)
 #define EQ_MODE_MIN         (1 << 14)
 #define EQ_MODE_MAX         (3 << 14)
 #define BASSL(x)            (((x) & 0xF) << 8)
@@ -127,16 +126,29 @@ extern void uda1380_set_monitor(int enable);
 /* REG_MUTE: Master Mute, silence detector and oversampling */
 #define REG_MUTE            0x13
 #define MUTE_MASTER         (1 << 14)      /* Master Mute (soft)       */
-#define MIX_MODE(x)         ((x) << 12)    /* Mixer mode: See table 48 */ 
 #define MUTE_CH2            (1 << 11)      /* Channel 2 mute           */
 #define MUTE_CH1            (1 << 3)       /* Channel 1 mute           */
-
+#define DE_EMPHASIS_NONE    (0 << 8)       /* no de-emphasis           */
+#define DE_EMPHASIS_32kHz   (1 << 8)       /* 32 kHz                   */
+#define DE_EMPHASIS_44kHz   (2 << 8)       /* 44.1 kHz                 */
+#define DE_EMPHASIS_48kHz   (3 << 8)       /* 48 kHz                   */
+#define DE_EMPHASIS_96kHz   (4 << 8)       /* 96 kHz                   */
 
 /* REG_MIX_CTL: Mixer, silence detector and oversampling settings */
 #define REG_MIX_CTL         0x14
-#define MIX_CTL_MIX_POS     (1 << 13)
-#define MIX_CTL_MIX         (1 << 12)
-#define MIX_CTL_SEL_NS      (1 << 14)
+#define DAC_INVERT          (1 << 15)      /* invert DAC polarity      */
+#define MIX_CTL_SEL_NS      (1 << 14)      /* 0 = 3rd, 1 = 5th order   */
+#define MIX_CTL_MIX_POS     (1 << 13)      /* MIX MODE bit MIX POS     */
+#define MIX_CTL_MIX         (1 << 12)      /* MIX MODE bit MIX         */
+#define MIX_MODE(x)         (((x) & 0x3) << 12) /* Mixer mode: See table 48 */ 
+#define SILENCE_MODE        (1 << 7)       /* force silence output     */
+#define SILENCE_DET_ON      (1 << 6)       /* enable silence detection */
+#define SILENCE_DET(x)      (((x) & 0x3) << 4) /* silence detection value  */
+#define SILENCE_DET_3200    (0 << 4)       /* 3200 samples             */
+#define SILENCE_DET_4800    (1 << 4)       /* 4800 samples             */
+#define SILENCE_DET_9600    (2 << 4)       /* 9600 samples             */
+#define SILENCE_DET_19200   (3 << 4)       /* 19200 samples            */
+#define OVERSAMPLE_MODE(x)  (((x) & 0x3) << 0) /* oversampling mode        */
 
 /* REG_DEC_VOL: Decimator (ADC) volume control */
 #define REG_DEC_VOL         0x20
@@ -152,12 +164,13 @@ extern void uda1380_set_monitor(int enable);
 
 /* REG_ADC: */
 #define REG_ADC             0x22
+#define ADC_INVERT          (1 << 12)       /* invert ADC polarity      */
+#define VGA_GAIN(x)         (((x) & 0xF) << 8)
+#define VGA_GAIN_MASK       0x0F00
 #define SEL_LNA             (1 << 3)
 #define SEL_MIC             (1 << 2)
 #define SKIP_DCFIL          (1 << 1)
 #define EN_DCFIL            (1 << 0)
-#define VGA_GAIN(x)         (((x) & 0xF) << 8)
-#define VGA_GAIN_MASK       0x0F00
 
 /* REG_AGC: Attack / Gain */
 #define REG_AGC             0x23
