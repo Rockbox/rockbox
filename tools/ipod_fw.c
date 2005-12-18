@@ -282,6 +282,7 @@ main(int argc, char **argv)
     };
     int images_done = 0;
     unsigned version = 0, offset = 0, len = 0;
+    int needs_rcsc = 0;
     
     test_endian();
     
@@ -318,6 +319,9 @@ main(int argc, char **argv)
 			(strcasecmp(optarg, "5g") == 0)) {
 		    fw_version = 3;
 		    image.addr = 0x10000000;
+		    if ((strcasecmp(optarg, "5g") == 0) || (strcasecmp(optarg, "video") == 0)) {
+			    needs_rcsc = 1;
+		    }
 		}
 		else if ((strcasecmp(optarg, "1g") != 0) &&
 			(strcasecmp(optarg, "2g") != 0) &&
@@ -512,6 +516,35 @@ main(int argc, char **argv)
     if (write_entry(&image, out, TBL, 0) == -1)
 	return 1;
     if (verbose) print_image(&image, "Master image: ");
+
+    if (needs_rcsc) {
+	image_t rsrc;
+
+	if ((in = fopen("apple_sw_5g_rcsc.bin", "rb")) == NULL) {
+	    fprintf(stderr, "Cannot open firmware image file %s\n", "apple_sw_5g_rcsc.bin");
+	    return 1;
+	}
+	if (load_entry(&rsrc, in, 0, 0) == -1) {
+	    return 1;
+	}
+	rsrc.devOffset = image.devOffset + image.len;
+	rsrc.devOffset = ((rsrc.devOffset + 0x1ff) & ~0x1ff) + 0x200;
+	if (fseek(out, rsrc.devOffset + IMAGE_PADDING, SEEK_SET) == -1) {
+	    fprintf(stderr, "fseek failed: %s\n", strerror(errno));
+	    return 1;
+    	}
+	if ((rsrc.chksum = copysum(in, out, rsrc.len, 0x200)) == -1) {
+	    return 1;
+	}
+	fclose(in);
+
+	if (write_entry(&rsrc, out, TBL, 1) == -1) {
+	    return 1;
+	}
+
+        if (verbose) print_image(&rsrc, "rsrc image: ");
+    }
+
     return 0;
 }
 
