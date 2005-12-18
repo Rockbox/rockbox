@@ -68,7 +68,7 @@ void usage(void)
            "\t-mm=X   Archos Multimedia format (X values: A=JBMM, B=AV1xx, C=AV3xx)\n"
            "\t-iriver iRiver format\n"
            "\t-add=X  Rockbox generic \"add-up\" checksum format\n"
-           "\t        (X values: h100, h120, h140, h300, ipco, nano)\n"
+           "\t        (X values: h100, h120, h140, h300, ipco, nano, ipvd)\n"
            "\nNo option results in Archos standard player/recorder format.\n");
 
     exit(1);
@@ -166,6 +166,8 @@ int main (int argc, char** argv)
             modelnum = 3;
         else if(!strcmp(&argv[1][5], "nano"))
             modelnum = 4;
+        else if(!strcmp(&argv[1][5], "ipvd"))
+            modelnum = 5;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

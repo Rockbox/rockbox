@@ -61,6 +61,9 @@ drivers/lcd-16bit.c
 #if CONFIG_LCD==LCD_IPODNANO || CONFIG_LCD==LCD_IPODCOLOR
 drivers/lcd-ipod.c
 #endif
+#if CONFIG_LCD==LCD_IPODVIDEO
+drivers/lcd-ipodvideo.c
+#endif
 #if CONFIG_LCD==LCD_H300
 drivers/lcd-h300.c
 #endif
@@ -99,7 +102,7 @@ drivers/mas.c
 #ifdef IRIVER_H300_SERIES
 drivers/pcf50606.c
 #endif
-#if defined(APPLE_IPODCOLOR) || defined(APPLE_IPODNANO)
+#if defined(APPLE_IPODCOLOR) || defined(APPLE_IPODNANO) || defined(APPLE_IPODVIDEO)
 drivers/pcf50605.c
 #endif
 #if CONFIG_RTC == RTC_M41ST84W

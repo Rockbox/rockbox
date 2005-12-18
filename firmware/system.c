@@ -1126,6 +1126,9 @@ void irq(void)
 
 static void ipod_init_cache(void)
 {
+/* Initialising the cache in the iPod Video bootloader prevents
+   Rockbox from starting */
+#if !defined(BOOTLOADER) || !defined(APPLE_IPODVIDEO)
     unsigned i;
 
     /* cache init mode? */
@@ -1144,6 +1147,7 @@ static void ipod_init_cache(void)
 
     for (i = 0x10000000; i < 0x10002000; i += 16)
         inb(i);
+#endif
 }
     
 static void ipod_set_cpu_speed(void)

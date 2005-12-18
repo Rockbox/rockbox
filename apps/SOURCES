@@ -56,11 +56,11 @@ recorder/icons.c
 recorder/keyboard.c
 recorder/peakmeter.c
 recorder/widgets.c
-#ifdef IRIVER_H300_SERIES
+#if defined(IRIVER_H300_SERIES) || defined(APPLE_IPODVIDEO)
 recorder/logo-h300.c
-#elif APPLE_IPODCOLOR
+#elif defined(APPLE_IPODCOLOR)
 recorder/logo-ipod.c
-#elif APPLE_IPODNANO
+#elif defined(APPLE_IPODNANO)
 recorder/logo-nano.c
 #endif
 #endif

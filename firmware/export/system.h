@@ -34,6 +34,8 @@ extern long cpu_frequency;
 #define outl(a,b) (*(volatile unsigned long *) (b) = (a))
 #define inb(a) (*(volatile unsigned char *) (a))
 #define outb(a,b) (*(volatile unsigned char *) (b) = (a))
+#define inw(a) (*(volatile unsigned short *) (a))
+#define outw(a,b) (*(volatile unsigned short *) (b) = (a))
 static inline void udelay(unsigned usecs)
 {
     unsigned start = inl(0x60005010);

@@ -410,6 +410,7 @@ appsdir='\$(ROOTDIR)/apps'
   echo "12 - iAudio X5"
   echo "13 - iPod Color/Photo"
   echo "14 - iPod Nano"
+  echo "15 - iPod Video"
 
   getit=`input`;
 
@@ -659,6 +660,23 @@ appsdir='\$(ROOTDIR)/apps'
     toolset=$ipodbitmaptools
     ;;
 
+   15)
+    archos="ipodvideo"
+    target="-DIPOD_VIDEO"
+    memory=32 # 30GB models have 32MB, 60GB have 64MB
+    arm7tdmicc
+    tool="$rootdir/tools/scramble -add=ipvd"
+    output="rockbox.ipod"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins="yes"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$ipodbitmaptools
+    ;;
+
    *)
     echo "Please select an actual target platform!"
     exit
@@ -703,7 +721,7 @@ fi
   case $option in
     [Bb])
       case $archos in
-          h100|h120|h300|ipodcolor|ipodnano)
+          h100|h120|h300|ipodcolor|ipodnano|ipodvideo)
               extradefines="-DBOOTLOADER" # for target makefile symbol EXTRA_DEFINES
               appsdir='\$(ROOTDIR)/bootloader'
               apps="bootloader"

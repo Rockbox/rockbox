@@ -81,7 +81,7 @@ extern const unsigned char bitmap_icon_disk[];
 #if  LCD_WIDTH == 112 || LCD_WIDTH == 128 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_WIDTH == 128)
 extern const unsigned char rockbox112x37[];
 #endif
-#if defined(IRIVER_H300_SERIES) || defined(APPLE_IPODCOLOR)
+#if defined(IRIVER_H300_SERIES) || defined(APPLE_IPODCOLOR) || defined(APPLE_IPODVIDEO)
 #define ROCKBOXLOGO_WIDTH 220
 #define ROCKBOXLOGO_HEIGHT 68
 extern const unsigned short rockboxlogo[];

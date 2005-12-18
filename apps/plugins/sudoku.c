@@ -381,7 +381,7 @@ static unsigned char num_inverse[10][8]= {
      /* Numeral 9 */
   {0x3f,0x3f,0x1b,0x15,0x15,0x23,0x3f,0x3f},
 };
-#elif (LCD_HEIGHT==176) && (LCD_WIDTH==220)
+#elif (LCD_HEIGHT>=176) && (LCD_WIDTH>=220)
 /* iriver h300 */
 
 /* Internal dimensions of a cell */

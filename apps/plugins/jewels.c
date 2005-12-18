@@ -103,7 +103,7 @@
 #define SWAP_TIMER 30
 
 /* use 22x22 tiles */
-#if (LCD_HEIGHT == 176) && (LCD_WIDTH == 220) && \
+#if (LCD_HEIGHT >= 176) && (LCD_WIDTH >= 220) && \
     (LCD_PIXELFORMAT == RGB565SWAPPED)
 /* size of a tile */
 #define TILE_WIDTH  22
@@ -616,7 +616,7 @@ static unsigned short jewel[8][484] = {
 };
 
 /* use 22x22 tiles */
-#elif (LCD_HEIGHT == 176) && (LCD_WIDTH == 220) && \
+#elif (LCD_HEIGHT >= 176) && (LCD_WIDTH >= 220) && \
       (LCD_PIXELFORMAT == RGB565)
 /* size of a tile */
 #define TILE_WIDTH  22

@@ -75,6 +75,7 @@
                           unknown at the time of this writing */
 #define LCD_IPODCOLOR 6 /* as used by iPod Color/Photo */
 #define LCD_IPODNANO  7 /* as used by iPod Nano */
+#define LCD_IPODVIDEO 8 /* as used by iPod Video */
 
 /* LCD_PIXELFORMAT */
 #define RGB565 565
@@ -87,7 +88,7 @@
 #define BL_IRIVER_H100   3 /* IRiver GPIO */
 #define BL_GMINI         4 /* Archos GMini */
 #define BL_IPOD4G        5 /* Apple iPod 4G */
-#define BL_IPODNANO      6 /* Apple iPod Nano */
+#define BL_IPODNANO      6 /* Apple iPod Nano and iPod Video*/
 #define BL_IRIVER_H300   7 /* IRiver PWM */
 
 /* CONFIG_I2C */
@@ -137,6 +138,8 @@
 #include "config-ipodcolor.h"
 #elif defined(IPOD_NANO)
 #include "config-ipodnano.h"
+#elif defined(IPOD_VIDEO)
+#include "config-ipodvideo.h"
 #else
 /* no known platform */
 #endif
