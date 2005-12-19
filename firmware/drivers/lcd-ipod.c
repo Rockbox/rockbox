@@ -7,11 +7,14 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 by Dave Chapman
- *
  * Rockbox driver for iPod LCDs
  *
- * Based on code from ipodlinux - http://ipodlinux.org
+ * Based on code from the ipodlinux project - http://ipodlinux.org/
+ * Adapted for Rockbox in November 2005
+ *
+ * Original file: linux/arch/armnommu/mach-ipod/fb.c
+ *
+ * Copyright (c) 2003-2005 Bernard Leach (leachbj@bouncycastle.org)
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.

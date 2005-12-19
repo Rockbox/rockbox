@@ -9,6 +9,12 @@
  *
  * Copyright (C) 2002 by Daniel Stenberg
  *
+ * iPod driver based on code from the ipodlinux project - http://ipodlinux.org
+ * Adapted for Rockbox in December 2005
+ * Original file: linux/arch/armnommu/mach-ipod/keyboard.c
+ * Copyright (c) 2003-2005 Bernard Leach (leachbj@bouncycastle.org)
+ *
+ *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
  *

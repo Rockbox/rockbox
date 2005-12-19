@@ -24,6 +24,7 @@ extern void wm8975_reset(void);
 extern int wm8975_init(void);
 extern void wm8975_enable_output(bool enable);
 extern int wm8975_set_master_vol(int vol_l, int vol_r);
+extern void wm8975_get_master_vol(int* vol_l, int* vol_r);
 extern int wm8975_set_mixer_vol(int channel1, int channel2);
 extern void wm8975_set_bass(int value);
 extern void wm8975_set_treble(int value);

@@ -7,9 +7,14 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 by Dave Chapman
+ * Driver for pcf50605 PMU and RTC
  *
- * Based on code from the iPodLinux project (C) 2004-2005 Bernard Leach
+ * Based on code from the ipodlinux project - http://ipodlinux.org/
+ * Adapted for Rockbox in December 2005
+ *
+ * Original file: linux/arch/armnommu/mach-ipod/pcf50605.c
+ *
+ * Copyright (c) 2003-2005 Bernard Leach (leachbj@bouncycastle.org)
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
