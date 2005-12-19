@@ -125,7 +125,7 @@ int read_decorr_terms (WavpackStream *wps, WavpackMetadata *wpmd)
 int read_decorr_weights (WavpackStream *wps, WavpackMetadata *wpmd)
 {
     int termcnt = wpmd->byte_length, tcount;
-    char *byteptr = wpmd->data;
+    signed char *byteptr = wpmd->data;
     struct decorr_pass *dpp;
 
     if (!(wps->wphdr.flags & MONO_FLAG))

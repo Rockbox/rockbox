@@ -386,8 +386,8 @@ void send_words (long *buffer, int nsamples, ulong flags,
 void flush_word (struct words_data *w, Bitstream *bs);
 int log2s (long value);
 long exp2s (int log);
-char store_weight (int weight);
-int restore_weight (char weight);
+signed char store_weight (int weight);
+int restore_weight (signed char weight);
 
 #define WORD_EOF (1L << 31)
 

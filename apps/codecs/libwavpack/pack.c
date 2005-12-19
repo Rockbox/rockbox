@@ -96,7 +96,7 @@ static void write_decorr_weights (WavpackStream *wps, WavpackMetadata *wpmd)
 {
     int tcount = wps->num_terms;
     struct decorr_pass *dpp;
-    char *byteptr;
+    signed char *byteptr;
 
     byteptr = wpmd->data = wpmd->temp_data;
     wpmd->id = ID_DECORR_WEIGHTS;
@@ -108,7 +108,7 @@ static void write_decorr_weights (WavpackStream *wps, WavpackMetadata *wpmd)
             dpp->weight_B = restore_weight (*byteptr++ = store_weight (dpp->weight_B));
     }
 
-    wpmd->byte_length = byteptr - (char *) wpmd->data;
+    wpmd->byte_length = byteptr - (signed char *) wpmd->data;
 }
 
 // Allocate room for and copy the decorrelation samples from the decorr_passes

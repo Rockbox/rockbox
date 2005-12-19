@@ -762,7 +762,7 @@ long exp2s (int log)
 // to and from an 8-bit signed character version for storage in metadata. The
 // weights are clipped here in the case that they are outside that range.
 
-char store_weight (int weight)
+signed char store_weight (int weight)
 {
     if (weight > 1024)
         weight = 1024;
@@ -775,7 +775,7 @@ char store_weight (int weight)
     return (weight + 4) >> 3;
 }
 
-int restore_weight (char weight)
+int restore_weight (signed char weight)
 {
     int result;
 

@@ -186,7 +186,7 @@ static int wav2wv (char *filename)
         unsigned long samples_count, samples_to_pack, bytes_count;
         int cnt, buttons;
         long value, *lp;
-        char *cp;
+        signed char *cp;
  
         samples_count = SAMPLES_PER_BLOCK;
 
@@ -204,7 +204,7 @@ static int wav2wv (char *filename)
         total_bytes_read += bytes_count;
         WavpackStartBlock (wpc, output_buffer, output_buffer + 0x100000);
         samples_to_pack = samples_count;
-        cp = (char *) input_buffer;
+        cp = (signed char *) input_buffer;
 
         while (samples_to_pack) {
             unsigned long samples_this_pass = TEMP_SAMPLES / num_chans;
