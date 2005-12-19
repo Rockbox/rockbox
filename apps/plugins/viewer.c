@@ -119,7 +119,7 @@
 #define VIEWER_COLUMN_LEFT (BUTTON_ON | BUTTON_LEFT)
 #define VIEWER_COLUMN_RIGHT (BUTTON_ON | BUTTON_RIGHT)
 
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define VIEWER_QUIT BUTTON_MENU
 #define VIEWER_PAGE_UP BUTTON_SCROLL_FWD
 #define VIEWER_PAGE_DOWN BUTTON_SCROLL_BACK
@@ -1172,7 +1172,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
 
 #if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == ONDIO_PAD) \
     || (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD) \
-    || (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
             case VIEWER_MODE_PAGE:
                 /* Page-overlap mode */
                 if (++page_mode == PAGE_MODES)

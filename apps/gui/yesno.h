@@ -23,7 +23,7 @@
 #elif CONFIG_KEYPAD == GMINI100_PAD
 #define YESNO_OK       BUTTON_PLAY
 
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define YESNO_OK       BUTTON_RIGHT
 #endif
 enum yesno_res

@@ -71,7 +71,7 @@ use F3 to see how many mines are left (supposing all your flags are correct)
 #define MINESWP_DISCOVER BUTTON_ON
 #define MINESWP_INFO BUTTON_MODE
 
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define MINESWP_UP BUTTON_SCROLL_BACK
 #define MINESWP_DOWN BUTTON_SCROLL_FWD
 #define MINESWP_QUIT BUTTON_MENU

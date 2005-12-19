@@ -21,7 +21,7 @@
 #define LCD_DEPTH  16   /* 65536 colours */
 #define LCD_PIXELFORMAT RGB565SWAPPED /* rgb565 byte-swapped */
 
-#define CONFIG_KEYPAD IPOD_NANO_PAD
+#define CONFIG_KEYPAD IPOD_4G_PAD
 
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC

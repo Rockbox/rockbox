@@ -28,7 +28,7 @@ static int fontwidth, fontheight;
 
 #if CONFIG_KEYPAD == PLAYER_PAD 
 #define STATS_STOP BUTTON_STOP
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define STATS_STOP BUTTON_MENU
 #else
 #define STATS_STOP BUTTON_OFF

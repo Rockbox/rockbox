@@ -102,7 +102,7 @@ long reverse (long N) {
 /* Button definitions */
 #if CONFIG_KEYPAD == PLAYER_PAD
 #define LP_QUIT BUTTON_STOP
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define LP_QUIT BUTTON_MENU
 #else
 #define LP_QUIT BUTTON_OFF

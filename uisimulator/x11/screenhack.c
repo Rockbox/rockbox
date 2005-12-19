@@ -122,7 +122,7 @@
   "Enter, A   OFF\n" \
   "., INS     MENU\n"
 
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define KEYBOARD_SPECIFIC \
   "[not written yet]"
 

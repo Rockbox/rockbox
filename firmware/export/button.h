@@ -149,7 +149,7 @@ bool remote_button_hold(void);
 #define  BUTTON_DOWN          0x0020
 #define  BUTTON_MENU          0x0100
 
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD)
 
 /* TODO: These codes should relate to the hardware */
 

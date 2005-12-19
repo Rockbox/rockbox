@@ -67,7 +67,7 @@
 #define BEJEWELED_SELECT BUTTON_SELECT
 #define BEJEWELED_RESUME BUTTON_MODE
 
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define BEJEWELED_SCROLLWHEEL
 #define BEJEWELED_UP         BUTTON_MENU
 #define BEJEWELED_DOWN       BUTTON_PLAY
@@ -2241,7 +2241,7 @@ static int bejeweled(struct game_context* bj) {
             rb->lcd_puts(0, 7, "Directions to move");
             rb->snprintf(str, 18, "High Score: %d", bj->highscores[0]);
             rb->lcd_puts(0, 9, str);
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD)
             rb->lcd_puts(0, 2, "PLAY to start");
             rb->lcd_puts(0, 3, "SELECT+PLAY to save/resume");
             rb->lcd_puts(0, 4, "SELECT+MENU to exit");

@@ -53,8 +53,7 @@ dir is the current direction of the snake - 0=up, 1=right, 2=down, 3=left;
 #define SNAKE_DOWN BUTTON_DOWN
 #define SNAKE_PLAYPAUSE BUTTON_ON
 
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_NANO_PAD)
-
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define SNAKE_QUIT (BUTTON_SELECT|BUTTON_MENU)
 #define SNAKE_UP   BUTTON_MENU
 #define SNAKE_DOWN BUTTON_PLAY

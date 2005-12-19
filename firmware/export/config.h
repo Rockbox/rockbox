@@ -51,7 +51,6 @@
 #define IRIVER_H300_PAD 5
 #define IAUDIO_X5_PAD   6
 #define IPOD_4G_PAD     7
-#define IPOD_NANO_PAD   8
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1

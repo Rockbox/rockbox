@@ -172,8 +172,7 @@
 #define WPS_KEYLOCK    (BUTTON_MENU | BUTTON_DOWN)
 #define WPS_ID3        (BUTTON_MENU | BUTTON_ON)
 
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-(CONFIG_KEYPAD == IPOD_NANO_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD)
 
 /* TODO: Check WPS button assignments */
 

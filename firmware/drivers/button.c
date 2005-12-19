@@ -63,7 +63,7 @@ static int button_read(void);
 static bool remote_button_hold_only(void);
 #endif
 
-#if CONFIG_KEYPAD == IPOD_4G_PAD || CONFIG_KEYPAD == IPOD_NANO_PAD
+#if CONFIG_KEYPAD == IPOD_4G_PAD
 /* Variable to use for setting button status in interrupt handler */
 int int_btn = BUTTON_NONE;
 
@@ -371,7 +371,7 @@ void button_init(void)
     /* nothing to initialize here */
 #elif CONFIG_KEYPAD == GMINI100_PAD
     /* nothing to initialize here */
-#elif CONFIG_KEYPAD == IPOD_4G_PAD || CONFIG_KEYPAD == IPOD_NANO_PAD
+#elif CONFIG_KEYPAD == IPOD_4G_PAD
     opto_i2c_init();
     /* hold button - enable as input */
     GPIOA_ENABLE |= 0x20;
@@ -397,7 +397,7 @@ void button_init(void)
 }
 
 #ifdef HAVE_LCD_BITMAP /* only bitmap displays can be flipped */
-#if (CONFIG_KEYPAD != IPOD_4G_PAD) && (CONFIG_KEYPAD != IPOD_NANO_PAD)
+#if (CONFIG_KEYPAD != IPOD_4G_PAD)
 /*
  * helper function to swap UP/DOWN, LEFT/RIGHT (and F1/F3 for Recorder)
  */
@@ -821,7 +821,7 @@ static int button_read(void)
     if (data & 0x01)
         btn |= BUTTON_ON;
 
-#elif CONFIG_KEYPAD == IPOD_4G_PAD || CONFIG_KEYPAD == IPOD_NANO_PAD
+#elif CONFIG_KEYPAD == IPOD_4G_PAD
     (void)data;
     /* The int_btn variable is set in the button interrupt handler */
     btn = int_btn;
