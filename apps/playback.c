@@ -46,6 +46,7 @@
 #include "playback.h"
 #include "pcmbuf.h"
 #include "pcm_playback.h"
+#include "pcm_record.h"
 #include "buffer.h"
 #include "dsp.h"
 #ifdef HAVE_LCD_BITMAP
@@ -2385,9 +2386,15 @@ void test_unbuffer_event(struct mp3entry *id3, bool last_track)
 void audio_init(void)
 {
     static bool voicetagtrue = true;
-    
+
     logf("audio api init");
     pcm_init();
+
+#if defined(HAVE_RECORDING) && !defined(SIMULATOR)
+    /* Set the input multiplexer to Line In */
+    pcm_rec_mux(0);
+#endif
+    
     filebufused = 0;
     filling = false;
     current_codec = CODEC_IDX_AUDIO;
