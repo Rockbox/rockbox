@@ -187,6 +187,10 @@ extern fb_data lcd_framebuffer[LCD_HEIGHT/4][LCD_WIDTH];
 extern fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH];
 #endif
 
+#if CONFIG_BACKLIGHT==BL_IRIVER_H300
+extern void lcd_enable(bool on);
+#endif
+
 extern void lcd_set_invert_display(bool yesno);
 extern void lcd_set_flip(bool yesno);
 extern void lcd_roll(int pixels);

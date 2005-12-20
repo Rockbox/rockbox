@@ -30,6 +30,9 @@
 #include "timer.h"
 #include "backlight.h"
 
+#if CONFIG_BACKLIGHT == BL_IRIVER_H300
+#include "lcd.h" /* for lcd_enable() */
+#endif
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
@@ -211,6 +214,7 @@ static void __backlight_on(void)
         and_l(~0x00020000, &GPIO1_OUT);
     }
 #elif CONFIG_BACKLIGHT == BL_IRIVER_H300
+    lcd_enable(true);
     or_l(0x00020000, &GPIO1_OUT);    
 #elif CONFIG_BACKLIGHT == BL_RTC
     /* Enable square wave */
@@ -251,6 +255,7 @@ static void __backlight_off(void)
     }
 #elif CONFIG_BACKLIGHT == BL_IRIVER_H300
     and_l(~0x00020000, &GPIO1_OUT);
+    lcd_enable(false);
 #elif CONFIG_BACKLIGHT == BL_RTC
     /* Disable square wave */
     rtc_write(0x0a, rtc_read(0x0a) & ~0x40);
