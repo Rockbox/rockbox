@@ -152,6 +152,13 @@ static struct plugin_api* rb;
 #define HELP_SOL_CUR2STACK "SELECT..: Put the card under the cursor on one of the 4 final stacks."
 #define HELP_SOL_REM2STACK "PLAY+RIGHT: Put the card on top of the remains' stack on one of the 4 final stacks."
 
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) 	 
+#define HELP_SOL_MOVE "SELECT: Select cards, Move cards, reveal hidden cards ..." 	 
+#define HELP_SOL_DRAW "SELECT+PLAY: Un-select a card if it was selected. Else, draw 3 new cards out of the remains' stack." 	 
+#define HELP_SOL_REM2CUR "SELECT+LEFT: Put the card on top of the remains' stack on top of the cursor." 	 
+#define HELP_SOL_CUR2STACK "SELECT+RIGHT..: Put the card under the cursor on one of the 4 final stacks." 	 
+#define HELP_SOL_REM2STACK "LEFT+RIGHT: Put the card on top of the remains' stack on one of the 4 final stacks." 	 
+  	 
 #endif
 
 #if LCD_DEPTH>1
