@@ -154,7 +154,6 @@ void lcd_update_rect(int x, int y, int width, int height)
     unsigned int curpixel=0;
     int c, r;
     unsigned long *addr;
-    int p0,p1;
 
     /* Ensure x and width are both even - so we can read 32-bit aligned 
        data from lcd_framebuffer */
