@@ -22,45 +22,6 @@
 #include <string.h>
 #include "ogg.h"
 
-static const unsigned long mask[] ICONST_ATTR =
-{0x00000000,0x00000001,0x00000003,0x00000007,0x0000000f,
- 0x0000001f,0x0000003f,0x0000007f,0x000000ff,0x000001ff,
- 0x000003ff,0x000007ff,0x00000fff,0x00001fff,0x00003fff,
- 0x00007fff,0x0000ffff,0x0001ffff,0x0003ffff,0x0007ffff,
- 0x000fffff,0x001fffff,0x003fffff,0x007fffff,0x00ffffff,
- 0x01ffffff,0x03ffffff,0x07ffffff,0x0fffffff,0x1fffffff,
- 0x3fffffff,0x7fffffff,0xffffffff };
-
-/* mark read process as having run off the end */
-static void _adv_halt(oggpack_buffer *b){
-  b->headptr=b->head->buffer->data+b->head->begin+b->head->length;
-  b->headend=-1;
-  b->headbit=0;
-}
-
-/* spans forward, skipping as many bytes as headend is negative; if
-   headend is zero, simply finds next byte.  If we're up to the end
-   of the buffer, leaves headend at zero.  If we've read past the end,
-   halt the decode process. */
-static void _span(oggpack_buffer *b){
-  while(b->headend<1){
-    if(b->head->next){
-      b->count+=b->head->length;
-      b->head=b->head->next;
-      b->headptr=b->head->buffer->data+b->head->begin-b->headend; 
-      b->headend+=b->head->length;      
-    }else{
-      /* we've either met the end of decode, or gone past it. halt
-         only if we're past */
-      if(b->headend<0 || b->headbit)
-        /* read has fallen off the end */
-        _adv_halt(b);
-
-      break;
-    }
-  }
-}
-
 void oggpack_readinit(oggpack_buffer *b,ogg_reference *r){
   memset(b,0,sizeof(*b));
 
@@ -79,9 +40,9 @@ void oggpack_readinit(oggpack_buffer *b,ogg_reference *r){
                       }
 
 /* Read in bits without advancing the bitptr; bits <= 32 */
-long oggpack_look(oggpack_buffer *b,int bits) ICODE_ATTR;
-long oggpack_look(oggpack_buffer *b,int bits){
-  unsigned long m=mask[bits];
+long oggpack_look_full(oggpack_buffer *b,int bits) ICODE_ATTR;
+long oggpack_look_full(oggpack_buffer *b,int bits){
+  unsigned long m=(1<<bits)-1;
   unsigned long ret=0;
 
   bits+=b->headbit;
@@ -139,19 +100,6 @@ long oggpack_look(oggpack_buffer *b,int bits){
   return ret;
 }
 
-/* limited to 32 at a time */
-#if CONFIG_CPU!=PP5020
-/* TODO: This function (and this function only) causes a "relocation
-   truncated to fit: R_ARM_PC24" error when in IRAM on ARM targets */
-void oggpack_adv(oggpack_buffer *b,int bits) ICODE_ATTR;
-#endif
-void oggpack_adv(oggpack_buffer *b,int bits){
-  bits+=b->headbit;
-  b->headbit=bits&7;
-  b->headptr+=bits/8;
-  if((b->headend-=bits/8)<1)_span(b);
-}
-
 /* spans forward and finds next byte.  Never halts */
 static void _span_one(oggpack_buffer *b){
   while(b->headend<1){
@@ -180,7 +128,7 @@ int oggpack_eop(oggpack_buffer *b){
 
 /* bits <= 32 */
 long oggpack_read(oggpack_buffer *b,int bits){
-  unsigned long m=mask[bits];
+  unsigned long m=(1<<bits)-1;
   ogg_uint32_t ret=0;
 
   bits+=b->headbit;
@@ -235,7 +183,7 @@ long oggpack_read(oggpack_buffer *b,int bits){
       }
     }
   }else{
-  
+
     ret=b->headptr[0]>>b->headbit;
     if(bits>8){
       ret|=b->headptr[1]<<(8-b->headbit);  

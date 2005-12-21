@@ -141,12 +141,75 @@ typedef struct {
 /* Ogg BITSTREAM PRIMITIVES: bitstream ************************/
 
 extern void  oggpack_readinit(oggpack_buffer *b,ogg_reference *r);
-extern long  oggpack_look(oggpack_buffer *b,int bits);
-extern void  oggpack_adv(oggpack_buffer *b,int bits);
+extern long  oggpack_look_full(oggpack_buffer *b,int bits);
 extern long  oggpack_read(oggpack_buffer *b,int bits);
 extern long  oggpack_bytes(oggpack_buffer *b);
 extern long  oggpack_bits(oggpack_buffer *b);
 extern int   oggpack_eop(oggpack_buffer *b);
+
+/* Inline a few, often called functions */
+
+/* mark read process as having run off the end */
+static inline void _adv_halt(oggpack_buffer *b){
+  b->headptr=b->head->buffer->data+b->head->begin+b->head->length;
+  b->headend=-1;
+  b->headbit=0;
+}
+
+/* spans forward, skipping as many bytes as headend is negative; if
+   headend is zero, simply finds next byte.  If we're up to the end
+   of the buffer, leaves headend at zero.  If we've read past the end,
+   halt the decode process. */
+static inline void _span(oggpack_buffer *b){
+  while(b->headend<1){
+    if(b->head->next){
+      b->count+=b->head->length;
+      b->head=b->head->next;
+      b->headptr=b->head->buffer->data+b->head->begin-b->headend; 
+      b->headend+=b->head->length;      
+    }else{
+      /* we've either met the end of decode, or gone past it. halt
+         only if we're past */
+      if(b->headend<0 || b->headbit)
+        /* read has fallen off the end */
+        _adv_halt(b);
+
+      break;
+    }
+  }
+}
+
+/* limited to 32 at a time */
+static inline void oggpack_adv(oggpack_buffer *b,int bits){
+  bits+=b->headbit;
+  b->headbit=bits&7;
+  b->headptr+=bits/8;
+  if((b->headend-=bits/8)<1)_span(b);
+}
+
+static inline long oggpack_look(oggpack_buffer *b, int bits){
+  if(bits+b->headbit < b->headend<<3){
+    unsigned long m=(1<<bits)-1;
+    unsigned long ret=0;
+
+    bits+=b->headbit;
+    ret=b->headptr[0]>>b->headbit;
+    if(bits>8){
+      ret|=b->headptr[1]<<(8-b->headbit);  
+      if(bits>16){
+        ret|=b->headptr[2]<<(16-b->headbit);  
+        if(bits>24){
+          ret|=b->headptr[3]<<(24-b->headbit);  
+          if(bits>32 && b->headbit)
+            ret|=b->headptr[4]<<(32-b->headbit);
+        }
+      }
+    }
+    return ret&m;
+  }else{
+    return oggpack_look_full(b, bits);
+  }
+}
 
 /* Ogg BITSTREAM PRIMITIVES: decoding **************************/
 
