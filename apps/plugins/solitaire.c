@@ -604,15 +604,15 @@ int solitaire_menu(unsigned char when_n)
 
         button = rb->button_get(true);
         switch(button){
-            case BUTTON_UP:
+            case SOL_UP:
                 cursor = (cursor + MENU_LENGTH - 1)%MENU_LENGTH;
                 break;
 
-            case BUTTON_DOWN:
+            case SOL_DOWN:
                 cursor = (cursor + 1)%MENU_LENGTH;
                 break;
 
-            case BUTTON_LEFT:
+            case SOL_LEFT:
                 return MENU_RESUME;
 
             case SOL_MENU_RUN:
