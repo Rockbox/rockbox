@@ -18,6 +18,7 @@ viewer.c
 dict.c
 
 #ifdef HAVE_LCD_BITMAP /* Recorder/Ondio models only */
+solitaire.c
 #ifndef HAVE_LCD_COLOR
 fire.c
 plasma.c
@@ -44,7 +45,6 @@ sliding_puzzle.c
 snake.c
 snake2.c
 sokoban.c
-solitaire.c
 star.c
 starfield.c
 #if (LCD_WIDTH != 176)

@@ -106,6 +106,21 @@ static struct plugin_api* rb;
 #define SOL_MENU_INFO BUTTON_MODE
 #define SOL_OPT BUTTON_ON
 #define SOL_REM BUTTON_REC
+
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) 	 
+#define SOL_QUIT (BUTTON_SELECT | BUTTON_MENU) 	 
+#define SOL_UP BUTTON_MENU 	 
+#define SOL_DOWN BUTTON_PLAY 	 
+#define SOL_LEFT BUTTON_LEFT 	 
+#define SOL_RIGHT BUTTON_RIGHT 	 
+#define SOL_MOVE BUTTON_SELECT 	 
+#define SOL_DRAW (BUTTON_SELECT | BUTTON_PLAY) 	 
+#define SOL_REM2CUR (BUTTON_SELECT | BUTTON_LEFT) 	 
+#define SOL_CUR2STACK (BUTTON_SELECT | BUTTON_RIGHT) 	 
+#define SOL_REM2STACK (BUTTON_LEFT | BUTTON_RIGHT) 	 
+#define SOL_MENU_RUN BUTTON_SELECT 	 
+#define SOL_MENU_INFO (BUTTON_PLAY | BUTTON_MENU) 	 
+  	 
 #endif
 
 /* common help definitions */
@@ -618,9 +633,12 @@ int solitaire_menu(unsigned char when_n)
 #endif
                 rb->splash(HZ, true, "Solitaire for Rockbox by dionoea");
                 break;
-            case BUTTON_ON:
-                return MENU_OPT;                                                                   
-            case BUTTON_OFF:
+
+#ifdef SOL_OPT
+            case SOL_OPT:
+                return MENU_OPT;
+#endif
+            case SOL_QUIT:
                 return MENU_QUIT;
             
             default:
