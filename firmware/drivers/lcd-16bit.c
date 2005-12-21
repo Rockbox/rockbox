@@ -36,7 +36,7 @@
 #define SCROLLABLE_LINES 26
 
 /*** globals ***/
-fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH] __attribute__ ((aligned (4)));
+fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH] __attribute__ ((aligned (16)));
 
 static unsigned fg_pattern IDATA_ATTR = LCD_DEFAULT_FG;
 static unsigned bg_pattern IDATA_ATTR = LCD_DEFAULT_BG;

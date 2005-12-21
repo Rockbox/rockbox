@@ -89,12 +89,20 @@ inline void lcd_begin_write_gram(void)
     *(volatile unsigned short *)0xf0000000 = R_WRITE_DATA_2_GRAM;
 }
 
-/* called very frequently - inline! */
-inline void lcd_write_data(const unsigned short* p_bytes, int count) ICODE_ATTR;
-inline void lcd_write_data(const unsigned short* p_bytes, int count)
+void lcd_write_data(const unsigned short* p_bytes, int count) ICODE_ATTR;
+void lcd_write_data(const unsigned short* p_bytes, int count)
 {
-    while(count--)
-        *(volatile unsigned short *)0xf0000002 = *p_bytes++;
+    SAR1 = (unsigned long)p_bytes; /* Destination address */
+    while(count)
+    {
+        int cnt = MIN(count, 256);
+        DAR1 = (unsigned long)0xf0000002; /* Destination address */
+        BCR1 = cnt*2;          /* Bytes to transfer */
+        DCR1 = 0x02000000 | DMA_SINC | (2 << 20) | (2 << 17) | DMA_START;
+        while(!(DSR1 & 1)) {};
+        DSR1 = 1;
+        count -= cnt;
+    }
 }
 
 /*** hardware configuration ***/
@@ -131,6 +139,9 @@ void lcd_roll(int lines)
 /* LCD init */
 void lcd_init_device(void)
 {
+    MPARK = 0x81;    /* PARK[1,0]=10 + BCR24BIT */
+    DSR1 = 1;
+
     /* GPO46 is LCD RESET */
     or_l(0x00004000, &GPIO1_OUT);
     or_l(0x00004000, &GPIO1_ENABLE);
