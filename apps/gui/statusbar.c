@@ -93,10 +93,15 @@
                                                 7*ICONS_SPACING
 #define STATUSBAR_LOCKR_WIDTH                   5
 
+#if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
 #define STATUSBAR_DISK_WIDTH                    12
 #define STATUSBAR_DISK_X_POS(statusbar_width)   statusbar_width - \
                                                 STATUSBAR_DISK_WIDTH
-#define STATUSBAR_TIME_X_END(statusbar_width)   statusbar_width-1
+#else
+#define STATUSBAR_DISK_WIDTH                    0
+#endif
+#define STATUSBAR_TIME_X_END(statusbar_width)   statusbar_width - 1 - \
+                                                STATUSBAR_DISK_WIDTH
 
 struct gui_syncstatusbar statusbars;
 

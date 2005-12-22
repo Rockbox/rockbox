@@ -21,12 +21,41 @@
 #include "i2c.h"
 #include "rtc.h"
 #include "kernel.h"
+#include "system.h"
+#include "pcf50606.h"
 #include <stdbool.h> 
 
 #define RTC_ADR 0xd0
 #define	RTC_DEV_WRITE   (RTC_ADR | 0x00)
 #define	RTC_DEV_READ    (RTC_ADR | 0x01)
 
+#if CONFIG_RTC == RTC_PCF50606
+void rtc_init(void)
+{
+}
+int rtc_read_datetime(unsigned char* buf) {
+    int rc;
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    
+    rc = pcf50606_read_multiple(0x0a, buf, 7);
+
+    set_irq_level(oldlevel);
+
+    return rc;
+}
+
+int rtc_write_datetime(unsigned char* buf) {
+    int rc;
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    
+    rc = pcf50606_write_multiple(0x0a, buf, 7);
+
+    set_irq_level(oldlevel);
+
+    return rc;
+}
+
+#else
 void rtc_init(void)
 {
     unsigned char data; 
@@ -278,5 +307,6 @@ int rtc_write_datetime(unsigned char* buf) {
 
     return rc;
 }
+#endif /* CONFIG_RTC == RTC_PCF50606 */
 
 #endif /* CONFIG_RTC */
