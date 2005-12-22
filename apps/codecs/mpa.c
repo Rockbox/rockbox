@@ -178,16 +178,15 @@ next_track:
                     break;
         
                 /* Fill the buffer */
+                if (stream.next_frame)
+                    ci->advance_buffer_loc((void *)stream.next_frame);
+                else
+                    ci->advance_buffer(size);
                 stream.error = 0;
                 file_end++;
                 continue;
             } else if (MAD_RECOVERABLE(stream.error)) {
-                if (stream.error != MAD_ERROR_LOSTSYNC) {
-                    // rb->splash(HZ*1, true, "Recoverable...!");
-                }
                 continue;
-            } else if (stream.error == MAD_ERROR_BUFLEN) {
-                break;
             } else {
                 /* Some other unrecoverable error */
                 status = 1;
