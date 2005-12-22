@@ -60,8 +60,14 @@ static bool flipped;  /* buttons can be flipped to match the LCD flip */
 /* speed repeat finishes at */
 #define REPEAT_INTERVAL_FINISH  5
 
-/* Number of repeated keys before shutting off */
+/* the power-off button and number of repeated keys before shutting off */
+#if CONFIG_KEYPAD == IPOD_4G_PAD
+#define POWEROFF_BUTTON BUTTON_PLAY
+#define POWEROFF_COUNT 40
+#else
+#define POWEROFF_BUTTON BUTTON_OFF
 #define POWEROFF_COUNT 10
+#endif
 
 static int button_read(void);
 
@@ -274,9 +280,9 @@ static void button_tick(void)
                                key */
 #ifdef HAVE_SW_POWEROFF
 #ifdef BUTTON_RC_STOP
-                            if ((btn == BUTTON_OFF || btn == BUTTON_RC_STOP) &&
+                            if ((btn == POWEROFF_BUTTON || btn == BUTTON_RC_STOP) &&
 #else
-                            if (btn == BUTTON_OFF &&
+                            if (btn == POWEROFF_BUTTON &&
 #endif
 #ifndef HAVE_POWEROFF_WHILE_CHARGING
                                 !charger_inserted() &&
