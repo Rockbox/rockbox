@@ -27,6 +27,10 @@
 #include "timefuncs.h"
 #include "abrepeat.h"
 
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+#include "backlight.h" /* for [MIN|MAX]_BRIGHTNESS_SETTING */
+#endif
+
 #define ROCKBOX_DIR "/.rockbox"
 #define ROCKBOX_DIR_LEN 9
 #define FONT_DIR "/fonts"
@@ -446,10 +450,6 @@ extern const char rec_base_directory[];
 #endif
 #define MIN_CONTRAST_SETTING        5
 
-#ifdef HAVE_BACKLIGHT_BRIGHTNESS
-#define MIN_BRIGHTNESS_SETTING      2
-#define MAX_BRIGHTNESS_SETTING      15
-#endif
 
 /* argument bits for settings_load() */
 #define SETTINGS_RTC 1 /* only the settings from the RTC nonvolatile RAM */

@@ -51,5 +51,7 @@ void sim_remote_backlight(int value);
 #endif
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
+#define MIN_BRIGHTNESS_SETTING      2
+#define MAX_BRIGHTNESS_SETTING      15
 void backlight_set_brightness(int val);
 #endif
