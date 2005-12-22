@@ -3550,3 +3550,10 @@ desc: in radio screen / menu
 eng: "Mode:"
 voice: ""
 new:
+
+id: LANG_BRIGHTNESS
+desc: in settings_menu
+eng: "Brightness"
+voice: "Brightness"
+new:
+

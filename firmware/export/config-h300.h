@@ -100,4 +100,6 @@
 #define BOOTFILE_EXT "iriver"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 
+#define HAVE_BACKLIGHT_BRIGHTNESS
+
 #endif

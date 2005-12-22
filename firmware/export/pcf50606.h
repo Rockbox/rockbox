@@ -25,6 +25,7 @@ int pcf50606_write_multiple(int address, const unsigned char* buf, int count);
 int pcf50606_write(int address, unsigned char val);
 int pcf50606_read_multiple(int address, unsigned char* buf, int count);
 int pcf50606_read(int address);
+void pcf50606_set_bl_pwm(unsigned char ucVal);
 #endif
 
 #endif

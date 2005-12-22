@@ -30,6 +30,10 @@
 #include "timer.h"
 #include "backlight.h"
 
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+#include "pcf50606.h" /* iRiver brightness */
+#endif
+ 
 #if CONFIG_BACKLIGHT == BL_IRIVER_H300
 #include "lcd.h" /* for lcd_enable() */
 #endif
@@ -537,4 +541,14 @@ void remote_backlight_off(void) {}
 void remote_backlight_set_timeout(int index) {(void)index;}
 #endif
 #endif /* #ifdef CONFIG_BACKLIGHT */
+
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+void backlight_set_brightness(int val)
+{
+    /* set H300 brightness by changing the PWM
+       accepts 0..15 but note that 0 and 1 give a black display! */
+    unsigned char ucVal = (unsigned char)(val & 0x0F);
+    pcf50606_set_bl_pwm(ucVal);
+}
+#endif
 

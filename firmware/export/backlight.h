@@ -49,3 +49,7 @@ void sim_backlight(int value);
 void sim_remote_backlight(int value);
 #endif
 #endif
+
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+void backlight_set_brightness(int val);
+#endif

@@ -381,6 +381,10 @@ struct user_settings
 #ifdef HAVE_REMOTE_LCD
     unsigned char rwps_file[MAX_FILENAME+1];  /* last remote-wps */
 #endif
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS 
+    int brightness;         /* iriver h300: backlight PWM value: 2..15
+                                (0 and 1 are black) */
+#endif
 };
 
 enum optiontype { INT, BOOL };
@@ -441,6 +445,11 @@ extern const char rec_base_directory[];
 #define DEFAULT_CONTRAST_SETTING    38
 #endif
 #define MIN_CONTRAST_SETTING        5
+
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+#define MIN_BRIGHTNESS_SETTING      2
+#define MAX_BRIGHTNESS_SETTING      15
+#endif
 
 /* argument bits for settings_load() */
 #define SETTINGS_RTC 1 /* only the settings from the RTC nonvolatile RAM */

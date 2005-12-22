@@ -488,6 +488,10 @@ static const struct bit_entry hd_bits[] =
 #endif
     {4, S_O(default_codepage), 0, "default codepage", "iso8859-1,iso8859-7,iso8859-8,cp1251,iso8859-11,iso8859-6,iso8859-9,iso8859-2,sjis,gb2312,ksx1001,big5,utf-8" },
     
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+    {4, S_O(brightness), 9, "brightness", "2,3,4,5,6,7,8,9,10,11,12,13,14,15"},
+#endif
+
     /* If values are just added to the end, no need to bump the version. */
     /* new stuff to be added at the end */
 
@@ -891,6 +895,9 @@ void settings_apply(void)
     backlight_set_fade_in(global_settings.backlight_fade_in);
     backlight_set_fade_out(global_settings.backlight_fade_out);
 #endif
+#endif
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+    backlight_set_brightness(global_settings.brightness);
 #endif
     ata_spindown(global_settings.disk_spindown);
 #if (CONFIG_CODEC == MAS3507D) && !defined(SIMULATOR)

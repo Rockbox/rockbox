@@ -214,6 +214,16 @@ static bool backlight_fade_out(void)
 #endif
 #endif /* CONFIG_BACKLIGHT */
 
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+static bool brightness(void)
+{
+    return set_int( str(LANG_BRIGHTNESS), "", UNIT_INT,
+                    &global_settings.brightness, 
+                    backlight_set_brightness, 1, MIN_BRIGHTNESS_SETTING,
+                    MAX_BRIGHTNESS_SETTING, NULL );
+}
+#endif
+
 #ifdef HAVE_REMOTE_LCD
 
 static bool remote_backlight_timer(void)
@@ -1524,6 +1534,9 @@ static bool lcd_settings_menu(void)
 #if (CONFIG_BACKLIGHT == BL_IRIVER_H100) && !defined(SIMULATOR)
         { ID2P(LANG_BACKLIGHT_FADE_IN), backlight_fade_in },
         { ID2P(LANG_BACKLIGHT_FADE_OUT), backlight_fade_out },
+#endif
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+        { ID2P(LANG_BRIGHTNESS), brightness },
 #endif
 #endif /* CONFIG_BACKLIGHT */
         { ID2P(LANG_CONTRAST),        contrast },
