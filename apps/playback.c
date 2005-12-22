@@ -1027,9 +1027,12 @@ static bool read_next_metadata(void)
     status = get_metadata(&tracks[next_track],fd,trackname,v1first);
     /* Preload the glyphs in the tags */
     if (status) {
-        lcd_getstringsize(tracks[next_track].id3.title, NULL, NULL);
-        lcd_getstringsize(tracks[next_track].id3.artist, NULL, NULL);
-        lcd_getstringsize(tracks[next_track].id3.album, NULL, NULL);
+        if (tracks[next_track].id3.title)
+            lcd_getstringsize(tracks[next_track].id3.title, NULL, NULL);
+        if (tracks[next_track].id3.artist)
+            lcd_getstringsize(tracks[next_track].id3.artist, NULL, NULL);
+        if (tracks[next_track].id3.album)
+            lcd_getstringsize(tracks[next_track].id3.album, NULL, NULL);
     }
     track_changed = true;
     close(fd);
