@@ -112,7 +112,7 @@ id: LANG_TIME_SET
 desc: used in set_time()
 eng: "ON To Set"
 voice: ""
-new: "[NAVI]: 설정 저장"
+new: "[재생]: 설정 저장"
 
 id: LANG_TIME_REVERT
 desc: used in set_time()
@@ -124,7 +124,7 @@ id: LANG_CONTRAST
 desc: in settings_menu
 eng: "Contrast"
 voice: "Contrast"
-new: "밝기"
+new: "명암 조절"
 
 id: LANG_SHUFFLE
 desc: in settings_menu
@@ -178,7 +178,7 @@ id: LANG_SCROLL
 desc: in settings_menu
 eng: "Scroll Speed Setting Example"
 voice: ""
-new: "[문자 흐름 속도 설정을 위한 예시]"
+new: "[문자 흐름 속도 설정을 위한 예시입니다]"
 
 id: LANG_DISCHARGE
 desc: DEPRECATED
@@ -1048,7 +1048,7 @@ id: LANG_SCROLL_STEP_EXAMPLE
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size Setting Example Text"
 voice: ""
-new: "[문자 흐름 크기 설정을 위한 예시]"
+new: "[문자 흐름 크기 설정을 위한 예시입니다]"
 
 id: LANG_SCROLL_SPEED
 desc: in display_settings_menu()
@@ -1156,7 +1156,7 @@ id: LANG_ALARM_MOD_KEYS
 desc: Shown key functions in alarm menu (for the RTC alarm mod).
 eng: "PLAY=Set OFF=Cancel"
 voice: ""
-new: "[재생]: 설정   [정지]: 취소"
+new: "[NAVI]: 설정   [정지]: 취소"
 
 id: LANG_CREATE_PLAYLIST
 desc: Menu option for creating a playlist
@@ -1438,7 +1438,7 @@ id: LANG_CONFIRM_WITH_PLAY_RECORDER
 desc: Generic recorder string to use to confirm
 eng: "PLAY = Yes"
 voice: ""
-new: "[재생]: 예"
+new: "[NAVI]: 예"
 
 id: LANG_CANCEL_WITH_ANY_RECORDER
 desc: Generic recorder string to use to cancel
@@ -1808,7 +1808,7 @@ id: LANG_BOOKMARK_SELECT_PLAY
 desc: Used on the bookmark select window to indicated the play option
 eng: "PLAY = Select"
 voice: ""
-new: "[재생]: 선택"
+new: "[NAVI]: 선택"
 
 id: LANG_BOOKMARK_SELECT_DELETE
 desc: Used on the bookmark select window to indicated the bookmark delete option
@@ -3537,3 +3537,9 @@ desc: in radio screen / menu
 eng: "Mode:"
 voice: ""
 new: "모드: "
+   
+id: LANG_BRIGHTNESS 
+desc: in settings_menu 
+eng: "Brightness" 
+voice: "Brightness" 
+new: "화면 밝기"
