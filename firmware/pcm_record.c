@@ -58,8 +58,9 @@ static volatile unsigned long num_rec_bytes;    /* Num bytes recorded */
 static volatile unsigned long num_file_bytes;   /* Num bytes written to current file */
 static volatile int error_count;                /* Number of DMA errors */
 
-static unsigned long record_start_time;         /* Value of current_tick when recording was started */
-static unsigned long pause_start_time;          /* Value of current_tick when pause was started */
+static long record_start_time;                  /* Value of current_tick when recording was started */
+static long pause_start_time;                   /* Value of current_tick when pause was started */
+static volatile int buffered_chunks;            /* number of valid chunks in buffer */
 
 static int wav_file;
 static char recording_filename[MAX_PATH];
@@ -94,6 +95,8 @@ static int num_chunks;             /* Number of chunks available in rec_buffer *
 static volatile int write_index;       /* Current chunk the DMA is writing to */
 static volatile int read_index;        /* Oldest chunk that is not written to disk */
 static volatile int read2_index;       /* Latest chunk that has not been converted to little endian */
+static long pre_record_ticks;          /* pre-record time expressed in ticks */
+static int pre_record_chunks;          /* pre-record time expressed in chunks */
 
 /***************************************************************************/
 
@@ -205,7 +208,17 @@ void audio_set_recording_options(int frequency, int quality,
     (void)quality;
     (void)channel_mode;
     (void)editable;
-    (void)prerecord_time;
+
+    /* WARNING: calculation below uses fixed frequency! */
+    pre_record_ticks = prerecord_time * HZ;
+    pre_record_chunks = ((44100 * prerecord_time * 4)/CHUNK_SIZE)+1;
+    if(pre_record_chunks >= (num_chunks-250))
+    {
+        /* we can't prerecord more than our buffersize minus treshold to write to disk! */
+        pre_record_chunks = num_chunks-250;
+        /* don't forget to recalculate that time! */
+        pre_record_ticks = ((pre_record_chunks * CHUNK_SIZE)/(4*44100)) * HZ;
+    }
     
     //logf("pcmrec: src=%d", source);
 
@@ -423,6 +436,7 @@ static void pcmrec_callback(bool flush)
 
     if ((!is_recording || is_paused) && !flush)
     {
+        /* not recording = no saving to disk, fake buffer clearing */
         read_index = write_index;
         return;
     }
@@ -499,6 +513,9 @@ static void pcmrec_dma_start(void)
     /* Start the DMA transfer.. */
     DCR1 = DMA_INT | DMA_EEXT | DMA_CS | DMA_DINC | DMA_START;
 
+    /* pre-recording: buffer count */
+    buffered_chunks = 0;
+
     logf("dma1 started");
 }
 
@@ -527,6 +544,10 @@ void DMA1(void)
         write_index++;
         if (write_index >= num_chunks)
             write_index = 0;
+
+        /* update number of valid chunks for pre-recording */
+        if(buffered_chunks < num_chunks)
+            buffered_chunks++;
 
         if (is_stopping)
         {
@@ -606,6 +627,9 @@ static void close_wave(void)
 
 static void pcmrec_start(void)
 {
+    int pre_chunks = pre_record_chunks; /* recalculate every time! */
+    long pre_ticks = pre_record_ticks;   /* recalculate every time! */
+
     logf("pcmrec_start");
 
     if (is_recording) 
@@ -614,7 +638,7 @@ static void pcmrec_start(void)
         record_done = true;
         return; 
     }
-    
+
     if (wav_file != -1)
         close(wav_file);
 
@@ -624,19 +648,30 @@ static void pcmrec_start(void)
         record_done = true;
         return;
     }
- 
+
+    /* pre-recording calculation */
+    if(buffered_chunks < pre_chunks)
+    {
+        /* not enough good chunks available - limit pre-record time */
+        pre_chunks = buffered_chunks;
+        pre_ticks = ((buffered_chunks * CHUNK_SIZE)/(4*44100)) * HZ;
+    }
+    record_start_time = current_tick - pre_ticks;
+
+    read_index = write_index - pre_chunks;
+    if(read_index < 0)
+    {
+        read_index += num_chunks;
+    }
+    read2_index = read_index;
+
     peak_left = 0;
     peak_right = 0;
  
     num_rec_bytes = 0;
     num_file_bytes = 0;
-    record_start_time = current_tick;
     pause_start_time = 0;
     
-    write_index = 0;
-    read_index = 0;
-    read2_index = 0;
-
     is_stopping = false;
     is_paused = false;
     is_recording = true;
@@ -791,7 +826,9 @@ static void pcmrec_init(void)
     read_index = 0;
     read2_index = 0;
     write_index = 0;
-    
+    pre_record_chunks = 0;
+    pre_record_ticks = 0;
+
     peak_left = 0;
     peak_right = 0;
     
@@ -799,6 +836,7 @@ static void pcmrec_init(void)
     num_file_bytes = 0;
     record_start_time = 0;
     pause_start_time = 0;
+    buffered_chunks = 0;
     
     is_recording = false;
     is_stopping = false;
@@ -807,8 +845,6 @@ static void pcmrec_init(void)
 
     rec_buffer = (unsigned char*)(((unsigned long)audiobuf) & ~3);
     buffer_size = (long)audiobufend - (long)audiobuf - 16;
-    
-    //buffer_size = 1024*1024*5;
     
     logf("buf size: %d kb", buffer_size/1024);
     
