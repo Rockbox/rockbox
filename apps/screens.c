@@ -495,7 +495,7 @@ void quick_screen_quick_apply(struct gui_quickscreen *qs)
 
 bool quick_screen_quick(int button_enter)
 {
-    bool res, oldrepeat;
+    bool res, oldrepeat, oldshuffle;
     struct option_select left_option;
     struct option_select bottom_option;
     struct option_select right_option;
@@ -540,13 +540,14 @@ bool quick_screen_quick(int button_enter)
     gui_quickscreen_init(&qs, &left_option, &bottom_option, &right_option,
                          (char *)str(LANG_F2_MODE), &quick_screen_quick_apply);
     oldrepeat=global_settings.repeat_mode;
+    oldshuffle=global_settings.playlist_shuffle;
     res=gui_syncquickscreen_run(&qs, button_enter);
     if(!res)
     {
         if ( oldrepeat != global_settings.repeat_mode &&
             (audio_status() & AUDIO_STATUS_PLAY) )
             audio_flush_and_reload_tracks();
-        if(global_settings.playlist_shuffle
+        if(oldshuffle != global_settings.playlist_shuffle
            && audio_status() & AUDIO_STATUS_PLAY)
         {
 #if CONFIG_CODEC == SWCODEC
