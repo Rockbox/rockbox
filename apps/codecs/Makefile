@@ -171,7 +171,7 @@ libfaad:
 
 clean:
 	@echo "cleaning codecs"
-	$(SILENT)rm -fr $(OBJDIR)/libmad $(BUILDDIR)/libmad.a $(OBJDIR)/liba52 $(OBJDIR)/libffmpegFLAC $(OBJDIR)/Tremor $(OBJDIR)/libwavpack $(OBJDIR)/dumb $(BUILDDIR)/libdumb.a $(BUILDDIR)/libdumbd.a $(OBJDIR)/libmusepack $(BUILDDIR)/libmusepack.a $(OBJDIR)/libalac $(BUILDDIR)/libalac.a $(OBJDIR)/libfaad $(BUILDDIR)/libfaad.a $(OBJDIR)/libm4a $(BUILDDIR)/libm4a.a
+	$(SILENT)rm -fr $(OBJDIR)/libmad $(BUILDDIR)/libmad.a $(OBJDIR)/liba52 $(BUILDDIR)/liba52.a $(OBJDIR)/libffmpegFLAC $(BUILDDIR)/libffmpegFLAC.a $(OBJDIR)/Tremor $(BUILDDIR)/libTremor.a $(OBJDIR)/libwavpack $(BUILDDIR)/libwavpack.a $(OBJDIR)/dumb $(BUILDDIR)/libdumb.a $(BUILDDIR)/libdumbd.a $(OBJDIR)/libmusepack $(BUILDDIR)/libmusepack.a $(OBJDIR)/libalac $(BUILDDIR)/libalac.a $(OBJDIR)/libfaad $(BUILDDIR)/libfaad.a $(OBJDIR)/libm4a $(BUILDDIR)/libm4a.a
 	@$(MAKE) -C libmad clean OBJDIR=$(OBJDIR)/libmad
 	@$(MAKE) -C liba52 clean OBJDIR=$(OBJDIR)/liba52
 	@$(MAKE) -C libffmpegFLAC clean OBJDIR=$(OBJDIR)/libffmpegFLAC
