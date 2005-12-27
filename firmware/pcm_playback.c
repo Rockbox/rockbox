@@ -72,7 +72,7 @@ static void dma_start(const void *addr, long size)
 
     /* Reset the audio FIFO */
 #ifdef HAVE_SPDIF_OUT
-    EBU1CONFIG = IIS_RESET;
+    EBU1CONFIG = IIS_RESET | EBU_DEFPARM;
 #endif
 
     /* Set up DMA transfer  */
@@ -99,7 +99,7 @@ static void dma_stop(void)
     /* Reset the FIFO */
     IIS2CONFIG = IIS_RESET | IIS_DEFPARM(pcm_freq);
 #ifdef HAVE_SPDIF_OUT
-    EBU1CONFIG = IIS_RESET;
+    EBU1CONFIG = IIS_RESET | EBU_DEFPARM;
 #endif
 
     next_start = NULL;
@@ -243,7 +243,7 @@ void pcm_play_pause(bool play)
         DCR0 &= ~DMA_EEXT;
         IIS2CONFIG = IIS_RESET | IIS_DEFPARM(pcm_freq);
 #ifdef HAVE_SPDIF_OUT
-        EBU1CONFIG = IIS_RESET;
+        EBU1CONFIG = IIS_RESET | EBU_DEFPARM;
 #endif
     }
     pcm_paused = !play;
