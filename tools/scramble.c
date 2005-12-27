@@ -22,6 +22,8 @@
 #include <string.h>
 #include "iriver.h"
 
+int iaudio_encode(char *iname, char *oname);
+
 enum
 {
     ARCHOS_PLAYER, /* and V1 recorder */
@@ -67,6 +69,7 @@ void usage(void)
            "\t-neo    SSI Neo format\n"
            "\t-mm=X   Archos Multimedia format (X values: A=JBMM, B=AV1xx, C=AV3xx)\n"
            "\t-iriver iRiver format\n"
+           "\t-iaudio iAudio format\n"
            "\t-add=X  Rockbox generic \"add-up\" checksum format\n"
            "\t        (X values: h100, h120, h140, h300, ipco, nano, ipvd)\n"
            "\nNo option results in Archos standard player/recorder format.\n");
@@ -183,6 +186,11 @@ int main (int argc, char** argv)
         oname = argv[3];
         iriver_encode(iname, oname, FALSE);
         return 0;
+    }
+    else if(!strcmp(argv[1], "-iaudio")) {
+        iname = argv[2];
+        oname = argv[3];
+        return iaudio_encode(iname, oname);
     }
     
     /* open file */
@@ -352,4 +360,61 @@ int main (int argc, char** argv)
     free(outbuf);
     
     return 0;
+}
+
+int iaudio_encode(char *iname, char *oname)
+{
+    size_t len;
+    int length;
+    FILE *file;
+    unsigned char *outbuf;
+    int i;
+    unsigned char sum = 0;
+    
+    file = fopen(iname, "rb");
+    if (!file) {
+       perror(iname);
+       return -1;
+    }
+    fseek(file,0,SEEK_END);
+    length = ftell(file);
+    
+    fseek(file,0,SEEK_SET); 
+    outbuf = malloc(length+0x1030);
+
+    if ( !outbuf ) {
+       printf("out of memory!\n");
+       return -1;
+    }
+
+    len = fread(outbuf+0x1030, 1, length, file);
+    if(len < length) {
+        perror(iname);
+        return -2;
+    }
+    
+    memset(outbuf, 0, 0x1030);
+    strcpy((char *)outbuf, "COWON_X5_FW");
+
+    for(i = 0; i < length;i++)
+        sum += outbuf[0x1030 + i];
+
+    int2be(length, &outbuf[0x1024]);
+    outbuf[0x102b] = sum;
+
+    fclose(file);
+
+    file = fopen(oname, "wb");
+    if (!file) {
+       perror(oname);
+       return -3;
+    }
+    
+    len = fwrite(outbuf, 1, length+0x1030, file);
+    if(len < length) {
+        perror(oname);
+        return -4;
+    }
+
+    fclose(file);
 }

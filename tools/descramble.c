@@ -23,6 +23,8 @@
 
 #include "iriver.h"
 
+int iaudio_decode(char *iname, char *oname);
+
 void usage(void)
 {
     printf("usage: descramble [options] <input file> <output file>\n");
@@ -31,6 +33,7 @@ void usage(void)
            "\t-v2     Archos V2 recorder format\n"
            "\t-mm=X   Archos Multimedia format (X values: A=JBMM, B=AV1xx, C=AV3xx)\n"
            "\t-iriver iRiver format\n"
+           "\t-iaudio iAudio format\n"
           "\nNo option assumes Archos standard player/recorder format.\n");
     exit(1);
 }
@@ -69,6 +72,12 @@ int main (int argc, char** argv)
         oname = argv[3];
         iriver_decode(iname, oname, FALSE, STRIP_NONE);
         return 0;
+    }
+    
+    if(!strcmp(argv[1], "-iaudio")) {
+        iname = argv[2];
+        oname = argv[3];
+        return iaudio_decode(iname, oname);
     }
     
     /* open file and check size */
@@ -198,4 +207,64 @@ int main (int argc, char** argv)
     free(outbuf);
     
     return 0;	
+}
+
+int iaudio_decode(char *iname, char *oname)
+{
+    size_t len;
+    int length;
+    FILE *file;
+    char *outbuf;
+    int i;
+    unsigned char sum = 0;
+    unsigned char filesum;
+    
+    file = fopen(iname, "rb");
+    if (!file) {
+        perror(iname);
+        return -1;
+    }
+    fseek(file,0,SEEK_END);
+    length = ftell(file);
+    
+    fseek(file,0,SEEK_SET); 
+    outbuf = malloc(length);
+
+    if ( !outbuf ) {
+        printf("out of memory!\n");
+        return -1;
+    }
+
+    len = fread(outbuf, 1, length, file);
+    if(len < length) {
+        perror(iname);
+        return -2;
+    }
+
+    fclose(file);
+    
+    for(i = 0; i < length-0x1030;i++)
+        sum += outbuf[0x1030 + i];
+
+    filesum = outbuf[0x102b];
+
+    if(filesum != sum) {
+        printf("Checksum mismatch!\n");
+        return -1;
+    }
+
+    file = fopen(oname, "wb");
+    if (!file) {
+        perror(oname);
+        return -3;
+    }
+    
+    len = fwrite(outbuf+0x1030, 1, length-0x1030, file);
+    if(len < length-0x1030) {
+        perror(oname);
+        return -4;
+    }
+
+    fclose(file);
+    return 0;
 }
