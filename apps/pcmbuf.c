@@ -353,7 +353,7 @@ static void crossfade_process_buffer(
         /* Prevent pcmbuffer from wrapping. */
         if (pos >= pcmbuf_size)
             pos -= pcmbuf_size;
-        blocksize = MIN(pcmbuf_size - pos, blocksize);
+        blocksize = MIN((pcmbuf_size - pos)/2, blocksize);
         buf = (short *)&audiobuffer[pos];
         
         fade_out_rem -= blocksize;
@@ -413,13 +413,13 @@ static void crossfade_start(void)
             fade_out_rem = NATIVE_FREQUENCY
                     * global_settings.crossfade_fade_out_duration * 2;
 
-            /* Truncate fade out duration if necessary. */
-            if (fade_out_rem > crossfade_rem)
-                fade_out_rem = crossfade_rem;
-
             /* We want only to modify the last part of the buffer. */
             if (crossfade_rem > fade_out_rem + fade_out_delay)
                 crossfade_rem = fade_out_rem + fade_out_delay;
+
+            /* Truncate fade out duration if necessary. */
+            if (crossfade_rem < fade_out_rem + fade_out_delay)
+                fade_out_rem -= (fade_out_rem + fade_out_delay) - crossfade_rem;
 
             /* Get also fade in duration and delays from settings. */
             crossfade_fade_in_rem = NATIVE_FREQUENCY
