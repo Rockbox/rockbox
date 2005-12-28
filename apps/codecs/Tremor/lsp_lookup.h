@@ -26,7 +26,7 @@
 #define FROMdB2_SHIFT 3
 #define FROMdB2_MASK 31
 
-static const ogg_int32_t FROMdB_LOOKUP[FROMdB_LOOKUP_SZ]  ={
+static const ogg_int32_t FROMdB_LOOKUP[FROMdB_LOOKUP_SZ] ICONST_ATTR ={
   0x003fffff, 0x0028619b, 0x00197a96, 0x0010137a,
   0x000a24b0, 0x00066666, 0x000409c3, 0x00028c42,
   0x00019b8c, 0x000103ab, 0x0000a3d7, 0x00006760,
@@ -37,7 +37,7 @@ static const ogg_int32_t FROMdB_LOOKUP[FROMdB_LOOKUP_SZ]  ={
   0x0000000b, 0x00000007, 0x00000004, 0x00000003,
   0x00000002, 0x00000001, 0x00000001};
 
-static const ogg_int32_t FROMdB2_LOOKUP[FROMdB2_LOOKUP_SZ]  ={
+static const ogg_int32_t FROMdB2_LOOKUP[FROMdB2_LOOKUP_SZ] ICONST_ATTR ={
   0x000001fc, 0x000001f5, 0x000001ee, 0x000001e7,
   0x000001e0, 0x000001d9, 0x000001d2, 0x000001cc,
   0x000001c5, 0x000001bf, 0x000001b8, 0x000001b2,
@@ -50,7 +50,7 @@ static const ogg_int32_t FROMdB2_LOOKUP[FROMdB2_LOOKUP_SZ]  ={
 
 #define INVSQ_LOOKUP_I_SHIFT 10
 #define INVSQ_LOOKUP_I_MASK 1023
-static const long INVSQ_LOOKUP_I[64+1]  ={
+static const long INVSQ_LOOKUP_I[64+1] ICONST_ATTR ={
 	   92682,   91966,   91267,   90583,
 	   89915,   89261,   88621,   87995,
 	   87381,   86781,   86192,   85616,
@@ -70,7 +70,7 @@ static const long INVSQ_LOOKUP_I[64+1]  ={
 	   65536,
 };
 
-static const long INVSQ_LOOKUP_IDel[64]  ={
+static const long INVSQ_LOOKUP_IDel[64] ICONST_ATTR ={
              716,     699,     684,     668,
              654,     640,     626,     614,
              600,     589,     576,     565,
@@ -92,7 +92,7 @@ static const long INVSQ_LOOKUP_IDel[64]  ={
 #define COS_LOOKUP_I_SHIFT 9
 #define COS_LOOKUP_I_MASK 511
 #define COS_LOOKUP_I_SZ 128
-static const ogg_int32_t COS_LOOKUP_I[COS_LOOKUP_I_SZ+1]  ={
+static const ogg_int32_t COS_LOOKUP_I[COS_LOOKUP_I_SZ+1] ICONST_ATTR ={
 	   16384,   16379,   16364,   16340,
 	   16305,   16261,   16207,   16143,
 	   16069,   15986,   15893,   15791,

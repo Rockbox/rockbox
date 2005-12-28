@@ -259,6 +259,8 @@ int res1_inverse(vorbis_block *vb,vorbis_look_residue *vl,
 
 /* duplicate code here as speed is somewhat more important */
 int res2_inverse(vorbis_block *vb,vorbis_look_residue *vl,
+                 ogg_int32_t **in,int *nonzero,int ch) ICODE_ATTR;
+int res2_inverse(vorbis_block *vb,vorbis_look_residue *vl,
                  ogg_int32_t **in,int *nonzero,int ch){
   long i,k,l,s;
   vorbis_look_residue0 *look=(vorbis_look_residue0 *)vl;
@@ -311,7 +313,7 @@ int res2_inverse(vorbis_block *vb,vorbis_look_residue *vl,
 }
 
 
-const vorbis_func_residue residue0_exportbundle  ={
+const vorbis_func_residue residue0_exportbundle ICONST_ATTR ={
   &res0_unpack,
   &res0_look,
   &res0_free_info,
@@ -319,7 +321,7 @@ const vorbis_func_residue residue0_exportbundle  ={
   &res0_inverse
 };
 
-const vorbis_func_residue residue1_exportbundle  ={
+const vorbis_func_residue residue1_exportbundle ICONST_ATTR ={
   &res0_unpack,
   &res0_look,
   &res0_free_info,
@@ -327,7 +329,7 @@ const vorbis_func_residue residue1_exportbundle  ={
   &res1_inverse
 };
 
-const vorbis_func_residue residue2_exportbundle  ={
+const vorbis_func_residue residue2_exportbundle ICONST_ATTR ={
   &res0_unpack,
   &res0_look,
   &res0_free_info,

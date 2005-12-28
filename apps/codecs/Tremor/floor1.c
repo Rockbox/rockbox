@@ -197,17 +197,19 @@ static vorbis_look_floor *floor1_look(vorbis_dsp_state *vd,vorbis_info_mode *mi,
 static int render_point(int x0,int x1,int y0,int y1,int x){
   y0&=0x7fff; /* mask off flag */
   y1&=0x7fff;
-    
-  {
-    int dy=y1-y0;
-    int adx=x1-x0;
-    int ady=abs(dy);
-    int err=ady*(x-x0);
-    
-    int off=err/adx;
-    if(dy<0)return(y0-off);
-    return(y0+off);
-  }
+#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+  asm volatile ("sub.l %[x0],%[x];"
+                "sub.l %[y0],%[y1];"
+                "sub.l %[x0],%[x1];"
+                "muls.l %[y1],%[x];"
+                "divs.l %[x1],%[x];"
+                "add.l %[y0],%[x];"
+       : [x] "+d" (x), [x1] "+d" (x1), [y1] "+d" (y1)
+       : [x0] "r" (x0), [y0] "r" (y0) );
+  return x;
+#else
+  return y0+((y1-y0)*(x-x0))/(x1-x0);
+#endif
 }
 
 #ifdef _LOW_ACCURACY_
@@ -217,7 +219,7 @@ static int render_point(int x0,int x1,int y0,int y1,int x){
 #endif
 
 /* keep the floor lookup table in fast IRAM */
-static ogg_int32_t FLOOR_fromdB_LOOKUP[256] IDATA_ATTR = {
+static const ogg_int32_t FLOOR_fromdB_LOOKUP[256] ICONST_ATTR = {
   XdB(0x000000e5), XdB(0x000000f4), XdB(0x00000103), XdB(0x00000114),
   XdB(0x00000126), XdB(0x00000139), XdB(0x0000014e), XdB(0x00000163),
   XdB(0x0000017a), XdB(0x00000193), XdB(0x000001ad), XdB(0x000001c9),
@@ -283,7 +285,7 @@ static ogg_int32_t FLOOR_fromdB_LOOKUP[256] IDATA_ATTR = {
   XdB(0x52606733), XdB(0x57bad899), XdB(0x5d6e593a), XdB(0x6380b298),
   XdB(0x69f80e9a), XdB(0x70dafda8), XdB(0x78307d76), XdB(0x7fffffff),
 };
-  
+
 static void render_line(int x0,register int x1,int y0,int y1,ogg_int32_t *d){
   int dy=y1-y0;
   register int x=x0;
@@ -310,6 +312,7 @@ static void render_line(int x0,register int x1,int y0,int y1,ogg_int32_t *d){
   }
 }
 
+static void *floor1_inverse1(vorbis_block *vb,vorbis_look_floor *in) ICODE_ATTR;
 static void *floor1_inverse1(vorbis_block *vb,vorbis_look_floor *in){
   vorbis_look_floor1 *look=(vorbis_look_floor1 *)in;
   vorbis_info_floor1 *info=look->vi;
@@ -387,7 +390,6 @@ static void *floor1_inverse1(vorbis_block *vb,vorbis_look_floor *in){
       }else{
         fit_value[i]=predicted|0x8000;
       }
-        
     }
 
     return(fit_value);
@@ -396,6 +398,8 @@ static void *floor1_inverse1(vorbis_block *vb,vorbis_look_floor *in){
   return(NULL);
 }
 
+static int floor1_inverse2(vorbis_block *vb,vorbis_look_floor *in,void *memo,
+                          ogg_int32_t *out) ICODE_ATTR;
 static int floor1_inverse2(vorbis_block *vb,vorbis_look_floor *in,void *memo,
                           ogg_int32_t *out){
   vorbis_look_floor1 *look=(vorbis_look_floor1 *)in;
@@ -433,7 +437,7 @@ static int floor1_inverse2(vorbis_block *vb,vorbis_look_floor *in,void *memo,
 }
 
 /* export hooks */
-vorbis_func_floor floor1_exportbundle  = {
+const vorbis_func_floor floor1_exportbundle ICONST_ATTR = {
   &floor1_unpack,&floor1_look,&floor1_free_info,
   &floor1_free_look,&floor1_inverse1,&floor1_inverse2
 };

@@ -47,7 +47,7 @@ typedef struct {
    16.16 format 
    returns in m.8 format */
 
-static long ADJUST_SQRT2[2] ICODE_ATTR ={8192,5792};
+static const long ADJUST_SQRT2[2] ICONST_ATTR ={8192,5792};
 static inline ogg_int32_t vorbis_invsqlook_i(long a,long e){
   long i=(a&0x7fff)>>(INVSQ_LOOKUP_I_SHIFT-1); 
   long d=a&INVSQ_LOOKUP_I_MASK;                              /*  0.10 */
@@ -117,21 +117,21 @@ static inline ogg_int32_t toBARK(int n){
   }
 }
 
-static const unsigned char MLOOP_1[64] IDATA_ATTR ={
+static const unsigned char MLOOP_1[64] ICONST_ATTR ={
    0,10,11,11, 12,12,12,12, 13,13,13,13, 13,13,13,13,
   14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14,
   15,15,15,15, 15,15,15,15, 15,15,15,15, 15,15,15,15,
   15,15,15,15, 15,15,15,15, 15,15,15,15, 15,15,15,15,
 };
 
-static const unsigned char MLOOP_2[64] IDATA_ATTR ={
+static const unsigned char MLOOP_2[64] ICONST_ATTR ={
   0,4,5,5, 6,6,6,6, 7,7,7,7, 7,7,7,7,
   8,8,8,8, 8,8,8,8, 8,8,8,8, 8,8,8,8,
   9,9,9,9, 9,9,9,9, 9,9,9,9, 9,9,9,9,
   9,9,9,9, 9,9,9,9, 9,9,9,9, 9,9,9,9,
 };
 
-static const unsigned char MLOOP_3[8] IDATA_ATTR ={0,1,2,2,3,3,3,3};
+static const unsigned char MLOOP_3[8] ICONST_ATTR ={0,1,2,2,3,3,3,3};
 
 void vorbis_lsp_to_curve(ogg_int32_t *curve,int *map,int n,int ln,
 			 ogg_int32_t *lsp,int m,
@@ -430,7 +430,7 @@ static int floor0_inverse2(vorbis_block *vb,vorbis_look_floor *i,
 }
 
 /* export hooks */
-vorbis_func_floor floor0_exportbundle={
+const vorbis_func_floor floor0_exportbundle ICONST_ATTR ={
   &floor0_unpack,&floor0_look,&floor0_free_info,
   &floor0_free_look,&floor0_inverse1,&floor0_inverse2
 };

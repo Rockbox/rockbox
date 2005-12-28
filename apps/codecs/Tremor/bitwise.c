@@ -22,6 +22,15 @@
 #include <string.h>
 #include "ogg.h"
 
+const unsigned long oggpack_mask[] ICONST_ATTR =
+{0x00000000,0x00000001,0x00000003,0x00000007,0x0000000f,
+ 0x0000001f,0x0000003f,0x0000007f,0x000000ff,0x000001ff,
+ 0x000003ff,0x000007ff,0x00000fff,0x00001fff,0x00003fff,
+ 0x00007fff,0x0000ffff,0x0001ffff,0x0003ffff,0x0007ffff,
+ 0x000fffff,0x001fffff,0x003fffff,0x007fffff,0x00ffffff,
+ 0x01ffffff,0x03ffffff,0x07ffffff,0x0fffffff,0x1fffffff,
+ 0x3fffffff,0x7fffffff,0xffffffff };
+
 void oggpack_readinit(oggpack_buffer *b,ogg_reference *r){
   memset(b,0,sizeof(*b));
 
@@ -42,7 +51,7 @@ void oggpack_readinit(oggpack_buffer *b,ogg_reference *r){
 /* Read in bits without advancing the bitptr; bits <= 32 */
 long oggpack_look_full(oggpack_buffer *b,int bits) ICODE_ATTR;
 long oggpack_look_full(oggpack_buffer *b,int bits){
-  unsigned long m=(1<<bits)-1;
+  unsigned long m=oggpack_mask[bits];
   unsigned long ret=0;
 
   bits+=b->headbit;
@@ -127,8 +136,9 @@ int oggpack_eop(oggpack_buffer *b){
 }
 
 /* bits <= 32 */
+long oggpack_read(oggpack_buffer *b,int bits) ICODE_ATTR;
 long oggpack_read(oggpack_buffer *b,int bits){
-  unsigned long m=(1<<bits)-1;
+  unsigned long m=oggpack_mask[bits];
   ogg_uint32_t ret=0;
 
   bits+=b->headbit;
@@ -198,8 +208,8 @@ long oggpack_read(oggpack_buffer *b,int bits){
       }
     }
     
-    b->headptr+=bits/8;
-    b->headend-=bits/8;
+    b->headptr+=((unsigned)bits)/8;
+    b->headend-=((unsigned)bits)/8;
   }
 
   ret&=m;

@@ -332,6 +332,7 @@ STIN void mdct_bitreverse(DATA_TYPE *x,int n,int step,int shift) {
 }
 
 
+void mdct_backward(int n, DATA_TYPE *in, DATA_TYPE *out) ICODE_ATTR;
 void mdct_backward(int n, DATA_TYPE *in, DATA_TYPE *out) {
   int n2=n>>1;
   int n4=n>>2;

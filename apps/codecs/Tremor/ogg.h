@@ -184,12 +184,13 @@ static inline void oggpack_adv(oggpack_buffer *b,int bits){
   bits+=b->headbit;
   b->headbit=bits&7;
   b->headptr+=bits/8;
-  if((b->headend-=bits/8)<1)_span(b);
+  if((b->headend-=((unsigned)bits)/8)<1)_span(b);
 }
 
 static inline long oggpack_look(oggpack_buffer *b, int bits){
   if(bits+b->headbit < b->headend<<3){
-    unsigned long m=(1<<bits)-1;
+    extern const unsigned long oggpack_mask[];
+    unsigned long m=oggpack_mask[bits];
     unsigned long ret=0;
 
     bits+=b->headbit;

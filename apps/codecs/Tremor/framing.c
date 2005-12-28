@@ -105,6 +105,7 @@ static ogg_buffer *_fetch_buffer(ogg_buffer_state *bs,long bytes){
   return ob;
 }
 
+static ogg_reference *_fetch_ref(ogg_buffer_state *bs) ICODE_ATTR;
 static ogg_reference *_fetch_ref(ogg_buffer_state *bs){
   ogg_reference *or;
   bs->outstanding++;
@@ -501,7 +502,7 @@ int ogg_page_packets(ogg_page *og){
 /* Static CRC calculation table.  See older code in CVS for dead
    run-time initialization code. */
 
-static ogg_uint32_t crc_lookup[256] = {
+static const ogg_uint32_t crc_lookup[256] ICONST_ATTR = {
   0x00000000,0x04c11db7,0x09823b6e,0x0d4326d9,
   0x130476dc,0x17c56b6b,0x1a864db2,0x1e475005,
   0x2608edb8,0x22c9f00f,0x2f8ad6d6,0x2b4bcb61,
@@ -856,6 +857,7 @@ static void _next_lace(oggbyte_buffer *ob,ogg_stream_state *os){
   }
 }
 
+static void _span_queued_page(ogg_stream_state *os) ICODE_ATTR;
 static void _span_queued_page(ogg_stream_state *os){ 
   while( !(os->body_fill&FINFLAG) ){
     
@@ -1014,6 +1016,7 @@ int ogg_stream_reset_serialno(ogg_stream_state *os,int serialno){
   return OGG_SUCCESS;
 }
 
+static int _packetout(ogg_stream_state *os,ogg_packet *op,int adv) ICODE_ATTR;
 static int _packetout(ogg_stream_state *os,ogg_packet *op,int adv){
 
   ogg_packet_release(op);

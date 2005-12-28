@@ -480,6 +480,9 @@ static void _decode_clear(OggVorbis_File *vf){
 
 static int _fetch_and_process_packet(OggVorbis_File *vf,
                                      int readp,
+                                     int spanp) ICODE_ATTR;
+static int _fetch_and_process_packet(OggVorbis_File *vf,
+                                     int readp,
                                      int spanp){
   ogg_page og={0,0,0,0};
   ogg_packet op={0,0,0,0,0,0};
@@ -1457,6 +1460,7 @@ ogg_int64_t ov_pcm_tell(OggVorbis_File *vf){
 }
 
 /* return time offset (milliseconds) of next PCM sample to be read */
+ogg_int64_t ov_time_tell(OggVorbis_File *vf) ICODE_ATTR;
 ogg_int64_t ov_time_tell(OggVorbis_File *vf){
   int link=0;
   ogg_int64_t pcm_total=0;
