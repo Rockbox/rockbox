@@ -93,8 +93,37 @@ inline void lcd_begin_write_gram(void)
 inline void lcd_write_data(const unsigned short* p_bytes, int count) ICODE_ATTR;
 inline void lcd_write_data(const unsigned short* p_bytes, int count)
 {
-    while(count--)
+    int precount = ((-(size_t)p_bytes) & 0xf) / 2;
+    count -= precount;
+    while(precount--)
         *(volatile unsigned short *)0xf0000002 = *p_bytes++;
+    while((count -= 8) >= 0) asm (
+            "\n\tmovem.l (%[p_bytes]),%%d1-%%d4\
+             \n\tswap %%d1\
+             \n\tmove.w %%d1,(%[dest])\
+             \n\tswap %%d1\
+             \n\tmove.w %%d1,(%[dest])\
+             \n\tswap %%d2\
+             \n\tmove.w %%d2,(%[dest])\
+             \n\tswap %%d2\
+             \n\tmove.w %%d2,(%[dest])\
+             \n\tswap %%d3\
+             \n\tmove.w %%d3,(%[dest])\
+             \n\tswap %%d3\
+             \n\tmove.w %%d3,(%[dest])\
+             \n\tswap %%d4\
+             \n\tmove.w %%d4,(%[dest])\
+             \n\tswap %%d4\
+             \n\tmove.w %%d4,(%[dest])\
+             \n\tlea.l (16,%[p_bytes]),%[p_bytes]"
+             : [p_bytes] "+a" (p_bytes)
+             : [dest] "a" ((volatile unsigned short *)0xf0000002)
+             : "d1", "d2", "d3", "d4", "memory");
+    if (count != 0) {
+        count += 8;
+        while(count--)
+            *(volatile unsigned short *)0xf0000002 = *p_bytes++;
+    }
 }
 
 /*** hardware configuration ***/
