@@ -103,7 +103,10 @@ void gui_list_put_selection_in_screen(struct gui_list * gui_list,
     int nb_lines=gui_list->display->nb_lines;
     if(put_from_end)
     {
-        int list_end = gui_list->selected_item + SCROLL_LIMIT - 1;
+        int list_end = gui_list->selected_item + SCROLL_LIMIT;
+        
+        if(list_end-1 == gui_list->nb_items)
+            list_end--;
         if(list_end > gui_list->nb_items)
             list_end = nb_lines;
         gui_list->start_item = list_end - nb_lines;
