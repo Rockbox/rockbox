@@ -38,6 +38,7 @@
 
 #include "splash.h"
 #include "scrollbar.h"
+#include "led.h"
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
 /* Image stuff */
@@ -661,6 +662,21 @@ static char* get_tag(struct wps_data* wps_data,
 		}
             }
             break;
+
+#if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
+        case 'l': /* VIRTUAL_LED */
+        {
+            switch(tag[1])
+            {
+                case 'h': /* Only one we have so far HDD LED */
+                    if(led_read(HZ/2))
+                        return "h";
+                    else
+                        return NULL;
+            }
+        }
+        break;
+#endif
 
         case 'D': /* Directory path information */
             id3 = nid3; /* next song please! */
