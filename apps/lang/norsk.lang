@@ -631,10 +631,10 @@ voice: "No"
 new: "Nei"
 
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
-desc: in display_settings_menu
-eng: "Backlight On When Plugged"
-voice: "Backlight On When Plugged"
-new: "Skjermlys på ved tilkoblet strøm"
+desc: in display_settings_menu, backlight timeout with charger connected
+eng: "Backlight When Plugged"
+voice: "Backlight When Plugged"
+new: "Skjermlys ved tilkoblet strøm"
 
 id: LANG_PM_CLIP_HOLD
 desc: in the peak meter menu
@@ -652,7 +652,7 @@ id: LANG_PM_MENU
 desc: in the display menu
 eng: "Peak Meter"
 voice: "Peak Meter"
-new: "Toppmåler"
+new: "Nivåmåler"
 
 id: LANG_PM_PEAK_HOLD
 desc: in the peak meter menu
@@ -664,7 +664,7 @@ id: LANG_PM_RELEASE
 desc: in the peak meter menu
 eng: "Peak Release"
 voice: "Peak Release"
-new: "Toppen slippes"
+new: "Toppfallrate"
 
 id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
@@ -676,7 +676,7 @@ id: LANG_REPEAT
 desc: in settings_menu
 eng: "Repeat"
 voice: "Repeat"
-new: "Repeter"
+new: "Gjenta"
 
 id: LANG_REPEAT_ALL
 desc: repeat playlist once all songs have completed
@@ -944,9 +944,9 @@ new: "Forsterkning"
 
 id: LANG_RECORDING_LEFT
 desc: in the recording screen
-eng: "Left"
+eng: "Gain Left"
 voice: ""
-new: "Venstre"
+new: "Forsterkning venstre"
 
 id: LANG_RECORDING_QUALITY
 desc: in the recording settings
@@ -956,9 +956,9 @@ new: "Kvalitet"
 
 id: LANG_RECORDING_RIGHT
 desc: in the recording screen
-eng: "Right"
+eng: "Gain Right"
 voice: ""
-new: "Høyre"
+new: "Forsterkning høyre"
 
 id: LANG_RECORDING_SETTINGS
 desc: in the main menu
@@ -1006,7 +1006,7 @@ id: LANG_POWEROFF
 desc: disk poweroff flag
 eng: "Disk Poweroff"
 voice: "Disk Poweroff"
-new: "Disken slås av"
+new: "Disk slås av"
 
 id: LANG_BATTERY_TIME
 desc: battery level in % and estimated time remaining
@@ -1072,7 +1072,7 @@ id: LANG_SCROLL_STEP_EXAMPLE
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size Setting Example Text"
 voice: ""
-new: "Eksempel for å sette rullesteglengde"
+new: "Eksempeltekst for å sette rullesteglengde"
 
 id: LANG_TRICKLE_CHARGE
 desc: DEPRECATED
@@ -1246,7 +1246,7 @@ id: LANG_SETTINGS_LOADED2
 desc: Feedback shown when a .cfg file is loaded
 eng: "Loaded"
 voice: ""
-new: "Innlest"
+new: "Lastet"
 
 id: LANG_CHANNEL_KARAOKE
 desc: in sound_settings
@@ -1690,19 +1690,19 @@ id: LANG_FM_PRESET_SAVE_FAILED
 desc: in radio screen
 eng: "Preset save failed"
 voice: ""
-new: "Lagring av forhåndsinnstilling feilet"
+new: "Lagring av kanalinnstilling feilet"
 
 id: LANG_FM_NO_PRESETS
-desc: DEPRECATED
-eng: ""
+desc: error when preset list is empty
+eng: "No presets"
 voice: ""
-new: 
+new: "Ingen kanalinnstillinger"
 
 id: LANG_FM_NO_FREE_PRESETS
 desc: in radio screen
 eng: "The preset list is full"
 voice: ""
-new: "Forhåndsinnstillingslisten er full"
+new: "Kanalinnstillingslisten er full"
 
 id: LANG_FM_RADIO
 desc: in main menu
@@ -2692,7 +2692,7 @@ id: LANG_FM_EDIT_PRESET
 desc: in radio screen
 eng: "Edit preset"
 voice: ""
-new: "Editer forhåndsinnstilling"
+new: "Editere kanalinnstilling"
 
 id: LANG_FM_MONO_MODE
 desc: in radio screen
@@ -2979,7 +2979,7 @@ new: "Alarm avslått"
 id: LANG_RECORD_TRIGGER
 desc: in recording settings_menu
 eng: "Trigger"
-voice: 
+voice: "Trigger"
 new: "Utløser"
 
 id: LANG_RECORD_START_THRESHOLD
@@ -3051,7 +3051,7 @@ new: "Utløser aktiv"
 id: LANG_LCD_REMOTE_MENU
 desc: in the display sub menu
 eng: "Remote-LCD Settings"
-voice: ""
+voice: "Remote LCD settings"
 new: "LCD-innstillinger for fjernkontroll"
 
 id: LANG_DISK_NAME_INTERNAL
@@ -3109,10 +3109,10 @@ voice: "Optical output"
 new: "Optisk utgang"
 
 id: LANG_NEXT_FOLDER
-desc: in settings_menu.  Should we move to next folder when current one ends
-eng: "Move to Next Folder"
-voice: "Move to Next Folder"
-new: "Fortsett i neste katalog"
+desc: in settings_menu. Should we allow move to next/prev folder from last/first track of current one
+eng: "Auto change directory"
+voice: "Auto change directory"
+new: "Bytt katalog automatisk"
 
 id: LANG_RUNTIMEDB_ACTIVE
 desc: in settings_menu.
@@ -3133,10 +3133,10 @@ voice:
 new: "Bedømmelse:"
 
 id: LANG_CROSSFADE_DURATION
-desc: in playback settings
-eng: "Crossfade duration"
-voice: "Crossfade duration"
-new: "Kryssfadelengde"
+desc: DEPRECATED
+eng: ""
+voice:
+new:
 
 id: LANG_MIX
 desc: in playback settings, crossfade option
@@ -3153,37 +3153,37 @@ new: "Omstarter avspilling..."
 id: LANG_REPLAYGAIN
 desc: in replaygain
 eng: "Replaygain"
-voice: 
+voice: "Replaygain"
 new: "Replaygain"
 
 id: LANG_REPLAYGAIN_ENABLE
 desc: in replaygain
 eng: "Enable replaygain"
-voice: 
+voice: "Enable replaygain"
 new: "Slå på replaygain"
 
 id: LANG_REPLAYGAIN_NOCLIP
 desc: in replaygain
 eng: "Prevent clipping"
-voice: 
+voice: "Prevent clipping"
 new: "Forhindre forvrengning"
 
 id: LANG_REPLAYGAIN_MODE
 desc: in replaygain
 eng: "Replaygain type"
-voice: 
+voice: "Replaygain type"
 new: "Replaygain-type"
 
 id: LANG_TRACK_GAIN
 desc: in replaygain
 eng: "Track gain"
-voice: 
+voice: "Track gain"
 new: "Spornivå"
 
 id: LANG_ALBUM_GAIN
 desc: in replaygain
 eng: "Album gain"
-voice: 
+voice: "Album gain"
 new: "Albumnivå" 
 
 id: LANG_ID3_TRACK_GAIN
@@ -3205,15 +3205,15 @@ voice:
 new: 
 
 id: LANG_BIDI_SUPPORT
-desc: in settings_menu, option to enable reversal of hebrew/arabic text
-eng: "BiDi Hebrew/Arabic"
+desc: DEPRECATED
+eng: ""
 voice: 
-new: "Toveis hebraisk/arabisk"
+new:
 
 id: LANG_REPLAYGAIN_PREAMP
-desc: in browse_id3
+desc: in replaygain settings
 eng: "Pre-amp"
-voice: 
+voice: "Preamp"
 new: "Forforsterker"
 
 id: LANG_UNIT_DB
@@ -3231,25 +3231,25 @@ new: " (VBR)"
 id: LANG_BEEP
 desc: in playback settings
 eng: "Beep volume"
-voice: 
+voice: "Beep volume"
 new: "Pip-volum"
 
 id: LANG_WEAK
 desc: in beep volume in playback settings
 eng: "Weak"
-voice: 
+voice: "Weak"
 new: "Svak"
 
 id: LANG_MODERATE
 desc: in beep volume in playback settings
 eng: "Moderate"
-voice: 
+voice: "Moderate"
 new: "Middels"
 
 id: LANG_STRONG
 desc: in beep volume in playback settings
 eng: "Strong"
-voice: 
+voice: "Strong"
 new: "Sterk"
 
 id: LANG_REPEAT_AB
@@ -3257,3 +3257,267 @@ desc: repeat one song
 eng: "A-B"
 voice: "A-B"
 new: "A-B"
+
+id: LANG_SHUFFLE_GAIN
+desc: use track gain if shuffle mode is on, album gain otherwise
+eng: "Track gain if shuffling"
+voice: "Track gain if shuffling"
+new: "Spornivå hvis omstokket"
+
+id: LANG_DIRCACHE_ENABLE
+desc: in directory cache settings
+eng: "Directory cache"
+voice: "Directory cache"
+new: "Forhåndsles katalogstruktur"
+
+id: LANG_DIRCACHE_REBOOT
+desc: when activating directory cache
+eng: "Please reboot to enable the cache"
+voice: ""
+new: "Start på nytt for å aktivere"
+
+id: LANG_DIRCACHE_BUILDING
+desc: when booting up and rebuilding the cache
+eng: "Scanning disk..."
+voice: ""
+new: "Leser katalogstruktur..."
+
+id: LANG_CROSSFADE_ENABLE
+desc: in crossfade settings menu
+eng: "Enable crossfade"
+voice: "Enable crossfade"
+new: "Slå på kryssfading"
+
+id: LANG_CROSSFADE_FADE_IN_DELAY
+desc: in crossfade settings menu
+eng: "Fade in delay"
+voice: "Fade in delay"
+new: "Fade inn-forsinkelse"
+
+id: LANG_CROSSFADE_FADE_OUT_DELAY
+desc: in crossfade settings menu
+eng: "Fade out delay"
+voice: "Fade out delay"
+new: "Fade ut-forsinkelse"
+
+id: LANG_CROSSFADE_FADE_IN_DURATION
+desc: in crossfade settings menu
+eng: "Fade in duration"
+voice: "Fade in duration"
+new: "Fade inn-lengde"
+
+id: LANG_CROSSFADE_FADE_OUT_DURATION
+desc: in crossfade settings menu
+eng: "Fade out duration"
+voice: "Fade out duration"
+new: "Fade ut-lengde"
+
+id: LANG_CROSSFADE_FADE_OUT_MODE
+desc: in crossfade settings menu
+eng: "Fade out mode"
+voice: "Fade out mode"
+new: "Fade ut-modus"
+
+id: LANG_RECORDING_ADC_RIGHT
+desc: in the recording settings
+eng: "ADC Gain Right"
+voice: "ADC Gain Right"
+new: "ADC-forsterkning høyre"
+
+id: LANG_RECORDING_ADC_LEFT
+desc: in the recording settings
+eng: "ADC Gain Left"
+voice: "ADC Gain Left"
+new: "ADC-forsterkning venstre"
+
+id: LANG_RECORDING_MONITOR
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: 
+
+id: LANG_RADIO_SCAN_MODE
+desc: in radio screen / menu
+eng: "Scan"
+voice: ""
+new: "Søk"
+
+id: LANG_RADIO_PRESET_MODE
+desc: in radio screen / menu
+eng: "Preset"
+voice: ""
+new: "Kanalinnstilling"
+
+id: LANG_FM_FREEZE
+desc: splash screen during freeze in radio mode
+eng: "Screen frozen!"
+voice: ""
+new: "Skjerm frosset!"
+
+id: LANG_DEFAULT_CODEPAGE
+desc: default encoding used with id3 tags
+eng: "Default Codepage"
+voice: 
+new: "Standard tegnsett"
+
+id: LANG_CODEPAGE_LATIN1
+desc: in codepage setting menu
+eng: "Latin1 (ISO-8859-1)"
+voice: 
+new: "Latin1 (ISO-8859-1)"
+
+id: LANG_CODEPAGE_GREEK
+desc: in codepage setting menu
+eng: "Greek (ISO-8859-7)"
+voice: 
+new: "Gresk (ISO-8859-7)"
+
+id: LANG_CODEPAGE_HEBREW
+desc: in codepage setting menu
+eng: "Hebrew (ISO-8859-8)"
+voice: 
+new: "Hebraisk (ISO-8859-8)"
+
+id: LANG_CODEPAGE_RUSSIAN
+desc: in codepage setting menu
+eng: "Russian (CP1251)"
+voice: 
+new: "Russisk (CP1251)"
+
+id: LANG_CODEPAGE_THAI
+desc: in codepage setting menu
+eng: "Thai (ISO-8859-11)"
+voice: 
+new: "Thai (ISO-8859-11)"
+
+id: LANG_CODEPAGE_ARABIC
+desc: in codepage setting menu
+eng: "Arabic (ISO-8859-6)"
+voice: 
+new: "Arabisk (ISO-8859-6)"
+
+id: LANG_CODEPAGE_TURKISH
+desc: in codepage setting menu
+eng: "Turkish (ISO-8859-9)"
+voice: 
+new: "Tyrkisk (ISO-8859-9)"
+
+id: LANG_CODEPAGE_LATIN_EXTENDED
+desc: in codepage setting menu
+eng: "Latin Extended (ISO-8859-2)"
+voice: 
+new: "Latin utvidet (ISO-8859-2)"
+
+id: LANG_CODEPAGE_JAPANESE
+desc: in codepage setting menu
+eng: "Japanese (SJIS)"
+voice: 
+new: "Japansk (SJIS)"
+
+id: LANG_CODEPAGE_SIMPLIFIED
+desc: in codepage setting menu
+eng: "Simp. Chinese (GB2312)"
+voice: 
+new: "Forenkl. kinesisk (GB2312)"
+
+id: LANG_CODEPAGE_KOREAN
+desc: in codepage setting menu
+eng: "Korean (KSX1001)"
+voice: 
+new: "Koreansk (KSX1001)"
+
+id: LANG_CODEPAGE_TRADITIONAL
+desc: in codepage setting menu
+eng: "Trad. Chinese (BIG5)"
+voice: 
+new: "Trad. kinesisk (BIG5)"
+
+id: LANG_CODEPAGE_UTF8
+desc: 
+eng: "Unicode (UTF-8)"
+voice: 
+new: "Unicode (UTF-8)"
+
+id: LANG_CROSSFEED_ENABLE
+desc: DEPRECATED
+eng: ""
+voice: 
+new: 
+
+id: LANG_CROSSFEED
+desc: in the sound settings menu
+eng: "Crossfeed"
+voice: "Crossfeed"
+new: "Stereokryssmating"
+
+id: LANG_FM_SCAN_PRESETS
+desc: in radio menu
+eng: "Auto scan presets"
+voice: "Auto scan presets"
+new: "Autosøk kanalinnstillinger"
+
+id: LANG_FM_SCANNING
+desc: during auto scan
+eng: "Scanning %d.%01dMHz"
+voice: ""
+new: "Søker %d.%01dMHz"
+
+id: LANG_FM_DEFAULT_PRESET_NAME
+desc: default preset name for auto scan mode
+eng: "%d.%01dMHz"
+voice: 
+new: "%d.%01dMHz" 
+
+id: LANG_FM_ADD_PRESET
+desc: in radio menu
+eng: "Add preset"
+voice: "Add preset"
+new: "Legg til kanalinnstilling"
+
+id: LANG_FM_CLEAR_PRESETS
+desc: confirmation if presets can be cleared
+eng: "Clear current presets?"
+voice: ""
+new: "Fjern nåværende kanalinnstilling?"
+
+id: LANG_WAIT
+desc: general please wait splash
+eng: "Loading..."
+voice: 
+new: "Laster..."
+
+id: VOICE_EXT_RWPS
+desc: spoken only, for file extension
+eng: ""
+voice: "remote while-playing-screen"
+new:
+
+id: LANG_REMOTE_WHILE_PLAYING
+desc: in settings_menu()
+eng: "Browse .rwps files"
+voice: "Browse remote while-playing-screen files"
+new: "Bla igjennom .rwps-filer"
+
+id: LANG_CUSTOM_THEME
+desc: Custom themes menu
+eng: "Browse Themes"
+voice: "Browse Themes"
+new: "Bla igjennom temaer"
+
+id: LANG_REDUCE_TICKING
+desc: in remote lcd settings menu
+eng: "Reduce ticking"
+voice: "Reduce ticking"
+new: "Reduser tikking"
+
+id: LANG_FM_TUNE_MODE
+desc: in radio screen / menu
+eng: "Mode:"
+voice: ""
+new: "Modus:"
+
+id: LANG_BRIGHTNESS
+desc: in settings_menu
+eng: "Brightness"
+voice: "Brightness"
+new: "Lysstyrke"
