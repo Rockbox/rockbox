@@ -669,6 +669,7 @@ static char* get_tag(struct wps_data* wps_data,
             switch(tag[1])
             {
                 case 'h': /* Only one we have so far HDD LED */
+                    *flags |= WPS_REFRESH_DYNAMIC;
                     if(led_read(HZ/2))
                         return "h";
                     else
