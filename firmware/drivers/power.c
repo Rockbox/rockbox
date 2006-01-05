@@ -262,8 +262,10 @@ void power_off(void)
 #if CONFIG_CPU == MCF5249
     and_l(~0x00080000, &GPIO1_OUT);
 #elif CONFIG_CPU == PP5020
+#ifndef BOOTLOADER
     /* We don't turn off the ipod, we put it in a deep sleep */
     pcf50605_standby_mode();
+#endif
 #elif defined(GMINI_ARCH)
     P1 &= ~1;
     P1CON &= ~1;

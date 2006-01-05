@@ -25,7 +25,9 @@
 #include "system.h"
 #include "panic.h"
 
+#if (CONFIG_CPU != PP5020) || !defined(BOOTLOADER)
 long current_tick = 0;
+#endif
 
 static void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
 
@@ -48,7 +50,7 @@ void kernel_init(void)
 
     num_queues = 0;
     memset(all_queues, 0, sizeof(all_queues));
-    
+
     tick_start(1000/HZ);
 }
 
@@ -319,6 +321,7 @@ void tick_start(unsigned int interval_in_ms)
 
 #define USECS_PER_INT 0x2710
 
+#ifndef BOOTLOADER
 void TIMER1(void)
 {
     int i;
@@ -336,9 +339,11 @@ void TIMER1(void)
     current_tick++;
     wake_up_thread();
 }
+#endif
 
 void tick_start(unsigned int interval_in_ms)
 {
+#ifndef BOOTLOADER
     /* TODO: use interval_in_ms to set timer periode */
     (void)interval_in_ms;
     PP5020_TIMER1 = 0x0;
@@ -347,6 +352,10 @@ void tick_start(unsigned int interval_in_ms)
     PP5020_TIMER1 = 0xc0000000 | USECS_PER_INT;
     /* unmask interrupt source */
     PP5020_CPU_INT_EN = PP5020_TIMER1_MASK;
+#else
+    /* We don't enable interrupts in the bootloader */
+    (void)interval_in_ms;
+#endif
 }
 
 #endif

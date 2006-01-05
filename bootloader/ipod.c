@@ -415,7 +415,16 @@ void* main(void)
             lcd_puts(0, line++, "Rockbox loaded.");
             lcd_update();
             memcpy((void*)DRAM_START,loadbuffer,rc);
-            return (void*)DRAM_START;
+
+            /* Transfer execution directly to Rockbox - we don't want
+               to run the rest of the bootloader startup code. */
+            asm volatile(
+                "mov   r0, #0x10000000    \n"
+                "mov   pc, r0             \n"
+            );
+
+            /* We don't get here, but keep the compiler happy. */
+            return (void*)0;
         }
     }
 

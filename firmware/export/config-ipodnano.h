@@ -27,7 +27,9 @@
 #define CONFIG_CODEC SWCODEC
 
 /* define this if you have a real-time clock */
+#ifndef BOOTLOADER
 #define CONFIG_RTC RTC_PCF50605
+#endif
 
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF

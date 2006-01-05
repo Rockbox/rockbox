@@ -197,12 +197,13 @@ start_loc:
     /* execute the loader - this will load an image to 0x10000000 */
     bl     main
 
+    /* The loader only returns if it is loading the Apple firmware or Linux -
+       the following code isn't executed when starting Rockbox */
+
     /* save the startup address for the COP */
     ldr    r1, =startup_loc
     str    r0, [r1]
 
-#if 0
-/* TODO: fix something for the COP to wake up to, until then let it sleep. */
 #if CONFIG_CPU==PP5002
     /* make sure COP is sleeping */
     ldr    r4, =0xcf004050
@@ -227,8 +228,7 @@ start_loc:
     @ldr    r4, =PP5020_COP_CTRL
     mov    r3, #0x0
     str    r3, [r4]
-#endif 
-#endif 
+#endif
     /* jump to start location */
     mov    pc, r0
 

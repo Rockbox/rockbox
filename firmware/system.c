@@ -1106,6 +1106,7 @@ int system_memory_guard(int newmode)
 }
 #elif CONFIG_CPU==PP5020
 
+#ifndef BOOTLOADER
 extern void TIMER1(void);
 extern void ipod_4g_button_int(void);
 
@@ -1116,6 +1117,7 @@ void irq(void)
     else if (PP5020_CPU_HI_INT_STAT & PP5020_I2C_MASK)
         ipod_4g_button_int();
 }
+#endif
 
 /* TODO: The following two function have been lifted straight from IPL, and
    hence have a lot of numeric addresses used straight. I'd like to use
@@ -1124,11 +1126,10 @@ void irq(void)
    to extend the funtions to do alternate cache configurations and/or 
    some other CPU frequency scaling. */
 
+#ifndef BOOTLOADER
 static void ipod_init_cache(void)
 {
-/* Initialising the cache in the iPod Video bootloader prevents
-   Rockbox from starting */
-#if !defined(BOOTLOADER) || !defined(APPLE_IPODVIDEO)
+/* Initialising the cache in the iPod bootloader prevents Rockbox from starting */
     unsigned i;
 
     /* cache init mode? */
@@ -1147,7 +1148,6 @@ static void ipod_init_cache(void)
 
     for (i = 0x10000000; i < 0x10002000; i += 16)
         inb(i);
-#endif
 }
     
 static void ipod_set_cpu_speed(void)
@@ -1163,9 +1163,11 @@ static void ipod_set_cpu_speed(void)
 
     outl((inl(0x60006020) & 0x0fffff0f) | 0x20000070, 0x60006020);
 }
+#endif
 
 void system_init(void)
 {
+#ifndef BOOTLOADER
     /* disable all irqs */
     outl(-1, 0x60001138);
     outl(-1, 0x60001128);
@@ -1176,6 +1178,7 @@ void system_init(void)
     outl(-1, 0x6000101c);
     ipod_set_cpu_speed();
     ipod_init_cache();
+#endif
 }
 
 void system_reboot(void)
