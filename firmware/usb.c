@@ -9,6 +9,11 @@
  *
  * Copyright (C) 2002 by Linus Nielsen Feltzing
  *
+ * iPod driver based on code from the ipodlinux project - http://ipodlinux.org
+ * Adapted for Rockbox in January 2006
+ * Original file: podzilla/usb.c
+ * Copyright (C) 2005 Adam Johnston
+ *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
  *
@@ -31,6 +36,7 @@
 #include "usb.h"
 #include "button.h"
 #include "sprintf.h"
+#include "string.h"
 #include "hwcompat.h"
 #ifdef HAVE_MMC
 #include "ata_mmc.h"
@@ -62,6 +68,9 @@ void screen_dump(void);   /* Nasty again. Defined in apps/ too */
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define USBPOWER_BUTTON BUTTON_MENU
 #define USBPOWER_BTN_IGNORE BUTTON_OFF
+#elif CONFIG_KEYPAD == IPOD_4G_PAD
+#define USBPOWER_BUTTON BUTTON_MENU
+#define USBPOWER_BTN_IGNORE BUTTON_PLAY
 #endif
 #endif /* HAVE_USB_POWER */
 
@@ -155,8 +164,22 @@ void usb_enable(bool on)
     }
     
 #elif defined(USB_IPODSTYLE)
-    /* TODO: Implement USB_IPODSTYLE */
-    (void) on;
+    /* For the ipod, we can only do one thing with USB mode - reboot
+       into Apple's flash-based disk-mode.  This does not return. */
+    if (on)
+    {
+        /* The following code is copied from ipodlinux - it doesn't work on the 
+           iPod Video */
+        unsigned char* storage_ptr = (unsigned char *)0x40017F00;
+        char* diskmode = "diskmode\0";
+        char* hotstuff = "hotstuff\0";
+
+        memcpy(storage_ptr, diskmode, 9);
+        storage_ptr = (unsigned char *)0x40017f08;
+        memcpy(storage_ptr, hotstuff, 9);
+        outl(1, 0x40017F10);
+        outl(inl(0x60006004) | 0x4, 0x60006004);
+    }
 #else
 #ifdef HAVE_LCD_BITMAP
     if(read_hw_mask() & USB_ACTIVE_HIGH)
@@ -375,8 +398,12 @@ bool usb_detect(void)
     current_status = (GPIO1_READ & 0x80)?true:false;
 #endif
 #ifdef USB_IPODSTYLE
-    /* TODO: Implement USB_IPODSTYLE */
-    current_status = false;
+    /* The following check is in the ipodlinux source, with the
+       comment "USB2D_IDENT is bad" if USB2D_IDENT != 0x22FA05 */
+    if (USB2D_IDENT != 0x22FA05) {
+        return false;
+    }
+    current_status = (USB_STATUS & 0x800)?true:false;
 #endif
     return current_status;
 }
@@ -465,6 +492,45 @@ void usb_init(void)
     or_l(0x01000040, &GPIO_FUNCTION);
 #endif
 
+#elif defined(USB_IPODSTYLE)
+    int r0;
+    outl(inl(0x70000084) | 0x200, 0x70000084);
+
+    outl(inl(0x7000002C) | 0x3000000, 0x7000002C);
+    outl(inl(0x6000600C) | 0x400000, 0x6000600C);
+
+    outl(inl(0x60006004) | 0x400000, 0x60006004);   /* reset usb start */
+    outl(inl(0x60006004) & ~0x400000, 0x60006004);  /* reset usb end */
+
+    outl(inl(0x70000020) | 0x80000000, 0x70000020);
+    while ((inl(0x70000028) & 0x80) == 0);
+
+    outl(inl(0xc5000184) | 0x100, 0xc5000184);
+    while ((inl(0xc5000184) & 0x100) != 0);
+
+    outl(inl(0xc50001A4) | 0x5F000000, 0xc50001A4);
+    if ((inl(0xc50001A4) & 0x100) == 0) {
+        outl(inl(0xc50001A8) & ~0x3, 0xc50001A8);
+        outl(inl(0xc50001A8) | 0x2, 0xc50001A8);
+        outl(inl(0x70000028) | 0x4000, 0x70000028);
+        outl(inl(0x70000028) | 0x2, 0x70000028);
+    } else {
+        outl(inl(0xc50001A8) | 0x3, 0xc50001A8);
+        outl(inl(0x70000028) &~0x4000, 0x70000028);
+        outl(inl(0x70000028) | 0x2, 0x70000028);
+    }
+    outl(inl(0xc5000140) | 0x2, 0xc5000140);
+    while((inl(0xc5000140) & 0x2) != 0);
+    r0 = inl(0xc5000184);
+
+    /* Note from IPL source (referring to next 5 lines of code: 
+       THIS NEEDS TO BE CHANGED ONCE THERE IS KERNEL USB */
+    outl(inl(0x70000020) | 0x80000000, 0x70000020);
+    outl(inl(0x6000600C) | 0x400000, 0x6000600C);
+    while ((inl(0x70000028) & 0x80) == 0);
+    outl(inl(0x70000028) | 0x2, 0x70000028);
+
+    udelay(0x186A0);    
 #endif
 
     usb_enable(false);

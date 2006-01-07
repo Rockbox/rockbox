@@ -87,4 +87,7 @@
 #define PP5020_SER1_MASK    (1 << (PP5020_SER1_IRQ-32))
 #define PP5020_I2C_MASK     (1 << (PP5020_I2C_IRQ-32))
 
+#define USB2D_IDENT         (*(volatile unsigned long*)(0xc5000000))
+#define USB_STATUS          (*(volatile unsigned long*)(0xc50001a4))
+
 #endif

@@ -86,6 +86,9 @@
 
 #define USB_IPODSTYLE
 
+/* define this if the unit can be powered or charged via USB */
+#define HAVE_USB_POWER
+
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
 
