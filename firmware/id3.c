@@ -882,6 +882,32 @@ static int getsonglength(int fd, struct mp3entry *entry)
     
     bytecount += entry->id3v2len;
 
+    /* Validate byte count, in case the file has been edited without
+     * updating the header.
+     */
+    if (info.byte_count)
+    {
+        const unsigned long expected = entry->filesize - entry->id3v1len 
+            - entry->id3v2len;
+        const unsigned long diff = MAX(10240, info.byte_count / 20);
+    
+        if ((info.byte_count > expected + diff) 
+            || (info.byte_count < expected - diff))
+        {
+            DEBUGF("Note: info.byte_count differs from expected value by "
+                "%d bytes\n", labs((long) (expected - info.byte_count)));
+            info.byte_count = 0;
+            info.frame_count = 0;
+            info.file_time = 0;
+            info.enc_padding = 0;
+
+            /* Even if the bitrate was based on "known bad" values, it
+             * should still be better for VBR files than using the bitrate
+             * of the first audio frame.
+             */
+        }
+    }
+
     entry->bitrate = info.bitrate;
     entry->frequency = info.frequency;
     entry->version = info.version;
