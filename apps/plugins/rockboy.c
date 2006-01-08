@@ -69,10 +69,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                    " overlay doesn't fit into memory.");
         return PLUGIN_ERROR;
     }
+    rb->memset(header.start_addr, 0, header.end_addr - header.start_addr);
+
     rb->lseek(fh, 0, SEEK_SET);
     readsize = rb->read(fh, header.start_addr, header.end_addr - header.start_addr);
     rb->close(fh);
-    if (readsize != header.end_addr - header.start_addr)
+    if (readsize <= sizeof(header))
     {
         rb->splash(2*HZ, true, "Error loading " OVL_DISPLAYNAME " overlay.");
         return PLUGIN_ERROR;

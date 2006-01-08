@@ -113,6 +113,7 @@ SECTIONS
 #endif
     {
         *(.bss*)
+        *(COMMON)
     } > PLUGIN_RAM
 
     /* Special trick to avoid a linker error when no other sections are

@@ -28,18 +28,19 @@ SECTIONS
         *(.text)
     } > OVERLAY_RAM
 
+    .rodata : {
+        *(.rodata)
+        *(.rodata.str1.1)
+        *(.rodata.str1.4)
+    } > OVERLAY_RAM
+
     .data : {
         *(.data)
     } > OVERLAY_RAM
 
     .bss : {
         *(.bss)
-    } > OVERLAY_RAM
-
-    .rodata : {
-        *(.rodata)
-        *(.rodata.str1.1)
-        *(.rodata.str1.4)
+        *(COMMON)
         . = ALIGN(0x4);
         _ovl_end_addr = .;
     } > OVERLAY_RAM
