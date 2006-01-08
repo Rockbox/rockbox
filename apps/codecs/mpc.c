@@ -68,6 +68,8 @@ MPC_SAMPLE_FORMAT sample_buffer[MPC_FRAME_LENGTH*2] IBSS_ATTR;
 extern char iramcopy[];
 extern char iramstart[];
 extern char iramend[];
+extern char iedata[];
+extern char iend[];
 #endif
 
 /* this is the codec entry point */
@@ -83,6 +85,7 @@ enum codec_status codec_start(struct codec_api *api)
     TEST_CODEC_API(api);
     #ifdef USE_IRAM 
     ci->memcpy(iramstart, iramcopy, iramend - iramstart);
+    ci->memset(iedata, 0, iend - iedata);
     #endif
     
     ci->configure(CODEC_DSP_ENABLE, (bool *)true);

@@ -42,6 +42,8 @@ const struct {
 extern char iramcopy[];
 extern char iramstart[];
 extern char iramend[];
+extern char iedata[];
+extern char iend[];
 #endif
 
 /* here is a global api struct pointer. while not strictly necessary,
@@ -116,6 +118,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
 #ifdef USE_IRAM
     memcpy(iramstart, iramcopy, iramend-iramstart);
+    memset(iedata, 0, iend - iedata);
 #endif
     shut=0;
     cleanshut=0;

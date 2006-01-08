@@ -20,10 +20,12 @@
 #include "codeclib.h"
 #include <codecs/libffmpegFLAC/shndec.h>
 
-#ifndef SIMULATOR
+#ifdef USE_IRAM
 extern char iramcopy[];
 extern char iramstart[];
 extern char iramend[];
+extern char iedata[];
+extern char iend[];
 #endif
 
 struct codec_api* rb;
@@ -52,8 +54,9 @@ enum codec_status codec_start(struct codec_api* api)
     rb = api;
     ci = (struct codec_api*)api;
 
-#ifndef SIMULATOR
+#ifdef USE_IRAM
     ci->memcpy(iramstart, iramcopy, iramend-iramstart);
+    ci->memset(iedata, 0, iend - iedata);
 #endif
 
     ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));

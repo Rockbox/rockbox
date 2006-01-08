@@ -17,7 +17,7 @@
 #endif
 
 
-struct cpu cpu IDATA_ATTR;
+struct cpu cpu IBSS_ATTR;
 
 
 

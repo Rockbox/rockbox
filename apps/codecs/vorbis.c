@@ -101,6 +101,8 @@ bool vorbis_set_codec_parameters(OggVorbis_File *vf)
 extern char iramcopy[];
 extern char iramstart[];
 extern char iramend[];
+extern char iedata[];
+extern char iend[];
 #endif
 
 /* this is the codec entry point */
@@ -125,6 +127,7 @@ enum codec_status codec_start(struct codec_api *api)
 
     #ifdef USE_IRAM
     rb->memcpy(iramstart, iramcopy, iramend - iramstart);
+    rb->memset(iedata, 0, iend - iedata);
     #endif
 
     rb->configure(CODEC_DSP_ENABLE, (bool *)true);

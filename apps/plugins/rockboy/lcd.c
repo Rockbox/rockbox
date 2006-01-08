@@ -15,7 +15,7 @@
 
 struct lcd lcd;
 
-struct scan scan IDATA_ATTR;
+struct scan scan IBSS_ATTR;
 
 #define BG (scan.bg)
 #define WND (scan.wnd)

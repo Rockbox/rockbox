@@ -21,10 +21,12 @@
 #include "libm4a/m4a.h"
 #include "libalac/decomp.h"
 
-#ifndef SIMULATOR
+#ifdef USE_IRAM
 extern char iramcopy[];
 extern char iramstart[];
 extern char iramend[];
+extern char iedata[];
+extern char iend[];
 #endif
 
 int32_t outputbuffer[ALAC_MAX_CHANNELS][ALAC_BLOCKSIZE] IBSS_ATTR;
@@ -53,8 +55,9 @@ enum codec_status codec_start(struct codec_api* api)
   rb = api;
   ci = (struct codec_api*)api;
 
-#ifndef SIMULATOR
+#ifdef USE_IRAM
   rb->memcpy(iramstart, iramcopy, iramend-iramstart);
+  rb->memset(iedata, 0, iend - iedata);
 #endif
 
   ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));

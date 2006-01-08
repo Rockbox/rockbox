@@ -40,6 +40,8 @@ static long read_callback (void *buffer, long bytes)
 extern char iramcopy[];
 extern char iramstart[];
 extern char iramend[];
+extern char iedata[];
+extern char iend[];
 #endif
 
 /* this is the codec entry point */
@@ -56,6 +58,7 @@ enum codec_status codec_start(struct codec_api* api)
 
 #ifdef USE_IRAM
     ci->memcpy(iramstart, iramcopy, iramend-iramstart);
+    ci->memset(iedata, 0, iend - iedata);
 #endif
 
     ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));

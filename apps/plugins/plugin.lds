@@ -60,7 +60,8 @@ MEMORY
 
 SECTIONS
 {
-    .text : {
+    .text : 
+    {
         KEEP(*(.entry))
         *(.text*)
 #if CONFIG_CPU==PP5020
@@ -69,25 +70,24 @@ SECTIONS
 #endif
     } > PLUGIN_RAM
 
-    .data : {
-        *(.data*)
-    } > PLUGIN_RAM
-
-    /DISCARD/ : {
-        *(.eh_frame)
-    }
-
-    .bss : {
-        *(.bss*)
-    } > PLUGIN_RAM
-
-    .rodata : {
+    .rodata : 
+    {
         *(.rodata*)
         . = ALIGN(0x4);
+    } > PLUGIN_RAM
+
+    .data : 
+    {
+        *(.data*)
 #if defined(ARCH_IRIVER) || defined(ARCH_IPOD)
         iramcopy = .;
 #endif
     } > PLUGIN_RAM
+
+    /DISCARD/ : 
+    {
+        *(.eh_frame)
+    }
 
 #if defined(ARCH_IRIVER) || defined(ARCH_IPOD)
     .iram IRAMORIG : AT ( iramcopy)
@@ -96,13 +96,29 @@ SECTIONS
         *(.icode)
         *(.irodata)
         *(.idata)
-        *(.ibss)
         iramend = .;
     } > PLUGIN_IRAM
+
+    .ibss (NOLOAD) :
+    {
+        iedata = .;
+        *(.ibss)
+        . = ALIGN(0x4);
+        iend = .;
+    } > PLUGIN_IRAM
+
+    .bss ADDR(.data) + SIZEOF(.data) + SIZEOF(.iram):
+#else
+    .bss :
 #endif
+    {
+        *(.bss*)
+    } > PLUGIN_RAM
+
     /* Special trick to avoid a linker error when no other sections are
        left after garbage collection (plugin not for this platform) */
-    .comment 0 : {
+    .comment 0 : 
+    {
         KEEP(*(.comment))
     }
 }

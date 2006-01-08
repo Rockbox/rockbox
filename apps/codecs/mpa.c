@@ -43,6 +43,8 @@ int mpeg_latency[3] = { 0, 481, 529 };
 extern char iramcopy[];
 extern char iramstart[];
 extern char iramend[];
+extern char iedata[];
+extern char iend[];
 #endif
 
 struct codec_api *ci;
@@ -83,6 +85,7 @@ enum codec_status codec_start(struct codec_api *api)
 
 #ifdef USE_IRAM
     ci->memcpy(iramstart, iramcopy, iramend - iramstart);
+    ci->memset(iedata, 0, iend - iedata);
 #endif
 
     if (codec_init(api))
