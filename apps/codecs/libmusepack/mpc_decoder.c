@@ -269,11 +269,15 @@ mpc_decoder_huffman_decode_faster(mpc_decoder *d, const HuffmanTyp* Table)
     return Table->Value;
 }
 
+MPC_SAMPLE_FORMAT V_L[MPC_V_MEM + 960] IBSS_ATTR;
+MPC_SAMPLE_FORMAT V_R[MPC_V_MEM + 960] IBSS_ATTR;
+
 static void
 mpc_decoder_reset_v(mpc_decoder *d) 
 {
-    memset(d->V_L, 0, sizeof d->V_L);
-    memset(d->V_R, 0, sizeof d->V_R);
+    /* since d->V_L and d->V_R are now pointers, sizeof (d->V_x) will no longer work */
+    memset(d->V_L, 0, sizeof V_L);
+    memset(d->V_R, 0, sizeof V_R);
 }
 
 static void
@@ -1105,9 +1109,6 @@ mpc_decoder_read_bitstream_sv7(mpc_decoder *d)
         }
     }
 }
-
-MPC_SAMPLE_FORMAT V_L[MPC_V_MEM + 960] IBSS_ATTR;
-MPC_SAMPLE_FORMAT V_R[MPC_V_MEM + 960] IBSS_ATTR;
 
 void mpc_decoder_setup(mpc_decoder *d, mpc_reader *r)
 {

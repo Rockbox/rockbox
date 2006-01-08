@@ -81,6 +81,10 @@ enum codec_status codec_start(struct codec_api *api)
     mpc_streaminfo info;
     
     TEST_CODEC_API(api);
+    #ifdef USE_IRAM 
+    ci->memcpy(iramstart, iramcopy, iramend - iramstart);
+    #endif
+    
     ci->configure(CODEC_DSP_ENABLE, (bool *)true);
     ci->configure(DSP_DITHER, (bool *)false);
     
@@ -103,10 +107,6 @@ enum codec_status codec_start(struct codec_api *api)
     reader.data = ci;
 
 next_track:    
-    #ifdef USE_IRAM 
-    ci->memcpy(iramstart, iramcopy, iramend - iramstart);
-    #endif
-    
     if (codec_init(api))
         return CODEC_ERROR;
 
