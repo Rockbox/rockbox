@@ -887,7 +887,7 @@ sed > Makefile \
  -e "s,@PLUGINS@,${plugins},g" \
  -e "s,@CODECS@,${codecs},g" \
  -e "s,@GCCOPTS@,${GCCOPTS},g" \
- -e "s,@LDOPTS@,${LDOPTS},g" \
+ -e "s!@LDOPTS@!${LDOPTS}!g" \
  -e "s,@LOADADDRESS@,${loadaddress},g" \
  -e "s,@EXTRADEF@,${extradefines},g" \
  -e "s,@APPSDIR@,${appsdir},g" \
