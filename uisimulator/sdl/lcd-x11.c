@@ -31,6 +31,7 @@
 #include <time.h>
 
 #include "screenhack.h"
+#include "system.h"
 #include "config.h"
 
 /*
@@ -99,9 +100,10 @@ void lcd_update_rect(int x_start, int y_start,
             colors[p] = SDL_MapRGB(surface->format, 255-gray, 255-gray, 255-gray);
 #elif LCD_DEPTH == 16
 #if LCD_PIXELFORMAT == RGB565SWAPPED
-            unsigned b = ((lcd_framebuffer[y][x] >> 11) & 0x1f) << 3;
-            unsigned g = ((lcd_framebuffer[y][x] >> 5) & 0x3f) << 2;
-            unsigned r = ((lcd_framebuffer[y][x]) & 0x1f) << 3;
+            unsigned short pixel = swap16(lcd_framebuffer[y][x]);
+            unsigned r = ((pixel >> 11) & 0x1f) << 3;
+            unsigned g = ((pixel >> 5) & 0x3f) << 2;
+            unsigned b = (pixel & 0x1f) << 3;
             points[p].x = x + MARGIN_X;
             points[p].y = y + MARGIN_Y;
             colors[p] = SDL_MapRGB(surface->format, r, g, b);
