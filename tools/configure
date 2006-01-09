@@ -80,6 +80,11 @@ simcc () {
        # win32 version
        GCCOPTS="$GCCOPTS -mno-cygwin -DNOCYGWIN"
        LDOPTS="-lgdi32 -luser32 -mno-cygwin"
+   elif [ "$simver" = "sdl" ]; then
+       # sdl version
+       GCCOPTS="$GCCOPTS `sdl-config --cflags`"
+       LDOPTS="`sdl-config --libs`"
+       checksoundcard
    else
        # x11 version
        GCCOPTS="$GCCOPTS"
@@ -92,10 +97,15 @@ simcc () {
    Linux)
    echo "Linux host detected"
    GCCOPTS="$GCCOPTS"
-   LDOPTS='-L/usr/X11R6/lib -lX11 -lm -lXt -lXmu -lnsl -ldl -lpthread'
    if [ "$simver" = "win32" ]; then
+       LDOPTS='-L/usr/X11R6/lib -lX11 -lm -lXt -lXmu -lnsl -ldl -lpthread'
        crosswincc # setup cross-compiler
+   elif [ "$simver" = "sdl" ]; then
+       GCCOPTS="$GCCOPTS `sdl-config --cflags`"
+       LDOPTS="`sdl-config --libs`"
+       checksoundcard
    else
+       LDOPTS='-L/usr/X11R6/lib -lX11 -lm -lXt -lXmu -lnsl -ldl -lpthread'
        checksoundcard
    fi # not a cross-compiler
    ;;
@@ -247,7 +257,7 @@ if [ -z "$simver" ]; then
   # Figure out win32/x11 GUI
   #
   echo ""
-  echo "Build (W)in32 or  (X)11 GUI version? (X)"
+  echo "Build (W)in32 or (X)11 or (S)DL GUI version? (S)"
 
   option=`input`;
 
@@ -262,8 +272,13 @@ if [ -z "$simver" ]; then
      # make sure the code knows this is for win32
      extradefines="$extradefines -DWIN32"
      ;;
-   *)
+   [Xx])
      simver="x11"
+     extradefines="$extradefines -DX11"
+     ;;
+   [Ss]|*)
+     simver="sdl"
+     extradefines="$extradefines -DSDL"
      ;;
    esac
    echo "Selected $simver simulator"

@@ -86,6 +86,22 @@ else
 endif
 
 else # end of x11-simulator
+ifeq ($(SIMVER), sdl)
+###################################################
+# This is the SDL simulator version
+
+$(OBJDIR)/%.rock : $(OBJDIR)/%.o  $(BUILDDIR)/libplugin.a
+	@echo "LD "`basename $@`
+	@$(CC) $(CFLAGS) -shared $< -L$(BUILDDIR)  $(CODECLIBS) -lplugin -o $@
+ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
+# 'x' must be kept or you'll have "Win32 error 5"
+#     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
+#         #define ERROR_ACCESS_DENIED 5L
+else
+	@chmod -x $@
+endif
+
+else # end of sdl-simulator
 ###################################################
 # This is the win32 simulator version
 DLLTOOLFLAGS = --export-all
@@ -104,6 +120,7 @@ else
 	@chmod -x $@
 endif
 endif # end of win32-simulator
+endif
 
 endif # end of simulator section
 
