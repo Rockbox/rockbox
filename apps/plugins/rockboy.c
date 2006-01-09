@@ -74,7 +74,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lseek(fh, 0, SEEK_SET);
     readsize = rb->read(fh, header.start_addr, header.end_addr - header.start_addr);
     rb->close(fh);
-    if (readsize <= sizeof(header))
+    if (readsize <= (int)sizeof(header))
     {
         rb->splash(2*HZ, true, "Error loading " OVL_DISPLAYNAME " overlay.");
         return PLUGIN_ERROR;
