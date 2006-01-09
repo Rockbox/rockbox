@@ -313,6 +313,8 @@ void lcd_init_device(void)
      * Gate output: VGH/VGL
      * 6th bit not set*/ 
     lcd_write_reg(R_DISP_CONTROL1, 0x0637);
+    /* ok, the display is finally on */
+    display_on=true;
 }
 
 void lcd_enable(bool on)
@@ -347,8 +349,9 @@ void lcd_enable(bool on)
 
             /* halt negative volt ampl. */
             lcd_write_reg(R_POWER_CONTROL4,0x0000); 
+            display_on=false;
         }
-        display_on=on;
+        /* display_on = on */
     }
 }
 
