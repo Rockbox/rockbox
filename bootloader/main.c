@@ -217,6 +217,9 @@ void main(void)
     backlight_init();
     set_irq_level(0);
     lcd_init();
+#ifdef IRIVER_H300_SERIES
+    lcd_enable(true);
+#endif
     font_init();
     adc_init();
     button_init();
