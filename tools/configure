@@ -270,34 +270,6 @@ if [ -z "$simver" ]; then
 fi
 }
 
-picklang() {
-    # figure out which languages that are around
-    for file in $rootdir/apps/lang/*.lang; do
-        clean=`echo $file | sed -e 's:.*/::g' | cut "-d." -f1`
-        langs="$langs $clean"
-    done
-
-    num=1
-    for one in $langs; do
-        echo "$num. $one"
-        num=`expr $num + 1`
-    done
-
-    read pick
-    return $pick;
-}
-
-whichlang() {
-    num=1
-    for one in $langs; do
-        if [ "$num" = "$pick" ]; then
-            echo $one
-            return
-        fi
-        num=`expr $num + 1`
-    done
-}
-
 if test "$1" = "--help"; then
   echo "Rockbox configure script."
   echo "Invoke this in a directory to generate a Makefile to build Rockbox"
@@ -757,19 +729,8 @@ fi
 
 whichaddr
 
-############################################################################
-# language
-
-    echo "Select a number for the language to use (default is english)"
-
-    picklang
-    language=`whichlang`
-
-    if [ -z "$language" ]; then
-        # pick a default
-        language="english"
-    fi
-    echo "Language set to $language"
+# this was once possible to change at build-time, but no more:
+language="english"
 
 uname=`uname`
 
