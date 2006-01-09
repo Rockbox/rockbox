@@ -94,7 +94,7 @@ void lcd_update_rect(int x_start, int y_start,
             points[p].y = y + MARGIN_Y;
             colors[p] = ((lcd_framebuffer[y/8][x] >> (y & 7)) & 1) ? sdl_black : sdl_white;
 #elif LCD_DEPTH == 2
-            unsigned gray = ((lcd_framebuffer[y/4][x] >> (2 * (y & 3))) & 3) << 6;
+            unsigned gray = ((lcd_framebuffer[y/4][x] >> (2 * (y & 3))) & 3) * 85;
             points[p].x = x + MARGIN_X;
             points[p].y = y + MARGIN_Y;
             colors[p] = SDL_MapRGB(surface->format, 255-gray, 255-gray, 255-gray);
