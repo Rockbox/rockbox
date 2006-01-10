@@ -32,6 +32,7 @@ flipit.c
 grayscale.c
 jpeg.c
 mandelbrot.c
+metronome.c
 minesweeper.c
 oscillograph.c
 oscilloscope.c
