@@ -711,11 +711,23 @@ static signed short sound[] = {
 
 int tock;
 
+short sndbuf[sizeof(sound)*2];
+
+/* Convert the mono "tock" sample to interleaved stereo */
+void prepare_tock(void)
+{
+    int i;
+    for(i = 0;i < (int)sizeof(sound)/2;i++) {
+        sndbuf[i*2] = sound[i];
+        sndbuf[i*2+1] = sound[i];
+    }
+}
+
 void callback_pcm(unsigned char** start, long* size)
 {
     if(sound_active) {
-        *start = (unsigned char *)sound;
-        *size = sizeof(sound);
+        *start = (unsigned char *)sndbuf;
+        *size = sizeof(sndbuf);
         sound_active = false;
     }
 }
@@ -876,6 +888,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
 #if CONFIG_CODEC != SWCODEC
     rb->bitswap(sound, sizeof(sound));
 #else
+    prepare_tock();
     rb->pcm_set_frequency(44100);
 #endif
 
