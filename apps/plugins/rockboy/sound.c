@@ -158,9 +158,10 @@ void sound_reset(void)
     sound_off();
 }
 
-
 void sound_mix(void)
 {
+
+	if (!sound) return;
     int s, l, r, f, n;
 
     if (!RATE || cpu.snd < RATE) return;
@@ -275,10 +276,10 @@ void sound_mix(void)
                 pcm_submit();
             if (pcm.stereo)
             {
-                pcm.buf[pcm.pos++] = (signed short)(l * 256);
-                pcm.buf[pcm.pos++] = (signed short)(r * 256);
+				pcm.buf[pcm.pos++] = l+128;
+				pcm.buf[pcm.pos++] = r+128;
             }
-            else pcm.buf[pcm.pos++] = (signed short)((r+l) * 128);
+			else pcm.buf[pcm.pos++] = ((l+r)>>1)+128;
         }
     }
     R_NR52 = (R_NR52&0xf0) | S1.on | (S2.on<<1) | (S3.on<<2) | (S4.on<<3);
@@ -288,6 +289,7 @@ void sound_mix(void)
 
 byte sound_read(byte r)
 {
+	if(!sound) return 0;
     sound_mix();
     /* printf("read %02X: %02X\n", r, REG(r)); */
     return REG(r);
@@ -344,6 +346,7 @@ void s4_init(void)
 
 void sound_write(byte r, byte b)
 {
+	if(!sound) return;
 #if 0
     static void *timer;
     if (!timer) timer = sys_timer();

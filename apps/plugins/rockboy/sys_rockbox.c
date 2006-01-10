@@ -25,6 +25,8 @@
 #include "hw.h"
 #include "config.h"
 
+int frameskip;
+
 rcvar_t joy_exports[] =
 {
             RCV_END
@@ -52,13 +54,19 @@ void joy_close(void)
 {
 }
 
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
-    (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD)
 #define ROCKBOY_PAD_A BUTTON_ON
 #define ROCKBOY_PAD_B BUTTON_OFF
 #define ROCKBOY_PAD_START BUTTON_REC
 #define ROCKBOY_PAD_SELECT BUTTON_SELECT
 #define ROCKBOY_MENU BUTTON_MODE
+
+#elif (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define ROCKBOY_PAD_A BUTTON_REC
+#define ROCKBOY_PAD_B BUTTON_MODE
+#define ROCKBOY_PAD_START BUTTON_ON
+#define ROCKBOY_PAD_SELECT BUTTON_SELECT
+#define ROCKBOY_MENU BUTTON_OFF
 
 #elif CONFIG_KEYPAD == RECORDER_PAD
 #define ROCKBOY_PAD_A BUTTON_F1
@@ -71,10 +79,11 @@ void joy_close(void)
 
 unsigned int oldbuttonstate = 0, newbuttonstate,holdbutton;
 
+int released, pressed;
+
 void ev_poll(void)
 {
     event_t ev;
-    int released, pressed;
     newbuttonstate = rb->button_status();
     released = ~newbuttonstate & oldbuttonstate;
     pressed = newbuttonstate & ~oldbuttonstate;
@@ -141,31 +150,49 @@ void vid_setpal(int i, int r, int g, int b)
     (void)b;
 }
 
-void vid_begin(void)
+void vid_begin(void) // This frameskip code is borrowed from the GNUboyCE project
 {
+	static int skip = 0;
+	skip = (skip + 1) % (frameskip > 0 ? frameskip + 1 : 1);
+	fb.enabled = skip == 0;
 }
 
 void vid_init(void)
 {
-    fb.pelsize=1; // 8 bit framebuffer.. (too much.. but lowest gnuboy will support.. so yea...
     fb.h=144;
     fb.w=160;
     fb.pitch=160;
     fb.enabled=1;
     fb.dirty=0;
     fb.mode=3;
+
+	frameskip=2;
+
+#if defined(HAVE_LCD_COLOR)
+    fb.pelsize=2; // 16 bit framebuffer
+
+	fb.indexed = 0; // no palette on lcd
+	fb.cc[0].r = 3;  // 8-5 (wasted bits on red)
+	fb.cc[0].l = 11;  //this is the offset to the R bits (16-5)
+	fb.cc[1].r = 2;  // 8-6 (wasted bits on green)
+	fb.cc[1].l = 5;  // This is the offset to the G bits (16-5-6)
+	fb.cc[2].r = 3;  // 8-5 (wasted bits on red)
+	fb.cc[2].l = 0;  // This is the offset to the B bits (16-5-6-5)
+	fb.cc[3].r = 0;  // no alpha
+	fb.cc[3].l = 0;
+	fb.yuv = 0;		// not in yuv format
+#else // ***** NEED TO LOOK INTO THIS MORE FOR THE H100 (Should be able to get rid of some IFDEF's elsewhere)
+    fb.pelsize=1; // 8 bit framebuffer.. (too much.. but lowest gnuboy will support.. so yea...
+#endif
 }
 
-#ifdef HAVE_LCD_COLOR
-static const fb_data my_pal[4] = {
-    LCD_WHITE, LCD_LIGHTGRAY, LCD_DARKGRAY, LCD_BLACK
-};
-#endif
-
+fb_data *frameb;
 void vid_update(int scanline) 
 {
-    int cnt=0,scanline_remapped;
-    fb_data *frameb;
+    register int cnt=0;
+#if LCD_HEIGHT < 144
+    int scanline_remapped;
+#endif
 #if (LCD_HEIGHT == 64) && (LCD_DEPTH == 1) /* Archos */
     int balance = 0;
     if (fb.mode==1)
@@ -258,11 +285,11 @@ void vid_update(int scanline)
     }
     rb->lcd_update_rect(0, scanline & ~3, LCD_WIDTH, 4);
 #elif (LCD_HEIGHT >= 144) && defined(HAVE_LCD_COLOR) /* iriver H3x0, colour iPod */
-    scanline_remapped = scanline + (LCD_HEIGHT-144)/2;
-    frameb = rb->lcd_framebuffer + scanline_remapped * LCD_WIDTH + (LCD_WIDTH-160)/2;
+    frameb = rb->lcd_framebuffer + (scanline + (LCD_HEIGHT-144)/2) * LCD_WIDTH + (LCD_WIDTH-160)/2;;
     while (cnt < 160)
-        *frameb++ = my_pal[scan.buf[0][cnt++]&0x3];
-    rb->lcd_update_rect((LCD_WIDTH-160)/2, scanline_remapped, 160, 1);
+    		*frameb++ = scan.pal2[scan.buf[cnt++]];
+	if(scanline==143)
+		rb->lcd_update(); // this seems faster then doing individual scanlines
 #endif /* LCD_HEIGHT */
 }
 

@@ -5,117 +5,89 @@
 
 struct pcm pcm;
 
-#define BUF_SIZE (8192)
-#define DMA_PORTION (1024)
-
-static short buf1_unal[(BUF_SIZE / sizeof(short)) + 2]; // to make sure 4 byte aligned
+bool sound = 1;
+#define N_BUFS 4
+#define BUF_SIZE 1024
 
 rcvar_t pcm_exports[] =
 {
 	    RCV_END
 };
 
-/*#if CONFIG_CODEC == SWCODEC && !defined(SIMULATOR)
- * disabled cause it crashes with current audio implementation.. no sound.
- */
-#if 0
-static short* buf1;
+#if CONFIG_CODEC == SWCODEC && !defined(SIMULATOR)
 
-static short front_buf[512];
+static int curbuf,gmcurbuf;
 
-static short* last_back_pos;
+static byte *buf=0;
+static short *gmbuf;
 
 static bool newly_started;
-static int turns;
 
 void pcm_init(void)
 {
-    buf1 = (signed short*)((((unsigned int)buf1_unal) >> 2) << 2); /* here i just make sure that buffer is aligned to 4 bytes*/
+	if(!sound) return;
+
     newly_started = true;
-    last_back_pos = buf1;
-    turns = 0;
     
     pcm.hz = 11025;
     pcm.stereo = 1;
-    pcm.buf = front_buf;
-    pcm.len = (sizeof(front_buf)) / sizeof(short); /* length in shorts, not bytes */
-    pcm.pos = 0;
 
+	pcm.len = BUF_SIZE;
+	if(!buf){
+		buf = my_malloc(pcm.len * N_BUFS);
+		gmbuf = my_malloc(pcm.len * N_BUFS*sizeof (short));
+		pcm.buf = buf;
+		pcm.pos = 0;
+    		curbuf = gmcurbuf= 0;
+	}
     
     rb->pcm_play_stop();
-    rb->pcm_set_frequency(11025);
-    rb->pcm_set_volume(200);
+    rb->pcm_set_frequency(11025); // 44100 22050 11025
 }
 
 void pcm_close(void)
 {
     memset(&pcm, 0, sizeof pcm);    
     newly_started = true;   
-    last_back_pos = buf1;
     rb->pcm_play_stop();	
+	rb->pcm_set_frequency(44100);
 }
 
 void get_more(unsigned char** start, long* size)
 {	
-    int length;
-    unsigned int sar = (unsigned int)SAR0;    
-    length = ((unsigned int)buf1) + BUF_SIZE - sar;
-    
-    if(turns > 0)
-    {       
-        newly_started = true;       
-        last_back_pos = buf1;
-        turns = 0;
-        return;
-    } /* sound will stop if no one feeds data*/
-
-    if(length <= 0)
-    {
-        *start = (unsigned char*)buf1;
-        *size = DMA_PORTION;
-        turns++;
-    }
-    else
-    {
-        *start = (unsigned char*)sar;
-        if(length > DMA_PORTION)
-            *size = DMA_PORTION;
-        else
-            *size = length;
-    }
-    
+    *start = (unsigned char*)(&gmbuf[pcm.len*curbuf]);
+    *size = BUF_SIZE*sizeof(short);
 }
             
 int pcm_submit(void)
 {
-    while( (turns < 0) && ((((unsigned int)last_back_pos) + pcm.pos * sizeof(short)) > ((unsigned int)SAR0)) && !newly_started) rb->yield(); /* wait until data is passed through DAC or until exit*/
-    int shorts_left = ((((unsigned int)buf1) + BUF_SIZE) - ((unsigned int)last_back_pos)) / sizeof(short);
-    if( shorts_left >= pcm.pos )
-    {
-        memcpy(last_back_pos,pcm.buf,pcm.pos * sizeof(short));
-        last_back_pos = &last_back_pos[pcm.pos];
+	register int i;
+
+	if (!sound) {
+		pcm.pos = 0;
+		return 0;
     }
-    else
-    {
-        int last_pos = shorts_left;
-        memcpy(last_back_pos,pcm.buf,shorts_left * sizeof(short));
-        last_back_pos = buf1;                
-        shorts_left = pcm.pos - shorts_left;
-        memcpy(last_back_pos,&pcm.buf[last_pos],shorts_left * sizeof(short));
-        last_back_pos = &buf1[shorts_left];
-        turns--;	
+
+    if (pcm.pos >= pcm.len) {
+		curbuf = (curbuf + 1) % N_BUFS;
+		pcm.buf = buf + pcm.len * curbuf;
+		pcm.pos = 0;
+
+		// gotta convert the 8 bit buffer to 16
+		for(i=0; i<pcm.len;i++)
+			gmbuf[i+pcm.len*curbuf] = (pcm.buf[i]<<8)-0x8000;
     }
     
     if(newly_started)
     {  
-        rb->pcm_play_data((unsigned char*)buf1,pcm.pos * sizeof(short),&get_more);
+        rb->pcm_play_data(&get_more);
         newly_started = false;
     }    
     
-    pcm.pos = 0;
     return 1;
 }
 #else
+static byte buf1_unal[(BUF_SIZE / sizeof(short)) + 2]; // to make sure 4 byte aligned
 void pcm_init(void)
 {
     pcm.hz = 11025;

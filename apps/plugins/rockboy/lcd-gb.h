@@ -21,7 +21,7 @@ struct scan
 #elif LCD_DEPTH == 2
     byte buf[4][256];
 #elif LCD_DEPTH > 4
-    byte buf[1][256];
+    byte buf[256];
 #endif
 	byte pal1[128];
 	un16 pal2[64];

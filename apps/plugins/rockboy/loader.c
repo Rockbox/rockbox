@@ -86,7 +86,7 @@ static char *savedir = "/.rockbox/rockboy";
 static int saveslot;
 
 static int forcebatt, nobatt;
-static int forcedmg;
+static int forcedmg, gbamode;
 
 static int memfill = -1, memrand = -1;
 
@@ -181,7 +181,7 @@ int rom_load(void)
 
 	c = header[0x0143];
         hw.cgb = ((c == 0x80) || (c == 0xc0)) && !forcedmg;
-	hw.gba = 0; //(hw.cgb && gbamode);
+	hw.gba = (hw.cgb && gbamode);
 		
 	close(fd);
 

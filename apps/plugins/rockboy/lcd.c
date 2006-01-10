@@ -19,7 +19,13 @@ struct scan scan IBSS_ATTR;
 
 #define BG (scan.bg)
 #define WND (scan.wnd)
+
+#if LCD_DEPTH ==16
+#define BUF (scan.buf)
+#else
 #define BUF (scan.buf[scanline_ind])
+#endif
+
 #define PRI (scan.pri)
 
 #define PAL1 (scan.pal1)
@@ -55,7 +61,10 @@ static int rgb332;
 
 static int sprsort = 1;
 static int sprdebug;
-static int scanline_ind=0,insync=0;
+static int insync=0;
+#if LCD_DEPTH < 16
+static int scanline_ind=0;
+#endif
 
 #define DEF_PAL { 0x98d0e0, 0x68a0b0, 0x60707C, 0x2C3C3C }
 
@@ -930,7 +939,7 @@ void lcd_refreshline(void)
 
 
 
-/*
+#if HAVE_LCD_COLOR
 static void updatepalette(int i)
 {
     int c, r, g, b, y, u, v, rr, gg;
@@ -964,7 +973,7 @@ static void updatepalette(int i)
                   | (u<<fb.cc[1].l) | (v<<fb.cc[2].l);
         return;
     }
-
+/*
     if (fb.indexed)
     {
         pal_release(PAL1[i]);
@@ -973,7 +982,7 @@ static void updatepalette(int i)
         PAL2[i] = (c<<8) | c;
         PAL4[i] = (c<<24) | (c<<16) | (c<<8) | c;
         return;
-    }
+    }*/
 
     r = (r >> fb.cc[0].r) << fb.cc[0].l;
     g = (g >> fb.cc[1].r) << fb.cc[1].l;
@@ -996,13 +1005,16 @@ static void updatepalette(int i)
         PAL4[i] = c;
         break;
     }
-}*/
+}
+#endif
 
 void pal_write(int i, byte b)
 {
     if (lcd.pal[i] == b) return;
     lcd.pal[i] = b;
-//    updatepalette(i>>1);
+#if LCD_DEPTH ==16
+    updatepalette(i>>1);
+#endif
 }
 
 void pal_write_dmg(int i, int mapnum, byte d)
@@ -1043,7 +1055,9 @@ void vram_dirty(void)
 
 void pal_dirty(void)
 {
-//    int i;
+#if LCD_DEPTH ==16
+    int i;
+#endif
     if (!hw.cgb)
     {
 
@@ -1052,8 +1066,10 @@ void pal_dirty(void)
         pal_write_dmg(64, 2, R_OBP0);
         pal_write_dmg(72, 3, R_OBP1);
     }
-//    for (i = 0; i < 64; i++)
-//        updatepalette(i);
+#if LCD_DEPTH ==16
+    for (i = 0; i < 64; i++)
+        updatepalette(i);
+#endif
 }
 
 void lcd_reset(void)

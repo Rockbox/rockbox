@@ -102,6 +102,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
        otherwise you will get lovely "I04: IllInstr" errors... :-) */
     rb = api;
     
+	rb->lcd_setfont(0);
+    
     if (!parameter) {
         rb->splash(HZ*3, true, "Play gameboy ROM file! (.gb/.gbc)");
         return PLUGIN_OK;

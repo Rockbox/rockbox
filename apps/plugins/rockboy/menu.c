@@ -67,11 +67,33 @@ static const char *slot_menu[] = {
 
 #define OPT_MENU_TITLE "Options"
 typedef enum {
+  OM_ITEM_FS,
+  OM_ITEM_SOUND,
   OM_ITEM_BACK,
   OM_MENU_LAST
 } OptMenuItem;
 
 static const char *opt_menu[] = {
+  "Frameskip",
+  "Sound ON/OFF",
+  "Previous Menu..."
+};
+
+#define FS_MENU_TITLE "Frameskip"
+typedef enum {
+  FS_ITEM_FS0,
+  FS_ITEM_FS1,
+  FS_ITEM_FS2,
+  FS_ITEM_FS3,
+  FS_ITEM_BACK,
+  FS_MENU_LAST
+} FSMenuItem;
+
+static const char *fs_menu[] = {
+  "Skip 0 Frames",
+  "Skip 1 Frames",
+  "Skip 2 Frames",
+  "Skip 3 Frames",
   "Previous Menu..."
 };
 
@@ -89,6 +111,8 @@ static const char *opt_menu[] = {
 int do_user_menu(void) {
   int mi, ret, num_items;
   bool done = false;
+
+  pcm_init();
 
   /* set defaults */
   ret = 0; /* return value */
@@ -119,7 +143,7 @@ int do_user_menu(void) {
         break;
     }
   }
-
+  rb->lcd_clear_display();
   /* return somethin' */
   return ret;
 }
@@ -314,6 +338,42 @@ static void do_slot_menu(bool is_load) {
   }
 }
 
+static void do_fs_menu(void) {
+  int mi, ret, num_items;
+  bool done = false;
+
+  /* set defaults */
+  ret = 0; /* return value */
+  mi = 0; /* initial menu selection */
+  num_items = sizeof(fs_menu) / sizeof(char*);
+  
+  /* loop until we should exit menu */
+  while (!done) {
+    /* get item selection */
+    mi = do_menu(FS_MENU_TITLE, (char**) fs_menu, num_items, mi);
+    
+    /* handle selected menu item */
+    switch (mi) {
+      case MENU_CANCEL:
+      case FS_ITEM_BACK:
+        done = true;
+        break;
+      case FS_ITEM_FS0:
+        frameskip=0;
+        break;
+	  case FS_ITEM_FS1:
+        frameskip=1;
+        break;
+	  case FS_ITEM_FS2:
+        frameskip=2;
+        break;
+	  case FS_ITEM_FS3:
+        frameskip=3;
+        break;
+    }
+  }
+}
+
 static void do_opt_menu(void) {
   int mi, num_items;
   bool done = false;
@@ -324,8 +384,18 @@ static void do_opt_menu(void) {
   
   while (!done) {
     mi = do_menu(OPT_MENU_TITLE, (char**) opt_menu, num_items, mi);
-    if (mi == MENU_CANCEL || mi == OM_ITEM_BACK)
+	switch (mi) {
+      case OM_ITEM_FS:
+        do_fs_menu();
+        break;
+	  case OM_ITEM_SOUND:
+        sound=!sound;
+        break;
+      case MENU_CANCEL:
+      case OM_ITEM_BACK:
       done = true;
+        break;
+	}
   }
 }
 

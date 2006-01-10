@@ -92,3 +92,6 @@ void savestate(int fd);
 
 /* Using #define isn't enough with GCC 4.0.1 */
 void* memcpy(void* dst, const void* src, size_t size);
+
+extern int frameskip;
+extern bool sound;

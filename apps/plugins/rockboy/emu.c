@@ -73,7 +73,7 @@ void emu_run(void)
 #if !defined(SIMULATOR) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
 	rb->cpu_boost(true);
 #endif
-	while(shut==0)
+	while(!shut)
 	{
 		cpu_emulate(2280);
 		while (R_LY > 0 && R_LY < 144)
