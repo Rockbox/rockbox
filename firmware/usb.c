@@ -394,7 +394,6 @@ bool usb_detect(void)
     current_status = (P5 & 0x10)?true:false;
 #endif
 #ifdef IRIVER_H300
-    /* TODO: add proper code code for H300 USB style */
     current_status = (GPIO1_READ & 0x80)?true:false;
 #endif
 #ifdef USB_IPODSTYLE

@@ -175,7 +175,7 @@ void main(void)
     power_init();
 
     /* Turn off if neither ON button is pressed */
-    if(!(on_button || rc_on_button))
+    if(!(on_button || rc_on_button || usb_detect()))
         power_off();
     
     /* Backlight ON */
@@ -243,8 +243,8 @@ void main(void)
 
     /* Don't start if the Hold button is active on the device you
        are starting with */
-    if((on_button && button_hold()) ||
-       (rc_on_button && remote_button_hold())) {
+    if(!usb_detect() && ((on_button && button_hold()) ||
+       (rc_on_button && remote_button_hold()))) {
         lcd_puts(0, 8, "HOLD switch on, power off...");
         lcd_update();
         sleep(HZ*2);
