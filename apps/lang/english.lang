@@ -3427,7 +3427,7 @@ new:
 
 id: LANG_CODEPAGE_ARABIC
 desc: in codepage setting menu
-eng: "Arabic (ISO-8859-6)"
+eng: "Arabic (CP1256)"
 voice:
 new:
 

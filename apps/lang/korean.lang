@@ -3414,9 +3414,9 @@ new: "태국어 (ISO-8859-11)"
 
 id: LANG_CODEPAGE_ARABIC
 desc: in codepage setting menu
-eng: "Arabic (ISO-8859-6)"
+eng: "Arabic (CP1256)"
 voice:
-new: "아랍어 (ISO-8859-6)"
+new: "아랍어 (CP1256)"
 
 id: LANG_CODEPAGE_TURKISH
 desc: in codepage setting menu

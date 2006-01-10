@@ -84,13 +84,13 @@ unsigned short iso_decode(unsigned char *latin1, int cp, int count)
             }
             break;
 
-        case 0x05: /* Arabic (ISO-8859-6) */
+        case 0x05: /* Arabic (CP1256) */
             while (count--) {
                 /* first convert to unicode */
-                if (*latin1 < 0xAC || *latin1 == 0xAD)
+                if (*latin1 < 0x80)
                     ucs = *latin1++;
-                else                    
-                    ucs = *latin1++ + 0x0560;
+                else
+                    ucs = cp1256_to_uni[*latin1++ - 0x80];
             }
             break;
 
