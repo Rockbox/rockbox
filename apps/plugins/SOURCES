@@ -17,6 +17,10 @@ vbrfix.c
 viewer.c
 dict.c
 
+#if CONFIG_KEYPAD != IPOD_4G_PAD
+metronome.c
+#endif
+
 #ifdef HAVE_LCD_BITMAP /* Recorder/Ondio models only */
 solitaire.c
 #ifndef HAVE_LCD_COLOR
@@ -32,7 +36,6 @@ flipit.c
 grayscale.c
 jpeg.c
 mandelbrot.c
-metronome.c
 minesweeper.c
 oscillograph.c
 oscilloscope.c
@@ -88,5 +91,4 @@ wav2wv.c
 midi2wav.c
 #else
 splitedit.c
-metronome.c
 #endif
