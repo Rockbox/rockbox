@@ -561,6 +561,14 @@ irq_handler:
     bhi.b   .iramloop
 #endif /* !BOOTLOADER */
 
+#ifdef IRIVER_H300_SERIES
+    /* Set KEEP_ACT before doing the lengthy copy and zero-fill operations */
+    move.l #0x00080000,%d0
+    or.l %d0,(0xb4,%a1)
+    or.l %d0,(0xb8,%a1)
+    or.l %d0,(0xbc,%a1)
+#endif
+
     /* zero out bss */
     lea     _edata,%a2
     lea     _end,%a4
