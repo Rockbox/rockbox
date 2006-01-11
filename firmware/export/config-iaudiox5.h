@@ -14,7 +14,7 @@
 /* LCD dimensions */
 #define LCD_WIDTH  160
 #define LCD_HEIGHT 128
-#define LCD_DEPTH  18   /* 262.144 colors */
+#define LCD_DEPTH  16   /* 262.144 colors but we use 16bit for now */
 
 /* remote LCD */
 #define LCD_REMOTE_WIDTH  128
