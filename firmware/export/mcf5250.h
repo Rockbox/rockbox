@@ -36,17 +36,6 @@
 #undef IPERRORADR
 
 /* here we define some new stuff */
-#define IPR    (*(volatile unsigned long *)(MBAR + 0x040))  /* interrupt oending register    */
-#define IMR    (*(volatile unsigned long *)(MBAR + 0x044))  /* Interrupt Mask Register       */
-
-#define ICR1   (*(volatile unsigned long *)(MBAR + 0x04d))  /* Primary interrupt control reg: timer 0   */
-#define ICR2   (*(volatile unsigned long *)(MBAR + 0x04e))  /* Primary interrupt control reg: timer 1   */
-#define ICR3   (*(volatile unsigned long *)(MBAR + 0x04f))  /* Primary interrupt control reg: i2c0      */
-#define ICR5   (*(volatile unsigned long *)(MBAR + 0x051))  /* Primary interrupt control reg: uart1     */
-#define ICR6   (*(volatile unsigned long *)(MBAR + 0x052))  /* Primary interrupt control reg: dma0      */
-#define ICR7   (*(volatile unsigned long *)(MBAR + 0x053))  /* Primary interrupt control reg: dam1      */
-#define ICR9   (*(volatile unsigned long *)(MBAR + 0x055))  /* Primary interrupt control reg: dam3      */
-#define ICR10  (*(volatile unsigned long *)(MBAR + 0x056))  /* Primary interrupt control reg: qspi      */
 
 #define CSAR4 (*(volatile unsigned long *)(MBAR + 0x0b0))   /* Chip Select Address Register Bank 4  */
 #define CSMR4 (*(volatile unsigned long *)(MBAR + 0x0b4))   /* Chip Select Mask Register Bank 4     */
