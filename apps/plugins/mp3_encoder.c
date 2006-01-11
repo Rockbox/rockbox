@@ -34,13 +34,6 @@
 enum e_byte_order { order_unknown, order_bigEndian, order_littleEndian };
 
 #include "plugin.h"
-#ifdef SIMULATOR
-#define LINE_ATTR
-#define IDATA_ATTR
-#else
-#define LINE_ATTR   __attribute__ ((aligned (16)))
-#define IDATA_ATTR  __attribute__ ((section(".idata")))
-#endif
 #define PFILE       int*
 #define memcpy      rb->memcpy
 #define memset      rb->memset
@@ -114,55 +107,55 @@ struct huffcodetab {
 };
 
 /* !!!!!!!! start of IRAM area: do not insert before x_int1 array !!!!!!!!!!!!! */
-short     x_int0      [HAN_SIZE]              IDATA_ATTR LINE_ATTR; //  1024 Bytes
-int       mdct_freq   [2][2][samp_per_frame2] IDATA_ATTR LINE_ATTR; //  9216 Bytes
-short     x_int1      [HAN_SIZE]              IDATA_ATTR LINE_ATTR; //  1024 Bytes
+short     x_int0      [HAN_SIZE]              IBSS_ATTR; //  1024 Bytes
+int       mdct_freq   [2][2][samp_per_frame2] IBSS_ATTR; //  9216 Bytes
+short     x_int1      [HAN_SIZE]              IBSS_ATTR; //  1024 Bytes
 /* !!!!!!!!!!!!!!!!!!!!! here you may insert other data !!!!!!!!!!!!!!!!!!!!!!! */
-uint8     int2idx     [4096]                  IDATA_ATTR LINE_ATTR; //  4096 Bytes
-enct8     enc_data    [2][2][samp_per_frame2] IDATA_ATTR LINE_ATTR; //  4608 Bytes
-short     y_int       [64]                    IDATA_ATTR LINE_ATTR; //   256 Bytes
-int       off         [2]                     IDATA_ATTR LINE_ATTR; //    16 Bytes
-int       scalefac_long[23]                   IDATA_ATTR LINE_ATTR; //    96 Bytes
-int       mdct_in     [36]                    IDATA_ATTR LINE_ATTR; //   144 Bytes
-int       sb_sample   [2][3][18][SBLIMIT]     IDATA_ATTR LINE_ATTR; // 13824 Bytes
-BF_Data   CodedData                           IDATA_ATTR LINE_ATTR; //  1040 Bytes
-int       ca_int      [8]                     IDATA_ATTR LINE_ATTR; //    32 Bytes
-int       cs_int      [8]                     IDATA_ATTR LINE_ATTR; //    32 Bytes
-int       win_int     [18][36]                IDATA_ATTR LINE_ATTR; //  2592 Bytes
-short     filter_int  [SBLIMIT][64]           IDATA_ATTR LINE_ATTR; //  8192 Bytes
-short     enwindow_int[512]                   IDATA_ATTR LINE_ATTR; //  1024 Bytes
-uint8     ht_count1   [2][2][16]              IDATA_ATTR LINE_ATTR; //    64 Bytes
-uint16    t1HB        [  4]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint16    t2HB        [  9]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint16    t3HB        [  9]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint16    t5HB        [ 16]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint16    t6HB        [ 16]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint16    t7HB        [ 36]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint16    t8HB        [ 36]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint16    t9HB        [ 36]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint16    t10HB       [ 64]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint16    t11HB       [ 64]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint16    t12HB       [ 64]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint16    t13HB       [256]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint16    t15HB       [256]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint16    t16HB       [256]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint16    t24HB       [256]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint8     t1l         [  4]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint8     t2l         [  9]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint8     t3l         [  9]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint8     t5l         [ 16]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint8     t6l         [ 16]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint8     t7l         [ 36]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint8     t8l         [ 36]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint8     t9l         [ 36]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint8     t10l        [ 64]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint8     t11l        [ 64]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint8     t12l        [ 64]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint8     t13l        [256]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint8     t15l        [256]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint8     t16l        [256]                   IDATA_ATTR LINE_ATTR; //   Bytes
-uint8     t24l        [256]                   IDATA_ATTR LINE_ATTR; //   Bytes
-struct huffcodetab ht [HTN]                   IDATA_ATTR LINE_ATTR; //   Bytes
+uint8     int2idx     [4096]                  IBSS_ATTR; //  4096 Bytes
+enct8     enc_data    [2][2][samp_per_frame2] IBSS_ATTR; //  4608 Bytes
+short     y_int       [64]                    IBSS_ATTR; //   256 Bytes
+int       off         [2]                     IBSS_ATTR; //    16 Bytes
+int       scalefac_long[23]                   IBSS_ATTR; //    96 Bytes
+int       mdct_in     [36]                    IBSS_ATTR; //   144 Bytes
+int       sb_sample   [2][3][18][SBLIMIT]     IBSS_ATTR; // 13824 Bytes
+BF_Data   CodedData                           IBSS_ATTR; //  1040 Bytes
+int       ca_int      [8]                     IBSS_ATTR; //    32 Bytes
+int       cs_int      [8]                     IBSS_ATTR; //    32 Bytes
+int       win_int     [18][36]                IBSS_ATTR; //  2592 Bytes
+short     filter_int  [SBLIMIT][64]           IBSS_ATTR; //  8192 Bytes
+short     enwindow_int[512]                   IBSS_ATTR; //  1024 Bytes
+uint8     ht_count1   [2][2][16]              IBSS_ATTR; //    64 Bytes
+uint16    t1HB        [  4]                   IBSS_ATTR; //   Bytes
+uint16    t2HB        [  9]                   IBSS_ATTR; //   Bytes
+uint16    t3HB        [  9]                   IBSS_ATTR; //   Bytes
+uint16    t5HB        [ 16]                   IBSS_ATTR; //   Bytes
+uint16    t6HB        [ 16]                   IBSS_ATTR; //   Bytes
+uint16    t7HB        [ 36]                   IBSS_ATTR; //   Bytes
+uint16    t8HB        [ 36]                   IBSS_ATTR; //   Bytes
+uint16    t9HB        [ 36]                   IBSS_ATTR; //   Bytes
+uint16    t10HB       [ 64]                   IBSS_ATTR; //   Bytes
+uint16    t11HB       [ 64]                   IBSS_ATTR; //   Bytes
+uint16    t12HB       [ 64]                   IBSS_ATTR; //   Bytes
+uint16    t13HB       [256]                   IBSS_ATTR; //   Bytes
+uint16    t15HB       [256]                   IBSS_ATTR; //   Bytes
+uint16    t16HB       [256]                   IBSS_ATTR; //   Bytes
+uint16    t24HB       [256]                   IBSS_ATTR; //   Bytes
+uint8     t1l         [  4]                   IBSS_ATTR; //   Bytes
+uint8     t2l         [  9]                   IBSS_ATTR; //   Bytes
+uint8     t3l         [  9]                   IBSS_ATTR; //   Bytes
+uint8     t5l         [ 16]                   IBSS_ATTR; //   Bytes
+uint8     t6l         [ 16]                   IBSS_ATTR; //   Bytes
+uint8     t7l         [ 36]                   IBSS_ATTR; //   Bytes
+uint8     t8l         [ 36]                   IBSS_ATTR; //   Bytes
+uint8     t9l         [ 36]                   IBSS_ATTR; //   Bytes
+uint8     t10l        [ 64]                   IBSS_ATTR; //   Bytes
+uint8     t11l        [ 64]                   IBSS_ATTR; //   Bytes
+uint8     t12l        [ 64]                   IBSS_ATTR; //   Bytes
+uint8     t13l        [256]                   IBSS_ATTR; //   Bytes
+uint8     t15l        [256]                   IBSS_ATTR; //   Bytes
+uint8     t16l        [256]                   IBSS_ATTR; //   Bytes
+uint8     t24l        [256]                   IBSS_ATTR; //   Bytes
+struct huffcodetab ht [HTN]                   IBSS_ATTR; //   Bytes
 
 static const uint8 ht_count1_const[2][2][16] =
 { { { 1,  5,  4,  5,  6,  5, 4, 4, 7, 3, 6, 0, 7, 2, 3, 1 },     /* table0 */
@@ -707,7 +700,7 @@ void putbits(uint32 val, uint32 nbit)
 /* open the device to write the bit stream into it */
 void open_bitstream(char *bs_filenam) /* name of the bit stream file */
 {
-  mp3file = (mp3_hdl=rb->open(bs_filenam, O_WRONLY|O_CREAT)) < 0 ? NULL : &mp3_hdl;
+  mp3file = (mp3_hdl=rb->open(bs_filenam, O_WRONLY|O_CREAT|O_TRUNC)) < 0 ? NULL : &mp3_hdl;
 }
 
 /* This is called after a frame of audio has been quantized and coded.
@@ -1328,6 +1321,9 @@ void iteration_loop(int mdct_freq_org[2][2][samp_per_frame2], side_info_t cod_in
 /*   36 coefficents in the time domain and 18 in the frequency       */
 /*   domain.                                                         */
 /*-------------------------------------------------------------------*/
+
+/* TODO: This MDCT implementation is very crude, and should be replaced by
+   a completely different algorithm. */
 void mdct_int( int *in, int *out )
 {
   int m, tmp=0;
@@ -1335,58 +1331,56 @@ void mdct_int( int *in, int *out )
   for(m=18; m--; )
   {
 #ifdef CPU_COLDFIRE
-    asm volatile ("move.l #0, %macsr"); /* integer mode */
-
     { int *wint  = win_int[m];
       int *indat = in;
 
       asm volatile(
       "movem.l (%[indat]), %%d0-%%d7\n"
-      "move.l (%[wint]), %%a5\n"
-      "mac.l %%d0, %%a5, (  4, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d1, %%a5, (  8, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d2, %%a5, ( 12, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d3, %%a5, ( 16, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d4, %%a5, ( 20, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d5, %%a5, ( 24, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d6, %%a5, ( 28, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d7, %%a5, ( 32, %[wint]), %%a5, %%acc0\n"
+      "move.l (%[wint])+, %%a5\n"
+      "mac.l %%d0, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d1, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d2, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d3, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d4, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d5, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d6, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d7, %%a5, (%[wint])+, %%a5, %%acc0\n"
       "movem.l (32,%[indat]), %%d0-%%d7\n"
-      "mac.l %%d0, %%a5, ( 36, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d1, %%a5, ( 40, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d2, %%a5, ( 44, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d3, %%a5, ( 48, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d4, %%a5, ( 52, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d5, %%a5, ( 56, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d6, %%a5, ( 60, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d7, %%a5, ( 64, %[wint]), %%a5, %%acc0\n"
+      "mac.l %%d0, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d1, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d2, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d3, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d4, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d5, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d6, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d7, %%a5, (%[wint])+, %%a5, %%acc0\n"
       "movem.l (64,%[indat]), %%d0-%%d7\n"
-      "mac.l %%d0, %%a5, ( 68, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d1, %%a5, ( 72, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d2, %%a5, ( 76, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d3, %%a5, ( 80, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d4, %%a5, ( 84, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d5, %%a5, ( 88, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d6, %%a5, ( 92, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d7, %%a5, ( 96, %[wint]), %%a5, %%acc0\n"
+      "mac.l %%d0, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d1, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d2, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d3, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d4, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d5, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d6, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d7, %%a5, (%[wint])+, %%a5, %%acc0\n"
       "movem.l (96,%[indat]), %%d0-%%d7\n"
-      "mac.l %%d0, %%a5, (100, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d1, %%a5, (104, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d2, %%a5, (108, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d3, %%a5, (112, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d4, %%a5, (116, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d5, %%a5, (120, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d6, %%a5, (124, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d7, %%a5, (128, %[wint]), %%a5, %%acc0\n"
+      "mac.l %%d0, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d1, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d2, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d3, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d4, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d5, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d6, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d7, %%a5, (%[wint])+, %%a5, %%acc0\n"
       "movem.l (128,%[indat]), %%d0-%%d3\n"
-      "mac.l %%d0, %%a5, (132, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d1, %%a5, (136, %[wint]), %%a5, %%acc0\n"
-      "mac.l %%d2, %%a5, (140, %[wint]), %%a5, %%acc0\n"
+      "mac.l %%d0, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d1, %%a5, (%[wint])+, %%a5, %%acc0\n"
+      "mac.l %%d2, %%a5, (%[wint])+, %%a5, %%acc0\n"
       "mac.l %%d3, %%a5, %%acc0\n"
-        : : [indat] "a" (indat), [wint] "a" (wint)
+      "movclr.l %%acc0, %[tmp]"
+        : [wint] "+a" (wint), [tmp] "+r" (tmp) : [indat] "a" (indat)
         : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
     }
-    asm volatile ("movclr.l %%acc0, %[tmp]\n" : [tmp]"+r"(tmp) );
 #else
     int k;
     for(k=36,tmp=0; k--; )
@@ -1468,17 +1462,13 @@ void filter_subband(short *buffer, int s[SBLIMIT], int k)
     short *yint = y_int;
 
     asm volatile ("movem.l %%d0/%%d2-%%d7/%%a2-%%a7,(%0)\n" : : "a" (reg_buff) : "d0");
-    asm volatile ("move.l #0,  %macsr");  /* integer mode */
-    asm volatile ("move.l #32, %acc2");   /* set loop counter */
-
     asm volatile(
-    "move.l #32, %%acc2\n"
+    "moveq.l #32, %%d0\n"
+    "move.l %%d0, %%acc2\n"               /* set loop counter */
     "move.l %[xint], %%d0\n"              /* d0 = x_int[k]   */
     "or.l #0x3ff, %%d0\n"
     "move.l %%d0, %%mask\n"               /* set address mask */
-
     "move.l (%[xint]), %%d4\n"            /* d4 =  x_int[k][off[k]] */
-    ".align 2\n"
 
   "loop_start:\n"
     "movem.l (%[enwindow]), %%d0-%%d3\n"  /* load 4 values */
@@ -1499,20 +1489,20 @@ void filter_subband(short *buffer, int s[SBLIMIT], int k)
     "mac.w %%d2u, %%a2l, %%acc1\n"
     "mac.w %%d2l, %%a3l, %%acc1\n"
     "mac.w %%d3u, %%a4l, %%acc1\n"
-    "add.l #4, %[xint]\n"                   /* xint += 2 */
+    "addq.l #4, %[xint]\n"                  /* xint += 2 */
     "mac.w %%d3l, %%a5l, (%[xint])&, %%d4, %%acc1\n"
 
     "movclr.l %%acc0, %%d5\n"
     "movclr.l %%acc1, %%d6\n"
-    "add.l #262144, %%d5\n"
-    "add.l #262144, %%d6\n"
-    "move.l #19, %%d7\n"
-    "asr.l %%d7,%%d5\n"
-    "asr.l %%d7,%%d6\n"
-    "move.w %%d5, (%[yint])\n"
-    "move.w %%d6, (2,%[yint])\n"
+    "move.l #262144, %%d7\n"
+    "add.l %%d7, %%d5\n"
+    "add.l %%d7, %%d6\n"
+    "moveq.l #19, %%d7\n"
+    "asr.l %%d7, %%d5\n"
+    "asr.l %%d7, %%d6\n"
+    "move.w %%d5, (%[yint])+\n"
+    "move.w %%d6, (%[yint])+\n"
 
-    "add.l #4, %[yint]\n"                   /* yint     += 2  */
     "add.l #32, %[enwindow]\n"              /* enwindow += 16 */
 
     "moveq.l #1, %%d0\n"
@@ -1542,83 +1532,81 @@ void filter_subband(short *buffer, int s[SBLIMIT], int k)
     short *filt = filter_int[i];
 
 #ifdef CPU_COLDFIRE
-    asm volatile ("move.l #0, %macsr"); /* integer mode */
     {
       asm volatile(
-      "move.l (%[yint]), %%a5\n"
+      "move.l (%[yint])+, %%a5\n"
       "movem.l (%[filt]), %%d0-%%d7\n"
       "mac.w %%d0u, %%a5u,                       %%acc0\n"
-      "mac.w %%d0l, %%a5l, (  4, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d0l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d1u, %%a5u,                       %%acc0\n"
-      "mac.w %%d1l, %%a5l, (  8, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d1l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d2u, %%a5u,                       %%acc0\n"
-      "mac.w %%d2l, %%a5l, ( 12, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d2l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d3u, %%a5u,                       %%acc0\n"
-      "mac.w %%d3l, %%a5l, ( 16, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d3l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d4u, %%a5u,                       %%acc0\n"
-      "mac.w %%d4l, %%a5l, ( 20, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d4l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d5u, %%a5u,                       %%acc0\n"
-      "mac.w %%d5l, %%a5l, ( 24, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d5l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d6u, %%a5u,                       %%acc0\n"
-      "mac.w %%d6l, %%a5l, ( 28, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d6l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d7u, %%a5u,                       %%acc0\n"
-      "mac.w %%d7l, %%a5l, ( 32, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d7l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "movem.l (32,%[filt]), %%d0-%%d7\n"
       "mac.w %%d0u, %%a5u,                       %%acc0\n"
-      "mac.w %%d0l, %%a5l, ( 36, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d0l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d1u, %%a5u,                       %%acc0\n"
-      "mac.w %%d1l, %%a5l, ( 40, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d1l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d2u, %%a5u,                       %%acc0\n"
-      "mac.w %%d2l, %%a5l, ( 44, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d2l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d3u, %%a5u,                       %%acc0\n"
-      "mac.w %%d3l, %%a5l, ( 48, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d3l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d4u, %%a5u,                       %%acc0\n"
-      "mac.w %%d4l, %%a5l, ( 52, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d4l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d5u, %%a5u,                       %%acc0\n"
-      "mac.w %%d5l, %%a5l, ( 56, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d5l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d6u, %%a5u,                       %%acc0\n"
-      "mac.w %%d6l, %%a5l, ( 60, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d6l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d7u, %%a5u,                       %%acc0\n"
-      "mac.w %%d7l, %%a5l, ( 64, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d7l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "movem.l (64,%[filt]), %%d0-%%d7\n"
       "mac.w %%d0u, %%a5u,                       %%acc0\n"
-      "mac.w %%d0l, %%a5l, ( 68, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d0l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d1u, %%a5u,                       %%acc0\n"
-      "mac.w %%d1l, %%a5l, ( 72, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d1l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d2u, %%a5u,                       %%acc0\n"
-      "mac.w %%d2l, %%a5l, ( 76, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d2l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d3u, %%a5u,                       %%acc0\n"
-      "mac.w %%d3l, %%a5l, ( 80, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d3l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d4u, %%a5u,                       %%acc0\n"
-      "mac.w %%d4l, %%a5l, ( 84, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d4l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d5u, %%a5u,                       %%acc0\n"
-      "mac.w %%d5l, %%a5l, ( 88, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d5l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d6u, %%a5u,                       %%acc0\n"
-      "mac.w %%d6l, %%a5l, ( 92, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d6l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d7u, %%a5u,                       %%acc0\n"
-      "mac.w %%d7l, %%a5l, ( 96, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d7l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "movem.l (96,%[filt]), %%d0-%%d7\n"
       "mac.w %%d0u, %%a5u,                       %%acc0\n"
-      "mac.w %%d0l, %%a5l, (100, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d0l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d1u, %%a5u,                       %%acc0\n"
-      "mac.w %%d1l, %%a5l, (104, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d1l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d2u, %%a5u,                       %%acc0\n"
-      "mac.w %%d2l, %%a5l, (108, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d2l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d3u, %%a5u,                       %%acc0\n"
-      "mac.w %%d3l, %%a5l, (112, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d3l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d4u, %%a5u,                       %%acc0\n"
-      "mac.w %%d4l, %%a5l, (116, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d4l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d5u, %%a5u,                       %%acc0\n"
-      "mac.w %%d5l, %%a5l, (120, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d5l, %%a5l, (%[yint])+, %%a5, %%acc0\n"
       "mac.w %%d6u, %%a5u,                       %%acc0\n"
-      "mac.w %%d6l, %%a5l, (124, %[yint]), %%a5, %%acc0\n"
+      "mac.w %%d6l, %%a5l, (%[yint]), %%a5, %%acc0\n"
       "mac.w %%d7u, %%a5u,                       %%acc0\n"
       "mac.w %%d7l, %%a5l,                       %%acc0\n"
-
-      : : [filt] "a" (filt), [yint] "a" (y_int)
+      "lea.l (-31*4, %[yint]), %[yint]\n" /* wrap yint back to start */
+      "movclr.l %%acc0, %[tmp]"
+      : [tmp] "=r" (tmp) : [filt] "a" (filt), [yint] "a" (y_int)
       : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5" );
-
-      asm volatile ("movclr.l %%acc0, %[tmp]\n" : [tmp]"+r"(tmp) );
     }
 #else
     for(j=64, tmp=0; j--; )
@@ -1734,15 +1722,19 @@ void compress(void)
   x_int[0] = x_int0;
   x_int[1] = x_int1;
 
+#ifdef CPU_COLDFIRE
+  asm volatile ("move.l #0, %macsr"); /* integer mode */
+#endif
+  
 #ifndef SIMULATOR
   if(((long)x_int0 | (long)x_int1) & 0x7ff)
     return; /* both arrays must be aligned to 0x800 boundary */
 #endif
 
-	if(config.wave.channels == 1)
+  if(config.wave.channels == 1)
     sideinfo_len = 32 + 136;
   else
-		sideinfo_len = 32 + 256;
+    sideinfo_len = 32 + 256;
 
   /* Set initial step size */
   cod_info[0][0].quantizerStepSize = 0x10;
