@@ -281,7 +281,10 @@ void pcf50606_init(void)
 
     set_voltages();
 
-    /* Backlight PWM = 512Hz 50/50 */
+    pcf50606_write(0x08, 0x60); /* Wake on USB and charger insertion */
+    pcf50606_write(0x09, 0x05); /* USB and ON key debounce: 14ms */
+    
+     /* Backlight PWM = 512Hz 50/50 */
     /*pcf50606_write(0x35, 0x13);*/
     pcf50606_set_bl_pwm(9);
 }
