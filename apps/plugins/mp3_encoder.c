@@ -1334,11 +1334,7 @@ void mdct_int( int *in, int *out )
   
   for(m=18; m--; )
   {
-#ifdef SIMULATOR
-    int k;
-    for(k=36,tmp=0; k--; )
-      tmp += in[k] * win_int[m][k];
-#else
+#ifdef CPU_COLDFIRE
     asm volatile ("move.l #0, %macsr"); /* integer mode */
 
     { int *wint  = win_int[m];
@@ -1391,6 +1387,10 @@ void mdct_int( int *in, int *out )
         : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
     }
     asm volatile ("movclr.l %%acc0, %[tmp]\n" : [tmp]"+r"(tmp) );
+#else
+    int k;
+    for(k=36,tmp=0; k--; )
+      tmp += in[k] * win_int[m][k];
 #endif
     out[m] = (tmp + 16384) >> 15;
   }
@@ -1442,7 +1442,7 @@ void filter_subband(short *buffer, int s[SBLIMIT], int k)
 {
   short *enwindow = enwindow_int;
   int   i, j, tmp = 0;
-#ifndef SIMULATOR
+#ifdef CPU_COLDFIRE 
   int   reg_buff[14]; /* register storage buffer */
 #endif
 
@@ -1463,14 +1463,7 @@ void filter_subband(short *buffer, int s[SBLIMIT], int k)
   }
 
   /* 36864=72*512: shift samples into proper window positions */
-#ifdef SIMULATOR
-  for(i=0; i<64; i++)
-  {
-    for(j=0, tmp=0; j<512; j+=64)
-      tmp += (int)x_int[k][(i+0+j+off[k])&(HAN_SIZE-1)] * (int)*(enwindow++);
-    y_int[i] = (short)((tmp + (1<<18)) >> 19);
-  }
-#else
+#ifdef CPU_COLDFIRE
   { short *xint = &x_int[k][off[k]];
     short *yint = y_int;
 
@@ -1534,6 +1527,13 @@ void filter_subband(short *buffer, int s[SBLIMIT], int k)
 
     asm volatile ("movem.l (%0),%%d0/%%d2-%%d7/%%a2-%%a7\n" : : "a" (reg_buff) : "d0");
   }
+#else
+  for(i=0; i<64; i++)
+  {
+    for(j=0, tmp=0; j<512; j+=64)
+      tmp += (int)x_int[k][(i+0+j+off[k])&(HAN_SIZE-1)] * (int)*(enwindow++);
+    y_int[i] = (short)((tmp + (1<<18)) >> 19);
+  }
 #endif
     
   /* 147456=72*2048 */
@@ -1541,10 +1541,7 @@ void filter_subband(short *buffer, int s[SBLIMIT], int k)
   {
     short *filt = filter_int[i];
 
-#ifdef SIMULATOR
-    for(j=64, tmp=0; j--; )
-      tmp += (long)filt[j] * (long)y_int[j];
-#else
+#ifdef CPU_COLDFIRE
     asm volatile ("move.l #0, %macsr"); /* integer mode */
     {
       asm volatile(
@@ -1623,6 +1620,9 @@ void filter_subband(short *buffer, int s[SBLIMIT], int k)
 
       asm volatile ("movclr.l %%acc0, %[tmp]\n" : [tmp]"+r"(tmp) );
     }
+#else
+    for(j=64, tmp=0; j--; )
+      tmp += (long)filt[j] * (long)y_int[j];
 #endif
     s[i] = (tmp + 16384) >> 15;
   }
@@ -1878,6 +1878,18 @@ char *get_mp3_filename(char *wav_name)
     return mp3_name;
 }
 
+#if CONFIG_KEYPAD == IRIVER_H100_PAD || CONFIG_KEYPAD == IRIVER_H300_PAD
+#define MP3ENC_PREV BUTTON_UP
+#define MP3ENC_NEXT BUTTON_DOWN
+#define MP3ENC_DONE BUTTON_OFF
+#define MP3ENC_SELECT BUTTON_SELECT
+#elif CONFIG_KEYPAD == IPOD_4G_PAD
+#define MP3ENC_PREV BUTTON_SCROLL_BACK
+#define MP3ENC_NEXT BUTTON_SCROLL_FWD
+#define MP3ENC_DONE BUTTON_MENU
+#define MP3ENC_SELECT BUTTON_SELECT
+#endif
+
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int   fil, sfil, nfil; /* for file selection */
@@ -1895,7 +1907,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     rb->lcd_setfont(FONT_SYSFIXED);
 
-#ifndef SIMULATOR
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif
     rb->button_clear_queue();
@@ -1907,13 +1919,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     sfil = 0; /* set first file as default */
     cont = 1;
 
-    while(cont && (butt = rb->button_get_w_tmo(HZ/10)) != BUTTON_RIGHT)
+    while(cont && (butt = rb->button_get_w_tmo(HZ/10)) != MP3ENC_SELECT)
     {
         switch(butt)
         {
-            case BUTTON_OFF:   cont = 0;               break;
-            case BUTTON_UP:    if(sfil >  0  ) sfil--; break;
-            case BUTTON_DOWN:  if(sfil < nfil) sfil++; break;
+            case MP3ENC_DONE:   cont = 0;               break;
+            case MP3ENC_PREV:   if(sfil >  0  ) sfil--; break;
+            case MP3ENC_NEXT:   if(sfil < nfil) sfil++; break;
         }
 
         rb->lcd_clear_display();
@@ -1930,13 +1942,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     nrat = 9;
     srat = 4; /* set 128kBit as default */
 
-    while(cont && (butt = rb->button_get_w_tmo(HZ/10)) != BUTTON_RIGHT)
+    while(cont && (butt = rb->button_get_w_tmo(HZ/10)) != MP3ENC_SELECT)
     {
         switch(butt)
         {
-            case BUTTON_OFF:   cont = 0;               break;
-            case BUTTON_UP:    if(srat >  0  ) srat--; break;
-            case BUTTON_DOWN:  if(srat < nrat) srat++; break;
+            case MP3ENC_DONE:   cont = 0;               break;
+            case MP3ENC_PREV:   if(srat >  0  ) srat--; break;
+            case MP3ENC_NEXT:   if(srat < nrat) srat++; break;
         }
 
         rb->lcd_clear_display();
@@ -1952,7 +1964,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     config.infile             = filename[sfil];
     config.outfile            = get_mp3_filename(filename[sfil]);
-#ifdef SIMULATOR
+#ifdef ROCKBOX_LITTLE_ENDIAN
     config.byte_order         = order_littleEndian;
 #else
     config.byte_order         = order_bigEndian;
@@ -2001,7 +2013,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }
 
     rb->lcd_setfont(FONT_UI);
-#ifndef SIMULATOR
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
 #endif
     return PLUGIN_OK;
