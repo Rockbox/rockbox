@@ -126,6 +126,11 @@
 #define KEYBOARD_SPECIFIC \
   "[not written yet]"
 
+#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
+#define KEYBOARD_SPECIFIC \
+  "[not written yet]"
+#else
+#error "Put your defines here"
 #endif
 
 
