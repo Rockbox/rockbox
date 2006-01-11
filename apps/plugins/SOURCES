@@ -83,7 +83,6 @@ alpine_cdc.c
 #endif
 
 #if CONFIG_CODEC == SWCODEC /* software codec platforms */
-mp3_encoder.c
 iriverify.c
 wav2wv.c
 midi2wav.c
