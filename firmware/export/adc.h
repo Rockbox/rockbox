@@ -29,6 +29,15 @@
 #define ADC_BATTERY 2
 #define ADC_UNREG_POWER ADC_BATTERY /* For compatibility */
 
+#elif defined(IRIVER_IFP7XX)
+
+#define NUM_ADC_CHANNELS 5
+
+#define ADC_BUTTONS     0
+#define ADC_BATTERY     1
+#define ADC_BUTTON_PLAY 2
+#define ADC_UNREG_POWER ADC_BATTERY /* For compatibility */
+
 #else
 
 #define NUM_ADC_CHANNELS 8

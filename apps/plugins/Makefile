@@ -43,7 +43,9 @@ SUBDIRS += searchengine databox
 
 #for any recorder and iRiver model
 ifneq (,$(strip $(foreach tgt,RECORDER IRIVER,$(findstring $(tgt),$(TARGET)))))
+ifneq (-DIRIVER_IFP7XX,$(TARGET))
     SUBDIRS += rockboy
+endif
 endif
 
 

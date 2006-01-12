@@ -78,6 +78,14 @@
 #define MENU_EXIT_MENU  BUTTON_MENU
 #define MENU_ENTER      BUTTON_RIGHT
 
+#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
+
+#define MENU_NEXT       BUTTON_DOWN
+#define MENU_PREV       BUTTON_UP
+#define MENU_EXIT       BUTTON_LEFT
+#define MENU_EXIT_MENU  BUTTON_PLAY
+#define MENU_ENTER      BUTTON_RIGHT
+
 #endif
 
 struct menu_item {

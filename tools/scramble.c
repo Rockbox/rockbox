@@ -171,6 +171,8 @@ int main (int argc, char** argv)
             modelnum = 4;
         else if(!strcmp(&argv[1][5], "ipvd"))
             modelnum = 5;
+        else if(!strcmp(&argv[1][5], "fp7x"))
+            modelnum = 6;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

@@ -33,3 +33,6 @@
 #if CONFIG_CPU == PP5020
 #include "pp5020.h"
 #endif
+#if CONFIG_CPU == PNX0101
+#include "pnx0101.h"
+#endif

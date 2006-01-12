@@ -182,6 +182,8 @@ void ide_power_enable(bool on)
         P1 |= 0x08;
     else
         P1 &= ~0x08;
+#elif CONFIG_CPU == PNX0101
+    /* no ide controller */
 #else /* SH1 based archos */
     bool touched = false;
 #ifdef NEEDS_ATA_POWER_ON
@@ -266,6 +268,9 @@ void power_off(void)
     /* We don't turn off the ipod, we put it in a deep sleep */
     pcf50605_standby_mode();
 #endif
+#elif CONFIG_CPU == PNX0101
+    GPIO1_CLR = 1 << 16;
+    GPIO2_SET = 1;
 #elif defined(GMINI_ARCH)
     P1 &= ~1;
     P1CON &= ~1;

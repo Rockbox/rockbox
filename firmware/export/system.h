@@ -299,7 +299,7 @@ static inline void invalidate_icache(void)
 #define CPUFREQ_MAX_MULT     11
 #define CPUFREQ_MAX          (CPUFREQ_MAX_MULT * CPU_FREQ)
 
-#elif CONFIG_CPU == PP5020
+#elif defined(CPU_ARM)
 
 /* TODO: Implement set_irq_level and check CPU frequencies */
 
@@ -330,13 +330,25 @@ static inline unsigned long swap32(unsigned long value)
 }
 
 #define HIGHEST_IRQ_LEVEL (1)
+
 static inline int set_irq_level(int level)
 {
-  int result=level;
-  return result;
+    unsigned long cpsr;
+    /* Read the old level and set the new one */
+    asm volatile ("mrs %0,cpsr" : "=r" (cpsr));
+    asm volatile ("msr cpsr_c,%0"
+                  : : "r" ((cpsr & ~0x80) | (level << 7)));
+    return (cpsr >> 7) & 1;
 }
 
 #define invalidate_icache()
+
+#if CONFIG_CPU == PNX0101
+typedef void (*interrupt_handler_t)(void);
+
+void irq_set_int_handler(int n, interrupt_handler_t handler);
+void irq_enable_int(int n);
+#endif
 
 #elif CONFIG_CPU == TCC730
 

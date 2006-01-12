@@ -326,7 +326,7 @@ int create_thread(void (*function)(void), void* stack, int stack_size,
     thread_stack[num_threads] = stack;
     thread_stack_size[num_threads] = stack_size;
     regs = &thread_contexts[num_threads];
-#if defined(CPU_COLDFIRE) || (CONFIG_CPU == SH7034) || (CONFIG_CPU == PP5020)
+#if defined(CPU_COLDFIRE) || (CONFIG_CPU == SH7034) || defined(CPU_ARM)
     /* Align stack to an even 32 bit boundary */
     regs->sp = (void*)(((unsigned int)stack + stack_size) & ~3);
 #elif CONFIG_CPU == TCC730

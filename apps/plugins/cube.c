@@ -92,6 +92,18 @@
 #define CUBE_PAUSE         (BUTTON_PLAY | BUTTON_REL)
 #define CUBE_HIGHSPEED     (BUTTON_SELECT | BUTTON_PLAY)
 
+#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
+#define CUBE_QUIT          BUTTON_PLAY
+#define CUBE_X_INC         BUTTON_RIGHT
+#define CUBE_X_DEC         BUTTON_LEFT
+#define CUBE_Y_INC         BUTTON_UP
+#define CUBE_Y_DEC         BUTTON_DOWN
+#define CUBE_Z_INC         BUTTON_MODE
+#define CUBE_Z_DEC         BUTTON_EQ
+#define CUBE_MODE          (BUTTON_SELECT | BUTTON_REPEAT)
+#define CUBE_PAUSE         (BUTTON_SELECT | BUTTON_REL)
+#define CUBE_HIGHSPEED     (BUTTON_MODE | BUTTON_EQ) /* TODO: this is impossible */
+
 #endif
 
 #ifdef HAVE_LCD_BITMAP

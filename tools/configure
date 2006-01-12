@@ -425,6 +425,7 @@ appsdir='\$(ROOTDIR)/apps'
   echo "13 - iPod Color/Photo"
   echo "14 - iPod Nano"
   echo "15 - iPod Video"
+  echo "16 - iriver iFP-790"
 
   getit=`input`;
 
@@ -689,6 +690,20 @@ appsdir='\$(ROOTDIR)/apps'
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ipodbitmaptools
+    ;;
+
+   16)
+    archos="ifp7xx"
+    target="-DIRIVER_IFP7XX"
+    memory=1
+    arm7tdmicc
+    tool="cp"
+    output="rockbox.wma"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins="yes"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
     ;;
 
    *)

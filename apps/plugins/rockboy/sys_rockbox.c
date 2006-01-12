@@ -75,6 +75,13 @@ void joy_close(void)
 #define ROCKBOY_PAD_SELECT BUTTON_PLAY
 #define ROCKBOY_MENU BUTTON_OFF
 
+#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
+#define ROCKBOY_PAD_A BUTTON_PLAY
+#define ROCKBOY_PAD_B BUTTON_EQ
+#define ROCKBOY_PAD_START BUTTON_MODE
+#define ROCKBOY_PAD_SELECT (BUTTON_SELECT | BUTTON_REL)
+#define ROCKBOY_MENU (BUTTON_SELECT | BUTTON_REPEAT)
+
 #endif
 
 unsigned int oldbuttonstate = 0, newbuttonstate,holdbutton;

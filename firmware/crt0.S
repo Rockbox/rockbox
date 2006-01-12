@@ -37,6 +37,8 @@ start:
  *
  */
 
+    msr    cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ */
+
 #ifndef BOOTLOADER
 #if CONFIG_CPU == PP5002 || CONFIG_CPU == PP5020
     b      pad_skip
@@ -247,8 +249,8 @@ boot_table:
     /* Set up stack for IRQ mode */ 
     msr    cpsr_c, #0xd2
     ldr    sp, =irq_stack
-    /* Switch to supervisor mode, enable IRQ and FIQ processing */
-    msr    cpsr_c, #0x13
+    /* Switch to supervisor mode */
+    msr    cpsr_c, #0xd3
     ldr    sp, =stackend
     bl     main
     /* main() should never return */

@@ -74,7 +74,11 @@ drivers/adc.c
 #ifdef HAVE_MMC
 drivers/ata_mmc.c
 #else
+#ifdef HAVE_FLASH_DISK
+drivers/ata_flash.c
+#else
 drivers/ata.c
+#endif
 #endif
 drivers/button.c
 drivers/dac.c
@@ -93,6 +97,8 @@ tuner_philips.c
 drivers/i2c-coldfire.c
 #elif CONFIG_I2C == I2C_PP5020
 drivers/i2c-pp5020.c
+#elif CONFIG_I2C == I2C_PNX0101
+drivers/i2c-pnx0101.c
 #else
 drivers/i2c.c
 #endif

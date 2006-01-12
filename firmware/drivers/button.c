@@ -61,7 +61,7 @@ static bool flipped;  /* buttons can be flipped to match the LCD flip */
 #define REPEAT_INTERVAL_FINISH  5
 
 /* the power-off button and number of repeated keys before shutting off */
-#if CONFIG_KEYPAD == IPOD_4G_PAD
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD)
 #define POWEROFF_BUTTON BUTTON_PLAY
 #define POWEROFF_COUNT 40
 #else
@@ -731,6 +731,47 @@ static int button_read(void)
     if (!remote_hold_button && ((data & 0x40) == 0))
         btn |= BUTTON_RC_ON;
     
+#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
+
+    static bool hold_button = false;
+
+    /* light handling */
+    if (hold_button && !button_hold())
+    {
+        backlight_on();
+    }
+    hold_button = button_hold();
+
+    /* normal buttons */
+    if (!button_hold())
+    {
+        data = adc_read(ADC_BUTTONS);
+        
+        if (data < 0x151)
+            if (data < 0xc7)
+                if (data < 0x41)
+                    btn = BUTTON_LEFT;
+                else
+                    btn = BUTTON_RIGHT;
+            else
+                btn = BUTTON_SELECT;
+        else
+            if (data < 0x268)
+                if (data < 0x1d7)
+                    btn = BUTTON_UP;
+                else
+                    btn = BUTTON_DOWN;
+            else
+                if (data < 0x2f9)
+                    btn = BUTTON_EQ;
+                else
+                    if (data < 0x35c)
+                        btn = BUTTON_MODE;
+    }
+    
+    if (!button_hold() && (adc_read(ADC_BUTTON_PLAY) < 0x64))
+        btn |= BUTTON_PLAY;
+
 #elif CONFIG_KEYPAD == RECORDER_PAD
 
 #ifdef HAVE_FMADC
@@ -874,6 +915,13 @@ static bool remote_button_hold_only(void)
 bool remote_button_hold(void)
 {
     return ((GPIO_READ & 0x40000000) == 0)?remote_button_hold_only():false;
+}
+#endif
+
+#if CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
+bool button_hold(void)
+{
+    return (GPIO5_READ & 4) ? false : true;
 }
 #endif
 

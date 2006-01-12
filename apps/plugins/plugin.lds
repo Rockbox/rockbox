@@ -4,7 +4,7 @@
 
 #ifdef CPU_COLDFIRE
 OUTPUT_FORMAT(elf32-m68k)
-#elif CONFIG_CPU==PP5020
+#elif defined(CPU_ARM)
 OUTPUT_FORMAT(elf32-littlearm)
 #else
 OUTPUT_FORMAT(elf32-sh)
@@ -32,6 +32,10 @@ OUTPUT_FORMAT(elf32-sh)
 #define DRAMORIG 0x10000000
 #define IRAMORIG 0x4000c000
 #define IRAMSIZE 0xc000
+#elif CONFIG_CPU == PNX0101
+#define DRAMORIG 0x24000000
+#define IRAMORIG 0x408000
+#define IRAMSIZE 0x8000
 #else
 #define DRAMORIG 0x09000000 + STUBOFFSET
 #endif
@@ -53,7 +57,7 @@ OUTPUT_FORMAT(elf32-sh)
 MEMORY
 {
    PLUGIN_RAM : ORIGIN = THIS_ORIGIN, LENGTH = THIS_LENGTH
-#if defined(ARCH_IRIVER) || defined(ARCH_IPOD)
+#if defined(ARCH_IRIVER) || defined(ARCH_IPOD) || (CONFIG_CPU==PNX0101)
    PLUGIN_IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
 #endif
 }
@@ -64,7 +68,7 @@ SECTIONS
     {
         KEEP(*(.entry))
         *(.text*)
-#if CONFIG_CPU==PP5020
+#if (CONFIG_CPU==PP5020) || (CONFIG_CPU==PNX0101)
         *(.glue_7)
         *(.glue_7t)
 #endif
@@ -79,7 +83,7 @@ SECTIONS
     .data : 
     {
         *(.data*)
-#if defined(ARCH_IRIVER) || defined(ARCH_IPOD)
+#if defined(ARCH_IRIVER) || defined(ARCH_IPOD) || (CONFIG_CPU==PNX0101)
         iramcopy = .;
 #endif
     } > PLUGIN_RAM
@@ -89,7 +93,7 @@ SECTIONS
         *(.eh_frame)
     }
 
-#if defined(ARCH_IRIVER) || defined(ARCH_IPOD)
+#if defined(ARCH_IRIVER) || defined(ARCH_IPOD) || (CONFIG_CPU==PNX0101)
     .iram IRAMORIG : AT ( iramcopy)
     {
         iramstart = .;

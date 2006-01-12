@@ -104,6 +104,8 @@ long reverse (long N) {
 #define LP_QUIT BUTTON_STOP
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define LP_QUIT BUTTON_MENU
+#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
+#define LP_QUIT BUTTON_PLAY
 #else
 #define LP_QUIT BUTTON_OFF
 #endif

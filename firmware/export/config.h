@@ -41,6 +41,7 @@
 #define TCC730   730   /* lacking a proper abbrivation */
 #define PP5002  5002
 #define PP5020  5020
+#define PNX0101  101
 
 /* CONFIG_KEYPAD */
 #define PLAYER_PAD      0
@@ -51,6 +52,7 @@
 #define IRIVER_H300_PAD 5
 #define IAUDIO_X5_PAD   6
 #define IPOD_4G_PAD     7
+#define IRIVER_IFP7XX_PAD 8
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -75,6 +77,7 @@
 #define LCD_IPODCOLOR 6 /* as used by iPod Color/Photo */
 #define LCD_IPODNANO  7 /* as used by iPod Nano */
 #define LCD_IPODVIDEO 8 /* as used by iPod Video */
+#define LCD_IFP7XX    9 /* as used by iRiver iFP 7xx/8xx */
 
 /* LCD_PIXELFORMAT */
 #define RGB565 565
@@ -89,6 +92,7 @@
 #define BL_IPOD4G        5 /* Apple iPod 4G */
 #define BL_IPODNANO      6 /* Apple iPod Nano and iPod Video*/
 #define BL_IRIVER_H300   7 /* IRiver PWM */
+#define BL_IRIVER_IFP7XX 8 /* IRiver GPIO */
 
 /* CONFIG_I2C */
 #define I2C_PLAYREC  0 /* Archos Player/Recorder style */
@@ -96,10 +100,14 @@
 #define I2C_GMINI    2 /* Gmini style */
 #define I2C_COLDFIRE 3 /* Coldfire style */
 #define I2C_PP5020   4 /* PP5020 style */
+#define I2C_PNX0101  5 /* PNX0101 style */
 
 /* CONFIG_LED */
 #define LED_REAL     1 /* SW controlled LED (Archos recorders, player, Gmini) */
 #define LED_VIRTUAL  2 /* Virtual LED (icon) (Archos Ondio) */
+
+/* CONFIG_FLASH */
+#define FLASH_IFP7XX 1
 
 /* CONFIG_RTC */
 #define RTC_M41ST84W 1 /* Archos Recorder */
@@ -139,6 +147,8 @@
 #include "config-ipodnano.h"
 #elif defined(IPOD_VIDEO)
 #include "config-ipodvideo.h"
+#elif defined(IRIVER_IFP7XX)
+#include "config-ifp7xx.h"
 #else
 /* no known platform */
 #endif
@@ -156,7 +166,7 @@
 #endif
 
 /* define for all cpus from ARM family */
-#if (CONFIG_CPU == PP5020) 
+#if (CONFIG_CPU == PP5020) || (CONFIG_CPU == PNX0101)
 #define CPU_ARM
 #endif
 

@@ -45,6 +45,10 @@ bool button_hold(void);
 bool remote_button_hold(void);
 #endif
 
+#if CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
+bool button_hold(void);
+#endif
+
 #define  BUTTON_NONE          0x0000
 
 /* Shared button codes */
@@ -158,6 +162,15 @@ bool remote_button_hold(void);
 #define  BUTTON_SELECT        0x0008
 #define  BUTTON_SCROLL_FWD    0x0010
 #define  BUTTON_SCROLL_BACK   0x0020
+
+#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
+
+#define  BUTTON_PLAY          0x0001
+#define  BUTTON_EQ            0x0002
+#define  BUTTON_MODE          0x0004
+#define  BUTTON_UP            0x0010
+#define  BUTTON_DOWN          0x0020
+#define  BUTTON_SELECT        0x0100
 
 #endif /* RECORDER/PLAYER/ONDIO/GMINI KEYPAD */
 

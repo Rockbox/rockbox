@@ -487,4 +487,55 @@ long pcm_get_bytes_waiting(void)
     return 0;
 }
 
+#elif CONFIG_CPU == PNX0101
+
+/* TODO: Implement for iFP7xx
+   For now, just implement some dummy functions.
+*/
+
+void pcm_init(void)
+{
+
+}
+
+void pcm_set_frequency(unsigned int frequency)
+{
+    (void)frequency;
+}
+
+void pcm_play_data(void (*get_more)(unsigned char** start, long* size))
+{
+    (void)get_more;
+}
+
+void pcm_play_stop(void)
+{
+}
+
+void pcm_play_pause(bool play)
+{
+    (void)play;
+}
+
+bool pcm_is_paused(void)
+{
+    return false;
+}
+
+bool pcm_is_playing(void)
+{
+    return false;
+}
+
+void pcm_calculate_peaks(int *left, int *right)
+{
+    (void)left;
+    (void)right;
+}
+
+long pcm_get_bytes_waiting(void)
+{
+    return 0;
+}
+
 #endif

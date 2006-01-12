@@ -358,6 +358,41 @@ void tick_start(unsigned int interval_in_ms)
 #endif
 }
 
+#elif CONFIG_CPU == PNX0101
+
+void timer_handler(void)
+{
+    int i;
+
+    /* Run through the list of tick tasks */
+    for(i = 0;i < MAX_NUM_TICK_TASKS;i++)
+    {
+        if(tick_funcs[i])
+            tick_funcs[i]();
+    }
+
+    current_tick++;
+    wake_up_thread();
+
+    TIMERR0C = 1;
+}
+
+void tick_start(unsigned int interval_in_ms)
+{
+  TIMERR08 &= ~0x80;
+  TIMERR0C = 1;
+  TIMERR08 &= ~0x80;
+  TIMERR08 |= 0x40;
+  TIMERR00 = 3000000 * interval_in_ms / 1000;
+  TIMERR08 &= ~0xc;
+  TIMERR0C = 1;
+
+  irq_set_int_handler(4, timer_handler);
+  irq_enable_int(4);
+
+  TIMERR08 |= 0x80;
+}
+
 #endif
 
 int tick_add_task(void (*f)(void))

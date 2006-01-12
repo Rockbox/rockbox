@@ -294,4 +294,38 @@ void adc_init(void)
 
 }
 
+#elif CONFIG_CPU == PNX0101
+
+static unsigned short adcdata[NUM_ADC_CHANNELS];
+
+unsigned short adc_read(int channel)
+{
+    return adcdata[channel];
+}
+
+static void adc_tick(void)
+{
+    if (ADCST & 0x10) {
+        adcdata[0] = ADCCH0 & 0x3ff;
+        adcdata[1] = ADCCH1 & 0x3ff;
+        adcdata[2] = ADCCH2 & 0x3ff;
+        adcdata[3] = ADCCH3 & 0x3ff;
+        adcdata[4] = ADCCH4 & 0x3ff;
+        ADCST = 0xa;
+    }
+}
+
+void adc_init(void)
+{
+    ADCR24 = 0xaaaaa;
+    ADCR28 = 0;
+    ADCST = 2;
+    ADCST = 0xa;
+
+    while (!(ADCST & 0x10));
+    adc_tick();
+  
+    tick_add_task(adc_tick);
+}
+
 #endif

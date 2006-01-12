@@ -135,6 +135,24 @@ void lcd_write_data( const unsigned char* data, int count ) {
         P2 |= 0x20;
     }
 }
+
+#elif CONFIG_CPU == PNX0101
+
+void lcd_write_command(int cmd)
+{
+    while ((LCDSTAT & 3) != 3);
+    LCDCMD = cmd;
+}
+
+void lcd_write_data( const unsigned char* data, int count )
+{
+    int i;
+    for (i=0; i < count; i++) {
+        while ((LCDSTAT & 3) != 3);
+        LCDDATA = data[i];
+    }
+}
+
 #endif
 
 /*** hardware configuration ***/
@@ -145,6 +163,8 @@ int lcd_default_contrast(void)
     return 30;
 #elif CONFIG_LCD == LCD_GMINI100
     return 31;
+#elif CONFIG_LCD == LCD_IFP7XX
+    return 45;
 #else
     return (read_hw_mask() & LCD_CONTRAST_BIAS) ? 31 : 49;
 #endif
@@ -197,7 +217,11 @@ void lcd_set_flip(bool yesno)
     {
         lcd_write_command(LCD_SET_SEGMENT_REMAP | 0x01);
         lcd_write_command(LCD_SET_COM_OUTPUT_SCAN_DIRECTION | 0x08);
+#if CONFIG_LCD == LCD_IFP7XX
+        xoffset = 4;
+#else
         xoffset = 0;
+#endif
     }
 #endif
 }
@@ -236,6 +260,9 @@ void lcd_init(void)
     P2CONL |= 0x5a;
     P2CONL &= 0x5b;
     P2CONH |= 1;
+#elif CONFIG_CPU == PNX0101
+    LCDREG10 = 0xf;
+    LCDREG04 = 0x4084;
 #else
     /* Initialize PB0-3 as output pins */
     PBCR2 &= 0xff00; /* MD = 00 */
@@ -245,7 +272,11 @@ void lcd_init(void)
     /* inits like the original firmware */
     lcd_write_command(LCD_SOFTWARE_RESET);
     lcd_write_command(LCD_SET_INTERNAL_REGULATOR_RESISTOR_RATIO + 4);
+#if CONFIG_LCD == LCD_IFP7XX
+    lcd_write_command(LCD_SET_LCD_BIAS);
+#else
     lcd_write_command(LCD_SET_1OVER4_BIAS_RATIO + 0); /* force 1/4 bias: 0 */
+#endif
     lcd_write_command(LCD_SET_POWER_CONTROL_REGISTER + 7); 
                /* power control register: op-amp=1, regulator=1, booster=1 */
     lcd_write_command(LCD_SET_DISPLAY_ON);

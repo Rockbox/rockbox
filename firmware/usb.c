@@ -180,6 +180,9 @@ void usb_enable(bool on)
         outl(1, 0x40017F10);
         outl(inl(0x60006004) | 0x4, 0x60006004);
     }
+#elif defined(USB_ISP1582)
+    /* TODO: Implement USB_ISP1582 */
+    (void) on;
 #else
 #ifdef HAVE_LCD_BITMAP
     if(read_hw_mask() & USB_ACTIVE_HIGH)
@@ -403,6 +406,10 @@ bool usb_detect(void)
         return false;
     }
     current_status = (USB_STATUS & 0x800)?true:false;
+#endif
+#ifdef USB_ISP1582
+    /* TODO: Implement USB_ISP1582 */
+    current_status = false;
 #endif
     return current_status;
 }

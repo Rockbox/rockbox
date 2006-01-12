@@ -7,7 +7,7 @@ INPUT(crt0.o)
 #elif CONFIG_CPU == TCC730
 OUTPUT_FORMAT(elf32-calmrisc16)
 INPUT(crt0.o)
-#elif CONFIG_CPU == PP5020
+#elif defined(CPU_ARM)
 OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
 INPUT(crt0.o)
@@ -126,6 +126,10 @@ _pluginbuf = 0;
 #define DRAMORIG 0x00000000 + STUBOFFSET
 #define IRAMORIG 0x40000000
 #define IRAMSIZE 0xc000
+#elif CONFIG_CPU==PNX0101
+#define DRAMORIG 0x24000000 + STUBOFFSET
+#define IRAMORIG 0x400100
+#define IRAMSIZE 0x7f00
 #else
 #define DRAMORIG 0x09000000 + STUBOFFSET
 #define IRAMORIG 0x0f000000
@@ -161,7 +165,7 @@ SECTIONS
         . = ALIGN(0x200);
         *(.init.text)
         *(.text*)
-#if CONFIG_CPU==PP5020
+#ifdef CPU_ARM
         *(.glue_7)
         *(.glue_7t)
 #endif
@@ -214,7 +218,7 @@ SECTIONS
         _iend = .;
     } > IRAM
 
-#if defined(CPU_COLDFIRE) || CONFIG_CPU==PP5020
+#if defined(CPU_COLDFIRE) || defined(CPU_ARM)
     .stack :
     {
        *(.stack)
@@ -234,7 +238,7 @@ SECTIONS
     } > DRAM
 #endif
 
-#if defined(CPU_COLDFIRE) || CONFIG_CPU==PP5020
+#if defined(CPU_COLDFIRE) || defined(CPU_ARM)
     .bss ADDR(.data) + SIZEOF(.data) + SIZEOF(.iram):
 #else
     .bss :

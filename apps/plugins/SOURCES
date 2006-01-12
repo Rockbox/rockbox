@@ -18,6 +18,7 @@ viewer.c
 dict.c
 metronome.c
 
+#ifndef IRIVER_IFP7XX_SERIES   /* Temporarily disable plugin building for iFP7xx */
 #ifdef HAVE_LCD_BITMAP /* Recorder/Ondio models only */
 solitaire.c
 #ifndef HAVE_LCD_COLOR
@@ -89,4 +90,5 @@ wav2wv.c
 midi2wav.c
 #else
 splitedit.c
+#endif /* iFP7xx */
 #endif

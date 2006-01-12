@@ -1191,5 +1191,86 @@ int system_memory_guard(int newmode)
     return 0;
 }
 
+#elif CONFIG_CPU==PNX0101
+
+interrupt_handler_t interrupt_vector[0x1d]  __attribute__ ((section(".idata")));
+
+#define IRQ_REG(reg) (*(volatile unsigned long *)(0x80300000 + (reg)))
+
+static inline unsigned long irq_read(int reg)
+{
+    unsigned long v, v2;
+    do
+    {
+        v = IRQ_REG(reg);
+        v2 = IRQ_REG(reg);
+    } while (v != v2);
+    return v;
+}
+
+#define IRQ_WRITE_WAIT(reg, val, cond) \
+    do { unsigned long v, v2; \
+        do { \
+            IRQ_REG(reg) = (val); \
+            v = IRQ_REG(reg); \
+            v2 = IRQ_REG(reg); \
+        } while ((v != v2) || !(cond)); \
+    } while (0);
+
+static void UIE(void) {}
+
+void irq(void)
+{
+    int n = irq_read(0x100) >> 3;
+    (*(interrupt_vector[n]))();
+}
+
+void irq_enable_int(int n)
+{
+    IRQ_WRITE_WAIT(0x404 + n * 4, 0x4010000, v & 0x10000);
+}
+
+void irq_set_int_handler(int n, interrupt_handler_t handler)
+{
+    interrupt_vector[n + 1] = handler;
+}
+
+void system_init(void)
+{
+    int i;
+
+    /* turn off watchdog */
+    (*(volatile unsigned long *)0x80002804) = 0;
+
+    /*
+    IRQ_WRITE_WAIT(0x100, 0, v == 0);
+    IRQ_WRITE_WAIT(0x104, 0, v == 0);
+    IRQ_WRITE_WAIT(0, 0, v == 0);
+    IRQ_WRITE_WAIT(4, 0, v == 0);
+    */
+    
+    for (i = 0; i < 0x1c; i++)
+    {
+        IRQ_WRITE_WAIT(0x404 + i * 4, 0x1e000001, (v & 0x3010f) == 1);
+        IRQ_WRITE_WAIT(0x404 + i * 4, 0x4000000, (v & 0x10000) == 0);
+        IRQ_WRITE_WAIT(0x404 + i * 4, 0x10000001, (v & 0xf) == 1);
+        interrupt_vector[i + 1] = UIE;
+    }
+    interrupt_vector[0] = UIE;
+}
+
+
+void system_reboot(void)
+{
+    (*(volatile unsigned long *)0x80002804) = 1;
+    while (1);
+}
+
+int system_memory_guard(int newmode)
+{
+    (void)newmode;
+    return 0;
+}
+
 #endif /* CONFIG_CPU */
 

@@ -114,6 +114,20 @@
 #define KBD_UP BUTTON_SCROLL_BACK
 #define KBD_DOWN BUTTON_SCROLL_FWD
 
+#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
+
+/* TODO: Check keyboard mappings */
+
+#define KBD_MODES /* iFP7xx uses 2 modes, picker and line edit */
+#define KBD_SELECT (BUTTON_SELECT | BUTTON_REL) /* backspace in line edit */
+#define KBD_SELECT_PRE BUTTON_SELECT
+#define KBD_DONE BUTTON_MODE
+#define KBD_ABORT BUTTON_PLAY
+#define KBD_LEFT BUTTON_LEFT
+#define KBD_RIGHT BUTTON_RIGHT
+#define KBD_UP BUTTON_UP
+#define KBD_DOWN BUTTON_DOWN
+
 #endif
 
 #if KEYBOARD_PAGES == 1
