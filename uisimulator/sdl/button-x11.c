@@ -166,6 +166,8 @@ void button_read (void)
         case SDLK_8:
 #ifdef BUTTON_UP
             k = BUTTON_UP;
+#elif defined BUTTON_SCROLL_BACK
+            k = BUTTON_SCROLL_BACK;
 #elif defined BUTTON_PLAY
             k = BUTTON_PLAY;
 #endif
@@ -176,6 +178,8 @@ void button_read (void)
         case SDLK_2:
 #ifdef BUTTON_DOWN
             k = BUTTON_DOWN;
+#elif defined BUTTON_SCROLL_FWD
+            k = BUTTON_SCROLL_FWD;
 #elif defined BUTTON_STOP
             k = BUTTON_STOP;
 #endif
