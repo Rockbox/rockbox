@@ -17,6 +17,6 @@
  *
  ****************************************************************************/
 
-void sound_playback_thread(void);
+int sound_playback_thread(void* p);
 
 extern void (*sound_get_pcm)(unsigned char** start, long* size);

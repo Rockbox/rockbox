@@ -88,11 +88,13 @@ int sim_sound_init(void)
   //SDL_CloseAudio();
 }
 
-void sound_playback_thread(void)
+int sound_playback_thread(void* p)
 {
   int sndret = sim_sound_init();
   unsigned char *buf;
   long size;
+
+  (void)p;
 
   while(sndret)
     sleep(100000); /* wait forever, can't play sound! */

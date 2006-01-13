@@ -20,7 +20,10 @@
 #include "autoconf.h"
 
 #include <stdio.h>
-#include <pthread.h>
+
+/* SDL threading wrapper */
+#include <SDL.h>
+#include <SDL_thread.h>
 
 #include "kernel.h"
 #include <sys/time.h>
@@ -45,10 +48,12 @@ static void msleep(int msec)
  * This is not a target thread, so it does not fall under the 1 thread at a
  * time thing.
  */
-static void update_tick_thread()
+static int update_tick_thread(void* p)
 {
     struct timeval start, now;
     long new_tick;
+
+    (void)p;
 
     gettimeofday(&start, NULL);
     while (1)
@@ -66,73 +71,64 @@ static void update_tick_thread()
 }
 
 /*
- * We emulate the target threads by using pthreads. We have a mutex that only
- * allows one thread at a time to execute. It forces each thread to yield()
- * for the other(s) to run.
+ * We emulate the target threads by using SDL threads. We have a mutex
+ * that only allows one thread at a time to execute. It forces each
+ * thread to yield() for the other(s) to run.
  */
 
-pthread_mutex_t mp;
+SDL_mutex * mp;
 
 void init_threads(void)
 {  
-    pthread_t tick_tid;
+    SDL_Thread *tick_tid;
 
-    pthread_mutex_init(&mp, NULL);
+    mp=SDL_CreateMutex();
     /* get mutex to only allow one thread running at a time */
-    pthread_mutex_lock(&mp);
+    SDL_mutexP(mp);
 
     /* start a tick thread */
-    pthread_create(&tick_tid, NULL, (void *(*)(void *)) update_tick_thread, 
-                   NULL);
+    tick_tid=SDL_CreateThread(update_tick_thread, NULL);
 
 #ifdef ROCKBOX_HAS_SIMSOUND /* start thread that plays PCM data */
     {
-        pthread_t sound_tid;
-        pthread_create(&sound_tid, NULL,
-                       (void *(*)(void *)) sound_playback_thread, 
-                       NULL);
+        SDL_Thread *sound_tid;
+        sound_tid = SDL_CreateThread(sound_playback_thread, NULL);
     }
 #endif
 
 }
-/* 
-   int pthread_create(pthread_t *new_thread_ID,
-   const pthread_attr_t *attr,
-   void * (*start_func)(void *), void *arg);
-*/
 
 void yield(void)
 {
-    pthread_mutex_unlock(&mp); /* return */
+    SDL_mutexV(mp); /* return */
     msleep(1);                 /* prevent busy loop */
-    pthread_mutex_lock(&mp);   /* get it again */
+    SDL_mutexP(mp);   /* get it again */
 }
 
 void newfunc(void (*func)(void))
 {
-    pthread_mutex_lock(&mp);
+    SDL_mutexP(mp);
     func();
-    pthread_mutex_unlock(&mp); 
+    SDL_mutexV(mp); 
 }
 
 
 int create_thread(void (*fp)(void), void* sp, int stk_size)
 {
-    pthread_t tid;
+    SDL_Thread * tid;
     int i;
     int error;
 
     /* we really don't care about these arguments */
     (void)sp;
     (void)stk_size;
-    error = pthread_create(&tid,
-                           NULL,   /* default attributes please */
-                           (void *(*)(void *)) newfunc, /* function to start */
+    tid = SDL_CreateThread(
+                           (int(*)(void *))newfunc, /* function to start */
                            fp      /* start argument */);
-    if(0 != error)
-        fprintf(stderr, "Couldn't run thread number %d, errno %d\n", i, error);
+    if(0 == tid) /* don't really have an error number here. */
+        fprintf(stderr, "Couldn't run thread number %d\n", i);
     else
-        fprintf(stderr, "Thread %ld is running\n", (long)tid);
+        fprintf(stderr, "Thread %d is running\n", (int)SDL_GetThreadID(tid));
 
     yield();
 
@@ -141,8 +137,8 @@ int create_thread(void (*fp)(void), void* sp, int stk_size)
 
 void sim_sleep(int ticks)
 {
-    pthread_mutex_unlock(&mp); /* return */
+    SDL_mutexV(mp); /* return */
     msleep((1000/HZ) * ticks);
-    pthread_mutex_lock(&mp);   /* get it again */
+    SDL_mutexP(mp);   /* get it again */
 }
 
