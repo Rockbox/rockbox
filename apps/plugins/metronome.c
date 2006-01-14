@@ -99,6 +99,8 @@ static int tap_count    = 0;
 static int tap_time     = 0;
 static int tap_timeout  = 0;
 
+int bpm_step_counter = 0;
+
 void led(bool on)
 {
 #if CONFIG_CPU == SH7034
@@ -189,7 +191,7 @@ void play_tock(void){
 #else
 
 #define MET_IS_PLAYING rb->pcm_is_playing()
-#define MET_PLAY_STOP rb->pcm_play_stop()
+#define MET_PLAY_STOP rb->audio_stop()
 
 static signed short sound[] = {
      1,    -1,     1,    -1,     0,     0,     0,     1,    -1,     0,     0,
@@ -829,6 +831,24 @@ void change_volume(int delta){
     }
 }
 
+/*function to accelerate bpm change*/
+void change_bpm(int direction){
+        if((bpm_step_counter < 20)
+            || (bpm > 389)
+            || (bpm < 10))
+        bpm = bpm + direction;
+    else if (bpm_step_counter < 60)
+        bpm = bpm + direction * 2;
+    else
+        bpm = bpm + direction * 9; 
+        
+    if (bpm > 400) bpm = 400;
+    if (bpm < 1) bpm = 1;
+    calc_period();
+    draw_display();
+    bpm_step_counter++;
+}    
+
 void timer_callback(void)
 {
     if(minitick >= period){
@@ -892,8 +912,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
     rb = api;
 
     if (MET_IS_PLAYING)
-        MET_PLAY_STOP; // stop audio ISR
-    
+        MET_PLAY_STOP; // stop audio IS
+        
 #if CONFIG_CODEC != SWCODEC
     rb->bitswap(sound, sizeof(sound));
 #else
@@ -1005,31 +1025,15 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
                 break;
 
             case BUTTON_LEFT:
-                if (bpm > 1)
-                    bpm--;
-                calc_period();
-                draw_display();
-                break;
-
+                bpm_step_counter = 0;
             case BUTTON_LEFT | BUTTON_REPEAT:
-                if (bpm > 10)
-                    bpm=bpm-10;
-                calc_period();
-                draw_display();
+                change_bpm(-1);
                 break;
 
             case BUTTON_RIGHT:
-                if(bpm < 400)
-                    bpm++;
-                calc_period();
-                draw_display();
-                break;
-
+                bpm_step_counter = 0;
             case BUTTON_RIGHT | BUTTON_REPEAT:
-                if (bpm < 400)
-                    bpm=bpm+10;
-                calc_period();
-                draw_display();
+                change_bpm(1);
                 break;
 
 #if CONFIG_KEYPAD != ONDIO_PAD
