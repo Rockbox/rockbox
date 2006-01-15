@@ -20,6 +20,8 @@
 
 #ifdef HAVE_LCD_BITMAP
 
+PLUGIN_HEADER
+
 #define PAD_HEIGHT LCD_HEIGHT / 6    /* Recorder: 10   iRiver: 21 */
 #define PAD_WIDTH LCD_WIDTH / 50     /* Recorder: 2    iRiver: 2  */
 
@@ -336,9 +338,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* if you don't use the parameter, you can do like
        this to avoid the compiler warning about it */
     (void)parameter;
-
-    TEST_PLUGIN_API(api);
-    
+  
     rb = api; /* use the "standard" rb pointer */
 
     /* Clear screen */

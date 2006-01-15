@@ -20,9 +20,7 @@
 #include "plugin.h"
 #include <ctype.h>
 
-#if PLUGIN_API_VERSION < 3
-#error Scrollbar function requires PLUGIN_API_VERSION 3 at least
-#endif
+PLUGIN_HEADER
 
 #define SETTINGS_FILE	"/.rockbox/viewers/viewer.dat"
 
@@ -1022,7 +1020,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
     int i;
     int ok;
 
-    TEST_PLUGIN_API(api);
     rb = api;
 
     if (!file)

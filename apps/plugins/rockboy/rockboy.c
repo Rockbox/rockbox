@@ -36,6 +36,8 @@ const struct {
     0x524f564c, /* ROVL */
     ovl_start_addr, ovl_end_addr, plugin_start
 };
+#else
+PLUGIN_HEADER
 #endif
 
 #ifdef USE_IRAM
@@ -93,17 +95,12 @@ void setmallocpos(void *pointer)
 /* this is the plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    /* this macro should be called as the first thing you do in the plugin.
-       it test that the api version and model the plugin was compiled for
-       matches the machine it is running on */
-    TEST_PLUGIN_API(api);
-
     /* if you are using a global api pointer, don't forget to copy it!
        otherwise you will get lovely "I04: IllInstr" errors... :-) */
     rb = api;
     
 	rb->lcd_setfont(0);
-    
+
     if (!parameter) {
         rb->splash(HZ*3, true, "Play gameboy ROM file! (.gb/.gbc)");
         return PLUGIN_OK;

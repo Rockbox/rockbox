@@ -18,6 +18,8 @@
  ****************************************************************************/
 #include "plugin.h"
 
+PLUGIN_HEADER
+
 static struct plugin_api* rb;
 
 static char *audiobuf;
@@ -265,8 +267,6 @@ static bool vbr_fix(char *selected_file)
 
 enum plugin_status plugin_start(struct plugin_api* api, void *parameter)
 {
-    TEST_PLUGIN_API(api);
-
     rb = api;
 
     if (!parameter)

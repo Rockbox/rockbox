@@ -57,10 +57,10 @@ Example ".ss" file, and one with a saved state:
 */
 
 #include "plugin.h"
-#include "button.h"
-#include "lcd.h"
 
 #ifdef HAVE_LCD_BITMAP
+
+PLUGIN_HEADER
 
 #define STATE_FILE        PLUGIN_DIR "/sudoku.state"
 #define GAMES_FILE        PLUGIN_DIR "/sudoku.levels"
@@ -2429,7 +2429,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
   struct sudoku_state_t state;
 
   /* plugin init */
-  TEST_PLUGIN_API(api);
   rb = api;
   /* end of plugin init */
 

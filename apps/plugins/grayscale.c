@@ -25,6 +25,8 @@
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
 #include "gray.h"
 
+PLUGIN_HEADER
+
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define GRAYSCALE_SHIFT BUTTON_ON
@@ -302,11 +304,6 @@ int main(void)
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    /* this macro should be called as the first thing you do in the plugin.
-    it test that the api version and model the plugin was compiled for
-    matches the machine it is running on */
-    TEST_PLUGIN_API(api);
-
     rb = api; // copy to global api pointer
     (void)parameter;
 

@@ -21,6 +21,8 @@
 
 #ifdef HAVE_LCD_BITMAP
 
+PLUGIN_HEADER
+
 #define SS_TITLE       "Bouncer"
 #define SS_TITLE_FONT  2
 
@@ -443,7 +445,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     char *off = "[Off] to stop";
     int len;
 
-    TEST_PLUGIN_API(api);
     (void)(parameter);
     rb = api;
 

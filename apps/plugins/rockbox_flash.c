@@ -23,6 +23,8 @@
 
 #if !defined(SIMULATOR) && (CONFIG_CPU == SH7034) /* Only for SH targets */
 
+PLUGIN_HEADER
+
 /* define DUMMY if you only want to "play" with the UI, does no harm */
 /* #define DUMMY */
 
@@ -1010,10 +1012,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int oldmode;
 
-    /* this macro should be called as the first thing you do in the plugin.
-       it test that the api version and model the plugin was compiled for
-       matches the machine it is running on */
-    TEST_PLUGIN_API(api);
     rb = api; /* copy to global api pointer */
 
     if (parameter == NULL)

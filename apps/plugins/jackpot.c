@@ -29,6 +29,8 @@ History:
 
 #ifdef HAVE_LCD_CHARCELLS
 
+PLUGIN_HEADER
+
 /* Jackpot game for the player */
 
 static unsigned char pattern[]={
@@ -88,11 +90,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     int g=20;
     bool exit=false;
     bool go;
-
-    /* this macro should be called as the first thing you do in the plugin.
-       it test that the api version and model the plugin was compiled for
-       matches the machine it is running on */
-    TEST_PLUGIN_API(api);
 
     /* if you don't use the parameter, you can do like
        this to avoid the compiler warning about it */

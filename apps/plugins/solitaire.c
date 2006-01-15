@@ -39,6 +39,8 @@ use F3 to put card on top of the remains' stack on one of the 4 final stacks
 
 #ifdef HAVE_LCD_BITMAP
 
+PLUGIN_HEADER
+
 /* here is a global api struct pointer. while not strictly necessary,
    it's nice not to have to pass the api pointer in all function calls
    in the plugin */
@@ -1541,7 +1543,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     int result;
 
     /* plugin init */
-    TEST_PLUGIN_API(api);
     (void)parameter;
     rb = api;
     /* end of plugin init */

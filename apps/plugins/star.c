@@ -19,6 +19,8 @@
 #include "plugin.h"
 #ifdef HAVE_LCD_BITMAP
 
+PLUGIN_HEADER
+
 /* file which contains the levels */
 #define STAR_LEVELS_FILE "/.rockbox/star/levels.txt"
 
@@ -877,7 +879,6 @@ static int star_menu(void)
  */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    TEST_PLUGIN_API(api);
     (void)parameter;
     rb = api;
 

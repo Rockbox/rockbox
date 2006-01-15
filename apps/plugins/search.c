@@ -20,6 +20,8 @@
 #include "plugin.h"
 #include "ctype.h"
 
+PLUGIN_HEADER
+
 static struct plugin_api* rb;
 
 #define BUFFER_SIZE 16384
@@ -149,8 +151,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     int ok;
     char *filename = parameter;
     char *p;
-
-    TEST_PLUGIN_API(api);
 
     rb = api;
 

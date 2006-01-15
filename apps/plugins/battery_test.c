@@ -29,6 +29,8 @@
    to watch.
 */
 
+PLUGIN_HEADER
+
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define BATTERY_TEST_QUIT BUTTON_OFF
@@ -136,7 +138,6 @@ enum plugin_status loop(void)
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    TEST_PLUGIN_API(api);
     (void)parameter;
     rb = api;
 

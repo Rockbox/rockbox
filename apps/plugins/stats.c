@@ -18,6 +18,8 @@
  ****************************************************************************/
 #include "plugin.h"
 
+PLUGIN_HEADER
+
 static struct plugin_api* rb;
 static int files, dirs;
 static int lasttick;
@@ -100,7 +102,6 @@ void traversedir(char* location, char* name)
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int button;
-    TEST_PLUGIN_API(api);
 
     (void)parameter;
 

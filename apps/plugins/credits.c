@@ -18,6 +18,8 @@
  ****************************************************************************/
 #include "plugin.h"
 
+PLUGIN_HEADER
+
 void roll_credits(void);
 const char* const credits[] = {
 #include "credits.raw" /* generated list of names from docs/CREDITS */
@@ -30,7 +32,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     int j = 0;
     int btn;
 
-    TEST_PLUGIN_API(api);
     (void)parameter;
     rb = api;
 

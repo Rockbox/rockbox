@@ -1,6 +1,8 @@
 #include "plugin.h"
 #define FAVORITES_FILE "/favorites.m3u"
 
+PLUGIN_HEADER
+
 static struct plugin_api* rb;
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
@@ -9,11 +11,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     char track_path[MAX_PATH+1];
     int fd, result, len;
     
-    /* this macro should be called as the first thing you do in the plugin.
-       it test that the api version and model the plugin was compiled for
-       matches the machine it is running on */
-    TEST_PLUGIN_API(api);
-
     rb = api;
 
     /* If we were passed a parameter, use that as the file name,

@@ -28,10 +28,10 @@ use F3 to see how many mines are left (supposing all your flags are correct)
 *****************************************************************************/
 
 #include "plugin.h"
-#include "button.h"
-#include "lcd.h"
 
 #ifdef HAVE_LCD_BITMAP
+
+PLUGIN_HEADER
 
 //what the minesweeper() function can return
 #define MINESWEEPER_USB  3
@@ -521,7 +521,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     bool exit = false;
     /* plugin init */
-    TEST_PLUGIN_API(api);
     (void)parameter;
     rb = api;
     /* end of plugin init */

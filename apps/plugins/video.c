@@ -32,6 +32,8 @@
 #ifndef SIMULATOR // not for simulator by now
 #ifdef HAVE_LCD_BITMAP // and definitely not for the Player, haha
 
+PLUGIN_HEADER
+
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define VIDEO_STOP_SEEK BUTTON_PLAY
@@ -984,11 +986,6 @@ int main(char* filename)
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    /* this macro should be called as the first thing you do in the plugin.
-    it test that the api version and model the plugin was compiled for
-    matches the machine it is running on */
-    TEST_PLUGIN_API(api);
-    
     rb = api; // copy to global api pointer
     
     if (parameter == NULL)

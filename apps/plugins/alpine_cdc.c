@@ -34,6 +34,8 @@
 /* Only build for (correct) target */
 #if !defined(SIMULATOR) && CONFIG_CPU==SH7034 && !defined(HAVE_MMC)
 
+PLUGIN_HEADER
+
 #ifdef HAVE_LCD_CHARCELLS /* player model */
 #define LINES    2
 #define COLUMNS 11
@@ -1192,10 +1194,6 @@ int main(void* parameter)
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    /* this macro should be called as the first thing you do in the plugin.
-       it test that the api version and model the plugin was compiled for
-       matches the machine it is running on */
-    TEST_PLUGIN_API(api);
     rb = api; /* copy to global api pointer */
 
     /* now go ahead and have fun! */

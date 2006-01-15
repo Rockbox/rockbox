@@ -22,6 +22,8 @@
 /* Only build for (correct) target */
 #ifdef HAVE_LCD_BITMAP 
 
+PLUGIN_HEADER
+
 static struct plugin_api* rb; /* here is a global api struct pointer */
 
 #define EXTERN static
@@ -1276,10 +1278,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     char* filename;
 
-    /* this macro should be called as the first thing you do in the plugin.
-       it test that the api version and model the plugin was compiled for
-       matches the machine it is running on */
-    TEST_PLUGIN_API(api);
     rb = api; /* copy to global api pointer */
 
     if (parameter == NULL)

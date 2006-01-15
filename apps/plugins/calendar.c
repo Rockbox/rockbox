@@ -23,6 +23,8 @@
 
 #include <timefuncs.h>
 
+PLUGIN_HEADER
+
 static struct plugin_api* rb;
 
 static bool leap_year;
@@ -664,9 +666,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     bool exit = false;
     int button;
     
-    TEST_PLUGIN_API(api);
     (void)(parameter);
-    
+
     rb = api;
 
     calendar_init(&today, &shown);

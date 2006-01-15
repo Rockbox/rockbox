@@ -30,6 +30,8 @@ Head and Tail are stored
 #include "plugin.h"
 #ifdef HAVE_LCD_BITMAP
 
+PLUGIN_HEADER
+
 #define WIDTH  28
 #define HEIGHT 16
 
@@ -1425,7 +1427,6 @@ void game_init(void)
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    TEST_PLUGIN_API(api);
     (void)(parameter);
     rb = api;
 

@@ -41,6 +41,8 @@
 
 //#include "../codecs/lib/xxx2wav.h"
 
+PLUGIN_HEADER
+
 int numberOfSamples IDATA_ATTR;
 long bpm;
 
@@ -67,9 +69,6 @@ struct plugin_api * rb;
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    TEST_PLUGIN_API(api);
-    rb = api;
-    TEST_PLUGIN_API(api);
     (void)parameter;
     rb = api;
 

@@ -19,6 +19,8 @@
 
 #include "plugin.h"
 
+PLUGIN_HEADER
+
 /* as in hello world :) */
 static struct plugin_api* rb;
 /* screen info */
@@ -127,7 +129,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     int lines, len, outputted, next;
 
     /* plugin stuff */
-    TEST_PLUGIN_API(api);
     (void)parameter;
     rb = api;
 

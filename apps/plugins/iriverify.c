@@ -23,6 +23,7 @@
  ****************************************************************************/
 #include "plugin.h"
 
+PLUGIN_HEADER
 
 static struct plugin_api* rb;
 
@@ -133,7 +134,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     char *buf;
     int rc;
-    TEST_PLUGIN_API(api);
 
     filename = (char *)parameter;
 

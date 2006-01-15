@@ -22,6 +22,8 @@
 #ifndef SIMULATOR /* don't want this code in the simulator */
 #if CONFIG_CODEC != SWCODEC /* only for MAS-targets */
 
+PLUGIN_HEADER
+
 /* The different drawing modes */
 #define DRAW_MODE_FILLED  0
 #define DRAW_MODE_OUTLINE 1
@@ -93,7 +95,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     
     bool exit = false;
 
-    TEST_PLUGIN_API(api);
     (void)parameter;
     rb = api;
     

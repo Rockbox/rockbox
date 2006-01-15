@@ -18,6 +18,8 @@
  ****************************************************************************/
 #include "plugin.h"
 
+PLUGIN_HEADER
+
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define CHC_QUIT BUTTON_OFF
@@ -136,8 +138,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     bool done;
     int nr;
     
-    TEST_PLUGIN_API(api);
-
     (void)parameter;
     rb=api;
 

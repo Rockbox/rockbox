@@ -19,6 +19,8 @@
 #include "plugin.h"
 #ifdef HAVE_LCD_BITMAP
 
+PLUGIN_HEADER
+
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define FLIPIT_UP   BUTTON_UP
@@ -294,7 +296,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int w, h, i;
 
-    TEST_PLUGIN_API(api);
     (void)parameter;
     rb = api;
 

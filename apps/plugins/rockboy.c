@@ -22,6 +22,8 @@
 
 #if MEM <= 8 && !defined(SIMULATOR)
 
+PLUGIN_HEADER
+
 #define OVL_NAME "/.rockbox/viewers/rockboy.ovl"
 #define OVL_DISPLAYNAME "RockBoy"
 
@@ -40,10 +42,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         enum plugin_status(*entry_point)(struct plugin_api*, void*);
     } header;
 
-    /* this macro should be called as the first thing you do in the plugin.
-       it test that the api version and model the plugin was compiled for
-       matches the machine it is running on */
-    TEST_PLUGIN_API(api);
     rb = api;
 
     fh = rb->open(OVL_NAME, O_RDONLY);

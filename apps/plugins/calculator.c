@@ -76,6 +76,8 @@ F3: equal to "="
 #ifdef HAVE_LCD_BITMAP
 #include "math.h"
 
+PLUGIN_HEADER
+
 #define REC_HEIGHT 10   /* blank height = 9 */
 #define REC_WIDTH 22    /* blank width = 21 */
 
@@ -1324,7 +1326,6 @@ Main();
 ----------------------------------------------------------------------- */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    TEST_PLUGIN_API(api);
     (void)parameter;
     rb = api;
 

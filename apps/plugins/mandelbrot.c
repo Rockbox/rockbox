@@ -24,6 +24,8 @@
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
 #include "gray.h"
 
+PLUGIN_HEADER
+
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define MANDELBROT_QUIT BUTTON_OFF
@@ -371,7 +373,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     int grayscales;
     int redraw = REDRAW_FULL;
 
-    TEST_PLUGIN_API(api);
     rb = api;
     (void)parameter;
 

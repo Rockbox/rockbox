@@ -19,6 +19,8 @@
 #include "plugin.h"
 #include "playergfx.h"
 
+PLUGIN_HEADER
+
 #ifdef HAVE_LCD_BITMAP
 #define DISPLAY_WIDTH LCD_WIDTH
 #define DISPLAY_HEIGHT LCD_HEIGHT
@@ -226,7 +228,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     int old_cpos = -1;
 #endif
 
-    TEST_PLUGIN_API(api);
     (void)parameter;
 
 #ifdef HAVE_LCD_CHARCELLS

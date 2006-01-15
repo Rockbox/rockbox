@@ -19,6 +19,8 @@
 #include "plugin.h"
 #include "playergfx.h"
 
+PLUGIN_HEADER
+
 #ifdef HAVE_LCD_BITMAP
 #define NUM_PARTICLES (LCD_WIDTH * LCD_HEIGHT / 72)
 #define SNOW_HEIGHT LCD_HEIGHT
@@ -161,7 +163,6 @@ static void snow_init(void)
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int button;
-    TEST_PLUGIN_API(api);
     (void)(parameter);
     rb = api;
 

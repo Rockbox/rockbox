@@ -21,6 +21,8 @@
 #include "token.h"
 #include "dbinterface.h"
 
+PLUGIN_HEADER
+
 void *audio_bufferbase;
 void *audio_bufferpointer;
 unsigned int audio_buffer_free;
@@ -58,15 +60,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     unsigned char *result,buf[500];
     int parsefd,hits;
-    /* this macro should be called as the first thing you do in the plugin.
-       it test that the api version and model the plugin was compiled for
-       matches the machine it is running on */
-    TEST_PLUGIN_API(api);
-
     /* if you are using a global api pointer, don't forget to copy it!
        otherwise you will get lovely "I04: IllInstr" errors... :-) */
     rb = api;
-    
+
     audio_bufferbase=audio_bufferpointer=0;
     audio_buffer_free=0;
 

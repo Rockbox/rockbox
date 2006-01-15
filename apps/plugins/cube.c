@@ -22,6 +22,8 @@
 #include "playergfx.h"
 #include "xlcd.h"
 
+PLUGIN_HEADER
+
 /* Loops that the values are displayed */
 #define DISP_TIME 30
 
@@ -446,7 +448,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     bool redraw = true;
     bool exit = false;
 
-    TEST_PLUGIN_API(api);
     (void)(parameter);
     rb = api;
 

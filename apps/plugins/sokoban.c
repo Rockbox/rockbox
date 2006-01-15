@@ -22,6 +22,8 @@
 
 #ifdef HAVE_LCD_BITMAP
 
+PLUGIN_HEADER
+
 #define SOKOBAN_TITLE       "Sokoban"
 #define SOKOBAN_TITLE_FONT  2
 
@@ -896,7 +898,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     int w, h;
     int len;
 
-    TEST_PLUGIN_API(api);
     (void)(parameter);
     rb = api;
     

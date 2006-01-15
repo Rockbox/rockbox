@@ -80,6 +80,8 @@ Original release, featuring analog / digital modes and a few options.
 
 #if defined(HAVE_LCD_BITMAP) && defined(CONFIG_RTC)
 
+PLUGIN_HEADER
+
 #define CLOCK_VERSION "2.60"
 
 #define MODE_ANALOG 1
@@ -2875,7 +2877,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     struct tm* current_time;
 
-    TEST_PLUGIN_API(api);
     (void)parameter;
     rb = api;
     

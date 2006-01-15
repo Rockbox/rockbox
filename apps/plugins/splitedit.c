@@ -22,6 +22,8 @@
 #ifndef SIMULATOR
 #ifdef HAVE_LCD_BITMAP
 
+PLUGIN_HEADER
+
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define SPLITEDIT_QUIT BUTTON_OFF

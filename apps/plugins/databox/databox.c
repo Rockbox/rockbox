@@ -18,6 +18,8 @@
  ****************************************************************************/
 #include "databox.h"
 
+PLUGIN_HEADER
+
 /* variable button definitions */
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
     (CONFIG_KEYPAD == IRIVER_H300_PAD)
@@ -233,11 +235,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int button,done=0,abort=0;
     char filename[100],buf[100];
-    /* this macro should be called as the first thing you do in the plugin.
-       it test that the api version and model the plugin was compiled for
-       matches the machine it is running on */
-    TEST_PLUGIN_API(api);
-
     /* if you don't use the parameter, you can do like
        this to avoid the compiler warning about it */
     (void)parameter;

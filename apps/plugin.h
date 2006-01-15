@@ -90,43 +90,22 @@
 #define PREFIX(_x_) _x_
 #endif
 
+#define PLUGIN_MAGIC 0x526F634B /* RocK */
+
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 54
+#define PLUGIN_API_VERSION 1
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 51
+#define PLUGIN_MIN_API_VERSION 1
 
 /* plugin return codes */
 enum plugin_status {
     PLUGIN_OK = 0,
     PLUGIN_USB_CONNECTED,
-
-    PLUGIN_WRONG_API_VERSION = -1,
-    PLUGIN_WRONG_MODEL = -2,
-    PLUGIN_ERROR = -3,
+    PLUGIN_ERROR = -1,
 };
-
-/* different (incompatible) plugin models */
-enum model {
-    PLAYER,
-    RECORDER
-};
-
-#ifdef HAVE_LCD_CHARCELLS
-#define MODEL PLAYER
-#else
-#define MODEL RECORDER
-#endif
-
-/* compatibility test macro */
-#define TEST_PLUGIN_API(_api_) \
-do { \
- int _rc_ = _api_->plugin_test(PLUGIN_API_VERSION, MODEL, MEM); \
- if (_rc_<0) \
-     return _rc_; \
-} while(0)
 
 /* NOTE: To support backwards compatibility, only add new functions at
          the end of the structure.  Every time you add a new function,
@@ -135,10 +114,6 @@ do { \
          version
  */
 struct plugin_api {
-    /* these two fields must always be first, to ensure
-       TEST_PLUGIN_API will always work */
-    int version;
-    int (*plugin_test)(int api_version, int model, int memsize);
 
     /* lcd */
     void (*lcd_set_contrast)(int x);
@@ -198,6 +173,7 @@ struct plugin_api {
     struct font* (*font_get)(int font);
     int  (*font_getstringsize)(const unsigned char *str, int *w, int *h,
                                int fontnumber);
+    int (*font_get_width)(struct font* pf, unsigned short char_code);
 #endif
     void (*backlight_on)(void);
     void (*backlight_off)(void);
@@ -314,9 +290,18 @@ struct plugin_api {
     char *(*strcat)(char *s1, const char *s2);
     int (*memcmp)(const void *s1, const void *s2, size_t n);
     char *(*strcasestr) (const char* phaystack, const char* pneedle);
+    /* unicode stuff */
+    const unsigned char* (*utf8decode)(const unsigned char *utf8, unsigned short *ucs);
+    unsigned char* (*iso_decode)(const unsigned char *iso, unsigned char *utf8, int cp, int count);
+    unsigned char* (*utf16LEdecode)(const unsigned char *utf16, unsigned char *utf8, unsigned int count);
+    unsigned char* (*utf16BEdecode)(const unsigned char *utf16, unsigned char *utf8, unsigned int count);
+    unsigned char* (*utf8encode)(unsigned long ucs, unsigned char *utf8);
+    unsigned long (*utf8length)(const unsigned char *utf8);
 
     /* sound */
     void (*sound_set)(int setting, int value);
+    int (*sound_min)(int setting);
+    int (*sound_max)(int setting);
 #ifndef SIMULATOR
     void (*mp3_play_data)(const unsigned char* start, int size, void (*get_more)(unsigned char** start, int* size));
     void (*mp3_play_pause)(bool play);
@@ -378,6 +363,23 @@ struct plugin_api {
     int *rundb_fd;
     int *rundb_initialized;            
 
+    /* menu */
+    int (*menu_init)(const struct menu_item* mitems, int count,
+               int (*callback)(int, int),
+               const char *button1, const char *button2, const char *button3);
+    void (*menu_exit)(int menu);
+    int (*menu_show)(int m);
+    bool (*menu_run)(int menu);
+    int (*menu_cursor)(int menu);
+    char* (*menu_description)(int menu, int position);
+    void (*menu_delete)(int menu, int position);
+    int (*menu_count)(int menu);
+    bool (*menu_moveup)(int menu);
+    bool (*menu_movedown)(int menu);
+    void (*menu_draw)(int menu);
+    void (*menu_insert)(int menu, int position, char *desc, bool (*function) (void));
+    void (*menu_set_cursor)(int menu, int position);
+
     /* misc */
     void (*srand)(unsigned int seed);
     int  (*rand)(void);
@@ -416,42 +418,37 @@ struct plugin_api {
 #ifdef HAVE_LCD_BITMAP
     int (*read_bmp_file)(char* filename, int *get_width, int *get_height,
                          char *bitmap, int maxsize);
+    void (*screen_dump_set_hook)(void (*hook)(int fh));
 #endif
     int (*show_logo)(void);
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */     
 
-    int (*menu_init)(const struct menu_item* mitems, int count, 
-               int (*callback)(int, int),
-               const char *button1, const char *button2, const char *button3);
-    void (*menu_exit)(int menu);
-    int (*menu_show)(int m);
-    bool (*menu_run)(int menu);
-    int (*menu_cursor)(int menu);
-    char* (*menu_description)(int menu, int position);
-    void (*menu_delete)(int menu, int position);
-    int (*menu_count)(int menu);
-    bool (*menu_moveup)(int menu);
-    bool (*menu_movedown)(int menu);
-    void (*menu_draw)(int menu);
-    void (*menu_insert)(int menu, int position, char *desc, bool (*function) (void));
-    void (*menu_set_cursor)(int menu, int position);
-
-#ifdef HAVE_LCD_BITMAP
-    void (*screen_dump_set_hook)(void (*hook)(int fh));
-    int (*font_get_width)(struct font* pf, unsigned short char_code);
-#endif
-    const unsigned char* (*utf8decode)(const unsigned char *utf8, unsigned short *ucs);
-    unsigned char* (*iso_decode)(const unsigned char *iso, unsigned char *utf8, int cp, int count);
-    unsigned char* (*utf16LEdecode)(const unsigned char *utf16, unsigned char *utf8, unsigned int count);
-    unsigned char* (*utf16BEdecode)(const unsigned char *utf16, unsigned char *utf8, unsigned int count);
-    unsigned char* (*utf8encode)(unsigned long ucs, unsigned char *utf8);
-    unsigned long (*utf8length)(const unsigned char *utf8);
-    
-    int (*sound_min)(int setting);
-    int (*sound_max)(int setting);
 };
+
+#ifndef SIMULATOR
+/* plugin header */
+struct plugin_header {
+    unsigned long magic;
+    unsigned short target_id;
+    unsigned short api_version;
+    unsigned char *load_addr;
+    unsigned char *end_addr;
+    enum plugin_status(*entry_point)(struct plugin_api*, void*);
+};
+#ifdef PLUGIN
+extern unsigned char plugin_start_addr[];
+extern unsigned char plugin_end_addr[];
+#define PLUGIN_HEADER \
+        const struct plugin_header __header \
+        __attribute__ ((section (".header")))= { \
+        PLUGIN_MAGIC, TARGET_ID, PLUGIN_API_VERSION, \
+        plugin_start_addr, plugin_end_addr, plugin_start };
+#endif
+#else /* SIMULATOR */
+#define PLUGIN_HEADER
+#endif
 
 int plugin_load(const char* plugin, void* parameter);
 void* plugin_get_buffer(int *buffer_size);

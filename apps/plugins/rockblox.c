@@ -22,6 +22,8 @@
 
 #ifdef HAVE_LCD_BITMAP
 
+PLUGIN_HEADER
+
 #if (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define ROCKBLOX_OFF   BUTTON_MENU
 #define ROCKBLOX_UP    BUTTON_SCROLL_BACK
@@ -420,11 +422,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int ret;
 
-    TEST_PLUGIN_API(api);
-
     (void)parameter;
     rb = api;
-    
+
     /* Lets use the default font */
     rb->lcd_setfont(FONT_SYSFIXED);
 

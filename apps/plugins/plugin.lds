@@ -64,7 +64,13 @@ MEMORY
 
 SECTIONS
 {
-    .text : 
+    .header : {
+        _plugin_start_addr = .;
+        plugin_start_addr = .;
+        KEEP(*(.header))
+    } > PLUGIN_RAM
+
+    .text :
     {
         KEEP(*(.entry))
         *(.text*)
@@ -80,7 +86,7 @@ SECTIONS
         . = ALIGN(0x4);
     } > PLUGIN_RAM
 
-    .data : 
+    .data :
     {
         *(.data*)
 #if defined(ARCH_IRIVER) || defined(ARCH_IPOD) || (CONFIG_CPU==PNX0101)
@@ -118,6 +124,9 @@ SECTIONS
     {
         *(.bss*)
         *(COMMON)
+        . = ALIGN(0x4);
+        _plugin_end_addr = .;
+        plugin_end_addr = .;
     } > PLUGIN_RAM
 
     /* Special trick to avoid a linker error when no other sections are

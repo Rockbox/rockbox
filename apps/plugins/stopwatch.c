@@ -19,6 +19,8 @@
 
 #include "plugin.h"
 
+PLUGIN_HEADER
+
 #ifdef HAVE_LCD_BITMAP
 #define LAP_LINES 6
 #define TIMER_Y 1
@@ -121,7 +123,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     int done = false;
     bool update_lap = true;
 
-    TEST_PLUGIN_API(api);
     (void)parameter;
     rb = api;
 

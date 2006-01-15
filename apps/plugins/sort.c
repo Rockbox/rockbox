@@ -55,6 +55,8 @@
  * TODO: Implement a merge sort for files larger than the buffer
  ****************************************************************************/
 
+PLUGIN_HEADER
+
 static struct plugin_api* rb;
 
 int buf_size;
@@ -178,7 +180,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     char *buf;
     int rc;
-    TEST_PLUGIN_API(api);
 
     filename = (char *)parameter;
 

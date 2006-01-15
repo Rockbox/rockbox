@@ -33,6 +33,8 @@ dir is the current direction of the snake - 0=up, 1=right, 2=down, 3=left;
 #include "plugin.h"
 #ifdef HAVE_LCD_BITMAP
 
+PLUGIN_HEADER
+
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define SNAKE_QUIT BUTTON_OFF
@@ -344,7 +346,6 @@ void game_init(void) {
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    TEST_PLUGIN_API(api);
     (void)(parameter);
     rb = api;
 

@@ -427,7 +427,7 @@ appsdir='\$(ROOTDIR)/apps'
   echo "15 - iPod Video"
   echo "16 - iriver iFP-790"
 
-  getit=`input`;
+  target_id=`input`;
 
   # Set of tools built for all target platforms:
   toolset="rdf2binary convbdf"
@@ -437,7 +437,7 @@ appsdir='\$(ROOTDIR)/apps'
   iriverbitmaptools="$toolset scramble descramble mkboot bmp2rb codepages"
   ipodbitmaptools="$toolset scramble ipod_fw bmp2rb codepages"
 
-  case $getit in
+  case $target_id in
 
    1)
     archos="player"
@@ -881,6 +881,7 @@ sed > Makefile \
  -e "s,@ROOTDIR@,${rootdir},g" \
  -e "s,@DEBUG@,${debug},g" \
  -e "s,@MEMORY@,${memory},g" \
+ -e "s,@TARGET_ID@,${target_id},g" \
  -e "s,@TARGET@,${target},g" \
  -e "s,@ARCHOS@,${archos},g" \
  -e "s,@LANGUAGE@,${language},g" \
@@ -927,6 +928,7 @@ export DEBUG=@DEBUG@
 export ARCHOS=@ARCHOS@
 export ARCHOSROM=@ARCHOSROM@
 export FLASHFILE=@FLASHFILE@
+export TARGET_ID=@TARGET_ID@
 export TARGET=@TARGET@
 export OBJDIR=@PWD@
 export BUILDDIR=@PWD@

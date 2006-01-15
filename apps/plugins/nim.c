@@ -20,7 +20,7 @@
 
 #ifdef HAVE_LCD_CHARCELLS
 
-/* NIM game for the player 
+/* NIM game for the player
 
 Rules of nim game
 -----------------
@@ -46,6 +46,7 @@ V1.2 : 2003-07-30
      take a match. Later you are obliged to take at least one.)
 */
 
+PLUGIN_HEADER
 
 /*Pattern for the game*/
 static unsigned char smile[]={0x00, 0x11, 0x04, 0x04, 0x00, 0x11, 0x0E};    /* :-) */
@@ -139,11 +140,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     int x,v,min;
     bool ok;
     bool go;
-
-    /* this macro should be called as the first thing you do in the plugin.
-       it test that the api version and model the plugin was compiled for
-       matches the machine it is running on */
-    TEST_PLUGIN_API(api);
 
     /* if you don't use the parameter, you can do like
        this to avoid the compiler warning about it */

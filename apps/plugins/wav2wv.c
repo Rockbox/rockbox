@@ -20,6 +20,8 @@
 
 #include <codecs/libwavpack/wavpack.h>
 
+PLUGIN_HEADER
+
 #define SAMPLES_PER_BLOCK 22050
 
 static struct plugin_api* rb;
@@ -287,8 +289,6 @@ static int wav2wv (char *filename)
 
 enum plugin_status plugin_start(struct plugin_api* api, void *parameter)
 {
-    TEST_PLUGIN_API(api);
-
     rb = api;
 
     if (!parameter)

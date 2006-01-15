@@ -20,6 +20,8 @@
 
 #if defined(HAVE_LCD_BITMAP) && (CONFIG_KEYPAD == RECORDER_PAD)
 
+PLUGIN_HEADER
+
 /* size of the field the worm lives in */
 #define FIELD_RECT_X 1
 #define FIELD_RECT_Y 1
@@ -1891,7 +1893,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     bool worm_dead = false;
     int button;
     
-    TEST_PLUGIN_API(api);
     (void)(parameter);
 
     rb = api;

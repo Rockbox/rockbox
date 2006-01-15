@@ -20,10 +20,10 @@
 ****************************************************************************/
 
 #include "plugin.h"
-#include "button.h"
-#include "lcd.h"
 
 #ifdef HAVE_LCD_BITMAP
+
+PLUGIN_HEADER
 
 /* save files */
 #define SCORE_FILE PLUGIN_DIR "/bejeweled.score"
@@ -2466,7 +2466,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     char str[19];
 
     /* plugin init */
-    TEST_PLUGIN_API(api);
     (void)parameter;
     rb = api;
     /* end of plugin init */

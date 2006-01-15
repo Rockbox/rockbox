@@ -78,13 +78,8 @@ static bool plugin_loaded = false;
 static int  plugin_size = 0;
 static void (*pfn_tsr_exit)(void) = NULL; /* TSR exit callback */
 
-static int plugin_test(int api_version, int model, int memsize);
-
 static const struct plugin_api rockbox_api = {
-    PLUGIN_API_VERSION,
 
-    plugin_test,
-    
     /* lcd */
     lcd_set_contrast,
     lcd_clear_display,
@@ -135,6 +130,7 @@ static const struct plugin_api rockbox_api = {
     checkbox,
     font_get,
     font_getstringsize,
+    font_get_width,
 #endif
     backlight_on,
     backlight_off,
@@ -243,9 +239,18 @@ static const struct plugin_api rockbox_api = {
     strcat,
     memcmp,
     strcasestr,
+    /* unicode stuff */
+    utf8decode,
+    iso_decode,
+    utf16LEdecode,
+    utf16BEdecode,
+    utf8encode,
+    utf8length,
 
     /* sound */
     sound_set,
+    sound_min,
+    sound_max,
 #ifndef SIMULATOR
     mp3_play_data,
     mp3_play_pause,
@@ -307,6 +312,21 @@ static const struct plugin_api rockbox_api = {
     &rundb_fd,
     &rundb_initialized,            
 
+    /* menu */
+    menu_init,
+    menu_exit,
+    menu_show,
+    menu_run,
+    menu_cursor,
+    menu_description,
+    menu_delete,
+    menu_count,
+    menu_moveup,
+    menu_movedown,
+    menu_draw,
+    menu_insert,
+    menu_set_cursor,
+
     /* misc */
     srand,
     rand,
@@ -337,39 +357,13 @@ static const struct plugin_api rockbox_api = {
 #endif
 #ifdef HAVE_LCD_BITMAP
     read_bmp_file,
+    screen_dump_set_hook,
 #endif
     show_logo,
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
-    menu_init,
-    menu_exit,
-    menu_show,
-    menu_run,
-    menu_cursor,
-    menu_description,
-    menu_delete,
-    menu_count,
-    menu_moveup,
-    menu_movedown,
-    menu_draw,
-    menu_insert,
-    menu_set_cursor,
-
-#ifdef HAVE_LCD_BITMAP
-    screen_dump_set_hook,
-    font_get_width,
-#endif
-    utf8decode,
-    iso_decode,
-    utf16LEdecode,
-    utf16BEdecode,
-    utf8encode,
-    utf8length,
-    
-    sound_min,
-    sound_max,
 };
 
 int plugin_load(const char* plugin, void* parameter)
@@ -377,7 +371,8 @@ int plugin_load(const char* plugin, void* parameter)
     enum plugin_status (*plugin_start)(struct plugin_api* api, void* param);
     int rc;
 #ifndef SIMULATOR
-    char buf[64];
+    struct plugin_header header;
+    ssize_t readsize;
 #endif
     int fd;
 
@@ -408,28 +403,50 @@ int plugin_load(const char* plugin, void* parameter)
 #else
     fd = open(plugin, O_RDONLY);
     if (fd < 0) {
-        snprintf(buf, sizeof buf, str(LANG_PLUGIN_CANT_OPEN), plugin);
-        gui_syncsplash(HZ*2, true, buf);
+        gui_syncsplash(HZ*2, true, str(LANG_PLUGIN_CANT_OPEN), plugin);
         return fd;
     }
-    
-    /* zero out plugin buffer to ensure a properly zeroed bss area */
-    memset(pluginbuf, 0, PLUGIN_BUFFER_SIZE);
 
-    plugin_start = (void*)&pluginbuf;
-    plugin_size = read(fd, plugin_start, PLUGIN_BUFFER_SIZE);
+    readsize = read(fd, &header, sizeof(header));
+    close(fd); 
+    /* Close for now. Less code than doing it in all error checks.
+     * Would need to seek back anyway. */
+
+    if (readsize != sizeof(header)) {
+        gui_syncsplash(HZ*2, true, str(LANG_READ_FAILED), plugin);
+        return -1;
+    }
+    if (header.magic != PLUGIN_MAGIC
+        || header.target_id != TARGET_ID
+        || header.load_addr != pluginbuf
+        || header.end_addr > pluginbuf + PLUGIN_BUFFER_SIZE) {
+        gui_syncsplash(HZ*2, true,  str(LANG_PLUGIN_WRONG_MODEL));
+        return -1;
+    }
+    if (header.api_version > PLUGIN_API_VERSION
+        || header.api_version < PLUGIN_MIN_API_VERSION) {
+        gui_syncsplash(HZ*2, true,  str(LANG_PLUGIN_WRONG_VERSION));
+        return -1;
+    }
+
+    /* zero out plugin buffer to ensure a properly zeroed bss area */
+    memset(pluginbuf, 0, header.end_addr - pluginbuf);
+
+    fd = open(plugin, O_RDONLY);
+    if (fd < 0) {
+        gui_syncsplash(HZ*2, true, str(LANG_PLUGIN_CANT_OPEN), plugin);
+        return fd;
+    }
+    readsize = read(fd, pluginbuf, PLUGIN_BUFFER_SIZE);
     close(fd);
-    if (plugin_size < 0) {
+    
+    if (readsize < 0) {
         /* read error */
-        snprintf(buf, sizeof buf, str(LANG_READ_FAILED), plugin);
-        gui_syncsplash(HZ*2, true, buf);
+        gui_syncsplash(HZ*2, true, str(LANG_READ_FAILED), plugin);
         return -1;
     }
-    if (plugin_size == 0) {
-        /* loaded a 0-byte plugin, implying it's not for this model */
-        gui_syncsplash(HZ*2, true, str(LANG_PLUGIN_WRONG_MODEL));
-        return -1;
-    }
+    plugin_start = header.entry_point;
+    plugin_size = header.end_addr - header.load_addr;
 #endif
 
     plugin_loaded = true;
@@ -457,14 +474,6 @@ int plugin_load(const char* plugin, void* parameter)
 
         case PLUGIN_USB_CONNECTED:
             return PLUGIN_USB_CONNECTED;
-
-        case PLUGIN_WRONG_API_VERSION:
-            gui_syncsplash(HZ*2, true, str(LANG_PLUGIN_WRONG_VERSION));
-            break;
-
-        case PLUGIN_WRONG_MODEL:
-            gui_syncsplash(HZ*2, true, str(LANG_PLUGIN_WRONG_MODEL));
-            break;
 
         default:
             gui_syncsplash(HZ*2, true, str(LANG_PLUGIN_ERROR));
@@ -520,20 +529,4 @@ void* plugin_get_audio_buffer(int* buffer_size)
 void plugin_tsr(void (*exit_callback)(void))
 {
     pfn_tsr_exit = exit_callback; /* remember the callback for later */
-}
-
-
-static int plugin_test(int api_version, int model, int memsize)
-{
-    if (api_version < PLUGIN_MIN_API_VERSION ||
-        api_version > PLUGIN_API_VERSION)
-        return PLUGIN_WRONG_API_VERSION;
-
-    if (model != MODEL)
-        return PLUGIN_WRONG_MODEL;
-
-    if (memsize != MEM)
-        return PLUGIN_WRONG_MODEL;
-    
-    return PLUGIN_OK;
 }

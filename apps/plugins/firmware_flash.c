@@ -79,6 +79,8 @@
 
 #ifdef PLATFORM_ID
 
+PLUGIN_HEADER
+
 #if CONFIG_KEYPAD == ONDIO_PAD /* limited keypad */
 #define KEY1 BUTTON_LEFT
 #define KEY2 BUTTON_UP
@@ -1048,7 +1050,7 @@ void DoUserDialog(char* filename)
         rb->snprintf(buf, sizeof(buf), "Verify failed! %d errors", rc);
         rb->lcd_puts_scroll(0, 0, buf);
     }
-    
+
     rb->lcd_puts_scroll(0, 1, "Press any key to exit.");
     WaitForButton();
 }
@@ -1062,11 +1064,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int oldmode;
 
-    /* this macro should be called as the first thing you do in the plugin.
-    it test that the api version and model the plugin was compiled for
-    matches the machine it is running on */
-    TEST_PLUGIN_API(api);
-    
     rb = api; /* copy to global api pointer */
     
     /* now go ahead and have fun! */

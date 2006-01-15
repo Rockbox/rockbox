@@ -25,6 +25,8 @@
 #ifdef HAVE_LCD_BITMAP /* and also not for the Player */
 #include "gray.h"
 
+PLUGIN_HEADER
+
 /******************************* Globals ***********************************/
 
 static struct plugin_api* rb; /* global api struct pointer */
@@ -278,13 +280,6 @@ int main(void)
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int ret;
-    /*
-    * this macro should be called as the first thing you do in the plugin.
-    * it test that the api version and model the plugin was compiled for
-    * matches the machine it is running on
-    */
-
-    TEST_PLUGIN_API(api);
 
     rb = api; // copy to global api pointer
     (void)parameter;

@@ -23,6 +23,8 @@
 
 #ifdef HAVE_LCD_BITMAP
 
+PLUGIN_HEADER
+
 /* Key assignement */
 #if (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define DEMYSTIFY_QUIT BUTTON_MENU
@@ -337,19 +339,12 @@ int plugin_main(void)
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int ret;
-    /*
-    * this macro should be called as the first thing you do in the plugin.
-    * it test that the api version and model the plugin was compiled for
-    * matches the machine it is running on
-    */
-
-    TEST_PLUGIN_API(api);
 
     rb = api; /* copy to global api pointer */
     (void)parameter;
     if (rb->global_settings->backlight_timeout > 0)
         rb->backlight_set_timeout(1);/* keep the light on */
-        
+
     ret = plugin_main();
 
     return ret;

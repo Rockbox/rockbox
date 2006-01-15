@@ -20,6 +20,10 @@
 
 /* welcome to the example rockbox plugin */
 
+/* This macros must always be included. Should be placed at the top by
+   convention, although the actual position doesn't matter */
+PLUGIN_HEADER
+
 /* here is a global api struct pointer. while not strictly necessary,
    it's nice not to have to pass the api pointer in all function calls
    in the plugin */
@@ -28,11 +32,6 @@ static struct plugin_api* rb;
 /* this is the plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    /* this macro should be called as the first thing you do in the plugin.
-       it test that the api version and model the plugin was compiled for
-       matches the machine it is running on */
-    TEST_PLUGIN_API(api);
-
     /* if you don't use the parameter, you can do like
        this to avoid the compiler warning about it */
     (void)parameter;

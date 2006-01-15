@@ -38,6 +38,8 @@ enum e_byte_order { order_unknown, order_bigEndian, order_littleEndian };
 #define memcpy      rb->memcpy
 #define memset      rb->memset
 
+PLUGIN_HEADER
+
 static struct  plugin_api* rb;
 extern char    iramcopy[];
 extern char    iramstart[];
@@ -1891,8 +1893,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     char  stg[40];
     char  *bitratename[] = { "64","80","96","112","128","160","192","224","256","320" };
     int   brate[]        = { 64,80,96,112,128,160,192,224,256,320 };
-
-    TEST_PLUGIN_API(api);
 
     (void)parameter;
     rb = api;

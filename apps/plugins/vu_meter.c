@@ -19,6 +19,8 @@
 
 #if defined(HAVE_LCD_BITMAP) && (CONFIG_CODEC != SWCODEC)
 
+PLUGIN_HEADER
+
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define VUMETER_QUIT BUTTON_OFF
@@ -427,7 +429,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     int button;
     int lastbutton = BUTTON_NONE;
     
-    TEST_PLUGIN_API(api);
     (void) parameter;
     rb = api;
 
