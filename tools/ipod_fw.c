@@ -453,7 +453,11 @@ main(int argc, char **argv)
 
     printf("Generating firmware image compatible with ");
     if (fw_version == 3) {
-	printf("iPod mini, 4g and iPod photo...\n");
+        if (needs_rcsc) {
+            printf("iPod video\n");
+        } else {
+            printf("iPod mini, 4g and iPod photo/color...\n");
+        }
     } else {
 	printf("1g, 2g and 3g iPods...\n");
     }
