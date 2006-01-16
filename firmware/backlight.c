@@ -550,11 +550,10 @@ void remote_backlight_set_timeout(int index) {(void)index;}
 void backlight_set_brightness(int val)
 {
     /* set H300 brightness by changing the PWM
-       accepts 0..15 but note that 0 and 1 give a black display! */
-    unsigned char ucVal = (unsigned char)(val & 0x0F);
-    if(val<MIN_BRIGHTNESS_SETTING)
-            val=MIN_BRIGHTNESS_SETTING;
-    pcf50606_set_bl_pwm(ucVal);
+       accepts 0..15 but note that 0 and 1 gives a black display! */
+    if(val < MIN_BRIGHTNESS_SETTING)
+            val = MIN_BRIGHTNESS_SETTING;
+    pcf50606_set_bl_pwm(val & 0xf);
 }
 #endif
 
