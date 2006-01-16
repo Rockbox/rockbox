@@ -34,47 +34,62 @@ int audiobuf_size;
 /* this is the plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    int fh, readsize;
-    struct {
-        unsigned long magic;
-        unsigned char *start_addr;
-        unsigned char *end_addr;
-        enum plugin_status(*entry_point)(struct plugin_api*, void*);
-    } header;
+    int fd, readsize;
+    struct plugin_header header;
 
     rb = api;
 
-    fh = rb->open(OVL_NAME, O_RDONLY);
-    if (fh < 0)
+    fd = rb->open(OVL_NAME, O_RDONLY);
+    if (fd < 0)
     {
-        rb->splash(2*HZ, true, "Couldn't open " OVL_DISPLAYNAME " overlay.");
+        rb->splash(2*HZ, true, "Can't open " OVL_NAME);
         return PLUGIN_ERROR;
     }
-    readsize = rb->read(fh, &header, sizeof(header));
-    if (readsize != sizeof(header) || header.magic != 0x524f564c)
+    readsize = rb->read(fd, &header, sizeof(header));
+    rb->close(fd);
+    /* Close for now. Less code than doing it in all error checks.
+     * Would need to seek back anyway. */
+
+    if (readsize != sizeof(header))
     {
-        rb->close(fh);
-        rb->splash(2*HZ, true, OVL_NAME " is not a valid Rockbox overlay.");
+        rb->splash(2*HZ, true, "Reading" OVL_DISPLAYNAME " overlay failed.");
         return PLUGIN_ERROR;
     }
-    
+    if (header.magic != PLUGIN_MAGIC || header.target_id != TARGET_ID)
+    {
+        rb->splash(2*HZ, true, OVL_DISPLAYNAME 
+                               " overlay: Incompatible model.");
+        return PLUGIN_ERROR;
+    }
+    if (header.api_version != PLUGIN_API_VERSION) 
+    {
+        rb->splash(2*HZ, true, OVL_DISPLAYNAME
+                               " overlay: Incompatible version.");
+        return PLUGIN_ERROR;
+    }
+
     audiobuf = rb->plugin_get_audio_buffer(&audiobuf_size);
-    if (header.start_addr < audiobuf ||
+    if (header.load_addr < audiobuf ||
         header.end_addr > audiobuf + audiobuf_size)
     {
-        rb->close(fh);
         rb->splash(2*HZ, true, OVL_DISPLAYNAME 
-                   " overlay doesn't fit into memory.");
+                               " overlay doesn't fit into memory.");
         return PLUGIN_ERROR;
     }
-    rb->memset(header.start_addr, 0, header.end_addr - header.start_addr);
+    rb->memset(header.load_addr, 0, header.end_addr - header.load_addr);
 
-    rb->lseek(fh, 0, SEEK_SET);
-    readsize = rb->read(fh, header.start_addr, header.end_addr - header.start_addr);
-    rb->close(fh);
-    if (readsize <= (int)sizeof(header))
+    fd = rb->open(OVL_NAME, O_RDONLY);
+    if (fd < 0)
     {
-        rb->splash(2*HZ, true, "Error loading " OVL_DISPLAYNAME " overlay.");
+        rb->splash(2*HZ, true, "Can't open " OVL_NAME);
+        return PLUGIN_ERROR;
+    }
+    readsize = rb->read(fd, header.load_addr, header.end_addr - header.load_addr);
+    rb->close(fd);
+
+    if (readsize < 0)
+    {
+        rb->splash(2*HZ, true, "Reading" OVL_DISPLAYNAME " overlay failed.");
         return PLUGIN_ERROR;
     }
     return header.entry_point(api, parameter);

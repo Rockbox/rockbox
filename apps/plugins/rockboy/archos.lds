@@ -19,7 +19,7 @@ MEMORY
 SECTIONS
 {
     .header : {
-        _ovl_start_addr = .;
+        _plugin_start_addr = .;
         *(.header)
     } > OVERLAY_RAM
 
@@ -42,6 +42,6 @@ SECTIONS
         *(.bss)
         *(COMMON)
         . = ALIGN(0x4);
-        _ovl_end_addr = .;
+        _plugin_end_addr = .;
     } > OVERLAY_RAM
 }

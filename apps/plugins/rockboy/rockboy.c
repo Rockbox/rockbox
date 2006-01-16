@@ -20,25 +20,7 @@
 #include "loader.h"
 #include "rockmacros.h"
 
-#if MEM <= 8 && !defined(SIMULATOR)
-/* On archos this is loaded as an overlay */
-
-/* These are defined in the linker script */
-extern unsigned char ovl_start_addr[];
-extern unsigned char ovl_end_addr[];
-
-const struct {
-    unsigned long magic;
-    unsigned char *start_addr;
-    unsigned char *end_addr;
-    enum plugin_status (*entry_point)(struct plugin_api*, void*);
-} header __attribute__ ((section (".header"))) = {
-    0x524f564c, /* ROVL */
-    ovl_start_addr, ovl_end_addr, plugin_start
-};
-#else
 PLUGIN_HEADER
-#endif
 
 #ifdef USE_IRAM
 extern char iramcopy[];
@@ -109,10 +91,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     audio_bufferbase = audio_bufferpointer
         = rb->plugin_get_audio_buffer((int *)&audio_buffer_free);
 #if MEM <= 8 && !defined(SIMULATOR)
-    /* loaded as an overlay, protect from overwriting ourselves */
-    if ((unsigned)(ovl_start_addr - (unsigned char *)audio_bufferbase)
+    /* loaded as an overlay plugin, protect from overwriting ourselves */
+    if ((unsigned)(plugin_start_addr - (unsigned char *)audio_bufferbase)
         < audio_buffer_free)
-        audio_buffer_free = ovl_start_addr - (unsigned char *)audio_bufferbase;
+        audio_buffer_free = plugin_start_addr - (unsigned char *)audio_bufferbase;
 #endif
 
 #ifdef USE_IRAM
