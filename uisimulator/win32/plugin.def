@@ -1,3 +1,2 @@
 EXPORTS
-	plugin_start
-
+	__header

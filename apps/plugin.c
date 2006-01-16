@@ -369,15 +369,15 @@ static const struct plugin_api rockbox_api = {
 int plugin_load(const char* plugin, void* parameter)
 {
     enum plugin_status (*plugin_start)(struct plugin_api* api, void* param);
-    int rc;
+    int fd, rc;
 #ifndef SIMULATOR
     struct plugin_header header;
     ssize_t readsize;
+#else
+    struct plugin_header *hdr;
 #endif
-    int fd;
-
 #ifdef HAVE_LCD_BITMAP
-    int xm,ym;
+    int xm, ym;
 #endif
 
     if (pfn_tsr_exit != NULL) /* if we have a resident old plugin: */
@@ -397,18 +397,34 @@ int plugin_load(const char* plugin, void* parameter)
     lcd_clear_display();
 #endif
 #ifdef SIMULATOR
-    plugin_start = sim_plugin_load((char *)plugin, &fd);
-    if(!plugin_start)
+    hdr = sim_plugin_load((char *)plugin, &fd);
+    if (!fd) {
+        gui_syncsplash(HZ*2, true, str(LANG_PLUGIN_CANT_OPEN), plugin);
         return -1;
+    }
+    if (hdr == NULL
+        || hdr->magic != PLUGIN_MAGIC
+        || hdr->target_id != TARGET_ID
+        || hdr->entry_point == NULL) {
+        sim_plugin_close(fd);
+        gui_syncsplash(HZ*2, true,  str(LANG_PLUGIN_WRONG_MODEL));
+        return -1;
+    }
+    if (hdr->api_version > PLUGIN_API_VERSION
+        || hdr->api_version < PLUGIN_MIN_API_VERSION) {
+        sim_plugin_close(fd);
+        gui_syncsplash(HZ*2, true,  str(LANG_PLUGIN_WRONG_VERSION));
+        return -1;
+    }
+    plugin_start = hdr->entry_point;
 #else
     fd = open(plugin, O_RDONLY);
     if (fd < 0) {
         gui_syncsplash(HZ*2, true, str(LANG_PLUGIN_CANT_OPEN), plugin);
         return fd;
     }
-
     readsize = read(fd, &header, sizeof(header));
-    close(fd); 
+    close(fd);
     /* Close for now. Less code than doing it in all error checks.
      * Would need to seek back anyway. */
 
@@ -428,7 +444,6 @@ int plugin_load(const char* plugin, void* parameter)
         gui_syncsplash(HZ*2, true,  str(LANG_PLUGIN_WRONG_VERSION));
         return -1;
     }
-
     /* zero out plugin buffer to ensure a properly zeroed bss area */
     memset(pluginbuf, 0, header.end_addr - pluginbuf);
 
@@ -445,8 +460,8 @@ int plugin_load(const char* plugin, void* parameter)
         gui_syncsplash(HZ*2, true, str(LANG_READ_FAILED), plugin);
         return -1;
     }
-    plugin_start = header.entry_point;
     plugin_size = header.end_addr - header.load_addr;
+    plugin_start = header.entry_point;
 #endif
 
     plugin_loaded = true;
@@ -463,10 +478,14 @@ int plugin_load(const char* plugin, void* parameter)
 #else /* LCD_DEPTH == 1 */
     lcd_set_drawmode(DRMODE_SOLID);
 #endif /* LCD_DEPTH */
+    /* restore margins */
+    lcd_setmargins(xm,ym);
 #endif /* HAVE_LCD_BITMAP */
     
     if (pfn_tsr_exit == NULL)
         plugin_loaded = false;
+
+    sim_plugin_close(fd);
 
     switch (rc) {
         case PLUGIN_OK:
@@ -479,13 +498,6 @@ int plugin_load(const char* plugin, void* parameter)
             gui_syncsplash(HZ*2, true, str(LANG_PLUGIN_ERROR));
             break;
     }
-
-    sim_plugin_close(fd);
-
-#ifdef HAVE_LCD_BITMAP
-    /* restore margins */
-    lcd_setmargins(xm,ym);
-#endif
 
     return PLUGIN_OK;
 }

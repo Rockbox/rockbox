@@ -303,7 +303,7 @@ int sim_fsync(int fd)
 #include <dlfcn.h>
 #endif
 
-void *sim_codec_load_ram(char* codecptr, int size, 
+void *sim_codec_load_ram(char* codecptr, int size,
         void* ptr2, int bufwrap, int *pd_fd)
 {
     void *pd;
@@ -372,22 +372,21 @@ void *sim_codec_load_ram(char* codecptr, int size,
 
 void sim_codec_close(int pd)
 {
-        dlclose((void *)pd);
+    dlclose((void *)pd);
 }
 
 void *sim_plugin_load(char *plugin, int *fd)
 {
-    void* pd;
+    void *pd, *hdr;
     char path[256];
-    int (*plugin_start)(void * api, void* param);
 #ifdef WIN32
     char buf[256];
 #endif
 
     snprintf(path, sizeof path, "archos%s", plugin);
-
-    *fd = -1;
     
+    *fd = 0;
+
     pd = dlopen(path, RTLD_NOW);
     if (!pd) {
         DEBUGF("failed to load %s\n", plugin);
@@ -402,16 +401,12 @@ void *sim_plugin_load(char *plugin, int *fd)
         return NULL;
     }
 
-    plugin_start = dlsym(pd, "plugin_start");
-    if (!plugin_start) {
-        plugin_start = dlsym(pd, "_plugin_start");
-        if (!plugin_start) {
-            dlclose(pd);
-            return NULL;
-        }
-    }
+    hdr = dlsym(pd, "__header");
+    if (!hdr)
+        hdr = dlsym(pd, "___header");
+
     *fd = (int)pd; /* success */
-    return plugin_start;
+    return hdr;    /* maybe NULL if symbol not present */
 }
 
 void sim_plugin_close(int pd)

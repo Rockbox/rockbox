@@ -427,7 +427,6 @@ struct plugin_api {
 
 };
 
-#ifndef SIMULATOR
 /* plugin header */
 struct plugin_header {
     unsigned long magic;
@@ -438,6 +437,7 @@ struct plugin_header {
     enum plugin_status(*entry_point)(struct plugin_api*, void*);
 };
 #ifdef PLUGIN
+#ifndef SIMULATOR
 extern unsigned char plugin_start_addr[];
 extern unsigned char plugin_end_addr[];
 #define PLUGIN_HEADER \
@@ -445,9 +445,12 @@ extern unsigned char plugin_end_addr[];
         __attribute__ ((section (".header")))= { \
         PLUGIN_MAGIC, TARGET_ID, PLUGIN_API_VERSION, \
         plugin_start_addr, plugin_end_addr, plugin_start };
-#endif
 #else /* SIMULATOR */
-#define PLUGIN_HEADER
+#define PLUGIN_HEADER \
+        const struct plugin_header __header = { \
+        PLUGIN_MAGIC, TARGET_ID, PLUGIN_API_VERSION, \
+        NULL, NULL, plugin_start };
+#endif
 #endif
 
 int plugin_load(const char* plugin, void* parameter);
@@ -456,7 +459,6 @@ void* plugin_get_audio_buffer(int *buffer_size);
 void plugin_tsr(void (*exit_callback)(void));
 
 /* defined by the plugin */
-enum plugin_status plugin_start(struct plugin_api* rockbox, void* parameter)
-    __attribute__ ((section (".entry")));
+enum plugin_status plugin_start(struct plugin_api* rockbox, void* parameter);
 
 #endif
