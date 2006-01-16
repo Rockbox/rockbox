@@ -991,6 +991,9 @@ static int ata_perform_sleep(void)
 {
     int ret = 0;
 
+    /* ATA sleep is currently broken on Nano, and will hang all subsequent
+     accesses, so disable until we find a cure. */
+#ifndef APPLE_IPODNANO 
     mutex_lock(&ata_mtx);
 
     SET_REG(ATA_SELECT, ata_device);
@@ -1011,6 +1014,7 @@ static int ata_perform_sleep(void)
 
     sleeping = true;
     mutex_unlock(&ata_mtx);
+#endif
     return ret;
 }
 
