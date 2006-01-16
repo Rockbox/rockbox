@@ -52,11 +52,11 @@ endif
 .PHONY: $(SUBDIRS)
 all: $(BUILDDIR)/libplugin.a $(ROCKS) $(SUBDIRS) $(DEPFILE)
 
-$(OBJDIR)/credits.raw: $(DOCSDIR)/CREDITS
+$(BUILDDIR)/credits.raw: $(DOCSDIR)/CREDITS
 	@echo "create credits.raw"
 	@perl credits.pl < $< > $@
 
-$(OBJDIR)/credits.o: credits.c $(OBJDIR)/credits.raw
+$(OBJDIR)/credits.o: credits.c $(BUILDDIR)/credits.raw
 	@mkdir -p `dirname $@`
 	@echo "CC $<"
 	@$(CC) $(CFLAGS) -I$(OBJDIR) -c $< -o $@

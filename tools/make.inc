@@ -29,13 +29,22 @@ $(DEPFILE): $(SOURCES)
 	$(SILENT)mkdir -p `dirname $(DEPFILE)`
 	$(SILENT)rm -f $(DEPFILE)
 	$(SILENT)(if test ! -f $(BUILDDIR)/lang.h; then \
+	  del="$(BUILDDIR)/lang.h"; \
 	  touch $(BUILDDIR)/lang.h; \
 	fi; \
 	for each in $(SOURCES) x; do \
+	  if test "$$each" = "credits.c"; then \
+	    del="$$del$(BUILDDIR)/credits.raw"; \
+	    touch $(BUILDDIR)/credits.raw; \
+	  fi; \
           if test "x" != "$$each"; then \
 	    obj=`echo $$each | sed -e 's/\.[cS]/.o/'`; \
 	    $(CC) -MM -MT "$(OBJDIR)/$$obj" $(CFLAGS) $$each >> $(DEPFILE) 2>/dev/null; \
           fi; \
+	  if test -n "$$del"; then \
+	    rm $$del; \
+            del=""; \
+	  fi \
 	done; \
 	echo "oo" >/dev/null )
 
