@@ -1963,7 +1963,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
     config.mpeg.type          = 1;
     config.mpeg.layr          = 2;
-    config.mpeg.mode          = 2;
+    config.mpeg.mode          = 0;
     config.mpeg.bitr          = brate[srat];
     config.mpeg.emph          = 0; 
     config.mpeg.crc           = 0;
