@@ -37,6 +37,7 @@
 #include "talk.h"
 #include "misc.h"
 #include "action.h"
+#include "debug.h"
 
 #include "lang.h"
 
@@ -183,8 +184,9 @@ void playlist_buffer_load_entries_screen(struct playlist_buffer * pb,
     if(direction==FORWARD)
     {
         int min_start=viewer.selected_track-2*screens[0].nb_lines;
-        if(min_start<0)
-            min_start=MAX_PLAYLIST_ENTRIES+min_start;
+        while(min_start<0)
+            min_start+=viewer.num_tracks;
+        min_start %= viewer.num_tracks;
         playlist_buffer_load_entries(pb, min_start, FORWARD);
     }
      else
