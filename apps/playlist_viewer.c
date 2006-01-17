@@ -184,7 +184,7 @@ void playlist_buffer_load_entries_screen(struct playlist_buffer * pb,
     {
         int min_start=viewer.selected_track-2*screens[0].nb_lines;
         if(min_start<0)
-            min_start=0;
+            min_start=MAX_PLAYLIST_ENTRIES+min_start;
         playlist_buffer_load_entries(pb, min_start, FORWARD);
     }
      else
@@ -334,10 +334,10 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
 
     if (!reload)
     {
-        if (global_settings.browse_current && !viewer->playlist)
-            viewer->selected_track = playlist_get_display_index() - 1;
-        else
+        if (viewer->playlist)
             viewer->selected_track = 0;
+        else
+            viewer->selected_track = playlist_get_display_index() - 1;
     }
 
     if (!update_playlist(true))
