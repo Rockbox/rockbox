@@ -368,13 +368,10 @@ static const struct plugin_api rockbox_api = {
 
 int plugin_load(const char* plugin, void* parameter)
 {
-    enum plugin_status (*plugin_start)(struct plugin_api* api, void* param);
     int fd, rc;
-#ifndef SIMULATOR
-    struct plugin_header header;
-    ssize_t readsize;
-#else
     struct plugin_header *hdr;
+#ifndef SIMULATOR
+    ssize_t readsize;
 #endif
 #ifdef HAVE_LCD_BITMAP
     int xm, ym;
@@ -387,14 +384,12 @@ int plugin_load(const char* plugin, void* parameter)
         plugin_loaded = false;
     }
 
-#ifdef HAVE_LCD_BITMAP
     lcd_clear_display();
+#ifdef HAVE_LCD_BITMAP
     xm = lcd_getxmargin();
     ym = lcd_getymargin();
     lcd_setmargins(0,0);
     lcd_update();
-#else
-    lcd_clear_display();
 #endif
 #ifdef SIMULATOR
     hdr = sim_plugin_load((char *)plugin, &fd);
@@ -416,59 +411,44 @@ int plugin_load(const char* plugin, void* parameter)
         gui_syncsplash(HZ*2, true,  str(LANG_PLUGIN_WRONG_VERSION));
         return -1;
     }
-    plugin_start = hdr->entry_point;
 #else
     fd = open(plugin, O_RDONLY);
     if (fd < 0) {
         gui_syncsplash(HZ*2, true, str(LANG_PLUGIN_CANT_OPEN), plugin);
         return fd;
     }
-    readsize = read(fd, &header, sizeof(header));
-    close(fd);
-    /* Close for now. Less code than doing it in all error checks.
-     * Would need to seek back anyway. */
+    /* zero out plugin buffer to ensure a properly zeroed bss area */
+    memset(pluginbuf, 0, PLUGIN_BUFFER_SIZE);
 
-    if (readsize != sizeof(header)) {
+    readsize = read(fd, pluginbuf, PLUGIN_BUFFER_SIZE);
+    close(fd);
+
+    if (readsize <= (signed)sizeof(struct plugin_header)) {
         gui_syncsplash(HZ*2, true, str(LANG_READ_FAILED), plugin);
         return -1;
     }
-    if (header.magic != PLUGIN_MAGIC
-        || header.target_id != TARGET_ID
-        || header.load_addr != pluginbuf
-        || header.end_addr > pluginbuf + PLUGIN_BUFFER_SIZE) {
+    hdr = (struct plugin_header *)pluginbuf;
+
+    if (hdr->magic != PLUGIN_MAGIC
+        || hdr->target_id != TARGET_ID
+        || hdr->load_addr != pluginbuf
+        || hdr->end_addr > pluginbuf + PLUGIN_BUFFER_SIZE) {
         gui_syncsplash(HZ*2, true,  str(LANG_PLUGIN_WRONG_MODEL));
         return -1;
     }
-    if (header.api_version > PLUGIN_API_VERSION
-        || header.api_version < PLUGIN_MIN_API_VERSION) {
+    if (hdr->api_version > PLUGIN_API_VERSION
+        || hdr->api_version < PLUGIN_MIN_API_VERSION) {
         gui_syncsplash(HZ*2, true,  str(LANG_PLUGIN_WRONG_VERSION));
         return -1;
     }
-    /* zero out plugin buffer to ensure a properly zeroed bss area */
-    memset(pluginbuf, 0, header.end_addr - pluginbuf);
-
-    fd = open(plugin, O_RDONLY);
-    if (fd < 0) {
-        gui_syncsplash(HZ*2, true, str(LANG_PLUGIN_CANT_OPEN), plugin);
-        return fd;
-    }
-    readsize = read(fd, pluginbuf, PLUGIN_BUFFER_SIZE);
-    close(fd);
-    
-    if (readsize < 0) {
-        /* read error */
-        gui_syncsplash(HZ*2, true, str(LANG_READ_FAILED), plugin);
-        return -1;
-    }
-    plugin_size = header.end_addr - header.load_addr;
-    plugin_start = header.entry_point;
+    plugin_size = hdr->end_addr - pluginbuf;
 #endif
 
     plugin_loaded = true;
 
     invalidate_icache();
 
-    rc = plugin_start((struct plugin_api*) &rockbox_api, parameter);
+    rc = hdr->entry_point((struct plugin_api*) &rockbox_api, parameter);
     /* explicitly casting the pointer here to avoid touching every plugin. */
 
     button_clear_queue();
