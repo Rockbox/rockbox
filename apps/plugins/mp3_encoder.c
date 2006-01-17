@@ -11,8 +11,6 @@
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 //    Library General Public License for more details.
 
-#include <stdio.h>
-
 #define samp_per_frame   1152
 #define samp_per_frame2   576
 #define HAN_SIZE          512
@@ -41,9 +39,14 @@ enum e_byte_order { order_unknown, order_bigEndian, order_littleEndian };
 PLUGIN_HEADER
 
 static struct  plugin_api* rb;
-extern char    iramcopy[];
-extern char    iramstart[];
-extern char    iramend[];
+
+#ifdef USE_IRAM
+extern char iramcopy[];
+extern char iramstart[];
+extern char iramend[];
+extern char iedata[];
+extern char iend[];
+#endif
 
 typedef struct {
     PFILE file;
@@ -1896,6 +1899,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     (void)parameter;
     rb = api;
+
+#ifdef USE_IRAM    
+    memcpy(iramstart, iramcopy, iramend - iramstart);
+    memset(iedata, 0, iend - iedata);
+#endif
 
     rb->lcd_setfont(FONT_SYSFIXED);
 
