@@ -3538,7 +3538,7 @@ eng: "Mode:"
 voice: ""
 new: "모드: "
    
-id: LANG_BRIGHTNESS 
+id: LANG_BRIGHTNESS
 desc: in settings_menu 
 eng: "Brightness" 
 voice: "Brightness" 
