@@ -380,7 +380,7 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
         {   /* loop compiles to 9 assembler instructions */
             /* takes 14 clock cycles (2 pipeline stalls, 1 wait) */
             tmp = ATA_DATA;
-#ifdef SWAP_WORDS
+#if defined(SWAP_WORDS) || defined(ROCKBOX_LITTLE_ENDIAN)
             *buf++ = tmp & 0xff; /* I assume big endian */
             *buf++ = tmp >> 8;   /*  and don't use the SWAB16 macro */
 #else
@@ -691,7 +691,7 @@ static void copy_write_sectors(const unsigned char* buf, int wordcount)
         const unsigned char* bufend = buf + wordcount*2;
         do
         {
-#ifdef SWAP_WORDS
+#if defined(SWAP_WORDS) || defined(ROCKBOX_LITTLE_ENDIAN)
             /* SH1: loop compiles to 9 assembler instructions */
             /* takes 13 clock cycles (2 pipeline stalls) */
             tmp = (unsigned short) *buf++;
