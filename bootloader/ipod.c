@@ -243,7 +243,9 @@ int load_rockbox(unsigned char* buf)
 
     model[4] = 0;
     
-    snprintf(str, 80, "Model: %s, Checksum: %x", model, chksum);
+    snprintf(str, 80, "Model: %s", model);
+    lcd_puts(0, line++, str);
+    snprintf(str, 80, "Checksum: %x", chksum);
     lcd_puts(0, line++, str);
     lcd_update();
 
