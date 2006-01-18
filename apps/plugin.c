@@ -399,8 +399,7 @@ int plugin_load(const char* plugin, void* parameter)
     }
     if (hdr == NULL
         || hdr->magic != PLUGIN_MAGIC
-        || hdr->target_id != TARGET_ID
-        || hdr->entry_point == NULL) {
+        || hdr->target_id != TARGET_ID) {
         sim_plugin_close(fd);
         gui_syncsplash(HZ*2, true,  str(LANG_PLUGIN_WRONG_MODEL));
         return -1;
@@ -423,13 +422,14 @@ int plugin_load(const char* plugin, void* parameter)
     readsize = read(fd, pluginbuf, PLUGIN_BUFFER_SIZE);
     close(fd);
 
-    if (readsize <= (signed)sizeof(struct plugin_header)) {
+    if (readsize < 0) {
         gui_syncsplash(HZ*2, true, str(LANG_READ_FAILED), plugin);
         return -1;
     }
     hdr = (struct plugin_header *)pluginbuf;
 
-    if (hdr->magic != PLUGIN_MAGIC
+    if ((unsigned)readsize <= sizeof(struct plugin_header)
+        || hdr->magic != PLUGIN_MAGIC
         || hdr->target_id != TARGET_ID
         || hdr->load_addr != pluginbuf
         || hdr->end_addr > pluginbuf + PLUGIN_BUFFER_SIZE) {

@@ -243,7 +243,8 @@ int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,
     }
     hdr = (struct codec_header *)codecbuf;
         
-    if (hdr->magic != CODEC_MAGIC
+    if (size <= (signed)sizeof(struct codec_header)
+        || hdr->magic != CODEC_MAGIC
         || hdr->target_id != TARGET_ID
         || hdr->load_addr != codecbuf
         || hdr->end_addr > codecbuf + CODEC_SIZE) {
@@ -258,8 +259,7 @@ int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,
 
     if (hdr == NULL
         || hdr->magic != CODEC_MAGIC
-        || hdr->target_id != TARGET_ID
-        || hdr->entry_point == NULL) {
+        || hdr->target_id != TARGET_ID) {
         sim_codec_close(pd);
         return CODEC_ERROR;
     }
