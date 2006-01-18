@@ -72,7 +72,8 @@ enum codec_status codec_start(struct codec_api* api)
 
     if (codec_init(api)) {
         LOGF("FAAD: Error initialising codec\n");
-        return CODEC_ERROR;
+        err = CODEC_ERROR;
+        goto exit;
     }
 
     while (!rb->taginfo_ready)
@@ -86,7 +87,8 @@ enum codec_status codec_start(struct codec_api* api)
      * the movie data, which can be used directly by the decoder */
     if (!qtmovie_read(&input_stream, &demux_res)) {
         LOGF("FAAD: Error initialising file\n");
-        return CODEC_ERROR;
+        err = CODEC_ERROR;
+        goto exit;
     }
 
     /* initialise the sound converter */
@@ -95,7 +97,8 @@ enum codec_status codec_start(struct codec_api* api)
 
     if (!hDecoder) {
         LOGF("FAAD: Error opening decoder\n");
-        return CODEC_ERROR;
+        err = CODEC_ERROR;
+        goto exit;
     }
 
     NeAACDecConfigurationPtr conf = NeAACDecGetCurrentConfiguration(hDecoder);
@@ -108,7 +111,8 @@ enum codec_status codec_start(struct codec_api* api)
     err = NeAACDecInit2(hDecoder, demux_res.codecdata,demux_res.codecdata_len, &s, &c);
     if (err) {
         LOGF("FAAD: Error initialising decoder: %d, type=%d\n", err,hDecoder->object_type);
-        return CODEC_ERROR;
+        err = CODEC_ERROR;
+        goto exit;
     }
 
     ci->id3->frequency=s;
@@ -137,7 +141,8 @@ enum codec_status codec_start(struct codec_api* api)
         if (!get_sample_info(&demux_res, i, &sample_duration, 
                              &sample_byte_size)) {
             LOGF("AAC: Error in get_sample_info\n");
-            return CODEC_ERROR;
+            err = CODEC_ERROR;
+            goto exit;
         }
 
         /* Request the required number of bytes from the input buffer */
@@ -150,7 +155,8 @@ enum codec_status codec_start(struct codec_api* api)
            decoder struct directly */
         if (frameInfo.error > 0) {
              LOGF("FAAD: decoding error \"%s\"\n", NeAACDecGetErrorMessage(frameInfo.error));
-             return CODEC_ERROR;
+             err = CODEC_ERROR;
+             goto exit;
         }
 
         /* Get the number of decoded samples */
@@ -182,5 +188,7 @@ enum codec_status codec_start(struct codec_api* api)
     if (ci->request_next_track())
         goto next_track;
 
-    return CODEC_OK;
+    err = CODEC_OK;
+exit:
+    return err;
 }

@@ -75,7 +75,7 @@ void recalc_samplecount(void)
 /* this is the codec entry point */
 enum codec_status codec_start(struct codec_api *api)
 {
-    int status = 0;
+    int status = CODEC_OK;
     long size;
     int file_end;
     int frame_skip;      /* samples to skip current frame */
@@ -193,7 +193,7 @@ next_track:
                 continue;
             } else {
                 /* Some other unrecoverable error */
-                status = 1;
+                status = CODEC_ERROR;
                 break;
             }
             break;
@@ -264,5 +264,6 @@ next_track:
   
     if (ci->request_next_track())
         goto next_track;
-    return CODEC_OK;
+    
+    return status;
 }

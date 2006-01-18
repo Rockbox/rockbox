@@ -248,7 +248,8 @@ enum codec_status codec_start(struct codec_api* api)
   next_track:
 
   if (codec_init(api)) {
-      return CODEC_ERROR;
+      i = CODEC_ERROR;
+      goto exit;
   }
 
   while (!*ci->taginfo_ready)
@@ -257,10 +258,12 @@ enum codec_status codec_start(struct codec_api* api)
   /* assume the WAV header is less than 1024 bytes */
   buf=ci->request_buffer((long *)&n,1024);
   if (n<44) {
-      return CODEC_ERROR;
+      i = CODEC_ERROR;
+      goto exit;
   }
   if ((memcmp(buf,"RIFF",4)!=0) || (memcmp(&buf[8],"WAVE",4)!=0)) {
-      return CODEC_ERROR;
+      i = CODEC_ERROR;
+      goto exit;
   }
 
   buf += 12;
@@ -275,7 +278,8 @@ enum codec_status codec_start(struct codec_api* api)
       if (memcmp(buf,"fmt ",4)==0) {
           if (i<16) {
               DEBUGF("CODEC_ERROR: 'fmt ' chunk size=%lu < 16\n",i);
-              return CODEC_ERROR;
+              i = CODEC_ERROR;
+              goto exit;
           }
           /* wFormatTag */
           formattag=buf[8]|(buf[9]<<8);
@@ -302,7 +306,8 @@ enum codec_status codec_start(struct codec_api* api)
                   if (size < 2) {
                       DEBUGF("CODEC_ERROR: dvi_adpcm is missing "
                              "SamplesPerBlock value\n");
-                      return CODEC_ERROR;
+                      i = CODEC_ERROR;
+                      goto exit;
                   }
                   samplesperblock = buf[26]|(buf[27]<<8);
               }
@@ -310,7 +315,8 @@ enum codec_status codec_start(struct codec_api* api)
                   if (size < 22) {
                       DEBUGF("CODEC_ERROR: WAVE_FORMAT_EXTENSIBLE is "
                              "missing extension\n");
-                      return CODEC_ERROR;
+                      i = CODEC_ERROR;
+                      goto exit;
                   }
                   /* wValidBitsPerSample */
                   bitspersample = buf[26]|(buf[27]<<8);
@@ -340,18 +346,21 @@ enum codec_status codec_start(struct codec_api* api)
       buf += i+8;
       if (n < (i+8)) {
           DEBUGF("CODEC_ERROR: WAVE header size > 1024\n");
-          return CODEC_ERROR;
+          i = CODEC_ERROR;
+          goto exit;
       }
       n -= i+8;
   }
 
   if (channels == 0) {
       DEBUGF("CODEC_ERROR: 'fmt ' chunk not found or 0-channels file\n");
-      return CODEC_ERROR;
+      i = CODEC_ERROR;
+      goto exit;
   }
   if (numbytes == 0) {
       DEBUGF("CODEC_ERROR: 'data' chunk not found or has zero-length\n");
-      return CODEC_ERROR;
+      i = CODEC_ERROR;
+      goto exit;
   }
   if (formattag != WAVE_FORMAT_PCM && totalsamples == 0) {
       /* This is non-fatal for some formats */
@@ -361,19 +370,22 @@ enum codec_status codec_start(struct codec_api* api)
       formattag == IBM_FORMAT_ALAW || formattag == IBM_FORMAT_MULAW) {
       if (bitspersample != 8) {
           DEBUGF("CODEC_ERROR: alaw and mulaw must have 8 bitspersample\n");
-          return CODEC_ERROR;
+          i = CODEC_ERROR;
+          goto exit;
       }
       bytespersample = channels;
   }
   if ( formattag == WAVE_FORMAT_DVI_ADPCM
        && bitspersample != 4 && bitspersample != 3) {
       DEBUGF("CODEC_ERROR: dvi_adpcm must have 3 or 4 bitspersample\n");
-      return CODEC_ERROR;
+      i = CODEC_ERROR;
+      goto exit;
   }
   if (formattag == WAVE_FORMAT_PCM && bitspersample > 32) {
       DEBUGF("CODEC_ERROR: pcm with more than 32 bitspersample "
              "is unsupported\n");
-      return CODEC_ERROR;
+      i = CODEC_ERROR;
+      goto exit;
   }
 
   ci->configure(CODEC_DSP_ENABLE, (bool *)true);
@@ -395,7 +407,8 @@ enum codec_status codec_start(struct codec_api* api)
       ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_MONO);
   } else {
       DEBUGF("CODEC_ERROR: more than 2 channels\n");
-      return CODEC_ERROR;
+      i = CODEC_ERROR;
+      goto exit;
   }
 
   if (totalsamples == 0) {
@@ -408,7 +421,8 @@ enum codec_status codec_start(struct codec_api* api)
       }
       else {
           DEBUGF("CODEC_ERROR: cannot compute totalsamples\n");
-          return CODEC_ERROR;
+          i = CODEC_ERROR;
+          goto exit;
       }
   }
 
@@ -519,15 +533,18 @@ enum codec_status codec_start(struct codec_api* api)
                                  int16_samples+i*samplesperblock*channels,
                                  &decodedsize)
                 != CODEC_OK)
-                return CODEC_ERROR;
+                i = CODEC_ERROR;
+            goto exit;
             if (decodedsize != samplesperblock)
-                return CODEC_ERROR;
+                i = CODEC_ERROR;
+            goto exit;
         }
         wavbufsize = nblocks*samplesperblock*channels*2;
     }
     else {
         DEBUGF("CODEC_ERROR: unsupported format %x\n", formattag);
-        return CODEC_ERROR;
+        i = CODEC_ERROR;
+        goto exit;
     }
 
     while (!ci->pcmbuf_insert((char*)int16_samples, wavbufsize)) {
@@ -546,7 +563,9 @@ enum codec_status codec_start(struct codec_api* api)
   if (ci->request_next_track())
       goto next_track;
 
-  return CODEC_OK;
+  i = CODEC_OK;
+exit:
+  return i;
 }
 
 static enum codec_status

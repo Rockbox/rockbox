@@ -129,6 +129,7 @@ enum codec_status codec_start(struct codec_api *api)
     long n;
     unsigned char *filebuf;
     int sample_loc;
+    int retval;
 
     /* Generic codec initialisation */
     ci = api;
@@ -147,8 +148,10 @@ enum codec_status codec_start(struct codec_api *api)
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (long *)(1024*128));
 
 next_track:
-    if (codec_init(api))
-        return CODEC_ERROR;
+    if (codec_init(api)) {
+        retval = CODEC_ERROR;
+        goto exit;
+    }
 
     while (!ci->taginfo_ready)
         ci->yield();
@@ -184,6 +187,8 @@ next_track:
     }
     if (ci->request_next_track())
         goto next_track;
+    retval = CODEC_OK;
+exit:
     a52_free(state);
-    return CODEC_OK;
+    return retval;
 }

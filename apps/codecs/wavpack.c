@@ -52,6 +52,7 @@ enum codec_status codec_start(struct codec_api* api)
     WavpackContext *wpc;
     char error [80];
     int bps, nchans, sr_100;
+    int retval;
 
     /* Generic codec initialisation */
     ci = api;
@@ -70,8 +71,10 @@ enum codec_status codec_start(struct codec_api* api)
 
     next_track:
 
-    if (codec_init(api))
-        return CODEC_ERROR;
+    if (codec_init(api)) {
+        retval = CODEC_ERROR;
+        goto exit;
+    }
 
     while (!*ci->taginfo_ready && !ci->stop_codec)
         ci->sleep(1);
@@ -94,8 +97,10 @@ enum codec_status codec_start(struct codec_api* api)
     /* Create a decoder instance */
     wpc = WavpackOpenFileInput (read_callback, error);
 
-    if (!wpc)
-        return CODEC_ERROR;
+    if (!wpc) {
+        retval = CODEC_ERROR;
+        goto exit;
+    }
 
     bps = WavpackGetBytesPerSample (wpc);
     nchans = WavpackGetReducedChannels (wpc);
@@ -206,5 +211,7 @@ enum codec_status codec_start(struct codec_api* api)
     if (ci->request_next_track())
         goto next_track;
 
-    return CODEC_OK;
+    retval = CODEC_OK;
+exit:
+    return retval;
 }

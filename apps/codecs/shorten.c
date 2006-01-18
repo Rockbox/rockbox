@@ -50,6 +50,7 @@ enum codec_status codec_start(struct codec_api* api)
     int8_t *buf;
     int cur_chan, consumed, res;
     long bytesleft;
+    int retval;
 
     /* Generic codec initialisation */
     rb = api;
@@ -72,7 +73,8 @@ next_track:
     /* Codec initialization */
     if (codec_init(api)) {
         LOGF("Shorten: Error initialising codec\n");
-        return CODEC_ERROR;
+        retval = CODEC_ERROR;
+        goto exit;
     }
 
     while (!*ci->taginfo_ready)
@@ -92,7 +94,8 @@ next_track:
     res = shorten_init(&sc, (unsigned char *)buf, bytesleft);
     if (res < 0) {
         LOGF("shorten_init error: %d\n", res);
-        return CODEC_ERROR;
+        retval = CODEC_ERROR;
+        goto exit;
     }
 
     ci->id3->frequency = sc.sample_rate;
@@ -169,7 +172,8 @@ seek_start:
             break;
         } else if (res < 0) {
             LOGF("shorten_decode_frame error: \n", res);
-            return CODEC_ERROR;
+            retval = CODEC_ERROR;
+            goto exit;
         }
 
         consumed = sc.gb.index/8;
@@ -183,5 +187,7 @@ seek_start:
     if (ci->request_next_track())
         goto next_track;
 
-    return CODEC_OK;
+    retval = CODEC_OK;
+exit:
+    return retval;
 }

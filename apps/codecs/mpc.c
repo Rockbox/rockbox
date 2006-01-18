@@ -83,6 +83,7 @@ enum codec_status codec_start(struct codec_api *api)
     unsigned status;
     mpc_reader reader;
     mpc_streaminfo info;
+    int retval;
     
     #ifdef USE_IRAM 
     ci->memcpy(iramstart, iramcopy, iramend - iramstart);
@@ -111,13 +112,17 @@ enum codec_status codec_start(struct codec_api *api)
     reader.data = ci;
 
 next_track:    
-    if (codec_init(api))
-        return CODEC_ERROR;
+    if (codec_init(api)) {
+        retval = CODEC_ERROR;
+        goto exit;
+    }
 
     /* read file's streaminfo data */
     mpc_streaminfo_init(&info);
-    if (mpc_streaminfo_read(&info, &reader) != ERROR_CODE_OK)
-        return CODEC_ERROR;  
+    if (mpc_streaminfo_read(&info, &reader) != ERROR_CODE_OK) {
+        retval = CODEC_ERROR;
+        goto exit;
+    }
     frequency = info.sample_freq;
     ci->configure(DSP_SET_FREQUENCY, (long *)info.sample_freq);
         
@@ -128,14 +133,18 @@ next_track:
         ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_NONINTERLEAVED);
     else if (info.channels == 1)
         ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_MONO);
-    else
-       return CODEC_ERROR;
+    else {
+       retval = CODEC_ERROR;
+       goto exit;
+    }
     
     codec_set_replaygain(ci->id3);
     /* instantiate a decoder with our file reader */
     mpc_decoder_setup(&decoder, &reader);
-    if (!mpc_decoder_initialize(&decoder, &info))
-        return CODEC_ERROR;
+    if (!mpc_decoder_initialize(&decoder, &info)) {
+        retval = CODEC_ERROR;
+        goto exit;
+    }
 
     /* This is the decoding loop. */
     samplesdone = 0;
@@ -169,7 +178,8 @@ next_track:
         status = mpc_decoder_decode(&decoder, sample_buffer, NULL, NULL);
         ci->yield();
         if (status == (unsigned)(-1)) { /* decode error */
-            return CODEC_ERROR;
+            retval = CODEC_ERROR;
+            goto exit;
         } else {
             while (!ci->pcmbuf_insert_split(sample_buffer,
                                             sample_buffer + MPC_FRAME_LENGTH,
@@ -182,6 +192,9 @@ next_track:
     
     if (ci->request_next_track())
         goto next_track;
-    return CODEC_OK;
+
+    retval = CODEC_OK;
+exit:
+    return retval;
 }
 

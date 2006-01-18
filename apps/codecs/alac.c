@@ -50,6 +50,7 @@ enum codec_status codec_start(struct codec_api* api)
   unsigned int i;
   unsigned char* buffer;
   alac_file alac;
+  int retval;
 
   /* Generic codec initialisation */
   rb = api;
@@ -72,7 +73,8 @@ enum codec_status codec_start(struct codec_api* api)
 
   if (codec_init(api)) {
     LOGF("ALAC: Error initialising codec\n");
-    return CODEC_ERROR;
+    retval = CODEC_ERROR;
+    goto exit;
   }
 
   while (!rb->taginfo_ready)
@@ -86,7 +88,8 @@ enum codec_status codec_start(struct codec_api* api)
    * the movie data, which can be used directly by the decoder */
   if (!qtmovie_read(&input_stream, &demux_res)) {
     LOGF("ALAC: Error initialising file\n");
-    return CODEC_ERROR;
+    retval = CODEC_ERROR;
+    goto exit;
   }
 
   /* initialise the sound converter */
@@ -117,14 +120,16 @@ enum codec_status codec_start(struct codec_api* api)
     if (!get_sample_info(&demux_res, i, &sample_duration, 
                          &sample_byte_size)) {
       LOGF("ALAC: Error in get_sample_info\n");
-      return CODEC_ERROR;
+      retval = CODEC_ERROR;
+      goto exit;
     }
 
     /* Request the required number of bytes from the input buffer */
 
     buffer=ci->request_buffer((long*)&n,sample_byte_size);
     if (n!=sample_byte_size) {
-        return CODEC_ERROR;
+        retval = CODEC_ERROR;
+        goto exit;
     }
 
     /* Decode one block - returned samples will be host-endian */
@@ -157,5 +162,7 @@ enum codec_status codec_start(struct codec_api* api)
   if (ci->request_next_track())
    goto next_track;
 
-  return CODEC_OK;
+  retval = CODEC_OK;
+exit:
+  return retval;
 }

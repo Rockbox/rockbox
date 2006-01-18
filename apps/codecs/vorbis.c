@@ -145,11 +145,11 @@ enum codec_status codec_start(struct codec_api *api)
      */
     rb->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (long *)(1024*256));
 
-    
 /* We need to flush reserver memory every track load. */
 next_track:
     if (codec_init(rb)) {
-        return CODEC_ERROR;
+        error = CODEC_ERROR;
+        goto exit;
     }
 
     while (!*rb->taginfo_ready && !rb->stop_codec)
@@ -195,7 +195,8 @@ next_track:
          vf.links = 1;
     } else {
          //rb->logf("ov_open: %d", error);
-         return CODEC_ERROR;
+         error = CODEC_ERROR;
+         goto exit;
     }
 
     if (rb->id3->offset) {
@@ -224,7 +225,8 @@ next_track:
         /* Change DSP and buffer settings for this bitstream */
         if (current_section != previous_section) {
             if (!vorbis_set_codec_parameters(&vf)) {
-                return CODEC_ERROR;
+                error = CODEC_ERROR;
+                goto exit;
             } else {
                 previous_section = current_section;
             }
@@ -255,6 +257,8 @@ next_track:
         goto next_track;
     }
         
-    return CODEC_OK;
+    error = CODEC_OK;
+exit:
+    return error;
 }
 

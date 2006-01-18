@@ -226,6 +226,7 @@ enum codec_status codec_start(struct codec_api* api)
     int consumed;
     int res;
     int frame;
+    int retval;
 
     /* Generic codec initialisation */
     rb = api;
@@ -243,17 +244,19 @@ enum codec_status codec_start(struct codec_api* api)
     ci->configure(DSP_DITHER, (bool *)false);
     ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_NONINTERLEAVED);
     ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(FLAC_OUTPUT_DEPTH-1));
-    
+
     next_track:
 
     if (codec_init(api)) {
         LOGF("FLAC: Error initialising codec\n");
-        return CODEC_ERROR;
+        retval = CODEC_ERROR;
+        goto exit;
     }
 
     if (!flac_init(&fc,ci->id3->first_frame_offset)) {
         LOGF("FLAC: Error initialising codec\n");
-        return CODEC_ERROR;
+        retval = CODEC_ERROR;
+        goto exit;
     }
 
     while (!*ci->taginfo_ready)
@@ -284,7 +287,8 @@ enum codec_status codec_start(struct codec_api* api)
         if((res=flac_decode_frame(&fc,decoded0,decoded1,buf,
                              bytesleft,ci->yield)) < 0) {
              LOGF("FLAC: Frame %d, error %d\n",frame,res);
-             return CODEC_ERROR;
+             retval = CODEC_ERROR;
+             goto exit;
         }
         consumed=fc.gb.index/8;
         frame++;
@@ -309,5 +313,7 @@ enum codec_status codec_start(struct codec_api* api)
     if (ci->request_next_track())
         goto next_track;
 
-    return CODEC_OK;
+    retval = CODEC_OK;
+exit:
+    return retval;
 }
