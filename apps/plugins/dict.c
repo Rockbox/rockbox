@@ -108,6 +108,8 @@ long reverse (long N) {
 #define LP_QUIT BUTTON_MENU
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
 #define LP_QUIT BUTTON_PLAY
+#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+#define LP_QUIT BUTTON_POWER
 #else
 #define LP_QUIT BUTTON_OFF
 #endif

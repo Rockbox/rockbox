@@ -31,6 +31,9 @@
 
 #define CONFIG_LCD LCD_X5
 
+/* Define this for LCD backlight available */
+#define CONFIG_BACKLIGHT BL_IRIVER_H100 /* port controlled */
+
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 
@@ -58,9 +61,6 @@
 
 /* The start address index for ROM builds */
 #define ROM_START 0x11010
-
-/* Define this for LCD backlight available */
-#define CONFIG_BACKLIGHT BL_IRIVER_H100 /* port controlled */
 
 /* Define this to the CPU frequency */
 #define CPU_FREQ      11289600

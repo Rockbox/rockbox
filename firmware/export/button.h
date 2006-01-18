@@ -172,6 +172,17 @@ bool button_hold(void);
 #define  BUTTON_DOWN          0x0020
 #define  BUTTON_SELECT        0x0100
 
+#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+
+/* TODO: These codes should relate to the hardware */
+
+#define BUTTON_PLAY           0x0001
+#define BUTTON_REC            0x0002
+#define BUTTON_POWER          0x0004
+#define BUTTON_UP             0x0008
+#define BUTTON_DOWN           0x0010
+#define BUTTON_MENU           0x0020
+
 #endif /* RECORDER/PLAYER/ONDIO/GMINI KEYPAD */
 
 #endif /* _BUTTON_H_ */

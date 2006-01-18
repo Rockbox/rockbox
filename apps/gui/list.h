@@ -78,6 +78,11 @@
 #define LIST_PREV      BUTTON_UP
 #define LIST_PGUP      (BUTTON_ON | BUTTON_UP)
 #define LIST_PGDN      (BUTTON_ON | BUTTON_DOWN)
+
+#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+#define LIST_NEXT      BUTTON_DOWN
+#define LIST_PREV      BUTTON_UP
+
 #endif
 
 /*

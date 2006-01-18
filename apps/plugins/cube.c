@@ -106,6 +106,19 @@ PLUGIN_HEADER
 #define CUBE_PAUSE         (BUTTON_SELECT | BUTTON_REL)
 #define CUBE_HIGHSPEED     (BUTTON_MODE | BUTTON_EQ) /* TODO: this is impossible */
 
+#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
+#define CUBE_QUIT          BUTTON_POWER
+#define CUBE_X_INC         BUTTON_LEFT
+#define CUBE_X_DEC         BUTTON_RIGHT
+#define CUBE_Y_INC         BUTTON_UP
+#define CUBE_Y_DEC         BUTTON_DOWN
+#define CUBE_Z_INC         (BUTTON_PLAY | BUTTON_UP)
+#define CUBE_Z_DEC         (BUTTON_PLAY | BUTTON_DOWN)
+#define CUBE_MODE          BUTTON_MENU
+#define CUBE_PAUSE_PRE     BUTTON_PLAY
+#define CUBE_PAUSE         (BUTTON_PLAY | BUTTON_REL)
+#define CUBE_HIGHSPEED     (BUTTON_REC | BUTTON_REL)
+
 #endif
 
 #ifdef HAVE_LCD_BITMAP

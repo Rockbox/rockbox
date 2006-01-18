@@ -109,19 +109,33 @@ static struct plugin_api* rb;
 #define SOL_OPT BUTTON_ON
 #define SOL_REM BUTTON_REC
 
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) 	 
-#define SOL_QUIT (BUTTON_SELECT | BUTTON_MENU) 	 
-#define SOL_UP BUTTON_MENU 	 
-#define SOL_DOWN BUTTON_PLAY 	 
-#define SOL_LEFT BUTTON_LEFT 	 
-#define SOL_RIGHT BUTTON_RIGHT 	 
-#define SOL_MOVE BUTTON_SELECT 	 
-#define SOL_DRAW (BUTTON_SELECT | BUTTON_PLAY) 	 
-#define SOL_REM2CUR (BUTTON_SELECT | BUTTON_LEFT) 	 
-#define SOL_CUR2STACK (BUTTON_SELECT | BUTTON_RIGHT) 	 
-#define SOL_REM2STACK (BUTTON_LEFT | BUTTON_RIGHT) 	 
-#define SOL_MENU_RUN BUTTON_SELECT 	 
-#define SOL_MENU_INFO (BUTTON_PLAY | BUTTON_MENU) 	 
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define SOL_QUIT (BUTTON_SELECT | BUTTON_MENU)
+#define SOL_UP BUTTON_MENU
+#define SOL_DOWN BUTTON_PLAY
+#define SOL_LEFT BUTTON_LEFT
+#define SOL_RIGHT BUTTON_RIGHT
+#define SOL_MOVE BUTTON_SELECT
+#define SOL_DRAW (BUTTON_SELECT | BUTTON_PLAY)
+#define SOL_REM2CUR (BUTTON_SELECT | BUTTON_LEFT)
+#define SOL_CUR2STACK (BUTTON_SELECT | BUTTON_RIGHT)
+#define SOL_REM2STACK (BUTTON_LEFT | BUTTON_RIGHT)
+#define SOL_MENU_RUN BUTTON_SELECT
+#define SOL_MENU_INFO (BUTTON_PLAY | BUTTON_MENU)
+
+#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
+#define SOL_QUIT BUTTON_POWER
+#define SOL_UP BUTTON_UP
+#define SOL_DOWN BUTTON_DOWN
+#define SOL_LEFT BUTTON_LEFT
+#define SOL_RIGHT BUTTON_RIGHT
+#define SOL_MOVE BUTTON_MENU
+#define SOL_DRAW BUTTON_PLAY
+#define SOL_REM2CUR (BUTTON_REC | BUTTON_LEFT)
+#define SOL_CUR2STACK (BUTTON_REC | BUTTON_UP)
+#define SOL_REM2STACK (BUTTON_REC | BUTTON_DOWN)
+#define SOL_MENU_RUN BUTTON_MENU
+#define SOL_MENU_INFO BUTTON_PLAY
   	 
 #endif
 
@@ -160,6 +174,13 @@ static struct plugin_api* rb;
 #define HELP_SOL_REM2CUR "SELECT+LEFT: Put the card on top of the remains' stack on top of the cursor." 	 
 #define HELP_SOL_CUR2STACK "SELECT+RIGHT..: Put the card under the cursor on one of the 4 final stacks." 	 
 #define HELP_SOL_REM2STACK "LEFT+RIGHT: Put the card on top of the remains' stack on one of the 4 final stacks." 	 
+
+#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD) 
+#define HELP_SOL_MOVE "MENU: Select cards, Move cards, reveal hidden cards ..." 	 
+#define HELP_SOL_DRAW "PLAY: Un-select a card if it was selected. Else, draw 3 new cards out of the remains' stack."
+#define HELP_SOL_REM2CUR "REC+LEFT: Put the card on top of the remains' stack on top of the cursor." 	 
+#define HELP_SOL_CUR2STACK "REC+UP..: Put the card under the cursor on one of the 4 final stacks." 	 
+#define HELP_SOL_REM2STACK "REC+DOWN: Put the card on top of the remains' stack on one of the 4 final stacks." 	 
   	 
 #endif
 
