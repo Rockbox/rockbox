@@ -178,7 +178,7 @@ WFLAGS_ALLEGRO := -Wno-missing-declarations
 OFLAGS := -O2 -ffast-math -fomit-frame-pointer
 DBGFLAGS := -DDEBUGMODE=1 -g3
 
-CFLAGS_RELEASE := -Iinclude $(WFLAGS) $(OFLAGS)
+CFLAGS_RELEASE := -Iinclude $(WFLAGS) $(OFLAGS) $(PROFILE_OPTS)
 CFLAGS_DEBUG := -Iinclude $(WFLAGS) $(DBGFLAGS)
 
 LDFLAGS := -s

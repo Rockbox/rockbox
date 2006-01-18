@@ -17,6 +17,9 @@
  *
  ****************************************************************************/
 #include "plugin.h"
+#ifdef RB_PROFILE
+#include "lib/profile_plugin.h"
+#endif
 
 #include <codecs/libwavpack/wavpack.h>
 
@@ -289,6 +292,15 @@ static int wav2wv (char *filename)
 
 enum plugin_status plugin_start(struct plugin_api* api, void *parameter)
 {
+#ifdef RB_PROFILE
+    /* This doesn't start profiling or anything, it just gives the
+     * profiling functions that are compiled in someplace to call,
+     * this is needed here to let this compile with profiling support
+     * since it calls code from a codec that is compiled with profiling
+     * support */
+    profile_init(api);
+#endif
+
     rb = api;
 
     if (!parameter)

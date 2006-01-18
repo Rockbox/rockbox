@@ -16,7 +16,7 @@ endif
 
 M4AOPTS = -O3
 CFLAGS = $(GCCOPTS) $(M4AOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
- -DMEM=${MEMORYSIZE}
+ -DMEM=${MEMORYSIZE} $(PROFILE_OPTS)
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc

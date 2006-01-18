@@ -172,3 +172,29 @@ Charging
   controlled charging that Rockbox can't affect.)
 
   ...
+
+Profiling
+
+  Rockbox contains a profiling system which can be used to monitor call count
+  and time in function for a specific set of functions on a single thread.
+
+  To use this functionality:
+  1) Configure a developer build with profiling support.
+  2) Make sure that the functions of interest will be compiled with the
+     PROFILE_OPTS added to their CFLAGS
+  3) On the same thread as these functions will be run, surround the relevent
+     running time with calls to profile_thread and profstop.  (For codecs,
+     this can be done in the codec.c file for example)
+  4) Compile and run the code on the target, after the section to be profiled
+     exits (when profstop is called) a profile.out file will be written to
+     the player's root.
+  5) Use the tools/profile_reader/profile_reader.pl script to convert the 
+     profile.out into a human readable format.  This script requires the
+     relevent map files and object (or library) files created in the build.
+     (ex: ./profile_reader.pl profile.out vorbis.map libTremor.a 0)
+
+  There is also a profile_comparator.pl script which can compare two profile
+  runs as output by the above script to show percent change from optimization
+
+  profile_reader.pl requires a recent binutils that can automatically handle
+  target object files, or objdump in path to be the target-objdump.

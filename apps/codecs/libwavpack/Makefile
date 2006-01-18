@@ -16,7 +16,7 @@ endif
 
 WAVPACKOPTS = -O2
 CFLAGS = $(GCCOPTS) $(WAVPACKOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
- -DMEM=${MEMORYSIZE}
+ -DMEM=${MEMORYSIZE} $(PROFILE_OPTS)
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc

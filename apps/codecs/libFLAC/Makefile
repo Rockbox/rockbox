@@ -27,7 +27,7 @@ ifeq ($(NEWGCC), 1)
   FLACOPTS += --param large-function-insns=10000
 endif
 
-CFLAGS = $(GCCOPTS) $(FLACOPTS)\
+CFLAGS = $(GCCOPTS) $(PROFILE_OPTS) $(FLACOPTS)\
 $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
 
 # This sets up 'SRC' based on the files mentioned in SOURCES

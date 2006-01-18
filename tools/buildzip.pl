@@ -199,6 +199,7 @@ sub buildzip {
          "CUSTOM_CFG_FORMAT",
          "CUSTOM_WPS_FORMAT",
          "FAQ",
+         "LICENSES",
          "NODO",
          "TECH")) {
         `cp $ROOT/docs/$_ .rockbox/docs/$_.txt`;

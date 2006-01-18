@@ -12,3 +12,6 @@ xlcd.c
 #ifdef HAVE_LCD_CHARCELLS
 playergfx.c
 #endif
+#ifdef RB_PROFILE
+profile_plugin.c
+#endif

@@ -37,5 +37,8 @@ void sleep_thread(void);
 void wake_up_thread(void);
 void init_threads(void);
 int thread_stack_usage(int threadnum);
+#ifdef RB_PROFILE
+void profile_thread(void);
+#endif
 
 #endif

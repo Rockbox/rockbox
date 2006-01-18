@@ -58,3 +58,9 @@ void qsort(void *base, size_t nmemb, size_t size, int(*compar)(const void *, con
 int codec_init(struct codec_api* rb);
 void codec_set_replaygain(struct mp3entry* id3);
 
+#ifdef RB_PROFILE
+void __cyg_profile_func_enter(void *this_fn, void *call_site)
+    NO_PROF_ATTR ICODE_ATTR;
+void __cyg_profile_func_exit(void *this_fn, void *call_site)
+    NO_PROF_ATTR ICODE_ATTR;
+#endif

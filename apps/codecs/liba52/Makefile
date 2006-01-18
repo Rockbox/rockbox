@@ -16,7 +16,7 @@ endif
 
 A52OPTS = -O2
 CFLAGS = $(GCCOPTS) $(A52OPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
- -DMEM=${MEMORYSIZE}
+ -DMEM=${MEMORYSIZE} $(PROFILE_OPTS)
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc

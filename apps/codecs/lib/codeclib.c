@@ -149,3 +149,14 @@ void qsort(void *base, size_t nmemb, size_t size,
 {
     local_rb->qsort(base,nmemb,size,compar);
 }
+
+#ifdef RB_PROFILE
+void __cyg_profile_func_enter(void *this_fn, void *call_site) {
+    (void)call_site;
+    local_rb->profile_func_enter(this_fn, __builtin_return_address(1));
+}
+
+void __cyg_profile_func_exit(void *this_fn, void *call_site) {
+    local_rb->profile_func_exit(this_fn,call_site);
+}
+#endif

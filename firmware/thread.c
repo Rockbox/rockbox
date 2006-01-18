@@ -78,6 +78,13 @@ void switch_thread(void) ICODE_ATTR;
 static inline void store_context(void* addr) __attribute__ ((always_inline));
 static inline void load_context(const void* addr) __attribute__ ((always_inline));
 
+#ifdef RB_PROFILE
+#include <profile.h>
+void profile_thread(void) {
+    profstart(current_thread);
+}
+#endif
+
 #if defined(CPU_ARM)
 /*--------------------------------------------------------------------------- 
  * Store non-volatile context.
@@ -245,6 +252,9 @@ static inline void load_context(const void* addr)
  */
 void switch_thread(void)
 {
+#ifdef RB_PROFILE
+    profile_thread_stopped(current_thread);
+#endif
     int current;
     unsigned int *stackptr;
 
@@ -284,6 +294,9 @@ void switch_thread(void)
 
     current_thread = current;
     load_context(&thread_contexts[current]);
+#ifdef RB_PROFILE
+    profile_thread_started(current_thread);
+#endif
 }
 
 void sleep_thread(void)

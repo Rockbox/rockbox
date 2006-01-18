@@ -44,6 +44,9 @@
 #include "mpeg.h"
 #include "audio.h"
 #include "mp3_playback.h"
+#ifdef RB_PROFILE
+#include "profile.h"
+#endif
 #include "misc.h"
 #if (HWCODEC == SWCODEC)
 #include "pcm_playback.h"
@@ -93,7 +96,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 1
+#define PLUGIN_API_VERSION 2
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -424,6 +427,12 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */     
+#ifdef RB_PROFILE
+    void (*profile_thread)(void);
+    void (*profstop)(void);
+    void (*profile_func_enter)(void *this_fn, void *call_site);
+    void (*profile_func_exit)(void *this_fn, void *call_site);
+#endif
 
 };
 

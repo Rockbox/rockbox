@@ -240,7 +240,7 @@ whichdevel () {
   #
   echo ""
   echo "Enter your developer options (press enter when done)"
-  echo "(D)EBUG, (L)ogf, (S)imulator"
+  echo "(D)EBUG, (L)ogf, (S)imulator, (P)rofiling"
   cont=1
 
   while [ $cont = "1" ]; do
@@ -249,18 +249,28 @@ whichdevel () {
 
     case $option in
       [Dd])
-        echo "define DEBUG"
-        debug="-DDEBUG"
-        GCCOPTS="$GCCOPTS -g -DDEBUG"
+        if [ "yes" = "$profile" ]; then
+          echo "Debug is incompatible with profiling"
+        else
+          echo "define DEBUG"
+          use_debug="yes"
+        fi
         ;;
       [Ll])
-        logf="yes"
         echo "logf() support enabled"
-        use_logf="#define ROCKBOX_HAS_LOGF 1"
+        logf="yes"
         ;;
       [Ss])
         echo "Simulator build enabled"
         simulator="yes"
+        ;;
+      [Pp])
+        if [ "yes" = "$use_debug" ]; then
+          echo "Profiling is incompatible with debug"
+        else
+          echo "Profiling support is enabled"
+          profile="yes"
+        fi
         ;;
       *)
         echo "done"
@@ -269,10 +279,22 @@ whichdevel () {
     esac 
   done
 
+  if [ "yes" = "$use_debug" ]; then
+    debug="-DDEBUG"
+    GCCOPTS="$GCCOPTS -g -DDEBUG"
+  fi
+  if [ "yes" = "$logf" ]; then
+    use_logf="#define ROCKBOX_HAS_LOGF 1"
+  fi
   if [ "yes" = "$simulator" ]; then
     debug="-DDEBUG"
-    extradefines="-DSIMULATOR"
+    extradefines="$extradefines -DSIMULATOR"
     whichsim
+  fi
+  if [ "yes" = "$profile" ]; then
+    extradefines="$extradefines -DRB_PROFILE"
+    PROFILE_OPTS="-finstrument-functions"
+    GCCOPTS="$GCCOPTS $GCCOPTIMIZE"
   fi
 }
 
@@ -902,6 +924,7 @@ sed > Makefile \
  -e "s,@FLASHFILE@,${flash},g" \
  -e "s,@PLUGINS@,${plugins},g" \
  -e "s,@CODECS@,${codecs},g" \
+ -e "s,@PROFILE_OPTS@,${PROFILE_OPTS},g" \
  -e "s,@GCCOPTS@,${GCCOPTS},g" \
  -e "s!@LDOPTS@!${LDOPTS}!g" \
  -e "s,@LOADADDRESS@,${loadaddress},g" \
@@ -952,6 +975,7 @@ export WINDRES=@WINDRES@
 export DLLTOOL=@DLLTOOL@
 export DLLWRAP=@DLLWRAP@
 export RANLIB=@RANLIB@
+export PROFILE_OPTS=@PROFILE_OPTS@
 export GCCOPTS=@GCCOPTS@
 export LOADADDRESS=@LOADADDRESS@
 export SIMVER=@SIMVER@

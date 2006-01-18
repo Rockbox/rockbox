@@ -363,6 +363,12 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+#ifdef RB_PROFILE
+    profile_thread,
+    profstop,
+    profile_func_enter,
+    profile_func_exit,
+#endif
 
 };
 

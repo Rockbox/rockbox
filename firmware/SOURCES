@@ -123,6 +123,9 @@ font.c
 #endif
 id3.c
 #ifndef SIMULATOR
+#ifdef RB_PROFILE
+profile.c
+#endif /* RB_PROFILE */
 hwcompat.c
 kernel.c
 rolo.c

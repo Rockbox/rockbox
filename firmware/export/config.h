@@ -174,6 +174,14 @@
 #define CODEC_SIZE 0
 #endif
 
+/* This attribute can be used to ensure that certain symbols are never profiled
+ * which can be important as profiling a function de-inlines it */
+#ifdef RB_PROFILE
+#define NO_PROF_ATTR __attribute__ ((no_instrument_function))
+#else
+#define NO_PROF_ATTR
+#endif
+
 /* IRAM usage */
 #if !defined(SIMULATOR) &&   /* Not for simulators */ \
     (((CONFIG_CPU == SH7034) && !defined(PLUGIN)) || /* SH1 archos: core only */ \
