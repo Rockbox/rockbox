@@ -396,9 +396,6 @@ bool usb_detect(void)
 #ifdef USB_GMINISTYLE
     current_status = (P5 & 0x10)?true:false;
 #endif
-#ifdef IRIVER_H300
-    current_status = (GPIO1_READ & 0x80)?true:false;
-#endif
 #ifdef USB_IPODSTYLE
     /* The following check is in the ipodlinux source, with the
        comment "USB2D_IDENT is bad" if USB2D_IDENT != 0x22FA05 */
