@@ -827,6 +827,8 @@ static void init_need_scrollbar(void) {
     draw_columns = need_scrollbar? display_columns-glyph_width['o'] : display_columns;
     par_indent_spaces = draw_columns/(5*glyph_width[' ']);
 }
+#else
+#define init_need_scrollbar()
 #endif
 
 static bool viewer_init(void)
@@ -885,10 +887,8 @@ static bool viewer_init(void)
       init file_pos, buffer_end, screen_top_ptr */
     viewer_top();
 
-#ifdef HAVE_LCD_BITMAP
     /* Init need_scrollbar value */
     init_need_scrollbar();
-#endif
 
     return true;
 }
@@ -935,9 +935,7 @@ static void viewer_load_settings(void)
             line_mode = rb->atoi(prefs->line_mode);
             view_mode = rb->atoi(prefs->view_mode);
             
-#ifdef HAVE_LCD_BITMAP
             init_need_scrollbar();
-#endif
             /* the following settings are safety checked 
              * (file may have changed on disk) 
              */
@@ -1062,9 +1060,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 if (++word_mode == WORD_MODES)
                     word_mode = 0;
 
-#ifdef HAVE_LCD_BITMAP
                 init_need_scrollbar();
-#endif
+
                 viewer_draw(col);
 
                 rb->splash(HZ, true, "%s %s",
@@ -1088,9 +1085,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                             line_mode = 0;
                 }
 
-#ifdef HAVE_LCD_BITMAP
                 init_need_scrollbar();
-#endif
+
                 viewer_draw(col);
 
                 rb->splash(HZ, true, "%s %s",
@@ -1125,9 +1121,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 }
                 ***********/
 
-#ifdef HAVE_LCD_BITMAP
                 init_need_scrollbar();
-#endif
+
                 viewer_draw(col);
 
                 rb->splash(HZ, true, "%s %s",
