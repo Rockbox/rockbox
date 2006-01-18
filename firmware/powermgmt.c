@@ -544,12 +544,12 @@ static void power_thread_sleep(int ticks)
          */
         if (!ata_disk_is_active() || usb_inserted()) {
             avgbat = avgbat - (avgbat / BATT_AVE_SAMPLES) +
-                     adc_read(ADC_UNREG_POWER);
+                     adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR;
             /*
              * battery_centivolts is the centivolt-scaled filtered battery value.
              */
-            battery_centivolts = ((avgbat / BATT_AVE_SAMPLES) *
-                                   BATTERY_SCALE_FACTOR) / 10000;
+            battery_centivolts = avgbat / BATT_AVE_SAMPLES / 10000;
+
         }
 #if defined(DEBUG_FILE) && defined(HAVE_CHARGE_CTRL)
         /*
@@ -585,8 +585,9 @@ static void power_thread(void)
 
     /* initialize the voltages for the exponential filter */
 
-    avgbat = adc_read(ADC_UNREG_POWER) * BATT_AVE_SAMPLES;
-    battery_centivolts = ((avgbat / BATT_AVE_SAMPLES) * BATTERY_SCALE_FACTOR) / 10000;
+    avgbat = adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR * 
+        BATT_AVE_SAMPLES;
+    battery_centivolts = avgbat / BATT_AVE_SAMPLES / 10000;
 
 #if defined(DEBUG_FILE) && defined(HAVE_CHARGE_CTRL)
     fd      = -1;
