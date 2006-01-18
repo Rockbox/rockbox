@@ -10,7 +10,7 @@
 INCLUDES = -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I$(FIRMDIR)/common \
  -I$(FIRMDIR)/drivers -I$(APPSDIR) -Ilib -I$(BUILDDIR)
 CFLAGS = $(GCCOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
- -DMEM=${MEMORYSIZE} -DCODEC
+ -DTARGET_ID=$(TARGET_ID) -DMEM=${MEMORYSIZE} -DCODEC
 
 ifdef APPEXTRA
    INCLUDES += $(patsubst %,-I$(APPSDIR)/%,$(subst :, ,$(APPEXTRA)))

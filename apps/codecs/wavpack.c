@@ -20,6 +20,8 @@
 #include "codeclib.h"
 #include "libwavpack/wavpack.h"
 
+CODEC_HEADER
+
 static struct codec_api *ci;
 
 #define FORCE_DSP_USE    /* fixes some WavPack bugs; adds about 12% to boost ratio
@@ -52,8 +54,6 @@ enum codec_status codec_start(struct codec_api* api)
     int bps, nchans, sr_100;
 
     /* Generic codec initialisation */
-    TEST_CODEC_API(api);
-
     ci = api;
 
 #ifdef USE_IRAM

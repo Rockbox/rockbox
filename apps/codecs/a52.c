@@ -22,6 +22,8 @@
 #include <codecs/liba52/config-a52.h>
 #include <codecs/liba52/a52.h>
 
+CODEC_HEADER
+
 #define BUFFER_SIZE 4096
 
 #define A52_SAMPLESPERFRAME (6*256)
@@ -129,7 +131,6 @@ enum codec_status codec_start(struct codec_api *api)
     int sample_loc;
 
     /* Generic codec initialisation */
-    TEST_CODEC_API(api);
     ci = api;
 
     #ifdef USE_IRAM 

@@ -21,6 +21,8 @@
 #include "Tremor/ivorbisfile.h"
 #include "Tremor/ogg.h"
 
+CODEC_HEADER
+
 static struct codec_api *rb;
 
 /* Some standard functions and variables needed by Tremor */
@@ -122,7 +124,6 @@ enum codec_status codec_start(struct codec_api *api)
     ogg_uint32_t vf_serialnos;
     ogg_int64_t vf_pcmlengths[2];
 
-    TEST_CODEC_API(api);
     rb = api;
 
     #ifdef USE_IRAM

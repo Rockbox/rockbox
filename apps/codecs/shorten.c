@@ -20,6 +20,8 @@
 #include "codeclib.h"
 #include <codecs/libffmpegFLAC/shndec.h>
 
+CODEC_HEADER
+
 #ifdef USE_IRAM
 extern char iramcopy[];
 extern char iramstart[];
@@ -50,9 +52,8 @@ enum codec_status codec_start(struct codec_api* api)
     long bytesleft;
 
     /* Generic codec initialisation */
-    TEST_CODEC_API(api);
     rb = api;
-    ci = (struct codec_api*)api;
+    ci = api;
 
 #ifdef USE_IRAM
     ci->memcpy(iramstart, iramcopy, iramend-iramstart);

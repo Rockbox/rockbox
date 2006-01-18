@@ -21,6 +21,8 @@
 #include <codecs/libmad/mad.h>
 #include <inttypes.h>
 
+CODEC_HEADER
+
 struct mad_stream stream IBSS_ATTR;
 struct mad_frame frame IBSS_ATTR;
 struct mad_synth synth IBSS_ATTR;
@@ -81,7 +83,6 @@ enum codec_status codec_start(struct codec_api *api)
     char *inputbuffer;
 
     ci = api;
-    TEST_CODEC_API(api);
 
 #ifdef USE_IRAM
     ci->memcpy(iramstart, iramcopy, iramend - iramstart);

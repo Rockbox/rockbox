@@ -19,7 +19,7 @@
 #define CODEC_SIZE 0x40000
 
 /* The number of bytes reserved for loadable plugins */
-#define PLUGIN_BUFFER_SIZE 0xC0000
+#define PLUGIN_BUFFER_SIZE 0x80000
 
 #ifndef SIMULATOR
 

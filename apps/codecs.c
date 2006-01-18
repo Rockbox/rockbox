@@ -68,13 +68,9 @@ extern unsigned char codecbuf[];
 
 extern void* plugin_get_audio_buffer(int *buffer_size);
 
-static int codec_test(int api_version, int model, int memsize);
-
 struct codec_api ci_voice;
 
 struct codec_api ci = {
-    CODEC_API_VERSION,
-    codec_test,
 
     0, /* filesize */
     0, /* curpos */
@@ -83,6 +79,8 @@ struct codec_api ci = {
     false, /* stop_codec */
     false, /* reload_codec */
     0, /* seek_time */
+    NULL,
+    NULL,
     NULL,
     NULL,
     NULL,
@@ -155,6 +153,7 @@ struct codec_api ci = {
     strcat,
     memcmp,
     strcasestr,
+    memchr,
 
     /* sound */
     sound_set,
@@ -163,9 +162,6 @@ struct codec_api ci = {
     mp3_play_pause,
     mp3_play_stop,
     mp3_is_playing,
-#if CONFIG_CODEC != SWCODEC
-    bitswap,
-#endif
 #if CONFIG_CODEC == SWCODEC
     pcm_play_data,    
     pcm_play_stop,
@@ -190,24 +186,6 @@ struct codec_api ci = {
     audio_current_track,
     audio_flush_and_reload_tracks,
     audio_get_file_pos,
-#if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
-    mpeg_get_last_header,
-#endif
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    sound_set_pitch,
-#endif
-
-#if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
-    /* MAS communication */
-    mas_readmem,
-    mas_writemem,
-    mas_readreg,
-    mas_writereg,
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    mas_codec_writereg,
-    mas_codec_readreg,
-#endif
-#endif /* !simulator and HWCODEC != SWCODEC */
 
     /* tag database */
     &tagdbheader,
@@ -227,6 +205,9 @@ struct codec_api ci = {
 #if defined(DEBUG) || defined(SIMULATOR)
     debugf,
 #endif
+#ifdef ROCKBOX_HAS_LOGF
+    logf,
+#endif
     &global_settings,
     mp3info,
     count_mp3_frames,
@@ -234,28 +215,16 @@ struct codec_api ci = {
     find_next_frame,
     battery_level,
     battery_level_safe,
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    peak_meter_scale_value,
-    peak_meter_set_use_dbfs,
-    peak_meter_get_use_dbfs,
-#endif
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
-#ifdef ROCKBOX_HAS_LOGF
-    logf,
-#endif
-
-    memchr,
-    NULL,
-    NULL,
 };
 
 int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,
                    struct codec_api *api)
 {
-    enum codec_status (*codec_start)(const struct codec_api* api);
+    struct codec_header *hdr;
     int status;
 #ifndef SIMULATOR
     int copy_n;
@@ -272,22 +241,40 @@ int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,
             memcpy(&codecbuf[copy_n], ptr2, size);
         }
     }
-    codec_start = (void*)&codecbuf;
+    hdr = (struct codec_header *)codecbuf;
         
+    if (hdr->magic != CODEC_MAGIC
+        || hdr->target_id != TARGET_ID
+        || hdr->load_addr != codecbuf
+        || hdr->end_addr > codecbuf + CODEC_SIZE) {
+        return CODEC_ERROR;
+    }
 #else /* SIMULATOR */
     int pd;
     
-    codec_start = sim_codec_load_ram(codecptr, size, ptr2, bufwrap, &pd);
+    hdr = sim_codec_load_ram(codecptr, size, ptr2, bufwrap, &pd);
     if (pd < 0)
         return CODEC_ERROR;
+
+    if (hdr == NULL
+        || hdr->magic != CODEC_MAGIC
+        || hdr->target_id != TARGET_ID
+        || hdr->entry_point == NULL) {
+        sim_codec_close(pd);
+        return CODEC_ERROR;
+    }
 #endif /* SIMULATOR */
+    if (hdr->api_version > CODEC_API_VERSION
+        || hdr->api_version < CODEC_MIN_API_VERSION) {
+        sim_codec_close(pd);
+        return CODEC_ERROR;
+    }
 
     invalidate_icache();
-    status = codec_start(api);
-#ifdef SIMULATOR
+    status = hdr->entry_point(api);
+
     sim_codec_close(pd);
-#endif
-    
+
     return status;
 }
 
@@ -316,22 +303,4 @@ int codec_load_file(const char *plugin, struct codec_api *api)
     }
 
     return codec_load_ram(codecbuf, (size_t)rc, NULL, 0, api);
-}
-
-static int codec_test(int api_version, int model, int memsize)
-{
-    if (api_version < CODEC_MIN_API_VERSION ||
-        api_version > CODEC_API_VERSION)
-        return CODEC_WRONG_API_VERSION;
-
-    (void)model;
-#if 0
-    if (model != MODEL)
-        return CODEC_WRONG_MODEL;
-#endif
-
-    if (memsize != MEM)
-        return CODEC_WRONG_MODEL;
-    
-    return CODEC_OK;
 }

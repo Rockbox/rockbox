@@ -80,31 +80,22 @@
 #define PREFIX(_x_) _x_
 #endif
 
+#define CODEC_MAGIC 0x52434F44 /* RCOD */
+
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 44
+#define CODEC_API_VERSION 1
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 44
+#define CODEC_MIN_API_VERSION 1
 
 /* codec return codes */
 enum codec_status {
     CODEC_OK = 0,
     CODEC_USB_CONNECTED,
-
-    CODEC_WRONG_API_VERSION = -1,
-    CODEC_WRONG_MODEL = -2,
-    CODEC_ERROR = -3,
+    CODEC_ERROR = -1,
 };
-
-/* compatibility test macro */
-#define TEST_CODEC_API(_api_) \
-do { \
- int _rc_ = _api_->codec_test(CODEC_API_VERSION, 1, MEM); \
- if (_rc_<0) \
-     return _rc_; \
-} while(0)
 
 /* NOTE: To support backwards compatibility, only add new functions at
          the end of the structure.  Every time you add a new function,
@@ -113,10 +104,6 @@ do { \
          version
  */
 struct codec_api {
-    /* these two fields must always be first, to ensure
-       TEST_CODEC_API will always work */
-    int version;
-    int (*codec_test)(int api_version, int model, int memsize);
 
     off_t  filesize;          /* Total file length */
     off_t  curpos;            /* Current buffer position */
@@ -158,6 +145,8 @@ struct codec_api {
     void (*advance_buffer_loc)(void *ptr);
     /* Seek file buffer to position <newpos> beginning of file. */
     bool (*seek_buffer)(off_t newpos);
+    /* Codec should call this function when it has done the seeking. */
+    void (*seek_complete)(void);
     /* Calculate mp3 seek position from given time data in ms. */
     off_t (*mp3_get_filepos)(int newtime);
     /* Request file change from file buffer. Returns true is next
@@ -165,6 +154,7 @@ struct codec_api {
        codec should exit immediately with PLUGIN_OK status. */
     bool (*request_next_track)(void);
     
+    void (*set_offset)(unsigned int value);
     /* Configure different codec buffer parameters. */
     void (*configure)(int setting, void *value);
 
@@ -228,6 +218,7 @@ struct codec_api {
     char *(*strcat)(char *s1, const char *s2);
     int (*memcmp)(const void *s1, const void *s2, size_t n);
     char *(*strcasestr) (const char* phaystack, const char* pneedle);
+    void *(*memchr)(const void *s1, int c, size_t n);
 
     /* sound */
     void (*sound_set)(int setting, int value);
@@ -236,9 +227,6 @@ struct codec_api {
     void (*mp3_play_pause)(bool play);
     void (*mp3_play_stop)(void);
     bool (*mp3_is_playing)(void);
-#if CONFIG_CODEC != SWCODEC
-    void (*bitswap)(unsigned char *data, int length);
-#endif
 #if CONFIG_CODEC == SWCODEC
     void (*pcm_play_data)(void (*get_more)(unsigned char** start, long*size));
     void (*pcm_play_stop)(void);
@@ -263,24 +251,6 @@ struct codec_api {
     struct mp3entry* (*audio_current_track)(void);
     void (*audio_flush_and_reload_tracks)(void);
     int (*audio_get_file_pos)(void);
-#if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
-    unsigned long (*mpeg_get_last_header)(void);
-#endif
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    void (*sound_set_pitch)(int pitch);        
-#endif
-
-    /* MAS communication */
-#if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
-    int (*mas_readmem)(int bank, int addr, unsigned long* dest, int len);
-    int (*mas_writemem)(int bank, int addr, const unsigned long* src, int len);
-    int (*mas_readreg)(int reg);
-    int (*mas_writereg)(int reg, unsigned int val);
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    int (*mas_codec_writereg)(int reg, unsigned int val);
-    int (*mas_codec_readreg)(int reg);
-#endif
-#endif
 
     /* tag database */
     struct tagdb_header *tagdbheader;
@@ -301,6 +271,9 @@ struct codec_api {
 #if defined(DEBUG) || defined(SIMULATOR)
     void (*debugf)(const char *fmt, ...);
 #endif
+#ifdef ROCKBOX_HAS_LOGF
+    void (*logf)(const char *fmt, ...);
+#endif
     struct user_settings* global_settings;
     bool (*mp3info)(struct mp3entry *entry, const char *filename, bool v1first);
     int (*count_mp3_frames)(int fd, int startpos, int filesize,
@@ -313,35 +286,45 @@ struct codec_api {
                                      long max_offset, unsigned long last_header);
     int (*battery_level)(void);
     bool (*battery_level_safe)(void);
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    unsigned short (*peak_meter_scale_value)(unsigned short val,
-                                             int meterwidth);
-    void (*peak_meter_set_use_dbfs)(bool use);
-    bool (*peak_meter_get_use_dbfs)(void);
-#endif
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */     
-       
-#ifdef ROCKBOX_HAS_LOGF
-    void (*logf)(const char *fmt, ...);
-#endif
 
-    void *(*memchr)(const void *s1, int c, size_t n);
-    void (*set_offset)(unsigned int value);
-    /* Codec should call this function when it has done the seeking. */
-    void (*seek_complete)(void);
 };
 
+/* codec header */
+struct codec_header {
+    unsigned long magic;
+    unsigned short target_id;
+    unsigned short api_version;
+    unsigned char *load_addr;
+    unsigned char *end_addr;
+    enum codec_status(*entry_point)(struct codec_api*);
+};
+#ifdef CODEC
+#ifndef SIMULATOR
+/* plugin_* is correct, codecs use the plugin linker script */
+extern unsigned char plugin_start_addr[];
+extern unsigned char plugin_end_addr[];
+#define CODEC_HEADER \
+        const struct codec_header __header \
+        __attribute__ ((section (".header")))= { \
+        CODEC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
+        plugin_start_addr, plugin_end_addr, codec_start };
+#else /* SIMULATOR */
+#define CODEC_HEADER \
+        const struct codec_header __header = { \
+        CODEC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
+        NULL, NULL, codec_start };
+#endif
+#endif
+
 /* defined by the codec loader (codec.c) */
-#if CONFIG_CODEC == SWCODEC
 int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,
                    struct codec_api *api);
 int codec_load_file(const char* codec, struct codec_api *api);
-#endif
 
 /* defined by the codec */
-enum codec_status codec_start(struct codec_api* rockbox)
-    __attribute__ ((section (".entry")));
+enum codec_status codec_start(struct codec_api* rockbox);
 
 #endif

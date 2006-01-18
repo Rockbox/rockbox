@@ -20,6 +20,8 @@
 #include "codeclib.h"
 #include <codecs/libmusepack/musepack.h>
 
+CODEC_HEADER
+
 mpc_decoder decoder;
 
 /* Our implementations of the mpc_reader callback functions. */
@@ -82,7 +84,6 @@ enum codec_status codec_start(struct codec_api *api)
     mpc_reader reader;
     mpc_streaminfo info;
     
-    TEST_CODEC_API(api);
     #ifdef USE_IRAM 
     ci->memcpy(iramstart, iramcopy, iramend - iramstart);
     ci->memset(iedata, 0, iend - iedata);

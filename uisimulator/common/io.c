@@ -306,20 +306,20 @@ int sim_fsync(int fd)
 void *sim_codec_load_ram(char* codecptr, int size,
         void* ptr2, int bufwrap, int *pd_fd)
 {
-    void *pd;
-    char *path = "archos/_temp_codec.dll";
-    int (*codec_start)(void * api);
+    void *pd, *hdr;
+    const char *path = "archos/_temp_codec.dll";
     int fd;
     int copy_n;
 #ifdef WIN32
     char buf[256];
 #endif
 
+    *pd_fd = 0;
+
     /* We have to create the dynamic link library file from ram
-     * so we could simulate the codec loading.
-     */
-    *pd_fd = -1;
-    fd = open(path, O_WRONLY | O_CREAT, S_IRWXU);
+       so we could simulate the codec loading. */
+
+    fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
     if (fd < 0) {
         DEBUGF("failed to open for write: %s\n", path);
         return NULL;
@@ -341,7 +341,7 @@ void *sim_codec_load_ram(char* codecptr, int size,
         }
     }
     close(fd);
-    
+
     /* Now load the library. */
     pd = dlopen(path, RTLD_NOW);
     if (!pd) {
@@ -357,17 +357,12 @@ void *sim_codec_load_ram(char* codecptr, int size,
         return NULL;
     }
 
-    codec_start = dlsym(pd, "codec_start");
-    if (!codec_start) {
-        codec_start = dlsym(pd, "_codec_start");
-        if (!codec_start) {
-            dlclose(pd);
-            return NULL;
-        }
-    }
+    hdr = dlsym(pd, "__header");
+    if (!hdr)
+        hdr = dlsym(pd, "___header");
 
     *pd_fd = (int)pd;
-    return codec_start;
+    return hdr;       /* maybe NULL if symbol not present */
 }
 
 void sim_codec_close(int pd)

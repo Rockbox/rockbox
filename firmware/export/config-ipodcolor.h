@@ -38,7 +38,7 @@
 #define CODEC_SIZE 0x80000
 
 /* The number of bytes reserved for loadable plugins */
-#define PLUGIN_BUFFER_SIZE 0xC0000
+#define PLUGIN_BUFFER_SIZE 0x80000
 
 /* Define this if you have the WM8975 audio codec */
 #define HAVE_WM8975

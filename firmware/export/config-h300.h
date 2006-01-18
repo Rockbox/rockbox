@@ -46,7 +46,7 @@
 #define CODEC_SIZE 0x80000
 
 /* The number of bytes reserved for loadable plugins */
-#define PLUGIN_BUFFER_SIZE 0xC0000
+#define PLUGIN_BUFFER_SIZE 0x80000
 
 #define CONFIG_TUNER TEA5767
 #define CONFIG_TUNER_XTAL 32768

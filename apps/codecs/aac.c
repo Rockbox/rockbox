@@ -23,6 +23,8 @@
 #include "libfaad/structs.h"
 #include "libfaad/decoder.h"
 
+CODEC_HEADER
+
 #ifndef SIMULATOR
 extern char iramcopy[];
 extern char iramstart[];
@@ -51,10 +53,8 @@ enum codec_status codec_start(struct codec_api* api)
     int16_t* decodedbuffer;
 
     /* Generic codec initialisation */
-    TEST_CODEC_API(api);
-
     rb = api;
-    ci = (struct codec_api*)api;
+    ci = api;
 
 #ifndef SIMULATOR
     rb->memcpy(iramstart, iramcopy, iramend-iramstart);
