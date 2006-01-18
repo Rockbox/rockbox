@@ -24,7 +24,6 @@ SECTIONS
     } > OVERLAY_RAM
 
     .text : {
-        *(.entry)
         *(.text)
     } > OVERLAY_RAM
 

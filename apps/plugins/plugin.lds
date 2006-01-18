@@ -72,7 +72,6 @@ SECTIONS
 
     .text :
     {
-        KEEP(*(.entry))
         *(.text*)
 #if (CONFIG_CPU==PP5020) || (CONFIG_CPU==PNX0101)
         *(.glue_7)
