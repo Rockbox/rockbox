@@ -840,7 +840,6 @@ static void audio_fill_file_buffer(void)
         rc = read(current_fd, &filebuf[buf_widx], rc);
         if (rc <= 0) {
             tracks[track_widx].filerem = 0;
-            strip_id3v1_tag();
             break ;
         }
         
@@ -854,6 +853,11 @@ static void audio_fill_file_buffer(void)
         filebufused += rc;
         fill_bytesleft -= rc;
     }
+
+    if (tracks[track_widx].filerem == 0) {
+        strip_id3v1_tag();
+    }
+
     mutex_unlock(&mutex_bufferfill);
     
     /*logf("Filled:%d/%d", tracks[track_widx].available,
