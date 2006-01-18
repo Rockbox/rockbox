@@ -54,9 +54,6 @@
 
 char version[] = APPSVERSION;
 
-#include "rockbox-16bit.h"
-#include "ipodlinux-16bit.h"
-
 typedef struct _image {
     unsigned type;              /* '' */
     unsigned id;                /* */
@@ -347,19 +344,11 @@ void* main(void)
     button_init();
 #endif
 
-    /* Notes: iPod Color/Photo LCD is 220x176, Nano is 176x138 */
-
-    /* Display the 42x47 pixel iPodLinux logo */
-    lcd_bitmap(ipllogo, 20,6, 42,47);
-
-    /* Display the 100x31 pixel Rockbox logo */
-    lcd_bitmap(rockboxlogo, 74,16, 100,31);
-
-    line=7;
+    line=0;
 
     lcd_setfont(FONT_SYSFIXED);
 
-    lcd_puts(0, line++, "iPodLinux/Rockbox boot loader");
+    lcd_puts(0, line++, "Rockbox boot loader");
     snprintf(buf, sizeof(buf), "Version: 20%s", version);
     lcd_puts(0, line++, buf);
     snprintf(buf, sizeof(buf), "IPOD version: 0x%08x", IPOD_HW_REVISION);
