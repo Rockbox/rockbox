@@ -168,17 +168,14 @@ void usb_enable(bool on)
        into Apple's flash-based disk-mode.  This does not return. */
     if (on)
     {
-        /* The following code is copied from ipodlinux - it doesn't work on the 
-           iPod Video */
+      /* The following code is copied from ipodlinux */
+#ifdef APPLE_IPODCOLOR
         unsigned char* storage_ptr = (unsigned char *)0x40017F00;
-        char* diskmode = "diskmode\0";
-        char* hotstuff = "hotstuff\0";
-
-        memcpy(storage_ptr, diskmode, 9);
-        storage_ptr = (unsigned char *)0x40017f08;
-        memcpy(storage_ptr, hotstuff, 9);
-        outl(1, 0x40017F10);
-        outl(inl(0x60006004) | 0x4, 0x60006004);
+#elif defined(APPLE_IPODNANO) || defined(APPLE_IPODVIDEO)
+        unsigned char* storage_ptr = (unsigned char *)0x4001FF00;
+#endif
+        memcpy(storage_ptr, "diskmode\0\0hotstuff\0\0\1", 21);
+        DEV_RS |= 4; /* Reboot */
     }
 #elif defined(USB_ISP1582)
     /* TODO: Implement USB_ISP1582 */
