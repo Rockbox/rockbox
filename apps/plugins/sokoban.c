@@ -31,9 +31,9 @@ PLUGIN_HEADER
 
 #define ROWS                16
 #define COLS                20
+/* Use all but 8k of the plugin buffer for board data */
+#define MAX_BUFFERED_BOARDS (PLUGIN_BUFFER_SIZE - 0x2000)/(16*20)
 #define MAX_UNDOS           5
-
-#define SOKOBAN_LEVEL_SIZE (ROWS*COLS)
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
@@ -87,21 +87,24 @@ PLUGIN_HEADER
 
 #endif
 
-#if LCD_DEPTH > 1
 #ifdef HAVE_LCD_COLOR
-#define MEDIUM_GRAY LCD_RGBPACK(127, 127, 127)
-#else
+#define WALL_COLOR         LCD_RGBPACK(16,20,180)     /* Color of the walls */
+#define FREE_TARGET_COLOR  LCD_RGBPACK(251,158,25)    /* Color of a 'target' without a block on top */
+#define USED_TARGET_COLOR  LCD_RGBPACK(255,255,255)   /* Color of a 'target' with a block on top */
+#define FREE_BLOCK_COLOR   LCD_RGBPACK(22,130,53)     /* Color of a block when it's not on a 'target' */
+#define USED_BLOCK_COLOR   LCD_RGBPACK(22,130,53)     /* Color of a block when it is on a 'target' */
+#define CHAR_COLOR         LCD_BLACK                  /* Color of the 'character' */
+
+#elif LCD_DEPTH > 1
 #define MEDIUM_GRAY LCD_BRIGHTNESS(127)
-#endif
 #endif
 
 static void init_undo(void);
 static void undo(void);
 static void add_undo(int button);
 
-static int get_level(char *level, int level_size);
-static int get_level_count(void);
-static int load_level(void);
+static int read_levels(int initialize_count);
+static void load_level(void);
 static void draw_level(void);
 
 static void init_boards(void);
@@ -135,6 +138,10 @@ struct Undo {
     struct Location location[3];
 };
 
+struct Board {
+    char spaces[ROWS][COLS];
+};
+
 /* Our full undo history */
 static struct UndoInfo {
     short count;    /* How many undos are there in history */
@@ -148,9 +155,13 @@ static struct BoardInfo {
     struct LevelInfo level;
     struct Location player;
     int max_level;               /* How many levels do we have? */
-    int level_offset;            /* Where in the level file is this level */
     int loaded_level;            /* Which level is in memory */
 } current_info;
+
+static struct BufferedBoards {
+    struct Board levels[MAX_BUFFERED_BOARDS];
+    int low;
+} buffered_boards;
 
 static struct plugin_api* rb;
 
@@ -290,125 +301,97 @@ static void init_boards(void)
     current_info.player.col = 0;
     current_info.player.spot = ' ';
     current_info.max_level = 0;
-    current_info.level_offset = 0;
     current_info.loaded_level = 0;
+  
+    buffered_boards.low = 0;
 
     init_undo();
 }
 
-static int get_level_count(void) 
+static int read_levels(int initialize_count) 
 {
     int fd = 0;
+    int len;
     int lastlen = 0;
+    int row = 0;
+    int level_count = 0;
     char buffer[COLS + 3]; /* COLS plus CR/LF and \0 */
+    int endpoint = current_info.level.level-1;
 
+    if (endpoint < buffered_boards.low)
+        endpoint = current_info.level.level - MAX_BUFFERED_BOARDS;
+
+    if (endpoint < 0) endpoint = 0;
+   
+    buffered_boards.low = endpoint;
+    endpoint += MAX_BUFFERED_BOARDS;
+ 
     if ((fd = rb->open(LEVELS_FILE, O_RDONLY)) < 0) {
         rb->splash(0, true, "Unable to open %s", LEVELS_FILE);
         return -1;
     }
-
-    while(1) {
-        int len = rb->read_line(fd, buffer, sizeof(buffer));
-        if(len <= 0)
-            break;
-
-        /* Two short lines in a row means new level */
-        if(len < 3 && lastlen < 3)
-            current_info.max_level++;
-
-        lastlen = len;
-    }
-
-    rb->close(fd);
-    return 0;
-}
-
-static int get_level(char *level, int level_size) 
-{
-    int fd = 0, i = 0;
-    int nread = 0;
-    int count = 0;
-    int lastlen = 0;
-    int level_ct = 1;
-    unsigned char buffer[SOKOBAN_LEVEL_SIZE * 2];
-    bool level_found = false;
-
-    /* open file */
-    if ((fd = rb->open(LEVELS_FILE, O_RDONLY)) < 0)
-        return -1;
-
-    /* Lets not reparse the full file if we can avoid it */
-    if (current_info.loaded_level < current_info.level.level) {
-        rb->lseek(fd, current_info.level_offset, SEEK_SET);
-        level_ct = current_info.loaded_level;
-    }
-
-    if(current_info.level.level > 1) {
-        while(!level_found) {
-            int len = rb->read_line(fd, buffer, SOKOBAN_LEVEL_SIZE);
-            if(len <= 0) {
-                rb->close(fd);
+ 
+    do {
+        len = rb->read_line(fd, buffer, sizeof(buffer));
+        if (len >= 3) {
+            /* This finds lines that are more than 1 or 2 characters
+             * shorter than they should be.  Due to the possibility of
+             * a mixed unix and dos CR/LF file format, I'm not going to
+             * do a precise check */
+            if (len < COLS) {
+                rb->splash(0, true, "Error in levels file: short line");
                 return -1;
             }
-            
-            /* Two short lines in a row means new level */
-            if(len < 3 && lastlen < 3) {
-                level_ct++;
-                if(level_ct == current_info.level.level)
-                    level_found = true;
+            if (level_count >= buffered_boards.low && level_count < endpoint) {
+                int index = level_count - buffered_boards.low;
+                rb->memcpy(
+                        buffered_boards.levels[index].spaces[row],buffer,COLS);
             }
-            lastlen = len;
+            row++;
+        } else if (len) {
+            if (lastlen < 3) {
+                /* Two short lines in a row means new level */
+                level_count++;
+                if (level_count >= endpoint && !initialize_count) break;
+                if (level_count && row != ROWS) {
+                    rb->splash(0, true, "Error in levels file: short board");
+                    return -1;
+                }
+                row = 0;
+            }
         }
-    }
+    } while ((lastlen=len));
 
-    /* Remember the current offset */
-    current_info.level_offset = rb->lseek(fd, 0, SEEK_CUR);
-    
-    /* read a full buffer chunk from here */
-    nread = rb->read(fd, buffer, sizeof(buffer)-1);
-    if (nread < 0)
-        return -1;
-    buffer[nread] = 0;
-    
     rb->close(fd);
-    
-    /* If we read less then a level, error */
-    if (nread < level_size)
-        return -1;
-    
-    /* Load our new level */
-    for(i=0, count=0; (count < nread) && (i<level_size);) {
-        if (buffer[count] != '\n' && buffer[count] != '\r')
-            level[i++] = buffer[count];
-        count++;
+    if (initialize_count) {
+        /* Plus one because there aren't trailing short lines in the file */
+        current_info.max_level = level_count + 1;
     }
-    level[i] = 0;
-
-    current_info.loaded_level = current_info.level.level;
     return 0;
 }
-
+ 
 /* return non-zero on error */
-static int load_level(void)
+static void load_level(void)
 {
-    short c = 0;
-    short r = 0;
-    short i = 0;
-    char level[ROWS*COLS+1];
-    int x = 0;
+    int c = 0;
+    int r = 0;
+    int index = current_info.level.level - buffered_boards.low - 1;
+    struct Board *level;
+    
+    if (index < 0 || index >= MAX_BUFFERED_BOARDS) {
+        read_levels(false);
+        index=index<0?MAX_BUFFERED_BOARDS-1:0;
+    }
+    level = &buffered_boards.levels[index];
 
     current_info.player.spot=' ';
     current_info.level.boxes_to_go = 0;
     current_info.level.moves = 0;
+    current_info.loaded_level = current_info.level.level;
 
-    if (get_level(level, sizeof(level)) != 0)
-        return -1;
-
-    i = 0;
     for (r = 0; r < ROWS; r++) {
-        x++;
-        for (c = 0; c < COLS; c++, i++) {
-            current_info.board[r][c] = level[i];
+        for (c = 0; c < COLS; c++) {
+            current_info.board[r][c] = level->spaces[r][c];
             
             if (current_info.board[r][c] == '.')
                 current_info.level.boxes_to_go++;
@@ -419,8 +402,6 @@ static int load_level(void)
             }
         }
     }
-
-    return 0;
 }
 #define STAT_WIDTH (LCD_WIDTH-(COLS * magnify))
 
@@ -429,9 +410,11 @@ static void update_screen(void)
     int b = 0, c = 0;
     int rows = 0, cols = 0;
     char s[25];
-    
-#if LCD_HEIGHT >= 128
-    int magnify = 6;
+
+#if LCD_HEIGHT == 128        /* magnify is the number of pixels for each block */
+    int magnify = 6;         /* 6 on h1x0, 9 on h3x0, and 4 on everything else */
+#elif LCD_HEIGHT >= 176
+    int magnify = 9;
 #else
     int magnify = 4;
 #endif
@@ -447,7 +430,11 @@ static void update_screen(void)
                 break;
 
             case '#': /* this is a wall */
-#if LCD_DEPTH > 1
+#if HAVE_LCD_COLOR
+                rb->lcd_set_foreground(WALL_COLOR);
+                rb->lcd_fillrect(c, b, magnify, magnify);
+                rb->lcd_set_foreground(LCD_BLACK);
+#elif LCD_DEPTH > 1
                 rb->lcd_set_foreground(MEDIUM_GRAY);
                 rb->lcd_fillrect(c, b, magnify, magnify);
                 rb->lcd_set_foreground(LCD_BLACK);
@@ -463,12 +450,21 @@ static void update_screen(void)
                 break;
 
             case '.': /* this is a home location */
-                rb->lcd_drawrect(c+(magnify/2)-1, b+(magnify/2)-1, magnify/2, 
+#ifdef HAVE_LCD_COLOR
+                rb->lcd_set_foreground(FREE_TARGET_COLOR);
+                rb->lcd_fillrect(c+(magnify/2)-1, b+(magnify/2)-1, magnify/2,
                                  magnify/2);
+#else
+                rb->lcd_drawrect(c+(magnify/2)-1, b+(magnify/2)-1, magnify/2,
+                                 magnify/2);
+#endif
                 break;
 
             case '$': /* this is a box */
-                rb->lcd_drawrect(c, b, magnify, magnify);
+#ifdef HAVE_LCD_COLOR
+                rb->lcd_set_foreground(FREE_BLOCK_COLOR);
+#endif
+                rb->lcd_drawrect(c, b, magnify, magnify);  /* Free boxes are not filled in */
                 break;
 
             case '@': /* this is you */
@@ -476,7 +472,9 @@ static void update_screen(void)
                     int max = magnify - 1;
                     int middle = max / 2;
                     int ldelta = (middle + 1) / 2;
-
+#ifdef HAVE_LCD_COLOR
+                    rb->lcd_set_foreground(CHAR_COLOR);
+#endif
                     rb->lcd_drawline(c, b+middle, c+max, b+middle);
                     rb->lcd_drawline(c+middle, b, c+middle, b+max-ldelta);
                     rb->lcd_drawline(c+max-middle, b, 
@@ -489,14 +487,25 @@ static void update_screen(void)
                 break;
 
             case '%': /* this is a box on a home spot */ 
+
+#ifdef HAVE_LCD_COLOR
+                rb->lcd_set_foreground(USED_BLOCK_COLOR);
+                rb->lcd_fillrect(c, b, magnify, magnify);
+#else
                 rb->lcd_drawrect(c, b, magnify, magnify);
+#endif
+#ifdef HAVE_LCD_COLOR
+                rb->lcd_set_foreground(USED_TARGET_COLOR);
+                rb->lcd_fillrect(c+(magnify/2)-1, b+(magnify/2)-1, magnify/2,
+                                 magnify/2);
+#else
                 rb->lcd_drawrect(c+(magnify/2)-1, b+(magnify/2)-1, magnify/2,
                                  magnify/2);
+#endif
                 break;
             }
         }
     }
-    
 
     rb->snprintf(s, sizeof(s), "%d", current_info.level.level);
     rb->lcd_putsxy(LCD_WIDTH-STAT_WIDTH+4, 22, s);
@@ -877,11 +886,14 @@ static bool sokoban_loop(void)
             rb->lcd_clear_display();
 
             if (current_info.level.level > current_info.max_level) {
-                rb->lcd_putsxy(10, 20, "You WIN!!");
+                /* Center "You WIN!!" on all screen sizes */
+                rb->lcd_putsxy(LCD_WIDTH/2 - 27,(LCD_HEIGHT/2) - 4 , 
+                               "You WIN!!");
 
                 rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+                /* Pattern Fills whole screen now on all screen sizes */
                 for (i = 0; i < 30000 ; i++) {
-                    rb->lcd_fillrect(0, 0, 111, 63);
+                    rb->lcd_fillrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
                     rb->lcd_update();
 
                     button = rb->button_get(false);
@@ -934,24 +946,24 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_clear_display();
 
 #if CONFIG_KEYPAD == RECORDER_PAD
-    rb->lcd_putsxy(3,  6, "[OFF] To Stop");
-    rb->lcd_putsxy(3, 16, "[ON] To Undo");
-    rb->lcd_putsxy(3, 26, "[F1] - Level");
-    rb->lcd_putsxy(3, 36, "[F2] Same Level");
-    rb->lcd_putsxy(3, 46, "[F3] + Level");
+    rb->lcd_putsxy(3,  6, "[OFF] Quit");
+    rb->lcd_putsxy(3, 16, "[ON] Undo");
+    rb->lcd_putsxy(3, 26, "[F1] Down a Level");
+    rb->lcd_putsxy(3, 36, "[F2] Restart Level");
+    rb->lcd_putsxy(3, 46, "[F3] Up a Level");
 #elif CONFIG_KEYPAD == ONDIO_PAD
-    rb->lcd_putsxy(3,  6, "[OFF] To Stop");
-    rb->lcd_putsxy(3, 16, "[MODE] To Undo");
-    rb->lcd_putsxy(3, 26, "[M-LEFT] - Level");
-    rb->lcd_putsxy(3, 36, "[M-UP] Same Level");
-    rb->lcd_putsxy(3, 46, "[M-RIGHT] + Level");
+    rb->lcd_putsxy(3,  6, "[OFF] Quit");
+    rb->lcd_putsxy(3, 16, "[MODE] Undo");
+    rb->lcd_putsxy(3, 26, "[M-LEFT] Down a Level");
+    rb->lcd_putsxy(3, 36, "[M-UP] Restart Level");
+    rb->lcd_putsxy(3, 46, "[M-RIGHT] Up Level");
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
-    rb->lcd_putsxy(3,  6, "[STOP] To Stop");
-    rb->lcd_putsxy(3, 16, "[PLAY] To Undo");
-    rb->lcd_putsxy(3, 26, "[REC] - Level");
-    rb->lcd_putsxy(3, 36, "[SELECT] Same Level");
-    rb->lcd_putsxy(3, 46, "[MODE] + Level");
+    rb->lcd_putsxy(3,  6, "[STOP] Stop");
+    rb->lcd_putsxy(3, 16, "[PLAY] Undo");
+    rb->lcd_putsxy(3, 26, "[REC] Down a Level");
+    rb->lcd_putsxy(3, 36, "[SELECT] Restart Level");
+    rb->lcd_putsxy(3, 46, "[MODE] + Up a Level");
 #endif
 
     rb->lcd_update();
@@ -960,7 +972,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     init_boards();
 
-    if (get_level_count() != 0) {
+    if (read_levels(1) != 0) {
         rb->splash(HZ*2, true, "Failed loading levels!");
         return PLUGIN_OK;
     }
