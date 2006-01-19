@@ -1119,6 +1119,34 @@ void irq(void)
 }
 #endif
 
+static const char* const uiename[] = {
+    "Undefined instruction", "Prefetch abort", "Data abort"
+};
+
+/* Unexpected Interrupt or Exception handler. Currently only deals with
+   exceptions, but will deal with interrupts later.
+ */
+void UIE(unsigned int pc, unsigned int num)
+{
+    char str[32];
+    
+    lcd_clear_display();
+#ifdef HAVE_LCD_BITMAP
+    lcd_setfont(FONT_SYSFIXED);
+#endif
+    lcd_puts(0, 0, uiename[num]);
+    snprintf(str, sizeof(str), "at %08x", pc);
+    lcd_puts(0, 1, str);
+    lcd_update();
+    
+    while (1)
+    {
+        /* TODO: perhaps add button handling in here when we get a polling
+           driver some day.
+         */
+    }
+}
+
 /* TODO: The following two function have been lifted straight from IPL, and
    hence have a lot of numeric addresses used straight. I'd like to use
    #defines for these, but don't know what most of them are for or even what
