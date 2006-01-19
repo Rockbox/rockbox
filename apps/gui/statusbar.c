@@ -127,7 +127,9 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 #endif /* HAVE_LCD_CHARCELLS */
 
     bar->info.volume = sound_val2phys(SOUND_VOLUME, global_settings.volume);
+#ifdef HAVE_CHARGING
     bar->info.inserted = (charger_input_state == CHARGER);
+#endif
     bar->info.battlevel = battery_level();
     bar->info.battery_safe = battery_level_safe();
 

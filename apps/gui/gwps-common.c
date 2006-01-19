@@ -652,7 +652,8 @@ static char* get_tag(struct wps_data* wps_data,
                         strncpy(buf, "?h ?m", buf_size);
                     return buf;
                 }
-                
+
+#ifdef HAVE_CHARGING             
 		case 'p': /* External power plugged in? */
 		{
 		    if(charger_input_state==CHARGER)
@@ -660,6 +661,7 @@ static char* get_tag(struct wps_data* wps_data,
 		    else
 			return NULL;
 		}
+#endif
 #if defined(HAVE_CHARGE_CTRL) || \
     defined (HAVE_CHARGE_STATE) || \
     CONFIG_BATTERY == BATT_LIION2200
