@@ -547,13 +547,29 @@ void remote_backlight_set_timeout(int index) {(void)index;}
 #endif /* #ifdef CONFIG_BACKLIGHT */
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
+#ifdef IRIVER_H300_SERIES
 void backlight_set_brightness(int val)
 {
     /* set H300 brightness by changing the PWM
-       accepts 0..15 but note that 0 and 1 gives a black display! */
-    if(val < MIN_BRIGHTNESS_SETTING)
-            val = MIN_BRIGHTNESS_SETTING;
-    pcf50606_set_bl_pwm(val & 0xf);
+       accepts 0..15 but note that 0 and 1 give a black display! */
+    val &= 0x0F;
+    if(val<MIN_BRIGHTNESS_SETTING)
+        val=MIN_BRIGHTNESS_SETTING;
+
+    /* shift one bit left */
+    val <<= 1;
+
+    /* enable PWM */
+    val |= 0x01;
+
+    /* disable IRQs while bitbanging */
+    int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
+
+    pcf50606_write(0x35, val);
+
+    /* enable IRQs again */
+    set_irq_level(old_irq_level);
 }
+#endif
 #endif
 

@@ -44,8 +44,6 @@
 /* delay loop to achieve 400kHz at 120MHz CPU frequency */
 #define DELAY    do { int _x; for(_x=0;_x<22;_x++);} while(0)
 
-void pcf50606_set_bl_pwm(unsigned char ucVal);
-
 static void pcf50606_i2c_start(void)
 {
     SDA_OUTPUT;
@@ -285,24 +283,5 @@ void pcf50606_init(void)
     pcf50606_write(0x09, 0x05); /* USB and ON key debounce: 14ms */
     pcf50606_write(0x29, 0x1C); /* Disable the unused MBC module */
     
-     /* Backlight PWM = 512Hz 50/50 */
-    /*pcf50606_write(0x35, 0x13);*/
-    pcf50606_set_bl_pwm(9);
-}
-
-void pcf50606_set_bl_pwm(unsigned char ucVal)
-{
-    /* set the backlight PWM */
-    /* range is 0 - 15 */
-
-    /* limit incoming value */
-    ucVal = ucVal & 0x0F;   
-
-    /* shift one bit left */
-    ucVal = ucVal << 1;
-    ucVal = ucVal | 0x01;
-
-    /* 0x00 = 512Hz */
-    ucVal = ucVal | 0x00;   
-    pcf50606_write(0x35, ucVal);
+    pcf50606_write(0x35, 0x13); /* Backlight PWM = 512Hz 50/50 */
 }
