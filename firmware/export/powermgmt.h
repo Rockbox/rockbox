@@ -87,8 +87,8 @@ typedef enum {
     CHARGING,
 #ifdef HAVE_CHARGE_CTRL
     TOPOFF,
-    TRICKLE
 #endif
+    TRICKLE
 } charge_state_type;
 
 /* tells what the charger is doing */
