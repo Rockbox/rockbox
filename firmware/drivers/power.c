@@ -104,33 +104,26 @@ void power_init(void)
 #endif
 }
 
+#ifdef HAVE_CHARGING
 bool charger_inserted(void)
 {     
 #if CONFIG_CPU == MCF5249
     return (GPIO1_READ & 0x00400000)?true:false;
 #elif defined(GMINI_ARCH)
     return (P7 & 0x80) == 0;
-#else
-#ifdef HAVE_CHARGING
-#ifdef HAVE_CHARGE_CTRL
+#elif defined(HAVE_CHARGE_CTRL)
     /* Recorder */
     return adc_read(ADC_EXT_POWER) > 0x100;
-#else
-#ifdef HAVE_FMADC
+#elif defined (HAVE_FMADC)
     /* FM or V2, can also charge from the USB port */
     return (adc_read(ADC_CHARGE_REGULATOR) < 0x1FF) ||
         (adc_read(ADC_USB_POWER) < 0x1FF);
 #else
     /* Player */
     return (PADR & 1) == 0;
-#endif /* HAVE_FMADC */
-#endif /* HAVE_CHARGE_CTRL */
-#else
-    /* Ondio */
-    return false;
-#endif /* HAVE_CHARGING */
 #endif
 }
+#endif /* HAVE_CHARGING */
 
 #ifdef HAVE_CHARGE_CTRL
 void charger_enable(bool on)

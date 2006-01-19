@@ -1333,11 +1333,13 @@ static bool view_runtime(void)
 #endif
 
         if (state & 1) {
+#ifdef HAVE_CHARGING
             if (charger_inserted())
             {
                 global_settings.runtime = 0;
             }
             else
+#endif
             {
                 global_settings.runtime += ((current_tick - lasttime) / HZ);
             }
