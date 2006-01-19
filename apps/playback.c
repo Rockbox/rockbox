@@ -1527,7 +1527,12 @@ static int skip_next_track(void)
     {
         logf("Loading from disk...");
         ci.reload_codec = true;
-        //queue_post(&audio_queue, AUDIO_PLAY, 0);
+        /* Stop playback if manual track change. */
+        if (new_track != 0 && !pcmbuf_is_crossfade_enabled())
+            pcmbuf_play_stop();
+        
+        /* Don't flush buffer */
+        queue_post(&audio_queue, AUDIO_PLAY, (bool *)false);
         return SKIP_OK_DISK;
     }
     
@@ -1559,7 +1564,12 @@ static int skip_previous_track(void)
         /*+ (off_t)tracks[track_ridx].codecsize*/ > filebuflen) {
         logf("Loading from disk...");
         ci.reload_codec = true;
-        queue_post(&audio_queue, AUDIO_PLAY, 0);
+        /* Stop playback. */
+        /* FIXME: Only stop playback if disk is not spinning! */
+        if (!pcmbuf_is_crossfade_enabled())
+            pcmbuf_play_stop();
+        
+        queue_post(&audio_queue, AUDIO_PLAY, (bool *)true);
         return SKIP_OK_DISK;
     }
     
@@ -1597,8 +1607,8 @@ static void audio_change_track(void)
     
     ci.reload_codec = false;
     /* Needed for fast skipping. */
-    if (cur_ti->codecsize > 0)
-        queue_post(&codec_queue, CODEC_LOAD, 0);
+    //if (cur_ti->codecsize > 0)
+    //    queue_post(&codec_queue, CODEC_LOAD, 0);
 }
 
 bool codec_request_next_track_callback(void)
@@ -1644,7 +1654,7 @@ bool codec_request_next_track_callback(void)
         if (cur_ti->codecsize == 0)
         {
             logf("Loading from disk [2]...");
-            queue_post(&audio_queue, AUDIO_PLAY, 0);
+            queue_post(&audio_queue, AUDIO_PLAY, (bool *)(new_track != 0));
         }
         else
             ci.reload_codec = true;
@@ -1682,7 +1692,7 @@ static void initiate_track_change(int peek_index)
 {
     /* Detect if disk is spinning or already loading. */
     if (filling || ci.reload_codec || !audio_codec_loaded) {
-        queue_post(&audio_queue, AUDIO_PLAY, 0);
+        queue_post(&audio_queue, AUDIO_PLAY, (bool *)true);
     } else {
         new_track = peek_index;
         ci.reload_codec = true;
@@ -1698,7 +1708,7 @@ static void initiate_dir_change(int direction)
     if(!playlist_next_dir(direction))
         return;
 
-    queue_post(&audio_queue, AUDIO_PLAY, 0);
+    queue_post(&audio_queue, AUDIO_PLAY, (bool *)true);
 
     codec_track_changed();
 }
@@ -1725,7 +1735,7 @@ void audio_thread(void)
         if (ev.id == SYS_TIMEOUT && play_pending)
         {
             ev.id = AUDIO_PLAY;
-            ev.data = 0;
+            ev.data = (bool *)1;
         }
         
         switch (ev.id) {
@@ -1760,7 +1770,11 @@ void audio_thread(void)
                 ci.stop_codec = true;
                 ci.reload_codec = false;
                 ci.seek_time = 0;
-                pcmbuf_crossfade_init();
+
+                /* Only flush audio if it has been requested. */
+                if ((bool)ev.data)
+                    pcmbuf_crossfade_init();
+                
                 while (audio_codec_loaded)
                     yield();
                 audio_play_start((int)ev.data);
