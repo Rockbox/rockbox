@@ -32,7 +32,8 @@ PLUGIN_HEADER
 #define ROWS                16
 #define COLS                20
 /* Use all but 8k of the plugin buffer for board data */
-#define MAX_BUFFERED_BOARDS (PLUGIN_BUFFER_SIZE - 0x2000)/(16*20)
+#define SOKOBAN_LEVEL_SIZE  (ROWS*COLS)
+#define MAX_BUFFERED_BOARDS (PLUGIN_BUFFER_SIZE - 0x2000)/SOKOBAN_LEVEL_SIZE
 #define MAX_UNDOS           5
 
 /* variable button definitions */
@@ -895,6 +896,7 @@ static bool sokoban_loop(void)
                 for (i = 0; i < 30000 ; i++) {
                     rb->lcd_fillrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
                     rb->lcd_update();
+                    rb->sleep(HZ/20);
 
                     button = rb->button_get(false);
                     if (button && ((button & BUTTON_REL) != BUTTON_REL))
