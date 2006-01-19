@@ -284,7 +284,7 @@ static void button_tick(void)
 #else
                             if (btn == POWEROFF_BUTTON &&
 #endif
-#ifndef HAVE_POWEROFF_WHILE_CHARGING
+#if defined(HAVE_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
                                 !charger_inserted() &&
 #endif
                                 repeat_count > POWEROFF_COUNT)
