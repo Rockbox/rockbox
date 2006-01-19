@@ -653,15 +653,17 @@ static char* get_tag(struct wps_data* wps_data,
                     return buf;
                 }
 
+                case 'p': /* External power plugged in? */
+                {
 #ifdef HAVE_CHARGING             
-		case 'p': /* External power plugged in? */
-		{
-		    if(charger_input_state==CHARGER)
-			return "p";
-		    else
-			return NULL;
-		}
+                    if(charger_input_state==CHARGER)
+#else
+                    if(charger_inserted())
 #endif
+                        return "p";
+                    else
+                        return NULL;
+                }
 #if defined(HAVE_CHARGE_CTRL) || \
     defined (HAVE_CHARGE_STATE) || \
     CONFIG_BATTERY == BATT_LIION2200

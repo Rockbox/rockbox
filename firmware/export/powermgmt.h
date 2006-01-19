@@ -85,9 +85,7 @@ extern int trickle_sec;          /* trickle charge: How many seconds per minute 
 typedef enum {
     DISCHARGING,
     CHARGING,
-#ifdef HAVE_CHARGE_CTRL
     TOPOFF,
-#endif
     TRICKLE
 } charge_state_type;
 

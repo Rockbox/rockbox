@@ -129,6 +129,8 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
     bar->info.volume = sound_val2phys(SOUND_VOLUME, global_settings.volume);
 #ifdef HAVE_CHARGING
     bar->info.inserted = (charger_input_state == CHARGER);
+#else
+    bar->info.inserted = charger_inserted();
 #endif
     bar->info.battlevel = battery_level();
     bar->info.battery_safe = battery_level_safe();
