@@ -199,6 +199,12 @@ void button_read (void)
             break;
 #endif
 
+#ifdef BUTTON_POWER
+       case SDLK_KP_MINUS:
+	case SDLK_p:
+            k = BUTTON_POWER;
+#endif
+
 #ifdef BUTTON_F1
         case SDLK_KP_DIVIDE:
         case SDLK_F1:

@@ -28,6 +28,10 @@
 
 #elif (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD)
 #define YESNO_OK       BUTTON_RIGHT
+
+#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
+#define YESNO_OK       BUTTON_RIGHT
+
 #endif
 enum yesno_res
 {

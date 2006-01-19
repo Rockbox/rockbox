@@ -208,6 +208,25 @@
 #define WPS_EXIT       (BUTTON_PLAY | BUTTON_REPEAT)
 #define WPS_CONTEXT    (BUTTON_SELECT | BUTTON_REPEAT)
 
+#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+
+/* TODO: Check WPS button assignments */
+
+#define WPS_NEXT       (BUTTON_RIGHT | BUTTON_REL)
+#define WPS_NEXT_PRE   BUTTON_RIGHT
+#define WPS_PREV       (BUTTON_LEFT | BUTTON_REL)
+#define WPS_PREV_PRE   BUTTON_LEFT
+#define WPS_FFWD       (BUTTON_RIGHT | BUTTON_REPEAT)
+#define WPS_REW        (BUTTON_LEFT | BUTTON_REPEAT)
+#define WPS_INCVOL     BUTTON_UP
+#define WPS_DECVOL     BUTTON_DOWN
+#define WPS_PAUSE      BUTTON_PLAY
+/* #define WPS_MENU    iAudioX5 can't have both main menu and context menu in wps (unless we use BUTTON_REC?) */
+#define WPS_BROWSE     (BUTTON_MENU | BUTTON_REL)
+#define WPS_BROWSE_PRE BUTTON_MENU
+#define WPS_EXIT       (BUTTON_PLAY | BUTTON_REPEAT)
+#define WPS_CONTEXT    (BUTTON_MENU | BUTTON_REPEAT)
+
 #endif
 
 /* constants used in line_type and as refresh_mode for wps_refresh */
