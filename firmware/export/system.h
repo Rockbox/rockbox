@@ -238,7 +238,7 @@ static inline int set_irq_level(int level)
     /* Read the old level and set the new one */
     asm volatile ("move.w %%sr,%0\n"
                   "or.l #0x2000,%1\n"
-                  "move.w %1,%%sr\n" : "=r" (oldlevel), "+r" (level) : );
+                  "move.w %1,%%sr\n" : "=d" (oldlevel), "+d" (level) : );
     return oldlevel;
 }
 
