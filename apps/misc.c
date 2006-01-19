@@ -458,7 +458,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
     (void)parameter;
     exit(0);
 #else
-#ifndef HAVE_POWEROFF_WHILE_CHARGING
+#if defined(HAVE_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
     if(!charger_inserted())
 #endif
     {
