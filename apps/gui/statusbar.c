@@ -127,7 +127,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 #endif /* HAVE_LCD_CHARCELLS */
 
     bar->info.volume = sound_val2phys(SOUND_VOLUME, global_settings.volume);
-    bar->info.inserted = charger_inserted();
+    bar->info.inserted = (charger_input_state == CHARGER);
     bar->info.battlevel = battery_level();
     bar->info.battery_safe = battery_level_safe();
 
@@ -178,16 +178,21 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 #ifdef HAVE_CHARGING
         if (bar->info.inserted) {
             battery_state = true;
-#if defined(HAVE_CHARGE_CTRL) || CONFIG_BATTERY == BATT_LIION2200
+#if defined(HAVE_CHARGE_CTRL) || \
+    defined(HAVE_CHARGE_STATE) || \
+    CONFIG_BATTERY == BATT_LIION2200
             /* zero battery run time if charging */
-            if (charge_state > 0) {
+            if (charge_state > DISCHARGING) {
                 global_settings.runtime = 0;
                 lasttime = current_tick;
             }
 
             /* animate battery if charging */
-            if ((charge_state == 1) ||
-                (charge_state == 2)) {
+            if ((charge_state == CHARGING)
+#ifdef HAVE_CHARGE_CTRL
+                    || (charge_state == TOPOFF)
+#endif
+                ) {
 #else
             global_settings.runtime = 0;
             lasttime = current_tick;
@@ -323,7 +328,8 @@ void gui_statusbar_icon_battery(struct screen * display, int percent)
     if (fill > 100)
         fill = 100;
 
-#if defined(HAVE_CHARGE_CTRL) && !defined(SIMULATOR) /* Rec v1 target only */
+#if (defined(HAVE_CHARGE_CTRL) || defined(HAVE_CHARGE_STATE)) && \
+    !defined(SIMULATOR) /* Certain charge controlled targets */
     /* show graphical animation when charging instead of numbers */
     if ((global_settings.battery_display) &&
         (charge_state != 1) &&

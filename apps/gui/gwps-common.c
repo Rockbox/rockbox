@@ -655,11 +655,27 @@ static char* get_tag(struct wps_data* wps_data,
                 
 		case 'p': /* External power plugged in? */
 		{
-		    if(charger_inserted())
+		    if(charger_input_state==CHARGER)
 			return "p";
 		    else
 			return NULL;
 		}
+#if defined(HAVE_CHARGE_CTRL) || \
+    defined (HAVE_CHARGE_STATE) || \
+    CONFIG_BATTERY == BATT_LIION2200
+                case 'c': /* Charging */
+                {
+                    if (charge_state == CHARGING
+#ifdef HAVE_CHARGE_CTRL
+                            || charge_state == TOPOFF
+#endif
+                            ) {
+                        return "c";
+                    } else {
+                        return NULL;
+                    }
+                }
+#endif
             }
             break;
 

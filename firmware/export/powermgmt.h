@@ -79,17 +79,37 @@ extern int trickle_sec;          /* trickle charge: How many seconds per minute 
 
 #endif /* HAVE_CHARGE_CTRL */
 
-#if defined(HAVE_CHARGE_CTRL) || (CONFIG_BATTERY == BATT_LIION2200)
+#if defined(HAVE_CHARGE_CTRL) || \
+    (CONFIG_BATTERY == BATT_LIION2200) || \
+    defined(HAVE_CHARGE_STATE)
 typedef enum {
     DISCHARGING,
     CHARGING,
+#ifdef HAVE_CHARGE_CTRL
     TOPOFF,
     TRICKLE
+#endif
 } charge_state_type;
 
 /* tells what the charger is doing */
 extern charge_state_type charge_state;
 #endif /* defined(HAVE_CHARGE_CTRL) || (CONFIG_BATTERY == BATT_LIION2200) */
+
+#ifdef HAVE_CHARGING
+/*
+ * Flag that the charger has been plugged in/removed: this is set for exactly
+ * one time through the power loop when the charger has been plugged in.
+ */
+typedef enum {
+    NO_CHARGER,
+    CHARGER_UNPLUGGED,              /* transient state */
+    CHARGER_PLUGGED,                /* transient state */
+    CHARGER
+} charger_input_state_type;
+
+/* tells the state of the charge input */
+extern charger_input_state_type charger_input_state;
+#endif
 
 #ifdef HAVE_MMC  /* Values for Ondio */
 # define CURRENT_NORMAL     95  /* average, nearly proportional to 1/U */
@@ -106,9 +126,13 @@ extern charge_state_type charge_state;
 
 # define CURRENT_MIN_CHG    70  /* minimum charge current */
 # define MIN_CHG_V        8500  /* at 8.5v charger voltage get CURRENT_MIN_CHG */
-# define CURRENT_MAX_CHG   350  /* maximum charging current */
+# ifdef IRIVER_H300_SERIES
+#  define CURRENT_MAX_CHG  650  /* maximum charging current */
+# else
+#  define CURRENT_MAX_CHG  350  /* maximum charging current */
+# endif
 # define MAX_CHG_V       10250  /* anything over 10.25v gives CURRENT_MAX_CHG */
-#endif /* HAVE_MMC */
+#endif /* not HAVE_MMC */
 
 extern unsigned int bat;       /* filtered battery voltage, centivolts */
 extern unsigned short power_history[POWER_HISTORY_LEN];

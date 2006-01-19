@@ -145,31 +145,26 @@ static const short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 };
 
 #ifdef HAVE_CHARGING
+charger_input_state_type charger_input_state IDATA_ATTR;
+
 /* voltages (centivolt) of 0%, 10%, ... 100% when charging enabled */
 static const short percent_to_volt_charge[11] =
 {
+#if CONFIG_BATTERY == BATT_LIPOL1300
+    340, 349, 358, 367, 376, 385, 394, 403, 408, 413, 418 /* Estimated */
+#else
     /* values guessed, see
        http://www.seattlerobotics.org/encoder/200210/LiIon2.pdf until someone
        measures voltages over a charging cycle */
     476, 544, 551, 556, 561, 564, 566, 576, 582, 584, 585 /* NiMH */
+#endif
 };
 #endif /* HAVE_CHARGING */
 
-#if defined(HAVE_CHARGE_CTRL) || CONFIG_BATTERY == BATT_LIION2200
+#if defined(HAVE_CHARGE_CTRL) || \
+    CONFIG_BATTERY == BATT_LIION2200 || \
+    defined(HAVE_CHARGE_STATE)
 charge_state_type charge_state;     /* charging mode */
-#endif
-
-#ifdef HAVE_CHARGING
-/*
- * Flag that the charger has been plugged in/removed: this is set for exactly
- * one time through the power loop when the charger has been plugged in.
- */
-static enum {
-    NO_CHARGER,
-    CHARGER_UNPLUGGED,              /* transient state */
-    CHARGER_PLUGGED,                /* transient state */
-    CHARGER
-} charger_input_state;
 #endif
 
 #ifdef HAVE_CHARGE_CTRL
@@ -317,7 +312,7 @@ static void battery_status_update(void)
 {
     int level;
 
-#ifdef HAVE_CHARGE_CTRL
+#if defined(HAVE_CHARGE_CTRL) || defined(HAVE_CHARGE_STATE)
     if (charge_state == DISCHARGING) {
         level = voltage_to_percent(battery_centivolts,
                 percent_to_volt_discharge[battery_type]);
@@ -520,6 +515,23 @@ static void power_thread_sleep(int ticks)
             }
         }
 #endif
+#ifdef HAVE_CHARGE_STATE
+        switch (charger_input_state) {
+            case CHARGER_UNPLUGGED:
+                charge_state = DISCHARGING;
+            case NO_CHARGER:
+                break;
+            case CHARGER_PLUGGED:
+            case CHARGER:
+                if (charging_state()) {
+                    charge_state = CHARGING;
+                } else {
+                    charge_state = DISCHARGING;
+                }
+                break;
+        }
+        
+#endif /* HAVE_CHARGE_STATE */
 
         small_ticks = MIN(HZ/2, ticks);
         sleep(small_ticks);
@@ -551,6 +563,7 @@ static void power_thread_sleep(int ticks)
             battery_centivolts = avgbat / BATT_AVE_SAMPLES / 10000;
 
         }
+
 #if defined(DEBUG_FILE) && defined(HAVE_CHARGE_CTRL)
         /*
          * If we have a lot of pending writes or if the disk is spining,
@@ -821,7 +834,7 @@ static void power_thread(void)
             snprintf(power_message, POWER_MESSAGE_LEN, "Charger: discharge");
         }
 
-#endif /* HAVE_CHARGE_CTRL*/
+#endif /* end HAVE_CHARGE_CTRL */
 
         /* sleep for a minute */
 
@@ -840,7 +853,7 @@ static void power_thread(void)
 #if defined(DEBUG_FILE) && defined(HAVE_CHARGE_CTRL)
         if(usb_inserted()) {
             if(fd >= 0) {
-                /* It is probably too late to close the file but we can try... */
+                /* It is probably too late to close the file but we can try...*/
                 close(fd);
                 fd = -1;
             }
@@ -855,9 +868,11 @@ static void power_thread(void)
                 }
             }
             if(fd >= 0) {
-                snprintf(debug_message, DEBUG_MESSAGE_LEN, "%d, %d, %d, %d, %d, %d, %d, %d\n",
+                snprintf(debug_message, DEBUG_MESSAGE_LEN, 
+                        "%d, %d, %d, %d, %d, %d, %d, %d\n",
                     powermgmt_last_cycle_startstop_min, battery_centivolts,
-                    battery_percent, charger_input_state, charge_state, pid_p, pid_i, trickle_sec);
+                    battery_percent, charger_input_state, charge_state,
+                    pid_p, pid_i, trickle_sec);
                 write(fd, debug_message, strlen(debug_message));
                 wrcount++;
             }

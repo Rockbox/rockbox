@@ -148,6 +148,12 @@ void charger_enable(bool on)
 }
 #endif
 
+#ifdef HAVE_CHARGE_STATE
+bool charging_state(void) {
+    return (GPIO_READ & 0x00800000)?true:false;
+}
+#endif
+
 #ifdef HAVE_SPDIF_POWER
 void spdif_power_enable(bool on)
 {
