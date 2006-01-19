@@ -1290,6 +1290,7 @@ static void audio_clear_track_entries(bool buffered_only)
 
 static void audio_stop_playback(bool resume)
 {
+    logf("stop_playback:%d", resume);
     paused = false;
     if (playing)
         playlist_update_resume_info(resume ? audio_current_track() : NULL);
@@ -1526,7 +1527,7 @@ static int skip_next_track(void)
     {
         logf("Loading from disk...");
         ci.reload_codec = true;
-        queue_post(&audio_queue, AUDIO_PLAY, 0);
+        //queue_post(&audio_queue, AUDIO_PLAY, 0);
         return SKIP_OK_DISK;
     }
     
@@ -2026,22 +2027,25 @@ struct mp3entry* audio_current_track(void)
     
     if (track_count > 0 && cur_ti->taginfo_ready)
         return (struct mp3entry *)&cur_ti->id3;
-    else {
-        filename = playlist_peek(0);
-        if (!filename)
-            filename = "No file!";
-        p = strrchr(filename, '/');
-        if (!p)
-            p = filename;
-        else
-            p++;
-        
-        memset(&temp_id3, 0, sizeof(struct mp3entry));
-        strncpy(temp_id3.path, p, sizeof(temp_id3.path)-1);
-        temp_id3.title = &temp_id3.path[0];
 
-        return &temp_id3;
-    }
+    filename = playlist_peek(0);
+    if (!filename)
+        filename = "No file!";
+    
+    // if (tagcache_fill_tags(&temp_id3, filename))
+    //    return &temp_id3;
+    
+    p = strrchr(filename, '/');
+    if (!p)
+        p = filename;
+    else
+        p++;
+
+    memset(&temp_id3, 0, sizeof(struct mp3entry));
+    strncpy(temp_id3.path, p, sizeof(temp_id3.path)-1);
+    temp_id3.title = &temp_id3.path[0];
+
+    return &temp_id3;
 }
 
 struct mp3entry* audio_next_track(void)
