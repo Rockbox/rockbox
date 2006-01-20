@@ -63,7 +63,7 @@ void savestate(int fd);
 #undef open
 #define open(a,b)       rb->sim_open((a),(b))
 #undef close
-#define close(a)        rb->sim_close((a))
+#define close(a)        rb->close((a))
 #undef lseek
 #define lseek(a,b,c)    rb->sim_lseek((a),(b),(c))
 #else /* !SIMULATOR */
@@ -76,7 +76,6 @@ void savestate(int fd);
 #endif /* !SIMULATOR */
 
 #define strcat(a,b)     rb->strcat((a),(b))
-#define close(a)        rb->close((a))
 #define read(a,b,c)     rb->read((a),(b),(c))
 #define write(a,b,c)    rb->write((a),(b),(c))
 #define memset(a,b,c)   rb->memset((a),(b),(c))
