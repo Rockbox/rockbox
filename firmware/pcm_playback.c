@@ -221,6 +221,9 @@ void pcm_play_stop(void)
 
 void pcm_play_pause(bool play)
 {
+    if (!pcm_playing)
+        return ;
+
     if(pcm_paused && play && next_size)
     {
         logf("unpause");

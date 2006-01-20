@@ -229,7 +229,8 @@ bool pcmbuf_is_lowdata(void)
 
 bool pcmbuf_crossfade_init(void)
 {
-    if (pcmbuf_size - audiobuffer_free < CHUNK_SIZE * 8 || !crossfade_enabled
+    if (pcmbuf_size - audiobuffer_free < CHUNK_SIZE * 8
+        || !pcmbuf_is_crossfade_enabled()
         || crossfade_active || crossfade_init) {
         pcmbuf_flush_audio();
         return false;

@@ -101,6 +101,12 @@ enum codec_status codec_start(struct codec_api *api)
     ci->configure(DSP_SET_CLIP_MAX, (int *)(MAD_F_ONE - 1));
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*16));
     
+    /** This label might need to be moved above all the init code, but I don't
+     * think reiniting the codec is necessary for MPEG. It might even be unwanted
+     * for gapless playback.
+     * Reinitializing seems to be necessary to avoid playback quircks when seeking. */
+    next_track:
+        
     ci->memset(&stream, 0, sizeof(struct mad_stream));
     ci->memset(&frame, 0, sizeof(struct mad_frame));
     ci->memset(&synth, 0, sizeof(struct mad_synth));
@@ -114,10 +120,6 @@ enum codec_status codec_start(struct codec_api *api)
     frame.overlap = &mad_frame_overlap;
     stream.main_data = &mad_main_data;
 
-    /* This label might need to be moved above all the init code, but I don't
-       think reiniting the codec is necessary for MPEG. It might even be unwanted
-       for gapless playback */
-next_track:
     file_end = 0;
     while (!*ci->taginfo_ready && !ci->stop_codec)
         ci->sleep(1);
@@ -156,14 +158,21 @@ next_track:
         
             samplesdone = ((int64_t) (ci->seek_time - 1)) 
                 * current_frequency / 1000;
-            newpos = ci->mp3_get_filepos(ci->seek_time-1) +
-                ci->id3->first_frame_offset;
+
+            if (ci->seek_time-1 == 0)
+                newpos = 0;
+            else
+                newpos = ci->mp3_get_filepos(ci->seek_time-1) +
+                    ci->id3->first_frame_offset;
 
             if (!ci->seek_buffer(newpos))
                 goto next_track;
-            if (newpos == 0)
-                samples_to_skip = start_skip;
             ci->seek_complete();
+            if (newpos == 0)
+            {
+                ci->id3->elapsed = 0;
+                goto next_track;
+            }
         }
 
         /* Lock buffers */
