@@ -2096,8 +2096,11 @@ bool save_sudoku(struct sudoku_state_t* state) {
   int fd;
   int r,c;
   int i;
-  char line[]="...|...|...\r\n";
-  char sep[]="-----------\r\n";  
+  char line[16];
+  char sep[16];
+
+  rb->memcpy(line,"...|...|...\r\n",13);
+  rb->memcpy(sep,"-----------\r\n",13);
 
   if (state->filename[0]==0) {
     return false;
