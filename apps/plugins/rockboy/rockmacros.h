@@ -47,6 +47,11 @@ void loadstate(int fd);
 void savestate(int fd);
 #define USER_MENU_QUIT -2
 
+/* Disable ICODE for the ARMs */
+#ifdef CPU_ARM
+#undef ICODE_ATTR
+#define ICODE_ATTR
+#endif
 
 /* libc functions */
 #define isdigit(c) ((c) >= '0' && (c) <= '9')

@@ -113,6 +113,13 @@ void setoptions (void) {
       options.SELECT=BUTTON_PLAY;
       options.MENU=BUTTON_OFF;
 
+#elif CONFIG_KEYPAD == IPOD_4G_PAD
+      options.A=BUTTON_NONE;
+      options.B=BUTTON_NONE;
+      options.START=BUTTON_SELECT;
+      options.SELECT=BUTTON_NONE;
+      options.MENU=(BUTTON_SELECT | BUTTON_REPEAT);
+
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
       options.A=BUTTON_PLAY;
       options.B=BUTTON_EQ;

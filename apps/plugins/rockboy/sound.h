@@ -27,6 +27,11 @@ struct snd
 
 extern struct snd snd;
 
+#if defined(ICODE_ATTR) && defined(CPU_ARM)
+#undef ICODE_ATTR
+#define ICODE_ATTR
+#endif
+
 byte sound_read(byte r) ICODE_ATTR;
 void sound_write(byte r, byte b)ICODE_ATTR;
 void sound_dirty(void)ICODE_ATTR;

@@ -10,6 +10,20 @@
 #include "rockmacros.h"
 #include "mem.h"
 
+#if (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define MENU_BUTTON_UP BUTTON_SCROLL_BACK
+#define MENU_BUTTON_DOWN BUTTON_SCROLL_FWD
+#define MENU_BUTTON_LEFT BUTTON_LEFT
+#define MENU_BUTTON_RIGHT BUTTON_RIGHT
+#define MENU_BUTTON_CANCEL BUTTON_MENU
+#else
+#define MENU_BUTTON_UP BUTTON_UP
+#define MENU_BUTTON_DOWN BUTTON_DOWN
+#define MENU_BUTTON_LEFT BUTTON_LEFT
+#define MENU_BUTTON_RIGHT BUTTON_RIGHT
+#define MENU_BUTTON_CANCEL BUTTON_OFF
+#endif
+
 /* load/save state function declarations */
 static void do_slot_menu(bool is_load);
 static void do_opt_menu(void);
@@ -115,10 +129,10 @@ int getbutton(char *text)
       button = rb->button_get(true);
       button=button&0x00000FFF;
       switch(button) {
-         case BUTTON_LEFT:
-         case BUTTON_RIGHT:
-         case BUTTON_UP:
-         case BUTTON_DOWN:
+         case MENU_BUTTON_LEFT:
+         case MENU_BUTTON_RIGHT:
+         case MENU_BUTTON_UP:
+         case MENU_BUTTON_DOWN:
             break;
          default:
             return button;
@@ -581,7 +595,7 @@ static int do_menu(char *title, char **items, size_t num_items, int sel) {
 
     /* handle the button */
     switch (btn) {
-      case BUTTON_DOWN:
+      case MENU_BUTTON_DOWN:
         /* select next item in list */
         sel_item = curr_item + 1;
         if (sel_item >= (int) num_items)
@@ -589,7 +603,7 @@ static int do_menu(char *title, char **items, size_t num_items, int sel) {
         select_item(title, curr_item, sel_item);
         curr_item = sel_item;
         break;
-      case BUTTON_UP:
+      case MENU_BUTTON_UP:
         /* select prev item in list */
         sel_item = curr_item - 1;
         if (sel_item < 0)
@@ -597,13 +611,13 @@ static int do_menu(char *title, char **items, size_t num_items, int sel) {
         select_item(title, curr_item, sel_item);
         curr_item = sel_item;
         break;
-      case BUTTON_RIGHT:
+      case MENU_BUTTON_RIGHT:
         /* select current item */
         ret = curr_item;
         done = true;
         break;
-      case BUTTON_LEFT:
-      case BUTTON_OFF:
+      case MENU_BUTTON_LEFT:
+      case MENU_BUTTON_CANCEL:
         /* cancel out of menu */
         ret = MENU_CANCEL;
         done = true;

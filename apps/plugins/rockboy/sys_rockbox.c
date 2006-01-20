@@ -25,6 +25,22 @@
 #include "hw.h"
 #include "config.h"
 
+#if (CONFIG_KEYPAD == IPOD_4G_PAD)
+
+#define ROCKBOY_PAD_LEFT BUTTON_LEFT
+#define ROCKBOY_PAD_RIGHT BUTTON_RIGHT
+#define ROCKBOY_PAD_UP BUTTON_MENU
+#define ROCKBOY_PAD_DOWN BUTTON_PLAY
+
+#else
+
+#define ROCKBOY_PAD_LEFT BUTTON_LEFT
+#define ROCKBOY_PAD_RIGHT BUTTON_RIGHT
+#define ROCKBOY_PAD_UP BUTTON_UP
+#define ROCKBOY_PAD_DOWN BUTTON_DOWN
+
+#endif
+
 rcvar_t joy_exports[] =
 {
             RCV_END
@@ -73,10 +89,10 @@ void ev_poll(void)
 #endif
     if(released) {
         ev.type = EV_RELEASE;
-        if(released & BUTTON_LEFT) { ev.code=PAD_LEFT; ev_postevent(&ev); }
-        if(released & BUTTON_RIGHT) {ev.code=PAD_RIGHT; ev_postevent(&ev);}
-        if(released & BUTTON_DOWN) { ev.code=PAD_DOWN; ev_postevent(&ev); }
-        if(released & BUTTON_UP) { ev.code=PAD_UP; ev_postevent(&ev); }
+        if(released & ROCKBOY_PAD_LEFT) { ev.code=PAD_LEFT; ev_postevent(&ev); }
+        if(released & ROCKBOY_PAD_RIGHT) {ev.code=PAD_RIGHT; ev_postevent(&ev);}
+        if(released & ROCKBOY_PAD_DOWN) { ev.code=PAD_DOWN; ev_postevent(&ev); }
+        if(released & ROCKBOY_PAD_UP) { ev.code=PAD_UP; ev_postevent(&ev); }
         if(released & options.A) { ev.code=PAD_A; ev_postevent(&ev); }
         if(released & options.B) { ev.code=PAD_B; ev_postevent(&ev); }
         if(released & options.START) {
@@ -90,10 +106,10 @@ void ev_poll(void)
     }
     if(pressed) { /* button press */
         ev.type = EV_PRESS;
-        if(pressed & BUTTON_LEFT) { ev.code=PAD_LEFT; ev_postevent(&ev); }
-        if(pressed & BUTTON_RIGHT) { ev.code=PAD_RIGHT; ev_postevent(&ev);}
-        if(pressed & BUTTON_DOWN) { ev.code=PAD_DOWN; ev_postevent(&ev); }
-        if(pressed & BUTTON_UP) { ev.code=PAD_UP; ev_postevent(&ev); }
+        if(pressed & ROCKBOY_PAD_LEFT) { ev.code=PAD_LEFT; ev_postevent(&ev); }
+        if(pressed & ROCKBOY_PAD_RIGHT) { ev.code=PAD_RIGHT; ev_postevent(&ev);}
+        if(pressed & ROCKBOY_PAD_DOWN) { ev.code=PAD_DOWN; ev_postevent(&ev); }
+        if(pressed & ROCKBOY_PAD_UP) { ev.code=PAD_UP; ev_postevent(&ev); }
         if(pressed & options.A) { ev.code=PAD_A; ev_postevent(&ev); }
         if(pressed & options.B) { ev.code=PAD_B; ev_postevent(&ev); }
         if(pressed & options.START) {
@@ -105,7 +121,9 @@ void ev_poll(void)
             ev_postevent(&ev);
         }
         if(pressed & options.MENU) {
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+    (CONFIG_KEYPAD == IRIVER_H300_PAD) || \
+    (CONFIG_KEYPAD == IPOD_4G_PAD)
           if (do_user_menu() == USER_MENU_QUIT) 
 #endif
           {
@@ -264,7 +282,7 @@ void vid_update(int scanline)
         cnt++;
     }
     rb->lcd_update_rect(0, scanline & ~3, LCD_WIDTH, 4);
-#elif (LCD_HEIGHT >= 144) && defined(HAVE_LCD_COLOR) /* iriver H3x0, colour iPod */
+#elif defined(HAVE_LCD_COLOR) /* iriver H3x0, colour iPod */
     // handled in lcd.c now
 #endif /* LCD_HEIGHT */
 }
