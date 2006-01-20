@@ -58,15 +58,16 @@ void emu_step(void)
 	cpu_emulate(cpu.lcdc);
 }
 
-
+struct options options;
 
 /* This mess needs to be moved to another module; it's just here to
  * make things work in the mean time. */
-
+//extern struct plugin_api* rb;
 void emu_run(void)
 {
-	void *timer = sys_timer();
-	int delay;
+//	void *timer = sys_timer();
+   int framesin=0,frames=0,timeten=*rb->current_tick, timehun=*rb->current_tick;
+//	int delay;
 
 	vid_begin();
 	lcd_begin();
@@ -79,18 +80,17 @@ void emu_run(void)
 		while (R_LY > 0 && R_LY < 144)
 			emu_step();
 		
-		vid_end();
 		rtc_tick();
 		sound_mix();
 		if (!pcm_submit())
 		{
-			delay = framelen - sys_elapsed(timer);
+/*			delay = framelen - sys_elapsed(timer);
 			sys_sleep(delay);
-			sys_elapsed(timer);
+			sys_elapsed(timer);*/
 		}
+
 		doevents();
 		vid_begin();
-//		if (framecount) { if (!--framecount) die("finished\n"); }
 		
 		if (!(R_LCDC & 0x80))
 			cpu_emulate(32832);
@@ -98,11 +98,34 @@ void emu_run(void)
 		while (R_LY > 0) /* wait for next frame */
 			emu_step();
 		rb->yield();
+
+      frames++;
+      framesin++;
+
+      if(*rb->current_tick-timeten>=20)
+      {
+         timeten=*rb->current_tick;
+         if(framesin<12) options.frameskip++;
+         if(framesin>12) options.frameskip--;
+         if(options.frameskip>options.maxskip) options.frameskip=options.maxskip;
+         if(options.frameskip<0) options.frameskip=0;
+         framesin=0;
 	}
+
+      if(options.showstats)
+      {
+         if(*rb->current_tick-timehun>=100) {
+            options.fps=frames;
+            frames=0;
+            timehun=*rb->current_tick;
+         }
+      }
+
+	}
+
 #if !defined(SIMULATOR) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
     rb->cpu_boost(false);
 #endif
-		
 }
 
 

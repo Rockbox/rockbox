@@ -2,7 +2,7 @@
 #include "defs.h"
 
 
-static const byte cycles_table[256] =
+static const byte cycles_table[256]ICONST_ATTR =
 {
 	1, 3, 2, 2, 1, 1, 2, 1, 5, 2, 2, 2, 1, 1, 2, 1,
 	1, 3, 2, 2, 1, 1, 2, 1, 3, 2, 2, 2, 1, 1, 2, 1,
@@ -25,7 +25,7 @@ static const byte cycles_table[256] =
 	3, 3, 2, 1, 0, 4, 2, 4, 3, 2, 4, 1, 0, 0, 2, 4,
 };
 
-static const byte cb_cycles_table[256] =
+static const byte cb_cycles_table[256] ICONST_ATTR =
 {
 	2, 2, 2, 2, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2, 4, 2,
 	2, 2, 2, 2, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2, 4, 2,
@@ -50,7 +50,7 @@ static const byte cb_cycles_table[256] =
 
 
 
-static const byte zflag_table[256] =
+static const byte zflag_table[256] ICONST_ATTR =
 {
 	FZ, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -70,7 +70,7 @@ static const byte zflag_table[256] =
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-static const byte incflag_table[256] =
+static const byte incflag_table[256] ICONST_ATTR =
 {
 	FZ|FH, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	FH, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -90,7 +90,7 @@ static const byte incflag_table[256] =
 	FH, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-static const byte decflag_table[256] =
+static const byte decflag_table[256] ICONST_ATTR =
 {
 	FZ|FN, FN, FN, FN, FN, FN, FN, FN, FN, FN, FN, FN, FN, FN, FN, FN|FH,
 	FN, FN, FN, FN, FN, FN, FN, FN, FN, FN, FN, FN, FN, FN, FN, FN|FH,
@@ -110,7 +110,7 @@ static const byte decflag_table[256] =
 	FN, FN, FN, FN, FN, FN, FN, FN, FN, FN, FN, FN, FN, FN, FN, FN|FH
 };
 
-static const byte swap_table[256] =
+static const byte swap_table[256] ICONST_ATTR =
 {
 	0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80, 0x90, 0xA0, 0xB0, 0xC0, 0xD0, 0xE0, 0xF0,
 	0x01, 0x11, 0x21, 0x31, 0x41, 0x51, 0x61, 0x71, 0x81, 0x91, 0xA1, 0xB1, 0xC1, 0xD1, 0xE1, 0xF1,
@@ -130,7 +130,7 @@ static const byte swap_table[256] =
 	0x0F, 0x1F, 0x2F, 0x3F, 0x4F, 0x5F, 0x6F, 0x7F, 0x8F, 0x9F, 0xAF, 0xBF, 0xCF, 0xDF, 0xEF, 0xFF,
 };
 
-static const byte daa_table[4096] =
+static const byte daa_table[4096] ICONST_ATTR=
 {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x06, 0x06, 0x06, 0x06, 0x06,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x06, 0x06, 0x06, 0x06, 0x06,
@@ -269,7 +269,7 @@ static const byte daa_table[4096] =
 	0x9A, 0x9A, 0x9A, 0x9A, 0x9A, 0x9A, 0x9A, 0x9A, 0x9A, 0x9A, 0x9A, 0x9A, 0x9A, 0x9A, 0x9A, 0x9A,
 };
 
-static const byte daa_carry_table[64] =
+static const byte daa_carry_table[64] ICONST_ATTR =
 {
 	00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,	
 	00, 00, 00, 00, 00, 00, 00, 00, FC, FC, 00, 00, 00, 00, 00, 00,

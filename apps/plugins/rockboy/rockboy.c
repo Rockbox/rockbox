@@ -39,6 +39,8 @@ char *errormsg;
 int gnuboy_main(char *rom);
 void pcm_close(void);
 
+#define optionname "options"
+
 void die(char *message, ...)
 {
     shut=1;
@@ -74,6 +76,74 @@ void setmallocpos(void *pointer)
     audio_buffer_free = audio_bufferpointer - audio_bufferbase;
 }
 
+void setoptions (void) {
+   int fd;
+   DIR* dir;
+   char optionsave[sizeof(savedir)+sizeof(optionname)];
+
+   	dir=opendir(savedir);
+	if(!dir)
+	  mkdir(savedir,0);
+	else
+	  closedir(dir);
+
+   snprintf(optionsave, sizeof(optionsave), "%s/%s", savedir, optionname);
+
+   fd = open(optionsave, O_RDONLY);
+   if(fd < 0) // no options to read, set defaults
+   { 
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD)
+      options.A=BUTTON_ON;
+      options.B=BUTTON_OFF;
+      options.START=BUTTON_REC;
+      options.SELECT=BUTTON_SELECT;
+      options.MENU=BUTTON_MODE;
+
+#elif (CONFIG_KEYPAD == IRIVER_H300_PAD)
+      options.A=BUTTON_REC;
+      options.B=BUTTON_MODE;
+      options.START=BUTTON_ON;
+      options.SELECT=BUTTON_SELECT;
+      options.MENU=BUTTON_OFF;
+
+#elif CONFIG_KEYPAD == RECORDER_PAD
+      options.A=BUTTON_F1;
+      options.B=BUTTON_F2;
+      options.START=BUTTON_F3;
+      options.SELECT=BUTTON_PLAY;
+      options.MENU=BUTTON_OFF;
+
+#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
+      options.A=BUTTON_PLAY;
+      options.B=BUTTON_EQ;
+      options.START=BUTTON_MODE;
+      options.SELECT=(BUTTON_SELECT | BUTTON_REL);
+      options.MENU=(BUTTON_SELECT | BUTTON_REPEAT);
+#endif
+
+      options.maxskip=4;
+      options.fps=0;
+      options.showstats=0;
+      options.fullscreen=1;
+      options.sound=1;
+   }
+   else
+      read(fd,&options, sizeof(options));
+
+   close(fd);
+}
+
+void savesettings(void)
+{
+   int fd;
+   char optionsave[sizeof(savedir)+sizeof(optionname)];
+
+   snprintf(optionsave, sizeof(optionsave), "%s/%s", savedir, optionname);
+   fd = open(optionsave, O_WRONLY|O_CREAT|O_TRUNC);
+   write(fd,&options, sizeof(options));
+   close(fd);
+}
+
 /* this is the plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
@@ -96,7 +166,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         < audio_buffer_free)
         audio_buffer_free = plugin_start_addr - (unsigned char *)audio_bufferbase;
 #endif
-
+   setoptions();
 #ifdef USE_IRAM
     memcpy(iramstart, iramcopy, iramend-iramstart);
     memset(iedata, 0, iend - iedata);
@@ -110,11 +180,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     gnuboy_main(parameter);
 
     if(shut&&!cleanshut) {
-        rb->splash(HZ*2, true, errormsg);
+        rb->splash(HZ/2, true, errormsg);
         return PLUGIN_ERROR;
     }
     pcm_close();
-    rb->splash(HZ*2, true, "Shutting down.. byebye ^^");
+    rb->splash(HZ/2, true, "Shutting down");
+
+   savesettings();
 
     cleanup();
 

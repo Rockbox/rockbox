@@ -48,12 +48,12 @@ extern int blockclen;
 #endif
 
 void cpu_reset(void);
-void div_advance(int cnt);
-void timer_advance(int cnt);
-void lcdc_advance(int cnt);
-void sound_advance(int cnt);
-void cpu_timers(int cnt);
+void div_advance(int cnt) ICODE_ATTR;
+void timer_advance(int cnt) ICODE_ATTR;
+void lcdc_advance(int cnt) ICODE_ATTR;
+void sound_advance(int cnt) ICODE_ATTR;
+void cpu_timers(int cnt) ICODE_ATTR;
 int cpu_emulate(int cycles) ICODE_ATTR;
-int cpu_step(int max) ICODE_ATTR;
+inline int cpu_step(int max);
 
 #endif

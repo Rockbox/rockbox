@@ -10,7 +10,7 @@
 
 struct fb
 {
-	byte *ptr;
+	fb_data *ptr;
 	int w, h;
 	int pelsize;
 	int pitch;

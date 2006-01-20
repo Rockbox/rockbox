@@ -27,12 +27,12 @@ struct snd
 
 extern struct snd snd;
 
-byte sound_read(byte r);
-void sound_write(byte r, byte b);
-void sound_dirty(void);
+byte sound_read(byte r) ICODE_ATTR;
+void sound_write(byte r, byte b)ICODE_ATTR;
+void sound_dirty(void)ICODE_ATTR;
 void sound_off(void);
 void sound_reset(void);
-void sound_mix(void);
+void sound_mix(void)ICODE_ATTR;
 void s1_init(void);
 void s2_init(void);
 void s3_init(void);

@@ -55,21 +55,21 @@ extern struct scan scan;
 
 
 void updatepatpix(void) ICODE_ATTR;
-void tilebuf(void);
-void bg_scan(void);
-void wnd_scan(void);
-void bg_scan_pri(void);
-void wnd_scan_pri(void);
+void tilebuf(void) ICODE_ATTR;
+void bg_scan(void) ICODE_ATTR;
+void wnd_scan(void) ICODE_ATTR;
+void bg_scan_pri(void) ICODE_ATTR;
+void wnd_scan_pri(void) ICODE_ATTR;
 void spr_count(void);
-void spr_enum(void);
-void spr_scan(void);
-void lcd_begin(void);
-void lcd_refreshline(void);
+void spr_enum(void) ICODE_ATTR;
+void spr_scan(void) ICODE_ATTR;
+void lcd_begin(void) ICODE_ATTR;
+void lcd_refreshline(void) ICODE_ATTR;
 void pal_write(int i, byte b);
-void pal_write_dmg(int i, int mapnum, byte d);
-void vram_write(int a, byte b);
-void vram_dirty(void);
-void pal_dirty(void);
+void pal_write_dmg(int i, int mapnum, byte d) ICODE_ATTR;
+void vram_write(int a, byte b) ICODE_ATTR;
+void vram_dirty(void) ICODE_ATTR;
+void pal_dirty(void) ICODE_ATTR;
 void lcd_reset(void);
 
 #endif

@@ -34,14 +34,14 @@ struct hw
 
 extern struct hw hw;
 
-void hw_interrupt(byte i, byte mask);
-void hw_dma(byte b);
-void hw_hdma_cmd(byte c);
-void hw_hdma(void);
-void pad_refresh(void);
-void pad_press(byte k);
-void pad_release(byte k);
-void pad_set(byte k, int st);
+void hw_interrupt(byte i, byte mask) ICODE_ATTR;
+void hw_dma(byte b) ICODE_ATTR;
+void hw_hdma_cmd(byte c) ICODE_ATTR;
+void hw_hdma(void) ICODE_ATTR;
+void pad_refresh(void)ICODE_ATTR;
+void pad_press(byte k)ICODE_ATTR;
+void pad_release(byte k)ICODE_ATTR;
+void pad_set(byte k, int st)ICODE_ATTR;
 void hw_reset(void);
 
 #endif

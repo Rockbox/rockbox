@@ -18,7 +18,7 @@ typedef struct event_s
 #define EV_RELEASE 2
 #define EV_REPEAT 3
 
-int ev_postevent(event_t *ev);
-int ev_getevent(event_t *ev);
+int ev_postevent(event_t *ev) ICODE_ATTR;
+int ev_getevent(event_t *ev) ICODE_ATTR;
 
 

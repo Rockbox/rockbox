@@ -11,7 +11,7 @@
 #include "lcdc.h"
 #include "sound.h"
 
-struct mbc mbc;
+struct mbc mbc IBSS_ATTR;
 struct rom rom;
 struct ram ram;
 

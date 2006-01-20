@@ -9,7 +9,7 @@
 #include "rtc-gb.h"
 #include "rc.h"
 
-struct rtc rtc;
+struct rtc rtc IBSS_ATTR;
 
 static int syncrtc = 1;
 

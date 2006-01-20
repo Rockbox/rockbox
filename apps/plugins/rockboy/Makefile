@@ -9,8 +9,8 @@
 
 INCLUDES = -I$(APPSDIR) -I.. -I. -I$(FIRMDIR)/include -I$(FIRMDIR)/export \
  -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers -I$(OUTDIR) -I$(BUILDDIR)
-CFLAGS = $(GCCOPTS) -O3 $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
- -DTARGET_ID=$(TARGET_ID) -DMEM=${MEMORYSIZE} -DPLUGIN
+CFLAGS = $(GCCOPTS) -O2 $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
+ -DTARGET_ID=$(TARGET_ID) -DMEM=${MEMORYSIZE} -DPLUGIN -finline-functions
 
 ifdef APPEXTRA
    INCLUDES += $(patsubst %,-I$(APPSDIR)/%,$(subst :, ,$(APPEXTRA)))
@@ -48,7 +48,7 @@ all: $(OUTPUT)
 ifndef SIMVER
 $(OBJDIR)/rockboy.elf: $(OBJS) $(LINKFILE)
 	@echo "LD "`basename $@`
-	@$(CC) $(GCCOPTS) -O -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lgcc \
+	@$(CC) $(GCCOPTS) -O2 -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -fast -lgcc \
            -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockboy.map
 
 $(OUTPUT): $(OBJDIR)/rockboy.elf

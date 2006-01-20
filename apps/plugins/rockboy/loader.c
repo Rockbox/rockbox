@@ -81,7 +81,6 @@ static char rtcfile[500];
 static char saveprefix[500];
 
 static char *savename;
-static char *savedir = "/.rockbox/rockboy";
 
 static int saveslot;
 
@@ -332,14 +331,14 @@ void cleanup(void)
 void loader_init(char *s)
 {
 	char *name;
-	DIR* dir;
+//	DIR* dir;
 
 //	sys_checkdir(savedir, 1); /* needs to be writable */
-	dir=opendir(savedir);
+/*	dir=opendir(savedir); // should be handled when the program opens
 	if(!dir)
 	  mkdir(savedir,0);
 	else
-	  closedir(dir);
+	  closedir(dir);*/
 
 	romfile = s;
 	if(rom_load())

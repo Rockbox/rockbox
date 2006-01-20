@@ -7,12 +7,12 @@
 #include "mem.h"
 
 
-byte readb(int a);
-void writeb(int a, byte b);
-int readw(int a);
-void writew(int a, int w);
-byte readhi(int a);
-void writehi(int a, byte b);
+byte readb(int a) ICODE_ATTR;
+void writeb(int a, byte b) ICODE_ATTR;
+int readw(int a) ICODE_ATTR;
+void writew(int a, int w) ICODE_ATTR;
+byte readhi(int a) ICODE_ATTR;
+void writehi(int a, byte b) ICODE_ATTR;
 #if 0
 byte readhi(int a);
 void writehi(int a, byte b);

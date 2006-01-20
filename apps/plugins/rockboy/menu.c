@@ -69,6 +69,9 @@ static const char *slot_menu[] = {
 typedef enum {
   OM_ITEM_FS,
   OM_ITEM_SOUND,
+  OM_ITEM_STATS,
+  OM_ITEM_FULLSCREEN,
+  OM_ITEM_KEYS,
   OM_ITEM_BACK,
   OM_MENU_LAST
 } OptMenuItem;
@@ -76,6 +79,9 @@ typedef enum {
 static const char *opt_menu[] = {
   "Frameskip",
   "Sound ON/OFF",
+  "Stats ON/OFF",
+  "Fullscreen ON/OFF",
+  "Set Keys (BUGGY)",
   "Previous Menu..."
 };
 
@@ -90,12 +96,49 @@ typedef enum {
 } FSMenuItem;
 
 static const char *fs_menu[] = {
-  "Skip 0 Frames",
-  "Skip 1 Frames",
-  "Skip 2 Frames",
-  "Skip 3 Frames",
+  "Frameskip 3 Max",
+  "Frameskip 4 Max",
+  "Frameskip 5 Max",
+  "Frameskip 7 Max",
   "Previous Menu..."
 };
+
+int getbutton(char *text)
+{
+   rb->lcd_putsxy(0, 0, text);
+   rb->lcd_update();
+   rb->sleep(30);
+   while (rb->button_get(false) != BUTTON_NONE) 
+      rb->yield();
+   int button;
+   while(true){
+      button = rb->button_get(true);
+      button=button&0x00000FFF;
+      switch(button) {
+         case BUTTON_LEFT:
+         case BUTTON_RIGHT:
+         case BUTTON_UP:
+         case BUTTON_DOWN:
+            break;
+         default:
+            return button;
+            break;
+	  }
+   }
+}
+
+void setupkeys(void)
+{
+   options.A=getbutton("Press A");
+
+   options.B=getbutton("Press B");
+
+   options.START=getbutton("Press Start");
+
+   options.SELECT=getbutton("Press Select");
+
+   options.MENU=getbutton("Press Menu");
+}
 
 /*
  * do_user_menu - create the user menu on the screen.
@@ -144,6 +187,7 @@ int do_user_menu(void) {
     }
   }
   rb->lcd_clear_display();
+  rb->lcd_update();
   /* return somethin' */
   return ret;
 }
@@ -359,16 +403,16 @@ static void do_fs_menu(void) {
         done = true;
         break;
       case FS_ITEM_FS0:
-        frameskip=0;
+        options.maxskip=3;
         break;
 	  case FS_ITEM_FS1:
-        frameskip=1;
+        options.maxskip=4;
         break;
 	  case FS_ITEM_FS2:
-        frameskip=2;
+        options.maxskip=5;
         break;
 	  case FS_ITEM_FS3:
-        frameskip=3;
+        options.maxskip=7;
         break;
     }
   }
@@ -389,8 +433,17 @@ static void do_opt_menu(void) {
         do_fs_menu();
         break;
 	  case OM_ITEM_SOUND:
-        sound=!sound;
+        options.sound=!options.sound;
         break;
+     case OM_ITEM_STATS:
+        options.showstats=!options.showstats;
+        break;
+     case OM_ITEM_FULLSCREEN:
+         options.fullscreen=!options.fullscreen;
+         break;
+      case OM_ITEM_KEYS:
+         setupkeys();
+         break;
       case MENU_CANCEL:
       case OM_ITEM_BACK:
       done = true;

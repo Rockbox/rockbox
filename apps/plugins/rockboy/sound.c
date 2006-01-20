@@ -49,7 +49,7 @@ static const int freqtab[8] =
         (1<<14)/7
     };
 
-struct snd snd;
+struct snd snd IBSS_ATTR;
 int pcm_submit(void);
 
 #define RATE (snd.rate)
@@ -161,7 +161,7 @@ void sound_reset(void)
 void sound_mix(void)
 {
 
-	if (!sound) return;
+	if (!options.sound) return;
     int s, l, r, f, n;
 
     if (!RATE || cpu.snd < RATE) return;
@@ -289,7 +289,7 @@ void sound_mix(void)
 
 byte sound_read(byte r)
 {
-	if(!sound) return 0;
+	if(!options.sound) return 0;
     sound_mix();
     /* printf("read %02X: %02X\n", r, REG(r)); */
     return REG(r);
@@ -346,7 +346,7 @@ void s4_init(void)
 
 void sound_write(byte r, byte b)
 {
-	if(!sound) return;
+	if(!options.sound) return;
 #if 0
     static void *timer;
     if (!timer) timer = sys_timer();

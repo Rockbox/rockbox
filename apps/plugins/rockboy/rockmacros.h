@@ -16,6 +16,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef __ROCKMACROS_H__
+#define __ROCKMACROS_H__
 
 #include "plugin.h"
 
@@ -28,7 +30,7 @@ extern struct plugin_api* rb;
 extern int shut,cleanshut;
 void vid_update(int scanline);
 void vid_init(void);
-void vid_begin(void);
+inline void vid_begin(void);
 void vid_end(void);
 void die(char *message, ...);
 void setmallocpos(void *pointer);
@@ -38,7 +40,7 @@ int  sys_elapsed(long *oldtick);
 void sys_sleep(int us);
 int  pcm_submit(void);
 void pcm_init(void);
-void doevents(void);
+void doevents(void) ICODE_ATTR;
 void ev_poll(void);
 int do_user_menu(void);
 void loadstate(int fd);
@@ -60,6 +62,8 @@ void savestate(int fd);
 #define mkdir(a,b)      rb->sim_mkdir((a),(b))
 #undef open
 #define open(a,b)       rb->sim_open((a),(b))
+#undef close
+#define close(a)        rb->sim_close((a))
 #undef lseek
 #define lseek(a,b,c)    rb->sim_lseek((a),(b),(c))
 #else /* !SIMULATOR */
@@ -68,6 +72,7 @@ void savestate(int fd);
 #define mkdir(a,b)      rb->mkdir((a),(b))
 #define open(a,b)       rb->open((a),(b))
 #define lseek(a,b,c)    rb->lseek((a),(b),(c))
+#define close(a)        rb->close((a))
 #endif /* !SIMULATOR */
 
 #define strcat(a,b)     rb->strcat((a),(b))
@@ -93,5 +98,13 @@ void savestate(int fd);
 /* Using #define isn't enough with GCC 4.0.1 */
 void* memcpy(void* dst, const void* src, size_t size);
 
-extern int frameskip;
-extern bool sound;
+struct options {
+   int A, B, START, SELECT, MENU;
+   int frameskip, fps, maxskip;
+   bool sound, fullscreen, showstats;
+};
+
+extern struct options options;
+#define savedir "/.rockbox/rockboy"
+
+#endif

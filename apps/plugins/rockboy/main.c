@@ -86,7 +86,7 @@ int gnuboy_main(char *rom)
 	PUTS("Emu run");
 #if (LCD_HEIGHT > 144) || (LCD_WIDTH > 160)
     rb->lcd_clear_display();
-    rb->lcd_drawrect((LCD_WIDTH-160)/2-1, (LCD_HEIGHT-144)/2-1, 162, 146);
+//    rb->lcd_drawrect((LCD_WIDTH-160)/2-1, (LCD_HEIGHT-144)/2-1, 162, 146);
     rb->lcd_update();
 #endif
 	emu_run();

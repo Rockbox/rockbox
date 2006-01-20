@@ -52,11 +52,11 @@ extern struct ram ram;
 
 
 
-void mem_updatemap(void);
-void ioreg_write(byte r, byte b);
-void mbc_write(int a, byte b);
-void mem_write(int a, byte b);
-byte mem_read(int a);
+void mem_updatemap(void) ICODE_ATTR;
+void ioreg_write(byte r, byte b) ICODE_ATTR;
+void mbc_write(int a, byte b) ICODE_ATTR;
+void mem_write(int a, byte b) ICODE_ATTR;
+byte mem_read(int a) ICODE_ATTR;
 void mbc_reset(void);
 
 

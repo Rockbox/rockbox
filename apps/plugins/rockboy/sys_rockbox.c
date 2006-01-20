@@ -25,8 +25,6 @@
 #include "hw.h"
 #include "config.h"
 
-int frameskip;
-
 rcvar_t joy_exports[] =
 {
             RCV_END
@@ -43,7 +41,7 @@ extern int debug_trace;
 
 void vid_settitle(char *title)
 {
-    rb->splash(HZ*2, true, title);
+    rb->splash(HZ/2, true, title);
 }
 
 void joy_init(void)
@@ -53,36 +51,6 @@ void joy_init(void)
 void joy_close(void)
 {
 }
-
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD)
-#define ROCKBOY_PAD_A BUTTON_ON
-#define ROCKBOY_PAD_B BUTTON_OFF
-#define ROCKBOY_PAD_START BUTTON_REC
-#define ROCKBOY_PAD_SELECT BUTTON_SELECT
-#define ROCKBOY_MENU BUTTON_MODE
-
-#elif (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define ROCKBOY_PAD_A BUTTON_REC
-#define ROCKBOY_PAD_B BUTTON_MODE
-#define ROCKBOY_PAD_START BUTTON_ON
-#define ROCKBOY_PAD_SELECT BUTTON_SELECT
-#define ROCKBOY_MENU BUTTON_OFF
-
-#elif CONFIG_KEYPAD == RECORDER_PAD
-#define ROCKBOY_PAD_A BUTTON_F1
-#define ROCKBOY_PAD_B BUTTON_F2
-#define ROCKBOY_PAD_START BUTTON_F3
-#define ROCKBOY_PAD_SELECT BUTTON_PLAY
-#define ROCKBOY_MENU BUTTON_OFF
-
-#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-#define ROCKBOY_PAD_A BUTTON_PLAY
-#define ROCKBOY_PAD_B BUTTON_EQ
-#define ROCKBOY_PAD_START BUTTON_MODE
-#define ROCKBOY_PAD_SELECT (BUTTON_SELECT | BUTTON_REL)
-#define ROCKBOY_MENU (BUTTON_SELECT | BUTTON_REPEAT)
-
-#endif
 
 unsigned int oldbuttonstate = 0, newbuttonstate,holdbutton;
 
@@ -109,13 +77,13 @@ void ev_poll(void)
         if(released & BUTTON_RIGHT) {ev.code=PAD_RIGHT; ev_postevent(&ev);}
         if(released & BUTTON_DOWN) { ev.code=PAD_DOWN; ev_postevent(&ev); }
         if(released & BUTTON_UP) { ev.code=PAD_UP; ev_postevent(&ev); }
-        if(released & ROCKBOY_PAD_A) { ev.code=PAD_A; ev_postevent(&ev); }
-        if(released & ROCKBOY_PAD_B) { ev.code=PAD_B; ev_postevent(&ev); }
-        if(released & ROCKBOY_PAD_START) {
+        if(released & options.A) { ev.code=PAD_A; ev_postevent(&ev); }
+        if(released & options.B) { ev.code=PAD_B; ev_postevent(&ev); }
+        if(released & options.START) {
             ev.code=PAD_START;
             ev_postevent(&ev);
         }
-        if(released & ROCKBOY_PAD_SELECT) {
+        if(released & options.SELECT) {
             ev.code=PAD_SELECT;
             ev_postevent(&ev);
         }
@@ -126,17 +94,17 @@ void ev_poll(void)
         if(pressed & BUTTON_RIGHT) { ev.code=PAD_RIGHT; ev_postevent(&ev);}
         if(pressed & BUTTON_DOWN) { ev.code=PAD_DOWN; ev_postevent(&ev); }
         if(pressed & BUTTON_UP) { ev.code=PAD_UP; ev_postevent(&ev); }
-        if(pressed & ROCKBOY_PAD_A) { ev.code=PAD_A; ev_postevent(&ev); }
-        if(pressed & ROCKBOY_PAD_B) { ev.code=PAD_B; ev_postevent(&ev); }
-        if(pressed & ROCKBOY_PAD_START) {
+        if(pressed & options.A) { ev.code=PAD_A; ev_postevent(&ev); }
+        if(pressed & options.B) { ev.code=PAD_B; ev_postevent(&ev); }
+        if(pressed & options.START) {
             ev.code=PAD_START;
             ev_postevent(&ev); 
         }
-        if(pressed & ROCKBOY_PAD_SELECT) {
+        if(pressed & options.SELECT) {
             ev.code=PAD_SELECT;
             ev_postevent(&ev);
         }
-        if(pressed & ROCKBOY_MENU) {
+        if(pressed & options.MENU) {
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
           if (do_user_menu() == USER_MENU_QUIT) 
 #endif
@@ -157,11 +125,17 @@ void vid_setpal(int i, int r, int g, int b)
     (void)b;
 }
 
-void vid_begin(void) // This frameskip code is borrowed from the GNUboyCE project
+inline void vid_begin(void) // New frameskip, makes more sense to me and performs as well
 {
 	static int skip = 0;
-	skip = (skip + 1) % (frameskip > 0 ? frameskip + 1 : 1);
-	fb.enabled = skip == 0;
+   if (skip<options.frameskip) {
+      skip++;
+      fb.enabled=0;
+   }
+   else {
+      skip=0;
+      fb.enabled=1;
+   }
 }
 
 void vid_init(void)
@@ -173,7 +147,7 @@ void vid_init(void)
     fb.dirty=0;
     fb.mode=3;
 
-	frameskip=2;
+   fb.ptr=rb->lcd_framebuffer;
 
 #if defined(HAVE_LCD_COLOR)
     fb.pelsize=2; // 16 bit framebuffer
@@ -193,13 +167,12 @@ void vid_init(void)
 #endif
 }
 
+#if LCD_HEIGHT<144
 fb_data *frameb;
 void vid_update(int scanline) 
-{
-    register int cnt=0;
-#if LCD_HEIGHT < 144
+{ 
+   register int cnt=0;
     int scanline_remapped;
-#endif
 #if (LCD_HEIGHT == 64) && (LCD_DEPTH == 1) /* Archos */
     int balance = 0;
     if (fb.mode==1)
@@ -292,13 +265,10 @@ void vid_update(int scanline)
     }
     rb->lcd_update_rect(0, scanline & ~3, LCD_WIDTH, 4);
 #elif (LCD_HEIGHT >= 144) && defined(HAVE_LCD_COLOR) /* iriver H3x0, colour iPod */
-    frameb = rb->lcd_framebuffer + (scanline + (LCD_HEIGHT-144)/2) * LCD_WIDTH + (LCD_WIDTH-160)/2;;
-    while (cnt < 160)
-    		*frameb++ = scan.pal2[scan.buf[cnt++]];
-	if(scanline==143)
-		rb->lcd_update(); // this seems faster then doing individual scanlines
+    // handled in lcd.c now
 #endif /* LCD_HEIGHT */
 }
+#endif
 
 void vid_end(void)
 {
@@ -307,19 +277,30 @@ void vid_end(void)
 long timerresult;
 
 void *sys_timer(void) 
-{
+{/*
    timerresult=*rb->current_tick;
-   return &timerresult;
+   return &timerresult;*/
+   return 0;
 }
 
 // returns microseconds passed since sys_timer
 int sys_elapsed(long *oldtick) 
 {
-   return ((*rb->current_tick-(*oldtick))*1000000)/HZ;
+/*
+   int elap,mytime=microtick;
+
+   elap=mytime-*oldtick;
+   *oldtick=mytime;
+   return elap;*/
+//   return ((*rb->current_tick-(*oldtick))*1000000)/HZ;
+   return *oldtick;
 }
 
 void sys_sleep(int us)
 {
-  if (us <= 0) return;
-//  rb->sleep(HZ*us/1000000);
+   if(us<=0) return;
+   int i=0;
+   while(i< us*11)
+      i++;
+//  if (us <= 0) return;
 }

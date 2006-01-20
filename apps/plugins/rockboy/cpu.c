@@ -1006,9 +1006,9 @@ next:
 
 #ifndef ASM_CPU_STEP
 
-int cpu_step(int max)
+inline int cpu_step(int max)
 {
-	int cnt;
+	register int cnt;
 	if ((cnt = cpu_idle(max))) return cnt;
 	return cpu_emulate(1);
 }

@@ -94,7 +94,7 @@ rcvar_t lcd_exports[] =
         RCV_END
     };
 
-static byte *vdest;
+fb_data *vdest;
 
 #ifdef ALLOW_UNALIGNED_IO /* long long is ok since this is i386-only anyway? */
 #define MEMCPY8(d, s) ((*(long long *)(d)) = (*(long long *)(s)))
@@ -532,9 +532,21 @@ void bg_scan(void)
     if (cnt <= 0) return;
     while (cnt >= 8)
     {
+#if CONFIG_CPU == MCF5249 && !defined(SIMULATOR)
+      asm volatile (
+         "move.l (%1)+,(%0)+ \n"
+         "move.l (%1)+,(%0)+ \n"
+         : /*outputs*/
+         : /*inputs*/
+         /* %0 */ "a" (dest),
+         /* %1 */ "a" (patpix[*(tile++)][V])
+         //: /* clobbers */
+      );
+#else
         src = patpix[*(tile++)][V];
         MEMCPY8(dest, src);
         dest += 8;
+#endif
         cnt -= 8;
     }
     src = patpix[*tile][V];
@@ -555,9 +567,21 @@ void wnd_scan(void)
 
     while (cnt >= 8)
     {
+#if CONFIG_CPU == MCF5249 && !defined(SIMULATOR)
+      asm volatile (
+         "move.l (%1)+,(%0)+ \n"
+         "move.l (%1)+,(%0)+ \n"
+         : /*outputs*/
+         : /*inputs*/
+         /* %0 */ "a" (dest),
+         /* %1 */ "a" (patpix[*(tile++)][WV])
+         //: /* clobbers */
+      );
+#else
         src = patpix[*(tile++)][WV];
         MEMCPY8(dest, src);
         dest += 8;
+#endif
         cnt -= 8;
     }
     src = patpix[*tile][WV];
@@ -651,8 +675,55 @@ void bg_scan_color(void)
     while (cnt >= 8)
     {
         src = patpix[*(tile++)][V];
+#if CONFIG_CPU == MCF5249 && !defined(SIMULATOR)
+      asm volatile (
+         "move.l (%2)+,%%d1 \n"
+
+         "move.b %%d1,%%d2 \n"
+
+         "move.b (%1)+,%%d0  \n"
+         "or.l %%d2,%%d0      \n"
+         "move.b %%d0,(%0)+   \n"
+
+         "move.b (%1)+,%%d0  \n"
+         "or.l %%d1,%%d0      \n"
+         "move.b %%d0,(%0)+   \n"
+
+         "move.b (%1)+,%%d0  \n"
+         "or.l %%d2,%%d0      \n"
+         "move.b %%d0,(%0)+   \n"
+
+         "move.b (%1)+,%%d0  \n"
+         "or.l %%d2,%%d0      \n"
+         "move.b %%d0,(%0)+   \n"
+
+         "move.b (%1)+,%%d0  \n"
+         "or.l %%d2,%%d0      \n"
+         "move.b %%d0,(%0)+   \n"
+
+         "move.b (%1)+,%%d0  \n"
+         "or.l %%d2,%%d0      \n"
+         "move.b %%d0,(%0)+   \n"
+
+         "move.b (%1)+,%%d0  \n"
+         "or.l %%d2,%%d0      \n"
+         "move.b %%d0,(%0)+   \n"
+
+         "move.b (%1)+,%%d0  \n"
+         "or.l %%d2,%%d0      \n"
+         "move.b %%d0,(%0)+   \n"
+   : /*outputs*/
+   : /*inputs*/
+   /* %0 */ "a" (dest),
+   /* %1 */ "a" (src),
+   /* %2 */ "a" (tile)
+   : /* clobbers */
+   "d0", "d1", "d2"
+);
+#else
         blendcpy(dest, src, *(tile++), 8);
         dest += 8;
+#endif
         cnt -= 8;
     }
     src = patpix[*(tile++)][V];
@@ -843,14 +914,21 @@ void lcd_begin(void)
         else pal_expire();
     }
     while (scale * 160 > fb.w || scale * 144 > fb.h) scale--; */
-    vdest = fb.ptr + ((fb.w*fb.pelsize)>>1)
-        - (80*fb.pelsize)
-        + ((fb.h>>1) - 72) * fb.pitch;
+   if(options.fullscreen)
+      vdest = fb.ptr;
+   else
+      vdest = fb.ptr + ((LCD_HEIGHT-144)/2)*LCD_WIDTH + ((LCD_WIDTH-160)/2);
+
     WY = R_WY;
 }
 
+char frameout[25];
 void lcd_refreshline(void)
 {
+#if LCD_HEIGHT>=144
+   int cnt=0, two;
+#endif
+
     if (!fb.enabled) return;
     if(!insync) {
         if(R_LY!=0)
@@ -924,7 +1002,32 @@ void lcd_refreshline(void)
         else
             vid_update(L-((int)(L/9)));
 #else
-        vid_update(L);
+
+   for(two=0;two<( (options.showstats ? (L&0x07)==0x05 : (L&0x07)==0x05 || (L&0x0F)==0x08) && options.fullscreen)+1;two++)
+   {
+      while (cnt < 160)
+      {
+         *vdest++ = scan.pal2[scan.buf[cnt++]];
+         if( ((cnt&0x03)==0x03 || (cnt&0x07)==0x06) && options.fullscreen ) *vdest++ = scan.pal2[scan.buf[cnt]];
+      }
+
+      if(!options.fullscreen)
+            vdest+=(LCD_WIDTH-160);
+      cnt=0;
+   }
+
+   if(L==143)
+   {
+      if(options.showstats) {
+         snprintf(frameout,sizeof(frameout),"FPS: %d \t %d ",options.fps, options.frameskip);
+         if(options.fullscreen) rb->lcd_putsxy(0,166,frameout);
+         else rb->lcd_putsxy((LCD_WIDTH-160)/2,(LCD_HEIGHT-144)/2,frameout);
+      }
+      if(options.fullscreen)
+         rb->lcd_update();
+      else
+         rb->lcd_update_rect( (LCD_WIDTH-160)/2, (LCD_HEIGHT-144)/2, 160, 144 );
+   }
 #endif
     }
 #if LCD_DEPTH == 1
