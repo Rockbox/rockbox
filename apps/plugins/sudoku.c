@@ -2228,25 +2228,36 @@ void display_board(struct sudoku_state_t* state)
   rb->lcd_vline(XOFSSCRATCHPAD,YOFS,YOFS+BOARD_HEIGHT-1);
   rb->lcd_vline(XOFSSCRATCHPAD+CELL_WIDTH+1,YOFS,YOFS+BOARD_HEIGHT-1);
   for (r=0;r<9;r++) {
-#if (LCD_HEIGHT==128) || (LCD_HEIGHT==176)
-      rb->lcd_hline(XOFSSCRATCHPAD,XOFSSCRATCHPAD+CELL_WIDTH+1,
-                    YOFS+cellypos[r]-1);
-#elif (LCD_HEIGHT==64)
-      for (c=XOFSSCRATCHPAD;c<XOFSSCRATCHPAD+CELL_WIDTH+1;c+=2) {
-        rb->lcd_drawpixel(c,YOFS+cellypos[r]-1);
-        }
-#endif
+#if LCD_HEIGHT > 64
+    /* Large targets - draw single/double lines */
+    rb->lcd_hline(XOFSSCRATCHPAD,XOFSSCRATCHPAD+CELL_WIDTH+1,
+                  YOFS+cellypos[r]-1);
     if ((r % 3)==0)
       rb->lcd_hline(XOFSSCRATCHPAD,XOFSSCRATCHPAD+CELL_WIDTH+1,
                     YOFS+cellypos[r]-2);
+#elif LCD_HEIGHT == 64
+    /* Small targets - draw dotted/single lines */
+    if ((r % 3)==0) {
+      /* Solid Line */
+      rb->lcd_hline(XOFSSCRATCHPAD,XOFSSCRATCHPAD+CELL_WIDTH+1,
+                    YOFS+cellypos[r]-1);
+    } else {
+      /* Dotted line */
+      for (c=XOFSSCRATCHPAD;c<XOFSSCRATCHPAD+CELL_WIDTH+1;c+=2) {
+        rb->lcd_drawpixel(c,YOFS+cellypos[r]-1);
+      }
+    }
+#endif
     if ((r>0) && state->possiblevals[state->y][state->x]&(1<<(r)))
       rb->lcd_bitmap(num[r],XOFSSCRATCHPAD+1,YOFS+cellypos[r-1],
                      CELL_WIDTH,CELL_HEIGHT);
   }
   rb->lcd_hline(XOFSSCRATCHPAD,XOFSSCRATCHPAD+CELL_WIDTH+1,
                 YOFS+cellypos[8]+CELL_HEIGHT);
+#if LCD_HEIGHT > 64
   rb->lcd_hline(XOFSSCRATCHPAD,XOFSSCRATCHPAD+CELL_WIDTH+1,
                 YOFS+cellypos[8]+CELL_HEIGHT+1);
+#endif
   if (state->possiblevals[state->y][state->x]&(1<<(r)))
     rb->lcd_bitmap(num[r],XOFSSCRATCHPAD+1,YOFS+cellypos[8],
                    CELL_WIDTH,CELL_HEIGHT);
