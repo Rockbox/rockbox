@@ -59,8 +59,8 @@ static bool pcm_playing;
 static bool pcm_paused;
 static int pcm_freq = 0x6; /* 44.1 is default */
 
-static unsigned char *next_start;
-static long next_size;
+static unsigned char *next_start IDATA_ATTR;
+static long next_size IDATA_ATTR;
 
 /* Set up the DMA transfer that kicks in when the audio FIFO gets empty */
 static void dma_start(const void *addr, long size)
@@ -193,7 +193,7 @@ void pcm_set_frequency(unsigned int frequency)
 }
 
 /* the registered callback function to ask for more mp3 data */
-static void (*callback_for_more)(unsigned char**, long*) = NULL;
+static void (*callback_for_more)(unsigned char**, long*) IDATA_ATTR = NULL;
 
 void pcm_play_data(void (*get_more)(unsigned char** start, long* size))
 {

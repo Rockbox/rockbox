@@ -46,8 +46,8 @@
 static long pcmbuf_size = 0;      /* Size of the PCM buffer. */
 static char *audiobuffer;
 static long audiobuffer_pos;      /* Current audio buffer write index. */
-long audiobuffer_free;            /* Amount of bytes left in the buffer. */
-static long audiobuffer_fillpos;  /* Amount audiobuffer_pos will be increased. */
+long audiobuffer_free IDATA_ATTR; /* Amount of bytes left in the buffer. */
+static long audiobuffer_fillpos;  /* Amount audiobuffer_pos will be increased.*/
 static char *guardbuf;
 
 static void (*pcmbuf_event_handler)(void);
@@ -81,11 +81,11 @@ struct pcmbufdesc
     int size;
     /* Call this when the buffer has been played */
     void (*callback)(void);
-} pcmbuffers[NUM_PCM_BUFFERS];
+} pcmbuffers[NUM_PCM_BUFFERS] IDATA_ATTR;
 
 volatile int pcmbuf_read_index;
 volatile int pcmbuf_write_index;
-int pcmbuf_unplayed_bytes;
+int pcmbuf_unplayed_bytes IDATA_ATTR;
 int pcmbuf_mix_used_bytes;
 int pcmbuf_watermark;
 void (*pcmbuf_watermark_event)(int bytes_left);
@@ -121,6 +121,7 @@ int pcmbuf_num_used_buffers(void)
     return (pcmbuf_write_index - pcmbuf_read_index) & NUM_PCM_BUFFERS_MASK;
 }
 
+static void pcmbuf_callback(unsigned char** start, long* size) ICODE_ATTR;
 static void pcmbuf_callback(unsigned char** start, long* size)
 {
     struct pcmbufdesc *desc = &pcmbuffers[pcmbuf_read_index];
@@ -206,14 +207,10 @@ void pcmbuf_add_event(void (*event_handler)(void))
 
 unsigned int pcmbuf_get_latency(void)
 {
-    int latency;
+    int latency = (pcmbuf_unplayed_bytes + pcm_get_bytes_waiting()) 
+        * 1000 / 4 / 44100;
     
-    latency = (pcmbuf_unplayed_bytes + pcm_get_bytes_waiting())
-                * 1000 / 4 / 44100;
-    if (latency < 0)
-        latency = 0;
-    
-    return latency;
+    return latency<0?0:latency;
 }
 
 bool pcmbuf_is_lowdata(void)
