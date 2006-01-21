@@ -86,19 +86,20 @@ static volatile bool paused;
 #define AUDIO_DEFAULT_WATERMARK      (1024*512)
 #define AUDIO_DEFAULT_FILECHUNK      (1024*32)
 
-#define AUDIO_PLAY         1
-#define AUDIO_STOP         2
-#define AUDIO_PAUSE        3
-#define AUDIO_RESUME       4
-#define AUDIO_NEXT         5
-#define AUDIO_PREV         6
-#define AUDIO_FF_REWIND    7
-#define AUDIO_FLUSH_RELOAD 8
-#define AUDIO_CODEC_DONE   9
-#define AUDIO_FLUSH        10
+#define AUDIO_PLAY           1
+#define AUDIO_STOP           2
+#define AUDIO_PAUSE          3
+#define AUDIO_RESUME         4
+#define AUDIO_NEXT           5
+#define AUDIO_PREV           6
+#define AUDIO_FF_REWIND      7
+#define AUDIO_FLUSH_RELOAD   8
+#define AUDIO_CODEC_DONE     9
+#define AUDIO_FLUSH         10
 #define AUDIO_TRACK_CHANGED 11
 #define AUDIO_DIR_NEXT      12
 #define AUDIO_DIR_PREV      13
+#define AUDIO_SEAMLESS_SEEK 14
 
 #define CODEC_LOAD       1
 #define CODEC_LOAD_DISK  2
@@ -306,13 +307,15 @@ bool codec_pcmbuf_insert_split_callback(void *ch1, void *ch2,
 
     while (length > 0) {
         /* This will prevent old audio from playing when skipping tracks. */
-        if ((ci.reload_codec || ci.stop_codec) && current_codec != CODEC_IDX_VOICE)
+        if ((ci.reload_codec || ci.stop_codec) && 
+                current_codec != CODEC_IDX_VOICE)
             return true;
     
         while ((dest = pcmbuf_request_buffer(dsp_output_size(length), 
             &output_size)) == NULL) {
             sleep(1);
-            if ((ci.reload_codec || ci.stop_codec) && current_codec != CODEC_IDX_VOICE)
+            if ((ci.reload_codec || ci.stop_codec) && 
+                    current_codec != CODEC_IDX_VOICE)
                 return true;
         }
 
@@ -330,9 +333,10 @@ bool codec_pcmbuf_insert_split_callback(void *ch1, void *ch2,
             DEBUGF("Warning: dsp_input_size(%ld=dsp_output_size(%ld))=%ld <= 0\n",
                    output_size, length, input_size);
             /* should we really continue, or should we break?
-             * We should probably continue because calling pcmbuf_flush_buffer(0)
-             * will wrap the buffer if it was fully filled and so next call to
-             * pcmbuf_request_buffer should give the requested output_size. */
+             * We should probably continue because calling 
+             * pcmbuf_flush_buffer(0) will wrap the buffer if it was fully 
+             * filled and so next call to pcmbuf_request_buffer should give 
+             * the requested output_size. */
             continue;
         }
 
@@ -665,7 +669,6 @@ void codec_seek_complete_callback(void)
 {
     /* assume we're called from non-voice codec, as they shouldn't seek */
     ci.seek_time = 0;
-    pcmbuf_play_stop();
 }
 
 bool codec_seek_buffer_callback(off_t newpos)
@@ -1868,6 +1871,12 @@ void audio_thread(void)
                 ci.seek_time = (int)ev.data+1;
                 break ;
 
+            case AUDIO_SEAMLESS_SEEK:
+                if (!playing)
+                    break ;
+                ci.seek_time = (int)ev.data+1;
+                break ;
+
             case AUDIO_DIR_NEXT:
                 logf("audio_dir_next");
                 playlist_end = false;
@@ -2220,6 +2229,12 @@ void audio_ff_rewind(int newpos)
 {
     logf("rewind: %d", newpos);
     queue_post(&audio_queue, AUDIO_FF_REWIND, (int *)newpos);
+}
+
+void audio_seamless_seek(int newpos)
+{
+    logf("seamless_seek: %d", newpos);
+    queue_post(&audio_queue, AUDIO_SEAMLESS_SEEK, (int *)newpos);
 }
 
 void audio_flush_and_reload_tracks(void)
