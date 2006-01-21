@@ -31,6 +31,7 @@
 #ifdef HAVE_LCD_CHARCELLS
 #include "hwcompat.h"
 #endif
+#include "abrepeat.h"
 #include "mp3_playback.h"
 #include "backlight.h"
 #include "lang.h"
@@ -1431,8 +1432,8 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
                                     HORIZONTAL);
 #ifdef AB_REPEAT_ENABLE
                 if ( ab_repeat_mode_enabled() )
-                    ab_draw_markers(state->id3->length, 0, sby, LCD_WIDTH,
-                                    PROGRESS_BAR_HEIGHT);
+                    ab_draw_markers(display, state->id3->length, 0, sby, 
+                            PROGRESS_BAR_HEIGHT);
 #endif
                 update_line = true;
             }

@@ -392,11 +392,17 @@ long gui_wps_show(void)
 #ifdef AB_REPEAT_ENABLE
                 /* if we're in A/B repeat mode and the current position
                    is past the A marker, jump back to the A marker... */
-                if ( ab_repeat_mode_enabled() 
-                     && ab_after_A_marker(wps_state.id3->elapsed) )
+                if ( ab_repeat_mode_enabled() )
                 {
-                    ab_jump_to_A_marker();
-                    break;
+                    if ( ab_after_A_marker(wps_state.id3->elapsed) )
+                    {
+                        ab_jump_to_A_marker();
+                        break;
+#if (AB_REPEAT_ENABLE == 2)
+                    } else {
+                        ab_reset_markers();
+#endif
+                    }
                 }
                 /* ...otherwise, do it normally */
 #endif
@@ -451,11 +457,17 @@ long gui_wps_show(void)
 #ifdef AB_REPEAT_ENABLE
                 /* if we're in A/B repeat mode and the current position is
                    before the A marker, jump to the A marker... */
-                if ( ab_repeat_mode_enabled() 
-                     && ab_before_A_marker(wps_state.id3->elapsed) )
+                if ( ab_repeat_mode_enabled() )
                 {
-                    ab_jump_to_A_marker();
-                    break;
+                    if ( ab_before_A_marker(wps_state.id3->elapsed) )
+                    {
+                        ab_jump_to_A_marker();
+                        break;
+#if (AB_REPEAT_ENABLE == 2)
+                    } else {
+                        ab_reset_markers();
+#endif
+                    }
                 }
                 /* ...otherwise, do it normally */
 #endif
@@ -545,6 +557,33 @@ long gui_wps_show(void)
 
 #ifdef AB_REPEAT_ENABLE
 
+#ifdef WPS_AB_SINGLE
+            case WPS_AB_SINGLE:
+#ifdef WPS_AB_SINGLE_PRE
+                if (lastbutton != WPS_AB_SINGLE_PRE)
+                    break;
+#endif
+/* If we are using the menu option to enable ab_repeat mode, don't do anything
+ * when it's disabled */
+#if (AB_REPEAT_ENABLE == 1)
+                if (!ab_repeat_mode_enabled())
+                    break;
+#endif
+                if (ab_A_marker_set()) {
+                    update_track = true;
+                    if (ab_B_marker_set()) {
+                        ab_reset_markers();
+                        break;
+                    }
+                    ab_set_B_marker(wps_state.id3->elapsed);
+                    ab_jump_to_A_marker();
+                    break;
+                }
+                ab_set_A_marker(wps_state.id3->elapsed);
+                break;
+#endif
+                
+                
 #ifdef WPS_AB_SET_A_MARKER
             /* set A marker for A-B repeat */
             case WPS_AB_SET_A_MARKER:

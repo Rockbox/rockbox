@@ -739,7 +739,7 @@ static void display_bookmark(const char* bookmark,
     /* bookmark shuffle and repeat states*/
     switch (repeat_mode)
     {
-#ifdef AB_REPEAT_ENABLE
+#if (AB_REPEAT_ENABLE == 1)
         case REPEAT_AB:
             statusbar_icon_play_mode(Icon_RepeatAB);
             break;

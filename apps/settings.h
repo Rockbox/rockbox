@@ -25,7 +25,6 @@
 #include "file.h"
 #include "dircache.h"
 #include "timefuncs.h"
-#include "abrepeat.h"
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
 #include "backlight.h" /* for [MIN|MAX]_BRIGHTNESS_SETTING */
@@ -478,7 +477,7 @@ enum
     REPEAT_ALL,
     REPEAT_ONE,
     REPEAT_SHUFFLE,
-#ifdef AB_REPEAT_ENABLE
+#if (AB_REPEAT_ENABLE == 1)
     REPEAT_AB,
 #endif
     NUM_REPEAT_MODES

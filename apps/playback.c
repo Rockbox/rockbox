@@ -49,6 +49,7 @@
 #include "pcm_record.h"
 #include "buffer.h"
 #include "dsp.h"
+#include "abrepeat.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "peakmeter.h"
@@ -418,6 +419,9 @@ void codec_set_elapsed_callback(unsigned int value)
     if (ci.stop_codec || current_codec == CODEC_IDX_VOICE)
         return ;
         
+#ifdef AB_REPEAT_ENABLE
+    ab_position_report(value);
+#endif
     latency = pcmbuf_get_latency();
     
     if (value < latency) {
@@ -1663,7 +1667,10 @@ bool codec_request_next_track_callback(void)
            the core has been requested the codec to be terminated. */
         return !ci_voice.stop_codec && queue_empty(&voice_codec_queue);
     }
-        
+#ifdef AB_REPEAT_ENABLE
+    ab_end_of_track_report();
+#endif
+
     pcmbuf_set_position_callback(pcmbuf_position_callback);
 
     if (ci.stop_codec || !playing)

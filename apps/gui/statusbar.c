@@ -247,11 +247,11 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
                                                 Icon_Play);
 
         switch (bar->info.repeat) {
-#ifdef AB_REPEAT_ENABLE
+#if (AB_REPEAT_ENABLE == 1)
             case REPEAT_AB:
                 gui_statusbar_icon_play_mode(display, Icon_RepeatAB);
                 break;
-#endif /* AB_REPEAT_ENABLE */
+#endif /* AB_REPEAT_ENABLE == 1 */
 
             case REPEAT_ONE:
                 gui_statusbar_icon_play_mode(display, Icon_RepeatOne);

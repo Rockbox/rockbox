@@ -46,7 +46,6 @@
 #include "debug.h"
 #include "led.h"
 #include "sound.h"
-#include "abrepeat.h"
 #include "gwps-common.h"
 #include "splash.h"
 #include "statusbar.h"
@@ -515,7 +514,7 @@ bool quick_screen_quick(int button_enter)
         [REPEAT_ALL]={ STR(LANG_REPEAT_ALL) },
         [REPEAT_ONE]={ STR(LANG_REPEAT_ONE) },
         [REPEAT_SHUFFLE]={ STR(LANG_SHUFFLE) },
-#ifdef AB_REPEAT_ENABLE
+#if (AB_REPEAT_ENABLE == 1)
         [REPEAT_AB]={ STR(LANG_REPEAT_AB) }
 #endif
     };

@@ -20,6 +20,7 @@
 #include "quickscreen.h"
 #ifdef HAS_QUICKSCREEN
 
+#include "system.h"
 #include "icons.h"
 #include "textarea.h"
 #include "font.h"

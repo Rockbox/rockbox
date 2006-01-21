@@ -1,4 +1,5 @@
 #include "yesno.h"
+#include "system.h"
 #include "kernel.h"
 #include "misc.h"
 #include "lang.h"

@@ -580,7 +580,7 @@ static bool repeat_mode(void)
         { STR(LANG_REPEAT_ALL) },
         { STR(LANG_REPEAT_ONE) },
         { STR(LANG_SHUFFLE) },
-#ifdef AB_REPEAT_ENABLE
+#if (AB_REPEAT_ENABLE == 1)
         { STR(LANG_REPEAT_AB) }
 #endif
     };

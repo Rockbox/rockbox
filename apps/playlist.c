@@ -994,7 +994,7 @@ static int get_next_index(const struct playlist_info* playlist, int steps,
         }
 
         case REPEAT_ONE:
-#ifdef AB_REPEAT_ENABLE
+#if (AB_REPEAT_ENABLE == 1)
         case REPEAT_AB:
 #endif
             next_index = current_index;
@@ -2205,7 +2205,7 @@ int playlist_next(int steps)
     int index;
 
     if ( (steps > 0)
-#ifdef AB_REPEAT_ENABLE
+#if (AB_REPEAT_ENABLE == 1)
     && (global_settings.repeat_mode != REPEAT_AB)
 #endif
     && (global_settings.repeat_mode != REPEAT_ONE) )
