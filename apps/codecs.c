@@ -238,13 +238,12 @@ int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,
     if ((char *)&codecbuf[0] != codecptr) {
         /* zero out codec buffer to ensure a properly zeroed bss area */
         memset(codecbuf, 0, CODEC_SIZE);
-        
+
         size = MIN(size, CODEC_SIZE);
         copy_n = MIN(size, bufwrap);
         memcpy(codecbuf, codecptr, copy_n);         
-        size -= copy_n;
-        if (size > 0) {
-            memcpy(&codecbuf[copy_n], ptr2, size);
+        if (size - copy_n > 0) {
+            memcpy(&codecbuf[copy_n], ptr2, size - copy_n);
         }
     }
     hdr = (struct codec_header *)codecbuf;
@@ -253,7 +252,9 @@ int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,
         || hdr->magic != CODEC_MAGIC
         || hdr->target_id != TARGET_ID
         || hdr->load_addr != codecbuf
-        || hdr->end_addr > codecbuf + CODEC_SIZE) {
+        || hdr->end_addr > codecbuf + CODEC_SIZE)
+    {
+        logf("codec header error");
         return CODEC_ERROR;
     }
 #else /* SIMULATOR */
