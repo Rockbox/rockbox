@@ -75,6 +75,11 @@ static void dma_start(const void *addr, long size)
     EBU1CONFIG = IIS_RESET | EBU_DEFPARM;
 #endif
 
+    /** Prevent a very tiny pop from happening by muting audio
+     * until dma has been initialized. */
+    uda1380_mute(true);
+    sleep(HZ/16);
+    
     /* Set up DMA transfer  */
     SAR0 = ((unsigned long)addr); /* Source address */
     DAR0 = (unsigned long)&PDOR3; /* Destination address */
@@ -87,6 +92,9 @@ static void dma_start(const void *addr, long size)
     EBU1CONFIG = EBU_DEFPARM;
 #endif
     DCR0 = DMA_INT | DMA_EEXT | DMA_CS | DMA_SINC | DMA_START;
+
+    /* Now unmute the audio. */
+    uda1380_mute(false);
 }
 
 /* Stops the DMA transfer and interrupt */
@@ -215,7 +223,11 @@ long pcm_get_bytes_waiting(void)
 void pcm_play_stop(void)
 {
     if (pcm_playing) {
+        /* Same muting trick here to prevent a tiny pop. */
+        uda1380_mute(true);
+        sleep(HZ/16);
         dma_stop();
+        uda1380_mute(false);
     }
 }
 
@@ -274,7 +286,7 @@ void DMA0(void)
     /* Stop on error */
     if(res & 0x70)
     {
-       pcm_play_stop();
+       dma_stop();
        logf("DMA Error:0x%04x", res);
     }
     else
@@ -290,7 +302,7 @@ void DMA0(void)
         else
         {
             /* Finished playing */
-            pcm_play_stop();
+            dma_stop();
             logf("DMA No Data:0x%04x", res);
         }
     }
@@ -340,7 +352,6 @@ void pcm_init(void)
     sleep(HZ/4);
     tlv320_mute(false);
 #endif
-
     
     /* Call dma_stop to initialize everything. */
     dma_stop();
