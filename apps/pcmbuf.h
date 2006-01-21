@@ -30,8 +30,6 @@ bool pcmbuf_is_crossfade_active(void);
 
 /* These functions are for playing chained buffers of PCM data */
 bool pcmbuf_add_chunk(void *addr, int size, void (*callback)(void));
-int pcmbuf_num_used_buffers(void);
-void pcmbuf_set_watermark(int numbytes, void (*callback)(int bytes_left));
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 void pcmbuf_boost(bool state);
@@ -45,6 +43,7 @@ void pcmbuf_flush_audio(void);
 void pcmbuf_play_start(void);
 bool pcmbuf_crossfade_init(void);
 void pcmbuf_add_event(void (*event_handler)(void));
+void pcmbuf_set_position_callback(void (*callback)(int size));
 unsigned int pcmbuf_get_latency(void);
 bool pcmbuf_insert_buffer(char *buf, long length);
 void pcmbuf_flush_buffer(long length);

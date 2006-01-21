@@ -83,12 +83,14 @@ struct pcmbufdesc
     void (*callback)(void);
 } pcmbuffers[NUM_PCM_BUFFERS] IDATA_ATTR;
 
-volatile int pcmbuf_read_index;
-volatile int pcmbuf_write_index;
-int pcmbuf_unplayed_bytes IDATA_ATTR;
-int pcmbuf_mix_used_bytes;
-int pcmbuf_watermark;
-void (*pcmbuf_watermark_event)(int bytes_left);
+static int pcmbuf_read_index;
+static int pcmbuf_write_index;
+static int pcmbuf_unplayed_bytes IDATA_ATTR;
+static int pcmbuf_mix_used_bytes;
+static int pcmbuf_watermark;
+static void pcmbuf_under_watermark(int bytes_left);
+static int pcmbuf_num_used_buffers(void);
+static void (*position_callback)(int size);
 static int last_chunksize;
 static long mixpos = 0;
 
@@ -116,7 +118,7 @@ void pcmbuf_set_boost_mode(bool state)
 }
 #endif
 
-int pcmbuf_num_used_buffers(void)
+static int pcmbuf_num_used_buffers(void)
 {
     return (pcmbuf_write_index - pcmbuf_read_index) & NUM_PCM_BUFFERS_MASK;
 }
@@ -125,6 +127,10 @@ static void pcmbuf_callback(unsigned char** start, long* size) ICODE_ATTR;
 static void pcmbuf_callback(unsigned char** start, long* size)
 {
     struct pcmbufdesc *desc = &pcmbuffers[pcmbuf_read_index];
+
+    if (position_callback) {
+        position_callback(last_chunksize);
+    }
     
     pcmbuf_unplayed_bytes -= last_chunksize;
     audiobuffer_free += last_chunksize;
@@ -159,19 +165,20 @@ static void pcmbuf_callback(unsigned char** start, long* size)
     }
 
     last_chunksize = *size;
+
     if(pcmbuf_unplayed_bytes <= pcmbuf_watermark)
     {
-        if(pcmbuf_watermark_event)
-        {
-            pcmbuf_watermark_event(pcmbuf_unplayed_bytes);
-        }
+        pcmbuf_under_watermark(pcmbuf_unplayed_bytes);
     }
 }
 
-void pcmbuf_set_watermark(int numbytes, void (*callback)(int bytes_left))
+void pcmbuf_set_position_callback(void (*callback)(int size)) {
+    position_callback = callback;
+}
+
+static void pcmbuf_set_watermark_bytes(int numbytes)
 {
     pcmbuf_watermark = numbytes;
-    pcmbuf_watermark_event = callback;
 }
 
 bool pcmbuf_add_chunk(void *addr, int size, void (*callback)(void))
@@ -192,7 +199,7 @@ bool pcmbuf_add_chunk(void *addr, int size, void (*callback)(void))
         return false;
 }
 
-void pcmbuf_watermark_callback(int bytes_left)
+static void pcmbuf_under_watermark(int bytes_left)
 {
     /* Fill audio buffer by boosting cpu */
     pcmbuf_boost(true);
@@ -802,9 +809,9 @@ void pcmbuf_crossfade_enable(bool on_off)
     crossfade_enabled = on_off;
 
     if (crossfade_enabled) {
-        pcmbuf_set_watermark(pcmbuf_size - (CHUNK_SIZE*6), pcmbuf_watermark_callback);
+        pcmbuf_set_watermark_bytes(pcmbuf_size - (CHUNK_SIZE*6));
     } else {
-        pcmbuf_set_watermark(PCMBUF_WATERMARK, pcmbuf_watermark_callback);
+        pcmbuf_set_watermark_bytes(PCMBUF_WATERMARK);
     }
 }
 

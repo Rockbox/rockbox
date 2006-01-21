@@ -179,6 +179,7 @@ static struct track_info tracks[MAX_TRACK];
 
 /* Pointer to track info structure about current song playing. */
 static struct track_info *cur_ti;
+static struct track_info *prev_ti;
 
 /* Have we reached end of the current playlist. */
 static bool playlist_end = false;
@@ -393,6 +394,17 @@ void* get_codec_memory_callback(long *size)
         return &audiobuf[talk_get_bufsize()];
 
     return &audiobuf[0];
+}
+
+static void pcmbuf_position_callback(int size) ICODE_ATTR;
+static void pcmbuf_position_callback(int size) {
+    unsigned int time = size * 1000 / 4 / 44100 + prev_ti->id3.elapsed;
+    if (time >= prev_ti->id3.length) {
+        pcmbuf_set_position_callback(NULL);
+        prev_ti->id3.elapsed = cur_ti->id3.length;
+    } else {
+        prev_ti->id3.elapsed = time;
+    }
 }
 
 void codec_set_elapsed_callback(unsigned int value)
@@ -1640,8 +1652,8 @@ static void audio_change_track(void)
 
 bool codec_request_next_track_callback(void)
 {
-    struct track_info *prev_ti = cur_ti;
-    
+    prev_ti = cur_ti;
+
     if (current_codec == CODEC_IDX_VOICE) {
         voice_remaining = 0;
         /* Terminate the codec if there are messages waiting on the queue or
@@ -1649,6 +1661,8 @@ bool codec_request_next_track_callback(void)
         return !ci_voice.stop_codec && queue_empty(&voice_codec_queue);
     }
         
+    pcmbuf_set_position_callback(pcmbuf_position_callback);
+
     if (ci.stop_codec || !playing)
         return false;
     
@@ -1878,6 +1892,7 @@ void audio_thread(void)
                 if (track_changed_callback)
                     track_changed_callback(&cur_ti->id3);
                 playlist_update_resume_info(audio_current_track());
+                pcmbuf_set_position_callback(NULL);
                 break ;
                 
             case AUDIO_CODEC_DONE:
