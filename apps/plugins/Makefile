@@ -148,7 +148,6 @@ clean:
 	$(BUILDDIR)/credits.raw $(OBJS) $(DEFS)
 	@$(MAKE) -C lib clean OBJDIR=$(OBJDIR)/lib
 	@$(MAKE) -C rockboy clean OBJDIR=$(OBJDIR)/rockboy
-	@$(MAKE) -C mpeg2 clean OBJDIR=$(OBJDIR)/mpeg2
 	@$(MAKE) -C searchengine clean OBJDIR=$(OBJDIR)/searchengine
 
 -include $(DEPFILE)
