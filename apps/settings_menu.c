@@ -1515,9 +1515,9 @@ static bool scroll_settings_menu(void)
 
     static const struct menu_item items[] = {
         { ID2P(LANG_SCROLL_SPEED),        scroll_speed       },
-        { ID2P(LANG_SCROLL_DELAY),        scroll_delay       },  
+        { ID2P(LANG_SCROLL_DELAY),        scroll_delay       },
 #ifdef HAVE_LCD_BITMAP
-        { ID2P(LANG_SCROLL_STEP),         scroll_step        },  
+        { ID2P(LANG_SCROLL_STEP),         scroll_step        },
 #endif
         { ID2P(LANG_BIDIR_SCROLL),        bidir_limit        },
 #ifdef HAVE_LCD_CHARCELLS
@@ -1526,7 +1526,7 @@ static bool scroll_settings_menu(void)
 #endif
 #ifdef HAVE_LCD_BITMAP
         { ID2P(LANG_SCREEN_SCROLL_VIEW),  screen_scroll      },
-        { ID2P(LANG_SCREEN_SCROLL_STEP),  screen_scroll_step }, 
+        { ID2P(LANG_SCREEN_SCROLL_STEP),  screen_scroll_step },
 #endif
     };
 

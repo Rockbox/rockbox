@@ -126,19 +126,20 @@ typedef void list_get_icon(int selected_item,
  *             a buffer when it's not necessary)
  * Returns a pointer to a string that contains the text to display
  */
-
 typedef char * list_get_name(int selected_item,
                              void * data,
                              char *buffer);
 
 struct gui_list
 {
-    int offsetval; /* value of screen offset */
     int nb_items;
     int selected_item;
     bool cursor_flash_state;
     int start_item; /* the item that is displayed at the top of the screen */
 
+#ifdef HAVE_LCD_BITMAP
+    int offset_position; /* the list's screen scroll placement in pixels */
+#endif
     list_get_icon *callback_get_item_icon;
     list_get_name *callback_get_item_name;
 
@@ -234,13 +235,6 @@ extern void gui_list_draw(struct gui_list * gui_list);
  * (Item 0 gets selected if the end of the list is reached)
  * - gui_list : the list structure
  */
-
-extern void gui_list_screen_scroll_step(int ofs);
-/* parse global setting to static int */
-
-extern void gui_list_screen_scroll_out_of_view(bool enable);
-/* parse global setting to static bool */
- 
 extern void gui_list_select_next(struct gui_list * gui_list);
 
 /*
@@ -250,27 +244,32 @@ extern void gui_list_select_next(struct gui_list * gui_list);
  */
 extern void gui_list_select_previous(struct gui_list * gui_list);
 
-/*
- * Go to next page if any, else selects the last item in the list
- * - gui_list : the list structure
- * - nb_lines : the number of lines to try to move the cursor
- */
- 
-extern void gui_list_offset_right(struct gui_list * gui_list);
-
+#ifdef HAVE_LCD_BITMAP
 /*
  * Makes all the item in the list scroll by one step to the right.
  * Should stop increasing the value when reaching the widest item value 
  * in the list.
  */
-
-extern void gui_list_offset_left(struct gui_list * gui_list);
+void gui_list_scroll_right(struct gui_list * gui_list);
 
 /*
  * Makes all the item in the list scroll by one step to the left.
  * stops at starting position.
- */ 
- 
+ */
+void gui_list_scroll_left(struct gui_list * gui_list);
+
+/* parse global setting to static int */
+extern void gui_list_screen_scroll_step(int ofs);
+
+/* parse global setting to static bool */
+extern void gui_list_screen_scroll_out_of_view(bool enable);
+#endif /* HAVE_LCD_BITMAP */
+
+/*
+ * Go to next page if any, else selects the last item in the list
+ * - gui_list : the list structure
+ * - nb_lines : the number of lines to try to move the cursor
+ */
 extern void gui_list_select_next_page(struct gui_list * gui_list,
                                       int nb_lines);
 
@@ -347,8 +346,6 @@ extern void gui_synclist_select_item(struct gui_synclist * lists,
                                      int item_number);
 extern void gui_synclist_select_next(struct gui_synclist * lists);
 extern void gui_synclist_select_previous(struct gui_synclist * lists);
-extern void gui_synclist_offset_right(struct gui_synclist * lists);
-extern void gui_synclist_offset_left(struct gui_synclist * lists);
 extern void gui_synclist_select_next_page(struct gui_synclist * lists,
                                           enum screen_type screen);
 extern void gui_synclist_select_previous_page(struct gui_synclist * lists,
@@ -357,6 +354,8 @@ extern void gui_synclist_add_item(struct gui_synclist * lists);
 extern void gui_synclist_del_item(struct gui_synclist * lists);
 extern void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll);
 extern void gui_synclist_flash(struct gui_synclist * lists);
+void gui_synclist_scroll_right(struct gui_synclist * lists);
+void gui_synclist_scroll_left(struct gui_synclist * lists);
 
 /*
  * Do the action implied by the given button,

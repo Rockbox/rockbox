@@ -37,8 +37,13 @@
 #define SCROLL_LIMIT 2
 #endif
 
-static int offset_step = 15;
-static bool offset_outof_view = false;
+#ifdef HAVE_LCD_BITMAP
+static int offset_step = 16; /* pixels per screen scroll step */
+/* should lines scroll out of the screen */
+static bool offset_out_of_view = false;
+#endif
+
+
 
 void gui_list_init(struct gui_list * gui_list,
     list_get_name callback_get_item_name,
@@ -54,7 +59,9 @@ void gui_list_init(struct gui_list * gui_list,
     gui_list->limit_scroll = false;
     gui_list->data=data;
     gui_list->cursor_flash_state=false;
-    gui_list->offsetval = 0;
+#ifdef HAVE_LCD_BITMAP
+    gui_list->offset_position = 0;
+#endif
 }
 
 void gui_list_set_display(struct gui_list * gui_list, struct screen * display)
@@ -181,47 +188,43 @@ void gui_list_draw(struct gui_list * gui_list)
         entry_name = gui_list->callback_get_item_name(current_item,
                                                       gui_list->data,
                                                       entry_buffer);
-
 #ifdef HAVE_LCD_BITMAP
-    /* position the string at the right offset place */
-    int item_offset;
-    int str_width,h;
-    display->getstringsize(entry_name, &str_width, &h);
+        /* position the string at the correct offset place */
+        int item_offset;
+        int item_width,h;
+        display->getstringsize(entry_name, &item_width, &h);
 
-    if (offset_outof_view)
-        item_offset = gui_list->offsetval;
-    else
-        /* if text is smaller then view */
-        if (str_width <= display->width - text_pos)
-            item_offset = 0;
+        if (offset_out_of_view)
+            item_offset = gui_list->offset_position;
         else
-            /* if text got out of view  */
-            if (gui_list->offsetval > str_width - (display->width - text_pos))
-                item_offset = str_width - (display->width - text_pos);
+            /* if text is smaller then view */
+            if (item_width <= display->width - text_pos)
+                item_offset = 0;
             else
-                item_offset = gui_list->offsetval;
-                
-#endif        
+                /* if text got out of view  */
+                if (gui_list->offset_position > 
+                        item_width - (display->width - text_pos))
+                    item_offset = item_width - (display->width - text_pos);
+                else
+                    item_offset = gui_list->offset_position;
 
+#endif
         if(current_item == gui_list->selected_item) {
-        /* The selected item must be displayed scrolling */
+            /* The selected item must be displayed scrolling */
 #ifdef HAVE_LCD_BITMAP
-            if (global_settings.invert_cursor) /* Display inverted-line-style*/
-
+            if (global_settings.invert_cursor)/* Display inverted-line-style*/
                 /* if text got out of view */
-                if (item_offset > str_width - (display->width - text_pos))
+                if (item_offset > item_width - (display->width - text_pos))
                     /* don't scroll */
                     display->puts_style_offset(0, i, entry_name, STYLE_INVERT,item_offset);
                 else
                     display->puts_scroll_style_offset(0, i, entry_name, STYLE_INVERT,item_offset);
-                    
-            else  /*  if (global_settings.invert_cursor) */
-            
-                if (item_offset > str_width - (display->width - text_pos))
-                    display->puts_offset(0, i, entry_name,item_offset); 
-                else
-                    display->puts_scroll_offset(0, i, entry_name,item_offset);
 
+            else  /*  if (!global_settings.invert_cursor) */
+                if (item_offset > item_width - (display->width - text_pos))
+                    display->puts_offset(0, i, entry_name,item_offset);
+            else
+                display->puts_scroll_offset(0, i, entry_name,item_offset);
 #else
                 display->puts_scroll(text_pos, i, entry_name);
 #endif
@@ -263,40 +266,6 @@ void gui_list_draw(struct gui_list * gui_list)
 #endif
     gui_textarea_update(display);
 }
-
-#ifdef HAVE_LCD_BITMAP
-void gui_list_screen_scroll_step(int ofs)
-{
-     offset_step = ofs;
-}
-
-void gui_list_screen_scroll_out_of_view(bool enable)
-{
-    if (enable)
-        offset_outof_view = true;
-    else
-        offset_outof_view = false;
-}
-
-void gui_list_offset_right(struct gui_list * gui_list)
-{
-    /* there should be a callback to find out what's the longest item on the list,
-     * and then, by finding out the width with get_stringsize, we would stop the 
-     * list from scrolling at that point */
-     
-    gui_list->offsetval+=offset_step;
-    if (gui_list->offsetval > 1000)
-        gui_list->offsetval = 1000;
-}
-
-void gui_list_offset_left(struct gui_list * gui_list)
-{
-    gui_list->offsetval-=offset_step;
-    if (gui_list->offsetval < 0)
-        gui_list->offsetval = 0;
-
-}
-#endif /* HAVE_LCD_BITMAP */
 
 void gui_list_select_item(struct gui_list * gui_list, int item_number)
 {
@@ -428,6 +397,37 @@ void gui_list_del_item(struct gui_list * gui_list)
     }
 }
 
+#ifdef HAVE_LCD_BITMAP
+void gui_list_scroll_right(struct gui_list * gui_list)
+{
+    /* FIXME: This is a fake right boundry limiter. there should be some 
+     * callback function to find the longest item on the list in pixels, 
+     * to stop the list from scrolling past that point */ 
+    gui_list->offset_position+=offset_step;
+    if (gui_list->offset_position > 1000)
+        gui_list->offset_position = 1000;
+}
+
+void gui_list_scroll_left(struct gui_list * gui_list)
+{
+    gui_list->offset_position-=offset_step;
+    if (gui_list->offset_position < 0)
+        gui_list->offset_position = 0;
+}
+void gui_list_screen_scroll_step(int ofs)
+{
+     offset_step = ofs;
+}
+
+void gui_list_screen_scroll_out_of_view(bool enable)
+{
+    if (enable)
+        offset_out_of_view = true;
+    else
+        offset_out_of_view = false;
+}
+#endif /* HAVE_LCD_BITMAP */
+
 /*
  * Synchronized lists stuffs
  */
@@ -453,7 +453,9 @@ void gui_synclist_set_nb_items(struct gui_synclist * lists, int nb_items)
     FOR_NB_SCREENS(i)
     {
         gui_list_set_nb_items(&(lists->gui_list[i]), nb_items);
-        lists->gui_list[i].offsetval = 0;
+#ifdef HAVE_LCD_BITMAP
+        lists->gui_list[i].offset_position = 0;
+#endif
     }
 }
 void gui_synclist_set_icon_callback(struct gui_synclist * lists, list_get_icon icon_callback)
@@ -502,22 +504,6 @@ void gui_synclist_select_next_page(struct gui_synclist * lists,
                                   screens[screen].nb_lines);
 }
 
-#ifdef HAVE_LCD_BITMAP
-void gui_synclist_offset_right(struct gui_synclist * lists)
-{
-    int i;
-    FOR_NB_SCREENS(i)
-        gui_list_offset_right(&(lists->gui_list[i]));
-}
-
-void gui_synclist_offset_left(struct gui_synclist * lists)
-{
-    int i;
-    FOR_NB_SCREENS(i)
-        gui_list_offset_left(&(lists->gui_list[i]));
-}
-#endif /* HAVE_LCD_BITMAP */
-
 void gui_synclist_select_previous_page(struct gui_synclist * lists,
                                        enum screen_type screen)
 {
@@ -555,6 +541,22 @@ void gui_synclist_flash(struct gui_synclist * lists)
         gui_list_flash(&(lists->gui_list[i]));
 }
 
+#ifdef HAVE_LCD_BITMAP
+void gui_synclist_scroll_right(struct gui_synclist * lists)
+{
+    int i;
+    FOR_NB_SCREENS(i)
+        gui_list_scroll_right(&(lists->gui_list[i]));
+}
+
+void gui_synclist_scroll_left(struct gui_synclist * lists)
+{
+    int i;
+    FOR_NB_SCREENS(i)
+        gui_list_scroll_left(&(lists->gui_list[i]));
+}
+#endif /* HAVE_LCD_BITMAP */
+
 unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
 {
     gui_synclist_limit_scroll(lists, true);
@@ -588,7 +590,7 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
             gui_synclist_select_next(lists);
             gui_synclist_draw(lists);
             return LIST_NEXT;
-            
+
 #ifdef LIST_PGRIGHT
         case LIST_PGRIGHT:
         case LIST_PGRIGHT | BUTTON_REPEAT:
@@ -596,7 +598,7 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
         case LIST_RC_PGRIGHT:
         case LIST_RC_PGRIGHT | BUTTON_REPEAT:
 #endif
-        gui_synclist_offset_right(lists);
+        gui_synclist_scroll_right(lists);
         gui_synclist_draw(lists);
         return true;
 #endif
@@ -608,7 +610,7 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
         case LIST_RC_PGLEFT:
         case LIST_RC_PGLEFT | BUTTON_REPEAT:
 #endif
-        gui_synclist_offset_left(lists);
+        gui_synclist_scroll_left(lists);
         gui_synclist_draw(lists);
         return true;
 #endif

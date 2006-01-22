@@ -1138,7 +1138,7 @@ void lcd_remote_putsxy(int x, int y, const unsigned char *str)
 /* put a string at a given char position */
 void lcd_remote_puts(int x, int y, const unsigned char *str)
 {
-    lcd_remote_puts_style(x, y, str, STYLE_DEFAULT);
+    lcd_remote_puts_style_offset(x, y, str, STYLE_DEFAULT, 0);
 }
 
 void lcd_remote_puts_style(int x, int y, const unsigned char *str, int style)
@@ -1151,7 +1151,8 @@ void lcd_remote_puts_offset(int x, int y, const unsigned char *str, int offset)
     lcd_remote_puts_style_offset(x, y, str, STYLE_DEFAULT, offset);
 }
 
-/* put a string at a given char position at a given style and with a given offset */
+/* put a string at a given char position, style, and pixel position,
+ * skipping first offset pixel columns */
 void lcd_remote_puts_style_offset(int x, int y, const unsigned char *str, int style, int offset)
 {
     int xpos,ypos,w,h;
@@ -1223,16 +1224,16 @@ void lcd_remote_puts_scroll(int x, int y, const unsigned char *string)
 
 void lcd_remote_puts_scroll_style(int x, int y, const unsigned char *string, int style)
 {
-    lcd_remote_puts_scroll_style_offset(x, y, string, style, 0);
+     lcd_remote_puts_scroll_style_offset(x, y, string, style, 0);
 }
- 
+
 void lcd_remote_puts_scroll_offset(int x, int y, const unsigned char *string, int offset)
 {
      lcd_remote_puts_scroll_style_offset(x, y, string, STYLE_DEFAULT, offset);
-}
-                                                
+}          
+   
 void lcd_remote_puts_scroll_style_offset(int x, int y, const unsigned char *string,
-                                                int style, int offset)
+                                         int style, int offset)
 {
     struct scrollinfo* s;
     int w, h;
@@ -1288,7 +1289,6 @@ void lcd_remote_puts_scroll_style_offset(int x, int y, const unsigned char *stri
         /* force a bit switch-off since it doesn't scroll */
         scrolling_lines &= ~(1<<y);
 }
-
 
 static void scroll_thread(void)
 {
