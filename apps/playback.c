@@ -406,7 +406,7 @@ static void pcmbuf_position_callback(int size) {
     unsigned int time = size * 1000 / 4 / 44100 + prev_ti->id3.elapsed;
     if (time >= prev_ti->id3.length) {
         pcmbuf_set_position_callback(NULL);
-        prev_ti->id3.elapsed = cur_ti->id3.length;
+        prev_ti->id3.elapsed = prev_ti->id3.length;
     } else {
         prev_ti->id3.elapsed = time;
     }
@@ -1503,7 +1503,7 @@ static void audio_update_trackinfo(void)
     ci.curpos = 0;
     cur_ti->start_pos = 0;
     ci.taginfo_ready = (bool *)&cur_ti->taginfo_ready;
-    
+
     /* Manual track change (always crossfade or flush audio). */
     if (new_track)
     {
