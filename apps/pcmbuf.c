@@ -275,6 +275,7 @@ void pcmbuf_init(long bufsize)
     audiobuffer = (char *)&audiobuf[(audiobufend - audiobuf) - 
                                     pcmbuf_size - PCMBUF_GUARD];
     guardbuf = &audiobuffer[pcmbuf_size];
+    position_callback = NULL;
     pcmbuf_event_handler = NULL;
     pcmbuf_play_stop();
 }
@@ -327,6 +328,7 @@ void pcmbuf_flush_fillpos(void)
                 return ;
             }
         }
+        position_callback = NULL;
         pcmbuf_event_handler = NULL;
         audiobuffer_pos += copy_n;
         if (audiobuffer_pos >= pcmbuf_size)
