@@ -40,6 +40,11 @@ bool pcm_is_playing(void)
     return playing;
 }
 
+void pcm_mute(bool state)
+{
+    (void)state;
+}
+
 void pcm_play_pause(bool state)
 {
     (void)state;

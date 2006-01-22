@@ -526,6 +526,11 @@ void pcm_play_stop(void)
 {
 }
 
+void pcm_mute(bool mute)
+{
+    (void)mute;
+}
+
 void pcm_play_pause(bool play)
 {
     (void)play;
