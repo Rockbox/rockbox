@@ -203,6 +203,14 @@ extern int  lcd_getymargin(void);
 extern void lcd_setfont(int font);
 extern int  lcd_getstringsize(const unsigned char *str, int *w, int *h);
 
+extern void lcd_puts_offset(int x, int y, const unsigned char *str, int offset);
+extern void lcd_puts_style_offset(int x, int y, const unsigned char *str, 
+                                  int style, int offset);
+extern void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
+                                  int offset);
+extern void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
+                                  int style, int offset);                                  
+
 /* low level drawing function pointer arrays */
 extern lcd_pixelfunc_type* const lcd_pixelfuncs[8];
 extern lcd_blockfunc_type* const lcd_blockfuncs[8];

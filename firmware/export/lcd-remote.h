@@ -37,15 +37,23 @@ extern void lcd_remote_emireduce(bool state);
 extern void lcd_remote_clear_display(void);
 extern void lcd_remote_puts(int x, int y, const unsigned char *string);
 extern void lcd_remote_puts_style(int x, int y, const unsigned char *string,
-                                  int style);
+                                                int style);
+extern void lcd_remote_puts_offset(int x, int y, const unsigned char *str, int offset);
+extern void lcd_remote_puts_style_offset(int x, int y, const unsigned char *str, int style, int offset);
+
 extern void lcd_remote_putc(int x, int y, unsigned short ch);
 extern void lcd_remote_stop_scroll(void);
+
 extern void lcd_remote_scroll_speed(int speed);
 extern void lcd_remote_scroll_delay(int ms);
 extern void lcd_remote_puts_scroll(int x, int y, const unsigned char* string);
-extern void lcd_remote_puts_scroll_style(int x, int y,
-                                         const unsigned char* string, int style);
-                                                               
+extern void lcd_remote_puts_scroll_style(int x, int y,const unsigned char* string,
+                                                int style);
+extern void lcd_remote_puts_scroll_offset(int x, int y, const unsigned char *string,
+                                                int offset);
+extern void lcd_remote_puts_scroll_style_offset(int x, int y, const unsigned char *string,
+                                                int style, int offset);
+
 extern void lcd_remote_update(void);
 extern void lcd_remote_update_rect(int x, int y, int width, int height);
 

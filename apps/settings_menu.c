@@ -53,6 +53,7 @@
 #include "rbunicode.h"
 #include "splash.h"
 #include "yesno.h"
+#include "list.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
@@ -747,7 +748,6 @@ static bool scroll_speed(void)
                    &lcd_scroll_speed, 1, 0, 15, NULL );
 }
 
-
 static bool scroll_delay(void)
 {
     int dummy = global_settings.scroll_delay * (HZ/10);
@@ -759,6 +759,20 @@ static bool scroll_delay(void)
 }
 
 #ifdef HAVE_LCD_BITMAP
+static bool screen_scroll(void)
+{
+    bool rc = set_bool( str(LANG_SCREEN_SCROLL_VIEW), &global_settings.offset_out_of_view);
+    gui_list_screen_scroll_out_of_view(global_settings.offset_out_of_view);
+    return rc;
+}
+
+static bool screen_scroll_step(void)
+{
+    return set_int(str(LANG_SCREEN_SCROLL_STEP), "pixels", UNIT_PIXEL,
+                   &global_settings.screen_scroll_step,
+                   &gui_list_screen_scroll_step, 1, 1, LCD_WIDTH, NULL );
+}
+
 static bool scroll_step(void)
 {
     return set_int(str(LANG_SCROLL_STEP_EXAMPLE), "pixels", UNIT_PIXEL,
@@ -1500,15 +1514,19 @@ static bool scroll_settings_menu(void)
     bool result;
 
     static const struct menu_item items[] = {
-        { ID2P(LANG_SCROLL_SPEED),     scroll_speed    },
-        { ID2P(LANG_SCROLL_DELAY),    scroll_delay    },  
+        { ID2P(LANG_SCROLL_SPEED),        scroll_speed       },
+        { ID2P(LANG_SCROLL_DELAY),        scroll_delay       },  
 #ifdef HAVE_LCD_BITMAP
-        { ID2P(LANG_SCROLL_STEP),     scroll_step     },  
+        { ID2P(LANG_SCROLL_STEP),         scroll_step        },  
 #endif
-        { ID2P(LANG_BIDIR_SCROLL),    bidir_limit    },
+        { ID2P(LANG_BIDIR_SCROLL),        bidir_limit        },
 #ifdef HAVE_LCD_CHARCELLS
-        { ID2P(LANG_JUMP_SCROLL),    jump_scroll    },
-        { ID2P(LANG_JUMP_SCROLL_DELAY),    jump_scroll_delay    },
+        { ID2P(LANG_JUMP_SCROLL),         jump_scroll        },
+        { ID2P(LANG_JUMP_SCROLL_DELAY),   jump_scroll_delay  },
+#endif
+#ifdef HAVE_LCD_BITMAP
+        { ID2P(LANG_SCREEN_SCROLL_VIEW),  screen_scroll      },
+        { ID2P(LANG_SCREEN_SCROLL_STEP),  screen_scroll_step }, 
 #endif
     };
 

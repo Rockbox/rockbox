@@ -1143,6 +1143,17 @@ void lcd_remote_puts(int x, int y, const unsigned char *str)
 
 void lcd_remote_puts_style(int x, int y, const unsigned char *str, int style)
 {
+    lcd_remote_puts_style_offset(x, y, str, style, 0);
+}
+
+void lcd_remote_puts_offset(int x, int y, const unsigned char *str, int offset)
+{
+    lcd_remote_puts_style_offset(x, y, str, STYLE_DEFAULT, offset);
+}
+
+/* put a string at a given char position at a given style and with a given offset */
+void lcd_remote_puts_style_offset(int x, int y, const unsigned char *str, int style, int offset)
+{
     int xpos,ypos,w,h;
     int lastmode = drawmode;
 
@@ -1155,7 +1166,7 @@ void lcd_remote_puts_style(int x, int y, const unsigned char *str, int style)
     lcd_remote_getstringsize(str, &w, &h);
     xpos = xmargin + x*w / utf8length((char *)str);
     ypos = ymargin + y*h;
-    lcd_remote_putsxy(xpos, ypos, str);
+    lcd_remote_putsxyofs(xpos, ypos, offset, str);
     drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
     lcd_remote_fillrect(xpos + w, ypos, LCD_REMOTE_WIDTH - (xpos + w), h);
     if (style & STYLE_INVERT)
@@ -1212,6 +1223,17 @@ void lcd_remote_puts_scroll(int x, int y, const unsigned char *string)
 
 void lcd_remote_puts_scroll_style(int x, int y, const unsigned char *string, int style)
 {
+    lcd_remote_puts_scroll_style_offset(x, y, string, style, 0);
+}
+ 
+void lcd_remote_puts_scroll_offset(int x, int y, const unsigned char *string, int offset)
+{
+     lcd_remote_puts_scroll_style_offset(x, y, string, STYLE_DEFAULT, offset);
+}
+                                                
+void lcd_remote_puts_scroll_style_offset(int x, int y, const unsigned char *string,
+                                                int style, int offset)
+{
     struct scrollinfo* s;
     int w, h;
 
@@ -1221,10 +1243,10 @@ void lcd_remote_puts_scroll_style(int x, int y, const unsigned char *string, int
     s->invert = false;
     if (style & STYLE_INVERT) {
         s->invert = true;
-        lcd_remote_puts_style(x,y,string,STYLE_INVERT);
+        lcd_remote_puts_style_offset(x,y,string,STYLE_INVERT,offset);
     }
     else
-        lcd_remote_puts(x,y,string);
+        lcd_remote_puts_offset(x,y,string,offset);
 
     lcd_remote_getstringsize(string, &w, &h);
 
@@ -1257,7 +1279,7 @@ void lcd_remote_puts_scroll_style(int x, int y, const unsigned char *string, int
         strncpy(end, (char *)string, LCD_REMOTE_WIDTH/2);
 
         s->len = utf8length((char *)string);
-        s->offset = 0;
+        s->offset = offset;
         s->startx = x;
         s->backward = false;
         scrolling_lines |= (1<<y);
@@ -1266,6 +1288,7 @@ void lcd_remote_puts_scroll_style(int x, int y, const unsigned char *string, int
         /* force a bit switch-off since it doesn't scroll */
         scrolling_lines &= ~(1<<y);
 }
+
 
 static void scroll_thread(void)
 {

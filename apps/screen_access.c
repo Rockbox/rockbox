@@ -66,10 +66,16 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->scroll_speed=&lcd_remote_scroll_speed;
             screen->scroll_delay=&lcd_remote_scroll_delay;
             screen->scroll_step=&lcd_remote_scroll_step;
-            screen->puts_scroll_style=&lcd_remote_puts_scroll_style;
             screen->invertscroll=&lcd_remote_invertscroll;
-#endif /* LCD_REMOTE_DEPTH > 1 */
 
+            screen->puts_scroll_style=&lcd_remote_puts_scroll_style;          
+            screen->puts_scroll_offset=&lcd_remote_puts_scroll_offset;
+            screen->puts_scroll_style_offset=&lcd_remote_puts_scroll_style_offset;
+            
+            screen->puts_offset=&lcd_remote_puts_offset;
+            screen->puts_style=&lcd_remote_puts_style;
+            screen->puts_style_offset=&lcd_remote_puts_style_offset;
+#endif /* LCD_REMOTE_DEPTH > 1 */
 #if 0 /* no charcell remote LCDs so far */
             screen->width=11;
             screen->height=2;
@@ -93,6 +99,7 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->backlight_on=&remote_backlight_on;
             screen->backlight_off=&remote_backlight_off;
             break;
+            
 #endif /* HAVE_REMOTE_LCD */
 
         case SCREEN_MAIN:
@@ -128,8 +135,14 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->scroll_speed=&lcd_scroll_speed;
             screen->scroll_delay=&lcd_scroll_delay;
             screen->scroll_step=&lcd_scroll_step;
-            screen->puts_scroll_style=&lcd_puts_scroll_style;
             screen->invertscroll=&lcd_invertscroll;
+
+            screen->puts_scroll_offset=&lcd_puts_scroll_offset;
+            screen->puts_scroll_style_offset=&lcd_puts_scroll_style_offset;
+            
+            screen->puts_offset=&lcd_puts_offset;
+            screen->puts_style_offset=&lcd_puts_style_offset;
+            screen->puts_style=&lcd_puts_style;
 #endif /* HAVE_LCD_BITMAP */
 
 #ifdef HAVE_LCD_CHARCELLS

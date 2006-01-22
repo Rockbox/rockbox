@@ -71,6 +71,7 @@
 #include "select.h"
 #include "statusbar.h"
 #include "splash.h"
+#include "list.h"
 
 #if CONFIG_CODEC == MAS3507D
 void dac_line_in(bool enable);
@@ -491,6 +492,15 @@ static const struct bit_entry hd_bits[] =
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
     {4, S_O(brightness), 9, "brightness", NULL }, 
 #endif
+
+#ifdef HAVE_LCD_BITMAP
+    {1, S_O(offset_out_of_view), false, "Screen Scrolls Out Of View", off_on },
+#if LCD_WIDTH > 127
+    {8, S_O(screen_scroll_step), 16, "screen scroll step", NULL }, /* 1...160 */
+#else
+    {7, S_O(screen_scroll_step), 16, "screen scroll step", NULL }, /* 1...112 */
+#endif
+#endif /* HAVE_LCD_BITMAP */
 
     /* If values are just added to the end, no need to bump the version. */
     /* new stuff to be added at the end */
@@ -957,6 +967,8 @@ void settings_apply(void)
         font_reset();
 
     lcd_scroll_step(global_settings.scroll_step);
+    gui_list_screen_scroll_step(global_settings.screen_scroll_step);
+    gui_list_screen_scroll_out_of_view(global_settings.offset_out_of_view);
 #else
     lcd_jump_scroll(global_settings.jump_scroll);
     lcd_jump_scroll_delay(global_settings.jump_scroll_delay * (HZ/10));

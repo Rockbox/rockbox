@@ -33,12 +33,16 @@
 #define LIST_PREV      BUTTON_UP
 #define LIST_PGUP      (BUTTON_ON | BUTTON_UP)
 #define LIST_PGDN      (BUTTON_ON | BUTTON_DOWN)
+#define LIST_PGRIGHT   (BUTTON_ON | BUTTON_RIGHT)
+#define LIST_PGLEFT    (BUTTON_ON | BUTTON_LEFT)
 
 #ifdef CONFIG_REMOTE_KEYPAD
 #define LIST_RC_NEXT   BUTTON_RC_FF
 #define LIST_RC_PREV   BUTTON_RC_REW
 #define LIST_RC_PGUP   BUTTON_RC_SOURCE
 #define LIST_RC_PGDN   BUTTON_RC_BITRATE
+#define LIST_RC_PGRIGHT (BUTTON_RC_VOL_UP)
+#define LIST_RC_PGLEFT (BUTTON_RC_VOL_DOWN)
 #endif /* CONFIG_REMOTE_KEYPAD */
 
 #elif CONFIG_KEYPAD == RECORDER_PAD
@@ -46,6 +50,8 @@
 #define LIST_PREV      BUTTON_UP
 #define LIST_PGUP      (BUTTON_ON | BUTTON_UP)
 #define LIST_PGDN      (BUTTON_ON | BUTTON_DOWN)
+#define LIST_PGRIGHT   (BUTTON_ON | BUTTON_RIGHT)
+#define LIST_PGLEFT    (BUTTON_ON | BUTTON_LEFT)
 
 #ifdef CONFIG_REMOTE_KEYPAD
 #define LIST_RC_NEXT   BUTTON_RC_RIGHT
@@ -64,6 +70,8 @@
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define LIST_NEXT      BUTTON_DOWN
 #define LIST_PREV      BUTTON_UP
+#define LIST_PGRIGHT   (BUTTON_MENU | BUTTON_RIGHT)
+#define LIST_PGLEFT    (BUTTON_MENU | BUTTON_LEFT)
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define LIST_NEXT      BUTTON_SCROLL_FWD
@@ -78,6 +86,8 @@
 #define LIST_PREV      BUTTON_UP
 #define LIST_PGUP      (BUTTON_ON | BUTTON_UP)
 #define LIST_PGDN      (BUTTON_ON | BUTTON_DOWN)
+#define LIST_PGRIGHT   (BUTTON_ON | BUTTON_RIGHT)
+#define LIST_PGLEFT    (BUTTON_ON | BUTTON_LEFT)
 
 #elif CONFIG_KEYPAD == IAUDIO_X5_PAD
 #define LIST_NEXT      BUTTON_DOWN
@@ -116,12 +126,14 @@ typedef void list_get_icon(int selected_item,
  *             a buffer when it's not necessary)
  * Returns a pointer to a string that contains the text to display
  */
+
 typedef char * list_get_name(int selected_item,
                              void * data,
                              char *buffer);
 
 struct gui_list
 {
+    int offsetval; /* value of screen offset */
     int nb_items;
     int selected_item;
     bool cursor_flash_state;
@@ -222,6 +234,13 @@ extern void gui_list_draw(struct gui_list * gui_list);
  * (Item 0 gets selected if the end of the list is reached)
  * - gui_list : the list structure
  */
+
+extern void gui_list_screen_scroll_step(int ofs);
+/* parse global setting to static int */
+
+extern void gui_list_screen_scroll_out_of_view(bool enable);
+/* parse global setting to static bool */
+ 
 extern void gui_list_select_next(struct gui_list * gui_list);
 
 /*
@@ -236,6 +255,22 @@ extern void gui_list_select_previous(struct gui_list * gui_list);
  * - gui_list : the list structure
  * - nb_lines : the number of lines to try to move the cursor
  */
+ 
+extern void gui_list_offset_right(struct gui_list * gui_list);
+
+/*
+ * Makes all the item in the list scroll by one step to the right.
+ * Should stop increasing the value when reaching the widest item value 
+ * in the list.
+ */
+
+extern void gui_list_offset_left(struct gui_list * gui_list);
+
+/*
+ * Makes all the item in the list scroll by one step to the left.
+ * stops at starting position.
+ */ 
+ 
 extern void gui_list_select_next_page(struct gui_list * gui_list,
                                       int nb_lines);
 
@@ -312,6 +347,8 @@ extern void gui_synclist_select_item(struct gui_synclist * lists,
                                      int item_number);
 extern void gui_synclist_select_next(struct gui_synclist * lists);
 extern void gui_synclist_select_previous(struct gui_synclist * lists);
+extern void gui_synclist_offset_right(struct gui_synclist * lists);
+extern void gui_synclist_offset_left(struct gui_synclist * lists);
 extern void gui_synclist_select_next_page(struct gui_synclist * lists,
                                           enum screen_type screen);
 extern void gui_synclist_select_previous_page(struct gui_synclist * lists,

@@ -69,10 +69,23 @@ struct screen
     void (*setfont)(int newfont);
     int (*getstringsize)(const unsigned char *str, int *w, int *h);
     void (*putsxy)(int x, int y, const unsigned char *str);
-
     void (*scroll_step)(int pixels);
-    void (*puts_scroll_style)(int x, int y,
-                              const unsigned char *string, int style);
+
+
+    void (*puts_scroll_style)(int x, int y, const unsigned char *string,
+                                 int style);
+    void (*puts_scroll_offset)(int x, int y, const unsigned char *string,
+                                 int offset);
+    void (*puts_scroll_style_offset)(int x, int y, const unsigned char *string,
+                                  int style, int offset);
+                                  
+    void (*puts_offset)(int x, int y, const unsigned char *str, int offset);
+    void (*puts_style)(int x, int y, const unsigned char *string, int style);
+    void (*puts_style_offset)(int x, int y, const unsigned char *str, 
+                                  int style, int offset);   
+
+                             
+              
     void (*mono_bitmap)(const unsigned char *src,
                         int x, int y, int width, int height);
     void (*set_drawmode)(int mode);

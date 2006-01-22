@@ -917,7 +917,9 @@ void lcd_putsxy(int x, int y, const unsigned char *str)
 
 /*** Line oriented text output ***/
 
-void lcd_puts_style(int x, int y, const unsigned char *str, int style)
+/* put a string at a given char position at a given style and with a given pixel position */
+void lcd_puts_style_offset(int x, int y, const unsigned char *str, int style,
+                                                                   int offset)
 {
     int xpos,ypos,w,h;
     int lastmode = drawmode;
@@ -931,7 +933,7 @@ void lcd_puts_style(int x, int y, const unsigned char *str, int style)
     lcd_getstringsize(str, &w, &h);
     xpos = xmargin + x*w / utf8length(str);
     ypos = ymargin + y*h;
-    lcd_putsxy(xpos, ypos, str);
+    lcd_putsxyofs(xpos, ypos, offset, str);
     drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
     lcd_fillrect(xpos + w, ypos, LCD_WIDTH - (xpos + w), h);
     if (style & STYLE_INVERT)
@@ -942,10 +944,21 @@ void lcd_puts_style(int x, int y, const unsigned char *str, int style)
     drawmode = lastmode;
 }
 
+void lcd_puts_style(int x, int y, const unsigned char *str, int style)
+{
+    lcd_puts_style_offset(x, y, str, style, 0);
+}
+
+/* put a string at a given char position at a given offset mark */
+void lcd_puts_offset(int x, int y, const unsigned char *str, int offset)
+{
+     lcd_puts_style_offset(x, y, str, STYLE_DEFAULT, offset);
+}
+
 /* put a string at a given char position */
 void lcd_puts(int x, int y, const unsigned char *str)
 {
-    lcd_puts_style(x, y, str, STYLE_DEFAULT);
+    lcd_puts_style_offset(x, y, str, STYLE_DEFAULT, 0);
 }
 
 /*** scrolling ***/
@@ -989,10 +1002,21 @@ void lcd_bidir_scroll(int percent)
 
 void lcd_puts_scroll(int x, int y, const unsigned char *string)
 {
-    lcd_puts_scroll_style(x, y, string, STYLE_DEFAULT);
+    lcd_puts_scroll_style_offset(x, y, string, STYLE_DEFAULT, 0);
 }
 
+void lcd_puts_scroll_offset(int x, int y, const unsigned char *string, int offset)
+{
+     lcd_puts_scroll_style_offset(x, y, string, STYLE_DEFAULT, offset);
+}  
+
 void lcd_puts_scroll_style(int x, int y, const unsigned char *string, int style)
+{
+     lcd_puts_scroll_style_offset(x, y, string, style, 0);
+}
+
+void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string, 
+                                  int style, int offset)
 {
     struct scrollinfo* s;
     int w, h;
@@ -1003,10 +1027,10 @@ void lcd_puts_scroll_style(int x, int y, const unsigned char *string, int style)
     s->invert = false;
     if (style & STYLE_INVERT) {
         s->invert = true;
-        lcd_puts_style(x,y,string,STYLE_INVERT);
+        lcd_puts_style_offset(x,y,string,STYLE_INVERT,offset);
     }
     else
-        lcd_puts(x,y,string);
+        lcd_puts_offset(x,y,string,offset);
 
     lcd_getstringsize(string, &w, &h);
 
@@ -1039,7 +1063,7 @@ void lcd_puts_scroll_style(int x, int y, const unsigned char *string, int style)
         strncpy(end, string, LCD_WIDTH/2);
 
         s->len = utf8length(string);
-        s->offset = 0;
+        s->offset = offset;
         s->startx = x;
         s->backward = false;
         scrolling_lines |= (1<<y);
@@ -1106,8 +1130,7 @@ static void scroll_thread(void)
             lcd_fillrect(xpos, ypos, LCD_WIDTH - xpos, pf->height);
             drawmode = DRMODE_SOLID;
             lcd_putsxyofs(xpos, ypos, s->offset, s->line);
-            if (s->invert)
-            {
+            if (s->invert) {
                 drawmode = DRMODE_COMPLEMENT;
                 lcd_fillrect(xpos, ypos, LCD_WIDTH - xpos, pf->height);
             }

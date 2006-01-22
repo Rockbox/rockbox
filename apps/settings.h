@@ -319,6 +319,8 @@ struct user_settings
     int bidir_limit;   /* bidir scroll length limit */
     int scroll_delay;  /* delay (in 1/10s) before starting scroll */
     int scroll_step;   /* pixels to advance per update */
+    bool offset_out_of_view; /* should lines scroll out of the screen */
+    int screen_scroll_step;   /* pixels to advance screen view*/
 
     /* auto bookmark settings */
     int autoloadbookmark;   /* auto load option: 0=off, 1=ask, 2=on */
