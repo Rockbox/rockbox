@@ -59,7 +59,7 @@ endif
 
 
 .PHONY: $(SUBDIRS)
-all: $(BUILDDIR)/libplugin.a $(ROCKS) $(SUBDIRS) $(DEPFILE)
+all: $(BITMAPLIBS) $(BUILDDIR)/libplugin.a $(ROCKS) $(SUBDIRS) $(DEPFILE)
 
 $(BUILDDIR)/credits.raw: $(DOCSDIR)/CREDITS
 	@echo "create credits.raw"

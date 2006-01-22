@@ -57,7 +57,7 @@ LIBROCKBOX = $(BUILDDIR)/librockbox.a
 ifdef SIMVER
 # this is a sim build
 
-all: $(BUILDDIR)/$(BINARY) $(CODECS) $(ROCKS)
+all: $(BITMAPLIBS) $(BUILDDIR)/$(BINARY) $(CODECS) $(ROCKS)
 
 else
 # regular target build
@@ -166,7 +166,7 @@ endif
 $(BUILDDIR)/$(BINARY) : $(OBJS) $(DEPFILE) $(BUILDDIR)/libsim.a \
 	$(BUILDDIR)/libcomsim.a $(LIBROCKBOX)
 	@echo "LD $(BINARY)"
-	$(SILENT)$(CC) $(GCCOPTS) -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lsim -lcomsim $(LDOPTS) $(EXTRAOBJ) -Wl,-Map,$(OBJDIR)/rockbox.map
+	$(SILENT)$(CC) $(GCCOPTS) -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lsim -lcomsim $(LINKBITMAPS) $(LDOPTS) $(EXTRAOBJ) -Wl,-Map,$(OBJDIR)/rockbox.map
 
 endif
 
