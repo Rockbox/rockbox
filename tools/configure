@@ -680,6 +680,8 @@ appsdir='\$(ROOTDIR)/apps'
     tool="$rootdir/tools/scramble -add=x5" # wrong, must be fixed
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.iaudio"
     appextra="recorder:gui"
     archosrom=""

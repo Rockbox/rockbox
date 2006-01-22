@@ -90,6 +90,11 @@ extern const fb_data rockboxlogo[];
 #define ROCKBOXLOGO_WIDTH 160
 #define ROCKBOXLOGO_HEIGHT 53
 
+#elif (LCD_WIDTH == 160) && (LCD_DEPTH == 16)
+/* iAudio X5 */
+#define ROCKBOXLOGO_WIDTH 160
+#define ROCKBOXLOGO_HEIGHT 50
+
 #elif (LCD_WIDTH == 176) && (LCD_DEPTH == 16)
 /* iPod Nano */
 #define ROCKBOXLOGO_WIDTH 176
