@@ -29,6 +29,7 @@ void pcm_calculate_peaks(int *left, int *right);
 long pcm_get_bytes_waiting(void);
 
 void pcm_play_stop(void);
+void pcm_mute(bool mute);
 void pcm_play_pause(bool play);
 bool pcm_is_paused(void);
 bool pcm_is_playing(void);

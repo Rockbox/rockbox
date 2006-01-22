@@ -60,6 +60,8 @@ static bool crossfade_init;
 static int crossfade_pos;
 static int crossfade_rem;
 
+static struct mutex pcmbuf_mutex;
+
 /* Crossfade modes. If CFM_CROSSFADE is selected, normal
  * crossfader will activate. Selecting CFM_FLUSH is a special
  * operation that only overwrites the pcm buffer without crossfading.
@@ -252,7 +254,14 @@ bool pcmbuf_crossfade_init(void)
 
 void pcmbuf_play_stop(void)
 {
+    mutex_lock(&pcmbuf_mutex);
+    
+    /** Prevent a very tiny pop from happening by muting audio
+     *  until dma has been initialized. */
+    pcm_mute(true);
     pcm_play_stop();
+    pcm_mute(false);
+    
     last_chunksize = 0;
     pcmbuf_unplayed_bytes = 0;
     pcmbuf_mix_used_bytes = 0;
@@ -266,11 +275,13 @@ void pcmbuf_play_stop(void)
     
     pcmbuf_set_boost_mode(false);
     pcmbuf_boost(false);
-    
+
+    mutex_unlock(&pcmbuf_mutex);
 }
 
 void pcmbuf_init(long bufsize)
 {
+    mutex_init(&pcmbuf_mutex);
     pcmbuf_size = bufsize;
     audiobuffer = (char *)&audiobuf[(audiobufend - audiobuf) - 
                                     pcmbuf_size - PCMBUF_GUARD];
@@ -304,7 +315,16 @@ void pcmbuf_flush_audio(void)
 void pcmbuf_play_start(void)
 {
     if (!pcm_is_playing() && pcmbuf_unplayed_bytes)
+    {
+        /** Prevent a very tiny pop from happening by muting audio
+         *  until dma has been initialized. */
+        pcm_mute(true);
+    
         pcm_play_data(pcmbuf_callback);
+
+        /* Now unmute the audio. */
+        pcm_mute(false);
+    }
 }
 
 /**
@@ -314,6 +334,8 @@ void pcmbuf_flush_fillpos(void)
 {
     int copy_n;
 
+    mutex_lock(&pcmbuf_mutex);
+    
     copy_n = MIN(audiobuffer_fillpos, CHUNK_SIZE);
     
     if (copy_n) {
@@ -324,7 +346,8 @@ void pcmbuf_flush_fillpos(void)
             /* This is a fatal error situation that should never happen. */
             if (!pcm_is_playing()) {
                 logf("pcm_flush_fillpos error");
-                pcm_play_data(pcmbuf_callback);
+                pcmbuf_play_start();
+                mutex_unlock(&pcmbuf_mutex);
                 return ;
             }
         }
@@ -336,6 +359,8 @@ void pcmbuf_flush_fillpos(void)
         audiobuffer_free -= copy_n;
         audiobuffer_fillpos -= copy_n;
     }
+    
+    mutex_unlock(&pcmbuf_mutex);
 }
 
 /**
@@ -576,7 +601,7 @@ static bool prepare_insert(long length)
         crossfade_active = false;
         if (audiobuffer_free < pcmbuf_size - CHUNK_SIZE*4) {
             logf("pcm starting");
-            pcm_play_data(pcmbuf_callback);
+            pcmbuf_play_start();
         }
     }
     

@@ -72,6 +72,22 @@ void recalc_samplecount(void)
     samplecount -= start_skip + stop_skip;
 }
 
+void init_mad(void)
+{
+    ci->memset(&stream, 0, sizeof(struct mad_stream));
+    ci->memset(&frame, 0, sizeof(struct mad_frame));
+    ci->memset(&synth, 0, sizeof(struct mad_synth));
+    
+    mad_stream_init(&stream);
+    mad_frame_init(&frame);
+    mad_synth_init(&synth);
+
+    /* We do this so libmad doesn't try to call codec_calloc() */
+    ci->memset(mad_frame_overlap, 0, sizeof(mad_frame_overlap));
+    frame.overlap = &mad_frame_overlap;
+    stream.main_data = &mad_main_data;
+}
+
 /* this is the codec entry point */
 enum codec_status codec_start(struct codec_api *api)
 {
@@ -107,18 +123,7 @@ enum codec_status codec_start(struct codec_api *api)
      * Reinitializing seems to be necessary to avoid playback quircks when seeking. */
     next_track:
         
-    ci->memset(&stream, 0, sizeof(struct mad_stream));
-    ci->memset(&frame, 0, sizeof(struct mad_frame));
-    ci->memset(&synth, 0, sizeof(struct mad_synth));
-    
-    mad_stream_init(&stream);
-    mad_frame_init(&frame);
-    mad_synth_init(&synth);
-
-    /* We do this so libmad doesn't try to call codec_calloc() */
-    ci->memset(mad_frame_overlap, 0, sizeof(mad_frame_overlap));
-    frame.overlap = &mad_frame_overlap;
-    stream.main_data = &mad_main_data;
+    init_mad();
 
     file_end = 0;
     while (!*ci->taginfo_ready && !ci->stop_codec)
@@ -168,11 +173,7 @@ enum codec_status codec_start(struct codec_api *api)
             if (!ci->seek_buffer(newpos))
                 goto next_track;
             ci->seek_complete();
-            if (newpos == 0)
-            {
-                ci->id3->elapsed = 0;
-                goto next_track;
-            }
+            init_mad();
         }
 
         /* Lock buffers */

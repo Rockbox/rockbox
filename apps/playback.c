@@ -294,8 +294,6 @@ bool codec_pcmbuf_insert_split_callback(void *ch1, void *ch2,
 
     while (paused)
     {
-        if (pcm_is_playing())
-            pcm_play_pause(false);
         sleep(1);
         if (ci.stop_codec || ci.reload_codec || ci.seek_time)
             return true;
@@ -1845,15 +1843,15 @@ void audio_thread(void)
                 
             case AUDIO_PAUSE:
                 logf("audio_pause");
-                /* We will pause the pcm playback in audiobuffer insert function
-                   to prevent a loop inside the pcm buffer. */
-                // pcm_play_pause(false);
+                pcm_mute(true);
+                pcm_play_pause(false);
                 paused = true;
                 break ;
                 
             case AUDIO_RESUME:
                 logf("audio_resume");
                 pcm_play_pause(true);
+                pcm_mute(false);
                 paused = false;
                 break ;
             
