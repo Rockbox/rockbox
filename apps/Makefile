@@ -22,6 +22,14 @@ ifdef SOFTWARECODECS
 CODECS=build-codecs
 endif
 
+# Set up the bitmap libraries
+BITMAPLIBS = $(BUILDDIR)/libbitmapsmono.a \
+             $(BUILDDIR)/libbitmapsnative.a \
+             $(BUILDDIR)/libbitmapsremotemono.a \
+             $(BUILDDIR)/libbitmapsremotenative.a
+
+LINKBITMAPS = -lbitmapsmono -lbitmapsnative -lbitmapsremotemono -lbitmapsremotenative
+
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc
 
@@ -59,7 +67,7 @@ ifndef DEBUG
 REALBIN = $(BUILDDIR)/$(BINARY)
 endif
 
-all:  $(REALBIN) $(FLASHFILE) $(CODECS) $(ROCKS) $(ARCHOSROM)
+all: $(BITMAPLIBS) $(REALBIN) $(FLASHFILE) $(CODECS) $(ROCKS) $(ARCHOSROM)
 endif
 
 dep: $(DEPFILE)
@@ -67,6 +75,26 @@ dep: $(DEPFILE)
 build-codecs:
 	@$(MAKE) -C codecs/lib OBJDIR=$(OBJDIR)/codecs/lib
 	@$(MAKE) -C codecs OBJDIR=$(OBJDIR)/codecs
+
+$(BUILDDIR)/libbitmapsnative.a:
+	@echo "MAKE in bitmaps/native"
+	$(SILENT)mkdir -p $(OBJDIR)/bitmaps/native
+	@$(MAKE) -C bitmaps/native OBJDIR=$(OBJDIR)/bitmaps/native
+
+$(BUILDDIR)/libbitmapsmono.a:
+	@echo "MAKE in bitmaps/mono"
+	$(SILENT)mkdir -p $(OBJDIR)/bitmaps/mono
+	@$(MAKE) -C bitmaps/mono OBJDIR=$(OBJDIR)/bitmaps/mono
+
+$(BUILDDIR)/libbitmapsremotenative.a:
+	@echo "MAKE in bitmaps/remote_native"
+	$(SILENT)mkdir -p $(OBJDIR)/bitmaps/remote_native
+	@$(MAKE) -C bitmaps/remote_native OBJDIR=$(OBJDIR)/bitmaps/remote_native
+
+$(BUILDDIR)/libbitmapsremotemono.a:
+	@echo "MAKE in bitmaps/remote_mono"
+	$(SILENT)mkdir -p $(OBJDIR)/bitmaps/remote_mono
+	@$(MAKE) -C bitmaps/remote_mono OBJDIR=$(OBJDIR)/bitmaps/remote_mono
 
 rocks:
 	@$(MAKE) -C plugins/lib OBJDIR=$(OBJDIR)/plugins/lib
@@ -86,15 +114,15 @@ $(MAXOUTFILE):
 	@cat $(MAXINFILE) | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - > $(MAXOUTFILE)
 	@rm $(MAXINFILE)
 
-$(OBJDIR)/rombox.elf : $(OBJS) $(LINKROM) $(DEPFILE) $(LIBROCKBOX)
+$(OBJDIR)/rombox.elf : $(OBJS) $(LINKROM) $(DEPFILE) $(LIBROCKBOX) $(BITMAPLIBS)
 	@echo "LD rombox.elf"
-	@$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lgcc -L$(BUILDDIR)/firmware -T$(LINKROM) -Wl,-Map,$(OBJDIR)/rombox.map
+	@$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lgcc $(LINKBITMAPS) -L$(BUILDDIR)/firmware -T$(LINKROM) -Wl,-Map,$(OBJDIR)/rombox.map
 
 ifndef SIMVER
 
-$(OBJDIR)/rockbox.elf : $(OBJS) $(LINKFILE) $(DEPFILE) $(LIBROCKBOX)
+$(OBJDIR)/rockbox.elf : $(OBJS) $(LINKFILE) $(DEPFILE) $(LIBROCKBOX) $(BITMAPLIBS)
 	@echo "LD rockbox.elf"
-	@$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS)  -L$(BUILDDIR)/firmware -L$(BUILDDIR) -lrockbox -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
+	@$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS)  -L$(BUILDDIR)/firmware -L$(BUILDDIR) -lrockbox $(LINKBITMAPS) -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
 
 $(OBJDIR)/rockbox.bin : $(OBJDIR)/rockbox.elf
 	@echo "OBJCOPY "`basename $@`
@@ -177,6 +205,10 @@ clean:
 	$(LINKFILE) $(BUILDDIR)/rockbox.ucl $(LINKROM)                       \
 	$(BUILDDIR)/rombox.ucl $(OBJDIR)/rombox.bin $(OBJDIR)/rombox.elf     \
 	$(MAXOUTFILE) $(DEPFILE)
+	@$(MAKE) -C bitmaps/mono clean OBJDIR=$(OBJDIR)/bitmaps/mono
+	@$(MAKE) -C bitmaps/native clean OBJDIR=$(OBJDIR)/bitmaps/native
+	@$(MAKE) -C bitmaps/remote_mono clean OBJDIR=$(OBJDIR)/bitmaps/remote_mono
+	@$(MAKE) -C bitmaps/remote_native clean OBJDIR=$(OBJDIR)/bitmaps/remote_native
 	@$(MAKE) -C plugins clean OBJDIR=$(OBJDIR)/plugins
 	@$(MAKE) -C codecs clean OBJDIR=$(OBJDIR)/codecs
 	@rm -rf $(OBJDIR)/recorder $(OBJDIR)/player
@@ -184,4 +216,6 @@ ifdef SIMVER
 	@$(MAKE) -C $(SIMDIR) clean
 endif
 
+ifneq ($(MAKECMDGOALS),clean)
 -include $(DEPFILE)
+endif

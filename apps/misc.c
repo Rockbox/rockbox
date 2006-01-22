@@ -575,18 +575,12 @@ int show_logo( void )
     int font_h, font_w;
 
     lcd_clear_display();
-#if LCD_WIDTH == 112 || LCD_WIDTH == 128
-    lcd_bitmap(rockbox112x37, 0, 10, 112, 37);
-#endif
-#if (LCD_WIDTH >= 176) && defined(HAVE_LCD_COLOR)
     lcd_bitmap(rockboxlogo, 0, 10, ROCKBOXLOGO_WIDTH, ROCKBOXLOGO_HEIGHT);
-#elif LCD_WIDTH >= 160
-    lcd_bitmap(rockbox160x53x2, 0, 10, 160, 53);
-#endif
 
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_clear_display();
-    lcd_remote_bitmap(rockbox112x37,10,14,112,37);
+    lcd_remote_bitmap(remote_rockboxlogo,10,14,REMOTE_ROCKBOXLOGO_WIDTH,
+                      REMOTE_ROCKBOXLOGO_HEIGHT);
 #endif
 
     snprintf(version, sizeof(version), "Ver. %s", appsversion);

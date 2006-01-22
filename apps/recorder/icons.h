@@ -78,19 +78,33 @@ extern const unsigned char bitmap_icons_6x8[Icon6x8Last][6];
 extern const unsigned char bitmap_icons_7x8[Icon7x8Last][7];
 extern const unsigned char bitmap_icon_disk[];
 
-#if  LCD_WIDTH == 112 || LCD_WIDTH == 128 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_WIDTH == 128)
-extern const unsigned char rockbox112x37[];
-#endif
-#if defined(IRIVER_H300_SERIES) || defined(APPLE_IPODCOLOR) || defined(APPLE_IPODVIDEO)
-#define ROCKBOXLOGO_WIDTH 220
-#define ROCKBOXLOGO_HEIGHT 68
-extern const unsigned short rockboxlogo[];
-#elif defined(APPLE_IPODNANO)
+extern const fb_data rockboxlogo[];
+
+#if LCD_DEPTH == 1
+/* Archos targets */
+#define ROCKBOXLOGO_WIDTH 112
+#define ROCKBOXLOGO_HEIGHT 37
+
+#elif (LCD_WIDTH == 160) && (LCD_DEPTH == 2)
+/* iRiver H1x0 */
+#define ROCKBOXLOGO_WIDTH 160
+#define ROCKBOXLOGO_HEIGHT 53
+
+#elif (LCD_WIDTH == 176) && (LCD_DEPTH == 16)
+/* iPod Nano */
 #define ROCKBOXLOGO_WIDTH 176
 #define ROCKBOXLOGO_HEIGHT 54
-extern const unsigned short rockboxlogo[];
-#elif LCD_WIDTH >= 160
-extern const unsigned char rockbox160x53x2[];
+
+#elif (LCD_WIDTH >= 220) && (LCD_DEPTH == 16)
+/* iriver H3x0, iPod Color/Photo and Video */
+#define ROCKBOXLOGO_WIDTH 220
+#define ROCKBOXLOGO_HEIGHT 68
+#endif
+
+#ifdef HAVE_REMOTE_LCD
+extern const unsigned char remote_rockboxlogo[];
+#define REMOTE_ROCKBOXLOGO_WIDTH 112
+#define REMOTE_ROCKBOXLOGO_HEIGHT 37
 #endif
 
 #define STATUSBAR_X_POS       0

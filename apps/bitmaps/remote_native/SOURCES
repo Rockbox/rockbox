@@ -1,0 +1,3 @@
+#ifdef HAVE_REMOTE_LCD
+remote_rockboxlogo.112x37x1.bmp
+#endif

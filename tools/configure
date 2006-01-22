@@ -488,6 +488,8 @@ appsdir='\$(ROOTDIR)/apps'
     target="-DARCHOS_RECORDER"
     shcc
     tool="$rootdir/tools/scramble"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
     output="ajbrec.ajz"
     appextra="recorder:gui"
     archosrom="$pwd/rombox.ucl"
@@ -504,6 +506,8 @@ appsdir='\$(ROOTDIR)/apps'
     target="-DARCHOS_FMRECORDER"
     shcc
     tool="$rootdir/tools/scramble -fm"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
     output="ajbrec.ajz"
     appextra="recorder:gui"
     archosrom="$pwd/rombox.ucl"
@@ -520,6 +524,8 @@ appsdir='\$(ROOTDIR)/apps'
     target="-DARCHOS_RECORDERV2"
     shcc
     tool="$rootdir/tools/scramble -v2"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
     output="ajbrec.ajz"
     appextra="recorder:gui"
     archosrom="$pwd/rombox.ucl"
@@ -537,6 +543,8 @@ appsdir='\$(ROOTDIR)/apps'
     memory=16 # fixed size (16 is a guess, remove comment when checked)
     calmrisccc
     tool="cp" # might work for now!
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.gmini"
     appextra="recorder:gui"
     archosrom=""
@@ -554,6 +562,8 @@ appsdir='\$(ROOTDIR)/apps'
     memory=16 # fixed size (16 is a guess, remove comment when checked)
     calmrisccc
     tool="cp" # might work for now!
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.gmini"
     appextra="recorder:gui"
     archosrom=""
@@ -570,6 +580,8 @@ appsdir='\$(ROOTDIR)/apps'
     target="-DARCHOS_ONDIOSP"
     shcc
     tool="$rootdir/tools/scramble -osp"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
     output="ajbrec.ajz"
     appextra="recorder:gui"
     archosrom="$pwd/rombox.ucl"
@@ -586,6 +598,8 @@ appsdir='\$(ROOTDIR)/apps'
     target="-DARCHOS_ONDIOFM"
     shcc
     tool="$rootdir/tools/scramble -ofm"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
     output="ajbrec.ajz"
     appextra="recorder:gui"
     archosrom="$pwd/rombox.ucl"
@@ -601,6 +615,10 @@ appsdir='\$(ROOTDIR)/apps'
     memory=32 # always
     coldfirecc
     tool="$rootdir/tools/scramble -add=h120"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 2"
+    bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.iriver"
     appextra="recorder:gui"
     archosrom=""
@@ -618,6 +636,10 @@ appsdir='\$(ROOTDIR)/apps'
     memory=32 # always
     coldfirecc
     tool="$rootdir/tools/scramble -add=h300"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.iriver"
     appextra="recorder:gui"
     archosrom=""
@@ -635,6 +657,10 @@ appsdir='\$(ROOTDIR)/apps'
     memory=16 # always
     coldfirecc
     tool="$rootdir/tools/scramble -add=h100"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 2"
+    bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.iriver"
     appextra="recorder:gui"
     archosrom=""
@@ -652,6 +678,8 @@ appsdir='\$(ROOTDIR)/apps'
     memory=32 # always
     coldfirecc
     tool="$rootdir/tools/scramble -add=x5" # wrong, must be fixed
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.iaudio"
     appextra="recorder:gui"
     archosrom=""
@@ -669,6 +697,8 @@ appsdir='\$(ROOTDIR)/apps'
     memory=32 # always
     arm7tdmicc
     tool="$rootdir/tools/scramble -add=ipco"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
     output="rockbox.ipod"
     appextra="recorder:gui"
     archosrom=""
@@ -686,6 +716,8 @@ appsdir='\$(ROOTDIR)/apps'
     memory=32 # always
     arm7tdmicc
     tool="$rootdir/tools/scramble -add=nano"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
     output="rockbox.ipod"
     appextra="recorder:gui"
     archosrom=""
@@ -703,6 +735,8 @@ appsdir='\$(ROOTDIR)/apps'
     memory=32 # 30GB models have 32MB, 60GB have 64MB
     arm7tdmicc
     tool="$rootdir/tools/scramble -add=ipvd"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.ipod"
     appextra="recorder:gui"
     archosrom=""
@@ -720,6 +754,8 @@ appsdir='\$(ROOTDIR)/apps'
     memory=1
     arm7tdmicc
     tool="cp"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.wma"
     appextra="recorder:gui"
     archosrom=""
@@ -918,6 +954,10 @@ sed > Makefile \
  -e "s,@DLLWRAP@,${DLLWRAP},g" \
  -e "s,@RANLIB@,${RANLIB},g" \
  -e "s,@TOOL@,${tool},g" \
+ -e "s,@BMP2RB_NATIVE@,${bmp2rb_native},g" \
+ -e "s,@BMP2RB_MONO@,${bmp2rb_mono},g" \
+ -e "s,@BMP2RB_REMOTENATIVE@,${bmp2rb_remotenative},g" \
+ -e "s,@BMP2RB_REMOTEMONO@,${bmp2rb_remotemono},g" \
  -e "s,@OUTPUT@,${output},g" \
  -e "s,@APPEXTRA@,${appextra},g" \
  -e "s,@ARCHOSROM@,${archosrom},g" \
@@ -960,6 +1000,10 @@ export MEMORYSIZE=@MEMORY@
 export VERSION=\$(shell date +%y%m%d-%H%M)
 export BUILDDATE=\$(shell date +'-DYEAR=%Y -DMONTH=%m -DDAY=%d')
 export MKFIRMWARE=@TOOL@
+export BMP2RB_MONO=@BMP2RB_MONO@
+export BMP2RB_NATIVE=@BMP2RB_NATIVE@
+export BMP2RB_REMOTEMONO=@BMP2RB_REMOTEMONO@
+export BMP2RB_REMOTENATIVE=@BMP2RB_REMOTENATIVE@
 export BINARY=@OUTPUT@
 export APPEXTRA=@APPEXTRA@
 export ENABLEDPLUGINS=@PLUGINS@

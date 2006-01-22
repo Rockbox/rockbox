@@ -20,6 +20,15 @@ ifdef SOFTWARECODECS
    CODECLIBS = -lmad -la52 -lffmpegFLAC -lTremor -lwavpack -lmusepack
 endif
 
+# Set up the bitmap libraries
+BITMAPLIBS = $(BUILDDIR)/libpluginbitmapsmono.a \
+             $(BUILDDIR)/libpluginbitmapsnative.a \
+             $(BUILDDIR)/libpluginbitmapsremotemono.a \
+             $(BUILDDIR)/libpluginbitmapsremotenative.a
+
+LINKBITMAPS = -lpluginbitmapsmono -lpluginbitmapsnative \
+              -lpluginbitmapsremotemono -lpluginbitmapsremotenative
+
 LDS := plugin.lds
 LINKFILE := $(OBJDIR)/pluginlink.lds
 DEPFILE = $(OBJDIR)/dep-plugins
@@ -62,10 +71,10 @@ $(OBJDIR)/credits.o: credits.c $(BUILDDIR)/credits.raw
 	@$(CC) $(CFLAGS) -I$(OBJDIR) -c $< -o $@
 
 ifndef SIMVER
-$(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKFILE) $(BUILDDIR)/libplugin.a
+$(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKFILE) $(BUILDDIR)/libplugin.a $(BITMAPLIBS)
 	$(SILENT)(file=`basename $@`; \
 	echo "LD $$file"; \
-	$(CC) $(GCCOPTS) -O -nostdlib -o $@ $< -L$(BUILDDIR) $(CODECLIBS) -lplugin -lgcc -T$(LINKFILE) -Wl,--gc-sections -Wl,-Map,$(OBJDIR)/$*.map)
+	$(CC) $(GCCOPTS) -O -nostdlib -o $@ $< -L$(BUILDDIR) $(CODECLIBS) -lplugin $(LINKBITMAPS) -lgcc -T$(LINKFILE) -Wl,--gc-sections -Wl,-Map,$(OBJDIR)/$*.map)
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.elf
 	@echo "OBJCOPY "`basename $@`
@@ -78,7 +87,7 @@ ifeq ($(SIMVER), x11)
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.o  $(BUILDDIR)/libplugin.a
 	@echo "LD "`basename $@`
-	@$(CC) $(CFLAGS) -shared $< -L$(BUILDDIR)  $(CODECLIBS) -lplugin -o $@
+	@$(CC) $(CFLAGS) -shared $< -L$(BUILDDIR)  $(CODECLIBS) -lplugin $(LINKBITMAPS) -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
@@ -112,7 +121,7 @@ DLLWRAPFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 -mno-cygwin
 $(OBJDIR)/%.rock : $(OBJDIR)/%.o  $(BUILDDIR)/libplugin.a
 	@echo "DLL "`basename $@`
 	@$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $<
-	@$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< $(BUILDDIR)/libplugin.a \
+	@$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< $(BUILDDIR)/libplugin.a $(BITMAPLIBS) \
                 $(patsubst -l%,$(BUILDDIR)/lib%.a,$(CODECLIBS)) -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
@@ -133,6 +142,26 @@ $(BUILDDIR)/libplugin.a:
 	$(SILENT)mkdir -p $(OBJDIR)/lib
 	$(SILENT)$(MAKE) -C lib OBJDIR=$(OBJDIR)/lib
 
+$(BUILDDIR)/libpluginbitmapsnative.a:
+	@echo "MAKE in plugins/bitmaps/native"
+	$(SILENT)mkdir -p $(OBJDIR)/bitmaps/native
+	@$(MAKE) -C bitmaps/native OBJDIR=$(OBJDIR)/bitmaps/native
+
+$(BUILDDIR)/libpluginbitmapsmono.a:
+	@echo "MAKE in plugins/bitmaps/mono"
+	$(SILENT)mkdir -p $(OBJDIR)/bitmaps/mono
+	@$(MAKE) -C bitmaps/mono OBJDIR=$(OBJDIR)/bitmaps/mono
+
+$(BUILDDIR)/libpluginbitmapsremotenative.a:
+	@echo "MAKE in plugins/bitmaps/remote_native"
+	$(SILENT)mkdir -p $(OBJDIR)/bitmaps/remote_native
+	@$(MAKE) -C bitmaps/remote_native OBJDIR=$(OBJDIR)/bitmaps/remote_native
+
+$(BUILDDIR)/libpluginbitmapsremotemono.a:
+	@echo "MAKE in plugins/bitmaps/remote_mono"
+	$(SILENT)mkdir -p $(OBJDIR)/bitmaps/remote_mono
+	@$(MAKE) -C bitmaps/remote_mono OBJDIR=$(OBJDIR)/bitmaps/remote_mono
+
 $(LINKFILE): $(LDS)
 	@echo "build $@"
 	@cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P - >$@
@@ -147,6 +176,10 @@ clean:
 	@rm -f $(ROCKS) $(LINKFILE) $(OBJDIR)/*.rock $(DEPFILE) $(ELFS) \
 	$(BUILDDIR)/credits.raw $(OBJS) $(DEFS)
 	@$(MAKE) -C lib clean OBJDIR=$(OBJDIR)/lib
+	@$(MAKE) -C bitmaps/mono clean OBJDIR=$(OBJDIR)/bitmaps/mono
+	@$(MAKE) -C bitmaps/native clean OBJDIR=$(OBJDIR)/bitmaps/native
+	@$(MAKE) -C bitmaps/remote_mono clean OBJDIR=$(OBJDIR)/bitmaps/remote_mono
+	@$(MAKE) -C bitmaps/remote_native clean OBJDIR=$(OBJDIR)/bitmaps/remote_native
 	@$(MAKE) -C rockboy clean OBJDIR=$(OBJDIR)/rockboy
 	@$(MAKE) -C searchengine clean OBJDIR=$(OBJDIR)/searchengine
 
