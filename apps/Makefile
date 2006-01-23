@@ -23,12 +23,24 @@ CODECS=build-codecs
 endif
 
 # Set up the bitmap libraries
-BITMAPLIBS = $(BUILDDIR)/libbitmapsmono.a \
-             $(BUILDDIR)/libbitmapsnative.a \
-             $(BUILDDIR)/libbitmapsremotemono.a \
-             $(BUILDDIR)/libbitmapsremotenative.a
-
-LINKBITMAPS = -lbitmapsmono -lbitmapsnative -lbitmapsremotemono -lbitmapsremotenative
+BITMAPLIBS =
+LINKBITMAPS =
+ifneq ($(strip $(BMP2RB_MONO)),)
+  BITMAPLIBS += $(BUILDDIR)/libbitmapsmono.a
+  LINKBITMAPS += -lbitmapsmono
+endif
+ifneq ($(strip $(BMP2RB_NATIVE)),)
+  BITMAPLIBS += $(BUILDDIR)/libbitmapsnative.a
+  LINKBITMAPS += -lbitmapsnative
+endif
+ifneq ($(strip $(BMP2RB_REMOTEMONO)),)
+  BITMAPLIBS += $(BUILDDIR)/libbitmapsremotemono.a
+  LINKBITMAPS += -lbitmapsremotemono
+endif
+ifneq ($(strip $(BMP2RB_REMOTENATIVE)),)
+  BITMAPLIBS += $(BUILDDIR)/libbitmapsremotenative.a
+  LINKBITMAPS += -lbitmapsremotenative
+endif
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc

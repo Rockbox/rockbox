@@ -21,13 +21,24 @@ ifdef SOFTWARECODECS
 endif
 
 # Set up the bitmap libraries
-BITMAPLIBS = $(BUILDDIR)/libpluginbitmapsmono.a \
-             $(BUILDDIR)/libpluginbitmapsnative.a \
-             $(BUILDDIR)/libpluginbitmapsremotemono.a \
-             $(BUILDDIR)/libpluginbitmapsremotenative.a
-
-LINKBITMAPS = -lpluginbitmapsmono -lpluginbitmapsnative \
-              -lpluginbitmapsremotemono -lpluginbitmapsremotenative
+BITMAPLIBS =
+LINKBITMAPS =
+ifneq ($(strip $(BMP2RB_MONO)),)
+  BITMAPLIBS += $(BUILDDIR)/libpluginbitmapsmono.a
+  LINKBITMAPS += -lpluginbitmapsmono
+endif
+ifneq ($(strip $(BMP2RB_NATIVE)),)
+  BITMAPLIBS += $(BUILDDIR)/libpluginbitmapsnative.a
+  LINKBITMAPS += -lpluginbitmapsnative
+endif
+ifneq ($(strip $(BMP2RB_REMOTEMONO)),)
+  BITMAPLIBS += $(BUILDDIR)/libpluginbitmapsremotemono.a
+  LINKBITMAPS += -lpluginbitmapsremotemono
+endif
+ifneq ($(strip $(BMP2RB_REMOTENATIVE)),)
+  BITMAPLIBS += $(BUILDDIR)/libpluginbitmapsremotenative.a
+  LINKBITMAPS += -lpluginbitmapsremotenative
+endif
 
 LDS := plugin.lds
 LINKFILE := $(OBJDIR)/pluginlink.lds
