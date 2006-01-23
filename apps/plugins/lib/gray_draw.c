@@ -529,7 +529,7 @@ void gray_gray_bitmap(const unsigned char *src, int x, int y, int width,
 void gray_putsxyofs(int x, int y, int ofs, const unsigned char *str)
 {
     int ch;
-    struct font* pf = font_get(_gray_info.curfont);
+    struct font* pf = _gray_rb->font_get(_gray_info.curfont);
 
     while ((ch = *str++) != '\0' && x < _gray_info.width)
     {
