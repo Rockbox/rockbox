@@ -477,6 +477,17 @@ static void cube_draw(void)
     }
 }
 
+void cleanup(void *parameter)
+{
+    (void)parameter;
+
+#ifdef USE_GSLIB
+    gray_release();
+#elif defined HAVE_LCD_CHARCELLS
+    pgfx_release();
+#endif
+}
+
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     char buffer[30];
@@ -753,27 +764,20 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 break;
 
             default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
-                {
-#ifdef HAVE_LCD_CHARCELLS
-                    pgfx_release();
-#elif defined(USE_GSLIB)
-                    gray_release();
-#endif
+                if (rb->default_event_handler_ex(button, cleanup, NULL)
+                    == SYS_USB_CONNECTED)
                     return PLUGIN_USB_CONNECTED;
-                }
                 break;
         }
         if (button != BUTTON_NONE)
             lastbutton = button;
     }
-    
-#ifdef HAVE_LCD_CHARCELLS
-    pgfx_release();
-#elif defined(USE_GSLIB)
-    gray_release();
-#endif
 
+#ifdef USE_GSLIB
+    gray_release();
+#elif defined(HAVE_LCD_CHARCELLS)
+    pgfx_release();
+#endif
     return PLUGIN_OK;
 }
 
