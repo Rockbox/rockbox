@@ -3543,3 +3543,15 @@ desc: in settings_menu
 eng: "Brightness" 
 voice: "Brightness" 
 new: "화면 밝기"
+
+id: LANG_SCREEN_SCROLL_VIEW
+desc: should lines scroll out of the screen
+eng: "Screen Scrolls Out Of View"
+voice: "Screen Scrolls Out Of View"
+new: "화면을 이동하여 보기"
+
+id: LANG_SCREEN_SCROLL_STEP
+desc: Pixels to advance per Screen scroll
+eng: "Screen Scroll Step Size"
+voice: "Screen Scroll Step Size"
+new: "긴 문자 흐름 크기"
