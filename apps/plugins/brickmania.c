@@ -1096,14 +1096,17 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     bally=0;
     ballx=0;
 
-    rb->backlight_set_timeout(1);
+    /* Permanently enable the backlight (unless the user has turned it off) */
+    if (rb->global_settings->backlight_timeout > 0)
+        rb->backlight_set_timeout(1);
 
     /* now go ahead and have fun! */
     while (dxball_game()!=1);
 
     configfile_save(HIGH_SCORE,config,1,0);
 
-    rb->backlight_set_timeout(15);
+    /* Restore user's original backlight setting */
+    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
 
 #if !defined(SIMULATOR) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
     rb->cpu_boost(false);
