@@ -114,7 +114,7 @@ ifeq ($(SIMVER), sdl)
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.o  $(BUILDDIR)/libplugin.a
 	@echo "LD "`basename $@`
-	@$(CC) $(CFLAGS) -shared $< -L$(BUILDDIR)  $(CODECLIBS) -lplugin -o $@
+	@$(CC) $(CFLAGS) -shared $< -L$(BUILDDIR)  $(CODECLIBS) -lplugin $(LINKBITMAPS) -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
