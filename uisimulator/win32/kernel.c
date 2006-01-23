@@ -43,6 +43,11 @@ void queue_init(struct event_queue *q)
     q->write = 0;
 }
 
+void queue_delete(struct event_queue *q)
+{
+    (void)q;
+}
+
 void queue_wait(struct event_queue *q, struct event *ev)
 {
     while(q->read == q->write)

@@ -86,6 +86,7 @@ int tick_add_task(void (*f)(void));
 int tick_remove_task(void (*f)(void));
 
 extern void queue_init(struct event_queue *q);
+extern void queue_delete(struct event_queue *q);
 extern void queue_wait(struct event_queue *q, struct event *ev);
 extern void queue_wait_w_tmo(struct event_queue *q, struct event *ev, int ticks);
 extern void queue_post(struct event_queue *q, long id, void *data);
