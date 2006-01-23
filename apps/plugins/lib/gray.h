@@ -30,9 +30,12 @@
 
 #ifdef HAVE_LCD_BITMAP /* and also not for the Player */
 
-#define GRAY_MAX_LEVEL 255 /* The real value is variable, so normalise */
-#define GRAY_BLACK 0
-#define GRAY_WHITE GRAY_MAX_LEVEL
+#define GRAY_BRIGHTNESS(y) (y)
+
+#define GRAY_BLACK     GRAY_BRIGHTNESS(0)
+#define GRAY_DARKGRAY  GRAY_BRIGHTNESS(85)
+#define GRAY_LIGHTGRAY GRAY_BRIGHTNESS(170)
+#define GRAY_WHITE     GRAY_BRIGHTNESS(255)
 
 /* Library initialisation and release */
 int  gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
