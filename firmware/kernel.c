@@ -86,21 +86,28 @@ void queue_init(struct event_queue *q)
 void queue_delete(struct event_queue *q)
 {
     int i;
+    bool found = false;
 
     /* Find the queue to be deleted */
     for(i = 0;i < num_queues;i++)
     {
         if(all_queues[i] == q)
+        {
+            found = true;
             break;
+        }
     }
 
-    /* Move the following queues up in the list */
-    for(;i < num_queues-1;i++)
+    if(found)
     {
-        all_queues[i] = all_queues[i+1];
+        /* Move the following queues up in the list */
+        for(;i < num_queues-1;i++)
+        {
+            all_queues[i] = all_queues[i+1];
+        }
+        
+        num_queues--;
     }
-
-    num_queues--;
 }
 
 void queue_wait(struct event_queue *q, struct event *ev)
