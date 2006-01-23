@@ -27,6 +27,10 @@ plasma.c
 #endif
 bejeweled.c
 bounce.c
+/* H300 and iPod Color/Video only */
+#if (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176) && (LCD_DEPTH == 16)
+brickmania.c
+#endif
 calculator.c
 chip8.c
 demystify.c
