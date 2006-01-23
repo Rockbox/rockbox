@@ -19,6 +19,7 @@
 *
 ***************************************************************************/
 #include "plugin.h"
+#include "gray.h"
 #include "playergfx.h"
 #include "xlcd.h"
 
@@ -122,21 +123,52 @@ PLUGIN_HEADER
 #endif
 
 #ifdef HAVE_LCD_BITMAP
-#define MYLCD(fn) rb->lcd_ ## fn
+
 #define DIST (10*LCD_HEIGHT/16)
 static int x_off = LCD_WIDTH/2;
 static int y_off = LCD_HEIGHT/2;
+
+#if LCD_DEPTH == 1 && !defined(SIMULATOR)
+#define USE_GSLIB
+struct my_lcd {
+    void (*update)(void);
+    void (*clear_display)(void);
+    void (*drawline)(int x1, int y1, int x2, int y2);
+    void (*putsxy)(int x, int y, const unsigned char *string);
+};
+
+static struct my_lcd grayfuncs = {
+    gray_update, gray_clear_display, gray_drawline, gray_putsxy
+};
+static struct my_lcd lcdfuncs; /* initialised at runtime */
+static struct my_lcd *mylcd = &grayfuncs;
+
+#define MYLCD(fn) mylcd->fn
+#define MY_FILLTRIANGLE(x1, y1, x2, y2, x3, y3) gray_filltriangle(x1, y1, x2, y2, x3, y3)
+#define MY_SET_FOREGROUND(fg) gray_set_foreground(fg)
+#define MY_BLACK GRAY_BLACK
+
+#else
+#define MYLCD(fn) rb->lcd_ ## fn
+#define MY_FILLTRIANGLE(x1, y1, x2, y2, x3, y3) xlcd_filltriangle(x1, y1, x2, y2, x3, y3)
+#define MY_SET_FOREGROUND(fg) rb->lcd_set_foreground(fg)
+#define MY_BLACK LCD_BLACK
+#endif
+
 #if CONFIG_LCD == LCD_SSD1815
 #define ASPECT 320 /* = 1.25 (fixed point 24.8) */
 #else
 #define ASPECT 256 /* = 1.00 */
 #endif
+
 #else /* !LCD_BITMAP */
+
 #define MYLCD(fn) pgfx_ ## fn
 #define DIST 9
 static int x_off = 10;
 static int y_off = 7;
 #define ASPECT 300 /* = 1.175 */
+
 #endif /* !LCD_BITMAP */
 
 struct point_3D {
@@ -191,21 +223,24 @@ static const struct face faces[6] =
     {{1, 5, 6, 2}, {9, 6, 10, 1}}
 };
 
-#if LCD_DEPTH > 1
+#if LCD_DEPTH > 1 || defined(USE_GSLIB)
 static const unsigned face_colors[6] =
 {
 #ifdef HAVE_LCD_COLOR
     LCD_RGBPACK(255, 0, 0), LCD_RGBPACK(255, 0, 0), LCD_RGBPACK(0, 255, 0),
     LCD_RGBPACK(0, 255, 0), LCD_RGBPACK(0, 0, 255), LCD_RGBPACK(0, 0, 255)
+#elif defined(USE_GSLIB)
+    GRAY_LIGHTGRAY, GRAY_LIGHTGRAY, GRAY_DARKGRAY,
+    GRAY_DARKGRAY,  GRAY_BLACK,     GRAY_BLACK
 #else
     LCD_LIGHTGRAY, LCD_LIGHTGRAY, LCD_DARKGRAY,
-    LCD_DARKGRAY, LCD_BLACK, LCD_BLACK
+    LCD_DARKGRAY,  LCD_BLACK,     LCD_BLACK
 #endif
 };
 #endif
 
 enum {
-#if LCD_DEPTH > 1
+#if LCD_DEPTH > 1 || defined(USE_GSLIB)
     SOLID,
 #endif
     HIDDEN_LINES,
@@ -369,7 +404,7 @@ static void cube_draw(void)
 
     switch (mode)
     {
-#if LCD_DEPTH > 1
+#if LCD_DEPTH > 1 || defined(USE_GSLIB)
       case SOLID:
 
         for (i = 0; i < 6; i++)
@@ -383,24 +418,24 @@ static void cube_draw(void)
                    * (point2D[faces[i].corner[2]].x - point2D[faces[i].corner[1]].x))
                 continue;
 
-            rb->lcd_set_foreground(face_colors[i]);
-            xlcd_filltriangle(point2D[faces[i].corner[0]].x,
-                              point2D[faces[i].corner[0]].y,
-                              point2D[faces[i].corner[1]].x,
-                              point2D[faces[i].corner[1]].y,
-                              point2D[faces[i].corner[2]].x,
-                              point2D[faces[i].corner[2]].y);
-            xlcd_filltriangle(point2D[faces[i].corner[0]].x,
-                              point2D[faces[i].corner[0]].y,
-                              point2D[faces[i].corner[2]].x,
-                              point2D[faces[i].corner[2]].y,
-                              point2D[faces[i].corner[3]].x,
-                              point2D[faces[i].corner[3]].y);
+            MY_SET_FOREGROUND(face_colors[i]);
+            MY_FILLTRIANGLE(point2D[faces[i].corner[0]].x,
+                            point2D[faces[i].corner[0]].y,
+                            point2D[faces[i].corner[1]].x,
+                            point2D[faces[i].corner[1]].y,
+                            point2D[faces[i].corner[2]].x,
+                            point2D[faces[i].corner[2]].y);
+            MY_FILLTRIANGLE(point2D[faces[i].corner[0]].x,
+                            point2D[faces[i].corner[0]].y,
+                            point2D[faces[i].corner[2]].x,
+                            point2D[faces[i].corner[2]].y,
+                            point2D[faces[i].corner[3]].x,
+                            point2D[faces[i].corner[3]].y);
 
         }
-        rb->lcd_set_foreground(LCD_BLACK);
+        MY_SET_FOREGROUND(MY_BLACK);
         break;
-#endif /* LCD_DEPTH > 1 */
+#endif /* (LCD_DEPTH > 1) || GSLIB */
 
       case HIDDEN_LINES:
 
@@ -442,11 +477,15 @@ static void cube_draw(void)
     }
 }
 
-
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     char buffer[30];
     int t_disp = 0;
+#ifdef USE_GSLIB
+    unsigned char *gbuf;
+    unsigned int gbuf_size = 0;
+    bool mode_switch = true;
+#endif
 
     int button;
     int lastbutton = BUTTON_NONE;
@@ -467,9 +506,24 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH > 1
     xlcd_init(rb);
+#elif defined(USE_GSLIB)
+    gbuf = (unsigned char *)rb->plugin_get_buffer(&gbuf_size);
+    if (gray_init(rb, gbuf, gbuf_size, true, LCD_WIDTH, LCD_HEIGHT/8, 3, NULL)
+        != 3)
+    {
+        rb->splash(HZ, true, "Couldn't get grayscale buffer");
+        return PLUGIN_ERROR;
+    }
+    /* init lcd_ function pointers */
+    lcdfuncs.update =        rb->lcd_update;
+    lcdfuncs.clear_display = rb->lcd_clear_display;
+    lcdfuncs.drawline =      rb->lcd_drawline;
+    lcdfuncs.putsxy =        rb->lcd_putsxy;
+
+    gray_setfont(FONT_SYSFIXED);
 #endif
     rb->lcd_setfont(FONT_SYSFIXED);
-#else
+#else /* LCD_CHARCELLS */
     if (!pgfx_init(rb, 4, 2))
     {
         rb->splash(HZ*2, true, "Old LCD :(");
@@ -500,7 +554,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             t_disp--;
             rb->snprintf(buffer, sizeof(buffer), "x:%d y:%d z:%d h:%d",
                          xs, ys, zs, highspeed);
-            rb->lcd_putsxy(0, LCD_HEIGHT-8, buffer);
+            MYLCD(putsxy)(0, LCD_HEIGHT-8, buffer);
             if (t_disp == 0)
                 redraw = true;
         }
@@ -525,6 +579,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 rb->lcd_clear_display();
                 pgfx_display(3, 0);
             }
+        }
+#endif
+#ifdef USE_GSLIB
+        if (mode_switch)
+        {
+            gray_show(mode == SOLID);
+            mode_switch = false;
         }
 #endif
         MYLCD(update)();
@@ -663,6 +724,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
                 if (++mode >= NUM_MODES)
                     mode = 0;
+#ifdef USE_GSLIB
+                mylcd = (mode == SOLID) ? &grayfuncs : &lcdfuncs;
+                mode_switch = true;
+#endif
                 redraw = true;
                 break;
 
@@ -692,6 +757,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 {
 #ifdef HAVE_LCD_CHARCELLS
                     pgfx_release();
+#elif defined(USE_GSLIB)
+                    gray_release();
 #endif
                     return PLUGIN_USB_CONNECTED;
                 }
@@ -703,6 +770,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     
 #ifdef HAVE_LCD_CHARCELLS
     pgfx_release();
+#elif defined(USE_GSLIB)
+    gray_release();
 #endif
 
     return PLUGIN_OK;
