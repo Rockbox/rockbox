@@ -346,8 +346,6 @@ void tick_start(unsigned int interval_in_ms)
 
 #elif CONFIG_CPU == PP5020
 
-#define USECS_PER_INT 0x2710
-
 #ifndef BOOTLOADER
 void TIMER1(void)
 {
@@ -371,12 +369,10 @@ void TIMER1(void)
 void tick_start(unsigned int interval_in_ms)
 {
 #ifndef BOOTLOADER
-    /* TODO: use interval_in_ms to set timer periode */
-    (void)interval_in_ms;
     PP5020_TIMER1 = 0x0;
     PP5020_TIMER1_ACK;
-    /* enable timer, period, trigger value 0x2710 -> 100Hz */
-    PP5020_TIMER1 = 0xc0000000 | USECS_PER_INT;
+    /* enable timer */
+    PP5020_TIMER1 = 0xc0000000 | (interval_in_ms*1000);
     /* unmask interrupt source */
     PP5020_CPU_INT_EN = PP5020_TIMER1_MASK;
 #else
