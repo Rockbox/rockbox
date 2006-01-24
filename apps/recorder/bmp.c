@@ -80,14 +80,6 @@ static long readlong(long *value) {
 #endif
 
 
-/* Function to get a pixel from a line. (Tomas: maybe a better way?) */
-int getpix(int px, unsigned char *bmpbuf) {
-    int a = (px / 8);
-    int b = (7 - (px % 8));
-
-    return (bmpbuf[a] & (1 << b)) != 0;
-}
-
 
 /******************************************************************************
  * read_bmp_file()
@@ -172,6 +164,9 @@ int read_bmp_file(char* filename,
 
     /* loop to read rows and put them to buffer */
     for (row = 0; row < bitmap_height; row++) {
+        int bitsel = 1 << ((bitmap_height - row - 1) % 8);
+        int bytesel = bitmap_width * ((bitmap_height - row - 1) / 8);
+        
         /* read one row */
         ret = read(fd, bmpbuf, PaddedWidth);
         if (ret != PaddedWidth) {
@@ -183,14 +178,11 @@ int read_bmp_file(char* filename,
 
         /* loop though the pixels in this line. */
         for (col = 0; col < bitmap_width; col++) {
-            ret = getpix(col, bmpbuf);
-            if (ret == 1) {
-                bitmap[bitmap_width * ((bitmap_height - row - 1) / 8) + col]
-                    &= ~ 1 << ((bitmap_height - row - 1) % 8);
-            } else {
-                bitmap[bitmap_width * ((bitmap_height - row - 1) / 8) + col]
-                    |= 1 << ((bitmap_height - row - 1) % 8);
-            }
+            ret = (bmpbuf[col/8] & (1 << (7 - (col % 8)))) != 0;
+            if (ret == 1)
+                bitmap[bytesel + col] &= ~bitsel;
+            else
+                bitmap[bytesel + col] |= bitsel;
         }
     }
 
@@ -201,5 +193,4 @@ int read_bmp_file(char* filename,
     *get_height = bitmap_height;
 
     return (PaddedHeight * bitmap_width); /* return the used buffer size. */
-
 }
