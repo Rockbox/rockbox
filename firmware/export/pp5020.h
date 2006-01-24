@@ -57,35 +57,35 @@
 #define DEV_RS (*(volatile unsigned long *)(0x60006004))
 #define DEV_EN (*(volatile unsigned long *)(0x6000600c))
 
-#define PP5020_TIMER1       (*(volatile unsigned long *)(0x60005000))
-#define PP5020_TIMER1_ACK   (*(volatile unsigned long *)(0x60005004))
-#define PP5020_TIMER2       (*(volatile unsigned long *)(0x60005008))
-#define PP5020_TIMER2_ACK   (*(volatile unsigned long *)(0x6000500c))
-#define PP5020_TIMER_STATUS (*(volatile unsigned long *)(0x60005010))
+#define TIMER1_CFG   (*(volatile unsigned long *)(0x60005000))
+#define TIMER1_VAL   (*(volatile unsigned long *)(0x60005004))
+#define TIMER2_CFG   (*(volatile unsigned long *)(0x60005008))
+#define TIMER2_VAL   (*(volatile unsigned long *)(0x6000500c))
+#define USEC_TIMER   (*(volatile unsigned long *)(0x60005010))
 
-#define PP5020_CPU_INT_STAT     (*(volatile unsigned long*)(0x64004000))
-#define PP5020_CPU_HI_INT_STAT  (*(volatile unsigned long*)(0x64004100))
-#define PP5020_CPU_INT_EN       (*(volatile unsigned long*)(0x60004024))
-#define PP5020_CPU_HI_INT_EN    (*(volatile unsigned long*)(0x60004124))
-#define PP5020_CPU_INT_CLR      (*(volatile unsigned long*)(0x60004028))
-#define PP5020_CPU_HI_INT_CLR   (*(volatile unsigned long*)(0x60004128))
+#define CPU_INT_STAT     (*(volatile unsigned long*)(0x64004000))
+#define CPU_HI_INT_STAT  (*(volatile unsigned long*)(0x64004100))
+#define CPU_INT_EN       (*(volatile unsigned long*)(0x60004024))
+#define CPU_HI_INT_EN    (*(volatile unsigned long*)(0x60004124))
+#define CPU_INT_CLR      (*(volatile unsigned long*)(0x60004028))
+#define CPU_HI_INT_CLR   (*(volatile unsigned long*)(0x60004128))
        
-#define PP5020_TIMER1_IRQ   0
-#define PP5020_TIMER2_IRQ   1
-#define PP5020_I2S_IRQ      10
-#define PP5020_IDE_IRQ      23
-#define PP5020_GPIO_IRQ     (32+0)
-#define PP5020_SER0_IRQ     (32+4)
-#define PP5020_SER1_IRQ     (32+5)
-#define PP5020_I2C_IRQ      (32+8)
+#define TIMER1_IRQ   0
+#define TIMER2_IRQ   1
+#define I2S_IRQ      10
+#define IDE_IRQ      23
+#define GPIO_IRQ     (32+0)
+#define SER0_IRQ     (32+4)
+#define SER1_IRQ     (32+5)
+#define I2C_IRQ      (32+8)
 
-#define PP5020_TIMER1_MASK  (1 << PP5020_TIMER1_IRQ)
-#define PP5020_I2S_MASK     (1 << PP5020_I2S_IRQ)
-#define PP5020_IDE_MASK     (1 << PP5020_IDE_IRQ)
-#define PP5020_GPIO_MASK    (1 << (PP5020_GPIO_IRQ-32))
-#define PP5020_SER0_MASK    (1 << (PP5020_SER0_IRQ-32))
-#define PP5020_SER1_MASK    (1 << (PP5020_SER1_IRQ-32))
-#define PP5020_I2C_MASK     (1 << (PP5020_I2C_IRQ-32))
+#define TIMER1_MASK  (1 << TIMER1_IRQ)
+#define I2S_MASK     (1 << I2S_IRQ)
+#define IDE_MASK     (1 << IDE_IRQ)
+#define GPIO_MASK    (1 << (GPIO_IRQ-32))
+#define SER0_MASK    (1 << (SER0_IRQ-32))
+#define SER1_MASK    (1 << (SER1_IRQ-32))
+#define I2C_MASK     (1 << (I2C_IRQ-32))
 
 #define USB2D_IDENT         (*(volatile unsigned long*)(0xc5000000))
 #define USB_STATUS          (*(volatile unsigned long*)(0xc50001a4))

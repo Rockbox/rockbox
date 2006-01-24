@@ -31,7 +31,6 @@
 
 /*** definitions ***/
 #define IPOD_HW_REVISION        (*((volatile unsigned long*)0x00002084))
-#define IPOD_PP5020_RTC         (*((volatile unsigned long*)0x60005010))
 
 #define IPOD_LCD_BASE           0x70008a0c
 #define IPOD_LCD_BUSY_MASK      0x80000000
@@ -49,7 +48,7 @@ static int lcd_type = 1; /* 0 = "old" Color/Photo, 1 = "new" Color & Nano */
 /* check if number of useconds has past */
 static inline int timer_check(unsigned long clock_start, unsigned long usecs)
 {
-    if ( (IPOD_PP5020_RTC - clock_start) >= usecs ) {
+    if ( (USEC_TIMER - clock_start) >= usecs ) {
         return 1;
     } else {
         return 0;
@@ -59,7 +58,7 @@ static inline int timer_check(unsigned long clock_start, unsigned long usecs)
 static void lcd_wait_write(void)
 {
     if ((inl(IPOD_LCD_BASE) & IPOD_LCD_BUSY_MASK) != 0) {
-        int start = IPOD_PP5020_RTC;
+        int start = USEC_TIMER;
 
         do {
             if ((inl(IPOD_LCD_BASE) & IPOD_LCD_BUSY_MASK) == 0) break;

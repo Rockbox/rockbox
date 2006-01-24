@@ -203,7 +203,7 @@ static int ipod_4g_button_read(void)
 
 void ipod_4g_button_int(void)
 {
-    PP5020_CPU_HI_INT_CLR = PP5020_I2C_MASK;
+    CPU_HI_INT_CLR = I2C_MASK;
     udelay(250);
     outl(0x0, 0x7000c140); 
     int_btn = ipod_4g_button_read();
@@ -211,8 +211,8 @@ void ipod_4g_button_int(void)
     outl(0x400a1f00, 0x7000c100);
 
     GPIOB_OUTPUT_VAL |= 0x10;
-    PP5020_CPU_INT_EN = 0x40000000;
-    PP5020_CPU_HI_INT_EN = PP5020_I2C_MASK;
+    CPU_INT_EN = 0x40000000;
+    CPU_HI_INT_EN = I2C_MASK;
 }
 #endif 
 
@@ -397,8 +397,8 @@ void button_init(void)
     GPIOA_INT_CLR = GPIOA_INT_STAT & 0x20;
     /* enable interrupts */
     GPIOA_INT_EN = 0x20;
-    PP5020_CPU_INT_EN = 0x40000000;
-    PP5020_CPU_HI_INT_EN = PP5020_I2C_MASK;
+    CPU_INT_EN = 0x40000000;
+    CPU_HI_INT_EN = I2C_MASK;
 #endif /* CONFIG_KEYPAD */
 
     queue_init(&button_queue);

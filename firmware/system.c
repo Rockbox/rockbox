@@ -1112,9 +1112,9 @@ extern void ipod_4g_button_int(void);
 
 void irq(void)
 {
-    if (PP5020_CPU_INT_STAT & PP5020_TIMER1_MASK) 
+    if (CPU_INT_STAT & TIMER1_MASK) 
         TIMER1();
-    else if (PP5020_CPU_HI_INT_STAT & PP5020_I2C_MASK)
+    else if (CPU_HI_INT_STAT & I2C_MASK)
         ipod_4g_button_int();
 }
 #endif

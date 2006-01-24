@@ -351,7 +351,7 @@ void TIMER1(void)
 {
     int i;
 
-    PP5020_TIMER1_ACK;
+    TIMER1_VAL; /* Read value to ack IRQ */
     /* Run through the list of tick tasks */
     for (i = 0;i < MAX_NUM_TICK_TASKS;i++)
     {
@@ -369,12 +369,12 @@ void TIMER1(void)
 void tick_start(unsigned int interval_in_ms)
 {
 #ifndef BOOTLOADER
-    PP5020_TIMER1 = 0x0;
-    PP5020_TIMER1_ACK;
+    TIMER1_CFG = 0x0;
+    TIMER1_VAL;
     /* enable timer */
-    PP5020_TIMER1 = 0xc0000000 | (interval_in_ms*1000);
+    TIMER1_CFG = 0xc0000000 | (interval_in_ms*1000);
     /* unmask interrupt source */
-    PP5020_CPU_INT_EN = PP5020_TIMER1_MASK;
+    CPU_INT_EN = TIMER1_MASK;
 #else
     /* We don't enable interrupts in the bootloader */
     (void)interval_in_ms;
