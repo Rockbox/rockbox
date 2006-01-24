@@ -84,13 +84,13 @@ remap_end:
 #endif /* PP specific */
 
     /* Copy exception handler code to address 0 */
-    ldr    r2, =ecode
-    ldr    r3, =ecodeend
-    mov    r4, #0 
+    ldr    r2, =_vectorsstart
+    ldr    r3, =_vectorsend
+    ldr    r4, =_vectorscopy
 1:
     cmp    r3, r2
-    ldrhi  r5, [r2], #4
-    strhi  r5, [r4], #4
+    ldrhi  r5, [r4], #4
+    strhi  r5, [r2], #4
     bhi    1b
     
     /* Zero out IBSS */
@@ -259,7 +259,7 @@ boot_table:
     /* main() should never return */
 
 /* Exception handlers. Will be copied to address 0 after memory remapping */
-ecode:
+    .section .vectors,"aw"
     ldr    pc, [pc, #24]
     ldr    pc, [pc, #24]
     ldr    pc, [pc, #24]
@@ -270,6 +270,8 @@ ecode:
     ldr    pc, [pc, #24]
 
     /* Exception vectors */
+    .global vectors
+vectors:
     .word  start 
     .word  undef_instr_handler
     .word  software_int_handler
@@ -278,7 +280,8 @@ ecode:
     .word  reserved_handler
     .word  irq_handler
     .word  fiq_handler
-ecodeend:
+
+    .text
 
     .global irq
     .global UIE

@@ -128,8 +128,8 @@ _pluginbuf = 0;
 #define IRAMSIZE 0xc000
 #elif CONFIG_CPU==PNX0101
 #define DRAMORIG 0x24000000 + STUBOFFSET
-#define IRAMORIG 0x400100
-#define IRAMSIZE 0x7f00
+#define IRAMORIG 0x400000
+#define IRAMSIZE 0x8000
 #else
 #define DRAMORIG 0x09000000 + STUBOFFSET
 #define IRAMORIG 0x0f000000
@@ -150,6 +150,7 @@ MEMORY
 
 SECTIONS
 {
+#ifndef CPU_ARM
     .vectors :
     {
         loadaddress = .;
@@ -162,6 +163,12 @@ SECTIONS
 
     .text :
     {
+#else
+    .text :
+    {
+        loadaddress = .;
+        _loadaddress = .;
+#endif
         . = ALIGN(0x200);
         *(.init.text)
         *(.text*)
@@ -193,7 +200,6 @@ SECTIONS
         *(.data*)
         . = ALIGN(0x4);
         _dataend  = .;
-        _iramcopy = .;
     } > DRAM
 
     /DISCARD/ : 
@@ -201,14 +207,31 @@ SECTIONS
         *(.eh_frame)
     }
 
-    .iram IRAMORIG : AT ( _iramcopy)
+#ifdef CPU_ARM
+    .vectors 0x0 :
+    {
+        _vectorsstart = .;
+        *(.vectors);
+        _vectorsend = .;
+    } AT> DRAM
+
+    _vectorscopy = LOADADDR(.vectors);
+#endif
+
+#if CONFIG_CPU==PNX0101
+    .iram IRAMORIG + SIZEOF(.vectors) :
+#else
+    .iram IRAMORIG :
+#endif
     {
         _iramstart = .;
         *(.icode)
         *(.irodata)
         *(.idata)
         _iramend = .;
-    } > IRAM
+    } > IRAM AT> DRAM
+
+    _iramcopy = LOADADDR(.iram);
     
     .ibss (NOLOAD) :
     {
@@ -238,8 +261,10 @@ SECTIONS
     } > DRAM
 #endif
 
-#if defined(CPU_COLDFIRE) || defined(CPU_ARM)
+#if defined(CPU_COLDFIRE)
     .bss ADDR(.data) + SIZEOF(.data) + SIZEOF(.iram):
+#elif defined(CPU_ARM)
+    .bss ADDR(.data) + SIZEOF(.data) + SIZEOF(.iram) + SIZEOF(.vectors):
 #else
     .bss :
 #endif
