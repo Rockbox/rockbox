@@ -1104,20 +1104,7 @@ int system_memory_guard(int newmode)
     
     return oldmode;
 }
-#elif CONFIG_CPU==PP5020
-
-#ifndef BOOTLOADER
-extern void TIMER1(void);
-extern void ipod_4g_button_int(void);
-
-void irq(void)
-{
-    if (CPU_INT_STAT & TIMER1_MASK) 
-        TIMER1();
-    else if (CPU_HI_INT_STAT & I2C_MASK)
-        ipod_4g_button_int();
-}
-#endif
+#elif defined(CPU_ARM)
 
 static const char* const uiename[] = {
     "Undefined instruction", "Prefetch abort", "Data abort"
@@ -1146,6 +1133,21 @@ void UIE(unsigned int pc, unsigned int num)
          */
     }
 }
+
+#if CONFIG_CPU==PP5020
+
+#ifndef BOOTLOADER
+extern void TIMER1(void);
+extern void ipod_4g_button_int(void);
+
+void irq(void)
+{
+    if (CPU_INT_STAT & TIMER1_MASK) 
+        TIMER1();
+    else if (CPU_HI_INT_STAT & I2C_MASK)
+        ipod_4g_button_int();
+}
+#endif
 
 /* TODO: The following two function have been lifted straight from IPL, and
    hence have a lot of numeric addresses used straight. I'd like to use
@@ -1245,7 +1247,9 @@ static inline unsigned long irq_read(int reg)
         } while ((v != v2) || !(cond)); \
     } while (0);
 
-static void UIE(void) {}
+static void undefined_int(void)
+{
+}
 
 void irq(void)
 {
@@ -1282,9 +1286,9 @@ void system_init(void)
         IRQ_WRITE_WAIT(0x404 + i * 4, 0x1e000001, (v & 0x3010f) == 1);
         IRQ_WRITE_WAIT(0x404 + i * 4, 0x4000000, (v & 0x10000) == 0);
         IRQ_WRITE_WAIT(0x404 + i * 4, 0x10000001, (v & 0xf) == 1);
-        interrupt_vector[i + 1] = UIE;
+        interrupt_vector[i + 1] = undefined_int;
     }
-    interrupt_vector[0] = UIE;
+    interrupt_vector[0] = undefined_int;
 }
 
 
@@ -1300,5 +1304,6 @@ int system_memory_guard(int newmode)
     return 0;
 }
 
+#endif /* CPU_ARM */
 #endif /* CONFIG_CPU */
 
