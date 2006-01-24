@@ -458,6 +458,7 @@ appsdir='\$(ROOTDIR)/apps'
   archosbitmaptools="$toolset scramble descramble sh2d uclpack bmp2rb codepages"
   iriverbitmaptools="$toolset scramble descramble mkboot bmp2rb codepages"
   ipodbitmaptools="$toolset scramble ipod_fw bmp2rb codepages"
+  ifpbitmaptools="$toolset bmp2rb codepages"
 
   case $target_id in
 
@@ -764,6 +765,9 @@ appsdir='\$(ROOTDIR)/apps'
     flash=""
     plugins="yes"
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$ifpbitmaptools
     ;;
 
    *)
