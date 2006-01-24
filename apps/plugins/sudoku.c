@@ -141,6 +141,7 @@ static unsigned char cellypos[9]={ 2, 15, 28, 42, 55, 68, 82, 95, 108 };
 
 /* The height of one cell in the bitmap */
 #define BITMAP_HEIGHT 12
+#define BITMAP_STRIDE 12
 
 #elif (LCD_HEIGHT==64) && (LCD_WIDTH==112)
 /* For Archos Recorder, FM and Ondio (112x64):
@@ -165,6 +166,7 @@ static unsigned char cellypos[9]={ 1,  8, 15, 22, 29, 36, 43, 50, 57 };
 
 /* The height of one cell in the bitmap */
 #define BITMAP_HEIGHT 8
+#define BITMAP_STRIDE 8
 
 #elif (LCD_HEIGHT>=176) && (LCD_WIDTH>=220)
 /* iriver h300 */
@@ -187,6 +189,7 @@ static unsigned char cellypos[9]={ 2, 19, 36, 54, 71, 88, 106, 123, 140 };
 
 /* The height of one cell in the bitmap */
 #define BITMAP_HEIGHT 16
+#define BITMAP_STRIDE  16
 
 #else
   #error SUDOKU: Unsupported LCD size
@@ -658,14 +661,14 @@ void update_cell(struct sudoku_state_t* state, int r, int c)
       */
 
       if ((r==state->y) && (c==state->x)) {
-        rb->lcd_bitmap_part(sudoku_inverse,0,BITMAP_HEIGHT*(state->currentboard[r][c]-'0'),0,
+        rb->lcd_bitmap_part(sudoku_inverse,0,BITMAP_HEIGHT*(state->currentboard[r][c]-'0'),BITMAP_STRIDE,
              XOFS+cellxpos[c],YOFS+cellypos[r],CELL_WIDTH,CELL_HEIGHT);
       } else {
         if (state->startboard[r][c]!='0') {
-          rb->lcd_bitmap_part(sudoku_start,0,BITMAP_HEIGHT*(state->startboard[r][c]-'0'),0,
+          rb->lcd_bitmap_part(sudoku_start,0,BITMAP_HEIGHT*(state->startboard[r][c]-'0'),BITMAP_STRIDE,
                XOFS+cellxpos[c],YOFS+cellypos[r],CELL_WIDTH,CELL_HEIGHT);
         } else {
-          rb->lcd_bitmap_part(sudoku_normal,0,BITMAP_HEIGHT*(state->currentboard[r][c]-'0'),0,
+          rb->lcd_bitmap_part(sudoku_normal,0,BITMAP_HEIGHT*(state->currentboard[r][c]-'0'),BITMAP_STRIDE,
                XOFS+cellxpos[c],YOFS+cellypos[r],CELL_WIDTH,CELL_HEIGHT);
         }
       }
@@ -745,7 +748,7 @@ void display_board(struct sudoku_state_t* state)
     }
 #endif
     if ((r>0) && state->possiblevals[state->y][state->x]&(1<<(r)))
-      rb->lcd_bitmap_part(sudoku_normal,0,BITMAP_HEIGHT*r,0,
+      rb->lcd_bitmap_part(sudoku_normal,0,BITMAP_HEIGHT*r,BITMAP_STRIDE,
                           XOFSSCRATCHPAD+1,YOFS+cellypos[r-1],
                          CELL_WIDTH,CELL_HEIGHT);
   }
@@ -756,7 +759,7 @@ void display_board(struct sudoku_state_t* state)
                 YOFS+cellypos[8]+CELL_HEIGHT+1);
 #endif
   if (state->possiblevals[state->y][state->x]&(1<<(r)))
-      rb->lcd_bitmap_part(sudoku_normal,0,BITMAP_HEIGHT*r,0,
+      rb->lcd_bitmap_part(sudoku_normal,0,BITMAP_HEIGHT*r,BITMAP_STRIDE,
                           XOFSSCRATCHPAD+1,YOFS+cellypos[8],
                          CELL_WIDTH,CELL_HEIGHT);
 #endif
@@ -771,14 +774,14 @@ void display_board(struct sudoku_state_t* state)
       */
 
       if ((r==state->y) && (c==state->x)) {
-        rb->lcd_bitmap_part(sudoku_inverse,0,BITMAP_HEIGHT*(state->currentboard[r][c]-'0'),0,
+        rb->lcd_bitmap_part(sudoku_inverse,0,BITMAP_HEIGHT*(state->currentboard[r][c]-'0'),BITMAP_STRIDE,
              XOFS+cellxpos[c],YOFS+cellypos[r],CELL_WIDTH,CELL_HEIGHT);
       } else {
         if (state->startboard[r][c]!='0') {
-          rb->lcd_bitmap_part(sudoku_start,0,BITMAP_HEIGHT*(state->startboard[r][c]-'0'),0,
+          rb->lcd_bitmap_part(sudoku_start,0,BITMAP_HEIGHT*(state->startboard[r][c]-'0'),BITMAP_STRIDE,
                XOFS+cellxpos[c],YOFS+cellypos[r],CELL_WIDTH,CELL_HEIGHT);
         } else {
-          rb->lcd_bitmap_part(sudoku_normal,0,BITMAP_HEIGHT*(state->currentboard[r][c]-'0'),0,
+          rb->lcd_bitmap_part(sudoku_normal,0,BITMAP_HEIGHT*(state->currentboard[r][c]-'0'),BITMAP_STRIDE,
                XOFS+cellxpos[c],YOFS+cellypos[r],CELL_WIDTH,CELL_HEIGHT);
         }
       }
