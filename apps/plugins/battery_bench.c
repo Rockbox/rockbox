@@ -48,6 +48,12 @@ PLUGIN_HEADER
 
 #define BATTERY_OFF BUTTON_OFF
 #define BATTERY_RC_OFF BUTTON_RC_STOP
+
+#elif CONFIG_KEYPAD == IPOD_4G_PAD
+
+#define BATTERY_ON  BUTTON_PLAY
+#define BATTERY_OFF BUTTON_MENU
+
 #endif
 
 
@@ -159,8 +165,13 @@ void thread(void)
         }
         else
         {            
-            if(!rb->pcm_is_playing() &&
-                (*rb->current_tick - tick) > DISK_SPINDOWN_TIMEOUT * HZ)
+            if(
+#if CONFIG_CODEC == SWCODEC                
+                !rb->pcm_is_playing()
+#else
+                !rb->mp3_is_playing()
+#endif                
+                && (*rb->current_tick - tick) > DISK_SPINDOWN_TIMEOUT * HZ)
                 timeflag = true;
             
             if(last_voltage != rb->battery_voltage())
