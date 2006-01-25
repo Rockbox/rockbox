@@ -426,7 +426,18 @@ long gui_wps_show(void)
             case WPS_RC_NEXT_DIR:
 #endif
             case WPS_NEXT_DIR:
-                audio_next_dir();
+#if defined(AB_REPEAT_ENABLE) && defined(WPS_AB_SHARE_DIR_BUTTONS)
+                if (ab_repeat_mode_enabled())
+                {
+                    ab_set_B_marker(wps_state.id3->elapsed);
+                    ab_jump_to_A_marker();
+                    update_track = true;
+                }
+                else
+#endif
+                {
+                    audio_next_dir();
+                }
                 break;
 #endif
 #ifdef WPS_PREV_DIR
@@ -434,7 +445,14 @@ long gui_wps_show(void)
             case WPS_RC_PREV_DIR:
 #endif
             case WPS_PREV_DIR:
-                audio_prev_dir();
+#if defined(AB_REPEAT_ENABLE) && defined(WPS_AB_SHARE_DIR_BUTTONS)
+                if (ab_repeat_mode_enabled())
+                    ab_set_A_marker(wps_state.id3->elapsed);
+                else
+#endif
+                {
+                    audio_prev_dir();
+                }
                 break;
 #endif
 
