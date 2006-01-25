@@ -73,6 +73,11 @@ static int shutdown_timeout = 0;
 
 #ifdef SIMULATOR /***********************************************************/
 
+unsigned int battery_voltage(void)
+{
+    return 400;
+}
+
 int battery_level(void)
 {
     return 75;
