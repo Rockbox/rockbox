@@ -93,6 +93,7 @@ remap_end:
     strhi  r5, [r2], #4
     bhi    1b
     
+#ifndef STUB
     /* Zero out IBSS */
     ldr    r2, =_iedata
     ldr    r3, =_iend
@@ -111,6 +112,7 @@ remap_end:
     ldrhi  r5, [r2], #4
     strhi  r5, [r3], #4
     bhi    1b
+#endif /* !STUB */
 #endif /* !BOOTLOADER */
 
     /* Initialise bss section to zero */
@@ -283,8 +285,10 @@ vectors:
 
     .text
 
+#ifndef STUB
     .global irq
     .global UIE
+#endif
 
 /* All illegal exceptions call into UIE with exception address as first
    parameter. This is calculated differently depending on which exception
@@ -317,11 +321,18 @@ data_abort_handler:
     b      UIE
 
 irq_handler:
+#ifndef STUB
     stmfd  sp!, {r0-r3, r12, lr}
     bl     irq
     ldmfd  sp!, {r0-r3, r12, lr}
+#endif
     subs   pc, lr, #4
-    
+
+#ifdef STUB
+UIE:
+    b UIE
+#endif
+
 /* 256 words of IRQ stack */
     .space 256*4
 irq_stack:

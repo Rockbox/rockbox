@@ -7,6 +7,67 @@
 # $Id$
 #
 
+ifeq ($(ARCHOS),ifp7xx)
+
+INCLUDES= -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I. -I$(OBJDIR)	\
+ -I$(BUILDDIR)
+
+DEPFILE = $(OBJDIR)/dep-stub
+LDS := linker.cfg
+
+SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P -include "config.h" - )
+DIRS = .
+
+ifdef APPEXTRA
+   DIRS += $(subst :, ,$(APPEXTRA))
+   INCLUDES += $(patsubst %,-I%,$(subst :, ,$(APPEXTRA)))
+endif
+
+ifndef VERSION
+VERSION=$(shell date +%y%m%d-%H%M)
+endif
+
+CFLAGS = $(GCCOPTS) $(INCLUDES) $(TARGET) $(DEFINES)			\
+ -DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
+
+OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
+SOURCES = $(SRC)
+LINKFILE = $(OBJDIR)/linkage.lds
+
+LIBROCKBOX = $(BUILDDIR)/librockbox.a
+
+all: $(BUILDDIR)/$(BINARY) $(FLASHFILE)
+
+dep: $(DEPFILE)
+
+$(LINKFILE): $(LDS)
+	@echo "Build LDS file"
+	@cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
+
+$(OBJDIR)/stub.elf : $(OBJS) $(LINKFILE) $(DEPFILE) $(LIBROCKBOX)
+	@echo "LD stub.elf"
+	@$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -L$(BUILDDIR)/firmware -lrockbox -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/stub.map
+
+$(OBJDIR)/stub.bin : $(OBJDIR)/stub.elf
+	@echo "OBJCOPY $<"
+	@$(OC) -O binary $< $@
+
+$(BUILDDIR)/$(BINARY) : $(OBJDIR)/stub.bin
+	@echo "Build stub file"
+	$(MKFIRMWARE) $< $@
+
+include $(TOOLSDIR)/make.inc
+
+clean:
+	@echo "cleaning stub"
+	@-rm -f $(OBJS) $(BUILDDIR)/$(BINARY) \
+	$(OBJDIR)/stub.bin $(OBJDIR)/stub.elf $(OBJDIR)/*.map \
+	$(LINKFILE) $(DEPFILE)
+
+-include $(DEPFILE)
+
+else # not ifp7xx
+
 ifdef RECORDER
 EXTRA = -DRECORDER
 EXT = ajz
@@ -38,6 +99,8 @@ $(TARGET).elf: $(OBJS)
 clean:
 	rm $(OBJS) $(TARGET).map $(TARGET).elf $(TARGET).out $(TARGET).mod $(TARGET).ajz
 
-start.o: start.S
+start.o: start.s
 sh-stub.o: sh-stub.c
 setjmp.o: setjmp.S
+
+endif

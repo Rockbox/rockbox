@@ -170,3 +170,7 @@ replaygain.c
 pcm_record.c
 #endif
 sound.c
+#if defined(IRIVER_IFP7XX_SERIES) && defined(STUB)
+common/sscanf.c
+usb_serial.c
+#endif
