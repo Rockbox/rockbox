@@ -646,13 +646,9 @@ static char* get_tag(struct wps_data* wps_data,
 
                 case 'v': /* battery voltage */
                 {
-                    int v = battery_voltage();
-                    if (v > -1)
-                    {
-                        snprintf(buf, buf_size, "%d.%02d", v/100, v%100);
-                        return buf;
-                    } else
-                        return "?";
+                    unsigned int v = battery_voltage();
+                    snprintf(buf, buf_size, "%d.%02d", v/100, v%100);
+                    return buf;
                 }
 
                 case 't': /* estimated battery time */
