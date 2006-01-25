@@ -807,7 +807,7 @@ fi
 # Figure out build "type"
 #
   echo ""
-  echo "Build (N)ormal, (D)evel, (S)imulator, (B)ootloader? (N)"
+  echo "Build (N)ormal, (D)evel, (S)imulator, (B)ootloader, (G)DB stub? (N)"
 
   option=`input`;
 
@@ -838,6 +838,19 @@ fi
     [Dd])
       echo "Devel build selected"
       whichdevel
+      ;;
+    [Gg])
+      extradefines="-DSTUB" # for target makefile symbol EXTRA_DEFINES
+      appsdir='\$(ROOTDIR)/gdb'
+      apps="stub"
+      case $archos in
+          ifp7xx)
+              output="stub.wma"
+              ;;
+          *)
+              ;;
+      esac
+      echo "GDB stub build selected"
       ;;
     *)
       debug=""
