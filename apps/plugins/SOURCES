@@ -1,4 +1,5 @@
 /* plugins common to all models */
+battery_bench.c
 battery_test.c
 chessclock.c
 credits.c

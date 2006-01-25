@@ -218,6 +218,11 @@ static long last_event_tick;
 static void battery_status_update(void);
 static int runcurrent(void);
 
+unsigned int battery_voltage(void)
+{
+    return battery_centivolts;
+}
+
 void reset_poweroff_timer(void)
 {
     last_event_tick = current_tick;

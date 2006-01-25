@@ -37,6 +37,7 @@
 #include "dir.h"
 #include "kernel.h"
 #include "button.h"
+#include "usb.h"
 #include "font.h"
 #include "system.h"
 #include "lcd.h"
@@ -96,7 +97,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 2
+#define PLUGIN_API_VERSION 3
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -427,13 +428,23 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */     
+       
 #ifdef RB_PROFILE
     void (*profile_thread)(void);
     void (*profstop)(void);
     void (*profile_func_enter)(void *this_fn, void *call_site);
     void (*profile_func_exit)(void *this_fn, void *call_site);
 #endif
-
+    int (*battery_time)(void);
+#ifndef SIMULATOR
+    bool (*ata_disk_is_active)(void);
+    unsigned int (*battery_voltage)(void);
+#endif
+    void (*queue_init)(struct event_queue *q);
+    void (*queue_delete)(struct event_queue *q);
+    void (*queue_post)(struct event_queue *q, long id, void *data);
+    void (*queue_wait_w_tmo)(struct event_queue *q, struct event *ev, int ticks);
+    void (*usb_acknowledge)(long id);
 };
 
 /* plugin header */

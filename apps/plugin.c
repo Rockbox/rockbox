@@ -28,6 +28,7 @@
 #include "dir.h"
 #include "file.h"
 #include "kernel.h"
+#include "usb.h"
 #include "sprintf.h"
 #include "logf.h"
 #include "screens.h"
@@ -369,7 +370,16 @@ static const struct plugin_api rockbox_api = {
     profile_func_enter,
     profile_func_exit,
 #endif
-
+    battery_time,
+#ifndef SIMULATOR
+	ata_disk_is_active,
+	battery_voltage,
+#endif
+    queue_init,
+    queue_delete,
+    queue_post,
+    queue_wait_w_tmo,
+    usb_acknowledge,
 };
 
 int plugin_load(const char* plugin, void* parameter)

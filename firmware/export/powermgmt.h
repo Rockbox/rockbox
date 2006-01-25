@@ -144,6 +144,8 @@ void powermgmt_init(void);
 int battery_level(void);
 int battery_time(void); /* minutes */
 
+unsigned int battery_voltage(void); /* filtered batt. voltage in centivolts */
+
 /* Tells if the battery level is safe for disk writes */
 bool battery_level_safe(void);
 
