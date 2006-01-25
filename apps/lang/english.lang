@@ -3568,3 +3568,10 @@ desc: Pixels to advance per Screen scroll
 eng: "Screen Scroll Step Size"
 voice: "Screen Scroll Step Size"
 new:
+
+id: LANG_QUEUE_SHUFFLED
+desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
+eng: "Queue shuffled"
+voice: "Queue shuffled"
+new:
+

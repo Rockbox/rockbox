@@ -319,6 +319,11 @@ static bool playlist_options(void)
             args[i].position = PLAYLIST_INSERT_LAST;
             args[i].queue = true;
             i++;
+
+            items[i].desc = ID2P(LANG_QUEUE_SHUFFLED);
+            args[i].position = PLAYLIST_INSERT_SHUFFLED;
+            args[i].queue = true;
+            i++;
         }
         else if (((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_MPA) ||
                  (selected_file_attr & ATTR_DIRECTORY))
