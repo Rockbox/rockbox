@@ -139,7 +139,7 @@ mp3data.c
 #if CONFIG_CODEC != SWCODEC
 mpeg.c
 #endif
-#ifndef WIN32 /* the win32 sim has its own versin of these: */
+#if !defined(WIN32) || defined(SDL)
 panic.c
 debug.c
 #endif

@@ -409,7 +409,7 @@ void sim_plugin_close(int pd)
     dlclose((void *)pd);
 }
 
-#ifndef WIN32
+#if !defined(WIN32) || defined(SDL)
 /* the win32 version is in debug-win32.c */
 
 void debug_init(void)

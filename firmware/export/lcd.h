@@ -29,7 +29,9 @@
 
 #ifdef SIMULATOR
 #define lcd_icon(x,y) sim_lcd_icon(x,y)
+#ifndef MAX_PATH
 #define MAX_PATH 260
+#endif
 #else
 #include "file.h"  /* for MAX_PATH; FIXME: Why does this not work for sims? */
 #endif
