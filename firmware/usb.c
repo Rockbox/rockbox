@@ -55,7 +55,7 @@ void screen_dump(void);   /* Nasty again. Defined in apps/ too */
 
 /* Messages from usb_tick and thread states */
 #define USB_INSERTED    1
-#define USB_EXTRACTED   2
+#define USB_EXTRACTED   2 
 #ifdef HAVE_MMC
 #define USB_REENABLE    3
 #endif
@@ -71,6 +71,9 @@ void screen_dump(void);   /* Nasty again. Defined in apps/ too */
 #elif CONFIG_KEYPAD == IPOD_4G_PAD
 #define USBPOWER_BUTTON BUTTON_MENU
 #define USBPOWER_BTN_IGNORE BUTTON_PLAY
+#elif CONFIG_KEYPAD == IRIVER_H300_PAD
+#define USBPOWER_BUTTON BUTTON_REC
+#define USBPOWER_BTN_IGNORE BUTTON_ON
 #endif
 #endif /* HAVE_USB_POWER */
 
