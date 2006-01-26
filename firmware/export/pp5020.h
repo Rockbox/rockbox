@@ -90,4 +90,10 @@
 #define USB2D_IDENT         (*(volatile unsigned long*)(0xc5000000))
 #define USB_STATUS          (*(volatile unsigned long*)(0xc50001a4))
 
+#define IISCONFIG           (*(volatile unsigned long*)(0x70002800))
+
+#define IISFIFO_CFG         (*(volatile unsigned long*)(0x7000280c))
+#define IISFIFO_WR          (*(volatile unsigned long*)(0x70002840))
+#define IISFIFO_RD          (*(volatile unsigned long*)(0x70002880))
+
 #endif
