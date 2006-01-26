@@ -11,6 +11,7 @@ bitmaps/mono/*
 bitmaps/native/*
 bitmaps/remote_mono/*
 bitmaps/remote_native/*
+bitmaps/Makefile
 plugins/*.[ch]
 plugins/*.pl
 plugins/Makefile
@@ -21,6 +22,7 @@ plugins/bitmaps/mono/*
 plugins/bitmaps/native/*
 plugins/bitmaps/remote_mono/*
 plugins/bitmaps/remote_native/*
+plugins/bitmaps/Makefile
 plugins/sokoban.levels
 plugins/viewers.config
 plugins/snake2.levels

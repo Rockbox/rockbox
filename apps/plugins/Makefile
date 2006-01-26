@@ -70,7 +70,7 @@ endif
 
 
 .PHONY: $(SUBDIRS)
-all: $(BITMAPLIBS) $(BUILDDIR)/libplugin.a $(ROCKS) $(SUBDIRS) $(DEPFILE)
+all: build-bitmaps $(BUILDDIR)/libplugin.a $(ROCKS) $(SUBDIRS) $(DEPFILE)
 
 $(BUILDDIR)/credits.raw: $(DOCSDIR)/CREDITS
 	@echo "create credits.raw"
@@ -80,6 +80,9 @@ $(OBJDIR)/credits.o: credits.c $(BUILDDIR)/credits.raw
 	@mkdir -p `dirname $@`
 	@echo "CC $<"
 	@$(CC) $(CFLAGS) -I$(OBJDIR) -c $< -o $@
+
+build-bitmaps:
+	@$(MAKE) -C bitmaps OBJDIR=$(OBJDIR)/bitmaps
 
 ifndef SIMVER
 $(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKFILE) $(BUILDDIR)/libplugin.a $(BITMAPLIBS)

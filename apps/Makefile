@@ -69,7 +69,7 @@ LIBROCKBOX = $(BUILDDIR)/librockbox.a
 ifdef SIMVER
 # this is a sim build
 
-all: $(BITMAPLIBS) $(BUILDDIR)/$(BINARY) $(CODECS) $(ROCKS)
+all: build-bitmaps $(BUILDDIR)/$(BINARY) $(CODECS) $(ROCKS)
 
 else
 # regular target build
@@ -79,7 +79,7 @@ ifndef DEBUG
 REALBIN = $(BUILDDIR)/$(BINARY)
 endif
 
-all: $(BITMAPLIBS) $(REALBIN) $(FLASHFILE) $(CODECS) $(ROCKS) $(ARCHOSROM)
+all: build-bitmaps $(REALBIN) $(FLASHFILE) $(CODECS) $(ROCKS) $(ARCHOSROM)
 endif
 
 dep: $(DEPFILE)
@@ -88,25 +88,8 @@ build-codecs:
 	@$(MAKE) -C codecs/lib OBJDIR=$(OBJDIR)/codecs/lib
 	@$(MAKE) -C codecs OBJDIR=$(OBJDIR)/codecs
 
-$(BUILDDIR)/libbitmapsnative.a:
-	@echo "MAKE in bitmaps/native"
-	$(SILENT)mkdir -p $(OBJDIR)/bitmaps/native
-	@$(MAKE) -C bitmaps/native OBJDIR=$(OBJDIR)/bitmaps/native
-
-$(BUILDDIR)/libbitmapsmono.a:
-	@echo "MAKE in bitmaps/mono"
-	$(SILENT)mkdir -p $(OBJDIR)/bitmaps/mono
-	@$(MAKE) -C bitmaps/mono OBJDIR=$(OBJDIR)/bitmaps/mono
-
-$(BUILDDIR)/libbitmapsremotenative.a:
-	@echo "MAKE in bitmaps/remote_native"
-	$(SILENT)mkdir -p $(OBJDIR)/bitmaps/remote_native
-	@$(MAKE) -C bitmaps/remote_native OBJDIR=$(OBJDIR)/bitmaps/remote_native
-
-$(BUILDDIR)/libbitmapsremotemono.a:
-	@echo "MAKE in bitmaps/remote_mono"
-	$(SILENT)mkdir -p $(OBJDIR)/bitmaps/remote_mono
-	@$(MAKE) -C bitmaps/remote_mono OBJDIR=$(OBJDIR)/bitmaps/remote_mono
+build-bitmaps:
+	@$(MAKE) -C bitmaps OBJDIR=$(OBJDIR)/bitmaps
 
 rocks:
 	@$(MAKE) -C plugins/lib OBJDIR=$(OBJDIR)/plugins/lib
