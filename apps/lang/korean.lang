@@ -3555,3 +3555,9 @@ desc: Pixels to advance per Screen scroll
 eng: "Screen Scroll Step Size"
 voice: "Screen Scroll Step Size"
 new: "긴 문자 흐름 크기"
+
+id: LANG_QUEUE_SHUFFLED
+desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
+eng: "Queue shuffled"
+voice: "Queue shuffled"
+new: "무작위 순서로 재생목록에 예약"
