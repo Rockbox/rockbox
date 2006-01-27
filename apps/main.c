@@ -65,6 +65,7 @@
 #include "splash.h"
 
 #if (CONFIG_CODEC == SWCODEC)
+#include "playback.h"
 #include "pcmbuf.h"
 #else
 #define pcmbuf_init()
@@ -178,6 +179,9 @@ void init(void)
               global_settings.mdb_shape,
               global_settings.mdb_enable,
               global_settings.superbass);
+#if CONFIG_CODEC == SWCODEC
+    audio_preinit();
+#endif
     audio_init();
     button_clear_queue(); /* Empty the keyboard buffer */
 #if CONFIG_CODEC == SWCODEC
@@ -200,6 +204,7 @@ void init(void)
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     set_cpu_frequency(CPUFREQ_NORMAL);
+    cpu_boost(true);
 #endif
     
     buffer_init();
@@ -244,6 +249,10 @@ void init(void)
     button_init();
 
     powermgmt_init();
+    
+#if CONFIG_CODEC == SWCODEC
+    audio_preinit();
+#endif
 
 #ifdef CONFIG_TUNER
     radio_init();
@@ -360,16 +369,13 @@ void init(void)
               global_settings.mdb_enable,
               global_settings.superbass);
     audio_init();
-#if (CONFIG_CODEC == SWCODEC)
-    sound_settings_apply();
-#endif
 #if (defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)) && !defined(SIMULATOR)
     pcm_rec_init();
 #endif
     talk_init();
     /* runtime database has to be initialized after audio_init() */
     rundb_init();
-
+    cpu_boost(false);
 
 #ifdef AUTOROCK
     {

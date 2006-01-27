@@ -61,6 +61,8 @@ void voice_init(void);
 extern void audio_next_dir(void);
 extern void audio_prev_dir(void);
 
+void audio_preinit(void);
+
 #endif
 
 

@@ -87,23 +87,26 @@ static volatile bool paused;
 #define AUDIO_DEFAULT_WATERMARK      (1024*512)
 #define AUDIO_DEFAULT_FILECHUNK      (1024*32)
 
-#define AUDIO_PLAY           1
-#define AUDIO_STOP           2
-#define AUDIO_PAUSE          3
-#define AUDIO_RESUME         4
-#define AUDIO_NEXT           5
-#define AUDIO_PREV           6
-#define AUDIO_FF_REWIND      7
-#define AUDIO_FLUSH_RELOAD   8
-#define AUDIO_CODEC_DONE     9
-#define AUDIO_FLUSH         10
-#define AUDIO_TRACK_CHANGED 11
-#define AUDIO_DIR_NEXT      12
-#define AUDIO_DIR_PREV      13
-#define AUDIO_SEAMLESS_SEEK 14
-
-#define CODEC_LOAD       1
-#define CODEC_LOAD_DISK  2
+enum {
+    Q_AUDIO_PLAY = 1,
+    Q_AUDIO_STOP,
+    Q_AUDIO_PAUSE,
+    Q_AUDIO_RESUME,
+    Q_AUDIO_NEXT,
+    Q_AUDIO_PREV,
+    Q_AUDIO_FF_REWIND,
+    Q_AUDIO_FLUSH_RELOAD,
+    Q_AUDIO_CODEC_DONE,
+    Q_AUDIO_FLUSH,
+    Q_AUDIO_TRACK_CHANGED,
+    Q_AUDIO_DIR_NEXT,
+    Q_AUDIO_DIR_PREV,
+    Q_AUDIO_SEAMLESS_SEEK,
+    Q_AUDIO_POSTINIT,
+    
+    Q_CODEC_LOAD,
+    Q_CODEC_LOAD_DISK,
+};
 
 /* As defined in plugins/lib/xxx2wav.h */
 #define MALLOC_BUFSIZE (512*1024)
@@ -198,6 +201,8 @@ static int new_track;
 void (*track_changed_callback)(struct mp3entry *id3);
 void (*track_buffer_callback)(struct mp3entry *id3, bool last_track);
 void (*track_unbuffer_callback)(struct mp3entry *id3, bool last_track);
+
+static void playback_init(void);
 
 /* Configuration */
 static int conf_bufferlimit;
@@ -776,7 +781,7 @@ void audio_set_track_changed_event(void (*handler)(struct mp3entry *id3))
 static void codec_track_changed(void)
 {
     track_changed = true;
-    queue_post(&audio_queue, AUDIO_TRACK_CHANGED, 0);
+    queue_post(&audio_queue, Q_AUDIO_TRACK_CHANGED, 0);
 }
 
 /* Give codecs or file buffering the right amount of processing time
@@ -973,7 +978,7 @@ static bool loadcodec(bool start_play)
         ci.curpos = 0;
         playing = true;
         logf("Starting codec");
-        queue_post(&codec_queue, CODEC_LOAD_DISK, (void *)codec_path);
+        queue_post(&codec_queue, Q_CODEC_LOAD_DISK, (void *)codec_path);
         return true;
     }
     
@@ -1571,7 +1576,7 @@ static int skip_next_track(bool inside_codec_thread)
         else if (pcmbuf_is_crossfade_enabled())
             pcmbuf_crossfade_init();
         
-        queue_post(&audio_queue, AUDIO_PLAY, 0);
+        queue_post(&audio_queue, Q_AUDIO_PLAY, 0);
         return SKIP_OK_DISK;
     }
     
@@ -1612,7 +1617,7 @@ static int skip_previous_track(bool inside_codec_thread)
         else
             stop_codec_flush();
         
-        queue_post(&audio_queue, AUDIO_PLAY, 0);
+        queue_post(&audio_queue, Q_AUDIO_PLAY, 0);
         return SKIP_OK_DISK;
     }
     
@@ -1652,7 +1657,7 @@ static void audio_change_track(void)
     ci.reload_codec = false;
     /* Needed for fast skipping. */
     if (cur_ti->codecsize > 0)
-        queue_post(&codec_queue, CODEC_LOAD, 0);
+        queue_post(&codec_queue, Q_CODEC_LOAD, 0);
 }
 
 bool codec_request_next_track_callback(void)
@@ -1703,7 +1708,7 @@ bool codec_request_next_track_callback(void)
         if (cur_ti->codecsize == 0)
         {
             logf("Loading from disk [2]...");
-            queue_post(&audio_queue, AUDIO_PLAY, 0);
+            queue_post(&audio_queue, Q_AUDIO_PLAY, 0);
         }
         else
             ci.reload_codec = true;
@@ -1720,7 +1725,7 @@ void audio_invalidate_tracks(void)
     if (track_count == 0) {
         /* This call doesn't seem necessary anymore. Uncomment it
            if things break */
-        /* queue_post(&audio_queue, AUDIO_PLAY, 0); */
+        /* queue_post(&audio_queue, Q_AUDIO_PLAY, 0); */
         return ;
     }
     
@@ -1746,7 +1751,7 @@ static void initiate_track_change(int peek_index)
         else
             pcmbuf_play_stop();
         ci.stop_codec = true;
-        queue_post(&audio_queue, AUDIO_PLAY, 0);
+        queue_post(&audio_queue, Q_AUDIO_PLAY, 0);
     } else {
         new_track = peek_index;
         ci.reload_codec = true;
@@ -1760,7 +1765,7 @@ static void initiate_dir_change(int direction)
     if(!playlist_next_dir(direction))
         return;
 
-    queue_post(&audio_queue, AUDIO_PLAY, (bool *)true);
+    queue_post(&audio_queue, Q_AUDIO_PLAY, (bool *)true);
 
     codec_track_changed();
 }
@@ -1770,6 +1775,9 @@ void audio_thread(void)
     struct event ev;
     int last_tick = 0;
     bool play_pending = false;
+
+    /* At first initialize audio system in background. */
+    playback_init();
     
     while (1) {
         if (!play_pending && queue_empty(&audio_queue))
@@ -1786,12 +1794,12 @@ void audio_thread(void)
         queue_wait_w_tmo(&audio_queue, &ev, 0);
         if (ev.id == SYS_TIMEOUT && play_pending)
         {
-            ev.id = AUDIO_PLAY;
+            ev.id = Q_AUDIO_PLAY;
             ev.data = (bool *)1;
         }
         
         switch (ev.id) {
-            case AUDIO_PLAY:
+            case Q_AUDIO_PLAY:
                 /* Don't start playing immediately if user is skipping tracks
                  * fast to prevent UI lag. */
                 track_count = 0;
@@ -1837,52 +1845,52 @@ void audio_thread(void)
                 }
                 break ;
                 
-            case AUDIO_STOP:
+            case Q_AUDIO_STOP:
                 audio_stop_playback(true);
                 break ;
                 
-            case AUDIO_PAUSE:
+            case Q_AUDIO_PAUSE:
                 logf("audio_pause");
                 pcm_mute(true);
                 pcm_play_pause(false);
                 paused = true;
                 break ;
                 
-            case AUDIO_RESUME:
+            case Q_AUDIO_RESUME:
                 logf("audio_resume");
                 pcm_play_pause(true);
                 pcm_mute(false);
                 paused = false;
                 break ;
             
-            case AUDIO_NEXT:
+            case Q_AUDIO_NEXT:
                 logf("audio_next");
                 last_tick = current_tick;
                 playlist_end = false;
                 initiate_track_change(1);
                 break ;
                 
-            case AUDIO_PREV:
+            case Q_AUDIO_PREV:
                 logf("audio_prev");
                 last_tick = current_tick;
                 playlist_end = false;
                 initiate_track_change(-1);
                 break;
                 
-            case AUDIO_FF_REWIND:
+            case Q_AUDIO_FF_REWIND:
                 if (!playing)
                     break ;
                 pcmbuf_play_stop();
                 ci.seek_time = (int)ev.data+1;
                 break ;
 
-            case AUDIO_SEAMLESS_SEEK:
+            case Q_AUDIO_SEAMLESS_SEEK:
                 if (!playing)
                     break ;
                 ci.seek_time = (int)ev.data+1;
                 break ;
 
-            case AUDIO_DIR_NEXT:
+            case Q_AUDIO_DIR_NEXT:
                 logf("audio_dir_next");
                 playlist_end = false;
                 if (global_settings.beep)
@@ -1890,7 +1898,7 @@ void audio_thread(void)
                 initiate_dir_change(1);
                 break;
             
-            case AUDIO_DIR_PREV:
+            case Q_AUDIO_DIR_PREV:
                 logf("audio_dir_prev");
                 playlist_end = false;
                 if (global_settings.beep)
@@ -1898,18 +1906,18 @@ void audio_thread(void)
                 initiate_dir_change(-1);
                 break;
 
-            case AUDIO_FLUSH:
+            case Q_AUDIO_FLUSH:
                 audio_invalidate_tracks();
                 break ;
                 
-            case AUDIO_TRACK_CHANGED:
+            case Q_AUDIO_TRACK_CHANGED:
                 if (track_changed_callback)
                     track_changed_callback(&cur_ti->id3);
                 playlist_update_resume_info(audio_current_track());
                 pcmbuf_set_position_callback(NULL);
                 break ;
                 
-            case AUDIO_CODEC_DONE:
+            case Q_AUDIO_CODEC_DONE:
                 break ;
 
 #ifndef SIMULATOR
@@ -1939,7 +1947,7 @@ void codec_thread(void)
         new_track = 0;
         
         switch (ev.id) {
-            case CODEC_LOAD_DISK:
+            case Q_CODEC_LOAD_DISK:
                 ci.stop_codec = false;
                 audio_codec_loaded = true;
                 mutex_lock(&mutex_codecthread);
@@ -1948,7 +1956,7 @@ void codec_thread(void)
                 mutex_unlock(&mutex_codecthread);
                 break ;
                 
-            case CODEC_LOAD:
+            case Q_CODEC_LOAD:
                 logf("Codec start");
                 codecsize = cur_ti->codecsize;
                 if (codecsize == 0) {
@@ -1987,8 +1995,8 @@ void codec_thread(void)
         audio_codec_loaded = false;
         
         switch (ev.id) {
-        case CODEC_LOAD_DISK:
-        case CODEC_LOAD:
+        case Q_CODEC_LOAD_DISK:
+        case Q_CODEC_LOAD:
             if (status != CODEC_OK) {
                 logf("Codec failure");
                 // audio_stop_playback();
@@ -2001,7 +2009,7 @@ void codec_thread(void)
             if (playing && !ci.stop_codec)
                 audio_change_track();
             
-            // queue_post(&audio_queue, AUDIO_CODEC_DONE, (void *)status);
+            // queue_post(&audio_queue, Q_AUDIO_CODEC_DONE, (void *)status);
         }
     }
 }
@@ -2031,7 +2039,7 @@ void voice_codec_thread(void)
         voice_is_playing = false;
         queue_wait(&voice_codec_queue, &ev);
         switch (ev.id) {
-            case CODEC_LOAD_DISK:
+            case Q_CODEC_LOAD_DISK:
                 logf("Loading voice codec");
                 audio_stop_playback(true);
                 mutex_lock(&mutex_codecthread);
@@ -2083,7 +2091,7 @@ void voice_init(void)
         return ;
         
     logf("Starting voice codec");
-    queue_post(&voice_codec_queue, CODEC_LOAD_DISK, (void *)CODEC_MPA_L3);
+    queue_post(&voice_codec_queue, Q_CODEC_LOAD_DISK, (void *)CODEC_MPA_L3);
     while (!voice_codec_loaded)
         sleep(1);
 }
@@ -2158,13 +2166,13 @@ void audio_play(int offset)
         pcmbuf_play_stop();
     }
         
-    queue_post(&audio_queue, AUDIO_PLAY, (void *)offset);
+    queue_post(&audio_queue, Q_AUDIO_PLAY, (void *)offset);
 }
 
 void audio_stop(void)
 {
     logf("audio_stop");
-    queue_post(&audio_queue, AUDIO_STOP, 0);
+    queue_post(&audio_queue, Q_AUDIO_STOP, 0);
     while (playing || audio_codec_loaded)
         yield();
 }
@@ -2176,12 +2184,12 @@ bool mp3_pause_done(void)
 
 void audio_pause(void)
 {
-    queue_post(&audio_queue, AUDIO_PAUSE, 0);
+    queue_post(&audio_queue, Q_AUDIO_PAUSE, 0);
 }
 
 void audio_resume(void)
 {
-    queue_post(&audio_queue, AUDIO_RESUME, 0);
+    queue_post(&audio_queue, Q_AUDIO_RESUME, 0);
 }
 
 void audio_next(void)
@@ -2199,7 +2207,7 @@ void audio_next(void)
     if (mutex_bufferfill.locked)
         cur_ti->taginfo_ready = false;
     
-    queue_post(&audio_queue, AUDIO_NEXT, 0);
+    queue_post(&audio_queue, Q_AUDIO_NEXT, 0);
 }
 
 void audio_prev(void)
@@ -2217,35 +2225,35 @@ void audio_prev(void)
     if (mutex_bufferfill.locked)
         cur_ti->taginfo_ready = false;
     
-    queue_post(&audio_queue, AUDIO_PREV, 0);
+    queue_post(&audio_queue, Q_AUDIO_PREV, 0);
 }
 
 void audio_next_dir(void)
 {
-    queue_post(&audio_queue, AUDIO_DIR_NEXT, 0);
+    queue_post(&audio_queue, Q_AUDIO_DIR_NEXT, 0);
 }
 
 void audio_prev_dir(void)
 {
-    queue_post(&audio_queue, AUDIO_DIR_PREV, 0);
+    queue_post(&audio_queue, Q_AUDIO_DIR_PREV, 0);
 }
 
 void audio_ff_rewind(int newpos)
 {
     logf("rewind: %d", newpos);
-    queue_post(&audio_queue, AUDIO_FF_REWIND, (int *)newpos);
+    queue_post(&audio_queue, Q_AUDIO_FF_REWIND, (int *)newpos);
 }
 
 void audio_seamless_seek(int newpos)
 {
     logf("seamless_seek: %d", newpos);
-    queue_post(&audio_queue, AUDIO_SEAMLESS_SEEK, (int *)newpos);
+    queue_post(&audio_queue, Q_AUDIO_SEAMLESS_SEEK, (int *)newpos);
 }
 
 void audio_flush_and_reload_tracks(void)
 {
     logf("flush & reload");
-    queue_post(&audio_queue, AUDIO_FLUSH, 0);
+    queue_post(&audio_queue, Q_AUDIO_FLUSH, 0);
 }
 
 void audio_error_clear(void)
@@ -2481,38 +2489,23 @@ void test_unbuffer_event(struct mp3entry *id3, bool last_track)
     logf("ube:%d%s", last_track, id3->path);
 }
 
-void audio_init(void)
+static void playback_init(void)
 {
     static bool voicetagtrue = true;
+    struct event ev;
 
-    logf("audio api init");
+    logf("playback api init");
     pcm_init();
 
 #if defined(HAVE_RECORDING) && !defined(SIMULATOR)
     /* Set the input multiplexer to Line In */
     pcm_rec_mux(0);
 #endif
-    
-    filebufused = 0;
-    filling = false;
-    current_codec = CODEC_IDX_AUDIO;
-    filebuf = (char *)&audiobuf[MALLOC_BUFSIZE];
-    playing = false;
-    audio_codec_loaded = false;
-    voice_is_playing = false;
-    paused = false;
-    track_changed = false;
-    current_fd = -1;
-    track_buffer_callback = NULL;
-    track_unbuffer_callback = NULL;
-    track_changed_callback = NULL;
-    /* Just to prevent cur_ti never be anything random. */
-    cur_ti = &tracks[0];
-    
+
     audio_set_track_buffer_event(test_buffer_event);
     audio_set_track_unbuffer_event(test_unbuffer_event);
-    
-    /* Initialize codec api. */    
+
+    /* Initialize codec api. */
     ci.read_filebuf = codec_filebuf_callback;
     ci.pcmbuf_insert = pcmbuf_insert_buffer;
     ci.pcmbuf_insert_split = codec_pcmbuf_insert_split_callback;
@@ -2535,24 +2528,61 @@ void audio_init(void)
     ci_voice.pcmbuf_insert = codec_pcmbuf_insert_callback;
     id3_voice.frequency = 11200;
     id3_voice.length = 1000000L;
-    
-    mutex_init(&mutex_bufferfill);
-    mutex_init(&mutex_codecthread);
-    
-    queue_init(&audio_queue);
-    queue_init(&codec_queue);
-    queue_init(&voice_codec_queue);
-    
+
     create_thread(codec_thread, codec_stack, sizeof(codec_stack),
                   codec_thread_name);
     create_thread(voice_codec_thread, voice_codec_stack,
                   sizeof(voice_codec_stack), voice_codec_thread_name);
-    create_thread(audio_thread, audio_stack, sizeof(audio_stack),
-                  audio_thread_name);
 
+    while (1)
+    {
+        queue_wait(&audio_queue, &ev);
+        if (ev.id == Q_AUDIO_POSTINIT)
+            break ;
+    }
+    
     /* Apply relevant settings */
     audio_set_buffer_margin(global_settings.buffer_margin);
     audio_set_crossfade(global_settings.crossfade);
+    
+    sound_settings_apply();
 }
 
+void audio_preinit(void)
+{
+    logf("playback system pre-init");
+    
+    filebufused = 0;
+    filling = false;
+    current_codec = CODEC_IDX_AUDIO;
+    filebuf = (char *)&audiobuf[MALLOC_BUFSIZE];
+    playing = false;
+    audio_codec_loaded = false;
+    voice_is_playing = false;
+    paused = false;
+    track_changed = false;
+    current_fd = -1;
+    track_buffer_callback = NULL;
+    track_unbuffer_callback = NULL;
+    track_changed_callback = NULL;
+    /* Just to prevent cur_ti never be anything random. */
+    cur_ti = &tracks[0];
+    
+    mutex_init(&mutex_bufferfill);
+    mutex_init(&mutex_codecthread);
+
+    queue_init(&audio_queue);
+    queue_init(&codec_queue);
+    queue_init(&voice_codec_queue);
+
+    create_thread(audio_thread, audio_stack, sizeof(audio_stack),
+                  audio_thread_name);
+}
+
+void audio_init(void)
+{
+    logf("playback system post-init");
+    
+    queue_post(&audio_queue, Q_AUDIO_POSTINIT, 0);
+}
 
