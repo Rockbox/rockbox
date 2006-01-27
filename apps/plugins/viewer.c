@@ -191,15 +191,23 @@ enum {
     SB_ON,
     SCROLLBAR_MODES
 } scrollbar_mode[VIEW_MODES] = {SB_OFF, SB_ON};
+#ifdef VIEWER_MODE_SCROLLBAR
 static unsigned char *scrollbar_mode_str[] = {"off", "on", "scrollbar"};
+#endif
+
 static bool need_scrollbar;
+
 
 enum {
     NO_OVERLAP=0,
     OVERLAP,
     PAGE_MODES
 } page_mode = 0;
+
+#ifdef VIEWER_MODE_PAGE
 static unsigned char *page_mode_str[] = {"don't overlap", "overlap", "pages"};
+#endif
+
 #endif
 
 static unsigned char buffer[BUFFER_SIZE + 1];
@@ -1184,9 +1192,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 viewer_draw(col);
                 break;
 
-#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == ONDIO_PAD) \
-    || (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD) \
-    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#ifdef VIEWER_MODE_PAGE
             case VIEWER_MODE_PAGE:
                 /* Page-overlap mode */
                 if (++page_mode == PAGE_MODES)
@@ -1198,7 +1204,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
 
                 viewer_draw(col);
                 break;
-
+#endif
+#ifdef VIEWER_MODE_SCROLLBAR
             case VIEWER_MODE_SCROLLBAR:
                 /* Show-scrollbar mode for current view-width mode */
                 if (!(ONE_SCREEN_FITS_ALL())) {
@@ -1218,8 +1225,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 break;
 #endif
 
-#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H100_PAD) \
-  || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#ifdef VIEWER_LINE_UP
             case VIEWER_LINE_UP:
             case VIEWER_LINE_UP | BUTTON_REPEAT:
                 /* Scroll up one line */
@@ -1235,7 +1241,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
 
                 viewer_draw(col);
                 break;
-
+#endif
+#ifdef VIEWER_COLUMN_LEFT
             case VIEWER_COLUMN_LEFT:
             case VIEWER_COLUMN_LEFT | BUTTON_REPEAT:
                 /* Scroll left one column */
