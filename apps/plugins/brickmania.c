@@ -22,6 +22,12 @@
 
 PLUGIN_HEADER
 
+/* The time (in ms) for one iteration through the game loop - decrease this
+   to speed up the game - note that current_tick is (currently) only accurate
+   to 10ms.
+*/
+#define CYCLETIME 30
+
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 
 #define QUIT BUTTON_OFF
@@ -31,6 +37,10 @@ PLUGIN_HEADER
 #define UP BUTTON_UP
 #define DOWN BUTTON_DOWN
 
+/* H100 and H300 don't have scroll events */
+#define SCROLL_FWD(x) (0)
+#define SCROLL_BACK(x) (0)
+
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD)
 
 #define QUIT BUTTON_MENU
@@ -39,6 +49,9 @@ PLUGIN_HEADER
 #define SELECT BUTTON_SELECT
 #define UP BUTTON_SCROLL_BACK
 #define DOWN BUTTON_SCROLL_FWD
+
+#define SCROLL_FWD(x) ((x) & BUTTON_SCROLL_FWD)
+#define SCROLL_BACK(x) ((x) & BUTTON_SCROLL_BACK)
 
 #else
 #error Unsupported keypad
@@ -71,6 +84,11 @@ extern const fb_data brickmania_bricks[];
 
 /* TO DO: This needs adjusting correctly for larger than 220x176 LCDS */
 #if (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176)
+
+/* Offsets for LCDS > 220x176 */
+#define XOFS ((LCD_WIDTH-220)/2)
+#define YOFS ((LCD_HEIGHT-176)/2)
+
 #define PAD_WIDTH 40
 #define PAD_HEIGHT 5
 #define PAD_POS_Y LCD_HEIGHT - 7
@@ -107,6 +125,18 @@ extern const fb_data brickmania_bricks[];
 
 #define BMPHEIGHT_powerup 6
 #define BMPWIDTH_powerup 10
+
+#define BMPXOFS_resume (62+XOFS)
+#define BMPYOFS_resume (100+YOFS)
+#define BMPXOFS_quit (93+XOFS)
+#define BMPYOFS_quit (138+YOFS)
+#define BMPXOFS_start (55+XOFS)
+#define BMPYOFS_start (78+YOFS)
+#define BMPXOFS_help (92+XOFS)
+#define BMPYOFS_help (118+YOFS)
+#define HIGHSCORE_XPOS (7+XOFS)
+#define HIGHSCORE_YPOS (56+YOFS)
+
 
 #else
 #error Unsupported LCD Size
@@ -498,44 +528,46 @@ int game_menu(int when)
     int button,cur=0;
     char str[10];
 
-    rb->lcd_clear_display();
-    rb->lcd_bitmap(brickmania_menu_bg,0,0,220,176);
+    rb->lcd_bitmap(brickmania_menu_bg,0,0,LCD_WIDTH,LCD_HEIGHT);
     while (true) {
         for(i=0;i<MENU_LENGTH;i++) {
             if (cur==0)
-                rb->lcd_bitmap(brickmania_sel_start,55,78,
+                rb->lcd_bitmap(brickmania_sel_start,
+                               BMPXOFS_start,BMPYOFS_start,
                                BMPWIDTH_sel_start,BMPHEIGHT_sel_start);
             else
-                rb->lcd_bitmap(brickmania_start,55,78,
+                rb->lcd_bitmap(brickmania_start,BMPXOFS_start,BMPYOFS_start,
                                BMPWIDTH_start,BMPHEIGHT_start);
 
             if (when==1) {
                 if (cur==1)
-                    rb->lcd_bitmap(brickmania_sel_resume,62,100,
+                    rb->lcd_bitmap(brickmania_sel_resume,
+                                   BMPXOFS_resume,BMPYOFS_resume,
                                    BMPWIDTH_sel_resume,BMPHEIGHT_sel_resume);
                 else
-                    rb->lcd_bitmap(brickmania_resume,62,100,
+                    rb->lcd_bitmap(brickmania_resume,
+                                   BMPXOFS_resume,BMPYOFS_resume,
                                    BMPWIDTH_resume,BMPHEIGHT_resume);
 
             } else {
-                rb->lcd_bitmap(brickmania_no_resume,62,100,
+                rb->lcd_bitmap(brickmania_no_resume,
+                               BMPXOFS_resume,BMPYOFS_resume,
                                BMPWIDTH_no_resume,BMPHEIGHT_no_resume);
             }
 
 
             if (cur==2)
-                rb->lcd_bitmap(brickmania_sel_help,92,118,
+                rb->lcd_bitmap(brickmania_sel_help,BMPXOFS_help,BMPYOFS_help,
                                BMPWIDTH_sel_help,BMPHEIGHT_sel_help);
             else
-                rb->lcd_bitmap(brickmania_help,92,118,
+                rb->lcd_bitmap(brickmania_help,BMPXOFS_help,BMPYOFS_help,
                                BMPWIDTH_help,BMPHEIGHT_help);
 
-
             if (cur==3)
-                rb->lcd_bitmap(brickmania_sel_quit,93,138,
+                rb->lcd_bitmap(brickmania_sel_quit,BMPXOFS_quit,BMPYOFS_quit,
                                BMPWIDTH_sel_quit,BMPHEIGHT_sel_quit);
             else
-                rb->lcd_bitmap(brickmania_quit,93,138,
+                rb->lcd_bitmap(brickmania_quit,BMPXOFS_quit,BMPYOFS_quit,
                                BMPWIDTH_quit,BMPHEIGHT_quit);
         }
 
@@ -543,11 +575,11 @@ int game_menu(int when)
         rb->lcd_setfont(FONT_SYSFIXED);
         rb->lcd_set_background(LCD_RGBPACK(0,0,140));
         rb->lcd_set_foreground(LCD_WHITE);
-        rb->lcd_putsxy(7, 56, "High Score");
+        rb->lcd_putsxy(HIGHSCORE_XPOS, HIGHSCORE_YPOS, "High Score");
         rb->snprintf(str, sizeof(str), "%d", highscore);
         rb->lcd_getstringsize("High Score", &sw, NULL);
         rb->lcd_getstringsize(str, &w, NULL);
-        rb->lcd_putsxy(7+sw/2-w/2, 65, str);
+        rb->lcd_putsxy(HIGHSCORE_XPOS+sw/2-w/2, HIGHSCORE_YPOS+9, str);
         rb->lcd_setfont(FONT_UI);
 
         rb->lcd_update();
@@ -690,6 +722,7 @@ int game_loop(void){
     int j,i,k,bricky,brickx;
     char s[20];
     int sec_count=0,num_count=10;
+    int end;
     
     rb->srand( *rb->current_tick );
 
@@ -713,7 +746,10 @@ int game_loop(void){
             break;
     }
 
-    while(true) {  
+    while(true) {
+        /* Convert CYCLETIME (in ms) to HZ */
+        end = *rb->current_tick + (CYCLETIME * HZ) / 1000;
+
         if (life >= 0) {
             rb->lcd_set_background(LCD_BLACK);
             rb->lcd_set_drawmode(DRMODE_SOLID);
@@ -733,7 +769,7 @@ int game_loop(void){
                   rb->lcd_getstringsize(s, &sw, NULL);                  
                   rb->lcd_putsxy(LCD_WIDTH/2-2, 150, s);
             }     
-            
+
             /* write life num */
             rb->snprintf(s, sizeof(s), "Life: %d", life);
             rb->lcd_putsxy(2, 2, s);
@@ -741,7 +777,6 @@ int game_loop(void){
             rb->snprintf(s, sizeof(s), "Level %d", cur_level+1);
             rb->lcd_getstringsize(s, &sw, NULL);
             rb->lcd_putsxy(LCD_WIDTH-sw-2, 2, s);
-
 
             if (vscore<score) vscore++;
             rb->snprintf(s, sizeof(s), "%d", vscore);
@@ -1033,58 +1068,59 @@ int game_loop(void){
                   }
 
                   int move_button,button;
-                  int time = 3; /* number of ticks this function will loop reading keys */
-                  int start = *rb->current_tick;
-                  int end = start + time;
-                  button=rb->button_get_w_tmo(end - *rb->current_tick);
+                  int button_right,button_left;
+                  button=rb->button_get(false);
                   move_button=rb->button_status();
 
-                  if ((move_button & RIGHT && flip_sides==false) || (flip_sides==true && move_button & LEFT)) {
+                  button_right=((move_button & RIGHT) || (SCROLL_FWD(button)));
+                  button_left=((move_button & LEFT) || (SCROLL_BACK(button)));
+
+                  if ((button_right && flip_sides==false) || (button_left && flip_sides==true)) {
                       if (pad_pos_x+8+PAD_WIDTH > LCD_WIDTH) {
                           if (start_game==1 || on_the_pad==1) ball_pos_x+=LCD_WIDTH-pad_pos_x-PAD_WIDTH;
                               pad_pos_x+=LCD_WIDTH-pad_pos_x-PAD_WIDTH;
-                          } else {
-                              if ((start_game==1 || on_the_pad==1))
-                                  ball_pos_x+=8;
-                              pad_pos_x+=8;
-                          }
-                      } else if ((move_button & LEFT && flip_sides==false) || (flip_sides==true && move_button & RIGHT)) {
-                          if (pad_pos_x-8 < 0) {
-                              if (start_game==1 || on_the_pad==1) ball_pos_x-=pad_pos_x;
-                                  pad_pos_x-=pad_pos_x;
-                          } else {
-                              if (start_game==1 || on_the_pad==1) ball_pos_x-=8;
-                                  pad_pos_x-=8;
-                          }
+                      } else {
+                          if ((start_game==1 || on_the_pad==1))
+                              ball_pos_x+=8;
+                          pad_pos_x+=8;
                       }
+                  } else if ((button_left && flip_sides==false) || (button_right && flip_sides==true)) {
+                      if (pad_pos_x-8 < 0) {
+                          if (start_game==1 || on_the_pad==1) ball_pos_x-=pad_pos_x;
+                              pad_pos_x-=pad_pos_x;
+                      } else {
+                          if (start_game==1 || on_the_pad==1) ball_pos_x-=8;
+                              pad_pos_x-=8;
+                      }
+                  }
 
 
-                      switch(button){
-                          case SELECT:
-                              if (start_game==1 && con_game!=1 && pad_type!=1) {
-                                  bally=-4;
-                                  ballx=pad_pos_x+(PAD_WIDTH/2)-2>=LCD_WIDTH/2?2:-2;
+                  switch(button) {
+                      case SELECT:
+                          if (start_game==1 && con_game!=1 && pad_type!=1) {
+                              bally=-4;
+                              ballx=pad_pos_x+(PAD_WIDTH/2)-2>=LCD_WIDTH/2?2:-2;
+                              start_game =0;
+                          } else if (pad_type==1 && on_the_pad==1) {
+                              on_the_pad=0;
+                              if (start_game!=1 && con_game==1) {
                                   start_game =0;
-                              } else if (pad_type==1 && on_the_pad==1) {
-                                  on_the_pad=0;
-                                  if (start_game!=1 && con_game==1) {
-                                      start_game =0;
-                                      con_game=0;
-                                  }
-                              } else if (pad_type==2 && con_game!=1) {
-                                  int tfire;
-                                  tfire=fire_space();
-                                  fire[tfire].top=PAD_POS_Y-7;
-                                  fire[tfire].left=pad_pos_x+1;
-                                  tfire=fire_space();
-                                  fire[tfire].top=PAD_POS_Y-7;
-                                  fire[tfire].left=pad_pos_x+PAD_WIDTH-1;
-                              } else if (con_game==1 && start_game!=1) {
-                                  ballx=x;
-                                  bally=y;
                                   con_game=0;
                               }
-                              break;
+                          } else if (pad_type==2 && con_game!=1) {
+                              int tfire;
+                              tfire=fire_space();
+                              fire[tfire].top=PAD_POS_Y-7;
+                              fire[tfire].left=pad_pos_x+1;
+                              tfire=fire_space();
+                              fire[tfire].top=PAD_POS_Y-7;
+                              fire[tfire].left=pad_pos_x+PAD_WIDTH-1;
+                          } else if (con_game==1 && start_game!=1) {
+                              ballx=x;
+                              bally=y;
+                              con_game=0;
+                          }
+                          break;
                      case QUIT:
                          switch(game_menu(1)){
                              case 0:
@@ -1140,6 +1176,8 @@ int game_loop(void){
                          break;
                  }
             }
+        if (end > *rb->current_tick) 
+            rb->sleep(end-*rb->current_tick);
     }
 }
 

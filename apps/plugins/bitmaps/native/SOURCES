@@ -18,11 +18,15 @@ sudoku_inverse.220x176x16.bmp
 /* Brickmania */
 
 #if (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176) && (LCD_DEPTH == 16)
+#if (LCD_WIDTH == 320)
+brickmania_menu_bg.320x240x16.bmp
+#else
+brickmania_menu_bg.220x176x16.bmp
+#endif
 brickmania_ball.220x176x16.bmp
 brickmania_bricks.220x176x16.bmp
 brickmania_gameover.220x176x16.bmp
 brickmania_help.220x176x16.bmp
-brickmania_menu_bg.220x176x16.bmp
 brickmania_no_resume.220x176x16.bmp
 brickmania_pads.220x176x16.bmp
 brickmania_powerups.220x176x16.bmp
