@@ -233,7 +233,7 @@ bool pcmbuf_is_lowdata(void)
     return false;
 }
 
-bool pcmbuf_crossfade_init(void)
+bool pcmbuf_crossfade_init(bool manual_skip)
 {
     if (pcmbuf_size - audiobuffer_free < CHUNK_SIZE * 8
         || !pcmbuf_is_crossfade_enabled()
@@ -244,8 +244,12 @@ bool pcmbuf_crossfade_init(void)
     logf("pcmbuf_crossfade_init");
     pcmbuf_boost(true);
 
-    crossfade_mode = global_settings.crossfade_fade_out_mixmode
-            ? CFM_MIX : CFM_CROSSFADE;
+    /* Don't enable mix mode when skipping tracks manually. */
+    if (manual_skip)
+        crossfade_mode = CFM_CROSSFADE;
+    else
+        crossfade_mode = global_settings.crossfade_fade_out_mixmode
+                ? CFM_MIX : CFM_CROSSFADE;
     crossfade_init = true;
     
     return true;

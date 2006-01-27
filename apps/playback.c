@@ -1510,14 +1510,14 @@ static void audio_update_trackinfo(void)
     /* Manual track change (always crossfade or flush audio). */
     if (new_track)
     {
-        pcmbuf_crossfade_init();
+        pcmbuf_crossfade_init(true);
         codec_track_changed();
     }
 
     /* Automatic track change with crossfade. */
     else if (pcmbuf_is_crossfade_enabled() && !pcmbuf_is_crossfade_active())
     {
-        pcmbuf_crossfade_init();
+        pcmbuf_crossfade_init(false);
         codec_track_changed();
     }
 
@@ -1574,7 +1574,7 @@ static int skip_next_track(bool inside_codec_thread)
                 stop_codec_flush();
         }
         else if (pcmbuf_is_crossfade_enabled())
-            pcmbuf_crossfade_init();
+            pcmbuf_crossfade_init(new_track != 0);
         
         queue_post(&audio_queue, Q_AUDIO_PLAY, 0);
         return SKIP_OK_DISK;
@@ -1611,7 +1611,7 @@ static int skip_previous_track(bool inside_codec_thread)
         /* Stop playback. */
         /* FIXME: Only stop playback if disk is not spinning! */
         if (pcmbuf_is_crossfade_enabled())
-            pcmbuf_crossfade_init();
+            pcmbuf_crossfade_init(true);
         else if (inside_codec_thread)
             pcmbuf_play_stop();
         else
@@ -1747,7 +1747,7 @@ static void initiate_track_change(int peek_index)
     /* Detect if disk is spinning or already loading. */
     if (filling || ci.reload_codec || !audio_codec_loaded) {
         if (pcmbuf_is_crossfade_enabled())
-            pcmbuf_crossfade_init();
+            pcmbuf_crossfade_init(true);
         else
             pcmbuf_play_stop();
         ci.stop_codec = true;
@@ -2158,7 +2158,7 @@ void audio_play(int offset)
     {
         ci.stop_codec = true;
         sleep(1);
-        pcmbuf_crossfade_init();
+        pcmbuf_crossfade_init(true);
     }
     else
     {

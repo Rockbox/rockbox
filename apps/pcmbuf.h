@@ -41,7 +41,7 @@ void pcmbuf_set_boost_mode(bool state);
 bool pcmbuf_is_lowdata(void);
 void pcmbuf_flush_audio(void);
 void pcmbuf_play_start(void);
-bool pcmbuf_crossfade_init(void);
+bool pcmbuf_crossfade_init(bool manual_skip);
 void pcmbuf_add_event(void (*event_handler)(void));
 void pcmbuf_set_position_callback(void (*callback)(int size));
 unsigned int pcmbuf_get_latency(void);
