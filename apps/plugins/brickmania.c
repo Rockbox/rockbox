@@ -1186,9 +1186,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     (void)parameter;
     rb = api;
-#if !defined(SIMULATOR) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
-    rb->cpu_boost(true);
-#endif
 
     bally=0;
     ballx=0;
@@ -1204,10 +1201,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     /* Restore user's original backlight setting */
     rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
-
-#if !defined(SIMULATOR) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
-    rb->cpu_boost(false);
-#endif
 
     return PLUGIN_OK;
 }
