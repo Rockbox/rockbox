@@ -27,6 +27,7 @@
 #include "logf.h"
 #include "pcf50605.h"
 #include "pcf50606.h"
+#include "usb.h"
 
 #ifdef HAVE_CHARGE_CTRL
 bool charger_enabled;
@@ -108,7 +109,7 @@ void power_init(void)
 bool charger_inserted(void)
 {     
 #if CONFIG_CPU == MCF5249
-    return (GPIO1_READ & 0x00400000)?true:false;
+    return (GPIO1_READ & 0x00400000) || usb_powered();
 #elif defined(GMINI_ARCH)
     return (P7 & 0x80) == 0;
 #elif defined(HAVE_CHARGE_CTRL)
