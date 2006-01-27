@@ -22,6 +22,7 @@
 #include "plugin.h"
 
 #ifdef HAVE_LCD_BITMAP
+#if (LCD_DEPTH != 16) || (LCD_WIDTH != 160)
 
 PLUGIN_HEADER
 
@@ -1426,7 +1427,7 @@ static unsigned short jewel[8][256] = {
 };
 
 /* use 16x16 tiles */
-#elif (LCD_HEIGHT == 128) && (LCD_WIDTH == 160)
+#elif (LCD_HEIGHT == 128) && (LCD_WIDTH == 160) && (LCD_DEPTH == 2)
 /* size of a tile */
 #define TILE_WIDTH  16
 #define TILE_HEIGHT 16
@@ -2521,4 +2522,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     return PLUGIN_OK;
 }
 
-#endif
+#endif /* width 160, depth 16 bits */
+#endif /* HAVE_LCD_BITMAP */
+
