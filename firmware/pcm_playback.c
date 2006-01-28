@@ -362,54 +362,25 @@ static bool pcm_playing;
 static bool pcm_paused;
 static int pcm_freq = 0x6; /* 44.1 is default */
 
-static unsigned char *next_start;
-static long next_size;
-
-/* Set up the DMA transfer that kicks in when the audio FIFO gets empty */
-static void dma_start(const void *addr, long size)
-{
-    pcm_playing = true;
-
-    addr = (void *)((unsigned long)addr & ~3); /* Align data */
-    size &= ~3; /* Size must be multiple of 4 */
-
-    /* Disable playback for now */
-    pcm_playing = false;
-    return;
-
-/* This is the uda1380 code */
-#if 0
-    /* Reset the audio FIFO */
-
-    /* Set up DMA transfer  */
-    SAR0 = ((unsigned long)addr); /* Source address */
-    DAR0 = (unsigned long)&PDOR3; /* Destination address */
-    BCR0 = size;                  /* Bytes to transfer */
-
-    /* Enable the FIFO and force one write to it */
-    IIS2CONFIG = IIS_DEFPARM(pcm_freq);
-
-    DCR0 = DMA_INT | DMA_EEXT | DMA_CS | DMA_SINC | DMA_START;
-#endif
-}
+/* the registered callback function to ask for more mp3 data */
+static void (*callback_for_more)(unsigned char**, long*) = NULL;
+static unsigned short *p IBSS_ATTR;
+static long size IBSS_ATTR;
 
 /* Stops the DMA transfer and interrupt */
 static void dma_stop(void)
 {
     pcm_playing = false;
 
-#if 0
-/* This is the uda1380 code */
-    DCR0 = 0;
-    DSR0 = 1;
-    /* Reset the FIFO */
-    IIS2CONFIG = IIS_RESET | IIS_DEFPARM(pcm_freq);
-#endif
-    next_start = NULL;
-    next_size = 0;
+    p = NULL;
+    size = 0;
+    callback_for_more = NULL;
     pcm_paused = false;
-}
 
+    /* Disable playback FIFO */
+    IISCONFIG &= ~0x20000000;
+    // TODO: ??? disable_fiq();
+}
 
 void pcm_init(void)
 {
@@ -437,20 +408,69 @@ void pcm_set_frequency(unsigned int frequency)
     pcm_freq=frequency;
 }
 
-/* the registered callback function to ask for more mp3 data */
-static void (*callback_for_more)(unsigned char**, long*) = NULL;
+void fiq(void) ICODE_ATTR;
+void fiq(void)
+{
+    /* Clear interrupt */
+    IISCONFIG &= ~0x2;
+
+    if ((size==0) && (callback_for_more)) {
+        callback_for_more((unsigned char **)&p, (long *)&size);
+    }
+
+    while (size > 0) {
+        if (((inl(0x7000280c) & 0x3f0000) >> 16) < 2) {
+            /* Enable interrupt */
+            IISCONFIG |= 0x2;
+            return;
+        }
+
+        IISFIFO_WR = (*(p++))<<16;
+        IISFIFO_WR = (*(p++))<<16;
+        size-=4;
+
+        if ((size==0) && (callback_for_more)) {
+            callback_for_more((unsigned char **)&p, (long *)&size);
+	}
+    }
+}
 
 void pcm_play_data(void (*get_more)(unsigned char** start, long* size))
 {
-    unsigned char *start;
-    long size;
-
+    int free_count;
+    
     callback_for_more = get_more;
 
-    get_more((unsigned char **)&start, (long *)&size);
-    get_more(&next_start, &next_size);
+    if (size > 0) { return; }
 
-    dma_start(start, size);
+    get_more((unsigned char **)&p, (long *)&size);
+
+    /* setup I2S interrupt for FIQ */
+    outl(inl(0x6000402c) | I2S_MASK, 0x6000402c);
+    outl(I2S_MASK, 0x60004024);
+
+    enable_fiq();              /* Clear the FIQ disable bit in cpsr_c */
+
+    IISCONFIG |= 0x20000000;   /* Enable playback FIFO */
+
+    /* Fill the FIFO */
+    while (size > 0) {
+        free_count = (inl(0x7000280c) & 0x3f0000) >> 16;
+
+        if (free_count < 2) {
+            /* Enable interrupt */
+            IISCONFIG |= 0x2;
+            return;
+        }
+
+        IISFIFO_WR = (*(p++))<<16;
+        IISFIFO_WR = (*(p++))<<16;
+        size-=4;
+
+        if ((size==0) && (get_more)) {
+            get_more((unsigned char **)&p, (long *)&size);
+	}
+    }
 }
 
 void pcm_play_stop(void)
@@ -467,7 +487,7 @@ void pcm_mute(bool mute)
 
 void pcm_play_pause(bool play)
 {
-    if(pcm_paused && play && next_size)
+    if(pcm_paused && play && size)
     {
         logf("unpause");
         /* We need to enable DMA here */
@@ -498,7 +518,7 @@ void pcm_calculate_peaks(int *left, int *right)
 
 long pcm_get_bytes_waiting(void)
 {
-    return 0;
+    return size;
 }
 
 #elif CONFIG_CPU == PNX0101

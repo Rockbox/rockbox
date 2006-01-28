@@ -251,6 +251,9 @@ boot_table:
     /* Set up stack for IRQ mode */ 
     msr    cpsr_c, #0xd2
     ldr    sp, =irq_stack
+    /* Set up stack for FIQ mode */ 
+    msr    cpsr_c, #0xd1
+    ldr    sp, =fiq_stack
     /* Let abort mode use IRQ stack */
     msr    cpsr_c, #0xd7
     ldr    sp, =irq_stack
@@ -287,6 +290,7 @@ vectors:
 
 #ifndef STUB
     .global irq
+    .global fiq
     .global UIE
 #endif
 
@@ -313,6 +317,10 @@ prefetch_abort_handler:
     b      UIE
 
 fiq_handler:
+    stmfd  sp!, {r0-r3, r12, lr}
+    mov    lr, pc
+    ldr    pc, =fiq
+    ldmfd  sp!, {r0-r3, r12, lr}
     subs   pc, lr, #4
 
 data_abort_handler:
@@ -336,6 +344,10 @@ UIE:
 /* 256 words of IRQ stack */
     .space 256*4
 irq_stack:
+
+/* 256 words of FIQ stack */
+    .space 256*4
+fiq_stack:
 
 #endif /* BOOTLOADER */ 
 

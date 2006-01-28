@@ -341,6 +341,17 @@ static inline int set_irq_level(int level)
     return (cpsr >> 7) & 1;
 }
 
+static inline void enable_fiq(void)
+{
+    /* enable FIQ */
+    asm volatile (
+        "mrs     r0, cpsr         \n"\
+        "bic     r0, r0, #0x40    \n"\
+        "msr     cpsr_c, r0         "
+        : : : "r0"
+    );
+}
+
 #define invalidate_icache()
 
 #if CONFIG_CPU == PNX0101
