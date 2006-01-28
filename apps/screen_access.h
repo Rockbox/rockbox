@@ -84,6 +84,8 @@ struct screen
                         int x, int y, int width, int height);
     void (*bitmap)(const fb_data *src,
                    int x, int y, int width, int height);
+    void (*transparent_bitmap)(const fb_data *src,
+                               int x, int y, int width, int height);
     void (*set_drawmode)(int mode);
 #if (LCD_DEPTH > 1) || (LCD_REMOTE_DEPTH > 1)
     void (*set_background)(unsigned background);

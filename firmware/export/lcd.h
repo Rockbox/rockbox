@@ -201,11 +201,16 @@ enum
     FORMAT_ANY   /* For passing to read_bmp_file() */
 };
 
+#define FORMAT_TRANSPARENT 0x40000000
+
+#define TRANSPARENT_COLOR LCD_RGBPACK(255,0,255)
+
 struct bitmap {
     int width;
     int height;
 #if LCD_DEPTH > 1
     int format;
+    unsigned char *maskdata;
 #endif
     unsigned char *data;
 };
@@ -265,6 +270,12 @@ extern void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
                             int stride, int x, int y, int width, int height);
 extern void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width,
                             int height);
+extern void lcd_bitmap_transparent_part(const fb_data *src,
+                                        int src_x, int src_y,
+                                        int stride, int x, int y, int width,
+                                        int height);
+extern void lcd_bitmap_transparent(const fb_data *src, int x, int y,
+                                   int width, int height);
 #else /* LCD_DEPTH == 1 */
 #define lcd_mono_bitmap lcd_bitmap
 #define lcd_mono_bitmap_part lcd_bitmap_part

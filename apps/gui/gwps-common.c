@@ -219,7 +219,7 @@ bool wps_data_preload_tags(struct wps_data *data, char *buf,
                         data->img[n].bm.data = data->img_buf_ptr;
                         ret = read_bmp_file(imgname, &data->img[n].bm,
                                             data->img_buf_free,
-                                            FORMAT_ANY);
+                                            FORMAT_ANY|FORMAT_TRANSPARENT);
                         if (ret > 0)
                         {
                             data->img_buf_ptr += ret;
@@ -1252,9 +1252,10 @@ static void wps_draw_image(struct gui_wps *gwps, int n)
                              data->img[n].bm.height);
 #if LCD_DEPTH > 1
     } else {
-        display->bitmap((fb_data *)data->img[n].bm.data, data->img[n].x,
-                        data->img[n].y, data->img[n].bm.width,
-                        data->img[n].bm.height);
+        display->transparent_bitmap((fb_data *)data->img[n].bm.data,
+                                    data->img[n].x,
+                                    data->img[n].y, data->img[n].bm.width,
+                                    data->img[n].bm.height);
     }
 #endif
 }

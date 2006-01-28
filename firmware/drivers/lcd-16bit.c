@@ -540,6 +540,64 @@ void lcd_bitmap(const fb_data *src, int x, int y, int width, int height)
     lcd_bitmap_part(src, 0, 0, width, x, y, width, height);
 }
 
+/* Draw a partial native bitmap */
+void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
+                                 int stride, int x, int y, int width,
+                                 int height) ICODE_ATTR;
+void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
+                                 int stride, int x, int y, int width,
+                                 int height)
+{
+    fb_data *dst, *dst_end;
+
+    /* nothing to draw? */
+    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
+        || (x + width <= 0) || (y + height <= 0))
+        return;
+        
+    /* clipping */
+    if (x < 0)
+    {
+        width += x;
+        src_x -= x;
+        x = 0;
+    }
+    if (y < 0)
+    {
+        height += y;
+        src_y -= y;
+        y = 0;
+    }
+    if (x + width > LCD_WIDTH)
+        width = LCD_WIDTH - x;
+    if (y + height > LCD_HEIGHT)
+        height = LCD_HEIGHT - y;
+
+    src += stride * src_y + src_x; /* move starting point */
+    dst = LCDADDR(x, y);
+    dst_end = dst + height * LCD_WIDTH;
+
+    do
+    {
+        int i;
+        for(i = 0;i < width;i++)
+        {
+            if(src[i] != TRANSPARENT_COLOR)
+                dst[i] = src[i];
+        }
+        src += stride;
+        dst += LCD_WIDTH;
+    }
+    while (dst < dst_end);
+}
+
+/* Draw a full native bitmap with a transparent color */
+void lcd_bitmap_transparent(const fb_data *src, int x, int y,
+                            int width, int height)
+{
+    lcd_bitmap_transparent_part(src, 0, 0, width, x, y, width, height);
+}
+
 /* put a string at a given pixel position, skipping first ofs pixel columns */
 static void lcd_putsxyofs(int x, int y, int ofs, const unsigned char *str)
 {
