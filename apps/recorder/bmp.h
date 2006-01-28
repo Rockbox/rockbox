@@ -16,6 +16,12 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef _BMP_H_
+#define _BMP_H_
+
+#include "config.h"
+#include "lcd.h"
+
 /*********************************************************************
  * read_bmp_file()
  *
@@ -24,7 +30,7 @@
  *
  **********************************************/
 int read_bmp_file(char* filename,
-                  int *get_width,  /* in pixels */
-                  int *get_height, /* in pixels */
-                  char *bitmap,
-                  int maxsize);/* Maximum amount of bytes to write to bitmap */
+                  struct bitmap *bm,
+                  int maxsize,
+                  int format);
+#endif

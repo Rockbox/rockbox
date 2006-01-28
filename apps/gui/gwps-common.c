@@ -216,12 +216,12 @@ bool wps_data_preload_tags(struct wps_data *data, char *buf,
                         }
 
                         /* load the image */
-                        ret = read_bmp_file(imgname, &data->img[n].w,
-                                            &data->img[n].h, data->img_buf_ptr,
-                                            data->img_buf_free);
+                        data->img[n].bm.data = data->img_buf_ptr;
+                        ret = read_bmp_file(imgname, &data->img[n].bm,
+                                            data->img_buf_free,
+                                            FORMAT_ANY);
                         if (ret > 0)
                         {
-                            data->img[n].ptr = data->img_buf_ptr;
                             data->img_buf_ptr += ret;
                             data->img_buf_free -= ret;
                             data->img[n].loaded = true;
@@ -785,7 +785,7 @@ static void clear_image_pos(struct gui_wps *gwps, int n)
     struct wps_data *data = gwps->data;
     gwps->display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
     gwps->display->fillrect(data->img[n].x, data->img[n].y, 
-                            data->img[n].w, data->img[n].h);
+                            data->img[n].bm.width, data->img[n].bm.height);
     gwps->display->set_drawmode(DRMODE_SOLID);
 }
 #endif
@@ -827,12 +827,13 @@ static const char* skip_conditional(struct gui_wps *gwps, const char* fmt,
                     if(n >= 'A' && n <= 'Z')
                         n = n - 'A' + 26;
                     if(last_x != data->img[n].x || last_y != data->img[n].y
-                       || last_w != data->img[n].w || last_h != data->img[n].h)
+                       || last_w != data->img[n].bm.width
+                       || last_h != data->img[n].bm.height)
                     {
                         last_x = data->img[n].x;
                         last_y = data->img[n].y;
-                        last_w = data->img[n].w;
-                        last_h = data->img[n].h;
+                        last_w = data->img[n].bm.width;
+                        last_h = data->img[n].bm.height;
                         clear_image_pos(gwps,n);
                     }
                 }
@@ -1243,9 +1244,19 @@ static void wps_draw_image(struct gui_wps *gwps, int n)
     else
         display->set_drawmode(DRMODE_SOLID);
 
-    display->mono_bitmap(data->img[n].ptr, data->img[n].x,
-                         data->img[n].y, data->img[n].w,
-                         data->img[n].h);
+#if LCD_DEPTH > 1
+    if(data->img[n].bm.format == FORMAT_MONO) {
+#endif
+        display->mono_bitmap(data->img[n].bm.data, data->img[n].x,
+                             data->img[n].y, data->img[n].bm.width,
+                             data->img[n].bm.height);
+#if LCD_DEPTH > 1
+    } else {
+        display->bitmap((fb_data *)data->img[n].bm.data, data->img[n].x,
+                        data->img[n].y, data->img[n].bm.width,
+                        data->img[n].bm.height);
+    }
+#endif
 }
 static void wps_display_images(struct gui_wps *gwps, bool always)
 {

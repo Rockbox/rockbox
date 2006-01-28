@@ -255,11 +255,9 @@ extern bool keys_locked;
 
 #ifdef HAVE_LCD_BITMAP
 struct gui_img{
-    unsigned char* ptr;     /* pointer */
+    struct bitmap bm;
     int x;                  /* x-pos */
     int y;                  /* y-pos */
-    int w;                  /* width */
-    int h;                  /* height */
     bool loaded;            /* load state */
     bool display;           /* is to be displayed */
     bool always_display;    /* not using the preload/display mechanism */
@@ -274,7 +272,7 @@ struct align_pos {
 
 #ifdef HAVE_LCD_BITMAP
 #define MAX_IMAGES (26*2) /* a-z and A-Z */
-#define IMG_BUFSIZE (LCD_HEIGHT * LCD_WIDTH * MAX_IMAGES/10) / 8
+#define IMG_BUFSIZE (LCD_HEIGHT * LCD_WIDTH * MAX_IMAGES/10)
 #define WPS_MAX_LINES (LCD_HEIGHT/5+1)
 #define FORMAT_BUFFER_SIZE 3072
 #else

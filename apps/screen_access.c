@@ -120,6 +120,7 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->mono_bitmap=&lcd_mono_bitmap;
             screen->set_drawmode=&lcd_set_drawmode;
 #if LCD_DEPTH > 1   
+            screen->bitmap=&lcd_bitmap;
             screen->set_background=&lcd_set_background;
 #endif
             screen->update_rect=&lcd_update_rect;

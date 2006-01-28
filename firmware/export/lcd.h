@@ -193,6 +193,23 @@ extern fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH];
 extern void lcd_enable(bool on);
 #endif
 
+/* Bitmap formats */
+enum
+{
+    FORMAT_MONO,
+    FORMAT_NATIVE,
+    FORMAT_ANY   /* For passing to read_bmp_file() */
+};
+
+struct bitmap {
+    int width;
+    int height;
+#if LCD_DEPTH > 1
+    int format;
+#endif
+    unsigned char *data;
+};
+
 extern void lcd_set_invert_display(bool yesno);
 extern void lcd_set_flip(bool yesno);
 extern void lcd_roll(int pixels);
