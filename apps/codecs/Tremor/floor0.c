@@ -173,6 +173,8 @@ void vorbis_lsp_to_curve(ogg_int32_t *curve,int *map,int n,int ln,
     ogg_int32_t wi=icos[k];
 
 #ifdef _V_LSP_MATH_ASM
+    (void)shift; /* kill warnings */
+    (void)j;
     lsp_loop_asm(&qi,&pi,&qexp,ilsp,wi,m);
 
     pi=((pi*pi)>>16);
