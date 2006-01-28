@@ -2541,6 +2541,8 @@ static void playback_init(void)
             break ;
     }
     
+    filebuf = (char *)&audiobuf[MALLOC_BUFSIZE];
+    
     /* Apply relevant settings */
     audio_set_buffer_margin(global_settings.buffer_margin);
     audio_set_crossfade(global_settings.crossfade);
@@ -2555,7 +2557,6 @@ void audio_preinit(void)
     filebufused = 0;
     filling = false;
     current_codec = CODEC_IDX_AUDIO;
-    filebuf = (char *)&audiobuf[MALLOC_BUFSIZE];
     playing = false;
     audio_codec_loaded = false;
     voice_is_playing = false;
@@ -2582,7 +2583,7 @@ void audio_preinit(void)
 void audio_init(void)
 {
     logf("playback system post-init");
-    
+
     queue_post(&audio_queue, Q_AUDIO_POSTINIT, 0);
 }
 
