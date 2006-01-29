@@ -862,6 +862,7 @@ bool wps_data_load(struct wps_data *wps_data,
             wps_data->img_buf_ptr = wps_data->img_buf; /* where in image buffer */
 
             wps_data->img_buf_free = IMG_BUFSIZE; /* free space in image buffer */
+            wps_initialize_bmp_cache(ROCKBOX_DIR "/.wpscache");
 #endif
             while( ( read_line(fd, &wps_data->format_buffer[start],
                     sizeof(wps_data->format_buffer)-start) ) > 0 )
@@ -880,6 +881,10 @@ bool wps_data_load(struct wps_data *wps_data,
                 }
             }
 
+#ifdef HAVE_LCD_BITMAP
+            wps_close_bmp_cache(ROCKBOX_DIR "/.wpscache");
+#endif
+            
             if (start > 0)
             {
                 gui_wps_format(wps_data);
