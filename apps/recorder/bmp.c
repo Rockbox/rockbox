@@ -127,7 +127,15 @@ int read_bmp_file(char* filename,
 
 #if LCD_DEPTH == 1
     (void)format;
+#else
+    bool transparent;
+    
+    if(format & FORMAT_TRANSPARENT) {
+        transparent = true;
+        format &= ~FORMAT_TRANSPARENT;
+    }
 #endif
+        
     
     fd = open(filename, O_RDONLY);
 
@@ -175,7 +183,7 @@ int read_bmp_file(char* filename,
     PaddedWidth = (width * depth / 8 + 3) & ~3;
 
 #if LCD_DEPTH > 1
-        if(format & FORMAT_ANY) {
+        if(format == FORMAT_ANY) {
             if(depth == 1)
                 format = FORMAT_MONO;
             else
@@ -184,7 +192,7 @@ int read_bmp_file(char* filename,
 #endif
 
     /* PaddedHeight is for rockbox format. */
-    if(format & FORMAT_MONO) {
+    if(format == FORMAT_MONO) {
         PaddedHeight = (height + 7) / 8;
         totalsize = PaddedHeight * width;
     } else {
@@ -230,7 +238,7 @@ int read_bmp_file(char* filename,
     lseek(fd, (off_t)readlong(&fh.OffBits), SEEK_SET);
 
 #if LCD_DEPTH == 2
-    if(format & FORMAT_NATIVE)
+    if(format == FORMAT_NATIVE)
         memset(bitmap, 0, width * height / 4);
 #endif
     
@@ -254,7 +262,7 @@ int read_bmp_file(char* filename,
         switch(depth) {
         case 1:
 #if LCD_DEPTH > 1
-            if(format & FORMAT_MONO) {
+            if(format == FORMAT_MONO) {
 #endif
                 /* Mono -> Mono */
                 for (col = 0; col < width; col++) {
@@ -299,7 +307,7 @@ int read_bmp_file(char* filename,
         case 24:
             p = bmpbuf;
 #if LCD_DEPTH > 1
-            if(format & FORMAT_MONO) {
+            if(format == FORMAT_MONO) {
 #endif
                 /* RGB24 -> mono */
                 for (col = 0; col < width; col++) {
