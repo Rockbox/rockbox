@@ -76,8 +76,4 @@ playback.c
 metadata.c
 codecs.c
 dsp.c
-eq.c
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
-eq_cf.S
-#endif
 #endif
