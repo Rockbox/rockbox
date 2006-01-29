@@ -24,6 +24,8 @@
    Slightly faster calculation can be done by deriving forms which use tan()
    instead of cos() and sin(), but the latter are far easier to use when doing
    fixed point math, and performance is not a big point in the calculation part.
+   All the 'a' filter coefficients are negated so we can use only additions
+   in the filtering equation.
    We realise the filters as a second order direct form 1 structure. Direct
    form 1 was chosen because of better numerical properties for fixed point
    implementations.
@@ -153,8 +155,8 @@ void eq_pk_coefs(unsigned long cutoff, unsigned long Q, long db, long *c)
     c[0] = DIV64(b0, a0, 28);
     c[1] = DIV64(b1, a0, 28);
     c[2] = DIV64(b2, a0, 28);
-    c[3] = DIV64(a1, a0, 28);
-    c[4] = DIV64(a2, a0, 28);
+    c[3] = DIV64(-a1, a0, 28);
+    c[4] = DIV64(-a2, a0, 28);
 }
 
 /* Calculate coefficients for lowshelf filter */
@@ -180,8 +182,8 @@ void eq_ls_coefs(unsigned long cutoff, unsigned long Q, long db, long *c)
     c[0] = DIV64(b0, a0, 24);
     c[1] = DIV64(b1, a0, 24);
     c[2] = DIV64(b2, a0, 24);
-    c[3] = DIV64(a1, a0, 24);
-    c[4] = DIV64(a2, a0, 24);
+    c[3] = DIV64(-a1, a0, 24);
+    c[4] = DIV64(-a2, a0, 24);
 }
 
 /* Calculate coefficients for highshelf filter */
@@ -207,8 +209,8 @@ void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, long *c)
     c[0] = DIV64(b0, a0, 24);
     c[1] = DIV64(b1, a0, 24);
     c[2] = DIV64(b2, a0, 24);
-    c[3] = DIV64(a1, a0, 24);
-    c[4] = DIV64(a2, a0, 24);
+    c[3] = DIV64(-a1, a0, 24);
+    c[4] = DIV64(-a2, a0, 24);
 }
 
 #if !defined(CPU_COLDFIRE) || defined(SIMULATOR)

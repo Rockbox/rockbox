@@ -26,21 +26,24 @@ eq_filter:
     movem.l (11*4+16, %sp), %d6-%d7   | load num. channels and shift count
     movem.l (%a5), %a0-%a4            | load coefs
     lea.l (5*4, %a5), %a5             | point to filter history
-    moveq.l #2, %d6                   | number of channels (hardcode to stereo)
 
 .filterloop:
     move.l (11*4+4, %sp), %a6         | load input channel pointer
+    addq.l #4, (11*4+4, %sp)          | point x to next channel
     move.l (%a6), %a6
     move.l (11*4+12, %sp), %d5        | number of samples
-    addq.l #4, (11*4+4, %sp)          | point x to next channel
     movem.l (%a5), %d0-%d3            | load filter history
 .loop:
-    move.l (%a6), %d4
-    mac.l %a0, %d4, %acc0               | acc = b0*x[i]
-    mac.l %a1, %d0, %acc0               | acc += b1*x[i - 1]
+    /* Direct form 1 filtering code. We assume DSP has put EMAC in frac mode.
+       y[n] = b0*x[i] + b1*x[i - 1] + b2*x[i - 2] + a1*y[i - 1] + a2*y[i - 2],
+       where y[] is output and x[] is input. This is performed out of order
+       to do parallel load of input value.
+     */
+    mac.l %a1, %d0, (%a6), %d4, %acc0   | acc = b1*x[i - 1], x[i] -> d4
     mac.l %a2, %d1, %acc0               | acc += b2*x[i - 2]
-    msac.l %a3, %d2, %acc0              | acc -= a1*y[i - 1]
-    msac.l %a4, %d3, %acc0              | acc -= a2*y[i - 2]
+    mac.l %a0, %d4, %acc0               | acc += b0*x[i]
+    mac.l %a3, %d2, %acc0               | acc += a1*y[i - 1]
+    mac.l %a4, %d3, %acc0               | acc += a2*y[i - 2]
     move.l %d0, %d1                     | fix history
     move.l %d4, %d0
     move.l %d2, %d3
