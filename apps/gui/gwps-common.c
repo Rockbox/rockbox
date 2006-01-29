@@ -75,10 +75,17 @@ static char* skip_utf8_bom(char* buf)
  * a..z and A..Z
  */
 #ifdef HAVE_LCD_BITMAP
+#define BMP_CACHE_VERSION 1
+
+struct bmp_cache_header {
+    int version;
+};
+
 struct bmp_cache_entry {
     char filename[MAX_PATH];
     int width;
     int height;
+    int format;
     int size;
 };
 static int bmp_cache_fd = -1;
@@ -95,12 +102,31 @@ static int get_image_id(int c)
 
 void wps_initialize_bmp_cache(const char *file)
 {
+    struct bmp_cache_header h;
+    
     bmp_cache_fd = open(file, O_RDONLY);
     bmp_cache_write = 0;
+
+    /* Check header validity. */
+    if (bmp_cache_fd >= 0)
+    {
+        if ((read(bmp_cache_fd, &h, sizeof(struct bmp_cache_header))
+            != sizeof(struct bmp_cache_header)
+            ) || h.version != BMP_CACHE_VERSION)
+        {
+            close(bmp_cache_fd);
+            bmp_cache_fd = -1;
+        }
+    }
+    
     if (bmp_cache_fd < 0)
     {
         bmp_cache_fd = open(file, O_WRONLY | O_CREAT);
         bmp_cache_write = 1;
+
+        /* Write the header. */
+        h.version = BMP_CACHE_VERSION;
+        write(bmp_cache_fd, &h, sizeof(struct bmp_cache_header));
     }
 }
 
@@ -138,6 +164,9 @@ static int read_bmp_from_cache(const char *filename, struct bitmap *bm,
 
     bm->width = c.width;
     bm->height = c.height;
+#if LCD_DEPTH > 1
+    bm->format = c.format;
+#endif
     rc = read(bmp_cache_fd, bm->data, c.size);
     if (rc != c.size)
         return -4;
@@ -297,12 +326,16 @@ bool wps_data_preload_tags(struct wps_data *data, char *buf,
                         
                         if (ret > 0)
                         {
+                            /* Update the image cache. */
                             if (bmp_cache_write && bmp_cache_fd >= 0)
                             {
                                 struct bmp_cache_entry c;
                                 strncpy(c.filename, imgname, sizeof(c.filename)-1);
                                 c.width = data->img[n].bm.width;
                                 c.height = data->img[n].bm.height;
+#if LCD_DEPTH > 1
+                                c.format = data->img[n].bm.format;
+#endif
                                 c.size = ret;
                                 write(bmp_cache_fd, &c, sizeof(struct bmp_cache_entry));
                                 write(bmp_cache_fd, data->img_buf_ptr, ret);
