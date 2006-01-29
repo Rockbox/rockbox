@@ -86,7 +86,6 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
     int endofmetadata=0;
     int blocklength;
     int n;
-    uint32_t* p;
 
     ci->memset(fc,0,sizeof(FLACContext));
     nseekpoints=0;
@@ -152,12 +151,19 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
                 if (n < 18) return false;
                 blocklength-=n;
 
-                p=(uint32_t*)buf;
-                seekpoint_hi=betoh32(*(p++));
-                seekpoint_lo=betoh32(*(p++));
-                offset_hi=betoh32(*(p++));
-                offset_lo=betoh32(*(p++));
-            
+                seekpoint_hi=(buf[0] << 24) | (buf[1] << 16) | 
+                             (buf[2] << 8) | buf[3];
+                seekpoint_lo=(buf[4] << 24) | (buf[5] << 16) | 
+                             (buf[6] << 8) | buf[7];
+                offset_hi=(buf[8] << 24) | (buf[9] << 16) | 
+                             (buf[10] << 8) | buf[11];
+                offset_lo=(buf[12] << 24) | (buf[13] << 16) | 
+                             (buf[14] << 8) | buf[15];
+
+                /* The final two bytes contain the number of samples in the 
+                   target frame - but we don't care about that. */
+
+                /* Only store seekpoints where the high 32 bits are zero */
                 if ((seekpoint_hi == 0) && (seekpoint_lo != 0xffffffff) &&
                     (offset_hi == 0)) {
                         seekpoints[nseekpoints].sample=seekpoint_lo;
