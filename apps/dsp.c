@@ -19,6 +19,7 @@
 #include <inttypes.h>
 #include <string.h>
 #include "dsp.h"
+#include "eq.h"
 #include "kernel.h"
 #include "playback.h"
 #include "system.h"
@@ -166,10 +167,21 @@ struct crossfeed_data
     int index;
 };
 
+/* Current setup is one lowshelf filters, three peaking filters and one
+   highshelf filter. Varying the number of shelving filters make no sense,
+   but adding peaking filters are possible. */
+struct eq_state {
+    char enabled[5];    /* Flags for active filters */
+    struct eqfilter ls;
+    struct eqfilter pk[3];
+    struct eqfilter hs;
+};
+
 static struct dsp_config dsp_conf[2] IBSS_ATTR;
 static struct dither_data dither_data[2] IBSS_ATTR;
 static struct resample_data resample_data[2] IBSS_ATTR;
 struct crossfeed_data crossfeed_data IBSS_ATTR;
+static struct eq_state eq_data;
 
 static int pitch_ratio = 1000;
 
@@ -608,6 +620,25 @@ static void apply_crossfeed(long* src[], int count)
 }
 #endif
 
+/* Apply EQ filters to those bands that have got it switched on. */
+void eq_process(long **x, unsigned num)
+{
+    int i;
+    unsigned int channels = dsp->stereo_mode != STEREO_MONO ? 2 : 1;
+	
+    /* filter configuration currently is 1 low shelf filter, 3 band peaking
+       filters and 1 high shelf filter, in that order.
+     */
+    if (eq_data.enabled[0])
+        eq_filter(x, &eq_data.ls, num, channels, EQ_SHELF_SHIFT);
+    for (i = 0; i < 3; i++) {
+        if (eq_data.enabled[1 + i])
+            eq_filter(x, &eq_data.pk[i], num, channels, EQ_PEAK_SHIFT);
+    }
+    if (eq_data.enabled[4])
+        eq_filter(x, &eq_data.hs, num, channels, EQ_SHELF_SHIFT);
+}
+
 /* Apply a constant gain to the samples (e.g., for ReplayGain). May update
  * the src array if gain was applied.
  * Note that this must be called before the resampler.
@@ -713,6 +744,9 @@ long dsp_process(char* dst, char* src[], long size)
         samples = resample(tmp, samples);
         if (dsp->crossfeed_enabled && dsp->stereo_mode != STEREO_MONO)
             apply_crossfeed(tmp, samples);
+        /* TODO: Might want to wrap this with a generic eq_enabled when the
+           settings are in place */
+        eq_process(tmp, samples);
         write_samples((short*) dst, tmp, samples);
         written += samples;
         dst += samples * sizeof(short) * 2;
