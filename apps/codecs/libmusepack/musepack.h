@@ -53,6 +53,10 @@ extern "C" {
 #include "reader.h"
 #include "streaminfo.h"
     
+#ifdef ROCKBOX_LITTLE_ENDIAN
+#define MPC_LITTLE_ENDIAN
+#endif
+
 enum {
     MPC_FRAME_LENGTH = (36 * 32),    /// samples per mpc frame
     MPC_DECODER_BUFFER_LENGTH = 4 * MPC_FRAME_LENGTH /// required buffer size for decoder
