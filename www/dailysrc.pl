@@ -7,21 +7,15 @@ opendir(DIR, $basedir) or
 @tarballs = sort grep { /^rockbox-daily-/ } readdir(DIR);
 closedir DIR;
 
-print "<ul>\n";
-
-for ( sort {$b <=> $a} @tarballs ) {
+for ( sort {$b cmp $a} @tarballs ) {
     $size = (stat("$basedir/$_"))[7];
     $log = "";
     if (/-(\d+)/) {
         $date = $1;
-        if ( -f "$basedir/changes-$date.txt") {
-            $lines = `grep "Number of changes:" $basedir/changes-$date.txt | cut "-d " -f4` + 0;
-            $log = "<a href=\"daily/changes-$date.html\">Changelog</a> <small>($lines changes)</small>";
+        if ( -f "$basedir/changes-$date.html") {
+            $log = "<a href=\"daily/changes-$date.html\">Changes done $date</a>";
         }
     }
-    print "<li><a href=\"daily/$_\">$_</a> <small>($size bytes)</small> $log\n";
-    print "<li><a href=\"dl.cgi?bin=source\">old versions</a>\n";
+    print "$log\n";
     last;
 }
-
-print "</ul>\n";

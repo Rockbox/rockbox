@@ -4,8 +4,15 @@ require "rockbox.pm";
 
 my $basedir = "/home/dast/rockbox-build/daily-build";
 
-my @list=("player", "recorder", "fmrecorder", "recorderv2",
-          "recorder8mb", "fmrecorder8mb", "ondiofm", "ondiosp");
+my @list=("player",
+          "recorder", "recorder8mb",
+          "fmrecorder", "fmrecorder8mb",
+          "recorderv2",
+          "ondiofm", "ondiosp",
+          "h100", "h120", "h300", "ipodcolor", "ipodnano",
+
+          # install and source are special cases
+          "install", "source");
 
 for(@list) {
     my $dir = $_;
@@ -19,44 +26,59 @@ for(@list) {
     }
 }
 
-$color1 = 0xc6;
-$color2 = 0xd6;
-$color3 = 0xf5;
-$font1 = "<b>";
-$font2 = "</b>";
-
 for(reverse sort keys %date) {
     my $d = $_;
     my $nice = $d;
     if($d =~ /(\d\d\d\d)(\d\d)(\d\d)/) {
         $nice = "$1-$2-$3";
     }
-    $col = sprintf("style=\"background-color: #%02x%02x%02x\"",
-                   $color1, $color2, $color3);
-    print "<h2>Download daily build</h2>\n";
-    print "<table class=rockbox><tr valign=top>\n";
+    print "<table class=rockbox cellpadding=\"0\"><tr valign=top>\n";
 
     $color1 -= 0x18;
     $color2 -= 0x18;
     $color3 -= 0x18;
     
-    for(@list) {
-        my $n=0;
-        my $m = $_;
-        printf "<td $col>$font1$m$font2<br><img src=\"$model{$m}\"><br>";
-        # new-style full zip:
-        if( -f "daily/$m/rockbox-${m}-${d}.zip") {
-            printf "%s<a href=\"daily/$_/rockbox-${m}-${d}.zip\">latest</a>",
-            $n?", ":"";
-            $n++;
-        }
-        print "$font2 <p><a href=\"dl.cgi?bin=$_\">old versions</a></td>\n";
+    my $count = 0;
+    my $split = int((scalar @list) / 2);
+    my $x = 0;
+    my @head;
+
+    foreach $t (@list) {
+        my $show = $t;
+        $show =~ s/recorder/rec/;
+        # Remove the comment below to get long names
+        # $show = $longname{$t};
+        $head[$x] .= "<th>$show</th>\n";
+	$count++;
+	if ($count == $split) {
+	    $x++;
+	}
     }
-    printf "<td $col>${font1}windows installer$font2<br><img src=\"$model{install}\"><br>";
-    print "<a href=\"daily/Rockbox-${d}-install.exe\">latest</a>",
-    "<p><a href=\"dl.cgi?bin=install\">old versions</a></td>";
+    print "$head[0]</tr><tr>\n";
+
+    $count = 0;
+    for(@list) {
+        my $m = $_;
+        printf "<td><img alt=\"$m\" src=\"$model{$m}\"><br>";
+        # new-style full zip:
+        my $file = "rockbox-${m}-${d}.zip";
+        if($m eq "source") {
+            $file = "rockbox-daily-${d}.tar.gz";
+        }
+        elsif($m eq "install") {
+            $file = "Rockbox-${d}-install.exe";
+        }
+        if( -f "$basedir/$m/$file") {
+            printf "<a href=\"/daily/$_/$file\">latest</a>",
+        }
+        print "<p><a href=\"/dl.cgi?bin=$_\">older</a></td>\n";
+
+	$count++;
+	if ($count == $split) {
+	    print "</tr><tr>$head[1]</tr><tr>\n";
+	}
+    }
     print "</tr>\n";
-    $font1 = $font2 = "";
     last;
 }
 print "</table>\n";
