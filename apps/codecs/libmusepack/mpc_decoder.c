@@ -322,6 +322,7 @@ mpc_decoder_decode_frame(mpc_decoder *d, mpc_uint32_t *in_buffer,
   for (i = 0; i < (in_len + 3) / 4; i++)
     d->Speicher[i] = mpc_swap32(d->Speicher[i]);
 #endif
+  (void)i; /* avoid warning */
   d->dword = d->Speicher[0];
   switch (d->StreamVersion) {
 #ifdef MPC_SUPPORT_SV456
