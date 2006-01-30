@@ -34,8 +34,8 @@
 
 /// \file streaminfo.h
 
-#ifndef _musepack_streaminfo_h_
-#define _musepack_streaminfo_h_
+#ifndef _mpcdec_streaminfo_h_
+#define _mpcdec_streaminfo_h_
 
 typedef mpc_int32_t mpc_streaminfo_off_t;
 
@@ -83,4 +83,4 @@ typedef struct mpc_streaminfo {
     //@}
 } mpc_streaminfo;
 
-#endif // _musepack_streaminfo_h_
+#endif // _mpcdec_streaminfo_h_

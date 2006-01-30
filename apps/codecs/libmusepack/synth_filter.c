@@ -36,11 +36,8 @@
 /// Synthesis functions.
 /// \todo document me
 
-#include <string.h>
 #include "musepack.h"
 #include "internal.h"
-
-typedef mpc_int32_t ptrdiff_t;
 
 /* C O N S T A N T S */
 #undef _
@@ -334,7 +331,6 @@ static void Calculate_New_V ( const MPC_SAMPLE_FORMAT * Sample, MPC_SAMPLE_FORMA
 static void Synthese_Filter_float_internal(MPC_SAMPLE_FORMAT * OutData,MPC_SAMPLE_FORMAT * V,const MPC_SAMPLE_FORMAT * Y)
 {
     mpc_uint32_t n;
-    
     for ( n = 0; n < 36; n++, Y += 32 ) {
         V -= 64;
         Calculate_New_V ( Y, V );
@@ -457,7 +453,7 @@ static const unsigned char    Parity [256] = {  // parity
  *  XORed values of both generators.
  */
 mpc_uint32_t
-random_int(mpc_decoder *d) 
+mpc_random_int(mpc_decoder *d) 
 {
 #if 1
     mpc_uint32_t  t1, t2, t3, t4;

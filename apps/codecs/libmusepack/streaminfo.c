@@ -35,7 +35,6 @@
 /// \file streaminfo.c
 /// Implementation of streaminfo reading functions.
 
-#include <string.h>
 #include "musepack.h"
 #include "internal.h"
 
@@ -57,16 +56,6 @@ void
 mpc_streaminfo_init(mpc_streaminfo * si)
 {
     memset(si, 0, sizeof(mpc_streaminfo));
-}
-
-// read information from SV8 header
-// not yet implemented
-static mpc_int32_t
-streaminfo_read_header_sv8(mpc_streaminfo * si, mpc_reader * fp)
-{
-    (void)si;
-    (void)fp;
-    return 0;
 }
 
 /// Reads streaminfo from SV7 header. 
@@ -143,6 +132,7 @@ streaminfo_read_header_sv7(mpc_streaminfo * si, mpc_uint32_t HeaderData[8])
 }
 
 // read information from SV4-SV6 header
+#ifdef MPC_SUPPORT_SV456
 static mpc_int32_t
 streaminfo_read_header_sv6(mpc_streaminfo * si, mpc_uint32_t HeaderData[8])
 {
@@ -199,7 +189,7 @@ streaminfo_read_header_sv6(mpc_streaminfo * si, mpc_uint32_t HeaderData[8])
 
     return ERROR_CODE_OK;
 }
-
+#endif
 // reads file header and tags
 mpc_int32_t
 mpc_streaminfo_read(mpc_streaminfo * si, mpc_reader * r)
@@ -228,23 +218,27 @@ mpc_streaminfo_read(mpc_streaminfo * si, mpc_reader * r)
 #ifndef MPC_LITTLE_ENDIAN
         mpc_uint32_t ptr;
         for (ptr = 0; ptr < 8; ptr++) {
-            HeaderData[ptr] = swap32(HeaderData[ptr]);
+            HeaderData[ptr] = mpc_swap32(HeaderData[ptr]);
         }
 #endif
         si->stream_version = HeaderData[0] >> 24;
 
         // stream version 8
         if ((si->stream_version & 15) >= 8) {
-            Error = streaminfo_read_header_sv8(si, r);
+            return ERROR_CODE_INVALIDSV;
         }
         // stream version 7
         else if ((si->stream_version & 15) == 7) {
             Error = streaminfo_read_header_sv7(si, HeaderData);
+            if (Error != ERROR_CODE_OK) return Error;
         }
-    }
-    else {
+    } else {
+#ifdef MPC_SUPPORT_SV456
         // stream version 4-6
         Error = streaminfo_read_header_sv6(si, HeaderData);
+#else
+        return ERROR_CODE_INVALIDSV;
+#endif
     }
 
     // estimation, exact value needs too much time
@@ -259,7 +253,7 @@ mpc_streaminfo_read(mpc_streaminfo * si, mpc_reader * r)
         si->average_bitrate = 0;
     }
 
-    return Error;
+    return ERROR_CODE_OK;
 }
 
 double

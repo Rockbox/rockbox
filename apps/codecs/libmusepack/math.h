@@ -32,11 +32,11 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/// \file mpc_math.h
-/// Libmusepack internal math routines.  
+/// \file math.h
+/// Libmpcdec internal math routines.  
 
-#ifndef _musepack_math_h_
-#define _musepack_math_h_
+#ifndef _mpcdec_math_h_
+#define _mpcdec_math_h_
 
 #define MPC_FIXED_POINT
 
@@ -215,5 +215,5 @@ typedef float MPC_SAMPLE_FORMAT;
 
 #endif
 
-#endif // _musepack_math_h_
+#endif // _mpcdec_math_h_
 

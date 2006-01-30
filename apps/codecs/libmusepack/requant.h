@@ -35,8 +35,8 @@
 /// \file requant.h
 /// Requantization function definitions.
 
-#ifndef _musepack_requant_h
-#define _musepack_requant_h_
+#ifndef _mpcdec_requant_h
+#define _mpcdec_requant_h_
 
 #include "musepack.h"
 
@@ -48,4 +48,4 @@ extern const mpc_int32_t          __Dc    [1 + 18];     // offset for requantiza
 #define Cc      (__Cc + 1)
 #define Dc      (__Dc + 1)
 
-#endif // _musepack_requant_h_
+#endif // _mpcdec_requant_h_

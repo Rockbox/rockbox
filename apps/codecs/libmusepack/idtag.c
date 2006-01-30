@@ -38,7 +38,6 @@
 
 #include "musepack.h"
 #include "internal.h"
-#include "string.h"
 
 mpc_int32_t
 JumpID3v2 (mpc_reader* r) {

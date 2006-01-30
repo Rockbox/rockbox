@@ -34,8 +34,8 @@
 
 /// \file reader.h
 
-#ifndef _musepack_reader_h_
-#define _musepack_reader_h_
+#ifndef _mpcdec_reader_h_
+#define _mpcdec_reader_h_
 
 /// \brief Stream reader interface structure.
 ///
@@ -47,7 +47,7 @@ typedef struct mpc_reader_t {
 	mpc_int32_t (*read)(void *t, void *ptr, mpc_int32_t size);
 
     /// Seeks to byte position offset.
-	bool (*seek)(void *t, mpc_int32_t offset);
+	mpc_bool_t (*seek)(void *t, mpc_int32_t offset);
 
     /// Returns the current byte offset in the stream.
 	mpc_int32_t (*tell)(void *t);
@@ -56,18 +56,27 @@ typedef struct mpc_reader_t {
 	mpc_int32_t (*get_size)(void *t);
 
     /// True if the stream is a seekable stream.
-	bool (*canseek)(void *t);
+	mpc_bool_t (*canseek)(void *t);
 
-    /// Optional field that can be used to identify a particular instance of
+    /// Field that can be used to identify a particular instance of
     /// reader or carry along data associated with that reader.
     void *data;
-} mpc_reader;
 
+} mpc_reader;
+/* No standard STDIO based reader in Rockbox
+typedef struct mpc_reader_file_t {
+	mpc_reader reader;
+
+    FILE *file;
+    long file_size;
+    mpc_bool_t is_seekable;
+} mpc_reader_file;
+*/
 /// Initializes reader with default stdio file reader implementation.  Use
 /// this if you're just reading from a plain file.
 ///
 /// \param r reader struct to initalize
 /// \param input input stream to attach to the reader
-// void mpc_reader_setup_file_reader(mpc_reader *r, FILE *input);
+/* void mpc_reader_setup_file_reader(mpc_reader_file *r, FILE *input); */
 
-#endif // _musepack_reader_h_
+#endif // _mpcdec_reader_h_

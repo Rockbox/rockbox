@@ -32,15 +32,23 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/// \file musepack_internal.h
-/// Definitions and structures used only internally by the libmusepack.
+/// \file internal.h
+/// Definitions and structures used only internally by the libmpcdec.
 
-#ifndef _musepack_internal_h
-#define _musepack_internal_h
+#ifndef _mpcdec_internal_h
+#define _mpcdec_internal_h
+
 
 enum {
     MPC_DECODER_SYNTH_DELAY = 481
 };
+
+/// Big/little endian 32 bit byte swapping routine.
+static __inline
+mpc_uint32_t mpc_swap32(mpc_uint32_t val) {
+    return (((val & 0xff000000) >> 24) | ((val & 0x00ff0000) >> 8) |
+            ((val & 0x0000ff00) <<  8) | ((val & 0x000000ff) << 24));
+}
 
 /// Searches for a ID3v2-tag and reads the length (in bytes) of it.
 /// \param reader supplying raw stream data
@@ -49,9 +57,9 @@ enum {
 mpc_int32_t JumpID3v2(mpc_reader* fp);
 
 /// helper functions used by multiple files
-mpc_uint32_t random_int(mpc_decoder *d); // in synth_filter.c
+mpc_uint32_t mpc_random_int(mpc_decoder *d); // in synth_filter.c
 void mpc_decoder_initialisiere_quantisierungstabellen(mpc_decoder *d, double scale_factor);
 void mpc_decoder_synthese_filter_float(mpc_decoder *d, MPC_SAMPLE_FORMAT* OutData);
 
-#endif // _musepack_internal_h
+#endif // _mpcdec_internal_h
 

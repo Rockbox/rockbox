@@ -35,9 +35,9 @@
 #ifndef __MUSEPACK_CONFIG_TYPES_H__
 #define __MUSEPACK_CONFIG_TYPES_H__
 
-// typedef unsigned char BOOL;
-// #define TRUE  1
-// #define FALSE 0
+typedef unsigned char mpc_bool_t;
+#define TRUE  1
+#define FALSE 0
 
 /* these are filled in by configure */
 typedef short mpc_int16_t;

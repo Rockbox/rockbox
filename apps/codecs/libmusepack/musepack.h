@@ -32,19 +32,18 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/// \file musepack.h
-/// Top level include file for libmusepack.
+/// \file mpcdec.h
+/// Top level include file for libmpcdec.
 
-#ifndef _musepack_h_
-#define _musepack_h_
+#ifndef _mpcdec_h_
+#define _mpcdec_h_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <stdbool.h>
-#include <stdlib.h>
-//#include <string.h>
+//#include <stdlib.h>
+#include <string.h>
 
 #include "../codec.h"
 #include "config_types.h"
@@ -98,7 +97,9 @@ void mpc_decoder_setup(mpc_decoder *d, mpc_reader *r);
 /// Call this next after calling mpc_decoder_setup.
 /// \param si streaminfo structure indicating format of source stream
 /// \return TRUE if decoder was initalized successfully, FALSE otherwise    
-bool mpc_decoder_initialize(mpc_decoder *d, mpc_streaminfo *si);
+mpc_bool_t mpc_decoder_initialize(mpc_decoder *d, mpc_streaminfo *si);
+
+void mpc_decoder_set_streaminfo(mpc_decoder *d, mpc_streaminfo *si);
 
 /// Sets decoder sample scaling factor.  All decoded samples will be multiplied
 /// by this factor.
@@ -119,14 +120,20 @@ mpc_uint32_t mpc_decoder_decode(
     mpc_uint32_t *vbr_update_acc, 
     mpc_uint32_t *vbr_update_bits);
 
+mpc_uint32_t mpc_decoder_decode_frame(
+    mpc_decoder *d,
+    mpc_uint32_t *in_buffer,
+    mpc_uint32_t in_len,
+    MPC_SAMPLE_FORMAT *out_buffer);
+
 /// Seeks to the specified sample in the source stream.
-bool mpc_decoder_seek_sample(mpc_decoder *d, mpc_int64_t destsample);
+mpc_bool_t mpc_decoder_seek_sample(mpc_decoder *d, mpc_int64_t destsample);
 
 /// Seeks to specified position in seconds in the source stream.
-bool mpc_decoder_seek_seconds(mpc_decoder *d, double seconds);
+mpc_bool_t mpc_decoder_seek_seconds(mpc_decoder *d, double seconds);
 
 #ifdef __cplusplus
 }
 #endif // __cplusplus
 
-#endif // _musepack_h_
+#endif // _mpcdec_h_
