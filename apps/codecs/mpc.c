@@ -32,7 +32,7 @@ mpc_int32_t read_impl(void *data, void *ptr, mpc_int32_t size)
     return ((mpc_int32_t)(ci->read_filebuf(ptr, size)));
 }
 
-bool seek_impl(void *data, mpc_int32_t offset)
+mpc_bool_t seek_impl(void *data, mpc_int32_t offset)
 {  
     struct codec_api *ci = (struct codec_api *)data;
 
@@ -55,7 +55,7 @@ mpc_int32_t get_size_impl(void *data)
     return ci->filesize;
 }
 
-bool canseek_impl(void *data)
+mpc_bool_t canseek_impl(void *data)
 {
     (void)data;
     
