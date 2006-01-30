@@ -196,14 +196,25 @@ int wm8975_set_mixer_vol(int channel1, int channel2)
     return 0;
 }
 
+/* We are using Linear bass control */
 void wm8975_set_bass(int value)
 {
-    (void)value;
+  int regvalues[]={11, 10, 10,  9,  8,  8, 0xf , 6, 6, 5, 4, 4, 3, 2, 1, 0};
+
+  if ((value >= -6) && (value <= 9)) {
+      /* We use linear bass control with 130Hz cutoff */
+      ipod_i2c_send(0x1a, 0x0c << 1, regvalues[value+6]);
+  }
 }
 
 void wm8975_set_treble(int value)
 {
-    (void)value;
+  int regvalues[]={11, 10, 10,  9,  8,  8, 0xf , 6, 6, 5, 4, 4, 3, 2, 1, 0};
+
+  if ((value >= -6) && (value <= 9)) {
+      /* We use a 8Khz cutoff */
+      ipod_i2c_send(0x1a, 0x0d << 1, regvalues[value+6]);
+  }
 }
 
 int wm8975_mute(int mute)
