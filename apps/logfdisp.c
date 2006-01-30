@@ -30,6 +30,12 @@
 #include "menu.h"
 #include "logf.h"
 
+#if CONFIG_KEYPAD == IPOD_4G_PAD
+#define LOGF_BUTTON_QUIT BUTTON_MENU
+#else
+#define LOGF_BUTTON_QUIT BUTTON_OFF
+#endif
+
 #ifdef HAVE_LCD_BITMAP
 bool logfdisplay(void)
 
@@ -83,7 +89,7 @@ bool logfdisplay(void)
         }
         lcd_update();
         button = button_get_w_tmo(HZ/2);
-    } while(button != BUTTON_OFF);
+    } while(button != LOGF_BUTTON_QUIT);
 
     return false;
 }
