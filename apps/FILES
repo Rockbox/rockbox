@@ -1,6 +1,6 @@
 FILES
 Makefile
-*.[ch]
+*.[chS]
 gui/*.[ch]
 recorder/*.[ch]
 player/*.[ch]
