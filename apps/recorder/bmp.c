@@ -197,7 +197,7 @@ int read_bmp_file(char* filename,
         totalsize = PaddedHeight * width;
     } else {
 #if LCD_DEPTH == 2
-        PaddedHeight = height/4;
+        PaddedHeight = (height + 3) / 4;
 #else
         PaddedHeight = height;
 #endif
