@@ -232,7 +232,7 @@ int read_bmp_file(char* filename,
 
 #if LCD_DEPTH == 2
     if(format == FORMAT_NATIVE)
-        memset(bitmap, 0, width * height / 4);
+        memset(bitmap, 0, totalsize);
 #endif
     
 #if LCD_DEPTH > 1
