@@ -1136,11 +1136,11 @@ void UIE(unsigned int pc, unsigned int num)
 
 #if CONFIG_CPU==PP5020
 
+unsigned int ipod_hw_rev;
+
 #ifndef BOOTLOADER
 extern void TIMER1(void);
 extern void ipod_4g_button_int(void);
-
-unsigned int ipod_hw_rev;
 
 void irq(void)
 {

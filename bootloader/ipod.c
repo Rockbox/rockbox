@@ -340,6 +340,7 @@ void* main(void)
 #endif
 
     TMP_IPOD_HW_REVISION = IPOD_HW_REVISION;
+    ipod_hw_rev = IPOD_HW_REVISION;
 
     system_init();
     kernel_init();
