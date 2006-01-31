@@ -59,6 +59,15 @@ Width: 160
 </wps>
 
 <wps>
+Name: boxes-176x132c.wps
+Author: Christi Scarborough (after Magnus Westerlund)
+Font: rockbox_default.fnt
+Statusbar: on
+Height: 132
+Width: 160
+</wps>
+
+<wps>
 Name: engineeer2.wps
 RWPS: engineeer2.rwps
 Author: Magnus Westerlund
