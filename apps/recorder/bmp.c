@@ -173,7 +173,7 @@ int read_bmp_file(char* filename,
     depth = readshort(&fh.BitCount);
 
     /* 4-byte boundary aligned */
-    PaddedWidth = (width * depth / 8 + 3) & ~3;
+    PaddedWidth = ((width * depth + 31) / 8) & ~3;
 
 #if LCD_DEPTH > 1
         if(format == FORMAT_ANY) {
