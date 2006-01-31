@@ -222,8 +222,8 @@ int read_bmp_file(char* filename,
     }
 
     /* Use the darker palette color as foreground on mono bitmaps */
-    if(readshort(&fh.BitCount) == 1) {
-        if(brightness(palette[0]) > brightness(palette[1]))
+    if(depth == 1) {
+        if(brightness(palette[0]) < brightness(palette[1]))
            invert_pixel = 1;
     }
     
@@ -260,12 +260,12 @@ int read_bmp_file(char* filename,
                 /* Mono -> Mono */
                 for (col = 0; col < width; col++) {
                     ret = getpix(col, bmpbuf) ^ invert_pixel;
-                    if (ret == 1) {
-                        bitmap[width * ((height - row - 1) / 8) + col]
-                            &= ~ 1 << ((height - row - 1) % 8);
-                    } else {
+                    if (ret) {
                         bitmap[width * ((height - row - 1) / 8) + col]
                             |= 1 << ((height - row - 1) % 8);
+                    } else {
+                        bitmap[width * ((height - row - 1) / 8) + col]
+                            &= ~ 1 << ((height - row - 1) % 8);
                     }
                 }
 #if LCD_DEPTH == 2
