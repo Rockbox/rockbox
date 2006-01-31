@@ -71,8 +71,7 @@ pad_skip:
     ldr    r2, =0xf000f014
     mov    r1, #0x3a00
     ldr    r0, =0xf000f010
-    ldr    r4, =0x40000000
-    mov    pc, r4
+    mov    pc, #0x40000000 
 
 remap_start:
     str    r1, [r0]
