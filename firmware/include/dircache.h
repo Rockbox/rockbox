@@ -41,6 +41,7 @@ struct travel_data {
 struct dircache_maindata {
     long magic;
     long size;
+    long entry_count;
     struct dircache_entry *root_entry;
 };
 
@@ -61,6 +62,7 @@ struct dircache_entry {
 typedef struct {
     bool busy;
     struct dircache_entry *entry;
+    struct dircache_entry *internal_entry;
     struct dircache_entry secondary_entry;
     DIR *regulardir;
 } DIRCACHED;
@@ -70,6 +72,7 @@ int dircache_load(const char *path);
 int dircache_save(const char *path);
 int dircache_build(int last_size);
 bool dircache_is_enabled(void);
+int dircache_get_entry_count(void);
 int dircache_get_cache_size(void);
 int dircache_get_reserve_used(void);
 int dircache_get_build_ticks(void);

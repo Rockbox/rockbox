@@ -160,6 +160,12 @@
 #define HAVE_DIRCACHE 1
 #endif
 
+/* Determine if accesses should be strictly long aligned. */
+#if (CONFIG_CPU == SH7034) || (CONFIG_CPU == PNX0101) \
+    || (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
+#define ROCKBOX_STRICT_ALIGN 1
+#endif
+
 /* define for all cpus from coldfire family */
 #if (CONFIG_CPU == MCF5249) || (CONFIG_CPU == MCF5250)
 #define CPU_COLDFIRE

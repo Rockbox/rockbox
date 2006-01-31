@@ -55,6 +55,7 @@ static bool dircache_initialized = false;
 static bool thread_enabled = false;
 static unsigned long allocated_size = DIRCACHE_LIMIT;
 static unsigned long dircache_size = 0;
+static unsigned long entry_count = 0;
 static unsigned long reserve_used = 0;
 static unsigned int  cache_build_ticks = 0;
 static char dircache_cur_path[MAX_PATH];
@@ -79,12 +80,22 @@ static struct dircache_entry* allocate_entry(void)
     }
     
     next_entry = (struct dircache_entry *)((char *)dircache_root+dircache_size);
-    dircache_size += sizeof(struct dircache_entry);
+#ifdef ROCKBOX_STRICT_ALIGN
+    /* Make sure the entry is long aligned. */
+    if ((long)next_entry & 0x03)
+    {
+        next_entry = (struct dircache_entry *)(((long)next_entry & ~0x03) + 0x04);
+        dircache_size += 4 - ((long)next_entry & 0x03);
+    }
+#endif
     next_entry->name_len = 0;
     next_entry->d_name = NULL;
     next_entry->up = NULL;
     next_entry->down = NULL;
     next_entry->next = NULL;
+    
+    dircache_size += sizeof(struct dircache_entry);
+    entry_count++;
 
     return next_entry;
 }
@@ -306,16 +317,17 @@ int dircache_load(const char *path)
     if (fd < 0)
         return -2;
         
+    dircache_root = (struct dircache_entry *)(((long)audiobuf & ~0x03) + 0x04);
     bytes_read = read(fd, &maindata, sizeof(struct dircache_maindata));
     if (bytes_read != sizeof(struct dircache_maindata)
-        || (long)maindata.root_entry != (long)audiobuf
+        || (long)maindata.root_entry != (long)dircache_root
         || maindata.size <= 0)
     {
         close(fd);
         return -3;
     }
 
-    dircache_root = (struct dircache_entry *)audiobuf;
+    entry_count = maindata.entry_count;
     bytes_read = read(fd, dircache_root, MIN(DIRCACHE_LIMIT, maindata.size));
     close(fd);
     
@@ -359,6 +371,7 @@ int dircache_save(const char *path)
     maindata.magic = DIRCACHE_MAGIC;
     maindata.size = dircache_size;
     maindata.root_entry = dircache_root;
+    maindata.entry_count = entry_count;
 
     /* Save the info structure */
     bytes_written = write(fd, &maindata, sizeof(struct dircache_maindata));
@@ -491,7 +504,7 @@ int dircache_build(int last_size)
     }
     else
     {
-        dircache_root = (struct dircache_entry *)audiobuf;
+        dircache_root = (struct dircache_entry *)(((long)audiobuf & ~0x03) + 0x04);
         dircache_size = 0;
     }
 
@@ -538,6 +551,14 @@ void dircache_init(void)
 bool dircache_is_enabled(void)
 {
     return dircache_initialized;
+}
+
+/**
+ * Returns the current number of entries (directories and files) in the cache.
+ */
+int dircache_get_entry_count(void)
+{
+    return entry_count;
 }
 
 /**
@@ -896,7 +917,7 @@ struct dircache_entry* readdir_cached(DIRCACHED* dir)
         regentry = readdir(dir->regulardir);
         if (regentry == NULL)
             return NULL;
-        
+
         strncpy(dir->secondary_entry.d_name, regentry->d_name, MAX_PATH-1);
         dir->secondary_entry.size = regentry->size;
         dir->secondary_entry.startcluster = regentry->startcluster;
@@ -928,6 +949,7 @@ struct dircache_entry* readdir_cached(DIRCACHED* dir)
     dir->secondary_entry.wrttime = ce->wrttime;
     dir->secondary_entry.wrtdate = ce->wrtdate;
     dir->secondary_entry.next = NULL;
+    dir->internal_entry = ce;
 
     //logf("-> %s", ce->name);
     return &dir->secondary_entry;
