@@ -35,7 +35,7 @@ void eq_pk_coefs(unsigned long cutoff, unsigned long Q, long db, long *c);
 void eq_ls_coefs(unsigned long cutoff, unsigned long Q, long db, long *c);
 void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, long *c);
 void eq_filter(long **x, struct eqfilter *f, unsigned num,
-               unsigned samples, unsigned shift);
+               unsigned channels, unsigned shift);
 
 #endif
 
