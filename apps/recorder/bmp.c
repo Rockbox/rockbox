@@ -344,9 +344,7 @@ int read_bmp_file(char* filename,
             } else {
                 /* RGB24 -> RGB16 */
                 for (col = 0; col < width; col++) {
-                    unsigned short rgb = (((p[2] >> 3) << 11) |
-                                          ((p[1] >> 2) << 5) |
-                                          ((p[0] >> 3)));
+                    unsigned short rgb = LCD_RGBPACK(p[2],p[1],p[0]);
                     dest[width * (height - row - 1) + col] = rgb;
                     p += 3;
                 }
