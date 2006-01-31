@@ -68,11 +68,6 @@ struct rgb_quad { /* Little endian */
   unsigned char reserved;
 } STRUCT_PACKED; 
 
-#ifdef ROCKBOX_LITTLE_ENDIAN
-#define readshort(x) *(x)
-#define readlong(x) *(x)
-#else
-
 /* big endian functions */
 static short readshort(short *value) {
     unsigned char* bytes = (unsigned char*) value;
@@ -84,8 +79,6 @@ static long readlong(long *value) {
     return (long)bytes[0] | ((long)bytes[1] << 8) |
         ((long)bytes[2] << 16) | ((long)bytes[3] << 24);
 }
-
-#endif
 
 unsigned char brightness(struct rgb_quad color)
 {

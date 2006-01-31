@@ -326,6 +326,10 @@ bool wps_data_preload_tags(struct wps_data *data, char *buf,
                         
                         if (ret > 0)
                         {
+#if LCD_DEPTH == 16
+                            if (ret % 2) ret++; 
+                            /* Always consume an even number of bytes */
+#endif
                             /* Update the image cache. */
                             if (bmp_cache_write && bmp_cache_fd >= 0)
                             {
