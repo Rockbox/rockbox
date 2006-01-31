@@ -44,7 +44,7 @@ struct regs
 #elif defined(CPU_ARM) 
 struct regs
 {
-    unsigned int r[9];   /* Registers r4-r12 */
+    unsigned int r[8];   /* Registers r4-r11 */
     void         *sp;    /* Stack pointer (r13) */
     unsigned int lr;     /* r14 (lr) */
     void         *start; /* Thread start address, or NULL when started */
@@ -93,7 +93,7 @@ void profile_thread(void) {
 static inline void store_context(void* addr)
 {
     asm volatile(
-        "stmia  %0, { r4-r14 }   \n"
+        "stmia  %0, { r4-r11, sp, lr }\n"
         : : "r" (addr)
     );
 }
@@ -105,16 +105,15 @@ static inline void store_context(void* addr)
 static inline void load_context(const void* addr)
 {
     asm volatile(
-        "ldmia  %0, { r4-r14 }   \n" /* load regs r4 to r14 from context */
-        "ldr    r0, [%0, #44]    \n" /* load start pointer */
+        "ldmia  %0, { r4-r11, sp, lr }\n" /* load regs r4 to r14 from context */
+        "ldr    r0, [%0, #40]    \n" /* load start pointer */
         "mov    r1, #0           \n"
         "cmp    r0, r1           \n" /* check for NULL */
-        "strne  r1, [%0, #44]    \n" /* if it's NULL, we're already running */
+        "strne  r1, [%0, #40]    \n" /* if it's NULL, we're already running */
         "movne  pc, r0           \n" /* not already running, so jump to start */
         : : "r" (addr) : "r0", "r1"
     );
 }
-
 
 #elif defined(CPU_COLDFIRE)
 /*--------------------------------------------------------------------------- 
