@@ -297,6 +297,51 @@ int read_bmp_file(char* filename,
 #endif
             break;
 
+
+        case 8:
+            p = bmpbuf;
+#if LCD_DEPTH > 1
+            if(format == FORMAT_MONO) {
+#endif
+                /* 8-bit RGB24 palette -> mono */
+                for (col = 0; col < width; col++) {
+                    struct rgb_quad rgb = palette[*p];
+                    ret = brightness(rgb);
+                    if (ret > 96) {
+                        bitmap[width * ((height - row - 1) / 8) + col]
+                            &= ~ 1 << ((height - row - 1) % 8);
+                    } else {
+                        bitmap[width * ((height - row - 1) / 8) + col]
+                            |= 1 << ((height - row - 1) % 8);
+                    }
+                    p++;
+                }
+#if LCD_DEPTH == 2
+            } else {
+                /* 8-bit RGB24 palette -> 2gray (iriver H1xx) */
+                for (col = 0; col < width; col++) {
+                    struct rgb_quad rgb = palette[*p];
+                    ret = brightness(rgb);
+
+                    dest[((height - row - 1)/4) * width + col] |=
+                        (~ret & 0xC0) >> (2 * (~(height - row - 1) & 3));
+                    p++;
+                }
+            }
+#elif LCD_DEPTH == 16
+            } else {
+                /* 8-bit RGB24 palette -> RGB16 */
+                for (col = 0; col < width; col++) {
+                    struct rgb_quad rgb = palette[*p];
+                    unsigned short rgb16 =
+                        LCD_RGBPACK(rgb.red, rgb.green, rgb.blue);
+                    dest[width * (height - row - 1) + col] = rgb16;
+                    p++;
+                }
+            }
+#endif
+            break;
+
         case 24:
             p = bmpbuf;
 #if LCD_DEPTH > 1
