@@ -1001,6 +1001,47 @@ bool dbg_ports(void)
         }
     }
 
+#elif CONFIG_CPU == PP5020
+
+    unsigned int gpio_a, gpio_b, gpio_c, gpio_d;
+
+    char buf[128];
+    int button;
+    int line;
+
+    lcd_setmargins(0, 0);
+    lcd_clear_display();
+    lcd_setfont(FONT_SYSFIXED);
+
+    while(1)
+    {
+        gpio_a = GPIOA_INPUT_VAL;
+        gpio_b = GPIOB_INPUT_VAL;
+        gpio_c = GPIOC_INPUT_VAL;
+        gpio_d = GPIOD_INPUT_VAL;
+
+        line = 0;
+        snprintf(buf, sizeof(buf), "IPOD version: 0x%08x", ipod_hw_rev);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPIO_A:       %02x", gpio_a);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPIO_B:       %02x", gpio_b);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPIO_C:       %02x", gpio_c);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPIO_D:       %02x", gpio_d);
+        lcd_puts(0, line++, buf);
+        
+        lcd_update();
+        button = button_get_w_tmo(HZ/10);
+
+        switch(button)
+        {
+            case SETTINGS_CANCEL:
+                return false;
+        }
+    }
+
 #endif /* CPU */
     return false;
 }
@@ -1843,6 +1884,8 @@ bool debug_menu(void)
     static const struct menu_item items[] = {
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE)
         { "Dump ROM contents", dbg_save_roms },
+#endif
+#if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || (CONFIG_CPU == PP5020)
         { "View I/O ports", dbg_ports },
 #endif
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
