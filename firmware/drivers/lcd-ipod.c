@@ -30,8 +30,6 @@
 #include "system.h"
 
 /*** definitions ***/
-#define IPOD_HW_REVISION        (*((volatile unsigned long*)0x00002084))
-
 #define IPOD_LCD_BASE           0x70008a0c
 #define IPOD_LCD_BUSY_MASK      0x80000000
 
@@ -129,7 +127,7 @@ void lcd_roll(int lines)
 void lcd_init_device(void)
 {  
 #if CONFIG_LCD == LCD_IPODCOLOR
-    if (IPOD_HW_REVISION == 0x60000) {
+    if (ipod_hw_rev == 0x60000) {
         lcd_type = 0;
     } else {
         int gpio_a01, gpio_a04;

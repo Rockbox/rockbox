@@ -1140,6 +1140,8 @@ void UIE(unsigned int pc, unsigned int num)
 extern void TIMER1(void);
 extern void ipod_4g_button_int(void);
 
+unsigned int ipod_hw_rev;
+
 void irq(void)
 {
     if (CPU_INT_STAT & TIMER1_MASK) 
@@ -1198,6 +1200,10 @@ static void ipod_set_cpu_speed(void)
 void system_init(void)
 {
 #ifndef BOOTLOADER
+    /* The hw revision is written to the last 4 bytes of SDRAM by the
+       bootloader - we save it before Rockbox overwrites it. */
+    ipod_hw_rev = (*((volatile unsigned long*)(0x01fffffc)));
+
     /* disable all irqs */
     outl(-1, 0x60001138);
     outl(-1, 0x60001128);

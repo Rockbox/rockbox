@@ -36,6 +36,8 @@ extern long cpu_frequency;
 #define outb(a,b) (*(volatile unsigned char *) (b) = (a))
 #define inw(a) (*(volatile unsigned short *) (a))
 #define outw(a,b) (*(volatile unsigned short *) (b) = (a))
+extern unsigned int ipod_hw_rev;
+
 static inline void udelay(unsigned usecs)
 {
     unsigned start = inl(0x60005010);

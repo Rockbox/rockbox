@@ -44,6 +44,10 @@
 
 #define IPOD_HW_REVISION (*((volatile unsigned long*)(0x00002084)))
 
+/* We copy the hardware revision to the last four bytes of SDRAM and then
+   re-read it after we have re-mapped SDRAM to 0x0 in Rockbox */
+#define TMP_IPOD_HW_REVISION (*((volatile unsigned long*)(0x11fffffc)))
+
 #define BUTTON_LEFT  1
 #define BUTTON_MENU  2
 #define BUTTON_RIGHT 3
@@ -334,6 +338,8 @@ void* main(void)
     outl(((0x100 | 1) << 7), 0x6000d12c);
 
 #endif
+
+    TMP_IPOD_HW_REVISION = IPOD_HW_REVISION;
 
     system_init();
     kernel_init();
