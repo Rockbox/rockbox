@@ -23,9 +23,6 @@
 
 #include "gwps.h"
 
-void wps_initialize_bmp_cache(const char *file);
-void wps_close_bmp_cache(const char *file);
-
 void gui_wps_format_time(char* buf, int buf_size, long time);
 void fade(bool fade_in);
 void gui_wps_format(struct wps_data *data);
