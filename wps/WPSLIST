@@ -64,7 +64,17 @@ Author: Christi Scarborough (after Magnus Westerlund)
 Font: rockbox_default.fnt
 Statusbar: on
 Height: 132
-Width: 160
+Width: 176
+</wps>
+
+<wps>
+Name: boxes-220x176c.wps
+rwps: boxes.wps
+Author: Christi Scarborough (after Magnus Westerlund)
+Font: rockbox_default.fnt
+Statusbar: on
+Height: 176
+Width: 220
 </wps>
 
 <wps>
