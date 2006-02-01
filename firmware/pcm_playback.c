@@ -107,70 +107,6 @@ static void dma_stop(void)
     pcm_paused = false;
 }
 
-/*
- * This function goes directly into the DMA buffer to calculate the left and
- * right peak values. To avoid missing peaks it tries to look forward two full
- * peek periods (2/HZ sec, 100% overlap), although it's always possible that
- * the entire period will not be visible. To reduce CPU load it only looks at
- * every third sample, and this can be reduced even further if needed (even
- * every tenth sample would still be pretty accurate).
- */
-
-#define PEAK_SAMPLES  (44100*2/HZ)  /* 44100 samples * 2 / 100 Hz tick */
-#define PEAK_STRIDE   3       /* every 3rd sample is plenty... */
-
-void pcm_calculate_peaks(int *left, int *right)
-{
-    long samples = (BCR0 & 0xffffff) / 4;
-    short *addr = (short *) (SAR0 & ~3);
-
-    if (samples > PEAK_SAMPLES)
-        samples = PEAK_SAMPLES;
-
-    samples /= PEAK_STRIDE;
-
-    if (left && right) {
-        int left_peak = 0, right_peak = 0, value;    
-
-        while (samples--) {
-            if ((value = addr [0]) > left_peak)
-                left_peak = value;
-            else if (-value > left_peak)
-                left_peak = -value;
-
-            if ((value = addr [PEAK_STRIDE | 1]) > right_peak)
-                right_peak = value;
-            else if (-value > right_peak)
-                right_peak = -value;
-
-            addr += PEAK_STRIDE * 2;
-        }
-
-        *left = left_peak;
-        *right = right_peak;
-    }
-    else if (left || right) {
-        int peak_value = 0, value;
-
-        if (right)
-            addr += (PEAK_STRIDE | 1);
-
-        while (samples--) {
-            if ((value = addr [0]) > peak_value)
-                peak_value = value;
-            else if (-value > peak_value)
-                peak_value = -value;
-
-            addr += PEAK_STRIDE * 2;
-        }
-
-        if (left)
-            *left = peak_value;
-        else
-            *right = peak_value;
-    }
-}
-
 /* sets frequency of input to DAC */
 void pcm_set_frequency(unsigned int frequency)
 {
@@ -510,12 +446,6 @@ bool pcm_is_playing(void)
     return pcm_playing;
 }
 
-void pcm_calculate_peaks(int *left, int *right)
-{
-    *left=0;
-    *right=0;
-}
-
 long pcm_get_bytes_waiting(void)
 {
     return size;
@@ -575,6 +505,78 @@ void pcm_calculate_peaks(int *left, int *right)
 long pcm_get_bytes_waiting(void)
 {
     return 0;
+}
+
+#endif
+
+#if CONFIG_CPU != PNX0101
+/*
+ * This function goes directly into the DMA buffer to calculate the left and
+ * right peak values. To avoid missing peaks it tries to look forward two full
+ * peek periods (2/HZ sec, 100% overlap), although it's always possible that
+ * the entire period will not be visible. To reduce CPU load it only looks at
+ * every third sample, and this can be reduced even further if needed (even
+ * every tenth sample would still be pretty accurate).
+ */
+
+#define PEAK_SAMPLES  (44100*2/HZ)  /* 44100 samples * 2 / 100 Hz tick */
+#define PEAK_STRIDE   3       /* every 3rd sample is plenty... */
+
+void pcm_calculate_peaks(int *left, int *right)
+{
+#ifdef HAVE_UDA1380
+    long samples = (BCR0 & 0xffffff) / 4;
+    short *addr = (short *) (SAR0 & ~3);
+#elif defined(HAVE_WM8975)
+    long samples = size / 4;
+    short *addr = p;
+#endif
+
+    if (samples > PEAK_SAMPLES)
+        samples = PEAK_SAMPLES;
+
+    samples /= PEAK_STRIDE;
+
+    if (left && right) {
+        int left_peak = 0, right_peak = 0, value;    
+
+        while (samples--) {
+            if ((value = addr [0]) > left_peak)
+                left_peak = value;
+            else if (-value > left_peak)
+                left_peak = -value;
+
+            if ((value = addr [PEAK_STRIDE | 1]) > right_peak)
+                right_peak = value;
+            else if (-value > right_peak)
+                right_peak = -value;
+
+            addr += PEAK_STRIDE * 2;
+        }
+
+        *left = left_peak;
+        *right = right_peak;
+    }
+    else if (left || right) {
+        int peak_value = 0, value;
+
+        if (right)
+            addr += (PEAK_STRIDE | 1);
+
+        while (samples--) {
+            if ((value = addr [0]) > peak_value)
+                peak_value = value;
+            else if (-value > peak_value)
+                peak_value = -value;
+
+            addr += PEAK_STRIDE * 2;
+        }
+
+        if (left)
+            *left = peak_value;
+        else
+            *right = peak_value;
+    }
 }
 
 #endif
