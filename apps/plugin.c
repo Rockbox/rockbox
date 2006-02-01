@@ -119,6 +119,8 @@ static const struct plugin_api rockbox_api = {
     lcd_get_background,
     lcd_bitmap_part,
     lcd_bitmap,
+    lcd_bitmap_transparent_part,
+    lcd_bitmap_transparent,
 #endif
     lcd_putsxy,
     lcd_puts_style,

@@ -72,6 +72,7 @@ extern const fb_data brickmania_sel_quit[];
 extern const fb_data brickmania_sel_resume[];
 extern const fb_data brickmania_sel_start[];
 extern const fb_data brickmania_start[];
+extern const fb_data brickmania_break[];
 
 /* normal, glue, fire */
 extern const fb_data brickmania_pads[];
@@ -93,8 +94,9 @@ extern const fb_data brickmania_bricks[];
 #define PAD_HEIGHT 5
 #define PAD_POS_Y LCD_HEIGHT - 7
 #define BRICK_HEIGHT 8
-#define BRICK_WIDTH 20
+#define BRICK_WIDTH 21
 #define BALL 5
+#define LEFTMARGIN 5
 
 #define BMPHEIGHT_help 19
 #define BMPWIDTH_help 37
@@ -458,6 +460,7 @@ typedef struct cube {
     char used;
     int color;
     int hits;
+    int hiteffect;
 } cube;
 cube brick[80];
 
@@ -505,6 +508,7 @@ void int_game(int new_game)
                 brick[i*10+j].power=rb->rand()%25; /* +8 make the game with less powerups */
                 brick[i*10+j].hits=levels[cur_level][i][j]>=10?
                                      levels[cur_level][i][j]/16-1:0;
+                brick[i*10+j].hiteffect=0;
                 brick[i*10+j].powertop=30+i*10+BRICK_HEIGHT;
                 brick[i*10+j].used=(levels[cur_level][i][j]==0?0:1);
                 brick[i*10+j].color=(levels[cur_level][i][j]>=10?
@@ -813,12 +817,12 @@ int game_loop(void){
                                 brick[i*10+j].powertop+=2;
                                 rb->lcd_bitmap_part(brickmania_powerups,0,
                                         BMPHEIGHT_powerup*brick[i*10+j].power,
-                                        BMPWIDTH_powerup,10+j*BRICK_WIDTH+5, 
+                                        BMPWIDTH_powerup,LEFTMARGIN+j*BRICK_WIDTH+5, 
                                         brick[i*10+j].powertop, 10, 6);
                             }
                         }
 
-                        if ((pad_pos_x<10+j*BRICK_WIDTH+5 && pad_pos_x+PAD_WIDTH>10+j*BRICK_WIDTH+5) && brick[i*10+j].powertop+6>=PAD_POS_Y && brick[i*10+j].poweruse==2) {
+                        if ((pad_pos_x<LEFTMARGIN+j*BRICK_WIDTH+5 && pad_pos_x+PAD_WIDTH>LEFTMARGIN+j*BRICK_WIDTH+5) && brick[i*10+j].powertop+6>=PAD_POS_Y && brick[i*10+j].poweruse==2) {
                         switch(brick[i*10+j].power) {
                             case 0:
                                 life++;
@@ -859,7 +863,7 @@ int game_loop(void){
                 if (brick[i*10+j].powertop>PAD_POS_Y)
                     brick[i*10+j].poweruse=1;
 
-                brickx=10+j*BRICK_WIDTH;
+                brickx=LEFTMARGIN+j*BRICK_WIDTH;
                 bricky=30+i*8;
                 if (pad_type==2) {
                     for (k=0;k<=30;k++) {
@@ -869,6 +873,7 @@ int game_loop(void){
                                 fire[k].top=-16;
                                 if (brick[i*10+j].hits > 0){
                                     brick[i*10+j].hits--;
+                                    brick[i*10+j].hiteffect++;
                                     score+=3;    
                                 }                     
                                 else {
@@ -881,8 +886,10 @@ int game_loop(void){
                     }
                 }
 
-                if (brick[i*10+j].used==1)
-                    rb->lcd_bitmap_part(brickmania_bricks,0,BRICK_HEIGHT*brick[i*10+j].color,BRICK_WIDTH,10+j*BRICK_WIDTH, 30+i*8, BRICK_WIDTH, BRICK_HEIGHT);
+                if (brick[i*10+j].used==1){
+                    rb->lcd_bitmap_part(brickmania_bricks,0,BRICK_HEIGHT*brick[i*10+j].color,BRICK_WIDTH,LEFTMARGIN+j*BRICK_WIDTH, 30+i*8, BRICK_WIDTH, BRICK_HEIGHT);
+                    rb->lcd_bitmap_transparent_part(brickmania_break,0,BRICK_HEIGHT*brick[i*10+j].hiteffect,BRICK_WIDTH,LEFTMARGIN+j*BRICK_WIDTH, 30+i*8, BRICK_WIDTH, BRICK_HEIGHT);
+                }
                     if (ball_pos_y <100) {
                         if (brick[i*10+j].used==1) {
                             if ((ball_pos_x+ballx+3 >= brickx && ball_pos_x+ballx+3 <= brickx+BRICK_WIDTH) && ((bricky-4<ball_pos_y+BALL && bricky>ball_pos_y+BALL) || (bricky+4>ball_pos_y+BALL+BALL && bricky<ball_pos_y+BALL+BALL)) && (bally >0)){
@@ -900,6 +907,7 @@ int game_loop(void){
                             if ((ball_pos_x+3 >= brickx && ball_pos_x+3 <= brickx+BRICK_WIDTH) && ((bricky+BRICK_HEIGHT==ball_pos_y) || (bricky+BRICK_HEIGHT-6<=ball_pos_y && bricky+BRICK_HEIGHT>ball_pos_y)) && (bally <0)) { /* bottom line */
                                 if (brick[i*10+j].hits > 0){
                                     brick[i*10+j].hits--;
+                                    brick[i*10+j].hiteffect++;
                                     score+=2;    
                                 }                   
                                 else {
@@ -912,6 +920,7 @@ int game_loop(void){
                             } else if ((ball_pos_x+3 >= brickx && ball_pos_x+3 <= brickx+BRICK_WIDTH) && ((bricky==ball_pos_y+BALL) || (bricky+6>=ball_pos_y+BALL && bricky<ball_pos_y+BALL)) && (bally >0)) { /* top line */
                                 if (brick[i*10+j].hits > 0){
                                     brick[i*10+j].hits--;
+                                    brick[i*10+j].hiteffect++;
                                     score+=2;    
                                 }                    
                                 else {
@@ -926,6 +935,7 @@ int game_loop(void){
                             if ((ball_pos_y+3 >= bricky && ball_pos_y+3 <= bricky+BRICK_HEIGHT) && ((brickx==ball_pos_x+BALL) || (brickx+6>=ball_pos_x+BALL && brickx<ball_pos_x+BALL)) && (ballx > 0)) { /* left line */
                                 if (brick[i*10+j].hits > 0){
                                     brick[i*10+j].hits--;
+                                    brick[i*10+j].hiteffect++;
                                     score+=2;    
                                 }                    
                                 else {
@@ -938,6 +948,7 @@ int game_loop(void){
                             } else if ((ball_pos_y+3 >= bricky && ball_pos_y+3 <= bricky+BRICK_HEIGHT) && ((brickx+BRICK_WIDTH==ball_pos_x) || (brickx+BRICK_WIDTH-6<=ball_pos_x && brickx+BRICK_WIDTH>ball_pos_x)) && (ballx < 0)) { /* Right line */
                                 if (brick[i*10+j].hits > 0){
                                     brick[i*10+j].hits--;
+                                    brick[i*10+j].hiteffect++;
                                     score+=2;    
                                 }                     
                                 else {

@@ -37,6 +37,7 @@ brickmania_sel_resume.220x176x16.bmp
 brickmania_sel_quit.220x176x16.bmp
 brickmania_sel_start.220x176x16.bmp
 brickmania_start.220x176x16.bmp
+brickmania_break.220x176x16.bmp
 #endif
 
 #endif /* HAVE_LCD_BITMAP */

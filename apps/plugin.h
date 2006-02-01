@@ -161,6 +161,10 @@ struct plugin_api {
                             int stride, int x, int y, int width, int height);
     void (*lcd_bitmap)(const fb_data *src, int x, int y, int width,
                        int height);
+    void (*lcd_bitmap_transparent_part)(const fb_data *src, int src_x, int src_y,
+  	                                     int stride, int x, int y, int width, int height);
+  	void (*lcd_bitmap_transparent)(const fb_data *src, int x, int y,
+  	                            int width, int height);
 #endif
     void (*lcd_putsxy)(int x, int y, const unsigned char *string);
     void (*lcd_puts_style)(int x, int y, const unsigned char *str, int style);
