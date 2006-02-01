@@ -9,3 +9,6 @@ export/*.h
 include/*.h
 include/sys/*.h
 SOURCES
+decompressor/Makefile
+decompressor/*.[chS]
+decompressor/*.lds
