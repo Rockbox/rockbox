@@ -510,6 +510,26 @@ static char* get_tag(struct wps_data* wps_data,
                     wps_data->full_line_progressbar=0;
                     return buf;
 #else
+                    char *p=strchr(tag, '|');
+                    if (p) {
+                        wps_data->progress_height=atoi(++p);
+                        p=strchr(p, '|');
+                        if (p) {        
+                            wps_data->progress_start=atoi(++p);
+                            p=strchr(p, '|');
+                            if (p)
+                                wps_data->progress_end=atoi(++p);   
+                            else 
+                                wps_data->progress_end=NULL;
+                        }else {
+                             wps_data->progress_start=0;
+                             wps_data->progress_end=NULL;
+                        }     
+                    }else {
+                        wps_data->progress_height=6;
+                        wps_data->progress_start=0;
+                        wps_data->progress_end=NULL; 
+                    }
                     return "\x01";
 #endif
                 case 'f':  /* full-line progress bar */
@@ -1449,9 +1469,12 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
             /* progress */
             if (flags & refresh_mode & WPS_REFRESH_PLAYER_PROGRESS) 
             {
-#define PROGRESS_BAR_HEIGHT 6 /* this should probably be defined elsewhere; config-*.h perhaps? */
                 int sby = i*h + offset + (h > 7 ? (h - 6) / 2 : 1);
-                gui_scrollbar_draw(display, 0, sby, display->width,
+#define PROGRESS_BAR_HEIGHT gwps->data->progress_height /* this should probably be defined elsewhere; config-*.h perhaps? */
+                if (!gwps->data->progress_end) 
+                            gwps->data->progress_end=gwps->display->width;
+                gui_scrollbar_draw(display, gwps->data->progress_start, sby, 
+                                    gwps->data->progress_end-gwps->data->progress_start,
                                     PROGRESS_BAR_HEIGHT,
                                     state->id3->length?state->id3->length:1, 0,
                                     state->id3->length?state->id3->elapsed + state->ff_rewind_count:0,

@@ -309,6 +309,9 @@ struct wps_data
     unsigned short time_mult[WPS_MAX_LINES][WPS_MAX_SUBLINES];
     long subline_expire_time[WPS_MAX_LINES];
     int curr_subline[WPS_MAX_LINES];
+    int progress_height;
+    int progress_start;
+    int progress_end; 
     bool wps_loaded;
     bool peak_meter_enabled;
 };
