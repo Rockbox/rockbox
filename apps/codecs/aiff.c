@@ -56,10 +56,10 @@ enum codec_status codec_start(struct codec_api* api)
 {
   struct codec_api* ci;
   uint32_t numbytes, bytesdone;
-  uint16_t numChannels = 0;
-  uint32_t numSampleFrames = 0;
-  uint16_t sampleSize = 0;
-  uint32_t sampleRate = 0;
+  uint16_t num_channels = 0;
+  uint32_t num_sample_frames = 0;
+  uint16_t sample_size = 0;
+  uint32_t sample_rate = 0;
   uint32_t i;
   size_t n, aifbufsize;
   int endofstream;
@@ -67,7 +67,7 @@ enum codec_status codec_start(struct codec_api* api)
   uint16_t* aifbuf;
   long chunksize;
   uint32_t offset2snd = 0;
-  uint16_t blockSize  = 0;
+  uint16_t block_size  = 0;
   uint32_t avgbytespersec = 0;
   off_t firstblockposn;     /* position of the first block in file */
   int shortorlong = 1;      /* do we output shorts (1) or longs (2)? */
@@ -122,35 +122,35 @@ enum codec_status codec_start(struct codec_api* api)
               i = CODEC_ERROR;
               goto exit;
           }
-          /* numChannels */
-          numChannels = ((buf[8]<<8)|buf[9]);
-          /* numSampleFrames */
-          numSampleFrames = ((buf[10]<<24)|(buf[11]<<16)|(buf[12]<<8)|buf[13]);
-          /* sampleSize */
-          sampleSize  = ((buf[14]<<8)|buf[15]);
-          /* sampleRate (don't use last 4 bytes, only integer fs) */
+          /* num_channels */
+          num_channels = ((buf[8]<<8)|buf[9]);
+          /* num_sample_frames */
+          num_sample_frames = ((buf[10]<<24)|(buf[11]<<16)|(buf[12]<<8)|buf[13]);
+          /* sample_size */
+          sample_size  = ((buf[14]<<8)|buf[15]);
+          /* sample_rate (don't use last 4 bytes, only integer fs) */
           if (buf[16] != 0x40) {
               DEBUGF("CODEC_ERROR: wierd sampling rate (no @)\n",i);
               i = CODEC_ERROR;
               goto exit;
           }
-          sampleRate = ((buf[18]<<24)|(buf[19]<<16)|(buf[20]<<8)|buf[21])+1;
-          sampleRate = sampleRate >> (16+14-buf[17]);
+          sample_rate = ((buf[18]<<24)|(buf[19]<<16)|(buf[20]<<8)|buf[21])+1;
+          sample_rate = sample_rate >> (16+14-buf[17]);
           /* calc average bytes per second */
-          avgbytespersec = sampleRate*numChannels*sampleSize/8;
+          avgbytespersec = sample_rate*num_channels*sample_size/8;
       }
       else if (memcmp(buf,"SSND",4)==0) {
-          if (sampleSize == 0) {
+          if (sample_size == 0) {
               DEBUGF("CODEC_ERROR: unsupported chunk order\n");
               i = CODEC_ERROR;
               goto exit;
           }
           /* offset2snd */
           offset2snd = ((buf[8]<<8)|buf[9]);
-          /* blockSize */
-          blockSize = ((buf[10]<<8)|buf[11]);
-          if (blockSize == 0)
-              blockSize = numChannels*sampleSize;
+          /* block_size */
+          block_size = ((buf[10]<<8)|buf[11]);
+          if (block_size == 0)
+              block_size = num_channels*sample_size;
           numbytes = i-8-offset2snd;
           i = 8+offset2snd; /* advance to the beginning of data */
       }
@@ -170,7 +170,7 @@ enum codec_status codec_start(struct codec_api* api)
       n -= i+8;
   } /* while 'SSND' */
 
-  if (numChannels == 0) {
+  if (num_channels == 0) {
       DEBUGF("CODEC_ERROR: 'COMM' chunk not found or 0-channels file\n");
       i = CODEC_ERROR;
       goto exit;
@@ -180,7 +180,7 @@ enum codec_status codec_start(struct codec_api* api)
       i = CODEC_ERROR;
       goto exit;
   }
-  if (sampleSize > 24) {
+  if (sample_size > 24) {
       DEBUGF("CODEC_ERROR: PCM with more than 24 bits per sample "
              "is unsupported\n");
       i = CODEC_ERROR;
@@ -190,7 +190,7 @@ enum codec_status codec_start(struct codec_api* api)
   ci->configure(CODEC_DSP_ENABLE, (bool *)true);
   ci->configure(DSP_SET_FREQUENCY, (long *)(ci->id3->frequency));
 
-  if (sampleSize <= 16) {
+  if (sample_size <= 16) {
       ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(16));
   } else {
       shortorlong = 2;
@@ -200,9 +200,9 @@ enum codec_status codec_start(struct codec_api* api)
       ci->configure(DSP_SET_CLIP_MIN, (long *) (-2147483647-1));
   }
 
-  if (numChannels == 2) {
+  if (num_channels == 2) {
       ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_INTERLEAVED);
-  } else if (numChannels == 1) {
+  } else if (num_channels == 1) {
       ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_MONO);
   } else {
       DEBUGF("CODEC_ERROR: more than 2 channels unsupported\n");
@@ -221,14 +221,14 @@ enum codec_status codec_start(struct codec_api* api)
   /* chunksize is computed so that one chunk is about 1/50s.
    * this make 4096 for 44.1kHz 16bits stereo.
    * It also has to be a multiple of blockalign */
-  chunksize = (1 + avgbytespersec / (50*blockSize)) * blockSize;
+  chunksize = (1 + avgbytespersec / (50*block_size)) * block_size;
   /* check that the output buffer is big enough (convert to samplespersec,
-     then round to the blockSize multiple below) */
-  if (((uint64_t)chunksize*ci->id3->frequency*numChannels*shortorlong)
+     then round to the block_size multiple below) */
+  if (((uint64_t)chunksize*ci->id3->frequency*num_channels*shortorlong)
       / (uint64_t)avgbytespersec >= AIF_CHUNK_SIZE) {
       chunksize = ((uint64_t)AIF_CHUNK_SIZE * avgbytespersec
-                   / ((uint64_t)ci->id3->frequency * numChannels * shortorlong 
-                      * blockSize)) * blockSize;
+                   / ((uint64_t)ci->id3->frequency * num_channels * shortorlong 
+                      * block_size)) * block_size;
   }
 
   while (!endofstream) {
@@ -245,7 +245,7 @@ enum codec_status codec_start(struct codec_api* api)
         /* use avgbytespersec to round to the closest blockalign multiple,
            add firstblockposn. 64-bit casts to avoid overflows. */
         newpos = (((uint64_t)avgbytespersec * (ci->seek_time - 1))
-                  / (1000LL*blockSize)) * blockSize;
+                  / (1000LL*block_size)) * block_size;
         if (newpos > numbytes)
             break;
         if (ci->seek_buffer(firstblockposn + newpos)) {
@@ -266,19 +266,19 @@ enum codec_status codec_start(struct codec_api* api)
 
     aifbufsize = sizeof(int16_samples);
 
-    if (sampleSize > 24) {
+    if (sample_size > 24) {
         for (i=0;i<n;i+=4) {
             int32_samples[i/4]=(int32_t)((aifbuf8[i]<<24)|
                           (aifbuf8[i+1]<<16)|(aifbuf8[i+2]<<8)|aifbuf8[i+3]);
         }
         aifbufsize = n;
-    } else if (sampleSize > 16) {
+    } else if (sample_size > 16) {
         for (i=0;i<n;i+=3) {
             int32_samples[i/3]=(int32_t)((aifbuf8[i]<<24)|
                        (aifbuf8[i+1]<<16)|(aifbuf8[i+2]<<8));
         }
         aifbufsize = n*4/3;
-    } else if (sampleSize > 8) {
+    } else if (sample_size > 8) {
         /* copy data. */
         for (i=0;i<n;i+=2) {
             int16_samples[i/2]=(int16_t)((aifbuf8[i]<<8)|aifbuf8[i+1]);
@@ -311,4 +311,3 @@ enum codec_status codec_start(struct codec_api* api)
 exit:
   return i;
 }
-
