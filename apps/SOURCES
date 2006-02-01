@@ -79,5 +79,7 @@ dsp.c
 eq.c	 	
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)	 	
 eq_cf.S	 	
+#elif defined(CPU_ARM) && !defined(SIMULATOR)
+eq_arm.S
 #endif
 #endif

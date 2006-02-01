@@ -213,7 +213,7 @@ void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, long *c)
     c[4] = DIV64(-a2, a0, 24);
 }
 
-#if !defined(CPU_COLDFIRE) || defined(SIMULATOR)
+#if (!defined(CPU_COLDFIRE) && !defined(CPU_ARM)) || defined(SIMULATOR)
 void eq_filter(long **x, struct eqfilter *f, unsigned num,
                unsigned channels, unsigned shift)
 {
