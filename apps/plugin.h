@@ -97,7 +97,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 4
+#define PLUGIN_API_VERSION 5
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -161,10 +161,6 @@ struct plugin_api {
                             int stride, int x, int y, int width, int height);
     void (*lcd_bitmap)(const fb_data *src, int x, int y, int width,
                        int height);
-    void (*lcd_bitmap_transparent_part)(const fb_data *src, int src_x, int src_y,
-  	                                     int stride, int x, int y, int width, int height);
-  	void (*lcd_bitmap_transparent)(const fb_data *src, int x, int y,
-  	                            int width, int height);
 #endif
     void (*lcd_putsxy)(int x, int y, const unsigned char *string);
     void (*lcd_puts_style)(int x, int y, const unsigned char *str, int style);
@@ -449,6 +445,12 @@ struct plugin_api {
     void (*queue_post)(struct event_queue *q, long id, void *data);
     void (*queue_wait_w_tmo)(struct event_queue *q, struct event *ev, int ticks);
     void (*usb_acknowledge)(long id);
+#if LCD_DEPTH == 16
+    void (*lcd_bitmap_transparent_part)(const fb_data *src, int src_x, int src_y,
+  	                                     int stride, int x, int y, int width, int height);
+  	void (*lcd_bitmap_transparent)(const fb_data *src, int x, int y,
+  	                            int width, int height);
+#endif
 };
 
 /* plugin header */
