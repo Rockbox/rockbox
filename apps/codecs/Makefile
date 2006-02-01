@@ -63,6 +63,7 @@ $(OBJDIR)/wavpack.elf: $(OBJDIR)/wavpack.o $(CODECDEPS) $(BUILDDIR)/libwavpack.a
 $(OBJDIR)/alac.elf: $(OBJDIR)/alac.o $(CODECDEPS) $(BUILDDIR)/libalac.a $(BUILDDIR)/libm4a.a
 $(OBJDIR)/aac.elf: $(OBJDIR)/aac.o $(CODECDEPS) $(BUILDDIR)/libfaad.a $(BUILDDIR)/libm4a.a
 $(OBJDIR)/shorten.elf: $(OBJDIR)/shorten.o $(CODECDEPS) $(BUILDDIR)/libffmpegFLAC.a
+$(OBJDIR)/aiff.elf: $(OBJDIR)/aiff.o $(CODECDEPS)
 
 $(OBJDIR)/%.elf: $(OBJDIR)/%.o $(CODECDEPS)
 	$(ELFIT)

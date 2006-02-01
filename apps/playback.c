@@ -81,6 +81,7 @@ static volatile bool paused;
 #define CODEC_ALAC     "/.rockbox/codecs/alac.codec"
 #define CODEC_AAC      "/.rockbox/codecs/aac.codec"
 #define CODEC_SHN      "/.rockbox/codecs/shorten.codec"
+#define CODEC_AIFF     "/.rockbox/codecs/aiff.codec"
 
 #define AUDIO_DEFAULT_FIRST_LIMIT    (1024*1024*10)
 #define AUDIO_FILL_CYCLE             (1024*256)
@@ -949,6 +950,10 @@ static bool loadcodec(bool start_play)
     case AFMT_SHN:
         logf("Codec: SHN");
         codec_path = CODEC_SHN;
+        break;
+    case AFMT_AIFF:
+        logf("Codec: PCM AIFF");
+        codec_path = CODEC_AIFF;
         break;
     default:
         logf("Codec: Unsupported");

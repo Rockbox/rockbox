@@ -41,6 +41,7 @@ enum {
     AFMT_ALAC,         /* Apple Lossless Audio Codec */
     AFMT_AAC,          /* Advanced Audio Coding (AAC) in M4A container */
     AFMT_SHN,          /* Shorten */
+    AFMT_AIFF,         /* Audio Interchange File Format */
 
     /* New formats must be added to the end of this list */
 

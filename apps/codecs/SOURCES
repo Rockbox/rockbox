@@ -11,4 +11,5 @@ alac.c
 aac.c
 #endif
 shorten.c
+aiff.c
 #endif

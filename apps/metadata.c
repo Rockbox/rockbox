@@ -78,6 +78,8 @@ static const struct format_list formats[] =
     { AFMT_ALAC,          "m4a"  },
     { AFMT_AAC,           "mp4"  },
     { AFMT_SHN,           "shn"  },
+    { AFMT_AIFF,          "aif"  },
+    { AFMT_AIFF,          "aiff" },
 };
 
 static const unsigned short a52_bitrates[] =
@@ -894,7 +896,6 @@ static bool get_wave_metadata(int fd, struct mp3entry* id3)
 }
 
 
-
 static bool get_m4a_metadata(int fd, struct mp3entry* id3)
 {
   unsigned char* buf;
@@ -1245,6 +1246,76 @@ static bool get_musepack_metadata(int fd, struct mp3entry *id3)
     return true;
 }
 
+static bool get_aiff_metadata(int fd, struct mp3entry* id3)
+{
+    /* Use the trackname part of the id3 structure as a temporary buffer */
+    unsigned char* buf = id3->path;
+    unsigned long numChannels = 0;
+    unsigned long numSampleFrames = 0;
+    unsigned long sampleSize = 0;
+    unsigned long sampleRate = 0;
+    unsigned long numbytes = 0;
+    int read_bytes;
+    int i;
+
+    if ((lseek(fd, 0, SEEK_SET) < 0) 
+        || ((read_bytes = read(fd, buf, sizeof(id3->path))) < 44))
+    {
+        return false;
+    }
+    
+    if ((memcmp(buf, "FORM",4) != 0)
+        || (memcmp(&buf[8], "AIFF", 4) !=0 ))
+    {
+        return false;
+    }
+
+    buf += 12;
+    read_bytes -= 12;
+
+    while ((numbytes == 0) && (read_bytes >= 8)) 
+    {
+        /* chunkSize */
+        i = ((buf[4]<<24)|(buf[5]<<16)|(buf[6]<<8)|buf[7]);
+        
+        if (memcmp(buf, "COMM", 4) == 0)
+        {
+            /* numChannels */
+            numChannels = ((buf[8]<<8)|buf[9]);
+            /* numSampleFrames */
+            numSampleFrames =((buf[10]<<24)|(buf[11]<<16)|(buf[12]<<8)|buf[13]);
+            /* sampleSize */
+            sampleSize = ((buf[14]<<8)|buf[15]);
+            /* sampleRate */
+            sampleRate = ((buf[18]<<24)|(buf[19]<<16)|(buf[20]<<8)|buf[21]);
+            sampleRate = sampleRate >> (16+14-buf[17]);
+            /* save format infos */
+            id3->bitrate = (sampleSize * numChannels * sampleRate) / 1000;
+            id3->frequency = sampleRate;
+            id3->length = (numSampleFrames / id3->frequency) * 1000;
+            id3->vbr = false;   /* AIFF files are CBR */
+            id3->filesize = filesize(fd);
+        }
+        else if (memcmp(buf, "SSND", 4) == 0) 
+        {
+            numbytes = i - 8;
+        }
+
+        if (i & 0x01)
+        {
+            i++;  /* odd chunk sizes must be padded */
+        }
+        buf += i + 8;
+        read_bytes -= i + 8;
+    }
+
+    if ((numbytes == 0) || (numChannels == 0)) 
+    {
+        return false;
+    }
+    return true;
+}
+
 /* Simple file type probing by looking at the filename extension. */
 static unsigned int probe_file_format(const char *filename)
 {
@@ -1446,6 +1517,14 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
             return false;
         }
         /* TODO: read the id3v2 header if it exists */
+        break;
+
+    case AFMT_AIFF:
+        if (!get_aiff_metadata(fd, &(track->id3)))
+        {
+            return false;
+        }
+
         break;
 
     default:

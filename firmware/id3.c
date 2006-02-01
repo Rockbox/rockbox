@@ -102,6 +102,7 @@ static const char* const codec_labels[] = {
   "ALAC", /* Apple Lossless Audio Codec */
   "AAC",  /* Advanced Audio Coding in M4A container */
   "SHN",  /* Shorten */
+  "AIFF", /* Audio Interchange File Format */
 #endif
 };
 
