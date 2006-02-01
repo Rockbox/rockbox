@@ -24,6 +24,7 @@ eq_filter:
     movem.l %d2-%d7/%a2-%a6, (%sp)    | save clobbered regs
     move.l (11*4+8, %sp), %a5         | fetch filter structure address
     movem.l (11*4+16, %sp), %d6-%d7   | load num. channels and shift count
+    subq.l #1, %d7                    | EMAC gives us one free shift
     movem.l (%a5), %a0-%a4            | load coefs
     lea.l (5*4, %a5), %a5             | point to filter history
 

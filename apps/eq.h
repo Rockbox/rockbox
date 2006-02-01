@@ -23,8 +23,8 @@
 /* These depend on the fixed point formats used by the different filter types
    and need to be changed when they change.
  */
-#define EQ_PEAK_SHIFT 3
-#define EQ_SHELF_SHIFT 7
+#define EQ_PEAK_SHIFT 4
+#define EQ_SHELF_SHIFT 8
 
 struct eqfilter {
     long coefs[5];        /* Order is b0, b1, b2, a1, a2 */
