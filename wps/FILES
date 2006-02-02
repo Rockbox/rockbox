@@ -1,0 +1,12 @@
+WPSLIST
+*.wps
+*.rwps
+wpsbuild.pl
+ipodVOL/*.bmp
+boxes/*.bmp
+marquee/*.bmp
+DancePuffDuo/*.bmp
+boxes-176x132c/*.bmp
+engineeer2/*.bmp
+iAmp/*.bmp
+zezayer/*.bmp
