@@ -56,13 +56,6 @@ recorder/icons.c
 recorder/keyboard.c
 recorder/peakmeter.c
 recorder/widgets.c
-#if defined(IRIVER_H300_SERIES) || defined(APPLE_IPODVIDEO)
-recorder/logo-h300.c
-#elif defined(APPLE_IPODCOLOR)
-recorder/logo-ipod.c
-#elif defined(APPLE_IPODNANO)
-recorder/logo-nano.c
-#endif
 #endif
 #ifdef CONFIG_TUNER
 recorder/radio.c
