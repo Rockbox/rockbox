@@ -37,6 +37,7 @@
 #define WPS_DIR ROCKBOX_DIR "/wps"
 #define THEME_DIR ROCKBOX_DIR "/themes"
 #define PLUGIN_DIR ROCKBOX_DIR"/rocks"
+#define BACKDROP_DIR ROCKBOX_DIR"/backdrops"
 #define REC_BASE_DIR "/recordings"
 
 #define MAX_FILENAME 20
@@ -406,6 +407,9 @@ struct user_settings
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS 
     int brightness;         /* iriver h300: backlight PWM value: 2..15
                                 (0 and 1 are black) */
+#endif
+#ifdef HAVE_LCD_COLOR
+    unsigned char backdrop_file[MAX_FILENAME+1];  /* backdrop bitmap file */
 #endif
 };
 

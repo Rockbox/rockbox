@@ -56,6 +56,9 @@ recorder/icons.c
 recorder/keyboard.c
 recorder/peakmeter.c
 recorder/widgets.c
+#ifdef HAVE_LCD_COLOR
+recorder/backdrop.c
+#endif
 #endif
 #ifdef CONFIG_TUNER
 recorder/radio.c

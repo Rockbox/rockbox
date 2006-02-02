@@ -72,6 +72,7 @@
 #include "statusbar.h"
 #include "splash.h"
 #include "list.h"
+#include "backdrop.h"
 
 #if CONFIG_CODEC == MAS3507D
 void dac_line_in(bool enable);
@@ -149,7 +150,10 @@ Rest of config block, only saved to disk:
 0xB8  (char[20]) WPS file
 0xCC  (char[20]) Lang file
 0xE0  (char[20]) Font file
-0xF4-0xFF  <unused>
+...   (char[20]) RWPS file (on targets supporting a Remote WPS)
+...   (char[20]) Main backdrop file (on color LCD targets)
+
+... to 0x200  <unused>
 
 *************************************/
 
@@ -771,6 +775,8 @@ void settings_calc_config_sector(void)
  */
 int settings_save( void )
 {
+    int i;
+
     {
         int elapsed_secs;
 
@@ -786,15 +792,25 @@ int settings_save( void )
     save_bit_table(rtc_bits, sizeof(rtc_bits)/sizeof(rtc_bits[0]), 4*8);
     save_bit_table(hd_bits, sizeof(hd_bits)/sizeof(hd_bits[0]), RTC_BLOCK_SIZE*8);
 
-    strncpy((char *)&config_block[0xb8], (char *)global_settings.wps_file,
+    i = 0xb8;
+    strncpy((char *)&config_block[i], (char *)global_settings.wps_file,
             MAX_FILENAME);
-    strncpy((char *)&config_block[0xcc], (char *)global_settings.lang_file,
+    i+= MAX_FILENAME;
+    strncpy((char *)&config_block[i], (char *)global_settings.lang_file,
             MAX_FILENAME);
-    strncpy((char *)&config_block[0xe0], (char *)global_settings.font_file,
+    i+= MAX_FILENAME;
+    strncpy((char *)&config_block[i], (char *)global_settings.font_file,
             MAX_FILENAME);
+    i+= MAX_FILENAME;
 #ifdef HAVE_REMOTE_LCD
-    strncpy((char *)&config_block[0xf4], (char *)global_settings.rwps_file,
+    strncpy((char *)&config_block[i], (char *)global_settings.rwps_file,
             MAX_FILENAME);
+    i+= MAX_FILENAME;
+#endif
+#ifdef HAVE_LCD_COLOR
+    strncpy((char *)&config_block[i], (char *)global_settings.backdrop_file,
+            MAX_FILENAME);
+    i+= MAX_FILENAME;
 #endif
 
     if(save_config_buffer())
@@ -945,6 +961,18 @@ void settings_apply(void)
     else
         wps_data_init(gui_wps[0].data);
 
+#ifdef HAVE_LCD_COLOR
+    if ( global_settings.backdrop_file[0] &&
+         global_settings.backdrop_file[0] != 0xff ) {
+        snprintf(buf, sizeof buf, BACKDROP_DIR "/%s.bmp",
+                 global_settings.backdrop_file);
+
+        load_main_backdrop(buf);
+    } else {
+        lcd_set_backdrop(NULL);
+    }
+#endif
+
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
     if ( global_settings.rwps_file[0] &&
          global_settings.rwps_file[0] != 0xff ) {
@@ -1056,6 +1084,7 @@ static void load_bit_table(const struct bit_entry* p_table, int count, int bitst
  */
 void settings_load(int which)
 {
+    int i;
     DEBUGF( "reload_all_settings()\n" );
 
     /* load the buffer from the RTC (resets it to all-unused if the block
@@ -1076,15 +1105,25 @@ void settings_load(int which)
         if ( global_settings.contrast < MIN_CONTRAST_SETTING )
             global_settings.contrast = lcd_default_contrast();
 
-        strncpy((char *)global_settings.wps_file, (char *)&config_block[0xb8],
+        i = 0xb8;
+        strncpy((char *)global_settings.wps_file, (char *)&config_block[i],
                 MAX_FILENAME);
-        strncpy((char *)global_settings.lang_file, (char *)&config_block[0xcc],
+        i+= MAX_FILENAME;
+        strncpy((char *)global_settings.lang_file, (char *)&config_block[i],
                 MAX_FILENAME);
-        strncpy((char *)global_settings.font_file, (char *)&config_block[0xe0],
+        i+= MAX_FILENAME;
+        strncpy((char *)global_settings.font_file, (char *)&config_block[i],
                 MAX_FILENAME);
+        i+= MAX_FILENAME;
 #ifdef HAVE_REMOTE_LCD
-        strncpy((char *)global_settings.rwps_file, (char *)&config_block[0xf4],
+        strncpy((char *)global_settings.rwps_file, (char *)&config_block[i],
                 MAX_FILENAME);
+        i+= MAX_FILENAME;
+#endif
+#ifdef HAVE_LCD_COLOR
+        strncpy((char *)global_settings.backdrop_file, (char *)&config_block[i],
+                MAX_FILENAME);
+        i+= MAX_FILENAME;
 #endif
     }
 }
@@ -1246,6 +1285,13 @@ bool settings_load_config(const char* file)
                 set_file(value, (char *)global_settings.font_file, MAX_FILENAME);
         }
 #endif
+#ifdef HAVE_LCD_COLOR
+        else if (!strcasecmp(name, "backdrop")) {
+            if (load_main_backdrop(value))
+                set_file(value, (char *)global_settings.backdrop_file, MAX_FILENAME);
+        }
+#endif
+
 
         /* check for scalar values, using the two tables */
         pos = load_cfg_table(table[last_table], ta_size[last_table],
@@ -1388,6 +1434,12 @@ bool settings_save_config(void)
                  global_settings.font_file);
 #endif
 
+#ifdef HAVE_LCD_COLOR
+    if (global_settings.backdrop_file[0] != 0)
+        fdprintf(fd, "backdrop: %s/%s.bmp\r\n", BACKDROP_DIR,
+                 global_settings.backdrop_file);
+#endif
+
     /* here's the action: write values to file, specified via table */
     save_cfg_table(rtc_bits, sizeof(rtc_bits)/sizeof(rtc_bits[0]), fd);
     save_cfg_table(hd_bits, sizeof(hd_bits)/sizeof(hd_bits[0]), fd);
@@ -1465,6 +1517,9 @@ void settings_reset(void) {
 #endif
     global_settings.font_file[0] = '\0';
     global_settings.lang_file[0] = '\0';
+#ifdef HAVE_LCD_COLOR
+    global_settings.backdrop_file[0] = '\0';
+#endif
 
 }
 

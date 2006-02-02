@@ -90,6 +90,7 @@ sub buildzip {
     mkdir ".rockbox/codepages", 0777;
     mkdir ".rockbox/wps", 0777;
     mkdir ".rockbox/themes", 0777;
+    mkdir ".rockbox/backdrops", 0777;
 
     my $c = 'find apps -name "*.codec" ! -empty -exec cp {} .rockbox/codecs/ \;';
     print `$c`;

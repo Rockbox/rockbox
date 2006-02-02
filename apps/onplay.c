@@ -49,6 +49,7 @@
 #include "action.h"
 #include "splash.h"
 #include "yesno.h"
+#include "backdrop.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
@@ -440,6 +441,31 @@ static bool delete_dir(void)
     return delete_handler(true);
 }
 
+#ifdef HAVE_LCD_COLOR
+static bool set_backdrop(void)
+{
+    struct bitmap bm;
+    int ret;
+
+    /* load the image */
+    bm.data=(char*)&main_backdrop[0][0];
+    ret = read_bmp_file(selected_file, &bm,
+                        sizeof(main_backdrop), FORMAT_NATIVE);
+
+    if ((ret > 0) && (bm.width == LCD_WIDTH) 
+                  && (bm.height == LCD_HEIGHT)) {
+        lcd_set_backdrop(&main_backdrop[0][0]);
+        gui_syncsplash(HZ, true, str(LANG_BACKDROP_LOADED));
+        set_file(selected_file, (char *)global_settings.backdrop_file, MAX_FILENAME);
+        return true;
+    } else {
+        lcd_set_backdrop(NULL);
+        gui_syncsplash(HZ, true, str(LANG_BACKDROP_FAILED));
+        return false;
+    }
+}
+#endif
+
 static bool rename_file(void)
 {
     char newname[MAX_PATH];
@@ -512,6 +538,7 @@ int onplay(char* file, int attr, int from)
 {
     struct menu_item items[8]; /* increase this if you add entries! */
     int m, i=0, result;
+    char *suffix;
 
     onplay_result = ONPLAY_OK;
     context=from;
@@ -573,6 +600,17 @@ int onplay(char* file, int attr, int from)
                 items[i].desc = ID2P(LANG_DELETE);
                 items[i].function = delete_file;
                 i++;
+
+#if HAVE_LCD_COLOR
+                suffix = strrchr(file, '.');
+                if (suffix) {
+                    if (strcasecmp(suffix, ".bmp") == 0) {
+                        items[i].desc = ID2P(LANG_SET_AS_BACKDROP);
+                        items[i].function = set_backdrop;
+                        i++;
+                    }
+                }
+#endif
             }
             else
             {

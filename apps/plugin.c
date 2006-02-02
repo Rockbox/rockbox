@@ -396,6 +396,9 @@ int plugin_load(const char* plugin, void* parameter)
 #ifdef HAVE_LCD_BITMAP
     int xm, ym;
 #endif
+#ifdef HAVE_LCD_COLOR
+    fb_data* old_backdrop;
+#endif
 
     if (pfn_tsr_exit != NULL) /* if we have a resident old plugin: */
     {
@@ -404,6 +407,10 @@ int plugin_load(const char* plugin, void* parameter)
         plugin_loaded = false;
     }
 
+#ifdef HAVE_LCD_COLOR
+    old_backdrop = lcd_get_backdrop();
+    lcd_set_backdrop(NULL);
+#endif
     lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
     xm = lcd_getxmargin();
@@ -481,6 +488,9 @@ int plugin_load(const char* plugin, void* parameter)
     /* restore margins */
     lcd_setmargins(xm,ym);
 #endif /* HAVE_LCD_BITMAP */
+#ifdef HAVE_LCD_COLOR
+    lcd_set_backdrop(old_backdrop);
+#endif
     
     if (pfn_tsr_exit == NULL)
         plugin_loaded = false;

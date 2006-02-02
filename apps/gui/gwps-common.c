@@ -28,6 +28,7 @@
 #include "power.h"
 #include "powermgmt.h"
 #include "sound.h"
+#include "debug.h"
 #ifdef HAVE_LCD_CHARCELLS
 #include "hwcompat.h"
 #endif
@@ -36,10 +37,11 @@
 #include "backlight.h"
 #include "lang.h"
 #include "misc.h"
-
+#include "backdrop.h"
 #include "splash.h"
 #include "scrollbar.h"
 #include "led.h"
+#include "lcd.h"
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
 /* Image stuff */
@@ -56,6 +58,10 @@ static void draw_player_fullbar(struct gui_wps *gwps,
 #define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
                                 /* 3% of 30min file == 54s step size */
 #define MIN_FF_REWIND_STEP 500
+
+#ifdef HAVE_LCD_COLOR
+extern bool wps_has_backdrop;
+#endif
 
 /* Skip leading UTF-8 BOM, if present. */
 static char* skip_utf8_bom(char* buf)
@@ -88,6 +94,7 @@ static int get_image_id(int c)
 /*
  * parse the given buffer for following static tags:
  * %x    -   load image for always display
+ * %X    -   load backdrop image
  * %xl   -   preload image
  * %we   -   enable statusbar on wps regardless of the global setting
  * %wd   -   disable statusbar on wps regardless of the global setting
@@ -133,7 +140,54 @@ bool wps_data_preload_tags(struct wps_data *data, char *buf,
                 return true;
             }
         break;
-        
+
+#ifdef HAVE_LCD_COLOR
+        case 'X':
+            /* Backdrop image - must be the same size as the LCD */
+        {
+            int ret = 0;
+            struct bitmap bm;
+            char *ptr = buf+2;
+            char *pos = NULL;
+            char imgname[MAX_PATH];
+
+            /* format: %X|filename.bmp| */
+            {
+                /* get filename */
+                pos = strchr(ptr, '|');
+                if ((pos - ptr) <
+                    (int)sizeof(imgname)-ROCKBOX_DIR_LEN-2)
+                {
+                    memcpy(imgname, bmpdir, bmpdirlen);
+                    imgname[bmpdirlen] = '/';
+                    memcpy(&imgname[bmpdirlen+1],
+                           ptr, pos - ptr);
+                    imgname[bmpdirlen+1+pos-ptr] = 0;
+                }
+                else
+                    /* filename too long */
+                    imgname[0] = 0;
+
+                ptr = pos+1;
+
+                /* load the image */
+                bm.data=(char*)&wps_backdrop[0][0];
+                ret = read_bmp_file(imgname, &bm,
+                                    sizeof(wps_backdrop), FORMAT_NATIVE);
+
+                if ((ret > 0) && (bm.width == LCD_WIDTH) 
+                              && (bm.height == LCD_HEIGHT)) {
+                    wps_has_backdrop=true;
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        break;
+#endif
+
         case 'x':
             /* Preload images so the %xd# tag can display it */
         {

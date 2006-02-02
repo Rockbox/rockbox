@@ -265,6 +265,10 @@ extern void     lcd_set_background(unsigned background);
 extern unsigned lcd_get_background(void);
 extern void     lcd_set_drawinfo(int mode, unsigned foreground,
                                  unsigned background);
+#ifdef HAVE_LCD_COLOR
+void lcd_set_backdrop(fb_data* backdrop);
+fb_data* lcd_get_backdrop(void);
+#endif
 
 extern void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
                             int stride, int x, int y, int width, int height);

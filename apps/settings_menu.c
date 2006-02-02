@@ -300,7 +300,19 @@ static bool invert_cursor(void)
                             STR(LANG_INVERT_CURSOR_POINTER),
                             NULL);
 }
- 
+
+#ifdef HAVE_LCD_COLOR 
+/**
+ * Menu to clear the backdrop image
+ */
+static bool clear_main_backdrop(void)
+{
+    global_settings.backdrop_file[0]=0;
+    lcd_set_backdrop(NULL);
+    return true;
+}
+#endif
+
 /**
  * Menu to configure the battery display on status bar
  */
@@ -1562,6 +1574,9 @@ static bool lcd_settings_menu(void)
         { ID2P(LANG_INVERT),          invert },
         { ID2P(LANG_FLIP_DISPLAY),    flip_display },
         { ID2P(LANG_INVERT_CURSOR),   invert_cursor },
+#endif
+#ifdef HAVE_LCD_COLOR
+        { ID2P(LANG_CLEAR_BACKDROP),   clear_main_backdrop },
 #endif
     };
 
