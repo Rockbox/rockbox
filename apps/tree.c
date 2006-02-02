@@ -864,18 +864,18 @@ static bool dirbrowse(void)
         if (start_wps && audio_status() )
         {
             int i;
-#if HAVE_LCD_COLOR
+#ifdef HAVE_LCD_COLOR
             fb_data* old_backdrop;
 #endif
 
             FOR_NB_SCREENS(i)
                 screens[i].stop_scroll();
-#if HAVE_LCD_COLOR
+#ifdef HAVE_LCD_COLOR
             old_backdrop = lcd_get_backdrop();
 #endif
             if (gui_wps_show() == SYS_USB_CONNECTED)
                 reload_dir = true;
-#if HAVE_LCD_COLOR
+#ifdef HAVE_LCD_COLOR
             lcd_set_backdrop(old_backdrop);
 #endif
 #ifdef HAVE_HOTSWAP

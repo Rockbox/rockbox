@@ -109,7 +109,7 @@ long gui_wps_show(void)
     {
         gui_wps_set_margin(&gui_wps[i]);
     }
-#if HAVE_LCD_COLOR
+#ifdef HAVE_LCD_COLOR
     old_backdrop = lcd_get_backdrop();
     if (wps_has_backdrop) {
         lcd_set_backdrop(&wps_backdrop[0][0]);

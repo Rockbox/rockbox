@@ -539,7 +539,7 @@ int onplay(char* file, int attr, int from)
 {
     struct menu_item items[8]; /* increase this if you add entries! */
     int m, i=0, result;
-#if HAVE_LCD_COLOR
+#ifdef HAVE_LCD_COLOR
     char *suffix;
 #endif
 
@@ -604,7 +604,7 @@ int onplay(char* file, int attr, int from)
                 items[i].function = delete_file;
                 i++;
 
-#if HAVE_LCD_COLOR
+#ifdef HAVE_LCD_COLOR
                 suffix = strrchr(file, '.');
                 if (suffix) {
                     if (strcasecmp(suffix, ".bmp") == 0) {
