@@ -51,6 +51,10 @@ static void splash(struct screen * screen,
     bool first=true;
 #ifdef HAVE_LCD_BITMAP
     int maxw=0;
+#if LCD_DEPTH > 1
+    unsigned prevbg = LCD_DEFAULT_BG;
+    unsigned prevfg = LCD_DEFAULT_FG;
+#endif
 #endif
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -127,8 +131,12 @@ static void splash(struct screen * screen,
         int xx = (screen->width-maxw)/2 - 2;
         /* The new graphics routines handle clipping, so no need to check */
 #if LCD_DEPTH > 1
-        if(screen->depth>1)
+        if(screen->depth>1) {
+            prevbg = screen->get_background();
+            prevfg = screen->get_foreground();
             screen->set_background(LCD_LIGHTGRAY);
+            screen->set_foreground(LCD_BLACK);
+        }
 #endif
         screen->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
         screen->fillrect(xx, y-2, maxw+4, screen->height-y*2+4);
@@ -177,8 +185,10 @@ static void splash(struct screen * screen,
     }
 
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH > 1)
-    if(screen->depth > 1)
-        screen->set_background(LCD_DEFAULT_BG);
+    if(screen->depth > 1) {
+        screen->set_background(prevbg);
+        screen->set_foreground(prevfg);
+    }
 #endif
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
     screen->update();

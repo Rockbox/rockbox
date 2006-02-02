@@ -54,7 +54,10 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->mono_bitmap=&lcd_remote_mono_bitmap;
             screen->set_drawmode=&lcd_remote_set_drawmode;
 #if LCD_REMOTE_DEPTH > 1
+            screen->get_background=&lcd_remote_get_background;
+            screen->get_foreground=&lcd_remote_get_foreground;
             screen->set_background=&lcd_remote_set_background;
+            screen->set_foreground=&lcd_remote_set_foreground;
 #endif /* LCD_REMOTE_DEPTH > 1 */
             screen->update_rect=&lcd_remote_update_rect;
             screen->fillrect=&lcd_remote_fillrect;
@@ -127,7 +130,10 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
 #else
             screen->transparent_bitmap=&lcd_bitmap_transparent;
 #endif
+            screen->get_background=&lcd_get_background;
+            screen->get_foreground=&lcd_get_foreground;
             screen->set_background=&lcd_set_background;
+            screen->set_foreground=&lcd_set_foreground;
 #endif
             screen->update_rect=&lcd_update_rect;
             screen->fillrect=&lcd_fillrect;

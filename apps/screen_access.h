@@ -88,7 +88,10 @@ struct screen
                                int x, int y, int width, int height);
     void (*set_drawmode)(int mode);
 #if (LCD_DEPTH > 1) || (LCD_REMOTE_DEPTH > 1)
+    unsigned (*get_background)(void);
+    unsigned (*get_foreground)(void);
     void (*set_background)(unsigned background);
+    void (*set_foreground)(unsigned foreground);
 #endif /* (LCD_DEPTH > 1) || (LCD_REMOTE_DEPTH > 1) */
     void (*update_rect)(int x, int y, int width, int height);
     void (*fillrect)(int x, int y, int width, int height);
