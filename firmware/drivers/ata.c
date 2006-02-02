@@ -32,7 +32,7 @@
 
 #define SECTOR_SIZE     (512)
 
-#if CONFIG_CPU == MCF5249
+#if (CONFIG_CPU == MCF5249) || (CONFIG_CPU == MCF5250)
 
 /* don't use sh7034 assembler routines */
 #define PREFER_C_READING
@@ -1098,12 +1098,14 @@ int ata_hard_reset(void)
     /* state HRR1 */
     or_b(0x02, &PADRH); /* negate _RESET */
     sleep(1); /* > 2ms */
-#elif CONFIG_CPU == MCF5249
+#elif defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
     and_l(~0x00080000, &GPIO_OUT);
     sleep(1); /* > 25us */
 
     or_l(0x00080000, &GPIO_OUT);
     sleep(1); /* > 25us */
+#elif defined(IAUDIO_X5)
+    /* X5 TODO */
 #elif CONFIG_CPU == TCC730
 
     P6 &= ~0x40;
@@ -1239,7 +1241,7 @@ void ata_enable(bool on)
         or_b(0x80, &PADRL); /* disable ATA */
 
     or_b(0x80, &PAIORL);
-#elif CONFIG_CPU == MCF5249
+#elif defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
     if(on)
         and_l(~0x0040000, &GPIO_OUT);
     else
@@ -1247,6 +1249,9 @@ void ata_enable(bool on)
     
     or_l(0x00040000, &GPIO_ENABLE);
     or_l(0x00040000, &GPIO_FUNCTION);
+#elif defined(IAUDIO_X5)
+    /* X5 TODO */
+    (void)on;
 #elif CONFIG_CPU == TCC730
 
 #elif CONFIG_CPU == PP5020
@@ -1400,8 +1405,11 @@ int ata_init(void)
     int rc;
 #if CONFIG_CPU == TCC730
     bool coldstart = (P1 & 0x80) == 0;
-#elif CONFIG_CPU == MCF5249
+#elif defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
     bool coldstart = (GPIO_FUNCTION & 0x00080000) == 0;
+#elif defined(IAUDIO_X5)
+    /* X5 TODO */
+    bool coldstart = true;
 #elif CONFIG_CPU == PP5020
     bool coldstart = false;
     /* TODO: Implement coldstart variable */

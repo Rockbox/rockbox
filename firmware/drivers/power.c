@@ -114,6 +114,8 @@ bool charger_inserted(void)
     return (GPIO1_READ & 0x00400000) || usb_powered();
 #elif defined(GMINI_ARCH)
     return (P7 & 0x80) == 0;
+#elif defined(IAUDIO_X5)
+    return (GPIO1_READ & 0x01000000)?true:false;
 #elif defined(HAVE_CHARGE_CTRL)
     /* Recorder */
     return adc_read(ADC_EXT_POWER) > 0x100;
@@ -172,11 +174,13 @@ void ide_power_enable(bool on)
 {
     (void)on;
 
-#if CONFIG_CPU == MCF5249
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
     if(on)
         and_l(~0x80000000, &GPIO_OUT);
     else
         or_l(0x80000000, &GPIO_OUT);
+#elif defined(IAUDIO_X5)
+    /* X5 TODO */
 #elif CONFIG_CPU == PP5020
     /* We do nothing on the iPod */
 #elif defined(GMINI_ARCH)
@@ -229,8 +233,10 @@ void ide_power_enable(bool on)
 
 bool ide_powered(void)
 {
-#if CONFIG_CPU == MCF5249
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
     return (GPIO_OUT & 0x80000000)?false:true;
+#elif defined(IAUDIO_X5)
+    return false; /* X5 TODO */
 #elif CONFIG_CPU == PP5020
     /* pretend we are always powered - we don't turn it off on the ipod */
     return true;
@@ -263,8 +269,10 @@ bool ide_powered(void)
 void power_off(void)
 {
     set_irq_level(HIGHEST_IRQ_LEVEL);
-#if CONFIG_CPU == MCF5249
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
     and_l(~0x00080000, &GPIO1_OUT);
+#elif defined(IAUDIO_X5)
+    and_l(~0x00000008, &GPIO_OUT);
 #elif CONFIG_CPU == PP5020
 #ifndef BOOTLOADER
     /* We don't turn off the ipod, we put it in a deep sleep */
