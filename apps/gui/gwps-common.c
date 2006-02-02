@@ -37,7 +37,6 @@
 #include "backlight.h"
 #include "lang.h"
 #include "misc.h"
-#include "backdrop.h"
 #include "splash.h"
 #include "scrollbar.h"
 #include "led.h"
@@ -47,6 +46,9 @@
 /* Image stuff */
 #include "bmp.h"
 #include "atoi.h"
+#endif
+#ifdef HAVE_LCD_COLOR
+#include "backdrop.h"
 #endif
 
 #ifdef HAVE_LCD_CHARCELLS

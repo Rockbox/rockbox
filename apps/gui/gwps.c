@@ -52,8 +52,10 @@
 #include "onplay.h"
 #include "abrepeat.h"
 #include "playback.h"
-#include "backdrop.h"
 #include "splash.h"
+#ifdef HAVE_LCD_COLOR
+#include "backdrop.h"
+#endif
 
 #define WPS_DEFAULTCFG WPS_DIR "/rockbox_default.wps"
 #define RWPS_DEFAULTCFG WPS_DIR "/rockbox_default.rwps"

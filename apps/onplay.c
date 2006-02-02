@@ -49,8 +49,9 @@
 #include "action.h"
 #include "splash.h"
 #include "yesno.h"
+#ifdef HAVE_LCD_COLOR
 #include "backdrop.h"
-
+#endif
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #endif
@@ -538,7 +539,9 @@ int onplay(char* file, int attr, int from)
 {
     struct menu_item items[8]; /* increase this if you add entries! */
     int m, i=0, result;
+#if HAVE_LCD_COLOR
     char *suffix;
+#endif
 
     onplay_result = ONPLAY_OK;
     context=from;

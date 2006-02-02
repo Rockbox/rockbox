@@ -72,7 +72,9 @@
 #include "statusbar.h"
 #include "splash.h"
 #include "list.h"
+#if HAVE_LCD_COLOR
 #include "backdrop.h"
+#endif
 
 #if CONFIG_CODEC == MAS3507D
 void dac_line_in(bool enable);
