@@ -40,14 +40,13 @@ eq_filter:
        where y[] is output and x[] is input. This is performed out of order
        to do parallel load of input value.
      */
-    mac.l %a1, %d0, (%a6), %d4, %acc0   | acc = b1*x[i - 1], x[i] -> d4
-    mac.l %a2, %d1, %acc0               | acc += b2*x[i - 2]
-    mac.l %a0, %d4, %acc0               | acc += b0*x[i]
+    mac.l %a2, %d1, %acc0               | acc = b2*x[i - 2]
+    move.l %d0, %d1                     | fix input history
+    mac.l %a1, %d0, (%a6), %d0, %acc0   | acc += b1*x[i - 1], x[i] -> d0
+    mac.l %a0, %d0, %acc0               | acc += b0*x[i]
     mac.l %a3, %d2, %acc0               | acc += a1*y[i - 1]
     mac.l %a4, %d3, %acc0               | acc += a2*y[i - 2]
-    move.l %d0, %d1                     | fix history
-    move.l %d4, %d0
-    move.l %d2, %d3
+    move.l %d2, %d3                     | fix output history
     movclr.l %acc0, %d2                 | fetch and write result
     asl.l %d7, %d2                      | restore fixed point format
     move.l %d2, (%a6)+                  | save result
