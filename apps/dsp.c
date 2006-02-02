@@ -172,9 +172,7 @@ struct crossfeed_data
    but adding peaking filters are possible. */
 struct eq_state {
     char enabled[5];    /* Flags for active filters */
-    struct eqfilter ls;
-    struct eqfilter pk[3];
-    struct eqfilter hs;
+    struct eqfilter filters[5];
 };
 
 static struct dsp_config dsp_conf[2] IBSS_ATTR;
@@ -621,22 +619,25 @@ static void apply_crossfeed(long* src[], int count)
 #endif
 
 /* Apply EQ filters to those bands that have got it switched on. */
-void eq_process(long **x, unsigned num)
+static void eq_process(long **x, unsigned num)
 {
     int i;
     unsigned int channels = dsp->stereo_mode != STEREO_MONO ? 2 : 1;
-	
+    unsigned shift;
+    
     /* filter configuration currently is 1 low shelf filter, 3 band peaking
-       filters and 1 high shelf filter, in that order.
+       filters and 1 high shelf filter, in that order. we need to know this
+       so we can choose the correct shift factor.
      */
-    if (eq_data.enabled[0])
-        eq_filter(x, &eq_data.ls, num, channels, EQ_SHELF_SHIFT);
-    for (i = 0; i < 3; i++) {
-        if (eq_data.enabled[1 + i])
-            eq_filter(x, &eq_data.pk[i], num, channels, EQ_PEAK_SHIFT);
+    for (i = 0; i < 5; i++) {
+        if (eq_data.enabled[i]) {
+            if (i == 0 || i == 4) /* shelving filters */
+                shift = EQ_SHELF_SHIFT;
+            else
+                shift = EQ_PEAK_SHIFT;
+            eq_filter(x, &eq_data.filters[i], num, channels, shift);
+        }
     }
-    if (eq_data.enabled[4])
-        eq_filter(x, &eq_data.hs, num, channels, EQ_SHELF_SHIFT);
 }
 
 /* Apply a constant gain to the samples (e.g., for ReplayGain). May update
