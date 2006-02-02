@@ -675,15 +675,11 @@ void lcd_puts_style_offset(int x, int y, const unsigned char *str, int style, in
     lcd_getstringsize(str, &w, &h);
     xpos = xmargin + x*w / utf8length(str);
     ypos = ymargin + y*h;
+    drawmode = (style & STYLE_INVERT) ?
+               (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
     lcd_putsxyofs(xpos, ypos, offset, str);
-    drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
-    (void)style;
+    drawmode ^= DRMODE_INVERSEVID;
     lcd_fillrect(xpos + w, ypos, LCD_WIDTH - (xpos + w), h);
-    if (style & STYLE_INVERT)
-    {
-        drawmode = DRMODE_COMPLEMENT;
-        lcd_fillrect(xpos, ypos, LCD_WIDTH - xpos, h);
-    }
     drawmode = lastmode;
 }
 
@@ -854,15 +850,9 @@ static void scroll_thread(void)
             }
 
             lastmode = drawmode;
-            drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
-            lcd_fillrect(xpos, ypos, LCD_WIDTH - xpos, pf->height);
-            drawmode = DRMODE_SOLID;
+            drawmode = s->invert ? 
+                       (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
             lcd_putsxyofs(xpos, ypos, s->offset, s->line);
-            if (s->invert)
-            {
-                drawmode = DRMODE_COMPLEMENT;
-                lcd_fillrect(xpos, ypos, LCD_WIDTH - xpos, pf->height);
-            }
             drawmode = lastmode;
             lcd_update_rect(xpos, ypos, LCD_WIDTH - xpos, pf->height);
         }

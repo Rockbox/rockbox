@@ -845,7 +845,7 @@ void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
             unsigned mask_col = mask;
             unsigned data = 0;
             
-            for (y = ny; y >= 8; y -= 8)
+            for (y = ny; y >= 8; y -= 8)                    
             {
                 data |= *src_col << shift;
 
@@ -1090,14 +1090,11 @@ void lcd_puts_style_offset(int x, int y, const unsigned char *str,
     lcd_getstringsize(str, &w, &h);
     xpos = xmargin + x*w / utf8length((char *)str);
     ypos = ymargin + y*h;
+    drawmode = (style & STYLE_INVERT) ?
+               (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
     lcd_putsxyofs(xpos, ypos, offset, str);
-    drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
+    drawmode ^= DRMODE_INVERSEVID;
     lcd_fillrect(xpos + w, ypos, LCD_WIDTH - (xpos + w), h);
-    if (style & STYLE_INVERT)
-    {
-        drawmode = DRMODE_COMPLEMENT;
-        lcd_fillrect(xpos, ypos, LCD_WIDTH - xpos, h);
-    }
     drawmode = lastmode;
 }
 
@@ -1266,15 +1263,9 @@ static void scroll_thread(void)
             }
 
             lastmode = drawmode;
-            drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
-            lcd_fillrect(xpos, ypos, LCD_WIDTH - xpos, pf->height);
-            drawmode = DRMODE_SOLID;
-            lcd_putsxyofs(xpos, ypos, s->offset, (unsigned char *)s->line);
-            if (s->invert)
-            {
-                drawmode = DRMODE_COMPLEMENT;
-                lcd_fillrect(xpos, ypos, LCD_WIDTH - xpos, pf->height);
-            }
+            drawmode = s->invert ?
+                       (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
+            lcd_putsxyofs(xpos, ypos, s->offset, s->line);
             drawmode = lastmode;
             lcd_update_rect(xpos, ypos, LCD_WIDTH - xpos, pf->height);
         }

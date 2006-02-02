@@ -1167,14 +1167,11 @@ void lcd_remote_puts_style_offset(int x, int y, const unsigned char *str, int st
     lcd_remote_getstringsize(str, &w, &h);
     xpos = xmargin + x*w / utf8length((char *)str);
     ypos = ymargin + y*h;
+    drawmode = (style & STYLE_INVERT) ?
+               (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
     lcd_remote_putsxyofs(xpos, ypos, offset, str);
-    drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
+    drawmode ^= DRMODE_INVERSEVID;
     lcd_remote_fillrect(xpos + w, ypos, LCD_REMOTE_WIDTH - (xpos + w), h);
-    if (style & STYLE_INVERT)
-    {
-        drawmode = DRMODE_COMPLEMENT;
-        lcd_remote_fillrect(xpos, ypos, LCD_REMOTE_WIDTH - xpos, h);
-    }
     drawmode = lastmode;
 }
 
@@ -1354,15 +1351,9 @@ static void scroll_thread(void)
             }
 
             lastmode = drawmode;
-            drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
-            lcd_remote_fillrect(xpos, ypos, LCD_REMOTE_WIDTH - xpos, pf->height);
-            drawmode = DRMODE_SOLID;
-            lcd_remote_putsxyofs(xpos, ypos, s->offset, (unsigned char *)s->line);
-            if (s->invert)
-            {
-                drawmode = DRMODE_COMPLEMENT;
-                lcd_remote_fillrect(xpos, ypos, LCD_REMOTE_WIDTH - xpos, pf->height);
-            }
+            drawmode = s->invert ?
+                       (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
+            lcd_remote_putsxyofs(xpos, ypos, s->offset, s->line);
             drawmode = lastmode;
             lcd_remote_update_rect(xpos, ypos, LCD_REMOTE_WIDTH - xpos, pf->height);
         }
