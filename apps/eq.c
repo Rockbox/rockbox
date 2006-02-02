@@ -132,7 +132,7 @@ static long dbtoA(long db)
 /* Calculate second order section peaking filter coefficients.
    cutoff is a value from 0 to 0xffffffff, where 0 represents 0 hz and
    0xffffffff represents nyquist (samplerate/2).
-   Q is an unsigned 6.26 fixed point number, lower bound is artificially set
+   Q is an unsigned 16.16 fixed point number, lower bound is artificially set
    at 0.5.
    db is s15.16 fixed point and describes gain/attenuation at peak freq.
    c is a pointer where the coefs will be stored.
@@ -141,7 +141,7 @@ void eq_pk_coefs(unsigned long cutoff, unsigned long Q, long db, long *c)
 {
     const long one = 1 << 28; /* s3.28 */
     const long A = dbtoA(db);
-    const long alpha = DIV64(fsin(cutoff), 2*Q, 25); /* s1.30 */
+    const long alpha = DIV64(fsin(cutoff), 2*Q, 15); /* s1.30 */
     long a0, a1, a2; /* these are all s3.28 format */
     long b0, b1, b2;
 
@@ -164,7 +164,7 @@ void eq_ls_coefs(unsigned long cutoff, unsigned long Q, long db, long *c)
 {
     const long one = 1 << 24; /* s7.24 */
     const long A = dbtoA(db);
-    const long alpha = DIV64(fsin(cutoff), 2*Q, 25); /* s1.30 */
+    const long alpha = DIV64(fsin(cutoff), 2*Q, 15); /* s1.30 */
     const long ap1 = (A >> 5) + one;
     const long am1 = (A >> 5) - one;
     const long twosqrtalpha = 2*(FRACMUL(fsqrt(A >> 5, 24), alpha) << 1);
@@ -191,7 +191,7 @@ void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, long *c)
 {
     const long one = 1 << 24; /* s7.24 */
     const long A = dbtoA(db);
-    const long alpha = DIV64(fsin(cutoff), 2*Q, 25); /* s1.30 */
+    const long alpha = DIV64(fsin(cutoff), 2*Q, 15); /* s1.30 */
     const long ap1 = (A >> 5) + one;
     const long am1 = (A >> 5) - one;
     const long twosqrtalpha = 2*(FRACMUL(fsqrt(A >> 5, 24), alpha) << 1);
