@@ -82,6 +82,7 @@ L_post_remap: .word remap_end
 remap_end:
 #endif /* PP specific */
 
+#ifndef DEBUG
     /* Copy exception handler code to address 0 */
     ldr    r2, =_vectorsstart
     ldr    r3, =_vectorsend
@@ -91,6 +92,13 @@ remap_end:
     ldrhi  r5, [r4], #4
     strhi  r5, [r2], #4
     bhi    1b
+#else
+    ldr    r1, =vectors
+    ldr    r0, =irq_handler
+    str    r0, [r1, #24]
+    ldr    r0, =fiq_handler
+    str    r0, [r1, #28]
+#endif
     
 #ifndef STUB
     /* Zero out IBSS */
