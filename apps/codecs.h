@@ -48,7 +48,6 @@
 #endif
 #if (CONFIG_CODEC == SWCODEC)
 #include "dsp.h"
-#include "pcm_playback.h"
 #include "playback.h"
 #endif
 #include "settings.h"
@@ -86,12 +85,12 @@
 #define CODEC_MAGIC 0x52434F44 /* RCOD */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 2
+#define CODEC_API_VERSION 3
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 1
+#define CODEC_MIN_API_VERSION 3
 
 /* codec return codes */
 enum codec_status {
@@ -230,13 +229,6 @@ struct codec_api {
     void (*mp3_play_pause)(bool play);
     void (*mp3_play_stop)(void);
     bool (*mp3_is_playing)(void);
-#if CONFIG_CODEC == SWCODEC
-    void (*pcm_play_data)(void (*get_more)(unsigned char** start, long*size));
-    void (*pcm_play_stop)(void);
-    void (*pcm_set_frequency)(unsigned int frequency);
-    bool (*pcm_is_playing)(void);
-    void (*pcm_play_pause)(bool play);
-#endif
 #endif /* !SIMULATOR */
 
     /* playback control */
@@ -290,14 +282,15 @@ struct codec_api {
     int (*battery_level)(void);
     bool (*battery_level_safe)(void);
 
-    /* new stuff at the end, sort into place next time
-       the API gets incompatible */     
 #ifdef RB_PROFILE
     void (*profile_thread)(void);
     void (*profstop)(void);
     void (*profile_func_enter)(void *this_fn, void *call_site);
     void (*profile_func_exit)(void *this_fn, void *call_site);
 #endif
+
+    /* new stuff at the end, sort into place next time
+       the API gets incompatible */     
 
 };
 

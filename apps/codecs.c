@@ -50,10 +50,6 @@
 #include "database.h"
 #include "splash.h"
 
-#if (CONFIG_CODEC == SWCODEC)
-#include "pcm_playback.h"
-#endif
-
 #ifdef SIMULATOR
 #if CONFIG_CODEC == SWCODEC
 unsigned char codecbuf[CODEC_SIZE];
@@ -162,13 +158,6 @@ struct codec_api ci = {
     mp3_play_pause,
     mp3_play_stop,
     mp3_is_playing,
-#if CONFIG_CODEC == SWCODEC
-    pcm_play_data,    
-    pcm_play_stop,
-    pcm_set_frequency,
-    pcm_is_playing,
-    pcm_play_pause,
-#endif
 #endif
 
     /* playback control */
@@ -216,14 +205,15 @@ struct codec_api ci = {
     battery_level,
     battery_level_safe,
 
-    /* new stuff at the end, sort into place next time
-       the API gets incompatible */
 #ifdef RB_PROFILE
     profile_thread,
     profstop,
     profile_func_enter,
     profile_func_exit,
 #endif
+
+    /* new stuff at the end, sort into place next time
+       the API gets incompatible */
 
 };
 
