@@ -814,7 +814,7 @@ fi
   case $option in
     [Bb])
       case $archos in
-          h100|h120|h300|ipodcolor|ipodnano|ipodvideo)
+          h100|h120|h300|x5|ipodcolor|ipodnano|ipodvideo)
               extradefines="-DBOOTLOADER" # for target makefile symbol EXTRA_DEFINES
               appsdir='\$(ROOTDIR)/bootloader'
               apps="bootloader"
