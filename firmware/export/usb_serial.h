@@ -22,5 +22,7 @@
 void usb_serial_init(void);
 void usb_serial_put_byte(int b);
 int usb_serial_get_byte(void);
+int usb_serial_try_put_byte(int b);
+int usb_serial_try_get_byte(void);
 
 #endif

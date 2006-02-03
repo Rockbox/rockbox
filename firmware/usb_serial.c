@@ -1081,6 +1081,17 @@ int usb_serial_get_byte(void)
     return fifo_get_byte(&serial_in_fifo);
 }
 
+int usb_serial_try_get_byte(void)
+{
+    int r;
+    if (fifo_empty(&serial_in_fifo))
+        r = -1;
+    else
+        r = fifo_get_byte(&serial_in_fifo);
+    usb_serial_handle();
+    return r;
+}
+
 /*
   Not used:
 static int usb_serial_out_full(void)
@@ -1095,6 +1106,18 @@ void usb_serial_put_byte(int b)
         usb_serial_handle();
     fifo_put_byte(&serial_out_fifo, b);
     usb_serial_handle();
+}
+
+int usb_serial_try_put_byte(int b)
+{
+    int r = -1;
+    if (!fifo_full(&serial_out_fifo))
+    {
+        fifo_put_byte(&serial_out_fifo, b);
+        r = 0;
+    }
+    usb_serial_handle();
+    return r;
 }
 
 void usb_serial_init(void)
