@@ -38,8 +38,8 @@
 /*** globals ***/
 fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH] __attribute__ ((aligned (16)));
 
-fb_data* lcd_backdrop IDATA_ATTR = NULL;
-int lcd_backdrop_offset = NULL;
+static fb_data* lcd_backdrop = NULL;
+static int lcd_backdrop_offset IDATA_ATTR = 0;
 
 static unsigned fg_pattern IDATA_ATTR = LCD_DEFAULT_FG;
 static unsigned bg_pattern IDATA_ATTR = LCD_DEFAULT_BG;
@@ -106,18 +106,6 @@ unsigned lcd_get_foreground(void)
 void lcd_set_background(unsigned color)
 {
     bg_pattern = color;
-}
-
-void lcd_set_backdrop(fb_data* backdrop)
-{
-    lcd_backdrop = backdrop;
-    if (backdrop)
-        lcd_backdrop_offset = (int)backdrop - (int)&lcd_framebuffer[0][0];
-}
-
-fb_data* lcd_get_backdrop(void)
-{
-    return lcd_backdrop;
 }
 
 unsigned lcd_get_background(void)
@@ -192,15 +180,37 @@ static void nopixel(fb_data *address)
     (void)address;
 }
 
-lcd_fastpixelfunc_type* const lcd_fastpixelfuncs[8] = {
+lcd_fastpixelfunc_type* const lcd_fastpixelfuncs_bgcolor[8] = {
     flippixel, nopixel, setpixel, setpixel,
     nopixel, clearpixel, nopixel, clearpixel
 };
 
-lcd_fastpixelfunc_type* const lcd_fastimgpixelfuncs[8] = {
+lcd_fastpixelfunc_type* const lcd_fastpixelfuncs_backdrop[8] = {
     flippixel, nopixel, setpixel, setpixel,
     nopixel, clearimgpixel, nopixel, clearimgpixel
 };
+
+lcd_fastpixelfunc_type* const * lcd_fastpixelfuncs = lcd_fastpixelfuncs_bgcolor;
+
+void lcd_set_backdrop(fb_data* backdrop)
+{
+    lcd_backdrop = backdrop;
+    if (backdrop)
+    {
+        lcd_backdrop_offset = (int)backdrop - (int)&lcd_framebuffer[0][0];
+        lcd_fastpixelfuncs = lcd_fastpixelfuncs_backdrop;
+    } 
+    else 
+    {
+        lcd_backdrop_offset = 0;
+        lcd_fastpixelfuncs = lcd_fastpixelfuncs_bgcolor;
+    }
+}
+
+fb_data* lcd_get_backdrop(void)
+{
+    return lcd_backdrop;
+}
 
 /*** drawing functions ***/
 
@@ -208,16 +218,18 @@ lcd_fastpixelfunc_type* const lcd_fastimgpixelfuncs[8] = {
 void lcd_clear_display(void)
 {
     fb_data *dst = LCDADDR(0, 0);
-    fb_data *dst_end = dst + LCD_HEIGHT*LCD_WIDTH;
 
-    if (lcd_backdrop) {    
+    if (!lcd_backdrop || (drawmode & DRMODE_INVERSEVID))
+    {
+        fb_data bits = (drawmode & DRMODE_INVERSEVID) ? fg_pattern : bg_pattern;
+        fb_data *dst_end = dst + LCD_HEIGHT*LCD_WIDTH;
         do
-            clearimgpixel(dst++);
+            *dst++ = bits;
         while (dst < dst_end);
-    } else {
-        do
-            clearpixel(dst++);
-        while (dst < dst_end);
+    }
+    else
+    {
+        memcpy(dst, lcd_backdrop, sizeof(lcd_framebuffer));
     }
     scrolling_lines = 0;
 }
@@ -225,13 +237,8 @@ void lcd_clear_display(void)
 /* Set a single pixel */
 void lcd_drawpixel(int x, int y)
 {
-    if (((unsigned)x < LCD_WIDTH) && ((unsigned)y < LCD_HEIGHT)) {
-        if (lcd_backdrop) {
-            lcd_fastimgpixelfuncs[drawmode](LCDADDR(x, y));
-        } else {
-            lcd_fastpixelfuncs[drawmode](LCDADDR(x, y));
-        }
-    }
+    if (((unsigned)x < LCD_WIDTH) && ((unsigned)y < LCD_HEIGHT))
+        lcd_fastpixelfuncs[drawmode](LCDADDR(x, y));
 }
 
 /* Draw a line */
@@ -243,10 +250,7 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
     int d, dinc1, dinc2;
     int x, xinc1, xinc2;
     int y, yinc1, yinc2;
-    lcd_fastpixelfunc_type *pfunc = (lcd_backdrop ? 
-                                     lcd_fastimgpixelfuncs[drawmode] :
-                                     lcd_fastpixelfuncs[drawmode]);
-
+    lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[drawmode];
 
     deltax = abs(x2 - x1);
     deltay = abs(y2 - y1);
@@ -313,9 +317,7 @@ void lcd_hline(int x1, int x2, int y)
 {
     int x;
     fb_data *dst, *dst_end;
-    lcd_fastpixelfunc_type *pfunc = (lcd_backdrop ? 
-                                     lcd_fastimgpixelfuncs[drawmode] :
-                                     lcd_fastpixelfuncs[drawmode]);
+    lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[drawmode];
 
     /* direction flip */
     if (x2 < x1)
@@ -348,9 +350,7 @@ void lcd_vline(int x, int y1, int y2)
 {
     int y;
     fb_data *dst, *dst_end;
-    lcd_fastpixelfunc_type *pfunc = (lcd_backdrop ? 
-                                     lcd_fastimgpixelfuncs[drawmode] :
-                                     lcd_fastpixelfuncs[drawmode]);
+    lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[drawmode];
 
     /* direction flip */
     if (y2 < y1)
@@ -400,9 +400,7 @@ void lcd_drawrect(int x, int y, int width, int height)
 void lcd_fillrect(int x, int y, int width, int height)
 {
     fb_data *dst, *dst_end;
-    lcd_fastpixelfunc_type *pfunc = (lcd_backdrop ? 
-                                     lcd_fastimgpixelfuncs[drawmode] :
-                                     lcd_fastpixelfuncs[drawmode]);
+    lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[drawmode];
 
     /* nothing to draw? */
     if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
@@ -494,13 +492,8 @@ void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
     src_end = src + width;
 
     dst = LCDADDR(x, y);
-    if (lcd_backdrop) {
-        fgfunc = lcd_fastimgpixelfuncs[drawmode];
-        bgfunc = lcd_fastimgpixelfuncs[drawmode ^ DRMODE_INVERSEVID];
-    } else {
-        fgfunc = lcd_fastpixelfuncs[drawmode];
-        bgfunc = lcd_fastpixelfuncs[drawmode ^ DRMODE_INVERSEVID];
-    }
+    fgfunc = lcd_fastpixelfuncs[drawmode];
+    bgfunc = lcd_fastpixelfuncs[drawmode ^ DRMODE_INVERSEVID];
 
     do
     {

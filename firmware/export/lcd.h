@@ -239,7 +239,7 @@ extern void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *stri
 extern lcd_pixelfunc_type* const lcd_pixelfuncs[8];
 extern lcd_blockfunc_type* const lcd_blockfuncs[8];
 #if LCD_DEPTH >= 8
-extern lcd_fastpixelfunc_type* const lcd_fastpixelfuncs[8];
+extern lcd_fastpixelfunc_type* const * lcd_fastpixelfuncs;
 #endif
 
 extern void lcd_drawpixel(int x, int y);
