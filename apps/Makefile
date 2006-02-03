@@ -75,7 +75,9 @@ all: build-bitmaps $(BUILDDIR)/$(BINARY) $(CODECS) $(ROCKS)
 else
 # regular target build
 
-ifndef DEBUG
+ifdef DEBUG
+REALBIN = $(OBJDIR)/rockbox.elf
+else
 # this is not needed to get built when doing debug builds
 REALBIN = $(BUILDDIR)/$(BINARY)
 endif
