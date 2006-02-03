@@ -60,7 +60,7 @@ unsigned tlv320_regs[0xf];
 
 void tlv320_write_reg(unsigned reg, unsigned value)
 {
-    unsigned data[3];
+    unsigned char data[3];
 
     data[0] = TLV320_ADDR;
     data[1] = reg << 1;
@@ -76,7 +76,7 @@ void tlv320_write_reg(unsigned reg, unsigned value)
 }
 
 /* Returns 0 if successful or -1 if some register failed */
-void tlv320_set_regs()
+void tlv320_set_regs(void)
 {
     int i;
     memset(tlv320_regs, 0, sizeof(tlv320_regs));
@@ -96,7 +96,7 @@ void tlv320_set_regs()
 /**
  * Init our tlv with default values
  */
-void tlv320_init()
+void tlv320_init(void)
 {
     tlv320_reset();
     tlv320_set_regs();
@@ -105,14 +105,14 @@ void tlv320_init()
 /**
  * Resets tlv320 to default values
  */
-void tlv320_reset()
+void tlv320_reset(void)
 {
-    tlv320_write_reg(REG_RR, RR_RESET):
+    tlv320_write_reg(REG_RR, RR_RESET);
 }
 
 void tlv320_enable_output(bool enable)
 {
-    unsigned value = tlv320regs[REG_PC];
+    unsigned value = tlv320_regs[REG_PC];
 
     if (enable)
         value |= PC_OUT;
@@ -148,11 +148,11 @@ void tlv320_set_headphone_vol(int vol_l, int vol_r)
  */
 void tlv320_set_linein_vol(int vol_l, int vol_r)
 {
-    unsigned value_l = tlv320regs[REG_LLIV];
-    unsigned value_r = tlv320regs[REG_RLIV];
+    unsigned value_l = tlv320_regs[REG_LLIV];
+    unsigned value_r = tlv320_regs[REG_RLIV];
 
-    value_l |= LLIV_LHV(vol_l);
-    value_r |= RLIV_RHV(vol_r);
+    value_l |= LLIV_LIV(vol_l);
+    value_r |= RLIV_RIV(vol_r);
 
     tlv320_write_reg(REG_LLIV, value_l);
     tlv320_write_reg(REG_RLIV, value_r);
@@ -164,8 +164,8 @@ void tlv320_set_linein_vol(int vol_l, int vol_r)
  */
 void tlv320_mute(bool mute)
 {
-    unsigned value_l = tlv320regs[REG_LHV];
-    unsigned value_r = tlv320regs[REG_RHV];
+    unsigned value_l = tlv320_regs[REG_LHV];
+    unsigned value_r = tlv320_regs[REG_RHV];
 
     if (mute)
     {
@@ -189,8 +189,8 @@ void tlv320_close()
 
 void tlv320_enable_recording(bool source_mic)
 {
-    unsigned value_pc = tlv320regs[REG_PC];
-    unsigned value_aap = tlv320regs[REG_AAP];
+    unsigned value_pc = tlv320_regs[REG_PC];
+    unsigned value_aap = tlv320_regs[REG_AAP];
 
     /* select source*/
     if (source_mic)
@@ -213,7 +213,7 @@ void tlv320_enable_recording(bool source_mic)
 
 void tlv320_disable_recording()
 {
-    unsigned value = tlv320regs[REG_PC];
+    unsigned value = tlv320_regs[REG_PC];
 
     /* powerdown mic, linein and adc */
     value &= ~(PC_MIC | PC_LINE | PC_ADC);

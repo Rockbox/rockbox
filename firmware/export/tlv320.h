@@ -41,25 +41,25 @@ extern void tlv320_disable_recording(void);
 #define REG_LLIV        0x0
 #define LLIV_LRS        (0 << 8)    /* simultaneous volume/mute update  */
 #define LLIV_LIM        (1 << 7)    /* Left line input mute             */
-#define LLIV_LIV        ((x) & 0x1f)/* Left line input volume control   */
+#define LLIV_LIV(x)     ((x) & 0x1f)/* Left line input volume control   */
 
 /* REG_RLIV: Right line input channel volume control */
 #define REG_RLIV        0x1
 #define RLIV_RLS        (0 << 8)    /* simultaneous volume/mute update  */
 #define RLIV_RIM        (0 << 7)    /* Right line input mute            */
-#define RLIV_LIV        ((x) & 0x1f)/* Right line input volume control  */
+#define RLIV_RIV(x)     ((x) & 0x1f)/* Right line input volume control  */
 
 /* REG_LHV: Left Channel Headphone Volume Control */
 #define REG_LHV         0x2
 #define LHV_LRS         (0 << 8)    /* simultaneous volume/mute update */
 #define LHV_LZC         (0 << 7)	/* Left-channel zero-cross detect  */
-#define LHV_LHV         ((x) & 0x7f)/* Left headphone volume control    */
+#define LHV_LHV(x)      ((x) & 0x7f)/* Left headphone volume control    */
 
 /* REG_RHV: Right Channel Headphone Volume Control */
 #define REG_RHV         0x3
 #define RHV_LRS         (0 << 8)    /* simultaneous volume/mute update  */
 #define RHV_RZC         (0 << 7)    /* Right-channel zero-cross detect  */
-#define RHV_LHV         ((x) & 0x7f)/* Right headphone volume control   */
+#define RHV_RHV(x)      ((x) & 0x7f)/* Right headphone volume control   */
 
 /* REG_AAP: Analog Audio Path Control */
 #define REG_AAP         0x4
