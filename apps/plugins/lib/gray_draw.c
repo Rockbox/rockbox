@@ -904,6 +904,12 @@ static void _writearray(unsigned char *address, const unsigned char *src,
         : /* clobbers */
         "d0", "d1", "d2", "d3", "d4", "d5", "d6", "a0", "a1"
     );
+#elif defined(CPU_ARM) && (LCD_DEPTH == 1)
+    /* TODO: implement for iFP */
+    (void)address;
+    (void)src;
+    (void)stride;
+    (void)mask;
 #endif
 }
 

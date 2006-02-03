@@ -29,8 +29,8 @@
 #include "string.h"
 #include "buffer.h"
 
-#if CONFIG_CPU != TCC730
-/* FIX: this doesn't work on Gmini yet */
+#if (CONFIG_CPU != TCC730) && !defined(IRIVER_IFP7XX_SERIES)
+/* FIX: this doesn't work on Gmini and iFP yet */
 
 #define IRQ0_EDGE_TRIGGER 0x80
 
@@ -210,7 +210,7 @@ int rolo_load(const char* filename)
 
     return 0; /* this is never reached */
 }
-#else  /* CONFIG_CPU != TCC730 */
+#else  /* (CONFIG_CPU != TCC730) && !defined(IRIVER_IFP7XX_SERIES) */
 int rolo_load(const char* filename)
 {
     /* dummy */
@@ -218,4 +218,4 @@ int rolo_load(const char* filename)
     return 0;
 }
 
-#endif /* ! CONFIG_CPU != TCC730 */
+#endif /* (CONFIG_CPU != TCC730) && !defined(IRIVER_IFP7XX_SERIES) */

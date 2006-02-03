@@ -56,8 +56,8 @@ static bool timer_set(long cycles, bool start)
     int phi = 0; /* bits for the prescaler */
     int prescale = 1;
 
-#if CONFIG_CPU==PP5020
-    /* TODO: Implement for iPod */
+#if (CONFIG_CPU==PP5020) || (CONFIG_CPU==PNX0101)
+    /* TODO: Implement for iPod and iFP */
     (void)start;
     (void)phi;
 #endif
@@ -162,7 +162,7 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
     if (reg_prio <= timer_prio || cycles == 0)
         return false;
 
-#if CONFIG_CPU==PP5020
+#if (CONFIG_CPU==PP5020) || (CONFIG_CPU==PNX0101)
     /* TODO: Implement for iPod */
     (void)int_prio;
 #endif

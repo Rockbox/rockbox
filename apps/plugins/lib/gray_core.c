@@ -233,6 +233,9 @@ void gray_show(bool enable)
         _gray_rb->timer_register(1, NULL, CPU_FREQ / 67, 1, _timer_isr);
 #elif CONFIG_LCD == LCD_S1D15E06
         _gray_rb->timer_register(1, NULL, CPU_FREQ / 70, 1, _timer_isr);
+#elif CONFIG_LCD == LCD_IFP7XX
+        /* TODO: implement for iFP */
+        (void)_timer_isr;
 #endif
         _gray_rb->screen_dump_set_hook(gray_screendump_hook);
     }
