@@ -1263,6 +1263,10 @@ void irq(void)
     (*(interrupt_vector[n]))();
 }
 
+void fiq(void)
+{
+}
+
 void irq_enable_int(int n)
 {
     IRQ_WRITE_WAIT(0x404 + n * 4, 0x4010000, v & 0x10000);
