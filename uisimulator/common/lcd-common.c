@@ -24,7 +24,9 @@
 
 #include "lcd.h"
 
-#if defined(WIN32) && !defined(SDL)
+#if defined(SDL)
+#include "lcd-sdl.h"
+#elif defined(WIN32)
 #include "lcd-win32.h"
 #else
 #include "lcd-x11.h"

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/ 
  * $Id$
  *
- * Copyright (C) 2002 by Daniel Stenberg <daniel@haxx.se>
+ * Copyright (C) 2006 by Daniel Everton <dan@iocaine.org>
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,211 +16,170 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <stdio.h>
-#include <string.h>
-#include <stdarg.h>
+
 #include <stdlib.h>
-#include <ctype.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+#include "autoconf.h"
+#include "uisdl.h"
+#include "button.h"
+#include "thread.h"
+#include "thread-sdl.h"
+#include "kernel.h"
+#include "sound.h"
 
-#include <errno.h>
-#include <ctype.h>
-#include <time.h>
+// extern functions
+extern void                 app_main (void *); // mod entry point
+extern void                 new_key(int key);
+extern void                 sim_tick_tasks(void);
 
-#include <SDL.h>
+void button_event(int key, bool pressed);
 
-#include "config.h"
-#include "screenhack.h"
+SDL_Surface *gui_surface;
 
-#include "version.h"
+SDL_Thread *gui_thread;
+SDL_TimerID tick_timer_id;
+#ifdef ROCKBOX_HAS_SIMSOUND
+SDL_Thread *sound_thread;
+#endif
 
-#include "lcd-x11.h"
-#include "lcd-playersim.h"
+bool lcd_display_redraw=true; // Used for player simulator
+char having_new_lcd=true; // Used for player simulator
 
-#define MAX(x,y) ((x)>(y)?(x):(y))
-#define MIN(x,y) ((x)<(y)?(x):(y))
+long start_tick;
 
-#define PROGNAME "rockboxui"
-
-/* -- -- */
-
-extern SDL_Surface *surface;
-
-int display_zoom=2;
-
-bool lcd_display_redraw=true;
-
-char *progclass = "rockboxui";
-
-void init_window ()
+Uint32 tick_timer(Uint32 interval, void *param)
 {
-    /* stub */
-}
+    long new_tick;
 
-/* used for the player sim */
-void drawdots(int color, struct coordinate *points, int count)
-{
-    SDL_Rect rect;
+    (void) interval;
+    (void) param;
     
-    while (count--) {
-        rect.x = points[count].x * display_zoom;
-        rect.y = points[count].y * display_zoom;
-        rect.w = display_zoom;
-        rect.h = display_zoom;
+    new_tick = (SDL_GetTicks() - start_tick) * HZ / 1000;
         
-        SDL_FillRect(surface, &rect, color);
+    if (new_tick != current_tick)
+    {
+        long i;
+        for (i = new_tick - current_tick; i > 0; i--)
+            sim_tick_tasks();
+        current_tick = new_tick;
     }
-}
-
-void drawrect(int color, int x1, int y1, int x2, int y2)
-{
-    SDL_Rect rect;
     
-    rect.x = x1 * display_zoom;
-    rect.y = y1 * display_zoom;
-    rect.w = (x2-x1) * display_zoom;
-    rect.h = (y2-y1) * display_zoom;
-
-    SDL_FillRect(surface, &rect, color);
+    return 1;
 }
 
-#if 0
-static void help(void)
+void gui_message_loop(void)
 {
-    printf(PROGNAME " " ROCKBOXUI_VERSION " " __DATE__ "\n"
-           "usage: " PROGNAME "\n");
-}
-#endif 
+    SDL_Event event;
+    bool done = false;
 
-void dots(int *colors, struct coordinate *points, int count)
-{
-    int bpp = surface->format->BytesPerPixel;
-
-    if (SDL_MUSTLOCK(surface)) {
-        if (SDL_LockSurface(surface)) {
-            fprintf(stderr, "cannot lock surface: %s", SDL_GetError());
-            exit(-1);
+    while(!done && SDL_WaitEvent(&event))
+    {
+        switch(event.type)
+        {
+            case SDL_KEYDOWN:
+                button_event(event.key.keysym.sym, true);
+                break;
+            case SDL_KEYUP:
+                button_event(event.key.keysym.sym, false);
+                break;
+            case SDL_QUIT:
+                done = true;
+                break;
+            default:
+                //printf("Unhandled event\n");
+                break;
         }
     }
+}
 
-    while (count--) {
-        int x_off, y_off;
+bool gui_startup()
+{
+    SDL_Surface *picture_surface;
 
-        for (x_off = 0; x_off < display_zoom; x_off++) {
-            for (y_off = 0; y_off < display_zoom; y_off++) {
-                int x = points[count].x*display_zoom + x_off;
-                int y = points[count].y*display_zoom + y_off;
+    if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_TIMER)) {
+        fprintf(stderr, "fatal: %s", SDL_GetError());
+        return false;
+    }
 
-                Uint8 *p = (Uint8 *) surface->pixels + y * surface->pitch + x * bpp;
+    atexit(SDL_Quit);
 
-		        switch (bpp) {
-		            case 1:
-		                *p = colors[count];
-		                break;
+    if ((gui_surface = SDL_SetVideoMode(UI_WIDTH, UI_HEIGHT, 24, SDL_HWSURFACE|SDL_DOUBLEBUF)) == NULL) {
+        fprintf(stderr, "fatal: %s", SDL_GetError());
+        return false;
+    }
+
+    SDL_WM_SetCaption(UI_TITLE, NULL);
+
+    simlcdinit();
 		
-		            case 2:
-		                *(Uint16 *)p = colors[count];
-		                break;
+    SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 		
-		            case 3:
-		                if (SDL_BYTEORDER == SDL_BIG_ENDIAN) {
-		                    p[0] = (colors[count] >> 16) & 0xff;
-		                    p[1] = (colors[count] >> 8) & 0xff;
-		                    p[2] = (colors[count]) & 0xff;
+    picture_surface = SDL_LoadBMP("UI256.bmp");
+    if (picture_surface == NULL) {
+        fprintf(stderr, "warn: %s", SDL_GetError());
 		                } else {
-		                    p[2] = (colors[count] >> 16) & 0xff;
-		                    p[1] = (colors[count] >> 8) & 0xff;
-		                    p[0] = (colors[count]) & 0xff;
+        SDL_BlitSurface(picture_surface, NULL, gui_surface, NULL);
+        SDL_UpdateRect(gui_surface, 0, 0, 0, 0);
 		                }
-		                break;
 		
-		            case 4:
-		                *(Uint32 *)p = colors[count];
-		                break;
-		        }
-            }
-        }
-    }
+    start_tick = SDL_GetTicks();
 
-    if (SDL_MUSTLOCK(surface)) {
-        SDL_UnlockSurface(surface);
-    }
-
-    SDL_UpdateRect(surface, 0, 0, 0, 0);
+    return true;
 }
 
-/* this is where the applicaton starts */
-extern void app_main(void);
-
-void screenhack()
+bool gui_shutdown()
 {
-#if 0
-    Bool helpme;
+    int i;
 
-    /* This doesn't work, but I don't know why (Daniel 1999-12-01) */
-    helpme = get_boolean_resource ("help", "Boolean");
-    if(helpme)
-        help();
+    SDL_KillThread(gui_thread);
+    SDL_RemoveTimer(tick_timer_id);
+#ifdef ROCKBOX_HAS_SIMSOUND
+    SDL_KillThread(sound_thread);
 #endif
 
-    printf(PROGNAME " " ROCKBOXUI_VERSION " (" __DATE__ ")\n");
-
-    init_window();
-
-    screen_redraw();
-
-    app_main();
-}
-
-/* used for the player sim */
-void drawrectangles(int color, struct rectangle *points, int count)
-{
-    SDL_Rect rect;
-    Uint32 sdl_white = SDL_MapRGB(surface->format, 255, 255, 255);
-    Uint32 sdl_black = SDL_MapRGB(surface->format, 0, 0, 0);
-
-    while (count--) {
-        rect.x = points[count].x * display_zoom;
-        rect.y = points[count].y * display_zoom;
-        rect.w = points[count].width * display_zoom;
-        rect.h = points[count].height * display_zoom;
-        
-        SDL_FillRect(surface, &rect, color ? sdl_white : sdl_black);
+    for (i = 0; i < threadCount; i++)
+    {
+        SDL_KillThread(threads[i]);
     }
+
+    return true;
 }
 
-
-void screen_redraw()
+/**
+ * Thin wrapper around normal app_main() to stop gcc complaining about types.
+ */
+int sim_app_main(void *param)
 {
-    /* draw a border around the screen */
-    int X1 = 0;
-    int Y1 = 0;
-    int X2 = LCD_WIDTH + 2*MARGIN_X - 1;
-    int Y2 = LCD_HEIGHT + 2*MARGIN_Y - 1;
+    app_main(param);
 
-    drawrect(SDL_MapRGB(surface->format, 255, 255, 255), X1, Y1, X2, Y1+1);
-    drawrect(SDL_MapRGB(surface->format, 255, 255, 255), X2, Y1, X2+1, Y2);
-    drawrect(SDL_MapRGB(surface->format, 255, 255, 255), X1, Y2, X2, Y2+1);
-    drawrect(SDL_MapRGB(surface->format, 255, 255, 255), X1, Y1, X1+1, Y2);
-
-    lcd_display_redraw = true;
-    lcd_update();
-
-#ifdef LCD_REMOTE_HEIGHT
-    /* draw a border around the remote LCD screen */
-    int RX1 = 0;
-    int RY1 = Y2 + 1;
-    int RX2 = LCD_REMOTE_WIDTH + 2*MARGIN_X - 1;
-    int RY2 = RY1 + LCD_REMOTE_HEIGHT + 2*MARGIN_Y - 1;
-
-    drawrect(SDL_MapRGB(surface->format, 255, 255, 255), RX1, RY1, RX2, RY1+1);
-    drawrect(SDL_MapRGB(surface->format, 255, 255, 255), RX2, RY1, RX2+1, RY2);
-    drawrect(SDL_MapRGB(surface->format, 255, 255, 255), RX1, RY2, RX2, RY2+1);
-    drawrect(SDL_MapRGB(surface->format, 255, 255, 255), RX1, RY1, RX1+1, RY2);
-
-    lcd_display_redraw = true;
-    lcd_remote_update();
-#endif
+    return 0;
 }
+
+int main(int argc, char *argv[])
+{
+    (void)argc;
+    (void)argv;
+
+    if (!gui_startup())
+        return -1;
+
+    gui_thread = SDL_CreateThread(sim_app_main, NULL);
+    if (gui_thread == NULL) {
+        printf("Error creating GUI thread!\n");
+        return -1;
+    }
+
+    tick_timer_id = SDL_AddTimer(10, tick_timer, NULL);
+
+#ifdef ROCKBOX_HAS_SIMSOUND
+    sound_thread = SDL_CreateThread(sound_playback_thread, NULL);
+    if (sound_thread == NULL) {
+        printf("Error creating sound thread!\n");
+        return -1;
+    }
+#endif
+
+    gui_message_loop();
+
+    return gui_shutdown();
+}
+

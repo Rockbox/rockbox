@@ -71,7 +71,11 @@ typedef struct mydir MYDIR;
 #if 1 /* maybe this needs disabling for MSVC... */
 static unsigned int rockbox2sim(int opt)
 {
+#ifdef WIN32
+    int newopt = O_BINARY;
+#else
     int newopt = 0;
+#endif
     if(opt & 1)
         newopt |= O_WRONLY;
     if(opt & 2)

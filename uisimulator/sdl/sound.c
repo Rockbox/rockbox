@@ -21,24 +21,15 @@
 
 #ifdef ROCKBOX_HAS_SIMSOUND /* play sound in sim enabled */
 
-#include <stdio.h>
+#include <memory.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <string.h>
-#include <SDL.h>
-
+#include "uisdl.h"
 #include "sound.h"
 
-//static Uint8 *audio_chunk;
 static int audio_len;
 static char *audio_pos;
 SDL_sem* sem;
 
-/* The audio function callback takes the following parameters:
-   stream:  A pointer to the audio buffer to be filled
-   len:     The length (in bytes) of the audio buffer
-*/
 void mixaudio(void *udata, Uint8 *stream, int len)
 {
   (void)udata;
@@ -59,8 +50,6 @@ void mixaudio(void *udata, Uint8 *stream, int len)
   }
 }
 
-
-
 int sim_sound_init(void)
 {
   SDL_AudioSpec fmt;
@@ -80,15 +69,12 @@ int sim_sound_init(void)
     fprintf(stderr, "Unable to open audio: %s\n", SDL_GetError());
     return -1;
   }
+
   SDL_PauseAudio(0);
   return 0;
-
-  //...
-    
-  //SDL_CloseAudio();
 }
 
-int sound_playback_thread(void* p)
+int sound_playback_thread(void *p)
 {
   int sndret = sim_sound_init();
   unsigned char *buf;
@@ -97,12 +83,12 @@ int sound_playback_thread(void* p)
   (void)p;
 
   while(sndret)
-    sleep(100000); /* wait forever, can't play sound! */
+        SDL_Delay(100000); /* wait forever, can't play sound! */
     
   do {
     while(!sound_get_pcm)
       /* TODO: fix a fine thread-synch mechanism here */
-      usleep(10000);
+          SDL_Delay(100);
     do {
       sound_get_pcm(&buf, &size);
       if(!size) {
@@ -111,11 +97,13 @@ int sound_playback_thread(void* p)
       }
       audio_pos = buf; // TODO: is this safe?
       audio_len = size;
-      //printf("len: %i\n",audio_len);
+
       if(SDL_SemWait(sem)) 
 	fprintf(stderr,"Couldn't wait: %s",SDL_GetError());
     } while(size);
   } while(1);
+
 }
 
 #endif /* ROCKBOX_HAS_SIMSOUND */
+

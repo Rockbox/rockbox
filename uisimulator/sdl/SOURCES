@@ -1,7 +1,6 @@
-button-x11.c
+button.c
 kernel.c
-lcd-x11.c
-screenhack.c
-thread.c
-uisdl.c
+lcd-sdl.c
 sound.c
+thread-sdl.c
+uisdl.c

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Felix Arends
+ * Copyright (C) 2006 Dan Everton
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -17,20 +17,7 @@
  *
  ****************************************************************************/
 
-#ifndef __SPRINTF_H__
-#define __SPRINTF_H__
+extern SDL_Thread* threads[256];
+extern int         threadCount;
+extern SDL_mutex*  mutex;
 
-#include <stddef.h>
-#include <stdarg.h>
-#include <stdio.h>
-
-int snprintf (char *buf, size_t size, const char *fmt, ...);
-char *strtok_r (char *, const char *, char **);
-
-int rockbox_fprintf (int fd, const char *fmt, ...);
-#define fprintf rockbox_fprintf
-
-int rockbox_vsnprintf (char *buf, int size, const char *fmt, va_list ap);
-#define vsnprintf rockbox_vsnprintf
-
-#endif /* __SPRINTF_H__ */

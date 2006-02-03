@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 by Jens Arnold
+ * Copyright (C) 2002 by Felix Arends
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -17,10 +17,17 @@
  *
  ****************************************************************************/
 
-#include <stddef.h>
+#include <stdlib.h>
+#include "uisdl.h"
 #include "kernel.h"
+#include "thread-sdl.h"
 #include "thread.h"
 #include "debug.h"
+
+/* (Daniel 2002-10-31) Mingw32 requires this errno variable to be present.
+   I'm not quite sure why and I don't know if this breaks the MSVC compile.
+   If it does, we should put this within #ifdef __MINGW32__ */
+int errno;
 
 static void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
 
@@ -148,6 +155,7 @@ int tick_remove_task(void (*f)(void))
     return -1;
 }
 
+/* TODO: Implement mutexes for win32 */
 void mutex_init(struct mutex *m)
 {
     (void)m;
@@ -162,4 +170,3 @@ void mutex_unlock(struct mutex *m)
 {
     (void)m;
 }
-

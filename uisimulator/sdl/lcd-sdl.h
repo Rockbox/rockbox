@@ -3,11 +3,11 @@
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
  *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \ 
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Felix Arends
+ * Copyright (C) 2006 Dan Everton
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -17,20 +17,23 @@
  *
  ****************************************************************************/
 
-#ifndef __SPRINTF_H__
-#define __SPRINTF_H__
+#ifndef __LCDSDL_H__
+#define __LCDSDL_H__
 
-#include <stddef.h>
-#include <stdarg.h>
-#include <stdio.h>
+#include "uisdl.h"
+#include "lcd.h"
 
-int snprintf (char *buf, size_t size, const char *fmt, ...);
-char *strtok_r (char *, const char *, char **);
+extern SDL_Surface*  lcd_surface;
+#if LCD_DEPTH <= 8
+extern SDL_Color   lcd_palette[(1<<LCD_DEPTH)];
+#endif
 
-int rockbox_fprintf (int fd, const char *fmt, ...);
-#define fprintf rockbox_fprintf
+#ifdef HAVE_REMOTE_LCD
+extern SDL_Surface*  remote_surface;
+extern SDL_Color   remote_palette[(1<<LCD_REMOTE_DEPTH)];
+#endif
 
-int rockbox_vsnprintf (char *buf, int size, const char *fmt, va_list ap);
-#define vsnprintf rockbox_vsnprintf
+void simlcdinit(void);
 
-#endif /* __SPRINTF_H__ */
+#endif // #ifndef __LCDSDL_H__
+

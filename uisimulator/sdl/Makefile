@@ -40,7 +40,7 @@ SOURCES = $(SRC)
 
 DIRS = .
 
-CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) $(GCCOPTS)
+CFLAGS = $(DEBUG) $(DEFINES) $(INCLUDES) $(GCCOPTS) -W -Wall
 
 OUTFILE = $(BUILDDIR)/libsim.a
 
@@ -48,13 +48,19 @@ all: $(OUTFILE)
 
 include $(TOOLSDIR)/make.inc
 
-clean:
-	@echo "cleaning sim"
-	@$(RM) $(OBJS) *~ core $(OUTFILE) $(DEPFILE)
-	@$(MAKE) -C $(SIMCOMMON) clean
-
-$(OUTFILE): $(OBJS)
+$(OUTFILE): $(OBJS) $(BUILDDIR)/UI256.bmp
 	@echo "AR $@"
 	@$(AR) ruv $@ $(OBJS) >/dev/null 2>&1
+
+clean:
+	@echo "cleaning sim"
+	@$(RM) $(OBJS) *~ core $(OUTFILE) $(DEPFILE) \
+	$(BUILDDIR)/UI256.bmp $(DEPFILE)
+	@$(MAKE) -C $(SIMCOMMON) clean
+
+################## Specific dependencies ##################
+$(BUILDDIR)/UI256.bmp: UI-$(ARCHOS).bmp
+	@echo UI
+	@cp $< $@
 
 -include $(DEPFILE)
