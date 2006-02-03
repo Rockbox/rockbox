@@ -184,18 +184,48 @@ static inline void unreadbits(alac_file *alac, int bits)
         alac->input_buffer_bitaccumulator *= -1;
 }
 
-/* hideously inefficient. could use a bitmask search,
- * alternatively bsr on x86,
- */
-static inline int count_leading_zeros(int32_t input)
+static inline int count_leading_zeros(int input)
 {
-    int i = 0;
-    while (!(0x80000000 & input) && i < 32)
+    int output = 0;
+    int curbyte = 0;
+
+    curbyte = input >> 24;
+    if (curbyte) goto found;
+    output += 8;
+
+    curbyte = input >> 16;
+    if (curbyte & 0xff) goto found;
+    output += 8;
+
+    curbyte = input >> 8;
+    if (curbyte & 0xff) goto found;
+    output += 8;
+
+    curbyte = input;
+    if (curbyte & 0xff) goto found;
+    output += 8;
+
+    return output;
+
+found:
+    if (!(curbyte & 0xf0))
     {
-        i++;
-        input = input << 1;
+        output += 4;
     }
-    return i;
+    else
+        curbyte >>= 4;
+
+    if (curbyte & 0x8)
+        return output;
+    if (curbyte & 0x4)
+        return output + 1;
+    if (curbyte & 0x2)
+        return output + 2;
+    if (curbyte & 0x1)
+        return output + 3;
+
+    /* shouldn't get here: */
+    return output + 4;
 }
 
 void basterdised_rice_decompress(alac_file *alac,
