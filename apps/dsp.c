@@ -145,7 +145,6 @@ struct dsp_config
     bool dither_enabled;
     bool new_gain;
     bool crossfeed_enabled;
-    bool eq_enabled;
 };
 
 struct resample_data
@@ -619,52 +618,6 @@ static void apply_crossfeed(long* src[], int count)
 }
 #endif
 
-#define EQ_CUTOFF_USER2REAL(x) (0xffffffff / dsp->frequency * (x))
-#define EQ_Q_USER2REAL(x) (((x) << 16) / 10)
-#define EQ_GAIN_USER2REAL(x) (((x) << 16) / 10)
-
-/* Synchronize the EQ filters with the global settings */
-static void eq_update_data()
-{
-    int i;
-    int *setting;
-    int gain, cutoff, q, maxgain;
-    
-    /* Don't do anything if we're not playing */
-    if (dsp->frequency == 0)
-        return;
-    
-    setting = &global_settings.eq_band0_cutoff;
-    maxgain = 0;
-    
-    /* Iterate over each band and update the appropriate filter */
-    for(i = 0; i < 5; i++) {
-        cutoff = *setting++;
-        q = *setting++;
-        gain = *setting++;
-
-        /* Keep track of maxgain for the pre-amp */
-        if (gain > maxgain)
-            maxgain = gain;
-
-        if (gain == 0) {
-            eq_data.enabled[i] = 0;
-        } else {
-            if (i == 0)
-                eq_ls_coefs(EQ_CUTOFF_USER2REAL(cutoff), EQ_Q_USER2REAL(q),
-                    EQ_GAIN_USER2REAL(gain), eq_data.filters[0].coefs);
-            else if (i == 4)
-                eq_hs_coefs(EQ_CUTOFF_USER2REAL(cutoff), EQ_Q_USER2REAL(q),
-                    EQ_GAIN_USER2REAL(gain), eq_data.filters[4].coefs);
-            else
-                eq_pk_coefs(EQ_CUTOFF_USER2REAL(cutoff), EQ_Q_USER2REAL(q),
-                    EQ_GAIN_USER2REAL(gain), eq_data.filters[i].coefs);
-
-            eq_data.enabled[i] = 1;
-        }
-    }
-}
-
 /* Apply EQ filters to those bands that have got it switched on. */
 static void eq_process(long **x, unsigned num)
 {
@@ -784,9 +737,6 @@ long dsp_process(char* dst, char* src[], long size)
     size /= dsp->sample_bytes * factor;
     dsp_set_replaygain(false);
 
-    if (dsp->eq_enabled)
-        eq_update_data();
-
     while (size > 0)
     {
         samples = convert_to_internal(src, size, tmp);
@@ -795,7 +745,8 @@ long dsp_process(char* dst, char* src[], long size)
         samples = resample(tmp, samples);
         if (dsp->crossfeed_enabled && dsp->stereo_mode != STEREO_MONO)
             apply_crossfeed(tmp, samples);
-        if (dsp->eq_enabled)
+        /* TODO: Might want to wrap this with a generic eq_enabled when the
+           settings are in place */
         eq_process(tmp, samples);
         write_samples((short*) dst, tmp, samples);
         written += samples;
@@ -990,11 +941,6 @@ bool dsp_configure(int setting, void *value)
     }
 
     return 1;
-}
-
-void dsp_set_eq(bool enable)
-{
-    dsp->eq_enabled = enable;
 }
 
 void dsp_set_crossfeed(bool enable)

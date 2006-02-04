@@ -78,5 +78,4 @@ eq_cf.S
 #elif defined(CPU_ARM) && !defined(SIMULATOR)
 eq_arm.S
 #endif
-eq_menu.c
 #endif

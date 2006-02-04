@@ -39,7 +39,6 @@
 #define PLUGIN_DIR ROCKBOX_DIR"/rocks"
 #define BACKDROP_DIR ROCKBOX_DIR"/backdrops"
 #define REC_BASE_DIR "/recordings"
-#define EQS_DIR ROCKBOX_DIR "/eqs"
 
 #define MAX_FILENAME 20
 
@@ -409,39 +408,6 @@ struct user_settings
     int brightness;         /* iriver h300: backlight PWM value: 2..15
                                 (0 and 1 are black) */
 #endif
-
-#if CONFIG_CODEC == SWCODEC
-    bool eq_enabled;            /* Enable equalizer */
-    
-    /* Order is important here, must be cutoff, q, then gain for each band.
-       See dsp_eq_update_data in dsp.c for why. */
-    
-    /* Band 0 settings */
-    int  eq_band0_cutoff;      /* Hz */
-    int  eq_band0_q;
-    int  eq_band0_gain;        /* +/- dB */
-    
-    /* Band 1 settings */
-    int  eq_band1_cutoff;      /* Hz */
-    int  eq_band1_q;
-    int  eq_band1_gain;        /* +/- dB */
-    
-    /* Band 2 settings */
-    int  eq_band2_cutoff;      /* Hz */
-    int  eq_band2_q;
-    int  eq_band2_gain;        /* +/- dB */
-    
-    /* Band 3 settings */
-    int  eq_band3_cutoff;      /* Hz */
-    int  eq_band3_q;
-    int  eq_band3_gain;        /* +/- dB */
-    
-    /* Band 4 settings */
-    int  eq_band4_cutoff;      /* Hz */
-    int  eq_band4_q;
-    int  eq_band4_gain;        /* +/- dB */
-#endif
-
 #ifdef HAVE_LCD_COLOR
     unsigned char backdrop_file[MAX_FILENAME+1];  /* backdrop bitmap file */
 #endif
