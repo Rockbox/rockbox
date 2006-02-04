@@ -212,7 +212,9 @@ void main(void)
     set_cpu_frequency(0); /* PLL off */
 #endif
 
+#ifdef HAVE_UDA1380
     uda1380_reset();
+#endif
     
     backlight_init();
     set_irq_level(0);
