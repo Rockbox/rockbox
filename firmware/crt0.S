@@ -452,7 +452,7 @@ irq_handler:
     pop r1, r0
     ret_irq
 
-#elif defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
+#elif defined(CPU_COLDFIRE)
     move.w  #0x2700,%sr
 
     move.l  #vectors,%d0

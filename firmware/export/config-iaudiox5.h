@@ -2,6 +2,9 @@
  * This config file is for iAudio X5
  */
 
+/* For Rolo and boot loader */
+#define MODEL_NUMBER 1
+
 /* define this if you have recording possibility */
 /*#define HAVE_RECORDING 1*/
 
@@ -59,11 +62,16 @@
 /* define this if the hardware can be powered off while charging */
 #define HAVE_POWEROFF_WHILE_CHARGING
 
-/* The start address index for ROM builds */
-#define ROM_START 0x11010
+/* The size of the flash ROM */
+#define FLASH_SIZE 0x400000
 
 /* Define this to the CPU frequency */
 #define CPU_FREQ      11289600
+
+/* Type of mobile power */
+#define CONFIG_BATTERY BATT_LIPOL1300
+
+#define BATTERY_SCALE_FACTOR 23437 /* FIX: this value is picked at random */
 
 /* Define this if you have ATA power-off control */
 #define HAVE_ATA_POWER_OFF
@@ -73,6 +81,8 @@
 
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 8
+
+#define USB_X5STYLE
 
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ

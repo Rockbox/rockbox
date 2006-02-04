@@ -43,7 +43,7 @@
 #endif
 #ifdef HAVE_UDA1380
 #include "uda1380.h"
-#elif HAVE_TLV320
+#elif defined(HAVE_TLV320)
 #include "tlv320.h"
 #endif
 #ifdef HAVE_LCD_BITMAP
@@ -939,7 +939,7 @@ void shutdown_hw(void)
     mp3_shutdown();
 #ifdef HAVE_UDA1380
     uda1380_close();
-#elif HAVE_TLV320
+#elif defined(HAVE_TLV320)
     tlv320_close();
 #endif
     backlight_off();

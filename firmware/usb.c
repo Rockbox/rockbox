@@ -183,6 +183,8 @@ void usb_enable(bool on)
 #elif defined(USB_ISP1582)
     /* TODO: Implement USB_ISP1582 */
     (void) on;
+#elif defined(USB_X5STYLE)
+    /* TODO X5 */
 #else
 #ifdef HAVE_LCD_BITMAP
     if(read_hw_mask() & USB_ACTIVE_HIGH)

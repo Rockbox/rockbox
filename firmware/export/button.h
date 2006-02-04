@@ -182,6 +182,9 @@ bool button_hold(void);
 #define BUTTON_UP             0x0008
 #define BUTTON_DOWN           0x0010
 #define BUTTON_MENU           0x0020
+#define  BUTTON_OFF           0x0040 /* DOES NOT EXIST!!! */
+
+#define BUTTON_RC_REC         (BUTTON_REMOTE | 0x00400000)
 
 #endif /* RECORDER/PLAYER/ONDIO/GMINI KEYPAD */
 

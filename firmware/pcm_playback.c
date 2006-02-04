@@ -530,6 +530,9 @@ void pcm_calculate_peaks(int *left, int *right)
 #elif defined(HAVE_WM8975)
     long samples = size / 4;
     short *addr = p;
+#elif defined(HAVE_TLV320)
+    long samples = 4;  /* TODO X5 */
+    short *addr = NULL;
 #endif
 
     if (samples > PEAK_SAMPLES)

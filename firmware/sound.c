@@ -28,7 +28,7 @@
 #include "uda1380.h"
 #elif defined(HAVE_WM8975)
 #include "wm8975.h"
-#elif HAVE_TLV320
+#elif defined(HAVE_TLV320)
 #include "tlv320.h"
 #endif
 #include "dac.h"
