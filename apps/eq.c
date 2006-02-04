@@ -32,11 +32,11 @@
  */
 
 #define DIV64(x, y, z) (long)(((long long)(x) << (z))/(y))
-/* TODO: This macro requires the EMAC unit to be in fractional mode
-   when the coef generator routines are called. If this can be guaranteeed,
-   then remove the "&& 0" below for faster coef calculation on Coldfire.
+/* This macro requires the EMAC unit to be in fractional mode
+   when the coef generator routines are called. If this can't be guaranteeed,
+   then add "&& 0" below. This will use a slower coef calculation on Coldfire.
  */
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR) && 0
+#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
 #define FRACMUL(x, y) \
 ({ \
     long t; \

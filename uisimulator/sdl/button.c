@@ -135,7 +135,7 @@ void button_event(int key, bool pressed)
         break;
 #endif
 
-    case SDLK_PERIOD:
+    case SDLK_KP_PERIOD:
     case SDLK_INSERT:
 #ifdef BUTTON_MENU
         new_btn = BUTTON_MENU;

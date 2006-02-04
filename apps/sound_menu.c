@@ -45,6 +45,7 @@
 #include "splash.h"
 #if CONFIG_CODEC == SWCODEC
 #include "dsp.h"
+#include "eq_menu.h"
 #endif
 
 int selected_setting; /* Used by the callback */
@@ -379,6 +380,7 @@ bool sound_menu(void)
         { ID2P(LANG_STEREO_WIDTH), stereo_width },
 #if CONFIG_CODEC == SWCODEC
         { ID2P(LANG_CROSSFEED), crossfeed },
+        { ID2P(LANG_EQUALIZER), eq_menu },
 #endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
         { ID2P(LANG_LOUDNESS), loudness },

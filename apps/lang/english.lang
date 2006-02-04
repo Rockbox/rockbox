@@ -3599,3 +3599,57 @@ eng: "Backdrop failed"
 voice: "Backdrop failed"
 new:
 
+id: LANG_EQUALIZER
+desc: in the sound settings menu
+eng: "Equalizer"
+voice: "Equalizer"
+new:
+
+id: LANG_EQUALIZER_SETTINGS
+desc: in the equalizer menu
+eng: "Browse EQ Presets"
+voice: "Browse EQ Presets"
+new:
+
+id: LANG_EQUALIZER_GRAPHICAL
+desc: in the equalizer menu
+eng: "Graphical EQ"
+voice: "Graphical EQ"
+new:
+
+id: LANG_EQUALIZER_GAIN
+desc: in the equalizer menu
+eng: "EQ Gain"
+voice: "EQ Gain"
+new:
+
+id: LANG_EQUALIZER_GAIN_ITEM
+desc: in the equalizer menu
+eng: "%d Hz Band Gain"
+voice: ""
+new:
+
+id: LANG_EQUALIZER_ADVANCED
+desc: in the equalizer menu
+eng: "EQ Advanced Settings"
+voice: "EQ Advanced Settings"
+new:
+
+id: LANG_EQUALIZER_BAND_CUTOFF
+desc: in the equalizer menu
+eng: "Cutoff"
+voice: "Cutoff"
+new:
+
+id: LANG_EQUALIZER_BAND_Q
+desc: in the equalizer menu
+eng: "Q"
+voice: "Q"
+new:
+
+id: LANG_EQUALIZER_BAND_GAIN
+desc: in the equalizer menu
+eng: "Gain"
+voice: "Gain"
+new:
+
