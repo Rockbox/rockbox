@@ -323,7 +323,11 @@ void *sim_codec_load_ram(char* codecptr, int size,
     /* We have to create the dynamic link library file from ram
        so we could simulate the codec loading. */
 
+#ifdef WIN32
     fd = open(path, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, S_IRWXU);
+#else
+    fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
+#endif
     if (fd < 0) {
         DEBUGF("failed to open for write: %s\n", path);
         return NULL;
