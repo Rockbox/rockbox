@@ -139,6 +139,25 @@
 #define UI_LCD_WIDTH                192 // * 1.5
 #define UI_LCD_HEIGHT               96  // * 1.5
 
+
+#elif defined(IAUDIO_X5)
+#define UI_TITLE                    "iAudio X5"
+#define UI_WIDTH                    300 // width of GUI window
+#define UI_HEIGHT                   462 // height of GUI window
+#define UI_LCD_BGCOLOR              90, 145, 90 // bkgnd color of LCD (no backlight)
+#define UI_LCD_BGCOLORLIGHT         230, 160, 60 // bkgnd color of LCD (backlight)
+#define UI_LCD_BLACK                0, 0, 0 // black
+#define UI_LCD_POSX                 55 // x position of lcd
+#define UI_LCD_POSY                 61 // y position of lcd (74 for real aspect)
+#define UI_LCD_WIDTH                LCD_WIDTH // * 1.5
+#define UI_LCD_HEIGHT               LCD_HEIGHT  // * 1.5
+
+#define UI_REMOTE_POSX              12  // x position of remote lcd
+#define UI_REMOTE_POSY              478 // y position of remote lcd
+#define UI_REMOTE_WIDTH             128
+#define UI_REMOTE_HEIGHT            64
+
+#define UI_REMOTE_BGCOLORLIGHT      250, 180, 130 // bkgnd of remote lcd (bklight)
 #endif
 
 extern SDL_Surface *gui_surface;
