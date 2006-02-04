@@ -22,6 +22,9 @@
 #include <stdarg.h>
 #include "config.h"
 #include "cpu.h"
+#ifdef HAVE_GDB_API
+#include "gdb_api.h"
+#endif
 
 #ifdef DEBUG
 static char debugmembuf[200];
@@ -196,6 +199,34 @@ static void debug(const char *msg)
     putpacket(debugbuf);
 }
 #endif /* SH7034 */
+
+#ifdef HAVE_GDB_API
+static void *get_api_function(int n)
+{
+    struct gdb_api *api = (struct gdb_api *)GDB_API_ADDRESS;
+    if (api->magic == GDB_API_MAGIC)
+        return api->func[n];
+    else
+        return NULL;
+}
+
+void breakpoint(void)
+{
+    void (*f)(void) = get_api_function(0);
+    if (f) (*f)();
+}
+
+static void debug(char *msg)
+{
+    void (*f)(char *) = get_api_function(1);
+    if (f) (*f)(msg);
+}
+
+void debug_init()
+{
+}
+
+#endif /* HAVE_GDB_API */
 #endif /* end of DEBUG section */
 
 #ifdef __GNUC__

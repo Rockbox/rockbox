@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Linus Nielsen Feltzing
+ * Copyright (C) 2006 by Tomasz Malesinski
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,41 +16,20 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef DEBUG_H
-#define DEBUG_H
 
-extern void debug_init(void);
-extern void debugf(const char* fmt,...);
-extern void ldebugf(const char* file, int line, const char *fmt, ...);
+#ifndef _GDB_API_H_
+#define _GDB_API_H_
 
-#ifdef __GNUC__
+#include "config.h"
 
-/*  */
-#if defined(SIMULATOR)
-#define DEBUGF	debugf
-#define LDEBUGF(...) ldebugf(__FILE__, __LINE__, __VA_ARGS__)
-#else
-#if defined(DEBUG)
-
-#ifdef HAVE_GDB_API
-void breakpoint(void);
+#define GDB_API_MAGIC 0x6db570b
+#ifdef IRIVER_IFP7XX_SERIES
+#define GDB_API_ADDRESS 0x24006000
 #endif
 
-#define DEBUGF	debugf
-#define LDEBUGF debugf
-#else
-#define DEBUGF(...)
-#define LDEBUGF(...)
-#endif
-#endif
-
-
-#else
-
-#define DEBUGF debugf
-#define LDEBUGF debugf
-
-#endif /* GCC */
-
-
+struct gdb_api
+{
+    unsigned long magic;
+    void *func[];
+};
 #endif

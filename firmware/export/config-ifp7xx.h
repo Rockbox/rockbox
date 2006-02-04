@@ -84,6 +84,8 @@
 
 #define USB_ISP1582
 
+#define HAVE_GDB_API
+
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
 
