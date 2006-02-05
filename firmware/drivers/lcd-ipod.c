@@ -29,7 +29,192 @@
 #include "kernel.h"
 #include "system.h"
 
-/*** definitions ***/
+
+/* check if number of useconds has past */
+static int timer_check(int clock_start, int usecs)
+{
+    if ( ((int)(USEC_TIMER - clock_start)) >= usecs ) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+
+#if (CONFIG_LCD == LCD_IPOD2BPP)
+
+/*** hardware configuration ***/
+
+#define IPOD_LCD_BASE            0xc0001000
+#define IPOD_LCD_BUSY_MASK        0x80000000
+
+/* LCD command codes for HD66789R */
+
+
+#define LCD_CMD  0x08
+#define LCD_DATA 0x10
+
+static unsigned int lcd_contrast = 0x6a;
+
+
+/* wait for LCD with timeout */
+static void lcd_wait_write(void)
+{
+    int start = USEC_TIMER;
+
+    do {
+        if ((inl(IPOD_LCD_BASE) & 0x8000) == 0) break;
+    } while (timer_check(start, 1000) == 0);
+}
+
+
+/* send LCD data */
+static void lcd_send_data(int data_lo, int data_hi)
+{
+    lcd_wait_write();
+        outl(data_lo, IPOD_LCD_BASE + LCD_DATA);
+        lcd_wait_write();
+        outl(data_hi, IPOD_LCD_BASE + LCD_DATA);
+}
+
+/* send LCD command */
+static void lcd_prepare_cmd(int cmd)
+{
+    lcd_wait_write();
+    
+        outl(0x0, IPOD_LCD_BASE + LCD_CMD);
+        lcd_wait_write();
+        outl(cmd, IPOD_LCD_BASE + LCD_CMD);
+    
+}
+
+/* send LCD command and data */
+static void lcd_cmd_and_data(int cmd, int data_lo, int data_hi)
+{
+    lcd_prepare_cmd(cmd);
+
+    lcd_send_data(data_lo, data_hi);
+}
+
+int lcd_default_contrast(void)
+{
+    return 28;
+}
+
+/** 
+ * 
+ * LCD init 
+ **/
+void lcd_init_device(void){
+    /* driver output control - 160x128 */
+    lcd_cmd_and_data(0x1, 0x1, 0xf);
+    lcd_cmd_and_data(0x5, 0x0, 0x10);
+}
+
+/*** update functions ***/
+/* srccopy bitblt, opcode is currently ignored*/
+
+/* Performance function that works with an external buffer
+   note that x and bwidtht are in 8-pixel units! */
+void lcd_blit(const unsigned char* data, int x, int by, int width,
+              int bheight, int stride)
+{
+    /* TODO implement this on iPod  */
+    (void)data;
+    (void)x;
+    (void)by;
+    (void)width;
+    (void)bheight;
+    (void)stride;
+}
+
+/* Rolls up the lcd display by the specified amount of lines.
+ * Lines that are rolled out over the top of the screen are
+ * rolled in from the bottom again. This is a hardware 
+ * remapping only and all operations on the lcd are affected.
+ * -> 
+ * @param int lines - The number of lines that are rolled. 
+ *  The value must be 0 <= pixels < LCD_HEIGHT. */
+void lcd_roll(int lines)
+{
+    /* TODO Implement lcd_roll() */
+    lines &= LCD_HEIGHT-1;
+}
+
+/*** hardware configuration ***/
+
+/* Update the display.
+   This must be called after all other LCD functions that change the display. */
+void lcd_update(void)
+{
+    lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
+}
+
+void lcd_set_contrast(int val)
+{
+    lcd_cmd_and_data(0x4, 0x4, val);
+    lcd_contrast = val;
+}
+
+void lcd_update_rect(int x, int y, int width, int height)
+{
+    int cursor_pos, xx;
+    int ny;
+    int sx = x, sy = y, mx = width, my = height;
+
+    /* only update the ipod if we are writing to the screen */
+    
+    sx >>= 3;
+    //mx = (mx+7)>>3;
+    mx >>= 3;
+
+    cursor_pos = sx + (sy << 5);
+
+    for ( ny = sy; ny <= my; ny++ ) {
+        unsigned char * img_data;
+        
+
+        // move the cursor
+        lcd_cmd_and_data(0x11, cursor_pos >> 8, cursor_pos & 0xff);
+
+        // setup for printing
+        lcd_prepare_cmd(0x12);
+
+        img_data = &lcd_framebuffer[ny][sx<<1];
+
+        // 160/8 -> 20 == loops 20 times
+        // make sure we loop at least once
+        for ( xx = sx; xx <= mx; xx++ ) {
+            // display a character
+            lcd_send_data(*(img_data+1), *img_data);
+
+            img_data += 2;
+        }
+
+        // update cursor pos counter
+        cursor_pos += 0x20;
+    }
+}
+
+/** Switch on or off the backlight **/
+void lcd_enable (bool on){
+    int lcd_state;
+
+        lcd_state = inl(IPOD_LCD_BASE);
+    if (on){
+        lcd_state = lcd_state | 0x2;
+        outl(lcd_state, IPOD_LCD_BASE);
+        lcd_cmd_and_data(0x7, 0x0, 0x11);
+    }
+    else {
+        lcd_state = lcd_state & ~0x2;
+        outl(lcd_state, IPOD_LCD_BASE);
+        lcd_cmd_and_data(0x7, 0x0, 0x9);
+    }
+}
+
+#else
+
 #define IPOD_LCD_BASE           0x70008a0c
 #define IPOD_LCD_BUSY_MASK      0x80000000
 
@@ -41,17 +226,6 @@
 
 /*** globals ***/
 static int lcd_type = 1; /* 0 = "old" Color/Photo, 1 = "new" Color & Nano */
-
-
-/* check if number of useconds has past */
-static inline int timer_check(unsigned long clock_start, unsigned long usecs)
-{
-    if ( (USEC_TIMER - clock_start) >= usecs ) {
-        return 1;
-    } else {
-        return 0;
-    }
-}
 
 static void lcd_wait_write(void)
 {
@@ -229,7 +403,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 
         /* start vert = max vert */
 #if CONFIG_LCD == LCD_IPODCOLOR
-	x0 = x1;
+        x0 = x1;
 #endif
 
         /* position cursor (set AD0-AD15) */
@@ -288,3 +462,4 @@ void lcd_update(void)
     lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
 }
 
+#endif
