@@ -447,7 +447,9 @@ appsdir='\$(ROOTDIR)/apps'
   echo "13 - iPod Color/Photo"
   echo "14 - iPod Nano"
   echo "15 - iPod Video"
-  echo "16 - iriver iFP-790"
+  echo "16 - iPod 3G"
+  echo "17 - iPod 4G (Grayscale)"
+  echo "18 - iriver iFP-790"
 
   target_id=`input`;
 
@@ -753,6 +755,44 @@ appsdir='\$(ROOTDIR)/apps'
     ;;
 
    16)
+    archos="ipod3g"
+    target="-DIPOD_3G"
+    memory=32 # always
+    arm7tdmicc
+    tool="$rootdir/tools/scramble -add=ip3g"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 2"
+    output="rockbox.ipod"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins="yes"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$ipodbitmaptools
+    ;;
+    
+   17)
+    archos="ipod4g"
+    target="-DIPOD_4G"
+    memory=32 # always
+    arm7tdmicc
+    tool="$rootdir/tools/scramble -add=ip4g"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 2"
+    output="rockbox.ipod"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins="yes"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$ipodbitmaptools
+    ;;
+    
+   18)
     archos="ifp7xx"
     target="-DIRIVER_IFP7XX"
     memory=1
@@ -815,7 +855,7 @@ fi
   case $option in
     [Bb])
       case $archos in
-          h100|h120|h300|x5|ipodcolor|ipodnano|ipodvideo)
+          h100|h120|h300|x5|ipodcolor|ipodnano|ipodvideo|ipod3g|ipod4g)
               extradefines="-DBOOTLOADER" # for target makefile symbol EXTRA_DEFINES
               appsdir='\$(ROOTDIR)/bootloader'
               apps="bootloader"
