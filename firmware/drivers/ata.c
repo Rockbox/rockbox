@@ -71,13 +71,20 @@
 #define SET_REG(reg,val) reg = ((val) << 8)
 #define SET_16BITREG(reg,val) reg = (val)
 
-#elif CONFIG_CPU == PP5020
+#elif (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
 
 /* don't use sh7034 assembler routines */
 #define PREFER_C_READING
 #define PREFER_C_WRITING
 
+#if (CONFIG_CPU == PP5002)
+#define ATA_IOBASE      0xc00031e0
+#define ATA_CONTROL     (*((volatile unsigned char*)(0xc00033f8)))
+#elif (CONFIG_CPU == PP5020)
 #define ATA_IOBASE      0xc30001e0
+#define ATA_CONTROL     (*((volatile unsigned char*)(0xc30003f8)))
+#endif
+
 #define ATA_DATA        (*((volatile unsigned short*)(ATA_IOBASE)))
 #define ATA_ERROR       (*((volatile unsigned char*)(ATA_IOBASE + 0x04)))
 #define ATA_NSECTOR     (*((volatile unsigned char*)(ATA_IOBASE + 0x08)))
@@ -86,7 +93,6 @@
 #define ATA_HCYL        (*((volatile unsigned char*)(ATA_IOBASE + 0x14)))
 #define ATA_SELECT      (*((volatile unsigned char*)(ATA_IOBASE + 0x18)))
 #define ATA_COMMAND     (*((volatile unsigned char*)(ATA_IOBASE + 0x1c)))
-#define ATA_CONTROL     (*((volatile unsigned char*)(0xc30003f8)))
 
 #define STATUS_BSY      0x80
 #define STATUS_RDY      0x40
@@ -928,6 +934,11 @@ extern void ata_flush(void)
 
 static int check_registers(void)
 {
+#if (CONFIG_CPU == PP5002)
+    /* This fails on the PP5002, but the ATA driver still works.  This
+       needs more investigation. */
+    return 0;
+#else
     int i;
     if ( ATA_STATUS & STATUS_BSY )
             return -1;
@@ -939,13 +950,14 @@ static int check_registers(void)
       SET_REG(ATA_HCYL,    WRITE_PATTERN4);
       
       if ((ATA_NSECTOR == READ_PATTERN1) &&
-	  (ATA_SECTOR  == READ_PATTERN2) &&
-	  (ATA_LCYL    == READ_PATTERN3) &&
-	  (ATA_HCYL    == READ_PATTERN4))
+          (ATA_SECTOR  == READ_PATTERN2) &&
+          (ATA_LCYL    == READ_PATTERN3) &&
+          (ATA_HCYL    == READ_PATTERN4))
         return 0;
     }
 
     return -2;
+#endif
 }
 
 static int freeze_lock(void)
@@ -1254,7 +1266,7 @@ void ata_enable(bool on)
     (void)on;
 #elif CONFIG_CPU == TCC730
 
-#elif CONFIG_CPU == PP5020
+#elif (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
     /* TODO: Implement ata_enable() */
     (void)on;
 #endif
@@ -1410,7 +1422,7 @@ int ata_init(void)
 #elif defined(IAUDIO_X5)
     /* X5 TODO */
     bool coldstart = true;
-#elif CONFIG_CPU == PP5020
+#elif (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
     bool coldstart = false;
     /* TODO: Implement coldstart variable */
 #else
@@ -1440,6 +1452,13 @@ int ata_init(void)
     or_l(0x00080000, &GPIO_FUNCTION);
 
     /* FYI: The IDECONFIGx registers are set by set_cpu_frequency() */
+#elif CONFIG_CPU == PP5002
+    /* From ipod-ide.c:ipod_ide_register() */
+    outl(inl(0xc0003024) | (1 << 7), 0xc0003024);
+    outl(inl(0xc0003024) & ~(1<<2), 0xc0003024);
+
+    outl(0x10, 0xc0003000);
+    outl(0x80002150, 0xc0003004);
 #elif CONFIG_CPU == PP5020
     /* From ipod-ide.c:ipod_ide_register() */
     outl(inl(0xc3000028) | (1 << 5), 0xc3000028);

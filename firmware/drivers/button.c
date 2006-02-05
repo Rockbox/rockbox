@@ -61,7 +61,8 @@ static bool flipped;  /* buttons can be flipped to match the LCD flip */
 #define REPEAT_INTERVAL_FINISH  5
 
 /* the power-off button and number of repeated keys before shutting off */
-#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD)
+#if (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD) ||\
+    (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD)
 #define POWEROFF_BUTTON BUTTON_PLAY
 #define POWEROFF_COUNT 40
 #else
@@ -220,7 +221,132 @@ void ipod_4g_button_int(void)
     CPU_HI_INT_EN = I2C_MASK;
 }
 #endif 
+#if CONFIG_KEYPAD == IPOD_3G_PAD
+/* Variable to use for setting button status in interrupt handler */
+int int_btn = BUTTON_NONE;
 
+/**
+ * 
+ * 
+ */
+void handle_scroll_wheel(int new_scroll, int was_hold, int reverse)
+{
+    int wheel_keycode = BUTTON_NONE;
+    static int prev_scroll = -1;
+    static int scroll_state[4][4] = {
+        {0, 1, -1, 0},
+        {-1, 0, 0, 1},
+        {1, 0, 0, -1},
+        {0, -1, 1, 0}
+    };
+
+    if ( prev_scroll == -1 ) {
+        prev_scroll = new_scroll;
+    }
+    else if (!was_hold) {
+        switch (scroll_state[prev_scroll][new_scroll]) {
+        case 1:
+            if (reverse) {
+                /* 'r' keypress */
+                wheel_keycode = BUTTON_SCROLL_FWD;
+            }
+            else {
+                /* 'l' keypress */
+                wheel_keycode = BUTTON_SCROLL_BACK;
+            }
+            break;
+        case -1:
+            if (reverse) {
+                /* 'l' keypress */
+                wheel_keycode = BUTTON_SCROLL_BACK;
+            }
+            else {
+                /* 'r' keypress */
+                wheel_keycode = BUTTON_SCROLL_FWD;
+            break;
+        default:
+            /* only happens if we get out of sync */
+            break;
+        }
+    }
+    }
+    if (wheel_keycode != BUTTON_NONE)
+              queue_post(&button_queue, wheel_keycode, NULL);
+    prev_scroll = new_scroll;
+}
+
+static int ipod_3g_button_read(void)
+{
+     unsigned char source, state;
+    static int was_hold = 0;
+int btn = BUTTON_NONE;
+    /*
+     * we need some delay for g3, cause hold generates several interrupts,
+     * some of them delayed
+     */
+        udelay(250);
+
+    /* get source of interupts */
+    source = inb(0xcf000040);
+    if (source) {
+        
+        /* get current keypad status */
+        state = inb(0xcf000030);
+        outb(~state, 0xcf000060);
+    
+            if (was_hold && source == 0x40 && state == 0xbf) {
+                /* ack any active interrupts */
+                outb(source, 0xcf000070);
+                return BUTTON_NONE;
+            }
+            was_hold = 0;
+    
+    
+        if ( source & 0x20 ) {
+                /* 3g hold switch is active low */
+                    btn |= BUTTON_HOLD;
+                    was_hold = 1;
+                /* hold switch on 3g causes all outputs to go low */
+                /* we shouldn't interpret these as key presses */
+                goto done;
+        }
+        if (source & 0x1) {
+             btn |= BUTTON_RIGHT;
+        }
+        if (source & 0x2) {
+            btn |= BUTTON_SELECT;
+        }
+        if (source & 0x4) {
+            btn |= BUTTON_PLAY;
+        }
+        if (source & 0x8) {
+            btn |= BUTTON_LEFT;
+        }
+        if (source & 0x10) {
+            btn |= BUTTON_MENU;
+        }
+    
+        if (source & 0xc0) {
+            handle_scroll_wheel((state & 0xc0) >> 6, was_hold, 0);
+        }
+    done:
+    
+        /* ack any active interrupts */
+        outb(source, 0xcf000070);
+    }
+    return btn;
+}
+
+void ipod_3g_button_int(void)
+{
+    /**
+     *  Theire is other things to do but for now ...
+     * TODO: implement this function in a better way 
+     **/
+   int_btn = ipod_3g_button_read();
+   
+}
+#endif 
 static void button_tick(void)
 {
     static int tick = 0;
@@ -404,8 +530,13 @@ void button_init(void)
     GPIOA_INT_EN = 0x20;
     CPU_INT_EN = 0x40000000;
     CPU_HI_INT_EN = I2C_MASK;
-#endif /* CONFIG_KEYPAD */
 
+#elif CONFIG_KEYPAD == IPOD_3G_PAD
+    outb(~inb(GPIOA_INPUT_VAL), GPIOA_INT_LEV);
+    outb(inb(GPIOA_INT_STAT), GPIOA_INT_CLR);
+    outb(0xff, GPIOA_INT_EN);
+
+#endif /* CONFIG_KEYPAD */
     queue_init(&button_queue);
     button_read();
     lastbtn = button_read();
@@ -418,7 +549,7 @@ void button_init(void)
 }
 
 #ifdef HAVE_LCD_BITMAP /* only bitmap displays can be flipped */
-#if (CONFIG_KEYPAD != IPOD_4G_PAD)
+#if (CONFIG_KEYPAD != IPOD_3G_PAD) && (CONFIG_KEYPAD != IPOD_4G_PAD)
 /*
  * helper function to swap UP/DOWN, LEFT/RIGHT (and F1/F3 for Recorder)
  */
@@ -883,7 +1014,7 @@ static int button_read(void)
     if (data & 0x01)
         btn |= BUTTON_ON;
 
-#elif CONFIG_KEYPAD == IPOD_4G_PAD
+#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
     (void)data;
     /* The int_btn variable is set in the button interrupt handler */
     btn = int_btn;

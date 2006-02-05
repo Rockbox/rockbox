@@ -84,7 +84,7 @@ void power_init(void)
     pcf50606_init();
 #endif
 #endif
-#elif CONFIG_CPU == PP5020
+#elif CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
     /* TODO: Implement power_init() */
 #else
 #ifdef HAVE_POWEROFF_ON_PB5
@@ -181,7 +181,7 @@ void ide_power_enable(bool on)
         or_l(0x80000000, &GPIO_OUT);
 #elif defined(IAUDIO_X5)
     /* X5 TODO */
-#elif CONFIG_CPU == PP5020
+#elif (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
     /* We do nothing on the iPod */
 #elif defined(GMINI_ARCH)
     if(on)
@@ -237,7 +237,7 @@ bool ide_powered(void)
     return (GPIO_OUT & 0x80000000)?false:true;
 #elif defined(IAUDIO_X5)
     return false; /* X5 TODO */
-#elif CONFIG_CPU == PP5020
+#elif (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
     /* pretend we are always powered - we don't turn it off on the ipod */
     return true;
 #elif defined(GMINI_ARCH)
@@ -273,7 +273,7 @@ void power_off(void)
     and_l(~0x00080000, &GPIO1_OUT);
 #elif defined(IAUDIO_X5)
     and_l(~0x00000008, &GPIO_OUT);
-#elif CONFIG_CPU == PP5020
+#elif (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5002)
 #ifndef BOOTLOADER
     /* We don't turn off the ipod, we put it in a deep sleep */
     pcf50605_standby_mode();
