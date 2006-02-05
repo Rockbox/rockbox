@@ -25,7 +25,44 @@
 #include "kernel.h"
 #include "id3.h"
 
-/* playlist data */
+#define PLAYLIST_ATTR_QUEUED    0x01
+#define PLAYLIST_ATTR_INSERTED  0x02
+#define PLAYLIST_ATTR_SKIPPED   0x04
+#define PLAYLIST_MAX_CACHE      16
+
+#define DEFAULT_DYNAMIC_PLAYLIST_NAME "/dynamic.m3u"
+
+enum playlist_command {
+    PLAYLIST_COMMAND_PLAYLIST,
+    PLAYLIST_COMMAND_ADD,
+    PLAYLIST_COMMAND_QUEUE,
+    PLAYLIST_COMMAND_DELETE,
+    PLAYLIST_COMMAND_SHUFFLE,
+    PLAYLIST_COMMAND_UNSHUFFLE,
+    PLAYLIST_COMMAND_RESET,
+    PLAYLIST_COMMAND_COMMENT
+};
+
+enum {
+    PLAYLIST_PREPEND = -1,
+    PLAYLIST_INSERT = -2,
+    PLAYLIST_INSERT_LAST = -3,
+    PLAYLIST_INSERT_FIRST = -4,
+    PLAYLIST_INSERT_SHUFFLED = -5
+};
+
+enum {
+    PLAYLIST_DELETE_CURRENT = -1
+};
+
+struct playlist_control_cache {
+    enum playlist_command command;
+    int i1;
+    int i2;
+    const char* s1;
+    const char* s2;
+    void* data;
+};
 
 struct playlist_info
 {
@@ -53,15 +90,15 @@ struct playlist_info
                               inserted tracks?                      */
     bool deleted;        /* have any tracks been deleted?           */
     int num_inserted_tracks; /* number of tracks inserted           */
-    bool shuffle_flush;  /* does shuffle value need to be flushed?  */
+
+    /* cache of playlist control commands waiting to be flushed to
+       to disk                                                      */
+    struct playlist_control_cache control_cache[PLAYLIST_MAX_CACHE];
+    int num_cached;      /* number of cached entries                */
+    bool pending_control_sync; /* control file needs to be synced   */
+
     struct mutex control_mutex; /* mutex for control file access    */
 };
-
-#define PLAYLIST_ATTR_QUEUED    0x01
-#define PLAYLIST_ATTR_INSERTED  0x02
-#define PLAYLIST_ATTR_SKIPPED   0x04
-
-#define DEFAULT_DYNAMIC_PLAYLIST_NAME "/dynamic.m3u"
 
 struct playlist_track_info
 {
@@ -73,6 +110,7 @@ struct playlist_track_info
 
 /* Exported functions only for current playlist. */
 void playlist_init(void);
+void playlist_shutdown(void);
 int playlist_create(const char *dir, const char *file);
 int playlist_resume(void);
 int playlist_add(const char *filename);
@@ -119,17 +157,5 @@ char *playlist_get_name(const struct playlist_info* playlist, char *buf,
 int playlist_get_track_info(struct playlist_info* playlist, int index,
                             struct playlist_track_info* info);
 int playlist_save(struct playlist_info* playlist, char *filename);
-
-enum {
-    PLAYLIST_PREPEND = -1,
-    PLAYLIST_INSERT = -2,
-    PLAYLIST_INSERT_LAST = -3,
-    PLAYLIST_INSERT_FIRST = -4,
-    PLAYLIST_INSERT_SHUFFLED = -5
-};
-
-enum {
-    PLAYLIST_DELETE_CURRENT = -1
-};
 
 #endif /* __PLAYLIST_H__ */

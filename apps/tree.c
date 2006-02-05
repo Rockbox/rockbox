@@ -1325,6 +1325,7 @@ void tree_flush(void)
 {
     rundb_shutdown();
     tagdb_shutdown();
+    playlist_shutdown();
 #ifdef HAVE_DIRCACHE
     if (global_settings.dircache)
     {
