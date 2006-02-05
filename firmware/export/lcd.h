@@ -192,6 +192,8 @@ typedef void lcd_fastpixelfunc_type(fb_data *address);
 /* Memory copy of display bitmap */
 #if LCD_DEPTH == 1
 extern fb_data lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
+#elif CONFIG_LCD == LCD_IPOD2BPP
+extern fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH/4];
 #elif LCD_DEPTH == 2
 extern fb_data lcd_framebuffer[LCD_HEIGHT/4][LCD_WIDTH];
 #elif LCD_DEPTH == 16
@@ -200,7 +202,7 @@ extern fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH];
 extern fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH];
 #endif
 
-#if CONFIG_BACKLIGHT==BL_IRIVER_H300
+#if (CONFIG_BACKLIGHT==BL_IRIVER_H300) || (CONFIG_BACKLIGHT==BL_IPOD3G)
 extern void lcd_enable(bool on);
 #endif
 

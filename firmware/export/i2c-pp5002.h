@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2004 by Linus Nielsen Feltzing
+ * Copyright (C) 2002 by Linus Nielsen Feltzing
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,26 +16,19 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "config.h"
 
-#if CONFIG_CPU == SH7034
-#include "sh7034.h"
-#endif
-#if CONFIG_CPU == MCF5249
-#include "mcf5249.h"
-#endif
-#if CONFIG_CPU == MCF5250
-#include "mcf5250.h"
-#endif
-#if CONFIG_CPU == TCC730
-#include "tcc730.h"
-#endif
-#if CONFIG_CPU == PP5020
-#include "pp5020.h"
-#endif
-#if CONFIG_CPU == PP5002
-#include "pp5002.h"
-#endif
-#if CONFIG_CPU == PNX0101
-#include "pnx0101.h"
+/*
+ * PP5002 i2c driver
+ *
+ */
+ 
+#ifndef _I2C_PP5002_H
+#define _I2C_PP5002_H
+
+/* TODO: Fully implement i2c driver */
+
+void i2c_init(void);
+int i2c_readbyte(unsigned int dev_addr, int addr);
+int ipod_i2c_send(unsigned int addr, int data0, int data1);
+
 #endif

@@ -44,15 +44,16 @@
 #define PNX0101  101
 
 /* CONFIG_KEYPAD */
-#define PLAYER_PAD      0
-#define RECORDER_PAD    1
-#define ONDIO_PAD       2
-#define IRIVER_H100_PAD 3
-#define GMINI100_PAD    4
-#define IRIVER_H300_PAD 5
-#define IAUDIO_X5_PAD   6
-#define IPOD_4G_PAD     7
-#define IRIVER_IFP7XX_PAD 8
+#define PLAYER_PAD          0
+#define RECORDER_PAD        1
+#define ONDIO_PAD           2
+#define IRIVER_H100_PAD     3
+#define GMINI100_PAD        4
+#define IRIVER_H300_PAD     5
+#define IAUDIO_X5_PAD       6
+#define IPOD_4G_PAD         7
+#define IPOD_3G_PAD         8
+#define IRIVER_IFP7XX_PAD   9
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -77,7 +78,8 @@
 #define LCD_IPODCOLOR 6 /* as used by iPod Color/Photo */
 #define LCD_IPODNANO  7 /* as used by iPod Nano */
 #define LCD_IPODVIDEO 8 /* as used by iPod Video */
-#define LCD_IFP7XX    9 /* as used by iRiver iFP 7xx/8xx */
+#define LCD_IPOD2BPP  9 /* as used by all greyscale iPods */
+#define LCD_IFP7XX   10 /* as used by iRiver iFP 7xx/8xx */
 
 /* LCD_PIXELFORMAT */
 #define RGB565 565
@@ -91,16 +93,18 @@
 #define BL_GMINI         4 /* Archos GMini */
 #define BL_IPOD4G        5 /* Apple iPod 4G */
 #define BL_IPODNANO      6 /* Apple iPod Nano and iPod Video*/
-#define BL_IRIVER_H300   7 /* IRiver PWM */
-#define BL_IRIVER_IFP7XX 8 /* IRiver GPIO */
+#define BL_IPOD3G        7 /* Apple iPod 3g with dock */
+#define BL_IRIVER_H300   8 /* IRiver PWM */
+#define BL_IRIVER_IFP7XX 9 /* IRiver GPIO */
 
 /* CONFIG_I2C */
 #define I2C_PLAYREC  0 /* Archos Player/Recorder style */
 #define I2C_ONDIO    1 /* Ondio style */
 #define I2C_GMINI    2 /* Gmini style */
 #define I2C_COLDFIRE 3 /* Coldfire style */
-#define I2C_PP5020   4 /* PP5020 style */
-#define I2C_PNX0101  5 /* PNX0101 style */
+#define I2C_PP5002   4 /* PP5002 style */
+#define I2C_PP5020   5 /* PP5020 style */
+#define I2C_PNX0101  6 /* PNX0101 style */
 
 /* CONFIG_LED */
 #define LED_REAL     1 /* SW controlled LED (Archos recorders, player, Gmini) */
@@ -111,7 +115,7 @@
 
 /* CONFIG_RTC */
 #define RTC_M41ST84W 1 /* Archos Recorder */
-#define RTC_PCF50605 2 /* iPod 4G */
+#define RTC_PCF50605 2 /* iPod 3G and 4G*/
 #define RTC_PCF50606 3 /* iriver H300 */
 
 /* else                   HW controlled LED (iRiver H1x0) */
@@ -147,6 +151,8 @@
 #include "config-ipodnano.h"
 #elif defined(IPOD_VIDEO)
 #include "config-ipodvideo.h"
+#elif defined(IPOD_3G)
+#include "config-ipod3g.h"
 #elif defined(IRIVER_IFP7XX)
 #include "config-ifp7xx.h"
 #else
@@ -172,7 +178,7 @@
 #endif
 
 /* define for all cpus from ARM family */
-#if (CONFIG_CPU == PP5020) || (CONFIG_CPU == PNX0101)
+#if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020) || (CONFIG_CPU == PNX0101)
 #define CPU_ARM
 #endif
 
@@ -193,11 +199,12 @@
     (((CONFIG_CPU == SH7034) && !defined(PLUGIN)) || /* SH1 archos: core only */ \
     (CONFIG_CPU == MCF5249) || /* Coldfire: core, plugins, codecs */ \
     (CONFIG_CPU == PP5020) ||  /* iPod: core, plugins, codecs */ \
+    (CONFIG_CPU == PP5002) ||  /* iPod: core, plugins, codecs */ \
     (CONFIG_CPU == TCC730))    /* CalmRISC16: core, (plugins, codecs) */
-#define ICODE_ATTR	__attribute__ ((section(".icode")))
-#define ICONST_ATTR __attribute__ ((section(".irodata")))
-#define IDATA_ATTR	__attribute__ ((section(".idata")))
-#define IBSS_ATTR	__attribute__ ((section(".ibss")))
+#define ICODE_ATTR      __attribute__ ((section(".icode")))
+#define ICONST_ATTR     __attribute__ ((section(".irodata")))
+#define IDATA_ATTR      __attribute__ ((section(".idata")))
+#define IBSS_ATTR       __attribute__ ((section(".ibss")))
 #define USE_IRAM
 #else
 #define ICODE_ATTR

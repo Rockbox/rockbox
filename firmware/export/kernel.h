@@ -66,10 +66,10 @@ struct mutex
 };
 
 /* global tick variable */
-#if (CONFIG_CPU == PP5020) && defined(BOOTLOADER)
+#if ((CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)) && defined(BOOTLOADER)
 /* We don't enable interrupts in the iPod bootloader, so we need to fake
    the current_tick variable */
-#define current_tick ((*((volatile long*)0x60005010))/10000)
+#define current_tick (USEC_TIMER/10000)
 #else
 extern long current_tick;
 #endif

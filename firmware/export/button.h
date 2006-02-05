@@ -163,6 +163,17 @@ bool button_hold(void);
 #define  BUTTON_SCROLL_FWD    0x0010
 #define  BUTTON_SCROLL_BACK   0x0020
 
+#elif CONFIG_KEYPAD == IPOD_3G_PAD
+
+/* TODO: These codes should relate to the hardware */
+
+#define  BUTTON_MENU          0x0002
+#define  BUTTON_PLAY          0x0004
+#define  BUTTON_SELECT        0x0008
+#define  BUTTON_SCROLL_FWD    0x0010
+#define  BUTTON_SCROLL_BACK   0x0020
+#define  BUTTON_HOLD          0x0100
+
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
 
 #define  BUTTON_PLAY          0x0001
