@@ -411,6 +411,8 @@ struct user_settings
 #ifdef HAVE_LCD_COLOR
     unsigned char backdrop_file[MAX_FILENAME+1];  /* backdrop bitmap file */
 #endif
+
+    bool warnon_erase_dynplaylist; /* warn when erasing dynamic playlist */
 };
 
 enum optiontype { INT, BOOL };

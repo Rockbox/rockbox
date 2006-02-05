@@ -40,6 +40,7 @@
 #include "sprintf.h"
 #include "dircache.h"
 #include "splash.h"
+#include "yesno.h"
 
 #ifndef SIMULATOR
 static int boot_size = 0;
@@ -346,6 +347,18 @@ int ft_enter(struct tree_context* c)
                 if (bookmark_autoload(buf))
                     break;
 
+                /* about to create a new current playlist...
+                   allow user to cancel the operation */
+                if (global_settings.warnon_erase_dynplaylist && 
+                    playlist_modified(NULL))
+                {
+                    char *lines[]={str(LANG_WARN_ERASEDYNPLAYLIST_PROMPT)};
+                    struct text_message message={lines, 1};
+
+                    if(gui_syncyesno_run(&message, NULL, NULL) != YESNO_YES)
+                        break;
+                }
+
                 if (playlist_create(c->currdir, file->name) != -1)
                 {
                     if (global_settings.playlist_shuffle)
@@ -359,6 +372,18 @@ int ft_enter(struct tree_context* c)
             case TREE_ATTR_MPA:
                 if (bookmark_autoload(c->currdir))
                     break;
+
+                /* about to create a new current playlist...
+                   allow user to cancel the operation */
+                if (global_settings.warnon_erase_dynplaylist && 
+                    playlist_modified(NULL))
+                {
+                    char *lines[]={str(LANG_WARN_ERASEDYNPLAYLIST_PROMPT)};
+                    struct text_message message={lines, 1};
+
+                    if(gui_syncyesno_run(&message, NULL, NULL) != YESNO_YES)
+                        break;
+                }
 
                 if (playlist_create(c->currdir, NULL) != -1)
                 {

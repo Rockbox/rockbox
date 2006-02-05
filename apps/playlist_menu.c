@@ -60,6 +60,12 @@ static bool recurse_directory(void)
                        NULL );
 }
 
+static bool warnon_option(void)
+{
+    return set_bool(str(LANG_WARN_ERASEDYNPLAYLIST_MENU),
+        &global_settings.warnon_erase_dynplaylist);
+}
+
 bool playlist_menu(void)
 {
     int m;
@@ -70,6 +76,7 @@ bool playlist_menu(void)
         { ID2P(LANG_VIEW_DYNAMIC_PLAYLIST), playlist_viewer   },
         { ID2P(LANG_SAVE_DYNAMIC_PLAYLIST), save_playlist     },
         { ID2P(LANG_RECURSE_DIRECTORY),     recurse_directory },
+        { ID2P(LANG_WARN_ERASEDYNPLAYLIST_MENU), warnon_option},
     };
 
     m = menu_init( items, sizeof items / sizeof(struct menu_item), NULL,

@@ -508,6 +508,9 @@ static const struct bit_entry hd_bits[] =
 #endif
 #endif /* HAVE_LCD_BITMAP */
 
+    {1, S_O(warnon_erase_dynplaylist), false,
+        "warn when erasing dynamic playlist", off_on },
+
     /* If values are just added to the end, no need to bump the version. */
     /* new stuff to be added at the end */
 
