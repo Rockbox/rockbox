@@ -145,7 +145,7 @@ SECTIONS
        stackend = .;
     } > IRAM
 
-#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES) || defined(IAUDIO_X5)
     .bss DRAMORIG+0x800000:
 #else
     .bss :
@@ -156,7 +156,7 @@ SECTIONS
         *(.bss)
         *(COMMON)
        _end = .;
-#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES) || defined(IAUDIO_X5)
     } > DRAM
 #else
     } > IRAM
