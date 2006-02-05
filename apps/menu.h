@@ -68,7 +68,7 @@
 #define MENU_ENTER      BUTTON_RIGHT
 #define MENU_ENTER2     BUTTON_PLAY
 
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
 
 /* TODO: Check menu button assignments */
 

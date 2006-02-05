@@ -101,7 +101,7 @@
 #define KBD_UP BUTTON_UP
 #define KBD_DOWN BUTTON_DOWN
 
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
 
 #define KBD_MODES /* iPod uses 2 modes, picker and line edit */
 #define KBD_SELECT (BUTTON_SELECT | BUTTON_REL) /* backspace in line edit */
