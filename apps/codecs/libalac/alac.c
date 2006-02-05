@@ -184,49 +184,39 @@ static inline void unreadbits(alac_file *alac, int bits)
         alac->input_buffer_bitaccumulator *= -1;
 }
 
+static const unsigned char bittab[16] ICONST_ATTR = {
+    0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4
+};
+
 static inline int count_leading_zeros(int input)
 {
-    int output = 0;
-    int curbyte = 0;
+    int output = 32;
 
-    curbyte = input >> 24;
-    if (curbyte) goto found;
-    output += 8;
-
-    curbyte = input >> 16;
-    if (curbyte & 0xff) goto found;
-    output += 8;
-
-    curbyte = input >> 8;
-    if (curbyte & 0xff) goto found;
-    output += 8;
-
-    curbyte = input;
-    if (curbyte & 0xff) goto found;
-    output += 8;
-
-    return output;
-
-found:
-    if (!(curbyte & 0xf0))
+#if 0
+    /* Experimentation has shown that the following test is always false,
+       so we don't bother to perform it. */
+    if (input & 0xffff0000)
     {
-        output += 4;
+        input >>= 16;
+        output -= 16;
     }
-    else
-        curbyte >>= 4;
-
-    if (curbyte & 0x8)
-        return output;
-    if (curbyte & 0x4)
-        return output + 1;
-    if (curbyte & 0x2)
-        return output + 2;
-    if (curbyte & 0x1)
-        return output + 3;
-
-    /* shouldn't get here: */
-    return output + 4;
+#endif
+    if (input & 0xff00)
+    {
+        input >>= 8;
+        output -= 8;
+    }
+    if (input & 0xf0)
+    {
+        input >>= 4;
+        output -= 4;
+    }
+    output -= bittab[input];
+    return output;
 }
+
+
+
 
 void basterdised_rice_decompress(alac_file *alac,
                                  int32_t *output_buffer,
