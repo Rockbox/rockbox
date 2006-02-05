@@ -273,7 +273,7 @@ void power_off(void)
     and_l(~0x00080000, &GPIO1_OUT);
 #elif defined(IAUDIO_X5)
     and_l(~0x00000008, &GPIO_OUT);
-#elif (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5002)
+#elif (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
 #ifndef BOOTLOADER
     /* We don't turn off the ipod, we put it in a deep sleep */
     pcf50605_standby_mode();

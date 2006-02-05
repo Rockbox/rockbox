@@ -156,6 +156,19 @@ void lcd_set_contrast(int val)
     lcd_contrast = val;
 }
 
+void lcd_set_invert_display(bool yesno)
+{
+  /* TODO: Implement lcd_set_invert_display() */
+  (void)yesno;
+}
+
+/* turn the display upside down (call lcd_update() afterwards) */
+void lcd_set_flip(bool yesno)
+{
+  /* TODO: Implement lcd_set_flip() */
+  (void)yesno;
+}
+
 void lcd_update_rect(int x, int y, int width, int height)
 {
     int cursor_pos, xx;

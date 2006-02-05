@@ -153,6 +153,8 @@
 #include "config-ipodvideo.h"
 #elif defined(IPOD_3G)
 #include "config-ipod3g.h"
+#elif defined(IPOD_4G)
+#include "config-ipod4g.h"
 #elif defined(IRIVER_IFP7XX)
 #include "config-ifp7xx.h"
 #else

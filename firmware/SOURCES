@@ -112,7 +112,7 @@ drivers/mas.c
 #ifdef IRIVER_H300_SERIES
 drivers/pcf50606.c
 #endif
-#if defined(APPLE_IPODCOLOR) || defined(APPLE_IPODNANO) || defined(APPLE_IPODVIDEO) || defined(APPLE_IPOD3G)
+#if defined(APPLE_IPODCOLOR) || defined(APPLE_IPODNANO) || defined(APPLE_IPODVIDEO) || defined(APPLE_IPOD3G) || defined(APPLE_IPOD4G)
 drivers/pcf50605.c
 #endif
 #if (CONFIG_RTC == RTC_M41ST84W) || (CONFIG_RTC == RTC_PCF50606)
