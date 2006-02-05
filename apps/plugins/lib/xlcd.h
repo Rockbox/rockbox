@@ -29,6 +29,11 @@
 void xlcd_init(struct plugin_api* newrb);
 void xlcd_filltriangle(int x1, int y1, int x2, int y2, int x3, int y3);
 
+void xlcd_scroll_left(int count);
+void xlcd_scroll_right(int count);
+void xlcd_scroll_up(int count);
+void xlcd_scroll_down(int count);
+
 #endif /* HAVE_LCD_BITMAP */
 #endif /* __XLCD_H__ */
 

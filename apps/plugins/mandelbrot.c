@@ -18,17 +18,21 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef SIMULATOR 
 #include "plugin.h"
 
-#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
+#if defined(HAVE_LCD_BITMAP) && ((LCD_DEPTH >= 8) || !defined(SIMULATOR))
 #include "gray.h"
+#include "xlcd.h"
 
 PLUGIN_HEADER
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define MANDELBROT_QUIT BUTTON_OFF
+#define MANDELBROT_UP BUTTON_UP
+#define MANDELBROT_DOWN BUTTON_DOWN
+#define MANDELBROT_LEFT BUTTON_LEFT
+#define MANDELBROT_RIGHT BUTTON_RIGHT
 #define MANDELBROT_ZOOM_IN BUTTON_PLAY
 #define MANDELBROT_ZOOM_OUT BUTTON_ON
 #define MANDELBROT_MAXITER_INC BUTTON_F2
@@ -37,6 +41,10 @@ PLUGIN_HEADER
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define MANDELBROT_QUIT BUTTON_OFF
+#define MANDELBROT_UP BUTTON_UP
+#define MANDELBROT_DOWN BUTTON_DOWN
+#define MANDELBROT_LEFT BUTTON_LEFT
+#define MANDELBROT_RIGHT BUTTON_RIGHT
 #define MANDELBROT_ZOOM_IN_PRE BUTTON_MENU
 #define MANDELBROT_ZOOM_IN (BUTTON_MENU | BUTTON_REL)
 #define MANDELBROT_ZOOM_IN2 (BUTTON_MENU | BUTTON_UP)
@@ -45,17 +53,57 @@ PLUGIN_HEADER
 #define MANDELBROT_MAXITER_DEC (BUTTON_MENU | BUTTON_LEFT)
 #define MANDELBROT_RESET (BUTTON_MENU | BUTTON_OFF)
 
-#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+      (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define MANDELBROT_QUIT BUTTON_OFF
+#define MANDELBROT_UP BUTTON_UP
+#define MANDELBROT_DOWN BUTTON_DOWN
+#define MANDELBROT_LEFT BUTTON_LEFT
+#define MANDELBROT_RIGHT BUTTON_RIGHT
 #define MANDELBROT_ZOOM_IN BUTTON_SELECT
 #define MANDELBROT_ZOOM_OUT BUTTON_MODE
 #define MANDELBROT_MAXITER_INC (BUTTON_ON | BUTTON_RIGHT)
 #define MANDELBROT_MAXITER_DEC (BUTTON_ON | BUTTON_LEFT)
 #define MANDELBROT_RESET BUTTON_REC
+
+#elif CONFIG_KEYPAD == IPOD_4G_PAD
+#define MANDELBROT_QUIT (BUTTON_SELECT | BUTTON_MENU)
+#define MANDELBROT_UP BUTTON_MENU
+#define MANDELBROT_DOWN BUTTON_PLAY
+#define MANDELBROT_LEFT BUTTON_LEFT
+#define MANDELBROT_RIGHT BUTTON_RIGHT
+#define MANDELBROT_ZOOM_IN BUTTON_SCROLL_FWD
+#define MANDELBROT_ZOOM_OUT BUTTON_SCROLL_BACK
+#define MANDELBROT_MAXITER_INC (BUTTON_SELECT | BUTTON_RIGHT)
+#define MANDELBROT_MAXITER_DEC (BUTTON_SELECT | BUTTON_LEFT)
+#define MANDELBROT_RESET (BUTTON_SELECT | BUTTON_PLAY)
+
+#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+#define MANDELBROT_QUIT BUTTON_POWER
+#define MANDELBROT_UP BUTTON_UP
+#define MANDELBROT_DOWN BUTTON_DOWN
+#define MANDELBROT_LEFT BUTTON_LEFT
+#define MANDELBROT_RIGHT BUTTON_RIGHT
+#define MANDELBROT_ZOOM_IN_PRE BUTTON_MENU
+#define MANDELBROT_ZOOM_IN (BUTTON_MENU | BUTTON_REL)
+#define MANDELBROT_ZOOM_OUT (BUTTON_MENU | BUTTON_REPEAT)
+#define MANDELBROT_MAXITER_INC (BUTTON_PLAY | BUTTON_RIGHT)
+#define MANDELBROT_MAXITER_DEC (BUTTON_PLAY | BUTTON_LEFT)
+#define MANDELBROT_RESET BUTTON_REC
+#endif
+
+#if LCD_DEPTH < 8
+#define USEGSLIB
+#define MYLCD(fn) gray_ub_ ## fn
+#define MYLCD_UPDATE()
+#define MYXLCD(fn) gray_ub_ ## fn
+#else
+#define MYLCD(fn) rb->lcd_ ## fn
+#define MYLCD_UPDATE() rb->lcd_update();
+#define MYXLCD(fn) xlcd_ ## fn
 #endif
 
 static struct plugin_api* rb;
-static char buff[32];
 
 /* Fixed point format: 6 bits integer part incl. sign, 26 bits fractional part */
 static long x_min;
@@ -75,9 +123,26 @@ static int py_max = LCD_HEIGHT;
 static int step_log2;
 static unsigned max_iter;
 
+#ifdef USEGSLIB
 static unsigned char *gbuf;
 static unsigned int gbuf_size = 0;
-static unsigned char graybuffer[LCD_HEIGHT];   
+static unsigned char imgbuffer[LCD_HEIGHT];
+#else
+static fb_data imgbuffer[LCD_HEIGHT];
+#endif
+
+/* 8 entries cyclical, last entry is black (convergence) */
+#ifdef HAVE_LCD_COLOR
+static const fb_data color[9] = {
+    LCD_RGBPACK(255, 0, 159), LCD_RGBPACK(159, 0, 255), LCD_RGBPACK(0, 0, 255),
+    LCD_RGBPACK(0, 159, 255), LCD_RGBPACK(0, 255, 128), LCD_RGBPACK(128, 255, 0),
+    LCD_RGBPACK(255, 191, 0), LCD_RGBPACK(255, 0, 0),   LCD_RGBPACK(0, 0, 0)
+};
+#else /* greyscale */
+static const fb_data color[9] = {
+    255, 223, 191, 159, 128, 96, 64, 32, 0
+};
+#endif
 
 #if CONFIG_CPU == SH7034
 
@@ -244,7 +309,7 @@ void init_mandelbrot_set(void)
 #if CONFIG_LCD == LCD_SSD1815 /* Recorder, Ondio. */
     x_min = -38L<<22;  // -2.375<<26
     x_max =  15L<<22;  //  0.9375<<26
-#else  /* Iriver H1x0 */
+#else  /* all others (square pixels) */
     x_min = -36L<<22;  // -2.25<<26
     x_max =  12L<<22;  //  0.75<<26
 #endif
@@ -260,7 +325,6 @@ void calc_mandelbrot_low_prec(void)
     long a32, b32;
     short x, x2, y, y2, a, b;
     int p_x, p_y;
-    int brightness;
 
     start_tick = last_yield = *rb->current_tick;
     
@@ -286,13 +350,11 @@ void calc_mandelbrot_low_prec(void)
                 x = x2 - y2 + a;
             }
 
-            // "coloring"
-            if  (n_iter > max_iter){
-                brightness = 0; // black
-            } else {
-                brightness = 255 - (32 * (n_iter & 7));
-            }
-            graybuffer[p_y] = brightness;
+            if  (n_iter > max_iter)
+                imgbuffer[p_y] = color[8];
+            else
+                imgbuffer[p_y] = color[n_iter & 7];
+
             /* be nice to other threads:
              * if at least one tick has passed, yield */
             if  (*rb->current_tick > last_yield) {
@@ -300,8 +362,14 @@ void calc_mandelbrot_low_prec(void)
                 last_yield = *rb->current_tick;
             }
         }
-        gray_ub_gray_bitmap_part(graybuffer, 0, py_min, 1,
+#ifdef USEGSLIB
+        gray_ub_gray_bitmap_part(imgbuffer, 0, py_min, 1,
                                  p_x, py_min, 1, py_max-py_min);
+#else
+        rb->lcd_bitmap_part(imgbuffer, 0, py_min, 1,
+                            p_x, py_min, 1, py_max-py_min);
+        rb->lcd_update_rect(p_x, py_min, 1, py_max-py_min);
+#endif
     }
 }
 
@@ -311,8 +379,7 @@ void calc_mandelbrot_high_prec(void)
     unsigned n_iter;
     long x, x2, y, y2, a, b;
     int p_x, p_y;
-    int brightness;
-    
+
     MULS32_INIT();
     start_tick = last_yield = *rb->current_tick;
 
@@ -336,13 +403,11 @@ void calc_mandelbrot_high_prec(void)
                 x = x2 - y2 + a;
             }
 
-            // "coloring"
-            if  (n_iter > max_iter){
-                brightness = 0; // black
-            } else {
-                brightness = 255 - (32 * (n_iter & 7));
-            }
-            graybuffer[p_y] = brightness;
+            if  (n_iter > max_iter)
+                imgbuffer[p_y] = color[8];
+            else
+                imgbuffer[p_y] = color[n_iter & 7];
+
             /* be nice to other threads:
              * if at least one tick has passed, yield */
             if  (*rb->current_tick > last_yield) {
@@ -350,16 +415,23 @@ void calc_mandelbrot_high_prec(void)
                 last_yield = *rb->current_tick;
             }
         }
-        gray_ub_gray_bitmap_part(graybuffer, 0, py_min, 1,
+#ifdef USEGSLIB
+        gray_ub_gray_bitmap_part(imgbuffer, 0, py_min, 1,
                                  p_x, py_min, 1, py_max-py_min);
+#else
+        rb->lcd_bitmap_part(imgbuffer, 0, py_min, 1,
+                            p_x, py_min, 1, py_max-py_min);
+        rb->lcd_update_rect(p_x, py_min, 1, py_max-py_min);
+#endif
     }
 }
 
 void cleanup(void *parameter)
 {
     (void)parameter;
-    
+#ifdef USEGSLIB
     gray_release();
+#endif
 }
 
 #define REDRAW_NONE    0
@@ -370,12 +442,16 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int button;
     int lastbutton = BUTTON_NONE;
-    int grayscales;
     int redraw = REDRAW_FULL;
+#ifdef USEGSLIB
+    int grayscales;
+    char buff[32];
+#endif
 
     rb = api;
     (void)parameter;
 
+#ifdef USEGSLIB
     /* get the remainder of the plugin buffer */
     gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
 
@@ -392,6 +468,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }
 
     gray_show(true); /* switch on grayscale overlay */
+#else
+    xlcd_init(rb);
+#endif
 
     init_mandelbrot_set();
 
@@ -401,8 +480,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #if !defined(SIMULATOR) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
             rb->cpu_boost(true);
 #endif
-            if (redraw == REDRAW_FULL)
-                gray_ub_clear_display();
+            if (redraw == REDRAW_FULL) {
+                MYLCD(clear_display)();
+                MYLCD_UPDATE();
+            }
 
             if (step_log2 <= -10) /* select precision */
                 calc_mandelbrot_high_prec();
@@ -422,7 +503,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         button = rb->button_get(true);
         switch (button) {
         case MANDELBROT_QUIT:
+#ifdef USEGSLIB
             gray_release();
+#endif
             return PLUGIN_OK;
 
         case MANDELBROT_ZOOM_OUT:
@@ -451,34 +534,38 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             redraw = REDRAW_FULL;
             break;
 
-        case BUTTON_UP:
+        case MANDELBROT_UP:
             y_min += y_delta;
             y_max += y_delta;
-            gray_ub_scroll_down(LCD_HEIGHT/8);
+            MYXLCD(scroll_down)(LCD_HEIGHT/8);
+            MYLCD_UPDATE();
             py_max = (LCD_HEIGHT/8);
             redraw = REDRAW_PARTIAL;
             break;
 
-        case BUTTON_DOWN:
+        case MANDELBROT_DOWN:
             y_min -= y_delta;
             y_max -= y_delta;
-            gray_ub_scroll_up(LCD_HEIGHT/8);
+            MYXLCD(scroll_up)(LCD_HEIGHT/8);
+            MYLCD_UPDATE();
             py_min = (LCD_HEIGHT-LCD_HEIGHT/8);
             redraw = REDRAW_PARTIAL;
             break;
 
-        case BUTTON_LEFT:
+        case MANDELBROT_LEFT:
             x_min -= x_delta;
             x_max -= x_delta;
-            gray_ub_scroll_right(LCD_WIDTH/8);
+            MYXLCD(scroll_right)(LCD_WIDTH/8);
+            MYLCD_UPDATE();
             px_max = (LCD_WIDTH/8);
             redraw = REDRAW_PARTIAL;
             break;
 
-        case BUTTON_RIGHT:
+        case MANDELBROT_RIGHT:
             x_min += x_delta;
             x_max += x_delta;
-            gray_ub_scroll_left(LCD_WIDTH/8);
+            MYXLCD(scroll_left)(LCD_WIDTH/8);
+            MYLCD_UPDATE();
             px_min = (LCD_WIDTH-LCD_WIDTH/8);
             redraw = REDRAW_PARTIAL;
             break;
@@ -509,8 +596,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         if (button != BUTTON_NONE)
             lastbutton = button;
     }
+#ifdef USEGSLIB
     gray_release();
+#endif
     return PLUGIN_OK;
 }
-#endif
 #endif
