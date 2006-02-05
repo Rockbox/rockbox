@@ -77,53 +77,16 @@ static bool display_on=false; /* is the display turned on? */
 
 
 /* called very frequently - inline! */
-inline void lcd_write_reg(int reg, int val)
+static inline void lcd_write_reg(int reg, int val)
 {
     *(volatile unsigned short *)0xf0000000 = reg;
     *(volatile unsigned short *)0xf0000002 = val;
 }
 
 /* called very frequently - inline! */
-inline void lcd_begin_write_gram(void)
+static inline void lcd_begin_write_gram(void)
 {
     *(volatile unsigned short *)0xf0000000 = R_WRITE_DATA_2_GRAM;
-}
-
-/* called very frequently - inline! */
-inline void lcd_write_data(const unsigned short* p_bytes, int count) ICODE_ATTR;
-inline void lcd_write_data(const unsigned short* p_bytes, int count)
-{
-    int precount = ((-(size_t)p_bytes) & 0xf) / 2;
-    count -= precount;
-    while(precount--)
-        *(volatile unsigned short *)0xf0000002 = *p_bytes++;
-    while((count -= 8) >= 0) asm (
-            "\n\tmovem.l (%[p_bytes]),%%d1-%%d4\
-             \n\tswap %%d1\
-             \n\tmove.w %%d1,(%[dest])\
-             \n\tswap %%d1\
-             \n\tmove.w %%d1,(%[dest])\
-             \n\tswap %%d2\
-             \n\tmove.w %%d2,(%[dest])\
-             \n\tswap %%d2\
-             \n\tmove.w %%d2,(%[dest])\
-             \n\tswap %%d3\
-             \n\tmove.w %%d3,(%[dest])\
-             \n\tswap %%d3\
-             \n\tmove.w %%d3,(%[dest])\
-             \n\tswap %%d4\
-             \n\tmove.w %%d4,(%[dest])\
-             \n\tswap %%d4\
-             \n\tmove.w %%d4,(%[dest])\
-             \n\tlea.l (16,%[p_bytes]),%[p_bytes]"
-             : [p_bytes] "+a" (p_bytes)
-             : [dest] "a" ((volatile unsigned short *)0xf0000002)
-             : "d1", "d2", "d3", "d4", "memory");
-    if (count != 0) {
-        count += 8;
-        while(count--)
-            *(volatile unsigned short *)0xf0000002 = *p_bytes++;
-    }
 }
 
 /*** hardware configuration ***/
@@ -406,8 +369,8 @@ void lcd_update_rect(int x, int y, int width, int height)
         lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (ymax<<8) | y); 
         
         /* vert ram addr */ 
-        lcd_write_reg(R_VERT_RAM_ADDR_POS,((x+width-1)<<8) | x); 
-        lcd_write_reg(R_RAM_ADDR_SET, (x<<8) | y); 
+        lcd_write_reg(R_VERT_RAM_ADDR_POS,((x+width-1)<<8) | x);
+        lcd_write_reg(R_RAM_ADDR_SET, (x<<8) | y);
         lcd_begin_write_gram(); 
 
         /* Copy specified rectangle bitmap to hardware */ 
@@ -421,6 +384,6 @@ void lcd_update_rect(int x, int y, int width, int height)
         lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 0xaf00); 
 
         /* vert ram addr: 0 - 219 */  
-        lcd_write_reg(R_VERT_RAM_ADDR_POS, 0xdb00); 
+        lcd_write_reg(R_VERT_RAM_ADDR_POS, 0xdb00);
     }
 }

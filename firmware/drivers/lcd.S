@@ -313,62 +313,135 @@ _lcd_write_data:
     .type       lcd_write_command,@function
 
 lcd_write_command:
-        move.l  (4,%sp),%d0
-        lea MBAR2,%a1
-        move.l   #~8,%d1
-        and.l   %d1,(0xb4,%a1)
-        move.w  %d0,0xf0000000
-        rts
+    move.l  (4,%sp),%d0
+    lea MBAR2,%a1
+    move.l   #~8,%d1
+    and.l   %d1,(0xb4,%a1)
+    move.w  %d0,0xf0000000
+    rts
 
     .align      2
     .global     lcd_write_command_ex
     .type       lcd_write_command_ex,@function
 
 lcd_write_command_ex:
-        lea MBAR2,%a1
-        
-        move.l  (4,%sp),%d0     /* Command */
+    lea MBAR2,%a1
 
-        move.l   #~8,%d1        /* Set A0 = 0 */
-        and.l   %d1,(0xb4,%a1)
-        move.w  %d0,0xf0000000  /* Write to LCD */
+    move.l  (4,%sp),%d0     /* Command */
 
-        not.l   %d1             /* Set A0 = 1 */
-        or.l    %d1,(0xb4,%a1)
+    move.l   #~8,%d1        /* Set A0 = 0 */
+    and.l   %d1,(0xb4,%a1)
+    move.w  %d0,0xf0000000  /* Write to LCD */
 
-        move.l  (8,%sp),%d0     /* Data */
-        cmp.l   #0xffffffff,%d0 /* -1? */
-        beq.b   .last
-        move.w  %d0,0xf0000000  /* Write to LCD */
-        
-        move.l  (12,%sp),%d0     /* Data */
-        cmp.l   #0xffffffff,%d0 /* -1? */
-        beq.b   .last
-        move.w  %d0,0xf0000000  /* Write to LCD */
-        
-.last:  
-        rts
+    not.l   %d1             /* Set A0 = 1 */
+    or.l    %d1,(0xb4,%a1)
+
+    move.l  (8,%sp),%d0     /* Data */
+    cmp.l   #0xffffffff,%d0 /* -1? */
+    beq.b   .last
+    move.w  %d0,0xf0000000  /* Write to LCD */
+
+    move.l  (12,%sp),%d0    /* Data */
+    cmp.l   #0xffffffff,%d0 /* -1? */
+    beq.b   .last
+    move.w  %d0,0xf0000000  /* Write to LCD */
+
+.last:
+    rts
 
     .align      2
     .global     lcd_write_data
     .type       lcd_write_data,@function
 
 lcd_write_data:
-        move.l  (4,%sp),%a0       /* Data pointer */
-        move.l  (8,%sp),%d0     /* Length */
-        lea MBAR2,%a1
-        moveq   #8,%d1
-        or.l    %d1,(0xb4,%a1)
+    move.l  (4,%sp),%a0     /* Data pointer */
+    move.l  (8,%sp),%d0     /* Length */
+    lea MBAR2,%a1
+    moveq   #8,%d1
+    or.l    %d1,(0xb4,%a1)
 
-        lea     0xf0000000,%a1
+    lea     0xf0000000,%a1
 .loop:
-        /* When running in IRAM, this loop takes 7 cycles plus the LCD write.
-           The 7 cycles are necessary to follow the LCD timing specs
-           at 140MHz */
-        move.b  (%a0)+,%d1  /* 3(1/0) */
-        move.w  %d1,(%a1)   /* 1(0/1) */
-        subq.l  #1,%d0      /* 1(0/0) */
-        nop                 /* 1(0/0) */
-        bne     .loop       /* 2(0/0) */
-        rts
+    /* When running in IRAM, this loop takes 7 cycles plus the LCD write.
+       The 7 cycles are necessary to follow the LCD timing specs
+       at 140MHz */
+    move.b  (%a0)+,%d1      /* 3(1/0) */
+    move.w  %d1,(%a1)       /* 1(0/1) */
+    subq.l  #1,%d0          /* 1(0/0) */
+    nop                     /* 1(0/0) */
+    bne     .loop           /* 2(0/0) */
+    rts
+#elif defined(IRIVER_H300_SERIES)
+    .section    .icode,"ax",@progbits
+
+    .align      2
+    .global     lcd_write_data
+    .type       lcd_write_data,@function
+
+lcd_write_data:
+    move.l  (4,%sp),%a0     /* data pointer */
+    move.l  (8,%sp),%d0     /* length in words */
+    add.l   %d0,%d0         /* words -> bytes */
+    add.l   %a0,%d0         /* -> end address */
+    lea.l   0xf0000002,%a1  /* LCD data port */
+    
+    moveq.l #31,%d1
+    add.l   %a0,%d1
+    and.l   #0xFFFFFFF0,%d1 /* %d1 = first line bound + 16 */
+    cmp.l   %d1,%d0         /* at least one full line to send? */
+    blo.b   .words2_loop    /* no: skip to word loop */
+    
+    subq.l  #8,%d1
+    subq.l  #8,%d1          /* %d1 = first line bound */
+
+    cmp.l   %a0,%d1         /* any leading words? */
+    bls.b   .words1_end     /* no: skip leading word loop */
+    
+.words1_loop:
+    move.w  (%a0)+,(%a1)    /* transfer word */
+    cmp.l   %a0,%d1         /* run %a0 up to first line bound */
+    bhi.b   .words1_loop
+    
+.words1_end:
+    lea.l   (-16,%sp),%sp   /* free up some registers */
+    movem.l %d2-%d4/%a2,(%sp)
+    move.l  %d0,%a2
+    lea.l   (-15,%a2),%a2   /* %a2 = end address - 15 (one line/pass) */
+    
+    /* burst-optimised line transfers */
+.line_loop:
+    movem.l (%a0),%d1-%d4   /* burst-read line */
+    lea.l   (16,%a0),%a0    /* increment address */
+    swap    %d1             /* send data to LCD in correct order... */
+    move.w  %d1,(%a1)
+    swap    %d1
+    move.w  %d1,(%a1)
+    swap    %d2
+    move.w  %d2,(%a1)
+    swap    %d2
+    move.w  %d2,(%a1)
+    swap    %d3
+    move.w  %d3,(%a1)
+    swap    %d3
+    move.w  %d3,(%a1)
+    swap    %d4
+    move.w  %d4,(%a1)
+    swap    %d4
+    move.w  %d4,(%a1)
+    cmp.l   %a0,%a2         /* run %a0 up to last line bound */
+    bhi.b   .line_loop
+    
+    movem.l (%sp),%d2-%d4/%a2
+    lea.l   (16,%sp),%sp    /* restore registers */
+    
+    cmp.l   %a0,%d0         /* any trailing words? */
+    bls.b   .words2_end     /* no: get otta here */
+
+.words2_loop:
+    move.w  (%a0)+,(%a1)    /* transfer word */
+    cmp.l   %a0,%d0         /* run %a0 up to end address */
+    bhi.b   .words2_loop
+
+.words2_end:
+    rts
 #endif
