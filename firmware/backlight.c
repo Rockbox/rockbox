@@ -242,6 +242,8 @@ static void __backlight_on(void)
 
     /* set port L07 on */
     outl(((0x100 | 1) << 7), 0x6000d12c);
+#elif CONFIG_BACKLIGHT==BL_IPOD3G
+    lcd_enable(true);
 #elif CONFIG_BACKLIGHT==BL_IRIVER_IFP7XX
     GPIO3_SET = 1;
 #endif
@@ -283,6 +285,8 @@ static void __backlight_off(void)
     outl(((0x100 | 0) << 7), 0x6000d12c);
 #elif CONFIG_BACKLIGHT==BL_IRIVER_IFP7XX
     GPIO3_CLR = 1;
+#elif CONFIG_BACKLIGHT==BL_IPOD3G
+    lcd_enable(false);
 #endif
 }
 

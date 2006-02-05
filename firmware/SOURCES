@@ -50,15 +50,17 @@ drivers/lcd-player.c
 #ifdef HAVE_LCD_BITMAP
 arabjoin.c
 bidi.c
-#if LCD_DEPTH == 2
-drivers/lcd-h100.c
-#elif LCD_DEPTH == 1
+#if LCD_DEPTH == 1
 drivers/lcd-recorder.c
+#elif CONFIG_LCD==LCD_IPOD2BPP
+drivers/lcd-2bit-horz.c
+#elif LCD_DEPTH == 2
+drivers/lcd-h100.c
 #elif LCD_DEPTH == 16
 drivers/lcd-16bit.c
 #endif
 #endif
-#if CONFIG_LCD==LCD_IPODNANO || CONFIG_LCD==LCD_IPODCOLOR
+#if CONFIG_LCD==LCD_IPODNANO || CONFIG_LCD==LCD_IPODCOLOR || CONFIG_LCD == LCD_IPOD2BPP
 drivers/lcd-ipod.c
 #endif
 #if CONFIG_LCD==LCD_IPODVIDEO
@@ -97,6 +99,8 @@ tuner_philips.c
 drivers/i2c-coldfire.c
 #elif CONFIG_I2C == I2C_PP5020
 drivers/i2c-pp5020.c
+#elif CONFIG_I2C == I2C_PP5002
+drivers/i2c-pp5002.c
 #elif CONFIG_I2C == I2C_PNX0101
 drivers/i2c-pnx0101.c
 #else
@@ -108,7 +112,7 @@ drivers/mas.c
 #ifdef IRIVER_H300_SERIES
 drivers/pcf50606.c
 #endif
-#if defined(APPLE_IPODCOLOR) || defined(APPLE_IPODNANO) || defined(APPLE_IPODVIDEO)
+#if defined(APPLE_IPODCOLOR) || defined(APPLE_IPODNANO) || defined(APPLE_IPODVIDEO) || defined(APPLE_IPOD3G)
 drivers/pcf50605.c
 #endif
 #if (CONFIG_RTC == RTC_M41ST84W) || (CONFIG_RTC == RTC_PCF50606)
@@ -157,6 +161,8 @@ drivers/lcd-h100-remote.c
 drivers/uda1380.c
 #elif defined(HAVE_WM8975) && !defined(SIMULATOR)
 drivers/wm8975.c
+#elif defined(HAVE_WM8731L) && !defined(SIMULATOR)
+drivers/wm8731l.c
 #elif defined(HAVE_TLV320) && !defined(SIMULATOR)
 drivers/tlv320.c
 #endif

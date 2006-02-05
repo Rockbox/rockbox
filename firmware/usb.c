@@ -68,7 +68,7 @@ void screen_dump(void);   /* Nasty again. Defined in apps/ too */
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define USBPOWER_BUTTON BUTTON_MENU
 #define USBPOWER_BTN_IGNORE BUTTON_OFF
-#elif CONFIG_KEYPAD == IPOD_4G_PAD
+#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define USBPOWER_BUTTON BUTTON_MENU
 #define USBPOWER_BTN_IGNORE BUTTON_PLAY
 #elif CONFIG_KEYPAD == IRIVER_H300_PAD
@@ -172,7 +172,7 @@ void usb_enable(bool on)
     if (on)
     {
       /* The following code is copied from ipodlinux */
-#ifdef APPLE_IPODCOLOR
+#if defined (APPLE_IPODCOLOR) || defined(APPLE_IPOD3G) 
         unsigned char* storage_ptr = (unsigned char *)0x40017F00;
 #elif defined(APPLE_IPODNANO) || defined(APPLE_IPODVIDEO)
         unsigned char* storage_ptr = (unsigned char *)0x4001FF00;

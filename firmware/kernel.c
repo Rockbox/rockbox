@@ -25,7 +25,7 @@
 #include "system.h"
 #include "panic.h"
 
-#if (CONFIG_CPU != PP5020) || !defined(BOOTLOADER)
+#if ((CONFIG_CPU != PP5020) && (CONFIG_CPU != PP5002)) || !defined(BOOTLOADER) 
 long current_tick = 0;
 #endif
 
@@ -344,7 +344,7 @@ void tick_start(unsigned int interval_in_ms)
     IMR0 |= (1<<2);
 }
 
-#elif CONFIG_CPU == PP5020
+#elif (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
 
 #ifndef BOOTLOADER
 void TIMER1(void)

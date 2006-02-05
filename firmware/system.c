@@ -477,7 +477,7 @@ void (* const vbr[]) (void) __attribute__ ((section (".vectors"))) =
     UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,
     UIE,UIE,UIE,TIMER0,TIMER1,UIE,UIE,UIE,
     /*          lvl 3  lvl 4             */
-		
+
     TRAP0,TRAP1,TRAP2,TRAP3,TRAP4,TRAP5,TRAP6,TRAP7,
     TRAP8,TRAP9,TRAP10,TRAP11,TRAP12,TRAP13,TRAP14,TRAP15,
     
@@ -1219,6 +1219,96 @@ void system_init(void)
 
 void system_reboot(void)
 {
+}
+
+int system_memory_guard(int newmode)
+{
+    (void)newmode;
+    return 0;
+}
+#elif CONFIG_CPU==PP5002
+unsigned int ipod_hw_rev;
+#ifndef BOOTLOADER
+extern void TIMER1(void);
+extern void ipod_3g_button_int(void);
+
+void irq(void)
+{
+    if (CPU_INT_STAT & TIMER1_MASK) 
+        TIMER1();
+    else if (CPU_INT_STAT & GPIO_MASK)
+        ipod_3g_button_int();
+}
+#endif
+
+/* TODO: The following two function have been lifted straight from IPL, and
+   hence have a lot of numeric addresses used straight. I'd like to use
+   #defines for these, but don't know what most of them are for or even what
+   they should be named. Because of this I also have no way of knowing how
+   to extend the funtions to do alternate cache configurations and/or 
+   some other CPU frequency scaling. */
+
+#ifndef BOOTLOADER
+static void ipod_init_cache(void)
+{
+    int i =0;
+/* Initialising the cache in the iPod bootloader prevents Rockbox from starting */
+    outl(inl(0xcf004050) & ~0x700, 0xcf004050);
+    outl(0x4000, 0xcf004020);
+
+    outl(0x2, 0xcf004024);
+
+    /* PP5002 has 8KB cache */
+    for (i = 0xf0004000; i < 0xf0006000; i += 16) {
+        outl(0x0, i);
+    }
+
+    outl(0x0, 0xf000f020);
+    outl(0x3fc0, 0xf000f024);
+
+    outl(0x3, 0xcf004024);
+}
+    
+static void ipod_set_cpu_speed(void)
+{
+    outl(0x02, 0xcf005008);
+    outl(0x55, 0xcf00500c);
+    outl(0x6000, 0xcf005010);
+#if 1
+    // 75  MHz (24/24 * 75) (default)
+    outl(24, 0xcf005018);
+    outl(75, 0xcf00501c);
+#endif
+
+#if 0
+    // 66 MHz (24/3 * 8)
+    outl(3, 0xcf005018);
+    outl(8, 0xcf00501c);
+#endif
+
+    outl(0xe000, 0xcf005010);
+
+    udelay(2000);
+
+    outl(0xa8, 0xcf00500c);
+}
+#endif
+
+void system_init(void)
+{
+#ifndef BOOTLOADER
+    ipod_hw_rev = (*((volatile unsigned long*)(0x01fffffc)));
+    outl(-1, 0xcf00101c);
+    outl(-1, 0xcf001028);
+    outl(-1, 0xcf001038);
+    ipod_set_cpu_speed();
+    ipod_init_cache();
+#endif
+}
+
+void system_reboot(void)
+{
+    outl(inl(0xcf005030) | 0x4, 0xcf005030);
 }
 
 int system_memory_guard(int newmode)

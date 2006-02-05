@@ -30,6 +30,8 @@
 #include "wm8975.h"
 #elif defined(HAVE_TLV320)
 #include "tlv320.h"
+#elif defined(HAVE_WM8731L)
+#include "wm8731l.h"
 #endif
 #include "system.h"
 #endif
@@ -451,6 +453,145 @@ long pcm_get_bytes_waiting(void)
     return size;
 }
 
+#elif defined(HAVE_WM8731L)
+
+/* We need to unify this code with the uda1380 code as much as possible, but
+   we will keep it separate during early development.
+*/
+
+static bool pcm_playing;
+static bool pcm_paused;
+static int pcm_freq = 0x6; /* 44.1 is default */
+
+static unsigned char *next_start;
+static long next_size;
+
+/* Set up the DMA transfer that kicks in when the audio FIFO gets empty */
+static void dma_start(const void *addr, long size)
+{
+    pcm_playing = true;
+
+    addr = (void *)((unsigned long)addr & ~3); /* Align data */
+    size &= ~3; /* Size must be multiple of 4 */
+
+    /* Disable playback for now */
+    pcm_playing = false;
+    return;
+
+/* This is the uda1380 code */
+#if 0
+    /* Reset the audio FIFO */
+
+    /* Set up DMA transfer  */
+    SAR0 = ((unsigned long)addr); /* Source address */
+    DAR0 = (unsigned long)&PDOR3; /* Destination address */
+    BCR0 = size;                  /* Bytes to transfer */
+
+    /* Enable the FIFO and force one write to it */
+    IIS2CONFIG = IIS_DEFPARM(pcm_freq);
+
+    DCR0 = DMA_INT | DMA_EEXT | DMA_CS | DMA_SINC | DMA_START;
+#endif
+}
+
+/* Stops the DMA transfer and interrupt */
+static void dma_stop(void)
+{
+    pcm_playing = false;
+
+#if 0
+/* This is the uda1380 code */
+    DCR0 = 0;
+    DSR0 = 1;
+    /* Reset the FIFO */
+    IIS2CONFIG = IIS_RESET | IIS_DEFPARM(pcm_freq);
+#endif
+    next_start = NULL;
+    next_size = 0;
+    pcm_paused = false;
+}
+
+
+void pcm_init(void)
+{
+    pcm_playing = false;
+    pcm_paused = false;
+
+    /* Initialize default register values. */
+    wm8731l_init();
+    
+    /* The uda1380 needs a sleep(HZ) here - do we need one? */
+
+    /* Power on */
+    wm8731l_enable_output(true);
+
+    /* Unmute the master channel (DAC should be at zero point now). */
+    wm8731l_mute(false);
+    
+    /* Call dma_stop to initialize everything. */
+    dma_stop();
+}
+
+void pcm_set_frequency(unsigned int frequency)
+{
+    (void)frequency;
+    pcm_freq=frequency;
+}
+
+/* the registered callback function to ask for more mp3 data */
+static void (*callback_for_more)(unsigned char**, long*) = NULL;
+
+void pcm_play_data(void (*get_more)(unsigned char** start, long* size))
+{
+    unsigned char *start;
+    long size;
+
+    callback_for_more = get_more;
+
+    get_more((unsigned char **)&start, (long *)&size);
+    get_more(&next_start, &next_size);
+
+    dma_start(start, size);
+}
+
+void pcm_play_stop(void)
+{
+    if (pcm_playing) {
+        dma_stop();
+    }
+}
+
+void pcm_play_pause(bool play)
+{
+    if(pcm_paused && play && next_size)
+    {
+        logf("unpause");
+        /* We need to enable DMA here */
+    }
+    else if(!pcm_paused && !play)
+    {
+        logf("pause");
+        /* We need to disable DMA here */
+    }
+    pcm_paused = !play;
+}
+
+bool pcm_is_paused(void)
+{
+    return pcm_paused;
+}
+
+bool pcm_is_playing(void)
+{
+    return pcm_playing;
+}
+
+
+long pcm_get_bytes_waiting(void)
+{
+    return 0;
+}
+
 #elif CONFIG_CPU == PNX0101
 
 /* TODO: Implement for iFP7xx
@@ -530,6 +671,9 @@ void pcm_calculate_peaks(int *left, int *right)
 #elif defined(HAVE_WM8975)
     long samples = size / 4;
     short *addr = p;
+#elif defined(HAVE_WM8731L)
+    long samples = next_size / 4;
+    short *addr = (short *)next_start;
 #elif defined(HAVE_TLV320)
     long samples = 4;  /* TODO X5 */
     short *addr = NULL;
