@@ -457,6 +457,7 @@ appsdir='\$(ROOTDIR)/apps'
   # Toolsets for some target families:
   archosbitmaptools="$toolset scramble descramble sh2d uclpack bmp2rb codepages"
   iriverbitmaptools="$toolset scramble descramble mkboot bmp2rb codepages"
+  iaudiobitmaptools="$toolset scramble descramble mkboot bmp2rb codepages"
   ipodbitmaptools="$toolset scramble ipod_fw bmp2rb codepages"
   ifpbitmaptools="$toolset bmp2rb codepages"
 
@@ -678,7 +679,7 @@ appsdir='\$(ROOTDIR)/apps'
     target="-DIAUDIO_X5"
     memory=32 # always
     coldfirecc
-    tool="$rootdir/tools/scramble -add=x5" # wrong, must be fixed
+    tool="$rootdir/tools/scramble -add=h120" # wrong, must be fixed
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
@@ -691,7 +692,7 @@ appsdir='\$(ROOTDIR)/apps'
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset="$toolset iaudio bmp2rb codepages"
+    toolset="$iaudiobitmaptools"
     ;;
 
    13)
