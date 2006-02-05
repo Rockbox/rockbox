@@ -210,7 +210,7 @@ void ipod_4g_button_int(void)
     CPU_HI_INT_CLR = I2C_MASK;
     /* The following delay was 250 in the ipodlinux source, but 10 seems to 
        work fine - tested on Nano, Color/Photo and Video. */
-    udelay(10); 
+    udelay(50); 
     outl(0x0, 0x7000c140); 
     int_btn = ipod_4g_button_read();
     outl(inl(0x7000c104) | 0xC000000, 0x7000c104);
