@@ -668,10 +668,6 @@ irq_handler:
 vectors:
     .long   stackend
     .long   start
-#elif defined(IRIVER_H300)
-    /* Platform:     iRiver H320/H340 */
-
-    /* Fill in code here */
 #else
     /* Platform:     Archos Jukebox */
 
