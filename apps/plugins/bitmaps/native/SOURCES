@@ -1,5 +1,10 @@
 #ifdef HAVE_LCD_BITMAP
 
+/* Solitaire */
+#ifdef HAVE_LCD_COLOR
+solitaire_cardback.220x176x16.bmp
+#endif
+
 /* Sudoku */
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT==64) && (LCD_DEPTH == 1)
 sudoku_start.112x64x1.bmp
