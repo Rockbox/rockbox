@@ -1,4 +1,4 @@
-#if (CONFIG_CPU == PP5020)
+#if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
 ipod.c
 #else
 main.c

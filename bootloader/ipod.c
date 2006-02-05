@@ -39,9 +39,12 @@
 #include "power.h"
 #include "file.h"
 
-#define DRAM_START             0x10000000
-#define IPOD_PP5020_RTC        0x60005010
-
+#if (CONFIG_CPU == PP5020)
+#define DRAM_START              0x10000000
+#else
+#define IPOD_LCD_BASE           0xc0001000
+#define DRAM_START              0x28000000
+#endif
 #define IPOD_HW_REVISION (*((volatile unsigned long*)(0x00002084)))
 
 /* We copy the hardware revision to the last four bytes of SDRAM and then
@@ -52,6 +55,7 @@
 #define BUTTON_MENU  2
 #define BUTTON_RIGHT 3
 #define BUTTON_PLAY  4
+#define BUTTON_HOLD  5
 
 /* Size of the buffer to store the loaded Rockbox/Linux image */
 #define MAX_LOADSIZE (4*1024*1024)
@@ -96,34 +100,16 @@ static void memmove16(void *dest, const void *src, unsigned count)
     }
 }
 
-/* get current usec counter */
-int timer_get_current(void)
-{
-    return inl(IPOD_PP5020_RTC);
-}
-
+#if CONFIG_KEYPAD == IPOD_4G_PAD
 /* check if number of seconds has past */
 int timer_check(int clock_start, unsigned int usecs)
 {
-    if ((inl(IPOD_PP5020_RTC) - clock_start) >= usecs) {
+    if ((USEC_TIMER - clock_start) >= usecs) {
         return 1;
     } else {
         return 0;
     }
 }
-
-/* This isn't a sleep, but let's call it that. */
-int usleep(unsigned int usecs)
-{
-    unsigned int start = inl(IPOD_PP5020_RTC);
-
-    while ((inl(IPOD_PP5020_RTC) - start) < usecs) {
-       // empty
-    }
-
-    return 0;
-}
-
 
 static void ser_opto_keypad_cfg(int val)
 {
@@ -138,7 +124,7 @@ static void ser_opto_keypad_cfg(int val)
     outl(inl(0x6000d024) & ~0x10, 0x6000d024);
     outl(inl(0x6000d014) | 0x10, 0x6000d014);
 
-    start_time = timer_get_current();
+    start_time = USEC_TIMER;
     do {
         if ((inl(0x7000c104) & 0x80000000) == 0) {
             break;
@@ -167,7 +153,7 @@ int opto_keypad_read(void)
 
         ser_opto_keypad_cfg(0x8000023a);
 
-        start_time = timer_get_current();
+        start_time = USEC_TIMER;
         do {
             if (inl(0x7000c104) & 0x4000000) {
                 had_io = 1;
@@ -197,16 +183,26 @@ int opto_keypad_read(void)
 
     return 0;
 }
+#endif
 
 static int key_pressed(void)
 {
     unsigned char state;
 
+#if CONFIG_KEYPAD == IPOD_4G_PAD
     state = opto_keypad_read();
     if ((state & 0x4) == 0) return BUTTON_LEFT;
     if ((state & 0x10) == 0) return BUTTON_MENU;
     if ((state & 0x8) == 0) return BUTTON_PLAY;
     if ((state & 0x2) == 0) return BUTTON_RIGHT;
+#elif CONFIG_KEYPAD == IPOD_3G_PAD
+    state = inb(0xcf000030);
+    if (((state & 0x20) == 0)) return BUTTON_HOLD; /* hold on */
+    if ((state & 0x08) == 0) return BUTTON_LEFT;
+    if ((state & 0x10) == 0) return BUTTON_MENU;
+    if ((state & 0x04) == 0) return BUTTON_PLAY;
+    if ((state & 0x01) == 0) return BUTTON_RIGHT;
+#endif
     return 0;
 }
 
@@ -336,7 +332,8 @@ void* main(void)
 
     /* set port L07 on */
     outl(((0x100 | 1) << 7), 0x6000d12c);
-
+#elif CONFIG_BACKLIGHT==BL_IPOD3G
+    outl(inl(IPOD_LCD_BASE) | 0x2, IPOD_LCD_BASE);
 #endif
 
     TMP_IPOD_HW_REVISION = IPOD_HW_REVISION;
@@ -441,12 +438,11 @@ void* main(void)
     }
 
     /* If everything else failed, try the original firmware */
-
     lcd_puts(0, line, "Loading original firmware...");
     lcd_update();
 
     /* Pause for 5 seconds so we can see what's happened */
-//    usleep(5000000);
+//    udelay(5000000);
 
     entry = tblp->addr + tblp->entryOffset;
     if (imageno || ((int)tblp->addr & 0xffffff) != 0) {
