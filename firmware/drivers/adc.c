@@ -329,3 +329,19 @@ void adc_init(void)
 }
 
 #endif
+#ifdef IAUDIO_X5
+unsigned char adc_scan(int channel)
+{
+    return 0;
+}
+
+unsigned short adc_read(int channel)
+{
+    return 0;
+}
+
+void adc_init(void)
+{
+}
+
+#endif
