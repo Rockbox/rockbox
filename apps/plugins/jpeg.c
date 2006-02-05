@@ -35,15 +35,39 @@ PLUGIN_HEADER
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define JPEG_ZOOM_IN BUTTON_PLAY
 #define JPEG_ZOOM_OUT BUTTON_ON
+#define JPEG_UP BUTTON_UP
+#define JPEG_DOWN BUTTON_DOWN
+#define JPEG_LEFT BUTTON_LEFT
+#define JPEG_RIGHT BUTTON_RIGHT
+#define JPEG_QUIT BUTTON_OFF
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define JPEG_ZOOM_PRE BUTTON_MENU
 #define JPEG_ZOOM_IN (BUTTON_MENU | BUTTON_REL)
 #define JPEG_ZOOM_OUT (BUTTON_MENU | BUTTON_REPEAT)
+#define JPEG_UP BUTTON_UP
+#define JPEG_DOWN BUTTON_DOWN
+#define JPEG_LEFT BUTTON_LEFT
+#define JPEG_RIGHT BUTTON_RIGHT
+#define JPEG_QUIT BUTTON_OFF
 
 #elif CONFIG_KEYPAD == IRIVER_H100_PAD
 #define JPEG_ZOOM_IN BUTTON_SELECT
 #define JPEG_ZOOM_OUT BUTTON_MODE
+#define JPEG_UP BUTTON_UP
+#define JPEG_DOWN BUTTON_DOWN
+#define JPEG_LEFT BUTTON_LEFT
+#define JPEG_RIGHT BUTTON_RIGHT
+#define JPEG_QUIT BUTTON_OFF
+
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define JPEG_ZOOM_IN BUTTON_SCROLL_FWD
+#define JPEG_ZOOM_OUT BUTTON_SCROLL_BACK
+#define JPEG_UP BUTTON_MENU
+#define JPEG_DOWN BUTTON_PLAY
+#define JPEG_LEFT BUTTON_LEFT
+#define JPEG_RIGHT BUTTON_RIGHT
+#define JPEG_QUIT BUTTON_SELECT
 
 #endif
 
@@ -1541,8 +1565,8 @@ int scroll_bmp(struct t_disp* pdisp)
         
         switch(button)
         {
-        case BUTTON_LEFT:
-        case BUTTON_LEFT | BUTTON_REPEAT:
+        case JPEG_LEFT:
+        case JPEG_LEFT | BUTTON_REPEAT:
             move = MIN(HSCROLL, pdisp->x);
             if (move > 0)
             {
@@ -1555,8 +1579,8 @@ int scroll_bmp(struct t_disp* pdisp)
             }
             break;
 
-        case BUTTON_RIGHT:
-        case BUTTON_RIGHT | BUTTON_REPEAT:
+        case JPEG_RIGHT:
+        case JPEG_RIGHT | BUTTON_REPEAT:
             move = MIN(HSCROLL, pdisp->width - pdisp->x - LCD_WIDTH);
             if (move > 0)
             {
@@ -1570,8 +1594,8 @@ int scroll_bmp(struct t_disp* pdisp)
             }
             break;
 
-        case BUTTON_UP:
-        case BUTTON_UP | BUTTON_REPEAT:
+        case JPEG_UP:
+        case JPEG_UP | BUTTON_REPEAT:
             move = MIN(VSCROLL, pdisp->y);
             if (move > 0)
             {
@@ -1584,8 +1608,8 @@ int scroll_bmp(struct t_disp* pdisp)
             }
             break;
 
-        case BUTTON_DOWN:
-        case BUTTON_DOWN | BUTTON_REPEAT:
+        case JPEG_DOWN:
+        case JPEG_DOWN | BUTTON_REPEAT:
             move = MIN(VSCROLL, pdisp->height - pdisp->y - LCD_HEIGHT);
             if (move > 0)
             {
@@ -1615,7 +1639,7 @@ int scroll_bmp(struct t_disp* pdisp)
             return ZOOM_OUT;
             break;
 
-        case BUTTON_OFF:
+        case JPEG_QUIT:
             return PLUGIN_OK;
             
         default:

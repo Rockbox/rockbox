@@ -20,7 +20,7 @@ OUTPUT_FORMAT(elf32-sh)
 #define ARCH_IRIVER
 #endif
 
-#if CONFIG_CPU==PP5020
+#if (CONFIG_CPU==PP5002) || (CONFIG_CPU==PP5020)
 #define ARCH_IPOD
 #endif
 

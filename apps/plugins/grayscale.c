@@ -30,10 +30,35 @@ PLUGIN_HEADER
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define GRAYSCALE_SHIFT BUTTON_ON
+#define GRAYSCALE_UP BUTTON_UP
+#define GRAYSCALE_DOWN BUTTON_DOWN
+#define GRAYSCALE_LEFT BUTTON_LEFT
+#define GRAYSCALE_RIGHT BUTTON_RIGHT
+#define GRAYSCALE_OFF BUTTON_OFF
+
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define GRAYSCALE_SHIFT BUTTON_MENU
+#define GRAYSCALE_UP BUTTON_UP
+#define GRAYSCALE_DOWN BUTTON_DOWN
+#define GRAYSCALE_LEFT BUTTON_LEFT
+#define GRAYSCALE_RIGHT BUTTON_RIGHT
+#define GRAYSCALE_OFF BUTTON_OFF
+
 #elif CONFIG_KEYPAD == IRIVER_H100_PAD
 #define GRAYSCALE_SHIFT BUTTON_ON
+#define GRAYSCALE_UP BUTTON_UP
+#define GRAYSCALE_DOWN BUTTON_DOWN
+#define GRAYSCALE_LEFT BUTTON_LEFT
+#define GRAYSCALE_RIGHT BUTTON_RIGHT
+#define GRAYSCALE_OFF BUTTON_OFF
+
+#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define GRAYSCALE_SHIFT (BUTTON_SELECT | BUTTON_REL)
+#define GRAYSCALE_UP BUTTON_MENU
+#define GRAYSCALE_DOWN BUTTON_PLAY
+#define GRAYSCALE_LEFT BUTTON_LEFT
+#define GRAYSCALE_RIGHT BUTTON_RIGHT
+#define GRAYSCALE_OFF (BUTTON_SELECT | BUTTON_MENU)
 #endif
 
 #define GFX_HEIGHT (LCD_HEIGHT-8)
@@ -268,31 +293,31 @@ int main(void)
 
         switch (button & ~(GRAYSCALE_SHIFT | BUTTON_REPEAT))
         {
-            case BUTTON_LEFT:
+            case GRAYSCALE_LEFT:
 
                 gray_scroll_left(scroll_amount);  /* scroll left */
                 gray_update();
                 break;
 
-            case BUTTON_RIGHT:
+            case GRAYSCALE_RIGHT:
 
                 gray_scroll_right(scroll_amount); /* scroll right */
                 gray_update();
                 break;
 
-            case BUTTON_UP:
+            case GRAYSCALE_UP:
 
                 gray_scroll_up(scroll_amount);    /* scroll up */
                 gray_update();
                 break;
 
-            case BUTTON_DOWN:
+            case GRAYSCALE_DOWN:
 
                 gray_scroll_down(scroll_amount);  /* scroll down */
                 gray_update();
                 break;
 
-            case BUTTON_OFF:
+            case GRAYSCALE_OFF:
 
                 cleanup(NULL);
                 return PLUGIN_OK;
