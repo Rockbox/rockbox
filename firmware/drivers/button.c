@@ -930,6 +930,18 @@ bool button_hold(void)
 }
 #endif
 
+#if (CONFIG_KEYPAD == IAUDIO_X5_PAD)
+bool button_hold(void)
+{
+    return (GPIO_READ & 0x08000000)?true:false;
+}
+
+bool remote_button_hold(void)
+{
+    return false; /* TODO X5 */
+}
+#endif
+
 int button_status(void)
 {
     return lastbtn;
