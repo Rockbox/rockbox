@@ -40,6 +40,8 @@
 typedef unsigned char fb_data;
 #elif LCD_DEPTH <= 16
 typedef unsigned short fb_data;
+#else
+typedef unsigned long fb_data;
 #endif
 
 /* common functions */
@@ -157,6 +159,13 @@ typedef void lcd_fastpixelfunc_type(fb_data *address);
 #else
 #define LCD_RGBPACK(r, g, b) _RGBPACK((r), (g), (b))
 #endif
+#elif LCD_DEPTH == 18
+#define LCD_MAX_RED    63
+#define LCD_MAX_GREEN  63
+#define LCD_MAX_BLUE   63
+#define LCD_RGBPACK(r, g, b) ( ((((r) * 63 + 127) / 255) << 12) \
+                           |((((g) * 63 + 127) / 255) << 6) \
+                           | (((b) * 63 + 127) / 255))
 #else
 /* other colour depths */
 #endif 
@@ -186,6 +195,8 @@ extern fb_data lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
 #elif LCD_DEPTH == 2
 extern fb_data lcd_framebuffer[LCD_HEIGHT/4][LCD_WIDTH];
 #elif LCD_DEPTH == 16
+extern fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH];
+#elif LCD_DEPTH == 18
 extern fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH];
 #endif
 
