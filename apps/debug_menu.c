@@ -353,7 +353,7 @@ bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
                   unsigned addr1, unsigned addr2)
           
 {
-#if CONFIG_CPU == PP5020
+#if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
     /* TODO: Implement for iPod */
     (void)p_manufacturer;
     (void)p_device;
