@@ -1,0 +1,76 @@
+\documentclass[a4paper,11pt]{report}
+\usepackage[latin1]{inputenc}
+\usepackage{helvet}
+
+\usepackage{float}
+\floatstyle{ruled}
+
+\usepackage{hyperref}
+\usepackage{xspace}
+\usepackage{optional}
+
+\input{platform/\platform.tex}
+
+\opt{Archos}{\newcommand{\playerman}{Archos\xspace}}
+\opt{Iaudio}{\newcommand{\playerman}{iAudio\xspace}}
+\opt{Apple}{\newcommand{\playerman}{Apple iPod\xspace}}
+
+\opt{PS}{\newcommand{\playertype}{Player/Studio\xspace}}
+\opt{Rec}{\newcommand{\playertype}{Recorder\xspace}}
+\opt{FMRec}{\newcommand{\playertype}{FM Recorder\xspace}}
+\opt{Rec2}{\newcommand{\playertype}{Recorder V2\xspace}}
+\opt{Gmini120}{\newcommand{\playertype}{Gmini 120\xspace}}
+\opt{GminiSP}{\newcommand{\playertype}{Gmini SP\xspace}}
+\opt{OndioSP}{\newcommand{\playertype}{Ondio SP\xspace}}
+\opt{OndioFM}{\newcommand{\playertype}{Ondio FM\xspace}}
+\opt{H320}{\newcommand{\playertype}{H320/340\xspace}}
+\opt{H100}{\newcommand{\playertype}{iHP-100/iHP-110/iHP-115\xspace}}
+\opt{Ifp790}{\newcommand{\playertype}{iFP-790\xspace}}
+\opt{X5}{\newcommand{\playertype}{X5\xspace}}
+\opt{Color}{\newcommand{\playertype}{Color/Photo\xspace}}
+\opt{Nano}{\newcommand{\playertype}{Nano\xspace}}
+\opt{Video}{\newcommand{\playertype}{Video\xspace}}
+
+\newcommand{\playername}{\playerman \playertype}
+
+\newcommand{\fname}[1]{\textbf{#1}}
+\newcommand{\tabeltc}[1]{{\centering #1 \par}}
+\newcommand{\tabelth}[1]{{\centering \textbf{\textit{#1}} \par}}
+
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{lscape}
+\usepackage{makeidx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{fancyvrb}
+\usepackage{enumerate}
+\usepackage{subfigure}
+\usepackage{color}
+%\usepackage{url}
+%\urlstyle{same}
+
+\pagestyle{fancy}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\fancyhead{}
+\fancyfoot{}
+\fancyhead[RO]{\iffloatpage{}{\rightmark}}
+\fancyhead[LE]{\iffloatpage{}{\leftmark}}
+\fancyhead[LO,RE]{\iffloatpage{}{\raisebox{-3pt}}}
+\fancyfoot[RO,LE]{\iffloatpage{}{\thepage}}
+
+\fancyfoot[CO,CE]{}
+\renewcommand{\headrulewidth}{\iffloatpage{0pt}{0.4pt}}
+\renewcommand{\footrulewidth}{\iffloatpage{0pt}{0.4pt}}
+\setlength{\headheight}{18.5pt}
+\newcounter{example}[chapter]
+\newenvironment{example}
+    {\stepcounter{example}\paragraph{Example \theexample:}}
+    {\hfill$\Box$
+    
+    \bigskip
+    \noindent}
+
+\renewcommand{\familydefault}{\sfdefault}

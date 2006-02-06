@@ -425,6 +425,9 @@ fi
 
 apps="apps"
 appsdir='\$(ROOTDIR)/apps'
+firmdir='\$(ROOTDIR)/firmware'
+toolsdir='\$(TOOLSDIR)/tools'
+
 
 ##################################################################
 # Figure out target platform
@@ -848,7 +851,7 @@ fi
 # Figure out build "type"
 #
   echo ""
-  echo "Build (N)ormal, (D)evel, (S)imulator, (B)ootloader, (G)DB stub? (N)"
+  echo "Build (N)ormal, (D)evel, (S)imulator, (B)ootloader, (G)DB stub, (M)anual? (N)"
 
   option=`input`;
 
@@ -893,6 +896,30 @@ fi
       esac
       echo "GDB stub build selected"
       ;;
+    [Mm])
+      appsdir='\$(ROOTDIR)/manual'
+      firmdir='\$(ROOTDIR)/manual/platform' # No Makefile here.  Effectively ignores target
+      toolsdir=$firmdir;
+      toolset='';
+      apps="manual"
+      case $archos in
+          fmrecorder)
+              archos="recorderv2fm"
+              ;;
+          recorderv2)
+              archos="recorderv2fm"
+              ;;
+          ondio??)
+              archos="ondio"
+              ;;
+          h1??)
+              archos="h1xx"
+              ;;        
+          *)
+              ;;
+      esac
+      echo "Manual build selected"
+      ;; 
     *)
       debug=""
       echo "Normal build selected"
@@ -1030,6 +1057,8 @@ sed > Makefile \
  -e "s,@LOADADDRESS@,${loadaddress},g" \
  -e "s,@EXTRADEF@,${extradefines},g" \
  -e "s,@APPSDIR@,${appsdir},g" \
+ -e "s,@FIRMDIR@,${firmdir},g" \
+ -e "s,@TOOLSDIR@,${toolsdir},g" \
  -e "s,@APPS@,${apps},g" \
  -e "s,@SIMVER@,${simver},g" \
  -e "s,@GCCVER@,${gccver},g" \
@@ -1043,10 +1072,11 @@ sed > Makefile \
 ## Automaticly generated. http://www.rockbox.org/
 
 export ROOTDIR=@ROOTDIR@
-export FIRMDIR=\$(ROOTDIR)/firmware
+export FIRMDIR=@FIRMDIR@
 export APPSDIR=@APPSDIR@
-export TOOLSDIR=\$(ROOTDIR)/tools
+export TOOLSDIR=@TOOLSDIR@
 export DOCSDIR=\$(ROOTDIR)/docs
+export MANUALDIR=\${ROOTDIR}/manual
 export DEBUG=@DEBUG@
 export ARCHOS=@ARCHOS@
 export ARCHOSROM=@ARCHOSROM@
@@ -1092,7 +1122,7 @@ export UNAME=@UNAME@
 # Do not print "Entering directory ..."
 MAKEFLAGS += --no-print-directory
 
-.PHONY: all clean tags zip tools
+.PHONY: all clean tags zip tools manual
 
 all: tools
 	@SIMUL1@
@@ -1104,7 +1134,7 @@ clean:
 	@\$(MAKE) -C \$(FIRMDIR) clean OBJDIR=\$(BUILDDIR)/firmware
 	@\$(MAKE) -C \$(APPSDIR) clean OBJDIR=\$(BUILDDIR)/@APPS@
 	@\$(MAKE) -C \$(TOOLSDIR) clean
-	@rm -rf rockbox.zip TAGS @APPS@ firmware comsim sim lang.h
+	@rm -rf rockbox.zip TAGS @APPS@ firmware comsim sim lang.h manual *.pdf
 
 tools:
 	\$(MAKE) -C \$(TOOLSDIR) CC=\$(HOSTCC) @TOOLSET@
@@ -1121,6 +1151,10 @@ zip:
 
 7zip:
 	@\$(TOOLSDIR)/buildzip.pl -o "rockbox.7z" -z "7za a" -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
+
+manual:
+	@\$(MAKE) -C \$(MANUALDIR) OBJDIR=\$(BUILDDIR)/manual buildmanual
+
 EOF
 
 if [ "yes" = "$simulator" ]; then
