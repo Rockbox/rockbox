@@ -426,7 +426,7 @@ fi
 apps="apps"
 appsdir='\$(ROOTDIR)/apps'
 firmdir='\$(ROOTDIR)/firmware'
-toolsdir='\$(TOOLSDIR)/tools'
+toolsdir='\$(ROOTDIR)/tools'
 
 
 ##################################################################
