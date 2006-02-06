@@ -132,16 +132,9 @@ void* memchr(const void *s, int c, size_t n)
     return(local_rb->memchr(s,c,n));
 }
 
-void* memmove(void *s1, const void *s2, size_t n)
+void *memmove(void *dest, const void *src, size_t n)
 {
-    char* dest=(char*)s1;
-    char* src=(char*)s2;
-    size_t i;
-    
-    for (i=0;i<n;i++)
-        dest[i]=src[i];
-
-    return(dest);
+    return(local_rb->memmove(dest,src,n));
 }
 
 void qsort(void *base, size_t nmemb, size_t size,

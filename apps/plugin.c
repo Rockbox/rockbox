@@ -384,6 +384,7 @@ static const struct plugin_api rockbox_api = {
     lcd_bitmap_transparent_part,
     lcd_bitmap_transparent,
 #endif
+    memmove,
 };
 
 int plugin_load(const char* plugin, void* parameter)

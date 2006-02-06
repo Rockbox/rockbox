@@ -106,28 +106,6 @@ void xlcd_filltriangle(int x1, int y1, int x2, int y2, int x3, int y3)
 }
 
 #if LCD_DEPTH >= 8
-/* FIXME: intermediate solution until we have properly optimised memmove() */
-static void *my_memmove(void *dst0, const void *src0, size_t len0)
-{
-    char *dst = (char *) dst0;
-    char *src = (char *) src0;
-    
-    if (dst <= src)
-    {
-        while (len0--)
-            *dst++ = *src++;
-    }
-    else
-    {
-        dst += len0;
-        src += len0;
-        
-        while (len0--)
-            *(--dst) = *(--src);
-    }
-
-    return dst0;
-}
 
 void xlcd_scroll_left(int count)
 {
@@ -143,7 +121,7 @@ void xlcd_scroll_left(int count)
 
     do
     {
-        my_memmove(data, data + count, length * sizeof(fb_data));
+        local_rb->memmove(data, data + count, length * sizeof(fb_data));
         data += LCD_WIDTH;
     }
     while (data < data_end);
@@ -168,7 +146,7 @@ void xlcd_scroll_right(int count)
 
     do
     {
-        my_memmove(data + count, data, length * sizeof(fb_data));
+        local_rb->memmove(data + count, data, length * sizeof(fb_data));
         data += LCD_WIDTH;
     }
     while (data < data_end);
@@ -188,9 +166,9 @@ void xlcd_scroll_up(int count)
 
     length = LCD_HEIGHT - count;
 
-    my_memmove(local_rb->lcd_framebuffer,
-               local_rb->lcd_framebuffer + count * LCD_WIDTH,
-               length * LCD_WIDTH * sizeof(fb_data));
+    local_rb->memmove(local_rb->lcd_framebuffer,
+                      local_rb->lcd_framebuffer + count * LCD_WIDTH,
+                      length * LCD_WIDTH * sizeof(fb_data));
 
     oldmode = local_rb->lcd_get_drawmode();
     local_rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
@@ -207,9 +185,9 @@ void xlcd_scroll_down(int count)
 
     length = LCD_HEIGHT - count;
 
-    my_memmove(local_rb->lcd_framebuffer + count * LCD_WIDTH,
-               local_rb->lcd_framebuffer,
-               length * LCD_WIDTH * sizeof(fb_data));
+    local_rb->memmove(local_rb->lcd_framebuffer + count * LCD_WIDTH,
+                      local_rb->lcd_framebuffer,
+                      length * LCD_WIDTH * sizeof(fb_data));
 
     oldmode = local_rb->lcd_get_drawmode();
     local_rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);

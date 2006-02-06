@@ -29,29 +29,6 @@
 #ifdef HAVE_LCD_BITMAP /* and also not for the Player */
 #include "gray.h"
 
-/* FIXME: intermediate solution until we have properly optimised memmove() */
-static void *my_memmove(void *dst0, const void *src0, size_t len0)
-{
-    char *dst = (char *) dst0;
-    char *src = (char *) src0;
-    
-    if (dst <= src)
-    {
-        while (len0--)
-            *dst++ = *src++;
-    }
-    else
-    {
-        dst += len0;
-        src += len0;
-        
-        while (len0--)
-            *(--dst) = *(--src);
-    }
-
-    return dst0;
-}
-
 /*** Scrolling ***/
 
 /* Scroll left */
@@ -68,7 +45,7 @@ void gray_scroll_left(int count)
     blank = (_gray_info.drawmode & DRMODE_INVERSEVID) ?
             _gray_info.fg_brightness : _gray_info.bg_brightness;
 
-    my_memmove(_gray_info.cur_buffer, _gray_info.cur_buffer + shift, length);
+    _gray_rb->memmove(_gray_info.cur_buffer, _gray_info.cur_buffer + shift, length);
     _gray_rb->memset(_gray_info.cur_buffer + length, blank, shift);
 }
 
@@ -86,7 +63,7 @@ void gray_scroll_right(int count)
     blank = (_gray_info.drawmode & DRMODE_INVERSEVID) ?
             _gray_info.fg_brightness : _gray_info.bg_brightness;
 
-    my_memmove(_gray_info.cur_buffer + shift, _gray_info.cur_buffer, length);
+    _gray_rb->memmove(_gray_info.cur_buffer + shift, _gray_info.cur_buffer, length);
     _gray_rb->memset(_gray_info.cur_buffer, blank, shift);
 }
 
@@ -107,7 +84,7 @@ void gray_scroll_up(int count)
 
     do
     {
-        my_memmove(data, data + count, length);
+        _gray_rb->memmove(data, data + count, length);
         _gray_rb->memset(data + length, blank, count);
         data += _gray_info.height;
     }
@@ -131,7 +108,7 @@ void gray_scroll_down(int count)
 
     do
     {
-        my_memmove(data + count, data, length);
+        _gray_rb->memmove(data + count, data, length);
         _gray_rb->memset(data, blank, count);
         data += _gray_info.height;
     }
@@ -161,7 +138,7 @@ void gray_ub_scroll_left(int count)
                                + MULU16(_gray_info.plane_size, _gray_info.depth);
         do
         {
-            my_memmove(ptr_row, ptr_row + count, length);
+            _gray_rb->memmove(ptr_row, ptr_row + count, length);
             _gray_rb->memset(ptr_row + length, 0, count);
             ptr_row += _gray_info.plane_size;
         }
@@ -193,7 +170,7 @@ void gray_ub_scroll_right(int count)
                                + MULU16(_gray_info.plane_size, _gray_info.depth);
         do
         {
-            my_memmove(ptr_row + count, ptr_row, length);
+            _gray_rb->memmove(ptr_row + count, ptr_row, length);
             _gray_rb->memset(ptr_row, 0, count);
             ptr_row += _gray_info.plane_size;
         }
