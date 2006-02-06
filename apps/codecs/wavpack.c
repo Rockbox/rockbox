@@ -24,9 +24,6 @@ CODEC_HEADER
 
 static struct codec_api *ci;
 
-#define FORCE_DSP_USE    /* fixes some WavPack bugs; adds about 12% to boost ratio
-                            (when DSP would not have been used) */
-
 #define BUFFER_SIZE 4096
 
 static long temp_buffer [BUFFER_SIZE] IBSS_ATTR;
@@ -66,8 +63,7 @@ enum codec_status codec_start(struct codec_api* api)
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*128));
   
     ci->configure(DSP_DITHER, (bool *)false);
-    ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_INTERLEAVED);
-    ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(16));
+    ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(27));   // should be 28...
 
     next_track:
 
@@ -79,20 +75,9 @@ enum codec_status codec_start(struct codec_api* api)
     while (!*ci->taginfo_ready && !ci->stop_codec)
         ci->sleep(1);
         
-#ifdef FORCE_DSP_USE
     ci->configure(CODEC_DSP_ENABLE, (bool *)true);
     ci->configure(DSP_SET_FREQUENCY, (long *)(ci->id3->frequency));
     codec_set_replaygain(ci->id3);
-#else
-    if (ci->id3->frequency != NATIVE_FREQUENCY ||
-        ci->global_settings->replaygain) {
-            ci->configure(CODEC_DSP_ENABLE, (bool *)true);
-            ci->configure(DSP_SET_FREQUENCY, (long *)(ci->id3->frequency));
-            codec_set_replaygain(ci->id3);
-    }
-    else
-        ci->configure(CODEC_DSP_ENABLE, (bool *)false);
-#endif
    
     /* Create a decoder instance */
     wpc = WavpackOpenFileInput (read_callback, error);
@@ -104,6 +89,7 @@ enum codec_status codec_start(struct codec_api* api)
 
     bps = WavpackGetBytesPerSample (wpc);
     nchans = WavpackGetReducedChannels (wpc);
+    ci->configure(DSP_SET_STEREO_MODE, nchans == 2 ? (int *)STEREO_INTERLEAVED : (int *)STEREO_MONO);
     sr_100 = ci->id3->frequency / 100;
 
     ci->set_elapsed (0);
@@ -141,71 +127,21 @@ enum codec_status codec_start(struct codec_api* api)
             ci->yield ();
         }
 
-        nsamples = WavpackUnpackSamples (wpc, temp_buffer, BUFFER_SIZE / 2);  
+        nsamples = WavpackUnpackSamples (wpc, temp_buffer, BUFFER_SIZE / nchans);  
 
         if (!nsamples || ci->stop_codec || ci->reload_codec)
             break;
 
-        /* convert mono to stereo here, in place */
-
-        if (nchans == 1) {
-            long *dst = temp_buffer + (nsamples * 2);
-            long *src = temp_buffer + nsamples;
-            long count = nsamples;
-
-            while (count--) {
-                *--dst = *--src;
-                *--dst = *src;
-                if (!(count & 0x7f))
-                    ci->yield ();
-            }
-        }
-
-        if (bps == 1) {
-            short *dst = (short *) temp_buffer;
-            long *src = temp_buffer;
-            long count = nsamples;
-
-            while (count--) {
-                *dst++ = *src++ << 8;
-                *dst++ = *src++ << 8;
-                if (!(count & 0x7f))
-                    ci->yield ();
-            }
-        }
-        else if (bps == 2) {
-            short *dst = (short *) temp_buffer;
-            long *src = temp_buffer;
-            long count = nsamples;
-
-            while (count--) {
-                *dst++ = *src++;
-                *dst++ = *src++;
-                if (!(count & 0x7f))
-                    ci->yield ();
-            }
-        }
-        else {
-            short *dst = (short *) temp_buffer;
-            int shift = (bps - 2) * 8;
-            long *src = temp_buffer;
-            long count = nsamples;
-
-            while (count--) {
-                *dst++ = *src++ >> shift;
-                *dst++ = *src++ >> shift;
-                if (!(count & 0x7f))
-                    ci->yield ();
-            }
-        }
+        ci->yield ();
 
         if (ci->stop_codec || ci->reload_codec)
             break;
 
-        while (!ci->pcmbuf_insert ((char *) temp_buffer, nsamples * 4))
+        while (!ci->pcmbuf_insert ((char *) temp_buffer, nsamples * nchans * 4))
             ci->sleep (1);
 
         ci->set_elapsed (WavpackGetSampleIndex (wpc) / sr_100 * 10);
+        ci->yield ();
     }
 
     if (ci->request_next_track())

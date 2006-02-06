@@ -675,10 +675,16 @@ static void decorr_mono_pass (struct decorr_pass *dpp, long *buffer, long sample
 // it is clipped and shifted in a single operation. Otherwise, if it's
 // lossless then the last step is to apply the final shift (if any).
 
+// This function has been modified for RockBox to return all integer samples
+// as 28-bits, and clipping (for lossy mode) has been eliminated because this
+// now happens in the dsp module.
+
 static void fixup_samples (WavpackStream *wps, long *buffer, ulong sample_count)
 {
     ulong flags = wps->wphdr.flags;
     int shift = (flags & SHIFT_MASK) >> SHIFT_LSB;
+
+    shift += 20 - (flags & BYTES_STORED) * 8;   // this provides RockBox with 28-bit data
 
     if (flags & FLOAT_DATA) {
         float_values (wps, buffer, (flags & MONO_FLAG) ? sample_count : sample_count * 2);
@@ -689,7 +695,6 @@ static void fixup_samples (WavpackStream *wps, long *buffer, ulong sample_count)
         ulong count = (flags & MONO_FLAG) ? sample_count : sample_count * 2;
         int sent_bits = wps->int32_sent_bits, zeros = wps->int32_zeros;
         int ones = wps->int32_ones, dups = wps->int32_dups;
-//      ulong mask = (1 << sent_bits) - 1;
         long *dptr = buffer;
 
         if (!(flags & HYBRID_FLAG) && !sent_bits && (zeros + ones + dups))
@@ -707,50 +712,21 @@ static void fixup_samples (WavpackStream *wps, long *buffer, ulong sample_count)
             shift += zeros + sent_bits + ones + dups;
     }
 
-    if (flags & HYBRID_FLAG) {
-        long min_value, max_value, min_shifted, max_shifted;
-
-        switch (flags & BYTES_STORED) {
-            case 0:
-                min_shifted = (min_value = -128 >> shift) << shift;
-                max_shifted = (max_value = 127 >> shift) << shift;
-                break;
-
-            case 1:
-                min_shifted = (min_value = -32768 >> shift) << shift;
-                max_shifted = (max_value = 32767 >> shift) << shift;
-                break;
-
-            case 2:
-                min_shifted = (min_value = -8388608 >> shift) << shift;
-                max_shifted = (max_value = 8388607 >> shift) << shift;
-                break;
-
-            case 3:
-            default:
-                min_shifted = (min_value = (long) 0x80000000 >> shift) << shift;
-                max_shifted = (max_value = (long) 0x7FFFFFFF >> shift) << shift;
-                break;
-        }
-
-        if (!(flags & MONO_FLAG))
-            sample_count *= 2;
-
-        while (sample_count--) {
-            if (*buffer < min_value)
-                *buffer++ = min_shifted;
-            else if (*buffer > max_value)
-                *buffer++ = max_shifted;
-            else
-                *buffer++ <<= shift;
-        }
-    }
-    else if (shift) {
+    if (shift > 0) {
         if (!(flags & MONO_FLAG))
             sample_count *= 2;
 
         while (sample_count--)
             *buffer++ <<= shift;
+    }
+    else if (shift < 0) {
+        shift = -shift;
+
+        if (!(flags & MONO_FLAG))
+            sample_count *= 2;
+
+        while (sample_count--)
+            *buffer++ >>= shift;
     }
 }
 
