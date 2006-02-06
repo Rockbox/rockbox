@@ -181,31 +181,20 @@ struct font_cache_entry* font_cache_get(
 
     if (insertion_point < index_to_replace)
     {
-        /* shift memory down */
-        int dest = insertion_point+2;
-        int src  = insertion_point+1;
-        int len  = index_to_replace - insertion_point - 1;
-
-        int desti = dest + len - 1;
-        int srci  = src  + len - 1;
-
-        int i;
-        for (i = 0; i < len; i++)
-            fcache->_index[desti--] = fcache->_index[srci--];
+        /* shift memory up */
+        memmove(fcache->_index + insertion_point + 2,
+                fcache->_index + insertion_point + 1,
+                (index_to_replace - insertion_point - 1) * sizeof(short));
 
         /* add to index */
         fcache->_index[insertion_point + 1] = lru_handle_to_replace;
     }
     else if (insertion_point > index_to_replace)
     {
-        /* shift memory up */
-        int dest = index_to_replace;
-        int src  = index_to_replace + 1;
-        int len  = insertion_point - index_to_replace;
-
-        int i;
-        for (i=0; i < len; i++)
-            fcache->_index[dest++] = fcache->_index[src++];
+        /* shift memory down */
+        memmove(fcache->_index + index_to_replace,
+                fcache->_index + index_to_replace + 1,
+                (insertion_point - index_to_replace) * sizeof(short));
 
         /* add to index */
         fcache->_index[insertion_point] = lru_handle_to_replace;
