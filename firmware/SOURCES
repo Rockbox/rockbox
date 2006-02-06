@@ -38,9 +38,11 @@ common/strtok.c
 common/timefuncs.c
 #if (CONFIG_CPU == SH7034) || defined(CPU_COLDFIRE)
 common/memcpy_a.S
+common/memmove_a.S
 common/memset_a.S
 #else
 common/memcpy.c
+common/memmove.c
 common/memset.c
 #endif
 #ifdef HAVE_LCD_CHARCELLS

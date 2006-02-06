@@ -23,6 +23,7 @@
 #if CONFIG_CPU == SH7034
     .align      2
     .global     _memcpy
+    .global     ___memcpy_fwd_entry
     .type       _memcpy,@function
 
 /* Copies <length> bytes of data in memory from <source> to <dest>
@@ -46,12 +47,13 @@
  *  r6 - source end address
  *  r7 - stored dest start address
  *
- * The instruction order below is devised in a way to utilize the pipelining
+ * The instruction order is devised in a way to utilize the pipelining
  * of the SH1 to the max. The routine also tries to utilize fast page mode.
  */
 
 _memcpy:
     mov     r4,r7       /* store dest for returning */
+___memcpy_fwd_entry:
     add     #-8,r4      /* offset for early increment (max. 2 longs) */
     mov     #11,r0
     cmp/hs  r0,r6       /* at least 11 bytes to copy? (ensures 2 aligned longs) */
@@ -99,7 +101,7 @@ _memcpy:
     mov.l   r0,@-r4     /* store second long */
     mov.l   r1,@-r4     /* store first long; NOT ALIGNED - no speed loss here! */
     bt      .loop_do0
-    
+           
     add     #4,r3       /* readjust end address */
     cmp/hi  r5,r3       /* one long left? */
     bf      .start_b2   /* no, jump to trailing byte loop */
@@ -148,20 +150,20 @@ _memcpy:
     mov.l   @r5+,r1     /* load first long & increment source addr */
     add     #16,r4      /* increment dest addr */
     mov.l   @r5+,r0     /* load second long & increment source addr */
-    mov     r1,r2       /* copy first long */
+    cmp/hi  r5,r3       /* runs r5 up to last or second last long bound */
     mov.b   r0,@-r4     /* store low byte of second long */
     shlr8   r0          /* get upper 3 bytes */
+    mov     r1,r2       /* copy first long */
     shll16  r2          /* move low byte of first long all the way up, .. */
     shll8   r2
     or      r2,r0       /* ..combine with the 3 bytes of second long.. */
-    cmp/hi  r5,r3       /* runs r5 up to last or second last long bound */
     mov.l   r0,@-r4     /* ..and store as long */
     shlr8   r1          /* get middle 2 bytes */
     mov.w   r1,@-r4     /* store as word */
     shlr16  r1          /* get upper byte */
     mov.b   r1,@-r4     /* and store */
     bt      .loop_do1
-    
+
     add     #4,r3       /* readjust end address */
 .last_do13:
     cmp/hi  r5,r3       /* one long left? */
@@ -218,6 +220,7 @@ _memcpy:
 #define FULLSPEED /* use burst writing for word aligned destinations */
     .align  2
     .global memcpy
+    .global __memcpy_fwd_entry
     .type   memcpy,@function
 
 /* Copies <length> bytes of data in memory from <source> to <dest>
@@ -249,7 +252,9 @@ memcpy:
     move.l  (4,%sp),%a1     /* Destination */
     move.l  (8,%sp),%a0     /* Source */
     move.l  (12,%sp),%d1    /* Length */
-    add.l   %a0,%d1         /* %d1 = end address */
+
+__memcpy_fwd_entry:
+    add.l   %a0,%d1         /* %d1 = source end */
 
     move.l  %a0,%d0
     addq.l  #7,%d0
@@ -278,7 +283,7 @@ memcpy:
     movem.l %d2-%d7/%a2,(%sp)
 
     moveq.l #16,%d2
-    sub.l   %d2,%d0         /* %d0 = first source long bound */
+    sub.l   %d2,%d0         /* %d0 = first source line bound */
     move.l  %d1,%a2         /* %a2 = end address */
     lea.l   (-15,%a2),%a2   /* adjust end address for loops doing 16 bytes/ pass */
     move.l  %a1,%d1
@@ -507,7 +512,7 @@ memcpy:
     lea.l   (12,%a2),%a2    /* readjust end address for doing longwords */
     cmp.l   %a0,%a2         /* any trailing longwords? */
     jls     .lines_end      /* no: get outta here */
-    
+
 .lines_do0_tail_loop:
     move.l  (%a0)+,(%a1)+   /* copy longword */
     cmp.l   %a0,%a2         /* runs %a0 up to last long bound */
@@ -610,7 +615,7 @@ memcpy:
     /* word aligned destination (line + 14): use line bursts in the loop */
 .lines_lo14_start:
     movem.l (%a0),%d4-%d7   /* load first line */
-    lea.l   (16,%a0),%a0
+    add.l   %d0,%a0
     swap    %d4             /* swap words of 1st long */
     move.w  %d4,(%a1)+      /* store word */
     jra     .lines_lo14_entry      /* jump into main loop */
@@ -784,7 +789,7 @@ memcpy:
     move.l  (%a0)+,%d7      /* load first longword */
     swap    %d7             /* swap words */
     move.w  %d7,(%a1)+      /* store high word */
-    cmp.l   %a0,%d0         /* any full lnogword? */
+    cmp.l   %a0,%d0         /* any full longword? */
     jls     .lines_do2_loop /* no: skip head loop */
 
 .lines_do2_head_loop:
