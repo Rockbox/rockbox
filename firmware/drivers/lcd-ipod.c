@@ -45,11 +45,15 @@ static int timer_check(int clock_start, int usecs)
 
 /*** hardware configuration ***/
 
+#if CONFIG_CPU == PP5002
 #define IPOD_LCD_BASE            0xc0001000
-#define IPOD_LCD_BUSY_MASK        0x80000000
+#define IPOD_LCD_BUSY_MASK       0x80000000
+#else /* PP5020 */
+#define IPOD_LCD_BASE            0x70003000
+#define IPOD_LCD_BUSY_MASK       0x00008000
+#endif
 
 /* LCD command codes for HD66789R */
-
 
 #define LCD_CMD  0x08
 #define LCD_DATA 0x10
@@ -98,7 +102,7 @@ static void lcd_cmd_and_data(int cmd, int data_lo, int data_hi)
 
 int lcd_default_contrast(void)
 {
-    return 28;
+    return 96;
 }
 
 /** 
@@ -109,6 +113,15 @@ void lcd_init_device(void){
     /* driver output control - 160x128 */
     lcd_cmd_and_data(0x1, 0x1, 0xf);
     lcd_cmd_and_data(0x5, 0x0, 0x10);
+
+#ifdef APPLE_IPOD4G
+    outl(inl(0x6000d004) | 0x4, 0x6000d004); /* B02 enable */
+    outl(inl(0x6000d004) | 0x8, 0x6000d004); /* B03 enable */
+    outl(inl(0x70000084) | 0x2000000, 0x70000084); /* D01 enable */
+    outl(inl(0x70000080) | 0x2000000, 0x70000080); /* D01 =1 */
+
+    outl(inl(0x6000600c) | 0x20000, 0x6000600c);    /* PWM enable */
+#endif
 }
 
 /*** update functions ***/
