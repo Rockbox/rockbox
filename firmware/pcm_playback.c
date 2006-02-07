@@ -320,28 +320,210 @@ void pcm_init(void)
    we will keep it separate during early development.
 */
 
+#define FIFO_FREE_COUNT ((IISFIFO_CFG & 0x3f0000) >> 16)
+
 static bool pcm_playing;
 static bool pcm_paused;
 static int pcm_freq = 0x6; /* 44.1 is default */
 
-/* the registered callback function to ask for more mp3 data */
-static void (*callback_for_more)(unsigned char**, size_t*) = NULL;
-static unsigned short *p IBSS_ATTR;
-static size_t size IBSS_ATTR;
+unsigned short* p IBSS_ATTR;
+long p_size IBSS_ATTR;
+
+static void dma_start(const void *addr, size_t size)
+{
+    p=(unsigned short*)addr;
+    p_size=size;
+
+    pcm_playing = true;
+
+    /* setup I2S interrupt for FIQ */
+    outl(inl(0x6000402c) | I2S_MASK, 0x6000402c);
+    outl(I2S_MASK, 0x60004024);
+
+    /* Clear the FIQ disable bit in cpsr_c */
+    enable_fiq();
+
+    /* Enable playback FIFO */
+    IISCONFIG |= 0x20000000;
+
+    /* Fill the FIFO - we assume there are enough bytes in the pcm buffer to
+       fill the 32-byte FIFO. */
+    while (p_size > 0) {
+        if (FIFO_FREE_COUNT < 2) {
+            /* Enable interrupt */
+            IISCONFIG |= 0x2;
+            return;
+        }
+
+        IISFIFO_WR = (*(p++))<<16;
+        IISFIFO_WR = (*(p++))<<16;
+        p_size-=4;
+    }
+}
 
 /* Stops the DMA transfer and interrupt */
 static void dma_stop(void)
 {
     pcm_playing = false;
 
-    p = NULL;
-    size = 0;
-    callback_for_more = NULL;
-    pcm_paused = false;
-
     /* Disable playback FIFO */
     IISCONFIG &= ~0x20000000;
-    // TODO: ??? disable_fiq();
+
+    /* Disable the interrupt */
+    IISCONFIG &= ~0x2;
+
+    disable_fiq();
+
+    pcm_paused = false;
+}
+
+void pcm_set_frequency(unsigned int frequency)
+{
+    pcm_freq=frequency;
+}
+
+/* the registered callback function to ask for more PCM data */
+static void (*callback_for_more)(unsigned char**, size_t*) IDATA_ATTR = NULL;
+
+void pcm_play_data(void (*get_more)(unsigned char** start, size_t* size),
+        unsigned char* start, size_t size)
+{
+    callback_for_more = get_more;
+
+    if (!(start && size))
+    {
+        if (get_more)
+            get_more(&start, &size);
+        else
+            return;
+    }
+    if (start && size)
+        dma_start(start, size);
+}
+
+size_t pcm_get_bytes_waiting(void)
+{
+    return p_size;
+}
+
+void pcm_mute(bool mute)
+{
+    wm8975_mute(mute);
+    if (mute)
+        sleep(HZ/16);
+}
+
+void pcm_play_stop(void)
+{
+    if (pcm_playing) {
+        dma_stop();
+    }
+}
+
+void pcm_play_pause(bool play)
+{
+    size_t next_size;
+    unsigned char *next_start;
+
+    if (!pcm_playing)
+        return ;
+
+    if(pcm_paused && play)
+    {
+        if (pcm_get_bytes_waiting())
+        {
+            logf("unpause");
+            /* Enable the FIFO and fill it */
+
+            enable_fiq();
+
+            /* Enable playback FIFO */
+            IISCONFIG |= 0x20000000;
+
+            /* Fill the FIFO - we assume there are enough bytes in the 
+               pcm buffer to fill the 32-byte FIFO. */
+            while (p_size > 0) {
+                if (FIFO_FREE_COUNT < 2) {
+                    /* Enable interrupt */
+                    IISCONFIG |= 0x2;
+                    return;
+                }
+
+                IISFIFO_WR = (*(p++))<<16;
+                IISFIFO_WR = (*(p++))<<16;
+                p_size-=4;
+            }
+        }
+        else
+        {
+            logf("unpause, no data waiting");
+            void (*get_more)(unsigned char**, size_t*) = callback_for_more;
+            if (get_more)
+                get_more(&next_start, &next_size);
+            if (next_start && next_size)
+                dma_start(next_start, next_size);
+            else
+            {
+                dma_stop();
+                logf("unpause attempted, no data");
+            }
+        }
+    }
+    else if(!pcm_paused && !play)
+    {
+        logf("pause");
+
+        /* Disable the interrupt */
+        IISCONFIG &= ~0x2;
+
+        /* Disable playback FIFO */
+        IISCONFIG &= ~0x20000000;
+
+        disable_fiq();
+    }
+    pcm_paused = !play;
+}
+
+bool pcm_is_paused(void)
+{
+    return pcm_paused;
+}
+
+bool pcm_is_playing(void)
+{
+    return pcm_playing;
+}
+
+unsigned int fiq_count IBSS_ATTR;
+
+void fiq(void) ICODE_ATTR;
+void fiq(void)
+{
+    /* Clear interrupt */
+    IISCONFIG &= ~0x2;
+
+    fiq_count++;
+    do {
+        while (p_size) {
+            if (FIFO_FREE_COUNT < 2) {
+                /* Enable interrupt */
+                IISCONFIG |= 0x2;
+                return;
+            }
+
+            IISFIFO_WR = (*(p++))<<16;
+            IISFIFO_WR = (*(p++))<<16;
+            p_size-=4;
+        }
+
+        /* p is empty, get some more data */
+        if (callback_for_more) {
+            callback_for_more((unsigned char**)&p,&p_size);
+        }
+    } while (p_size);
+
+    /* No more data, so disable the FIFO/FIQ */
+    dma_stop();
 }
 
 void pcm_init(void)
@@ -359,263 +541,9 @@ void pcm_init(void)
 
     /* Unmute the master channel (DAC should be at zero point now). */
     wm8975_mute(false);
-    
+
     /* Call dma_stop to initialize everything. */
     dma_stop();
-}
-
-void pcm_set_frequency(unsigned int frequency)
-{
-    (void)frequency;
-    pcm_freq=frequency;
-}
-
-void fiq(void) ICODE_ATTR;
-void fiq(void)
-{
-    /* Clear interrupt */
-    IISCONFIG &= ~0x2;
-
-    if ((size==0) && (callback_for_more)) {
-        callback_for_more((unsigned char **)&p, &size);
-    }
-
-    while (size > 0) {
-        if (((inl(0x7000280c) & 0x3f0000) >> 16) < 2) {
-            /* Enable interrupt */
-            IISCONFIG |= 0x2;
-            return;
-        }
-
-        IISFIFO_WR = (*(p++))<<16;
-        IISFIFO_WR = (*(p++))<<16;
-        size-=4;
-
-        if ((size==0) && (callback_for_more)) {
-            callback_for_more((unsigned char **)&p, &size);
-        }
-    }
-}
-
-void pcm_play_data(void (*get_more)(unsigned char** start, size_t* size),
-        unsigned char* _p, size_t _size)
-{
-    size_t free_count;
-    
-    callback_for_more = get_more;
-
-    if (size > 0) { return; }
-
-    p = (unsigned short *)_p;
-    size = _size;
-
-    /* setup I2S interrupt for FIQ */
-    outl(inl(0x6000402c) | I2S_MASK, 0x6000402c);
-    outl(I2S_MASK, 0x60004024);
-
-    enable_fiq();              /* Clear the FIQ disable bit in cpsr_c */
-
-    IISCONFIG |= 0x20000000;   /* Enable playback FIFO */
-
-    /* Fill the FIFO */
-    while (size > 0) {
-        free_count = (inl(0x7000280c) & 0x3f0000) >> 16;
-
-        if (free_count < 2) {
-            /* Enable interrupt */
-            IISCONFIG |= 0x2;
-            return;
-        }
-
-        IISFIFO_WR = (*(p++))<<16;
-        IISFIFO_WR = (*(p++))<<16;
-        size-=4;
-
-        if ((size==0) && (get_more)) {
-            get_more((unsigned char **)&p, &size);
-	}
-    }
-}
-
-void pcm_play_stop(void)
-{
-    if (pcm_playing) {
-        dma_stop();
-    }
-}
-
-void pcm_mute(bool mute)
-{
-    (void)mute;
-}
-
-void pcm_play_pause(bool play)
-{
-    if(pcm_paused && play && size)
-    {
-        logf("unpause");
-        /* We need to enable DMA here */
-    }
-    else if(!pcm_paused && !play)
-    {
-        logf("pause");
-        /* We need to disable DMA here */
-    }
-    pcm_paused = !play;
-}
-
-bool pcm_is_paused(void)
-{
-    return pcm_paused;
-}
-
-bool pcm_is_playing(void)
-{
-    return pcm_playing;
-}
-
-size_t pcm_get_bytes_waiting(void)
-{
-    return size;
-}
-
-#elif defined(HAVE_WM8731L)
-
-/* We need to unify this code with the uda1380 code as much as possible, but
-   we will keep it separate during early development.
-*/
-
-static bool pcm_playing;
-static bool pcm_paused;
-static int pcm_freq = 0x6; /* 44.1 is default */
-
-static unsigned char *next_start;
-static long next_size;
-
-/* Set up the DMA transfer that kicks in when the audio FIFO gets empty */
-static void dma_start(const void *addr, long size)
-{
-    pcm_playing = true;
-
-    addr = (void *)((unsigned long)addr & ~3); /* Align data */
-    size &= ~3; /* Size must be multiple of 4 */
-
-    /* Disable playback for now */
-    pcm_playing = false;
-    return;
-
-/* This is the uda1380 code */
-#if 0
-    /* Reset the audio FIFO */
-
-    /* Set up DMA transfer  */
-    SAR0 = ((unsigned long)addr); /* Source address */
-    DAR0 = (unsigned long)&PDOR3; /* Destination address */
-    BCR0 = size;                  /* Bytes to transfer */
-
-    /* Enable the FIFO and force one write to it */
-    IIS2CONFIG = IIS_DEFPARM(pcm_freq);
-
-    DCR0 = DMA_INT | DMA_EEXT | DMA_CS | DMA_SINC | DMA_START;
-#endif
-}
-
-/* Stops the DMA transfer and interrupt */
-static void dma_stop(void)
-{
-    pcm_playing = false;
-
-#if 0
-/* This is the uda1380 code */
-    DCR0 = 0;
-    DSR0 = 1;
-    /* Reset the FIFO */
-    IIS2CONFIG = IIS_RESET | IIS_DEFPARM(pcm_freq);
-#endif
-    next_start = NULL;
-    next_size = 0;
-    pcm_paused = false;
-}
-
-
-void pcm_init(void)
-{
-    pcm_playing = false;
-    pcm_paused = false;
-
-    /* Initialize default register values. */
-    wm8731l_init();
-    
-    /* The uda1380 needs a sleep(HZ) here - do we need one? */
-
-    /* Power on */
-    wm8731l_enable_output(true);
-
-    /* Unmute the master channel (DAC should be at zero point now). */
-    wm8731l_mute(false);
-    
-    /* Call dma_stop to initialize everything. */
-    dma_stop();
-}
-
-void pcm_set_frequency(unsigned int frequency)
-{
-    (void)frequency;
-    pcm_freq=frequency;
-}
-
-/* the registered callback function to ask for more mp3 data */
-static void (*callback_for_more)(unsigned char**, long*) = NULL;
-
-void pcm_play_data(void (*get_more)(unsigned char** start, long* size))
-{
-    unsigned char *start;
-    long size;
-
-    callback_for_more = get_more;
-
-    get_more((unsigned char **)&start, (long *)&size);
-    get_more(&next_start, &next_size);
-
-    dma_start(start, size);
-}
-
-void pcm_play_stop(void)
-{
-    if (pcm_playing) {
-        dma_stop();
-    }
-}
-
-void pcm_play_pause(bool play)
-{
-    if(pcm_paused && play && next_size)
-    {
-        logf("unpause");
-        /* We need to enable DMA here */
-    }
-    else if(!pcm_paused && !play)
-    {
-        logf("pause");
-        /* We need to disable DMA here */
-    }
-    pcm_paused = !play;
-}
-
-bool pcm_is_paused(void)
-{
-    return pcm_paused;
-}
-
-bool pcm_is_playing(void)
-{
-    return pcm_playing;
-}
-
-
-long pcm_get_bytes_waiting(void)
-{
-    return 0;
 }
 
 #elif CONFIG_CPU == PNX0101
@@ -698,7 +626,7 @@ void pcm_calculate_peaks(int *left, int *right)
     long samples = (BCR0 & 0xffffff) / 4;
     short *addr = (short *) (SAR0 & ~3);
 #elif defined(HAVE_WM8975)
-    long samples = size / 4;
+    long samples = p_size / 4;
     short *addr = p;
 #elif defined(HAVE_WM8731L)
     long samples = next_size / 4;

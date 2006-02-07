@@ -345,10 +345,21 @@ static inline int set_irq_level(int level)
 
 static inline void enable_fiq(void)
 {
-    /* enable FIQ */
+    /* Clear FIQ disable bit */
     asm volatile (
         "mrs     r0, cpsr         \n"\
         "bic     r0, r0, #0x40    \n"\
+        "msr     cpsr_c, r0         "
+        : : : "r0"
+    );
+}
+
+static inline void disable_fiq(void)
+{
+    /* Set FIQ disable bit */
+    asm volatile (
+        "mrs     r0, cpsr         \n"\
+        "orr     r0, r0, #0x40    \n"\
         "msr     cpsr_c, r0         "
         : : : "r0"
     );
