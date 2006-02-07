@@ -736,18 +736,8 @@ void prepare_tock(void)
     }
 }
 
-void callback_pcm(unsigned char** start, long* size)
-{
-    if(sound_active) {
-        *start = (unsigned char *)sndbuf;
-        *size = sizeof(sndbuf);
-        sound_active = false;
-    }
-}
-
 void play_tock(void) {
-    sound_active = true;
-    rb->pcm_play_data(callback_pcm);
+    rb->pcm_play_data(NULL,(unsigned char *)sndbuf,sizeof(sndbuf));
     tock++;
 }
 

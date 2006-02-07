@@ -124,6 +124,10 @@ static const struct plugin_api rockbox_api = {
     lcd_bitmap_part,
     lcd_bitmap,
 #endif
+#if LCD_DEPTH == 16
+    lcd_bitmap_transparent_part,
+    lcd_bitmap_transparent,
+#endif
     lcd_putsxy,
     lcd_puts_style,
     lcd_puts_scroll_style,
@@ -198,6 +202,7 @@ static const struct plugin_api rockbox_api = {
     settings_parseline,
 #ifndef SIMULATOR
     ata_sleep,
+	ata_disk_is_active,
 #endif
 
     /* dir */
@@ -225,6 +230,17 @@ static const struct plugin_api rockbox_api = {
     timer_unregister,
     timer_set_period,
 #endif
+    queue_init,
+    queue_delete,
+    queue_post,
+    queue_wait_w_tmo,
+    usb_acknowledge,
+#ifdef RB_PROFILE
+    profile_thread,
+    profstop,
+    profile_func_enter,
+    profile_func_exit,
+#endif
 
     /* strings and memory */
     snprintf,
@@ -238,6 +254,7 @@ static const struct plugin_api rockbox_api = {
     strncasecmp,
     memset,
     memcpy,
+    memmove,
     _ctype_,
     atoi,
     strchr,
@@ -332,6 +349,23 @@ static const struct plugin_api rockbox_api = {
     menu_insert,
     menu_set_cursor,
 
+    /* power */
+    battery_level,
+    battery_level_safe,
+    battery_time,
+#ifndef SIMULATOR
+	battery_voltage,
+#endif
+#ifdef HAVE_CHARGING
+    charger_inserted,
+# ifdef HAVE_CHARGE_STATE
+    charging_state,
+# endif
+#endif
+#ifdef HAVE_USB_POWER
+        usb_powered,
+#endif
+
     /* misc */
     srand,
     rand,
@@ -353,8 +387,6 @@ static const struct plugin_api rockbox_api = {
     count_mp3_frames,
     create_xing_header,
     find_next_frame,
-    battery_level,
-    battery_level_safe,
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     peak_meter_scale_value,
     peak_meter_set_use_dbfs,
@@ -368,37 +400,7 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-#ifdef RB_PROFILE
-    profile_thread,
-    profstop,
-    profile_func_enter,
-    profile_func_exit,
-#endif
-    battery_time,
-#ifndef SIMULATOR
-	ata_disk_is_active,
-	battery_voltage,
-#endif
-    queue_init,
-    queue_delete,
-    queue_post,
-    queue_wait_w_tmo,
-    usb_acknowledge,
-#if LCD_DEPTH == 16
-    lcd_bitmap_transparent_part,
-    lcd_bitmap_transparent,
-#endif
-    memmove,
-#ifdef HAVE_CHARGING
-    charger_inserted,
-# ifdef HAVE_CHARGE_STATE
-    charging_state,
-# endif
-#endif
-#ifdef HAVE_USB_POWER
-        usb_powered,
-#endif
-    
+
 };
 
 int plugin_load(const char* plugin, void* parameter)

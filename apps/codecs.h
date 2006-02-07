@@ -128,8 +128,8 @@ struct codec_api {
     void* (*get_codec_memory)(long *size);
     /* Insert PCM data into audio buffer for playback. Playback will start
        automatically. */
-    bool (*pcmbuf_insert)(char *data, long length);
-    bool (*pcmbuf_insert_split)(void *ch1, void *ch2, long length);
+    bool (*pcmbuf_insert)(const char *data, size_t length);
+    bool (*pcmbuf_insert_split)(const void *ch1, const void *ch2, size_t length);
     /* Set song position in WPS (value in ms). */
     void (*set_elapsed)(unsigned int value);
     

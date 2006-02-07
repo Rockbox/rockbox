@@ -97,12 +97,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 6
+#define PLUGIN_API_VERSION 7
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 2
+#define PLUGIN_MIN_API_VERSION 7
 
 /* plugin return codes */
 enum plugin_status {
@@ -161,6 +161,13 @@ struct plugin_api {
                             int stride, int x, int y, int width, int height);
     void (*lcd_bitmap)(const fb_data *src, int x, int y, int width,
                        int height);
+#endif
+#if LCD_DEPTH == 16
+    void (*lcd_bitmap_transparent_part)(const fb_data *src,
+            int src_x, int src_y, int stride,
+            int x, int y, int width, int height);
+  	void (*lcd_bitmap_transparent)(const fb_data *src, int x, int y,
+            int width, int height);
 #endif
     void (*lcd_putsxy)(int x, int y, const unsigned char *string);
     void (*lcd_puts_style)(int x, int y, const unsigned char *str, int style);
@@ -246,6 +253,7 @@ struct plugin_api {
     bool (*settings_parseline)(char* line, char** name, char** value);
 #ifndef SIMULATOR
     void (*ata_sleep)(void);
+    bool (*ata_disk_is_active)(void);
 #endif
     
     /* dir */
@@ -275,6 +283,18 @@ struct plugin_api {
     void (*timer_unregister)(void);
     bool (*timer_set_period)(long count);
 #endif
+    void (*queue_init)(struct event_queue *q);
+    void (*queue_delete)(struct event_queue *q);
+    void (*queue_post)(struct event_queue *q, long id, void *data);
+    void (*queue_wait_w_tmo)(struct event_queue *q, struct event *ev,
+            int ticks);
+    void (*usb_acknowledge)(long id);
+#ifdef RB_PROFILE
+    void (*profile_thread)(void);
+    void (*profstop)(void);
+    void (*profile_func_enter)(void *this_fn, void *call_site);
+    void (*profile_func_exit)(void *this_fn, void *call_site);
+#endif
 
     /* strings and memory */
     int (*snprintf)(char *buf, size_t size, const char *fmt, ...);
@@ -288,6 +308,7 @@ struct plugin_api {
     int (*strncasecmp)(const char *s1, const char *s2, size_t n);
     void* (*memset)(void *dst, int c, size_t length);
     void* (*memcpy)(void *out, const void *in, size_t n);
+    void* (*memmove)(void *out, const void *in, size_t n);
     const unsigned char *_ctype_;
     int (*atoi)(const char *str);
     char *(*strchr)(const char *s, int c);
@@ -315,7 +336,8 @@ struct plugin_api {
     void (*bitswap)(unsigned char *data, int length);
 #endif
 #if CONFIG_CODEC == SWCODEC
-    void (*pcm_play_data)(void (*get_more)(unsigned char** start, long*size));
+    void (*pcm_play_data)(void (*get_more)(unsigned char** start, size_t*size),
+            unsigned char* start, size_t size);
     void (*pcm_play_stop)(void);
     void (*pcm_set_frequency)(unsigned int frequency);
     bool (*pcm_is_playing)(void);
@@ -384,6 +406,23 @@ struct plugin_api {
     void (*menu_insert)(int menu, int position, char *desc, bool (*function) (void));
     void (*menu_set_cursor)(int menu, int position);
 
+    /* power */
+    int (*battery_level)(void);
+    bool (*battery_level_safe)(void);
+    int (*battery_time)(void);
+#ifndef SIMULATOR
+    unsigned int (*battery_voltage)(void);
+#endif
+#ifdef HAVE_CHARGING
+    bool (*charger_inserted)(void);
+# ifdef HAVE_CHARGE_STATE
+    bool (*charging_state)(void);
+# endif    
+#endif
+#ifdef HAVE_USB_POWER
+    bool (*usb_powered)(void);
+#endif
+
     /* misc */
     void (*srand)(unsigned int seed);
     int  (*rand)(void);
@@ -406,13 +445,12 @@ struct plugin_api {
     int (*count_mp3_frames)(int fd, int startpos, int filesize,
                             void (*progressfunc)(int));
     int (*create_xing_header)(int fd, long startpos, long filesize,
-                              unsigned char *buf, unsigned long num_frames,
-                              unsigned long rec_time, unsigned long header_template,
-                              void (*progressfunc)(int), bool generate_toc);
+            unsigned char *buf, unsigned long num_frames,
+            unsigned long rec_time, unsigned long header_template,
+            void (*progressfunc)(int), bool generate_toc);
     unsigned long (*find_next_frame)(int fd, long *offset,
-                                     long max_offset, unsigned long last_header);
-    int (*battery_level)(void);
-    bool (*battery_level_safe)(void);
+            long max_offset, unsigned long last_header);
+
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     unsigned short (*peak_meter_scale_value)(unsigned short val,
                                              int meterwidth);
@@ -429,40 +467,6 @@ struct plugin_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */     
        
-#ifdef RB_PROFILE
-    void (*profile_thread)(void);
-    void (*profstop)(void);
-    void (*profile_func_enter)(void *this_fn, void *call_site);
-    void (*profile_func_exit)(void *this_fn, void *call_site);
-#endif
-    int (*battery_time)(void);
-#ifndef SIMULATOR
-    bool (*ata_disk_is_active)(void);
-    unsigned int (*battery_voltage)(void);
-#endif
-    void (*queue_init)(struct event_queue *q);
-    void (*queue_delete)(struct event_queue *q);
-    void (*queue_post)(struct event_queue *q, long id, void *data);
-    void (*queue_wait_w_tmo)(struct event_queue *q, struct event *ev, int ticks);
-    void (*usb_acknowledge)(long id);
-#if LCD_DEPTH == 16
-    void (*lcd_bitmap_transparent_part)(const fb_data *src, int src_x, int src_y,
-  	                                     int stride, int x, int y, int width, int height);
-  	void (*lcd_bitmap_transparent)(const fb_data *src, int x, int y,
-  	                            int width, int height);
-#endif
-    void* (*memmove)(void *out, const void *in, size_t n);
-
-#ifdef HAVE_CHARGING
-    bool (*charger_inserted)(void);
-# ifdef HAVE_CHARGE_STATE
-    bool (*charging_state)(void);
-# endif    
-#endif
-#ifdef HAVE_USB_POWER
-    bool (*usb_powered)(void);
-#endif
-
 };
 
 /* plugin header */

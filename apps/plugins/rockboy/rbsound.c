@@ -35,7 +35,7 @@ static unsigned short *gmbuf;
 
 static bool newly_started;
 
-void get_more(unsigned char** start, long* size)
+void get_more(unsigned char** start, size_t* size)
 {
 #ifdef ONEBUF
    doneplay=1;
@@ -108,7 +108,7 @@ int pcm_submit(void)
     
    if(newly_started)
    {  
-      rb->pcm_play_data(&get_more);
+      rb->pcm_play_data(&get_more,NULL,0);
       newly_started = false;
    }    
    

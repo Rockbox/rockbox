@@ -209,7 +209,7 @@ extern int filebuflen;
 extern int filebufused;
 extern int track_count;
 
-static int ticks, boost_ticks;
+static unsigned int ticks, boost_ticks;
 
 void dbg_audio_task(void)
 {
@@ -225,7 +225,8 @@ bool dbg_audio_thread(void)
     int button;
     int line;
     bool done = false;
-    int bufsize = pcmbuf_get_bufsize();
+    size_t bufsize = pcmbuf_get_bufsize();
+    int pcmbufdescs = pcmbuf_descs();
 
     ticks = boost_ticks = 0;
 
@@ -239,6 +240,12 @@ bool dbg_audio_thread(void)
         button = button_get_w_tmo(HZ/5);
         switch(button)
         {
+            case SETTINGS_NEXT:
+                audio_next();
+                break;
+            case SETTINGS_PREV:
+                audio_prev();
+                break;
             case SETTINGS_CANCEL:
                 done = true;
                 break;
@@ -248,8 +255,8 @@ bool dbg_audio_thread(void)
         
         lcd_clear_display();
 
-        snprintf(buf, sizeof(buf), "pcm: %d/%d",
-                 bufsize-(int)audiobuffer_free, bufsize);
+        snprintf(buf, sizeof(buf), "pcm: %7ld/%7ld",
+                 bufsize-audiobuffer_free, bufsize);
         lcd_puts(0, line++, buf);
 
         /* Playable space left */
@@ -257,7 +264,7 @@ bool dbg_audio_thread(void)
                   bufsize-audiobuffer_free, HORIZONTAL);
         line++;
 
-        snprintf(buf, sizeof(buf), "codec: %d/%d", filebufused, filebuflen);
+        snprintf(buf, sizeof(buf), "codec: %8d/%8d", filebufused, filebuflen);
         lcd_puts(0, line++, buf);
 
         /* Playable space left */
@@ -265,17 +272,21 @@ bool dbg_audio_thread(void)
                   filebufused, HORIZONTAL);
         line++;
 
-        snprintf(buf, sizeof(buf), "track count: %d", track_count);
+        snprintf(buf, sizeof(buf), "track count: %2d", track_count);
         lcd_puts(0, line++, buf);
 
-        snprintf(buf, sizeof(buf), "cpu freq: %dMHz",
+        snprintf(buf, sizeof(buf), "cpu freq: %3dMHz",
                  (int)((FREQ + 500000) / 1000000));
         lcd_puts(0, line++, buf);
 
-        snprintf(buf, sizeof(buf), "boost ratio: %d%%",
+        snprintf(buf, sizeof(buf), "boost ratio: %3d%%",
                  boost_ticks * 100 / ticks);
         lcd_puts(0, line++, buf);
 
+        snprintf(buf, sizeof(buf), "pcmbufdesc: %2d/%2d",
+                pcmbuf_used_descs(), pcmbufdescs);
+        lcd_puts(0, line++, buf);
+        
         lcd_update();
     }
 

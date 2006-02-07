@@ -19,36 +19,48 @@
 #ifndef PCMBUF_H
 #define PCMBUF_H
 
-/* Guard buffer for crossfader when dsp is enabled. */
-#define PCMBUF_GUARD  32768
+#define PCMBUF_TARGET_CHUNK 32768 /* This is the target fill size of chunks
+                                     on the pcm buffer */
+#define PCMBUF_MINAVG_CHUNK 24576 /* This is the minimum average size of
+                                     chunks on the pcm buffer (or we run out
+                                     of buffer descriptors, which is
+                                     non-fatal) */
+#define PCMBUF_MIN_CHUNK     4096 /* We try to never feed a chunk smaller than
+                                     this to the DMA */
+#define PCMBUF_FADE_CHUNK    8192 /* This is the maximum size of one packet
+                                     for mixing (crossfade or voice) */
 
-void pcmbuf_init(long bufsize);
-long pcmbuf_get_bufsize(void);
+/* Returns true if the buffer needs to change size */
+bool pcmbuf_is_same_size(size_t bufsize);
+void pcmbuf_init(size_t bufsize);
+/* Size in bytes used by the pcmbuffer */
+size_t pcmbuf_get_bufsize(void);
+size_t get_pcmbuf_descsize(void);
 
+void pcmbuf_pause(bool pause);
 void pcmbuf_play_stop(void);
 bool pcmbuf_is_crossfade_active(void);
 
 /* These functions are for playing chained buffers of PCM data */
-bool pcmbuf_add_chunk(void *addr, int size, void (*callback)(void));
-
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ) && !defined(SIMULATOR)
 void pcmbuf_boost(bool state);
 void pcmbuf_set_boost_mode(bool state);
 #else
-#define pcmbuf_boost(state)          do { } while(0)
+#define pcmbuf_boost(state) do { } while(0)
 #define pcmbuf_set_boost_mode(state) do { } while(0)
 #endif
 bool pcmbuf_is_lowdata(void);
-void pcmbuf_flush_audio(void);
 void pcmbuf_play_start(void);
 bool pcmbuf_crossfade_init(bool manual_skip);
-void pcmbuf_add_event(void (*event_handler)(void));
-void pcmbuf_set_position_callback(void (*callback)(int size));
+void pcmbuf_set_event_handler(void (*callback)(void));
+void pcmbuf_set_position_callback(void (*callback)(size_t size));
 unsigned int pcmbuf_get_latency(void);
 void pcmbuf_set_low_latency(bool state);
-bool pcmbuf_insert_buffer(char *buf, long length);
-void pcmbuf_flush_buffer(long length);
-void* pcmbuf_request_buffer(long length, long *realsize);
+bool pcmbuf_insert_buffer(const char *buf, size_t length);
+void pcmbuf_write_complete(size_t length);
+void pcmbuf_write_voice(size_t length);
+void* pcmbuf_request_buffer(size_t length, size_t *realsize);
+void* pcmbuf_request_voice_buffer(size_t length, size_t *realsize, bool mix);
 bool pcmbuf_is_crossfade_enabled(void);
 void pcmbuf_crossfade_enable(bool on_off);
 
@@ -56,6 +68,9 @@ int pcmbuf_usage(void);
 int pcmbuf_mix_usage(void);
 void pcmbuf_beep(int frequency, int duration, int amplitude);
 void pcmbuf_reset_mixpos(void);
-void pcmbuf_mix(char *buf, long length);
+void pcmbuf_mix(char *buf, size_t length);
+
+int pcmbuf_used_descs(void);
+int pcmbuf_descs(void);
 
 #endif

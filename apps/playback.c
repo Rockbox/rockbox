@@ -216,6 +216,13 @@ static bool v1first = false;
 static void mp3_set_elapsed(struct mp3entry* id3);
 int mp3_get_file_pos(void);
 
+#ifdef TIME_CODEC
+bool is_filling(void)
+{
+    return filling;
+}
+#endif
+
 static void do_swap(int idx_old, int idx_new)
 {
 #ifndef SIMULATOR
@@ -287,13 +294,13 @@ static void voice_boost_cpu(bool state)
 #define voice_boost_cpu(state)   do { } while(0)
 #endif
 
-bool codec_pcmbuf_insert_split_callback(void *ch1, void *ch2,
-                                        long length)
+bool codec_pcmbuf_insert_split_callback(const void *ch1, const void *ch2,
+                                        size_t length)
 {
-    char* src[2];
+    const char* src[2];
     char *dest;
     long input_size;
-    long output_size;
+    size_t output_size;
 
     src[0] = ch1;
     src[1] = ch2;
@@ -311,47 +318,50 @@ bool codec_pcmbuf_insert_split_callback(void *ch1, void *ch2,
     }
 
     while (length > 0) {
+        long est_output_size = dsp_output_size(length);
         /* This will prevent old audio from playing when skipping tracks. */
-        if ((ci.reload_codec || ci.stop_codec) && 
-                current_codec != CODEC_IDX_VOICE)
-            return true;
-    
-        while ((dest = pcmbuf_request_buffer(dsp_output_size(length), 
-            &output_size)) == NULL) {
-            sleep(1);
-            if ((ci.reload_codec || ci.stop_codec) && 
-                    current_codec != CODEC_IDX_VOICE)
+        if (current_codec == CODEC_IDX_VOICE) {
+            while ((dest = pcmbuf_request_voice_buffer(est_output_size,
+                            &output_size, audio_codec_loaded)) == NULL)
+                sleep(1);
+        }
+        else
+        {
+            if (ci.reload_codec || ci.stop_codec) 
                 return true;
+
+            while ((dest = pcmbuf_request_buffer(est_output_size,
+                            &output_size)) == NULL) {
+                sleep(1);
+                if (ci.reload_codec || ci.stop_codec)
+                    return true;
+            }
         }
 
         /* Get the real input_size for output_size bytes, guarding
          * against resampling buffer overflows. */
         input_size = dsp_input_size(output_size);
-        if (input_size > length) {
+        
+        if (input_size <= 0) {
+            DEBUGF("Warning: dsp_input_size(%ld=dsp_output_size(%ld))=%ld <= 0\n",
+                   output_size, length, input_size);
+            /* this cannot happen */
+            break;
+        }
+
+        if ((size_t)input_size > length) {
             DEBUGF("Error: dsp_input_size(%ld=dsp_output_size(%ld))=%ld > %ld\n",
                    output_size, length, input_size, length);
             input_size = length;
         }
         
-        if (input_size <= 0) {
-            pcmbuf_flush_buffer(0);
-            DEBUGF("Warning: dsp_input_size(%ld=dsp_output_size(%ld))=%ld <= 0\n",
-                   output_size, length, input_size);
-            /* should we really continue, or should we break?
-             * We should probably continue because calling 
-             * pcmbuf_flush_buffer(0) will wrap the buffer if it was fully 
-             * filled and so next call to pcmbuf_request_buffer should give 
-             * the requested output_size. */
-            continue;
-        }
-
         output_size = dsp_process(dest, src, input_size);
 
         /* Hotswap between audio and voice codecs as necessary. */
         switch (current_codec)
         {
             case CODEC_IDX_AUDIO:
-                pcmbuf_flush_buffer(output_size);
+                pcmbuf_write_complete(output_size);
                 if (voice_is_playing && pcmbuf_usage() > 30
                     && pcmbuf_mix_usage() < 20)
                 {
@@ -368,7 +378,7 @@ bool codec_pcmbuf_insert_split_callback(void *ch1, void *ch2,
                         || pcmbuf_mix_usage() > 70)
                         swap_codec();
                 } else {
-                    pcmbuf_flush_buffer(output_size);
+                    pcmbuf_write_complete(output_size);
                 }
                 break ;
         }
@@ -379,7 +389,7 @@ bool codec_pcmbuf_insert_split_callback(void *ch1, void *ch2,
     return true;
 }
 
-bool codec_pcmbuf_insert_callback(char *buf, long length)
+bool codec_pcmbuf_insert_callback(const char *buf, size_t length)
 {
     /* TODO: The audiobuffer API should probably be updated, and be based on
      *       pcmbuf_insert_split().
@@ -405,9 +415,10 @@ void* get_codec_memory_callback(long *size)
     return &audiobuf[0];
 }
 
-static void pcmbuf_position_callback(int size) ICODE_ATTR;
-static void pcmbuf_position_callback(int size) {
-    unsigned int time = size * 1000 / 4 / 44100 + prev_ti->id3.elapsed;
+static void pcmbuf_position_callback(size_t size) ICODE_ATTR;
+static void pcmbuf_position_callback(size_t size) {
+    unsigned int time = size * 1000 / 4 / NATIVE_FREQUENCY +
+        prev_ti->id3.elapsed;
     if (time >= prev_ti->id3.length) {
         pcmbuf_set_position_callback(NULL);
         prev_ti->id3.elapsed = prev_ti->id3.length;
@@ -782,6 +793,13 @@ void audio_set_track_changed_event(void (*handler)(struct mp3entry *id3))
 static void codec_track_changed(void)
 {
     track_changed = true;
+    queue_post(&audio_queue, Q_AUDIO_TRACK_CHANGED, 0);
+}
+
+static void pcmbuf_track_changed_callback(void)
+{
+    track_changed = true;
+    pcmbuf_set_position_callback(NULL);
     queue_post(&audio_queue, Q_AUDIO_TRACK_CHANGED, 0);
 }
 
@@ -1529,7 +1547,7 @@ static void audio_update_trackinfo(void)
     /* Gapless playback. */
     else
     {
-        pcmbuf_add_event(codec_track_changed);
+        pcmbuf_set_event_handler(pcmbuf_track_changed_callback);
     }
 }
 
@@ -1675,15 +1693,17 @@ bool codec_request_next_track_callback(void)
            the core has been requested the codec to be terminated. */
         return !ci_voice.stop_codec && queue_empty(&voice_codec_queue);
     }
-#ifdef AB_REPEAT_ENABLE
-    ab_end_of_track_report();
-#endif
-
-    pcmbuf_set_position_callback(pcmbuf_position_callback);
 
     if (ci.stop_codec || !playing)
         return false;
     
+#ifdef AB_REPEAT_ENABLE
+    ab_end_of_track_report();
+#endif
+    
+    if (!new_track)
+        pcmbuf_set_position_callback(pcmbuf_position_callback);
+
     logf("Request new track");
 
     /* Advance to next track. */
@@ -1856,15 +1876,13 @@ void audio_thread(void)
                 
             case Q_AUDIO_PAUSE:
                 logf("audio_pause");
-                pcm_mute(true);
-                pcm_play_pause(false);
+                pcmbuf_pause(true);
                 paused = true;
                 break ;
                 
             case Q_AUDIO_RESUME:
                 logf("audio_resume");
-                pcm_play_pause(true);
-                pcm_mute(false);
+                pcmbuf_pause(false);
                 paused = false;
                 break ;
             
@@ -2022,8 +2040,9 @@ void codec_thread(void)
 static void reset_buffer(void)
 {
     filebuf = (char *)&audiobuf[MALLOC_BUFSIZE];
-    filebuflen = audiobufend - audiobuf - pcmbuf_get_bufsize()
-                  - PCMBUF_GUARD - MALLOC_BUFSIZE - GUARD_BUFSIZE;
+    filebuflen = audiobufend - audiobuf - MALLOC_BUFSIZE - GUARD_BUFSIZE -
+        (pcmbuf_get_bufsize() + get_pcmbuf_descsize() + PCMBUF_FADE_CHUNK);
+        
                   
     if (talk_get_bufsize() && voice_codec_loaded)
     {
@@ -2422,7 +2441,7 @@ void audio_set_buffer_margin(int setting)
 /* Set crossfade & PCM buffer length. */
 void audio_set_crossfade(int enable)
 {
-    long size;
+    size_t size;
     bool was_playing = playing;
     int offset = 0;
     int seconds = 1;

@@ -47,7 +47,7 @@ enum {
     DSP_CROSSFEED
 };
 
-long dsp_process(char *dest, char *src[], long size);
+long dsp_process(char *dest, const char *src[], long size);
 long dsp_input_size(long size);
 long dsp_output_size(long size);
 int dsp_stereo_mode(void);

@@ -23,10 +23,11 @@ void pcm_init(void);
 void pcm_set_frequency(unsigned int frequency);
 
 /* This is for playing "raw" PCM data */
-void pcm_play_data(void (*get_more)(unsigned char** start, long* size));
+void pcm_play_data(void (*get_more)(unsigned char** start, size_t* size),
+        unsigned char* start, size_t size);
 
 void pcm_calculate_peaks(int *left, int *right);
-long pcm_get_bytes_waiting(void);
+size_t pcm_get_bytes_waiting(void);
 
 void pcm_play_stop(void);
 void pcm_mute(bool mute);

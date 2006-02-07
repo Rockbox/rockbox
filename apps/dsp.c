@@ -213,7 +213,7 @@ void sound_set_pitch(int permille)
  * consume. Note that for mono, dst[0] equals dst[1], as there is no point
  * in processing the same data twice.
  */
-static int convert_to_internal(char* src[], int count, long* dst[])
+static int convert_to_internal(const char* src[], int count, long* dst[])
 {
     count = MIN(SAMPLE_BUF_SIZE / 2, count);
 
@@ -773,7 +773,7 @@ static void write_samples(short* dst, long* src[], int count)
  * pointers, one for each audio channel. Returns number of bytes written to
  * dest.
  */
-long dsp_process(char* dst, char* src[], long size)
+long dsp_process(char* dst, const char* src[], long size)
 {
     long* tmp[2];
     long written = 0;

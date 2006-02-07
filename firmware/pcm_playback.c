@@ -61,11 +61,11 @@ static bool pcm_playing;
 static bool pcm_paused;
 static int pcm_freq = 0x6; /* 44.1 is default */
 
-static unsigned char *next_start IDATA_ATTR;
-static long next_size IDATA_ATTR;
+size_t next_size IBSS_ATTR;
+unsigned char *next_start IBSS_ATTR;
 
 /* Set up the DMA transfer that kicks in when the audio FIFO gets empty */
-static void dma_start(const void *addr, long size)
+static void dma_start(const void *addr, size_t size)
 {
     pcm_playing = true;
 
@@ -104,8 +104,6 @@ static void dma_stop(void)
     EBU1CONFIG = IIS_RESET | EBU_DEFPARM;
 #endif
 
-    next_start = NULL;
-    next_size = 0;
     pcm_paused = false;
 }
 
@@ -131,23 +129,27 @@ void pcm_set_frequency(unsigned int frequency)
 }
 
 /* the registered callback function to ask for more mp3 data */
-static void (*callback_for_more)(unsigned char**, long*) IDATA_ATTR = NULL;
+static void (*callback_for_more)(unsigned char**, size_t*) IDATA_ATTR = NULL;
 
-void pcm_play_data(void (*get_more)(unsigned char** start, long* size))
+void pcm_play_data(void (*get_more)(unsigned char** start, size_t* size),
+        unsigned char* start, size_t size)
 {
-    unsigned char *start;
-    long size;
-
     callback_for_more = get_more;
 
-    get_more((unsigned char **)&start, (long *)&size);
-    get_more(&next_start, &next_size);
-    dma_start(start, size);
+    if (!(start && size))
+    {
+        if (get_more)
+            get_more(&start, &size);
+        else
+            return;
+    }
+    if (start && size)
+        dma_start(start, size);
 }
 
-long pcm_get_bytes_waiting(void)
+size_t pcm_get_bytes_waiting(void)
 {
-    return next_size + (BCR0 & 0xffffff);
+    return (BCR0 & 0xffffff);
 }
 
 void pcm_mute(bool mute)
@@ -169,19 +171,32 @@ void pcm_play_pause(bool play)
     if (!pcm_playing)
         return ;
 
-    if(pcm_paused && play && next_size)
+    if(pcm_paused && play)
     {
-        logf("unpause");
-        /* Reset chunk size so dma has enough data to fill the fifo. */
-        /* This shouldn't be needed anymore. */
-        //SAR0 = (unsigned long)next_start;
-        //BCR0 = next_size;
-        /* Enable the FIFO and force one write to it */
-        IIS2CONFIG = IIS_DEFPARM(pcm_freq);
+        if (BCR0 & 0xffffff)
+        {
+            logf("unpause");
+            /* Enable the FIFO and force one write to it */
+            IIS2CONFIG = IIS_DEFPARM(pcm_freq);
 #ifdef HAVE_SPDIF_OUT
-        EBU1CONFIG = EBU_DEFPARM;
+            EBU1CONFIG = EBU_DEFPARM;
 #endif
-        DCR0 |= DMA_EEXT | DMA_START;
+            DCR0 |= DMA_EEXT | DMA_START;
+        }
+        else
+        {
+            logf("unpause, no data waiting");
+            void (*get_more)(unsigned char**, size_t*) = callback_for_more;
+            if (get_more)
+                get_more(&next_start, &next_size);
+            if (next_start && next_size)
+                dma_start(next_start, next_size);
+            else
+            {
+                dma_stop();
+                logf("unpause attempted, no data");
+            }
+        }
     }
     else if(!pcm_paused && !play)
     {
@@ -224,13 +239,22 @@ void DMA0(void)
     }
     else
     {
+        {
+            void (*get_more)(unsigned char**, size_t*) = callback_for_more;
+            if (get_more)
+                get_more(&next_start, &next_size);
+            else
+            {
+                next_size = 0;
+                next_start = NULL;
+            }
+        }
         if(next_size)
         {
             SAR0 = (unsigned long)next_start;  /* Source address */
             BCR0 = next_size;                  /* Bytes to transfer */
             DCR0 |= DMA_EEXT;
-            if (callback_for_more)
-                callback_for_more(&next_start, &next_size);
+
         }
         else
         {
@@ -301,9 +325,9 @@ static bool pcm_paused;
 static int pcm_freq = 0x6; /* 44.1 is default */
 
 /* the registered callback function to ask for more mp3 data */
-static void (*callback_for_more)(unsigned char**, long*) = NULL;
+static void (*callback_for_more)(unsigned char**, size_t*) = NULL;
 static unsigned short *p IBSS_ATTR;
-static long size IBSS_ATTR;
+static size_t size IBSS_ATTR;
 
 /* Stops the DMA transfer and interrupt */
 static void dma_stop(void)
@@ -353,7 +377,7 @@ void fiq(void)
     IISCONFIG &= ~0x2;
 
     if ((size==0) && (callback_for_more)) {
-        callback_for_more((unsigned char **)&p, (long *)&size);
+        callback_for_more((unsigned char **)&p, &size);
     }
 
     while (size > 0) {
@@ -368,20 +392,22 @@ void fiq(void)
         size-=4;
 
         if ((size==0) && (callback_for_more)) {
-            callback_for_more((unsigned char **)&p, (long *)&size);
-	}
+            callback_for_more((unsigned char **)&p, &size);
+        }
     }
 }
 
-void pcm_play_data(void (*get_more)(unsigned char** start, long* size))
+void pcm_play_data(void (*get_more)(unsigned char** start, size_t* size),
+        unsigned char* _p, size_t _size)
 {
-    int free_count;
+    size_t free_count;
     
     callback_for_more = get_more;
 
     if (size > 0) { return; }
 
-    get_more((unsigned char **)&p, (long *)&size);
+    p = (unsigned short *)_p;
+    size = _size;
 
     /* setup I2S interrupt for FIQ */
     outl(inl(0x6000402c) | I2S_MASK, 0x6000402c);
@@ -406,7 +432,7 @@ void pcm_play_data(void (*get_more)(unsigned char** start, long* size))
         size-=4;
 
         if ((size==0) && (get_more)) {
-            get_more((unsigned char **)&p, (long *)&size);
+            get_more((unsigned char **)&p, &size);
 	}
     }
 }
@@ -448,7 +474,7 @@ bool pcm_is_playing(void)
     return pcm_playing;
 }
 
-long pcm_get_bytes_waiting(void)
+size_t pcm_get_bytes_waiting(void)
 {
     return size;
 }
@@ -608,9 +634,12 @@ void pcm_set_frequency(unsigned int frequency)
     (void)frequency;
 }
 
-void pcm_play_data(void (*get_more)(unsigned char** start, long* size))
+void pcm_play_data(void (*get_more)(unsigned char** start, long* size),
+        unsigned char* start, long size)
 {
     (void)get_more;
+    (void)start;
+    (void)size;
 }
 
 void pcm_play_stop(void)
