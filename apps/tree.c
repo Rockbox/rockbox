@@ -639,7 +639,8 @@ static bool dirbrowse(void)
                     /* Stop the music if it is playing */
                     if(audio_status())
                         audio_stop();
-#if (CONFIG_KEYPAD == RECORDER_PAD) && !defined(HAVE_SW_POWEROFF)
+#if defined(HAVE_CHARGING) && \
+    (CONFIG_KEYPAD == RECORDER_PAD) && !defined(HAVE_SW_POWEROFF)
                     else { 
                         if (!charger_inserted()) {
                             if(shutdown_screen())

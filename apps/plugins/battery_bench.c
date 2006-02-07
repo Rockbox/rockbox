@@ -326,9 +326,10 @@ int main(void)
 {
     int button, fd;
     bool on = false;
+#ifdef HAVE_LCD_BITMAP
     const char *msgs[] = { "Battery Benchmark","Check file", BATTERY_LOG,
             "for more info", "PLAY - start", "OFF  - quit" };
-    
+#endif    
     rb->lcd_clear_display();
 
 #ifdef HAVE_LCD_BITMAP
