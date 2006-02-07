@@ -511,6 +511,28 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(warnon_erase_dynplaylist), false,
         "warn when erasing dynamic playlist", off_on },
 
+#if CONFIG_CODEC == SWCODEC
+        {1, S_O(eq_enabled), false, "eq enabled", off_on },
+        /* 0..32768 Hz */
+        {15, S_O(eq_band0_cutoff), 60, "eq band 0 cutoff", NULL },
+        {15, S_O(eq_band1_cutoff), 200, "eq band 1 cutoff", NULL },
+        {15, S_O(eq_band2_cutoff), 800, "eq band 2 cutoff", NULL },
+        {15, S_O(eq_band3_cutoff), 4000, "eq band 3 cutoff", NULL },
+        {15, S_O(eq_band4_cutoff), 12000, "eq band 4 cutoff", NULL },
+        /* 0..64 (or 0.0 to 6.4) */
+        {6, S_O(eq_band0_q), 7, "eq band 0 q", NULL },
+        {6, S_O(eq_band1_q), 10, "eq band 1 q", NULL },
+        {6, S_O(eq_band2_q), 10, "eq band 2 q", NULL },
+        {6, S_O(eq_band3_q), 10, "eq band 3 q", NULL },
+        {6, S_O(eq_band4_q), 7, "eq band 4 q", NULL },
+        /* -240..240 (or -24db to +24db) */
+        {9|SIGNED, S_O(eq_band0_gain), 0, "eq band 0 gain", NULL },
+        {9|SIGNED, S_O(eq_band1_gain), 0, "eq band 1 gain", NULL },
+        {9|SIGNED, S_O(eq_band2_gain), 0, "eq band 2 gain", NULL },
+        {9|SIGNED, S_O(eq_band3_gain), 0, "eq band 3 gain", NULL },
+        {9|SIGNED, S_O(eq_band4_gain), 0, "eq band 4 gain", NULL },
+#endif
+
     /* If values are just added to the end, no need to bump the version. */
     /* new stuff to be added at the end */
 
@@ -1023,6 +1045,7 @@ void settings_apply(void)
     audio_set_crossfade(global_settings.crossfade);
     dsp_set_replaygain(true);
     dsp_set_crossfeed(global_settings.crossfeed);
+    dsp_eq_update_data(global_settings.eq_enabled);
 #endif
 
 #ifdef HAVE_SPDIF_POWER

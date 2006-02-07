@@ -58,6 +58,9 @@
 #include "main_menu.h"
 #include "sound_menu.h"
 #include "database.h"
+#if CONFIG_CODEC == SWCODEC
+#include "eq_menu.h"
+#endif
 
 static int context;
 static char* selected_file = NULL;
@@ -537,7 +540,11 @@ static int onplay_callback(int key, int menu)
 
 int onplay(char* file, int attr, int from)
 {
-    struct menu_item items[8]; /* increase this if you add entries! */
+#if CONFIG_CODEC == SWCODEC
+    struct menu_item items[10]; /* increase this if you add entries! */
+#else
+    struct menu_item items[8];
+#endif
     int m, i=0, result;
 #ifdef HAVE_LCD_COLOR
     char *suffix;
@@ -640,6 +647,19 @@ int onplay(char* file, int attr, int from)
         items[i].function = create_dir;
         i++;
     }
+
+#if CONFIG_CODEC == SWCODEC
+    /* Equalizer menu items */
+    if (context == CONTEXT_WPS)
+    {
+        items[i].desc = ID2P(LANG_EQUALIZER_GRAPHICAL);
+        items[i].function = eq_menu_graphical;
+        i++;
+        items[i].desc = ID2P(LANG_EQUALIZER_BROWSE);
+        items[i].function = eq_browse_presets;
+        i++;
+    }
+#endif
 
     /* DIY menu handling, since we want to exit after selection */
     if (i)
