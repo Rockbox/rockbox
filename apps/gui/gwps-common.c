@@ -576,15 +576,20 @@ static char* get_tag(struct wps_data* wps_data,
                             if (p)
                                 wps_data->progress_end=atoi(++p);   
                             else 
-                                wps_data->progress_end=NULL;
+                                wps_data->progress_end=0;
                         }else {
                              wps_data->progress_start=0;
-                             wps_data->progress_end=NULL;
+                             wps_data->progress_end=0;
                         }     
+                        
+                        if (wps_data->progress_height<3)
+                            wps_data->progress_height=3;
+                        if (wps_data->progress_end<wps_data->progress_start+3)
+                            wps_data->progress_end=0;
                     }else {
                         wps_data->progress_height=6;
                         wps_data->progress_start=0;
-                        wps_data->progress_end=NULL; 
+                        wps_data->progress_end=0; 
                     }
                     return "\x01";
 #endif
@@ -1525,20 +1530,22 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
             /* progress */
             if (flags & refresh_mode & WPS_REFRESH_PLAYER_PROGRESS) 
             {
-                int sby = i*h + offset + (h > 7 ? (h - 6) / 2 : 1);
-#define PROGRESS_BAR_HEIGHT gwps->data->progress_height /* this should probably be defined elsewhere; config-*.h perhaps? */
-                if (!gwps->data->progress_end) 
-                            gwps->data->progress_end=gwps->display->width;
-                gui_scrollbar_draw(display, gwps->data->progress_start, sby, 
-                                    gwps->data->progress_end-gwps->data->progress_start,
-                                    PROGRESS_BAR_HEIGHT,
+                int sb_y = i*h + offset + ((h > data->progress_height + 1)
+                    ? (h - data->progress_height) / 2 : 1);
+
+                if (!data->progress_end)
+                    data->progress_end=display->width;
+                
+                gui_scrollbar_draw(display, data->progress_start, sb_y, 
+                                    data->progress_end-data->progress_start,
+                                    data->progress_height,
                                     state->id3->length?state->id3->length:1, 0,
                                     state->id3->length?state->id3->elapsed + state->ff_rewind_count:0,
                                     HORIZONTAL);
 #ifdef AB_REPEAT_ENABLE
                 if ( ab_repeat_mode_enabled() )
-                    ab_draw_markers(display, state->id3->length, 0, sby, 
-                            PROGRESS_BAR_HEIGHT);
+                    ab_draw_markers(display, state->id3->length, 0, sb_y, 
+                            data->progress_height);
 #endif
                 update_line = true;
             }
