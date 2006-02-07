@@ -54,6 +54,10 @@
 #include "pcm_playback.h"
 #endif
 
+#ifdef HAVE_CHARGING
+#include "power.h"
+#endif
+
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
 #include "widgets.h"
@@ -385,6 +389,16 @@ static const struct plugin_api rockbox_api = {
     lcd_bitmap_transparent,
 #endif
     memmove,
+#ifdef HAVE_CHARGING
+    charger_inserted,
+# ifdef HAVE_CHARGE_STATE
+    charging_state,
+# endif
+#endif
+#ifdef HAVE_USB_POWER
+        usb_powered,
+#endif
+    
 };
 
 int plugin_load(const char* plugin, void* parameter)

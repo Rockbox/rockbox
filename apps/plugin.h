@@ -452,6 +452,17 @@ struct plugin_api {
   	                            int width, int height);
 #endif
     void* (*memmove)(void *out, const void *in, size_t n);
+
+#ifdef HAVE_CHARGING
+    bool (*charger_inserted)(void);
+# ifdef HAVE_CHARGE_STATE
+    bool (*charging_state)(void);
+# endif    
+#endif
+#ifdef HAVE_USB_POWER
+    bool (*usb_powered)(void);
+#endif
+
 };
 
 /* plugin header */

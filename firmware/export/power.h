@@ -21,15 +21,26 @@
 
 #ifdef HAVE_CHARGE_CTRL
 extern bool charger_enabled;
+void charger_enable(bool on);
 #endif
 
-void power_init(void);
+#ifdef HAVE_CHARGING
 bool charger_inserted(void);
-bool charging_state(void);
-void charger_enable(bool on);
-void ide_power_enable(bool on);
-bool ide_powered(void);
+#endif
+
 void power_off(void);
+void ide_power_enable(bool on);
+
+#ifndef SIMULATOR
+
+void power_init(void);
+
+# ifdef HAVE_CHARGE_STATE
+bool charging_state(void);
+# endif
+
+bool ide_powered(void);
+#endif
 
 #ifdef HAVE_SPDIF_POWER
 void spdif_power_enable(bool on);

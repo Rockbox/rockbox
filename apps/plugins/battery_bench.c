@@ -28,8 +28,11 @@ PLUGIN_HEADER
 
 #define EV_EXIT 1337
 
+/* seems to work with 1300, but who knows... */ 
+#define THREAD_STACK_SIZE DEFAULT_STACK_SIZE + 0x200 
+
 #if CONFIG_KEYPAD == RECORDER_PAD
-#define BATTERY_ON BUTTON_ON
+#define BATTERY_ON BUTTON_PLAY
 #define BATTERY_OFF BUTTON_OFF
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
@@ -62,11 +65,12 @@ PLUGIN_HEADER
 #endif
 
 
-/***************** Plugin Entry Point *****************/
+/****************************** Plugin Entry Point ****************************/
 static struct plugin_api* rb;
 int main(void);
 void exit_tsr(void);
 void thread(void);
+
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
@@ -87,7 +91,7 @@ struct batt_info
 {
     int ticks, level, eta;
     unsigned int voltage;
-};
+} bat[BUF_SIZE/sizeof(struct batt_info)];
 
 struct event_queue thread_q;
 
@@ -100,18 +104,49 @@ void exit_tsr(void)
     rb->queue_delete(&thread_q);
 }
 
+#define BIT_CHARGER     0x1000
+#define BIT_CHARGING    0x2000
+#define BIT_USB_POWER   0x4000
+
 #define HMS(x) (x)/3600,((x)%3600)/60,((x)%3600)%60 
+
+/* use long for aligning */
+unsigned long thread_stack[THREAD_STACK_SIZE/sizeof(long)];
+
+#if defined(HAVE_CHARGING) || defined(HAVE_USB_POWER)
+unsigned int charge_state(void)
+{
+    unsigned int ret = 0;
+#ifdef HAVE_CHARGING
+    if(rb->charger_inserted())
+        ret = BIT_CHARGER;
+#ifdef HAVE_CHARGE_STATE
+    if(rb->charging_state())
+        ret |= BIT_CHARGING;
+#endif
+#endif
+#ifdef HAVE_USB_POWER
+    if(rb->usb_powered())
+        ret |= BIT_USB_POWER;
+#endif
+    return ret; 
+}
+#endif
+
 void thread(void)
 {
     bool got_info = false, timeflag = false, in_usb_mode = false;
     int fd, buffelements, tick = 1, i = 0, skipped = 0, exit = 0;
     int fst = 0, lst = 0; /* first and last skipped tick */
     unsigned int last_voltage = 0;
+#if  defined(HAVE_CHARGING) || defined(HAVE_USB_POWER) 
+    unsigned int last_state = 0;
+#endif    
     long sleep_time;
     
     struct event ev;
 
-    struct batt_info bat[buffelements = (BUF_SIZE / sizeof(struct batt_info))];
+    buffelements = sizeof(bat)/sizeof(struct batt_info);
 
     sleep_time = (rb->global_settings->disk_spindown > 1) ?
         (rb->global_settings->disk_spindown - 1) * HZ : 5 * HZ;
@@ -151,10 +186,39 @@ void thread(void)
                          secs = bat[j].ticks/HZ;
                          rb->fdprintf(fd,
                                 "%02d:%02d:%02d,  %05d,     %03d%%,     "
-                                "%02d:%02d,           %04d,     %04d\n",
+                                "%02d:%02d,           %04d,     %04d"
+#ifdef HAVE_CHARGING
+                                ",  %c"
+#ifdef HAVE_CHARGE_STATE
+                                ",  %c"
+#endif
+#endif
+#ifdef HAVE_USB_POWER
+                                ",  %c"
+#endif
+                                "\n",
+                                
                                 HMS(secs), secs, bat[j].level,
                                 bat[j].eta / 60, bat[j].eta % 60, 
-                                bat[j].voltage * 10, temp + 1 + (j-i));
+#if defined(HAVE_CHARGING) || defined(HAVE_USB_POWER)
+                                (bat[j].voltage & 
+                                 (~(BIT_CHARGER|BIT_CHARGING|BIT_USB_POWER)))
+                                *10,
+#else
+                                bat[j].voltage * 10,
+#endif
+                                temp + 1 + (j-i)
+#ifdef HAVE_CHARGING
+                                ,(bat[j].voltage & BIT_CHARGER)?'A':'-' 
+#ifdef HAVE_CHARGE_STATE
+                                ,(bat[j].voltage & BIT_CHARGING)?'C':'-'
+#endif
+#endif
+#ifdef HAVE_USB_POWER
+                                ,(bat[j].voltage & BIT_USB_POWER)?'U':'-'
+#endif
+                                        
+                                        );
                          if(!j % 100 && !j) /* yield() at every 100 writes */
                             rb->yield();
                     }
@@ -170,6 +234,7 @@ void thread(void)
         }
         else
         {            
+            unsigned int current_voltage;
             if(
 #if CONFIG_CODEC == SWCODEC                
                 !rb->pcm_is_playing()
@@ -179,7 +244,11 @@ void thread(void)
                 && (*rb->current_tick - tick) > DISK_SPINDOWN_TIMEOUT * HZ)
                 timeflag = true;
             
-            if(last_voltage != rb->battery_voltage())
+            if(last_voltage != (current_voltage=rb->battery_voltage())
+#if defined(HAVE_CHARGING) || defined(HAVE_USB_POWER)
+                || last_state != charge_state()
+#endif
+                            )
             {
                 if(i == buffelements)
                 {
@@ -195,7 +264,11 @@ void thread(void)
                 bat[i].ticks = *rb->current_tick;
                 bat[i].level = rb->battery_level();
                 bat[i].eta = rb->battery_time();
-                last_voltage = bat[i++].voltage = rb->battery_voltage();
+                last_voltage = bat[i].voltage = current_voltage;
+#if defined(HAVE_CHARGING) || defined(HAVE_USB_POWER)
+                bat[i].voltage |= last_state = charge_state();
+#endif                
+                i++;
                 got_info = true;
             }            
  
@@ -204,7 +277,12 @@ void thread(void)
         if(exit)
         {
             if(exit == 2)
-                    rb->splash(HZ,true,"Exiting battery_bench...");
+                    rb->splash(HZ,true,
+#ifdef HAVE_LCD_BITMAP                                    
+                        "Exiting battery_bench...");
+#else
+                        "bench exit");
+#endif                        
             s_thread.ended = true;
             rb->remove_thread(s_thread.id);
             rb->yield(); /* exit the thread, this yield() won't return */
@@ -232,37 +310,50 @@ void thread(void)
     
 }
 
+
+#ifdef HAVE_LCD_BITMAP
+typedef void (*plcdfunc)(int x, int y, const unsigned char *str);
+
+void put_centered_str(const char* str, plcdfunc putsxy, int lcd_width, int line)
+{
+    int strwdt, strhgt;
+    rb->lcd_getstringsize(str, &strwdt, &strhgt);
+    putsxy((lcd_width - strwdt)/2, line*(strhgt), str);
+}
+#endif
+
 int main(void)
 {
-    int stacksize, button, fd;
+    int button, fd;
     bool on = false;
-    void* stack;
-    
+    const char *msgs[] = { "Battery Benchmark","Check file", BATTERY_LOG,
+            "for more info", "PLAY - start", "OFF  - quit" };
     
     rb->lcd_clear_display();
 
 #ifdef HAVE_LCD_BITMAP
-    int strwdt, strhgt;
+    int i;
     
+    rb->lcd_clear_display();
     rb->lcd_setfont(FONT_SYSFIXED);
-    
-    rb->lcd_getstringsize("Battery Benchmark", &strwdt, &strhgt);
-    rb->lcd_putsxy((LCD_WIDTH - strwdt)/2, strhgt, "Battery Benchmark");
-    
-    rb->lcd_getstringsize("Check /battery_bench.txt", &strwdt, &strhgt);
-    rb->lcd_putsxy((LCD_WIDTH - strwdt)/2,strhgt * 3,
-        "Check /battery_bench.txt");
-    rb->lcd_getstringsize("file for more info.", &strwdt, &strhgt);
-    rb->lcd_putsxy((LCD_WIDTH - strwdt)/2, strhgt * 4, "file for more info.");
-    rb->lcd_getstringsize("Play to start, OFF to quit", &strwdt, &strhgt);
-    rb->lcd_putsxy((LCD_WIDTH - strwdt)/2, strhgt * 5,
-        "PLAY to start, OFF to quit");
+
+    for(i = 0; i<(int)(sizeof(msgs)/sizeof(char *)); i++)
+        put_centered_str(msgs[i],rb->lcd_putsxy,LCD_WIDTH,i+1);
     
     rb->lcd_update();
-
+#ifdef HAVE_REMOTE_LCD
+    rb->lcd_remote_clear_display();
+    put_centered_str(msgs[0],rb->lcd_remote_putsxy,LCD_REMOTE_WIDTH,0);
+    put_centered_str(msgs[sizeof(msgs)/sizeof(char*)-2],
+                    rb->lcd_remote_putsxy,LCD_REMOTE_WIDTH,1);
+    put_centered_str(msgs[sizeof(msgs)/sizeof(char*)-1],
+                    rb->lcd_remote_putsxy,LCD_REMOTE_WIDTH,2);
+    rb->lcd_remote_update();
+#endif
+    
 #else
-    rb->lcd_puts_scroll(0, 1, "Battery Benchmark");
-    rb->lcd_puts_scroll(0, 2, "PLAY to start, OFF to quit");
+    rb->lcd_puts_scroll(0, 1, "Batt.Bench.");
+    rb->lcd_puts_scroll(0, 2, "PLAY/STOP");
 #endif
     
     do
@@ -286,17 +377,6 @@ int main(void)
                     return PLUGIN_USB_CONNECTED;
         }
     }while(!on);
-    
-    stack = rb->plugin_get_buffer(&stacksize);
-    /* long align it and leave some space (200bytes) for vars */
-    stack = (void*)(((unsigned int)stack + 200) & ~3);
-    
-    stacksize = (stacksize - 200) & ~3;
-    if (stacksize < BUF_SIZE)
-    {
-        rb->splash(HZ*2, true, "Out of memory");
-        return PLUGIN_ERROR;
-    }
     
     fd = rb->open(BATTERY_LOG, O_RDONLY);
     if(fd < 0)
@@ -324,7 +404,17 @@ int main(void)
                 "data was logged in the buffer between Disk Activity.\n\n"
                 "Battery type: %d mAh      Buffer Entries: %d\n"
                 "  Time:,  Seconds:,  Level:,  Time Left:,  Voltage[mV]:,"
-                "  M/DA:\n"
+                "  M/DA:"
+#ifdef HAVE_CHARGING
+                ", C:"
+#endif
+#ifdef HAVE_CHARGE_STATE
+                ", S:"
+#endif
+#ifdef HAVE_USB_POWER
+                ", U:"
+#endif
+                "\n"
                 ,BATTERY_LOG,rb->global_settings->battery_capacity,
                 BUF_SIZE / sizeof(struct batt_info));
             rb->close(fd);
@@ -339,14 +429,14 @@ int main(void)
     {
         rb->close(fd);
         fd = rb->open(BATTERY_LOG, O_RDWR | O_APPEND);
-        rb->fdprintf(fd, "\nFile already present. Resuming Benchmark\n");
+        rb->fdprintf(fd, "\n--File already present. Resuming Benchmark--\n");
         rb->close(fd);
     }
     
     rb->queue_init(&thread_q); /* put the thread's queue in the bcast list */
     rb->memset(&s_thread, 0, sizeof(s_thread)); /* zero the struct */
-    s_thread.id = rb->create_thread(thread, stack,
-        stacksize, "Battery Benchmark");
+    s_thread.id = rb->create_thread(thread, thread_stack,
+        sizeof(thread_stack), "Battery Benchmark");
     rb->plugin_tsr(exit_tsr);
     
     return PLUGIN_OK;

@@ -105,13 +105,12 @@ void power_init(void)
 #endif
 }
 
+
 #ifdef HAVE_CHARGING
 bool charger_inserted(void)
 {     
-#if defined(IRIVER_H100_SERIES)
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
     return (GPIO1_READ & 0x00400000)?true:false;
-#elif defined(IRIVER_H300_SERIES)
-    return (GPIO1_READ & 0x00400000) || usb_powered();
 #elif defined(GMINI_ARCH)
     return (P7 & 0x80) == 0;
 #elif defined(IAUDIO_X5)
