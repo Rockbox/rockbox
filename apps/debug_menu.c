@@ -995,8 +995,8 @@ bool dbg_ports(void)
         button = button_get_w_tmo(HZ/10);
 
         switch(button)
-        {
-            case SETTINGS_CANCEL:
+        {   /* quit on release to allow for reading the cancel button input */
+            case (SETTINGS_CANCEL|BUTTON_REL):  
                 return false;
         }
     }
