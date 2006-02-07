@@ -233,8 +233,9 @@ bool pcmbuf_is_lowdata(void)
 {
     if (!pcm_is_playing() || pcm_is_paused() || crossfade_init || crossfade_active)
         return false;
-    
-    if (pcmbuf_unplayed_bytes < pcmbuf_watermark - CHUNK_SIZE)
+
+    /* 0.5s. */
+    if (pcmbuf_unplayed_bytes < NATIVE_FREQUENCY * 4 / 2)
         return true;
         
     return false;
@@ -429,7 +430,7 @@ static void crossfade_start(void)
     int fade_in_delay = 0;
     
     crossfade_init = 0;
-    if (bytesleft < NATIVE_FREQUENCY * 4 / 2) {
+    if (bytesleft < CHUNK_SIZE * 4) {
         logf("crossfade rejected");
         pcmbuf_play_stop();
         return ;
@@ -446,7 +447,8 @@ static void crossfade_start(void)
         case CFM_MIX:
         case CFM_CROSSFADE:
             /* Initialize the crossfade buffer size. */
-            crossfade_rem = (bytesleft - (NATIVE_FREQUENCY / 4))/2;
+            // FIXME: Crashes unless we use CHUNK_SIZE here
+            crossfade_rem = (bytesleft - (CHUNK_SIZE * 2))/2;
 
             /* Get fade out delay from settings. */
             fade_out_delay = NATIVE_FREQUENCY
