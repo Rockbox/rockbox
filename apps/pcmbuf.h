@@ -45,6 +45,7 @@ bool pcmbuf_crossfade_init(bool manual_skip);
 void pcmbuf_add_event(void (*event_handler)(void));
 void pcmbuf_set_position_callback(void (*callback)(int size));
 unsigned int pcmbuf_get_latency(void);
+void pcmbuf_set_low_latency(bool state);
 bool pcmbuf_insert_buffer(char *buf, long length);
 void pcmbuf_flush_buffer(long length);
 void* pcmbuf_request_buffer(long length, long *realsize);

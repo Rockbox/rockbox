@@ -36,11 +36,12 @@
 #include "audio.h"
 #include "dsp.h"
 
-#define CHUNK_SIZE           PCMBUF_GUARD
+#define CHUNK_SIZE           32768
 /* Must be a power of 2 */
 #define NUM_PCM_BUFFERS      128
 #define NUM_PCM_BUFFERS_MASK (NUM_PCM_BUFFERS - 1)
-#define PCMBUF_WATERMARK     (CHUNK_SIZE * 6)
+/* Watermark level at 1s. */
+#define PCMBUF_WATERMARK     (NATIVE_FREQUENCY * 4 * 1)
 
 /* Audio buffer related settings. */
 static long pcmbuf_size = 0;      /* Size of the PCM buffer. */
@@ -83,7 +84,7 @@ struct pcmbufdesc
     int size;
     /* Call this when the buffer has been played */
     void (*callback)(void);
-} pcmbuffers[NUM_PCM_BUFFERS] IDATA_ATTR;
+} pcmbuffers[NUM_PCM_BUFFERS] IDATA_ATTR; /* Do we really need IRAM for this? */
 
 static int pcmbuf_read_index;
 static int pcmbuf_write_index;
@@ -95,6 +96,7 @@ static int pcmbuf_num_used_buffers(void);
 static void (*position_callback)(int size);
 static int last_chunksize;
 static long mixpos = 0;
+static bool low_latency_mode = false;
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 static bool boost_mode;
@@ -222,12 +224,17 @@ unsigned int pcmbuf_get_latency(void)
     return latency<0?0:latency;
 }
 
+void pcmbuf_set_low_latency(bool state)
+{
+    low_latency_mode = state;
+}
+
 bool pcmbuf_is_lowdata(void)
 {
     if (!pcm_is_playing() || pcm_is_paused() || crossfade_init || crossfade_active)
         return false;
     
-    if (pcmbuf_unplayed_bytes < CHUNK_SIZE * 4)
+    if (pcmbuf_unplayed_bytes < pcmbuf_watermark - CHUNK_SIZE)
         return true;
         
     return false;
@@ -237,7 +244,7 @@ bool pcmbuf_crossfade_init(bool manual_skip)
 {
     if (pcmbuf_size - audiobuffer_free < CHUNK_SIZE * 8
         || !pcmbuf_is_crossfade_enabled()
-        || crossfade_active || crossfade_init) {
+        || crossfade_active || crossfade_init || low_latency_mode) {
         pcmbuf_flush_audio();
         return false;
     }
@@ -422,7 +429,7 @@ static void crossfade_start(void)
     int fade_in_delay = 0;
     
     crossfade_init = 0;
-    if (bytesleft < CHUNK_SIZE * 4) {
+    if (bytesleft < NATIVE_FREQUENCY * 4 / 2) {
         logf("crossfade rejected");
         pcmbuf_play_stop();
         return ;
@@ -439,7 +446,7 @@ static void crossfade_start(void)
         case CFM_MIX:
         case CFM_CROSSFADE:
             /* Initialize the crossfade buffer size. */
-            crossfade_rem = (bytesleft - (CHUNK_SIZE * 2))/2;
+            crossfade_rem = (bytesleft - (NATIVE_FREQUENCY / 4))/2;
 
             /* Get fade out delay from settings. */
             fade_out_delay = NATIVE_FREQUENCY
@@ -593,6 +600,14 @@ static bool prepare_insert(long length)
 {
     if (crossfade_init)
         crossfade_start();
+
+    if (low_latency_mode)
+    {
+        /* 1/4s latency. */
+        if (pcmbuf_unplayed_bytes > NATIVE_FREQUENCY * 4 / 4
+            && pcm_is_playing())
+            return false;
+    }
     
     if (audiobuffer_free < length + audiobuffer_fillpos
            + CHUNK_SIZE && !crossfade_active) {
@@ -603,7 +618,8 @@ static bool prepare_insert(long length)
     if (!pcm_is_playing()) {
         pcmbuf_boost(true);
         crossfade_active = false;
-        if (audiobuffer_free < pcmbuf_size - CHUNK_SIZE*4) {
+        /* Pre-buffer 1s. */
+        if (audiobuffer_free < pcmbuf_size - NATIVE_FREQUENCY*4) {
             logf("pcm starting");
             pcmbuf_play_start();
         }
@@ -840,7 +856,7 @@ void pcmbuf_crossfade_enable(bool on_off)
     crossfade_enabled = on_off;
 
     if (crossfade_enabled) {
-        pcmbuf_set_watermark_bytes(pcmbuf_size - (CHUNK_SIZE*6));
+        pcmbuf_set_watermark_bytes(pcmbuf_size - (NATIVE_FREQUENCY*4/2));
     } else {
         pcmbuf_set_watermark_bytes(PCMBUF_WATERMARK);
     }

@@ -46,6 +46,7 @@
 #if CONFIG_CODEC == SWCODEC
 #include "dsp.h"
 #include "eq_menu.h"
+#include "pcmbuf.h"
 #endif
 
 int selected_setting; /* Used by the callback */
@@ -394,10 +395,18 @@ bool sound_menu(void)
 #endif
     };
     
+#if CONFIG_CODEC == SWCODEC
+    pcmbuf_set_low_latency(true);
+#endif
+
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
                  NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
+
+#if CONFIG_CODEC == SWCODEC
+    pcmbuf_set_low_latency(false);
+#endif
 
     return result;
 }
