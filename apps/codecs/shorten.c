@@ -33,13 +33,13 @@ extern char iend[];
 struct codec_api* rb;
 struct codec_api* ci;
 
-#define MAX_DECODED (DEFAULT_BLOCK_SIZE + MAX_NWRAP)
-int32_t decoded0[MAX_DECODED] IBSS_ATTR;
-int32_t decoded1[MAX_DECODED] IBSS_ATTR;
+int32_t decoded0[MAX_DECODE_SIZE] IBSS_ATTR;
+int32_t decoded1[MAX_DECODE_SIZE] IBSS_ATTR;
 
-#define MAX_OFFSETS MAX_NMEAN
-int32_t offset0[MAX_OFFSETS] IBSS_ATTR;
-int32_t offset1[MAX_OFFSETS] IBSS_ATTR;
+int32_t offset0[MAX_OFFSET_SIZE] IBSS_ATTR;
+int32_t offset1[MAX_OFFSET_SIZE] IBSS_ATTR;
+
+int8_t ibuf[MAX_BUFFER_SIZE] IBSS_ATTR;
 
 /* this is the codec entry point */
 enum codec_status codec_start(struct codec_api* api)
@@ -48,9 +48,8 @@ enum codec_status codec_start(struct codec_api* api)
     uint32_t samplesdone;
     uint32_t elapsedtime;
     int8_t *buf;
-    int cur_chan, consumed, res;
+    int consumed, res, nsamples;
     long bytesleft;
-    int retval;
 
     /* Generic codec initialisation */
     rb = api;
@@ -72,9 +71,8 @@ enum codec_status codec_start(struct codec_api* api)
 next_track:
     /* Codec initialization */
     if (codec_init(api)) {
-        LOGF("Shorten: Error initialising codec\n");
-        retval = CODEC_ERROR;
-        goto exit;
+        LOGF("Shorten: codec_init error\n");
+        return CODEC_ERROR;
     }
 
     while (!*ci->taginfo_ready)
@@ -90,12 +88,11 @@ next_track:
     }
 
     /* Read the shorten & wave headers */
-    buf = ci->request_buffer(&bytesleft, MAX_FRAMESIZE);
+    buf = ci->request_buffer(&bytesleft, MAX_HEADER_SIZE);
     res = shorten_init(&sc, (unsigned char *)buf, bytesleft);
     if (res < 0) {
-        LOGF("shorten_init error: %d\n", res);
-        retval = CODEC_ERROR;
-        goto exit;
+        LOGF("Shorten: shorten_init error: %d\n", res);
+        return CODEC_ERROR;
     }
 
     ci->id3->frequency = sc.sample_rate;
@@ -117,14 +114,13 @@ next_track:
 
 seek_start:
     /* The main decoding loop */
-    ci->memset(&decoded0, 0, sizeof(int32_t)*MAX_DECODED);
-    ci->memset(&decoded1, 0, sizeof(int32_t)*MAX_DECODED);
-    ci->memset(&offset0, 0, sizeof(int32_t)*MAX_OFFSETS);
-    ci->memset(&offset1, 0, sizeof(int32_t)*MAX_OFFSETS);
+    ci->memset(&decoded0, 0, sizeof(int32_t)*MAX_DECODE_SIZE);
+    ci->memset(&decoded1, 0, sizeof(int32_t)*MAX_DECODE_SIZE);
+    ci->memset(&offset0, 0, sizeof(int32_t)*MAX_OFFSET_SIZE);
+    ci->memset(&offset1, 0, sizeof(int32_t)*MAX_OFFSET_SIZE);
 
-    cur_chan = 0;
     samplesdone = 0;
-    buf = ci->request_buffer(&bytesleft, MAX_FRAMESIZE);
+    buf = ci->request_buffer(&bytesleft, MAX_BUFFER_SIZE);
     while (bytesleft) {
         ci->yield();
         if (ci->stop_codec || ci->reload_codec) {
@@ -143,51 +139,43 @@ seek_start:
         }
 
         /* Decode a frame */
-        ci->yield();
-        if (cur_chan == 0) {
-            res = shorten_decode_frame(&sc, decoded0 + sc.nwrap, offset0,
-                                       (unsigned char *)buf, bytesleft);
+        ci->memcpy(ibuf, buf, bytesleft); /* copy buf to iram */
+        res = shorten_decode_frames(&sc, &nsamples, decoded0, decoded1,
+                                    offset0, offset1, (unsigned char *)ibuf,
+                                    bytesleft, ci->yield);
+ 
+        if (res == FN_ERROR) {
+            LOGF("Shorten: shorten_decode_frames error (%d)\n", samplesdone);
+            return CODEC_ERROR;
         } else {
-            res = shorten_decode_frame(&sc, decoded1 + sc.nwrap, offset1,
-                                       (unsigned char *)buf, bytesleft);
-        }
-        cur_chan++;
-
-        if (res == 0 && cur_chan == sc.channels) {
-            cur_chan = 0;
-
             /* Insert decoded samples in pcmbuf */
-            ci->yield();
-            while (!ci->pcmbuf_insert_split((char*)(decoded0 + sc.nwrap),
-                    (char*)(decoded1 + sc.nwrap), sc.blocksize*4)) {
+            if (nsamples) {
                 ci->yield();
+                while (!ci->pcmbuf_insert_split((char*)(decoded0 + sc.nwrap),
+                                                (char*)(decoded1 + sc.nwrap),
+                                                4*nsamples)) {
+                    ci->yield();
+                }
+
+                /* Update the elapsed-time indicator */
+                samplesdone += nsamples;
+                elapsedtime = (samplesdone*10) / (sc.sample_rate/100);
+                ci->set_elapsed(elapsedtime);
             }
 
-            /* Update the elapsed-time indicator */
-            samplesdone += sc.blocksize;
-            elapsedtime = (samplesdone*10) / (sc.sample_rate/100);
-            ci->set_elapsed(elapsedtime);
-        } else if (res == 1) {
             /* End of shorten stream...go to next track */
-            break;
-        } else if (res < 0) {
-            LOGF("shorten_decode_frame error: \n", res);
-            retval = CODEC_ERROR;
-            goto exit;
+            if (res == FN_QUIT)
+                break;
         }
 
         consumed = sc.gb.index/8;
         ci->advance_buffer(consumed);
+        buf = ci->request_buffer(&bytesleft, MAX_BUFFER_SIZE);
         sc.bitindex = sc.gb.index - 8*consumed;
-        buf = ci->request_buffer(&bytesleft, MAX_FRAMESIZE);
     }
-
-    LOGF("Shorten: Decoded %d samples\n", samplesdone);
 
     if (ci->request_next_track())
         goto next_track;
 
-    retval = CODEC_OK;
-exit:
-    return retval;
+    return CODEC_OK;
 }

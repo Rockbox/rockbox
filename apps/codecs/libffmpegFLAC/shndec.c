@@ -28,12 +28,6 @@
 #include "golomb.h"
 #include "shndec.h"
 
-/* These seem reasonable from my test files.
-   Does MAX_HEADER_SIZE really need to be 16384? */
-#define MAX_PRED_ORDER 16
-#define MAX_HEADER_SIZE DEFAULT_BLOCK_SIZE*4
-//#define MAX_HEADER_SIZE 16384
-
 #define ULONGSIZE 2
 
 #define WAVE_FORMAT_PCM 0x0001
@@ -54,16 +48,6 @@
 #define V2LPCQOFFSET (1 << LPCQUANT)
 
 #define FNSIZE       2
-#define FN_DIFF0     0
-#define FN_DIFF1     1
-#define FN_DIFF2     2
-#define FN_DIFF3     3
-#define FN_QUIT      4
-#define FN_BLOCKSIZE 5
-#define FN_BITSHIFT  6
-#define FN_QLPC      7
-#define FN_ZERO      8
-#define FN_VERBATIM  9
 
 #define VERBATIM_CKSIZE_SIZE  5
 #define VERBATIM_BYTE_SIZE    8
@@ -76,22 +60,21 @@
 #define get_le16(gb) bswap_16(get_bits_long(gb, 16))
 #define get_le32(gb) bswap_32(get_bits_long(gb, 32))
 
-static inline uint32_t bswap_32(uint32_t x){
+static uint32_t bswap_32(uint32_t x){
     x= ((x<<8)&0xFF00FF00) | ((x>>8)&0x00FF00FF);
     return (x>>16) | (x<<16);
 }
 
-static inline uint16_t bswap_16(uint16_t x){
+static uint16_t bswap_16(uint16_t x){
     return (x>>8) | (x<<8);
 }
 
 /* converts fourcc string to int */
-static inline int ff_get_fourcc(const char *s){
+static int ff_get_fourcc(const char *s){
     //assert( strlen(s)==4 );
     return (s[0]) + (s[1]<<8) + (s[2]<<16) + (s[3]<<24);
 }
 
-static unsigned int get_uint(ShortenContext *s, int k) ICODE_ATTR;
 static unsigned int get_uint(ShortenContext *s, int k)
 {
     if (s->version != 0)
@@ -99,10 +82,77 @@ static unsigned int get_uint(ShortenContext *s, int k)
     return get_ur_golomb_shorten(&s->gb, k);
 }
 
-static void decode_subframe_lpc(ShortenContext *s, int32_t *decoded,
-                                int residual_size, int pred_order) ICODE_ATTR;
-static void decode_subframe_lpc(ShortenContext *s, int32_t *decoded,
-                                int residual_size, int pred_order)
+#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+static void coldfire_lshift_samples(int n, int shift, int32_t *samples) ICODE_ATTR;
+static void coldfire_lshift_samples(int n, int shift, int32_t *samples)
+{
+/*
+    for (i = 0; i < n; i++)
+        samples[i] =<< shift;
+*/
+    asm volatile (
+            "move.l %[n], %%d0              \n" /* d0 = loop counter */
+            "asr.l  #2, %%d0                \n"
+            "beq l1_shift                   \n"
+        "l2_shift:" /* main loop (unroll by 4) */
+            "movem.l (%[x]), %%d4-%%d7      \n"
+            "asl.l   %[s], %%d4             \n"
+            "asl.l   %[s], %%d5             \n"
+            "asl.l   %[s], %%d6             \n"
+            "asl.l   %[s], %%d7             \n"
+            "movem.l %%d4-%%d7, (%[x])      \n"
+            "add.l  #16, %[x]               \n"
+
+            "subq.l  #1, %%d0               \n"
+            "bne l2_shift                   \n"
+        "l1_shift:" /* any loops left? */
+            "and.l  #3, %[n]                \n"
+            "beq l4_shift                   \n"
+        "l3_shift:" /* remaining loops */
+            "move.l (%[x]), %%d4            \n"
+            "asl.l  %[s], %%d4              \n"
+            "move.l %%d4, (%[x])+           \n"
+
+            "subq.l #1, %[n]                \n"
+            "bne l3_shift                   \n"
+        "l4_shift:" /* exit */
+        : [n] "+d" (n),         /* d1 */
+          [s] "+d" (shift),     /* d2 */
+          [x] "+a" (samples)    /* a0 */
+        :
+        : "%d0", "%d4", "%d5", "%d6", "%d7"
+    );
+}
+#endif
+
+static inline void fix_bitshift(ShortenContext *s, int32_t *samples)
+{
+    int i;
+
+    /* Wrapped samples don't get bitshifted, so we'll do them during
+       the next iteration. */
+    if (s->bitshift != 0) {
+#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+        coldfire_lshift_samples(s->blocksize, s->bitshift, samples - s->nwrap);
+#else
+        for (i = -s->nwrap; i < (s->blocksize - s->nwrap); i++)
+            samples[i] <<= s->bitshift;
+#endif
+    }
+
+    /* Also, when we have to remember to fix the wrapped samples when
+       the bitshift changes.*/
+    if (s->bitshift != s->last_bitshift) {
+        if (s->last_bitshift != 0)
+            for (i = -s->nwrap; i < 0; i++)
+                samples[i] <<= s->last_bitshift;
+
+        s->last_bitshift = s->bitshift;
+    }
+}
+
+static inline void decode_subframe_lpc(ShortenContext *s, int32_t *decoded,
+                                       int residual_size, int pred_order)
 {
     int sum, i, j;
     int coeffs[MAX_PRED_ORDER];
@@ -121,17 +171,11 @@ static void decode_subframe_lpc(ShortenContext *s, int32_t *decoded,
     }
 }
 
-int shorten_decode_frame(ShortenContext *s,
-                         int32_t *decoded,
-                         int32_t *offset,
-                         uint8_t *buf,
-                         int buf_size)
+static inline int shorten_decode_frame(ShortenContext *s, int32_t *decoded,
+                                       int32_t *offset)
 {
     int i;
     int32_t sum;
-
-    init_get_bits(&s->gb, buf, buf_size*8);
-    get_bits(&s->gb, s->bitindex);
 
     int cmd = get_ur_golomb_shorten(&s->gb, FNSIZE);
     switch (cmd) {
@@ -201,10 +245,6 @@ int shorten_decode_frame(ShortenContext *s,
                 case FN_QLPC:
                 {
                     int pred_order = get_ur_golomb_shorten(&s->gb, LPCQSIZE);
-                    if (pred_order > MAX_PRED_ORDER) {
-                        return -2;
-                    }
-
                     for (i=0; i<pred_order; i++)
                         decoded[i - pred_order] -= coffset;
                     decode_subframe_lpc(s, decoded, residual_size, pred_order);
@@ -231,12 +271,7 @@ int shorten_decode_frame(ShortenContext *s,
                 }
             }
 
-            for (i=-s->nwrap; i<0; i++)
-                decoded[i] = decoded[i + s->blocksize];
-
-            int scale = s->bitshift + SHN_OUTPUT_DEPTH - s->bits_per_sample;
-            for (i = 0; i < s->blocksize; i++)
-                decoded[i] <<= scale;
+            fix_bitshift(s, decoded);
             break;
         }
 
@@ -244,29 +279,88 @@ int shorten_decode_frame(ShortenContext *s,
             i = get_ur_golomb_shorten(&s->gb, VERBATIM_CKSIZE_SIZE);
             while (i--)
                 get_ur_golomb_shorten(&s->gb, VERBATIM_BYTE_SIZE);
-            return 4;
             break;
 
         case FN_BITSHIFT:
             s->bitshift = get_ur_golomb_shorten(&s->gb, BITSHIFTSIZE);
-            return 3;
             break;
 
         case FN_BLOCKSIZE:
             s->blocksize = get_uint(s, av_log2(s->blocksize));
-            return 2;
             break;
 
         case FN_QUIT:
-            return 1;
             break;
 
         default:
-            return -1;
+            return FN_ERROR;
             break;
     }
 
-    return 0;
+    return cmd;
+}
+
+int shorten_decode_frames(ShortenContext *s, int *nsamples,
+                          int32_t *decoded0, int32_t *decoded1,
+                          int32_t *offset0, int32_t *offset1,
+                          uint8_t *buf, int buf_size,
+                          void (*yield)(void))
+{
+    int32_t *decoded, *offset;
+    int cmd;
+
+    *nsamples = 0;
+
+    init_get_bits(&s->gb, buf, buf_size*8);
+    get_bits(&s->gb, s->bitindex);
+
+    int n = 0;
+    while (n < NUM_DEC_LOOPS) {
+        int chan = n%2;
+        if (chan == 0) {
+            decoded = decoded0 + s->nwrap + *nsamples;
+            offset = offset0;
+        } else {
+            decoded = decoded1 + s->nwrap + *nsamples;
+            offset = offset1;
+        }
+
+        yield();
+
+        cmd = shorten_decode_frame(s, decoded, offset);
+
+        if (cmd == FN_VERBATIM || cmd == FN_BITSHIFT || cmd == FN_BLOCKSIZE) {
+            continue;
+        } else if (cmd == FN_QUIT || cmd == FN_ERROR) {
+            break;
+        }
+
+        *nsamples += chan * s->blocksize;
+        n++;
+    }
+
+    if (*nsamples) {
+        /* Wrap the samples for the next loop */
+        int i;
+        for (i = 0; i < s->nwrap; i++) {
+            decoded0[i] = decoded0[*nsamples + i];
+            decoded1[i] = decoded1[*nsamples + i];
+        }
+
+        /* Scale the samples for the pcmbuf */
+        int scale = SHN_OUTPUT_DEPTH - s->bits_per_sample;
+#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+        coldfire_lshift_samples(*nsamples, scale, decoded0 + s->nwrap);
+        coldfire_lshift_samples(*nsamples, scale, decoded1 + s->nwrap);
+#else
+        for (i = 0; i < *nsamples; i++) {
+            decoded0[i + s->nwrap] <<= scale;
+            decoded1[i + s->nwrap] <<= scale;
+        }
+#endif
+    }
+
+    return cmd;
 }
 
 static int decode_wave_header(ShortenContext *s,
