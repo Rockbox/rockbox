@@ -796,7 +796,7 @@ static int button_read(void)
     {
         data = adc_scan(ADC_BUTTONS);
         
-        if (data < 0x50)
+        if (data < 0x54)
             if (data < 0x30)
                 if (data < 0x10)
                     btn = BUTTON_SELECT;
@@ -805,13 +805,13 @@ static int button_read(void)
             else
                 btn = BUTTON_LEFT;
         else
-            if (data < 0x90)
-                if (data < 0x70)
+            if (data < 0x98)
+                if (data < 0x76)
                     btn = BUTTON_DOWN;
                 else
                     btn = BUTTON_RIGHT;
             else
-                if(data < 0xc0)
+                if(data < 0xba)
                     btn = BUTTON_OFF;
     }
         
