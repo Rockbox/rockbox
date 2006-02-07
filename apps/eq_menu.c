@@ -49,7 +49,10 @@
 /* Key definitions */
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD || \
      CONFIG_KEYPAD == IRIVER_H300_PAD)
-     
+
+#define EQ_BTN_MODIFIER     BUTTON_ON
+#define EQ_BTN_DECREMENT    BUTTON_LEFT
+#define EQ_BTN_INCREMENT    BUTTON_RIGHT
 #define EQ_BTN_NEXT_BAND    BUTTON_DOWN
 #define EQ_BTN_PREV_BAND    BUTTON_UP
 #define EQ_BTN_CHANGE_MODE  BUTTON_SELECT
@@ -57,9 +60,20 @@
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD)
 
-#define EQ_BTN_NEXT_BAND    BUTTON_SCROLL_FWD
-#define EQ_BTN_PREV_BAND    BUTTON_SCROLL_BACK
+#define EQ_BTN_DECREMENT    BUTTON_SCROLL_BACK
+#define EQ_BTN_INCREMENT    BUTTON_SCROLL_FWD
+#define EQ_BTN_NEXT_BAND    BUTTON_RIGHT
+#define EQ_BTN_PREV_BAND    BUTTON_LEFT
 #define EQ_BTN_CHANGE_MODE  BUTTON_SELECT
+#define EQ_BTN_EXIT         BUTTON_MENU
+
+#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+
+#define EQ_BTN_DECREMENT    BUTTON_LEFT
+#define EQ_BTN_INCREMENT    BUTTON_RIGHT
+#define EQ_BTN_NEXT_BAND    BUTTON_DOWN
+#define EQ_BTN_PREV_BAND    BUTTON_UP
+#define EQ_BTN_CHANGE_MODE  BUTTON_REC
 #define EQ_BTN_EXIT         BUTTON_MENU
 
 #endif
@@ -68,12 +82,15 @@
 #define EQ_CUTOFF_MIN        20
 #define EQ_CUTOFF_MAX     22040
 #define EQ_CUTOFF_STEP       10
+#define EQ_CUTOFF_FAST_STEP 100
 #define EQ_GAIN_MIN       (-240)
 #define EQ_GAIN_MAX         240
 #define EQ_GAIN_STEP          1
+#define EQ_GAIN_FAST_STEP    10
 #define EQ_Q_MIN              5
 #define EQ_Q_MAX             64
 #define EQ_Q_STEP             1
+#define EQ_Q_FAST_STEP       10
 
 #define EQ_USER_DIVISOR      10
 
@@ -104,6 +121,16 @@ static void eq_q_format(char* buffer, int buffer_size, int value, const char* un
 #define eq_make_gain_label(buf, bufsize, frequency) snprintf((buf), \
     (bufsize), str(LANG_EQUALIZER_GAIN_ITEM), (frequency))
 
+#define eq_set_center(band) \
+static bool eq_set_band ## band ## _center(void) \
+{ \
+    bool result = set_int(str(LANG_EQUALIZER_BAND_CENTER), "Hertz", UNIT_HERTZ, \
+        &global_settings.eq_band ## band ## _cutoff, NULL, \
+        EQ_CUTOFF_STEP, EQ_CUTOFF_MIN, EQ_CUTOFF_MAX, NULL); \
+    dsp_eq_update_data(global_settings.eq_enabled); \
+    return result; \
+}
+    
 #define eq_set_cutoff(band) \
 static bool eq_set_band ## band ## _cutoff(void) \
 { \
@@ -135,9 +162,9 @@ static bool eq_set_band ## band ## _gain(void) \
 }
 
 eq_set_cutoff(0);
-eq_set_cutoff(1);
-eq_set_cutoff(2);
-eq_set_cutoff(3);
+eq_set_center(1);
+eq_set_center(2);
+eq_set_center(3);
 eq_set_cutoff(4);
 
 eq_set_q(0);
@@ -209,7 +236,7 @@ static bool eq_set_band1(void)
     int m;
     bool result;
     static const struct menu_item items[] = {
-        { ID2P(LANG_EQUALIZER_BAND_CUTOFF), eq_set_band1_cutoff },
+        { ID2P(LANG_EQUALIZER_BAND_CENTER), eq_set_band1_center },
         { ID2P(LANG_EQUALIZER_BAND_Q), eq_set_band1_q },
         { ID2P(LANG_EQUALIZER_BAND_GAIN), eq_set_band1_gain },
     };
@@ -227,7 +254,7 @@ static bool eq_set_band2(void)
     int m;
     bool result;
     static const struct menu_item items[] = {
-        { ID2P(LANG_EQUALIZER_BAND_CUTOFF), eq_set_band2_cutoff },
+        { ID2P(LANG_EQUALIZER_BAND_CENTER), eq_set_band2_center },
         { ID2P(LANG_EQUALIZER_BAND_Q), eq_set_band2_q },
         { ID2P(LANG_EQUALIZER_BAND_GAIN), eq_set_band2_gain },
     };
@@ -245,7 +272,7 @@ static bool eq_set_band3(void)
     int m;
     bool result;
     static const struct menu_item items[] = {
-        { ID2P(LANG_EQUALIZER_BAND_CUTOFF), eq_set_band3_cutoff },
+        { ID2P(LANG_EQUALIZER_BAND_CENTER), eq_set_band3_center },
         { ID2P(LANG_EQUALIZER_BAND_Q), eq_set_band3_q },
         { ID2P(LANG_EQUALIZER_BAND_GAIN), eq_set_band3_gain },
     };
@@ -470,7 +497,7 @@ bool eq_menu_graphical(void)
     bool has_changed = false;
     int button;
     int *setting;
-    int current_band, y, step, min, max, voice_unit;
+    int current_band, y, step, fast_step, min, max, voice_unit;
     enum eq_slider_mode mode;
     enum eq_type current_type;
     char buf[24];
@@ -497,6 +524,7 @@ bool eq_menu_graphical(void)
             setting += current_band * 3;
         
             step = EQ_GAIN_STEP;
+            fast_step = EQ_GAIN_FAST_STEP;
             min = EQ_GAIN_MIN;
             max = EQ_GAIN_MAX;
             voice_unit = UNIT_DB;
@@ -511,6 +539,7 @@ bool eq_menu_graphical(void)
             setting += current_band * 3;
         
             step = EQ_CUTOFF_STEP;
+            fast_step = EQ_CUTOFF_FAST_STEP;
             min = EQ_CUTOFF_MIN;
             max = EQ_CUTOFF_MAX;
             voice_unit = UNIT_HERTZ;
@@ -525,6 +554,7 @@ bool eq_menu_graphical(void)
             setting += current_band * 3;
         
             step = EQ_Q_STEP;
+            fast_step = EQ_Q_FAST_STEP;
             min = EQ_Q_MIN;
             max = EQ_Q_MAX;
             voice_unit = UNIT_INT;
@@ -537,25 +567,43 @@ bool eq_menu_graphical(void)
 
         screens[SCREEN_MAIN].update();
         
-        button = button_get_w_tmo(HZ/10);
+        button = button_get(true);
 
         switch (button) {
-        case BUTTON_LEFT:
-        case BUTTON_LEFT | BUTTON_REPEAT:
+        case EQ_BTN_DECREMENT:
+        case EQ_BTN_DECREMENT | BUTTON_REPEAT:
             *(setting) -= step;
             has_changed = true;
             if (*(setting) < min)
                 *(setting) = min;
             break;
 
-        case BUTTON_RIGHT:
-        case BUTTON_RIGHT | BUTTON_REPEAT:
+        case EQ_BTN_INCREMENT:
+        case EQ_BTN_INCREMENT | BUTTON_REPEAT:
             *(setting) += step;
             has_changed = true;
             if (*(setting) > max)
                 *(setting) = max;
             break;
             
+#ifdef EQ_BTN_MODIFIER
+        case EQ_BTN_MODIFIER | EQ_BTN_INCREMENT:
+        case EQ_BTN_MODIFIER | EQ_BTN_INCREMENT | BUTTON_REPEAT:
+            *(setting) += fast_step;
+            has_changed = true;
+            if (*(setting) > max)
+                *(setting) = max;
+            break;
+
+        case EQ_BTN_MODIFIER | EQ_BTN_DECREMENT:
+        case EQ_BTN_MODIFIER | EQ_BTN_DECREMENT | BUTTON_REPEAT:
+            *(setting) -= fast_step;
+            has_changed = true;
+            if (*(setting) < min)
+                *(setting) = min;
+            break;
+#endif
+
         case EQ_BTN_PREV_BAND:
         case EQ_BTN_PREV_BAND | BUTTON_REPEAT:
             current_band--;

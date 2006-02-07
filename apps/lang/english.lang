@@ -3661,8 +3661,14 @@ new:
 
 id: LANG_EQUALIZER_BAND_CUTOFF
 desc: in the equalizer settings menu
-eng: "Cutoff"
-voice: "Cutoff"
+eng: "Cutoff Frequency"
+voice: "Cutoff Frequency"
+new:
+
+id: LANG_EQUALIZER_BAND_CENTER
+desc: in the equalizer settings menu
+eng: "Center Frequency"
+voice: "Center frequency"
 new:
 
 id: LANG_EQUALIZER_BAND_Q
