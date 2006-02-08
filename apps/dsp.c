@@ -48,7 +48,7 @@
 #define ATT_COMP 0x73333333L /* 0.9 */
 #define LOW  0x4CCCCCCDL /* 0.6 */
 #define LOW_COMP 0x33333333L /* 0.4 */
-#define HIGH_NEG 0x9999999AL /* -0.2 */
+#define HIGH_NEG -0x66666666L /* -0.2 (not unsigned!) */
 #define HIGH_COMP 0x66666666L /* 0.8 */
 
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
