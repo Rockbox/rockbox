@@ -268,6 +268,10 @@ void switch_thread(void)
 #elif CONFIG_CPU == SH7034
         and_b(0x7F, &SBYCR);
         asm volatile ("sleep");
+#elif CONFIG_CPU == PP5020
+        /* This should sleep the CPU. It appears to wake by itself on
+           interrupts */
+        CPU_CTL = 0x80000000;
 #elif CONFIG_CPU == TCC730
 	    /* Sleep mode is triggered by the SYS instr on CalmRisc16.
          * Unfortunately, the manual doesn't specify which arg to use.
