@@ -20,6 +20,8 @@
 #define __PP5020_H__
 
 /* All info gleaned and/or copied from the iPodLinux project. */
+#define CPU_CTL          (*(volatile unsigned long *)(0x60007000))
+#define COP_CTL          (*(volatile unsigned long *)(0x60007004))
 
 #define GPIOA_ENABLE     (*(volatile unsigned long *)(0x6000d000))
 #define GPIOB_ENABLE     (*(volatile unsigned long *)(0x6000d004))
