@@ -25,6 +25,8 @@
 #include <SDL_thread.h>
 #include "lcd-sdl.h"
 
+/* colour definitions are R, G, B */
+
 #if defined(ARCHOS_RECORDER)
 #define UI_TITLE                    "Jukebox Recorder"
 #define UI_WIDTH                    270 // width of GUI window
@@ -78,14 +80,14 @@
 #define UI_WIDTH                    379 // width of GUI window
 #define UI_HEIGHT                   508 // height of GUI window
 #define UI_LCD_BGCOLOR              90, 145, 90 // bkgnd color of LCD (no backlight)
-#define UI_LCD_BGCOLORLIGHT         230, 216, 173 // bkgnd color of LCD (backlight)
+#define UI_LCD_BGCOLORLIGHT         173, 216, 230 // bkgnd color of LCD (backlight)
 #define UI_LCD_BLACK                0, 0, 0 // black
 #define UI_LCD_POSX                 109 // x position of lcd
 #define UI_LCD_POSY                 23 // y position of lcd
 #define UI_LCD_WIDTH                160
 #define UI_LCD_HEIGHT               128
 #define UI_REMOTE_BGCOLOR           90, 145, 90 // bkgnd of remote lcd (no bklight)
-#define UI_REMOTE_BGCOLORLIGHT      250, 180, 130 // bkgnd of remote lcd (bklight)
+#define UI_REMOTE_BGCOLORLIGHT      130, 180, 250 // bkgnd of remote lcd (bklight)
 #define UI_REMOTE_POSX              50  // x position of remote lcd
 #define UI_REMOTE_POSY              403 // y position of remote lcd
 #define UI_REMOTE_WIDTH             128
@@ -101,7 +103,7 @@
 #define UI_LCD_WIDTH                220
 #define UI_LCD_HEIGHT               176
 #define UI_REMOTE_BGCOLOR           90, 145, 90 // bkgnd of remote lcd (no bklight)
-#define UI_REMOTE_BGCOLORLIGHT      250, 180, 130 // bkgnd of remote lcd (bklight)
+#define UI_REMOTE_BGCOLORLIGHT      130, 180, 250 // bkgnd of remote lcd (bklight)
 #define UI_REMOTE_POSX              12  // x position of remote lcd
 #define UI_REMOTE_POSY              478 // y position of remote lcd
 #define UI_REMOTE_WIDTH             128
@@ -132,7 +134,7 @@
 #define UI_WIDTH                    370 // width of GUI window
 #define UI_HEIGHT                   264 // height of GUI window
 #define UI_LCD_BGCOLOR              90, 145, 90 // bkgnd color of LCD (no backlight)
-#define UI_LCD_BGCOLORLIGHT         230, 160, 60 // bkgnd color of LCD (backlight)
+#define UI_LCD_BGCOLORLIGHT         60, 160, 230 // bkgnd color of LCD (backlight)
 #define UI_LCD_BLACK                0, 0, 0 // black
 #define UI_LCD_POSX                 85 // x position of lcd
 #define UI_LCD_POSY                 61 // y position of lcd (74 for real aspect)
