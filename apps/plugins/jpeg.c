@@ -23,11 +23,11 @@
 *
 ****************************************************************************/
 
-#ifndef SIMULATOR /* not for simulator by now */
 #include "plugin.h"
 
-#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
+#if defined(HAVE_LCD_BITMAP) && ((LCD_DEPTH >= 8) || !defined(SIMULATOR))
 #include "gray.h"
+#include "xlcd.h"
 
 PLUGIN_HEADER
 
@@ -51,7 +51,8 @@ PLUGIN_HEADER
 #define JPEG_RIGHT BUTTON_RIGHT
 #define JPEG_QUIT BUTTON_OFF
 
-#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+      (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define JPEG_ZOOM_IN BUTTON_SELECT
 #define JPEG_ZOOM_OUT BUTTON_MODE
 #define JPEG_UP BUTTON_UP
@@ -69,6 +70,27 @@ PLUGIN_HEADER
 #define JPEG_RIGHT BUTTON_RIGHT
 #define JPEG_QUIT BUTTON_SELECT
 
+#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+#define JPEG_ZOOM_IN_PRE BUTTON_MENU
+#define JPEG_ZOOM_IN (BUTTON_MENU | BUTTON_REL)
+#define JPEG_ZOOM_OUT (BUTTON_MENU | BUTTON_REPEAT)
+#define JPEG_UP BUTTON_UP
+#define JPEG_DOWN BUTTON_DOWN
+#define JPEG_LEFT BUTTON_LEFT
+#define JPEG_RIGHT BUTTON_RIGHT
+#define JPEG_QUIT BUTTON_POWER
+#endif
+
+/* different graphics libraries */
+#if LCD_DEPTH < 8
+#define USEGSLIB
+#define MYLCD(fn) gray_ub_ ## fn
+#define MYLCD_UPDATE()
+#define MYXLCD(fn) gray_ub_ ## fn
+#else
+#define MYLCD(fn) rb->lcd_ ## fn
+#define MYLCD_UPDATE() rb->lcd_update();
+#define MYXLCD(fn) xlcd_ ## fn
 #endif
 
 /******************************* Globals ***********************************/
@@ -1538,8 +1560,9 @@ int root_size;
 void cleanup(void *parameter)
 {
     (void)parameter;
-    
-    gray_show(false); 
+#ifdef USEGSLIB
+    gray_show(false);
+#endif 
 }
 
 #define VSCROLL (LCD_HEIGHT/8)
@@ -1570,12 +1593,13 @@ int scroll_bmp(struct t_disp* pdisp)
             move = MIN(HSCROLL, pdisp->x);
             if (move > 0)
             {
-                gray_ub_scroll_right(move); /* scroll right */
+                MYXLCD(scroll_right)(move); /* scroll right */
                 pdisp->x -= move;
-                gray_ub_gray_bitmap_part(
+                MYXLCD(gray_bitmap_part)(
                     pdisp->bitmap, pdisp->x, pdisp->y, pdisp->stride,
                     0, MAX(0, (LCD_HEIGHT-pdisp->height)/2), /* x, y */
                     move, MIN(LCD_HEIGHT, pdisp->height));   /* w, h */
+                MYLCD_UPDATE();
             }
             break;
 
@@ -1584,13 +1608,14 @@ int scroll_bmp(struct t_disp* pdisp)
             move = MIN(HSCROLL, pdisp->width - pdisp->x - LCD_WIDTH);
             if (move > 0)
             {
-                gray_ub_scroll_left(move); /* scroll left */
+                MYXLCD(scroll_left)(move); /* scroll left */
                 pdisp->x += move;
-                gray_ub_gray_bitmap_part(
+                MYXLCD(gray_bitmap_part)(
                     pdisp->bitmap, pdisp->x + LCD_WIDTH - move,
                     pdisp->y, pdisp->stride,
                     LCD_WIDTH - move, MAX(0, (LCD_HEIGHT-pdisp->height)/2), /* x, y */
                     move, MIN(LCD_HEIGHT, pdisp->height));   /* w, h */
+                MYLCD_UPDATE();
             }
             break;
 
@@ -1599,12 +1624,13 @@ int scroll_bmp(struct t_disp* pdisp)
             move = MIN(VSCROLL, pdisp->y);
             if (move > 0)
             {
-                gray_ub_scroll_down(move); /* scroll down */
+                MYXLCD(scroll_down)(move); /* scroll down */
                 pdisp->y -= move;
-                gray_ub_gray_bitmap_part(
+                MYXLCD(gray_bitmap_part)(
                     pdisp->bitmap, pdisp->x, pdisp->y, pdisp->stride,
                     MAX(0, (LCD_WIDTH-pdisp->width)/2), 0,   /* x, y */
                     MIN(LCD_WIDTH, pdisp->width), move);     /* w, h */
+                MYLCD_UPDATE();
             }
             break;
 
@@ -1613,13 +1639,14 @@ int scroll_bmp(struct t_disp* pdisp)
             move = MIN(VSCROLL, pdisp->height - pdisp->y - LCD_HEIGHT);
             if (move > 0)
             {
-                gray_ub_scroll_up(move); /* scroll up */
+                MYXLCD(scroll_up)(move); /* scroll up */
                 pdisp->y += move;
-                gray_ub_gray_bitmap_part(
+                MYXLCD(gray_bitmap_part)(
                     pdisp->bitmap, pdisp->x,
                     pdisp->y + LCD_HEIGHT - move, pdisp->stride,
                     MAX(0, (LCD_WIDTH-pdisp->width)/2), LCD_HEIGHT - move, /* x, y */
                     MIN(LCD_WIDTH, pdisp->width), move);     /* w, h */
+                MYLCD_UPDATE();
             }
             break;
 
@@ -1821,12 +1848,14 @@ void get_view(struct t_disp* p_disp, int* p_cx, int* p_cy)
 
 
 /* load, decode, display the image */
-int main(char* filename)
+int plugin_main(char* filename)
 {
     int fd;
     int filesize;
+#ifdef USEGSLIB
     int grayscales;
     long graysize; // helper
+#endif
     unsigned char* buf_jpeg; /* compressed JPEG image */
     static struct jpeg jpg; /* too large for stack */
     int status;
@@ -1847,6 +1876,7 @@ int main(char* filename)
     buf = rb->plugin_get_audio_buffer(&buf_size); /* start munching memory */
 
 
+#ifdef USEGSLIB
     /* initialize the grayscale buffer: 32 bitplanes for 33 shades of gray. */
     grayscales = gray_init(rb, buf, buf_size, false, LCD_WIDTH, LCD_HEIGHT/8,
                            32, &graysize) + 1;
@@ -1858,6 +1888,9 @@ int main(char* filename)
         rb->close(fd);
         return PLUGIN_ERROR;
     }
+#else
+    xlcd_init(rb);
+#endif
 
 
     /* allocate JPEG buffer */
@@ -1927,15 +1960,18 @@ int main(char* filename)
         rb->lcd_puts(0, 3, print);
         rb->lcd_update();
 
-        gray_ub_clear_display();
-        gray_ub_gray_bitmap_part(
+        MYLCD(clear_display)();
+        MYXLCD(gray_bitmap_part)(
             p_disp->bitmap, p_disp->x, p_disp->y, p_disp->stride,
             MAX(0, (LCD_WIDTH - p_disp->width) / 2),
             MAX(0, (LCD_HEIGHT - p_disp->height) / 2),
             MIN(LCD_WIDTH, p_disp->width),
             MIN(LCD_HEIGHT, p_disp->height));
+        MYLCD_UPDATE();
 
+#ifdef USEGSLIB
         gray_show(true); /* switch on grayscale overlay */
+#endif
 
         /* drawing is now finished, play around with scrolling
          * until you press OFF or connect USB
@@ -1971,12 +2007,18 @@ int main(char* filename)
             break;
         }
 
+#ifdef USEGSLIB
         gray_show(false); /* switch off overlay */
+#else
+        rb->lcd_clear_display();
+#endif
 
     }
     while (status != PLUGIN_OK && status != PLUGIN_USB_CONNECTED);
 
+#ifdef USEGSLIB
     gray_release(); /* deinitialize */
+#endif
 
     return status;
 }
@@ -1987,9 +2029,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     rb = api; /* copy to global api pointer */
 
-    return main((char*)parameter);
+    return plugin_main((char*)parameter);
 }
 
-#endif /* #ifdef HAVE_LCD_BITMAP */
-#endif /* #ifndef SIMULATOR */
+#endif /* HAVE_LCD_BITMAP && ((LCD_DEPTH >= 8) || !defined(SIMULATOR))*/
 

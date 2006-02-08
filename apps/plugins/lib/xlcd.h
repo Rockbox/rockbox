@@ -29,6 +29,13 @@
 void xlcd_init(struct plugin_api* newrb);
 void xlcd_filltriangle(int x1, int y1, int x2, int y2, int x3, int y3);
 
+#if LCD_DEPTH >= 8
+void xlcd_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
+                           int stride, int x, int y, int width, int height);
+void xlcd_gray_bitmap(const unsigned char *src, int x, int y, int width,
+                      int height);
+#endif
+
 void xlcd_scroll_left(int count);
 void xlcd_scroll_right(int count);
 void xlcd_scroll_up(int count);
