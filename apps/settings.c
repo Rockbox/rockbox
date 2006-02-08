@@ -485,8 +485,10 @@ static const struct bit_entry hd_bits[] =
     {5, S_O(rec_prerecord_time), 0, "prerecording time", NULL }, /* 0...30 */
     {1, S_O(rec_directory), 0, /* rec_base_directory */
         "rec directory", REC_BASE_DIR ",current" },
-    {8|SIGNED, S_O(rec_adc_left_gain),  0, /* 0dB */   "adc left gain", NULL }, /* -128...48 */
-    {8|SIGNED, S_O(rec_adc_right_gain), 0, /* 0dB */   "adc right gain", NULL }, /* -128...48 */
+    {8|SIGNED, S_O(rec_linein_decimator_left_gain),  0, /* 0dB */
+        "line in decimator left gain", NULL }, /* -128...48 */
+    {8|SIGNED, S_O(rec_linein_decimator_right_gain), 0, /* 0dB */
+        "line in decimator right gain", NULL }, /* -128...48 */
 #endif
 
 #ifdef HAVE_REMOTE_LCD
@@ -507,10 +509,8 @@ static const struct bit_entry hd_bits[] =
     {7, S_O(screen_scroll_step), 16, "screen scroll step", NULL }, /* 1...112 */
 #endif
 #endif /* HAVE_LCD_BITMAP */
-
     {1, S_O(warnon_erase_dynplaylist), false,
         "warn when erasing dynamic playlist", off_on },
-
 #if CONFIG_CODEC == SWCODEC
         {1, S_O(eq_enabled), false, "eq enabled", off_on },
         /* 0..32768 Hz */
@@ -532,7 +532,13 @@ static const struct bit_entry hd_bits[] =
         {9|SIGNED, S_O(eq_band3_gain), 0, "eq band 3 gain", NULL },
         {9|SIGNED, S_O(eq_band4_gain), 0, "eq band 4 gain", NULL },
 #endif
-
+#if defined(HAVE_UDA1380) /* PLEASE merge this with the other UDA1380 define
+                             when bumping the settings version number PLEASE */
+    {8|SIGNED, S_O(rec_mic_decimator_left_gain),  0, /* 0dB */
+        "mic decimator left gain", NULL }, /* -128...48 */
+    {8|SIGNED, S_O(rec_mic_decimator_right_gain), 0, /* 0dB */
+        "mic decimator right gain", NULL }, /* -128...48 */
+#endif
     /* If values are just added to the end, no need to bump the version. */
     /* new stuff to be added at the end */
 

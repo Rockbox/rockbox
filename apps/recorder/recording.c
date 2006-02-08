@@ -134,44 +134,85 @@ static void set_gain(void)
 {
     if(global_settings.rec_source == SOURCE_MIC)
     {
-        audio_set_recording_gain(global_settings.rec_mic_gain, 0, AUDIO_GAIN_MIC);
+        audio_set_recording_gain(global_settings.rec_mic_gain,
+                                 0, AUDIO_GAIN_MIC);
+#ifdef HAVE_UDA1380
+        audio_set_recording_gain(global_settings.rec_mic_decimator_left_gain,
+                                 global_settings.rec_mic_decimator_right_gain,
+                                 AUDIO_GAIN_DECIMATOR);
+#endif    
     }
     else
     {
         audio_set_recording_gain(global_settings.rec_left_gain,
-                                global_settings.rec_right_gain, AUDIO_GAIN_LINEIN);
-    }
+                                 global_settings.rec_right_gain,
+                                 AUDIO_GAIN_LINEIN);
 #ifdef HAVE_UDA1380
-    audio_set_recording_gain(global_settings.rec_adc_left_gain, 
-                             global_settings.rec_adc_right_gain, 
-                             AUDIO_GAIN_ADC);
+        audio_set_recording_gain(global_settings.rec_linein_decimator_left_gain,
+                                 global_settings.rec_linein_decimator_right_gain,
+                                 AUDIO_GAIN_DECIMATOR);
 #endif    
+    }
 }
 
 static const char* const fmtstr[] =
 {
-    "%d %s",            /* no decimals */
-    "%d.%d %s  ",       /* 1 decimal */
-    "%d.%02d %s  "      /* 2 decimals */
+    "%c%d %s",            /* no decimals */
+    "%c%d.%d %s ",        /* 1 decimal */
+    "%c%d.%02d %s "       /* 2 decimals */
 };
 
 char *fmt_gain(int snd, int val, char *str, int len)
 {
-    int tmp, i, d, numdec;
+    int i, d, numdec;
     const char *unit;
-    
-    tmp = sound_val2phys(snd, val);
+
+    val = sound_val2phys(snd, val);
+    char sign = ' ';
+    if(val < 0)
+    {
+        sign = '-';
+        val = abs(val);
+    }
     numdec = sound_numdecimals(snd);
     unit = sound_unit(snd);
     
     if(numdec)
     {
-        i = tmp / (10*numdec);
-        d = abs(tmp % (10*numdec));
-        snprintf(str, len, fmtstr[numdec], i, d, unit);
+        i = val / (10*numdec);
+        d = val % (10*numdec);
+        snprintf(str, len, fmtstr[numdec], sign, i, d, unit);
     }
     else
-        snprintf(str, len, fmtstr[numdec], tmp, unit);
+        snprintf(str, len, fmtstr[numdec], sign, val, unit);
+    
+    return str;
+}
+
+char *fmt_gain2(int snd1, int val1, int snd2, int val2, char *str, int len)
+{
+    /* same as above but for combined (added) values (recording gain) */
+    int i, d, numdec;
+    const char *unit;
+
+    int val = sound_val2phys(snd1, val1) + sound_val2phys(snd2, val2);
+    char sign = ' ';
+    if(val < 0)
+    {
+        sign = '-';
+        val = abs(val);
+    }
+    numdec = MAX(sound_numdecimals(snd1), sound_numdecimals(snd2));
+    unit = sound_unit(snd1); /* should be same! */
+    
+    if(numdec)
+    {
+        i = val / (10*numdec);
+        d = val % (10*numdec);
+        snprintf(str, len, fmtstr[numdec], sign, i, d, unit);
+    }
+    else
+        snprintf(str, len, fmtstr[numdec], sign, val, unit);
     
     return str;
 }
@@ -190,7 +231,6 @@ void adjust_cursor(void)
     case SOURCE_MIC:
         max_cursor = 1;
         break;
-        
     case SOURCE_LINE:
         max_cursor = 3;
         break;
@@ -198,7 +238,7 @@ void adjust_cursor(void)
         max_cursor = 0;
         break;
     }
-    
+
     if(cursor > max_cursor)
         cursor = max_cursor;
 }
@@ -292,6 +332,158 @@ static void trigger_listener(int trigger_status)
     }
 }
 
+#ifdef HAVE_UDA1380
+/* Handles combined recording gain changes.
+   GAIN RANGE = negative digital / analog / positive digital
+ */
+void change_recording_gain(bool increment, bool left, bool right,
+                           int ana_mic_size, int ana_line_size)
+{
+    if (increment)
+    {
+        if(global_settings.rec_source == SOURCE_MIC)
+        {
+            /* always changed as stereo */
+            if(global_settings.rec_mic_decimator_left_gain < 
+                    sound_max(SOUND_DECIMATOR_LEFT_GAIN))
+            {
+                /* increase digital gain by 1 if below max */
+                global_settings.rec_mic_decimator_left_gain++;
+                global_settings.rec_mic_decimator_right_gain =
+                    global_settings.rec_mic_decimator_left_gain;
+            }
+
+            /* mono increase */
+            if((global_settings.rec_mic_decimator_left_gain >= ana_mic_size) &&
+               (global_settings.rec_mic_gain < sound_max(SOUND_MIC_GAIN)))
+            {    
+                /* in analogue range, cycle digital gain for each analogue */
+                global_settings.rec_mic_decimator_left_gain = 0;
+                global_settings.rec_mic_decimator_right_gain =
+                    global_settings.rec_mic_decimator_left_gain;
+                global_settings.rec_mic_gain++;
+            }
+        }
+        else
+        {
+            if(((left) && (right)) &&
+               (global_settings.rec_linein_decimator_left_gain < 
+                    sound_max(SOUND_DECIMATOR_LEFT_GAIN)) && 
+               (global_settings.rec_linein_decimator_right_gain < 
+                    sound_max(SOUND_DECIMATOR_RIGHT_GAIN)) )
+            {
+                /* increase digital gain by 1 if below max*/
+                global_settings.rec_linein_decimator_left_gain++;
+                global_settings.rec_linein_decimator_right_gain++; 	
+            }
+            else if((right) && (!left) &&
+                    (global_settings.rec_linein_decimator_right_gain < 
+                        sound_max(SOUND_DECIMATOR_RIGHT_GAIN)))
+            {
+                 global_settings.rec_linein_decimator_right_gain++;
+            }
+            else if((left) && (!right) &&
+                    (global_settings.rec_linein_decimator_left_gain < 
+                        sound_max(SOUND_DECIMATOR_LEFT_GAIN)))
+            {
+                 global_settings.rec_linein_decimator_left_gain++;    
+            }
+
+            /* Stereo increase */
+            if((left) &&
+               (global_settings.rec_linein_decimator_left_gain >=
+                                                        ana_line_size) &&
+               (global_settings.rec_left_gain < sound_max(SOUND_LEFT_GAIN)))
+            {
+           	    /* if analogue range cycle left digital gain for each */
+                global_settings.rec_linein_decimator_left_gain = 0;
+                global_settings.rec_left_gain++;
+            }
+            if((right) &&
+               (global_settings.rec_linein_decimator_right_gain >=
+                                                        ana_line_size) &&
+               (global_settings.rec_right_gain < sound_max(SOUND_RIGHT_GAIN)))
+            {
+           	    /* if analogue range cycle right digital for each */
+                global_settings.rec_linein_decimator_right_gain = 0;
+                global_settings.rec_right_gain++;
+            }
+        }
+    }
+    else
+    {
+        if(global_settings.rec_source == SOURCE_MIC)
+        {
+            /* always changed as stereo */
+            if(global_settings.rec_mic_decimator_left_gain > 
+                    sound_min(SOUND_DECIMATOR_LEFT_GAIN))
+            {
+                /* decrease digital gain by 1 if above minimum */
+                global_settings.rec_mic_decimator_left_gain--;
+                global_settings.rec_mic_decimator_right_gain =
+                    global_settings.rec_mic_decimator_left_gain;
+            }
+
+            /* mono decrease */
+            if((global_settings.rec_mic_decimator_left_gain < 0) &&
+               (global_settings.rec_mic_gain > sound_min(SOUND_MIC_GAIN)))
+            {
+                /* if analogue in range, cycle digital gain for each */              
+                global_settings.rec_mic_decimator_left_gain = ana_mic_size - 1;
+                global_settings.rec_mic_decimator_right_gain =
+                    global_settings.rec_mic_decimator_left_gain;
+                global_settings.rec_mic_gain--;
+            }
+        }
+        else
+        {
+            if( ((left) && (right)) &&
+                (global_settings.rec_linein_decimator_left_gain > 
+                    sound_min(SOUND_DECIMATOR_LEFT_GAIN)) && 
+                (global_settings.rec_linein_decimator_right_gain > 
+                    sound_min(SOUND_DECIMATOR_RIGHT_GAIN)) )
+            {
+                /* decrease digital gain by 1 if above minimum */
+                global_settings.rec_linein_decimator_left_gain--;
+                global_settings.rec_linein_decimator_right_gain--; 	
+            }
+            else if((right) && (!left) &&
+                    (global_settings.rec_linein_decimator_right_gain > 
+                        sound_min(SOUND_DECIMATOR_RIGHT_GAIN)))
+            {
+                global_settings.rec_linein_decimator_right_gain--;
+            }
+            else if((left) && (!right) &&
+                    (global_settings.rec_linein_decimator_left_gain >
+                        sound_min(SOUND_DECIMATOR_LEFT_GAIN)))
+            {
+                global_settings.rec_linein_decimator_left_gain--;
+            }
+
+            /* Stereo decrease */
+            if((left) && 
+               (global_settings.rec_linein_decimator_left_gain < 0) &&
+               (global_settings.rec_left_gain > sound_min(SOUND_LEFT_GAIN)))
+            {
+                /* if in analogue range cycle left digital gain for each */
+                global_settings.rec_left_gain--;
+                global_settings.rec_linein_decimator_left_gain =
+                                                            ana_line_size - 1;
+            }
+            if((right) &&
+               (global_settings.rec_linein_decimator_right_gain < 0) &&
+               (global_settings.rec_right_gain > sound_min(SOUND_RIGHT_GAIN)))
+            {
+               	/* if in analogue range cycle right digital gain for each */
+                global_settings.rec_right_gain--;
+                global_settings.rec_linein_decimator_right_gain =
+                                                            ana_line_size - 1;
+            }
+        }
+    }
+}
+#endif /* UDA1380 */
+
 bool recording_screen(void)
 {
     long button;
@@ -299,7 +491,6 @@ bool recording_screen(void)
     bool done = false;
     char buf[32];
     char buf2[32];
-    int gain;
     int w, h;
     int update_countdown = 1;
     bool have_recorded = false;
@@ -312,6 +503,22 @@ bool recording_screen(void)
 #if CONFIG_LED == LED_REAL
     bool led_state = false;
     int led_countdown = 2;
+#endif
+
+#ifdef HAVE_UDA1380
+/*calculate no. of digital steps to each analogue step. Assuming 
+  left dig step = right dig step, and there is an integer no. of digital steps 
+  in each analogue*/
+    int ana_mic_size = sound_val2phys(SOUND_MIC_GAIN, 1) / 
+                        sound_val2phys(SOUND_DECIMATOR_LEFT_GAIN, 1);
+    int ana_line_size = sound_val2phys(SOUND_LEFT_GAIN, 1) / 
+                        sound_val2phys(SOUND_DECIMATOR_LEFT_GAIN, 1);
+
+    if(global_settings.rec_source == SOURCE_MIC)
+    {
+        global_settings.rec_mic_decimator_left_gain =
+            global_settings.rec_mic_decimator_right_gain;
+    }
 #endif
 
     const unsigned char *byte_units[] = {
@@ -516,7 +723,7 @@ bool recording_screen(void)
                 update_countdown = 1; /* Update immediately */
                 break;
 #endif
-
+       
             case REC_INC:
             case REC_INC | BUTTON_REPEAT:
                 switch(cursor)
@@ -527,7 +734,20 @@ bool recording_screen(void)
                             global_settings.volume++;
                         sound_set_volume(global_settings.volume);
                         break;
-                        
+#ifdef HAVE_UDA1380
+                    case 1:
+                        change_recording_gain(true, true, true,
+                            ana_mic_size, ana_line_size);
+                        break;
+                    case 2:
+                        change_recording_gain(true, true, false,
+                            ana_mic_size, ana_line_size);
+                        break;
+                    case 3:
+                        change_recording_gain(true, false, true,
+                            ana_mic_size, ana_line_size);
+                        break;
+#else                        
                     case 1:
                         if(global_settings.rec_source == SOURCE_MIC)
                         {
@@ -537,12 +757,12 @@ bool recording_screen(void)
                         }
                         else
                         {
-                            gain = MAX(global_settings.rec_left_gain,
-                                       global_settings.rec_right_gain);
-                            if(gain < sound_max(SOUND_LEFT_GAIN))
-                                gain++;
-                            global_settings.rec_left_gain = gain;
-                            global_settings.rec_right_gain = gain;
+                            if(global_settings.rec_left_gain <
+                               sound_max(SOUND_LEFT_GAIN))
+                                global_settings.rec_left_gain++;
+                            if(global_settings.rec_right_gain <
+                               sound_max(SOUND_RIGHT_GAIN))
+                                global_settings.rec_right_gain++;
                         }
                         break;
                     case 2:
@@ -555,6 +775,7 @@ bool recording_screen(void)
                            sound_max(SOUND_RIGHT_GAIN))
                             global_settings.rec_right_gain++;
                         break;
+#endif
                 }
                 set_gain();
                 update_countdown = 1; /* Update immediately */
@@ -570,7 +791,23 @@ bool recording_screen(void)
                             global_settings.volume--;
                         sound_set_volume(global_settings.volume);
                         break;
-                        
+#ifdef HAVE_UDA1380
+                    case 1:
+                        /* both channels */
+                        change_recording_gain(false, true, true,
+                            ana_mic_size, ana_line_size);
+                        break;
+                    case 2:
+                        /* only left */
+                        change_recording_gain(false, true, false,
+                            ana_mic_size, ana_line_size);
+                        break;
+                    case 3:
+                        /* only right */
+                        change_recording_gain(false, false, true,
+                            ana_mic_size, ana_line_size);
+                        break;
+#else                        
                     case 1:
                         if(global_settings.rec_source == SOURCE_MIC)
                         {
@@ -580,12 +817,12 @@ bool recording_screen(void)
                         }
                         else
                         {
-                            gain = MAX(global_settings.rec_left_gain,
-                                       global_settings.rec_right_gain);
-                            if(gain > sound_min(SOUND_LEFT_GAIN))
-                                gain--;
-                            global_settings.rec_left_gain = gain;
-                            global_settings.rec_right_gain = gain;
+                            if(global_settings.rec_left_gain >
+                               sound_min(SOUND_LEFT_GAIN))
+                                global_settings.rec_left_gain--;
+                            if(global_settings.rec_right_gain >
+                               sound_min(SOUND_RIGHT_GAIN))
+                                global_settings.rec_right_gain--;
                         }
                         break;
                     case 2:
@@ -598,6 +835,7 @@ bool recording_screen(void)
                            sound_min(SOUND_RIGHT_GAIN))
                             global_settings.rec_right_gain--;
                         break;
+#endif
                 }
                 set_gain();
                 update_countdown = 1; /* Update immediately */
@@ -777,63 +1015,148 @@ bool recording_screen(void)
                 lcd_puts_style(0, 3, buf, STYLE_INVERT);
             else
                 lcd_puts(0, 3, buf);
+                
 
             if(global_settings.rec_source == SOURCE_MIC)
-            {
-                snprintf(buf, 32, "%s: %s", str(LANG_RECORDING_GAIN),
+            { 
+#ifdef HAVE_UDA1380
+
+                /*****************test info code***********************
+                snprintf(buf, 32, "Aa:(2x) %d DigL:(0.5x) %d ",
+                         global_settings.rec_mic_gain,
+                         global_settings.rec_mic_decimator_left_gain);
+                lcd_puts(0, 10, buf);
+                snprintf(buf, 32, "DigR:(0.5x) %d",
+                         global_settings.rec_mic_decimator_right_gain);
+                lcd_puts(9, 12, buf);
+                *****************test info code***********************/
+
+                snprintf(buf, 32, "%s:%s (%s)",
+                         str(LANG_RECORDING_GAIN),
+                         fmt_gain2(SOUND_MIC_GAIN,
+                                   global_settings.rec_mic_gain,
+                                   SOUND_DECIMATOR_LEFT_GAIN,
+                                   global_settings.rec_mic_decimator_left_gain,
+                                   buf2, sizeof(buf2)),
+                         (((global_settings.rec_mic_gain ==
+                            sound_max(SOUND_MIC_GAIN)) && 
+                           (global_settings.rec_mic_decimator_left_gain > 0))||
+                          ((global_settings.rec_mic_gain ==
+                            sound_min(SOUND_MIC_GAIN)) &&
+                           (global_settings.rec_mic_decimator_left_gain < 0)))?
+                         str(LANG_RECORDING_GAIN_DIGITAL) :
+                         str(LANG_RECORDING_GAIN_ANALOG)
+                        );
+#else /* HAVE_UDA1380 */
+                snprintf(buf, 32, "%s:%s", str(LANG_RECORDING_GAIN),
                          fmt_gain(SOUND_MIC_GAIN,
                                   global_settings.rec_mic_gain,
                                   buf2, sizeof(buf2)));
-                if (global_settings.invert_cursor && (pos++ == cursor))
+#endif
+                if(global_settings.invert_cursor && ((1==cursor)||(2==cursor)))
                     lcd_puts_style(0, 4, buf, STYLE_INVERT);
                 else
                     lcd_puts(0, 4, buf);
             }
-            else
+            else if(global_settings.rec_source == SOURCE_LINE)
             {
-                if(global_settings.rec_source == SOURCE_LINE)
-                {
-                    gain = MAX(global_settings.rec_left_gain,
-                               global_settings.rec_right_gain);
+#ifdef HAVE_UDA1380
 
-                    snprintf(buf, 32, "%s: %s", str(LANG_RECORDING_GAIN),
-                             fmt_gain(SOUND_LEFT_GAIN, gain,
-                                      buf2, sizeof(buf2)));
-                    if (global_settings.invert_cursor && (pos++ == cursor))
-                        lcd_puts_style(0, 4, buf, STYLE_INVERT);
-                    else
-                        lcd_puts(0, 4, buf);
+                /*****************test info code***********************
+                snprintf(buf, 32, "AL:(3x) %d DigL:(0.5x) %d",
+                         global_settings.rec_left_gain,
+                         global_settings.rec_linein_decimator_left_gain);
+                lcd_puts(0, 10, buf);
+                snprintf(buf, 32, "AR:(3x) %d DigR:(0.5x) %d",
+                         global_settings.rec_right_gain,
+                         global_settings.rec_linein_decimator_right_gain);
+                lcd_puts(0, 12, buf);
+                *****************test info code***********************/
 
-                    snprintf(buf, 32, "%s: %s", str(LANG_RECORDING_LEFT),
-                             fmt_gain(SOUND_LEFT_GAIN,
-                                      global_settings.rec_left_gain,
-                                      buf2, sizeof(buf2)));
-                    if (global_settings.invert_cursor && (pos++ == cursor))
-                        lcd_puts_style(0, 5, buf, STYLE_INVERT);
-                    else
-                        lcd_puts(0, 5, buf);
-
-                    snprintf(buf, 32, "%s: %s", str(LANG_RECORDING_RIGHT),
-                             fmt_gain(SOUND_RIGHT_GAIN,
-                                      global_settings.rec_right_gain,
-                                      buf2, sizeof(buf2)));
-                    if (global_settings.invert_cursor && (pos == cursor))
-                        lcd_puts_style(0, 6, buf, STYLE_INVERT);
-                    else
-                        lcd_puts(0, 6, buf);
-                }
+                snprintf(buf, 32, "%s:%s (%s)",
+                         str(LANG_RECORDING_LEFT),
+                         fmt_gain2(SOUND_LEFT_GAIN,
+                               global_settings.rec_left_gain,
+                               SOUND_DECIMATOR_LEFT_GAIN,
+                               global_settings.rec_linein_decimator_left_gain,
+                               buf2, sizeof(buf2)),
+                         (((global_settings.rec_left_gain == 
+                            sound_max(SOUND_LEFT_GAIN)) && 
+                           (global_settings.rec_linein_decimator_left_gain
+                                                                    > 0)) ||
+                          ((global_settings.rec_left_gain ==
+                            sound_min(SOUND_LEFT_GAIN)) &&
+                           (global_settings.rec_linein_decimator_left_gain
+                                                                    < 0))) ?
+                         str(LANG_RECORDING_GAIN_DIGITAL) :
+                         str(LANG_RECORDING_GAIN_ANALOG)
+                        );
+#else /* HAVE_UDA1380 */
+                snprintf(buf, 32, "%s:%s",
+                         str(LANG_RECORDING_LEFT),
+                         fmt_gain(SOUND_LEFT_GAIN,
+                                  global_settings.rec_left_gain,
+                                  buf2, sizeof(buf2)));
+#endif /* HAVE_UDA1380 */
+                if(global_settings.invert_cursor && ((1==cursor)||(2==cursor)))
+                    lcd_puts_style(0, 4, buf, STYLE_INVERT);
+                else
+                    lcd_puts(0, 4, buf);
+#ifdef HAVE_UDA1380
+                snprintf(buf, 32, "%s:%s (%s)",
+                         str(LANG_RECORDING_RIGHT),
+                         fmt_gain2(SOUND_RIGHT_GAIN,
+                               global_settings.rec_right_gain,
+                               SOUND_DECIMATOR_RIGHT_GAIN,
+                               global_settings.rec_linein_decimator_right_gain,
+                               buf2, sizeof(buf2)),
+                         (((global_settings.rec_right_gain ==
+                            sound_max(SOUND_RIGHT_GAIN)) && 
+                           (global_settings.rec_linein_decimator_right_gain
+                                                                    > 0)) ||
+                          ((global_settings.rec_right_gain ==
+                            sound_min(SOUND_RIGHT_GAIN)) &&
+                           (global_settings.rec_linein_decimator_right_gain
+                                                                    < 0))) ?
+                         str(LANG_RECORDING_GAIN_DIGITAL) :
+                         str(LANG_RECORDING_GAIN_ANALOG)
+                        );
+#else /* HAVE_UDA1380 */
+                snprintf(buf, 32, "%s:%s",
+                         str(LANG_RECORDING_RIGHT),
+                         fmt_gain(SOUND_RIGHT_GAIN,
+                                  global_settings.rec_right_gain,
+                                  buf2, sizeof(buf2)));
+#endif /* HAVE_UDA1380 */
+                if(global_settings.invert_cursor && ((1==cursor)||(3==cursor)))
+                    lcd_puts_style(0, 5, buf, STYLE_INVERT);
+                else
+                    lcd_puts(0, 5, buf);
+            }
+            switch(cursor)
+            {
+            case 1:
+                put_cursorxy(0, 4, true);
+                
+                if(global_settings.rec_source != SOURCE_MIC)
+                    put_cursorxy(0, 5, true);
+                
+                break;
+            case 2:
+                put_cursorxy(0, 4, true);
+                break;
+            case 3:
+                put_cursorxy(0, 5, true);
+                break;
+            default:
+                put_cursorxy(0, 0, true);
             }
 
-            put_cursorxy(0, 3 + cursor, true);
-            
-            if (global_settings.rec_source != SOURCE_LINE) {
-                snprintf(buf, 32, "%s %s [%d]",
-                         freq_str[global_settings.rec_frequency],
-                         global_settings.rec_channels?
-                         str(LANG_CHANNEL_MONO):str(LANG_CHANNEL_STEREO),
-                         global_settings.rec_quality);
-                lcd_puts(0, 6, buf);
-            }
+            snprintf(buf, 32, "%s %s",
+                     freq_str[global_settings.rec_frequency],
+                     global_settings.rec_channels?
+                     str(LANG_CHANNEL_MONO):str(LANG_CHANNEL_STEREO));
+            lcd_puts(0, 7, buf);
 
             gui_syncstatusbar_draw(&statusbars, true);
             peak_meter_draw(0, 8 + h*2, LCD_WIDTH, h);

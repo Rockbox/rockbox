@@ -3354,13 +3354,13 @@ voice: "Fade out mode"
 new:
 
 id: LANG_RECORDING_ADC_RIGHT
-desc: in the recording settings
+desc: DEPRECATED
 eng: "ADC Gain Right"
 voice: "ADC Gain Right"
 new:
 
 id: LANG_RECORDING_ADC_LEFT
-desc: in the recording settings
+desc: DEPRECATED
 eng: "ADC Gain Left"
 voice: "ADC Gain Left"
 new:
@@ -3707,3 +3707,14 @@ eng: "High Shelf Filter"
 voice: ""
 new:
 
+id: LANG_RECORDING_GAIN_ANALOG
+desc: in the recording screen
+eng: "A"
+voice: "Analog Gain"
+new:
+
+id: LANG_RECORDING_GAIN_DIGITAL
+desc: in the recording screen
+eng: "D"
+voice: "Digital Gain"
+new:

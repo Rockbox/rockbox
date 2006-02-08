@@ -357,7 +357,7 @@ bool radio_screen(void)
                             sound_default(SOUND_RIGHT_GAIN), AUDIO_GAIN_LINEIN);
 #else
     uda1380_enable_recording(false);
-    uda1380_set_recvol(10, 10, AUDIO_GAIN_ADC);
+    uda1380_set_recvol(10, 10, AUDIO_GAIN_DECIMATOR);
     uda1380_set_recvol(0, 0, AUDIO_GAIN_LINEIN);
     uda1380_set_monitor(true);
 

@@ -255,10 +255,10 @@ void uda1380_disable_recording(void)
 /**
  * Set recording gain and volume
  * 
- * type:             params:        ranges:
- * AUDIO_GAIN_MIC    left              0 .. 15 ->   0 .. 30 dB gain
- * AUDIO_GAIN_LINEIN left & right      0 ..  8 ->   0 .. 24 dB gain
- * AUDIO_GAIN_ADC    left & right   -128 .. 48 -> -64 .. 24 dB gain
+ * type:                    params:        ranges:
+ * AUDIO_GAIN_MIC           left              0 .. 15 ->   0 .. 30 dB gain
+ * AUDIO_GAIN_LINEIN        left & right      0 ..  8 ->   0 .. 24 dB gain
+ * AUDIO_GAIN_DECIMATOR     left & right   -128 .. 48 -> -64 .. 24 dB gain
  *
  * Note: For all types the value 0 gives 0 dB gain.
  */
@@ -274,7 +274,7 @@ void uda1380_set_recvol(int left, int right, int type)
             uda1380_write_reg(REG_PGA, (uda1380_regs[REG_PGA] & ~PGA_GAIN_MASK) | PGA_GAINL(left) | PGA_GAINR(right));
         break;
         
-        case AUDIO_GAIN_ADC:
+        case AUDIO_GAIN_DECIMATOR:
             uda1380_write_reg(REG_DEC_VOL, DEC_VOLL(left) | DEC_VOLR(right));
         break;
     }

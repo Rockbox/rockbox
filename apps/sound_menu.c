@@ -18,6 +18,7 @@
  ****************************************************************************/
 #include "config.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include "system.h"
 #include "kernel.h"
@@ -53,9 +54,15 @@ int selected_setting; /* Used by the callback */
 void dec_sound_formatter(char *buffer, int buffer_size, int val, const char * unit)
 {
     val = sound_val2phys(selected_setting, val);
+    char sign = ' ';
+    if(val < 0)
+    {
+        sign = '-';
+        val = abs(val);
+    }
     int integer = val / 10;
     int dec = val % 10;
-    snprintf(buffer, buffer_size, "%d.%d %s", integer, dec, unit);
+    snprintf(buffer, buffer_size, "%c%d.%d %s", sign, integer, dec, unit);
 }
 
 bool set_sound(const unsigned char * string,
@@ -237,6 +244,9 @@ static bool recchannels(void)
 
 static bool recquality(void)
 {
+#ifdef HAVE_UDA1380
+     (void)recquality();
+#endif
     return set_int(str(LANG_RECORDING_QUALITY), "", UNIT_INT,
                    &global_settings.rec_quality, 
                    NULL, 1, 0, 7, NULL );
@@ -248,21 +258,6 @@ static bool receditable(void)
                     &global_settings.rec_editable);
 }
 
-#ifdef HAVE_UDA1380
-static bool recadcleft(void)
-{
-    return set_sound(str(LANG_RECORDING_ADC_LEFT),
-                    &global_settings.rec_adc_left_gain,
-                    SOUND_ADC_LEFT_GAIN);
-}
-
-static bool recadcright(void)
-{
-    return set_sound(str(LANG_RECORDING_ADC_RIGHT),
-                    &global_settings.rec_adc_right_gain,
-                    SOUND_ADC_RIGHT_GAIN);
-}
-#endif
 
 static bool rectimesplit(void)
 {
@@ -791,8 +786,10 @@ bool recording_menu(bool no_source)
     struct menu_item items[13];
     bool result;
 
+#ifndef HAVE_UDA1380
     items[i].desc = ID2P(LANG_RECORDING_QUALITY);
     items[i++].function = recquality;
+#endif
     items[i].desc = ID2P(LANG_RECORDING_FREQUENCY);
     items[i++].function = recfrequency;
     if(!no_source) {
@@ -801,14 +798,6 @@ bool recording_menu(bool no_source)
     }
     items[i].desc = ID2P(LANG_RECORDING_CHANNELS);
     items[i++].function = recchannels;
-    
-#ifdef HAVE_UDA1380
-    items[i].desc = ID2P(LANG_RECORDING_ADC_LEFT);
-    items[i++].function = recadcleft;
-    items[i].desc = ID2P(LANG_RECORDING_ADC_RIGHT);
-    items[i++].function = recadcright;
-#endif
-
     items[i].desc = ID2P(LANG_RECORDING_EDITABLE);
     items[i++].function = receditable;
     items[i].desc = ID2P(LANG_RECORD_TIMESPLIT);
