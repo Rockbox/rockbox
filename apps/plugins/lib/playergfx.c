@@ -430,7 +430,7 @@ void pgfx_fillrect(int x, int y, int width, int height)
  *
  * This approximates the (even more strange) internal hardware format. */
 
-/* Draw a partial bitmap. Note that stride is given in bytes */
+/* Draw a partial bitmap. stride is given in pixels */
 void pgfx_bitmap_part(const unsigned char *src, int src_x, int src_y,
                       int stride, int x, int y, int width, int height)
 {
@@ -461,6 +461,8 @@ void pgfx_bitmap_part(const unsigned char *src, int src_x, int src_y,
         width = pixel_width - x;
     if (y + height > pixel_height)
         height = pixel_height - y;
+        
+    stride = (stride + 7) >> 3; /* convert to no. of bytes */
 
     src   += stride * src_y + (src_x >> 3); /* move starting point */  
     dst   = &gfx_buffer[pixel_height * (x/5) + y];
@@ -507,7 +509,7 @@ void pgfx_bitmap_part(const unsigned char *src, int src_x, int src_y,
 /* Draw a full bitmap */
 void pgfx_bitmap(const unsigned char *src, int x, int y, int width, int height)
 {
-    pgfx_bitmap_part(src, 0, 0, (width + 7) >> 3, x, y, width, height);
+    pgfx_bitmap_part(src, 0, 0, width, x, y, width, height);
 }
 
 #endif /* HAVE_LCD_CHARCELLS */
