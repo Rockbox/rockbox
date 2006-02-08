@@ -3257,3 +3257,430 @@ desc: repeat one song
 eng: "A-B"
 voice: "A-B"
 new:  "A-B"
+
+id: LANG_SHUFFLE_GAIN
+desc: use track gain if shuffle mode is on, album gain otherwise
+eng: "Track gain if shuffling"
+voice: "Track gain if shuffling"
+new: "Track gain tijdens schudden"
+
+id: LANG_DIRCACHE_ENABLE
+desc: in directory cache settings
+eng: "Directory cache"
+voice: "Directory cache"
+new: "Folder buffer"
+
+id: LANG_DIRCACHE_REBOOT
+desc: when activating directory cache
+eng: "Please reboot to enable the cache"
+voice: ""
+new: "Herstart om Folder Buffer te activeren"
+
+id: LANG_DIRCACHE_BUILDING
+desc: when booting up and rebuilding the cache
+eng: "Scanning disk..."
+voice: ""
+new: "Schijf wordt doorzocht..."
+
+id: LANG_CROSSFADE_ENABLE
+desc: in crossfade settings menu
+eng: "Enable crossfade"
+voice: "Enable crossfade"
+new: "Zet overvloeiing aan"
+
+id: LANG_CROSSFADE_FADE_IN_DELAY
+desc: in crossfade settings menu
+eng: "Fade in delay"
+voice: "Fade in delay"
+new: "Invloei vertraging"
+
+id: LANG_CROSSFADE_FADE_OUT_DELAY
+desc: in crossfade settings menu
+eng: "Fade out delay"
+voice: "Fade out delay"
+new: "Uitvloei vertraging"
+
+id: LANG_CROSSFADE_FADE_IN_DURATION
+desc: in crossfade settings menu
+eng: "Fade in duration"
+voice: "Fade in duration"
+new: "Invloei duur"
+
+id: LANG_CROSSFADE_FADE_OUT_DURATION
+desc: in crossfade settings menu
+eng: "Fade out duration"
+voice: "Fade out duration"
+new: "Uitvloei duur"
+
+id: LANG_CROSSFADE_FADE_OUT_MODE
+desc: in crossfade settings menu
+eng: "Fade out mode"
+voice: "Fade out mode"
+new: "Overvloei mode"
+
+id: LANG_RECORDING_ADC_RIGHT
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
+
+id: LANG_RECORDING_ADC_LEFT
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
+
+id: LANG_RECORDING_MONITOR
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
+
+id: LANG_RADIO_SCAN_MODE
+desc: in radio screen / menu
+eng: "Scan"
+voice: ""
+new: "Zoeken"
+
+id: LANG_RADIO_PRESET_MODE
+desc: in radio screen / menu
+eng: "Preset"
+voice: ""
+new: "Voorkeuze"
+
+id: LANG_FM_FREEZE
+desc: splash screen during freeze in radio mode
+eng: "Screen frozen!"
+voice: ""
+new: "Scherm geblokkeerd!"
+
+id: LANG_DEFAULT_CODEPAGE
+desc: default encoding used with id3 tags
+eng: "Default Codepage"
+voice:
+new: "Standaard codepagina"
+
+id: LANG_CODEPAGE_LATIN1
+desc: in codepage setting menu
+eng: "Latin1 (ISO-8859-1)"
+voice:
+new: "Latin1 (ISO-8859-1)"
+
+id: LANG_CODEPAGE_GREEK
+desc: in codepage setting menu
+eng: "Greek (ISO-8859-7)"
+voice:
+new: "Greek (ISO-8859-7)"
+
+id: LANG_CODEPAGE_HEBREW
+desc: in codepage setting menu
+eng: "Hebrew (ISO-8859-8)"
+voice:
+new: "Hebrew (ISO-8859-8)"
+
+id: LANG_CODEPAGE_RUSSIAN
+desc: in codepage setting menu
+eng: "Russian (CP1251)"
+voice:
+new: "Russian (CP1251)"
+
+id: LANG_CODEPAGE_THAI
+desc: in codepage setting menu
+eng: "Thai (ISO-8859-11)"
+voice:
+new: "Thai (ISO-8859-11)"
+
+id: LANG_CODEPAGE_ARABIC
+desc: in codepage setting menu
+eng: "Arabic (CP1256)"
+voice:
+new: "Arabic (CP1256)"
+
+id: LANG_CODEPAGE_TURKISH
+desc: in codepage setting menu
+eng: "Turkish (ISO-8859-9)"
+voice:
+new: "Turkish (ISO-8859-9)"
+
+id: LANG_CODEPAGE_LATIN_EXTENDED
+desc: in codepage setting menu
+eng: "Latin Extended (ISO-8859-2)"
+voice:
+new: "Latin Extended (ISO-8859-2)"
+
+id: LANG_CODEPAGE_JAPANESE
+desc: in codepage setting menu
+eng: "Japanese (SJIS)"
+voice:
+new: "Japanese (SJIS)"
+
+id: LANG_CODEPAGE_SIMPLIFIED
+desc: in codepage setting menu
+eng: "Simp. Chinese (GB2312)"
+voice:
+new: "Simp. Chinese (GB2312)"
+
+id: LANG_CODEPAGE_KOREAN
+desc: in codepage setting menu
+eng: "Korean (KSX1001)"
+voice:
+new: "Korean (KSX1001)"
+
+id: LANG_CODEPAGE_TRADITIONAL
+desc: in codepage setting menu
+eng: "Trad. Chinese (BIG5)"
+voice:
+new: "Trad. Chinese (BIG5)"
+
+id: LANG_CODEPAGE_UTF8
+decs: in codepage setting menu
+eng: "Unicode (UTF-8)"
+voice:
+new: "Unicode (UTF-8)"
+
+id: LANG_CROSSFEED_ENABLE
+desc: DEPRECATED
+eng: ""
+voice:
+new:
+
+id: LANG_CROSSFEED
+desc: in the sound settings menu
+eng: "Crossfeed"
+voice: "Crossfeed"
+new: "Crossfeed"
+
+id: LANG_FM_SCAN_PRESETS
+desc: in radio menu
+eng: "Auto scan presets"
+voice: "Auto scan presets"
+new: "Automatische voorkeuzes"
+
+id: LANG_FM_SCANNING
+desc: during auto scan
+eng: "Scanning %d.%01dMHz"
+voice: ""
+new: "Zoeken: %d.%01dMHz"
+
+id: LANG_FM_DEFAULT_PRESET_NAME
+desc: default preset name for auto scan mode
+eng: "%d.%01dMHz"
+voice:
+new: "%d.%01dMHz"
+
+id: LANG_FM_ADD_PRESET
+desc: in radio menu
+eng: "Add preset"
+voice: "Add preset"
+new: "Voorkeuze toevoegen"
+
+id: LANG_FM_CLEAR_PRESETS
+desc: confirmation if presets can be cleared
+eng: "Clear current presets?"
+voice: ""
+new: "Voorkeuzes wissen?"
+
+id: LANG_WAIT
+desc: general please wait splash
+eng: "Loading..."
+voice: 
+new: "Laden..."
+
+id: VOICE_EXT_RWPS
+desc: spoken only, for file extension
+eng: ""
+voice: "remote while-playing-screen"
+new: ""
+
+id: LANG_REMOTE_WHILE_PLAYING
+desc: in settings_menu()
+eng: "Browse .rwps files"
+voice: "Browse remote while-playing-screen files"
+new: "Doorzoek .rwps bestanden"
+
+id: LANG_CUSTOM_THEME
+desc: Custom themes menu
+eng: "Browse Themes"
+voice: "Browse Themes"
+new: "Doorzoek Thema's"
+
+id: LANG_REDUCE_TICKING
+desc: in remote lcd settings menu
+eng: "Reduce ticking"
+voice: "Reduce ticking"
+new: "Reduceer tikken"
+
+id: LANG_FM_TUNE_MODE
+desc: in radio screen / menu
+eng: "Mode:"
+voice: ""
+new: "Mode:"
+
+id: LANG_BRIGHTNESS
+desc: in settings_menu
+eng: "Brightness"
+voice: "Brightness"
+new: "Helderheid"
+
+id: LANG_SCREEN_SCROLL_VIEW
+desc: should lines scroll out of the screen
+eng: "Screen Scrolls Out Of View"
+voice: "Screen Scrolls Out Of View"
+new: "Scherm shuift uit beeld"
+
+id: LANG_SCREEN_SCROLL_STEP
+desc: Pixels to advance per Screen scroll
+eng: "Screen Scroll Step Size"
+voice: "Screen Scroll Step Size"
+new:"Scherm schuif stap"
+
+id: LANG_QUEUE_SHUFFLED
+desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
+eng: "Queue shuffled"
+voice: "Queue shuffled"
+new: "Lijst schudden"
+
+id: LANG_CLEAR_BACKDROP
+desc: text for LCD settings menu
+eng: "Clear backdrop"
+voice: "Clear backdrop"
+new: "Achtergrond wissen"
+
+id: LANG_SET_AS_BACKDROP
+desc: text for onplay menu entry
+eng: "Set as backdrop"
+voice: "Set as backdrop"
+new: "Kies als achtergrond"
+
+id: LANG_BACKDROP_LOADED
+desc: text for splash to indicate a new backdrop has been loaded successfully
+eng: "Backdrop loaded"
+voice: "Backdrop loaded"
+new: "Achtergrond geladen"
+
+id: LANG_BACKDROP_FAILED
+desc: text for splash to indicate a failure to load a bitmap as backdrop
+eng: "Backdrop failed"
+voice: "Backdrop failed"
+new: "Achtergrond laden mislukt"
+
+id: LANG_WARN_ERASEDYNPLAYLIST_MENU
+desc: in playlist options menu, option to warn when erasing dynamic playlist
+eng: "Warn When Erasing Dynamic Playlist"
+voice ""
+new: "Waarschuw bij wissen dynamische speellijst"
+
+id: LANG_WARN_ERASEDYNPLAYLIST_PROMPT
+desc: prompt shown when about to erase a modified dynamic playlist
+eng: "Erase dynamic playlist?"
+voice ""
+new: "Dynamische speellijst wissen?"
+
+id: LANG_EQUALIZER
+desc: in the sound settings menu
+eng: "Equalizer"
+voice: "Equalizer"
+new: "Equalizer"
+
+id: LANG_EQUALIZER_ENABLED
+desc: in the equalizer settings menu
+eng: "Enable EQ"
+voice: "Enable EQ"
+new: "EQ Aanzetten"
+
+id: LANG_EQUALIZER_GRAPHICAL
+desc: in the equalizer settings menu
+eng: "Graphical EQ"
+voice: "Graphical EQ"
+new: "Grafische EQ"
+
+id: LANG_EQUALIZER_GAIN
+desc: in the equalizer settings menu
+eng: "Simple EQ Settings"
+voice: "Simple EQ Settings"
+new: "Eenvoudige EQ instellingen"
+
+id: LANG_EQUALIZER_ADVANCED
+desc: in the equalizer settings menu
+eng: "Advanced EQ Settings"
+voice: "Advanced EQ Settings"
+new: "Geavanceerde EQ instellingen"
+
+id: LANG_EQUALIZER_SAVE
+desc: in the equalizer settings menu
+eng: "Save EQ Preset"
+voice: "Save EQ Preset"
+new: "EQ voorkeuze bewaren"
+
+id: LANG_EQUALIZER_BROWSE
+desc: in the equalizer settings menu
+eng: "Browse EQ Presets"
+voice: "Browse EQ Presets"
+new: "Doorzoek EQ voorkeuzes"
+
+id: LANG_EQUALIZER_GAIN_ITEM
+desc: in the equalizer settings menu
+eng: "%d Hz Band Gain"
+voice: ""
+new: "%d Hz Band Versterking"
+
+id: LANG_EQUALIZER_BAND_CUTOFF
+desc: in the equalizer settings menu
+eng: "Cutoff Frequency"
+voice: "Cutoff Frequency"
+new: "Afsnij frequentie"
+
+id: LANG_EQUALIZER_BAND_CENTER
+desc: in the equalizer settings menu
+eng: "Center Frequency"
+voice: "Center frequency"
+new: "Center frequentie"
+
+id: LANG_EQUALIZER_BAND_Q
+desc: in the equalizer settings menu
+eng: "Q"
+voice: "Q"
+new: "Q"
+
+id: LANG_EQUALIZER_BAND_GAIN
+desc: in the equalizer settings menu
+eng: "Gain"
+voice: "Gain"
+new: "Gain"
+
+id: LANG_EQUALIZER_EDIT_MODE
+desc: in the equalizer settings menu
+eng: "Edit mode: %s"
+voice: ""
+new: "Editeer mode: %s"
+
+id: LANG_EQUALIZER_BAND_LOW_SHELF
+desc: in the equalizer settings menu
+eng: "Low Shelf Filter"
+voice: ""
+new: "Laagste band filter"
+
+id: LANG_EQUALIZER_BAND_PEAK
+desc: in the equalizer settings menu
+eng: "Peak Filter %d"
+voice: ""
+new: "Piek filter"
+
+id: LANG_EQUALIZER_BAND_HIGH_SHELF
+desc: in the equalizer settings menu
+eng: "High Shelf Filter"
+voice: ""
+new: "Hoogste band filter"
+
+id: LANG_RECORDING_GAIN_ANALOG
+desc: in the recording screen
+eng: "A"
+voice: "Analog Gain"
+new: "A"
+
+id: LANG_RECORDING_GAIN_DIGITAL
+desc: in the recording screen
+eng: "D"
+voice: "Digital Gain"
+new: "D"
+
