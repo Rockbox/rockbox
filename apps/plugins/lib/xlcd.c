@@ -297,7 +297,7 @@ void xlcd_color_bitmap_part(const unsigned char *src, int src_x, int src_y,
         }
         while (src_row < row_end);
 
-        src +=  stride;
+        src +=  3 * stride;
         dst += LCD_WIDTH;
     }
     while (src < src_end);
