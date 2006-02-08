@@ -71,15 +71,15 @@ void lcd_update_rect(int x_start, int y_start, int width, int height)
             Uint8 *p = (Uint8 *)lcd_surface->pixels + y * lcd_surface->pitch + x * bpp;
 
 #if LCD_DEPTH == 1
-            *(Uint8 *)p = ((lcd_framebuffer[y/8][x] >> (y & 7)) & 1);
+            *p = ((lcd_framebuffer[y/8][x] >> (y & 7)) & 1);
 #elif LCD_DEPTH == 2
-            *(Uint8 *)p = ((lcd_framebuffer[y/4][x] >> (2 * (y & 3))) & 3);
+            *p = ((lcd_framebuffer[y/4][x] >> (2 * (y & 3))) & 3);
 #elif LCD_DEPTH == 16
 #if LCD_PIXELFORMAT == RGB565SWAPPED
             unsigned bits = lcd_framebuffer[y][x];
-            *(Uint32 *)p = (bits >> 8) | (bits << 8);
+            *(Uint16 *)p = (bits >> 8) | (bits << 8);
 #else
-            *(Uint32 *)p = lcd_framebuffer[y][x];
+            *(Uint16 *)p = lcd_framebuffer[y][x];
 #endif
 #endif
         }
@@ -129,7 +129,7 @@ void lcd_remote_update_rect(int x_start, int y_start,
         {
             Uint8 *p = (Uint8 *)remote_surface->pixels + y * remote_surface->pitch + x * bpp;
 
-            *(Uint8 *)p = ((lcd_remote_framebuffer[y/8][x] >> (y & 7)) & 1);
+            *p = ((lcd_remote_framebuffer[y/8][x] >> (y & 7)) & 1);
         }
 
     SDL_UnlockSurface(remote_surface);
