@@ -129,7 +129,7 @@ void lcd_remote_update_rect(int x_start, int y_start,
         {
             Uint8 *p = (Uint8 *)remote_surface->pixels + y * remote_surface->pitch + x * bpp;
 
-            *(Uint32 *)p = ((lcd_remote_framebuffer[y/8][x] >> (y & 7)) & 1);
+            *(Uint8 *)p = ((lcd_remote_framebuffer[y/8][x] >> (y & 7)) & 1);
         }
 
     SDL_UnlockSurface(remote_surface);
