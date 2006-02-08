@@ -238,6 +238,78 @@ void xlcd_gray_bitmap(const unsigned char *src, int x, int y, int width,
     xlcd_gray_bitmap_part(src, 0, 0, width, x, y, width, height);
 }
 
+#ifdef HAVE_LCD_COLOR
+/* Draw a partial colour bitmap, canonical 24 bit RGB format */
+void xlcd_color_bitmap_part(const unsigned char *src, int src_x, int src_y,
+                            int stride, int x, int y, int width, int height)
+{
+    const unsigned char *src_end;
+    fb_data *dst;
+
+    /* nothing to draw? */
+    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT) 
+        || (x + width <= 0) || (y + height <= 0))
+        return;
+        
+    /* clipping */
+    if (x < 0)
+    {
+        width += x;
+        src_x -= x;
+        x = 0;
+    }
+    if (y < 0)
+    {
+        height += y;
+        src_y -= y;
+        y = 0;
+    }
+    if (x + width > LCD_WIDTH)
+        width = LCD_WIDTH - x;
+    if (y + height > LCD_HEIGHT)
+        height = LCD_HEIGHT - y;
+
+    src    += 3 * (stride * src_y + src_x); /* move starting point */
+    src_end = src + 3 * stride * height;
+    dst     = local_rb->lcd_framebuffer + LCD_WIDTH * y + x;
+
+    do
+    {
+        const unsigned char *src_row = src;
+        const unsigned char *row_end = src_row + 3 * width;
+        fb_data *dst_row = dst;
+
+        do
+        {   /* only RGB565 and RGB565SWAPPED so far */
+            unsigned red   = 31 * (*src_row++) + 127;
+            unsigned green = 63 * (*src_row++) + 127;
+            unsigned blue  = 31 * (*src_row++) + 127;
+
+            red   = (red + (red >> 8)) >> 8;     /* approx red /= 255: */
+            green = (green + (green >> 8)) >> 8; /* approx green /= 255: */
+            blue  = (blue + (blue >> 8)) >> 8;   /* approx blue /= 255: */
+
+#if LCD_PIXELFORMAT == RGB565
+            *dst_row++ = (red << 11) | (green << 5) | blue;
+#elif LCD_PIXELFORMAT == RGB565SWAPPED
+            *dst_row++ = swap16((red << 11) | (green << 5) | blue);
+#endif
+        }
+        while (src_row < row_end);
+
+        src +=  stride;
+        dst += LCD_WIDTH;
+    }
+    while (src < src_end);
+}
+
+/* Draw a full colour bitmap, canonical 24 bit RGB format */
+void xlcd_color_bitmap(const unsigned char *src, int x, int y, int width,
+                       int height)
+{
+    xlcd_color_bitmap_part(src, 0, 0, width, x, y, width, height);
+}
+#endif /* HAVE_LCD_COLOR */
 
 void xlcd_scroll_left(int count)
 {

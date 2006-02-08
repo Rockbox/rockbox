@@ -34,6 +34,12 @@ void xlcd_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
                            int stride, int x, int y, int width, int height);
 void xlcd_gray_bitmap(const unsigned char *src, int x, int y, int width,
                       int height);
+#ifdef HAVE_LCD_COLOR
+void xlcd_color_bitmap_part(const unsigned char *src, int src_x, int src_y,
+                            int stride, int x, int y, int width, int height);
+void xlcd_color_bitmap(const unsigned char *src, int x, int y, int width,
+                       int height);
+#endif
 #endif
 
 void xlcd_scroll_left(int count);
