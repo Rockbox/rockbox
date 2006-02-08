@@ -49,21 +49,21 @@
 struct Fileheader
 {
     unsigned short Type;          /* signature - 'BM' */
-    unsigned  long Size;          /* file size in bytes */
+    unsigned  int Size;          /* file size in bytes */
     unsigned short Reserved1;     /* 0 */
     unsigned short Reserved2;     /* 0 */
-    unsigned long  OffBits;       /* offset to bitmap */
-    unsigned long  StructSize;    /* size of this struct (40) */
-    unsigned long  Width;         /* bmap width in pixels */
-    unsigned long  Height;        /* bmap height in pixels */
+    unsigned int  OffBits;       /* offset to bitmap */
+    unsigned int  StructSize;    /* size of this struct (40) */
+    unsigned int  Width;         /* bmap width in pixels */
+    unsigned int  Height;        /* bmap height in pixels */
     unsigned short Planes;        /* num planes - always 1 */
     unsigned short BitCount;      /* bits per pixel */
-    unsigned long  Compression;   /* compression flag */
-    unsigned long  SizeImage;     /* image size in bytes */
-    long           XPelsPerMeter; /* horz resolution */
-    long           YPelsPerMeter; /* vert resolution */
-    unsigned long  ClrUsed;       /* 0 -> color table size */
-    unsigned long  ClrImportant;  /* important color count */
+    unsigned int  Compression;   /* compression flag */
+    unsigned int  SizeImage;     /* image size in bytes */
+    int           XPelsPerMeter; /* horz resolution */
+    int           YPelsPerMeter; /* vert resolution */
+    unsigned int  ClrUsed;       /* 0 -> color table size */
+    unsigned int  ClrImportant;  /* important color count */
 } STRUCT_PACKED;
 
 struct RGBQUAD
@@ -80,7 +80,7 @@ short readshort(void* value)
     return bytes[0] | (bytes[1] << 8);
 }
 
-int readlong(void* value)
+int readint(void* value)
 {
     unsigned char* bytes = (unsigned char*) value;
     return bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24);
@@ -101,8 +101,8 @@ unsigned char brightness(struct RGBQUAD color)
  ***************************************************************************/
 
 int read_bmp_file(char* filename,
-                  long *get_width,  /* in pixels */
-                  long *get_height, /* in pixels */
+                  int *get_width,  /* in pixels */
+                  int *get_height, /* in pixels */
                   struct RGBQUAD **bitmap)
 {
     struct Fileheader fh;
@@ -111,11 +111,11 @@ int read_bmp_file(char* filename,
     int fd = open(filename, O_RDONLY);
     unsigned short data;
     unsigned char *bmp;
-    long width, height;
-    long padded_width;
-    long size;
-    long row, col, i;
-    long numcolors, compression;
+    int width, height;
+    int padded_width;
+    int size;
+    int row, col, i;
+    int numcolors, compression;
     int depth;
 
     if (fd == -1)
@@ -131,7 +131,7 @@ int read_bmp_file(char* filename,
         return 2;
     }
     
-    compression = readlong(&fh.Compression);
+    compression = readint(&fh.Compression);
 
     if (compression != 0)
     {
@@ -144,7 +144,7 @@ int read_bmp_file(char* filename,
 
     if (depth <= 8)
     {
-        numcolors = readlong(&fh.ClrUsed);
+        numcolors = readint(&fh.ClrUsed);
         if (numcolors == 0)
             numcolors = 1 << depth;
 
@@ -157,8 +157,8 @@ int read_bmp_file(char* filename,
         }
     }
 
-    width = readlong(&fh.Width);
-    height = readlong(&fh.Height);
+    width = readint(&fh.Width);
+    height = readint(&fh.Height);
     padded_width = (width * depth / 8 + 3) & ~3; /* aligned 4-bytes boundaries */
 
     size = padded_width * height; /* read this many bytes */
@@ -172,13 +172,13 @@ int read_bmp_file(char* filename,
         return 5;
     }
 
-    if (lseek(fd, (off_t)readlong(&fh.OffBits), SEEK_SET) < 0)
+    if (lseek(fd, (off_t)readint(&fh.OffBits), SEEK_SET) < 0)
     {
         debugf("error - Can't seek to start of image data\n");
         close(fd);
         return 6;
     }
-    if (read(fd, (unsigned char*)bmp, (long)size) != size)
+    if (read(fd, (unsigned char*)bmp, (int)size) != size)
     {
         debugf("error - Can't read image\n");
         close(fd);
@@ -276,12 +276,12 @@ int read_bmp_file(char* filename,
  * destination formats
  ****************************************************************************/
 
-int transform_bitmap(const struct RGBQUAD *src, long width, long height,
-                     int format, unsigned short **dest, long *dst_width,
-                     long *dst_height)
+int transform_bitmap(const struct RGBQUAD *src, int width, int height,
+                     int format, unsigned short **dest, int *dst_width,
+                     int *dst_height)
 {
-    long row, col;
-    long dst_w, dst_h;
+    int row, col;
+    int dst_w, dst_h;
 
     switch (format)
     {
@@ -395,12 +395,12 @@ int transform_bitmap(const struct RGBQUAD *src, long width, long height,
  * some #define's
  ****************************************************************************/
 
-void generate_c_source(char *id, long width, long height,
-                       const unsigned short *t_bitmap, long t_width,
-                       long t_height, int format)
+void generate_c_source(char *id, int width, int height,
+                       const unsigned short *t_bitmap, int t_width,
+                       int t_height, int format)
 {
     FILE *f;
-    long i, a;
+    int i, a;
 
     f = stdout;
 
@@ -439,10 +439,10 @@ void generate_c_source(char *id, long width, long height,
  * Outputs an ascii picture of the bitmap
  ****************************************************************************/
 
-void generate_ascii(long width, long height, struct RGBQUAD *bitmap)
+void generate_ascii(int width, int height, struct RGBQUAD *bitmap)
 {
     FILE *f;
-    long x, y;
+    int x, y;
 
     f = stdout;
 
@@ -482,8 +482,8 @@ int main(int argc, char **argv)
     int format = 0;
     struct RGBQUAD *bitmap = NULL;
     unsigned short *t_bitmap = NULL;
-    long width, height;
-    long t_width, t_height;
+    int width, height;
+    int t_width, t_height;
 
 
     for (i = 1;i < argc;i++)

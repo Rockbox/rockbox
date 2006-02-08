@@ -42,13 +42,13 @@ struct font {
     int		firstchar;	/* first character in bitmap*/
     int		size;		/* font size in glyphs*/
     bitmap_t*	bits;		/* 16-bit right-padded bitmap data*/
-    unsigned long* offset;	/* offsets into bitmap data*/
+    unsigned int* offset;	/* offsets into bitmap data*/
     unsigned char* width;	/* character widths or NULL if fixed*/
     int		defaultchar;	/* default char (not glyph index)*/
-    long	bits_size;	/* # words of bitmap_t bits*/
+    int	bits_size;	/* # words of bitmap_t bits*/
     
     /* unused by runtime system, read in by convbdf*/
-    unsigned long* offrot;	/* offsets into rotated bitmap data*/
+    unsigned int* offrot;	/* offsets into rotated bitmap data*/
     char *	name;		/* font name*/
     char *	facename;	/* facename of font*/
     char *	copyright;	/* copyright info for loadable fonts*/
@@ -435,8 +435,8 @@ int bdf_read_header(FILE *fp, struct font* pf)
 
     /* allocate bits, offset, and width arrays*/
     pf->bits = (bitmap_t *)malloc(pf->bits_size * sizeof(bitmap_t) + EXTRA);
-    pf->offset = (unsigned long *)malloc(pf->size * sizeof(unsigned long));
-    pf->offrot = (unsigned long *)malloc(pf->size * sizeof(unsigned long));
+    pf->offset = (unsigned int *)malloc(pf->size * sizeof(unsigned int));
+    pf->offrot = (unsigned int *)malloc(pf->size * sizeof(unsigned int));
     pf->width = (unsigned char *)malloc(pf->size * sizeof(unsigned char));
 	
     if (!pf->bits || !pf->offset || !pf->offrot || !pf->width) {
@@ -451,14 +451,14 @@ int bdf_read_header(FILE *fp, struct font* pf)
 /* read bdf font bitmaps, return 0 on error*/
 int bdf_read_bitmaps(FILE *fp, struct font* pf)
 {
-    long ofs = 0;
-    long ofr = 0;
+    int ofs = 0;
+    int ofr = 0;
     int maxwidth = 0;
     int i, k, encoding, width;
     int bbw, bbh, bbx, bby;
     int proportional = 0;
     int encodetable = 0;
-    long l;
+    int l;
     char buf[256];
 
     /* reset file pointer*/
@@ -511,7 +511,7 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
                 continue;
 
             /* set bits offset in encode map*/
-            if (pf->offset[encoding-pf->firstchar] != (unsigned long)-1) {
+            if (pf->offset[encoding-pf->firstchar] != (unsigned int)-1) {
                 fprintf(stderr, "Error: duplicate encoding for character %d (0x%02x), ignoring duplicate\n",
                         encoding, encoding);
                 continue;
@@ -589,7 +589,7 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
     for (i=0; i<pf->size; ++i) {
         int defchar = pf->defaultchar - pf->firstchar;
 
-        if (pf->offset[i] == (unsigned long)-1) {
+        if (pf->offset[i] == (unsigned int)-1) {
             pf->offset[i] = pf->offset[defchar];
             pf->offrot[i] = pf->offrot[defchar];
             pf->width[i] = pf->width[defchar];
@@ -983,7 +983,7 @@ static int writeshort(FILE *fp, unsigned short s)
     return putc(s>>8, fp) != EOF;
 }
 
-static int writelong(FILE *fp, unsigned long l)
+static int writeint(FILE *fp, unsigned int l)
 {
     putc(l, fp);
     putc(l>>8, fp);
@@ -1041,14 +1041,14 @@ int gen_fnt_file(struct font* pf, char *path)
     writeshort(ofp, pf->height);
     writeshort(ofp, pf->ascent);
     writeshort(ofp, 0);
-    writelong(ofp, pf->firstchar);
-    writelong(ofp, pf->defaultchar);
-    writelong(ofp, pf->size);
+    writeint(ofp, pf->firstchar);
+    writeint(ofp, pf->defaultchar);
+    writeint(ofp, pf->size);
 
     /* variable font data sizes*/
-    writelong(ofp, pf->bits_size);		  /* # words of bitmap_t*/
-    writelong(ofp, pf->offset? pf->size: 0);  /* # longs of offset*/
-    writelong(ofp, pf->width? pf->size: 0);	  /* # bytes of width*/
+    writeint(ofp, pf->bits_size);		  /* # words of bitmap_t*/
+    writeint(ofp, pf->offset? pf->size: 0);  /* # ints of offset*/
+    writeint(ofp, pf->width? pf->size: 0);	  /* # bytes of width*/
     /* variable font data*/
 #ifdef ROTATE
     for (i=0; i<pf->size; ++i)
@@ -1083,7 +1083,7 @@ int gen_fnt_file(struct font* pf, char *path)
     }
     else
     {
-        /* bitmap offset is large then 64K, use unsigned long for offset */
+        /* bitmap offset is large then 64K, use unsigned int for offset */
         while (ftell(ofp) & 3)
             writebyte(ofp, 0);          /* pad to 32-bit boundary*/
     }
@@ -1095,7 +1095,7 @@ int gen_fnt_file(struct font* pf, char *path)
             if ( pf->bits_size < 0xFFDB )
                 writeshort(ofp, pf->offrot[i]);
             else
-                writelong(ofp, pf->offrot[i]);
+                writeint(ofp, pf->offrot[i]);
         }
     }
 
@@ -1110,7 +1110,7 @@ int gen_fnt_file(struct font* pf, char *path)
 
     if (pf->offset)
         for (i=0; i<pf->size; ++i)
-            writelong(ofp, pf->offset[i]);
+            writeint(ofp, pf->offset[i]);
 
     if (pf->width)
         for (i=0; i<pf->size; ++i)
