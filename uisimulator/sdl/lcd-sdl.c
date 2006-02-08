@@ -71,9 +71,9 @@ void lcd_update_rect(int x_start, int y_start, int width, int height)
             Uint8 *p = (Uint8 *)lcd_surface->pixels + y * lcd_surface->pitch + x * bpp;
 
 #if LCD_DEPTH == 1
-            *(Uint32 *)p = ((lcd_framebuffer[y/8][x] >> (y & 7)) & 1);
+            *(Uint8 *)p = ((lcd_framebuffer[y/8][x] >> (y & 7)) & 1);
 #elif LCD_DEPTH == 2
-            *(Uint32 *)p = ((lcd_framebuffer[y/4][x] >> (2 * (y & 3))) & 3);
+            *(Uint8 *)p = ((lcd_framebuffer[y/4][x] >> (2 * (y & 3))) & 3);
 #elif LCD_DEPTH == 16
 #if LCD_PIXELFORMAT == RGB565SWAPPED
             unsigned bits = lcd_framebuffer[y][x];
