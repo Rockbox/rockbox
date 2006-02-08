@@ -303,10 +303,12 @@ whichsim () {
 if [ -z "$simver" ]; then
 
   ##################################################################
-  # Figure out win32/x11 GUI
+  # Figure out what simulator version
+  #
+  # x11 is deprecated so hide it from the question
   #
   echo ""
-  echo "Build (W)in32 or (X)11 or (S)DL GUI version? (S)"
+  echo "Build (W)in32 or (S)DL version? (S)"
 
   option=`input`;
 
