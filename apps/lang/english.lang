@@ -3355,14 +3355,14 @@ new:
 
 id: LANG_RECORDING_ADC_RIGHT
 desc: DEPRECATED
-eng: "ADC Gain Right"
-voice: "ADC Gain Right"
+eng: ""
+voice: ""
 new:
 
 id: LANG_RECORDING_ADC_LEFT
 desc: DEPRECATED
-eng: "ADC Gain Left"
-voice: "ADC Gain Left"
+eng: ""
+voice: ""
 new:
 
 id: LANG_RECORDING_MONITOR
