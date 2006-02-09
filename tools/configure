@@ -852,8 +852,19 @@ fi
 ##################################################################
 # Figure out build "type"
 #
+
+  # the ifp7x0 is the only platform that supports building a gdb stub like
+  # this
+  case $archos in
+    ifp7xx)
+       gdbstub="(G)DB stub, "
+       ;;
+    *)
+       ;;
+  esac
+
   echo ""
-  echo "Build (N)ormal, (D)evel, (S)imulator, (B)ootloader, (G)DB stub, (M)anual? (N)"
+  echo "Build (N)ormal, (D)evel, (S)imulator, (B)ootloader, $gdbstub(M)anual? (N)"
 
   option=`input`;
 
