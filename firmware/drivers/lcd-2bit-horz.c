@@ -84,7 +84,7 @@ void lcd_init(void)
 
 int lcd_default_contrast(void)
 {
-    return 96;
+    return 40;
 }
 
 /*** parameter handling ***/

@@ -158,9 +158,13 @@ void lcd_update(void)
     lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
 }
 
+/* Rockbox stores the contrast as 0..63 - we add 64 to it */
 void lcd_set_contrast(int val)
 {
-    lcd_cmd_and_data(0x4, 0x4, val);
+    if (val < 0) val = 0;
+    else if (val > 63) val = 63;
+
+    lcd_cmd_and_data(0x4, 0x4, val + 64);
     lcd_contrast = val;
 }
 
