@@ -143,6 +143,7 @@ static void new_playlist(struct playlist_info* playlist, const char *dir,
                          const char *file);
 static void create_control(struct playlist_info* playlist);
 static int  check_control(struct playlist_info* playlist);
+static int  recreate_control(struct playlist_info* playlist);
 static void update_playlist_filename(struct playlist_info* playlist,
                                      const char *dir, const char *file);
 static int add_indices_to_playlist(struct playlist_info* playlist,
@@ -317,6 +318,107 @@ static int check_control(struct playlist_info* playlist)
 
     if (playlist->control_fd < 0)
         return -1;
+
+    return 0;
+}
+
+/*
+ * recreate the control file based on current playlist entries
+ */
+static int recreate_control(struct playlist_info* playlist)
+{
+    char temp_file[MAX_PATH+1];
+    int  temp_fd = -1;
+    int  i;
+    int  result = 0;
+
+    if(playlist->control_fd >= 0)
+    {
+        char* dir = playlist->filename;
+        char* file = playlist->filename+playlist->dirlen;
+        char c = playlist->filename[playlist->dirlen-1];
+
+        close(playlist->control_fd);
+
+        snprintf(temp_file, sizeof(temp_file), "%s_temp",
+            playlist->control_filename);
+
+        if (rename(playlist->control_filename, temp_file) < 0)
+            return -1;
+
+        temp_fd = open(temp_file, O_RDONLY);
+        if (temp_fd < 0)
+            return -1;
+
+        playlist->control_fd = open(playlist->control_filename,
+            O_CREAT|O_RDWR|O_TRUNC);
+        if (playlist->control_fd < 0)
+            return -1;
+
+        playlist->filename[playlist->dirlen-1] = '\0';
+        
+        /* cannot call update_control() because of mutex */
+        result = fdprintf(playlist->control_fd, "P:%d:%s:%s\n",
+            PLAYLIST_CONTROL_FILE_VERSION, dir, file);
+
+        playlist->filename[playlist->dirlen-1] = c;
+
+        if (result < 0)
+        {
+            close(temp_fd);
+            return result;
+        }
+    }
+
+    playlist->seed = 0;
+    playlist->shuffle_modified = false;
+    playlist->deleted = false;
+    playlist->num_inserted_tracks = 0;
+
+    if (playlist->current)
+    {
+        global_settings.resume_seed = -1;
+        settings_save();
+    }
+
+    for (i=0; i<playlist->amount; i++)
+    {
+        if (playlist->indices[i] & PLAYLIST_INSERT_TYPE_MASK)
+        {
+            bool queue = playlist->indices[i] & PLAYLIST_QUEUE_MASK;
+            char inserted_file[MAX_PATH+1];
+
+            lseek(temp_fd, playlist->indices[i] & PLAYLIST_SEEK_MASK,
+                SEEK_SET);
+            read_line(temp_fd, inserted_file, sizeof(inserted_file));
+
+            result = fdprintf(playlist->control_fd, "%c:%d:%d:",
+                queue?'Q':'A', i, playlist->last_insert_pos);
+            if (result > 0)
+            {
+                /* save the position in file where name is written */
+                int seek_pos = lseek(playlist->control_fd, 0, SEEK_CUR);
+
+                result = fdprintf(playlist->control_fd, "%s\n",
+                    inserted_file);
+
+                playlist->indices[i] =
+                    (playlist->indices[i] & ~PLAYLIST_SEEK_MASK) | seek_pos;
+            }
+
+            if (result < 0)
+                break;
+
+            playlist->num_inserted_tracks++;
+        }
+    }
+
+    close(temp_fd);
+    remove(temp_file);
+    fsync(playlist->control_fd);
+
+    if (result < 0)
+        return result;
 
     return 0;
 }
@@ -1183,6 +1285,8 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
     }
     else if (max < 0)
     {
+        mutex_lock(&playlist->control_mutex);
+
         if (control_file)
             fd = playlist->control_fd;
         else
@@ -1195,17 +1299,14 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
         
         if(-1 != fd)
         {
-            if (control_file)
-                mutex_lock(&playlist->control_mutex);
             
             if (lseek(fd, seek, SEEK_SET) != seek)
                 max = -1;
             else
                 max = read(fd, tmp_buf, buf_length);
-            
-            if (control_file)
-                mutex_unlock(&playlist->control_mutex);
         }
+
+        mutex_unlock(&playlist->control_mutex);
 
         if (max < 0)
         {
@@ -3114,8 +3215,11 @@ int playlist_save(struct playlist_info* playlist, char *filename)
     int fd;
     int i, index;
     int count = 0;
+    char path[MAX_PATH+1];
     char tmp_buf[MAX_PATH+1];
     int result = 0;
+    bool overwrite_current = false;
+    int* index_buf = NULL;
 
     if (!playlist)
         playlist = &current_playlist;
@@ -3124,11 +3228,31 @@ int playlist_save(struct playlist_info* playlist, char *filename)
         return -1;
 
     /* use current working directory as base for pathname */
-    if (format_track_path(tmp_buf, filename, sizeof(tmp_buf),
+    if (format_track_path(path, filename, sizeof(tmp_buf),
                           strlen(filename)+1, getcwd(NULL, -1)) < 0)
         return -1;
 
-    fd = open(tmp_buf, O_CREAT|O_WRONLY|O_TRUNC);
+    if (!strncmp(playlist->filename, path, strlen(path)))
+    {
+        /* Attempting to overwrite current playlist file.*/
+
+        if (playlist->buffer_size < (int)(playlist->amount * sizeof(int)))
+        {
+            /* not enough buffer space to store updated indices */
+            gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_ACCESS_ERROR));
+            return -1;
+        }
+
+        /* in_ram buffer is unused for m3u files so we'll use for storing
+           updated indices */
+        index_buf = (int*)playlist->buffer;
+
+        /* use temporary pathname */
+        snprintf(path, sizeof(path), "%s_temp", playlist->filename);
+        overwrite_current = true;
+    }
+
+    fd = open(path, O_CREAT|O_WRONLY|O_TRUNC);
     if (fd < 0)
     {
         gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_ACCESS_ERROR));
@@ -3146,7 +3270,10 @@ int playlist_save(struct playlist_info* playlist, char *filename)
 
         /* user abort */
         if (button_get(false) == SETTINGS_CANCEL)
+        {
+            result = -1;
             break;
+        }
 
         control_file = playlist->indices[index] & PLAYLIST_INSERT_TYPE_MASK;
         queue = playlist->indices[index] & PLAYLIST_QUEUE_MASK;
@@ -3162,9 +3289,12 @@ int playlist_save(struct playlist_info* playlist, char *filename)
                 break;
             }
 
+            if (overwrite_current)
+                index_buf[count] = lseek(fd, 0, SEEK_CUR);
+
             if (fdprintf(fd, "%s\n", tmp_buf) < 0)
             {
-                gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_UPDATE_ERROR));
+                gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_ACCESS_ERROR));
                 result = -1;
                 break;
             }
@@ -3183,6 +3313,44 @@ int playlist_save(struct playlist_info* playlist, char *filename)
     display_playlist_count(count, str(LANG_PLAYLIST_SAVE_COUNT));
 
     close(fd);
+
+    if (overwrite_current && result >= 0)
+    {
+        result = -1;
+
+        mutex_lock(&playlist->control_mutex);
+
+        /* Replace the current playlist with the new one and update indices */
+        close(playlist->fd);
+        if (remove(playlist->filename) >= 0)
+        {
+            if (rename(path, playlist->filename) >= 0)
+            {
+                playlist->fd = open(playlist->filename, O_RDONLY);
+                if (playlist->fd >= 0)
+                {
+                    index = playlist->first_index;
+                    for (i=0, count=0; i<playlist->amount; i++)
+                    {
+                        if (!(playlist->indices[index] & PLAYLIST_QUEUE_MASK))
+                        {
+                            playlist->indices[index] = index_buf[count];
+                            count++;
+                        }
+                        index = (index+1)%playlist->amount;
+                    }
+
+                    /* we need to recreate control because inserted tracks are
+                       now part of the playlist and shuffle has been
+                       invalidated */
+                    result = recreate_control(playlist);
+                }
+            }
+       }
+
+       mutex_unlock(&playlist->control_mutex);
+
+    }
 
     return result;
 }

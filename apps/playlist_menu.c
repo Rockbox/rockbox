@@ -28,22 +28,11 @@
 #include "playlist_viewer.h"
 #include "talk.h"
 #include "lang.h"
+#include "playlist_menu.h"
 
-/* FIXME: there is a very similar function in onplay.c */
 static bool save_playlist(void)
 {
-    char filename[MAX_PATH+1];
-
-    strncpy(filename, DEFAULT_DYNAMIC_PLAYLIST_NAME, sizeof(filename));
-
-    if (!kbd_input(filename, sizeof(filename)))
-    {
-        playlist_save(NULL, filename);
-
-        /* reload in case playlist was saved to cwd */
-        reload_directory();
-    }
-
+    save_playlist_screen(NULL);
     return false;
 }
 
@@ -84,4 +73,27 @@ bool playlist_menu(void)
     result = menu_run(m);
     menu_exit(m);
     return result;
+}
+
+int save_playlist_screen(struct playlist_info* playlist)
+{
+    char* filename;
+    char temp[MAX_PATH+1];
+    int len;
+
+    filename = playlist_get_name(playlist, temp, sizeof(temp));
+
+    if (!filename || (len=strlen(filename)) <= 4 ||
+        strcasecmp(&filename[len-4], ".m3u"))
+        filename = DEFAULT_DYNAMIC_PLAYLIST_NAME;
+
+    if (!kbd_input(filename, sizeof(filename)))
+    {
+        playlist_save(playlist, filename);
+
+        /* reload in case playlist was saved to cwd */
+        reload_directory();
+    }
+
+    return 0;
 }

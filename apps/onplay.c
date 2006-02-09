@@ -61,6 +61,7 @@
 #if CONFIG_CODEC == SWCODEC
 #include "eq_menu.h"
 #endif
+#include "playlist_menu.h"
 
 static int context;
 static char* selected_file = NULL;
@@ -152,18 +153,7 @@ static bool shuffle_playlist(void)
 
 static bool save_playlist(void)
 {
-    char filename[MAX_PATH+1];
-
-    strncpy(filename, DEFAULT_DYNAMIC_PLAYLIST_NAME, sizeof(filename));
-
-    if (!kbd_input(filename, sizeof(filename)))
-    {
-        playlist_save(NULL, filename);
-
-        /* reload in case playlist was saved to cwd */
-        onplay_result = ONPLAY_RELOAD_DIR;
-    }
-
+    save_playlist_screen(NULL);
     return false;
 }
 

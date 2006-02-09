@@ -19,6 +19,9 @@
 #ifndef _PLAYLIST_MENU_H
 #define _PLAYLIST_MENU_H
 
+#include "playlist.h"
+
 bool playlist_menu(void);
+int save_playlist_screen(struct playlist_info* playlist);
 
 #endif

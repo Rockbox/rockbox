@@ -46,6 +46,7 @@
 #include "list.h"
 #include "statusbar.h"
 #include "splash.h"
+#include "playlist_menu.h"
 
 /* Maximum number of tracks we can have loaded at one time */
 #define MAX_PLAYLIST_ENTRIES 200
@@ -543,17 +544,7 @@ static bool track_display(void)
 /* Save playlist to disk */
 static bool save_playlist(void)
 {
-    char filename[MAX_PATH+1];
-
-    strncpy(filename, DEFAULT_VIEWER_PLAYLIST_NAME, sizeof(filename));
-
-    if (!kbd_input(filename, sizeof(filename)))
-    {
-        playlist_save(viewer.playlist, filename);
-        /* reload in case playlist was saved to cwd */
-        reload_directory();
-    }
-
+    save_playlist_screen(viewer.playlist);
     return false;
 }
 
