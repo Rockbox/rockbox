@@ -164,7 +164,7 @@ endif
 
 
 $(BUILDDIR)/$(BINARY) : $(OBJS) $(DEPFILE) $(BUILDDIR)/libsim.a \
-	$(BUILDDIR)/libcomsim.a $(LIBROCKBOX)
+	$(BUILDDIR)/libcomsim.a $(LIBROCKBOX) $(BITMAPLIBS)
 	@echo "LD $(BINARY)"
 	$(SILENT)$(CC) $(GCCOPTS) -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lsim -lcomsim $(LINKBITMAPS) $(LDOPTS) $(EXTRAOBJ) -Wl,-Map,$(OBJDIR)/rockbox.map
 

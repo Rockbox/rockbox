@@ -76,7 +76,7 @@ ifeq ($(SIMVER), x11)
 ###################################################
 # This is the X11 simulator version
 
-$(OBJDIR)/%.codec : $(OBJDIR)/%.o  $(BUILDDIR)/libcodec.a
+$(OBJDIR)/%.codec : $(OBJDIR)/%.o  $(BUILDDIR)/libcodec.a $(OUTPUT)
 	@echo "LD $(notdir $@)"
 	$(SILENT)$(CC) $(CFLAGS) -shared $^ -L$(BUILDDIR)  $(CODECLIBS) -lcodec -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
@@ -92,8 +92,8 @@ ifeq ($(SIMVER), sdl)
 ###################################################
 # This is the SDL simulator version
 
-$(OBJDIR)/%.codec : $(OBJDIR)/%.o  $(BUILDDIR)/libcodec.a
-	@echo "LD "`basename $@`
+$(OBJDIR)/%.codec : $(OBJDIR)/%.o  $(BUILDDIR)/libcodec.a $(OUTPUT)
+	@echo "LD $(notdir $@)"
 	$(SILENT)$(CC) $(CFLAGS) -shared $< -L$(BUILDDIR)  $(CODECLIBS) -lcodec -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
@@ -109,7 +109,7 @@ else	# end of sdl-simulator
 DLLTOOLFLAGS = --export-all
 DLLWRAPFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 -mno-cygwin
 
-$(OBJDIR)/%.codec : $(OBJDIR)/%.o  $(BUILDDIR)/libcodec.a
+$(OBJDIR)/%.codec : $(OBJDIR)/%.o  $(BUILDDIR)/libcodec.a $(OUTPUT)
 	@echo "DLL $(notdir $@)"
 	$(SILENT)$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $<
 	$(SILENT)$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< $(BUILDDIR)/libcodec.a \
