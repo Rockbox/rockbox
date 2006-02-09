@@ -46,23 +46,22 @@ OUTPUT = $(SOFTWARECODECS)
 all: $(ROCKS)
 
 ifndef SIMVER
-NULL =
-
-$(OBJDIR)/wav.elf : $(NULL)
-$(OBJDIR)/aiff.elf : $(NULL)
-$(OBJDIR)/mpa.elf : $(BUILDDIR)/libmad.a
-$(OBJDIR)/a52.elf : $(BUILDDIR)/liba52.a
-$(OBJDIR)/flac.elf : $(BUILDDIR)/libffmpegFLAC.a
-$(OBJDIR)/vorbis.elf : $(BUILDDIR)/libTremor.a
-$(OBJDIR)/mpc.elf : $(BUILDDIR)/libmusepack.a
-$(OBJDIR)/wavpack.elf : $(BUILDDIR)/libwavpack.a
-$(OBJDIR)/alac.elf : $(BUILDDIR)/libalac.a $(BUILDDIR)/libm4a.a
-$(OBJDIR)/aac.elf : $(BUILDDIR)/libfaad.a $(BUILDDIR)/libm4a.a
-$(OBJDIR)/shorten.elf : $(BUILDDIR)/libffmpegFLAC.a
+$(OBJDIR)/wav.elf : $(OBJDIR)/wav.o
+$(OBJDIR)/aiff.elf : $(OBJDIR)/aiff.o
+$(OBJDIR)/mpa.elf : $(OBJDIR)/mpa.o $(BUILDDIR)/libmad.a
+$(OBJDIR)/a52.elf : $(OBJDIR)/a52.o $(BUILDDIR)/liba52.a
+$(OBJDIR)/flac.elf : $(OBJDIR)/flac.o $(BUILDDIR)/libffmpegFLAC.a
+$(OBJDIR)/vorbis.elf : $(OBJDIR)/vorbis.o $(BUILDDIR)/libTremor.a
+$(OBJDIR)/mpc.elf : $(OBJDIR)/mpc.o $(BUILDDIR)/libmusepack.a
+$(OBJDIR)/wavpack.elf : $(OBJDIR)/wavpack.o $(BUILDDIR)/libwavpack.a
+$(OBJDIR)/alac.elf : $(OBJDIR)/alac.o $(BUILDDIR)/libalac.a $(BUILDDIR)/libm4a.a
+$(OBJDIR)/aac.elf : $(OBJDIR)/aac.o $(BUILDDIR)/libfaad.a $(BUILDDIR)/libm4a.a
+$(OBJDIR)/shorten.elf : $(OBJDIR)/shorten.o $(BUILDDIR)/libffmpegFLAC.a
 
 $(OBJDIR)/%.elf :
 	@echo "LD $(notdir $@)"
-	$(SILENT)$(CC) $(GCCOPTS) -O -nostdlib -o $@ $^ -L$(BUILDDIR) -lcodec -lgcc -T$(LINKCODEC) -Wl,-Map,$(OBJDIR)/$*.map
+	$(SILENT)$(CC) $(GCCOPTS) -O -nostdlib -o $@ $^ -L$(BUILDDIR) -lcodec \
+		-lgcc -T$(LINKCODEC) -Wl,-Map,$(OBJDIR)/$*.map
 
 $(BUILDDIR)/%.a : % $(CODECDEPS)
 	
@@ -78,7 +77,7 @@ ifeq ($(SIMVER), x11)
 
 $(OBJDIR)/%.codec : $(OBJDIR)/%.o  $(BUILDDIR)/libcodec.a $(OUTPUT)
 	@echo "LD $(notdir $@)"
-	$(SILENT)$(CC) $(CFLAGS) -shared $^ -L$(BUILDDIR)  $(CODECLIBS) -lcodec -o $@
+	$(SILENT)$(CC) $(CFLAGS) -shared $< -L$(BUILDDIR) $(CODECLIBS) -lcodec -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
@@ -94,7 +93,7 @@ ifeq ($(SIMVER), sdl)
 
 $(OBJDIR)/%.codec : $(OBJDIR)/%.o  $(BUILDDIR)/libcodec.a $(OUTPUT)
 	@echo "LD $(notdir $@)"
-	$(SILENT)$(CC) $(CFLAGS) -shared $< -L$(BUILDDIR)  $(CODECLIBS) -lcodec -o $@
+	$(SILENT)$(CC) $(CFLAGS) -shared $< -L$(BUILDDIR) $(CODECLIBS) -lcodec -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
@@ -112,8 +111,9 @@ DLLWRAPFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 -mno-cygwin
 $(OBJDIR)/%.codec : $(OBJDIR)/%.o  $(BUILDDIR)/libcodec.a $(OUTPUT)
 	@echo "DLL $(notdir $@)"
 	$(SILENT)$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $<
-	$(SILENT)$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< $(BUILDDIR)/libcodec.a \
-                $(patsubst -l%,$(BUILDDIR)/lib%.a,$(CODECLIBS)) -o $@
+	$(SILENT)$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< \
+		$(BUILDDIR)/libcodec.a $(patsubst -l%,$(BUILDDIR)/lib%.a,$(CODECLIBS)) \
+		-o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
