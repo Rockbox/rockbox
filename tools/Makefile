@@ -27,30 +27,31 @@ iaudio.o: iaudio.c
 sh2d: sh2d.c
 
 bmp2rb:	bmp2rb.c
-	$(CC) -DAPPLICATION_NAME=\"$@\" -g $+ -o $@
+	$(SILENT)$(CC) -DAPPLICATION_NAME=\"$@\" -g $+ -o $@
 
 rdf2binary:	rdf2binary.c
-	$(CC) -g $+ -o $@
+	$(SILENT)$(CC) -g $+ -o $@
 
 mkboot:	mkboot.c
-	$(CC) -g $+ -o $@
+	$(SILENT)$(CC) -g $+ -o $@
 
 ipod_fw:	ipod_fw.c
-	$(CC) -g $+ -o $@
+	$(SILENT)$(CC) -g $+ -o $@
 
 convbdf: convbdf.c
-	$(CC) -g $+ -o $@
+	$(SILENT)$(CC) -g $+ -o $@
 
 codepages: codepages.c codepage_tables.c
-	$(CC) -g $+ -o $@
+	$(SILENT)$(CC) -g $+ -o $@
 
 generate_rocklatin: generate_rocklatin.c ../firmware/drivers/lcd-player-charset.c 
-	$(CC) -DHAVE_LCD_CHARCELLS -D__CONFIG_H__ -I../firmware/export $+ -o $@
+	$(SILENT)$(CC) -DHAVE_LCD_CHARCELLS -D__CONFIG_H__ -I../firmware/export $+ -o $@
 
 uclpack:
-	$(MAKE) -C ucl
+	$(SILENT)$(MAKE) -C ucl
 
 clean:
-	rm -f $(CLEANALL) $(shell for f in $(CLEANALL) ; do echo $$f.exe $$f.o $$f.obj ; done) *.ajf *~
-	$(MAKE) -C ucl clean
+	@echo "Cleaning tools"
+	$(SILENT)rm -f $(CLEANALL) $(shell for f in $(CLEANALL) ; do echo $$f.exe $$f.o $$f.obj ; done) *.ajf *~
+	$(SILENT)$(MAKE) -C ucl clean
 

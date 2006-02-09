@@ -28,15 +28,15 @@ dep: $(DEPFILE)
 
 $(OUTPUT): $(OBJS) $(DEPFILE)
 	@echo "AR+RANLIB $@"
-	@$(AR) ruv $@ $(OBJS) >/dev/null 2>&1
-	@$(RANLIB) $@
+	$(SILENT)$(AR) ruv $@ $(OBJS) >/dev/null 2>&1
+	$(SILENT)$(RANLIB) $@
 
 include $(TOOLSDIR)/make.inc
 
 clean:
 	@echo "cleaning firmware"
-	@rm -f $(OBJS) $(OUTPUT) $(OBJDIR)/sysfont.c $(DEPFILE)
-	@rm -rf $(OBJDIR)/drivers $(OBJDIR)/common
+	$(SILENT)rm -f $(OBJS) $(OUTPUT) $(OBJDIR)/sysfont.c $(DEPFILE)
+	$(SILENT)rm -rf $(OBJDIR)/drivers $(OBJDIR)/common
 
 # Special targets
 $(OBJDIR)/thread.o: thread.c export/thread.h

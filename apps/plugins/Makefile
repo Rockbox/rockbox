@@ -70,29 +70,30 @@ endif
 
 
 .PHONY: $(SUBDIRS)
-all: build-bitmaps $(BUILDDIR)/libplugin.a $(ROCKS) $(SUBDIRS) $(DEPFILE)
+all: $(BUILDDIR)/libplugin.a $(ROCKS) $(SUBDIRS) $(DEPFILE)
 
 $(BUILDDIR)/credits.raw: $(DOCSDIR)/CREDITS
 	@echo "create credits.raw"
-	@perl credits.pl < $< > $@
+	$(SILENT)perl credits.pl < $< > $@
 
 $(OBJDIR)/credits.o: credits.c $(BUILDDIR)/credits.raw
-	@mkdir -p `dirname $@`
+	$(SILENT)mkdir -p $(dir $@)
 	@echo "CC $<"
-	@$(CC) $(CFLAGS) -I$(OBJDIR) -c $< -o $@
+	$(SILENT)$(CC) $(CFLAGS) -I$(OBJDIR) -c $< -o $@
 
 build-bitmaps:
-	@$(MAKE) -C bitmaps OBJDIR=$(OBJDIR)/bitmaps
+	$(SILENT)$(MAKE) -C bitmaps OBJDIR=$(OBJDIR)/bitmaps
+
+$(BITMAPLIBS): build-bitmaps
 
 ifndef SIMVER
 $(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKFILE) $(BUILDDIR)/libplugin.a $(BITMAPLIBS)
-	$(SILENT)(file=`basename $@`; \
-	echo "LD $$file"; \
-	$(CC) $(GCCOPTS) -O -nostdlib -o $@ $< -L$(BUILDDIR) $(CODECLIBS) -lplugin $(LINKBITMAPS) -lgcc -T$(LINKFILE) -Wl,--gc-sections -Wl,-Map,$(OBJDIR)/$*.map)
+	@echo "LD $(notdir $@)"
+	$(SILENT)$(CC) $(GCCOPTS) -O -nostdlib -o $@ $< -L$(BUILDDIR) $(CODECLIBS) -lplugin $(LINKBITMAPS) -lgcc -T$(LINKFILE) -Wl,--gc-sections -Wl,-Map,$(OBJDIR)/$*.map
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.elf
 	@echo "OBJCOPY "`basename $@`
-	@$(OC) -O binary $< $@
+	$(SILENT)$(OC) -O binary $< $@
 else
 
 ifeq ($(SIMVER), x11)
@@ -101,13 +102,13 @@ ifeq ($(SIMVER), x11)
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.o  $(BUILDDIR)/libplugin.a
 	@echo "LD "`basename $@`
-	@$(CC) $(CFLAGS) -shared $< -L$(BUILDDIR)  $(CODECLIBS) -lplugin $(LINKBITMAPS) -o $@
+	$(SILENT)$(CC) $(CFLAGS) -shared $< -L$(BUILDDIR)  $(CODECLIBS) -lplugin $(LINKBITMAPS) -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
 #         #define ERROR_ACCESS_DENIED 5L
 else
-	@chmod -x $@
+	$(SILENT)chmod -x $@
 endif
 
 else # end of x11-simulator
@@ -117,13 +118,13 @@ ifeq ($(SIMVER), sdl)
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.o  $(BUILDDIR)/libplugin.a
 	@echo "LD "`basename $@`
-	@$(CC) $(CFLAGS) -shared $< -L$(BUILDDIR)  $(CODECLIBS) -lplugin $(LINKBITMAPS) -o $@
+	$(SILENT)$(CC) $(CFLAGS) -shared $< -L$(BUILDDIR)  $(CODECLIBS) -lplugin $(LINKBITMAPS) -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
 #         #define ERROR_ACCESS_DENIED 5L
 else
-	@chmod -x $@
+	$(SILENT)chmod -x $@
 endif
 
 else # end of sdl-simulator
@@ -134,15 +135,15 @@ DLLWRAPFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 -mno-cygwin
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.o  $(BUILDDIR)/libplugin.a
 	@echo "DLL "`basename $@`
-	@$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $<
-	@$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< $(BUILDDIR)/libplugin.a $(BITMAPLIBS) \
+	$(SILENT)$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $<
+	$(SILENT)$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< $(BUILDDIR)/libplugin.a $(BITMAPLIBS) \
                 $(patsubst -l%,$(BUILDDIR)/lib%.a,$(CODECLIBS)) -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
 #         #define ERROR_ACCESS_DENIED 5L
 else
-	@chmod -x $@
+	$(SILENT)chmod -x $@
 endif
 endif # end of win32-simulator
 endif
@@ -159,26 +160,26 @@ $(BUILDDIR)/libplugin.a:
 $(BUILDDIR)/libpluginbitmapsnative.a:
 	@echo "MAKE in plugins/bitmaps/native"
 	$(SILENT)mkdir -p $(OBJDIR)/bitmaps/native
-	@$(MAKE) -C bitmaps/native OBJDIR=$(OBJDIR)/bitmaps/native
+	$(SILENT)$(MAKE) -C bitmaps/native OBJDIR=$(OBJDIR)/bitmaps/native
 
 $(BUILDDIR)/libpluginbitmapsmono.a:
 	@echo "MAKE in plugins/bitmaps/mono"
 	$(SILENT)mkdir -p $(OBJDIR)/bitmaps/mono
-	@$(MAKE) -C bitmaps/mono OBJDIR=$(OBJDIR)/bitmaps/mono
+	$(SILENT)$(MAKE) -C bitmaps/mono OBJDIR=$(OBJDIR)/bitmaps/mono
 
 $(BUILDDIR)/libpluginbitmapsremotenative.a:
 	@echo "MAKE in plugins/bitmaps/remote_native"
 	$(SILENT)mkdir -p $(OBJDIR)/bitmaps/remote_native
-	@$(MAKE) -C bitmaps/remote_native OBJDIR=$(OBJDIR)/bitmaps/remote_native
+	$(SILENT)$(MAKE) -C bitmaps/remote_native OBJDIR=$(OBJDIR)/bitmaps/remote_native
 
 $(BUILDDIR)/libpluginbitmapsremotemono.a:
 	@echo "MAKE in plugins/bitmaps/remote_mono"
 	$(SILENT)mkdir -p $(OBJDIR)/bitmaps/remote_mono
-	@$(MAKE) -C bitmaps/remote_mono OBJDIR=$(OBJDIR)/bitmaps/remote_mono
+	$(SILENT)$(MAKE) -C bitmaps/remote_mono OBJDIR=$(OBJDIR)/bitmaps/remote_mono
 
 $(LINKFILE): $(LDS)
 	@echo "build $@"
-	@cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P - >$@
+	$(SILENT)cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P - >$@
 
 $(SUBDIRS):
 	@echo "MAKE in $@"
@@ -187,14 +188,14 @@ $(SUBDIRS):
 
 clean:
 	@echo "cleaning plugins"
-	@rm -f $(ROCKS) $(LINKFILE) $(OBJDIR)/*.rock $(DEPFILE) $(ELFS) \
+	$(SILENT)rm -f $(ROCKS) $(LINKFILE) $(OBJDIR)/*.rock $(DEPFILE) $(ELFS) \
 	$(BUILDDIR)/credits.raw $(OBJS) $(DEFS)
-	@$(MAKE) -C lib clean OBJDIR=$(OBJDIR)/lib
-	@$(MAKE) -C bitmaps/mono clean OBJDIR=$(OBJDIR)/bitmaps/mono
-	@$(MAKE) -C bitmaps/native clean OBJDIR=$(OBJDIR)/bitmaps/native
-	@$(MAKE) -C bitmaps/remote_mono clean OBJDIR=$(OBJDIR)/bitmaps/remote_mono
-	@$(MAKE) -C bitmaps/remote_native clean OBJDIR=$(OBJDIR)/bitmaps/remote_native
-	@$(MAKE) -C rockboy clean OBJDIR=$(OBJDIR)/rockboy
-	@$(MAKE) -C searchengine clean OBJDIR=$(OBJDIR)/searchengine
+	$(SILENT)$(MAKE) -C lib clean OBJDIR=$(OBJDIR)/lib
+	$(SILENT)$(MAKE) -C bitmaps/mono clean OBJDIR=$(OBJDIR)/bitmaps/mono
+	$(SILENT)$(MAKE) -C bitmaps/native clean OBJDIR=$(OBJDIR)/bitmaps/native
+	$(SILENT)$(MAKE) -C bitmaps/remote_mono clean OBJDIR=$(OBJDIR)/bitmaps/remote_mono
+	$(SILENT)$(MAKE) -C bitmaps/remote_native clean OBJDIR=$(OBJDIR)/bitmaps/remote_native
+	$(SILENT)$(MAKE) -C rockboy clean OBJDIR=$(OBJDIR)/rockboy
+	$(SILENT)$(MAKE) -C searchengine clean OBJDIR=$(OBJDIR)/searchengine
 
 -include $(DEPFILE)

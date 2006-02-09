@@ -70,7 +70,7 @@ LIBROCKBOX = $(BUILDDIR)/librockbox.a
 ifdef SIMVER
 # this is a sim build
 
-all: build-bitmaps $(BUILDDIR)/$(BINARY) $(CODECS) $(ROCKS)
+all: $(BUILDDIR)/$(BINARY) $(CODECS) $(ROCKS)
 
 else
 # regular target build
@@ -82,7 +82,7 @@ else
 REALBIN = $(BUILDDIR)/$(BINARY)
 endif
 
-all: build-bitmaps $(REALBIN) $(FLASHFILE) $(CODECS) $(ROCKS) $(ARCHOSROM)
+all: $(REALBIN) $(FLASHFILE) $(CODECS) $(ROCKS) $(ARCHOSROM)
 endif
 
 dep: $(DEPFILE)
@@ -94,7 +94,9 @@ build-codecs:
 build-bitmaps:
 	@$(MAKE) -C bitmaps OBJDIR=$(OBJDIR)/bitmaps
 
-rocks:
+$(BITMAPLIBS): build-bitmaps
+	
+rocks: build-codecs
 	@$(MAKE) -C plugins/lib OBJDIR=$(OBJDIR)/plugins/lib
 	@$(MAKE) -C plugins  OBJDIR=$(OBJDIR)/plugins
 
