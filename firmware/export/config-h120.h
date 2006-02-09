@@ -14,6 +14,8 @@
 #define LCD_HEIGHT 128
 #define LCD_DEPTH  2
 
+#define LCD_PIXELFORMAT VERTICAL_PACKING
+
 /* remote LCD */
 #define LCD_REMOTE_WIDTH  128
 #define LCD_REMOTE_HEIGHT 64

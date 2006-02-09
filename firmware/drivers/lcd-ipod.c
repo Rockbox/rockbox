@@ -100,11 +100,6 @@ static void lcd_cmd_and_data(int cmd, int data_lo, int data_hi)
     lcd_send_data(data_lo, data_hi);
 }
 
-int lcd_default_contrast(void)
-{
-    return 96;
-}
-
 /** 
  * 
  * LCD init 

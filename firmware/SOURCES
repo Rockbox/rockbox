@@ -54,10 +54,12 @@ arabjoin.c
 bidi.c
 #if LCD_DEPTH == 1
 drivers/lcd-recorder.c
-#elif CONFIG_LCD==LCD_IPOD2BPP
-drivers/lcd-2bit-horz.c
 #elif LCD_DEPTH == 2
+#if (LCD_PIXELFORMAT == HORIZONTAL_PACKING)
+drivers/lcd-2bit-horz.c
+#else
 drivers/lcd-h100.c
+#endif
 #elif LCD_DEPTH == 16
 drivers/lcd-16bit.c
 #endif

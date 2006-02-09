@@ -3,6 +3,8 @@
  */
 #define APPLE_IPOD3G 1
 
+#define IPOD_ARCH 1
+
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 7
 
@@ -16,6 +18,8 @@
 #define LCD_WIDTH  160
 #define LCD_HEIGHT 128
 #define LCD_DEPTH  2   /* 4 colours - 2bpp */
+
+#define LCD_PIXELFORMAT HORIZONTAL_PACKING
 
 #define CONFIG_KEYPAD IPOD_3G_PAD
 

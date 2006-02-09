@@ -82,6 +82,11 @@ void lcd_init(void)
                   sizeof(scroll_stack), scroll_name);
 }
 
+int lcd_default_contrast(void)
+{
+    return 96;
+}
+
 /*** parameter handling ***/
 
 void lcd_set_drawmode(int mode)

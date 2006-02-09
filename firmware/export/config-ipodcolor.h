@@ -3,6 +3,8 @@
  */
 #define APPLE_IPODCOLOR 1
 
+#define IPOD_ARCH 1
+
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 3
 

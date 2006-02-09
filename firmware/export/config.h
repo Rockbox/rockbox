@@ -82,6 +82,8 @@
 #define LCD_IFP7XX   10 /* as used by iRiver iFP 7xx/8xx */
 
 /* LCD_PIXELFORMAT */
+#define HORIZONTAL_PACKING 1
+#define VERTICAL_PACKING 2
 #define RGB565 565
 #define RGB565SWAPPED 3553
 
