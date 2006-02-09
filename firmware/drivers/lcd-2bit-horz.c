@@ -412,6 +412,8 @@ void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
 {
     int ny, nx, ymax;
     const unsigned char * src_end;
+    lcd_pixelfunc_type* fgfunc;
+    lcd_pixelfunc_type* bgfunc;
 
     /* nothing to draw? */
     if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
@@ -439,7 +441,9 @@ void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
     src += stride * (src_y >> 3) + src_x; /* move starting point */
     src_y  &= 7;
     src_end = src + width;
-    
+
+    fgfunc = lcd_pixelfuncs[drawmode];    
+    bgfunc = lcd_pixelfuncs[drawmode ^ DRMODE_INVERSEVID];    
     nx = x;
     do
     {
@@ -452,9 +456,9 @@ void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
         do
         {
             if (data & 0x01)
-                setpixel (nx,ny);
+                fgfunc(nx,ny);
             else
-                clearpixel (nx,ny);
+                bgfunc(nx,ny);
 
             ny++;
 
