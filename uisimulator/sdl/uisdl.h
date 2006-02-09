@@ -175,6 +175,7 @@
 #endif
 
 extern SDL_Surface *gui_surface;
+extern bool background;  /* True if the background image is enabled */
 
 #endif // #ifndef __UISDL_H__
 

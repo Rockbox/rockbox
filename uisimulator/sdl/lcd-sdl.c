@@ -94,7 +94,11 @@ void lcd_update_rect(int x_start, int y_start, int width, int height)
     SDL_Rect src = {x_start, y_start, xmax, ymax};
     SDL_Rect dest = {UI_LCD_POSX + x_start, UI_LCD_POSY + y_start, xmax, ymax};
 
-
+    if (!background) {
+        dest.x -= UI_LCD_POSX;
+        dest.y -= UI_LCD_POSY;
+    }
+    
     SDL_BlitSurface(lcd_surface, &src, gui_surface, &dest);
     SDL_UpdateRect(gui_surface, dest.x, dest.y, dest.w, dest.h);
     SDL_Flip(gui_surface);
@@ -141,6 +145,12 @@ void lcd_remote_update_rect(int x_start, int y_start,
     SDL_Rect src = {x_start, y_start, xmax, ymax};
     SDL_Rect dest = {UI_REMOTE_POSX + x_start, UI_REMOTE_POSY + y_start, xmax, ymax};
 
+    if (!background) {
+        dest.x -= UI_REMOTE_POSX;
+        dest.y -= UI_REMOTE_POSY;
+        dest.y += UI_LCD_HEIGHT;
+    }
+
     SDL_BlitSurface(remote_surface, &src, gui_surface, &dest);
     SDL_UpdateRect(gui_surface, dest.x, dest.y, dest.w, dest.h);
     SDL_Flip(gui_surface);
@@ -176,12 +186,19 @@ void lcd_update(void)
             }
         }
     }
+
     if (changed)
     {
+        if (!background) {
+            dest.x -= UI_LCD_POSX;
+            dest.y -= UI_LCD_POSY;
+        }
+    
         SDL_BlitSurface(lcd_surface, NULL, gui_surface, &dest);
         SDL_UpdateRect(gui_surface, dest.x, dest.y, dest.w, dest.h);
         SDL_Flip(gui_surface);
     }
+
     lcd_display_redraw = false;
 }
 

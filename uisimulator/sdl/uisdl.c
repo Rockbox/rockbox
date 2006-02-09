@@ -18,6 +18,7 @@
  ****************************************************************************/
 
 #include <stdlib.h>
+#include <string.h>
 #include "autoconf.h"
 #include "uisdl.h"
 #include "button.h"
@@ -34,6 +35,7 @@ extern void                 sim_tick_tasks(void);
 void button_event(int key, bool pressed);
 
 SDL_Surface *gui_surface;
+bool background = false;        /* Don't use backgrounds by default */
 
 SDL_Thread *gui_thread;
 SDL_TimerID tick_timer_id;
@@ -94,6 +96,7 @@ void gui_message_loop(void)
 bool gui_startup()
 {
     SDL_Surface *picture_surface;
+    int width, height;
 
     if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_TIMER)) {
         fprintf(stderr, "fatal: %s", SDL_GetError());
@@ -102,25 +105,47 @@ bool gui_startup()
 
     atexit(SDL_Quit);
 
-    if ((gui_surface = SDL_SetVideoMode(UI_WIDTH, UI_HEIGHT, 24, SDL_HWSURFACE|SDL_DOUBLEBUF)) == NULL) {
-        fprintf(stderr, "fatal: %s", SDL_GetError());
+    /* Try and load the background image. If it fails go without */
+    if (background) {
+        picture_surface = SDL_LoadBMP("UI256.bmp");
+        if (picture_surface == NULL) {
+            background = false;
+            fprintf(stderr, "warn: %s", SDL_GetError());
+        }
+    }
+
+    /* Set things up */
+
+    if (background) {
+        width = UI_WIDTH;
+        height = UI_HEIGHT;
+    } else {
+#ifdef HAVE_REMOTE_LCD
+        width = UI_LCD_WIDTH > UI_REMOTE_WIDTH ? UI_LCD_WIDTH : UI_REMOTE_WIDTH;
+        height = UI_LCD_HEIGHT + UI_REMOTE_HEIGHT;
+#else
+        width = UI_LCD_WIDTH;
+        height = UI_LCD_HEIGHT;
+#endif
+    }
+   
+    
+    if ((gui_surface = SDL_SetVideoMode(width, height, 24, SDL_HWSURFACE|SDL_DOUBLEBUF)) == NULL) {
+        fprintf(stderr, "fatal: %s\n", SDL_GetError());
         return false;
     }
 
     SDL_WM_SetCaption(UI_TITLE, NULL);
 
     simlcdinit();
-		
+
     SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
-		
-    picture_surface = SDL_LoadBMP("UI256.bmp");
-    if (picture_surface == NULL) {
-        fprintf(stderr, "warn: %s", SDL_GetError());
-		                } else {
+
+    if (background && picture_surface != NULL) {
         SDL_BlitSurface(picture_surface, NULL, gui_surface, NULL);
         SDL_UpdateRect(gui_surface, 0, 0, 0, 0);
-		                }
-		
+    }
+    
     start_tick = SDL_GetTicks();
 
     return true;
@@ -156,8 +181,24 @@ int sim_app_main(void *param)
 
 int main(int argc, char *argv[])
 {
-    (void)argc;
-    (void)argv;
+    if (argc >= 1) {
+        int x;
+        for (x = 1; x < argc; x++) {
+            if (!strcmp("--background", argv[x])) {
+                background = true;
+                printf("Using background image.\n");
+            } else if (!strcmp("--old_lcd", argv[x])) {
+                having_new_lcd = false;
+                printf("Using old LCD layout.\n");
+            } else {
+                printf("rockboxui\n");
+                printf("Arguments:\n");
+                printf("  --background \t Use background image of hardware\n");
+                printf("  --old_lcd \t [Player] simulate old playermodel (ROM version<4.51)\n");
+                exit(0);
+            }
+        }
+    }
 
     if (!gui_startup())
         return -1;
