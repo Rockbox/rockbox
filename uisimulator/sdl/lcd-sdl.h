@@ -20,20 +20,18 @@
 #ifndef __LCDSDL_H__
 #define __LCDSDL_H__
 
-#include "uisdl.h"
 #include "lcd.h"
+#include "SDL.h"
 
-extern SDL_Surface*  lcd_surface;
-#if LCD_DEPTH <= 8
-extern SDL_Color   lcd_palette[(1<<LCD_DEPTH)];
-#endif
+/* Default display zoom level */
+extern int display_zoom;
 
-#ifdef HAVE_REMOTE_LCD
-extern SDL_Surface*  remote_surface;
-extern SDL_Color   remote_palette[(1<<LCD_REMOTE_DEPTH)];
-#endif
+void sdl_update_rect(SDL_Surface *surface, int x_start, int y_start, int width,
+    int height, int max_x, int max_y, int ui_x, int ui_y,
+    Uint32 (*getpixel)(int, int));
 
-void simlcdinit(void);
+void sdl_set_gradient(SDL_Surface *surface, SDL_Color *start, SDL_Color *end,
+    int steps);
 
 #endif // #ifndef __LCDSDL_H__
 

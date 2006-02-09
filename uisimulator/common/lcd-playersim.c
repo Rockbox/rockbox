@@ -35,7 +35,7 @@
 #define CHAR_WIDTH 6
 #define CHAR_HEIGHT 8
 #define ICON_HEIGHT 24
-#define CHAR_PIXEL 4
+#define CHAR_PIXEL 2
 #define BORDER_MARGIN 2
 
 static int double_height=1;

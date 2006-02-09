@@ -3,7 +3,7 @@
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
  *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \ 
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
@@ -17,14 +17,13 @@
  *
  ****************************************************************************/
 
-#ifndef __THREADSDL_H__
-#define __THREADSDL_H__
+#ifndef __LCDREMOTE_H__
+#define __LCDREMOTE_H__
 
-#include "SDL_thread.h"
+#include "lcd.h"
+#include "SDL.h"
 
-extern SDL_Thread* threads[256];
-extern int         threadCount;
-extern SDL_mutex*  mutex;
+void sim_lcd_remote_init(void);
 
-#endif // #ifndef __THREADSDL_H__
+#endif // #ifndef __LCDREMOTE_H__
 

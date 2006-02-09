@@ -17,296 +17,67 @@
  *
  ****************************************************************************/
 
+#include "lcd-sdl.h"
 #include "uisdl.h"
-#include "lcd.h"
-#include "lcd-playersim.h"
 
-SDL_Surface* lcd_surface;
+int display_zoom = 1;
 
-#if LCD_DEPTH == 16
-#else
-SDL_Color lcd_palette[(1<<LCD_DEPTH)];
-SDL_Color lcd_color_zero = {UI_LCD_BGCOLORLIGHT, 0};
-SDL_Color lcd_color_max  = {0, 0, 0, 0};
-
-#endif
-
-#ifdef HAVE_LCD_BITMAP
-
-#ifdef HAVE_REMOTE_LCD
-SDL_Surface *remote_surface;
-SDL_Color remote_palette[(1<<LCD_REMOTE_DEPTH)];
-SDL_Color remote_color_zero = {UI_REMOTE_BGCOLORLIGHT, 0};
-SDL_Color remote_color_max  = {0, 0, 0, 0};
-
-#endif
-
-void lcd_update (void)
-{
-    /* update a full screen rect */
-    lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
-}
-
-void lcd_update_rect(int x_start, int y_start, int width, int height)
+void sdl_update_rect(SDL_Surface *surface, int x_start, int y_start, int width,
+    int height, int max_x, int max_y, int ui_x, int ui_y,
+    Uint32 (*getpixel)(int, int))
 {
     int x, y;
     int xmax, ymax;
+    SDL_Rect dest;
 
     ymax = y_start + height;
     xmax = x_start + width;
 
-    if(xmax > LCD_WIDTH)
-        xmax = LCD_WIDTH;
-    if(ymax >= LCD_HEIGHT)
-        ymax = LCD_HEIGHT;
+    if(xmax > max_x)
+        xmax = max_x;
+    if(ymax >= max_y)
+        ymax = max_y;
 
-    SDL_LockSurface(lcd_surface);
+    SDL_LockSurface(surface);
 
-    int bpp = lcd_surface->format->BytesPerPixel;
+    dest.w = display_zoom;
+    dest.h = display_zoom;
+    
+    for (x = x_start; x < xmax; x++) {
+        dest.x = x * display_zoom;
 
-    for (x = x_start; x < xmax; x++)
-    {
-        for (y = y_start; y < ymax; y++)
-        {
-            Uint8 *p = (Uint8 *)lcd_surface->pixels + y * lcd_surface->pitch + x * bpp;
-
-#if LCD_DEPTH == 1
-            *p = ((lcd_framebuffer[y/8][x] >> (y & 7)) & 1);
-#elif LCD_DEPTH == 2
-#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-            *p = ((lcd_framebuffer[y][x/4] >> (2 * (x & 3))) & 3);
-#else
-            *p = ((lcd_framebuffer[y/4][x] >> (2 * (y & 3))) & 3);
-#endif
-#elif LCD_DEPTH == 16
-#if LCD_PIXELFORMAT == RGB565SWAPPED
-            unsigned bits = lcd_framebuffer[y][x];
-            *(Uint16 *)p = (bits >> 8) | (bits << 8);
-#else
-            *(Uint16 *)p = lcd_framebuffer[y][x];
-#endif
-#endif
+        for (y = y_start; y < ymax; y++) {
+            dest.y = y * display_zoom;
+            
+            SDL_FillRect(surface, &dest, getpixel(x, y));
         }
     }
 
-    SDL_UnlockSurface(lcd_surface);
+    SDL_UnlockSurface(surface);
 
-    SDL_Rect src = {x_start, y_start, xmax, ymax};
-    SDL_Rect dest = {UI_LCD_POSX + x_start, UI_LCD_POSY + y_start, xmax, ymax};
-
-    if (!background) {
-        dest.x -= UI_LCD_POSX;
-        dest.y -= UI_LCD_POSY;
-    }
+    SDL_Rect src = {x_start * display_zoom, y_start * display_zoom, xmax * display_zoom, ymax * display_zoom};
+    dest.x = (ui_x + x_start) * display_zoom;
+    dest.y = (ui_y + y_start) * display_zoom;;
+    dest.w = xmax * display_zoom;
+    dest.h = ymax * display_zoom;
     
-    SDL_BlitSurface(lcd_surface, &src, gui_surface, &dest);
+    SDL_BlitSurface(surface, &src, gui_surface, &dest);
     SDL_UpdateRect(gui_surface, dest.x, dest.y, dest.w, dest.h);
     SDL_Flip(gui_surface);
-
 }
 
-#ifdef HAVE_REMOTE_LCD
-
-extern unsigned char lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH];
-
-void lcd_remote_update (void)
-{
-    lcd_remote_update_rect(0, 0, LCD_REMOTE_WIDTH, LCD_REMOTE_HEIGHT);
-}
-
-void lcd_remote_update_rect(int x_start, int y_start,
-                           int width, int height)
-{
-    int x, y;
-    int xmax, ymax;
-
-    ymax = y_start + height;
-    xmax = x_start + width;
-
-    if(xmax > LCD_REMOTE_WIDTH)
-        xmax = LCD_REMOTE_WIDTH;
-    if(ymax >= LCD_REMOTE_HEIGHT)
-        ymax = LCD_REMOTE_HEIGHT;
-
-    SDL_LockSurface(remote_surface);
-
-    int bpp = remote_surface->format->BytesPerPixel;
-
-    for (x = x_start; x < xmax; x++)
-        for (y = y_start; y < ymax; y++)
-        {
-            Uint8 *p = (Uint8 *)remote_surface->pixels + y * remote_surface->pitch + x * bpp;
-
-            *p = ((lcd_remote_framebuffer[y/8][x] >> (y & 7)) & 1);
-        }
-
-    SDL_UnlockSurface(remote_surface);
-
-    SDL_Rect src = {x_start, y_start, xmax, ymax};
-    SDL_Rect dest = {UI_REMOTE_POSX + x_start, UI_REMOTE_POSY + y_start, xmax, ymax};
-
-    if (!background) {
-        dest.x -= UI_REMOTE_POSX;
-        dest.y -= UI_REMOTE_POSY;
-        dest.y += UI_LCD_HEIGHT;
-    }
-
-    SDL_BlitSurface(remote_surface, &src, gui_surface, &dest);
-    SDL_UpdateRect(gui_surface, dest.x, dest.y, dest.w, dest.h);
-    SDL_Flip(gui_surface);
-
-}
-
-#endif /* HAVE_REMOTE_LCD */
-#endif /* HAVE_LCD_BITMAP */
-
-#ifdef HAVE_LCD_CHARCELLS
-/* Defined in lcd-playersim.c */
-extern void lcd_print_char(int x, int y);
-extern bool lcd_display_redraw;
-extern unsigned char hardware_buffer_lcd[11][2];
-static unsigned char lcd_buffer_copy[11][2];
-
-void lcd_update(void)
-{
-    int x, y;
-    bool changed = false;
-    SDL_Rect dest = {UI_LCD_POSX, UI_LCD_POSY, UI_LCD_WIDTH, UI_LCD_HEIGHT};
-
-    for (y = 0; y < 2; y++)
-    {
-        for (x = 0; x < 11; x++)
-        {
-            if (lcd_display_redraw ||
-                lcd_buffer_copy[x][y] != hardware_buffer_lcd[x][y])
-            {
-                lcd_buffer_copy[x][y] = hardware_buffer_lcd[x][y];
-                lcd_print_char(x, y);
-                changed = true;
-            }
-        }
-    }
-
-    if (changed)
-    {
-        if (!background) {
-            dest.x -= UI_LCD_POSX;
-            dest.y -= UI_LCD_POSY;
-        }
-    
-        SDL_BlitSurface(lcd_surface, NULL, gui_surface, &dest);
-        SDL_UpdateRect(gui_surface, dest.x, dest.y, dest.w, dest.h);
-        SDL_Flip(gui_surface);
-    }
-
-    lcd_display_redraw = false;
-}
-
-void drawdots(int color, struct coordinate *points, int count)
-{
-    int bpp = lcd_surface->format->BytesPerPixel;
-
-    SDL_LockSurface(lcd_surface);
-
-    while (count--)
-    {
-        Uint8 *p = (Uint8 *)lcd_surface->pixels + (points[count].y) * lcd_surface->pitch + (points[count].x) * bpp;
-
-        *p = color;
-    }
-
-    SDL_UnlockSurface(lcd_surface);
-}
-
-void drawrectangles(int color, struct rectangle *points, int count)
-{
-    int bpp = lcd_surface->format->BytesPerPixel;
-
-    SDL_LockSurface(lcd_surface);
-
-    while (count--)
-    {
-        int x;
-        int y;
-        int ix;
-        int iy;
-
-        for (x = points[count].x, ix = 0; ix < points[count].width; x++, ix++)
-        {
-            for (y = points[count].y, iy = 0; iy < points[count].height; y++, iy++)
-            {
-                Uint8 *p = (Uint8 *)lcd_surface->pixels + y * lcd_surface->pitch + x * bpp;
-
-                *p = color;
-            }
-        }
-    }
-
-    SDL_UnlockSurface(lcd_surface);
-}
-#endif /* HAVE_LCD_CHARCELLS */
-
-#if LCD_DEPTH <= 8
 /* set a range of bitmap indices to a gradient from startcolour to endcolour */
-void lcdcolors(int index, int count, SDL_Color *start, SDL_Color *end)
+void sdl_set_gradient(SDL_Surface *surface, SDL_Color *start, SDL_Color *end, int steps)
 {
     int i;
+    SDL_Color palette[steps];
 
-    count--;
-    for (i = 0; i <= count; i++)
-    {
-        lcd_palette[i+index].r = start->r
-                              + (end->r - start->r) * i / count;
-        lcd_palette[i+index].g = start->g
-                              + (end->g - start->g) * i / count;
-        lcd_palette[i+index].b = start->b
-                              + (end->b - start->b) * i / count;
+    for (i = 0; i < steps; i++) {
+        palette[i].r = start->r + (end->r - start->r) * i / steps;
+        palette[i].g = start->g + (end->g - start->g) * i / steps;
+        palette[i].b = start->b + (end->b - start->b) * i / steps;
     }
 
-    SDL_SetPalette(lcd_surface, SDL_LOGPAL|SDL_PHYSPAL, lcd_palette, index, count);
+    SDL_SetPalette(surface, SDL_LOGPAL|SDL_PHYSPAL, palette, 0, steps);
 }
-#endif
 
-#ifdef HAVE_REMOTE_LCD
-/* set a range of bitmap indices to a gradient from startcolour to endcolour */
-void lcdremotecolors(int index, int count, SDL_Color *start, SDL_Color *end)
-{
-    int i;
-
-    count--;
-    for (i = 0; i <= count; i++)
-    {
-        remote_palette[i+index].r = start->r
-                              + (end->r - start->r) * i / count;
-        remote_palette[i+index].g = start->g
-                              + (end->g - start->g) * i / count;
-        remote_palette[i+index].b = start->b
-                              + (end->b - start->b) * i / count;
-    }
-
-    SDL_SetPalette(remote_surface, SDL_LOGPAL|SDL_PHYSPAL, remote_palette, index, count);
-}
-#endif
-
-/* initialise simulator lcd driver */
-void simlcdinit(void)
-{
-#if LCD_DEPTH == 16
-    lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE, LCD_WIDTH, LCD_HEIGHT, 16,
-                                  0, 0, 0, 0);
-#else
-    lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE, LCD_WIDTH, LCD_HEIGHT, 8,
-                                  0, 0, 0, 0);
-#endif
-
-#if LCD_DEPTH <= 8
-    lcdcolors(0, (1<<LCD_DEPTH), &lcd_color_zero, &lcd_color_max);
-#endif
-
-#ifdef HAVE_REMOTE_LCD
-    remote_surface = SDL_CreateRGBSurface(SDL_SWSURFACE, LCD_REMOTE_WIDTH, LCD_REMOTE_HEIGHT, 8,
-                                  0, 0, 0, 0);
-
-    lcdremotecolors(0, (1<<LCD_REMOTE_DEPTH), &remote_color_zero, &remote_color_max);
-#endif
-}

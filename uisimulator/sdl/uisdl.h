@@ -20,10 +20,8 @@
 #ifndef __UISDL_H__
 #define __UISDL_H__
 
-#include <SDL.h>
-#include <SDL_mutex.h>
-#include <SDL_thread.h>
-#include "lcd-sdl.h"
+#include <stdbool.h>
+#include "SDL.h"
 
 /* colour definitions are R, G, B */
 
@@ -93,7 +91,7 @@
 #define UI_REMOTE_WIDTH             128
 #define UI_REMOTE_HEIGHT            64
 
-#elif defined(IRIVER_H300_SERIES)
+#elif defined(IRIVER_H300)
 #define UI_TITLE                    "iriver H300"
 #define UI_WIDTH                    288 // width of GUI window
 #define UI_HEIGHT                   581 // height of GUI window
@@ -176,6 +174,7 @@
 
 extern SDL_Surface *gui_surface;
 extern bool background;  /* True if the background image is enabled */
+extern int display_zoom; 
 
 #endif // #ifndef __UISDL_H__
 

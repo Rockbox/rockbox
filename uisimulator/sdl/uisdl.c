@@ -20,14 +20,25 @@
 #include <stdlib.h>
 #include <string.h>
 #include "autoconf.h"
-#include "uisdl.h"
 #include "button.h"
 #include "thread.h"
-#include "thread-sdl.h"
 #include "kernel.h"
 #include "sound.h"
+#include "uisdl.h"
+#include "lcd-sdl.h"
+#ifdef HAVE_LCD_BITMAP
+#include "lcd-bitmap.h"
+#elif HAVE_LCD_CHARCELLS
+#include "lcd-charcell.h"
+#endif
+#ifdef HAVE_REMOTE_LCD
+#include "lcd-remote.h"
+#endif
+#include "thread-sdl.h"
+#include "SDL_mutex.h"
+#include "SDL_thread.h"
 
-// extern functions
+/* extern functions */
 extern void                 app_main (void *); // mod entry point
 extern void                 new_key(int key);
 extern void                 sim_tick_tasks(void);
@@ -43,8 +54,8 @@ SDL_TimerID tick_timer_id;
 SDL_Thread *sound_thread;
 #endif
 
-bool lcd_display_redraw=true; // Used for player simulator
-char having_new_lcd=true; // Used for player simulator
+bool lcd_display_redraw = true;         /* Used for player simulator */
+char having_new_lcd=true;               /* Used for player simulator */
 
 long start_tick;
 
@@ -130,14 +141,17 @@ bool gui_startup()
     }
    
     
-    if ((gui_surface = SDL_SetVideoMode(width, height, 24, SDL_HWSURFACE|SDL_DOUBLEBUF)) == NULL) {
+    if ((gui_surface = SDL_SetVideoMode(width * display_zoom, height * display_zoom, 24, SDL_HWSURFACE|SDL_DOUBLEBUF)) == NULL) {
         fprintf(stderr, "fatal: %s\n", SDL_GetError());
         return false;
     }
 
     SDL_WM_SetCaption(UI_TITLE, NULL);
 
-    simlcdinit();
+    sim_lcd_init();
+#ifdef HAVE_REMOTE_LCD
+    sim_lcd_remote_init();
+#endif
 
     SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
@@ -190,16 +204,26 @@ int main(int argc, char *argv[])
             } else if (!strcmp("--old_lcd", argv[x])) {
                 having_new_lcd = false;
                 printf("Using old LCD layout.\n");
+            } else if (!strcmp("--zoom", argv[x])) {
+                x++;
+                display_zoom=atoi(argv[x]);
+                printf("Window zoom is %d\n", display_zoom);
             } else {
                 printf("rockboxui\n");
                 printf("Arguments:\n");
                 printf("  --background \t Use background image of hardware\n");
                 printf("  --old_lcd \t [Player] simulate old playermodel (ROM version<4.51)\n");
+                printf("  --zoom \t window zoom (will disable backgrounds)\n");
                 exit(0);
             }
         }
     }
 
+    if (display_zoom > 1) {
+        background = false;
+    }
+
+    
     if (!gui_startup())
         return -1;
 

@@ -1,5 +1,13 @@
 button.c
 kernel.c
+#ifdef HAVE_LCD_BITMAP
+lcd-bitmap.c
+#elif HAVE_LCD_CHARCELLS
+lcd-charcell.c
+#endif
+#ifdef HAVE_REMOTE_LCD
+lcd-remote.c
+#endif
 lcd-sdl.c
 sound.c
 thread-sdl.c
