@@ -638,7 +638,7 @@ void dsp_eq_update_data(bool enabled)
     /* set emac unit for dsp processing, and save old macsr, we're running in
        codec thread context at this point, so can't clobber it */
     unsigned long old_macsr = coldfire_get_macsr();
-    coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
+    coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE | EMAC_ROUND);
     #endif
     
     /* Iterate over each band and update the appropriate filter */
