@@ -41,7 +41,7 @@ void lcd_remote_update_rect(int x_start, int y_start, int width, int height)
 {
     sdl_update_rect(remote_surface, x_start, y_start, width, height,
         LCD_REMOTE_WIDTH, LCD_REMOTE_HEIGHT, background ? UI_REMOTE_POSX : 0,
-        (background? UI_REMOTE_POSY : 0) + UI_LCD_HEIGHT, get_lcd_remote_pixel);
+        (background ? UI_REMOTE_POSY : LCD_HEIGHT), get_lcd_remote_pixel);
 }
 
 /* initialise simulator lcd remote driver */
