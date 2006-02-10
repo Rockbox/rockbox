@@ -174,8 +174,19 @@ static int ipod_4g_button_read(void)
                         old_wheel_value = new_wheel_value;
                     }
 
-                    if (wheel_keycode != BUTTON_NONE)
-                        queue_post(&button_queue, wheel_keycode, NULL);
+                    if (wheel_keycode != BUTTON_NONE) {
+                        /* When you use the clickwheel, the queue should
+                           usually have no other events in it, so we check if
+                           it's empty to see whether pending clickwheel events
+                           have been handled. This way, Rockbox will stop
+                           responding to the clickwheel if it doesn't have time
+                           to handle the events immediately.
+                           Can also implement queue_peek() to do this in a
+                           cleaner way.
+                         */
+                        if (queue_empty(&button_queue))
+                            queue_post(&button_queue, wheel_keycode, NULL);
+                    }
                 }
                 else {
                     old_wheel_value = new_wheel_value;
