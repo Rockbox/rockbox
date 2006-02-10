@@ -1,4 +1,4 @@
-#             __________               __   ___.
+﻿#             __________               __   ___.
 #   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
 #   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
@@ -6,11 +6,11 @@
 #                     \/            \/     \/    \/            \/
 #     $Id$
 #
-#     Fichier de langue français - Version optimisée pour le player (!)
+#     Fichier de langue français - Valable pour toutes les plateformes
 #     Eric LASSAUGE <lassauge AT users.sourceforge.net> - Juin 2004
 #     Modifié par Mourad Jaber <newbeewan AT users.sourceforge.net> - Octobre 2004
 #     Modifié par Manuel Dejonghe (lImbus) <lImbus AT users.soureforge.net> - February 2005
-#     Modifié par Mustapha Senhaji (Moos) <moos012 AT hotmail.com> - Novembre 2005
+#     Modifié par Mustapha Senhaji (Moos) <moos012 AT hotmail.com> - Novembre 2005,Fevrier 2006 
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -256,7 +256,7 @@ id: LANG_CASE_MENU
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: "" 
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
@@ -328,7 +328,7 @@ id: LANG_BBOOST
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: "" 
 
 id: LANG_DECAY
 desc: in sound_settings
@@ -394,7 +394,7 @@ id: LANG_RESUME_ASK
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: ""
 
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
@@ -430,37 +430,37 @@ id: LANG_MUTE_ON_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: "" 
 
 id: LANG_MUTE_OFF_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: ""
 
 id: LANG_MUTE_ON_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: "" 
 
 id: LANG_MUTE_OFF_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: "" 
 
 id: LANG_ID3_INFO
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: "" 
 
 id: LANG_ID3_SCREEN
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: "" 
 
 id: LANG_ID3_TITLE
 desc: in wps
@@ -646,7 +646,7 @@ id: LANG_PM_MENU
 desc: in the display menu
 eng: "Peak Meter"
 voice: "Vu-mètre"
-new: "Vu-mètre"
+new: "Indicateur de niveau des pics"
 
 id: LANG_PM_RELEASE
 desc: in the peak meter menu
@@ -879,7 +879,7 @@ new: "Numérique (%)"
 id: LANG_PM_PERFORMANCE
 desc: DEPRECATED
 eng: ""
-voice: 
+voice: ""
 new: ""
 
 id: LANG_PM_HIGH_PERFORMANCE
@@ -1072,7 +1072,7 @@ id: LANG_TRICKLE_CHARGE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: ""
 
 id: LANG_BATTERY_TOPOFF_CHARGE
 desc: in info display, shows that top off charge is running
@@ -1186,25 +1186,25 @@ id: LANG_PLAYER_KEYBOARD_BACKSPACE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:  
+new: ""  
 
 id: LANG_PLAYER_KEYBOARD_DELETE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: "" 
 
 id: LANG_PLAYER_KEYBOARD_ACCEPT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: "" 
 
 id: LANG_PLAYER_KEYBOARD_ABORT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: "" 
 
 id: LANG_MENU_SHOW_ID3_INFO
 desc: Menu option to start id3 viewer
@@ -1264,7 +1264,7 @@ id: LANG_SOKOBAN_ON
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: ""
 
 id: LANG_INVERT
 desc: in settings_menu
@@ -1276,19 +1276,19 @@ id: LANG_CHANNEL_STEREO_NARROW_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: ""
 
 id: LANG_CHANNEL_STEREO_NARROW_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: ""
 
 id: LANG_CHANNEL_STEREO_WIDE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: "" 
 
 id: LANG_CHANNEL_KARAOKE
 desc: in sound_settings
@@ -1318,19 +1318,19 @@ id: LANG_VBRFIX_STOP_PLAY
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: ""
 
 id: LANG_VBRFIX_NOT_VBR
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: ""
 
 id: LANG_VBRFIX
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: "" 
 
 id: LANG_INVERT_CURSOR
 desc: in settings_menu
@@ -1692,7 +1692,7 @@ id: LANG_FM_SAVE_PRESET
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: "" 
 
 id: LANG_FM_DELETE_PRESET
 desc: in radio screen
@@ -1716,7 +1716,7 @@ id: LANG_FM_NO_PRESETS
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: "" 
 
 id: LANG_FM_NO_FREE_PRESETS
 desc: in radio screen
@@ -1843,8 +1843,6 @@ desc: Indicates bookmark was not created
 eng: "Bookmark Failed!"
 voice: ""
 new: "Erreur de signet!"
-
-# Bookmark creation/failure text
 
 id: LANG_BOOKMARK_LOAD_EMPTY
 desc: Indicates bookmark was empty
@@ -2277,8 +2275,8 @@ new:
 id: VOICE_POINT
 desc: DEPRECATED
 eng: ""
-voice: "."
-new: 
+voice: ""
+new: ""
 
 id: VOICE_MILLISECONDS
 desc: spoken only, a unit postfix
@@ -2344,13 +2342,13 @@ id: VOICE_MEGABYTE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: ""
 
 id: VOICE_GIGABYTE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: ""
 
 id: VOICE_MILLIAMPHOURS
 desc: spoken only, a unit postfix
@@ -2412,7 +2410,7 @@ id: LANG_VOICE_DIR_ENTER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: ""
 
 id: LANG_VOICE_DIR_HOVER
 desc: "talkbox" mode for directories + files
@@ -2750,7 +2748,7 @@ id: LANG_FM_BUTTONBAR_EDIT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new: 
+new: ""
 
 id: LANG_FM_BUTTONBAR_ADD
 desc: in radio screen
@@ -3241,14 +3239,14 @@ new: "[Gain par album]"
 id: LANG_ID3_NO_GAIN
 desc: DEPRECATED
 eng: ""
-voice: 
-new: 
+voice: "" 
+new: ""
 
 id: LANG_BIDI_SUPPORT
 desc: in settings_menu, option to enable reversal of hebrew/arabic text
 eng: "BiDi Hebrew/Arabic"
 voice: "Textes bidirectionels"
-new: "Arabe/Hébreux (BiDi)"
+new: "Arabe/Hébreu (BiDi)"
 
 id: LANG_REPLAYGAIN_PREAMP
 desc: in browse_id3
@@ -3261,8 +3259,6 @@ desc: in browse_id3
 eng: "dB"
 voice: "décibel"
 new: "dB"
-
-# unsure about that one. Isn't there a better term ?
 
 id: LANG_ID3_VBR
 desc: in browse_id3
@@ -3467,3 +3463,255 @@ desc: in remote lcd settings menu
 eng: "Reduce ticking"
 voice: "Reduire le bruit parasite"
 new: "Reduire le bruit parasite"
+
+id: LANG_DEFAULT_CODEPAGE
+desc: default encoding used with id3 tags
+eng: "Default Codepage"
+voice:
+new: "Codepage id3 tag par défaut"
+
+id: LANG_CODEPAGE_LATIN1
+desc: in codepage setting menu
+eng: "Latin1 (ISO-8859-1)"
+voice:
+new: "Latin1 (ISO-8859-1)"
+
+id: LANG_CODEPAGE_GREEK
+desc: in codepage setting menu
+eng: "Greek (ISO-8859-7)"
+voice:
+new: "Grecque (ISO-8859-7)"
+
+id: LANG_CODEPAGE_HEBREW
+desc: in codepage setting menu
+eng: "Hebrew (ISO-8859-8)"
+voice:
+new: "Hébreu (ISO-8859-8)"
+
+id: LANG_CODEPAGE_RUSSIAN
+desc: in codepage setting menu
+eng: "Russian (CP1251)"
+voice:
+new:"Russe (CP1251)"
+
+id: LANG_CODEPAGE_THAI
+desc: in codepage setting menu
+eng: "Thai (ISO-8859-11)"
+voice:
+new: "Thaï (ISO-8859-11)" 
+
+id: LANG_CODEPAGE_ARABIC
+desc: in codepage setting menu
+eng: "Arabic (CP1256)"
+voice:
+new:"Arabe (CP1256)"
+
+id: LANG_CODEPAGE_TURKISH
+desc: in codepage setting menu
+eng: "Turkish (ISO-8859-9)"
+voice:
+new:"Turc (ISO-8859-9)"
+
+id: LANG_CODEPAGE_LATIN_EXTENDED
+desc: in codepage setting menu
+eng: "Latin Extended (ISO-8859-2)"
+voice:
+new:"Latin Etendue (ISO-8859-2)"
+
+id: LANG_CODEPAGE_JAPANESE
+desc: in codepage setting menu
+eng: "Japanese (SJIS)"
+voice:
+new:"Japonais (SJIS)"
+
+id: LANG_CODEPAGE_SIMPLIFIED
+desc: in codepage setting menu
+eng: "Simp. Chinese (GB2312)"
+voice:
+new:"Chinois Simplifié (GB2312)"
+
+id: LANG_CODEPAGE_KOREAN
+desc: in codepage setting menu
+eng: "Korean (KSX1001)"
+voice:
+new: "Coréen (KSX1001)"
+
+id: LANG_CODEPAGE_TRADITIONAL
+desc: in codepage setting menu
+eng: "Trad. Chinese (BIG5)"
+voice:
+new: "Chinois Traditionnel (BIG5)"
+
+id: LANG_CODEPAGE_UTF8
+decs: in codepage setting menu
+eng: "Unicode (UTF-8)"
+voice:
+new: "Unicode (UTF-8)
+
+id: LANG_BRIGHTNESS
+desc: in settings_menu
+eng: "Brightness"
+voice: ""
+new: "Luminosité"
+
+id: LANG_SCREEN_SCROLL_VIEW
+desc: should lines scroll out of the screen
+eng: "Screen Scrolls Out Of View"
+voice: ""
+new: "Défilement de l'écran entièrement"
+
+id: LANG_SCREEN_SCROLL_STEP
+desc: Pixels to advance per Screen scroll
+eng: "Screen Scroll Step Size"
+voice: ""
+new: "Taille du pas de défilement de l'écran"
+
+id: LANG_QUEUE_SHUFFLED
+desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
+eng: "Queue shuffled"
+voice: ""
+new: "Insérer mélangé (lecture unique)"
+
+id: LANG_CLEAR_BACKDROP
+desc: text for LCD settings menu
+eng: "Clear backdrop"
+voice: ""
+new: "Réinitialiser fond d'écran"
+
+id: LANG_SET_AS_BACKDROP
+desc: text for onplay menu entry
+eng: "Set as backdrop"
+voice: ""
+new: "Choisir comme fond d'écran"
+
+id: LANG_BACKDROP_LOADED
+desc: text for splash to indicate a new backdrop has been loaded successfully
+eng: "Backdrop loaded"
+voice: ""
+new: "Fond d'écran chargé"
+
+id: LANG_BACKDROP_FAILED
+desc: text for splash to indicate a failure to load a bitmap as backdrop
+eng: "Backdrop failed"
+voice: ""
+new: "Fond d'écran échec"
+
+id: LANG_WARN_ERASEDYNPLAYLIST_MENU
+desc: in playlist options menu, option to warn when erasing dynamic playlist
+eng: "Warn When Erasing Dynamic Playlist"
+voice ""
+new: "Avertir avant d'éffacer liste de lecture dynamique"
+
+id: LANG_WARN_ERASEDYNPLAYLIST_PROMPT
+desc: prompt shown when about to erase a modified dynamic playlist
+eng: "Erase dynamic playlist?"
+voice ""
+new: "Effacer la liste de lecture dynamique?"
+
+id: LANG_EQUALIZER
+desc: in the sound settings menu
+eng: "Equalizer"
+voice: ""
+new: "Equaliseur"
+
+id: LANG_EQUALIZER_ENABLED
+desc: in the equalizer settings menu
+eng: "Enable EQ"
+voice: ""
+new: "Activer EQ"
+
+id: LANG_EQUALIZER_GRAPHICAL
+desc: in the equalizer settings menu
+eng: "Graphical EQ"
+voice: ""
+new: "EQ Graphique"
+
+id: LANG_EQUALIZER_GAIN
+desc: in the equalizer settings menu
+eng: "Simple EQ Settings"
+voice: ""
+new: "Options EQ simples"
+
+id: LANG_EQUALIZER_ADVANCED
+desc: in the equalizer settings menu
+eng: "Advanced EQ Settings"
+voice: ""
+new: "Options EQ avancées"
+
+id: LANG_EQUALIZER_SAVE
+desc: in the equalizer settings menu
+eng: "Save EQ Preset"
+voice: ""
+new: "Sauvegarder EQ Preset"
+
+id: LANG_EQUALIZER_BROWSE
+desc: in the equalizer settings menu
+eng: "Browse EQ Presets"
+voice: ""
+new: "Sélectionner EQ Preset"
+
+id: LANG_EQUALIZER_GAIN_ITEM
+desc: in the equalizer settings menu
+eng: "%d Hz Band Gain"
+voice: ""
+new: "Gain Bande %d Hz"
+
+id: LANG_EQUALIZER_BAND_CUTOFF
+desc: in the equalizer settings menu
+eng: "Cutoff Frequency"
+voice: ""
+new: "Fréquence de coupure"
+
+id: LANG_EQUALIZER_BAND_CENTER
+desc: in the equalizer settings menu
+eng: "Center Frequency"
+voice: ""
+new: "Fréquence centrale"
+
+id: LANG_EQUALIZER_BAND_Q
+desc: in the equalizer settings menu
+eng: "Q"
+voice: "Q"
+new: "Q"
+
+id: LANG_EQUALIZER_BAND_GAIN
+desc: in the equalizer settings menu
+eng: "Gain"
+voice: ""
+new: "Gain"
+
+id: LANG_EQUALIZER_EDIT_MODE
+desc: in the equalizer settings menu
+eng: "Edit mode: %s"
+voice: ""
+new: "Mode Edition: %s"
+
+id: LANG_EQUALIZER_BAND_LOW_SHELF
+desc: in the equalizer settings menu
+eng: "Low Shelf Filter"
+voice: ""
+new: "Filtre Low-Shelf"
+
+id: LANG_EQUALIZER_BAND_PEAK
+desc: in the equalizer settings menu
+eng: "Peak Filter %d"
+voice: ""
+new: "Filtre Peak %d"
+
+id: LANG_EQUALIZER_BAND_HIGH_SHELF
+desc: in the equalizer settings menu
+eng: "High Shelf Filter"
+voice: ""
+new: "Filtre High-Shelf"
+
+id: LANG_RECORDING_GAIN_ANALOG
+desc: in the recording screen
+eng: "A"
+voice: "Gain analogique"
+new: "A"
+
+id: LANG_RECORDING_GAIN_DIGITAL
+desc: in the recording screen
+eng: "D"
+voice: "Gain digital"
+new: "D"
