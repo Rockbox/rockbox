@@ -22,7 +22,7 @@
 #ifndef SIMULATOR /* not for simulator by now */
 #include "plugin.h"
 
-#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
+#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4) && (CONFIG_LCD != LCD_IPOD2BPP)
 #include "gray.h"
 
 PLUGIN_HEADER

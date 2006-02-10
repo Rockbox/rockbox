@@ -20,7 +20,7 @@
 #ifndef PCF50605_H
 #define PCF50605_H
 
-#if defined(APPLE_IPODCOLOR) || defined(APPLE_IPODNANO)
+#ifdef IPOD_ARCH
 int pcf50605_read(int address);
 void pcf50605_read_multiple(int address, unsigned char* buf, int count);
 int pcf50605_write(int address, unsigned char val);
