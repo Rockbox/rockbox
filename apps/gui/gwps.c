@@ -835,6 +835,7 @@ static void wps_clear(struct wps_data *data )
     }
     data->wps_sb_tag = false;
     data->show_sb_on_wps = false;
+    data->progressbar.have_bitmap_pb=false;
 }
 #else
 #define wps_clear(a)
