@@ -190,6 +190,61 @@ bool wps_data_preload_tags(struct wps_data *data, char *buf,
         break;
 #endif
 
+        case 'P':
+            /* progress bar image */
+        {
+            int ret = 0;
+            char *ptr = buf+2;
+            char *pos = NULL;
+            char imgname[MAX_PATH];
+
+            /* format: %P|filename.bmp| */
+            {
+                /* get filename */
+                pos = strchr(ptr, '|');
+                if ((pos - ptr) <
+                    (int)sizeof(imgname)-ROCKBOX_DIR_LEN-2)
+                {
+                    memcpy(imgname, bmpdir, bmpdirlen);
+                    imgname[bmpdirlen] = '/';
+                    memcpy(&imgname[bmpdirlen+1],
+                           ptr, pos - ptr);
+                    imgname[bmpdirlen+1+pos-ptr] = 0;
+                }
+                else
+                    /* filename too long */
+                    imgname[0] = 0;
+
+                ptr = pos+1;
+
+                /* load the image */
+                data->progressbar.bm.data=data->img_buf_ptr;
+                ret = read_bmp_file(imgname, &data->progressbar.bm,
+                                    data->img_buf_free,
+                                    FORMAT_ANY|FORMAT_TRANSPARENT);
+                        
+                if (ret > 0)
+                {
+#if LCD_DEPTH == 16
+                     if (ret % 2) ret++; 
+                     /* Always consume an even number of bytes */
+#endif
+
+                     data->img_buf_ptr += ret;
+                     data->img_buf_free -= ret;
+
+                     if (data->progressbar.bm.width <= LCD_WIDTH) {
+                          data->progressbar.have_bitmap_pb=true;
+                          return true;
+                     } else
+                          return false;
+                }
+                
+            }
+        }
+
+        break;
+        
         case 'x':
             /* Preload images so the %xd# tag can display it */
         {
@@ -1536,12 +1591,21 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
                 if (!data->progress_end)
                     data->progress_end=display->width;
                 
-                gui_scrollbar_draw(display, data->progress_start, sb_y, 
-                                    data->progress_end-data->progress_start,
-                                    data->progress_height,
-                                    state->id3->length?state->id3->length:1, 0,
-                                    state->id3->length?state->id3->elapsed + state->ff_rewind_count:0,
-                                    HORIZONTAL);
+                if (gwps->data->progressbar.have_bitmap_pb)
+                    gui_bitmap_scrollbar_draw(display, data->progressbar.bm,
+                                        data->progress_start, sb_y, 
+                                        data->progress_end-data->progress_start,
+                                        data->progressbar.bm.height,
+                                        state->id3->length?state->id3->length:1, 0,
+                                        state->id3->length?state->id3->elapsed + state->ff_rewind_count:0,
+                                        HORIZONTAL);
+                else
+                    gui_scrollbar_draw(display, data->progress_start, sb_y, 
+                                        data->progress_end-data->progress_start,
+                                        data->progress_height,
+                                        state->id3->length?state->id3->length:1, 0,
+                                        state->id3->length?state->id3->elapsed + state->ff_rewind_count:0,
+                                        HORIZONTAL);
 #ifdef AB_REPEAT_ENABLE
                 if ( ab_repeat_mode_enabled() )
                     ab_draw_markers(display, state->id3->length, 0, sb_y, 

@@ -52,6 +52,7 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->getstringsize=&lcd_remote_getstringsize;
             screen->putsxy=&lcd_remote_putsxy;
             screen->mono_bitmap=&lcd_remote_mono_bitmap;
+            screen->mono_bitmap_part=&lcd_remote_mono_bitmap_part;            
             screen->set_drawmode=&lcd_remote_set_drawmode;
 #if LCD_REMOTE_DEPTH > 1
             screen->get_background=&lcd_remote_get_background;
@@ -121,14 +122,18 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->getstringsize=&lcd_getstringsize;
             screen->putsxy=&lcd_putsxy;
             screen->mono_bitmap=&lcd_mono_bitmap;
+            screen->mono_bitmap_part=&lcd_mono_bitmap_part;
             screen->set_drawmode=&lcd_set_drawmode;
 #if LCD_DEPTH > 1   
             screen->bitmap=&lcd_bitmap;
+            screen->bitmap_part=&lcd_bitmap_part;            
 #if LCD_DEPTH == 2
             /* No transparency yet for grayscale lcd */
             screen->transparent_bitmap=&lcd_bitmap;
+            screen->transparent_bitmap_part=&lcd_bitmap_part;
 #else
             screen->transparent_bitmap=&lcd_bitmap_transparent;
+            screen->transparent_bitmap_part=&lcd_bitmap_transparent_part;
 #endif
             screen->get_background=&lcd_get_background;
             screen->get_foreground=&lcd_get_foreground;

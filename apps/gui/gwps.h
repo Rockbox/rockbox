@@ -263,6 +263,11 @@ struct gui_img{
     bool display;           /* is to be displayed */
     bool always_display;    /* not using the preload/display mechanism */
 };
+
+struct prog_img{ /*progressbar image*/
+    struct bitmap bm;
+    bool have_bitmap_pb;
+};
 #endif
 
 struct align_pos {
@@ -293,6 +298,7 @@ struct wps_data
 {
 #ifdef HAVE_LCD_BITMAP
     struct gui_img img[MAX_IMAGES];
+    struct prog_img progressbar;
     unsigned char img_buf[IMG_BUFSIZE];
     unsigned char* img_buf_ptr;
     int img_buf_free;

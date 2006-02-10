@@ -82,10 +82,16 @@ struct screen
                                      int style, int offset);
     void (*mono_bitmap)(const unsigned char *src,
                         int x, int y, int width, int height);
+    void (*mono_bitmap_part)(const unsigned char *src, int src_x, int src_y,
+                          int stride, int x, int y, int width, int height);
     void (*bitmap)(const fb_data *src,
                    int x, int y, int width, int height);
+    void (*bitmap_part)(const fb_data *src, int src_x, int src_y,
+                          int stride, int x, int y, int width, int height);                    
     void (*transparent_bitmap)(const fb_data *src,
                                int x, int y, int width, int height);
+    void (*transparent_bitmap_part)(const fb_data *src, int src_x, int src_y,
+                                    int stride, int x, int y, int width, int height);
     void (*set_drawmode)(int mode);
 #if (LCD_DEPTH > 1) || (LCD_REMOTE_DEPTH > 1)
     unsigned (*get_background)(void);

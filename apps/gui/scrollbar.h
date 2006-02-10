@@ -44,5 +44,9 @@ extern void gui_scrollbar_draw(struct screen * screen, int x, int y,
                                int width, int height, int items,
                                int min_shown, int max_shown,
                                enum orientation orientation);
+extern void gui_bitmap_scrollbar_draw(struct screen * screen, struct bitmap bm, int x, int y,
+                            int width, int height, int items,
+                            int min_shown, int max_shown,
+                            enum orientation orientation);
 #endif /* HAVE_LCD_BITMAP */
 #endif /* _GUI_SCROLLBAR_H_ */

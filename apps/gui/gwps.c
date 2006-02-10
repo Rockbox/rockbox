@@ -811,6 +811,7 @@ void wps_data_init(struct wps_data *wps_data)
     }
     wps_data->wps_sb_tag = false;
     wps_data->show_sb_on_wps = false;
+    wps_data->progressbar.have_bitmap_pb=false;
 #else /* HAVE_LCD_CHARCELLS */
     for(i = 0; i < 8; i++)
         wps_data->wps_progress_pat[i] = 0;
