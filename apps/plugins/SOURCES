@@ -21,11 +21,18 @@ metronome.c
 
 #ifndef IRIVER_IFP7XX_SERIES /* Temporarily disable plugins for iFP7xx */
 #ifdef HAVE_LCD_BITMAP /* Recorder/Ondio models only */
-solitaire.c
+
+/* Plugins needing the grayscale lib */
+#if CONFIG_LCD != LCD_IPOD2BPP
 #ifndef HAVE_LCD_COLOR
 fire.c
 plasma.c
 #endif
+jpeg.c
+mandelbrot.c
+#endif
+
+solitaire.c
 bejeweled.c
 bounce.c
 /* H300 and iPod Color/Video only */
@@ -37,8 +44,6 @@ chip8.c
 demystify.c
 flipit.c
 grayscale.c
-jpeg.c
-mandelbrot.c
 minesweeper.c
 oscillograph.c
 oscilloscope.c
