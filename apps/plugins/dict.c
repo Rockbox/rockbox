@@ -21,7 +21,7 @@
 
 PLUGIN_HEADER
 
-/* as in hello world :) */
+/* save the plugin api pointer. */
 static struct plugin_api* rb;
 /* screen info */
 static int display_columns, display_lines;
