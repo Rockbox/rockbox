@@ -29,8 +29,9 @@
 #include "string.h"
 #include "buffer.h"
 
-#if (CONFIG_CPU != TCC730) && !defined(IRIVER_IFP7XX_SERIES)
-/* FIX: this doesn't work on Gmini and iFP yet */
+#if (CONFIG_CPU != TCC730) && !defined(IRIVER_IFP7XX_SERIES) && \
+    !defined(IPOD_ARCH)
+/* FIX: this doesn't work on Gmini, iFP and iPods yet */
 
 #define IRQ0_EDGE_TRIGGER 0x80
 
