@@ -1,0 +1,1243 @@
+\chapter{Plugins}
+\newpage
+Plugins are little programs that Rockbox can load and run. Plugins have
+the file extension .rock.  Most of them can be started from the main
+menu if you put them in the \textbf{/.rockbox/rocks} directory. Press
+PLAY on them to start them. 
+
+Viewer plugins get started automatically by
+``playing'' an associated file (i.e. text
+files, chip8 games), or from the ``Open with'' option on the File menu.
+
+Plugins listed here have the platforms they run under (Player for
+Jukebox players, Recorder for Jukebox recorders including Jukebox FM,
+and Ondio for the Ondio SP and FM).  If no platforms are listed then
+the plugin runs on all Rockbox platforms.\\
+
+\textbf{The plugin loader}
+Only one plugin can be loaded at a time. Plugins run in the GUI thread
+and have exclusive control over the user interface. This means you
+cannot switch back and forth between a plugin and Rockbox. A plugin is
+loaded, run and then exited, which returns control to Rockbox.  Music
+will carry on playing whilst plugins are being run.
+
+\section{Games}
+See also the Chip{}-8 emulator on page \pageref{ref:Chip8emulator}.
+
+\opt{recorder,recorderv2fm,ondio,h1xx,h300}{\input{plugins/flipit.tex}}
+
+\opt{player}{\input{plugins/jackpot.tex}}
+
+\opt{recorder,recorderv2fm,ondio,h1xx,h300}{\input{plugins/minesweeper.tex}}
+
+\opt{player}{\input{plugins/nim.tex}}
+
+\opt{recorder,recorderv2fm,ondio,h1xx,h300}{\input{plugins/rockblox.tex}}
+
+\opt{recorder,recorderv2fm,ondio,h1xx,h300}{\input{plugins/sliding.tex}}
+
+\opt{recorder,recorderv2fm,ondio}{\input{plugins/snake.tex}}
+
+\opt{recorder,recorderv2fm,ondio,h1xx,h300}{\input{plugins/snake2.tex}}
+
+\opt{recorder,recorderv2fm,ondio,h1xx,h300}{\input{plugins/sokoban.tex}}
+
+\opt{recorder,recorderv2fm,ondio,h1xx,h300}{\input{plugins/solitaire.tex}}
+
+\opt{recorder,recorderv2fm,ondio}{\input{plugins/star.tex}}
+
+\opt{recorder,recorderv2fm}{\input{plugins/wormlet.tex}}
+
+\section{Demos}
+
+\opt{recorder,recorderv2fm,ondio,h1xx,h300}{\input{plugins/bounce.tex}}
+
+\opt{recorder,recorderv2fm,ondio,h1xx,h300}{\input{plugins/cube.tex}}
+
+\opt{recorder,recorderv2fm,ondio,h1xx,h300}{\input{plugins/grayscale.tex}}
+
+{\input{plugins/hello.tex}}
+
+\opt{recorder,recorderv2fm,ondio,h1xx,h300}{\input{plugins/mandelbrot.tex}}
+
+\opt{recorder,recorderv2fm,ondio,h1xx,h300}{\input{plugins/mosaic.tex}}
+
+\opt{recorder,recorderv2fm,ondio}{\input{plugins/oscillograph.tex}}
+
+\opt{recorder,recorderv2fm,ondio,h1xx,h300}{\input{plugins/snow.tex}}
+
+\opt{recorder,recorderv2fm,ondio}{\input{plugins/vumeter.tex}}
+
+\section{\label{ref:Viewersplugins}Viewers}
+
+Viewers are plugins which are associated with specific file extensions.
+They cannot be run directly but are started by ``playing''
+the associated file.  Viewers are stored in the
+\textbf{/.rockbox/viewers/ }directory.
+
+\subsection{\label{ref:Chip8emulator}Chip{}-8 Emulator (Recorder, Ondio)}
+The Chip{}-8 Emulator allows you to play many old chip8 games found on
+the Net. It modifies Rockbox, so file extensions .ch8 will be
+recognised as chip8 games. Just press PLAY on a .ch8 file to start a
+game.
+
+There are lots of tiny Chip8 games (usually only about 256 bytes to a
+couple of KB) which were made popular by the HP48
+calculator's emulator for them. The original Chip8 had
+64x32 pixel graphics, and the new superchip emulator supports 128x64
+graphics, which almost fits on the Recorder's display.
+The only problem is they are based on a 4x4 keyboard, but since most
+games do not use all of the buttons, this can easily be worked around.
+
+Some places where can you can find .ch8 files:
+
+\begin{itemize}
+\item The original chip8 patch had several attached:
+\url{http://sourceforge.net/tracker/index.php?func=detail&aid=628509&group_id=44306&atid=439120}
+\item Check out the HP48 chip games section:
+\url{http://www.hpcalc.org/hp48/games/chip/}
+\item Check out the PC emulator by the guy who wrote the HP48 emulator:
+\url{http://www.pdc.kth.se/~lfo/chip8/CHIP8.htm}
+\item Links to other chip8 emulators: 
+\url{http://www.zophar.net/chip8.html}
+\end{itemize}
+
+\subsection{JPEG viewer (Recorder, Ondio)}
+Press PLAY on a .jpg file in order to view the contents using Rockbox's greyscale library.  Use the arrow keys to move around the image, PLAY to zoom in
+and ON to zoom out.  Press OFF to exit the viewer.
+
+Note: JPEGs that use progressive scan encoding are not supported and will produce an error.
+
+\subsection{Movie Player (Recorder, Ondio)}
+Play movies on your Jukebox!  In order to do
+this, movies must be in AVI format, and then converted to .RVF,
+Rockbox's own video format.  For more details on how to use this plugin, please see \url{http://www.rockbox.org/twiki/bin/view/Main/VideoTutorial}.
+
+\subsection{Rockbox\_flash (Recorder, Ondio)}
+{\centering\itshape
+  [Warning: Image ignored] % Unhandled or unsupported graphics:
+%\includegraphics[width=4.059cm,height=2.32cm]{images/rockbox-manual-img57.png}
+ \newline
+Rockbox flash
+\par}
+
+For ``playing'' .UCL files on flashed Jukeboxes. Reprograms the flash memory of
+the Jukebox unit (see page \pageref{ref:Rockboxinflash} for details).
+
+\subsection{Search}
+This plugin can be used on playlists.  It searches through the playlist
+that it is opened on looking for any occurrences of the string entered by the
+user.  The results of this search are saved to a new playlist,
+\textbf{search\_results.m3u}, within the same directory as the
+original playlist.
+
+\subsection{Sort}
+This plugin takes a file and sorts it in  forward alphabetical order.  Case is
+ignored.  This is useful for ordering playlists generated by the ``Create Playlist'' menu option (see page \pageref{ref:Playlistsubmenu}).
+
+\subsection{Text Viewer}
+This is a Viewer for text files with word wrap. Just press PLAY on a
+.txt file to display it. Has controls to handle various styles of text
+formatting. Has top{}-of{}-file and bottom{}-of{}-file buttons.  You
+can view files without a .txt extension by using \textbf{Open with ..}
+from the Play Screen menu
+
+\subsubsection{Controls}
+
+\begin{itemize}
+\item \textbf{F1 (Recorder) / ON{}-MINUS (Player): }
+toggles Word mode between Wrap and Chop:
+
+\begin{itemize}
+\item Wrap breaks lines at white space or hyphen.
+\item Chop breaks lines at the maximum column limit.
+\end{itemize}
+
+\item \textbf{F2 (Recorder) / ON{}-MENU{}-PLUS (Player): }
+cycles Line mode through Normal, Join and Expand:
+
+\begin{itemize}
+\item Normal breaks lines at newline characters.
+\item Join ignores unpaired newline characters  (i.e., joins lines). Useful for
+adopting the orphans that occur with e{}-mail style (i.e.,pre{}-wrapped) text files.
+\item Expand doubles unpaired newlines (i.e., adds a blank line). Useful
+for making the paragraphs clearer in some book style text files.
+\end{itemize}
+
+\item \textbf{F3 (Recorder) / ON{}-PLUS (Player):} 
+toggles View mode between Narrow and Wide:
+
+\begin{itemize}
+\item Narrow sets maximum column to the screen width.
+\item Wide sets maximum column to 114. Useful for navigating large
+files. (Currently, Wide and Join cannot be selected together.)
+\end{itemize}
+
+\item \textbf{ON{}-F1 (Recorder):} 
+toggles Page mode between Normal and Overlap:
+
+\begin{itemize}
+\item Normal sets page{}-down/page{}-up to one full screen.
+\item Overlap tells page{}-down/page{}-up to retain one line from
+previous screen.
+\end{itemize}
+
+\item \textbf{ON{}-F3 (Recorder):} 
+toggles Scrollbar mode, for the current View mode.
+
+\begin{itemize}
+\item Narrow mode has no scrollbar by default, until toggled.
+\item Wide mode has a scrollbar by default, until toggled.
+\item If file fits on one screen, there is no scrollbar and ON{}-F3 has
+no effect.
+\end{itemize}
+\end{itemize}
+
+Settings are not remembered after the viewer has been exited. 
+Keys are as follows:
+
+\subsubsection{Recorder}
+
+\begin{tabular}[c]{|p{3.317cm}|p{7.104cm}|}
+\hline
+{\centering\bfseries\itshape
+KEY
+\par}
+&
+{\centering\bfseries\itshape
+ACTION
+\par}
+\\\hline
+{\centering
+UP
+\par}
+&
+Page{}-up (one screen up)
+\\\hline
+{\centering
+DOWN
+\par}
+&
+Page{}-down (one screen down)
+\\\hline
+{\centering
+LEFT
+\par}
+&
+Top of file (Narrow mode)\newline
+One screen left (Wide mode)
+\\\hline
+{\centering
+RIGHT
+\par}
+&
+Bottom of file (Narrow mode)\newline
+One screen right (Wide mode)
+\\\hline
+{\centering
+ON{}-UP
+\par}
+&
+One line up
+\\\hline
+{\centering
+ON{}-DOWN
+\par}
+&
+One line down
+\\\hline
+{\centering
+ON{}-LEFT 
+\par}
+&
+One column left
+\\\hline
+{\centering
+ON{}-RIGHT
+\par}
+&
+One column right
+\\\hline
+{\centering
+OFF
+\par}
+&
+Exit text viewer
+\\\hline
+\end{tabular}
+
+\subsubsection{Player}
+
+\begin{tabular}[c]{|p{3.291cm}|p{7.131cm}|}
+\hline
+{\centering\bfseries\itshape
+KEY
+\par}
+&
+{\centering\bfseries\itshape
+ACTION
+\par}
+\\\hline
+{\centering
+MINUS
+\par}
+&
+Page{}-up (one screen up)
+\\\hline
+{\centering
+PLUS
+\par}
+&
+Page{}-down (one screen down)
+\\\hline
+{\centering
+MENU MINUS
+\par}
+&
+Top of file (Narrow mode)\newline
+One screen left (Wide mode)
+\\\hline
+{\centering
+MENU PLUS
+\par}
+&
+Bottom of file (Narrow mode)\newline
+One screen right (Wide mode)
+\\\hline
+{\centering
+STOP
+\par}
+&
+Exit text viewer
+\\\hline
+\end{tabular}
+
+\subsubsection{Compatibility}
+
+\begin{itemize}
+\item Correctly reads plain text files in Unix, Win/DOS, or Macintosh
+format. Latin{}-alphabet Unicode files are  a l m o s t  r e a d a b l
+e.
+\item Currently prefers fixed{}-width fonts. With proportional fonts,
+pretends all characters are the width of a lower{}-case 'o'.
+\item Currently messages are in English 
+\item Does not currently support right{}-to{}-left languages.
+\end{itemize}
+
+\subsection{VBRfix}
+This function scans a VBR (Variable Bitrate)
+MP3 file and updates/creates the Xing VBR header. The Xing header
+contains information about the VBR stream used to calculate average bit
+rate, time information and to more accurately fwd/rew in the stream.
+
+This function is especially useful when the playback of a file skips,
+fwd/rew does not work correctly or the time display is incorrect. Run
+VBRfix on files you record with your Jukebox. The header is not present
+in the recorded files and VBRfix adds this header.
+
+Note: VBRfix can only run when music is
+turned off (since it uses the same memory as the player) and can take a
+while to complete if run on big files.
+
+\section{Applications}
+
+\subsection{Battery\_test}
+{\centering\itshape
+  [Warning: Image ignored] % Unhandled or unsupported graphics:
+%\includegraphics[width=3.704cm,height=2.117cm]{images/rockbox-manual-img58.png}
+ \textmd{  }  [Warning: Image ignored]
+% Unhandled or unsupported graphics:
+%\includegraphics[width=4.598cm,height=1.976cm]{images/rockbox-manual-img59.png}
+ \newline
+  Recorder battery test  Player battery test  
+\par}
+
+This plugin simulates normal power drain by spinning up the disk and
+reading a big file once every 90 seconds (or thereabouts). Each
+spin up also writes the battery level to a
+log file. The test stops when battery level reaches 4\% in order to
+avoid being unable to write to the disk.  The power usage data is saved
+to a file in the root directory of the Jukebox.  This plugin can
+sometimes be useful for diagnosing problems with battery charging.
+
+\subsection{Calculator (Recorder, Ondio)}
+{\centering\itshape
+  [Warning: Image ignored] % Unhandled or unsupported graphics:
+%\includegraphics[width=3.889cm,height=2.223cm]{images/rockbox-manual-img60.png}
+ \newline
+Calculator
+\par}
+
+This is a simple scientific calculator for
+use on the Jukebox.  It works like a standard calculator.  Move using
+the arrow keys and press PLAY to press a button.  Pressing the ``1st''
+button will toggle between other available maths functions on the right
+hand side.
+
+\subsection{Calendar (Recorder, Ondio)}
+{\centering\itshape
+  [Warning: Image ignored] % Unhandled or unsupported graphics:
+%\includegraphics[width=3.9cm,height=2.23cm]{images/rockbox-manual-img61.png}
+ \newline
+Calendar
+\par}
+
+This is a small and simple calendar application with memo saving function.
+
+Dots indicate dates with memos. To add a new memo press PLAY on the
+date. Includes one off, annual, monthly, and weekly memos:
+
+\begin{tabular}[c]{|p{2.6469998cm}|p{3.95cm}|}
+\hline
+{\centering\bfseries\itshape
+KEY
+\par}
+&
+{\centering\bfseries\itshape
+ACTION
+\par}
+\\\hline
+{\centering
+PLAY
+\par}
+&
+monthly
+\\\hline
+{\centering
+LEFT
+\par}
+&
+weekly
+\\\hline
+{\centering
+RIGHT
+\par}
+&
+annually 
+\\\hline
+{\centering
+ON
+\par}
+&
+one off
+\\\hline
+{\centering
+STOP
+\par}
+&
+exit 
+\\\hline
+\end{tabular}
+
+\subsection{Chess Clock}
+{\centering\itshape
+  [Warning: Image ignored] % Unhandled or unsupported graphics:
+%\includegraphics[width=4.634cm,height=1.984cm]{images/rockbox-manual-img62.png}
+ \newline
+Chess Clock 
+\par}
+
+The chess clock plugin is designed  to
+simulate a chess clock, but it can be used
+in any kind of game with up to ten players.
+
+\subsubsection{Setup}
+
+\begin{itemize}
+\item First enter the number of players (1{}-10) (press  PLAY to
+continue). 
+\item Then set the total game time in mm:ss (press PLAY to continue,
+STOP to go back). 
+\item Then the maximum round time is entered.  For example, this could
+be used  to play Scrabble for a maximum of 15 minutes each, with each
+round taking no longer than one minute. (press  PLAY to continue). 
+\item Done. Player 1 starts in paused mode. So press PLAY to start.
+\end{itemize}
+
+\subsubsection{While playing}
+The number of the current player is displayed on the top line. The time
+below is the time remaining for that round (and possibly also the total
+time left if different). 
+
+Keys are as follows:
+
+\begin{center}\begin{tabular}{|p{1.917cm}|p{2.7649999cm}|p{1.7049999cm}|p{9.433001cm}|}
+\hline
+{\centering\bfseries\itshape
+PLAYER 
+\par}
+&
+{\centering\bfseries\itshape
+RECORDER 
+\par}
+&
+{\centering\bfseries\itshape
+ONDIO 
+\par}
+&
+{\centering\bfseries\itshape
+FUNCTION 
+\par}
+\\\hline
+{\centering
+ON 
+\par}
+&
+{\centering
+OFF 
+\par}
+&
+{\centering
+ONOFF 
+\par}
+&
+Exit plugin 
+\\\hline
+{\centering
+STOP 
+\par}
+&
+{\centering
+LEFT 
+\par}
+&
+{\centering
+LEFT 
+\par}
+&
+Restart round for the player 
+\\\hline
+{\centering
+PLAY 
+\par}
+&
+{\centering
+PLAY 
+\par}
+&
+{\centering
+RIGHT 
+\par}
+&
+Pausing the time (press again to continue) 
+\\\hline
+{\centering
+RIGHT 
+\par}
+&
+{\centering
+UP 
+\par}
+&
+{\centering
+UP 
+\par}
+&
+Switch to next player 
+\\\hline
+{\centering
+LEFT 
+\par}
+&
+{\centering
+DOWN 
+\par}
+&
+{\centering
+DOWN 
+\par}
+&
+Switch to previous player 
+\\\hline
+{\centering
+MENU 
+\par}
+&
+{\centering
+F1 
+\par}
+&
+{\centering
+MODE 
+\par}
+&
+Enter a simple menu 
+\\\hline
+\end{tabular}\end{center}
+From the menu it is possible to delete a player, modify the round time
+for the current player or set the total time for the game. 
+
+When the round time is up for a player the message ``ROUND UP!'' is shown (press  NEXT to continue). 
+
+When the total time is up for a player the message ``TIME UP!''is shown. Then player will  then be removed from the timer. 
+
+\subsection{Clock (Recorder)}
+{\centering\itshape
+  [Warning: Image ignored] % Unhandled or unsupported graphics:
+%\includegraphics[width=3.528cm,height=2.016cm]{images/rockbox-manual-img63.png}
+ \newline
+Clock
+\par}
+
+This is a fully featured analogue and digital clock program.  
+
+\subsubsection{Key configuration}
+
+\begin{center}\begin{tabular}{|p{2.411cm}|p{6.012cm}|}
+\hline
+{\centering\bfseries\itshape
+KEY
+\par}
+&
+{\centering\bfseries\itshape
+ACTION
+\par}
+\\\hline
+{\centering
+F1
+\par}
+&
+Help
+\\\hline
+{\centering
+F2
+\par}
+&
+Start / Stop stopwatch
+\\\hline
+{\centering
+F2 (Hold)
+\par}
+&
+Reset stopwatch
+\\\hline
+{\centering
+F3
+\par}
+&
+Options
+\\\hline
+{\centering
+Play
+\par}
+&
+Select clock mode
+\\\hline
+{\centering
+UP
+\par}
+&
+Enable idle power off
+\\\hline
+{\centering
+DOWN
+\par}
+&
+Disable idle power off
+\\\hline
+{\centering
+RIGHT
+\par}
+&
+Enable backlight
+\\\hline
+{\centering
+LEFT
+\par}
+&
+Disable backlight
+\\\hline
+{\centering
+OFF
+\par}
+&
+Save settings to disk and exit
+\\\hline
+\end{tabular}\end{center}
+
+\subsubsection{Backlight configuration}
+If RIGHT or LEFT is not pressed during clock operation (with the
+exception of at the Help/Options/Mode Selector/Credit screens) then the
+backlight timeout will remain your Rockbox default setting (example, 15
+seconds). If RIGHT or LEFT is pressed, Clock will set the backlight to
+ON or OFF, respectively. When Clock is exited, your default Rockbox
+setting for Backlight will be restored. 
+
+\subsubsection{Saving Settings}
+Settings are saved to disk when Clock is exited. They are saved to
+\textbf{/.rockbox/rocks/.clock\_settings''}. To reset your settings
+back to the defaults, simply navigate to this file using Rockbox,
+highlight it, and press the ON+PLAY keys to get the Delete option. This way you can feel free to experiment with the settings {}- and you could even load
+separate settings, say, one for your desk at home and one for in the car {}- by keeping two files in your \textbf{/.rockbox/rocks} folder such as
+``h.clock\_settings'' and ``c.clock\_settings''. Simply remove the
+``h'' for your home settings to go into effect, or add the ``h'' back and take off the ``c'' for your car settings.
+
+In the future, loading different settings will probably be made easier
+through a built{}-in settings file loader in Clock. 
+
+\subsection{Euro Converter (Player)}
+{\centering\itshape
+  [Warning: Image ignored] % Unhandled or unsupported graphics:
+%\includegraphics[width=4.671cm,height=2cm]{images/rockbox-manual-img64.png}
+ \newline
+Euro converter
+\par}
+
+This plugin converts euros back into pre{}-euro currency.  The country for which is does this is selectable by pressing the MENU key.  The MINUS and
+PLUS keys move the cursor between the digits and the PLAY and STOP keys
+increase and decrease the current digit.  The amount in the old
+currency is displayed on the second line.
+
+\subsection{Favorites}
+{\centering\itshape
+  [Warning: Image ignored] % Unhandled or unsupported graphics:
+%\includegraphics[width=4.667cm,height=1.998cm]{images/rockbox-manual-img65.png}
+ \newline
+Favorites
+\par}
+
+When listening to any song you can open it with this plugin and it will
+add the current song to a special playlist of all songs you selected in
+\textbf{/favorites.m3u}.
+
+\subsection{Firmware\_flash (Recorder, Ondio)}
+{\centering\mdseries\itshape
+  [Warning: Image ignored] % Unhandled or unsupported graphics:
+%\includegraphics[width=3.634cm,height=2.076cm]{images/rockbox-manual-img66.png}
+ \newline
+Firmware\_flash
+\par}
+
+Use when flashing Rockbox (see page \pageref{ref:FlashingRockboxReal}.
+In the ideal case, you'll need this tool only once. For safety reasons you may wish to delete \textbf{firmware\_flash.rock} from \textbf{/.rockbox/rocks} once flashing is complete.
+
+\subsection{Metronome}
+This plugin can be used as a metronome to keep time during music
+practice.  Adjust the tempo though the interface or by tapping it out
+on the appropriate button.
+
+\begin{tabular}[c]{|p{2.587cm}|p{2.55cm}|p{2.62cm}|p{4.952cm}|}
+\hline
+{\centering\bfseries\itshape
+PLAYER 
+\par}
+&
+{\centering\bfseries\itshape
+RECORDER 
+\par}
+&
+{\centering\bfseries\itshape
+ONDIO 
+\par}
+&
+{\centering\bfseries\itshape
+FUNCTION 
+\par}
+\\\hline
+{\centering
+STOP 
+\par}
+&
+{\centering
+OFF 
+\par}
+&
+{\centering
+ONOFF 
+\par}
+&
+Exit plugin 
+\\\hline
+{\centering
+PLAY 
+\par}
+&
+{\centering
+PLAY 
+\par}
+&
+{\centering
+~ 
+\par}
+&
+Start / Stop 
+\\\hline
+{\centering
+ON 
+\par}
+&
+{\centering
+ON 
+\par}
+&
+{\centering
+~ 
+\par}
+&
+Tap tempo 
+\\\hline
+{\centering
+~ 
+\par}
+&
+{\centering
+~ 
+\par}
+&
+{\centering
+MODE 
+\par}
+&
+Start / Tap tempo
+\\\hline
+{\centering
+~ 
+\par}
+&
+{\centering
+~ 
+\par}
+&
+{\centering
+HOLD MODE 
+\par}
+&
+Stop 
+\\\hline
+{\centering
+MINUS/PLUS
+\par}
+&
+{\centering
+LEFT/RIGHT 
+\par}
+&
+{\centering
+LEFT/RIGHT 
+\par}
+&
+Adjust tempo 
+\\\hline
+{\centering
+ON+MINUS/\newline
+ON+PLUS 
+\par}
+&
+{\centering
+UP/DOWN 
+\par}
+&
+{\centering
+UP/DOWN 
+\par}
+&
+Adjust volume
+\\\hline
+\end{tabular}
+
+\subsection{Split Editor (Recorder, Ondio)}
+When recording an mp3 file, it is common practice to start the recording
+a little bit early and stop it a little bit late to ensure all the
+desired sound is recorded. This results in recordings that contain
+extra snippets of sound and the beginning and end. Unfortunately these
+snippets can not be deleted easily because they are stored in the same
+file as the desired recording. The purpose of the split editor is to
+split a mp3 file (the input file) at a point in time (split point). Two
+new files can be generated from the input file. The first file contains
+the part before the split point and the second file contains the part
+after the split point. Once this process has been successful the
+original file can be deleted or kept as a backup. 
+
+The whole process of splitting a mp3 file consists of three steps: 
+
+\begin{enumerate}
+\item defining the split point 
+\item generating the result files. 
+\item if desired delete the input file (with the browser, not the split
+editor) 
+\end{enumerate}
+
+\subsubsection{How to use the Split Editor}
+
+\begin{itemize}
+\item \textbf{Pause near the split point}
+When the device plays the song just hit the PAUSE button, when playback
+has roughly reached the split point. This need not be very precise as
+the split point can be fine tuned later.
+\item \textbf{Open the split editor}
+
+Open the plugin.  A screen similar to the one below will appear. 
+
+{\centering\itshape
+  [Warning: Image ignored] % Unhandled or unsupported graphics:
+%\includegraphics[width=3.701cm,height=2.11cm]{images/rockbox-manual-img67.gif}
+ \newline
+The Split Editor
+\par}
+
+{\centering\upshape
+Here is an explanation of the areas marked in red on the screenshot.
+\par}
+
+\begin{enumerate}
+\item The waveform \newline
+\newline
+The waveform displays the volume of the song over time. It will appear
+as the song plays and help to visually identify the point in time where
+the split is desired
+\item The split point indicator\newline
+\newline
+The split point indicator is a vertical line with a small triangle at
+the top end. It is the most important control element of the split
+editor. It can be moved with the LEFT and RIGHT buttons. Later, when
+you have fine tuned the split point, the song will be split at this
+position.
+\item The split time\newline
+\newline
+At the top of the window a time value is displayed. This is the point in
+time within the song at which the split point indicator is positioned. 
+\item The locator\newline
+\newline
+Another vertical bar represents the position locator. It moves along as
+the song plays. In contrast to the split point indicator it has no
+triangles at the ends. 
+\item The time bar\newline
+\newline
+The time bar displays the current position within the song relative to
+the whole song. The entire length of the time bar represents the song
+length. The length of the solid part of the time bar represents the position and length
+of the displayed part of the song.
+\item The scale mode\newline
+\newline
+Directly above the F3 button the scale mode is displayed. The waveform
+can be scaled either logarithmically or linearly. In logarithmic scale
+mode the letters ``dB'' are displayed, in linear mode ``\%''. Use F3 to
+switch between these modes. Linear mode usually gives better optical
+hints with commercially recorded music. For quiet recordings,
+especially of human speech, the logarithmic scale often is preferable.
+\item The loop mode \newline
+\newline
+Directly above the F2 button the loop mode icon is displayed. There are
+4 different loop modes. Pressing F2 changes to the next loop mode. 
+
+\begin{itemize}
+\item   [Warning: Image ignored] % Unhandled or unsupported graphics:
+%\includegraphics[width=0.794cm,height=0.476cm]{images/rockbox-manual-img68.gif}
+  Playback loops around the split point indicator. This mode is best
+used when searching and zooming for the desired point at which to split
+the recording. 
+\item   [Warning: Image ignored] % Unhandled or unsupported graphics:
+%\includegraphics[width=0.794cm,height=0.476cm]{images/rockbox-manual-img69.gif}
+  Playback loops from the split point indicator to the end of the
+visible area. This mode is best used when fine tuning the split
+indicator position at the beginning of a recording. 
+\item   [Warning: Image ignored] % Unhandled or unsupported graphics:
+%\includegraphics[width=0.794cm,height=0.476cm]{images/rockbox-manual-img70.gif}
+  Playback loops from the beginning of the
+visible area to the split point. This mode is best used when fine
+tuning the split indicator position at the end of a recording.
+\item   [Warning: Image ignored] % Unhandled or unsupported graphics:
+%\includegraphics[width=0.688cm,height=0.476cm]{images/rockbox-manual-img71.gif}
+  Playback doesn't loop, the borders of the visible
+area as well as the split point indicator are ignored. This mode is
+best used when playing the song outside of the borders of the displayed
+region. 
+\end{itemize}
+
+\item Perform the split \newline
+\newline
+The icon directly above the F1 button indicates its function to execute
+the split. When split positioning is complete open the save dialogue with F1.
+\end{enumerate}
+
+{\bfseries
+Controls in the split editor }
+\end{itemize}
+
+\begin{tabular}[c]{|p{2.975cm}|p{3.047cm}|p{6.649cm}|}
+\hline
+{\centering\bfseries\itshape
+Recorder 
+\par}
+&
+{\centering\bfseries\itshape
+Ondio 
+\par}
+&
+{\centering\bfseries\itshape
+Function 
+\par}
+\\\hline
+{\centering
+Off 
+\par}
+&
+{\centering
+On/Off 
+\par}
+&
+Quit plugin 
+\\\hline
+{\centering
+Left/Right 
+\par}
+&
+{\centering
+Left/Right 
+\par}
+&
+Move the split point indicator 
+\\\hline
+{\centering
+Up/Down 
+\par}
+&
+{\centering
+Up/Down 
+\par}
+&
+Zoom in / out 
+\\\hline
+{\centering
+Play 
+\par}
+&
+{\centering
+Mode 
+\par}
+&
+Play from the split position 
+\\\hline
+{\centering
+F1 
+\par}
+&
+{\centering
+Mode+Left 
+\par}
+&
+Enter the save dialogue
+\\\hline
+{\centering
+F2 
+\par}
+&
+{\centering
+Mode+Up 
+\par}
+&
+Toggle loop modes 
+\\\hline
+{\centering
+F3 
+\par}
+&
+{\centering
+Mode+Right 
+\par}
+&
+Toggle logarithmic / linear scaling 
+\\\hline
+{\centering
+On+Left 
+\par}
+&
+{\centering
+~ 
+\par}
+&
+Play half speed 
+\\\hline
+{\centering
+On+Right 
+\par}
+&
+{\centering
+~ 
+\par}
+&
+Play 150\% speed 
+\\\hline
+{\centering
+On+Play 
+\par}
+&
+{\centering
+~ 
+\par}
+&
+Play normal speed 
+\\\hline
+\end{tabular}
+
+\subsubsection{Save the files}
+In the save dialogue it is possible to specify which of the files you
+want to save and their names.  When finished, select
+``Save'' and the files will be written to
+disk. Note that files can not be overwritten, so filenames that
+don't exist yet must be chosen. If unsure whether the
+file already exists simply try to save it. If another file with this
+name exists the dialogue will return and you can choose another
+filename
+
+{\centering\itshape
+  [Warning: Image ignored] % Unhandled or unsupported graphics:
+%\includegraphics[width=3.701cm,height=2.11cm]{images/rockbox-manual-img72.gif}
+ \newline
+Save dialogue
+\par}
+
+Controls in the save dialogue
+\begin{tabular}[c]{|p{2.62cm}|p{2.266cm}|p{3.965cm}|}
+\hline
+{\centering\bfseries\itshape
+RECORDER 
+\par}
+&
+{\centering\bfseries\itshape
+ONDIO 
+\par}
+&
+{\centering\bfseries\itshape
+FUNCTION 
+\par}
+\\\hline
+{\centering
+UP/DOWN 
+\par}
+&
+{\centering
+UP/DOWN 
+\par}
+&
+Select item 
+\\\hline
+{\centering
+PLAY 
+\par}
+&
+{\centering
+RIGHT 
+\par}
+&
+Toggle / edit item 
+\\\hline
+\end{tabular}
+
+\subsubsection{Scale}
+The values in the waveform are scaled according to the settings of the
+peak meter. These can be altered in the menu
+\textbf{General Settings {}-{\textgreater} Display{}-{\textgreater} Peak Meter}. If extreme minimum /
+maximum values are set the waveform might be cut off.  A minimum
+setting of {}-60 dB and a maximum setting of 0 dB are recommended.
+These settings should be capable of producing useful waveforms for very
+soft sounds in logarithmic mode (dB). When the editor is used on loud
+sounds (such as commercial rock or pop music) switching to the linear
+scale may prove more effective since the logarithmic scale compresses
+loud noises and makes it more difficult to identify characteristic
+shapes. Note that it is always possible to toggle the scale with F3. 
+
+\subsection{Stopwatch}
+{\centering\itshape
+  [Warning: Image ignored] % Unhandled or unsupported graphics:
+%\includegraphics[width=3.704cm,height=2.117cm]{images/rockbox-manual-img73.png}
+ \textmd{  }  [Warning: Image ignored]
+% Unhandled or unsupported graphics:
+%\includegraphics[width=4.667cm,height=1.998cm]{images/rockbox-manual-img74.png}
+ \newline
+Recorder stopwatch  Player stopwatch  
+\par}
+
+A simple stopwatch program with support for saving times.
+
+\subsubsection{Keys are as follows:}
+
+\begin{tabular}[c]{|p{2.9029999cm}|p{2.763cm}|p{2.199cm}|p{5.235cm}|}
+\hline
+{\centering\bfseries\itshape
+PLAYER 
+\par}
+&
+{\centering\bfseries\itshape
+RECORDER 
+\par}
+&
+{\centering\bfseries\itshape
+ONDIO 
+\par}
+&
+{\centering\bfseries\itshape
+FUNCTION 
+\par}
+\\\hline
+{\centering
+MENU 
+\par}
+&
+{\centering
+OFF 
+\par}
+&
+{\centering
+ONOFF 
+\par}
+&
+Quit Plugin 
+\\\hline
+{\centering
+PLAY 
+\par}
+&
+{\centering
+PLAY 
+\par}
+&
+{\centering
+RIGHT 
+\par}
+&
+Start / stop 
+\\\hline
+{\centering
+STOP 
+\par}
+&
+{\centering
+LEFT
+\par}
+&
+{\centering
+LEFT 
+\par}
+&
+Reset timer 
+\\\hline
+{\centering
+ON 
+\par}
+&
+{\centering
+ON 
+\par}
+&
+{\centering
+MODE 
+\par}
+&
+Take lap time 
+\\\hline
+{\centering
+MINUS/PLUS 
+\par}
+&
+{\centering
+DOWN/UP 
+\par}
+&
+{\centering
+DOWN/UP 
+\par}
+&
+Scroll through lap times
+\\\hline
+\end{tabular}
