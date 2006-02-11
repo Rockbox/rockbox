@@ -678,7 +678,7 @@ static bool eq_save_preset(void)
     }
 
     /* TODO: Should we really do this? */
-    fdprintf(fd, "eq enabled: yes\r\n");
+    fdprintf(fd, "eq enabled: on\r\n");
     
     setting = &global_settings.eq_band0_cutoff;
     
