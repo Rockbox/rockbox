@@ -2230,6 +2230,7 @@ bool ffwd_rew(int button)
             case WPS_RC_NEXT:
 #endif
                 audio_ff_rewind(wps_state.id3->elapsed+ff_rewind_count);
+                wps_state.id3->elapsed = wps_state.id3->elapsed+ff_rewind_count;
                 ff_rewind_count = 0;
                 wps_state.ff_rewind = false;
                 status_set_ffmode(0);
@@ -2253,10 +2254,6 @@ bool ffwd_rew(int button)
             button = button_get(true);
     }
 
-    /* let audio thread update id3->elapsed before calling wps_refresh */
-    yield(); 
-    FOR_NB_SCREENS(i)
-        gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_ALL);
     return usb;
 }
 
