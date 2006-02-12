@@ -80,7 +80,31 @@ remap_start:
     mov    pc, r0
 L_post_remap: .word remap_end
 remap_end:
-#endif /* PP specific */
+
+#elif CONFIG_CPU == PNX0101
+
+#ifndef DEBUG
+    ldr    r0, =0x80105000
+    mov    r1, #1
+    str    r1, [r0, #4]
+    mov    r1, #0
+    str    r1, [r0, #4]
+1:  ldr    r1, [r0]
+    cmp    r1, #0
+    bne    1b
+    mov    r1, #0x74
+    str    r1, [r0, #8]
+    mov    r1, #2
+    str    r1, [r0, #0x18]	
+    mov    r1, #0x120
+    str    r1, [r0, #0x30]
+    mov    r1, #6
+    str    r1, [r0, #4]
+    ldr    r0, =1f
+    mov    r15, r0
+1:
+#endif /* !DEBUG */
+#endif /* chipset specific */
 
 #ifndef DEBUG
     /* Copy exception handler code to address 0 */
