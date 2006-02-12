@@ -28,7 +28,9 @@
 
 #ifdef DEBUG
 static char debugmembuf[200];
+#if CONFIG_CPU == SH3704
 static char debugbuf[400];
+#endif
 #endif
 
 #ifndef SIMULATOR /* allow non archos platforms to display output */
@@ -222,7 +224,7 @@ static void debug(char *msg)
     if (f) (*f)(msg);
 }
 
-void debug_init()
+void debug_init(void)
 {
 }
 
