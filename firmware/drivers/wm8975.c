@@ -45,16 +45,6 @@ void wm8975_reset(void);
 
 #define IPOD_PCM_LEVEL 0x65       /* -6dB */
 
-#define RESET     (0x0f<<1)
-#define PWRMGMT1  (0x19<<1)
-#define PWRMGMT2  (0x1a<<1)
-#define AINTFCE   (0x07<<1)
-#define LOUT1VOL  (0x02<<1)
-#define ROUT1VOL  (0x03<<1)
-#define LOUT2VOL  (0x28<<1)
-#define ROUT2VOL  (0x29<<1)
-
-
 /*
  * Reset the I2S BIT.FORMAT I2S, 16bit, FIFO.FORMAT 32bit
  */
@@ -81,6 +71,11 @@ static void i2s_reset(void)
 
     /* Rx.CLR = 1, TX.CLR = 1 */
     outl(inl(0x7000280c) | 0x1100, 0x7000280c);
+}
+
+void wm8975_write(int reg, int data)
+{
+    ipod_i2c_send(0x1a, (reg<<1) | ((data&0x100)>>8),data&0xff);
 }
 
 /*
@@ -129,39 +124,39 @@ void wm8975_enable_output(bool enable)
          *    and Headphone outputs are all OFF (DACMU = 1 Power
          *    Management registers 1 and 2 are all zeros).
          */
-        ipod_i2c_send(0x1a, RESET | 1, 0xff);    /*Reset*/
-        ipod_i2c_send(0x1a, RESET, 0x0);
+        wm8975_write(RESET, 0x1ff);    /*Reset*/
+        wm8975_write(RESET, 0x0);
     
          /* 2. Enable Vmid and VREF. */
-        ipod_i2c_send(0x1a, PWRMGMT1, 0xc0);    /*Pwr Mgmt(1)*/
+        wm8975_write(PWRMGMT1, 0xc0);    /*Pwr Mgmt(1)*/
     
          /* 3. Enable DACs as required. */
-        ipod_i2c_send(0x1a, PWRMGMT2 | 0x1, 0x80);    /*Pwr Mgmt(2)*/
+        wm8975_write(PWRMGMT2, 0x180);    /*Pwr Mgmt(2)*/
     
          /* 4. Enable line and / or headphone output buffers as required. */
-        ipod_i2c_send(0x1a, PWRMGMT2 | 0x1, 0xf8);    /*Pwr Mgmt(2)*/
+        wm8975_write(PWRMGMT2, 0x1f8);    /*Pwr Mgmt(2)*/
     
         /* BCLKINV=0(Dont invert BCLK) MS=1(Enable Master) LRSWAP=0 LRP=0 */
         /* IWL=00(16 bit) FORMAT=10(I2S format) */
-        ipod_i2c_send(0x1a, AINTFCE, 0x42);
+        wm8975_write(AINTFCE, 0x42);
     
         /* The iPod can handle multiple frequencies, but fix at 44.1KHz for now */
         wm8975_set_sample_rate(WM8975_44100HZ);
     
         /* set the volume to -6dB */
-        ipod_i2c_send(0x1a, LOUT1VOL, IPOD_PCM_LEVEL);
-        ipod_i2c_send(0x1a, ROUT1VOL | 0x1, IPOD_PCM_LEVEL);
-        ipod_i2c_send(0x1a, LOUT1VOL, IPOD_PCM_LEVEL);
-        ipod_i2c_send(0x1a, ROUT1VOL | 0x1, IPOD_PCM_LEVEL);
+        wm8975_write(LOUT1VOL, IPOD_PCM_LEVEL);
+        wm8975_write(ROUT1VOL,0x100 | IPOD_PCM_LEVEL);
+        wm8975_write(LOUT1VOL, IPOD_PCM_LEVEL);
+        wm8975_write(ROUT1VOL,0x100 | IPOD_PCM_LEVEL);
+
+        wm8975_write(LOUTMIX1, 0x150);    /* Left out Mix(def) */
+        wm8975_write(LOUTMIX2, 0x50);
     
-        ipod_i2c_send(0x1a, 0x45, 0x50);    /* Left out Mix(def) */
-        ipod_i2c_send(0x1a, 0x46, 0x50);
+        wm8975_write(ROUTMIX1, 0x50);    /* Right out Mix(def) */
+        wm8975_write(ROUTMIX2, 0x150);
     
-        ipod_i2c_send(0x1a, 0x48, 0x50);    /* Right out Mix(def) */
-        ipod_i2c_send(0x1a, 0x4b, 0x50);
-    
-        ipod_i2c_send(0x1a, 0x4c, 0x0);     /* Mono out Mix */
-        ipod_i2c_send(0x1a, 0x4e, 0x0);
+        wm8975_write(MOUTMIX1, 0x0);     /* Mono out Mix */
+        wm8975_write(MOUTMIX2, 0x0);
 
         wm8975_mute(0);
     } else {
@@ -178,12 +173,12 @@ int wm8975_set_master_vol(int vol_l, int vol_r)
     /* 0101111 == mute (0x2f) */
 
     /* OUT1 */
-    ipod_i2c_send(0x1a, LOUT1VOL, vol_l);
-    ipod_i2c_send(0x1a, ROUT1VOL | 0x1, vol_r);
+    wm8975_write(LOUT1VOL, vol_l);
+    wm8975_write(ROUT1VOL, 0x100 | vol_r);
 
     /* OUT2 */
-    ipod_i2c_send(0x1a, LOUT2VOL, vol_l);
-    ipod_i2c_send(0x1a, ROUT2VOL | 0x1, vol_r);
+    wm8975_write(LOUT2VOL, vol_l);
+    wm8975_write(ROUT2VOL, 0x100 | vol_r);
 
     return 0;
 }
@@ -203,7 +198,7 @@ void wm8975_set_bass(int value)
 
   if ((value >= -6) && (value <= 9)) {
       /* We use linear bass control with 130Hz cutoff */
-      ipod_i2c_send(0x1a, 0x0c << 1, regvalues[value+6]);
+      wm8975_write(BASSCTRL, regvalues[value+6]);
   }
 }
 
@@ -213,7 +208,7 @@ void wm8975_set_treble(int value)
 
   if ((value >= -6) && (value <= 9)) {
       /* We use a 8Khz cutoff */
-      ipod_i2c_send(0x1a, 0x0d << 1, regvalues[value+6]);
+      wm8975_write(TREBCTRL, regvalues[value+6]);
   }
 }
 
@@ -222,10 +217,10 @@ int wm8975_mute(int mute)
     if (mute)
     {
         /* Set DACMU = 1 to soft-mute the audio DACs. */
-        ipod_i2c_send(0x1a, 0xa, 0x8);
+        wm8975_write(DACCTRL, 0x8);
     } else {
         /* Set DACMU = 0 to soft-un-mute the audio DACs. */
-        ipod_i2c_send(0x1a, 0xa, 0x0);
+        wm8975_write(DACCTRL, 0x0);
     }
 
     return 0;
@@ -235,13 +230,13 @@ int wm8975_mute(int mute)
 void wm8975_close(void)
 {
     /* 1. Set DACMU = 1 to soft-mute the audio DACs. */
-    ipod_i2c_send(0x1a, 0xa, 0x8);
+    wm8975_write(DACCTRL, 0x8);
 
     /* 2. Disable all output buffers. */
-    ipod_i2c_send(0x1a, 0x34, 0x0);     /*Pwr Mgmt(2)*/
+    wm8975_write(PWRMGMT2, 0x0);     /*Pwr Mgmt(2)*/
 
     /* 3. Switch off the power supplies. */
-    ipod_i2c_send(0x1a, 0x32, 0x0);     /*Pwr Mgmt(1)*/
+    wm8975_write(PWRMGMT1, 0x0);     /*Pwr Mgmt(1)*/
 }
 
 /* Change the order of the noise shaper, 5th order is recommended above 32kHz */
@@ -253,7 +248,7 @@ void wm8975_set_nsorder(int order)
 /* Note: Disable output before calling this function */
 void wm8975_set_sample_rate(int sampling_control) {
 
-  ipod_i2c_send(0x1a, 0x10, sampling_control);
+  wm8975_write(0x08, sampling_control);
 
 }
 

@@ -37,6 +37,26 @@ extern void wm8975_disable_recording(void);
 extern void wm8975_set_recvol(int left, int right, int type);
 extern void wm8975_set_monitor(int enable);
 
+/* Register addresses */
+#define LOUT1VOL 0x02
+#define ROUT1VOL 0x03
+#define DACCTRL  0x05
+#define AINTFCE  0x07
+#define BASSCTRL 0x0c
+#define TREBCTRL 0x0d
+#define RESET    0x0f
+#define PWRMGMT1 0x19
+#define PWRMGMT2 0x1a
+#define LOUTMIX1 0x22
+#define LOUTMIX2 0x23
+#define ROUTMIX1 0x24
+#define ROUTMIX2 0x25
+#define MOUTMIX1 0x26
+#define MOUTMIX2 0x27
+#define LOUT2VOL 0x28
+#define ROUT2VOL 0x29
+
+
 /* Register settings for the supported samplerates: */
 #define WM8975_8000HZ      0x4d
 #define WM8975_12000HZ     0x61
