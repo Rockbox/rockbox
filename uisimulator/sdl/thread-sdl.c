@@ -46,7 +46,7 @@ void sim_sleep(int ticks)
 
 int runthread(void *data)
 {
-    SDL_mutexV(m);
+    SDL_mutexP(m);
     ((void(*)())data) ();
     SDL_mutexV(m);
     return 0;
@@ -63,6 +63,8 @@ int create_thread(void (*fp)(void), void* sp, int stk_size)
     }
 
     threads[threadCount++] = SDL_CreateThread(runthread, fp);
+
+    yield();
 
     return 0;
 }
