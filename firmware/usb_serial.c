@@ -153,7 +153,7 @@ static unsigned char device_descriptor[18] = {
     0x10, 0x01, /* USB version (1.1) */
     0xff, 0xff, /* class and subclass */
     0xff,       /* protocol */
-    0x08,       /* max packet size 0 */
+    0x40,       /* max packet size 0 */
     0x02, 0x41, /* vendor (iRiver) */
     0x07, 0xee, /* product (0xee07) */
     0x01, 0x00, /* device version */
@@ -310,8 +310,8 @@ void usb_setup(int reset)
 
     ISP1582_ADDRESS = reset ? 0x80: 0;
 
-    usb_setup_endpoint(ep_index(0, DIR_RX), 8, 0);
-    usb_setup_endpoint(ep_index(0, DIR_TX), 8, 0);
+    usb_setup_endpoint(ep_index(0, DIR_RX), 64, 0);
+    usb_setup_endpoint(ep_index(0, DIR_TX), 64, 0);
     
     ISP1582_MODE |= 1; /* SOFTCT on */
 
@@ -808,11 +808,11 @@ static void usb_handle_int(int i)
 #ifdef LCD_DEBUG
 /*
     char s[10];
-    int_count[i]++;
     snprintf(s, sizeof(s), "%02d", i);
     lcd_puts(0, 2, s);
     lcd_update();
 */
+    int_count[i]++;
     if (i == 10)
         log_char('o');
     if (i == 11)
@@ -845,7 +845,7 @@ static void usb_handle_int(int i)
 void usb_handle_interrupts(void)
 {
 #ifdef LCD_DEBUG
-    /* char s[20]; */
+    char s[20];
 #endif
 
     while (1)
@@ -870,14 +870,12 @@ void usb_handle_interrupts(void)
         usb_handle_int(i);
 
 #ifdef LCD_DEBUG
-        /*
         for (i = 0; i < 8; i++)
             snprintf(s + i * 2, 3, "%02x", int_count[i]);
         lcd_puts(0, 6, s);
         for (i = 0; i < 8; i++)
             snprintf(s + i * 2, 3, "%02x", int_count[i + 8]);
         lcd_puts(0, 7, s);
-        */
 #endif
     }
 #ifdef LCD_DEBUG
