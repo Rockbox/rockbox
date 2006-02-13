@@ -717,7 +717,8 @@ static bool prepare_insert(size_t length)
             return false;
     }
     
-    if (audiobuffer_free < length && !crossfade_active)
+    /* Need to save PCMBUF_MIN_CHUNK to prevent wrapping overwriting */
+    if (audiobuffer_free < length + PCMBUF_MIN_CHUNK && !crossfade_active)
     {
         pcmbuf_boost(false);
         return false;
@@ -750,16 +751,18 @@ void* pcmbuf_request_buffer(size_t length, size_t *realsize)
         if(prepare_insert(length))
         {
             size_t audiobuffer_index = audiobuffer_pos + audiobuffer_fillpos;
-            if (pcmbuf_size - audiobuffer_index < PCMBUF_MIN_CHUNK) {
-                pcmbuf_flush_fillpos();
-                audiobuffer_pos = 0;
-                *realsize = MIN(length, pcmbuf_size);
-                return &audiobuffer[0];
+            *realsize = length;
+            if (pcmbuf_size - audiobuffer_index >= PCMBUF_MIN_CHUNK)
+            {
+                /* Usual case, there's space here */
+                return &audiobuffer[audiobuffer_index];
             }
             else
             {
-                *realsize = MIN(length, pcmbuf_size - audiobuffer_index);
-                return &audiobuffer[audiobuffer_index];
+                /* Flush and wrap the buffer */
+                pcmbuf_flush_fillpos();
+                audiobuffer_pos = 0;
+                return &audiobuffer[0];
             }
         }
         else
