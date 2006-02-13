@@ -684,7 +684,7 @@ toolsdir='\$(ROOTDIR)/tools'
    12)
     archos="x5"
     target="-DIAUDIO_X5"
-    memory=32 # always
+    memory=16 # always
     coldfirecc
     tool="$rootdir/tools/scramble -add=h120" # wrong, must be fixed
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
