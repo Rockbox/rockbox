@@ -295,11 +295,21 @@ void gui_list_select_next(struct gui_list * gui_list)
         gui_list->selected_item++;
         item_pos = gui_list->selected_item - gui_list->start_item;
         end_item = gui_list->start_item + nb_lines;
-        /* we start scrolling vertically when reaching the line
-         * (nb_lines-SCROLL_LIMIT)
-         * and when we are not in the last part of the list*/
-        if( item_pos > nb_lines-SCROLL_LIMIT && end_item < gui_list->nb_items )
-            gui_list->start_item++;
+        if (global_settings.scroll_paginated)
+        {
+            /* When we reach the bottom of the list
+             * we jump to a new page if there are more items*/
+            if( item_pos > nb_lines-1 && end_item < gui_list->nb_items )
+                gui_list->start_item = gui_list->selected_item;
+        }
+        else
+        {
+            /* we start scrolling vertically when reaching the line
+             * (nb_lines-SCROLL_LIMIT)
+             * and when we are not in the last part of the list*/
+            if( item_pos > nb_lines-SCROLL_LIMIT && end_item < gui_list->nb_items )
+                gui_list->start_item++;
+        }
     }
 }
 
@@ -323,10 +333,26 @@ void gui_list_select_previous(struct gui_list * gui_list)
     else
     {
         int item_pos;
+        int nb_lines = gui_list->display->nb_lines;
         gui_list->selected_item--;
         item_pos = gui_list->selected_item - gui_list->start_item;
-        if( item_pos < SCROLL_LIMIT-1 && gui_list->start_item > 0 )
-            gui_list->start_item--;
+        if (global_settings.scroll_paginated)
+        {
+            /* When we reach the top of the list
+             * we jump to a new page if there are more items*/
+            if( item_pos < 0 && gui_list->start_item > 0 )
+                gui_list->start_item = gui_list->selected_item-nb_lines+1;
+    	    if( gui_list->start_item < 0 )
+    	    	gui_list->start_item = 0;
+        }
+        else
+        {
+            /* we start scrolling vertically when reaching the line
+             * (nb_lines-SCROLL_LIMIT)
+             * and when we are not in the last part of the list*/
+            if( item_pos < SCROLL_LIMIT-1 && gui_list->start_item > 0 )
+                gui_list->start_item--;
+        }
     }
 }
 

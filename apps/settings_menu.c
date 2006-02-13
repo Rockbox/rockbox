@@ -92,6 +92,14 @@ static bool show_icons(void)
     return set_bool( (char *)str(LANG_SHOW_ICONS), &global_settings.show_icons );
 }
 
+/**
+ * Menu to set the option to scroll paginated
+ */
+static bool scroll_paginated(void)
+{
+    return set_bool( (char *)str(LANG_SCROLL_PAGINATED), &global_settings.scroll_paginated );
+}
+
 #ifdef HAVE_REMOTE_LCD
 static bool remote_contrast(void)
 {
@@ -1540,6 +1548,7 @@ static bool scroll_settings_menu(void)
         { ID2P(LANG_SCREEN_SCROLL_VIEW),  screen_scroll      },
         { ID2P(LANG_SCREEN_SCROLL_STEP),  screen_scroll_step },
 #endif
+        { ID2P(LANG_SCROLL_PAGINATED),    scroll_paginated   },
     };
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL,

@@ -451,6 +451,7 @@ struct user_settings
 #endif
 
     bool warnon_erase_dynplaylist; /* warn when erasing dynamic playlist */
+    bool scroll_paginated;   /* 0=dont 1=do */
 };
 
 enum optiontype { INT, BOOL };

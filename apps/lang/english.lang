@@ -3718,3 +3718,9 @@ desc: in the recording screen
 eng: "D"
 voice: "Digital Gain"
 new:
+
+id: LANG_SCROLL_PAGINATED
+desc: jump to new page when scrolling
+eng: "Paged Scrolling"
+voice: ""
+new:
