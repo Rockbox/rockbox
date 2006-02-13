@@ -28,6 +28,8 @@
 #include "uda1380.h"
 #elif defined(HAVE_WM8975)
 #include "wm8975.h"
+#elif defined(HAVE_WM8758)
+#include "wm8758.h"
 #elif defined(HAVE_TLV320)
 #include "tlv320.h"
 #elif defined(HAVE_WM8731L)
@@ -314,7 +316,7 @@ void pcm_init(void)
     dma_stop();
 }
 
-#elif defined(HAVE_WM8975)
+#elif defined(HAVE_WM8975) || defined(HAVE_WM8758)
 
 /* We need to unify this code with the uda1380 code as much as possible, but
    we will keep it separate during early development.
@@ -408,7 +410,7 @@ size_t pcm_get_bytes_waiting(void)
 
 void pcm_mute(bool mute)
 {
-    wm8975_mute(mute);
+    wmcodec_mute(mute);
     if (mute)
         sleep(HZ/16);
 }
@@ -532,15 +534,15 @@ void pcm_init(void)
     pcm_paused = false;
 
     /* Initialize default register values. */
-    wm8975_init();
+    wmcodec_init();
     
     /* The uda1380 needs a sleep(HZ) here - do we need one? */
 
     /* Power on */
-    wm8975_enable_output(true);
+    wmcodec_enable_output(true);
 
     /* Unmute the master channel (DAC should be at zero point now). */
-    wm8975_mute(false);
+    wmcodec_mute(false);
 
     /* Call dma_stop to initialize everything. */
     dma_stop();
@@ -625,7 +627,7 @@ void pcm_calculate_peaks(int *left, int *right)
 #ifdef HAVE_UDA1380
     long samples = (BCR0 & 0xffffff) / 4;
     short *addr = (short *) (SAR0 & ~3);
-#elif defined(HAVE_WM8975)
+#elif defined(HAVE_WM8975) || defined(HAVE_WM8758)
     long samples = p_size / 4;
     short *addr = p;
 #elif defined(HAVE_WM8731L)

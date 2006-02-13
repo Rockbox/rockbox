@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Driver for WM8975 audio codec
+ * Driver for WM8758 audio codec
  *
  * Based on code from the ipodlinux project - http://ipodlinux.org/
  * Adapted for Rockbox in December 2005
@@ -38,12 +38,15 @@
 #include "audio.h"
 
 #include "i2c-pp5020.h"
-#include "wm8975.h"
+#include "wm8758.h"
 #include "pcf50605.h"
 
 void wmcodec_reset(void);
 
 #define IPOD_PCM_LEVEL 0x65       /* -6dB */
+
+//#define BASSCTRL   0x
+//#define TREBCTRL   0x0b
 
 /*
  * Reset the I2S BIT.FORMAT I2S, 16bit, FIFO.FORMAT 32bit
@@ -73,13 +76,13 @@ static void i2s_reset(void)
     outl(inl(0x7000280c) | 0x1100, 0x7000280c);
 }
 
-void wm8975_write(int reg, int data)
+void wm8758_write(int reg, int data)
 {
     ipod_i2c_send(0x1a, (reg<<1) | ((data&0x100)>>8),data&0xff);
 }
 
 /*
- * Initialise the WM8975 for playback via headphone and line out.
+ * Initialise the WM8758 for playback via headphone and line out.
  * Note, I'm using the WM8750 datasheet as its apparently close.
  */
 int wmcodec_init(void) {
@@ -117,47 +120,23 @@ void wmcodec_enable_output(bool enable)
         /* reset the I2S controller into known state */
         i2s_reset();
 
-        /*
-         * 1. Switch on power supplies.
-         *    By default the WM8750L is in Standby Mode, the DAC is
-         *    digitally muted and the Audio Interface, Line outputs
-         *    and Headphone outputs are all OFF (DACMU = 1 Power
-         *    Management registers 1 and 2 are all zeros).
-         */
-        wm8975_write(RESET, 0x1ff);    /*Reset*/
-        wm8975_write(RESET, 0x0);
+        wm8758_write(RESET, 0x1ff);    /*Reset*/
     
-         /* 2. Enable Vmid and VREF. */
-        wm8975_write(PWRMGMT1, 0xc0);    /*Pwr Mgmt(1)*/
-    
-         /* 3. Enable DACs as required. */
-        wm8975_write(PWRMGMT2, 0x180);    /*Pwr Mgmt(2)*/
-    
-         /* 4. Enable line and / or headphone output buffers as required. */
-        wm8975_write(PWRMGMT2, 0x1f8);    /*Pwr Mgmt(2)*/
-    
-        /* BCLKINV=0(Dont invert BCLK) MS=1(Enable Master) LRSWAP=0 LRP=0 */
-        /* IWL=00(16 bit) FORMAT=10(I2S format) */
-        wm8975_write(AINTFCE, 0x42);
-    
-        /* The iPod can handle multiple frequencies, but fix at 44.1KHz for now */
-        wmcodec_set_sample_rate(WM8975_44100HZ);
-    
-        /* set the volume to -6dB */
-        wm8975_write(LOUT1VOL, IPOD_PCM_LEVEL);
-        wm8975_write(ROUT1VOL,0x100 | IPOD_PCM_LEVEL);
-        wm8975_write(LOUT1VOL, IPOD_PCM_LEVEL);
-        wm8975_write(ROUT1VOL,0x100 | IPOD_PCM_LEVEL);
+	wm8758_write(PWRMGMT1, 0x2b);
+        wm8758_write(PWRMGMT2, 0x180);
+	wm8758_write(PWRMGMT3, 0x6f);
 
-        wm8975_write(LOUTMIX1, 0x150);    /* Left out Mix(def) */
-        wm8975_write(LOUTMIX2, 0x50);
-    
-        wm8975_write(ROUTMIX1, 0x50);    /* Right out Mix(def) */
-        wm8975_write(ROUTMIX2, 0x150);
-    
-        wm8975_write(MOUTMIX1, 0x0);     /* Mono out Mix */
-        wm8975_write(MOUTMIX2, 0x0);
+	wm8758_write(AINTFCE, 0x10);
+	wm8758_write(CLKCTRL, 0x49);
 
+        wm8758_write(OUTCTRL, 1 | (0x3 << 5));
+
+        /* The iPod can handle multiple frequencies, but fix at 44.1KHz
+           for now */
+        wmcodec_set_sample_rate(WM8758_44100HZ);
+    
+        wm8758_write(LOUTMIX,0x1); /* Enable mixer */
+        wm8758_write(ROUTMIX,0x1); /* Enable mixer */
         wmcodec_mute(0);
     } else {
         wmcodec_mute(1);
@@ -173,12 +152,12 @@ int wmcodec_set_master_vol(int vol_l, int vol_r)
     /* 0101111 == mute (0x2f) */
 
     /* OUT1 */
-    wm8975_write(LOUT1VOL, vol_l);
-    wm8975_write(ROUT1VOL, 0x100 | vol_r);
+    wm8758_write(LOUT1VOL, vol_l);
+    wm8758_write(ROUT1VOL, 0x100 | vol_r);
 
     /* OUT2 */
-    wm8975_write(LOUT2VOL, vol_l);
-    wm8975_write(ROUT2VOL, 0x100 | vol_r);
+    wm8758_write(LOUT2VOL, vol_l);
+    wm8758_write(ROUT2VOL, 0x100 | vol_r);
 
     return 0;
 }
@@ -194,22 +173,31 @@ int wmcodec_set_mixer_vol(int channel1, int channel2)
 /* We are using Linear bass control */
 void wmcodec_set_bass(int value)
 {
-  int regvalues[]={11, 10, 10,  9,  8,  8, 0xf , 6, 6, 5, 4, 4, 3, 2, 1, 0};
+    (void)value;
+#if 0
+    /* Not yet implemented - this is the wm8975 code*/
+    int regvalues[]={11, 10, 10,  9,  8,  8, 0xf , 6, 6, 5, 4, 4, 3, 2, 1, 0};
 
-  if ((value >= -6) && (value <= 9)) {
-      /* We use linear bass control with 130Hz cutoff */
-      wm8975_write(BASSCTRL, regvalues[value+6]);
-  }
+    if ((value >= -6) && (value <= 9)) {
+        /* We use linear bass control with 130Hz cutoff */
+        wm8758_write(BASSCTRL, regvalues[value+6]);
+    }
+#endif
 }
 
 void wmcodec_set_treble(int value)
 {
-  int regvalues[]={11, 10, 10,  9,  8,  8, 0xf , 6, 6, 5, 4, 4, 3, 2, 1, 0};
+    (void)value;
+#if 0
+    /* Not yet implemented - this is the wm8975 code*/
+    int regvalues[]={11, 10, 10,  9,  8,  8, 0xf , 6, 6, 5, 4, 4, 3, 2, 1, 0};
 
-  if ((value >= -6) && (value <= 9)) {
-      /* We use a 8Khz cutoff */
-      wm8975_write(TREBCTRL, regvalues[value+6]);
-  }
+    if ((value >= -6) && (value <= 9)) {
+        /* We use a 8Khz cutoff */
+        wm8758_write(TREBCTRL, regvalues[value+6]);
+    }
+#endif
+
 }
 
 int wmcodec_mute(int mute)
@@ -217,26 +205,25 @@ int wmcodec_mute(int mute)
     if (mute)
     {
         /* Set DACMU = 1 to soft-mute the audio DACs. */
-        wm8975_write(DACCTRL, 0x8);
+        wm8758_write(DACCTRL, 0x40);
     } else {
         /* Set DACMU = 0 to soft-un-mute the audio DACs. */
-        wm8975_write(DACCTRL, 0x0);
+        wm8758_write(DACCTRL, 0x0);
     }
 
     return 0;
 }
 
-/* Nice shutdown of WM8975 codec */
+/* Nice shutdown of WM8758 codec */
 void wmcodec_close(void)
 {
-    /* 1. Set DACMU = 1 to soft-mute the audio DACs. */
-    wm8975_write(DACCTRL, 0x8);
+    wmcodec_mute(1);
 
-    /* 2. Disable all output buffers. */
-    wm8975_write(PWRMGMT2, 0x0);     /*Pwr Mgmt(2)*/
+    wm8758_write(PWRMGMT3, 0x0);
 
-    /* 3. Switch off the power supplies. */
-    wm8975_write(PWRMGMT1, 0x0);     /*Pwr Mgmt(1)*/
+    wm8758_write(PWRMGMT1, 0x0);
+
+    wm8758_write(PWRMGMT2, 0x40);
 }
 
 /* Change the order of the noise shaper, 5th order is recommended above 32kHz */
@@ -246,14 +233,29 @@ void wmcodec_set_nsorder(int order)
 }
 
 /* Note: Disable output before calling this function */
-void wmcodec_set_sample_rate(int sampling_control) {
+void wmcodec_set_sample_rate(int sampling_control)
+{
+    /**** We force 44.1KHz for now. ****/
+    (void)sampling_control;
 
-  wm8975_write(0x08, sampling_control);
+    /* set clock div */
+    wm8758_write(CLKCTRL, 1 | (0 << 2) | (2 << 5));
 
+    /* setup PLL for MHZ=11.2896 */
+    wm8758_write(PLLN, (1 << 4) | 0x7);
+    wm8758_write(PLLK1, 0x21);
+    wm8758_write(PLLK2, 0x161);
+    wm8758_write(PLLK3, 0x26);
+
+    /* set clock div */
+    wm8758_write(CLKCTRL, 1 | (0 << 2) | (2 << 5) | (1 << 8));
+
+    /* set srate */
+    wm8758_write(SRATECTRL, (0 << 1));
 }
 
-void wmcodec_enable_recording(bool source_mic) {
-
+void wmcodec_enable_recording(bool source_mic)
+{
     (void)source_mic;
 }
 

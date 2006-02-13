@@ -165,6 +165,8 @@ drivers/lcd-h100-remote.c
 drivers/uda1380.c
 #elif defined(HAVE_WM8975) && !defined(SIMULATOR)
 drivers/wm8975.c
+#elif defined(HAVE_WM8758) && !defined(SIMULATOR)
+drivers/wm8758.c
 #elif defined(HAVE_WM8731L) && !defined(SIMULATOR)
 drivers/wm8731l.c
 #elif defined(HAVE_TLV320) && !defined(SIMULATOR)
