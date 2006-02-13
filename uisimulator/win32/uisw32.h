@@ -109,6 +109,18 @@ typedef unsigned short wchar_t;
 #define UI_REMOTE_WIDTH             128
 #define UI_REMOTE_HEIGHT            64
 
+#elif defined(IPOD_4G)
+#define UI_TITLE                    "iPod 4G"
+#define UI_WIDTH                    196 // width of GUI window
+#define UI_HEIGHT                   370 // height of GUI window
+#define UI_LCD_BGCOLOR              90, 145, 90 // bkgnd color of LCD (no backlight)
+#define UI_LCD_BGCOLORLIGHT         173, 216, 230 // bkgnd color of LCD (backlight)
+#define UI_LCD_BLACK                0, 0, 0 // black
+#define UI_LCD_POSX                 19 // x position of lcd
+#define UI_LCD_POSY                 14 // y position of lcd
+#define UI_LCD_WIDTH                160
+#define UI_LCD_HEIGHT               128
+
 #elif defined(IPOD_COLOR)
 #define UI_TITLE                    "iPod Color"
 #define UI_WIDTH                    261 // width of GUI window
