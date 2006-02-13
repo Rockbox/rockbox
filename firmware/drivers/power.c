@@ -71,6 +71,13 @@ void power_init(void)
     or_l(0x00080000, &GPIO1_ENABLE);
     or_l(0x00080000, &GPIO1_FUNCTION);
 
+#ifdef IRIVER_H300_SERIES
+    /* ISD300 3.3V ON */
+    or_l(8,&GPIO1_FUNCTION);
+    or_l(8,&GPIO1_OUT);
+    or_l(8,&GPIO1_ENABLE);
+#endif
+
 #ifndef BOOTLOADER
     /* The boot loader controls the power */
     ide_power_enable(true);
@@ -178,6 +185,13 @@ void ide_power_enable(bool on)
         and_l(~0x80000000, &GPIO_OUT);
     else
         or_l(0x80000000, &GPIO_OUT);
+#ifdef IRIVER_H300_SERIES
+    if(on)
+        and_l(~0x00000008,&GPIO1_OUT); /* ISD300 3.3V on */
+    else
+        or_l(0x00000008,&GPIO1_OUT); /* ISD300 3.3V off */
+#endif
+
 #elif defined(IAUDIO_X5)
     /* X5 TODO */
 #elif (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
