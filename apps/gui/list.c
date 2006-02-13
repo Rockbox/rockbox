@@ -300,7 +300,11 @@ void gui_list_select_next(struct gui_list * gui_list)
             /* When we reach the bottom of the list
              * we jump to a new page if there are more items*/
             if( item_pos > nb_lines-1 && end_item < gui_list->nb_items )
+            {
                 gui_list->start_item = gui_list->selected_item;
+                if ( gui_list->start_item > gui_list->nb_items-nb_lines )
+                    gui_list->start_item = gui_list->nb_items-nb_lines;
+            }
         }
         else
         {
