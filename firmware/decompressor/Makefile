@@ -22,9 +22,12 @@ $(OBJDIR)/compressed.bin : $(OBJDIR)/compressed.elf
 	@echo "OBJCOPY "`basename $@`
 	$(SILENT)$(OC) -O binary $< $@
 
-$(OBJDIR)/compressed.elf : $(OBJS) $(LINKFILE)
+$(OBJDIR)/compressed.elf : $(LINKFILE)
 	@echo "LD `basename $@`"
 	$(SILENT)$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/compressed.map
+
+$(LDS): $(OBJS)
+	
 
 $(LINKFILE): $(LDS)
 	@echo "Build LDS file"
