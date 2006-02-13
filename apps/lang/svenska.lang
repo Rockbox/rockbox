@@ -3318,16 +3318,16 @@ voice: "Fade out mode"
 new: "Uttoningsläge"
 
 id: LANG_RECORDING_ADC_RIGHT
-desc: in the recording settings
-eng: "ADC Gain Right"
-voice: "ADC Gain Right"
-new: "Förstärkning höger ADC"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_RECORDING_ADC_LEFT
-desc: in the recording settings
-eng: "ADC Gain Left"
-voice: "ADC Gain Left"
-new: "Förstärkning vänster ADC"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_RECORDING_MONITOR
 desc: DEPRECATED
@@ -3520,3 +3520,165 @@ desc: in settings_menu
 eng: "Brightness"
 voice: "Brightness"
 new: "Ljusstyrka"
+
+id: LANG_SCREEN_SCROLL_VIEW
+desc: should lines scroll out of the screen
+eng: "Screen Scrolls Out Of View"
+voice: "Screen Scrolls Out Of View"
+new: "Skärmen rullar ur sikte" 
+
+id: LANG_SCREEN_SCROLL_STEP
+desc: Pixels to advance per Screen scroll
+eng: "Screen Scroll Step Size"
+voice: "Screen Scroll Step Size"
+new: "Storlek på skärmrullningssteg" 
+
+id: LANG_QUEUE_SHUFFLED
+desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
+eng: "Queue shuffled"
+voice: "Queue shuffled"
+new: "Kö slumpad"
+
+id: LANG_CLEAR_BACKDROP
+desc: text for LCD settings menu
+eng: "Clear backdrop"
+voice: "Clear backdrop"
+new: "Rensa bakgrunden"
+
+id: LANG_SET_AS_BACKDROP
+desc: text for onplay menu entry
+eng: "Set as backdrop"
+voice: "Set as backdrop"
+new: "Använd som bakgrund"
+
+id: LANG_BACKDROP_LOADED
+desc: text for splash to indicate a new backdrop has been loaded successfully
+eng: "Backdrop loaded"
+voice: "Backdrop loaded"
+new: "Bakgrunden laddad"
+
+id: LANG_BACKDROP_FAILED
+desc: text for splash to indicate a failure to load a bitmap as backdrop
+eng: "Backdrop failed"
+voice: "Backdrop failed"
+new: "Bakgrunden misslyckades"
+
+id: LANG_WARN_ERASEDYNPLAYLIST_MENU
+desc: in playlist options menu, option to warn when erasing dynamic playlist
+eng: "Warn When Erasing Dynamic Playlist"
+voice: 
+new: "Varna vid radering av dynamisk spellista"
+
+id: LANG_WARN_ERASEDYNPLAYLIST_PROMPT
+desc: prompt shown when about to erase a modified dynamic playlist
+eng: "Erase dynamic playlist?"
+voice: 
+new: "Ta bort dynamisk spellista?"
+
+id: LANG_EQUALIZER
+desc: in the sound settings menu
+eng: "Equalizer"
+voice: "Equalizer"
+new: "Equalizer"
+
+id: LANG_EQUALIZER_ENABLED
+desc: in the equalizer settings menu
+eng: "Enable EQ"
+voice: "Enable EQ"
+new: "Aktivera EQ"
+
+id: LANG_EQUALIZER_GRAPHICAL
+desc: in the equalizer settings menu
+eng: "Graphical EQ"
+voice: "Graphical EQ"
+new: "Grafisk EQ"
+
+id: LANG_EQUALIZER_GAIN
+desc: in the equalizer settings menu
+eng: "Simple EQ Settings"
+voice: "Simple EQ Settings"
+new: "Enkla EQ-inställnngar"
+
+id: LANG_EQUALIZER_ADVANCED
+desc: in the equalizer settings menu
+eng: "Advanced EQ Settings"
+voice: "Advanced EQ Settings"
+new: "Avancerade EQ-inställningar"
+
+id: LANG_EQUALIZER_SAVE
+desc: in the equalizer settings menu
+eng: "Save EQ Preset"
+voice: "Save EQ Preset"
+new: "Spara förinställningar för EQ"
+
+id: LANG_EQUALIZER_BROWSE
+desc: in the equalizer settings menu
+eng: "Browse EQ Presets"
+voice: "Browse EQ Presets"
+new: "Se förinställningar för EQ"
+
+id: LANG_EQUALIZER_GAIN_ITEM
+desc: in the equalizer settings menu
+eng: "%d Hz Band Gain"
+voice: ""
+new: "%d Hz Bandförstärkning"
+
+id: LANG_EQUALIZER_BAND_CUTOFF
+desc: in the equalizer settings menu
+eng: "Cutoff Frequency"
+voice: "Cutoff Frequency"
+new: "Brytfrekvens"
+
+id: LANG_EQUALIZER_BAND_CENTER
+desc: in the equalizer settings menu
+eng: "Center Frequency"
+voice: "Center frequency"
+new: "Mittfrekvens"
+
+id: LANG_EQUALIZER_BAND_Q
+desc: in the equalizer settings menu
+eng: "Q"
+voice: "Q"
+new: "Q"
+
+id: LANG_EQUALIZER_BAND_GAIN
+desc: in the equalizer settings menu
+eng: "Gain"
+voice: "Gain"
+new: "Förstärkning"
+
+id: LANG_EQUALIZER_EDIT_MODE
+desc: in the equalizer settings menu
+eng: "Edit mode: %s"
+voice: ""
+new: "Redigeringsläge: %s"
+
+id: LANG_EQUALIZER_BAND_LOW_SHELF
+desc: in the equalizer settings menu
+eng: "Low Shelf Filter"
+voice: ""
+new: "Low shelf-filter"
+
+id: LANG_EQUALIZER_BAND_PEAK
+desc: in the equalizer settings menu
+eng: "Peak Filter %d"
+voice: ""
+new: "Peak-filter %d"
+
+id: LANG_EQUALIZER_BAND_HIGH_SHELF
+desc: in the equalizer settings menu
+eng: "High Shelf Filter"
+voice: ""
+new: "High shelf-filter"
+
+id: LANG_RECORDING_GAIN_ANALOG
+desc: in the recording screen
+eng: "A"
+voice: "Analog Gain"
+new: "A"
+
+id: LANG_RECORDING_GAIN_DIGITAL
+desc: in the recording screen
+eng: "D"
+voice: "Digital Gain"
+new: "D"
