@@ -185,8 +185,6 @@ static void pcmbuf_callback(unsigned char** start, size_t* size)
             CALL_IF_EXISTS(pcmbuf_event_handler);
         }
     }
-    
-    if(pcmbuf_unplayed_bytes <= pcmbuf_watermark) pcmbuf_under_watermark();
 }
 
 void pcmbuf_set_position_callback(void (*callback)(size_t size))
@@ -735,7 +733,9 @@ static bool prepare_insert(size_t length)
             logf("pcm starting");
             pcmbuf_play_start();
         }
-    }
+    } else if (pcmbuf_unplayed_bytes <= pcmbuf_watermark)
+        pcmbuf_under_watermark();
+
     return true;
 }
 
