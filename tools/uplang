@@ -2,7 +2,7 @@
 
 if(!$ARGV[0]) {
     print <<MOO
-Usage: lang.pl <english file> <translated file>
+Usage: uplang <english file> <translated file>
 MOO
 ;
     exit;
