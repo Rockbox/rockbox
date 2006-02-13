@@ -23,7 +23,6 @@
 #include "button.h"
 #include "thread.h"
 #include "kernel.h"
-#include "sound.h"
 #include "uisdl.h"
 #include "lcd-sdl.h"
 #ifdef HAVE_LCD_BITMAP
@@ -50,9 +49,6 @@ bool background = false;        /* Don't use backgrounds by default */
 
 SDL_Thread *gui_thread;
 SDL_TimerID tick_timer_id;
-#ifdef ROCKBOX_HAS_SIMSOUND
-SDL_Thread *sound_thread;
-#endif
 
 bool lcd_display_redraw = true;         /* Used for player simulator */
 char having_new_lcd=true;               /* Used for player simulator */
@@ -68,8 +64,7 @@ Uint32 tick_timer(Uint32 interval, void *param)
     
     new_tick = (SDL_GetTicks() - start_tick) * HZ / 1000;
         
-    if (new_tick != current_tick)
-    {
+    if (new_tick != current_tick) {
         long i;
         for (i = new_tick - current_tick; i > 0; i--)
             sim_tick_tasks();
@@ -171,9 +166,6 @@ bool gui_shutdown()
 
     SDL_KillThread(gui_thread);
     SDL_RemoveTimer(tick_timer_id);
-#ifdef ROCKBOX_HAS_SIMSOUND
-    SDL_KillThread(sound_thread);
-#endif
 
     for (i = 0; i < threadCount; i++)
     {
@@ -223,7 +215,6 @@ int main(int argc, char *argv[])
         background = false;
     }
 
-    
     if (!gui_startup())
         return -1;
 
@@ -234,14 +225,6 @@ int main(int argc, char *argv[])
     }
 
     tick_timer_id = SDL_AddTimer(10, tick_timer, NULL);
-
-#ifdef ROCKBOX_HAS_SIMSOUND
-    sound_thread = SDL_CreateThread(sound_playback_thread, NULL);
-    if (sound_thread == NULL) {
-        printf("Error creating sound thread!\n");
-        return -1;
-    }
-#endif
 
     gui_message_loop();
 

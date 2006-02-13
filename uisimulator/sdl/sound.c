@@ -21,88 +21,170 @@
 
 #ifdef ROCKBOX_HAS_SIMSOUND /* play sound in sim enabled */
 
-#include <memory.h>
 #include <stdlib.h>
-#include "uisdl.h"
+#include <stdbool.h>
+#include <memory.h>
 #include "sound.h"
+#include "SDL.h"
 
-static int audio_len;
-static char *audio_pos;
-SDL_sem* sem;
+static bool pcm_playing;
+static bool pcm_paused;
 
-void mixaudio(void *udata, Uint8 *stream, int len)
+static Uint8* pcm_data;
+static int pcm_data_size;
+
+static void sdl_dma_start(const void *addr, size_t size)
 {
-  (void)udata;
+    pcm_playing = true;
 
-  /* Only play if we have data left */
-  if ( audio_len == 0 )
-    return;
+    pcm_data = (Uint8 *) addr;
+    pcm_data_size = size;
 
-  len = (len > audio_len) ? audio_len : len;
-  memcpy(stream, audio_pos, len);
-  audio_pos += len;
-  audio_len -= len;
-
-  if(audio_len == 0) {
-    if(SDL_SemPost(sem)) 
-      fprintf(stderr,"Couldn't post: %s",SDL_GetError());
-      
-  }
+    SDL_PauseAudio(0);
 }
 
-int sim_sound_init(void)
+static void sdl_dma_stop() 
 {
-  SDL_AudioSpec fmt;
+    pcm_playing = false;
 
-  /* Set 16-bit stereo audio at 44Khz */
-  fmt.freq = 44100;
-  fmt.format = AUDIO_S16SYS;
-  fmt.channels = 2;
-  fmt.samples = 512;        /* A good value for games */
-  fmt.callback = mixaudio;
-  fmt.userdata = NULL;
+    SDL_PauseAudio(1);
 
-  sem = SDL_CreateSemaphore(0);
-
-  /* Open the audio device and start playing sound! */
-  if(SDL_OpenAudio(&fmt, NULL) < 0) {
-    fprintf(stderr, "Unable to open audio: %s\n", SDL_GetError());
-    return -1;
-  }
-
-  SDL_PauseAudio(0);
-  return 0;
+    pcm_paused = false;
 }
 
-int sound_playback_thread(void *p)
+static void (*callback_for_more)(unsigned char**, size_t*) = NULL;
+void pcm_play_data(void (*get_more)(unsigned char** start, size_t* size),
+        unsigned char* start, size_t size)
 {
-  int sndret = sim_sound_init();
-  unsigned char *buf;
-  long size;
+    callback_for_more = get_more;
 
-  (void)p;
+    if (!(start && size)) {
+        if (get_more)
+            get_more(&start, &size);
+        else
+            return;
+    }
 
-  while(sndret)
-        SDL_Delay(100000); /* wait forever, can't play sound! */
+    if (start && size) {
+        sdl_dma_start(start, size);
+    }
+}
+
+size_t pcm_get_bytes_waiting(void)
+{
+    return pcm_data_size;
+}
+
+void pcm_mute(bool mute)
+{
+    (void) mute;
+}
+
+void pcm_play_stop(void)
+{
+    if (pcm_playing) {
+        sdl_dma_stop();
+    }
+}
+
+void pcm_play_pause(bool play)
+{
+    int next_size;
+    Uint8 *next_start;
     
-  do {
-    while(!sound_get_pcm)
-      /* TODO: fix a fine thread-synch mechanism here */
-          SDL_Delay(100);
-    do {
-      sound_get_pcm(&buf, &size);
-      if(!size) {
-	sound_get_pcm = NULL;
-	break;
-      }
-      audio_pos = buf; // TODO: is this safe?
-      audio_len = size;
+    if (!pcm_playing) {
+        return;
+    }
 
-      if(SDL_SemWait(sem)) 
-	fprintf(stderr,"Couldn't wait: %s",SDL_GetError());
-    } while(size);
-  } while(1);
+    if(pcm_paused && play) {
+        if (pcm_get_bytes_waiting()) {
+            printf("unpause\n");
 
+            SDL_PauseAudio(0);
+        } else {
+            printf("unpause, no data waiting\n");
+
+            void (*get_more)(unsigned char**, size_t*) = callback_for_more;
+
+            if (get_more) {
+                get_more(&next_start, &next_size);
+            }
+
+            if (next_start && next_size) {
+                sdl_dma_start(next_start, next_size);
+            } else {
+                sdl_dma_stop();
+                printf("unpause attempted, no data\n");
+            }
+        }
+    } else if(!pcm_paused && !play) {
+        printf("pause\n");
+
+        SDL_PauseAudio(1);
+    }
+    
+    pcm_paused = !play;
+}
+
+bool pcm_is_paused(void)
+{
+    return pcm_paused;
+}
+
+bool pcm_is_playing(void)
+{
+    return pcm_playing;
+}
+
+void sdl_audio_callback(void *udata, Uint8 *stream, int len)
+{
+    int datalen;
+    
+    (void) udata;
+
+    if (pcm_data_size == 0) {
+        return;
+    }
+
+    datalen = (len > pcm_data_size) ? pcm_data_size : len;
+
+    memcpy(stream, pcm_data, datalen);
+
+    pcm_data_size -= datalen;
+    pcm_data += datalen;
+
+    if (pcm_data_size == 0) {
+        void (*get_more)(unsigned char**, size_t*) = callback_for_more;
+        if (get_more) {
+            get_more(&pcm_data, &pcm_data_size);
+        } else {
+            pcm_data_size = 0;
+            pcm_data = NULL;
+        }
+    }
+}
+
+int pcm_init(void)
+{
+    SDL_AudioSpec fmt;
+
+    /* Set 16-bit stereo audio at 44Khz */
+    fmt.freq = 44100;
+    fmt.format = AUDIO_S16SYS;
+    fmt.channels = 2;
+    fmt.samples = 512;
+    fmt.callback = sdl_audio_callback;
+    fmt.userdata = NULL;
+
+    /* Open the audio device and start playing sound! */
+    if(SDL_OpenAudio(&fmt, NULL) < 0) {
+        fprintf(stderr, "Unable to open audio: %s\n", SDL_GetError());
+        return -1;
+    }
+    
+    sdl_dma_stop();
+
+    return 0;
 }
 
 #endif /* ROCKBOX_HAS_SIMSOUND */

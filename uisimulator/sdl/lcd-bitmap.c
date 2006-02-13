@@ -17,13 +17,15 @@
  *
  ****************************************************************************/
 
+#include "debug.h"
 #include "uisdl.h"
 #include "lcd-sdl.h"
 
 SDL_Surface* lcd_surface;
 
 #if LCD_DEPTH <= 8
-SDL_Color lcd_color_zero = {UI_LCD_BGCOLORLIGHT, 0};
+SDL_Color lcd_color_zero = {UI_LCD_BGCOLOR, 0};
+SDL_Color lcd_backlight_color_zero = {UI_LCD_BGCOLORLIGHT, 0};
 SDL_Color lcd_color_max  = {0, 0, 0, 0};
 #endif
 
@@ -60,6 +62,22 @@ void lcd_update_rect(int x_start, int y_start, int width, int height)
         get_lcd_pixel);
 }
 
+#ifdef CONFIG_BACKLIGHT
+void sim_backlight(int value)
+{
+#if LCD_DEPTH <= 8
+    if (value > 0) {
+        sdl_set_gradient(lcd_surface, &lcd_backlight_color_zero, &lcd_color_max, (1<<LCD_DEPTH));
+    } else {
+        sdl_set_gradient(lcd_surface, &lcd_color_zero, &lcd_color_max, (1<<LCD_DEPTH));
+    }
+    
+    lcd_update();
+#else
+    DEBUGF("backlight: %s\n", (value > 0) ? "on" : "off");
+#endif
+}
+#endif
 
 /* initialise simulator lcd driver */
 void sim_lcd_init(void)

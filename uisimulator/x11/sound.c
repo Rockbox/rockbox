@@ -21,6 +21,7 @@
 
 #ifdef ROCKBOX_HAS_SIMSOUND /* play sound in sim enabled */
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -30,6 +31,8 @@
 #include <sys/soundcard.h>
 
 #include "sound.h"
+
+static bool playing = false;
 
 int sim_sound_init(void)
 {
@@ -90,6 +93,48 @@ void sound_playback_thread(void)
 
     } while(1);
     
+}
+
+/* Stubs for PCM audio playback. */
+bool pcm_is_playing(void)
+{
+    return playing;
+}
+
+void pcm_mute(bool state)
+{
+    (void)state;
+}
+
+void pcm_play_pause(bool state)
+{
+    (void)state;
+}
+
+bool pcm_is_paused(void)
+{
+    return false;
+}
+
+void pcm_play_stop(void)
+{
+    playing = false;
+}
+
+void pcm_init(void)
+{
+}
+
+void (*sound_get_pcm)(unsigned char** start, long* size);
+void pcm_play_data(void (*get_more)(unsigned char** start, long* size))
+{
+    sound_get_pcm = get_more;
+    playing = true;
+}
+
+long pcm_get_bytes_waiting(void)
+{
+    return 0;
 }
 
 #endif /* ROCKBOX_HAS_SIMSOUND */

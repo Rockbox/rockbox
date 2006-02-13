@@ -32,6 +32,7 @@
 
 #include "screenhack.h"
 #include "config.h"
+#include "debug.h"
 
 /*
  * Specific implementations for X11, using the generic LCD API and data.
@@ -244,3 +245,18 @@ void lcd_update (void)
 }
 
 #endif
+
+#ifdef CONFIG_BACKLIGHT
+void sim_backlight(int value)
+{
+    DEBUGF("backlight: %s\n", (value > 0) ? "on" : "off");
+}
+#endif
+
+#ifdef HAVE_REMOTE_LCD
+void sim_remote_backlight(int value)
+{
+    DEBUGF("remote backlight: %s\n", (value > 0) ? "on" : "off");
+}
+#endif
+

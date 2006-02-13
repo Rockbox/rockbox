@@ -23,7 +23,8 @@
 
 SDL_Surface *remote_surface;
 
-SDL_Color remote_color_zero = {UI_REMOTE_BGCOLORLIGHT, 0};
+SDL_Color remote_color_zero = {UI_REMOTE_BGCOLOR, 0};
+SDL_Color remote_backlight_color_zero = {UI_REMOTE_BGCOLORLIGHT, 0};
 SDL_Color remote_color_max  = {0, 0, 0, 0};
 
 extern unsigned char lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH];
@@ -42,6 +43,15 @@ void lcd_remote_update_rect(int x_start, int y_start, int width, int height)
     sdl_update_rect(remote_surface, x_start, y_start, width, height,
         LCD_REMOTE_WIDTH, LCD_REMOTE_HEIGHT, background ? UI_REMOTE_POSX : 0,
         (background ? UI_REMOTE_POSY : LCD_HEIGHT), get_lcd_remote_pixel);
+}
+
+void sim_remote_backlight(int value)
+{
+    if (value > 0) {
+        sdl_set_gradient(remote_surface, &remote_backlight_color_zero, &remote_color_max, (1<<LCD_REMOTE_DEPTH));
+    } else {
+        sdl_set_gradient(remote_surface, &remote_color_zero, &remote_color_max, (1<<LCD_REMOTE_DEPTH));
+    }
 }
 
 /* initialise simulator lcd remote driver */

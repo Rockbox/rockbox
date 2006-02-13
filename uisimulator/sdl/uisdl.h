@@ -139,6 +139,16 @@
 #define UI_LCD_WIDTH                176
 #define UI_LCD_HEIGHT               132
 
+#elif defined(IPOD_VIDEO)
+#define UI_TITLE                    "iPod Video"
+#define UI_WIDTH                    320 // width of GUI window
+#define UI_HEIGHT                   240 // height of GUI window
+/* high-colour */
+#define UI_LCD_POSX                 0 // x position of lcd
+#define UI_LCD_POSY                 0 // y position of lcd
+#define UI_LCD_WIDTH                320
+#define UI_LCD_HEIGHT               240
+
 #elif defined(ARCHOS_GMINI120)
 #define UI_TITLE                    "Gmini 120"
 #define UI_WIDTH                    370 // width of GUI window
@@ -150,7 +160,6 @@
 #define UI_LCD_POSY                 61 // y position of lcd (74 for real aspect)
 #define UI_LCD_WIDTH                192 // * 1.5
 #define UI_LCD_HEIGHT               96  // * 1.5
-
 
 #elif defined(IAUDIO_X5)
 #define UI_TITLE                    "iAudio X5"

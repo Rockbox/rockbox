@@ -32,68 +32,11 @@
 #include "ata.h" /* for volume definitions */
 
 extern char having_new_lcd;
-static bool playing = false;
-
-/* Stubs for PCM audio playback. */
-bool pcm_is_playing(void)
-{
-    return playing;
-}
-
-void pcm_mute(bool state)
-{
-    (void)state;
-}
-
-void pcm_play_pause(bool state)
-{
-    (void)state;
-}
-
-bool pcm_is_paused(void)
-{
-    return false;
-}
-
-void pcm_play_stop(void)
-{
-    playing = false;
-}
-
-void pcm_init(void)
-{
-}
-
-void (*sound_get_pcm)(unsigned char** start, long* size);
-void pcm_play_data(void (*get_more)(unsigned char** start, long* size))
-{
-    sound_get_pcm = get_more;
-    playing = true;
-}
-
-long pcm_get_bytes_waiting(void)
-{
-    return 0;
-}
 
 #if CONFIG_CODEC != SWCODEC
 void audio_set_buffer_margin(int seconds)
 {
      (void)seconds;
-}
-#endif
-
-#ifdef CONFIG_BACKLIGHT
-void sim_backlight(int value)
-{
-    DEBUGF("backlight: %s\n", (value > 0) ? "on" : "off");
-}
-#endif
-
-#ifdef HAVE_REMOTE_LCD
-void sim_remote_backlight(int value)
-{
-    DEBUGF("remote backlight: %s\n", (value > 0) ? "on" : "off");
 }
 #endif
 

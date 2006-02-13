@@ -22,6 +22,7 @@
 #include "uisw32.h"
 #include "lcd.h"
 #include "lcd-playersim.h"
+#include "debug.h"
 
 #if LCD_DEPTH == 16
 unsigned short bitmap[LCD_HEIGHT][LCD_WIDTH]; /* the ui display */
@@ -308,4 +309,18 @@ void simlcdinit(void)
     lcdremotecolors(0, (1<<LCD_REMOTE_DEPTH), &remote_color_zero, &remote_color_max);
 #endif
 }
+
+#ifdef CONFIG_BACKLIGHT
+void sim_backlight(int value)
+{
+    DEBUGF("backlight: %s\n", (value > 0) ? "on" : "off");
+}
+#endif
+
+#ifdef HAVE_REMOTE_LCD
+void sim_remote_backlight(int value)
+{
+    DEBUGF("remote backlight: %s\n", (value > 0) ? "on" : "off");
+}
+#endif
 

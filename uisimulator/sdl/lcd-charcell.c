@@ -23,7 +23,8 @@
 #include "lcd-sdl.h"
 
 SDL_Surface* lcd_surface;
-SDL_Color lcd_color_zero = {UI_LCD_BGCOLORLIGHT, 0};
+SDL_Color lcd_color_zero = {UI_LCD_BGCOLOR, 0};
+SDL_Color lcd_backlight_color_zero = {UI_LCD_BGCOLORLIGHT, 0};
 SDL_Color lcd_color_max  = {0, 0, 0, 0};
 
 /* Defined in lcd-playersim.c */
@@ -103,6 +104,19 @@ void drawrectangles(int color, struct rectangle *points, int count)
 
     SDL_UnlockSurface(lcd_surface);
 }
+
+#ifdef CONFIG_BACKLIGHT
+void sim_backlight(int value)
+{
+    if (value > 0) {
+        sdl_set_gradient(lcd_surface, &lcd_backlight_color_zero, &lcd_color_max, (1<<LCD_DEPTH));
+    } else {
+        sdl_set_gradient(lcd_surface, &lcd_color_zero, &lcd_color_max, (1<<LCD_DEPTH));
+    }
+    
+    lcd_update();
+}
+#endif
 
 /* initialise simulator lcd driver */
 void sim_lcd_init(void)
