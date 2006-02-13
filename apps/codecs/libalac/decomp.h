@@ -1,8 +1,8 @@
 #ifndef __ALAC__DECOMP_H
 #define __ALAC__DECOMP_H
 
-/* Always output samples shifted to 28 bits */
-#define ALAC_OUTPUT_DEPTH 28
+/* Always output samples shifted to 28 bits + sign*/
+#define ALAC_OUTPUT_DEPTH 29
 #define SCALE16 (ALAC_OUTPUT_DEPTH - 16)
 #define ALAC_MAX_CHANNELS 2
 #define ALAC_BLOCKSIZE 4096  /* Number of samples per channel per block */

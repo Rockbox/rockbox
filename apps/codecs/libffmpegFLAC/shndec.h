@@ -1,6 +1,6 @@
 #include "bitstream.h"
 
-#define SHN_OUTPUT_DEPTH 28
+#define SHN_OUTPUT_DEPTH 29 /* 28 bits + sign */
 
 #define MAX_CHANNELS   2
 #define MAX_PRED_ORDER 16
