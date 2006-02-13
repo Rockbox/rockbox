@@ -367,7 +367,6 @@ static void Synthese_Filter_float_internal(MPC_SAMPLE_FORMAT * OutData,MPC_SAMPL
                     "mac.l %%d2, %%a5, (992*4, %[V]), %%a5, %%acc0\n\t"
                     "mac.l %%d3, %%a5, %%acc0\n\t"
                     "movclr.l %%acc0, %%d0\n\t"
-                    "asl.l #1, %%d0\n\t"
                     "move.l %%d0, (%[Data])+\n"
                     : [Data] "+a" (Data)
                     : [V] "a" (V), [D] "a" (D)
@@ -378,7 +377,7 @@ static void Synthese_Filter_float_internal(MPC_SAMPLE_FORMAT * OutData,MPC_SAMPL
                     + MPC_MULTIPLY_FRACT(V[256],D[ 4]) + MPC_MULTIPLY_FRACT(V[352],D[ 5]) + MPC_MULTIPLY_FRACT(V[384],D[ 6]) + MPC_MULTIPLY_FRACT(V[480],D[ 7])
                     + MPC_MULTIPLY_FRACT(V[512],D[ 8]) + MPC_MULTIPLY_FRACT(V[608],D[ 9]) + MPC_MULTIPLY_FRACT(V[640],D[10]) + MPC_MULTIPLY_FRACT(V[736],D[11])
                     + MPC_MULTIPLY_FRACT(V[768],D[12]) + MPC_MULTIPLY_FRACT(V[864],D[13]) + MPC_MULTIPLY_FRACT(V[896],D[14]) + MPC_MULTIPLY_FRACT(V[992],D[15])
-                    , 2);
+                    , 1);
                 
                 Data += 1;
                 #endif

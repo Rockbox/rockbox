@@ -92,15 +92,7 @@ enum codec_status codec_start(struct codec_api *api)
     
     ci->configure(CODEC_DSP_ENABLE, (bool *)true);
     ci->configure(DSP_DITHER, (bool *)false);
-    
-    /* NOTE: this _should_ be set to MPC_FIXED_POINT_SCALE_SHIFT, not with
-       a 1 subtracted. However, doing so yields an output with only half the
-       amplitude it should have, so currently we use what's here, as it gives
-       correct level output. */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)(MPC_FIXED_POINT_SCALE_SHIFT - 1));
-    /* disable these until we can figure out what's going on.
-    ci->configure(DSP_SET_CLIP_MAX, (long *)MPC_FIXED_POINT_SCALE);
-    ci->configure(DSP_SET_CLIP_MIN, (long *)-MPC_FIXED_POINT_SCALE);*/
+    ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)(28));
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (long *)(1024*16));
     
     /* Create a decoder instance */
