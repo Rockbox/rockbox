@@ -81,8 +81,10 @@ void a52_decode_data(uint8_t *start, uint8_t *end)
                 }
                 bufpos = buf + length;
             } else {
-                /* The following two defaults are taken from audio_out_oss.c: */
-                level_t level = 1 << 26;
+                /* Unity gain is 1 << 26, and we want to end up on 28 bits
+                   of precision instead of the default 30.
+                 */
+                level_t level = 1 << 24;
                 sample_t bias = 0;
                 int i;
 
@@ -142,9 +144,7 @@ enum codec_status codec_start(struct codec_api *api)
     ci->configure(CODEC_DSP_ENABLE, (bool *)true);
     ci->configure(DSP_DITHER, (bool *)false);
     ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_NONINTERLEAVED);
-    ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)30);
-    ci->configure(DSP_SET_CLIP_MAX, (long *)((1 << 30) - 1));
-    ci->configure(DSP_SET_CLIP_MIN, (long *)-(1 << 30));
+    ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)28);
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (long *)(1024*128));
 
 next_track:
