@@ -424,10 +424,6 @@ int plugin_load(const char* plugin, void* parameter)
         plugin_loaded = false;
     }
 
-#ifdef HAVE_LCD_COLOR
-    old_backdrop = lcd_get_backdrop();
-    lcd_set_backdrop(NULL);
-#endif
     lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
     xm = lcd_getxmargin();
@@ -489,6 +485,12 @@ int plugin_load(const char* plugin, void* parameter)
 #endif
 
     plugin_loaded = true;
+
+#ifdef HAVE_LCD_COLOR
+    old_backdrop = lcd_get_backdrop();
+    lcd_set_backdrop(NULL);
+    lcd_update();
+#endif
 
     invalidate_icache();
 
