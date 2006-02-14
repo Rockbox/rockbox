@@ -3537,13 +3537,13 @@ id: LANG_QUEUE_SHUFFLED
 desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
 eng: "Queue shuffled"
 voice: "Queue shuffled"
-new: "Kö slumpad"
+new: "Köa blandat"
 
 id: LANG_CLEAR_BACKDROP
 desc: text for LCD settings menu
 eng: "Clear backdrop"
 voice: "Clear backdrop"
-new: "Rensa bakgrunden"
+new: "Rensa bakgrund"
 
 id: LANG_SET_AS_BACKDROP
 desc: text for onplay menu entry
@@ -3555,13 +3555,13 @@ id: LANG_BACKDROP_LOADED
 desc: text for splash to indicate a new backdrop has been loaded successfully
 eng: "Backdrop loaded"
 voice: "Backdrop loaded"
-new: "Bakgrunden laddad"
+new: "Bakgrund laddad"
 
 id: LANG_BACKDROP_FAILED
 desc: text for splash to indicate a failure to load a bitmap as backdrop
 eng: "Backdrop failed"
 voice: "Backdrop failed"
-new: "Bakgrunden misslyckades"
+new: "Bakgrund misslyckades"
 
 id: LANG_WARN_ERASEDYNPLAYLIST_MENU
 desc: in playlist options menu, option to warn when erasing dynamic playlist
@@ -3573,7 +3573,7 @@ id: LANG_WARN_ERASEDYNPLAYLIST_PROMPT
 desc: prompt shown when about to erase a modified dynamic playlist
 eng: "Erase dynamic playlist?"
 voice: 
-new: "Ta bort dynamisk spellista?"
+new: "Radera dynamisk spellista?"
 
 id: LANG_EQUALIZER
 desc: in the sound settings menu
@@ -3591,7 +3591,7 @@ id: LANG_EQUALIZER_GRAPHICAL
 desc: in the equalizer settings menu
 eng: "Graphical EQ"
 voice: "Graphical EQ"
-new: "Grafisk EQ"
+new: "Parametrisk EQ"
 
 id: LANG_EQUALIZER_GAIN
 desc: in the equalizer settings menu
@@ -3609,19 +3609,19 @@ id: LANG_EQUALIZER_SAVE
 desc: in the equalizer settings menu
 eng: "Save EQ Preset"
 voice: "Save EQ Preset"
-new: "Spara förinställningar för EQ"
+new: "Spara EQ-inställningar"
 
 id: LANG_EQUALIZER_BROWSE
 desc: in the equalizer settings menu
 eng: "Browse EQ Presets"
 voice: "Browse EQ Presets"
-new: "Se förinställningar för EQ"
+new: "Lista EQ-inställningar"
 
 id: LANG_EQUALIZER_GAIN_ITEM
 desc: in the equalizer settings menu
 eng: "%d Hz Band Gain"
 voice: ""
-new: "%d Hz Bandförstärkning"
+new: "%d Hz bandförstärkning"
 
 id: LANG_EQUALIZER_BAND_CUTOFF
 desc: in the equalizer settings menu
