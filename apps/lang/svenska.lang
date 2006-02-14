@@ -3651,7 +3651,7 @@ id: LANG_EQUALIZER_EDIT_MODE
 desc: in the equalizer settings menu
 eng: "Edit mode: %s"
 voice: ""
-new: "Redigeringsläge: %s"
+new: "Läge: %s"
 
 id: LANG_EQUALIZER_BAND_LOW_SHELF
 desc: in the equalizer settings menu
