@@ -139,6 +139,8 @@ static void lcd_bcm_finishup(void) {
     lcd_bcm_read32(0x1FC);
 
     do {
+        /* This function takes about 14ms to execute - so we yield() */
+        yield();
         data = lcd_bcm_read32(0x1F8);
     } while (data == 0xFFFA0005 || data == 0xFFFF);
 
