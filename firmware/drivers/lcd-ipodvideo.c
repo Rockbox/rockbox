@@ -85,7 +85,7 @@ void lcd_blit(const fb_data* data, int x, int by, int width,
     (void)stride;
 }
 
-static void lcd_bcm_write32(unsigned address, unsigned value)
+static inline void lcd_bcm_write32(unsigned address, unsigned value)
 {
     /* write out destination address as two 16bit values */
     outw(address, 0x30010000);
