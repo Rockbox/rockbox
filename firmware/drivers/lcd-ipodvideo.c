@@ -153,9 +153,8 @@ void lcd_update_rect(int x, int y, int width, int height)
     int rect1,rect2,rect3,rect4;
     int newx,newwidth;
     int count;
-    unsigned int curpixel=0;
     int c, r;
-    unsigned long *addr;
+    unsigned short *src;
 
     /* Ensure x and width are both even - so we can read 32-bit aligned 
        data from lcd_framebuffer */
@@ -174,18 +173,23 @@ void lcd_update_rect(int x, int y, int width, int height)
     count=(width * height) << 1;
     lcd_bcm_setup_rect(0x34, rect1, rect2, rect3, rect4, count);
 
-    addr = (unsigned long*)&lcd_framebuffer[y][x];
+    src = (unsigned short*)&lcd_framebuffer[y][x];
 
-    /* for each row */
+    /* write out destination address as two 16bit values */
+    outw((0xE0020 & 0xffff), 0x30010000);
+    outw((0xE0020 >> 16), 0x30010000);
+
     for (r = 0; r < height; r++) {
         /* for each column */
         for (c = 0; c < width; c += 2) {
-            /* output 2 pixels */
-            lcd_bcm_write32(0xE0020 + (curpixel << 2), *(addr++));
-            curpixel++;
-        }
+            /* wait for it to be write ready */
+            while ((inw(0x30030000) & 0x2) == 0);
 
-        addr += (LCD_WIDTH - width)/2;
+            /* write out the value low 16, high 16 */
+            outw(*(src++), 0x30000000);
+            outw(*(src++), 0x30000000);
+        }
+        src += (LCD_WIDTH - width);
     }
 
     lcd_bcm_finishup();
