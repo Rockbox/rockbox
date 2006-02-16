@@ -359,12 +359,12 @@ enum eq_type {
 static void draw_slider(const struct screen * screen, int x, int y,
                            int width, int steps, int current_step)
 {
-    
-    int knob_x = (width / steps) * current_step + (SLIDER_KNOB_WIDTH / 2);
-    
+    int knob_x = ((width * 100 / steps) * current_step) / 100
+        + (SLIDER_KNOB_WIDTH / 2);
+
     /* Draw groove */
     screen->fillrect(x, y + 2, width, 2);
-    
+
     /* Draw knob */
     screen->fillrect(x + knob_x, y, SLIDER_KNOB_WIDTH, SLIDER_KNOB_HEIGHT);
 }
@@ -376,7 +376,7 @@ static int draw_eq_slider(const struct screen * screen, int x, int y,
 {
     char buf[26];
     const char separator[2] = " ";
-    int steps = (abs(EQ_GAIN_MIN) + abs(EQ_GAIN_MAX)) / EQ_USER_DIVISOR;
+    int steps = EQ_GAIN_MAX - EQ_GAIN_MIN;
     int abs_q = abs(q);
     int abs_gain = abs(gain);
     int current_x, total_height, separator_width, separator_height;
@@ -439,7 +439,7 @@ static int draw_eq_slider(const struct screen * screen, int x, int y,
     screen->set_drawmode(DRMODE_SOLID);
     screen->putsxy(current_x, y + 2, separator);
     current_x += separator_width;
-    
+
     /* Print out Q part of status line */
     snprintf(buf, sizeof(buf), "%d.%d Q", abs_q / EQ_USER_DIVISOR,
         abs_q % EQ_USER_DIVISOR);
@@ -457,10 +457,10 @@ static int draw_eq_slider(const struct screen * screen, int x, int y,
     if (selected) {
         screen->drawrect(x, y, width, total_height);
     }
-    
+
     /* Draw horizontal slider */
     draw_slider(screen, x + 3, y + h + 3, width - 6, steps,
-        (EQ_GAIN_MAX + gain) / EQ_USER_DIVISOR);
+        abs(EQ_GAIN_MIN) + gain);
 
     return total_height;
 }
@@ -474,12 +474,11 @@ static int draw_eq_sliders(int current_band, enum eq_slider_mode mode)
     int *setting = &global_settings.eq_band0_cutoff;
     enum eq_type type;
 
-    for( i = 0; i < 5; ++i)
-    {
+    for( i = 0; i < 5; ++i) {
         cutoff = *setting++;
         q = *setting++;
         gain = *setting++;
-            
+
         if (i == 0) {
             type = LOW_SHELF;
         } else if (i == 4) {
@@ -487,7 +486,7 @@ static int draw_eq_sliders(int current_band, enum eq_slider_mode mode)
         } else {
             type = PEAK;
         }
-            
+
         height += draw_eq_slider(&(screens[SCREEN_MAIN]), 2, height,
             slider_width, cutoff, q, gain, i == current_band, mode, type);
 
@@ -531,7 +530,7 @@ bool eq_menu_graphical(void)
             /* gain */
             setting = &global_settings.eq_band0_gain;
             setting += current_band * 3;
-        
+
             step = EQ_GAIN_STEP;
             fast_step = EQ_GAIN_FAST_STEP;
             min = EQ_GAIN_MIN;
@@ -546,7 +545,7 @@ bool eq_menu_graphical(void)
             /* cutoff */
             setting = &global_settings.eq_band0_cutoff;
             setting += current_band * 3;
-        
+
             step = EQ_CUTOFF_STEP;
             fast_step = EQ_CUTOFF_FAST_STEP;
             min = EQ_CUTOFF_MIN;
@@ -561,7 +560,7 @@ bool eq_menu_graphical(void)
             /* Q */
             setting = &global_settings.eq_band0_q;
             setting += current_band * 3;
-        
+
             step = EQ_Q_STEP;
             fast_step = EQ_Q_FAST_STEP;
             min = EQ_Q_MIN;
@@ -594,7 +593,7 @@ bool eq_menu_graphical(void)
             if (*(setting) > max)
                 *(setting) = max;
             break;
-            
+
 #ifdef EQ_BTN_MODIFIER
         case EQ_BTN_MODIFIER | EQ_BTN_INCREMENT:
         case EQ_BTN_MODIFIER | EQ_BTN_INCREMENT | BUTTON_REPEAT:
@@ -626,20 +625,20 @@ bool eq_menu_graphical(void)
             if (current_band > 4)
                 current_band = 0; /* wrap around */
             break;
-            
+
         case EQ_BTN_CHANGE_MODE:
         case EQ_BTN_CHANGE_MODE | BUTTON_REPEAT:
             mode++;
             if (mode > Q)
                 mode = GAIN; /* wrap around */
             break;
-            
+
         case EQ_BTN_EXIT:
         case EQ_BTN_EXIT | BUTTON_REPEAT:
             exit_request = true;
             result = false;
             break;
-         
+
         default:
             if(default_event_handler(button) == SYS_USB_CONNECTED) {
                 exit_request = true;
