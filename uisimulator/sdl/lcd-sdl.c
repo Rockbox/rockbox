@@ -73,9 +73,9 @@ void sdl_set_gradient(SDL_Surface *surface, SDL_Color *start, SDL_Color *end, in
     SDL_Color palette[steps];
 
     for (i = 0; i < steps; i++) {
-        palette[i].r = start->r + (end->r - start->r) * i / steps;
-        palette[i].g = start->g + (end->g - start->g) * i / steps;
-        palette[i].b = start->b + (end->b - start->b) * i / steps;
+        palette[i].r = start->r + (end->r - start->r) * i / (steps - 1);
+        palette[i].g = start->g + (end->g - start->g) * i / (steps - 1);
+        palette[i].b = start->b + (end->b - start->b) * i / (steps - 1);
     }
 
     SDL_SetPalette(surface, SDL_LOGPAL|SDL_PHYSPAL, palette, 0, steps);
