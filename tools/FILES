@@ -8,10 +8,7 @@ uplang
 binlang
 rockbox-style.el
 sample.emacs
-buildzip.pl
-romsizetest.pl
-wn2rdf.pl
-dict2rdf.pl
+*.pl
 *.inc
 fwpatcher/*.[ch]
 fwpatcher/Makefile
