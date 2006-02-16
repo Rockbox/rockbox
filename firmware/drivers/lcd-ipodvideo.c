@@ -131,7 +131,7 @@ static unsigned lcd_bcm_read32(unsigned address) {
     return inw(0x30000000) | inw(0x30000000) << 16;
 }
 
-static void lcd_bcm_finishup(void) {
+static inline void lcd_bcm_finishup(void) {
     unsigned data; 
 
     outw(0x31, 0x30030000); 
@@ -148,6 +148,7 @@ static void lcd_bcm_finishup(void) {
 }
 
 /* Update a fraction of the display. */
+void lcd_update_rect(int x, int y, int width, int height) ICODE_ATTR;
 void lcd_update_rect(int x, int y, int width, int height)
 {
     int rect1,rect2,rect3,rect4;
