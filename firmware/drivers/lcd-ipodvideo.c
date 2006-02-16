@@ -179,13 +179,13 @@ void lcd_update_rect(int x, int y, int width, int height)
     outw((0xE0020 & 0xffff), 0x30010000);
     outw((0xE0020 >> 16), 0x30010000);
 
+    /* wait for it to be write ready */
+    while ((inw(0x30030000) & 0x2) == 0);
+
     for (r = 0; r < height; r++) {
         /* for each column */
-        for (c = 0; c < width; c += 2) {
-            /* wait for it to be write ready */
-            while ((inw(0x30030000) & 0x2) == 0);
-
-            /* write out the value low 16, high 16 */
+        for (c = 0; c < width; c+=2) {
+            /* write out two pixels */
             outw(*(src++), 0x30000000);
             outw(*(src++), 0x30000000);
         }
