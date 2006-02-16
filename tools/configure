@@ -766,7 +766,7 @@ toolsdir='\$(ROOTDIR)/tools'
     arm7tdmicc
     tool="$rootdir/tools/scramble -add=ip3g"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 2"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 6"
     output="rockbox.ipod"
     appextra="recorder:gui"
     archosrom=""
@@ -785,7 +785,7 @@ toolsdir='\$(ROOTDIR)/tools'
     arm7tdmicc
     tool="$rootdir/tools/scramble -add=ip4g"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 2"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 6"
     output="rockbox.ipod"
     appextra="recorder:gui"
     archosrom=""

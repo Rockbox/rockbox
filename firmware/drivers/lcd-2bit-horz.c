@@ -45,6 +45,10 @@ static const unsigned char dibits[16] ICONST_ATTR = {
     0xC0, 0xC3, 0xCC, 0xCF, 0xF0, 0xF3, 0xFC, 0xFF
 };
 
+static const unsigned char pixmask[4] ICONST_ATTR = {
+    0x03, 0x0C, 0x30, 0xC0
+};
+
 static unsigned fg_pattern IDATA_ATTR = 0xFF; /* initially black */
 static unsigned bg_pattern IDATA_ATTR = 0x00; /* initially white */
 static int drawmode = DRMODE_SOLID;
@@ -69,8 +73,6 @@ static const char scroll_tick_table[16] = {
     100, 80, 64, 50, 40, 32, 25, 20, 16, 12, 10, 8, 6, 5, 4, 3
 };
 
-
-static unsigned char notmask[4] = { 0xfc, 0xf3, 0xcf, 0x3f };
 
 /* LCD init */
 void lcd_init(void)
@@ -154,29 +156,23 @@ int lcd_getstringsize(const unsigned char *str, int *w, int *h)
 
 /*** low-level drawing functions ***/
 
-static void setpixel_value(int x, int y, unsigned val)
-{
-    unsigned char *data = &lcd_framebuffer[y][x>>2];
-
-    *data = (*data & notmask[x&3]) | (val << ((x&3)<<1));
-}
-
 static void setpixel(int x, int y)
 {
     unsigned char *data = &lcd_framebuffer[y][x>>2];
-
-    *data = (*data & notmask[x&3]) | (fg_pattern << ((x&3)<<1));
+    unsigned mask = pixmask[x & 3];
+    *data = (*data & ~mask) | (fg_pattern & mask);
 }
 
 static void clearpixel(int x, int y)
 {
-  unsigned char *data = &lcd_framebuffer[y][x>>2];
-*data = (*data & notmask[x&3]) | (bg_pattern << ((x&3)<<1));
+    unsigned char *data = &lcd_framebuffer[y][x>>2];
+    unsigned mask = pixmask[x & 3];
+    *data = (*data & ~mask) | (bg_pattern & mask);
 }
 
 static void flippixel(int x, int y)
 {
-    lcd_framebuffer[y][x>>2] ^=  3 << (2 * (x & 3));
+    lcd_framebuffer[y][x>>2] ^=  pixmask[x & 3];
 }
 
 static void nopixel(int x, int y)
@@ -190,6 +186,78 @@ lcd_pixelfunc_type* const lcd_pixelfuncs[8] = {
     nopixel, clearpixel, nopixel, clearpixel
 };
 
+/* 'mask' and 'bits' contain 2 bits per pixel */
+static void flipblock(unsigned char *address, unsigned mask, unsigned bits)
+                      ICODE_ATTR;
+static void flipblock(unsigned char *address, unsigned mask, unsigned bits)
+{
+    *address ^= bits & mask;
+}
+
+static void bgblock(unsigned char *address, unsigned mask, unsigned bits)
+                    ICODE_ATTR;
+static void bgblock(unsigned char *address, unsigned mask, unsigned bits)
+{
+    mask &= ~bits;
+    *address = (*address & ~mask) | (bg_pattern & mask);
+}
+
+static void fgblock(unsigned char *address, unsigned mask, unsigned bits)
+                    ICODE_ATTR;
+static void fgblock(unsigned char *address, unsigned mask, unsigned bits)
+{
+    mask &= bits;
+    *address = (*address & ~mask) | (fg_pattern & mask);
+}
+
+static void solidblock(unsigned char *address, unsigned mask, unsigned bits)
+                       ICODE_ATTR;
+static void solidblock(unsigned char *address, unsigned mask, unsigned bits)
+{
+    *address = (*address & ~mask) | (bits & mask & fg_pattern)
+                                  | (~bits & mask & bg_pattern);
+}
+
+static void flipinvblock(unsigned char *address, unsigned mask, unsigned bits)
+                         ICODE_ATTR;
+static void flipinvblock(unsigned char *address, unsigned mask, unsigned bits)
+{
+    *address ^= ~bits & mask;
+}
+
+static void bginvblock(unsigned char *address, unsigned mask, unsigned bits)
+                       ICODE_ATTR;
+static void bginvblock(unsigned char *address, unsigned mask, unsigned bits)
+{
+    mask &= bits;
+    *address = (*address & ~mask) | (bg_pattern & mask);
+}
+
+static void fginvblock(unsigned char *address, unsigned mask, unsigned bits)
+                       ICODE_ATTR;
+static void fginvblock(unsigned char *address, unsigned mask, unsigned bits)
+{
+    mask &= ~bits;
+    *address = (*address & ~mask) | (fg_pattern & mask);
+}
+
+static void solidinvblock(unsigned char *address, unsigned mask, unsigned bits)
+                          ICODE_ATTR;
+static void solidinvblock(unsigned char *address, unsigned mask, unsigned bits)
+{
+    *address = (*address & ~mask) | (~bits & mask & fg_pattern)
+                                  | (bits & mask & bg_pattern);
+}
+
+lcd_blockfunc_type* const lcd_blockfuncs[8] = {
+    flipblock, bgblock, fgblock, solidblock,
+    flipinvblock, bginvblock, fginvblock, solidinvblock
+};
+
+static inline void setblock(unsigned char *address, unsigned mask, unsigned bits)
+{
+    *address = (*address & ~mask) | (bits & mask);
+}
 
 /*** drawing functions ***/
 
@@ -283,16 +351,17 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
 /* Draw a horizontal line (optimised) */
 void lcd_hline(int x1, int x2, int y)
 {
-    int x;
- 
-    lcd_pixelfunc_type *pfunc = lcd_pixelfuncs[drawmode];
+    int nx;
+    unsigned char *dst;
+    unsigned mask, mask_right;
+    lcd_blockfunc_type *bfunc;
 
     /* direction flip */
     if (x2 < x1)
     {
-        x = x1;
+        nx = x1;
         x1 = x2;
-        x2 = x;
+        x2 = nx;
     }
     
     /* nothing to draw? */
@@ -305,25 +374,35 @@ void lcd_hline(int x1, int x2, int y)
     if (x2 >= LCD_WIDTH)
         x2 = LCD_WIDTH-1;
 
-    while(x1 <= x2) {
-        pfunc(x1,y);
-        ++x1;
+    bfunc = lcd_blockfuncs[drawmode];
+    dst   = &lcd_framebuffer[y][x1>>2];
+    nx    = x2 - (x1 & ~3);
+    mask  = 0xFFu << (2 * (x1 & 3));
+    mask_right = 0xFFu >> (2 * (~nx & 3));
+    
+    for (; nx >= 4; nx -= 4)
+    {
+        bfunc(dst++, mask, 0xFFu);
+        mask = 0xFFu;
     }
+    mask &= mask_right;
+    bfunc(dst, mask, 0xFFu);
 }
 
 /* Draw a vertical line (optimised) */
 void lcd_vline(int x, int y1, int y2)
 {
-    int ny;
-
-    lcd_pixelfunc_type *pfunc = lcd_pixelfuncs[drawmode];
+    int y;
+    unsigned char *dst, *dst_end;
+    unsigned mask;
+    lcd_blockfunc_type *bfunc;
 
     /* direction flip */
     if (y2 < y1)
     {
-        ny = y1;
+        y = y1;
         y1 = y2;
-        y2 = ny;
+        y2 = y;
     }
 
     /* nothing to draw? */
@@ -336,10 +415,17 @@ void lcd_vline(int x, int y1, int y2)
     if (y2 >= LCD_HEIGHT)
         y2 = LCD_HEIGHT-1;
         
-
-    while(y1++ <= y2) {
-        pfunc(x, y1);
+    bfunc = lcd_blockfuncs[drawmode];
+    dst   = &lcd_framebuffer[y1][x>>2];
+    mask  = pixmask[x & 3];
+    
+    dst_end = dst + (y2 - y1) * (LCD_WIDTH/4);
+    do
+    {
+        bfunc(dst, mask, 0xFFu);
+        dst += (LCD_WIDTH/4);
     }
+    while (dst <= dst_end);
 }
 
 /* Draw a rectangular box */
@@ -360,8 +446,10 @@ void lcd_drawrect(int x, int y, int width, int height)
 /* Fill a rectangular area */
 void lcd_fillrect(int x, int y, int width, int height)
 {
-    int ny;
-
+    int nx;
+    unsigned char *dst, *dst_end;
+    unsigned mask, mask_right;
+    lcd_blockfunc_type *bfunc;
 
     /* nothing to draw? */
     if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
@@ -384,12 +472,36 @@ void lcd_fillrect(int x, int y, int width, int height)
     if (y + height > LCD_HEIGHT)
         height = LCD_HEIGHT - y;
 
-    ny = y;
-    while (ny <= height)
+    bfunc = lcd_blockfuncs[drawmode];
+    dst   = &lcd_framebuffer[y][x>>2];
+    nx    = width - 1 + (x & 3);
+    mask  = 0xFFu << (2 * (x & 3));
+    mask_right = 0xFFu >> (2 * (~nx & 3));
+    
+    for (; nx >= 4; nx -= 4)
     {
-        lcd_hline (x, width, ny);
-        ny++;
+        unsigned char *dst_col = dst;
+
+        dst_end = dst_col + height * (LCD_WIDTH/4);
+        do
+        {
+            bfunc(dst_col, mask, 0xFFu);
+            dst_col += (LCD_WIDTH/4);
+        }
+        while (dst_col < dst_end);
+
+        dst++;
+        mask = 0xFFu;
     }
+    mask &= mask_right;
+
+    dst_end = dst + height * (LCD_WIDTH/4);
+    do
+    {
+        bfunc(dst, mask, 0xFFu);
+        dst += (LCD_WIDTH/4);
+    }
+    while (dst < dst_end);
 }
 
 /* About Rockbox' internal monochrome bitmap format:
@@ -485,11 +597,10 @@ void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width, int heig
 /* About Rockbox' internal native bitmap format:
  *
  * A bitmap contains two bits for every pixel. 00 = white, 01 = light grey,
- * 10 = dark grey, 11 = black. Bits within a byte are arranged vertically, LSB
- * at top.
+ * 10 = dark grey, 11 = black. Bits within a byte are arranged horizontally,
+ * LSB at the left.
  * The bytes are stored in row-major order, with byte 0 being top left,
- * byte 1 2nd from left etc. The first row of bytes defines pixel rows
- * 0..3, the second row defines pixel row 4..7 etc.
+ * byte 1 2nd from left etc. Each row of bytes defines one pixel row.
  *
  * This is the same as the internal lcd hw format. */
 
@@ -500,8 +611,9 @@ void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
 void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
                      int stride, int x, int y, int width, int height)
 {
-  int  ny, nx,  ymax;
-    const unsigned char * src_end;
+    int  shift, nx;
+    unsigned char *dst, *dst_end;
+    unsigned mask, mask_right;
 
     /* nothing to draw? */
     if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
@@ -526,46 +638,49 @@ void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
     if (y + height > LCD_HEIGHT)
         height = LCD_HEIGHT - y;
 
-    src += stride * (src_y >> 3) + src_x; /* move starting point */
-    src_y  &= 7;
-    src_end = src + width;
+    stride = (stride + 3) >> 2; /* convert to no. of bytes */
+
+    src   += stride * src_y + (src_x >> 2); /* move starting point */
+    src_x &= 3;
+    x     -= src_x;
+    dst   = &lcd_framebuffer[y][x>>2];
+    shift = x & 3;
+    nx    = width - 1 + shift + src_x;
+
+    mask   = 0xFFu << (2 * (shift + src_x));
+    mask_right = 0xFFu >> (2 * (~nx & 3));
     
-    nx = x;
+    shift *= 2;
+    dst_end = dst + height * (LCD_WIDTH/4);
     do
     {
-        const unsigned char *src_col = src++;
-        unsigned data = *src_col >> src_y;
-        int numbits = 8 - src_y;
+        const unsigned char *src_row = src;
+        unsigned char *dst_row = dst;
+        unsigned mask_row = mask;
+        unsigned data = 0;
         
-        ymax = y + height;
-        ny = y;
-        do
+        for (x = nx; x >= 4; x -= 4)
         {
-            if (data & 0x03)
-                setpixel_value (nx,ny, 0xFF);
-            else
-            if (data & 0x01)
-                setpixel_value (nx,ny, 0x3F);
-            else
-            if (data & 0x02)
-                setpixel_value (nx,ny, 0xCF);
-            else
-                setpixel_value (nx,ny, 0x00);
-
-            ny++;
-
-            data >>= 2;
-            if (--numbits == 0)
+            data |= *src_row++ << shift;
+            
+            if (mask_row & 0xFF)
             {
-                src_col += stride;
-                data = *src_col;
-                numbits = 4;
+                setblock(dst_row, mask_row, data);
+                mask_row = 0xFF;
             }
+            else
+                mask_row >>= 8;
+
+            dst_row++;
+            data >>= 8;
         }
-        while (ny < ymax);
-        nx++;
+        data |= *src_row << shift;
+        setblock(dst_row, mask_row & mask_right, data);
+
+        src += stride;
+        dst += (LCD_WIDTH/4);
     }
-    while (src < src_end);
+    while (dst < dst_end);
 }
 
 /* Draw a full native bitmap */

@@ -49,7 +49,7 @@
 struct Fileheader
 {
     unsigned short Type;          /* signature - 'BM' */
-    unsigned  int Size;          /* file size in bytes */
+    unsigned int  Size;          /* file size in bytes */
     unsigned short Reserved1;     /* 0 */
     unsigned short Reserved2;     /* 0 */
     unsigned int  OffBits;       /* offset to bitmap */
@@ -278,41 +278,48 @@ int read_bmp_file(char* filename,
 
 int transform_bitmap(const struct RGBQUAD *src, int width, int height,
                      int format, unsigned short **dest, int *dst_width,
-                     int *dst_height)
+                     int *dst_height, int *dst_depth)
 {
     int row, col;
-    int dst_w, dst_h;
+    int dst_w, dst_h, dst_d;
 
     switch (format)
     {
       case 0: /* Archos recorders, Ondio, Gmini 120/SP, Iriver H1x0 monochrome */
         dst_w = width;
         dst_h = (height + 7) / 8;
+        dst_d = 8;
         break;
 
       case 1: /* Archos player graphics library */
         dst_w = (width + 7) / 8;
         dst_h = height;
+        dst_d = 8;
         break;
 
       case 2: /* Iriver H1x0 4-grey */
         dst_w = width;
         dst_h = (height + 3) / 4;
+        dst_d = 8;
         break;
 
       case 3: /* Canonical 8-bit grayscale */
         dst_w = width;
         dst_h = height;
+        dst_d = 8;
         break;
 
       case 4: /* 16-bit packed RGB (5-6-5) */
-        dst_w = width;
-        dst_h = height;
-        break;
-
       case 5: /* 16-bit packed and byte-swapped RGB (5-6-5) */
         dst_w = width;
         dst_h = height;
+        dst_d = 16;
+        break;
+
+      case 6: /* greyscale iPods 4-grey */
+        dst_w = (width + 3) / 4;
+        dst_h = height;
+        dst_d = 8;
         break;
 
       default: /* unknown */
@@ -329,6 +336,7 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
     memset(*dest, 0, dst_w * dst_h * sizeof(short));
     *dst_width = dst_w;
     *dst_height = dst_h;
+    *dst_depth = dst_d;
 
     switch (format)
     {
@@ -383,6 +391,15 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
                     (*dest)[row * dst_w + col] = ((rgb&0xff00)>>8)|((rgb&0x00ff)<<8);
             }
         break;
+        
+      case 6: /* greyscale iPods 4-grey */
+        for (row = 0; row < height; row++)
+            for (col = 0; col < width; col++)
+            {
+                (*dest)[row * dst_w + (col/4)] |=
+                       (~brightness(src[row * width + col]) & 0xC0) >> (2 * (~col & 3));
+            }
+        break;
     }
     
     return 0;
@@ -397,7 +414,7 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
 
 void generate_c_source(char *id, int width, int height,
                        const unsigned short *t_bitmap, int t_width,
-                       int t_height, int format)
+                       int t_height, int t_depth)
 {
     FILE *f;
     int i, a;
@@ -411,7 +428,7 @@ void generate_c_source(char *id, int width, int height,
             "#define BMPHEIGHT_%s %ld\n"
             "#define BMPWIDTH_%s %ld\n",
             id, height, id, width);
-    if(format < 4)
+    if (t_depth <= 8)
         fprintf(f, "const unsigned char %s[] = {\n", id);
     else
         fprintf(f, "const unsigned short %s[] = {\n", id);
@@ -420,7 +437,7 @@ void generate_c_source(char *id, int width, int height,
     {
         for (a = 0; a < t_width; a++)
         {
-            if(format < 4)
+            if (t_depth <= 8)
                 fprintf(f, "0x%02x,%c", t_bitmap[i * t_width + a],
                         (a + 1) % 13 ? ' ' : '\n');
             else
@@ -469,6 +486,7 @@ void print_usage(void)
            "\t         3  Canonical 8-bit grayscale\n"
            "\t         4  16-bit packed 5-6-5 RGB (iriver H300)\n"
            "\t         5  16-bit packed and byte-swapped 5-6-5 RGB (iPod)\n"
+           "\t         6  Greayscale iPod 4-grey\n"
            , APPLICATION_NAME);
     printf("build date: " __DATE__ "\n\n");
 }
@@ -483,7 +501,7 @@ int main(int argc, char **argv)
     struct RGBQUAD *bitmap = NULL;
     unsigned short *t_bitmap = NULL;
     int width, height;
-    int t_width, t_height;
+    int t_width, t_height, t_depth;
 
 
     for (i = 1;i < argc;i++)
@@ -580,9 +598,9 @@ int main(int argc, char **argv)
     else
     {
         if (transform_bitmap(bitmap, width, height, format, &t_bitmap,
-                             &t_width, &t_height))
+                             &t_width, &t_height, &t_depth))
             exit(1);
-        generate_c_source(id, width, height, t_bitmap, t_width, t_height, format);
+        generate_c_source(id, width, height, t_bitmap, t_width, t_height, t_depth);
     }
 
     return 0;
