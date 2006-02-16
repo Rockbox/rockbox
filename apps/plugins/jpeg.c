@@ -669,7 +669,7 @@ struct jpeg
     int x_phys, y_phys; /* physical size, block aligned */
     int x_mbl; /* x dimension of MBL */
     int y_mbl; /* y dimension of MBL */
-    int blocks; /* blocks per MBL */
+    int blocks; /* blocks per MB */
     int restart_interval; /* number of MCUs between RSTm markers */
     int store_pos[4]; /* for Y block ordering */
 
@@ -688,6 +688,8 @@ struct jpeg
 
     int mcu_membership[6]; /* info per block */
     int tab_membership[6];
+    int subsample_x[3]; /* info per component */
+    int subsample_y[3];
 };
 
 
@@ -1126,14 +1128,20 @@ void build_lut(struct jpeg* p_jpeg)
         p_jpeg->x_phys = p_jpeg->x_mbl * 16;
         p_jpeg->y_mbl = (p_jpeg->y_size+7) / 8;
         p_jpeg->y_phys = p_jpeg->y_mbl * 8;
-        p_jpeg->mcu_membership[0] = 0; /* Y1=Y2=0, U=2, V=3 */
+        p_jpeg->mcu_membership[0] = 0; /* Y1=Y2=0, U=1, V=2 */
         p_jpeg->mcu_membership[1] = 0;
-        p_jpeg->mcu_membership[2] = 2;
-        p_jpeg->mcu_membership[3] = 3;
+        p_jpeg->mcu_membership[2] = 1;
+        p_jpeg->mcu_membership[3] = 2;
         p_jpeg->tab_membership[0] = 0; /* DC, DC, AC, AC */
         p_jpeg->tab_membership[1] = 0;
         p_jpeg->tab_membership[2] = 1;
         p_jpeg->tab_membership[3] = 1;
+        p_jpeg->subsample_x[0] = 1;
+        p_jpeg->subsample_x[1] = 2;
+        p_jpeg->subsample_x[2] = 2;
+        p_jpeg->subsample_y[0] = 1;
+        p_jpeg->subsample_y[1] = 1;
+        p_jpeg->subsample_y[2] = 1;
     }
     if (p_jpeg->frameheader[0].horizontal_sampling == 1
         && p_jpeg->frameheader[0].vertical_sampling == 2)
@@ -1145,14 +1153,20 @@ void build_lut(struct jpeg* p_jpeg)
         p_jpeg->x_phys = p_jpeg->x_mbl * 8;
         p_jpeg->y_mbl = (p_jpeg->y_size+15) / 16;
         p_jpeg->y_phys = p_jpeg->y_mbl * 16;
-        p_jpeg->mcu_membership[0] = 0; /* Y1=Y2=0, U=2, V=3 */
+        p_jpeg->mcu_membership[0] = 0; /* Y1=Y2=0, U=1, V=2 */
         p_jpeg->mcu_membership[1] = 0;
-        p_jpeg->mcu_membership[2] = 2;
-        p_jpeg->mcu_membership[3] = 3;
+        p_jpeg->mcu_membership[2] = 1;
+        p_jpeg->mcu_membership[3] = 2;
         p_jpeg->tab_membership[0] = 0; /* DC, DC, AC, AC */
         p_jpeg->tab_membership[1] = 0;
         p_jpeg->tab_membership[2] = 1;
         p_jpeg->tab_membership[3] = 1;
+        p_jpeg->subsample_x[0] = 1;
+        p_jpeg->subsample_x[1] = 1;
+        p_jpeg->subsample_x[2] = 1;
+        p_jpeg->subsample_y[0] = 1;
+        p_jpeg->subsample_y[1] = 2;
+        p_jpeg->subsample_y[2] = 2;
     }
     else if (p_jpeg->frameheader[0].horizontal_sampling == 2
         && p_jpeg->frameheader[0].vertical_sampling == 2)
@@ -1166,14 +1180,20 @@ void build_lut(struct jpeg* p_jpeg)
         p_jpeg->mcu_membership[1] = 0;
         p_jpeg->mcu_membership[2] = 0;
         p_jpeg->mcu_membership[3] = 0;
-        p_jpeg->mcu_membership[4] = 2;
-        p_jpeg->mcu_membership[5] = 3;
+        p_jpeg->mcu_membership[4] = 1;
+        p_jpeg->mcu_membership[5] = 2;
         p_jpeg->tab_membership[0] = 0;
         p_jpeg->tab_membership[1] = 0;
         p_jpeg->tab_membership[2] = 0;
         p_jpeg->tab_membership[3] = 0;
         p_jpeg->tab_membership[4] = 1;
         p_jpeg->tab_membership[5] = 1;
+        p_jpeg->subsample_x[0] = 1;
+        p_jpeg->subsample_x[1] = 2;
+        p_jpeg->subsample_x[2] = 2;
+        p_jpeg->subsample_y[0] = 1;
+        p_jpeg->subsample_y[1] = 2;
+        p_jpeg->subsample_y[2] = 2;
     }
     else if (p_jpeg->frameheader[0].horizontal_sampling == 1
         && p_jpeg->frameheader[0].vertical_sampling == 1)
@@ -1184,11 +1204,21 @@ void build_lut(struct jpeg* p_jpeg)
         p_jpeg->y_mbl = (p_jpeg->y_size+7) / 8;
         p_jpeg->y_phys = p_jpeg->y_mbl * 8;
         p_jpeg->mcu_membership[0] = 0;
-        p_jpeg->mcu_membership[1] = 2;
-        p_jpeg->mcu_membership[2] = 3;
+        p_jpeg->mcu_membership[1] = 1;
+        p_jpeg->mcu_membership[2] = 2;
         p_jpeg->tab_membership[0] = 0;
         p_jpeg->tab_membership[1] = 1;
         p_jpeg->tab_membership[2] = 1;
+        p_jpeg->subsample_x[0] = 1;
+        p_jpeg->subsample_x[1] = 1;
+        p_jpeg->subsample_x[2] = 1;
+        p_jpeg->subsample_y[0] = 1;
+        p_jpeg->subsample_y[1] = 1;
+        p_jpeg->subsample_y[2] = 1;
+    }
+    else
+    {
+        // error
     }
 
 }
@@ -1522,6 +1552,187 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel, int downscale,
     return 0; /* success */
 }
 
+
+#ifdef HAVE_LCD_COLOR
+
+/* JPEG decoder variant for YUV decoding, into 3 different planes */
+/*  Note: it keeps the original color subsampling, even if resized. */
+int jpeg_decode_color(struct jpeg* p_jpeg, unsigned char* p_pixel[3], 
+        int downscale, void (*pf_progress)(int current, int total))
+{
+    struct bitstream bs; /* bitstream "object" */
+    static int block[64]; /* decoded DCT coefficients */
+
+    int width, height;
+    int skip_line[3]; /* bytes from one line to the next (skip_line) */
+    int skip_strip[3], skip_mcu[3]; /* bytes to next DCT row / column */
+
+    int i, x, y; /* loop counter */
+
+    unsigned char* p_line[3] = {p_pixel[0], p_pixel[1], p_pixel[2]};
+    unsigned char* p_byte[3]; /* bitmap pointer */
+
+    void (*pf_idct)(unsigned char*, int*, int*, int); /* selected IDCT */
+    int k_need; /* AC coefficients needed up to here */
+    int zero_need; /* init the block with this many zeros */
+
+    int last_dc_val[3] = {0, 0, 0}; // or 128 for chroma?
+    int store_offs[4]; /* memory offsets: order of Y11 Y12 Y21 Y22 U V */
+    int restart = p_jpeg->restart_interval; /* MCUs until restart marker */
+
+    /* pick the IDCT we want, determine how to work with coefs */
+    if (downscale == 1)
+    {
+        pf_idct = idct8x8;
+        k_need = 64; /* all */
+        zero_need = 63; /* all */
+    }
+    else if (downscale == 2)
+    {
+        pf_idct = idct4x4;
+        k_need = 25; /* this far in zig-zag to cover 4*4 */
+        zero_need = 27; /* clear this far in linear order */
+    }
+    else if (downscale == 4)
+    {
+        pf_idct = idct2x2;
+        k_need = 5; /* this far in zig-zag to cover 2*2 */
+        zero_need = 9; /* clear this far in linear order */
+    }
+    else if (downscale == 8)
+    {
+        pf_idct = idct1x1;
+        k_need = 0; /* no AC, not needed */
+        zero_need = 0; /* no AC, not needed */
+    }
+    else return -1; /* not supported */
+
+    /* init bitstream, fake a restart to make it start */
+    bs.next_input_byte = p_jpeg->p_entropy_data;
+    bs.bits_left = 0;
+    bs.input_end = p_jpeg->p_entropy_end;
+
+    width  = p_jpeg->x_phys / downscale;
+    height = p_jpeg->y_phys / downscale;
+    for (i=0; i<3; i++) /* calculate some strides */
+    {
+        skip_line[i] = width / p_jpeg->subsample_x[i];
+        skip_strip[i] = skip_line[i]
+                        * (height / p_jpeg->y_mbl) / p_jpeg->subsample_y[i];
+        skip_mcu[i] = width/p_jpeg->x_mbl / p_jpeg->subsample_x[i];
+    }
+
+    /* prepare offsets about where to store the different blocks */
+    store_offs[p_jpeg->store_pos[0]] = 0;
+    store_offs[p_jpeg->store_pos[1]] = 8 / downscale; /* to the right */
+    store_offs[p_jpeg->store_pos[2]] = width * 8 / downscale; /* below */
+    store_offs[p_jpeg->store_pos[3]] = store_offs[1] + store_offs[2]; /* r+b */
+
+    for(y=0; y<p_jpeg->y_mbl && bs.next_input_byte <= bs.input_end; y++)
+    {
+        for (i=0; i<3; i++) // scan line init
+        {
+            p_byte[i] = p_line[i];
+            p_line[i] += skip_strip[i];
+        }
+        for (x=0; x<p_jpeg->x_mbl; x++)
+        {
+            int blkn;
+
+            /* Outer loop handles each block in the MCU */
+            for (blkn = 0; blkn < p_jpeg->blocks; blkn++)
+            {   /* Decode a single block's worth of coefficients */
+                int k = 1; /* coefficient index */
+                int s, r; /* huffman values */
+                int ci = p_jpeg->mcu_membership[blkn]; /* component index */
+                int ti = p_jpeg->tab_membership[blkn]; /* table index */
+                struct derived_tbl* dctbl = &p_jpeg->dc_derived_tbls[ti];
+                struct derived_tbl* actbl = &p_jpeg->ac_derived_tbls[ti];
+
+                /* Section F.2.2.1: decode the DC coefficient difference */
+                s = huff_decode_dc(&bs, dctbl);
+
+                last_dc_val[ci] += s;
+                block[0] = last_dc_val[ci]; /* output it (assumes zag[0] = 0) */
+
+                /* coefficient buffer must be cleared */
+                MEMSET(block+1, 0, zero_need*sizeof(block[0]));
+
+                /* Section F.2.2.2: decode the AC coefficients */
+                for (; k < k_need; k++)
+                {
+                    s = huff_decode_ac(&bs, actbl);
+                    r = s >> 4;
+                    s &= 15;
+
+                    if (s)
+                    {
+                        k += r;
+                        check_bit_buffer(&bs, s);
+                        r = get_bits(&bs, s);
+                        block[zag[k]] = HUFF_EXTEND(r, s);
+                    }
+                    else
+                    {
+                        if (r != 15)
+                        {
+                            k = 64;
+                            break;
+                        }
+                        k += r;
+                    }
+                }  /* for k */
+                /* In this path we just discard the values */
+                for (; k < 64; k++)
+                {
+                    s = huff_decode_ac(&bs, actbl);
+                    r = s >> 4;
+                    s &= 15;
+
+                    if (s)
+                    {
+                        k += r;
+                        check_bit_buffer(&bs, s);
+                        drop_bits(&bs, s);
+                    }
+                    else
+                    {
+                        if (r != 15)
+                            break;
+                        k += r;
+                    }
+                }  /* for k */
+
+                if (ci == 0)
+                {   /* Y component needs to bother about block store */
+                    pf_idct(p_byte[0]+store_offs[blkn], block,
+                        p_jpeg->qt_idct[ti], skip_line[0]);
+                }
+                else
+                {   /* chroma */
+                    pf_idct(p_byte[ci], block, p_jpeg->qt_idct[ti], 
+                        skip_line[ci]);
+                }
+            } /* for blkn */
+            p_byte[0] += skip_mcu[0]; // unrolled for (i=0; i<3; i++) loop
+            p_byte[1] += skip_mcu[1];
+            p_byte[2] += skip_mcu[2];
+            if (p_jpeg->restart_interval && --restart == 0) 
+            {   /* if a restart marker is due: */
+                restart = p_jpeg->restart_interval; /* count again */
+                search_restart(&bs); /* align the bitstream */
+                last_dc_val[0] = last_dc_val[1] = 
+                                 last_dc_val[2] = 0; /* reset decoder */
+            }
+        } /* for x */
+        if (pf_progress != NULL)
+            pf_progress(y, p_jpeg->y_mbl-1); /* notify about decoding progress */
+    } /* for y */
+
+    return 0; /* success */
+}
+
+#endif /* #ifdef HAVE_LCD_COLOR */
 
 /**************** end JPEG code ********************/
 
