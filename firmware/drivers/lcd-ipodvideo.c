@@ -131,21 +131,7 @@ static unsigned lcd_bcm_read32(unsigned address) {
     return inw(0x30000000) | inw(0x30000000) << 16;
 }
 
-static inline void lcd_bcm_finishup(void) {
-    unsigned data; 
-
-    outw(0x31, 0x30030000); 
-
-    lcd_bcm_read32(0x1FC);
-
-    do {
-        /* This function takes about 14ms to execute - so we yield() */
-        yield();
-        data = lcd_bcm_read32(0x1F8);
-    } while (data == 0xFFFA0005 || data == 0xFFFF);
-
-    lcd_bcm_read32(0x1FC);
-}
+extern void _HD_ARM_Update5G (fb_data *fb, int x, int y, int w, int h);
 
 /* Update a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height) ICODE_ATTR;
@@ -155,7 +141,9 @@ void lcd_update_rect(int x, int y, int width, int height)
     int newx,newwidth;
     int count;
     int c, r;
+    unsigned int data;
     unsigned short *src;
+    static int finishup_needed = 0;
 
     /* Ensure x and width are both even - so we can read 32-bit aligned 
        data from lcd_framebuffer */
@@ -169,6 +157,18 @@ void lcd_update_rect(int x, int y, int width, int height)
     rect2 = y;                         /* start vert */
     rect3 = (x + width) - 1;           /* max horiz */
     rect4 = (y + height) - 1;          /* max vert */
+
+    if (finishup_needed) {
+        /* Bottom-half of original lcd_bcm_finishup() function */
+        do {
+            /* This function takes about 14ms to execute - so we yield() */
+            yield();
+            data = lcd_bcm_read32(0x1F8);
+        } while (data == 0xFFFA0005 || data == 0xFFFF);
+    }
+
+    lcd_bcm_read32(0x1FC);
+
 
     /* setup the drawing region */
     count=(width * height) << 1;
@@ -193,7 +193,12 @@ void lcd_update_rect(int x, int y, int width, int height)
         src += (LCD_WIDTH - width);
     }
 
-    lcd_bcm_finishup();
+    /* Top-half of original lcd_bcm_finishup() function */
+    outw(0x31, 0x30030000); 
+
+    lcd_bcm_read32(0x1FC);
+
+    finishup_needed = 1;
 }
 
 /* Update the display.
