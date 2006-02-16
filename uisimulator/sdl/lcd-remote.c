@@ -52,6 +52,8 @@ void sim_remote_backlight(int value)
     } else {
         sdl_set_gradient(remote_surface, &remote_color_zero, &remote_color_max, (1<<LCD_REMOTE_DEPTH));
     }
+
+    lcd_remote_update();
 }
 
 /* initialise simulator lcd remote driver */
