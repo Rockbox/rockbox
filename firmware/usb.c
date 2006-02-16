@@ -151,6 +151,8 @@ void usb_enable(bool on)
         /* Power on the Cypress chip */
 #ifdef IRIVER_H100_SERIES
         or_l(0x01000040, &GPIO_OUT);
+#else
+        and_l(~0x00000008,&GPIO1_OUT);
 #endif
         sleep(2);
     }
@@ -159,6 +161,8 @@ void usb_enable(bool on)
         /* Power off the Cypress chip */
 #ifdef IRIVER_H100_SERIES
         and_l(~0x01000040, &GPIO_OUT);
+#else
+        or_l(0x00000008,&GPIO1_OUT);
 #endif
     }
     
@@ -479,6 +483,11 @@ void usb_init(void)
     or_l(0x00000080, &GPIO1_FUNCTION); /* GPIO39 is the USB detect input */
 
 #ifdef IRIVER_H300_SERIES
+    /* ISD300 3.3V ON */
+    or_l(8,&GPIO1_FUNCTION);
+    or_l(8,&GPIO1_OUT);
+    or_l(8,&GPIO1_ENABLE);
+
     /* Tristate the SCK/SDA to the ISD300 config EEPROM */
     and_l(~0x03000000, &GPIO_ENABLE);
     or_l(0x03000000, &GPIO_FUNCTION);
