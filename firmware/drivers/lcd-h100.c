@@ -69,6 +69,10 @@ static const unsigned char dibits[16] ICONST_ATTR = {
     0xC0, 0xC3, 0xCC, 0xCF, 0xF0, 0xF3, 0xFC, 0xFF
 };
 
+static const unsigned char pixmask[4] ICONST_ATTR = {
+    0x03, 0x0C, 0x30, 0xC0
+};
+
 static unsigned fg_pattern IDATA_ATTR = 0xFF; /* initially black */
 static unsigned bg_pattern IDATA_ATTR = 0x00; /* initially white */
 static int drawmode = DRMODE_SOLID;
@@ -366,20 +370,20 @@ int lcd_getstringsize(const unsigned char *str, int *w, int *h)
 static void setpixel(int x, int y)
 {
     unsigned char *data = &lcd_framebuffer[y>>2][x];
-    unsigned mask = 3 << (2 * (y & 3));
+    unsigned mask = pixmask[y & 3];
     *data = (*data & ~mask) | (fg_pattern & mask);
 }
 
 static void clearpixel(int x, int y)
 {
     unsigned char *data = &lcd_framebuffer[y>>2][x];
-    unsigned mask = 3 << (2 * (y & 3));
+    unsigned mask = pixmask[y & 3];
     *data = (*data & ~mask) | (bg_pattern & mask);
 }
 
 static void flippixel(int x, int y)
 {
-    lcd_framebuffer[y>>2][x] ^=  3 << (2 * (y & 3));
+    lcd_framebuffer[y>>2][x] ^=  pixmask[y & 3];
 }
 
 static void nopixel(int x, int y)
@@ -460,6 +464,11 @@ lcd_blockfunc_type* const lcd_blockfuncs[8] = {
     flipblock, bgblock, fgblock, solidblock,
     flipinvblock, bginvblock, fginvblock, solidinvblock
 };
+
+static inline void setblock(unsigned char *address, unsigned mask, unsigned bits)
+{
+    *address = (*address & ~mask) | (bits & mask);
+}
 
 /*** drawing functions ***/
 
@@ -578,7 +587,7 @@ void lcd_hline(int x1, int x2, int y)
         
     bfunc = lcd_blockfuncs[drawmode];
     dst   = &lcd_framebuffer[y>>2][x1];
-    mask  = 3 << (2 * (y & 3));
+    mask  = pixmask[y & 3];
 
     dst_end = dst + x2 - x1;
     do
@@ -674,7 +683,7 @@ void lcd_fillrect(int x, int y, int width, int height)
     if (y + height > LCD_HEIGHT)
         height = LCD_HEIGHT - y;
     
-    fillopt = (drawmode & DRMODE_INVERSEVID) ? 
+    fillopt = (drawmode & DRMODE_INVERSEVID) ?
               (drawmode & DRMODE_BG) : (drawmode & DRMODE_FG);
     if (fillopt &&(drawmode & DRMODE_INVERSEVID))
         bits = bg_pattern;
@@ -903,7 +912,6 @@ void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
     int shift, ny;
     unsigned char *dst, *dst_end;
     unsigned mask, mask_bottom;
-    lcd_blockfunc_type *bfunc;
 
     /* nothing to draw? */
     if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
@@ -935,7 +943,6 @@ void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
     shift  = y & 3;
     ny     = height - 1 + shift + src_y;
 
-    bfunc  = lcd_blockfuncs[drawmode];
     mask   = 0xFFu << (2 * (shift + src_y));
     mask_bottom = 0xFFu >> (2 * (~ny & 3));
     
@@ -952,7 +959,7 @@ void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
                 
                 dst_end = dst_row + width;
                 do 
-                    bfunc(dst_row++, mask, *src_row++);
+                    setblock(dst_row++, mask, *src_row++);
                 while (dst_row < dst_end);
             }
 
@@ -968,7 +975,7 @@ void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
         {
             dst_end = dst + width;
             do
-                bfunc(dst++, mask, *src++);
+                setblock(dst++, mask, *src++);
             while (dst < dst_end);
         }
     }
@@ -989,7 +996,7 @@ void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
 
                 if (mask_col & 0xFFu)
                 {
-                    bfunc(dst_col, mask_col, data);
+                    setblock(dst_col, mask_col, data);
                     mask_col = 0xFFu;
                 }
                 else
@@ -1000,7 +1007,7 @@ void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
                 data >>= 8;
             }
             data |= *src_col << shift;
-            bfunc(dst_col, mask_col & mask_bottom, data);
+            setblock(dst_col, mask_col & mask_bottom, data);
         }
         while (dst < dst_end);
     }
