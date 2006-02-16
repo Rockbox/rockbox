@@ -22,7 +22,7 @@
 
 PLUGIN_HEADER
 
-#define SETTINGS_FILE	"/.rockbox/viewers/viewer.dat"
+#define SETTINGS_FILE   "/.rockbox/viewers/viewer.dat"
 
 #define WRAP_TRIM          44  /* Max number of spaces to trim (arbitrary) */
 #define MAX_COLUMNS        64  /* Max displayable string len (over-estimate) */
@@ -117,10 +117,11 @@ PLUGIN_HEADER
 #define VIEWER_COLUMN_LEFT (BUTTON_ON | BUTTON_LEFT)
 #define VIEWER_COLUMN_RIGHT (BUTTON_ON | BUTTON_RIGHT)
 
+/* iPods with the 4G pad */
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define VIEWER_QUIT BUTTON_MENU
-#define VIEWER_PAGE_UP BUTTON_SCROLL_FWD
-#define VIEWER_PAGE_DOWN BUTTON_SCROLL_BACK
+#define VIEWER_PAGE_UP BUTTON_SCROLL_BACK
+#define VIEWER_PAGE_DOWN BUTTON_SCROLL_FWD
 #define VIEWER_SCREEN_LEFT BUTTON_LEFT
 #define VIEWER_SCREEN_RIGHT BUTTON_RIGHT
 #define VIEWER_MODE_WRAP (BUTTON_SELECT | BUTTON_LEFT)
@@ -287,9 +288,9 @@ static unsigned char* find_next_line(const unsigned char* cur_line, bool *is_sho
     bool first_chars;
     unsigned char c;
 
-    if (is_short != NULL) 
+    if (is_short != NULL)
         *is_short = true;
-    
+
     if BUFFER_OOB(cur_line)
         return NULL;
 
@@ -297,7 +298,7 @@ static unsigned char* find_next_line(const unsigned char* cur_line, bool *is_sho
         search_len = MAX_WIDTH;
     }
     else {   /* view_mode == NARROW */
-        search_len = crop_at_width(cur_line) - cur_line; 
+        search_len = crop_at_width(cur_line) - cur_line;
     }
 
     size = BUFFER_OOB(cur_line+search_len) ? buffer_end-cur_line : search_len;
@@ -326,7 +327,7 @@ static unsigned char* find_next_line(const unsigned char* cur_line, bool *is_sho
                         }
                         if (j==0) /* i=1 is intentional */
                             for (i=0; i<par_indent_spaces; i++)
-                                ADVANCE_COUNTERS(' '); 
+                                ADVANCE_COUNTERS(' ');
                     }
                     if (!first_chars) spaces++;
                     break;
@@ -339,7 +340,7 @@ static unsigned char* find_next_line(const unsigned char* cur_line, bool *is_sho
                             return (unsigned char*) next_line;
                         break;
                     }
-                    
+
                     newlines++;
                     size += spaces -1;
                     if (BUFFER_OOB(cur_line+size) || size > 2*search_len)
@@ -360,9 +361,9 @@ static unsigned char* find_next_line(const unsigned char* cur_line, bool *is_sho
                         }
                         newlines=0;
                    } else if (spaces) {
-                        /* REFLOW, multiple spaces between words: count only 
+                        /* REFLOW, multiple spaces between words: count only
                          * one. If more are needed, they will be added
-                         * while drawing. */ 
+                         * while drawing. */
                         search_len = size;
                         spaces=0;
                         ADVANCE_COUNTERS(' ');
@@ -370,7 +371,7 @@ static unsigned char* find_next_line(const unsigned char* cur_line, bool *is_sho
                             size = search_len = j;
                             break;
                         }
-                    } 
+                    }
                     first_chars = false;
                     ADVANCE_COUNTERS(c);
                     break;
@@ -418,7 +419,7 @@ static unsigned char* find_next_line(const unsigned char* cur_line, bool *is_sho
 
     if (is_short)
         *is_short = false;
-    
+
     return (unsigned char*) next_line;
 }
 
@@ -514,7 +515,7 @@ static int read_and_synch(int direction)
 /* direction: 1 for down (i.e., further into file), -1 for up */
     int move_size, move_vector, offset;
     unsigned char *fill_buf;
-    
+
     if (direction == -1) /* up */ {
         move_size = SMALL_BLOCK_SIZE;
         offset = 0;
@@ -668,7 +669,7 @@ static void viewer_draw(int col)
                         break;
                 }
             }
-        
+
             if (col != -1)
                 if (k > col) {
                     scratch_buffer[k] = 0;
@@ -693,10 +694,10 @@ static void viewer_draw(int col)
                         case ' ':
                         case 0:
                             if ((j==0) && (word_mode==WRAP))
-                                /* special case: indent the paragraph, 
+                                /* special case: indent the paragraph,
                                  * don't count spaces */
                                 indent_spaces = par_indent_spaces;
-                            else if (!multiple_spacing) 
+                            else if (!multiple_spacing)
                                 spaces++;
                             multiple_spacing = true;
                             break;
@@ -708,10 +709,10 @@ static void viewer_draw(int col)
                     }
                 }
                 if (multiple_spacing) spaces--;
-                
+
                 if (spaces) {
                     /* total number of spaces to insert between words */
-                    extra_spaces = (draw_columns-width) / glyph_width[' '] 
+                    extra_spaces = (draw_columns-width) / glyph_width[' ']
                             - indent_spaces;
                     /* number of spaces between each word*/
                     spaces_per_word = extra_spaces / spaces;
@@ -720,7 +721,7 @@ static void viewer_draw(int col)
                     if (spaces_per_word > 2) { /* too much spacing is awful */
                         spaces_per_word = 3;
                         extra_spaces = 0;
-                    } 
+                    }
                 } else { /* this doesn't matter much... no spaces anyway */
                     spaces_per_word = extra_spaces = 0;
                 }
@@ -728,7 +729,7 @@ static void viewer_draw(int col)
                 spaces_per_word = 1;
                 extra_spaces = 0;
             }
-            
+
             multiple_spacing = false;
             for (j=k=spaces=0; j < line_len; j++) {
                 if (k == MAX_COLUMNS)
@@ -742,7 +743,7 @@ static void viewer_draw(int col)
                             for (j=0; j<par_indent_spaces; j++)
                                 scratch_buffer[k++] = ' ';
                             j=0;
-                        } 
+                        }
                         else if (!multiple_spacing) {
                             for (width = spaces<extra_spaces ? -1:0; width < spaces_per_word; width++)
                                     scratch_buffer[k++] = ' ';
@@ -756,13 +757,13 @@ static void viewer_draw(int col)
                         break;
                 }
             }
-                    
+
             if (col != -1)
                 if (k > col) {
                     scratch_buffer[k] = 0;
                     rb->lcd_puts(left_col, i, scratch_buffer + col);
                 }
-        } 
+        }
         else { /* line_mode != JOIN && line_mode != REFLOW */
             if (col != -1)
                 if (line_len > col) {
@@ -848,16 +849,16 @@ static bool viewer_init(void)
     pf = rb->font_get(FONT_UI);
     if (pf->width != NULL)
     {   /* variable pitch font -- fill structure from font width data */
-        ch = pf->defaultchar - pf->firstchar; 
+        ch = pf->defaultchar - pf->firstchar;
         rb->memset(glyph_width, pf->width[ch], 256);
         idx = pf->firstchar;
         rb->memcpy(&glyph_width[idx], pf->width, pf->size);
         idx += pf->size;
         rb->memset(&glyph_width[idx], pf->width[ch], 256-idx);
-    } 
+    }
     else /* fixed pitch font -- same width for all glyphs */
         rb->memset(glyph_width, pf->maxwidth, 256);
-    
+
     display_lines = LCD_HEIGHT / pf->height;
     display_columns = LCD_WIDTH;
 #else
@@ -916,16 +917,16 @@ typedef struct {
 
 static void viewer_load_settings(void)
 {
-    int settings_fd, file_name_len, req_line_len, line_len; 
+    int settings_fd, file_name_len, req_line_len, line_len;
     char line[1024];
-    
+
     settings_fd=rb->open(SETTINGS_FILE, O_RDONLY);
     if (settings_fd < 0) return;
 
     file_name_len = rb->strlen(file_name);
     req_line_len = file_name_len + sizeof(viewer_settings_string);
     while ((line_len = rb->read_line(settings_fd, line, sizeof(line))) > 0) {
-        if ((line_len == req_line_len) && 
+        if ((line_len == req_line_len) &&
                 (rb->strncasecmp(line, file_name, file_name_len) == 0)) {
             /* found a match, load stored values */
             viewer_settings_string *prefs = (void*) &line[file_name_len];
@@ -933,27 +934,27 @@ static void viewer_load_settings(void)
 #ifdef HAVE_LCD_BITMAP
             /* view mode will be initialized later anyways */
             for (view_mode=0; view_mode<VIEW_MODES; ++view_mode)
-                scrollbar_mode[view_mode] = 
+                scrollbar_mode[view_mode] =
                         rb->atoi(prefs->scrollbar_mode[view_mode]);
-            
+
             page_mode = rb->atoi(prefs->page_mode);
 #endif
-            
+
             word_mode = rb->atoi(prefs->word_mode);
             line_mode = rb->atoi(prefs->line_mode);
             view_mode = rb->atoi(prefs->view_mode);
-            
+
             init_need_scrollbar();
-            /* the following settings are safety checked 
-             * (file may have changed on disk) 
+            /* the following settings are safety checked
+             * (file may have changed on disk)
              */
             file_pos = rb->atoi(prefs->file_pos); /* should be atol() */
             if (file_pos > file_size) {
                     file_pos = 0;
                     break;
-            } 
+            }
             buffer_end = BUFFER_END();  /* Update whenever file_pos changes */
-            
+
             screen_top_ptr = buffer + rb->atoi(prefs->screen_top_ptr);
             if (BUFFER_OOB(screen_top_ptr)) {
                     screen_top_ptr = buffer;
@@ -962,16 +963,16 @@ static void viewer_load_settings(void)
         }
     }
     rb->close(settings_fd);
-    
+
     fill_buffer(file_pos, buffer, BUFFER_SIZE);
 }
-            
+
 static void viewer_save_settings(void)
 {
-    int settings_fd, file_name_len, req_line_len, line_len; 
+    int settings_fd, file_name_len, req_line_len, line_len;
     char line[1024];
     viewer_settings_string prefs;
-    
+
     settings_fd=rb->open(SETTINGS_FILE, O_RDWR | O_CREAT);
     DEBUGF("SETTINGS_FILE: %d\n", settings_fd);
     if (settings_fd < 0) return;
@@ -979,16 +980,16 @@ static void viewer_save_settings(void)
     file_name_len = rb->strlen(file_name);
     req_line_len = file_name_len + sizeof(viewer_settings_string);
     while ((line_len = rb->read_line(settings_fd, line, sizeof(line))) > 0) {
-        if ((line_len == req_line_len) && 
+        if ((line_len == req_line_len) &&
                 (rb->strncasecmp(line, file_name, file_name_len) == 0)) {
             /* found a match, reposition file pointer to overwrite this line */
             rb->lseek(settings_fd, -line_len, SEEK_CUR);
             break;
         }
     }
-    
+
     /* fill structure in order to prevent overwriting with 0s (snprintf
-     * intentionally overflows so that no terminating NULLs are written 
+     * intentionally overflows so that no terminating NULLs are written
      * to disk). */
     rb->snprintf(prefs.word_mode, 3, "%2d", word_mode);
     rb->snprintf(prefs.line_mode, 3, "%2d", line_mode);
@@ -997,18 +998,18 @@ static void viewer_save_settings(void)
     rb->snprintf(prefs.screen_top_ptr, 12, "%11d", screen_top_ptr-buffer);
 #ifdef HAVE_LCD_BITMAP
     /* view_mode is not needed anymore */
-    for (view_mode=0; view_mode<VIEW_MODES; ++view_mode) 
-        rb->snprintf(prefs.scrollbar_mode[view_mode], 3, 
+    for (view_mode=0; view_mode<VIEW_MODES; ++view_mode)
+        rb->snprintf(prefs.scrollbar_mode[view_mode], 3,
                         "%2d", scrollbar_mode[view_mode]);
-                        
+
     rb->snprintf(prefs.page_mode, 3, "%2d", page_mode);
 #endif
     prefs.EOL = '\n';
-    
+
     rb->write(settings_fd, file_name, file_name_len);
     rb->write(settings_fd, &prefs, sizeof(prefs));
     rb->close(settings_fd);
-}     
+}
 
 static void viewer_exit(void *parameter)
 {
