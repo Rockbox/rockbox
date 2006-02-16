@@ -424,13 +424,8 @@ int plugin_load(const char* plugin, void* parameter)
         plugin_loaded = false;
     }
 
-    lcd_clear_display();
-#ifdef HAVE_LCD_BITMAP
-    xm = lcd_getxmargin();
-    ym = lcd_getymargin();
-    lcd_setmargins(0,0);
-    lcd_update();
-#endif
+    gui_syncsplash(0, true, str(LANG_WAIT));
+
 #ifdef SIMULATOR
     hdr = sim_plugin_load((char *)plugin, &fd);
     if (!fd) {
@@ -486,10 +481,18 @@ int plugin_load(const char* plugin, void* parameter)
 
     plugin_loaded = true;
 
+#ifdef HAVE_LCD_BITMAP
+    xm = lcd_getxmargin();
+    ym = lcd_getymargin();
+    lcd_setmargins(0,0);
 #ifdef HAVE_LCD_COLOR
     old_backdrop = lcd_get_backdrop();
     lcd_set_backdrop(NULL);
+#endif
+    lcd_clear_display();
     lcd_update();
+#else /* !HAVE_LCD_BITMAP */
+    lcd_clear_display();
 #endif
 
     invalidate_icache();
@@ -506,10 +509,12 @@ int plugin_load(const char* plugin, void* parameter)
 #endif /* LCD_DEPTH */
     /* restore margins */
     lcd_setmargins(xm,ym);
-#endif /* HAVE_LCD_BITMAP */
 #ifdef HAVE_LCD_COLOR
     lcd_set_backdrop(old_backdrop);
 #endif
+    lcd_clear_display();
+    lcd_update();
+#endif /* HAVE_LCD_BITMAP */
     
     if (pfn_tsr_exit == NULL)
         plugin_loaded = false;
