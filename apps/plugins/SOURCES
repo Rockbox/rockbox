@@ -26,8 +26,8 @@ metronome.c
 #if CONFIG_LCD != LCD_IPOD2BPP
 #ifndef HAVE_LCD_COLOR
 fire.c
-plasma.c
 #endif
+plasma.c
 jpeg.c
 mandelbrot.c
 #endif

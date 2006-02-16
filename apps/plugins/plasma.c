@@ -26,18 +26,26 @@
 #include "plugin.h"
 
 #ifdef HAVE_LCD_BITMAP /* and also not for the Player */
+#ifdef HAVE_LCD_COLOR
+#include "xlcd.h"
+#else
 #include "gray.h"
+#endif
 
 PLUGIN_HEADER
 
 /******************************* Globals ***********************************/
 
 static struct plugin_api* rb; /* global api struct pointer */
-static unsigned char *gbuf;
-static unsigned int gbuf_size = 0;
 static unsigned char wave_array[256];  /* Pre calculated wave array */
 static unsigned char colours[256]; /* Smooth transition of shades */
+#ifdef HAVE_LCD_COLOR
+static unsigned char colorbuffer[3*LCD_HEIGHT*LCD_WIDTH]; /* off screen buffer */
+#else
 static unsigned char graybuffer[LCD_HEIGHT*LCD_WIDTH]; /* off screen buffer */
+static unsigned char *gbuf;
+static unsigned int gbuf_size = 0;
+#endif
 static unsigned char sp1, sp2, sp3, sp4; /* Speed of plasma */
 static int plasma_frequency;
 
@@ -50,6 +58,16 @@ static int plasma_frequency;
 #define PLASMA_QUIT BUTTON_OFF
 #define PLASMA_INCREASE_FREQUENCY BUTTON_UP
 #define PLASMA_DECREASE_FREQUENCY BUTTON_DOWN
+#endif
+
+#ifdef HAVE_LCD_COLOR
+#if CONFIG_KEYPAD == IAUDIO_X5_PAD
+#define PLASMA_REGEN_COLORS BUTTON_SELECT
+#elif CONFIG_KEYPAD == IPOD_4G_PAD
+#define PLASMA_REGEN_COLORS BUTTON_SELECT
+#elif CONFIG_KEYPAD == IRIVER_H300_PAD
+#define PLASMA_REGEN_COLORS BUTTON_SELECT
+#endif
 #endif
 
 #define WAV_AMP 90
@@ -152,7 +170,9 @@ void cleanup(void *parameter)
 {
     (void)parameter;
     
+#ifndef HAVE_LCD_COLOR
     gray_release();
+#endif
     rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
 }
 
@@ -167,19 +187,32 @@ int main(void)
     int shades, button, x, y;
     unsigned char p1,p2,p3,p4,t1,t2,t3,t4, z;
     int n=0;
-
+#ifdef HAVE_LCD_COLOR
+    int time=0;
+    int redfactor=1, greenfactor=2, bluefactor=3;
+    int redphase=0, greenphase=50, bluephase=100; /* lower chance of gray at *
+                                                   * regular intervals       */
+#endif
     /*Generate the neccesary pre calced stuff*/
     wave_table_generate();
     shades_generate();
 
+#ifdef HAVE_LCD_COLOR
+    shades = 256;
+#else
     /* get the remainder of the plugin buffer */
     gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
 
     shades = gray_init(rb, gbuf, gbuf_size, false, LCD_WIDTH, LCD_HEIGHT/8,
                        32, NULL) + 1;
+#endif
 
+#ifdef HAVE_LCD_COLOR
+    xlcd_init(rb);
+#else
     /* switch on grayscale overlay */
     gray_show(true);
+#endif
     sp1 = 4;
     sp2 = 2;
     sp3 = 4;
@@ -198,7 +231,15 @@ int main(void)
             {
                 z = wave_array[t1] + wave_array[t2] + wave_array[t3]
                   + wave_array[t4];
+#ifdef HAVE_LCD_COLOR
+                colorbuffer[n] = colours[(z+time*redfactor+redphase)%256];
+                ++n;
+                colorbuffer[n] = colours[(z+time*greenfactor+greenphase)%256];
+                ++n;
+                colorbuffer[n] = colours[(z+time*bluefactor+bluephase)%256];
+#else
                 graybuffer[n] = colours[z];
+#endif
                 t3+=1;
                 t4+=2;
                 ++n;
@@ -211,7 +252,13 @@ int main(void)
         p2-=sp2;
         p3+=sp3;
         p4-=sp4;
+#ifdef HAVE_LCD_COLOR
+        time++;
+        xlcd_color_bitmap(colorbuffer, 0, 0, LCD_WIDTH, LCD_HEIGHT);
+        rb->lcd_update();
+#else
         gray_ub_gray_bitmap(graybuffer, 0, 0, LCD_WIDTH, LCD_HEIGHT);
+#endif
 
         button = rb->button_get(false);
 
@@ -234,6 +281,16 @@ int main(void)
                     wave_table_generate();
                 }
                 break;
+#ifdef HAVE_LCD_COLOR
+            case (PLASMA_REGEN_COLORS):
+                redfactor=rb->rand()%4;
+                greenfactor=rb->rand()%4;
+                bluefactor=rb->rand()%4;
+                redphase=rb->rand()%256;
+                greenphase=rb->rand()%256;
+                bluephase=rb->rand()%256;
+                break;
+#endif
                 
             default:
                 if (rb->default_event_handler_ex(button, cleanup, NULL)
