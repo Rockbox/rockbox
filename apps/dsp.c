@@ -624,48 +624,43 @@ static void apply_crossfeed(long* src[], int count)
 #define EQ_GAIN_USER2REAL(x) (((x) << 16) / 10)
 
 /* Synchronize the EQ filters with the global settings */
-void dsp_eq_update_data(bool enabled)
+void dsp_eq_update_data(bool enabled, int band)
 {
-    int i;
     int *setting;
-    int gain, cutoff, q, maxgain;
-    
+    int gain, cutoff, q;
+
     dsp->eq_enabled = enabled;
-    setting = &global_settings.eq_band0_cutoff;
-    maxgain = 0;
     
+    /* Adjust setting pointer to the band we actually want to change */
+    setting = &global_settings.eq_band0_cutoff + (band * 3);
+
+    cutoff = *setting++;
+    q = *setting++;
+    gain = *setting++;
+
+    DEBUGF("cutoff %d, q %d, gain %d\n", cutoff, q, gain);
+
     #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
     /* set emac unit for dsp processing, and save old macsr, we're running in
        codec thread context at this point, so can't clobber it */
     unsigned long old_macsr = coldfire_get_macsr();
     coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE | EMAC_ROUND);
     #endif
-    
-    /* Iterate over each band and update the appropriate filter */
-    for(i = 0; i < 5; i++) {
-        cutoff = *setting++;
-        q = *setting++;
-        gain = *setting++;
 
-        /* Keep track of maxgain for the pre-amp */
-        if (gain > maxgain)
-            maxgain = gain;
+    if (gain == 0) {
+        eq_data.enabled[band] = 0;
+    } else {
+        if (band == 0)
+            eq_ls_coefs(EQ_CUTOFF_USER2REAL(cutoff), EQ_Q_USER2REAL(q),
+                EQ_GAIN_USER2REAL(gain), eq_data.filters[band].coefs);
+        else if (band == 4)
+            eq_hs_coefs(EQ_CUTOFF_USER2REAL(cutoff), EQ_Q_USER2REAL(q),
+                EQ_GAIN_USER2REAL(gain), eq_data.filters[band].coefs);
+        else
+            eq_pk_coefs(EQ_CUTOFF_USER2REAL(cutoff), EQ_Q_USER2REAL(q),
+                EQ_GAIN_USER2REAL(gain), eq_data.filters[band].coefs);
 
-        if (gain == 0) {
-            eq_data.enabled[i] = 0;
-        } else {
-            if (i == 0)
-                eq_ls_coefs(EQ_CUTOFF_USER2REAL(cutoff), EQ_Q_USER2REAL(q),
-                    EQ_GAIN_USER2REAL(gain), eq_data.filters[0].coefs);
-            else if (i == 4)
-                eq_hs_coefs(EQ_CUTOFF_USER2REAL(cutoff), EQ_Q_USER2REAL(q),
-                    EQ_GAIN_USER2REAL(gain), eq_data.filters[4].coefs);
-            else
-                eq_pk_coefs(EQ_CUTOFF_USER2REAL(cutoff), EQ_Q_USER2REAL(q),
-                    EQ_GAIN_USER2REAL(gain), eq_data.filters[i].coefs);
-
-            eq_data.enabled[i] = 1;
-        }
+        eq_data.enabled[band] = 1;
     }
 
     #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)

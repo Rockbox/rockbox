@@ -924,6 +924,7 @@ void sound_settings_apply(void)
 void settings_apply(void)
 {
     char buf[64];
+    int i;
 
     sound_settings_apply();
 
@@ -1052,7 +1053,11 @@ void settings_apply(void)
     audio_set_crossfade(global_settings.crossfade);
     dsp_set_replaygain(true);
     dsp_set_crossfeed(global_settings.crossfeed);
-    dsp_eq_update_data(global_settings.eq_enabled);
+    
+    /* Update all EQ bands */
+    for(i = 0; i < 5; i++) {
+        dsp_eq_update_data(global_settings.eq_enabled, i);
+    }
 #endif
 
 #ifdef HAVE_SPDIF_POWER

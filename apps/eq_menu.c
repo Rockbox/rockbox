@@ -105,10 +105,15 @@
 
 static bool eq_enabled(void)
 {
+    int i;
+    
     bool result = set_bool(str(LANG_EQUALIZER_ENABLED),
         &global_settings.eq_enabled);
 
-    dsp_eq_update_data(global_settings.eq_enabled);
+    /* Update all bands */
+    for(i = 0; i < 5; i++) {
+        dsp_eq_update_data(global_settings.eq_enabled, i);
+    }
 
     return result;
 }
@@ -136,7 +141,7 @@ static bool eq_set_band ## band ## _center(void) \
     bool result = set_int(str(LANG_EQUALIZER_BAND_CENTER), "Hertz", UNIT_HERTZ, \
         &global_settings.eq_band ## band ## _cutoff, NULL, \
         EQ_CUTOFF_STEP, EQ_CUTOFF_MIN, EQ_CUTOFF_MAX, NULL); \
-    dsp_eq_update_data(global_settings.eq_enabled); \
+    dsp_eq_update_data(global_settings.eq_enabled, band); \
     return result; \
 }
     
@@ -146,7 +151,7 @@ static bool eq_set_band ## band ## _cutoff(void) \
     bool result = set_int(str(LANG_EQUALIZER_BAND_CUTOFF), "Hertz", UNIT_HERTZ, \
         &global_settings.eq_band ## band ## _cutoff, NULL, \
         EQ_CUTOFF_STEP, EQ_CUTOFF_MIN, EQ_CUTOFF_MAX, NULL); \
-    dsp_eq_update_data(global_settings.eq_enabled); \
+    dsp_eq_update_data(global_settings.eq_enabled, band); \
     return result; \
 }
 
@@ -156,7 +161,7 @@ static bool eq_set_band ## band ## _q(void) \
     bool result = set_int(str(LANG_EQUALIZER_BAND_Q), "Q", UNIT_INT, \
         &global_settings.eq_band ## band ## _q, NULL, \
         EQ_Q_STEP, EQ_Q_MIN, EQ_Q_MAX, eq_q_format); \
-    dsp_eq_update_data(global_settings.eq_enabled); \
+    dsp_eq_update_data(global_settings.eq_enabled, band); \
     return result; \
 }
 
@@ -166,7 +171,7 @@ static bool eq_set_band ## band ## _gain(void) \
     bool result = set_int("Band " #band, str(LANG_UNIT_DB), UNIT_DB, \
         &global_settings.eq_band ## band ## _gain, NULL, \
         EQ_GAIN_STEP, EQ_GAIN_MIN, EQ_GAIN_MAX, eq_gain_format); \
-    dsp_eq_update_data(global_settings.eq_enabled); \
+    dsp_eq_update_data(global_settings.eq_enabled, band); \
     return result; \
 }
 
@@ -648,8 +653,10 @@ bool eq_menu_graphical(void)
         }
         
         /* Update the filter if the user changed something */
-        if (has_changed) 
-            dsp_eq_update_data(global_settings.eq_enabled);
+        if (has_changed) {
+            dsp_eq_update_data(global_settings.eq_enabled, current_band);
+            has_changed = false;
+        }
     }
 
     /* Reset screen settings */
