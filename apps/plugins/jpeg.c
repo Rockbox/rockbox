@@ -1389,176 +1389,12 @@ INLINE int huff_decode_ac(struct bitstream* bs, struct derived_tbl* tbl)
 }
 
 
-/* a JPEG decoder specialized in decoding only the luminance (b&w) */
-int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel, int downscale,
-                void (*pf_progress)(int current, int total))
-{
-    struct bitstream bs; /* bitstream "object" */
-    static int block[64]; /* decoded DCT coefficients */
-
-    int width, height;
-    int skip_line; /* bytes from one line to the next (skip_line) */
-    int skip_strip, skip_mcu; /* bytes to next DCT row / column */
-
-    int x, y; /* loop counter */
-
-    unsigned char* p_byte; /* bitmap pointer */
-
-    void (*pf_idct)(unsigned char*, int*, int*, int); /* selected IDCT */
-    int k_need; /* AC coefficients needed up to here */
-    int zero_need; /* init the block with this many zeros */
-
-    int last_dc_val = 0;
-    int store_offs[4]; /* memory offsets: order of Y11 Y12 Y21 Y22 U V */
-    int restart = p_jpeg->restart_interval; /* MCUs until restart marker */
-
-    /* pick the IDCT we want, determine how to work with coefs */
-    if (downscale == 1)
-    {
-        pf_idct = idct8x8;
-        k_need = 64; /* all */
-        zero_need = 63; /* all */
-    }
-    else if (downscale == 2)
-    {
-        pf_idct = idct4x4;
-        k_need = 25; /* this far in zig-zag to cover 4*4 */
-        zero_need = 27; /* clear this far in linear order */
-    }
-    else if (downscale == 4)
-    {
-        pf_idct = idct2x2;
-        k_need = 5; /* this far in zig-zag to cover 2*2 */
-        zero_need = 9; /* clear this far in linear order */
-    }
-    else if (downscale == 8)
-    {
-        pf_idct = idct1x1;
-        k_need = 0; /* no AC, not needed */
-        zero_need = 0; /* no AC, not needed */
-    }
-    else return -1; /* not supported */
-
-    /* init bitstream, fake a restart to make it start */
-    bs.next_input_byte = p_jpeg->p_entropy_data;
-    bs.bits_left = 0;
-    bs.input_end = p_jpeg->p_entropy_end;
-
-    width  = p_jpeg->x_phys / downscale;
-    height = p_jpeg->y_phys / downscale;
-    skip_line = width;
-    skip_strip = skip_line * (height / p_jpeg->y_mbl);
-    skip_mcu = (width/p_jpeg->x_mbl);
-
-    /* prepare offsets about where to store the different blocks */
-    store_offs[p_jpeg->store_pos[0]] = 0;
-    store_offs[p_jpeg->store_pos[1]] = 8 / downscale; /* to the right */
-    store_offs[p_jpeg->store_pos[2]] = width * 8 / downscale; /* below */
-    store_offs[p_jpeg->store_pos[3]] = store_offs[1] + store_offs[2]; /* r+b */
-
-    for(y=0; y<p_jpeg->y_mbl && bs.next_input_byte <= bs.input_end; y++)
-    {
-        p_byte = p_pixel;
-        p_pixel += skip_strip;
-        for (x=0; x<p_jpeg->x_mbl; x++)
-        {
-            int blkn;
-
-            /* Outer loop handles each block in the MCU */
-            for (blkn = 0; blkn < p_jpeg->blocks; blkn++)
-            {   /* Decode a single block's worth of coefficients */
-                int k = 1; /* coefficient index */
-                int s, r; /* huffman values */
-                int ci = p_jpeg->mcu_membership[blkn]; /* component index */
-                int ti = p_jpeg->tab_membership[blkn]; /* table index */
-                struct derived_tbl* dctbl = &p_jpeg->dc_derived_tbls[ti];
-                struct derived_tbl* actbl = &p_jpeg->ac_derived_tbls[ti];
-
-                /* Section F.2.2.1: decode the DC coefficient difference */
-                s = huff_decode_dc(&bs, dctbl);
-
-                if (ci == 0) /* only for Y component */
-                {
-                    last_dc_val += s;
-                    block[0] = last_dc_val; /* output it (assumes zag[0] = 0) */
-
-                    /* coefficient buffer must be cleared */
-                    MEMSET(block+1, 0, zero_need*sizeof(block[0]));
-
-                    /* Section F.2.2.2: decode the AC coefficients */
-                    for (; k < k_need; k++)
-                    {
-                        s = huff_decode_ac(&bs, actbl);
-                        r = s >> 4;
-                        s &= 15;
-
-                        if (s)
-                        {
-                            k += r;
-                            check_bit_buffer(&bs, s);
-                            r = get_bits(&bs, s);
-                            block[zag[k]] = HUFF_EXTEND(r, s);
-                        }
-                        else
-                        {
-                            if (r != 15)
-                            {
-                                k = 64;
-                                break;
-                            }
-                            k += r;
-                        }
-                    }  /* for k */
-                }
-                /* In this path we just discard the values */
-                for (; k < 64; k++)
-                {
-                    s = huff_decode_ac(&bs, actbl);
-                    r = s >> 4;
-                    s &= 15;
-
-                    if (s)
-                    {
-                        k += r;
-                        check_bit_buffer(&bs, s);
-                        drop_bits(&bs, s);
-                    }
-                    else
-                    {
-                        if (r != 15)
-                            break;
-                        k += r;
-                    }
-                }  /* for k */
-
-                if (ci == 0)
-                {   /* only for Y component */
-                    pf_idct(p_byte+store_offs[blkn], block, p_jpeg->qt_idct[ti], 
-                        skip_line);
-                }
-            } /* for blkn */
-            p_byte += skip_mcu;
-            if (p_jpeg->restart_interval && --restart == 0) 
-            {   /* if a restart marker is due: */
-                restart = p_jpeg->restart_interval; /* count again */
-                search_restart(&bs); /* align the bitstream */
-                last_dc_val = 0; /* reset decoder */
-            }
-        } /* for x */
-        if (pf_progress != NULL)
-            pf_progress(y, p_jpeg->y_mbl-1); /* notify about decoding progress */
-    } /* for y */
-
-    return 0; /* success */
-}
-
-
 #ifdef HAVE_LCD_COLOR
 
 /* JPEG decoder variant for YUV decoding, into 3 different planes */
 /*  Note: it keeps the original color subsampling, even if resized. */
-int jpeg_decode_color(struct jpeg* p_jpeg, unsigned char* p_pixel[3], 
-        int downscale, void (*pf_progress)(int current, int total))
+int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel[3],
+                int downscale, void (*pf_progress)(int current, int total))
 {
     struct bitstream bs; /* bitstream "object" */
     static int block[64]; /* decoded DCT coefficients */
@@ -1710,7 +1546,7 @@ int jpeg_decode_color(struct jpeg* p_jpeg, unsigned char* p_pixel[3],
                 }
                 else
                 {   /* chroma */
-                    pf_idct(p_byte[ci], block, p_jpeg->qt_idct[ti], 
+                    pf_idct(p_byte[ci], block, p_jpeg->qt_idct[ti],
                         skip_line[ci]);
                 }
             } /* for blkn */
@@ -1731,8 +1567,172 @@ int jpeg_decode_color(struct jpeg* p_jpeg, unsigned char* p_pixel[3],
 
     return 0; /* success */
 }
+#else /* !HAVE_LCD_COLOR */
 
-#endif /* #ifdef HAVE_LCD_COLOR */
+/* a JPEG decoder specialized in decoding only the luminance (b&w) */
+int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel[1], int downscale,
+                void (*pf_progress)(int current, int total))
+{
+    struct bitstream bs; /* bitstream "object" */
+    static int block[64]; /* decoded DCT coefficients */
+
+    int width, height;
+    int skip_line; /* bytes from one line to the next (skip_line) */
+    int skip_strip, skip_mcu; /* bytes to next DCT row / column */
+
+    int x, y; /* loop counter */
+
+    unsigned char* p_line = p_pixel[0];
+    unsigned char* p_byte; /* bitmap pointer */
+
+    void (*pf_idct)(unsigned char*, int*, int*, int); /* selected IDCT */
+    int k_need; /* AC coefficients needed up to here */
+    int zero_need; /* init the block with this many zeros */
+
+    int last_dc_val = 0;
+    int store_offs[4]; /* memory offsets: order of Y11 Y12 Y21 Y22 U V */
+    int restart = p_jpeg->restart_interval; /* MCUs until restart marker */
+
+    /* pick the IDCT we want, determine how to work with coefs */
+    if (downscale == 1)
+    {
+        pf_idct = idct8x8;
+        k_need = 64; /* all */
+        zero_need = 63; /* all */
+    }
+    else if (downscale == 2)
+    {
+        pf_idct = idct4x4;
+        k_need = 25; /* this far in zig-zag to cover 4*4 */
+        zero_need = 27; /* clear this far in linear order */
+    }
+    else if (downscale == 4)
+    {
+        pf_idct = idct2x2;
+        k_need = 5; /* this far in zig-zag to cover 2*2 */
+        zero_need = 9; /* clear this far in linear order */
+    }
+    else if (downscale == 8)
+    {
+        pf_idct = idct1x1;
+        k_need = 0; /* no AC, not needed */
+        zero_need = 0; /* no AC, not needed */
+    }
+    else return -1; /* not supported */
+
+    /* init bitstream, fake a restart to make it start */
+    bs.next_input_byte = p_jpeg->p_entropy_data;
+    bs.bits_left = 0;
+    bs.input_end = p_jpeg->p_entropy_end;
+
+    width  = p_jpeg->x_phys / downscale;
+    height = p_jpeg->y_phys / downscale;
+    skip_line = width;
+    skip_strip = skip_line * (height / p_jpeg->y_mbl);
+    skip_mcu = (width/p_jpeg->x_mbl);
+
+    /* prepare offsets about where to store the different blocks */
+    store_offs[p_jpeg->store_pos[0]] = 0;
+    store_offs[p_jpeg->store_pos[1]] = 8 / downscale; /* to the right */
+    store_offs[p_jpeg->store_pos[2]] = width * 8 / downscale; /* below */
+    store_offs[p_jpeg->store_pos[3]] = store_offs[1] + store_offs[2]; /* r+b */
+
+    for(y=0; y<p_jpeg->y_mbl && bs.next_input_byte <= bs.input_end; y++)
+    {
+        p_byte = p_line;
+        p_line += skip_strip;
+        for (x=0; x<p_jpeg->x_mbl; x++)
+        {
+            int blkn;
+
+            /* Outer loop handles each block in the MCU */
+            for (blkn = 0; blkn < p_jpeg->blocks; blkn++)
+            {   /* Decode a single block's worth of coefficients */
+                int k = 1; /* coefficient index */
+                int s, r; /* huffman values */
+                int ci = p_jpeg->mcu_membership[blkn]; /* component index */
+                int ti = p_jpeg->tab_membership[blkn]; /* table index */
+                struct derived_tbl* dctbl = &p_jpeg->dc_derived_tbls[ti];
+                struct derived_tbl* actbl = &p_jpeg->ac_derived_tbls[ti];
+
+                /* Section F.2.2.1: decode the DC coefficient difference */
+                s = huff_decode_dc(&bs, dctbl);
+
+                if (ci == 0) /* only for Y component */
+                {
+                    last_dc_val += s;
+                    block[0] = last_dc_val; /* output it (assumes zag[0] = 0) */
+
+                    /* coefficient buffer must be cleared */
+                    MEMSET(block+1, 0, zero_need*sizeof(block[0]));
+
+                    /* Section F.2.2.2: decode the AC coefficients */
+                    for (; k < k_need; k++)
+                    {
+                        s = huff_decode_ac(&bs, actbl);
+                        r = s >> 4;
+                        s &= 15;
+
+                        if (s)
+                        {
+                            k += r;
+                            check_bit_buffer(&bs, s);
+                            r = get_bits(&bs, s);
+                            block[zag[k]] = HUFF_EXTEND(r, s);
+                        }
+                        else
+                        {
+                            if (r != 15)
+                            {
+                                k = 64;
+                                break;
+                            }
+                            k += r;
+                        }
+                    }  /* for k */
+                }
+                /* In this path we just discard the values */
+                for (; k < 64; k++)
+                {
+                    s = huff_decode_ac(&bs, actbl);
+                    r = s >> 4;
+                    s &= 15;
+
+                    if (s)
+                    {
+                        k += r;
+                        check_bit_buffer(&bs, s);
+                        drop_bits(&bs, s);
+                    }
+                    else
+                    {
+                        if (r != 15)
+                            break;
+                        k += r;
+                    }
+                }  /* for k */
+
+                if (ci == 0)
+                {   /* only for Y component */
+                    pf_idct(p_byte+store_offs[blkn], block, p_jpeg->qt_idct[ti], 
+                        skip_line);
+                }
+            } /* for blkn */
+            p_byte += skip_mcu;
+            if (p_jpeg->restart_interval && --restart == 0) 
+            {   /* if a restart marker is due: */
+                restart = p_jpeg->restart_interval; /* count again */
+                search_restart(&bs); /* align the bitstream */
+                last_dc_val = 0; /* reset decoder */
+            }
+        } /* for x */
+        if (pf_progress != NULL)
+            pf_progress(y, p_jpeg->y_mbl-1); /* notify about decoding progress */
+    } /* for y */
+
+    return 0; /* success */
+}
+#endif /* !HAVE_LCD_COLOR */
 
 /**************** end JPEG code ********************/
 
@@ -1745,7 +1745,12 @@ int jpeg_decode_color(struct jpeg* p_jpeg, unsigned char* p_pixel[3],
 
 struct t_disp
 {
-    unsigned char* bitmap;
+#ifdef HAVE_LCD_COLOR
+    unsigned char* bitmap[3]; /* Y, Cr, Cb */
+    int csub_x, csub_y;
+#else
+    unsigned char* bitmap[1]; /* Y only */
+#endif
     int width;
     int height;
     int stride;
@@ -1766,6 +1771,151 @@ unsigned char* buf_root; /* the root of the images */
 int root_size;
 
 /************************* Implementation ***************************/
+
+#ifdef HAVE_LCD_COLOR
+
+#if (LCD_DEPTH == 16) && \
+    ((LCD_PIXELFORMAT == RGB565) || (LCD_PIXELFORMAT == RGB565SWAPPED))
+#define RYFAC (31*257)
+#define GYFAC (63*257)
+#define BYFAC (31*257)
+#define RVFAC 11170     /* 31 * 257 *  1.402    */
+#define GVFAC (-11563)  /* 63 * 257 * -0.714136 */
+#define GUFAC (-5572)   /* 63 * 257 * -0.344136 */
+#define BUFAC 14118     /* 31 * 257 *  1.772    */
+#endif
+
+/* Draw a partial YUV colour bitmap */
+void yuv_bitmap_part(unsigned char *src[3], int csub_x, int csub_y,
+                     int src_x, int src_y, int stride,
+                     int x, int y, int width, int height)
+{
+    fb_data *dst, *dst_end;
+
+    /* nothing to draw? */
+    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
+        || (x + width <= 0) || (y + height <= 0))
+        return;
+        
+    /* clipping */
+    if (x < 0)
+    {
+        width += x;
+        src_x -= x;
+        x = 0;
+    }
+    if (y < 0)
+    {
+        height += y;
+        src_y -= y;
+        y = 0;
+    }
+    if (x + width > LCD_WIDTH)
+        width = LCD_WIDTH - x;
+    if (y + height > LCD_HEIGHT)
+        height = LCD_HEIGHT - y;
+
+    dst = rb->lcd_framebuffer + LCD_WIDTH * y + x;
+    dst_end = dst + LCD_WIDTH * height;
+    
+    do
+    {
+        fb_data *dst_row = dst;
+        fb_data *row_end = dst_row + width;
+        const unsigned char *ysrc = src[0] + stride * src_y + src_x;
+        int y, u, v;
+        int red, green, blue;
+        unsigned rbits, gbits, bbits;
+
+        if (csub_y) /* colour */
+        {
+            /* upsampling, YUV->RGB conversion and reduction to RGB565 in one go */
+            const unsigned char *usrc = src[1] + (stride/csub_x) * (src_y/csub_y)
+                                               + (src_x/csub_x);
+            const unsigned char *vsrc = src[2] + (stride/csub_x) * (src_y/csub_y)
+                                               + (src_x/csub_x);
+            int xphase = src_x % csub_x;
+            int rc, gc, bc;
+
+            u = *usrc++ - 128;
+            v = *vsrc++ - 128;
+            rc = RVFAC * v + 32639;
+            gc = GVFAC * v + GUFAC * u + 32639;
+            bc = BUFAC * u + 32639;
+            
+            do
+            {
+                y = *ysrc++;
+                red   = RYFAC * y + rc;
+                green = GYFAC * y + gc;
+                blue  = BYFAC * y + bc;
+
+                if ((unsigned)red > (RYFAC*255+32639))
+                {
+                    if (red < 0)
+                        red = 0;
+                    else
+                        red = (RYFAC*255+32639);
+                }
+                if ((unsigned)green > (GYFAC*255+32639))
+                {
+                    if (green < 0)
+                        green = 0;
+                    else
+                        green = (GYFAC*255+32639);
+                }
+                if ((unsigned)blue > (BYFAC*255+32639))
+                {
+                    if (blue < 0)
+                        blue = 0;
+                    else
+                        blue = (BYFAC*255+32639);
+                }
+                rbits = ((unsigned)red) >> 16 ;
+                gbits = ((unsigned)green) >> 16 ;
+                bbits = ((unsigned)blue) >> 16 ;
+#if LCD_PIXELFORMAT == RGB565
+                *dst_row++ = (rbits << 11) | (gbits << 5) | bbits;
+#elif LCD_PIXELFORMAT == RGB565SWAPPED
+                *dst_row++ = swap16((rbits << 11) | (gbits << 5) | bbits);
+#endif
+
+                if (++xphase >= csub_x)
+                {
+                    u = *usrc++ - 128;
+                    v = *vsrc++ - 128;
+                    rc = RVFAC * v + 32639;
+                    gc = GVFAC * v + GUFAC * u + 32639;
+                    bc = BUFAC * u + 32639;
+                    xphase = 0;
+                }
+            }
+            while (dst_row < row_end);
+        }
+        else /* monochrome */
+        {
+            do
+            {
+                y = *ysrc++;
+                red   = RYFAC * y + 32639;  /* blue == red */
+                green = GYFAC * y + 32639;
+                rbits = ((unsigned)red) >> 16;
+                gbits = ((unsigned)green) >> 16;
+#if LCD_PIXELFORMAT == RGB565
+                *dst_row++ = (rbits << 11) | (gbits << 5) | rbits;
+#elif LCD_PIXELFORMAT == RGB565SWAPPED
+                *dst_row++ = swap16((rbits << 11) | (gbits << 5) | rbits);
+#endif
+            }
+            while (dst_row < row_end);
+        }
+        
+        src_y++;
+        dst += LCD_WIDTH;
+    }
+    while (dst < dst_end);    
+}
+#endif
 
 /* switch off overlay, for handling SYS_ events */
 void cleanup(void *parameter)
@@ -1806,10 +1956,18 @@ int scroll_bmp(struct t_disp* pdisp)
             {
                 MYXLCD(scroll_right)(move); /* scroll right */
                 pdisp->x -= move;
-                MYXLCD(gray_bitmap_part)(
-                    pdisp->bitmap, pdisp->x, pdisp->y, pdisp->stride,
+#ifdef HAVE_LCD_COLOR
+                yuv_bitmap_part(
+                    pdisp->bitmap, pdisp->csub_x, pdisp->csub_y, 
+                    pdisp->x, pdisp->y, pdisp->stride,
                     0, MAX(0, (LCD_HEIGHT-pdisp->height)/2), /* x, y */
                     move, MIN(LCD_HEIGHT, pdisp->height));   /* w, h */
+#else
+                MYXLCD(gray_bitmap_part)(
+                    pdisp->bitmap[0], pdisp->x, pdisp->y, pdisp->stride,
+                    0, MAX(0, (LCD_HEIGHT-pdisp->height)/2), /* x, y */
+                    move, MIN(LCD_HEIGHT, pdisp->height));   /* w, h */
+#endif
                 MYLCD_UPDATE();
             }
             break;
@@ -1821,11 +1979,19 @@ int scroll_bmp(struct t_disp* pdisp)
             {
                 MYXLCD(scroll_left)(move); /* scroll left */
                 pdisp->x += move;
+#ifdef HAVE_LCD_COLOR
+                yuv_bitmap_part(
+                    pdisp->bitmap, pdisp->csub_x, pdisp->csub_y,
+                    pdisp->x + LCD_WIDTH - move, pdisp->y, pdisp->stride,
+                    LCD_WIDTH - move, MAX(0, (LCD_HEIGHT-pdisp->height)/2), /* x, y */
+                    move, MIN(LCD_HEIGHT, pdisp->height));   /* w, h */
+#else
                 MYXLCD(gray_bitmap_part)(
-                    pdisp->bitmap, pdisp->x + LCD_WIDTH - move,
+                    pdisp->bitmap[0], pdisp->x + LCD_WIDTH - move,
                     pdisp->y, pdisp->stride,
                     LCD_WIDTH - move, MAX(0, (LCD_HEIGHT-pdisp->height)/2), /* x, y */
                     move, MIN(LCD_HEIGHT, pdisp->height));   /* w, h */
+#endif
                 MYLCD_UPDATE();
             }
             break;
@@ -1837,10 +2003,18 @@ int scroll_bmp(struct t_disp* pdisp)
             {
                 MYXLCD(scroll_down)(move); /* scroll down */
                 pdisp->y -= move;
-                MYXLCD(gray_bitmap_part)(
-                    pdisp->bitmap, pdisp->x, pdisp->y, pdisp->stride,
+#ifdef HAVE_LCD_COLOR
+                yuv_bitmap_part(
+                    pdisp->bitmap, pdisp->csub_x, pdisp->csub_y,
+                    pdisp->x, pdisp->y, pdisp->stride,
                     MAX(0, (LCD_WIDTH-pdisp->width)/2), 0,   /* x, y */
                     MIN(LCD_WIDTH, pdisp->width), move);     /* w, h */
+#else
+                MYXLCD(gray_bitmap_part)(
+                    pdisp->bitmap[0], pdisp->x, pdisp->y, pdisp->stride,
+                    MAX(0, (LCD_WIDTH-pdisp->width)/2), 0,   /* x, y */
+                    MIN(LCD_WIDTH, pdisp->width), move);     /* w, h */
+#endif
                 MYLCD_UPDATE();
             }
             break;
@@ -1852,11 +2026,19 @@ int scroll_bmp(struct t_disp* pdisp)
             {
                 MYXLCD(scroll_up)(move); /* scroll up */
                 pdisp->y += move;
-                MYXLCD(gray_bitmap_part)(
-                    pdisp->bitmap, pdisp->x,
+#ifdef HAVE_LCD_COLOR
+               yuv_bitmap_part(
+                    pdisp->bitmap, pdisp->csub_x, pdisp->csub_y, pdisp->x,
                     pdisp->y + LCD_HEIGHT - move, pdisp->stride,
                     MAX(0, (LCD_WIDTH-pdisp->width)/2), LCD_HEIGHT - move, /* x, y */
                     MIN(LCD_WIDTH, pdisp->width), move);     /* w, h */
+#else
+                MYXLCD(gray_bitmap_part)(
+                    pdisp->bitmap[0], pdisp->x,
+                    pdisp->y + LCD_HEIGHT - move, pdisp->stride,
+                    MAX(0, (LCD_WIDTH-pdisp->width)/2), LCD_HEIGHT - move, /* x, y */
+                    MIN(LCD_WIDTH, pdisp->width), move);     /* w, h */
+#endif
                 MYLCD_UPDATE();
             }
             break;
@@ -1927,35 +2109,50 @@ void align(unsigned char** ppbuf, int* plen, int align)
     *ppbuf = (unsigned char*)aligned;
 }
 
+int jpegmem(struct jpeg *p_jpg, int ds)
+{
+    int size;
+
+    size = (p_jpg->x_phys/ds/p_jpg->subsample_x[0]) 
+         * (p_jpg->y_phys/ds/p_jpg->subsample_y[0]);
+#ifdef HAVE_LCD_COLOR
+    if (p_jpg->blocks > 1) /* colour, add requirements for chroma */
+    {
+        size += (p_jpg->x_phys/ds/p_jpg->subsample_x[1])
+              * (p_jpg->y_phys/ds/p_jpg->subsample_y[1]);
+        size += (p_jpg->x_phys/ds/p_jpg->subsample_x[2])
+              * (p_jpg->y_phys/ds/p_jpg->subsample_y[2]);
+    }
+#endif
+    return size;
+}
 
 /* how far can we zoom in without running out of memory */
-int min_downscale(int x, int y, int bufsize)
+int min_downscale(struct jpeg *p_jpg, int bufsize)
 {
     int downscale = 8;
-
-    if ((x/8) * (y/8) > bufsize)
+    
+    if (jpegmem(p_jpg, 8) > bufsize)
         return 0; /* error, too large, even 1:8 doesn't fit */
-
-    while ((x*2/downscale) * (y*2/downscale) < bufsize
-        && downscale > 1)
-    {
+        
+    while (downscale > 1 && jpegmem(p_jpg, downscale/2) <= bufsize)
         downscale /= 2;
-    }
+        
     return downscale;
 }
 
 
 /* how far can we zoom out, to fit image into the LCD */
-int max_downscale(int x, int y)
+int max_downscale(struct jpeg *p_jpg)
 {
     int downscale = 1;
-
-    while ((x/downscale > LCD_WIDTH || y/downscale > LCD_HEIGHT)
-        && downscale < 8)
+    
+    while (downscale < 8 && (p_jpg->x_size > LCD_WIDTH*downscale
+                          || p_jpg->y_size > LCD_HEIGHT*downscale))
     {
         downscale *= 2;
     }
-
+    
     return downscale;
 }
 
@@ -1970,7 +2167,7 @@ struct t_disp* get_image(struct jpeg* p_jpg, int ds)
 
     struct t_disp* p_disp = &disp[ds]; /* short cut */
 
-    if (p_disp->bitmap != NULL)
+    if (p_disp->bitmap[0] != NULL)
     {
         return p_disp; /* we still have it */
     }
@@ -1978,19 +2175,41 @@ struct t_disp* get_image(struct jpeg* p_jpg, int ds)
     /* assign image buffer */
 
      /* physical size needed for decoding */
-    size = (p_jpg->x_phys/ds) * (p_jpg->y_phys / ds);
+    size = jpegmem(p_jpg, ds);
     if (buf_size <= size)
     {   /* have to discard the current */
         int i;
         for (i=1; i<=8; i++)
-            disp[i].bitmap = NULL; /* invalidate all bitmaps */
+            disp[i].bitmap[0] = NULL; /* invalidate all bitmaps */
         buf = buf_root; /* start again from the beginning of the buffer */
         buf_size = root_size;
     }
+    
+#ifdef HAVE_LCD_COLOR
+    if (p_jpg->blocks > 1) /* colour jpeg */
+    {
+        int i;
 
+        for (i = 1; i < 3; i++)
+        {
+            size = (p_jpg->x_phys / ds / p_jpg->subsample_x[i])
+                 * (p_jpg->y_phys / ds / p_jpg->subsample_y[i]);
+            p_disp->bitmap[i] = buf;
+            buf += size;
+            buf_size -= size;
+        }
+        p_disp->csub_x = p_jpg->subsample_x[1];
+        p_disp->csub_y = p_jpg->subsample_y[1];
+    }
+    else
+    {
+        p_disp->csub_x = p_disp->csub_y = 0;
+        p_disp->bitmap[1] = p_disp->bitmap[2] = buf;
+    }
+#endif
     /* size may be less when decoded (if height is not block aligned) */
     size = (p_jpg->x_phys/ds) * (p_jpg->y_size / ds);
-    p_disp->bitmap = buf;
+    p_disp->bitmap[0] = buf;
     buf += size;
     buf_size -= size;
 
@@ -2000,9 +2219,9 @@ struct t_disp* get_image(struct jpeg* p_jpg, int ds)
     rb->lcd_update();
 
     /* update image properties */
-    p_disp->width = p_jpg->x_size/ds;
+    p_disp->width = p_jpg->x_size / ds;
     p_disp->stride = p_jpg->x_phys / ds; /* use physical size for stride */
-    p_disp->height = p_jpg->y_size/ds;
+    p_disp->height = p_jpg->y_size / ds;
 
     /* the actual decoding */
     time = *rb->current_tick;
@@ -2106,7 +2325,7 @@ int plugin_main(char* filename)
 
     /* allocate JPEG buffer */
     align(&buf, &buf_size, 2); /* 16 bit align */
-    buf_jpeg = (unsigned char*)(((int)buf + 1) & ~1);
+    buf_jpeg = buf;
     buf += filesize;
     buf_size -= filesize;
     buf_root = buf; /* we can start the decompressed images behind it */
@@ -2117,6 +2336,12 @@ int plugin_main(char* filename)
         rb->close(fd);
         return PLUGIN_ERROR;
     }
+    
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_foreground(LCD_WHITE);
+    rb->lcd_set_background(LCD_BLACK);
+    rb->lcd_clear_display();
+#endif
 
     rb->snprintf(print, sizeof(print), "loading %d bytes", filesize);
     rb->lcd_puts(0, 0, print);
@@ -2145,10 +2370,8 @@ int plugin_main(char* filename)
     rb->lcd_puts(0, 2, print);
     rb->lcd_update();
 
-    /* check display constraint */
-    ds_max = max_downscale(jpg.x_size, jpg.y_size);
-    /* check memory constraint */
-    ds_min = min_downscale(jpg.x_phys, jpg.y_phys, buf_size);
+    ds_max = max_downscale(&jpg);            /* check display constraint */
+    ds_min = min_downscale(&jpg, buf_size);  /* check memory constraint */
     if (ds_min == 0)
     {
         rb->splash(HZ*2, true, "too large");
@@ -2172,12 +2395,22 @@ int plugin_main(char* filename)
         rb->lcd_update();
 
         MYLCD(clear_display)();
-        MYXLCD(gray_bitmap_part)(
-            p_disp->bitmap, p_disp->x, p_disp->y, p_disp->stride,
+#ifdef HAVE_LCD_COLOR
+        yuv_bitmap_part(
+            p_disp->bitmap, p_disp->csub_x, p_disp->csub_y,
+            p_disp->x, p_disp->y, p_disp->stride,
             MAX(0, (LCD_WIDTH - p_disp->width) / 2),
             MAX(0, (LCD_HEIGHT - p_disp->height) / 2),
             MIN(LCD_WIDTH, p_disp->width),
             MIN(LCD_HEIGHT, p_disp->height));
+#else
+        MYXLCD(gray_bitmap_part)(
+            p_disp->bitmap[0], p_disp->x, p_disp->y, p_disp->stride,
+            MAX(0, (LCD_WIDTH - p_disp->width) / 2),
+            MAX(0, (LCD_HEIGHT - p_disp->height) / 2),
+            MIN(LCD_WIDTH, p_disp->width),
+            MIN(LCD_HEIGHT, p_disp->height));
+#endif
         MYLCD_UPDATE();
 
 #ifdef USEGSLIB
