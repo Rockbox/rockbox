@@ -32,6 +32,10 @@
 #include "icons.h"
 #include "lang.h"
 #include "peakmeter.h"
+#include "audio.h"
+#ifdef CONFIG_BACKLIGHT
+#include "backlight.h"
+#endif
 
 #if CONFIG_CODEC == SWCODEC
 #include "pcm_playback.h"
@@ -943,9 +947,35 @@ void peak_meter_draw(int x, int y, int width, int height)
            have been calculated before */
         lcd_drawpixel(db_scale_lcd_coord[i], y + height / 2 - 1);
     }
-
-
+    
 #ifdef HAVE_RECORDING
+
+#ifdef CONFIG_BACKLIGHT
+    /* cliplight */
+    if ((pm_clip_left || pm_clip_right) && 
+        global_settings.cliplight &&
+#if CONFIG_CODEC == SWCODEC        
+        (pcm_rec_status() & (AUDIO_STATUS_RECORD | AUDIO_STATUS_PRERECORD)))
+#else
+        (audio_status() & (AUDIO_STATUS_RECORD | AUDIO_STATUS_PRERECORD)))
+#endif
+    {
+        /* if clipping, cliplight setting on and in recording screen */
+        if (global_settings.cliplight <= 2)
+        {
+            /* turn on main unit light if setting set to main or both*/
+            backlight_on();
+        }
+#ifdef HAVE_REMOTE_LCD
+        if (global_settings.cliplight >= 2)
+        {
+            /* turn remote light unit on if setting set to remote or both */
+            remote_backlight_on();
+        }
+#endif /* HAVE_REMOTE_LCD */
+    }
+#endif /*CONFIG_BACKLIGHT */
+
     if (trig_status != TRIG_OFF) {
         int start_trigx, stop_trigx, ycenter;
 
@@ -961,7 +991,7 @@ void peak_meter_draw(int x, int y, int width, int height)
         lcd_vline(stop_trigx, ycenter - 2, ycenter);
         if (stop_trigx > 0) lcd_drawpixel(stop_trigx - 1, ycenter - 1);
     }
-#endif
+#endif /*HAVE_RECORDING*/
 
 #ifdef PM_DEBUG
     /* display a bar to show how many calls to peak_meter_peek 

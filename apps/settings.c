@@ -540,6 +540,11 @@ static const struct bit_entry hd_bits[] =
         "mic decimator right gain", NULL }, /* -128...48 */
 #endif
     {1, S_O(scroll_paginated), false, "scroll paginated", off_on },
+#ifdef HAVE_RECORDING
+#ifdef CONFIG_BACKLIGHT
+    {2, S_O(cliplight), 0, "cliplight", "off,main,both,remote" },
+#endif /* CONFIG_BACKLIGHT */
+#endif /*HAVE_RECORDING*/
     /* If values are just added to the end, no need to bump the version. */
     /* new stuff to be added at the end */
 

@@ -341,7 +341,29 @@ static bool reconstartup(void)
                     &global_settings.rec_startup);
 }
 
-#endif /* MAS3587F */
+#ifdef CONFIG_BACKLIGHT
+static bool cliplight(void)
+{
+    static const struct opt_items names[] = {
+        { STR(LANG_OFF) },
+        { STR(LANG_MAIN_UNIT) }
+#ifdef HAVE_REMOTE_LCD
+      , { STR(LANG_REMOTE_MAIN) },
+        { STR(LANG_REMOTE_UNIT) }
+#endif
+    };
+      
+    return set_option( str(LANG_CLIP_LIGHT),
+                    &global_settings.cliplight, INT, names,
+#ifdef HAVE_REMOTE_LCD
+                     4, NULL );
+#else
+                     2, NULL );
+#endif
+}
+#endif /*CONFIG_BACKLIGHT */
+
+#endif /* HAVE_RECORDING */
 
 static bool chanconf(void)
 {
@@ -808,6 +830,10 @@ bool recording_menu(bool no_source)
     items[i++].function = recdirectory;
     items[i].desc = ID2P(LANG_RECORD_STARTUP);
     items[i++].function = reconstartup;
+#ifdef CONFIG_BACKLIGHT
+    items[i].desc = ID2P(LANG_CLIP_LIGHT);
+    items[i++].function = cliplight;
+#endif
 #if !defined(SIMULATOR) && CONFIG_CODEC == MAS3587F
     items[i].desc = ID2P(LANG_RECORD_TRIGGER);
     items[i++].function = rectrigger;

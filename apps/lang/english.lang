@@ -3724,3 +3724,27 @@ desc: jump to new page when scrolling
 eng: "Paged Scrolling"
 voice: ""
 new:
+
+id: LANG_CLIP_LIGHT
+desc: in record settings menu.
+eng: "Clipping light"
+voice: "Clipping light"
+new:
+
+id: LANG_MAIN_UNIT
+desc: in record settings menu.
+eng: "Main unit only"
+voice: "Main unit only"
+new:
+
+id: LANG_REMOTE_UNIT
+desc: in record settings menu.
+eng: "Remote unit only"
+voice: "Remote unit only"
+new:
+
+id: LANG_REMOTE_MAIN
+desc: in record settings menu.
+eng: "Main and remote unit"
+voice: "Main and remote unit"
+new:

@@ -236,6 +236,10 @@ struct user_settings
     int rec_prerecord_time; /* In seconds, 0-30, 0 means OFF */
     int rec_directory; /* 0=base dir, 1=current dir */
     bool rec_startup; /* true means start Rockbox in recording screen */
+    int cliplight; /* 0 = off
+                      1 = main lcd
+                      2 = main and remote lcd
+                      3 = remote lcd */
     
     int rec_start_thres;    /* negative: db, positive: % range -87 .. 100 */
     int rec_start_duration; /* index of trig_durations */
