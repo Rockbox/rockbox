@@ -439,7 +439,9 @@ static unsigned char levels[29][8][10] = {
     }
 };
 
-int pad_pos_x,x,y;
+#define MAX_BALLS 10
+int pad_pos_x;
+int x[MAX_BALLS],y[MAX_BALLS];
 int life;
 int start_game,con_game;
 int pad_type;
@@ -470,7 +472,6 @@ typedef struct balls {
     bool glue;
 } balls;
 
-#define MAX_BALLS 10
 balls ball[MAX_BALLS];
 
 typedef struct sfire {
@@ -535,12 +536,34 @@ void int_game(int new_game)
 
 }
 
-
-#define HIGH_SCORE "highscore.cfg"
-
-#define MENU_LENGTH 4
 int sw,i,w;
 
+/* sleep timer counting the score */
+void sleep (int secs) {
+     bool done=false;
+     char s[20];
+     int count=0;
+     
+     while (!done) {
+
+         if (vscore<score) {
+             vscore++;
+             rb->snprintf(s, sizeof(s), "%d", vscore);
+             rb->lcd_getstringsize(s, &sw, NULL);
+             rb->lcd_putsxy(LCD_WIDTH/2-sw/2, 2, s);
+             rb->lcd_update();
+         } else {
+           if (count==0) count=*rb->current_tick+HZ*secs;
+           if (*rb->current_tick>=count)
+               done=true;
+         }
+     }
+     
+}
+
+
+#define HIGH_SCORE "highscore.cfg"
+#define MENU_LENGTH 4
 int game_menu(int when)
 {
     int button,cur=0;
@@ -847,7 +870,7 @@ int game_loop(void){
                                 life--;
                                 if (life>=0) {
                                     int_game(0);
-                                    rb->sleep(HZ*2);
+                                    sleep(2);
                                 }
                                 break;
                             case 2:
@@ -1038,14 +1061,16 @@ int game_loop(void){
                         life--;
                         if (life>=0){
                             int_game(0);
-                            rb->sleep(HZ*2);
+                            sleep(2);
                         }
                     }
                 }
     
                 /* left line ,right line */
-                if ((ball[k].pos_x <= 0) || (ball[k].pos_x+BALL >= LCD_WIDTH))
+                if ((ball[k].pos_x <= 0) || (ball[k].pos_x+BALL >= LCD_WIDTH)){
                     ball[k].x = ball[k].x*-1;
+                    ball[k].pos_x = ball[k].pos_x <= 0 ? 0 : LCD_WIDTH-BALL;
+                }
     
                 if ((ball[k].pos_y+5 >= PAD_POS_Y && (ball[k].pos_x >= pad_pos_x && ball[k].pos_x <= pad_pos_x+PAD_WIDTH)) &&
                             start_game != 1 && !ball[k].glue) {
@@ -1092,10 +1117,10 @@ int game_loop(void){
 
                 if (brick_on_board < 0) {
                     if (cur_level+1<levels_num) {
-                        rb->sleep(HZ * 2);
                         cur_level++;
                         score+=100;
                         int_game(1);
+                        sleep(2);
                     } else {
                         rb->lcd_getstringsize("Congratulations!", &sw, NULL);
                         rb->lcd_putsxy(LCD_WIDTH/2-sw/2, 140, "Congratulations!");
@@ -1104,11 +1129,11 @@ int game_loop(void){
                         vscore=score;
                         rb->lcd_update();
                         if (score>highscore) {
-                            rb->sleep(HZ*2);
+                            sleep(2);
                             highscore=score;
                             rb->splash(HZ*2,true,"New High Score");
                         } else {
-                            rb->sleep(HZ * 4);
+                            sleep(3);
                         }
 
                         switch(game_menu(0)){
@@ -1174,8 +1199,15 @@ int game_loop(void){
                               }
                               start_game =0;
                           } else if (pad_type==1) {
-                              for(k=0;k<used_balls;k++)
-                                  ball[k].glue=false;
+                              for(k=0;k<used_balls;k++) {
+                                  if (ball[k].glue)
+                                     ball[k].glue=false;
+                                  else {
+                                     ball[k].x = x[k];
+                                     ball[k].y = y[k];
+                                  }
+                              }
+                              
                               if (start_game!=1 && con_game==1) {
                                   start_game =0;
                                   con_game=0;
@@ -1190,8 +1222,8 @@ int game_loop(void){
                               fire[tfire].left=pad_pos_x+PAD_WIDTH-1;
                           } else if (con_game==1 && start_game!=1) {
                               for(k=0;k<used_balls;k++){
-                                  ball[k].x=x;
-                                  ball[k].y=y;
+                                  ball[k].x=x[k];
+                                  ball[k].y=y[k];
                               }
                               con_game=0;
                           }
@@ -1215,23 +1247,25 @@ int game_loop(void){
                                  return 1;
                                  break;
                          };
+                         
                          for(k=0;k<used_balls;k++){
-                             if (ball[k].x!=0) x=ball[k].x;
+                             if (ball[k].x!=0) x[k]=ball[k].x;
                              ball[k].x=0;
-                             if (ball[k].y!=0) y=ball[k].y;
+                             if (ball[k].y!=0) y[k]=ball[k].y;
                              ball[k].y=0;
                          }
+                         
                          break;
                      }
              } else {
                  rb->lcd_bitmap(brickmania_gameover,LCD_WIDTH/2-55,LCD_HEIGHT-87,110,52);
                  rb->lcd_update();
                  if (score>highscore) {
-                      rb->sleep(HZ*2);
+                      sleep(2);
                       highscore=score;
                       rb->splash(HZ*2,true,"New High Score");
                  } else {
-                   rb->sleep(HZ * 3);
+                      sleep(3);
                  }
 
                  for(k=0;k<used_balls;k++){
