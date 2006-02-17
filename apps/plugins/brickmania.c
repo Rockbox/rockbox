@@ -557,6 +557,7 @@ void sleep (int secs) {
            if (*rb->current_tick>=count)
                done=true;
          }
+         rb->yield();
      }
      
 }
@@ -1292,6 +1293,7 @@ int game_loop(void){
             }
         if (end > *rb->current_tick) 
             rb->sleep(end-*rb->current_tick);
+        else rb->yield();
     }
 }
 
