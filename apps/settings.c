@@ -924,7 +924,9 @@ void sound_settings_apply(void)
 void settings_apply(void)
 {
     char buf[64];
+#if CONFIG_CODEC == SWCODEC
     int i;
+#endif
 
     sound_settings_apply();
 
