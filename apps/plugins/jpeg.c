@@ -1785,6 +1785,8 @@ int root_size;
 #define BUFAC 14118     /* 31 * 257 *  1.772    */
 #endif
 
+#define ROUNDOFFS (127*257)
+
 /* Draw a partial YUV colour bitmap */
 void yuv_bitmap_part(unsigned char *src[3], int csub_x, int csub_y,
                      int src_x, int src_y, int stride,
@@ -1839,9 +1841,9 @@ void yuv_bitmap_part(unsigned char *src[3], int csub_x, int csub_y,
 
             u = *usrc++ - 128;
             v = *vsrc++ - 128;
-            rc = RVFAC * v + 32639;
-            gc = GVFAC * v + GUFAC * u + 32639;
-            bc = BUFAC * u + 32639;
+            rc = RVFAC * v + ROUNDOFFS;
+            gc = GVFAC * v + GUFAC * u + ROUNDOFFS;
+            bc = BUFAC * u + ROUNDOFFS;
             
             do
             {
@@ -1850,26 +1852,26 @@ void yuv_bitmap_part(unsigned char *src[3], int csub_x, int csub_y,
                 green = GYFAC * y + gc;
                 blue  = BYFAC * y + bc;
 
-                if ((unsigned)red > (RYFAC*255+32639))
+                if ((unsigned)red > (RYFAC*255+ROUNDOFFS))
                 {
                     if (red < 0)
                         red = 0;
                     else
-                        red = (RYFAC*255+32639);
+                        red = (RYFAC*255+ROUNDOFFS);
                 }
-                if ((unsigned)green > (GYFAC*255+32639))
+                if ((unsigned)green > (GYFAC*255+ROUNDOFFS))
                 {
                     if (green < 0)
                         green = 0;
                     else
-                        green = (GYFAC*255+32639);
+                        green = (GYFAC*255+ROUNDOFFS);
                 }
-                if ((unsigned)blue > (BYFAC*255+32639))
+                if ((unsigned)blue > (BYFAC*255+ROUNDOFFS))
                 {
                     if (blue < 0)
                         blue = 0;
                     else
-                        blue = (BYFAC*255+32639);
+                        blue = (BYFAC*255+ROUNDOFFS);
                 }
                 rbits = ((unsigned)red) >> 16 ;
                 gbits = ((unsigned)green) >> 16 ;
@@ -1884,9 +1886,9 @@ void yuv_bitmap_part(unsigned char *src[3], int csub_x, int csub_y,
                 {
                     u = *usrc++ - 128;
                     v = *vsrc++ - 128;
-                    rc = RVFAC * v + 32639;
-                    gc = GVFAC * v + GUFAC * u + 32639;
-                    bc = BUFAC * u + 32639;
+                    rc = RVFAC * v + ROUNDOFFS;
+                    gc = GVFAC * v + GUFAC * u + ROUNDOFFS;
+                    bc = BUFAC * u + ROUNDOFFS;
                     xphase = 0;
                 }
             }
@@ -1897,8 +1899,8 @@ void yuv_bitmap_part(unsigned char *src[3], int csub_x, int csub_y,
             do
             {
                 y = *ysrc++;
-                red   = RYFAC * y + 32639;  /* blue == red */
-                green = GYFAC * y + 32639;
+                red   = RYFAC * y + ROUNDOFFS;  /* blue == red */
+                green = GYFAC * y + ROUNDOFFS;
                 rbits = ((unsigned)red) >> 16;
                 gbits = ((unsigned)green) >> 16;
 #if LCD_PIXELFORMAT == RGB565
