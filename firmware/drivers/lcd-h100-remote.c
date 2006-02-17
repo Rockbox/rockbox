@@ -446,10 +446,19 @@ static void remote_lcd_init(void)
     lcd_remote_roll(cached_roll);
 }
 
+static int _remote_type = 0;
+
+int remote_type(void)
+{
+    return _remote_type;
+}
+
 /* Monitor remote hotswap */
 static void remote_tick(void)
 {
     bool current_status;
+    int val;
+    int level;
 
     current_status = ((GPIO_READ & 0x40000000) == 0);
     /* Only report when the status has changed */
@@ -468,6 +477,20 @@ static void remote_tick(void)
         {
             if (current_status)
             {
+                /* Determine which type of remote it is.
+                   The number 8 is just a fudge factor. */
+                level = set_irq_level(HIGHEST_IRQ_LEVEL);
+                val = adc_scan(ADC_REMOTEDETECT);
+                set_irq_level(level);
+
+                if(val < (ADCVAL_H100_LCD_REMOTE + 8))
+                    if(val < (ADCVAL_H300_LCD_REMOTE + 8))
+                        _remote_type = REMOTETYPE_H300_LCD;
+                    else
+                        _remote_type = REMOTETYPE_H100_LCD;
+                else
+                    _remote_type = REMOTETYPE_H300_NONLCD;
+                
                 init_remote = true;   
                 /* request init in scroll_thread */
             }
@@ -476,6 +499,7 @@ static void remote_tick(void)
                 CLK_LO;
                 CS_HI;
                 remote_initialized = false;
+                _remote_type = 0;
             }
         }
     }

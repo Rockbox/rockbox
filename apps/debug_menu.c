@@ -48,6 +48,7 @@
 #include "screens.h"
 #include "misc.h"
 #include "splash.h"
+#include "lcd-remote.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -942,7 +943,7 @@ bool dbg_ports(void)
     unsigned int gpio1_function;
     unsigned int gpio_enable;
     unsigned int gpio1_enable;
-    int adc_buttons, adc_remote, adc_battery;
+    int adc_buttons, adc_remote, adc_battery, adc_remotedetect;
     char buf[128];
     int button;
     int line;
@@ -986,12 +987,15 @@ bool dbg_ports(void)
         adc_buttons = adc_read(ADC_BUTTONS);
         adc_remote = adc_read(ADC_REMOTE);
         adc_battery = adc_read(ADC_BATTERY);
+        adc_remotedetect = adc_read(ADC_REMOTEDETECT);
 
         snprintf(buf, sizeof(buf), "ADC_BUTTONS: %02x", adc_buttons);
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "ADC_REMOTE:  %02x", adc_remote);
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "ADC_BATTERY: %02x", adc_battery);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "ADC_REMOTEDETECT: %02x", adc_remotedetect);
         lcd_puts(0, line++, buf);
 
         battery_voltage = (adc_battery * BATTERY_SCALE_FACTOR) / 10000;
@@ -1002,6 +1006,9 @@ bool dbg_ports(void)
                  battery_level());
         lcd_puts(0, line++, buf);
         
+        snprintf(buf, sizeof(buf), "remotetype:: %d", remote_type());
+        lcd_puts(0, line++, buf);
+
         lcd_update();
         button = button_get_w_tmo(HZ/10);
 

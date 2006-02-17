@@ -109,3 +109,7 @@
 /* Define this if you can control the S/PDIF power */
 #define HAVE_SPDIF_POWER
 
+/* ADC values for different remote control types */
+#define ADCVAL_H100_LCD_REMOTE 0x6a
+#define ADCVAL_H300_LCD_REMOTE 0x50
+#define ADCVAL_H300_NONLCD_REMOTE 0xfc

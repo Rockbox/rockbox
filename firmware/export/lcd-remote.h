@@ -23,11 +23,19 @@
 #include <stdbool.h>
 #include "cpu.h"
 #include "config.h"
+#include "adc.h"
 
 #ifdef HAVE_REMOTE_LCD
 
 #define STYLE_DEFAULT 0
 #define STYLE_INVERT  1
+
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
+#define REMOTETYPE_H100_LCD 1
+#define REMOTETYPE_H300_LCD 2
+#define REMOTETYPE_H300_NONLCD 3
+extern int remote_type(void);
+#endif
 
 extern void lcd_remote_init(void);
 extern int  lcd_remote_default_contrast(void);

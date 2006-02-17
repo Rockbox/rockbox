@@ -113,9 +113,10 @@ static unsigned char adcdata[NUM_ADC_CHANNELS];
 #ifdef IRIVER_H300_SERIES
 static int channelnum[] =
 {
-    5,   /* ADC_BUTTONS */
-    6,   /* ADC_REMOTE */
-    0,   /* ADC_BATTERY */
+    5,   /* ADC_BUTTONS (ADCIN2) */
+    6,   /* ADC_REMOTE  (ADCIN3) */
+    0,   /* ADC_BATTERY (BATVOLT, resistive divider) */
+    2,   /* ADC_REMOTEDETECT (ADCIN1, resistive divider) */
 };
 
 unsigned char adc_scan(int channel)
@@ -212,6 +213,8 @@ static void adc_tick(void)
     {
         adc_counter = 0;
         adc_scan(ADC_BATTERY);
+        adc_scan(ADC_REMOTEDETECT); /* Temporary. Remove when the remote
+                                       detection feels stable. */
     }
 }
 
