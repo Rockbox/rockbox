@@ -392,7 +392,7 @@ void idct8x8(unsigned char* p_byte, int* inptr, int* quantptr, int skip_line)
     int * wsptr;
     unsigned char* outptr;
     int ctr;
-    static int workspace[64];  /* buffers data between passes */
+    int workspace[64];  /* buffers data between passes */
 
     /* Pass 1: process columns from input, store into work array. */
     /* Note results are scaled up by sqrt(8) compared to a true IDCT; */
@@ -1397,7 +1397,7 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel[3],
                 int downscale, void (*pf_progress)(int current, int total))
 {
     struct bitstream bs; /* bitstream "object" */
-    static int block[64]; /* decoded DCT coefficients */
+    int block[64]; /* decoded DCT coefficients */
 
     int width, height;
     int skip_line[3]; /* bytes from one line to the next (skip_line) */
@@ -1574,7 +1574,7 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel[1], int downscale,
                 void (*pf_progress)(int current, int total))
 {
     struct bitstream bs; /* bitstream "object" */
-    static int block[64]; /* decoded DCT coefficients */
+    int block[64]; /* decoded DCT coefficients */
 
     int width, height;
     int skip_line; /* bytes from one line to the next (skip_line) */
