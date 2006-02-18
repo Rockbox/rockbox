@@ -413,6 +413,9 @@ int plugin_load(const char* plugin, void* parameter)
 #ifdef HAVE_LCD_BITMAP
     int xm, ym;
 #endif
+#ifdef HAVE_REMOTE_LCD
+    int rxm, rym;
+#endif
 #ifdef HAVE_LCD_COLOR
     fb_data* old_backdrop;
 #endif
@@ -495,12 +498,21 @@ int plugin_load(const char* plugin, void* parameter)
     lcd_clear_display();
 #endif
 
+#ifdef HAVE_REMOTE_LCD
+    rxm = lcd_remote_getxmargin();
+    rym = lcd_remote_getymargin();
+    lcd_remote_setmargins(0, 0);
+    lcd_remote_clear_display();
+    lcd_remote_update();
+#endif
+
     invalidate_icache();
 
     rc = hdr->entry_point((struct plugin_api*) &rockbox_api, parameter);
     /* explicitly casting the pointer here to avoid touching every plugin. */
 
     button_clear_queue();
+
 #ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH > 1
     lcd_set_drawinfo(DRMODE_SOLID, LCD_DEFAULT_FG, LCD_DEFAULT_BG);
@@ -515,7 +527,14 @@ int plugin_load(const char* plugin, void* parameter)
     lcd_clear_display();
     lcd_update();
 #endif /* HAVE_LCD_BITMAP */
-    
+
+#ifdef HAVE_REMOTE_LCD
+    lcd_remote_set_drawmode(DRMODE_SOLID);
+    lcd_remote_setmargins(rxm, rym);
+    lcd_remote_clear_display();
+    lcd_remote_update();
+#endif
+
     if (pfn_tsr_exit == NULL)
         plugin_loaded = false;
 
