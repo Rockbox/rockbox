@@ -400,7 +400,7 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-
+    tree_get_context,
 };
 
 int plugin_load(const char* plugin, void* parameter)

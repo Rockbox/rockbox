@@ -10,10 +10,11 @@
 * JPEG image viewer
 * (This is a real mess if it has to be coded in one single C file)
 *
+* File scrolling addition (C) 2005 Alexander Spyridakis
 * Copyright (C) 2004 Jörg Hohensohn aka [IDC]Dragon
-* Grayscale framework (c) 2004 Jens Arnold
-* Heavily borrowed from the IJG implementation (c) Thomas G. Lane
-* Small & fast downscaling IDCT (c) 2002 by Guido Vollbeding  JPEGclub.org
+* Grayscale framework (C) 2004 Jens Arnold
+* Heavily borrowed from the IJG implementation (C) Thomas G. Lane
+* Small & fast downscaling IDCT (C) 2002 by Guido Vollbeding  JPEGclub.org
 *
 * All files in this archive are subject to the GNU General Public License.
 * See the file COPYING in the source tree root for full license agreement.
@@ -40,16 +41,21 @@ PLUGIN_HEADER
 #define JPEG_LEFT BUTTON_LEFT
 #define JPEG_RIGHT BUTTON_RIGHT
 #define JPEG_QUIT BUTTON_OFF
+#define JPEG_NEXT BUTTON_F3
+#define JPEG_PREVIOUS BUTTON_F2
+
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define JPEG_ZOOM_PRE BUTTON_MENU
 #define JPEG_ZOOM_IN (BUTTON_MENU | BUTTON_REL)
-#define JPEG_ZOOM_OUT (BUTTON_MENU | BUTTON_REPEAT)
+#define JPEG_ZOOM_OUT (BUTTON_MENU | BUTTON_DOWN)
 #define JPEG_UP BUTTON_UP
 #define JPEG_DOWN BUTTON_DOWN
 #define JPEG_LEFT BUTTON_LEFT
 #define JPEG_RIGHT BUTTON_RIGHT
 #define JPEG_QUIT BUTTON_OFF
+#define JPEG_NEXT (BUTTON_MENU | BUTTON_RIGHT)
+#define JPEG_PREVIOUS (BUTTON_MENU | BUTTON_LEFT)
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
@@ -60,6 +66,13 @@ PLUGIN_HEADER
 #define JPEG_LEFT BUTTON_LEFT
 #define JPEG_RIGHT BUTTON_RIGHT
 #define JPEG_QUIT BUTTON_OFF
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD)
+#define JPEG_NEXT BUTTON_ON
+#define JPEG_PREVIOUS BUTTON_REC
+#else
+#define JPEG_NEXT BUTTON_REC
+#define JPEG_PREVIOUS BUTTON_ON
+#endif
 
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define JPEG_ZOOM_IN BUTTON_SCROLL_FWD
@@ -68,7 +81,9 @@ PLUGIN_HEADER
 #define JPEG_DOWN BUTTON_PLAY
 #define JPEG_LEFT BUTTON_LEFT
 #define JPEG_RIGHT BUTTON_RIGHT
-#define JPEG_QUIT BUTTON_SELECT
+#define JPEG_QUIT (BUTTON_SELECT | BUTTON_MENU)
+#define JPEG_NEXT (BUTTON_SELECT | BUTTON_RIGHT)
+#define JPEG_PREVIOUS (BUTTON_SELECT |BUTTON_LEFT)
 
 #elif CONFIG_KEYPAD == IAUDIO_X5_PAD
 #define JPEG_ZOOM_IN_PRE BUTTON_MENU
@@ -79,6 +94,9 @@ PLUGIN_HEADER
 #define JPEG_LEFT BUTTON_LEFT
 #define JPEG_RIGHT BUTTON_RIGHT
 #define JPEG_QUIT BUTTON_POWER
+#define JPEG_NEXT BUTTON_PLAY
+#define JPEG_PREVIOUS BUTTON_REC
+
 #endif
 
 /* different graphics libraries */
@@ -92,6 +110,24 @@ PLUGIN_HEADER
 #define MYLCD_UPDATE() rb->lcd_update();
 #define MYXLCD(fn) xlcd_ ## fn
 #endif
+
+#define MAX_X_SIZE LCD_WIDTH*8
+
+/* Min memory allowing us to use the plugin buffer
+ * and thus not stopping the music 
+ * *Very* rough estimation:
+ * Max 10 000 dir entries * 4bytes/entry (char **) = 40000 bytes
+ * + 20k code size = 60 000 
+ * + 50k min for jpeg = 120 000
+ */ 
+#define MIN_MEM 120000
+
+/* Headings */
+#define DIR_PREV  1
+#define DIR_NEXT -1
+#define DIR_NONE  0
+
+#define PLUGIN_OTHER 10 /* State code for output with return. */
 
 /******************************* Globals ***********************************/
 
@@ -825,7 +861,7 @@ int process_markers(unsigned char* p_src, long size, struct jpeg* p_jpeg)
                             p_jpeg->hufftable[i].huffmancodes_dc[j] = *p_src++;
                     }
                 } /* while */
-                p_src = p_temp+marker_size - 2; // skip possible residue
+                p_src = p_temp+marker_size - 2; /* skip possible residue */
             }
             break;
 
@@ -1757,7 +1793,6 @@ struct t_disp
     int x, y;
 };
 
-
 /************************* Globals ***************************/
 
 /* decompressed image in the possible sizes (1,2,4,8), wasting the other */
@@ -1766,9 +1801,29 @@ struct t_disp disp[9];
 /* my memory pool (from the mp3 buffer) */
 char print[32]; /* use a common snprintf() buffer */
 unsigned char* buf; /* up to here currently used by image(s) */
-int buf_size;
-unsigned char* buf_root; /* the root of the images */
+
+/* the remaining free part of the buffer for compressed+uncompressed images */
+unsigned char* buf_images; 
+
+int buf_size, buf_images_size;
+/* the root of the images, hereafter are decompresed ones */
+unsigned char* buf_root; 
 int root_size;
+
+int ds, ds_min, ds_max; /* downscaling and limits */
+static struct jpeg jpg; /* too large for stack */
+
+static struct tree_context *tree;
+
+/* the current full file name */
+static char np_file[MAX_PATH];
+int curfile = 0, direction = DIR_NONE, entries = 0;
+
+/* list of the jpeg files */
+char **file_pt;
+/* are we using the plugin buffer or the audio buffer? */
+bool plug_buf = false;
+
 
 /************************* Implementation ***************************/
 
@@ -1919,6 +1974,105 @@ void yuv_bitmap_part(unsigned char *src[3], int csub_x, int csub_y,
 }
 #endif
 
+
+/* support function for qsort() */
+static int compare(const void* p1, const void* p2)
+{
+    return rb->strcasecmp(*((char **)p1), *((char **)p2));
+}
+
+bool jpg_ext(const char ext[])
+{
+    if(!rb->strcasecmp(ext,".jpg") ||
+       !rb->strcasecmp(ext,".jpe") ||
+       !rb->strcasecmp(ext,".jpeg"))
+            return true;
+    else 
+            return false;
+}
+
+/*Read directory contents for scrolling. */
+void get_pic_list(void)
+{
+    int i;
+    long int str_len = 0;
+    char *pname; 
+    tree = rb->tree_get_context();
+    
+#if PLUGIN_BUFFER_SIZE >= MIN_MEM
+    file_pt = rb->plugin_get_buffer(&buf_size);
+#else
+    file_pt = rb->plugin_get_audio_buffer(&buf_size);
+#endif
+
+    for(i = 0; i < tree->filesindir; i++)
+    {
+        if(jpg_ext(rb->strrchr(&tree->name_buffer[str_len],'.')))
+            file_pt[entries++] = &tree->name_buffer[str_len];            
+
+        str_len += rb->strlen(&tree->name_buffer[str_len]) + 1;
+    }
+    
+    rb->qsort(file_pt, entries, sizeof(char**), compare);
+
+    /* Remove path and leave only the name.*/
+    pname = rb->strrchr(np_file,'/');
+    pname++;
+    
+    /* Find Selected File. */
+    for(i = 0; i < entries; i++)
+        if(!rb->strcmp(file_pt[i], pname))
+            curfile = i;
+}
+
+int change_filename(int direct)
+{
+    int count = 0;
+    direction = direct;
+    
+    if(direct == DIR_PREV)
+    {
+        do
+        {
+            count++;
+            if(curfile == 0)
+                curfile = entries - 1;
+            else
+                curfile--;
+        }while(file_pt[curfile] == '\0' && count < entries);
+        /* we "erase" the file name if  we encounter 
+         * a non-supported file, so skip it now */
+    }
+    else /* DIR_NEXT/DIR_NONE */
+    {
+        do
+        {
+            count++;    
+            if(curfile == entries - 1)
+                curfile = 0;
+            else
+                curfile++;
+        }while(file_pt[curfile] == '\0' && count < entries);
+    }
+    
+    if(count == entries && file_pt[curfile] == '\0')
+    {
+        rb->splash(HZ,true,"No supported files");
+        return PLUGIN_ERROR;
+    }
+    if(rb->strlen(tree->currdir) > 1)
+    {
+        rb->strcpy(np_file, tree->currdir);
+        rb->strcat(np_file, "/");
+    }
+    else
+        rb->strcpy(np_file, tree->currdir);
+
+    rb->strcat(np_file, file_pt[curfile]);   
+
+    return PLUGIN_OTHER;
+}
+
 /* switch off overlay, for handling SYS_ events */
 void cleanup(void *parameter)
 {
@@ -1931,7 +2085,7 @@ void cleanup(void *parameter)
 #define VSCROLL (LCD_HEIGHT/8)
 #define HSCROLL (LCD_WIDTH/10)
                              
-#define ZOOM_IN  100 // return codes for below function
+#define ZOOM_IN  100 /* return codes for below function */
 #define ZOOM_OUT 101
 
 /* interactively scroll around the image */
@@ -1952,6 +2106,8 @@ int scroll_bmp(struct t_disp* pdisp)
         switch(button)
         {
         case JPEG_LEFT:
+			if (!(ds < ds_max) && entries > 0 && jpg.x_size <= MAX_X_SIZE)
+				return change_filename(DIR_PREV);                
         case JPEG_LEFT | BUTTON_REPEAT:
             move = MIN(HSCROLL, pdisp->x);
             if (move > 0)
@@ -1975,6 +2131,8 @@ int scroll_bmp(struct t_disp* pdisp)
             break;
 
         case JPEG_RIGHT:
+            if (!(ds < ds_max) && entries > 0 && jpg.x_size <= MAX_X_SIZE)
+                return change_filename(DIR_NEXT);                
         case JPEG_RIGHT | BUTTON_REPEAT:
             move = MIN(HSCROLL, pdisp->width - pdisp->x - LCD_WIDTH);
             if (move > 0)
@@ -2044,7 +2202,17 @@ int scroll_bmp(struct t_disp* pdisp)
                 MYLCD_UPDATE();
             }
             break;
-
+            
+        case JPEG_NEXT:
+            if (entries > 0)
+                return change_filename(DIR_NEXT);
+            break;
+            
+        case JPEG_PREVIOUS:
+            if (entries > 0)
+                return change_filename(DIR_PREV);
+            break;
+            
         case JPEG_ZOOM_IN:
 #ifdef JPEG_ZOOM_PRE
             if (lastbutton != JPEG_ZOOM_PRE)
@@ -2099,16 +2267,6 @@ void cb_progess(int current, int total)
     rb->scrollbar(0, LCD_HEIGHT-8, LCD_WIDTH, 8, total, 0,
                   current, HORIZONTAL);
     rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
-}
-
-/* helper to align a buffer to a given power of two */
-void align(unsigned char** ppbuf, int* plen, int align)
-{
-    unsigned int orig = (unsigned int)*ppbuf;
-    unsigned int aligned = (orig + (align-1)) & ~(align-1);
-
-    *plen -= aligned - orig;
-    *ppbuf = (unsigned char*)aligned;
 }
 
 int jpegmem(struct jpeg *p_jpg, int ds)
@@ -2236,7 +2394,8 @@ struct t_disp* get_image(struct jpeg* p_jpg, int ds)
 #endif
     if (status)
     {
-        rb->splash(HZ*2, true, "decode error %d", status);
+        rb->splash(HZ, true, "decode error %d", status);
+        file_pt[curfile] = '\0';
         return NULL;
     }
     time = *rb->current_tick - time;
@@ -2280,63 +2439,98 @@ void get_view(struct t_disp* p_disp, int* p_cx, int* p_cy)
 
 
 /* load, decode, display the image */
-int plugin_main(char* filename)
+int load_and_show(char* filename)
 {
     int fd;
     int filesize;
-#ifdef USEGSLIB
-    int grayscales;
-    long graysize; // helper
-#endif
     unsigned char* buf_jpeg; /* compressed JPEG image */
-    static struct jpeg jpg; /* too large for stack */
     int status;
-    int ds, ds_min, ds_max; /* scaling and limits */
     struct t_disp* p_disp; /* currenly displayed image */
     int cx, cy; /* view center */
 
     fd = rb->open(filename, O_RDONLY);
     if (fd < 0)
     {
-        rb->splash(HZ*2, true, "fopen err");
+        rb->snprintf(print,sizeof(print),"err opening %s:%d",filename,fd);    
+        rb->splash(HZ, true, print);
         return PLUGIN_ERROR;
     }
     filesize = rb->filesize(fd);
-
     rb->memset(&disp, 0, sizeof(disp));
 
-    buf = rb->plugin_get_audio_buffer(&buf_size); /* start munching memory */
-
-
-#ifdef USEGSLIB
-    /* initialize the grayscale buffer: 32 bitplanes for 33 shades of gray. */
-    grayscales = gray_init(rb, buf, buf_size, false, LCD_WIDTH, LCD_HEIGHT/8,
-                           32, &graysize) + 1;
-    buf += graysize;
-    buf_size -= graysize;
-    if (grayscales < 33 || buf_size <= 0)
-    {
-        rb->splash(HZ*2, true, "gray buf error");
-        rb->close(fd);
-        return PLUGIN_ERROR;
-    }
-#else
-    xlcd_init(rb);
-#endif
-
-
+    buf = buf_images + filesize;
+    buf_size = buf_images_size - filesize;
     /* allocate JPEG buffer */
-    align(&buf, &buf_size, 2); /* 16 bit align */
-    buf_jpeg = buf;
-    buf += filesize;
-    buf_size -= filesize;
+    buf_jpeg = buf_images;
+
     buf_root = buf; /* we can start the decompressed images behind it */
     root_size = buf_size;
-    if (buf_size <= 0)
+    
+    if (buf_size <= 0) 
     {
-        rb->splash(HZ*2, true, "out of memory");
-        rb->close(fd);
-        return PLUGIN_ERROR;
+#if PLUGIN_BUFFER_SIZE >= MIN_MEM
+        if(plug_buf)
+        {
+            rb->close(fd);
+            rb->lcd_setfont(FONT_SYSFIXED);
+            rb->lcd_clear_display();
+            rb->snprintf(print,sizeof(print),"%s:",rb->strrchr(filename,'/')+1);
+            rb->lcd_puts(0,0,print);
+            rb->lcd_puts(0,1,"Not enough plugin memory!");
+            rb->lcd_puts(0,2,"Zoom In: Stop playback.");
+            if(entries>1)
+                rb->lcd_puts(0,3,"Left/Right: Skip File.");
+            rb->lcd_puts(0,4,"Off: Quit.");
+            rb->lcd_update();
+            rb->lcd_setfont(FONT_UI);
+            
+            rb->button_clear_queue();
+            
+            while (1)
+            {
+                int button = rb->button_get(true);
+                switch(button)
+                {
+                    case JPEG_ZOOM_IN:
+                        plug_buf = false;
+                        buf_images = 
+                                rb->plugin_get_audio_buffer(&buf_images_size);
+                        /*try again this file, now using the audio buffer */
+                        return PLUGIN_OTHER;
+                        
+                    case JPEG_QUIT:
+                        return PLUGIN_OK;
+                        
+                    case JPEG_LEFT:
+                        if(entries>1)
+                        {
+                            rb->lcd_clear_display();
+                            return change_filename(DIR_PREV);
+                        }
+                        break;
+                        
+                    case JPEG_RIGHT:
+                        if(entries>1)
+                        {
+                            rb->lcd_clear_display();
+                            return change_filename(DIR_NEXT);
+                        }    
+                        break;
+                    default: 
+                         if(rb->default_event_handler_ex(button, cleanup, NULL)
+                                == SYS_USB_CONNECTED)
+                              return PLUGIN_USB_CONNECTED;
+                                    
+                }
+            }
+        }
+        else
+#endif                
+        {
+            rb->splash(HZ, true, "Out of Memory");
+            rb->close(fd);
+            return PLUGIN_ERROR;
+        }
     }
     
 #ifdef HAVE_LCD_COLOR
@@ -2345,30 +2539,40 @@ int plugin_main(char* filename)
     rb->lcd_clear_display();
 #endif
 
-    rb->snprintf(print, sizeof(print), "loading %d bytes", filesize);
+    rb->lcd_clear_display();
+    rb->snprintf(print, sizeof(print), "%s:", rb->strrchr(filename,'/')+1);
     rb->lcd_puts(0, 0, print);
+    rb->lcd_update();
+    
+    rb->snprintf(print, sizeof(print), "loading %d bytes", filesize);
+    rb->lcd_puts(0, 1, print);
     rb->lcd_update();
 
     rb->read(fd, buf_jpeg, filesize);
     rb->close(fd);
 
     rb->snprintf(print, sizeof(print), "decoding markers");
-    rb->lcd_puts(0, 1, print);
+    rb->lcd_puts(0, 2, print);
     rb->lcd_update();
+    
+
 
     rb->memset(&jpg, 0, sizeof(jpg)); /* clear info struct */
     /* process markers, unstuffing */
     status = process_markers(buf_jpeg, filesize, &jpg);
+    
     if (status < 0 || (status & (DQT | SOF0)) != (DQT | SOF0))
     {   /* bad format or minimum components not contained */
-        rb->splash(HZ*2, true, "unsupported %d", status);
-        return PLUGIN_ERROR;
+        rb->splash(HZ, true, "unsupported %d", status);
+        file_pt[curfile] = '\0';
+        return change_filename(direction);
     }
+    
     if (!(status & DHT)) /* if no Huffman table present: */
         default_huff_tbl(&jpg); /* use default */
     build_lut(&jpg); /* derive Huffman and other lookup-tables */
 
-    rb->snprintf(print, sizeof(print), "image %d*%d", jpg.x_size, jpg.y_size);
+    rb->snprintf(print, sizeof(print), "image %dx%d", jpg.x_size, jpg.y_size);
     rb->lcd_puts(0, 2, print);
     rb->lcd_update();
 
@@ -2376,9 +2580,11 @@ int plugin_main(char* filename)
     ds_min = min_downscale(&jpg, buf_size);  /* check memory constraint */
     if (ds_min == 0)
     {
-        rb->splash(HZ*2, true, "too large");
-        return PLUGIN_ERROR;
+        rb->splash(HZ, true, "too large");
+        file_pt[curfile] = '\0';
+        return change_filename(direction);
     }
+    
     ds = ds_max; /* initials setting */
     cx = jpg.x_size/ds/2; /* center the view */
     cy = jpg.y_size/ds/2;
@@ -2387,11 +2593,11 @@ int plugin_main(char* filename)
     {
         p_disp = get_image(&jpg, ds); /* decode or fetch from cache */
         if (p_disp == NULL)
-            return PLUGIN_ERROR;
+            return change_filename(direction);
 
         set_view(p_disp, cx, cy);
 
-        rb->snprintf(print, sizeof(print), "showing %d*%d",
+        rb->snprintf(print, sizeof(print), "showing %dx%d",
             p_disp->width, p_disp->height);
         rb->lcd_puts(0, 3, print);
         rb->lcd_update();
@@ -2460,12 +2666,8 @@ int plugin_main(char* filename)
 #endif
 
     }
-    while (status != PLUGIN_OK && status != PLUGIN_USB_CONNECTED);
-
-#ifdef USEGSLIB
-    gray_release(); /* deinitialize */
-#endif
-
+    while (status != PLUGIN_OK && status != PLUGIN_USB_CONNECTED
+                                       && status != PLUGIN_OTHER);
     return status;
 }
 
@@ -2473,10 +2675,61 @@ int plugin_main(char* filename)
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    rb = api; /* copy to global api pointer */
+    rb = api;
+    
+    int condition;
+#ifdef USEGSLIB
+    int grayscales;
+    long graysize; /* helper */
+#endif
 
-    return plugin_main((char*)parameter);
+    rb->strcpy(np_file, parameter);
+    get_pic_list();    
+    
+#if PLUGIN_BUFFER_SIZE >= MIN_MEM
+    if(rb->pcm_is_playing())
+    {
+        buf = rb->plugin_get_buffer(&buf_size) +
+             (entries * sizeof(char**));
+        buf_size -= (entries * sizeof(char**));
+        plug_buf = true;
+    }
+    else
+        buf = rb->plugin_get_audio_buffer(&buf_size);
+#else
+    buf = rb->plugin_get_audio_buffer(&buf_size) +
+               (entries * sizeof(char**));
+    buf_size -= (entries * sizeof(char**));
+#endif
+
+#ifdef USEGSLIB
+    /* initialize the grayscale buffer: 32 bitplanes for 33 shades of gray. */
+    grayscales = gray_init(rb, buf, buf_size, false, LCD_WIDTH, LCD_HEIGHT/8,
+                           32, &graysize) + 1;
+    buf += graysize;
+    buf_size -= graysize;
+    if (grayscales < 33 || buf_size <= 0)
+    {
+        rb->splash(HZ, true, "gray buf error");
+        return PLUGIN_ERROR;
+    }
+#else
+    xlcd_init(rb);
+#endif
+
+    buf_images = buf; buf_images_size = buf_size;
+    
+    do
+    {
+        condition = load_and_show(np_file);
+    }while (condition != PLUGIN_OK && condition != PLUGIN_USB_CONNECTED
+                                          && condition != PLUGIN_ERROR);
+
+#ifdef USEGSLIB
+    gray_release(); /* deinitialize */
+#endif
+    
+    return condition;
 }
 
 #endif /* HAVE_LCD_BITMAP && ((LCD_DEPTH >= 8) || !defined(SIMULATOR))*/
-

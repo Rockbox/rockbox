@@ -33,18 +33,18 @@
 
 #define FILERECORD2OFFSET(_x_) (rb->tagdbheader->filestart + _x_ * FILEENTRY_SIZE)
 
-struct entry *currententry;
+struct dbentry *currententry;
 struct dbglobals dbglobal;
-static struct entry *entryarray;
+static struct dbentry *entryarray;
 
 int database_init() {
     char *p;
     unsigned int i;
     // allocate room for all entries
-    entryarray=(struct entry *)my_malloc(sizeof(struct entry)*rb->tagdbheader->filecount);
+    entryarray=(struct dbentry *)my_malloc(sizeof(struct dbentry)*rb->tagdbheader->filecount);
     p=(char *)entryarray;
     // zero all entries.
-    for(i=0;i<sizeof(struct entry)*rb->tagdbheader->filecount;i++) 
+    for(i=0;i<sizeof(struct dbentry)*rb->tagdbheader->filecount;i++) 
         *(p++)=0;
     if(!*rb->tagdb_initialized) {
         if(!rb->tagdb_init()) {

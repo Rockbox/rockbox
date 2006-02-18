@@ -23,7 +23,7 @@ struct dbglobals {
     int currententryindex;
 };
 
-struct entry {
+struct dbentry {
     int loadedfiledata,
         loadedsongdata,
         loadedrundbdata,
@@ -50,7 +50,7 @@ struct entry {
     short samplerate;
 };
 
-extern struct entry *currententry;
+extern struct dbentry *currententry;
 extern struct dbglobals dbglobal;
 
 int database_init(void);

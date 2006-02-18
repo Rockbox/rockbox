@@ -45,6 +45,7 @@
 #include "mpeg.h"
 #include "audio.h"
 #include "mp3_playback.h"
+#include "tree.h"
 #ifdef RB_PROFILE
 #include "profile.h"
 #endif
@@ -97,7 +98,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 7
+#define PLUGIN_API_VERSION 8
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -466,7 +467,9 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */     
-       
+
+    struct tree_context* (*tree_get_context)(void);
+    
 };
 
 /* plugin header */
