@@ -2685,8 +2685,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->strcpy(np_file, parameter);
     get_pic_list();    
     
-#if PLUGIN_BUFFER_SIZE >= MIN_MEM
+#if (PLUGIN_BUFFER_SIZE >= MIN_MEM) && !defined(SIMULATOR)
+#if CONFIG_CODEC == SWCODEC
     if(rb->pcm_is_playing())
+#else 
+    if(rb->mp3_is_playing())
+#endif
     {
         buf = rb->plugin_get_buffer(&buf_size) +
              (entries * sizeof(char**));
