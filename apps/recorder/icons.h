@@ -21,8 +21,8 @@
 
 #include <lcd.h>
 
-/* 
- * Icons of size 6x8 pixels 
+/*
+ * Icons of size 6x8 pixels
  */
 
 #ifdef HAVE_LCD_BITMAP
@@ -100,8 +100,13 @@ extern const fb_data rockboxlogo[];
 #define ROCKBOXLOGO_WIDTH 176
 #define ROCKBOXLOGO_HEIGHT 54
 
+#elif (LCD_WIDTH == 320) && (LCD_DEPTH == 16)
+/* iPod Video */
+#define ROCKBOXLOGO_WIDTH 320
+#define ROCKBOXLOGO_HEIGHT 98
+
 #elif (LCD_WIDTH >= 220) && (LCD_DEPTH == 16)
-/* iriver H3x0, iPod Color/Photo and Video */
+/* iriver H3x0, iPod Color/Photo */
 #define ROCKBOXLOGO_WIDTH 220
 #define ROCKBOXLOGO_HEIGHT 68
 #endif
@@ -145,7 +150,7 @@ extern void statusbar_icon_lock(void);
 extern void statusbar_time(int hour, int minute);
 #endif
 #if CONFIG_LED == LED_VIRTUAL
-extern void	statusbar_led(void);
+extern void statusbar_led(void);
 #endif
 
 #endif /* End HAVE_LCD_BITMAP */
