@@ -192,7 +192,7 @@ int sim_mkdir(const char *name, mode_t mode)
     /* since we build with -DNOCYGWIN we have the plain win32 version */
     return mkdir(buffer);
 #else
-    return mkdir(buffer, 0666);
+    return mkdir(buffer, 0777);
 #endif
 }
 
