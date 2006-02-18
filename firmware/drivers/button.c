@@ -1048,6 +1048,13 @@ static int button_read(void)
     return retval;
 }
 
+#if (CONFIG_KEYPAD == IPOD_4G_PAD)
+bool button_hold(void)
+{
+    return (GPIOA_INPUT_VAL & 0x20)?false:true;
+}
+#endif
+
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 bool button_hold(void)
 {
