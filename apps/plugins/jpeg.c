@@ -2536,7 +2536,6 @@ int load_and_show(char* filename)
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_WHITE);
     rb->lcd_set_background(LCD_BLACK);
-    rb->lcd_clear_display();
 #endif
 
     rb->lcd_clear_display();
