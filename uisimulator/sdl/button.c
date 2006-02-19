@@ -39,7 +39,6 @@ static int btn = 0;    /* Hopefully keeps track of currently pressed keys... */
 
 void button_event(int key, bool pressed)
 {
-    bool post = false;
     int new_btn = 0;
     int diff = 0;
     static int count = 0;
@@ -47,6 +46,7 @@ void button_event(int key, bool pressed)
     static int repeat_speed = REPEAT_INTERVAL_START;
     static int repeat_count = 0;
     static bool repeat = false;
+    static bool post = false;
 
     switch (key)
     {
@@ -175,7 +175,8 @@ void button_event(int key, bool pressed)
             {
                 if ( repeat )
                 {
-                    count--;
+                    if (!post)
+                        count--;
                     if (count == 0)
                     {
                         post = true;
@@ -203,9 +204,18 @@ void button_event(int key, bool pressed)
             if ( post )
             {
                 if(repeat)
-                    queue_post(&button_queue, BUTTON_REPEAT | btn, NULL);
+                {
+                    if (queue_empty(&button_queue))
+                    {
+                        queue_post(&button_queue, BUTTON_REPEAT | btn, NULL);
+                        post = false;
+                    }
+                }
                 else
+                {
                     queue_post(&button_queue, btn, NULL);
+                    post = false;
+                }    
 
 #ifdef HAVE_REMOTE_LCD
                 if(btn & BUTTON_REMOTE)

@@ -55,13 +55,13 @@ static void button_tick(void)
     static int repeat_speed = REPEAT_INTERVAL_START;
     static int repeat_count = 0;
     static bool repeat = false;
+    static bool post = false;
     int diff;
     int btn;
 
     /* only poll every X ticks */
     if ( ++tick >= POLL_FREQUENCY )
     {
-        bool post = false;
         button_read();
         btn = button_state;
 
@@ -115,9 +115,18 @@ static void button_tick(void)
                 if ( post )
                 {
                     if (repeat)
-                        queue_post(&button_queue, BUTTON_REPEAT | btn, NULL);
+                    {
+                        if (queue_empty(&button_queue))
+                        {
+                            queue_post(&button_queue, BUTTON_REPEAT | btn, NULL);
+                            post = false;
+                        }
+                    }
                     else
+                    {
                         queue_post(&button_queue, btn, NULL);
+                        post = false;
+                    }
 #ifdef HAVE_REMOTE_LCD
                     if(btn & BUTTON_REMOTE)
                         remote_backlight_on();

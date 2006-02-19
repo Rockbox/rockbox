@@ -604,6 +604,7 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
 #endif
             gui_synclist_select_previous(lists);
             gui_synclist_draw(lists);
+            yield();
             return LIST_PREV;
 
         case LIST_NEXT:
@@ -619,6 +620,7 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
 #endif
             gui_synclist_select_next(lists);
             gui_synclist_draw(lists);
+            yield();
             return LIST_NEXT;
 
 #ifdef LIST_PGRIGHT
