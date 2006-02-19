@@ -599,7 +599,7 @@ void usb_start_monitoring(void)
 
 bool usb_inserted(void)
 {
-    return usb_state == USB_INSERTED;
+    return usb_state == USB_INSERTED || usb_state == USB_POWERED;
 }
 
 #ifdef HAVE_USB_POWER
