@@ -18,15 +18,11 @@
  ****************************************************************************/
 
 #include "plugin.h"
+#include "gray.h"
 #include "configfile.h" /* Part of libplugin */
 
 PLUGIN_HEADER
 
-/* The time (in ms) for one iteration through the game loop - decrease this
-   to speed up the game - note that current_tick is (currently) only accurate
-   to 10ms.
-*/
-#define CYCLETIME 30
 
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 
@@ -83,8 +79,16 @@ extern const fb_data brickmania_powerups[];
 /* purple, red, blue, pink, green, yellow orange */
 extern const fb_data brickmania_bricks[];
 
+
+
 /* TO DO: This needs adjusting correctly for larger than 220x176 LCDS */
 #if (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176)
+
+/* The time (in ms) for one iteration through the game loop - decrease this
+   to speed up the game - note that current_tick is (currently) only accurate
+   to 10ms.
+*/
+#define CYCLETIME 30
 
 /* Offsets for LCDS > 220x176 */
 #define XOFS ((LCD_WIDTH-220)/2)
@@ -97,6 +101,7 @@ extern const fb_data brickmania_bricks[];
 #define BRICK_WIDTH 21
 #define BALL 5
 #define LEFTMARGIN 5
+#define TOPMARGIN 30
 
 #define BMPHEIGHT_help 19
 #define BMPWIDTH_help 37
@@ -128,17 +133,89 @@ extern const fb_data brickmania_bricks[];
 #define BMPHEIGHT_powerup 6
 #define BMPWIDTH_powerup 10
 
-#define BMPXOFS_resume (62+XOFS)
-#define BMPYOFS_resume (100+YOFS)
-#define BMPXOFS_quit (93+XOFS)
-#define BMPYOFS_quit (138+YOFS)
+#define BMPHEIGHT_menu LCD_HEIGHT
+#define BMPWIDTH_menu LCD_WIDTH
+
 #define BMPXOFS_start (55+XOFS)
 #define BMPYOFS_start (78+YOFS)
+#define BMPXOFS_resume (62+XOFS)
+#define BMPYOFS_resume (100+YOFS)
 #define BMPXOFS_help (92+XOFS)
 #define BMPYOFS_help (118+YOFS)
+#define BMPXOFS_quit (93+XOFS)
+#define BMPYOFS_quit (138+YOFS)
 #define HIGHSCORE_XPOS (7+XOFS)
 #define HIGHSCORE_YPOS (56+YOFS)
 
+#define STRINGPOS_finsh 140
+#define STRINGPOS_congrats 157
+#define STRINGPOS_navi 150
+#define STRINGPOS_flipsides 150
+
+#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH==2)
+/* The time (in ms) for one iteration through the game loop - decrease this
+   to speed up the game - note that current_tick is (currently) only accurate
+   to 10ms.
+*/
+#define CYCLETIME 50
+
+#define PAD_WIDTH 30
+#define PAD_HEIGHT 5
+#define PAD_POS_Y LCD_HEIGHT - 7
+#define BRICK_HEIGHT 7
+#define BRICK_WIDTH 15
+#define BALL 5
+#define LEFTMARGIN 5
+#define TOPMARGIN 21
+
+#define BMPHEIGHT_help 15
+#define BMPWIDTH_help 30
+
+#define BMPHEIGHT_sel_help 15
+#define BMPWIDTH_sel_help 30
+
+#define BMPHEIGHT_resume 14
+#define BMPWIDTH_resume 78
+
+#define BMPHEIGHT_no_resume 14
+#define BMPWIDTH_no_resume 78
+
+#define BMPHEIGHT_quit 17
+#define BMPWIDTH_quit 30
+
+#define BMPHEIGHT_sel_quit 17
+#define BMPWIDTH_sel_quit 30
+
+#define BMPHEIGHT_sel_resume 14
+#define BMPWIDTH_sel_resume 78
+
+#define BMPHEIGHT_sel_start 16
+#define BMPWIDTH_sel_start 88
+
+#define BMPHEIGHT_start 16
+#define BMPWIDTH_start 88
+
+#define BMPHEIGHT_powerup 6
+#define BMPWIDTH_powerup 10
+
+#define BMPHEIGHT_menu 45
+#define BMPWIDTH_menu 160
+
+#define BMPXOFS_start 34
+#define BMPYOFS_start 64
+#define BMPXOFS_resume 38
+#define BMPYOFS_resume 77
+#define BMPXOFS_help 64
+#define BMPYOFS_help 90
+#define BMPXOFS_quit 64
+#define BMPYOFS_quit 103
+#define HIGHSCORE_XPOS 7
+#define HIGHSCORE_YPOS 36
+
+#define STRINGPOS_finsh 100
+#define STRINGPOS_congrats 110
+#define STRINGPOS_navi 100
+#define STRINGPOS_flipsides 100
 
 #else
 #error Unsupported LCD Size
@@ -524,7 +601,7 @@ void int_game(int new_game)
                 brick[i*10+j].hits=levels[cur_level][i][j]>=10?
                                      levels[cur_level][i][j]/16-1:0;
                 brick[i*10+j].hiteffect=0;
-                brick[i*10+j].powertop=30+i*10+BRICK_HEIGHT;
+                brick[i*10+j].powertop=TOPMARGIN+i*BRICK_HEIGHT+BRICK_HEIGHT;
                 brick[i*10+j].used=(levels[cur_level][i][j]==0?0:1);
                 brick[i*10+j].color=(levels[cur_level][i][j]>=10?
                                     levels[cur_level][i][j]%16:levels[cur_level][i][j])-1;
@@ -569,8 +646,8 @@ int game_menu(int when)
 {
     int button,cur=0;
     char str[10];
-
-    rb->lcd_bitmap(brickmania_menu_bg,0,0,LCD_WIDTH,LCD_HEIGHT);
+	rb->lcd_clear_display();
+    rb->lcd_bitmap(brickmania_menu_bg,0,0,BMPWIDTH_menu,BMPHEIGHT_menu);
     while (true) {
         for(i=0;i<MENU_LENGTH;i++) {
             if (cur==0)
@@ -615,8 +692,10 @@ int game_menu(int when)
 
         /* high score */
         rb->lcd_setfont(FONT_SYSFIXED);
+#ifdef HAVE_LCD_COLOR
         rb->lcd_set_background(LCD_RGBPACK(0,0,140));
         rb->lcd_set_foreground(LCD_WHITE);
+#endif
         rb->lcd_putsxy(HIGHSCORE_XPOS, HIGHSCORE_YPOS, "High Score");
         rb->snprintf(str, sizeof(str), "%d", highscore);
         rb->lcd_getstringsize("High Score", &sw, NULL);
@@ -664,6 +743,11 @@ int game_menu(int when)
             case QUIT:
                 return 3;
                 break;
+            
+            default:
+                if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                    return 3;
+                break;
         }
     }
 }
@@ -672,38 +756,59 @@ int help(int when)
 {
     int w,h;
     int button;
+    int xoffset=0;
+    int yoffset=0;
+    /* set the maximum x and y in the helpscreen
+       dont forget to update, if you change text */
+    int maxY=160;
+    int maxX=210;
 
     while(true){
         rb->lcd_setfont(FONT_SYSFIXED);
+#ifdef HAVE_LCD_COLOR
         rb->lcd_set_background(LCD_BLACK);
         rb->lcd_clear_display();
         rb->lcd_set_background(LCD_BLACK);
         rb->lcd_set_foreground(LCD_WHITE);
+#else
+		rb->lcd_clear_display();
+#endif
 
         rb->lcd_getstringsize("BrickMania", &w, &h);
-        rb->lcd_putsxy(LCD_WIDTH/2-w/2, 1, "BrickMania");
+        rb->lcd_putsxy(LCD_WIDTH/2-w/2+xoffset, 1+yoffset, "BrickMania");
 
+#ifdef HAVE_LCD_COLOR
         rb->lcd_set_foreground(LCD_RGBPACK(245,0,0));
-        rb->lcd_putsxy(1, 1*(h+2),"Aim");
+        rb->lcd_putsxy(1+xoffset, 1*(h+2)+yoffset,"Aim");
         rb->lcd_set_foreground(LCD_WHITE);
-        rb->lcd_putsxy(1, 2*(h+2),"destroy all the bricks by bouncing");
-        rb->lcd_putsxy(1, 3*(h+2),"the ball of them using the paddle.");
-
+#else
+        rb->lcd_putsxy(1+xoffset, 1*(h+2)+yoffset,"Aim");
+#endif
+        rb->lcd_putsxy(1+xoffset, 2*(h+2)+yoffset,"destroy all the bricks by bouncing");
+        rb->lcd_putsxy(1+xoffset, 3*(h+2)+yoffset,"the ball of them using the paddle.");
+#ifdef HAVE_LCD_COLOR
         rb->lcd_set_foreground(LCD_RGBPACK(245,0,0));
-        rb->lcd_putsxy(1, 5*(h+2),"Controls");
+        rb->lcd_putsxy(1+xoffset, 5*(h+2)+yoffset,"Controls");
         rb->lcd_set_foreground(LCD_WHITE);
-        rb->lcd_putsxy(1, 6*(h+2),"< & > Move the paddle");
-        rb->lcd_putsxy(1, 7*(h+2),"NAVI  Releases the ball/Fire!");
-        rb->lcd_putsxy(1, 8*(h+2),"STOP  Opens menu/Quit");
-
+#else
+        rb->lcd_putsxy(1+xoffset, 5*(h+2)+yoffset,"Controls");
+		#endif
+        rb->lcd_putsxy(1+xoffset, 6*(h+2)+yoffset,"< & > Move the paddle");
+        rb->lcd_putsxy(1+xoffset, 7*(h+2)+yoffset,"NAVI  Releases the ball/Fire!");
+        rb->lcd_putsxy(1+xoffset, 8*(h+2)+yoffset,"STOP  Opens menu/Quit");
+#ifdef HAVE_LCD_COLOR
         rb->lcd_set_foreground(LCD_RGBPACK(245,0,0));
-        rb->lcd_putsxy(1, 10*(h+2),"Specials");
+        rb->lcd_putsxy(1+xoffset, 10*(h+2)+yoffset,"Specials");
         rb->lcd_set_foreground(LCD_WHITE);
-        rb->lcd_putsxy(1, 11*(h+2),"N Normal:returns paddle to normal");
-        rb->lcd_putsxy(1, 12*(h+2),"D DIE!:loses a life");
-        rb->lcd_putsxy(1, 13*(h+2),"L Life:gains a life/power up");
-        rb->lcd_putsxy(1, 14*(h+2),"F Fire:allows you to shoot bricks");
-        rb->lcd_putsxy(1, 15*(h+2),"G Glue:ball sticks to paddle");
+#else
+        rb->lcd_putsxy(1+xoffset, 10*(h+2)+yoffset,"Specials");
+#endif
+        rb->lcd_putsxy(1+xoffset, 11*(h+2)+yoffset,"N Normal:returns paddle to normal");
+        rb->lcd_putsxy(1+xoffset, 12*(h+2)+yoffset,"D DIE!:loses a life");
+        rb->lcd_putsxy(1+xoffset, 13*(h+2)+yoffset,"L Life:gains a life/power up");
+        rb->lcd_putsxy(1+xoffset, 14*(h+2)+yoffset,"F Fire:allows you to shoot bricks");
+        rb->lcd_putsxy(1+xoffset, 15*(h+2)+yoffset,"G Glue:ball sticks to paddle");
+        rb->lcd_putsxy(1+xoffset, 16*(h+2)+yoffset,"B Ball:Generates Another Ball");
         rb->lcd_update();
 
         button=rb->button_get(true);
@@ -727,6 +832,31 @@ int help(int when)
                         break;
                 }
                 return NULL;
+                break;
+			case LEFT:
+			case LEFT | BUTTON_REPEAT:
+                if( xoffset<0)
+                    xoffset+=2; 
+				break;
+			case RIGHT:
+            case RIGHT | BUTTON_REPEAT:
+                if(xoffset+maxX > LCD_WIDTH)
+                   xoffset-=2; 
+				break;
+			case UP:
+			case UP | BUTTON_REPEAT:
+                if(yoffset <0) 
+                   yoffset+=2; 
+				break;
+			case DOWN:
+			case DOWN | BUTTON_REPEAT:
+                if(yoffset+maxY > LCD_HEIGHT) 
+                  yoffset-=2; 
+				break;
+
+            default:
+                if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                    return 1;
                 break;
         }
     }
@@ -793,11 +923,15 @@ int game_loop(void){
         end = *rb->current_tick + (CYCLETIME * HZ) / 1000;
 
         if (life >= 0) {
+#ifdef HAVE_LCD_COLOR
             rb->lcd_set_background(LCD_BLACK);
             rb->lcd_set_drawmode(DRMODE_SOLID);
             rb->lcd_clear_display();
             rb->lcd_set_background(LCD_BLACK);
             rb->lcd_set_foreground(LCD_WHITE);
+#else
+    		rb->lcd_clear_display();
+#endif
             
             if (flip_sides) {
                   if (*rb->current_tick>=sec_count){
@@ -809,7 +943,7 @@ int game_loop(void){
                   }
                   rb->snprintf(s, sizeof(s), "%d", num_count);
                   rb->lcd_getstringsize(s, &sw, NULL);                  
-                  rb->lcd_putsxy(LCD_WIDTH/2-2, 150, s);
+                  rb->lcd_putsxy(LCD_WIDTH/2-2, STRINGPOS_flipsides, s);
             }     
 
             /* write life num */
@@ -828,7 +962,7 @@ int game_loop(void){
             /* continue game */
             if (con_game== 1 && start_game!=1) {
                 rb->lcd_getstringsize("Press NAVI To Continue", &sw, NULL);
-                rb->lcd_putsxy(LCD_WIDTH/2-sw/2, 150, "Press NAVI to continue");
+                rb->lcd_putsxy(LCD_WIDTH/2-sw/2, STRINGPOS_navi, "Press NAVI to continue");
                 sec_count=*rb->current_tick+HZ;
             }
 
@@ -911,7 +1045,7 @@ int game_loop(void){
                     brick[i*10+j].poweruse=1;
 
                 brickx=LEFTMARGIN+j*BRICK_WIDTH;
-                bricky=30+i*8;
+                bricky=TOPMARGIN+i*BRICK_HEIGHT;
                 if (pad_type==2) {
                     for (k=0;k<=30;k++) {
                         if (fire[k].top+7>0) {
@@ -934,9 +1068,11 @@ int game_loop(void){
                 }
 
                 if (brick[i*10+j].used==1){
-                    rb->lcd_bitmap_part(brickmania_bricks,0,BRICK_HEIGHT*brick[i*10+j].color,BRICK_WIDTH,LEFTMARGIN+j*BRICK_WIDTH, 30+i*8, BRICK_WIDTH, BRICK_HEIGHT);
+                    rb->lcd_bitmap_part(brickmania_bricks,0,BRICK_HEIGHT*brick[i*10+j].color,BRICK_WIDTH,LEFTMARGIN+j*BRICK_WIDTH, TOPMARGIN+i*BRICK_HEIGHT, BRICK_WIDTH, BRICK_HEIGHT);
+#ifdef HAVE_LCD_COLOR  /* No transparent effect for greyscale lcds for now */
                     if (brick[i*10+j].hiteffect>0)
-                         rb->lcd_bitmap_transparent_part(brickmania_break,0,BRICK_HEIGHT*brick[i*10+j].hiteffect,BRICK_WIDTH,LEFTMARGIN+j*BRICK_WIDTH, 30+i*8, BRICK_WIDTH, BRICK_HEIGHT);
+                         rb->lcd_bitmap_transparent_part(brickmania_break,0,BRICK_HEIGHT*brick[i*10+j].hiteffect,BRICK_WIDTH,LEFTMARGIN+j*BRICK_WIDTH, TOPMARGIN+i*BRICK_HEIGHT, BRICK_WIDTH, BRICK_HEIGHT);
+#endif
                 }
                 
                   for(k=0;k<used_balls;k++) {
@@ -1073,30 +1209,41 @@ int game_loop(void){
                     ball[k].pos_x = ball[k].pos_x <= 0 ? 0 : LCD_WIDTH-BALL;
                 }
     
-                if ((ball[k].pos_y+5 >= PAD_POS_Y && (ball[k].pos_x >= pad_pos_x && ball[k].pos_x <= pad_pos_x+PAD_WIDTH)) &&
+                if ((ball[k].pos_y+BALL >= PAD_POS_Y && (ball[k].pos_x >= pad_pos_x && ball[k].pos_x <= pad_pos_x+PAD_WIDTH)) &&
                             start_game != 1 && !ball[k].glue) {
-                    if ((ball[k].pos_x+3 >= pad_pos_x && ball[k].pos_x+3 <= pad_pos_x+5) || (ball[k].pos_x +2>= pad_pos_x+35 && ball[k].pos_x+2 <= pad_pos_x+40)) {
-                        ball[k].y = 2*-1;
-                        if (ball[k].pos_x != 0 && ball[k].pos_x+BALL!=LCD_WIDTH)
-                            ball[k].x = pad_check(6,0,ball[k].pos_x+2<=pad_pos_x+(PAD_WIDTH/2)?0:1,k);
-                        } else if ((ball[k].pos_x+3 >= pad_pos_x+5 && ball[k].pos_x+3 <= pad_pos_x+10) || (ball[k].pos_x+2 >= pad_pos_x+30 && ball[k].pos_x+2 <= pad_pos_x+35)) {
-                            ball[k].y = 3*-1;
-    
+                                       
+                    if ((ball[k].pos_x+3 >= pad_pos_x && ball[k].pos_x+3 <= pad_pos_x+(PAD_WIDTH/2/4)) || 
+                        (ball[k].pos_x +3>= pad_pos_x+(PAD_WIDTH-(PAD_WIDTH/2/4)) && ball[k].pos_x+3 <= pad_pos_x+PAD_WIDTH)) {
+                                       
+                            ball[k].y = -2;
+                            if (ball[k].pos_x != 0 && ball[k].pos_x+BALL!=LCD_WIDTH)
+                                ball[k].x = pad_check(6,0,ball[k].pos_x+2<=pad_pos_x+(PAD_WIDTH/2)?0:1,k);
+                                
+                    } else if ((ball[k].pos_x+3 >= pad_pos_x+(PAD_WIDTH/2/4) && ball[k].pos_x+3 <= pad_pos_x+2*(PAD_WIDTH/2/4)) ||
+                               (ball[k].pos_x+3 >= pad_pos_x+(PAD_WIDTH-2*(PAD_WIDTH/2/4)) && ball[k].pos_x+3 <= pad_pos_x+(PAD_WIDTH-(PAD_WIDTH/2/4)) )) {
+                            
+                            ball[k].y = -3;
                             if (ball[k].pos_x != 0 && ball[k].pos_x+BALL!=LCD_WIDTH) 
                                 ball[k].x = pad_check(4,0,ball[k].pos_x+2<=pad_pos_x+(PAD_WIDTH/2)?0:1,k);
-                        } else if ((ball[k].pos_x+3 >= pad_pos_x+10 && ball[k].pos_x+3 <= pad_pos_x+15) || (ball[k].pos_x+2 >= pad_pos_x+25 && ball[k].pos_x+2 <= pad_pos_x+30)) {
-                            ball[k].y = 4*-1;
-    
+                                
+                    } else if ((ball[k].pos_x+3 >= pad_pos_x+2*(PAD_WIDTH/2/4) && ball[k].pos_x+3 <= pad_pos_x+3*(PAD_WIDTH/2/4)) || 
+                               (ball[k].pos_x+2 >= pad_pos_x+(PAD_WIDTH-3*(PAD_WIDTH/2/4)) && ball[k].pos_x+2 <= pad_pos_x+ ((PAD_WIDTH/2)-2*(PAD_WIDTH/2/4)) )) {
+
+                            ball[k].y = -4;
                             if (ball[k].pos_x != 0 && ball[k].pos_x+BALL!=LCD_WIDTH)
                                 ball[k].x = pad_check(3,0,ball[k].pos_x+2<=pad_pos_x+(PAD_WIDTH/2)?0:1,k);
-                        } else if ((ball[k].pos_x+3 >= pad_pos_x+13 && ball[k].pos_x+3 <= pad_pos_x+18) || (ball[k].pos_x+2 >= pad_pos_x+22 && ball[k].pos_x+2 <= pad_pos_x+25)) {
-                            ball[k].y = 4*-1;
+
+                    } else if ((ball[k].pos_x+3 >= pad_pos_x+3*(PAD_WIDTH/2/4) && ball[k].pos_x+3 <= pad_pos_x+4*(PAD_WIDTH/2/4)-2) || 
+                               (ball[k].pos_x+2 >= pad_pos_x+(PAD_WIDTH/2+2) && ball[k].pos_x+2 <= pad_pos_x+(PAD_WIDTH-3*(PAD_WIDTH/2/4)) )) {
+
+                            ball[k].y = -4;
                             if (ball[k].pos_x != 0 && ball[k].pos_x+BALL!=LCD_WIDTH)
                                 ball[k].x = pad_check(2,1,NULL,k);
-                        } else {
-                            ball[k].y = 4*-1;
-                        }
+
+                    } else {
+                            ball[k].y = -4;
                     }
+               }
     
                     if (!ball[k].glue) {
                         ball[k].pos_x+=ball[k].tempx!=0?ball[k].tempx:ball[k].x;
@@ -1112,7 +1259,7 @@ int game_loop(void){
                         ball[k].pos_y=PAD_POS_Y-BALL;
                         ball[k].glue=true;
                     }
-                } /* for k */
+             } /* for k */
                 
                 rb->lcd_update();
 
@@ -1124,9 +1271,9 @@ int game_loop(void){
                         sleep(2);
                     } else {
                         rb->lcd_getstringsize("Congratulations!", &sw, NULL);
-                        rb->lcd_putsxy(LCD_WIDTH/2-sw/2, 140, "Congratulations!");
+                        rb->lcd_putsxy(LCD_WIDTH/2-sw/2, STRINGPOS_congrats, "Congratulations!");
                         rb->lcd_getstringsize("You have finished the game!", &sw, NULL);
-                        rb->lcd_putsxy(LCD_WIDTH/2-sw/2, 157, "You have finished the game!");
+                        rb->lcd_putsxy(LCD_WIDTH/2-sw/2, STRINGPOS_finsh, "You have finished the game!");
                         vscore=score;
                         rb->lcd_update();
                         if (score>highscore) {
@@ -1203,7 +1350,7 @@ int game_loop(void){
                               for(k=0;k<used_balls;k++) {
                                   if (ball[k].glue)
                                      ball[k].glue=false;
-                                  else {
+                                  else if (start_game==1) {
                                      ball[k].x = x[k];
                                      ball[k].y = y[k];
                                   }
@@ -1257,6 +1404,11 @@ int game_loop(void){
                          }
                          
                          break;
+
+                     default:
+                         if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                             return 1;
+                     break;                     
                      }
              } else {
                  rb->lcd_bitmap(brickmania_gameover,LCD_WIDTH/2-55,LCD_HEIGHT-87,110,52);
