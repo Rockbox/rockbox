@@ -143,78 +143,47 @@ static struct plugin_api* rb;
 
 /**************** begin JPEG code ********************/
 
-/* LUT for IDCT, this could also be used for gamma correction */
-const unsigned char range_limit[1024] =
+INLINE unsigned range_limit(int value)
 {
-    128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,
-    144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,
-    160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,
-    176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,
-    192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,
-    208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,
-    224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,
-    240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,
+#if CONFIG_CPU == SH7034
+    unsigned tmp;
+    asm (  /* Note: Uses knowledge that only the low byte of the result is used */
+        "mov     #-128,%[t]  \n"
+        "sub     %[t],%[v]   \n"  /* value -= -128; equals value += 128; */
+        "extu.b  %[v],%[t]   \n"
+        "cmp/eq  %[v],%[t]   \n"  /* low byte == whole number ? */
+        "bt      1f          \n"  /* yes: no overflow */
+        "cmp/pz  %[v]        \n"  /* overflow: positive? */
+        "subc    %[v],%[v]   \n"  /* %[r] now either 0 or 0xffffffff */
+    "1:                      \n"
+        : /* outputs */
+        [v]"+r"(value),
+        [t]"=&r"(tmp)
+    );
+    return value;
+#elif defined(CPU_COLDFIRE)
+    asm (  /* Note: Uses knowledge that only the low byte of the result is used */
+        "add.l   #128,%[v]   \n"  /* value += 128; */
+        "cmp.l   #255,%[v]   \n"  /* overflow? */
+        "bls.b   1f          \n"  /* no: return value */
+        "spl.b   %[v]        \n"  /* yes: set low byte to appropriate boundary */
+    "1:                      \n"
+        : /* outputs */
+        [v]"+r"(value)
+    );
+    return value;
+#else
+    value += 128;
 
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+    if ((unsigned)value <= 255)
+        return value;
 
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    if (value < 0)
+        return 0;
 
-    0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,
-    16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,
-    32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,
-    48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,
-    64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,
-    80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
-    96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,
-    112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127
-};
-
+    return 255;
+#endif
+}
 
 /* IDCT implementation */
 
@@ -266,8 +235,6 @@ const unsigned char range_limit[1024] =
 */
 #define DESCALE(x,n) (((x) + (1l << ((n)-1))) >> (n))
 
-#define RANGE_MASK (255 * 4 + 3) /* 2 bits wider than legal samples */
-
 
 
 /*
@@ -277,7 +244,7 @@ const unsigned char range_limit[1024] =
 void idct1x1(unsigned char* p_byte, int* inptr, int* quantptr, int skip_line)
 {
     (void)skip_line; /* unused */
-    *p_byte = range_limit[(inptr[0] * quantptr[0] >> 3) & RANGE_MASK];
+    *p_byte = range_limit(inptr[0] * quantptr[0] >> 3);
 }
 
 
@@ -312,18 +279,14 @@ void idct2x2(unsigned char* p_byte, int* inptr, int* quantptr, int skip_line)
     /* Row 0 */
     outptr = p_byte;
 
-    outptr[0] = range_limit[(int) DESCALE(tmp0 + tmp1, 3)
-        & RANGE_MASK];
-    outptr[1] = range_limit[(int) DESCALE(tmp0 - tmp1, 3)
-        & RANGE_MASK];
+    outptr[0] = range_limit((int) DESCALE(tmp0 + tmp1, 3));
+    outptr[1] = range_limit((int) DESCALE(tmp0 - tmp1, 3));
 
     /* Row 1 */
     outptr = p_byte + skip_line;
 
-    outptr[0] = range_limit[(int) DESCALE(tmp2 + tmp3, 3)
-        & RANGE_MASK];
-    outptr[1] = range_limit[(int) DESCALE(tmp2 - tmp3, 3)
-        & RANGE_MASK];
+    outptr[0] = range_limit((int) DESCALE(tmp2 + tmp3, 3));
+    outptr[1] = range_limit((int) DESCALE(tmp2 - tmp3, 3));
 }
 
 
@@ -398,18 +361,14 @@ void idct4x4(unsigned char* p_byte, int* inptr, int* quantptr, int skip_line)
 
         /* Final output stage */
 
-        outptr[0] = range_limit[(int) DESCALE(tmp10 + tmp2,
-            CONST_BITS+PASS1_BITS+3)
-            & RANGE_MASK];
-        outptr[3] = range_limit[(int) DESCALE(tmp10 - tmp2,
-            CONST_BITS+PASS1_BITS+3)
-            & RANGE_MASK];
-        outptr[1] = range_limit[(int) DESCALE(tmp12 + tmp0,
-            CONST_BITS+PASS1_BITS+3)
-            & RANGE_MASK];
-        outptr[2] = range_limit[(int) DESCALE(tmp12 - tmp0,
-            CONST_BITS+PASS1_BITS+3)
-            & RANGE_MASK];
+        outptr[0] = range_limit((int) DESCALE(tmp10 + tmp2,
+            CONST_BITS+PASS1_BITS+3));
+        outptr[3] = range_limit((int) DESCALE(tmp10 - tmp2,
+            CONST_BITS+PASS1_BITS+3));
+        outptr[1] = range_limit((int) DESCALE(tmp12 + tmp0,
+            CONST_BITS+PASS1_BITS+3));
+        outptr[2] = range_limit((int) DESCALE(tmp12 - tmp0,
+            CONST_BITS+PASS1_BITS+3));
 
         wsptr += 4;     /* advance pointer to next row */
     }
@@ -549,8 +508,8 @@ void idct8x8(unsigned char* p_byte, int* inptr, int* quantptr, int skip_line)
            | wsptr[4] | wsptr[5] | wsptr[6] | wsptr[7]) == 0)
         {
             /* AC terms all zero */
-            unsigned char dcval = range_limit[(int) DESCALE((long) wsptr[0],
-                PASS1_BITS+3) & RANGE_MASK];
+            unsigned char dcval = range_limit((int) DESCALE((long) wsptr[0],
+                PASS1_BITS+3));
 
             outptr[0] = dcval;
             outptr[1] = dcval;
@@ -617,22 +576,22 @@ void idct8x8(unsigned char* p_byte, int* inptr, int* quantptr, int skip_line)
 
         /* Final output stage: inputs are tmp10..tmp13, tmp0..tmp3 */
 
-        outptr[0] = range_limit[(int) DESCALE(tmp10 + tmp3,
-            CONST_BITS+PASS1_BITS+3) & RANGE_MASK];
-        outptr[7] = range_limit[(int) DESCALE(tmp10 - tmp3,
-            CONST_BITS+PASS1_BITS+3) & RANGE_MASK];
-        outptr[1] = range_limit[(int) DESCALE(tmp11 + tmp2,
-            CONST_BITS+PASS1_BITS+3) & RANGE_MASK];
-        outptr[6] = range_limit[(int) DESCALE(tmp11 - tmp2,
-            CONST_BITS+PASS1_BITS+3) & RANGE_MASK];
-        outptr[2] = range_limit[(int) DESCALE(tmp12 + tmp1,
-            CONST_BITS+PASS1_BITS+3) & RANGE_MASK];
-        outptr[5] = range_limit[(int) DESCALE(tmp12 - tmp1,
-            CONST_BITS+PASS1_BITS+3) & RANGE_MASK];
-        outptr[3] = range_limit[(int) DESCALE(tmp13 + tmp0,
-            CONST_BITS+PASS1_BITS+3) & RANGE_MASK];
-        outptr[4] = range_limit[(int) DESCALE(tmp13 - tmp0,
-            CONST_BITS+PASS1_BITS+3) & RANGE_MASK];
+        outptr[0] = range_limit((int) DESCALE(tmp10 + tmp3,
+            CONST_BITS+PASS1_BITS+3));
+        outptr[7] = range_limit((int) DESCALE(tmp10 - tmp3,
+            CONST_BITS+PASS1_BITS+3));
+        outptr[1] = range_limit((int) DESCALE(tmp11 + tmp2,
+            CONST_BITS+PASS1_BITS+3));
+        outptr[6] = range_limit((int) DESCALE(tmp11 - tmp2,
+            CONST_BITS+PASS1_BITS+3));
+        outptr[2] = range_limit((int) DESCALE(tmp12 + tmp1,
+            CONST_BITS+PASS1_BITS+3));
+        outptr[5] = range_limit((int) DESCALE(tmp12 - tmp1,
+            CONST_BITS+PASS1_BITS+3));
+        outptr[3] = range_limit((int) DESCALE(tmp13 + tmp0,
+            CONST_BITS+PASS1_BITS+3));
+        outptr[4] = range_limit((int) DESCALE(tmp13 - tmp0,
+            CONST_BITS+PASS1_BITS+3));
 
         wsptr += 8; /* advance pointer to next row */
     }
@@ -2273,7 +2232,7 @@ int jpegmem(struct jpeg *p_jpg, int ds)
 {
     int size;
 
-    size = (p_jpg->x_phys/ds/p_jpg->subsample_x[0]) 
+    size = (p_jpg->x_phys/ds/p_jpg->subsample_x[0])
          * (p_jpg->y_phys/ds/p_jpg->subsample_y[0]);
 #ifdef HAVE_LCD_COLOR
     if (p_jpg->blocks > 1) /* colour, add requirements for chroma */
