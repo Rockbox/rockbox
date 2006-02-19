@@ -996,7 +996,11 @@ void ata_poweroff(bool enable)
 
 bool ata_disk_is_active(void)
 {
+#ifdef APPLE_IPODNANO
+    return false;
+#else
     return !sleeping;
+#endif
 }
 
 static int ata_perform_sleep(void)
