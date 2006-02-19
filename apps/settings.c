@@ -1452,7 +1452,7 @@ bool settings_save_config(void)
                 break;
         }
         else {
-            gui_syncsplash(HZ, true, str(LANG_RESET_DONE_CANCEL));
+            gui_syncsplash(HZ, true, str(LANG_MENU_SETTING_CANCEL));
             return false;
         }
     }
