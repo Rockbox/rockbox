@@ -21,7 +21,6 @@
 #include "debug.h"
 #include "panic.h"
 #include <kernel.h>
-#ifndef SIMULATOR
 #include "cpu.h"
 #include "i2c.h"
 #if defined(HAVE_UDA1380)
@@ -36,7 +35,6 @@
 #include "wm8731l.h"
 #endif
 #include "system.h"
-#endif
 #include "logf.h"
 
 #include <stdio.h>
@@ -498,13 +496,93 @@ bool pcm_is_playing(void)
 
 unsigned int fiq_count IBSS_ATTR;
 
-void fiq(void) ICODE_ATTR;
+/* ASM optimised FIQ handler. GCC fails to make use of the fact that FIQ mode
+   has registers r8-r14 banked, and so does not need to be saved. This routine
+   uses only these registers, and so will never touch the stack unless it
+   actually needs to do so when calling callback_for_more. C version is still
+   included below for reference.
+ */
+#if 1
+void fiq(void) ICODE_ATTR __attribute__((naked));
+void fiq(void)
+{
+    asm volatile (
+        "ldr r12, =0x70002800 \n\t" /* r12 = IISCONFIG */
+        "ldr r11, [r12]       \n\t"
+        "bic r11, r11, #0x2   \n\t" /* clear interrupt */
+        "str r11, [r12]       \n\t"
+        "ldr r8, =p_size      \n\t"
+        "ldr r9, =p           \n\t"
+        "ldr r8, [r8]         \n\t" /* r8 = p_size */
+        "ldr r9, [r9]         \n\t" /* r9 = p */
+        "ldr r10, =0x70002840 \n\t" /* r10 = IISFIFO_WR */
+        "ldr r11, =0x7000280c \n\t" /* r11 = IISFIFO_CFG */
+    ".loop:                   \n\t"
+        "cmp r8, #0           \n\t" /* is p_size 0? */
+        "beq .more_data       \n\t" /* if so, ask pcmbuf for more data */
+    ".fifo_loop:              \n\t"    
+        "ldr r12, [r11]       \n\t" /* read IISFIFO_CFG to check FIFO status */
+        "and r12, r12, #0x3f0000\n\t"
+        "cmp r12, #0x10000    \n\t" 
+        "bls .fifo_full       \n\t" /* FIFO full, exit */
+        "ldr r12, [r9], #4    \n\t" /* load two samples to r12 */
+        "str r12, [r10]       \n\t" /* write top sample, lower sample ignored */
+        "mov r12, r12, lsl #16\n\t" /* shift lower sample up */
+        "str r12, [r10]       \n\t" /* then write it */
+        "subs r8, r8, #4      \n\t" /* check if we have more samples */
+        "bne .loop            \n\t" /* yes, continue */
+    ".more_data:              \n\t"
+        "stmdb sp!, { r0-r3, lr}\n\t" /* stack scratch regs and lr */
+        "ldr r0, =p           \n\t" /* load parameters to callback_for_more */
+        "ldr r1, =p_size      \n\t"
+        "str r9, [r0]         \n\t" /* save internal copies of variables back */
+        "str r8, [r1]         \n\t"
+        "ldr r2, =callback_for_more\n\t"
+        "ldr r2, [r2]         \n\t" /* get callback address */
+        "cmp r2, #0           \n\t" /* check for null pointer */
+        "movne lr, pc         \n\t" /* call callback_for_more */
+        "bxne r2              \n\t"
+        "ldmia sp!, { r0-r3, lr}\n\t"
+        "ldr r8, =p_size      \n\t" /* reload p_size and p */
+        "ldr r9, =p           \n\t"
+        "ldr r8, [r8]         \n\t" 
+        "ldr r9, [r9]         \n\t"
+        "cmp r8, #0           \n\t" /* did we actually get more data? */
+        "bne .loop            \n\t" /* yes, continue to try feeding FIFO */
+    ".dma_stop:               \n\t" /* no more data, do dma_stop() and exit */
+        "ldr r10, =pcm_playing\n\t"
+        "mov r12, #0          \n\t"
+        "strb r12, [r10]      \n\t" /* pcm_playing = false */
+        "ldr r10, =0x70002800 \n\t" /* r10 = IISCONFIG */
+        "ldr r11, [r10]       \n\t" 
+        "bic r11, r11, #0x20000002\n\t" /* disable playback FIFO and IRQ */
+        "str r11, [r10]       \n\t"
+        "mrs r10, cpsr        \n\t"
+        "orr r10, r10, #0x40  \n\t" /* disable FIQ */
+        "msr cpsr_c, r10      \n\t"
+        "ldr r10, =pcm_paused \n\t"
+        "strb r12, [r10]      \n\t" /* pcm_paused = false */
+    ".exit:                   \n\t"
+        "ldr r10, =p_size     \n\t" /* save back p_size and p, then exit */
+        "ldr r11, =p          \n\t"
+        "str r8, [r10]        \n\t"
+        "str r9, [r11]        \n\t"
+        "subs pc, lr, #4      \n\t" /* FIQ specific return sequence */
+    ".fifo_full:              \n\t" /* enable IRQ and exit */
+        "ldr r12, =0x70002800 \n\t" /* r12 = IISCONFIG */
+        "ldr r11, [r12]       \n\t"
+        "orr r11, r11, #0x2   \n\t" /* set interrupt */
+        "str r11, [r12]       \n\t"
+        "b .exit              \n\t"
+    );
+}
+#else
+void fiq(void) ICODE_ATTR __attribute__ ((interrupt ("FIQ")));
 void fiq(void)
 {
     /* Clear interrupt */
     IISCONFIG &= ~0x2;
 
-    fiq_count++;
     do {
         while (p_size) {
             if (FIFO_FREE_COUNT < 2) {
@@ -527,6 +605,7 @@ void fiq(void)
     /* No more data, so disable the FIFO/FIQ */
     dma_stop();
 }
+#endif
 
 void pcm_init(void)
 {
