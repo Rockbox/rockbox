@@ -172,6 +172,16 @@ INLINE unsigned range_limit(int value)
         [v]"+r"(value)
     );
     return value;
+#elif defined(CPU_ARM)
+    asm (
+        "adds %[v], %[v], #128\n"  /* value += 128 */
+        "movmi %[v], #0       \n"  /* clip to 0 if negative result */
+        "cmp %[v], #255       \n"  /* did we exceed 255? */
+        "movgt %[v], #255     \n"  /* yes, clip to limit */
+        :
+        [v]"+r"(value)
+    );
+    return value;
 #else
     value += 128;
 
@@ -2062,8 +2072,8 @@ int scroll_bmp(struct t_disp* pdisp)
         switch(button)
         {
         case JPEG_LEFT:
-			if (!(ds < ds_max) && entries > 0 && jpg.x_size <= MAX_X_SIZE)
-				return change_filename(DIR_PREV);                
+            if (!(ds < ds_max) && entries > 0 && jpg.x_size <= MAX_X_SIZE)
+                return change_filename(DIR_PREV);                
         case JPEG_LEFT | BUTTON_REPEAT:
             move = MIN(HSCROLL, pdisp->x);
             if (move > 0)
