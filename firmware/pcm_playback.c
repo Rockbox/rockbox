@@ -494,8 +494,6 @@ bool pcm_is_playing(void)
     return pcm_playing;
 }
 
-unsigned int fiq_count IBSS_ATTR;
-
 /* ASM optimised FIQ handler. GCC fails to make use of the fact that FIQ mode
    has registers r8-r14 banked, and so does not need to be saved. This routine
    uses only these registers, and so will never touch the stack unless it
