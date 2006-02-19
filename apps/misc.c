@@ -295,7 +295,11 @@ void screen_dump(void)
 #if LCD_DEPTH == 1
     static unsigned char line_block[8][BMP_LINESIZE];
 #elif LCD_DEPTH == 2
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+    static unsigned char line_block[BMP_LINESIZE];
+#else
     static unsigned char line_block[4][BMP_LINESIZE];
+#endif
 #elif LCD_DEPTH == 16
     static unsigned short line_block[BMP_LINESIZE/2];
 #endif
@@ -352,6 +356,30 @@ void screen_dump(void)
             write(fh, line_block, sizeof(line_block));
         }
 #elif LCD_DEPTH == 2
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+        for (by = LCD_HEIGHT - 1; by >= 0; by--)
+        {
+            unsigned char *src = &lcd_framebuffer[by][0];
+            unsigned char *dst = line_block;
+
+            memset(line_block, 0, sizeof(line_block));
+            for (bx = LCD_WIDTH/4; bx > 0; bx--)
+            {
+                unsigned src_byte = *src++;
+                unsigned tmp;
+                
+                tmp = src_byte & 3;
+                src_byte >>= 2;
+                *dst++ = (tmp << 4) | (src_byte & 3);
+                src_byte >>= 2;
+                tmp = src_byte & 3;
+                src_byte >>= 2;
+                *dst++ = (tmp << 4) | (src_byte & 3);
+            }
+
+            write(fh, line_block, sizeof(line_block));
+        }
+#else /* VERTICAL_PACKING */
         for (by = LCD_HEIGHT/4 - 1; by >= 0; by--)
         {
             unsigned char *src = &lcd_framebuffer[by][0];
@@ -376,6 +404,7 @@ void screen_dump(void)
 
             write(fh, line_block, sizeof(line_block));
         }
+#endif
 #elif LCD_DEPTH == 16
         for (by = LCD_HEIGHT - 1; by >= 0; by--)
         {
