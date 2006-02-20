@@ -179,6 +179,7 @@
 #define UI_REMOTE_HEIGHT            64
 
 #define UI_REMOTE_BGCOLORLIGHT      250, 180, 130 // bkgnd of remote lcd (bklight)
+#define UI_REMOTE_BGCOLOR           90, 145, 90 // bkgnd of remote lcd (no bklight)
 #endif
 
 extern SDL_Surface *gui_surface;
