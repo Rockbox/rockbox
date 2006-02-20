@@ -194,7 +194,8 @@ typedef void lcd_fastpixelfunc_type(fb_data *address);
 extern fb_data lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
 #elif LCD_DEPTH == 2
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-extern fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH/4];
+#define FB_WIDTH ((LCD_WIDTH+3)/4)
+extern fb_data lcd_framebuffer[LCD_HEIGHT][FB_WIDTH];
 #else
 extern fb_data lcd_framebuffer[LCD_HEIGHT/4][LCD_WIDTH];
 #endif

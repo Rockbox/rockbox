@@ -38,8 +38,6 @@
 
 /*** globals ***/
 
-#define FB_WIDTH ((LCD_WIDTH+3)/4)
-
 unsigned char lcd_framebuffer[LCD_HEIGHT][FB_WIDTH] IBSS_ATTR;
 
 static const unsigned char dibits[16] ICONST_ATTR = {
