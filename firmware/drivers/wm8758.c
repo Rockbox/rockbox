@@ -120,6 +120,8 @@ void wmcodec_enable_output(bool enable)
         /* reset the I2S controller into known state */
         i2s_reset();
 
+        /* TODO: Review the power-up sequence to prevent pops */
+
         wm8758_write(RESET, 0x1ff);    /*Reset*/
     
 	wm8758_write(PWRMGMT1, 0x2b);
@@ -129,7 +131,7 @@ void wmcodec_enable_output(bool enable)
 	wm8758_write(AINTFCE, 0x10);
 	wm8758_write(CLKCTRL, 0x49);
 
-        wm8758_write(OUTCTRL, 1 | (0x3 << 5));
+        wm8758_write(OUTCTRL, 1);
 
         /* The iPod can handle multiple frequencies, but fix at 44.1KHz
            for now */
@@ -248,7 +250,7 @@ void wmcodec_set_sample_rate(int sampling_control)
     wm8758_write(PLLK3, 0x26);
 
     /* set clock div */
-    wm8758_write(CLKCTRL, 1 | (0 << 2) | (2 << 5) | (1 << 8));
+    wm8758_write(CLKCTRL, 1 | (1 << 2) | (2 << 5) | (1 << 8));
 
     /* set srate */
     wm8758_write(SRATECTRL, (0 << 1));
