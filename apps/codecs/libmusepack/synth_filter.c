@@ -342,36 +342,85 @@ static void Synthese_Filter_float_internal(MPC_SAMPLE_FORMAT * OutData,MPC_SAMPL
 
             
             
+            #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
             for ( k = 0; k < 32; k++, D += 16, V++ ) {
-                #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
                 asm volatile (
-                    "movem.l (%[D]), %%d0-%%d3\n\t"
-                    "move.l (%[V]), %%a5\n\t"
-                    "mac.l %%d0, %%a5, (96*4, %[V]), %%a5, %%acc0\n\t"
+                    "movem.l (%[D]), %%d0-%%d3                    \n\t"
+                    "move.l (%[V]), %%a5                          \n\t"
+                    "mac.l %%d0, %%a5, (96*4, %[V]), %%a5, %%acc0 \n\t"
                     "mac.l %%d1, %%a5, (128*4, %[V]), %%a5, %%acc0\n\t"
                     "mac.l %%d2, %%a5, (224*4, %[V]), %%a5, %%acc0\n\t"
                     "mac.l %%d3, %%a5, (256*4, %[V]), %%a5, %%acc0\n\t"
-                    "movem.l (4*4, %[D]), %%d0-%%d3\n\t"
+                    "movem.l (4*4, %[D]), %%d0-%%d3               \n\t"
                     "mac.l %%d0, %%a5, (352*4, %[V]), %%a5, %%acc0\n\t"
                     "mac.l %%d1, %%a5, (384*4, %[V]), %%a5, %%acc0\n\t"
                     "mac.l %%d2, %%a5, (480*4, %[V]), %%a5, %%acc0\n\t"
                     "mac.l %%d3, %%a5, (512*4, %[V]), %%a5, %%acc0\n\t"
-                    "movem.l (8*4, %[D]), %%d0-%%d3\n\t"
+                    "movem.l (8*4, %[D]), %%d0-%%d3               \n\t"
                     "mac.l %%d0, %%a5, (608*4, %[V]), %%a5, %%acc0\n\t"
                     "mac.l %%d1, %%a5, (640*4, %[V]), %%a5, %%acc0\n\t"
                     "mac.l %%d2, %%a5, (736*4, %[V]), %%a5, %%acc0\n\t"
                     "mac.l %%d3, %%a5, (768*4, %[V]), %%a5, %%acc0\n\t"
-                    "movem.l (12*4, %[D]), %%d0-%%d3\n\t"
+                    "movem.l (12*4, %[D]), %%d0-%%d3              \n\t"
                     "mac.l %%d0, %%a5, (864*4, %[V]), %%a5, %%acc0\n\t"
                     "mac.l %%d1, %%a5, (896*4, %[V]), %%a5, %%acc0\n\t"
                     "mac.l %%d2, %%a5, (992*4, %[V]), %%a5, %%acc0\n\t"
-                    "mac.l %%d3, %%a5, %%acc0\n\t"
-                    "movclr.l %%acc0, %%d0\n\t"
-                    "move.l %%d0, (%[Data])+\n"
+                    "mac.l %%d3, %%a5, %%acc0                     \n\t"
+                    "movclr.l %%acc0, %%d0                        \n\t"
+                    "move.l %%d0, (%[Data])+                      \n"
                     : [Data] "+a" (Data)
                     : [V] "a" (V), [D] "a" (D)
                     : "d0", "d1", "d2", "d3", "a5");
-                #else
+            #elif defined(CPU_ARM) && !defined(SIMULATOR)
+            for ( k = 0; k < 32; k++, V++ ) {
+                asm volatile (
+                    "ldmia %[D]!, { r0-r3 } \n\t"
+                    "ldr r4, [%[V]]         \n\t"
+                    "smull r5, r6, r0, r4   \n\t"
+                    "ldr r4, [%[V], #96*4]  \n\t"
+                    "smlal r5, r6, r1, r4   \n\t"
+                    "ldr r4, [%[V], #128*4] \n\t"
+                    "smlal r5, r6, r2, r4   \n\t"
+                    "ldr r4, [%[V], #224*4] \n\t"
+                    "smlal r5, r6, r3, r4   \n\t"
+                    
+                    "ldmia %[D]!, { r0-r3 } \n\t"
+                    "ldr r4, [%[V], #256*4] \n\t"
+                    "smlal r5, r6, r0, r4   \n\t"
+                    "ldr r4, [%[V], #352*4] \n\t"
+                    "smlal r5, r6, r1, r4   \n\t"
+                    "ldr r4, [%[V], #384*4] \n\t"
+                    "smlal r5, r6, r2, r4   \n\t"
+                    "ldr r4, [%[V], #480*4] \n\t"
+                    "smlal r5, r6, r3, r4   \n\t"
+ 
+                    "ldmia %[D]!, { r0-r3 } \n\t"
+                    "ldr r4, [%[V], #512*4] \n\t"
+                    "smlal r5, r6, r0, r4   \n\t"
+                    "ldr r4, [%[V], #608*4] \n\t"
+                    "smlal r5, r6, r1, r4   \n\t"
+                    "ldr r4, [%[V], #640*4] \n\t"
+                    "smlal r5, r6, r2, r4   \n\t"
+                    "ldr r4, [%[V], #736*4] \n\t"
+                    "smlal r5, r6, r3, r4   \n\t"
+ 
+                    "ldmia %[D]!, { r0-r3 } \n\t"
+                    "ldr r4, [%[V], #768*4] \n\t"
+                    "smlal r5, r6, r0, r4   \n\t"
+                    "ldr r4, [%[V], #864*4] \n\t"
+                    "smlal r5, r6, r1, r4   \n\t"
+                    "ldr r4, [%[V], #896*4] \n\t"
+                    "smlal r5, r6, r2, r4   \n\t"
+                    "ldr r4, [%[V], #992*4] \n\t"
+                    "smlal r5, r6, r3, r4   \n\t"
+                    "mov r4, r6, lsl #1     \n\t"
+                    "orr r4, r4, r5, lsr #31\n\t"
+                    "str r4, [%[Data]], #4  \n"
+                    : [Data] "+r" (Data), [D] "+r" (D)
+                    : [V] "r" (V)
+                    : "r0", "r1", "r2", "r3", "r4", "r5", "r6");
+            #else
+            for ( k = 0; k < 32; k++, D += 16, V++ ) {
                 *Data = MPC_SHL(
                     MPC_MULTIPLY_FRACT(V[  0],D[ 0]) + MPC_MULTIPLY_FRACT(V[ 96],D[ 1]) + MPC_MULTIPLY_FRACT(V[128],D[ 2]) + MPC_MULTIPLY_FRACT(V[224],D[ 3])
                     + MPC_MULTIPLY_FRACT(V[256],D[ 4]) + MPC_MULTIPLY_FRACT(V[352],D[ 5]) + MPC_MULTIPLY_FRACT(V[384],D[ 6]) + MPC_MULTIPLY_FRACT(V[480],D[ 7])
