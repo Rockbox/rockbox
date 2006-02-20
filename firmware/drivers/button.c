@@ -40,6 +40,11 @@
 #include "system.h"
 #include "powermgmt.h"
 
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) \
+                    || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#include "lcd-remote.h"
+#endif
+
 struct event_queue button_queue;
 
 static long lastbtn;   /* Last valid button status */
@@ -703,7 +708,8 @@ static int button_read(void)
 
     int data;
 
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD)\
+     || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 
     static bool hold_button = false;
     static bool remote_hold_button = false;
@@ -725,7 +731,7 @@ static int button_read(void)
     if (!hold_button)
     {
         data = adc_scan(ADC_BUTTONS);
-        
+#if CONFIG_KEYPAD == IRIVER_H100_PAD        
         if (data < 0x80)
             if (data < 0x30)
                 if (data < 0x18)
@@ -749,74 +755,7 @@ static int button_read(void)
                 else
                     if (data < 0xf0)
                         btn = BUTTON_REC;
-    }
-    
-    /* remote buttons */
-    if (!remote_hold_button)
-    {
-        data = adc_scan(ADC_REMOTE);
-
-        if (data < 0x74)
-            if (data < 0x40)
-                if (data < 0x20)
-                    if(data < 0x10)
-                        btn = BUTTON_RC_STOP;
-                    else
-                        btn = BUTTON_RC_VOL_DOWN;
-                else
-                    btn = BUTTON_RC_MODE;
-            else
-                if (data < 0x58)
-                    btn = BUTTON_RC_VOL_UP;
-                else
-                    btn = BUTTON_RC_BITRATE;
-        else
-            if (data < 0xb0)
-                if (data < 0x88)
-                    btn = BUTTON_RC_REC;
-                else
-                    btn = BUTTON_RC_SOURCE;
-            else
-                if (data < 0xd8)
-                    if(data < 0xc0)
-                        btn = BUTTON_RC_FF;
-                    else
-                        btn = BUTTON_RC_MENU;
-                else
-                    if (data < 0xf0)
-                        btn = BUTTON_RC_REW;
-    }
-    
-    /* special buttons */
-    data = GPIO1_READ;
-    if (!hold_button && ((data & 0x20) == 0))
-        btn |= BUTTON_ON;
-    if (!remote_hold_button && ((data & 0x40) == 0))
-        btn |= BUTTON_RC_ON;
-    
-#elif CONFIG_KEYPAD == IRIVER_H300_PAD
-
-    static bool hold_button = false;
-    static bool remote_hold_button = false;
-
-    /* light handling */
-    if (hold_button && !button_hold())
-    {
-        backlight_on();
-    }
-    if (remote_hold_button && !remote_button_hold_only())
-    {
-        remote_backlight_on();
-    }
-
-    hold_button = button_hold();
-    remote_hold_button = remote_button_hold_only();
-
-    /* normal buttons */
-    if (!hold_button)
-    {
-        data = adc_scan(ADC_BUTTONS);
-        
+#else /* H300 */
         if (data < 0x54)
             if (data < 0x30)
                 if (data < 0x10)
@@ -834,45 +773,96 @@ static int button_read(void)
             else
                 if(data < 0xba)
                     btn = BUTTON_OFF;
+ 
+#endif
     }
-        
+    
     /* remote buttons */
     if (!remote_hold_button)
     {
         data = adc_scan(ADC_REMOTE);
-
-        if (data < 0x74)
-            if (data < 0x40)
-                if (data < 0x20)
-                    if(data < 0x10)
-                        btn = BUTTON_RC_STOP;
+        switch(remote_type())
+        {
+            case REMOTETYPE_H100_LCD:
+                if (data < 0x73)
+                    if (data < 0x3f)
+                        if (data < 0x25)
+                            if(data < 0x0c)
+                                btn = BUTTON_RC_STOP;
+                            else
+                                btn = BUTTON_RC_VOL_DOWN;
+                        else
+                            btn = BUTTON_RC_MODE;
                     else
-                        btn = BUTTON_RC_VOL_DOWN;
+                        if (data < 0x5a)
+                            btn = BUTTON_RC_VOL_UP;
+                        else
+                            btn = BUTTON_RC_BITRATE;
                 else
-                    btn = BUTTON_RC_MODE;
-            else
-                if (data < 0x58)
-                    btn = BUTTON_RC_VOL_UP;
+                    if (data < 0xa8)
+                        if (data < 0x8c)
+                            btn = BUTTON_RC_REC;
+                        else
+                            btn = BUTTON_RC_SOURCE;
+                    else
+                        if (data < 0xdf)
+                            if(data < 0xc5)
+                                btn = BUTTON_RC_FF;
+                            else
+                                btn = BUTTON_RC_MENU;
+                        else
+                            if (data < 0xf5)
+                                btn = BUTTON_RC_REW;
+                break;
+            case REMOTETYPE_H300_LCD:  
+                 if (data < 0x73)
+                    if (data < 0x42)
+                        if (data < 0x27)
+                            if(data < 0x0c)
+                                btn = BUTTON_RC_VOL_DOWN;
+                            else
+                                btn = BUTTON_RC_FF;
+                        else
+                            btn = BUTTON_RC_STOP;
+                    else
+                        if (data < 0x5b)
+                            btn = BUTTON_RC_MODE;
+                        else
+                            btn = BUTTON_RC_REC;
                 else
-                    btn = BUTTON_RC_BITRATE;
-        else
-            if (data < 0xb0)
-                if (data < 0x88)
-                    btn = BUTTON_RC_REC;
-                else
-                    btn = BUTTON_RC_SOURCE;
-            else
-                if (data < 0xd8)
-                    if(data < 0xc0)
+                    if (data < 0xab)
+                        if (data < 0x8e)
+                            btn = BUTTON_RC_ON;
+                        else
+                            btn = BUTTON_RC_BITRATE;
+                    else
+                        if (data < 0xde)
+                            if(data < 0xc5)
+                                btn = BUTTON_RC_SOURCE;
+                            else
+                                btn = BUTTON_RC_VOL_UP;
+                        else
+                            if (data < 0xf5)
+                                btn = BUTTON_RC_REW;
+                break;
+            case REMOTETYPE_H300_NONLCD:
+                if(data<0x7d)
+                    if(data<0x25)
                         btn = BUTTON_RC_FF;
                     else
-                        btn = BUTTON_RC_MENU;
-                else
-                    if (data < 0xf0)
                         btn = BUTTON_RC_REW;
+                else
+                    if(data<0xd5)
+                        btn = BUTTON_RC_VOL_DOWN;
+                    else
+                        if(data<0xf1) /* 0xff no button pressed */
+                            btn = BUTTON_RC_VOL_UP;
+                break;
+        }
     }
-
+    
     /* special buttons */
+#if CONFIG_KEYPAD == IRIVER_H300_PAD
     if (!hold_button)
     {
         data = GPIO_READ;
@@ -881,13 +871,23 @@ static int button_read(void)
         if ((data & 0x8000) == 0)
             btn |= BUTTON_REC;
     }
-    
+#endif
+
     data = GPIO1_READ;
     if (!hold_button && ((data & 0x20) == 0))
         btn |= BUTTON_ON;
     if (!remote_hold_button && ((data & 0x40) == 0))
-        btn |= BUTTON_RC_ON;
-    
+        switch(remote_type())
+        {
+            case REMOTETYPE_H100_LCD:
+            case REMOTETYPE_H300_NONLCD:
+                btn |= BUTTON_RC_ON;
+                break;
+            case REMOTETYPE_H300_LCD:
+                btn |= BUTTON_RC_MENU;
+                break;
+        }
+   
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
 
     static bool hold_button = false;
@@ -1072,13 +1072,21 @@ bool button_hold(void)
 }
 
 static bool remote_button_hold_only(void)
-{
-    return (GPIO1_READ & 0x00100000)?true:false;
+{        
+    if(remote_type() == REMOTETYPE_H300_NONLCD)
+            return adc_scan(ADC_REMOTE)<0x0d; /* hold should be 0x00 */
+    else
+            return (GPIO1_READ & 0x00100000)?true:false;
 }
 
+/* returns true only if there is remote present */
 bool remote_button_hold(void)
 {
-    return ((GPIO_READ & 0x40000000) == 0)?remote_button_hold_only():false;
+    /* H300's NON-LCD remote doesn't set the "remote present" bit */
+    if(remote_type() == REMOTETYPE_H300_NONLCD)
+        return remote_button_hold_only();
+    else
+        return ((GPIO_READ & 0x40000000) == 0)?remote_button_hold_only():false;
 }
 #endif
 
