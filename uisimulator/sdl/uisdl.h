@@ -45,9 +45,9 @@
 #define UI_LCD_BGCOLORLIGHT         126, 229, 126 // bkgnd color of LCD (backlight)
 #define UI_LCD_BLACK                0, 0, 0 // black
 #define UI_LCD_POSX                 75 // x position of lcd
-#define UI_LCD_POSY                 111 // y position of lcd
+#define UI_LCD_POSY                 116 // y position of lcd
 #define UI_LCD_WIDTH                132
-#define UI_LCD_HEIGHT               75
+#define UI_LCD_HEIGHT               64
 
 #elif defined(ARCHOS_FMRECORDER) || defined(ARCHOS_RECORDERV2)
 #define UI_TITLE                    "Jukebox FM Recorder"

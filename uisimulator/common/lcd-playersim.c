@@ -34,9 +34,9 @@
 
 #define CHAR_WIDTH 6
 #define CHAR_HEIGHT 8
-#define ICON_HEIGHT 24
+#define ICON_HEIGHT 12
 #define CHAR_PIXEL 2
-#define BORDER_MARGIN 2
+#define BORDER_MARGIN 1
 
 static int double_height=1;
 extern bool lcd_display_redraw;
@@ -47,13 +47,13 @@ extern unsigned char hardware_buffer_lcd[11][2];
 void lcd_print_icon(int x, int icon_line, bool enable, char **icon)
 {
   int xpos = x;
-  int ypos = icon_line*(ICON_HEIGHT+CHAR_HEIGHT*2*4);
+  int ypos = icon_line*(ICON_HEIGHT+(CHAR_HEIGHT*2+2)*CHAR_PIXEL);
   int row=0, col;
 
   int p=0, cp=0;
   struct coordinate points[LCD_WIDTH * LCD_HEIGHT];
   struct coordinate clearpoints[LCD_WIDTH * LCD_HEIGHT];
-  
+
   while (icon[row]) {
     col=0;
     while (icon[row][col]) {
