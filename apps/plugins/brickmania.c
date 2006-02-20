@@ -89,7 +89,7 @@ extern const fb_data brickmania_bricks[];
    to 10ms.
 */
 #define CYCLETIME 30
-
+ 
 /* Offsets for LCDS > 220x176 */
 #define XOFS ((LCD_WIDTH-220)/2)
 #define YOFS ((LCD_HEIGHT-176)/2)
@@ -209,6 +209,71 @@ extern const fb_data brickmania_bricks[];
 #define BMPYOFS_help 90
 #define BMPXOFS_quit 64
 #define BMPYOFS_quit 103
+#define HIGHSCORE_XPOS 7
+#define HIGHSCORE_YPOS 36
+
+#define STRINGPOS_finsh 100
+#define STRINGPOS_congrats 110
+#define STRINGPOS_navi 100
+#define STRINGPOS_flipsides 100
+
+#elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 132) && (LCD_DEPTH==16)
+/* The time (in ms) for one iteration through the game loop - decrease this
+   to speed up the game - note that current_tick is (currently) only accurate
+   to 10ms.
+*/
+#define CYCLETIME 30
+
+#define PAD_WIDTH 40
+#define PAD_HEIGHT 5
+#define PAD_POS_Y LCD_HEIGHT - 7
+#define BRICK_HEIGHT 7
+#define BRICK_WIDTH 17
+#define BALL 5
+#define LEFTMARGIN 3
+#define TOPMARGIN 21
+
+#define BMPHEIGHT_help 14
+#define BMPWIDTH_help 28
+
+#define BMPHEIGHT_sel_help 14
+#define BMPWIDTH_sel_help 28
+
+#define BMPHEIGHT_resume 13
+#define BMPWIDTH_resume 76
+
+#define BMPHEIGHT_no_resume 13
+#define BMPWIDTH_no_resume 76
+
+#define BMPHEIGHT_quit 14
+#define BMPWIDTH_quit 25
+
+#define BMPHEIGHT_sel_quit 14
+#define BMPWIDTH_sel_quit 25
+
+#define BMPHEIGHT_sel_resume 13
+#define BMPWIDTH_sel_resume 76
+
+#define BMPHEIGHT_sel_start 16
+#define BMPWIDTH_sel_start 89
+
+#define BMPHEIGHT_start 16
+#define BMPWIDTH_start 89
+
+#define BMPHEIGHT_powerup 6
+#define BMPWIDTH_powerup 10
+
+#define BMPHEIGHT_menu 132
+#define BMPWIDTH_menu 176
+
+#define BMPXOFS_start 44
+#define BMPYOFS_start 58
+#define BMPXOFS_resume 50
+#define BMPYOFS_resume 75
+#define BMPXOFS_help 74
+#define BMPYOFS_help 89
+#define BMPXOFS_quit 75
+#define BMPYOFS_quit 104
 #define HIGHSCORE_XPOS 7
 #define HIGHSCORE_YPOS 36
 
@@ -689,9 +754,8 @@ int game_menu(int when)
                 rb->lcd_bitmap(brickmania_quit,BMPXOFS_quit,BMPYOFS_quit,
                                BMPWIDTH_quit,BMPHEIGHT_quit);
         }
-
+        rb->lcd_set_drawmode(DRMODE_FG);
         /* high score */
-        rb->lcd_setfont(FONT_SYSFIXED);
 #ifdef HAVE_LCD_COLOR
         rb->lcd_set_background(LCD_RGBPACK(0,0,140));
         rb->lcd_set_foreground(LCD_WHITE);
@@ -701,7 +765,7 @@ int game_menu(int when)
         rb->lcd_getstringsize("High Score", &sw, NULL);
         rb->lcd_getstringsize(str, &w, NULL);
         rb->lcd_putsxy(HIGHSCORE_XPOS+sw/2-w/2, HIGHSCORE_YPOS+9, str);
-        rb->lcd_setfont(FONT_UI);
+        rb->lcd_set_drawmode(DRMODE_SOLID);
 
         rb->lcd_update();
 
@@ -764,7 +828,6 @@ int help(int when)
     int maxX=210;
 
     while(true){
-        rb->lcd_setfont(FONT_SYSFIXED);
 #ifdef HAVE_LCD_COLOR
         rb->lcd_set_background(LCD_BLACK);
         rb->lcd_clear_display();
@@ -814,7 +877,6 @@ int help(int when)
         button=rb->button_get(true);
         switch (button) {
             case QUIT:
-                rb->lcd_setfont(FONT_UI);
                 switch (game_menu(when)) {
                     case 0:
                         cur_level=0;
@@ -1454,7 +1516,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     (void)parameter;
     rb = api;
-
+    
+    rb->lcd_setfont(FONT_SYSFIXED);
     /* Permanently enable the backlight (unless the user has turned it off) */
     if (rb->global_settings->backlight_timeout > 0)
         rb->backlight_set_timeout(1);
@@ -1465,6 +1528,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     configfile_save(HIGH_SCORE,config,1,0);
 
     /* Restore user's original backlight setting */
+    rb->lcd_setfont(FONT_UI);
     rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
 
     return PLUGIN_OK;

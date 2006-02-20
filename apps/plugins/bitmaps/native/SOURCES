@@ -78,6 +78,25 @@ brickmania_sel_quit.160x128x2.bmp
 brickmania_sel_start.160x128x2.bmp
 brickmania_start.160x128x2.bmp
 brickmania_break.160x128x2.bmp
+
+#elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 132) && (LCD_DEPTH == 16)
+brickmania_ball.176x132x16.bmp
+brickmania_bricks.176x132x16.bmp
+brickmania_gameover.176x132x16.bmp
+brickmania_help.176x132x16.bmp
+brickmania_menu_bg.176x132x16.bmp
+brickmania_no_resume.176x132x16.bmp
+brickmania_pads.176x132x16.bmp
+brickmania_powerups.176x132x16.bmp
+brickmania_quit.176x132x16.bmp
+brickmania_resume.176x132x16.bmp
+brickmania_sel_help.176x132x16.bmp
+brickmania_sel_resume.176x132x16.bmp
+brickmania_sel_quit.176x132x16.bmp
+brickmania_sel_start.176x132x16.bmp
+brickmania_start.176x132x16.bmp
+brickmania_break.176x132x16.bmp
+
 #endif
 
 #endif /* HAVE_LCD_BITMAP */

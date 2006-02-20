@@ -35,8 +35,8 @@ mandelbrot.c
 solitaire.c
 bejeweled.c
 bounce.c
-/* H300 and iPod Color/Video only */
-#if ((LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176) && (LCD_DEPTH == 16)) || ((LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH==2))
+/* H300, H100 and iPod Nano/Color/Video only */
+#if ((LCD_WIDTH >= 176) && (LCD_HEIGHT >= 132) && (LCD_DEPTH == 16)) || ((LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH==2))
 brickmania.c
 #endif
 calculator.c
