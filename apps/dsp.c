@@ -84,17 +84,25 @@
  * to multiply with into x from s (and increase s); x must contain the
  * initial value.
  */
-#define FRACMUL_8_LOOP(x, y, s) \
-({ \
-    long t; \
+#define FRACMUL_8_LOOP_PART(x, s, d, y) \
+{ \
     long u; \
     asm volatile ("mac.l    %[a], %[b], (%[c])+, %[a], %%acc0\n\t" \
                   "move.l   %%accext01, %[u]\n\t" \
-                  "movclr.l %%acc0, %[t]\n\t" \
-                  : [a] "+r" (x), [c] "+a" (s), [t] "=r" (t), [u] "=r" (u) \
+                  "movclr.l %%acc0, %[t]" \
+                  : [a] "+r" (x), [c] "+a" (s), [t] "=r" (d), [u] "=r" (u) \
                   : [b] "r" (y)); \
-    (t << 8) | (u & 0xff); \
-})
+    d = (d << 8) | (u & 0xff); \
+}
+
+#define FRACMUL_8_LOOP(x, y, s, d) \
+{ \
+    long t; \
+    FRACMUL_8_LOOP_PART(x, s, t, y); \
+    asm volatile ("move.l   %[t],(%[d])+" \
+                  : [d] "+a" (d)\
+                  : [t] "r" (t)); \
+}
 
 #define ACC(acc, x, y) \
     (void)acc; \
@@ -118,11 +126,11 @@
 #define GET_ACC(acc) acc
 #define FRACMUL(x, y) (long) (((((long long) (x)) * ((long long) (y))) >> 31))
 #define FRACMUL_8(x, y) (long) (((((long long) (x)) * ((long long) (y))) >> 23))
-#define FRACMUL_8_LOOP(x, y, s) \
+#define FRACMUL_8_LOOP(x, y, s, d) \
 ({ \
     long t = x; \
     x = *(s)++; \
-    (long) (((((long long) (t)) * ((long long) (y))) >> 23)); \
+    *(d)++ = (long) (((((long long) (t)) * ((long long) (y))) >> 23)); \
 })
 
 #endif
@@ -695,36 +703,40 @@ static void eq_process(long **x, unsigned num)
  * the src array if gain was applied.
  * Note that this must be called before the resampler.
  */
-static void apply_gain(long* src[], int count)
+static void apply_gain(long* _src[], int _count)
 {
-    if (dsp->replaygain)
+    struct dsp_config *my_dsp = dsp;
+    if (my_dsp->replaygain)
     {
+        long** src = _src;
+        int count = _count;
         long* s0 = src[0];
         long* s1 = src[1];
-        long* d0 = &sample_buf[0];
-        long* d1 = (s0 == s1) ? d0 : &sample_buf[SAMPLE_BUF_SIZE / 2];
-        long gain = dsp->replaygain;
+        long gain = my_dsp->replaygain;
         long s;
-        long i;
+        int i;
+        long *d;
 
-        src[0] = d0;
-        src[1] = d1;
-        s = *s0++;
-
-        for (i = 0; i < count; i++)
+        if (s0 != s1)
         {
-            *d0++ = FRACMUL_8_LOOP(s, gain, s0);
-        }
-
-        if (src [0] != src [1])
-        {
+            d = &sample_buf[SAMPLE_BUF_SIZE / 2];
+            src[1] = d;
             s = *s1++;
 
             for (i = 0; i < count; i++)
-            {
-                *d1++ = FRACMUL_8_LOOP(s, gain, s1);
-            }
+                FRACMUL_8_LOOP(s, gain, s1, d);
         }
+        else
+        {
+            src[1] = &sample_buf[0];
+        }
+
+        d = &sample_buf[0];
+        src[0] = d;
+        s = *s0++;
+
+        for (i = 0; i < count; i++)
+            FRACMUL_8_LOOP(s, gain, s0, d);
     }
 }
 
