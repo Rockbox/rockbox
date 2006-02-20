@@ -524,11 +524,12 @@ void fiq(void)
         "cmp r12, #0x10000    \n\t" 
         "bls .fifo_full       \n\t" /* FIFO full, exit */
         "ldr r12, [r9], #4    \n\t" /* load two samples to r12 */
+        "mov r12, r12, ror #16\n\t" /* put left sample at the top bits */
         "str r12, [r10]       \n\t" /* write top sample, lower sample ignored */
         "mov r12, r12, lsl #16\n\t" /* shift lower sample up */
         "str r12, [r10]       \n\t" /* then write it */
         "subs r8, r8, #4      \n\t" /* check if we have more samples */
-        "bne .loop            \n\t" /* yes, continue */
+        "bne .fifo_loop       \n\t" /* yes, continue */
     ".more_data:              \n\t"
         "stmdb sp!, { r0-r3, lr}\n\t" /* stack scratch regs and lr */
         "ldr r0, =p           \n\t" /* load parameters to callback_for_more */
