@@ -306,9 +306,10 @@ if [ -z "$simver" ]; then
   # Figure out what simulator version
   #
   # x11 is deprecated so hide it from the question
+  # win32 is also deprecated
   #
   echo ""
-  echo "Build (W)in32 or (S)DL version? (S)"
+  echo "Build (S)DL version? (S)"
 
   option=`input`;
 
