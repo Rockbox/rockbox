@@ -8,8 +8,9 @@ endif
 
 $(OBJDIR)/%.c: %.bmp
 	$(SILENT)mkdir -p `dirname $@`
+	$(SILENT)mkdir -p $(BMPINCDIR)
 	@echo BMP2RB $<
-	$(SILENT)$(BMP2RB) $< > $@
+	$(SILENT)$(BMP2RB) -h $(BMPINCDIR) $< > $@
 
 $(OBJDIR)/%.o: $(OBJDIR)/%.c
 	$(SILENT)mkdir -p `dirname $@`
