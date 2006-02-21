@@ -203,7 +203,10 @@ int main(int argc, char *argv[])
                 printf("Using old LCD layout.\n");
             } else if (!strcmp("--zoom", argv[x])) {
                 x++;
-                display_zoom=atoi(argv[x]);
+                if(x < argc)
+                    display_zoom=atoi(argv[x]);
+                else
+                    display_zoom = 2;
                 printf("Window zoom is %d\n", display_zoom);
             } else {
                 printf("rockboxui\n");
