@@ -39,6 +39,9 @@
 #include "power.h"
 #include "file.h"
 
+#define XSC(X) #X
+#define SC(X) XSC(X)
+
 #if (CONFIG_CPU == PP5020)
 #define DRAM_START              0x10000000
 #else
@@ -418,8 +421,8 @@ void* main(void)
             /* Transfer execution directly to Rockbox - we don't want
                to run the rest of the bootloader startup code. */
             asm volatile(
-                "mov   r0, #0x10000000    \n"
-                "mov   pc, r0             \n"
+                "mov   r0, #" SC(DRAM_START) "\n"
+                "mov   pc, r0                 \n"
             );
 
             /* We don't get here, but keep the compiler happy. */
