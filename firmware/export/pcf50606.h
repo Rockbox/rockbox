@@ -19,12 +19,10 @@
 #ifndef PCF50606_H
 #define PCF50606_H
 
-#ifdef IRIVER_H300_SERIES
 void pcf50606_init(void);
 int pcf50606_write_multiple(int address, const unsigned char* buf, int count);
 int pcf50606_write(int address, unsigned char val);
 int pcf50606_read_multiple(int address, unsigned char* buf, int count);
 int pcf50606_read(int address);
-#endif
 
 #endif
