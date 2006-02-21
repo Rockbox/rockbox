@@ -33,13 +33,19 @@ static bool pcm_paused;
 static Uint8* pcm_data;
 static int pcm_data_size;
 
+extern bool debug_audio;
+
 static void sdl_dma_start(const void *addr, size_t size)
 {
     pcm_playing = true;
 
+    SDL_LockAudio();
+    
     pcm_data = (Uint8 *) addr;
     pcm_data_size = size;
 
+    SDL_UnlockAudio();
+    
     SDL_PauseAudio(0);
 }
 
@@ -136,37 +142,57 @@ bool pcm_is_playing(void)
     return pcm_playing;
 }
 
+char overflow[8192];
+int overflow_amount = 0;
+
 void sdl_audio_callback(void *udata, Uint8 *stream, int len)
 {
-    int datalen;
+    int datalen, offset;
+    FILE *debug = (FILE *)udata;
+
+    /* At all times we need to write a full 'len' bytes to stream. */
+
+    if (pcm_data_size <= len) {
+        /* Play what we have */
+        memcpy(stream, pcm_data, pcm_data_size);
+
+        if (debug != NULL) {
+            fwrite(pcm_data, sizeof(Uint8), pcm_data_size, debug);
+        }
+
+        offset = pcm_data_size;
+        datalen = len - pcm_data_size;
+
+        /* Get some more */
+        callback_for_more(&pcm_data, &pcm_data_size);
+        
+        /* Play enough of that to keep the audio buffer full */
+        memcpy(stream + offset, pcm_data, datalen);
+        
+        if (debug != NULL) {
+            fwrite(pcm_data, sizeof(Uint8), datalen, debug);
+        }
+    } else {
+        datalen = len;
+        memcpy(stream, pcm_data, len);
     
-    (void) udata;
-
-    if (pcm_data_size == 0) {
-        return;
+        if (debug != NULL) {
+            fwrite(pcm_data, sizeof(Uint8), len, debug);
+        }
     }
-
-    datalen = (len > pcm_data_size) ? pcm_data_size : len;
-
-    memcpy(stream, pcm_data, datalen);
 
     pcm_data_size -= datalen;
     pcm_data += datalen;
-
-    if (pcm_data_size == 0) {
-        void (*get_more)(unsigned char**, size_t*) = callback_for_more;
-        if (get_more) {
-            get_more(&pcm_data, &pcm_data_size);
-        } else {
-            pcm_data_size = 0;
-            pcm_data = NULL;
-        }
-    }
 }
 
 int pcm_init(void)
 {
     SDL_AudioSpec fmt;
+    FILE *debug = NULL;
+
+    if (debug_audio) {
+        debug = fopen("audiodebug.raw", "wb");
+    }
 
     /* Set 16-bit stereo audio at 44Khz */
     fmt.freq = 44100;
@@ -174,14 +200,14 @@ int pcm_init(void)
     fmt.channels = 2;
     fmt.samples = 512;
     fmt.callback = sdl_audio_callback;
-    fmt.userdata = NULL;
+    fmt.userdata = debug;
 
     /* Open the audio device and start playing sound! */
     if(SDL_OpenAudio(&fmt, NULL) < 0) {
         fprintf(stderr, "Unable to open audio: %s\n", SDL_GetError());
         return -1;
     }
-    
+
     sdl_dma_stop();
 
     return 0;

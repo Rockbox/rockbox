@@ -51,7 +51,9 @@ SDL_Thread *gui_thread;
 SDL_TimerID tick_timer_id;
 
 bool lcd_display_redraw = true;         /* Used for player simulator */
-char having_new_lcd=true;               /* Used for player simulator */
+char having_new_lcd = true;               /* Used for player simulator */
+
+bool debug_audio = false;
 
 long start_tick;
 
@@ -190,7 +192,10 @@ int main(int argc, char *argv[])
     if (argc >= 1) {
         int x;
         for (x = 1; x < argc; x++) {
-            if (!strcmp("--background", argv[x])) {
+            if (!strcmp("--debugaudio", argv[x])) {
+                debug_audio = true;
+                printf("Writing debug audio file.\n");
+            } else if (!strcmp("--background", argv[x])) {
                 background = true;
                 printf("Using background image.\n");
             } else if (!strcmp("--old_lcd", argv[x])) {
@@ -203,6 +208,7 @@ int main(int argc, char *argv[])
             } else {
                 printf("rockboxui\n");
                 printf("Arguments:\n");
+                printf("  --debugaudio \t Write raw PCM data to audiodebug.raw\n");
                 printf("  --background \t Use background image of hardware\n");
                 printf("  --old_lcd \t [Player] simulate old playermodel (ROM version<4.51)\n");
                 printf("  --zoom \t window zoom (will disable backgrounds)\n");
