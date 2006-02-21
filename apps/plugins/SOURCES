@@ -33,10 +33,14 @@ mandelbrot.c
 #endif
 
 solitaire.c
+#if (LCD_WIDTH != 138)
+/* These need adjusting for the Mini's screen */
 bejeweled.c
+#endif
 bounce.c
 /* H300, H100 and iPod Nano/Color/Video only */
-#if ((LCD_WIDTH >= 176) && (LCD_HEIGHT >= 132) && (LCD_DEPTH == 16)) || ((LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH==2))
+#if ((LCD_WIDTH >= 176) && (LCD_HEIGHT >= 132) && (LCD_DEPTH == 16)) || \
+    ((LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH==2))
 brickmania.c
 #endif
 calculator.c
@@ -59,8 +63,8 @@ snake2.c
 sokoban.c
 star.c
 starfield.c
-#if (LCD_WIDTH != 176)
-/* These need adjusting for the Nano's screen */
+#if (LCD_WIDTH != 176) && (LCD_WIDTH != 138)
+/* These need adjusting for the iPod Nano and Mini */
 sudoku.c
 #endif
 #if CONFIG_LCD == LCD_SSD1815

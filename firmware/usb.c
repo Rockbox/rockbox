@@ -172,7 +172,8 @@ void usb_enable(bool on)
     if (on)
     {
       /* The following code is copied from ipodlinux */
-#if defined (APPLE_IPODCOLOR) || defined(APPLE_IPOD3G) || defined(APPLE_IPOD4G)
+#if defined(APPLE_IPODCOLOR) || defined(APPLE_IPOD3G) || \
+    defined(APPLE_IPOD4G) || defined(APPLE_IPODMINI)
         unsigned char* storage_ptr = (unsigned char *)0x40017F00;
 #elif defined(APPLE_IPODNANO) || defined(APPLE_IPODVIDEO)
         unsigned char* storage_ptr = (unsigned char *)0x4001FF00;

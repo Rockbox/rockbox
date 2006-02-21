@@ -72,7 +72,7 @@ void usage(void)
            "\t-iaudio iAudio format\n"
            "\t-add=X  Rockbox generic \"add-up\" checksum format\n"
            "\t        (X values: h100, h120, h140, h300, ipco, nano, ipvd\n"
-           "\t                   ip3g, ip4g)\n"
+           "\t                   ip3g, ip4g, mini)\n"
            "\nNo option results in Archos standard player/recorder format.\n");
 
     exit(1);
@@ -178,6 +178,8 @@ int main (int argc, char** argv)
             modelnum = 7;
         else if(!strcmp(&argv[1][5], "ip4g"))
             modelnum = 8;
+        else if(!strcmp(&argv[1][5], "mini"))
+            modelnum = 9;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

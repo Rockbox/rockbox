@@ -98,6 +98,7 @@
 #define BL_IPOD3G        7 /* Apple iPod 3g with dock */
 #define BL_IRIVER_H300   8 /* IRiver PWM */
 #define BL_IRIVER_IFP7XX 9 /* IRiver GPIO */
+#define BL_IPODMINI      10 /* Apple iPod Mini */
 
 /* CONFIG_I2C */
 #define I2C_PLAYREC  0 /* Archos Player/Recorder style */
@@ -159,6 +160,8 @@
 #include "config-ipod4g.h"
 #elif defined(IRIVER_IFP7XX)
 #include "config-ifp7xx.h"
+#elif defined(IPOD_MINI)
+#include "config-ipodmini.h"
 #else
 /* no known platform */
 #endif

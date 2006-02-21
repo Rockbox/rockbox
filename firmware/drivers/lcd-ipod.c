@@ -105,8 +105,13 @@ static void lcd_cmd_and_data(int cmd, int data_lo, int data_hi)
  * LCD init 
  **/
 void lcd_init_device(void){
+#ifdef APPLE_IPODMINI
+    lcd_cmd_and_data(0x1, 0x0, 0xd);
+#else
     /* driver output control - 160x128 */
     lcd_cmd_and_data(0x1, 0x1, 0xf);
+#endif
+
     lcd_cmd_and_data(0x5, 0x0, 0x10);
 
 #ifdef APPLE_IPOD4G

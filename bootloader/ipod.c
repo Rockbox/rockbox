@@ -325,6 +325,10 @@ void* main(void)
     /* set port B03 on */
     outl(((0x100 | 1) << 3), 0x6000d824);
 
+#elif CONFIG_BACKLIGHT==BL_IPODMINI
+    /* set port B03 on */
+    outl(((0x100 | 1) << 3), 0x6000d824);
+
 #elif CONFIG_BACKLIGHT==BL_IPODNANO
 
     /* set port B03 on */
