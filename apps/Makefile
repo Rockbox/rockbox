@@ -8,7 +8,7 @@
 #
 
 INCLUDES= -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I. -I$(BUILDDIR)	\
- -I$(OBJDIR)
+ -I$(BUILDDIR)/bitmaps -I$(OBJDIR)
 
 DEPFILE = $(OBJDIR)/dep-apps
 LDS := $(FIRMDIR)/app.lds
@@ -85,6 +85,8 @@ endif
 all: $(REALBIN) $(FLASHFILE) $(CODECS) $(ROCKS) $(ARCHOSROM)
 endif
 
+$(DEPFILE): $(BITMAPLIBS)
+
 dep: $(DEPFILE)
 
 build-codecs:
@@ -95,7 +97,7 @@ build-bitmaps:
 	@$(MAKE) -C bitmaps OBJDIR=$(OBJDIR)/bitmaps
 
 $(BITMAPLIBS): build-bitmaps
-	
+
 rocks: build-codecs
 	@$(MAKE) -C plugins/lib OBJDIR=$(OBJDIR)/plugins/lib
 	@$(MAKE) -C plugins  OBJDIR=$(OBJDIR)/plugins
@@ -212,6 +214,7 @@ clean:
 	@$(MAKE) -C plugins clean OBJDIR=$(OBJDIR)/plugins
 	@$(MAKE) -C codecs clean OBJDIR=$(OBJDIR)/codecs
 	@rm -rf $(OBJDIR)/recorder $(OBJDIR)/player
+	@rm -rf $(BUILDDIR)/bitmaps
 ifdef SIMVER
 	@$(MAKE) -C $(SIMDIR) clean
 endif

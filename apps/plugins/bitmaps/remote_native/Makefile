@@ -21,6 +21,7 @@ DEPFILE = $(OBJDIR)/dep-bitmaps-remotenative
 
 BMP2RB = $(BMP2RB_REMOTENATIVE)
 OUTPUT = $(BUILDDIR)/libpluginbitmapsremotenative.a
+BMPINCDIR = $(BUILDDIR)/pluginbitmaps
 
 include $(TOOLSDIR)/makebmp.inc
 

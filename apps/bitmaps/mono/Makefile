@@ -21,6 +21,7 @@ DEPFILE = $(OBJDIR)/dep-bitmaps-mono
 
 BMP2RB = $(BMP2RB_MONO)
 OUTPUT = $(BUILDDIR)/libbitmapsmono.a
+BMPINCDIR = $(BUILDDIR)/pluginbitmaps
 
 include $(TOOLSDIR)/makebmp.inc
 

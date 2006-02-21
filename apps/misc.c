@@ -604,12 +604,12 @@ int show_logo( void )
     int font_h, font_w;
 
     lcd_clear_display();
-    lcd_bitmap(rockboxlogo, 0, 10, ROCKBOXLOGO_WIDTH, ROCKBOXLOGO_HEIGHT);
+    lcd_bitmap(rockboxlogo, 0, 10, BMPWIDTH_rockboxlogo, BMPHEIGHT_rockboxlogo);
 
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_clear_display();
-    lcd_remote_bitmap(remote_rockboxlogo,10,14,REMOTE_ROCKBOXLOGO_WIDTH,
-                      REMOTE_ROCKBOXLOGO_HEIGHT);
+    lcd_remote_bitmap(remote_rockboxlogo,10,14,BMPWIDTH_remote_rockboxlogo,
+                      BMPHEIGHT_remote_rockboxlogo);
 #endif
 
     snprintf(version, sizeof(version), "Ver. %s", appsversion);

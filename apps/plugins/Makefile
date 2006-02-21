@@ -8,7 +8,8 @@
 #
 
 INCLUDES = -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I$(FIRMDIR)/common \
- -I$(FIRMDIR)/drivers -I$(APPSDIR) -Ilib -I$(BUILDDIR)
+ -I$(FIRMDIR)/drivers -I$(APPSDIR) -Ilib -I$(BUILDDIR) \
+ -I$(BUILDDIR)/pluginbitmaps
 CFLAGS = $(GCCOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES)	\
  -DTARGET_ID=$(TARGET_ID) -DMEM=${MEMORYSIZE} -DPLUGIN
 
@@ -71,6 +72,10 @@ endif
 
 .PHONY: $(SUBDIRS)
 all: $(BUILDDIR)/libplugin.a $(ROCKS) $(SUBDIRS) $(DEPFILE)
+
+$(DEPFILE): $(BITMAPLIBS)
+
+dep: $(DEPFILE)
 
 $(BUILDDIR)/credits.raw: $(DOCSDIR)/CREDITS
 	@echo "create credits.raw"
@@ -197,5 +202,6 @@ clean:
 	$(SILENT)$(MAKE) -C bitmaps/remote_native clean OBJDIR=$(OBJDIR)/bitmaps/remote_native
 	$(SILENT)$(MAKE) -C rockboy clean OBJDIR=$(OBJDIR)/rockboy
 	$(SILENT)$(MAKE) -C searchengine clean OBJDIR=$(OBJDIR)/searchengine
+	@rm -rf $(BUILDDIR)/pluginbitmaps
 
 -include $(DEPFILE)

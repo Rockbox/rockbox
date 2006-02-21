@@ -21,11 +21,19 @@
 
 #include <lcd.h>
 
+#ifdef HAVE_LCD_BITMAP
+
+/* External bitmaps */
+
+#include <rockboxlogo.h>
+#ifdef HAVE_REMOTE_LCD
+#include <remote_rockboxlogo.h>
+#endif
+
 /*
  * Icons of size 6x8 pixels
  */
 
-#ifdef HAVE_LCD_BITMAP
 
 /* Symbolic names for icons */
 enum icons_5x8 {
@@ -77,45 +85,6 @@ extern const unsigned char bitmap_icons_5x8[Icon5x8Last][5];
 extern const unsigned char bitmap_icons_6x8[Icon6x8Last][6];
 extern const unsigned char bitmap_icons_7x8[Icon7x8Last][7];
 extern const unsigned char bitmap_icon_disk[];
-
-extern const fb_data rockboxlogo[];
-
-#if LCD_DEPTH == 1
-/* Archos targets */
-#define ROCKBOXLOGO_WIDTH 112
-#define ROCKBOXLOGO_HEIGHT 37
-
-#elif (LCD_WIDTH == 160) && (LCD_DEPTH == 2)
-/* iRiver H1x0 */
-#define ROCKBOXLOGO_WIDTH 160
-#define ROCKBOXLOGO_HEIGHT 53
-
-#elif (LCD_WIDTH == 160) && (LCD_DEPTH == 16)
-/* iAudio X5 */
-#define ROCKBOXLOGO_WIDTH 160
-#define ROCKBOXLOGO_HEIGHT 50
-
-#elif (LCD_WIDTH == 176) && (LCD_DEPTH == 16)
-/* iPod Nano */
-#define ROCKBOXLOGO_WIDTH 176
-#define ROCKBOXLOGO_HEIGHT 54
-
-#elif (LCD_WIDTH == 320) && (LCD_DEPTH == 16)
-/* iPod Video */
-#define ROCKBOXLOGO_WIDTH 320
-#define ROCKBOXLOGO_HEIGHT 98
-
-#elif (LCD_WIDTH >= 220) && (LCD_DEPTH == 16)
-/* iriver H3x0, iPod Color/Photo */
-#define ROCKBOXLOGO_WIDTH 220
-#define ROCKBOXLOGO_HEIGHT 68
-#endif
-
-#ifdef HAVE_REMOTE_LCD
-extern const unsigned char remote_rockboxlogo[];
-#define REMOTE_ROCKBOXLOGO_WIDTH 112
-#define REMOTE_ROCKBOXLOGO_HEIGHT 37
-#endif
 
 #define STATUSBAR_X_POS       0
 #define STATUSBAR_Y_POS       0 /* MUST be a multiple of 8 */

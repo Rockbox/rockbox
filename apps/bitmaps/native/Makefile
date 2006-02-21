@@ -21,6 +21,7 @@ DEPFILE = $(OBJDIR)/dep-bitmaps-native
 
 BMP2RB = $(BMP2RB_NATIVE)
 OUTPUT = $(BUILDDIR)/libbitmapsnative.a
+BMPINCDIR = $(BUILDDIR)/bitmaps
 
 include $(TOOLSDIR)/makebmp.inc
 

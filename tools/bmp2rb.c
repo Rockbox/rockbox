@@ -412,22 +412,47 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
  * some #define's
  ****************************************************************************/
 
-void generate_c_source(char *id, int width, int height,
+void generate_c_source(char *id, char* header_dir, int width, int height,
                        const unsigned short *t_bitmap, int t_width,
                        int t_height, int t_depth)
 {
     FILE *f;
+    FILE *fh;
     int i, a;
-
-    f = stdout;
+    char header_name[1024];
 
     if (!id || !id[0])
         id = "bitmap";
 
-    fprintf(f,
-            "#define BMPHEIGHT_%s %ld\n"
-            "#define BMPWIDTH_%s %ld\n",
-            id, height, id, width);
+    f = stdout;
+
+    if (header_dir && header_dir[0])
+    {
+        snprintf(header_name,sizeof(header_name),"%s/%s.h",header_dir,id);
+        fh = fopen(header_name,"w+");
+
+        if (fh == NULL)
+        {
+            debugf("error - can't open '%s'\n", header_name);
+            return;
+        }
+        fprintf(fh,
+                "#define BMPHEIGHT_%s %ld\n"
+                "#define BMPWIDTH_%s %ld\n",
+                id, height, id, width);
+        if (t_depth <= 8)
+            fprintf(fh, "extern const unsigned char %s[];\n", id);
+        else
+            fprintf(fh, "extern const unsigned short %s[];\n", id);
+
+        fclose(fh);
+    } else {
+        fprintf(f,
+                "#define BMPHEIGHT_%s %ld\n"
+                "#define BMPWIDTH_%s %ld\n",
+                id, height, id, width);
+    }
+
     if (t_depth <= 8)
         fprintf(f, "const unsigned char %s[] = {\n", id);
     else
@@ -478,6 +503,7 @@ void print_usage(void)
 {
     printf("Usage: %s [-i <id>] [-a] <bitmap file>\n"
            "\t-i <id>  Bitmap name (default is filename without extension)\n"
+           "\t-h <dir> Create header file in <dir>/<id>.h\n"
            "\t-a       Show ascii picture of bitmap\n"
            "\t-f <n>   Generate destination format n, default = 0\n"
            "\t         0  Archos recorder, Ondio, Gmini 120/SP, Iriver H1x0 mono\n"
@@ -495,6 +521,7 @@ int main(int argc, char **argv)
 {
     char *bmp_filename = NULL;
     char *id = NULL;
+    char* header_dir = NULL;
     int i;
     int ascii = false;
     int format = 0;
@@ -510,6 +537,23 @@ int main(int argc, char **argv)
         {
             switch (argv[i][1])
             {
+              case 'h':   /* .h filename */
+                if (argv[i][2])
+                {
+                    header_dir = &argv[i][2];
+                }
+                else if (argc > i+1)
+                {
+                    header_dir = argv[i+1];
+                    i++;
+                }
+                else
+                {
+                    print_usage();
+                    exit(1);
+                }
+                break;
+
               case 'i':   /* ID */
                 if (argv[i][2])
                 {
@@ -600,7 +644,8 @@ int main(int argc, char **argv)
         if (transform_bitmap(bitmap, width, height, format, &t_bitmap,
                              &t_width, &t_height, &t_depth))
             exit(1);
-        generate_c_source(id, width, height, t_bitmap, t_width, t_height, t_depth);
+        generate_c_source(id, header_dir, width, height, t_bitmap, 
+                          t_width, t_height, t_depth);
     }
 
     return 0;
