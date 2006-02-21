@@ -1,5 +1,5 @@
 /*
- * This config file is for the Apple iPod Color/Photo
+ * This config file is for the Apple iPod Mini (1st & 2nd Gen)
  */
 #define APPLE_IPODMINI 1
 
