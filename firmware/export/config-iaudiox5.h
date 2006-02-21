@@ -30,8 +30,9 @@
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 
-/* Define this if you have an remote lcd */
+/* Define this if you have an remote lcd
 #define HAVE_REMOTE_LCD
+*/
 
 #define CONFIG_LCD LCD_X5
 
