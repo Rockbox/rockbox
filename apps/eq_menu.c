@@ -33,7 +33,6 @@
 #include "screens.h"
 #include "icons.h"
 #include "font.h"
-#include "widgets.h"
 #include "lang.h"
 #include "sprintf.h"
 #include "talk.h"
@@ -45,6 +44,7 @@
 #include "talk.h"
 #include "screen_access.h"
 #include "keyboard.h"
+#include "gui/scrollbar.h"
 
 /* Key definitions */
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD || \
@@ -345,9 +345,6 @@ static bool eq_advanced_menu(void)
     return result;
 }
 
-#define SLIDER_KNOB_HEIGHT  6
-#define SLIDER_KNOB_WIDTH 4
-
 enum eq_slider_mode {
     GAIN,
     CUTOFF,
@@ -360,22 +357,8 @@ enum eq_type {
     HIGH_SHELF
 };
 
-/* Draw a slider */
-static void draw_slider(const struct screen * screen, int x, int y,
-                           int width, int steps, int current_step)
-{
-    int knob_x = ((width * 100 / steps) * current_step) / 100
-        + (SLIDER_KNOB_WIDTH / 2);
-
-    /* Draw groove */
-    screen->fillrect(x, y + 2, width, 2);
-
-    /* Draw knob */
-    screen->fillrect(x + knob_x, y, SLIDER_KNOB_WIDTH, SLIDER_KNOB_HEIGHT);
-}
-
 /* Draw the UI for a whole EQ band */
-static int draw_eq_slider(const struct screen * screen, int x, int y,
+static int draw_eq_slider(struct screen * screen, int x, int y,
     int width, int cutoff, int q, int gain, bool selected,
     enum eq_slider_mode mode, enum eq_type type)
 {
@@ -386,6 +369,7 @@ static int draw_eq_slider(const struct screen * screen, int x, int y,
     int abs_gain = abs(gain);
     int current_x, total_height, separator_width, separator_height;
     int w, h;
+    const int slider_height = 6;  
 
     /* Start two pixels in, one for border, one for margin */
     current_x = x + 2;
@@ -394,7 +378,7 @@ static int draw_eq_slider(const struct screen * screen, int x, int y,
     screen->getstringsize(separator, &separator_width, &separator_height);
     
     /* Total height includes margins, text, and line selector */
-    total_height = separator_height + SLIDER_KNOB_HEIGHT + 2 + 3;
+    total_height = separator_height + slider_height + 2 + 3;
     
     /* Print out the band label */
     if (type == LOW_SHELF) {
@@ -463,9 +447,10 @@ static int draw_eq_slider(const struct screen * screen, int x, int y,
         screen->drawrect(x, y, width, total_height);
     }
 
-    /* Draw horizontal slider */
-    draw_slider(screen, x + 3, y + h + 3, width - 6, steps,
-        abs(EQ_GAIN_MIN) + gain);
+    /* Draw horizontal slider. Reuse scrollbar for this */
+    gui_scrollbar_draw(screen, x + 3, y + h + 3, width - 6, slider_height, steps,
+        abs(EQ_GAIN_MIN) + gain - 10, abs(EQ_GAIN_MIN) + gain + 10,
+        HORIZONTAL);
 
     return total_height;
 }
