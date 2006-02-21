@@ -364,22 +364,40 @@ static int draw_eq_slider(struct screen * screen, int x, int y,
 {
     char buf[26];
     const char separator[2] = " ";
-    int steps = EQ_GAIN_MAX - EQ_GAIN_MIN;
-    int abs_q = abs(q);
+    int steps, min_item, max_item;
     int abs_gain = abs(gain);
     int current_x, total_height, separator_width, separator_height;
     int w, h;
     const int slider_height = 6;  
+
+    switch(mode) {
+    case Q:
+        steps = EQ_Q_MAX - EQ_Q_MIN;
+        min_item = q - EQ_Q_STEP - EQ_Q_MIN;
+        max_item = q + EQ_Q_STEP - EQ_Q_MIN;
+        break;        
+    case CUTOFF:
+        steps = EQ_CUTOFF_MAX - EQ_CUTOFF_MIN;
+        min_item = cutoff - EQ_CUTOFF_FAST_STEP * 2;
+        max_item = cutoff + EQ_CUTOFF_FAST_STEP * 2;
+        break;         
+    case GAIN:
+    default:
+        steps = EQ_GAIN_MAX - EQ_GAIN_MIN;
+        min_item = abs(EQ_GAIN_MIN) + gain - EQ_GAIN_STEP * 5;
+        max_item = abs(EQ_GAIN_MIN) + gain + EQ_GAIN_STEP * 5;
+        break;
+    }
 
     /* Start two pixels in, one for border, one for margin */
     current_x = x + 2;
 
     /* Figure out how large our separator string is */
     screen->getstringsize(separator, &separator_width, &separator_height);
-    
+
     /* Total height includes margins, text, and line selector */
     total_height = separator_height + slider_height + 2 + 3;
-    
+
     /* Print out the band label */
     if (type == LOW_SHELF) {
         screen->putsxy(current_x, y + 2, "LS:");
@@ -408,18 +426,18 @@ static int draw_eq_slider(struct screen * screen, int x, int y,
     screen->putsxy(current_x, y + 2, buf);
     screen->getstringsize(buf, &w, &h);
     current_x += w;
-    
+
     /* Print separator */
     screen->set_drawmode(DRMODE_SOLID);
     screen->putsxy(current_x, y + 2, separator);
     current_x += separator_width;
-    
+
     /* Print out cutoff part of status line */
     snprintf(buf, sizeof(buf),  "%5dHz", cutoff);
 
     if (mode == CUTOFF && selected)
         screen->set_drawmode(DRMODE_SOLID | DRMODE_INVERSEVID);
-    
+
     screen->putsxy(current_x, y + 2, buf);
     screen->getstringsize(buf, &w, &h);
     current_x += w;
@@ -430,8 +448,8 @@ static int draw_eq_slider(struct screen * screen, int x, int y,
     current_x += separator_width;
 
     /* Print out Q part of status line */
-    snprintf(buf, sizeof(buf), "%d.%d Q", abs_q / EQ_USER_DIVISOR,
-        abs_q % EQ_USER_DIVISOR);
+    snprintf(buf, sizeof(buf), "%d.%d Q", q / EQ_USER_DIVISOR,
+        q % EQ_USER_DIVISOR);
 
     if (mode == Q && selected)
         screen->set_drawmode(DRMODE_SOLID | DRMODE_INVERSEVID);
@@ -449,8 +467,7 @@ static int draw_eq_slider(struct screen * screen, int x, int y,
 
     /* Draw horizontal slider. Reuse scrollbar for this */
     gui_scrollbar_draw(screen, x + 3, y + h + 3, width - 6, slider_height, steps,
-        abs(EQ_GAIN_MIN) + gain - 10, abs(EQ_GAIN_MIN) + gain + 10,
-        HORIZONTAL);
+        min_item, max_item, HORIZONTAL);
 
     return total_height;
 }
