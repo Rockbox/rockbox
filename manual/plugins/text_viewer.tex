@@ -1,0 +1,190 @@
+\subsection{Text Viewer}
+This is a Viewer for text files with word wrap. Just press PLAY on a
+.txt file to display it. Has controls to handle various styles of text
+formatting. Has top{}-of{}-file and bottom{}-of{}-file buttons.  You
+can view files without a .txt extension by using \textbf{Open with ..}
+from the Play Screen menu
+
+\subsubsection{Controls}
+
+\begin{itemize}
+\item \textbf{F1 (Recorder) / ON{}-MINUS (Player): }
+toggles Word mode between Wrap and Chop:
+
+\begin{itemize}
+\item Wrap breaks lines at white space or hyphen.
+\item Chop breaks lines at the maximum column limit.
+\end{itemize}
+
+\item \textbf{F2 (Recorder) / ON{}-MENU{}-PLUS (Player): }
+cycles Line mode through Normal, Join and Expand:
+
+\begin{itemize}
+\item Normal breaks lines at newline characters.
+\item Join ignores unpaired newline characters  (i.e., joins lines). Useful for
+adopting the orphans that occur with e{}-mail style (i.e.,pre{}-wrapped) text files.
+\item Expand doubles unpaired newlines (i.e., adds a blank line). Useful
+for making the paragraphs clearer in some book style text files.
+\end{itemize}
+
+\item \textbf{F3 (Recorder) / ON{}-PLUS (Player):} 
+toggles View mode between Narrow and Wide:
+
+\begin{itemize}
+\item Narrow sets maximum column to the screen width.
+\item Wide sets maximum column to 114. Useful for navigating large
+files. (Currently, Wide and Join cannot be selected together.)
+\end{itemize}
+
+\item \textbf{ON{}-F1 (Recorder):} 
+toggles Page mode between Normal and Overlap:
+
+\begin{itemize}
+\item Normal sets page{}-down/page{}-up to one full screen.
+\item Overlap tells page{}-down/page{}-up to retain one line from
+previous screen.
+\end{itemize}
+
+\item \textbf{ON{}-F3 (Recorder):} 
+toggles Scrollbar mode, for the current View mode.
+
+\begin{itemize}
+\item Narrow mode has no scrollbar by default, until toggled.
+\item Wide mode has a scrollbar by default, until toggled.
+\item If file fits on one screen, there is no scrollbar and ON{}-F3 has
+no effect.
+\end{itemize}
+\end{itemize}
+
+Settings are not remembered after the viewer has been exited. 
+Keys are as follows:
+
+\subsubsection{Recorder}
+
+\begin{tabular}[c]{|p{3.317cm}|p{7.104cm}|}
+\hline
+{\centering\bfseries\itshape
+KEY
+\par}
+&
+{\centering\bfseries\itshape
+ACTION
+\par}
+\\\hline
+{\centering
+UP
+\par}
+&
+Page{}-up (one screen up)
+\\\hline
+{\centering
+DOWN
+\par}
+&
+Page{}-down (one screen down)
+\\\hline
+{\centering
+LEFT
+\par}
+&
+Top of file (Narrow mode)\newline
+One screen left (Wide mode)
+\\\hline
+{\centering
+RIGHT
+\par}
+&
+Bottom of file (Narrow mode)\newline
+One screen right (Wide mode)
+\\\hline
+{\centering
+ON{}-UP
+\par}
+&
+One line up
+\\\hline
+{\centering
+ON{}-DOWN
+\par}
+&
+One line down
+\\\hline
+{\centering
+ON{}-LEFT 
+\par}
+&
+One column left
+\\\hline
+{\centering
+ON{}-RIGHT
+\par}
+&
+One column right
+\\\hline
+{\centering
+OFF
+\par}
+&
+Exit text viewer
+\\\hline
+\end{tabular}
+
+\subsubsection{Player}
+
+\begin{tabular}[c]{|p{3.291cm}|p{7.131cm}|}
+\hline
+{\centering\bfseries\itshape
+KEY
+\par}
+&
+{\centering\bfseries\itshape
+ACTION
+\par}
+\\\hline
+{\centering
+MINUS
+\par}
+&
+Page{}-up (one screen up)
+\\\hline
+{\centering
+PLUS
+\par}
+&
+Page{}-down (one screen down)
+\\\hline
+{\centering
+MENU MINUS
+\par}
+&
+Top of file (Narrow mode)\newline
+One screen left (Wide mode)
+\\\hline
+{\centering
+MENU PLUS
+\par}
+&
+Bottom of file (Narrow mode)\newline
+One screen right (Wide mode)
+\\\hline
+{\centering
+STOP
+\par}
+&
+Exit text viewer
+\\\hline
+\end{tabular}
+
+\subsubsection{Compatibility}
+
+\begin{itemize}
+\item Correctly reads plain text files in Unix, Win/DOS, or Macintosh
+format. Latin{}-alphabet Unicode files are  a l m o s t  r e a d a b l
+e.
+\item Currently prefers fixed{}-width fonts. With proportional fonts,
+pretends all characters are the width of a lower{}-case 'o'.
+\item Currently messages are in English 
+\item Does not currently support right{}-to{}-left languages.
+\end{itemize}
+
+

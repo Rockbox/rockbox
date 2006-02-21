@@ -1,0 +1,105 @@
+\subsection{Clock}
+{\centering\itshape
+  [Warning: Image ignored] % Unhandled or unsupported graphics:
+%\includegraphics[width=3.528cm,height=2.016cm]{images/rockbox-manual-img63.png}
+ \newline
+Clock
+\par}
+
+This is a fully featured analogue and digital clock program.  
+
+\subsubsection{Key configuration}
+
+\begin{center}\begin{tabular}{|p{2.411cm}|p{6.012cm}|}
+\hline
+{\centering\bfseries\itshape
+KEY
+\par}
+&
+{\centering\bfseries\itshape
+ACTION
+\par}
+\\\hline
+{\centering
+F1
+\par}
+&
+Help
+\\\hline
+{\centering
+F2
+\par}
+&
+Start / Stop stopwatch
+\\\hline
+{\centering
+F2 (Hold)
+\par}
+&
+Reset stopwatch
+\\\hline
+{\centering
+F3
+\par}
+&
+Options
+\\\hline
+{\centering
+Play
+\par}
+&
+Select clock mode
+\\\hline
+{\centering
+UP
+\par}
+&
+Enable idle power off
+\\\hline
+{\centering
+DOWN
+\par}
+&
+Disable idle power off
+\\\hline
+{\centering
+RIGHT
+\par}
+&
+Enable backlight
+\\\hline
+{\centering
+LEFT
+\par}
+&
+Disable backlight
+\\\hline
+{\centering
+OFF
+\par}
+&
+Save settings to disk and exit
+\\\hline
+\end{tabular}\end{center}
+
+\subsubsection{Backlight configuration}
+If RIGHT or LEFT is not pressed during clock operation (with the
+exception of at the Help/Options/Mode Selector/Credit screens) then the
+backlight timeout will remain your Rockbox default setting (example, 15
+seconds). If RIGHT or LEFT is pressed, Clock will set the backlight to
+ON or OFF, respectively. When Clock is exited, your default Rockbox
+setting for Backlight will be restored. 
+
+\subsubsection{Saving Settings}
+Settings are saved to disk when Clock is exited. They are saved to
+\textbf{/.rockbox/rocks/.clock\_settings''}. To reset your settings
+back to the defaults, simply navigate to this file using Rockbox,
+highlight it, and press the ON+PLAY keys to get the Delete option. This way you can feel free to experiment with the settings {}- and you could even load
+separate settings, say, one for your desk at home and one for in the car {}- by keeping two files in your \textbf{/.rockbox/rocks} folder such as
+``h.clock\_settings'' and ``c.clock\_settings''. Simply remove the
+``h'' for your home settings to go into effect, or add the ``h'' back and take off the ``c'' for your car settings.
+
+In the future, loading different settings will probably be made easier
+through a built{}-in settings file loader in Clock. 
+
+

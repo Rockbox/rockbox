@@ -1,0 +1,16 @@
+\subsection{Battery\_test}
+\begin{figure}[h]
+\begin{center}
+%\includegraphics{plugins/images/\platform/ss_battery_test.png}
+\end{center}
+\caption{Battery Test}
+\end{figure}
+
+This plugin simulates normal power drain by spinning up the disk and
+reading a big file once every 90 seconds (or thereabouts). Each
+spin up also writes the battery level to a
+log file. The test stops when battery level reaches 4\% in order to
+avoid being unable to write to the disk.  The power usage data is saved
+to a file in the root directory of the Jukebox.  This plugin can
+sometimes be useful for diagnosing problems with battery charging.
+

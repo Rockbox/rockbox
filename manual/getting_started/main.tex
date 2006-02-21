@@ -26,7 +26,7 @@ uses no fragments of the original firmware.  Not only is it free to
 use, it's also released under the GNU public license,
 which means that it will always remain free to both use and to change.
 
-\opt{OndioSP,OndioFM}{Although Rockbox also runs on the Archos Ondio series of
+\opt{Ondio}{Although Rockbox also runs on the Archos Ondio series of
 flash based MP3 players,  this is a recent development, which is not covered
 fully in this manual.  Most of this manual will, however, apply equally to
 Rockbox on the Ondio Jukeboxes.  For more details on the Ondio port, please
@@ -72,9 +72,11 @@ your \playername drive. You can do this using a program such as
 
 You will need to unpack all of the files in the archive onto your hard
 disk. If this has been done correctly, you will have a file called
-\opt{PS}{\fname{archos.mod}}
-\opt{Rec,Rec2,FMRec}{\fname{ajbrec.ajz}}
-\opt{H120,H340}{\fname{rockbox.iriver}}
+\opt{h1xx,h300}{\fname{rockbox.iriver}}
+\opt{ipodcolor,ipodnano}{\fname{rockbox.ipod?}}
+\opt{ondio}{\fname{rockbox.ondio?}}
+\opt{player}{\fname{archos.mod}}
+\opt{recorder,recorderv2fm}{\fname{ajbrec.ajz}}
 in the main folder of your \playername drive, and also a folder called
 /\fname{.rockbox}, which contains a number of system files used by the
 software.
@@ -104,9 +106,11 @@ Rockbox is loaded and ready for use.
 If you would like to go back to using the
 original \playername software, then connect the \playername up to your computer,
 and delete the 
-\opt{PS}{\fname{archos.mod}}
-\opt{Rec,Rec2,FMRec}{\fname{ajbrec.ajz}}
-\opt{H120,H340}{\fname{rockbox.iriver}}
+\opt{h1xx,h300}{\fname{rockbox.iriver}}
+\opt{ipodcolor,ipodnano}{\fname{rockbox.ipod?}}
+\opt{ondio}{\fname{rockbox.ondio?}}
+\opt{player}{\fname{archos.mod}}
+\opt{recorder,recorderv2fm}{\fname{ajbrec.ajz}}
 If you wish to clean up your disk, you may also wish to delete the
 \fname{.rockbox} folder and its contents. Turn the \playername off and on and
 the normal \playername software will load.
