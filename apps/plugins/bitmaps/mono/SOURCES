@@ -1,0 +1,22 @@
+#ifdef HAVE_LCD_BITMAP
+
+/* BrickMania */
+#if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
+
+brickmania_bricks.112x64x1.bmp
+brickmania_ball.112x64x1.bmp
+brickmania_help.112x64x1.bmp
+brickmania_no_resume.112x64x1.bmp
+brickmania_pads.112x64x1.bmp
+brickmania_powerups.112x64x1.bmp
+brickmania_quit.112x64x1.bmp
+brickmania_resume.112x64x1.bmp
+brickmania_sel_help.112x64x1.bmp
+brickmania_sel_resume.112x64x1.bmp
+brickmania_sel_quit.112x64x1.bmp
+brickmania_sel_start.112x64x1.bmp
+brickmania_start.112x64x1.bmp
+
+#endif
+
+#endif /* HAVE_LCD_BITMAP */

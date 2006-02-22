@@ -38,9 +38,8 @@ solitaire.c
 bejeweled.c
 #endif
 bounce.c
-/* H300, H100 and iPod Nano/Color/Video only */
-#if ((LCD_WIDTH >= 176) && (LCD_HEIGHT >= 132) && (LCD_DEPTH == 16)) || \
-    ((LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH==2))
+#if (LCD_WIDTH != 138) && (LCD_WIDTH != 128)
+/* These need adjusting for the Mini's and iRiver if'p screen */
 brickmania.c
 #endif
 calculator.c

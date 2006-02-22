@@ -61,7 +61,7 @@ brickmania_sel_start.220x176x16.bmp
 brickmania_start.220x176x16.bmp
 brickmania_break.220x176x16.bmp
 
-#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 2)
+#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128)
 brickmania_ball.160x128x2.bmp
 brickmania_bricks.160x128x2.bmp
 brickmania_gameover.160x128x2.bmp
