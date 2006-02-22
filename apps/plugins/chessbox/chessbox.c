@@ -6,7 +6,7 @@
 *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 *                     \/            \/     \/    \/            \/
 *
-* Copyright (C) 2006 Miguel A. ArÃ©valo
+* Copyright (C) 2006 Miguel A. Arévalo 
 * Color graphics from eboard
 * GNUChess v2 chess engine Copyright (c) 1988  John Stanback
 *
