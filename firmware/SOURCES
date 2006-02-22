@@ -45,6 +45,11 @@ common/memcpy.c
 common/memmove.c
 common/memset.c
 #endif
+#ifdef CPU_COLDFIRE
+common/memset16_a.S
+#else
+common/memset16.c
+#endif
 #ifdef HAVE_LCD_CHARCELLS
 drivers/lcd-player-charset.c
 drivers/lcd-player.c
