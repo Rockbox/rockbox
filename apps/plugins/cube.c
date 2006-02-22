@@ -84,12 +84,12 @@ PLUGIN_HEADER
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define CUBE_QUIT          BUTTON_MENU
-#define CUBE_X_INC         BUTTON_LEFT
-#define CUBE_X_DEC         BUTTON_RIGHT
+#define CUBE_X_INC         BUTTON_RIGHT
+#define CUBE_X_DEC         BUTTON_LEFT
 #define CUBE_Y_INC         BUTTON_SCROLL_FWD
 #define CUBE_Y_DEC         BUTTON_SCROLL_BACK
-#define CUBE_Z_INC         (BUTTON_SELECT | BUTTON_LEFT)
-#define CUBE_Z_DEC         (BUTTON_SELECT | BUTTON_RIGHT)
+#define CUBE_Z_INC         (BUTTON_SELECT | BUTTON_RIGHT)
+#define CUBE_Z_DEC         (BUTTON_SELECT | BUTTON_LEFT)
 #define CUBE_MODE          (BUTTON_SELECT | BUTTON_MENU)
 #define CUBE_PAUSE_PRE     BUTTON_PLAY
 #define CUBE_PAUSE         (BUTTON_PLAY | BUTTON_REL)
@@ -370,10 +370,10 @@ static void cube_rotate(int xa, int ya, int za)
     {
         point3D[i].x = matrice[0][0] * sommet[i].x + matrice[1][0] * sommet[i].y
                      + matrice[2][0] * sommet[i].z;
-        
+
         point3D[i].y = matrice[0][1] * sommet[i].x + matrice[1][1] * sommet[i].y
                      + matrice[2][1] * sommet[i].z;
-        
+
         point3D[i].z = matrice[0][2] * sommet[i].x + matrice[1][2] * sommet[i].y
                      + matrice[2][2] * sommet[i].z;
     }
@@ -465,7 +465,7 @@ static void cube_draw(void)
             }
         }
         break;
-      
+
       case WIREFRAME:
 
         for (i = 0; i < 12; i++)
@@ -666,7 +666,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 {
                 if (ys < 10)
                     ys++;
-                } 
+                }
                 else
                 {
                     ya++;
