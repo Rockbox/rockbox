@@ -22,13 +22,11 @@
 *
 ****************************************************************************/
 
-#ifndef SIMULATOR /* not for simulator by now */
 #include "plugin.h"
 
-#ifdef HAVE_LCD_BITMAP /* and also not for the Player */
-#ifdef HAVE_LCD_COLOR
-#include "xlcd.h"
-#else
+#if defined(HAVE_LCD_BITMAP) && (defined(HAVE_LCD_COLOR) || !defined(SIMULATOR))
+
+#ifndef HAVE_LCD_COLOR
 #include "gray.h"
 #endif
 
@@ -38,10 +36,13 @@ PLUGIN_HEADER
 
 static struct plugin_api* rb; /* global api struct pointer */
 static unsigned char wave_array[256];  /* Pre calculated wave array */
-static unsigned char colours[256]; /* Smooth transition of shades */
 #ifdef HAVE_LCD_COLOR
-static unsigned char colorbuffer[3*LCD_HEIGHT*LCD_WIDTH]; /* off screen buffer */
+static fb_data colours[256]; /* Smooth transition of shades */
+static int redfactor = 1, greenfactor = 2, bluefactor = 3;
+static int redphase = 0, greenphase = 50, bluephase = 100;
+           /* lower chance of gray at regular intervals */
 #else
+static unsigned char colours[256]; /* Smooth transition of shades */
 static unsigned char graybuffer[LCD_HEIGHT*LCD_WIDTH]; /* off screen buffer */
 static unsigned char *gbuf;
 static unsigned int gbuf_size = 0;
@@ -142,29 +143,50 @@ static void wave_table_generate(void)
     }
 }
 
-/*
- * This function is to make a smooth shade from white into
- * black and back into white again. I thought this would be quicker 
- * than calculating on the fly - am I wrong?
- */
-
-static void shades_generate(void)
+#ifdef HAVE_LCD_COLOR
+/* Make a smooth colour cycle. */
+void shades_generate(int time)
 {
-    int i=1;
-    int j=0;
-    int nAdd=2;
+    int i;
+    unsigned red, green, blue;
+    unsigned r = time * redfactor + redphase;
+    unsigned g = time * greenfactor + greenphase;
+    unsigned b = time * bluefactor + bluephase;
 
     for(i=0; i < 256; ++i)
     {
-        colours[i] = j;
-        j += nAdd;
+        r &= 0xFF; g &= 0xFF; b &= 0xFF;
 
-        if(j > 240 || j < 2)
-        {
-            nAdd = -nAdd;
-        }
+        red = 2 * r;
+        if (red > 255)
+            red = 510 - red;
+        green = 2 * g;
+        if (green > 255)
+            green = 510 - green;
+        blue = 2 * b;
+        if (blue > 255)
+            blue= 510 - blue;
+
+        colours[i] = LCD_RGBPACK(red, green, blue);
+
+        r++; g++; b++;
     }
 }
+#else
+/* Make a smooth shade from black into white and back into black again. */
+static void shades_generate(void)
+{
+    int i, y;
+
+    for(i=0; i < 256; ++i)
+    {
+        y = 2 * i;
+        if (y > 255)
+            y = 510 - y;
+        colours[i] = y;
+    }
+}
+#endif
 
 void cleanup(void *parameter)
 {
@@ -184,32 +206,25 @@ void cleanup(void *parameter)
 int main(void)
 {
     plasma_frequency = 1;
-    int shades, button, x, y;
+    int button, x, y;
     unsigned char p1,p2,p3,p4,t1,t2,t3,t4, z;
-    int n=0;
 #ifdef HAVE_LCD_COLOR
+    fb_data *ptr;
     int time=0;
-    int redfactor=1, greenfactor=2, bluefactor=3;
-    int redphase=0, greenphase=50, bluephase=100; /* lower chance of gray at *
-                                                   * regular intervals       */
+#else
+    unsigned char *ptr;
 #endif
+
     /*Generate the neccesary pre calced stuff*/
     wave_table_generate();
-    shades_generate();
 
-#ifdef HAVE_LCD_COLOR
-    shades = 256;
-#else
+#ifndef HAVE_LCD_COLOR
+    shades_generate();  /* statically */
+
     /* get the remainder of the plugin buffer */
     gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
 
-    shades = gray_init(rb, gbuf, gbuf_size, false, LCD_WIDTH, LCD_HEIGHT/8,
-                       32, NULL) + 1;
-#endif
-
-#ifdef HAVE_LCD_COLOR
-    xlcd_init(rb);
-#else
+    gray_init(rb, gbuf, gbuf_size, false, LCD_WIDTH, LCD_HEIGHT/8, 32, NULL);
     /* switch on grayscale overlay */
     gray_show(true);
 #endif
@@ -220,9 +235,14 @@ int main(void)
     p1=p2=p3=p4=0;
     while (true)
     {
+#ifdef HAVE_LCD_COLOR
+        shades_generate(time++); /* dynamically */
+        ptr = rb->lcd_framebuffer;
+#else
+        ptr = graybuffer;
+#endif
         t1=p1;
         t2=p2;
-        n=0;
         for(y = 0; y < LCD_HEIGHT; ++y)
         {
             t3=p3;
@@ -230,19 +250,10 @@ int main(void)
             for(x = 0; x < LCD_WIDTH; ++x)
             {
                 z = wave_array[t1] + wave_array[t2] + wave_array[t3]
-                  + wave_array[t4];
-#ifdef HAVE_LCD_COLOR
-                colorbuffer[n] = colours[(z+time*redfactor+redphase)%256];
-                ++n;
-                colorbuffer[n] = colours[(z+time*greenfactor+greenphase)%256];
-                ++n;
-                colorbuffer[n] = colours[(z+time*bluefactor+bluephase)%256];
-#else
-                graybuffer[n] = colours[z];
-#endif
+                  + wave_array[t4];  
+                *ptr++ = colours[z];
                 t3+=1;
                 t4+=2;
-                ++n;
             }
             t1+=2;
             t2+=1;
@@ -253,8 +264,6 @@ int main(void)
         p3+=sp3;
         p4-=sp4;
 #ifdef HAVE_LCD_COLOR
-        time++;
-        xlcd_color_bitmap(colorbuffer, 0, 0, LCD_WIDTH, LCD_HEIGHT);
         rb->lcd_update();
 #else
         gray_ub_gray_bitmap(graybuffer, 0, 0, LCD_WIDTH, LCD_HEIGHT);
@@ -317,5 +326,4 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     return ret;
 }
 
-#endif // #ifdef HAVE_LCD_BITMAP
-#endif // #ifndef SIMULATOR
+#endif // HAVE_LCD_BITMAP && (HAVE_LCD_COLOR || !SIMULATOR)
