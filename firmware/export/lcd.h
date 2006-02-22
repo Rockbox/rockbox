@@ -150,9 +150,11 @@ typedef void lcd_fastpixelfunc_type(fb_data *address);
 #define LCD_MAX_RED    31
 #define LCD_MAX_GREEN  63
 #define LCD_MAX_BLUE   31
-#define _RGBPACK(r, g, b) ( ((((r) * 31 + 127) / 255) << 11) \
-                           |((((g) * 63 + 127) / 255) << 5) \
-                           | (((b) * 31 + 127) / 255))
+#define _RGBPACK(r, g, b) ( ((((r) * (31*257) + (127*257)) >> 16) << 11) \
+                           |((((g) * (63*257) + (127*257)) >> 16) << 5) \
+                           | (((b) * (31*257) + (127*257)) >> 16))
+/* Note: ((x * 257) >> 16) almost equals (x / 255), but it avoids the division,
+ * so it's faster when the macro is used for variable r, g, b in the source. */
 #if (LCD_PIXELFORMAT == RGB565SWAPPED)
 #define LCD_RGBPACK(r, g, b) ( ((_RGBPACK((r), (g), (b)) & 0xff00) >> 8) \
                               |((_RGBPACK((r), (g), (b)) & 0x00ff) << 8))
@@ -163,9 +165,9 @@ typedef void lcd_fastpixelfunc_type(fb_data *address);
 #define LCD_MAX_RED    63
 #define LCD_MAX_GREEN  63
 #define LCD_MAX_BLUE   63
-#define LCD_RGBPACK(r, g, b) ( ((((r) * 63 + 127) / 255) << 12) \
-                           |((((g) * 63 + 127) / 255) << 6) \
-                           | (((b) * 63 + 127) / 255))
+#define LCD_RGBPACK(r, g, b) ( ((((r) * (63*257) + (127*257)) >> 16) << 12) \
+                              |((((g) * (63*257) + (127*257)) >> 16) << 6) \
+                              | (((b) * (63*257) + (127*257)) >> 16))
 #else
 /* other colour depths */
 #endif 
