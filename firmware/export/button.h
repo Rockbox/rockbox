@@ -78,8 +78,6 @@ bool button_hold(void);
 #define  BUTTON_OFF           0x0002
 #define  BUTTON_UP            0x0010
 #define  BUTTON_DOWN          0x0020
-#define  BUTTON_QUICK         BUTTON_ON
-#define  BUTTON_QUICK_LONG    (BUTTON_ON | BUTTON_REPEAT)
 
 #define BUTTON_RC_ON          (BUTTON_REMOTE | 0x00010000)
 #define BUTTON_RC_STOP        (BUTTON_REMOTE | 0x00020000)
