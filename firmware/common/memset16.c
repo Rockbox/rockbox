@@ -19,7 +19,7 @@
 
 #include <string.h>
 #define LBLOCKSIZE (sizeof(long)/2)
-#define UNALIGNED(X)   ((long)X & (LBLOCKSIZE - 1))
+#define UNALIGNED(X)   ((long)X & (sizeof(long) - 1))
 #define TOO_SMALL(LEN) ((LEN) < LBLOCKSIZE)
 
 void *memset16(void *dst, int val, size_t len)
