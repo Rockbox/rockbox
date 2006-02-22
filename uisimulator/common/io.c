@@ -168,12 +168,12 @@ int sim_open(const char *name, int o)
 int sim_creat(const char *name, mode_t mode)
 {
     char buffer[256]; /* sufficiently big */
-    (void)mode;
+    int opts = rockbox2sim(mode);
     if(name[0] == '/') {
         sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
         
         debugf("We create the real file '%s'\n", buffer);
-        return creat(buffer, 0666);
+        return open(buffer, opts | O_CREAT | O_TRUNC, 0666);
     }
     fprintf(stderr, "WARNING, bad file name lacks slash: %s\n",
             name);
