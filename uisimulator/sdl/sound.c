@@ -31,7 +31,7 @@ static bool pcm_playing;
 static bool pcm_paused;
 
 static Uint8* pcm_data;
-static int pcm_data_size;
+static Uint32 pcm_data_size;
 
 extern bool debug_audio;
 
@@ -95,7 +95,7 @@ void pcm_play_stop(void)
 
 void pcm_play_pause(bool play)
 {
-    int next_size;
+    Uint32 next_size;
     Uint8 *next_start;
     
     if (!pcm_playing) {
@@ -128,7 +128,7 @@ void pcm_play_pause(bool play)
 
         SDL_PauseAudio(1);
     }
-    
+
     pcm_paused = !play;
 }
 
@@ -142,47 +142,60 @@ bool pcm_is_playing(void)
     return pcm_playing;
 }
 
-char overflow[8192];
-int overflow_amount = 0;
+Uint8 overflow[8192];
+Uint32 overflow_amount = 0;
 
 void sdl_audio_callback(void *udata, Uint8 *stream, int len)
 {
-    int datalen, offset;
+    Uint32 pcm_data_played, need_to_play;
     FILE *debug = (FILE *)udata;
 
     /* At all times we need to write a full 'len' bytes to stream. */
 
-    if (pcm_data_size <= len) {
-        /* Play what we have */
-        memcpy(stream, pcm_data, pcm_data_size);
+    if (pcm_data_size > 0) {
+        /* We have some PCM data to play. Play as much as we can. */
+
+        pcm_data_played = (((Uint32)len) > pcm_data_size) ? pcm_data_size : len;
+
+        memcpy(stream, pcm_data, pcm_data_played);
 
         if (debug != NULL) {
-            fwrite(pcm_data, sizeof(Uint8), pcm_data_size, debug);
+            fwrite(pcm_data, sizeof(Uint8), pcm_data_played, debug);
         }
-
-        offset = pcm_data_size;
-        datalen = len - pcm_data_size;
-
-        /* Get some more */
-        callback_for_more(&pcm_data, &pcm_data_size);
         
-        /* Play enough of that to keep the audio buffer full */
-        memcpy(stream + offset, pcm_data, datalen);
-        
-        if (debug != NULL) {
-            fwrite(pcm_data, sizeof(Uint8), datalen, debug);
+        stream += pcm_data_played;
+        need_to_play = len - pcm_data_played;
+        pcm_data += pcm_data_played;
+        pcm_data_size -= pcm_data_played;
+
+        while(need_to_play > 0) {
+            /* Loop until we have written enough */
+
+            callback_for_more(&pcm_data, &pcm_data_size);
+
+            if (pcm_data_size > 0) {
+                /* We got more data */
+                pcm_data_played = (need_to_play > pcm_data_size) ? pcm_data_size : need_to_play;
+
+                memcpy(stream, pcm_data, pcm_data_played);
+
+                if (debug != NULL) {
+                    fwrite(pcm_data, sizeof(Uint8), pcm_data_played, debug);
+                }
+
+                stream += pcm_data_played;
+                need_to_play -= pcm_data_played;
+                pcm_data += pcm_data_played;
+                pcm_data_size -= pcm_data_played;
+            }
         }
     } else {
-        datalen = len;
-        memcpy(stream, pcm_data, len);
-    
-        if (debug != NULL) {
-            fwrite(pcm_data, sizeof(Uint8), len, debug);
-        }
-    }
+        pcm_data_size = 0;
+        pcm_data = NULL;
 
-    pcm_data_size -= datalen;
-    pcm_data += datalen;
+        /* No data, try and get some */
+        callback_for_more(&pcm_data, &pcm_data_size);
+    }
 }
 
 int pcm_init(void)
@@ -198,7 +211,7 @@ int pcm_init(void)
     fmt.freq = 44100;
     fmt.format = AUDIO_S16SYS;
     fmt.channels = 2;
-    fmt.samples = 512;
+    fmt.samples = 2048;
     fmt.callback = sdl_audio_callback;
     fmt.userdata = debug;
 
