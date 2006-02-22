@@ -26,6 +26,7 @@
 #include "thread.h"
 #include <string.h>
 #include <stdlib.h>
+#include "memory.h"
 #include "file.h"
 #include "debug.h"
 #include "system.h"
@@ -34,6 +35,12 @@
 #include "bidi.h"
 
 #define SCROLLABLE_LINES 26
+
+enum fill_opt {
+    OPT_NONE = 0,
+    OPT_SET,
+    OPT_COPY
+};
 
 /*** globals ***/
 fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH] __attribute__ ((aligned (16)));
@@ -217,19 +224,18 @@ fb_data* lcd_get_backdrop(void)
 /* Clear the whole display */
 void lcd_clear_display(void)
 {
-    fb_data *dst = LCDADDR(0, 0);
-
-    if (!lcd_backdrop || (drawmode & DRMODE_INVERSEVID))
+    fb_data *dst = LCDADDR(0, 0); 
+    
+    if (drawmode & DRMODE_INVERSEVID)
     {
-        fb_data bits = (drawmode & DRMODE_INVERSEVID) ? fg_pattern : bg_pattern;
-        fb_data *dst_end = dst + LCD_HEIGHT*LCD_WIDTH;
-        do
-            *dst++ = bits;
-        while (dst < dst_end);
+        memset16(dst, fg_pattern, LCD_WIDTH*LCD_HEIGHT);
     }
     else
     {
-        memcpy(dst, lcd_backdrop, sizeof(lcd_framebuffer));
+        if (!lcd_backdrop)
+            memset16(dst, bg_pattern, LCD_WIDTH*LCD_HEIGHT);
+        else
+            memcpy(dst, lcd_backdrop, sizeof(lcd_framebuffer));
     }
     scrolling_lines = 0;
 }
@@ -315,7 +321,9 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
 /* Draw a horizontal line (optimised) */
 void lcd_hline(int x1, int x2, int y)
 {
-    int x;
+    int x, width;
+    unsigned bits = 0;
+    enum fill_opt fillopt = OPT_NONE;
     fb_data *dst, *dst_end;
     lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[drawmode];
 
@@ -337,12 +345,48 @@ void lcd_hline(int x1, int x2, int y)
     if (x2 >= LCD_WIDTH)
         x2 = LCD_WIDTH-1;
         
+    if (drawmode & DRMODE_INVERSEVID)
+    {
+        if (drawmode & DRMODE_BG)
+        {
+            if (!lcd_backdrop)
+            {
+                fillopt = OPT_SET;
+                bits = bg_pattern;
+            }
+            else
+                fillopt = OPT_COPY;
+        }
+    }
+    else
+    {
+        if (drawmode & DRMODE_FG)
+        {
+            fillopt = OPT_SET;
+            bits = fg_pattern;
+        }
+    }
     dst = LCDADDR(x1, y);
-    dst_end = dst + x2 - x1;
-        
-    do
-        pfunc(dst++);
-    while (dst <= dst_end);
+    width = x2 - x1 + 1;
+    
+    switch (fillopt)
+    {
+      case OPT_SET:
+        memset16(dst, bits, width);
+        break;
+
+      case OPT_COPY:
+        memcpy(dst, (void *)((int)dst + lcd_backdrop_offset),
+               width * sizeof(fb_data));
+        break;
+
+      case OPT_NONE:
+        dst_end = dst + width;
+        do
+            pfunc(dst++);
+        while (dst < dst_end);
+        break;
+    }
 }
 
 /* Draw a vertical line (optimised) */
@@ -399,6 +443,8 @@ void lcd_drawrect(int x, int y, int width, int height)
 /* Fill a rectangular area */
 void lcd_fillrect(int x, int y, int width, int height)
 {
+    unsigned bits = 0;
+    enum fill_opt fillopt = OPT_NONE;
     fb_data *dst, *dst_end;
     lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[drawmode];
 
@@ -423,18 +469,53 @@ void lcd_fillrect(int x, int y, int width, int height)
     if (y + height > LCD_HEIGHT)
         height = LCD_HEIGHT - y;
         
+    if (drawmode & DRMODE_INVERSEVID)
+    {
+        if (drawmode & DRMODE_BG)
+        {
+            if (!lcd_backdrop)
+            {
+                fillopt = OPT_SET;
+                bits = bg_pattern;
+            }
+            else
+                fillopt = OPT_COPY;
+        }
+    }
+    else
+    {
+        if (drawmode & DRMODE_FG)
+        {
+            fillopt = OPT_SET;
+            bits = fg_pattern;
+        }
+    }
     dst = LCDADDR(x, y);
     dst_end = dst + height * LCD_WIDTH;
 
     do
     {
-        fb_data *dst_row = dst;
-        fb_data *row_end = dst_row + width;
+        fb_data *dst_row, *row_end;
 
-        do
-            pfunc(dst_row++);
-        while (dst_row < row_end);
+        switch (fillopt)
+        {
+          case OPT_SET:
+            memset16(dst, bits, width);
+            break;
 
+          case OPT_COPY:
+            memcpy(dst, (void *)((int)dst + lcd_backdrop_offset),
+                   width * sizeof(fb_data));
+            break;
+
+          case OPT_NONE:
+            dst_row = dst;
+            row_end = dst_row + width;
+            do
+                pfunc(dst_row++);
+            while (dst_row < row_end);
+            break;
+        }
         dst += LCD_WIDTH;
     }
     while (dst < dst_end);
