@@ -40,6 +40,10 @@ common/timefuncs.c
 common/memcpy_a.S
 common/memmove_a.S
 common/memset_a.S
+#elif defined(CPU_ARM)
+common/memcpy.c
+common/memmove.c
+common/memset_a.S
 #else
 common/memcpy.c
 common/memmove.c
