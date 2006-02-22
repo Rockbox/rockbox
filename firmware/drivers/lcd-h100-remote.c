@@ -916,9 +916,9 @@ void lcd_remote_fillrect(int x, int y, int width, int height)
     int ny;
     unsigned char *dst, *dst_end;
     unsigned mask, mask_bottom;
-    unsigned bits = 0xFFu;
+    unsigned bits = 0;
     lcd_blockfunc_type *bfunc;
-    bool fillopt;
+    bool fillopt = false;
 
     /* nothing to draw? */
     if ((width <= 0) || (height <= 0) || (x >= LCD_REMOTE_WIDTH) 
@@ -941,10 +941,21 @@ void lcd_remote_fillrect(int x, int y, int width, int height)
     if (y + height > LCD_REMOTE_HEIGHT)
         height = LCD_REMOTE_HEIGHT - y;
     
-    fillopt = (drawmode & DRMODE_INVERSEVID) ? 
-              (drawmode & DRMODE_BG) : (drawmode & DRMODE_FG);
-    if (fillopt &&(drawmode & DRMODE_INVERSEVID))
-        bits = 0;
+    if (drawmode & DRMODE_INVERSEVID)
+    {
+        if (drawmode & DRMODE_BG)
+        {
+            fillopt = true;
+        }
+    }
+    else
+    {
+        if (drawmode & DRMODE_FG)
+        {
+            fillopt = true;
+            bits = 0xFFu;
+        }
+    }
     bfunc = lcd_remote_blockfuncs[drawmode];
     dst   = &lcd_remote_framebuffer[y>>3][x];
     ny    = height - 1 + (y & 7);

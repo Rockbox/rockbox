@@ -658,9 +658,9 @@ void lcd_fillrect(int x, int y, int width, int height)
     int ny;
     unsigned char *dst, *dst_end;
     unsigned mask, mask_bottom;
-    unsigned bits = fg_pattern;
+    unsigned bits = 0;
     lcd_blockfunc_type *bfunc;
-    bool fillopt;
+    bool fillopt = false;
 
     /* nothing to draw? */
     if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
@@ -683,10 +683,22 @@ void lcd_fillrect(int x, int y, int width, int height)
     if (y + height > LCD_HEIGHT)
         height = LCD_HEIGHT - y;
     
-    fillopt = (drawmode & DRMODE_INVERSEVID) ?
-              (drawmode & DRMODE_BG) : (drawmode & DRMODE_FG);
-    if (fillopt &&(drawmode & DRMODE_INVERSEVID))
-        bits = bg_pattern;
+    if (drawmode & DRMODE_INVERSEVID)
+    {
+        if (drawmode & DRMODE_BG)
+        {
+            fillopt = true;
+            bits = bg_pattern;
+        }
+    }
+    else
+    {
+        if (drawmode & DRMODE_FG)
+        {
+            fillopt = true;
+            bits = fg_pattern;
+        }
+    }
     bfunc = lcd_blockfuncs[drawmode];
     dst   = &lcd_framebuffer[y>>2][x];
     ny    = height - 1 + (y & 3);
