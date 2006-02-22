@@ -17,6 +17,19 @@ bejeweled_jewels.220x176x16.bmp
 bejeweled_jewels.320x240x16.bmp
 #endif
 
+/* ChessBox */
+#if (LCD_WIDTH >= 240) && (LCD_HEIGHT >= 240) & (LCD_DEPTH >= 16)
+chessbox_pieces.240x240x16.bmp
+#elif (LCD_WIDTH >= 176) && (LCD_HEIGHT >= 176) & (LCD_DEPTH >= 16)
+chessbox_pieces.176x176x16.bmp
+#elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 128) & (LCD_DEPTH > 1)
+chessbox_pieces.128x128x2.bmp
+#elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 128)
+chessbox_pieces.128x128x1.bmp
+#elif (LCD_WIDTH >= 64) && (LCD_HEIGHT >= 64)
+chessbox_pieces.64x64x1.bmp
+#endif
+
 /* Solitaire */
 #ifdef HAVE_LCD_COLOR
 solitaire_cardback.220x176x16.bmp
