@@ -20,7 +20,7 @@
 
 #ifdef CPU_ARM
     .section    .icode,"ax",%progbits
-#elif
+#else
     .section    .icode,"ax",@progbits
 #endif
 
