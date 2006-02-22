@@ -58,7 +58,6 @@ unsigned int pcmbuf_get_latency(void);
 void pcmbuf_set_low_latency(bool state);
 bool pcmbuf_insert_buffer(const char *buf, size_t length);
 void pcmbuf_write_complete(size_t length);
-void pcmbuf_write_voice(size_t length);
 void* pcmbuf_request_buffer(size_t length, size_t *realsize);
 void* pcmbuf_request_voice_buffer(size_t length, size_t *realsize, bool mix);
 bool pcmbuf_is_crossfade_enabled(void);
@@ -66,7 +65,7 @@ void pcmbuf_crossfade_enable(bool on_off);
 
 int pcmbuf_usage(void);
 int pcmbuf_mix_usage(void);
-void pcmbuf_beep(int frequency, int duration, int amplitude);
+void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude);
 void pcmbuf_reset_mixpos(void);
 void pcmbuf_mix(char *buf, size_t length);
 

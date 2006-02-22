@@ -97,7 +97,7 @@ static size_t last_chunksize IDATA_ATTR;
 static size_t pcmbuf_unplayed_bytes IDATA_ATTR;
 static size_t pcmbuf_mix_used_bytes IDATA_ATTR;
 static size_t pcmbuf_watermark IDATA_ATTR;
-static size_t mixpos IDATA_ATTR = 0;
+static short *mixpos IDATA_ATTR;
 static bool low_latency_mode = false;
 
 /* Helpful macros for use in conditionals this assumes some of the above
@@ -805,13 +805,6 @@ void pcmbuf_write_complete(size_t length)
     }
 }
 
-void pcmbuf_write_voice(size_t length)
-{
-    while (pcm_is_playing())
-        sleep(1);
-    pcm_play_data(NULL, &guardbuf[0], length);
-}
-
 bool pcmbuf_insert_buffer(const char *buf, size_t length)
 {
     if (!prepare_insert(length))
@@ -827,52 +820,63 @@ bool pcmbuf_insert_buffer(const char *buf, size_t length)
     return true;
 }
 
+/* Get a pointer to where to mix immediate audio */
+static inline short* get_mix_insert_pos(void) {
+    /* Give at least 1/8s clearance here */
+    size_t pcmbuf_mix_back_pos =
+        pcmbuf_unplayed_bytes - NATIVE_FREQUENCY * 4 / 8;
+    
+    if (audiobuffer_pos < pcmbuf_mix_back_pos)
+        return (short *)&audiobuffer[pcmbuf_size +
+            audiobuffer_pos - pcmbuf_mix_back_pos];
+    else
+        return (short *)&audiobuffer[audiobuffer_pos - pcmbuf_mix_back_pos];
+}
+
 /* Generates a constant square wave sound with a given frequency
    in Hertz for a duration in milliseconds. */
-void pcmbuf_beep(int frequency, int duration, int amplitude)
+void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
 {
-    unsigned int state = 0, count = 0;
+    unsigned int count = 0, i = 0;
+    bool state = false;
     unsigned int interval = NATIVE_FREQUENCY / frequency;
-    size_t pos;
-    short *buf = (short *)audiobuffer;
-    size_t bufsize = pcmbuf_size / 2;
+    short *buf;
+    short *pcmbuf_end = (short *)guardbuf;
+    bool playing = pcm_is_playing();
+    size_t samples = NATIVE_FREQUENCY / 1000 * duration;
     
-    /* FIXME: Should start playback. */
-    //if (pcmbuf_unplayed_bytes * 1000 < 4 * NATIVE_FREQUENCY * duration)
-    //    return ;
-
-    if (audiobuffer_pos < pcmbuf_unplayed_bytes)
-        pos = pcmbuf_size + audiobuffer_pos - pcmbuf_unplayed_bytes;
-    else
-        pos = audiobuffer_pos - pcmbuf_unplayed_bytes;
-    pos /= 2;
-
-    duration = NATIVE_FREQUENCY / 1000 * duration;
-    while (duration-- > 0)
+    if (playing) {
+        buf = get_mix_insert_pos();
+    } else {
+        buf = (short *)audiobuffer;
+    }
+    while (i++ < samples)
     {
+        long sample = *buf;
         if (state) {
-            buf[pos] = MIN(MAX(buf[pos] + amplitude, -32768), 32767);
-            if (++pos >= bufsize)
-                pos = 0;
-            buf[pos] = MIN(MAX(buf[pos] + amplitude, -32768), 32767);
+            *buf++ = MIN(MAX(sample + amplitude, -32768), 32767);
+            if (buf > pcmbuf_end)
+                buf = (short *)audiobuffer;
+            sample = *buf;
+            *buf++ = MIN(MAX(sample + amplitude, -32768), 32767);
         } else {
-            buf[pos] = MIN(MAX(buf[pos] - amplitude, -32768), 32767);
-            if (++pos >= bufsize)
-                pos = 0;
-            buf[pos] = MIN(MAX(buf[pos] - amplitude, -32768), 32767);
+            *buf++ = MIN(MAX(sample - amplitude, -32768), 32767);
+            if (buf > pcmbuf_end)
+                buf = (short *)audiobuffer;
+            sample = *buf;
+            *buf++ = MIN(MAX(sample - amplitude, -32768), 32767);
         }
         
         if (++count >= interval)
         {
             count = 0;
-            if (state)
-                state = 0;
-            else
-                state = 1;
+            state = !state;
         }
-        pos++;
-        if (pos >= bufsize)
-            pos = 0;
+        if (buf > pcmbuf_end)
+            buf = (short *)audiobuffer;
+    }
+    if (!playing) {
+        pcm_play_data(NULL, (unsigned char *)audiobuffer, samples * 4);
     }
 }
 
@@ -889,19 +893,14 @@ int pcmbuf_mix_usage(void)
 
 void pcmbuf_reset_mixpos(void)
 {
+    mixpos = get_mix_insert_pos();
     pcmbuf_mix_used_bytes = 0;
-    if (audiobuffer_pos < pcmbuf_unplayed_bytes)
-        mixpos = pcmbuf_size + audiobuffer_pos - pcmbuf_unplayed_bytes;
-    else
-        mixpos = audiobuffer_pos - pcmbuf_unplayed_bytes;
-    mixpos /= 2;
 }
 
 void pcmbuf_mix(char *buf, size_t length)
 {
     short *ibuf = (short *)buf;
-    short *obuf = (short *)audiobuffer;
-    size_t bufsize = pcmbuf_size / 2;
+    short *pcmbuf_end = (short *)guardbuf;
 
     if (pcmbuf_mix_used_bytes == 0)
         pcmbuf_reset_mixpos();
@@ -910,12 +909,12 @@ void pcmbuf_mix(char *buf, size_t length)
     length /= 2;
 
     while (length-- > 0) {
-        obuf[mixpos] = MIN(MAX(obuf[mixpos]/4 + *ibuf, -32768), 32767);
-        
-        ibuf++;
-        mixpos++;
-        if (mixpos >= bufsize)
-            mixpos = 0;
+        long sample = *ibuf++;
+        sample += *mixpos >> 2;
+        *mixpos++ = MIN(MAX(sample, -32768), 32767);
+
+        if (mixpos >= pcmbuf_end)
+            mixpos = (short *)audiobuffer;
     }
 }
 
