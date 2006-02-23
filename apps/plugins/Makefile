@@ -69,6 +69,13 @@ ifneq (-DIRIVER_IFP7XX,$(TARGET))
 endif
 endif
 
+# chessbox is too big to fit in the 32KB Archos plugin buffer, so we only
+# build for IRIVER and IPOD targets
+ifneq (,$(strip $(foreach tgt,IRIVER IPOD,$(findstring $(tgt),$(TARGET)))))
+ifneq (-DIRIVER_IFP7XX,$(TARGET))
+    SUBDIRS += chessbox
+endif
+endif
 
 .PHONY: $(SUBDIRS)
 all: $(BUILDDIR)/libplugin.a $(ROCKS) $(SUBDIRS) $(DEPFILE)
@@ -186,10 +193,11 @@ $(LINKFILE): $(LDS)
 	@echo "build $@"
 	$(SILENT)cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P - >$@
 
-$(SUBDIRS):
+$(SUBDIRS): $(BITMAPLIBS)
 	@echo "MAKE in $@"
 	$(SILENT)mkdir -p $(OBJDIR)/$@
-	$(SILENT)$(MAKE) -C $@ OUTDIR=$(OBJDIR) OBJDIR=$(OBJDIR)/$@
+	$(SILENT)$(MAKE) -C $@ OUTDIR=$(OBJDIR) OBJDIR=$(OBJDIR)/$@ \
+                               LINKBITMAPS="$(LINKBITMAPS)" BITMAPLIBS="$(BITMAPLIBS)"
 
 clean:
 	@echo "cleaning plugins"

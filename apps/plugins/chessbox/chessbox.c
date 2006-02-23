@@ -292,7 +292,7 @@ struct cb_command cb_getcommand (void) {
 	int button = BUTTON_NONE;
 	int marked = false , from_marked = false ;
 	short marked_x = 0 , marked_y = 0 ;
-	struct cb_command result;
+	struct cb_command result = { 0, {0,0,0,0,0}, 0 };
 	
 	cb_switch ( x , y );
 	/* main loop */
