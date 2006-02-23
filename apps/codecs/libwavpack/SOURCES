@@ -8,4 +8,7 @@ wputils.c
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
 coldfire.S
 #endif
+#if defined(CPU_ARM) && !defined(SIMULATOR)
+arm.S
+#endif
 
