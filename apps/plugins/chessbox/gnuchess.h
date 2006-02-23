@@ -19,7 +19,7 @@
 #define valueQ 1100
 #define valueK 1200
 
-
+/* ---- chess system global variables ---- */
 extern short mate,opponent,computer;
 extern short locn[8][8];
 extern short board[64];
@@ -27,7 +27,10 @@ extern short color[64];
 extern long Level;
 extern short TCflag,TCmoves,TCminutes;
 
+/* ---- RockBox integration ---- */
+extern struct plugin_api* rb;
 
+/* ---- The beginning of a GNUChess v2 APIfication ---- */
 void SetTimeControl(void);
 void GNUChess_Initialize(void);
 int VerifyMove(char s[],short iop,unsigned short *mv);

@@ -31,9 +31,6 @@ struct cb_command {
 	unsigned short mv;
 };
 
-/* global rockbox api */
-static struct plugin_api* rb;
-	
 /* External bitmaps */
 extern const fb_data chessbox_pieces[];
 
@@ -43,13 +40,13 @@ PLUGIN_HEADER
 /* button definitions */
 #if (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define CB_SELECT  BUTTON_SELECT
-#define CB_UP      BUTTON_SCROLL_BACK
-#define CB_DOWN    BUTTON_SCROLL_FWD
+#define CB_UP      BUTTON_MENU
+#define CB_DOWN    BUTTON_PLAY
 #define CB_LEFT    BUTTON_LEFT
 #define CB_RIGHT   BUTTON_RIGHT
-#define CB_PLAY    BUTTON_PLAY
-#define CB_LEVEL   BUTTON_MENU
-#define CB_QUIT    BUTTON_REL
+#define CB_PLAY    (BUTTON_SELECT | BUTTON_PLAY)
+#define CB_LEVEL   (BUTTON_SELECT | BUTTON_RIGHT)
+#define CB_QUIT    (BUTTON_SELECT | BUTTON_MENU)
 
 #elif CONFIG_KEYPAD == IAUDIO_X5_PAD
 #define CB_SELECT  BUTTON_MENU

@@ -66,7 +66,7 @@
 #define taxicab(a,b) (abs(column[a]-column[b]) + abs(row[a]-row[b]))
 
 /* ---- RockBox datatypes and variables */
-static struct plugin_api* rb;
+struct plugin_api* rb;
 
 /* ---- Chess datatypes and variables ---- */
 struct leaf
@@ -332,8 +332,7 @@ short pscore[3];
   xside = otherside[side];
   pscore[white] = pscore[black] = 0;
 
-  /* ok, I will yield here although this function will be called much more
-  many times than needed I think */
+  /* ok, I will yield here for lower levels */
   rb->yield();
 
   for (c1 = white; c1 <= black; c1++)
@@ -1237,6 +1236,9 @@ short best,tempb,tempc,tempsf,tempst;
 short xside,pbst,d,e,cf,score,rcnt;
 unsigned short mv,nxtline[maxdepth];
 struct leaf *node,tmp;
+
+  /* ok, I will yield here for higher levels */
+  rb->yield();
 
   NodeCnt++;
   xside = otherside[side];
@@ -2353,7 +2355,7 @@ void GNUChess_Initialize ( void ) {
   /*ttable = (struct hashentry *)malloc(ttblsz *
            (unsigned long)sizeof(struct hashentry));*/
   buffer_size = ttblsz * sizeof(struct hashentry);
-  ttable = rb->plugin_get_buffer( &buffer_size );
+  ttable = (struct hashentry *)rb->plugin_get_buffer( &buffer_size );
   Level = 1;
   OperatorTime = 0;
   TCmoves = 60;
