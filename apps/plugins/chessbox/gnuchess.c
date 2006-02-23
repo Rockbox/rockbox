@@ -181,7 +181,8 @@ unsigned short PV,hint,Swag0,Swag1,Swag2,Swag3,Swag4;
 unsigned short hashkey;
 unsigned long hashbd;
 struct hashval hashcode[2][7][64];
-struct hashentry huge *ttable,*ptbl;
+struct hashentry ttable[ttblsz];
+struct hashentry huge *ptbl;
 unsigned char history[8192];
 
 short Mwpawn[64],Mbpawn[64],Mknight[2][64],Mbishop[2][64];
@@ -2348,14 +2349,9 @@ void NewGame()  {
 
 /* ---- Initialize variables and reset board ---- */
 void GNUChess_Initialize ( void ) {
-  int buffer_size;
-  /* no malloc sir, 64K should be enough for now */
-  /*char ttablearray[65536];*/
-  /*ttable = (struct hashentry *)ttablearray;*/
   /*ttable = (struct hashentry *)malloc(ttblsz *
            (unsigned long)sizeof(struct hashentry));*/
-  buffer_size = ttblsz * sizeof(struct hashentry);
-  ttable = (struct hashentry *)rb->plugin_get_buffer( &buffer_size );
+  /* no malloc, statically allocated */
   Level = 1;
   OperatorTime = 0;
   TCmoves = 60;
