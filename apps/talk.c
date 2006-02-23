@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <stddef.h>
+#include <string.h>
 #include "file.h"
 #include "buffer.h"
 #include "system.h"
@@ -93,7 +94,7 @@ static unsigned char* p_silence; /* VOICE_PAUSE clip, used for termination */
 static long silence_len; /* length of the VOICE_PAUSE clip */
 static unsigned char* p_lastclip; /* address of latest clip, for silence add */
 static unsigned long voicefile_size = 0; /* size of the loaded voice file */
-
+static unsigned char last_lang[MAX_FILENAME+1]; /* name of last used lang file (in talk_init) */
 
 /***************** Private prototypes *****************/
 
@@ -472,6 +473,15 @@ static void reset_state(void)
 
 void talk_init(void)
 {
+    if (!strcasecmp(last_lang, global_settings.lang_file))
+    {
+        /* not a new file, nothing to do */
+        return;
+    }
+
+    strncpy((char *) last_lang, (char *)global_settings.lang_file,
+        MAX_FILENAME);
+
 #if CONFIG_CODEC == SWCODEC
     audio_stop();
 #endif
