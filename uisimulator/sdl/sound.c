@@ -157,8 +157,8 @@ bool pcm_is_playing(void)
 
 void pcm_calculate_peaks(int *left, int *right)
 {
-    long samples = pcm_data_size / 4;
-    short *addr = pcm_data;
+    long samples = (long) pcm_data_size / 4;
+    short *addr = (short *) pcm_data;
 
     if (samples > PEAK_SAMPLES)
         samples = PEAK_SAMPLES;
@@ -206,9 +206,6 @@ void pcm_calculate_peaks(int *left, int *right)
             *right = peak_value;
     }
 }
-
-Uint8 overflow[8192];
-Uint32 overflow_amount = 0;
 
 void sdl_audio_callback(void *udata, Uint8 *stream, int len)
 {
