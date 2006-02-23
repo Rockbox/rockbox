@@ -190,9 +190,10 @@ void gray_hline(int x1, int x2, int y)
 /* Draw a vertical line (optimised) */
 void gray_vline(int x, int y1, int y2)
 {
-    int y, bits;
+    int y;
+    int bits = 0;
     unsigned char *dst;
-    bool fillopt;
+    bool fillopt = false;
     void (*pfunc)(unsigned char *address);
 
     /* direction flip */
@@ -213,14 +214,23 @@ void gray_vline(int x, int y1, int y2)
         y1 = 0;
     if (y2 >= _gray_info.height)
         y2 = _gray_info.height - 1;
-
-    bits = _gray_info.fg_brightness;
-    fillopt = (_gray_info.drawmode & DRMODE_INVERSEVID) ?
-              (_gray_info.drawmode & DRMODE_BG) :
-              (_gray_info.drawmode & DRMODE_FG);
-    if (fillopt &&(_gray_info.drawmode & DRMODE_INVERSEVID))
-        bits = _gray_info.bg_brightness;
-
+        
+    if (_gray_info.drawmode & DRMODE_INVERSEVID)
+    {
+        if (_gray_info.drawmode & DRMODE_BG)
+        {
+            fillopt = true;
+            bits = _gray_info.bg_brightness;
+        }
+    }
+    else
+    {
+        if (_gray_info.drawmode & DRMODE_FG)
+        {
+            fillopt = true;
+            bits = _gray_info.fg_brightness;
+        }
+    }
     pfunc = _gray_pixelfuncs[_gray_info.drawmode];
     dst   = &_gray_info.cur_buffer[MULU16(x, _gray_info.height) + y1];
 
@@ -253,9 +263,9 @@ void gray_drawrect(int x, int y, int width, int height)
 /* Fill a rectangular area */
 void gray_fillrect(int x, int y, int width, int height)
 {
-    int bits;
+    int bits = 0;
     unsigned char *dst, *dst_end;
-    bool fillopt;
+    bool fillopt = false;
     void (*pfunc)(unsigned char *address);
 
     /* nothing to draw? */
@@ -279,13 +289,22 @@ void gray_fillrect(int x, int y, int width, int height)
     if (y + height > _gray_info.height)
         height = _gray_info.height - y;
     
-    bits = _gray_info.fg_brightness;
-    fillopt = (_gray_info.drawmode & DRMODE_INVERSEVID) ?
-              (_gray_info.drawmode & DRMODE_BG) :
-              (_gray_info.drawmode & DRMODE_FG);
-    if (fillopt &&(_gray_info.drawmode & DRMODE_INVERSEVID))
-        bits = _gray_info.bg_brightness;
-
+    if (_gray_info.drawmode & DRMODE_INVERSEVID)
+    {
+        if (_gray_info.drawmode & DRMODE_BG)
+        {
+            fillopt = true;
+            bits = _gray_info.bg_brightness;
+        }
+    }
+    else
+    {
+        if (_gray_info.drawmode & DRMODE_FG)
+        {
+            fillopt = true;
+            bits = _gray_info.fg_brightness;
+        }
+    }
     pfunc = _gray_pixelfuncs[_gray_info.drawmode];
     dst   = &_gray_info.cur_buffer[MULU16(x, _gray_info.height) + y];
     dst_end = dst + MULU16(width, _gray_info.height);
