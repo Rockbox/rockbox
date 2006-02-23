@@ -141,11 +141,11 @@
 
 #elif defined(IPOD_VIDEO)
 #define UI_TITLE                    "iPod Video"
-#define UI_WIDTH                    320 // width of GUI window
-#define UI_HEIGHT                   240 // height of GUI window
+#define UI_WIDTH                    350 // width of GUI window
+#define UI_HEIGHT                   591 // height of GUI window
 /* high-colour */
-#define UI_LCD_POSX                 0 // x position of lcd
-#define UI_LCD_POSY                 0 // y position of lcd
+#define UI_LCD_POSX                 14 // x position of lcd
+#define UI_LCD_POSY                 12 // y position of lcd
 #define UI_LCD_WIDTH                320
 #define UI_LCD_HEIGHT               240
 
