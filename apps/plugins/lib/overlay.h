@@ -7,9 +7,9 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 Jens Arnold
+ * Overlay loader
  *
- * Overlay loader stub plugin for rockboy on Archos
+ * Copyright (C) 2006 Jens Arnold
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -18,17 +18,17 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+ 
+#ifndef __OVERLAY_H__
+#define __OVERLAY_H__
+
+#ifndef SIMULATOR
 #include "plugin.h"
 
-#if MEM <= 8 && !defined(SIMULATOR)
+/* load and run a plugin linked as an overlay. */
+enum plugin_status run_overlay(struct plugin_api* api, void* parameter,
+                               unsigned char *filename, unsigned char *name);
 
-#include "overlay.h"
+#endif /* !SIMULATOR */
+#endif /* __OVERLAY_H__ */
 
-PLUGIN_HEADER
-
-/* this is the plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
-{
-    return run_overlay(api, parameter, "/.rockbox/viewers/rockboy.ovl", "RockBoy");
-}
-#endif

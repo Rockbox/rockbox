@@ -1,5 +1,4 @@
 configfile.c
-highscore.c
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4) && !defined(SIMULATOR) && \
     (CONFIG_LCD != LCD_IPOD2BPP)
 gray_core.c
@@ -7,12 +6,16 @@ gray_draw.c
 gray_parm.c
 gray_scroll.c
 #endif
-#ifdef HAVE_LCD_BITMAP
-xlcd.c
+highscore.c
+#ifndef SIMULATOR
+overlay.c
 #endif
 #ifdef HAVE_LCD_CHARCELLS
 playergfx.c
 #endif
 #ifdef RB_PROFILE
 profile_plugin.c
+#endif
+#ifdef HAVE_LCD_BITMAP
+xlcd.c
 #endif
