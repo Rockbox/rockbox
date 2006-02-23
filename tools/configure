@@ -1169,10 +1169,11 @@ all: tools
 	\$(SILENT)\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@
 
 clean:
-	\$(SILENT)\$(MAKE) -C \$(FIRMDIR) clean OBJDIR=\$(BUILDDIR)/firmware
-	\$(SILENT)\$(MAKE) -C \$(APPSDIR) clean OBJDIR=\$(BUILDDIR)/@APPS@
 	\$(SILENT)\$(MAKE) -C \$(TOOLSDIR) clean
-	\$(SILENT)rm -rf rockbox.zip TAGS @APPS@ firmware comsim sim lang.h manual *.pdf
+	\$(SILENT)echo Cleaning build directory
+	\$(SILENT)rm -rf rockbox.zip TAGS @APPS@ firmware comsim sim lang.[ch]\
+                  manual *.pdf *.a credits.raw @OUTPUT@ bitmaps pluginbitmaps \
+                  @ARCHOSROM@ @FLASHFILE@
 
 tools:
 	\$(SILENT)\$(MAKE) -C \$(TOOLSDIR) CC=\$(HOSTCC) @TOOLSET@
