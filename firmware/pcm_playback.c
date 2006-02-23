@@ -550,8 +550,7 @@ void fiq(void)
         "bne .loop            \n\t" /* yes, continue to try feeding FIFO */
     ".dma_stop:               \n\t" /* no more data, do dma_stop() and exit */
         "ldr r10, =pcm_playing\n\t"
-        "mov r12, #0          \n\t"
-        "strb r12, [r10]      \n\t" /* pcm_playing = false */
+        "strb r8, [r10]       \n\t" /* pcm_playing = false (r8=0, look above) */
         "ldr r10, =0x70002800 \n\t" /* r10 = IISCONFIG */
         "ldr r11, [r10]       \n\t" 
         "bic r11, r11, #0x20000002\n\t" /* disable playback FIFO and IRQ */
@@ -560,7 +559,7 @@ void fiq(void)
         "orr r10, r10, #0x40  \n\t" /* disable FIQ */
         "msr cpsr_c, r10      \n\t"
         "ldr r10, =pcm_paused \n\t"
-        "strb r12, [r10]      \n\t" /* pcm_paused = false */
+        "strb r8, [r10]       \n\t" /* pcm_paused = false */
     ".exit:                   \n\t"
         "ldr r10, =p_size     \n\t" /* save back p_size and p, then exit */
         "ldr r11, =p          \n\t"
