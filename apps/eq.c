@@ -130,8 +130,8 @@ static long dbtoA(long db)
 }
 
 /* Calculate second order section peaking filter coefficients.
-   cutoff is a value from 0 to 0xffffffff, where 0 represents 0 hz and
-   0xffffffff represents nyquist (samplerate/2).
+   cutoff is a value from 0 to 0x80000000, where 0 represents 0 hz and
+   0x80000000 represents nyquist (samplerate/2).
    Q is an unsigned 16.16 fixed point number, lower bound is artificially set
    at 0.5.
    db is s15.16 fixed point and describes gain/attenuation at peak freq.
