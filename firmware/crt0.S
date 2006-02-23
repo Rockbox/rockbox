@@ -489,8 +489,7 @@ irq_handler:
     lea     MBAR,%a0
     lea     MBAR2,%a1
         
-    moveq.l #0,%d0
-    move.l  %d0,(0x180,%a1)  /* PLLCR = 0 */
+    clr.l  (0x180,%a1)  /* PLLCR = 0 */
 
     /* 64K DMA-capable SRAM at 0x10000000
        DMA is enabled and has priority in both banks
