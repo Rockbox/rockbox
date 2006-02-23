@@ -87,7 +87,9 @@ drivers/power.c
 #endif
 drivers/led.c
 #ifndef SIMULATOR
+#ifndef IAUDIO_X5
 drivers/adc.c
+#endif
 #ifdef HAVE_MMC
 drivers/ata_mmc.c
 #else
@@ -204,5 +206,6 @@ drivers/generic_i2c.c
 target/coldfire/iaudio/x5/power-x5.c
 target/coldfire/iaudio/x5/lcd-x5.c
 target/coldfire/iaudio/x5/pcf50606-x5.c
+target/coldfire/iaudio/x5/adc-x5.c
 #endif
 #endif
