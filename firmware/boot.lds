@@ -30,7 +30,7 @@ INPUT(crt0.o)
 #define DRAMORIG 0x31000000
 #define IRAMORIG 0x10000000
 #define IRAMSIZE 0x20000
-#define FLASHORIG 0x00100000
+#define FLASHORIG 0x00010000
 #define FLASHSIZE 4M
 #elif CONFIG_CPU == PP5020
 #define DRAMORIG 0x10000000
@@ -104,6 +104,9 @@ SECTIONS
 {
     .vectors :
     {
+#ifdef IAUDIO_X5
+        *(.init.text)
+#endif
         _datacopy = .;
     } > FLASH
 
