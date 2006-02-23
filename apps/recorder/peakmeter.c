@@ -44,9 +44,7 @@
 #include "pcm_record.h"
 #endif
 
-#ifndef SIMULATOR /* this is not used in the sim */
 static bool pm_playback = true; /* selects between playback and recording peaks */
-#endif
 
 #endif
 
@@ -539,11 +537,7 @@ void peak_meter_peek(void)
 {
     int left, right;
    /* read current values */
-#ifdef SIMULATOR
-    pm_cur_left  = left  = 8000;
-    pm_cur_right = right = 9000;
-#elif CONFIG_CODEC == SWCODEC
-
+#if CONFIG_CODEC == SWCODEC
     if (pm_playback)
         pcm_calculate_peaks(&pm_cur_left, &pm_cur_right);
 #ifdef HAVE_RECORDING        
@@ -555,8 +549,13 @@ void peak_meter_peek(void)
     left  = pm_cur_left;
     right = pm_cur_right;
 #else
+#ifndef SIMULATOR
     pm_cur_left  = left  = mas_codec_readreg(pm_src_left);
     pm_cur_right = right = mas_codec_readreg(pm_src_right);
+#else
+    pm_cur_left  = left  = 8000;
+    pm_cur_right = right = 9000;
+#endif
 #endif
 
     /* check for clips

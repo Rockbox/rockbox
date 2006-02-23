@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <memory.h>
+#include "kernel.h"
 #include "sound.h"
 #include "SDL.h"
 
@@ -140,6 +141,70 @@ bool pcm_is_paused(void)
 bool pcm_is_playing(void)
 {
     return pcm_playing;
+}
+
+/*
+ * This function goes directly into the DMA buffer to calculate the left and
+ * right peak values. To avoid missing peaks it tries to look forward two full
+ * peek periods (2/HZ sec, 100% overlap), although it's always possible that
+ * the entire period will not be visible. To reduce CPU load it only looks at
+ * every third sample, and this can be reduced even further if needed (even
+ * every tenth sample would still be pretty accurate).
+ */
+
+#define PEAK_SAMPLES  (44100*2/HZ)  /* 44100 samples * 2 / 100 Hz tick */
+#define PEAK_STRIDE   3       /* every 3rd sample is plenty... */
+
+void pcm_calculate_peaks(int *left, int *right)
+{
+    long samples = pcm_data_size / 4;
+    short *addr = pcm_data;
+
+    if (samples > PEAK_SAMPLES)
+        samples = PEAK_SAMPLES;
+
+    samples /= PEAK_STRIDE;
+
+    if (left && right) {
+        int left_peak = 0, right_peak = 0, value;
+
+        while (samples--) {
+            if ((value = addr [0]) > left_peak)
+                left_peak = value;
+            else if (-value > left_peak)
+                left_peak = -value;
+
+            if ((value = addr [PEAK_STRIDE | 1]) > right_peak)
+                right_peak = value;
+            else if (-value > right_peak)
+                right_peak = -value;
+
+            addr += PEAK_STRIDE * 2;
+        }
+
+        *left = left_peak;
+        *right = right_peak;
+    }
+    else if (left || right) {
+        int peak_value = 0, value;
+
+        if (right)
+            addr += (PEAK_STRIDE | 1);
+
+        while (samples--) {
+            if ((value = addr [0]) > peak_value)
+                peak_value = value;
+            else if (-value > peak_value)
+                peak_value = -value;
+
+            addr += PEAK_STRIDE * 2;
+        }
+
+        if (left)
+            *left = peak_value;
+        else
+            *right = peak_value;
+    }
 }
 
 Uint8 overflow[8192];
