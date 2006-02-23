@@ -21,7 +21,15 @@
 
 #include "config.h"
 
-#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
+#ifdef IAUDIO_X5
+#define NUM_ADC_CHANNELS 3
+
+#define ADC_BUTTONS 0
+#define ADC_REMOTE  1
+#define ADC_BATTERY 2
+#define ADC_UNREG_POWER ADC_BATTERY /* For compatibility */
+
+#elif defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
 #define NUM_ADC_CHANNELS 4
 
 #define ADC_BUTTONS 0
