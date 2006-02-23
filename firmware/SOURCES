@@ -82,7 +82,9 @@ drivers/lcd-ipodvideo.c
 #if CONFIG_LCD==LCD_H300
 drivers/lcd-h300.c
 #endif
+#ifndef IAUDIO_X5
 drivers/power.c
+#endif
 drivers/led.c
 #ifndef SIMULATOR
 drivers/adc.c
@@ -194,4 +196,13 @@ sound.c
 #if defined(IRIVER_IFP7XX_SERIES) && defined(STUB)
 common/sscanf.c
 usb_serial.c
+#endif
+
+#ifndef SIMULATOR
+#ifdef IAUDIO_X5
+drivers/generic_i2c.c
+target/coldfire/iaudio/x5/power-x5.c
+target/coldfire/iaudio/x5/lcd-x5.c
+target/coldfire/iaudio/x5/pcf50606-x5.c
+#endif
 #endif
