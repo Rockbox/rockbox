@@ -1168,8 +1168,12 @@ all: tools
 	\$(SILENT)\$(MAKE) -C \$(FIRMDIR) OBJDIR=\$(BUILDDIR)/firmware
 	\$(SILENT)\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@
 
-clean:
+veryclean: clean toolsclean
+
+toolsclean:
 	\$(SILENT)\$(MAKE) -C \$(TOOLSDIR) clean
+
+clean:
 	\$(SILENT)echo Cleaning build directory
 	\$(SILENT)rm -rf rockbox.zip TAGS @APPS@ firmware comsim sim lang.[ch]\
                   manual *.pdf *.a credits.raw @OUTPUT@ bitmaps pluginbitmaps \
