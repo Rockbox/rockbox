@@ -155,7 +155,7 @@ void sdl_audio_callback(void *udata, Uint8 *stream, int len)
     if (pcm_data_size > 0) {
         /* We have some PCM data to play. Play as much as we can. */
 
-        pcm_data_played = (((Uint32)len) > pcm_data_size) ? pcm_data_size : len;
+        pcm_data_played = (((Uint32)len) > pcm_data_size) ? pcm_data_size : (Uint32)len;
 
         memcpy(stream, pcm_data, pcm_data_played);
 
