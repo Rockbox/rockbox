@@ -4,9 +4,11 @@ battery_test.c
 chessclock.c
 credits.c
 cube.c
+dict.c
 favorites.c
 firmware_flash.c
 logo.c
+metronome.c
 mosaique.c
 rockbox_flash.c
 search.c
@@ -16,23 +18,20 @@ stats.c
 stopwatch.c
 vbrfix.c
 viewer.c
-dict.c
-metronome.c
 
-#ifndef IRIVER_IFP7XX_SERIES /* Temporarily disable plugins for iFP7xx */
-#ifdef HAVE_LCD_BITMAP /* Recorder/Ondio models only */
+#ifndef IRIVER_IFP7XX_SERIES       /* Temporarily disable plugins for iFP7xx */
+#ifdef HAVE_LCD_BITMAP             /* Not for the Player */
 
-/* Plugins needing the grayscale lib */
-#if CONFIG_LCD != LCD_IPOD2BPP
+#if CONFIG_LCD != LCD_IPOD2BPP     /* Plugins needing the grayscale lib */
 #ifndef HAVE_LCD_COLOR
+grayscale.c
 fire.c
 #endif
-plasma.c
 jpeg.c
 mandelbrot.c
+plasma.c
 #endif
 
-solitaire.c
 bejeweled.c
 bounce.c
 #if (LCD_WIDTH != 138) && (LCD_WIDTH != 128)
@@ -43,19 +42,15 @@ calculator.c
 chip8.c
 demystify.c
 flipit.c
-grayscale.c
 minesweeper.c
 oscillograph.c
 oscilloscope.c
 pong.c
 rockblox.c
-#if (CONFIG_KEYPAD == RECORDER_PAD) && !defined(SIMULATOR)
-/* loader, only needed for Archos */
-rockboy.c
-#endif
 sliding_puzzle.c
 snake.c
 snake2.c
+solitaire.c
 sokoban.c
 star.c
 starfield.c
@@ -67,38 +62,42 @@ sudoku.c
 video.c
 #endif
 vu_meter.c
+#if CONFIG_KEYPAD == RECORDER_PAD  /* Recorder models only for now */
+wormlet.c
+#endif
 
 #ifdef CONFIG_RTC 
-#if CONFIG_KEYPAD == RECORDER_PAD
-/* Recorder models only for now */
+#if CONFIG_KEYPAD == RECORDER_PAD  /* Recorder models only for now */
 calendar.c
 clock.c
 #endif
-#endif /* #ifdef CONFIG_RTC */
+#endif /* CONFIG_RTC */
 
-#if CONFIG_KEYPAD != ONDIO_PAD
-/* gradually bring in the ones not working yet */
-wormlet.c
-#endif /* #if CONFIG_KEYPAD != ONDIO_PAD */
-#endif /*#ifdef HAVE_LCD_BITMAP */
+#if (MEM <= 8) && !defined(SIMULATOR) /* loaders, only needed for Archos */
+chessbox.c
+#if CONFIG_KEYPAD == RECORDER_PAD
+rockboy.c
+#endif
+#endif
 
-#ifdef HAVE_LCD_CHARCELLS /* Player model only */
+#endif /* HAVE_LCD_BITMAP */
+
+#ifdef HAVE_LCD_CHARCELLS          /* Player model only */
 euroconverter.c
 jackpot.c
 nim.c
-#endif /* #ifdef HAVE_LCD_CHARCELLS */
+#endif /* HAVE_LCD_CHARCELLS */
 
-#ifndef HAVE_MMC
-/* not for Ondio, has no remote control pin */
+#if CONFIG_CODEC == SWCODEC        /* software codec platforms */
+iriverify.c
+mp3_encoder.c
+midi2wav.c
+wav2wv.c
+#else                              /* hardware codec platforms */
+#ifndef HAVE_MMC                   /* not for Ondio, has no remote control pin */
 alpine_cdc.c
 #endif
-
-#if CONFIG_CODEC == SWCODEC /* software codec platforms */
-mp3_encoder.c
-iriverify.c
-wav2wv.c
-midi2wav.c
-#else
 splitedit.c
+#endif /* CONFIG_CODEC */
+
 #endif /* iFP7xx */
-#endif

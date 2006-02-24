@@ -89,12 +89,14 @@ PLUGIN_HEADER
 #define CB_QUIT    BUTTON_OFF
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
+#define CB_SELECT_PRE BUTTON_MENU
 #define CB_SELECT  (BUTTON_MENU|BUTTON_REL)
 #define CB_UP      BUTTON_UP
 #define CB_DOWN    BUTTON_DOWN
 #define CB_LEFT    BUTTON_LEFT
 #define CB_RIGHT   BUTTON_RIGHT
-#define CB_PLAY    BUTTON_MENU
+#define CB_PLAY_PRE BUTTON_MENU
+#define CB_PLAY    (BUTTON_MENU|BUTTON_REPEAT)
 #define CB_LEVEL   (BUTTON_MENU|BUTTON_OFF)
 #define CB_QUIT    BUTTON_OFF
 
@@ -132,6 +134,12 @@ PLUGIN_HEADER
 #define COMMAND_LEVEL	3
 /*#define COMMAND_RESTART	4*/
 #define COMMAND_QUIT	5
+
+/* GCC wants this to be present for some targets */
+void* memcpy(void* dst, const void* src, size_t size)
+{
+    return rb->memcpy(dst, src, size);
+}
 
 /* ---- Get the board column and row (e2 f.e.) for a physical x y ---- */
 void xy2cr ( short x, short y, short *c, short *r ) {
@@ -286,7 +294,7 @@ void cb_levelup ( void ) {
 struct cb_command cb_getcommand (void) {
 	static short x = 4 , y = 4 ;
 	short c , r , l;
-	int button = BUTTON_NONE;
+	int button, lastbutton = BUTTON_NONE;
 	int marked = false , from_marked = false ;
 	short marked_x = 0 , marked_y = 0 ;
 	struct cb_command result = { 0, {0,0,0,0,0}, 0 };
@@ -306,6 +314,10 @@ struct cb_command cb_getcommand (void) {
 				result.type = COMMAND_LEVEL;
 				return result;
 			case CB_PLAY:
+#ifdef CB_PLAY_PRE
+                if (lastbutton != CB_PLAY_PRE)
+                    break;
+#endif
 				result.type = COMMAND_PLAY;
 				return result;
 			case CB_UP:
@@ -369,6 +381,10 @@ struct cb_command cb_getcommand (void) {
 				}
 				break;
 			case CB_SELECT:
+#ifdef CB_SELECT_PRE
+                if (lastbutton != CB_SELECT_PRE)
+                    break;
+#endif
 				if ( !marked ) {
 					xy2cr ( x , y , &c , &r );
                     l = locn[r][c];
@@ -396,6 +412,8 @@ struct cb_command cb_getcommand (void) {
 				}
 				break;
 		}
+		if (button != BUTTON_NONE)
+            lastbutton = button;
 	}
 
 }

@@ -9,7 +9,7 @@
 
 INCLUDES = -I$(APPSDIR) -I.. -I. -I$(FIRMDIR)/include -I$(FIRMDIR)/export \
  -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers -I$(OUTDIR) -I$(BUILDDIR)
-CFLAGS = $(GCCOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
+CFLAGS = $(GCCOPTS) -O2 $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
  -DTARGET_ID=$(TARGET_ID) -DMEM=${MEMORYSIZE} -DPLUGIN
 
 ifdef APPEXTRA
@@ -24,8 +24,17 @@ SOURCES = $(SRC)
 OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 DIRS = .
 
-LDS := ../plugin.lds
-OUTPUT = $(OUTDIR)/chessbox.rock
+ifndef SIMVER
+ifneq (,$(strip $(foreach tgt,RECORDER ONDIO,$(findstring $(tgt),$(TARGET)))))
+    LDS := archos.lds
+    OUTPUT = $(OUTDIR)/chessbox.ovl
+else  ## iRiver target
+    LDS := ../plugin.lds
+    OUTPUT = $(OUTDIR)/chessbox.rock
+endif
+else  ## simulators
+    OUTPUT = $(OUTDIR)/chessbox.rock
+endif
 
 all: $(OUTPUT)
 
