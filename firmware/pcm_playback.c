@@ -625,9 +625,9 @@ void pcm_init(void)
     dma_stop();
 }
 
-#elif CONFIG_CPU == PNX0101
+#elif (CONFIG_CPU == PNX0101) || (CONFIG_CPU == PP5002)
 
-/* TODO: Implement for iFP7xx
+/* TODO: Implement for iFP7xx and iPod 3G
    For now, just implement some dummy functions.
 */
 
@@ -686,7 +686,7 @@ size_t pcm_get_bytes_waiting(void)
 
 #endif
 
-#if CONFIG_CPU != PNX0101
+#if (CONFIG_CPU != PNX0101) && (CONFIG_CPU != PP5002)
 /*
  * This function goes directly into the DMA buffer to calculate the left and
  * right peak values. To avoid missing peaks it tries to look forward two full
