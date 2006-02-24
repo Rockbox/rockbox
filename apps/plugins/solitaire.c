@@ -886,7 +886,7 @@ int solitaire(void){
             draw_type=change_draw(draw_type);
             configfile_save(FILENAME, config, 1, 0);   
             when=draw_type==0?MENU_BEFOREGAME:MENU_BEFOREGAMEOP;
-            return NULL; 
+            return 0; 
     }
 #if LCD_DEPTH>1
                 rb->lcd_set_foreground(LCD_BLACK);

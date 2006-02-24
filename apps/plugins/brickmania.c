@@ -958,7 +958,7 @@ int help(int when)
                         return 1;
                         break;
                 }
-                return NULL;
+                return 0;
                 break;
 			case LEFT:
 			case LEFT | BUTTON_REPEAT:
@@ -987,7 +987,7 @@ int help(int when)
                 break;
         }
     }
-    return NULL;
+    return 0;
 }
 
 int pad_check(int ballxc, int mode, int pon ,int ballnum) 
@@ -1014,7 +1014,7 @@ int fire_space(void)
         if (fire[t].top+7 < 0)
             return t;
 
-    return NULL;
+    return 0;
 }
 
 int game_loop(void){
@@ -1388,7 +1388,7 @@ int game_loop(void){
 
                             ball[k].y = -4;
                             if (ball[k].pos_x != 0 && ball[k].pos_x+BALL!=LCD_WIDTH)
-                                ball[k].x = pad_check(2,1,NULL,k);
+                                ball[k].x = pad_check(2,1,0,k);
 
                     } else {
                             ball[k].y = -4;
