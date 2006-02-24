@@ -954,9 +954,9 @@ void peak_meter_draw(int x, int y, int width, int height)
     if ((pm_clip_left || pm_clip_right) && 
         global_settings.cliplight &&
 #if CONFIG_CODEC == SWCODEC        
-        (pcm_rec_status() & (AUDIO_STATUS_RECORD | AUDIO_STATUS_PRERECORD)))
+        !pm_playback)
 #else
-        (audio_status() & (AUDIO_STATUS_RECORD | AUDIO_STATUS_PRERECORD)))
+        !(audio_status() & (AUDIO_STATUS_PLAY | AUDIO_STATUS_ERROR)))
 #endif
     {
         /* if clipping, cliplight setting on and in recording screen */
