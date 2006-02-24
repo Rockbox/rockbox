@@ -332,9 +332,14 @@ void init(void)
 
     settings_calc_config_sector();
     
+#if defined(SETTINGS_RESET) || (CONFIG_KEYPAD == IPOD_4G_PAD)
 #ifdef SETTINGS_RESET
     /* Reset settings if holding the rec button. */
     if ((button_status() & SETTINGS_RESET) == SETTINGS_RESET)
+#else
+    /* Reset settings if the hold button is turned on */
+    if (button_hold())
+#endif
     {
         gui_syncsplash(HZ*2, true, str(LANG_RESET_DONE_CLEAR));
         settings_reset();
