@@ -27,7 +27,8 @@
     (CONFIG_KEYPAD == IAUDIO_X5_PAD)
 #define HAS_BUTTON_HOLD
 #define HAS_REMOTE_BUTTON_HOLD
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_3G_PAD)
 #define HAS_BUTTON_HOLD
 #endif
 extern struct event_queue button_queue;

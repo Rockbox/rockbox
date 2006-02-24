@@ -82,10 +82,8 @@
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 8
 
-#define USB_IPODSTYLE
+#define USB_NONE
 
-/* define this if the unit can be powered or charged via USB */
-#define HAVE_USB_POWER
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL

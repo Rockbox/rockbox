@@ -34,7 +34,7 @@
 #include "pcf50606.h" /* iRiver brightness */
 #endif
  
-#if CONFIG_BACKLIGHT == BL_IRIVER_H300
+#if (CONFIG_BACKLIGHT == BL_IRIVER_H300) || (CONFIG_BACKLIGHT == BL_IPOD3G)
 #include "lcd.h" /* for lcd_enable() */
 #endif
 #ifdef HAVE_REMOTE_LCD

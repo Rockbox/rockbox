@@ -73,7 +73,7 @@ SECTIONS
     .text :
     {
         *(.text*)
-#if (CONFIG_CPU==PP5020) || (CONFIG_CPU==PNX0101)
+#if (CONFIG_CPU==PP5020) || (CONFIG_CPU==PNX0101) || (CONFIG_CPU==PP5002)
         *(.glue_7)
         *(.glue_7t)
 #endif

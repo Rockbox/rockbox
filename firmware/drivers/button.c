@@ -241,9 +241,6 @@ void ipod_4g_button_int(void)
 }
 #endif 
 #if CONFIG_KEYPAD == IPOD_3G_PAD
-/* Variable to use for setting button status in interrupt handler */
-int int_btn = BUTTON_NONE;
-
 /**
  * 
  * 
@@ -282,12 +279,13 @@ void handle_scroll_wheel(int new_scroll, int was_hold, int reverse)
             else {
                 /* 'r' keypress */
                 wheel_keycode = BUTTON_SCROLL_FWD;
+            }
             break;
         default:
             /* only happens if we get out of sync */
             break;
+        
         }
-    }
     }
     if (wheel_keycode != BUTTON_NONE)
               queue_post(&button_queue, wheel_keycode, NULL);
@@ -306,65 +304,56 @@ int btn = BUTTON_NONE;
         udelay(250);
 
     /* get source of interupts */
-    source = inb(0xcf000040);
-    if (source) {
+    source = GPIOA_INT_STAT;
+
         
         /* get current keypad status */
-        state = inb(0xcf000030);
-        outb(~state, 0xcf000060);
+        state = GPIOA_INPUT_VAL;
+        GPIOA_INT_LEV = ~state;
     
             if (was_hold && source == 0x40 && state == 0xbf) {
                 /* ack any active interrupts */
-                outb(source, 0xcf000070);
+                GPIOA_INT_CLR = source;
                 return BUTTON_NONE;
             }
             was_hold = 0;
     
     
-        if ( source & 0x20 ) {
+        if ((state & 0x20) == 0) {
                 /* 3g hold switch is active low */
                     btn |= BUTTON_HOLD;
                     was_hold = 1;
                 /* hold switch on 3g causes all outputs to go low */
                 /* we shouldn't interpret these as key presses */
-                goto done;
+                GPIOA_INT_CLR = source;
+                return BUTTON_NONE;
         }
-        if (source & 0x1) {
+        if ((state & 0x1) == 0) {
              btn |= BUTTON_RIGHT;
         }
-        if (source & 0x2) {
+        if ((state & 0x2) == 0) {
             btn |= BUTTON_SELECT;
         }
-        if (source & 0x4) {
+        if ((state & 0x4) == 0) {
             btn |= BUTTON_PLAY;
         }
-        if (source & 0x8) {
+        if ((state & 0x8) == 0) {
             btn |= BUTTON_LEFT;
         }
-        if (source & 0x10) {
+        if ((state & 0x10) == 0) {
             btn |= BUTTON_MENU;
         }
     
         if (source & 0xc0) {
             handle_scroll_wheel((state & 0xc0) >> 6, was_hold, 0);
         }
-    done:
     
         /* ack any active interrupts */
-        outb(source, 0xcf000070);
-    }
+       GPIOA_INT_CLR = source;
+    
     return btn;
 }
 
-void ipod_3g_button_int(void)
-{
-    /**
-     *  Theire is other things to do but for now ...
-     * TODO: implement this function in a better way 
-     **/
-   int_btn = ipod_3g_button_read();
-   
-}
 #endif 
 static void button_tick(void)
 {
@@ -566,10 +555,9 @@ void button_init(void)
     CPU_HI_INT_EN = I2C_MASK;
 
 #elif CONFIG_KEYPAD == IPOD_3G_PAD
-    outb(~inb(GPIOA_INPUT_VAL), GPIOA_INT_LEV);
-    outb(inb(GPIOA_INT_STAT), GPIOA_INT_CLR);
-    outb(0xff, GPIOA_INT_EN);
-
+    GPIOA_INT_LEV = ~GPIOA_INPUT_VAL;
+    GPIOA_INT_CLR = GPIOA_INT_STAT;
+    GPIOA_INT_EN  = 0xff;
 #endif /* CONFIG_KEYPAD */
     queue_init(&button_queue);
     button_read();
@@ -1043,10 +1031,14 @@ static int button_read(void)
     if (data & 0x01)
         btn |= BUTTON_ON;
 
-#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD)
     (void)data;
     /* The int_btn variable is set in the button interrupt handler */
     btn = int_btn;
+#elif (CONFIG_KEYPAD == IPOD_3G_PAD)
+    (void)data;
+    btn = ipod_3g_button_read();
+
 #elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
     static bool hold_button = false;
     static bool remote_hold_button = false;
@@ -1098,7 +1090,7 @@ static int button_read(void)
     return retval;
 }
 
-#if (CONFIG_KEYPAD == IPOD_4G_PAD)
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
 bool button_hold(void)
 {
     return (GPIOA_INPUT_VAL & 0x20)?false:true;

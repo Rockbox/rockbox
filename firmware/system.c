@@ -1230,14 +1230,16 @@ int system_memory_guard(int newmode)
 unsigned int ipod_hw_rev;
 #ifndef BOOTLOADER
 extern void TIMER1(void);
-extern void ipod_3g_button_int(void);
 
 void irq(void)
 {
     if (CPU_INT_STAT & TIMER1_MASK) 
         TIMER1();
-    else if (CPU_INT_STAT & GPIO_MASK)
-        ipod_3g_button_int();
+}
+
+void fiq(void)
+{
+   /** TODO: implement this function   **/
 }
 #endif
 
@@ -1259,7 +1261,7 @@ static void ipod_init_cache(void)
     outl(0x2, 0xcf004024);
 
     /* PP5002 has 8KB cache */
-    for (i = 0xf0004000; i < 0xf0006000; i += 16) {
+    for (i = 0xf0004000; i < (int)(0xf0006000); i += 16) {
         outl(0x0, i);
     }
 

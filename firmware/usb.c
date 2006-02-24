@@ -68,7 +68,7 @@ void screen_dump(void);   /* Nasty again. Defined in apps/ too */
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define USBPOWER_BUTTON BUTTON_MENU
 #define USBPOWER_BTN_IGNORE BUTTON_OFF
-#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define USBPOWER_BUTTON BUTTON_MENU
 #define USBPOWER_BTN_IGNORE BUTTON_PLAY
 #elif CONFIG_KEYPAD == IRIVER_H300_PAD
@@ -166,7 +166,7 @@ void usb_enable(bool on)
 #endif
     }
     
-#elif defined(USB_IPODSTYLE)
+#elif defined(USB_IPODSTYLE) 
     /* For the ipod, we can only do one thing with USB mode - reboot
        into Apple's flash-based disk-mode.  This does not return. */
     if (on)
@@ -181,6 +181,7 @@ void usb_enable(bool on)
         memcpy(storage_ptr, "diskmode\0\0hotstuff\0\0\1", 21);
         DEV_RS |= 4; /* Reboot */
     }
+
 #elif defined(USB_ISP1582)
     /* TODO: Implement USB_ISP1582 */
     (void) on;
@@ -554,6 +555,7 @@ void usb_init(void)
 
     tick_add_task(usb_tick);
 #endif
+
 }
 
 void usb_wait_for_disconnect(struct event_queue *q)
@@ -640,6 +642,11 @@ void usb_start_monitoring(void)
 bool usb_detect(void)
 {
     return false;
+}
+
+void usb_wait_for_disconnect(struct event_queue *q)
+{
+   (void*)q;
 }
 
 #endif /* USB_NONE or SIMULATOR */

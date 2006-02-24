@@ -183,7 +183,8 @@ const unsigned char rockbox16x7[] = {
 #define LP_INC_X BUTTON_RIGHT
 #define LP_DEC_Y (BUTTON_ON | BUTTON_LEFT)
 #define LP_INC_Y (BUTTON_ON | BUTTON_RIGHT)
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_3G_PAD)
 #define LP_QUIT BUTTON_MENU
 #define LP_DEC_X BUTTON_LEFT
 #define LP_INC_X BUTTON_RIGHT
