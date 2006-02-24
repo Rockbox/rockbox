@@ -706,7 +706,6 @@ void button_set_flip(bool flip)
 
 #endif /* CONFIG_KEYPAD */
 
-int counter;
 /*
  * Get button pressed from hardware
  */
@@ -1052,8 +1051,6 @@ static int button_read(void)
     static bool hold_button = false;
     static bool remote_hold_button = false;
 
-    counter ++;
-    
     hold_button = button_hold();
     remote_hold_button = remote_button_hold();
 
