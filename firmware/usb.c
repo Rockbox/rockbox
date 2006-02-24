@@ -646,7 +646,7 @@ bool usb_detect(void)
 
 void usb_wait_for_disconnect(struct event_queue *q)
 {
-   (void*)q;
+   (void)q;
 }
 
 #endif /* USB_NONE or SIMULATOR */
