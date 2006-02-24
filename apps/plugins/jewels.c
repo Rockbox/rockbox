@@ -25,71 +25,56 @@
 
 PLUGIN_HEADER
 
-/* button definitions */
+/* button definitions, every keypad must only have directions & select */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define BEJEWELED_UP     BUTTON_UP
 #define BEJEWELED_DOWN   BUTTON_DOWN
 #define BEJEWELED_LEFT   BUTTON_LEFT
 #define BEJEWELED_RIGHT  BUTTON_RIGHT
-#define BEJEWELED_QUIT   BUTTON_OFF
-#define BEJEWELED_START  BUTTON_ON
 #define BEJEWELED_SELECT BUTTON_PLAY
-#define BEJEWELED_RESUME BUTTON_F1
+#define BEJEWELED_CANCEL BUTTON_OFF
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
-#define BEJEWELED_UP         BUTTON_UP
-#define BEJEWELED_DOWN       BUTTON_DOWN
-#define BEJEWELED_LEFT       BUTTON_LEFT
-#define BEJEWELED_RIGHT      BUTTON_RIGHT
-#define BEJEWELED_QUIT       BUTTON_OFF
-#define BEJEWELED_START      BUTTON_RIGHT
-#define BEJEWELED_SELECT     (BUTTON_MENU|BUTTON_REL)
-#define BEJEWELED_SELECT_PRE BUTTON_MENU
-#define BEJEWELED_RESUME     (BUTTON_MENU|BUTTON_OFF)
+#define BEJEWELED_UP     BUTTON_UP
+#define BEJEWELED_DOWN   BUTTON_DOWN
+#define BEJEWELED_LEFT   BUTTON_LEFT
+#define BEJEWELED_RIGHT  BUTTON_RIGHT
+#define BEJEWELED_SELECT BUTTON_MENU
+#define BEJEWELED_CANCEL BUTTON_OFF
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define BEJEWELED_UP     BUTTON_UP
 #define BEJEWELED_DOWN   BUTTON_DOWN
 #define BEJEWELED_LEFT   BUTTON_LEFT
 #define BEJEWELED_RIGHT  BUTTON_RIGHT
-#define BEJEWELED_QUIT   BUTTON_OFF
-#define BEJEWELED_START  BUTTON_ON
 #define BEJEWELED_SELECT BUTTON_SELECT
-#define BEJEWELED_RESUME BUTTON_MODE
+#define BEJEWELED_CANCEL BUTTON_OFF
 
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define BEJEWELED_SCROLLWHEEL
-#define BEJEWELED_UP         BUTTON_MENU
-#define BEJEWELED_DOWN       BUTTON_PLAY
-#define BEJEWELED_LEFT       BUTTON_LEFT
-#define BEJEWELED_RIGHT      BUTTON_RIGHT
-#define BEJEWELED_PREV       BUTTON_SCROLL_BACK
-#define BEJEWELED_NEXT       BUTTON_SCROLL_FWD
-#define BEJEWELED_QUIT       (BUTTON_SELECT|BUTTON_MENU)
-#define BEJEWELED_START      BUTTON_PLAY
-#define BEJEWELED_SELECT     (BUTTON_SELECT|BUTTON_REL)
-#define BEJEWELED_SELECT_PRE BUTTON_SELECT
-#define BEJEWELED_RESUME     (BUTTON_SELECT|BUTTON_PLAY)
+#define BEJEWELED_UP     BUTTON_MENU
+#define BEJEWELED_DOWN   BUTTON_PLAY
+#define BEJEWELED_LEFT   BUTTON_LEFT
+#define BEJEWELED_RIGHT  BUTTON_RIGHT
+#define BEJEWELED_PREV   BUTTON_SCROLL_BACK
+#define BEJEWELED_NEXT   BUTTON_SCROLL_FWD
+#define BEJEWELED_SELECT BUTTON_SELECT
 
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
 #define BEJEWELED_UP     BUTTON_UP
 #define BEJEWELED_DOWN   BUTTON_DOWN
 #define BEJEWELED_LEFT   BUTTON_LEFT
 #define BEJEWELED_RIGHT  BUTTON_RIGHT
-#define BEJEWELED_QUIT   BUTTON_PLAY
-#define BEJEWELED_START  BUTTON_MODE
 #define BEJEWELED_SELECT BUTTON_SELECT
-#define BEJEWELED_RESUME BUTTON_EQ
+#define BEJEWELED_CANCEL BUTTON_PLAY
 
 #elif CONFIG_KEYPAD == IAUDIO_X5_PAD
 #define BEJEWELED_UP     BUTTON_UP
 #define BEJEWELED_DOWN   BUTTON_DOWN
 #define BEJEWELED_LEFT   BUTTON_LEFT
 #define BEJEWELED_RIGHT  BUTTON_RIGHT
-#define BEJEWELED_QUIT   BUTTON_POWER
-#define BEJEWELED_START  BUTTON_PLAY
 #define BEJEWELED_SELECT BUTTON_MENU
-#define BEJEWELED_RESUME BUTTON_REC
+#define BEJEWELED_CANCEL BUTTON_PLAY
 
 #else
     #error BEJEWELED: Unsupported keypad
@@ -123,6 +108,13 @@ PLUGIN_HEADER
 #define YOFS 0
 #define NUM_SCORES 10
 
+/* use 13x13 tiles (iPod Mini) */
+#elif (LCD_HEIGHT == 110) && (LCD_WIDTH == 138)
+#define TILE_WIDTH  13
+#define TILE_HEIGHT 13
+#define YOFS 6
+#define NUM_SCORES 10
+
 /* use 10x8 tiles (iFP 700) */
 #elif (LCD_HEIGHT == 64) && (LCD_WIDTH == 128)
 #define TILE_WIDTH 10
@@ -139,14 +131,6 @@ PLUGIN_HEADER
 
 #else
   #error BEJEWELED: Unsupported LCD
-#endif
-
-/* tile background colors */
-#if defined(HAVE_LCD_COLOR)
-static const unsigned bejeweled_bkgd[2] = {
-    LCD_RGBPACK(104, 63, 63),
-    LCD_RGBPACK(83, 44, 44)
-};
 #endif
 
 /* save files */
@@ -173,13 +157,68 @@ static const unsigned bejeweled_bkgd[2] = {
 #define LEVEL_PTS 100
 
 /* animation frame rate */
-#define FPS 20
+#define MAX_FPS 20
+
+/* menu values */
+#define FONT_HEIGHT 8
+#define MAX_MITEMS  5
+#define MENU_WIDTH  100
+
+/* menu results */
+enum menu_result {
+    MRES_NONE,
+    MRES_NEW,
+    MRES_SAVE,
+    MRES_RESUME,
+    MRES_SCORES,
+    MRES_HELP,
+    MRES_QUIT
+};
+
+/* menu commands */
+enum menu_cmd {
+    MCMD_NONE,
+    MCMD_NEXT,
+    MCMD_PREV,
+    MCMD_SELECT
+};
+
+/* menus */
+struct bejeweled_menu {
+    char *title;
+    bool hasframe;
+    int selected;
+    int itemcnt;
+    struct bejeweled_menuitem {
+        char *text;
+        enum menu_result res;
+    } items[MAX_MITEMS];
+} bjmenu[] = {
+    {"Bejeweled", false, 0, 5,
+        {{"New Game",    MRES_NEW},
+         {"Resume Game", MRES_RESUME},
+         {"High Scores", MRES_SCORES},
+         {"Help",        MRES_HELP},
+         {"Quit",        MRES_QUIT}}},
+    {"Menu", true, 0, 3,
+        {{"Resume Game", MRES_RESUME},
+         {"Save Game",   MRES_SAVE},
+         {"End Game",    MRES_QUIT}}}
+};
 
 /* global rockbox api */
 static struct plugin_api* rb;
 
 /* external bitmaps */
 extern const fb_data bejeweled_jewels[];
+
+/* tile background colors */
+#ifdef HAVE_LCD_COLOR
+static const unsigned bejeweled_bkgd[2] = {
+    LCD_RGBPACK(104, 63, 63),
+    LCD_RGBPACK(83, 44, 44)
+};
+#endif
 
 /* the tile struct
  * type is the jewel number 0-7
@@ -318,10 +357,74 @@ static void bejeweled_drawboard(struct game_context* bj) {
     rb->snprintf(str, 6, "%d", (bj->level-1)*LEVEL_PTS+bj->score);
     rb->lcd_getstringsize(str, &w, &h);
     rb->lcd_putsxy(LCD_WIDTH-(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2-w/2,
-                   LCD_HEIGHT-8,
-                   str);
+                   LCD_HEIGHT-8, str);
 
     rb->lcd_update();
+}
+
+/*****************************************************************************
+* bejeweled_showmenu() displays the chosen menu after performing the chosen
+*     menu command.
+******************************************************************************/
+static enum menu_result bejeweled_showmenu(struct bejeweled_menu* menu,
+                                           enum menu_cmd cmd) {
+    int i;
+    int w, h;
+    int firstline;
+    int adj;
+
+    /* handle menu command */
+    switch(cmd) {
+        case MCMD_NEXT:
+            menu->selected = (menu->selected+1)%menu->itemcnt;
+            break;
+
+        case MCMD_PREV:
+            menu->selected = (menu->selected-1+menu->itemcnt)%menu->itemcnt;
+            break;
+
+        case MCMD_SELECT:
+            return menu->items[menu->selected].res;
+
+        default:
+            break;
+    }
+
+    /* clear menu area */
+    firstline = (LCD_HEIGHT/FONT_HEIGHT-(menu->itemcnt+3))/2;
+
+    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    rb->lcd_fillrect((LCD_WIDTH-MENU_WIDTH)/2, firstline*FONT_HEIGHT,
+                     MENU_WIDTH, (menu->itemcnt+3)*FONT_HEIGHT);
+    rb->lcd_set_drawmode(DRMODE_SOLID);
+
+    if(menu->hasframe) {
+        rb->lcd_drawrect((LCD_WIDTH-MENU_WIDTH)/2-1, firstline*FONT_HEIGHT-1,
+                         MENU_WIDTH+2, (menu->itemcnt+3)*FONT_HEIGHT+2);
+        rb->lcd_hline((LCD_WIDTH-MENU_WIDTH)/2-1,
+                      (LCD_WIDTH-MENU_WIDTH)/2-1+MENU_WIDTH+2,
+                      (firstline+1)*FONT_HEIGHT);
+    }
+
+    /* draw menu items */
+    rb->lcd_getstringsize(menu->title, &w, &h);
+    rb->lcd_putsxy((LCD_WIDTH-w)/2, firstline*FONT_HEIGHT, menu->title);
+
+    for(i=0; i<menu->itemcnt; i++) {
+        if(i == menu->selected) {
+            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        }
+        rb->lcd_putsxy((LCD_WIDTH-MENU_WIDTH)/2, (firstline+i+2)*FONT_HEIGHT,
+                       menu->items[i].text);
+        if(i == menu->selected) {
+            rb->lcd_set_drawmode(DRMODE_SOLID);
+        }
+    }
+
+    adj = (firstline == 0 ? 0 : 1);
+    rb->lcd_update_rect((LCD_WIDTH-MENU_WIDTH)/2-1, firstline*FONT_HEIGHT-adj,
+                        MENU_WIDTH+2, (menu->itemcnt+3)*FONT_HEIGHT+2*adj);
+    return MRES_NONE;
 }
 
 /*****************************************************************************
@@ -412,13 +515,15 @@ static void bejeweled_putjewels(struct game_context* bj){
                 }
             }
 
-            rb->lcd_update();
+            rb->lcd_update_rect(0, 0, TILE_WIDTH*8, LCD_HEIGHT);
             bejeweled_setcolors();
 
             /* framerate limiting */
             currenttick = *rb->current_tick;
-            if(currenttick-lasttick < HZ/FPS) {
-                rb->sleep((HZ/FPS)-(currenttick-lasttick));
+            if(currenttick-lasttick < HZ/MAX_FPS) {
+                rb->sleep((HZ/MAX_FPS)-(currenttick-lasttick));
+            } else {
+                rb->yield();
             }
             lasttick = currenttick;
         }
@@ -650,13 +755,15 @@ static unsigned int bejeweled_swapjewels(struct game_context* bj,
             rb->lcd_set_drawmode(DRMODE_SOLID);
 #endif
 
-            rb->lcd_update();
+            rb->lcd_update_rect(0, 0, TILE_WIDTH*8, LCD_HEIGHT);
             bejeweled_setcolors();
 
             /* framerate limiting */
             currenttick = *rb->current_tick;
-            if(currenttick-lasttick < HZ/FPS) {
-                rb->sleep((HZ/FPS)-(currenttick-lasttick));
+            if(currenttick-lasttick < HZ/MAX_FPS) {
+                rb->sleep((HZ/MAX_FPS)-(currenttick-lasttick));
+            } else {
+                rb->yield();
             }
             lasttick = currenttick;
         }
@@ -939,12 +1046,12 @@ static int bejeweled(struct game_context* bj) {
     int i, j;
     int w, h;
     int button;
-    int lastbutton = BUTTON_NONE;
     char str[18];
-    char *title = "Bejeweled";
     bool startgame = false;
-    bool showscores = false;
+    bool inmenu = false;
     bool selected = false;
+    enum menu_cmd cmd = MCMD_NONE;
+    enum menu_result res;
 
     /* the cursor coordinates */
     int x=0, y=0;
@@ -955,115 +1062,129 @@ static int bejeweled(struct game_context* bj) {
     /********************
     *       menu        *
     ********************/
-    while(!startgame){
-        rb->lcd_clear_display();
+    rb->lcd_clear_display();
 
-        if(!showscores) {
-             /* welcome screen to display key bindings */
-            rb->lcd_getstringsize(title, &w, &h);
-            rb->lcd_putsxy((LCD_WIDTH-w)/2, 0, title);
-#if CONFIG_KEYPAD == RECORDER_PAD
-            rb->lcd_puts(0, 1, "ON to start");
-            rb->lcd_puts(0, 2, "F1 to save/resume");
-            rb->lcd_puts(0, 3, "OFF to exit");
-            rb->lcd_puts(0, 4, "PLAY to select");
-            rb->lcd_puts(0, 5, "& show high scores");
-            rb->lcd_puts(0, 6, "Directions to move");
-            rb->snprintf(str, 18, "High Score: %d", bj->highscores[0]);
-            rb->lcd_puts(0, 7, str);
-#elif CONFIG_KEYPAD == ONDIO_PAD
-            rb->lcd_puts(0, 1, "RIGHT to start");
-            rb->lcd_puts(0, 2, "MENU+OFF to sv/res");
-            rb->lcd_puts(0, 3, "OFF to exit");
-            rb->lcd_puts(0, 4, "MENU to select");
-            rb->lcd_puts(0, 5, "& show high scores");
-            rb->lcd_puts(0, 6, "Directions to move");
-            rb->snprintf(str, 18, "High Score: %d", bj->highscores[0]);
-            rb->lcd_puts(0, 7, str);
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-            rb->lcd_puts(0, 2, "ON to start");
-            rb->lcd_puts(0, 3, "MODE to save/resume");
-            rb->lcd_puts(0, 4, "OFF to exit");
-            rb->lcd_puts(0, 5, "SELECT to select");
-            rb->lcd_puts(0, 6, " and show high scores");
-            rb->lcd_puts(0, 7, "Directions to move");
-            rb->snprintf(str, 18, "High Score: %d", bj->highscores[0]);
-            rb->lcd_puts(0, 9, str);
-#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
-            rb->lcd_puts(0, 2, "PLAY to start");
-            rb->lcd_puts(0, 3, "SELECT+PLAY to save/resume");
-            rb->lcd_puts(0, 4, "SELECT+MENU to exit");
-            rb->lcd_puts(0, 5, "SELECT to select");
-            rb->lcd_puts(0, 6, " and show high scores");
-            rb->lcd_puts(0, 7, "Scroll or Directions to move");
-            rb->lcd_puts(0, 8, "Directions to swap");
-            rb->snprintf(str, 18, "High Score: %d", bj->highscores[0]);
-            rb->lcd_puts(0, 10, str);
-#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-            rb->lcd_puts(0, 1, "MODE to start");
-            rb->lcd_puts(0, 2, "EQ to save/resume");
-            rb->lcd_puts(0, 3, "PLAY to exit");
-            rb->lcd_puts(0, 4, "SELECT to select");
-            rb->lcd_puts(0, 5, "& show high scores");
-            rb->lcd_puts(0, 6, "Directions to move");
-            rb->snprintf(str, 18, "High Score: %d", bj->highscores[0]);
-            rb->lcd_puts(0, 7, str);
-#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
-            rb->lcd_puts(0, 2, "PLAY to start");
-            rb->lcd_puts(0, 3, "REC to save/resume");
-            rb->lcd_puts(0, 4, "POWER to exit");
-            rb->lcd_puts(0, 5, "MENU to select");
-            rb->lcd_puts(0, 6, " and show high scores");
-            rb->lcd_puts(0, 7, "Directions to move");
-            rb->snprintf(str, 18, "High Score: %d", bj->highscores[0]);
-#endif
-        } else {
-            /* room for a title? */
-            j = 0;
-            if(LCD_HEIGHT-NUM_SCORES*8 >= 8) {
-                rb->snprintf(str, 12, "%s", "High Scores");
+    while(!startgame) {
+        res = bejeweled_showmenu(&bjmenu[0], cmd);
+        cmd = MCMD_NONE;
+
+        rb->snprintf(str, 18, "High Score: %d", bj->highscores[0]);
+        rb->lcd_getstringsize(str, &w, &h);
+        rb->lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT-8, str);
+        rb->lcd_update();
+
+        switch(res) {
+            case MRES_NEW:
+                startgame = true;
+                continue;
+
+            case MRES_RESUME:
+                if(!bejeweled_loadgame(bj)) {
+                    rb->splash(HZ*2, true, "Nothing to resume");
+                    rb->lcd_clear_display();
+                } else {
+                    startgame = true;
+                }
+                continue;
+
+            case MRES_SCORES:
+                rb->lcd_clear_display();
+
+                /* room for a title? */
+                j = 0;
+                if(LCD_HEIGHT-NUM_SCORES*8 >= 8) {
+                    rb->snprintf(str, 12, "%s", "High Scores");
+                    rb->lcd_getstringsize(str, &w, &h);
+                    rb->lcd_putsxy((LCD_WIDTH-w)/2, 0, str);
+                    j = 2;
+                }
+
+                /* print high scores */
+                for(i=0; i<NUM_SCORES; i++) {
+                    rb->snprintf(str, 11, "#%02d: %d", i+1, bj->highscores[i]);
+                    rb->lcd_puts(0, i+j, str);
+                }
+
+                rb->lcd_update();
+                while(true) {
+                    button = rb->button_get(true);
+                    if(button != BUTTON_NONE && !(button&BUTTON_REL)) break;
+                }
+                rb->lcd_clear_display();
+                continue;
+
+            case MRES_HELP:
+                /* welcome screen to display key bindings */
+                rb->lcd_clear_display();
+                rb->snprintf(str, 5, "%s", "Help");
                 rb->lcd_getstringsize(str, &w, &h);
                 rb->lcd_putsxy((LCD_WIDTH-w)/2, 0, str);
-                j = 2;
-            }
+#if (LCD_HEIGHT <= 64)
+                rb->lcd_puts(0, 2, "Controls:");
+                rb->lcd_puts(0, 3, "Directions = move");
+                rb->lcd_puts(0, 4, "SELECT = select");
+                rb->lcd_puts(0, 5, "Long SELECT = menu");
+#elif (LCD_HEIGHT <= 132)
+                rb->lcd_puts(0, 2, "Swap pairs of jewels to");
+                rb->lcd_puts(0, 3, "form connected segments");
+                rb->lcd_puts(0, 4, "of three or more of the");
+                rb->lcd_puts(0, 5, "same type.");
+                rb->lcd_puts(0, 7, "Controls:");
+                rb->lcd_puts(0, 8, "Directions to move");
+                rb->lcd_puts(0, 9, "SELECT to select");
+                rb->lcd_puts(0, 10, "Long SELECT to show menu");
+#else
+                rb->lcd_puts(0, 2, "Swap pairs of jewels to form");
+                rb->lcd_puts(0, 3, "connected segments of three");
+                rb->lcd_puts(0, 4, "or more of the same type.");
+                rb->lcd_puts(0, 6, "Controls:");
+                rb->lcd_puts(0, 7, "Directions to move cursor");
+                rb->lcd_puts(0, 8, "SELECT to select");
+                rb->lcd_puts(0, 9, "Long SELECT to show menu");
+#endif
+                rb->lcd_update();
+                while(true) {
+                    button = rb->button_get(true);
+                    if(button != BUTTON_NONE && !(button&BUTTON_REL)) break;
+                }
+                rb->lcd_clear_display();
+                continue;
 
-            /* print high scores */
-            for(i=0; i<NUM_SCORES; i++) {
-                rb->snprintf(str, 11, "#%02d: %d", i+1, bj->highscores[i]);
-                rb->lcd_puts(0, i+j, str);
-            }
+            case MRES_QUIT:
+                return BJ_QUIT;
+
+            default:
+                break;
         }
-
-        rb->lcd_update();
 
         /* handle menu button presses */
         button = rb->button_get(true);
         switch(button){
-            case BEJEWELED_START: /* start playing */
-                startgame = true;
-                break;
-
-            case BEJEWELED_QUIT:  /* quit program */
-                if(showscores) {
-                    showscores = 0;
-                    break;
-                }
-                return BJ_QUIT;
-
-            case BEJEWELED_RESUME:/* resume game */
-                if(!bejeweled_loadgame(bj)) {
-                    rb->splash(HZ*2, true, "Nothing to resume");
-                } else {
-                    startgame = true;
-                }
-                break;
-
-            case BEJEWELED_SELECT:/* toggle high scores */
-#ifdef BEJEWELED_SELECT_PRE
-                if(lastbutton != BEJEWELED_SELECT_PRE) break;
+#ifdef BEJEWELED_SCROLLWHEEL
+            case BEJEWELED_PREV:
 #endif
-                showscores = !showscores;
+            case BEJEWELED_UP:
+            case (BEJEWELED_UP|BUTTON_REPEAT):
+                cmd = MCMD_PREV;
                 break;
+
+#ifdef BEJEWELED_SCROLLWHEEL
+            case BEJEWELED_NEXT:
+#endif
+            case BEJEWELED_DOWN:
+            case (BEJEWELED_DOWN|BUTTON_REPEAT):
+                cmd = MCMD_NEXT;
+                break;
+
+            case BEJEWELED_SELECT:
+            case BEJEWELED_RIGHT:
+                cmd = MCMD_SELECT;
+                break;
+
+#ifdef BEJEWELED_CANCEL
+            case BEJEWELED_CANCEL:
+                return BJ_QUIT;
+#endif
 
             default:
                 if(rb->default_event_handler_ex(button, bejeweled_callback,
@@ -1071,11 +1192,7 @@ static int bejeweled(struct game_context* bj) {
                     return BJ_USB;
                 break;
         }
-
-        if(button != BUTTON_NONE) lastbutton = button;
     }
-
-    lastbutton = BUTTON_NONE;
 
     /********************
     *       init        *
@@ -1094,33 +1211,47 @@ static int bejeweled(struct game_context* bj) {
     *        play         *
     **********************/
     while(true) {
-        /* refresh the board */
-        bejeweled_drawboard(bj);
+        if(!inmenu) {
+            /* refresh the board */
+            bejeweled_drawboard(bj);
 
-        /* display the cursor */
-        if(selected) {
-            rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-            rb->lcd_fillrect(x*TILE_WIDTH, y*TILE_HEIGHT+YOFS,
-                             TILE_WIDTH, TILE_HEIGHT);
-            rb->lcd_set_drawmode(DRMODE_SOLID);
+            /* display the cursor */
+            if(selected) {
+                rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+                rb->lcd_fillrect(x*TILE_WIDTH, y*TILE_HEIGHT+YOFS,
+                                 TILE_WIDTH, TILE_HEIGHT);
+                rb->lcd_set_drawmode(DRMODE_SOLID);
+            } else {
+                rb->lcd_drawrect(x*TILE_WIDTH, y*TILE_HEIGHT+YOFS,
+                                 TILE_WIDTH, TILE_HEIGHT);
+            }
+            rb->lcd_update_rect(x*TILE_WIDTH, y*TILE_HEIGHT+YOFS,
+                                TILE_WIDTH, TILE_HEIGHT);
         } else {
-            rb->lcd_drawrect(x*TILE_WIDTH, y*TILE_HEIGHT+YOFS,
-                             TILE_WIDTH, TILE_HEIGHT);
+            res = bejeweled_showmenu(&bjmenu[1], cmd);
+            cmd = MCMD_NONE;
+            switch(res) {
+                case MRES_RESUME:
+                    inmenu = false;
+                    selected = false;
+                    continue;
+
+                case MRES_SAVE:
+                    rb->splash(HZ, true, "Saving game...");
+                    bejeweled_savegame(bj);
+                    return BJ_END;
+
+                case MRES_QUIT:
+                    return BJ_END;
+
+                default:
+                    break;
+            }
         }
-        rb->lcd_update_rect(x*TILE_WIDTH, y*TILE_HEIGHT+YOFS,
-                            TILE_WIDTH, TILE_HEIGHT);
 
         /* handle game button presses */
         button = rb->button_get(true);
         switch(button){
-            case BEJEWELED_RESUME:           /* save and end game */
-                rb->splash(HZ, true, "Saving game...");
-                bejeweled_savegame(bj);
-                return BJ_END;
-
-            case BEJEWELED_QUIT:             /* end game */
-                return BJ_END;
-
             case BEJEWELED_LEFT:             /* move cursor left */
             case (BEJEWELED_LEFT|BUTTON_REPEAT):
                 if(selected) {
@@ -1134,65 +1265,97 @@ static int bejeweled(struct game_context* bj) {
 
             case BEJEWELED_RIGHT:            /* move cursor right */
             case (BEJEWELED_RIGHT|BUTTON_REPEAT):
-                if(selected) {
-                    bj->score += bejeweled_swapjewels(bj, x, y, SWAP_RIGHT);
-                    selected = false;
-                    if (!bejeweled_movesavail(bj)) return BJ_LOSE;
+                if(!inmenu) {
+                    if(selected) {
+                        bj->score += bejeweled_swapjewels(bj, x, y, SWAP_RIGHT);
+                        selected = false;
+                        if (!bejeweled_movesavail(bj)) return BJ_LOSE;
+                    } else {
+                        x = (x+1)%BJ_WIDTH;
+                    }
                 } else {
-                    x = (x+1)%BJ_WIDTH;
+                    cmd = MCMD_SELECT;
                 }
                 break;
 
             case BEJEWELED_DOWN:             /* move cursor down */
             case (BEJEWELED_DOWN|BUTTON_REPEAT):
-                if(selected) {
-                    bj->score += bejeweled_swapjewels(bj, x, y, SWAP_DOWN);
-                    selected = false;
-                    if (!bejeweled_movesavail(bj)) return BJ_LOSE;
+                if(!inmenu) {
+                    if(selected) {
+                        bj->score += bejeweled_swapjewels(bj, x, y, SWAP_DOWN);
+                        selected = false;
+                        if (!bejeweled_movesavail(bj)) return BJ_LOSE;
+                    } else {
+                        y = (y+1)%(BJ_HEIGHT-1);
+                    }
                 } else {
-                    y = (y+1)%(BJ_HEIGHT-1);
+                    cmd = MCMD_NEXT;
                 }
                 break;
 
             case BEJEWELED_UP:               /* move cursor up */
             case (BEJEWELED_UP|BUTTON_REPEAT):
-                if(selected) {
-                    bj->score += bejeweled_swapjewels(bj, x, y, SWAP_UP);
-                    selected = false;
-                    if (!bejeweled_movesavail(bj)) return BJ_LOSE;
+                if(!inmenu) {
+                    if(selected) {
+                        bj->score += bejeweled_swapjewels(bj, x, y, SWAP_UP);
+                        selected = false;
+                        if (!bejeweled_movesavail(bj)) return BJ_LOSE;
+                    } else {
+                        y = (y+(BJ_HEIGHT-1)-1)%(BJ_HEIGHT-1);
+                    }
                 } else {
-                    y = (y+(BJ_HEIGHT-1)-1)%(BJ_HEIGHT-1);
+                    cmd = MCMD_PREV;
                 }
                 break;
 
 #ifdef BEJEWELED_SCROLLWHEEL
             case BEJEWELED_PREV:             /* scroll backwards */
             case (BEJEWELED_PREV|BUTTON_REPEAT):
-                if(!selected) {
-                    if(x == 0) {
-                        y = (y+(BJ_HEIGHT-1)-1)%(BJ_HEIGHT-1);
+                if(!inmenu) {
+                    if(!selected) {
+                        if(x == 0) {
+                            y = (y+(BJ_HEIGHT-1)-1)%(BJ_HEIGHT-1);
+                        }
+                        x = (x+BJ_WIDTH-1)%BJ_WIDTH;
                     }
-                    x = (x+BJ_WIDTH-1)%BJ_WIDTH;
+                } else {
+                    cmd = MCMD_PREV;
                 }
                 break;
 
             case BEJEWELED_NEXT:             /* scroll forwards */
             case (BEJEWELED_NEXT|BUTTON_REPEAT):
-                if(!selected) {
-                    if(x == BJ_WIDTH-1) {
-                        y = (y+1)%(BJ_HEIGHT-1);
+                if(!inmenu) {
+                    if(!selected) {
+                        if(x == BJ_WIDTH-1) {
+                            y = (y+1)%(BJ_HEIGHT-1);
+                        }
+                        x = (x+1)%BJ_WIDTH;
                     }
-                    x = (x+1)%BJ_WIDTH;
+                } else {
+                    cmd = MCMD_NEXT;
                 }
                 break;
 #endif
 
             case BEJEWELED_SELECT:           /* toggle selected */
-#ifdef BEJEWELED_SELECT_PRE
-                if(lastbutton != BEJEWELED_SELECT_PRE) break;
-#endif
-                selected = !selected;
+                if(!inmenu) {
+                    selected = !selected;
+                } else {
+                    cmd = MCMD_SELECT;
+                }
                 break;
+
+            case (BEJEWELED_SELECT|BUTTON_REPEAT): /* show menu */
+                if(!inmenu) inmenu = true;
+                break;
+
+#ifdef BEJEWELED_CANCEL
+            case BEJEWELED_CANCEL:           /* toggle menu */
+                inmenu = !inmenu;
+                selected = false;
+                break;
+#endif
 
             default:
                 if(rb->default_event_handler_ex(button, bejeweled_callback,
@@ -1201,7 +1364,6 @@ static int bejeweled(struct game_context* bj) {
                 break;
         }
 
-        if(button != BUTTON_NONE) lastbutton = button;
         if(bj->score >= LEVEL_PTS) bj->score = bejeweled_nextlevel(bj);
     }
 }

@@ -33,10 +33,7 @@ mandelbrot.c
 #endif
 
 solitaire.c
-#if (LCD_WIDTH != 138)
-/* These need adjusting for the Mini's screen */
 bejeweled.c
-#endif
 bounce.c
 #if (LCD_WIDTH != 138) && (LCD_WIDTH != 128)
 /* These need adjusting for the Mini's and iRiver if'p screen */
