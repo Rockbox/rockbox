@@ -54,7 +54,7 @@ ifdef APPEXTRA
    INCLUDES += $(patsubst %,-I%,$(subst :, ,$(APPEXTRA)))
 endif
 
-CFLAGS = $(GCCOPTS) $(INCLUDES) $(TARGET) $(DEFINES) -DTARGET_ID=$(TARGET_ID)	\
+CFLAGS = $(INCLUDES) $(GCCOPTS) $(TARGET) $(DEFINES) -DTARGET_ID=$(TARGET_ID)	\
  -DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
 
 OBJS2 := $(OBJDIR)/lang.o $(patsubst %.c, $(OBJDIR)/%.o, $(SRC))

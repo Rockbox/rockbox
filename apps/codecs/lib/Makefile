@@ -17,8 +17,8 @@ ifdef APPEXTRA
    INCLUDES += $(patsubst %,-I$(APPSDIR)/%,$(subst :, ,$(APPEXTRA)))
 endif
 
-CFLAGS = $(GCCOPTS) \
-$(INCLUDES) $(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE} -DCODEC
+CFLAGS = $(INCLUDES) $(GCCOPTS) \
+$(TARGET) $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE} -DCODEC
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc

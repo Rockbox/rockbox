@@ -16,7 +16,7 @@ endif
 
 # NOTE: FPM_ define has been moved to global.h
 MADOPTS = -UDEBUG -DNDEBUG -O2
-CFLAGS = $(GCCOPTS) $(MADOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
+CFLAGS = $(INCLUDES) $(GCCOPTS) $(MADOPTS) $(TARGET) $(EXTRA_DEFINES) \
  -DMEM=${MEMORYSIZE} $(PROFILE_OPTS)
 
 # This sets up 'SRC' based on the files mentioned in SOURCES

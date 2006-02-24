@@ -9,7 +9,7 @@
 
 INCLUDES=-Iinclude -I$(FIRMDIR) -Iexport -Icommon -Idrivers -I$(BUILDDIR)
 
-CFLAGS = $(GCCOPTS) $(INCLUDES) $(TARGET) $(BUILDDATE) $(EXTRA_DEFINES) \
+CFLAGS = $(INCLUDES) $(GCCOPTS) $(TARGET) $(BUILDDATE) $(EXTRA_DEFINES) \
  -DMEM=${MEMORYSIZE}
 
 # This sets up 'SRC' based on the files mentioned in SOURCES

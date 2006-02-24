@@ -15,7 +15,7 @@ ifdef APPEXTRA
 endif
 
 FLACOPTS = -O2
-CFLAGS = $(GCCOPTS) $(FLACOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
+CFLAGS = $(INCLUDES) $(GCCOPTS) $(FLACOPTS) $(TARGET) $(EXTRA_DEFINES) \
  -DMEM=${MEMORYSIZE} $(PROFILE_OPTS)
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
