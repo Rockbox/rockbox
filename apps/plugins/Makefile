@@ -71,7 +71,7 @@ endif
 
 # chessbox is too big to fit in the 32KB Archos plugin buffer, so we only
 # build for IRIVER and IPOD targets
-ifneq (,$(strip $(foreach tgt,IRIVER IPOD,$(findstring $(tgt),$(TARGET)))))
+ifneq (,$(strip $(foreach tgt,RECORDER ONDIO IRIVER IPOD,$(findstring $(tgt),$(TARGET)))))
 ifneq (-DIRIVER_IFP7XX,$(TARGET))
     SUBDIRS += chessbox
 endif
