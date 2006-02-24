@@ -2563,6 +2563,15 @@ static void playback_init(void)
         queue_wait(&audio_queue, &ev);
         if (ev.id == Q_AUDIO_POSTINIT)
             break ;
+        
+#ifndef SIMULATOR
+        if (ev.id == SYS_USB_CONNECTED)
+        {
+            logf("USB: Audio preinit");
+            usb_acknowledge(SYS_USB_CONNECTED_ACK);
+            usb_wait_for_disconnect(&audio_queue);
+        }
+#endif
     }
     
     filebuf = (char *)&audiobuf[MALLOC_BUFSIZE];
