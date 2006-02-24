@@ -365,42 +365,39 @@ void pcm_rec_get_peaks(int *left, int *right)
 /* Functions that executes in the context of pcmrec_thread                 */
 /***************************************************************************/
 
-/* Skip PEAK_STRIDE sample-pairs for each compare */
+/* Skip PEAK_STRIDE sample-pairs for each compare 
 #define PEAK_STRIDE  3
 
-static void pcmrec_find_peaks(int chunk)
+static void pcmrec_find_peaks(int chunk, int* peak_l, int* peak_r)
 {
     short *ptr, value;        
-    int peak_l, peak_r;
     int j;
-    
+ 
+    if(!peak_l || ! peak_r) return;
+
     ptr = GET_CHUNK(chunk);
     
-    peak_l = 0;
-    peak_r = 0;
+    *peak_l = 0;
+    *peak_r = 0;
     
     for (j=0; j<CHUNK_SIZE/4; j+=PEAK_STRIDE+1)
     {
-        if ((value = ptr[0]) > peak_l)
-            peak_l = value;
-        else if (-value > peak_l)
-            peak_l = -value;
+        if ((value = ptr[0]) > *peak_l)
+            *peak_l = value;
+        else if (-value > *peak_l)
+            *peak_l = -value;
         ptr++;
     
-        if ((value = ptr[0]) > peak_r)
-            peak_r = value;
-        else if (-value > peak_r)
-            peak_r = -value;
+        if ((value = ptr[0]) > *peak_r)
+            *peak_r = value;
+        else if (-value > *peak_r)
+            *peak_r = -value;
         ptr++;
         
         ptr += PEAK_STRIDE * 2;
     }
-    
-    peak_left = peak_l;
-    peak_right = peak_r;
-   
 }
-
+*/
 
 /**
  * Process the chunks using read_index and write_index.
@@ -418,38 +415,40 @@ static void pcmrec_callback(bool flush)
     int num_ready, num_free, num_new;
     unsigned short *ptr;    
     int i, j, w;
-    
+    short value;
+
     w = write_index;
-    
+
     num_new = w - read2_index;
     if (num_new < 0)
         num_new += num_chunks;
 
-    if (num_new > 0)
-    {
-        /* Collect peak values for the last buffer only */
-        j = w - 1;
-        if (j < 0)
-            j += num_chunks;
-        pcmrec_find_peaks(j);
-    }
-
-    if ((!is_recording || is_paused) && !flush)
-    {
-        /* not recording = no saving to disk, fake buffer clearing */
-        read_index = write_index;
-        return;
-    }
-
+    peak_left = 0;
+    peak_right = 0;
     for (i=0; i<num_new; i++)
     {
         /* Convert the samples to little-endian so we only have to write later
-           (Less hd-spinning time)
+           (Less hd-spinning time), also do peak detection while we're at it
         */
         ptr = GET_CHUNK(read2_index);
-        for (j=0; j<CHUNK_SIZE/2; j++)
+        for (j=0; j<CHUNK_SIZE/4; j++)
         {
-            *ptr = htole16(*ptr);
+            value = *ptr;
+            if(value > peak_left)
+                peak_left = value;
+            else if (-value > peak_left)
+                peak_left = -value;
+
+            *ptr = htole16(value);
+            ptr++;
+
+            value = *ptr;
+            if(value > peak_right)
+                peak_right = value;
+            else if (-value > peak_right)
+                peak_right = -value;
+
+            *ptr = htole16(value);
             ptr++;
         }
 
@@ -458,6 +457,13 @@ static void pcmrec_callback(bool flush)
         read2_index++;
         if (read2_index >= num_chunks)
             read2_index = 0;
+    }
+
+    if ((!is_recording || is_paused) && !flush)
+    {
+        /* not recording = no saving to disk, fake buffer clearing */
+        read_index = write_index;
+        return;
     }
 
     num_ready = w - read_index;
