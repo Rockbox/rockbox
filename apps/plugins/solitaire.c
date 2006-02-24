@@ -136,7 +136,22 @@ static struct plugin_api* rb;
 #define SOL_REM2STACK (BUTTON_REC | BUTTON_DOWN)
 #define SOL_MENU_RUN BUTTON_SELECT
 #define SOL_MENU_INFO BUTTON_PLAY
-  	 
+
+#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
+#define SOL_QUIT BUTTON_A
+#define SOL_UP BUTTON_UP
+#define SOL_DOWN BUTTON_DOWN
+#define SOL_LEFT BUTTON_LEFT
+#define SOL_RIGHT BUTTON_RIGHT
+#define SOL_MOVE_PRE BUTTON_SELECT
+#define SOL_MOVE (BUTTON_SELECT | BUTTON_REL)
+#define SOL_DRAW BUTTON_MENU
+#define SOL_REM2CUR (BUTTON_LEFT | BUTTON_POWER)
+#define SOL_CUR2STACK (BUTTON_SELECT | BUTTON_REPEAT)
+#define SOL_REM2STACK (BUTTON_RIGHT | BUTTON_POWER)
+#define SOL_MENU_RUN BUTTON_SELECT
+#define SOL_MENU_RUN2 BUTTON_RIGHT
+#define SOL_MENU_INFO BUTTON_MENU
 #endif
 
 /* common help definitions */
@@ -181,6 +196,13 @@ static struct plugin_api* rb;
 #define HELP_SOL_REM2CUR "REC+LEFT: Put the card on top of the remains' stack on top of the cursor." 	 
 #define HELP_SOL_CUR2STACK "REC+UP..: Put the card under the cursor on one of the 4 final stacks." 	 
 #define HELP_SOL_REM2STACK "REC+DOWN: Put the card on top of the remains' stack on one of the 4 final stacks." 	 
+
+#elif (CONFIG_KEYPAD == GIGABEAT_PAD) 
+#define HELP_SOL_MOVE "SELECT: Select cards, Move cards, reveal hidden cards ..." 	 
+#define HELP_SOL_DRAW "MENU: Un-select a card if it was selected. Else, draw 3 new cards out of the remains' stack."
+#define HELP_SOL_REM2CUR "POWER+LEFT: Put the card on top of the remains' stack on top of the cursor." 	 
+#define HELP_SOL_CUR2STACK "SELECT..: Put the card under the cursor on one of the 4 final stacks." 	 
+#define HELP_SOL_REM2STACK "POWER+RIGHT: Put the card on top of the remains' stack on one of the 4 final stacks." 	 
   	 
 #endif
 

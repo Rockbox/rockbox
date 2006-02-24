@@ -42,6 +42,7 @@
 #define PP5002  5002
 #define PP5020  5020
 #define PNX0101  101
+#define S3C2440 2440
 
 /* CONFIG_KEYPAD */
 #define PLAYER_PAD          0
@@ -54,6 +55,7 @@
 #define IPOD_4G_PAD         7
 #define IPOD_3G_PAD         8
 #define IRIVER_IFP7XX_PAD   9
+#define GIGABEAT_PAD       10
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -80,6 +82,7 @@
 #define LCD_IPODVIDEO 8 /* as used by iPod Video */
 #define LCD_IPOD2BPP  9 /* as used by all greyscale iPods */
 #define LCD_IFP7XX   10 /* as used by iRiver iFP 7xx/8xx */
+#define LCD_GIGABEAT 11
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -99,6 +102,7 @@
 #define BL_IRIVER_H300   8 /* IRiver PWM */
 #define BL_IRIVER_IFP7XX 9 /* IRiver GPIO */
 #define BL_IPODMINI      10 /* Apple iPod Mini */
+#define BL_GIGABEAT      11 /* Toshiba Gigabeat */
 
 /* CONFIG_I2C */
 #define I2C_PLAYREC  0 /* Archos Player/Recorder style */
@@ -108,6 +112,7 @@
 #define I2C_PP5002   4 /* PP5002 style */
 #define I2C_PP5020   5 /* PP5020 style */
 #define I2C_PNX0101  6 /* PNX0101 style */
+#define I2C_S3C2440  7
 
 /* CONFIG_LED */
 #define LED_REAL     1 /* SW controlled LED (Archos recorders, player, Gmini) */
@@ -120,6 +125,7 @@
 #define RTC_M41ST84W 1 /* Archos Recorder */
 #define RTC_PCF50605 2 /* iPod 3G and 4G*/
 #define RTC_PCF50606 3 /* iriver H300 */
+#define RTC_S3C2440  4
 
 /* else                   HW controlled LED (iRiver H1x0) */
 
@@ -160,6 +166,8 @@
 #include "config-ipod4g.h"
 #elif defined(IRIVER_IFP7XX)
 #include "config-ifp7xx.h"
+#elif defined(GIGABEAT_F)
+#include "config-gigabeat.h"
 #elif defined(IPOD_MINI)
 #include "config-ipodmini.h"
 #else
@@ -185,7 +193,8 @@
 #endif
 
 /* define for all cpus from ARM family */
-#if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020) || (CONFIG_CPU == PNX0101)
+#if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == S3C2440)
+
 #define CPU_ARM
 #endif
 

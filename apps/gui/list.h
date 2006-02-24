@@ -93,6 +93,10 @@
 #define LIST_NEXT      BUTTON_DOWN
 #define LIST_PREV      BUTTON_UP
 
+#elif CONFIG_KEYPAD == GIGABEAT_PAD
+#define LIST_NEXT      BUTTON_DOWN
+#define LIST_PREV      BUTTON_UP
+
 #endif
 
 /*

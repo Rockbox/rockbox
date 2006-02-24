@@ -122,6 +122,8 @@ bool charger_inserted(void)
     /* FM or V2, can also charge from the USB port */
     return (adc_read(ADC_CHARGE_REGULATOR) < 0x1FF) ||
         (adc_read(ADC_USB_POWER) < 0x1FF);
+#elif defined(TOSHIBA_GIGABEAT_F)
+    return false;
 #else
     /* Player */
     return (PADR & 1) == 0;
@@ -189,6 +191,8 @@ void ide_power_enable(bool on)
         P1 &= ~0x08;
 #elif CONFIG_CPU == PNX0101
     /* no ide controller */
+#elif defined(TOSHIBA_GIGABEAT_F)
+    /* Gigabeat TODO */
 #else /* SH1 based archos */
     bool touched = false;
 #ifdef NEEDS_ATA_POWER_ON
@@ -241,6 +245,8 @@ bool ide_powered(void)
     return true;
 #elif defined(GMINI_ARCH)
     return (P1 & 0x08?true:false);
+#elif defined(TOSHIBA_GIGABEAT_F)
+    return false;
 #else /* SH1 based archos */
 #if defined(NEEDS_ATA_POWER_ON) || defined(HAVE_ATA_POWER_OFF)
 #ifdef ATA_POWER_PLAYERSTYLE
@@ -283,6 +289,8 @@ void power_off(void)
 #elif defined(GMINI_ARCH)
     P1 &= ~1;
     P1CON &= ~1;
+#elif defined(TOSHIBA_GIGABEAT_F)
+    /* FIXME: Can we turn the device off, or only enter sleep mode? */
 #else
 #ifdef HAVE_POWEROFF_ON_PBDR
     and_b(~0x10, &PBDRL);

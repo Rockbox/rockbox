@@ -197,6 +197,20 @@ bool button_hold(void);
 
 #define BUTTON_RC_REC         (BUTTON_REMOTE | 0x00400000)
 
+#elif CONFIG_KEYPAD == GIGABEAT_PAD
+
+/* TODO: These codes should relate to the hardware */
+
+#define BUTTON_POWER           0x0001
+#define BUTTON_MENU            0x0002
+#define BUTTON_VOL_UP          0x0008
+#define BUTTON_VOL_DOWN        0x0010
+#define BUTTON_A               0x0020
+#define BUTTON_UP              0x0100
+#define BUTTON_DOWN            0x0200
+#define BUTTON_SELECT          0x0400
+
+
 #endif /* RECORDER/PLAYER/ONDIO/GMINI KEYPAD */
 
 #endif /* _BUTTON_H_ */

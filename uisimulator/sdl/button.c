@@ -86,14 +86,18 @@ void button_event(int key, bool pressed)
         new_btn = BUTTON_ON;
 #elif defined(BUTTON_SELECT) && defined(BUTTON_PLAY)
         new_btn = BUTTON_PLAY;
+#elif defined BUTTON_POWER
+        new_btn = BUTTON_POWER;
 #endif
         break;
 
+    case SDLK_KP_ENTER:
 #ifdef BUTTON_OFF
-    case SDLK_RETURN:
         new_btn = BUTTON_OFF;
-        break;
+#elif defined BUTTON_A
+        new_btn = BUTTON_A;
 #endif
+        break;
 
 #ifdef BUTTON_F1
     case SDLK_KP_DIVIDE:

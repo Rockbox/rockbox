@@ -76,6 +76,16 @@ PLUGIN_HEADER
 #define BEJEWELED_SELECT BUTTON_SELECT
 #define BEJEWELED_CANCEL BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == GIGABEAT_PAD
+#define BEJEWELED_UP         BUTTON_UP
+#define BEJEWELED_DOWN       BUTTON_DOWN
+#define BEJEWELED_LEFT       BUTTON_LEFT
+#define BEJEWELED_RIGHT      BUTTON_RIGHT
+#define BEJEWELED_QUIT       BUTTON_A
+#define BEJEWELED_START      BUTTON_POWER
+#define BEJEWELED_SELECT     BUTTON_SELECT
+#define BEJEWELED_RESUME     BUTTON_MENU
+
 #else
     #error BEJEWELED: Unsupported keypad
 #endif
@@ -88,7 +98,7 @@ PLUGIN_HEADER
 #define NUM_SCORES 10
 
 /* use 22x22 tiles (H300, iPod Color) */
-#elif (LCD_HEIGHT == 176) && (LCD_WIDTH == 220)
+#elif ((LCD_HEIGHT == 176) && (LCD_WIDTH == 220)) || ((LCD_HEIGHT == 320) && (LCD_WIDTH == 240))
 #define TILE_WIDTH  22
 #define TILE_HEIGHT 22
 #define YOFS 0

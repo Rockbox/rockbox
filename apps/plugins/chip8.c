@@ -992,6 +992,14 @@ STATIC void chip8 (void)
 #define CHIP8_KEY6 BUTTON_RIGHT
 #define CHIP8_KEY8 BUTTON_DOWN
 
+#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
+#define CHIP8_OFF  BUTTON_A
+#define CHIP8_KEY2 BUTTON_UP
+#define CHIP8_KEY4 BUTTON_LEFT
+#define CHIP8_KEY5 BUTTON_MENU
+#define CHIP8_KEY6 BUTTON_RIGHT
+#define CHIP8_KEY8 BUTTON_DOWN
+
 #endif
 
 static byte chip8_virtual_keys[16];

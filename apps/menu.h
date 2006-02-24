@@ -95,6 +95,16 @@
 #define MENU_EXIT_MENU  BUTTON_REC
 #define MENU_ENTER      BUTTON_RIGHT
 
+#elif CONFIG_KEYPAD == GIGABEAT_PAD
+
+#define MENU_EXIT       BUTTON_LEFT
+#define MENU_EXIT2      BUTTON_A
+#define MENU_EXIT_MENU  BUTTON_MENU
+#define MENU_ENTER      BUTTON_RIGHT
+#define MENU_ENTER2     BUTTON_SELECT
+#define MENU_NEXT       BUTTON_DOWN
+#define MENU_PREV       BUTTON_UP
+
 #endif
 
 struct menu_item {

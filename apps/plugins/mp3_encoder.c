@@ -1890,6 +1890,12 @@ char *get_mp3_filename(char *wav_name)
 #define MP3ENC_NEXT BUTTON_DOWN
 #define MP3ENC_DONE BUTTON_POWER
 #define MP3ENC_SELECT BUTTON_SELECT
+#define MP3ENC_SELECT BUTTON_MENU
+#elif CONFIG_KEYPAD == GIGABEAT_PAD
+#define MP3ENC_PREV BUTTON_UP
+#define MP3ENC_NEXT BUTTON_DOWN
+#define MP3ENC_DONE BUTTON_A
+#define MP3ENC_SELECT BUTTON_SELECT
 #endif
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)

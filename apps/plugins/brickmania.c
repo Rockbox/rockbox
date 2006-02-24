@@ -75,6 +75,18 @@ PLUGIN_HEADER
 #define SCROLL_FWD(x) ((x) & BUTTON_SCROLL_FWD)
 #define SCROLL_BACK(x) ((x) & BUTTON_SCROLL_BACK)
 
+#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
+
+#define QUIT BUTTON_A
+#define LEFT BUTTON_LEFT
+#define RIGHT BUTTON_RIGHT
+#define SELECT BUTTON_SELECT
+#define UP BUTTON_UP
+#define DOWN BUTTON_DOWN
+
+#define SCROLL_FWD(x) (0)
+#define SCROLL_BACK(x) (0)
+
 #elif CONFIG_KEYPAD == IAUDIO_X5_PAD /* grayscale at the moment */
 
 #define QUIT BUTTON_POWER

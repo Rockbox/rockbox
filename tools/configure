@@ -212,6 +212,13 @@ arm7tdmicc () {
  endian="little"
 }
 
+arm9tdmicc () {
+ prefixtools arm-elf-
+ GCCOPTS="$CCOPTS -mcpu=arm9tdmi -ffunction-sections -mlong-calls"
+ GCCOPTIMIZE="-fomit-frame-pointer"
+ endian="little"
+}
+
 whichaddr () {
     case $archos in
     gmini120|gminisp)
@@ -457,6 +464,7 @@ toolsdir='\$(ROOTDIR)/tools'
   echo "17 - iPod 4G (Grayscale)"
   echo "18 - iPod Mini (1G/2G)"
   echo "19 - iriver iFP-790"
+  echo "20 - Toshiba Gigabeat F"
 
   target_id=`input`;
 
@@ -467,6 +475,7 @@ toolsdir='\$(ROOTDIR)/tools'
   archosbitmaptools="$toolset scramble descramble sh2d uclpack bmp2rb codepages"
   iriverbitmaptools="$toolset scramble descramble mkboot bmp2rb codepages"
   iaudiobitmaptools="$toolset scramble descramble mkboot bmp2rb codepages"
+  gigabeatbitmaptools="$toolset bmp2rb codepages"
   ipodbitmaptools="$toolset scramble ipod_fw bmp2rb codepages"
   ifpbitmaptools="$toolset bmp2rb codepages"
 
@@ -835,6 +844,23 @@ toolsdir='\$(ROOTDIR)/tools'
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ifpbitmaptools
+    ;;
+
+   20)
+    archos="gigabeatf"
+    target="-DGIGABEAT_F"
+    memory=32 # always
+    arm9tdmicc
+    tool="cp"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.gigabeat"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins="yes"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    toolset=$gigabeatbitmaptools
     ;;
 
    *)

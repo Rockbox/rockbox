@@ -156,6 +156,20 @@
 #define KBD_UP BUTTON_UP
 #define KBD_DOWN BUTTON_DOWN
 
+#elif CONFIG_KEYPAD == GIGABEAT_PAD
+
+/* TODO: Check keyboard mappings */
+
+#define KBD_MODES /* Gigabeat uses 2 modes, picker and line edit */
+#define KBD_SELECT (BUTTON_MENU | BUTTON_REL) /* backspace in line edit */
+#define KBD_SELECT_PRE BUTTON_MENU
+#define KBD_DONE BUTTON_POWER
+#define KBD_ABORT BUTTON_A
+#define KBD_LEFT BUTTON_LEFT
+#define KBD_RIGHT BUTTON_RIGHT
+#define KBD_UP BUTTON_UP
+#define KBD_DOWN BUTTON_DOWN
+
 #endif
 
 #if KEYBOARD_PAGES == 1

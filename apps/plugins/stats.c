@@ -36,6 +36,8 @@ static int fontwidth, fontheight;
 #define STATS_STOP BUTTON_PLAY
 #elif CONFIG_KEYPAD == IAUDIO_X5_PAD
 #define STATS_STOP BUTTON_POWER
+#elif CONFIG_KEYPAD == GIGABEAT_PAD
+#define STATS_STOP BUTTON_A
 #else
 #define STATS_STOP BUTTON_OFF
 #endif
