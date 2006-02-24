@@ -23,7 +23,8 @@
 #include <stdbool.h>
 #include "config.h"
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
-    (CONFIG_KEYPAD == IRIVER_H300_PAD)
+    (CONFIG_KEYPAD == IRIVER_H300_PAD) || \
+    (CONFIG_KEYPAD == IAUDIO_X5_PAD)
 #define HAS_BUTTON_HOLD
 #define HAS_REMOTE_BUTTON_HOLD
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD)
@@ -192,8 +193,7 @@ bool button_hold(void);
 #define BUTTON_POWER          0x0004
 #define BUTTON_UP             0x0008
 #define BUTTON_DOWN           0x0010
-#define BUTTON_MENU           0x0020
-#define  BUTTON_OFF           0x0040 /* DOES NOT EXIST!!! */
+#define BUTTON_SELECT         0x0020
 
 #define BUTTON_RC_REC         (BUTTON_REMOTE | 0x00400000)
 

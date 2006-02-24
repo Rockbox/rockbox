@@ -133,8 +133,8 @@
 /* TODO: Check keyboard mappings */
 
 #define KBD_MODES /* iAudio X5 uses 2 modes, picker and line edit */
-#define KBD_SELECT (BUTTON_MENU | BUTTON_REL) /* backspace in line edit */
-#define KBD_SELECT_PRE BUTTON_MENU
+#define KBD_SELECT (BUTTON_SELECT | BUTTON_REL) /* backspace in line edit */
+#define KBD_SELECT_PRE BUTTON_SELECT
 #define KBD_DONE BUTTON_PLAY
 #define KBD_ABORT BUTTON_REC
 #define KBD_LEFT BUTTON_LEFT

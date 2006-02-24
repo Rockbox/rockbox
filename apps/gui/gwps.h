@@ -228,10 +228,10 @@
 #define WPS_DECVOL     BUTTON_DOWN
 #define WPS_PAUSE      BUTTON_PLAY
 /* #define WPS_MENU    iAudioX5 can't have both main menu and context menu in wps (unless we use BUTTON_REC?) */
-#define WPS_BROWSE     (BUTTON_MENU | BUTTON_REL)
-#define WPS_BROWSE_PRE BUTTON_MENU
+#define WPS_BROWSE     (BUTTON_SELECT | BUTTON_REL)
+#define WPS_BROWSE_PRE BUTTON_SELECT
 #define WPS_EXIT       (BUTTON_PLAY | BUTTON_REPEAT)
-#define WPS_CONTEXT    (BUTTON_MENU | BUTTON_REPEAT)
+#define WPS_CONTEXT    (BUTTON_SELECT | BUTTON_REPEAT)
 
 #endif
 

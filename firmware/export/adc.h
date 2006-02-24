@@ -92,7 +92,8 @@
 unsigned short adc_read(int channel);
 void adc_init(void);
 
-#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)\
+ || defined(IAUDIO_X5)
 unsigned char adc_scan(int channel);
 #endif
 

@@ -92,7 +92,7 @@
 #define MENU_NEXT       BUTTON_DOWN
 #define MENU_PREV       BUTTON_UP
 #define MENU_EXIT       BUTTON_LEFT
-#define MENU_EXIT_MENU  BUTTON_MENU
+#define MENU_EXIT_MENU  BUTTON_REC
 #define MENU_ENTER      BUTTON_RIGHT
 
 #endif

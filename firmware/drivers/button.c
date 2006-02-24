@@ -70,6 +70,9 @@ static bool flipped;  /* buttons can be flipped to match the LCD flip */
     (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD)
 #define POWEROFF_BUTTON BUTTON_PLAY
 #define POWEROFF_COUNT 40
+#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
+#define POWEROFF_BUTTON BUTTON_POWER
+#define POWEROFF_COUNT 10
 #else
 #define POWEROFF_BUTTON BUTTON_OFF
 #define POWEROFF_COUNT 10
@@ -530,6 +533,11 @@ void button_init(void)
     /* Set GPIO33, GPIO37, GPIO38  and GPIO52 as general purpose inputs */
     GPIO1_ENABLE &= ~0x00100060;
     GPIO1_FUNCTION |= 0x00100062;
+#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+    /* Hold switch */
+    GPIO_FUNCTION |= 0x08000000;
+    GPIO_ENABLE &= ~0x08000000;
+
 #elif CONFIG_KEYPAD == RECORDER_PAD
     /* Set PB4 and PB8 as input pins */
     PBCR1 &= 0xfffc;  /* PB8MD = 00 */
@@ -698,6 +706,7 @@ void button_set_flip(bool flip)
 
 #endif /* CONFIG_KEYPAD */
 
+int counter;
 /*
  * Get button pressed from hardware
  */
@@ -1039,6 +1048,40 @@ static int button_read(void)
     (void)data;
     /* The int_btn variable is set in the button interrupt handler */
     btn = int_btn;
+#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
+    static bool hold_button = false;
+    static bool remote_hold_button = false;
+
+    counter ++;
+    
+    hold_button = button_hold();
+    remote_hold_button = remote_button_hold();
+
+    /* normal buttons */
+    if (!hold_button)
+    {
+        data = adc_scan(ADC_BUTTONS);
+        if(data < 0x7c)
+            if(data < 0x42)
+                btn = BUTTON_LEFT;
+            else
+                if(data < 0x62)
+                    btn = BUTTON_RIGHT;
+                else
+                    btn = BUTTON_SELECT;
+        else
+            if(data < 0xb6)
+                if(data < 0x98)
+                    btn = BUTTON_PLAY;
+                else
+                    btn = BUTTON_REC;
+            else
+                if(data < 0xd3)
+                    btn = BUTTON_DOWN;
+                else
+                    if(data < 0xf0)
+                        btn = BUTTON_UP;
+    }    
 #endif /* CONFIG_KEYPAD */
 
 
@@ -1100,7 +1143,7 @@ bool button_hold(void)
 #if (CONFIG_KEYPAD == IAUDIO_X5_PAD)
 bool button_hold(void)
 {
-    return (GPIO_READ & 0x08000000)?true:false;
+    return (GPIO_READ & 0x08000000)?false:true;
 }
 
 bool remote_button_hold(void)
