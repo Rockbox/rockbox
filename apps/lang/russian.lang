@@ -1,4 +1,17 @@
+#             __________               __   ___.
+#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+#   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+#                     \/            \/     \/    \/            \/
 # $Id$
+#
+# Russian language file
+# 2006-02-10 02:28 (GMT+3) Added and corrected by MegaVolt (Aleksey Kozyulin)
+# 2006-02-13 22:12 (GMT+3) More added and corrected by MegaVolt (Aleksey Kozyulin)
+# 2006-02-23 13:45 (GMT+3) Fixed some strings, added some new by MegaVolt (Aleksey Kozyulin)
+# 2006-02-25 22:48 (GMT+3) Fixed some strings, added some new by MegaVolt (Aleksey Kozyulin)
+# 2006-02-26 01:22 (GMT+3) Shorten some strings by MegaVolt (Aleksey Kozyulin)
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -28,13 +41,13 @@ id: LANG_DEBUG
 desc: in the main menu
 eng: "Debug (Keep Out!)"
 voice: "Debug, keep out!"
-new: "Дебаг (не трогать!)"
+new: "Отладка (не трогать!)"
 
 id: LANG_USB
 desc: in the main menu
 eng: "USB (Sim)"
 voice: ""
-new: "USB (сим)"
+new: "USB (эмуляция)"
 
 id: LANG_ROCKBOX_INFO
 desc: displayed topmost on the info screen
@@ -58,13 +71,13 @@ id: LANG_BATTERY_CHARGE
 desc: tells that the battery is charging, instead of battery level
 eng: "Battery: Charging"
 voice: ""
-new: "Питание: Зарядка"
+new: "Батарея: Зарядка"
 
 id: LANG_PLAYLIST_LOAD
 desc: displayed on screen while loading a playlist
 eng: "Loading..."
 voice: ""
-new: "Загружается..."
+new: "Загрузка..."
 
 id: LANG_PLAYLIST_SHUFFLE
 desc: displayed on screen while shuffling a playlist
@@ -120,17 +133,11 @@ eng: "Contrast"
 voice: "Contrast"
 new: "Контраст"
 
-id: LANG_SHUFFLE
-desc: in settings_menu
-eng: "Shuffle"
-voice: "Shuffle"
-new: "Случайный выбор"
-
 id: LANG_PLAY_SELECTED
 desc: in settings_menu
 eng: "Play Selected First"
 voice: "Play Selected File First"
-new: "Играть выбраные вначале"
+new: "Играть выбраные файлы первыми"
 
 id: LANG_SORT_CASE
 desc: in settings_menu
@@ -140,27 +147,15 @@ new: "Сортировать с учетом регистра"
 
 id: LANG_RESUME
 desc: in settings_menu
-eng: "Resume"
-voice: "Resume"
-new: "Возобновить"
-
-id: LANG_OFF
-desc: Used in a lot of places
-eng: "Off"
-voice: "Off"
-new: "Выкл."
+eng: "Resume on startup"
+voice: "Resume on startup"
+new: "Возобновить воспр. при включении"
 
 id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
 eng: "Ask"
 voice: "Ask"
 new: "Спросить"
-
-id: LANG_ON
-desc: Used in a lot of places
-eng: "On"
-voice: "On"
-new: "Вкл."
 
 id: LANG_BACKLIGHT
 desc: in settings_menu
@@ -196,13 +191,13 @@ id: LANG_FFRW_STEP
 desc: in settings_menu
 eng: "FF/RW Min Step"
 voice: "Minimum Step"
-new: "Шаг прокрутки/перемотки"
+new: "Мин. шаг перемотки"
 
 id: LANG_FFRW_ACCEL
 desc: in settings_menu
 eng: "FF/RW Accel"
 voice: "Acceleration"
-new: "Ускорение прокрутки/перемотки"
+new: "Ускорение перемотки"
 
 id: LANG_FOLLOW
 desc: in settings_menu
@@ -316,7 +311,7 @@ id: LANG_DECAY
 desc: in sound_settings
 eng: "AV Decay Time"
 voice: ""
-new: "Время реагирования автогромкости"
+new: "Время спада автогромкости"
 
 id: LANG_CHANNEL_MENU
 desc: in sound_settings
@@ -328,7 +323,7 @@ id: LANG_CHANNEL
 desc: in sound_settings
 eng: "Channel Configuration"
 voice: ""
-new: "Настройки канала"
+new: "Настройка каналов"
 
 id: LANG_CHANNEL_STEREO
 desc: in sound_settings
@@ -346,19 +341,19 @@ id: LANG_CHANNEL_LEFT
 desc: in sound_settings
 eng: "Mono Left"
 voice: "Mono Left"
-new: "Моно слева"
+new: "Моно левый"
 
 id: LANG_CHANNEL_RIGHT
 desc: in sound_settings
 eng: "Mono Right"
 voice: "Mono Right"
-new: "Моно справа"
+new: "Моно правый"
 
 id: LANG_AUTOVOL
 desc: in sound_settings
 eng: "Auto Volume"
 voice: "Auto Volume"
-new: "Авто. громкость"
+new: "Авто громкость"
 
 id: LANG_SHOWDIR_ERROR_BUFFER
 desc: in showdir(), displayed on screen when you reach buffer limit
@@ -373,8 +368,8 @@ voice: ""
 new: "заполнен!"
 
 id: LANG_RESUME_ASK
-desc: question asked at the begining when resume is on
-eng: "Resume?"
+desc: DEPRECATED
+eng: ""
 voice: ""
 new: "Возобновить?"
 
@@ -388,25 +383,25 @@ id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
 eng: "Key Lock ON"
 voice: ""
-new: "Замок вкл."
+new: "Блокировка вкл."
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
 eng: "Key Lock OFF"
 voice: ""
-new: "Замок выкл."
+new: "Блокировка выкл."
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
 eng: "Key Lock Is ON"
 voice: ""
-new: "Замок включен"
+new: "Блокировка включена"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key Lock Is OFF"
 voice: ""
-new: "Замок выключен"
+new: "Блокировка выключена"
 
 id: LANG_MUTE_ON_PLAYER
 desc: DEPRECATED
@@ -451,20 +446,20 @@ voice: ""
 new: "[Название]"
 
 id: LANG_ID3_NO_TITLE
-desc: in wps when no title is avaible
-eng: "<No Title>"
+desc: DEPRECATED
+eng: ""
 voice: ""
 new: "<Нет названия>"
 
 id: LANG_ID3_ARTIST
-desc: in wps 
+desc: in wps
 eng: "[Artist]"
 voice: ""
 new: "[Исполнитель]"
 
 id: LANG_ID3_NO_ARTIST
-desc: in wps when no artist is avaible
-eng: "<No Artist>"
+desc: DEPRECATED
+eng: ""
 voice: ""
 new: "<Нет исполнителя>"
 
@@ -475,8 +470,8 @@ voice: ""
 new: "[Альбом]"
 
 id: LANG_ID3_NO_ALBUM
-desc: in wps when no album is avaible
-eng: "<No Album>"
+desc: DEPRECATED
+eng: ""
 voice: ""
 new: "<Нет альбома>"
 
@@ -487,8 +482,8 @@ voice: ""
 new: "[Номер песни]"
 
 id: LANG_ID3_NO_TRACKNUM
-desc: in wps if no track number is avaible
-eng: "<No Tracknum>"
+desc: DEPRECATED
+eng: ""
 voice: ""
 new: "<Нет номера песни>"
 
@@ -520,7 +515,7 @@ id: LANG_ID3_PATH
 desc: in wps
 eng: "[Path]"
 voice: ""
-new: "[Строка]"
+new: "[Путь]"
 
 id: LANG_PITCH_UP
 desc: in wps
@@ -539,12 +534,6 @@ desc: in wps
 eng: "Pause"
 voice: ""
 new: "Пауза"
-
-id: LANG_F2_MODE
-desc: in wps F2 pressed
-eng: "Mode:"
-voice: ""
-new: "Режим:"
 
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
@@ -588,30 +577,6 @@ eng: "New Language"
 voice: ""
 new: "Новый язык"
 
-id: LANG_FILTER
-desc: setting name for dir filter
-eng: "Show Files"
-voice: "Show Files"
-new: "Показать файлы"
-
-id: LANG_FILTER_MUSIC
-desc: show only music-related files
-eng: "Music"
-voice: "Music"
-new: "Музыка"
-
-id: LANG_FILTER_SUPPORTED
-desc: show all file types supported by Rockbox
-eng: "Supported"
-voice: "Supported"
-new: "Поддерживаемые"
-
-id: LANG_FILTER_ALL
-desc: show all files
-eng: "All"
-voice: "All"
-new: "Все"
-
 id: LANG_SET_BOOL_YES
 desc: bool true representation
 eng: "Yes"
@@ -628,7 +593,7 @@ id: LANG_PM_MENU
 desc: in the display menu
 eng: "Peak Meter"
 voice: "Peak Meter"
-new: "Пики"
+new: "Уровень сигнала"
 
 id: LANG_PM_RELEASE
 desc: in the peak meter menu
@@ -640,19 +605,19 @@ id: LANG_PM_PEAK_HOLD
 desc: in the peak meter menu
 eng: "Peak Hold Time"
 voice: "Peak Hold Time"
-new: "Удерживать пик"
+new: "Время удержания пиков"
 
 id: LANG_PM_CLIP_HOLD
 desc: in the peak meter menu
 eng: "Clip Hold Time"
 voice: "Clip Hold Time"
-new: "Удерживать индикатор"
+new: "Время удержания индикатора"
 
 id: LANG_PM_ETERNAL
 desc: in the peak meter menu
 eng: "Eternal"
 voice: "Eternal"
-new: "Бесконечно"
+new: "Постоянно"
 
 id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
@@ -661,28 +626,10 @@ voice: "Units Per Read"
 new: "Единиц за считывание" 
 
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
-desc: in display_settings_menu
-eng: "Backlight On When Plugged"
-voice: "Backlight On When Plugged"
-new: "Подсветка при внешнем питании"
-
-id: LANG_REPEAT
-desc: in settings_menu
-eng: "Repeat"
-voice: "Repeat"
-new: "Повтор"
-
-id: LANG_REPEAT_ALL
-desc: repeat playlist once all songs have completed
-eng: "All"
-voice: "All"
-new: "Все"
-
-id: LANG_REPEAT_ONE
-desc: repeat one song
-eng: "One"
-voice: "One"
-new: "Одна"
+desc: in display_settings_menu, backlight timeout with charger connected
+eng: "Backlight When Plugged"
+voice: "Backlight When Plugged"
+new: "Подсветка при внеш. питании"
 
 id: LANG_RESET_CONFIRM
 desc: confirm to reset settings
@@ -829,16 +776,16 @@ voice: "December"
 new: "Дек"
 
 id: LANG_RESUME_SETTING_ASK_ONCE
-desc: in settings_menu
-eng: "Ask Once"
-voice: "Ask Once"
+desc: DEPRECATED
+eng: ""
+voice: ""
 new: "Спросить 1 раз"
 
 id: LANG_BATTERY_DISPLAY
 desc: Battery type title
 eng: "Battery Display"
 voice: "Battery Display"
-new: "Индикатор питания"
+new: "Индикатор батареи"
 
 id: LANG_VOLUME_DISPLAY
 desc: Volume type title
@@ -856,25 +803,25 @@ id: LANG_DISPLAY_NUMERIC
 desc: Label for type of icon display
 eng: "Numeric"
 voice: "Numeric"
-new: "Численный"
+new: "Числовой"
 
 id: LANG_PM_PERFORMANCE
-desc: in the peak meter menu
-eng: "Performance"
-voice: "Performance"
+desc: DEPRECATED
+eng: ""
+voice: 
 new: "Производительность"
 
 id: LANG_PM_HIGH_PERFORMANCE
-desc: in the peak meter menu
-eng: "High performance"
-voice: "High performance"
+desc: DEPRECATED
+eng: ""
+voice: ""
 new: "Высокая производительность"
 
 id: LANG_PM_ENERGY_SAVER
-desc: in the peak meter menu
-eng: "Save Energy"
-voice: "Save Energy"
-new: "Экономия питание"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: "Экономия энергии"
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
@@ -886,25 +833,25 @@ id: LANG_PM_DBFS
 desc: in the peak meter menu
 eng: "Logarithmic(dB)"
 voice: "Logarithmic decibel"
-new: "Логарифмически(dB)"
+new: "Логарифмическая(dB)"
 
 id: LANG_PM_LINEAR
 desc: in the peak meter menu
 eng: "Linear(%)"
 voice: "Linear percent"
-new: "Линейно(%)"
+new: "Линейная(%)"
 
 id: LANG_PM_MIN
 desc: in the peak meter menu
 eng: "Minimum Of Range"
 voice: "Minimum Of Range"
-new: "Минимум диапазона"
+new: "Мин. граница диапазона"
 
 id: LANG_PM_MAX
 desc: in the peak meter menu
 eng: "Maximum Of Range"
 voice: "Maximum Of Range"
-new: "Максимальный диапазон"
+new: "Макс. граница диапазона"
 
 id: LANG_RECORDING
 desc: in the main menu
@@ -916,17 +863,17 @@ id: LANG_RECORDING_GAIN
 desc: in the recording screen
 eng: "Gain"
 voice: ""
-new: "Увеличение"
+new: "Усиление"
 
 id: LANG_RECORDING_LEFT
 desc: in the recording screen
-eng: "Left"
+eng: "Gain Left"
 voice: ""
 new: "Левый"
 
 id: LANG_RECORDING_RIGHT
 desc: in the recording screen
-eng: "Right"
+eng: "Gain Right"
 voice: ""
 new: "Правый"
 
@@ -964,7 +911,7 @@ id: LANG_RECORDING_SRC_LINE
 desc: in the recording settings
 eng: "Line In"
 voice: "Line In"
-new: "Ввод"
+new: "Линейный вход"
 
 id: LANG_RECORDING_SRC_DIGITAL
 desc: in the recording settings
@@ -996,12 +943,6 @@ eng: "Disk Poweroff"
 voice: "Disk Poweroff"
 new: "Отключение диска"
 
-id: LANG_FILTER_PLAYLIST
-desc: show only playlist
-eng: "Playlists"
-voice: "Playlists"
-new: "Списки песен"
-
 id: LANG_BATTERY_TIME
 desc: battery level in % and estimated time remaining
 eng: "%d%% %dh %dm"
@@ -1018,7 +959,7 @@ id: LANG_MP3BUFFER_MARGIN
 desc: MP3 buffer margin time
 eng: "Anti-Skip Buffer"
 voice: "Anti-Skip Buffer"
-new: "Анти-скип буфер"
+new: "Буфер анти-шок"
 
 id: LANG_BATTERY_CAPACITY
 desc: in settings_menu
@@ -1042,7 +983,7 @@ id: LANG_BIDIR_SCROLL
 desc: Bidirectional scroll limit
 eng: "Bidirectional Scroll Limit"
 voice: "Bidirectional Scroll Limit"
-new: "Ограничение прокрутке в обе стороны"
+new: "Огранич. дву-направленной прокрутки"
 
 id: LANG_SCROLL_DELAY
 desc: Delay before scrolling
@@ -1066,7 +1007,7 @@ id: LANG_SCROLL_STEP_EXAMPLE
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size Setting Example Text"
 voice: ""
-new: "Образец текста для шага прокрутки"
+new: "Образец текста для велечины шага прокрутки"
 
 id: LANG_TRICKLE_CHARGE
 desc: DEPRECATED
@@ -1144,7 +1085,7 @@ id: LANG_ALARM_MOD_TIME
 desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
 eng: "Alarm Time: %02d:%02d"
 voice: ""
-new: "Время: %02d:%02d"
+new: "Время будильника: %02d:%02d"
 
 id: LANG_ALARM_MOD_TIME_TO_GO
 desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
@@ -1162,7 +1103,7 @@ id: LANG_ALARM_MOD_ERROR
 desc: The text that tells that the time is incorrect (for the RTC alarm mod).
 eng: "Alarm Time Is Too Soon!"
 voice: ""
-new: "Время установлено слишком раннее"
+new: "Установлено слишком раннее время"
 
 id: LANG_ALARM_MOD_KEYS
 desc: Shown key functions in alarm menu (for the RTC alarm mod).
@@ -1174,7 +1115,7 @@ id: LANG_CREATE_PLAYLIST
 desc: Menu option for creating a playlist
 eng: "Create Playlist"
 voice: "Create Playlist"
-new: "Создать списка песен"
+new: "Создать список песен"
 
 id: LANG_CREATING
 desc: Screen feedback during playlist creation
@@ -1258,7 +1199,7 @@ id: LANG_FADE_ON_STOP
 desc: options menu to set fade on stop or pause
 eng: "Fade On Stop/Pause"
 voice: "Fade On Stop and Pause"
-new: "Затухание при остановке"
+new: "Затухание при остановке/паузе"
 
 id: LANG_SOKOBAN_ON
 desc: DEPRECATED
@@ -1270,7 +1211,7 @@ id: LANG_INVERT
 desc: in settings_menu
 eng: "LCD Mode"
 voice: "LCD Mode"
-new: "ЖКД режим"
+new: "Режим ЖКД"
 
 id: LANG_CHANNEL_STEREO_NARROW_PLAYER
 desc: DEPRECATED
@@ -1348,7 +1289,7 @@ id: LANG_CAPTION_BACKLIGHT
 desc: in settings_menu
 eng: "Caption backlight"
 voice: "Caption backlight"
-new: "Водсветка заголовка"
+new: "Подсветка заголовка"
 
 id: LANG_INVERT_CURSOR_POINTER
 desc: in settings_menu
@@ -1360,7 +1301,7 @@ id: LANG_INVERT_CURSOR_BAR
 desc: in settings_menu
 eng: "Bar(Inverse)"
 voice: "Inverse Bar"
-new: "Столбик(Перевернут)"
+new: "Курсор(Инверсивный)"
 
 id: LANG_INVERT_LCD_NORMAL
 desc: in settings_menu
@@ -1372,25 +1313,25 @@ id: LANG_INVERT_LCD_INVERSE
 desc: in settings_menu
 eng: "Inverse"
 voice: "Inverse"
-new: "Обратный"
+new: "Инверсивный"
 
 id: LANG_MAX_FILES_IN_DIR
 desc: in settings_menu
 eng: "Max files in dir browser"
 voice: "Max files in directory browser"
-new: "Максимум файлов в директории"
+new: "Макс. файлов в директории"
 
 id: LANG_MAX_FILES_IN_PLAYLIST
 desc: in settings_menu
 eng: "Max playlist size"
 voice: "Max playlist size"
-new: "Максимальный размер списка песен"
+new: "Макс. размер списка песен"
 
 id: LANG_JUMP_SCROLL
 desc: (player) menu altarnative for jump scroll
 eng: "Jump scroll"
 voice: "Jump scroll"
-new: "Ступен. прокрутка"
+new: "Ступень прокрутки"
 
 id: LANG_ONE_TIME
 desc: (player) the jump scroll shall be done "one time"
@@ -1408,7 +1349,7 @@ id: LANG_JUMP_SCROLL_DELAY
 desc: (player) Delay before making a jump scroll
 eng: "Jump Scroll Delay"
 voice: "Jump Scroll Delay"
-new: "Задержка ступ. прокрутки"
+new: "Задержка ступени прокрутки"
 
 id: LANG_RECORD_TIMESPLIT
 desc: Prompt for record timer interval setting, in the record settings menu
@@ -1456,7 +1397,7 @@ id: LANG_READ_FAILED
 desc: There was an error reading a file
 eng: "Failed reading %s"
 voice: ""
-new: "Неудача при чтении %s"
+new: "Ошибка при чтении %s"
 
 id: LANG_PLUGIN_WRONG_MODEL
 desc: The plugin is not compatible with the archos model trying to run it
@@ -1492,7 +1433,7 @@ id: LANG_QUEUE_LAST
 desc: in onplay menu.  queue a track/playlist at end of playlist.
 eng: "Queue last"
 voice: "Queue last"
-new: "Очередь закончилась"
+new: "В конец очереди"
 
 id: LANG_INSERT
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
@@ -1510,13 +1451,13 @@ id: LANG_QUEUE_FIRST
 desc: in onplay menu.  queue a track/playlist into dynamic playlist.
 eng: "Queue next"
 voice: "Queue next"
-new: "Вписать след."
+new: "В очередь следующим"
 
 id: LANG_INSERT_FIRST
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
 eng: "Insert next"
 voice: "Insert next"
-new: "Вставить след."
+new: "Вставить следующим"
 
 id: LANG_SAVE_DYNAMIC_PLAYLIST
 desc: in playlist menu.
@@ -1552,31 +1493,31 @@ id: LANG_OFF_ABORT
 desc: Used on recorder models
 eng: "OFF to abort"
 voice: ""
-new: "OFF для остановки"
+new: "OFF для отмены"
 
 id: LANG_STOP_ABORT
 desc: Used on player models
 eng: "STOP to abort"
 voice: ""
-new: "STOP для остановки"
+new: "STOP для отмены"
 
 id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
 desc: Playlist error
 eng: "Error updating playlist control file"
 voice: ""
-new: "Ошибка при обновлении главного файла списка песен"
+new: "Ошибка при обновлении файла списка песен"
 
 id: LANG_PLAYLIST_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing playlist file"
 voice: ""
-new: "Ошибка доступа к списку песен"
+new: "Ошибка доступа к файлу списка песен"
 
 id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing playlist control file"
 voice: ""
-new: "Ошибка доступа главного файла списка песен"
+new: "Ошибка доступа к главному файлу списка песен"
 
 id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
 desc: Playlist error
@@ -1588,7 +1529,7 @@ id: LANG_PLAYLIST_CONTROL_INVALID
 desc: Playlist resume error
 eng: "Playlist control file is invalid"
 voice: ""
-new: "Главный файл скпика песен поврежден"
+new: "Файл скпика песен поврежден"
 
 id: LANG_RECURSE_DIRECTORY
 desc: In playlist menu
@@ -1606,13 +1547,13 @@ id: LANG_CUSTOM_FONT
 desc: in setting_menu()
 eng: "Browse Fonts"
 voice: "Browse Fonts"
-new: "Выбор шрифта"
+new: "Выбор шрифтов"
 
 id: LANG_FIRMWARE
 desc: in the main menu
 eng: "Browse Firmwares"
 voice: "Browse Firmwares"
-new: "Выбор прошивки"
+new: "Выбор прошивок"
 
 id: LANG_LANGUAGE
 desc: in settings_menu
@@ -1642,7 +1583,7 @@ id: LANG_CAR_ADAPTER_MODE
 desc: Displayed for setting car adapter mode to on/off
 eng: "Car Adapter Mode"
 voice: "Car Adapter Mode"
-new: "Машинный режим"
+new: "Режим адаптера машины"
 
 id: LANG_LINE_IN
 desc: in settings_menu
@@ -1666,7 +1607,7 @@ id: LANG_FM_BUTTONBAR_PRESETS
 desc: in button bar
 eng: "Preset"
 voice: ""
-new: "Преднастройка"
+new: "Предустановка"
 
 id: LANG_FM_SAVE_PRESET
 desc: DEPRECATED
@@ -1678,7 +1619,7 @@ id: LANG_FM_DELETE_PRESET
 desc: in radio screen
 eng: "Remove preset"
 voice: ""
-new: "Удалить преднастройку"
+new: "Удалить предустановку"
 
 id: LANG_FM_STATION
 desc: in radio screen
@@ -1690,11 +1631,11 @@ id: LANG_FM_PRESET_SAVE_FAILED
 desc: in radio screen
 eng: "Preset save failed"
 voice: ""
-new: "Преднастройка не сохранилась"
+new: "Предустановка не сохранилась"
 
 id: LANG_FM_NO_PRESETS
-desc: DEPRECATED
-eng: ""
+desc: error when preset list is empty
+eng: "No presets"
 voice: ""
 new: 
 
@@ -1702,7 +1643,7 @@ id: LANG_FM_NO_FREE_PRESETS
 desc: in radio screen
 eng: "The preset list is full"
 voice: ""
-new: "Список преднастроек полон"
+new: "Список предустановок полон"
 
 id: LANG_FM_RADIO
 desc: in main menu
@@ -1882,7 +1823,7 @@ id: LANG_BOOKMARK_MENU_LIST
 desc: Used off of the bookmark menu to list available bookmarks for the currently playing directory or M3U
 eng: "List Bookmarks"
 voice: "List Bookmarks"
-new: "Лист закладок"
+new: "Список закладок"
 
 id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
 desc: Text for the menu text to access the most recent bookmarks list
@@ -1906,7 +1847,7 @@ id: LANG_WIND_MENU
 desc: in the playback sub menu
 eng: "FFwd/Rewind"
 voice: "Fast forward and Rewind"
-new: "Вперед/Назад"
+new: "Настройки перемотки"
 
 id: LANG_LCD_MENU
 desc: in the display sub menu
@@ -1942,13 +1883,13 @@ id: LANG_LIMITS_MENU
 desc: in the system sub menu
 eng: "Limits"
 voice: "Limits"
-new: "Лимиты"
+new: "Ограничения"
 
 id: LANG_MANAGE_MENU
 desc: in the system sub menu
 eng: "Manage Settings"
 voice: "Manage Settings"
-new: "Изменить настройки"
+new: "Управление настройками"
 
 id: LANG_RECORD_DIRECTORY
 desc: in recording settings_menu
@@ -2350,7 +2291,7 @@ id: LANG_VOICE_MENU
 desc: item of voice menu, enable/disable the voice UI
 eng: "Voice Menus"
 voice: "Voice Menus"
-new: "Озвучивать меню"
+new: "Голосовые меню"
 
 id: LANG_VOICE_DIR
 desc: item of voice menu, set the "talkbox" mode for directories
@@ -2362,7 +2303,7 @@ id: LANG_VOICE_FILE
 desc: item of voice menu, set the voive mode for files
 eng: "Voice Filenames"
 voice: "Voice Filenames"
-new: "Озвучивать назв. файлов"
+new: "Озвучивать имена файлов"
 
 id: LANG_VOICE_NUMBER
 desc: "talkbox" mode for files+directories
@@ -2632,7 +2573,7 @@ id: LANG_FILETYPES_FULL
 desc: Filetype array full
 eng: "Filetype array full"
 voice: ""
-new: "Массив разширений файлов полон"
+new: "Массив типов файлов полон"
 
 id: LANG_FILETYPES_PLUGIN_NAME_LONG
 desc: Viewer plugin name too long
@@ -2680,7 +2621,7 @@ id: LANG_SORT_DATE_REVERSE
 desc: browser sorting setting
 eng: "by newest date"
 voice: "by newest date"
-new: "по последней дате"
+new: "по самой новой дате"
 
 id: LANG_SORT_TYPE
 desc: browser sorting setting
@@ -2692,7 +2633,7 @@ id: LANG_FM_EDIT_PRESET
 desc: in radio screen
 eng: "Edit preset"
 voice: ""
-new: "Редактировать преднастройку"
+new: "Редактир. предустановку"
 
 id: LANG_FM_MONO_MODE
 desc: in radio screen
@@ -2770,7 +2711,7 @@ id: LANG_SHUTTINGDOWN
 desc: in main menu
 eng: "Shutting down..."
 voice: ""
-new: "Выключаюсь"
+new: "Выключаюсь..."
 
 id: LANG_CONFIRM_SHUTDOWN
 desc: in shutdown screen
@@ -2800,7 +2741,7 @@ id: LANG_NO_ROCKBOX_DIR
 desc: in browse root
 eng: "No .rockbox directory"
 voice: ""
-new: "Нет .rockbox директории"
+new: "Нет директории .rockbox"
 
 id: LANG_INSTALLATION_INCOMPLETE
 desc: in browse root
@@ -2830,19 +2771,13 @@ id: LANG_STEREO_WIDTH
 desc: in sound_settings
 eng: "Stereo width"
 voice: "Stereo width"
-new: "Стерео ширина"
+new: "Ширина стерео"
 
 id: LANG_CHANNEL_CUSTOM
 desc: in sound_settings
 eng: "Custom"
 voice: "Custom"
 new: "Ручная настройка"
-
-id: LANG_FILTER_ID3DB
-desc: show ID3 database
-eng: "ID3 database"
-voice: "ID3 database"
-new: "ID3 база"
 
 id: LANG_ID3DB_ARTISTS
 desc: ID3 virtual folder name
@@ -2902,13 +2837,13 @@ id: LANG_BATTERY_TYPE_ALKALINE
 desc: in battery settings
 eng: "Alkaline"
 voice: "Alkaline"
-new: "Щелочная/Алкалиновая"
+new: "Щелочная"
 
 id: LANG_BATTERY_TYPE_NIMH
 desc: in battery settings
 eng: "NiMH"
 voice: "Nickel metal hydride"
-new: "Никель Металлогидридная"
+new: "Никель металлогидридная"
 
 id: LANG_POINT
 desc: decimal separator for composing numbers
@@ -2964,14 +2899,838 @@ eng: "Playlist"
 voice: "Playlist"
 new: "Список песен"
 
+id: LANG_LCD_REMOTE_MENU
+desc: in the display sub menu
+eng: "Remote-LCD Settings"
+voice: "Remote LCD settings"
+new: "Настройка ЖКД на пульте"
+
+id: LANG_BACKLIGHT_FADE_IN
+desc: in settings_menu
+eng: "Backlight fade in"
+voice: "Backlight fade in"
+new: "Нарастание подсветки"
+
+id: LANG_BACKLIGHT_FADE_OUT
+desc: in settings_menu
+eng: "Backlight fade out"
+voice: "Backlight fade out"
+new: "Затухание подсветки"
+
+id: LANG_SHUFFLE_PLAYLIST
+desc: in playlist menu, reshuffles the order in which songs are played
+eng: "Reshuffle"
+voice: "Reshuffle"
+new: "Перестановка"
+
+id: LANG_INSERT_SHUFFLED
+desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
+eng: "Insert shuffled"
+voice: "Insert shuffled"
+new: "Вставить в случайное место"
+
+id: LANG_SPDIF_ENABLE
+desc: in playback settings menu. enable/disable the optical out
+eng: "Optical output"
+voice: "Optical output"
+new: "Оптический выход"
+
+id: LANG_NEXT_FOLDER
+desc: in settings_menu. Should we allow move to next/prev folder from last/first track of current one
+eng: "Auto change directory"
+voice: "Auto change directory"
+new: "Авто смена директории"
+
+id: LANG_RUNTIMEDB_ACTIVE
+desc: in settings_menu.
+eng: "Gather runtime data (experimental)"
+voice: "Gather runtime data"
+new: "Сбор данных о времени работы (эксперемент.)"
+
+id: LANG_MENU_SET_RATING
+desc: in wps context menu
+eng: "Set song rating"
+voice: "Set song rating"
+new: "Установить рейтинг песни"
+
+id: LANG_BEEP
+desc: in playback settings
+eng: "Beep volume"
+voice: "Beep volume"
+new: "Громкость информационных сигналов"
+
+id: LANG_WEAK
+desc: in beep volume in playback settings
+eng: "Weak"
+voice: "Weak"
+new: "Тихо"
+
+id: LANG_MODERATE
+desc: in beep volume in playback settings
+eng: "Moderate"
+voice: "Moderate"
+new: "Средняя"
+
+id: LANG_STRONG
+desc: in beep volume in playback settings
+eng: "Strong"
+voice: "Strong"
+new: "Громко"
+
+id: LANG_DIRCACHE_ENABLE
+desc: in directory cache settings
+eng: "Directory cache"
+voice: "Directory cache"
+new: "Кэш директорий"
+
+id: LANG_DIRCACHE_REBOOT
+desc: when activating directory cache
+eng: "Please reboot to enable the cache"
+voice: ""
+new: "Пожалуйста перезагрузитесь для включения кэша"
+
+id: LANG_DIRCACHE_BUILDING
+desc: when booting up and rebuilding the cache
+eng: "Scanning disk..."
+voice: ""
+new: "Сканирование диска..."
+
+id: LANG_CROSSFADE_ENABLE
+desc: in crossfade settings menu
+eng: "Enable crossfade"
+voice: "Enable crossfade"
+new: "Включить crossfade"
+
+id: LANG_CROSSFADE_FADE_IN_DELAY
+desc: in crossfade settings menu
+eng: "Fade in delay"
+voice: "Fade in delay"
+new: "Задержка нарастания"
+
+id: LANG_CROSSFADE_FADE_OUT_DELAY
+desc: in crossfade settings menu
+eng: "Fade out delay"
+voice: "Fade out delay"
+new: "Задержка затухания"
+
+id: LANG_CROSSFADE_FADE_IN_DURATION
+desc: in crossfade settings menu
+eng: "Fade in duration"
+voice: "Fade in duration"
+new: "Длительность нарастания"
+
+id: LANG_CROSSFADE_FADE_OUT_DURATION
+desc: in crossfade settings menu
+eng: "Fade out duration"
+voice: "Fade out duration"
+new: "Длительность затухания"
+
+id: LANG_CROSSFADE_FADE_OUT_MODE
+desc: in crossfade settings menu
+eng: "Fade out mode"
+voice: "Fade out mode"
+new: "Режим затухания"
+
+id: LANG_WAIT
+desc: general please wait splash
+eng: "Loading..."
+voice: 
+new: "Загрузка..."
+
 id: LANG_RECORD_STARTUP
 desc: Start Rockbox in Recording screen
 eng: "Show recording screen on startup"
 voice: "Show recording screen on startup"
-new: "Показывать экран записи при загрузке"
+new: "Показывать экран записи при запуске"
 
 id: LANG_ALARM_MOD_DISABLE
 desc: Announce that the RTC alarm has been turned off
 eng: "Alarm Disabled"
 voice: "Alarm Disabled"
 new: "Будильник отключен"
+
+id: LANG_DEFAULT_CODEPAGE
+desc: default encoding used with id3 tags
+eng: "Default Codepage"
+voice: 
+new: "Кодировка по умолчанию"
+
+id: LANG_REMOTE_WHILE_PLAYING
+desc: in settings_menu()
+eng: "Browse .rwps files"
+voice: "Browse remote while-playing-screen files"
+new: "Выбор .rwps файлов"
+
+id: LANG_CUSTOM_THEME
+desc: Custom themes menu
+eng: "Browse Themes"
+voice: "Browse Themes"
+new: "Выбор тем"
+
+id: LANG_BRIGHTNESS
+desc: in settings_menu
+eng: "Brightness"
+voice: "Brightness"
+new: "Яркость"
+
+id: LANG_SCREEN_SCROLL_VIEW
+desc: should lines scroll out of the screen
+eng: "Screen Scrolls Out Of View"
+voice: "Screen Scrolls Out Of View"
+new: "Прокрутка экрана"
+
+id: LANG_SCREEN_SCROLL_STEP
+desc: Pixels to advance per Screen scroll
+eng: "Screen Scroll Step Size"
+voice: "Screen Scroll Step Size"
+new: "Шаг прокрутки экрана"
+
+id: LANG_QUEUE_SHUFFLED
+desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
+eng: "Queue shuffled"
+voice: "Queue shuffled"
+new: "Перемешать очередь"
+
+id: LANG_CLEAR_BACKDROP
+desc: text for LCD settings menu
+eng: "Clear backdrop"
+voice: "Clear backdrop"
+new: "Очистить фон"
+
+id: LANG_SET_AS_BACKDROP
+desc: text for onplay menu entry
+eng: "Set as backdrop"
+voice: "Set as backdrop"
+new: "Установить как фон"
+
+id: LANG_BACKDROP_LOADED
+desc: text for splash to indicate a new backdrop has been loaded successfully
+eng: "Backdrop loaded"
+voice: "Backdrop loaded"
+new: "Фон загружен"
+
+id: LANG_BACKDROP_FAILED
+desc: text for splash to indicate a failure to load a bitmap as backdrop
+eng: "Backdrop failed"
+voice: "Backdrop failed"
+new: "Ошибка загрузки фона"
+
+id: LANG_WARN_ERASEDYNPLAYLIST_MENU
+desc: in playlist options menu, option to warn when erasing dynamic playlist
+eng: "Warn When Erasing Dynamic Playlist"
+voice: 
+new: "Подтверждать очистку динамич. списка песен"
+
+id: LANG_WARN_ERASEDYNPLAYLIST_PROMPT
+desc: prompt shown when about to erase a modified dynamic playlist
+eng: "Erase dynamic playlist?"
+voice: 
+new: "Очистить динамич. список песен?"
+
+id: LANG_EQUALIZER
+desc: in the sound settings menu
+eng: "Equalizer"
+voice: "Equalizer"
+new: "Эквалайзер"
+
+id: LANG_EQUALIZER_ENABLED
+desc: in the equalizer settings menu
+eng: "Enable EQ"
+voice: "Enable EQ"
+new: "Включить экв."
+
+id: LANG_EQUALIZER_GRAPHICAL
+desc: in the equalizer settings menu
+eng: "Graphical EQ"
+voice: "Graphical EQ"
+new: "Графический экв."
+
+id: LANG_EQUALIZER_GAIN
+desc: in the equalizer settings menu
+eng: "Simple EQ Settings"
+voice: "Simple EQ Settings"
+new: "Простые установки экв."
+
+id: LANG_EQUALIZER_ADVANCED
+desc: in the equalizer settings menu
+eng: "Advanced EQ Settings"
+voice: "Advanced EQ Settings"
+new: "Расширенные установки экв."
+
+id: LANG_EQUALIZER_SAVE
+desc: in the equalizer settings menu
+eng: "Save EQ Preset"
+voice: "Save EQ Preset"
+new: "Сохранить установки экв."
+
+id: LANG_EQUALIZER_BROWSE
+desc: in the equalizer settings menu
+eng: "Browse EQ Presets"
+voice: "Browse EQ Presets"
+new: "Загрузить установки экв."
+
+id: LANG_EQUALIZER_GAIN_ITEM
+desc: in the equalizer settings menu
+eng: "%d Hz Band Gain"
+voice: ""
+new: "%d Гц"
+
+id: LANG_EQUALIZER_BAND_CUTOFF
+desc: in the equalizer settings menu
+eng: "Cutoff Frequency"
+voice: "Cutoff Frequency"
+new: "Частота среза"
+
+id: LANG_EQUALIZER_BAND_CENTER
+desc: in the equalizer settings menu
+eng: "Center Frequency"
+voice: "Center frequency"
+new: "Центральная частота"
+
+id: LANG_EQUALIZER_BAND_GAIN
+desc: in the equalizer settings menu
+eng: "Gain"
+voice: "Gain"
+new: "Усиление"
+
+id: LANG_EQUALIZER_EDIT_MODE
+desc: in the equalizer settings menu
+eng: "Edit mode: %s"
+voice: ""
+new: "Режим редактир.: %s"
+
+id: LANG_EQUALIZER_BAND_LOW_SHELF
+desc: in the equalizer settings menu
+eng: "Low Shelf Filter"
+voice: ""
+new: "Фильтр низких частот"
+
+id: LANG_EQUALIZER_BAND_PEAK
+desc: in the equalizer settings menu
+eng: "Peak Filter %d"
+voice: ""
+new: "Фильтр пиков %d"
+
+id: LANG_EQUALIZER_BAND_HIGH_SHELF
+desc: in the equalizer settings menu
+eng: "High Shelf Filter"
+voice: ""
+new: "Фильтр высоких частот"
+
+id: LANG_RECORDING_GAIN_ANALOG
+desc: in the recording screen
+eng: "A"
+voice: "Analog Gain"
+new: "А"
+
+id: LANG_RECORDING_GAIN_DIGITAL
+desc: in the recording screen
+eng: "D"
+voice: "Digital Gain"
+new: "Ц"
+
+id: LANG_NOTHING_TO_RESUME
+desc: Error message displayed when resume button pressed but no playlist
+eng: "Nothing to resume"
+voice: ""
+new: "Нечего возобновлять"
+
+id: LANG_RATING
+desc: in set_rating
+eng: "Rating:"
+voice: ""
+new: "Рейтинг"
+
+id: LANG_MIX
+desc: in playback settings, crossfade option
+eng: "Mix"
+voice: "Mix"
+new: "Микшировать"
+
+id: LANG_RESTARTING_PLAYBACK
+desc: splash screen displayed when pcm buffer size is changed
+eng: "Restarting playback..."
+voice: ""
+new: "Перезапуск воспроизведения..."
+
+id: LANG_REPLAYGAIN
+desc: in replaygain
+eng: "Replaygain"
+voice: "Replaygain"
+new: "Усиление воспроизвед."
+
+id: LANG_REPLAYGAIN_ENABLE
+desc: in replaygain
+eng: "Enable replaygain"
+voice: "Enable replaygain"
+new: "Включить усиление воспроизвед."
+
+id: LANG_REPLAYGAIN_NOCLIP
+desc: in replaygain
+eng: "Prevent clipping"
+voice: "Prevent clipping"
+new: "Предотвратить перегрузку"
+
+id: LANG_REPLAYGAIN_MODE
+desc: in replaygain
+eng: "Replaygain type"
+voice: "Replaygain type"
+new: "Тип усиления воспроизвед."
+
+id: LANG_TRACK_GAIN
+desc: in replaygain
+eng: "Track gain"
+voice: "Track gain"
+new: "Усиление трека"
+
+id: LANG_ALBUM_GAIN
+desc: in replaygain
+eng: "Album gain"
+voice: "Album gain"
+new: "Усиление альбома"
+
+id: LANG_ID3_TRACK_GAIN
+desc: in browse_id3
+eng: "[Track gain]"
+voice: ""
+new: "[Усиление трека]"
+
+id: LANG_ID3_ALBUM_GAIN
+desc: in browse_id3
+eng: "[Album gain]"
+voice: ""
+new: "[Усиление альбома]"
+
+id: LANG_REPLAYGAIN_PREAMP
+desc: in replaygain settings
+eng: "Pre-amp"
+voice: "Preamp"
+new: "Предусиление"
+
+id: LANG_UNIT_DB
+desc: in browse_id3
+eng: "dB"
+voice: ""
+new: "дБ"
+
+id: LANG_SHUFFLE_GAIN
+desc: use track gain if shuffle mode is on, album gain otherwise
+eng: "Track gain if shuffling"
+voice: "Track gain if shuffling"
+new: "Усиление трека при случайном воспр."
+
+id: LANG_RADIO_SCAN_MODE
+desc: in radio screen / menu
+eng: "Scan"
+voice: ""
+new: "Сканировать"
+
+id: LANG_RADIO_PRESET_MODE
+desc: in radio screen / menu
+eng: "Preset"
+voice: ""
+new: "Предустановка"
+
+id: LANG_FM_FREEZE
+desc: splash screen during freeze in radio mode
+eng: "Screen frozen!"
+voice: ""
+new: "Экран остановлен!"
+
+id: LANG_CROSSFEED
+desc: in the sound settings menu
+eng: "Crossfeed"
+voice: "Crossfeed"
+new: "Перекрёстная подача сигнала"
+
+id: LANG_FM_SCAN_PRESETS
+desc: in radio menu
+eng: "Auto scan presets"
+voice: "Auto scan presets"
+new: "Автоскан. предустановок"
+
+id: LANG_FM_SCANNING
+desc: during auto scan
+eng: "Scanning %d.%01dMHz"
+voice: ""
+new: "Сканирование %d.%01dМГц"
+
+id: LANG_FM_DEFAULT_PRESET_NAME
+desc: default preset name for auto scan mode
+eng: "%d.%01dMHz"
+voice: 
+new: "%d.%01dМГц"
+
+id: LANG_FM_ADD_PRESET
+desc: in radio menu
+eng: "Add preset"
+voice: "Add preset"
+new: "Добавить предустановку"
+
+id: LANG_FM_CLEAR_PRESETS
+desc: confirmation if presets can be cleared
+eng: "Clear current presets?"
+voice: ""
+new: "Очистить текущие предуст.?"
+
+id: LANG_REDUCE_TICKING
+desc: in remote lcd settings menu
+eng: "Reduce ticking"
+voice: "Reduce ticking"
+new: "Уменьшить мерцание"
+
+id: LANG_FM_TUNE_MODE
+desc: in radio screen / menu
+eng: "Mode:"
+voice: ""
+new: "Режим"
+
+id: LANG_F2_MODE
+desc: in wps F2 pressed
+eng: "Mode:"
+voice: ""
+new: "Режим"
+
+id: LANG_RECORD_START_THRESHOLD
+desc: in recording settings_menu
+eng: "Start above"
+voice: 
+new: "Начать после"
+
+id: LANG_RECORD_MIN_DURATION
+desc: in recording settings_menu
+eng: "for at least"
+voice: 
+new: "мин. продолжительность"
+
+id: LANG_RECORD_STOP_THRESHOLD
+desc: in recording settings_menu
+eng: "Stop below"
+voice: 
+new: "Остановить после"
+
+id: LANG_RECORD_STOP_POSTREC
+desc: in recording settings_menu
+eng: "for at least"
+voice: 
+new: "мин. продолжительность"
+
+id: LANG_RECORD_STOP_GAP
+desc: in recording settings_menu
+eng: "Presplit gap"
+voice: 
+new: "Промежуток предразбиения"
+
+id: LANG_RECORD_TRIG_NOREARM
+desc: in recording settings_menu
+eng: "Once"
+voice: 
+new: "Один раз"
+
+id: LANG_RECORD_TRIG_REARM
+desc: in recording settings_menu
+eng: "Repeat"
+voice: 
+new: "Повтор"
+
+id: LANG_CROSSFADE
+desc: in playback settings
+eng: "Crossfade"
+voice: "Crossfade"
+new: "Затухание пересечения"
+
+id: LANG_SCROLL_PAGINATED
+desc: jump to new page when scrolling
+eng: "Paged Scrolling"
+voice: ""
+new: "Страничная прокрутка"
+
+id: LANG_CLIP_LIGHT
+desc: in record settings menu.
+eng: "Clipping light"
+voice: "Clipping light"
+new: "Подсветка перегрузки"
+
+id: LANG_MAIN_UNIT
+desc: in record settings menu.
+eng: "Main unit only"
+voice: "Main unit only"
+new: "Только на плеере"
+
+id: LANG_REMOTE_UNIT
+desc: in record settings menu.
+eng: "Remote unit only"
+voice: "Remote unit only"
+new: "Только на пульте"
+
+id: LANG_REMOTE_MAIN
+desc: in record settings menu.
+eng: "Main and remote unit"
+voice: "Main and remote unit"
+new: "На плеере и на пульте"
+
+#############################################               
+###  TRANSLATED IN LATIN TRANSLITERATION  ###
+###                BEGIN                  ###
+#############################################
+id: LANG_SHUFFLE
+desc: in settings_menu
+eng: "Shuffle"
+voice: "Shuffle"
+new: "Sluchaino"
+
+id: LANG_OFF
+desc: Used in a lot of places
+eng: "Off"
+voice: "Off"
+new: "Vykl"
+
+id: LANG_ON
+desc: Used in a lot of places
+eng: "On"
+voice: "On"
+new: "Vkl"
+
+id: LANG_FILTER
+desc: setting name for dir filter
+eng: "Show Files"
+voice: "Show Files"
+new: "Pokazyvat faily"
+
+id: LANG_FILTER_MUSIC
+desc: show only music-related files
+eng: "Music"
+voice: "Music"
+new: "Muzyka"
+
+id: LANG_FILTER_SUPPORTED
+desc: show all file types supported by Rockbox
+eng: "Supported"
+voice: "Supported"
+new: "Podderjivaemie"
+
+id: LANG_FILTER_ALL
+desc: show all files
+eng: "All"
+voice: "All"
+new: "Vse"
+
+id: LANG_REPEAT
+desc: in settings_menu
+eng: "Repeat"
+voice: "Repeat"
+new: "Povtor"
+
+id: LANG_REPEAT_ALL
+desc: repeat playlist once all songs have completed
+eng: "All"
+voice: "All"
+new: "Vse"
+
+id: LANG_REPEAT_ONE
+desc: repeat one song
+eng: "One"
+voice: "One"
+new: "Odin"
+
+id: LANG_FILTER_ID3DB
+desc: show ID3 database
+eng: "ID3 database"
+voice: "ID3 database"
+new: "Bazy dannih ID3"
+#############################################               
+###  TRANSLATED IN LATIN TRANSLITERATION  ###
+###                 END                   ###
+#############################################
+
+id: LANG_RECORD_TRIGGER
+desc: in recording settings_menu
+eng: "Trigger"
+voice: "Trigger"
+new: "Спусковой механизм"
+
+id: LANG_RECORD_TRIGGER_MODE
+desc: in recording settings_menu
+eng: "Trigger"
+voice: 
+new: "Спусковой механизм"
+
+id: LANG_FILTER_PLAYLIST
+desc: show only playlist
+eng: "Playlists"
+voice: "Playlists"
+new: 
+
+id: LANG_DB_INF
+desc: -inf db for values below measurement
+eng: "-inf"
+voice: 
+new: 
+
+id: LANG_RECORD_TRIG_IDLE
+desc: waiting for threshold
+eng: "Trigger idle"
+voice: 
+new: "Спусковой механизм выключен"
+
+id: LANG_RECORD_TRIGGER_ACTIVE
+desc: 
+eng: "Trigger active"
+voice: 
+new: "Спусковой механизм включен"
+
+id: LANG_DISK_NAME_INTERNAL
+desc: in info menu; name for internal disk with multivolume (keep short!)
+eng: "Int:"
+voice: "Internal"
+new: "Внут:"
+
+id: LANG_DISK_NAME_MMC
+desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
+eng: "MMC:"
+voice: "Multimedia card"
+new: 
+
+id: LANG_CROSSFADE_DURATION
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: 
+
+id: LANG_ID3_NO_GAIN
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: 
+
+id: LANG_BIDI_SUPPORT
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: 
+
+id: LANG_ID3_VBR
+desc: in browse_id3
+eng: " (VBR)"
+voice: ""
+new: 
+
+id: LANG_REPEAT_AB
+desc: repeat one song
+eng: "A-B"
+voice: "A-B"
+new: 
+
+id: LANG_RECORDING_ADC_RIGHT
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: 
+
+id: LANG_RECORDING_ADC_LEFT
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: 
+
+id: LANG_RECORDING_MONITOR
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: 
+
+id: LANG_CODEPAGE_LATIN1
+desc: in codepage setting menu
+eng: "Latin1 (ISO-8859-1)"
+voice: 
+new: 
+
+id: LANG_CODEPAGE_GREEK
+desc: in codepage setting menu
+eng: "Greek (ISO-8859-7)"
+voice: 
+new: 
+
+id: LANG_CODEPAGE_HEBREW
+desc: in codepage setting menu
+eng: "Hebrew (ISO-8859-8)"
+voice: 
+new: 
+
+id: LANG_CODEPAGE_RUSSIAN
+desc: in codepage setting menu
+eng: "Russian (CP1251)"
+voice: 
+new: "Русская (CP1251)"
+
+id: LANG_CODEPAGE_THAI
+desc: in codepage setting menu
+eng: "Thai (ISO-8859-11)"
+voice: 
+new: 
+
+id: LANG_CODEPAGE_ARABIC
+desc: in codepage setting menu
+eng: "Arabic (CP1256)"
+voice: 
+new: 
+
+id: LANG_CODEPAGE_TURKISH
+desc: in codepage setting menu
+eng: "Turkish (ISO-8859-9)"
+voice: 
+new: 
+
+id: LANG_CODEPAGE_LATIN_EXTENDED
+desc: in codepage setting menu
+eng: "Latin Extended (ISO-8859-2)"
+voice: 
+new: 
+
+id: LANG_CODEPAGE_JAPANESE
+desc: in codepage setting menu
+eng: "Japanese (SJIS)"
+voice: 
+new: 
+
+id: LANG_CODEPAGE_SIMPLIFIED
+desc: in codepage setting menu
+eng: "Simp. Chinese (GB2312)"
+voice: 
+new: 
+
+id: LANG_CODEPAGE_KOREAN
+desc: in codepage setting menu
+eng: "Korean (KSX1001)"
+voice: 
+new: 
+
+id: LANG_CODEPAGE_TRADITIONAL
+desc: in codepage setting menu
+eng: "Trad. Chinese (BIG5)"
+voice: 
+new: 
+
+id: LANG_CODEPAGE_UTF8
+desc: 
+eng: "Unicode (UTF-8)"
+voice: 
+new: 
+
+id: LANG_CROSSFEED_ENABLE
+desc: DEPRECATED
+eng: ""
+voice: 
+new: 
+
+id: VOICE_EXT_RWPS
+desc: spoken only, for file extension
+eng: ""
+voice: "remote while-playing-screen"
+new: 
+
+id: LANG_EQUALIZER_BAND_Q
+desc: in the equalizer settings menu
+eng: "Q"
+voice: "Q"
+new: 
