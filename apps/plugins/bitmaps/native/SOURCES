@@ -44,7 +44,7 @@ solitaire_cardback.220x176x16.bmp
 sudoku_start.112x64x1.bmp
 sudoku_normal.112x64x1.bmp
 sudoku_inverse.112x64x1.bmp
-#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 2)
+#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH >= 2)
 sudoku_start.160x128x2.bmp
 sudoku_normal.160x128x2.bmp
 sudoku_inverse.160x128x2.bmp
