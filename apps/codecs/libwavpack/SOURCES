@@ -10,5 +10,6 @@ coldfire.S
 #endif
 #if defined(CPU_ARM) && !defined(SIMULATOR)
 arm.S
+arml.S
 #endif
 

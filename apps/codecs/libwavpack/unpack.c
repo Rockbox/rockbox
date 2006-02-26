@@ -290,6 +290,7 @@ int read_config_info (WavpackContext *wpc, WavpackMetadata *wpmd)
 extern void decorr_stereo_pass_cont_mcf5249 (struct decorr_pass *dpp, long *buffer, long sample_count);
 #elif defined(CPU_ARM) && !defined(SIMULATOR)
 extern void decorr_stereo_pass_cont_arm (struct decorr_pass *dpp, long *buffer, long sample_count);
+extern void decorr_stereo_pass_cont_arml (struct decorr_pass *dpp, long *buffer, long sample_count);
 #else
 static void decorr_stereo_pass_cont (struct decorr_pass *dpp, long *buffer, long sample_count);
 #endif
@@ -353,7 +354,10 @@ long unpack_samples (WavpackContext *wpc, long *buffer, ulong sample_count)
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
                 decorr_stereo_pass_cont_mcf5249 (dpp, buffer + 16, sample_count - 8);
 #elif defined(CPU_ARM) && !defined(SIMULATOR)
-                decorr_stereo_pass_cont_arm (dpp, buffer + 16, sample_count - 8);
+                if (((flags & MAG_MASK) >> MAG_LSB) > 15)
+                    decorr_stereo_pass_cont_arml (dpp, buffer + 16, sample_count - 8);
+                else
+                    decorr_stereo_pass_cont_arm (dpp, buffer + 16, sample_count - 8);
 #else
                 decorr_stereo_pass_cont (dpp, buffer + 16, sample_count - 8);
 #endif
