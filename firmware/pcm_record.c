@@ -67,7 +67,7 @@ static char recording_filename[MAX_PATH];
 
 static volatile bool init_done, close_done, record_done, stop_done, pause_done, resume_done, new_file_done;
 
-static int peak_left, peak_right;
+static short peak_left, peak_right;
 
 /***************************************************************************/
 
@@ -353,51 +353,19 @@ void audio_resume_recording(void)
     wake_up_thread();    
 }
 
+/* return peaks as int, so convert from short first
+   note that peak values are always positive */
 void pcm_rec_get_peaks(int *left, int *right)
 {
     if (left)
-        *left = peak_left;
+        *left = (int)peak_left;
     if (right)
-        *right = peak_right;
+        *right = (int)peak_right;
 }
 
 /***************************************************************************/
 /* Functions that executes in the context of pcmrec_thread                 */
 /***************************************************************************/
-
-/* Skip PEAK_STRIDE sample-pairs for each compare 
-#define PEAK_STRIDE  3
-
-static void pcmrec_find_peaks(int chunk, int* peak_l, int* peak_r)
-{
-    short *ptr, value;        
-    int j;
- 
-    if(!peak_l || ! peak_r) return;
-
-    ptr = GET_CHUNK(chunk);
-    
-    *peak_l = 0;
-    *peak_r = 0;
-    
-    for (j=0; j<CHUNK_SIZE/4; j+=PEAK_STRIDE+1)
-    {
-        if ((value = ptr[0]) > *peak_l)
-            *peak_l = value;
-        else if (-value > *peak_l)
-            *peak_l = -value;
-        ptr++;
-    
-        if ((value = ptr[0]) > *peak_r)
-            *peak_r = value;
-        else if (-value > *peak_r)
-            *peak_r = -value;
-        ptr++;
-        
-        ptr += PEAK_STRIDE * 2;
-    }
-}
-*/
 
 /**
  * Process the chunks using read_index and write_index.
