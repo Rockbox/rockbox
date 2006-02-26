@@ -55,5 +55,5 @@ Patches
 Create a patch using 'cvs diff -ub'. 
 Trim your patches so they only contain relevant changes.
 
-Submit your patch to the project via Sourceforge's patch tracker:
-http://sourceforge.net/tracker/?group_id=44306&atid=439120
+Submit your patch to the project via our patch tracker:
+http://www.rockbox.org/bugs/index.php?type=4
