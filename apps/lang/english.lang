@@ -3748,3 +3748,33 @@ desc: in record settings menu.
 eng: "Main and remote unit"
 voice: "Main and remote unit"
 new:
+
+id: LANG_COLOR_RGB_LABELS
+desc: what to show for the 'R' 'G' 'B' ONE LETTER EACH
+eng: "RGB"
+voice:
+new:
+
+id: LANG_COLOR_RGB_VALUE
+desc: in color screen
+eng: "RGB: %02X%02X%02X"
+voice:
+new:
+
+id: LANG_BACKGROUND_COLOR
+desc: menu entry to set the background color
+eng: "Background Colour"
+voice:
+new:
+
+id: LANG_FOREGROUND_COLOR
+desc: menu entry to set the foreground color
+eng: "Foreground Colour"
+voice:
+new:
+
+id: LANG_RESET_COLORS
+desc: menu
+eng: "Reset Colours"
+voice:
+new:

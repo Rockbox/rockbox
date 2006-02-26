@@ -515,7 +515,12 @@ int plugin_load(const char* plugin, void* parameter)
 
 #ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH > 1
+#ifdef HAVE_LCD_COLOR
+    lcd_set_drawinfo(DRMODE_SOLID, global_settings.fg_color, 
+                                   global_settings.bg_color);
+#else
     lcd_set_drawinfo(DRMODE_SOLID, LCD_DEFAULT_FG, LCD_DEFAULT_BG);
+#endif
 #else /* LCD_DEPTH == 1 */
     lcd_set_drawmode(DRMODE_SOLID);
 #endif /* LCD_DEPTH */

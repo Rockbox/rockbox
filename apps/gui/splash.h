@@ -20,6 +20,7 @@
 #ifndef _GUI_SPLASH_H_
 #define _GUI_SPLASH_H_
 #include "screen_access.h"
+
 /*
  * Puts a splash message on the given screen for a given period
  *  - screen : the screen to put the splash on

@@ -89,7 +89,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "dsp.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 36
+#define CONFIG_BLOCK_VERSION 37
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -122,7 +122,7 @@ struct bit_entry
     int default_val; /* min 15 bit */
     /* variable name in a .cfg file, NULL if not to be saved */
     const char* cfg_name;
-    /* set of values, or NULL for a numerical value */
+    /* set of values, "rgb" for a color, or NULL for a numerical value */
     const char* cfg_val;
 };
 
@@ -545,6 +545,10 @@ static const struct bit_entry hd_bits[] =
     {2, S_O(cliplight), 0, "cliplight", "off,main,both,remote" },
 #endif /* CONFIG_BACKLIGHT */
 #endif /*HAVE_RECORDING*/
+#ifdef HAVE_LCD_COLOR
+    {LCD_DEPTH,S_O(fg_color),LCD_DEFAULT_FG,"foreground color","rgb"}, 
+    {LCD_DEPTH,S_O(bg_color),LCD_DEFAULT_BG,"background color","rgb"}, 
+#endif
     /* If values are just added to the end, no need to bump the version. */
     /* new stuff to be added at the end */
 
@@ -595,6 +599,39 @@ static void set_bits(
 
     p[long_index] = (p[long_index] & ~mask) | (value << bit_index);
 }
+
+#ifdef HAVE_LCD_COLOR
+/*
+ * Helper function to convert a string of 6 hex digits to a native colour
+ */
+
+#define hex2dec(c) (((c) >= '0' && ((c) <= '9')) ? (toupper(c)) - '0' : \
+                                                   (toupper(c)) - 'A' + 10)
+
+int hex_to_rgb(const char* hex)
+{   int ok = 1;
+    int i;
+    int red, green, blue;
+
+    if (strlen(hex) == 6) {
+        for (i=0; i < 6; i++ ) {
+           if (!isxdigit(hex[i])) {
+              ok=0;
+              break;
+           }
+        }
+
+        if (ok) {
+            red = (hex2dec(hex[0]) << 4) | hex2dec(hex[1]);
+            green = (hex2dec(hex[2]) << 4) | hex2dec(hex[3]);
+            blue = (hex2dec(hex[4]) << 4) | hex2dec(hex[5]);
+            return LCD_RGBPACK(red,green,blue);
+        }
+    }
+
+    return 0;
+}
+#endif
 
 /*
  * Calculates the checksum for the config block and returns it
@@ -1013,6 +1050,8 @@ void settings_apply(void)
     } else {
         lcd_set_backdrop(NULL);
     }
+    screens[SCREEN_MAIN].set_foreground(global_settings.fg_color);
+    screens[SCREEN_MAIN].set_background(global_settings.bg_color);
 #endif
 
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
@@ -1225,6 +1264,12 @@ static int load_cfg_table(
             {   /* numerical value, just convert the string */
                 val = atoi(value);
             }
+#if HAVE_LCD_COLOR
+            else if (!strncasecmp(p_table[i].cfg_val,"rgb",4))
+            {
+                val = hex_to_rgb(value);
+            }
+#endif
             else
             {   /* set of string values, find the index */
                 const char* item;
@@ -1410,6 +1455,15 @@ static void save_cfg_table(const struct bit_entry* p_table, int count, int fd)
         {
             fdprintf(fd, "%s: %ld\r\n", p_run->cfg_name, value);
         }
+#ifdef HAVE_LCD_COLOR
+        else if (!strcasecmp(p_run->cfg_val, "rgb"))
+        {
+            fdprintf(fd, "%s: %02x%02x%02x\r\n", p_run->cfg_name, 
+                                                 (int)RGB_UNPACK_RED(value),
+                                                 (int)RGB_UNPACK_GREEN(value),
+                                                 (int)RGB_UNPACK_BLUE(value));
+        }
+#endif
         else /* write as item */
         {
             const char* p = p_run->cfg_val;
@@ -1566,6 +1620,9 @@ void settings_reset(void) {
     global_settings.lang_file[0] = '\0';
 #ifdef HAVE_LCD_COLOR
     global_settings.backdrop_file[0] = '\0';
+      
+    global_settings.fg_color = LCD_DEFAULT_FG;
+    global_settings.bg_color = LCD_DEFAULT_BG;
 #endif
 
 }

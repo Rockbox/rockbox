@@ -54,6 +54,7 @@
 #include "splash.h"
 #include "yesno.h"
 #include "list.h"
+#include "color_picker.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
@@ -318,6 +319,43 @@ static bool clear_main_backdrop(void)
     global_settings.backdrop_file[0]=0;
     lcd_set_backdrop(NULL);
     return true;
+}
+
+/**
+ * Menu for fore/back colors
+ */
+static bool set_fg_color(void)
+{
+    bool res;
+
+    res = set_color(&screens[SCREEN_MAIN],str(LANG_FOREGROUND_COLOR),
+                    &global_settings.fg_color);
+
+    screens[SCREEN_MAIN].set_foreground(global_settings.fg_color);
+
+    return res;
+}
+
+static bool set_bg_color(void)
+{
+    bool res;
+
+    res = set_color(&screens[SCREEN_MAIN],str(LANG_BACKGROUND_COLOR),
+                    &global_settings.bg_color);
+
+    screens[SCREEN_MAIN].set_background(global_settings.bg_color);
+
+    return res;
+}
+
+static bool reset_color(void)
+{
+    global_settings.fg_color = LCD_DEFAULT_FG;
+    global_settings.bg_color = LCD_DEFAULT_BG;
+    
+    screens[SCREEN_MAIN].set_foreground(global_settings.fg_color);
+    screens[SCREEN_MAIN].set_background(global_settings.bg_color);
+    return false;
 }
 #endif
 
@@ -1586,6 +1624,9 @@ static bool lcd_settings_menu(void)
 #endif
 #ifdef HAVE_LCD_COLOR
         { ID2P(LANG_CLEAR_BACKDROP),   clear_main_backdrop },
+        { ID2P(LANG_BACKGROUND_COLOR), set_bg_color },
+        { ID2P(LANG_FOREGROUND_COLOR), set_fg_color },
+        { ID2P(LANG_RESET_COLORS),     reset_color },
 #endif
     };
 

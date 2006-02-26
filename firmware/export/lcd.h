@@ -150,6 +150,9 @@ typedef void lcd_fastpixelfunc_type(fb_data *address);
 #define LCD_MAX_RED    31
 #define LCD_MAX_GREEN  63
 #define LCD_MAX_BLUE   31
+#define _RGB_UNPACK_RED(x)   ((((x) >> 8) & 0xf8) | ((x) >> 13))
+#define _RGB_UNPACK_GREEN(x) ((((x) >> 3) & 0xfc) | (((x) >> 9) & 0x03))
+#define _RGB_UNPACK_BLUE(x)  ((((x) << 3) & 0xf8) | (((x) >> 2) & 0x07))
 #define _RGBPACK(r, g, b) ( ((((r) * (31*257) + (127*257)) >> 16) << 11) \
                            |((((g) * (63*257) + (127*257)) >> 16) << 5) \
                            | (((b) * (31*257) + (127*257)) >> 16))
@@ -158,8 +161,14 @@ typedef void lcd_fastpixelfunc_type(fb_data *address);
 #if (LCD_PIXELFORMAT == RGB565SWAPPED)
 #define LCD_RGBPACK(r, g, b) ( ((_RGBPACK((r), (g), (b)) & 0xff00) >> 8) \
                               |((_RGBPACK((r), (g), (b)) & 0x00ff) << 8))
+#define RGB_UNPACK_RED(x)   _RGB_UNPACK_RED(swap16(x))
+#define RGB_UNPACK_GREEN(x) _RGB_UNPACK_GREEN(swap16(x))
+#define RGB_UNPACK_BLUE(x)  _RGB_UNPACK_BLUE(swap16(x)) 
 #else
 #define LCD_RGBPACK(r, g, b) _RGBPACK((r), (g), (b))
+#define RGB_UNPACK_RED(x)   _RGB_UNPACK_RED(x)
+#define RGB_UNPACK_GREEN(x) _RGB_UNPACK_GREEN(x)
+#define RGB_UNPACK_BLUE(x)  _RGB_UNPACK_BLUE(x) 
 #endif
 #elif LCD_DEPTH == 18
 #define LCD_MAX_RED    63

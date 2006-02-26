@@ -465,6 +465,10 @@ struct user_settings
 
     bool warnon_erase_dynplaylist; /* warn when erasing dynamic playlist */
     bool scroll_paginated;   /* 0=dont 1=do */
+#ifdef HAVE_LCD_COLOR
+    int bg_color; /* background color native format */
+    int fg_color; /* foreground color native format */
+#endif
 };
 
 enum optiontype { INT, BOOL };
