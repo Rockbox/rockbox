@@ -95,6 +95,8 @@
 #define GPIO_MASK    (1 << GPIO_IRQ)
 #define SER0_MASK    (1 << SER0_IRQ)
 #define SER1_MASK    (1 << SER1_IRQ)
+#define DMA_OUT_MASK (1 << DMA_OUT_IRQ)
+
 
 #define TIMER1_VAL   (*(volatile unsigned long *)(0xcf001104))
 #define TIMER1_CFG   (*(volatile unsigned long *)(0xcf001100))

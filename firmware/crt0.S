@@ -348,9 +348,17 @@ prefetch_abort_handler:
     b      UIE
 
 fiq_handler:
+#if CONFIG_CPU == PP5020
     @ Branch straight to FIQ handler in pcm_playback.c. This also handles the
     @ the correct return sequence.
     ldr    pc, =fiq
+#else
+    stmfd  sp!, {r0-r3, r12, lr}
+    mov    lr, pc
+    ldr    pc, =fiq
+    ldmfd  sp!, {r0-r3, r12, lr}
+    subs   pc, lr, #4
+#endif
 
 data_abort_handler:
     sub    r0, lr, #8 

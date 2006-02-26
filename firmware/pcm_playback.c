@@ -333,8 +333,6 @@ static int pcm_freq = 0x6; /* 44.1 is default */
 unsigned short* p IBSS_ATTR;
 long p_size IBSS_ATTR;
 
-#define PP5002_DMA_OUT_MASK     (1 << DMA_OUT_IRQ)
-
 static void dma_start(const void *addr, size_t size)
 {
     p=(unsigned short*)addr;
@@ -348,8 +346,8 @@ static void dma_start(const void *addr, size_t size)
     outl(I2S_MASK, 0x60004024);
 #else
     /* setup I2S interrupt for FIQ */
-    outl(inl(0xcf00103c) | PP5002_DMA_OUT_MASK, 0xcf00103c);
-    outl(PP5002_DMA_OUT_MASK, 0xcf001034);
+    outl(inl(0xcf00103c) | DMA_OUT_MASK, 0xcf00103c);
+    outl(DMA_OUT_MASK, 0xcf001034);
 #endif
 
     /* Clear the FIQ disable bit in cpsr_c */
@@ -370,7 +368,7 @@ static void dma_start(const void *addr, size_t size)
 #if CONFIG_CPU == PP5020
             IISCONFIG |= 0x2;
 #elif CONFIG_CPU == PP5002
-            IISFIFO_CFG &= ~(1<<9);
+            IISFIFO_CFG |= (1<<9);
 #endif
             return;
         }
@@ -483,7 +481,7 @@ void pcm_play_pause(bool play)
 #if CONFIG_CPU == PP5020
                     IISCONFIG |= 0x2;
 #elif CONFIG_CPU == PP5002
-                    IISFIFO_CFG &= ~(1<<9);
+                    IISFIFO_CFG |= (1<<9);
 #endif
                     return;
                 }
@@ -643,7 +641,7 @@ void fiq(void)
 #if CONFIG_CPU == PP5020
                 IISCONFIG |= 0x2;
 #elif CONFIG_CPU == PP5002
-                IISFIFO_CFG &= ~(1<<9);
+                IISFIFO_CFG |= (1<<9);
 #endif
                 return;
             }
