@@ -29,7 +29,7 @@ SDL_Color remote_color_max  = {0, 0, 0, 0};
 
 extern unsigned char lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH];
 
-static inline Uint32 get_lcd_remote_pixel(int x, int y) {
+static unsigned long get_lcd_remote_pixel(int x, int y) {
     return ((lcd_remote_framebuffer[y/8][x] >> (y & 7)) & 1);
 }
 
