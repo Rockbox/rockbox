@@ -25,8 +25,8 @@ viewer.c
 #if CONFIG_LCD != LCD_IPOD2BPP     /* Plugins needing the grayscale lib */
 #ifndef HAVE_LCD_COLOR
 grayscale.c
-fire.c
 #endif
+fire.c
 jpeg.c
 mandelbrot.c
 plasma.c
