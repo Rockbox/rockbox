@@ -95,6 +95,7 @@ static long silence_len; /* length of the VOICE_PAUSE clip */
 static unsigned char* p_lastclip; /* address of latest clip, for silence add */
 static unsigned long voicefile_size = 0; /* size of the loaded voice file */
 static unsigned char last_lang[MAX_FILENAME+1]; /* name of last used lang file (in talk_init) */
+static bool talk_initialized; /* true if talk_init has been called */
 
 /***************** Private prototypes *****************/
 
@@ -473,12 +474,13 @@ static void reset_state(void)
 
 void talk_init(void)
 {
-    if (!strcasecmp(last_lang, global_settings.lang_file))
+    if (talk_initialized && !strcasecmp(last_lang, global_settings.lang_file))
     {
         /* not a new file, nothing to do */
         return;
     }
 
+    talk_initialized = true;
     strncpy((char *) last_lang, (char *)global_settings.lang_file,
         MAX_FILENAME);
 
