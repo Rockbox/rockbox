@@ -10,10 +10,10 @@
 * Greyscale framework
 * Parameter handling
 *
-* This is a generic framework to use grayscale display within Rockbox
-* plugins. It obviously does not work for the player.
+* This is a generic framework to display up to 33 shades of grey
+* on low-depth bitmap LCDs (Archos b&w, Iriver 4-grey) within plugins.
 *
-* Copyright (C) 2004-2005 Jens Arnold
+* Copyright (C) 2004-2006 Jens Arnold
 *
 * All files in this archive are subject to the GNU General Public License.
 * See the file COPYING in the source tree root for full license agreement.
@@ -23,10 +23,9 @@
 *
 ****************************************************************************/
 
-#ifndef SIMULATOR /* not for simulator by now */
 #include "plugin.h"
 
-#ifdef HAVE_LCD_BITMAP /* and also not for the Player */
+#ifdef HAVE_LCD_BITMAP
 #include "gray.h"
 
 /* Set position of the top left corner of the greyscale overlay
@@ -37,7 +36,14 @@ void gray_set_position(int x, int by)
     _gray_info.by = by;
     
     if (_gray_info.flags & _GRAY_RUNNING)
+    {
+#ifdef SIMULATOR
+        gray_deferred_lcd_update();
+        gray_update();
+#else
         _gray_info.flags |= _GRAY_DEFERRED_UPDATE;
+#endif
+    }
 }
 
 /* Set the draw mode for subsequent drawing operations */
@@ -103,5 +109,3 @@ int  gray_getstringsize(const unsigned char *str, int *w, int *h)
 }
 
 #endif /* HAVE_LCD_BITMAP */
-#endif /* !SIMULATOR */
-

@@ -41,19 +41,26 @@ void lcd_remote_update (void)
 void lcd_remote_update_rect(int x_start, int y_start, int width, int height)
 {
     sdl_update_rect(remote_surface, x_start, y_start, width, height,
+        LCD_REMOTE_WIDTH, LCD_REMOTE_HEIGHT, get_lcd_remote_pixel);
+    sdl_gui_update(remote_surface, x_start, y_start, width, height,
         LCD_REMOTE_WIDTH, LCD_REMOTE_HEIGHT, background ? UI_REMOTE_POSX : 0,
-        (background ? UI_REMOTE_POSY : LCD_HEIGHT), get_lcd_remote_pixel);
+        background ? UI_REMOTE_POSY : LCD_HEIGHT);
 }
 
 void sim_remote_backlight(int value)
 {
     if (value > 0) {
-        sdl_set_gradient(remote_surface, &remote_backlight_color_zero, &remote_color_max, (1<<LCD_REMOTE_DEPTH));
+        sdl_set_gradient(remote_surface, &remote_backlight_color_zero,
+                         &remote_color_max, 0, (1<<LCD_REMOTE_DEPTH));
     } else {
-        sdl_set_gradient(remote_surface, &remote_color_zero, &remote_color_max, (1<<LCD_REMOTE_DEPTH));
+        sdl_set_gradient(remote_surface, &remote_color_zero, &remote_color_max,
+                         0, (1<<LCD_REMOTE_DEPTH));
     }
 
-    lcd_remote_update();
+    sdl_gui_update(remote_surface, 0, 0, LCD_REMOTE_WIDTH, LCD_REMOTE_HEIGHT,
+                   LCD_REMOTE_WIDTH, LCD_REMOTE_HEIGHT,
+                   background ? UI_REMOTE_POSX : 0,
+                   background? UI_REMOTE_POSY : LCD_HEIGHT);
 }
 
 /* initialise simulator lcd remote driver */
@@ -63,7 +70,7 @@ void sim_lcd_remote_init(void)
         LCD_REMOTE_WIDTH * display_zoom, LCD_REMOTE_HEIGHT * display_zoom,
         8, 0, 0, 0, 0);
 
-    sdl_set_gradient(remote_surface, &remote_color_zero, &remote_color_max,
-        (1<<LCD_REMOTE_DEPTH));
+    sdl_set_gradient(remote_surface, &remote_backlight_color_zero,
+                     &remote_color_max, 0, (1<<LCD_REMOTE_DEPTH));
 }
 

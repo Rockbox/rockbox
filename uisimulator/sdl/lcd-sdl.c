@@ -23,8 +23,8 @@
 int display_zoom = 1;
 
 void sdl_update_rect(SDL_Surface *surface, int x_start, int y_start, int width,
-    int height, int max_x, int max_y, int ui_x, int ui_y,
-    Uint32 (*getpixel)(int, int))
+                     int height, int max_x, int max_y,
+                     unsigned long (*getpixel)(int, int))
 {
     int x, y;
     int xmax, ymax;
@@ -49,25 +49,39 @@ void sdl_update_rect(SDL_Surface *surface, int x_start, int y_start, int width,
         for (y = y_start; y < ymax; y++) {
             dest.y = y * display_zoom;
             
-            SDL_FillRect(surface, &dest, getpixel(x, y));
+            SDL_FillRect(surface, &dest, (Uint32)getpixel(x, y));
         }
     }
 
     SDL_UnlockSurface(surface);
+}
 
-    SDL_Rect src = {x_start * display_zoom, y_start * display_zoom, xmax * display_zoom, ymax * display_zoom};
-    dest.x = (ui_x + x_start) * display_zoom;
-    dest.y = (ui_y + y_start) * display_zoom;;
-    dest.w = xmax * display_zoom;
-    dest.h = ymax * display_zoom;
-    
+void sdl_gui_update(SDL_Surface *surface, int x_start, int y_start, int width,
+                    int height, int max_x, int max_y, int ui_x, int ui_y)
+{
+    int xmax, ymax;
+
+    ymax = y_start + height;
+    xmax = x_start + width;
+
+    if(xmax > max_x)
+        xmax = max_x;
+    if(ymax >= max_y)
+        ymax = max_y;
+
+    SDL_Rect src = {x_start * display_zoom, y_start * display_zoom,
+                    xmax * display_zoom, ymax * display_zoom};
+    SDL_Rect dest= {(ui_x + x_start) * display_zoom, (ui_y + y_start) * display_zoom,
+                    xmax * display_zoom, ymax * display_zoom};
+
     SDL_BlitSurface(surface, &src, gui_surface, &dest);
     SDL_UpdateRect(gui_surface, dest.x, dest.y, dest.w, dest.h);
     SDL_Flip(gui_surface);
 }
 
 /* set a range of bitmap indices to a gradient from startcolour to endcolour */
-void sdl_set_gradient(SDL_Surface *surface, SDL_Color *start, SDL_Color *end, int steps)
+void sdl_set_gradient(SDL_Surface *surface, SDL_Color *start, SDL_Color *end,
+                      int first, int steps)
 {
     int i;
     SDL_Color palette[steps];
@@ -78,6 +92,6 @@ void sdl_set_gradient(SDL_Surface *surface, SDL_Color *start, SDL_Color *end, in
         palette[i].b = start->b + (end->b - start->b) * i / (steps - 1);
     }
 
-    SDL_SetPalette(surface, SDL_LOGPAL|SDL_PHYSPAL, palette, 0, steps);
+    SDL_SetPalette(surface, SDL_LOGPAL|SDL_PHYSPAL, palette, first, steps);
 }
 

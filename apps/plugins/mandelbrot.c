@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "plugin.h"
 
-#if defined(HAVE_LCD_BITMAP) && ((LCD_DEPTH >= 8) || !defined(SIMULATOR))
+#ifdef HAVE_LCD_BITMAP
 #include "gray.h"
 #include "xlcd.h"
 

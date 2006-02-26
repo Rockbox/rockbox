@@ -18,7 +18,6 @@
  ****************************************************************************/
 
 #include "plugin.h"
-#include "gray.h"
 #include "configfile.h" /* Part of libplugin */
 
 PLUGIN_HEADER

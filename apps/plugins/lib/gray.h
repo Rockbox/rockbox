@@ -9,10 +9,10 @@
 *
 * Greyscale framework
 *
-* This is a generic framework to use greyscale display within Rockbox
-* plugins. It does not work for the player.
+* This is a generic framework to display up to 33 shades of grey
+* on low-depth bitmap LCDs (Archos b&w, Iriver 4-grey) within plugins.
 *
-* Copyright (C) 2004-2005 Jens Arnold
+* Copyright (C) 2004-2006 Jens Arnold
 *
 * All files in this archive are subject to the GNU General Public License.
 * See the file COPYING in the source tree root for full license agreement.
@@ -25,7 +25,6 @@
 #ifndef __GRAY_H__
 #define __GRAY_H__
 
-#ifndef SIMULATOR /* not for simulator by now */
 #include "plugin.h"
 
 #ifdef HAVE_LCD_BITMAP /* and also not for the Player */
@@ -129,17 +128,19 @@ struct _gray_info
     int height;
     int bheight;    /* 8-pixel units */
     int depth;      /* number_of_bitplanes  = (number_of_grayscales - 1) */
-    int cur_plane;  /* for the timer isr */
-    int drawmode;              /* current draw mode */
-    int fg_brightness;         /* current foreground brightness */
-    int bg_brightness;         /* current background brightness */
-    long plane_size;
     unsigned long flags;       /* various flags, see #defines */
+#ifndef SIMULATOR
+    int cur_plane;  /* for the timer isr */
+    long plane_size;
     unsigned long randmask;    /* mask for random value in _writepixel() */
     unsigned long *bitpattern; /* start of pattern table */
     unsigned char *plane_data; /* start of bitplane data */
+#endif
     unsigned char *cur_buffer; /* start of current chunky pixel buffer */
     unsigned char *back_buffer;/* start of chunky pixel back buffer */
+    int drawmode;              /* current draw mode */
+    int fg_brightness;         /* current foreground brightness */
+    int bg_brightness;         /* current background brightness */
     int curfont;               /* current selected font */
 };
 
@@ -149,5 +150,4 @@ extern struct _gray_info _gray_info;
 extern short _gray_random_buffer;
 
 #endif /* HAVE_LCD_BITMAP */
-#endif /* !SIMULATOR */
 #endif /* __GRAY_H__ */

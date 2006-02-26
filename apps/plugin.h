@@ -98,7 +98,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 8
+#define PLUGIN_API_VERSION 9
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -469,6 +469,10 @@ struct plugin_api {
        the API gets incompatible */     
 
     struct tree_context* (*tree_get_context)(void);
+#if defined(SIMULATOR) && defined(HAVE_LCD_BITMAP) && LCD_DEPTH < 8
+    void (*sim_lcd_ex_init)(int shades, unsigned long (*getpixel)(int, int));
+    void (*sim_lcd_ex_update_rect)(int x, int y, int width, int height);
+#endif
     
 };
 

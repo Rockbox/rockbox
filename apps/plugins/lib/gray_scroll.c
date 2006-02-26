@@ -10,10 +10,10 @@
 * Greyscale framework
 * Scrolling routines
 *
-* This is a generic framework to use grayscale display within Rockbox
-* plugins. It obviously does not work for the player.
+* This is a generic framework to display up to 33 shades of grey
+* on low-depth bitmap LCDs (Archos b&w, Iriver 4-grey) within plugins.
 *
-* Copyright (C) 2004-2005 Jens Arnold
+* Copyright (C) 2004-2006 Jens Arnold
 *
 * All files in this archive are subject to the GNU General Public License.
 * See the file COPYING in the source tree root for full license agreement.
@@ -23,10 +23,9 @@
 *
 ****************************************************************************/
 
-#ifndef SIMULATOR /* not for simulator by now */
 #include "plugin.h"
 
-#ifdef HAVE_LCD_BITMAP /* and also not for the Player */
+#ifdef HAVE_LCD_BITMAP
 #include "gray.h"
 
 /*** Scrolling ***/
@@ -116,6 +115,38 @@ void gray_scroll_down(int count)
 }
 
 /*** Unbuffered scrolling functions ***/
+
+#ifdef SIMULATOR
+
+/* Scroll left */
+void gray_ub_scroll_left(int count)
+{
+    gray_scroll_left(count);
+    gray_update();
+}
+
+/* Scroll right */
+void gray_ub_scroll_right(int count)
+{
+    gray_scroll_right(count);
+    gray_update();
+}
+
+/* Scroll up */
+void gray_ub_scroll_up(int count)
+{
+    gray_scroll_up(count);
+    gray_update();
+}
+
+/* Scroll down */
+void gray_ub_scroll_down(int count)
+{
+    gray_scroll_down(count);
+    gray_update();
+}
+
+#else /* !SIMULATOR */
 
 /* Scroll left */
 void gray_ub_scroll_left(int count)
@@ -545,7 +576,7 @@ void gray_ub_scroll_down(int count)
 #endif
     }
 }
+#endif /* !SIMULATOR */
 
 #endif /* HAVE_LCD_BITMAP */
-#endif /* !SIMULATOR */
 

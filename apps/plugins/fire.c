@@ -19,7 +19,6 @@
 *
 ****************************************************************************/
 
-#ifndef SIMULATOR /* not for simulator (grayscale) */
 #include "plugin.h"
 
 #ifdef HAVE_LCD_BITMAP /* and also not for the Player */
@@ -305,4 +304,3 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 }
 
 #endif // #ifdef HAVE_LCD_BITMAP
-#endif // #ifndef SIMULATOR

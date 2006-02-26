@@ -24,7 +24,7 @@
 
 #include "plugin.h"
 
-#if defined(HAVE_LCD_BITMAP) && (defined(HAVE_LCD_COLOR) || !defined(SIMULATOR))
+#ifdef HAVE_LCD_BITMAP
 
 #ifndef HAVE_LCD_COLOR
 #include "gray.h"
@@ -336,4 +336,4 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     return ret;
 }
 
-#endif // HAVE_LCD_BITMAP && (HAVE_LCD_COLOR || !SIMULATOR)
+#endif /* HAVE_LCD_BITMAP */

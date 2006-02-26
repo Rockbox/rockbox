@@ -10,10 +10,10 @@
 * Greyscale framework
 * Drawing functions
 *
-* This is a generic framework to use grayscale display within Rockbox
-* plugins. It obviously does not work for the player.
+* This is a generic framework to display up to 33 shades of grey
+* on low-depth bitmap LCDs (Archos b&w, Iriver 4-grey) within plugins.
 *
-* Copyright (C) 2004-2005 Jens Arnold
+* Copyright (C) 2004-2006 Jens Arnold
 *
 * All files in this archive are subject to the GNU General Public License.
 * See the file COPYING in the source tree root for full license agreement.
@@ -23,10 +23,9 @@
 *
 ****************************************************************************/
 
-#ifndef SIMULATOR /* not for simulator by now */
 #include "plugin.h"
 
-#ifdef HAVE_LCD_BITMAP /* and also not for the Player */
+#ifdef HAVE_LCD_BITMAP
 #include "gray.h"
 
 /*** low-level drawing functions ***/
@@ -587,6 +586,26 @@ void gray_putsxy(int x, int y, const unsigned char *str)
 
 /*** Unbuffered drawing functions ***/
 
+#ifdef SIMULATOR
+
+/* Clear the greyscale display (sets all pixels to white) */
+void gray_ub_clear_display(void)
+{
+    _gray_rb->memset(_gray_info.cur_buffer, _gray_info.depth,
+                     MULU16(_gray_info.width, _gray_info.height));
+    gray_update();
+}
+
+/* Draw a partial greyscale bitmap, canonical format */
+void gray_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
+                              int stride, int x, int y, int width, int height)
+{
+    gray_gray_bitmap_part(src, src_x, src_y, stride, x, y, width, height);
+    gray_update_rect(x, y, width, height);
+}
+
+#else /* !SIMULATOR */
+
 /* Clear the greyscale display (sets all pixels to white) */
 void gray_ub_clear_display(void)
 {
@@ -1005,6 +1024,8 @@ void gray_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
     while (dst < dst_end);
 }
 
+#endif /* !SIMULATOR */
+
 /* Draw a full greyscale bitmap, canonical format */
 void gray_ub_gray_bitmap(const unsigned char *src, int x, int y, int width,
                          int height)
@@ -1014,5 +1035,4 @@ void gray_ub_gray_bitmap(const unsigned char *src, int x, int y, int width,
 
 
 #endif /* HAVE_LCD_BITMAP */
-#endif /* !SIMULATOR */
 

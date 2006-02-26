@@ -72,6 +72,8 @@
 static unsigned char pluginbuf[PLUGIN_BUFFER_SIZE];
 void *sim_plugin_load(char *plugin, int *fd);
 void sim_plugin_close(int fd);
+void sim_lcd_ex_init(int shades, unsigned long (*getpixel)(int, int));
+void sim_lcd_ex_update_rect(int x, int y, int width, int height);
 #else
 #define sim_plugin_close(x)
 extern unsigned char pluginbuf[];
@@ -401,6 +403,10 @@ static const struct plugin_api rockbox_api = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
     tree_get_context,
+#if defined(SIMULATOR) && defined(HAVE_LCD_BITMAP) && LCD_DEPTH < 8
+    sim_lcd_ex_init,
+    sim_lcd_ex_update_rect,
+#endif
 };
 
 int plugin_load(const char* plugin, void* parameter)

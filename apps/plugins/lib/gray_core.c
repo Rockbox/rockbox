@@ -10,10 +10,10 @@
 * Greyscale framework
 * Core & miscellaneous functions
 *
-* This is a generic framework to use grayscale display within Rockbox
-* plugins. It obviously does not work for the player.
+* This is a generic framework to display up to 33 shades of grey
+* on low-depth bitmap LCDs (Archos b&w, Iriver 4-grey) within plugins.
 *
-* Copyright (C) 2004-2005 Jens Arnold
+* Copyright (C) 2004-2006 Jens Arnold
 *
 * All files in this archive are subject to the GNU General Public License.
 * See the file COPYING in the source tree root for full license agreement.
@@ -23,21 +23,49 @@
 *
 ****************************************************************************/
 
-#ifndef SIMULATOR /* not for simulator by now */
 #include "plugin.h"
 
-#ifdef HAVE_LCD_BITMAP /* and also not for the Player */
+#ifdef HAVE_LCD_BITMAP
 #include "gray.h"
 
 /* Global variables */
 struct plugin_api *_gray_rb = NULL; /* global api struct pointer */
 struct _gray_info _gray_info;       /* global info structure */
+#ifndef SIMULATOR
 short _gray_random_buffer;          /* buffer for random number generator */
+#endif
 
 /* Prototypes */
+static inline void _deferred_update(void) __attribute__ ((always_inline));
+#ifdef SIMULATOR
+static unsigned long _gray_get_pixel(int x, int y);
+#else
 static void _timer_isr(void);
+#endif
 static void gray_screendump_hook(int fd);
 
+/* Update LCD areas not covered by the greyscale overlay */
+static inline void _deferred_update(void)
+{
+    int x1 = MAX(_gray_info.x, 0);
+    int x2 = MIN(_gray_info.x + _gray_info.width, LCD_WIDTH);
+    int y1 = MAX(_gray_info.by << _PBLOCK_EXP, 0);
+    int y2 = MIN((_gray_info.by << _PBLOCK_EXP) + _gray_info.height, LCD_HEIGHT);
+
+    if (y1 > 0)  /* refresh part above overlay, full width */
+        _gray_rb->lcd_update_rect(0, 0, LCD_WIDTH, y1);
+
+    if (y2 < LCD_HEIGHT) /* refresh part below overlay, full width */
+        _gray_rb->lcd_update_rect(0, y2, LCD_WIDTH, LCD_HEIGHT - y2);
+
+    if (x1 > 0) /* refresh part to the left of overlay */
+        _gray_rb->lcd_update_rect(0, y1, x1, y2 - y1);
+
+    if (x2 < LCD_WIDTH) /* refresh part to the right of overlay */
+        _gray_rb->lcd_update_rect(x2, y1, LCD_WIDTH - x2, y2 - y1);
+}
+
+#ifndef SIMULATOR
 /* Timer interrupt handler: display next bitplane */
 static void _timer_isr(void)
 {
@@ -50,26 +78,11 @@ static void _timer_isr(void)
 
     if (_gray_info.flags & _GRAY_DEFERRED_UPDATE)  /* lcd_update() requested? */
     {
-        int x1 = MAX(_gray_info.x, 0);
-        int x2 = MIN(_gray_info.x + _gray_info.width, LCD_WIDTH);
-        int y1 = MAX(_gray_info.by << _PBLOCK_EXP, 0);
-        int y2 = MIN((_gray_info.by << _PBLOCK_EXP) + _gray_info.height, LCD_HEIGHT);
-
-        if (y1 > 0)  /* refresh part above overlay, full width */
-            _gray_rb->lcd_update_rect(0, 0, LCD_WIDTH, y1);
-
-        if (y2 < LCD_HEIGHT) /* refresh part below overlay, full width */
-            _gray_rb->lcd_update_rect(0, y2, LCD_WIDTH, LCD_HEIGHT - y2);
-
-        if (x1 > 0) /* refresh part to the left of overlay */
-            _gray_rb->lcd_update_rect(0, y1, x1, y2 - y1);
-
-        if (x2 < LCD_WIDTH) /* refresh part to the right of overlay */
-            _gray_rb->lcd_update_rect(x2, y1, LCD_WIDTH - x2, y2 - y1);
-
+        _deferred_update();
         _gray_info.flags &= ~_GRAY_DEFERRED_UPDATE; /* clear request */
     }
 }
+#endif /* !SIMULATOR */
 
 /* Initialise the framework and prepare the greyscale display buffer
 
@@ -108,13 +121,21 @@ static void _timer_isr(void)
    + (width * bheight) * depth           (bitplane data)
    + buffered ?                          (chunky front- & backbuffer)
        (width * bheight * 8 * 2) : 0
-   + 0..3                                (longword alignment) */
+   + 0..3                                (longword alignment)
+   
+   The function tries to be as authentic as possible regarding memory usage on
+   the simulator, even if it doesn't use all of the allocated memory. There's
+   one situation where it will consume more memory on the sim than on the
+   target: if you're allocating a low depth (< 8) without buffering. */
 int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
               bool buffered, int width, int bheight, int depth, long *buf_taken)
 {
-    int possible_depth, i, j;
+    int possible_depth;
     long plane_size, buftaken;
-    
+#ifndef SIMULATOR
+    int i, j;
+#endif
+
     _gray_rb = newrb;
 
     if ((unsigned) width > LCD_WIDTH
@@ -152,19 +173,41 @@ int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
     depth = MIN(depth, 32);
     depth = MIN(depth, possible_depth);
 
+#ifdef SIMULATOR
+    if (!buffered)
+    {
+        long orig_size = depth * plane_size + (depth + 1) * sizeof(long);
+        
+        plane_size = MULU16(width, bheight << _PBLOCK_EXP);
+        if (plane_size > orig_size)
+        {
+            buftaken += plane_size;
+            if (buftaken > gbuf_size)
+                return 0;
+        }
+        else
+        {
+            buftaken += orig_size;
+        }
+        _gray_info.cur_buffer = gbuf;
+    }
+    else
+#endif
+        buftaken += depth * plane_size + (depth + 1) * sizeof(long);
+
     _gray_info.x = 0;
     _gray_info.by = 0;
     _gray_info.width = width;
     _gray_info.height = bheight << _PBLOCK_EXP;
     _gray_info.bheight = bheight;
-    _gray_info.plane_size = plane_size;
     _gray_info.depth = depth;
-    _gray_info.cur_plane = 0;
     _gray_info.flags = 0;
+#ifndef SIMULATOR
+    _gray_info.cur_plane = 0;
+    _gray_info.plane_size = plane_size;
     _gray_info.plane_data = gbuf;
     gbuf += depth * plane_size;
     _gray_info.bitpattern = (unsigned long *)gbuf;
-    buftaken += depth * plane_size + (depth + 1) * sizeof(long);
               
     i = depth - 1;
     j = 8;
@@ -195,6 +238,7 @@ int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
 
         _gray_info.bitpattern[i] = pattern;
     }
+#endif
 
     _gray_info.fg_brightness = 0;
     _gray_info.bg_brightness = depth;
@@ -229,6 +273,10 @@ void gray_show(bool enable)
     if (enable && !(_gray_info.flags & _GRAY_RUNNING))
     {
         _gray_info.flags |= _GRAY_RUNNING;
+#ifdef SIMULATOR
+        _gray_rb->sim_lcd_ex_init(_gray_info.depth + 1, _gray_get_pixel);
+        gray_update();
+#else /* !SIMULATOR */
 #if CONFIG_LCD == LCD_SSD1815
         _gray_rb->timer_register(1, NULL, CPU_FREQ / 67, 1, _timer_isr);
 #elif CONFIG_LCD == LCD_S1D15E06
@@ -236,18 +284,53 @@ void gray_show(bool enable)
 #elif CONFIG_LCD == LCD_IFP7XX
         /* TODO: implement for iFP */
         (void)_timer_isr;
-#endif
+#endif /* CONFIG_LCD */
+#endif /* !SIMULATOR */
         _gray_rb->screen_dump_set_hook(gray_screendump_hook);
     }
     else if (!enable && (_gray_info.flags & _GRAY_RUNNING))
     {
+#ifdef SIMULATOR
+        _gray_rb->sim_lcd_ex_init(0, NULL);
+#else
         _gray_rb->timer_unregister();
+#endif
         _gray_info.flags &= ~_GRAY_RUNNING;
         _gray_rb->screen_dump_set_hook(NULL);
         _gray_rb->lcd_update(); /* restore whatever there was before */
     }
 }
 
+#ifdef SIMULATOR
+/* Callback function for gray_update_rect() to read a pixel from the graybuffer.
+   Note that x and y are in LCD coordinates, not graybuffer coordinates! */
+static unsigned long _gray_get_pixel(int x, int y)
+{
+    return _gray_info.cur_buffer[MULU16(x - _gray_info.x, _gray_info.height)
+                                 + y - (_gray_info.by << _PBLOCK_EXP)]
+           + (1 << LCD_DEPTH);
+}
+
+/* Update a rectangular area of the greyscale overlay */
+void gray_update_rect(int x, int y, int width, int height)
+{
+    if (x + width > _gray_info.width)
+        width = _gray_info.width - x;
+    if (y + height > _gray_info.height)
+        height = _gray_info.height - y;
+        
+    x += _gray_info.x;
+    y += _gray_info.by << _PBLOCK_EXP;
+
+    if (x + width > LCD_WIDTH)
+        width = LCD_WIDTH - x;
+    if (y + height > LCD_HEIGHT)
+        height = LCD_HEIGHT - y;
+        
+    _gray_rb->sim_lcd_ex_update_rect(x, y, width, height);
+}
+
+#else /* !SIMULATOR */
 /* Update a rectangular area of the greyscale overlay */
 void gray_update_rect(int x, int y, int width, int height)
 {
@@ -647,7 +730,7 @@ void gray_update_rect(int x, int y, int width, int height)
                     "d0", "d1", "d2", "d3", "d4", "d5", "d6", "a0", "a1"
                 );
             }
-#endif
+#endif /* CONFIG_CPU, LCD_DEPTH */
             srcofs_row += _gray_info.height;
             dst_row++;
         }
@@ -657,7 +740,6 @@ void gray_update_rect(int x, int y, int width, int height)
         dst += _gray_info.width;
     }
 }
-
 #if CONFIG_CPU == SH7034
 /* References to C library routines used in gray_update_rect() */
 asm (
@@ -668,7 +750,9 @@ asm (
     ".long   ___lshrsi3  \n"  /* shift r4 right by r5, return in r0 */
     /* both routines preserve r4, destroy r5 and take ~16 cycles */
 );
-#endif
+#endif /* CONFIG_CPU == SH7034 */
+
+#endif /* !SIMULATOR */
 
 /* Update the whole greyscale overlay */
 void gray_update(void)
@@ -681,7 +765,13 @@ void gray_update(void)
 void gray_deferred_lcd_update(void)
 {
     if (_gray_info.flags & _GRAY_RUNNING)
+    {
+#ifdef SIMULATOR
+        _deferred_update();
+#else
         _gray_info.flags |= _GRAY_DEFERRED_UPDATE;
+#endif
+    }
     else
         _gray_rb->lcd_update();
 }
@@ -745,17 +835,14 @@ static const unsigned char bmpheader[] =
    content (b&w and greyscale overlay) to an 8-bit BMP file. */
 static void gray_screendump_hook(int fd)
 {
-    int i, idx;
+    int i;
     int x, y, by;
-    int gx, mask;
-#if LCD_DEPTH == 1
-    int gby;
-#elif LCD_DEPTH == 2
-    int shift, gy;
+    int gx, gy, mask;
+#if LCD_DEPTH == 2
+    int shift;
 #endif
     unsigned char *clut_entry;
     unsigned char *lcdptr;
-    unsigned char *grayptr, *grayptr2;
     unsigned char linebuf[MAX(4*BMP_VARCOLORS,BMP_LINESIZE)];
 
     _gray_rb->write(fd, bmpheader, sizeof(bmpheader));  /* write header */
@@ -778,16 +865,19 @@ static void gray_screendump_hook(int fd)
     {
         _gray_rb->memset(linebuf, 0, BMP_LINESIZE);
 
+        gy = y - (_gray_info.by << _PBLOCK_EXP);
 #if LCD_DEPTH == 1
         mask = 1 << (y & (_PBLOCK-1));
         by = y >> _PBLOCK_EXP;
         lcdptr = _gray_rb->lcd_framebuffer + MULU16(LCD_WIDTH, by);
-        gby = by - _gray_info.by;
 
-        if ((unsigned) gby < (unsigned) _gray_info.bheight)
+        if ((unsigned) gy < (unsigned) _gray_info.height)
         {
             /* line contains greyscale (and maybe b&w) graphics */
-            grayptr = _gray_info.plane_data + MULU16(_gray_info.width, gby);
+#ifndef SIMULATOR
+            unsigned char *grayptr = _gray_info.plane_data 
+                                   + MULU16(_gray_info.width, gy >> _PBLOCK_EXP);
+#endif
 
             for (x = 0; x < LCD_WIDTH; x++)
             {
@@ -795,8 +885,12 @@ static void gray_screendump_hook(int fd)
                 
                 if ((unsigned)gx < (unsigned)_gray_info.width)
                 {
-                    idx = BMP_FIXEDCOLORS;
-                    grayptr2 = grayptr + gx;
+#ifdef SIMULATOR
+                    linebuf[x] = BMP_FIXEDCOLORS + _gray_info.depth
+                               - _gray_info.cur_buffer[MULU16(gx, _gray_info.height) + gy];
+#else
+                    int idx = BMP_FIXEDCOLORS;
+                    unsigned char *grayptr2 = grayptr + gx;
 
                     for (i = _gray_info.depth; i > 0; i--)
                     {
@@ -805,6 +899,7 @@ static void gray_screendump_hook(int fd)
                         grayptr2 += _gray_info.plane_size;
                     }
                     linebuf[x] = idx;
+#endif
                 }
                 else
                 {
@@ -823,14 +918,17 @@ static void gray_screendump_hook(int fd)
         shift = 2 * (y & 3);
         by = y >> 2;
         lcdptr = _gray_rb->lcd_framebuffer + MULU16(LCD_WIDTH, by);
-        gy = y - (_gray_info.by << _PBLOCK_EXP);
-        
+
         if ((unsigned)gy < (unsigned)_gray_info.height)
         {
             /* line contains greyscale (and maybe b&w) graphics */
+#ifdef SIMULATOR
+            (void)mask;
+#else
+            unsigned char *grayptr = _gray_info.plane_data
+                                   + MULU16(_gray_info.width, gy >> _PBLOCK_EXP);
             mask = 1 << (gy & (_PBLOCK-1));
-            grayptr = _gray_info.plane_data 
-                    + MULU16(_gray_info.width, gy >> _PBLOCK_EXP);
+#endif
 
             for (x = 0; x < LCD_WIDTH; x++)
             {
@@ -838,8 +936,12 @@ static void gray_screendump_hook(int fd)
                 
                 if ((unsigned)gx < (unsigned)_gray_info.width)
                 {
-                    idx = BMP_FIXEDCOLORS;
-                    grayptr2 = grayptr + gx;
+#ifdef SIMULATOR
+                    linebuf[x] = BMP_FIXEDCOLORS + _gray_info.depth
+                               - _gray_info.cur_buffer[MULU16(gx, _gray_info.height) + gy];
+#else
+                    int idx = BMP_FIXEDCOLORS;
+                    unsigned char *grayptr2 = grayptr + gx;
 
                     for (i = _gray_info.depth; i > 0; i--)
                     {
@@ -848,6 +950,7 @@ static void gray_screendump_hook(int fd)
                         grayptr2 += _gray_info.plane_size;
                     }
                     linebuf[x] = idx;
+#endif
                 }
                 else
                 {
@@ -862,12 +965,11 @@ static void gray_screendump_hook(int fd)
             for (x = 0; x < LCD_WIDTH; x++)
                 linebuf[x] = (*lcdptr++ >> shift) & 3;
         }
-#endif
+#endif /* LCD_DEPTH */
 
         _gray_rb->write(fd, linebuf, BMP_LINESIZE);
     }
 }
 
 #endif /* HAVE_LCD_BITMAP */
-#endif /* !SIMULATOR */
 

@@ -109,9 +109,11 @@ void drawrectangles(int color, struct rectangle *points, int count)
 void sim_backlight(int value)
 {
     if (value > 0) {
-        sdl_set_gradient(lcd_surface, &lcd_backlight_color_zero, &lcd_color_max, (1<<LCD_DEPTH));
+        sdl_set_gradient(lcd_surface, &lcd_backlight_color_zero, &lcd_color_max,
+                         0, (1<<LCD_DEPTH));
     } else {
-        sdl_set_gradient(lcd_surface, &lcd_color_zero, &lcd_color_max, (1<<LCD_DEPTH));
+        sdl_set_gradient(lcd_surface, &lcd_color_zero, &lcd_color_max,
+                         0, (1<<LCD_DEPTH));
     }
     
     lcd_update();
@@ -124,6 +126,7 @@ void sim_lcd_init(void)
     lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE, LCD_WIDTH * display_zoom,
         LCD_HEIGHT * display_zoom, 8, 0, 0, 0, 0);
 
-    sdl_set_gradient(lcd_surface, &lcd_color_zero, &lcd_color_max, (1<<LCD_DEPTH));
+    sdl_set_gradient(lcd_surface, &lcd_backlight_color_zero, &lcd_color_max, 
+                     0, (1<<LCD_DEPTH));
 }
 

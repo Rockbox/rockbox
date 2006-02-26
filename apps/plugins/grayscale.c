@@ -19,7 +19,6 @@
 *
 ****************************************************************************/
 
-#ifndef SIMULATOR /* not for simulator by now */
 #include "plugin.h"
 
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4) && (CONFIG_LCD != LCD_IPOD2BPP)
@@ -336,5 +335,4 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 }
 
 #endif // #ifdef HAVE_LCD_BITMAP
-#endif // #ifndef SIMULATOR
 

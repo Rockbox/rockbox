@@ -27,11 +27,14 @@
 extern int display_zoom;
 
 void sdl_update_rect(SDL_Surface *surface, int x_start, int y_start, int width,
-    int height, int max_x, int max_y, int ui_x, int ui_y,
-    Uint32 (*getpixel)(int, int));
+                     int height, int max_x, int max_y,
+                     unsigned long (*getpixel)(int, int));
+
+void sdl_gui_update(SDL_Surface *surface, int x_start, int y_start, int width,
+                    int height, int max_x, int max_y, int ui_x, int ui_y);
 
 void sdl_set_gradient(SDL_Surface *surface, SDL_Color *start, SDL_Color *end,
-    int steps);
+                      int first, int steps);
 
 #endif // #ifndef __LCDSDL_H__
 

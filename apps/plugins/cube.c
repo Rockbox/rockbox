@@ -142,7 +142,7 @@ PLUGIN_HEADER
 static int x_off = LCD_WIDTH/2;
 static int y_off = LCD_HEIGHT/2;
 
-#if LCD_DEPTH == 1 && !defined(SIMULATOR)
+#if LCD_DEPTH == 1
 #define USE_GSLIB
 struct my_lcd {
     void (*update)(void);

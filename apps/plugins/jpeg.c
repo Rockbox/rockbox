@@ -26,7 +26,7 @@
 
 #include "plugin.h"
 
-#if defined(HAVE_LCD_BITMAP) && ((LCD_DEPTH >= 8) || !defined(SIMULATOR))
+#ifdef HAVE_LCD_BITMAP
 #include "gray.h"
 #include "xlcd.h"
 
@@ -2713,4 +2713,4 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     return condition;
 }
 
-#endif /* HAVE_LCD_BITMAP && ((LCD_DEPTH >= 8) || !defined(SIMULATOR))*/
+#endif /* HAVE_LCD_BITMAP */
