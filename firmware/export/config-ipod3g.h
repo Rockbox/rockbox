@@ -41,7 +41,7 @@
 #define PLUGIN_BUFFER_SIZE 0x80000
 
 /* Define this if you have the WM8731L audio codec */
-#define HAVE_WM8731L
+#define HAVE_WM8731
 
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_IPOD3G /* port controlled */

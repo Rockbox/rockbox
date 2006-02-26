@@ -41,40 +41,46 @@
 #include "wm8731l.h"
 #include "pcf50605.h"
 
-void wm8731l_reset(void);
-
 #define IPOD_PCM_LEVEL 0x65       /* -6dB */
 
-#define RESET     (0x0f<<1)
-#define PWRMGMT1  (0x19<<1)
-#define PWRMGMT2  (0x1a<<1)
-#define AINTFCE   (0x07<<1)
-#define LOUT1VOL  (0x02<<1)
-#define ROUT1VOL  (0x03<<1)
-#define LOUT2VOL  (0x28<<1)
-#define ROUT2VOL  (0x29<<1)
+#define LINVOL        0x00
+#define RINVOL        0x01
+#define LOUTVOL       0x02
+#define ROUTVOL       0x03
+#define DACCTRL       0x05
+#define PWRMGMT       0x06
+#define AINTFCE       0x07
+#define SAMPCTRL      0x08
+#define ACTIVECTRL    0x09
+#define RESET         0x0f
 
-int wm8731l_mute(int mute)
+void wm8731_write(int reg, int data)
+{
+    ipod_i2c_send(0x1a, (reg<<1) | ((data&0x100)>>8),data&0xff);
+}
+
+int wmcodec_mute(int mute)
 {
     if (mute)
     {
         /* Set DACMU = 1 to soft-mute the audio DACs. */
-        ipod_i2c_send(0x1a, 0xa, 0x8);
+        wm8731_write(DACCTRL, 0x8);
     } else {
         /* Set DACMU = 0 to soft-un-mute the audio DACs. */
-        ipod_i2c_send(0x1a, 0xa, 0x0);
+        wm8731_write(DACCTRL, 0x0);
     }
 
     return 0;
 }
+
 /** From ipodLinux **/
 static void codec_set_active(int active)
 {
     /* set active to 0x0 or 0x1 */
     if (active) {
-        ipod_i2c_send(0x1a, 0x12, 0x01);
+        wm8731_write(ACTIVECTRL, 0x01);
     } else {
-        ipod_i2c_send(0x1a, 0x12, 0x00);
+        wm8731_write(ACTIVECTRL, 0x00);
     }
 }
 
@@ -102,7 +108,7 @@ static void i2s_reset(void)
  * Initialise the WM8975 for playback via headphone and line out.
  * Note, I'm using the WM8750 datasheet as its apparently close.
  */
-int wm8731l_init(void) {
+int wmcodec_init(void) {
     /* reset I2C */
     i2c_init();
 
@@ -134,64 +140,61 @@ int wm8731l_init(void) {
 }
 
 /* Silently enable / disable audio output */
-void wm8731l_enable_output(bool enable)
+void wmcodec_enable_output(bool enable)
 {
     if (enable) 
     {
         /* reset the I2S controller into known state */
         i2s_reset();
 
-        ipod_i2c_send(0x1a, 0x1e, 0x0);        /*Reset*/
+        wm8731_write(RESET, 0x0);        /*Reset*/
 
         codec_set_active(0x0);
 
         /* DACSEL=1 */
         /* BYPASS=1 */
-        ipod_i2c_send(0x1a, 0x8, 0x18);
+        wm8731_write(0x4, 0x18);
     
         /* set power register to POWEROFF=0 on OUTPD=0, DACPD=0 */
-        ipod_i2c_send(0x1a, 0xc, 0x67);
+        wm8731_write(PWRMGMT, 0x67);
 
         /* BCLKINV=0(Dont invert BCLK) MS=1(Enable Master) LRSWAP=0 LRP=0 */
         /* IWL=00(16 bit) FORMAT=10(I2S format) */
-        ipod_i2c_send(0x1a, 0xe, 0x42);
+        wm8731_write(AINTFCE, 0x42);
 
-        wm8731l_set_sample_rate(WM8731L_44100HZ);
+        wmcodec_set_sample_rate(WM8731L_44100HZ);
 
         /* set the volume to -6dB */
-        ipod_i2c_send(0x1a, 0x4, IPOD_PCM_LEVEL);
-        ipod_i2c_send(0x1a, 0x6 | 0x1, IPOD_PCM_LEVEL);
+        wm8731_write(LOUTVOL, IPOD_PCM_LEVEL);
+        wm8731_write(ROUTVOL, 0x100 | IPOD_PCM_LEVEL);
 
         /* ACTIVE=1 */
         codec_set_active(1);
 
         /* 5. Set DACMU = 0 to soft-un-mute the audio DACs. */
-        ipod_i2c_send(0x1a, 0xa, 0x0);
+        wm8731_write(DACCTRL, 0x0);
 
-        wm8731l_mute(0);
+        wmcodec_mute(0);
     } else {
-        wm8731l_mute(1);
+        wmcodec_mute(1);
     }
 }
 
-int wm8731l_set_master_vol(int vol_l, int vol_r)
+int wmcodec_set_master_vol(int vol_l, int vol_r)
 {
     /* +6 to -73dB 1dB steps (plus mute == 80levels) 7bits */
     /* 1111111 == +6dB */
     /* 1111001 == 0dB */
     /* 0110000 == -73dB */
     /* 0101111 == mute (0x2f) */
-    if (vol_l == vol_r) {
-        ipod_i2c_send(0x1a, 0x4 | 0x1, vol_l);
-    } else {
-        ipod_i2c_send(0x1a, 0x4, vol_l);
-        ipod_i2c_send(0x1a, 0x6, vol_r);
-    }
+
+    wm8731_write(LOUTVOL, vol_l);
+    wm8731_write(ROUTVOL, vol_r);
  
     return 0;
 }
 
-int wm8975_set_mixer_vol(int channel1, int channel2)
+int wmcodec_set_mixer_vol(int channel1, int channel2)
 {
     (void)channel1;
     (void)channel2;
@@ -199,70 +202,69 @@ int wm8975_set_mixer_vol(int channel1, int channel2)
     return 0;
 }
 
-void wm8731l_set_bass(int value)
+void wmcodec_set_bass(int value)
 {
     (void)value;
 }
 
-void wm8731l_set_treble(int value)
+void wmcodec_set_treble(int value)
 {
     (void)value;
 }
 
-/* Nice shutdown of WM8975 codec */
-void wm8731l_close(void)
+/* Nice shutdown of WM8731 codec */
+void wmcodec_close(void)
 {
    /* set DACMU=1 DEEMPH=0 */
-    ipod_i2c_send(0x1a, 0xa, 0x8);
+    wm8731_write(DACCTRL, 0x8);
 
     /* ACTIVE=0 */
     codec_set_active(0x0);
 
     /* line in mute left & right*/
-    ipod_i2c_send(0x1a, 0x0 | 0x1, 0x80);
+    wm8731_write(LINVOL, 0x100 | 0x80);
 
     /* set DACSEL=0, MUTEMIC=1 */
-    ipod_i2c_send(0x1a, 0x8, 0x2);
+    wm8731_write(0x4, 0x2);
 
     /* set POWEROFF=0 OUTPD=0 DACPD=1 */
-    ipod_i2c_send(0x1a, 0xc, 0x6f);
+    wm8731_write(PWRMGMT, 0x6f);
 
     /* set POWEROFF=1 OUTPD=1 DACPD=1 */
-    ipod_i2c_send(0x1a, 0xc, 0xff);
+    wm8731_write(PWRMGMT, 0xff);
 }
 
 /* Change the order of the noise shaper, 5th order is recommended above 32kHz */
-void wm8731l_set_nsorder(int order)
+void wmcodec_set_nsorder(int order)
 {
     (void)order;
 }
 
-/*  */
-void wm8731l_set_sample_rate(int sampling_control)
+void wmcodec_set_sample_rate(int sampling_control)
 {
     codec_set_active(0x0);
-    ipod_i2c_send(0x1a, 0x10, sampling_control);
+    wm8731_write(SAMPCTRL, sampling_control);
     codec_set_active(0x1);
 }
 
-void wm8731l_enable_recording(bool source_mic)
+void wmcodec_enable_recording(bool source_mic)
 {
     (void)source_mic;
 }
 
-void wm8731l_disable_recording(void)
+void wmcodec_disable_recording(void)
 {
 
 }
 
-void wm8731l_set_recvol(int left, int right, int type)
+void wmcodec_set_recvol(int left, int right, int type)
 {
     (void)left;
     (void)right;
     (void)type;
 }
 
-void wm8731l_set_monitor(int enable)
+void wmcodec_set_monitor(int enable)
 {
     (void)enable;
 }

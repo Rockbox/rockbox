@@ -1237,10 +1237,6 @@ void irq(void)
         TIMER1();
 }
 
-void fiq(void)
-{
-   /** TODO: implement this function   **/
-}
 #endif
 
 /* TODO: The following two function have been lifted straight from IPL, and

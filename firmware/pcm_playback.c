@@ -31,7 +31,7 @@
 #include "wm8758.h"
 #elif defined(HAVE_TLV320)
 #include "tlv320.h"
-#elif defined(HAVE_WM8731L)
+#elif defined(HAVE_WM8731)
 #include "wm8731l.h"
 #endif
 #include "system.h"
@@ -314,13 +314,17 @@ void pcm_init(void)
     dma_stop();
 }
 
-#elif defined(HAVE_WM8975) || defined(HAVE_WM8758)
+#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_WM8731)
 
 /* We need to unify this code with the uda1380 code as much as possible, but
    we will keep it separate during early development.
 */
 
+#if CONFIG_CPU == PP5020
 #define FIFO_FREE_COUNT ((IISFIFO_CFG & 0x3f0000) >> 16)
+#elif CONFIG_CPU == PP5002
+#define FIFO_FREE_COUNT ((IISFIFO_CFG & 0x7800000) >> 23)
+#endif
 
 static bool pcm_playing;
 static bool pcm_paused;
@@ -329,6 +333,8 @@ static int pcm_freq = 0x6; /* 44.1 is default */
 unsigned short* p IBSS_ATTR;
 long p_size IBSS_ATTR;
 
+#define PP5002_DMA_OUT_MASK     (1 << DMA_OUT_IRQ)
+
 static void dma_start(const void *addr, size_t size)
 {
     p=(unsigned short*)addr;
@@ -336,22 +342,36 @@ static void dma_start(const void *addr, size_t size)
 
     pcm_playing = true;
 
+#if CONFIG_CPU == PP5020
     /* setup I2S interrupt for FIQ */
     outl(inl(0x6000402c) | I2S_MASK, 0x6000402c);
     outl(I2S_MASK, 0x60004024);
+#else
+    /* setup I2S interrupt for FIQ */
+    outl(inl(0xcf00103c) | PP5002_DMA_OUT_MASK, 0xcf00103c);
+    outl(PP5002_DMA_OUT_MASK, 0xcf001034);
+#endif
 
     /* Clear the FIQ disable bit in cpsr_c */
     enable_fiq();
 
     /* Enable playback FIFO */
+#if CONFIG_CPU == PP5020
     IISCONFIG |= 0x20000000;
+#elif CONFIG_CPU == PP5002
+    IISCONFIG |= 0x4;
+#endif
 
     /* Fill the FIFO - we assume there are enough bytes in the pcm buffer to
        fill the 32-byte FIFO. */
     while (p_size > 0) {
         if (FIFO_FREE_COUNT < 2) {
             /* Enable interrupt */
+#if CONFIG_CPU == PP5020
             IISCONFIG |= 0x2;
+#elif CONFIG_CPU == PP5002
+            IISFIFO_CFG &= ~(1<<9);
+#endif
             return;
         }
 
@@ -366,11 +386,22 @@ static void dma_stop(void)
 {
     pcm_playing = false;
 
+#if CONFIG_CPU == PP5020
+
     /* Disable playback FIFO */
     IISCONFIG &= ~0x20000000;
 
     /* Disable the interrupt */
     IISCONFIG &= ~0x2;
+
+#elif CONFIG_CPU == PP5002
+
+    /* Disable playback FIFO */
+    IISCONFIG &= ~0x4;
+
+    /* Disable the interrupt */
+    IISFIFO_CFG &= ~(1<<9);
+#endif
 
     disable_fiq();
 
@@ -438,14 +469,22 @@ void pcm_play_pause(bool play)
             enable_fiq();
 
             /* Enable playback FIFO */
+#if CONFIG_CPU == PP5020
             IISCONFIG |= 0x20000000;
+#elif CONFIG_CPU == PP5002
+            IISCONFIG |= 0x4;
+#endif
 
             /* Fill the FIFO - we assume there are enough bytes in the 
                pcm buffer to fill the 32-byte FIFO. */
             while (p_size > 0) {
                 if (FIFO_FREE_COUNT < 2) {
                     /* Enable interrupt */
+#if CONFIG_CPU == PP5020
                     IISCONFIG |= 0x2;
+#elif CONFIG_CPU == PP5002
+                    IISFIFO_CFG &= ~(1<<9);
+#endif
                     return;
                 }
 
@@ -473,11 +512,22 @@ void pcm_play_pause(bool play)
     {
         logf("pause");
 
+#if CONFIG_CPU == PP5020
+
         /* Disable the interrupt */
         IISCONFIG &= ~0x2;
 
         /* Disable playback FIFO */
         IISCONFIG &= ~0x20000000;
+
+#elif CONFIG_CPU == PP5002
+
+        /* Disable the interrupt */
+        IISFIFO_CFG &= ~(1<<9);
+
+        /* Disable playback FIFO */
+        IISCONFIG &= ~0x4;
+#endif
 
         disable_fiq();
     }
@@ -500,7 +550,7 @@ bool pcm_is_playing(void)
    actually needs to do so when calling callback_for_more. C version is still
    included below for reference.
  */
-#if 1
+#if CONFIG_CPU == PP5020
 void fiq(void) ICODE_ATTR __attribute__((naked));
 void fiq(void)
 {
@@ -579,13 +629,22 @@ void fiq(void) ICODE_ATTR __attribute__ ((interrupt ("FIQ")));
 void fiq(void)
 {
     /* Clear interrupt */
+#if CONFIG_CPU == PP5020
     IISCONFIG &= ~0x2;
+#elif CONFIG_CPU == PP5002
+    inl(0xcf001040);
+    IISFIFO_CFG &= ~(1<<9);
+#endif
 
     do {
         while (p_size) {
             if (FIFO_FREE_COUNT < 2) {
                 /* Enable interrupt */
+#if CONFIG_CPU == PP5020
                 IISCONFIG |= 0x2;
+#elif CONFIG_CPU == PP5002
+                IISFIFO_CFG &= ~(1<<9);
+#endif
                 return;
             }
 
@@ -625,9 +684,9 @@ void pcm_init(void)
     dma_stop();
 }
 
-#elif (CONFIG_CPU == PNX0101) || (CONFIG_CPU == PP5002)
+#elif (CONFIG_CPU == PNX0101)
 
-/* TODO: Implement for iFP7xx and iPod 3G
+/* TODO: Implement for iFP7xx
    For now, just implement some dummy functions.
 */
 
@@ -686,7 +745,7 @@ size_t pcm_get_bytes_waiting(void)
 
 #endif
 
-#if (CONFIG_CPU != PNX0101) && (CONFIG_CPU != PP5002)
+#if (CONFIG_CPU != PNX0101)
 /*
  * This function goes directly into the DMA buffer to calculate the left and
  * right peak values. To avoid missing peaks it tries to look forward two full
@@ -704,12 +763,9 @@ void pcm_calculate_peaks(int *left, int *right)
 #ifdef HAVE_UDA1380
     long samples = (BCR0 & 0xffffff) / 4;
     short *addr = (short *) (SAR0 & ~3);
-#elif defined(HAVE_WM8975) || defined(HAVE_WM8758)
+#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_WM8731)
     long samples = p_size / 4;
     short *addr = p;
-#elif defined(HAVE_WM8731L)
-    long samples = next_size / 4;
-    short *addr = (short *)next_start;
 #elif defined(HAVE_TLV320)
     long samples = 4;  /* TODO X5 */
     short *addr = NULL;
