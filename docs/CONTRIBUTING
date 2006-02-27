@@ -30,6 +30,7 @@ Preprocessor symbols should be all uppercase.
 Comments
 --------
 We only use plain old /* C standard comments */.
+If you want to comment out large blocks containing other comments, use #if 0.
 
 Style
 -----
