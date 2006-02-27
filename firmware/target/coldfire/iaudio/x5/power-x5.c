@@ -42,7 +42,13 @@ bool charger_inserted(void)
 
 void ide_power_enable(bool on)
 {
-    (void)on;
+    /* GPOOD3 */
+    int level = set_irq_level(HIGHEST_IRQ_LEVEL);
+    if(on)
+        pcf50606_write(0x3c, 0x07);
+    else
+        pcf50606_write(0x3c, 0x00);
+    set_irq_level(level);
 }
 
 bool ide_powered(void)
