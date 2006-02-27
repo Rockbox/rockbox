@@ -1,5 +1,18 @@
+#             __________               __   ___.
+#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+#   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+#                     \/            \/     \/    \/            \/
 # $Id$
-
+#
+# This is the Korean language file.
+# 이 파일은 한국어 언어 파일입니다.
+#
+# 수정을 원하시면 마음데로 수정하실 수 있습니다.
+#
+# Translated by Jeong Taek In, David J. Song
+#
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
@@ -70,7 +83,7 @@ id: LANG_PLAYLIST_SHUFFLE
 desc: displayed on screen while shuffling a playlist
 eng: "Shuffling..."
 voice: ""
-new: "섞는중..."
+new: "재생순서 섞는중..."
 
 id: LANG_PLAYINDICES_PLAYLIST
 desc: in playlist.indices() when playlist is full *WARNING* this and next ID are only used in this function.
@@ -88,25 +101,25 @@ id: LANG_SETTINGS_SAVE_PLAYER
 desc: displayed if save settings has failed
 eng: "Save Failed"
 voice: ""
-new: "저장을 실패했습니다."
+new: "저장에 실패하였습니다."
 
 id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
 eng: "Partition?"
 voice: ""
-new: "파티션?"
+new: "파티션을 확인하세요."
 
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
 eng: "Save Failed"
 voice: ""
-new: "저장을 실패했습니다."
+new: "저장에 실패하였습니다."
 
 id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
 eng: "No partition?"
 voice: ""
-new: "파티션 안함?"
+new: "파티션을 확인하세요."
 
 id: LANG_TIME_SET
 desc: used in set_time()
@@ -142,7 +155,7 @@ id: LANG_SORT_CASE
 desc: in settings_menu
 eng: "Sort Case Sensitive"
 voice: "Sort Case Sensitive"
-new: "대/소문자 순서대로 정렬"
+new: "대/소문자 순서로 정렬"
 
 id: LANG_RESUME
 desc: in settings_menu
@@ -178,7 +191,7 @@ id: LANG_SCROLL
 desc: in settings_menu
 eng: "Scroll Speed Setting Example"
 voice: ""
-new: "[문자 흐름 속도 설정을 위한 예시입니다]"
+new: "[문자 흐름 속도 설정을 미리보기 위한 문장입니다.]"
 
 id: LANG_DISCHARGE
 desc: DEPRECATED
@@ -208,7 +221,7 @@ id: LANG_FFRW_ACCEL
 desc: in settings_menu
 eng: "FF/RW Accel"
 voice: "Acceleration"
-new: "되/빨리감기 가속"
+new: "되/빨리감기 속도"
 
 id: LANG_FOLLOW
 desc: in settings_menu
@@ -310,7 +323,7 @@ id: LANG_LOUDNESS
 desc: in sound_settings
 eng: "Loudness"
 voice: "Loudness"
-new: "음량 설정"
+new: "음역 설정"
 
 id: LANG_BBOOST
 desc: DEPRECATED
@@ -322,7 +335,7 @@ id: LANG_DECAY
 desc: in sound_settings
 eng: "AV Decay Time"
 voice: ""
-new: "AV 감속 시간"
+new: "자동 볼륨조정 감속 시간"
 
 id: LANG_CHANNEL_MENU
 desc: in sound_settings
@@ -364,19 +377,19 @@ id: LANG_AUTOVOL
 desc: in sound_settings
 eng: "Auto Volume"
 voice: "Auto Volume"
-new: "볼륨 자동 설정"
+new: "자동 볼륨조정"
 
 id: LANG_SHOWDIR_ERROR_BUFFER
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Dir Buffer"
 voice: ""
-new: "폴더 버퍼"
+new: "폴더 버퍼의"
 
 id: LANG_SHOWDIR_ERROR_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
 eng: "Is Full!"
 voice: ""
-new: "공간이 없습니다!"
+new: "공간이 부족합니다!"
 
 id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
@@ -394,25 +407,25 @@ id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
 eng: "Key Lock ON"
 voice: ""
-new: "키 잠금을 설정했습니다."
+new: "키 잠금 설정"
 
 id: LANG_KEYLOCK_OFF_PLAYER
 desc: displayed when key lock is turned off
 eng: "Key Lock OFF"
 voice: ""
-new: "키 잠금을 해제했습니다."
+new: "키 잠금 해제"
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
 eng: "Key Lock Is ON"
 voice: ""
-new: "키 잠금이 설정되어 있습니다."
+new: "키 잠금이 설정되었습니다."
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key Lock Is OFF"
 voice: ""
-new: "키 잠금이 해제되어 있습니다."
+new: "키 잠금이 해제되었습니다."
 
 id: LANG_MUTE_ON_PLAYER
 desc: DEPRECATED
@@ -466,7 +479,7 @@ id: LANG_ID3_ARTIST
 desc: in wps
 eng: "[Artist]"
 voice: ""
-new: "[가수]"
+new: "[가수명]"
 
 id: LANG_ID3_NO_ARTIST
 desc: DEPRECATED
@@ -586,7 +599,7 @@ id: LANG_POWEROFF_IDLE
 desc: in settings_menu
 eng: "Idle Poweroff"
 voice: "Idle Poweroff"
-new: "미조작시 전원 종료"
+new: "미조작시 자동꺼짐 시간"
 
 id: LANG_LANGUAGE_LOADED
 desc: shown when a language has been loaded from the dir browser
@@ -856,13 +869,13 @@ id: LANG_DISPLAY_GRAPHIC
 desc: Label for type of icon display
 eng: "Graphic"
 voice: "Graphic"
-new: "그림"
+new: "그림으로 표시"
 
 id: LANG_DISPLAY_NUMERIC
 desc: Label for type of icon display
 eng: "Numeric"
 voice: "Numeric"
-new: "숫자"
+new: "숫자로 표시"
 
 id: LANG_PM_PERFORMANCE
 desc: DEPRECATED
@@ -886,7 +899,7 @@ id: LANG_PM_SCALE
 desc: in the peak meter menu
 eng: "Scale"
 voice: "Scale"
-new: "표시 기준"
+new: "표시 단위"
 
 id: LANG_PM_DBFS
 desc: in the peak meter menu
@@ -922,19 +935,19 @@ id: LANG_RECORDING_GAIN
 desc: in the recording screen
 eng: "Gain"
 voice: ""
-new: "음량"
+new: "Gain"
 
 id: LANG_RECORDING_LEFT
 desc: in the recording screen
 eng: "Gain Left"
 voice: ""
-new: "왼쪽 음량"
+new: "Gain Left"
 
 id: LANG_RECORDING_RIGHT
 desc: in the recording screen
 eng: "Gain Right"
 voice: ""
-new: "오른쪽 음량"
+new: "Gain Right"
 
 id: LANG_RECORDING_QUALITY
 desc: in the recording settings
@@ -1000,7 +1013,7 @@ id: LANG_POWEROFF
 desc: disk poweroff flag
 eng: "Disk Poweroff"
 voice: "Disk Poweroff"
-new: "디스크 전원 종료"
+new: "디스크 전원 끄기"
 
 id: LANG_FILTER_PLAYLIST
 desc: show only playlist
@@ -1024,7 +1037,7 @@ id: LANG_MP3BUFFER_MARGIN
 desc: MP3 buffer margin time
 eng: "Anti-Skip Buffer"
 voice: "Anti-Skip Buffer"
-new: "튕김방지 버퍼"
+new: "끊김방지 버퍼"
 
 id: LANG_BIDIR_SCROLL
 desc: Bidirectional scroll limit
@@ -1048,7 +1061,7 @@ id: LANG_SCROLL_STEP_EXAMPLE
 desc: Pixels to advance per scroll
 eng: "Scroll Step Size Setting Example Text"
 voice: ""
-new: "[문자 흐름 크기 설정을 위한 예시입니다]"
+new: "[문자 흐름 크기 설정을 미리보기 위한 문장입니다.]"
 
 id: LANG_SCROLL_SPEED
 desc: in display_settings_menu()
@@ -1120,7 +1133,7 @@ id: LANG_FAILED
 desc: Something failed. To be appended after above actions
 eng: "Failed"
 voice: ""
-new: "실패했습니다."
+new: "실패하였습니다."
 
 id: LANG_ALARM_MOD_ALARM_MENU
 desc: The name of the additional entry in the main menu for the RTC alarm mod.
@@ -1216,19 +1229,19 @@ id: LANG_ID3_NO_INFO
 desc: ID3 info is missing
 eng: "<No Info>"
 voice: ""
-new: "<정보 없음>"
+new: ""
 
 id: LANG_RECORDING_TIME
 desc: Display of recorded time
 eng: "Time:"
 voice: ""
-new: "시간: "
+new: "Time:"
 
 id: LANG_RECORDING_SIZE
 desc: Display of recorded file size
 eng: "Size:"
 voice: ""
-new: "크기: "
+new: "Size:"
 
 id: LANG_SETTINGS_LOADED1
 desc: Feedback shown when a .cfg file is loaded
@@ -1240,7 +1253,7 @@ id: LANG_SETTINGS_LOADED2
 desc: Feedback shown when a .cfg file is loaded
 eng: "Loaded"
 voice: ""
-new: "로딩되었습니다."
+new: "로드되었습니다."
 
 id: LANG_FADE_ON_STOP
 desc: options menu to set fade on stop or pause
@@ -1288,7 +1301,7 @@ id: LANG_SAVE_SETTINGS
 desc: in system_settings_menu()
 eng: "Write .cfg file"
 voice: "Write configuration file"
-new: ".cfg 파일 만들기"
+new: "설정 파일 만들기"
 
 id: LANG_SETTINGS_SAVED1
 desc: Feedback shown when a .cfg file is saved
@@ -1378,13 +1391,13 @@ id: LANG_MAX_FILES_IN_DIR
 desc: in settings_menu
 eng: "Max files in dir browser"
 voice: "Maximum files in directory browser"
-new: "한 폴더의 최대 파일수"
+new: "한 폴더의 최대 파일 수"
 
 id: LANG_MAX_FILES_IN_PLAYLIST
 desc: in settings_menu
 eng: "Max playlist size"
 voice: "Maximum playlist size"
-new: "최대 재생목록 크기"
+new: "재생목록의 최대 크기"
 
 id: LANG_JUMP_SCROLL
 desc: (player) menu altarnative for jump scroll
@@ -1420,7 +1433,7 @@ id: LANG_RECORD_TIMESPLIT_REC
 desc: Display of record timer interval setting, on the record screen
 eng: "Split time:"
 voice: ""
-new: "제한된 시간: "
+new: "Split time:"
 
 id: LANG_SHOW_ICONS
 desc: in settings_menu
@@ -1432,7 +1445,7 @@ id: LANG_DISK_FULL
 desc: in recording screen
 eng: "The disk is full. Press OFF to continue."
 voice: ""
-new: "디스크가 꽉 찼습니다. [정지] 버튼을 눌러주세요."
+new: "디스크의 공간이 부족합니다. [정지] 버튼을 누르세요."
 
 id: LANG_CONFIRM_WITH_PLAY_RECORDER
 desc: Generic recorder string to use to confirm
@@ -1460,7 +1473,7 @@ id: LANG_READ_FAILED
 desc: There was an error reading a file
 eng: "Failed reading %s"
 voice: ""
-new: "%s을(를) 읽는데 실패했습니다."
+new: "%s을(를) 읽는데 실패하였습니다."
 
 id: LANG_PLUGIN_WRONG_MODEL
 desc: The plugin is not compatible with the archos model trying to run it
@@ -1478,7 +1491,7 @@ id: LANG_PLUGIN_ERROR
 desc: The plugin return an error code
 eng: "Plugin returned error"
 voice: ""
-new: "플러그인에서 오류가 발생했습니다."
+new: "플러그인에서 오류가 발생하였습니다."
 
 ##
 ## boot change detection
@@ -1494,7 +1507,7 @@ id: LANG_REBOOT_NOW
 desc: Do you want to reboot?
 eng: "Reboot now?"
 voice: ""
-new: "지금 재부팅 할까요?"
+new: "지금 재부팅 하시겠습니까?"
 
 id: LANG_QUEUE_LAST
 desc: in onplay menu.  queue a track/playlist at end of playlist.
@@ -1542,19 +1555,19 @@ id: LANG_PLAYLIST_INSERT_COUNT
 desc: splash number of tracks inserted
 eng: "Inserted %d tracks (%s)"
 voice: ""
-new: "%d 트랙 추가 (%s)"
+new: "%d개의 음악 추가 (%s)"
 
 id: LANG_PLAYLIST_QUEUE_COUNT
 desc: splash number of tracks queued
 eng: "Queued %d tracks (%s)"
 voice: ""
-new: "%d 트랙 예약 (%s)"
+new: "%d개의 음악 예약 (%s)"
 
 id: LANG_PLAYLIST_SAVE_COUNT
 desc: splash number of tracks saved
 eng: "Saved %d tracks (%s)"
 voice: ""
-new: "%d 트랙 저장 (%s)"
+new: "%d개의 음악 저장 (%s)"
 
 id: LANG_OFF_ABORT
 desc: Used on recorder models
@@ -1608,7 +1621,7 @@ id: LANG_RECURSE_DIRECTORY_QUESTION
 desc: Asked from onplay screen
 eng: "Recursively?"
 voice: ""
-new: "하위 폴더도 추가할까요?"
+new: "하위 폴더도 추가하시겠습니까?"
 
 id: LANG_CUSTOM_FONT
 desc: in setting_menu()
@@ -1632,13 +1645,13 @@ id: LANG_WHILE_PLAYING
 desc: in settings_menu()
 eng: "Browse .wps files"
 voice: "Browse while-playing-screen files"
-new: ".wps 파일 보기"
+new: "WPS 보기"
 
 id: LANG_CUSTOM_CFG
 desc: in setting_menu()
 eng: "Browse .cfg files"
 voice: "Browse configuration files"
-new: ".cfg 파일 보기"
+new: "설정 파일 보기"
 
 id: LANG_PLUGINS
 desc: in main_menu()
@@ -1650,7 +1663,7 @@ id: LANG_CAR_ADAPTER_MODE
 desc: Displayed for setting car adapter mode to on/off
 eng: "Car Adapter Mode"
 voice: "Car Adapter Mode"
-new: "차량 어댑터 모드"
+new: "차량용 어댑터 사용"
 
 id: LANG_LINE_IN
 desc:  in settings_menu
@@ -1698,7 +1711,7 @@ id: LANG_FM_PRESET_SAVE_FAILED
 desc:  in radio screen
 eng: "Preset save failed"
 voice: ""
-new: "채널 저장을 실패했습니다."
+new: "채널 저장에 실패하였습니다."
 
 id: LANG_FM_NO_PRESETS
 desc: error when preset list is empty
@@ -1710,7 +1723,7 @@ id: LANG_FM_NO_FREE_PRESETS
 desc:  in radio screen
 eng: "The preset list is full"
 voice: ""
-new: "채널 목록이 꽉찼습니다."
+new: "채널 목록이 모두 찼습니다."
 
 id: LANG_FM_RADIO
 desc:  in main menu
@@ -1740,13 +1753,13 @@ id: LANG_MOVE_FAILED
 desc: Error message displayed in playlist viewer
 eng: "Move failed"
 voice: ""
-new: "이동에 실패했습니다."
+new: "이동에 실패하였습니다."
 
 id: LANG_FLIP_DISPLAY
 desc: in settings_menu, option to turn display+buttos by 180 degreed
 eng: "Upside Down"
 voice: "Upside Down"
-new: "버튼이동 반전"
+new: "상하이동 반전"
 
 id: LANG_RECORD_PRERECORD
 desc: in recording and radio screen
@@ -1758,27 +1771,27 @@ id: LANG_RECORD_PRERECORD_TIME
 desc: in recording settings_menu
 eng: "Prerecord time"
 voice: "Pre-Record time"
-new: "예약 녹음 시간"
+new: "Prerecord time"
 
 #Auto bookmark prompts
 id: LANG_BOOKMARK_AUTOLOAD_QUERY
 desc: prompt for user to decide to create a bookmark
 eng: "Load Last Bookmark?"
 voice: ""
-new: "마지막 북마크를 열까요?"
+new: "마지막 북마크를 여시겠습니까?"
 
 id: LANG_AUTO_BOOKMARK_QUERY
 desc: prompt for user to decide to create an bookmark
 eng: "Create a Bookmark?"
 voice: ""
-new: "북마크를 만들까요?"
+new: "북마크를 만드시겠습니까?"
 
 # Bookmark Select Menu Text
 id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
 desc: From the auto-load screen, allows user to list all bookmarks
 eng: "Down = List"
 voice: ""
-new: "[아래]: 리스트"
+new: "[ - ]: 리스트"
 
 id: LANG_BOOKMARK_SELECT_EXIT
 desc: From the bookmark list screen, allows user to exit
@@ -1814,7 +1827,7 @@ id: LANG_BOOKMARK_SELECT_DELETE
 desc: Used on the bookmark select window to indicated the bookmark delete option
 eng: "ON+Play = Delete"
 voice: ""
-new: "[NAVI]: 삭제"
+new: "[재생] + [NAVI]: 삭제"
 
 # Bookmark creation/failure text
 id: LANG_BOOKMARK_CREATE_SUCCESS
@@ -1827,7 +1840,7 @@ id: LANG_BOOKMARK_CREATE_FAILURE
 desc: Indicates bookmark was not created
 eng: "Bookmark Failed!"
 voice: ""
-new: "북마크 생성에 실패했습니다!"
+new: "북마크 생성에 실패하였습니다."
 
 # Bookmark creation/failure text
 id: LANG_BOOKMARK_LOAD_EMPTY
@@ -1853,19 +1866,19 @@ id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
 desc: prompt for user to decide to create an bookmark
 eng: "Bookmark on Stop"
 voice: "Bookmark on Stop"
-new: "정지시 북마크"
+new: "정지시 자동 북마크"
 
 id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
 desc: Configuration option to maintain a list of recent bookmarks
 eng: "Maintain a List of Recent Bookmarks?"
 voice: "Maintain a List of Recent Bookmarks?"
-new: "최근의 북마크 유지"
+new: "최근의 북마크 사용"
 
 id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
 desc: Save in recent bookmarks only
 eng: "Yes - Recent only"
 voice: "Yes - Recent only"
-new: "최근의 북마크만 보존"
+new: "최근의 북마크만 사용"
 
 id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
 desc: Save in recent bookmarks only
@@ -1915,7 +1928,7 @@ id: LANG_RECORDING_MENU
 desc: in the recording sub menu
 eng: "Recording screen"
 voice: "Recording screen"
-new: "녹음 화면"
+new: "녹음하기"
 
 id: LANG_WIND_MENU
 desc: in the playback sub menu
@@ -1939,26 +1952,26 @@ id: LANG_BATTERY_MENU
 desc: in the system sub menu
 eng: "Battery"
 voice: "Battery"
-new: "배터리"
+new: "배터리 설정"
 
 id: LANG_DISK_MENU
 desc: in the system sub menu
 eng: "Disk"
 voice: "Disk"
-new: "디스크"
+new: "디스크 설정"
 
 id: LANG_TIME_MENU
 desc: in the system sub menu
 eng: "Time & Date"
 voice: "Time and Date"
-new: "시간 & 날짜"
+new: "시간/날짜 설정"
 
 # Limits
 id: LANG_LIMITS_MENU
 desc: in the system sub menu
 eng: "Limits"
 voice: "Limits"
-new: "파일 수 제한"
+new: "제한 설정"
 
 id: LANG_MANAGE_MENU
 desc: in the system sub menu
@@ -2364,13 +2377,13 @@ id: LANG_VOICE
 desc: root of voice menu
 eng: "Voice"
 voice: "Voice"
-new: "음성안내"
+new: "음성 안내"
 
 id: LANG_VOICE_MENU
 desc: item of voice menu, enable/disable the voice UI
 eng: "Voice Menus"
 voice: "Voice Menus"
-new: "음성안내 메뉴"
+new: "음성 안내 사용"
 
 id: LANG_VOICE_DIR
 desc: item of voice menu, set the "talkbox" mode for directories
@@ -2647,13 +2660,13 @@ id: LANG_FILETYPES_EXTENSION_FULL
 desc: Extension array full
 eng: "Extension array full"
 voice: ""
-new: "확장자 배열이 꽉 찼습니다."
+new: "확장자의 길이가 너무 깁니다."
 
 id: LANG_FILETYPES_FULL
 desc: Filetype array full
 eng: "Filetype array full"
 voice: ""
-new: "파일종류 배열이 꽉 찼습니다."
+new: "확장자의 길이가 너무 깁니다."
 
 id: LANG_FILETYPES_PLUGIN_NAME_LONG
 desc: Viewer plugin name too long
@@ -2665,25 +2678,25 @@ id: LANG_FILETYPES_STRING_BUFFER_EMPTY
 desc: Filetype string buffer empty
 eng: "Filetype string buffer empty"
 voice: ""
-new: "파일형식 데이터 버퍼가 없습니다."
+new: "파일형식 스트링 버퍼가 없습니다."
 
 id: LANG_ONPLAY_OPEN_WITH
 desc: Onplay open with
 eng: "Open with"
 voice: "open with"
-new: "다음으로 열기"
+new: "플러그인으로 열기"
 
 id: LANG_SORT_DIR
 desc: browser sorting setting
 eng: "Sort Directories"
 voice: "sort directories"
-new: "폴더 분류"
+new: "폴더 정렬"
 
 id: LANG_SORT_FILE
 desc: browser sorting setting
 eng: "Sort Files"
 voice: "sort files"
-new: "파일 분류"
+new: "파일 정렬"
 
 id: LANG_SORT_ALPHA
 desc: browser sorting setting
@@ -2797,7 +2810,7 @@ id: LANG_CONFIRM_SHUTDOWN
 desc:  in shutdown screen
 eng: "Press OFF to shut down"
 voice: ""
-new: "[OFF] 버튼을 누르면 종료됩니다."
+new: "[정지] 버튼을 누르면 종료합니다."
 
 id: LANG_ID3_ORDER
 desc:  in playback settings screen
@@ -2809,13 +2822,13 @@ id: LANG_ID3_V1_FIRST
 desc:  in playback settings screen
 eng: "V1 then V2"
 voice: "Version 1 then version 2"
-new: "V2보다 V1 먼저"
+new: "V2보다 V1가 우선"
 
 id: LANG_ID3_V2_FIRST
 desc:  in playback settings screen
 eng: "V2 then V1"
 voice: "Version 2 then version 1"
-new: "V1보다 V2 먼저"
+new: "V1보다 V2가 우선"
 
 id: LANG_NO_ROCKBOX_DIR
 desc: in browse root
@@ -2965,13 +2978,13 @@ id: LANG_DISK_SIZE_INFO
 desc: disk size info
 eng: "Disk:"
 voice: ""
-new: "디스크: "
+new: "전체 용량: "
 
 id: LANG_DISK_FREE_INFO
 desc: disk size info
 eng: "Free:"
 voice: "Free diskspace:"
-new: "여유공간: "
+new: "남은 용량: "
 
 id: LANG_ID3DB_ALL_SONGS
 desc: ID3 virtual folder name
@@ -3002,7 +3015,7 @@ id: LANG_RECORD_TRIGGER
 desc: in recording settings_menu
 eng: "Trigger"
 voice: "Trigger"
-new: "자동 녹음시작 볼륨 설정"
+new: "Trigger"
 
 id: LANG_RECORD_START_THRESHOLD
 desc: in recording settings_menu
@@ -3032,25 +3045,25 @@ id: LANG_RECORD_STOP_GAP
 desc: in recording settings_menu
 eng: "Presplit gap"
 voice:
-new: "자동 녹음정지 설정"
+new: "Presplit gap"
 
 id: LANG_RECORD_TRIGGER_MODE
 desc: in recording settings_menu
 eng: "Trigger"
 voice:
-new: "자동 녹음시작 볼륨 설정"
+new: "Trigger"
 
 id: LANG_RECORD_TRIG_NOREARM
 desc: in recording settings_menu
 eng: "Once"
 voice:
-new: "한 번"
+new: "Once"
 
 id: LANG_RECORD_TRIG_REARM
 desc: in recording settings_menu
 eng: "Repeat"
 voice:
-new: "반복"
+new: "Repeat"
 
 id: LANG_DB_INF
 desc: -inf db for values below measurement
@@ -3074,13 +3087,13 @@ id: LANG_LCD_REMOTE_MENU
 desc: in the display sub menu
 eng: "Remote-LCD Settings"
 voice: "Remote LCD settings"
-new: "리모콘 LCD 설정"
+new: "리모컨 LCD 설정"
 
 id: LANG_DISK_NAME_INTERNAL
 desc: in info menu; name for internal disk with multivolume (keep short!)
 eng: "Int:"
 voice: "Internal"
-new: "내장:"
+new: "Int:"
 
 id: LANG_DISK_NAME_MMC
 desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
@@ -3110,7 +3123,7 @@ id: LANG_SHUFFLE_PLAYLIST
 desc: in playlist menu, reshuffles the order in which songs are played
 eng: "Reshuffle"
 voice: "Reshuffle"
-new: "다시섞기"
+new: "재생순서 다시섞기"
 
 id: LANG_NOTHING_TO_RESUME
 desc: Error message displayed when resume button pressed but no playlist
@@ -3122,7 +3135,7 @@ id: LANG_INSERT_SHUFFLED
 desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
 eng: "Insert shuffled"
 voice: "Insert shuffled"
-new: "섞어서 넣기"
+new: "무작위 순서로 재생목록에 삽입"
 
 id: LANG_SPDIF_ENABLE
 desc: in playback settings menu. enable/disable the optical out
@@ -3341,16 +3354,16 @@ voice: "Fade out mode"
 new: "페이드 아웃 모드"
 
 id: LANG_RECORDING_ADC_RIGHT
-desc: in the recording settings
-eng: "ADC Gain Right"
-voice: "ADC Gain Right"
-new: "ADC 오른쪽 게인"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_RECORDING_ADC_LEFT
-desc: in the recording settings
-eng: "ADC Gain Left"
-voice: "ADC Gain Left"
-new: "ADC 왼쪽 게인"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_RECORDING_MONITOR
 desc: DEPRECATED
@@ -3362,13 +3375,13 @@ id: LANG_RADIO_SCAN_MODE
 desc: in radio screen / menu
 eng: "Scan"
 voice: ""
-new: "선국"
+new: "선국모드"
 
 id: LANG_RADIO_PRESET_MODE
 desc: in radio screen / menu
 eng: "Preset"
 voice: ""
-new: "채널"
+new: "채널모드"
 
 id: LANG_FM_FREEZE
 desc: splash screen during freeze in radio mode
@@ -3518,7 +3531,7 @@ id: LANG_REMOTE_WHILE_PLAYING
 desc: in settings_menu()
 eng: "Browse .rwps files"
 voice: "Browse remote while-playing-screen files"
-new: ".rwps 파일 보기"
+new: "리모컨 WPS 보기"
 
 id: LANG_CUSTOM_THEME
 desc: Custom themes menu
@@ -3548,7 +3561,7 @@ id: LANG_SCREEN_SCROLL_VIEW
 desc: should lines scroll out of the screen
 eng: "Screen Scrolls Out Of View"
 voice: "Screen Scrolls Out Of View"
-new: "화면을 이동하여 보기"
+new: "긴 문자 화면을 이동하여 보기"
 
 id: LANG_SCREEN_SCROLL_STEP
 desc: Pixels to advance per Screen scroll
@@ -3566,25 +3579,25 @@ id: LANG_CLEAR_BACKDROP
 desc: text for LCD settings menu
 eng: "Clear backdrop"
 voice: "Clear backdrop"
-new: "바탕 화면 초기화"
+new: "배경화면 초기화"
 
 id: LANG_SET_AS_BACKDROP
 desc: text for onplay menu entry
 eng: "Set as backdrop"
 voice: "Set as backdrop"
-new: "바탕 화면으로 지정"
+new: "배경화면으로 지정"
 
 id: LANG_BACKDROP_LOADED
 desc: text for splash to indicate a new backdrop has been loaded successfully
 eng: "Backdrop loaded"
 voice: "Backdrop loaded"
-new: "바탕 화면이 지정되었습니다."
+new: "배경화면이 지정되었습니다."
 
 id: LANG_BACKDROP_FAILED
 desc: text for splash to indicate a failure to load a bitmap as backdrop
 eng: "Backdrop failed"
 voice: "Backdrop failed"
-new: "바탕 화면 지정을 실패했습니다."
+new: "배경화면 지정을 실패하였습니다."
 
 id: LANG_WARN_ERASEDYNPLAYLIST_MENU
 desc: in playlist options menu, option to warn when erasing dynamic playlist
@@ -3638,25 +3651,25 @@ id: LANG_EQUALIZER_BROWSE
 desc: in the equalizer settings menu
 eng: "Browse EQ Presets"
 voice: "Browse EQ Presets"
-new: "EQ 설정 열기"
+new: "EQ 설정 보기"
 
 id: LANG_EQUALIZER_GAIN_ITEM
 desc: in the equalizer settings menu
 eng: "%d Hz Band Gain"
 voice: ""
-new: "%d Hz 밴드 게인"
+new: "%d Hz 대역 증폭"
 
 id: LANG_EQUALIZER_BAND_CUTOFF
 desc: in the equalizer settings menu
 eng: "Cutoff Frequency"
 voice: "Cutoff Frequency"
-new: "차단 주파수"
+new: "Cutoff Frequency"
 
 id: LANG_EQUALIZER_BAND_CENTER
 desc: in the equalizer settings menu
 eng: "Center Frequency"
 voice: "Center frequency"
-new: "중앙 주파수"
+new: "주파수"
 
 id: LANG_EQUALIZER_BAND_Q
 desc: in the equalizer settings menu
@@ -3668,13 +3681,13 @@ id: LANG_EQUALIZER_BAND_GAIN
 desc: in the equalizer settings menu
 eng: "Gain"
 voice: "Gain"
-new: "게인"
+new: "Gain"
 
 id: LANG_EQUALIZER_EDIT_MODE
 desc: in the equalizer settings menu
 eng: "Edit mode: %s"
 voice: ""
-new: "변경 모드: %s"
+new: "Edit mode: %s"
 
 id: LANG_EQUALIZER_BAND_LOW_SHELF
 desc: in the equalizer settings menu
@@ -3694,3 +3707,74 @@ eng: "High Shelf Filter"
 voice: ""
 new: "고단 필터"
 
+id: LANG_RECORDING_GAIN_ANALOG
+desc: in the recording screen
+eng: "A"
+voice: "Analog Gain"
+new: "A"
+
+id: LANG_RECORDING_GAIN_DIGITAL
+desc: in the recording screen
+eng: "D"
+voice: "Digital Gain"
+new: "D"
+
+id: LANG_SCROLL_PAGINATED
+desc: jump to new page when scrolling
+eng: "Paged Scrolling"
+voice: ""
+new: "빠른 페이지 이동"
+
+id: LANG_CLIP_LIGHT
+desc: in record settings menu.
+eng: "Clipping light"
+voice: "Clipping light"
+new: "볼륨 레벨 조정시 조명 켜기"
+
+id: LANG_MAIN_UNIT
+desc: in record settings menu.
+eng: "Main unit only"
+voice: "Main unit only"
+new: "H300 본체만"
+
+id: LANG_REMOTE_UNIT
+desc: in record settings menu.
+eng: "Remote unit only"
+voice: "Remote unit only"
+new: "리모컨만"
+
+id: LANG_REMOTE_MAIN
+desc: in record settings menu.
+eng: "Main and remote unit"
+voice: "Main and remote unit"
+new: "H300과 리모컨 모두"
+
+id: LANG_COLOR_RGB_LABELS
+desc: what to show for the 'R' 'G' 'B' ONE LETTER EACH
+eng: "RGB"
+voice:
+new: "RGB"
+
+id: LANG_COLOR_RGB_VALUE
+desc: in color screen
+eng: "RGB: %02X%02X%02X"
+voice:
+new: "RGB 코드: %02X%02X%02X"
+
+id: LANG_BACKGROUND_COLOR
+desc: menu entry to set the background color
+eng: "Background Colour"
+voice:
+new: "배경색 변경"
+
+id: LANG_FOREGROUND_COLOR
+desc: menu entry to set the foreground color
+eng: "Foreground Colour"
+voice:
+new: "글자색 변경"
+
+id: LANG_RESET_COLORS
+desc: menu
+eng: "Reset Colours"
+voice:
+new: "색상 초기화"
