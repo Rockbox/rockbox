@@ -159,7 +159,7 @@ int read_bmp_file(char* filename,
 
     width = readint(&fh.Width);
     height = readint(&fh.Height);
-    padded_width = (width * depth / 8 + 3) & ~3; /* aligned 4-bytes boundaries */
+    padded_width = ((width * depth + 31) / 8) & ~3; /* aligned 4-bytes boundaries */
 
     size = padded_width * height; /* read this many bytes */
     bmp = (unsigned char *)malloc(size);
