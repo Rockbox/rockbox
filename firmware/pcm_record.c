@@ -637,7 +637,6 @@ static void pcmrec_start(void)
     {
         read_index += num_chunks;
     }
-    read2_index = read_index;
 
     peak_left = 0;
     peak_right = 0;
