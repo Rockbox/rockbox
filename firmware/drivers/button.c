@@ -87,7 +87,9 @@ static bool remote_button_hold_only(void);
 #if CONFIG_KEYPAD == IPOD_4G_PAD
 /* Variable to use for setting button status in interrupt handler */
 int int_btn = BUTTON_NONE;
+#endif
 
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) && (!defined(APPLE_IPODMINI))
 static void opto_i2c_init(void)
 {
     int i, curr_value;
@@ -240,7 +242,7 @@ void ipod_4g_button_int(void)
     CPU_HI_INT_EN = I2C_MASK;
 }
 #endif 
-#if CONFIG_KEYPAD == IPOD_3G_PAD
+#if (CONFIG_KEYPAD == IPOD_3G_PAD) || (defined(APPLE_IPODMINI))
 /**
  * 
  * 
@@ -291,7 +293,68 @@ void handle_scroll_wheel(int new_scroll, int was_hold, int reverse)
               queue_post(&button_queue, wheel_keycode, NULL);
     prev_scroll = new_scroll;
 }
+#endif
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) && (defined(APPLE_IPODMINI))
+static int ipod_mini_button_read(void)
+{
+     unsigned char source, wheel_source, state, wheel_state;
+     int btn = BUTTON_NONE;
 
+    /*
+     * we need some delay for mini, cause hold generates several interrupts,
+     * some of them delayed
+     */
+    udelay(250);
+
+    /* get source(s) of interupt */
+    source = GPIOA_INT_STAT & 0x3f;
+    wheel_source = GPIOB_INT_STAT & 0x30;
+
+    if (source == 0 && wheel_source == 0) {
+        return BUTTON_NONE; /* not for us */
+    }
+
+    /* get current keypad & wheel status */
+    state = GPIOA_INPUT_VAL & 0x3f;
+    wheel_state = GPIOB_INPUT_VAL & 0x30;
+
+    /* toggle interrupt level */
+    GPIOA_INT_LEV = ~state;
+    GPIOB_INT_LEV = ~wheel_state;
+
+    if (source & 0x1)
+        btn |= BUTTON_SELECT;
+    if (source & 0x2)
+        btn |= BUTTON_MENU;
+    if (source & 0x4)
+        btn |= BUTTON_PLAY;
+    if (source & 0x8)
+        btn |= BUTTON_RIGHT;
+    if (source & 0x10)
+        btn |= BUTTON_LEFT;
+
+    if (wheel_source & 0x30) {
+        handle_scroll_wheel((wheel_state & 0x30) >> 4, 0, 1);
+    }
+
+    /* ack any active interrupts */
+    if (source)
+        GPIOA_INT_CLR = source;
+    if (wheel_source)
+        GPIOB_INT_CLR = wheel_source;
+
+    return btn;
+}
+
+void ipod_mini_button_int(void)
+{
+    CPU_HI_INT_CLR = GPIO_MASK;
+    int_btn = ipod_mini_button_read();
+    //CPU_INT_EN = 0x40000000;
+    CPU_HI_INT_EN = GPIO_MASK;
+}
+#endif
+#if CONFIG_KEYPAD == IPOD_3G_PAD
 static int ipod_3g_button_read(void)
 {
      unsigned char source, state;
@@ -541,7 +604,7 @@ void button_init(void)
     /* nothing to initialize here */
 #elif CONFIG_KEYPAD == GMINI100_PAD
     /* nothing to initialize here */
-#elif CONFIG_KEYPAD == IPOD_4G_PAD
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) && (!defined(APPLE_IPODMINI))
     opto_i2c_init();
     /* hold button - enable as input */
     GPIOA_ENABLE |= 0x20;
@@ -551,8 +614,30 @@ void button_init(void)
     GPIOA_INT_CLR = GPIOA_INT_STAT & 0x20;
     /* enable interrupts */
     GPIOA_INT_EN = 0x20;
+    /* unmask interrupt */
     CPU_INT_EN = 0x40000000;
     CPU_HI_INT_EN = I2C_MASK;
+
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) && (defined(APPLE_IPODMINI))
+    /* iPod Mini G1 */
+    /* buttons - enable as input */
+    GPIOA_ENABLE |= 0x3f;
+    GPIOA_OUTPUT_EN &= ~0x3f;
+    /* scroll wheel- enable as input */
+    GPIOB_ENABLE |= 0x30; /* port b 4,5 */
+    GPIOB_OUTPUT_EN &= ~0x30; /* port b 4,5 */
+    /* buttons - set interrupt levels */
+    GPIOA_INT_LEV = ~(GPIOA_INPUT_VAL & 0x3f);
+    GPIOA_INT_CLR = GPIOA_INT_STAT & 0x3f;
+    /* scroll wheel - set interrupt levels */
+    GPIOB_INT_LEV = ~(GPIOB_INPUT_VAL & 0x3f);
+    GPIOB_INT_CLR = GPIOB_INT_STAT & 0x3f;
+    /* enable interrupts */
+    GPIOA_INT_EN = 0x3f;
+    GPIOB_INT_EN = 0x30;
+    /* unmask interrupt */
+    CPU_INT_EN = 0x40000000;
+    CPU_HI_INT_EN = GPIO_MASK;
 
 #elif CONFIG_KEYPAD == IPOD_3G_PAD
     GPIOA_INT_LEV = ~GPIOA_INPUT_VAL;

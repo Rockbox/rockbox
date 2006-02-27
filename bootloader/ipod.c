@@ -193,7 +193,11 @@ static int key_pressed(void)
     unsigned char state;
 
 #if CONFIG_KEYPAD == IPOD_4G_PAD
+#if defined(APPLE_IPODMINI)
+    state = GPIOA_INPUT_VAL & 0x3f;
+#else
     state = opto_keypad_read();
+#endif
     if ((state & 0x4) == 0) return BUTTON_LEFT;
     if ((state & 0x10) == 0) return BUTTON_MENU;
     if ((state & 0x8) == 0) return BUTTON_PLAY;

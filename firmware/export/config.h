@@ -123,7 +123,7 @@
 
 /* CONFIG_RTC */
 #define RTC_M41ST84W 1 /* Archos Recorder */
-#define RTC_PCF50605 2 /* iPod 3G and 4G*/
+#define RTC_PCF50605 2 /* iPod 3G, 4G & Mini */
 #define RTC_PCF50606 3 /* iriver H300 */
 #define RTC_S3C2440  4
 

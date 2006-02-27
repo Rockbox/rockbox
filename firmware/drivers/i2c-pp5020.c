@@ -161,6 +161,14 @@ void i2c_init(void)
 {
    /* From ipodlinux */
 
+#if defined(APPLE_IPODMINI)
+   /* GPIO port C disable port 0x10 */
+   GPIOC_ENABLE &= ~0x10;
+
+   /* GPIO port C disable port 0x20 */
+   GPIOC_ENABLE &= ~0x20;
+#endif
+
    outl(inl(0x6000600c) | 0x1000, 0x6000600c);     /* enable 12 */
    outl(inl(0x60006004) | 0x1000, 0x60006004);     /* start reset 12 */
    outl(inl(0x60006004) & ~0x1000, 0x60006004);    /* end reset 12 */

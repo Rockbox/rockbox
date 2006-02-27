@@ -1140,6 +1140,18 @@ unsigned int ipod_hw_rev;
 
 #ifndef BOOTLOADER
 extern void TIMER1(void);
+
+#if defined(APPLE_IPODMINI)
+extern void ipod_mini_button_int(void);
+
+void irq(void)
+{
+    if (CPU_INT_STAT & TIMER1_MASK)
+        TIMER1();
+    else if (CPU_HI_INT_STAT & GPIO_MASK)
+        ipod_mini_button_int();        
+}
+#else
 extern void ipod_4g_button_int(void);
 
 void irq(void)
@@ -1150,6 +1162,7 @@ void irq(void)
         ipod_4g_button_int();
 }
 #endif
+#endif /* BOOTLOADER */
 
 /* TODO: The following two function have been lifted straight from IPL, and
    hence have a lot of numeric addresses used straight. I'd like to use
