@@ -1,18 +1,4 @@
 ﻿# $Id$
-#
-# This is the master of the language files. This is the original, the one with
-# all the existing strings Rockbox features.
-#
-# *WARNING*
-#
-# If you want to add a new string, add it to the end of this file!
-# If you want to remove a string, just blank it, don't actually remove it!
-#
-# If you re-order things or remove entries, you must bump the binary language
-# file version number in both the 'binlang' tool and the language loader code.
-#
-# The "voice' entry contains how we want the speech UI to pronounce this.
-#
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
