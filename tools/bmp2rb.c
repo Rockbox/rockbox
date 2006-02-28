@@ -92,6 +92,11 @@ unsigned char brightness(struct RGBQUAD color)
               + (unsigned int)color.rgbBlue) / 10;
 }
 
+#ifndef O_BINARY
+#define O_BINARY 0 /* systems that don't have O_BINARY won't make a difference
+                      on text and binary files */
+#endif
+
 /****************************************************************************
  * read_bmp_file()
  *
@@ -108,7 +113,7 @@ int read_bmp_file(char* filename,
     struct Fileheader fh;
     struct RGBQUAD palette[256];
 
-    int fd = open(filename, O_RDONLY);
+    int fd = open(filename, O_RDONLY| O_BINARY);
     unsigned short data;
     unsigned char *bmp;
     int width, height;
