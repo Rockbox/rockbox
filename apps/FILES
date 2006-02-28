@@ -38,6 +38,9 @@ plugins/searchengine/Makefile
 plugins/searchengine/*.[ch]
 plugins/databox/Makefile
 plugins/databox/*.[ch]
+plugins/chessbox/Makefile
+plugins/chessbox/*.lds
+plugins/chessbox/*.[ch]
 plugins/midi/*.[ch]
 codecs/SOURCES
 codecs/*.[ch]
