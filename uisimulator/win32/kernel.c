@@ -24,11 +24,6 @@
 #include "thread.h"
 #include "debug.h"
 
-/* (Daniel 2002-10-31) Mingw32 requires this errno variable to be present.
-   I'm not quite sure why and I don't know if this breaks the MSVC compile.
-   If it does, we should put this within #ifdef __MINGW32__ */
-int errno;
-
 static void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
 
 int set_irq_level (int level)

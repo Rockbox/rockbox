@@ -14,7 +14,9 @@ common/file.c
 common/dircache.c
 #endif
 common/disk.c
+#if !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__)
 common/errno.c
+#endif
 common/memcmp.c
 common/memchr.c
 common/qsort.c

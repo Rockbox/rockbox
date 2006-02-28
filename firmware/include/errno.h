@@ -1,6 +1,12 @@
 /* errno is not a global variable, because that would make using it
    non-reentrant.  Instead, its address is returned by the function
    __errno.  */
+   
+#if defined(SIMULATOR) && !defined(__MINGW32__) && !defined(__CYGWIN__)
+
+#include "/usr/include/errno.h"  /* use the host system implementation */
+
+#else             /* use our own implementation */
 
 #ifndef _SYS_ERRNO_H_
 
@@ -132,3 +138,4 @@ extern int errno;
 #define __ELASTERROR 2000	/* Users can add values starting here */
 
 #endif /* _SYS_ERRNO_H */
+#endif /* !SIMULATOR */

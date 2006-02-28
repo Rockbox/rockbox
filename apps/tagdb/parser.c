@@ -1,10 +1,9 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #include "config.h"
-
-int errno;
 
 int read_failure(FILE *fd) {
 	fprintf(stderr, "Could not read from file: errno: %u ", errno);
