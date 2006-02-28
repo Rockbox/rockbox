@@ -155,7 +155,7 @@ static int dircache_scan(struct travel_data *td)
         {
             continue;
         }
-                
+        
         td->ce->attribute = td->entry.attr;
         td->ce->name_len = MIN(254, strlen(td->entry.name)) + 1;
         td->ce->d_name = ((char *)dircache_root+dircache_size);
@@ -211,15 +211,41 @@ static int dircache_travel(struct fat_dir *dir, struct dircache_entry *ce)
     memset(ce, 0, sizeof(struct dircache_entry));
     dir_recursion[0].dir = dir;
     dir_recursion[0].ce = ce;
+    dir_recursion[0].first = ce;
     
     do {
         //logf("=> %s", dircache_cur_path);
         result = dircache_scan(&dir_recursion[depth]);
         switch (result) {
             case 0: /* Leaving the current directory. */
+                /* Add the standard . and .. entries. */
+                ce = dir_recursion[depth].ce;
+                ce->attribute = FAT_ATTR_DIRECTORY;
+                ce->d_name = ".";
+                ce->name_len = 2;
+                ce->startcluster = dir_recursion[depth].dir->file.firstcluster;
+                ce->size = 0;
+                ce->down = dir_recursion[depth].first;
+    
                 depth--;
-                if (depth >= 0)
-                    dircache_cur_path[dir_recursion[depth].pathpos] = '\0';
+                if (depth < 0)
+                    break ;
+
+                dircache_cur_path[dir_recursion[depth].pathpos] = '\0';
+            
+                ce = dircache_gen_next(ce);
+                if (ce == NULL)
+                {
+                    logf("memory allocation error");
+                    return -3;
+                }
+                ce->attribute = FAT_ATTR_DIRECTORY;
+                ce->d_name = "..";
+                ce->name_len = 3;
+                ce->startcluster = dir_recursion[depth].dir->file.firstcluster;
+                ce->size = 0;
+                ce->down = dir_recursion[depth].first;
+    
                 break ;
 
             case 1: /* Going down in the directory tree. */
@@ -231,6 +257,7 @@ static int dircache_travel(struct fat_dir *dir, struct dircache_entry *ce)
                 }
                     
                 dir_recursion[depth].dir = &dir_recursion[depth-1].newdir;
+                dir_recursion[depth].first = dir_recursion[depth-1].down_entry;
                 dir_recursion[depth].ce = dir_recursion[depth-1].down_entry;
                 break ;
             
@@ -685,6 +712,7 @@ static struct dircache_entry* dircache_new_entry(const char *path, int attribute
     if (entry == NULL)
     {
         logf("basedir not found!");
+        logf(basedir);
         dircache_initialized = false;
         return NULL;
     }
@@ -812,11 +840,14 @@ void dircache_rename(const char *oldpath, const char *newpath)
 { /* Test ok. */
     struct dircache_entry *entry, *newentry;
     struct dircache_entry oldentry;
+    char absolute_path[MAX_PATH];
+    char *p;
     
     if (!dircache_initialized)
         return ;
         
     logf("rename: %s->%s", oldpath, newpath);
+    
     entry = dircache_get_entry(oldpath, true, false);
     if (entry == NULL)
     {
@@ -832,6 +863,23 @@ void dircache_rename(const char *oldpath, const char *newpath)
      * save the data, because the entry will be re-used. */
     oldentry = *entry;
 
+    /* Generate the absolute path for destination if necessary. */
+    if (newpath[0] != '/')
+    {
+        strncpy(absolute_path, oldpath, sizeof(absolute_path)-1);
+        p = strrchr(absolute_path, '/');
+        if (!p)
+        {
+            logf("Invalid path");
+            dircache_initialized = false;
+            return ;
+        }
+        
+        *p = '\0';
+        strncpy(p, absolute_path, sizeof(absolute_path)-1-strlen(p));
+        newpath = absolute_path;
+    }
+    
     newentry = dircache_new_entry(newpath, entry->attribute);
     if (newentry == NULL)
     {
@@ -840,7 +888,6 @@ void dircache_rename(const char *oldpath, const char *newpath)
     }
 
     newentry->down = oldentry.down;
-    newentry->up = oldentry.up;
     newentry->size = oldentry.size;
     newentry->startcluster = oldentry.startcluster;
     newentry->wrttime = oldentry.wrttime;
