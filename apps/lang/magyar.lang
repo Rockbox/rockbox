@@ -1,4 +1,5 @@
 # $Id$
+# Updated to english.lang 1.222
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -112,13 +113,13 @@ id: LANG_TIME_SET
 desc: used in set_time()
 eng: "ON To Set"
 voice: 
-new: "ON = mentés"
+new: "BE = mentés"
 
 id: LANG_TIME_REVERT
 desc: used in set_time()
 eng: "OFF To Revert"
 voice: 
-new: "OFF = mégsem"
+new: "KI = mégsem"
 
 id: LANG_CONTRAST
 desc: in settings_menu
@@ -856,13 +857,13 @@ id: LANG_DISPLAY_GRAPHIC
 desc: Label for type of icon display
 eng: "Graphic"
 voice: "Graphic"
-new: "grafikusan"
+new: "Grafikusan"
 
 id: LANG_DISPLAY_NUMERIC
 desc: Label for type of icon display
 eng: "Numeric"
 voice: "Numeric"
-new: "számmal"
+new: "Számmal"
 
 id: LANG_PM_PERFORMANCE
 desc: DEPRECATED
@@ -892,13 +893,13 @@ id: LANG_PM_DBFS
 desc: in the peak meter menu
 eng: "Logarithmic(dB)"
 voice: "Logarithmic decibel"
-new: "logaritmikus(dB)"
+new: "Logaritmikus(dB)"
 
 id: LANG_PM_LINEAR
 desc: in the peak meter menu
 eng: "Linear(%)"
 voice: "Linear percent"
-new: "lineáris (%)"
+new: "Lineáris (%)"
 
 id: LANG_PM_MIN
 desc: in the peak meter menu
@@ -1156,7 +1157,7 @@ id: LANG_ALARM_MOD_KEYS
 desc: Shown key functions in alarm menu (for the RTC alarm mod).
 eng: "PLAY=Set OFF=Cancel"
 voice: 
-new: "PLAY=OK OFF=Mégsem"
+new: "PLAY=OK KI=Mégsem"
 
 id: LANG_CREATE_PLAYLIST
 desc: Menu option for creating a playlist
@@ -1288,7 +1289,7 @@ id: LANG_SAVE_SETTINGS
 desc: in system_settings_menu()
 eng: "Write .cfg file"
 voice: "Write configuration file"
-new: ".cfg fájl írása"
+new: "Konfigurációs fájl írása"
 
 id: LANG_SETTINGS_SAVED1
 desc: Feedback shown when a .cfg file is saved
@@ -1360,7 +1361,7 @@ id: LANG_INVERT_CURSOR_BAR
 desc: in settings_menu
 eng: "Bar(Inverse)"
 voice: "Inverse Bar"
-new: "Bar(Inverse)"
+new: "Teljes sor kiemelése"
 
 id: LANG_INVERT_LCD_NORMAL
 desc: in settings_menu
@@ -1644,7 +1645,7 @@ id: LANG_PLUGINS
 desc: in main_menu()
 eng: "Browse Plugins"
 voice: "Browse Plugins"
-new: "Pluginok keresése"
+new: "Pluginok"
 
 id: LANG_CAR_ADAPTER_MODE
 desc: Displayed for setting car adapter mode to on/off
@@ -1786,7 +1787,7 @@ id: LANG_BOOKMARK_SELECT_EXIT
 desc: From the bookmark list screen, allows user to exit
 eng: "OFF = Exit"
 voice: 
-new: "OFF = Kilép"
+new: "KI = Kilép"
 
 id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
 desc: Used on the bookmark select window to label bookmark number
@@ -1816,7 +1817,7 @@ id: LANG_BOOKMARK_SELECT_DELETE
 desc: Used on the bookmark select window to indicated the bookmark delete option
 eng: "ON+Play = Delete"
 voice: 
-new: "ON+Play = Töröl"
+new: "BE+PLAY = Töröl"
 
 # Bookmark creation/failure text
 
@@ -2018,7 +2019,7 @@ id: LANG_DISPLAY_FULL_PATH
 desc: track display options
 eng: "Full path"
 voice: "Full path"
-new: "Teljes elérési út"
+new: "Elérési út"
 
 id: LANG_REMOVE
 desc: in playlist viewer on+play menu
@@ -2036,7 +2037,7 @@ id: LANG_BUTTON_BAR
 desc: in settings menu
 eng: "Button bar"
 voice: "Button bar"
-new: "Gomb sor"
+new: "Kapcsoló sor"
 
 id: LANG_DIRBROWSE_F1
 desc: in dir browser, F1 button bar text
@@ -2690,25 +2691,25 @@ id: LANG_SORT_ALPHA
 desc: browser sorting setting
 eng: "Alphabetical"
 voice: "Alphabetical"
-new: "ábécé szerint"
+new: "Ábécé szerint"
 
 id: LANG_SORT_DATE
 desc: browser sorting setting
 eng: "by date"
 voice: "by date"
-new: "dátum szerint"
+new: "Dátum szerint"
 
 id: LANG_SORT_DATE_REVERSE
 desc: browser sorting setting
 eng: "by newest date"
 voice: "by newest date"
-new: "legújabb elől"
+new: "Legújabb elől"
 
 id: LANG_SORT_TYPE
 desc: browser sorting setting
 eng: "by type"
 voice: "by type"
-new: "típus szerint"
+new: "Típus szerint"
 
 id: LANG_FM_EDIT_PRESET
 desc: in radio screen
@@ -2948,7 +2949,7 @@ id: LANG_KILOBYTE
 desc: a unit postfix, also voiced
 eng: "KB"
 voice: "kilobyte"
-new: "KB"
+new: "kB"
 
 id: LANG_MEGABYTE
 desc: a unit postfix, also voiced
@@ -3092,7 +3093,7 @@ id: LANG_CROSSFADE
 desc: in playback settings
 eng: "Crossfade"
 voice: "Crossfade"
-new: "Crossfade"
+new: "Átúsztatás"
 
 id: LANG_BACKLIGHT_FADE_IN
 desc: in settings_menu
@@ -3212,13 +3213,13 @@ id: LANG_ID3_TRACK_GAIN
 desc: in browse_id3
 eng: "[Track gain]"
 voice: 
-new: "[Számonkénti hangerőmódosítás]"
+new: "[Számonkénti módosítás]"
 
 id: LANG_ID3_ALBUM_GAIN
 desc: in browse_id3
 eng: "[Album gain]"
 voice: 
-new: "[Albumonkénti hangerőmódosítás]"
+new: "[Albumonkénti módosítás]"
 
 id: LANG_ID3_NO_GAIN
 desc: DEPRECATED
@@ -3374,7 +3375,7 @@ id: LANG_CODEPAGE_SIMPLIFIED
 desc: in codepage setting menu
 eng: "Simp. Chinese (GB2312)"
 voice: 
-new: "Egysz. kínai (GB2312)"
+new: "Egyszerűsített kínai (GB2312)"
 
 id: LANG_CODEPAGE_KOREAN
 desc: in codepage setting menu
@@ -3386,7 +3387,7 @@ id: LANG_CODEPAGE_TRADITIONAL
 desc: in codepage setting menu
 eng: "Trad. Chinese (BIG5)"
 voice: 
-new: "Hagyom. kínai (BIG5)"
+new: "Hagyományos kínai (BIG5)"
 
 id: LANG_CROSSFADE_ENABLE
 desc: in crossfade settings menu
@@ -3425,16 +3426,16 @@ voice: "Fade out mode"
 new: "Lekeveréses mód"
 
 id: LANG_RECORDING_ADC_RIGHT
-desc: in the recording settings
-eng: "ADC Gain Right"
-voice: "ADC Gain Right"
-new: "ADC módosítás jobb"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_RECORDING_ADC_LEFT
-desc: in the recording settings
-eng: "ADC Gain Left"
-voice: "ADC Gain Left"
-new: "ADC módosítás bal"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
 
 id: LANG_RECORDING_MONITOR
 desc: DEPRECATED
@@ -3506,7 +3507,7 @@ id: LANG_WAIT
 desc: general please wait splash
 eng: "Loading..."
 voice: 
-new: "Betöltés ..." 
+new: "Betöltés ..."
 
 id: VOICE_EXT_RWPS
 desc: spoken only, for file extension
@@ -3518,7 +3519,7 @@ id: LANG_REMOTE_WHILE_PLAYING
 desc: in settings_menu()
 eng: "Browse .rwps files"
 voice: "Browse remote while-playing-screen files"
-new: "rwps fájlok" 
+new: "rwps fájlok"
 
 id: LANG_CUSTOM_THEME
 desc: Custom themes menu
@@ -3536,13 +3537,13 @@ id: LANG_CODEPAGE_UTF8
 desc: 
 eng: "Unicode (UTF-8)"
 voice: 
-new: "UTF-8" 
+new: "UTF-8"
 
 id: LANG_FM_TUNE_MODE
 desc: in radio screen / menu
 eng: "Mode:"
 voice: ""
-new: "Mód:" 
+new: "Mód:"
 
 id: LANG_BRIGHTNESS
 desc: in settings_menu
@@ -3608,7 +3609,7 @@ id: LANG_EQUALIZER
 desc: in the sound settings menu
 eng: "Equalizer"
 voice: "Equalizer"
-new: "Equalizer" 
+new: "Equalizer"
 
 id: LANG_EQUALIZER_ENABLED
 desc: in the equalizer settings menu
@@ -3620,7 +3621,7 @@ id: LANG_EQUALIZER_GRAPHICAL
 desc: in the equalizer settings menu
 eng: "Graphical EQ"
 voice: "Graphical EQ"
-new: "Grafikus EQ"
+new: "EQ beállítás"
 
 id: LANG_EQUALIZER_GAIN
 desc: in the equalizer settings menu
@@ -3644,7 +3645,7 @@ id: LANG_EQUALIZER_BROWSE
 desc: in the equalizer settings menu
 eng: "Browse EQ Presets"
 voice: "Browse EQ Presets"
-new: "EQ beállítások"
+new: "Elmentett EQ beállítások"
 
 id: LANG_EQUALIZER_GAIN_ITEM
 desc: in the equalizer settings menu
@@ -3654,9 +3655,9 @@ new: "%d Hz sáv módosítás"
 
 id: LANG_EQUALIZER_BAND_CUTOFF
 desc: in the equalizer settings menu
-eng: "Cutoff"
-voice: "Cutoff"
-new:  "Cutoff"
+eng: "Cutoff Frequency"
+voice: "Cutoff Frequency"
+new: "Frekvencia levágás"
 
 id: LANG_EQUALIZER_BAND_Q
 desc: in the equalizer settings menu
@@ -3668,13 +3669,13 @@ id: LANG_EQUALIZER_BAND_GAIN
 desc: in the equalizer settings menu
 eng: "Gain"
 voice: "Gain"
-new: "Módosítás"
+new: "módosítás"
 
 id: LANG_EQUALIZER_EDIT_MODE
 desc: in the equalizer settings menu
 eng: "Edit mode: %s"
 voice: ""
-new: "Szerkesztő mód: %s"
+new: "Mód: %s"
 
 id: LANG_EQUALIZER_BAND_LOW_SHELF
 desc: in the equalizer settings menu
@@ -3692,4 +3693,52 @@ id: LANG_EQUALIZER_BAND_HIGH_SHELF
 desc: in the equalizer settings menu
 eng: "High Shelf Filter"
 voice: ""
-new: "Felső perem szűrő
+new: "Felső perem szűrő"
+
+id: LANG_EQUALIZER_BAND_CENTER
+desc: in the equalizer settings menu
+eng: "Center Frequency"
+voice: "Center frequency"
+new: "Közép frekvencia"
+
+id: LANG_RECORDING_GAIN_ANALOG
+desc: in the recording screen
+eng: "A"
+voice: "Analog Gain"
+new: "A"
+
+id: LANG_RECORDING_GAIN_DIGITAL
+desc: in the recording screen
+eng: "D"
+voice: "Digital Gain"
+new: "D"
+
+id: LANG_SCROLL_PAGINATED
+desc: jump to new page when scrolling
+eng: "Paged Scrolling"
+voice: ""
+new: "Oldal gördítés"
+
+id: LANG_CLIP_LIGHT
+desc: in record settings menu.
+eng: "Clipping light"
+voice: "Clipping light"
+new: "Clipping light"
+
+id: LANG_MAIN_UNIT
+desc: in record settings menu.
+eng: "Main unit only"
+voice: "Main unit only"
+new: "Csak a főegység"
+
+id: LANG_REMOTE_UNIT
+desc: in record settings menu.
+eng: "Remote unit only"
+voice: "Remote unit only"
+new: "Csak a távirányító"
+
+id: LANG_REMOTE_MAIN
+desc: in record settings menu.
+eng: "Main and remote unit"
+voice: "Main and remote unit"
+new: "Főegység és távirányító"
