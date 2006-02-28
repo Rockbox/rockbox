@@ -147,12 +147,6 @@ void wmcodec_enable_output(bool enable)
 
 int wmcodec_set_master_vol(int vol_l, int vol_r)
 {
-    /* +6 to -73dB 1dB steps (plus mute == 80levels) 7bits */
-    /* 1111111 == +6dB */
-    /* 1111001 == 0dB */
-    /* 0110000 == -73dB */
-    /* 0101111 == mute (0x2f) */
-
     /* OUT1 */
     wm8758_write(LOUT1VOL, vol_l);
     wm8758_write(ROUT1VOL, 0x100 | vol_r);

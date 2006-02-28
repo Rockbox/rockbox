@@ -76,7 +76,7 @@ static const struct sound_settings_info sound_settings_table[] = {
     [SOUND_BASS]          = {"dB", 0,  1,  -6,   9,   0, sound_set_bass},
     [SOUND_TREBLE]        = {"dB", 0,  1,  -6,   9,   0, sound_set_treble},
 #elif defined(HAVE_WM8758)
-    [SOUND_VOLUME]        = {"dB", 0,  1, -57,   6, -25, sound_set_volume},
+    [SOUND_VOLUME]        = {"dB", 0,  1, -58,   6, -25, sound_set_volume},
     [SOUND_BASS]          = {"dB", 0,  1,  -6,   9,   0, sound_set_bass},
     [SOUND_TREBLE]        = {"dB", 0,  1,  -6,   9,   0, sound_set_treble},
 #elif defined(HAVE_WM8731)
@@ -324,20 +324,22 @@ static int tenthdb2mixer(int db)
 
 #elif defined(HAVE_WM8758) 
 /* volume/balance/treble/bass interdependency */
-#define VOLUME_MIN -730
+#define VOLUME_MIN -570
 #define VOLUME_MAX  60
 
-/* convert tenth of dB volume (-730..60) to master volume register value */
+/* convert tenth of dB volume (-57..6) to master volume register value */
 static int tenthdb2master(int db)
 {
-    /* +6 to -73dB 1dB steps (plus mute == 80levels) 7bits */
-    /* 1111111 == +6dB  (0x7f) */
-    /* 1111001 == 0dB   (0x79) */
-    /* 0110000 == -73dB (0x30 */
-    /* 0101111 == mute  (0x2f) */
+    /* +6 to -57dB in 1dB steps == 64 levels = 6 bits */
+    /* 0111111 == +6dB  (0x3f) = 63) */
+    /* 0111001 == 0dB   (0x39) = 57) */
+    /* 0000001 == -56dB (0x01) = */
+    /* 0000000 == -57dB (0x00) */
 
-    if (db <= -570) {
-        return 0x0;
+    /* 1000000 == Mute (0x40) */
+
+    if (db < -570) {
+        return 0x40;
     } else {
         return((db/10)+57);
     }
