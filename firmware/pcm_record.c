@@ -381,9 +381,9 @@ static void pcmrec_callback(bool flush) __attribute__ ((section (".icode")));
 static void pcmrec_callback(bool flush)
 {
     int num_ready, num_free, num_new;
-    unsigned short *ptr;    
-    int i, j, w;
+    short *ptr;    
     short value;
+    int i, j, w;
 
     w = write_index;
 
