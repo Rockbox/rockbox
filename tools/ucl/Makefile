@@ -19,5 +19,5 @@ src/libucl.a:
 	$(MAKE) -C src
 
 clean:
-	rm -f $(TARGET)
+	rm -f $(TARGET) uclpack.o
 	$(MAKE) -C src clean
