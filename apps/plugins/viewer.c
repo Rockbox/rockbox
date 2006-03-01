@@ -598,6 +598,9 @@ static void viewer_draw(int col)
     unsigned char *line_end;
     unsigned char c;
     unsigned char scratch_buffer[MAX_COLUMNS + 1];
+    unsigned char utf8_buffer[MAX_COLUMNS*4 + 1];
+    int len;
+    unsigned char *endptr;
 
 
     /* If col==-1 do all calculations but don't display */
@@ -685,7 +688,11 @@ static void viewer_draw(int col)
             if (col != -1)
                 if (k > col) {
                     scratch_buffer[k] = 0;
-                    rb->lcd_puts(left_col, i, scratch_buffer + col);
+                    endptr = rb->iso_decode(scratch_buffer + col, utf8_buffer,
+                                            -1, k-col);
+                    *endptr = 0;
+                    len = rb->utf8length(utf8_buffer);
+                    rb->lcd_puts(left_col, i, utf8_buffer);
                 }
         }
         else if (line_mode == REFLOW) {
@@ -773,7 +780,11 @@ static void viewer_draw(int col)
             if (col != -1)
                 if (k > col) {
                     scratch_buffer[k] = 0;
-                    rb->lcd_puts(left_col, i, scratch_buffer + col);
+                    endptr = rb->iso_decode(scratch_buffer + col, utf8_buffer,
+                                            -1, k-col);
+                    *endptr = 0;
+                    len = rb->utf8length(utf8_buffer);
+                    rb->lcd_puts(left_col, i, utf8_buffer);
                 }
         }
         else { /* line_mode != JOIN && line_mode != REFLOW */
@@ -781,7 +792,11 @@ static void viewer_draw(int col)
                 if (line_len > col) {
                     c = line_end[0];
                     line_end[0] = 0;
-                    rb->lcd_puts(left_col, i, line_begin + col);
+                    endptr = rb->iso_decode(line_begin + col, utf8_buffer,
+                                            -1, line_end-line_begin);
+                    *endptr = 0;
+                    len = rb->utf8length(utf8_buffer);
+                    rb->lcd_puts(left_col, i, utf8_buffer);
                     line_end[0] = c;
                 }
         }
