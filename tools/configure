@@ -150,7 +150,10 @@ simcc () {
    exit
    ;;
  esac
-
+ 
+ if [ `uname -m` = "x86_64" ]; then
+   GCCOPTS="$GCCOPTS -fPIC"  # needed to make shared objects link
+ fi
 
  if test "X$crosscompile" != "Xyes"; then
    id=$$
