@@ -27,8 +27,6 @@ static struct codec_api *rb;
 
 /* Some standard functions and variables needed by Tremor */
 
-int errno;
-
 size_t read_handler(void *ptr, size_t size, size_t nmemb, void *datasource)
 {
     (void)datasource;
