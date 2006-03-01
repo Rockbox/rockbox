@@ -551,7 +551,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 break;
 
             case MINESWEEPER_LOSE:
-                rb->splash(HZ*2, true, "You Lost :(");
+                rb->splash(HZ*2, true, "You Lose :(");
                 break;
 
             case MINESWEEPER_USB:
