@@ -64,6 +64,7 @@
 
 
 #if CONFIG_KEYPAD == RECORDER_PAD
+#define REC_SHUTDOWN (BUTTON_OFF | BUTTON_REPEAT)
 #define REC_STOPEXIT BUTTON_OFF
 #define REC_RECPAUSE BUTTON_PLAY
 #define REC_INC BUTTON_RIGHT
@@ -75,6 +76,7 @@
 #define REC_F3 BUTTON_F3
 
 #elif CONFIG_KEYPAD == ONDIO_PAD /* only limited features */
+#define REC_SHUTDOWN (BUTTON_OFF | BUTTON_REPEAT)
 #define REC_STOPEXIT BUTTON_OFF
 #define REC_RECPAUSE_PRE BUTTON_MENU
 #define REC_RECPAUSE (BUTTON_MENU | BUTTON_REL)
@@ -85,6 +87,7 @@
 #define REC_SETTINGS (BUTTON_MENU | BUTTON_REPEAT) 
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define REC_SHUTDOWN (BUTTON_OFF | BUTTON_REPEAT)
 #define REC_STOPEXIT BUTTON_OFF
 #define REC_RECPAUSE BUTTON_REC
 #define REC_INC BUTTON_RIGHT
@@ -94,6 +97,7 @@
 #define REC_SETTINGS BUTTON_MODE
 
 #elif CONFIG_KEYPAD == GMINI100_PAD
+#define REC_SHUTDOWN (BUTTON_OFF | BUTTON_REPEAT)
 #define REC_STOPEXIT BUTTON_OFF
 #define REC_RECPAUSE BUTTON_ON
 #define REC_INC BUTTON_RIGHT
@@ -638,6 +642,7 @@ bool recording_screen(void)
         switch(button)
         {
             case REC_STOPEXIT:
+            case REC_SHUTDOWN:
                 /* turn off the trigger */
                 peak_meter_trigger(false);
                 peak_meter_set_trigger_listener(NULL);
