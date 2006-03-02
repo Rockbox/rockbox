@@ -38,7 +38,7 @@ void *my_malloc(size_t size)
         audio_bufferbase = audio_bufferpointer
             = rb->plugin_get_audio_buffer(&audio_buffer_free);
         audio_bufferpointer+=3;
-        audio_bufferpointer=(void *)(((int)audio_bufferpointer)&~3);
+        audio_bufferpointer=(void *)(((long)audio_bufferpointer)&~3);
         audio_buffer_free-=audio_bufferpointer-audio_bufferbase;
     }
     if (size + 4 > audio_buffer_free)
