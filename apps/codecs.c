@@ -55,8 +55,8 @@
 unsigned char codecbuf[CODEC_SIZE];
 #endif
 void *sim_codec_load_ram(char* codecptr, int size,
-        void* ptr2, int bufwrap, int *pd);
-void sim_codec_close(int pd);
+        void* ptr2, int bufwrap, void **pd);
+void sim_codec_close(void *pd);
 #else
 #define sim_codec_close(x)
 extern unsigned char codecbuf[];
@@ -249,10 +249,10 @@ int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,
         return CODEC_ERROR;
     }
 #else /* SIMULATOR */
-    int pd;
+    void *pd;
     
     hdr = sim_codec_load_ram(codecptr, size, ptr2, bufwrap, &pd);
-    if (pd < 0)
+    if (pd == NULL)
         return CODEC_ERROR;
 
     if (hdr == NULL

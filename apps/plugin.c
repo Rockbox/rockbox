@@ -70,8 +70,8 @@
 
 #ifdef SIMULATOR
 static unsigned char pluginbuf[PLUGIN_BUFFER_SIZE];
-void *sim_plugin_load(char *plugin, int *fd);
-void sim_plugin_close(int fd);
+void *sim_plugin_load(char *plugin, void **pd);
+void sim_plugin_close(void *pd);
 void sim_lcd_ex_init(int shades, unsigned long (*getpixel)(int, int));
 void sim_lcd_ex_update_rect(int x, int y, int width, int height);
 #else
@@ -411,9 +411,12 @@ static const struct plugin_api rockbox_api = {
 
 int plugin_load(const char* plugin, void* parameter)
 {
-    int fd, rc;
+    int rc;
     struct plugin_header *hdr;
-#ifndef SIMULATOR
+#ifdef SIMULATOR
+    void *pd;
+#else
+    int fd;
     ssize_t readsize;
 #endif
 #ifdef HAVE_LCD_BITMAP
@@ -436,21 +439,21 @@ int plugin_load(const char* plugin, void* parameter)
     gui_syncsplash(0, true, str(LANG_WAIT));
 
 #ifdef SIMULATOR
-    hdr = sim_plugin_load((char *)plugin, &fd);
-    if (!fd) {
+    hdr = sim_plugin_load((char *)plugin, &pd);
+    if (pd == NULL) {
         gui_syncsplash(HZ*2, true, str(LANG_PLUGIN_CANT_OPEN), plugin);
         return -1;
     }
     if (hdr == NULL
         || hdr->magic != PLUGIN_MAGIC
         || hdr->target_id != TARGET_ID) {
-        sim_plugin_close(fd);
+        sim_plugin_close(pd);
         gui_syncsplash(HZ*2, true,  str(LANG_PLUGIN_WRONG_MODEL));
         return -1;
     }
     if (hdr->api_version > PLUGIN_API_VERSION
         || hdr->api_version < PLUGIN_MIN_API_VERSION) {
-        sim_plugin_close(fd);
+        sim_plugin_close(pd);
         gui_syncsplash(HZ*2, true,  str(LANG_PLUGIN_WRONG_VERSION));
         return -1;
     }
@@ -549,7 +552,7 @@ int plugin_load(const char* plugin, void* parameter)
     if (pfn_tsr_exit == NULL)
         plugin_loaded = false;
 
-    sim_plugin_close(fd);
+    sim_plugin_close(pd);
 
     switch (rc) {
         case PLUGIN_OK:

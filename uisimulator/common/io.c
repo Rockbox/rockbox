@@ -308,9 +308,9 @@ int sim_fsync(int fd)
 #endif
 
 void *sim_codec_load_ram(char* codecptr, int size,
-        void* ptr2, int bufwrap, int *pd_fd)
+        void* ptr2, int bufwrap, void **pd)
 {
-    void *pd, *hdr;
+    void *hdr;
     const char *path = "archos/_temp_codec.dll";
     int fd;
     int copy_n;
@@ -318,7 +318,7 @@ void *sim_codec_load_ram(char* codecptr, int size,
     char buf[256];
 #endif
 
-    *pd_fd = 0;
+    *pd = NULL;
 
     /* We have to create the dynamic link library file from ram
        so we could simulate the codec loading. */
@@ -351,8 +351,8 @@ void *sim_codec_load_ram(char* codecptr, int size,
     close(fd);
 
     /* Now load the library. */
-    pd = dlopen(path, RTLD_NOW);
-    if (!pd) {
+    *pd = dlopen(path, RTLD_NOW);
+    if (*pd == NULL) {
         DEBUGF("failed to load %s\n", path); 
 #ifdef WIN32
         FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), 0,
@@ -361,26 +361,25 @@ void *sim_codec_load_ram(char* codecptr, int size,
 #else
         DEBUGF("dlopen(%s): %s\n", path, dlerror());
 #endif
-        dlclose(pd);
+        dlclose(*pd);
         return NULL;
     }
 
-    hdr = dlsym(pd, "__header");
+    hdr = dlsym(*pd, "__header");
     if (!hdr)
-        hdr = dlsym(pd, "___header");
+        hdr = dlsym(*pd, "___header");
 
-    *pd_fd = (int)pd;
     return hdr;       /* maybe NULL if symbol not present */
 }
 
-void sim_codec_close(int pd)
+void sim_codec_close(void *pd)
 {
-    dlclose((void *)pd);
+    dlclose(pd);
 }
 
-void *sim_plugin_load(char *plugin, int *fd)
+void *sim_plugin_load(char *plugin, void **pd)
 {
-    void *pd, *hdr;
+    void *hdr;
     char path[256];
 #ifdef WIN32
     char buf[256];
@@ -388,10 +387,10 @@ void *sim_plugin_load(char *plugin, int *fd)
 
     snprintf(path, sizeof path, "archos%s", plugin);
     
-    *fd = 0;
+    *pd = NULL;
 
-    pd = dlopen(path, RTLD_NOW);
-    if (!pd) {
+    *pd = dlopen(path, RTLD_NOW);
+    if (*pd == NULL) {
         DEBUGF("failed to load %s\n", plugin);
 #ifdef WIN32
         FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), 0,
@@ -400,21 +399,20 @@ void *sim_plugin_load(char *plugin, int *fd)
 #else
         DEBUGF("dlopen(%s): %s\n", path, dlerror());
 #endif
-        dlclose(pd);
+        dlclose(*pd);
         return NULL;
     }
 
-    hdr = dlsym(pd, "__header");
+    hdr = dlsym(*pd, "__header");
     if (!hdr)
-        hdr = dlsym(pd, "___header");
+        hdr = dlsym(*pd, "___header");
 
-    *fd = (int)pd; /* success */
     return hdr;    /* maybe NULL if symbol not present */
 }
 
-void sim_plugin_close(int pd)
+void sim_plugin_close(void *pd)
 {
-    dlclose((void *)pd);
+    dlclose(pd);
 }
 
 #if !defined(WIN32) || defined(SDL)
