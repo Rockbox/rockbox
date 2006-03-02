@@ -185,7 +185,6 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
     CONFIG_BATTERY == BATT_LIION2200
             /* zero battery run time if charging */
             if (charge_state > DISCHARGING) {
-                global_settings.runtime = 0;
                 lasttime = current_tick;
             }
 
@@ -196,7 +195,6 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 #endif
                 ) {
 #else
-            global_settings.runtime = 0;
             lasttime = current_tick;
             {
 #endif
@@ -227,19 +225,20 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 #ifdef HAVE_LCD_BITMAP
         if (battery_state)
             gui_statusbar_icon_battery(display, bar->info.battlevel);
+#ifdef HAVE_USB_POWER
+        if (bar->info.usb_power)
+            display->mono_bitmap(bitmap_icons_7x8[Icon_USBPlug],
+                                 STATUSBAR_PLUG_X_POS,
+                                 STATUSBAR_Y_POS, STATUSBAR_PLUG_WIDTH,
+                                 STATUSBAR_HEIGHT);
+        else
+#endif /* HAVE_USB_POWER */
         /* draw power plug if charging */
         if (bar->info.inserted)
             display->mono_bitmap(bitmap_icons_7x8[Icon_Plug],
                                     STATUSBAR_PLUG_X_POS,
                                     STATUSBAR_Y_POS, STATUSBAR_PLUG_WIDTH,
                                     STATUSBAR_HEIGHT);
-#ifdef HAVE_USB_POWER
-        else if (bar->info.usb_power)
-            display->mono_bitmap(bitmap_icons_7x8[Icon_USBPlug],
-                                 STATUSBAR_PLUG_X_POS,
-                                 STATUSBAR_Y_POS, STATUSBAR_PLUG_WIDTH,
-                                 STATUSBAR_HEIGHT);
-#endif /* HAVE_USB_POWER */
 
         bar->info.redraw_volume = gui_statusbar_icon_volume(bar,
                                                 bar->info.volume);

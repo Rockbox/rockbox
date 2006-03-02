@@ -120,8 +120,7 @@ bool charger_inserted(void)
     return adc_read(ADC_EXT_POWER) > 0x100;
 #elif defined (HAVE_FMADC)
     /* FM or V2, can also charge from the USB port */
-    return (adc_read(ADC_CHARGE_REGULATOR) < 0x1FF) ||
-        (adc_read(ADC_USB_POWER) < 0x1FF);
+    return (adc_read(ADC_CHARGE_REGULATOR) < 0x1FF);
 #elif defined(TOSHIBA_GIGABEAT_F)
     return false;
 #else

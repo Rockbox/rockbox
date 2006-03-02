@@ -353,7 +353,7 @@ static void battery_status_update(void)
     /* calculate estimated remaining running time */
     /* discharging: remaining running time */
     /* charging:    remaining charging time */
-#ifdef HAVE_CHARGE_CTRL
+#if defined(HAVE_CHARGE_CTRL) || defined(HAVE_CHARGE_STATE)
     if (charge_state == CHARGING) {
         powermgmt_est_runningtime_min = (100 - level) * battery_capacity / 100
                                       * 60 / (CURRENT_MAX_CHG - runcurrent());
@@ -497,7 +497,11 @@ static void power_thread_sleep(int ticks)
          * loop (including the subroutines), and end up back here where we
          * transition to the appropriate steady state charger on/off state.
          */
-        if(charger_inserted()) {
+        if(charger_inserted()
+#ifdef HAVE_USB_POWER
+                || usb_powered()
+#endif
+                ) {
             switch(charger_input_state) {
                 case NO_CHARGER:
                 case CHARGER_UNPLUGGED:
@@ -572,6 +576,9 @@ static void power_thread_sleep(int ticks)
              */
             battery_centivolts = avgbat / BATT_AVE_SAMPLES / 10000;
 
+            /* update battery status every time an update is available */
+            battery_status_update();
+
         }
 
 #if defined(DEBUG_FILE) && defined(HAVE_CHARGE_CTRL)
@@ -627,9 +634,6 @@ static void power_thread(void)
         
         /* insert new value at the start, in centivolts 8-) */
         power_history[0] = battery_centivolts;
-
-        /* update battery status every minute */
-        battery_status_update();
 
 #if CONFIG_BATTERY == BATT_LIION2200
         /* We use the information from the ADC_EXT_POWER ADC channel, which
