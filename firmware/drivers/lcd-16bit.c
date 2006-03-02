@@ -46,7 +46,7 @@ enum fill_opt {
 fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH] __attribute__ ((aligned (16)));
 
 static fb_data* lcd_backdrop = NULL;
-static int lcd_backdrop_offset IDATA_ATTR = 0;
+static long lcd_backdrop_offset IDATA_ATTR = 0;
 
 static unsigned fg_pattern IDATA_ATTR = LCD_DEFAULT_FG;
 static unsigned bg_pattern IDATA_ATTR = LCD_DEFAULT_BG;
@@ -172,7 +172,7 @@ static void clearpixel(fb_data *address)
 static void clearimgpixel(fb_data *address) ICODE_ATTR;
 static void clearimgpixel(fb_data *address)
 {
-    *address = *(fb_data *)((int)address + lcd_backdrop_offset);
+    *address = *(fb_data *)((long)address + lcd_backdrop_offset);
 }
 
 static void flippixel(fb_data *address) ICODE_ATTR;
@@ -204,7 +204,7 @@ void lcd_set_backdrop(fb_data* backdrop)
     lcd_backdrop = backdrop;
     if (backdrop)
     {
-        lcd_backdrop_offset = (int)backdrop - (int)&lcd_framebuffer[0][0];
+        lcd_backdrop_offset = (long)backdrop - (long)&lcd_framebuffer[0][0];
         lcd_fastpixelfuncs = lcd_fastpixelfuncs_backdrop;
     } 
     else 
@@ -376,7 +376,7 @@ void lcd_hline(int x1, int x2, int y)
         break;
 
       case OPT_COPY:
-        memcpy(dst, (void *)((int)dst + lcd_backdrop_offset),
+        memcpy(dst, (void *)((long)dst + lcd_backdrop_offset),
                width * sizeof(fb_data));
         break;
 
@@ -504,7 +504,7 @@ void lcd_fillrect(int x, int y, int width, int height)
             break;
 
           case OPT_COPY:
-            memcpy(dst, (void *)((int)dst + lcd_backdrop_offset),
+            memcpy(dst, (void *)((long)dst + lcd_backdrop_offset),
                    width * sizeof(fb_data));
             break;
 
