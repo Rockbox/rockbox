@@ -340,10 +340,17 @@ int rename(const char* path, const char* newpath)
     file = &openfiles[fd];
     rc = fat_rename(&file->fatfile, &dir->fatdir, nameptr,
                     file->size, file->attr);
+#ifdef HAVE_MULTIVOLUME
+    if ( rc == -1) {
+	DEBUGF("Failed renaming file across volumnes: %d\n", rc);
+	errno = EXDEV;
+	return -6;
+    }
+#endif
     if ( rc < 0 ) {
         DEBUGF("Failed renaming file: %d\n", rc);
         errno = EIO;
-        return rc * 10 - 6;
+        return rc * 10 - 7;
     }
 
 #ifdef HAVE_DIRCACHE
@@ -353,13 +360,13 @@ int rename(const char* path, const char* newpath)
     rc = close(fd);
     if (rc<0) {
         errno = EIO;
-        return rc * 10 - 7;
+        return rc * 10 - 8;
     }
 
     rc = closedir(dir);
     if (rc<0) {
         errno = EIO;
-        return rc * 10 - 8;
+        return rc * 10 - 9;
     }
 
     return 0;
