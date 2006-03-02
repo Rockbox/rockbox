@@ -20,13 +20,14 @@ struct tm
   int	tm_isdst;
 };
 
-#if defined(SIMULATOR) && !defined(_TIME_T_DEFINED)
+#if defined(SIMULATOR) && !defined(_TIME_T_DEFINED) && !defined(_TIME_T_DECLARED)
 /* for non-win32 simulators */
 typedef long time_t;
 
 /* this define below is used by the mingw headers to prevent duplicate
    typedefs */
 #define _TIME_T_DEFINED
+#define _TIME_T_DECLARED
 time_t time(time_t *t);
 struct tm *localtime(const time_t *timep);
 

@@ -1235,7 +1235,7 @@ if [ "yes" = "$simulator" ]; then
 
 install:
 	@echo "installing a full setup in your archos dir"
-	@(make zip && cd archos && unzip -oq ../rockbox.zip)
+	@(\$(MAKE) zip && cd archos && unzip -oq ../rockbox.zip)
 EOF
 
 fi
