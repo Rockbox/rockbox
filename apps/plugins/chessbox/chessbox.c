@@ -100,6 +100,16 @@ PLUGIN_HEADER
 #define CB_LEVEL   (BUTTON_MENU|BUTTON_OFF)
 #define CB_QUIT    BUTTON_OFF
 
+#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
+#define CB_SELECT  BUTTON_SELECT
+#define CB_UP      BUTTON_UP
+#define CB_DOWN    BUTTON_DOWN
+#define CB_LEFT    BUTTON_LEFT
+#define CB_RIGHT   BUTTON_RIGHT
+#define CB_PLAY    BUTTON_POWER
+#define CB_LEVEL   BUTTON_MENU
+#define CB_QUIT    BUTTON_A
+
 #else
     #error CHESSBOX: Unsupported keypad
 #endif

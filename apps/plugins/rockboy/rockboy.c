@@ -126,6 +126,13 @@ void setoptions (void) {
       options.START=BUTTON_MODE;
       options.SELECT=(BUTTON_SELECT | BUTTON_REL);
       options.MENU=(BUTTON_SELECT | BUTTON_REPEAT);
+
+#elif CONFIG_KEYPAD == GIGABEAT_PAD
+      options.A=BUTTON_VOL_UP;
+      options.B=BUTTON_VOL_DOWN;
+      options.START=BUTTON_POWER;
+      options.SELECT=BUTTON_SELECT;
+      options.MENU=BUTTON_MENU;
 #endif
 
       options.maxskip=4;

@@ -252,7 +252,7 @@ int ide_read_register(int reg) {
 #define PREFER_C_READING
 #define PREFER_C_WRITING
 
-#define ATA_IOBASE      0x20000000
+#define ATA_IOBASE      0x18000000
 #define ATA_DATA        (*((volatile unsigned short*)(ATA_IOBASE)))
 #define ATA_ERROR       (*((volatile unsigned char*)(ATA_IOBASE + 0x02)))
 #define ATA_NSECTOR     (*((volatile unsigned char*)(ATA_IOBASE + 0x04)))
@@ -261,7 +261,7 @@ int ide_read_register(int reg) {
 #define ATA_HCYL        (*((volatile unsigned char*)(ATA_IOBASE + 0x10)))
 #define ATA_SELECT      (*((volatile unsigned char*)(ATA_IOBASE + 0x12)))
 #define ATA_COMMAND     (*((volatile unsigned char*)(ATA_IOBASE + 0x14)))
-#define ATA_CONTROL     (*((volatile unsigned char*)(0x21000000 + 0x1c)))
+#define ATA_CONTROL     (*((volatile unsigned char*)(0x20000000 + 0x1c)))
 
 #define STATUS_BSY      0x80
 #define STATUS_RDY      0x40

@@ -63,7 +63,7 @@ DIRS = .
 SUBDIRS += searchengine databox
 
 #for any recorder, iRiver or iPod model
-ifneq (,$(strip $(foreach tgt,RECORDER IRIVER IPOD_COLOR IPOD_VIDEO,$(findstring $(tgt),$(TARGET)))))
+ifneq (,$(strip $(foreach tgt,RECORDER IRIVER IPOD_COLOR IPOD_VIDEO GIGABEAT,$(findstring $(tgt),$(TARGET)))))
 ifneq (-DIRIVER_IFP7XX,$(TARGET))
     SUBDIRS += rockboy
 endif
@@ -71,7 +71,7 @@ endif
 
 # chessbox is too big to fit in the 32KB Archos plugin buffer, so we only
 # build for IRIVER and IPOD targets
-ifneq (,$(strip $(foreach tgt,RECORDER ONDIO IRIVER IPOD,$(findstring $(tgt),$(TARGET)))))
+ifneq (,$(strip $(foreach tgt,RECORDER ONDIO IRIVER IPOD GIGABEAT,$(findstring $(tgt),$(TARGET)))))
 ifneq (-DIRIVER_IFP7XX,$(TARGET))
     SUBDIRS += chessbox
 endif
