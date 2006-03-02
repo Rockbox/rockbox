@@ -342,9 +342,9 @@ int rename(const char* path, const char* newpath)
                     file->size, file->attr);
 #ifdef HAVE_MULTIVOLUME
     if ( rc == -1) {
-	DEBUGF("Failed renaming file across volumnes: %d\n", rc);
-	errno = EXDEV;
-	return -6;
+        DEBUGF("Failed renaming file across volumnes: %d\n", rc);
+        errno = EXDEV;
+        return -6;
     }
 #endif
     if ( rc < 0 ) {
