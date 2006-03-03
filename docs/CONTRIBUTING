@@ -10,7 +10,13 @@ $Id$
 
 
 In order for the project to run as smoothly as possible, it's best if all
-contributors adhere to a few simple conventions:
+contributors adhere to a few simple source code conventions:
+
+Exceptions
+----------
+This project borrows and imports quite a lot of code from other free software
+projects. We do not change style of such code unless we really have to, even
+though they might be using style very different from others.
 
 Language
 --------
