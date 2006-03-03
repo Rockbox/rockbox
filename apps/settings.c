@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stddef.h>
 #include <limits.h>
+#include "inttypes.h"
 #include "config.h"
 #include "kernel.h"
 #include "thread.h"
@@ -557,14 +558,14 @@ static const struct bit_entry hd_bits[] =
 
 /* helper function to extract n (<=32) bits from an arbitrary position
  * counting from LSB to MSB */
-static unsigned long get_bits(
-    const unsigned long* p, /* the start of the bitfield array */
+static uint32_t get_bits(
+    const uint32_t *p, /* the start of the bitfield array */
     unsigned int from, /* bit no. to start reading from */
     unsigned int size) /* how many bits to read */
 {
     unsigned int long_index = from / 32;
     unsigned int bit_index = from % 32;
-    unsigned long result;
+    uint32_t result;
 
     result = p[long_index] >> bit_index;
 
@@ -579,14 +580,14 @@ static unsigned long get_bits(
 /* helper function to set n (<=32) bits to an arbitrary position,
  * counting from LSB to MSB */
 static void set_bits(
-    unsigned long* p, /* the start of the bitfield array */
+    uint32_t *p,       /* the start of the bitfield array */
     unsigned int from, /* bit no. to start writing into */
     unsigned int size, /* how many bits to change */
-    unsigned long value) /* content (LSBs will be taken) */
+    uint32_t value)    /* content (LSBs will be taken) */
 {
     unsigned int long_index = from / 32;
     unsigned int bit_index = from % 32;
-    unsigned long mask;
+    uint32_t mask;
 
     mask = 0xFFFFFFFF >> (32 - size);
     value &= mask;
@@ -783,8 +784,8 @@ static int load_config_buffer(int which)
    as described per table */
 static void save_bit_table(const struct bit_entry* p_table, int count, int bitstart)
 {
-    unsigned long* p_bitfield = (unsigned long*)config_block; /* 32 bit addr. */
-    unsigned long value; /* 32 bit content */
+    uint32_t *p_bitfield = (uint32_t *)config_block; /* 32 bit addr. */
+    uint32_t value; /* 32 bit content */
     int i;
     const struct bit_entry* p_run = p_table; /* start after the size info */
     int curr_bit = bitstart + p_table->bit_size;
@@ -797,16 +798,16 @@ static void save_bit_table(const struct bit_entry* p_table, int count, int bitst
         switch(p_run->byte_size)
         {
         case 1:
-            value = ((unsigned char*)&global_settings)[p_run->settings_offset];
+            value = ((uint8_t *)&global_settings)[p_run->settings_offset];
             break;
         case 2:
-            value = ((unsigned short*)&global_settings)[p_run->settings_offset/2];
+            value = ((uint16_t *)&global_settings)[p_run->settings_offset/2];
             break;
         case 4:
-            value = ((unsigned int*)&global_settings)[p_run->settings_offset/4];
+            value = ((uint32_t *)&global_settings)[p_run->settings_offset/4];
             break;
         default:
-            DEBUGF( "illegal size!" );
+            DEBUGF( "save_bit_table: illegal size!\n" );
             continue;
         }
         set_bits(p_bitfield, curr_bit, p_run->bit_size & 0x3F, value);
@@ -1115,8 +1116,8 @@ void settings_apply(void)
 /* helper to load global_settings from a bitfield, as described per table */
 static void load_bit_table(const struct bit_entry* p_table, int count, int bitstart)
 {
-    unsigned long* p_bitfield = (unsigned long*)config_block; /* 32 bit addr. */
-    unsigned long value; /* 32 bit content */
+    uint32_t *p_bitfield = (uint32_t *)config_block; /* 32 bit addr. */
+    uint32_t value; /* 32 bit content */
     int i;
     int maxbit; /* how many bits are valid in the saved part */
     const struct bit_entry* p_run = p_table; /* start after the size info */
@@ -1146,19 +1147,19 @@ static void load_bit_table(const struct bit_entry* p_table, int count, int bitst
         switch(p_run->byte_size)
         {
         case 1:
-            ((unsigned char*)&global_settings)[p_run->settings_offset] =
+            ((uint8_t *)&global_settings)[p_run->settings_offset] =
                 (unsigned char)value;
             break;
         case 2:
-            ((unsigned short*)&global_settings)[p_run->settings_offset/2] =
+            ((uint16_t *)&global_settings)[p_run->settings_offset/2] =
                 (unsigned short)value;
             break;
         case 4:
-            ((unsigned int*)&global_settings)[p_run->settings_offset/4] =
+            ((uint32_t *)&global_settings)[p_run->settings_offset/4] =
                 (unsigned int)value;
             break;
         default:
-            DEBUGF( "illegal size!" );
+            DEBUGF( "load_bit_table: illegal size!\n" );
             continue;
         }
     }

@@ -21,6 +21,7 @@
 #define __SETTINGS_H__
 
 #include <stdbool.h>
+#include "inttypes.h"
 #include "config.h"
 #include "file.h"
 #include "dircache.h"
@@ -285,7 +286,7 @@ struct user_settings
     bool resume;        /* resume option: 0=off, 1=on */
     int resume_index;  /* index in playlist (-1 for no active resume) */
     int resume_first_index;  /* index of first track in playlist */
-    unsigned long resume_offset; /* byte offset in mp3 file */
+    uint32_t resume_offset; /* byte offset in mp3 file */
     int resume_seed;   /* shuffle seed (-1=no resume shuffle 0=sorted
                           >0=shuffled) */
 
