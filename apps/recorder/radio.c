@@ -299,7 +299,9 @@ bool radio_screen(void)
     bool have_recorded = false;
     unsigned int seconds = 0;
     unsigned int last_seconds = 0;
+#if CONFIG_CODEC != SWCODEC
     int hours, minutes;
+#endif
     bool keep_playing = false;
     bool statusbar = global_settings.statusbar;
 #ifdef HAS_BUTTONBAR
@@ -356,6 +358,7 @@ bool radio_screen(void)
     audio_set_recording_gain(sound_default(SOUND_LEFT_GAIN),
                             sound_default(SOUND_RIGHT_GAIN), AUDIO_GAIN_LINEIN);
 #else
+    peak_meter_enabled = false;
     uda1380_enable_recording(false);
     uda1380_set_recvol(10, 10, AUDIO_GAIN_DECIMATOR);
     uda1380_set_recvol(0, 0, AUDIO_GAIN_LINEIN);
@@ -733,7 +736,9 @@ bool radio_screen(void)
         if (button != BUTTON_NONE)
             lastbutton = button;
         
+#if CONFIG_CODEC != SWCODEC
         peak_meter_peek();
+#endif
 
         if(!screen_freeze)
         {           
@@ -741,7 +746,9 @@ bool radio_screen(void)
             if(!audio_status())
             {
                 /* just main screen for the time being */
+#if CONFIG_CODEC != SWCODEC
                 peak_meter_draw(0, STATUSBAR_HEIGHT + fh*(top_of_screen + 4), LCD_WIDTH, fh);
+#endif
                 screens[SCREEN_MAIN].update_rect(0, STATUSBAR_HEIGHT + fh*(top_of_screen + 4), screens[SCREEN_MAIN].width, fh);
             }
 
@@ -796,7 +803,7 @@ bool radio_screen(void)
                                       str(LANG_RADIO_SCAN_MODE));
                 FOR_NB_SCREENS(i)
                     screens[i].puts_scroll(0, top_of_screen + 3, buf);
-
+#if CONFIG_CODEC != SWCODEC
                 if(audio_status() == AUDIO_STATUS_RECORD)
                 {
                     hours = seconds / 3600;
@@ -817,6 +824,7 @@ bool radio_screen(void)
                             screens[i].puts_scroll(0, top_of_screen + 4, buf);
                     }
                 }
+#endif
 
 #ifdef HAS_BUTTONBAR
                 gui_buttonbar_draw(&buttonbar);
