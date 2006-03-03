@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 Ben Basha (Paprica)
+ * Copyright (C) 2005, 2006 Ben Basha (Paprica)
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -144,7 +144,7 @@ extern const fb_data brickmania_bricks[];
    to 10ms.
 */
 #define CYCLETIME 30
- 
+
 /* Offsets for LCDS > 220x176 */
 #define XOFS ((LCD_WIDTH-220)/2)
 #define YOFS ((LCD_HEIGHT-176)/2)
@@ -349,7 +349,7 @@ extern const fb_data brickmania_bricks[];
 #endif
 
 int levels_num = 29;
-    
+
 static unsigned char levels[29][8][10] = {
     { /* level1 */
         {0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1,0x1},
@@ -695,79 +695,83 @@ static struct configdata config[] =
 void int_game(int new_game)
 {
     int i,j;
-    
+
     pad_pos_x=LCD_WIDTH/2-PAD_WIDTH/2;
-    
+
     for(i=0;i<MAX_BALLS;i++) {
         ball[i].x=0;
         ball[i].y=0;
         ball[i].tempy=0;
-        ball[i].tempx=0;        
+        ball[i].tempx=0;
         ball[i].pos_y=PAD_POS_Y-BALL;
         ball[i].pos_x=pad_pos_x+(PAD_WIDTH/2)-2;
         ball[i].glue=false;
     }
-    
+
     used_balls=1;
     start_game =1;
     con_game =0;
     pad_type=0;
 
     flip_sides=false;
-    
+
     if (new_game==1)
-     brick_on_board=0;
+        brick_on_board=0;
 
-     for(i=0;i<=7;i++){
-       for(j=0;j<=9;j++){
+    for(i=0;i<=7;i++) {
+        for(j=0;j<=9;j++) {
             brick[i*10+j].poweruse=(levels[cur_level][i][j]==0?0:1);
-            if (i*10+j<=30) fire[i*10+j].top=-8;
-                if (new_game==1) {
+            if (i*10+j<=30)
+                fire[i*10+j].top=-8;
+            if (new_game==1) {
+                brick[i*10+j].power=rb->rand()%25;
+                /* +8 make the game with less powerups */
 
-                brick[i*10+j].power=rb->rand()%25; /* +8 make the game with less powerups */
                 brick[i*10+j].hits=levels[cur_level][i][j]>=10?
-                                     levels[cur_level][i][j]/16-1:0;
+                    levels[cur_level][i][j]/16-1:0;
                 brick[i*10+j].hiteffect=0;
                 brick[i*10+j].powertop=TOPMARGIN+i*BRICK_HEIGHT+BRICK_HEIGHT;
                 brick[i*10+j].used=(levels[cur_level][i][j]==0?0:1);
                 brick[i*10+j].color=(levels[cur_level][i][j]>=10?
-                                    levels[cur_level][i][j]%16:levels[cur_level][i][j])-1;
-                if (levels[cur_level][i][j]!=0) brick_on_board++;
+                                     levels[cur_level][i][j]%16:
+                                     levels[cur_level][i][j])-1;
+                if (levels[cur_level][i][j]!=0)
+                    brick_on_board++;
             }
-       }
-     } 
-
-
+        }
+    }
 }
 
 int sw,i,w;
 
 /* sleep timer counting the score */
-void sleep (int secs) {
-     bool done=false;
-     char s[20];
-     int count=0;
-     
-     while (!done) {
+void sleep (int secs)
+{
+    bool done=false;
+    char s[20];
+    int count=0;
 
-         if (vscore<score) {
-             vscore++;
-             rb->snprintf(s, sizeof(s), "%d", vscore);
-             rb->lcd_getstringsize(s, &sw, &w);
+    while (!done) {
+
+        if (vscore<score) {
+            vscore++;
+            rb->snprintf(s, sizeof(s), "%d", vscore);
+            rb->lcd_getstringsize(s, &sw, &w);
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
-             rb->lcd_putsxy(LCD_WIDTH/2-sw/2, 0, s);
+            rb->lcd_putsxy(LCD_WIDTH/2-sw/2, 0, s);
 #else
-             rb->lcd_putsxy(LCD_WIDTH/2-sw/2, 2, s);
+            rb->lcd_putsxy(LCD_WIDTH/2-sw/2, 2, s);
 #endif
-             rb->lcd_update_rect(0,0,LCD_WIDTH,w+2);
-         } else {
-           if (count==0) count=*rb->current_tick+HZ*secs;
-           if (*rb->current_tick>=count)
-               done=true;
-         }
-         rb->yield();
-     }
-     
+            rb->lcd_update_rect(0,0,LCD_WIDTH,w+2);
+        } else {
+            if (count==0)
+                count=*rb->current_tick+HZ*secs;
+            if (*rb->current_tick>=count)
+                done=true;
+        }
+        rb->yield();
+    }
+
 }
 
 
@@ -777,10 +781,10 @@ int game_menu(int when)
 {
     int button,cur=0;
     char str[10];
-	rb->lcd_clear_display();
-	#if (LCD_WIDTH != 112) && (LCD_HEIGHT != 64)
-        rb->lcd_bitmap(brickmania_menu_bg,0,0,BMPWIDTH_menu,BMPHEIGHT_menu);
-    #endif
+    rb->lcd_clear_display();
+#if (LCD_WIDTH != 112) && (LCD_HEIGHT != 64)
+    rb->lcd_bitmap(brickmania_menu_bg,0,0,BMPWIDTH_menu,BMPHEIGHT_menu);
+#endif
     while (true) {
         for(i=0;i<MENU_LENGTH;i++) {
             if (cur==0)
@@ -838,7 +842,7 @@ int game_menu(int when)
         rb->lcd_update();
 
         button = rb->button_get(true);
-        switch(button){
+        switch(button) {
             case UP:
                 if (cur==0)
                     cur = MENU_LENGTH-1;
@@ -846,7 +850,7 @@ int game_menu(int when)
                     cur--;
                 if (when==0 && cur==1) {
                     cur = 0;
-                };
+                }
                 break;
 
             case DOWN:
@@ -856,7 +860,7 @@ int game_menu(int when)
                     cur++;
                 if (when==0 && cur==1) {
                     cur=2;
-                };
+                }
                 break;
 
             case RIGHT:
@@ -868,15 +872,15 @@ int game_menu(int when)
                 } else if (cur==1 && when==1) {
                     return 1;
                 } else if (cur==2) {
-                     return 2;
+                    return 2;
                 } else if (cur==3) {
-                     return 3;
+                    return 3;
                 }
                 break;
             case QUIT:
                 return 3;
                 break;
-            
+
             default:
                 if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
                     return 3;
@@ -896,14 +900,14 @@ int help(int when)
     int maxY=160;
     int maxX=210;
 
-    while(true){
+    while(true) {
 #ifdef HAVE_LCD_COLOR
         rb->lcd_set_background(LCD_BLACK);
         rb->lcd_clear_display();
         rb->lcd_set_background(LCD_BLACK);
         rb->lcd_set_foreground(LCD_WHITE);
 #else
-		rb->lcd_clear_display();
+        rb->lcd_clear_display();
 #endif
 
         rb->lcd_getstringsize("BrickMania", &w, &h);
@@ -916,39 +920,50 @@ int help(int when)
 #else
         rb->lcd_putsxy(1+xoffset, 1*(h+2)+yoffset,"Aim");
 #endif
-        rb->lcd_putsxy(1+xoffset, 2*(h+2)+yoffset,"destroy all the bricks by bouncing");
-        rb->lcd_putsxy(1+xoffset, 3*(h+2)+yoffset,"the ball of them using the paddle.");
+        rb->lcd_putsxy(1+xoffset, 2*(h+2)+yoffset,
+                       "destroy all the bricks by bouncing");
+        rb->lcd_putsxy(1+xoffset, 3*(h+2)+yoffset,
+                       "the ball of them using the paddle.");
 #ifdef HAVE_LCD_COLOR
         rb->lcd_set_foreground(LCD_RGBPACK(245,0,0));
         rb->lcd_putsxy(1+xoffset, 5*(h+2)+yoffset,"Controls");
         rb->lcd_set_foreground(LCD_WHITE);
 #else
         rb->lcd_putsxy(1+xoffset, 5*(h+2)+yoffset,"Controls");
-		#endif
+#endif
         rb->lcd_putsxy(1+xoffset, 6*(h+2)+yoffset,"< & > Move the paddle");
 #if CONFIG_KEYPAD == ONDIO_PAD
-        rb->lcd_putsxy(1+xoffset, 7*(h+2)+yoffset,"MENU  Releases the ball/Fire!");
+        rb->lcd_putsxy(1+xoffset, 7*(h+2)+yoffset,
+                       "MENU  Releases the ball/Fire!");
 #elif CONFIG_KEYPAD == RECORDER_PAD
-        rb->lcd_putsxy(1+xoffset, 7*(h+2)+yoffset,"PLAY  Releases the ball/Fire!");        
+        rb->lcd_putsxy(1+xoffset, 7*(h+2)+yoffset,
+                       "PLAY  Releases the ball/Fire!");
 #elif CONFIG_KEYPAD == IRIVER_H300_PAD
-        rb->lcd_putsxy(1+xoffset, 7*(h+2)+yoffset,"NAVI  Releases the ball/Fire!");
+        rb->lcd_putsxy(1+xoffset, 7*(h+2)+yoffset,
+                       "NAVI  Releases the ball/Fire!");
 #else
-        rb->lcd_putsxy(1+xoffset, 7*(h+2)+yoffset,"SELECT  Releases the ball/Fire!");
+        rb->lcd_putsxy(1+xoffset, 7*(h+2)+yoffset,
+                       "SELECT  Releases the ball/Fire!");
 #endif
-        rb->lcd_putsxy(1+xoffset, 8*(h+2)+yoffset,"STOP  Opens menu/Quit");
+        rb->lcd_putsxy(1+xoffset, 8*(h+2)+yoffset, "STOP  Opens menu/Quit");
 #ifdef HAVE_LCD_COLOR
         rb->lcd_set_foreground(LCD_RGBPACK(245,0,0));
-        rb->lcd_putsxy(1+xoffset, 10*(h+2)+yoffset,"Specials");
+        rb->lcd_putsxy(1+xoffset, 10*(h+2)+yoffset, "Specials");
         rb->lcd_set_foreground(LCD_WHITE);
 #else
-        rb->lcd_putsxy(1+xoffset, 10*(h+2)+yoffset,"Specials");
+        rb->lcd_putsxy(1+xoffset, 10*(h+2)+yoffset, "Specials");
 #endif
-        rb->lcd_putsxy(1+xoffset, 11*(h+2)+yoffset,"N Normal:returns paddle to normal");
-        rb->lcd_putsxy(1+xoffset, 12*(h+2)+yoffset,"D DIE!:loses a life");
-        rb->lcd_putsxy(1+xoffset, 13*(h+2)+yoffset,"L Life:gains a life/power up");
-        rb->lcd_putsxy(1+xoffset, 14*(h+2)+yoffset,"F Fire:allows you to shoot bricks");
-        rb->lcd_putsxy(1+xoffset, 15*(h+2)+yoffset,"G Glue:ball sticks to paddle");
-        rb->lcd_putsxy(1+xoffset, 16*(h+2)+yoffset,"B Ball:Generates Another Ball");
+        rb->lcd_putsxy(1+xoffset, 11*(h+2)+yoffset,
+                       "N Normal:returns paddle to normal");
+        rb->lcd_putsxy(1+xoffset, 12*(h+2)+yoffset, "D DIE!:loses a life");
+        rb->lcd_putsxy(1+xoffset, 13*(h+2)+yoffset,
+                       "L Life:gains a life/power up");
+        rb->lcd_putsxy(1+xoffset, 14*(h+2)+yoffset,
+                       "F Fire:allows you to shoot bricks");
+        rb->lcd_putsxy(1+xoffset, 15*(h+2)+yoffset,
+                       "G Glue:ball sticks to paddle");
+        rb->lcd_putsxy(1+xoffset, 16*(h+2)+yoffset,
+                       "B Ball:Generates Another Ball");
         rb->lcd_update();
 
         button=rb->button_get(true);
@@ -964,7 +979,8 @@ int help(int when)
                         con_game=1;
                         break;
                     case 2:
-                        if (help(when)==1) return 1;
+                        if (help(when)==1)
+                            return 1;
                         break;
                     case 3:
                         return 1;
@@ -972,27 +988,27 @@ int help(int when)
                 }
                 return 0;
                 break;
-			case LEFT:
-			case LEFT | BUTTON_REPEAT:
+            case LEFT:
+            case LEFT | BUTTON_REPEAT:
                 if( xoffset<0)
-                    xoffset+=2; 
-				break;
-			case RIGHT:
+                    xoffset+=2;
+                break;
+            case RIGHT:
             case RIGHT | BUTTON_REPEAT:
                 if(xoffset+maxX > LCD_WIDTH)
-                   xoffset-=2; 
-				break;
-			case UP:
-			case UP | BUTTON_REPEAT:
-                if(yoffset <0) 
-                   yoffset+=2; 
-				break;
-			case DOWN:
-			case DOWN | BUTTON_REPEAT:
-                if(yoffset+maxY > LCD_HEIGHT) 
-                  yoffset-=2; 
-				break;
-
+                    xoffset-=2;
+                break;
+            case UP:
+            case UP | BUTTON_REPEAT:
+                if(yoffset <0)
+                    yoffset+=2;
+                break;
+            case DOWN:
+            case DOWN | BUTTON_REPEAT:
+                if(yoffset+maxY > LCD_HEIGHT)
+                    yoffset-=2;
+                break;
+                
             default:
                 if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
                     return 1;
@@ -1002,7 +1018,7 @@ int help(int when)
     return 0;
 }
 
-int pad_check(int ballxc, int mode, int pon ,int ballnum) 
+int pad_check(int ballxc, int mode, int pon ,int ballnum)
 {
     /* pon: positive(1) or negative(0) */
 
@@ -1029,18 +1045,19 @@ int fire_space(void)
     return 0;
 }
 
-int game_loop(void){
+int game_loop(void)
+{
     int j,i,k,bricky,brickx;
     char s[30];
     int sec_count=0,num_count=10;
     int end;
-    
+
     rb->srand( *rb->current_tick );
 
     configfile_init(rb);
     configfile_load(HIGH_SCORE,config,1,0);
 
-    switch(game_menu(0)){
+    switch(game_menu(0)) {
         case 0:
             cur_level = 0;
             life = 2;
@@ -1069,22 +1086,22 @@ int game_loop(void){
             rb->lcd_set_background(LCD_BLACK);
             rb->lcd_set_foreground(LCD_WHITE);
 #else
-    		rb->lcd_clear_display();
+            rb->lcd_clear_display();
 #endif
-            
+
             if (flip_sides) {
-                  if (*rb->current_tick>=sec_count){
-                      sec_count=*rb->current_tick+HZ;
-                      if (num_count!=0)
-                           num_count--;
-                      else
-                           flip_sides=false;
-                  }
-                  rb->snprintf(s, sizeof(s), "%d", num_count);
-                  rb->lcd_getstringsize(s, &sw, NULL);                  
-                  rb->lcd_putsxy(LCD_WIDTH/2-2, STRINGPOS_flipsides, s);
-            }     
-            
+                if (*rb->current_tick>=sec_count) {
+                    sec_count=*rb->current_tick+HZ;
+                    if (num_count!=0)
+                        num_count--;
+                    else
+                        flip_sides=false;
+                }
+                rb->snprintf(s, sizeof(s), "%d", num_count);
+                rb->lcd_getstringsize(s, &sw, NULL);
+                rb->lcd_putsxy(LCD_WIDTH/2-2, STRINGPOS_flipsides, s);
+            }
+
             /* write life num */
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
             rb->snprintf(s, sizeof(s), "L:%d", life);
@@ -1093,7 +1110,7 @@ int game_loop(void){
             rb->snprintf(s, sizeof(s), "Life: %d", life);
             rb->lcd_putsxy(2, 2, s);
 #endif
-            
+
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
             rb->snprintf(s, sizeof(s), "L%d", cur_level+1);
             rb->lcd_getstringsize(s, &sw, NULL);
@@ -1130,9 +1147,11 @@ int game_loop(void){
 
             /* draw the ball */
             for(i=0;i<used_balls;i++)
-                   rb->lcd_bitmap(brickmania_ball,ball[i].pos_x, ball[i].pos_y, BALL, BALL);
+                rb->lcd_bitmap(brickmania_ball,ball[i].pos_x, ball[i].pos_y,
+                               BALL, BALL);
 
-            if (brick_on_board==0) brick_on_board--;
+            if (brick_on_board==0)
+                brick_on_board--;
 
             /* if the pad is fire */
             for(i=0;i<=30;i++) {
@@ -1150,14 +1169,23 @@ int game_loop(void){
                         if (brick[i*10+j].poweruse==2) {
                             if (con_game!=1)
                                 brick[i*10+j].powertop+=2;
-                                rb->lcd_bitmap_part(brickmania_powerups,0,
-                                        BMPHEIGHT_powerup*brick[i*10+j].power,
-                                        BMPWIDTH_powerup,LEFTMARGIN+j*BRICK_WIDTH+(BRICK_WIDTH/2-BMPWIDTH_powerup/2), 
-                                        brick[i*10+j].powertop, BMPWIDTH_powerup, BMPHEIGHT_powerup);
-                            }
+                            rb->lcd_bitmap_part(brickmania_powerups,0,
+                                                BMPHEIGHT_powerup*brick[i*10+j
+                                                    ].power,
+                                                BMPWIDTH_powerup,
+                                                LEFTMARGIN+j*BRICK_WIDTH+
+                                                (BRICK_WIDTH/2-
+                                                 BMPWIDTH_powerup/2),
+                                                brick[i*10+j].powertop,
+                                                BMPWIDTH_powerup,
+                                                BMPHEIGHT_powerup);
                         }
+                    }
 
-                        if ((pad_pos_x<LEFTMARGIN+j*BRICK_WIDTH+5 && pad_pos_x+PAD_WIDTH>LEFTMARGIN+j*BRICK_WIDTH+5) && brick[i*10+j].powertop+6>=PAD_POS_Y && brick[i*10+j].poweruse==2) {
+                    if ((pad_pos_x<LEFTMARGIN+j*BRICK_WIDTH+5 &&
+                         pad_pos_x+PAD_WIDTH>LEFTMARGIN+j*BRICK_WIDTH+5) &&
+                        brick[i*10+j].powertop+6>=PAD_POS_Y &&
+                        brick[i*10+j].poweruse==2) {
                         switch(brick[i*10+j].power) {
                             case 0:
                                 life++;
@@ -1177,159 +1205,250 @@ int game_loop(void){
                             case 3:
                                 score+=47;
                                 pad_type=2;
-                                for(k=0;k<used_balls;k++) 
+                                for(k=0;k<used_balls;k++)
                                     ball[k].glue=false;
                                 break;
                             case 4:
                                 score+=23;
                                 pad_type=0;
-                                for(k=0;k<used_balls;k++) 
+                                for(k=0;k<used_balls;k++)
                                     ball[k].glue=false;
                                 flip_sides=false;
                                 break;
                             case 5:
-                                score+=23; 
+                                score+=23;
                                 sec_count=*rb->current_tick+HZ;
                                 num_count=10;
                                 flip_sides=!flip_sides;
-                                break;  
+                                break;
                             case 6:
                                 score+=23;
                                 used_balls++;
-                                ball[used_balls-1].x= rb->rand()%1 == 0 ? -1 : 1;
+                                ball[used_balls-1].x= rb->rand()%1 == 0 ?
+                                    -1 : 1;
                                 ball[used_balls-1].y= -4;
-                                break;   
+                                break;
                         }
-                    brick[i*10+j].poweruse=1;
-                }
+                        brick[i*10+j].poweruse=1;
+                    }
 
-                if (brick[i*10+j].powertop>PAD_POS_Y)
-                    brick[i*10+j].poweruse=1;
-
-                brickx=LEFTMARGIN+j*BRICK_WIDTH;
-                bricky=TOPMARGIN+i*BRICK_HEIGHT;
-                if (pad_type==2) {
-                    for (k=0;k<=30;k++) {
-                        if (fire[k].top+7>0) {
-                            if (brick[i*10+j].used==1 && (fire[k].left+1 >= brickx && fire[k].left+1 <= brickx+BRICK_WIDTH) && (bricky+BRICK_HEIGHT>fire[k].top)){
-                                score+=13;
-                                fire[k].top=-16;
-                                if (brick[i*10+j].hits > 0){
-                                    brick[i*10+j].hits--;
-                                    brick[i*10+j].hiteffect++;
-                                    score+=3;    
-                                }                     
-                                else {
-                                    brick[i*10+j].used=0;
-                                    if (brick[i*10+j].power!=10) brick[i*10+j].poweruse=2;
+                    if (brick[i*10+j].powertop>PAD_POS_Y)
+                        brick[i*10+j].poweruse=1;
+                    
+                    brickx=LEFTMARGIN+j*BRICK_WIDTH;
+                    bricky=TOPMARGIN+i*BRICK_HEIGHT;
+                    if (pad_type==2) {
+                        for (k=0;k<=30;k++) {
+                            if (fire[k].top+7>0) {
+                                if (brick[i*10+j].used==1 &&
+                                    (fire[k].left+1 >= brickx &&
+                                     fire[k].left+1 <= brickx+BRICK_WIDTH) &&
+                                    (bricky+BRICK_HEIGHT>fire[k].top)) {
+                                    score+=13;
+                                    fire[k].top=-16;
+                                    if (brick[i*10+j].hits > 0) {
+                                        brick[i*10+j].hits--;
+                                        brick[i*10+j].hiteffect++;
+                                        score+=3;
+                                    }
+                                    else {
+                                        brick[i*10+j].used=0;
+                                        if (brick[i*10+j].power!=10)
+                                            brick[i*10+j].poweruse=2;
                                         brick_on_board--;
+                                    }
                                 }
                             }
                         }
                     }
-                }
-
-                if (brick[i*10+j].used==1){
-                    rb->lcd_bitmap_part(brickmania_bricks,0,BRICK_HEIGHT*brick[i*10+j].color,BRICK_WIDTH,LEFTMARGIN+j*BRICK_WIDTH, TOPMARGIN+i*BRICK_HEIGHT, BRICK_WIDTH, BRICK_HEIGHT);
+                    
+                    if (brick[i*10+j].used==1) {
+                        rb->lcd_bitmap_part(brickmania_bricks,0,
+                                            BRICK_HEIGHT*brick[i*10+j].color,
+                                            BRICK_WIDTH,
+                                            LEFTMARGIN+j*BRICK_WIDTH,
+                                            TOPMARGIN+i*BRICK_HEIGHT,
+                                            BRICK_WIDTH, BRICK_HEIGHT);
 #ifdef HAVE_LCD_COLOR  /* No transparent effect for greyscale lcds for now */
-                    if (brick[i*10+j].hiteffect>0)
-                         rb->lcd_bitmap_transparent_part(brickmania_break,0,BRICK_HEIGHT*brick[i*10+j].hiteffect,BRICK_WIDTH,LEFTMARGIN+j*BRICK_WIDTH, TOPMARGIN+i*BRICK_HEIGHT, BRICK_WIDTH, BRICK_HEIGHT);
+                        if (brick[i*10+j].hiteffect>0)
+                            rb->lcd_bitmap_transparent_part(brickmania_break,
+                                                            0,
+                                                            BRICK_HEIGHT*brick[i*10+j].hiteffect,
+                                                            BRICK_WIDTH,
+                                                            LEFTMARGIN+j*BRICK_WIDTH,
+                                                            TOPMARGIN+i*BRICK_HEIGHT,
+                                                            BRICK_WIDTH,
+                                                            BRICK_HEIGHT);
 #endif
-                }
-                
-                  for(k=0;k<used_balls;k++) {
-                    if (ball[k].pos_y <100) {
-                        if (brick[i*10+j].used==1) {
-                            if ((ball[k].pos_x+ball[k].x+HALFBALL >= brickx && ball[k].pos_x+ball[k].x+HALFBALL <= brickx+BRICK_WIDTH) && ((bricky-4<ball[k].pos_y+BALL && bricky>ball[k].pos_y+BALL) || (bricky+4>ball[k].pos_y+BALL+BALL && bricky<ball[k].pos_y+BALL+BALL)) && (ball[k].y >0)){
-                                ball[k].tempy=bricky-ball[k].pos_y-BALL;
-                            } else if ((ball[k].pos_x+ball[k].x+HALFBALL >= brickx && ball[k].pos_x+ball[k].x+HALFBALL <= brickx+BRICK_WIDTH) && ((bricky+BRICK_HEIGHT+4>ball[k].pos_y && bricky+BRICK_HEIGHT<ball[k].pos_y) || (bricky+BRICK_HEIGHT-4<ball[k].pos_y-BALL && bricky+BRICK_HEIGHT>ball[k].pos_y-BALL)) && (ball[k].y <0)){
-                                ball[k].tempy=-(ball[k].pos_y-(bricky+BRICK_HEIGHT));
-                            }
+                    }
 
-                            if ((ball[k].pos_y+HALFBALL >= bricky && ball[k].pos_y+HALFBALL <= bricky+BRICK_HEIGHT) && ((brickx-4<ball[k].pos_x+BALL && brickx>ball[k].pos_x+BALL) || (brickx+4>ball[k].pos_x+BALL+BALL && brickx<ball[k].pos_x+BALL+BALL)) && (ball[k].x >0)) {
-                                ball[k].tempx=brickx-ball[k].pos_x-BALL;
-                            } else if ((ball[k].pos_y+ball[k].y+HALFBALL >= bricky && ball[k].pos_y+ball[k].y+HALFBALL <= bricky+BRICK_HEIGHT) && ((brickx+BRICK_WIDTH+4>ball[k].pos_x && brickx+BRICK_WIDTH<ball[k].pos_x) || (brickx+BRICK_WIDTH-4<ball[k].pos_x-BALL && brickx+BRICK_WIDTH>ball[k].pos_x-BALL)) && (ball[k].x <0)) {
-                                ball[k].tempx=-(ball[k].pos_x-(brickx+BRICK_WIDTH));
-                            }
-
-                            if ((ball[k].pos_x+HALFBALL >= brickx && ball[k].pos_x+HALFBALL <= brickx+BRICK_WIDTH) && ((bricky+BRICK_HEIGHT==ball[k].pos_y) || (bricky+BRICK_HEIGHT-6<=ball[k].pos_y && bricky+BRICK_HEIGHT>ball[k].pos_y)) && (ball[k].y <0)) { /* bottom line */
-                                if (brick[i*10+j].hits > 0){
-                                    brick[i*10+j].hits--;
-                                    brick[i*10+j].hiteffect++;
-                                    score+=2;    
-                                }                   
-                                else {
-                                    brick[i*10+j].used=0;
-                                    if (brick[i*10+j].power!=10) 
-                                        brick[i*10+j].poweruse=2;     
+                    for(k=0;k<used_balls;k++) {
+                        if (ball[k].pos_y <100) {
+                            if (brick[i*10+j].used==1) {
+                                if ((ball[k].pos_x+ball[k].x+HALFBALL >=
+                                     brickx &&
+                                     ball[k].pos_x+ball[k].x+HALFBALL <=
+                                     brickx+BRICK_WIDTH) &&
+                                    ((bricky-4<ball[k].pos_y+BALL &&
+                                      bricky>ball[k].pos_y+BALL) ||
+                                     (bricky+4>ball[k].pos_y+BALL+BALL &&
+                                      bricky<ball[k].pos_y+BALL+BALL)) &&
+                                    (ball[k].y >0)) {
+                                    ball[k].tempy=bricky-ball[k].pos_y-BALL;
                                 }
-                                
-                                ball[k].y = ball[k].y*-1;
-                            } else if ((ball[k].pos_x+HALFBALL >= brickx && ball[k].pos_x+HALFBALL <= brickx+BRICK_WIDTH) && ((bricky==ball[k].pos_y+BALL) || (bricky+6>=ball[k].pos_y+BALL && bricky<ball[k].pos_y+BALL)) && (ball[k].y >0)) { /* top line */
-                                if (brick[i*10+j].hits > 0){
-                                    brick[i*10+j].hits--;
-                                    brick[i*10+j].hiteffect++;
-                                    score+=2;    
-                                }                    
-                                else {
-                                    brick[i*10+j].used=0;
-                                    if (brick[i*10+j].power!=10) 
-                                        brick[i*10+j].poweruse=2;     
+                                else if ((ball[k].pos_x+ball[k].x+HALFBALL >=
+                                          brickx &&
+                                          ball[k].pos_x+ball[k].x+HALFBALL <=
+                                          brickx+BRICK_WIDTH) &&
+                                         ((bricky+BRICK_HEIGHT+4>ball[k].pos_y &&
+                                           bricky+BRICK_HEIGHT<ball[k].pos_y) ||
+                                          (bricky+BRICK_HEIGHT-4<ball[k].pos_y-BALL &&
+                                           bricky+BRICK_HEIGHT>ball[k].pos_y-BALL)) &&
+                                         (ball[k].y <0)) {
+                                    ball[k].tempy=
+                                        -(ball[k].pos_y-(bricky+BRICK_HEIGHT));
                                 }
-                                    
-                                ball[k].y = ball[k].y*-1;
-                            }
 
-                            if ((ball[k].pos_y+HALFBALL >= bricky && ball[k].pos_y+HALFBALL <= bricky+BRICK_HEIGHT) && ((brickx==ball[k].pos_x+BALL) || (brickx+6>=ball[k].pos_x+BALL && brickx<ball[k].pos_x+BALL)) && (ball[k].x > 0)) { /* left line */
-                                if (brick[i*10+j].hits > 0){
-                                    brick[i*10+j].hits--;
-                                    brick[i*10+j].hiteffect++;
-                                    score+=2;    
-                                }                    
-                                else {
-                                    brick[i*10+j].used=0;
-                                    if (brick[i*10+j].power!=10) 
-                                        brick[i*10+j].poweruse=2;     
-                                }                                   
-                                ball[k].x = ball[k].x*-1;
-
-                            } else if ((ball[k].pos_y+HALFBALL >= bricky && ball[k].pos_y+HALFBALL <= bricky+BRICK_HEIGHT) && ((brickx+BRICK_WIDTH==ball[k].pos_x) || (brickx+BRICK_WIDTH-6<=ball[k].pos_x && brickx+BRICK_WIDTH>ball[k].pos_x)) && (ball[k].x < 0)) { /* Right line */
-                                if (brick[i*10+j].hits > 0){
-                                    brick[i*10+j].hits--;
-                                    brick[i*10+j].hiteffect++;
-                                    score+=2;    
-                                }                     
-                                else {
-                                    brick[i*10+j].used=0;
-                                    if (brick[i*10+j].power!=10) 
-                                        brick[i*10+j].poweruse=2;     
+                                if ((ball[k].pos_y+HALFBALL >=
+                                     bricky &&
+                                     ball[k].pos_y+HALFBALL <=
+                                     bricky+BRICK_HEIGHT) &&
+                                    ((brickx-4<ball[k].pos_x+BALL &&
+                                      brickx>ball[k].pos_x+BALL) ||
+                                     (brickx+4>ball[k].pos_x+BALL+BALL &&
+                                      brickx<ball[k].pos_x+BALL+BALL)) &&
+                                    (ball[k].x >0)) {
+                                    ball[k].tempx=brickx-ball[k].pos_x-BALL;
                                 }
-                                    
-                                ball[k].x = ball[k].x*-1;
-                            }
+                                else if ((ball[k].pos_y+ball[k].y+HALFBALL >=
+                                          bricky &&
+                                          ball[k].pos_y+ball[k].y+HALFBALL <=
+                                          bricky+BRICK_HEIGHT) &&
+                                         ((brickx+BRICK_WIDTH+4>ball[k].pos_x &&
+                                           brickx+BRICK_WIDTH<ball[k].pos_x) ||
+                                          (brickx+BRICK_WIDTH-4<ball[k].pos_x-
+                                           BALL &&
+                                           brickx+BRICK_WIDTH>ball[k].pos_x-
+                                           BALL)) && (ball[k].x <0)) {
+                                    ball[k].tempx=
+                                        -(ball[k].pos_x-(brickx+BRICK_WIDTH));
+                                }
 
-                            if (brick[i*10+j].used==0){
-                                brick_on_board--;
-                                score+=8;
+                                if ((ball[k].pos_x+HALFBALL >= brickx &&
+                                     ball[k].pos_x+HALFBALL <=
+                                     brickx+BRICK_WIDTH) &&
+                                    ((bricky+BRICK_HEIGHT==ball[k].pos_y) ||
+                                     (bricky+BRICK_HEIGHT-6<=ball[k].pos_y &&
+                                      bricky+BRICK_HEIGHT>ball[k].pos_y)) &&
+                                    (ball[k].y <0)) { /* bottom line */
+                                    if (brick[i*10+j].hits > 0) {
+                                        brick[i*10+j].hits--;
+                                        brick[i*10+j].hiteffect++;
+                                        score+=2;
+                                    }
+                                    else {
+                                        brick[i*10+j].used=0;
+                                        if (brick[i*10+j].power!=10)
+                                            brick[i*10+j].poweruse=2;
+                                    }
+
+                                    ball[k].y = ball[k].y*-1;
+                                }
+                                else if ((ball[k].pos_x+HALFBALL >= brickx &&
+                                          ball[k].pos_x+HALFBALL <=
+                                          brickx+BRICK_WIDTH) &&
+                                         ((bricky==ball[k].pos_y+BALL) ||
+                                          (bricky+6>=ball[k].pos_y+BALL &&
+                                           bricky<ball[k].pos_y+BALL)) &&
+                                         (ball[k].y >0)) { /* top line */
+                                    if (brick[i*10+j].hits > 0) {
+                                        brick[i*10+j].hits--;
+                                        brick[i*10+j].hiteffect++;
+                                        score+=2;
+                                    }
+                                    else {
+                                        brick[i*10+j].used=0;
+                                        if (brick[i*10+j].power!=10)
+                                            brick[i*10+j].poweruse=2;
+                                    }
+
+                                    ball[k].y = ball[k].y*-1;
+                                }
+
+                                if ((ball[k].pos_y+HALFBALL >= bricky &&
+                                     ball[k].pos_y+HALFBALL <=
+                                     bricky+BRICK_HEIGHT) &&
+                                    ((brickx==ball[k].pos_x+BALL) ||
+                                     (brickx+6>=ball[k].pos_x+BALL &&
+                                      brickx<ball[k].pos_x+BALL)) &&
+                                    (ball[k].x > 0)) { /* left line */
+                                    if (brick[i*10+j].hits > 0) {
+                                        brick[i*10+j].hits--;
+                                        brick[i*10+j].hiteffect++;
+                                        score+=2;
+                                    }
+                                    else {
+                                        brick[i*10+j].used=0;
+                                        if (brick[i*10+j].power!=10)
+                                            brick[i*10+j].poweruse=2;
+                                    }
+                                    ball[k].x = ball[k].x*-1;
+
+                                }
+                                else if ((ball[k].pos_y+HALFBALL >= bricky &&
+                                          ball[k].pos_y+HALFBALL <=
+                                          bricky+BRICK_HEIGHT) &&
+                                         ((brickx+BRICK_WIDTH==
+                                           ball[k].pos_x) ||
+                                          (brickx+BRICK_WIDTH-6<=
+                                           ball[k].pos_x &&
+                                           brickx+BRICK_WIDTH>
+                                           ball[k].pos_x)) &&
+                                         (ball[k].x < 0)) { /* Right line */
+                                    if (brick[i*10+j].hits > 0) {
+                                        brick[i*10+j].hits--;
+                                        brick[i*10+j].hiteffect++;
+                                        score+=2;
+                                    }
+                                    else {
+                                        brick[i*10+j].used=0;
+                                        if (brick[i*10+j].power!=10)
+                                            brick[i*10+j].poweruse=2;
+                                    }
+
+                                    ball[k].x = ball[k].x*-1;
+                                }
+
+                                if (brick[i*10+j].used==0) {
+                                    brick_on_board--;
+                                    score+=8;
+                                }
                             }
                         }
-                    }
-                  } /* for k */
+                    } /* for k */
                 } /* for j */
             } /* for i */
 
             /* draw the pad */
-            rb->lcd_bitmap_part(brickmania_pads,0,pad_type*PAD_HEIGHT,PAD_WIDTH,pad_pos_x, PAD_POS_Y, PAD_WIDTH, PAD_HEIGHT);
-            
+            rb->lcd_bitmap_part(brickmania_pads,0,pad_type*PAD_HEIGHT,
+                                PAD_WIDTH,pad_pos_x, PAD_POS_Y, PAD_WIDTH,
+                                PAD_HEIGHT);
+
             for(k=0;k<used_balls;k++) {
-                                     
-                if ((ball[k].pos_x >= pad_pos_x && ball[k].pos_x <= pad_pos_x+PAD_WIDTH) && (PAD_POS_Y-4<ball[k].pos_y+BALL && PAD_POS_Y>ball[k].pos_y+BALL) && (ball[k].y >0))
+
+                if ((ball[k].pos_x >= pad_pos_x &&
+                     ball[k].pos_x <= pad_pos_x+PAD_WIDTH) &&
+                    (PAD_POS_Y-4<ball[k].pos_y+BALL &&
+                     PAD_POS_Y>ball[k].pos_y+BALL) && (ball[k].y >0))
                     ball[k].tempy=PAD_POS_Y-ball[k].pos_y-BALL;
-                else if ((4>ball[k].pos_y && 0<ball[k].pos_y) && (ball[k].y <0))
+                else if ((4>ball[k].pos_y && 0<ball[k].pos_y) &&
+                         (ball[k].y <0))
                     ball[k].tempy=-ball[k].pos_y;
-                if ((LCD_WIDTH-4<ball[k].pos_x+BALL && LCD_WIDTH>ball[k].pos_x+BALL) && (ball[k].x >0))
+                if ((LCD_WIDTH-4<ball[k].pos_x+BALL &&
+                     LCD_WIDTH>ball[k].pos_x+BALL) && (ball[k].x >0))
                     ball[k].tempx=LCD_WIDTH-ball[k].pos_x-BALL;
-                else if ((4>ball[k].pos_x && 0<ball[k].pos_x) && (ball[k].x <0))
+                else if ((4>ball[k].pos_x && 0<ball[k].pos_x) &&
+                         (ball[k].x <0))
                     ball[k].tempx=-ball[k].pos_x;
 
                 /* top line */
@@ -1346,278 +1465,338 @@ int game_loop(void){
                         ball[k].x = ball[used_balls].x;
                         ball[k].tempx = ball[used_balls].tempx;
                         ball[k].glue = ball[used_balls].glue;
-                                                
+
                         ball[used_balls].x=0;
                         ball[used_balls].y=0;
                         ball[used_balls].tempy=0;
-                        ball[used_balls].tempx=0;        
+                        ball[used_balls].tempx=0;
                         ball[used_balls].pos_y=PAD_POS_Y-BALL;
                         ball[used_balls].pos_x=pad_pos_x+(PAD_WIDTH/2)-2;
-                        
+
                         k--;
                         continue;
                     } else {
                         life--;
-                        if (life>=0){
+                        if (life>=0) {
                             int_game(0);
                             sleep(2);
                         }
                     }
                 }
-    
+
                 /* left line ,right line */
-                if ((ball[k].pos_x <= 0) || (ball[k].pos_x+BALL >= LCD_WIDTH)){
+                if ((ball[k].pos_x <= 0) ||
+                    (ball[k].pos_x+BALL >= LCD_WIDTH)) {
                     ball[k].x = ball[k].x*-1;
                     ball[k].pos_x = ball[k].pos_x <= 0 ? 0 : LCD_WIDTH-BALL;
                 }
-    
-                if ((ball[k].pos_y+BALL >= PAD_POS_Y && (ball[k].pos_x >= pad_pos_x && ball[k].pos_x <= pad_pos_x+PAD_WIDTH)) &&
-                            start_game != 1 && !ball[k].glue) {
-                                       
-                    if ((ball[k].pos_x+HALFBALL >= pad_pos_x && ball[k].pos_x+HALFBALL <= pad_pos_x+(PAD_WIDTH/2/4)) || 
-                        (ball[k].pos_x +HALFBALL>= pad_pos_x+(PAD_WIDTH-(PAD_WIDTH/2/4)) && ball[k].pos_x+HALFBALL <= pad_pos_x+PAD_WIDTH)) {
-                                       
-                            ball[k].y = -2;
-                            if (ball[k].pos_x != 0 && ball[k].pos_x+BALL!=LCD_WIDTH)
-                                ball[k].x = pad_check(6,0,ball[k].pos_x+2<=pad_pos_x+(PAD_WIDTH/2)?0:1,k);
-                                
-                    } else if ((ball[k].pos_x+HALFBALL >= pad_pos_x+(PAD_WIDTH/2/4) && ball[k].pos_x+HALFBALL <= pad_pos_x+2*(PAD_WIDTH/2/4)) ||
-                               (ball[k].pos_x+HALFBALL >= pad_pos_x+(PAD_WIDTH-2*(PAD_WIDTH/2/4)) && ball[k].pos_x+HALFBALL <= pad_pos_x+(PAD_WIDTH-(PAD_WIDTH/2/4)) )) {
-                            
-                            ball[k].y = -3;
-                            if (ball[k].pos_x != 0 && ball[k].pos_x+BALL!=LCD_WIDTH) 
-                                ball[k].x = pad_check(4,0,ball[k].pos_x+2<=pad_pos_x+(PAD_WIDTH/2)?0:1,k);
-                                
-                    } else if ((ball[k].pos_x+HALFBALL >= pad_pos_x+2*(PAD_WIDTH/2/4) && ball[k].pos_x+HALFBALL <= pad_pos_x+3*(PAD_WIDTH/2/4)) || 
-                               (ball[k].pos_x+2 >= pad_pos_x+(PAD_WIDTH-3*(PAD_WIDTH/2/4)) && ball[k].pos_x+2 <= pad_pos_x+ ((PAD_WIDTH/2)-2*(PAD_WIDTH/2/4)) )) {
 
-                            ball[k].y = -4;
-                            if (ball[k].pos_x != 0 && ball[k].pos_x+BALL!=LCD_WIDTH)
-                                ball[k].x = pad_check(3,0,ball[k].pos_x+2<=pad_pos_x+(PAD_WIDTH/2)?0:1,k);
+                if ((ball[k].pos_y+BALL >= PAD_POS_Y &&
+                     (ball[k].pos_x >= pad_pos_x &&
+                      ball[k].pos_x <= pad_pos_x+PAD_WIDTH)) &&
+                    start_game != 1 && !ball[k].glue) {
 
-                    } else if ((ball[k].pos_x+HALFBALL >= pad_pos_x+3*(PAD_WIDTH/2/4) && ball[k].pos_x+HALFBALL <= pad_pos_x+4*(PAD_WIDTH/2/4)-2) || 
-                               (ball[k].pos_x+2 >= pad_pos_x+(PAD_WIDTH/2+2) && ball[k].pos_x+2 <= pad_pos_x+(PAD_WIDTH-3*(PAD_WIDTH/2/4)) )) {
+                    if ((ball[k].pos_x+HALFBALL >= pad_pos_x &&
+                         ball[k].pos_x+HALFBALL <=
+                         pad_pos_x+(PAD_WIDTH/2/4)) ||
+                        (ball[k].pos_x +HALFBALL>=
+                         pad_pos_x+(PAD_WIDTH-(PAD_WIDTH/2/4)) &&
+                         ball[k].pos_x+HALFBALL <= pad_pos_x+PAD_WIDTH)) {
+                        
+                        ball[k].y = -2;
+                        if (ball[k].pos_x != 0 &&
+                            ball[k].pos_x+BALL!=LCD_WIDTH)
+                            ball[k].x = pad_check(6,0,ball[k].pos_x+2<=
+                                                  pad_pos_x+(PAD_WIDTH/2)?
+                                                  0:1,k);
 
-                            ball[k].y = -4;
-                            if (ball[k].pos_x != 0 && ball[k].pos_x+BALL!=LCD_WIDTH)
-                                ball[k].x = pad_check(2,1,0,k);
-
-                    } else {
-                            ball[k].y = -4;
                     }
-               }
-    
-                    if (!ball[k].glue) {
-                        ball[k].pos_x+=ball[k].tempx!=0?ball[k].tempx:ball[k].x;
-                        ball[k].pos_y+=ball[k].tempy!=0?ball[k].tempy:ball[k].y;
-    
-                        ball[k].tempy=0;
-                        ball[k].tempx=0;
-                    }
-    
-                    if (ball[k].pos_y+5 >= PAD_POS_Y && (pad_type==1 && !ball[k].glue) &&
-                            (ball[k].pos_x >= pad_pos_x && ball[k].pos_x <= pad_pos_x+PAD_WIDTH)){
-                        ball[k].y=0;
-                        ball[k].pos_y=PAD_POS_Y-BALL;
-                        ball[k].glue=true;
-                    }
-             } /* for k */
-                
-                rb->lcd_update();
+                    else if ((ball[k].pos_x+HALFBALL >=
+                              pad_pos_x+(PAD_WIDTH/2/4) &&
+                              ball[k].pos_x+HALFBALL <=
+                              pad_pos_x+2*(PAD_WIDTH/2/4)) ||
+                             (ball[k].pos_x+HALFBALL >=
+                              pad_pos_x+(PAD_WIDTH-2*(PAD_WIDTH/2/4)) &&
+                              ball[k].pos_x+HALFBALL <=
+                              pad_pos_x+(PAD_WIDTH-(PAD_WIDTH/2/4)) )) {
 
-                if (brick_on_board < 0) {
-                    if (cur_level+1<levels_num) {
-                        cur_level++;
-                        score+=100;
-                        int_game(1);
-                        sleep(2);
-                    } else {
-                        rb->lcd_getstringsize("Congratulations!", &sw, NULL);
-                        rb->lcd_putsxy(LCD_WIDTH/2-sw/2, STRINGPOS_congrats, "Congratulations!");
+                        ball[k].y = -3;
+                        if (ball[k].pos_x != 0 &&
+                            ball[k].pos_x+BALL!=LCD_WIDTH)
+                            ball[k].x = pad_check(4,0,ball[k].pos_x+2<=
+                                                  pad_pos_x+(PAD_WIDTH/2)?
+                                                  0:1,k);
+
+                    }
+                    else if ((ball[k].pos_x+HALFBALL >=
+                              pad_pos_x+2*(PAD_WIDTH/2/4) &&
+                              ball[k].pos_x+HALFBALL <=
+                              pad_pos_x+3*(PAD_WIDTH/2/4)) ||
+                             (ball[k].pos_x+2 >=
+                              pad_pos_x+(PAD_WIDTH-3*(PAD_WIDTH/2/4)) &&
+                              ball[k].pos_x+2 <=
+                              pad_pos_x+ ((PAD_WIDTH/2)-2*(PAD_WIDTH/2/4)) )) {
+
+                        ball[k].y = -4;
+                        if (ball[k].pos_x != 0 &&
+                            ball[k].pos_x+BALL!=LCD_WIDTH)
+                            ball[k].x = pad_check(3,0,ball[k].pos_x+2<=
+                                                  pad_pos_x+(PAD_WIDTH/2)?
+                                                  0:1,k);
+
+                    }
+                    else if ((ball[k].pos_x+HALFBALL >=
+                              pad_pos_x+3*(PAD_WIDTH/2/4) &&
+                              ball[k].pos_x+HALFBALL <=
+                              pad_pos_x+4*(PAD_WIDTH/2/4)-2) ||
+                             (ball[k].pos_x+2 >= pad_pos_x+(PAD_WIDTH/2+2) &&
+                              ball[k].pos_x+2 <=
+                              pad_pos_x+(PAD_WIDTH-3*(PAD_WIDTH/2/4)) )) {
+                        
+                        ball[k].y = -4;
+                        if (ball[k].pos_x != 0 &&
+                            ball[k].pos_x+BALL!=LCD_WIDTH)
+                            ball[k].x = pad_check(2,1,0,k);
+
+                    }
+                    else {
+                        ball[k].y = -4;
+                    }
+                }
+
+                if (!ball[k].glue) {
+                    ball[k].pos_x+=ball[k].tempx!=0?ball[k].tempx:ball[k].x;
+                    ball[k].pos_y+=ball[k].tempy!=0?ball[k].tempy:ball[k].y;
+
+                    ball[k].tempy=0;
+                    ball[k].tempx=0;
+                }
+
+                if (ball[k].pos_y+5 >= PAD_POS_Y &&
+                    (pad_type==1 && !ball[k].glue) &&
+                    (ball[k].pos_x >= pad_pos_x &&
+                     ball[k].pos_x <= pad_pos_x+PAD_WIDTH)) {
+                    ball[k].y=0;
+                    ball[k].pos_y=PAD_POS_Y-BALL;
+                    ball[k].glue=true;
+                }
+            } /* for k */
+            
+            rb->lcd_update();
+
+            if (brick_on_board < 0) {
+                if (cur_level+1<levels_num) {
+                    cur_level++;
+                    score+=100;
+                    int_game(1);
+                    sleep(2);
+                }
+                else {
+                    rb->lcd_getstringsize("Congratulations!", &sw, NULL);
+                    rb->lcd_putsxy(LCD_WIDTH/2-sw/2, STRINGPOS_congrats,
+                                   "Congratulations!");
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
-                        rb->lcd_getstringsize("No more levels", &sw, NULL);
-                        rb->lcd_putsxy(LCD_WIDTH/2-sw/2, STRINGPOS_finsh, "No more levels");
+                    rb->lcd_getstringsize("No more levels", &sw, NULL);
+                    rb->lcd_putsxy(LCD_WIDTH/2-sw/2, STRINGPOS_finsh,
+                                   "No more levels");
 #else
-                        rb->lcd_getstringsize("You have finished the game!", &sw, NULL);
-                        rb->lcd_putsxy(LCD_WIDTH/2-sw/2, STRINGPOS_finsh, "You have finished the game!");
+                    rb->lcd_getstringsize("You have finished the game!",
+                                          &sw, NULL);
+                    rb->lcd_putsxy(LCD_WIDTH/2-sw/2, STRINGPOS_finsh,
+                                   "You have finished the game!");
 #endif
-                        vscore=score;
-                        rb->lcd_update();
-                        if (score>highscore) {
-                            sleep(2);
-                            highscore=score;
-                            rb->splash(HZ*2,true,"New High Score");
-                        } else {
-                            sleep(3);
+                    vscore=score;
+                    rb->lcd_update();
+                    if (score>highscore) {
+                        sleep(2);
+                        highscore=score;
+                        rb->splash(HZ*2,true,"New High Score");
+                    }
+                    else {
+                        sleep(3);
+                    }
+
+                    switch(game_menu(0)) {
+                        case 0:
+                            life=2;
+                            cur_level=0;
+                            int_game(1);
+                            break;
+                        case 1:
+                            con_game=1;
+                            break;
+                        case 2:
+                            if (help(0)==1) return 1;
+                            break;
+                        case 3:
+                            return 1;
+                            break;
+                    }
+                }
+            }
+
+            int move_button,button;
+            int button_right,button_left;
+            button=rb->button_get(false);
+            move_button=rb->button_status();
+
+            button_right=((move_button & RIGHT) || (SCROLL_FWD(button)));
+            button_left=((move_button & LEFT) || (SCROLL_BACK(button)));
+
+            if ((button_right && flip_sides==false) ||
+                (button_left && flip_sides==true)) {
+                if (pad_pos_x+8+PAD_WIDTH > LCD_WIDTH) {
+                    for(k=0;k<used_balls;k++)
+                        if (start_game==1 || ball[k].glue)
+                            ball[k].pos_x+=LCD_WIDTH-pad_pos_x-PAD_WIDTH;
+                    pad_pos_x+=LCD_WIDTH-pad_pos_x-PAD_WIDTH;
+                }
+                else {
+                    for(k=0;k<used_balls;k++)
+                        if ((start_game==1 || ball[k].glue))
+                            ball[k].pos_x+=8;
+                    pad_pos_x+=8;
+                }
+            }
+            else if ((button_left && flip_sides==false) ||
+                     (button_right && flip_sides==true)) {
+                if (pad_pos_x-8 < 0) {
+                    for(k=0;k<used_balls;k++)
+                        if (start_game==1 || ball[k].glue)
+                            ball[k].pos_x-=pad_pos_x;
+                    pad_pos_x-=pad_pos_x;
+                }
+                else {
+                    for(k=0;k<used_balls;k++)
+                        if (start_game==1 || ball[k].glue)
+                            ball[k].pos_x-=8;
+                    pad_pos_x-=8;
+                }
+            }
+
+
+            switch(button) {
+                case UP:
+                case SELECT:
+                    if (start_game==1 && con_game!=1 && pad_type!=1) {
+                        for(k=0;k<used_balls;k++) {
+                            ball[k].y=-4;
+                            ball[k].x=pad_pos_x+(PAD_WIDTH/2)-2>=
+                                LCD_WIDTH/2?2:-2;
+                        }
+                        start_game =0;
+                    }
+                    else if (pad_type==1) {
+                        for(k=0;k<used_balls;k++) {
+                            if (ball[k].glue)
+                                ball[k].glue=false;
+                            else if (start_game==1) {
+                                ball[k].x = x[k];
+                                ball[k].y = y[k];
+                            }
                         }
 
-                        switch(game_menu(0)){
-                            case 0:
-                                life=2;
-                                cur_level=0;
-                                int_game(1);
-                                break;
-                            case 1:
-                                con_game=1;
-                                break;
-                            case 2:
-                                if (help(0)==1) return 1;
-                                break;
-                            case 3:
+                        if (start_game!=1 && con_game==1) {
+                            start_game =0;
+                            con_game=0;
+                        }
+                    } else if (pad_type==2 && con_game!=1) {
+                        int tfire;
+                        tfire=fire_space();
+                        fire[tfire].top=PAD_POS_Y-7;
+                        fire[tfire].left=pad_pos_x+1;
+                        tfire=fire_space();
+                        fire[tfire].top=PAD_POS_Y-7;
+                        fire[tfire].left=pad_pos_x+PAD_WIDTH-1;
+                    } else if (con_game==1 && start_game!=1) {
+                        for(k=0;k<used_balls;k++) {
+                            ball[k].x=x[k];
+                            ball[k].y=y[k];
+                        }
+                        con_game=0;
+                    }
+                    break;
+                case QUIT:
+                    switch(game_menu(1)) {
+                        case 0:
+                            life=2;
+                            cur_level=0;
+                            int_game(1);
+                            break;
+                        case 1:
+                            for(k=0;k<used_balls;k++)
+                                if (ball[k].x!=0 && ball[k].y !=0)
+                                    con_game=1;
+                            break;
+                        case 2:
+                            if (help(1)==1)
                                 return 1;
-                                break;
-                            };
-                       }
-                  }
+                            break;
+                        case 3:
+                            return 1;
+                            break;
+                    }
 
-                  int move_button,button;
-                  int button_right,button_left;
-                  button=rb->button_get(false);
-                  move_button=rb->button_status();
+                    for(k=0;k<used_balls;k++) {
+                        if (ball[k].x!=0)
+                            x[k]=ball[k].x;
+                        ball[k].x=0;
+                        if (ball[k].y!=0)
+                            y[k]=ball[k].y;
+                        ball[k].y=0;
+                    }
+                    
+                    break;
 
-                  button_right=((move_button & RIGHT) || (SCROLL_FWD(button)));
-                  button_left=((move_button & LEFT) || (SCROLL_BACK(button)));
-
-                  if ((button_right && flip_sides==false) || (button_left && flip_sides==true)) {
-                      if (pad_pos_x+8+PAD_WIDTH > LCD_WIDTH) {
-                          for(k=0;k<used_balls;k++)
-                              if (start_game==1 || ball[k].glue) 
-                                  ball[k].pos_x+=LCD_WIDTH-pad_pos_x-PAD_WIDTH;
-                          pad_pos_x+=LCD_WIDTH-pad_pos_x-PAD_WIDTH;
-                      } else {
-                          for(k=0;k<used_balls;k++)
-                              if ((start_game==1 || ball[k].glue))
-                                  ball[k].pos_x+=8;
-                          pad_pos_x+=8;
-                      }
-                  } else if ((button_left && flip_sides==false) || (button_right && flip_sides==true)) {
-                      if (pad_pos_x-8 < 0) {
-                          for(k=0;k<used_balls;k++)
-                              if (start_game==1 || ball[k].glue) 
-                                  ball[k].pos_x-=pad_pos_x;
-                              pad_pos_x-=pad_pos_x;
-                      } else {
-                          for(k=0;k<used_balls;k++)
-                              if (start_game==1 || ball[k].glue) 
-                                   ball[k].pos_x-=8;
-                              pad_pos_x-=8;
-                      }
-                  }
-
-
-                  switch(button) {
-                      case UP:
-                      case SELECT:
-                          if (start_game==1 && con_game!=1 && pad_type!=1) {
-                              for(k=0;k<used_balls;k++){
-                                  ball[k].y=-4;
-                                  ball[k].x=pad_pos_x+(PAD_WIDTH/2)-2>=LCD_WIDTH/2?2:-2;
-                              }
-                              start_game =0;
-                          } else if (pad_type==1) {
-                              for(k=0;k<used_balls;k++) {
-                                  if (ball[k].glue)
-                                     ball[k].glue=false;
-                                  else if (start_game==1) {
-                                     ball[k].x = x[k];
-                                     ball[k].y = y[k];
-                                  }
-                              }
-                              
-                              if (start_game!=1 && con_game==1) {
-                                  start_game =0;
-                                  con_game=0;
-                              }
-                          } else if (pad_type==2 && con_game!=1) {
-                              int tfire;
-                              tfire=fire_space();
-                              fire[tfire].top=PAD_POS_Y-7;
-                              fire[tfire].left=pad_pos_x+1;
-                              tfire=fire_space();
-                              fire[tfire].top=PAD_POS_Y-7;
-                              fire[tfire].left=pad_pos_x+PAD_WIDTH-1;
-                          } else if (con_game==1 && start_game!=1) {
-                              for(k=0;k<used_balls;k++){
-                                  ball[k].x=x[k];
-                                  ball[k].y=y[k];
-                              }
-                              con_game=0;
-                          }
-                          break;
-                     case QUIT:
-                         switch(game_menu(1)){
-                             case 0:
-                                 life=2;
-                                 cur_level=0;
-                                 int_game(1);
-                                 break;
-                             case 1:
-                                  for(k=0;k<used_balls;k++)
-                                     if (ball[k].x!=0 && ball[k].y !=0)
-                                         con_game=1;
-                                 break;
-                             case 2:
-                                 if (help(1)==1) return 1;
-                                 break;
-                             case 3:
-                                 return 1;
-                                 break;
-                         };
-                         
-                         for(k=0;k<used_balls;k++){
-                             if (ball[k].x!=0) x[k]=ball[k].x;
-                             ball[k].x=0;
-                             if (ball[k].y!=0) y[k]=ball[k].y;
-                             ball[k].y=0;
-                         }
-                         
-                         break;
-
-                     default:
-                         if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
-                             return 1;
-                     break;                     
-                     }
-             } else {
-#if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
-                 rb->splash(HZ*2,true,"Game Over");
-#else
-                 rb->lcd_bitmap(brickmania_gameover,LCD_WIDTH/2-55,LCD_HEIGHT-87,110,52);
-                 rb->lcd_update();
-#endif
-                 if (score>highscore) {
-                      sleep(2);
-                      highscore=score;
-                      rb->splash(HZ*2,true,"New High Score");
-                 } else {
-                      sleep(3);
-                 }
-
-                 for(k=0;k<used_balls;k++){
-                    ball[k].x=0;
-                    ball[k].y=0;
-                 }
-
-                 switch(game_menu(0)){
-                     case 0:
-                         cur_level=0;
-                         life=2;
-                         int_game(1);
-                         break;
-                     case 1:
-                         con_game=1;
-                         break;
-                     case 2:
-                         if (help(0)==1) return 1;
-                         break;
-                     case 3:
-                         return 1;
-                         break;
-                 }
+                default:
+                    if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                        return 1;
+                    break;
             }
-        if (end > *rb->current_tick) 
+        }
+        else {
+#if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
+            rb->splash(HZ*2,true,"Game Over");
+#else
+            rb->lcd_bitmap(brickmania_gameover,LCD_WIDTH/2-55,LCD_HEIGHT-87,
+                           110,52);
+            rb->lcd_update();
+#endif
+            if (score>highscore) {
+                sleep(2);
+                highscore=score;
+                rb->splash(HZ*2,true,"New High Score");
+            } else {
+                sleep(3);
+            }
+
+            for(k=0;k<used_balls;k++) {
+                ball[k].x=0;
+                ball[k].y=0;
+            }
+
+            switch(game_menu(0)) {
+                case 0:
+                    cur_level=0;
+                    life=2;
+                    int_game(1);
+                    break;
+                case 1:
+                    con_game=1;
+                    break;
+                case 2:
+                    if (help(0)==1)
+                        return 1;
+                    break;
+                case 3:
+                    return 1;
+                    break;
+            }
+        }
+        if (end > *rb->current_tick)
             rb->sleep(end-*rb->current_tick);
-        else rb->yield();
+        else
+            rb->yield();
     }
 }
 
@@ -1626,7 +1805,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     (void)parameter;
     rb = api;
-    
+
     rb->lcd_setfont(FONT_SYSFIXED);
     /* Permanently enable the backlight (unless the user has turned it off) */
     if (rb->global_settings->backlight_timeout > 0)
