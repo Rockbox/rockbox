@@ -668,9 +668,9 @@ void codec_advance_buffer_loc_callback(void *ptr)
     long amount;
 
     if (current_codec == CODEC_IDX_VOICE)
-        amount = (int)ptr - (int)voicebuf;
+        amount = (long)ptr - (long)voicebuf;
     else
-        amount = (int)ptr - (int)&filebuf[buf_ridx];
+        amount = (long)ptr - (long)&filebuf[buf_ridx];
     codec_advance_buffer_callback(amount);
 }
 
@@ -1361,7 +1361,7 @@ static void audio_stop_playback(bool resume)
     audio_clear_track_entries(false);
 }
 
-static void audio_play_start(int offset)
+static void audio_play_start(long offset)
 {
     if (current_fd >= 0) {
         close(current_fd);
@@ -1859,7 +1859,7 @@ void audio_thread(void)
                 while (audio_codec_loaded)
                     yield();
                 
-                audio_play_start((int)ev.data);
+                audio_play_start((long)ev.data);
                 playlist_update_resume_info(audio_current_track());
 
                 /* If there are no tracks in the playlist, then the playlist
@@ -1904,13 +1904,13 @@ void audio_thread(void)
                 if (!playing)
                     break ;
                 pcmbuf_play_stop();
-                ci.seek_time = (int)ev.data+1;
+                ci.seek_time = (long)ev.data+1;
                 break ;
 
             case Q_AUDIO_SEAMLESS_SEEK:
                 if (!playing)
                     break ;
-                ci.seek_time = (int)ev.data+1;
+                ci.seek_time = (long)ev.data+1;
                 break ;
 
             case Q_AUDIO_DIR_NEXT:
@@ -1992,7 +1992,7 @@ void codec_thread(void)
                 }
                 
                 ci.stop_codec = false;
-                wrap = (int)&filebuf[filebuflen] - (int)cur_ti->codecbuf;
+                wrap = (long)&filebuf[filebuflen] - (long)cur_ti->codecbuf;
                 audio_codec_loaded = true;
                 mutex_lock(&mutex_codecthread);
                 current_codec = CODEC_IDX_AUDIO;
@@ -2175,7 +2175,7 @@ bool audio_has_changed_track(void)
     return false;
 }
 
-void audio_play(int offset)
+void audio_play(long offset)
 {
     logf("audio_play");
     if (pcmbuf_is_crossfade_enabled())
@@ -2262,13 +2262,13 @@ void audio_prev_dir(void)
     queue_post(&audio_queue, Q_AUDIO_DIR_PREV, 0);
 }
 
-void audio_ff_rewind(int newpos)
+void audio_ff_rewind(long newpos)
 {
     logf("rewind: %d", newpos);
     queue_post(&audio_queue, Q_AUDIO_FF_REWIND, (int *)newpos);
 }
 
-void audio_seamless_seek(int newpos)
+void audio_seamless_seek(long newpos)
 {
     logf("seamless_seek: %d", newpos);
     queue_post(&audio_queue, Q_AUDIO_SEAMLESS_SEEK, (int *)newpos);

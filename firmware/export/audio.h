@@ -63,15 +63,15 @@ struct audio_debug
 };
 
 void audio_init(void);
-void audio_play(int offset);
+void audio_play(long offset);
 void audio_stop(void);
 void audio_pause(void);
 void audio_resume(void);
 void audio_next(void);
 void audio_prev(void);
 int audio_status(void);
-void audio_ff_rewind(int newtime);
-void audio_seamless_seek(int newtime);
+void audio_ff_rewind(long newtime);
+void audio_seamless_seek(long newtime);
 void audio_flush_and_reload_tracks(void);
 struct mp3entry* audio_current_track(void);
 struct mp3entry* audio_next_track(void);

@@ -2671,7 +2671,7 @@ void audio_set_recording_options(int frequency, int quality,
 #endif /* SIMULATOR */
 #endif /* CONFIG_CODEC == MAS3587F */
 
-void audio_play(int offset)
+void audio_play(long offset)
 {
 #ifdef SIMULATOR
     char* trackname;
@@ -2805,7 +2805,7 @@ void audio_prev(void)
 #endif /* SIMULATOR */
 }
 
-void audio_ff_rewind(int newtime)
+void audio_ff_rewind(long newtime)
 {
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_FF_REWIND, (void *)newtime);

@@ -122,7 +122,7 @@ struct codec_api {
     bool reload_codec;
     /* If seek_time != 0, codec should seek to that song position (in ms)
        if codec supports seeking. */
-    int seek_time;
+    long seek_time;
     
     /* Returns buffer to malloc array. Only codeclib should need this. */
     void* (*get_codec_memory)(long *size);
@@ -232,13 +232,13 @@ struct codec_api {
 #endif /* !SIMULATOR */
 
     /* playback control */
-    void (*PREFIX(audio_play))(int offset);
+    void (*PREFIX(audio_play))(long offset);
     void (*audio_stop)(void);
     void (*audio_pause)(void);
     void (*audio_resume)(void);
     void (*audio_next)(void);
     void (*audio_prev)(void);
-    void (*audio_ff_rewind)(int newtime);
+    void (*audio_ff_rewind)(long newtime);
     struct mp3entry* (*audio_next_track)(void);
     int (*playlist_amount)(void);
     int (*audio_status)(void);

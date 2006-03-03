@@ -105,7 +105,7 @@ enum codec_status codec_start(struct codec_api* api)
     conf->outputFormat = FAAD_FMT_24BIT; /* irrelevant, we don't convert */
     NeAACDecSetConfiguration(hDecoder, conf);
 
-    unsigned long s=0;
+    uint32_t s=0;
     unsigned char c=0;
 
     err = NeAACDecInit2(hDecoder, demux_res.codecdata,demux_res.codecdata_len, &s, &c);

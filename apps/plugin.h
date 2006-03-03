@@ -347,13 +347,13 @@ struct plugin_api {
 #endif /* !SIMULATOR */
 
     /* playback control */
-    void (*PREFIX(audio_play))(int offset);
+    void (*PREFIX(audio_play))(long offset);
     void (*audio_stop)(void);
     void (*audio_pause)(void);
     void (*audio_resume)(void);
     void (*audio_next)(void);
     void (*audio_prev)(void);
-    void (*audio_ff_rewind)(int newtime);
+    void (*audio_ff_rewind)(long newtime);
     struct mp3entry* (*audio_next_track)(void);
     int (*playlist_amount)(void);
     int (*audio_status)(void);
