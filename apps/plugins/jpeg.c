@@ -2225,19 +2225,6 @@ int scroll_bmp(struct t_disp* pdisp)
 
 /********************* main function *************************/
 
-/* debug function */
-int wait_for_button(void)
-{
-    int button;
-
-    do
-    {
-        button = rb->button_get(true);
-    } while ((button & BUTTON_REL) && button != SYS_USB_CONNECTED);
-
-    return button;
-}
-
 /* callback updating a progress meter while JPEG decoding */
 void cb_progess(int current, int total)
 {
