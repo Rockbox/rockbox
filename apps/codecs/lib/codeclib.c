@@ -26,8 +26,8 @@
 
 struct codec_api *local_rb;
 
-int mem_ptr;
-int bufsize;
+long mem_ptr;
+long bufsize;
 unsigned char* mp3buf;     // The actual MP3 buffer from Rockbox
 unsigned char* mallocbuf;  // 512K from the start of MP3 buffer
 unsigned char* filebuf;    // The rest of the MP3 buffer
@@ -56,7 +56,7 @@ void* codec_malloc(size_t size)
 {
     void* x;
 
-    if (mem_ptr + (int)size > bufsize)
+    if (mem_ptr + (long)size > bufsize)
         return NULL;
     
     x=&mallocbuf[mem_ptr];

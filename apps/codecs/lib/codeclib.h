@@ -24,8 +24,8 @@
 
 #define MALLOC_BUFSIZE (512*1024)
 
-extern int mem_ptr;
-extern int bufsize;
+extern long mem_ptr;
+extern long bufsize;
 extern unsigned char* mp3buf;     // The actual MP3 buffer from Rockbox
 extern unsigned char* mallocbuf;  // 512K from the start of MP3 buffer
 extern unsigned char* filebuf;    // The rest of the MP3 buffer
