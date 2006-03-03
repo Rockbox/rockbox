@@ -52,9 +52,6 @@ PLUGIN_HEADER
 #endif
 /****************** constants ******************/
 
-#define INT_MAX ((int)(~(unsigned)0 >> 1))
-#define INT_MIN (-INT_MAX-1)
-
 #define SCREENSIZE (LCD_WIDTH*LCD_HEIGHT/8) // in bytes
 #define FPS 68 // default fps for headerless (old video-only) file
 #define MAX_ACC 20 // maximum FF/FR speedup
