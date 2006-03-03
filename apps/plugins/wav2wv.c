@@ -161,7 +161,7 @@ static int wav2wv (char *filename)
     num_chans = config.num_channels = native_header.NumChannels;
 	total_samples = native_header.data_ckSize / native_header.BlockAlign;
 
-//  config.flags |= CONFIG_HIGH_FLAG;
+/*  config.flags |= CONFIG_HIGH_FLAG; */
 
     if (!WavpackSetConfiguration (wpc, &config, total_samples)) {
         rb->splash(HZ*2, true, "internal error!");

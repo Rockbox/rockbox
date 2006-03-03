@@ -326,7 +326,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int ret;
 
-    rb = api; // copy to global api pointer
+    rb = api; /* copy to global api pointer */
     (void)parameter;
     if (rb->global_settings->backlight_timeout > 0)
         rb->backlight_set_timeout(1);/* keep the light on */

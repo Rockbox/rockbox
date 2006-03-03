@@ -321,14 +321,14 @@ void recalc_parameters(void)
 void init_mandelbrot_set(void)
 {
 #if CONFIG_LCD == LCD_SSD1815 /* Recorder, Ondio. */
-    x_min = -38L<<22;  // -2.375<<26
-    x_max =  15L<<22;  //  0.9375<<26
+    x_min = -38L<<22;  /* -2.375<<26 */
+    x_max =  15L<<22;  /*  0.9375<<26 */
 #else  /* all others (square pixels) */
-    x_min = -36L<<22;  // -2.25<<26
-    x_max =  12L<<22;  //  0.75<<26
+    x_min = -36L<<22;  /* -2.25<<26 */
+    x_max =  12L<<22;  /*  0.75<<26 */
 #endif
-    y_min = -19L<<22;  // -1.1875<<26
-    y_max =  19L<<22;  //  1.1875<<26
+    y_min = -19L<<22;  /* -1.1875<<26 */
+    y_max =  19L<<22;  /*  1.1875<<26 */
     recalc_parameters();
 }
 

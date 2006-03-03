@@ -404,4 +404,4 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     return ret;
 }
 
-#endif // #ifdef HAVE_LCD_BITMAP
+#endif /* #ifdef HAVE_LCD_BITMAP */

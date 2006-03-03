@@ -27,10 +27,10 @@
 #include "plugin.h"
 #include "sh7034.h"
 #include "system.h"
-#include "../apps/recorder/widgets.h" // not in search path, booh
+#include "../apps/recorder/widgets.h" /* not in search path, booh */
 
-#ifndef SIMULATOR // not for simulator by now
-#ifdef HAVE_LCD_BITMAP // and definitely not for the Player, haha
+#ifndef SIMULATOR /* not for simulator by now */
+#ifdef HAVE_LCD_BITMAP /* and definitely not for the Player, haha */
 
 PLUGIN_HEADER
 
@@ -52,89 +52,89 @@ PLUGIN_HEADER
 #endif
 /****************** constants ******************/
 
-#define SCREENSIZE (LCD_WIDTH*LCD_HEIGHT/8) // in bytes
-#define FPS 68 // default fps for headerless (old video-only) file
-#define MAX_ACC 20 // maximum FF/FR speedup
-#define FF_TICKS 3000; // experimentally found nice
+#define SCREENSIZE (LCD_WIDTH*LCD_HEIGHT/8) /* in bytes */
+#define FPS 68 /* default fps for headerless (old video-only) file */
+#define MAX_ACC 20 /* maximum FF/FR speedup */
+#define FF_TICKS 3000; /* experimentally found nice */
 
-// trigger levels, we need about 80 kB/sec
-#define SPINUP_INIT 5000 // from what level on to refill, in milliseconds
-#define SPINUP_SAFETY 700 // how much on top of the measured spinup time
-#define CHUNK (1024*32) // read size
+/* trigger levels, we need about 80 kB/sec */
+#define SPINUP_INIT 5000 /* from what level on to refill, in milliseconds */
+#define SPINUP_SAFETY 700 /* how much on top of the measured spinup time */
+#define CHUNK (1024*32) /* read size */
 
 
 /****************** prototypes ******************/
-void timer4_isr(void); // IMIA4 ISR
-int check_button(void); // determine next relative frame
+void timer4_isr(void); /* IMIA4 ISR */
+int check_button(void); /* determine next relative frame */
 
 
 /****************** data types ******************/
 
-// plugins don't introduce headers, so structs are repeated from rvf_format.h
+/* plugins don't introduce headers, so structs are repeated from rvf_format.h */
 
-#define HEADER_MAGIC 0x52564668 // "RVFh" at file start 
-#define AUDIO_MAGIC  0x41756446 // "AudF" for each audio block
-#define FILEVERSION  100 // 1.00
+#define HEADER_MAGIC 0x52564668 /* "RVFh" at file start  */
+#define AUDIO_MAGIC  0x41756446 /* "AudF" for each audio block */
+#define FILEVERSION  100 /* 1.00 */
 
-// format type definitions
+/* format type definitions */
 #define VIDEOFORMAT_NO_VIDEO       0
 #define VIDEOFORMAT_RAW            1
 #define AUDIOFORMAT_NO_AUDIO       0
 #define AUDIOFORMAT_MP3            1
 #define AUDIOFORMAT_MP3_BITSWAPPED 2
 
-// bit flags
-#define FLAG_LOOP 0x00000001 // loop the playback, e.g. for stills
+/* bit flags */
+#define FLAG_LOOP 0x00000001 /* loop the playback, e.g. for stills */
 
-typedef struct // contains whatever might be useful to the player
+typedef struct /* contains whatever might be useful to the player */
 {
-    // general info (16 entries = 64 byte)
-    unsigned long magic; // HEADER_MAGIC
-    unsigned long version; // file version
-    unsigned long flags; // combination of FLAG_xx
-    unsigned long blocksize; // how many bytes per block (=video frame)
-    unsigned long bps_average; // bits per second of the whole stream
-    unsigned long bps_peak; // max. of above (audio may be VBR)
-    unsigned long resume_pos; // file position to resume to
-    unsigned long reserved[9]; // reserved, should be zero
+    /* general info (16 entries = 64 byte) */
+    unsigned long magic; /* HEADER_MAGIC */
+    unsigned long version; /* file version */
+    unsigned long flags; /* combination of FLAG_xx */
+    unsigned long blocksize; /* how many bytes per block (=video frame) */
+    unsigned long bps_average; /* bits per second of the whole stream */
+    unsigned long bps_peak; /* max. of above (audio may be VBR) */
+    unsigned long resume_pos; /* file position to resume to */
+    unsigned long reserved[9]; /* reserved, should be zero */
 
-    // video info (16 entries = 64 byte)
-    unsigned long video_format; // one of VIDEOFORMAT_xxx
-    unsigned long video_1st_frame; // byte position of first video frame
-    unsigned long video_duration; // total length of video part, in ms
-    unsigned long video_payload_size; // total amount of video data, in bytes
-    unsigned long video_bitrate; // derived from resolution and frame time, in bps
-    unsigned long video_frametime; // frame interval in 11.0592 MHz clocks
-    long video_preroll; // video is how much ahead, in 11.0592 MHz clocks
-    unsigned long video_width; // in pixels
-    unsigned long video_height; // in pixels
-    unsigned long video_reserved[7]; // reserved, should be zero
+    /* video info (16 entries = 64 byte) */
+    unsigned long video_format; /* one of VIDEOFORMAT_xxx */
+    unsigned long video_1st_frame; /* byte position of first video frame */
+    unsigned long video_duration; /* total length of video part, in ms */
+    unsigned long video_payload_size; /* total amount of video data, in bytes */
+    unsigned long video_bitrate; /* derived from resolution and frame time, in bps */
+    unsigned long video_frametime; /* frame interval in 11.0592 MHz clocks */
+    long video_preroll; /* video is how much ahead, in 11.0592 MHz clocks */
+    unsigned long video_width; /* in pixels */
+    unsigned long video_height; /* in pixels */
+    unsigned long video_reserved[7]; /* reserved, should be zero */
 
-    // audio info (16 entries = 64 byte)
-    unsigned long audio_format; // one of AUDIOFORMAT_xxx
-    unsigned long audio_1st_frame; // byte position of first video frame
-    unsigned long audio_duration; // total length of audio part, in ms
-    unsigned long audio_payload_size; // total amount of audio data, in bytes
-    unsigned long audio_avg_bitrate; // average audio bitrate, in bits per second
-    unsigned long audio_peak_bitrate; // maximum bitrate
-    unsigned long audio_headersize; // offset to payload in audio frames
-    long audio_min_associated; // minimum offset to video frame, in bytes
-    long audio_max_associated; // maximum offset to video frame, in bytes
-    unsigned long audio_reserved[7]; // reserved, should be zero
+    /* audio info (16 entries = 64 byte) */
+    unsigned long audio_format; /* one of AUDIOFORMAT_xxx */
+    unsigned long audio_1st_frame; /* byte position of first video frame */
+    unsigned long audio_duration; /* total length of audio part, in ms */
+    unsigned long audio_payload_size; /* total amount of audio data, in bytes */
+    unsigned long audio_avg_bitrate; /* average audio bitrate, in bits per second */
+    unsigned long audio_peak_bitrate; /* maximum bitrate */
+    unsigned long audio_headersize; /* offset to payload in audio frames */
+    long audio_min_associated; /* minimum offset to video frame, in bytes */
+    long audio_max_associated; /* maximum offset to video frame, in bytes */
+    unsigned long audio_reserved[7]; /* reserved, should be zero */
 
-   // more to come... ?
+    /* more to come... ? */
 
-    // Note: padding up to 'blocksize' with zero following this header
+    /* Note: padding up to 'blocksize' with zero following this header */
 } tFileHeader;
 
-typedef struct // the little header for all audio blocks
+typedef struct /* the little header for all audio blocks */
 {
-    unsigned long magic; // AUDIO_MAGIC indicates an audio block
-	unsigned char previous_block; // previous how many blocks backwards
-    unsigned char next_block; // next how many blocks forward
-	short associated_video; // offset to block with corresponding video
-    unsigned short frame_start; // offset to first frame starting in this block
-    unsigned short frame_end; // offset to behind last frame ending in this block
+    unsigned long magic; /* AUDIO_MAGIC indicates an audio block */
+    unsigned char previous_block; /* previous how many blocks backwards */
+    unsigned char next_block; /* next how many blocks forward */
+    short associated_video; /* offset to block with corresponding video */
+    unsigned short frame_start; /* offset to first frame starting in this block */
+    unsigned short frame_end; /* offset to behind last frame ending in this block */
 } tAudioFrameHeader;
 
 
@@ -145,7 +145,7 @@ static struct plugin_api* rb; /* here is a global api struct pointer */
 static char gPrint[32]; /* a global printf buffer, saves stack */
 
 
-// playstate
+/* playstate */
 static struct 
 {
     enum 
@@ -157,40 +157,40 @@ static struct
     bool bVideoUnderrun;
     bool bHasAudio;
     bool bHasVideo;
-    int nTimeOSD; // OSD should stay for this many frames
-    bool bDirtyOSD; // OSD needs redraw
-    bool bRefilling; // set if refilling buffer
+    int nTimeOSD; /* OSD should stay for this many frames */
+    bool bDirtyOSD; /* OSD needs redraw */
+    bool bRefilling; /* set if refilling buffer */
     bool bSeeking;
-    int nSeekAcc; // accelleration value for seek
-    int nSeekPos; // current file position for seek
-    bool bDiskSleep; // disk is suspended
+    int nSeekAcc; /* accelleration value for seek */
+    int nSeekPos; /* current file position for seek */
+    bool bDiskSleep; /* disk is suspended */
 #if FREQ == 12000000 /* Ondio speed kludge */
     int nFrameTimeAdjusted;
 #endif
 } gPlay;
 
-// buffer information
+/* buffer information */
 static struct
 {
     int bufsize;
-    int granularity; // common multiple of block and sector size
-    unsigned char* pBufStart; // start of ring buffer
-    unsigned char* pBufEnd; // end of ring buffer
-    unsigned char* pOSD; // OSD memory (112 bytes for 112*8 pixels)
+    int granularity; /* common multiple of block and sector size */
+    unsigned char* pBufStart; /* start of ring buffer */
+    unsigned char* pBufEnd; /* end of ring buffer */
+    unsigned char* pOSD; /* OSD memory (112 bytes for 112*8 pixels) */
 
-    int vidcount; // how many video blocks are known in a row
-    unsigned char* pBufFill; // write pointer for disk, owned by main task
-    unsigned char* pReadVideo; // video readout, maintained by timer ISR
-    unsigned char* pReadAudio; // audio readout, maintained by demand ISR
-    bool bEOF; // flag for end of file
-    int low_water; // reload threshold 
-    int high_water; // end of reload threshold
-    int spinup_safety; // safety margin when recalculating low_water
-    int nReadChunk; // how much data for normal buffer fill
-    int nSeekChunk; // how much data while seeking
+    int vidcount; /* how many video blocks are known in a row */
+    unsigned char* pBufFill; /* write pointer for disk, owned by main task */
+    unsigned char* pReadVideo; /* video readout, maintained by timer ISR */
+    unsigned char* pReadAudio; /* audio readout, maintained by demand ISR */
+    bool bEOF; /* flag for end of file */
+    int low_water; /* reload threshold  */
+    int high_water; /* end of reload threshold */
+    int spinup_safety; /* safety margin when recalculating low_water */
+    int nReadChunk; /* how much data for normal buffer fill */
+    int nSeekChunk; /* how much data while seeking */
 } gBuf;
 
-// statistics
+/* statistics */
 static struct
 {
     int minAudioAvail;
@@ -201,11 +201,11 @@ static struct
     long maxSpinup;
 } gStats;
 
-tFileHeader gFileHdr; // file header
+tFileHeader gFileHdr; /* file header */
 
 /****************** implementation ******************/
 
-// tool function: return how much playable audio/video is left
+/* tool function: return how much playable audio/video is left */
 int Available(unsigned char* pSnapshot)
 {
     if (pSnapshot <= gBuf.pBufFill)
@@ -214,35 +214,35 @@ int Available(unsigned char* pSnapshot)
         return gBuf.bufsize - (pSnapshot - gBuf.pBufFill);
 }
 
-// debug function to draw buffer indicators
+/* debug function to draw buffer indicators */
 void DrawBuf(void)
 {
     int fill, video, audio;
 
-    rb->memset(gBuf.pOSD, 0x10, LCD_WIDTH); // draw line
-    gBuf.pOSD[0] = gBuf.pOSD[LCD_WIDTH-1] = 0xFE; // ends
+    rb->memset(gBuf.pOSD, 0x10, LCD_WIDTH); /* draw line */
+    gBuf.pOSD[0] = gBuf.pOSD[LCD_WIDTH-1] = 0xFE; /* ends */
 
-    // calculate new tick positions
+    /* calculate new tick positions */
     fill = 1 + ((gBuf.pBufFill - gBuf.pBufStart) * (LCD_WIDTH-2)) / gBuf.bufsize;
     video = 1 + ((gBuf.pReadVideo - gBuf.pBufStart) * (LCD_WIDTH-2)) / gBuf.bufsize;
     audio = 1 + ((gBuf.pReadAudio - gBuf.pBufStart) * (LCD_WIDTH-2)) / gBuf.bufsize;
 
-    gBuf.pOSD[fill] |= 0x20; // below the line, two pixels
-    gBuf.pOSD[video] |= 0x08; // one above
-    gBuf.pOSD[audio] |= 0x04; // two above
+    gBuf.pOSD[fill] |= 0x20; /* below the line, two pixels */
+    gBuf.pOSD[video] |= 0x08; /* one above */
+    gBuf.pOSD[audio] |= 0x04; /* two above */
 
-    if (gPlay.state == paused) // we have to draw ourselves
+    if (gPlay.state == paused) /* we have to draw ourselves */
         rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
     else
-        gPlay.bDirtyOSD = true; // redraw it with next timer IRQ
+        gPlay.bDirtyOSD = true; /* redraw it with next timer IRQ */
 }
 
 
-// helper function to draw a position indicator
+/* helper function to draw a position indicator */
 void DrawPosition(int pos, int total)
 {
     int w,h;
-    int sec; // estimated seconds
+    int sec; /* estimated seconds */
 
 
     /* print the estimated position */   
@@ -258,17 +258,17 @@ void DrawPosition(int pos, int total)
     w++;
     rb->scrollbar(w, LCD_HEIGHT-7, LCD_WIDTH-w, 7, total, 0, pos, HORIZONTAL);
 
-    if (gPlay.state == paused) // we have to draw ourselves
+    if (gPlay.state == paused) /* we have to draw ourselves */
         rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
-    else // let the display time do it
+    else /* let the display time do it */
     {
         gPlay.nTimeOSD = 70;
-        gPlay.bDirtyOSD = true; // redraw it with next timer IRQ
+        gPlay.bDirtyOSD = true; /* redraw it with next timer IRQ */
     }
 }
 
 
-// helper function to change the volume by a certain amount, +/-
+/* helper function to change the volume by a certain amount, +/- */
 void ChangeVolume(int delta)
 {
     int minvol = rb->sound_min(SOUND_VOLUME);
@@ -283,18 +283,18 @@ void ChangeVolume(int delta)
         rb->global_settings->volume = vol;
         rb->snprintf(gPrint, sizeof(gPrint), "Vol: %d dB", vol);
         rb->lcd_puts(0, 7, gPrint);
-        if (gPlay.state == paused) // we have to draw ourselves
+        if (gPlay.state == paused) /* we have to draw ourselves */
             rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
-        else // let the display time do it
+        else /* let the display time do it */
         {
-            gPlay.nTimeOSD = 50; // display it for 50 frames
-            gPlay.bDirtyOSD = true; // let the refresh copy it to LCD
+            gPlay.nTimeOSD = 50; /* display it for 50 frames */
+            gPlay.bDirtyOSD = true; /* let the refresh copy it to LCD */
         }
     }
 }
 
 
-// helper function to change the LCD contrast by a certain amount, +/-
+/* helper function to change the LCD contrast by a certain amount, +/- */
 void ChangeContrast(int delta)
 {
     static int mycontrast = -1; /* the "permanent" value while running */
@@ -312,18 +312,18 @@ void ChangeContrast(int delta)
         mycontrast = contrast;
         rb->snprintf(gPrint, sizeof(gPrint), "Contrast: %d", contrast);
         rb->lcd_puts(0, 7, gPrint);
-        if (gPlay.state == paused) // we have to draw ourselves
+        if (gPlay.state == paused) /* we have to draw ourselves */
             rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
-        else // let the display time do it
+        else /* let the display time do it */
         {
-            gPlay.nTimeOSD = 50; // display it for 50 frames
-            gPlay.bDirtyOSD = true; // let the refresh copy it to LCD
+            gPlay.nTimeOSD = 50; /* display it for 50 frames */
+            gPlay.bDirtyOSD = true; /* let the refresh copy it to LCD */
         }
     }
 }
 
 
-// sync the video to the current audio
+/* sync the video to the current audio */
 void SyncVideo(void)
 {
     tAudioFrameHeader* pAudioBuf;
@@ -331,12 +331,12 @@ void SyncVideo(void)
     pAudioBuf = (tAudioFrameHeader*)(gBuf.pReadAudio);
     if (pAudioBuf->magic == AUDIO_MAGIC)
     {
-        gBuf.vidcount = 0; // nothing known
-        // sync the video position
+        gBuf.vidcount = 0; /* nothing known */
+        /* sync the video position */
         gBuf.pReadVideo = gBuf.pReadAudio + 
             (long)pAudioBuf->associated_video * (long)gFileHdr.blocksize;
     
-        // handle possible wrap
+        /* handle possible wrap */
         if (gBuf.pReadVideo >= gBuf.pBufEnd)
             gBuf.pReadVideo -= gBuf.bufsize;
         else if (gBuf.pReadVideo < gBuf.pBufStart)
@@ -345,21 +345,21 @@ void SyncVideo(void)
 }
 
 
-// timer interrupt handler to display a frame
+/* timer interrupt handler to display a frame */
 void timer4_isr(void)
 {
     int available;
     tAudioFrameHeader* pAudioBuf;
-    int height; // height to display
+    int height; /* height to display */
 
-    // reduce height if we have OSD on
+    /* reduce height if we have OSD on */
     height = gFileHdr.video_height/8;        
     if (gPlay.nTimeOSD > 0)
     {
         gPlay.nTimeOSD--;
-        height = MIN(LCD_HEIGHT/8-1, height); // reserve bottom line
+        height = MIN(LCD_HEIGHT/8-1, height); /* reserve bottom line */
         if (gPlay.bDirtyOSD)
-        {   // OSD to bottom line
+        {   /* OSD to bottom line */
             rb->lcd_blit(gBuf.pOSD, 0, LCD_HEIGHT/8-1, 
                 LCD_WIDTH, 1, LCD_WIDTH);
             gPlay.bDirtyOSD = false;
@@ -371,58 +371,58 @@ void timer4_isr(void)
 
     available = Available(gBuf.pReadVideo);
 
-    // loop to skip audio frame(s)
+    /* loop to skip audio frame(s) */
     while(1)
     {
-        // just for the statistics
+        /* just for the statistics */
         if (!gBuf.bEOF && available < gStats.minVideoAvail)
             gStats.minVideoAvail = available;
 
         if (available <= (int)gFileHdr.blocksize)
-        {   // no data for next frame
+        {   /* no data for next frame */
 
             if (gBuf.bEOF && (gFileHdr.flags & FLAG_LOOP))
-            {   // loop now, assuming the looped clip fits in memory
+            {   /* loop now, assuming the looped clip fits in memory */
                 gBuf.pReadVideo = gBuf.pBufStart + gFileHdr.video_1st_frame;
-                // FixMe: pReadVideo is incremented below
+                /* FixMe: pReadVideo is incremented below */
             }
             else
             {
                 gPlay.bVideoUnderrun = true;
-                rb->timer_unregister(); // disable ourselves
-                return; // no data available
+                rb->timer_unregister(); /* disable ourselves */
+                return; /* no data available */
             }
         }
-        else // normal advance for next time
+        else /* normal advance for next time */
         {
             gBuf.pReadVideo += gFileHdr.blocksize;
             if (gBuf.pReadVideo >= gBuf.pBufEnd)
-                gBuf.pReadVideo -= gBuf.bufsize; // wraparound
+                gBuf.pReadVideo -= gBuf.bufsize; /* wraparound */
             available -= gFileHdr.blocksize;
         }
 
         if (!gPlay.bHasAudio)
-            break; // no need to skip any audio
+            break; /* no need to skip any audio */
         
         if (gBuf.vidcount)
         {   
-            // we know the next is a video frame
+            /* we know the next is a video frame */
             gBuf.vidcount--;
-            break; // exit the loop
+            break; /* exit the loop */
         }
         
         pAudioBuf = (tAudioFrameHeader*)(gBuf.pReadVideo);
         if (pAudioBuf->magic == AUDIO_MAGIC)
-        {   // we ran into audio, can happen after seek
+        {   /* we ran into audio, can happen after seek */
             gBuf.vidcount = pAudioBuf->next_block;
             if (gBuf.vidcount)
-                gBuf.vidcount--; // minus the audio block
+                gBuf.vidcount--; /* minus the audio block */
         }
-    } // while
+    } /* while */
 }
 
 
-// ISR function to get more mp3 data
+/* ISR function to get more mp3 data */
 void GetMoreMp3(unsigned char** start, int* size)
 {
     int available;
@@ -434,19 +434,19 @@ void GetMoreMp3(unsigned char** start, int* size)
 
     available = Available(gBuf.pReadAudio);
 
-    // just for the statistics
+    /* just for the statistics */
     if (!gBuf.bEOF && available < gStats.minAudioAvail)
         gStats.minAudioAvail = available;
     
     if (available < advance + (int)gFileHdr.blocksize || advance == 0)
     {
         gPlay.bAudioUnderrun = true;
-        return; // no data available
+        return; /* no data available */
     }
 
     gBuf.pReadAudio += advance;
     if (gBuf.pReadAudio >= gBuf.pBufEnd)
-        gBuf.pReadAudio -= gBuf.bufsize; // wraparound
+        gBuf.pReadAudio -= gBuf.bufsize; /* wraparound */
 
     *start = gBuf.pReadAudio + gFileHdr.audio_headersize;
     *size = gFileHdr.blocksize - gFileHdr.audio_headersize;
@@ -489,23 +489,23 @@ int SeekTo(int fd, int nPos)
     int read_now, got_now;
 
     if (gPlay.bHasAudio)
-        rb->mp3_play_stop(); // stop audio ISR
+        rb->mp3_play_stop(); /* stop audio ISR */
     if (gPlay.bHasVideo)
-        rb->timer_unregister(); // stop the timer
+        rb->timer_unregister(); /* stop the timer */
 
     rb->lseek(fd, nPos, SEEK_SET);
 
-    gBuf.pBufFill = gBuf.pBufStart; // all empty
+    gBuf.pBufFill = gBuf.pBufStart; /* all empty */
     gBuf.pReadVideo = gBuf.pReadAudio = gBuf.pBufStart;
 
-    read_now = gBuf.low_water - 1; // less than low water, so loading will continue
-    read_now -= read_now % gBuf.granularity; // round down to granularity
+    read_now = gBuf.low_water - 1; /* less than low water, so loading will continue */
+    read_now -= read_now % gBuf.granularity; /* round down to granularity */
     got_now = rb->read(fd, gBuf.pBufFill, read_now);
     gBuf.bEOF = (read_now != got_now);
     gBuf.pBufFill += got_now;
 
     if (nPos == 0)
-    {   // we seeked to the start
+    {   /* we seeked to the start */
         if (gPlay.bHasVideo)
             gBuf.pReadVideo += gFileHdr.video_1st_frame;
 
@@ -513,31 +513,31 @@ int SeekTo(int fd, int nPos)
             gBuf.pReadAudio += gFileHdr.audio_1st_frame;
     }
     else
-    {   // we have to search for the positions
-        if (gPlay.bHasAudio) // prepare audio playback, if contained
+    {   /* we have to search for the positions */
+        if (gPlay.bHasAudio) /* prepare audio playback, if contained */
         {
-            // search for audio frame
+            /* search for audio frame */
             while (((tAudioFrameHeader*)(gBuf.pReadAudio))->magic != AUDIO_MAGIC)
                 gBuf.pReadAudio += gFileHdr.blocksize;
             
             if (gPlay.bHasVideo)
-                SyncVideo(); // pick the right video for that
+                SyncVideo(); /* pick the right video for that */
         }
     }
 
-    // synchronous start
+    /* synchronous start */
     gPlay.state = playing;
     if (gPlay.bHasAudio)
     {
         gPlay.bAudioUnderrun = false;
         rb->mp3_play_data(gBuf.pReadAudio + gFileHdr.audio_headersize,
                 gFileHdr.blocksize - gFileHdr.audio_headersize, GetMoreMp3);
-        rb->mp3_play_pause(true); // kickoff audio
+        rb->mp3_play_pause(true); /* kickoff audio */
     }
     if (gPlay.bHasVideo)
     {
         gPlay.bVideoUnderrun = false;
-        // start display interrupt
+        /* start display interrupt */
 #if FREQ == 12000000 /* Ondio speed kludge */
         rb->timer_register(1, NULL, gPlay.nFrameTimeAdjusted, 1, timer4_isr);
 #else
@@ -548,25 +548,25 @@ int SeekTo(int fd, int nPos)
     return 0;
 }
 
-// called from default_event_handler_ex() or at end of playback
+/* called from default_event_handler_ex() or at end of playback */
 void Cleanup(void *fd)
 {
-    rb->close(*(int*)fd); // close the file
+    rb->close(*(int*)fd); /* close the file */
 
     if (gPlay.bHasVideo)
-        rb->timer_unregister(); // stop video ISR, now I can use the display again
+        rb->timer_unregister(); /* stop video ISR, now I can use the display again */
 
     if (gPlay.bHasAudio)
-        rb->mp3_play_stop(); // stop audio ISR
+        rb->mp3_play_stop(); /* stop audio ISR */
 
-    // restore normal backlight setting
+    /* restore normal backlight setting */
     rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
 
-    // restore normal contrast
+    /* restore normal contrast */
     rb->lcd_set_contrast(rb->global_settings->contrast);
 }
 
-// returns >0 if continue, =0 to stop, <0 to abort (USB)
+/* returns >0 if continue, =0 to stop, <0 to abort (USB) */
 int PlayTick(int fd)
 {
     int button;
@@ -575,7 +575,7 @@ int PlayTick(int fd)
     int retval = 1;
     int filepos;
 
-    // check buffer level
+    /* check buffer level */
     
     if (gPlay.bHasAudio)
         avail_audio = Available(gBuf.pReadAudio);
@@ -593,41 +593,41 @@ int PlayTick(int fd)
      && gBuf.bEOF)
     {
         if (gFileHdr.resume_pos)
-        {   // we played til the end, clear resume position
+        {   /* we played til the end, clear resume position */
             gFileHdr.resume_pos = 0;
-            rb->lseek(fd, 0, SEEK_SET); // save resume position
+            rb->lseek(fd, 0, SEEK_SET); /* save resume position */
             rb->write(fd, &gFileHdr, sizeof(gFileHdr));
         }
         Cleanup(&fd);
-        return 0; // all expired
+        return 0; /* all expired */
     }
 
     if (!gPlay.bRefilling || gBuf.bEOF)
-    {   // nothing to do
+    {   /* nothing to do */
         button = rb->button_get_w_tmo(HZ/10);
     }
     else
-    {   // refill buffer
+    {   /* refill buffer */
         int read_now, got_now;
         int buf_free;
-        long spinup; // measure the spinup time
+        long spinup; /* measure the spinup time */
         
-        // how much can we reload, don't fill completely, would appear empty
+        /* how much can we reload, don't fill completely, would appear empty */
         buf_free = gBuf.bufsize - MAX(avail_audio, avail_video) - gBuf.high_water;
         if (buf_free < 0)
-            buf_free = 0; // just for safety
-        buf_free -= buf_free % gBuf.granularity; // round down to granularity
+            buf_free = 0; /* just for safety */
+        buf_free -= buf_free % gBuf.granularity; /* round down to granularity */
 
-        // in one piece max. up to buffer end (wrap after that)
+        /* in one piece max. up to buffer end (wrap after that) */
         read_now = MIN(buf_free, gBuf.pBufEnd - gBuf.pBufFill);
 
-        // load piecewise, to stay responsive
+        /* load piecewise, to stay responsive */
         read_now = MIN(read_now, gBuf.nReadChunk);
 
         if (read_now == buf_free)
-            gPlay.bRefilling = false; // last piece requested
+            gPlay.bRefilling = false; /* last piece requested */
 
-        spinup = *rb->current_tick; // in case this is interesting below
+        spinup = *rb->current_tick; /* in case this is interesting below */
         
         got_now = rb->read(fd, gBuf.pBufFill, read_now);
         if (got_now != read_now || read_now == 0)
@@ -636,7 +636,7 @@ int PlayTick(int fd)
             gPlay.bRefilling = false;
         }
 
-        if (gPlay.bDiskSleep) // statistics about the spinup time
+        if (gPlay.bDiskSleep) /* statistics about the spinup time */
         {
             spinup = *rb->current_tick - spinup;
             gPlay.bDiskSleep = false;
@@ -645,49 +645,48 @@ int PlayTick(int fd)
             if (spinup < gStats.minSpinup)
                 gStats.minSpinup = spinup;
 
-            // recalculate the low water mark from real measurements
+            /* recalculate the low water mark from real measurements */
             gBuf.low_water = (gStats.maxSpinup + gBuf.spinup_safety) 
                              * gFileHdr.bps_peak / 8 / HZ;
         }
 
         if (!gPlay.bRefilling 
-            && rb->global_settings->disk_spindown < 20) // condition for test only
+            && rb->global_settings->disk_spindown < 20) /* condition for test only */
         {
-            rb->ata_sleep(); // no point in leaving the disk run til timeout
+            rb->ata_sleep(); /* no point in leaving the disk run til timeout */
             gPlay.bDiskSleep = true;
         }
 
         gBuf.pBufFill += got_now;
         if (gBuf.pBufFill >= gBuf.pBufEnd)
-            gBuf.pBufFill = gBuf.pBufStart; // wrap
+            gBuf.pBufFill = gBuf.pBufStart; /* wrap */
 
-        rb->yield(); // have mercy with the other threads
+        rb->yield(); /* have mercy with the other threads */
         button = rb->button_get(false);
     }
 
-    // check keypresses
+    /* check keypresses */
 
     if (button != BUTTON_NONE)
     {
         filepos = rb->lseek(fd, 0, SEEK_CUR);
 
-        if (gPlay.bHasVideo) // video position is more accurate
-            filepos -= Available(gBuf.pReadVideo); // take video position
+        if (gPlay.bHasVideo) /* video position is more accurate */
+            filepos -= Available(gBuf.pReadVideo); /* take video position */
         else
-            filepos -= Available(gBuf.pReadAudio); // else audio
+            filepos -= Available(gBuf.pReadAudio); /* else audio */
             
-        switch (button)
-        {   // set exit conditions
+        switch (button) {   /* set exit conditions */
         case BUTTON_OFF:
-            if (gFileHdr.magic == HEADER_MAGIC // only if file has header
-                && !(gFileHdr.flags & FLAG_LOOP)) // not for stills
+            if (gFileHdr.magic == HEADER_MAGIC /* only if file has header */
+                && !(gFileHdr.flags & FLAG_LOOP)) /* not for stills */
             {
                 gFileHdr.resume_pos = filepos;
-                rb->lseek(fd, 0, SEEK_SET); // save resume position
+                rb->lseek(fd, 0, SEEK_SET); /* save resume position */
                 rb->write(fd, &gFileHdr, sizeof(gFileHdr));
             }
             Cleanup(&fd);
-            retval = 0; // signal "stopped" to caller
+            retval = 0; /* signal "stopped" to caller */
             break;
         case VIDEO_STOP_SEEK:
 #ifdef VIDEO_STOP_SEEK_PRE
@@ -704,9 +703,9 @@ int PlayTick(int fd)
             {
                 gPlay.state = paused;
                 if (gPlay.bHasAudio)
-                    rb->mp3_play_pause(false); // pause audio
+                    rb->mp3_play_pause(false); /* pause audio */
                 if (gPlay.bHasVideo)
-                    rb->timer_unregister(); // stop the timer
+                    rb->timer_unregister(); /* stop the timer */
             }
             else if (gPlay.state == paused)
             {
@@ -715,10 +714,10 @@ int PlayTick(int fd)
                 {
                     if (gPlay.bHasVideo)
                         SyncVideo();
-                    rb->mp3_play_pause(true); // play audio
+                    rb->mp3_play_pause(true); /* play audio */
                 }
                 if (gPlay.bHasVideo)
-                {   // start the video
+                {   /* start the video */
 #if FREQ == 12000000 /* Ondio speed kludge */
                     rb->timer_register(1, NULL,
                         gPlay.nFrameTimeAdjusted, 1, timer4_isr);
@@ -741,44 +740,44 @@ int PlayTick(int fd)
             break;
         case BUTTON_LEFT:
         case BUTTON_LEFT | BUTTON_REPEAT:
-            if (!gPlay.bSeeking) // prepare seek
+            if (!gPlay.bSeeking) /* prepare seek */
             {
                 gPlay.nSeekPos = filepos;
                 gPlay.bSeeking = true;
                 gPlay.nSeekAcc = 0;
             }
-            else if (gPlay.nSeekAcc > 0) // other direction, stop sliding
+            else if (gPlay.nSeekAcc > 0) /* other direction, stop sliding */
                 gPlay.nSeekAcc = 0;
             else
                 gPlay.nSeekAcc--;
             break;
         case BUTTON_RIGHT:
         case BUTTON_RIGHT | BUTTON_REPEAT:
-            if (!gPlay.bSeeking) // prepare seek
+            if (!gPlay.bSeeking) /* prepare seek */
             {
                 gPlay.nSeekPos = filepos;
                 gPlay.bSeeking = true;
                 gPlay.nSeekAcc = 0;
             }
-            else if (gPlay.nSeekAcc < 0) // other direction, stop sliding
+            else if (gPlay.nSeekAcc < 0) /* other direction, stop sliding */
                 gPlay.nSeekAcc = 0;
             else
                 gPlay.nSeekAcc++;
             break;
 #ifdef VIDEO_DEBUG
-        case VIDEO_DEBUG: // debug key
+        case VIDEO_DEBUG: /* debug key */
         case VIDEO_DEBUG | BUTTON_REPEAT:
-            DrawBuf(); // show buffer status
+            DrawBuf(); /* show buffer status */
             gPlay.nTimeOSD = 30;
             gPlay.bDirtyOSD = true;
             break;
 #endif
-        case VIDEO_CONTRAST_DOWN: // contrast down
+        case VIDEO_CONTRAST_DOWN: /* contrast down */
         case VIDEO_CONTRAST_DOWN | BUTTON_REPEAT:
             if (gPlay.bHasVideo)
                 ChangeContrast(-1);
             break;
-        case VIDEO_CONTRAST_UP: // contrast up
+        case VIDEO_CONTRAST_UP: /* contrast up */
         case VIDEO_CONTRAST_UP | BUTTON_REPEAT:
             if (gPlay.bHasVideo)
                 ChangeContrast(1);
@@ -786,7 +785,7 @@ int PlayTick(int fd)
         default:
             if (rb->default_event_handler_ex(button, Cleanup, &fd)
                 == SYS_USB_CONNECTED)
-                retval = -1; // signal "aborted" to caller
+                retval = -1; /* signal "aborted" to caller */
             break;
         }
 
@@ -794,9 +793,9 @@ int PlayTick(int fd)
     } /*  if (button != BUTTON_NONE) */
 
     
-    // handle seeking
+    /* handle seeking */
     
-    if (gPlay.bSeeking) // seeking?
+    if (gPlay.bSeeking) /* seeking? */
     {
         if (gPlay.nSeekAcc < -MAX_ACC)
             gPlay.nSeekAcc = -MAX_ACC;
@@ -815,23 +814,23 @@ int PlayTick(int fd)
     }
 
 
-    // check + recover underruns
+    /* check + recover underruns */
     
     if ((gPlay.bAudioUnderrun || gPlay.bVideoUnderrun) && !gBuf.bEOF)
     {
-        gBuf.spinup_safety += HZ/2; // add extra spinup time for the future
+        gBuf.spinup_safety += HZ/2; /* add extra spinup time for the future */
         filepos = rb->lseek(fd, 0, SEEK_CUR);
 
         if (gPlay.bHasVideo && gPlay.bVideoUnderrun)
         {
             gStats.nVideoUnderruns++;
-            filepos -= Available(gBuf.pReadVideo); // take video position
+            filepos -= Available(gBuf.pReadVideo); /* take video position */
             SeekTo(fd, filepos);
         }
         else if (gPlay.bHasAudio && gPlay.bAudioUnderrun)
         {
             gStats.nAudioUnderruns++;
-            filepos -= Available(gBuf.pReadAudio); // else audio
+            filepos -= Available(gBuf.pReadAudio); /* else audio */
             SeekTo(fd, filepos);
         }
     }
@@ -848,46 +847,46 @@ int main(char* filename)
     int button = 0;
     int retval;
 
-    // try to open the file
+    /* try to open the file */
     fd = rb->open(filename, O_RDWR);
     if (fd < 0)
         return PLUGIN_ERROR;
     file_size =  rb->filesize(fd);
     
-    // reset pitch value to ensure synchronous playback
+    /* reset pitch value to ensure synchronous playback */
     rb->sound_set_pitch(1000);
 
-    // init statistics
+    /* init statistics */
     rb->memset(&gStats, 0, sizeof(gStats));
     gStats.minAudioAvail = gStats.minVideoAvail = INT_MAX;
     gStats.minSpinup = INT_MAX;
 
-    // init playback state
+    /* init playback state */
     rb->memset(&gPlay, 0, sizeof(gPlay));
 
-    // init buffer
+    /* init buffer */
     rb->memset(&gBuf, 0, sizeof(gBuf));
-    gBuf.pOSD = rb->lcd_framebuffer + LCD_WIDTH*7; // last screen line
+    gBuf.pOSD = rb->lcd_framebuffer + LCD_WIDTH*7; /* last screen line */
     gBuf.pBufStart = rb->plugin_get_audio_buffer(&gBuf.bufsize);
-    //gBuf.bufsize = 1700*1024; // test, like 2MB version!!!!
-    gBuf.pBufFill = gBuf.pBufStart; // all empty
+    /*gBuf.bufsize = 1700*1024; // test, like 2MB version!!!! */
+    gBuf.pBufFill = gBuf.pBufStart; /* all empty */
 
-    // load file header
+    /* load file header */
     read_now = sizeof(gFileHdr);
     got_now = rb->read(fd, &gFileHdr, read_now);
-    rb->lseek(fd, 0, SEEK_SET); // rewind to restart sector-aligned
+    rb->lseek(fd, 0, SEEK_SET); /* rewind to restart sector-aligned */
     if (got_now != read_now)
     {
         rb->close(fd);
         return (PLUGIN_ERROR);
     }
 
-    // check header
+    /* check header */
     if (gFileHdr.magic != HEADER_MAGIC)
-    {   // old file, use default info
+    {   /* old file, use default info */
         rb->memset(&gFileHdr, 0, sizeof(gFileHdr));
         gFileHdr.blocksize = SCREENSIZE;
-        if (file_size < SCREENSIZE * FPS) // less than a second
+        if (file_size < SCREENSIZE * FPS) /* less than a second */
             gFileHdr.flags |= FLAG_LOOP;
         gFileHdr.video_format = VIDEOFORMAT_RAW;
         gFileHdr.video_width = LCD_WIDTH;
@@ -900,60 +899,60 @@ int main(char* filename)
     gPlay.nFrameTimeAdjusted = (gFileHdr.video_frametime * 625) / 576;
 #endif
 
-    // continue buffer init: align the end, calc low water, read sizes
+    /* continue buffer init: align the end, calc low water, read sizes */
     gBuf.granularity = gFileHdr.blocksize;
-    while (gBuf.granularity % 512) // common multiple of sector size
+    while (gBuf.granularity % 512) /* common multiple of sector size */
         gBuf.granularity *= 2;
-    gBuf.bufsize -= gBuf.bufsize % gBuf.granularity; // round down
+    gBuf.bufsize -= gBuf.bufsize % gBuf.granularity; /* round down */
     gBuf.pBufEnd = gBuf.pBufStart + gBuf.bufsize;
     gBuf.low_water = SPINUP_INIT * gFileHdr.bps_peak / 8000;
-    gBuf.spinup_safety = SPINUP_SAFETY * HZ / 1000; // in time ticks
+    gBuf.spinup_safety = SPINUP_SAFETY * HZ / 1000; /* in time ticks */
     if (gFileHdr.audio_min_associated < 0)
         gBuf.high_water = 0 - gFileHdr.audio_min_associated;
     else
-        gBuf.high_water = 1; // never fill buffer completely, would appear empty
-    gBuf.nReadChunk = (CHUNK + gBuf.granularity - 1); // round up
-    gBuf.nReadChunk -= gBuf.nReadChunk % gBuf.granularity;// and align
+        gBuf.high_water = 1; /* never fill buffer completely, would appear empty */
+    gBuf.nReadChunk = (CHUNK + gBuf.granularity - 1); /* round up */
+    gBuf.nReadChunk -= gBuf.nReadChunk % gBuf.granularity;/* and align */
     gBuf.nSeekChunk = rb->filesize(fd) / FF_TICKS;
-    gBuf.nSeekChunk += gBuf.granularity - 1; // round up
-    gBuf.nSeekChunk -= gBuf.nSeekChunk % gBuf.granularity; // and align
+    gBuf.nSeekChunk += gBuf.granularity - 1; /* round up */
+    gBuf.nSeekChunk -= gBuf.nSeekChunk % gBuf.granularity; /* and align */
 
-    // prepare video playback, if contained
+    /* prepare video playback, if contained */
     if (gFileHdr.video_format == VIDEOFORMAT_RAW)
     {
         gPlay.bHasVideo = true;
         if (rb->global_settings->backlight_timeout > 0)
-            rb->backlight_set_timeout(1); // keep the light on
+            rb->backlight_set_timeout(1); /* keep the light on */
     }
 
-    // prepare audio playback, if contained
+    /* prepare audio playback, if contained */
     if (gFileHdr.audio_format == AUDIOFORMAT_MP3_BITSWAPPED)
     {
         gPlay.bHasAudio = true;
     }
 
-    // start playback by seeking to zero or resume position
-    if (gFileHdr.resume_pos && WantResume(fd)) // ask the user
+    /* start playback by seeking to zero or resume position */
+    if (gFileHdr.resume_pos && WantResume(fd)) /* ask the user */
         SeekTo(fd, gFileHdr.resume_pos);
     else
         SeekTo(fd, 0);
 
-    // all that's left to do is keep the buffer full
-    do // the main loop
+    /* all that's left to do is keep the buffer full */
+    do /* the main loop */
     {
         retval = PlayTick(fd);
     } while (retval > 0);
 
-    if (retval < 0) // aborted?
+    if (retval < 0) /* aborted? */
     {
         return PLUGIN_USB_CONNECTED;
     }
 
-#ifndef DEBUG // for release compilations, only display the stats in case of error
+#ifndef DEBUG /* for release compilations, only display the stats in case of error */
     if (gStats.nAudioUnderruns || gStats.nVideoUnderruns)
 #endif
     {
-        // display statistics
+        /* display statistics */
         rb->lcd_clear_display();
         rb->snprintf(gPrint, sizeof(gPrint), "%d Audio Underruns", gStats.nAudioUnderruns);
         rb->lcd_puts(0, 0, gPrint);
@@ -983,7 +982,7 @@ int main(char* filename)
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    rb = api; // copy to global api pointer
+    rb = api; /* copy to global api pointer */
     
     if (parameter == NULL)
     {
@@ -991,10 +990,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         return PLUGIN_ERROR;
     }
 
-    // now go ahead and have fun!
+    /* now go ahead and have fun! */
     return main((char*) parameter);
 }
 
-#endif // #ifdef HAVE_LCD_BITMAP
-#endif // #ifndef SIMULATOR
+#endif /* #ifdef HAVE_LCD_BITMAP */
+#endif /* #ifndef SIMULATOR */
 

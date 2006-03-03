@@ -448,19 +448,19 @@ static void star_display_text(char *str, bool waitkey)
 
         line[chars_for_line] = '\0';
 
-        // test if we have cutted a word. If it is the case we don't have to
-        // skip the space
+        /* test if we have cutted a word. If it is the case we don't have to */
+        /* skip the space */
         if (i == chars_by_line && chars_for_line == chars_by_line)
             first_char_index += chars_for_line;
         else
             first_char_index += chars_for_line + 1;
 
-        // print the line on the screen
+        /* print the line on the screen */
         rb->lcd_putsxy(0, current_line * char_height, line);
 
-        // if the number of line showed on the screen is equals to the
-        // maximum number of line we can show, we wait for a key pressed to
-        // clear and show the remaining text.
+        /* if the number of line showed on the screen is equals to the */
+        /* maximum number of line we can show, we wait for a key pressed to */
+        /* clear and show the remaining text. */
         current_line++;
         if (current_line == lines_by_screen || *ptr_char == '\0')
         {

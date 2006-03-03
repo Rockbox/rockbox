@@ -746,7 +746,7 @@ void play_tock(void) {
 
 void calc_period(void)
 {
-    period =  61440/bpm-1; // (60*1024)/bpm;
+    period =  61440/bpm-1; /* (60*1024)/bpm; */
 }
 
 
@@ -904,7 +904,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
     rb = api;
 
     if (MET_IS_PLAYING)
-        MET_PLAY_STOP; // stop audio IS
+        MET_PLAY_STOP; /* stop audio IS */
         
 #if CONFIG_CODEC != SWCODEC
     rb->bitswap(sound, sizeof(sound));

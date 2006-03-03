@@ -33,7 +33,7 @@ use F3 to see how many mines are left (supposing all your flags are correct)
 
 PLUGIN_HEADER
 
-//what the minesweeper() function can return
+/*what the minesweeper() function can return */
 #define MINESWEEPER_USB  3
 #define MINESWEEPER_QUIT 2
 #define MINESWEEPER_LOSE 1
@@ -402,10 +402,10 @@ int minesweeper(void)
 
     while(true){
 
-        //clear the screen buffer
+        /*clear the screen buffer */
         rb->lcd_clear_display();
 
-        //display the mine field
+        /*display the mine field */
         for(i=0;i<height;i++){
             for(j=0;j<width;j++){
 #if LCD_DEPTH > 1

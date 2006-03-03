@@ -362,13 +362,13 @@ tCheckResult CheckFirmwareFile(char* filename, int chipsize, bool is_romless)
     }
     
     if (fileleft == 256*1024)
-    {   // original dumped firmware file has no CRC nor platform ID
+    {   /* original dumped firmware file has no CRC nor platform ID */
         has_crc = false;
     }
     else
     {
         has_crc = true;
-        fileleft -= sizeof(unsigned); // exclude the last 4 bytes
+        fileleft -= sizeof(unsigned); /* exclude the last 4 bytes */
     }
 
     /* do some sanity checks */

@@ -1,15 +1,15 @@
-//    Shine is an MP3 encoder
-//    Copyright (C) 1999-2000  Gabriel Bouvigne
-//
-//    This library is free software; you can redistribute it and/or
-//    modify it under the terms of the GNU Library General Public
-//    License as published by the Free Software Foundation; either
-//    version 2 of the License, or (at your option) any later version.
-//
-//    This library is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//    Library General Public License for more details.
+/*    Shine is an MP3 encoder 
+ *    Copyright (C) 1999-2000  Gabriel Bouvigne
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Library General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Library General Public License for more details. */
 
 #define samp_per_frame   1152
 #define samp_per_frame2   576
@@ -112,55 +112,55 @@ struct huffcodetab {
 };
 
 /* !!!!!!!! start of IRAM area: do not insert before x_int1 array !!!!!!!!!!!!! */
-short     x_int0      [HAN_SIZE]              IBSS_ATTR; //  1024 Bytes
-int       mdct_freq   [2][2][samp_per_frame2] IBSS_ATTR; //  9216 Bytes
-short     x_int1      [HAN_SIZE]              IBSS_ATTR; //  1024 Bytes
+short     x_int0      [HAN_SIZE]              IBSS_ATTR; /*  1024 Bytes */
+int       mdct_freq   [2][2][samp_per_frame2] IBSS_ATTR; /*  9216 Bytes */
+short     x_int1      [HAN_SIZE]              IBSS_ATTR; /*  1024 Bytes */
 /* !!!!!!!!!!!!!!!!!!!!! here you may insert other data !!!!!!!!!!!!!!!!!!!!!!! */
-uint8     int2idx     [4096]                  IBSS_ATTR; //  4096 Bytes
-enct8     enc_data    [2][2][samp_per_frame2] IBSS_ATTR; //  4608 Bytes
-short     y_int       [64]                    IBSS_ATTR; //   256 Bytes
-int       off         [2]                     IBSS_ATTR; //    16 Bytes
-int       scalefac_long[23]                   IBSS_ATTR; //    96 Bytes
-int       mdct_in     [36]                    IBSS_ATTR; //   144 Bytes
-int       sb_sample   [2][3][18][SBLIMIT]     IBSS_ATTR; // 13824 Bytes
-BF_Data   CodedData                           IBSS_ATTR; //  1040 Bytes
-int       ca_int      [8]                     IBSS_ATTR; //    32 Bytes
-int       cs_int      [8]                     IBSS_ATTR; //    32 Bytes
-int       win_int     [18][36]                IBSS_ATTR; //  2592 Bytes
-short     filter_int  [SBLIMIT][64]           IBSS_ATTR; //  8192 Bytes
-short     enwindow_int[512]                   IBSS_ATTR; //  1024 Bytes
-uint8     ht_count1   [2][2][16]              IBSS_ATTR; //    64 Bytes
-uint16    t1HB        [  4]                   IBSS_ATTR; //   Bytes
-uint16    t2HB        [  9]                   IBSS_ATTR; //   Bytes
-uint16    t3HB        [  9]                   IBSS_ATTR; //   Bytes
-uint16    t5HB        [ 16]                   IBSS_ATTR; //   Bytes
-uint16    t6HB        [ 16]                   IBSS_ATTR; //   Bytes
-uint16    t7HB        [ 36]                   IBSS_ATTR; //   Bytes
-uint16    t8HB        [ 36]                   IBSS_ATTR; //   Bytes
-uint16    t9HB        [ 36]                   IBSS_ATTR; //   Bytes
-uint16    t10HB       [ 64]                   IBSS_ATTR; //   Bytes
-uint16    t11HB       [ 64]                   IBSS_ATTR; //   Bytes
-uint16    t12HB       [ 64]                   IBSS_ATTR; //   Bytes
-uint16    t13HB       [256]                   IBSS_ATTR; //   Bytes
-uint16    t15HB       [256]                   IBSS_ATTR; //   Bytes
-uint16    t16HB       [256]                   IBSS_ATTR; //   Bytes
-uint16    t24HB       [256]                   IBSS_ATTR; //   Bytes
-uint8     t1l         [  4]                   IBSS_ATTR; //   Bytes
-uint8     t2l         [  9]                   IBSS_ATTR; //   Bytes
-uint8     t3l         [  9]                   IBSS_ATTR; //   Bytes
-uint8     t5l         [ 16]                   IBSS_ATTR; //   Bytes
-uint8     t6l         [ 16]                   IBSS_ATTR; //   Bytes
-uint8     t7l         [ 36]                   IBSS_ATTR; //   Bytes
-uint8     t8l         [ 36]                   IBSS_ATTR; //   Bytes
-uint8     t9l         [ 36]                   IBSS_ATTR; //   Bytes
-uint8     t10l        [ 64]                   IBSS_ATTR; //   Bytes
-uint8     t11l        [ 64]                   IBSS_ATTR; //   Bytes
-uint8     t12l        [ 64]                   IBSS_ATTR; //   Bytes
-uint8     t13l        [256]                   IBSS_ATTR; //   Bytes
-uint8     t15l        [256]                   IBSS_ATTR; //   Bytes
-uint8     t16l        [256]                   IBSS_ATTR; //   Bytes
-uint8     t24l        [256]                   IBSS_ATTR; //   Bytes
-struct huffcodetab ht [HTN]                   IBSS_ATTR; //   Bytes
+uint8     int2idx     [4096]                  IBSS_ATTR; /*  4096 Bytes */
+enct8     enc_data    [2][2][samp_per_frame2] IBSS_ATTR; /*  4608 Bytes */
+short     y_int       [64]                    IBSS_ATTR; /*   256 Bytes */
+int       off         [2]                     IBSS_ATTR; /*    16 Bytes */
+int       scalefac_long[23]                   IBSS_ATTR; /*    96 Bytes */
+int       mdct_in     [36]                    IBSS_ATTR; /*   144 Bytes */
+int       sb_sample   [2][3][18][SBLIMIT]     IBSS_ATTR; /* 13824 Bytes */
+BF_Data   CodedData                           IBSS_ATTR; /*  1040 Bytes */
+int       ca_int      [8]                     IBSS_ATTR; /*    32 Bytes */
+int       cs_int      [8]                     IBSS_ATTR; /*    32 Bytes */
+int       win_int     [18][36]                IBSS_ATTR; /*  2592 Bytes */
+short     filter_int  [SBLIMIT][64]           IBSS_ATTR; /*  8192 Bytes */
+short     enwindow_int[512]                   IBSS_ATTR; /*  1024 Bytes */
+uint8     ht_count1   [2][2][16]              IBSS_ATTR; /*    64 Bytes */
+uint16    t1HB        [  4]                   IBSS_ATTR; /*   Bytes */
+uint16    t2HB        [  9]                   IBSS_ATTR; /*   Bytes */
+uint16    t3HB        [  9]                   IBSS_ATTR; /*   Bytes */
+uint16    t5HB        [ 16]                   IBSS_ATTR; /*   Bytes */
+uint16    t6HB        [ 16]                   IBSS_ATTR; /*   Bytes */
+uint16    t7HB        [ 36]                   IBSS_ATTR; /*   Bytes */
+uint16    t8HB        [ 36]                   IBSS_ATTR; /*   Bytes */
+uint16    t9HB        [ 36]                   IBSS_ATTR; /*   Bytes */
+uint16    t10HB       [ 64]                   IBSS_ATTR; /*   Bytes */
+uint16    t11HB       [ 64]                   IBSS_ATTR; /*   Bytes */
+uint16    t12HB       [ 64]                   IBSS_ATTR; /*   Bytes */
+uint16    t13HB       [256]                   IBSS_ATTR; /*   Bytes */
+uint16    t15HB       [256]                   IBSS_ATTR; /*   Bytes */
+uint16    t16HB       [256]                   IBSS_ATTR; /*   Bytes */
+uint16    t24HB       [256]                   IBSS_ATTR; /*   Bytes */
+uint8     t1l         [  4]                   IBSS_ATTR; /*   Bytes */
+uint8     t2l         [  9]                   IBSS_ATTR; /*   Bytes */
+uint8     t3l         [  9]                   IBSS_ATTR; /*   Bytes */
+uint8     t5l         [ 16]                   IBSS_ATTR; /*   Bytes */
+uint8     t6l         [ 16]                   IBSS_ATTR; /*   Bytes */
+uint8     t7l         [ 36]                   IBSS_ATTR; /*   Bytes */
+uint8     t8l         [ 36]                   IBSS_ATTR; /*   Bytes */
+uint8     t9l         [ 36]                   IBSS_ATTR; /*   Bytes */
+uint8     t10l        [ 64]                   IBSS_ATTR; /*   Bytes */
+uint8     t11l        [ 64]                   IBSS_ATTR; /*   Bytes */
+uint8     t12l        [ 64]                   IBSS_ATTR; /*   Bytes */
+uint8     t13l        [256]                   IBSS_ATTR; /*   Bytes */
+uint8     t15l        [256]                   IBSS_ATTR; /*   Bytes */
+uint8     t16l        [256]                   IBSS_ATTR; /*   Bytes */
+uint8     t24l        [256]                   IBSS_ATTR; /*   Bytes */
+struct huffcodetab ht [HTN]                   IBSS_ATTR; /*   Bytes */
 
 static const uint8 ht_count1_const[2][2][16] =
 { { { 1,  5,  4,  5,  6,  5, 4, 4, 7, 3, 6, 0, 7, 2, 3, 1 },     /* table0 */
@@ -240,7 +240,7 @@ const struct huffcodetab ht_const[HTN] =
 { 2, 2, 0,   0, t1HB,  t1l},
 { 3, 3, 0,   0, t2HB,  t2l},
 { 3, 3, 0,   0, t3HB,  t3l},
-{ 0, 0, 0,   0, NULL, NULL},// Apparently not used
+{ 0, 0, 0,   0, NULL, NULL},/* Apparently not used */
 { 4, 4, 0,   0, t5HB,  t5l},
 { 4, 4, 0,   0, t6HB,  t6l},
 { 6, 6, 0,   0, t7HB,  t7l},
@@ -250,7 +250,7 @@ const struct huffcodetab ht_const[HTN] =
 { 8, 8, 0,   0,t11HB, t11l},
 { 8, 8, 0,   0,t12HB, t12l},
 {16,16, 0,   0,t13HB, t13l},
-{ 0, 0, 0,   0, NULL, NULL},// Apparently not used
+{ 0, 0, 0,   0, NULL, NULL},/* Apparently not used */
 {16,16, 0,   0,t15HB, t15l},
 {16,16, 1,   1,t16HB, t16l},
 {16,16, 2,   3,t16HB, t16l},
@@ -1025,7 +1025,7 @@ int count_bit(enct8 ix[samp_per_frame2], unsigned int start, unsigned int end, u
   ylen = h->ylen;
 
   if(table > 15)
-  { // ESC-table is used 
+  { /* ESC-table is used  */
     linbits = h->linbits;
     for(i=start; i<end; i+=2)
     {
@@ -1532,7 +1532,7 @@ void filter_subband(short *buffer, int s[SBLIMIT], int k)
 #endif
     
   /* 147456=72*2048 */
-  for(i=SBLIMIT; i--; ) // SBLIMIT: 32
+  for(i=SBLIMIT; i--; ) /* SBLIMIT: 32 */
   {
     short *filt = filter_int[i];
 
@@ -1691,11 +1691,11 @@ void compress(void)
   memcpy(ht          , ht_const          , sizeof(ht          ));
 
   /* I don't know, wether this is really necessary */
-  ht[ 0].table =  NULL;  ht[ 0].hlen = NULL;// Apparently not used
+  ht[ 0].table =  NULL;  ht[ 0].hlen = NULL;/* Apparently not used */
   ht[ 1].table =  t1HB;  ht[ 1].hlen =  t1l;
   ht[ 2].table =  t2HB;  ht[ 2].hlen =  t2l;
   ht[ 3].table =  t3HB;  ht[ 3].hlen =  t3l;
-  ht[ 4].table =  NULL;  ht[ 4].hlen = NULL;// Apparently not used
+  ht[ 4].table =  NULL;  ht[ 4].hlen = NULL;/* Apparently not used */
   ht[ 5].table =  t5HB;  ht[ 5].hlen =  t5l;
   ht[ 6].table =  t6HB;  ht[ 6].hlen =  t6l;
   ht[ 7].table =  t7HB;  ht[ 7].hlen =  t7l;
@@ -1705,7 +1705,7 @@ void compress(void)
   ht[11].table = t11HB;  ht[11].hlen = t11l;
   ht[12].table = t12HB;  ht[12].hlen = t12l;
   ht[13].table = t13HB;  ht[13].hlen = t13l;
-  ht[14].table =  NULL;  ht[14].hlen = NULL;// Apparently not used
+  ht[14].table =  NULL;  ht[14].hlen = NULL;/* Apparently not used */
   ht[15].table = t15HB;  ht[15].hlen = t15l;
   ht[16].table = t16HB;  ht[16].hlen = t16l;
   ht[17].table = t16HB;  ht[17].hlen = t16l;

@@ -23,7 +23,7 @@
 /* Only define LOCAL_DSP on Simulator or else we're asking for trouble  */
 #if defined(SIMULATOR)
     /*Enable this to write to the soundcard via a /dsv/dsp symlink in */
-    //#define LOCAL_DSP
+    /*#define LOCAL_DSP */
 #endif
 
 
@@ -39,7 +39,7 @@
 
 #include "../../plugin.h"
 
-//#include "../codecs/lib/xxx2wav.h"
+/*#include "../codecs/lib/xxx2wav.h" */
 
 PLUGIN_HEADER
 
@@ -200,14 +200,14 @@ int midimain(void * filename)
              * why this happens.
              */
 
-            outputBuffer[outputBufferPosition]=outputSampleOne&0XFF; // Low byte first
+            outputBuffer[outputBufferPosition]=outputSampleOne&0XFF; /* Low byte first */
             outputBufferPosition++;
-            outputBuffer[outputBufferPosition]=outputSampleOne>>8;   //High byte second
+            outputBuffer[outputBufferPosition]=outputSampleOne>>8;   /*High byte second */
             outputBufferPosition++;
 
-            outputBuffer[outputBufferPosition]=outputSampleTwo&0XFF; // Low byte first
+            outputBuffer[outputBufferPosition]=outputSampleTwo&0XFF; /* Low byte first */
             outputBufferPosition++;
-            outputBuffer[outputBufferPosition]=outputSampleTwo>>8;   //High byte second
+            outputBuffer[outputBufferPosition]=outputSampleTwo>>8;   /*High byte second */
             outputBufferPosition++;
 
 

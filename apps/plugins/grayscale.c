@@ -328,11 +328,11 @@ int main(void)
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    rb = api; // copy to global api pointer
+    rb = api; /* copy to global api pointer */
     (void)parameter;
 
     return main();
 }
 
-#endif // #ifdef HAVE_LCD_BITMAP
+#endif /* #ifdef HAVE_LCD_BITMAP */
 

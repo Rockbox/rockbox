@@ -1235,7 +1235,7 @@ void build_lut(struct jpeg* p_jpeg)
     }
     else
     {
-        // error
+        /* error */
     }
 
 }
@@ -1429,7 +1429,7 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel[3],
     int k_need; /* AC coefficients needed up to here */
     int zero_need; /* init the block with this many zeros */
 
-    int last_dc_val[3] = {0, 0, 0}; // or 128 for chroma?
+    int last_dc_val[3] = {0, 0, 0}; /* or 128 for chroma? */
     int store_offs[4]; /* memory offsets: order of Y11 Y12 Y21 Y22 U V */
     int restart = p_jpeg->restart_interval; /* MCUs until restart marker */
 
@@ -1483,7 +1483,7 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel[3],
 
     for(y=0; y<p_jpeg->y_mbl && bs.next_input_byte <= bs.input_end; y++)
     {
-        for (i=0; i<3; i++) // scan line init
+        for (i=0; i<3; i++) /* scan line init */
         {
             p_byte[i] = p_line[i];
             p_line[i] += skip_strip[i];
@@ -1567,7 +1567,7 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel[3],
                         skip_line[ci]);
                 }
             } /* for blkn */
-            p_byte[0] += skip_mcu[0]; // unrolled for (i=0; i<3; i++) loop
+            p_byte[0] += skip_mcu[0]; /* unrolled for (i=0; i<3; i++) loop */
             p_byte[1] += skip_mcu[1];
             p_byte[2] += skip_mcu[2];
             if (p_jpeg->restart_interval && --restart == 0) 
