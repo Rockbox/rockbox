@@ -279,7 +279,8 @@ void CopyBoard( short a[64] , short b[64] );
 void OpeningBook ( void );
 int  search ( short side, short ply, short depth,
               short alpha, short beta,
-			  unsigned short bstline[], short *rpt );
+			  unsigned short bstline[], short *rpt,
+              void (*callback)(void) );
 int  evaluate ( short side, short xside, short ply, short depth,
                 short alpha, short beta );
 int  ProbeTTable ( short side, short depth,
@@ -332,9 +333,6 @@ short pscore[3];
   UpdateWeights();
   xside = otherside[side];
   pscore[white] = pscore[black] = 0;
-
-  /* ok, I will yield here for lower levels */
-  rb->yield();
 
   for (c1 = white; c1 <= black; c1++)
     {
@@ -1018,8 +1016,7 @@ register int sq;
 /* ............    MOVE GENERATION & SEARCH ROUTINES    .............. */
 
 
-int SelectMove(side,iop)
-short side,iop;
+int SelectMove( short side, short iop , void (*callback)(void))
 
 /*
    Select a move by calling function search() at progressively deeper 
@@ -1078,21 +1075,21 @@ static short i,alpha,beta,score,tempb,tempc,tempsf,tempst,xside,rpt;
     {
       Sdepth++;
       /*ShowDepth(' ');*/
-      score = search(side,1,Sdepth,alpha,beta,PrVar,&rpt);
+      score = search(side,1,Sdepth,alpha,beta,PrVar,&rpt,callback);
       for (i = 1; i <= Sdepth; i++) killr0[i] = PrVar[i];
       if (score < alpha && !timeout)
         {
           /*ShowDepth('-');*/
           ExtraTime = 10*ResponseTime;
           ZeroTTable();
-          score = search(side,1,Sdepth,-9000,beta,PrVar,&rpt);
+          score = search(side,1,Sdepth,-9000,beta,PrVar,&rpt,callback);
         }
       if (score > beta && !timeout && !(root->flags & exact))
         {
           /*ShowDepth('+');*/
           ExtraTime = 0;
           ZeroTTable();
-          score = search(side,1,Sdepth,alpha,9000,PrVar,&rpt);
+          score = search(side,1,Sdepth,alpha,9000,PrVar,&rpt,callback);
         }
       score = root->score;
       if (!timeout)
@@ -1209,9 +1206,9 @@ struct BookEntry *p;
     }\
 }
 
-int search(side,ply,depth,alpha,beta,bstline,rpt)
-short side,ply,depth,alpha,beta,*rpt;
-unsigned short bstline[];
+int search( short side, short ply, short depth,
+            short alpha, short beta, unsigned short bstline[], short *rpt,
+            void (*callback)(void) )
 
 /*
    Perform an alpha-beta search to determine the score for the current 
@@ -1238,8 +1235,10 @@ short xside,pbst,d,e,cf,score,rcnt;
 unsigned short mv,nxtline[maxdepth];
 struct leaf *node,tmp;
 
-  /* ok, I will yield here for higher levels */
+  /* this is the only place we need to yield */
   rb->yield();
+  /* and check for user interaction */
+  callback();
 
   NodeCnt++;
   xside = otherside[side];
@@ -1308,7 +1307,7 @@ struct leaf *node,tmp;
           PawnThreat[ply] = (node->flags & pwnthrt);
           Tscore[ply] = node->score;
           node->score = -search(xside,ply+1,depth-1,-beta,-alpha,
-                                nxtline,&rcnt);
+                                nxtline,&rcnt,callback);
           if (abs(node->score) > 9000) node->flags |= exact;
           else if (rcnt == 1) node->score /= 2;
           if (rcnt >= 2 || GameCnt-Game50 > 99 ||

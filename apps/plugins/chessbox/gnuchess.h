@@ -26,6 +26,7 @@ extern short board[64];
 extern short color[64];
 extern long Level;
 extern short TCflag,TCmoves,TCminutes;
+extern short timeout;
 
 /* ---- RockBox integration ---- */
 extern struct plugin_api* rb;
@@ -33,8 +34,7 @@ extern struct plugin_api* rb;
 /* ---- The beginning of a GNUChess v2 APIfication ---- */
 void SetTimeControl(void);
 void GNUChess_Initialize(void);
-int VerifyMove(char s[],short iop,unsigned short *mv);
-int  SelectMove ( short side, short iop);
-
+int  VerifyMove(char s[],short iop,unsigned short *mv);
+int  SelectMove ( short side, short iop , void (*callback)(void) );
 
 #endif
