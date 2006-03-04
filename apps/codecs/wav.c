@@ -532,12 +532,14 @@ enum codec_status codec_start(struct codec_api* api)
                                  blockalign, channels, bitspersample,
                                  int16_samples+i*samplesperblock*channels,
                                  &decodedsize)
-                != CODEC_OK)
+                != CODEC_OK) {
                 i = CODEC_ERROR;
-            goto exit;
-            if (decodedsize != samplesperblock)
+                goto exit;
+            }
+            if (decodedsize != samplesperblock) {
                 i = CODEC_ERROR;
-            goto exit;
+                goto exit;
+            }
         }
         wavbufsize = nblocks*samplesperblock*channels*2;
     }
