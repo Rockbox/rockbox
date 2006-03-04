@@ -119,6 +119,39 @@
 
 #define ACC_INIT(acc, x, y) ACC(acc, x, y)
 
+#elif defined(CPU_ARM) && !defined(SIMULATOR)
+
+/* Multiply two S.31 fractional integers and return the sign bit and the
+ * 31 most significant bits of the result.
+ */
+#define FRACMUL(x, y) \
+({ \
+    long t; \
+    asm volatile ("smull    r0, r1, %[a], %[b]\n\t" \
+                  "mov      %[t], r1, asl #1\n\t" \
+                  "orr      %[t], %[t], r0, lsr #31\n\t" \
+                  : [t] "=r" (t) : [a] "r" (x), [b] "r" (y) : "r0", "r1"); \
+    t; \
+})
+
+#define ACC_INIT(acc, x, y) acc = FRACMUL(x, y)
+#define ACC(acc, x, y) acc += FRACMUL(x, y)
+#define GET_ACC(acc) acc
+
+/* Multiply one S.31-bit and one S8.23 fractional integer and store the
+ * sign bit and the 31 most significant bits of the result to d (and
+ * increase d). Load next value to multiply with into x from s (and
+ * increase s); x must contain the initial value.
+ */
+#define FRACMUL_8_LOOP(x, y, s, d) \
+({ \
+    asm volatile ("smull    r0, r1, %[a], %[b]\n\t" \
+                  "mov      %[t], r1, asl #9\n\t" \
+                  "orr      %[t], %[t], r0, lsr #23\n\t" \
+                  : [t] "=r" (*(d)++) : [a] "r" (x), [b] "r" (y) : "r0", "r1"); \
+    x = *(s)++; \
+})
+
 #else
 
 #define ACC_INIT(acc, x, y) acc = FRACMUL(x, y)
