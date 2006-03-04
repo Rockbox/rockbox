@@ -3780,7 +3780,7 @@ voice:
 new:
 
 id: LANG_COLOR_UNACCEPTABLE
-desc: splash number of tracks inserted
-eng: "Invalid color"
+desc: splash when user selects an invalid colour
+eng: "Invalid colour"
 voice: ""
 new:
