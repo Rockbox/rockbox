@@ -1008,6 +1008,7 @@ static bool dirbrowse(void)
 }
 
 static int plsize = 0;
+static long pltick;
 static bool add_dir(char* dirname, int len, int fd)
 {
     bool abort = false;
@@ -1056,10 +1057,9 @@ static bool add_dir(char* dirname, int len, int fd)
                 cp++;
 
                 /* add all supported audio files to playlists */
-                for (i=0; i < sizeof(filetypes); i++) {
+                for (i=0; i < sizeof(filetypes)/sizeof(struct filetype); i++) {
                     if (filetypes[i].tree_attr == TREE_ATTR_MPA) {
-                        if (!strcasecmp(cp, filetypes[i].extension))
-                        {
+                        if (!strcasecmp(cp, filetypes[i].extension)) {
                             char buf[8];
                             int i;
                             write(fd, dirname, strlen(dirname));
@@ -1068,30 +1068,33 @@ static bool add_dir(char* dirname, int len, int fd)
                             write(fd, "\n", 1);
 
                             plsize++;
-                            snprintf(buf, sizeof buf, "%d", plsize);
+                            if(TIME_AFTER(current_tick, pltick+HZ/4)) {
+                                pltick = current_tick;
+                                
+                                snprintf(buf, sizeof buf, "%d", plsize);
 #ifdef HAVE_LCD_BITMAP
-                            FOR_NB_SCREENS(i)
-                            {
-                                gui_textarea_clear(&screens[i]);
-                                screens[i].puts(0, 4, (unsigned char *)buf);
-                            }
-#else
-                            x = 10;
-                            if (plsize > 999)
-                                x=7;
-                            else {
-                                if (plsize > 99)
-                                    x=8;
-                                else {
-                                    if (plsize > 9)
-                                        x=9;
+                                FOR_NB_SCREENS(i)
+                                {
+                                    screens[i].puts(0, 4, (unsigned char *)buf);
+                                    gui_textarea_update(&screens[i]);
                                 }
-                            }
-                            FOR_NB_SCREENS(i) {
-                                screens[i].puts(x,0,buf);
-                                gui_textarea_update(&screens[i]);
-                            }
+#else
+                                x = 10;
+                                if (plsize > 999)
+                                    x=7;
+                                else {
+                                    if (plsize > 99)
+                                        x=8;
+                                    else {
+                                        if (plsize > 9)
+                                            x=9;
+                                    }
+                                }
+                                FOR_NB_SCREENS(i) {
+                                    screens[i].puts(x,0,buf);
+                                }
 #endif
+                            }
                             break;
                         }
                     }
@@ -1110,6 +1113,8 @@ bool create_playlist(void)
     int i;
     char filename[MAX_PATH];
 
+    pltick = current_tick;
+    
     snprintf(filename, sizeof filename, "%s.m3u",
              tc.currdir[1] ? tc.currdir : "/root");
     FOR_NB_SCREENS(i)
