@@ -3784,3 +3784,15 @@ desc: splash when user selects an invalid colour
 eng: "Invalid colour"
 voice: ""
 new:
+
+id: LANG_SEARCH_IN_PLAYLIST
+desc: in playlist menu.
+eng: "Search In Playlist"
+voice:
+new:
+
+id: LANG_PLAYLIST_SEARCH_MSG
+desc: splash number of tracks inserted
+eng: "Searching... %d found (%s)"
+voice: ""
+new:

@@ -804,3 +804,113 @@ exit:
         playlist_close(viewer.playlist);
     return ret;
 }
+char * playlist_search_callback_name(int selected_item, void * data, char *buffer)
+{
+    int *found_indicies = (int*)data;
+    static struct playlist_track_info track;    
+    playlist_get_track_info(viewer.playlist,found_indicies[selected_item],&track);
+    format_name(buffer,track.filename);
+    return(buffer);
+}
+
+
+void playlist_search_callback_icons(int selected_item, void * data, ICON * icon)
+{
+    (void)selected_item;
+    (void)data;
+#ifdef HAVE_LCD_BITMAP
+        *icon=0;
+#else
+        *icon=-1;
+#endif
+}
+bool search_playlist(void)
+{
+    char search_str[32] = "";
+    bool ret = false, exit = false;
+    int i, playlist_count;
+    int found_indicies[MAX_PLAYLIST_ENTRIES],found_indicies_count = 0;
+    int button;
+    struct gui_synclist playlist_lists;
+    struct playlist_track_info track;
+    
+    if (!playlist_viewer_init(&viewer, 0, false))
+        return ret;
+    if (kbd_input(search_str,sizeof(search_str)) == -1)
+        return ret; 
+    lcd_clear_display();  
+    playlist_count = playlist_amount_ex(viewer.playlist);
+    for (i=0;(i<playlist_count)&&(found_indicies_count<MAX_PLAYLIST_ENTRIES);i++)
+    {
+        gui_syncsplash(0, true, str(LANG_PLAYLIST_SEARCH_MSG),found_indicies_count,
+#if CONFIG_KEYPAD == PLAYER_PAD
+                   str(LANG_STOP_ABORT)
+#else
+                   str(LANG_OFF_ABORT)
+#endif
+        );
+        if (SETTINGS_CANCEL == button_get(false))
+            return ret;
+        playlist_get_track_info(viewer.playlist,i,&track);
+        if (strcasestr(track.filename,search_str))
+        {
+            found_indicies[found_indicies_count++] = track.index;
+        }
+    }
+    if (!found_indicies_count)
+    {
+        return ret;
+    }
+    backlight_on();
+    gui_synclist_init(&playlist_lists, playlist_search_callback_name,
+                                found_indicies);
+    gui_synclist_set_icon_callback(&playlist_lists,
+                  global_settings.playlist_viewer_icons?
+                  &playlist_search_callback_icons:NULL);
+    gui_synclist_set_nb_items(&playlist_lists, found_indicies_count);
+    gui_synclist_select_item(&playlist_lists, 0);
+    gui_synclist_draw(&playlist_lists);
+    while (!exit)
+    {
+        button = button_get(true);
+        if (gui_synclist_do_button(&playlist_lists, button))
+            continue;
+        switch (button)
+        {
+            case TREE_EXIT:
+#ifdef TREE_RC_EXIT
+            case TREE_RC_EXIT:
+#endif
+#ifdef TREE_OFF
+            case TREE_OFF:
+#endif
+                exit = true;
+                break;
+
+#ifdef TREE_ENTER
+            case TREE_ENTER:
+            case TREE_ENTER | BUTTON_REPEAT:
+#endif
+#ifdef TREE_RC_RUN
+            case TREE_RC_RUN:
+#endif
+            case TREE_RUN:
+                playlist_start(
+                    found_indicies[gui_synclist_get_sel_pos(&playlist_lists)]
+                    ,0);
+                exit = 1;
+            break;
+            case BUTTON_NONE:
+                break;
+            default:
+                if(default_event_handler(button) == SYS_USB_CONNECTED)
+                {
+                    ret = true;
+                    exit = true;
+                }
+                break;
+        }
+    }
+    return ret;
+}
+

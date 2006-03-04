@@ -243,8 +243,8 @@ static bool view_playlist(void)
 /* Sub-menu for playlist options */
 static bool playlist_options(void)
 {
-    struct menu_item items[12]; 
-    struct playlist_args args[12]; /* increase these 2 if you add entries! */
+    struct menu_item items[13]; 
+    struct playlist_args args[13]; /* increase these 2 if you add entries! */
     int m, i=0, pstart=0, result;
     bool ret = false;
 
@@ -262,6 +262,11 @@ static bool playlist_options(void)
     {
         items[i].desc = ID2P(LANG_VIEW_DYNAMIC_PLAYLIST);
         items[i].function = playlist_viewer;
+        i++;
+        pstart++;
+        
+        items[i].desc = ID2P(LANG_SEARCH_IN_PLAYLIST);
+        items[i].function = search_playlist;
         i++;
         pstart++;
         

@@ -23,5 +23,6 @@
 
 bool playlist_viewer(void);
 bool playlist_viewer_ex(char* filename);
+bool search_playlist(void);
 
 #endif
