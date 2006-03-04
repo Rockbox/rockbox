@@ -27,6 +27,7 @@
 #include "settings.h"
 #include "scrollbar.h"
 #include "lang.h"
+#include "splash.h"
 
 #define TEXT_MARGIN display->char_width+2
 #define SLIDER_START 20
@@ -177,8 +178,9 @@ static void draw_screen(struct screen *display, char *title,
  set_color 
  returns true if USB was inserted, false otherwise
  color is a pointer to the colour (in native format) to modify
+ set banned_color to -1 to allow all
  ***********/
-bool set_color(struct screen *display,char *title, int* color)
+bool set_color(struct screen *display,char *title, int* color, int banned_color)
 {
     int exit = 0, button, slider=0;
     int rgb_val[3]; /* native depth r,g,b*/;
@@ -253,6 +255,11 @@ bool set_color(struct screen *display,char *title, int* color)
 #ifdef HAVE_LCD_REMOTE
             case SLIDER_RC_OK:
 #endif
+                if ((banned_color!=-1) && (banned_color == newcolor))
+                {
+                    gui_syncsplash(HZ*2,true,str(LANG_COLOR_UNACCEPTABLE));
+                    break;
+                }                    
                 *color = newcolor;
                 exit = 1;
                 break;

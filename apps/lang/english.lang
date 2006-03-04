@@ -3778,3 +3778,9 @@ desc: menu
 eng: "Reset Colours"
 voice:
 new:
+
+id: LANG_COLOR_UNACCEPTABLE
+desc: splash number of tracks inserted
+eng: "Invalid color"
+voice: ""
+new:
