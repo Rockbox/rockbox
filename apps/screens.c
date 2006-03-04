@@ -462,6 +462,11 @@ int pitch_screen(void)
                 used = true;
                 break;
 
+            case BUTTON_ON | BUTTON_OFF:
+                pitch = 1000;
+                sound_set_pitch( pitch );
+                break;
+
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
                     return 2;

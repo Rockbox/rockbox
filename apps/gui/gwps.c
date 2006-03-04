@@ -600,6 +600,7 @@ long gui_wps_show(void)
     || CONFIG_KEYPAD == IRIVER_H300_PAD
             case BUTTON_ON | BUTTON_UP:
             case BUTTON_ON | BUTTON_DOWN:
+            case BUTTON_ON | BUTTON_OFF:
 #ifdef HAVE_LCD_COLOR
                 lcd_set_backdrop(old_backdrop);
 #endif
