@@ -39,10 +39,10 @@
 
 #define POWER_HISTORY_LEN 2*60   /* 2 hours of samples, one per minute */
 
-#define CHARGE_END_NEGD   6      /* stop when N minutes have passed with
+#define CHARGE_END_SHORTD  6     /* stop when N minutes have passed with
                                   * avg delta being < -0.05 V */
-#define CHARGE_END_ZEROD  50     /* stop when N minutes have passed with
-                                  * avg delta being < 0.005 V */
+#define CHARGE_END_LONGD  50     /* stop when N minutes have passed with
+                                  * avg delta being < -0.02 V */
 
 #ifndef SIMULATOR
 
