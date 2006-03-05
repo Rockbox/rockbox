@@ -294,10 +294,7 @@ static struct adc_struct adcdata[NUM_ADC_CHANNELS];
 
 static unsigned short adc_scan(struct adc_struct *adc)
 {
-    /* Disable interrupts during the I2C transaction */
-    int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
     unsigned short data = pcf50605_a2d_read(adc->channelnum);
-    set_irq_level(old_irq_level);
     /* This gives us a 13 bit value corresponding to 0-5.4 volts
      * The range of the value is 13FB-17FA */
     data = (data<<2)+0x13FB;

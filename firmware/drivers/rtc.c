@@ -36,27 +36,17 @@ void rtc_init(void)
 }
 int rtc_read_datetime(unsigned char* buf)
 {
-    int rc;
-    int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
-
-    rc = pcf50605_read_multiple(0x0a, buf, 7);
-
-    set_irq_level(old_irq_level);
-
-    return rc;
+    return pcf50605_read_multiple(0x0a, buf, 7);
 }
 
 
 int rtc_write_datetime(unsigned char* buf)
 {
     int i;
-    int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
 
     for (i=0;i<7;i++) {
         pcf50605_write(0x0a+i, buf[i]);
     }
-
-    set_irq_level(old_irq_level);
 
     return 1;
 }

@@ -86,8 +86,6 @@ void wm8758_write(int reg, int data)
  * Note, I'm using the WM8750 datasheet as its apparently close.
  */
 int wmcodec_init(void) {
-    int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
-
     /* normal outputs for CDI and I2S pin groups */
     outl(inl(0x70000020) & ~0x300, 0x70000020);
 
@@ -108,7 +106,6 @@ int wmcodec_init(void) {
     /* external dev clock to 24MHz */
     outl(inl(0x70000018) & ~0xc, 0x70000018);
 
-    set_irq_level(old_irq_level);
     return 0;
 }
 
@@ -117,8 +114,6 @@ void wmcodec_enable_output(bool enable)
 {
     if (enable) 
     {
-        int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
-
         /* reset the I2S controller into known state */
         i2s_reset();
 
@@ -142,7 +137,6 @@ void wmcodec_enable_output(bool enable)
         wm8758_write(LOUTMIX,0x1); /* Enable mixer */
         wm8758_write(ROUTMIX,0x1); /* Enable mixer */
         wmcodec_mute(0);
-        set_irq_level(old_irq_level);
     } else {
         wmcodec_mute(1);
     }
@@ -150,7 +144,6 @@ void wmcodec_enable_output(bool enable)
 
 int wmcodec_set_master_vol(int vol_l, int vol_r)
 {
-    int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
     /* OUT1 */
     wm8758_write(LOUT1VOL, vol_l);
     wm8758_write(ROUT1VOL, 0x100 | vol_r);
@@ -159,8 +152,6 @@ int wmcodec_set_master_vol(int vol_l, int vol_r)
     wm8758_write(LOUT2VOL, vol_l);
     wm8758_write(ROUT2VOL, 0x100 | vol_r);
     
-    set_irq_level(old_irq_level);
-
     return 0;
 }
 
@@ -204,8 +195,6 @@ void wmcodec_set_treble(int value)
 
 int wmcodec_mute(int mute)
 {
-    int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
-
     if (mute)
     {
         /* Set DACMU = 1 to soft-mute the audio DACs. */
@@ -215,16 +204,12 @@ int wmcodec_mute(int mute)
         wm8758_write(DACCTRL, 0x0);
     }
 
-    set_irq_level(old_irq_level);
-
     return 0;
 }
 
 /* Nice shutdown of WM8758 codec */
 void wmcodec_close(void)
 {
-    int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
-
     wmcodec_mute(1);
 
     wm8758_write(PWRMGMT3, 0x0);
@@ -232,8 +217,6 @@ void wmcodec_close(void)
     wm8758_write(PWRMGMT1, 0x0);
 
     wm8758_write(PWRMGMT2, 0x40);
-
-    set_irq_level(old_irq_level);
 }
 
 /* Change the order of the noise shaper, 5th order is recommended above 32kHz */
@@ -245,8 +228,6 @@ void wmcodec_set_nsorder(int order)
 /* Note: Disable output before calling this function */
 void wmcodec_set_sample_rate(int sampling_control)
 {
-    int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
-
     /**** We force 44.1KHz for now. ****/
     (void)sampling_control;
 
@@ -264,8 +245,6 @@ void wmcodec_set_sample_rate(int sampling_control)
 
     /* set srate */
     wm8758_write(SRATECTRL, (0 << 1));
-
-    set_irq_level(old_irq_level);
 }
 
 void wmcodec_enable_recording(bool source_mic)
