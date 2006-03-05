@@ -321,7 +321,7 @@ void adc_init(void)
 {
     struct adc_struct *adc_battery = &adcdata[ADC_BATTERY];
     adc_battery->channelnum = 0x3; /* ADCVIN1, subtractor */
-
+    adc_battery->last_read = current_tick;
     adc_scan(adc_battery);
 }
 

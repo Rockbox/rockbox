@@ -43,12 +43,11 @@ bool valid_time(const struct tm *tm)
         return true;
 }
 
-static int last_tick = 0;
-
 struct tm *get_time(void)
 {
 #ifndef SIMULATOR
 #ifdef CONFIG_RTC
+    static long last_tick = 0;
 
     /* Don't read the RTC more than 4 times per second */
     if (last_tick + HZ/4 < current_tick) {
