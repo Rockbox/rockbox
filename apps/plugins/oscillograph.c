@@ -84,6 +84,10 @@ PLUGIN_HEADER
 
 #endif
 
+#if SIMULATOR && (CONFIG_CODEC != SWCODEC)
+#define mas_codec_readreg(x) rand()%MAX_PEAK
+#endif
+
 /* global api struct pointer */
 static struct plugin_api* rb;
 /* number of ticks between two volume samples */
