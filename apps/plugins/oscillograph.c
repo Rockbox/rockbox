@@ -19,7 +19,6 @@
 #include "plugin.h"
 
 #ifdef HAVE_LCD_BITMAP
-#ifndef SIMULATOR /* don't want this code in the simulator */
 
 PLUGIN_HEADER
 
@@ -89,8 +88,10 @@ PLUGIN_HEADER
 static struct plugin_api* rb;
 /* number of ticks between two volume samples */
 static int  speed = 1;
+#ifndef SIMULATOR
 /* roll == true -> lcd rolls */
 static bool roll = true;
+#endif
 /* see DRAW_MODE_XXX constants for valid values */
 static int  drawMode = DRAW_MODE_FILLED;
 
@@ -100,9 +101,11 @@ static int  drawMode = DRAW_MODE_FILLED;
 void cleanup(void *parameter)
 {
     (void)parameter;
+#ifndef SIMULATOR
     /* restore to default roll position.
        Looks funny if you forget to do this... */
     rb->lcd_roll(0);
+#endif
     rb->lcd_update();
 }
 
@@ -188,10 +191,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         if (y >=  LCD_HEIGHT)
             y = 0;
 
+#ifndef SIMULATOR
         /* I roll before update because otherwise the new
            line would appear at the wrong end of the display */
         if (roll)
             rb->lcd_roll(y);
+#endif
 
         /* now finally make the new sample visible */
         rb->lcd_update_rect(0, MAX(y-1, 0), LCD_WIDTH, 2);
@@ -234,16 +239,19 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                     break;
 #endif
 
+#ifndef SIMULATOR
                 case OSCILLOGRAPH_ROLL:
                     /* toggle rolling */
                     roll = !roll;
                     break;
-
+#endif
+                    
                 case OSCILLOGRAPH_MODE:
                     /* step through the display modes */
                     drawMode ++;
                     drawMode = drawMode % DRAW_MODE_COUNT;
 
+#ifndef SIMULATOR
                     /* lcd buffer might be rolled so that
                        the transition from LCD_HEIGHT to 0 
                        takes place in the middle of the screen.
@@ -251,8 +259,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                        mode. If rolling is enabled this change will
                        be reverted before the next update anyway.*/
                     rb->lcd_roll(0);
+#endif
                     break;
-
+            
                 case OSCILLOGRAPH_SPEED_RESET:
                     speed = 1;
                     draw = true;
@@ -284,5 +293,4 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     return PLUGIN_OK;
 }
 
-#endif /* #ifndef SIMULATOR */
 #endif
