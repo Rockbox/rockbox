@@ -1238,6 +1238,7 @@ static bool get_musepack_metadata(int fd, struct mp3entry *id3)
         return false;
     }
 
+    id3->vbr = true;
     /* Estimate bitrate, we should probably subtract the various header sizes
        here for super-accurate results */
     id3->length = samples/id3->frequency*1000;
