@@ -365,8 +365,10 @@ struct plugin_api {
 #if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
     unsigned long (*mpeg_get_last_header)(void);
 #endif
-
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) || \
+    (CONFIG_CODEC == SWCODEC)
     void (*sound_set_pitch)(int pitch);        
+#endif
 
     /* MAS communication */
 #if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
