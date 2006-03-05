@@ -38,6 +38,7 @@
 #include "misc.h"
 #include "action.h"
 #include "debug.h"
+#include "backlight.h"
 
 #include "lang.h"
 
