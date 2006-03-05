@@ -52,6 +52,7 @@
 #include "misc.h"
 #if (HWCODEC == SWCODEC)
 #include "pcm_playback.h"
+#include "dsp.h"
 #endif
 #include "settings.h"
 #include "timer.h"
@@ -98,12 +99,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 9
+#define PLUGIN_API_VERSION 10
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 7
+#define PLUGIN_MIN_API_VERSION 8
 
 /* plugin return codes */
 enum plugin_status {
@@ -167,7 +168,7 @@ struct plugin_api {
     void (*lcd_bitmap_transparent_part)(const fb_data *src,
             int src_x, int src_y, int stride,
             int x, int y, int width, int height);
-  	void (*lcd_bitmap_transparent)(const fb_data *src, int x, int y,
+    void (*lcd_bitmap_transparent)(const fb_data *src, int x, int y,
             int width, int height);
 #endif
     void (*lcd_putsxy)(int x, int y, const unsigned char *string);
@@ -364,9 +365,8 @@ struct plugin_api {
 #if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
     unsigned long (*mpeg_get_last_header)(void);
 #endif
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+
     void (*sound_set_pitch)(int pitch);        
-#endif
 
     /* MAS communication */
 #if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
@@ -418,7 +418,7 @@ struct plugin_api {
     bool (*charger_inserted)(void);
 # ifdef HAVE_CHARGE_STATE
     bool (*charging_state)(void);
-# endif    
+# endif
 #endif
 #ifdef HAVE_USB_POWER
     bool (*usb_powered)(void);
@@ -465,15 +465,19 @@ struct plugin_api {
 #endif
     int (*show_logo)(void);
 
-    /* new stuff at the end, sort into place next time
-       the API gets incompatible */     
-
     struct tree_context* (*tree_get_context)(void);
 #if defined(SIMULATOR) && defined(HAVE_LCD_BITMAP) && LCD_DEPTH < 8
     void (*sim_lcd_ex_init)(int shades, unsigned long (*getpixel)(int, int));
     void (*sim_lcd_ex_update_rect)(int x, int y, int width, int height);
 #endif
     
+#if (CONFIG_CODEC == SWCODEC)
+    void (*pcm_calculate_peaks)(int *left, int *right);
+#endif
+
+    /* new stuff at the end, sort into place next time
+       the API gets incompatible */     
+
 };
 
 /* plugin header */

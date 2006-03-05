@@ -17,7 +17,7 @@
  **************************************************************************/
 #include "plugin.h"
 
-#if defined(HAVE_LCD_BITMAP) && (CONFIG_CODEC != SWCODEC)
+#if defined(HAVE_LCD_BITMAP)
 
 PLUGIN_HEADER
 
@@ -28,6 +28,10 @@ PLUGIN_HEADER
 #define VUMETER_MENU BUTTON_F1
 #define VUMETER_MENU_EXIT BUTTON_F1
 #define VUMETER_MENU_EXIT2 BUTTON_OFF
+#define VUMETER_LEFT BUTTON_LEFT
+#define VUMETER_RIGHT BUTTON_RIGHT
+#define VUMETER_UP BUTTON_UP
+#define VUMETER_DOWN BUTTON_DOWN
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define VUMETER_QUIT BUTTON_OFF
@@ -37,12 +41,62 @@ PLUGIN_HEADER
 #define VUMETER_MENU (BUTTON_MENU | BUTTON_REPEAT)
 #define VUMETER_MENU_EXIT BUTTON_MENU
 #define VUMETER_MENU_EXIT2 BUTTON_OFF
+#define VUMETER_LEFT BUTTON_LEFT
+#define VUMETER_RIGHT BUTTON_RIGHT
+#define VUMETER_UP BUTTON_UP
+#define VUMETER_DOWN BUTTON_DOWN
+
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+      (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define VUMETER_QUIT BUTTON_OFF
+#define VUMETER_HELP BUTTON_ON
+#define VUMETER_MENU BUTTON_SELECT
+#define VUMETER_MENU_EXIT BUTTON_SELECT
+#define VUMETER_MENU_EXIT2 BUTTON_OFF
+#define VUMETER_LEFT BUTTON_LEFT
+#define VUMETER_RIGHT BUTTON_RIGHT
+#define VUMETER_UP BUTTON_UP
+#define VUMETER_DOWN BUTTON_DOWN
+
+#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define VUMETER_QUIT BUTTON_MENU
+#define VUMETER_HELP BUTTON_PLAY
+#define VUMETER_MENU BUTTON_SELECT
+#define VUMETER_MENU_EXIT BUTTON_SELECT
+#define VUMETER_MENU_EXIT2 BUTTON_MENU
+#define VUMETER_LEFT BUTTON_LEFT
+#define VUMETER_RIGHT BUTTON_RIGHT
+#define VUMETER_UP BUTTON_SCROLL_FWD
+#define VUMETER_DOWN BUTTON_SCROLL_BACK
+
+#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
+#define VUMETER_QUIT BUTTON_POWER
+#define VUMETER_HELP BUTTON_A
+#define VUMETER_MENU BUTTON_SELECT
+#define VUMETER_MENU_EXIT BUTTON_SELECT
+#define VUMETER_MENU_EXIT2 BUTTON_POWER
+#define VUMETER_LEFT BUTTON_LEFT
+#define VUMETER_RIGHT BUTTON_RIGHT
+#define VUMETER_UP BUTTON_UP
+#define VUMETER_DOWN BUTTON_DOWN
+
+#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+#define VUMETER_QUIT BUTTON_POWER
+#define VUMETER_HELP BUTTON_PLAY
+#define VUMETER_MENU BUTTON_SELECT
+#define VUMETER_MENU_EXIT BUTTON_SELECT
+#define VUMETER_MENU_EXIT2 BUTTON_POWER
+#define VUMETER_LEFT BUTTON_LEFT
+#define VUMETER_RIGHT BUTTON_RIGHT
+#define VUMETER_UP BUTTON_UP
+#define VUMETER_DOWN BUTTON_DOWN
 
 #endif
 
 const struct plugin_api* rb;
 
-#ifdef SIMULATOR
+#if SIMULATOR && (CONFIG_CODEC != SWCODEC)
 #define mas_codec_readreg(x) rand()%MAX_PEAK
 #endif
 
@@ -229,7 +283,7 @@ void change_settings(void)
                 quit = true;
                 break;
 
-            case BUTTON_LEFT:
+            case VUMETER_LEFT:
                 if(selected_setting==0)
                     settings.meter_type == DIGITAL ? settings.meter_type = ANALOG : settings.meter_type++;
                 if(settings.meter_type==ANALOG) {
@@ -250,7 +304,7 @@ void change_settings(void)
                 }
                 break;
 
-            case BUTTON_RIGHT:
+            case VUMETER_RIGHT:
                 if(selected_setting==0)
                     settings.meter_type == DIGITAL ? settings.meter_type = ANALOG : settings.meter_type++;
                 if(settings.meter_type==ANALOG) {
@@ -271,11 +325,11 @@ void change_settings(void)
                 }
                 break;
 
-            case BUTTON_DOWN:
+            case VUMETER_UP:
                 selected_setting == 3 ? selected_setting=0 : selected_setting++;
                 break;
 
-            case BUTTON_UP:
+            case VUMETER_DOWN:
                 selected_setting == 0 ? selected_setting=3 : selected_setting--;
         }
     }
@@ -334,14 +388,22 @@ void draw_digital_minimeters(void) {
 }
 
 void analog_meter(void) {
-    if(settings.analog_use_db_scale) {
-        left_needle_top_x = analog_db_scale[rb->mas_codec_readreg(0xC)*56/MAX_PEAK];
-        right_needle_top_x = analog_db_scale[rb->mas_codec_readreg(0xD)*56/MAX_PEAK]+56;
-    }
 
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+    int left_peak = rb->mas_codec_readreg(0xC);
+    int right_peak = rb->mas_codec_readreg(0xD);
+#elif (CONFIG_CODEC == SWCODEC)
+    int left_peak, right_peak;
+    rb->pcm_calculate_peaks(&left_peak, &right_peak);
+#endif
+
+    if(settings.analog_use_db_scale) {
+        left_needle_top_x = analog_db_scale[left_peak * 56 / MAX_PEAK];
+        right_needle_top_x = analog_db_scale[right_peak * 56 / MAX_PEAK] + 56;
+    }
     else {
-        left_needle_top_x = rb->mas_codec_readreg(0xC) * 56 / MAX_PEAK;
-        right_needle_top_x = (rb->mas_codec_readreg(0xD) * 56 / MAX_PEAK)+56;
+        left_needle_top_x = left_peak * 56 / MAX_PEAK;
+        right_needle_top_x = right_peak * 56 / MAX_PEAK + 56;
     }
 
     /* Makes a decay on the needle */
@@ -382,13 +444,21 @@ void analog_meter(void) {
 }
 
 void digital_meter(void) {
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+    int left_peak = rb->mas_codec_readreg(0xC);
+    int right_peak = rb->mas_codec_readreg(0xD);
+#elif (CONFIG_CODEC == SWCODEC)
+    int left_peak, right_peak;
+    rb->pcm_calculate_peaks(&left_peak, &right_peak);
+#endif
+
     if(settings.digital_use_db_scale) {
-        num_left_leds = digital_db_scale[rb->mas_codec_readreg(0xC) * 44 / MAX_PEAK];
-        num_right_leds = digital_db_scale[rb->mas_codec_readreg(0xD) * 44 / MAX_PEAK];
+        num_left_leds = digital_db_scale[left_peak * 44 / MAX_PEAK];
+        num_right_leds = digital_db_scale[right_peak * 44 / MAX_PEAK];
     }
     else {
-        num_left_leds = rb->mas_codec_readreg(0xC) * 11 / MAX_PEAK;
-        num_right_leds = rb->mas_codec_readreg(0xD) * 11 / MAX_PEAK;
+        num_left_leds = left_peak * 11 / MAX_PEAK;
+        num_right_leds = right_peak * 11 / MAX_PEAK;
     }
 
     num_left_leds = (num_left_leds+last_num_left_leds*settings.digital_decay)/(settings.digital_decay+1);
@@ -481,13 +551,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
                 change_settings();
                 break;
 
-            case BUTTON_UP:
-            case BUTTON_UP | BUTTON_REPEAT:
+            case VUMETER_UP:
+            case VUMETER_UP | BUTTON_REPEAT:
                 change_volume(1);
                 break;
 
-            case BUTTON_DOWN:
-            case BUTTON_DOWN | BUTTON_REPEAT:
+            case VUMETER_DOWN:
+            case VUMETER_DOWN | BUTTON_REPEAT:
                 change_volume(-1);
                 break;
 

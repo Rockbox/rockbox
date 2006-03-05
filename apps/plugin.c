@@ -52,6 +52,7 @@
 #include "splash.h"
 #if (CONFIG_CODEC == SWCODEC)
 #include "pcm_playback.h"
+#include "dsp.h"
 #endif
 
 #ifdef HAVE_CHARGING
@@ -310,9 +311,8 @@ static const struct plugin_api rockbox_api = {
 #if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
     mpeg_get_last_header,
 #endif
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+
     sound_set_pitch,
-#endif
 
 #if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
     /* MAS communication */
@@ -406,6 +406,10 @@ static const struct plugin_api rockbox_api = {
 #if defined(SIMULATOR) && defined(HAVE_LCD_BITMAP) && LCD_DEPTH < 8
     sim_lcd_ex_init,
     sim_lcd_ex_update_rect,
+#endif
+
+#if (CONFIG_CODEC == SWCODEC)
+    pcm_calculate_peaks,
 #endif
 };
 
