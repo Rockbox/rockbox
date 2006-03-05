@@ -152,7 +152,6 @@ static struct mutex i2c_mutex;
 
 int i2c_readbyte(unsigned int dev_addr, int addr)
 {
-    int retval;
     int data;
 
     mutex_lock(&i2c_mutex);
