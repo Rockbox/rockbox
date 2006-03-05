@@ -59,9 +59,9 @@
 #define CONFIG_I2C I2C_PP5020
 
 /* Type of mobile power */
-//#define CONFIG_BATTERY BATT_LIPOL1300
+#define CONFIG_BATTERY BATT_LIPOL1300
 
-#define BATTERY_SCALE_FACTOR 16665 /* FIX: this value is picked at random */
+#define BATTERY_SCALE_FACTOR 586 /* FIX: this value is picked at random */
 
 /* Define this if the platform can charge batteries */
 //#define HAVE_CHARGING 1

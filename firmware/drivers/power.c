@@ -123,6 +123,9 @@ bool charger_inserted(void)
     return (adc_read(ADC_CHARGE_REGULATOR) < 0x1FF);
 #elif defined(TOSHIBA_GIGABEAT_F)
     return false;
+#elif defined(IPOD_ARCH)
+    /* We need to get this value a faster way than i2c */
+    return false;
 #else
     /* Player */
     return (PADR & 1) == 0;

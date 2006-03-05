@@ -300,6 +300,11 @@ void charging_display_info(bool animate)
    2 if Off/Stop key was pressed
    3 if On key was pressed
    4 if USB was connected */
+#if (CONFIG_KEYPAD==IPOD_3G_PAD) || (CONFIG_KEYPAD==IPOD_4G_PAD)
+# define CHARGE_SCREEN_RESUME BUTTON_SELECT
+#else
+# define CHARGE_SCREEN_RESUME BUTTON_ON
+#endif
 int charging_screen(void)
 {
     unsigned int button;
@@ -325,7 +330,7 @@ int charging_screen(void)
         gui_syncstatusbar_draw(&statusbars, false);
         charging_display_info(true);
         button = button_get_w_tmo(HZ/3);
-        if (button == BUTTON_ON)
+        if (button == CHARGE_SCREEN_RESUME)
             rc = 2;
         else if (usb_detect())
             rc = 3;

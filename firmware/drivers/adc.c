@@ -22,6 +22,7 @@
 #include "kernel.h"
 #include "thread.h"
 #include "adc.h"
+#include "pcf50605.h"
 #include "pcf50606.h"
 
 #if CONFIG_CPU == SH7034
@@ -119,7 +120,7 @@ static int channelnum[] =
     2,   /* ADC_REMOTEDETECT (ADCIN1, resistive divider) */
 };
 
-unsigned char adc_scan(int channel)
+unsigned short adc_scan(int channel)
 {
     unsigned char data;
     
@@ -143,7 +144,7 @@ unsigned char adc_scan(int channel)
 /* delay loop */
 #define DELAY   do { int _x; for(_x=0;_x<10;_x++);} while (0)
 
-unsigned char adc_scan(int channel)
+unsigned short adc_scan(int channel)
 {
     unsigned char data = 0;
     int i;
@@ -220,8 +221,7 @@ static void adc_tick(void)
 
 void adc_init(void)
 {
-#ifdef IRIVER_H300_SERIES
-#else
+#ifndef IRIVER_H300_SERIES
     or_l(0x80600080, &GPIO_FUNCTION); /* GPIO7:  CS
                                          GPIO21: Data In (to the ADC)
                                          GPIO22: CLK
@@ -284,17 +284,45 @@ void adc_init(void)
 
 #elif CONFIG_CPU == PP5020 || (CONFIG_CPU == PP5002)
 
-/* TODO: Implement adc.c */
+struct adc_struct {
+    long last_read;
+    int channelnum;
+    unsigned short data;
+};
+
+static struct adc_struct adcdata[NUM_ADC_CHANNELS];
+
+static unsigned short adc_scan(struct adc_struct *adc)
+{
+    /* Disable interrupts during the I2C transaction */
+    int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
+    unsigned short data = pcf50605_a2d_read(adc->channelnum);
+    set_irq_level(old_irq_level);
+    /* This gives us a 13 bit value corresponding to 0-5.4 volts
+     * The range of the value is 13FB-17FA */
+    data = (data<<2)+0x13FB;
+    adc->data = data;
+
+    return data;
+}
 
 unsigned short adc_read(int channel)
 {
-    (void)channel;
-    return 0;
+    struct adc_struct *adc = &adcdata[channel];
+    if (adc->last_read + HZ < current_tick) {
+        adc->last_read = current_tick;
+        return adc_scan(adc);
+    } else {
+        return adcdata[channel].data;
+    }
 }
 
 void adc_init(void)
 {
+    struct adc_struct *adc_battery = &adcdata[ADC_BATTERY];
+    adc_battery->channelnum = 0x3; /* ADCVIN1, subtractor */
 
+    adc_scan(adc_battery);
 }
 
 #elif CONFIG_CPU == PNX0101

@@ -57,7 +57,6 @@ static int ipod_i2c_wait_not_busy(void)
          if (!(inb(IPOD_I2C_STATUS) & IPOD_I2C_BUSY)) {
             return 0;
          }
-         yield();
     }
 
     return -1;

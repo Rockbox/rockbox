@@ -134,7 +134,7 @@ drivers/pcf50606.c
 #ifdef IPOD_ARCH
 drivers/pcf50605.c
 #endif
-#if (CONFIG_RTC == RTC_M41ST84W) || (CONFIG_RTC == RTC_PCF50606)
+#if (CONFIG_RTC == RTC_M41ST84W) || (CONFIG_RTC == RTC_PCF50606) || (CONFIG_RTC == RTC_PCF50605)
 drivers/rtc.c
 #endif
 drivers/serial.c

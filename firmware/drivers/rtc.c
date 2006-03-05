@@ -23,24 +23,62 @@
 #include "kernel.h"
 #include "system.h"
 #include "pcf50606.h"
+#include "pcf50605.h"
 #include <stdbool.h> 
 
 #define RTC_ADR 0xd0
 #define	RTC_DEV_WRITE   (RTC_ADR | 0x00)
 #define	RTC_DEV_READ    (RTC_ADR | 0x01)
 
-#if CONFIG_RTC == RTC_PCF50606
+#if CONFIG_RTC == RTC_PCF50605
 void rtc_init(void)
 {
 }
+int rtc_read_datetime(unsigned char* buf)
+{
+    int rc;
+    int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
+
+    rc = pcf50605_read_multiple(0x0a, buf, 7);
+
+    set_irq_level(old_irq_level);
+
+    return rc;
+}
+
+
+int rtc_write_datetime(unsigned char* buf)
+{
+    int i;
+    int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
+
+    for (i=0;i<7;i++) {
+        pcf50605_write(0x0a+i, buf[i]);
+    }
+
+    set_irq_level(old_irq_level);
+
+    return 1;
+}
+#elif CONFIG_RTC == RTC_PCF50606
+static int last_tick;
+static char rtc_buf[7];
+void rtc_init(void)
+{
+    last_tick = 0;
+}
+
 int rtc_read_datetime(unsigned char* buf) {
     int rc;
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-    
-    rc = pcf50606_read_multiple(0x0a, buf, 7);
-
-    set_irq_level(oldlevel);
-
+    if (last_tick + HZ/2 < current_tick) {
+        int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+        last_tick = current_tick;
+        rc  = pcf50606_read_multiple(0x0a, rtc_buf, 7);
+        set_irq_level(oldlevel);
+    } else {
+        rc = 7;
+    }
+    memcpy(buf, rtc_buf, 7);
     return rc;
 }
 

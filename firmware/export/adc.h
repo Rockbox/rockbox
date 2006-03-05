@@ -29,6 +29,12 @@
 #define ADC_BATTERY 2
 #define ADC_UNREG_POWER ADC_BATTERY /* For compatibility */
 
+#elif defined(IPOD_ARCH)
+#define NUM_ADC_CHANNELS 1
+
+#define ADC_BATTERY 0
+#define ADC_UNREG_POWER ADC_BATTERY
+
 #elif defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
 #define NUM_ADC_CHANNELS 4
 
@@ -94,7 +100,7 @@ void adc_init(void);
 
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)\
  || defined(IAUDIO_X5)
-unsigned char adc_scan(int channel);
+unsigned short adc_scan(int channel);
 #endif
 
 #endif

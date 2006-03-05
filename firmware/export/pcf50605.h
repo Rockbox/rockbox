@@ -22,10 +22,11 @@
 
 #ifdef IPOD_ARCH
 int pcf50605_read(int address);
-void pcf50605_read_multiple(int address, unsigned char* buf, int count);
+int pcf50605_read_multiple(int address, unsigned char* buf, int count);
 int pcf50605_write(int address, unsigned char val);
 int pcf50605_write_multiple(int address, const unsigned char* buf, int count);
-int pcf50605_battery_read(void);
+int pcf50605_a2d_read(int channel);
+bool pcf50605_charger_inserted(void);
 void pcf50605_standby_mode(void);
 #endif
 
