@@ -101,5 +101,6 @@ close(VERSION);
 close(THIS);
 
 `tar -cf rockbox-$version.tar rockbox-$version`;
-`gzip -9 rockbox-$version.tar`;
-`rm -rf rockbox-$version`;
+`gzip -c9 rockbox-$version.tar > rockbox-$version.tar.gz`;
+`bzip2 -c9 rockbox-$version.tar > rockbox-$version.tar.bz2`;
+`rm -rf rockbox-$version rockbox-$version.tar`;
