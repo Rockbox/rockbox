@@ -52,6 +52,7 @@ struct tm *get_time(void)
     /* Don't read the RTC more than 4 times per second */
     if (last_tick + HZ/4 < current_tick) {
         char rtcbuf[7];
+        last_tick = current_tick;
         rtc_read_datetime(rtcbuf);
 
         tm.tm_sec = ((rtcbuf[0] & 0x70) >> 4) * 10 + (rtcbuf[0] & 0x0f);
