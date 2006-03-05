@@ -318,7 +318,7 @@ static bool clear_main_backdrop(void)
 {
     global_settings.backdrop_file[0]=0;
     lcd_set_backdrop(NULL);
-    return true;
+    return false;
 }
 
 /**
