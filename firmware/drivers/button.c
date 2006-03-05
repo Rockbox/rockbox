@@ -1028,16 +1028,21 @@ static int button_read(void)
 
     /* check F1..F3 and UP */
     data = adc_read(ADC_BUTTON_ROW1);
-
-    if (data >= LEVEL4)
-        btn |= BUTTON_F3;
-    else if (data >= LEVEL3)
-        btn |= BUTTON_UP;
-    else if (data >= LEVEL2)
-        btn |= BUTTON_F2;
-    else if (data >= LEVEL1)
-        btn |= BUTTON_F1;
-
+    
+    if (data >= LEVEL1)
+    {
+        if (data >= LEVEL3)
+            if (data >= LEVEL4)
+                btn |= BUTTON_F3;
+            else
+                btn |= BUTTON_UP;
+        else
+            if (data >= LEVEL2)
+                btn |= BUTTON_F2;
+            else
+                btn |= BUTTON_F1;
+    }
+    
     /* Some units have mushy keypads, so pressing UP also activates
        the Left/Right buttons. Let's combat that by skipping the AN5
        checks when UP is pressed. */
@@ -1046,14 +1051,19 @@ static int button_read(void)
         /* check DOWN, PLAY, LEFT, RIGHT */
         data = adc_read(ADC_BUTTON_ROW2);
 
-        if (data >= LEVEL4)
-            btn |= BUTTON_DOWN;
-        else if (data >= LEVEL3)
-            btn |= ROW2_BUTTON3;
-        else if (data >= LEVEL2)
-            btn |= BUTTON_LEFT;
-        else if (data >= LEVEL1)
-            btn |= ROW2_BUTTON1;
+        if (data >= LEVEL1)
+        {
+            if (data >= LEVEL3)
+                if (data >= LEVEL4)
+                    btn |= BUTTON_DOWN;
+                else
+                    btn |= ROW2_BUTTON3;
+            else
+                if (data >= LEVEL2)
+                    btn |= BUTTON_LEFT;
+                else
+                    btn |= ROW2_BUTTON1;
+        }
     }
 
 #elif CONFIG_KEYPAD == PLAYER_PAD
@@ -1085,14 +1095,19 @@ static int button_read(void)
     /* Check the 4 direction keys */
     data = adc_read(ADC_BUTTON_ROW1);
 
-    if (data >= LEVEL4)
-        btn |= BUTTON_LEFT;
-    else if (data >= LEVEL3)
-        btn |= BUTTON_RIGHT;
-    else if (data >= LEVEL2)
-        btn |= BUTTON_UP;
-    else if (data >= LEVEL1)
-        btn |= BUTTON_DOWN;
+    if (data >= LEVEL1)
+    {
+        if (data >= LEVEL3)
+            if (data >= LEVEL4)
+                btn |= BUTTON_LEFT;
+            else
+                btn |= BUTTON_RIGHT;
+        else
+            if (data >= LEVEL2)
+                btn |= BUTTON_UP;
+            else
+                btn |= BUTTON_DOWN;
+    }            
 
 #elif CONFIG_KEYPAD == GMINI100_PAD
 
