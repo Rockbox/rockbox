@@ -20,7 +20,6 @@
 
 #ifdef HAVE_LCD_BITMAP
 #ifndef SIMULATOR /* don't want this code in the simulator */
-#if CONFIG_CODEC != SWCODEC /* only for MAS-targets */
 
 PLUGIN_HEADER
 
@@ -48,6 +47,40 @@ PLUGIN_HEADER
 #define OSCILLOGRAPH_SPEED_DOWN BUTTON_DOWN
 #define OSCILLOGRAPH_ROLL BUTTON_RIGHT
 #define OSCILLOGRAPH_MODE BUTTON_MENU
+#define OSCILLOGRAPH_SPEED_RESET BUTTON_LEFT
+
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+      (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define OSCILLOGRAPH_QUIT BUTTON_OFF
+#define OSCILLOGRAPH_SPEED_UP BUTTON_UP
+#define OSCILLOGRAPH_SPEED_DOWN BUTTON_DOWN
+#define OSCILLOGRAPH_ROLL BUTTON_RIGHT
+#define OSCILLOGRAPH_MODE BUTTON_SELECT
+#define OSCILLOGRAPH_SPEED_RESET BUTTON_LEFT
+
+#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define OSCILLOGRAPH_QUIT BUTTON_MENU
+#define OSCILLOGRAPH_SPEED_UP BUTTON_SCROLL_FWD
+#define OSCILLOGRAPH_SPEED_DOWN BUTTON_SCROLL_BACK
+#define OSCILLOGRAPH_ROLL BUTTON_RIGHT
+#define OSCILLOGRAPH_MODE BUTTON_SELECT
+#define OSCILLOGRAPH_SPEED_RESET BUTTON_LEFT
+      
+#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
+#define OSCILLOGRAPH_QUIT BUTTON_POWER
+#define OSCILLOGRAPH_SPEED_UP BUTTON_UP
+#define OSCILLOGRAPH_SPEED_DOWN BUTTON_DOWN
+#define OSCILLOGRAPH_ROLL BUTTON_RIGHT
+#define OSCILLOGRAPH_MODE BUTTON_SELECT
+#define OSCILLOGRAPH_SPEED_RESET BUTTON_LEFT
+
+#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+#define OSCILLOGRAPH_QUIT BUTTON_POWER
+#define OSCILLOGRAPH_SPEED_UP BUTTON_UP
+#define OSCILLOGRAPH_SPEED_DOWN BUTTON_DOWN
+#define OSCILLOGRAPH_ROLL BUTTON_RIGHT
+#define OSCILLOGRAPH_MODE BUTTON_SELECT
 #define OSCILLOGRAPH_SPEED_RESET BUTTON_LEFT
 
 #endif
@@ -101,9 +134,16 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* the main loop */
     while (!exit) {
 
-        /* read the volume info from MAS */
-        left = rb->mas_codec_readreg(0xC) / (MAX_PEAK / (LCD_WIDTH / 2 - 2));
-        right = rb->mas_codec_readreg(0xD) / (MAX_PEAK / (LCD_WIDTH / 2 - 2));
+        /* read the volume info */
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+        left = rb->mas_codec_readreg(0xC);
+        right = rb->mas_codec_readreg(0xD);
+#elif (CONFIG_CODEC == SWCODEC)
+        rb->pcm_calculate_peaks(&left, &right);
+#endif
+        
+        left = left / (MAX_PEAK / (LCD_WIDTH / 2 - 2));
+        right = right / (MAX_PEAK / (LCD_WIDTH / 2 - 2));
 
         /* delete current line */
         rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
@@ -244,6 +284,5 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     return PLUGIN_OK;
 }
 
-#endif /* if using MAS */
 #endif /* #ifndef SIMULATOR */
 #endif
