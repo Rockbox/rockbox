@@ -285,6 +285,12 @@ boot_table:
     /* Set up stack for FIQ mode */ 
     msr    cpsr_c, #0xd1
     ldr    sp, =fiq_stack
+#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
+    /* We'll load the banked FIQ mode registers with useful values here.
+       These values will be used in the FIQ handler in pcm_playback.c */
+    ldr    r12, =0x70002800 /* IISCONFIG */
+    ldr    r11, =p
+#endif
     /* Let abort mode use IRQ stack */
     msr    cpsr_c, #0xd7
     ldr    sp, =irq_stack
