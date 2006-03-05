@@ -20,6 +20,7 @@
 #include <stdio.h> /* get NULL */
 #include "config.h"
 
+#include "kernel.h"
 #include "rtc.h"
 #include "timefuncs.h"
 #include "debug.h"
@@ -42,25 +43,29 @@ bool valid_time(const struct tm *tm)
         return true;
 }
 
+static int last_tick = 0;
 
 struct tm *get_time(void)
 {
 #ifndef SIMULATOR
 #ifdef CONFIG_RTC
-    char rtcbuf[7];
 
-    rtc_read_datetime(rtcbuf);
+    /* Don't read the RTC more than 4 times per second */
+    if (last_tick + HZ/4 < current_tick) {
+        char rtcbuf[7];
+        rtc_read_datetime(rtcbuf);
 
-    tm.tm_sec = ((rtcbuf[0] & 0x70) >> 4) * 10 + (rtcbuf[0] & 0x0f);
-    tm.tm_min = ((rtcbuf[1] & 0x70) >> 4) * 10 + (rtcbuf[1] & 0x0f);
-    tm.tm_hour = ((rtcbuf[2] & 0x30) >> 4) * 10 + (rtcbuf[2] & 0x0f);
-    tm.tm_wday = rtcbuf[3] & 0x07;
-    tm.tm_mday = ((rtcbuf[4] & 0x30) >> 4) * 10 + (rtcbuf[4] & 0x0f);
-    tm.tm_mon = ((rtcbuf[5] & 0x10) >> 4) * 10 + (rtcbuf[5] & 0x0f) - 1;
-    tm.tm_year = ((rtcbuf[6] & 0xf0) >> 4) * 10 + (rtcbuf[6] & 0x0f) + 100;
+        tm.tm_sec = ((rtcbuf[0] & 0x70) >> 4) * 10 + (rtcbuf[0] & 0x0f);
+        tm.tm_min = ((rtcbuf[1] & 0x70) >> 4) * 10 + (rtcbuf[1] & 0x0f);
+        tm.tm_hour = ((rtcbuf[2] & 0x30) >> 4) * 10 + (rtcbuf[2] & 0x0f);
+        tm.tm_wday = rtcbuf[3] & 0x07;
+        tm.tm_mday = ((rtcbuf[4] & 0x30) >> 4) * 10 + (rtcbuf[4] & 0x0f);
+        tm.tm_mon = ((rtcbuf[5] & 0x10) >> 4) * 10 + (rtcbuf[5] & 0x0f) - 1;
+        tm.tm_year = ((rtcbuf[6] & 0xf0) >> 4) * 10 + (rtcbuf[6] & 0x0f) + 100;
 
-    tm.tm_yday = 0; /* Not implemented for now */
-    tm.tm_isdst = -1; /* Not implemented for now */
+        tm.tm_yday = 0; /* Not implemented for now */
+        tm.tm_isdst = -1; /* Not implemented for now */
+    }
 #else
     tm.tm_sec = 0;
     tm.tm_min = 0;

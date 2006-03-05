@@ -61,24 +61,17 @@ int rtc_write_datetime(unsigned char* buf)
     return 1;
 }
 #elif CONFIG_RTC == RTC_PCF50606
-static int last_tick;
-static char rtc_buf[7];
 void rtc_init(void)
 {
-    last_tick = 0;
 }
 
 int rtc_read_datetime(unsigned char* buf) {
     int rc;
-    if (last_tick + HZ/2 < current_tick) {
-        int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-        last_tick = current_tick;
-        rc  = pcf50606_read_multiple(0x0a, rtc_buf, 7);
-        set_irq_level(oldlevel);
-    } else {
-        rc = 7;
-    }
-    memcpy(buf, rtc_buf, 7);
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    
+    rc = pcf50606_read_multiple(0x0a, buf, 7);
+
+    set_irq_level(oldlevel);
     return rc;
 }
 
