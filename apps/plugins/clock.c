@@ -86,6 +86,8 @@ Original release, featuring analog / digital modes and a few options.
 #include "plugin.h"
 #include "time.h"
 
+#if !(CONFIG_KEYPAD == IPOD_3G_PAD) /* let's not compile for 3g for now */
+
 PLUGIN_HEADER
 
 #define CLOCK_VERSION "v3.0"
@@ -2694,7 +2696,7 @@ void counter_settings(void)
                 else
                 {
                     if(cursorpos == 3)
-#if CONFIG_KEYPAD == RECORDER_PAD
+#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
                         if(target_hour < 9)
                             target_hour++;
                         else
@@ -2706,7 +2708,7 @@ void counter_settings(void)
                           target_hour = 9;
 #endif
                     else if(cursorpos == 4)
-#if CONFIG_KEYPAD == RECORDER_PAD
+#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
                         if(target_minute < 59)
                             target_minute++;
                         else
@@ -2718,7 +2720,7 @@ void counter_settings(void)
                           target_minute = 59;
 #endif
                     else
-#if CONFIG_KEYPAD == RECORDER_PAD
+#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
                         if(target_second < 59)
                             target_second++;
                         else
@@ -2742,19 +2744,19 @@ void counter_settings(void)
                 else
                 {
                     if(cursorpos == 3)
-#if CONFIG_KEYPAD == RECORDER_PAD
+#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
                         if(target_hour > 0)
                             target_hour--;
                         else
                             target_hour = 9;
-#elif CONFIG_KEYPAD == IPOD_4G_PAD
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
                         if(target_hour < 9)
                             target_hour++;
                         else
                           target_hour = 0;
 #endif
                     else if(cursorpos == 4)
-#if CONFIG_KEYPAD == RECORDER_PAD
+#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
                         if(target_minute > 0)
                             target_minute--;
                         else
@@ -2766,7 +2768,7 @@ void counter_settings(void)
                           target_minute = 0;
 #endif
                     else
-#if CONFIG_KEYPAD == RECORDER_PAD
+#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
                         if(target_second > 0)
                             target_second--;
                         else
@@ -3094,3 +3096,5 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         }
     }
 }
+
+#endif
