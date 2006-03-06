@@ -86,8 +86,6 @@ Original release, featuring analog / digital modes and a few options.
 #include "plugin.h"
 #include "time.h"
 
-#if !(CONFIG_KEYPAD == IPOD_3G_PAD) /* let's not compile for 3g for now */
-
 PLUGIN_HEADER
 
 #define CLOCK_VERSION "v3.0"
@@ -128,7 +126,7 @@ PLUGIN_HEADER
 #define MENU_BUTTON_TEXT "PLAY"
 #define COUNTER_BUTTON_TEXT "ON"
 
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
 
 #define COUNTER_TOGGLE_BUTTON (BUTTON_PLAY|BUTTON_REL)
 #define COUNTER_RESET_BUTTON (BUTTON_PLAY|BUTTON_REPEAT)
@@ -2701,7 +2699,7 @@ void counter_settings(void)
                             target_hour++;
                         else
                             target_hour = 0;
-#elif CONFIG_KEYPAD == IPOD_4G_PAD
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
                         if(target_hour > 0)
                             target_hour--;
                         else
@@ -2713,7 +2711,7 @@ void counter_settings(void)
                             target_minute++;
                         else
                           target_minute = 0;
-#elif CONFIG_KEYPAD == IPOD_4G_PAD
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
                         if(target_minute > 0)
                             target_minute--;
                         else
@@ -2725,7 +2723,7 @@ void counter_settings(void)
                             target_second++;
                         else
                           target_second = 0;
-#elif CONFIG_KEYPAD == IPOD_4G_PAD
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
                         if(target_second > 0)
                             target_second--;
                         else
@@ -2749,7 +2747,7 @@ void counter_settings(void)
                             target_hour--;
                         else
                             target_hour = 9;
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
                         if(target_hour < 9)
                             target_hour++;
                         else
@@ -2761,7 +2759,7 @@ void counter_settings(void)
                             target_minute--;
                         else
                           target_minute = 59;
-#elif CONFIG_KEYPAD == IPOD_4G_PAD
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
                         if(target_minute < 59)
                             target_minute++;
                         else
@@ -2773,7 +2771,7 @@ void counter_settings(void)
                             target_second--;
                         else
                           target_second = 59;
-#elif CONFIG_KEYPAD == IPOD_4G_PAD
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
                         if(target_second < 59)
                             target_second++;
                         else
@@ -3096,5 +3094,3 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         }
     }
 }
-
-#endif
