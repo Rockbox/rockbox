@@ -4,4 +4,6 @@ shndec.c
 tables.c
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
 coldfire.S
+#elif defined(CPU_ARM) && !defined(SIMULATOR)
+arm.S
 #endif
