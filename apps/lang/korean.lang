@@ -53,7 +53,7 @@ id: LANG_ROCKBOX_INFO
 desc: displayed topmost on the info screen
 eng: "Rockbox Info:"
 voice: ""
-new: "Rockbox 정보"
+new: "시스템 정보"
 
 id: LANG_BUFFER_STAT_PLAYER
 desc: the buffer size player-screen width, %d MB %d fraction of MB
@@ -971,7 +971,7 @@ id: LANG_RECORDING_CHANNELS
 desc: in the recording settings
 eng: "Channels"
 voice: "Channels"
-new: "채널"
+new: "채널 선택"
 
 id: LANG_RECORDING_SRC_MIC
 desc: in the recording settings
@@ -1343,7 +1343,7 @@ id: LANG_RECORDING_EDITABLE
 desc: Editable recordings setting
 eng: "Independent frames"
 voice: "Independent frames"
-new: "독립된 프레임"
+new: "독립된 프레임 사용"
 
 id: LANG_STATUS_BAR
 desc: display menu, F3 substitute
@@ -1427,7 +1427,7 @@ id: LANG_RECORD_TIMESPLIT
 desc: Prompt for record timer interval setting, in the record settings menu
 eng: "Time Split"
 voice: "Time Split"
-new: "시간 제한하기"
+new: "시간 제한 설정"
 
 id: LANG_RECORD_TIMESPLIT_REC
 desc: Display of record timer interval setting, on the record screen
@@ -1479,13 +1479,13 @@ id: LANG_PLUGIN_WRONG_MODEL
 desc: The plugin is not compatible with the archos model trying to run it
 eng: "Incompatible model"
 voice: ""
-new: "지원하지 않는 모델입니다."
+new: "이 모델은 지원하지 않습니다."
 
 id: LANG_PLUGIN_WRONG_VERSION
 desc: The plugin is not compatible with the rockbox version trying to run it
 eng: "Incompatible version"
 voice: ""
-new: "지원하지 않는 버전입니다."
+new: "이 버전은 지원하지 않습니다."
 
 id: LANG_PLUGIN_ERROR
 desc: The plugin return an error code
@@ -1771,7 +1771,7 @@ id: LANG_RECORD_PRERECORD_TIME
 desc: in recording settings_menu
 eng: "Prerecord time"
 voice: "Pre-Record time"
-new: "Prerecord time"
+new: "예약 녹음 시간 설정"
 
 #Auto bookmark prompts
 id: LANG_BOOKMARK_AUTOLOAD_QUERY
@@ -1928,7 +1928,7 @@ id: LANG_RECORDING_MENU
 desc: in the recording sub menu
 eng: "Recording screen"
 voice: "Recording screen"
-new: "녹음하기"
+new: "녹음 하기"
 
 id: LANG_WIND_MENU
 desc: in the playback sub menu
@@ -1983,7 +1983,7 @@ id: LANG_RECORD_DIRECTORY
 desc: in recording settings_menu
 eng: "Directory"
 voice: "Directory"
-new: "폴더"
+new: "폴더 선택"
 
 id: LANG_RECORD_CURRENT_DIR
 desc: in recording directory options
@@ -3729,7 +3729,7 @@ id: LANG_CLIP_LIGHT
 desc: in record settings menu.
 eng: "Clipping light"
 voice: "Clipping light"
-new: "볼륨 레벨 조정시 조명 켜기"
+new: "볼륨 조정시 조명 켜기"
 
 id: LANG_MAIN_UNIT
 desc: in record settings menu.
@@ -3778,3 +3778,21 @@ desc: menu
 eng: "Reset Colours"
 voice:
 new: "색상 초기화"
+
+id: LANG_COLOR_UNACCEPTABLE
+desc: splash when user selects an invalid colour
+eng: "Invalid colour"
+voice: ""
+new: "배경색과 글자색이 동일합니다!"
+
+id: LANG_SEARCH_IN_PLAYLIST
+desc: in playlist menu.
+eng: "Search In Playlist"
+voice:
+new:"재생목록에서 노래 검색"
+
+id: LANG_PLAYLIST_SEARCH_MSG
+desc: splash number of tracks inserted
+eng: "Searching... %d found (%s)"
+voice: ""
+new: "검색중... 현재 %d개를 찾았습니다. (%s)"
