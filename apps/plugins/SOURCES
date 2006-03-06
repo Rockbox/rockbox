@@ -74,7 +74,7 @@ calendar.c
 #endif
 #endif /* CONFIG_RTC */
 
-#if (MEM <= 8) && !defined(SIMULATOR) /* loaders, only needed for Archos */
+#if (MEMORYSIZE <= 8) && !defined(SIMULATOR) /* loaders, only needed for Archos */
 chessbox.c
 #if CONFIG_KEYPAD == RECORDER_PAD
 rockboy.c
