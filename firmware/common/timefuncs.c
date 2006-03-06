@@ -46,13 +46,13 @@ bool valid_time(const struct tm *tm)
 struct tm *get_time(void)
 {
 #ifndef SIMULATOR
-#ifdef CONFIG_RTC
     static long last_tick = 0;
 
     /* Don't read the RTC more than 4 times per second */
-    if (last_tick + HZ/4 < current_tick) {
+    if (last_tick + HZ < current_tick) {
+#ifdef CONFIG_RTC
         char rtcbuf[7];
-        last_tick = current_tick;
+        last_tick = HZ * (current_tick / HZ);
         rtc_read_datetime(rtcbuf);
 
         tm.tm_sec = ((rtcbuf[0] & 0x70) >> 4) * 10 + (rtcbuf[0] & 0x0f);
@@ -65,18 +65,18 @@ struct tm *get_time(void)
 
         tm.tm_yday = 0; /* Not implemented for now */
         tm.tm_isdst = -1; /* Not implemented for now */
-    }
 #else
-    tm.tm_sec = 0;
-    tm.tm_min = 0;
-    tm.tm_hour = 0;
-    tm.tm_mday = 1;
-    tm.tm_mon = 0;
-    tm.tm_year = 70;
-    tm.tm_wday = 1;
-    tm.tm_yday = 0; /* Not implemented for now */
-    tm.tm_isdst = -1; /* Not implemented for now */
+        tm.tm_sec = 0;
+        tm.tm_min = 0;
+        tm.tm_hour = 0;
+        tm.tm_mday = 1;
+        tm.tm_mon = 0;
+        tm.tm_year = 70;
+        tm.tm_wday = 1;
+        tm.tm_yday = 0; /* Not implemented for now */
+        tm.tm_isdst = -1; /* Not implemented for now */
 #endif
+    }
     return &tm;
 #else
     time_t now = time(NULL);
