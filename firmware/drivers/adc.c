@@ -21,6 +21,7 @@
 #include "system.h"
 #include "kernel.h"
 #include "thread.h"
+#include "string.h"
 #include "adc.h"
 #include "pcf50605.h"
 #include "pcf50606.h"
@@ -286,31 +287,44 @@ void adc_init(void)
 
 struct adc_struct {
     long last_read;
-    int channelnum;
+    unsigned short (*conversion)(unsigned short data);
+    short channelnum;
     unsigned short data;
 };
 
-static struct adc_struct adcdata[NUM_ADC_CHANNELS];
+static struct adc_struct adcdata[NUM_ADC_CHANNELS] IDATA_ATTR;
 
-static unsigned short adc_scan(struct adc_struct *adc)
+/* This takes 10 bit ADC data from the subtractor circuit and scales it to
+ * a 13 bit value corresponding to 0-5.4v, the resulting range is 13FB-17FA,
+ * representing 3.1-5.4v */
+static unsigned short ten_bit_subtractor(unsigned short data) {
+    return (data<<2)+0x13FB;
+}
+
+static unsigned short _adc_scan(struct adc_struct *adc)
 {
     unsigned short data = pcf50605_a2d_read(adc->channelnum);
-    /* This gives us a 13 bit value corresponding to 0-5.4 volts
-     * The range of the value is 13FB-17FA */
-    data = (data<<2)+0x13FB;
+    if (adc->conversion) {
+        data = adc->conversion(data);
+    }
     adc->data = data;
-
     return data;
 }
 
+/* Force an ADC scan _now_ */
+unsigned short adc_scan(int channel) {
+    return _adc_scan(&adcdata[channel]);
+}
+
+/* Retrieve the ADC value, only does a scan once per second or less */
 unsigned short adc_read(int channel)
 {
     struct adc_struct *adc = &adcdata[channel];
     if (adc->last_read + HZ < current_tick) {
         adc->last_read = current_tick;
-        return adc_scan(adc);
+        return _adc_scan(adc);
     } else {
-        return adcdata[channel].data;
+        return adc->data;
     }
 }
 
@@ -318,8 +332,9 @@ void adc_init(void)
 {
     struct adc_struct *adc_battery = &adcdata[ADC_BATTERY];
     adc_battery->channelnum = 0x3; /* ADCVIN1, subtractor */
+    adc_battery->conversion = ten_bit_subtractor;
     adc_battery->last_read = current_tick;
-    adc_scan(adc_battery);
+    _adc_scan(adc_battery);
 }
 
 #elif CONFIG_CPU == PNX0101
