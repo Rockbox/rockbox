@@ -24,7 +24,7 @@
 #include "adc.h"
 #include "pcf50606.h"
 
-static unsigned char adcdata[NUM_ADC_CHANNELS];
+static unsigned short adcdata[NUM_ADC_CHANNELS];
 
 static int channelnum[] =
 {
@@ -33,7 +33,7 @@ static int channelnum[] =
     0,   /* ADC_BATTERY (BATVOLT, resistive divider) */
 };
 
-unsigned char adc_scan(int channel)
+unsigned short adc_scan(int channel)
 {
     unsigned char data;
     
