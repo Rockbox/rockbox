@@ -304,6 +304,8 @@ bool radio_screen(void)
 #endif
     bool keep_playing = false;
     bool statusbar = global_settings.statusbar;
+    int mute_timeout = current_tick;
+    int button_timeout = current_tick + (2*HZ);
 #ifdef HAS_BUTTONBAR
     struct gui_buttonbar buttonbar;
     gui_buttonbar_init(&buttonbar);
@@ -378,6 +380,14 @@ bool radio_screen(void)
         radio_set(RADIO_IF_MEASUREMENT, 0);
         radio_set(RADIO_SENSITIVITY, 0);
         radio_set(RADIO_FORCE_MONO, global_settings.fm_force_mono);
+        mute_timeout = current_tick + (1*HZ);
+        while( !radio_get(RADIO_STEREO)
+             &&!radio_get(RADIO_TUNED) )
+        {
+            if(TIME_AFTER(current_tick, mute_timeout))
+                 break;
+            yield();
+        }
         radio_set(RADIO_MUTE, 0);
         radio_status = FMRADIO_PLAYING;
     }
@@ -429,6 +439,11 @@ bool radio_screen(void)
             button = button_get(false);
         else
             button = button_get_w_tmo(HZ / PEAK_METER_FPS);
+        if (button != BUTTON_NONE)
+        {
+            cpu_idle_mode(false);
+            button_timeout = current_tick + (2*HZ);
+        }
         switch(button)
         {
 #ifdef FM_RC_STOP
@@ -603,6 +618,14 @@ bool radio_screen(void)
                 {
                      radio_set(RADIO_SLEEP, 0);
                      radio_set(RADIO_FREQUENCY, curr_freq);
+                     mute_timeout = current_tick + (2*HZ);
+                     while( !radio_get(RADIO_STEREO)
+                          &&!radio_get(RADIO_TUNED) )
+                     {
+                         if(TIME_AFTER(current_tick, mute_timeout))
+                             break;
+                         yield();
+                     }
                      radio_set(RADIO_MUTE, 0);
                      radio_status = FMRADIO_PLAYING;
                 }
@@ -731,7 +754,7 @@ bool radio_screen(void)
             default:
                 default_event_handler(button);
                 break;
-        }
+        } /*switch(button)*/
 
         if (button != BUTTON_NONE)
             lastbutton = button;
@@ -842,7 +865,11 @@ bool radio_screen(void)
         {
             done = true;
         }
-    }
+        if (TIME_AFTER(current_tick, button_timeout))
+       	{
+       		cpu_idle_mode(true);
+       	}
+    } /*while(!done)*/
 
 #ifndef SIMULATOR
     if(audio_status() & AUDIO_STATUS_ERROR)
