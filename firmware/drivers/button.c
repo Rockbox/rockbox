@@ -128,7 +128,6 @@ static int ipod_4g_button_read(void)
     static int clickwheel_down = 0;
     static int old_wheel_value = -1;
     int wheel_keycode = BUTTON_NONE;
-    int wheel_delta, wheel_delta_abs;
     int new_wheel_value;
     int btn = BUTTON_NONE;
     
@@ -162,17 +161,16 @@ static int ipod_4g_button_read(void)
                 clickwheel_down = 1;
                 backlight_on();
                 if (old_wheel_value != -1) {
-                    wheel_delta = new_wheel_value - old_wheel_value;
-                    wheel_delta_abs = wheel_delta < 0 ? -wheel_delta 
-                                                      : wheel_delta;
-                    
-                    if (wheel_delta_abs > 48) {
-                        if (old_wheel_value > new_wheel_value)
-                            /* wrapped around the top going clockwise */
-                            wheel_delta += 96;
-                        else if (old_wheel_value < new_wheel_value)
-                            /* wrapped around the top going counterclockwise */                             wheel_delta -= 96;
+                    int wheel_delta;
+                    if (old_wheel_value > new_wheel_value + 48) {
+                        /* Forward wrapping case */
+                        wheel_delta = new_wheel_value + 96 - old_wheel_value;
+                    } else {
+                        wheel_delta = new_wheel_value - old_wheel_value;
+                        if (wheel_delta > 48)
+                            wheel_delta -= 96; /* Backward wrapping case */
                     }
+
                     /* TODO: these thresholds should most definitely be
                        settings, and we're probably going to want a more
                        advanced scheme than this anyway. */
