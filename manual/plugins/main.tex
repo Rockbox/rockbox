@@ -7,12 +7,7 @@ PLAY on them to start them.
 
 Viewer plugins get started automatically by
 ``playing'' an associated file (i.e. text
-files, chip8 games), or from the ``Open with'' option on the File menu.
-
-Plugins listed here have the platforms they run under (Player for
-Jukebox players, Recorder for Jukebox recorders including Jukebox FM,
-and Ondio for the Ondio SP and FM).  If no platforms are listed then
-the plugin runs on all Rockbox platforms.\\
+files, chip8 games), or from the ``Open with'' option on the File menu.\\
 
 \textbf{The plugin loader}
 Only one plugin can be loaded at a time. Plugins run in the GUI thread
@@ -23,6 +18,8 @@ will carry on playing whilst plugins are being run.
 
 \section{Games}
 See also the Chip{}-8 emulator on page \pageref{ref:Chip8emulator}.
+
+\opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodcolor,ipodnano}{\input{plugins/bejeweled.tex}}
 
 \opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodcolor,ipodnano}{\input{plugins/flipit.tex}}
 
@@ -77,7 +74,7 @@ the associated file.  Viewers are stored in the
 
 \opt{recorder,recorderv2fm,ondio}{\input{plugins/chip8emulator.tex}}
 
-\opt{recorder,recorderv2fm,ondio,h1xx}{\input{plugins/jpegviewer.tex}}
+\opt{recorder,recorderv2fm,ondio,h1xx,h300}{\input{plugins/jpegviewer.tex}}
 
 \opt{recorder,recorderv2fm,ondio}{\input{plugins/movieplayer.tex}}
 
