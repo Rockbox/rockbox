@@ -333,7 +333,7 @@ static int pcm_freq = 0x6; /* 44.1 is default */
 /* NOTE: The order of these two variables is important if you use the iPod
    assembler optimised fiq handler, so don't change it. */
 unsigned short* p IBSS_ATTR;
-long p_size IBSS_ATTR;
+size_t p_size IBSS_ATTR;
 
 static void dma_start(const void *addr, size_t size)
 {
@@ -751,31 +751,41 @@ size_t pcm_get_bytes_waiting(void)
  * every tenth sample would still be pretty accurate).
  */
 
-#define PEAK_SAMPLES  (44100*2/HZ)  /* 44100 samples * 2 / 100 Hz tick */
-#define PEAK_STRIDE   3       /* every 3rd sample is plenty... */
+/* Check for a peak every PEAK_STRIDE samples */
+#define PEAK_STRIDE   3
+/* Up to 1/50th of a second of audio for peak calculation */
+/* This should use NATIVE_FREQUENCY, or eventually an adjustable freq. value */
+#define PEAK_SAMPLES  (44100/50)
 
 void pcm_calculate_peaks(int *left, int *right)
 {
+    short *addr;
+    short *end;
+    {
 #ifdef HAVE_UDA1380
-    long samples = (BCR0 & 0xffffff) / 4;
-    short *addr = (short *) (SAR0 & ~3);
+        size_t samples = (BCR0 & 0xffffff) / 4;
+        addr = (short *) (SAR0 & ~3);
 #elif defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_WM8731)
-    long samples = p_size / 4;
-    short *addr = p;
+        size_t samples = p_size / 4;
+        addr = p;
 #elif defined(HAVE_TLV320)
-    long samples = 4;  /* TODO X5 */
-    short *addr = NULL;
+        size_t samples = 4;  /* TODO X5 */
+        addr = NULL;
 #endif
 
-    if (samples > PEAK_SAMPLES)
-        samples = PEAK_SAMPLES;
+        if (samples > PEAK_SAMPLES)
+            samples = PEAK_SAMPLES - (PEAK_STRIDE - 1);
+        else
+            samples -= MIN((PEAK_STRIDE - 1), samples);
 
-    samples /= PEAK_STRIDE;
+        end = addr + samples * 4;
+    }
 
     if (left && right) {
-        int left_peak = 0, right_peak = 0, value;    
+        int left_peak = 0, right_peak = 0;
 
-        while (samples--) {
+        while (addr < end) {
+            int value;
             if ((value = addr [0]) > left_peak)
                 left_peak = value;
             else if (-value > left_peak)
@@ -798,7 +808,7 @@ void pcm_calculate_peaks(int *left, int *right)
         if (right)
             addr += (PEAK_STRIDE | 1);
 
-        while (samples--) {
+        while (addr < end) {
             if ((value = addr [0]) > peak_value)
                 peak_value = value;
             else if (-value > peak_value)
