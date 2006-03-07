@@ -30,6 +30,10 @@
 #include "string.h"
 #include "hwcompat.h"
 
+#ifdef TARGET_TREE
+#include "ata-target.h"
+#endif
+
 #define SECTOR_SIZE     (512)
 
 #if (CONFIG_CPU == MCF5249) || (CONFIG_CPU == MCF5250)
@@ -67,6 +71,11 @@
 #define READ_PATTERN2 0x5a00
 #define READ_PATTERN3 0xaa00
 #define READ_PATTERN4 0x5500
+
+#define READ_PATTERN1_MASK 0xff00
+#define READ_PATTERN2_MASK 0xff00
+#define READ_PATTERN3_MASK 0xff00
+#define READ_PATTERN4_MASK 0xff00
 
 #define SET_REG(reg,val) reg = ((val) << 8)
 #define SET_16BITREG(reg,val) reg = (val)
@@ -111,6 +120,11 @@
 #define READ_PATTERN3 0xaa
 #define READ_PATTERN4 0x55
 
+#define READ_PATTERN1_MASK 0xff
+#define READ_PATTERN2_MASK 0xff
+#define READ_PATTERN3_MASK 0xff
+#define READ_PATTERN4_MASK 0xff
+
 #define SET_REG(reg,val) reg = (val)
 #define SET_16BITREG(reg,val) reg = (val)
 
@@ -149,6 +163,11 @@
 #define READ_PATTERN2 0x5a
 #define READ_PATTERN3 0xaa
 #define READ_PATTERN4 0x55
+
+#define READ_PATTERN1_MASK 0xff
+#define READ_PATTERN2_MASK 0xff
+#define READ_PATTERN3_MASK 0xff
+#define READ_PATTERN4_MASK 0xff
 
 #define SET_REG(reg,val) reg = (val)
 #define SET_16BITREG(reg,val) reg = (val)
@@ -207,6 +226,10 @@
 #define READ_PATTERN3 0xaa
 #define READ_PATTERN4 0x55
 
+#define READ_PATTERN1_MASK 0xff
+#define READ_PATTERN2_MASK 0xff
+#define READ_PATTERN3_MASK 0xff
+#define READ_PATTERN4_MASK 0xff
 
 static unsigned char ide_sector_data[SECTOR_SIZE] __attribute__ ((section(".idata")));
 static unsigned ide_reg_temp __attribute__ ((section(".idata")));
@@ -279,6 +302,11 @@ int ide_read_register(int reg) {
 #define READ_PATTERN2 0x5a
 #define READ_PATTERN3 0xaa
 #define READ_PATTERN4 0x55
+
+#define READ_PATTERN1_MASK 0xff
+#define READ_PATTERN2_MASK 0xff
+#define READ_PATTERN3_MASK 0xff
+#define READ_PATTERN4_MASK 0xff
 
 #define SET_REG(reg,val) reg = (val)
 #define SET_16BITREG(reg,val) reg = (val)
@@ -986,13 +1014,12 @@ static int check_registers(void)
       SET_REG(ATA_LCYL,    WRITE_PATTERN3);
       SET_REG(ATA_HCYL,    WRITE_PATTERN4);
       
-      if ((ATA_NSECTOR == READ_PATTERN1) &&
-          (ATA_SECTOR  == READ_PATTERN2) &&
-          (ATA_LCYL    == READ_PATTERN3) &&
-          (ATA_HCYL    == READ_PATTERN4))
+      if (((ATA_NSECTOR & READ_PATTERN1_MASK) == READ_PATTERN1) &&
+          ((ATA_SECTOR & READ_PATTERN2_MASK) == READ_PATTERN2) &&
+          ((ATA_LCYL & READ_PATTERN3_MASK) == READ_PATTERN3) &&
+          ((ATA_HCYL & READ_PATTERN4_MASK) == READ_PATTERN4))
         return 0;
     }
-
     return -2;
 #endif
 }
@@ -1143,7 +1170,9 @@ int ata_hard_reset(void)
 {
     int ret;
 
-#if CONFIG_CPU == SH7034
+#ifdef TARGET_TREE
+    ata_reset();
+#elif CONFIG_CPU == SH7034
     /* state HRR0 */
     and_b(~0x02, &PADRH); /* assert _RESET */
     sleep(1); /* > 25us */
@@ -1157,8 +1186,6 @@ int ata_hard_reset(void)
 
     or_l(0x00080000, &GPIO_OUT);
     sleep(1); /* > 25us */
-#elif defined(IAUDIO_X5)
-    /* X5 TODO */
 #elif CONFIG_CPU == TCC730
 
     P6 &= ~0x40;
@@ -1285,6 +1312,7 @@ static void io_address_detect(void)
 }
 #endif
 
+#ifndef TARGET_TREE
 void ata_enable(bool on)
 {
 #if CONFIG_CPU == SH7034
@@ -1302,9 +1330,6 @@ void ata_enable(bool on)
     
     or_l(0x00040000, &GPIO_ENABLE);
     or_l(0x00040000, &GPIO_FUNCTION);
-#elif defined(IAUDIO_X5)
-    /* X5 TODO */
-    (void)on;
 #elif CONFIG_CPU == TCC730
 
 #elif (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
@@ -1312,6 +1337,7 @@ void ata_enable(bool on)
     (void)on;
 #endif
 }
+#endif
 
 static int identify(void)
 {
@@ -1456,13 +1482,12 @@ static int init_and_check(bool hard_reset)
 int ata_init(void)
 {
     int rc;
-#if CONFIG_CPU == TCC730
+#ifdef TARGET_TREE
+    bool coldstart = ata_is_coldstart();
+#elif CONFIG_CPU == TCC730
     bool coldstart = (P1 & 0x80) == 0;
 #elif defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
     bool coldstart = (GPIO_FUNCTION & 0x00080000) == 0;
-#elif defined(IAUDIO_X5)
-    /* X5 TODO */
-    bool coldstart = true;
 #elif (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
     bool coldstart = false;
     /* TODO: Implement coldstart variable */
@@ -1477,7 +1502,9 @@ int ata_init(void)
 
     ata_led(false);
 
-#if CONFIG_CPU == SH7034
+#ifdef TARGET_TREE
+    ata_device_init();
+#elif CONFIG_CPU == SH7034
     /* Port A setup */
     or_b(0x02, &PAIORH); /* output for ATA reset */
     or_b(0x02, &PADRH); /* release ATA reset */
