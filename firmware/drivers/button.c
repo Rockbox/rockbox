@@ -124,28 +124,22 @@ static void opto_i2c_init(void)
 
 static int ipod_4g_button_read(void)
 {
-    unsigned reg, status;
-    static int clickwheel_down = 0;
-    static int old_wheel_value = -1;
-    int wheel_keycode = BUTTON_NONE;
-    int new_wheel_value;
-    int btn = BUTTON_NONE;
-    
     /* The ipodlinux source had a udelay(250) here, but testing has shown that
        it is not needed - tested on Nano, Color/Photo and Video. */
     /* udelay(250);*/
 
-    reg = 0x7000c104;
+    int btn = BUTTON_NONE;
+    unsigned reg = 0x7000c104;
     if ((inl(0x7000c104) & 0x4000000) != 0) {
-        reg = reg + 0x3C;   /* 0x7000c140 */
+        unsigned status = inl(0x7000c140);
 
-        status = inl(0x7000c140);
-        outl(0x0, 0x7000c140);  /* clear interrupt status? */
+        reg = reg + 0x3C;      /* 0x7000c140 */
+        outl(0x0, 0x7000c140); /* clear interrupt status? */
 
         if ((status & 0x800000ff) == 0x8000001a) {
-            /* NB: highest wheel = 0x5F, clockwise increases */
-            new_wheel_value = ((status << 9) >> 25) & 0xff;
-
+            static int clickwheel_down IDATA_ATTR = 0;
+            static int old_wheel_value IDATA_ATTR = -1;
+            
             if (status & 0x100)
                 btn |= BUTTON_SELECT;
             if (status & 0x200)
@@ -157,10 +151,14 @@ static int ipod_4g_button_read(void)
             if (status & 0x1000)
                 btn |= BUTTON_MENU;
             if (status & 0x40000000) {
+                /* NB: highest wheel = 0x5F, clockwise increases */
+                int new_wheel_value = ((status << 9) >> 25) & 0xff;
+
                 /* scroll wheel down */
                 clickwheel_down = 1;
                 backlight_on();
-                if (old_wheel_value != -1) {
+                if (old_wheel_value >= 0) {
+                    int wheel_keycode = BUTTON_NONE;
                     int wheel_delta;
                     if (old_wheel_value > new_wheel_value + 48) {
                         /* Forward wrapping case */
