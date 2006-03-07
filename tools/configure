@@ -714,6 +714,11 @@ toolsdir='\$(ROOTDIR)/tools'
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$iaudiobitmaptools"
+
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="coldfire"
+    t_manufactorer="iaudio"
+    t_model="x5"
     ;;
 
    13)
@@ -1075,6 +1080,13 @@ sed > autoconf.h \
 #endif /* __BUILD_AUTOCONF_H */
 EOF
 
+if test -n "$t_cpu"; then
+  TARGET_INC="-I\$(FIRMDIR)/target/$t_cpu/$t_manufactorer/$t_model"
+  TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu/$t_manufactorer"
+  TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu"
+  GCCOPTS="$GCCOPTS -DTARGET_TREE"
+fi
+
 if test "$simulator" = "yes"; then
   # add simul make stuff on the #SIMUL# line
   simmagic1="s,@SIMUL1@,@\$(MAKE) -C \$(SIMDIR) OBJDIR=\$(BUILDDIR)/sim,"
@@ -1116,6 +1128,7 @@ sed > Makefile \
  -e "s,@CODECS@,${codecs},g" \
  -e "s,@PROFILE_OPTS@,${PROFILE_OPTS},g" \
  -e "s,@GCCOPTS@,${GCCOPTS},g" \
+ -e "s,@TARGET_INC@,${TARGET_INC},g" \
  -e "s!@LDOPTS@!${LDOPTS}!g" \
  -e "s,@LOADADDRESS@,${loadaddress},g" \
  -e "s,@EXTRADEF@,${extradefines},g" \
@@ -1178,6 +1191,7 @@ export DLLWRAP=@DLLWRAP@
 export RANLIB=@RANLIB@
 export PROFILE_OPTS=@PROFILE_OPTS@
 export GCCOPTS=@GCCOPTS@
+export TARGET_INC=@TARGET_INC@
 export LOADADDRESS=@LOADADDRESS@
 export SIMVER=@SIMVER@
 export SIMDIR=\$(ROOTDIR)/uisimulator/\$(SIMVER)

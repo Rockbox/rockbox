@@ -7,7 +7,7 @@
 # $Id$
 #
 
-INCLUDES=-Iinclude -I$(FIRMDIR) -Iexport -Icommon -Idrivers -I$(BUILDDIR)
+INCLUDES=$(TARGET_INC) -Iinclude -I$(FIRMDIR) -Iexport -Icommon -Idrivers -I$(BUILDDIR)
 
 CFLAGS = $(INCLUDES) $(GCCOPTS) $(TARGET) $(BUILDDATE) $(EXTRA_DEFINES) \
  -DMEM=${MEMORYSIZE}

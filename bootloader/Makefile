@@ -7,7 +7,7 @@
 # $Id$
 #
 
-INCLUDES= -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I. -I$(OBJDIR)	\
+INCLUDES= $(TARGET_INC) -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I. -I$(OBJDIR)	\
  -I$(BUILDDIR)
 
 DEPFILE = $(OBJDIR)/dep-bootloader
