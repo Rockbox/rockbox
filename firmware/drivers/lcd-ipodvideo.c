@@ -131,8 +131,6 @@ static unsigned lcd_bcm_read32(unsigned address) {
     return inw(0x30000000) | inw(0x30000000) << 16;
 }
 
-extern void _HD_ARM_Update5G (fb_data *fb, int x, int y, int w, int h);
-
 /* Update a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height) ICODE_ATTR;
 void lcd_update_rect(int x, int y, int width, int height)
