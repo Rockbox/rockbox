@@ -137,28 +137,21 @@ extern void _HD_ARM_Update5G (fb_data *fb, int x, int y, int w, int h);
 void lcd_update_rect(int x, int y, int width, int height) ICODE_ATTR;
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    int rect1,rect2,rect3,rect4;
-    int newx,newwidth;
-    int count;
-    int c, r;
-    unsigned int data;
-    unsigned short *src;
     static int finishup_needed = 0;
 
-    /* Ensure x and width are both even - so we can read 32-bit aligned 
-       data from lcd_framebuffer */
-    newx=x&~1;
-    newwidth=width&~1;
-    if (newx+newwidth < x+width) { newwidth+=2; }
-    x=newx; width=newwidth;
-
-    /* calculate the drawing region */
-    rect1 = x;                         /* start horiz */
-    rect2 = y;                         /* start vert */
-    rect3 = (x + width) - 1;           /* max horiz */
-    rect4 = (y + height) - 1;          /* max vert */
+    {
+        int endy = x + width;
+        /* Ensure x and width are both even - so we can read 32-bit aligned 
+           data from lcd_framebuffer */
+        x &= ~1;
+        width &= ~1;
+        if (x + width < endy) {
+            width += 2;
+        }
+    }
 
     if (finishup_needed) {
+        unsigned int data;
         /* Bottom-half of original lcd_bcm_finishup() function */
         do {
             /* This function takes about 14ms to execute - so we yield() */
@@ -169,12 +162,18 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     lcd_bcm_read32(0x1FC);
 
+    {
+        int rect1, rect2, rect3, rect4;
+        int count = (width * height) << 1;
+        /* calculate the drawing region */
+        rect1 = x;                         /* start horiz */
+        rect2 = y;                         /* start vert */
+        rect3 = (x + width) - 1;           /* max horiz */
+        rect4 = (y + height) - 1;          /* max vert */
 
-    /* setup the drawing region */
-    count=(width * height) << 1;
-    lcd_bcm_setup_rect(0x34, rect1, rect2, rect3, rect4, count);
-
-    src = (unsigned short*)&lcd_framebuffer[y][x];
+        /* setup the drawing region */
+        lcd_bcm_setup_rect(0x34, rect1, rect2, rect3, rect4, count);
+    }
 
     /* write out destination address as two 16bit values */
     outw((0xE0020 & 0xffff), 0x30010000);
@@ -183,14 +182,20 @@ void lcd_update_rect(int x, int y, int width, int height)
     /* wait for it to be write ready */
     while ((inw(0x30030000) & 0x2) == 0);
 
-    for (r = 0; r < height; r++) {
-        /* for each column */
-        for (c = 0; c < width; c+=2) {
-            /* write out two pixels */
-            outw(*(src++), 0x30000000);
-            outw(*(src++), 0x30000000);
+    {
+        int r;
+        int line_size = (LCD_WIDTH - width);
+        unsigned short *src = (unsigned short*)&lcd_framebuffer[y][x];
+        for (r = 0; r < height; r++) {
+            /* for each column */
+            unsigned short *end = src + width;
+            while (src < end) {
+                /* write out two pixels */
+                outw(*(src++), 0x30000000);
+                outw(*(src++), 0x30000000);
+            }
+            src += line_size;
         }
-        src += (LCD_WIDTH - width);
     }
 
     /* Top-half of original lcd_bcm_finishup() function */
